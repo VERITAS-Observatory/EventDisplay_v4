@@ -1092,6 +1092,39 @@ unsigned int VEvndispData::getDead( unsigned int iChannel, bool iLowGain = false
 	return getDead( false )[iChannel];
 }
 
+double VEvndispData::getAverageElevation()
+{
+   double iAverageElevation = 0.;
+// for MC: return average elevation from CORSIKA
+   if( isMC() )
+   {
+       if( getReader() && getReader()->getMonteCarloHeader() )
+       {
+           iAverageElevation = 0.5 * (getReader()->getMonteCarloHeader()->alt_range[0]+getReader()->getMonteCarloHeader()->alt_range[1]);
+           iAverageElevation *= TMath::RadToDeg();
+       }
+   }
+// for data: loop over run and calculate average elevation
+   else
+   {
+       double iN = 0.;
+       double ze  = 0.;
+       double az = 0.;
+       for( float i = getRunParameter()->fDBDataStartTimeSecOfDay; i < getRunParameter()->fDBDataStoppTimeSecOfDay; i++ )
+       {
+           VSkyCoordinatesUtilities::getHorizontalCoordinates( getRunParameter()->fDBDataStartTimeMJD, i,
+                                                               getRunParameter()->fTargetDec, getRunParameter()->fTargetRA,
+                                                               az, ze);
+           iAverageElevation += 90. - ze;
+           iN++;
+       }
+       if( iN > 0. ) iAverageElevation /= iN;
+       else          iAverageElevation = 0.;
+   }
+
+   return iAverageElevation;
+}
+
 ////////////////////////////////
 // initialize static variables
 

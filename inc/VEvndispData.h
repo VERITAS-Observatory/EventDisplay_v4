@@ -187,10 +187,6 @@ class VEvndispData
 		{
 			return fAnaData[itelID]->fAnaHistos;
 		}
-		VEvndispReconstructionParameter* getArrayAnalysisCuts()
-		{
-			return fEvndispReconstructionParameter;    // kept for backwards compatibility
-		}
 		VEvndispReconstructionParameter* getEvndispReconstructionParameter()
 		{
 			return fEvndispReconstructionParameter;
@@ -203,6 +199,7 @@ class VEvndispData
 		{
 			return fAnalysisTelescopeEventStatus;
 		}
+                double getAverageElevation();
 		vector<bool>&       getBorder()
 		{
 			return fAnaData[fTelID]->fBorder;

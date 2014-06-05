@@ -416,21 +416,36 @@ double VSkyCoordinatesUtilities::angularDistance( double Az, double Ze, double T
 
 void VSkyCoordinatesUtilities::getEquatorialCoordinates( int MJD, double time, double az_deg, double ze_deg, double& dec_deg, double& ra_deg )
 {
-	double ha = 0.;
+	// convert time to fraction of a day
+	double iTime = time / 86400.;
 	// transform coordinates
+	double ha = 0.;
 	slaDh2e( az_deg * TMath::DegToRad(), ( 90. - ze_deg ) * TMath::DegToRad(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &ha, &dec_deg );
 	// convert hour angle into ra
-	double iTime = 0.;
-	double iSid = 0.;
-	// convert time to fraction of a day
-	iTime = time / 86400.;
 	// get Greenwich sideral time
-	iSid = slaGmsta( ( double )MJD, iTime );
+	double iSid = slaGmsta( ( double )MJD, iTime );
 	// calculate local sideral time
 	iSid = iSid - VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad();
 	// calculate right ascension
 	ra_deg = slaDranrm( iSid - ha );
-	
+	// from [rad] to [deg]
 	dec_deg *= TMath::RadToDeg();
 	ra_deg  *= TMath::RadToDeg();
+}
+
+void VSkyCoordinatesUtilities::getHorizontalCoordinates( int MJD, double time, double dec_deg, double ra_deg, double& az_deg, double& ze_deg )
+{
+	// convert time to fraction of a day
+	double iTime = time / 86400.;
+	// get Greenwich sideral time
+	double iSid = slaGmsta( ( double )MJD, iTime );
+	// calculate local sideral time
+	iSid = iSid - VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad();
+	// calculate hour angle
+	double ha = slaDranrm( iSid - ra_deg * TMath::DegToRad() );
+	// get horizontal coordinates
+	slaDe2h( ha, dec_deg * TMath::DegToRad(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &az_deg, &ze_deg );
+	// from [rad] to [deg]
+	ze_deg = 90 - ze_deg * TMath::RadToDeg();
+	az_deg *= TMath::RadToDeg();
 }

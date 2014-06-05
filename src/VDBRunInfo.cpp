@@ -1,8 +1,6 @@
 /*! \class VDBRunInfo
     \brief get run info from DB
 
-
-    \author Gernot Maier
 */
 
 #include "VDBRunInfo.h"
@@ -176,10 +174,12 @@ unsigned int VDBRunInfo::readRunDQM( string iDBserver, int run_number , unsigned
 		bitset<4> bitNewConfig = bitConfig & bitNDQM;
 		
 		for( int i = 0; i < ( int )bitNewConfig.size(); i++ )
+                {
 			if( bitNewConfig.test( i ) )
 			{
 				ConfigMaskNew += ( unsigned int )pow( 2., i );
 			}
+                }
 			
 			
 		config_mask = ConfigMaskNew;
@@ -330,8 +330,8 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 	double imjd = 0.;
 	int j = 0;
 	int iy = iStarttime / 10000;
-	int im = ( iStarttime - ( iStarttime / 10000 ) * 10000 ) / 100;
-	int id = ( iStarttime - ( iStarttime / 100 ) * 100 );
+	int im = ( iStarttime - iy * 10000 ) / 100;
+	int id = iStarttime - iy * 10000 - im * 100;
 	if( iStarttime > 0 )
 	{
 		slaCldj( iy, im, id, &imjd, &j );
@@ -342,8 +342,8 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 	}
 	fDataStartTimeMJD = imjd;
 	iy = iStopptime / 10000;
-	im = ( iStopptime - ( iStopptime / 10000 ) * 10000 ) / 100;
-	id = ( iStopptime - ( iStopptime / 100 ) * 100 );
+	im = ( iStopptime - iy * 10000 ) / 100;
+	id = iStopptime - iy * 10000 - im * 100;
 	if( iStopptime > 0 )
 	{
 		slaCldj( iy, im, id, &imjd, &j );

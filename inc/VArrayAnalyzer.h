@@ -73,6 +73,7 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
 		bool fillShowerDirection( unsigned int iMeth, float xoff, float yoff, float stds );
 		bool fillShowerCore( unsigned int iMeth, float ximp, float yimp ); //!< fill shower core results into VEvndispData
 		double getMeanPointingMismatch( unsigned int iTel );
+                string getTMVAFileNameForAngularReconstruction( unsigned int iStereoMethodID );
 		void initEvent();                         //!< reset vectors, etc. (called for each event)
 		int  rcs_method_0( unsigned int );        //!< GrIsu reconstruction method 1(!)
 		int  rcs_method_3( unsigned int );

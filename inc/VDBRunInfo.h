@@ -47,8 +47,6 @@ class VDBRunInfo
 		double fWobbleNorth;
 		double fWobbleEast;
 		unsigned int fConfigMask;
-		//unsigned int fConfigMaskDQM;
-		//unsigned int fConfigMaskNew;
 		unsigned int fTelToAna;
 		string fRunType;
 		string fObservingMode;

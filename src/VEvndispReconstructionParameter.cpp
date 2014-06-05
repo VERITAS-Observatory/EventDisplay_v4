@@ -8,10 +8,6 @@
 
     there should be one instance per reconstruction method of this class
 
-
-    \author
-    Gernot Maier
-
 */
 
 #include "VEvndispReconstructionParameter.h"
@@ -374,7 +370,10 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
 	fNImages_min.push_back( 2 );
 	fAxesAngles_min.push_back( 0. );
 	fMLPFileName.push_back( "" );
-	fTMVAFileName.push_back( "" );
+        vector< string > i_temp_string;
+	fTMVAFileName.push_back( i_temp_string );
+        vector< double > i_temp_double;
+        fMTVAZenithBin.push_back( i_temp_double );
 	fDispFileName.push_back( "" );
 	fMODDISP_MinAngleForDisp.push_back( 25. );
 	fMODDISP_MinAngleExpFactor.push_back( 0.02 );
@@ -540,7 +539,15 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
 		}
 		if( fTMVAFileName[m].size() > 0 )
 		{
-			cout << "\t\t TMVA (BDT) file: " << fTMVAFileName[m] << endl;
+                        for( unsigned int ze = 0; ze < fTMVAFileName[m].size(); ze++ )
+                        {
+                            if( fTMVAFileName[m][ze].size() > 0 )
+                            {
+                                cout << "\t\t TMVA (BDT) file for zenith angle ";
+                                cout << fMTVAZenithBin[m][ze] << " deg: ";
+                                cout << fTMVAFileName[m][ze] << endl;
+                            }
+                        }
 		}
 		if( fDispFileName[m].size() > 0 )
 		{
@@ -1125,7 +1132,11 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 			}
 			else if( iTemp == "TMVABDTFILE" )
 			{
-				fTMVAFileName[m_temp] = iTemp2;
+                                fMTVAZenithBin[m_temp].push_back( atof( iTemp2.c_str() ) );
+                                if( iTemp3.size() > 0 )
+                                {
+                                    fTMVAFileName[m_temp].push_back( iTemp3 );
+                                }
 			}
 			else if( iTemp == "DISPFILE" )
 			{

@@ -1,7 +1,6 @@
 /*!  \class VEventLoop
   \brief  main event loop, steering of analysis and event display
 
-  \author Gernot Maier
 */
 
 #include "VEventLoop.h"
@@ -121,7 +120,7 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	// Frogs Stuff
 	fFrogs = new VFrogs();
 #endif
-	fModel3D = new VModel3D();  //JG-NEW
+	fModel3D = new VModel3D();
 	if( fRunPar->fUseModel3D && fRunPar->fCreateLnLTable )
 	{
 		fModel3D->createLnLTable();
@@ -1372,9 +1371,9 @@ int VEventLoop::analyzeEvent()
 			fArrayAnalyzer->doAnalysis();
 			if( fRunPar->fUseModel3D && fReader->hasArrayTrigger() )
 			{
-				fModel3D->doModel3D();    //JG
+				fModel3D->doModel3D();
 			}
-			// GH Frogs Analysis
+			// Frogs Analysis
 #ifndef NOGSL
 			if( fRunPar->ffrogsmode )
 			{

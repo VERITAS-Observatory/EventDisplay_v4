@@ -2,6 +2,15 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140606 (GM)
+some code cleaning in VSkyCoordinates
+
+* 20140606 (GM)
+added zenith angle selection to DISP method
+
+* 20140606 (GM)
+bug fix in VDBRunInfo: MJD for run start and stop was not calculated correctly
+
 * 20140531 (GM)
 bug fix: analysis of old runs with 0 run duration let to seg fault in 
 dead time calculation

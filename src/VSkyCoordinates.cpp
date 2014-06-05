@@ -1,9 +1,6 @@
 /*! \class VSkyCoordinates
     \brief handle telescope pointing direction and target positions
 
-
-    \author
-       Gernot Maier
 */
 
 #include "VSkyCoordinates.h"
@@ -166,50 +163,26 @@ bool VSkyCoordinates::setTarget( string iTargetName )
 
     calculate azimuth and elevation of telescope pointing direction
     calculate azimuth and elevation of target
-
  */
 void VSkyCoordinates::updatePointing( int MJD, double time )
 {
 	fMJD = ( unsigned int )MJD;
 	fTime = time;
 	
-	double iTime = 0.;
-	double ha = 0.;
-	double iSid = 0.;
 	double az = 0.;
 	double el = 0.;
-	// convert time to fraction of a day
-	iTime = time / 86400.;
-	// get Greenwich sideral time
-	iSid = slaGmsta( ( double )MJD, iTime );
-	// calculate local sideral time
-	iSid = iSid - fObsLongitude;
-	// calculate hour angle
-	ha = slaDranrm( iSid - fTelRA );
-	// get horizontal coordinates
-	slaDe2h( ha, fTelDec, fObsLatitude, &az, &el );
-	// from [rad] to [deg]
-	el *= TMath::RadToDeg();
-	az *= TMath::RadToDeg();
-	
+
 	// telescope elevation/azimuth calculated from source coordinates and time
+        VSkyCoordinatesUtilities::getHorizontalCoordinates( MJD, time, fTelDec*TMath::RadToDeg(), fTelRA*TMath::RadToDeg(), az, el );
+        el = 90. - el;
 	fTelAzimuthCalculated   = ( float )az;
 	fTelElevationCalculated = ( float )el;
 	fTelElevation = fTelElevationCalculated;
 	fTelAzimuth   = fTelAzimuthCalculated;
 	
-	//////////////////////////////////////////////////
 	// set target azimuth/elevation
-	
-	// calculate hour angle
-	ha = slaDranrm( iSid - fTargetRA );
-	// get horizontal coordinates
-	fTargetAzimuth = 0.;
-	fTargetElevation = 0.;
-	slaDe2h( ha, fTargetDec, fObsLatitude, &fTargetAzimuth, &fTargetElevation );
-	fTargetAzimuth   *= TMath::RadToDeg();
-	fTargetElevation *= TMath::RadToDeg();
-	
+        VSkyCoordinatesUtilities::getHorizontalCoordinates( MJD, time, fTargetDec*TMath::RadToDeg(), fTargetRA*TMath::RadToDeg(), fTargetAzimuth, fTargetElevation );
+	fTargetElevation = 90. - fTargetElevation;
 }
 
 /*

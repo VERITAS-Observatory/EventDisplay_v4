@@ -6,8 +6,6 @@
 
      this class is also taking care of filling the showerpars tree correctly
 
-    \author
-      Gernot Maier
 */
 
 #include "VArrayAnalyzer.h"
@@ -422,9 +420,12 @@ void VArrayAnalyzer::initAnalysis()
 			{
 				fDispAnalyzer.push_back( new VDispAnalyzer() );
 				fDispAnalyzer.back()->setTelescopeTypeList( getDetectorGeometry()->getTelType_list() );
-				if( !fDispAnalyzer.back()->initialize( getEvndispReconstructionParameter()->fTMVAFileName[i], "TMVABDT" ) )
+				if( !fDispAnalyzer.back()->initialize( getTMVAFileNameForAngularReconstruction( i ), "TMVABDT" ) )
 				{
-					exit( -1 );
+                                        cout << "VArrayAnalyzer::initAnalysis() error initializing MVA-BDT" << endl;
+                                        cout << "\t file " << getTMVAFileNameForAngularReconstruction( i ) << endl;
+                                        cout << "exiting..." << endl;
+					exit( EXIT_FAILURE );
 				}
 			}
 			else if( getEvndispReconstructionParameter()->fMethodID[i] == 6 ||
@@ -436,11 +437,15 @@ void VArrayAnalyzer::initAnalysis()
 				fDispAnalyzer.push_back( new VDispAnalyzer() );
 				fDispAnalyzer.back()->setTelescopeTypeList( getDetectorGeometry()->getTelType_list() );
 				// initialize disp method
-				if( getEvndispReconstructionParameter()->fTMVAFileName[i].size() > 0 )
+                                string iMVAFileName = getTMVAFileNameForAngularReconstruction( i );
+				if( iMVAFileName.size() > 0 )
 				{
-					if( !fDispAnalyzer.back()->initialize( getEvndispReconstructionParameter()->fTMVAFileName[i], "TMVABDT" ) )
+					if( !fDispAnalyzer.back()->initialize( iMVAFileName, "TMVABDT" ) )
 					{
-						exit( -1 );
+                                                cout << "VArrayAnalyzer::initAnalysis() error initializing MVA-BDT" << endl;
+                                                cout << "\t file " << iMVAFileName << endl;
+                                                cout << "exiting..." << endl;
+						exit( EXIT_FAILURE );
 					}
 				}
 				else if( getEvndispReconstructionParameter()->fDispFileName[i].size() > 0 )
@@ -2311,4 +2316,42 @@ void VArrayAnalyzer::updatePointingToArbitraryTime( int iMJD, double iTime )
 		
 	}
 	
+}
+
+/*
+ * return TMVA file for angular reconstruction
+ *
+ * return file with zenith angle closest to the simulated ones
+ *
+ */
+string VArrayAnalyzer::getTMVAFileNameForAngularReconstruction( unsigned int iStereoMethodID )
+{
+    string iName = "";
+
+// use cos(ze) to determine the closest ze bin
+    double iAverageZenith = cos( (90.-getAverageElevation()) * TMath::DegToRad() );
+
+// loop over all zenith angles and files given in the reconstructionparameter file
+    if( getEvndispReconstructionParameter() && iStereoMethodID < getEvndispReconstructionParameter()->fMTVAZenithBin.size() )
+    {
+        unsigned int iBinSelected = 0;
+        double iDiff = 1.e20;
+        for( unsigned int i = 0; i < getEvndispReconstructionParameter()->fMTVAZenithBin[iStereoMethodID].size(); i++ )
+        {
+            double iZe = cos( getEvndispReconstructionParameter()->fMTVAZenithBin[iStereoMethodID][i] * TMath::DegToRad() );
+            if( TMath::Abs( iZe - iAverageZenith ) < iDiff )
+            {
+                iDiff = TMath::Abs( iZe - iAverageZenith );
+                iBinSelected = i;
+            }
+        }
+// this is the closest bin
+        if( iStereoMethodID < getEvndispReconstructionParameter()->fTMVAFileName.size() &&
+            iBinSelected < getEvndispReconstructionParameter()->fTMVAFileName[iStereoMethodID].size() )
+        {
+            iName = getEvndispReconstructionParameter()->fTMVAFileName[iStereoMethodID][iBinSelected];
+        }
+    }
+
+    return iName;
 }

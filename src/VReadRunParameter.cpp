@@ -1,10 +1,9 @@
 /*! \class VReadRunParameter
     \brief read command line parameters and do some tests for consistency
 
-  evndisp -help gives an overview of all parameters
+     evndisp -help gives an overview of the most important parameters
+     all parameters are listed in README/README.EVNDISP.commandline
 
-   \author
-   Gernot Maier
 */
 
 #include <VReadRunParameter.h>
