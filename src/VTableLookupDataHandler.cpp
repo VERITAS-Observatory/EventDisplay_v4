@@ -40,7 +40,7 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	setSelectRandom( fTLRunParameter->fSelectRandom, fTLRunParameter->fSelectRandomSeed );
 	
 	fDeadTime = new VDeadTime();
-	fDeadTime->defineHistograms();
+	fDeadTime->defineHistograms( 0, true );
 	
 	fOutFile = 0;
 	
@@ -1530,7 +1530,7 @@ void VTableLookupDataHandler::writeDeadTimeHistograms()
 		iNFil += iTel.Add( finputfile[i].c_str() );
 	}
 	
-	if( iNFil > 0 )
+	if( iNFil > 0 && fDeadTime )
 	{
 		TFile* f = iTel.GetFile();
 		if( f )

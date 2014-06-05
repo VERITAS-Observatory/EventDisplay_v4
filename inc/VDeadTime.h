@@ -59,7 +59,7 @@ class VDeadTime
 		VDeadTime( bool iIsOn = true );
 		~VDeadTime() {}
 		double calculateDeadTime();
-		void   defineHistograms( float iRunDuration = 0. );
+		void   defineHistograms( float iRunDuration = 0., bool iNoWarning = false );
 		double fillTimeDifferenceHistograms( double time );
 		double fillDeadTime( double time, unsigned int* tenMHzClock = 0 );
 		void   fillTenMHzClockArray( double time, unsigned int* tenMHzClock );
