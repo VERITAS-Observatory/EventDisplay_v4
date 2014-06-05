@@ -1012,9 +1012,11 @@ void VTableLookup::readLookupTable()
 			// calculate mean width ratio (mean scaled variables)
 			imr = 0.;
 			inr = 0.;
+                        // require size2 > 0 (to use only selected images for the MWR/MWL calculation)
+                        double* i_s2 = fData->getSize2( 1., fTLRunParameter->fUseSelectedImagesOnly );
 			for( unsigned int j = 0; j < s_N->fNTel; j++ )
 			{
-				if( s_N->mscw_T[j] > 0. && fData->getWidth() )
+				if( s_N->mscw_T[j] > 0. && fData->getWidth() && i_s2 && i_s2[j] > 0. )
 				{
 					imr += fData->getWidth()[j] / s_N->mscw_T[j];
 					inr++;
@@ -1033,7 +1035,7 @@ void VTableLookup::readLookupTable()
 			inr = 0.;
 			for( unsigned int j = 0; j < s_N->fNTel; j++ )
 			{
-				if( s_N->mscl_T[j] > 0. && fData->getLength() )
+				if( s_N->mscl_T[j] > 0. && fData->getLength() && i_s2 && i_s2[j] > 0. )
 				{
 					imr += fData->getLength()[j] / s_N->mscl_T[j];
 					inr++;

@@ -1059,14 +1059,14 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 					rdist1 = VUtilities::line_point_distance( fData->Ycore, -1.*fData->Xcore, 0., fData->Ze, fData->Az,
 							 fTel_y[j], -1.*fTel_x[j], fTel_z[j] );
 					hR[j]->Fill( rdist1, weight );
-					// camera distance is calculated relative to centre of camera (should be: wobble offset position (TODO))
+					// camera distance is calculated relative to centre of camera (should be: wobble offset position)
 					hdistR[j]->Fill( rdist1, sqrt( fData->cen_x[j]*fData->cen_x[j] + fData->cen_y[j]*fData->cen_y[j] ), weight );
 				}
 			}
 			
 			///////////////////////////////////////////////////////////////
 			// single telescope distributions
-			//  (loop over all images
+			//  (loop over all images -> use selected images only)
 			for( int t = 0; t < fData->NImages; t++ )
 			{
 				int j = fData->ImgSel_list[t];
