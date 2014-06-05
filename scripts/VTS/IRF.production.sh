@@ -15,7 +15,8 @@ required parameters:
     
     <IRF type>              type of instrument response function to produce
                             (e.g. EVNDISP, MAKETABLES, COMBINETABLES,
-                             ANALYSETABLES, EFFECTIVEAREAS, COMBINEEFFECTIVEAREAS )
+                             ANALYSETABLES, EFFECTIVEAREAS, COMBINEEFFECTIVEAREAS,
+                             TRAINMVANGRES )
     
 optional parameters:
     
@@ -113,8 +114,13 @@ for VX in $EPOCH; do
             continue
         fi
         for ZA in ${ZENITH_ANGLES[@]}; do
-            for WOBBLE in ${WOBBLE_OFFSETS[@]}; do
-                for NOISE in ${NSB_LEVELS[@]}; do
+            for NOISE in ${NSB_LEVELS[@]}; do
+                # train MVA for angular resolution
+                if [[ $IRFTYPE == "TRAINMVANGRES" ]]; then
+                   ./IRF.trainTMVAforAngularReconstruction.sh $VX $ATM $ZA $NOISE $SIMTYPE
+                   continue
+                fi
+                for WOBBLE in ${WOBBLE_OFFSETS[@]}; do
                     echo "Now processing epoch $VX, atmo $ATM, zenith angle $ZA, wobble $WOBBLE, noise level $NOISE"
                     # run simulations through evndisp
                     if [[ $IRFTYPE == "EVNDISP" ]]; then
@@ -142,8 +148,8 @@ for VX in $EPOCH; do
                             done #cuts
                         done #recID
                     fi
-                done #noise
-            done #wobble
+                done #wobble
+            done #noise
         done #ZA
     done #ATM
 done  #VX
