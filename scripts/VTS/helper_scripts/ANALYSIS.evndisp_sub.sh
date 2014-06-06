@@ -28,7 +28,7 @@ ACUTS="EVNDISP.reconstruction.runparameter"
 # pedestal calculation
 if [[ $CALIB == "1" || $CALIB == "2" ]]; then
     rm -f $LOGDIR/$RUN.ped.log
-    $EVNDISPSYS/bin/evndisp -runmode=1 -runnumber=$RUN &> $LOGDIR/$RUN.ped.log
+    $EVNDISPSYS/bin/evndisp -runmode=1 -runnumber=$RUN -reconstructionparameter $ACUTS &> $LOGDIR/$RUN.ped.log
 	echo "RUN$RUN PEDLOG $LOGDIR/$RUN.ped.log"
 fi
 
@@ -58,7 +58,7 @@ OPT=( "-readCalibDB" )
 # average tzero calculation
 if [[ $CALIB == "1" || $CALIB == "3" ]]; then
     rm -f $LOGDIR/$RUN.tzero.log
-    $EVNDISPSYS/bin/evndisp -runnumber=$RUN -runmode=7 ${OPT[@]} &> $LOGDIR/$RUN.tzero.log
+    $EVNDISPSYS/bin/evndisp -runnumber=$RUN -runmode=7 -reconstructionparameter $ACUTS ${OPT[@]} &> $LOGDIR/$RUN.tzero.log
 	echo "RUN$RUN TZEROLOG $LOGDIR/$RUN.tzero.log"
 fi
 
