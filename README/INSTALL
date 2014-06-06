@@ -5,7 +5,7 @@ Prerequisites
 =============
 
 (0.1) ROOT must be installed 
-      version >= 5.32
+      version >= 5.32 (but not yet v6.00)
       Compiling options should be 
        ./configure --enable-minuit2 --enable-mysql
 
@@ -83,7 +83,7 @@ For VERITAS analysis, the following directories are needed:
 VERITAS_EVNDISP_AUX_DIR:  directory with all auxiliary data like calibration files, lookup tables, effective areas, etc
 VERITAS_DATA_DIR :        directory containing the raw telescope data or input simulation files 
 VERITAS_USER_DATA_DIR :   user data directory: containing output files from this analysis package (most of them in root format)
-VERITAS_IRFPRODUCTION_DIR : directory used in IRF production (not needed for 'normal' data analysis)
+VERITAS_IRFPRODUCTION_DIR : directory used in IRF production (not needed for 'normal' data analysis; ignore it if you don't know it)
 
 To switch settings for the different observatory (in the $EVNDISPSYS directory): 
 

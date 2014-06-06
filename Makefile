@@ -38,9 +38,11 @@ ARCH = $(shell uname)
 #############################
 package = EVNDISP
 version = 4.43
+# version of auxiliary files
+auxversion = 4.43-auxv01
 distdir = $(package)-$(version)
 ctapara = $(distdir).CTA.runparameter
-vtspara = $(distdir).VTS.runparameter
+vtspara = $(package)-$(auxversion).VTS.aux
 #############################
 # check compiler
 GCCVERSION=$(shell gcc -dumpversion)
@@ -1420,6 +1422,7 @@ writeFITS_eventlist:	$(writeFITS_eventlistOBJ)
 
 ###############################################################################################################################
 # make a tar package with all the source files / Makefiles / scripts
+# used for distribution, file name is EVNDISP-$VERSION.tar.gz
 ###############################################################################################################################
 dist: $(distdir).tar.gz
 
@@ -1462,7 +1465,8 @@ $(distdir):	FORCEDISTDIR
 	cp -r scripts/CTA/CTA.EVNDISP* $(distdir)/scripts/CTA
 	cp -r scripts/CTA/grid-tools/* $(distdir)/scripts/CTA/grid-tools
 	cp -r scripts/VTS/*.sh $(distdir)/scripts/VTS
-	cp -r scripts/VTS/VTS.EVNDISP* $(distdir)/scripts/VTS
+	mkdir -p $(distdir)/templates
+	cp -r templates/* $(distdir)/templates
 
 FORCEDISTDIR:
 	rm -rf $(distdir).tar.gz  >/dev/null 2>&1
@@ -1508,98 +1512,136 @@ $(ctapara):
 #########################################
 # VTS
 #
+# several packages with auxililary files
+#
+# VTS.runfiles (required)
+# VTS.calibration (required)
+# VTS.lookuptables (required)
+# VTS.effectiveareas (required)
+# VTS.radialacceptances (required)
+#
 
-# VTS.runfiles:	$(vtscalirf).tar.gz $(vtspara).tar.gz
-VTS.runfiles:	$(vtspara).tar.gz
+VTS.auxfiles:	$(vtspara).runfiles.tar.gz $(vtspara).calibration.tar.gz $(vtspara).lookuptables.tar.gz $(vtspara).effectiveareas.tar.gz $(vtspara).radialacceptances.tar.gz
 
-$(vtspara).tar.gz:	
-	rm -rf $(vtspara).tar.gz  >/dev/null 2>&1
-	rm -rf $(distdir) >/dev/null 2>&1
-	mkdir -p $(vtspara)
-# astrodata	
-	mkdir -p $(vtspara)/AstroData
-	rsync -av --exclude=".*" $(VERITAS_EVNDISP_AUX_DIR)/AstroData/Catalogues $(vtspara)/AstroData
-	rsync -av --exclude=".*"  $(VERITAS_EVNDISP_AUX_DIR)/AstroData/TeV_data $(vtspara)/AstroData
-# calibration directories
-	mkdir -p $(vtspara)/Calibration/Tel_1
-	mkdir -p $(vtspara)/Calibration/Tel_2
-	mkdir -p $(vtspara)/Calibration/Tel_3
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.dat $(vtspara)/Calibration/
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.LowGain.dat $(vtspara)/Calibration/
-# detector geometry
-	mkdir -p $(vtspara)/DetectorGeometry
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V4_Autumn2007_20130110.txt $(vtspara)/DetectorGeometry
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V6_Upgrade_20121127_v420.txt $(vtspara)/DetectorGeometry
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt $(vtspara)/DetectorGeometry
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt $(vtspara)/DetectorGeometry
-# NSB files
-	mkdir -p $(vtspara)/NOISE
-# gamma hadron files
-	mkdir -p $(vtspara)/GammaHadronCutFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/GammaHadronCutFiles/ANASUM.GammaHadron.d20131031* $(vtspara)/GammaHadronCutFiles
-# run parameter files
-	mkdir -p $(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.runparameter $(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.timemask.dat $(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.runlist $(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EFFECTIVEAREA.runparameter $(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.global.runparameter $(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.SW18_noDoublePass.runparameter $(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.LGCalibration.runparameter $(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.specialchannels.dat $(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.validchannels.dat $(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/TMVA.BoxCuts.runparameter $(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/COMPAREMC.runparameter $(vtspara)/ParameterFiles
-# radial acceptances, effective areas, tables
-	mkdir -p $(vtspara)/RadialAcceptances
-	mkdir -p $(vtspara)/EffectiveAreas
-	mkdir -p $(vtspara)/Tables
-	cd $(vtspara) && tar -zcvf ../$(vtspara).tar.gz . && cd ..
-	rm -rf $(vtspara)
+VTS.runfiles:	$(vtspara).runfiles.tar.gz
+VTS.calibration:	$(vtspara).calibration.tar.gz
+VTS.lookuptables:	$(vtspara).lookuptables.tar.gz
+VTS.effectiveareas:	$(vtspara).effectiveareas.tar.gz
+VTS.radialacceptances:	$(vtspara).radialacceptances.tar.gz
 
 ######
-# VTS calibration and IRF files
+# VTS runparameter files
 
-$(vtscalirf).tar.gz:
-	@echo "bbb "
-	rm -rf $(vtspara).CAL.tar.gz  >/dev/null 2>&1
+$(vtspara).runfiles.tar.gz:	
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).runfiles.tar.gz  >/dev/null 2>&1
 	rm -rf $(distdir) >/dev/null 2>&1
-	mkdir -p $(vtspara)
-	mkdir -p $(vtspara)/Calibration/Tel_1
-	mkdir -p $(vtspara)/Calibration/Tel_2
-	mkdir -p $(vtspara)/Calibration/Tel_3
-	mkdir -p $(vtspara)/Calibration/Tel_4
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_1/36862.lpe* $(vtspara)/Calibration/Tel_1/
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_2/36862.lpe* $(vtspara)/Calibration/Tel_2/
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_3/36862.lpe* $(vtspara)/Calibration/Tel_3/
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_4/36862.lpe* $(vtspara)/Calibration/Tel_4/
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_1/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(vtspara)/Calibration/Tel_1/
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_2/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(vtspara)/Calibration/Tel_2/
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_3/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(vtspara)/Calibration/Tel_3/
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_4/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(vtspara)/Calibration/Tel_4/
-#	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_1/*.lmult.root  $(vtspara)/Calibration/Tel_1/
-#	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_2/*.lmult.root  $(vtspara)/Calibration/Tel_2/
-#	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_3/*.lmult.root  $(vtspara)/Calibration/Tel_3/
-#	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_4/*.lmult.root  $(vtspara)/Calibration/Tel_4/
-# NSB files for simulations
-	mkdir -p $(vtspara)/NOISE
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/NOISE/*.grisu $(vtspara)/NOISE
-# radial acceptances, effective areas, tables
-#	mkdir -p $(vtspara)/RadialAcceptances
-#	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/RadialAcceptances/radialAcceptance-d20131115-* $(vtspara)/RadialAcceptances/
-#	mkdir -p $(vtspara)/EffectiveAreas
-#	cp -L $(VERITAS_EVNDISP_AUX_DIR)/EffectiveAreas/effArea-d20131031* $(vtspara)/EffectiveAreas/
-#	mkdir -p $(vtspara)/Tables
-#	cp -L $(VERITAS_EVNDISP_AUX_DIR)/Tables/table_d20131115_GrI* $(vtspara)/Tables/
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
+# astrodata	
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/AstroData
+	rsync -av --exclude=".*" $(VERITAS_EVNDISP_AUX_DIR)/AstroData/Catalogues $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/AstroData
+	rsync -av --exclude=".*"  $(VERITAS_EVNDISP_AUX_DIR)/AstroData/TeV_data $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/AstroData
+# detector geometry
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/DetectorGeometry
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V4_Autumn2007_20130110.txt $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/DetectorGeometry
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V6_Upgrade_20121127_v420.txt $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/DetectorGeometry
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/DetectorGeometry
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/DetectorGeometry
+# gamma hadron files
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/GammaHadronCutFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/GammaHadronCutFiles/ANASUM.GammaHadron-Cut* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/GammaHadronCutFiles
+# run parameter files
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.timemask.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.runlist $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EFFECTIVEAREA.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.global.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.Hough.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.SW18_noDoublePass.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.LGCalibration.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.specialchannels.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.validchannels.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/TMVA.BoxCuts.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/COMPAREMC.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/SENSITIVITY.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/VISIBILITY.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+# make package
+	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).runfiles.tar.gz . && cd ..
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
+
+######
+# VTS calibration files
+
+$(vtspara).calibration.tar.gz:
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).calibration.tar.gz  >/dev/null 2>&1
+	rm -rf $(distdir) >/dev/null 2>&1
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_1
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_2
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_3
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_4
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.LowGain.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.LowGainForCare.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/
+	rsync -av --exclude=".*" $(VERITAS_EVNDISP_AUX_DIR)/Calibration/CareSimulations $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/
+	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_1/36862.lpe* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_1/
+	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_2/36862.lpe* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_2/
+	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_3/36862.lpe* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_3/
+	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_4/36862.lpe* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_4/
+	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_1/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_1/
+	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_2/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_2/
+	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_3/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_3/
+	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_4/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_4/
+# NSB files for pedestal calculation in grisu simulations
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/NOISE
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/NOISE/*.grisu $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/NOISE
 # make tar file
-	cd $(vtspara) && tar -zcvf ../$(vtspara).CAL.tar.gz . && cd ..
-	rm -rf $(vtspara)
+	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).calibration.tar.gz . && cd ..
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
+
+######
+# VTS lookup table files
+
+$(vtspara).lookuptables.tar.gz:
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).lookuptables.tar.gz  >/dev/null 2>&1
+	rm -rf $(distdir) >/dev/null 2>&1
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Tables
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Tables/table_v443rc_d20140604_CARE_Jan1427_ATM21_V6_ID0.* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Tables
+#	make tar file
+	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).lookuptables.tar.gz . && cd ..
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
+
+
+######
+# VTS radial acceptances
+
+$(vtspara).radialacceptances.tar.gz:
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).radialacceptances.tar.gz  >/dev/null 2>&1
+	rm -rf $(distdir) >/dev/null 2>&1
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/RadialAcceptances
+#	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/RadialAcceptances/... $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/RadialAcceptances
+#	make tar file
+	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).radialacceptances.tar.gz . && cd ..
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
+
+######
+# VTS effective areas
+
+$(vtspara).effectiveareas.tar.gz:
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).effectiveareas.tar.gz  >/dev/null 2>&1
+	rm -rf $(distdir) >/dev/null 2>&1
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/EffectiveAreas
+#	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/EffectiveAreas/... $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/EffectiveAreas
+#	make tar file
+	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).effectiveareas.tar.gz . && cd ..
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
+
 
 ###############################################################################################################################
 # print environment and compilation parameters
 ###############################################################################################################################
-configuration config:
+printconfig configuration config:
 	@echo ""
 	@echo "CONFIGURATION TEST FOR $(package) version $(version)"
 	@echo "======================================================"
@@ -1612,7 +1654,7 @@ configuration config:
 ifeq ($(GSLFLAG),-DNOGSL)
 	@echo "evndisp without GSL libraries (no frogs, no Hough muon calibration)"
 else
-	@echo "evndisp with GSL libraries (frogs, Hough muon calibration)"
+	@echo "evndisp with GSL libraries (used in frogs, Hough muon calibration)"
 endif
 ifeq ($(VBFFLAG),-DNOVBF)
 	@echo "evndisp without VBF support"
@@ -1634,6 +1676,51 @@ ifeq ($(FITS),FALSE)
 else
 	@echo "FITS support enabled"
 endif
+	@echo ""
+	@echo "Testing EVNDISP environmental variables (for VTS and CTA):"
+	@echo "----------------------------------------------------------"
+ifeq ($(strip $(EVNDISPSYS)),)
+	@echo "EVNDISPSYS not set (see README/INSTALL)"
+else
+	@echo "EVNDISPSYS set to $(EVNDISPSYS)"
+endif
+ifeq ($(strip $(VERITAS_EVNDISP_AUX_DIR)),)
+	@echo "VERITAS_EVNDISP_AUX_DIR not set (see README/INSTALL)"
+else
+	@echo "VERITAS_EVNDISP_AUX_DIR set to $(EVNDISPSYS)"
+endif
+ifeq ($(strip $(VERITAS_DATA_DIR)),)
+	@echo "VERITAS_DATA_DIR not set (see README/INSTALL)"
+else
+	@echo "VERITAS_DATA_DIR set to $(EVNDISPSYS)"
+endif
+ifeq ($(strip $(VERITAS_USER_DATA_DIR)),)
+	@echo "VERITAS_USER_DATA_DIR not set (see README/INSTALL)"
+else
+	@echo "VERITAS_USER_DATA_DIR set to $(EVNDISPSYS)"
+endif
+ifeq ($(strip $(VERITAS_IRFPRODUCTION_DIR)),)
+	@echo "VERITAS_IRFPRODUCTION_DIR not set (see README/INSTALL)"
+else
+	@echo "VERITAS_IRFPRODUCTION_DIR set to $(EVNDISPSYS)"
+endif
+ifeq ($(strip $(CTA_EVNDISP_AUX_DIR)),)
+	@echo "CTA_EVNDISP_AUX_DIR not set (see README/INSTALL)"
+else
+	@echo "CTA_EVNDISP_AUX_DIR set to $(EVNDISPSYS)"
+endif
+ifeq ($(strip $(CTA_DATA_DIR)),)
+	@echo "CTA_DATA_DIR not set (see README/INSTALL)"
+else
+	@echo "CTA_DATA_DIR set to $(EVNDISPSYS)"
+endif
+ifeq ($(strip $(CTA_USER_DATA_DIR)),)
+	@echo "CTA_USER_DATA_DIR not set (see README/INSTALL)"
+else
+	@echo "CTA_USER_DATA_DIR set to $(EVNDISPSYS)"
+endif
+
+
 
 ###############################################################################################################################
 # source code formating
