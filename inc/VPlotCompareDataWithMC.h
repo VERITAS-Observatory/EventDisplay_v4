@@ -49,7 +49,7 @@ class VPlotCompareDataWithMC
 		void   plotRelativePlot( TH1D* h1, TH1D* h2, double xmin = -999., double xmax = -999. );
 		void   plot_singleCanvas( string iHistoName, string iCanvasTitle, double iHistoXAxisMax, string iScalingVariable = "MSCW" );
 		void   setAxisTitles( TH2D* h, string iS, int iTel );
-		void   setHistogramAtt( TH1D* his, int icolor, double iwidth, double isize, int imarker = 1, int irebin = 1 );
+		void   setHistogramAtt( TH1D* his, int icolor, double iwidth, double isize, int imarker = 1, int irebin = 1, double iTitleOffset = 1.3 );
 		void   setHistogramAtt( TH2D* his, double imin );
 		
 	public:
@@ -63,8 +63,8 @@ class VPlotCompareDataWithMC
 		void distance_plots();
 		void emission_height( double iEmissionHeightMax = 20. );
 		void msc_plots( char* offFile = 0, char* helium = 0, char* proton = 0, double xmin = -1.5, double xmax = 4., string ivar = "MSCW" );
-		void msc_vs_energy_plots( int iRebin = 4, double xmin = -1.5, double xmax = 1.5 );
-		void mwr_vs_energy_plots( int iRebin = 4, double xmin =  0.5, double xmax = 1.5 );
+		void msc_vs_energy_plots( int iRebin = 2, double xmin = -1.5, double xmax = 1.5 );
+		void mwr_vs_energy_plots( int iRebin = 2, double xmin =  0.7, double xmax = 1.3 );
 		void model3D_vs_energy_plots(); 
 		void multiplicity_plots();
 		bool openDataFile( string ifile );

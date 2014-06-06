@@ -293,7 +293,7 @@ void VPlotCompareDataWithMC::setHistogramAtt( TH2D* his, double imin )
 	his->GetYaxis()->SetTitleOffset( 1.3 );
 }
 
-void VPlotCompareDataWithMC::setHistogramAtt( TH1D* his, int icolor, double iwidth, double isize, int imarker, int irebin )
+void VPlotCompareDataWithMC::setHistogramAtt( TH1D* his, int icolor, double iwidth, double isize, int imarker, int irebin, double iTitleOffset )
 {
 	his->SetLineColor( icolor );
 	his->SetMarkerColor( icolor );
@@ -304,7 +304,7 @@ void VPlotCompareDataWithMC::setHistogramAtt( TH1D* his, int icolor, double iwid
 		his->SetMarkerStyle( imarker );
 	}
 	his->SetStats( 0 );
-	his->GetYaxis()->SetTitleOffset( 1.3 );
+	his->GetYaxis()->SetTitleOffset( iTitleOffset );
 	his->GetXaxis()->SetTitleSize( 0.05 );
 	his->GetYaxis()->SetTitleSize( 0.05 );
 	if( irebin != 1 )
@@ -1380,7 +1380,7 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 	f_rebin.push_back( i_rebin );
 	f_logy.push_back( 0 );
 	f_x_min.push_back( 0. );
-	f_x_max.push_back( 0.20 );
+	f_x_max.push_back( 0.30 );
 	hname.push_back( "length" );
 	f_rebin.push_back( i_rebin );
 	f_logy.push_back( 0 );
@@ -1518,16 +1518,16 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 			cout << "off histogram not found " << hn << endl;
 			continue;
 		}
-		sprintf( htitle, "%s_%d", hname[j].c_str(), telid );
-		getScaling( s_sims, s_diff, htitle, iScalingMethod );
-		// normalize sims histograms to data histograms
-		hsims->Scale( s_sims );
-		hdiff->Scale( s_diff );
 		// rebin histograms
 		hsims->Rebin( f_rebin[j] );
 		hdiff->Rebin( f_rebin[j] );
 		hon->Rebin( f_rebin[j] );
 		hoff->Rebin( f_rebin[j] );
+		sprintf( htitle, "%s_%d", hname[j].c_str(), telid );
+		getScaling( s_sims, s_diff, htitle, iScalingMethod );
+		// normalize sims histograms to data histograms
+		hsims->Scale( s_sims );
+		if( TMath::Abs( s_diff - 1. ) > 1.e-2 ) hdiff->Scale( s_diff );
 		// relative histograms
 		if( hsims && hdiff )
 		{
@@ -1565,16 +1565,19 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 			hc->cd();
 		}
 		iL = new TLegend( 0.58 , 0.68, 0.85, 0.85 );
+
+		double iTitleOffset = 1.3;
+		if( !iOneCanvas ) iTitleOffset = 1.;
 		
-		setHistogramAtt( hsims, 2, 0.5, 1, 20, 1 );
+		setHistogramAtt( hsims, 2, 1, 1, 20, 1, iTitleOffset );
 		if( fPlotPoster )
 		{
-			setHistogramAtt( hsims, 2, 3, 2, 20, 1 );
+			setHistogramAtt( hsims, 2, 3, 2, 20, 1, iTitleOffset );
 		}
-		setHistogramAtt( hdiff, 1, 0.5, 1, 21, 1 );
+		setHistogramAtt( hdiff, 1, 1, 1, 21, 1, iTitleOffset );
 		if( fPlotPoster )
 		{
-			setHistogramAtt( hdiff, 1, 3, 2, 21, 1 );
+			setHistogramAtt( hdiff, 1, 3, 2, 21, 1, iTitleOffset );
 		}
 		setHistogramAtt( hon, 3, 1, 1, 20, 1 );
 		if( fPlotPoster )
@@ -1593,11 +1596,8 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 		}
 		
 		hdiff->SetYTitle( "number of shower [a.u.]" );
+		if( !f_logy[j] && hdiff->GetMinimum() < -5. ) hdiff->SetMinimum( -5. );
 		hdiff->SetMaximum( hdiff->GetMaximum() * 1.5 );
-/*		if( hname[j] == "fraclow" )
-		{
-		    hdiff->SetMaximum( hdiff->GetBinContent( hdiff->FindBin( 0.1 ) ) * 20. );
-                } */
 		hrel->SetYTitle( "sims/data" );
 		hrel->SetMinimum( fRelatePlotRange_min );
 		hrel->SetMaximum( fRelatePlotRange_max );
@@ -1629,7 +1629,7 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 			
 			if( !gPad->GetLogy() )
 			{
-				TLine* iL0 = new TLine( hdiff->GetXaxis()->GetXmin(), 0., hdiff->GetXaxis()->GetXmax(), 0. );
+				TLine* iL0 = new TLine( f_x_min[j], 0., f_x_max[j], 0. );
 				iL0->SetLineStyle( 2 );
 				iL0->Draw();
 			}
