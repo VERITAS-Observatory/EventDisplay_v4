@@ -37,9 +37,9 @@ ARCH = $(shell uname)
 # basic numbers 
 #############################
 package = EVNDISP
-version = 4.43
+version = 4.44
 # version of auxiliary files
-auxversion = 4.43-auxv01
+auxversion = $(version)-auxv01
 distdir = $(package)-$(version)
 ctapara = $(distdir).CTA.runparameter
 vtspara = $(package)-$(auxversion).VTS.aux

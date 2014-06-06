@@ -773,8 +773,8 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 						if( w[tel] > 0. )
 						{
 							value  += ( w[tel] - med ) / sigma * ( med * med ) / ( sigma * sigma );
+                                                        weight += ( med * med ) / ( sigma * sigma ); 
 						}
-						weight += ( med * med ) / ( sigma * sigma );
 					}
 					///////////////////////////////////////////////////////////////////////////////////////////////////////
 					// energy calculation

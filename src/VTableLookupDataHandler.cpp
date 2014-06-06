@@ -1498,7 +1498,7 @@ bool VTableLookupDataHandler::terminate( TNamed* iM )
 			fOutFile->cd();
 			newtree->Write();
 		}
-		else
+		else if( !fIsMC )
 		{
 			cout << "Warning, VTableLookupDataHandler->finputfile has size 0, unable to copy TTree 'pointingDataReduced' to file " << fOutFile->GetName() << endl;
 		}
