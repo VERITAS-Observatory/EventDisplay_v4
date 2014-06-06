@@ -89,6 +89,10 @@ if [[ $MODEL3D == "1" ]]; then
     OPT+=( -model3d -lnlfile "$VERITAS_EVNDISP_AUX_DIR/Tables/table_LnL.root" )
 fi
 
+if [[ "$SCIPIPE_FASTDEVMODE" == "yes" ]] ; then
+	OPT+=( -nevents=2000 ) 
+fi
+
 
 #########################################
 # run eventdisplay

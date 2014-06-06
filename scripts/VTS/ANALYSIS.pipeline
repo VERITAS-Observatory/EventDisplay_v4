@@ -93,7 +93,7 @@ RECID=0
 # ATTENTION: AFTER THE 'mscw' STAGE, YOU MUST RUN 
 # THE 'frogs' STAGE FOR THIS OPTION TO FULLY TAKE EFFECT
 # yes/no
-USEFROGS="yes"
+USEFROGS="no"
 
 # Where should the frogs's output files be stored?
 # Takes effect in the frogs stage.
@@ -232,12 +232,12 @@ DEBUGREGEX="WHITEBOARD"
 # if set to yes, some stages will only run
 # for the first few hundred events
 # to allow for very fast testing
-export FASTDEVMODE=no
+export SCIPIPE_FASTDEVMODE="no"
 
 # settings file, any settings in this file will override the above settings
 SETTINGSFILE="analysis.config"
 if [ -f "$SETTINGSFILE" ] ; then
-	echo "Loading settings from settings file '$SETTINGSFILE'..."
+	echo "Loading additional pipeline settings from '$SETTINGSFILE'..."
 	source "$SETTINGSFILE"
 fi
 
@@ -267,6 +267,10 @@ mkdir -p $SCIDIR
 
 # extra functions
 source $EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_functions.sh
+
+if [[ "$SCIPIPE_FASTDEVMODE" == "yes" ]] ; then
+	echo -e "${COTYELLOW}Warning, \$SCIPIPE_FASTDEVMODE is set to 'yes', evndisp stage will only process the first 2000 events...$CONORM"
+fi
 
 # evndisp output directory
 mkdir -p $EVNDISPOUTPUTDIR
@@ -419,7 +423,7 @@ if [[ "$STAGE" == "evndisp" ]] ; then
         VPM=1 ## on by default
         if [[ "$USEMODEL3D" == "yes" ]] ; then MODEL3D=1
         else                                   MODEL3D=0 ; fi
-                QSUBDATA=$(./ANALYSIS.evndisp.sh $RUNLIST $EVNDISPOUTPUTDIR $CALIBCODE $VPM $MODEL3D | tee >(cat - >&5) )
+		QSUBDATA=$(./ANALYSIS.evndisp.sh $RUNLIST $EVNDISPOUTPUTDIR $CALIBCODE $VPM $MODEL3D | tee >(cat - >&5) )
 		rm -rf "$EVNJOBSUB"
 		echo "$QSUBDATA" > "$EVNJOBSUB"
 		updateRunningJobFile "$QSUBDATA"
@@ -513,9 +517,8 @@ if [[ "$STAGE" == "evndisp" ]] ; then
             RUNSUCCESS=$( checkForSuccess "$EVNDISPLOG" "Final checks on result file (seems to be OK):")
             printf "%10s is %s, last modified %19s %12s %10s  : %s\n" "$DFBASE" "$DFSIZESTR" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
 		done < $RUNLIST
-
-		exit
-
+		
+		exit 0
 	fi
 fi
 
@@ -736,7 +739,7 @@ if [[ "$STAGE" == "anpar" ]] ; then
             echo -e "Using mscw files as input..."
         fi
 		
-		QSUBDATA=$( ./ANALYSIS.anasum_parallel.sh "$ANASUMRUNLIST" "$ANASUMOUTPUTDIR" "$RUNPARAMFILE" "$INPUTANASUMDIR" | tee >(cat - >&5) )
+		QSUBDATA=$( ./ANALYSIS.anasum_parallel.sh "$ANASUMRUNLIST" "$INPUTANASUMDIR" "$ANASUMOUTPUTDIR" "$RUNPARAMFILE" | tee >(cat - >&5) )
 		updateRunningJobFile "$QSUBDATA"
 		rm -rf "$ANPARJOBSUB"
         echo "$QSUBDATA" > "$ANPARJOBSUB"
