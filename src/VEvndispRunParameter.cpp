@@ -1,8 +1,6 @@
 /*! \class VEvndispRunParameter
   \brief input parameter storage class
 
-  \author
-  Gernot Maier
 */
 
 #include "VEvndispRunParameter.h"
@@ -513,7 +511,6 @@ void VEvndispRunParameter::print( int iEv )
 			cout << " (default ped: " << fsimu_pedestalfile_DefaultPed;
                         cout << ")" << endl;
 		}
-                if( fsimu_lowgain_pedestal_DefaultPed > 0. ) cout << "Low gain ped assumed: " << fsimu_lowgain_pedestal_DefaultPed;
 		else if( fsourcetype == 1 )
 		{
 			cout << "calculate pedestals from " << fsourcefile << endl;
@@ -649,6 +646,7 @@ void VEvndispRunParameter::print( int iEv )
 	{
 		cout << "\t tracelib file: " << ftracefile << endl;
 	}
+        if( fsimu_lowgain_pedestal_DefaultPed > 0. ) cout << "Low gain ped assumed: " << fsimu_lowgain_pedestal_DefaultPed;
 	if( fsourcetype == 1 || fsourcetype == 5 )
 	{
 		cout << "telescope numbering offset: " << ftelescopeNOffset << endl;

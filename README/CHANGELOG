@@ -2,6 +2,9 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140608 (GM)
+minor fix to set nocalibdb when external calibration file is read
+
 * 20140606 (GM)
 updates in Makefiles for production of distributions
 

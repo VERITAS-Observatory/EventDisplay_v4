@@ -2972,7 +2972,7 @@ int VCalibrator::getCalibrationRunNumbers_fromCalibFile()
 			{
 				is_stream >> iToff;
 			}
-			
+
 			// get pixel status number
 			if( !is_stream.eof() )
 			{
