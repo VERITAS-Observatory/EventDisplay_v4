@@ -1607,7 +1607,7 @@ $(vtspara).lookuptables.tar.gz:
 	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).lookuptables.tar.gz  >/dev/null 2>&1
 	rm -rf $(distdir) >/dev/null 2>&1
 	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Tables
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Tables/table_v443rc_d20140604_CARE_Jan1427_ATM21_V6_ID0.* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Tables
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Tables/table_* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Tables
 #	make tar file
 	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).lookuptables.tar.gz . && cd ..
 	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
@@ -1620,7 +1620,7 @@ $(vtspara).radialacceptances.tar.gz:
 	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).radialacceptances.tar.gz  >/dev/null 2>&1
 	rm -rf $(distdir) >/dev/null 2>&1
 	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/RadialAcceptances
-#	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/RadialAcceptances/... $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/RadialAcceptances
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/RadialAcceptances/rad* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/RadialAcceptances
 #	make tar file
 	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).radialacceptances.tar.gz . && cd ..
 	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
@@ -1632,7 +1632,7 @@ $(vtspara).effectiveareas.tar.gz:
 	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).effectiveareas.tar.gz  >/dev/null 2>&1
 	rm -rf $(distdir) >/dev/null 2>&1
 	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/EffectiveAreas
-#	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/EffectiveAreas/... $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/EffectiveAreas
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/EffectiveAreas/eff* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/EffectiveAreas
 #	make tar file
 	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).effectiveareas.tar.gz . && cd ..
 	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
