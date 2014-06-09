@@ -519,18 +519,12 @@ TList* VDeadTime::getDeadTimeHistograms()
 */
 double VDeadTime::getDeadTimeFraction( double iT_run_s, bool iTimeDiff )
 {
-	if( iT_run_s < 0. )
-	{
-		if( iTimeDiff )
-		{
-			return fDeadTimeFrac;
-		}
-		else
-		{
-			return fScalarDeadTimeFrac;
-		}
-	}
-	
+        // method of time difference: no time dependence
+        if( iTimeDiff )
+        {
+                return fDeadTimeFrac;
+        }
+        // dead time fraction from scalars
 	if( hScalarDeadTimeFraction )
 	{
 		int nbin = hScalarDeadTimeFraction->FindBin( iT_run_s );
@@ -539,7 +533,7 @@ double VDeadTime::getDeadTimeFraction( double iT_run_s, bool iTimeDiff )
 			return hScalarDeadTimeFraction->GetBinContent( nbin );
 		}
 	}
-	return fDeadTimeFrac;
+	return fScalarDeadTimeFrac;
 }
 
 /*
@@ -547,7 +541,7 @@ double VDeadTime::getDeadTimeFraction( double iT_run_s, bool iTimeDiff )
    get mean dead time fraction assuming that each mask entry corresponds to 1 s
 
 */
-double VDeadTime::getDeadTimeFraction( vector< bool > iMask )
+double VDeadTime::getDeadTimeFraction( vector< bool > iMask, bool iTimeDiff )
 {
 	double iN = 0.;
 	double iD = 0.;
@@ -556,7 +550,7 @@ double VDeadTime::getDeadTimeFraction( vector< bool > iMask )
 		// only get dead time if mask is open!
 		if( iMask[i] )
 		{
-			iD += getDeadTimeFraction( ( double )i + 0.5 );
+			iD += getDeadTimeFraction( ( double )i + 0.5, iTimeDiff );
 			iN++;
 		}
 	}

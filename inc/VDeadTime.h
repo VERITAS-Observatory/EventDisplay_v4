@@ -68,7 +68,7 @@ class VDeadTime
 			return fDeadTimeMS;
 		}
 		double getDeadTimeFraction( double iT_run_s = -99., bool iTimeDiffMethod = false );
-		double getDeadTimeFraction( vector< bool > iMask );
+		double getDeadTimeFraction( vector< bool > iMask, bool iTimeDiffMethod = false );
 		TList* getDeadTimeHistograms();
 		void   printDeadTime();
 		bool   readHistograms( TDirectoryFile* iDir );

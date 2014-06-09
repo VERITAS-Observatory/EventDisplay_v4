@@ -180,6 +180,9 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		int    fEnergyEffectiveAreaSmoothingIterations;
 		double fEnergyEffectiveAreaSmoothingThreshold;
 		vector< double > fMCZe;                   // zenith angle intervall for Monte Carlo
+
+                // dead time calculation method
+                int  fDeadTimeCalculationMethod;
 		
 		bool fWriteAllGammaToTree ; // WRITEALLGAMMATOTREE
 		int f2DAcceptanceMode ; // USE2DACCEPTANCE
@@ -251,8 +254,7 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		bool writeListOfExcludedSkyRegions();
 		bool getListOfExcludedSkyRegions( TFile* f );
 		
-		//void Write() { TObject::Write() ; } ;
-		ClassDef( VAnaSumRunParameter, 3 ) ;
+		ClassDef( VAnaSumRunParameter, 4 ) ;
 		
 };
 #endif

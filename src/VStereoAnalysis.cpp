@@ -792,13 +792,11 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	}
 	fDeadTime[fHisCounter]->printDeadTime();
 	
-	
 	// get mean run times after time cuts
 	fRunExposure[irun] = fTimeMask->getEffectiveDuration();
 	fRunMJD[irun] = fTimeMask->getMeanUTC_Mask();
 	fTimeMask->printMask( 100, kTRUE );
 	fTimeMask->printMeanTime( kTRUE );
-	//	fTimeMask->displayMask() ;
 	
 	return i_count;
 }
@@ -1433,10 +1431,9 @@ double VStereoAnalysis::getDeadTimeFraction()
 		// dead time depending on time mask
 		if( fTimeMask && fTimeMask->getMask().size() > 0 )
 		{
-			return fDeadTime[fHisCounter]->getDeadTimeFraction( fTimeMask->getMask().size() );
-			//return fDeadTime[fHisCounter]->getDeadTimeFraction( fTimeMask->getMask() );
+			return fDeadTime[fHisCounter]->getDeadTimeFraction( fTimeMask->getMask(), fRunPara->fDeadTimeCalculationMethod );
 		}
-		return fDeadTime[fHisCounter]->getDeadTimeFraction();
+		return fDeadTime[fHisCounter]->getDeadTimeFraction( -1, fRunPara->fDeadTimeCalculationMethod );
 	}
 	
 	return 0.;

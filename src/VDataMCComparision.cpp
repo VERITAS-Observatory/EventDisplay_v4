@@ -116,6 +116,7 @@ void VDataMCComparision::defineHistograms()
 	char hname[200];
 	
 	double vmax = 1.;
+        double core_max = 350.;
 	
 	if( bBckData )
 	{
@@ -190,23 +191,23 @@ void VDataMCComparision::defineHistograms()
 	hisList->Add( hMSCLErec );
 	
 	sprintf( hname, "hXcore_%s", fName.c_str() );
-	hXcore = new TH1D( hname, "", 200, -250., 250. );
+	hXcore = new TH1D( hname, "", 200, -1.*core_max, core_max );
 	hXcore->SetXTitle( "core position x [m]" );
 	hisList->Add( hXcore );
 	
 	sprintf( hname, "hYcore_%s", fName.c_str() );
-	hYcore = new TH1D( hname, "", 200, -250., 250. );
+	hYcore = new TH1D( hname, "", 200, -1.*core_max, core_max );
 	hYcore->SetXTitle( "core position Y [m]" );
 	hisList->Add( hYcore );
 	
 	sprintf( hname, "hXYcore_%s", fName.c_str() );
-	hXYcore = new TH2D( hname, "", 75, -250., 250., 75, -250., 250. );
+	hXYcore = new TH2D( hname, "", 75, -1.*core_max, core_max, 75, -core_max, core_max );
 	hXYcore->SetXTitle( "core position X [m]" );
 	hXYcore->SetYTitle( "core position Y [m]" );
 	hisList->Add( hXYcore );
 	
 	sprintf( hname, "hAzYcore_%s", fName.c_str() );
-	hAzYcore = new TH2D( hname, "", 360, -180., 180., 300, -250., 250. );
+	hAzYcore = new TH2D( hname, "", 360, -180., 180., 300, -1.*core_max, core_max );
 	hAzYcore->SetXTitle( "core position X [m]" );
 	hAzYcore->SetYTitle( "core position Y [m]" );
 	hisList->Add( hAzYcore );

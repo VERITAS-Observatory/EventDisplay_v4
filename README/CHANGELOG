@@ -3,6 +3,14 @@ Change log eventdisplay analysis package
 (please observe the wiki syntax for this file)
 
 * 20140608 (GM)
+added selection for dead time calculation in anasum
+runparameter file: DEADTIMECALCULATIONMETHOD
+
+* 20140608 (GM)
+added -teltoana flag to printRunParameters to 
+retrieve number of telescopes used
+
+* 20140608 (GM)
 minor fix to set nocalibdb when external calibration file is read
 
 * 20140606 (GM)

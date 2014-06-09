@@ -45,6 +45,14 @@ bool readRunParameter( TFile* fIn, string iPara )
         { 
                 cout << fPar->fDBRunStartTimeSQL << endl;
         }
+        else if( iPara == "-teltoana" )
+        {
+               for( unsigned int i = 0; i < fPar->fTelToAnalyze.size(); i++ )
+               {
+                   cout << fPar->fTelToAnalyze[i]+1;
+               }
+               cout << endl;
+        }
 	
 	return true;
 }
@@ -110,6 +118,7 @@ int main( int argc, char* argv[] )
 		cout << "      -runnumber    print MC run number" << endl;
 		cout << "      -mcsourcefile print source file name" << endl;
                 cout << "      -date         print date of run" << endl;
+                cout << "      -teltoana     print telescope combination used in analysis" << endl;
 		cout << endl;
 		exit( 0 );
 	}

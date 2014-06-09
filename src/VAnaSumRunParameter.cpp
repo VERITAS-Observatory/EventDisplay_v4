@@ -118,6 +118,7 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	fEnergySpectrumBinSize = 0.05;
 	fEnergyEffectiveAreaSmoothingIterations = -1;
 	fEnergyEffectiveAreaSmoothingThreshold = -1.;
+        fDeadTimeCalculationMethod = 0;
 	
 	// background model
 	fTMPL_fBackgroundModel = 0;
@@ -366,7 +367,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				if( checkNumberOfArguments( is_line ) != 4 )
 				{
 					return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line,
-											"* SKYMAPCENTRE_RADECJ2000_DEG (RA(deg) DEC(deg)" );
+								"* SKYMAPCENTRE_RADECJ2000_DEG (RA(deg) DEC(deg)" );
 				}
 				fSkyMapCentreRAJ2000 = atof( temp2.c_str() );
 				is_stream >> temp2;
@@ -377,7 +378,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				if( checkNumberOfArguments( is_line ) != 8 )
 				{
 					return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line,
-											"* SKYMAPCENTRE_RADECJ2000_HOUR RA(Hour Min Sec)  DEC(Deg Min Sec)" );
+				                                 "* SKYMAPCENTRE_RADECJ2000_HOUR RA(Hour Min Sec)  DEC(Deg Min Sec)" );
 				}
 				double d_tt = 0.;
 				d_tt += atof( temp2.c_str() );
@@ -546,6 +547,15 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 					return 0;
 				}
 			}
+                        else if( temp == "DEADTIMECALCULATIONMETHOD" )
+                        {
+                                fDeadTimeCalculationMethod = atoi( temp2.c_str() );
+                                if( fDeadTimeCalculationMethod != 0 && fDeadTimeCalculationMethod != 1 )
+                                {
+                                    cout << "Unknown dead time calculation method (0=scalar method, 1=time difference)" << endl;
+                                    return 0;
+                                }
+                        }
 			else if( temp == "RATEINTERVALLLENGTH" )
 			{
 				fTimeIntervall = atof( temp2.c_str() ) * 60.;
@@ -1143,6 +1153,9 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
 			cout << " (use effective area A_REC)";
 		}
 		cout << ", Method " << fEnergyReconstructionMethod << endl;
+                cout << "\t dead time calculation method: ";
+                if( fDeadTimeCalculationMethod == 0 ) cout << "scalar method" << endl;
+                else                                  cout << "tdiff method" << endl;
 		
 		cout << "\t background model: ";
 		if( fRunList[i].fBackgroundModel == eONOFF )

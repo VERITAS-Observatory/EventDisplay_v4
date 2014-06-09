@@ -3,7 +3,6 @@
 
   reads evndisp output trees, fill results from mscw and energy reconstruction
 
-  \author Gernot Maier
 */
 
 #include "VTableLookupDataHandler.h"
@@ -2226,12 +2225,16 @@ double VTableLookupDataHandler::getTelElevation()
 	}
 	// get telescope with maximum votes
 	unsigned int i_max = 0;
-	for( unsigned int i = 0; i < i_votes.size(); i++ ) if( i_votes[i] > i_votes[i_max] )
+	for( unsigned int i = 0; i < i_votes.size(); i++ )
+        {
+                if( i_votes[i] > i_votes[i_max] )
 		{
 			i_max = i;
 		}
+        }
 		
-	cout << "\t(reading telescope elevation from telescope " << i_max + 1 << " (from vote casting))" << endl;
+	cout << "\treading telescope elevation from telescope " << i_max + 1 << " (from vote casting): ";
+        cout << fTelElevation[i_max] << " deg" << endl;
 	
 	return fTelElevation[i_max];
 }

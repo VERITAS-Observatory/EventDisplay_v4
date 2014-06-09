@@ -1,8 +1,6 @@
 /*! \class VTableLookupRunParameter
     \brief parameter storage class
 
-    \author
-    Gernot Maier
 */
 
 #include "VTableLookupRunParameter.h"
@@ -102,13 +100,6 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 				fillInputFile_fromList( iTemp2 );
 				i++;
 			}
-		}
-		else if( iTemp.find( "-mctable" ) < iTemp.size() )
-		{
-			cout << "THIS COMMAND LINE OPTION IS OBSOLET !!" << endl;
-			cout << "(observe: changed handling of lookup tables with version 0.3" << endl;
-			cout << endl;
-			return false;
 		}
 		else if( iTemp.find( "-o" ) < iTemp.size() )
 		{
