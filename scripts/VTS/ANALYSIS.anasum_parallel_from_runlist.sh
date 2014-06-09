@@ -6,7 +6,7 @@ if [[ $# < 4 ]]; then
 echo "
 ANASUM parallel data analysis: submit jobs using a simple run list
 
-ANALYSIS.anasum_parallel_from_runlist.sh <run list> <output directory> <cut set> <background model> [run parameter file] [mscw directory]
+ANALYSIS.anasum_parallel_from_runlist.sh <run list> <output directory> <cut set> <background model> [run parameter file] [mscw directory] [sim type]
 
 required parameters:
 
@@ -27,6 +27,8 @@ optional parameters:
                             default is ANASUM.runparameter)
 
     [mscw directory]        directory containing the mscw.root files
+
+    [sim type]              use IRFs derived from this simulation type (e.g. GRISU, CARE)
 
 IMPORTANT! Run ANALYSIS.anasum_combine.sh once all parallel jobs have finished!
 
@@ -52,35 +54,28 @@ CUTS=$3
 BACKGND=$4
 [[ "$5" ]] && RUNP=$5  || RUNP="ANASUM.runparameter"
 [[ "$6" ]] && INDIR=$6 || INDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/RecID0"
+[[ "$7" ]] && SIMTYPE=$7 || SIMTYPE="GRISU"
 
 # cut definitions (note: VX to be replaced later in script)
 if [[ $CUTS == *super* ]]; then
     CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-SuperSoftSpectrum.dat"
-#    EFFAREA="effArea-d20131031-cut-N2-Point-005CU-SuperSoft-ATM$ATMO-VX-T1234-d20131115.root"
-    EFFAREA="effArea-GRISU-140531-Cut-NTel2-PointSource-SuperSoftSpectrum-VX-ATM$ATMO-T1234.root"
+    EFFAREA="effArea-${SIMTYPE}-140608-Cut-NTel2-PointSource-SuperSoftSpectrum-VX-ATM$ATMO-TX.root"
     RADACC="radialAcceptance-d20131115-cut-N2-Point-005CU-SuperSoft-VX-T1234.root"
 elif [[ $CUTS == *open* ]]; then
     CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-Open.dat"
-############### ---- not updated ---- ##############
-#    EFFAREA="effArea-d20131031-cut-N2-Point-005CU-Open-ATM$ATMO-VX-T1234-d20131115.root"
-    EFFAREA="effArea-140512-Cut-NTel2-PointSource-Open-VX-ATM$ATMO-T1234.root"
+    EFFAREA="effArea-${SIMTYPE}-140608-Cut-NTel2-PointSource-Open-VX-ATM$ATMO-TX.root"
     RADACC="radialAcceptance-d20131115-cut-N2-Point-005CU-Open-VX-T1234.root"
 elif [[ $CUTS == *soft* ]]; then
     CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-SoftSpectrum.dat"
-#    EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Soft-ATM$ATMO-VX-T1234-d20131115.root"
-    EFFAREA="effArea-GRISU-140531-Cut-NTel3-PointSource-SoftSpectrum-VX-ATM$ATMO-T1234.root"
+    EFFAREA="effArea-${SIMTYPE}-140608-Cut-NTel3-PointSource-SoftSpectrum-VX-ATM$ATMO-TX.root"
     RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Soft-VX-T1234.root"
 elif [[ $CUTS = *moderate* ]]; then
     CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-ModerateSpectrum.dat"
-    EFFAREA="effArea-GRISU-140531-Cut-NTel3-PointSource-ModerateSpectrum-VX-ATM$ATMO-T1234.root"
+    EFFAREA="effArea-${SIMTYPE}-140608-Cut-NTel3-PointSource-ModerateSpectrum-VX-ATM$ATMO-TX.root"
     RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-V5-T1234.root"
 elif [[ $CUTS = *hard* ]]; then
     CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-HardSpectrum.dat"
-#    EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Hard-ATM$ATMO-VX-T1234-d20131115.root"
-#    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Hard-VX-T1234.root"
-#    EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Moderate-ATM$ATMO-VX-T1234-d20131115.root"
-    EFFAREA="effArea-140512-Cut-NTel3-PointSource-HardSpectrum-VX-ATM$ATMO-T1234.root"
-    EFFAREA="effArea-GRISU-140531-Cut-NTel3-PointSource-HardSpectrum-VX-ATM$ATMO-T1234.root"
+    EFFAREA="effArea-${SIMTYPE}-140608-Cut-NTel3-PointSource-HardSpectrum-VX-ATM$ATMO-TX.root"
     RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-V5-T1234.root"
 else
     echo "ERROR: unknown cut definition: $CUTS"
@@ -141,19 +136,24 @@ for RUN in ${RUNS[@]}; do
     # get array epoch and atmosphere for the run
     EPOCH=`getRunArrayVersion $RUN`
     ATMO=`getRunAtmosphere $RUN $INDIR/$RUN.mscw.root`
+    ATMO="21"
     if [[ $ATMO == "error" ]]; then
        echo "error finding atmosphere; skipping run $RUN"
        continue
     fi
     echo "RUN $RUN at epoch $EPOCH and atmosphere $ATMO"
+    TELTOANA=`$EVNDISPSYS/bin/printRunParameter $INDIR/$RUN.mscw.root -teltoana`
+    TELTOANA="T$TELTOANA"
     
     # do string replacements
     EFFAREA=${EFFAREA/VX/$EPOCH}
+    EFFAREA=${EFFAREA/TX/$TELTOANA}
 #    EFFAREA=${EFFAREA/ATMXX/$ATMO}
     RADACC=${RADACC/VX/$EPOCH}
     
     # write line to file
     echo "* $RUN $RUN 0 $CUTFILE $BM $EFFAREA $BMPARAMS $RADACC" >> $ANARUNLIST
+    echo "* $RUN $RUN 0 $CUTFILE $BM $EFFAREA $BMPARAMS $RADACC"
 done
 
 # submit the job
