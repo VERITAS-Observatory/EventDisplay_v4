@@ -114,6 +114,38 @@ class VAtmosphereSoundingData
 			}
 			return fGraphThicknessHeight;
 		}
+		TGraph* getGraph( char* which )
+		{
+			if( strcmp( which, "density" ) == 0 )
+			{
+				return getDensityGraph();
+			}
+			if( strcmp( which, "temperature" ) == 0 )
+			{
+				return getTemperatureGraph() ;
+			}
+			if( strcmp( which, "pressure" ) == 0 )
+			{
+				return getPressureGraph() ;
+			}
+			if( strcmp( which, "humidity" ) == 0 )
+			{
+				return getHumidityGraph() ;
+			}
+			if( strcmp( which, "index" ) == 0 )
+			{
+				return getIndexGraph() ;
+			}
+			if( strcmp( which, "thickness" ) == 0 )
+			{
+				return getThicknessGraph() ;
+			}
+			else
+			{
+				return 0;
+			}
+			
+		}
 		
 		TGraph* fGraphScaledDensityHeight;
 		TGraph* fGraphPressureHeight;
@@ -123,6 +155,10 @@ class VAtmosphereSoundingData
 		TGraph* fGraphThicknessHeight;
 		
 		void setColor( int color );
+		int getColor( )
+		{
+			return PlotColor;
+		}
 		
 };
 

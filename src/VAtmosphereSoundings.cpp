@@ -957,7 +957,7 @@ double VAtmosphereSoundings::getAmosphericVaporPressure( double T )
 	
 	double p = ( c0 + T * ( c1 + T * ( c2 + T * ( c3 + T * ( c4 + T * ( c5 + T * ( c6 + T * ( c7 + T * ( c8 + T * ( c9 ) ) ) ) ) ) ) ) ) );
 	
-	double Es = eso / TMath::Power( p, 8. ) * 1.e2;             // vapour pressure [mb->pascal]
+	double Es = eso / TMath::Power( p, 8. ) * 1.e2;             // vapour pressure [mpascal]
 	
 	// alternative calculation (less accurate)
 	//   double Es = 6.1078 * TMath::Power( 10., 7.5*T/(237.3+T) ) * 1.e2;
@@ -3110,7 +3110,7 @@ VAtmosphereSoundingData* VAtmosphereSoundings::makeMeanAtmosphereMJD( double min
 	}
 	
 	vector<double> mjds;
-	for( double i = minMJD; i < maxMJD; i += 0.5 )
+	for( double i = 0.5 * TMath::Ceil( minMJD * 2.0 ); i <= maxMJD; i += 0.5 )
 	{
 		mjds.push_back( i );
 	}
@@ -3149,5 +3149,179 @@ VAtmosphereSoundingData* VAtmosphereSoundings::make_interpolated_atmosphere( VAt
 	
 	
 	return Data;
+	
+}
+
+TGraph* VAtmosphereSoundings::getResidualGraph( TGraph* data, TGraph* model, int color )
+{
+	TGraph* newgraph = new TGraph( 0 );
+	TString title = TString::Format( "res_%s_%s", data->GetName(), model->GetName() );
+	newgraph->SetNameTitle( title.Data(), title.Data() );
+	newgraph->SetLineColor( color );
+	newgraph->SetMarkerColor( color );
+	newgraph->SetMarkerStyle( 20 );
+	
+	for( int iA = 0; iA < data->GetN(); iA++ )
+	{
+		newgraph->SetPoint( iA , data->GetX()[iA], data->GetY()[iA] / model->Eval( data->GetX()[iA] ) - 1.0 );
+	}
+	
+	return newgraph;
+}
+
+
+void VAtmosphereSoundings::plot_season( double mjd_start, double mjd_end, TString season_name, char* value, TString outfileprefix = "" )
+{
+
+	int col[] = { 3, 5, 6, 7, 9, 11, 13, 28, 30, 38, 40, 41, 42, 46 }; //somewhat different root colors
+	double month = 29.53;						 //average length of synodic month
+	int Nmonth = TMath::CeilNint( ( mjd_end - mjd_start ) / month ) ;
+	
+	vector<double> start, end;
+	for( int i = 0; i < Nmonth; i++ )
+	{
+		start.push_back( mjd_start + i * month + 1 );
+		end.push_back( mjd_start + ( i + 1 )*month - 1 );
+		
+		cout << i << " " << start.at( i ) << " " << end.at( i ) << endl;
+	}
+	
+	vector<VAtmosphereSoundingData*> v;
+	
+	VAtmosphereSoundingData* summer = makeDefaultSummerAtmosphere( "summer", "" );
+	VAtmosphereSoundingData* winter = makeDefaultWinterAtmosphere( "winter", "" );
+	
+	TGraph* temp;
+	
+	TCanvas* c = new TCanvas( "c", "c", 900, 1200 );
+	c->Divide( 1, 3 );
+	
+	c->cd( 1 );
+	
+	winter->setColor( 4 );
+	summer->setColor( 2 );
+	winter->getGraph( value )->SetLineWidth( 4 );
+	winter->getGraph( value )->SetTitle( "Winter" );
+	summer->getGraph( value )->SetTitle( "Summer" );
+	
+	summer->getGraph( value )->SetLineWidth( 4 );
+	winter->getGraph( value )->Draw( "alp" );
+	TAxis* axis = winter->getGraph( value )->GetXaxis();
+	axis->SetLimits( 0., 30 );
+	summer->getGraph( value )->Draw( "lp same" );
+	
+	for( int i = 0; i < Nmonth; i++ )
+	{
+		int y1, y2, m1, m2, d1, d2, j;
+		double f;
+		slaDjcl( start[i] , &y1, &m1, &d1, &f, &j );
+		slaDjcl( end[i] , &y2, &m2, &d2, &f, &j );
+		TString name = TString::Format( "%d-%d-%d - %d-%d-%d", y1, m1, d1, y2, m2, d2 );
+		VAtmosphereSoundingData* t = makeMeanAtmosphereMJD( start[i], end[i], name.Data(), name.Data() );
+		t->setColor( col[i] );
+		t->getGraph( value )->SetTitle( name.Data() );
+		t->getGraph( value )->Draw( "lp same" );
+		
+	}
+	
+	TLegend* legend;
+	if( strcmp( value, "temperature" ) == 0 )
+	{
+		legend = gPad->BuildLegend( 0.35, 0.45, 1.0, 1.0 );
+	}
+	if( strcmp( value, "density" ) == 0 )
+	{
+		legend = gPad->BuildLegend( 0.2, 0.0, 0.8, 0.5 );
+	}
+	else
+	{
+		legend = gPad->BuildLegend();
+	}
+	legend->SetFillStyle( 0 );
+	legend->SetNColumns( 2 );
+	legend->SetBorderSize( 0 );
+	legend->SetDrawOption();
+	
+	c->cd( 2 );
+	
+	
+	temp = getResidualGraph( summer->getGraph( value ), winter->getGraph( value ), 2 );
+	temp->SetLineWidth( 4 );
+	temp->Draw( "alp" );
+	axis = temp->GetXaxis();
+	axis->SetLimits( 0., 30 );
+	temp = getResidualGraph( winter->getGraph( value ), winter->getGraph( value ), 4 );
+	temp->SetLineWidth( 4 );
+	temp->Draw( "lp same" );
+	
+	
+	for( int i = 0; i < Nmonth; i++ )
+	{
+		TGraph* temp = getResidualGraph( getAverageProfile( i + 2 )->getGraph( value ), winter->getGraph( value ), col[i] );
+		if( temp )
+		{
+			temp->Draw( "lp same" );
+		}
+	}
+	
+	
+	c->cd( 3 );
+	
+	temp = getResidualGraph( winter->getGraph( value ), summer->getGraph( value ), 4 );
+	temp->SetLineWidth( 4 );
+	temp->Draw( "alp" );
+	axis = temp->GetXaxis();
+	axis->SetLimits( 0., 30 );
+	temp = getResidualGraph( summer->getGraph( value ), summer->getGraph( value ), 2 );
+	temp->Draw( "lp same" );
+	temp->SetLineWidth( 4 );
+	
+	for( int i = 0; i < Nmonth; i++ )
+	{
+		TGraph* temp = getResidualGraph( getAverageProfile( i + 2 )->getGraph( value ), summer->getGraph( value ), col[i] );
+		if( temp )
+		{
+			temp->Draw( "lp same" );
+		}
+	}
+	
+	
+	TString filename = TString::Format( "%sseason_%s_%s.png", outfileprefix.Data(), season_name.Data(), value );
+	c->SaveAs( filename.Data() );
+	filename = TString::Format( "%sseason_%s_%s.pdf", outfileprefix.Data(), season_name.Data(), value );
+	c->SaveAs( filename.Data() );
+	
+	
+}
+
+
+
+
+void VAtmosphereSoundings::plot_season( int year_start, int month_start, int day_start, int year_end, int month_end , int day_end, char* value, TString outfileprefix = "" )
+{
+	//plots and prints temperature/density profiles per dark run for a given observing season. 
+	//expects the dates of the last full moon before the start of season and the first full moon after the end of season.
+	//value = "temperature" or "density" (or see VAtmosphereSoundingData::getGraph( ... ) ).
+	//example:
+	/*
+	gSystem->Load("libVAnaSum.so");
+	gStyle->SetOptTitle(0); 
+	VAtmosphereSoundings * a = new VAtmosphereSoundings();
+	a->setHeights(0.0, 30000.0, 1000.0);
+	a->readSoundingsFromTextFile("list.dat");
+	
+	a->plot_season(( 56524, 56820, "2013/14", "temperature");
+	a->plot_season( 2006, 9, 7, 2007, 6, 1, "temperature");
+
+	etc.
+
+	*/
+
+	double mjd_start, mjd_end;
+	int j;
+	TString season_name = TString::Format( "%d-%d", year_start, year_end );
+	slaCldj( year_start, month_start , day_start, &mjd_start, &j );
+	slaCldj( year_end, month_end , day_end, &mjd_end, &j );
+	plot_season( mjd_start, mjd_end, season_name, value );
 	
 }
