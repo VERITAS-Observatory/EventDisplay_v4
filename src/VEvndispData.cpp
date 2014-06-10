@@ -518,13 +518,42 @@ void VEvndispData::printDeadChannels( bool iLowGain )
 	{
 		if( getDead( iLowGain )[i] > 0 )
 		{
-			bitset<8 * sizeof( uint32_t )> i_dead = getDead( iLowGain )[i];
+			bitset<16 * sizeof( uint32_t )> i_dead = getDead( iLowGain )[i];
 			cout << "\t " << i << "\t";
 			for( unsigned j = 0; j < i_dead.size(); j++ )
 			{
 				if( i_dead.test( j ) && j < fDeadChannelText.size() )
 				{
-					cout << fDeadChannelText[j] << "\t";
+					cout << fDeadChannelText[j];
+					if( j == 5 || j == 7 )
+					{
+						cout << " (rel gain: " << getGains( iLowGain )[j] << ")";
+					}
+					if( j == 6 )
+					{
+						cout << " (gainvar: " << getGainvars( iLowGain )[j] << ")";
+					}
+					if( j == 1 )
+					{
+						cout << " (ped: " << getPeds( iLowGain )[j] << ")";
+					}
+					if( j == 2 || j == 3 || j == 4 )
+					{
+						cout << " (pedvar: " << getPedvars( ( bool )iLowGain, getSumWindow() )[ j ] << ")";
+					}
+					if( j == 13 )
+					{
+						cout << " (" << getL1Rate( j ) << " Hz)";
+					}
+					if( j == 14 )
+					{
+						cout << " (" << getHV( j ) << " V)";
+					}
+					if( j == 15 )
+					{
+						cout << " (" << getCurrent( j ) << " muA)";
+					}
+					cout << "\t" ;
 				}
 			}
 			cout << endl;
@@ -557,7 +586,7 @@ void VEvndispData::printDeadChannelList() // DEADCHAN
 {
 
 	cout << "==================================" << endl;
-	cout << "Dead Channel Listing" << endl;
+	cout << "Dead Channel Listing (last event)" << endl;
 	// loop over gains
 	for( unsigned int iHiLo = 0 ; iHiLo < 2 ; iHiLo++ )
 	{
@@ -572,13 +601,43 @@ void VEvndispData::printDeadChannelList() // DEADCHAN
 			{
 				if( getDead( iHiLo )[iChan] > 0 )
 				{
-					bitset<8 * sizeof( uint32_t )> i_dead = getDead( iHiLo )[iChan];
+					bitset<16 * sizeof( uint32_t )> i_dead = getDead( iHiLo )[iChan];
 					printf( "   DEADCHAN Tel %d, Channel %3d, %s gain: ", getTelID() + 1, iChan, ( iHiLo ? " low" : "high" ) ) ;
 					for( unsigned j = 0; j < i_dead.size(); j++ )
 					{
 						if( i_dead.test( j ) && j < fDeadChannelText.size() )
 						{
 							cout << " - " << fDeadChannelText[j] ;
+							
+							if( j == 5 || j == 7 )
+							{
+								cout << " (rel gain: " << getGains( iHiLo )[iChan] << ")";
+							}
+							
+							if( j == 6 )
+							{
+								cout << " (gainvar: " << getGainvars( iHiLo )[iChan] << ")";
+							}
+							if( j == 1 )
+							{
+								cout << " (ped: " << getPeds( iHiLo )[ iChan ] << ")";
+							}
+							if( j == 2 || j == 3 || j == 4 )
+							{
+								cout << " (pedvar: " << getPedvars( ( bool )iHiLo, getSumWindow() )[ iChan ] << ")";
+							}
+							if( j == 13 )
+							{
+								cout << " (" << getL1Rate( iChan ) << " Hz)";
+							}
+							if( j == 14 )
+							{
+								cout << " (" << getHV( iChan ) << " V)";
+							}
+							if( j == 15 )
+							{
+								cout << " (" << getCurrent( iChan ) << " muA)";
+							}
 						}
 					}
 					cout << endl;
@@ -1094,35 +1153,41 @@ unsigned int VEvndispData::getDead( unsigned int iChannel, bool iLowGain = false
 
 double VEvndispData::getAverageElevation()
 {
-   double iAverageElevation = 0.;
-// for MC: return average elevation from CORSIKA
-   if( isMC() )
-   {
-       if( getReader() && getReader()->getMonteCarloHeader() )
-       {
-           iAverageElevation = 0.5 * (getReader()->getMonteCarloHeader()->alt_range[0]+getReader()->getMonteCarloHeader()->alt_range[1]);
-           iAverageElevation *= TMath::RadToDeg();
-       }
-   }
-// for data: loop over run and calculate average elevation
-   else
-   {
-       double iN = 0.;
-       double ze  = 0.;
-       double az = 0.;
-       for( float i = getRunParameter()->fDBDataStartTimeSecOfDay; i < getRunParameter()->fDBDataStoppTimeSecOfDay; i++ )
-       {
-           VSkyCoordinatesUtilities::getHorizontalCoordinates( getRunParameter()->fDBDataStartTimeMJD, i,
-                                                               getRunParameter()->fTargetDec, getRunParameter()->fTargetRA,
-                                                               az, ze);
-           iAverageElevation += 90. - ze;
-           iN++;
-       }
-       if( iN > 0. ) iAverageElevation /= iN;
-       else          iAverageElevation = 0.;
-   }
-
-   return iAverageElevation;
+	double iAverageElevation = 0.;
+	// for MC: return average elevation from CORSIKA
+	if( isMC() )
+	{
+		if( getReader() && getReader()->getMonteCarloHeader() )
+		{
+			iAverageElevation = 0.5 * ( getReader()->getMonteCarloHeader()->alt_range[0] + getReader()->getMonteCarloHeader()->alt_range[1] );
+			iAverageElevation *= TMath::RadToDeg();
+		}
+	}
+	// for data: loop over run and calculate average elevation
+	else
+	{
+		double iN = 0.;
+		double ze  = 0.;
+		double az = 0.;
+		for( float i = getRunParameter()->fDBDataStartTimeSecOfDay; i < getRunParameter()->fDBDataStoppTimeSecOfDay; i++ )
+		{
+			VSkyCoordinatesUtilities::getHorizontalCoordinates( getRunParameter()->fDBDataStartTimeMJD, i,
+					getRunParameter()->fTargetDec, getRunParameter()->fTargetRA,
+					az, ze );
+			iAverageElevation += 90. - ze;
+			iN++;
+		}
+		if( iN > 0. )
+		{
+			iAverageElevation /= iN;
+		}
+		else
+		{
+			iAverageElevation = 0.;
+		}
+	}
+	
+	return iAverageElevation;
 }
 
 ////////////////////////////////
