@@ -3208,8 +3208,11 @@ void VAtmosphereSoundings::plot_season( double mjd_start, double mjd_end, TStrin
 	winter->getGraph( value )->Draw( "alp" );
 	TAxis* axis = winter->getGraph( value )->GetXaxis();
 	axis->SetLimits( 0., 30 );
-	summer->getGraph( value )->Draw( "lp same" );
+	axis->SetTitle("height a.s.l. [km]");
 	
+
+	summer->getGraph( value )->Draw( "lp same" );
+
 	for( int i = 0; i < Nmonth; i++ )
 	{
 		int y1, y2, m1, m2, d1, d2, j;
@@ -3221,6 +3224,7 @@ void VAtmosphereSoundings::plot_season( double mjd_start, double mjd_end, TStrin
 		t->setColor( col[i] );
 		t->getGraph( value )->SetTitle( name.Data() );
 		t->getGraph( value )->Draw( "lp same" );
+		v.push_back(t);
 		
 	}
 	
@@ -3228,10 +3232,12 @@ void VAtmosphereSoundings::plot_season( double mjd_start, double mjd_end, TStrin
 	if( strcmp( value, "temperature" ) == 0 )
 	{
 		legend = gPad->BuildLegend( 0.35, 0.45, 1.0, 1.0 );
+		winter->getGraph(value)->GetYaxis()->SetTitle("Temperature [K]");
 	}
-	if( strcmp( value, "density" ) == 0 )
+	else if( strcmp( value, "density" ) == 0 )
 	{
 		legend = gPad->BuildLegend( 0.2, 0.0, 0.8, 0.5 );
+		winter->getGraph(value)->GetYaxis()->SetTitle("density*exp(h/7.739km) [g/cm^{3}]");
 	}
 	else
 	{
@@ -3248,8 +3254,11 @@ void VAtmosphereSoundings::plot_season( double mjd_start, double mjd_end, TStrin
 	temp = getResidualGraph( summer->getGraph( value ), winter->getGraph( value ), 2 );
 	temp->SetLineWidth( 4 );
 	temp->Draw( "alp" );
+	temp->GetYaxis()->SetTitle("rel diff to winter");
 	axis = temp->GetXaxis();
 	axis->SetLimits( 0., 30 );
+	axis->SetTitle("height a.s.l. [km]");
+
 	temp = getResidualGraph( winter->getGraph( value ), winter->getGraph( value ), 4 );
 	temp->SetLineWidth( 4 );
 	temp->Draw( "lp same" );
@@ -3257,7 +3266,7 @@ void VAtmosphereSoundings::plot_season( double mjd_start, double mjd_end, TStrin
 	
 	for( int i = 0; i < Nmonth; i++ )
 	{
-		TGraph* temp = getResidualGraph( getAverageProfile( i + 2 )->getGraph( value ), winter->getGraph( value ), col[i] );
+		TGraph* temp = getResidualGraph( v[i]->getGraph( value ), winter->getGraph( value ), col[i] );
 		if( temp )
 		{
 			temp->Draw( "lp same" );
@@ -3272,13 +3281,15 @@ void VAtmosphereSoundings::plot_season( double mjd_start, double mjd_end, TStrin
 	temp->Draw( "alp" );
 	axis = temp->GetXaxis();
 	axis->SetLimits( 0., 30 );
+	axis->SetTitle("height a.s.l. [km]");
+	temp->GetYaxis()->SetTitle("rel diff to summer");
 	temp = getResidualGraph( summer->getGraph( value ), summer->getGraph( value ), 2 );
 	temp->Draw( "lp same" );
 	temp->SetLineWidth( 4 );
 	
 	for( int i = 0; i < Nmonth; i++ )
 	{
-		TGraph* temp = getResidualGraph( getAverageProfile( i + 2 )->getGraph( value ), summer->getGraph( value ), col[i] );
+		TGraph* temp = getResidualGraph( v[i]->getGraph( value ), summer->getGraph( value ), col[i] );
 		if( temp )
 		{
 			temp->Draw( "lp same" );
@@ -3291,13 +3302,12 @@ void VAtmosphereSoundings::plot_season( double mjd_start, double mjd_end, TStrin
 	filename = TString::Format( "%sseason_%s_%s.pdf", outfileprefix.Data(), season_name.Data(), value );
 	c->SaveAs( filename.Data() );
 	
-	
 }
 
 
 
 
-void VAtmosphereSoundings::plot_season( int year_start, int month_start, int day_start, int year_end, int month_end , int day_end, char* value, TString outfileprefix = "" )
+void VAtmosphereSoundings::plot_season( int year_start, int month_start, int day_start, int year_end, int month_end , int day_end, char* value, TString outfileprefix  )
 {
 	//plots and prints temperature/density profiles per dark run for a given observing season. 
 	//expects the dates of the last full moon before the start of season and the first full moon after the end of season.
