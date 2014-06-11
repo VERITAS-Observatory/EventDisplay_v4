@@ -1663,6 +1663,10 @@ void VArrayAnalyzer::prepareforDirectionReconstruction( unsigned int iMethodInde
 	tgrad.clear();
 	xcore.clear();
 	ycore.clear();
+	Xoff.clear();
+	Yoff.clear();
+	cen_x.clear();
+	cen_y.clear();
 	ltrig.clear();
 	ze.clear();
 	az.clear();
