@@ -29,7 +29,7 @@ void VImageAnalyzerHistograms::init()
 	char hisname[800];
 	char histitle[800];
 	
-	sprintf( hisname, "fdiagno" );
+	sprintf( hisname, "fFADCStop" );
 	sprintf( histitle, "FADC stop diagnostic tree (telescope %d)", fTelescopeID + 1 );
 	fdiagno = new TTree( hisname, histitle );
 	fdiagno->SetAutoSave( 100000000 );
@@ -100,12 +100,6 @@ void VImageAnalyzerHistograms::terminate( TFile* outputfile )
 		return;
 	}
 	TDirectory* iDir = gDirectory;
-	
-	// make histo directory
-	if( !gDirectory->FindObject( "histograms" ) )
-	{
-		gDirectory->mkdir( "histograms" )->cd();
-	}
 	
 	hisList->Write();
 	
