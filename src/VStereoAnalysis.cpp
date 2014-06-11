@@ -2677,17 +2677,9 @@ void VStereoAnalysis::save_TreeWithEventsForCtools() // WRITEEVENTTREEFORCTOOLS
 	// save our ctools tree
 	fTreeWithEventsForCtools->Write() ; // or maybe ->AutoSave() ?
 	
-	fRunPara->fScalarDeadTimeFrac = fDeadTime[0]->getScalarDeadTimeFraction() ;
+	fRunPara->fScalarDeadTimeFrac = fDeadTime[fHisCounter]->getDeadTimeFraction( fTimeMask->getMask(), fRunPara->fDeadTimeCalculationMethod );
 	fRunPara->SetName( "VAnaSumRunParameter" );
 	fRunPara->Write() ;
-	
-	/*
-	VAnaSumRunParameterDataClass* vasr = new VAnaSumRunParameterDataClass() ;
-	vasr->fWobbleNorth = 0.5 ;
-	vasr->fRunOn = 65543 ;
-	vasr->SetName( "VASRPDC" ) ;
-	vasr->Write() ;
-	*/
 	
 	fCDataTreeClone = fDataRunTree->CloneTree() ;
 	fCDataTreeClone->SetName( "cdatatree" );
