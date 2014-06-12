@@ -303,7 +303,7 @@ function checkForFASTDEVMODE {
 STAGEFILE="$SCIDIR/stage"
 RUNNINGJOBS="$SCIDIR/runningjobs" # file containing job numbers from the last action
 if [[ "$1" == "jobs" ]] ; then # print run status
-    checkIfJobsAreDone "$RUNNINGJOBS" "$STAGEFILE" 90
+    checkIfJobsAreDoneAlt "$RUNNINGJOBS" "$STAGEFILE" 30
 fi
 
 if [[ "$1" == "kill" ]] ; then # kill all running jobs

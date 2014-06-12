@@ -148,6 +148,127 @@ function checkIfJobsAreDone {
     exit 0
 }
 
+# check if any jobs are currently running,
+# pause SLEEPTIME seconds between each check
+# BY DESIGN: this function blocks until
+#   all jobs are either 
+# runnumbers are stored in file $1,
+function checkIfJobsAreDoneAlt {
+    local RUNNINGJOBS="$1"
+    local STAGEFILE="$2"
+    local SLEEPTIME="$3"
+    local JOBLIST=""
+    local JOBSWAITING=0
+    local JOBSINPROGRESS=0
+    local JOBSERRORED=0
+    local ALLJOBS=""
+    local JOBLINE=""
+    local JOBSTATE=""
+    local JOBSDONE=""
+    local RUNNINGSTAGE=""
+    local JL=""
+    local JITERCODE=""
+    local TOTALJOBS=""
+    # RUNNINGJOBS should be the filename that contains
+    # the simple list of jobnumbers to check if running
+    if [ -e "$RUNNINGJOBS" ] ; then # the RUNNINGJOBS file exists and we can do stuff
+		
+		# use subshell () so we can set IFS to \newline and read JOBLIST and JOBLINE
+		# in for loops, rather than using reads all over the place (which caused buggy
+		# behavior in this function)
+		( IFS='
+'
+        while true ; do
+            JOBLIST=`cat $RUNNINGJOBS`
+			#echo "JOBLIST:"
+			#echo "$JOBLIST"
+            JOBSWAITING=0
+            JOBSINPROGRESS=0
+            JOBSERRORED=0
+            ALLJOBS=$( qstat -u $USER | tail -n +3 | awk '{printf "%s %s %s %s \"%s\"\n", $1, $3, $5, $9, $0 }')
+            TOTALJOBS=0
+            #echo "ALLJOBS:$ALLJOBS"
+			for AJOB in ${JOBLIST[@]} ; do
+            #while read -r AJOB ; do
+				#echo
+                #echo "AJOB: '$AJOB'"
+				#echo
+                JOBNUM=$(   echo "$AJOB" | tr '.' ' ' | awk '{ print $1 }' )
+                #echo "JOBNUM: '$JOBNUM'"
+                JOBARRAYCODE=$( echo "$AJOB" | tr '.' ' ' | awk '{ print $2 }' ) 
+                #echo "JOBARRAYCODE: '$JOBARRAYCODE'"
+                
+                # figure out how many array jobs are 
+                # associated with this job number
+                if [[ -z "$JOBARRAYCODE" ]] ; then     
+                    JOBARRAYN=1
+                else
+                    JOBARRAYN=$( countArrayJobs "$JOBARRAYCODE" )
+                fi
+                #echo "JOBARRAYN: '$JOBARRAYN'"
+                TOTALJOBS=$(( TOTALJOBS + $JOBARRAYN ))
+                
+                # figure out how many jobs are in each state
+                JOBLINE=$( echo "$ALLJOBS" | grep -P "^${JOBNUM}" )
+                #echo "JOBLINE '$JOBLINE'"
+                #while read -r JL ; do
+				for JL in $JOBLINE ; do
+                    #echo "JL '$JL'"
+                    JOBSTATE=$( echo "$JL" | awk '{print $3}' )
+                    
+                    # code for arrayjobs, i.e. "1-4:1"
+                    JITERCODE=$( echo "$JL" | awk '{ print $4 }' )
+                    ADDJOB=1
+                    
+                    # if we have a range of jobs "1-4:1", then we 
+                    # need to count how many there are
+                    if [[ "$JITERCODE" =~ [-:] ]] ; then 
+                        echo "range of jobs!"
+                        ADDJOB=$( seq `echo "$JITERCODE" | tr '-' ' ' | tr ':' ' ' | awk '{ printf "%s %s %s\n", $1, $3, $2 }'` | wc -l )
+                    fi
+                    #echo "JOBSTATE '$JOBSTATE'"
+                    #echo "JOB:$AJOB"
+                    #echo "  JOBLINE:$JOBLINE"
+                    #echo "  JOBSTATE:$JOBSTATE"
+                    if   [ "$JOBSTATE" == "qw" ] ; then JOBSWAITING=$((    JOBSWAITING    + $ADDJOB))
+                    elif [ "$JOBSTATE" == "r"  ] ; then JOBSINPROGRESS=$(( JOBSINPROGRESS + $ADDJOB))
+                    elif [ "$JOBSTATE" == "E"  ] ; then JOBSERRORED=$((    JOBSERRORED    + $ADDJOB))
+                    fi
+                    #echo "JOBSINPROGRESS '$JOBSINPROGRESS'"
+                #done < <(echo "$JOBLINE")
+				done
+            #done <<< "$JOBLIST"
+			done 
+			#IFS=$OLDIFS
+            #echo "NJOBS `echo "$ALLJOBS" | wc -l`"
+            #echo "JOBSINPROGRESS '$JOBSINPROGRESS'"
+            JOBSDONE=$(( TOTALJOBS - (JOBSWAITING+JOBSINPROGRESS+JOBSERRORED) )) # how many jobs are not waiting, running, or errored
+            RUNNINGSTAGE=$( cat "$STAGEFILE" )
+            echo ; echo "$RUNNINGSTAGE jobs:"
+            echo -e "  ${COTBLUE}$JOBSWAITING jobs waiting${CONORM}"
+            echo -e "  ${COTCYAN}$JOBSINPROGRESS jobs in progress${CONORM}"
+            echo -e "  ${COTGREEN}$JOBSDONE jobs complete${CONORM}"
+            if [ "$JOBSERRORED" -gt "0" ] ; then # let the user know some jobs have errored
+                echo -e "  ${CORED}$JOBSERRORED jobs in the error state${CONORM}"
+            fi
+            echo
+            if [ "$((JOBSWAITING+JOBSINPROGRESS))" -le "0" ] ; then
+                #echo -ne "\007" ## I beep for the users.
+                if [[ "$JOBSERRORED" > 0 ]] ; then
+                    echo ; echo -e "  ${COTYELLOW}Careful, some jobs are in the error state!${CONORM}"
+                fi
+                break
+            else
+                sleep "$SLEEPTIME"
+            fi
+        done
+		)
+    else
+        echo "Jobs-file '$RUNNINGJOBS' currently contains no running jobs."
+    fi
+    exit 0
+}
+
 # count how many strings match $searchstring
 # only return the number, no formatting
 function countStrings {
