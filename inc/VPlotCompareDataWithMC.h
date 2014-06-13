@@ -43,7 +43,6 @@ class VPlotCompareDataWithMC
 						   int bContents = 1, double xmin = -9999., double xmax = 9999. );
 		void   getScaling( double& s_sims, double& s_diff, string his = "MSCW",
 						   int bContents = 1, double xmin = -9999., double xmax = 9999. );
-		void   plot_energyDependentDistributions( string iVariable, int iRebin, double x_min, double x_max, string iPlot = "SIMSDIFF" );
 		void   plotLegend( TH1D* hsims, TH1D* hdiff, double x0 = 0.5 );
 		TCanvas* plotRelativePlots( char* i_CanvasName, char* i_CanvasTitle, TH1D* h1, TH1D* h2, double xmin, double xmax );
 		void   plotRelativePlot( TH1D* h1, TH1D* h2, double xmin = -999., double xmax = -999. );
@@ -65,10 +64,12 @@ class VPlotCompareDataWithMC
 		void msc_plots( char* offFile = 0, char* helium = 0, char* proton = 0, double xmin = -1.5, double xmax = 4., string ivar = "MSCW" );
 		void msc_vs_energy_plots( int iRebin = 2, double xmin = -1.5, double xmax = 1.5 );
 		void mwr_vs_energy_plots( int iRebin = 2, double xmin =  0.7, double xmax = 1.3 );
+		void widthlength_vs_energy_plots( int iTelescope = 1, int iRebin = 2, double xmin =  0., double xmax = 0.5 );
 		void model3D_vs_energy_plots(); 
 		void multiplicity_plots();
 		bool openDataFile( string ifile );
 		void plot( string iPrintName = "" );
+		void plot_energyDependentDistributions( string iVariable, int iRebin = 1, double x_min = 0., double x_max = 1., string iPlot = "SIMSDIFF", int iTelescope = 0 );
 		void single_telescope( int telid = -1 );
 		void single_telescope( int telid, string iPlot, bool iOneCanvas = true,
 							   int iScalingMethod = 1, int i_rebin = 1 );
