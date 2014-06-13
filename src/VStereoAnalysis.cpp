@@ -830,6 +830,15 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 			iTimeMask->Write( "vtimemask" );
 		}
 		fHisto[fHisCounter]->writeHistograms();
+		
+		// requires fDeadTime histograms to be intact,
+		// so we need to save_TreeWithEventsForCtools() 
+		// *before* fDeadTime[fHisCounter]->writeHistograms()
+		if( fTreeWithEventsForCtools && fIsOn && fRunPara->fWriteEventTreeForCtools )  // WRITEEVENTTREEFORCTOOLS
+		{
+			save_TreeWithEventsForCtools() ;
+		}
+		
 		fDeadTime[fHisCounter]->writeHistograms();
 		// copy effective areas and radial acceptance to anasum output file
 		if( bOn )
@@ -866,11 +875,6 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 		if( fTreeWithAllGamma && fIsOn && fRunPara->fWriteAllGammaToTree )  // WRITEALLGAMMATOTREE
 		{
 			fTreeWithAllGamma->Write() ; // or maybe ->AutoSave() ?
-		}
-		
-		if( fTreeWithEventsForCtools && fIsOn && fRunPara->fWriteEventTreeForCtools )  // WRITEEVENTTREEFORCTOOLS
-		{
-			save_TreeWithEventsForCtools() ;
 		}
 		
 	}
@@ -2503,6 +2507,7 @@ bool VStereoAnalysis::init_TreeWithEventsForCtools( int irun ) // WRITEEVENTTREE
 	cout << " :: init_TreeWithEventsForCtools( " << irun << " )" << endl;
 	cout << endl;
 	
+	
 	if( fTreeWithEventsForCtools )
 	{
 		delete fTreeWithEventsForCtools;
@@ -2594,7 +2599,6 @@ void VStereoAnalysis::fill_TreeWithEventsForCtools( CData* c , double i_xderot, 
 	fTreeCTOOLS_EmissionHeight = c->EmissionHeight ; // height of shower maximum (in km) above telescope z-plane
 	fTreeCTOOLS_Acceptance     = fCTOOLSAcceptance->getAcceptance( i_xderot, i_yderot ) ;
 
-	
 	// RA- and DEC-aligned Wobbles
 	fTreeCTOOLS_WobbleWest  = getWobbleWest()  ;
 	fTreeCTOOLS_WobbleNorth = getWobbleNorth() ;
@@ -2604,7 +2608,7 @@ void VStereoAnalysis::fill_TreeWithEventsForCtools( CData* c , double i_xderot, 
 	fTreeCTOOLS_TargetDEC = fRunPara->fRunList[0].fTargetDecJ2000 ;
 	
 	// need the telescope pointing for the TangentPoint (RA/DEC of Telescope Pointing?)
-	double CenterPoint_RA  = ( fTreeCTOOLS_TargetRA  + fTreeCTOOLS_WobbleWest ) ;
+	double CenterPoint_RA  = ( fTreeCTOOLS_TargetRA  + -1.0*fTreeCTOOLS_WobbleWest ) ;
 	double CenterPoint_DEC = ( fTreeCTOOLS_TargetDEC + fTreeCTOOLS_WobbleNorth ) ;
 	CenterPoint_RA      *= TMath::DegToRad() ;
 	CenterPoint_DEC     *= TMath::DegToRad() ;
@@ -2614,41 +2618,19 @@ void VStereoAnalysis::fill_TreeWithEventsForCtools( CData* c , double i_xderot, 
 			  fTreeCTOOLS_Yderot * TMath::DegToRad(),
 			  CenterPoint_RA,   CenterPoint_DEC,
 			  &Spherical_RA,    &Spherical_DEC ) ;
-	//Spherical_RA   *= TMath::RadToDeg() ;
-	//Spherical_DEC  *= TMath::RadToDeg() ;
 	fTreeCTOOLS_RA  = Spherical_RA  * TMath::RadToDeg() ;
 	fTreeCTOOLS_DEC = Spherical_DEC * TMath::RadToDeg() ;;
 	
 	// Convert from spherical RA and DEC to Azimuth and Zenith
-	//double ObsLat_rad   = VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad() ;
-	//double EventRA_rad  = fTreeCTOOLS_RA  * TMath::DegToRad() ;
-	//double EventDEC_rad = fTreeCTOOLS_DEC * TMath::DegToRad() ;
-	//double Az_rad = 0.0 ;
 	double Az_deg = 0.0 ;
-	//double El_rad = 0.0 ;
 	double El_deg = 0.0 ;
-	
-	// calculate hour angle (HOUR ANGLE != RIGHT ASCENSION)
-	// taken from VSkyCoordinates::updatePointing()
-	//double iTime = c->Time / 86400. ;
-	//double iSid  = slaGmsta( (double)c->MJD, iTime ) ;
-	//iSid = iSid - ( VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad() ) ;
-	//double ha = slaDranrm( iSid - Spherical_RA ) ;
 	
 	// convert to degrees and do calculation
 	double Spherical_RA_deg  = Spherical_RA  * TMath::RadToDeg() ;
 	double Spherical_DEC_deg = Spherical_DEC * TMath::RadToDeg() ;
-	//slaDe2h( ha, Spherical_DEC, ObsLat_rad, &Az_rad, &El_rad ) ;
-	
-	//Az_deg = Az_rad * TMath::RadToDeg() ;
-	//El_deg = El_rad * TMath::RadToDeg() ;
-	// target's ra and decl in degrees
-	//vsky->setTargetJ2000( decl[i_row] * TMath::RadToDeg() , ra[i_row] * TMath::RadToDeg() ) ;
 	fVsky->setTargetJ2000( Spherical_DEC_deg , Spherical_RA_deg ) ;
-	// day that you're looking for elev and azimuth on
-	//fVsky->precessTarget( mjdDay[i_row], telescope ) ;
-	//fullMJD = (double)(fTreeCTOOLS_MJD + (fTreeCTOOLS_Time/86400.0)) ;
 	fVsky->precessTarget( fTreeCTOOLS_MJD, 0 ) ;
+
 	// calculate new param
 	fVsky->updatePointing( fTreeCTOOLS_MJD, fTreeCTOOLS_Time ) ;
 	Az_deg = fVsky->getTargetAzimuth() ;
@@ -2676,7 +2658,7 @@ void VStereoAnalysis::save_TreeWithEventsForCtools() // WRITEEVENTTREEFORCTOOLS
 {
 	// save our ctools tree
 	fTreeWithEventsForCtools->Write() ; // or maybe ->AutoSave() ?
-	
+
 	fRunPara->fScalarDeadTimeFrac = fDeadTime[fHisCounter]->getDeadTimeFraction( fTimeMask->getMask(), fRunPara->fDeadTimeCalculationMethod );
 	fRunPara->SetName( "VAnaSumRunParameter" );
 	fRunPara->Write() ;
