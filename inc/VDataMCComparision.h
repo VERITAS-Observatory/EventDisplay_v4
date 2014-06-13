@@ -18,14 +18,36 @@
 
 #include <bitset>
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
 using namespace std;
 
+class VDataMCComparisionHistogramData
+{
+      public:
+
+      string fVarName;
+      string fHistogramType;
+      unsigned int fTelescopeID;                    // 0 = array variable
+
+      TH1D*  fHis1D;
+      TH2D*  fHis2D;
+
+      VDataMCComparisionHistogramData( string iVarName = "", string iHistogramType = "", unsigned int iTelescopeID = 0 );
+     ~VDataMCComparisionHistogramData() {}
+      bool   initHistogram( string iXTitle, int iNbins, double ix_min, double ix_max );
+      void   fill( double iV, double iWeight = 1., double iLogEnergy_TeV = -99. );  
+};
+
 class VDataMCComparision
 {
 	private:
+
+                enum E_varname { ELENGTH, EWIDTH, EDIST, EALPHA, ENTUBES, ENLOWGAIN, ESIZE, ESIZE2, ESIZELG, EFRACLOW, EMAX1, EMAX2, EMAX3, ELOSS, ELOS, EASYM,
+                                 ECENX, ECENY, ETGRADX, EMSCWT, EMSCLT, ETELDIST, ETHETA2, ELTHETA2, EMSCW, EMSCL, EMWR, EMLR, EXCORE, EYCORE, EEREC, ENIMAGES,
+                                 EIMGSEL, EEMISSIONHEIGHT, EMVA, ESIGMAT3D, ENC3D, EDEPTH3D, ERWIDTH3D, EERRRWIDTH3D };
 	
 		string fName;
 		int fNTel;
@@ -55,68 +77,21 @@ class VDataMCComparision
 		VGammaHadronCuts* fCuts;
 		bool fCalculateMVAValues;
 		
-		// list with all histograms
+		// lists with all histograms
 		TList* hisList;
+		vector<TH1D* > hTel;
+		vector<TH2D* > hTel2D;
+
+                // histogram classes
+                map< E_varname, vector< VDataMCComparisionHistogramData* > > fHistoSingleTel; 
+                map< E_varname, VDataMCComparisionHistogramData* > fHistoArray; 
+
 		// stereo histograms
-		TH1D* htheta2;
-		TH1D* hltheta2;
-		TH1D* hMSCW;
-		TH1D* hMSCL;
-		TH2D* hMSCWErec;
-		TH2D* hMSCLErec;
-		TH1D* hMWR;//AMc
-		TH1D* hMLR;//AMc
-		TH2D* hMWRErec;//AMc
-		TH2D* hMLRErec;//AMc
-		TH1D* hXcore;
-		TH1D* hYcore;
 		TH2D* hXYcore;
 		TH2D* hAzYcore;
 		TH2D* hYt2;
-		TH1D* hErec;
-		TH1D* hNimages;
-		TH1D* hImgSel;
-		TH1D* hEmissionHeight;
-		TH1D* hMVA;
-		vector< TH1D* > hR;
+                vector<TH2D* > hcen_xy;
 		vector< TH2D* > hdistR;
-		TH1D* hsigmaT3D;    //JG
-		TH1D* hNc3D;        //JG
-		TH1D* hDepth3D;     //JG
-		TH1D* hRWidth3D;    //JG
-		TH1D* hErrRWidth3D; //JG
-		TH2D* hsigmaT3DErec;    //JG
-		TH2D* hNc3DErec;        //JG
-		TH2D* hDepth3DErec;     //JG
-		TH2D* hRWidth3DErec;    //JG
-		TH2D* hErrRWidth3DErec; //JG
-
-		// single telescope histograms
-		vector<TH1D* > hdist;
-		vector<TH1D* > hntubes;
-		vector<TH1D* > hnlowgain;
-		vector<TH1D* > hwidth;
-		vector<TH1D* > hlength;
-		vector<TH1D* > hlos;
-		vector<TH1D* > hloss;
-		vector<TH1D* > hsize;
-		vector<TH1D* > hsize2;
-		vector<TH1D* > hsizeLG;
-                vector<TH1D* > hfraclow;
-		vector<TH1D* > hmax1;
-		vector<TH1D* > hmax2;
-		vector<TH1D* > hmax3;
-		vector<TH1D* > halpha;
-		vector<TH1D* > hasym;
-		vector<TH1D* > hcen_x;
-		vector<TH1D* > hcen_y;
-		vector<TH2D* > hcen_xy;
-		vector<TH1D* > htgrad_x;
-		vector<TH1D* > hmscwt;
-		vector<TH1D* > hmsclt;
-		vector<TH1D* > hr;
-		vector<TH1D* > hTel;
-		vector<TH2D* > hTel2D;
 		
 		void setEntries( TH1D* );
 		void setEntries( TH2D* );
@@ -126,7 +101,7 @@ class VDataMCComparision
 	public:
 	
 		VDataMCComparision( string, bool, int );
-		~VDataMCComparision() {}
+	       ~VDataMCComparision() {}
 		void defineHistograms();
 		bool fillHistograms( string ifile, int iSingleTelescopeCuts );
 		bool fillHistograms( string ifile, int iSingleTelescopeCuts, double iWobbleNorth, double iWobbleEast );

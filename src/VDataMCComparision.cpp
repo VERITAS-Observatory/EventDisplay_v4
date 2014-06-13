@@ -1,11 +1,56 @@
 /* \class VDataMCComparision
  *
  *
- *   \author Gernot Maier
  */
 
 #include "VDataMCComparision.h"
 
+VDataMCComparisionHistogramData::VDataMCComparisionHistogramData( string iName, string iHistogramType, unsigned int iTelescopeID )
+{
+    fVarName = iName;
+    fHistogramType = iHistogramType;
+    fTelescopeID = iTelescopeID;
+    fHis1D = 0;
+    fHis2D = 0;
+}
+
+bool VDataMCComparisionHistogramData::initHistogram( string iXTitle, int iNbins, double ix_min, double ix_max )
+{
+     char hname[200];
+
+     if( fTelescopeID > 0 ) sprintf( hname, "h%s_%d_%s", fVarName.c_str(), fTelescopeID, fHistogramType.c_str() );
+     else                   sprintf( hname, "h%s_%s", fVarName.c_str(), fHistogramType.c_str() );
+
+     fHis1D = new TH1D( hname, "", iNbins, ix_min, ix_max );
+     fHis1D->SetXTitle( iXTitle.c_str() );
+     fHis1D->Sumw2();
+
+     if( fTelescopeID > 0 ) sprintf( hname, "h%sErec_%d_%s", fVarName.c_str(), fTelescopeID, fHistogramType.c_str() );
+     else                   sprintf( hname, "h%sErec_%s", fVarName.c_str(), fHistogramType.c_str() );
+
+     fHis2D = new TH2D( hname, "",  6, -1., 1., iNbins, ix_min, ix_max );
+     fHis2D->SetXTitle( "log_{10} energy_{rec} [TeV]" );
+     fHis2D->SetYTitle( iXTitle.c_str() );
+     fHis2D->Sumw2();
+
+     if( fHistogramType == "OFF" )
+     {
+        fHis1D->SetLineColor( 2 );
+        fHis1D->SetMarkerColor( 2 );
+        fHis2D->SetLineColor( 2 );
+        fHis2D->SetMarkerColor( 2 );
+     }
+
+     return true;
+}
+
+void VDataMCComparisionHistogramData::fill( double iV, double iWeight, double iLogEnergy_TeV )
+{
+    if( fHis1D ) fHis1D->Fill( iV, iWeight );
+    if( fHis2D && iLogEnergy_TeV > -98. ) fHis2D->Fill( iLogEnergy_TeV, iV, iWeight );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
 
 VDataMCComparision::VDataMCComparision( string iname, bool iBackgroundData, int intel )
 {
@@ -24,7 +69,7 @@ VDataMCComparision::VDataMCComparision( string iname, bool iBackgroundData, int 
 	fCuts = 0;
 	fCalculateMVAValues = false;
 	
-	// specral weighting (might be read from MC run header)
+	// spectral weighting (will be set later correctly, as it is run from MC run header)
 	fSpectralWeight = new VSpectralWeight();
 	fSpectralWeight->setMCParameter( 2.0, 0.05, 20. );
 	// index MC events are weighted to
@@ -32,35 +77,12 @@ VDataMCComparision::VDataMCComparision( string iname, bool iBackgroundData, int 
 	
 	// setting all variables
 	hisList = 0;
-	htheta2 = 0;
-	hltheta2 = 0;
-	hMSCW = 0;
-	hMSCL = 0;
-	hMSCWErec = 0;
-	hMSCLErec = 0;
-	hMWR = 0;
-	hMLR = 0;
-	hXcore = 0;
-	hYcore = 0;
+
+        // 2D histograms
 	hXYcore = 0;
 	hAzYcore = 0;
 	hYt2 = 0;
-	hErec = 0;
-	hNimages = 0;
-	hImgSel = 0;
-	hEmissionHeight = 0;
-	hMVA = 0;
-	hsigmaT3D = 0;    
-	hNc3D = 0;        
-	hDepth3D = 0;     
-	hRWidth3D = 0;    
-	hErrRWidth3D = 0; 
-	hsigmaT3DErec = 0;    
-	hNc3DErec = 0;        
-	hDepth3DErec = 0;     
-	hRWidth3DErec = 0;    
-	hErrRWidth3DErec = 0; 
-	
+
 	fAzRange = false;
 	fAzMin = 0.;
 	fAzMax = 0.;
@@ -115,91 +137,65 @@ void VDataMCComparision::defineHistograms()
 	hisList = new TList();
 	char hname[200];
 	
-	double vmax = 1.;
         double core_max = 350.;
 	
-	if( bBckData )
-	{
-		vmax = 20.;
-	}
-	else
-	{
-		vmax = 0.3;
-	}
-	sprintf( hname, "htheta2_%s", fName.c_str() );
-	htheta2 = new TH1D( hname, "", 100, 0., vmax );
-	htheta2->SetXTitle( "#theta^{2} [deg^{2}]" );
-	hisList->Add( htheta2 );
+        fHistoArray[ETHETA2] = new VDataMCComparisionHistogramData( "theta2", fName, 0 );
+        fHistoArray[ETHETA2]->initHistogram( "#theta^{2} [deg^{2}]", 100, 0., 0.3 );
+
+        fHistoArray[ELTHETA2] = new VDataMCComparisionHistogramData( "ltheta2", fName, 0 );
+        fHistoArray[ELTHETA2]->initHistogram( "log_{10} #theta^{2} [deg^{2}]", 30, -5., 2. );
+
+        fHistoArray[EMSCW] = new VDataMCComparisionHistogramData( "MSCW", fName, 0 );
+        fHistoArray[EMSCW]->initHistogram( "mean reduced scaled width [deg]", 500, -5., 10. );
+
+        fHistoArray[EMSCL] = new VDataMCComparisionHistogramData( "MSCL", fName, 0 );
+        fHistoArray[EMSCL]->initHistogram( "mean reduced scaled length [deg]", 500, -5., 10. );
+
+        fHistoArray[EMWR] = new VDataMCComparisionHistogramData( "MWR", fName, 0 );
+        fHistoArray[EMWR]->initHistogram( "mean scaled width [deg]", 500, -5., 5. );
+
+        fHistoArray[EMLR] = new VDataMCComparisionHistogramData( "MLR", fName, 0 );
+        fHistoArray[EMLR]->initHistogram( "mean scaled length [deg]", 500, -5., 5. );
+
+        fHistoArray[EXCORE] = new VDataMCComparisionHistogramData( "Xcore", fName, 0 );
+        fHistoArray[EXCORE]->initHistogram( "core position x [m]", 200, -1.*core_max, core_max );
+
+        fHistoArray[EYCORE] = new VDataMCComparisionHistogramData( "Ycore", fName, 0 );
+        fHistoArray[EYCORE]->initHistogram( "core position y [m]", 200, -1.*core_max, core_max );
 	
-	sprintf( hname, "hltheta2_%s", fName.c_str() );
-	hltheta2 = new TH1D( hname, "", 30, -5., 2. );
-	hltheta2->SetXTitle( "log_{10} #theta^{2} [deg^{2}]" );
-	hisList->Add( hltheta2 );
-	
-	if( bBckData )
-	{
-		vmax = 20.;
-	}
-	else
-	{
-		vmax = 10.;
-	}
-	sprintf( hname, "hMSCW_%s", fName.c_str() );
-	hMSCW = new TH1D( hname, "", 500, -5., vmax );
-	hMSCW->SetXTitle( "mean reduced scaled width [deg]" );
-	hisList->Add( hMSCW );
-	
-	if( bBckData )
-	{
-		vmax = 20.;
-	}
-	else
-	{
-		vmax = 10.;
-	}
-	sprintf( hname, "hMSCL_%s", fName.c_str() );
-	hMSCL = new TH1D( hname, "", 500, -5., vmax );
-	hMSCL->SetXTitle( "mean reduced scaled length [deg]" );
-	hisList->Add( hMSCL );
-	
-	if( bBckData )
-	{
-		vmax = 20.;
-	}
-	else
-	{
-		vmax = 10.;
-	}
-	sprintf( hname, "hMSCWErec_%s", fName.c_str() );
-	hMSCWErec = new TH2D( hname, "",  6, -1., 1., 500, -5., vmax );
-	hMSCWErec->SetYTitle( "mean reduced scaled width [deg]" );
-	hMSCWErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
-	hisList->Add( hMSCWErec );
-	
-	if( bBckData )
-	{
-		vmax = 20.;
-	}
-	else
-	{
-		vmax = 10.;
-	}
-	sprintf( hname, "hMSCLErec_%s", fName.c_str() );
-	hMSCLErec = new TH2D( hname, "",  6, -1., 1., 500, -5., vmax );
-	hMSCLErec->SetYTitle( "mean reduced scaled length [deg]" );
-	hMSCLErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
-	hisList->Add( hMSCLErec );
-	
-	sprintf( hname, "hXcore_%s", fName.c_str() );
-	hXcore = new TH1D( hname, "", 200, -1.*core_max, core_max );
-	hXcore->SetXTitle( "core position x [m]" );
-	hisList->Add( hXcore );
-	
-	sprintf( hname, "hYcore_%s", fName.c_str() );
-	hYcore = new TH1D( hname, "", 200, -1.*core_max, core_max );
-	hYcore->SetXTitle( "core position Y [m]" );
-	hisList->Add( hYcore );
-	
+        fHistoArray[ENIMAGES] = new VDataMCComparisionHistogramData( "NImages", fName, 0 );
+        fHistoArray[ENIMAGES]->initHistogram( "number of images", 5, 0., 5. );
+
+        fHistoArray[EIMGSEL] = new VDataMCComparisionHistogramData( "ImgSel", fName, 0 );
+        fHistoArray[EIMGSEL]->initHistogram( "telescope combinations", 16, 0., 16. );
+
+        fHistoArray[EEMISSIONHEIGHT] = new VDataMCComparisionHistogramData( "EmissionHeight", fName, 0 );
+        fHistoArray[EEMISSIONHEIGHT]->initHistogram( "estimated height of maximum emission [km]", 100, 0., 200. );
+
+        fHistoArray[EEREC] = new VDataMCComparisionHistogramData( "Erec", fName, 0 );
+        fHistoArray[EEREC]->initHistogram( "log_{10} energy_{MC}", 50, -2., 2. );
+
+        fHistoArray[EMVA] = new VDataMCComparisionHistogramData( "MVA", fName, 0 );
+        fHistoArray[EMVA]->initHistogram( "MVA variable", 100, -1., 1. );
+
+	//these histograms are only filled for Model3D analysis
+         
+        fHistoArray[ESIGMAT3D] = new VDataMCComparisionHistogramData( "sigmaT3D", fName, 0 );
+        fHistoArray[ESIGMAT3D]->initHistogram( "3D width [m]", 100, 0., 50. );
+
+        fHistoArray[ENC3D] = new VDataMCComparisionHistogramData( "Nc3D", fName, 0 );
+        fHistoArray[ENC3D]->initHistogram( "ln(Nc)", 100, 0., 20. );
+        
+        fHistoArray[EDEPTH3D] = new VDataMCComparisionHistogramData( "Depth3D", fName, 0 );
+        fHistoArray[EDEPTH3D]->initHistogram( "depth of shower (3D) [g cm^{-2}]", 100, 0., 1000. );
+
+        fHistoArray[ERWIDTH3D] = new VDataMCComparisionHistogramData( "RWidth3D", fName, 0 );
+        fHistoArray[ERWIDTH3D]->initHistogram( "reduced 3D width [m]", 100, 0, 10. );
+
+        fHistoArray[EERRRWIDTH3D] = new VDataMCComparisionHistogramData( "ErrRWidth3D", fName, 0 );
+        fHistoArray[EERRRWIDTH3D]->initHistogram( "error in reduced 3D width [m]", 100, 0., 0.2 );
+
+        // additional 2D histograms 
 	sprintf( hname, "hXYcore_%s", fName.c_str() );
 	hXYcore = new TH2D( hname, "", 75, -1.*core_max, core_max, 75, -core_max, core_max );
 	hXYcore->SetXTitle( "core position X [m]" );
@@ -217,247 +213,75 @@ void VDataMCComparision::defineHistograms()
 	hYt2->SetXTitle( "log_{10} #Theta^{2}" );
 	hYt2->SetYTitle( "core position Y [m]" );
 	hisList->Add( hYt2 );
-	
-	sprintf( hname, "hNimages_%s", fName.c_str() );
-	hNimages = new TH1D( hname, "", 5, 0., 5. );
-	hNimages->SetXTitle( "number of images" );
-	hisList->Add( hNimages );
-	
-	sprintf( hname, "hImgSel_%s", fName.c_str() );
-	hImgSel = new TH1D( hname, "", 16, 0., 16. );
-	hImgSel->SetXTitle( "telescope combinations" );
-	hisList->Add( hImgSel );
-	
-	sprintf( hname, "hEmissionHeight_%s", fName.c_str() );
-	hEmissionHeight = new TH1D( hname, "", 100, 0., 200. );
-	hEmissionHeight->SetXTitle( "estimated height of maximum emission [km]" );
-	hisList->Add( hEmissionHeight );
-	
-	sprintf( hname, "hMVA_%s", fName.c_str() );
-	hMVA = new TH1D( hname, "", 100, -1., 1. );
-	hMVA->SetXTitle( "MVA variable" );
-	hisList->Add( hMVA );
-	
-	// this histogram is only filled for simulations
-	sprintf( hname, "hErec_%s", fName.c_str() );
-	hErec = new TH1D( hname, "", 50, -2., 2. );
-	hErec->SetXTitle( "log_{10} energy_{MC}" );
-	hisList->Add( hErec );
-	
-	vmax = 5.;
-	sprintf( hname, "hMWR_%s", fName.c_str() );
-	hMWR = new TH1D( hname, "", 500, -5., vmax );
-	hMWR->SetXTitle( "mean scaled width [deg]" );
-	hisList->Add( hMWR );
-	
-	vmax = 5.;
-	sprintf( hname, "hMLR_%s", fName.c_str() );
-	hMLR = new TH1D( hname, "", 500, -5., vmax );
-	hMLR->SetXTitle( "mean scaled length [deg]" );
-	hisList->Add( hMLR );
-	
-	vmax = 5.;
-	sprintf( hname, "hMWRErec_%s", fName.c_str() );
-	hMWRErec = new TH2D( hname, "",  6, -1., 1., 500, -5., vmax );
-	hMWRErec->SetYTitle( "mean scaled width [deg]" );
-	hMWRErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
-	hisList->Add( hMWRErec );
-	
-	vmax = 5.;
-	sprintf( hname, "hMLRErec_%s", fName.c_str() );
-	hMLRErec = new TH2D( hname, "",  6, -1., 1., 500, -5., vmax );
-	hMLRErec->SetYTitle( "mean scaled length [deg]" );
-	hMLRErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
-	hisList->Add( hMLRErec );
-
-	//these histograms are only filled for Model3D analysis
-	sprintf( hname, "hsigmaT3D_%s", fName.c_str() );
-	hsigmaT3D = new TH1D( hname, "", 100, 0., 50. );
-	hsigmaT3D->SetXTitle( "3D width [m]" );
-	hisList->Add( hsigmaT3D );
-	sprintf( hname, "hNc3D_%s", fName.c_str() );
-	hNc3D = new TH1D( hname, "", 100, 0., 20. );
-	hNc3D->SetXTitle( "ln(Nc)" );
-	hisList->Add( hNc3D );
-	sprintf( hname, "hDepth3D_%s", fName.c_str() );
-	hDepth3D = new TH1D( hname, "", 100, 0., 1000. );
-	hDepth3D->SetXTitle( "depth of shower (3D) [g cm^{-2}]" );
-	hisList->Add( hDepth3D );
-	sprintf( hname, "hRWidth3D_%s", fName.c_str() );
-	hRWidth3D = new TH1D( hname, "", 100, 0, 10. );
-	hRWidth3D->SetXTitle( "reduced 3D width [m]" );
-	hisList->Add( hRWidth3D );
-	sprintf( hname, "hErrRWidth3D_%s", fName.c_str() );
-	hErrRWidth3D = new TH1D( hname, "", 100, 0., 0.2 );
-	hErrRWidth3D->SetXTitle( "error in reduced 3D width [m]" );
-	hisList->Add( hErrRWidth3D );
-	//3D vs energy//
-	sprintf( hname, "hsigmaT3DErec_%s", fName.c_str() );
-	hsigmaT3DErec = new TH2D( hname, "", 6, -1., 1., 100, 0., 50. );
-	hsigmaT3DErec->SetYTitle( "3D width [m]" );
-	hsigmaT3DErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
-	hisList->Add( hsigmaT3DErec );
-	sprintf( hname, "hNc3DErec_%s", fName.c_str() );
-	hNc3DErec = new TH2D( hname, "", 6, -1., 1., 100, 0., 20. );
-	hNc3DErec->SetYTitle( "ln(Nc)" );
-	hNc3DErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
-	hisList->Add( hNc3DErec );
-	sprintf( hname, "hDepth3DErec_%s", fName.c_str() );
-	hDepth3DErec = new TH2D( hname, "", 6, -1., 1., 100, 0., 1000. );
-	hDepth3DErec->SetYTitle( "depth of shower (3D) [g cm^{-2}]" );
-	hDepth3DErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
-	hisList->Add( hDepth3DErec );
-	sprintf( hname, "hRWidth3DErec_%s", fName.c_str() );
-	hRWidth3DErec = new TH2D( hname, "", 6, -1., 1., 100, 0, 10. );
-	hRWidth3DErec->SetYTitle( "reduced 3D width [m]" );
-	hRWidth3DErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
-	hisList->Add( hRWidth3DErec );
-	sprintf( hname, "hErrRWidth3DErec_%s", fName.c_str() );
-	hErrRWidth3DErec = new TH2D( hname, "", 6, -1., 1., 100, 0., 0.2 );
-	hErrRWidth3DErec->SetYTitle( "error in reduced 3D width [m]" );
-	hErrRWidth3DErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
-	hisList->Add( hErrRWidth3DErec );
-		
-	for( int i = 0; i < fNTel; i++ )
-	{
-		sprintf( hname, "hR%d_%s", i + 1, fName.c_str() );
-		hR.push_back( new TH1D( hname, "", 25, 0., 300. ) );
-		sprintf( hname, "distance to T%d [m]", i + 1 );
-		hR.back()->SetXTitle( hname );
-		hisList->Add( hR.back() );
-		
-		sprintf( hname, "hdistR%d_%s", i + 1, fName.c_str() );
-		hdistR.push_back( new TH2D( hname, "", 20, 0., 300., 20, 0., 2. ) );
-		sprintf( hname, "distance to T%d [m]", i + 1 );
-		hdistR.back()->SetXTitle( hname );
-		hdistR.back()->SetYTitle( "local distance [deg]" );
-		hisList->Add( hdistR.back() );
-		hTel2D.push_back( hdistR.back() );
-	}
-	
+        
 	// telescope numbering starts at 1!
 	for( int i = 1; i <= fNTel; i++ )
 	{
-		if( bBckData )
-		{
-			vmax = 1.;
-		}
-		else
-		{
-			vmax = 0.5;
-		}
-		sprintf( hname, "hlength_%d_%s", i, fName.c_str() );
-		hlength.push_back( new TH1D( hname, "", 80, 0., vmax ) );
-		hlength.back()->SetXTitle( "length [deg]" );
-		hTel.push_back( hlength.back() );
-		hisList->Add( hlength.back() );
-		
-		if( bBckData )
-		{
-			vmax = 1.;
-		}
-		else
-		{
-			vmax = 0.25;
-		}
-		sprintf( hname, "hwidth_%d_%s", i, fName.c_str() );
-		hwidth.push_back( new TH1D( hname, "", 100, 0., vmax ) );
-		hwidth.back()->SetXTitle( "width [deg]" );
-		hTel.push_back( hwidth.back() );
-		hisList->Add( hwidth.back() );
-		
-		sprintf( hname, "hdist_%d_%s", i, fName.c_str() );
-		hdist.push_back( new TH1D( hname, "", 100, 0., 2.0 ) );
-		hdist.back()->SetXTitle( "dist [deg]" );
-		hTel.push_back( hdist.back() );
-		hisList->Add( hdist.back() );
-		
-		if( bBckData )
-		{
-			vmax = 90.;
-		}
-		else
-		{
-			vmax = 25.;
-		}
-		sprintf( hname, "halpha_%d_%s", i, fName.c_str() );
-		halpha.push_back( new TH1D( hname, "", 100, 0., vmax ) );
-		halpha.back()->SetXTitle( "alpha [deg]" );
-		hTel.push_back( halpha.back() );
-		hisList->Add( halpha.back() );
-		
-		sprintf( hname, "hntubes_%d_%s", i, fName.c_str() );
-		hntubes.push_back( new TH1D( hname, "", 100, 0., 200.0 ) );
-		hntubes.back()->SetXTitle( "ntubes" );
-		hTel.push_back( hntubes.back() );
-		hisList->Add( hntubes.back() );
-		
-		sprintf( hname, "hnlowgain_%d_%s", i, fName.c_str() );
-		hnlowgain.push_back( new TH1D( hname, "", 100, 0., 100.0 ) );
-		hnlowgain.back()->SetXTitle( "nlowgain" );
-		hTel.push_back( hnlowgain.back() );
-		hisList->Add( hnlowgain.back() );
-		
-		sprintf( hname, "hsize_%d_%s", i, fName.c_str() );
-		hsize.push_back( new TH1D( hname, "", 100, 1., 8.0 ) );
-		hsize.back()->SetXTitle( "log_{10} size [d.c.]" );
-		hTel.push_back( hsize.back() );
-		hisList->Add( hsize.back() );
-		
-		sprintf( hname, "hsize2_%d_%s", i, fName.c_str() );
-		hsize2.push_back( new TH1D( hname, "", 100, 1., 8.0 ) );
-		hsize2.back()->SetXTitle( "log_{10} size2 [d.c.]" );
-		hTel.push_back( hsize2.back() );
-		hisList->Add( hsize2.back() );
+                fHistoSingleTel[ELENGTH].push_back( new VDataMCComparisionHistogramData( "length", fName, i ));
+                fHistoSingleTel[ELENGTH].back()->initHistogram( "length [deg]",  100, 0., 0.5 );
 
-		sprintf( hname, "hsizeLG_%d_%s", i, fName.c_str() );
-		hsizeLG.push_back( new TH1D( hname, "", 100, 1., 8.0 ) );
-		hsizeLG.back()->SetXTitle( "log_{10} size_{low gain} [d.c.]" );
-		hTel.push_back( hsizeLG.back() );
-		hisList->Add( hsizeLG.back() );
+                fHistoSingleTel[EWIDTH].push_back( new VDataMCComparisionHistogramData( "width", fName, i ));
+                fHistoSingleTel[EWIDTH].back()->initHistogram( "width [deg]",  100, 0., 0.25 );
 
-		sprintf( hname, "hfraclow_%d_%s", i, fName.c_str() );
-		hfraclow.push_back( new TH1D( hname, "", 100, 0., 1.0 ) );
-		hfraclow.back()->SetXTitle( "fraclow" );
-		hTel.push_back( hfraclow.back() );
-		hisList->Add( hfraclow.back() );
+                fHistoSingleTel[EDIST].push_back( new VDataMCComparisionHistogramData( "dist", fName, i ));
+                fHistoSingleTel[EDIST].back()->initHistogram( "dist [deg]",  100, 0., 2.0 );
+
+                fHistoSingleTel[EALPHA].push_back( new VDataMCComparisionHistogramData( "alpha", fName, i ));
+                fHistoSingleTel[EALPHA].back()->initHistogram( "alpha [deg]",  100, 0., 25 );
+
+                fHistoSingleTel[ENTUBES].push_back( new VDataMCComparisionHistogramData( "ntubes", fName, i ));
+                fHistoSingleTel[ENTUBES].back()->initHistogram( "ntubes",  100, 0., 200. );
+
+                fHistoSingleTel[ENLOWGAIN].push_back( new VDataMCComparisionHistogramData( "nlowgain", fName, i ));
+                fHistoSingleTel[ENLOWGAIN].back()->initHistogram( "nlowgain",  100, 0., 100. );
+
+                fHistoSingleTel[ESIZE].push_back( new VDataMCComparisionHistogramData( "size", fName, i ));
+                fHistoSingleTel[ESIZE].back()->initHistogram( "log_{10} size [d.c.]",  100, 1., 8. );
+
+                fHistoSingleTel[ESIZE2].push_back( new VDataMCComparisionHistogramData( "size2", fName, i ));
+                fHistoSingleTel[ESIZE2].back()->initHistogram( "log_{10} size2 [d.c.]",  100, 1., 8. );
+
+                fHistoSingleTel[ESIZELG].push_back( new VDataMCComparisionHistogramData( "sizeLG", fName, i ));
+                fHistoSingleTel[ESIZELG].back()->initHistogram( "log_{10} sizeLG [d.c.]",  100, 1., 8. );
 		
-		sprintf( hname, "hmax1_%d_%s", i, fName.c_str() );
-		hmax1.push_back( new TH1D( hname, "", 80, 1., 4.0 ) );
-		hmax1.back()->SetXTitle( "log_{10} size_{max1} [d.c.]" );
-		hTel.push_back( hmax1.back() );
-		hisList->Add( hmax1.back() );
+                fHistoSingleTel[EFRACLOW].push_back( new VDataMCComparisionHistogramData( "fraclow", fName, i ));
+                fHistoSingleTel[EFRACLOW].back()->initHistogram( "fraclow",  100, 0., 1. );
+
+                fHistoSingleTel[EMAX1].push_back( new VDataMCComparisionHistogramData( "max1", fName, i ));
+                fHistoSingleTel[EMAX1].back()->initHistogram( "log_{10} size_{max1} [d.c.]",  100, 1., 4. );
+
+                fHistoSingleTel[EMAX2].push_back( new VDataMCComparisionHistogramData( "max2", fName, i ));
+                fHistoSingleTel[EMAX2].back()->initHistogram( "log_{10} size_{max2} [d.c.]",  100, 1., 4. );
 		
-		sprintf( hname, "hmax2_%d_%s", i, fName.c_str() );
-		hmax2.push_back( new TH1D( hname, "", 80, 1., 4.0 ) );
-		hmax2.back()->SetXTitle( "log_{10} size_{max2} [d.c.]" );
-		hTel.push_back( hmax2.back() );
-		hisList->Add( hmax2.back() );
-		
-		sprintf( hname, "hmax3_%d_%s", i, fName.c_str() );
-		hmax3.push_back( new TH1D( hname, "", 80, 1., 4.0 ) );
-		hmax3.back()->SetXTitle( "log_{10} size_{max3} [d.c.]" );
-		hmax3.back()->GetXaxis()->SetTitleOffset( 1.2 );
-		hTel.push_back( hmax3.back() );
-		hisList->Add( hmax3.back() );
-		
-		sprintf( hname, "hloss_%d_%s", i, fName.c_str() );
-		hloss.push_back( new TH1D( hname, "", 80, 0., 1. ) );
-		hloss.back()->SetXTitle( "loss" );
-		hTel.push_back( hloss.back() );
-		hisList->Add( hloss.back() );
-		
-		sprintf( hname, "hlos_%d_%s", i, fName.c_str() );
-		hlos.push_back( new TH1D( hname, "", 40, 0., 1. ) );
-		hlos.back()->SetXTitle( "length/size [deg] x 1000" );
-		hTel.push_back( hlos.back() );
-		hisList->Add( hlos.back() );
-		
-		sprintf( hname, "hasym_%d_%s", i, fName.c_str() );
-		hasym.push_back( new TH1D( hname, "", 100, -2., 2. ) );
-		hasym.back()->SetXTitle( "asymmetry" );
-		hTel.push_back( hasym.back() );
-		hisList->Add( hasym.back() );
+                fHistoSingleTel[EMAX3].push_back( new VDataMCComparisionHistogramData( "max3", fName, i ));
+                fHistoSingleTel[EMAX3].back()->initHistogram( "log_{10} size_{max3} [d.c.]",  100, 1., 4. );
+
+                fHistoSingleTel[ELOSS].push_back( new VDataMCComparisionHistogramData( "loss", fName, i ));
+                fHistoSingleTel[ELOSS].back()->initHistogram( "loss",  100, 0., 1. );
+
+                fHistoSingleTel[ELOS].push_back( new VDataMCComparisionHistogramData( "los", fName, i ));
+                fHistoSingleTel[ELOS].back()->initHistogram( "length/size [deg] x 1000",  100, 0., 1. );
+
+                fHistoSingleTel[EASYM].push_back( new VDataMCComparisionHistogramData( "asym", fName, i ));
+                fHistoSingleTel[EASYM].back()->initHistogram( "asymmetry",  100, -2., 2. );
+
+                fHistoSingleTel[ECENX].push_back( new VDataMCComparisionHistogramData( "cen_x", fName, i ));
+                fHistoSingleTel[ECENX].back()->initHistogram( "image centroid (x) [deg]",  100, -2., 2. );
+
+                fHistoSingleTel[ECENY].push_back( new VDataMCComparisionHistogramData( "cen_y", fName, i ));
+                fHistoSingleTel[ECENY].back()->initHistogram( "image centroid (y) [deg]",  100, -2., 2. );
+
+                fHistoSingleTel[ETGRADX].push_back( new VDataMCComparisionHistogramData( "tgrad_x", fName, i ));
+                fHistoSingleTel[ETGRADX].back()->initHistogram( "time gradient (x)",  100, -30., 30. );
+
+                fHistoSingleTel[EMSCWT].push_back( new VDataMCComparisionHistogramData( "mscwt", fName, i ));
+                fHistoSingleTel[EMSCWT].back()->initHistogram( "expected width",  100, 0., 2. );
+
+                fHistoSingleTel[EMSCLT].push_back( new VDataMCComparisionHistogramData( "msclt", fName, i ));
+                fHistoSingleTel[EMSCLT].back()->initHistogram( "expected length",  100, 0., 2. );
+
+                fHistoSingleTel[ETELDIST].push_back( new VDataMCComparisionHistogramData( "r", fName, i ));
+                fHistoSingleTel[ETELDIST].back()->initHistogram( "distance telescope - core [m]",  100, 0., 300. );
 		
 		sprintf( hname, "hcen_xy%d_%s", i, fName.c_str() );
 		hcen_xy.push_back( new TH2D( hname, "", 100, -2., 2., 100, -2., 2. ) );
@@ -465,56 +289,34 @@ void VDataMCComparision::defineHistograms()
 		hcen_xy.back()->SetYTitle( "image centroid (y) [deg]" );
 		hTel2D.push_back( hcen_xy.back() );
 		hisList->Add( hcen_xy.back() );
-		
-		
-		sprintf( hname, "hcen_x_%d_%s", i, fName.c_str() );
-		hcen_x.push_back( new TH1D( hname, "", 100, -2., 2. ) );
-		hcen_x.back()->SetXTitle( "image centroid (x) [deg]" );
-		hTel.push_back( hcen_x.back() );
-		hisList->Add( hcen_x.back() );
-		
-		sprintf( hname, "hcen_y_%d_%s", i, fName.c_str() );
-		hcen_y.push_back( new TH1D( hname, "", 100, -2., 2. ) );
-		hcen_y.back()->SetXTitle( "image centroid (y) [deg]" );
-		hTel.push_back( hcen_y.back() );
-		hisList->Add( hcen_y.back() );
-		
-		sprintf( hname, "htgrad_x_%d_%s", i, fName.c_str() );
-		htgrad_x.push_back( new TH1D( hname, "", 100, -30., 30. ) );
-		htgrad_x.back()->SetXTitle( "time gradient (x)" );
-		hTel.push_back( htgrad_x.back() );
-		hisList->Add( htgrad_x.back() );
-		
-		sprintf( hname, "hmscwt_%d_%s", i, fName.c_str() );
-		hmscwt.push_back( new TH1D( hname, "", 100, 0., 2. ) );
-		hmscwt.back()->SetXTitle( "expected width" );
-		hTel.push_back( hmscwt.back() );
-		hisList->Add( hmscwt.back() );
-		
-		sprintf( hname, "hmsclt_%d_%s", i, fName.c_str() );
-		hmsclt.push_back( new TH1D( hname, "", 100, 0., 2. ) );
-		hmsclt.back()->SetXTitle( "expected length" );
-		hTel.push_back( hmsclt.back() );
-		hisList->Add( hmsclt.back() );
-		
-		sprintf( hname, "hr_%d_%s", i, fName.c_str() );
-		hr.push_back( new TH1D( hname, "", 100, 0., 300. ) );
-		hr.back()->SetXTitle( "distance telescope - core [m]" );
-		hTel.push_back( hr.back() );
-		hisList->Add( hr.back() );
+
+		sprintf( hname, "hdistR%d_%s", i, fName.c_str() );
+		hdistR.push_back( new TH2D( hname, "", 20, 0., 300., 20, 0., 2. ) );
+		sprintf( hname, "distance to T%d [m]", i );
+		hdistR.back()->SetXTitle( hname );
+		hdistR.back()->SetYTitle( "local distance [deg]" );
+		hisList->Add( hdistR.back() );
+		hTel2D.push_back( hdistR.back() );
 	}
-	TIter next( hisList );
-	while( TH1* h = ( TH1* )next() )
-	{
-		if( fName == "OFF" && h )
-		{
-			h->SetLineColor( 2 );
-		}
-		if( h )
-		{
-			h->Sumw2();
-		}
-	}
+
+        // add all histograms to list of histograms (for 1D and 2D)
+        for( map <E_varname, vector< VDataMCComparisionHistogramData* > >::iterator it = fHistoSingleTel.begin(); it != fHistoSingleTel.end(); it++ )
+        {
+             for( unsigned int i = 0; i < it->second.size(); i++ )
+             {
+                 hisList->Add( it->second[i]->fHis1D );
+                 hisList->Add( it->second[i]->fHis2D );
+                 hTel.push_back( it->second[i]->fHis1D );
+                 hTel2D.push_back( it->second[i]->fHis2D );
+             }
+        }
+        for( map <E_varname, VDataMCComparisionHistogramData* >::iterator it = fHistoArray.begin(); it != fHistoArray.end(); it++ )
+        {
+             hisList->Add( it->second->fHis1D );
+             hisList->Add( it->second->fHis2D );
+             hTel.push_back( it->second->fHis1D );
+             hTel2D.push_back( it->second->fHis2D );
+        }
 	
 }
 
@@ -531,68 +333,9 @@ bool VDataMCComparision::setOnOffHistograms( VDataMCComparision* on, VDataMCComp
 	}
 	norm *= -1.;
 	
-	htheta2->Add( on->htheta2, off->htheta2, 1., norm );
-	setEntries( htheta2 );
-	hltheta2->Add( on->hltheta2, off->hltheta2, 1., norm );
-	setEntries( hltheta2 );
-	hMSCW->Add( on->hMSCW, off->hMSCW, 1., norm );
-	setEntries( hMSCW );
-	hMSCL->Add( on->hMSCL, off->hMSCL, 1., norm );
-	setEntries( hMSCL );
-	hMSCWErec->Add( on->hMSCWErec, off->hMSCWErec, 1., norm );
-	setEntries( hMSCWErec );
-	hMSCLErec->Add( on->hMSCLErec, off->hMSCLErec, 1., norm );
-	setEntries( hMSCLErec );
-	hXcore->Add( on->hXcore, off->hXcore, 1., norm );
-	setEntries( hXcore );
-	hYcore->Add( on->hYcore, off->hYcore, 1., norm );
-	setEntries( hYcore );
 	hXYcore->Add( on->hXYcore, off->hXYcore, 1., norm );
 	hAzYcore->Add( on->hAzYcore, off->hAzYcore, 1., norm );
 	hYt2->Add( on->hYt2, off->hYt2, 1., norm );
-	
-	hMWR->Add( on->hMWR, off->hMWR, 1., norm );
-	setEntries( hMWR );
-	hMLR->Add( on->hMLR, off->hMLR, 1., norm );
-	setEntries( hMLR );
-	hMSCWErec->Add( on->hMSCWErec, off->hMSCWErec, 1., norm );
-	setEntries( hMSCWErec );
-	hMSCLErec->Add( on->hMSCLErec, off->hMSCLErec, 1., norm );
-	setEntries( hMSCLErec );
-	hMWRErec->Add( on->hMWRErec, off->hMWRErec, 1., norm );
-	setEntries( hMWRErec );
-	hMLRErec->Add( on->hMLRErec, off->hMLRErec, 1., norm );
-	setEntries( hMLRErec );
-	//3D//
-	hsigmaT3D->Add( on->hsigmaT3D, off->hsigmaT3D, 1., norm );
-	setEntries( hsigmaT3D );
-	hNc3D->Add( on->hNc3D, off->hNc3D, 1., norm );
-	setEntries( hNc3D );
-	hDepth3D->Add( on->hDepth3D, off->hDepth3D, 1., norm );
-	setEntries( hDepth3D );
-	hRWidth3D->Add( on->hRWidth3D, off->hRWidth3D, 1., norm );
-	setEntries( hRWidth3D );
-	hErrRWidth3D->Add( on->hErrRWidth3D, off->hErrRWidth3D, 1., norm );
-	setEntries( hErrRWidth3D );
-	hsigmaT3DErec->Add( on->hsigmaT3DErec, off->hsigmaT3DErec, 1., norm );
-	setEntries( hsigmaT3DErec );
-	hNc3DErec->Add( on->hNc3DErec, off->hNc3DErec, 1., norm );
-	setEntries( hNc3DErec );
-	hDepth3DErec->Add( on->hDepth3DErec, off->hDepth3DErec, 1., norm );
-	setEntries( hDepth3DErec );
-	hRWidth3DErec->Add( on->hRWidth3DErec, off->hRWidth3DErec, 1., norm );
-	setEntries( hRWidth3DErec );
-	hErrRWidth3DErec->Add( on->hErrRWidth3DErec, off->hErrRWidth3DErec, 1., norm );
-	setEntries( hErrRWidth3DErec );
-	
-	for( unsigned int j = 0; j < hR.size(); j++ )
-	{
-		hR[j]->Add( on->hR[j], off->hR[j], 1., norm );
-	}
-	hNimages->Add( on->hNimages, off->hNimages, 1., norm );
-	hImgSel->Add( on->hImgSel, off->hImgSel, 1., norm );
-	hEmissionHeight->Add( on->hEmissionHeight, off->hEmissionHeight, 1., norm );
-	hMVA->Add( on->hMVA, off->hMVA, 1., norm );
 	
 	// 1D histograms
 	for( unsigned int j = 0; j < hTel.size(); j++ )
@@ -604,6 +347,7 @@ bool VDataMCComparision::setOnOffHistograms( VDataMCComparision* on, VDataMCComp
 	{
 		hTel2D[j]->Add( on->hTel2D[j], off->hTel2D[j], 1., norm );
 	}
+
 	
 	return true;
 }
@@ -611,10 +355,13 @@ bool VDataMCComparision::setOnOffHistograms( VDataMCComparision* on, VDataMCComp
 void VDataMCComparision::setEntries( TH1D* iH )
 {
 	double ie = 0.;
-	for( int i = 1; i <= iH->GetNbinsX(); i++ ) if( iH->GetBinContent( i ) > 0. )
-		{
-			ie += iH->GetBinContent( i );
-		}
+	for( int i = 1; i <= iH->GetNbinsX(); i++ )
+        {
+            if( iH->GetBinContent( i ) > 0. )
+            {
+                    ie += iH->GetBinContent( i );
+            }
+         }
 		
 	iH->SetEntries( ie );
 }
@@ -650,7 +397,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 	// quality cuts
 	double fCoreMax_QC = 350.;       // cut on core distance
 	int    fNImages_min = 3;         // minimum number of images per event
-//	fNImages_min = 2;
+	fNImages_min = 2;
 	// stereo cuts
 	double theta2_cut = 0.035;
 	if( iSingleTelescopeCuts > 0 || iSingleTelescopeCuts == -2 )
@@ -703,7 +450,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 				// Deals with CARE sims without full information in the run header
 				if( fSpectralWeight->getSpectralWeight( 1.0 ) == 0 )
 				{
-					cout << "WARNING: Probably something gone funky with the MC runheader" << endl;
+					cout << "WARNING: Probably some error with the MC runheader" << endl;
 					cout << "WARNING: Setting  default values" << endl;
 					fSpectralWeight->setMCParameter( 2.0, 0.03, 200. );//Hard coded guess values
 					fSpectralWeight->print();
@@ -811,7 +558,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 					cout << "VDataMCComparision::fillHistograms: error reading runparameter for run ";
 					cout << fData->runNumber << endl;
 					cout << "exiting..." << endl;
-					exit( 0 );
+					exit( EXIT_FAILURE );
 				}
 			}
 			else
@@ -819,7 +566,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 				cout << "VDataMCComparision::fillHistograms: error reading file for wobbles ";
 				cout << iCurrentFile->GetName() << endl;
 				cout << "exiting..." << endl;
-				exit( 0 );
+				exit( EXIT_FAILURE );
 			}
 			
 			cout << "\t now at run " << fData->runNumber << " (" << fData->eventNumber << "):";
@@ -836,7 +583,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 		
 		/////////////////////////////////////////////////
 		// quality cuts
-		if( fData->EChi2S < 0 )
+		if( fData->EChi2S < 0 || fData->ErecS <= 0 )
 		{
 			continue;
 		}
@@ -863,29 +610,40 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 		// direction cut
 		theta2 = fData->theta2;
 		// get correct theta2 for wobble runs
-		// (off data)
-		if( fInput == 2 )
-		{
-			theta2 = ( fData->Yoff_derot - fWobbleNorth ) * ( fData->Yoff_derot - fWobbleNorth )
-					 + ( fData->Xoff_derot - fWobbleEast ) * ( fData->Xoff_derot - fWobbleEast );
-		}
 		// MC data
-		else if( fInput == 0 )
+		if( fInput == 0 )
 		{
 			theta2 = ( fData->Yoff - fData->MCyoff ) * ( fData->Yoff - fData->MCyoff )
-					 + ( fData->Xoff - fData->MCxoff ) * ( fData->Xoff - fData->MCxoff );
+			       + ( fData->Xoff - fData->MCxoff ) * ( fData->Xoff - fData->MCxoff );
 		}
-		// on data
-		else
-		{
-			theta2 = ( fData->Yoff_derot + fWobbleNorth ) * ( fData->Yoff_derot + fWobbleNorth )
-					 + ( fData->Xoff_derot + fWobbleEast ) * ( fData->Xoff_derot + fWobbleEast );
+                else
+                {
+                        float on_x = fData->Xoff_derot + fWobbleEast;
+                        float on_y = fData->Yoff_derot + fWobbleNorth;
+                        // off data
+                        if( fInput == 2 )
+                        {
+                            // loop over 5 off regions and use the smallest theta2
+                            theta2 = 1.e5;
+                            float off_theta = 90. * TMath::DegToRad();
+                            for( unsigned int th = 0; th < 5; th++ )
+                            {
+                                float off_x = cos( off_theta ) * fWobbleEast - sin( off_theta ) * fWobbleNorth + fData->Xoff_derot;
+                                float off_y = sin( off_theta ) * fWobbleEast + cos( off_theta ) * fWobbleNorth + fData->Yoff_derot;
+                                if( off_x * off_x + off_y * off_y < theta2 ) theta2 = off_x * off_x + off_y * off_y;
+                                off_theta += 45. * TMath::DegToRad();
+                            }
+                        }
+                        else 
+                        {
+                            theta2 = on_x * on_x + on_y * on_y;
+                        }
 		}
 		
 		// MC energy and spectral weight is filled for simulations only
 		if( fInput == 0 && fData->MCe0 > 0 )
 		{
-			hErec->Fill( log10( fData->MCe0 ) );
+                        if( fHistoArray[EEREC] ) fHistoArray[EEREC]->fill( log10( fData->MCe0 ), 1., -99. );
 			if( fSpectralWeight )
 			{
 				weight = fSpectralWeight->getSpectralWeight( fData->MCe0 );
@@ -959,73 +717,55 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 		if( fSingleTelescopeCuts != -1
 				|| ( theta2 >= 0. && fData->MSCW < msw_max && fData->MSCW > msw_min && fData->MSCL > msl_min && fData->MSCL < msl_max ) )
 		{
-			htheta2->Fill( theta2, weight );
-			hltheta2->Fill( log10( theta2 ), weight );
+                        if( fHistoArray[ETHETA2] ) fHistoArray[ETHETA2]->fill( theta2, weight, log10( fData->ErecS ) );
+                        if( fHistoArray[ELTHETA2] ) fHistoArray[ELTHETA2]->fill( log10( theta2 ), weight, log10( fData->ErecS ) );
 			hYt2->Fill( log10( theta2 ), fData->Ycore, weight );
 		}
 		if( fSingleTelescopeCuts != -1 || ( theta2 >= theta2_min && theta2 < theta2_cut &&  fData->MSCL < msl_max && fData->MSCL > msl_min ) )
 		{
-			hMSCW->Fill( fData->MSCW, weight );
-			if( fData->ErecS > 0. )
-			{
-				hMSCWErec->Fill( log10( fData->ErecS ), fData->MSCW, weight );
-			}
-			for( int j = 0; j < fNTel; j++ ) if( fData->MSCWT[j] > 0. )
-				{
-					hmscwt[j]->Fill( fData->width[j] / fData->MSCWT[j], weight );
-				}
-			hMWR->Fill( fData->MWR, weight );
-			if( fData->ErecS > 0. )
-			{
-				hMWRErec->Fill( log10( fData->ErecS ), fData->MWR, weight );
-			}
+                        if( fHistoArray[EMSCW] ) fHistoArray[EMSCW]->fill( fData->MSCW, weight, log10( fData->ErecS ) );
+			for( int j = 0; j < fNTel; j++ )
+                        {
+                            if( fData->MSCWT[j] > 0. && fHistoSingleTel[EMSCWT].size() > 0 && fHistoSingleTel[EMSCWT][j] )
+                            {
+                                    fHistoSingleTel[EMSCWT][j]->fill( fData->width[j] / fData->MSCWT[j], weight, log10( fData->ErecS ) );
+                            }
+                        }
+                        if( fHistoArray[EMWR] ) fHistoArray[EMWR]->fill( fData->MWR, weight, log10( fData->ErecS ) );
 			//3D//
-			hsigmaT3D->Fill( fData->sigmaT3D, weight ); 
-			hNc3D->Fill( fData->Nc3D, weight );         
-			hDepth3D->Fill( fData->Depth3D, weight );   
-			hRWidth3D->Fill( fData->RWidth3D, weight ); 
-			hErrRWidth3D->Fill( fData->ErrRWidth3D, weight ); 
-			if( fData->ErecS > 0. )
-			{
-			        hsigmaT3DErec->Fill( log10( fData->ErecS ), fData->sigmaT3D, weight ); 
-				hNc3DErec->Fill( log10( fData->ErecS ), fData->Nc3D, weight ); 
-			        hDepth3DErec->Fill( log10( fData->ErecS ), fData->Depth3D, weight ); 
-				hRWidth3DErec->Fill( log10( fData->ErecS ), fData->RWidth3D, weight ); 
-				hErrRWidth3DErec->Fill( log10( fData->ErecS ), fData->ErrRWidth3D, weight ); 
-			}
+                        if( fHistoArray[ESIGMAT3D] ) fHistoArray[ESIGMAT3D]->fill( fData->sigmaT3D, weight, log10( fData->ErecS ) );
+                        if( fHistoArray[ENC3D] ) fHistoArray[ENC3D]->fill(  fData->Nc3D, weight, log10( fData->ErecS ) );
+                        if( fHistoArray[EDEPTH3D] ) fHistoArray[EDEPTH3D]->fill( fData->Depth3D, weight, log10( fData->ErecS ) );
+                        if( fHistoArray[ERWIDTH3D] ) fHistoArray[ERWIDTH3D]->fill( fData->RWidth3D, weight, log10( fData->ErecS ) );
+                        if( fHistoArray[EERRRWIDTH3D] ) fHistoArray[EERRRWIDTH3D]->fill( fData->ErrRWidth3D, weight, log10( fData->ErecS ) );
 
 		}
 		if( fSingleTelescopeCuts != -1
 				|| ( theta2 >= theta2_min && theta2 < theta2_cut  &&  fData->MSCW < msw_max && fData->MSCW > msw_min ) )
 		{
-			hMSCL->Fill( fData->MSCL, weight );
-			for( int j = 0; j < fNTel; j++ ) if( fData->MSCLT[j] > 0. )
-				{
-					hmsclt[j]->Fill( fData->length[j] / fData->MSCLT[j], weight );
-				}
-			if( fData->ErecS > 0. )
+                        if( fHistoArray[EMSCL] ) fHistoArray[EMSCL]->fill( fData->MSCL, weight, log10( fData->ErecS ) );
+			for( int j = 0; j < fNTel; j++ )
+                        {
+                            if( fData->MSCLT[j] > 0. && fHistoSingleTel[EMSCLT].size() > 0 && fHistoSingleTel[EMSCLT][j] )
+                            {
+                                    fHistoSingleTel[EMSCLT][j]->fill( fData->length[j] / fData->MSCLT[j], weight, log10( fData->ErecS ) );
+                            }
+                        }
+                        if( fHistoArray[EMLR] ) fHistoArray[EMLR]->fill( fData->MLR, weight, log10( fData->ErecS ) );
+			if( fData->EmissionHeight > 0. && fHistoArray[EEMISSIONHEIGHT] )
 			{
-				hMSCLErec->Fill( log10( fData->ErecS ), fData->MSCL, weight );
+				fHistoArray[EEMISSIONHEIGHT]->fill( fData->EmissionHeight, weight, log10( fData->ErecS ) );
 			}
-			if( fData->EmissionHeight > 0. )
-			{
-				hEmissionHeight->Fill( fData->EmissionHeight, weight );
-			}
-			hNimages->Fill( fData->NImages, weight );
-			hImgSel->Fill( fData->ImgSel, weight );
-			hMLR->Fill( fData->MLR, weight );
-			if( fData->ErecS > 0. )
-			{
-				hMLRErec->Fill( log10( fData->ErecS ), fData->MLR, weight );
-			}
+                        if( fHistoArray[ENIMAGES] )fHistoArray[ENIMAGES]->fill( fData->NImages, weight, log10( fData->ErecS ) );
+                        if( fHistoArray[EIMGSEL] )fHistoArray[EIMGSEL]->fill( fData->ImgSel, weight, log10( fData->ErecS ) );
 			
 			if( fCuts )
 			{
 				fCuts->newEvent();
 				fCuts->applyTMVACut( i );
-				if( fCuts->getTMVA_EvaluationResult() > -90. )
+				if( fCuts->getTMVA_EvaluationResult() > -90. && fHistoArray[EMVA] )
 				{
-					hMVA->Fill( fCuts->getTMVA_EvaluationResult(), weight );
+                                        fHistoArray[EMVA]->fill( fCuts->getTMVA_EvaluationResult(), weight, log10( fData->ErecS ) );
 				}
 			}
 		}
@@ -1036,16 +776,16 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 				|| ( theta2 >= theta2_min && theta2 < theta2_cut
 					 && fData->MSCW < msw_max && fData->MSCW > msw_min && fData->MSCL < msl_max && fData->MSCL > msl_min ) )
 		{
-			hXcore->Fill( fData->Xcore, weight );
+                        if( fHistoArray[EXCORE] ) fHistoArray[EXCORE]->fill( fData->Xcore, weight, log10( fData->ErecS ) );
 			if( fInput == 0 )
 			{
-				hYcore->Fill( -1.*fData->Ycore , weight );
+                                if( fHistoArray[EYCORE] ) fHistoArray[EYCORE]->fill( -1.*fData->Ycore, weight, log10( fData->ErecS ) );
 				hXYcore->Fill( fData->Xcore, -1.*fData->Ycore, weight );
 				hAzYcore->Fill( fData->Az, -1.*fData->Ycore , weight );
 			}
 			else
 			{
-				hYcore->Fill( fData->Ycore , weight );
+                                if( fHistoArray[EYCORE] ) fHistoArray[EYCORE]->fill( fData->Ycore, weight, log10( fData->ErecS ) );
 				hXYcore->Fill( fData->Xcore, fData->Ycore, weight );
 				hAzYcore->Fill( fData->Az, fData->Ycore , weight );
 			}
@@ -1059,7 +799,6 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 				{
 					rdist1 = VUtilities::line_point_distance( fData->Ycore, -1.*fData->Xcore, 0., fData->Ze, fData->Az,
 							 fTel_y[j], -1.*fTel_x[j], fTel_z[j] );
-					hR[j]->Fill( rdist1, weight );
 					// camera distance is calculated relative to centre of camera (should be: wobble offset position)
 					hdistR[j]->Fill( rdist1, sqrt( fData->cen_x[j]*fData->cen_x[j] + fData->cen_y[j]*fData->cen_y[j] ), weight );
 				}
@@ -1072,61 +811,29 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 			{
 				int j = fData->ImgSel_list[t];
 				
-				if( fData->ntubes[j] > ntubes_min )
+				if( fData->ntubes[j] > ntubes_min && fData->size[j] > 0. && fData->size2[j] > 0. && fData->ErecS > 0. )
 				{
-					hntubes[j]->Fill( fData->ntubes[j], weight );
-					if( fData->nlowgain[j] > 0 )
-					{
-						hnlowgain[j]->Fill( ( double )fData->nlowgain[j], weight );
-					}
-					hdist[j]->Fill( fData->dist[j], weight );
-					if( fData->size[j] > 0. )
-					{
-						hsize[j]->Fill( log10( fData->size[j] ), weight );
-					}
-					if( fData->size2[j] > 0. )
-					{
-						hsize2[j]->Fill( log10( fData->size2[j] ), weight );
-					}
-					if( fData->size2[j] > 0. && fData->fraclow[j] > 0. )
-					{
-						hsizeLG[j]->Fill( log10( fData->size2[j] * fData->fraclow[j] ), weight );
-					}
-                                        hfraclow[j]->Fill( fData->fraclow[j], weight );
-					if( fData->max1[j] > 0. )
-					{
-						hmax1[j]->Fill( log10( fData->max1[j] ), weight );
-					}
-					if( fData->max2[j] > 0. )
-					{
-						hmax2[j]->Fill( log10( fData->max2[j] ), weight );
-					}
-					if( fData->max3[j] > 0. )
-					{
-						hmax3[j]->Fill( log10( fData->max3[j] ), weight );
-					}
-					hwidth[j]->Fill( fData->width[j], weight );
-					hlength[j]->Fill( fData->length[j], weight );
-					halpha[j]->Fill( fData->alpha[j], weight );
-					if( fData->size[j] > 0. )
-					{
-						hlos[j]->Fill( fData->length[j] / fData->size[j] * 1000., weight );
-					}
-					hloss[j]->Fill( fData->loss[j], weight );
-					hasym[j]->Fill( fData->asym[j], weight );
-					if( fInput == 0 )
-					{
-						hcen_x[j]->Fill( fData->cen_x[j], weight );
-						hcen_y[j]->Fill( fData->cen_y[j], weight );
-					}
-					else
-					{
-						hcen_x[j]->Fill( fData->cen_x[j], weight );
-						hcen_y[j]->Fill( fData->cen_y[j], weight );
-					}
-					hcen_xy[j]->Fill( fData->cen_x[j], fData->cen_y[j], weight );
-					htgrad_x[j]->Fill( fData->tgrad_x[j], weight );
-					hr[j]->Fill( fData->R[j], weight );
+                                        if( fHistoSingleTel[ELENGTH][j] ) fHistoSingleTel[ELENGTH][j]->fill( fData->length[j], weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[EWIDTH][j] )  fHistoSingleTel[EWIDTH][j]->fill( fData->width[j], weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[ENTUBES][j] ) fHistoSingleTel[ENTUBES][j]->fill( fData->ntubes[j], weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[ENLOWGAIN][j] && fData->nlowgain[j] ) fHistoSingleTel[ENLOWGAIN][j]->fill( fData->nlowgain[j], weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[EDIST][j] ) fHistoSingleTel[EDIST][j]->fill( fData->dist[j], weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[ESIZE][j] ) fHistoSingleTel[ESIZE][j]->fill( log10( fData->size[j] ), weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[ESIZE2][j] ) fHistoSingleTel[ESIZE2][j]->fill( log10( fData->size2[j] ), weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[ESIZELG][j] &&fData->fraclow[j] > 0. ) fHistoSingleTel[ESIZELG][j]->fill( log10( fData->size2[j]*fData->fraclow[j] ), weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[EFRACLOW][j] ) fHistoSingleTel[EFRACLOW][j]->fill( fData->fraclow[j], weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[EMAX1][j] && fData->max1[j] > 0. ) fHistoSingleTel[EMAX1][j]->fill( log10( fData->max1[j] ), weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[EMAX2][j] && fData->max2[j] > 0. ) fHistoSingleTel[EMAX2][j]->fill( log10( fData->max2[j] ), weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[EMAX3][j] && fData->max3[j] > 0. ) fHistoSingleTel[EMAX3][j]->fill( log10( fData->max3[j] ), weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[EALPHA][j] ) fHistoSingleTel[EALPHA][j]->fill( fData->alpha[j], weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[ELOS][j] ) fHistoSingleTel[ELOS][j]->fill( fData->length[j] / fData->size[j] * 1000., weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[ELOSS][j] ) fHistoSingleTel[ELOSS][j]->fill( fData->loss[j], weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[EASYM][j] ) fHistoSingleTel[EASYM][j]->fill( fData->asym[j], weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[ECENX][j] ) fHistoSingleTel[ECENX][j]->fill( fData->cen_x[j], weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[ECENY][j] ) fHistoSingleTel[ECENY][j]->fill( fData->cen_y[j], weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[ETGRADX][j] ) fHistoSingleTel[ETGRADX][j]->fill( fData->tgrad_x[j], weight, log10( fData->ErecS ) );
+                                        if( fHistoSingleTel[ETELDIST][j] ) fHistoSingleTel[ETELDIST][j]->fill( fData->R[j], weight, log10( fData->ErecS ) );
+                                        if( hcen_xy[j] ) hcen_xy[j]->Fill( fData->cen_x[j], fData->cen_y[j], weight );
 				}
 			}
 		}

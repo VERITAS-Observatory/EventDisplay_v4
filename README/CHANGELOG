@@ -2,6 +2,9 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140612 (GM)
+significant improvements in data/mc comparison;
+
 * 20140608 (GM)
 added selection for dead time calculation in anasum
 runparameter file: DEADTIMECALCULATIONMETHOD
