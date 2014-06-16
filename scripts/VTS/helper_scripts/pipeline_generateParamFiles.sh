@@ -19,17 +19,20 @@ COTRED="\033[0;31m"
 COYEL="\033[1;33m"
 function echoerr(){ echo -e "$@" 1>&2; } #for spitting out error text
 
+# epoch file to load
+METHOD="useparamfile"
+EPOCHSPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/VERITAS.Epochs.runparameter"
+
 function IsWinter {
 	local date="$1"
     local month="${date:4:2}"
+	local WinterCode="98"
 	
 	# get atmo boundary dates from param file
 	if [[ "$METHOD" == "useparamfile" ]] ; then
-		# epoch file to load
-		PARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/VERITAS.Epochs.runparameter"
 		
 		# get only lines that start with '*'
-		ATMOTHRESH=$( cat $PARAMFILE | grep -P "^\s??\*" | grep "ATMOSPHERE" )
+		local ATMOTHRESH=$( cat $EPOCHSPARAMFILE | grep -P "^\s??\*" | grep "ATMOSPHERE" )
 		#echo "$ATMOTHRESH"
 		
 		# other vars
@@ -38,7 +41,7 @@ function IsWinter {
 		local MAXDATE=""
 		
 		# flag for if we found the atmo
-		FOUNDATMO=false
+		local FOUNDATMO=false
 		(IFS='
 '
 		for line in $ATMOTHRESH ; do
@@ -48,20 +51,25 @@ function IsWinter {
 			MAXDATE=$(  echo "$line" | awk '{ print $5 }' | tr -d '-' | grep -oP "\d+" )
 			#echoerr "  ATMOCODE:$ATMOCODE"
 			#echoerr "  MINDATE: $MINDATE"
+			#echoerr "  TARGDATE:$date"
 			#echoerr "  MAXDATE: $MAXDATE"
 			if (( "$date" >= "$MINDATE" )) && (( "$date" <= "$MAXDATE" )) ; then
 				
 				# winter
 				if [[ "$ATMOCODE" == "21" ]] ; then
-					echo 1 	
-					#echoerr "$date - winter!"
+					#echo 1 	
+					#echoerr "  $date - winter!"
 					FOUNDATMO=true
+					WinterCode="21"
+					echo "$WinterCode"
 					break
 				# summer
 				elif [[ "$ATMOCODE" == "22" ]] ; then
-					echo 2
-					#echoerr "$date - summer!"
+					#echo 2
+					#echoerr "  $date - summer!"
 					FOUNDATMO=true
+					WinterCode="22"
+					echo "$WinterCode"
 					break
 				fi
 			fi
@@ -69,7 +77,9 @@ function IsWinter {
 		)
 		# 3 = did not find valid atmo range
 		if [ ! $FOUNDATMO ] ; then
-			echo 3
+			#echo 3
+			WinterCode="99"
+			echo "$WinterCode"
 		fi
 	
 	fi
@@ -93,13 +103,16 @@ function IsWinter {
 			if   [ "$month" -ge 5 -a "$month" -le 10 ] ; then
 				#echo 2 # summer
 				WinterFlag=false
+				WinterCode="22"
 			# november through april inclusive is 'winter'
 			elif [ "$month" -le 4 -o "$month" -ge 11 ] ; then
 				#echo 1 # winter
 				WinterFlag=true
+				WinterCode="21"
 			else
 				#echo 3 # unassignable
-				echoerr "Error, can only assign atmosphere to runs before 20130425, exiting..." ; exit 1
+				echoerr "Error, can only assign atmosphere to runs before 20130425, exiting..."
+				exit 1
 			fi
 		else
 			WinterFlag=false
@@ -276,7 +289,8 @@ if [[ $1 =~ ^[a-zA-Z]{4,8}$ ]] ; then
 	ENERGYARG=$( echo "$1" | tr "[:upper:]" "[:lower:]" ) # force all to lowercase
 	#echo "Setting ENERGYARG=$ENERGYARG"
 else
-	echo -e "${CORED}Error, 1st arg '$1' must be the energy cut, either 'soft', 'moderate', or 'hard'.  Exiting.${CONORM}" >&2 ; exit 1
+	echoerr "${CORED}Error, 1st arg '$1' must be the energy cut, either 'soft', 'moderate', or 'hard'.  Exiting.${CONORM}"
+	exit 1
 fi
 
 # date argument, 8-digit number
@@ -285,35 +299,40 @@ if [[ $2 =~ ^[0-9]{8}$ ]] ; then # its valid!
     GHCUTDATECODE="$2"
 	#echo "Setting DATEARG=$DATEARG"
 else
-	echo -e "${CORED}Error, 2nd arg '$2' must be an 8-digit number, YYYYMMDD. Exiting.${CONORM}" >&2 ; exit 1
+	echoerr "${CORED}Error, 2nd arg '$2' must be an 8-digit number, YYYYMMDD. Exiting.${CONORM}"
+	exit 1
 fi
 if [[ $3 =~ ^[0-9]{8}$ ]] ; then # its valid!
 	#DATEARG="$2"   # 8-digit number
     RADATECODE="$3"
 	#echo "Setting DATEARG=$DATEARG"
 else
-	echo -e "${CORED}Error, 3rd arg '$2' must be an 8-digit number, YYYYMMDD. Exiting.${CONORM}" >&2 ; exit 1
+	echoerr "${CORED}Error, 3rd arg '$2' must be an 8-digit number, YYYYMMDD. Exiting.${CONORM}"
+	exit 1
 fi
 if [[ $4 =~ ^[0-9]{8}$ ]] ; then # its valid!
 	#DATEARG="$2"   # 8-digit number
     EFDATECODE1="$4"
 	#echo "Setting DATEARG=$DATEARG"
 else
-	echo -e "${CORED}Error, 4th arg '$2' must be an 8-digit number, YYYYMMDD. Exiting.${CONORM}" >&2 ; exit 1
+	echoerr "${CORED}Error, 4th arg '$2' must be an 8-digit number, YYYYMMDD. Exiting.${CONORM}"
+	exit 1
 fi
 if [[ $5 =~ ^[0-9]{8}$ ]] ; then # its valid!
 	#DATEARG="$2"   # 8-digit number
     EFDATECODE2="$5"
 	#echo "Setting DATEARG=$DATEARG"
 else
-	echo -e "${CORED}Error, 5th arg '$2' must be an 8-digit number, YYYYMMDD. Exiting.${CONORM}" >&2 ; exit 1
+	echoerr "${CORED}Error, 5th arg '$2' must be an 8-digit number, YYYYMMDD. Exiting.${CONORM}"
+	exit 1
 fi
 if [[ $6 =~ ^[0-9]{8}$ ]] ; then # its valid!
 	#DATEARG="$2"   # 8-digit number
     TADATECODE="$6"
 	#echo "Setting DATEARG=$DATEARG"
 else
-	echo -e "${CORED}Error, 6th arg '$2' must be an 8-digit number, YYYYMMDD. Exiting.${CONORM}" >&2 ; exit 1
+	echoerr "${CORED}Error, 6th arg '$2' must be an 8-digit number, YYYYMMDD. Exiting.${CONORM}"
+	exit 1
 fi
 
 # number of telescopes, 1-digit number
@@ -322,17 +341,19 @@ if [[ $7 =~ ^[0-9]{1}$ ]] ; then
 		NTELARG="$7"   # 1-digit number
 		#echo "Setting NTELARG=$NTELARG"
 	else
-		echo -e "${CORED}Error, 7th arg '$7' must be the number of telescopes to use, either '2' or '3'. Exiting.${CONORM}" >&2 ; exit 1
+		echoerr "${CORED}Error, 7th arg '$7' must be the number of telescopes to use, either '2' or '3'. Exiting.${CONORM}"
+		exit 1
 	fi
 else
-	echo -e "${CORED}Error, 7th arg '$7' must be a 1 digit number, the number of telescopes to use ('2' or '3'). Exiting.${CONORM}" >&2 ; exit 1
+	echoerr "${CORED}Error, 7th arg '$7' must be a 1 digit number, the number of telescopes to use ('2' or '3'). Exiting.${CONORM}"
+	exit 1
 fi
 
 # USEFROGS= yes/no
 if [[ $8 =~ ^(yes|no)$ ]] ; then
 	USEFROGS="$8"	
 else
-	echo -e "${CORED}Error, 8th arg '$8' (usefrogs?) must be either yes or no. Exiting.${CONORM}" >&2 ;
+	echoerr "${CORED}Error, 8th arg '$8' (usefrogs?) must be either yes or no. Exiting.${CONORM}"
 	exit 1
 fi
 
@@ -344,14 +365,16 @@ elif [[ "$ENERGYARG" == "hard"     ]] ; then ENERGYCODE="Hard"     ; fi
 
 # can only use 2 telescopes on soft cuts
 if [ "$NTELARG" -eq "2" ] && [[ ! "$ENERGYARG" == "soft" ]] ; then
-	echo -e "${CORED}Error, can only use 2 telescopes with soft cuts.  Exiting.${CONORM}" >&2 ; exit 1
+	echoerr "${CORED}Error, can only use 2 telescopes with soft cuts.  Exiting.${CONORM}"
+	exit 1
 fi
 
 # get database url from parameter file
 EVNDISPPARAMFILE="$VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter"
 MYSQLDB=`grep '^\*[ \t]*DBSERVER[ \t]*mysql://' "$EVNDISPPARAMFILE" | egrep -o '[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}'`  # extract the database url from $EVNDISPPARAMFILE
 if [ ! -n "$MYSQLDB" ] ; then
-    echo "* DBSERVER param not found in \$VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter!" >&2 ; exit 1
+    echoerr "* DBSERVER param not found in \$VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter!"
+	exit 1
 fi
 
 # mysql login info
@@ -383,12 +406,27 @@ RICMD="$MYSQL -e \"USE VERITAS ; SELECT run_id, data_start_time, config_mask FRO
 RILINES=$( eval $RICMD )
 #echo "RILINES:" ; echo "$RILINES" ; echo
 
+# epoch file to load
+PARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/VERITAS.Epochs.runparameter"
+
+# get only lines that start with '*'
+EPOCHTHRESH=$( cat $PARAMFILE | grep -P "^\s??\*" | grep "EPOCH" | grep -P "V\d" )
+#echo "$EPOCHTHRESH"
+
+# find out what are the smallest and largest epochs to work with
+# so we don't loop over V1, V2, V3.... V10, V11, etc
+MINEPOCH=$( echo "$EPOCHTHRESH" | awk '{ print $3 }' | grep -oP "\d" | awk '{ if(min==""){min=$1}; if($1<min){min=$1};} END {print min }' )
+MAXEPOCH=$( echo "$EPOCHTHRESH" | awk '{ print $3 }' | grep -oP "\d" | awk '{ if(max==""){max=$1}; if($1>max){max=$1};} END {print max }' )
+#echo "EPOCHTHRESH:"
+#echo "$EPOCHTHRESH"
+#echo "MINEPOCH:$MINEPOCH"
+#echo "MAXEPOCH:$MAXEPOCH"
+
 # Loop over all runs in runlist
 #ALLFILESGOOD=true
 for i in ${RUNLIST[@]} ; do
-	#echo "$i"
+	echo "$i"
 	# figure out codes
-	#DATECODE="d$DATEARG"   # d20130411 : general datecode at the beginning of the acceptance file and effective area file
 	NTELCODE="N$NTELARG"   # N2, N3, N4
 	
 	#echo "   RACLINES:$RACLINES"
@@ -404,10 +442,21 @@ for i in ${RUNLIST[@]} ; do
 	DATASTARTTIMESTR=$( echo "$RILINES" | grep -i "$i" | awk '{ print $2 }' | tr -d '-' )
 	#echo "   DATASTARTTIMESTR: $DATASTARTTIMESTR"
 	WinterFlag=true
-	IsWinter "$DATASTARTTIMESTR" 
-	if $WinterFlag ; then ATMOCODE="ATM21" #echo "   Winter Run"
-	else                  ATMOCODE="ATM22" #echo "   Summer Run"
+	WinterCode="00"
+	WinterCode=$( IsWinter "$DATASTARTTIMESTR" )
+	
+	# old code
+	#if $WinterFlag ; then ATMOCODE="ATM21" #echo "   Winter Run"
+	#else                  ATMOCODE="ATM22" #echo "   Summer Run"
+	#fi
+	if [[ "$WinterCode" == "21" ]] ||
+	   [[ "$WinterCode" == "22" ]] ; then
+		ATMOCODE="ATM$WinterCode"
+	else
+		echoerr "${CORED}Error, for run '$i', no valid atmosphere date range defined for '$DATASTARTTIMESTR' in '$EPOCHSPARAMFILE' (WinterCode='$WinterCode'), exiting...$CONORM"
+		exit 1
 	fi
+	#echoerr "  '$ATMOCODE'"
 	
 	# extra datecodes
 	# HARDCODE
@@ -424,9 +473,28 @@ for i in ${RUNLIST[@]} ; do
 
 	# array version
 	# HARDCODE
-	if   [ "$i" -le "46641"                     ] ; then VERSIONCODE="V4"
-	elif [ "$i" -ge "46642" -a "$i" -le "63372" ] ; then VERSIONCODE="V5"
-	elif [                     "$i" -ge "63373" ] ; then VERSIONCODE="V6" ; fi
+	#if   [ "$i" -le "46641"                     ] ; then VERSIONCODE="V4"
+	#elif [ "$i" -ge "46642" -a "$i" -le "63372" ] ; then VERSIONCODE="V5"
+	#elif [                     "$i" -ge "63373" ] ; then VERSIONCODE="V6" ; fi
+	
+	# loop through all epochs between min and max
+	for epoch in $(seq $MINEPOCH $MAXEPOCH) ; do
+		
+		# find out run boundaries for this
+		MINRUN=$( echo "$EPOCHTHRESH" | grep -P "V$epoch" | awk '{ print $4 }' | grep -oP "\d+" )
+		MAXRUN=$( echo "$EPOCHTHRESH" | grep -P "V$epoch" | awk '{ print $5 }' | grep -oP "\d+" )
+		#echo "RUN:   '$run'"
+		#echo "MINRUN:'$MINRUN'"
+		#echo "MAXRUN:'$MAXRUN'"
+		if (( "$i" <= "$MAXRUN" )) && (( "$i" >= "$MINRUN" )) ; then
+			#echo "V"
+			VERSIONCODE="V$epoch"
+			break # break out of epoch loop, but not the runlist loop
+		fi
+		
+	done
+	#echoerr "  '$VERSIONCODE'"
+	
 	
 	#echo "r${i}"
 	
