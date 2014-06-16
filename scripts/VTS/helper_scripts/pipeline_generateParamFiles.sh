@@ -22,33 +22,88 @@ function echoerr(){ echo -e "$@" 1>&2; } #for spitting out error text
 function IsWinter {
 	local date="$1"
     local month="${date:4:2}"
-	if
-		# HARDCODE
-		# atmosphere dates, the boundaries between summer and winter
-		#    atmospheres change each year
-		[ "$date" -gt "20071026" ] && [ "$date" -lt "20080420" ] ||
-		[ "$date" -gt "20081113" ] && [ "$date" -lt "20090509" ] ||
-		[ "$date" -gt "20091102" ] && [ "$date" -lt "20100428" ] ||
-		[ "$date" -gt "20101023" ] && [ "$date" -lt "20110418" ] ||
-		[ "$date" -gt "20111110" ] && [ "$date" -lt "20120506" ] ||
-		[ "$date" -gt "20121029" ] && [ "$date" -lt "20130425" ] ; then
-		WinterFlag=true
-	elif [ "$date" -ge "20130425" -o "$date" -le "20071026" ] ; then
-        # if summer/winter boundary not explicitly defined, define it via the month
-        # may through october inclusive is 'summer'
-        if   [ "$month" -ge 5 -a "$month" -le 10 ] ; then
-            #echo 2 # summer
-            WinterFlag=false
-        # november through april inclusive is 'winter'
-        elif [ "$month" -le 4 -o "$month" -ge 11 ] ; then
-            #echo 1 # winter
-            WinterFlag=true
-        else
-            #echo 3 # unassignable
-            echoerr "Error, can only assign atmosphere to runs before 20130425, exiting..." ; exit 1
-        fi
-	else
-		WinterFlag=false
+	
+	# get atmo boundary dates from param file
+	if [[ "$METHOD" == "useparamfile" ]] ; then
+		# epoch file to load
+		PARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/VERITAS.Epochs.runparameter"
+		
+		# get only lines that start with '*'
+		ATMOTHRESH=$( cat $PARAMFILE | grep -P "^\s??\*" | grep "ATMOSPHERE" )
+		#echo "$ATMOTHRESH"
+		
+		# other vars
+		local ATMOCODE=""
+		local MINDATE=""
+		local MAXDATE=""
+		
+		# flag for if we found the atmo
+		FOUNDATMO=false
+		(IFS='
+'
+		for line in $ATMOTHRESH ; do
+			#echoerr "line:$line"
+			ATMOCODE=$( echo "$line" | awk '{ print $3 }' | grep -oP "\d+" )
+			MINDATE=$(  echo "$line" | awk '{ print $4 }' | tr -d '-' | grep -oP "\d+" )
+			MAXDATE=$(  echo "$line" | awk '{ print $5 }' | tr -d '-' | grep -oP "\d+" )
+			#echoerr "  ATMOCODE:$ATMOCODE"
+			#echoerr "  MINDATE: $MINDATE"
+			#echoerr "  MAXDATE: $MAXDATE"
+			if (( "$date" >= "$MINDATE" )) && (( "$date" <= "$MAXDATE" )) ; then
+				
+				# winter
+				if [[ "$ATMOCODE" == "21" ]] ; then
+					echo 1 	
+					#echoerr "$date - winter!"
+					FOUNDATMO=true
+					break
+				# summer
+				elif [[ "$ATMOCODE" == "22" ]] ; then
+					echo 2
+					#echoerr "$date - summer!"
+					FOUNDATMO=true
+					break
+				fi
+			fi
+		done 
+		)
+		# 3 = did not find valid atmo range
+		if [ ! $FOUNDATMO ] ; then
+			echo 3
+		fi
+	
+	fi
+	
+	# hardcoded old method
+	if [[ "$METHOD" == "usehardcoded" ]] ; then
+		if
+			# HARDCODE
+			# atmosphere dates, the boundaries between summer and winter
+			#    atmospheres change each year
+			[ "$date" -gt "20071026" ] && [ "$date" -lt "20080420" ] ||
+			[ "$date" -gt "20081113" ] && [ "$date" -lt "20090509" ] ||
+			[ "$date" -gt "20091102" ] && [ "$date" -lt "20100428" ] ||
+			[ "$date" -gt "20101023" ] && [ "$date" -lt "20110418" ] ||
+			[ "$date" -gt "20111110" ] && [ "$date" -lt "20120506" ] ||
+			[ "$date" -gt "20121029" ] && [ "$date" -lt "20130425" ] ; then
+			WinterFlag=true
+		elif [ "$date" -ge "20130425" -o "$date" -le "20071026" ] ; then
+			# if summer/winter boundary not explicitly defined, define it via the month
+			# may through october inclusive is 'summer'
+			if   [ "$month" -ge 5 -a "$month" -le 10 ] ; then
+				#echo 2 # summer
+				WinterFlag=false
+			# november through april inclusive is 'winter'
+			elif [ "$month" -le 4 -o "$month" -ge 11 ] ; then
+				#echo 1 # winter
+				WinterFlag=true
+			else
+				#echo 3 # unassignable
+				echoerr "Error, can only assign atmosphere to runs before 20130425, exiting..." ; exit 1
+			fi
+		else
+			WinterFlag=false
+		fi
 	fi
 }
 
