@@ -62,6 +62,10 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fPrintAnalysisProgress = 25000;
 	fRunDuration = 60. * 3600.;        // default run duration is 1 h (reset by DBRunInfo)
 	fPrintGrisuHeader = 0;
+
+        fEpochFile = "";
+        fInstrumentEpoch = "noepoch";
+        fAtmosphereID = 0;
 	
 	fprintdeadpixelinfo = false ; // DEADCHAN if true, print list of dead pixels to evndisp.log
 	
@@ -446,6 +450,8 @@ void VEvndispRunParameter::print( int iEv )
 			cout << " use database" << endl;
 		}
 	}
+        cout << "Instrument epoch: " << fInstrumentEpoch << "  Atmosphere (corsika ID): " << fAtmosphereID << endl;
+        if( fEpochFile.size() > 0 ) cout << "(epochs read from " << fEpochFile << ")" << endl;
 	if( fDBCameraRotationMeasurements )
 	{
 		cout << "using camera rotation values from DB" << endl;

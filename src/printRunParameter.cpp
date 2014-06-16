@@ -53,6 +53,14 @@ bool readRunParameter( TFile* fIn, string iPara )
                }
                cout << endl;
         }
+        else if( iPara == "-atmosphere" )
+        {
+               cout << fPar->fAtmosphereID << endl;
+        }
+        else if( iPara == "-epoch" )
+        {
+               cout << fPar->fInstrumentEpoch << endl;
+        }
 	
 	return true;
 }
@@ -118,6 +126,8 @@ int main( int argc, char* argv[] )
 		cout << "      -runnumber    print MC run number" << endl;
 		cout << "      -mcsourcefile print source file name" << endl;
                 cout << "      -date         print date of run" << endl;
+                cout << "      -epoch        print epoch of this run" << endl;
+                cout << "      -atmosphere   print corsika ID of atmospheric condition of this run" << endl;
                 cout << "      -teltoana     print telescope combination used in analysis" << endl;
 		cout << endl;
 		exit( 0 );

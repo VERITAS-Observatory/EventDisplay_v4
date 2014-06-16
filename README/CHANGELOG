@@ -2,6 +2,12 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140616 (GM)
+added epoch and atmosphere IDs to run parameters
+can by accessed by: 
+./bin/printRunParameters <source file> -epoch
+./bin/printRunParameters <source file> -atmosphere
+
 * 20140612 (GM)
 significant improvements in data/mc comparison;
 

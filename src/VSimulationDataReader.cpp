@@ -60,7 +60,7 @@ bool VSimulationDataReader::printSimulationHeader( VPacket* packet, int bPrintCF
 		cout << ", simulated by " << h->fSimulator;
 		cout << ", simulation package " << ( int )h->fSimulationPackage;
 		cout << ", array configurations from " << h->fDateOfArrayForSims << endl;
-		cout << "\t atmospheric model : " << h->fAtmosphericModel << endl;
+		cout << "\t atmospheric model : " << h->fAtmosphericModel << " (possibly not filled yet)" << endl;
 		cout << "\t array configuration: " << endl;
 		for( unsigned int i = 0; i < h->fArray.size(); i++ )
 		{
@@ -370,16 +370,11 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
 				{
 					is_stream >> iATM;
 				}
-				// (GM) simulation header in MC vbf file is not filled properly (yet)
+				// simulation header in MC vbf file is not filled properly (yet)
 				if( iATM != 0 )
 				{
 					iMCRunHeader->atmosphere = iATM;
 				}
-				/*	      if( iATM != iMCRunHeader->atmosphere )
-					      {
-					         cout << "VSimulationDataReader::fillSimulationHeader warning: different atmospheric models in runheader and simconfig string ";
-						 cout << iMCRunHeader->atmosphere << "\t" << iATM << endl;
-				              } */
 			}
 			else if( iTemp == "*" )
 			{

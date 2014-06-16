@@ -59,7 +59,7 @@ class VEventLoop : public VEvndispData
 		E_runmode fRunMode;                       //!< run mode (analysis, pedestal calculation, gain/toffset calculation)
 		
 		bool fAnalyzeMode;                        //!< used for gotoEvent (go through file without analyse events)
-		bool bCheckTelescopePositions;
+		bool bMCSetAtmosphericID;
 		vector< bool > fBoolPrintSample;
 		
 		bool fCutTelescope;                       //!< cuts apply only to one telescope
@@ -79,8 +79,6 @@ class VEventLoop : public VEvndispData
 		int      analyzeEvent();                  //!< analyze current event
 		int      checkArrayCuts();                //!< check cuts (see tab cut option) for current event
 		int      checkCuts();                     //!< check cuts (see tab cut option) for current event
-		//!< check if T1 is on the right place
-		void     checkTelescopePositions( int iMJD );
 		void     fillTriggerVectors();
 		void     setEventTimeFromReader();        //! calculate event time in appropriate format
 		void     printRunInfos();                 //!< print some informations about current run

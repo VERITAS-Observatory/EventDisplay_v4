@@ -40,7 +40,7 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	fDSTReader = 0;
 	fPEReader = 0;
 	
-	bCheckTelescopePositions = true;
+	bMCSetAtmosphericID = false;
 	fBoolPrintSample.assign( fNTel, true );
 	fGPSClockWarnings.assign( fNTel, 0 );
 	
@@ -580,7 +580,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 		getRunParameter()->fTargetDec = getArrayPointing()->getTargetDecJ2000();
 		getRunParameter()->fTargetRA  = getArrayPointing()->getTargetRAJ2000();
 	}
-	
+
 	return true;
 }
 
@@ -1102,13 +1102,16 @@ int VEventLoop::analyzeEvent()
 	for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
 	{
 		setTelID( fRunPar->fTelToAnalyze[i] );
-		
-		/////////////////////////////////////////////////////////////////////
-		// check telescope position of T1
-		if( getTelID() == 0 && bCheckTelescopePositions && !isMC() )
-		{
-			checkTelescopePositions( fEventMJD[getTelID()] );
-		}
+
+                if( isMC() && !bMCSetAtmosphericID )
+                {
+                    
+                    if( fRunPar->fAtmosphereID == 0 && getReader()->getMonteCarloHeader() )
+                    {
+                        fRunPar->fAtmosphereID = getReader()->getMonteCarloHeader()->atmosphere;
+                    }
+                    bMCSetAtmosphericID = true;
+                }
 		
 		// check number of samples
 		if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isDST_MC() )
@@ -1135,7 +1138,7 @@ int VEventLoop::analyzeEvent()
 		{
 			cout << "VEventLoop::analyzeEvent() error: retrieved sample length of zero" << endl;
 			cout << "exiting..." << endl;
-			exit( -1 );
+			exit( EXIT_FAILURE );
 		}
 		
 		// check the requested sumwindow is not larger than the number of samples. Also check that correct low gain multipliers were read in for all 'reset' sum windows.
@@ -1970,21 +1973,3 @@ void VEventLoop::setEventTimeFromReader()
 }
 
 
-/*!
-    check if T1 is at the right place after the move in Summer 2009
-
-    first run with new array was 55075
-*/
-void VEventLoop::checkTelescopePositions( int iMJD )
-{
-	if( iMJD > 55075 )
-	{
-		// check X-position only, should be enough
-		if( getDetectorGeometry() && getDetectorGeometry()->getTelXpos().size() > 0 && ( TMath::Abs( getDetectorGeometry()->getTelXpos()[getTelID()] - 135. ) > 1. && TMath::Abs( getDetectorGeometry()->getTelXpos()[getTelID()] - 91.8 ) > 1. ) )
-		{
-			cout << "==============================================" << endl;
-			cout << "WARNING: T1 possibly not at the right position" << endl;
-			cout << "==============================================" << endl;
-		}
-	}
-}

@@ -75,6 +75,10 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		// on all images, irregardless of if they are near the
 		// edge of the camera or not.  Set in
 		// EVNDISP.reconstruction.runparameter
+                
+                string fInstrumentEpoch;                  // Instrumental epoch (e.g. for VTS V5 or V6)
+                unsigned int fAtmosphereID;               // corsika ID of atmosphere
+                string fEpochFile;                        // file with list of epochs and atmospheres
 		
 		float  fRunDuration;                      // duration of runs in [s]
 		
@@ -323,6 +327,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fuseDB;
 		}
 		
-		ClassDef( VEvndispRunParameter, 149 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 150 ); //(increase this number)
 };
 #endif

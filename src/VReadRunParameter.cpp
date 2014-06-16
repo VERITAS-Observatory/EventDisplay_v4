@@ -472,6 +472,26 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->frunnumber = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
+                else if( iTemp.rfind ( "epochfile" ) < iTemp.size() )
+                {
+                        if( iTemp2.size() > 0 )
+                        {
+                            fRunPara->fEpochFile = iTemp2;
+                            i++;
+                        }
+                }
+                else if( iTemp.rfind( "epoch" ) < iTemp.size() && !( iTemp.find( "epochfile" ) < iTemp.size() ) )
+                {
+                        if( iTemp2.size() > 0 )
+                        {
+                            fRunPara->fInstrumentEpoch = iTemp2;
+                            i++;
+                        }
+                }
+                else if( iTemp.rfind( "atmosphereid" ) < iTemp.size() )
+                {
+                        fRunPara->fAtmosphereID = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+                } 
 		else if( iTemp.rfind( "gaincorrection" ) < iTemp.size() )
 		{
 			fRunPara->fGainCorrection[0] = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -1262,9 +1282,14 @@ void VReadRunParameter::test_and_adjustParams()
 			cout << endl;
 			cout << "FATAL ERROR: cannot connect to VERITAS database" << endl;
 			cout << "exiting..." << endl;
-			exit( 0 );
+			exit( EXIT_FAILURE );
 		}
 	}
+        if( !readEpochsAndAtmospheres() )
+        {
+             cout << "exiting..." << endl;
+             exit( EXIT_FAILURE );
+        }
 	// muon runs need long tree
 	if( fRunPara->fmuonmode || fRunPara->fhoughmuonmode )
 	{
@@ -1551,7 +1576,7 @@ void VReadRunParameter::test_and_adjustParams()
 		}
 	}
 	
-	// MS: throws an error if its a simulation file and it was asked to calculate the PW parameters from the CFD hits, since CFDs don't exist in the simulation record
+	// throws an error if its a simulation file and it was asked to calculate the PW parameters from the CFD hits, since CFDs don't exist in the simulation record
 	if( fRunPara->fIsMC > 0 && ( fRunPara->fPWmethod == 0 || fRunPara->fPWmethod == 1 ) )
 	{
 		cout << " GrISU simulations don't have true CFD hits! PWmethod=" << fRunPara->fPWmethod << " can only be used with data with CFD hits." << endl;
@@ -1885,4 +1910,114 @@ bool VReadRunParameter::readTrigSimInputCard( TString card )
 	}
 	
 	return true;
+}
+
+/*
+ *  read instrument epoch and atmospheric ID from a parameter file
+ *
+ *  (this might be extended in future to read the values from the db)
+ *
+ */
+bool VReadRunParameter::readEpochsAndAtmospheres()
+{
+     if( !fRunPara ) return false;
+
+     if( fRunPara->fEpochFile.size() == 0 ) return true;
+
+	ifstream is;
+	is.open( fRunPara->fEpochFile.c_str(), ifstream::in );
+	if( !is )
+	{
+                string iTemp = fRunPara->getDirectory_EVNDISPParameterFiles() + fRunPara->fEpochFile;
+                is.open( iTemp.c_str(), ifstream::in );
+                if( !is )
+                {
+                    cout << "error opening epoch parameter file " << fRunPara->fEpochFile << endl;
+                    cout << iTemp << endl;
+                    exit( EXIT_FAILURE );
+                }
+	}
+	string is_line;
+	string temp;
+	cout << endl;
+	cout << "========================================" << endl;
+        cout << "reading epoch for given run and date from " << fRunPara->fEpochFile << endl;
+
+     if( fRunPara->fInstrumentEpoch != "noepoch" )
+     {
+         cout << "   (epoch is set from command line - ignoring values in epoch parameter file" << endl;
+     }
+     if( fRunPara->fAtmosphereID != 0 )
+     {
+         cout << "   (atmosphere ID is set from command line - ignoring values in epoch parameter file" << endl;
+     }
+
+	
+	while( getline( is, is_line ) )
+	{
+		if( is_line.size() > 0 )
+		{
+			istringstream is_stream( is_line );
+
+                        int run_min = 0;
+                        int run_max = 0;
+
+			is_stream >> temp;
+			if( temp != "*" )
+			{
+				continue;
+			}
+                        if( is_stream.eof() ) continue;
+			is_stream >> temp;
+			// EPOCH (e.g. V4, V5 and V6)
+                        // * EPOCH V6 <run min> <run max>
+			if( temp == "EPOCH" && fRunPara->fInstrumentEpoch == "noepoch" )
+			{
+                                string iTemp = "";
+                                if( !is_stream.eof() ) is_stream >> iTemp;
+                                if( !is_stream.eof() ) is_stream >> run_min;
+                                if( !is_stream.eof() ) is_stream >> run_max;
+
+                                if( fRunPara->frunnumber >= run_min && fRunPara->frunnumber <= run_max )
+                                {
+                                     fRunPara->fInstrumentEpoch = iTemp;
+                                }
+                        }
+                        // atmosphere (e.g. summer or winter)
+                        //    expect input string in sql format without hours: 2014-06-16)
+                        //  * ATMOSPHERE 21 2014-06-01 2014-06-16
+                        else if( temp == "ATMOSPHERE" && fRunPara->fAtmosphereID == 0 )
+                        {
+                                string iTemp = "";
+                                string date_min = "";
+                                string date_max = "";
+                                double imjd_min = 0.;
+                                double isec_min = 0.;
+                                double imjd_max = 0.;
+                                double isec_max = 0.;
+                                if( !is_stream.eof() ) is_stream >> iTemp;
+                                if( !is_stream.eof() ) is_stream >> date_min;
+                                if( !is_stream.eof() ) is_stream >> date_max;
+                                date_min += " 12:00:00";
+                                date_max += " 12:00:00";
+                                if( VSkyCoordinatesUtilities::getMJD_from_SQLstring( date_min, imjd_min, isec_min ) != 0 )
+                                {
+                                    cout << "VReadRunParameter::readEpochsAndAtmospheres() error: invalid date string: " << date_min << endl;
+                                    return false;
+                                }
+                                if( VSkyCoordinatesUtilities::getMJD_from_SQLstring( date_max, imjd_max, isec_max ) != 0 )
+                                {
+                                    cout << "VReadRunParameter::readEpochsAndAtmospheres() error: invalid date string: " << date_max << endl;
+                                    return false;
+                                }
+                                if( fRunPara->fDBDataStartTimeMJD >= imjd_min && fRunPara->fDBDataStartTimeMJD <= imjd_max )
+                                {
+                                     fRunPara->fAtmosphereID = atoi( iTemp.c_str() );
+                                }
+                        }
+                 }
+          }
+          is.close();
+
+    return true;
 }
