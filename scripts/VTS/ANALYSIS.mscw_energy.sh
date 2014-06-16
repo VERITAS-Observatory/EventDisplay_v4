@@ -69,6 +69,9 @@ if [ ! -f "$RLIST" ] ; then
 fi
 FILES=`cat $RLIST`
 
+NRUNS=`cat $RLIST | wc -l ` 
+echo "total number of runs to analyze: $NRUNS"
+echo
 # Check that table file exists
 if [[ "$TABFILE" == `basename $TABFILE` ]]; then
     TABFILE="$VERITAS_EVNDISP_AUX_DIR/Tables/$TABFILE"

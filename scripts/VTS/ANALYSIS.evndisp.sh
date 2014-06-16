@@ -9,7 +9,7 @@ if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 echo "
 EVNDISP data analysis: submit jobs from a simple run list
 
-ANALYSIS.evndisp.sh <runlist> [output directory] [calibration] [VPM] [Model3D]
+ANALYSIS.evndisp.sh <runlist> [output directory] [calibration] [VPM] [Model3D] [teltoana] [calibration file name]
 
 required parameters:
 
@@ -23,11 +23,20 @@ optional parameters:
           1                 pedestal & average tzero calculation (default)
           2                 pedestal calculation only
           3                 average tzero calculation only
+          4                 pedestal & average tzero calculation from calibration file
 
     [VPM]                   set to 0 to switch off (default is on)
 
     [Model3D]               set to 1 to switch on  (default is off)
-    
+
+    [teltoana]              restrict telescope combination to be analyzed:
+                            e.g.: teltoana=123 (for tel. 1,2,3), 234, ...
+                            default is 1234 (all telescopes)
+
+    [calibration file name] only used with calibration=4 option
+                            standard calibration file name is calibrationlist.dat
+                            file is searched in $VERITAS_EVNDISP_ANA_DIR/Calibration
+
 --------------------------------------------------------------------------------
 "
 #end help message
@@ -52,6 +61,8 @@ mkdir -p $ODIR
 [[ "$3" ]] && CALIB=$3 || CALIB=1
 [[ "$4" ]] && VPM=$4   || VPM=1
 [[ "$5" ]] && MODEL3D=$5 || MODEL3D=0
+[[ "$6" ]] && TELTOANA=$6 || TELTOANA=1234
+[[ "$7" ]] && CALIBFILE=$7 || CALIBFILE=calibrationlist.dat
 
 # Read runlist
 if [ ! -f "$RLIST" ] ; then
@@ -68,6 +79,11 @@ mkdir -p $LOGDIR
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/ANALYSIS.evndisp_sub"
 
+
+NRUNS=`cat $RLIST | wc -l ` 
+echo "total number of runs to analyze: $NRUNS"
+echo
+
 #########################################
 # loop over all files in files loop
 for AFILE in $FILES
@@ -79,10 +95,33 @@ do
         -e "s|CALIBRATIONOPTION|$CALIB|"    \
         -e "s|OUTPUTDIRECTORY|$ODIR|"       \
         -e "s|USEVPMPOINTING|$VPM|" \
+        -e "s|TELTOANACOMB|$TELTOANA|"                   \
+        -e "s|USECALIBLIST|$CALIBFILE|"                  \
         -e "s|USEMODEL3D|$MODEL3D|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
     chmod u+x $FSCRIPT.sh
     echo $FSCRIPT.sh
+	# output selected input during submission:
+	if [[ $MODEL3D == "0" ]]; then
+	echo "VPM is switched on (default)"
+	else
+	echo "VPM bool is set to $VPM (switched off)"
+	fi 
+	if [[ $MODEL3D == "0" ]]; then
+	echo "Model3D is switched off (default)"
+	else
+	echo "Model3D bool is set to $MODEL3D (switched on)"
+	fi 
+	if [[ $TELTOANA == "1234" ]]; then
+	echo "Analyzed telescopes: $TELTOANA (default, all telescopes)"
+	else
+	echo "Analyzed telescopes: $TELTOANA"
+	fi 
+	if [[ $CALIB == "4" ]]; then
+	echo "read calibration from calibration file $CALIBFILE"
+	else
+            echo "read calibration from VOffline DB (default)"
+	fi 
 
     # run locally or on cluster
     SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`

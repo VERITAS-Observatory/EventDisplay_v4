@@ -10,6 +10,8 @@ CALIB=CALIBRATIONOPTION
 ODIR=OUTPUTDIRECTORY
 VPM=USEVPMPOINTING
 MODEL3D=USEMODEL3D
+CALIBFILE=USECALIBLIST
+TELTOANA=TELTOANACOMB
 LOGDIR="$ODIR"
 
 # temporary (scratch) directory
@@ -26,15 +28,28 @@ ACUTS="EVNDISP.reconstruction.runparameter"
 
 #########################################
 # pedestal calculation
-if [[ $CALIB == "1" || $CALIB == "2" ]]; then
+if [[ $CALIB == "1" || ( $CALIB == "2" || $CALIB == "4" ) ]]; then
     rm -f $LOGDIR/$RUN.ped.log
     $EVNDISPSYS/bin/evndisp -runmode=1 -runnumber=$RUN -reconstructionparameter $ACUTS &> $LOGDIR/$RUN.ped.log
-	echo "RUN$RUN PEDLOG $LOGDIR/$RUN.ped.log"
+    echo "RUN$RUN PEDLOG $LOGDIR/$RUN.ped.log"
 fi
 
 #########################################
-# read gain and toffsets from VOFFLINE DB
-OPT=( "-readCalibDB" )
+
+if [[ $CALIB == "4" ]]; then
+	## use text file for calibration information
+	OPT+=( -calibrationfile $CALIBFILE )
+else
+	# read gain and toffsets from VOFFLINE DB
+	OPT+=( "-readCalibDB" )
+fi
+
+# restrict telescope combination to be analyzed:
+if [[ $TELTOANA == "1234" ]]; then
+	echo "Analyzed telescopes: $TELTOANA (all telescopes)"
+else
+	OPT+=( -teltoana=$TELTOANA )
+fi
 
 # None of the following command line options is needed for the standard analysis!
 
@@ -46,17 +61,9 @@ OPT=( "-readCalibDB" )
 ## where the calib file should be (it won't erase what is already there)
 # OPT+=( -readandsavecalibdb )
 
-## Quick look option (has no effect if readCalibDB or equivalent is set):
-## use this option when you don't care about the calibration information
-## if no gain can be read from your laser file, gain will be set to 1
-## if no toffset can be read from your laser file, toffset will be set to 0
-# OPT+=( -nocalibnoproblem )
-## Note: if this option is NOT set, the analysis will break if there is problem
-## reading the gain and toffset files
-
 #########################################
 # average tzero calculation
-if [[ $CALIB == "1" || $CALIB == "3" ]]; then
+if [[ $CALIB == "1" || ( $CALIB == "3" || $CALIB == "4" ) ]]; then
     rm -f $LOGDIR/$RUN.tzero.log
     $EVNDISPSYS/bin/evndisp -runnumber=$RUN -runmode=7 -reconstructionparameter $ACUTS ${OPT[@]} &> $LOGDIR/$RUN.tzero.log
 	echo "RUN$RUN TZEROLOG $LOGDIR/$RUN.tzero.log"

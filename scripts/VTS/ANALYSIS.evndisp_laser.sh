@@ -9,11 +9,21 @@ if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 echo "
 EVNDISP laser analysis: submit jobs from a simple run list
 
-ANALYSIS.evndisp_laser.sh <runlist>
+ANALYSIS.evndisp_laser.sh <runlist> [teltoana]
 
 required parameters:
 
     <runlist>           simple run list with one run number per line
+                        runlist should contain laser run numbers
+
+                        example for run list:
+                        48626
+                        58453
+                        61429
+
+    [teltoana]          restrict telescope combination to be analyzed:
+                        e.g.: teltoana=123 (for tel. 1,2,3), 234, ...
+                        default is 1234 (all telescopes)
 
 --------------------------------------------------------------------------------
 "
@@ -27,6 +37,8 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 
 # Parse command line arguments
 RLIST=$1
+
+[[ "$2" ]] && TELTOANA=$2 || TELTOANA=1234
 
 # Read runlist
 if [[ ! -f "$RLIST" ]] ; then
@@ -55,9 +67,18 @@ for RUN in $RUNNUMS; do
         echo "Error: laser vbf file not found for run $RUN"
     else
         echo "Now starting laser run $RUN"
+
+        # output selected input during submission:
+        if [[ $TELTOANA == "1234" ]]; then
+        echo "Analyzed telescopes: $TELTOANA (default, all telescopes)"
+        else
+        echo "Analyzed telescopes: $TELTOANA"
+        fi
+        
         FSCRIPT="$LOGDIR/EVN.laser-$RUN"
 
         sed -e "s|RUNFILE|$RUN|" \
+            -e "s|TELTOANACOMB|$TELTOANA|" \
             -e "s|LOGDIRECTORY|$LOGDIR|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
         chmod u+x $FSCRIPT.sh
