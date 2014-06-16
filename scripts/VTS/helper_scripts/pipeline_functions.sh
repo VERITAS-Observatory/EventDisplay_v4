@@ -174,7 +174,7 @@ function checkIfJobsAreDoneAlt {
     if [ -e "$RUNNINGJOBS" ] ; then # the RUNNINGJOBS file exists and we can do stuff
 		
 		# use subshell () so we can set IFS to \newline and read JOBLIST and JOBLINE
-		# in for loops, rather than using reads all over the place (which caused buggy
+		# in for loops, rather than using 'read' all over the place (which caused buggy
 		# behavior in this function)
 		( IFS='
 '
@@ -560,4 +560,5 @@ function tagDir {
     local tagarg=$2
     echo "${tagname}_$tagarg"
 }
+
 

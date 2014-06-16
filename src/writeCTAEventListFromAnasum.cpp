@@ -70,8 +70,9 @@ int main( int argc, char* argv[] )
 	string INPoutnameStr ;
 	bool overwriteFlag = false ;
 	bool maxEventsFlag = false ;
+	bool rawEventsFlag = false ;
 	unsigned int maxEvents = -1 ;
-	while( ( c = getopt( argc, argv, "i:o:n:hf" ) ) != -1 )
+	while( ( c = getopt( argc, argv, "i:o:n:hfe" ) ) != -1 )
 	{
 		switch( c )
 		{
@@ -92,6 +93,9 @@ int main( int argc, char* argv[] )
 				break ;
 			case 'f':
 				overwriteFlag = true ;
+				break ;
+			case 'e':
+				rawEventsFlag = true ;
 				break ;
 			default:
 				//cout << "unknown option '" << c << "', aborting!" << endl;
@@ -118,8 +122,9 @@ int main( int argc, char* argv[] )
 		cout << "   Optional:" << endl;
 		cout << "      -m <int>   : only load first <int> ttrees from anasum root file, for debugging."    << endl ;
 		cout << "      -n <int>   : only read at most <int> events total, for debugging."                  << endl ;
-		cout << "      -f         : clobber, will forcably overwrite existing output fits file." << endl ;
+		cout << "      -f         : clobber, will forcably overwrite existing output fits file."           << endl ;
 		cout << "                   otherwise error out if file already exists."                           << endl ;
+		cout << "      -e         : also print each event to stdout, for debugging purposes"               << endl ;
 		cout << endl;
 		cout << "   *** Note: input anasum file must have been created with the '* WRITEEVENTTREEFORCTOOLS 1'" << endl;
 		cout << "        option in ANASUM.runparameter, which is not on by default.  The output anasum" << endl;
@@ -719,6 +724,10 @@ int main( int argc, char* argv[] )
 		dety        = Yoff           ;
 		shwidth     = -9999.9        ;
 		shlength    = -9999.9        ;
+			
+		if ( rawEventsFlag ) {
+			printf( "EVENT %d %d %f %f\n", obs_id, event_id, ra, dec ) ;
+		}
 		
 		// set the telmask
 		telmask_clear( telmask ) ;

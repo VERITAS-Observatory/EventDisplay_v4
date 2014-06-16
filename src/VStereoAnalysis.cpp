@@ -831,13 +831,9 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 		}
 		fHisto[fHisCounter]->writeHistograms();
 		
-		// requires fDeadTime histograms to be intact,
-		// so we need to save_TreeWithEventsForCtools() 
-		// *before* fDeadTime[fHisCounter]->writeHistograms()
-		if( fTreeWithEventsForCtools && fIsOn && fRunPara->fWriteEventTreeForCtools )  // WRITEEVENTTREEFORCTOOLS
-		{
-			save_TreeWithEventsForCtools() ;
-		}
+		// need to grab fScalarDeadTimeFrac while fDeadTime histograms are intact,
+		// fScalarDeadTimeFrac is needed in  save_TreeWithEventsForCtools()
+		fRunPara->fScalarDeadTimeFrac = fDeadTime[fHisCounter]->getDeadTimeFraction( fTimeMask->getMask(), fRunPara->fDeadTimeCalculationMethod );
 		
 		fDeadTime[fHisCounter]->writeHistograms();
 		// copy effective areas and radial acceptance to anasum output file
@@ -875,6 +871,11 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 		if( fTreeWithAllGamma && fIsOn && fRunPara->fWriteAllGammaToTree )  // WRITEALLGAMMATOTREE
 		{
 			fTreeWithAllGamma->Write() ; // or maybe ->AutoSave() ?
+		}
+		
+		if( fTreeWithEventsForCtools && fIsOn && fRunPara->fWriteEventTreeForCtools )  // WRITEEVENTTREEFORCTOOLS
+		{
+			save_TreeWithEventsForCtools() ;
 		}
 		
 	}
@@ -2659,7 +2660,6 @@ void VStereoAnalysis::save_TreeWithEventsForCtools() // WRITEEVENTTREEFORCTOOLS
 	// save our ctools tree
 	fTreeWithEventsForCtools->Write() ; // or maybe ->AutoSave() ?
 
-	fRunPara->fScalarDeadTimeFrac = fDeadTime[fHisCounter]->getDeadTimeFraction( fTimeMask->getMask(), fRunPara->fDeadTimeCalculationMethod );
 	fRunPara->SetName( "VAnaSumRunParameter" );
 	fRunPara->Write() ;
 	
