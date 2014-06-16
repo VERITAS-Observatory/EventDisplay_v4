@@ -974,8 +974,12 @@ TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution( string iXaxis, 
 						   getPlottingAxis( "angularesolution_Lin" )->fMaxValue, iResolutionTreeName, iXaxis );
 }
 
-TCanvas* VPlotInstrumentResponseFunction::plotCoreResolution( string iXaxis )
+TCanvas* VPlotInstrumentResponseFunction::plotCoreResolution( string iXaxis, double iMax )
 {
+        if( iMax > 0. )
+        {
+            getPlottingAxis( "coreresolution_Lin" )->fMaxValue = iMax;
+        }
 	return plotResolution( "coreres", "core resolution vs " + iXaxis, "core resolution [m]",
 						   getPlottingAxis( "coreresolution_Lin" )->fMinValue,
 						   getPlottingAxis( "coreresolution_Lin" )->fMaxValue, "t_core_resolution", iXaxis );

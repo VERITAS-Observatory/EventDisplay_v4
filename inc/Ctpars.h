@@ -357,7 +357,7 @@ void Ctpars::Init( TTree* tree )
 		}
 		else
 		{
-			fChain->SetBranchAddress( "size", &size2 );
+			size2 = 0.;
 		}
 		size = 0.;
 	}
@@ -505,7 +505,7 @@ Bool_t Ctpars::Notify()
 		}
 		else
 		{
-			b_size2 = fChain->GetBranch( "size" );
+			b_size2 = 0;
 		}
 		fChain->AddBranchToCache( b_size2 );
 	}

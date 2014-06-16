@@ -4,9 +4,8 @@
     two methods are applied:
 
     i)  using the distribution of time differences
-    ii) using the ten MHz clock and busy counter (scaler)
+    ii) using the ten MHz clock and busy counter (scalar)
 
-    \author  Gernot Maier
 */
 
 #include "VDeadTime.h"

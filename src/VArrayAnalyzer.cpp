@@ -2356,6 +2356,18 @@ string VArrayAnalyzer::getTMVAFileNameForAngularReconstruction( unsigned int iSt
             iName = getEvndispReconstructionParameter()->fTMVAFileName[iStereoMethodID][iBinSelected];
         }
     }
+    if( fDebug )
+    {
+        cout << "Average zenith angle in current run: " << 90.-getAverageElevation() << endl;
+        cout << "TMVA BDTs available for: " << endl;
+        if( getEvndispReconstructionParameter() && iStereoMethodID < getEvndispReconstructionParameter()->fMTVAZenithBin.size() )
+        {
+            for( unsigned int i = 0; i < getEvndispReconstructionParameter()->fMTVAZenithBin[iStereoMethodID].size(); i++ )
+            {
+                cout << "\t" << getEvndispReconstructionParameter()->fMTVAZenithBin[iStereoMethodID][i] << endl;
+            }
+        }
+    }
 
     return iName;
 }

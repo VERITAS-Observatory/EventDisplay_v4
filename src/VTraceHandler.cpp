@@ -87,15 +87,7 @@ void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSample
         }
 		
 	fpTrazeSize = int( fpTrace.size() );
-	if( iHiLo > 0. )
-	{
-		apply_lowgain( iHiLo );
-		fHiLo = true;
-	}
-	else
-	{
-		fHiLo = false;
-	}
+        fHiLo = apply_lowgain( iHiLo );
 }
 
 void VTraceHandler::setTrace( vector<uint16_t> pTrace, double ped, double pedrms, unsigned int iChanID, double iHiLo )
@@ -139,10 +131,13 @@ void VTraceHandler::setTrace( vector<uint8_t> pTrace, double ped, double pedrms,
 			fpTrace.push_back( ( double )pTrace[i] );
 		}
 	}
-	else for( unsigned int i = 0; i < i_tsize; i++ )
+	else 
+        {
+                for( unsigned int i = 0; i < i_tsize; i++ )
 		{
 			fpTrace[i] = ( double )pTrace[i];
 		}
+        }
 		
 	fpTrazeSize = int( fpTrace.size() );
 	fHiLo = apply_lowgain( iHiLo );
@@ -188,7 +183,6 @@ void VTraceHandler::calcQuickPed( int fFirst, int fLast )
 	{
 		pedsum = 0;
 	}
-	//cout << pedsum << " " << count <<endl;
 	fPed = pedsum;
 }
 

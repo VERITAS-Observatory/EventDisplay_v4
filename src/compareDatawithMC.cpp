@@ -278,6 +278,7 @@ int main( int argc, char* argv[] )
 	cout << "DIFF" << endl;
 	cout << "----" << endl;
 	VDataMCComparision* fDiff = new VDataMCComparision( "DIFF", false, iNT );
-	fDiff->setOnOffHistograms( fStereoCompareOn, fStereoCompareOff, 1. );
+        // assume 5 background regions
+	fDiff->setOnOffHistograms( fStereoCompareOn, fStereoCompareOff, 1./5. );
 	fDiff->writeHistograms( fout );
 }

@@ -541,7 +541,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			// gamma/hadron cuts
 			bIsGamma = fCuts->isGamma( i, false, fIsOn );
 			
-			// fill on/offstereo maps and directoin cut
+			// fill on/offstereo maps and direction cut
 			bDirectionCuts = fMap->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max( iErec ),
 										 fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma, i_theta2 );
 			bDirectionCuts = fMapUC->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max( iErec ),

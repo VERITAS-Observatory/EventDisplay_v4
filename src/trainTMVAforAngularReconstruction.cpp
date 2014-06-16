@@ -122,7 +122,7 @@ bool trainTMVA( string iOutputDir, string iOutputName )
 		// quality cuts
 		TCut fQualityCut = "size>100.&&ntubes>4.&&length>0.&&loss<0.2";
 		
-		factory->PrepareTrainingAndTestTree( fQualityCut, "nTrain_Regression=1000000:nTest_Regression=100000:SplitMode=Random:NormMode=NumEvents:!V" );
+		factory->PrepareTrainingAndTestTree( fQualityCut, "nTrain_Regression=400000:nTest_Regression=40000:SplitMode=Random:NormMode=NumEvents:!V" );
 		
 		
 		ostringstream iMVAName;
