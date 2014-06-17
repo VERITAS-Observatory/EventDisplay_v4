@@ -151,8 +151,10 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		//////////////////////////
 		// FROGS
 		string  fFileNameFrogsCut;
-		TGraph* fShowerGoodness;     // energy dependent shower goodness cuts
-		TGraph* fBackgroundGoodness; // energy dependent background goodness cuts
+		TGraph* fShowerGoodness;     // shower goodness cuts
+		TGraph* fBackgroundGoodness; // background goodness cuts
+		TGraph* fMSCW;               // mscw cuts
+		TGraph* fMSCL;               // mscl cuts
 		
 		// cut statistics
 		VGammaHadronCutsStatistics* fStats;                       //!
@@ -270,6 +272,10 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		// FROGS
 		void   printFrogsCuts( string );
 		double getShowerGoodnessCut_max( double );
+		double getBackgroundGoodnessCut_max( double );
+		double getMSCWCut_max( double );
+		double getMSCLCut_max( double );
+		double getMeanGoodness( double, double, double, double );
 		
 		TF1*   getAngularResolutionFunction()
 		{
@@ -425,6 +431,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			return fUseOrbitalPhaseCuts;
 		}
 		
-		ClassDef( VGammaHadronCuts, 45 );
+		ClassDef( VGammaHadronCuts, 46 );
 };
 #endif
