@@ -290,7 +290,7 @@ class VAtmosphereSoundings
 		
 		TGraph* getResidualGraph( TGraph* data, TGraph* model , int color = 2 ) ;
 		void plot_season( double mjd_start, double mjd_end, TString season_name, char* value, TString outfileprefix ) ;
-		void plot_season( int year_start, int month_start, int day_start, int year_end, int month_end , int day_end, char* value, TString outfileprefix ) ;
+		void plot_season( int year_start, int month_start, int day_start, int year_end, int month_end , int day_end, char* value, TString outfileprefix="" ) ;
 		
 		
 };

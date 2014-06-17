@@ -3183,7 +3183,13 @@ void VAtmosphereSoundings::plot_season( double mjd_start, double mjd_end, TStrin
 		start.push_back( mjd_start + i * month + 1 );
 		end.push_back( mjd_start + ( i + 1 )*month - 1 );
 		
-		cout << i << " " << start.at( i ) << " " << end.at( i ) << endl;
+		int y1, y2, m1, m2, d1, d2, j;
+		double f;
+		slaDjcl( start[i] , &y1, &m1, &d1, &f, &j );
+		slaDjcl( end[i] , &y2, &m2, &d2, &f, &j );
+		TString output = TString::Format("%d\t%d-%d-%d\t%d-%d-%d", i+1, y1, m1, d1, y2, m2, d2 );
+		cout << output << endl;
+
 	}
 	
 	vector<VAtmosphereSoundingData*> v;
@@ -3219,7 +3225,7 @@ void VAtmosphereSoundings::plot_season( double mjd_start, double mjd_end, TStrin
 		double f;
 		slaDjcl( start[i] , &y1, &m1, &d1, &f, &j );
 		slaDjcl( end[i] , &y2, &m2, &d2, &f, &j );
-		TString name = TString::Format( "%d-%d-%d - %d-%d-%d", y1, m1, d1, y2, m2, d2 );
+		TString name = TString::Format( "%d-%d-%d - %d-%d-%d", y1, m1, d1, y2, m2, d2 );		
 		VAtmosphereSoundingData* t = makeMeanAtmosphereMJD( start[i], end[i], name.Data(), name.Data() );
 		t->setColor( col[i] );
 		t->getGraph( value )->SetTitle( name.Data() );
