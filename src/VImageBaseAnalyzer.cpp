@@ -645,8 +645,8 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 			
 			///////////////////////////////////////////
 			// integrate trace
-			setSums( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) * getLowGainSumCorrection( fRunPar->fsumwindow_pass1[fTelID] , corrlast - corrfirst, getHiLo()[i_channelHitID] ) );
-			
+			setSums( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) * getLowGainSumCorrection( iLastSum - iFirstSum , corrlast - corrfirst, getHiLo()[i_channelHitID] ) );
+
 			// fill parameters characterizing the trace
 			setTCorrectedSumFirst( i_channelHitID, fTraceHandler->getTraceIntegrationFirst() );
 			setTCorrectedSumLast( i_channelHitID, fTraceHandler->getTraceIntegrationLast() );
