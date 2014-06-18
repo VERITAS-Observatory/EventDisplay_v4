@@ -84,7 +84,13 @@ VGammaHadronCuts::VGammaHadronCuts()
 	fOrbitalPhase_min = -1.;
 	fOrbitalPhase_max = 1.e99;
 	fUseOrbitalPhaseCuts = false;
-	
+
+	// model3D parameters	
+	fCut_Depth3D_min = -1.;
+	fCut_Depth3D_max = 9999.;
+	fCut_RWidth3D_min = -1.;
+	fCut_RWidth3D_max = 9999.;
+
 	// TMVA evaluator
 	fTMVAEvaluator = 0;
 	fTMVA_MVAMethod = "";
@@ -219,6 +225,11 @@ void VGammaHadronCuts::resetCutValues()
 	fOrbitalPhase_min = -1.;
 	fOrbitalPhase_max = 1.e99;
 	
+	fCut_Depth3D_min = -1.;
+	fCut_Depth3D_max = 9999.;
+	fCut_RWidth3D_min = -1.;
+	fCut_RWidth3D_max = 9999.;
+
 	fCut_CoreDistanceToArrayCentreX_min = -1.e10;
 	fCut_CoreDistanceToArrayCentreX_max =  1.e10;
 	fCut_CoreDistanceToArrayCentreY_min = -1.e10;
@@ -520,6 +531,21 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 					fOrbitalPhase_max = 1.e99;
 				}
 				fUseOrbitalPhaseCuts = true;
+			}
+			// model3D parameters
+			else if( iCutVariable == "depth3D" )
+			{
+				is_stream >> temp;
+				fCut_Depth3D_min = ( atof( temp.c_str() ) );
+				is_stream >> temp;
+				fCut_Depth3D_max = ( atof( temp.c_str() ) );
+			}
+			else if( iCutVariable == "rwidth3D" )
+			{
+				is_stream >> temp;
+				fCut_RWidth3D_min = ( atof( temp.c_str() ) );
+				is_stream >> temp;
+				fCut_RWidth3D_max = ( atof( temp.c_str() ) );
 			}
 			
 			// to define the lower bounds in probablity cut ranges  (e.g. random forest)
@@ -1010,6 +1036,13 @@ void VGammaHadronCuts::printCutSummary()
 		cout << endl;
 		cout << "Orbital Phase bin ( " << fOrbitalPhase_min << ", " << fOrbitalPhase_max << " )";
 	}
+	// model3D cuts
+	if( fGammaHadronCutSelector / 10 == 6 )
+	{
+		cout << " Model3D cuts ( ";
+		cout << fCut_Depth3D_min << " < Depth3D < " << fCut_Depth3D_max;
+		cout << ", " << fCut_RWidth3D_min << " < RWidth3D < " << fCut_RWidth3D_max << " )";
+	}
 	// TMVA cuts
 	if( fGammaHadronCutSelector / 10 == 4 )
 	{
@@ -1492,7 +1525,19 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
 			return false;
 		}
 	}
-	
+	// apply Model3D Cuts
+	else if( fGammaHadronCutSelector / 10 == 6 )
+	{
+		if( !applyModel3DCut( i, fIsOn ) )
+		{
+			if( bCount && fStats )
+			{
+				fStats->updateCutCounter( VGammaHadronCutsStatistics::eIsGamma );
+			}
+			return false;
+		}
+	}
+
 	return true;
 }
 
@@ -1653,6 +1698,31 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 		return true;
 	}
 	return false;
+}
+
+/*
+   appy Model3D Cuts
+*/
+
+bool VGammaHadronCuts::applyModel3DCut( int i, bool fIsOn )
+{
+	if( !fData->isModel3D() )
+	{
+		cout << "VGammaHadronCuts::applyModel3DCut error: input data (mscw file) does not contain Model3D parameters" << endl;
+		cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
+	}
+
+	if( fData->Depth3D > fCut_Depth3D_max )
+	{
+		return false;
+	}
+	if( fData->RWidth3D > fCut_RWidth3D_max )
+	{
+		return false;
+	}
+	
+	return true;	
 }
 
 /*
