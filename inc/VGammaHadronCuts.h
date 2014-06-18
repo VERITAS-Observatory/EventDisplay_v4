@@ -161,6 +161,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		
 		bool   applyProbabilityCut( int i, bool fIsOn );
 		bool   applyFrogsCut( int i, bool fIsOn );
+		bool   applyModel3DCut( int i, bool fIsOn );
 		bool   initAngularResolutionFile();
 		bool   initPhaseCuts( int irun );
 		bool   initPhaseCuts( string iDir );
@@ -249,7 +250,11 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		bool   fUseOrbitalPhaseCuts;
 		double fOrbitalPhase_min;
 		double fOrbitalPhase_max;
-		
+		double fCut_Depth3D_min;
+		double fCut_Depth3D_max;
+		double fCut_RWidth3D_min;
+		double fCut_RWidth3D_max;
+
 		VGammaHadronCuts();
 		~VGammaHadronCuts();
 		
