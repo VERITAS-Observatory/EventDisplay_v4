@@ -3,8 +3,6 @@
 
     to get last resolution graph: getLastPlottedGraph()
 
-    \author
-    Gernot Maier
 */
 
 #include "VPlotInstrumentResponseFunction.h"
@@ -139,7 +137,7 @@ void VPlotInstrumentResponseFunction::resetInstrumentResponseData()
 	fData.clear();   // this is not a clean way to get rid of the data -> fix
 }
 
-TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMax_m2 )
+TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMax_m2, TPad *iEffAreaPad )
 {
 	if( fData.size() == 0 )
 	{
@@ -154,26 +152,39 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMax_
 	
 	char hname[200];
 	
-	sprintf( hname, "cEA_EFF" );
-	TCanvas* iEffectiveAreaPlottingCanvas = new TCanvas( hname, "effective area", 10, 10, fCanvasSize_X, fCanvasSize_Y );
-	iEffectiveAreaPlottingCanvas->SetGridx( 0 );
-	iEffectiveAreaPlottingCanvas->SetGridy( 0 );
-	iEffectiveAreaPlottingCanvas->SetLeftMargin( 0.15 );
-	iEffectiveAreaPlottingCanvas->SetRightMargin( 0.07 );
-	
-	TH1D* heff = new TH1D( "heff", "", 100, log10( getPlottingAxis( "energy_Lin" )->fMinValue ), log10( getPlottingAxis( "energy_Lin" )->fMaxValue ) );
-	heff->SetStats( 0 );
-	heff->SetXTitle( "log_{10} energy [TeV]" );
-	heff->SetYTitle( "effective area [m^{2}]" );
-	heff->SetMinimum( getPlottingAxis( "effarea_Lin" )->fMinValue );
-	heff->SetMaximum( getPlottingAxis( "effarea_Lin" )->fMaxValue );
-	heff->Draw( "" );
-	heff->Draw( "AH" );
-	
-	plot_nullHistogram( iEffectiveAreaPlottingCanvas, heff, getPlottingAxis( "energy_Lin" )->fLogAxis,
-						getPlottingAxis( "effarea_Lin" )->fLogAxis, 1.3,
-						getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" )->fMaxValue );
-						
+	TCanvas* iEffectiveAreaPlottingCanvas = 0;
+	if( iEffAreaPad )
+	{
+	    iEffectiveAreaPlottingCanvas = (TCanvas*)iEffAreaPad;
+        }
+	else
+	{
+	   sprintf( hname, "cEA_EFF" );
+	   iEffectiveAreaPlottingCanvas = new TCanvas( hname, "effective area", 10, 10, fCanvasSize_X, fCanvasSize_Y );
+	   iEffectiveAreaPlottingCanvas->SetGridx( 0 );
+	   iEffectiveAreaPlottingCanvas->SetGridy( 0 );
+	   iEffectiveAreaPlottingCanvas->SetLeftMargin( 0.15 );
+	   iEffectiveAreaPlottingCanvas->SetRightMargin( 0.07 );
+        }
+	if( !iEffectiveAreaPlottingCanvas ) return 0;
+	iEffectiveAreaPlottingCanvas->cd();
+
+	if( !iEffectiveAreaPlottingCanvas->GetListOfPrimitives()->FindObject( "heff" ) )
+	{
+	   TH1D* heff = new TH1D( "heff", "", 100, log10( getPlottingAxis( "energy_Lin" )->fMinValue ), log10( getPlottingAxis( "energy_Lin" )->fMaxValue ) );
+	   heff->SetStats( 0 );
+	   heff->SetXTitle( "log_{10} energy [TeV]" );
+	   heff->SetYTitle( "effective area [m^{2}]" );
+	   heff->SetMinimum( getPlottingAxis( "effarea_Lin" )->fMinValue );
+	   heff->SetMaximum( getPlottingAxis( "effarea_Lin" )->fMaxValue );
+	   heff->Draw( "" );
+	   heff->Draw( "AH" );
+	   
+	   plot_nullHistogram( iEffectiveAreaPlottingCanvas, heff, getPlottingAxis( "energy_Lin" )->fLogAxis,
+						   getPlottingAxis( "effarea_Lin" )->fLogAxis, 1.3,
+						   getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" )->fMaxValue );
+        }
+						   
 	int z = 0;
 	for( unsigned int i = 0; i < fData.size(); i++ )
 	{
@@ -688,7 +699,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveAreaRatio( unsigned int i
 	return iEffectiveAreaRatioPlottingCanvas;
 }
 
-TCanvas* VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax )
+TCanvas* VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax, TPad *iResolutionPad )
 {
 	if( fDebug )
 	{
@@ -698,32 +709,45 @@ TCanvas* VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax )
 	// canvas
 	char hname[200];
 	sprintf( hname, "cEA_energyResolution" );
-	TCanvas* iEnergyResolutionPlottingCanvas = new TCanvas( hname, "energy resolution", 10, 10, fCanvasSize_X, fCanvasSize_Y );
-	iEnergyResolutionPlottingCanvas->SetGridx( 0 );
-	iEnergyResolutionPlottingCanvas->SetGridy( 0 );
-	iEnergyResolutionPlottingCanvas->SetLeftMargin( 0.15 );
-	iEnergyResolutionPlottingCanvas->SetRightMargin( 0.07 );
+	TCanvas* iEnergyResolutionPlottingCanvas = 0;
+	if( iResolutionPad )
+	{
+	    iEnergyResolutionPlottingCanvas = (TCanvas*)iResolutionPad;
+        }
+        else
+	{
+	   iEnergyResolutionPlottingCanvas = new TCanvas( hname, "energy resolution", 10, 10, fCanvasSize_X, fCanvasSize_Y );
+	   iEnergyResolutionPlottingCanvas->SetGridx( 0 );
+	   iEnergyResolutionPlottingCanvas->SetGridy( 0 );
+	   iEnergyResolutionPlottingCanvas->SetLeftMargin( 0.15 );
+	   iEnergyResolutionPlottingCanvas->SetRightMargin( 0.07 );
+        }
+	if( !iEnergyResolutionPlottingCanvas ) return 0;
+	iEnergyResolutionPlottingCanvas->cd();
 	
 	// plotting frame
 	TH1D* he0 = 0;
-	if( getPlottingAxis( "energy_Lin" )->fMinValue > 0. && getPlottingAxis( "energy_Lin" )->fMaxValue > 0. )
+	if( !iEnergyResolutionPlottingCanvas->GetListOfPrimitives()->FindObject( "he0" ) )
 	{
-		he0 = new TH1D( "he0", "", 100, log10( getPlottingAxis( "energy_Lin" )->fMinValue ), log10( getPlottingAxis( "energy_Lin" )->fMaxValue ) );
-		he0->SetStats( 0 );
-		he0->SetXTitle( "log_{10} energy [TeV]" );
-		he0->SetYTitle( "energy resolution #Delta E" );
-		he0->SetMinimum( 0. );
-		he0->SetMaximum( ymax );
-	}
-	else
-	{
-		cout << "VPlotInstrumentResponseFunction::plotEnergyResolution error: negative energy axis: ";
-		cout << getPlottingAxis( "energy_Lin" )->fMinValue << "\t" << getPlottingAxis( "energy_Lin" )->fMaxValue << endl;
-		return 0;
-	}
-	plot_nullHistogram( iEnergyResolutionPlottingCanvas, he0, getPlottingAxis( "energy_Lin" )->fLogAxis,
-						false, he0->GetYaxis()->GetTitleOffset() * 1.3,
-						getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" )->fMaxValue );
+	   if( getPlottingAxis( "energy_Lin" )->fMinValue > 0. && getPlottingAxis( "energy_Lin" )->fMaxValue > 0. )
+	   {
+		   he0 = new TH1D( "he0", "", 100, log10( getPlottingAxis( "energy_Lin" )->fMinValue ), log10( getPlottingAxis( "energy_Lin" )->fMaxValue ) );
+		   he0->SetStats( 0 );
+		   he0->SetXTitle( "log_{10} energy [TeV]" );
+		   he0->SetYTitle( "energy resolution #Delta E" );
+		   he0->SetMinimum( 0. );
+		   he0->SetMaximum( ymax );
+	   }
+	   else
+	   {
+		   cout << "VPlotInstrumentResponseFunction::plotEnergyResolution error: negative energy axis: ";
+		   cout << getPlottingAxis( "energy_Lin" )->fMinValue << "\t" << getPlottingAxis( "energy_Lin" )->fMaxValue << endl;
+		   return 0;
+	   }
+	   plot_nullHistogram( iEnergyResolutionPlottingCanvas, he0, getPlottingAxis( "energy_Lin" )->fLogAxis,
+						   false, he0->GetYaxis()->GetTitleOffset() * 1.3,
+						   getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" )->fMaxValue );
+      }
 						
 	for( unsigned int i = 0; i < fData.size(); i++ )
 	{
@@ -957,7 +981,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution2D( unsigned int 
 							 getPlottingAxis( "angularesolution_Lin" )->fMaxValue, iResolutionTreeName, iXaxis, iEnergySlice_GeV );
 }
 
-TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution( string iXaxis, string iProbabilityString, double iMax )
+TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution( string iXaxis, string iProbabilityString, double iMax, TPad *iResolutionPad )
 {
 	string iResolutionTreeName = "t_angular_resolution";
 	if( iMax > 0. )
@@ -971,7 +995,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution( string iXaxis, 
 	return plotResolution( "angres"  + iProbabilityString, "angular resolution vs " + iXaxis + " (" + iProbabilityString + "%)",
 						   "angular resolution [deg]",
 						   getPlottingAxis( "angularesolution_Lin" )->fMinValue,
-						   getPlottingAxis( "angularesolution_Lin" )->fMaxValue, iResolutionTreeName, iXaxis );
+						   getPlottingAxis( "angularesolution_Lin" )->fMaxValue, iResolutionTreeName, iXaxis, iResolutionPad );
 }
 
 TCanvas* VPlotInstrumentResponseFunction::plotCoreResolution( string iXaxis, double iMax )
@@ -1169,7 +1193,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotResolution2D( unsigned int iDataSe
 
 */
 TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string iCanvasTitle, string iYTitle,
-		double iYmin, double iYmax, string iResolutionTreeName, string iXaxis )
+		double iYmin, double iYmax, string iResolutionTreeName, string iXaxis, TPad *iResolutionPad )
 {
 	if( fData.size() == 0 )
 	{
@@ -1247,25 +1271,43 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
 	}
 	
 	// create canvas
-	sprintf( hname, "c%s_%s", iName.c_str(), iXaxis.c_str() );
-	TCanvas* iResolutionPlottingCanvas = new TCanvas( hname, iCanvasTitle.c_str(), 210, 10, fCanvasSize_X, fCanvasSize_Y );
-	iResolutionPlottingCanvas->SetGridx( 0 );
-	iResolutionPlottingCanvas->SetGridy( 0 );
-	iResolutionPlottingCanvas->SetLeftMargin( 0.15 );
-	iResolutionPlottingCanvas->SetRightMargin( 0.07 );
-	
+	TCanvas *iResolutionPlottingCanvas = 0;
+	if( iResolutionPad )
+	{
+	    iResolutionPlottingCanvas = (TCanvas*)iResolutionPad;
+        }
+	else
+	{
+	   sprintf( hname, "c%s_%s", iName.c_str(), iXaxis.c_str() );
+	   iResolutionPlottingCanvas = new TCanvas( hname, iCanvasTitle.c_str(), 210, 10, fCanvasSize_X, fCanvasSize_Y );
+	   iResolutionPlottingCanvas->SetGridx( 0 );
+	   iResolutionPlottingCanvas->SetGridy( 0 );
+	   iResolutionPlottingCanvas->SetLeftMargin( 0.15 );
+	   iResolutionPlottingCanvas->SetRightMargin( 0.07 );
+        }
+	if( !iResolutionPlottingCanvas ) return 0;
+	iResolutionPlottingCanvas->cd();
+
 	sprintf( hname, "har_%s_%s", iName.c_str(), iXaxis.c_str() );
-	TH1D* har = new TH1D( hname, "", 100, i_Plotting_L_Min, i_Plotting_L_Max );
-	har->SetStats( 0 );
-	har->SetXTitle( iXTitle.c_str() );
-	har->SetYTitle( iYTitle.c_str() );
-	har->SetMinimum( iYmin );
-	har->SetMaximum( iYmax );
-	har->Draw( "" );
-	har->Draw( "AH" );
-	
-	plot_nullHistogram( iResolutionPlottingCanvas, har, i_Plotting_log, false, 1.6, i_Plotting_Min, i_Plotting_Max );
-	
+	TH1D *har = 0;
+	if( !iResolutionPlottingCanvas->GetListOfPrimitives()->FindObject( hname ) )
+	{
+	   har = new TH1D( hname, "", 100, i_Plotting_L_Min, i_Plotting_L_Max );
+	   har->SetStats( 0 );
+	   har->SetXTitle( iXTitle.c_str() );
+	   har->SetYTitle( iYTitle.c_str() );
+	   har->SetMinimum( iYmin );
+	   har->SetMaximum( iYmax );
+	   har->Draw( "" );
+	   har->Draw( "AH" );
+	   
+	   plot_nullHistogram( iResolutionPlottingCanvas, har, i_Plotting_log, false, 1.6, i_Plotting_Min, i_Plotting_Max );
+        }
+	else
+        {
+	   har = (TH1D*)iResolutionPlottingCanvas->GetListOfPrimitives()->FindObject( hname );
+        }
+	   
 	// get resolution graphs for the whole data sample
 	int z = 0;
 	for( unsigned int i = 0; i < fData.size(); i++ )

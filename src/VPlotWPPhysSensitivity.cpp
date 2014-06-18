@@ -90,7 +90,7 @@ bool VPlotWPPhysSensitivity::addDataSets( string iDataSettxtFile, string iDirect
    plot IRFs for all data sets
 
 */
-bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double iEffAreaMax, double iEnergyResolutionMax )
+bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double iEffAreaMax, double iEnergyResolutionMax, TPad *iEffAreaPad, TPad *iAngResPad, TPad *iEResPad )
 {
 	fIRF = new VPlotInstrumentResponseFunction();
 	
@@ -118,7 +118,7 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
 	char hname[2000];
 	////////////////////////////
 	// effective areas
-	TCanvas* c = fIRF->plotEffectiveArea( 2.e7 );
+	TCanvas* c = fIRF->plotEffectiveArea( 2.e7, iEffAreaPad );
 	plotLegend( c, true );
 	if( iPrint.size() > 0 )
 	{
@@ -150,11 +150,11 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
 		fPlotCTARequirements->plotRequirement_AngularResolution( c, fPlotCTARequirementGoals );
 	}
 	// angular resolution (80%)
-	c = fIRF->plotAngularResolution( "energy", "80" );
+	c = fIRF->plotAngularResolution( "energy", "80", -1.e99, iAngResPad );
 	plotLegend( c, false );
 	////////////////////////////
 	// energy resolution
-	c = fIRF->plotEnergyResolution( iEnergyResolutionMax );
+	c = fIRF->plotEnergyResolution( iEnergyResolutionMax, iEResPad );
 	plotLegend( c, false );
 	if( iPrint.size() > 0 )
 	{
@@ -338,12 +338,8 @@ TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas* c, double 
 					{
 						iGraph->SetPoint( p, x, 0. );
 					}
-					iGraph->SetPointEYhigh( p,
-											VMathsandFunctions::getRatioError( y_norm, y, y_normE_high,
-													iGraph->GetErrorYhigh( p ) ) );
-					iGraph->SetPointEYlow( p,
-										   VMathsandFunctions::getRatioError( y_norm, y, y_normE_low,
-												   iGraph->GetErrorYlow( p ) ) );
+					iGraph->SetPointEYhigh( p, VMathsandFunctions::getRatioError( y_norm, y, y_normE_high, iGraph->GetErrorYhigh( p ) ) );
+					iGraph->SetPointEYlow( p, VMathsandFunctions::getRatioError( y_norm, y, y_normE_low, iGraph->GetErrorYlow( p ) ) );
 				}
 				setGraphPlottingStyle( iGraph, i + 1, 1., 20, 1.0 );
 				iGraph->Draw( "pl" );
@@ -360,22 +356,32 @@ TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas* c, double 
 	return cC;
 }
 
-bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, double ymax, bool iRatoToGoal )
+bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, double ymax, bool iRatoToGoal, TPad *iSensRatio )
 {
 	char hname[200];
 	char htitle[200];
 	sprintf( hname, "cSensRatio_%d", (int)iRatoToGoal );
 	if( iRatoToGoal ) sprintf( htitle, "ratio of sensitivities (to goal)" );
 	else              sprintf( htitle, "ratio of sensitivities (to requirement)" );
-	TCanvas* cSensRatio = new TCanvas( hname, htitle, 200, 200, 900, 600 );
-	cSensRatio->SetGridy( 0 );
-	cSensRatio->SetGridx( 0 );
+	TCanvas* cSensRatio = 0;
+	if( !iSensRatio )
+	{
+	    cSensRatio = new TCanvas( hname, htitle, 200, 200, 900, 600 );
+	    cSensRatio->SetGridy( 0 );
+	    cSensRatio->SetGridx( 0 );
+        }
+	else
+	{
+	    cSensRatio = (TCanvas*)iSensRatio;
+        }
+	cSensRatio->cd();
 	
 	sprintf( hname, "hSensRatio_%d", (int)iRatoToGoal );
 	TH1D* hNull = new TH1D( hname, "", 10, log10( fMinEnergy_TeV ), log10( fMaxEnergy_TeV ) );
 	hNull->SetStats( 0 );
 	hNull->SetXTitle( "log_{10} energy [TeV]" );
-	hNull->SetYTitle( "Sensitivity ratio" );
+	if( iRatoToGoal ) hNull->SetYTitle( "Sensitivity ratio to goal sensitivity" );
+	else              hNull->SetYTitle( "Sensitivity ratio to required sensitivity" );
 	hNull->SetMinimum( ymin );
 	hNull->SetMaximum( ymax );
 	hNull->Draw( "" );
@@ -424,7 +430,7 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
 				}
 				if( g->GetN() > 0 )
 				{
-					setGraphPlottingStyle( g, fData[i]->fGraphSensitivity[j]->GetMarkerColor(), 1., 20., 1., fData[i]->fPlottingFillStyle[j], fData[i]->fPlottingLineStyle[j] );
+					setGraphPlottingStyle( g, fData[i]->fGraphSensitivity[j]->GetMarkerColor(), 1., 20., 0.5, fData[i]->fPlottingFillStyle[j], fData[i]->fPlottingLineStyle[j] );
 					g->Draw( "p" );
 				}
 			}
@@ -577,12 +583,12 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( TGraphAsymmErrors* g
     plot sensitivities and data rates for different data sets
 
 */
-bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitivity, double iMaxSensitivity, string iUnit )
+bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitivity, double iMaxSensitivity, string iUnit, TPad *iSensitivityPad, TPad *iSensitivityRatioPad, TPad *iBckPad )
 {
 	TCanvas* cIntSens = 0;
 	TCanvas* cSens = 0;
-	TCanvas* cSensInter = 0;
-	TCanvas* cBck = 0;
+	TCanvas* cSensInter = (TCanvas*)iSensitivityPad;
+	TCanvas* cBck = (TCanvas*)iBckPad;
 	
 	initialProjectedSensitivityPlots();
 	
@@ -624,14 +630,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
 			//	 c_temp = a->plotIntegralSensitivityvsEnergyFromCrabSpectrum( cIntSens, "CTA-PHYS", fData[i]->fPlottingColor[j], iUnit,
 			//	  		                                                  fData[i]->fSiteFile_Emin[j], fData[i]->fSiteFile_Emax[j] );
 			//	 if( c_temp ) cIntSens = c_temp;
-			if( z == 0 )
-			{
-				c_temp = a->plotSignalBackgroundRates( cBck, true, 2.e-7, 14. );    // plot also protons and electrons
-			}
-			else
-			{
-				c_temp = a->plotSignalBackgroundRates( cBck, false, 2.e-7, 14. );
-			}
+			c_temp = a->plotSignalBackgroundRates( cBck, (z==0), 2.e-7, 14. );    // plot also protons and electrons
 			if( c_temp )
 			{
 				cBck = c_temp;
@@ -658,14 +657,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
 			{
 				b->setPlottingStyle( fData[i]->fPlottingColor[0], fData[i]->fPlottingLineStyle[0], 2., 1, 2., fData[i]->fPlottingFillStyle[0] );
 			}
-			if( i == 0 )
-			{
-				cSensInter = b->plotSensitivityvsEnergyFromCrabSpectrum( 0, i + 1, iUnit, 0.2 );
-			}
-			else
-			{
-				cSensInter = b->plotSensitivityvsEnergyFromCrabSpectrum( cSensInter, i + 1, iUnit, 0.2 );
-			}
+			cSensInter = b->plotSensitivityvsEnergyFromCrabSpectrum( cSensInter, i + 1, iUnit, 0.2, (i==0) );
 			if( fPlotCTARequirementsID >= 0 && fPlotCTARequirements )
 			{
 				fPlotCTARequirements->plotRequirement_DifferentialSensitivity( cSensInter, fPlotCTARequirementGoals, iUnit );

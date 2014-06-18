@@ -31,15 +31,25 @@ class VWPPhysSensitivityPlotsMaker
 		
 		int   fPlotCTARequirements;
 		bool  fPlotCTARequirementGoals;
+
+                // pads for plotAllInOneCanvas()
+		TCanvas *fPlotAllInOneCanvas;
+		TPad *fSensitivityPad;
+		TPad *fSensitivityRatioPad;
+		TPad *fEffAreaPad;
+		TPad *fBckRatesPad;
+		TPad *fERes;
+		TPad *fAngRes;
 		
 	public:
 	
 		VWPPhysSensitivityPlotsMaker();
-		~VWPPhysSensitivityPlotsMaker() {}
+	       ~VWPPhysSensitivityPlotsMaker() {}
 		
 		void compareDataSets( string iDataSetFile, string iDirectionString = "" );
 		void compareOffAxisSensitivities( string iSubArray, vector< string > iDataSet );
 		void compareOffAxisSensitivities( string iSubArray = "", string iDataSet = "" );
+		void plotAllInOneCanvas();
 		void printPlotCTARequirementsIDs();
 		void resetVectors();
 		void setAxisUnits( double iMinSensitivity = 4.e-14, double iMaxSensitivity = 2.5e-10, string iUnit = "ENERGY" );

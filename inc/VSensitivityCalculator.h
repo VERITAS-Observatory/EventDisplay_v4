@@ -260,7 +260,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 		unsigned int  listDataSets();
 		void     listUnits();
 		void     list_sensitivity( unsigned int iD = 0 );
-		TCanvas* plotCanvas_SensitivityvsEnergy( string bUnit, bool bIntegralSensitivity );
+		TCanvas* plotCanvas_SensitivityvsEnergy( string bUnit, bool bIntegralSensitivity, bool bNewCanvas = false );
 		TCanvas* plotObservationTimevsFlux( unsigned int iD = 0, TCanvas* c = 0, int iLineColor = 1, double iLineWidth = 4., bool bGuidingLines = true );
 		void     plotObservationTimevsFluxFromTextFile( TCanvas* c, string iTextFile, int iLineColor = 4, double iLineWidth = 1., int iLineStyle = 2 );
 		TCanvas* plotSignalBackgroundRates( TCanvas* c = 0, bool bPlotParticleBackground = false, double iRateMinimum = 2.e-7, double iRateMaximum = 1.e-1 );
@@ -278,7 +278,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 		TCanvas* plotIntegralSensitivityvsEnergyFromCrabSpectrum( TCanvas* c, string iAnasumCrabFile,
 				int iColor = 1, string bUnit = "CU",
 				double iEnergyMin_TeV_lin = 0.01, double iEnergyMax_TeV_lin = 1.e6 );
-		TCanvas*   plotSensitivityvsEnergyFromCrabSpectrum( TCanvas* c, int iColor = 1, string bUnit = "CU", double dE_Log10 = 0.25 );
+		TCanvas*   plotSensitivityvsEnergyFromCrabSpectrum( TCanvas* c, int iColor = 1, string bUnit = "CU", double dE_Log10 = 0.25, bool bNewCanvas = false );
 		void     plotSignificanceParameters( TCanvas* cSensitivity = 0 );
 		bool     printSensitivity();
 		bool     removeDataSet( unsigned int iD );

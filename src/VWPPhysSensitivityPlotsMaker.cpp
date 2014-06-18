@@ -38,6 +38,56 @@ VWPPhysSensitivityPlotsMaker::VWPPhysSensitivityPlotsMaker()
 	setAxisUnits();
 	setPrintingOptions();
 	setPlotRequirements();
+
+        fPlotAllInOneCanvas = 0;
+        fSensitivityPad = 0;
+        fSensitivityRatioPad = 0;
+        fEffAreaPad = 0;
+        fBckRatesPad = 0;
+        fERes = 0;
+	fAngRes = 0;
+		
+}
+
+void VWPPhysSensitivityPlotsMaker::plotAllInOneCanvas()
+{
+    fPlotAllInOneCanvas = new TCanvas( "cSensitivityFullCanvas", "sensitivity", 400, 10, 900, 720 );
+    fPlotAllInOneCanvas->SetGridx( 0 );
+    fPlotAllInOneCanvas->SetGridy( 0 );
+
+    fSensitivityPad = new TPad( "cSensitivityPad", "sensitivity", 0.01, 0.34, 0.68, 0.99 );
+    fSensitivityPad->SetLeftMargin( 0.15 );
+    fSensitivityPad->SetRightMargin( 0.03 );
+    fSensitivityPad->Draw();
+
+    fSensitivityRatioPad = new TPad( "cSensitivityPadRatio", "sensitivity ratio", 0.02, 0.01, 0.38, 0.34 );
+    fSensitivityRatioPad->SetBottomMargin( 0.13 );
+    fSensitivityRatioPad->SetTopMargin( 0.05 );
+    fSensitivityRatioPad->Draw();
+
+    fEffAreaPad = new TPad( "cEffAreaPad", "effective area", 0.69, 0.67, 0.99, 0.99 );
+    fEffAreaPad->SetLeftMargin( 0.15 );
+    fEffAreaPad->SetRightMargin( 0.05 );
+    fEffAreaPad->Draw();
+
+    fBckRatesPad = new TPad( "cBckRatesPad", "background rates", 0.69, 0.34, 0.99, 0.67 );
+    fBckRatesPad->SetLeftMargin( 0.15 );
+    fBckRatesPad->SetRightMargin( 0.05 );
+    fBckRatesPad->Draw();
+
+    fERes = new TPad( "cERes", "energy resolution", 0.69, 0.01, 0.99, 0.34 );
+    fERes->SetLeftMargin( 0.15 );
+    fERes->SetRightMargin( 0.05 );
+    fERes->SetBottomMargin( 0.13 );
+    fERes->SetTopMargin( 0.05 );
+    fERes->Draw();
+
+    fAngRes = new TPad( "cAngRes", "angular resolution", 0.40, 0.01, 0.68, 0.34 );
+    fAngRes->SetLeftMargin( 0.13 );
+    fAngRes->SetRightMargin( 0.05 );
+    fAngRes->SetBottomMargin( 0.13 );
+    fAngRes->SetTopMargin( 0.05 );
+    fAngRes->Draw();
 }
 
 void VWPPhysSensitivityPlotsMaker::compareDataSets( string iDataSetFile, string iDirectionString )
@@ -46,10 +96,10 @@ void VWPPhysSensitivityPlotsMaker::compareDataSets( string iDataSetFile, string 
 	a.setPlotCTARequirements( fPlotCTARequirements, fPlotCTARequirementGoals );
 	a.setEnergyRange_Lin_TeV( fMinEnergy_TeV, fMaxEnergy_TeV );
 	a.addDataSets( iDataSetFile, iDirectionString );
-	a.plotIRF( fPrintingOptions, 50., 5.e7, 0.3 );
-	a.plotSensitivity( fPrintingOptions, fSensitivity_min, fSensitivity_max, fSensitivity_Unit );
+	a.plotIRF( fPrintingOptions, 50., 5.e7, 0.3, fEffAreaPad, fAngRes, fERes );
+	a.plotSensitivity( fPrintingOptions, fSensitivity_min, fSensitivity_max, fSensitivity_Unit, fSensitivityPad, fSensitivityRatioPad, fBckRatesPad );
 	a.plotProjectedSensitivities( 0, 5. );
-	a.plotSensitivityRatio( fPrintingOptions, 0.4, 4.1 );
+	a.plotSensitivityRatio( fPrintingOptions, 0.4, 4.1, false, fSensitivityRatioPad );
 	a.plotSensitivityRatio( fPrintingOptions, 0.2, 1.8, true );
 	// Southern sites: 30 GeV - 100 TeV
 	if( fPlotCTARequirements < 3 )

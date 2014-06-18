@@ -664,20 +664,27 @@ bool VSensitivityCalculator::calculateParticleNumberGraphs_MC( double dE_Log10 )
     integral sensitivity:     dE_Log10 < 0
     differential sensitivity: dE_Log10 = bin size in log10 E
 
+
+    bNewCanvas:   plot histograms and Crab lines
+
 */
-TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanvas* cSensitivity, int iColor,
-		string bUnit, double dE_Log10 )
+TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanvas* cSensitivity, int iColor, string bUnit, double dE_Log10, bool bNewCanvas )
 {
 
 	// get canvas
 	if( cSensitivity == 0 )
 	{
 		cSensitivity = plotCanvas_SensitivityvsEnergy( bUnit, ( dE_Log10 < 0. ) );
-		if( !cSensitivity )
-		{
-			return 0;
-		}
 	}
+	else if( bNewCanvas )
+	{
+	    cSensitivity->cd();
+	    cSensitivity = plotCanvas_SensitivityvsEnergy( bUnit, ( dE_Log10 < 0. ), bNewCanvas );
+        }
+        if( !cSensitivity )
+        {
+	       return 0;
+        }
 	cSensitivity->cd();
 	if( !gSensitivityvsEnergy )
 	{
@@ -1026,13 +1033,22 @@ bool VSensitivityCalculator::printSensitivity()
     add lines corresponding to XXX% of the Crab
 
 */
-TCanvas* VSensitivityCalculator::plotCanvas_SensitivityvsEnergy( string bUnit, bool bIntegralSensitivity )
+TCanvas* VSensitivityCalculator::plotCanvas_SensitivityvsEnergy( string bUnit, bool bIntegralSensitivity, bool bNewCanvas )
 {
 	char htitle[400];
-	TCanvas* iCanvas = new TCanvas( fPlot_CanvasName.c_str(), fPlot_CanvasTitle.c_str(), 10, 10, fPlot_CanvasSize_x, fPlot_CanvasSize_y );
-	iCanvas->SetGridx( 0 );
-	iCanvas->SetGridy( 0 );
-	iCanvas->SetLeftMargin( 0.15 );
+	TCanvas *iCanvas = 0;
+	if( !bNewCanvas )
+	{
+	   iCanvas = new TCanvas( fPlot_CanvasName.c_str(), fPlot_CanvasTitle.c_str(), 10, 10, fPlot_CanvasSize_x, fPlot_CanvasSize_y );
+	   iCanvas->SetGridx( 0 );
+	   iCanvas->SetGridy( 0 );
+	   iCanvas->SetLeftMargin( 0.15 );
+        }
+	else
+	{
+	   iCanvas = (TCanvas*)gPad;
+        }
+	if( !iCanvas ) return 0;
 	
 	hnull = new TH1D( "hnullSens", "", 10, fEnergy_min_Log, fEnergy_max_Log );
 	hnull->SetStats( 0 );
@@ -1139,11 +1155,8 @@ TCanvas* VSensitivityCalculator::plotCanvas_SensitivityvsEnergy( string bUnit, b
 
     energy in TeV
 
-   TODO: conversion of different units
 */
-TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromTextTFile( TCanvas* c, string iTextFile,
-		int iColor, double iLineWidth, int iLineStyle,
-		string bUnit, bool bIntegralSensitivity )
+TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromTextTFile( TCanvas* c, string iTextFile, int iColor, double iLineWidth, int iLineStyle, string bUnit, bool bIntegralSensitivity )
 {
 	// check if canvas exists, otherwise create a new one
 	if( c == 0 )
@@ -3196,7 +3209,14 @@ TCanvas* VSensitivityCalculator::plotSignalBackgroundRates( TCanvas* c, bool bPl
 		c->SetRightMargin( 0.07 );
 		c->Draw();
 		bNewCanvas = true;
-		
+        }
+	else
+	{
+		c->cd();
+	}
+
+	if( !c->GetListOfPrimitives()->FindObject( "hnullSignalParticleRates" ) )
+	{
 		TH1D* h = new TH1D( "hnullSignalParticleRates", "", 10, fEnergy_min_Log, fEnergy_max_Log );
 		h->SetStats( 0 );
 		h->SetMaximum( iRateMaximum );
@@ -3205,15 +3225,12 @@ TCanvas* VSensitivityCalculator::plotSignalBackgroundRates( TCanvas* c, bool bPl
 		h->SetYTitle( "background rate [1/s]" );
 		plot_nullHistogram( c, h, true, true, 1.7, TMath::Power( 10., fEnergy_min_Log ), TMath::Power( 10., fEnergy_max_Log ) );
 		c->SetLogy( 1 );
-	}
-	else
-	{
-		c->cd();
-	}
+        }
 	
 	if( gBGRate )
 	{
 		setGraphPlottingStyle( gBGRate );
+		gBGRate->SetLineWidth( 1. );
 		gBGRate->Draw( "l" );
 		
 		if( gProtonRate && bPlotParticleBackground )

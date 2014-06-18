@@ -47,7 +47,7 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
 		
 		// general resolution plotter
 		TCanvas* plotResolution( string iName, string iCanvasTitle, string iYTitle,
-								 double iYmin, double iYmax, string iResolutionTreeName, string iXaxis );
+								 double iYmin, double iYmax, string iResolutionTreeName, string iXaxis, TPad *iResolutionPad = 0 );
 		TCanvas* plotResolution2D( unsigned int iDataSetID, string iName, string iCanvasTitle, string iYTitle,
 								   double iYmin, double iYmax, string iResolutionTreeName, string iXaxis, double iEnergySlice_GeV = -1. );
 								   
@@ -77,13 +77,13 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
 		unsigned int getNumberOfGoodDataSets();
 		TH1D*        getTheta2Histogram( unsigned int iDataSetID = 0, double i_Energy_TeV_lin = 1. );
 		void         listDataSets();
-		TCanvas*     plotAngularResolution( string iXaxis = "energy", string iProbabilityString = "68", double iMax = -1.e99 );
+		TCanvas*     plotAngularResolution( string iXaxis = "energy", string iProbabilityString = "68", double iMax = -1.e99, TPad *iResolutionPad = 0  );
 		TCanvas*     plotAngularResolution2D( unsigned int iDataSetID = 0, string iXaxis = "energy", string iProbabilityString = "68", double iEnergySlice_GeV = -1. );
 		TCanvas*     plotCoreResolution( string iXaxis = "energy", double iMax = -1.e99 );
 		TCanvas*     plotCoreResolution2D( unsigned int iDataSetID = 0, string iXaxis = "energy" );
 		void         plotCutEfficiency( unsigned int iDataSetID = 0 );
 		void         plotCutEfficiencyRatio( unsigned int iDataSetID = 0, unsigned int iCutID = 999, double iPlotMaximum = 1.2 );
-		TCanvas*     plotEffectiveArea( double iEffAreaMax_m2 = -1. );
+		TCanvas*     plotEffectiveArea( double iEffAreaMax_m2 = -1., TPad *iEffAreaPad = 0 );
 		TCanvas*     plotEffectiveAreaRatio( unsigned int iDataSetID = 0, double ymin = 0., double ymax = 1.3 );
 		TCanvas*     plotEnergyReconstructionBias( string iM = "mean", double ymin = -1., double ymax = 1., bool iLogBias = false );
 		void         plotEnergyReconstructionBias2D( unsigned int iDataSetID = 0, double iYmin = 0., double iYmax = 3. );
@@ -91,7 +91,7 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
 		void         plotEnergyReconstructionLogBias2D( unsigned int iDataSetID = 0, string iM = "mean", double ymin = -0.8, double ymax = 0.8 );
 		void         plotEnergyReconstructionMatrix( unsigned int iDataSetID = 0, bool bFineBinning = true, bool bQualityCuts = false,
 				bool bInterPol = false, bool bPlotMedian = false );
-		TCanvas*     plotEnergyResolution( double ymax = 1. );                                             // from geteffective area
+		TCanvas*     plotEnergyResolution( double ymax = 1., TPad *iResolutionPad = 0  );                  // from makeEffectiveArea
 		TCanvas*     plotEnergyResolution( string iXaxis );                                                // from IRF
 		TCanvas*     plotEnergyResolution2D( unsigned int iDataSetID = 0, string iXaxis = "energy" );
 		void         plotEnergySpectra( bool iWeighted = true, double iYMax = -1., int iRebin = 1 );
