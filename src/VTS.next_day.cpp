@@ -108,9 +108,9 @@ int main( int argc, char* argv[] )
 				{
 				
 					fResults << setw( 12 ) << left << "MJD" ;
-					fResults << setw( 6 ) << left << "RA" ;
-					fResults << setw( 6 ) << left << "Dec" ;
-					fResults << setw( 7 ) << left << "runOn" ;
+					fResults << setw( 8 ) << left << "RA" ;
+					fResults << setw( 8 ) << left << "Dec" ;
+					fResults << setw( 9 ) << left << "runOn" ;
 					fResults << setw( 12 ) << left << "NOn" ;
 					fResults << setw( 12 ) << left << "NOff" ;
 					fResults << setw( 18 ) << left << "tOn w/o deadtime";
@@ -125,9 +125,9 @@ int main( int argc, char* argv[] )
 					fResults << setw( 14 ) << left << "FluxULVsCrab";
 					fResults << endl;
 					fResults << setw( 12 ) << left << " " ;
-					fResults << setw( 6 ) << left << "[deg]" ;
-					fResults << setw( 6 ) << left << "[deg]" ;
-					fResults << setw( 7 ) << left << " " ;
+					fResults << setw( 8 ) << left << "[deg]" ;
+					fResults << setw( 8 ) << left << "[deg]" ;
+					fResults << setw( 9 ) << left << " " ;
 					fResults << setw( 12 ) << left << " " ;
 					fResults << setw( 12 ) << left << " " ;
 					fResults << setw( 18 ) << left << "[min]";
@@ -153,9 +153,9 @@ int main( int argc, char* argv[] )
 					fResults.precision( 9 );
 					fResults << setw( 12 ) << left << c->MJDOn;
 					fResults.precision( 4 );
-					fResults << setw( 6 ) << left << c->TargetRAJ2000 ;
-					fResults << setw( 6 ) << left << c->TargetDecJ2000;
-					fResults << setw( 7 ) << left << c->runOn ;
+					fResults << setw( 8 ) << left << c->TargetRAJ2000 ;
+					fResults << setw( 8 ) << left << c->TargetDecJ2000;
+					fResults << setw( 9 ) << left << c->runOn ;
 					fResults << setw( 12 ) << left << c->NOn ;
 					fResults << setw( 12 ) << left << c->NOff ;
 					fResults << setw( 18 ) << left << c->tOn / 60.*( 1. - c->DeadTimeFracOn ) ;
@@ -178,9 +178,9 @@ int main( int argc, char* argv[] )
 					iFluxULinCU = fluxUL->getFluxVsCrab( iFluxUL, fMinEnergy, fGamma );
 					
 					fResults << setw( 12 ) << left << "Total:";
-					fResults << setw( 6 ) << left << c->TargetRAJ2000 ;
-					fResults << setw( 6 ) << left << c->TargetDecJ2000 ;
-					fResults << setw( 7 ) << left << 0.0 ;
+					fResults << setw( 8 ) << left << c->TargetRAJ2000 ;
+					fResults << setw( 8 ) << left << c->TargetDecJ2000 ;
+					fResults << setw( 9 ) << left << 0.0 ;
 					fResults << setw( 12 ) << left << c->NOn ;
 					fResults << setw( 12 ) << left << c->NOff ;
 					fResults << setw( 18 ) << left << c->tOn / 60.*( 1. - c->DeadTimeFracOn )  ;
