@@ -135,7 +135,6 @@ void VModelLnL::scopeLnL( unsigned int iscope, const vector<double>& a, double& 
 				dmuda[par] *= qterm1;
 			}
 			
-			////if( mu < 1.0 ) mu = 0.;       /// Gauss   set small mu to 0
 			if( mu < 0.01 || fabs( mu - s ) > 900 )
 			{
 				mu = 0.;    /// Poisson set small mu to 0
@@ -145,8 +144,6 @@ void VModelLnL::scopeLnL( unsigned int iscope, const vector<double>& a, double& 
 			double dlnl = 0;
 			double d2lnl = 0;
 			// double pixGOF = 0; //JG Gaussian
-			
-			/// if(fDebug && fabs(mu-s) > 900) cout<<"VModelLnL: T"<<iscope+1<<" ch"<<ichan;
 			
 			///pixelLnLGauss(s,pixel_var,pixel_nsb,mu,pix_lnl,dlnl,d2lnl ); //JG: Gauss
 			pixelLnL_lookup( s, pixel_var, pixel_nsb, mu, pix_lnl, dlnl, d2lnl ); //JG: Poisson

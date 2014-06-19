@@ -1,7 +1,5 @@
 /*
     add variables by hand
-
-
 */
 
 #include "VPlotOptimalCut.h"
@@ -23,9 +21,9 @@ VPlotOptimalCut::VPlotOptimalCut( string iFile )
 
     fListOfVariables.push_back( "MSCW" );
     fListOfVariables.push_back( "MSCL" );
-    fListOfVariables.push_back( "EChi2" );
-    fListOfVariables.push_back( "EmissionHeight" );
-    fListOfVariables.push_back( "EmissionHeightChi2" );
+    //fListOfVariables.push_back( "EChi2" );
+    //fListOfVariables.push_back( "EmissionHeight" );
+    //fListOfVariables.push_back( "EmissionHeightChi2" );
     fListOfVariables.push_back( "SizeSecondMax" );
 }
 
@@ -205,4 +203,60 @@ int VPlotOptimalCut::findOptimalCut( int iSourceStrength, double size )
 
 }
 
+void VPlotOptimalCut::plotScanParameter( string iVar1, string iVar2 )
+{
+  // iVar1 = "MSCW_max";
 
+  string varY = "sig[4]";  //// plot significance vs variable
+
+  const int nVar = 4; //number of variables
+  /// fixed parameter cut values (if not scanned) 
+  double fix_MSCW_max = 0.35;
+  double fix_MSCL_max = 0.7;
+  double fix_theta2_max = 0.008;
+  double fix_SizeSecondMax_min = 700;
+
+  /// add fixed parameters
+  char cutexp[nVar][600];
+  int cVar = 0;
+  if( iVar1 != "MSCW_max" && iVar2 != "MSCW_max" ) {
+    sprintf( cutexp[cVar], "MSCW_max == %f", fix_MSCW_max );
+    cVar++;
+  }
+  if( iVar1 != "MSCL_max" && iVar2 != "MSCL_max" ) {
+    sprintf( cutexp[cVar], "MSCL_max == %f", fix_MSCL_max );
+    cVar++;
+  }
+  if( iVar1 != "theta2_max" && iVar2 != "theta2_max" ) {
+    sprintf( cutexp[cVar], "theta2_max == %f", fix_theta2_max );
+    cVar++;
+  }
+  if( iVar1 != "SizeSecondMax_min" && iVar2 != "SizeSecondMax_min" ) {
+    sprintf( cutexp[cVar], "SizeSecondMax_min == %f", fix_SizeSecondMax_min );
+    cVar++;
+  }
+
+  char hname[600]; //TEST
+  sprintf( hname, "SizeSecondMax_min == %f", fix_SizeSecondMax_min ); //TEST
+
+  vector< string > iDraw;
+  vector< string > iCut;
+  vector< string > iName;
+  vector< string > iTitle;
+  iName.push_back( iVar1 );
+  iDraw.push_back( varY + ":" + iVar1 );
+  iCut.push_back( hname );
+  iTitle.push_back( hname );
+
+  TCanvas *c = new TCanvas( "c","c", 100, 100, 450, 450 );
+  //c->SetLeftMargin( 0.13 );
+  //c->Draw();
+
+  int i = 0; //TEST
+  string plot_option = "";
+
+  fData->SetMarkerStyle(20);
+  fData->SetMarkerSize(1.0);
+  fData->Draw( iDraw[i].c_str(), iCut[i].c_str(), plot_option.c_str() );
+
+}

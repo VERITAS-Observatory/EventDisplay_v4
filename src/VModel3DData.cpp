@@ -69,6 +69,8 @@ void VModel3DData::initModel3D( unsigned int iNTel3D, vector<unsigned int>& iNpi
 	fzsg3D.resize( fNdim3D, 0 );
 	
 	// telescope configuration parameters
+	fDCPE.resize( fNTel3D, 0 );
+
 	fMarea3D.resize( fNTel3D, 0 );
 	
 	fomegapix3D.resize( fNTel3D );

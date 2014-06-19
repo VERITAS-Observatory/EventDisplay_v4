@@ -13,10 +13,8 @@ VModel3D::VModel3D()
 	fEmissionHeightCalculator = new VEmissionHeightCalculator();
 	fModel3DFn = new VModel3DFn();
 	fModelLnL = new VModelLnL( fData3D, fModel3DFn );
-	
 	fInitialized3D = false;
 	fData3D->fexNoise3D = 0.4; // HARD-WIRED
-	fData3D->fDCPE = 5.62; // HARD-WIRED (need implementation)
 	fData3D->fDebug3D = false; // set true for debug mode
 }
 
@@ -31,7 +29,7 @@ void VModel3D::doModel3D()
 	//// initialized only at first call in the analysis run ////
 	if( !fInitialized3D )
 	{
-		initOutput(); //TEST
+		initOutput(); 
 		initModel3DTree(); // initialize the output tree
 		vector<unsigned int> iNpix3D;
 		iNpix3D.resize( fData->getNTel(), 0 );
@@ -41,13 +39,10 @@ void VModel3D::doModel3D()
 		}
 		fData3D->initModel3D( fData->getNTel(), iNpix3D ); // initialize data
 		readLnLTable();    // read LnL lookup table
+		setGain();         // get dc/pe ratio
 		getDetector();     // get detector configuration
 		fInitialized3D = true;
 	}
-	// return if triggered only events are written to output
-	///if( !fReader->hasArrayTrigger() ) return;
-	/// if( getRunParameter()->fWriteTriggerOnly && !fReader->hasArrayTrigger() ) return;
-	
 	fData3D->initEventModel3D();  /// initialize event
 	if( fData3D->fDebug3D )
 	{
@@ -141,8 +136,47 @@ void VModel3D::readLnLTable()
 	fModelLnL->readLnLTable( LnLTableFile );
 }
 
+void VModel3D::setGain()
+{
+        //// HARD-WIRED for VERITAS based on date of observation ////
+        int iMJD = fData->getEventMJD();
+        cout<< "Model3D: MJD = "<< iMJD <<" Gains: ";
+        /// set gain for each telescope ///
+        for( unsigned int iTel = 0; iTel < fData->getNTel(); iTel++ )
+        {
+	        if( iMJD > 54315 && iMJD < 55045 ) // V4 (08/2007 - 08/2009)
+	        {
+            	     if( iTel == 0 ) fData3D->fDCPE[iTel] = 5.11;
+            	     if( iTel == 1 ) fData3D->fDCPE[iTel] = 5.32;
+            	     if( iTel == 2 ) fData3D->fDCPE[iTel] = 4.76;
+            	     if( iTel == 3 ) fData3D->fDCPE[iTel] = 5.00;
+	        }
+		else if( iMJD > 55045 && iMJD < 56140 ) // V5 (08/2009 - 08/2012)
+		{
+           	     if( iTel == 0 ) fData3D->fDCPE[iTel] = 5.20;
+            	     if( iTel == 1 ) fData3D->fDCPE[iTel] = 5.31;
+            	     if( iTel == 2 ) fData3D->fDCPE[iTel] = 5.33;
+            	     if( iTel == 3 ) fData3D->fDCPE[iTel] = 5.46;
+		}
+		else if( iMJD > 56140 && iMJD < 60000 ) // V6 (09/2009 - future)
+		{
+           	     if( iTel == 0 ) fData3D->fDCPE[iTel] = 5.20;
+            	     if( iTel == 1 ) fData3D->fDCPE[iTel] = 5.12;
+            	     if( iTel == 2 ) fData3D->fDCPE[iTel] = 5.12;
+            	     if( iTel == 3 ) fData3D->fDCPE[iTel] = 5.54;
+		}
+		else
+		{
+	             fData3D->fDCPE[iTel] = 5.62; // default
+		}
+		cout<<"T"<< iTel+1 <<" "<< fData3D->fDCPE[iTel] <<", ";
+	}
+	cout<<endl;
+}
+
 void VModel3D::getDetector()
 {
+        ///// HARD-WIRED to VERITAS /////////////
 	/// get telescope locations on ground ///
 	for( unsigned int iTel = 0; iTel < fData->getNTel(); iTel++ )
 	{
@@ -209,9 +243,6 @@ void VModel3D::calcPointing()
 	if( Npoint > 0 )
 	{
 		mTze = mTze / ( double )Npoint;
-	}
-	if( Npoint > 0 )
-	{
 		mTaz = mTaz / ( double )Npoint;
 	}
 	
@@ -406,7 +437,6 @@ void VModel3D::calcStartParameters()
 	{
 		TotSize = ( ( double )fData3D->fNTel3D / ( double )TotTel ) * TotSize;
 	}
-	//  fData3D->fStartNc3D = 1.2e3 * TotSize * pow( cos( ZenRad ), 0.46 );
 	fData3D->fStartNc3D = 370 * TotSize * 0.97179; //Nc
 	fData3D->fStartNc3D = log( fData3D->fStartNc3D ); //log(Nc)
 	
@@ -439,8 +469,8 @@ void VModel3D::setSelectedPixels()
 			{
 				fData3D->fClean3D[iTel][iPix] = true;
 				telPix += 1;
-				fData3D->fMeasuredSum3D[iTel][iPix] = getData()->getSums()[iPix] / fData3D->fDCPE;
-				fData3D->fPedvar3D[iTel][iPix] = getData()->getPedvars( fData->getCurrentSumWindow()[iPix] )[iPix] / fData3D->fDCPE;
+				fData3D->fMeasuredSum3D[iTel][iPix] = getData()->getSums()[iPix] / fData3D->fDCPE[iTel];
+				fData3D->fPedvar3D[iTel][iPix] = getData()->getPedvars( fData->getCurrentSumWindow()[iPix] )[iPix] / fData3D->fDCPE[iTel];
 			}
 		}
 		fData3D->fNDFTel3D[iTel] = telPix;
@@ -515,7 +545,7 @@ void VModel3D::fillMuDisplay()
 		vector<bool> clean( fData3D->fNpix3D[iTel] );
 		for( unsigned int iPix = 0; iPix < fData3D->fNpix3D[iTel]; iPix++ )
 		{
-			a0[iPix] = fData3D->fMu3D[iTel][iPix] * fData3D->fDCPE;
+			a0[iPix] = fData3D->fMu3D[iTel][iPix] * fData3D->fDCPE[iTel];
 			clean[iPix] = fData3D->fClean3D[iTel][iPix];
 		}
 		fData->setModel3DMu( a0 );
