@@ -36,9 +36,10 @@ class VModel3D : public VEvndispData
 		
 		/// FUNCTIONS ///
 		void doFit();              // do LnL fit
-		void initOutput(); //TEST
+		void initOutput(); 
 		void initModel3DTree();    // initialize tree for output parameters
 		void readLnLTable();       // read lookup table for likelihood
+		void setGain();            // get dc/pe ratio
 		void getDetector();        // get telescope locations, pixel positions, etc.
 		void calcPointing();       // calculate the telescope pointing
 		void calcCoord();          // calc sky unit base vectors in ground coordinate

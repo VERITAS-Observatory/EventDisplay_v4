@@ -31,7 +31,7 @@ class VModel3DData
 		unsigned int fNdim3D; // dimensional space (x,y,z)
 		
 		double fexNoise3D; // HARD-WIRED
-		double fDCPE;  // HARD-WIRED (need implementation)
+		vector<double> fDCPE;  // for each telescope
 		
 		unsigned int fNTel3D; // total number of telescopes
 		vector<unsigned int> fNpix3D; // total number of pixels for each telescope

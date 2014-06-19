@@ -32,9 +32,8 @@ class VModelLnL : public VMinimizerFn
 		unsigned int  fNParam;   // number of parameters in Model3D
 		double fSinglePEvar;     // from Matthew's CTA analysis, valid for VERITAS ??
 		
-		/// TEST lookup table ///
+		/// lookup table ///
 		TFile* fLnLFile;
-		
 		TH2D* m_lnl_lmu;
 		TH2D* m_dlnl_lmu;
 		TH2D* m_d2lnl_lmu;

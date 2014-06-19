@@ -32,4 +32,6 @@ class VPlotOptimalCut
     void plotAll( int iSourceStrength = 4, bool bPrint = false );
     void plotHistograms( string iVariable, int i_opt = -1, bool bPrint = false );
     void plotOptimalCuts( string iVariable, int iSourceStrength = 4, bool iMax = true, double size = -999, double iMaxObs = 1.e20 );
+
+    void plotScanParameter( string iVar1, string iVar2 );
 };
