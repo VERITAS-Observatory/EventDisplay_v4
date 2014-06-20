@@ -77,7 +77,7 @@ mkdir -p $LOGDIR
 # Create list of partial table files
 FLIST=$OFILE.list
 rm -f $ODIR/$FLIST
-ls -1 $INDIR/*.root > $ODIR/$FLIST
+ls -1 $INDIR/*ID${RECID}.root > $ODIR/$FLIST
 echo $FLIST
 
 # Job submission script
