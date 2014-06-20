@@ -96,7 +96,7 @@ class VImageParameter
 		double 	houghTD; 					      //!< TD parameter
 		int 	houghNpix; 						  //!< Number of hit pixels
 		double 	houghCN; 						  //!< C/N parameter
-		double 	houghContained; 			  //!< Distance from the center of the ring to the center of the camera plus the ring radius in mm
+		double 	houghContained; 			  //!< Distance from the center of the ring to the center of the camera plus the ring radius in mm. Before filling tree, this is divided by the pixel diameter
 		int 	houghMuonValid;					  //!< 0/1 depending on whether it satisfies the Hough transform muon ID criteria
 		
 		// signal section
@@ -170,7 +170,7 @@ class VImageParameter
 			return tpars;
 		}
 		bool hasImage();                          //!< succesfull image reconstruction
-		void initTree( string, string, bool, bool );
+		void initTree( string, string, bool, bool, bool, bool );
 		bool isMC()
 		{
 			return fMC;

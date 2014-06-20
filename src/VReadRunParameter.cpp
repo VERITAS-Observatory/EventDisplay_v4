@@ -1294,12 +1294,7 @@ void VReadRunParameter::test_and_adjustParams()
              cout << "exiting..." << endl;
              exit( EXIT_FAILURE );
         }
-	// muon runs need long tree
-	if( fRunPara->fmuonmode || fRunPara->fhoughmuonmode )
-	{
-		fRunPara->fShortTree = false;
-	}
-	
+		
 	/////////////////////////////////////////////////////////////////
 	// check if sourcefile is given
 	if( fRunPara->fsourcefile.size() < 1 )

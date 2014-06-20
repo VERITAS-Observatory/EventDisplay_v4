@@ -503,12 +503,20 @@ void VImageParameterCalculation::sizeInMuonRing()
 	{
 		return;
 	}
-	if( fParGeo->muonValid == 0 && fParGeo->houghMuonValid == 0 )
+	
+	//if( fParGeo->muonValid == 0 && fParGeo->houghMuonValid == 0 )
+	//{
+	//	fParGeo->muonSize = 0.0;
+	//	fParGeo->muonIPCorrectedSize = 0.0;
+	//	return;
+	//} 
+	
+	if( fParGeo->muonValid == 0 && fParGeo->houghNpix == 0 )//Calculates size for muonValid or if HT was run.
 	{
 		fParGeo->muonSize = 0.0;
 		fParGeo->muonIPCorrectedSize = 0.0;
 		return;
-	}
+	} 
 	
 	if( fData->getSums().size() == 0 || fParGeo->muonRadius == 0.0 )
 	{
@@ -757,7 +765,7 @@ float VImageParameterCalculation::correctSizeInMuonRing()
 void VImageParameterCalculation::houghInitialization()
 {
 
-	fHoughTransform = new VHoughTransform( getDetectorGeo() );
+fHoughTransform = new VHoughTransform( getDetectorGeo() );
 	
 }
 

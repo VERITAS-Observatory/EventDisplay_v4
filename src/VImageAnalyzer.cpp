@@ -56,11 +56,36 @@ VImageAnalyzer::VImageAnalyzer()
 		fRGraph.push_back( new TGraphErrors( 1 ) );
 	}
 	
-	//If -hough is specified on the command line, run the hough transform initialization method in fVImageParameterCalculation
+	//If -hough is specified on the command line, run the hough transform initialization method in
+	//VImageParameterCalculation
 	if( fRunPar->fhoughmuonmode )
 	{
-		fVImageParameterCalculation->houghInitialization();
+		
+	#ifndef NOGSL
+	cout << "Using GSL libraries for muon analysis." << endl;
+	#else
+	cout << "Warning! No GSL libraries found. Muon impact parameter corrected Size will not be calculated." << endl;
+	#endif	
+
+	cout << "" << endl;
+
+	fVImageParameterCalculation->houghInitialization();
+	
 	}
+
+	if( fRunPar->fmuonmode )
+	{
+		
+	#ifndef NOGSL
+	cout << "Using GSL libraries for muon analysis." << endl;
+	#else
+	cout << "Warning! No GSL libraries found. Muon impact parameter corrected Size will not be calculated." << endl;
+	#endif	
+
+	cout << "" << endl;
+
+	}
+
 }
 
 
@@ -567,14 +592,14 @@ void VImageAnalyzer::initTrees()
 	{
 		sprintf( i_textTitle, "%s (short tree)", i_textTitle );
 	}
-	fVImageParameterCalculation->getParameters()->initTree( i_text, i_textTitle, fReader->isMC(), false );
+	fVImageParameterCalculation->getParameters()->initTree( i_text, i_textTitle, fReader->isMC(), false, fRunPar->fmuonmode, fRunPar->fhoughmuonmode );
 	
 	// for log likelihood method, book a second image parameter tree
 	if( fRunPar->fImageLL )
 	{
 		sprintf( i_text, "lpars" );
 		sprintf( i_textTitle, "Event Parameters, loglikelihood (Telescope %d)", getTelID() + 1 );
-		fVImageParameterCalculation->getLLParameters()->initTree( i_text, i_textTitle, fReader->isMC(), true );
+		fVImageParameterCalculation->getLLParameters()->initTree( i_text, i_textTitle, fReader->isMC(), true, fRunPar->fmuonmode, fRunPar->fhoughmuonmode );
 	}
 }
 

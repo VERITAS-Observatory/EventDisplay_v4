@@ -11,9 +11,8 @@ VHoughTransform::VHoughTransform( VDetectorGeometry* fDetectorGeo )
 	
 	
 	//Print this when the constructor is run.
-	cout << "---------------------------------------------------------------------" << endl;
-	cout << "Initializing the Hough transform muon identification algorithm..." << endl;
-	
+	//cout << "---------------------------------------------------------------------" << endl;
+	//cout << "Initializing the Hough transform muon identification algorithm." << endl;
 	
 	//Set the global pointer to the detector geometry
 	fDetectorGeometry = fDetectorGeo;
@@ -24,21 +23,21 @@ VHoughTransform::VHoughTransform( VDetectorGeometry* fDetectorGeo )
 	
 	
 	//Print the number of telescopes
-	cout << "Number of telescopes: " << fDetectorGeometry->getNTel() << endl;
+	//cout << "Number of telescopes: " << fDetectorGeometry->getNTel() << endl;
 	
 	
 	//Loop over all the telescopes and set up the accumulator arrays, lookup tables, PMT diameters and number of channels
 	for( unsigned int iTelescopeIndex = 0 ; iTelescopeIndex < fDetectorGeometry->getNTel() ; iTelescopeIndex++ )
 	{
 	
-		cout << endl;
-		cout << "Telescope " << iTelescopeIndex + 1 << ":" << endl;
+		//cout << endl;
+		//cout << "Telescope " << iTelescopeIndex + 1 << ":" << endl;
 		
 		//Read in the parameter file values for each telescope.
 		//Stores the values in global variables.
 		readHTParameterFile( iTelescopeIndex );
 		
-		//Calculate the distance between the first and second pixels to get the pixel radius
+		//Calculate the distance between the first and second pixels to get the pixel diameter
 		//Assumes circular PMTs
 		fPMTDiameter.push_back( sqrt(
 		
@@ -59,34 +58,35 @@ VHoughTransform::VHoughTransform( VDetectorGeometry* fDetectorGeo )
 		fNumberOfChannels.push_back( fDetectorGeometry->getNChannels( iTelescopeIndex ) );
 		
 		//Print this before initializing the accumulator array for a given telescope
-		cout << "Initializing the accumulator array for telescope " << iTelescopeIndex + 1 << "..." << endl;
+		//cout << "Initializing the accumulator array for telescope " << iTelescopeIndex + 1 << "..." << endl;
 		
 		//Set up the accumulator array for a given telescope
 		fAccumulatorArray.push_back( initAccumulatorArray( fRMinDpmt[iTelescopeIndex], fRMaxDpmt[iTelescopeIndex],
 									 fStepsPerPMTDiameter[iTelescopeIndex], iTelescopeIndex ) );
 									 
 		//Print this when the accumulator array is initialized.
-		cout << "Accumulator array for telescope " << iTelescopeIndex + 1 << " initialized." << endl;
+		//cout << "Accumulator array for telescope " << iTelescopeIndex + 1 << " initialized." << endl;
 		
 		//Print this before initializing the lookup table
-		cout << "Initializing the lookup table for telescope " << iTelescopeIndex + 1 << "..." << endl;
+		//cout << "Initializing the lookup table for telescope " << iTelescopeIndex + 1 << "..." << endl;
 		
 		//Set up the lookup table for a given telescope
 		fHTLookupTableTree.push_back( initLookupTable( fRMinDpmt[iTelescopeIndex], fRMaxDpmt[iTelescopeIndex],
 									  fStepsPerPMTDiameter[iTelescopeIndex], iTelescopeIndex ) );
 									  
 		//Print this when the lookup table is initialized
-		cout << "Lookup table for telescope " << iTelescopeIndex + 1 << " initialized." << endl;
+		//cout << "Lookup table for telescope " << iTelescopeIndex + 1 << " initialized." << endl;
 		
 		
 	}//End of loop over all the telescopes and set up the accumulator arrays and lookup tables
 	
 	
 	//Output this when everything has been initialized
-	cout << endl;
+	//cout << endl;
 	cout << "Hough transform muon identification algorithm initialized." << endl;
-	cout << "---------------------------------------------------------------------" << endl;
-	cout << endl;
+	cout << "" << endl;
+	//cout << "---------------------------------------------------------------------" << endl;
+	//cout << endl;
 	
 	
 }//End of constructor
@@ -497,13 +497,13 @@ void VHoughTransform::analysis( VEvndispData* fData, VImageParameter* fParGeo )
 	
 	
 	//Display the event number if the event passes the cuts
-	if( fIsMuon == 1 )
-	{
+	//if( fIsMuon == 1 )
+	//{
 	
-		cout << "Muon found on T" << ( fData->getTelID() + 1 ) << " at event " << fData->getEventNumber() << endl;
-		cout << "Total: " << fNumberOfMuons << endl;
+	//	cout << "Muon found on T" << ( fData->getTelID() + 1 ) << " at event " << fData->getEventNumber() << endl;
+	//	cout << "Total: " << fNumberOfMuons << endl;
 		
-	}
+	//}
 	
 	
 	//Write the Hough transform muon ID parameters to the tree
@@ -513,8 +513,8 @@ void VHoughTransform::analysis( VEvndispData* fData, VImageParameter* fParGeo )
 	fParGeo->houghTD = fTD;
 	fParGeo->houghNpix = fNpix;
 	fParGeo->houghCN = fCN;
-	fParGeo->houghContained = fContained;
-	
+	fParGeo->houghContained = fContained/fPMTDiameter[ fData->getTelID() ];//Divide by PMT diameter.
+	//In muon analysis macro, use houghContained < 11.0
 	
 }//End of analysis method
 
@@ -856,7 +856,7 @@ TTree* VHoughTransform::initLookupTable( int fRMinDpmt, int fRMaxDpmt, int fStep
 void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 {
 
-	cout << "Initializing parameters for telescope " << fTelID + 1 << "..." << endl;
+	//cout << "Initializing parameters for telescope " << fTelID + 1 << "..." << endl;
 	
 	
 	//Convert the telescope number (+1) into a string
@@ -900,7 +900,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	if( !is )
 	{
 	
-		cout << "VHoughTransform::readHTParameterFile error while opening parameter file: " << ifile << endl;
+	//	cout << "VHoughTransform::readHTParameterFile error while opening parameter file: " << ifile << endl;
 		
 	}//End of if the parameter file is not opened
 	
@@ -909,7 +909,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	else
 	{
 	
-		cout << "Hough transform muon ID parameter file: " << ifile << " opened." << endl;
+		//cout << "Hough transform muon ID parameter file: " << ifile << " opened." << endl;
 		
 		//Strings for lines and individual strings
 		string iLine;
@@ -1076,12 +1076,12 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	
 	//fRMinDpmt
 	
-	if( fRMinDpmtIsSet == 1 )
-	{
+	//if( fRMinDpmtIsSet == 1 )
+	//{
 	
-		cout << "RMINT" << fTelID + 1 <<  " set to " << fRMinDpmt[fTelID] << endl;
+	//	cout << "RMINT" << fTelID + 1 <<  " set to " << fRMinDpmt[fTelID] << endl;
 		
-	}
+	//}
 	
 	if( fRMinDpmtIsSet == 0 )
 	{
@@ -1089,20 +1089,20 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 		//Set the minimum radius in units of PMT diameters of the template circles to default value of 3
 		fRMinDpmt.push_back( 3 );
 		
-		cout << "Failed to read the RMINT" << fTelID + 1 <<  " value from the parameter file." << endl;
-		cout << "Using the default value of "  << fRMinDpmt[fTelID] << "." << endl;
+		//cout << "Failed to read the RMINT" << fTelID + 1 <<  " value from the parameter file." << endl;
+		//cout << "Using the default value of "  << fRMinDpmt[fTelID] << "." << endl;
 		
 	}
 	
 	
 	//fRMaxDpmt
 	
-	if( fRMaxDpmtIsSet == 1 )
-	{
+	//if( fRMaxDpmtIsSet == 1 )
+	//{
 	
-		cout << "RMAXT" << fTelID + 1 <<  " set to " << fRMaxDpmt[fTelID] << endl;
+	//	cout << "RMAXT" << fTelID + 1 <<  " set to " << fRMaxDpmt[fTelID] << endl;
 		
-	}
+	//}
 	
 	if( fRMaxDpmtIsSet == 0 )
 	{
@@ -1110,20 +1110,20 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 		//Set the maximum radius in units of PMT diameters of the template circles to default value of 11
 		fRMaxDpmt.push_back( 11 );
 		
-		cout << "Failed to read the RMAXT" << fTelID + 1 <<  " value from the parameter file." << endl;
-		cout << "Using the default value of "  << fRMaxDpmt[fTelID] << "." << endl;
+		//cout << "Failed to read the RMAXT" << fTelID + 1 <<  " value from the parameter file." << endl;
+		//cout << "Using the default value of "  << fRMaxDpmt[fTelID] << "." << endl;
 		
 	}
 	
 	
 	//fStepsPerPMTDiameter
 	
-	if( fStepsPerPMTDiameterIsSet == 1 )
-	{
+	//if( fStepsPerPMTDiameterIsSet == 1 )
+	//{
 	
-		cout << "STEPSPERPMTDIAMETERT" << fTelID + 1 <<  " set to " << fStepsPerPMTDiameter[fTelID] << endl;
+	//	cout << "STEPSPERPMTDIAMETERT" << fTelID + 1 <<  " set to " << fStepsPerPMTDiameter[fTelID] << endl;
 		
-	}
+	//}
 	
 	if( fStepsPerPMTDiameterIsSet == 0 )
 	{
@@ -1131,41 +1131,41 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 		//Set the number of steps in radius per PMT diameter to defaut value of 3
 		fStepsPerPMTDiameter.push_back( 3 );
 		
-		cout << "Failed to read the STEPSPERPMTDIAMETERT" << fTelID + 1 <<  " value from the parameter file." << endl;
-		cout << "Using the default value of "  << fStepsPerPMTDiameter[fTelID] << "." << endl;
+		//cout << "Failed to read the STEPSPERPMTDIAMETERT" << fTelID + 1 <<  " value from the parameter file." << endl;
+		//cout << "Using the default value of "  << fStepsPerPMTDiameter[fTelID] << "." << endl;
 		
 	}
 	
 	
 	//fNpixMin
 	
-	if( fNpixMinIsSet == 1 )
-	{
+	//if( fNpixMinIsSet == 1 )
+	//{
 	
-		cout << "NPIXMINT" << fTelID + 1 <<  " set to " << fNpixMin[fTelID] << endl;
+	//	cout << "NPIXMINT" << fTelID + 1 <<  " set to " << fNpixMin[fTelID] << endl;
 		
-	}
+	//}
 	
 	if( fNpixMinIsSet == 0 )
 	{
 	
-		//Set the min number of pixels cut to default value of 10
+		//Set the min number of pixels cut to default value of 40
 		fNpixMin.push_back( 40 );
 		
-		cout << "Failed to read the NPIXMINT" << fTelID + 1 <<  " value from the parameter file." << endl;
-		cout << "Using the default value of "  << fNpixMin[fTelID] << "." << endl;
+		//cout << "Failed to read the NPIXMINT" << fTelID + 1 <<  " value from the parameter file." << endl;
+		//cout << "Using the default value of "  << fNpixMin[fTelID] << "." << endl;
 		
 	}
 	
 	
 	//fNpixMax
 	
-	if( fNpixMaxIsSet == 1 )
-	{
+	//if( fNpixMaxIsSet == 1 )
+	//{
 	
-		cout << "NPIXMAXT" << fTelID + 1 <<  " set to " << fNpixMax[fTelID] << endl;
+	//	cout << "NPIXMAXT" << fTelID + 1 <<  " set to " << fNpixMax[fTelID] << endl;
 		
-	}
+	//}
 	
 	if( fNpixMaxIsSet == 0 )
 	{
@@ -1173,20 +1173,20 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 		//Set the max number of pixels cut to default value of 79
 		fNpixMax.push_back( 79 );
 		
-		cout << "Failed to read the NPIXMAXT" << fTelID + 1 <<  " value from the parameter file." << endl;
-		cout << "Using the default value of "  << fNpixMax[fTelID] << "." << endl;
+		//cout << "Failed to read the NPIXMAXT" << fTelID + 1 <<  " value from the parameter file." << endl;
+		//cout << "Using the default value of "  << fNpixMax[fTelID] << "." << endl;
 		
 	}
 	
 	
 	//fAlpha
 	
-	if( fAlphaIsSet == 1 )
-	{
+	//if( fAlphaIsSet == 1 )
+	//{
 	
-		cout << "ALPHAT" << fTelID + 1 <<  " set to " << fAlpha[fTelID] << endl;
+	//	cout << "ALPHAT" << fTelID + 1 <<  " set to " << fAlpha[fTelID] << endl;
 		
-	}
+	//}
 	
 	if( fAlphaIsSet == 0 )
 	{
@@ -1194,20 +1194,20 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 		//Set the alpha Hough transform cut, described in memo and cuts file to default value of 0.011
 		fAlpha.push_back( 0.011 );
 		
-		cout << "Failed to read the ALPHAT" << fTelID + 1 <<  " value from the parameter file." << endl;
-		cout << "Using the default value of "  << fAlpha[fTelID] << "." << endl;
+		//cout << "Failed to read the ALPHAT" << fTelID + 1 <<  " value from the parameter file." << endl;
+		//cout << "Using the default value of "  << fAlpha[fTelID] << "." << endl;
 		
 	}
 	
 	
 	//fBeta
 	
-	if( fBetaIsSet == 1 )
-	{
+	//if( fBetaIsSet == 1 )
+	//{
 	
-		cout << "BETAT" << fTelID + 1 <<  " set to " << fBeta[fTelID] << endl;
+	//	cout << "BETAT" << fTelID + 1 <<  " set to " << fBeta[fTelID] << endl;
 		
-	}
+	//}
 	
 	if( fBetaIsSet == 0 )
 	{
@@ -1215,20 +1215,20 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 		//Set the beta Hough transform cut, described in memo and cuts file to default value of 6.6
 		fBeta.push_back( 6.6 );
 		
-		cout << "Failed to read the BETAT" << fTelID + 1 <<  " value from the parameter file." << endl;
-		cout << "Using the default value of "  << fBeta[fTelID] << "." << endl;
+		//cout << "Failed to read the BETAT" << fTelID + 1 <<  " value from the parameter file." << endl;
+		//cout << "Using the default value of "  << fBeta[fTelID] << "." << endl;
 		
 	}
 	
 	
 	//fGamma
 	
-	if( fGammaIsSet == 1 )
-	{
+	//if( fGammaIsSet == 1 )
+	//{
 	
-		cout << "GAMMAT" << fTelID + 1 <<  " set to " << fGamma[fTelID] << endl;
+	//	cout << "GAMMAT" << fTelID + 1 <<  " set to " << fGamma[fTelID] << endl;
 		
-	}
+	//}
 	
 	if( fGammaIsSet == 0 )
 	{
@@ -1236,20 +1236,20 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 		//Set the gamma Hough transform cut, described in memo and cuts file to default value of 182.0
 		fGamma.push_back( 182.0 );
 		
-		cout << "Failed to read the GAMMAT" << fTelID + 1 <<  " value from the parameter file." << endl;
-		cout << "Using the default value of "  << fGamma[fTelID] << "." << endl;
+		//cout << "Failed to read the GAMMAT" << fTelID + 1 <<  " value from the parameter file." << endl;
+		//cout << "Using the default value of "  << fGamma[fTelID] << "." << endl;
 		
 	}
 	
 	
 	//fEta
 	
-	if( fEtaIsSet == 1 )
-	{
+	//if( fEtaIsSet == 1 )
+	//{
 	
-		cout << "ETAT" << fTelID + 1 <<  " set to " << fEta[fTelID] << endl;
+	//	cout << "ETAT" << fTelID + 1 <<  " set to " << fEta[fTelID] << endl;
 		
-	}
+	//}
 	
 	if( fEtaIsSet == 0 )
 	{
@@ -1257,20 +1257,20 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 		//Set the azimuthal completeness cut to default value of 2.0
 		fEta.push_back( 2.0 );
 		
-		cout << "Failed to read the ETAT" << fTelID + 1 <<  " value from the parameter file." << endl;
-		cout << "Using the default value of "  << fEta[fTelID] << "." << endl;
+		//cout << "Failed to read the ETAT" << fTelID + 1 <<  " value from the parameter file." << endl;
+		//cout << "Using the default value of "  << fEta[fTelID] << "." << endl;
 		
 	}
 	
 	
 	//fCameraRadius
 	
-	if( fCameraRadiusIsSet == 1 )
-	{
+	//if( fCameraRadiusIsSet == 1 )
+	//{
 	
-		cout << "CAMERARADIUST" << fTelID + 1 <<  " set to " << fCameraRadius[fTelID] << endl;
+	//	cout << "CAMERARADIUST" << fTelID + 1 <<  " set to " << fCameraRadius[fTelID] << endl;
 		
-	}
+	//}
 	
 	if( fCameraRadiusIsSet == 0 )
 	{
@@ -1278,13 +1278,13 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 		//Set the containedness cut (camera radius in units of PMT diameters) to default value of 11.0
 		fCameraRadius.push_back( 11.0 );
 		
-		cout << "Failed to read the CAMERARADIUST" << fTelID + 1 <<  " value from the parameter file." << endl;
-		cout << "Using the default value of "  << fCameraRadius[fTelID] << "." << endl;
+		//cout << "Failed to read the CAMERARADIUST" << fTelID + 1 <<  " value from the parameter file." << endl;
+		//cout << "Using the default value of "  << fCameraRadius[fTelID] << "." << endl;
 		
 	}
 	
 	
-	cout << "Parameters for telescope " <<  fTelID + 1 << " initialized." << endl;
+	//cout << "Parameters for telescope " <<  fTelID + 1 << " initialized." << endl;
 	
 	
 }//End of readHTParameterFile method

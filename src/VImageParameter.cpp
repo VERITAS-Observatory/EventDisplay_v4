@@ -26,8 +26,9 @@ VImageParameter::~VImageParameter()
 }
 
 
-void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL )
+void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL, bool iMuon, bool iHough )
 {
+		
 	tpars = new TTree( iName.c_str(), iTitle.c_str() );
 	tpars->SetMaxTreeSize( 1000 * Long64_t( 2000000000 ) );
 	tpars->SetAutoSave( 150000000 );               // autosave when 150 Mbytes written
@@ -151,7 +152,7 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL 
 	}
 	
 	// muon parameters (Iterative fit muon analysis)
-	if( fShortTree < 1 )
+	if( iMuon || iHough )
 	{
 		tpars->Branch( "muonX0", &muonX0, "muonX0/F" );
 		tpars->Branch( "muonY0", &muonY0, "muonY0/F" );
@@ -166,7 +167,7 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL 
 	}
 	
 	// muon parameters (Hough transform)
-	if( fShortTree < 1 )
+	if( iHough )
 	{
 	
 		tpars->Branch( "houghAP", &houghAP, "houghAP/D" );
