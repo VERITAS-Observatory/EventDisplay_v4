@@ -67,6 +67,8 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		string fsourcefile;                       // name of data file
 		int    fnevents;                          // total number of events to be analyzed
 		int    fFirstEvent;                       // skip up till this event
+                int    fTimeCutsMin_min;                  // start to analyse run at this min
+                int    fTimeCutsMin_max;                  // stop to analyse this run at this min
 		
 		bool fprintdeadpixelinfo ; 		 // DEADCHAN if true, will print list of dead pixels
 		// at end of run to evndisp.log
@@ -142,7 +144,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		vector< int > fLowGainMultiplierFileNumber;
 		vector< int > fTZeroLowGainFileNumber;
 		vector< int > fPixFileNumber;
-		vector< int > fPadFileNumber;
 		string fDeadChannelFile;
 		float fCameraCoordinateTransformX;        // multiply all X coordinates in camera by this value
 		float fCameraCoordinateTransformY;        // multiply all Y coordinates in camera by this value
@@ -327,6 +328,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fuseDB;
 		}
 		
-		ClassDef( VEvndispRunParameter, 150 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 151 ); //(increase this number)
 };
 #endif

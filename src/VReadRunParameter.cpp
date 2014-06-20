@@ -698,7 +698,17 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->fFirstEvent = -10000;
 			}
 		}
-		
+                // start analyzing at this minute
+                else if( iTemp.find( "timecutmin" ) < iTemp.size() )
+                {
+                      fRunPara->fTimeCutsMin_min = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+                }
+                // stopp analyzing at this minute
+                else if( iTemp.find( "timecutmax" ) < iTemp.size() )
+                {
+                      fRunPara->fTimeCutsMin_max = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+                }
+
 		// check if the user wants to print the list of dead pixels for this run
 		else if( iTemp.rfind( "printdeadpixelinfo" ) < iTemp.size() ) // DEADCHAN
 		{
@@ -930,17 +940,14 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fPWmethod = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-		// MS
 		else if( iTemp.find( "pwcleanneighbors" ) < iTemp.size() )
 		{
 			fRunPara->fPWcleanNeighbors = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-		// MS
 		else if( iTemp.find( "pwcleanthreshold" ) < iTemp.size() )
 		{
 			fRunPara->fPWcleanThreshold = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-		// MS
 		else if( iTemp.find( "pwlimit" ) < iTemp.size() )
 		{
 			fRunPara->fPWlimit = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -1034,6 +1041,7 @@ void VReadRunParameter::test_and_adjustParams()
 		{
 			fRunPara->fLowGainCalibrationFile = "";
 		}
+                fRunPara->fEpochFile = "";
 	}
 	
 	// CTA/AGIS adjustments
@@ -1168,10 +1176,6 @@ void VReadRunParameter::test_and_adjustParams()
 		if( i >= fRunPara->fPixFileNumber.size() )
 		{
 			fRunPara->fPixFileNumber.push_back( 0 );
-		}
-		if( i >= fRunPara->fPadFileNumber.size() )
-		{
-			fRunPara->fPadFileNumber.push_back( 0 );
 		}
 		if( i >= fRunPara->fTZeroLowGainFileNumber.size() )
 		{

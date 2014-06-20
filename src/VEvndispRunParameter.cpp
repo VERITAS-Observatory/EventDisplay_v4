@@ -57,13 +57,15 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fPedestalSingleRootFile = false;
 	fnevents = -10000;
 	fFirstEvent = -10000;
+        fTimeCutsMin_min = -99;
+        fTimeCutsMin_max = -99;
 	fIsMC = 0;
 	fIgnoreCFGversions = false;
 	fPrintAnalysisProgress = 25000;
 	fRunDuration = 60. * 3600.;        // default run duration is 1 h (reset by DBRunInfo)
 	fPrintGrisuHeader = 0;
 
-        fEpochFile = "";
+        fEpochFile = "VERITAS.Epochs.runparameter";
         fInstrumentEpoch = "noepoch";
         fAtmosphereID = 0;
 	
@@ -483,6 +485,14 @@ void VEvndispRunParameter::print( int iEv )
 	{
 		cout << "number of events to analyse: " << fnevents << endl;
 	}
+        if( fTimeCutsMin_min > 0 )
+        {
+                cout << "start analysing at minute " << fTimeCutsMin_min << endl;
+        }
+        if( fTimeCutsMin_max > 0 )
+        {
+                cout << "stop analysing at minute " << fTimeCutsMin_max << endl;
+        }
 	if( fNCalibrationEvents > 0 )
 	{
 		cout << "number of events in calibration analysis: " << fNCalibrationEvents << endl;

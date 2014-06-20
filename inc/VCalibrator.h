@@ -70,7 +70,6 @@ class VCalibrator : public VImageBaseAnalyzer
 		vector< vector< TH1F* > > htzero;
 		
 		vector< string > fPedFileNameC;
-		vector< string > fPadFileNameC;
 		vector< string > fGainFileNameC;
 		vector< string > fToffFileNameC;
 		vector< string > fPixFileNameC;

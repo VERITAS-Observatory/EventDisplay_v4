@@ -43,6 +43,7 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	bMCSetAtmosphericID = false;
 	fBoolPrintSample.assign( fNTel, true );
 	fGPSClockWarnings.assign( fNTel, 0 );
+        fTimeCut_RunStartSeconds = 0;
 	
 	fAnalyzeMode = true;
 	fRunMode = ( E_runmode )fRunPar->frunmode;
@@ -895,7 +896,7 @@ void VEventLoop::gotoEvent( int gEv )
 		while( ( int )fEventNumber != gEv )
 		{
 			i_res = nextEvent();
-			if( fReader->getEventStatus() > 998 )
+			if( fReader->getEventStatus() > 998 || !fNextEventStatus )
 			{
 				i_res = -1;
 				break;
@@ -989,8 +990,9 @@ bool VEventLoop::nextEvent()
 	{
 		cout << "VEventLoop::nextEvent()" << endl;
 	}
-	int i_cut = 1;
-	do                                            // => while( i_cut == 0 );
+	int i_Analysis_cut = 1;
+        int i_Time_cut = 1;
+	do                                            // => while( i_Analysis_cut == 0 );
 	{
 		// get next event from data reader and check
 		// if there is a next event (or EOF) ??
@@ -1049,6 +1051,19 @@ bool VEventLoop::nextEvent()
 			fReader->setTelescopeID( getTeltoAna()[i] );
 			getTelescopeEventNumber()[getTeltoAna()[i]] = fReader->getEventNumber();
 		}
+                // set event time from data reader
+                setEventTimeFromReader();
+                // check time into the run 
+                i_Time_cut = checkTimeCuts();
+                if( i_Time_cut == 2 )
+                {
+                    fNextEventStatus = 0;
+                    return false;
+                }
+                else if( i_Time_cut == 1 )
+                {
+                    continue;
+                }
 		///////////////////////////////////////////////////////////
 		// in displaymode, look for user interaction
 		if( fRunPar->fdisplaymode )
@@ -1058,12 +1073,12 @@ bool VEventLoop::nextEvent()
 		// analyze event ( do this always except if searching for a specifing event number in the file)
 		if( fAnalyzeMode )
 		{
-			i_cut = analyzeEvent();
+			i_Analysis_cut = analyzeEvent();
 		}
 	}
-	while( i_cut == 0 && fNextEventStatus );
+	while( i_Analysis_cut == 0 && fNextEventStatus );
 	// user cut failed
-	if( i_cut < 0 )
+	if( i_Analysis_cut < 0 )
 	{
 		return false;
 	}
@@ -1093,8 +1108,6 @@ int VEventLoop::analyzeEvent()
 		fDST->fill();
 		return 1;
 	}
-	// set event time from data reader
-	setEventTimeFromReader();
 	
 	////////////////////////////////////
 	// analyze all requested telescopes
@@ -1970,6 +1983,25 @@ void VEventLoop::setEventTimeFromReader()
 	/////////////////////////////////////////////////////////////////////
 	setTelID( iCurrentTelID );
 #endif
+}
+
+int VEventLoop::checkTimeCuts()
+{
+    if( fTimeCut_RunStartSeconds == 0 ) 
+    {
+        fTimeCut_RunStartSeconds = fArrayEventTime;
+    }
+
+    if( getRunParameter()->fTimeCutsMin_min > 0 && ( fArrayEventTime - fTimeCut_RunStartSeconds ) < getRunParameter()->fTimeCutsMin_min * 60 )
+    {
+        return 1;
+    }
+    if( getRunParameter()->fTimeCutsMin_max > 0 && ( fArrayEventTime - fTimeCut_RunStartSeconds ) > getRunParameter()->fTimeCutsMin_max * 60 )
+    {
+        return 2;
+    }
+     
+    return 0;
 }
 
 

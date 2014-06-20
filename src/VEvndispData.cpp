@@ -1169,7 +1169,18 @@ double VEvndispData::getAverageElevation()
 		double iN = 0.;
 		double ze  = 0.;
 		double az = 0.;
-		for( float i = getRunParameter()->fDBDataStartTimeSecOfDay; i < getRunParameter()->fDBDataStoppTimeSecOfDay; i++ )
+                float i_start = getRunParameter()->fDBDataStartTimeSecOfDay;
+                if( getRunParameter()->fTimeCutsMin_min > 0 )
+                {
+                    i_start += (float)(getRunParameter()->fTimeCutsMin_min) * 60.;
+                }
+                float i_stopp = getRunParameter()->fDBDataStoppTimeSecOfDay;
+                if( getRunParameter()->fTimeCutsMin_max > 0 && getRunParameter()->fDBDataStartTimeSecOfDay + getRunParameter()->fTimeCutsMin_max*60 < getRunParameter()->fDBDataStoppTimeSecOfDay )
+                {
+                    i_stopp = getRunParameter()->fDBDataStartTimeSecOfDay + (float)(getRunParameter()->fTimeCutsMin_max) * 60.;
+                }
+
+		for( float i = i_start; i < i_stopp; i++ )
 		{
 			VSkyCoordinatesUtilities::getHorizontalCoordinates( getRunParameter()->fDBDataStartTimeMJD, i,
 					getRunParameter()->fTargetDec, getRunParameter()->fTargetRA,

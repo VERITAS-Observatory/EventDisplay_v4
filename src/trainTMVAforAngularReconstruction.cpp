@@ -116,6 +116,7 @@ bool trainTMVA( string iOutputDir, string iOutputName )
 		factory->AddVariable( "asym", 'F' );
 		factory->AddVariable( "loss", 'F' );		
 		factory->AddTarget( "disp", 'F' );
+//		factory->AddTarget( "dispEnergy", 'F' );
 		
 		factory->AddRegressionTree( fMapOfTrainingTree_iter->second, 1. );
 		
@@ -152,7 +153,7 @@ bool trainTMVA( string iOutputDir, string iOutputName )
    (simply a tree with all the necessary variables; one tree per telescope type)
 
 */
-bool writeTrainingFile( string iInputFile, string iOutputDir, string iOutputName )
+bool writeTrainingFile( string iInputFile )
 {
 
 	// telescope configuration
@@ -190,6 +191,7 @@ bool writeTrainingFile( string iInputFile, string iOutputDir, string iOutputName
 	    float NImages = -1.;
 	    float cross = -1.;
 	    float dispPhi = -1.;
+            float dispEnergy = -1.;
 	    float dist = -1.;
 	    float tgrad_x = -1.;
 	    float meanPedvar_Image = -1.;
@@ -240,6 +242,7 @@ bool writeTrainingFile( string iInputFile, string iOutputDir, string iOutputName
 			  fMapOfTrainingTree[i_tel.TelType]->Branch( "disp", &disp, "disp/F" );
 			  fMapOfTrainingTree[i_tel.TelType]->Branch( "cross", &cross, "cross/F" );
 			  fMapOfTrainingTree[i_tel.TelType]->Branch( "dispPhi", &dispPhi, "dispPhi/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "dispEnergy", &dispEnergy, "dispEnergy/F" );
 			
 		}
 	}
@@ -308,6 +311,8 @@ bool writeTrainingFile( string iInputFile, string iOutputDir, string iOutputName
 			disp = sqrt( ( cen_y + MCyoff ) * ( cen_y + MCyoff ) + ( cen_x - MCxoff ) * ( cen_x - MCxoff ) );
 			cross = sqrt( (cen_y+Yoff)*(cen_y+Yoff) + (cen_x-Xoff)*(cen_x-Xoff) );
 			dispPhi = TMath::ATan2( sinphi, cosphi ) - TMath::ATan2( cen_y + MCyoff, cen_x - MCxoff );
+
+                        dispEnergy = i_showerpars.MCe0;
 			
 			if( fMapOfTrainingTree.find( i_tel.TelType ) != fMapOfTrainingTree.end() )
 			{
@@ -361,7 +366,7 @@ int main( int argc, char* argv[] )
 		exit( EXIT_FAILURE );
 	}
 	// fill training file
-	if( !writeTrainingFile( fInputFile, fOutputDir, fOutputName ) )
+	if( !writeTrainingFile( fInputFile ) )
 	{
 		cout << "error writing training file " << endl;
                 cout << "exiting..." << endl;

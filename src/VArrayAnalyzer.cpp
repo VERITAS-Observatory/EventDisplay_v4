@@ -413,48 +413,12 @@ void VArrayAnalyzer::initAnalysis()
 				fDispAnalyzer.back()->setTelescopeTypeList( getDetectorGeometry()->getTelType_list() );
 				if( !fDispAnalyzer.back()->initialize( getEvndispReconstructionParameter()->fMLPFileName[i], "MLP" ) )
 				{
-					exit( -1 );
+					exit( EXIT_FAILURE );
 				}
 			}
 			else if( getEvndispReconstructionParameter()->fMethodID[i] == 7 )
 			{
-				fDispAnalyzer.push_back( new VDispAnalyzer() );
-				fDispAnalyzer.back()->setTelescopeTypeList( getDetectorGeometry()->getTelType_list() );
-				if( !fDispAnalyzer.back()->initialize( getTMVAFileNameForAngularReconstruction( i ), "TMVABDT" ) )
-				{
-                                        cout << "VArrayAnalyzer::initAnalysis() error initializing MVA-BDT" << endl;
-                                        cout << "\t file " << getTMVAFileNameForAngularReconstruction( i ) << endl;
-                                        cout << "exiting..." << endl;
-					exit( EXIT_FAILURE );
-				}
-			}
-			else if( getEvndispReconstructionParameter()->fMethodID[i] == 6 ||
-					 getEvndispReconstructionParameter()->fMethodID[i] == 8 ||
-					 getEvndispReconstructionParameter()->fMethodID[i] == 9 )
-			{
-				cout << "init array analysis for analysis cut set " << fDispAnalyzer.size();
-				cout << " and reconstruction method " << getEvndispReconstructionParameter()->fMethodID[i] << endl;
-				fDispAnalyzer.push_back( new VDispAnalyzer() );
-				fDispAnalyzer.back()->setTelescopeTypeList( getDetectorGeometry()->getTelType_list() );
-				// initialize disp method
-                                string iMVAFileName = getTMVAFileNameForAngularReconstruction( i );
-				if( iMVAFileName.size() > 0 )
-				{
-					if( !fDispAnalyzer.back()->initialize( iMVAFileName, "TMVABDT" ) )
-					{
-                                                cout << "VArrayAnalyzer::initAnalysis() error initializing MVA-BDT" << endl;
-                                                cout << "\t file " << iMVAFileName << endl;
-                                                cout << "exiting..." << endl;
-						exit( EXIT_FAILURE );
-					}
-				}
-				else if( getEvndispReconstructionParameter()->fDispFileName[i].size() > 0 )
-				{
-					if( !fDispAnalyzer.back()->initialize( getEvndispReconstructionParameter()->fDispFileName[i], "DISPTABLE" ) )
-					{
-						exit( -1 );
-					}
-				}
+                                initializeDispAnalyzer( i );
 			}
 			else
 			{
@@ -1571,9 +1535,14 @@ bool VArrayAnalyzer::fillShowerDirection( unsigned int iMethod, float xs, float 
 		getShowerParameters()->fShowerZe[iMethod] = -99999.;
 		getShowerParameters()->fShowerAz[iMethod] = -99999.;
 		getShowerParameters()->fShower_stdS[iMethod] = -99999.;
+                getShowerParameters()->fShower_Chi2[iMethod] = -99999.;
 		
 		return false;
 	}
+        if( xs < -9998. || ys < -9998. )
+        {
+             getShowerParameters()->fShower_Chi2[iMethod] = -99999.;
+        }
 	
 	getShowerParameters()->fShower_Xoffset[iMethod] = xs;
 	if( getDetectorGeo()->getGrIsuVersion() >= 412 )
@@ -1613,8 +1582,7 @@ bool VArrayAnalyzer::fillShowerDirection( unsigned int iMethod, float xs, float 
 		if( getArrayPointing() )
 		{
 			iUTC = VSkyCoordinatesUtilities::getUTC( getShowerParameters()->MJD, getShowerParameters()->time );
-			getArrayPointing()->derotateCoords( iUTC, getShowerParameters()->fShower_Xoffset[iMethod],
-												-1.*getShowerParameters()->fShower_Yoffset[iMethod], xrot, yrot );
+			getArrayPointing()->derotateCoords( iUTC, getShowerParameters()->fShower_Xoffset[iMethod], -1.*getShowerParameters()->fShower_Yoffset[iMethod], xrot, yrot );
 		}
 		
 		getShowerParameters()->fShower_XoffsetDeRot[iMethod] = xrot;
@@ -1845,6 +1813,7 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp )
 
 	float xoff_4 = getShowerParameters()->fShower_Xoffset[iMethod];
 	float yoff_4 = getShowerParameters()->fShower_Yoffset[iMethod];
+
        
 	// are there enough images the run an array analysis
 	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] )
@@ -1853,14 +1822,14 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp )
 	}
 	else
 	{
-		fillShowerDirection( iMethod, 0., 0., -1. );
+		fillShowerDirection( iMethod, -9999., -9999., -1. );
 		return 0;
 	}
 	
 	// check that disp analyzer exists
 	if( iMethod >= fDispAnalyzer.size() || !fDispAnalyzer[iMethod] || fDispAnalyzer[iMethod]->isZombie() )
 	{
-		fillShowerDirection( iMethod, 0., 0., -2. );
+		fillShowerDirection( iMethod, -9999., -9999., -2. );
 		return 0;
 	}
 	
@@ -1913,7 +1882,10 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp )
 	fillShowerCore( iMethod, ximp, yimp );
 	getShowerParameters()->fShower_stdP[iMethod] = stdp;
 	/* indicates fit ok */
-	getShowerParameters()->fShower_Chi2[iMethod] = 0.0;
+        if( xs > -9998. && ys > -9998. )
+        {
+            getShowerParameters()->fShower_Chi2[iMethod] = 0.0;
+        }
 	
 	return 0;
 }
@@ -2328,7 +2300,7 @@ void VArrayAnalyzer::updatePointingToArbitraryTime( int iMJD, double iTime )
  * return file with zenith angle closest to the simulated ones
  *
  */
-string VArrayAnalyzer::getTMVAFileNameForAngularReconstruction( unsigned int iStereoMethodID )
+string VArrayAnalyzer::getTMVAFileNameForAngularReconstruction( unsigned int iStereoMethodID, string iBDTFileName )
 {
     string iName = "";
 
@@ -2356,9 +2328,24 @@ string VArrayAnalyzer::getTMVAFileNameForAngularReconstruction( unsigned int iSt
             iName = getEvndispReconstructionParameter()->fTMVAFileName[iStereoMethodID][iBinSelected];
         }
     }
+//////////////
+// check if full file name is given, otherwise adjust it
+
+// full path given
+    if( iName.find( "/" ) != string::npos )
+    {
+        iName += "/" + iBDTFileName;
+    }
+// no full path given - expect file to be at the default location
+// $OBS_EVNDISP_ANA_DIR/DISP_BDTs/VX/ze...
+    else
+    {
+        string iFullFileName = getRunParameter()->getDirectory_EVNDISPAnaData() + "/DISP_BDTs/" + getRunParameter()->fInstrumentEpoch + "/";
+        iName = iFullFileName + iName + "/" + iBDTFileName;
+    }
+    cout << "initializing TMVA disp analyzer for average zenith angle in current run: " << 90.-getAverageElevation() << endl;
     if( fDebug )
     {
-        cout << "Average zenith angle in current run: " << 90.-getAverageElevation() << endl;
         cout << "TMVA BDTs available for: " << endl;
         if( getEvndispReconstructionParameter() && iStereoMethodID < getEvndispReconstructionParameter()->fMTVAZenithBin.size() )
         {
@@ -2370,4 +2357,43 @@ string VArrayAnalyzer::getTMVAFileNameForAngularReconstruction( unsigned int iSt
     }
 
     return iName;
+}
+
+void VArrayAnalyzer::initializeDispAnalyzer( unsigned int iStereoMethodID )
+{
+// first check if we can 'reuse' a MVA from another, previously defined method
+//   this is indicated by a single TMVABDTFILE BDT file with the file name USE_BDT_METHOD_<methodID>
+     if( iStereoMethodID < getEvndispReconstructionParameter()->fTMVAFileName.size() && 
+         getEvndispReconstructionParameter()->fTMVAFileName[iStereoMethodID].size() == 1 &&
+         getEvndispReconstructionParameter()->fTMVAFileName[iStereoMethodID][0].find( "USE_BDT_METHOD_" ) != string::npos )
+     {
+         string iTemp = getEvndispReconstructionParameter()->fTMVAFileName[iStereoMethodID][0];
+         unsigned int iMethodID = (unsigned int)atoi( iTemp.substr( iTemp.rfind( "_" )+1, iTemp.size() ).c_str() );
+         cout << "initializing TMVA disp analyzer for array reconstruction method " << iStereoMethodID;
+         cout << " using disp analyser from method " << iMethodID << endl;
+         if( iMethodID < fDispAnalyzer.size() )
+         {
+             fDispAnalyzer.push_back( fDispAnalyzer[11] );
+         }
+         else
+         {
+                    cout << "VArrayAnalyzer::initAnalysis() error initializing MVA-BDT (method " << iStereoMethodID << ")" << endl;
+                    cout << "\t could not find disp analyzer from previous method " << iMethodID << endl;
+                    cout << "exiting..." << endl;
+                    exit( EXIT_FAILURE );
+         }
+     }
+// initialize disp analyzer
+     else
+     {
+            fDispAnalyzer.push_back( new VDispAnalyzer() );
+            fDispAnalyzer.back()->setTelescopeTypeList( getDetectorGeometry()->getTelType_list() );
+            if( !fDispAnalyzer.back()->initialize( getTMVAFileNameForAngularReconstruction( iStereoMethodID ), "TMVABDT" ) )
+            {
+                    cout << "VArrayAnalyzer::initAnalysis() error initializing MVA-BDT (method " << iStereoMethodID << ")" << endl;
+                    cout << "\t file " << getTMVAFileNameForAngularReconstruction( iStereoMethodID ) << endl;
+                    cout << "exiting..." << endl;
+                    exit( EXIT_FAILURE );
+            }
+      }
 }

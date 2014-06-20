@@ -75,10 +75,13 @@ class VEventLoop : public VEvndispData
 		
 		bool fNextEventStatus;                    //!< for stopping event loop from display
 		bool fEndCalibrationRunNow;               //!< for stopping event loop for calibration
+
+                int  fTimeCut_RunStartSeconds;                 //!< run start in seconds of the day
 		
 		int      analyzeEvent();                  //!< analyze current event
 		int      checkArrayCuts();                //!< check cuts (see tab cut option) for current event
 		int      checkCuts();                     //!< check cuts (see tab cut option) for current event
+                int      checkTimeCuts();                 //!< check time cuts
 		void     fillTriggerVectors();
 		void     setEventTimeFromReader();        //! calculate event time in appropriate format
 		void     printRunInfos();                 //!< print some informations about current run

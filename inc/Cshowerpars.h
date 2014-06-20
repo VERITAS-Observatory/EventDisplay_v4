@@ -633,9 +633,9 @@ Bool_t Cshowerpars::Notify()
 	if( !bShort )
 	{
 		b_stds = fChain->GetBranch( "stds" );
-		b_dec = fChain->GetBranch( "dec" );
-		b_ra = fChain->GetBranch( "ra" );
-	}
+        }
+        if( fChain->GetBranchStatus( "dec" ) ) b_dec = fChain->GetBranch( "dec" );
+        if( fChain->GetBranchStatus( "ra" ) ) b_ra = fChain->GetBranch( "ra" );
 	else
 	{
 		b_stds = 0;

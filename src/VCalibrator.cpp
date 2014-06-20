@@ -1,8 +1,6 @@
 /*! \class VCalibrator
     \brief calibration class, calculation of pedestals, gains, ...
 
-    \author Jamie Holder
-    \author Gernot Maier
 */
 
 #include "VCalibrator.h"

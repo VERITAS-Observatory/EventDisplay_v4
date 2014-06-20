@@ -2,7 +2,7 @@
 evndisp command line options:
 =============================
 
-(observe: default values are in general good for a standard analysis)
+(observe: default values are in general good for a standard analysis; if not complain!)
 
 Typical use cases:
 ------------------
@@ -13,19 +13,21 @@ Plot VTS data:
 Quick plotting of VTS data, ignoring all calibration data:
 ./bin/evndisp -plotraw -nocalibnoproblem -display=1 -sourcefile <your vbf data file>
 
+Please take also note of the useful scripts in ./scripts/VTS/
+
 General:
 --------
 	 -runmode=0-7 				 0=analysis (default)
 	              				 1=pedestal calculation (high gain channels)
-	              				 2=gain/toffset calculation (high gain channels)
-	              				 3=trace library
+	              				 2=relative gain/toffset calculation (high gain channels)
+	              				 3=trace library production
 	              				 4=write dstfile
-	              				 5=gain/toffset calculation (low gain channels)
+	              				 5=relative gain/toffset calculation (low gain channels)
 	              				 6=pedestal calculation (low gain channels)
-	              				 7=tzero calculation
+	              				 7=average pulse arrival (tzero) calculation
 	 -sourcefile FILENAME 			 full path + filename
 	 -sourcetype=0-7 			 source data file format
-	              				 0=rawdata
+	              				 0=rawdata (VTS eventbuilder type)
 	              				 1=GrIsu Monte Carlo (ascii file)
 	              				 2=MC in vbf/cvbf format
 	              				 3=rawdata in vbf/cvbf format (default)
@@ -39,7 +41,12 @@ General:
 						 default: on, switch of with -donotusedbinfo )
 	 -nevents=NEVENTS 			 loop over NEVENTS events in display=0 mode (<0 = no limit) (default=-10000)
 	 -firstevent=EVENTNUMBER                 start analysis at event EVENTNUMBER (default=-10000)
+         -timecutMin=TIME_MIN                    start analysis at minute TIME_MIN
+         -timecutMax=TIME_MAX                    stop analysis at minute TIME_MAX
 	 -reconstructionparameter FILENAME 	 file with reconstruction parameters (e.g., array analysis cuts)
+         -epochfile FILENAME                     file with definitions of epochs (e.g. VERITAS.Epochs.runparameter)
+         -epoch STRING                           set epoch (e.g. V5) for current run
+         -atmosphereid=INT                       set ID for atmosphere (corsika value)
 
 Output:
 -------
@@ -61,6 +68,7 @@ Detector definition:
 						 (Telescope 1=1,..., Telescopes 2 and 3 = 23, Telescopes 1,2,4 = 124, or 1,2,10,25)
 	 -camera=CAMERA 			 set detector geometry file (default=veritasBC4_080117_Autumn2007-4.1.2_EVNDISP.cfg)
 	 -vbfnsamples 				 use number of FADC samples from VBF file (default=0)
+
 
 Calibration:
 ------------
@@ -127,7 +135,6 @@ Image calculation:
 	 -smoothdead 				 smooth over dead pixels
 	 -logl=0/1/2 				 perform loglikelihood image parameterisation 0=off,1=on,2=on with minuit output (default=off)
 	 -fuifactor=FLOAT 			 fraction of image/border pixel under image ellipse fact (default=2)
-	 -padrun=RUN 				 padding run number (use with care)
 
 Parallaxwidth calculation
 --------------------------
@@ -178,10 +185,14 @@ Simulations:
 	                                         1=Reproduce full grisu simulation header including detector config file (from VBF header).
 	 				 	 2=Print config file name that was used for detector simulation, if available.
 
+Muon analysis:
+--------------
+	 -muon 					 search for muon rings
+         -hough                                  search for muon rings with Hough method
+
 Others:
 -------
 	 -debug 				 print lots of debug output
-	 -muon 					 search for muon rings
 	 -frogs 				 use frogs template analysis
 	 -user USERNAME 			 username
 

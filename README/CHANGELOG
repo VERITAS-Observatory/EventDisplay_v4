@@ -3,6 +3,20 @@ Change log eventdisplay analysis package
 (please observe the wiki syntax for this file)
 
 * 20140620 (GM)
+disps are now in $VERITAS_EVNDISP_AUX_DIR/DISP_BDTs
+
+* 20140620 (GM)
+added option to analyse only a certain fraction of a run
+(import for disp analysis of e.g. GRB runs, as average
+elevation is used)
+-timecutMin=TIME_MIN 
+-timecutMax=TIME_MAX
+
+* 20140620 (GM)
+added loud warnings that -target option should only
+be used by expert
+
+* 20140620 (GM)
 hopefully fixed the long-standing annoying time-zone
 dependence of the RA axis in the plotting routines
 
