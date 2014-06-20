@@ -16,13 +16,15 @@
 #include "TStyle.h"
 #include "TTree.h"
 
+#include "VHistogramUtilities.h"
+
 #include <iostream>
 #include <string>
 #include <vector>
 
 using namespace std;
 
-class VPlotCompareDataWithMC
+class VPlotCompareDataWithMC : public VHistogramUtilities
 {
 	private:
 	
@@ -46,6 +48,7 @@ class VPlotCompareDataWithMC
 		void   plotLegend( TH1D* hsims, TH1D* hdiff, double x0 = 0.5 );
 		TCanvas* plotRelativePlots( char* i_CanvasName, char* i_CanvasTitle, TH1D* h1, TH1D* h2, double xmin, double xmax );
 		void   plotRelativePlot( TH1D* h1, TH1D* h2, double xmin = -999., double xmax = -999. );
+		void   plotCummulativePlot( TH1D* h1, TH1D* h2, double xmin = -999., double xmax = -999. );
 		void   plot_singleCanvas( string iHistoName, string iCanvasTitle, double iHistoXAxisMax, string iScalingVariable = "MSCW" );
 		void   setAxisTitles( TH2D* h, string iS, int iTel );
 		void   setHistogramAtt( TH1D* his, int icolor, double iwidth, double isize, int imarker = 1, int irebin = 1, double iTitleOffset = 1.3 );

@@ -344,6 +344,43 @@ TF1* VPlotCompareDataWithMC::do_theta2Fit( TH1D* h, int icolor, int istyle )
 	return fTheta2;
 }
 
+void VPlotCompareDataWithMC::plotCummulativePlot( TH1D* h1, TH1D* h2, double xmin, double xmax )
+{
+	if( !h1 || !h2 )
+	{
+		return;
+	}
+	
+	if( xmin < -998. )
+	{
+		xmin = h1->GetXaxis()->GetXmin();
+	}
+	if( xmax < -998. )
+	{
+		xmax = h1->GetXaxis()->GetXmax();
+	}
+	
+	TH1D* hCumu_1 = VHistogramUtilities::get_Cumulative_Histogram( h1, true, true );
+	TH1D* hCumu_2 = VHistogramUtilities::get_Cumulative_Histogram( h2, true, true );
+	if( !hCumu_1 || !hCumu_2 ) return;
+	
+	hCumu_1->SetMaximum( 1.15 );
+	hCumu_1->SetMinimum( 0. );
+	hCumu_1->SetAxisRange( xmin, xmax );
+	hCumu_1->SetYTitle( "cumulative distribution" );
+	hCumu_1->SetLineWidth( 2 );
+	hCumu_2->SetLineWidth( 2 );
+	
+	hCumu_1->Draw();
+	hCumu_2->Draw( "sames" );
+	
+	TLine* iL = new TLine( xmin, 1., xmax, 1. );
+	iL->SetLineStyle( 2 );
+	iL->Draw();
+
+
+}
+
 void VPlotCompareDataWithMC::plotRelativePlot( TH1D* h1, TH1D* h2, double xmin, double xmax )
 {
 	if( !h1 || !h2 )
@@ -625,6 +662,8 @@ void VPlotCompareDataWithMC::msc_vs_energy_plots( int iRebin, double xmin, doubl
 		return;
 	}
 	
+	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax , "CUMU" );
+	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax , "CUMU" );
 	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax , "REL" );
 	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax , "REL" );
 	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax );
@@ -735,10 +774,15 @@ void VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVariable
 			lLine->SetLineStyle( 2 );
 			lLine->Draw();
 		}
-		else
+		else if( iPlot == "REL" )
 		{
 			plotRelativePlot( hSims, hDiff, x_min, x_max );
 		}
+		else if( iPlot == "CUMU" )
+		{
+			plotCummulativePlot( hSims, hDiff, x_min, x_max );
+		}
+
 		
 		sprintf( hname, "%.1f < log_{10} E_{rec} < %.1f", h_sims->GetXaxis()->GetBinLowEdge( i ),  h_sims->GetXaxis()->GetBinUpEdge( i ) );
 		TLatex* iT = new TLatex( x_min + 0.1 * ( x_max - x_min ), 0.9 * hSims->GetMaximum(), hname );
