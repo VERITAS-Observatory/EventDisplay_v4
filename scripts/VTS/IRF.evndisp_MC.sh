@@ -1,5 +1,5 @@
 #!/bin/bash
-# submit evndisp for grisu/care simulations (analyse all noise levels at the same time)
+# submit evndisp for grisu/care simulations
 #
 
 # qsub parameters

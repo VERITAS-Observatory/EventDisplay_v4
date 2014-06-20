@@ -29,7 +29,7 @@ ONAME="$RUNNUM"
 ITER=$((SGE_TASK_ID - 1))
 FIRSTEVENT=$(($ITER * $NEVENTS))
 MSCWFILE="gamma_${ZA}deg_750m_w${WOB}_ID0_ana${TELTOANA}_NOISE${NOISE}_1_${ITER}.root"
-if [[ $USEFROGS != "1" ]]; then
+if [[ $USEFROGS == "1" ]]; then
     echo -e "FROGS MSCW Dir:\n $MSCWDIR"
     echo -e "FROGS MSCW File:\n $MSCWFILE"
     echo "FROGS NEvents: $NEVENTS"
@@ -37,9 +37,11 @@ fi
 
 # detector configuration and cuts
 ACUT="EVNDISP.reconstruction.runparameter"
+ACUT="EVNDISP.reconstruction.DISP.runparameter"
 DEAD="EVNDISP.validchannels.dat"
 PEDLEV="16."
-LOWPEDLEV="8."
+# LOWPEDLEV="8."
+LOWPEDLEV="16."
 
 if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     # Input files (observe that these might need some adjustments)
@@ -116,12 +118,12 @@ if [[ ! -f "$DDIR/$VBF_FILE" ]]; then
         echo "Copying $SIMDIR/${VBF_FILE}.gz to $DDIR"
         cp -f "$SIMDIR/$VBF_FILE.gz" $DDIR/
         echo " (vbf file copied, was gzipped)"
-        gunzip -f -v "$DDIR/$VBF_FILE.gz"
+        gunzip -f -q "$DDIR/$VBF_FILE.gz"
     elif [[ -e "$SIMDIR/$VBF_FILE.bz2" ]]; then
         echo "Copying $SIMDIR/$VBF_FILE.bz2 to $DDIR"
         cp -f "$SIMDIR/$VBF_FILE.bz2" $DDIR/
         echo " (vbf file copied, was bzipped)"
-        bunzip2 -f -v "$DDIR/$VBF_FILE.bz2"
+        bunzip2 -f -q "$DDIR/$VBF_FILE.bz2"
     elif [[ -e "$SIMDIR/$VBF_FILE" ]]; then
         echo "Copying $VBF_FILE to $DDIR"
         cp -f "$SIMDIR/$VBF_FILE" $DDIR/
