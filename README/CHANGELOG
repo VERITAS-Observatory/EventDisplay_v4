@@ -2,6 +2,10 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140620 (GM)
+hopefully fixed the long-standing annoying time-zone
+dependence of the RA axis in the plotting routines
+
 * 20140616 (GM)
 added epoch and atmosphere IDs to run parameters
 can by accessed by: 

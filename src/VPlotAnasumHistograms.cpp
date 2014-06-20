@@ -1259,10 +1259,9 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 		if( fPlotUseHours == true )
 		{
 			// set time offsets to midnight
-			//            TDatime da(2000,01,01,fPlotZeroHours,00,00);
 			iRA_hrs += fPlotZeroHours;
-			TDatime da( 2000, 01, 01, iRA_hrs, iRA_min, iRA_sec );
-			raLowerAxis->SetTimeOffset( da.Convert(), "local" );
+                        TTimeStamp dt( 2000, 01, 01, iRA_hrs, iRA_min, iRA_sec );
+			raLowerAxis->SetTimeOffset( dt.GetSec(), "gmt" );
 			raLowerAxis->SetTimeFormat( TmpTimeFormat );
 			raLowerAxis->SetOption( "t" );
 			raLowerAxis->SetNdivisions( 5 );
@@ -1274,26 +1273,6 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 			raLowerAxis->SetNdivisions( 510 );
 		}
 		raLowerAxis->Draw();
-		
-		/*	TGraph *gTarget = new TGraph( 1 );
-			gTarget->SetPoint( 0, 0., 0. );
-			gTarget->SetMarkerStyle( 2 );
-			gTarget->SetMarkerSize( 2.5 );
-			gTarget->Draw( "p" ); */
-		
-		
-		/*        if( bDrawSource )
-		        {
-		            cout << "Targetshift: " << fTargetShiftWest << " " << fTargetShiftNorth << endl;
-		            TGraph *gTarget = new TGraph( 1 );
-		            gTarget->SetPoint( 0, fTargetShiftWest, -1.*fTargetShiftNorth );
-		            gTarget->SetMarkerStyle( 2 );
-		            gTarget->SetMarkerSize( 2.5 );
-		            gTarget->SetMarkerColor( 0 );
-		            gTarget->SetLineColor( 0 );
-		            gTarget->Draw( "p" );
-		
-		        } */
 		
 		////////////////////////////////
 		// plot slices
