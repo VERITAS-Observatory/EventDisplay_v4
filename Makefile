@@ -1519,6 +1519,7 @@ $(ctapara):
 # VTS.lookuptables (required)
 # VTS.effectiveareas (required)
 # VTS.radialacceptances (required)
+# VTS.dispBDTs (optional)
 #
 
 VTS.auxfiles:	$(vtspara).runfiles.tar.gz $(vtspara).calibration.tar.gz $(vtspara).lookuptables.tar.gz $(vtspara).effectiveareas.tar.gz $(vtspara).radialacceptances.tar.gz
@@ -1528,6 +1529,7 @@ VTS.calibration:	$(vtspara).calibration.tar.gz
 VTS.lookuptables:	$(vtspara).lookuptables.tar.gz
 VTS.effectiveareas:	$(vtspara).effectiveareas.tar.gz
 VTS.radialacceptances:	$(vtspara).radialacceptances.tar.gz
+VTS.dispBDTs:	$(vtspara).dispBDTs.tar.gz
 
 ######
 # VTS runparameter files
@@ -1636,6 +1638,18 @@ $(vtspara).effectiveareas.tar.gz:
 	cp -f $(VERITAS_EVNDISP_AUX_DIR)/EffectiveAreas/eff* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/EffectiveAreas
 #	make tar file
 	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).effectiveareas.tar.gz . && cd ..
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
+
+######
+# VTS disp BDTs
+
+$(vtspara).dispBDTs.tar.gz:
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).dispBDTs.tar.gz  >/dev/null 2>&1
+	rm -rf $(distdir) >/dev/null 2>&1
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/DISP_BDTs
+	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/DISP_BDTs/V* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/DISP_BDTs/
+#	make tar file
+	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).dispBDTs.tar.gz . && cd ..
 	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
 
 
