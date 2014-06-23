@@ -21,10 +21,10 @@ VPlotOptimalCut::VPlotOptimalCut( string iFile )
 
     fListOfVariables.push_back( "MSCW" );
     fListOfVariables.push_back( "MSCL" );
-    //fListOfVariables.push_back( "EChi2" );
-    //fListOfVariables.push_back( "EmissionHeight" );
-    //fListOfVariables.push_back( "EmissionHeightChi2" );
-    fListOfVariables.push_back( "SizeSecondMax" );
+    fListOfVariables.push_back( "EChi2" );
+    fListOfVariables.push_back( "EmissionHeight" );
+    fListOfVariables.push_back( "EmissionHeightChi2" );
+//    fListOfVariables.push_back( "SizeSecondMax" );
 }
 
 void VPlotOptimalCut::listVariables()
@@ -250,7 +250,7 @@ void VPlotOptimalCut::plotScanParameter( string iVar1, string iVar2 )
 
   TCanvas *c = new TCanvas( "c","c", 100, 100, 450, 450 );
   //c->SetLeftMargin( 0.13 );
-  //c->Draw();
+  c->Draw();
 
   int i = 0; //TEST
   string plot_option = "";

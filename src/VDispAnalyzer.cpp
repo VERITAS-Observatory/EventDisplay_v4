@@ -101,7 +101,8 @@ void VDispAnalyzer::terminate()
 }
 
 float VDispAnalyzer::evaluate( float iWidth, float iLength, float iAsymm, float iDist, float iSize,
-							   float iPedvar, float iTGrad, float iLoss, float icen_x, float icen_y, float xoff_4, float yoff_4, ULong64_t iTelType, float iZe, float iAz, bool b2D)
+	                       float iPedvar, float iTGrad, float iLoss, float icen_x, float icen_y, 
+                               float xoff_4, float yoff_4, ULong64_t iTelType, float iZe, float iAz, bool b2D)
 {
 	f_disp = -99.;
 	

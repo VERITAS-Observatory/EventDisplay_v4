@@ -270,36 +270,35 @@ int main( int argc, char* argv[] )
 	
 	// mscw
 	double mscw_step = 0.05;
-	unsigned int    mscw_max_n = 20;
-	double mscw_max_start =  0.;
+	unsigned int    mscw_max_n = 1;
+	double mscw_max_start =  0.5;
 	
 	// mscl
 	double mscl_step = 0.05;
-	unsigned int    mscl_max_n = 20;
-	double mscl_max_start =  0.;
+	unsigned int    mscl_max_n = 1;
+	double mscl_max_start =  0.7;
 
         if( bReducedWidth )
         {
             mscw_max_start = 1.;
             mscl_max_start = 1.;
         }
-        
 	
 	// size2ndmax
 	double size_step = 100.;
-	unsigned int size_n = 10;
-	double size_start = 400.;
+	unsigned int size_n = 1;
+	double size_start = 500.;
 	
 	// theta2
 	double theta2_step = 0.001;
-	unsigned int    theta2_max_n = 1;
-	double theta2_max_start = 0.008;
+	unsigned int    theta2_max_n = 5;
+	double theta2_max_start = 0.005;
 	
 	// emmission height
 	double emm_step = 0.5;
-	unsigned int    emm_max_n = 20.;
-	double emm_max_start = 10.;
-	unsigned int    emm_min_n = 20;
+	unsigned int    emm_max_n = 1.;
+	double emm_max_start = 16.;
+	unsigned int    emm_min_n = 1;
 	double emm_min_start = 0.;
 	
 	// emmission height Chi2 (log scale)
@@ -313,7 +312,7 @@ int main( int argc, char* argv[] )
 	double echi2_max_start = -1.5;
 	
 	bool fQuickTest = false;
-	fQuickTest = true;
+//	fQuickTest = true;
 	if( fQuickTest )
 	{
 /*		mscw_max_n = 1;
