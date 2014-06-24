@@ -74,6 +74,7 @@ class VEventLoop : public VEvndispData
 		vector< unsigned int > fGPSClockWarnings;
 		
 		bool fNextEventStatus;                    //!< for stopping event loop from display
+                bool fTimeCutsfNextEventStatus;
 		bool fEndCalibrationRunNow;               //!< for stopping event loop for calibration
 
                 int  fTimeCut_RunStartSeconds;                 //!< run start in seconds of the day

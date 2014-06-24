@@ -49,6 +49,7 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	fRunMode = ( E_runmode )fRunPar->frunmode;
 	fEventNumber = 0;
 	fNextEventStatus = false;
+        fTimeCutsfNextEventStatus = false;
 	fEndCalibrationRunNow = false;
 	fBoolSumWindowChangeWarning = 0;
 	fLowGainMultiplierWarning = 0;
@@ -896,7 +897,7 @@ void VEventLoop::gotoEvent( int gEv )
 		while( ( int )fEventNumber != gEv )
 		{
 			i_res = nextEvent();
-			if( fReader->getEventStatus() > 998 || !fNextEventStatus )
+			if( fReader->getEventStatus() > 998 || !fTimeCutsfNextEventStatus )
 			{
 				i_res = -1;
 				break;
@@ -1057,7 +1058,7 @@ bool VEventLoop::nextEvent()
                 i_Time_cut = checkTimeCuts();
                 if( i_Time_cut == 2 )
                 {
-                    fNextEventStatus = 0;
+                    fTimeCutsfNextEventStatus = 0;
                     return false;
                 }
                 else if( i_Time_cut == 1 )
@@ -1077,6 +1078,7 @@ bool VEventLoop::nextEvent()
 		}
 	}
 	while( i_Analysis_cut == 0 && fNextEventStatus );
+        fTimeCutsfNextEventStatus = true;
 	// user cut failed
 	if( i_Analysis_cut < 0 )
 	{
