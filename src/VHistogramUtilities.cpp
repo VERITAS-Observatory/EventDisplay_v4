@@ -286,7 +286,7 @@ bool VHistogramUtilities::normalizeTH2D_y( TH2* h )
 	return true;
 }
 
-TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormalize, bool iLeft_to_right )
+TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormalize, bool iLeft_to_right, double iMax )
 {
 	if( !iH_in )
 	{
@@ -298,6 +298,8 @@ TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormaliz
 	sprintf( hname, "%s_CUMU", iH_in->GetName() );
 	TH1D* iH_out = ( TH1D* )iH_in->Clone( hname );
 	iH_out->Reset();
+
+	float z = 0.;
 	
 	if( iLeft_to_right )
 	{
@@ -305,6 +307,11 @@ TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormaliz
 		// loop over all bins
 		for( int i = 2; i <= iH_in->GetNbinsX(); i++ )
 		{
+			if( iH_in->GetBinCenter( i ) > iMax )
+			{
+			   z = i-1;
+			   break;
+                        }
 			iH_out->SetBinContent( i, iH_in->GetBinContent( i ) + iH_out->GetBinContent( i - 1 ) );
 		}
 	}
@@ -317,9 +324,10 @@ TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormaliz
 			iH_out->SetBinContent( i, iH_in->GetBinContent( i ) + iH_out->GetBinContent( i + 1 ) );
 		}
 	}
-	if( iNormalize && iH_out->GetBinContent( iH_out->GetNbinsX() ) > 0. )
+	cout << "XXX " << z << "\t" << iH_out->GetBinContent( z ) << endl;
+	if( iNormalize && iH_out->GetBinContent( z ) > 0. )
 	{
-		iH_out->Scale( 1. / iH_out->GetBinContent( iH_out->GetNbinsX() ) );
+		iH_out->Scale( 1. / iH_out->GetBinContent( z ) );
 	}
 	
 	iH_out->SetMaximum( iH_out->GetMaximum() * 1.2 );

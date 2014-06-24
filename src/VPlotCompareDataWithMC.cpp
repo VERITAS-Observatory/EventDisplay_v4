@@ -360,8 +360,8 @@ void VPlotCompareDataWithMC::plotCummulativePlot( TH1D* h1, TH1D* h2, double xmi
 		xmax = h1->GetXaxis()->GetXmax();
 	}
 	
-	TH1D* hCumu_1 = VHistogramUtilities::get_Cumulative_Histogram( h1, true, true );
-	TH1D* hCumu_2 = VHistogramUtilities::get_Cumulative_Histogram( h2, true, true );
+	TH1D* hCumu_1 = VHistogramUtilities::get_Cumulative_Histogram( h1, true, true, 1.5 );
+	TH1D* hCumu_2 = VHistogramUtilities::get_Cumulative_Histogram( h2, true, true, 1.5 );
 	if( !hCumu_1 || !hCumu_2 ) return;
 	
 	hCumu_1->SetMaximum( 1.15 );
