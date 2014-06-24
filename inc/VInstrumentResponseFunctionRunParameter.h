@@ -4,6 +4,7 @@
 #define VInstrumentResponseFunctionRunParameter_H
 
 #include "Ctelconfig.h"
+#include "VEvndispRunParameter.h"
 #include "VMonteCarloRunHeader.h"
 #include "VTableLookupRunParameter.h"
 #include "VEnergySpectrumfromLiterature.h"
@@ -33,6 +34,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
 		unsigned int    fFillingMode;              // filling mode
 		
 		string          fCutFileName;
+                string          fInstrumentEpoch;
 		int             fGammaHadronCutSelector;
 		int             fDirectionCutSelector;
 		
@@ -74,7 +76,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
 		vector< double > fAzMin;
 		vector< double > fAzMax;
 		
-		double          fWobbleIsotropic; //DS
+		double          fWobbleIsotropic;
 		
 		unsigned int    telconfig_ntel;
 		double          telconfig_arraycentre_X;
@@ -94,7 +96,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
 		bool                  readRunParameterFromTextFile( string iFile );
 		bool                  testRunparameters();
 		
-		ClassDef( VInstrumentResponseFunctionRunParameter, 12 );
+		ClassDef( VInstrumentResponseFunctionRunParameter, 13 );
 };
 
 #endif

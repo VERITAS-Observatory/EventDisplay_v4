@@ -63,6 +63,7 @@ VGammaHadronCuts::VGammaHadronCuts()
 	fNTel = 0;
 	fNLTrigs = 0;
 	fDataDirectory = "";
+        fInstrumentEpoch = "NOT_SET";
 	
 	// mean width/length/distance
 	fMeanImageWidth = 0.;
@@ -608,9 +609,24 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			else if( iCutVariable == "sizesecondmax" )
 			{
 				is_stream >> temp;
-				fCut_SizeSecondMax_min = atof( temp.c_str() );
+                                float isize_min = atof( temp.c_str() );
 				is_stream >> temp;
-				fCut_SizeSecondMax_max = atof( temp.c_str() );
+                                float isize_max = atof( temp.c_str() );
+                                // check instrument epoch
+                                if( !is_stream.eof() )
+                                {
+                                    is_stream >> temp;
+                                    if( temp == fInstrumentEpoch )
+                                    {
+                                        fCut_SizeSecondMax_min = isize_min;
+                                        fCut_SizeSecondMax_max = isize_max;
+                                    }
+                                }
+                                else
+                                {
+                                    fCut_SizeSecondMax_min = isize_min;
+                                    fCut_SizeSecondMax_max = isize_max;
+                                }
 			}
 			// telescope type dependent cut on number of images
 			// syntax:  teltype_nnimages <min images> <tel type counter>
@@ -1573,7 +1589,7 @@ bool VGammaHadronCuts::applyTMVACut( int i )
 
 bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 {
-	if( !fData->isFrogs() )
+	if( fData && !fData->isFrogs() )
 	{
 		cout << "VGammaHadronCuts::applyFrogsCut error: input data (mscw file) without frogs data" << endl;
 		cout << "exiting..." << endl;
@@ -2475,7 +2491,7 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
 			// get theta2 cut
 			theta_cut_max  = fIRFAngRes->Eval( e );
 			
-			if( fData->isFrogs() == 1 )
+			if( fData && fData->isFrogs() == 1 )
 			{
 				for( int i = 0; i < fIRFAngRes->GetN() - 1; i++ )
 				{

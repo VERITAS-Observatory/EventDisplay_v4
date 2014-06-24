@@ -83,6 +83,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		
 		CData* fData;                                       //! transient
 		string fDataDirectory;
+                string fInstrumentEpoch;
 		
 		// cut selector
 		int fGammaHadronCutSelector;                            // see description at beginning of VGammaHadronCuts.cpp
@@ -419,6 +420,10 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			fCut_Erec_min = imin;
 			fCut_Erec_max = imax;
 		}
+                void   setInstrumentEpoch (string iEpoch )
+                {
+                       fInstrumentEpoch = iEpoch;
+                }
 		bool   setIRFGraph( TGraphErrors* g );
 		void   setNTel( unsigned int itel,  double iX = 0., double iY = 0. )
 		{
@@ -436,6 +441,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			return fUseOrbitalPhaseCuts;
 		}
 		
-		ClassDef( VGammaHadronCuts, 46 );
+		ClassDef( VGammaHadronCuts, 47 );
 };
 #endif

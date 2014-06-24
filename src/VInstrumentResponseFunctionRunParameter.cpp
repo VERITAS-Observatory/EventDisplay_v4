@@ -9,6 +9,8 @@
 VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter()
 {
 	fFillingMode = 0;
+
+        fInstrumentEpoch = "NOT_SET";
 	
 	fNSpectralIndex = 1;
 	fSpectralIndexMin = 2.0;
@@ -427,13 +429,26 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
 		cout << "VInstrumentResponseFunctionRunParameter::readRunParameters() error reading simulation file: " << ifilename << endl;
 		return false;
 	}
+        // read instrument epoch from run parameters
+        VEvndispRunParameter *i_runPara = (VEvndispRunParameter*)iFile->Get("runparameterV2");
+        if( i_runPara )
+        {
+            fInstrumentEpoch = i_runPara->fInstrumentEpoch;
+        }
+        else
+        {
+            cout << "VInstrumentResponseFunctionRunParameter::readRunParameters() warning: cannot read instrument epoch from MC event file" << endl;
+            cout << "this might lead to a wrong choice in the gamma/hadron cuts - please check" << endl;
+            fInstrumentEpoch = "NOT_FOUND";
+        }
+        // get NSB (pedvar) level
 	VTableLookupRunParameter* fR = ( VTableLookupRunParameter* )iFile->Get( "TLRunParameter" );
 	if( !fR )
 	{
 		cout << "VInstrumentResponseFunctionRunParameter::readRunParameters() error: cannot find tablelookup run parameters in " << ifilename << endl;
 		return false;
 	}
-	if( !fIsotropicArrivalDirections )   //DS
+	if( !fIsotropicArrivalDirections )   
 	{
 		fze = fR->ze;
 		fnoise = fR->fNoiseLevel;
@@ -459,12 +474,12 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
 	}
 	else
 	{
-		if( fWobbleIsotropic != 0. )   //DS
+		if( fWobbleIsotropic != 0. )   
 		{
-			fXoff = fWobbleIsotropic; //DS
-			fYoff = 0.;  //DS
+			fXoff = fWobbleIsotropic; 
+			fYoff = 0.;  
 		}
-		else     //DS
+		else     
 		{
 			fXoff = 0.;
 			fYoff = 0.;
@@ -550,6 +565,14 @@ void VInstrumentResponseFunctionRunParameter::print()
 	{
 		cout << "  gamma/hadron probabilities: " << fGammaHadronProbabilityFile << endl;
 	}
+        if( fInstrumentEpoch != "NOT_SET" )
+        {
+            cout << "Instrument epoch: " << fInstrumentEpoch << endl;
+        }
+        else
+        {
+            cout << "Instrument epoch not set" << endl;
+        }
 	
 	cout << endl;
 	cout << "cuts: ";

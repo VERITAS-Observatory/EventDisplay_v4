@@ -166,6 +166,8 @@ bool writeTrainingFile( string iInputFile )
 	
 	// training trees (one per telescope type)
 	
+            int runNumber = -1;
+            int eventNumber = -1;
 	    float cen_x = -1.;
 	    float cen_y = -1.;
 	    float sinphi = -1.;
@@ -212,6 +214,8 @@ bool writeTrainingFile( string iInputFile )
 			iTreeTitle << "training tree for modified disp method (telescope type " << i_tel.TelType << ")";
 			fMapOfTrainingTree[i_tel.TelType] = new TTree( iTreeName.str().c_str(), iTreeTitle.str().c_str() );
 			
+                          fMapOfTrainingTree[i_tel.TelType]->Branch( "runNumber", &runNumber, "runNumber/I" );
+                          fMapOfTrainingTree[i_tel.TelType]->Branch( "eventNumber", &eventNumber, "eventNumber/I" );
 			  fMapOfTrainingTree[i_tel.TelType]->Branch( "cen_x", &cen_x, "cen_x/F" );
 			  fMapOfTrainingTree[i_tel.TelType]->Branch( "cen_y", &cen_y, "cen_y/F" );
 			  fMapOfTrainingTree[i_tel.TelType]->Branch( "sinphi", &sinphi, "sinphi/F" );
@@ -279,6 +283,8 @@ bool writeTrainingFile( string iInputFile )
 				continue;
 			}
 			
+                          runNumber = i_showerpars.runNumber;
+                          eventNumber = i_showerpars.eventNumber;
 			  cen_x = i_tpars.cen_x;
 			  cen_y = i_tpars.cen_y;
 			  sinphi = i_tpars.sinphi;
@@ -299,12 +305,12 @@ bool writeTrainingFile( string iInputFile )
 			  MCyoff = i_showerpars.MCyoff;
 			  MCxcore = i_showerpars.MCxcore;
 			  MCycore = i_showerpars.MCycore;
-			  Xoff = i_showerpars.Xoff[4];
-			  Yoff = i_showerpars.Yoff[4];
-			  Xcore = i_showerpars.Xcore[4];
-			  Ycore = i_showerpars.Ycore[4];
+			  Xoff = i_showerpars.Xoff[0];
+			  Yoff = i_showerpars.Yoff[0];
+			  Xcore = i_showerpars.Xcore[0];
+			  Ycore = i_showerpars.Ycore[0];
 			  LTrig = i_showerpars.LTrig;
-			  NImages = i_showerpars.NImages[4];
+			  NImages = i_showerpars.NImages[0];
 			  MCaz = i_showerpars.MCaz;
 			
 			// calculate disp (observe sign convention for MCyoff)
@@ -353,6 +359,9 @@ int main( int argc, char* argv[] )
 
         cout << "trainTMVAforAngularReconstruction (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
         cout << "------------------------------------" << endl;
+        cout << endl;
+        cout << "input evndisp file with training events: " << endl;
+        cout << fInputFile << endl;
         cout << endl;
 	
 	// output file

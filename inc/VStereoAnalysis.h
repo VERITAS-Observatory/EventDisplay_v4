@@ -7,6 +7,7 @@
 #include "VGammaHadronCuts.h"
 #include "VAnaSumRunParameter.h"
 #include "VASlalib.h"
+#include "VEvndispRunParameter.h"
 #include "VTimeMask.h"
 #include "VDeadTime.h"
 #include "VEffectiveAreaCalculator.h"
@@ -299,6 +300,7 @@ class VStereoAnalysis
 		TTree* fDataRunTree;
 		TTree* fDataFrogsTree;
 		TFile* fDataFile;
+                string fInstrumentEpoch;
 		
 		vector< VSkyCoordinates* > fAstro;        //!< Astronomical source parameters for this analysis
 		VGammaHadronCuts* fCuts;                  //!< Parameter Cuts

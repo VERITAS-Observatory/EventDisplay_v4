@@ -14,6 +14,7 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 	fDebug = false;
 	
 	fDataFile = 0;
+        fInstrumentEpoch = "NOT_SET";
 	fDirTot = iDirTot;
 	fDirTotRun = iDirRun;
 	bTotalAnalysisOnly = iTotalAnalysisOnly;
@@ -338,8 +339,18 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	
 	// get effective area time bin vector
 	int i_t_bins = int( ( f_t_in_s_max[irun] - f_t_in_s_min[irun] ) / fRunPara->fTimeIntervall + 0.5 );
-	// TIMEEFF GM: is i_t_bins always > 0?
-	double i_time_intervall = ( f_t_in_s_max[irun] - f_t_in_s_min[irun] ) / ( ( double )i_t_bins );
+	double i_time_intervall = 0.;
+        if( i_t_bins != 0. )
+        {
+            i_time_intervall = ( f_t_in_s_max[irun] - f_t_in_s_min[irun] ) / ( ( double )i_t_bins );
+        }
+        else
+        {
+            cout << "VStereoAnalysis::fillHistograms error: 0 time bins for effective area vector" << endl;
+            cout << "exiting..." << endl;
+            exit( EXIT_FAILURE );
+        }
+
 	
 	double iEffAreaTimeBin[i_t_bins + 1];
 	for( int i = 0; i < i_t_bins + 1; i++ )
@@ -1839,6 +1850,7 @@ void VStereoAnalysis::setCuts( VAnaSumRunParameterDataClass iL, int irun )
 		else
 		{
 			fCuts->setNTel( iL.fMaxTelID );
+                        fCuts->setInstrumentEpoch( fInstrumentEpoch );
 			fCuts->readCuts( iL.fCutFile );
 			fCuts->setTheta2Cut( iL.fSourceRadius );
 		}
@@ -1969,12 +1981,14 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
 		if( fDataFile->IsZombie() )
 		{
 			cout << "VStereoAnalysis::getDataFromFile() error opening file " << iFileName << endl;
-			exit( -1 );
+                        cout << "exiting..." << endl;
+			exit( EXIT_FAILURE );
 		}
 		fDataRunTree = ( TTree* )fDataFile->Get( "data" );
 		if( !fDataRunTree )
 		{
 			cout << "VStereoAnalysis::getDataFromFile() error: cannot find data tree in " << iFileName << endl;
+                        cout << "exiting..." << endl;
 			exit( -1 );
 		}
 		if( fRunPara->fFrogs == 1 )
@@ -1983,11 +1997,24 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
 			if( !fDataFrogsTree )
 			{
 				cout << "VStereoAnalysis::getDataFromFile() error: cannot find frogspars tree in " << iFileName << endl;
+                                cout << "exiting..." << endl;
 				exit( -1 );
 			}
 			fDataRunTree->AddFriend( fDataFrogsTree );
 		}
 		c = new CData( fDataRunTree );
+                // read current epoch from data file
+                VEvndispRunParameter *i_runPara = (VEvndispRunParameter*)fDataFile->Get("runparameterV2");
+                if( i_runPara )
+                {
+                    fInstrumentEpoch = i_runPara->fInstrumentEpoch;
+                }
+                else
+                {
+                    cout << "VStereoAnalysis::getDataFromFile() warning: epoch of current file cannot be determined " << endl;
+                    cout << "this might lead to a wrong choice in the gamma/hadron cuts - please check" << endl;
+                    fInstrumentEpoch = "NOT_FOUND";
+                }
 	}
 	return c;
 }
