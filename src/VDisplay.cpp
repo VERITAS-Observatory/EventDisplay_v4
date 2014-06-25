@@ -1495,13 +1495,13 @@ void VDisplay::setFADCText()
 			iChannel < fEventLoop->getAnalyzer()->getCurrentSumWindow().size() )
 	{
 		unsigned int iSumWindow = fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel];
-		if( iChannel < fEventLoop->getAnalyzer()->getPedvars( iSumWindow ).size() )
+		if( iChannel < fEventLoop->getAnalyzer()->getPedvars( iSumWindow ).size() && iChannel < fEventLoop->getAnalyzer()->getGains().size() )
 		{
 			if( iChannel < fEventLoop->getAnalyzer()->getPedvars( iSumWindow, true ).size() )
 			{
 				if( fEventLoop->getAnalyzer()->getPedvars( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel], fEventLoop->getHiLo()[iChannel] )[iChannel]  > 0. )
 				{
-					i_var = fEventLoop->getAnalyzer()->getSums()[iChannel]
+					i_var = fEventLoop->getAnalyzer()->getSums()[iChannel] * fEventLoop->getAnalyzer()->getGains()[iChannel]
 							/ fEventLoop->getAnalyzer()->getPedvars( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel], fEventLoop->getHiLo()[iChannel] )[iChannel];
 				}
 			}
