@@ -17,7 +17,7 @@ ACUT="EVNDISP.prod2.reconstruction.runparameter"
 # run options
 # OPT="-display=1 -useFixedThresholds -reconstructionparameter $ACUT -traceanalysis=0"
 # OPT="-display=1 -plotmethod=0 -ignoredstgains -reconstructionparameter $ACUT"
-OPT="-display=1 -plotmethod=0 -reconstructionparameter $ACUT"
+OPT="-display=1 -plotmethod=0 -reconstructionparameter $ACUT -averagetzerofiducialradius=0.5 -l2setspecialchannels nofile"
 #### time NN cleaning
 # ACUT="EVNDISP.prod2.TIMENEXTNEIGHBOUR.reconstruction.runparameter"
 # OPT="-display=1 -highres -plotmethod=0 -ignoredstgains -reconstructionparameter $ACUT -NNcleaninginputcard /lustre/fs9/group/cta/users/maierg/CTA/analysis/AnalysisData/TIMENEXTNEIGHBOUR/Evtdisp.rc.v2"
