@@ -2,6 +2,10 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140624 (GM)
+added epoch dependent cuts to effective area and
+anasum code
+
 * 20140620 (GM)
 disps are now in $VERITAS_EVNDISP_AUX_DIR/DISP_BDTs
 

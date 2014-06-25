@@ -471,7 +471,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 					cout << "current telescope configuration ( " << fNTel << " telescopes)" << endl;
 					continue;
 				}
-				// calculate how many possible telescope combinations exist
+				// calculate how many possible telescope combinations exist (16 for 4 telescopes)
 				if( fNLTrigs == 0 )
 				{
 					int num_ltrigs = 0;
@@ -486,22 +486,34 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						fCut_ImgSelect.push_back( 1 );
 					}
 				}
-				
+			        // telescope combination	
 				is_stream >> temp;
 				int index = ( atoi( temp.c_str() ) );
+                                // on = 0 or off = 1
 				is_stream >> temp;
-				if( index < 0 )
-				{
-					for( unsigned int i = 0; i < fCut_ImgSelect.size(); i++ )
-					{
-						fCut_ImgSelect[i] = atoi( temp.c_str() );
-					}
-				}
-				else if( index < ( int )fCut_ImgSelect.size() )
-				{
-					fCut_ImgSelect[index] = atoi( temp.c_str() );
-				}
-				
+                                int i_select = atoi( temp.c_str() );
+                                // check epoch
+                                bool i_currentEpoch = true;
+                                if( !is_stream.eof() )
+                                {
+                                    is_stream >> temp;
+                                    if( temp != fInstrumentEpoch ) i_currentEpoch = false;
+                                }
+                                // set telescope combinations on or off
+                                if( i_currentEpoch )
+                                {
+                                    if( index < 0 )
+                                    {
+                                            for( unsigned int i = 0; i < fCut_ImgSelect.size(); i++ )
+                                            {
+                                                    fCut_ImgSelect[i] = i_select;
+                                            }
+                                    }
+                                    else if( index < ( int )fCut_ImgSelect.size() )
+                                    {
+                                            fCut_ImgSelect[index] = i_select;
+                                    }
+			       }	
 			}
 			// probability cut variables (e.g. random forest)
 			else if( iCutVariable == "RFthresh" || iCutVariable == "Probthresh" )
