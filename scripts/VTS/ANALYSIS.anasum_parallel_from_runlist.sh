@@ -57,25 +57,39 @@ BACKGND=$4
 [[ "$7" ]] && SIMTYPE=$7 || SIMTYPE="GRISU"
 
 # cut definitions (note: VX to be replaced later in script)
-if [[ $CUTS == *super* ]]; then
-    CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-SuperSoftSpectrum.dat"
-    EFFAREA="effArea-${SIMTYPE}-140608-Cut-NTel2-PointSource-SuperSoftSpectrum-VX-ATM$ATMO-TX.root"
+if [[ $CUTS == *superhard* ]]; then
+    CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-SuperHard.dat"
+    EFFAREA="effArea-${SIMTYPE}-140619-Cut-NTel2-PointSource-SuperSoftSpectrum-VX-ATM$ATMO-TX.root"
     RADACC="radialAcceptance-d20131115-cut-N2-Point-005CU-SuperSoft-VX-T1234.root"
+elif [[ $CUTS == *super* ]]; then
+    CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-SuperSoftSpectrum.dat"
+    EFFAREA="effArea-${SIMTYPE}-140619-Cut-NTel2-PointSource-SuperSoftSpectrum-VX-ATM$ATMO-TX.root"
+    RADACC="radialAcceptance-d20131115-cut-N2-Point-005CU-SuperSoft-VX-T1234.root"
+#    EFFAREA="effArea-CARE_June1409_UV-140611-Cut-NTel2-PointSource-SuperSoftSpectrum-V6-ATM21-T1234.root"
 elif [[ $CUTS == *open* ]]; then
-    CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-Open.dat"
-    EFFAREA="effArea-${SIMTYPE}-140608-Cut-NTel2-PointSource-Open-VX-ATM$ATMO-TX.root"
+    CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-ModerateOpen.dat"
+    EFFAREA="effArea-${SIMTYPE}-140619-Cut-NTel2-PointSource-Open-VX-ATM$ATMO-TX.root"
     RADACC="radialAcceptance-d20131115-cut-N2-Point-005CU-Open-VX-T1234.root"
 elif [[ $CUTS == *soft* ]]; then
-    CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-SoftSpectrum.dat"
-    EFFAREA="effArea-${SIMTYPE}-140608-Cut-NTel3-PointSource-SoftSpectrum-VX-ATM$ATMO-TX.root"
+#    CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-SoftSpectrum.dat"
+    CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-SoftSpectrum.dat"
+    EFFAREA="effArea-${SIMTYPE}-140619-Cut-NTel3-PointSource-SoftSpectrum-VX-ATM$ATMO-TX.root"
     RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Soft-VX-T1234.root"
-elif [[ $CUTS = *moderate* ]]; then
-    CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-ModerateSpectrum.dat"
-    EFFAREA="effArea-${SIMTYPE}-140608-Cut-NTel3-PointSource-ModerateSpectrum-VX-ATM$ATMO-TX.root"
+elif [[ $CUTS = *moderate2tel* ]]; then
+    CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat"
+    EFFAREA="effArea-${SIMTYPE}-140619-Cut-NTel3-PointSource-ModerateSpectrum-VX-ATM$ATMO-TX.root"
     RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-V5-T1234.root"
-elif [[ $CUTS = *hard* ]]; then
-    CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-HardSpectrum.dat"
-    EFFAREA="effArea-${SIMTYPE}-140608-Cut-NTel3-PointSource-HardSpectrum-VX-ATM$ATMO-TX.root"
+elif [[ $CUTS = *moderate3tel* ]]; then
+    CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-Moderate.dat"
+    EFFAREA="effArea-${SIMTYPE}-140619-Cut-NTel3-PointSource-ModerateSpectrum-VX-ATM$ATMO-TX.root"
+    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-V5-T1234.root"
+elif [[ $CUTS = *hard2tel* ]]; then
+    CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard.dat"
+    EFFAREA="effArea-${SIMTYPE}-140619-Cut-NTel3-PointSource-HardSpectrum-VX-ATM$ATMO-TX.root"
+    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-V5-T1234.root"
+elif [[ $CUTS = *hard3tel* ]]; then
+    CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard.dat"
+    EFFAREA="effArea-${SIMTYPE}-140619-Cut-NTel3-PointSource-HardSpectrum-VX-ATM$ATMO-TX.root"
     RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-V5-T1234.root"
 else
     echo "ERROR: unknown cut definition: $CUTS"

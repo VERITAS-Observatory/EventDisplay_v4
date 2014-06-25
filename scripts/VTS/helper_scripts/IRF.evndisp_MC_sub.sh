@@ -37,7 +37,6 @@ fi
 
 # detector configuration and cuts
 ACUT="EVNDISP.reconstruction.runparameter"
-ACUT="EVNDISP.reconstruction.DISP.runparameter"
 DEAD="EVNDISP.validchannels.dat"
 PEDLEV="16."
 # LOWPEDLEV="8."

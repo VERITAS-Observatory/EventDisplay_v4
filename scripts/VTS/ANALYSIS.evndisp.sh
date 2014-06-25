@@ -2,7 +2,7 @@
 # script to run eventdisplay analysis for VTS data
 
 # qsub parameters
-h_cpu=41:29:00; h_vmem=2000M; tmpdir_size=10G
+h_cpu=11:59:00; h_vmem=2000M; tmpdir_size=25G
 
 if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 # begin help message

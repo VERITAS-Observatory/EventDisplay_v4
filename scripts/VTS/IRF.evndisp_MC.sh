@@ -115,7 +115,7 @@ elif [[ ${#INT_WOBBLE} -lt 3 ]]; then
 fi
 
 # make run script
-FSCRIPT="$LOGDIR/evn-$SIMTYPE-$ZA-$WOBBLE-$NOISE-$EPOCH-ATM$ATM"
+FSCRIPT="$LOGDIR/evn-$EPOCH-$SIMTYPE-$ZA-$WOBBLE-$NOISE-ATM$ATM"
 sed -e "s|DATADIR|$SIMDIR|" \
     -e "s|RUNNUMBER|$RUNNUM|" \
     -e "s|ZENITHANGLE|$ZA|" \

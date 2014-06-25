@@ -51,9 +51,9 @@ OPT="-display=1 -runnumber=$RUNNUM -plotmethod=0 -sourcetype=2 -pedestalseed=102
 # DEAD="deadChannelDefinition_VERITAS_MC_d20101110.dat"
 
 # array analysis cuts
-# ACUTS="array_analysis_cuts_VERITAS_d20101110.dat"
+ACUT="EVNDISP.reconstruction.runparameter.noDISP"
 
 # $EVNDISPSYS/bin/evndisp -sourcefile $SIMFILE -pedestalfile $NOISE -deadchannelfile $DEAD -pedestalDefaultPedestal=$PEDLEV -arraycuts $ACUTS $OPT
-$EVNDISPSYS/bin/evndisp -nodp2005 -donotusedbinfo -sourcefile $SIMFILE -pedestalfile $NOISEFILE -pedestalDefaultPedestal=$PEDLEV $OPT
+$EVNDISPSYS/bin/evndisp -nodp2005 -donotusedbinfo -sourcefile $SIMFILE -pedestalfile $NOISEFILE -pedestalDefaultPedestal=$PEDLEV $OPT -reconstructionparameter $ACUT
 
 exit
