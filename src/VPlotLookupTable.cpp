@@ -128,18 +128,18 @@ TH2F* VPlotLookupTable::divide2DHistograms( TH2F* h1, TH2F* h2, char* hname )
 }
 
 
-void VPlotLookupTable::plotLookupTables( unsigned int iSetID )
+void VPlotLookupTable::plotLookupTables( unsigned int iSetID, double i_ymin )
 {
 	if( iSetID >= fLookupTableData.size() )
 	{
 		cout << "VPlotLookupTable::plotLookupTables error: setID to large (should be <" << fLookupTableData.size() << endl;
 		return;
 	}
-	plot2DHistogram( fLookupTableData[iSetID]->hmedian, iSetID, "median", 10, -999., -999., ( fLookupTableData[iSetID]->fLookupTable == "energySR" ) );
-	plot2DHistogram( fLookupTableData[iSetID]->hmean,   iSetID, "mean", 100, -999., -999., ( fLookupTableData[iSetID]->fLookupTable == "energySR" ) );
-	plot2DHistogram( fLookupTableData[iSetID]->hmpv,    iSetID, "mpv", 200, -999., -999., ( fLookupTableData[iSetID]->fLookupTable == "energySR" ) );
-	plot2DHistogram( fLookupTableData[iSetID]->hsigma,  iSetID, "sigma", 300, -999., -999., false );
-	plot2DHistogram( fLookupTableData[iSetID]->hnevents, iSetID, "number of events", 400, -999., -999., true );
+	plot2DHistogram( fLookupTableData[iSetID]->hmedian, iSetID, "median", 10, i_ymin, -999., ( fLookupTableData[iSetID]->fLookupTable == "energySR" ) );
+	plot2DHistogram( fLookupTableData[iSetID]->hmean,   iSetID, "mean", 100, i_ymin, -999., ( fLookupTableData[iSetID]->fLookupTable == "energySR" ) );
+	plot2DHistogram( fLookupTableData[iSetID]->hmpv,    iSetID, "mpv", 200, i_ymin, -999., ( fLookupTableData[iSetID]->fLookupTable == "energySR" ) );
+	plot2DHistogram( fLookupTableData[iSetID]->hsigma,  iSetID, "sigma", 300, i_ymin, -999., false );
+	plot2DHistogram( fLookupTableData[iSetID]->hnevents, iSetID, "number of events", 400, i_ymin, -999., true );
 	
 	// divide mean by median
 	if( fLookupTableData[iSetID]->hmedian && fLookupTableData[iSetID]->hmean )

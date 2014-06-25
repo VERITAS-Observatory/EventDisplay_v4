@@ -76,7 +76,7 @@ class VPlotLookupTable : public VPlotUtilities, public VHistogramUtilities
 		bool  addLookupTable( string iLookupTableFile, string iTable = "mscw", int ze = 20, int az = 0, int telID = 1, int noise = 524, int woff = 500 );
 		
 		void  printLookupTables();
-		void  plotLookupTables( unsigned int iSetID = 0 );
+		void  plotLookupTables( unsigned int iSetID = 0, double i_ymin = -999. );
 		void  plotRelativeTables( unsigned int iSetID1, unsigned int iSetID2, double iMin = 0.95, double iMax = 1.05 );
 		void  setPlottingDistanceAxis( double imin = 0., double imax = 600. )
 		{
