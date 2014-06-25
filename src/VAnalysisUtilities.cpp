@@ -260,7 +260,7 @@ TGraph* VAnalysisUtilities::calcCumulativeSig( int iTot )
 	double cum_alpha = 0;
 	double cum_t = 0;
 	int cum_N = 0;
-	TGraph* gCumSig = new TGraph( nentries );
+	TGraph* gCumSig = new TGraph( 0 );
 	
 	for( int i = 0; i < nentries; i++ )
 	{
@@ -272,10 +272,10 @@ TGraph* VAnalysisUtilities::calcCumulativeSig( int iTot )
 			// cumulative significance vs time
 			cum_Non += ctRunSum->NOn;
 			cum_Noff += ctRunSum->NOff;
-			cum_alpha += ctRunSum->OffNorm;
+			cum_alpha += ctRunSum->OffNorm * ctRunSum->NOff;
 			cum_t += ctRunSum->tOn;
 			cum_N++;
-			gCumSig->SetPoint( cum_N, cum_t / 60, VStatistics::calcSignificance( cum_Non, cum_Noff, cum_alpha / cum_N ) );
+			gCumSig->SetPoint( cum_N, cum_t / 60, VStatistics::calcSignificance( cum_Non, cum_Noff, cum_alpha / cum_Noff ) );
 			
 		}
 	}

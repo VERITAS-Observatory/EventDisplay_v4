@@ -100,7 +100,8 @@ int main( int argc, char* argv[] )
 		ofstream fResults;
 		fResults.open( ( fOUTFile + ".dat" ).c_str() );
 		if( fResults && c )
-		{
+		{	
+			double tOn_total = 0;
 			for( int i = 0; i < c->fChain->GetEntries(); i++ )
 			{
 				c->GetEntry( i );
@@ -169,6 +170,8 @@ int main( int argc, char* argv[] )
 					fResults << setw( 12 ) << left << iFluxUL ;
 					fResults << setw( 14 ) << left << iFluxULinCU ;
 					fResults << endl;
+					tOn_total += c->tOn/60.0*(1.0-c->DeadTimeFracOn) ;
+ 
 				}
 				else
 				{
@@ -183,9 +186,9 @@ int main( int argc, char* argv[] )
 					fResults << setw( 9 ) << left << 0.0 ;
 					fResults << setw( 12 ) << left << c->NOn ;
 					fResults << setw( 12 ) << left << c->NOff ;
-					fResults << setw( 18 ) << left << c->tOn / 60.*( 1. - c->DeadTimeFracOn )  ;
+					fResults << setw( 18 ) << left << tOn_total ;
 					fResults << setw( 12 ) << left << c->Signi ;
-					fResults << setw( 8 ) << left << 0.0 ;
+					fResults << setw( 8 ) << left <<  ( c->tOn == 0 ? 0.0 : 1.0 - tOn_total / c->tOn );
 					fResults << setw( 15 ) << left << c->Rate ;
 					fResults << setw( 15 ) << left << c->RateE ;
 					fResults << setw( 12 ) << left << iFlux ;
