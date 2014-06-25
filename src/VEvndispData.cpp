@@ -527,31 +527,31 @@ void VEvndispData::printDeadChannels( bool iLowGain )
 					cout << fDeadChannelText[j];
 					if( j == 5 || j == 7 )
 					{
-						cout << " (rel gain: " << getGains( iLowGain )[j] << ")";
+						cout << " (rel gain: " << getGains( iLowGain )[i] << ")";
 					}
 					if( j == 6 )
 					{
-						cout << " (gainvar: " << getGainvars( iLowGain )[j] << ")";
+						cout << " (gainvar: " << getGainvars( iLowGain )[i] << ")";
 					}
 					if( j == 1 )
 					{
-						cout << " (ped: " << getPeds( iLowGain )[j] << ")";
+						cout << " (ped: " << getPeds( iLowGain )[i] << ")";
 					}
 					if( j == 2 || j == 3 || j == 4 )
 					{
-						cout << " (pedvar: " << getPedvars( ( bool )iLowGain, getSumWindow() )[ j ] << ")";
+						cout << " (pedvar: " << getPedvars( ( bool )iLowGain, getSumWindow() )[ i ] << ")";
 					}
 					if( j == 13 )
 					{
-						cout << " (" << getL1Rate( j ) << " Hz)";
+						cout << " (" << getL1Rate(i) << " Hz)";
 					}
 					if( j == 14 )
 					{
-						cout << " (" << getHV( j ) << " V)";
+						cout << " (" << getHV(i) << " V)";
 					}
 					if( j == 15 )
 					{
-						cout << " (" << getCurrent( j ) << " muA)";
+						cout << " (" << getCurrent(i) << " muA)";
 					}
 					cout << "\t" ;
 				}
