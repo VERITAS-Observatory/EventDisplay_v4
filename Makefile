@@ -1520,9 +1520,10 @@ $(ctapara):
 # VTS.effectiveareas (required)
 # VTS.radialacceptances (required)
 # VTS.dispBDTs (optional)
+# VTS.Model3D (optional)
 #
 
-VTS.auxfiles:	$(vtspara).runfiles.tar.gz $(vtspara).calibration.tar.gz $(vtspara).lookuptables.tar.gz $(vtspara).effectiveareas.tar.gz $(vtspara).radialacceptances.tar.gz
+VTS.auxfiles:	$(vtspara).runfiles.tar.gz $(vtspara).calibration.tar.gz $(vtspara).lookuptables.tar.gz $(vtspara).effectiveareas.tar.gz $(vtspara).radialacceptances.tar.gz $(vtspara).dispBDTs.tar.gz $(vtspara).Model3D.tar.gz
 
 VTS.runfiles:	$(vtspara).runfiles.tar.gz
 VTS.calibration:	$(vtspara).calibration.tar.gz
@@ -1530,6 +1531,7 @@ VTS.lookuptables:	$(vtspara).lookuptables.tar.gz
 VTS.effectiveareas:	$(vtspara).effectiveareas.tar.gz
 VTS.radialacceptances:	$(vtspara).radialacceptances.tar.gz
 VTS.dispBDTs:	$(vtspara).dispBDTs.tar.gz
+VTS.Model3D:	$(vtspara).Model3D.tar.gz
 
 ######
 # VTS runparameter files
@@ -1560,6 +1562,7 @@ $(vtspara).runfiles.tar.gz:
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.global.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.Hough.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter.noDISP $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.SW18_noDoublePass.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.LGCalibration.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.specialchannels.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
@@ -1651,6 +1654,19 @@ $(vtspara).dispBDTs.tar.gz:
 #	make tar file
 	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).dispBDTs.tar.gz . && cd ..
 	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
+
+######
+# VTS Model3D files
+
+$(vtspara).Model3D.tar.gz:
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).Model3D.tar.gz  >/dev/null 2>&1
+	rm -rf $(distdir) >/dev/null 2>&1
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Model3D
+	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/Model3D/*.root $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Model3D/
+#	make tar file
+	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).Model3D.tar.gz . && cd ..
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
+
 
 
 ###############################################################################################################################
