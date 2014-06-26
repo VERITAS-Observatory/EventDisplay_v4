@@ -64,8 +64,8 @@ void merge( string ifile, char* outputfile, bool bFull = false )
 		f.SetBranchStatus( "e0", 1 );
 		f.SetBranchStatus( "eff", 1 );
 		// errors not needed for standard analysis
-		//        f.SetBranchStatus( "seff_L", 1 );
-		//        f.SetBranchStatus( "seff_U", 1 );
+		f.SetBranchStatus( "seff_L", 1 );
+		f.SetBranchStatus( "seff_U", 1 );
 		f.SetBranchStatus( "Rec_nbins", 1 );
 		f.SetBranchStatus( "Rec_e0", 1 );
 		f.SetBranchStatus( "Rec_eff", 1 );
@@ -135,11 +135,11 @@ void merge( string ifile, char* outputfile, bool bFull = false )
 	// merge all log files
 	if( ifile.find( ".root" ) != string::npos )
 	{
-		sprintf( hname, "cat %s*.log > %s.log", ifile.substr( ifile.size() - 5, ifile.size() ).c_str(), outputfile );
+		sprintf( hname, "cat %s*.log > %s.combine.log", ifile.substr( 0, ifile.size()-5 ).c_str(), outputfile );
 	}
 	else
 	{
-		sprintf( hname, "cat %s*.log > %s.log", ifile.c_str(), outputfile );
+		sprintf( hname, "cat %s*.log > %s.combine.log", ifile.c_str(), outputfile );
 	}
 	cout << "merge log files into " << hname << endl;
 	system( hname );
@@ -164,7 +164,7 @@ int main( int argc, char* argv[] )
 	if( argc < 4 )
 	{
 		cout << endl;
-		cout << "combineEffectiveAreas <effective area files> <combined file> <write all histograms (default=false)>" << endl;
+		cout << "combineEffectiveAreas <effective area files> <combined file> <write all histograms (default value is=false)>" << endl;
 		cout << endl;
 		cout << "   <effective area files>    without .root suffix (e.g. effArea*. Note need of \"...\")" << endl;
 		cout << endl;
