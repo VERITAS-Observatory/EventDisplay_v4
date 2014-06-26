@@ -9,14 +9,14 @@ if [ $# -lt 2 ]; then
 echo "
 MSCW_ENERGY data analysis: submit jobs from a simple run list
 
-ANALYSIS.mscw_energy.sh <runlist> <table file> [evndisp directory] [Rec ID] [output directory]
+ANALYSIS.mscw_energy.sh <table file> <runlist> [evndisp directory] [Rec ID] [output directory]
 
 required parameters:
 
+    <table file>            mscw_energy lookup table file
+
     <runlist>               simple run list with one run number per line
     
-    
-    <table file>            mscw_energy lookup table file
     
 optional parameters:
     
@@ -48,8 +48,8 @@ bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
 exec 5>&1
 
 # Parse command line arguments
-RLIST=$1
-TABFILE=$2
+RLIST=$2
+TABFILE=$1
 TABFILE=${TABFILE%%.root}.root
 [[ "$3" ]] && INPUTDIR=$3 || INPUTDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/"
 [[ "$4" ]] && ID=$4 || ID=0
