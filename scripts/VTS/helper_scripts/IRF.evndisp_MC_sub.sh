@@ -37,6 +37,7 @@ fi
 
 # detector configuration and cuts
 ACUT="EVNDISP.reconstruction.runparameter"
+# ACUT="EVNDISP.reconstruction.runparameter.noDISP"
 DEAD="EVNDISP.validchannels.dat"
 PEDLEV="16."
 # LOWPEDLEV="8."
@@ -178,7 +179,8 @@ fi
 if [[ $USEFROGS == "1" ]]; then
     FROGS="-frogs $MSCWDIR/$MSCWFILE -frogid 0 -nevents=$NEVENTS -firstevent=$FIRSTEVENT"
 fi
-MCOPT=" -runnumber=$RUNNUM -sourcetype=2 -epoch $EPOCH -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory $ODIR"
+# run options
+MCOPT=" -runnumber=$RUNNUM -sourcetype=2 -epoch $EPOCH -camera=$CFG -reconstructionparameter $ACUT -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory $ODIR"
 # special options for GRISU
 if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     MCOPT="$MCOPT -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
