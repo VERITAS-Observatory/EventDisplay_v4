@@ -13,7 +13,14 @@ mkdir -p $ODIR
 # Write histograms?
 WRITEHISTOS="false"
 
+# keep a list of all input files for checks
+rm -f $ODIR/$OFILE.list
+ls -1 $EAFILES > $ODIR/$OFILE.list
+
 # combine effective areas
 $EVNDISPSYS/bin/combineEffectiveAreas "$EAFILES" $ODIR/$OFILE $WRITEHISTOS &> $ODIR/$OFILE.log 
+
+# zip lot files
+bzip2 $ODIR/$OFILE.combine.log
 
 exit
