@@ -35,6 +35,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
 		
 		string          fCutFileName;
                 string          fInstrumentEpoch;
+                vector< unsigned int > fTelToAnalyse;             // telescopes used in analysis (optional, not always filled)
 		int             fGammaHadronCutSelector;
 		int             fDirectionCutSelector;
 		
@@ -96,7 +97,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
 		bool                  readRunParameterFromTextFile( string iFile );
 		bool                  testRunparameters();
 		
-		ClassDef( VInstrumentResponseFunctionRunParameter, 13 );
+		ClassDef( VInstrumentResponseFunctionRunParameter, 14 );
 };
 
 #endif

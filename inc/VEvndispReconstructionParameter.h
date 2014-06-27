@@ -68,7 +68,6 @@ class VEvndispReconstructionParameter : public TNamed
 		vector< vector< double > > fMCEnergy_linTeV_max;
 		
 		vector< bool > fUseEventdisplayPointing;
-		// C. Duke: 20oct06  added vector to store select image results
 		vector< vector< bool > > fLocalUseImage;
 		
 		vector< string > fMLPFileName;

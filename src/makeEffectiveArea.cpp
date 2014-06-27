@@ -106,6 +106,7 @@ int main( int argc, char* argv[] )
 	fCuts->initialize();
 	fCuts->setNTel( fRunPara->telconfig_ntel, fRunPara->telconfig_arraycentre_X, fRunPara->telconfig_arraycentre_Y );
         fCuts->setInstrumentEpoch( fRunPara->fInstrumentEpoch );
+        fCuts->setTelToAnalyze( fRunPara->fTelToAnalyse );
 	if( !fCuts->readCuts( fRunPara->fCutFileName, 2 ) )
 	{
 		exit( -1 );

@@ -2,6 +2,10 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140627 (GM)
+find telescope used in analysis and allow gamma/hadrons
+cuts which depend on these combinations
+
 * 20140624 (GM)
 added epoch dependent cuts to effective area and
 anasum code

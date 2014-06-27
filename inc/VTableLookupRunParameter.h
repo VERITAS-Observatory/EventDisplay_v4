@@ -4,6 +4,7 @@
 #define VTABLELOOKUPRUNPARAMTER_H
 
 #include <TChain.h>
+#include <TFile.h>
 #include <TMath.h>
 #include <TNamed.h>
 #include <TSystem.h>
@@ -14,6 +15,8 @@
 #include <string>
 #include <vector>
 
+#include "VEvndispRunParameter.h"
+#include "VEvndispReconstructionParameter.h"
 #include "VGlobalRunParameter.h"
 
 using namespace std;
@@ -24,6 +27,7 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 	
 		bool fillInputFile_fromList( string iList );
 		void printCTA_MC_offaxisBins();
+                bool readTelescopeToAnalyze( string iFile );
 		void setCTA_MC_offaxisBins();
 		
 	public:
@@ -62,6 +66,8 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		double fSpectralIndex;
 		int fWobbleOffset;
 		int fNoiseLevel;
+
+                vector< unsigned int > fTelToAnalyse;             // telescopes used in analysis
 		
 		unsigned int fTableFillingCut_NImages_min;
 		double       fTableFillingCut_WobbleCut_max;
@@ -90,6 +96,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		void print( int iB = 0 );
 		void printHelp();
 		
-		ClassDef( VTableLookupRunParameter, 23 );
+		ClassDef( VTableLookupRunParameter, 24 );
 };
 #endif

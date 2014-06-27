@@ -493,14 +493,23 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				is_stream >> temp;
                                 int i_select = atoi( temp.c_str() );
                                 // check epoch
-                                bool i_currentEpoch = true;
+                                bool i_useTheseCuts = true;
                                 if( !is_stream.eof() )
                                 {
                                     is_stream >> temp;
-                                    if( temp != fInstrumentEpoch ) i_currentEpoch = false;
+                                    if( temp != fInstrumentEpoch ) i_useTheseCuts = false;
+                                }
+                                // check telescope combinations
+                                if( !is_stream.eof() )
+                                {
+                                   is_stream >> temp;
+                                   if( fTelToAnalyze.size() > 0 && temp != getTelToAnalyzeString() )
+                                   {
+                                      i_useTheseCuts = false;
+                                   }
                                 }
                                 // set telescope combinations on or off
-                                if( i_currentEpoch )
+                                if( i_useTheseCuts )
                                 {
                                     if( index < 0 )
                                     {
@@ -2870,53 +2879,6 @@ bool VGammaHadronCuts::applyPhaseCut( int i )
 	
 }
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cut on number of images per telescope type depend
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-VNTelTypeCut::VNTelTypeCut()
-{
-	fNTelType_min = 0;
-}
-
-
-bool VNTelTypeCut::test( CData* c )
-{
-	if( !c )
-	{
-		return false;
-	}
-	
-	unsigned int ntel_type = 0;
-	for( unsigned int i = 0; i < fTelType_counter.size(); i++ )
-	{
-		if( ( int )fTelType_counter[i] < c->NTtype )
-		{
-			ntel_type += c->NImages_Ttype[fTelType_counter[i]];
-		}
-	}
-	// OBS! >=
-	if( ntel_type >= fNTelType_min )
-	{
-		return true;
-	}
-	
-	return false;
-}
-
-void VNTelTypeCut::print()
-{
-	cout << "telescope type cut: mintel >= " << fNTelType_min << " for type(s) ";
-	for( unsigned int i = 0; i < fTelType_counter.size(); i++ )
-	{
-		cout << fTelType_counter[i] << " ";
-	}
-	cout << endl;
-}
-
 //////////////////////
 // FROGS
 
@@ -3098,3 +3060,63 @@ double VGammaHadronCuts::getMeanGoodness( double G0, double G1, double G2, doubl
 	}
 	return sum / N;
 }
+
+string VGammaHadronCuts::getTelToAnalyzeString()
+{
+   stringstream iTemp;
+   sort( fTelToAnalyze.begin(), fTelToAnalyze.end() );
+   for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ )
+   {
+         iTemp << fTelToAnalyze[i]+1;
+   }
+
+   return iTemp.str();
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cut on number of images per telescope type depend
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+VNTelTypeCut::VNTelTypeCut()
+{
+	fNTelType_min = 0;
+}
+
+
+bool VNTelTypeCut::test( CData* c )
+{
+	if( !c )
+	{
+		return false;
+	}
+	
+	unsigned int ntel_type = 0;
+	for( unsigned int i = 0; i < fTelType_counter.size(); i++ )
+	{
+		if( ( int )fTelType_counter[i] < c->NTtype )
+		{
+			ntel_type += c->NImages_Ttype[fTelType_counter[i]];
+		}
+	}
+	// OBS! >=
+	if( ntel_type >= fNTelType_min )
+	{
+		return true;
+	}
+	
+	return false;
+}
+
+void VNTelTypeCut::print()
+{
+	cout << "telescope type cut: mintel >= " << fNTelType_min << " for type(s) ";
+	for( unsigned int i = 0; i < fTelType_counter.size(); i++ )
+	{
+		cout << fTelType_counter[i] << " ";
+	}
+	cout << endl;
+}
+

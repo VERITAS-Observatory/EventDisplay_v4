@@ -454,6 +454,8 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
 		fnoise = fR->fNoiseLevel;
 	}
 	fpedvar = fR->meanpedvars;
+        // get list of telescopes to be analyzed
+        fTelToAnalyse = fR->fTelToAnalyse;
 	
 	// get wobble offset from first event in file
 	// (should not change during a simulation run!)

@@ -333,18 +333,82 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 	// set output file name (mainly for VTS analysis with a single inputfile)
 	if( outputfile.size() == 0 && inputfile.size() == 1 )
 	{
+                // wildcards for input file
 		if( inputfile[0].find( "*" ) < inputfile[0].size() )
 		{
 			outputfile = "mscw.root";
 		}
+                // no wildcards for input file
 		else
 		{
 			outputfile = inputfile[0].substr( 0, inputfile[0].rfind( "." ) );
 			outputfile += ".mscw.root";
 		}
 	}
+        // for VTS analysis with a single inputfile: get telescope combinations
+        if( inputfile.size() == 1 && inputfile[0].find( "*" ) == string::npos )
+        {
+            readTelescopeToAnalyze( inputfile[0] );
+        }
 	
 	return true;
+}
+
+/*
+ * read telescope combination for analysis
+ *
+ * this works only for a small number of telescopes (<10)
+ */
+bool VTableLookupRunParameter::readTelescopeToAnalyze( string iFile )
+{
+    fTelToAnalyse.clear();
+
+    TFile iF( iFile.c_str() );
+    if( iF.IsZombie() )
+    {
+        cout << "VTableLookupRunParameter::readTelescopeToAnalyze warning: could not open input file to read run parameters" << endl;
+        cout << "\t " << iFile.c_str() << endl;
+        return false;
+    }
+
+// read telescopes to analyse from eventdisplay run parameter list
+    vector< unsigned int > iRunParT;
+    VEvndispRunParameter *iPar = (VEvndispRunParameter*)iF.Get( "runparameterV2" );
+    if( iPar )
+    {
+        iRunParT = iPar->fTelToAnalyze;
+    }
+    else
+    {
+       cout << "VTableLookupRunParameter::readTelescopeToAnalyze warning: could not find evndisp run parameters (runparameterV2)" << endl;
+       return false;
+    }
+// cross check if one of the has been switched off in the analysis
+    VEvndispReconstructionParameter *iA = (VEvndispReconstructionParameter*)iF.Get( "EvndispReconstructionParameter" );  
+    if( iA && iPar )
+    {
+        // this works only if number of telescopes = number of telescope types
+        if( rec_method < (int)iA->fLocalUseImage.size() && iPar->fNTelescopes == iA->fLocalUseImage[rec_method].size() )
+        {
+            for( unsigned int i = 0; i < iRunParT.size(); i++ )
+            {
+                if( iRunParT[i] < iA->fLocalUseImage[rec_method].size() && iA->fLocalUseImage[rec_method][iRunParT[i]] )
+                {
+                    fTelToAnalyse.push_back( iRunParT[i] );
+                }
+            } 
+            cout << "Following telescopes are included in the analysis: ";
+            for( unsigned int i = 0; i < fTelToAnalyse.size(); i++ ) cout << " T" << fTelToAnalyse[i]+1;
+            cout << endl;
+        }
+    }
+    else
+    {
+        cout << "VTableLookupRunParameter::readTelescopeToAnalyze warning: could not find evndisp reconstruction parameters (EvndispReconstructionParameter)" << endl;
+        return false;
+    }
+
+    return true;
 }
 
 
@@ -500,7 +564,7 @@ bool VTableLookupRunParameter::fillInputFile_fromList( string iList )
 		cout << "VTableLookupRunParameter::fillInputFile_fromList() error reading list of input files: " << endl;
 		cout << iList << endl;
 		cout << "exiting..." << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	cout << "VTableLookupRunParameter::fillInputFile_fromList() reading input file list: " << endl;
 	cout << iList << endl;

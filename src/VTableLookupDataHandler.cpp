@@ -52,7 +52,7 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	fEventCounter = 0;
 	
 	fEventWeight = 1.;
-	fIsModel3D = false; //(JG)
+	fIsModel3D = false;
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	// weighting of energy spectrum
@@ -382,7 +382,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 	fXoff_derot = fshowerpars->XoffDeRot[fMethod];
 	fYoff_derot = fshowerpars->YoffDeRot[fMethod];
 	
-	// fill Model3D parameters (JG)
+	// fill Model3D parameters
 	if( fIsModel3D )
 	{
 		fSmax3D = fmodel3Dpars->Smax3D;
@@ -1231,7 +1231,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 		sprintf( iTT, "Fitstat[%d]/I", fNTel );
 		fOTree->Branch( "Fitstat", fFitstat, iTT );
 	}
-	// Model3D parameters (JG)
+	// Model3D parameters
 	if( fIsModel3D )
 	{
 		fOTree->Branch( "Smax3D", &fSmax3D, "Smax3D/D" );
@@ -2032,7 +2032,7 @@ void VTableLookupDataHandler::resetAll()
 	fMC_distance_to_cameracenter_min = 0.;
 	fMC_distance_to_cameracenter_max = 1.e10;
 	
-	// Model3D parameters (JG)
+	// Model3D parameters
 	fSmax3D = 0;
 	fsigmaL3D = 0;
 	fsigmaT3D = 0;
@@ -2343,31 +2343,8 @@ double* VTableLookupDataHandler::getDistance( ULong64_t iTelType )
 	return fdist_telType;
 }
 
-/*
-double* VTableLookupDataHandler::getMCDistanceToCore( ULong64_t iTelType )
-{
-    unsigned int z = 0;
-    for( unsigned int i = 0; i < getNTel(); i++ )
-    {
-       if( fTel_type[i] == iTelType )
-       {
-          fMCR_telType[z] = fMCR[i];
-  z++;
-       }
-    }
-    return fMCR_telType;
-} */
-
 unsigned int VTableLookupDataHandler::getTelType_arraycounter( unsigned int iTelID )
 {
-	/*    unsigned int z = 0;
-	    for( fList_of_Tel_type_iterator = fList_of_Tel_type.begin();
-	         fList_of_Tel_type_iterator != fList_of_Tel_type.end(); fList_of_Tel_type_iterator++ )
-	    {
-	       if( fTel_type[iTelID] == fList_of_Tel_type_iterator->first ) return z;
-	       z++;
-	    }
-	    return 999999; */
 	if( iTelID < fTel_type_counter.size() )
 	{
 		return fTel_type_counter[iTelID];

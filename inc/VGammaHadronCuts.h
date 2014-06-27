@@ -3,6 +3,7 @@
 #ifndef VGammaHadronCuts_H
 #define VGammaHadronCuts_H
 
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -96,6 +97,9 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		
 		// number of possible telescope combinations
 		unsigned int fNLTrigs;
+
+                // telescope used in analysis (optional)
+                vector< unsigned int > fTelToAnalyze;
 		
 		// values calculated from shower/image parameter
 		double fMeanImageDistance;
@@ -169,6 +173,8 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		bool   initProbabilityCuts( int irun );
 		bool   initProbabilityCuts( string iDir );
 		bool   initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_min, unsigned int iTMVAWeightFileIndex_max );
+                string getTelToAnalyzeString();
+
 		
 		////////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////
@@ -431,6 +437,10 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			fArrayCentre_X = iX;
 			fArrayCentre_Y = iY;
 		}
+                void   setTelToAnalyze( vector< unsigned int > iTelToAnalyze )
+                {
+                        fTelToAnalyze = iTelToAnalyze;
+                }
 		void   setTheta2Cut( double it2 )
 		{
 			fCut_Theta2_max = it2;
@@ -441,6 +451,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			return fUseOrbitalPhaseCuts;
 		}
 		
-		ClassDef( VGammaHadronCuts, 47 );
+		ClassDef( VGammaHadronCuts, 48 );
 };
 #endif
