@@ -20,6 +20,7 @@
 #include "TDirectory.h"
 #include "TFile.h"
 #include "TTree.h"
+#include "TString.h"
 
 #include <fitsio.h>
 
@@ -31,6 +32,7 @@
 #include "VStatistics.h"
 #include "VEnergySpectrum.h"
 #include "VFluxCalculation.h"
+#include "VLightCurve.h"
 
 using namespace std;
 
@@ -56,6 +58,7 @@ class VFITS : public VAnalysisUtilities, public VPlotUtilities, public VHistogra
 		int writeTGraphFits( TGraph* g, string DiagName, string x_name, string y_name, string x_unit, string y_unit, bool iPrint );
 		int writeVecTH1DFits( vector<pair<TH1D*, string> > vhist, string DiagName,  char* tType[], char* tUnit[], char* tForm[] , bool iPrint );
 		int writeTGraphErrorsFits( TGraphErrors* g, string DiagName, string x_name, string y_name, string x_unit, string y_unit, bool iPrint );
+		int writeTGraphAsymmErrorsFits(TGraphAsymmErrors* g,string DiagName, string x_name, string y_name, string x_unit, string y_unit, bool iPrint);
 		int createTableFitsFile( vector< vector<double> > Table , char* ttype[] , char* tunit[], char* tform[], string DiagName, bool iPrint );
 		int createImageFitsFile( TH2D* hSkyMap , string DiagName, bool iPrint );
 		bool writeFITSInfo( bool iPrint = false );
@@ -76,6 +79,6 @@ class VFITS : public VAnalysisUtilities, public VPlotUtilities, public VHistogra
 		bool writeThetaSquareDistribution( bool iPrint = false );
 		bool writeEnergySpectrum( bool iPrint = false );
 		bool writeFITSFile( bool iPrint = false );
-		bool writeNightlyFlux( bool iPrint = false );
+		bool writeNightlyFlux( bool iPrint = false ,string outfile="");
 };
 #endif

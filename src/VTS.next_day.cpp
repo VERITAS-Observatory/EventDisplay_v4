@@ -58,7 +58,7 @@ int main( int argc, char* argv[] )
 	/////////////////////////////////////////
 	// calculate total fluxes and upper limits
 	double fMinEnergy = 0.2;
-	double fGamma = 2.49;
+	double fGamma = 2.5;
 	double iFlux , iFluxE, iFluxUL, iFluxInCU, iFluxULinCU , var1, var2;
 	char ifile[100];
 	sprintf( ifile, "%s", fDataFile.c_str() );
@@ -214,7 +214,7 @@ int main( int argc, char* argv[] )
 		f.writeEnergySpectrum( fDebug );
 		f.writeSignificanceSkyMap( fDebug );
 		f.writeExcessSkyMap( fDebug );
-		f.writeNightlyFlux( fDebug );
+		f.writeNightlyFlux( fDebug, ( fOUTFile + ".flux" ).c_str() );
 		f.writeFITSFile( fDebug );
 		
 	}

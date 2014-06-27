@@ -121,23 +121,60 @@ bool VFITS::writeCumSignificance( bool iPrint )
 /* Calculate integral flux in nightly bins and store as table in FITS file */
 /*********************************************************************/
 
-bool VFITS::writeNightlyFlux( bool iPrint )
+bool VFITS::writeNightlyFlux( bool iPrint, string outfile )
 {
 	cout << " Write nightly flux to fits file" << endl;
-	VFluxCalculation flux( fFile_anasum );
-	flux.setSpectralParameters( 0.2, 1.0, -2.5 );
+	VFluxCalculation flux2( fFile_anasum );
+	flux2.setSpectralParameters( 0.2, 1.0, -2.5 );
+	flux2.setSignificanceParameters( -9, -9 );
+	flux2.calculateIntegralFlux( 0.2 );
+
+	VLightCurve flux;
+	flux.initializeTeVLightCurve(fFile_anasum);
+	flux.setSpectralParameters(0.2, 1.0, -2.5);
 	flux.setSignificanceParameters( -9, -9 );
-	flux.calculateIntegralFlux( 0.2 );
-	TGraphErrors* gFlux = flux.plotFluxesVSMJDDaily();
+	flux.fill(0.2);
+	flux.plotLightCurve();
+	TGraphAsymmErrors* gFlux = flux.getLightCurveGraph();
+ 
 	
 	if( iPrint )
 	{
 		cout << " Calculated the integral flux " << endl;
 	}
-	writeTGraphErrorsFits( gFlux, "NightlyFlux", "Date", "F(>0.2 TeV)", "MJD", "1/[cm^2*s]", iPrint );
+	writeTGraphAsymmErrorsFits(gFlux,"NightlyFlux", "Date","F(>0.2 TeV)", "MJD", "1/[cm^2*s]", iPrint);
 	if( iPrint )
 	{
 		cout << " transformed nightly flux into FITS-table" << endl;
+	}
+
+	if( outfile!="" )
+	{
+		ofstream out;
+		out.open( outfile.c_str() );
+		out << "MJD\tF(>200GeV) [/cm^2/s]\tFlux in C.U." << endl;
+		TString line;
+		double mjd, flx, flxE, flxCrab, flxCrabE;
+
+		for(int i=0; i<gFlux->GetN(); i++) 
+		{
+			mjd = gFlux->GetX()[i];
+			flx = gFlux->GetY()[i];
+			flxE= (gFlux->GetErrorYhigh(i)+gFlux->GetErrorYlow(i))/2.0;
+
+			flxCrab = flux2.getFluxVsCrab( flx, 0.2, 2.5);
+			flxCrabE = flux2.getFluxVsCrab( flxE, 0.2, 2.5);
+
+			line.Form( "%d\t%.3e\t%.3e\t%.2f%.2f\n", (int)mjd, flx, flxE, flxCrab, flxCrabE); 
+			out << line ;
+ 
+		}
+		flux2.getFlux( -1, flx, flxE, mjd);
+		flxCrab = flux2.getFluxVsCrab( flx, 0.2, 2.5);
+		flxCrabE = flux2.getFluxVsCrab( flxE, 0.2, 2.5);
+		
+		line.Form( "Total:\t%.3e\t%.3e\t%.2f%.2f\n", flx, flxE, flxCrab, flxCrabE);  
+		out << line << endl;		
 	}
 	
 	return true;
@@ -612,6 +649,44 @@ int VFITS::writeTGraphErrorsFits( TGraphErrors* g, string DiagName, string x_nam
 	
 	return true;
 }
+
+int VFITS::writeTGraphAsymmErrorsFits(TGraphAsymmErrors* g,string DiagName, string x_name, string y_name, string x_unit, string y_unit, bool iPrint)
+{
+    
+	//create a table
+	int HduNum = -99;
+	vector< double> runValues;
+	vector< vector<double> > table;
+	double x1 = 0.;
+	for( int i = 0; i < g->GetN(); i++ )
+	{ 
+		double x = 0.;
+		double y = 0.;
+		g->GetPoint(i,x,y); 
+		runValues.clear();
+		runValues.push_back(x); //1.row = X values
+		runValues.push_back(x - x1); //2.row = delta_X values
+		runValues.push_back(y); //3.row = Y values
+		runValues.push_back( g->GetErrorY(i)); //4.row = Error of Y
+		table.push_back(runValues);
+		x1 = x;
+	}
+	if (iPrint) cout<<"   Got X value, Y values and Y_errors from TGraphErrors and stored them in a table"<<endl;
+
+	// define Names, Units and DataForms for new FITS BinTable   
+	string DeltaX("Delta_"+x_name);   
+	string ErrorY(y_name+"_Error");
+	char *tType[4] = {const_cast<char*>(x_name.c_str()),const_cast<char*>(DeltaX.c_str()) ,const_cast<char*>(y_name.c_str()),const_cast<char*>(ErrorY.c_str())};
+	char *tUnit[4] = {const_cast<char*>(x_unit.c_str()),const_cast<char*>(x_unit.c_str()), const_cast<char*>(y_unit.c_str()),const_cast<char*>(y_unit.c_str()),};
+	char *tForm[4] = {(char*)"1D",(char*)"1D",(char*)"1D",(char*)"1D"};
+	if (iPrint) cout<<"   Set names, units and dataformats for different colums "<<endl;
+
+	HduNum = createTableFitsFile( table,tType,tUnit,tForm,DiagName, iPrint);
+	if (iPrint) cout<<"   Wrote table into FITS-table"<<endl;
+
+	return true;
+}
+
 
 /*************************************************/
 /* Create FITS file with BinTable extension      */

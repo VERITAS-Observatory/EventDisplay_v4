@@ -1284,6 +1284,9 @@ VTS.next_day:	./obj/VFITS.o \
 		./obj/VEnergyThreshold.o ./obj/VEnergyThreshold_Dict.o \
 		./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 		./obj/VFluxCalculation.o ./obj/VFluxCalculation_Dict.o \
+		./obj/VLightCurve.o ./obj/VLightCurve_Dict.o \
+		./obj/VLightCurveData.o \
+		./obj/VLightCurveUtilities.o ./obj/VLightCurveUtilities_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 		./obj/VTS.next_day.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS)  $(OutPutOpt) ./bin/$@
