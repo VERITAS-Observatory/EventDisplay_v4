@@ -335,9 +335,15 @@ TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormaliz
 	return iH_out;
 }
 
+/*
 
+regioncode:  extra specifier for additional region cuts
+             'a' - exclude x<0 (only use top    half of skymap)
+             'b' - exclude x>0 (only use bottom half of skymap)
+
+*/
 TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, double rSource, bool iDiff, TH2D* hTest,
-		int iExcN, float* iExcX, float* iExcY, float* iExcR )
+		int iExcN, float* iExcX, float* iExcY, float* iExcR, string regioncode )
 {
 	if( !h )
 	{
@@ -381,14 +387,22 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 	xmax = 10.9;
 	nbin = 100;
 	
+	char regioncode_histname[100] = "" ;
+	if ( regioncode.length() > 0 )
+	{
+		sprintf( regioncode_histname, "_%s", regioncode.c_str() ) ;
+	}
+	
+	
+	
 	char hname[200];
 	if( iDiff )
 	{
-		sprintf( hname, "hdiff1D_%d_%f", ion, rSource );
+		sprintf( hname, "hdiff1D_%d_%f%s", ion, rSource, regioncode_histname );
 	}
 	else
 	{
-		sprintf( hname, "hsig1D_%d_%f_%d", ion, rSource, iExcN );
+		sprintf( hname, "hsig1D_%d_%f_%d%s", ion, rSource, iExcN, regioncode_histname );
 	}
 	
 	TH1D* h1D;
@@ -400,6 +414,20 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 	else
 	{
 		h1D = new TH1D( hname, "", nbin, xmin, xmax );
+	}
+
+	// setup regioncode flags
+	string regioncode_a = "a" ; 
+	bool   regioncodeflag_a = false ;
+	if ( regioncode_a.compare( regioncode ) == 0 )
+	{
+		regioncodeflag_a = true ;
+	}
+	string regioncode_b = "b" ;
+	bool   regioncodeflag_b = false ;
+	if ( regioncode_b.compare( regioncode ) == 0 )
+	{
+		regioncodeflag_b = true ;
 	}
 	
 	// fill the histogram
@@ -419,6 +447,24 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 			if( TMath::Sqrt( x_r * x_r + y_r * y_r ) > rmax )
 			{
 				continue;
+			}
+			
+			// regioncode cuts
+			// regioncode = "a" , exclude x<0
+			if ( regioncodeflag_a )
+			{
+				if ( x_r < 0 )
+				{
+					continue ;
+				}
+			}
+			// regioncode = "b" , exclude x>0
+			else if ( regioncodeflag_b ) 
+			{
+				if ( x_r > 0 )
+				{
+					continue ;
+				}
 			}
 			
 			// exclusion regions

@@ -797,8 +797,11 @@ TCanvas* VPlotAnasumHistograms::plot_theta2( double t2min, double t2max, int irb
     rmax:        maximum distance to sky plot centre of bins to be taken into account
     rSource:     minimum distance to sky plot centre of bins to be taken into account (exclude the source region)
     xmin, xmax:  plotting range (significances)
+	regioncode:  extra specifier for additional region cuts
+				 'a' - exclude x<0 (only use top    half of skymap)
+				 'b' - exclude x>0 (only use bottom half of skymap)
 */
-TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, double rSource, double xmin, double xmax, TCanvas* cCanvas )
+TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, double rSource, double xmin, double xmax, TCanvas* cCanvas , string regioncode )
 {
 	char hname[200];
 	char htitle[200];
@@ -886,6 +889,37 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	}
 	cout << "  black:   without source region and exclusion regions" << endl;
 	cout << "           (use entire skymap, except the ON region and the excluded regions)" << endl;
+
+	bool regioncodeflag = true ;
+
+	// Top half of skymap ONLY
+	TH1D* hsig_1DTopOnly = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on, iN, v_x, v_y, v_r , "a" );
+	// if ( regioncode.find( "a" ) != std::string::npos )
+	if ( regioncodeflag ) 
+	{
+		setHistogramPlottingStyle( hsig_1DTopOnly, kMagenta, 2, 2, 1, 1, 0 );
+		if( hsig_1DTopOnly )
+		{
+			hsig_1DTopOnly->SetStats( 1 );
+		}
+		cout << "light purple:  without source region and exclusion regions, Top Half Only" << endl;
+		cout << "               (use top half of skymap, except the ON region and the excluded regions)" << endl;
+	}
+	
+	// Bottom half of skymap ONLY
+	TH1D* hsig_1DBottomOnly = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on, iN, v_x, v_y, v_r , "b" );
+	//if ( regioncode.find( "b" ) != std::string::npos )
+	if ( regioncodeflag ) 
+	{
+		setHistogramPlottingStyle( hsig_1DBottomOnly, kGreen+3, 2, 2, 1, 1, 0 );
+		if( hsig_1DBottomOnly )
+		{
+			hsig_1DBottomOnly->SetStats( 1 );
+		}
+		cout << "dark green:  without source region and exclusion regions, Bottom Half Only" << endl;
+		cout << "             (use bottom half of skymap, except the ON region and the excluded regions)" << endl;
+	}
+
 	delete v_x;
 	delete v_y;
 	delete v_r;
@@ -945,6 +979,24 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 		
 		hsig_1DAll->Draw( "e hist same" );
 		hsig_1D->Draw( "e hist same" );
+		
+		if ( regioncodeflag )
+		{
+			hsig_1DTopOnly->Draw(    "e hist same" );
+			hsig_1DBottomOnly->Draw( "e hist same" );
+		}
+		
+		/*
+		if ( regioncode.find( "a" ) != std::string::npos )
+		{
+			hsig_1DTopOnly->Draw(    "e hist same" );
+		}
+		if ( regioncode.find( "b" ) != std::string::npos )
+		{
+			hsig_1DBottomOnly->Draw( "e hist same" );
+		}
+		*/
+		
 		plotHistogramTitle( hsig_1DExcluded );
 		
 		/////////////////////////
