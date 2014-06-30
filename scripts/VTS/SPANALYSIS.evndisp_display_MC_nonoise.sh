@@ -7,8 +7,7 @@ echo "
 EVNDISP special-purpose analysis: display a simulation VBF file (with external
 noise file)
 
-SPANALYSIS.evndisp_display_MC_nonoise.sh <input VBF file> [run number]
- [noise level] [noise file]
+SPANALYSIS.evndisp_display_MC_nonoise.sh <input VBF file> [run number] [noise level] [noise file]
 
 required parameters:
 
@@ -38,7 +37,7 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 # Parse command line arguments
 SIMFILE="$1"
 [[ "$2" ]] && RUNNUM=$2    || RUNNUM="65432"    # this number is arbitrary
-[[ "$3" ]] && NOISELEV=$3  || NOISELEV="200"
+[[ "$3" ]] && NOISELEV=$3  || NOISELEV="325"
 [[ "$4" ]] && NOISEFILE=$4 || NOISEFILE="$VERITAS_EVNDISP_AUX_DIR/NOISE/NOISE$NOISELEV.grisu"
 
 # default noise level
