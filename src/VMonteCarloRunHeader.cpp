@@ -103,7 +103,7 @@ void VMonteCarloRunHeader::print()
 	}
 	cout << "code version: shower prog " << shower_prog_id << " (" << shower_prog_vers << "), ";
 	cout << "detector prog " << detector_prog_id << " (" << detector_prog_vers << "), ";
-	cout << converter_prog_vers << endl;
+	cout << "convert " << converter_prog_vers << endl;
 	cout << "date: " << shower_date << "\t" << detector_date << endl;
 	cout << "number of showers: " << num_showers << " (each shower used " << num_use << " times)" << endl;
 	cout << "Primary " << primary_id << endl;
