@@ -38,11 +38,6 @@ class VTraceHandler
 		int fDynamicRange;                        //!< dynamic range
 		int fMaxThreshold;
 		unsigned int fMC_FADCTraceStart;          // start of FADC trace (in case the simulated trace is longer than needed)
-		unsigned int fMaxSumSearchStart;          // start of maximum sum search within FADC readout window (need for IPR calc)
-		
-		//double   getQuickMaximumSum( int iIntegrationWindow, bool fRaw = false );
-		//double   getQuickMaximumSum( unsigned int iSearchStart, int iIntegrationWindow, bool fRaw = false );
-		
 		
 		// Signal Extractors (Maxim)
 		float SaturLimit;
@@ -72,7 +67,6 @@ class VTraceHandler
 							   unsigned int iChanID, unsigned int iHitID, double iHilo = -1. );
 		// methods for getting quick trace parameters between specified limits
 		bool   apply_lowgain( double );
-		void   calcQuickPed( int , int );
 		double getQuickSum( int , int, bool );
 		double getQuickTZero( int , int );
 		double getQuickTZero( int , int, int );

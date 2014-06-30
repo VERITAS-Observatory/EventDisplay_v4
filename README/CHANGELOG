@@ -2,6 +2,10 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140630 (GM)
+fix in tzero calculation for 'small' low-gain pulses
+(tzero was set to 0 for pulses with max <200 dc.)
+
 * 20140627 (GM)
 find telescope used in analysis and allow gamma/hadrons
 cuts which depend on these combinations

@@ -772,10 +772,11 @@ void VImageAnalyzer::smoothDeadTubes()
 			continue;
 		}
 		// exclude low gain channel from this estimation
-		if( getHiLo()[i] )
-		{
-			continue;
-		}
+                // (GM) not clear why low-gain channels are excluded
+		// if( getHiLo()[i] )
+	 	// {
+		//	continue;
+		// }
 		
 		double ave_sum = 0.;
 		double ave_pedvar = 0.;

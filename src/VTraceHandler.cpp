@@ -18,10 +18,9 @@ VTraceHandler::VTraceHandler()
 	fChanID = 0;
 	fpTrazeSize = 0;
 	fHiLo = false;
-	fDynamicRange = 216;                 // 8bit FADC, switch to low-gain
-	fMaxThreshold = 200;
+	fDynamicRange = 216;                 // 8bit FADC, switch to low-gain; used only for debugging info
+	fMaxThreshold = 150;                 // used for trace max calculation in low gain
 	fMC_FADCTraceStart = 0;
-	fMaxSumSearchStart = 30;
 	fpTrazeSize = 0;
 	fpulsetiming_maxPV = 0;
 	fpulsetiminglevels_size = 0;
@@ -157,33 +156,6 @@ bool VTraceHandler::apply_lowgain( double iHiLo )
 		return true;
 	}
 	return false;
-}
-
-
-void VTraceHandler::calcQuickPed( int fFirst, int fLast )
-{
-	// calculates the pedestal for this channel
-	double pedsum = 0;
-	int count = 0;
-	
-	for( int i = fFirst; i < fLast; i++ )
-	{
-		if( i < fpTrazeSize )
-		{
-			count++;
-			pedsum += fpTrace[i];
-		}
-	}
-	
-	if( count > 0 )
-	{
-		pedsum = pedsum / ( double )count;
-	}
-	else
-	{
-		pedsum = 0;
-	}
-	fPed = pedsum;
 }
 
 
@@ -328,8 +300,6 @@ vector<float> VTraceHandler::getFADCTiming( int fFirst, int fLast, bool debug )
    fFirst, fLast:   range where maximum is determined
    fTFirst, fTLast: range where timing parameters are determined
 
-  (this function still needs some optimization (GM))
-
 */
 
 vector< float >& VTraceHandler::getPulseTiming( int fFirst, int fLast, int fTFirst, int fTLast )
@@ -345,7 +315,7 @@ vector< float >& VTraceHandler::getPulseTiming( int fFirst, int fLast, int fTFir
 	}
 	unsigned int m_pos = 0;
 	
-	// by definition are there always an odd number of values -> centre values is 1
+	// by definition are there always an odd number of values -> centre value is 1
 	double i_trace = 0.;
 	
 	// get pulse maximum
@@ -450,6 +420,8 @@ void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpo
 		}
 	}
 	// low gain channel
+        // (needs special treatment as end of the high gain pulse is
+        //  occassionally at the beginning of the readout window)
 	else
 	{
 		if( fFirst >= 0 && fFirst < fLast && fLast <= fpTrazeSize )
@@ -470,6 +442,7 @@ void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpo
 					tmax = it;
 					maxpos = i;
 				}
+                                // do some rough counting of saturation
 				if( nMax > 0 && it > nMax )
 				{
 					n255++;

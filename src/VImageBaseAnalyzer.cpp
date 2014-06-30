@@ -1230,7 +1230,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 	
 	// get number of channels
 	unsigned int nhits = fReader->getNumChannelsHit();
-	// exclude photodiode from this
+	// exclude photodiode from number of channels
 	if( nhits > getDead( false ).size() )
 	{
 		nhits = getDead( false ).size();
@@ -1241,6 +1241,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 	setTCorrectedSumFirst( getSumFirst() );
 	// set dynamic integration window
 	// (depending on the measured integrated charge in first pass)
+        // (not implemented yet)
 	for( unsigned int i = 0; i < nhits; i++ )
 	{
 		unsigned int i_channelHitID = 0;
@@ -1325,8 +1326,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 				}
 				// fit times are corrected for TOffsets and FADCStopOffsets.
 				// undo this to get integration window in FADC trace.
-				corrfirst = ( int )( xtime + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]
-									 + getSumWindowShift() );
+				corrfirst = ( int )( xtime + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID] + getSumWindowShift() );
 				if( fDebugTrace )
 				{
 					cout << "2ndFITcorrfirst " << getTelID() + 1 << ", CH " << i_channelHitID;
