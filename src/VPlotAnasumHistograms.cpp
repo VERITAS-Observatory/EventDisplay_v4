@@ -1164,8 +1164,8 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 		{
 			y2 = hmap->GetYaxis()->GetXmax();
 		}
-		hmap->SetAxisRange( x1, x2, "X" );
-		hmap->SetAxisRange( y1, y2, "Y" );
+		hmap->GetXaxis()->SetRangeUser( x1, x2);
+		hmap->GetYaxis()->SetRangeUser( y1, y2);
 		
 		if( zmin > -1000. )
 		{
@@ -1210,7 +1210,7 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 		xmin = hmap->GetXaxis()->GetBinLowEdge( hmap->GetXaxis()->FindBin( x1 ) );
 		ymin = hmap->GetYaxis()->GetBinLowEdge( hmap->GetYaxis()->FindBin( y1 ) );
 		xmax = hmap->GetXaxis()->GetBinLowEdge( hmap->GetXaxis()->FindBin( x1 ) );
-		ymax = hmap->GetYaxis()->GetBinUpEdge( hmap->GetYaxis()->FindBin( y2 ) );
+		ymax = hmap->GetYaxis()->GetBinLowEdge( hmap->GetYaxis()->FindBin( y2 ) );
 		iYRange = ymax - ymin;
 		wmin = dec + ymin;
 		wmax = dec + ymax;

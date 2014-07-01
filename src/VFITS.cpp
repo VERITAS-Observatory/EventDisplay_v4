@@ -833,7 +833,7 @@ int VFITS::createImageFitsFile( TH2D* hSkyMap , string DiagName, bool iPrint )
 	{
 		for( int b = 0; b < naxes[1]; b++ )
 		{
-			array[a][b] = hSkyMap->GetBinContent( naxes[1] - b, a );
+			array[a][b] = hSkyMap->GetBinContent( naxes[1] - b, a+1 );
 			if( array[a][b] < -9000 )
 			{
 				array[a][b] = NAN;

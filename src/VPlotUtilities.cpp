@@ -439,7 +439,7 @@ TH2D* VPlotUtilities::removeOuterRing( TH2D* h, double r, double ivalue )
 		}
 	}
 	
-	return 0;
+	return h;
 }
 
 unsigned int VPlotUtilities::setPlottingAxis( string iName, string iAxis, bool iLog, double xmin, double xmax, string iAxisTitle )
