@@ -1105,10 +1105,15 @@ int VEventLoop::analyzeEvent()
 	int i_cutTemp = 0;
 	
 	// short cut for dst writing
-	if( fRunMode == R_DST && fDST && fReader->getATEventType() != VEventType::PED_TRIGGER )
+	if( fRunMode == R_DST && fDST )
 	{
-		fDST->fill();
-		return 1;
+#ifndef NOVBF
+	        if( fReader->getATEventType() != VEventType::PED_TRIGGER )
+#endif
+		{
+		   fDST->fill();
+		   return 1;
+		}
 	}
 	
 	////////////////////////////////////
