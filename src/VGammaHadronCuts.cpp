@@ -486,43 +486,46 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						fCut_ImgSelect.push_back( 1 );
 					}
 				}
-			        // telescope combination	
+				// telescope combination
 				is_stream >> temp;
 				int index = ( atoi( temp.c_str() ) );
-                                // on = 0 or off = 1
+				// on = 0 or off = 1
 				is_stream >> temp;
-                                int i_select = atoi( temp.c_str() );
-                                // check epoch
-                                bool i_useTheseCuts = true;
-                                if( !is_stream.eof() )
-                                {
-                                    is_stream >> temp;
-                                    if( temp != fInstrumentEpoch ) i_useTheseCuts = false;
-                                }
-                                // check telescope combinations
-                                if( !is_stream.eof() )
-                                {
-                                   is_stream >> temp;
-                                   if( fTelToAnalyze.size() > 0 && temp != getTelToAnalyzeString() )
-                                   {
-                                      i_useTheseCuts = false;
-                                   }
-                                }
-                                // set telescope combinations on or off
-                                if( i_useTheseCuts )
-                                {
-                                    if( index < 0 )
-                                    {
-                                            for( unsigned int i = 0; i < fCut_ImgSelect.size(); i++ )
-                                            {
-                                                    fCut_ImgSelect[i] = i_select;
-                                            }
-                                    }
-                                    else if( index < ( int )fCut_ImgSelect.size() )
-                                    {
-                                            fCut_ImgSelect[index] = i_select;
-                                    }
-			       }	
+				int i_select = atoi( temp.c_str() );
+				// check epoch
+				bool i_useTheseCuts = true;
+				if( !is_stream.eof() )
+				{
+					is_stream >> temp;
+					if( temp != fInstrumentEpoch )
+					{
+						i_useTheseCuts = false;
+					}
+				}
+				// check telescope combinations
+				if( !is_stream.eof() )
+				{
+					is_stream >> temp;
+					if( fTelToAnalyze.size() > 0 && temp != getTelToAnalyzeString() )
+					{
+						i_useTheseCuts = false;
+					}
+				}
+				// set telescope combinations on or off
+				if( i_useTheseCuts )
+				{
+					if( index < 0 )
+					{
+						for( unsigned int i = 0; i < fCut_ImgSelect.size(); i++ )
+						{
+							fCut_ImgSelect[i] = i_select;
+						}
+					}
+					else if( index < ( int )fCut_ImgSelect.size() )
+					{
+						fCut_ImgSelect[index] = i_select;
+					}
+				}
 			}
 			// probability cut variables (e.g. random forest)
 			else if( iCutVariable == "RFthresh" || iCutVariable == "Probthresh" )
@@ -1610,12 +1613,12 @@ bool VGammaHadronCuts::applyTMVACut( int i )
 
 bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 {
-	if( fData && !fData->isFrogs() )
+	/*	if( fData && !fData->isFrogs() )
 	{
 		cout << "VGammaHadronCuts::applyFrogsCut error: input data (mscw file) without frogs data" << endl;
 		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
-	}
+		}*/
 	
 	if( fData->frogsEnergy < -99. || fabs( fData->frogsEnergy ) < 1E-18 || fData->frogsNImages < 1 )
 	{
@@ -2895,12 +2898,12 @@ void VGammaHadronCuts::printFrogsCuts( string iVariableNameFrogsCut )
 		cout << "Number of points: " << fFrogsBackgroundGoodness->GetN() << endl;
 		fFrogsBackgroundGoodness->Print();
 	}
-	if( iVariableNameFrogsCut == "fFrogsMSCW" )
+	if( iVariableNameFrogsCut == "fMSCW" )
 	{
 		cout << "Number of points: " << fFrogsMSCW->GetN() << endl;
 		fFrogsMSCW->Print();
 	}
-	if( iVariableNameFrogsCut == "fFrogsMSCL" )
+	if( iVariableNameFrogsCut == "fMSCL" )
 	{
 		cout << "Number of points: " << fFrogsMSCL->GetN() << endl;
 		fFrogsMSCL->Print();
@@ -3063,14 +3066,14 @@ double VGammaHadronCuts::getMeanGoodness( double G0, double G1, double G2, doubl
 
 string VGammaHadronCuts::getTelToAnalyzeString()
 {
-   stringstream iTemp;
-   sort( fTelToAnalyze.begin(), fTelToAnalyze.end() );
-   for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ )
-   {
-         iTemp << fTelToAnalyze[i]+1;
-   }
-
-   return iTemp.str();
+	stringstream iTemp;
+	sort( fTelToAnalyze.begin(), fTelToAnalyze.end() );
+	for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ )
+	{
+		iTemp << fTelToAnalyze[i] + 1;
+	}
+	
+	return iTemp.str();
 }
 
 

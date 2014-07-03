@@ -57,7 +57,7 @@ int main( int argc, char* argv[] )
 			exit( 0 );
 		}
 	}
-
+	
 	cout << endl;
 	cout << "makeEffectiveArea " << VGlobalRunParameter::getEVNDISP_VERSION() << endl;
 	cout << "-----------------------------" << endl;
@@ -105,8 +105,8 @@ int main( int argc, char* argv[] )
 	VGammaHadronCuts* fCuts = new VGammaHadronCuts();
 	fCuts->initialize();
 	fCuts->setNTel( fRunPara->telconfig_ntel, fRunPara->telconfig_arraycentre_X, fRunPara->telconfig_arraycentre_Y );
-        fCuts->setInstrumentEpoch( fRunPara->fInstrumentEpoch );
-        fCuts->setTelToAnalyze( fRunPara->fTelToAnalyse );
+	fCuts->setInstrumentEpoch( fRunPara->fInstrumentEpoch );
+	fCuts->setTelToAnalyze( fRunPara->fTelToAnalyse );
 	if( !fCuts->readCuts( fRunPara->fCutFileName, 2 ) )
 	{
 		exit( -1 );
@@ -204,6 +204,15 @@ int main( int argc, char* argv[] )
 		cout << "exiting..." << endl;
 		exit( -1 );
 	}
+	
+	TChain* fchain = new TChain( "frogspars" );
+	if( !fchain->Add( fRunPara->fdatafile.c_str(), -1 ) )
+	{
+		cout << "Error while trying to add mscw frogs tree from file " << fRunPara->fdatafile  << endl;
+		cout << "exiting..." << endl;
+		exit( -1 );
+	}
+	c->AddFriend( fchain );
 	
 	CData d( c, true, 6, true );
 	fCuts->setDataTree( &d );
