@@ -389,6 +389,10 @@ void VDST::terminate()
 				}
 				getDetectorTree()->Write();
 			}
+                        if( fDebug )
+                        {
+                                cout << "\t writing mean pulses " << endl;
+                        }
 			// write pulse shape histograms
 			if( fDSTfile->mkdir( "meanPulses" )->cd() )
 			{
@@ -422,6 +426,10 @@ void VDST::terminate()
 
 bool VDST::writeCalibrationData()
 {
+        if( fDebug )
+        {
+                cout << "VDST::writeCalibrationData()" << endl;
+        }
 	if( fDSTfile )
 	{
 		fDSTfile->cd();
@@ -484,19 +492,22 @@ bool VDST::writeCalibrationData()
 	{
 		setTelID( itel );
 		fTelID = getTelID();
+
+                // correct number of samples 
+                if( getNSamples() < fnum_sumwindow ) fnum_sumwindow = getNSamples();
 		
 		nPixel = ( unsigned int )getNChannels();
 		if( VDST_MAXCHANNELS < nPixel )
 		{
 			cout << "DST_fillCalibrationTree error: number of pixels (" << nPixel << ") exeeds allowed range (" << VDST_MAXCHANNELS << ")" << endl;
 			cout << "\t adjust arrays..." << endl;
-			exit( -1 );
+			return false;
 		}
 		for( unsigned int p = 0; p < nPixel; p++ )
 		{
 			fPed_high[p] = getPeds()[p];
 			
-			for( unsigned int i = 0; i < ( unsigned int )getRunParameter()->fCalibrationSumWindow; i++ )
+			for( unsigned int i = 0; i < ( unsigned int )fnum_sumwindow; i++ )
 			{
 				fPedvar_high[p * VDST_MAXSUMWINDOW + i] = getPedvars( i + 1 )[p];
 				fPedvar_low[p * VDST_MAXSUMWINDOW + i] = getPedvars( i + 1, true )[p];
@@ -510,6 +521,11 @@ bool VDST::writeCalibrationData()
 		t->Fill();
 	}
 	t->Write();
+
+        if( fDebug )
+        {
+                cout << "END VDST::writeCalibrationData()" << endl;
+        }
 	
 	return true;
 }
