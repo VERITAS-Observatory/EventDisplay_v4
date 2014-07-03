@@ -671,13 +671,6 @@ bool DST_fillEvent( VDSTTree* fData, AllHessData* hsdata, map< unsigned int, flo
 								}
 							}
 						}
-					}
-					/////////////////////////////
-					// fill QADC results
-					else
-					{
-						fData->fDSTRecord[i_ntel_data][p] = hsdata->event.teldata[telID].raw->significant[p];
-						fData->fDSTsums[i_ntel_data][p] = ( float )( TMath::Nint( calibrate_pixel_amplitude( hsdata, telID, p, FLAG_AMP_TMP, iLowGain ) * 100. ) ) / 100.;
 						// fill timing information
 						for( int t = 0; t < hsdata->event.teldata[telID].pixtm->num_types; t++ )
 						{
@@ -689,6 +682,7 @@ bool DST_fillEvent( VDSTTree* fData, AllHessData* hsdata, map< unsigned int, flo
 								}
 							}
 						}
+						fData->fDSTsums[i_ntel_data][p] = ( float )( TMath::Nint( calibrate_pixel_amplitude( hsdata, telID, p, FLAG_AMP_TMP, iLowGain ) * 100. ) ) / 100.;
 						for( int t = 0; t < hsdata->event.teldata[telID].pixtm->num_types; t++ )
 						{
 							if( t < ( int )fData->getDSTpulsetiminglevelsN() && getTimingLevelIndex( t ) < fData->getDSTpulsetiminglevelsN() )
@@ -702,6 +696,13 @@ bool DST_fillEvent( VDSTTree* fData, AllHessData* hsdata, map< unsigned int, flo
 								}
 							}
 						}
+					}
+					/////////////////////////////
+					// fill QADC results
+					else
+					{
+						fData->fDSTRecord[i_ntel_data][p] = hsdata->event.teldata[telID].raw->significant[p];
+						fData->fDSTsums[i_ntel_data][p] = ( float )( TMath::Nint( calibrate_pixel_amplitude( hsdata, telID, p, FLAG_AMP_TMP, iLowGain ) * 100. ) ) / 100.;
 						fData->fDSTMax[i_ntel_data][p] = ( short )( hsdata->event.teldata[telID].pixtm->pulse_sum_loc[HI_GAIN][p] );
 						if( FLAG_AMP_TMP > 0 )
 						{

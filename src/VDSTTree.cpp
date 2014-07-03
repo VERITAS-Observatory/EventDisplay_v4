@@ -46,7 +46,7 @@ VDSTTree::VDSTTree()
 	fDSTTel_xoff = 0;
 	fDSTTel_yoff = 0;
 	
-	fDSTMeanPulseTimingMinLightLevel = 100.;
+	fDSTMeanPulseTimingMinLightLevel = 5.;
 	for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
 	{
 		fDSTMeanPulseTimingHistogram[i] = 0;
