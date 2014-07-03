@@ -63,7 +63,7 @@ VGammaHadronCuts::VGammaHadronCuts()
 	fNTel = 0;
 	fNLTrigs = 0;
 	fDataDirectory = "";
-        fInstrumentEpoch = "NOT_SET";
+	fInstrumentEpoch = "NOT_SET";
 	
 	// mean width/length/distance
 	fMeanImageWidth = 0.;
@@ -85,13 +85,13 @@ VGammaHadronCuts::VGammaHadronCuts()
 	fOrbitalPhase_min = -1.;
 	fOrbitalPhase_max = 1.e99;
 	fUseOrbitalPhaseCuts = false;
-
-	// model3D parameters	
+	
+	// model3D parameters
 	fCut_Depth3D_min = -1.;
 	fCut_Depth3D_max = 9999.;
 	fCut_RWidth3D_min = -1.;
 	fCut_RWidth3D_max = 9999.;
-
+	
 	// TMVA evaluator
 	fTMVAEvaluator = 0;
 	fTMVA_MVAMethod = "";
@@ -125,11 +125,11 @@ VGammaHadronCuts::VGammaHadronCuts()
 	
 	//////////////////////////
 	// FROGS
-	fFileNameFrogsCut   = "";
-	fShowerGoodness     = 0;
-	fBackgroundGoodness = 0;
-	fMSCW               = 0;
-	fMSCL               = 0;
+	fFileNameFrogsCut        = "";
+	fFrogsShowerGoodness     = 0;
+	fFrogsBackgroundGoodness = 0;
+	fFrogsMSCW               = 0;
+	fFrogsMSCL               = 0;
 	
 	setArrayCentre();
 }
@@ -230,7 +230,7 @@ void VGammaHadronCuts::resetCutValues()
 	fCut_Depth3D_max = 9999.;
 	fCut_RWidth3D_min = -1.;
 	fCut_RWidth3D_max = 9999.;
-
+	
 	fCut_CoreDistanceToArrayCentreX_min = -1.e10;
 	fCut_CoreDistanceToArrayCentreX_max =  1.e10;
 	fCut_CoreDistanceToArrayCentreY_min = -1.e10;
@@ -630,24 +630,24 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			else if( iCutVariable == "sizesecondmax" )
 			{
 				is_stream >> temp;
-                                float isize_min = atof( temp.c_str() );
+				float isize_min = atof( temp.c_str() );
 				is_stream >> temp;
-                                float isize_max = atof( temp.c_str() );
-                                // check instrument epoch
-                                if( !is_stream.eof() )
-                                {
-                                    is_stream >> temp;
-                                    if( temp == fInstrumentEpoch )
-                                    {
-                                        fCut_SizeSecondMax_min = isize_min;
-                                        fCut_SizeSecondMax_max = isize_max;
-                                    }
-                                }
-                                else
-                                {
-                                    fCut_SizeSecondMax_min = isize_min;
-                                    fCut_SizeSecondMax_max = isize_max;
-                                }
+				float isize_max = atof( temp.c_str() );
+				// check instrument epoch
+				if( !is_stream.eof() )
+				{
+					is_stream >> temp;
+					if( temp == fInstrumentEpoch )
+					{
+						fCut_SizeSecondMax_min = isize_min;
+						fCut_SizeSecondMax_max = isize_max;
+					}
+				}
+				else
+				{
+					fCut_SizeSecondMax_min = isize_min;
+					fCut_SizeSecondMax_max = isize_max;
+				}
 			}
 			// telescope type dependent cut on number of images
 			// syntax:  teltype_nnimages <min images> <tel type counter>
@@ -679,7 +679,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				{
 					string iVariableNameFrogsCut;
 					is_stream >> iVariableNameFrogsCut;
-					if( iVariableNameFrogsCut == "SG" )
+					if( iVariableNameFrogsCut == "fSG" )
 					{
 						TGraph* g = ( TGraph* )TFile( fFileNameFrogsCut.c_str(), "READ" ).Get( "gShowerGoodness" );
 						if( !g )
@@ -690,13 +690,13 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						}
 						else
 						{
-							fShowerGoodness = ( TGraph* )g->Clone();
-							fShowerGoodness->SetName( "ShowerGoodness" );
+							fFrogsShowerGoodness = ( TGraph* )g->Clone();
+							fFrogsShowerGoodness->SetName( "FrogsShowerGoodness" );
 							// print results
 							printFrogsCuts( iVariableNameFrogsCut );
 						}
 					}
-					if( iVariableNameFrogsCut == "BG" )
+					if( iVariableNameFrogsCut == "fBG" )
 					{
 						TGraph* g = ( TGraph* )TFile( fFileNameFrogsCut.c_str(), "READ" ).Get( "gBackgroundGoodness" );
 						if( !g )
@@ -707,13 +707,13 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						}
 						else
 						{
-							fBackgroundGoodness = ( TGraph* )g->Clone();
-							fBackgroundGoodness->SetName( "BackgroundGoodness" );
+							fFrogsBackgroundGoodness = ( TGraph* )g->Clone();
+							fFrogsBackgroundGoodness->SetName( "FrogsBackgroundGoodness" );
 							// print results
 							printFrogsCuts( iVariableNameFrogsCut );
 						}
 					}
-					if( iVariableNameFrogsCut == "MSCW" )
+					if( iVariableNameFrogsCut == "fMSCW" )
 					{
 						TGraph* g = ( TGraph* )TFile( fFileNameFrogsCut.c_str(), "READ" ).Get( "gMSCW" );
 						if( !g )
@@ -724,13 +724,13 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						}
 						else
 						{
-							fMSCW = ( TGraph* )g->Clone();
-							fMSCW->SetName( "MSCW" );
+							fFrogsMSCW = ( TGraph* )g->Clone();
+							fFrogsMSCW->SetName( "FrogsMSCW" );
 							// print results
 							printFrogsCuts( iVariableNameFrogsCut );
 						}
 					}
-					if( iVariableNameFrogsCut == "MSCL" )
+					if( iVariableNameFrogsCut == "fMSCL" )
 					{
 						TGraph* g = ( TGraph* )TFile( fFileNameFrogsCut.c_str(), "READ" ).Get( "gMSCL" );
 						if( !g )
@@ -741,8 +741,8 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						}
 						else
 						{
-							fMSCL = ( TGraph* )g->Clone();
-							fMSCL->SetName( "MSCL" );
+							fFrogsMSCL = ( TGraph* )g->Clone();
+							fFrogsMSCL->SetName( "FrogsMSCL" );
 							// print results
 							printFrogsCuts( iVariableNameFrogsCut );
 						}
@@ -1574,7 +1574,7 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
 			return false;
 		}
 	}
-
+	
 	return true;
 }
 
@@ -1623,7 +1623,7 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 	}
 	
 	double ShowerGoodnessCut_max = -99.;
-	if( fShowerGoodness->GetN() > 0 )
+	if( fFrogsShowerGoodness->GetN() > 0 )
 	{
 		ShowerGoodnessCut_max = getShowerGoodnessCut_max( fData->frogsEnergy );
 		double fMeanShowerGoodness =
@@ -1635,7 +1635,7 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 	}
 	
 	double BackgroundGoodnessCut_max = -99.;
-	if( fBackgroundGoodness->GetN() > 0 )
+	if( fFrogsBackgroundGoodness->GetN() > 0 )
 	{
 		BackgroundGoodnessCut_max = getBackgroundGoodnessCut_max( fData->frogsEnergy );
 		double fMeanBackgroundGoodness =
@@ -1647,7 +1647,7 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 	}
 	
 	double MSCWCut_max = -99.;
-	if( fMSCW->GetN() > 0 )
+	if( fFrogsMSCW->GetN() > 0 )
 	{
 		MSCWCut_max = getMSCWCut_max( fData->frogsEnergy );
 		if( fData->MSCW > MSCWCut_max )
@@ -1657,7 +1657,7 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 	}
 	
 	double MSCLCut_max = -99.;
-	if( fMSCL->GetN() > 0 )
+	if( fFrogsMSCL->GetN() > 0 )
 	{
 		MSCLCut_max = getMSCLCut_max( fData->frogsEnergy );
 		if( fData->MSCL > MSCLCut_max )
@@ -1749,7 +1749,7 @@ bool VGammaHadronCuts::applyModel3DCut( int i, bool fIsOn )
 		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
 	}
-
+	
 	if( fData->Depth3D > fCut_Depth3D_max )
 	{
 		return false;
@@ -1759,7 +1759,7 @@ bool VGammaHadronCuts::applyModel3DCut( int i, bool fIsOn )
 		return false;
 	}
 	
-	return true;	
+	return true;
 }
 
 /*
@@ -2885,25 +2885,25 @@ bool VGammaHadronCuts::applyPhaseCut( int i )
 void VGammaHadronCuts::printFrogsCuts( string iVariableNameFrogsCut )
 {
 	cout << "Frogs cut variable: " << iVariableNameFrogsCut << endl;
-	if( iVariableNameFrogsCut == "SG" )
+	if( iVariableNameFrogsCut == "fSG" )
 	{
-		cout << "Number of points: " << fShowerGoodness->GetN() << endl;
-		fShowerGoodness->Print();
+		cout << "Number of points: " << fFrogsShowerGoodness->GetN() << endl;
+		fFrogsShowerGoodness->Print();
 	}
-	if( iVariableNameFrogsCut == "BG" )
+	if( iVariableNameFrogsCut == "fBG" )
 	{
-		cout << "Number of points: " << fBackgroundGoodness->GetN() << endl;
-		fBackgroundGoodness->Print();
+		cout << "Number of points: " << fFrogsBackgroundGoodness->GetN() << endl;
+		fFrogsBackgroundGoodness->Print();
 	}
-	if( iVariableNameFrogsCut == "MSCW" )
+	if( iVariableNameFrogsCut == "fFrogsMSCW" )
 	{
-		cout << "Number of points: " << fMSCW->GetN() << endl;
-		fMSCW->Print();
+		cout << "Number of points: " << fFrogsMSCW->GetN() << endl;
+		fFrogsMSCW->Print();
 	}
-	if( iVariableNameFrogsCut == "MSCL" )
+	if( iVariableNameFrogsCut == "fFrogsMSCL" )
 	{
-		cout << "Number of points: " << fMSCL->GetN() << endl;
-		fMSCL->Print();
+		cout << "Number of points: " << fFrogsMSCL->GetN() << endl;
+		fFrogsMSCL->Print();
 	}
 }
 
@@ -2911,26 +2911,26 @@ double VGammaHadronCuts::getShowerGoodnessCut_max( double le )
 {
 	double shower_goodness_cut_max = -1.;
 	
-	//shower_goodness_cut_max = fShowerGoodness->Eval( le );
+	//shower_goodness_cut_max = fFrogsShowerGoodness->Eval( le );
 	
-	for( int i = 0; i < fShowerGoodness->GetN() - 1; i++ )
+	for( int i = 0; i < fFrogsShowerGoodness->GetN() - 1; i++ )
 	{
-		if( le >= fShowerGoodness->GetX()[i] && le < fShowerGoodness->GetX()[i + 1 ] )
+		if( le >= fFrogsShowerGoodness->GetX()[i] && le < fFrogsShowerGoodness->GetX()[i + 1 ] )
 		{
-			shower_goodness_cut_max = fShowerGoodness->GetY()[i + 1 ];
+			shower_goodness_cut_max = fFrogsShowerGoodness->GetY()[i + 1 ];
 		}
 	}
 	
 	// for logE outside of graph range, return edge values
-	if( fShowerGoodness->GetN() > 0 && fShowerGoodness->GetX() && fShowerGoodness->GetY() )
+	if( fFrogsShowerGoodness->GetN() > 0 && fFrogsShowerGoodness->GetX() && fFrogsShowerGoodness->GetY() )
 	{
-		if( le < fShowerGoodness->GetX()[0] )
+		if( le < fFrogsShowerGoodness->GetX()[0] )
 		{
-			shower_goodness_cut_max = fShowerGoodness->GetY()[0];
+			shower_goodness_cut_max = fFrogsShowerGoodness->GetY()[0];
 		}
-		if( le > fShowerGoodness->GetX()[fShowerGoodness->GetN() - 1] )
+		if( le > fFrogsShowerGoodness->GetX()[fFrogsShowerGoodness->GetN() - 1] )
 		{
-			shower_goodness_cut_max = fShowerGoodness->GetY()[fShowerGoodness->GetN() - 1];
+			shower_goodness_cut_max = fFrogsShowerGoodness->GetY()[fFrogsShowerGoodness->GetN() - 1];
 		}
 	}
 	
@@ -2941,26 +2941,26 @@ double VGammaHadronCuts::getBackgroundGoodnessCut_max( double le )
 {
 	double background_goodness_cut_max = -1.;
 	
-	//background_goodness_cut_max = fBackgroundGoodness->Eval( le );
+	//background_goodness_cut_max = fFrogsBackgroundGoodness->Eval( le );
 	
-	for( int i = 0; i < fBackgroundGoodness->GetN() - 1; i++ )
+	for( int i = 0; i < fFrogsBackgroundGoodness->GetN() - 1; i++ )
 	{
-		if( le >= fBackgroundGoodness->GetX()[i] && le < fBackgroundGoodness->GetX()[i + 1 ] )
+		if( le >= fFrogsBackgroundGoodness->GetX()[i] && le < fFrogsBackgroundGoodness->GetX()[i + 1 ] )
 		{
-			background_goodness_cut_max = fBackgroundGoodness->GetY()[i + 1 ];
+			background_goodness_cut_max = fFrogsBackgroundGoodness->GetY()[i + 1 ];
 		}
 	}
 	
 	// for logE outside of graph range, return edge values
-	if( fBackgroundGoodness->GetN() > 0 && fBackgroundGoodness->GetX() && fBackgroundGoodness->GetY() )
+	if( fFrogsBackgroundGoodness->GetN() > 0 && fFrogsBackgroundGoodness->GetX() && fFrogsBackgroundGoodness->GetY() )
 	{
-		if( le < fBackgroundGoodness->GetX()[0] )
+		if( le < fFrogsBackgroundGoodness->GetX()[0] )
 		{
-			background_goodness_cut_max = fBackgroundGoodness->GetY()[0];
+			background_goodness_cut_max = fFrogsBackgroundGoodness->GetY()[0];
 		}
-		if( le > fBackgroundGoodness->GetX()[fBackgroundGoodness->GetN() - 1] )
+		if( le > fFrogsBackgroundGoodness->GetX()[fFrogsBackgroundGoodness->GetN() - 1] )
 		{
-			background_goodness_cut_max = fBackgroundGoodness->GetY()[fBackgroundGoodness->GetN() - 1];
+			background_goodness_cut_max = fFrogsBackgroundGoodness->GetY()[fFrogsBackgroundGoodness->GetN() - 1];
 		}
 	}
 	
@@ -2971,26 +2971,26 @@ double VGammaHadronCuts::getMSCWCut_max( double le )
 {
 	double MSCW_cut_max = -1.;
 	
-	//MSCW_cut_max = fMSCW->Eval( le );
+	//MSCW_cut_max = fFrogsMSCW->Eval( le );
 	
-	for( int i = 0; i < fMSCW->GetN() - 1; i++ )
+	for( int i = 0; i < fFrogsMSCW->GetN() - 1; i++ )
 	{
-		if( le >= fMSCW->GetX()[i] && le < fMSCW->GetX()[i + 1 ] )
+		if( le >= fFrogsMSCW->GetX()[i] && le < fFrogsMSCW->GetX()[i + 1 ] )
 		{
-			MSCW_cut_max = fMSCW->GetY()[i + 1 ];
+			MSCW_cut_max = fFrogsMSCW->GetY()[i + 1 ];
 		}
 	}
 	
 	// for logE outside of graph range, return edge values
-	if( fMSCW->GetN() > 0 && fMSCW->GetX() && fMSCW->GetY() )
+	if( fFrogsMSCW->GetN() > 0 && fFrogsMSCW->GetX() && fFrogsMSCW->GetY() )
 	{
-		if( le < fMSCW->GetX()[0] )
+		if( le < fFrogsMSCW->GetX()[0] )
 		{
-			MSCW_cut_max = fMSCW->GetY()[0];
+			MSCW_cut_max = fFrogsMSCW->GetY()[0];
 		}
-		if( le > fMSCW->GetX()[fMSCW->GetN() - 1] )
+		if( le > fFrogsMSCW->GetX()[fFrogsMSCW->GetN() - 1] )
 		{
-			MSCW_cut_max = fMSCW->GetY()[fMSCW->GetN() - 1];
+			MSCW_cut_max = fFrogsMSCW->GetY()[fFrogsMSCW->GetN() - 1];
 		}
 	}
 	
@@ -3001,26 +3001,26 @@ double VGammaHadronCuts::getMSCLCut_max( double le )
 {
 	double MSCL_cut_max = -1.;
 	
-	//MSCL_cut_max = fMSCL->Eval( le );
+	//MSCL_cut_max = fFrogsMSCL->Eval( le );
 	
-	for( int i = 0; i < fMSCL->GetN() - 1; i++ )
+	for( int i = 0; i < fFrogsMSCL->GetN() - 1; i++ )
 	{
-		if( le >= fMSCL->GetX()[i] && le < fMSCL->GetX()[i + 1 ] )
+		if( le >= fFrogsMSCL->GetX()[i] && le < fFrogsMSCL->GetX()[i + 1 ] )
 		{
-			MSCL_cut_max = fMSCL->GetY()[i + 1 ];
+			MSCL_cut_max = fFrogsMSCL->GetY()[i + 1 ];
 		}
 	}
 	
 	// for logE outside of graph range, return edge values
-	if( fMSCL->GetN() > 0 && fMSCL->GetX() && fMSCL->GetY() )
+	if( fFrogsMSCL->GetN() > 0 && fFrogsMSCL->GetX() && fFrogsMSCL->GetY() )
 	{
-		if( le < fMSCL->GetX()[0] )
+		if( le < fFrogsMSCL->GetX()[0] )
 		{
-			MSCL_cut_max = fMSCL->GetY()[0];
+			MSCL_cut_max = fFrogsMSCL->GetY()[0];
 		}
-		if( le > fMSCL->GetX()[fMSCL->GetN() - 1] )
+		if( le > fFrogsMSCL->GetX()[fFrogsMSCL->GetN() - 1] )
 		{
-			MSCL_cut_max = fMSCL->GetY()[fMSCL->GetN() - 1];
+			MSCL_cut_max = fFrogsMSCL->GetY()[fFrogsMSCL->GetN() - 1];
 		}
 	}
 	

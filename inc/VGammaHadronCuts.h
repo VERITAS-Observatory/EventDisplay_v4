@@ -84,7 +84,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		
 		CData* fData;                                       //! transient
 		string fDataDirectory;
-                string fInstrumentEpoch;
+		string fInstrumentEpoch;
 		
 		// cut selector
 		int fGammaHadronCutSelector;                            // see description at beginning of VGammaHadronCuts.cpp
@@ -156,10 +156,10 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		//////////////////////////
 		// FROGS
 		string  fFileNameFrogsCut;
-		TGraph* fShowerGoodness;     // shower goodness cuts
-		TGraph* fBackgroundGoodness; // background goodness cuts
-		TGraph* fMSCW;               // mscw cuts
-		TGraph* fMSCL;               // mscl cuts
+		TGraph* fFrogsShowerGoodness;     // shower goodness cuts
+		TGraph* fFrogsBackgroundGoodness; // background goodness cuts
+		TGraph* fFrogsMSCW;               // mscw cuts
+		TGraph* fFrogsMSCL;               // mscl cuts
 		
 		// cut statistics
 		VGammaHadronCutsStatistics* fStats;                       //!
@@ -261,7 +261,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		double fCut_Depth3D_max;
 		double fCut_RWidth3D_min;
 		double fCut_RWidth3D_max;
-
+		
 		VGammaHadronCuts();
 		~VGammaHadronCuts();
 		
@@ -426,10 +426,10 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			fCut_Erec_min = imin;
 			fCut_Erec_max = imax;
 		}
-                void   setInstrumentEpoch (string iEpoch )
-                {
-                       fInstrumentEpoch = iEpoch;
-                }
+		void   setInstrumentEpoch( string iEpoch )
+		{
+			fInstrumentEpoch = iEpoch;
+		}
 		bool   setIRFGraph( TGraphErrors* g );
 		void   setNTel( unsigned int itel,  double iX = 0., double iY = 0. )
 		{
@@ -451,6 +451,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			return fUseOrbitalPhaseCuts;
 		}
 		
-		ClassDef( VGammaHadronCuts, 48 );
+		ClassDef( VGammaHadronCuts, 49 );
 };
 #endif
