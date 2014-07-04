@@ -1325,7 +1325,7 @@ TCanvas* VSensitivityCalculator::plotObservationTimevsFlux( unsigned int iD, TCa
 	{
 		for( unsigned int i = 0; i < fSourceStrength.size(); i++ )
 		{
-			plot_guidingLines( fSourceStrength[i], fGraphObsvsTime[iD], ( fSourceStrength[i] < 0.1 ) );
+			plot_guidingLines( fSourceStrength[i], fGraphObsvsTime[iD], ( fSourceStrength[i] < 0.9 ) );
 		}
 	}
 	
@@ -1447,11 +1447,13 @@ void VSensitivityCalculator::plot_guidingLines( double x, TGraph* g, bool iHours
 	char hname[600];
 	if( iHours )
 	{
-		sprintf( hname, "%d%% Crab in %d h", ( int )( x * 100. ), ( int )( i_y + 0.5 ) );
+		if( x > 1.e-2 ) sprintf( hname, "%d%% Crab in %d h", ( int )( x * 100. ), ( int )( i_y + 0.5 ) );
+		else            sprintf( hname, "%.2f%% Crab in %d h", x*100., ( int )( i_y + 0.5 ) );
 	}
 	else
 	{
-		sprintf( hname, "%d%% Crab in %d min", ( int )( x * 100. ), ( int )( i_y * 60. + 0.5 ) );
+		if( x > 1.e-2 ) sprintf( hname, "%d%% Crab in %d min", ( int )( x * 100. ), ( int )( i_y * 60. + 0.5 ) );
+		else            sprintf( hname, "%.2f%% Crab in %d h", x*100., ( int )( i_y + 0.5 ) );
 	}
 	TText* iT = new TText( x * 1.5, i_y, hname );
 	iT->SetTextSize( iT->GetTextSize() * 0.8 );
@@ -3377,6 +3379,16 @@ bool VSensitivityCalculator::checkCutOptimization( double iEnergy )
 		}
 	}
 	return false;
+}
+
+TGraph* VSensitivityCalculator::getObservationTimevsFluxGraph( unsigned int ID )
+{
+    if( fGraphObsvsTime.find( ID ) == fGraphObsvsTime.end() )
+    {
+        return 0;
+    }
+
+    return fGraphObsvsTime[ID];
 }
 
 

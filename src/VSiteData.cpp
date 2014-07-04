@@ -393,10 +393,14 @@ TGraphAsymmErrors* VSiteData::getCombinedSensitivityGraph( bool iInterpolate, st
 		if( fCameraOffset_deg[f] < 1.e-2 )
 		{
 			h = ( TH1F* )iFile->Get( "DiffSens" );
+// (use integral sensitivity)
+//			h = ( TH1F* )iFile->Get( "IntSens" );
 		}
 		else
 		{
 			TH2F* h2 = ( TH2F* )iFile->Get( "DiffSens_offaxis" );
+// (use integral sensitivity)
+//			TH2F* h2 = ( TH2F* )iFile->Get( "IntSens_offaxis" );
 			if( h2 )
 			{
 				char hname[200];
@@ -418,8 +422,7 @@ TGraphAsymmErrors* VSiteData::getCombinedSensitivityGraph( bool iInterpolate, st
 		
 		for( int i = 1; i <= h->GetNbinsX(); i++ )
 		{
-			if( h->GetXaxis()->GetBinCenter( i ) > log10( fSiteFile_Emin[f] ) &&
-					h->GetXaxis()->GetBinCenter( i ) <= log10( fSiteFile_Emax[f] ) )
+			if( h->GetXaxis()->GetBinCenter( i ) > log10( fSiteFile_Emin[f] ) && h->GetXaxis()->GetBinCenter( i ) <= log10( fSiteFile_Emax[f] ) )
 			{
 				if( h->GetBinContent( i ) > 0. )
 				{

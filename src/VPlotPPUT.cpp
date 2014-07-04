@@ -44,7 +44,8 @@ void VPlotPPUT::getMergedFigureOfMerits( VSiteData* iSite, float* fom, float* fo
 	
 	// calculate figure of merrit:
 	VPlotWPPhysSensitivity b;
-	b.setCTARequirements( iSite->fSiteRequirementID );
+	// change second argument to select goal sensitivity
+	b.setCTARequirements( iSite->fSiteRequirementID, false);
 	cout << iSite->fSiteName << "\t" << iDirectionString << endl;
 	b.printSensitivityFigureOfMerit( iGraphSensitivity, f_pput_Energy_linTeV_min, f_pput_Energy_linTeV_max, iSite->fSiteName );
 	

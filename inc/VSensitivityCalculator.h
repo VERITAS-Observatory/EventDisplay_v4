@@ -257,6 +257,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 		{
 			return gSensitivityvsEnergy;
 		}
+		TGraph*  getObservationTimevsFluxGraph( unsigned int ID = 0 );
 		unsigned int  listDataSets();
 		void     listUnits();
 		void     list_sensitivity( unsigned int iD = 0 );
@@ -356,6 +357,6 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 			fDebugParticleNumberFile = iFile;
 		}
 		
-		ClassDef( VSensitivityCalculator, 22 );
+		ClassDef( VSensitivityCalculator, 23 );
 };
 #endif

@@ -189,13 +189,15 @@ void VPlotWPPhysSensitivity::initialProjectedSensitivityPlots()
 	fProjectionEnergy_max_logTeV.clear();
 	// (hard coded energies here...not good)
 	fProjectionEnergy_min_logTeV.push_back( log10( 10.0 ) );
-	fProjectionEnergy_max_logTeV.push_back( log10( 30.0 ) );
+	fProjectionEnergy_max_logTeV.push_back( log10( 10.0 ) );
 	fProjectionEnergy_min_logTeV.push_back( log10( 1.0 ) );
 	fProjectionEnergy_max_logTeV.push_back( log10( 3.0 ) );
 	fProjectionEnergy_min_logTeV.push_back( log10( 0.4 ) );
 	fProjectionEnergy_max_logTeV.push_back( log10( 0.6 ) );
 	fProjectionEnergy_min_logTeV.push_back( log10( 0.08 ) );
-	fProjectionEnergy_max_logTeV.push_back( log10( 0.08 ) );
+	fProjectionEnergy_max_logTeV.push_back( log10( 0.08 ) ); 
+//	fProjectionEnergy_min_logTeV.push_back( log10( 0.10 ) );
+//	fProjectionEnergy_max_logTeV.push_back( log10( 10.0 ) );
 	// graphs
 	for( unsigned int i = 0; i < fData.size(); i++ )
 	{
@@ -493,8 +495,7 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( double iEmin_TeV, do
 	}
 }
 
-void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( TGraphAsymmErrors* gSensitivity, double iEmin_TeV, double iEmax_TeV,
-		string iAnalysis )
+void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( TGraphAsymmErrors* gSensitivity, double iEmin_TeV, double iEmax_TeV, string iAnalysis )
 {
 	if( !gSensitivity )
 	{
@@ -527,7 +528,8 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( TGraphAsymmErrors* g
 			// south 50h
 			if( fPlotCTARequirementsID == 0 )
 			{
-				req = VCTASensitivityRequirements::Flux_req50_E2erg_south( TMath::Power( 10., x ) );
+				if( !fPlotCTARequirementGoals ) req = VCTASensitivityRequirements::Flux_req50_E2erg_south( TMath::Power( 10., x ) );
+				else                            req = VCTASensitivityRequirements::Flux_goal50_E2erg_south( TMath::Power( 10., x ) );
 			}
 			// south 5 h
 			else if( fPlotCTARequirementsID == 1 )
