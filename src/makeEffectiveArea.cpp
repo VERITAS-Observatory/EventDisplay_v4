@@ -205,14 +205,18 @@ int main( int argc, char* argv[] )
 		exit( -1 );
 	}
 	
-	TChain* fchain = new TChain( "frogspars" );
-	if( !fchain->Add( fRunPara->fdatafile.c_str(), -1 ) )
+	//FROGS
+	if( fRunPara->fGammaHadronCutSelector / 10 == 5 )
 	{
-		cout << "Error while trying to add mscw frogs tree from file " << fRunPara->fdatafile  << endl;
-		cout << "exiting..." << endl;
-		exit( -1 );
+		TChain* fchain = new TChain( "frogspars" );
+		if( !fchain->Add( fRunPara->fdatafile.c_str(), -1 ) )
+		{
+			cout << "Error while trying to add mscw frogs tree from file " << fRunPara->fdatafile  << endl;
+			cout << "exiting..." << endl;
+			exit( -1 );
+		}
+		c->AddFriend( fchain );
 	}
-	c->AddFriend( fchain );
 	
 	CData d( c, true, 6, true );
 	fCuts->setDataTree( &d );
