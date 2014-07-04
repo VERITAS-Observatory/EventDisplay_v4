@@ -25,6 +25,7 @@ mkdir -p $TEMPDIR
 
 # eventdisplay reconstruction parameter
 ACUTS="EVNDISP.reconstruction.runparameter"
+# DST ACUTS="EVNDISP.reconstruction.SW18_noDoublePass.runparameter"
 
 #########################################
 # pedestal calculation
@@ -106,7 +107,7 @@ fi
 LOGFILE="$LOGDIR/$RUN.log"
 rm -f $LOGDIR/$RUN.log
 $EVNDISPSYS/bin/evndisp -runnumber=$RUN -noshorttree -reconstructionparameter $ACUTS -outputfile $TEMPDIR/$RUN.root ${OPT[@]} &> "$LOGFILE"
-# $EVNDISPSYS/bin/evndisp -runnumber=$RUN -nevents=250000 -runmode=4 -dstfile $TEMPDIR/$RUN.dst.root -reconstructionparameter $ACUTS -outputfile $TEMPDIR/$RUN.root ${OPT[@]} &> "$LOGFILE"
+# DST $EVNDISPSYS/bin/evndisp -runnumber=$RUN -nevents=250000 -runmode=4 -readcalibdb -dstfile $TEMPDIR/$RUN.dst.root -reconstructionparameter $ACUTS -outputfile $TEMPDIR/$RUN.root ${OPT[@]} &> "$LOGFILE"
 echo "RUN$RUN EVNDISPLOG $LOGFILE"
 
 # move data file from tmp dir to data dir
@@ -114,6 +115,6 @@ DATAFILE="$ODIR/$RUN.root"
 cp -f -v $TEMPDIR/$RUN.root $DATAFILE
 echo "RUN$RUN EVNDISPDATA $DATAFILE"
 rm -f $TEMPDIR/$RUN.root
-# cp -f -v $TEMPDIR/$RUN.dst.root $DATAFILE
+# DST cp -f -v $TEMPDIR/$RUN.dst.root $DATAFILE
 
 exit
