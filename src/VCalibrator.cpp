@@ -251,7 +251,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 				{
 					// get pedestal and pedestal variances from pedestal histograms
 					os << t << " " << i << " ";
-					if( hped_vec[telType][fRunPar->fCalibrationSumWindow - 1][i] )
+					if( hped_vec[telType][fRunPar->fCalibrationSumWindow - 1][i] && hped_vec[telType][fRunPar->fCalibrationSumWindow - 1][i]->GetEntries() > 100 )
 					{
 						os << hped_vec[telType][fRunPar->fCalibrationSumWindow - 1][i]->GetMean() / ( double )fRunPar->fCalibrationSumWindow << " ";
 					}
@@ -262,7 +262,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 					// loop over all window sizes
 					for( unsigned int j = 0; j < hped_vec[telType].size(); j++ )
 					{
-						if( hped_vec[telType][j][i] )
+						if( hped_vec[telType][j][i] && hped_vec[telType][j][i]->GetEntries() > 100  )
 						{
 							os << hped_vec[telType][j][i]->GetRMS() << " ";
 						}
@@ -1286,7 +1286,11 @@ void VCalibrator::readCalibrationData()
 		readPeds( fPedFileNameC[getTelID()], false, getSumWindow() );
 		
 		// read low gain pedestals
-		if( fLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
+		if( fNewLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
+		{
+			readPeds( fNewLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow() );
+		}
+		else if( fLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
 		{
 			readPeds( fLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow() );
 		}
@@ -1335,6 +1339,11 @@ void VCalibrator::readCalibrationData()
 		readPeds( fPedFileNameC[getTeltoAna()[i]], false, getSumWindow_2() );
 		
 		// read low gain pedestals
+		if( fNewLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
+		{
+			readPeds( fNewLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow_2() );
+		}
+		else 
 		if( fLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
 		{
 			readPeds( fLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow_2() );
@@ -1759,6 +1768,174 @@ bool VCalibrator::readPeds_from_textfile( string iFile, bool iLowGain, unsigned 
 	return true;
 }
 
+/*
+   read low gain pedestals from combined file
+*/
+bool VCalibrator::readPeds_from_combinedfile( string iFile,bool iLowGain, unsigned int i_SumWindow )
+{
+        
+	ifstream infile;
+	infile.open( iFile.c_str(), ifstream::in );
+	if( !infile )
+	{
+		cout << "VCalibrator::readPeds_from_combinedfile error: unable to open pedestal file " << iFile << endl;
+		return false;
+	}
+	
+	cout << "Telescope " << getTelID() + 1;
+	if( !iLowGain )
+	{
+		cout << ": reading pedestals (combined) for high gain channels";
+	}
+	else
+	{
+		cout << ": reading pedestals (combined) for low gain channels";
+	}
+	cout << " and sumwindow " << i_SumWindow << " from: " << endl;
+	cout << "Telescope " << getTelID() + 1 << ": ";
+	cout << iFile << endl;
+	
+	// resetting all vectors
+	getPeds( iLowGain, -99. ) = 1.0;
+	getPedvars( iLowGain, i_SumWindow, -99. ) = 1.0;
+	getPedrms( iLowGain ) = 1.0;
+	float mean = 0.;
+	float rms = 0.;
+	vector<double> vars;
+	int i_testCounter = 0;
+
+	//read out DB to get current FADC to pixel relations.
+	vector<vector<int> > fadc_modules;
+	vector<vector<int> > fadc_channels; //per telescope and channel
+
+	// loop over long pedestal file (text format)
+	string i_Line;
+
+	std::map< std::pair<int, int>, vector<int> > runs;
+	std::map< std::pair<int, int>, vector<double> > peds;
+	std::map< std::pair<int, int>, vector<vector<double> > > pedvars;
+
+	while( getline( infile, i_Line ) )
+	{
+		int i_module, i_chan, i_run, i;
+		double i_ped, i_pedvar;	
+
+		if( i_Line.size() > 0 )
+		{
+			vector<double> i_pedvars;
+			std::istringstream is_stream( i_Line );
+			is_stream >> i_module >> i_chan >> i_run >> i >> i >> i_ped;
+			while ( is_stream >> i_pedvar ) 
+			{
+				i_pedvars.push_back( i_pedvar ) ;
+			}
+			if( i_ped == 0 ) { //don't use runs where no pedestal was measured.
+				continue;
+			}
+			std::pair<int, int> itemp( i_module, i_chan );
+			runs[itemp].push_back(i_run);
+			peds[itemp].push_back(i_ped);
+			pedvars[itemp].push_back(i_pedvars);
+		}
+	}
+
+	//now find closest runs for each tel/pixel and fill 
+
+	for(unsigned int iChan=0; iChan< getPedvars( iLowGain, i_SumWindow, -99. ).size(); iChan++) 
+	{
+		int iFADCModule;
+		int iFADCChannel;
+		iFADCModule = getDBPixelDataReader()->getFADC_module(getTelID(), iChan);
+		iFADCChannel = getDBPixelDataReader()->getFADC_channel(getTelID(), iChan);
+
+		//special catch for swapped channels at start of season 2013/14. This should be fixed in the data base.
+		if( getRunParameter()->frunnumber >= 69474 && getRunParameter()->frunnumber <= 69641 ) {
+			if( iFADCModule == 18 ) { 
+				iFADCModule = 26;
+			}
+			else if (iFADCModule == 26) {
+				iFADCModule = 18 ;
+			}
+		}
+
+		std::pair<int, int> temp(iFADCModule , iFADCChannel );
+		vector<int> i_runs = runs[temp];
+		vector<double> i_peds= peds[temp];
+		vector< vector<double> > i_pedvars = pedvars[temp];
+
+		
+		mean = 0;
+		rms = 0;
+		vars = std::vector<double>( getPedvarsAllSumWindows( iLowGain ).size() , 0 );
+
+		
+		if( i_runs.size() == 0 )
+		{
+			i_testCounter++;
+		}			
+		else 
+		{
+			unsigned int iLower=0; unsigned int iUpper=i_runs.size()-1;
+			for(unsigned int iT=0; iT<i_runs.size(); iT++)
+			{
+				if( i_runs.at( iT )/100 < getRunNumber() && i_runs.at( iT ) > i_runs.at( iLower ) ) 
+				{
+					iLower = iT;
+				}		
+				if( i_runs.at( iT )/100 > getRunNumber() && i_runs.at( iT ) < i_runs.at( iUpper ) ) 
+				{
+					iUpper = iT;
+				}		
+			}
+
+			//int theIndex = iLower;
+			//if( TMath::Abs( i_runs.at( iUpper )/100 - getRunNumber() ) < TMath::Abs( i_runs.at( iLower )/100 ) - getRunNumber() )  theIndex = iUpper ;
+			int theIndex = iUpper;			 
+			mean = i_peds.at(theIndex);
+			vars = std::vector<double>( getPedvarsAllSumWindows( iLowGain ).size() , 0.0 );
+
+			for(unsigned int iS=1; iS<getPedvarsAllSumWindows( iLowGain ).size() && iS<i_pedvars.at(theIndex).size(); iS++ )
+			{
+				vars.at( iS ) = i_pedvars.at(theIndex).at(iS);
+			}	
+
+			rms = vars.size() > 1 ? vars.at(1) : 0.0;		
+
+		}
+
+		getPeds( iLowGain, -99 )[iChan] = mean;
+		getPedvars( iLowGain, i_SumWindow, -99. )[iChan] = vars.size() > i_SumWindow ?  vars.at(i_SumWindow) : 0.0 ;
+		getPedrms( iLowGain )[iChan] = rms;
+		for(unsigned int iS=1; iS<getPedvarsAllSumWindows( iLowGain ).size(); iS++ )
+		{
+			getPedvarsAllSumWindows( iLowGain )[iS][iChan] = vars.at( iS );
+		}
+
+		if (iLowGain) 
+		{
+			getPedLowGainDist()->Fill( mean ) ;
+			getPedvarsLowGainDist()->Fill( vars.size() > i_SumWindow ?  vars.at(i_SumWindow) : 0.0 );
+
+		}
+		else 
+		{
+			getPedDist()->Fill(mean);
+			getPedvarsDist()->Fill( vars.size() > i_SumWindow ?  vars.at(i_SumWindow) : 0.0 );
+
+		}
+
+	}//channel
+
+	if( i_testCounter > 40 ) {
+		cout << "VCalibrator::readPeds_from_combinedfile(): Warning: did not find valid pedestal for " << i_testCounter << " channels, trying traditional pedestal text file." << endl;
+		return false;
+	}
+	else {
+		cout << "VCalibrator::readPeds_from_combinedfile(): did not find valid pedestal for " << i_testCounter << " channels " << endl;
+		return true;
+	}
+}
+
 bool VCalibrator::readPeds_from_grisufile( bool iLowGain, unsigned int i_SumWindow )
 {
 	cout << "Telescope " << getTelID() + 1 << ": reading peds from 'P' lines (sumwindow " << i_SumWindow;
@@ -1836,7 +2013,10 @@ bool VCalibrator::readPeds( string i_pedfile, bool iLowGain, unsigned int i_SumW
 		// read pedestals from root file
 		if( !readPeds_from_rootfile( i_pedfile, iLowGain, i_SumWindow ) )
 		{
-			readPeds_from_textfile( i_pedfile, iLowGain, i_SumWindow );
+			if( !getRunParameter()->fuseDB || !iLowGain || !readPeds_from_combinedfile( i_pedfile, iLowGain, i_SumWindow ) ) 
+			{
+				readPeds_from_textfile( i_pedfile, iLowGain, i_SumWindow );
+			}
 		}
 	}
 	////////////////////////////////////////////////////////////////
@@ -1893,15 +2073,21 @@ bool VCalibrator::readPeds( string i_pedfile, bool iLowGain, unsigned int i_SumW
 }
 
 
-string VCalibrator::getCalibrationFileName( int iTel, int irun, string iSuffix )
+string VCalibrator::getCalibrationFileName( int iTel, int irun, string iSuffix, string name  )
 {
 	if( irun <= 0 )
 	{
 		return "";
 	}
-	
 	stringstream iFileStr;
+
 	iFileStr << getRunParameter()->getDirectory_EVNDISPCalibrationData();
+
+	if ( iSuffix == "newlped" ) 
+	{
+		iFileStr << name ;
+		return iFileStr.str();
+	}
 	iFileStr << "Tel_" << iTel + 1 << "/";
 	iFileStr << irun << ".";
 	iFileStr << iSuffix;
@@ -2585,6 +2771,18 @@ void VCalibrator::setCalibrationFileNames()
 		{
 			fLowGainPedFileNameC.push_back( getCalibrationFileName( i, getRunParameter()->fPedLowGainFileNumber[i], "lped" ) );
 		}
+
+		if( i < fNewLowGainPedFileNameC.size() )
+		{
+			fNewLowGainPedFileNameC[i] = getCalibrationFileName( i, 10, "newlped" , getRunParameter()->fPedLowGainFile );
+		}
+		else
+		{
+			fNewLowGainPedFileNameC.push_back( getCalibrationFileName( i, 10, "newlped", getRunParameter()->fPedLowGainFile ) );
+		}
+		//cout << getRunParameter()->fPedLowGainFile << endl;
+		//cout << fNewLowGainPedFileNameC[i] << endl; HF
+
 		if( i < fLowGainMultiplierNameC.size() )
 		{
 			fLowGainMultiplierNameC[i] = getCalibrationFileName( i, getRunParameter()->fLowGainMultiplierFileNumber[i], "lmult" );
@@ -2656,11 +2854,11 @@ void VCalibrator::getCalibrationRunNumbers()
 	int iLowGainCaliLines = 0;
 	if( getRunParameter()->fLowGainCalibrationFile.size() > 0 && getRunParameter()->frunmode != 6 && !getRunParameter()->fIsMC )
 	{
-		iLowGainCaliLines = readLowGainCalibrationValues_fromCalibFile( "LOWGAINPED" );
+		iLowGainCaliLines = readLowGainCalibrationValues_fromCalibFile( "LOWGAINPED" ) + readLowGainCalibrationValues_fromCalibFile( "LOWGAINPEDFILE" ) ;
 		if( iLowGainCaliLines > 0 )
 		{
 			setCalibrationFileNames();
-		}
+		}		
 	}
 	
 	// take pedestals from grisu output file ('P'-lines), gains=1, and toff = 0.
@@ -2761,7 +2959,8 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 		exit( -1 );
 	}
 	
-	string is_line;
+	string is_line; 
+	string is_tempstring;
 	int iRunMin = 0;
 	int iRunMax = 0;
 	int iTel = -1;
@@ -2795,6 +2994,15 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 				{
 					continue;
 				}
+		
+				if( iVariable == "LOWGAINPEDFILE" ) 
+				{
+					is_stream >> is_tempstring;
+					getRunParameter()->fPedLowGainFile = is_tempstring ; 
+					iLinesFound++;
+					continue;
+				}
+
 				is_stream >> iTel;
 				iTel--;              // internal counting starts at 0
 				if( is_stream.eof() )

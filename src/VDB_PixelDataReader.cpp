@@ -21,6 +21,8 @@ VDB_PixelDataReader::VDB_PixelDataReader( vector< unsigned int > nPixel_per_tele
 	fPixelDataType.push_back( "L1_Rates" );
 	fPixelDataType.push_back( "HV" );
 	fPixelDataType.push_back( "Currents" );
+	fPixelDataType.push_back( "FADC_board" );
+	fPixelDataType.push_back( "FADC_channel" );
 	
 	// define data vectors and histograms
 	char htitle[800];
@@ -224,6 +226,45 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
 		}
 	}
 	
+
+	//read FADC settings
+	for( unsigned int i = 0; i < getNTel(); i++ )
+	{
+		//GetField( 0 ) = pixel_id (really channel, starts counting at 0)
+		//GetField( 1 ) = fadc_id i.e. FADC module number
+		//GetField( 2 ) = fadc_channel (per module)
+		
+	
+		sprintf( c_query, "select c.pixel_id , s.fadc_id, c.fadc_channel from tblFADC_Slot_Relation as s, tblFADC_Channel_Relation as c where s.db_start_time < \"%s\" and c.db_start_time < \"%s\" and ( s.db_end_time IS NULL or s.db_end_time > \"%s\" ) and ( c.db_end_time IS NULL or c.db_end_time > \"%s\" ) and s.fadc_crate=c.fadc_crate and s.fadc_slot=c.fadc_slot and s.telescope_id=c.telescope_id and c.pixel_id IS NOT NULL and s.telescope_id=%d order by c.pixel_id ;", iDBStartTimeSQL.c_str(), iDBStartTimeSQL.c_str(), fDBRunStoppTimeSQL.c_str(), fDBRunStoppTimeSQL.c_str(), i );
+
+		if( !my_connection.make_query( c_query ) )
+		{
+			fDBStatus = false;
+			cout << "VDB_PixelDataReader::readFromDB: FAILED making query for reading FADC status" << endl;
+			return false;
+		}
+
+		TSQLResult* db_res = my_connection.Get_QueryResult();
+		
+		if( db_res && db_res->GetRowCount() > 0 )
+		{
+			while( TSQLRow* db_row = db_res->Next() )
+			{
+				if( !db_row )
+				{
+					cout << "VDB_PixelDataReader::readFromDB: failed reading a DB row" << endl;
+					fDBStatus = false;
+					return false;
+				}
+
+				if( db_row->GetField( 0 ) && db_row->GetField( 1 ) && db_row->GetField( 2 ) )
+				{
+					fillDataRow( 3, iDBStartTimeSQL, i, atoi( db_row->GetField( 0 ) ) , atof( db_row->GetField( 1 ) ) );
+					fillDataRow( 4, iDBStartTimeSQL, i, atoi( db_row->GetField( 0 ) ) , atof( db_row->GetField( 2 ) ) );
+				}
+			}
+		}
+	}
 	print();
 	
 	return true;
@@ -358,7 +399,6 @@ float VDB_PixelDataReader::getValue( unsigned int iDataType, unsigned int iTel, 
 vector< float > VDB_PixelDataReader::getDataVector( unsigned int iDataType, unsigned int iTel, int iMJD, float iTime )
 {
 	fDummyReturnVector.clear();
-	
 	// is this a good data type ID?
 	if( iDataType < fPixelData.size() )
 	{
@@ -412,6 +452,11 @@ vector< float > VDB_PixelDataReader::getDataVector( unsigned int iDataType, unsi
 							break;
 						}
 					}
+				}
+				else if( fPixelData[iDataType][iTel][i]->fMJD.size() == 1 )
+				{
+					fDummyReturnVector[i] = fPixelData[iDataType][iTel][i]->fData[0];
+
 				}
 			}
 		}

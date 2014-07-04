@@ -75,6 +75,7 @@ class VCalibrator : public VImageBaseAnalyzer
 		vector< string > fPixFileNameC;
 		vector< string > fTZeroFileNameC;
 		vector< bool > fBlockTel;
+		vector< string > fNewLowGainPedFileNameC;
 		vector< string > fLowGainPedFileNameC;
 		vector< string > fLowGainGainFileNameC;
 		vector< string > fLowGainToffFileNameC;
@@ -89,7 +90,7 @@ class VCalibrator : public VImageBaseAnalyzer
 		unsigned int getNumberOfEventsUsedInCalibration( map< ULong64_t, int > iE, int iTelID );
 		TFile* getPedestalRootFile( ULong64_t iTel );
 		int  readLowGainCalibrationValues_fromCalibFile( string iVariable = "LOWGAINPED", unsigned int iTel = 9999, int iSumWindow = 9999 );
-		string getCalibrationFileName( int iTel, int irun, string iSuffix );
+		string getCalibrationFileName( int iTel, int irun, string iSuffix, string name = "" );
 		void readCalibrationData();
 		bool readCalibrationDatafromDSTFiles( string iSourceFile );
 		void readfromVOFFLINE_DB( int gain_or_toff, string& iFile, vector< unsigned int >& VchannelList, vector< double >& Vmean, vector< double >& Vrms );
@@ -99,6 +100,7 @@ class VCalibrator : public VImageBaseAnalyzer
 		bool readPeds_from_grisufile( bool, unsigned int );
 		bool readPeds_from_rootfile( string iFile, bool, unsigned int );
 		bool readPeds_from_textfile( string iFile, bool iLowGain, unsigned int i_SumWindow );
+		bool readPeds_from_combinedfile( string iFile, bool iLowGain, unsigned int i_SumWindow );
 		void readPixelstatus();
 		void readTOffsets( bool iLowGain = false );
 		bool readAverageTZeros( bool iLowGain = false );

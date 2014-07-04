@@ -119,6 +119,22 @@ class VDB_PixelDataReader
 		{
 			return getDataVector( 0, iTel, iMJD, iTime );
 		}
+		vector< float > getFADC_modules( unsigned int iTel )
+		{
+			return getDataVector( 3, iTel, 0, 0 );
+		}
+		vector< float > getFADC_channels( unsigned int iTel )
+		{
+			return getDataVector( 4, iTel, 0, 0 );
+		}
+		int getFADC_module( unsigned int iTel, unsigned int iChannel )
+		{
+			return getValue( 3, iTel, iChannel, 0, 0);
+		}
+		int getFADC_channel( unsigned int iTel, unsigned int iChannel )
+		{
+			return getValue( 4, iTel, iChannel, 0, 0);
+		}
 		unsigned int    getNTel()
 		{
 			return fNPixel.size();

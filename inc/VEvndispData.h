@@ -1355,6 +1355,10 @@ class VEvndispData
 		{
 			fCalData[fTelID]->setLowGainMultiplier_Trace( lmult );
 		}
+		void	setLowGainPedestalFile( string file )
+		{
+			fCalData[fTelID]->setLowGainPedestalFile( file );
+		}
 		void	setLowGainMultiplier_Sum( int iSumWindow, int jSumWindow, double lmult )
 		{
 			fCalData[fTelID]->setLowGainMultiplier_Sum( iSumWindow, jSumWindow, lmult );

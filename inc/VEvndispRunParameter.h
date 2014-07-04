@@ -1,4 +1,4 @@
-//! VEvndispRunParameter  input parameter storage class
+/! VEvndispRunParameter  input parameter storage class
 //
 //  IMPORTANT   IMPORTANT    IMPORTANT   IMPORTANT   IMPORTANT    IMPORTANT
 //
@@ -139,6 +139,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		vector< int > fPedFileNumber;
 		vector< int > fTZeroFileNumber;
 		vector< int > fPedLowGainFileNumber;
+		string fPedLowGainFile;
 		vector< int > fGainLowGainFileNumber;
 		vector< int > fTOffLowGainFileNumber;
 		vector< int > fLowGainMultiplierFileNumber;
@@ -329,6 +330,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fuseDB;
 		}
 		
-		ClassDef( VEvndispRunParameter, 152 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 153 ); //(increase this number)
 };
 #endif

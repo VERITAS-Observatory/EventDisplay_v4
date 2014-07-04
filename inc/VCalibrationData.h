@@ -19,7 +19,6 @@
 #include <string>
 #include <valarray>
 #include <vector>
-#include <map>
 
 using namespace std;
 
@@ -93,6 +92,7 @@ class VCalibrationData
 		
 		// low gain channels
 		bool fBoolLowGainPedestals;
+		string fLowGainPedestalFile;
 		
 		valarray<double> fLowGainPedsrms;         //!< low gain mean pedestal variance
 		double fmeanLowGainPedvars;
@@ -321,6 +321,11 @@ class VCalibrationData
 		unsigned int getTSTimeIndex( double iTime, unsigned int& i1, unsigned int& i2, double& ifrac1, double& ifrac2 );
 		
 		void     recoverLowGainPedestals();
+		bool 	setLowGainPedestalFile( string file ) 
+		{
+			fLowGainPedestalFile = file;
+			return true;
+		}
 		bool 	setLowGainMultiplier_Trace( double lmult )
 		{
 			fLowGainMultiplier_Trace = lmult;
