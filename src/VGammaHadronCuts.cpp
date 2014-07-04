@@ -14,6 +14,7 @@
      3: apply cuts on probabilities given by a friend to the data tree already at the level of
         the event quality level (e.g. of use for analysis of certain binary phases only)
      4: TMVA gamma/hadron separation
+	  5: apply frogs cut
 
   ID1:
 
