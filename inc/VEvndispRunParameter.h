@@ -179,6 +179,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   fDynamicIntegrationWindow;         // use a dynamic integration window (doublepass only)
 		vector< int >    fTraceWindowShift;       // shift the summation window by value (in doublepass: low gain channels only, default: 0 )
 		vector< bool >   fsumfirst_start_at_T0;   // start the summation window at T0 (+shift; not for doublepass)
+                vector< double > fSumWindowMaxTimeDifferenceLGtoHG;   // maximum difference between lg and hg window in doublepass method
 		vector< double > fSumWindowMaxTimedifferenceToDoublePassPosition; // maximum difference between doublepass calculated window start and t0 (in samples, default: 10 )
 		double ftracefit;                         // tracefit mode or getquick mode (-1.=no fitting, 0=fit all PMTs, else: fit only PMTs with maximum ftracefit x tracerms
 		string ftracefitfunction;                 // number of tracefit function (default=ev, others: grisu);
@@ -328,6 +329,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fuseDB;
 		}
 		
-		ClassDef( VEvndispRunParameter, 151 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 152 ); //(increase this number)
 };
 #endif

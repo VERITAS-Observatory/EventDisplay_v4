@@ -718,6 +718,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 	string iTemp3;
 	string iTemp4;
 	string iTemp5;
+	string iTemp6;
 	ULong64_t t_type = 0;
 	int t_temp = 0;
 	vector< int > v_temp;
@@ -790,6 +791,14 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 			{
 				iTemp5 = "";
 			}
+			if( !is_stream.eof() )
+			{
+				is_stream >> iTemp6;
+			}
+			else
+			{
+				iTemp6 = "";
+			}
 			
 			//////////////////////////////////////////////////////////////////////////////////////////////
 			// fadc trace analysis
@@ -845,6 +854,21 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				{
 					fRunPara->fDoublePassErrorWeighting2005 = !( bool )atoi( iTemp5.c_str() );
 				}
+                                // set maximal allowed time difference (in samples) between lg and hg T0
+                                if( iTemp6.size() > 0 )
+                                {
+					for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
+					{
+						if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+						{
+							if( i < fRunPara->fSumWindowMaxTimeDifferenceLGtoHG.size() )
+							{
+								fRunPara->fSumWindowMaxTimeDifferenceLGtoHG[i] = atof( iTemp6.c_str() );
+							}
+						}
+					}
+                                }
+                                       
 				continue;
 			}
 			else if( iTemp == "FADCSUMMATIONWINDOW" && fRunPara )

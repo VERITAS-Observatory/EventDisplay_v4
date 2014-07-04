@@ -1352,24 +1352,43 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 				// low gain channel have different time -> use tzero (do not do this for DST sims)
 				if( getHiLo()[i_channelHitID] && getRunParameter()->fsourcetype != 7 )
 				{
-					// get new tzero for sumwindow starting at corrfirst to the end of the window
-					corrfirst = 0;
-					try
-					{
-						float iT0 = fTraceHandler->getPulseTiming( corrfirst, getNSamples(), 0, getNSamples() ).at( getRunParameter()->fpulsetiming_tzero_index );
-						if( corrfirst - iT0 < getSumWindowMaxTimedifferenceToDoublePassPosition() )
-						{
-							corrfirst = TMath::Nint( iT0 ) + getSumWindowShift();
-						}
-					}
-					catch( const std::out_of_range& oor )
-					{
-						cout << "VImageBaseAnalyzer::calcSecondTZerosSums: out of Range error: " << oor.what() << endl;
-					}
-					if( corrfirst < 0 )
-					{
-						corrfirst = 0;
-					}
+                                        // integrate low-gain pulse only if prediction window start is before the end of the readout window
+                                        if( corrfirst < (int)getNSamples() )
+                                        {
+                                            // get new tzero for sumwindow starting at corrfirst to the end of the window
+                                            // assume that high and low gain timing is not more than 5 samples off
+                                            if( getSumWindowMaxTimeDifferenceLGtoHG() > -998. )
+                                            {
+                                                 corrfirst += getSumWindowMaxTimeDifferenceLGtoHG();
+                                            }
+                                            else
+                                            {
+                                                 corrfirst = 0;
+                                            } 
+                                            try
+                                            {
+                                                    float iT0 = fTraceHandler->getPulseTiming( corrfirst, getNSamples(), corrfirst, getNSamples() ).at( getRunParameter()->fpulsetiming_tzero_index );
+                                                    if( fTraceHandler->getPulseTimingStatus() )
+                                                    {
+                                                        if( corrfirst - iT0 < getSumWindowMaxTimedifferenceToDoublePassPosition() )
+                                                        {
+                                                                corrfirst = TMath::Nint( iT0 ) + getSumWindowShift();
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                       corrfirst = getNSamples();
+                                                    }
+                                            }
+                                            catch( const std::out_of_range& oor )
+                                            {
+                                                    cout << "VImageBaseAnalyzer::calcSecondTZerosSums: out of Range error: " << oor.what() << endl;
+                                            }
+                                            if( corrfirst < 0 )
+                                            {
+                                                    corrfirst = 0;
+                                            }
+                                         }
 				}
 				////////////////////
 				// high gain channel

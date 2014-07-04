@@ -1647,7 +1647,7 @@ bool VCalibrator::readPeds_from_textfile( string iFile, bool iLowGain, unsigned 
 	{
 		cout << "VCalibrator::readPeds_from_textfile error: unable to open pedestal file " << iFile << endl;
 		cout << "\t exiting..." << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	
 	cout << "Telescope " << getTelID() + 1;

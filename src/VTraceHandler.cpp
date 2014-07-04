@@ -24,6 +24,7 @@ VTraceHandler::VTraceHandler()
 	fpTrazeSize = 0;
 	fpulsetiming_maxPV = 0;
 	fpulsetiminglevels_size = 0;
+        fFindPulseTiming = false;
 	
 	fTraceIntegrationMethod = 1;
 	
@@ -328,6 +329,7 @@ vector< float >& VTraceHandler::getPulseTiming( int fFirst, int fLast, int fTFir
 	// first half of the pulse
 	// (loop backwards over pulse)
 	bool bBreak = false;
+        fFindPulseTiming = false;
 	for( int i = maxpos; i >= fTFirst ; i-- )
 	{
 		i_trace = fpTrace[i] - fPed;
@@ -342,6 +344,7 @@ vector< float >& VTraceHandler::getPulseTiming( int fFirst, int fLast, int fTFir
 					fpulsetiming[m_pos] = getLinInterpol( fpulsetiminglevels[m_pos] * trace_max, i, i_trace, i + 1, fpTrace[i + 1] - fPed );
 					if( m_pos == 0 )
 					{
+                                                fFindPulseTiming = true;
 						bBreak = true;
 					}
 				}

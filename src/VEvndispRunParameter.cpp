@@ -166,6 +166,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fTraceIntegrationMethod.push_back( 1 );
 	fTraceIntegrationMethod_pass1.push_back( 1 );
 	fSumWindowMaxTimedifferenceToDoublePassPosition.push_back( 10. );
+        fSumWindowMaxTimeDifferenceLGtoHG.push_back( -5. );
 	fSmoothDead = false;
 	fUsePedEvents = true;
 	fFADCChargeUnit = "DC";

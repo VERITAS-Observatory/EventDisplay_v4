@@ -598,6 +598,11 @@ class VEvndispData
 		{
 			return fCalData[fTelID]->fBoolLowGainTOff;
 		}
+                double              getSumWindowMaxTimeDifferenceLGtoHG()
+                {
+                                    if( fTelID < fRunPar->fSumWindowMaxTimeDifferenceLGtoHG.size() ) return fRunPar->fSumWindowMaxTimeDifferenceLGtoHG[fTelID];
+                                    return -999.;
+                }
 		VMCParameters*      getMCParameters()
 		{
 			return fMCParameters;

@@ -2,6 +2,12 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140704 (GM)
+added new restriction in trace integration of low-gain
+channels: LG tzero must follow double-pass prediction
+inside a given tolerance (new parameter in 
+FADCDOUBLEPASS option in parameter file)
+
 * 20140630 (GM)
 fix in tzero calculation for 'small' low-gain pulses
 (tzero was set to 0 for pulses with max <200 dc.)
