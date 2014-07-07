@@ -14,7 +14,7 @@
      3: apply cuts on probabilities given by a friend to the data tree already at the level of
         the event quality level (e.g. of use for analysis of certain binary phases only)
      4: TMVA gamma/hadron separation
-	  5: apply frogs cut
+     5: apply frogs cut
 
   ID1:
 
@@ -41,8 +41,6 @@
      4: TMVA: get direction cut from TMVA evaluator for each event
      5: TMVA: get direction cut from theta2 graph obtained during initialization of TMVA evaluator
 
-  \author
-  Jamie Holder, Gernot Maier
 
 */
 
@@ -1988,10 +1986,6 @@ bool VGammaHadronCuts::applyStereoShapeCuts()
 */
 void VGammaHadronCuts::initializeCuts( int irun, string iFile )
 {
-	cout << "VGammaHadronCuts::initializeCuts selector ID ";
-	cout << fGammaHadronCutSelector;
-	cout << ", " << fDirectionCutSelector << endl;
-	
 	// probability cuts
 	if( fGammaHadronCutSelector / 10 >= 1 && fGammaHadronCutSelector / 10 <= 3 )
 	{

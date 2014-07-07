@@ -1,7 +1,5 @@
 /*! \class VAnaSumRunParameter
  *
- * \author
- *   Gernot Maier
  *
 */
 
@@ -68,10 +66,6 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 	fRE_distanceSourceOff = 0.2;                  // minimal distance of off source regions in number of background regions from the source region
 	fRE_nMinoffsource = 3;                        // minmum number of off source regions (default 3)
 	fRE_nMaxoffsource = 7;                        // maximum number of off source regions (default 7)
-	
-	// FOV BACKGROUND MODEL
-	fFOV_SourceRadius = 0.;                       //!< source radius [deg]
-	fFOV_offdist = -1.;                           //!< minimum distance of background events from source region [deg]
 	
 	// TEMPLATE MODEL
 	fTE_mscw_min = 0.;
@@ -153,8 +147,10 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	
 	fWriteEventTreeForCtools = false ;
 	
-	fFrogs = 0;
-	fModel3D = false; // MODEL3DANALYSIS
+	// frogs analysis
+	fFrogs = false;
+	// model 3D analysis
+	fModel3D = false; 
 	
 	// if 0, use default 1D radial acceptance
 	// if >0, use alternate 2D-dependent acceptance
@@ -634,7 +630,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			// Frogs Analysis
 			else if( temp == "FROGSANALYSIS" )
 			{
-				fFrogs = atoi( temp2.c_str() );
+				fFrogs = (bool)atoi( temp2.c_str() );
 			}
 			else
 			{
@@ -942,10 +938,6 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
 			{
 				i_sT.fBackgroundModel = eONOFF;
 			}
-			else if( temp == "FOV" )
-			{
-				i_sT.fBackgroundModel = eFOV;
-			}
 			else if( temp == "TML" )
 			{
 				i_sT.fBackgroundModel = eTEMPLATE;
@@ -1038,20 +1030,6 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
 			}
 			
 			/////////////////
-			else if( i_sT.fBackgroundModel == eFOV )
-			{
-				is_stream >> temp;
-				i_sT.fFOV_SourceRadius = atof( temp.c_str() );
-				if( fVersion < 5 )
-				{
-					is_stream >> temp;
-					i_sT.fFOV_offdist = atof( temp.c_str() );
-				}
-				is_stream >> temp;
-				i_sT.fAcceptanceFile = temp;
-			}
-			
-			//////////////////////////////////
 			
 			else if( i_sT.fBackgroundModel == eTEMPLATE )
 			{
@@ -1191,18 +1169,6 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
 		}
 		
 		////////////////////////////////
-		else if( fRunList[i].fBackgroundModel == eFOV )
-		{
-			cout << "FOV BACKROUND MODEL" << endl;
-			cout << "\t theta2 cut: " << fRunList[i].fSourceRadius << " deg2" << endl;
-			cout << "\t source radius: " << fRunList[i].fFOV_SourceRadius << " deg" << endl;
-			if( fVersion < 5 )
-			{
-				cout << "\t distance cut outside the source: " << fRunList[i].fFOV_offdist << " deg "  << endl;
-			}
-			cout << "\t acceptance file: " << fRunList[i].fAcceptanceFile << endl;
-		}
-		////////////////////////////////
 		
 		else if( fRunList[i].fBackgroundModel == eTEMPLATE )
 		{
@@ -1332,8 +1298,6 @@ void VAnaSumRunParameter::reset( VAnaSumRunParameterDataClass it )
 	it.fRE_nMinoffsource = 0;
 	it.fRE_nMaxoffsource = 0;
 	
-	it.fFOV_SourceRadius = 0.;
-	it.fFOV_offdist = -1.;                        // observe: this parameter is obsolete since runlist version 5
 	it.fAcceptanceFile = "";
 	
 	it.fTE_mscw_min = 0.;

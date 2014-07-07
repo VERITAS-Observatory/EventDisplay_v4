@@ -1,10 +1,6 @@
 /*! \class VAnaSum
     \brief class for producing an analysis summary from parameterized veritas data
 
-    \author
-      Jamie Holder
-      Gernot Maier
-
 */
 
 #include "VAnaSum.h"
@@ -38,8 +34,7 @@ VAnaSum::VAnaSum( string i_datadir, unsigned int iAnalysisType )
    NOTE: mono analysis might not work anymore
 
 */
-void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename, int i_singletel,
-						  unsigned int iRunType, string i_outfile, int iRandomSeed, string iRunParameterfile )
+void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename, int i_singletel, unsigned int iRunType, string i_outfile, int iRandomSeed, string iRunParameterfile )
 {
 	char i_temp[2000];
 	char i_title[200];
@@ -65,7 +60,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 	{
 		cout << "error while reading run parameters" << endl;
 		cout << "...exiting" << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	int i_npair = 0;
 	if( i_LongListFilename.size() > 0 )
@@ -80,7 +75,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 	{
 		cout << "VAnaSum error: no files found in runlist" << endl;
 		cout << "...exiting" << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	cout << "Random seed for stereo maps: " << iRandomSeed << endl;
 	cout << endl;
@@ -122,7 +117,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 	{
 		cout << "Error: cannot open output file " << i_outfile << endl;
 		cout << "exiting..." << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	
 	// make directories with combined result
@@ -131,14 +126,14 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 	if( !fTotalDir )
 	{
 		cout << "VAnaSum::initialize error creating directory " << fTotalDirName << " in output file " << fOPfile->GetName() << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	fTotalDir->cd();
 	fStereoTotalDir = fTotalDir->mkdir( "stereo", "combined stereo results" );
 	if( !fStereoTotalDir )
 	{
 		cout << "VAnaSum::initialize error creating directory stereo in output file " << fOPfile->GetName() << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	
 	// make mono directories
@@ -179,7 +174,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 				cout << "VAnasum::initialize error opening anasum file for run  " << fRunPara->fRunList[j].fRunOn << ": " << endl;
 				cout << iAnasumInputFile.GetName() << endl;
 				cout << "exiting..." << endl;
-				exit( -1 );
+				exit( EXIT_FAILURE );
 			}
 			// copying histograms
 			cout << "reading in histograms from " << iAnasumInputFile.GetName() << endl;
@@ -197,7 +192,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 				cout << endl;
 				cout << "Fatal error: directory not found for run " << fRunPara->fRunList[j].fRunOn << endl;
 				cout << "...exiting" << endl;
-				exit( -1 );
+				exit( EXIT_FAILURE );
 			}
 			iDir = fOPfile->GetDirectory( i_temp );
 			fStereoRunDir.push_back( iDir );
@@ -239,7 +234,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 				{
 					cout << "VAnaSum::initialize error creating run directory " << i_temp << " in output file " << fOPfile->GetName() << endl;
 					cout << "(run " << fRunPara->fRunList[j].fRunOn << ")" << endl;
-					exit( -1 );
+					exit( EXIT_FAILURE );
 				}
 				
 				sprintf( i_temp, "stereo" );
@@ -247,24 +242,12 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 				fRunDir.back()->cd();
 				fStereoRunDir.push_back( fRunDir.back()->mkdir( i_temp, i_title ) );
 				
-				/*           fStereoRunDir.back()->cd();
-				         char i_temp1[2000];
-				         sprintf( i_temp1, "%s%s%d%s", fDatadir.c_str(), fPrefix.c_str(), fRunPara->fRunList[j].fRunOn,fSuffix.c_str() );
-				         TFile *oldfile = new TFile(i_temp1);
-				         TTree *iTree = (TTree*)oldfile->Get("telconfig");
-				
-				         TTree *newtree = iTree->CloneTree();
-				         newtree->Print();
-				         newtree->SetDirectory( fStereoRunDir.back() );
-				       fStereoRunDir.back()->Write();
-				       */
-				
 				if( !fStereoRunDir.back() )
 				{
 					cout << "VAnaSum::initialize error creating stereo run directory ";
 					cout << i_temp << " in output file " << fOPfile->GetName() << endl;
 					cout << "(run " << fRunPara->fRunList[j].fRunOn << ")" << endl;
-					exit( -1 );
+					exit( EXIT_FAILURE );
 				}
 				// mono directories
 				if( fAnalysisType == 0 || fAnalysisType == 1 || fAnalysisType == 5 )
@@ -320,35 +303,38 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 			// get noise level
 			fRunPedVarsOff[fRunPara->fRunList[j].fRunOff] = getNoiseLevel( fRunPara->fRunList[j].fRunOff );
 			
-			// copy TTree telconfig to anasum.root file
-			fStereoRunDir.back()->cd();
-			char i_temp1[2000];
-			sprintf( i_temp1, "%s%s%d%s", fDatadir.c_str(), fPrefix.c_str(), fRunPara->fRunList[j].fRunOn, fSuffix.c_str() );
-			TFile* oldfile = new TFile( i_temp1 );
-			if( !oldfile->IsZombie() )
+			// cp some information over to anasum file from mscw file
+			if( j < fStereoRunDir.size() && fStereoRunDir[j] )
 			{
+			   fStereoRunDir[j]->cd();
+			   char i_temp1[2000];
+			   sprintf( i_temp1, "%s%s%d%s", fDatadir.c_str(), fPrefix.c_str(), fRunPara->fRunList[j].fRunOn, fSuffix.c_str() );
+			   TFile* oldfile = new TFile( i_temp1 );
+			   if( !oldfile->IsZombie() )
+			   {
+				// copy TTree telconfig to anasum.root file
 				TTree* iTree = ( TTree* )oldfile->Get( "telconfig" );
 				if( iTree )
 				{
+				        fStereoRunDir[j]->cd();
 					TTree* newtree = iTree->CloneTree();
-					newtree->SetDirectory( fStereoRunDir.back() );
+					newtree->Write();
 				}
 				// copy TTree pointingDataReduced to anasum.root file
 				TTree* jTree = ( TTree* )oldfile->Get( "pointingDataReduced" );
 				if( jTree )
 				{
+					fStereoRunDir[j]->cd();
 					TTree* newtreej = jTree->CloneTree();
-					newtreej->SetDirectory( fStereoRunDir.back() );
+					newtreej->Write();
 				}
+			   }
+			   // copy VEvndispRunParameter 'runparameterV2' to anasum.root file
+			   fStereoRunDir[j]->cd();
+			   VEvndispRunParameter* evnrunpar = ( VEvndispRunParameter* )oldfile->Get( "runparameterV2" );
+			   evnrunpar->Write();
+			   delete oldfile;
 			}
-			
-			// write the TTree's telconfig, pointingDataReduced, and runparameterV2 to the anasum.root file
-			fStereoRunDir.back()->Write();
-			
-			// copy VEvndispRunParameter 'runparameterV2' to anasum.root file
-			fStereoRunDir.back()->cd();
-			VEvndispRunParameter* evnrunpar = ( VEvndispRunParameter* )oldfile->Get( "runparameterV2" );
-			evnrunpar->Write();
 			
 		}
 		
@@ -890,7 +876,7 @@ void VAnaSum::copyDirectory( TDirectory* source )
 	if( !adir )
 	{
 		cout << "VAnaSum::copyDirectory error creating directory " << source->GetName() << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	adir->cd();
 	//loop on all entries of this directory
@@ -1213,7 +1199,7 @@ double VAnaSum::getAzRange( int i_run, string i_treename, double& azmin, double&
 	if( i_f->IsZombie() )
 	{
 		cout << "VAnaSum::getAZRange fatal error: file not found, " << i_temp << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	
 	TTree* i_tree = ( TTree* )i_f->Get( i_treename.c_str() );
@@ -1346,7 +1332,7 @@ double VAnaSum::getNoiseLevel( int i_run )
 	if( i_f->IsZombie() )
 	{
 		cout << "VAnaSum::getNoiseLevel fatal error: file not found, " << i_temp << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	VTableLookupRunParameter* fR = ( VTableLookupRunParameter* )i_f->Get( "TLRunParameter" );
 	if( fR )

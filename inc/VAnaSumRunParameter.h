@@ -24,7 +24,7 @@
 
 using namespace std;
 
-enum e_background { eONOFF, eRINGMODEL, eREFLECTEDREGION, eFOV, eTEMPLATE };
+enum e_background { eONOFF, eRINGMODEL, eREFLECTEDREGION, eTEMPLATE };
 
 class VAnaSumRunParameterListOfExclusionRegions
 {
@@ -114,10 +114,6 @@ class VAnaSumRunParameterDataClass : public TNamed
 		int fRE_nMinoffsource;                    // minmum number of off source regions (default 3)
 		int fRE_nMaxoffsource;                    // maximum number of off source regions (default 7)
 		
-		// FOV BACKGROUND MODEL
-		double fFOV_SourceRadius;                 //!< source radius [deg] (to be use to exclude the source)
-		double fFOV_offdist;                      //!< minimum distance of background events from source region [deg]
-		
 		// TEMPLATE MODEL
 		double fTE_mscw_min;
 		double fTE_mscw_max;
@@ -187,8 +183,10 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		bool fWriteAllGammaToTree ; // WRITEALLGAMMATOTREE
 		int f2DAcceptanceMode ; // USE2DACCEPTANCE
 		bool fWriteEventTreeForCtools ; // WRITEEVENTTREEFORCTOOLS
+
+		// advanced analysis codes
 		bool fModel3D;
-		int fFrogs;
+		bool fFrogs;
 		
 		// vector with all run parameters
 		vector< VAnaSumRunParameterDataClass > fRunList;
@@ -254,7 +252,6 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		bool writeListOfExcludedSkyRegions();
 		bool getListOfExcludedSkyRegions( TFile* f );
 		
-		ClassDef( VAnaSumRunParameter, 4 ) ;
-		
+		ClassDef( VAnaSumRunParameter, 5 ) ;
 };
 #endif

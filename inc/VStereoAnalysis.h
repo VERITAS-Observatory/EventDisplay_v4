@@ -95,7 +95,7 @@ class VStereoAnalysis
 		{
 			return fTreeSelectedEvents;
 		}
-		void   scaleAlpha( double inorm, TH2D* hon, TH2D* h_ON, TH2D* h_OFF, TH1D* hMSR, bool buc, int incounter );
+		void   scaleAlpha( double inorm, TH2D* halpha_on, TH2D* h_ON, TH2D* h_OFF, TH1D* hMSR, bool buc, int incounter );
 		void   setAlphaOff( TH2D* ih, TH2D* ihUC );
 		void   setCuts( VAnaSumRunParameterDataClass iL, int irun );
 		void   setNoSkyPlots( bool iS )
@@ -226,8 +226,8 @@ class VStereoAnalysis
 		int     fTreeCTOOLS_GregYear  ;
 		int     fTreeCTOOLS_GregMonth ;
 		int     fTreeCTOOLS_GregDay   ;
-        double  fTreeCTOOLS_Acceptance ;
-        VRadialAcceptance* fCTOOLSAcceptance ;
+		double  fTreeCTOOLS_Acceptance ;
+		VRadialAcceptance* fCTOOLSAcceptance ;
 
 		TTree* fCDataTreeClone ;
 		double  fDeadTimeStorage ;
@@ -326,7 +326,6 @@ class VStereoAnalysis
 		bool   closeDataFile();
 		CData* getDataFromFile( int i_runNumber );
 		
-		//void fill_TreeWithSelectedEvents( CData* );
 		void fill_TreeWithSelectedEvents( CData*, double, double, double );
 		bool init_TreeWithSelectedEvents( int, bool );
 		void reset_TreeWithSelectedEvents();
@@ -344,7 +343,6 @@ class VStereoAnalysis
 		
 		int  getDataRunNumber() const;            // Check for existence of fDataRun and try to retrieve run number from first entry of the tree
 		
-		// Returning frogs value for
 		double getXcore()
 		{
 			if( fDataRun->fFrogs )
@@ -395,8 +393,8 @@ class VStereoAnalysis
 		
 		double getYoff()
 		{
+			// -1 sign difference for frogs ED
 			if( fDataRun->fFrogs )
-				// -1 sign difference for frogs ED
 			{
 				return -1.0 * fDataRun->frogsYS;
 			}

@@ -2,6 +2,14 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140707 (GM)
+bug fix in anasum for significance and normalization
+parameters for runs with zero off events
+
+* 20140707 (GM)
+bug fix to anasum: write telconfig and pointingReduced
+trees in correct subdirectories
+
 * 20140704 (GM)
 added new restriction in trace integration of low-gain
 channels: LG tzero must follow double-pass prediction

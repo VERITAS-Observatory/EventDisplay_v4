@@ -1,8 +1,6 @@
 /*! \class VStereoHistograms
- *  \brief  holds all stereo histograms
+ *  \brief  holds all histograms for science analysis (stereo mode): sky maps, energy spectra, etc.
  *
- *  \author
- *  Gernot Maier
  *
  */
 
@@ -10,8 +8,6 @@
 
 VStereoHistograms::VStereoHistograms( string i_hsuffix, double ibinsize, double ibinsizeUC, double iEnergyBinSize, double iTimeBinSize, double iTimeMin, double iTimeMax, bool iIsOn )
 {
-	//   defineHistograms( i_count, irun, i_hsuffix, ibinsize, ibinsizeUC, iEnergyBinSize, iIsOn );
-	
 	bIsOn = iIsOn;
 	fHisSuffix = i_hsuffix;
 	fBinSize = ibinsize;
@@ -20,6 +16,8 @@ VStereoHistograms::VStereoHistograms( string i_hsuffix, double ibinsize, double 
 	fBinSizeTime = iTimeBinSize;
 	fTimeMin = iTimeMin;
 	fTimeMax = iTimeMax;
+
+	fRunNumber = -99;
 	
 	fSkyMapSizeXmin = -2.;
 	fSkyMapSizeXmax =  2.;
@@ -46,12 +44,6 @@ void VStereoHistograms::setSkyMapSize( double xmin, double xmax, double ymin, do
 }
 
 
-void VStereoHistograms::defineHistograms( int i_count, int irun, string i_hsuffix, double ibinsize, double ibinsizeUC, double iEnergyBinSize, bool iIsOn )
-{
-
-}
-
-
 void VStereoHistograms::defineHistograms()
 {
 	char i_key[800];
@@ -75,7 +67,7 @@ void VStereoHistograms::defineHistograms()
 	if( fBinSize <= 0 )
 	{
 		cout << "VStereoHistograms::defineHistograms error: invalid binsize for stereo maps: " << fBinSize << endl;
-		exit( 0 );
+		exit( EXIT_FAILURE );
 	}
 	int xbin   = ( int )( ( xmax - xmin ) / fBinSize + 0.5 );
 	int xbinUC = ( int )( ( xmax - xmin ) / fBinSizeUC + 0.5 );
@@ -96,6 +88,7 @@ void VStereoHistograms::defineHistograms()
 	double i_tmin = fTimeMin;
 	double i_tmax = fTimeMax;
 	int i_tbin = int( ( i_tmax - i_tmin ) / fBinSizeTime + 0.5 );
+	if( i_tbin <= 0 ) i_tbin = 1;
         // distance to camera centre axis
         double i_t_offmin = 0.;
         double i_t_offmax = 4.;
@@ -312,7 +305,7 @@ void VStereoHistograms::defineHistograms()
 	hListParameterHistograms->Add( hmscl );
 	hListStereoParameterHistograms->Add( hmscl );
 	hListNameofParameterHistograms["hmscl"] = hmscl;
-	
+
 	//! setup rf histogram
 	sprintf( i_key, "hrf_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "rf Histogram (%s)", fHisSuffix.c_str() );
@@ -396,7 +389,7 @@ void VStereoHistograms::defineHistograms()
 	hListParameterHistograms->Add( hLinerecCounts2DtimeBinned );
 	hListEnergyHistograms->Add( hLinerecCounts2DtimeBinned );
 	hListNameofParameterHistograms["hLinerecCounts2DtimeBinned"] = hLinerecCounts2DtimeBinned;
-	
+     
 	sprintf( i_key, "hLinerecWeights_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "effective area vs. raw energy (%s)", fHisSuffix.c_str() );
 	hLinerecWeights = new TH2D( i_key, i_name, i_Linebin, i_Linemin, i_Linemax, 140, 1., 7. );

@@ -1,4 +1,5 @@
 /*! \class VStereoMaps
+ *  fill sky maps and calculate on and off events
  *
  *  \author
  *  Gernot Maier
@@ -114,9 +115,9 @@ void VStereoMaps::setRunList( VAnaSumRunParameterDataClass iL )
     fill an ON or OFF event into a sky map
 
 */
-bool VStereoMaps::fill( bool is_on, double x_sky, double y_sky, double theta2Cut_max,
-						double ze, double erec, int irun, bool i_isGamma, double& i_theta2 )
+bool VStereoMaps::fill( bool is_on, double x_sky, double y_sky, double theta2Cut_max, double ze, double erec, int irun, bool i_isGamma, double& i_theta2 )
 {
+	// maximum allow theta2 cut is the size of the source region
 	fTheta2Cut_Max = theta2Cut_max;
 	if( fTheta2Cut_Max > fRunList.fSourceRadius )
 	{
@@ -209,17 +210,6 @@ bool VStereoMaps::fillOn( double x, double y, double ze, double erec, int irun, 
 					return false;
 				}
 			}                                     // irun != fInitRun
-			////////////////////////////////////////
-			// FOVMODEL
-			////////////////////////////////////////
-			else if( fRunList.fBackgroundModel == eFOV )
-			{
-				// at the beginning of each run, get acceptance curve
-				if( !initialize_FOVBackgroundModel( true ) )
-				{
-					return false;
-				}
-			}                                     // irun != fInitRun
 		}
 		
 		// this cuts events away further than the maximum distance
@@ -228,8 +218,7 @@ bool VStereoMaps::fillOn( double x, double y, double ze, double erec, int irun, 
 			return false;
 		}
 		// fill 2D stereo Maps for all models (ON map)
-		makeTwoDStereo_BoxSmooth( x - fRunList.fWobbleWestMod, y - fRunList.fWobbleNorthMod, i_weight,
-								  sqrt( fTheta2Cut_Max ), i_MeanSignalBackgroundAreaRatio );
+		makeTwoDStereo_BoxSmooth( x-fRunList.fWobbleWestMod, y-fRunList.fWobbleNorthMod, i_weight, sqrt( fTheta2Cut_Max ), i_MeanSignalBackgroundAreaRatio );
 	}
 	
 	// direction cut
@@ -269,6 +258,7 @@ bool VStereoMaps::fillOff( double x, double y, double ze, double erec, int irun,
 	}
 	///////////////////////////////////////
 	// ON/OFF analysis
+	// (same method as filling ON runs)
 	
 	if( fRunList.fBackgroundModel == eONOFF )
 	{
@@ -292,25 +282,14 @@ bool VStereoMaps::fillOff( double x, double y, double ze, double erec, int irun,
 	
 	else if( fRunList.fBackgroundModel == eREFLECTEDREGION )
 	{
-		//return fill_ReflectedRegionModel( x, y, irun, i_isGamma );
 		return fill_ReflectedRegionModel( x, y, irun, i_isGamma, i_theta2 );
 	}
 	
 	///////////////////////////////////////
 	
 	///////////////////////////////////////
-	// FOVMODEL
-	
-	else if( fRunList.fBackgroundModel == eFOV )
-	{
-		return fill_FOVBackgroundModel( x, y, ze, erec, irun, i_isGamma );
-	}
-	
-	///////////////////////////////////////
-	
-	///////////////////////////////////////
 	// TEMPLATE MODEL
-	// (work in progress)
+	// (work in progress, not completely implemeted yet)
 	else if( fRunList.fBackgroundModel == eTEMPLATE )
 	{
 		// apply new shape cuts
@@ -364,7 +343,7 @@ void VStereoMaps::makeTwoDStereo_BoxSmooth( double i_xderot, double i_yderot, do
 	int i_x = hmap_stereo->GetXaxis()->FindBin( i_xderot );
 	int i_y = hmap_stereo->GetYaxis()->FindBin( i_yderot );
 	
-	// get upper and lower limit for loop (add 2 bins to be save)
+	// get upper and lower limit for loop (add 2 bins to be on the save side)
 	int fn_r0X = int( thetaCutMax / hmap_stereo->GetXaxis()->GetBinWidth( 2 ) ) + 2;
 	int fn_r0Y = int( thetaCutMax / hmap_stereo->GetYaxis()->GetBinWidth( 2 ) ) + 2;
 	
@@ -402,11 +381,12 @@ void VStereoMaps::makeTwoDStereo_BoxSmooth( double i_xderot, double i_yderot, do
 			i_ybin = hmap_stereo->GetYaxis()->GetBinCenter( j + 1 );
 			// test if this position is inside maximum accepted distance from camera center
 			if( sqrt( ( i_xbin + fRunList.fWobbleWestMod ) * ( i_xbin + fRunList.fWobbleWestMod ) +
-					  ( i_ybin + fRunList.fWobbleNorthMod ) * ( i_ybin + fRunList.fWobbleNorthMod ) ) > fRunList.fmaxradius )
+				  ( i_ybin + fRunList.fWobbleNorthMod ) * ( i_ybin + fRunList.fWobbleNorthMod ) ) > fRunList.fmaxradius )
 			{
 				continue;
 			}
 			
+			// additional smoothing to get ride of edge feature (not a default feature!)
 			// get filling factor (fraction of bin in theta2 circle)
 			if( fRunList.fNBoxSmooth > 0 )
 			{
@@ -434,6 +414,7 @@ void VStereoMaps::makeTwoDStereo_BoxSmooth( double i_xderot, double i_yderot, do
 					}
 				}
 			}
+			// default: filling of the sky map at the corresponding bin
 			else
 			{
 				// theta2 cut
@@ -498,13 +479,6 @@ void VStereoMaps::finalize( bool iIsOn, double OnOff_Alpha )
 	else if( fRunList.fBackgroundModel == eREFLECTEDREGION )
 	{
 		RE_getAlpha( iIsOn );
-	}
-	
-	///////////////////////////////////////////
-	// FOVMODEL
-	else if( fRunList.fBackgroundModel == eFOV )
-	{
-		FOVM_getAlpha( iIsOn );
 	}
 	
 	// remove stuff we don't need anymore
@@ -706,6 +680,8 @@ void VStereoMaps::RM_getAlpha( bool iIsOn )
 
 /*!
 
+  normalization map for reflected region model
+
   each bin in alpha map contains nregion*nevents(this bin only) events
   (divide by this number to get normalization value alpha)
 
@@ -722,19 +698,32 @@ void VStereoMaps::RE_getAlpha( bool iIsOn )
 			}
 			else
 			{
-				if( hmap_stereo->GetBinContent( i, j ) > 0. )
+				// correlated maps
+			        if( !bUncorrelatedSkyMaps && i < fRE_off.size() && j < fRE_off[i].size() )
 				{
-					hmap_alpha->SetBinContent( i, j, hmap_alpha->GetBinContent( i, j ) / hmap_stereo->GetBinContent( i, j ) );
-				}
+				    hmap_alpha->SetBinContent( hmap_alpha->GetXaxis()->FindBin( hmap_alpha->GetXaxis()->GetBinCenter( i ) - fRunList.fWobbleWestMod ),
+				                               hmap_alpha->GetYaxis()->FindBin( hmap_alpha->GetYaxis()->GetBinCenter( j ) - fRunList.fWobbleNorthMod ),
+				                               ( double )fRE_off[i][j].noff );
+                                }
+				// uncorrelated maps
+				else if( hmap_stereo->GetBinContent( i, j ) > 0. )
+				{
+				    hmap_alpha->SetBinContent( i, j, hmap_alpha->GetBinContent( i, j ) / hmap_stereo->GetBinContent( i, j ) );
+                                }
 				else
 				{
 					hmap_alpha->SetBinContent( i, j, 0. );
-				}
+				} 
 			}
 		}
 	}
 }
 
+/*
+
+       main routine for reflected region model
+
+*/
 bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool i_isGamma, double& i_theta2 )
 {
 	// at the beginning of each run, set up off regions
@@ -795,6 +784,7 @@ bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool 
 		f_RE_WN = hmap_stereo->GetYaxis()->FindBin( fRunList.fWobbleNorthMod - fTargetShiftNorth );
 	}
 	
+	///////////////////////////
 	// filling
 	
 	// first check if (x,y) is inside the fiducal area in the camera
@@ -855,15 +845,12 @@ bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool 
 				{
 					// apply theta2 cut in background region
 					double theta2 = ( x - fRE_off[i][j].xoff[p] ) * ( x - fRE_off[i][j].xoff[p] ) + ( y - fRE_off[i][j].yoff[p] ) * ( y - fRE_off[i][j].yoff[p] );
-					//if( ( x - fRE_off[i][j].xoff[p] ) * ( x - fRE_off[i][j].xoff[p] ) + ( y - fRE_off[i][j].yoff[p] ) * ( y - fRE_off[i][j].yoff[p] ) <
-					//fRE_off[i][j].roff[p]*fRE_off[i][j].roff[p] )
 					
 					if( theta2 < fRE_off[i][j].roff[p]*fRE_off[i][j].roff[p] )
 					{
 						i_theta2 = theta2;
 						hmap_stereo->Fill( i_cx - fRunList.fWobbleWestMod, i_cy - fRunList.fWobbleNorthMod );
-						hmap_alpha->Fill( i_cx - fRunList.fWobbleWestMod, i_cy - fRunList.fWobbleNorthMod,
-										  ( double )fRE_off[i][j].noff * f_RE_AreaNorm );
+						hmap_alpha->Fill( i_cx - fRunList.fWobbleWestMod, i_cy - fRunList.fWobbleNorthMod, ( double )fRE_off[i][j].noff * f_RE_AreaNorm );
 					}
 				}
 			}
@@ -1156,8 +1143,8 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
 								{
 									// vXTOEXCLUDE and vYTOEXCLUDE are relative to sky map centre in rotated camera coordinates
 									if( ( x_t - vXTOEXCLUDE[ex] - fRunList.fWobbleWestMod ) * ( x_t - vXTOEXCLUDE[ex] - fRunList.fWobbleWestMod )
-											+ ( y_t - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod ) * ( y_t - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod )
-											< ( vRTOEXCLUDE[ex] + fRE_roffTemp ) * ( vRTOEXCLUDE[ex] + fRE_roffTemp ) )
+									  + ( y_t - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod ) * ( y_t - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod )
+									    < ( vRTOEXCLUDE[ex] + fRE_roffTemp ) * ( vRTOEXCLUDE[ex] + fRE_roffTemp ) )
 									{
 										bExclude = true;
 									}
@@ -1290,7 +1277,7 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////
-	cout << "\t\t ....initialized" << endl;
+	cout << "\t\t ....reflected regions initialized" << endl;
 	
 	return true;
 }
@@ -1312,7 +1299,6 @@ void VStereoMaps::initialize_theta2()
 			hAuxHisList->Add( hAux_theta2On );
 		}
 		
-		// (GM)      if( hAux_theta2Off ) delete hAux_theta2Off;
 		sprintf( hname, "hAux_theta2Off" );
 		hAux_theta2Off = new TH1D( hname, "", 200, 0., 2. );
 		hAux_theta2Off->SetXTitle( "#theta^{2} [deg^{2}]" );
@@ -1323,7 +1309,6 @@ void VStereoMaps::initialize_theta2()
 			hAuxHisList->Add( hAux_theta2Off );
 		}
 		
-		// (GM)      if( hAux_theta2Ratio ) delete hAux_theta2Ratio;
 		sprintf( hname, "hAux_theta2Ratio" );
 		hAux_theta2Ratio = new TH1D( hname, "", 200, 0., 2. );
 		hAux_theta2Ratio->SetXTitle( "#theta^{2} [deg^{2}]" );
@@ -1594,7 +1579,7 @@ void VStereoMaps::calculateTheta2( bool isOn, double x, double y )
 		//
 		// background events come from theta2 region opposite to the potential source region
 		//
-		else if( fRunList.fBackgroundModel == eRINGMODEL || fRunList.fBackgroundModel == eREFLECTEDREGION || fRunList.fBackgroundModel == eFOV )
+		else if( fRunList.fBackgroundModel == eRINGMODEL || fRunList.fBackgroundModel == eREFLECTEDREGION )
 		{
 			theta2  = ( x - fRunList.fWobbleWestMod + fTargetShiftWest ) * ( x - fRunList.fWobbleWestMod + fTargetShiftWest );
 			theta2 += ( y - fRunList.fWobbleNorthMod + fTargetShiftNorth ) * ( y - fRunList.fWobbleNorthMod + fTargetShiftNorth );
@@ -1700,191 +1685,6 @@ void VStereoMaps::cleanup()
 				hmap_alpha->SetBinContent( i, j, 0. );
 				hmap_stereo->SetBinContent( i, j, 0. );
 			}
-		}
-	}
-}
-
-
-bool VStereoMaps::initialize_FOVBackgroundModel( bool iIsOn )
-{
-	if( !defineAcceptance() )
-	{
-		return false;
-	}
-	
-	if( !iIsOn )
-	{
-		initialize_Histograms();
-		if( !bUncorrelatedSkyMaps )
-		{
-			initialize_theta2();
-		}
-	}
-	
-	return true;
-}
-
-
-//////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////////////////
-/////////                FOV MODEL                                      ///////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-
-bool VStereoMaps::fill_FOVBackgroundModel( double x, double y, double ze, double erec, int irun, bool i_isGamma )
-{
-
-	// The map is done only for the first event, the normalisation will be done later
-	
-	// at the beginning of each run, get acceptance curve
-	if( irun != fInitRun )
-	{
-		fInitRun = irun;
-		if( !initialize_FOVBackgroundModel( false ) )
-		{
-			// intialization failed, return 0
-			return false;
-		}
-		double i_acc = 0.;
-		
-		// bin center of current bin
-		double i_cx = 0.;
-		double i_cy = 0.;
-		// now loop over the interesting region on the map
-		
-		// loop over all bins
-		for( int i = 1; i <= hmap_stereo->GetNbinsX(); i++ )
-		{
-			for( int j = 1; j <= hmap_stereo->GetNbinsY(); j++ )
-			{
-				// get bin coordinates (source test position)
-				i_cx = fRandom->Uniform( hmap_stereo->GetXaxis()->GetBinLowEdge( i ), hmap_stereo->GetXaxis()->GetBinUpEdge( i ) );
-				i_cy = fRandom->Uniform( hmap_stereo->GetYaxis()->GetBinLowEdge( j ), hmap_stereo->GetYaxis()->GetBinUpEdge( j ) );
-				i_acc = fAcceptance->getAcceptance( i_cx, i_cy );
-				hmap_stereo->Fill( ( i_cx - fRunList.fWobbleWestMod ) , ( i_cy - fRunList.fWobbleNorthMod ), fAcceptance->getNumberofRawFiles() * i_acc );
-			}
-		}
-		return true;
-	}
-	
-	return true;
-}
-
-
-/////////////////////////////////////////////////
-void VStereoMaps::FOVM_getAlpha( bool iIsOn )
-{
-	cout << "\t finalizing FOV model alpha plots ";
-	if( bUncorrelatedSkyMaps )
-	{
-		cout << "(uncorrelated maps)";
-	}
-	else
-	{
-		cout << "(correlated maps)";
-	}
-	cout << endl;
-	
-	// check acceptance
-	if( !fAcceptance )
-	{
-		cout << "VStereoMaps::FOVM_getAlpha error: no acceptance map" << endl;
-		return;
-	}
-	
-	double i_rS = sqrt( fRunList.fSourceRadius );
-	
-	double x = 0.;
-	double x_w = hmap_stereo->GetXaxis()->GetBinWidth( 2 );
-	double y = 0.;
-	double y_w = hmap_stereo->GetYaxis()->GetBinWidth( 2 );
-	double cx = 0.;
-	double cy = 0.;
-	
-	double cr = 0.;
-	
-	double i_acc = 0.;
-	
-	// all calculations are with camera center at (0,0), but alpha histograms are
-	// filled with source center at (0,0)
-	int i_xoff =  hmap_stereo->GetXaxis()->FindBin( fRunList.fWobbleWestMod ) - hmap_stereo->GetXaxis()->FindBin( 0. );
-	int j_yoff =  hmap_stereo->GetYaxis()->FindBin( fRunList.fWobbleNorthMod ) - hmap_stereo->GetYaxis()->FindBin( 0. );
-	
-	// loop over all possible source positions,
-	// calculate alpha for source positions
-	
-	// lower edge of bins
-	double i_xLE = 0.;
-	double i_yLE = 0.;
-	
-	int i_nbinsXstart = 0;
-	int i_nbinsX = hmap_alpha->GetNbinsX();
-	int i_nbinsXstopp = i_nbinsX;
-	int i_nbinsYstart = 0;
-	int i_nbinsY = hmap_alpha->GetNbinsY();
-	int i_nbinsYstopp = i_nbinsY;
-	if( fNoSkyPlots )
-	{
-		i_nbinsXstart = hmap_stereo->GetXaxis()->FindBin( fRunList.fWobbleWestMod );
-		i_nbinsXstopp = hmap_stereo->GetXaxis()->FindBin( fRunList.fWobbleWestMod );
-		i_nbinsYstart = hmap_stereo->GetYaxis()->FindBin( fRunList.fWobbleNorthMod );
-		i_nbinsYstopp = hmap_stereo->GetYaxis()->FindBin( fRunList.fWobbleNorthMod );
-	}
-	
-	for( int i = i_nbinsXstart; i <= i_nbinsXstopp; i++ )
-	{
-		i_xLE = hmap_alpha->GetXaxis()->GetBinLowEdge( i );
-		x = fRandom->Uniform( i_xLE, i_xLE + x_w );
-		
-		for( int j = i_nbinsYstart; j <= i_nbinsYstopp; j++ )
-		{
-			i_yLE = hmap_alpha->GetYaxis()->GetBinLowEdge( j );
-			y = fRandom->Uniform( i_yLE, i_yLE + y_w );
-			
-			// reset acceptance
-			i_acc = 0.;
-			
-			// check if events is in fiducial area
-			if( sqrt( x * x + y * y ) > fRunList.fmaxradius )
-			{
-				hmap_alpha->SetBinContent( i - i_xoff, j - j_yoff, 0. );
-				continue;
-			}
-			
-			cx = fRandom->Uniform( i_xLE, i_xLE + x_w );
-			cy = fRandom->Uniform( i_yLE, i_yLE + y_w );
-			
-			cr = ( cx - x ) * ( cx - x ) + ( cy - y ) * ( cy - y );
-			
-			// get sum of acceptance for on region
-			if( iIsOn )
-			{
-				if( fAcceptance->isExcludedfromSource( cx, cy ) )
-				{
-					continue;
-				}
-				// check if event is in 'on' region
-				if( bUncorrelatedSkyMaps )
-				{
-					// check if event is in bin
-					i_acc += fAcceptance->getAcceptance( cx, cy );
-				}
-				else
-				{
-					// check if event is inside source region
-					if( cr < i_rS * i_rS )
-					{
-						i_acc += fAcceptance->getAcceptance( cx, cy );
-					}
-				}
-			}
-			// get acceptance for OFF regions
-			else
-			{
-				i_acc += fAcceptance->getAcceptance( cx, cy );
-			}
-			hmap_alpha->SetBinContent( i - i_xoff, j - j_yoff, i_acc );
-			
 		}
 	}
 }

@@ -110,7 +110,7 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
 											  double zmin = -100., double zmax = -100., double rSource = 0.4,
 											  int iN = -1, unsigned int nstart = 0 );
 		TCanvas*        plot_skyPlots( string iPlotMode = "colz", bool iSingleCanvases = false );
-		TCanvas*        plot_significance( bool iCorrelated = false, double rmax = 0., double zmin = -100., double zmax = -100., bool bPoster = false );
+		TCanvas*        plot_skyPlots_significance( bool iCorrelated = false, double rmax = 0., double zmin = -100., double zmax = -100., bool bPoster = false );
 		TCanvas*        plot_on( bool iCorrelated = false, double rmax = -1. );
 		TCanvas*        plot_significanceDistributions( double rmax = 2.0, double rSource = 0.4,
 				double xmin = -6.5, double xmax = 10., TCanvas* c = 0, string regioncode = "" );
@@ -146,7 +146,7 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
 		}
 		bool            setRunNumber( int iRun );                                      // select run for plotting
 		
-		ClassDef( VPlotAnasumHistograms, 14 );
+		ClassDef( VPlotAnasumHistograms, 15 );
 };
 
 #endif

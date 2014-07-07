@@ -1,9 +1,6 @@
 /*! \class VStereoAnalysis
     \brief class for producing histograms from parameterized stereo VERITAS data
 
-    \author
-     Jamie Holder
-     Gernot Maier
 */
 
 #include "VStereoAnalysis.h"
@@ -55,9 +52,6 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 		setRunTimes();
 	}
 	
-	double f_t_tot_min = f_t_in_s_min[fIsOn ? fRunPara->fRunList[0].fRunOn : fRunPara->fRunList[0].fRunOff];
-	double f_t_tot_max = f_t_in_s_max[fIsOn ? fRunPara->fRunList[fRunPara->fRunList.size() - 1].fRunOn : fRunPara->fRunList[fRunPara->fRunList.size() - 1].fRunOff];
-	
 	// targets and exclusion regions
 	if( !bTotalAnalysisOnly )
 	{
@@ -70,7 +64,7 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 	// combined results
 	iDirTot->cd();
 	fHistoTot = new VStereoHistograms( i_hsuffix, fRunPara->fSkyMapBinSize, fRunPara->fSkyMapBinSizeUC,
-									   fRunPara->fEnergySpectrumBinSize, fRunPara->fTimeIntervall, f_t_tot_min , f_t_tot_max, fIsOn );
+					   fRunPara->fEnergySpectrumBinSize, fRunPara->fTimeIntervall, -1, -1, fIsOn );
 	fHistoTot->setSkyMapSize( fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax, fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax );
 	
 	// one set of histograms for each run
@@ -242,7 +236,7 @@ int VStereoAnalysis::getDataRunNumber() const
 		}
 	}
 	
-	exit( -1 );
+	exit( EXIT_FAILURE );
 	return 0;
 }
 
@@ -295,12 +289,12 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 		cout << "VStereoAnalysis::fillHistograms error, no data tree " << endl;
 		cout << "\t" << fDataRun << "\t" << fDataRunTree << endl;
 		cout << "exiting..." << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	if( fHisCounter > ( int )fHisto.size() )
 	{
 		cout << "VStereoAnalysis::fillHistograms invalid run number " << irun << "\t" << fHisCounter << "\t" << fHisto.size() << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	
 	double iMJDStart = 0.;
@@ -366,6 +360,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	
 	// define histograms
 	fDirTotRun[fHisCounter]->cd();
+	fHisto[fHisCounter]->setRunNumber( irun );
 	fHisto[fHisCounter]->defineHistograms();
 	
 	// adjust dead time calculator
@@ -504,7 +499,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			}
 			
 			// get energy (depending on energy reconstruction method)
-			if( fRunPara->fFrogs == 1 )
+			if( fRunPara->fFrogs )
 			{
 				iErec = ( float )( fDataRun->frogsEnergy );
 				iErec = pow( 10.0, iErec );
@@ -632,7 +627,6 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 					fHisto[fHisCounter]->herecChi2->Fill( iErecChi2 );
 				}
 				// fill a tree with the selected events (after direction cut only)
-				//fill_TreeWithSelectedEvents( fDataRun );
 				fill_TreeWithSelectedEvents( fDataRun, i_xderot, i_yderot, i_theta2 );
 			}
 			
@@ -641,7 +635,8 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 				fill_TreeWithAllGamma( fDataRun, i_xderot, i_yderot, icounter, i_UTC, fEVDVersionSign );
 			}
 			
-			if( fIsOn && bIsGamma && fRunPara->fWriteEventTreeForCtools )  // WRITEEVENTTREEFORCTOOLS
+			// fill a tree with current event for ctools converter
+			if( fIsOn && bIsGamma && fRunPara->fWriteEventTreeForCtools )
 			{
 				fill_TreeWithEventsForCtools( fDataRun, i_xderot, i_yderot, icounter, i_UTC, fEVDVersionSign );
 			}
@@ -994,144 +989,64 @@ void VStereoAnalysis::scaleAlpha( double inorm, TH2D* halpha_on, TH2D* h_ON, TH2
 	// hmap_alphaNorm: alpha histogram used in significance calculations (alphaNorm)
 	halpha_off->Scale( inorm );
 	
-	//////////////////////////////////////////////////////////////////////
-	// FOV model only
-	//////////////////////////////////////////////////////////////////////
-	if( fHisCounter > -1 && fRunPara->fRunList[fHisCounter].fBackgroundModel == eFOV )
-	{
-		// We set the information for the source, so the events coming from the source won't be taken...
-		VRadialAcceptance* fAcceptance = 0;
-		if( !bUC )
-		{
-			fAcceptance = fMap->getAcceptance();
+        // individual runs
+        if( fHisCounter > -1 )
+        {
+	       double iSignalBackgroundRatio = 1.;
+	       // normalize alpha (essentially 1./alpha_off)
+	       for( int i = 1; i <= halpha_off->GetNbinsX(); i++ )
+	       {
+		       for( int j = 1; j <= halpha_off->GetNbinsY(); j++ )
+		       {
+			       if( halpha_off->GetBinContent( i, j ) > 0. )
+			       {
+				       if( h_alpha_ratio && h_alpha_ratio->GetMean() > 0. )
+				       {
+					       iSignalBackgroundRatio = h_alpha_ratio->GetMean();
+				       }
+				       else
+				       {
+					       iSignalBackgroundRatio = 1.;
+				       }
+				       // this one is used for the sky maps
+				       hmap_alphaNorm->SetBinContent( i, j, iSignalBackgroundRatio * halpha_on->GetBinContent( i, j ) / halpha_off->GetBinContent( i, j ) );
+				       // keep alpha off for debugging
+				       if( halpha_on->GetBinContent( i, j ) > 0. )
+				       {
+					       halpha_off->SetBinContent( i, j, halpha_off->GetBinContent( i, j ) / ( iSignalBackgroundRatio * halpha_on->GetBinContent( i, j ) ) );
+				       }
+				       else
+				       {
+					       halpha_off->SetBinContent( i, j, 0. );
+				       }
+				       // alpha on is only set if all off histos are set
+				       halpha_on->SetBinContent( i, j, iSignalBackgroundRatio );
+			       }
+			       else
+			       {
+				       hmap_alphaNorm->SetBinContent( i, j, 0. );
+			       }
+		       }
 		}
-		else
-		{
-			fAcceptance = fMapUC->getAcceptance();
-		}
-		if( !fAcceptance )
-		{
-			cout << "Error in VStereoAnalysis::scaleAlpha, no acceptance curves available" << endl;
-			cout << "exiting..." << endl;
-			exit( 0 );
-		}
-		double nevts_on = 0.;
-		double nevts_off = 0.;
-		
-		double cx = 0.;
-		double cy = 0.;
-		
-		int i_xoff =  h_ON->GetXaxis()->FindBin( fRunPara->fRunList[fHisCounter].fWobbleWestMod ) - h_ON->GetXaxis()->FindBin( 0. );
-		int j_yoff =  h_ON->GetYaxis()->FindBin( fRunPara->fRunList[fHisCounter].fWobbleNorthMod ) - h_ON->GetYaxis()->FindBin( 0. );
-		
-		// Loop on all the bins of On and Off maps to calculate the total number of events
-		for( Int_t i = 1; i < h_ON->GetNbinsX(); i++ )
-		{
-			for( Int_t j = 1; j < h_ON->GetNbinsY(); j++ )
-			{
-				cx = h_ON->GetXaxis()->GetBinCenter( i + i_xoff );
-				cy = h_ON->GetYaxis()->GetBinCenter( j + j_yoff );
-				
-				// If the events are not in the source region, they will be calculated
-				if( fAcceptance->isExcludedfromBackground( cx, cy ) )
-				{
-					continue;
-				}
-				else
-				{
-					nevts_on += h_ON->GetBinContent( i , j );
-					nevts_off += h_OFF->GetBinContent( i, j );
-				}
-			}
-		}
-		
-		// Calculation of the normalisation factor for the Off map, so that it's a the same level as the On
-		double alpha_norm = ( nevts_on / nevts_off );
-		if( fHisCounter >= 0 )
-		{
-			halpha_off->Scale( 1.0 / alpha_norm );
-		}
-		
-		// normalize alpha (essentially 1./alpha_off)
-		for( int i = 1; i <= halpha_off->GetNbinsX(); i++ )
-		{
-			for( int j = 1; j <= halpha_off->GetNbinsY(); j++ )
-			{
-				if( halpha_off->GetBinContent( i, j ) > 0. )
-				{
-					hmap_alphaNorm->SetBinContent( i, j, ( halpha_on->GetBinContent( i, j ) / halpha_off->GetBinContent( i, j ) ) );
-				}
-				else
-				{
-					hmap_alphaNorm->SetBinContent( i, j, 0. );
-				}
-			}
-		}
-	}
-	//////////////////////////////////////////////////////////////////////
-	// all other background models except FOV model
-	//////////////////////////////////////////////////////////////////////
-	else
-	{
-		// individual runs
-		if( fHisCounter > -1 )
-		{
-			double iSignalBackgroundRatio = 1.;
-			// normalize alpha (essentially 1./alpha_off)
-			for( int i = 1; i <= halpha_off->GetNbinsX(); i++ )
-			{
-				for( int j = 1; j <= halpha_off->GetNbinsY(); j++ )
-				{
-					if( halpha_off->GetBinContent( i, j ) > 0. )
-					{
-						if( h_alpha_ratio && h_alpha_ratio->GetMean() > 0. )
-						{
-							iSignalBackgroundRatio = h_alpha_ratio->GetMean();
-						}
-						else
-						{
-							iSignalBackgroundRatio = 1.;
-						}
-						// this one is used for the sky maps
-						hmap_alphaNorm->SetBinContent( i, j, iSignalBackgroundRatio * halpha_on->GetBinContent( i, j ) / halpha_off->GetBinContent( i, j ) );
-						// keep alpha off for debugging
-						if( halpha_on->GetBinContent( i, j ) > 0. )
-						{
-							halpha_off->SetBinContent( i, j, halpha_off->GetBinContent( i, j ) / ( iSignalBackgroundRatio * halpha_on->GetBinContent( i, j ) ) );
-						}
-						else
-						{
-							halpha_off->SetBinContent( i, j, 0. );
-						}
-						// alpha on is only set if all off histos are set
-						halpha_on->SetBinContent( i, j, iSignalBackgroundRatio );
-					}
-					else
-					{
-						hmap_alphaNorm->SetBinContent( i, j, 0. );
-					}
-				}
-			}
-		}
-		// combined runs
-		else
-		{
-			for( int i = 1; i <= halpha_off->GetNbinsX(); i++ )
-			{
-				for( int j = 1; j <= halpha_off->GetNbinsY(); j++ )
-				{
-					if( hmap_stereo_off->GetBinContent( i, j ) > 0. )
-					{
-						hmap_alphaNorm->SetBinContent( i, j, halpha_off->GetBinContent( i, j ) / hmap_stereo_off->GetBinContent( i, j ) );
-					}
-					else
-					{
-						hmap_alphaNorm->SetBinContent( i, j, 0. );
-					}
-				}
-			}
-		}
-	}
+	  }
+	  // combined runs
+	  else
+	  {
+		  for( int i = 1; i <= halpha_off->GetNbinsX(); i++ )
+		  {
+			  for( int j = 1; j <= halpha_off->GetNbinsY(); j++ )
+			  {
+				  if( halpha_off->GetBinContent( i, j ) > 0. )
+				  {
+					  hmap_alphaNorm->SetBinContent( i, j, halpha_on->GetBinContent( i, j ) /  halpha_off->GetBinContent( i, j ) );
+				  }
+				  else
+				  {
+					  hmap_alphaNorm->SetBinContent( i, j, 0. );
+				  }
+			  }
+		  }
+	  }
 }
 
 
@@ -1188,23 +1103,28 @@ double VStereoAnalysis::combineHistograms()
 		// CORRELATED PLOTS
 		nxbin = fHistoTot->hmap_stereo->GetNbinsX();
 		nybin = fHistoTot->hmap_stereo->GetNbinsY();
+		float i_exposure = 0.;
+		if( fHisto[h]->getRunNumber() > 0  ) i_exposure = getEffectiveExposure( fHisto[h]->getRunNumber() );
 		for( int i = 1; i <= nxbin; i++ )
 		{
 			for( int j = 1; j <= nybin; j++ )
 			{
-				if( fHisto[h]->hmap_alpha_off && fHisto[h]->hmap_alpha_off->GetBinContent( i, j ) > 0. )
+				fHistoTot->hmap_stereo->SetBinContent( i, j, fHisto[h]->hmap_stereo->GetBinContent( i, j ) + fHistoTot->hmap_stereo->GetBinContent( i, j ) );
+				// average normalization (alpha) factor
+				if( fHisto[h]->hmap_alpha && fHisto[h]->hmap_alpha->GetBinContent( i, j ) > 0. )
 				{
-					fHistoTot->hmap_stereo->SetBinContent( i, j, fHisto[h]->hmap_stereo->GetBinContent( i, j ) + fHistoTot->hmap_stereo->GetBinContent( i, j ) );
-					// divide later by total number of off events
-					fHistoTot->hmap_alpha->SetBinContent( i, j, 1. / fHisto[h]->hmap_alpha->GetBinContent( i, j )*fHisto[h]->hmap_stereo->GetBinContent( i, j )
-														  + fHistoTot->hmap_alpha->GetBinContent( i, j ) );
-				}
+					{
+					   fHistoTot->hmap_alpha->SetBinContent( i, j, fHisto[h]->hmap_alpha->GetBinContent( i, j ) * i_exposure
+											  + fHistoTot->hmap_alpha->GetBinContent( i, j ) );
+                                        }
+                                }
 			}
 		}
 		fHisto[h]->deleteSkyPlots();
 		iDir->cd();
 	}  // (end loop over all histograms)
 	
+	//////////////////////////////////////
 	// combine parameter (1D) histograms
 	for( unsigned int h = 0; h < n_histo; h++ )
 	{
@@ -1790,7 +1710,6 @@ void VStereoAnalysis::defineAstroSource()
 		{
 			if( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 > -90. )
 			{
-				// NEWNEWNEW changed from target to sky map centre
 				fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  = VSkyCoordinatesUtilities::getTargetShiftWest( fRunPara->fRunList[i].fSkyMapCentreRAJ2000,
 						fRunPara->fRunList[i].fSkyMapCentreDecJ2000,
 						fRunPara->fExclusionRegions[k]->fExcludeFromBackground_RAJ2000,
@@ -1799,9 +1718,6 @@ void VStereoAnalysis::defineAstroSource()
 						fRunPara->fRunList[i].fSkyMapCentreDecJ2000,
 						fRunPara->fExclusionRegions[k]->fExcludeFromBackground_RAJ2000,
 						fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 );
-				// NEWNEWNEW
-				/*		  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  += fRunPara->fRunList[i].fSkyMapCentreWest;
-						  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North += fRunPara->fRunList[i].fSkyMapCentreNorth; */
 				if( TMath::Abs( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North ) < 1.e-4 )
 				{
 					fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North = 0.;
@@ -1811,7 +1727,6 @@ void VStereoAnalysis::defineAstroSource()
 					fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  = 0.;
 				}
 			}
-			// NEWNEWNEW	     fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  *= -1.;
 		}
 	}
 }
@@ -1989,16 +1904,16 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
 		{
 			cout << "VStereoAnalysis::getDataFromFile() error: cannot find data tree in " << iFileName << endl;
                         cout << "exiting..." << endl;
-			exit( -1 );
+			exit( EXIT_FAILURE );
 		}
-		if( fRunPara->fFrogs == 1 )
+		if( fRunPara->fFrogs )
 		{
 			fDataFrogsTree = ( TTree* )fDataFile->Get( "frogspars" );
 			if( !fDataFrogsTree )
 			{
 				cout << "VStereoAnalysis::getDataFromFile() error: cannot find frogspars tree in " << iFileName << endl;
                                 cout << "exiting..." << endl;
-				exit( -1 );
+				exit( EXIT_FAILURE );
 			}
 			fDataRunTree->AddFriend( fDataFrogsTree );
 		}
@@ -2113,7 +2028,7 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
 		fTreeSelectedEvents->Branch( "Converged3D", &fTreeSelected_Converged3D, "Converged3D/b" );
 	}
 	
-	if( fRunPara->fFrogs == 1 )
+	if( fRunPara->fFrogs )
 	{
 		fTreeSelectedEvents->Branch( "frogsEventID", &fTreeSelescted_frogsEventID, "frogsEventID/I" );
 		fTreeSelectedEvents->Branch( "frogsGSLConStat", &fTreeSelescted_frogsGSLConStat, "frogsGSLConStat/I" );
@@ -2234,7 +2149,6 @@ void VStereoAnalysis::reset_TreeWithSelectedEvents()
 	fTreeSelescted_frogs_theta2  = 0.;
 }
 
-//void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c )
 void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c, double i_xderot, double i_yderot, double i_theta2 )
 {
 	if( !c )

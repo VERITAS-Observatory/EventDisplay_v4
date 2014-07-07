@@ -37,8 +37,9 @@ class VStereoHistograms
 		double fSkyMapSizeYmax;
 		double fTimeMin;
 		double fTimeMax;
+
+		int    fRunNumber;
 		
-		void defineHistograms( int i_count, int irun, string i_hsuffix, double ibinsize, double ibinsizeUC, double iEnergyBinSize, bool ion );
 		bool readHistograms( TList*, string );
 		
 	public:
@@ -118,11 +119,13 @@ class VStereoHistograms
 		void defineHistograms();
 		void deleteParameterHistograms();
 		void deleteSkyPlots();
+		int  getRunNumber() { return fRunNumber; }
 		void makeRateHistograms( double, double );
 		bool readParameterHistograms();
 		bool readSkyPlots();
 		void scaleDistributions( double );
 		void setAlphaOff( TH2D* ioff, bool iuc );
+		void setRunNumber( int iRun ) { fRunNumber = iRun; }
 		void setSkyMapSize( double xmin, double xmax, double ymin, double ymax );
 		void writeObjects( string, string, TObject* );
 		void writeHistograms();

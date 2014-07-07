@@ -94,7 +94,7 @@ void VPlotAnasumHistograms::help()
 	cout << "   plot theta2 histograms" << endl << endl;
 	cout << "plot_skyPlots()" << endl;
 	cout << "   plot on, background, and on-background count maps, plot normalisation factors" << endl << endl;
-	cout << "plot_significance(char* filename = \"output.root\", int ion = -1, bool iCorrelated = false,";
+	cout << "plot_skyPlots_significance(char* filename = \"output.root\", int ion = -1, bool iCorrelated = false,";
 	cout << "double rmax = -1., double zmin = -100., double zmax = -100., bool bPoster = false)" << endl;
 	cout << "plot_UncorrelatedSkyPlots()" << endl;
 	cout << "   plot on, background, and on-background uncorrelated count maps, plot normalisation factors" << endl << endl;
@@ -527,11 +527,11 @@ TCanvas* VPlotAnasumHistograms::plot_skyPlots( string iPlotMode, bool iSingleCan
 	TH2D* hmap_alpha_diff = 0;
 	if( fPlotCorrelated )
 	{
-		sprintf( hname, "hmap_alphaUC_diff" );
+		sprintf( hname, "hmap_alphaNormUC_off" );
 	}
 	else
 	{
-		sprintf( hname, "hmap_alpha_diff" );
+		sprintf( hname, "hmap_alphaNorm_off" );
 	}
 	hmap_alpha_diff = ( TH2D* )getHistogram( hname, fRunNumber, "skyHistograms" );
 	setHistogramPlottingStyle( hmap_alpha_diff, 1.5 );
@@ -654,7 +654,8 @@ TCanvas* VPlotAnasumHistograms::plot_skyPlots( string iPlotMode, bool iSingleCan
  */
 void VPlotAnasumHistograms::plot_UncorrelatedSkyPlots()
 {
-	plot_skyPlots( "colz", true );
+	setPlottingCorrelatedHistograms( true );
+	plot_skyPlots( "colz", false );
 }
 
 
@@ -665,6 +666,7 @@ void VPlotAnasumHistograms::plot_UncorrelatedSkyPlots()
  */
 void VPlotAnasumHistograms::plot_CorrelatedSkyPlots()
 {
+	setPlottingCorrelatedHistograms( false );
 	plot_skyPlots( "colz", false );
 }
 
@@ -2294,6 +2296,8 @@ void VPlotAnasumHistograms::plot_deadTimes()
 	if( fRunNumber < 0 )
 	{
 		cout << "VPlotAnasumHistograms::plot_deadTimes(): error no run number set" << endl;
+		cout << endl;
+		cout << "  this plotting routine works only for individual runs, use VPlotAnasumHistograms::setRunNumber( <run number> ); to select a run" <<  endl;
 		return;
 	}
 	
@@ -2668,6 +2672,13 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
  */
 void VPlotAnasumHistograms::plot_theta2Correction()
 {
+	if( fRunNumber < 0 )
+	{
+		cout << "VPlotAnasumHistograms::plot_theta2Correction(): error no run number set" << endl;
+		cout << endl;
+		cout << "  this plotting routine works only for individual runs, use VPlotAnasumHistograms::setRunNumber( <run number> ); to select a run" <<  endl;
+		return;
+        }
 	char itemp[200];
 	TH1D* hon = ( TH1D* )getHistogram( "hAux_theta2On", fRunNumber, "debug" );
 	TH1D* hoff = ( TH1D* )getHistogram( "hAux_theta2Off", fRunNumber, "debug" );
@@ -2926,7 +2937,7 @@ void VPlotAnasumHistograms::plot_qfactors( char* varexp, char* selection, char* 
  *  rmax < 0: apply box cut around pointing direction
  */
 
-TCanvas* VPlotAnasumHistograms::plot_significance( bool iCorrelated, double rmax, double zmin, double zmax, bool bPoster )
+TCanvas* VPlotAnasumHistograms::plot_skyPlots_significance( bool iCorrelated, double rmax, double zmin, double zmax, bool bPoster )
 {
 	bool bZetaTau = false;
 	

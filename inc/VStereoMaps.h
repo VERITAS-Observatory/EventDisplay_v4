@@ -111,11 +111,6 @@ class VStereoMaps
 		int f_RE_WW;
 		int f_RE_WN;
 		
-		// FOV BACKGROUND MODEL
-		bool fill_FOVBackgroundModel( double, double, double, double, int, bool );
-		bool initialize_FOVBackgroundModel( bool iIsOn );
-		void FOVM_getAlpha( bool );
-		
 		// etc
 		void   cleanup();                         // delete all objects not needed anymore
 		bool   defineAcceptance();
