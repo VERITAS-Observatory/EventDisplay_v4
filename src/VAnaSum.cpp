@@ -631,30 +631,25 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	// normalization
 	double i_norm_alpha = i_norm * fStereoOff->getAlphaNorm()->GetBinContent( fStereoOff->getAlphaNorm()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ),
 						  fStereoOff->getAlphaNorm()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
-						  
+
 	double i_sig = VStatistics::calcSignificance( i_nevts_on, i_nevts_off, i_norm_alpha );
 	double i_rate = 0.;
+        double i_rateE = 0.;
 	double i_rateOFF = 0.;
-	if( iexp_on > 0. )
+	if( iexp_on > 0. && iexp_off > 0. )
 	{
 		i_rate = ( i_nevts_on - i_norm_alpha * i_nevts_off ) * 60. / iexp_on;       // rates in 1/min
 		i_rateOFF = i_norm_alpha * i_nevts_off * 60. / iexp_off;                    // rates in 1/min
+                i_rateE = sqrt( i_nevts_on + i_norm * i_norm * i_norm_alpha * i_norm_alpha * i_nevts_off ) * 60. / iexp_on;
 	}
 	
 	cout << endl;
 	cout << "\t ---------------------------- " << endl;
 	cout << "\t RESULTS FOR SOURCE POSITION: " << endl;
 	cout << "\t ---------------------------- " << endl;
-	cout << "\t ON:" << i_nevts_on << "  OFF:" << setprecision( 4 ) << i_nevts_off* i_norm_alpha << " (" << i_nevts_off << ", " << i_norm_alpha << ")" << endl;
-	cout << "\t " << setprecision( 4 ) <<  i_sig << " Sigma  " << i_rate << "+/-";
-	if( i_sig != 0. )
-	{
-		cout << i_rate / i_sig << " gammas/min" << endl;
-	}
-	else
-	{
-		cout << 0. << " gammas/min" << endl;
-	}
+	cout << "\t ON:" << i_nevts_on << "  OFF:" << setprecision( 4 ) << i_nevts_off* i_norm_alpha << " (";
+        cout << "off " << i_nevts_off << ", alpha=" << i_norm_alpha << ")" << endl;
+	cout << "\t " << setprecision( 4 ) <<  i_sig << " Sigma  " << i_rate << "+/-" << i_rateE << " gammas/min" << endl;
 	cout << "\t background rate: " << i_rateOFF << " CR/min" << endl;
 	cout << endl;
 	

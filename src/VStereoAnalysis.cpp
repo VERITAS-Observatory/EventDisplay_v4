@@ -986,7 +986,7 @@ void VStereoAnalysis::scaleAlpha( double inorm, TH2D* halpha_on, TH2D* h_ON, TH2
 	{
 		cout << "VStereoAnalysis::scaleAlpha: fatal error, cannot find histograms ";
 		cout << halpha_off << "\t" << hmap_alphaNorm << "\t" << hmap_stereo_off << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	
 	// halpha_on: on alpha histogram

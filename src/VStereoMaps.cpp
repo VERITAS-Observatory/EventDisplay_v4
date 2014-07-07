@@ -125,12 +125,10 @@ bool VStereoMaps::fill( bool is_on, double x_sky, double y_sky, double theta2Cut
 	
 	if( is_on )
 	{
-		//return fillOn( x_sky, y_sky, ze, erec, irun, i_isGamma );
 		return fillOn( x_sky, y_sky, ze, erec, irun, i_isGamma, i_theta2 );
 	}
 	else
 	{
-		//return fillOff( x_sky, y_sky, ze, erec, irun, i_isGamma );
 		return fillOff( x_sky, y_sky, ze, erec, irun, i_isGamma, i_theta2 );
 	}
 	
@@ -143,7 +141,6 @@ bool VStereoMaps::fill( bool is_on, double x_sky, double y_sky, double theta2Cut
     fill ON event into a sky map
 
 */
-//bool VStereoMaps::fillOn( double x, double y, double ze, double erec, int irun, bool i_isGamma )
 bool VStereoMaps::fillOn( double x, double y, double ze, double erec, int irun, bool i_isGamma, double& i_theta2 )
 {
 	double i_weight = 1.;
@@ -738,7 +735,6 @@ void VStereoMaps::RE_getAlpha( bool iIsOn )
 	}
 }
 
-//bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool i_isGamma )
 bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool i_isGamma, double& i_theta2 )
 {
 	// at the beginning of each run, set up off regions
