@@ -102,6 +102,7 @@ class VStereoAnalysis
 		{
 			fNoSkyPlots = iS;
 		}
+                void   setRunExposure( map< int, double > iExpl ) { fRunExposure = iExpl; }
 		void   setRunMJD( map< int, double > iRunMJD )
 		{
 			fRunMJD = iRunMJD;
@@ -407,6 +408,7 @@ class VStereoAnalysis
 				return fDataRun->Yoff;
 			}
 		}
+
 		
 };
 #endif

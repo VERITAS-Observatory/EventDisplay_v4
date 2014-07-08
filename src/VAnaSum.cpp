@@ -1,5 +1,5 @@
 /*! \class VAnaSum
-    \brief class for producing an analysis summary from parameterized veritas data
+    brief class for producing an analysis summary from parameterized veritas data
 
 */
 
@@ -371,10 +371,6 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 		{
 			fMonoRatePlots.push_back( new VRatePlots( fRunPara, fStereoOn->getRunMJD() ) );
 		}
-		// MJD times for mono analysis calculated in VStereoAnalysis!
-		// Shouldn't make a difference:
-		// - VStereoAnalysis is initialised even in the case of mono analysis
-		// - the trees are the same
 	}
 	fRunSummary = new VRunSummary();
 	
@@ -413,6 +409,8 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 		fMeanRawRateOff = fRunSummary->fMeanRawRateOff;
 		fMeanPedVarsOn  = fRunSummary->fMeanPedVarsOn;
 		fMeanPedVarsOff = fRunSummary->fMeanPedVarsOff;
+                if( fStereoOn )  fStereoOn->setRunExposure( fRunExposureOn );
+                if( fStereoOff ) fStereoOff->setRunExposure( fRunExposureOff );
 	}
 }
 

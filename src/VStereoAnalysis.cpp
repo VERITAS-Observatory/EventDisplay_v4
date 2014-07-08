@@ -85,6 +85,8 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 						  f_t_in_s_max[fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff], fIsOn ) );
 		fHisto.back()->setSkyMapSize( fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax,
 									  fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax );
+                if( fIsOn ) fHisto.back()->setRunNumber( fRunPara->fRunList[i].fRunOn );
+                else        fHisto.back()->setRunNumber( fRunPara->fRunList[i].fRunOff );
 									  
 		// define dead time calculators
 		fDeadTime.push_back( new VDeadTime( fIsOn ) );

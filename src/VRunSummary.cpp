@@ -260,13 +260,13 @@ bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_director
 		{
 			cout << "VRunSummary::fill error file not found: " << iInputfile.GetName() << endl;
 			cout << "exiting..." << endl;
-			exit( -1 );
+			exit( EXIT_FAILURE );
 		}
 		if( !iInputfile.cd( ( i_inputfile_total_directory + "/stereo/" ).c_str() ) )
 		{
 			cout << "VRunSummary::fill error summary directory " << i_inputfile_total_directory << " not found " << endl;
 			cout << "exiting..." << endl;
-			exit( -1 );
+			exit( EXIT_FAILURE );
 		}
 		// read anasum tree from file
 		TTree* i_runSumTree = ( TTree* )gDirectory->Get( "tRunSummary" );
@@ -274,7 +274,7 @@ bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_director
 		{
 			cout << "VRunSummary::fill error: run summary tree in " << iInputfile.GetName() << " not found" << endl;
 			cout << "exiting..." << endl;
-			exit( -1 );
+			exit( EXIT_FAILURE );
 		}
 		CRunSummary i_runSum( i_runSumTree );
 		
@@ -306,6 +306,8 @@ bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_director
 			i_runSum.GetEntry( n );
 			if( i_runSum.runOn == iRunList[i].fRunOn )
 			{
+                                runOn = iRunList[i].fRunOn;
+                                runOff = iRunList[i].fRunOff;
 				// copy entries to new run summary tree
 				fRunSummaryTree->CopyAddresses( i_runSumTree );
 				fRunSummaryTree->CopyEntries( i_runSumTree, 1 );

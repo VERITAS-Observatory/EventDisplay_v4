@@ -1087,7 +1087,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			// that probably does not make sense
 			else
 			{
-				cout << "SHOULD NOT BE HERE XXXX" << endl;
+				cout << "SHOULD NOT BE HERE" << endl;
 			}
 		}
 		///////////////////////////////

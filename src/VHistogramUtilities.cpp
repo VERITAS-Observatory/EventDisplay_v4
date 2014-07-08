@@ -324,7 +324,6 @@ TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormaliz
 			iH_out->SetBinContent( i, iH_in->GetBinContent( i ) + iH_out->GetBinContent( i + 1 ) );
 		}
 	}
-	cout << "XXX " << z << "\t" << iH_out->GetBinContent( z ) << endl;
 	if( iNormalize && iH_out->GetBinContent( z ) > 0. )
 	{
 		iH_out->Scale( 1. / iH_out->GetBinContent( z ) );
