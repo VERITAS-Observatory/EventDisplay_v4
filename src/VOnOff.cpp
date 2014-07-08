@@ -1,9 +1,6 @@
 /*! \class VOnOff
  *  \brief do signal - background histogramming for sky maps and 1D histograms (e.g. energy spectra, mscw histograms, ...)
  *
- *  \author
- *  Gernot Maier
- *
  */
 
 #include "VOnOff.h"
@@ -209,8 +206,7 @@ void VOnOff::doOnOffforSkyHistograms( TList* ionlist, TList* iofflist, double i_
 				{
 					int j_a = ialpha->GetYaxis()->FindBin( hTemp->GetYaxis()->GetBinCenter( j ) );
 					// normalisation factor must be nonzero
-					// (GM) (why on value? why off value?)
-					if( ialpha->GetBinContent( i_a, j_a ) != 0. && hon->GetBinContent( i, j ) != 0. && hoff->GetBinContent( i, j ) != 0. )
+					if( ialpha->GetBinContent( i_a, j_a ) != 0. && hon->GetBinContent( i, j ) > 0. )
 					{
 						hTemp->SetBinContent( i, j, hon->GetBinContent( i, j ) - hoff->GetBinContent( i, j )*ialpha->GetBinContent( i_a, j_a ) );
 					}
