@@ -251,6 +251,7 @@ static void syntax( char* program )
 	printf( "   -t <trgmask directory> (directory with trigger mask files (corrections for Spring 2013 prod2 production)\n" );
 	printf( "   -r on=1/off=0    (apply camera plate scaling for DC telescopes; default=1)\n" );
 	printf( "   -d <nbits dyn.>  (dynamic range of readout (e.g. 12 for 12 bit. Switch to low gain)\n" );
+	printf( "   -NSB <float>     (scale pedvars by sqrt(...) of this value\n" );
 	printf( "   -pe              (fill leaf with photoelectrons into DST tree (default: off)\n" );
 	
 	exit( 1 );
@@ -778,7 +779,7 @@ bool DST_fillEvent( VDSTTree* fData, AllHessData* hsdata, map< unsigned int, flo
        e.g. pedestals, tzeros, gains, etc.
 
 */
-TTree* DST_fillCalibrationTree( VDSTTree* fData, AllHessData* hsdata, map< unsigned int, float > telescope_list, string ipedfile )
+TTree* DST_fillCalibrationTree( VDSTTree* fData, AllHessData* hsdata, map< unsigned int, float > telescope_list, string ipedfile, float iNSBScaling )
 {
 	if( !hsdata )
 	{
@@ -794,6 +795,12 @@ TTree* DST_fillCalibrationTree( VDSTTree* fData, AllHessData* hsdata, map< unsig
 		cout << " (using data from simtelarray file)";
 	}
 	cout << endl;
+        if( iNSBScaling <= 0. )
+        {
+            cout << "DST_fillCalibrationTree: invalid NSB scaling factor (should be >0): iNSBScaling" << endl;
+            cout << "exiting..." << endl;
+            exit( EXIT_FAILURE );
+        }
 	
 	int fTelID = 0;
 	
@@ -881,7 +888,7 @@ TTree* DST_fillCalibrationTree( VDSTTree* fData, AllHessData* hsdata, map< unsig
 			{
 				cout << "DST_fillCalibrationTree error: number of pixels (" << nPixel << ") exeeds allowed range (" << VDST_MAXCHANNELS << ")" << endl;
 				cout << "\t adjust arrays..." << endl;
-				exit( -1 );
+				exit( EXIT_FAILURE );
 			}
 			// pedestal (always taken from hessio file)
 			for( unsigned int p = 0; p < nPixel; p++ )
@@ -927,8 +934,8 @@ TTree* DST_fillCalibrationTree( VDSTTree* fData, AllHessData* hsdata, map< unsig
 					
 					for( unsigned int w = 0; w < fnum_sumwindow; w++ )
 					{
-						fPedvar_high[p * VDST_MAXSUMWINDOW + w] = iT_pedvars[w];
-						fPedvar_low[p * VDST_MAXSUMWINDOW + w] = hsdata->tel_moni[itel].noise[LO_GAIN][p];
+						fPedvar_high[p * VDST_MAXSUMWINDOW + w] = iT_pedvars[w] * sqrt( iNSBScaling );
+						fPedvar_low[p * VDST_MAXSUMWINDOW + w] = hsdata->tel_moni[itel].noise[LO_GAIN][p] * sqrt( iNSBScaling );
 					}
 				}
 				if( i_curDir )
@@ -1260,6 +1267,7 @@ int main( int argc, char** argv )
 	bool   fWriteFADC = false;           // fill FADC traces into converter
 	unsigned int fDynamicRange = 0;      // dynamic range (for decision of high/low gain)
 	bool   fApplyCameraScaling = true;   // apply camera plate scaling according for DC telescopes
+        float  fNSB_scaling = 1.;            // pedvar scaling due to higher NSB
 	
 	static AllHessData* hsdata;
 	
@@ -1356,6 +1364,13 @@ int main( int argc, char** argv )
 			argv += 2;
 			continue;
 		}
+		else if( strcmp( argv[1], "-NSB" ) == 0 )
+		{
+			fNSB_scaling = atof( argv[2] );
+			argc -= 2;
+			argv += 2;
+			continue;
+		}
 		else if( strcmp( argv[1], "-a" ) == 0 )
 		{
 			config_file = argv[2];
@@ -1445,7 +1460,7 @@ int main( int argc, char** argv )
 	if( fDSTfile->IsZombie() )
 	{
 		cout << "Error while opening DST output file: " << fDSTfile->GetName() << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	cout << "DST tree will be written to " << dst_file << endl;
 	if( fWriteFADC )
@@ -1476,7 +1491,7 @@ int main( int argc, char** argv )
 	if( fTelescope_list.size() < 1 )
 	{
 		cout << "error reading array configuration file" << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	fDST->setFADC( fWriteFADC );
 	fDST->setFillPELeaf( fFillPELeaf );
@@ -1524,7 +1539,7 @@ int main( int argc, char** argv )
 			perror( input_fname );
 			cout << "Cannot open input file." << endl;
 			cout << "exiting..." << endl;
-			exit( -1 );
+			exit( EXIT_FAILURE );
 		}
 		cout << "opening simtel file " << input_fname << endl;
 		
@@ -2122,7 +2137,7 @@ int main( int argc, char** argv )
 		fMC_header->print();
 	}
 	// writing calibration data
-	TTree* i_calibTree = DST_fillCalibrationTree( fDST, hsdata, fTelescope_list, ped_file );
+	TTree* i_calibTree = DST_fillCalibrationTree( fDST, hsdata, fTelescope_list, ped_file, fNSB_scaling );
 	if( fDSTfile )
 	{
 		fDSTfile->cd();
