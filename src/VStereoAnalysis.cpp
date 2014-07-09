@@ -1086,6 +1086,7 @@ double VStereoAnalysis::combineHistograms()
 		// read in sky plots from disk
 		fHisto[h]->readSkyPlots();
 		
+		/////////////////////////////
 		// UNCORRELATED PLOTS
 		int nxbin = fHistoTot->hmap_stereoUC->GetNbinsX();
 		int nybin = fHistoTot->hmap_stereoUC->GetNbinsY();
@@ -1102,6 +1103,7 @@ double VStereoAnalysis::combineHistograms()
 			}
 		}
 		
+		//////////////////////////////
 		// CORRELATED PLOTS
 		nxbin = fHistoTot->hmap_stereo->GetNbinsX();
 		nybin = fHistoTot->hmap_stereo->GetNbinsY();
@@ -1122,6 +1124,29 @@ double VStereoAnalysis::combineHistograms()
 		fHisto[h]->deleteSkyPlots();
 		iDir->cd();
 	}  // (end loop over all histograms)
+
+	//////////////////////////////////////
+	// errors in sky maps (simple counting)
+	for( int i = 1; i <= fHistoTot->hmap_stereoUC->GetNbinsX(); i++ )
+	{
+	    for( int j = 1; j <= fHistoTot->hmap_stereoUC->GetNbinsY(); j++ )
+	    {
+	        if( fHistoTot->hmap_stereoUC->GetBinContent( i, j ) > 0 )
+		{
+		     fHistoTot->hmap_stereoUC->SetBinError( i, j, sqrt( fHistoTot->hmap_stereoUC->GetBinContent( i, j ) ) );
+                }
+            }
+        }
+	for( int i = 1; i <= fHistoTot->hmap_stereo->GetNbinsX(); i++ )
+	{
+	    for( int j = 1; j <= fHistoTot->hmap_stereo->GetNbinsY(); j++ )
+	    {
+	        if( fHistoTot->hmap_stereo->GetBinContent( i, j ) > 0 )
+		{
+		     fHistoTot->hmap_stereo->SetBinError( i, j, sqrt( fHistoTot->hmap_stereo->GetBinContent( i, j ) ) );
+                }
+            }
+        }
 	
 	//////////////////////////////////////
 	// combine parameter (1D) histograms
