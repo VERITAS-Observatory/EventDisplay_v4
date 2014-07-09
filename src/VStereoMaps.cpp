@@ -1,9 +1,6 @@
 /*! \class VStereoMaps
  *  fill sky maps and calculate on and off events
  *
- *  \author
- *  Gernot Maier
- *
  *
  *  Random generator is used for:
  *  =============================
@@ -682,8 +679,6 @@ void VStereoMaps::RM_getAlpha( bool iIsOn )
 
   normalization map for reflected region model
 
-  each bin in alpha map contains nregion*nevents(this bin only) events
-  (divide by this number to get normalization value alpha)
 
 */
 void VStereoMaps::RE_getAlpha( bool iIsOn )
@@ -1088,7 +1083,8 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
 			
 			// bin is outside confidence region (distance of bin + off source radius)
 			// and bin is too close to center of camera
-			if( ids < ( fRunList.fmaxradius - fRE_roffTemp ) && ids > fRE_roffTemp && fRE_roffTemp != 0. )
+//			if( ids < ( fRunList.fmaxradius - fRE_roffTemp ) && ids > fRE_roffTemp && fRE_roffTemp != 0. )
+			if( ids < ( fRunList.fmaxradius ) && ids > fRE_roffTemp && fRE_roffTemp != 0. )
 			{
 				// angular size of the on region seen from the observation position
 				double w = asin( fRE_roffTemp / ids );
@@ -1671,10 +1667,10 @@ void VStereoMaps::cleanup()
 	double r = 0.;
 	double w = hmap_alpha->GetXaxis()->GetBinWidth( 2 );
 	
-	for( int i = 1; i < hmap_alpha->GetNbinsX(); i++ )
+	for( int i = 1; i <= hmap_alpha->GetNbinsX(); i++ )
 	{
 		x = hmap_alpha->GetXaxis()->GetBinCenter( i );
-		for( int j = 1; j < hmap_alpha->GetNbinsY(); j++ )
+		for( int j = 1; j <= hmap_alpha->GetNbinsY(); j++ )
 		{
 			y = hmap_alpha->GetYaxis()->GetBinCenter( j );
 			

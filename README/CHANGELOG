@@ -2,6 +2,10 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140708 (GM)
+correction at edges and centre of FOV for reflected
+region model
+
 * 20140707 (GM)
 bug fix in anasum for significance and normalization
 parameters for runs with zero off events

@@ -1025,6 +1025,10 @@ void VGammaHadronCuts::printCutSummary()
 	cout << " (ntel=" << fNTel << "): ";
 	cout << endl;
 	cout << "Gamma/hadron cut selector: " << fGammaHadronCutSelector << endl;
+	if( fInstrumentEpoch != "NOT_SET" )
+	{
+	    cout << "Instrument epoch selected: " << fInstrumentEpoch << endl;
+        }
 	
 	// direction cuts
 	printDirectionCuts();
