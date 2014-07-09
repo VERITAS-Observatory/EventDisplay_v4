@@ -1285,17 +1285,8 @@ void VCalibrator::readCalibrationData()
 		// read high gain pedestals
 		readPeds( fPedFileNameC[getTelID()], false, getSumWindow() );
 		
-		// read low gain pedestals
-		if( fNewLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
-		{
-			readPeds( fNewLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow() );
-		}
-		else if( fLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
-		{
-			readPeds( fLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow() );
-		}
                 // use for simulations a fixed value for low-gain pedestal
-                else if( getRunParameter()->fsimu_lowgain_pedestal_DefaultPed > 0. )
+                if( getRunParameter()->fsimu_lowgain_pedestal_DefaultPed > 0. )
                 {
 			getPedsLowGain() = getRunParameter()->fsimu_lowgain_pedestal_DefaultPed;
 			getPedvarsLowGain() = getPedvars();
@@ -1303,6 +1294,15 @@ void VCalibrator::readCalibrationData()
 			getmeanPedvarsAllSumWindow( true ) = getmeanPedvarsAllSumWindow( false );
 			getmeanRMSPedvarsAllSumWindow( true ) = getmeanRMSPedvarsAllSumWindow( false );
                 }
+		// read low gain pedestals
+		else if( fNewLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
+		{
+			readPeds( fNewLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow() );
+		}
+		else if( fLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
+		{
+			readPeds( fLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow() );
+		}
 		// no low gain peds available -> set low gain peds to high gain peds (not sure if this is a good idea)
 		else
 		{
@@ -1337,19 +1337,9 @@ void VCalibrator::readCalibrationData()
 		
 		// read summation window dependend values for second summation window
 		readPeds( fPedFileNameC[getTeltoAna()[i]], false, getSumWindow_2() );
-		
-		// read low gain pedestals
-		if( fNewLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
-		{
-			readPeds( fNewLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow_2() );
-		}
-		else 
-		if( fLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
-		{
-			readPeds( fLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow_2() );
-		}
-                // use for simulations a fixed value for low-gain pedestal
-                else if( getRunParameter()->fsimu_lowgain_pedestal_DefaultPed > 0. )
+		           
+	     // use for simulations a fixed value for low-gain pedestal
+                if( getRunParameter()->fsimu_lowgain_pedestal_DefaultPed > 0. )
                 {
 			for( unsigned int g = 0; g < getPedsLowGain().size(); g++ )
 			{
@@ -1359,6 +1349,16 @@ void VCalibrator::readCalibrationData()
 				}
                         }
                 }
+
+		// read low gain pedestals
+		else if( fNewLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
+		{
+			readPeds( fNewLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow_2() );
+		}
+		else if( fLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
+		{
+			readPeds( fLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow_2() );
+		}
 		// (preli) fill high gain value if low value is not available
 		else
 		{
@@ -2780,8 +2780,6 @@ void VCalibrator::setCalibrationFileNames()
 		{
 			fNewLowGainPedFileNameC.push_back( getCalibrationFileName( i, 10, "newlped", getRunParameter()->fPedLowGainFile ) );
 		}
-		//cout << getRunParameter()->fPedLowGainFile << endl;
-		//cout << fNewLowGainPedFileNameC[i] << endl; HF
 
 		if( i < fLowGainMultiplierNameC.size() )
 		{
