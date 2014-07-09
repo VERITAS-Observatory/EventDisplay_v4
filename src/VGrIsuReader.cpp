@@ -1637,8 +1637,7 @@ uint8_t VGrIsuReader::getNoiseSample( unsigned int iTel, uint32_t iHitID, unsign
 		{
 			fNoiseTraceStart = fRandomGen->Integer( fGrIsuPedsN[iTel][iHitID] - fNumSamples[iTel] );
 		}
-		
-		return fGrIsuPeds[iTel][iHitID][fNoiseTraceStart + iSample] - fdefaultPedUI;
+		return fGrIsuPeds[iTel][iHitID][fNoiseTraceStart + iSample];
 	}
 	
 	return 0;
@@ -1658,11 +1657,9 @@ vector< uint8_t >& VGrIsuReader::getNoiseVec( unsigned int iTel, uint32_t iHitID
 		{
 			fNoiseTraceStart = fRandomGen->Integer( fGrIsuPeds[iTel][iHitID].size() - fNumSamples[iTel] );
 			
-			fNoiseTraceStart = 0;
-			
 			for( unsigned int j = 0; j < fNumSamples[iTel]; j++ )
 			{
-				fSamplesVec[iTel][iHitID][j] = ( uint8_t )fGrIsuPeds[iTel][iHitID][fNoiseTraceStart + j] - ( uint8_t )fdefaultPed;
+				fSamplesVec[iTel][iHitID][j] = ( uint8_t )fGrIsuPeds[iTel][iHitID][fNoiseTraceStart + j];
 			}
 		}
 		return fSamplesVec[iTel][iHitID];

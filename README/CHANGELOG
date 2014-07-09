@@ -2,6 +2,9 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140709 (GM)
+fixes in NSB adding to grisudet traces
+
 * 20140708 (GM)
 correction at edges and centre of FOV for reflected
 region model

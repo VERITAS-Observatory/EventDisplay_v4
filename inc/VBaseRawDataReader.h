@@ -42,6 +42,9 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
 		std::pair< bool, uint32_t > fDummyPair;
 		
 		VNoiseFileReader* fNoiseFileReader;
+		uint8_t           fNoiseFilePedestal;
+		uint8_t           fNoiseFileFADCRange;
+		
 		
 		VMonteCarloRunHeader* fMonteCarloHeader;
 		
