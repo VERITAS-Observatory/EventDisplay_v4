@@ -4,7 +4,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class vector<Bool_t>+;
-#pragma link C++ class vector<UInt_t>+;
+// #pragma link C++ class vector<Bool_t>+;
+// #pragma link C++ class vector<UInt_t>+;
 #pragma link C++ class VTimeMask+;
 #endif
