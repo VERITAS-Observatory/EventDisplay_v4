@@ -8,7 +8,7 @@
 VDB_PixelDataReader::VDB_PixelDataReader( vector< unsigned int > nPixel_per_telescope )
 {
 	setDebug( true );
-	fDBStatus = false;
+	fDBStatus = true;
 	
 	fNPixel = nPixel_per_telescope;
 	
