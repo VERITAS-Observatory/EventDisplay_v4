@@ -1849,11 +1849,12 @@ bool VCalibrator::readPeds_from_combinedfile( string iFile,bool iLowGain, unsign
 		iFADCChannel = getDBPixelDataReader()->getFADC_channel(getTelID(), iChan);
 
 		//special catch for swapped channels at start of season 2013/14. This should be fixed in the data base.
+		//see elog http://veritash.sao.arizona.edu:8081/VERITAS-Operations/11544
 		if( getRunParameter()->frunnumber >= 69474 && getRunParameter()->frunnumber <= 69641 ) {
-			if( iFADCModule == 18 ) { 
+			if( getTelID()== 3 && iChan>=220 && iChan<230  ) { 
 				iFADCModule = 26;
 			}
-			else if (iFADCModule == 26) {
+			else if ( getTelID()== 3 && iChan>=230 && iChan<240  ) {
 				iFADCModule = 18 ;
 			}
 		}
