@@ -498,160 +498,63 @@ void VEvndispData::endOfRunInfo()
 	cout << "-----------------------------------------------" << endl;
 }
 
-
-void VEvndispData::printDeadChannels( bool iLowGain )
+//if iGrepAble == true, prints DEADCHAN at beginning of line. Prints list of dead pixels, some properties, and the reason why they are dead.
+void VEvndispData::printDeadChannels( bool iLowGain, bool iGrepAble )
 {
+	TString mode = iLowGain ? " low" : "high" ; 
+
 	unsigned int idead = 0;
 	cout << endl;
-	cout << "Dead channel ";
-	if( !iLowGain )
-	{
-		cout << "(high gain channel)";
-	}
-	else
-	{
-		cout << "(low gain channel)";
-	}
-	cout << " list for Telescope " << getTelID() + 1 << endl;
+
+	cout << "Dead channel list (" << mode << " gain) for Telescope " << getTelID() + 1 << endl;
 	cout << "==================================" << endl;
+
 	for( unsigned int i = 0; i < getDead( iLowGain ).size(); i++ )
 	{
 		if( getDead( iLowGain )[i] > 0 )
 		{
 			bitset<16 * sizeof( uint32_t )> i_dead = getDead( iLowGain )[i];
-			cout << "\t " << i << "\t";
-			for( unsigned j = 0; j < i_dead.size(); j++ )
+			TString linestart, extrainfo ;
+			if ( iGrepAble ) 
 			{
-				if( i_dead.test( j ) && j < fDeadChannelText.size() )
-				{
-					cout << fDeadChannelText[j];
-					if( j == 5 || j == 7 )
-					{
-						cout << " (rel gain: " << getGains( iLowGain )[i] << ")";
-					}
-					if( j == 6 )
-					{
-						cout << " (gainvar: " << getGainvars( iLowGain )[i] << ")";
-					}
-					if( j == 1 )
-					{
-						cout << " (ped: " << getPeds( iLowGain )[i] << ")";
-					}
-					if( j == 2 || j == 3 || j == 4 )
-					{
-						cout << " (pedvar: " << getPedvars( ( bool )iLowGain, getSumWindow() )[ i ] << ")";
-					}
-					if( j == 13 )
-					{
-						cout << " (" << getL1Rate(i) << " Hz)";
-					}
-					if( j == 14 )
-					{
-						cout << " (" << getHV(i) << " V)";
-					}
-					if( j == 15 )
-					{
-						cout << " (" << getCurrent(i) << " muA)";
-					}
-					cout << "\t" ;
-				}
+				linestart.Form("DEADCHAN Tel %d, Channel %3d, %s gain, run %d: ", getTelID() + 1, i, mode.Data(), getRunNumber() ) ;
 			}
-			cout << endl;
-			if( !i_dead.test( 9 ) )
+			else 
 			{
-				idead++;
+				linestart.Form("\t%3d: ", i );
 			}
-		}
-	}
-	cout << "Total number of dead channels ";
-	if( !iLowGain )
-	{
-		cout << "(high gain channel)";
-	}
-	else
-	{
-		cout << "(low gain channel)";
-	}
-	cout << " for Telescope " << getTelID() + 1 << ": " << idead << endl;
-	cout << "==================================" << endl;
-}
 
-// Prints list of disabled channels, along with their gain and host telescope,
-// and the reasons they were disabled, in an easily grep-able format.
-// The list is only produced when the evndisp option -printdeadpixelinfo is used.
-// To see the results, cd to where your *.evndisp.log files are, and do:
-// $ grep DEADCHAN <runnumber>.evndisp.log
-// Chan: Channel Number (not Pixel Number)
-void VEvndispData::printDeadChannelList() // DEADCHAN
-{
-
-	cout << "==================================" << endl;
-	cout << "Dead Channel Listing (last event)" << endl;
-	// loop over gains
-	for( unsigned int iHiLo = 0 ; iHiLo < 2 ; iHiLo++ )
-	{
-		// loop over telescopes
-		for( unsigned int jTel = 0 ; jTel < getTeltoAna().size() ; jTel++ )
-		{
-			setTelID( getTeltoAna()[jTel] ) ;
-			unsigned int ndead = 0;
+			if( i_dead.test(9) ) //L2 channel
+			{ 
+				cout << linestart  << fDeadChannelText[9] << endl;
+			}
+			else if (  i_dead.test(11) ) //user set 
+			{ 
+				cout << linestart  << fDeadChannelText[11] << endl;
+			}
+			else //set dead by eventdisplay
+			{
+				extrainfo.Form("(pedestal %5.1f, pedvar %5.1f, rel. gain %3.2f, gainvar %3.2f, L1 rate %.2e Hz, HV %4d V, I %4.1f muA)", getPeds( iLowGain )[i] , getPedvars( ( bool )iLowGain, getSumWindow() )[ i ], getGains( iLowGain )[i] , getGainvars( iLowGain )[i] , getL1Rate(i), (int)getHV(i), getCurrent(i) );
 			
-			// loop over dead channels
-			for( unsigned int iChan = 0; iChan < getDead( iHiLo ).size(); iChan++ )
-			{
-				if( getDead( iHiLo )[iChan] > 0 )
+				cout << linestart << extrainfo ; 
+				for( unsigned j = 0; j < i_dead.size(); j++ )
 				{
-					bitset<16 * sizeof( uint32_t )> i_dead = getDead( iHiLo )[iChan];
-					printf( "   DEADCHAN Tel %d, Channel %3d, %s gain: ", getTelID() + 1, iChan, ( iHiLo ? " low" : "high" ) ) ;
-					for( unsigned j = 0; j < i_dead.size(); j++ )
+					if( i_dead.test( j ) && j < fDeadChannelText.size() )
 					{
-						if( i_dead.test( j ) && j < fDeadChannelText.size() )
-						{
-							cout << " - " << fDeadChannelText[j] ;
-							
-							if( j == 5 || j == 7 )
-							{
-								cout << " (rel gain: " << getGains( iHiLo )[iChan] << ")";
-							}
-							
-							if( j == 6 )
-							{
-								cout << " (gainvar: " << getGainvars( iHiLo )[iChan] << ")";
-							}
-							if( j == 1 )
-							{
-								cout << " (ped: " << getPeds( iHiLo )[ iChan ] << ")";
-							}
-							if( j == 2 || j == 3 || j == 4 )
-							{
-								cout << " (pedvar: " << getPedvars( ( bool )iHiLo, getSumWindow() )[ iChan ] << ")";
-							}
-							if( j == 13 )
-							{
-								cout << " (" << getL1Rate( iChan ) << " Hz)";
-							}
-							if( j == 14 )
-							{
-								cout << " (" << getHV( iChan ) << " V)";
-							}
-							if( j == 15 )
-							{
-								cout << " (" << getCurrent( iChan ) << " muA)";
-							}
-						}
-					}
-					cout << endl;
-					if( !i_dead.test( 9 ) )
-					{
-						ndead++;
+						cout << " - " << fDeadChannelText[j] ;
 					}
 				}
+				cout << endl;
+				idead++;
+				
 			}
+
 		}
 	}
+	cout << "Total number of dead channels (" << mode << " gain) for Telescope " << getTelID() + 1 << ": " << idead << endl;
 	cout << "==================================" << endl;
-	
 }
+
 
 
 VImageParameter* VEvndispData::getImageParameters( int iselect )

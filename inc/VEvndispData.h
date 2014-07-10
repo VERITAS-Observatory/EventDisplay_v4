@@ -1137,8 +1137,7 @@ class VEvndispData
 			}
 		}
 		bool                isTeltoAna( unsigned int iTel );
-		void                printDeadChannels( bool iLowGain = false );
-		void                printDeadChannelList();  // DEADCHAN print list of dead channels, 1 line per channel/gain/telescope
+		void                printDeadChannels( bool iLowGain = false, bool iGrepAble = false );
 		void                resetAnaData();
 		void                setAnalysisArrayEventStatus( unsigned int i )
 		{

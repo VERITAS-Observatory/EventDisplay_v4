@@ -689,13 +689,18 @@ void VEventLoop::shutdown()
 	}
 	endOfRunInfo();
 	cout << endl << "-----------------------------------------------" << endl;
-	
+
 	// if we have the proper settings,
 	// print the dead pixel information
 	if( fRunPar->frunmode == R_ANA && fRunPar->fprintdeadpixelinfo )  // DEADCHAN
 	{
-		cout << endl;
-		printDeadChannelList();
+		for( unsigned int i = 0; i < getTeltoAna().size(); i++ ) 
+		{
+			cout << endl;
+			setTelID( getTeltoAna()[i] );
+			printDeadChannels( false , true );
+			printDeadChannels( true , true );
+		}
 	}
 	
 		// write detector parameter tree to disk

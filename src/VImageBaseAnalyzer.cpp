@@ -1053,7 +1053,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 		{
 			cout << "Error: Number of dead channel is comparable to total number of channels" << endl;
 			cout << "Exiting..." << endl;
-			printDeadChannels();
+			printDeadChannels( iLowGain );
 			exit( EXIT_FAILURE );
 		}
 	}
