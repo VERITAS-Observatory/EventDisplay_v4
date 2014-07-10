@@ -939,6 +939,7 @@ void VDisplay::drawFADC( bool iFit )
 		fHisFADC->SetStats( 0 );
 		fCanvasFADC->SetEditable( 1 );
 		fCanvasFADC->cd();
+		fHisFADC->SetMarkerSize( 2) ;
 		fHisFADC->Draw( fHisFADCDrawString.c_str() );
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1381,12 +1382,20 @@ void VDisplay::setFADCText()
 	
 	fEventLoop->getData()->setTelID( fTelescope );
 	// channel number
-	sprintf( cTemp, "telescope %d channel %d (NN %d)", fTelescope + 1, fSelectedChan - 200000, fEventLoop->getDetectorGeometry()->getNNeighbours()[iChannel] );
+	TString iFADCtext="";
+	if( fEventLoop->getDBPixelDataReader() && fEventLoop->getDBPixelDataReader()->getDBStatus() ) 
+	{ 
+		int iFADCmodule=fEventLoop->getDBPixelDataReader()->getFADC_module(fTelescope, fSelectedChan - 200000);
+		int iFADCchannel=fEventLoop->getDBPixelDataReader()->getFADC_channel(fTelescope, fSelectedChan - 200000);
+		iFADCtext.Form(", FADC %d/%d", iFADCmodule, iFADCchannel);
+	}
+
+	sprintf( cTemp, "telescope %d channel %d%s (NN %d)", fTelescope + 1, fSelectedChan - 200000, iFADCtext.Data(), fEventLoop->getDetectorGeometry()->getNNeighbours()[iChannel] );
 	fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 	// L1/HV/currents (if available)
 	if( fEventLoop->getDBPixelDataReader() && fEventLoop->getDBPixelDataReader()->getDBStatus() )
 	{
-		sprintf( cTemp, "L1 rate %.2e Hz, HV %d, I %.2f", fEventLoop->getL1Rate( fSelectedChan - 200000 ),
+		sprintf( cTemp, "L1 rate %.2e Hz, HV %d V, I %.2f muA", fEventLoop->getL1Rate( fSelectedChan - 200000 ),
 				 ( int )fEventLoop->getHV( fSelectedChan - 200000 ),
 				 fEventLoop->getCurrent( fSelectedChan - 200000 ) );
 		fTextFADC.push_back( new TText( xL, yT, cTemp ) );
@@ -1644,9 +1653,18 @@ void VDisplay::setInfoText()
 		i_Text.push_back( new TText( xL, yT, c_Text ) );
 		if( fEventLoop->getReader()->getDataFormat() == "rawdata"  ||  fEventLoop->getReader()->getDataFormat() == "Rawvbf" )
 		{
-			sprintf( c_Text, "    pedestal (low): %d (%d), rel.gain %d time offset %d ",
+			TString ilpedString;
+			if ( fEventLoop->getRunParameter()->fPedLowGainFile != "" ) 
+			{
+				ilpedString = fEventLoop->getRunParameter()->fPedLowGainFile;
+			}
+			else 
+			{
+				ilpedString.Form("%d", fEventLoop->getRunParameter()->fPedLowGainFileNumber[fEventLoop->getTeltoAna()[i]] );
+			}
+			sprintf( c_Text, "    pedestal (low): %d (%s), rel.gain %d time offset %d ",
 					 fEventLoop->getRunParameter()->fPedFileNumber[fEventLoop->getTeltoAna()[i]],
-					 fEventLoop->getRunParameter()->fPedLowGainFileNumber[fEventLoop->getTeltoAna()[i]],
+					 ilpedString.Data(),
 					 fEventLoop->getRunParameter()->fGainFileNumber[fEventLoop->getTeltoAna()[i]],
 					 fEventLoop->getRunParameter()->fTOffFileNumber[fEventLoop->getTeltoAna()[i]] );
 			i_Text.push_back( new TText( xL, yT, c_Text ) );
