@@ -35,14 +35,14 @@ class VLowGainCalibrationFromPulsShape
 
 
     double  integrate( TGraph *g, double iWindowStartRelT0_sample, double iWindowLength_sample );
-    TGraph* readPulseShape( string iFile );
+    TGraph* readPulseShape( string iFile, bool iGrisuFormat, double iSampling );
 
 
     public:
     VLowGainCalibrationFromPulsShape();
    ~VLowGainCalibrationFromPulsShape() {}
     void calculateChargeFraction();
-    bool readPulseShapes( string iHighGainPulse, string iLowGainPulse );
+    bool readPulseShapes( string iHighGainPulse, string iLowGainPulse, bool iGrisuFormat = false, double iSampling = 2.0 );
     void plot();
     void setTraceIntegrationParameters( double iStartRelT0_sample, int iHighGainWindowLength_sample, int iLowGainWindowStart_sample, int iLowGainWindowStop_sample );
     void test(); 
@@ -55,6 +55,7 @@ VLowGainCalibrationFromPulsShape::VLowGainCalibrationFromPulsShape()
    fFADCSampling = 2.;
    fHighGainPulse = 0;
    fLowGainPulse = 0;
+   fLGRatio_window = 0;
 
    fWindowStartRelT0_sample = 1;
    fHighGainWindowLength_sample = 10;
@@ -77,7 +78,7 @@ void VLowGainCalibrationFromPulsShape::setTraceIntegrationParameters( double iSt
    fLowGainWindowStop_sample = iLowGainWindowStop_sample;
 }
 
-TGraph* VLowGainCalibrationFromPulsShape::readPulseShape( string iFile )
+TGraph* VLowGainCalibrationFromPulsShape::readPulseShape( string iFile, bool iGrisuFormat, double iSampling )
 {
      ifstream is;
      is.open( iFile.c_str(), ifstream::in );
@@ -90,29 +91,38 @@ TGraph* VLowGainCalibrationFromPulsShape::readPulseShape( string iFile )
      double x = 0.;
      double y = 0.;
      int z = 0;
+     double iSampleOffset = 0.;
      while( getline( is, is_line ) )
      {
          if( is_line.find( "*" ) != string::npos ) break;
 	 istringstream is_stream( is_line );
-	 if( !is_stream.eof() ) is_stream >> x;
+	 if( !iGrisuFormat )
+	 {
+	     if( !is_stream.eof() ) is_stream >> x;
+         }
+	 else
+	 {
+	    x = iSampleOffset;
+         }
 	 if( !is_stream.eof() ) is_stream >> y;
 	 if( x > 1000. ) continue;
 	 g->SetPoint( z, x, y );
 	 z++;
+	 iSampleOffset += iSampling;
      }
      return g;
 }
 
-bool VLowGainCalibrationFromPulsShape::readPulseShapes( string iHighGainPulse, string iLowGainPulse )
+bool VLowGainCalibrationFromPulsShape::readPulseShapes( string iHighGainPulse, string iLowGainPulse, bool iGrisuFormat, double iSampling )
 {
-     fHighGainPulse = readPulseShape( iHighGainPulse );
+     fHighGainPulse = readPulseShape( iHighGainPulse, iGrisuFormat, iSampling );
      if( !fHighGainPulse || fHighGainPulse->GetN() < 1 )
      {
          cout << "error reading high gain pulse shape" << endl;
 	 return false;
      }
      fHighGainPulse->SetTitle( "" );
-     fLowGainPulse = readPulseShape( iLowGainPulse );
+     fLowGainPulse = readPulseShape( iLowGainPulse, iGrisuFormat, iSampling );
      if( !fLowGainPulse || fLowGainPulse->GetN() < 1 )
      {
          cout << "error reading low gain pulse shape" << endl;
@@ -134,7 +144,7 @@ void VLowGainCalibrationFromPulsShape::plot()
     fHighGainPulse->Draw( "al" );
     fLowGainPulse->Draw( "l" );
 
-    if( fLGRatio_window )
+    if( fLGRatio_window && fLGRatio_window->GetN() > 0 )
     {
        TCanvas *d = new TCanvas( "cLGRatio", "LG ratio" );
        d->Draw();
