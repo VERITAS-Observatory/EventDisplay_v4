@@ -78,7 +78,13 @@ mkdir -p $LOGDIR
 FLIST=$OFILE.list
 rm -f $ODIR/$FLIST
 ls -1 $INDIR/*ID${RECID}.root > $ODIR/$FLIST
+NFIL=`cat $ODIR/$FLIST | wc -l`
+if [[ $NFIL = "0" ]]; then
+   exit
+fi
 echo $FLIST
+echo "LOOKUPTABLE $OFILE" 
+
 
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.lookup_table_combine_sub"

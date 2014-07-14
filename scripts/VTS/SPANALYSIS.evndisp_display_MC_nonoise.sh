@@ -45,6 +45,7 @@ PEDLEV="16."
 
 # Run options
 OPT="-display=1 -runnumber=$RUNNUM -plotmethod=0 -sourcetype=2 -pedestalseed=1020 -pedestalnoiselevel=$NOISELEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
+# OPT="-printGrisuHeader=1 -runnumber=$RUNNUM -plotmethod=0 -sourcetype=2 -pedestalseed=1020 -pedestalnoiselevel=$NOISELEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
 
 # dead channel definition for MC
 # DEAD="deadChannelDefinition_VERITAS_MC_d20101110.dat"

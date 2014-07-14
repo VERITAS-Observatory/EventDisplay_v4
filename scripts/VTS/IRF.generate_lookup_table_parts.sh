@@ -10,8 +10,7 @@ echo "
 IRF generation: create partial (for one point in the parameter space) lookup
                 tables from MC evndisp ROOT files
 
-IRF.generate_lookup_table_parts.sh <epoch> <atmosphere> <zenith> <offset angle>
- <NSB level> <Rec ID> <sim type>
+IRF.generate_lookup_table_parts.sh <epoch> <atmosphere> <zenith> <offset angle> <NSB level> <Rec ID> <sim type>
 
 required parameters:
         

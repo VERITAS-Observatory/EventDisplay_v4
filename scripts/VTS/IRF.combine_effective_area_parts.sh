@@ -9,7 +9,7 @@ if [[ $# < 5 ]]; then
 echo "
 IRF generation: combine partial effective area files
 
-IRF.combine_effective_area_parts.sh <cuts file> <epoch> <atmosphere> <Rec ID> <sim type> [date]
+IRF.combine_effective_area_parts.sh <cuts file> <epoch> <atmosphere> <Rec ID> <sim type> [name]
 
 required parameters:
     
@@ -93,9 +93,6 @@ mkdir -p $LOGDIR
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.effective_area_combine_sub"
 
-# loop over all files/cases
-echo "Processing epoch $EPOCH, atmosphere ATM$ATMOS, RecID $RECID"
-
 # telescope combinations
 [[ $RECID == 0 ]] && T="1234"
 [[ $RECID == 1 ]] && T="234"
@@ -108,8 +105,12 @@ echo "Processing epoch $EPOCH, atmosphere ATM$ATMOS, RecID $RECID"
 [[ $RECID == 14 ]] && T="124"
 [[ $RECID == 15 ]] && T="123"
 
+# loop over all files/cases
+echo "Processing epoch $EPOCH, atmosphere ATM$ATMOS, RecID $RECID (telescope combination T${T})"
+
+
 # output effective area name
-OFILE="effArea-$SIMTYPE-${EANAME}-${CUTS_NAME}-ID${RECID}-${EPOCH}-ATM${ATMOS}-T${T}"
+OFILE="effArea-${EDVERSION}-${EANAME}-$SIMTYPE-${CUTS_NAME}-ID${RECID}-${EPOCH}-ATM${ATMOS}-T${T}"
 
 FSCRIPT="$LOGDIR/COMB-EFFAREA-$CUTSFILE-ATM$ATMOS-$EPOCH-ID$RECID"
 rm -f $FSCRIPT.sh

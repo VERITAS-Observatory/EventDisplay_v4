@@ -9,15 +9,14 @@ if [[ $# != 5 ]]; then
 echo "
 IRF generation: create radial acceptances for a set of cuts
 
-IRF.generate_radial_acceptance.sh <runlist> <input directory> <cuts list file>
- <epoch> <Rec ID>
+IRF.generate_radial_acceptance.sh <runlist> <input directory> <cuts list file> <epoch> <Rec ID>
 
 required parameters:
 
     <runlist>               simple format run list with one run number per line
 
     <input directory>       directory containing mscw_energy ROOT files from a
-                            gamma-ray dark region of the sky
+                            gamma-ray dark region of the sky (data, not MC)
         
     <cuts list file>        file containing one gamma/hadron cuts file per line
         
@@ -29,6 +28,8 @@ required parameters:
     <Rec ID>                reconstruction ID(s)
                             (see EVNDISP.reconstruction.runparameter)
                             Set to 0 for all telescopes, 1 to cut T1, etc.
+
+(note: hardwired reconstruction IDs vs telescope combinations)
 
 examples:
 ./IRF.generate_radial_acceptance.sh ~/runlist.dat \
@@ -53,6 +54,10 @@ MSCWDIR=$2
 CUTLISTFILE=$3
 EPOCH=$4
 RECID=$5
+# make radial acceptance version
+EDVERSION=`$EVNDISPSYS/bin/makeRadialAcceptance --version | tr -d .`
+# version string for aux files
+AUX="auxv01"
 
 # Read runlist
 if [[ ! -f "$RLIST" ]]; then
@@ -62,8 +67,9 @@ fi
 FILES=`cat $RLIST`
 
 # Read cuts list file
-if [[ ! -f "$CUTSLISTFILE" ]]; then
+if [[ ! -f "$CUTLISTFILE" ]]; then
     echo "Error, cuts list file not found, exiting..."
+    echo $CUTLISTFILE
     exit 1
 fi
 IFS=$'\r\n' CUTLIST=($(cat $CUTLISTFILE))
@@ -75,7 +81,7 @@ echo -e "Log files will be written to:\n $LOGDIR"
 mkdir -p $LOGDIR
 
 # Job submission script
-SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.radial_acceptance_sub"
+SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.radial_acceptance_sub.sh"
 
 # loop over all files/cases
 for CUTS in ${CUTLIST[@]}; do
@@ -89,6 +95,17 @@ for CUTS in ${CUTLIST[@]}; do
             [[ $ID == "2" ]] && TELES="134"
             [[ $ID == "3" ]] && TELES="124"
             [[ $ID == "4" ]] && TELES="123"
+            [[ $ID == "5" ]] && TELES="12"
+            [[ $ID == "6" ]] && TELES="1234"
+            [[ $ID == "7" ]] && TELES="234"
+            [[ $ID == "8" ]] && TELES="134"
+            [[ $ID == "9" ]] && TELES="124"
+            [[ $ID == "10" ]] && TELES="123"
+            [[ $RECID == 11 ]] && TELES="1234"
+            [[ $RECID == 12 ]] && TELES="234"
+            [[ $RECID == 13 ]] && TELES="134"
+            [[ $RECID == 14 ]] && TELES="124"
+            [[ $RECID == 15 ]] && TELES="123"
 
             # Check that cuts file exists
             CUTSNAME=${CUTS%%.dat}.dat
@@ -97,30 +114,40 @@ for CUTS in ${CUTLIST[@]}; do
             fi
             if [[ ! -f "$CUTSFILE" ]]; then
                 echo "Error, gamma/hadron cuts file not found, exiting..."
+                echo "cut file $CUTSFILE"
                 exit 1
             fi
             
             # Generate base file name based on cuts file
-            CUTSNAME=${CUTSNAME##ANASUM.GammaHadron.}
+            CUTSNAME=${CUTSNAME##ANASUM.GammaHadron-}
             CUTSNAME=${CUTSNAME%%.dat}
-            OFILE="radialAcceptance-$CUTSNAME-$VX-T$TELES"
-            ODIR="$VERITAS_EVNDISP_AUX_DIR/RadialAcceptances"
-            echo -e "Output files will be written to:\n $ODIR"
+            OFILE="radialAcceptance-${EDVERSION}-${AUX}-$CUTSNAME-$VX-T$TELES"
+            ODIR="$VERITAS_IRFPRODUCTION_DIR/RadialAcceptances"
+            mkdir -p $ODIR
+            echo -e "Output files will be written to:\n$ODIR"
+            echo "Output file name $OFILE"
             
             FSCRIPT="$LOGDIR/RADIAL-$CUTSNAME-$VX-$ID"
             sed -e "s|RUNLIST|$RLIST|"     \
                 -e "s|INPUTDIR|$MSCWDIR|"  \
                 -e "s|CUTSFILE|$CUTSFILE|" \
                 -e "s|OUTPUTDIR|$ODIR|"    \
+                -e "s|IEPO|$VX|" \
                 -e "s|OUTPUTFILE|$OFILE|" $SUBSCRIPT > $FSCRIPT.sh
             
-            chmod u+x $FNAM.sh
+            chmod u+x $FSCRIPT.sh
+            echo "Script submitted to cluster: $FSCRIPT.sh"
             
             # run locally or on cluster
             SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
+            echo "$SUBC"
+            echo $LOGDIR
             SUBC=`eval "echo \"$SUBC\""`
             if [[ $SUBC == *qsub* ]]; then
-                JOBID=`$SUBC $FSCRIPT.sh`
+                echo $FSCRIPT.sh
+#                JOBID=`$SUBC $FSCRIPT.sh`
+                #### (GM) for some odd reason the normal way of getting the submission command does not work ####
+                JOBID=`qsub -P cta_high -js 10000 -V -terse -l os=sl6 -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=10G -o $LOGDIR -e $LOGDIR $FSCRIPT.sh`
                 echo "JOBID: $JOBID"
             elif [[ $SUBC == *parallel* ]]; then
                 echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
