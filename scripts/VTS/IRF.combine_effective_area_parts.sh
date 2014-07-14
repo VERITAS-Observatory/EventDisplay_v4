@@ -109,7 +109,7 @@ echo "Processing epoch $EPOCH, atmosphere ATM$ATMOS, RecID $RECID"
 [[ $RECID == 15 ]] && T="123"
 
 # output effective area name
-OFILE="effArea-$SIMTYPE-${EANAME}-${CUTS_NAME}-BASEID${RECID}-${EPOCH}-ATM${ATMOS}-T${T}"
+OFILE="effArea-$SIMTYPE-${EANAME}-${CUTS_NAME}-ID${RECID}-${EPOCH}-ATM${ATMOS}-T${T}"
 
 FSCRIPT="$LOGDIR/COMB-EFFAREA-$CUTSFILE-ATM$ATMOS-$EPOCH-ID$RECID"
 rm -f $FSCRIPT.sh
