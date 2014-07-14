@@ -18,6 +18,8 @@ VPlotWPPhysSensitivity::VPlotWPPhysSensitivity()
 	fSensitivityFOM_error = -1.;
 	
 	fPlotCTARequirementsID = -99;
+
+	fUseIntegratedSensitivityForOffAxisPlots = false;
 }
 
 void VPlotWPPhysSensitivity::reset()
@@ -188,16 +190,23 @@ void VPlotWPPhysSensitivity::initialProjectedSensitivityPlots()
 	fProjectionEnergy_min_logTeV.clear();
 	fProjectionEnergy_max_logTeV.clear();
 	// (hard coded energies here...not good)
-	fProjectionEnergy_min_logTeV.push_back( log10( 10.0 ) );
-	fProjectionEnergy_max_logTeV.push_back( log10( 10.0 ) );
-	fProjectionEnergy_min_logTeV.push_back( log10( 1.0 ) );
-	fProjectionEnergy_max_logTeV.push_back( log10( 3.0 ) );
-	fProjectionEnergy_min_logTeV.push_back( log10( 0.4 ) );
-	fProjectionEnergy_max_logTeV.push_back( log10( 0.6 ) );
-	fProjectionEnergy_min_logTeV.push_back( log10( 0.08 ) );
-	fProjectionEnergy_max_logTeV.push_back( log10( 0.08 ) ); 
-//	fProjectionEnergy_min_logTeV.push_back( log10( 0.10 ) );
-//	fProjectionEnergy_max_logTeV.push_back( log10( 10.0 ) );
+	if( !fUseIntegratedSensitivityForOffAxisPlots )
+	{
+	   fProjectionEnergy_min_logTeV.push_back( log10( 10.0 ) );
+	   fProjectionEnergy_max_logTeV.push_back( log10( 10.0 ) );
+	   fProjectionEnergy_min_logTeV.push_back( log10( 1.0 ) );
+	   fProjectionEnergy_max_logTeV.push_back( log10( 3.0 ) );
+	   fProjectionEnergy_min_logTeV.push_back( log10( 0.4 ) );
+	   fProjectionEnergy_max_logTeV.push_back( log10( 0.6 ) );
+	   fProjectionEnergy_min_logTeV.push_back( log10( 0.10 ) );
+	   fProjectionEnergy_max_logTeV.push_back( log10( 0.125 ) ); 
+        }
+	// integrated sensitivity
+	else
+	{
+           fProjectionEnergy_min_logTeV.push_back( log10( 0.128 ) ); // choose 128 GeV the be at the lower end of the corresponding bin on the log axis)
+   	   fProjectionEnergy_max_logTeV.push_back( log10( 0.128 ) );
+        }
 	// graphs
 	for( unsigned int i = 0; i < fData.size(); i++ )
 	{
@@ -350,7 +359,8 @@ TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas* c, double 
 			}
 		}
 	}
-	if( iColor < 0 )
+        // 
+	if( iColor < 0 && fProjectionEnergy_min_logTeV.size() > 1 )
 	{
 		iL->Draw();
 	}
@@ -664,7 +674,15 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
 			{
 				fPlotCTARequirements->plotRequirement_DifferentialSensitivity( cSensInter, fPlotCTARequirementGoals, iUnit );
 			}
-			fillProjectedSensitivityPlot( i, iGraphSensitivity );
+			if( fUseIntegratedSensitivityForOffAxisPlots )
+			{
+			   TGraphAsymmErrors* iGraphIntegratedSensitivity = fData[i]->getCombinedSensitivityGraph( true, "", true );
+			   fillProjectedSensitivityPlot( i, iGraphIntegratedSensitivity );
+                        }
+			else
+			{
+			   fillProjectedSensitivityPlot( i, iGraphSensitivity );
+                        }
 		}
 	}
 	/////////////////////////////

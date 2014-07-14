@@ -45,6 +45,8 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
 		int fPlotCTARequirementsID;
 		bool fPlotCTARequirementGoals;
 		VCTARequirements* fPlotCTARequirements;
+
+		bool fUseIntegratedSensitivityForOffAxisPlots;
 		
 		// FOM variables
 		double fSensitivityFOM;
@@ -103,6 +105,10 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
 		bool setCTARequirements( int iRequirementID = -1, bool iPlotRequirementGoals = true )
 		{
 			return setPlotCTARequirements( iRequirementID, iPlotRequirementGoals );
+		}
+		void setUseIntegratedSensitivityForOffAxisPlots( bool iUseIntegratedSensitivityForOffAxisPlots = false )
+		{
+		       fUseIntegratedSensitivityForOffAxisPlots = iUseIntegratedSensitivityForOffAxisPlots;
 		}
 };
 

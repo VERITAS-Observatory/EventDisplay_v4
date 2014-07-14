@@ -365,7 +365,7 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 	return true;
 }
 
-TGraphAsymmErrors* VSiteData::getCombinedSensitivityGraph( bool iInterpolate, string iDirectionString )
+TGraphAsymmErrors* VSiteData::getCombinedSensitivityGraph( bool iInterpolate, string iDirectionString, bool iIntegratedSensitivity )
 {
 	TGraphAsymmErrors* iGraphSensitivity = new TGraphAsymmErrors( 1 );
 	if( fSiteFileName.size() > 0 )
@@ -392,19 +392,21 @@ TGraphAsymmErrors* VSiteData::getCombinedSensitivityGraph( bool iInterpolate, st
 		TH1F* h = 0;
 		if( fCameraOffset_deg[f] < 1.e-2 )
 		{
-			h = ( TH1F* )iFile->Get( "DiffSens" );
-// (use integral sensitivity)
-//			h = ( TH1F* )iFile->Get( "IntSens" );
+//			if( iIntegratedSensitivity ) h = ( TH1F* )iFile->Get( "IntSensCU" );
+			if( iIntegratedSensitivity ) h = ( TH1F* )iFile->Get( "IntSens" );
+			else                         h = ( TH1F* )iFile->Get( "DiffSens" );
 		}
 		else
 		{
-			TH2F* h2 = ( TH2F* )iFile->Get( "DiffSens_offaxis" );
-// (use integral sensitivity)
-//			TH2F* h2 = ( TH2F* )iFile->Get( "IntSens_offaxis" );
+			TH2F* h2 = 0;
+//			if( iIntegratedSensitivity ) h2 = ( TH2F* )iFile->Get( "IntSensCU_offaxis" );
+			if( iIntegratedSensitivity ) h2 = ( TH2F* )iFile->Get( "IntSens_offaxis" );
+                        else                         h2 = ( TH2F* )iFile->Get( "DiffSens_offaxis" );
 			if( h2 )
 			{
 				char hname[200];
-				sprintf( hname, "DiffSens_%d", ( int )fCameraOffset_deg[f] * 100 );
+				if( iIntegratedSensitivity ) sprintf( hname, "IntSens_%d", ( int )fCameraOffset_deg[f] * 100 );
+			        else                         sprintf( hname, "DiffSens_%d", ( int )fCameraOffset_deg[f] * 100 );
 				h = ( TH1F* )h2->ProjectionX( hname, h2->GetYaxis()->FindBin( fCameraOffset_deg[f] ), h2->GetYaxis()->FindBin( fCameraOffset_deg[f] ) );
 			}
 		}

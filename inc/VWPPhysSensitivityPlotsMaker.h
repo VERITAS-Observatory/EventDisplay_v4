@@ -46,7 +46,7 @@ class VWPPhysSensitivityPlotsMaker
 		VWPPhysSensitivityPlotsMaker();
 	       ~VWPPhysSensitivityPlotsMaker() {}
 		
-		void compareDataSets( string iDataSetFile, string iDirectionString = "" );
+		void compareDataSets( string iDataSetFile, string iDirectionString = "", bool IntegratedSensitivityForOffAxisPlots = false );
 		void compareOffAxisSensitivities( string iSubArray, vector< string > iDataSet );
 		void compareOffAxisSensitivities( string iSubArray = "", string iDataSet = "" );
 		void plotAllInOneCanvas();

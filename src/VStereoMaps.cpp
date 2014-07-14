@@ -532,6 +532,12 @@ void VStereoMaps::RM_getAlpha( bool iIsOn )
 	double cx = 0.;
 	double cy = 0.;
 	double cr = 0.;
+        // expected number of bins in source region
+        // (assume also that x and y binning is the same;
+	//  this assumption is not critical)
+	double iNB_expected = 1.;
+	if( x_w > 0. ) iNB_expected = i_rS*i_rS*TMath::Pi() / x_w / x_w;
+	if( iNB_expected <= 0. ) iNB_expected = 1.;
 	
 	double i_acc = 0.;
 	
@@ -668,8 +674,8 @@ void VStereoMaps::RM_getAlpha( bool iIsOn )
 					}
 				}
 			}
-			// fill the alpha map
-			hmap_alpha->SetBinContent( i - i_xoff, j - j_yoff, i_acc );
+			// fill the alpha map (scaled to acceptance 1)
+			hmap_alpha->SetBinContent( i - i_xoff, j - j_yoff, i_acc / iNB_expected );
 		}
 	}
 }

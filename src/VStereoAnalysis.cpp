@@ -1013,7 +1013,7 @@ void VStereoAnalysis::scaleAlpha( double inorm, TH2D* halpha_on, TH2D* h_ON, TH2
 				       // this one is used for the sky maps
 				       hmap_alphaNorm->SetBinContent( i, j, iSignalBackgroundRatio * halpha_on->GetBinContent( i, j ) / halpha_off->GetBinContent( i, j ) );
 				       // keep alpha off for debugging
-				       if( halpha_on->GetBinContent( i, j ) > 0. )
+/*				       if( halpha_on->GetBinContent( i, j ) > 0. )
 				       {
 					       halpha_off->SetBinContent( i, j, halpha_off->GetBinContent( i, j ) / ( iSignalBackgroundRatio * halpha_on->GetBinContent( i, j ) ) );
 				       }
@@ -1022,7 +1022,7 @@ void VStereoAnalysis::scaleAlpha( double inorm, TH2D* halpha_on, TH2D* h_ON, TH2
 					       halpha_off->SetBinContent( i, j, 0. );
 				       }
 				       // alpha on is only set if all off histos are set
-				       halpha_on->SetBinContent( i, j, iSignalBackgroundRatio );
+				       halpha_on->SetBinContent( i, j, iSignalBackgroundRatio ); */
 			       }
 			       else
 			       {

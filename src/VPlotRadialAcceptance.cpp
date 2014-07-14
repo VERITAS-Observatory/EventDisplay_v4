@@ -161,7 +161,7 @@ TCanvas* VPlotRadialAcceptance::plotRadialAcceptance( TCanvas* cX )
 		fAcceptanceHisto->SetMaximum( fAxis_y_max );
 		fAcceptanceHisto->SetAxisRange( fAxis_x_min, fAxis_x_max );
 		fAcceptanceHisto->SetTitle( "" );
-		setHistogramPlottingStyle( fAcceptanceHisto, getPlottingColor(), 1., 1.5, 20 );
+		setHistogramPlottingStyle( fAcceptanceHisto, getPlottingColor(), 1., 1.0, 20 );
 		if( bPlotSame )
 		{
 			fAcceptanceHisto->Draw( "e same" );

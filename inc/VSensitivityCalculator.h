@@ -240,7 +240,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 		VSensitivityCalculator();
 		~VSensitivityCalculator() {}
 		
-		unsigned int  addDataSet( double iGammaRayRate, double iBackGroundRate, double iAlpha, string iName );
+		unsigned int  addDataSet( double iGammaRayRate, double iBackGroundRate, double iAlpha, string iName = "" );
 		double   calculateObservationTimevsFlux( unsigned int iD );
 		bool     calculateParticleNumberGraphs_MC( double dE_Log10 );
 		bool     fillSensitivityHistograms( TH1F* iSensitivity = 0, TH1F* iBGRate = 0, TH1F* iBGRateSqDeg = 0,
@@ -357,6 +357,6 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 			fDebugParticleNumberFile = iFile;
 		}
 		
-		ClassDef( VSensitivityCalculator, 23 );
+		ClassDef( VSensitivityCalculator, 24 );
 };
 #endif

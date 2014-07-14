@@ -112,8 +112,7 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
 		TCanvas*        plot_skyPlots( string iPlotMode = "colz", bool iSingleCanvases = false );
 		TCanvas*        plot_skyPlots_significance( bool iCorrelated = false, double rmax = 0., double zmin = -100., double zmax = -100., bool bPoster = false );
 		TCanvas*        plot_on( bool iCorrelated = false, double rmax = -1. );
-		TCanvas*        plot_significanceDistributions( double rmax = 2.0, double rSource = 0.4,
-				double xmin = -6.5, double xmax = 10., TCanvas* c = 0, string regioncode = "" );
+		TCanvas*        plot_significanceDistributions( double rmax = 2.0, double rSource = 0.4, double xmin = -6.5, double xmax = 10., TCanvas* c = 0, string regioncode = "" );
 		TCanvas*        plot_radec( int sPlot = 0, double rmax = -3., double zmin = -5., double zmax = -1000.,
 									double xcenter = 0., double ycenter = 0.,
 									bool bSlices = false, double fSliceXmin = -0.1, double fSliceXmax = 0.1, bool bProjX = true );

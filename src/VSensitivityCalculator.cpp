@@ -371,7 +371,7 @@ bool VSensitivityCalculator::removeDataSet( unsigned int iD )
 /*!
      iGammaRayRate = signal rate [1/min]
      iBackGroundRate = background rate [1/min]
-     iAlpha = normalization parameter
+     iAlpha = normalization parameter (e.g. 1./5.)
      iName  = name of data set
 */
 unsigned int VSensitivityCalculator::addDataSet( double iGammaRayRate, double iBackGroundRate, double iAlpha, string iName )

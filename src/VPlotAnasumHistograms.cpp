@@ -629,6 +629,7 @@ TCanvas* VPlotAnasumHistograms::plot_skyPlots( string iPlotMode, bool iSingleCan
 	if( hmap_alpha_off )
 	{
 		hmap_alpha_off->Draw( iPlotMode.data() );
+		plot_excludedRegions( cSky[5] );
 	}
 	
 	cSky[6]->cd();

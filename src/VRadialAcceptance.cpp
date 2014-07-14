@@ -436,7 +436,7 @@ double VRadialAcceptance::getAcceptance( double x, double y, double erec, double
 	else
 	{
 		cout << "ERROR: getAcceptance() not defined for f2DAcceptanceMode > 0 " << endl;
-		exit( -1 ) ;
+		exit( EXIT_FAILURE ) ;
 		return -1000.0 ;
 	}
 	

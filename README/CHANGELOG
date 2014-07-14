@@ -2,6 +2,10 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140714 (GM)
+ring background model validation and fixes in 
+alpha calculation
+
 * 20140709 (GM)
 fixes in NSB adding to grisudet traces
 

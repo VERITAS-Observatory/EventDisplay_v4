@@ -90,9 +90,10 @@ void VWPPhysSensitivityPlotsMaker::plotAllInOneCanvas()
     fAngRes->Draw();
 }
 
-void VWPPhysSensitivityPlotsMaker::compareDataSets( string iDataSetFile, string iDirectionString )
+void VWPPhysSensitivityPlotsMaker::compareDataSets( string iDataSetFile, string iDirectionString, bool iUseIntegratedSensitivityForOffAxisPlots )
 {
 	VPlotWPPhysSensitivity a;
+	a.setUseIntegratedSensitivityForOffAxisPlots( iUseIntegratedSensitivityForOffAxisPlots );
 	a.setPlotCTARequirements( fPlotCTARequirements, fPlotCTARequirementGoals );
 	a.setEnergyRange_Lin_TeV( fMinEnergy_TeV, fMaxEnergy_TeV );
 	a.addDataSets( iDataSetFile, iDirectionString );
