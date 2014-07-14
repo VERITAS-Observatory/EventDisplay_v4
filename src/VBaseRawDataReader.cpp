@@ -332,7 +332,7 @@ uint8_t VBaseRawDataReader::getSample( unsigned channel, unsigned sample, bool i
 	
 	// add noise from external noise library to traces
 	// (e.g. VTS grisu MC are simulated without noise, noise is added here to the samples) 
-	if( fNoiseFileReader )
+	if( fNoiseFileReader && !getHiLo( channel ) )
 	{
 		uint8_t iNoiseSampleValue = fNoiseFileReader->getNoiseSample( fTelID, channel, sample, iNewNoiseTrace );
 		if( iSampleValue > iNoiseSampleValue && iSampleValue > fNoiseFileFADCRange - iNoiseSampleValue + fNoiseFilePedestal )

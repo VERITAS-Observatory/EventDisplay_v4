@@ -1029,6 +1029,10 @@ void VGammaHadronCuts::printCutSummary()
 	{
 	    cout << "Instrument epoch selected: " << fInstrumentEpoch << endl;
         }
+        else
+        {
+            cout << "Instrument epoch not set" << endl;
+        }
 	
 	// direction cuts
 	printDirectionCuts();

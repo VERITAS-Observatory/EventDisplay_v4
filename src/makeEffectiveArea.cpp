@@ -29,7 +29,6 @@
 #include "VTableLookupRunParameter.h"
 
 #include <fstream>
-#include <getopt.h>
 #include <iostream>
 #include <sstream>
 #include <string>

@@ -148,6 +148,12 @@ int parseOptions( int argc, char* argv[] )
 		};
 		int option_index = 0;
 		int c = getopt_long( argc, argv, "h:l:k:m:o:d:s:r:i:u:f:g", long_options, &option_index );
+                if( optopt != 0 )
+                {
+                    cout << "error: unknown option" << endl;
+                    cout << "exiting..." << endl;
+                    exit( EXIT_FAILURE );
+                }
 		if( argc == 1 )
 		{
 			c = 'h';

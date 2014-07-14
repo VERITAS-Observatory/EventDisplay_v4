@@ -13,7 +13,6 @@
 #include "VOrbitalPhase.h"
 #include "VGlobalRunParameter.h"
 
-#include <getopt.h>
 #include <iostream>
 #include <string>
 #include <vector>

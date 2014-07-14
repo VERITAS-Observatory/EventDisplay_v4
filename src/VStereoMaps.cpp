@@ -694,7 +694,7 @@ void VStereoMaps::RE_getAlpha( bool iIsOn )
 			else
 			{
 				// correlated maps
-			        if( !bUncorrelatedSkyMaps && i < fRE_off.size() && j < fRE_off[i].size() )
+			        if( !bUncorrelatedSkyMaps && i < (int)fRE_off.size() && j < (int)fRE_off[i].size() )
 				{
 				    hmap_alpha->SetBinContent( hmap_alpha->GetXaxis()->FindBin( hmap_alpha->GetXaxis()->GetBinCenter( i ) - fRunList.fWobbleWestMod ),
 				                               hmap_alpha->GetYaxis()->FindBin( hmap_alpha->GetYaxis()->GetBinCenter( j ) - fRunList.fWobbleNorthMod ),

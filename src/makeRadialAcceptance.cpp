@@ -3,9 +3,6 @@
  *
  *   use off events which pass all gamma/hadron separation cuts
  *
- * \author
- *   Gernot Maier
- *
  */
 
 #include "CData.h"
@@ -34,6 +31,7 @@ string datadir = "../eventdisplay/output";
 int entries = -1;
 string histdir = "" ;
 struct stat sb ;
+string fInstrumentEpoch = "NOT_SET";
 
 int main( int argc, char* argv[] )
 {
@@ -45,7 +43,7 @@ int main( int argc, char* argv[] )
 		{
 			VGlobalRunParameter fRunPara;
 			cout << fRunPara.getEVNDISP_VERSION() << endl;
-			exit( 0 );
+			exit( EXIT_SUCCESS );
 		}
 	}
 
@@ -67,7 +65,7 @@ int main( int argc, char* argv[] )
 		{
 			cout << "require run list >= 4" << endl;
 			cout << "...exiting" << endl;
-			exit( 0 );
+			exit( EXIT_FAILURE );
 		}
 		fRunPara->getEventdisplayRunParameter( datadir );
 	}
@@ -79,11 +77,12 @@ int main( int argc, char* argv[] )
 	{
 		cout << "error reading run list" << endl;
 		cout << "exiting..";
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	
 	// read gamma/hadron cuts from cut file
 	VGammaHadronCuts* fCuts = new VGammaHadronCuts();
+        fCuts->setInstrumentEpoch( fInstrumentEpoch );
 	fCuts->setNTel( ntel );
 	if( cutfilename.size() > 0 )
 	{
@@ -91,7 +90,7 @@ int main( int argc, char* argv[] )
 		{
 			cout << "error reading cut file: " << cutfilename << endl;
 			cout << "exiting..." << endl;
-			exit( -1 );
+			exit( EXIT_FAILURE );
 		}
 	}
 	else
@@ -99,9 +98,8 @@ int main( int argc, char* argv[] )
 		cout << "error: no gamma/hadron cut file given" << endl;
 		cout << "(command line option -c)" << endl;
 		cout << "exiting..." << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
-	
 	
 	cout << "total number of files to read: " << fRunPara->fRunList.size() << endl;
 	
@@ -180,7 +178,7 @@ int main( int argc, char* argv[] )
 		if( fTest.IsZombie() )
 		{
 			cout << "error: file not found, " << ifile << endl;
-			exit( -1 );
+			exit( EXIT_FAILURE );
 		}
 		// get data tree
 		TTree* c = ( TTree* )fTest.Get( "data" );
@@ -194,8 +192,7 @@ int main( int argc, char* argv[] )
 			{
 				cout << endl;
 				cout << "error: Number of Telecopes ntel " << ntel << " does not equal number in run " << iParV2->fTelToAnalyze.size() << " (defaul ntel 4)." << endl;
-				//            cout << "To specify us -n ntel option" << endl;
-				exit( -1 );
+				exit( EXIT_FAILURE );
 			}
 		}
 		
@@ -271,6 +268,7 @@ int main( int argc, char* argv[] )
 	}
 	
 	fo->Close();
+        cout << "closing radial acceptance file: " << fo->GetName() << endl;
 	
 	cout << "exiting.." << endl;
 }
@@ -289,15 +287,21 @@ int parseOptions( int argc, char* argv[] )
 			{"runlist", required_argument, 0, 'l'},
 			{"srunlist", required_argument, 0, 's'},
 			{"cutfile", required_argument, 0, 'c'},
+			{"instrumentepoch", required_argument, 0, 'i'},
 			{"outfile", required_argument, 0, 'o'},
-			//            {"ntel", required_argument, 0, 'n'},
 			{"entries", required_argument, 0, 'n'},
 			{"datadir", required_argument, 0, 'd'},
 			{"writehists", optional_argument, 0, 'w'},
 			{0, 0, 0, 0}
 		};
 		int option_index = 0;
-		int c = getopt_long( argc, argv, "ht:s:l:e:o:d:n:c:w:", long_options, &option_index );
+		int c = getopt_long( argc, argv, "ht:s:l:e:o:i:d:n:c:w:", long_options, &option_index );
+                if( optopt != 0 )
+                {
+                    cout << "error: unknown option" << endl;
+                    cout << "exiting..." << endl;
+                    exit( EXIT_FAILURE );
+                }
 		if( argc == 1 )
 		{
 			c = 'h';
@@ -326,13 +330,13 @@ int parseOptions( int argc, char* argv[] )
 				cout << "-l --runlist [anasum-style run list file name, runlist on/off like]" << endl;
 				cout << "-s --srunlist [simple run list file name]" << endl;
 				cout << "-c --cutfile [cut file name]" << endl;
+                                cout << "-i --instrumentepoch [instrument epoch (e.g. V6)" << endl;
 				cout << "-d --datadir [directory for input mscw root files]" << endl;
-				//                cout << "-n --ntel [number of telescopes, default=4]" << endl;
 				cout << "-o --outfile [output ROOT file name]" << endl;
 				cout << "-e --entries [number of entries]" << endl;
 				cout << "-w --writehists [directory]" << endl ;
 				cout << endl;
-				exit( 0 );
+				exit( EXIT_SUCCESS );
 				break;
 			case 'd':
 				cout << "Directory for input Files is " << optarg << endl;
@@ -350,12 +354,13 @@ int parseOptions( int argc, char* argv[] )
 				cout << "Simple List File Name is " << optarg << endl;
 				simpleListFileName = optarg;
 				break;
-			//            case 'n':
-			//                ntel=(unsigned int)atoi(optarg);
-			//                break;
 			case 'c':
 				cutfilename = optarg;
 				cout << "Cut File Name is " << cutfilename << endl;
+				break;
+			case 'i':
+				fInstrumentEpoch = optarg;
+				cout << "Instrument epoch is " << fInstrumentEpoch << endl;
 				break;
 			case 'e':
 				entries = ( int )atoi( optarg );
@@ -366,7 +371,7 @@ int parseOptions( int argc, char* argv[] )
 			case '?':
 				break;
 			default:
-				exit( 0 );
+				exit( EXIT_SUCCESS );
 		}
 	}
 	return optind;

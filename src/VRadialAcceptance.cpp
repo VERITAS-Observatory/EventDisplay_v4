@@ -98,7 +98,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
 	{
 		cout << "VRadialAcceptance error: no gamma/hadron separation cuts defined" << endl;
 		cout << "exiting..";
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	// maximum distance to camera center for which events are taken into account:
 	fCut_CameraFiducialSize_max = fCuts->fCut_CameraFiducialSize_max;
@@ -738,7 +738,7 @@ bool VRadialAcceptance::terminate( TDirectory* iDirectory )
 	if( !iDirectory->cd() )
 	{
 		cout << "VRadialAcceptance::terminate() error accessing directory  " << iDirectory->GetName() << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	/////////////////////////////////////
 	// normalize radial acceptance histograms
@@ -849,7 +849,7 @@ bool VRadialAcceptance::terminate( TDirectory* iDirectory )
 		cout << "\t" << hAccZe[i]->GetName() << "\t" << hAccZe[i]->GetEntries() << endl;
 	}
 	
-	cout << endl << "writing acceptance curves to " << iDirectory->GetName() << endl;
+	cout << endl << "writing acceptance curves to following directory: " << iDirectory->GetName() << endl;
 	
 	hList->Write();
 	
