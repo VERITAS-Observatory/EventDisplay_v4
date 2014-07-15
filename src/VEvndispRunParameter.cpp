@@ -86,6 +86,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fTZeroFileNumber.push_back( 0 );
 	fLowGainMultiplierFileNumber.push_back( 0 );
 	fPedLowGainFileNumber.push_back( 0 );
+        fPedLowGainFile = "";
 	fGainLowGainFileNumber.push_back( 0 );
 	fTOffLowGainFileNumber.push_back( 0 );
 	fTZeroLowGainFileNumber.push_back( 0 );
