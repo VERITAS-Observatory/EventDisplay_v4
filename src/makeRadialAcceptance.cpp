@@ -32,6 +32,7 @@ int entries = -1;
 string histdir = "" ;
 struct stat sb ;
 string fInstrumentEpoch = "NOT_SET";
+double fMaxDistanceAllowed = 2.5;
 
 int main( int argc, char* argv[] )
 {
@@ -116,7 +117,7 @@ int main( int argc, char* argv[] )
 	TDirectory* facc_dir = ( TDirectory* )fo;
 	
 	// create acceptance object
-	VRadialAcceptance* facc = new VRadialAcceptance( fCuts, fRunPara );
+	VRadialAcceptance* facc = new VRadialAcceptance( fCuts, fRunPara, fMaxDistanceAllowed );
 	
 	// set facc to write extra histograms if necessary
 	if( histdir.size() > 0 )
@@ -288,6 +289,7 @@ int parseOptions( int argc, char* argv[] )
 			{"srunlist", required_argument, 0, 's'},
 			{"cutfile", required_argument, 0, 'c'},
 			{"instrumentepoch", required_argument, 0, 'i'},
+                        {"maxdistance", required_argument, 0, 'm'},
 			{"outfile", required_argument, 0, 'o'},
 			{"entries", required_argument, 0, 'n'},
 			{"datadir", required_argument, 0, 'd'},
@@ -295,7 +297,7 @@ int parseOptions( int argc, char* argv[] )
 			{0, 0, 0, 0}
 		};
 		int option_index = 0;
-		int c = getopt_long( argc, argv, "ht:s:l:e:o:i:d:n:c:w:", long_options, &option_index );
+		int c = getopt_long( argc, argv, "ht:s:l:e:m:o:i:d:n:c:w:", long_options, &option_index );
                 if( optopt != 0 )
                 {
                     cout << "error: unknown option" << endl;
@@ -334,6 +336,7 @@ int parseOptions( int argc, char* argv[] )
 				cout << "-d --datadir [directory for input mscw root files]" << endl;
 				cout << "-o --outfile [output ROOT file name]" << endl;
 				cout << "-e --entries [number of entries]" << endl;
+                                cout << "-m --maxdist [max distance from camera centre (deg)]" << endl;
 				cout << "-w --writehists [directory]" << endl ;
 				cout << endl;
 				exit( EXIT_SUCCESS );
@@ -358,6 +361,10 @@ int parseOptions( int argc, char* argv[] )
 				cutfilename = optarg;
 				cout << "Cut File Name is " << cutfilename << endl;
 				break;
+                        case 'm':
+                                fMaxDistanceAllowed = atof( optarg );
+                                cout << "Maximum allowed distance from camera centre: " << fMaxDistanceAllowed << endl;
+                                break;
 			case 'i':
 				fInstrumentEpoch = optarg;
 				cout << "Instrument epoch is " << fInstrumentEpoch << endl;

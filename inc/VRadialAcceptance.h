@@ -130,7 +130,7 @@ class VRadialAcceptance
 	public:
 	
 		VRadialAcceptance();                                                            //!< use acceptance curve from simulation
-		VRadialAcceptance( VGammaHadronCuts* iCuts, VAnaSumRunParameter* irun );        //!< set data source and cuts for acceptance curve calculation
+		VRadialAcceptance( VGammaHadronCuts* iCuts, VAnaSumRunParameter* irun, double iMaxDistanceAllowed = -99. ); //!< set data source and cuts for acceptance curve calculation
 		VRadialAcceptance( string ifile );                                              //!< use acceptance curve from this file
 		~VRadialAcceptance();
 		
