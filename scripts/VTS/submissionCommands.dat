@@ -16,6 +16,9 @@
 # DESY batch farm -- no qsub logs
   qsub -V -terse -l os=sl6 -l h_cpu=$h_cpu -l h_vmem=$h_vmem -l tmpdir_size=$tmpdir_size -j y -o /dev/null
 
+# U Chicago 
+  qsub -V -terse,-l nodes=1,walltime=60:00:00,cput=86400
+
 # University of Iowa
   qsub -V -terse -q all.q -r y -j y -o /dev/null
   qsub -V -terse -q UI -tc 25 -o $LOGDIR/ -e $LOGDIR/

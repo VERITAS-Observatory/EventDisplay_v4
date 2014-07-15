@@ -94,7 +94,7 @@ fi
 
 # Command line options for Model3D
 if [[ $MODEL3D == "1" ]]; then
-    OPT+=( -model3d -lnlfile "$VERITAS_EVNDISP_AUX_DIR/Tables/table_LnL.root" )
+    OPT+=( -model3d -lnlfile "$VERITAS_EVNDISP_AUX_DIR/Model3D/table_Model3D_Likelihood.root" )
 fi
 
 if [[ "$SCIPIPE_FASTDEVMODE" == "yes" ]] ; then

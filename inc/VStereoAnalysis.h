@@ -350,7 +350,7 @@ class VStereoAnalysis
 			{
 				return fDataRun->frogsXP;
 			}
-			else if( fRunPara->fModel3D && fDataRun->fModel3D )
+			else if( fRunPara->fDirectionModel3D && fDataRun->fModel3D )
 			{
 				return fDataRun->Xcore3D;
 			}
@@ -366,7 +366,7 @@ class VStereoAnalysis
 			{
 				return fDataRun->frogsYP;
 			}
-			else if( fRunPara->fModel3D && fDataRun->fModel3D )
+			else if( fRunPara->fDirectionModel3D && fDataRun->fModel3D )
 			{
 				return fDataRun->Ycore3D;
 			}
@@ -382,7 +382,7 @@ class VStereoAnalysis
 			{
 				return fDataRun->frogsXS;
 			}
-			else if( fRunPara->fModel3D && fDataRun->fModel3D )
+			else if( fRunPara->fDirectionModel3D && fDataRun->fModel3D )
 			{
 				return fDataRun->Xoff3D;
 			}
@@ -399,7 +399,7 @@ class VStereoAnalysis
 			{
 				return -1.0 * fDataRun->frogsYS;
 			}
-			else if( fRunPara->fModel3D && fDataRun->fModel3D )
+			else if( fRunPara->fDirectionModel3D && fDataRun->fModel3D )
 			{
 				return fDataRun->Yoff3D;
 			}

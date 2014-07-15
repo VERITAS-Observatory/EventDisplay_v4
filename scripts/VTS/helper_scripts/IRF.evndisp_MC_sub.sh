@@ -173,7 +173,7 @@ fi
 ###############################################
 # model 3D
 if [[ $USEMODEL3D == "1" ]]; then
-    MODEL3D="-model3d -lnlfile $VERITAS_EVNDISP_AUX_DIR/Tables/table_LnL.root"
+    MODEL3D="-model3d -lnlfile $VERITAS_EVNDISP_AUX_DIR/Model3D/table_Model3D_Likelihood.root"
 fi
 # FROGS
 if [[ $USEFROGS == "1" ]]; then

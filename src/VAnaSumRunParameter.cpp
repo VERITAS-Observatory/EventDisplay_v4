@@ -149,9 +149,10 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	
 	// frogs analysis
 	fFrogs = false;
-	// model 3D analysis
-	fModel3D = false; 
-	
+	// model3D analysis
+	fModel3D = false; // MODEL3DANALYSIS
+	fDirectionModel3D = false; //USEDIRECTIONMODEL3D
+
 	// if 0, use default 1D radial acceptance
 	// if >0, use alternate 2D-dependent acceptance
 	f2DAcceptanceMode = 0 ; // USE2DACCEPTANCE
@@ -624,6 +625,15 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				if( tmpModel3D == 1 )
 				{
 					fModel3D = true;
+				}
+			}
+			/// use Model3D direction ///
+			else if( temp == "USEDIRECTIONMODEL3D" )
+			{
+			        unsigned int tmpDirectionModel3D = ( unsigned int )atoi( temp2.c_str() ) ;
+				if( tmpDirectionModel3D == 1 )
+				{
+					fDirectionModel3D = true;
 				}
 			}
 			////////////////////////////////////////////////////////////
