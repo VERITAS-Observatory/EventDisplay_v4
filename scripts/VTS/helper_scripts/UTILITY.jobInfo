@@ -145,13 +145,21 @@ elif [[ $STORAGEFLAG == long ]] ; then
 	#echo "$SUBTIME"
 	LATESTLINES=$( echo "$JOBTEXT" | grep "submission_time = $SUBTIME" | grep "job_number = $JOBNUM" )
 fi
+
 #echo "LATESTLINES:"
 #echo "$LATESTLINES"
+
+if [ -z "$LATESTLINES" ] ; then
+	echo "Error, could not get job info, exiting..." 2>&1
+	exit 1
+fi
+
+#echo
 #exit 0
 
 while read -r LINE ; do
-    #echo
-    #echo "$LINE"
+#    echo
+#    echo "line:'$LINE'"
     #echo
     
     # get info about each task
