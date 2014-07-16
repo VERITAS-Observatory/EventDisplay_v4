@@ -86,7 +86,9 @@ int main( int argc, char* argv[] )
 	fRunPara->SetName( "makeEffectiveArea_runparameter" );
 	if( !fRunPara->readRunParameterFromTextFile( argv[1] ) )
 	{
-		exit( -1 );
+                cout << "error reading runparameters from text file" << endl;
+                cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
 	}
 	fRunPara->print();
 	
@@ -96,7 +98,8 @@ int main( int argc, char* argv[] )
 	if( fOutputfile->IsZombie() )
 	{
 		cout << "Error in opening output file: " << fOutputfile->GetName() << endl;
-		exit( 0 );
+                cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
 	}
 	
 	/////////////////////////////////////////////////////////////////
@@ -108,7 +111,8 @@ int main( int argc, char* argv[] )
 	fCuts->setTelToAnalyze( fRunPara->fTelToAnalyse );
 	if( !fCuts->readCuts( fRunPara->fCutFileName, 2 ) )
 	{
-		exit( -1 );
+                cout << "exiting..." << endl;
+		exit( EXIT_FAILURE ) ;
 	}
 	fRunPara->fGammaHadronCutSelector = fCuts->getGammaHadronCutSelector();
 	fRunPara->fDirectionCutSelector   = fCuts->getDirectionCutSelector();
@@ -154,7 +158,6 @@ int main( int argc, char* argv[] )
 				&& TMath::Abs( ( float )fCuts->getAngularResolutionContainmentRadius() - 68. ) > 1.e-5
 				&& TMath::Abs( ( float )fCuts->getAngularResolutionContainmentRadius() - 80. ) > 1.e-5 )
 		{
-			cout << "XXX " << TMath::Abs( fCuts->getAngularResolutionContainmentRadius() - 0.68 ) << "\t" << TMath::Abs( fCuts->getAngularResolutionContainmentRadius() - 0.80 ) << endl;
 			exit( 0 );
 			char hname[200];
 			sprintf( hname, "angular_resolution_0%dp", fCuts->getAngularResolutionContainmentRadius() );
@@ -201,7 +204,7 @@ int main( int argc, char* argv[] )
 	{
 		cout << "Error while trying to add mscw data tree from file " << fRunPara->fdatafile  << endl;
 		cout << "exiting..." << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	
 	//FROGS
@@ -212,7 +215,7 @@ int main( int argc, char* argv[] )
 		{
 			cout << "Error while trying to add mscw frogs tree from file " << fRunPara->fdatafile  << endl;
 			cout << "exiting..." << endl;
-			exit( -1 );
+			exit( EXIT_FAILURE );
 		}
 		c->AddFriend( fchain );
 	}
@@ -276,14 +279,14 @@ int main( int argc, char* argv[] )
 			{
 				cout << "Error reading MC histograms from file " << fRunPara->fMCdatafile_histo << endl;
 				cout << "exiting..." << endl;
-				exit( -1 );
+				exit( EXIT_FAILURE );
 			}
 			fMC_histo = ( VEffectiveAreaCalculatorMCHistograms* )fMC_histoFile->Get( "MChistos" );
 			if( !fMC_histo )
 			{
 				cout << "Error reading MC histograms from file " << fRunPara->fMCdatafile_histo << " (no histograms)" << endl;
 				cout << "exiting..." << endl;
-				exit( -1 );
+				exit( EXIT_FAILURE );
 			}
 			fMC_histo->matchDataVectors( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex );
 			fMC_histo->print();
@@ -296,7 +299,7 @@ int main( int argc, char* argv[] )
 			{
 				cout << "Error while trying to read MC data file: " << fRunPara->fMCdatafile_tree << endl;
 				cout << "exiting..." << endl;
-				exit( -1 );
+				exit( EXIT_FAILURE );
 			}
 			fMC_histo = new VEffectiveAreaCalculatorMCHistograms();
 			fMC_histo->setMonteCarloEnergyRange( fRunPara->fMCEnergy_min, fRunPara->fMCEnergy_max, TMath::Abs( fRunPara->fMCEnergy_index ) );
