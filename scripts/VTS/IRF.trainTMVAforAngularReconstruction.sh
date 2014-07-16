@@ -82,7 +82,7 @@ SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.trainTMVAforAngularReconst
 echo "Processing Zenith = $ZA, Noise = $NOISE, Wobble = $WOBBLE"
             
 # set parameters in run script
-FSCRIPT="$LOGDIR/TA.ID${RECID}.$DATE.MC"
+FSCRIPT="$LOGDIR/TA.ID${RECID}.${EPOCH}.$DATE.MC"
 sed -e "s|OUTPUTDIR|$ODIR|" \
     -e "s|EVNDISPFILE|$INDIR|" \
     -e "s|BDTFILE|$BDTFILE|" $SUBSCRIPT.sh > $FSCRIPT.sh
