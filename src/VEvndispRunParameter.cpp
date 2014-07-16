@@ -65,10 +65,6 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fRunDuration = 60. * 3600.;        // default run duration is 1 h (reset by DBRunInfo)
 	fPrintGrisuHeader = 0;
 
-        fEpochFile = "VERITAS.Epochs.runparameter";
-        fInstrumentEpoch = "noepoch";
-        fAtmosphereID = 0;
-	
 	fprintdeadpixelinfo = false ; // DEADCHAN if true, print list of dead pixels to evndisp.log
 	
 	// geometry/calibration parameters
@@ -97,6 +93,11 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fTelToAnalyze.push_back( 0 );
 	
 	fDeadChannelFile = "EVNDISP.validchannels.dat";
+
+        fEpochFile = "VERITAS.Epochs.runparameter";
+        fInstrumentEpoch = "noepoch";
+        fAtmosphereID = 0;
+	fEpochGain.resize( fNTelescopes, 5.5 );
 	
 	fCameraCoordinateTransformX = 1.;
 	fCameraCoordinateTransformY = 1.;

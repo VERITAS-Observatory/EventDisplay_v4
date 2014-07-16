@@ -1922,6 +1922,11 @@ bool VReadRunParameter::readEpochsAndAtmospheres()
 {
      if( !fRunPara ) return false;
 
+     if( fRunPara->fEpochGain.size() != fRunPara->fNTelescopes )
+     {
+        fRunPara->fEpochGain.resize( fRunPara->fNTelescopes, 5.5 );
+     }
+
      if( fRunPara->fEpochFile.size() == 0 ) return true;
 
 	ifstream is;
@@ -2015,9 +2020,33 @@ bool VReadRunParameter::readEpochsAndAtmospheres()
                                      fRunPara->fAtmosphereID = atoi( iTemp.c_str() );
                                 }
                         }
-                 }
-          }
-          is.close();
+			// absolute gains (dc/pe) for each VERITAS epoch
+			//  * GAIN V4 1 5.11
+                        else if( temp == "GAIN" )
+                        {
+                                string iEpoch = "";
+                                string iTel = "";
+                                string iGain = "";
+                                if( !is_stream.eof() ) is_stream >> iEpoch;
+				if( !is_stream.eof() ) is_stream >> iTel;
+				if( !is_stream.eof() ) is_stream >> iGain;
+				unsigned int iTelNum = 0;
 
-    return true;
+				if( iEpoch == fRunPara->fInstrumentEpoch )
+				{
+				     iTelNum = atoi( iTel.c_str() );
+				     for( unsigned int i = 0; i < fRunPara->fNTelescopes; i++ )
+		                     {
+				          if( iTelNum == i+1 ) 
+					  {
+					       fRunPara->fEpochGain[i] = atof( iGain.c_str() );
+					  }
+				     }  
+				}
+			}
+		}
+        }
+     is.close();
+
+     return true;
 }
