@@ -138,40 +138,12 @@ void VModel3D::readLnLTable()
 
 void VModel3D::setGain()
 {
-        //// HARD-WIRED for VERITAS based on date of observation ////
-        int iMJD = fData->getEventMJD();
-        cout<< "Model3D: MJD = "<< iMJD <<" Gains: ";
         /// set gain for each telescope ///
         for( unsigned int iTel = 0; iTel < fData->getNTel(); iTel++ )
         {
-	        if( iMJD > 54315 && iMJD < 55045 ) // V4 (08/2007 - 08/2009)
-	        {
-            	     if( iTel == 0 ) fData3D->fDCPE[iTel] = 5.11;
-            	     if( iTel == 1 ) fData3D->fDCPE[iTel] = 5.32;
-            	     if( iTel == 2 ) fData3D->fDCPE[iTel] = 4.76;
-            	     if( iTel == 3 ) fData3D->fDCPE[iTel] = 5.00;
-	        }
-		else if( iMJD > 55045 && iMJD < 56140 ) // V5 (08/2009 - 08/2012)
-		{
-           	     if( iTel == 0 ) fData3D->fDCPE[iTel] = 5.20;
-            	     if( iTel == 1 ) fData3D->fDCPE[iTel] = 5.31;
-            	     if( iTel == 2 ) fData3D->fDCPE[iTel] = 5.33;
-            	     if( iTel == 3 ) fData3D->fDCPE[iTel] = 5.46;
-		}
-		else if( iMJD > 56140 && iMJD < 60000 ) // V6 (09/2009 - future)
-		{
-           	     if( iTel == 0 ) fData3D->fDCPE[iTel] = 5.20;
-            	     if( iTel == 1 ) fData3D->fDCPE[iTel] = 5.12;
-            	     if( iTel == 2 ) fData3D->fDCPE[iTel] = 5.12;
-            	     if( iTel == 3 ) fData3D->fDCPE[iTel] = 5.54;
-		}
-		else
-		{
-	             fData3D->fDCPE[iTel] = 5.62; // default
-		}
-		cout<<"T"<< iTel+1 <<" "<< fData3D->fDCPE[iTel] <<", ";
+	     fData3D->fDCPE[iTel] = fRunPar->fEpochGain[iTel];
+	     cout<<"telescope absolute gains: "<< fRunPar->fInstrumentEpoch <<" "<< iTel+1 <<" "<< fData3D->fDCPE[iTel] <<endl;
 	}
-	cout<<endl;
 }
 
 void VModel3D::getDetector()
