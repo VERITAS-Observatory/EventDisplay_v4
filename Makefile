@@ -37,7 +37,7 @@ ARCH = $(shell uname)
 # basic numbers 
 #############################
 package = EVNDISP
-version = 447
+version = 451
 # version of auxiliary files
 auxversion = $(version)-auxv01
 distdir = $(package)-$(version)

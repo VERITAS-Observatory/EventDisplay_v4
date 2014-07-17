@@ -2,6 +2,10 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+*************************************************************
+******* 20140717 release of v4.50; trunk is now v4.51 *******
+*************************************************************
+
 * 20140714 (GM)
 ring background model validation and fixes in 
 alpha calculation
