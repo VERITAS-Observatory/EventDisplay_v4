@@ -11,7 +11,7 @@
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ]
 then
    echo
-   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob <sub array list> <list of simtelarray files> <particle> <data set> [keep simtel.root files (default off=0)] [log file directory counter] [qsub options] [TRIGGER MASK DIRECTORY]"
+   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.prod2.sh <sub array list> <list of simtelarray files> <particle> <data set> [keep simtel.root files (default off=0)] [log file directory counter] [qsub options] [TRIGGER MASK DIRECTORY]"
    echo
    echo "CTA PROD2 ANALYSIS"
    echo

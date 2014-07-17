@@ -27,6 +27,7 @@ STEPSIZE=STST
 FIELD=$SUBA
 
 # converter command line parameter
+# COPT="-NSB 1.5 -f 1 -c $PEDFILE"
 COPT="-f 1 -c $PEDFILE"
 
 # eventdisplay command line parameter
