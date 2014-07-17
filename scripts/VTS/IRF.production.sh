@@ -60,11 +60,12 @@ AUX="auxv01"
 # simulation types and definition of parameter space
 if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
     # GrISU simulation parameters
+    ZENITH_ANGLES=( 00 20 30 35 40 )
     ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 60 65 )
     NSB_LEVELS=( 075 100 150 200 250 325 425 550 750 1000 )
 #    NSB_LEVELS=( 200 )
-    WOBBLE_OFFSETS=( 0.5 )
     WOBBLE_OFFSETS=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
+    WOBBLE_OFFSETS=( 0.5 )
 elif [ ${SIMTYPE:0:4} = "CARE" ]; then
     # CARE simulation parameters
     ZENITH_ANGLES=( 00 20 30 35 40 )
@@ -89,19 +90,19 @@ if [[ $CUTSLISTFILE != "" ]]; then
     IFS=$'\r\n' CUTLIST=($(cat $CUTLISTFILE))
 else
     # default list of cuts
-#    CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat 
-#             ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft.dat 
-#             ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard.dat 
-#             ANASUM.GammaHadron-Cut-NTel3-PointSource-SuperHard.dat 
-#             ANASUM.GammaHadron-Cut-NTel2-PointSource-ModerateOpen.dat
-#             ANASUM.GammaHadron-Cut-NTel2-PointSource-SoftOpen.dat 
-#             ANASUM.GammaHadron-Cut-NTel2-PointSource-HardOpen.dat 
-#             ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Moderate.dat 
-#             ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Soft.dat 
-#             ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Hard.dat 
-#             ANASUM.GammaHadron-Cut-NTel3-PointSource-Moderate.dat 
-#             ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard.dat"
-     CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat"
+    CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat 
+             ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft.dat 
+             ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard.dat 
+             ANASUM.GammaHadron-Cut-NTel3-PointSource-SuperHard.dat 
+             ANASUM.GammaHadron-Cut-NTel2-PointSource-ModerateOpen.dat
+             ANASUM.GammaHadron-Cut-NTel2-PointSource-SoftOpen.dat 
+             ANASUM.GammaHadron-Cut-NTel2-PointSource-HardOpen.dat 
+             ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Moderate.dat 
+             ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Soft.dat 
+             ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Hard.dat 
+             ANASUM.GammaHadron-Cut-NTel3-PointSource-Moderate.dat 
+             ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard.dat"
+#     CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat"
 fi
 
 ############################################################
@@ -148,6 +149,8 @@ for VX in $EPOCH; do
                     if [[ $IRFTYPE == "EVNDISP" ]]; then
                        if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
                           SIMDIR=$VERITAS_DATA_DIR/simulations/"$VX"_FLWO/grisu/ATM"$ATM"
+                       elif [[ ${SIMTYPE:0:13} = "CARE_June1425" ]]; then
+                          SIMDIR=$VERITAS_DATA_DIR/simulations/"$VX"_FLWO/CARE_June1425/
                        elif [[ ${SIMTYPE:0:4} = "CARE" ]]; then
                           SIMDIR=$VERITAS_DATA_DIR/simulations/"$VX"_FLWO/${SIMTYPE}
                        fi

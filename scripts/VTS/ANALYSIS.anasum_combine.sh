@@ -6,8 +6,7 @@ if [[ $# < 3 ]]; then
 echo "
 ANASUM parallel data analysis: combine parallel-processed anasum runs
 
-ANALYSIS.anasum_combine.sh <anasum run list> <anasum directory>
- <output file name> [run parameter file]
+ANALYSIS.anasum_combine.sh <anasum run list> <anasum directory> <output file name> [run parameter file]
 
 required parameters:
 

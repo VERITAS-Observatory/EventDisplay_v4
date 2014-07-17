@@ -23,8 +23,17 @@ fi
 echo "Scratch dir: $TEMPDIR"
 mkdir -p $TEMPDIR
 
+#################################
 # eventdisplay reconstruction parameter
-ACUTS="EVNDISP.reconstruction.runparameter"
+# no disp, long integration window
+ACUT="EVNDISP.reconstruction.runparameter"
+# disp, long integration window
+#ACUT="EVNDISP.reconstruction.runparameter.DISP"
+# no disp, short integration window
+#ACUT="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
+# disp, short integration window
+#ACUT="EVNDISP.reconstruction.runparameter.SumWindow6-DISP"
+
 # DST ACUTS="EVNDISP.reconstruction.SW18_noDoublePass.runparameter"
 
 #########################################

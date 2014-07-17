@@ -10,8 +10,7 @@ if [ $# -ne 4 ]; then
 echo "
 ANASUM parallel data analysis: submit jobs from an anasum run list
 
-ANALYSIS.anasum_parallel.sh <anasum run list> <mscw directory>
- <output directory> <run parameter file>
+ANALYSIS.anasum_parallel.sh <anasum run list> <mscw directory> <output directory> <run parameter file>
 
 required parameters:
 
@@ -64,13 +63,13 @@ fi
 
 # directory for run scripts
 DATE=`date +"%y%m%d"`
-LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/ANASUM.ANADATA"
-mkdir -p $LOGDIR
+LOGDIRTEMP="$VERITAS_USER_LOG_DIR/$DATE/ANASUM.ANADATA"
+mkdir -p $LOGDIRTEMP
 
 # temporary run list
 DATECODE=`date +%Y%m%d`
 TEMPLIST=`basename $FLIST`
-TEMPLIST="$LOGDIR/$DATECODE.PID$$.$TEMPLIST.tmp"
+TEMPLIST="$LOGDIRTEMP/$DATECODE.PID$$.$TEMPLIST.tmp"
 rm -f $TEMPLIST
 cat $FLIST | grep "*" >> $TEMPLIST
 
@@ -96,6 +95,10 @@ for ((i=1; i <= $NLINES; i++)); do
     if [[ $RUN != "VERSION" ]]; then
         # output file name
         ONAME="$RUN.anasum"
+
+        # temporary log dir
+        LOGDIR="$LOGDIRTEMP/${RUN}"
+        mkdir -p $LOGDIR
 
         # temporary per-run file list
         RUNTEMPLIST="$LOGDIR/qsub_analyse_fileList_${ODIRBASE}_${RUN}_${DATECODE}_PID$$"
@@ -135,14 +138,14 @@ for ((i=1; i <= $NLINES; i++)); do
                 echo "RUN $RUN ELOG $FSCRIPT.sh.e$JOBID"
             fi
         elif [[ $SUBC == *parallel* ]]; then
-            echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
+            echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIRTEMP/runscripts.dat
         fi
     fi
 done
 
 # Execute all FSCRIPTs locally in parallel
 if [[ $SUBC == *parallel* ]]; then
-    cat $LOGDIR/runscripts.dat | $SUBC
+    cat $LOGDIRTEMP/runscripts.dat | $SUBC
 fi
 
 rm -f $TEMPLIST

@@ -35,9 +35,18 @@ if [[ $USEFROGS == "1" ]]; then
     echo "FROGS NEvents: $NEVENTS"
 fi
 
+#################################
 # detector configuration and cuts
+# no disp, long integration window
 ACUT="EVNDISP.reconstruction.runparameter"
-# ACUT="EVNDISP.reconstruction.runparameter.noDISP"
+# disp, long integration window
+#ACUT="EVNDISP.reconstruction.runparameter.DISP"
+# no disp, short integration window
+#ACUT="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
+# disp, short integration window
+#ACUT="EVNDISP.reconstruction.runparameter.SumWindow6-DISP"
+
+
 DEAD="EVNDISP.validchannels.dat"
 PEDLEV="16."
 # LOWPEDLEV="8."
