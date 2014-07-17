@@ -70,6 +70,7 @@ class VTMVARunData : public TNamed
 		unsigned int      fMinBackgroundEvents;
 		TCut              fQualityCuts;
 		TCut              fMCxyoffCut;
+                bool              fMCxyoffCutSignalOnly;
 		string            fPrepareTrainingOptions;
 		vector< VTMVARunDataEnergyCut* > fEnergyCutData;
 		
@@ -98,7 +99,7 @@ class VTMVARunData : public TNamed
 			fName = iN;
 		}
 		
-		ClassDef( VTMVARunData, 7 );
+		ClassDef( VTMVARunData, 8 );
 };
 
 #endif

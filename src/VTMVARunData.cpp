@@ -24,6 +24,7 @@ VTMVARunData::VTMVARunData()
 	
 	fQualityCuts = "";
 	fMCxyoffCut = "";
+        fMCxyoffCutSignalOnly = false;
 	fPrepareTrainingOptions = "SplitMode=random:!V";
 	
 	fSignalWeight = 1.;
@@ -140,7 +141,8 @@ bool VTMVARunData::openDataFiles()
 		{
 			if( fBackgroundTree[j] )
 			{
-				fBackgroundTree[j]->Draw( ">>+BackgroundList", fQualityCuts && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut, "entrylist" );
+				if( fMCxyoffCutSignalOnly ) fBackgroundTree[j]->Draw( ">>+BackgroundList", fQualityCuts && fEnergyCutData[i]->fEnergyCut, "entrylist" );
+                                else                        fBackgroundTree[j]->Draw( ">>+BackgroundList", fQualityCuts && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut, "entrylist" );
 				i_BackgroundList = ( TEntryList* )gDirectory->Get( "BackgroundList" );
 			}
 		}
@@ -149,6 +151,7 @@ bool VTMVARunData::openDataFiles()
 			cout << "number of background events in energy bin " << i << "\t" << i_BackgroundList->GetN();
 			cout << "\t required > " << fMinBackgroundEvents << endl;
 			cout << "  (cuts are " << fQualityCuts << "&&" << fMCxyoffCut;
+                        if( fMCxyoffCutSignalOnly ) cout << " (signal only) ";
 			cout << "&&" << fEnergyCutData[i]->fEnergyCut << ")" << endl;
 			if( i_BackgroundList->GetN() < fMinBackgroundEvents )
 			{
@@ -264,7 +267,9 @@ void VTMVARunData::print()
 	}
 	cout << endl;
 	cout << "pre-training selection cuts: " << fQualityCuts << endl;
-	cout << "cut on MC arrival directions: " << fMCxyoffCut << endl;
+	cout << "cut on MC arrival directions: " << fMCxyoffCut;
+        if( fMCxyoffCutSignalOnly ) cout << " (signal only)";
+        cout << endl;
 	cout << endl;
 	cout << "prepare traing options: " << fPrepareTrainingOptions << endl;
 	cout << "energy bin(s) (" << fEnergyCutData.size() << "): ";
@@ -446,7 +451,13 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 					return false;
 				}
 			}
-			
+                        if( temp == "MCXYCUTSignalOnly" )
+                        {
+                             if( !is_stream.eof() )
+                             {
+                                 fMCxyoffCutSignalOnly = (atoi)(  is_stream.str().substr( is_stream.tellg(), is_stream.str().size() ).c_str() );
+                             }
+                        }
 			// prepare training options
 			if( temp == "PREPARE_TRAINING_OPTIONS" )
 			{
