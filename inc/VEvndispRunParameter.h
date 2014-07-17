@@ -281,6 +281,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool fUseDisplayModel3D;                  // display Model3D generated images, JG
 		bool fCreateLnLTable;                     // create lookup table for likelihood
 		string fLnLTableFile;                     // read lookup table for likelihood from this file
+		unsigned int fIDstartDirectionModel3D;    // reconstruction ID for starting values
 		
 		// write pulse histograms to gain files
 		int  fwriteLaserPulseN;                    // number of pulse histogram written to gain file
@@ -331,6 +332,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fuseDB;
 		}
 		
-		ClassDef( VEvndispRunParameter, 154 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 155 ); //(increase this number)
 };
 #endif

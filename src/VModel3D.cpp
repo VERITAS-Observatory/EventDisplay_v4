@@ -298,9 +298,13 @@ void VModel3D::calcPvector()
 void VModel3D::calcStartParameters()
 {
 	/////// Get model starting point ///////////
-	/////// use reconstruction method 0 as default ////
-	fData3D->fStartXcore3D = fData->getShowerParameters()->fShowerXcore[0];
-	fData3D->fStartYcore3D = fData->getShowerParameters()->fShowerYcore[0];
+	/////// use reconstruction method 0 as default ////////////
+        /////// or set with MODEL3DSTARTID in runparameter file ///
+        unsigned int iID = fRunPar->fIDstartDirectionModel3D;
+	if( fRunPar->fIDstartDirectionModel3D > getEvndispReconstructionParameter()->fNMethods ) iID = 0;
+	
+	fData3D->fStartXcore3D = fData->getShowerParameters()->fShowerXcore[iID];
+	fData3D->fStartYcore3D = fData->getShowerParameters()->fShowerYcore[iID];
 	
 	double corecut = 9999;
 	if( fabs( fData3D->fStartXcore3D ) >= corecut || fabs( fData3D->fStartYcore3D ) >= corecut )
@@ -311,8 +315,8 @@ void VModel3D::calcStartParameters()
 	//// shower direction (sky to ground coordinates) ////
 	//// multiply by base vectors to be in ground system ////
 	double ts[3]; // temp s vector
-	ts[0] = fData->getShowerParameters()->fShower_Xoffset[0];
-	ts[1] = fData->getShowerParameters()->fShower_Yoffset[0];
+	ts[0] = fData->getShowerParameters()->fShower_Xoffset[iID];
+	ts[1] = fData->getShowerParameters()->fShower_Yoffset[iID];
 	ts[2] = 0;
 	if( ts[0] == 0 && ts[1] == 0 )
 	{
