@@ -59,46 +59,50 @@ BACKGND=$4
 [[ "$7" ]] && SIMTYPE=$7 || SIMTYPE="GRISU"
 [[ "$8" ]] && BASEID=$8 || BASEID="0"
 
+###########################
+# IRFs
+IRFVERSION="v447-auxv01"
+
 # cut definitions (note: VX to be replaced later in script)
 if [[ $CUTS == *superhard* ]]; then
-    CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-SuperHard.dat"
-    EFFAREA="effArea-${SIMTYPE}-140626-Cut-NTel3-PointSource-SuperHard-BASEID${BASEID}-VX-ATM${ATMO}-TX.root"
-    RADACC="radialAcceptance-d20131115-cut-N2-Point-005CU-SuperSoft-VX-T1234.root"
+    CUT="NTel3-PointSource-SuperHard"
 elif [[ $CUTS == *super* ]]; then
-    CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-SuperSoftSpectrum.dat"
-    EFFAREA="effArea-${SIMTYPE}-140619-Cut-NTel2-PointSource-SuperSoftSpectrum-VX-ATM$ATMO-TX.root"
-    EFFAREA="effArea-GRISU-140608-Cut-NTel3-PointSource-ModerateSpectrum-V4-ATM21-T1234.root"
-    RADACC="radialAcceptance-d20131115-cut-N2-Point-005CU-SuperSoft-VX-T1234.root"
-#    EFFAREA="effArea-CARE_June1409_UV-140611-Cut-NTel2-PointSource-SuperSoftSpectrum-V6-ATM21-T1234.root"
-elif [[ $CUTS == *open* ]]; then
-    CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-ModerateOpen.dat"
-    EFFAREA="effArea-${SIMTYPE}-140626-Cut-NTel2-PointSource-ModerateOpen-BASEID${BASEID}-VX-ATM${ATMO}-TX.root"
-    RADACC="radialAcceptance-d20131115-cut-N2-Point-005CU-Open-VX-T1234.root"
+    CUT="NTel2-PointSource-SuperSoftSpectrum"
+elif [[ $CUTS == *moderateopen* ]]; then
+    CUT="NTel2-PointSource-ModerateOpen"
+elif [[ $CUTS == *softopen* ]]; then
+    CUT="NTel2-PointSource-SoftOpen"
+elif [[ $CUTS == *hardopen* ]]; then
+    CUT="NTel2-PointSource-HardOpen"
+elif [[ $CUTS == *softExt* ]]; then
+    CUT="NTel2-ExtendedSource-Soft"
 elif [[ $CUTS == *soft* ]]; then
-#    CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-SoftSpectrum.dat"
-    CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-SoftSpectrum.dat"
-    EFFAREA="effArea-${SIMTYPE}-140626-Cut-NTel2-PointSource-Soft-BASEID${BASEID}-VX-ATM${ATMO}-TX.root"
-    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Soft-VX-T1234.root"
+    CUT="NTel2-PointSource-Soft"
 elif [[ $CUTS = *moderate2tel* ]]; then
-    CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat"
-    EFFAREA="effArea-${SIMTYPE}-140626-Cut-NTel2-PointSource-Moderate-BASEID${BASEID}-VX-ATM${ATMO}-TX.root"
-    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-V5-T1234.root"
+    CUT="NTel2-PointSource-Moderate"
+elif [[ $CUTS = *moderateExt2tel* ]]; then
+    CUT="NTel2-ExtendedSource-Moderate"
 elif [[ $CUTS = *moderate3tel* ]]; then
-    CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-Moderate.dat"
-    EFFAREA="effArea-${SIMTYPE}-140626-Cut-NTel3-PointSource-Moderate-BASEID${BASEID}-VX-ATM${ATMO}-TX.root"
-    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-V5-T1234.root"
+    CUT="NTel3-PointSource-Moderate"
 elif [[ $CUTS = *hard2tel* ]]; then
-    CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard.dat"
-    EFFAREA="effArea-${SIMTYPE}-140626-Cut-NTel2-PointSource-Hard-BASEID${BASEID}-VX-ATM${ATMO}-TX.root"
-    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-V5-T1234.root"
+    CUT="NTel2-PointSource-Hard"
 elif [[ $CUTS = *hard3tel* ]]; then
-    CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard.dat"
-    EFFAREA="effArea-${SIMTYPE}-140626-Cut-NTel2-PointSource-Hard-BASEID${BASEID}-VX-ATM${ATMO}-TX.root"
-    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-V5-T1234.root"
+    CUT="NTel3-PointSource-Hard"
+elif [[ $CUTS = *hard2Exttel* ]]; then
+    CUT="NTel2-ExtendedSource-Moderate"
 else
     echo "ERROR: unknown cut definition: $CUTS"
     exit 1
 fi
+CUTFILE="ANASUM.GammaHadron-Cut-${CUT}.dat"
+EFFAREA="effArea-${IRFVERSION}-${SIMTYPE}-Cut-${CUT}-ID${BASEID}-VX-ATM${ATMO}-TX.root"
+RADACC="radialAcceptance-${IRFVERSION}-Cut-${CUT}-ID${BASEID}-VX-TX.root"
+# preliminary: use ID0 for all data
+RADACC="radialAcceptance-${IRFVERSION}-Cut-${CUT}-ID0-VX-TX.root"
+
+echo $CUTFILE
+echo $EFFAREA
+echo $RADACC
 
 # background model parameters
 if [[ "$BACKGND" == *RB* ]]; then
@@ -168,6 +172,7 @@ for RUN in ${RUNS[@]}; do
     EFFAREA=${EFFAREA/TX/$TELTOANA}
 #    EFFAREA=${EFFAREA/ATMXX/$ATMO}
     RADACC=${RADACC/VX/$EPOCH}
+    RADACC=${RADACC/TX/$TELTOANA}
     
     # write line to file
     echo "* $RUN $RUN 0 $CUTFILE $BM $EFFAREA $BMPARAMS $RADACC" >> $ANARUNLIST
