@@ -225,8 +225,7 @@ double VSensitivityCalculator::getSensitivity( double iSignal, double iBackgroun
 		f = fSourceStrength[n];
 		
 		// default significance calculation
-		s = VStatistics::calcSignificance( t * ( f * n_diff + iBackground * iAlpha ),
-										   t * iBackground, iAlpha, fLiAndMaEqu );
+		s = VStatistics::calcSignificance( t * ( f * n_diff + iBackground * iAlpha ), t * iBackground, iAlpha, fLiAndMaEqu );
 		// significance calculation for Crab flares (don't use!)
 		//        s = VStatistics::calcSignificance( t * ( f * n_diff + iBackground * iAlpha + n_diff),
 		//	                                   t * ( iBackground + n_diff / iAlpha ), iAlpha, fLiAndMaEqu );
@@ -380,6 +379,26 @@ unsigned int VSensitivityCalculator::addDataSet( double iGammaRayRate, double iB
 	
 	t.fSignal = iGammaRayRate;
 	t.fBackground = iBackGroundRate;
+	t.fAlpha = iAlpha;
+	t.fName = iName;
+	
+	fData.push_back( t );
+	
+	return fData.size() - 1;
+}
+
+/*!
+     iOnRate = signal rate [1/min]
+     iOffRate = background rate [1/min]
+     iAlpha = normalization parameter (e.g. 1./5.)
+     iName  = name of data set
+*/
+unsigned int VSensitivityCalculator::addDataSetOnOff( double iOnRate, double iOffRate, double iAlpha, string iName )
+{
+	sSensitivityData t;
+	
+	t.fSignal = iOnRate - iOffRate * iAlpha;
+	t.fBackground = iOffRate;
 	t.fAlpha = iAlpha;
 	t.fName = iName;
 	
