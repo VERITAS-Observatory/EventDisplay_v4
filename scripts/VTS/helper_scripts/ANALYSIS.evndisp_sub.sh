@@ -75,7 +75,7 @@ fi
 # average tzero calculation
 if [[ $CALIB == "1" || ( $CALIB == "3" || $CALIB == "4" ) ]]; then
     rm -f $LOGDIR/$RUN.tzero.log
-    $EVNDISPSYS/bin/evndisp -runnumber=$RUN -runmode=7 -reconstructionparameter $ACUTS ${OPT[@]} &> $LOGDIR/$RUN.tzero.log
+    $EVNDISPSYS/bin/evndisp -runnumber=$RUN -runmode=7 -reconstructionparameter $ACUT ${OPT[@]} &> $LOGDIR/$RUN.tzero.log
 	echo "RUN$RUN TZEROLOG $LOGDIR/$RUN.tzero.log"
 fi
 
@@ -115,7 +115,7 @@ fi
 # run eventdisplay
 LOGFILE="$LOGDIR/$RUN.log"
 rm -f $LOGDIR/$RUN.log
-$EVNDISPSYS/bin/evndisp -runnumber=$RUN -noshorttree -reconstructionparameter $ACUTS -outputfile $TEMPDIR/$RUN.root ${OPT[@]} &> "$LOGFILE"
+$EVNDISPSYS/bin/evndisp -runnumber=$RUN -noshorttree -reconstructionparameter $ACUT -outputfile $TEMPDIR/$RUN.root ${OPT[@]} &> "$LOGFILE"
 # DST $EVNDISPSYS/bin/evndisp -runnumber=$RUN -nevents=250000 -runmode=4 -readcalibdb -dstfile $TEMPDIR/$RUN.dst.root -reconstructionparameter $ACUTS -outputfile $TEMPDIR/$RUN.root ${OPT[@]} &> "$LOGFILE"
 echo "RUN$RUN EVNDISPLOG $LOGFILE"
 
