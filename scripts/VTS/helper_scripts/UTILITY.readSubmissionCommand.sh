@@ -18,7 +18,7 @@ exit
 fi
 
 # Set submission commands file to arg or default
-[[ "$1" ]] && CMDFILE=$1 || CMDFILE="submissionCommands.dat"
+[[ "$1" ]] && CMDFILE=$1 || CMDFILE="$EVNDISPSYS/scripts/VTS/submissionCommands.dat"
 
 # Check to make sure submission commands file exists
 if [[ ! -f "$CMDFILE" ]]; then
