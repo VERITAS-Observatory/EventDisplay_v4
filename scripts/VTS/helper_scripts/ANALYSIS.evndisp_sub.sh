@@ -40,7 +40,7 @@ ACUT="EVNDISP.reconstruction.runparameter"
 # pedestal calculation
 if [[ $CALIB == "1" || ( $CALIB == "2" || $CALIB == "4" ) ]]; then
     rm -f $LOGDIR/$RUN.ped.log
-    $EVNDISPSYS/bin/evndisp -runmode=1 -runnumber=$RUN -reconstructionparameter $ACUTS &> $LOGDIR/$RUN.ped.log
+    $EVNDISPSYS/bin/evndisp -runmode=1 -runnumber=$RUN -reconstructionparameter $ACUT &> $LOGDIR/$RUN.ped.log
     echo "RUN$RUN PEDLOG $LOGDIR/$RUN.ped.log"
 fi
 
