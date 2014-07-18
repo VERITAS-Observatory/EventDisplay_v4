@@ -211,7 +211,9 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 	}
 	
 	// quality cuts before filling
-	TCut iCut = iRun->fQualityCuts && iRun->fMCxyoffCut && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut;
+	TCut iCutSignal = iRun->fQualityCuts && iRun->fMCxyoffCut && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut;
+        TCut iCutBck = iRun->fQualityCuts && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut;
+        if( !iRun->fMCxyoffCutSignalOnly ) iCutBck = iCutBck && iRun->fMCxyoffCut;
 	
 	// adding training variables
 	if( iRun->fTrainingVariable.size() != iRun->fTrainingVariableType.size() )
@@ -243,8 +245,8 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 				// require at least 2 image per telescope type
 				iTempCut << iTemp.str() << ">1";
 				TCut iCutCC = iTempCut.str().c_str();
-				double iSignalMean = checkIfVariableIsConstant( iRun, iCut && iCutCC, iTemp.str(), true, iSplitBlock );
-				double iBckMean    = checkIfVariableIsConstant( iRun, iCut && iCutCC, iTemp.str(), false, iSplitBlock );
+				double iSignalMean = checkIfVariableIsConstant( iRun, iCutSignal && iCutCC, iTemp.str(), true, iSplitBlock );
+				double iBckMean    = checkIfVariableIsConstant( iRun, iCutBck && iCutCC, iTemp.str(), false, iSplitBlock );
 				// check if the training variable is constant
 				// (checkIfVariableIsConstant returns -9999 if RMS of variable is >0)
 				cout << "\t mean values " << iSignalMean << "\t" << iBckMean << endl;
@@ -264,8 +266,8 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 		else
 		{
 			// check if the training variable is constant
-			double iSignalMean = checkIfVariableIsConstant( iRun, iCut, iRun->fTrainingVariable[i].c_str(), true, iSplitBlock );
-			double iBckMean    = checkIfVariableIsConstant( iRun, iCut, iRun->fTrainingVariable[i].c_str(), false, iSplitBlock );
+			double iSignalMean = checkIfVariableIsConstant( iRun, iCutSignal, iRun->fTrainingVariable[i].c_str(), true, iSplitBlock );
+			double iBckMean    = checkIfVariableIsConstant( iRun, iCutBck, iRun->fTrainingVariable[i].c_str(), false, iSplitBlock );
 			cout << "\t mean values " << iSignalMean << "\t" << iBckMean << endl;
 			if( TMath::Abs( iSignalMean - iBckMean ) > 1.e-6
 					|| TMath::Abs( iSignalMean + 9999. ) < 1.e-2 || TMath::Abs( iBckMean + 9999. ) < 1.e-2 )
@@ -288,9 +290,7 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 	//////////////////////////////////////////
 	// prepare training events
 	// nTrain Signal=5000:nTrain Background=5000: nTest Signal=4000:nTest Background=5000
-	factory->PrepareTrainingAndTestTree( iRun->fQualityCuts && iRun->fMCxyoffCut &&
-										 iRun->fEnergyCutData[iEnergyBin]->fEnergyCut,
-										 iRun->fPrepareTrainingOptions );
+	factory->PrepareTrainingAndTestTree( iCutSignal, iCutBck, iRun->fPrepareTrainingOptions );
 										 
 	//////////////////////////////////////////
 	// book all methods
