@@ -1586,6 +1586,7 @@ $(vtspara).calibration.tar.gz:
 	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/
 	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.LowGain.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/
 	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.LowGainForCare.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.LowGainForCalibration.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/
 	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Calibration/LowGainPedestals.lped $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/
 	rsync -av --exclude=".*" $(VERITAS_EVNDISP_AUX_DIR)/Calibration/CareSimulations $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/
 #	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_1/36862.lpe* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_1/
