@@ -83,8 +83,10 @@ NENE=${#EMIN[@]}
 # offset bins 
 if [ $CONE == "TRUE" ]
 then
-   OFFMIN=( 0.0 1.0 2.0 3.00 3.50 4.00 4.50 5.00 5.50 )
-   OFFMAX=( 1.0 2.0 3.0 3.50 4.00 4.50 5.00 5.50 6.00 )
+# OFFMIN=( 0.0 1.0 2.0 3.00 3.50 4.00 4.50 5.00 5.50 )
+#   OFFMAX=( 1.0 2.0 3.0 3.50 4.00 4.50 5.00 5.50 6.00 )
+   OFFMIN=( 0.0 0.0 1.5 2.50 3.00 3.50 4.00 4.50 5.00 )
+   OFFMAX=( 2.0 2.0 3.5 3.50 4.00 4.50 5.00 5.50 6.00 )
    OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
    DSUF="gamma_cone"
 else
@@ -154,6 +156,7 @@ do
 	 rm -f $RFIL
 	 echo "* ENERGYBINS $EREC ${EMIN[$i]} ${EMAX[$i]}" > $RFIL.runparameter
 	 echo "* MCXYOFF (MCxoff*MCxoff+MCyoff*MCyoff)>=${OFFMIN[$W]}*${OFFMIN[$W]}&&(MCxoff*MCxoff+MCyoff*MCyoff)<${OFFMAX[$W]}*${OFFMAX[$W]}" >> $RFIL.runparameter
+         echo "* MCXYCUTSignalOnly 1" >> $RFIL.runparameter
 	 grep "*" $RPAR.runparameter | grep -v ENERGYBINS | grep -v OUTPUTFILE | grep -v SIGNALFILE | grep -v BACKGROUNDFILE | grep -v MCXYOFF >> $RFIL.runparameter
 	 echo "* OUTPUTFILE $ODIR $OFIL"_$i" " >> $RFIL.runparameter
 	 for arg in $SFIL
