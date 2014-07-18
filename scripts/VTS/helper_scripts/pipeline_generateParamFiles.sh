@@ -153,7 +153,7 @@ function GetActiveTelComboCode {
 }
 
 
-# directory to look for global param files if not in your $VERITAS_EVNDISP_ANA_DIR , DESY-specific, 
+# directory to look for global param files if not in your $VERITAS_EVNDISP_AUX_DIR , DESY-specific, 
 #GLOBALPARAMDIR="/lustre/fs5/group/cta/VERITAS/analysis/AnalysisData-VTS-v400/"   # HARDCODE
 #GLOBALPARAMDIR="/lustre/fs5/group/cta/VERITAS/analysis/AnalysisData-VTS-v430/" # HARDCODE
 
@@ -181,15 +181,15 @@ function addMissing {
 
 # search for param file, link to it if we dont have it, print errors if it doesn't exist
 function huntForParameterFileName {
-	local PFDIR=$1  # Subdir in $VERITAS_EVNDISP_ANA_DIR: GammaHadronCutFiles, RadialAcceptances, etc
+	local PFDIR=$1  # Subdir in $VERITAS_EVNDISP_AUX_DIR: GammaHadronCutFiles, RadialAcceptances, etc
 	local PF=$2     # name of param file
 	local RRRUN=$3
-	if [ ! -e "$VERITAS_EVNDISP_ANA_DIR/$PFDIR/$PF" ] ; then # the file doesn't exist in our personal directory
-		if [ -e "$VERITAS_EVNDISP_ANA_DIR/GlobalDir/$PFDIR/$PF" ] ; then # the file exists in the global dir, and we must link to it
-			LINKTARG=$(readlink -m "$VERITAS_EVNDISP_ANA_DIR/GlobalDir/$PFDIR/$PF")
-			LINKNAME="$VERITAS_EVNDISP_ANA_DIR/$PFDIR/$PF"
+	if [ ! -e "$VERITAS_EVNDISP_AUX_DIR/$PFDIR/$PF" ] ; then # the file doesn't exist in our personal directory
+		if [ -e "$VERITAS_EVNDISP_AUX_DIR/GlobalDir/$PFDIR/$PF" ] ; then # the file exists in the global dir, and we must link to it
+			LINKTARG=$(readlink -m "$VERITAS_EVNDISP_AUX_DIR/GlobalDir/$PFDIR/$PF")
+			LINKNAME="$VERITAS_EVNDISP_AUX_DIR/$PFDIR/$PF"
 			echoerr "${COYEL}Warning, For run $RRRUN File $PFDIR/$PF"
-			echoerr "   doesnt exist in your \$VERITAS_EVNDISP_ANA_DIR/$PFDIR ."
+			echoerr "   doesnt exist in your \$VERITAS_EVNDISP_AUX_DIR/$PFDIR ."
 			echoerr "   Adding soft link to the global dir: "
 			echoerr "      $LINKNAME"
 			echoerr "      VVVVV"
@@ -197,9 +197,9 @@ function huntForParameterFileName {
             echoerr " "
 			rm -rf "$LINKNAME" ; ln -sf "$LINKTARG" "$LINKNAME" # delete the link if it exists, and make it
 		else # the file doesnt exist anywhere, and the user needs to know
-			echoerr "${CORED}Error: For run $RRRUN Param File Does Not Exist! \$VERITAS_EVNDISP_ANA_DIR/$PFDIR/$PF ${CONORM}"
+			echoerr "${CORED}Error: For run $RRRUN Param File Does Not Exist! \$VERITAS_EVNDISP_AUX_DIR/$PFDIR/$PF ${CONORM}"
 			ALLFILESGOOD=false
-			addMissing "\$VERITAS_EVNDISP_ANA_DIR/$PFDIR/$PF"
+			addMissing "\$VERITAS_EVNDISP_AUX_DIR/$PFDIR/$PF"
 		fi
 	fi
 }
@@ -208,11 +208,11 @@ function huntForParameterFileName {
 HELPFLAG=false
 ISPIPEFILE=`readlink /dev/fd/0` # check to see if input is from terminal, or from a pipe
 if [[ "$ISPIPEFILE" =~ ^/dev/pts/[0-9]{1,2} ]] ; then # its a terminal (not a pipe)
-	if ! [ "$#" -eq "9" ] ; then # the human didn't add the right # of arguments
+	if ! [ "$#" -eq "2" ] ; then # the human didn't add the right # of arguments
 		HELPFLAG=true  # and we must print help text then quickly exit
 	fi
 else # its a pipe, and we need to check for 3 args
-	if ! [ "$#" -eq "8" ] ; then
+	if ! [ "$#" -eq "1" ] ; then
 		HELPFLAG=true
 	fi
 fi
@@ -276,7 +276,7 @@ if $HELPFLAG ; then
 fi
 
 # list of run_id's to read in
-RUNFILE=$9
+RUNFILE="$2"
 if [ ! -e $RUNFILE ] ; then
 	echo "File $RUNFILE could not be found in $PWD , sorry." >&2 ; exit 1
 fi
@@ -284,96 +284,99 @@ fi
 RUNLIST=`cat "$RUNFILE" | awk '!/^($|#)/{ print $1 }'` # removes empty lines and anything after the first number in each line
 #echo "RUNLIST:$RUNLIST"
 
-# energy arguement, only between 4 (soft/hard) and 8 (moderate) letters
-if [[ $1 =~ ^[a-zA-Z]{4,8}$ ]] ; then
-	ENERGYARG=$( echo "$1" | tr "[:upper:]" "[:lower:]" ) # force all to lowercase
-	#echo "Setting ENERGYARG=$ENERGYARG"
-else
-	echoerr "${CORED}Error, 1st arg '$1' must be the energy cut, either 'soft', 'moderate', or 'hard'.  Exiting.${CONORM}"
-	exit 1
+SETTINGLINE="$1"
+#echo
+#echo "SETTINGLINE:'$SETTINGLINE'" 2>&1
+#
+#echo
+
+# parse settings from first argument
+# SETTINGLINE must have the format:
+# -OPTIONNAME:OPTIONVAL-OPTIONNAME:OPTIONVAL-OPTIONNAME:OPTIONVAL-OPTIONNAME:OPTIONVAL- etc.
+ENERGYCODE=$(      echo "$SETTINGLINE" | grep -oP "~CUTS:\w+~"              | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+AUXVER_RADACC=$(   echo "$SETTINGLINE" | grep -oP "~AUXVERRADEC:auxv\d+~"   | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+AUXVER_EFFAREA=$(  echo "$SETTINGLINE" | grep -oP "~AUXVEREFFAREA:auxv\d+~" | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+AUXVER_TABLE=$(    echo "$SETTINGLINE" | grep -oP "~AUXVERTABLE:auxv\d+~"   | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+AUXFILE_EVNVER=$(  echo "$SETTINGLINE" | grep -oP "~AUXFILEEVNVER:v\d+~"    | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+AUXFILE_SIMDATE=$( echo "$SETTINGLINE" | grep -oP "~AUXFILESIMDATE:\w+~"    | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+AUXFILE_MINTEL=$(  echo "$SETTINGLINE" | grep -oP "~AUXFILEMINTEL:\d+~"     | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+AUXFILE_SRCEXT=$(  echo "$SETTINGLINE" | grep -oP "~AUXFILESRCEXT:\w+~"     | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+AUXFILE_DISP=$(    echo "$SETTINGLINE" | grep -oP "~AUXFILEDISP:\w+~"       | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+USEFROGS=$(        echo "$SETTINGLINE" | grep -oP "~USEFROGS:\w+~"          | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+
+#echoerr "ENERGYCODE:      '$ENERGYCODE'"
+#echoerr "AUXVER_RADACC:   '$AUXVER_RADACC'"
+#echoerr "AUXVER_EFFAREA:  '$AUXVER_EFFAREA'"
+#echoerr "AUXVER_TABLE:    '$AUXVER_TABLE'"
+#echoerr "AUXFILE_EVNVER:  '$AUXFILE_EVNVER'"
+#echoerr "AUXFILE_SIMDATE: '$AUXFILE_SIMDATE'"
+#echoerr "AUXFILE_MINTEL:  '$AUXFILE_MINTEL'"
+#echoerr "AUXFILE_SRCEXT:  '$AUXFILE_SRCEXT'"
+#echoerr "AUXFILE_DISP:    '$AUXFILE_DISP'"
+#echoerr "USEFROGS:        '$USEFROGS'"
+
+# test if any of the above are empty
+EXITFLAG=false
+if [[ -z "$ENERGYCODE" ]] ; then
+	echoerr "Error, Unrecognized option in 'CUTS', exiting..."
+	EXITFLAG=true
 fi
 
-# date argument, 8-digit number
-if [[ $2 =~ ^[0-9]{8}$ ]] ; then # its valid!
-	#DATEARG="$2"   # 8-digit number
-    GHCUTDATECODE="$2"
-	#echo "Setting DATEARG=$DATEARG"
-else
-	echoerr "${CORED}Error, 2nd arg '$2' must be an 8-digit number, YYYYMMDD. Exiting.${CONORM}"
-	exit 1
-fi
-if [[ $3 =~ ^[0-9]{8}$ ]] ; then # its valid!
-	#DATEARG="$2"   # 8-digit number
-    RADATECODE="$3"
-	#echo "Setting DATEARG=$DATEARG"
-else
-	echoerr "${CORED}Error, 3rd arg '$2' must be an 8-digit number, YYYYMMDD. Exiting.${CONORM}"
-	exit 1
-fi
-if [[ $4 =~ ^[0-9]{8}$ ]] ; then # its valid!
-	#DATEARG="$2"   # 8-digit number
-    EFDATECODE1="$4"
-	#echo "Setting DATEARG=$DATEARG"
-else
-	echoerr "${CORED}Error, 4th arg '$2' must be an 8-digit number, YYYYMMDD. Exiting.${CONORM}"
-	exit 1
-fi
-if [[ $5 =~ ^[0-9]{8}$ ]] ; then # its valid!
-	#DATEARG="$2"   # 8-digit number
-    EFDATECODE2="$5"
-	#echo "Setting DATEARG=$DATEARG"
-else
-	echoerr "${CORED}Error, 5th arg '$2' must be an 8-digit number, YYYYMMDD. Exiting.${CONORM}"
-	exit 1
-fi
-if [[ $6 =~ ^[0-9]{8}$ ]] ; then # its valid!
-	#DATEARG="$2"   # 8-digit number
-    TADATECODE="$6"
-	#echo "Setting DATEARG=$DATEARG"
-else
-	echoerr "${CORED}Error, 6th arg '$2' must be an 8-digit number, YYYYMMDD. Exiting.${CONORM}"
-	exit 1
+if [[ -z "$AUXVER_RADACC" ]] ; then
+	echoerr "Error, Unrecognized option in 'AUXVER_RADACC', exiting..."
+	EXITFLAG=true
 fi
 
-# number of telescopes, 1-digit number
-if [[ $7 =~ ^[0-9]{1}$ ]] ; then
-	if [[ "$7" == "2" || "$7" == "3" ]] ; then
-		NTELARG="$7"   # 1-digit number
-		#echo "Setting NTELARG=$NTELARG"
-	else
-		echoerr "${CORED}Error, 7th arg '$7' must be the number of telescopes to use, either '2' or '3'. Exiting.${CONORM}"
-		exit 1
-	fi
-else
-	echoerr "${CORED}Error, 7th arg '$7' must be a 1 digit number, the number of telescopes to use ('2' or '3'). Exiting.${CONORM}"
-	exit 1
+if [[ -z "$AUXVER_EFFAREA" ]] ; then
+	echoerr "Error, Unrecognized option in 'AUXVER_EFFAREA', exiting..."
+	EXITFLAG=true
 fi
 
-# USEFROGS= yes/no
-if [[ $8 =~ ^(yes|no)$ ]] ; then
-	USEFROGS="$8"	
-else
-	echoerr "${CORED}Error, 8th arg '$8' (usefrogs?) must be either yes or no. Exiting.${CONORM}"
-	exit 1
+if [[ -z "$AUXVER_TABLE" ]] ; then
+	echoerr "Error, Unrecognized option in 'AUXVER_TABLE', exiting..."
+	EXITFLAG=true
 fi
 
-# energy regime
-ENERGYCODE="BADENERGYCODE_PLEASECHECK"
-if   [[ "$ENERGYARG" == "soft"     ]] ; then ENERGYCODE="Soft"
-elif [[ "$ENERGYARG" == "moderate" ]] ; then ENERGYCODE="Moderate"
-elif [[ "$ENERGYARG" == "hard"     ]] ; then ENERGYCODE="Hard"     ; fi
+if [[ -z "$AUXFILE_EVNVER" ]] ; then
+	echoerr "Error, Unrecognized option in 'AUXFILE_EVNVER', exiting..."
+	EXITFLAG=true
+fi
 
-# can only use 2 telescopes on soft cuts
-if [ "$NTELARG" -eq "2" ] && [[ ! "$ENERGYARG" == "soft" ]] ; then
-	echoerr "${CORED}Error, can only use 2 telescopes with soft cuts.  Exiting.${CONORM}"
+if [[ -z "$AUXFILE_SIMDATE" ]] ; then
+	echoerr "Error, Unrecognized option in 'AUXFILE_SIMDATE', exiting..."
+	EXITFLAG=true
+fi
+
+if [[ -z "$AUXFILE_MINTEL" ]] ; then
+	echoerr "Error, Unrecognized option in 'AUXFILE_MINTEL', exiting..."
+	EXITFLAG=true
+fi
+
+if [[ -z "$AUXFILE_SRCEXT" ]] ; then
+	echoerr "Error, Unrecognized option in 'AUXFILE_SRCEXT', exiting..."
+	EXITFLAG=true
+fi
+
+if [[ -z "$AUXFILE_DISP" ]] ; then
+	echoerr "Error, Unrecognized option in 'AUXFILE_DISP', exiting..."
+	EXITFLAG=true
+fi
+
+if [[ -z "$USEFROGS" ]] ; then
+	echoerr "Error, Unrecognized option in 'USEFROGS', exiting..."
+	EXITFLAG=true
+fi
+
+if $EXITFLAG ; then
+	echoerr "Error, see above problems, exiting..."
 	exit 1
 fi
 
 # get database url from parameter file
-EVNDISPPARAMFILE="$VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter"
+EVNDISPPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/EVNDISP.global.runparameter"
 MYSQLDB=`grep '^\*[ \t]*DBSERVER[ \t]*mysql://' "$EVNDISPPARAMFILE" | egrep -o '[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}'`  # extract the database url from $EVNDISPPARAMFILE
 if [ ! -n "$MYSQLDB" ] ; then
-    echoerr "* DBSERVER param not found in \$VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter!"
+    echoerr "* DBSERVER param not found in \$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/EVNDISP.global.runparameter!"
 	exit 1
 fi
 
@@ -421,13 +424,20 @@ MAXEPOCH=$( echo "$EPOCHTHRESH" | awk '{ print $3 }' | grep -oP "\d" | awk '{ if
 #echo "$EPOCHTHRESH"
 #echo "MINEPOCH:$MINEPOCH"
 #echo "MAXEPOCH:$MAXEPOCH"
+DISPCODE="DISPCODE_ERROR"
+if [[ "$AUXFILE_DISP" == "yes" ]] ; then
+	DISPCODE="ID11"
+else
+	DISPCODE="ID0"
+fi
 
 # Loop over all runs in runlist
 #ALLFILESGOOD=true
 for i in ${RUNLIST[@]} ; do
 	echo "$i"
 	# figure out codes
-	NTELCODE="N$NTELARG"   # N2, N3, N4
+	#NTELCODE="N$NTELARG"   # N2, N3, N4
+	NTELCODE="NTel${AUXFILE_MINTEL}"   # N2, N3, N4
 	
 	#echo "   RACLINES:$RACLINES"
 	TELCUTMASK=$( echo "$RACLINES" | grep -i "$i" | awk '{ print $2 }' )
@@ -498,21 +508,26 @@ for i in ${RUNLIST[@]} ; do
 	
 	#echo "r${i}"
 	
+	
 	# Example: GammaHadronCutFiles/ANASUM.GammaHadron.d20120322-cut-N2-Point-005CU-Soft.dat
-	GHCUTFILE="ANASUM.GammaHadron.d${GHCUTDATECODE}-cut-${NTELCODE}-Point-005CU-${ENERGYCODE}${FROGSCODE}.dat"
+	#GHCUTFILE="ANASUM.GammaHadron.d${GHCUTDATECODE}-cut-${NTELCODE}-Point-005CU-${ENERGYCODE}${FROGSCODE}.dat"
+	GHCUTFILE="ANASUM.GammaHadron-Cut-${NTELCODE}-${AUXFILE_SRCEXT}-${ENERGYCODE}.dat"
 	huntForParameterFileName "GammaHadronCutFiles" "$GHCUTFILE" "$i"
 
 	# Example: RadialAcceptances/radialAcceptance-d20130411-cut-N3-Point-005CU-Soft-V5-T234.root
-	ACCEPFILE="radialAcceptance-d${RADATECODE}-cut-${NTELCODE}-Point-005CU-${ENERGYCODE}-${VERSIONCODE}-${TELCOMBOCODE}.root"
+	#ACCEPFILE="radialAcceptance-d${RADATECODE}-cut-${NTELCODE}-Point-005CU-${ENERGYCODE}-${VERSIONCODE}-${TELCOMBOCODE}.root"
+	ACCEPFILE="radialAcceptance-${AUXFILE_EVNVER}-${AUXVER_RADACC}-Cut-${NTELCODE}-${AUXFILE_SRCEXT}-${ENERGYCODE}-${DISPCODE}-${VERSIONCODE}-${TELCOMBOCODE}.root"
 	huntForParameterFileName "RadialAcceptances" "$ACCEPFILE" "$i"
 
 	# Example: EffectiveAreas/effArea-d20130411-cut-N3-Point-005CU-Soft-ATM22-V5-T1234-d20130521.root
-	echo -e "${COTYELLOW}Warning, Effective area probably depends on if we're using frogs or not.  Fix!!!!$CONORM" >&2
-	AREAFILE="effArea-d${EFDATECODE1}-cut-${NTELCODE}-Point-005CU-${ENERGYCODE}-${ATMOCODE}-${VERSIONCODE}-${TELCOMBOCODE}-d${EFDATECODE2}.root"
+	#echo -e "${COTYELLOW}Warning, Effective area probably depends on if we're using frogs or not.  Fix!!!!$CONORM" >&2
+	#AREAFILE="effArea-d${EFDATECODE1}-cut-${NTELCODE}-Point-005CU-${ENERGYCODE}-${ATMOCODE}-${VERSIONCODE}-${TELCOMBOCODE}-d${EFDATECODE2}.root"
+	AREAFILE="effArea-${AUXFILE_EVNVER}-${AUXVER_EFFAREA}-${AUXFILE_SIMDATE}-Cut-${NTELCODE}-${AUXFILE_SRCEXT}-${ENERGYCODE}-${DISPCODE}-${VERSIONCODE}-${ATMOCODE}-${TELCOMBOCODE}.root"
 	huntForParameterFileName "EffectiveAreas" "$AREAFILE" "$i"
 
 	# Example: Tables/table_d20130521_GrIsuDec12_ATM22_V5_ID0
-	TABLEFILE="table_d${TADATECODE}_GrIsuDec12_${ATMOCODE}_${VERSIONCODE}_ID0"
+	#TABLEFILE="table_d${TADATECODE}_GrIsuDec12_${ATMOCODE}_${VERSIONCODE}_ID0"
+	TABLEFILE="table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-${ATMOCODE}-${VERSIONCODE}-${DISPCODE}"
 	huntForParameterFileName "Tables" "${TABLEFILE}.root" "$i"
 
 	# output format, print to screen, for each run:
@@ -523,7 +538,7 @@ done
 
 if ! $ALLFILESGOOD ; then
 	echoerr ""
-	echoerr "${CORED}Warning! Some needed files do not exist anywhere in \$VERITAS_EVNDISP_ANA_DIR or in the global dir `readlink -m $VERITAS_EVNDISP_ANA_DIR/GlobalDir`." >&2
+	echoerr "${CORED}Warning! Some needed files do not exist anywhere in \$VERITAS_EVNDISP_AUX_DIR or in the global dir `readlink -m $VERITAS_EVNDISP_AUX_DIR/GlobalDir`." >&2
 	echoerr "${CORED}List of missing files:"
 	for i in "${MISSINGFILELIST[@]}" ; do
 		echoerr "${COTRED}$i${CONORM}"

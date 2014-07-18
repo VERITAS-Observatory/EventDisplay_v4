@@ -33,48 +33,50 @@ CWD=$PWD
 # It should be a simple list of veritas runnumbers,
 # one per line.  Used in all stages.
 # (full path please)
-RUNLIST="$CWD/runlist.crab.dat"
+export RUNLIST="$CWD/runlist.crab.dat"
 
 ## use Model3D (yes/no)##
 # Takes effect in the evndisp stage.
-USEMODEL3D="no"
+export USEMODEL3D="no"
 
 # What kind of cuts do you want to use?
-# Currently supports 'soft', 'moderate', or 'hard'
+# Currently supports:
+# 'Soft', 'Moderate', 'Hard', 
+# 'SoftOpen', 'ModerateOpen', 'SuperHard'
 # Takes effect in the anpar stage.
-CUTS="moderate"
+export CUTS="Moderate"
 
 # What kind of background do you want to use?
 # 'ring' or 'refl' (for reflected)
 # Takes effect in the anpar stage.
-BACKGROUND="refl" # ring or [refl, reflect, reflected]
+export BACKGROUND="refl" # ring or [refl, reflect, reflected]
 
 # IF USING 'ring' BACKGROUND:
 # how how big should the radius of the the 'on' region be, in degrees?
-RINGCENT="0.5"
+export RINGCENT="0.5"
 # and how big should the 'off' ring be, in units of 'on'-region areas?
-RINGAREA="10"
+export RINGAREA="10"
 
 # IF USING 'refl' BACKGROUND:
 # what should be the minimum distance between off region edges, in degrees?
-REFLWOBOFF="0.5"
+export REFLWOBOFF="0.5"
 # whats the minimum number of off regions we should use?
-REFLMINREG="1"
+export REFLMINREG="1"
 # and the maximum number of off regions to use?
-REFLMAXREG="10"
+export REFLMAXREG="10"
 
 # Should we produce the tzero and pedestal files first?
 # These are required to do an analysis.
 # Takes effect in the evndisp stage.
 # yes/no
-DOCALIB=yes
+export DOCALIB=yes
 
 # Where should we store the evndisp and mscw output files?
 # Takes effect in the evndisp stage.
 # (full path please)
 # evndisp files will be: $EVNDISPOUTPUTDIR/#####.root, #####.tzero.root, etc
 # mscw files will be put in RecIDX within this directory (see next option)
-EVNDISPOUTPUTDIR="$VERITAS_USER_DATA_DIR/analysis/Results/EVD-v423/"
+export EVNDISPOUTPUTDIR="$VERITAS_USER_DATA_DIR/analysis/Results/EVD-v423/"
 
 # Which Reconstruction ID (RecID) should we use?
 # 0, 1, 2, 3, or 4
@@ -85,7 +87,7 @@ EVNDISPOUTPUTDIR="$VERITAS_USER_DATA_DIR/analysis/Results/EVD-v423/"
 # 4 = do mscw stage without using T4 images
 # Takes effect in the mscw stage.
 # For regular data analysis, this should be 0
-RECID=0
+export RECID=0
 
 # In the anasum stage, should we use frogs datafiles as the input?
 # If no, we will use the mscw datafiles instead.
@@ -93,26 +95,84 @@ RECID=0
 # ATTENTION: AFTER THE 'mscw' STAGE, YOU MUST RUN 
 # THE 'frogs' STAGE FOR THIS OPTION TO FULLY TAKE EFFECT
 # yes/no
-USEFROGS="no"
+export USEFROGS="no"
 
 # Where should the frogs's output files be stored?
 # Takes effect in the frogs stage.
-FROGSOUTPUTDIR="$EVNDISPOUTPUTDIR/frogs"
+# (full path please)
+export FROGSOUTPUTDIR="$EVNDISPOUTPUTDIR/frogs"
 
 # Where should we put the anasum output files (parallel and merged)?
 # Takes effect in the anpar stage.
 # (full path please)
-ANASUMOUTPUTDIR="$CWD/arf"
+export ANASUMOUTPUTDIR="$CWD/arf"
 
 # What should we name the final merged anasum
 # output root file? It will be put in $ANASUMOUTPUTDIR
 # Takes effect in the anmer stage.
-FINALOUTPUT="anmer.output.root"
+# Filename only, not full path.
+export FINALOUTPUT="anmer.output.root"
 
 # Which anasum runparameter file should we use?
 # Takes effect in the anpar stage.
 # (full path please)
-RUNPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.Crab.ctools"
+export RUNPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.Crab"
+
+# For the Effective Area and Radial Acceptance Files, whats the minimum
+# number of telescopes we require?
+# Should be 2, 3, or 4.
+export AUXFILE_MINTEL="2"
+
+# Are we analysing a point source, or an extended source?
+# The Effective Area and Radial Acceptance files depend on this setting.
+# Either 'PointSource' or 'ExtendedSource'
+export AUXFILE_SRCEXT="PointSource"
+
+# Do you want to use the DISP feature?
+# This will change how image axes and their intersection
+# are handled.
+# (yes/no)
+export SCIPIPE_USEDISP="yes"
+
+# For your Effective Area files, your Radial Acceptance Files, and your
+# Table files, which event display version should they have been made with?
+# e.g. effArea-v447-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
+#              ^^^^
+# radialAcceptance-v447-auxv01-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root
+#                  ^^^^
+# table-v447-auxv01-CARE_June1425-ATM21-V6-ID0.root
+#       ^^^^
+# Should have the format 'v###', like 'v447' or 'v525', etc.
+export AUXFILE_EVNVER="v447"
+
+# For your Effective Area files, your Radial Acceptance Files, and your
+# Table files, which simulation type should they have been made with?
+# e.g. effArea-v447-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
+#                          ^^^^^^^^^^^^^
+# Should have the format '<simtype>_<month><year><day>', like 'CARE_June1425' or 'GRISU_March1327'
+export AUXFILE_SIMDATE="CARE_June1425"
+
+# For the radial acceptance file, what aux-file-version should we use
+# in the radial acceptance filename?
+# e.g. radialAcceptance-v447-auxv01-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root
+#                            ^^^^^^
+# Should have the format 'auxv##', e.g. 'auxv01' or 'auxv31'
+export AUXVER_RADEC="auxv01"
+
+# For the table file, what aux-file-version shoudl we use in the
+# table filename?
+# e.g. table-v447-auxv01-CARE_June1425-ATM21-V6-ID0.root
+#                 ^^^^^^
+# Should have the format 'auxv##', e.g. 'auxv01' or 'auxv31'
+export AUXVER_TABLE="auxv01"
+
+# For the effective area file, what aux-file-version should we use in
+# the effective area filename?
+# e.g. effArea-v447-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
+#                   ^^^^^^
+# Should have the format 'auxv##', e.g. 'auxv01' or 'auxv31'
+export AUXVER_EFFAREA="auxv01"
+
 
 # For the radial acceptance file, what date should be used
 # in the radial acceptance filename?
@@ -121,7 +181,7 @@ RUNPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.Crab.c
 # (all other parts of filename will be figured out automatically)
 # format: YYYYMMDD
 # Takes effect in the anpar stage.
-RADECDATE="20131115"
+#RADECDATE="20131115"
 
 # For the mscw lookup tables, what date should be used in the filename?
 # e.g. table_d20131115_GrIsuDec12_ATM22_V5_ID0
@@ -129,7 +189,16 @@ RADECDATE="20131115"
 # (all other parts of filename will be figured out automatically)
 # format: YYYYMMDD
 # Takes effect in the mscw stage.
-TABLEDATE="20131115"
+#TABLEDATE="20131115"
+
+# For the effective area file, what two dates should be used in the filename? 
+# effArea-d20131031-cut-N3-Point-005CU-Soft-ATM22-V5-T1234-d20131115.root
+#          ^EFDATE1                                         ^EFDATE2
+# (all other parts of filename will be figured out automatically)
+# format: YYYYMMDD
+# Takes effect in the anpar stage.
+#EFDATE1="20131031"
+#EFDATE2="20131115"
 
 # For the gamma-hadron cut file, what date should be used in the filename?
 # ANASUM.GammaHadron.d20130411-cut-N2-Point-005CU-Soft.dat
@@ -138,20 +207,12 @@ TABLEDATE="20131115"
 # format: YYYYMMDD
 # Takes effect in the anpar stage.
 #GAMHADCUTDATE="20130411"
-GAMHADCUTDATE="20131031"
+#GAMHADCUTDATE="20131031"
 
-# For the effective area file, what two dates should be used in the filename? 
-# effArea-d20131031-cut-N3-Point-005CU-Soft-ATM22-V5-T1234-d20131115.root
-#          ^EFDATE1                                         ^EFDATE2
-# (all other parts of filename will be figured out automatically)
-# format: YYYYMMDD
-# Takes effect in the anpar stage.
-EFDATE1="20131031"
-EFDATE2="20131115"
 
 # Which directory should we keep the morphed ctools datafiles?
 # Takes effect in the mutate stage.
-CTOOLSDIR="$CWD/ctoolsdata"
+export CTOOLSDIR="$CWD/ctoolsdata"
 
 # Should we use manually-defined laser runs for some runs?
 # Takes effect in the evndisp stage.
@@ -180,12 +241,23 @@ export SCIPIPE_MANUALLASERFILE="calibrationlist.dat"
 
 
 BINNAME="$0"
-if [[ $# < 1 || ! $1 =~ (evndisp|mscw|frogs|anpar|anmer|mutate|jobs|kill) ]] ; then 
+if [[ $# < 1 || ! $1 =~ (evndisp|mscw|frogs|anpar|anmer|mutate|jobs|kill|xxf) ]] ; then 
     echo "
 HOW DO I USE THIS ?                             
-   1. Copy this script into a new directory,                    
+
+   1. Make a new directory, and make a soft link to ANALYIS.pipeline, via
+       $ ln -s \$EVNDISPSYS/scripts/VTS/ANALYSIS.pipeline
+
    2. Add your runlist file to that directory,        
-   3. Edit the ANALYSIS SETTINGS within your copied ANALYSIS.pipeline file,
+
+   3. Read the 'ANALYSIS SETTINGS' section within ANALYSIS.pipeline,
+      and add any settings you want to a new file 'analysis.config', in the
+      same directory as your runlist.  You will probably need to at least
+      tell 'analysis.config' the name of your runlist file, and the cuts
+      you want, via the lines:
+	  export RUNLIST=$PWD/crab.runlist
+      export CUTS="Moderate"
+
    4. Run a stage of the analysis:
 		
         i) Submit stage jobs to the cluster:
@@ -197,6 +269,7 @@ HOW DO I USE THIS ?
         iii) Check the results of the stage for errors
         $ $BINNAME [evndisp|mscw|frogs|anpar|anmer|mutate] check
 		
+
 Stages of Event Display: (evndisp, mscw, frogs, anpar, anmer) please,
   (optional 'check' afterwards)
   $ $BINNAME evndisp         # run the 'event display' stage
@@ -312,12 +385,25 @@ fi
 
 
 function setupFilteredRunlists {
-	TABLEFILEWINTV4="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM21_V4_ID0"
-	TABLEFILESUMMV4="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM22_V4_ID0"
-	TABLEFILEWINTV5="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM21_V5_ID0"
-	TABLEFILESUMMV5="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM22_V5_ID0"
-	TABLEFILEWINTV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM21_V6_ID0"
-	TABLEFILESUMMV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM22_V6_ID0"
+	if [[ "$SCIPIPE_USEDISP" == "yes" ]] ; then
+		TABLEDISPCODE="ID11"
+	else
+		TABLEDISPCODE="ID0"
+	fi
+	TABLEFILEWINTV4="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-ATM21-V4-${TABLEDISPCODE}"
+	TABLEFILESUMMV4="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-ATM22-V4-${TABLEDISPCODE}"
+	TABLEFILEWINTV5="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-ATM21-V5-${TABLEDISPCODE}"
+	TABLEFILESUMMV5="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-ATM22-V5-${TABLEDISPCODE}"
+	TABLEFILEWINTV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-ATM21-V6-${TABLEDISPCODE}"
+	TABLEFILESUMMV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-ATM22-V6-${TABLEDISPCODE}"
+
+	#TABLEFILEWINTV4="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM21_V4_ID0"
+	#TABLEFILESUMMV4="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM22_V4_ID0"
+	#TABLEFILEWINTV5="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM21_V5_ID0"
+	#TABLEFILESUMMV5="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM22_V5_ID0"
+	#TABLEFILEWINTV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM21_V6_ID0"
+	#TABLEFILESUMMV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM22_V6_ID0"
+
 	RUNLISTSUMMV4="$SCIDIR/runlist.summer.V4"
 	RUNLISTWINTV4="$SCIDIR/runlist.winter.V4"
 	RUNLISTSUMMV5="$SCIDIR/runlist.summer.V5"
@@ -342,7 +428,14 @@ function makeParamFile {
     rm -rf $PARAMFILELIST
     rm -rf $ANASUMRUNLIST
     # generate basic param files
-	$EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_generateParamFiles.sh "$CUTS" "$GAMHADCUTDATE" "$RADECDATE" "$EFDATE1" "$EFDATE2" "$TABLEDATE" 3 "$USEFROGS" "$RUNLIST" > "$PARAMFILELIST"
+	#$EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_generateParamFiles.sh "$CUTS" "$GAMHADCUTDATE" "$RADECDATE" "$EFDATE1" "$EFDATE2" "$TABLEDATE" 3 "$USEFROGS" "$RUNLIST" > "$PARAMFILELIST"
+	
+	# Pack all the settings into a one-line argument.
+	# Characters that will break this: if any options have '~' or ':' or ' ' in them, 
+	# as these are used as delimiters in this packing technique.
+	SETTINGLINE="~CUTS:$CUTS~AUXFILEEVNVER:$AUXFILE_EVNVER~AUXFILESIMDATE:$AUXFILE_SIMDATE~AUXVERRADEC:$AUXVER_RADEC~AUXVEREFFAREA:$AUXVER_EFFAREA~AUXVERTABLE:$AUXVER_TABLE~AUXFILEMINTEL:$AUXFILE_MINTEL~USEFROGS:$USEFROGS~AUXFILESRCEXT:$AUXFILE_SRCEXT~AUXFILEDISP:$SCIPIPE_USEDISP~"
+	#echo "SETTINGLINE:'$SETTINGLINE'"
+	$EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_generateParamFiles.sh "$SETTINGLINE" "$RUNLIST" > "$PARAMFILELIST"
 	PARAMEXIT="$?"
 	#echo "PARAMEXIT:$PARAMEXIT" # =0 if ok, !=0 if bad things happened
 	if [[ "$PARAMEXIT" != "0" ]] ; then # had a problem generating param files
@@ -406,6 +499,13 @@ function stageBanner {
 	echo -e "${COTBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~$CONORM"
 }
 
+if [[ "$STAGE" == "xxf" ]] ; then
+	stageBanner
+	echo "\$VERITAS_EVNDISP_AUX_DIR:$VERITAS_EVNDISP_AUX_DIR"
+	echo "\$EVNDISPSYS:$EVNDISPSYS"
+	makeParamFile
+	exit 0
+fi
 
 # s1 event display
 if [[ "$STAGE" == "evndisp" ]] ; then

@@ -25,14 +25,19 @@ mkdir -p $TEMPDIR
 
 #################################
 # eventdisplay reconstruction parameter
-# no disp, long integration window
-ACUT="EVNDISP.reconstruction.runparameter"
-# disp, long integration window
-#ACUT="EVNDISP.reconstruction.runparameter.DISP"
+if [[ "$SCIPIPE_USEDISP" == "yes" ]] ; then
+	# disp, long integration window
+	echo "Using Disp Method"
+	ACUTS="EVNDISP.reconstruction.runparameter.DISP"
+else
+	# no disp, long integration window
+	echo "Not using Disp Method"
+	ACUTS="EVNDISP.reconstruction.runparameter"
+fi
 # no disp, short integration window
-#ACUT="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
+#ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
 # disp, short integration window
-#ACUT="EVNDISP.reconstruction.runparameter.SumWindow6-DISP"
+#ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-DISP"
 
 # DST ACUTS="EVNDISP.reconstruction.SW18_noDoublePass.runparameter"
 
@@ -40,7 +45,7 @@ ACUT="EVNDISP.reconstruction.runparameter"
 # pedestal calculation
 if [[ $CALIB == "1" || ( $CALIB == "2" || $CALIB == "4" ) ]]; then
     rm -f $LOGDIR/$RUN.ped.log
-    $EVNDISPSYS/bin/evndisp -runmode=1 -runnumber=$RUN -reconstructionparameter $ACUT &> $LOGDIR/$RUN.ped.log
+    $EVNDISPSYS/bin/evndisp -runmode=1 -runnumber=$RUN -reconstructionparameter $ACUTS &> $LOGDIR/$RUN.ped.log
     echo "RUN$RUN PEDLOG $LOGDIR/$RUN.ped.log"
 fi
 
@@ -107,7 +112,7 @@ if [[ $MODEL3D == "1" ]]; then
 fi
 
 if [[ "$SCIPIPE_FASTDEVMODE" == "yes" ]] ; then
-	OPT+=( -nevents=2000 ) 
+	OPT+=( -nevents=10000 ) 
 fi
 
 
