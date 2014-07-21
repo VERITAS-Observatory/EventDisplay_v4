@@ -241,6 +241,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 		~VSensitivityCalculator() {}
 		
 		unsigned int  addDataSet( double iGammaRayRate, double iBackGroundRate, double iAlpha, string iName = "" );
+		unsigned int  addDataSetOnOff( double iOnRate, double iOffRate, double iAlpha, string iName = "" );
 		double   calculateObservationTimevsFlux( unsigned int iD );
 		bool     calculateParticleNumberGraphs_MC( double dE_Log10 );
 		bool     fillSensitivityHistograms( TH1F* iSensitivity = 0, TH1F* iBGRate = 0, TH1F* iBGRateSqDeg = 0,
