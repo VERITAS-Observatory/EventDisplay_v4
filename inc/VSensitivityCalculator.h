@@ -358,6 +358,6 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 			fDebugParticleNumberFile = iFile;
 		}
 		
-		ClassDef( VSensitivityCalculator, 24 );
+		ClassDef( VSensitivityCalculator, 25 );
 };
 #endif
