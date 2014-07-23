@@ -1,5 +1,0 @@
-# submission commands (example for batch farm at DESY)
-EVNDISP QSUB -V -l h_cpu=41:29:00 -l os=sl6 -l h_vmem=2000M -l tmpdir_size=10G
-
-# submission commands (direct execution in the shell)
-# EVNDISP SHELLSUB
