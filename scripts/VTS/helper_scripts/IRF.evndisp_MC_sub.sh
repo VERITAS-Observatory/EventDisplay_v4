@@ -38,9 +38,9 @@ fi
 #################################
 # detector configuration and cuts
 # no disp, long integration window
-ACUT="EVNDISP.reconstruction.runparameter"
+#ACUT="EVNDISP.reconstruction.runparameter"
 # disp, long integration window
-#ACUT="EVNDISP.reconstruction.runparameter.DISP"
+ACUT="EVNDISP.reconstruction.runparameter.DISP"
 # no disp, short integration window
 #ACUT="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
 # disp, short integration window

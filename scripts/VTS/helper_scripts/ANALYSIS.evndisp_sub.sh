@@ -34,6 +34,7 @@ else
 	echo "Not using Disp Method"
 	ACUTS="EVNDISP.reconstruction.runparameter"
 fi
+ACUTS="EVNDISP.reconstruction.runparameter.DISP"
 # no disp, short integration window
 #ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
 # disp, short integration window

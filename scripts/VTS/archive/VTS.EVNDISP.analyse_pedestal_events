@@ -1,0 +1,75 @@
+#!/bin/bash
+#####################################
+# calculate pedestals
+#
+#  Revision $Id: evndisp.calculate_pedestals,v 1.14.20.1.2.1.4.1.6.1.6.2.2.3.2.3 2010/11/11 10:11:42 gmaier Exp $
+#
+# Author: Gernot Maier
+#
+#####################################
+
+if [ ! -n "$1" ] || [ "$1" = "-h" ]
+then
+   echo
+   echo "VTS.EVNDISP.analyse_pedestal_events <runnumber> [telescope number] [lowgain]"
+   echo
+   echo "calculate pedestals from a data file (for high and low gain)"
+   echo
+   echo "required parameters:"
+   echo 
+   echo "    <runnumber>             runnumber"
+   echo 
+   echo "optional parameters: "
+   echo 
+   echo "    [telescope number]      use 1 for telescope 1, 13 for telescope 1 and 3 only, etc."
+   echo "                            (default telescope combination is 1234)"
+   echo
+   echo "    [lowgain=1]             low gain pedestal calculation (expert user only!)"
+   echo
+   echo "example:"
+   echo
+   echo "    VTS.EVNDISP.analyse_pedestal_events 1234 33709"
+   echo
+   echo "----------------------------------------------------------------------------------------"
+   exit
+fi
+
+# run options
+
+# number of telescopes to analyse
+TELTOANA="1234"
+if [ -n "$2" ]
+then
+  TELTOANA=$2
+fi
+
+OPT="-runmode=1 -calibrationsumwindow=20 -calibrationsumfirst=0"
+if [ -n "$3" ] && [ $3 -eq "1" ]
+then
+# low gain run with 64 samples
+   OPT="-calibrationsumwindow=20 -calibrationsumfirst=40 -runmode=6 -nevents=5000 -reconstructionparameter EVNDISP.reconstruction.LGCalibration.runparameter"
+# low gain run with 128 samples
+   OPT="-calibrationsumwindow=20 -calibrationsumfirst=80 -runmode=6 -nevents=5000 -reconstructionparameter EVNDISP.reconstruction.LGCalibration.runparameter"
+fi
+
+# source file
+
+# first check if source file exists
+SF=`find -L $VERITAS_DATA_DIR/data -name "$1.cvbf"`
+if [ ${#SF} = 0 ]
+then
+   echo
+   echo "ERROR: VERITAS source (VBF) file $1.cvbf not found in $VERITAS_DATA_DIR/data/"
+   echo
+   exit
+fi
+
+OPT="-runnumber=$1 $OPT"
+
+#########################
+# NOW START EVENTDISPLAY
+#########################
+echo "$EVNDISPSYS/bin/evndisp $OPT"
+$EVNDISPSYS/bin/evndisp $OPT
+
+exit

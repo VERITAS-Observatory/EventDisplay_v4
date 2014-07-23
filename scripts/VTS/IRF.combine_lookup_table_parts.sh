@@ -61,7 +61,7 @@ if [[ -n $VERITAS_IRFPRODUCTION_DIR ]]; then
 fi
 echo -e "Output files will be written to:\n$ODIR"
 mkdir -p $ODIR
-
+chmod -R g+w $ODIR
 
 if [[ -f $OFILE ]]; then
     echo "ERROR: table file $ODIR/$OFILE exists; move it or delete it"

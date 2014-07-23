@@ -83,6 +83,7 @@ if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
 fi
 echo -e "Output files will be written to:\n $ODIR"
 mkdir -p $ODIR
+chmod -R g+w $ODIR
 
 # Run scripts and log files are written into this directory
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/EFFAREA"

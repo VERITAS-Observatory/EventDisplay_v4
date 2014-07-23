@@ -57,6 +57,7 @@ OPT="-runnumber=$RUNNUM -teltoana=$TELTOANA"
 if [[ $CALDB -eq 1 ]]; then
     OPT="$OPT -readCalibDB"
 else
+    OPT="$OPT -calibrationfile calibrationlist.Cygnusregion.dat"
     OPT="$OPT -nocalibnoproblem"
 fi
 

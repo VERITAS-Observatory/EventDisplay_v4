@@ -1,0 +1,111 @@
+#!/bin/bash
+#####################################
+# analyze data files with eventdisplay
+#
+#
+# Author: Gernot Maier
+#
+#####################################
+
+#####################################
+## HARDCODED VAVLUES
+#####################################
+# run options (will be overwritten in DST mode)
+# OPT="-nevents=2000"
+#####################################
+## END OF HARDCODED VAVLUES
+#####################################
+
+# print help
+if [ ! -n "$1" ] || [ "$1" = "-h" ]
+then
+   echo
+   echo "VTS.EVNDISP.analyse <runnumber> [telescope number] [laser calib from DB] [DST=0/1]"
+   echo
+   echo "analyse a data file and write results to file runnumber.root"
+   echo
+   echo "required parameters:"
+   echo 
+   echo "    <runnumber>             runnumber "
+   echo 
+   echo "optional parameters (not needed for default analysis)"
+   echo
+   echo "    [telescope number]      use 1 for telescope 1, 13 for telescope 1 and 3 only, etc."
+   echo "                            (default telescope combination is 1234 (euqivalent to -1))"
+   echo    
+   echo "    [read laser calibration from DB]  use 0 to switch of (default is on)" 
+   echo
+   echo "    [DST]                   output format is DST (default OFF=0)"
+   echo
+   echo "examples:"
+   echo 
+   echo "    VTS.EVNDISP.analyse 33709"
+   echo
+   echo "    VTS.EVNDISP.analyse 33709 124"
+   echo "             (for a 3-telescope run with T1, T2 and T4)"
+   echo
+   echo "----------------------------------------------------------------------------------------"
+   exit
+fi
+
+########################################################################################################
+# overwrite option in DST mode
+# dst production
+if [ -n "$4" ] 
+then
+   OPT="-imagethresh=0 -borderthresh=0 -runmode=4"
+# output file
+   OPT="$OPT -dstfile $EVNDISPDATA/eventdisplay_output/$1.dst.root"
+fi
+########################################################################################################
+
+# telescope combination
+TELTOANA="1234"
+if [ -n "$2" ]
+then
+  OPT="$OPT -teltoana=$2"
+fi
+
+# laser calibration from DB
+LASERCALIB="-readCalibDB"
+if [ -n "$3" ]
+then
+   if [ $3 = "0" ]
+   then
+      LASERCALIB=""
+   fi
+fi
+
+# source (VBF) file
+
+# check first if source file exists
+SF=`find -L $VERITAS_DATA_DIR/data -name "$1.cvbf"`
+if [ ${#SF} = 0 ]
+then
+   echo
+   echo "ERROR: VERITAS source (VBF) file $1.cvbf not found in $VERITAS_DATA_DIR/data/"
+   echo
+   exit
+fi
+
+OPT="$OPT -runnumber=$1"
+
+# use by default relative gains and toffsets from database
+OPT="$LASERCALIB $OPT"
+
+#########################
+# NOW START EVENTDISPLAY
+#########################
+# checking the path for binary
+if [ -z $EVNDISPSYS ]
+then
+    echo "no EVNDISPSYS env variable defined"
+    exit
+fi
+# set correct environmental variables
+source $EVNDISPSYS/setObservatory.sh VTS
+
+echo "$EVNDISPSYS/bin/evndisp $OPT"
+$EVNDISPSYS/bin/evndisp $OPT
+
+exit

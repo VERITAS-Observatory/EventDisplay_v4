@@ -72,6 +72,7 @@ if [[ ! -z $VERITAS_IRFPRODUCTION_DIR ]]; then
 fi
 echo "Output file directory: $ODIR"
 mkdir -p $ODIR
+chmod -R g+w $ODIR
 
 # run scripts and output are written into this directory
 DATE=`date +"%y%m%d"`

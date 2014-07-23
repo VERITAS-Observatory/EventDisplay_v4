@@ -100,6 +100,7 @@ if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
 fi
 echo -e "Output files will be written to:\n $ODIR"
 mkdir -p $ODIR
+chmod -R g+w $ODIR
 
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.mscw_energy_MC_sub"

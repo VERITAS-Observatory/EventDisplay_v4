@@ -89,6 +89,7 @@ fi
 # output dir
 OPDIR=$ODIR"/ze"$ZA"deg_offset"$WOBBLE"deg_NSB"$NOISE"MHz"
 mkdir -p $OPDIR
+chmod -R g+w $OPDIR
 echo -e "Output files will be written to:\n $OPDIR"
 
 [[ $USEFROGS != 0 ]] && ODIR="${ODIR}_FROGS"
