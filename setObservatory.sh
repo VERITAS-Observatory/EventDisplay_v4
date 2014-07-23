@@ -10,7 +10,7 @@ then
    echo 
    echo "set the environmental variables for EVNDISP"
    echo 
-   echo "   source ./setObservatory.sh <observatory = CTA or VERITAS/VTS>"
+   echo "   source ./setObservatory.sh <observatory = CTA or VERITAS/VTS> [-q for no output if successful]"
    echo 
    echo "    (this is needed to find e.g. the parameter or lookup table files)"
    echo 
@@ -58,8 +58,9 @@ LD_LIBRARY_PATH=$EVNDISPSYS/lib/:$LD_LIBRARY_PATH; export LD_LIBRARY_PATH
 ######################################################
 if [ $OBSERVATORY = "VERITAS" ] || [ $OBSERVATORY = "VTS" ]
 then
-  echo "setting observatory to VERITAS"
-
+  if [[ $2 != "-q" ]]; then
+	echo "setting observatory to VERITAS"
+  fi
   if [ -z "${VERITAS_EVNDISP_AUX_DIR+xxx}" ]; then 
      export OBS_EVNDISP_ANA_DIR=$VERITAS_EVNDISP_ANA_DIR
   else
@@ -72,7 +73,9 @@ fi
 
 if [ $OBSERVATORY = "CTA" ]
 then
-  echo "setting observatory to CTA"
+  if [[ $2 != "-q" ]]; then
+  	echo "setting observatory to CTA"
+  fi	
   if [ -z "${CTA_EVNDISP_AUX_DIR+xxx}" ]; then 
      export OBS_EVNDISP_ANA_DIR=$CTA_EVNDISP_ANA_DIR
   else

@@ -24,7 +24,7 @@ if [[ -z $VERITAS_USER_LOG_DIR ]]; then
 fi
 
 # set the right observatory (environmental variables)
-source $EVNDISPSYS/setObservatory.sh VTS
+source $EVNDISPSYS/setObservatory.sh VTS -q
 
 # return 0 if successful
 exit 0
