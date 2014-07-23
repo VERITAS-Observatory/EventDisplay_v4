@@ -123,12 +123,14 @@ MYSQL="mysql -u readonly -h $MYSQLDB -A"
 COUNT=0
 SUB=""
 for ARUN in $RUNLIST ; do
-	if [[ "$COUNT" -eq 0 ]] ; then
-		SUB="run_id = $ARUN"
-	else 
-		SUB="$SUB OR run_id = $ARUN"
+	if (( $ARUN > 0 )); then
+		if [[ "$COUNT" -eq 0 ]] ; then
+			SUB="run_id = $ARUN"
+		else 
+			SUB="$SUB OR run_id = $ARUN"
+		fi
+		COUNT=$((COUNT+1))
 	fi
-	COUNT=$((COUNT+1))
 done
 #echo "SUB:"
 #echo "$SUB"
