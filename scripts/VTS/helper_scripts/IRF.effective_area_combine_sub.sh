@@ -9,6 +9,7 @@ EAFILES=INPUTFILES
 OFILE=OUTPUTFILE
 ODIR=OUTPUTDIR
 mkdir -p $ODIR
+chmod -R g+w $ODIR
 
 # Write histograms?
 WRITEHISTOS="false"
