@@ -8,7 +8,7 @@ echo "
 EVNDISP runlist script: generate a simple run list (one run per line)
 with quality cuts for a given VERITAS source name
 
-RUNLIST.generate.sh <search string> [allow 3-tel] [worst weather]
+RUNLIST.generate.sh <source name> [allow 3-tel] [worst weather]
  [min duration] [start date] [end date]
 
 required parameters:

@@ -2,10 +2,6 @@
 # from a run list, prints the list of runs that were taken in a specific atmosphere, summer(22) or winter(21)
 # written by Nathan Kelley-Hoskins Sept 2013
 
-# variables for coloring terminal output
-CONORM="\e[0m"
-CORED='\e[1;31m'
-
 # check to see if input is from terminal, or from a pipe
 ISPIPEFILE=`readlink /dev/fd/0`
 if [[ "$ISPIPEFILE" =~ ^/dev/pts/[0-9]{1,2} && $# < 2 ]]; then # its a terminal (not a pipe)
@@ -19,11 +15,7 @@ if [[ "$ISPIPEFILE" =~ ^/dev/pts/[0-9]{1,2} && $# < 2 ]]; then # its a terminal 
     echo " $ `basename $0` 21 myrunlist.dat" ; echo
     echo "Works with pipes : " 
     echo " $ cat myrunlist.dat | `basename $0` w" ; echo
-    echo -e "${CORED}WARNING!${CONORM}"
-    echo "   The summer/winter status is crudely calculated as "
-    echo "      'summer is any run in the months of May through October, inclusive (months 5,6,7,8,9,10)'."
-    echo "      'winter is any run in the months of November through April, inclusive (months 11,12,1,2,3,4)'."
-    echo "   Since that is not the exact way Summer is defined (the boundary between summer/winter moves each year), tread carefully when using this script." ; echo
+    echo "Summer/winter transition dates taken from $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/VERITAS.Epochs.runparameter"
     exit
 fi
 
@@ -166,12 +158,14 @@ MYSQL="mysql -u readonly -h $MYSQLDB -A"
 COUNT=0
 SUB=""
 for ARUN in $RUNLIST ; do
-	if [[ "$COUNT" -eq 0 ]] ; then
-		SUB="run_id = $ARUN"
-	else 
-		SUB="$SUB OR run_id = $ARUN"
+	if (( $ARUN > 0 )); then
+		if [[ "$COUNT" -eq 0 ]] ; then
+			SUB="run_id = $ARUN"
+		else 
+			SUB="$SUB OR run_id = $ARUN"
+		fi
+		COUNT=$((COUNT+1))
 	fi
-	COUNT=$((COUNT+1))
 done
 #echo "SUB:"
 #echo "$SUB"
