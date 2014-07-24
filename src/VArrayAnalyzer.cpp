@@ -1852,7 +1852,7 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp )
 		}
 		else
 		{
-			setTelID( ii );
+			setTelID( telID[ii] );
 			v_weight.push_back( getImageParameters( getRunParameter()->fImageLL )->ntubes * (1. - getImageParameters( getRunParameter()->fImageLL )->width / getImageParameters( getRunParameter()->fImageLL )->length ) );
 		}
 	}
