@@ -37,8 +37,8 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 # Parse command line arguments
 SIMFILE="$1"
 [[ "$2" ]] && RUNNUM=$2    || RUNNUM="65432"    # this number is arbitrary
-[[ "$3" ]] && NOISELEV=$3  || NOISELEV="325"
-[[ "$4" ]] && NOISEFILE=$4 || NOISEFILE="$VERITAS_EVNDISP_AUX_DIR/NOISE/NOISE$NOISELEV.grisu"
+[[ "$3" ]] && NOISELEV=$3  || NOISELEV="425"
+[[ "$4" ]] && NOISEFILE=$4 || NOISEFILE="$VERITAS_EVNDISP_AUX_DIR/NOISE/NOISE${NOISELEV}_20120827_v420.grisu"
 
 # default noise level
 PEDLEV="16."

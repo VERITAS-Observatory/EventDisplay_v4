@@ -16,7 +16,7 @@ required parameters:
     <IRF type>              type of instrument response function to produce
                             (e.g. EVNDISP, MAKETABLES, COMBINETABLES,
                              ANALYSETABLES, EFFECTIVEAREAS, COMBINEEFFECTIVEAREAS,
-                             TRAINMVANGRES )
+                             MVAEVNDISP, TRAINMVANGRES )
     
 optional parameters:
     
@@ -63,14 +63,22 @@ if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
     ZENITH_ANGLES=( 00 20 30 35 40 )
     ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 60 65 )
     NSB_LEVELS=( 075 100 150 200 250 325 425 550 750 1000 )
-#    NSB_LEVELS=( 200 )
+#   Y NSB_LEVELS=( 200 )
     WOBBLE_OFFSETS=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
     WOBBLE_OFFSETS=( 0.5 )
+    if [[ $IRFTYPE == "MVAEVNDISP" ]]; then
+       NSB_LEVELS=( 200 )
+       WOBBLE_OFFSETS=( 0.5 )
+    fi
 elif [ ${SIMTYPE:0:4} = "CARE" ]; then
     # CARE simulation parameters
     ZENITH_ANGLES=( 00 20 30 35 40 )
     NSB_LEVELS=( 50 80 120 170 230 290 370 450 )
     WOBBLE_OFFSETS=( 0.5 )
+    if [[ $IRFTYPE == "MVAEVNDISP" ]]; then
+       NSB_LEVELS=( 170 )
+       WOBBLE_OFFSETS=( 0.5 )
+    fi
 else
     echo "Invalid simulation type. Exiting..."
     exit 1
@@ -146,7 +154,7 @@ for VX in $EPOCH; do
                     echo "Now processing epoch $VX, atmo $ATM, zenith angle $ZA, wobble $WOBBLE, noise level $NOISE"
                     ######################
                     # run simulations through evndisp
-                    if [[ $IRFTYPE == "EVNDISP" ]]; then
+                    if [[ $IRFTYPE == "EVNDISP" ]] || [[ $IRFTYPE == "MVAEVNDISP" ]]; then
                        if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
                           SIMDIR=$VERITAS_DATA_DIR/simulations/"$VX"_FLWO/grisu/ATM"$ATM"
                        elif [[ ${SIMTYPE:0:13} = "CARE_June1425" ]]; then
