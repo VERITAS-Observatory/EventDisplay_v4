@@ -2,6 +2,14 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140728 (GM)
+read hilo ratio from VBF run header file 
+(used currently for grisudet simulations only)
+
+* 20140720 (HF) 
+important bug fix in evndisp, disp angular reconstruction:
+telescope event selection was wrong (severe bug)
+
 *************************************************************
 ******* 20140717 release of v4.50; trunk is now v4.60 *******
 *************************************************************

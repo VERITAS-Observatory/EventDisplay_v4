@@ -44,14 +44,14 @@ SIMFILE="$1"
 PEDLEV="16."
 
 # Run options
-OPT="-display=1 -runnumber=$RUNNUM -plotmethod=0 -sourcetype=2 -pedestalseed=1020 -pedestalnoiselevel=$NOISELEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
-# OPT="-printGrisuHeader=1 -runnumber=$RUNNUM -plotmethod=0 -sourcetype=2 -pedestalseed=1020 -pedestalnoiselevel=$NOISELEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
+OPT="-display=1 -simu_hilo_from_simfile -runnumber=$RUNNUM -plotmethod=0 -sourcetype=2 -pedestalseed=1020 -pedestalnoiselevel=$NOISELEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
+# OPT="-simu_hilo_from_simfile -runnumber=$RUNNUM -plotmethod=0 -sourcetype=2 -pedestalseed=1020 -pedestalnoiselevel=$NOISELEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
 
 # dead channel definition for MC
 # DEAD="deadChannelDefinition_VERITAS_MC_d20101110.dat"
 
 # array analysis cuts
-ACUT="EVNDISP.reconstruction.runparameter.noDISP"
+ACUT="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
 
 # $EVNDISPSYS/bin/evndisp -sourcefile $SIMFILE -pedestalfile $NOISE -deadchannelfile $DEAD -pedestalDefaultPedestal=$PEDLEV -arraycuts $ACUTS $OPT
 $EVNDISPSYS/bin/evndisp -nodp2005 -donotusedbinfo -sourcefile $SIMFILE -pedestalfile $NOISEFILE -pedestalDefaultPedestal=$PEDLEV $OPT -reconstructionparameter $ACUT

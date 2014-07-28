@@ -240,6 +240,11 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				i++;
 			}
 		}
+                // hilo from MC run her
+                else if( iTemp.find( "simu_hilo_from_simfile" ) < iTemp.size()  )
+                {
+                        fRunPara->fsimu_HILO_from_simFile = true;
+                }
 		// noise level of external grisu pedestal file
 		else if( iTemp.find( "pedestalnoiselevel" ) < iTemp.size() )
 		{

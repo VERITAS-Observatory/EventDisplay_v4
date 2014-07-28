@@ -5,10 +5,10 @@ UCLA=`grep "\* VTSRAWDATA" $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/EVNDISP.globa
 echo $UCLA
 
 # upload version might be different from download version
-UP="v450"
+UP="450"
 VERSION="EVNDISP-447-auxv01"
 
-#bbftp -u bbftp -V -S -m -p 12 -e "put EVNDISP-447.tar.gz /veritas/upload/EVNDISP/$UP/EVNDISP-447.tar.gz" $UCLA
+bbftp -u bbftp -V -S -m -p 12 -e "put EVNDISP-${UP}.tar.gz /veritas/upload/EVNDISP/v${UP}/EVNDISP-${UP}.tar.gz" $UCLA
 
 for N in calibration lookuptables runfiles dispBDTs Model3D effectiveareas radialacceptances
 do

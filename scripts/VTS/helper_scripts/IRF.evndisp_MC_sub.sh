@@ -38,9 +38,9 @@ fi
 #################################
 # detector configuration and cuts
 # no disp, long integration window
-#ACUT="EVNDISP.reconstruction.runparameter"
+ACUT="EVNDISP.reconstruction.runparameter"
 # disp, long integration window
-ACUT="EVNDISP.reconstruction.runparameter.DISP"
+#ACUT="EVNDISP.reconstruction.runparameter.DISP"
 # no disp, short integration window
 #ACUT="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
 # disp, short integration window
@@ -192,7 +192,7 @@ fi
 MCOPT=" -runnumber=$RUNNUM -sourcetype=2 -epoch $EPOCH -camera=$CFG -reconstructionparameter $ACUT -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory $ODIR"
 # special options for GRISU
 if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
-    MCOPT="$MCOPT -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
+    MCOPT="$MCOPT -simu_hilo_from_simfile -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
 else
     MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV"
 fi

@@ -1354,6 +1354,10 @@ class VEvndispData
 		{
 			fCalData[fTelID]->setLowGainMultiplier_Trace( lmult );
 		}
+		void	setLowGainMultiplier_Trace( unsigned int iTelID, double lmult )
+		{
+			if( iTelID < fCalData.size() ) fCalData[iTelID]->setLowGainMultiplier_Trace( lmult );
+		}
 		void	setLowGainPedestalFile( string file )
 		{
 			fCalData[fTelID]->setLowGainPedestalFile( file );

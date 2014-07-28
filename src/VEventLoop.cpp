@@ -1034,6 +1034,22 @@ bool VEventLoop::nextEvent()
 				getRunParameter()->fTraceIntegrationMethod[i] = 0;
 			}
 		}
+                // grisu sims only (currently)
+                // set FADC hilo mulitplier as read from simulation run header in the vbf file
+                // do this only for the first event
+                if( getRunParameter()->fsimu_HILO_from_simFile && fReader->getMonteCarloHeader() )
+                {
+                    if( fReader->getMonteCarloHeader()->fFADC_hilo_multipler > 0 )
+                    {
+                        getRunParameter()->fsimu_HILO_from_simFile = false;
+                        for( unsigned int i = 0; i < getNTel(); i++ )
+                        {
+                            setLowGainMultiplier_Trace( i, fReader->getMonteCarloHeader()->fFADC_hilo_multipler );
+                            getDetectorGeometry()->setLowGainMultiplier_Trace( i, fReader->getMonteCarloHeader()->fFADC_hilo_multipler );
+                        }
+                        cout << "Lowgain multiplier (trace) read from MC run header: " << fReader->getMonteCarloHeader()->fFADC_hilo_multipler << endl;
+                    }
+                }
 		fillTriggerVectors();
 		///////////////////////////////////////////////////////////
 		// set eventnumbers

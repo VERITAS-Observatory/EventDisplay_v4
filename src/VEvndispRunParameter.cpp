@@ -51,6 +51,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fDBRunStartTimeSQL = "";
 	fDBRunStoppTimeSQL = "";
 	fsimu_pedestalfile = "";
+        fsimu_HILO_from_simFile = false;
 	fsimu_noiselevel   = 250;
 	fsimu_pedestalfile_DefaultPed = 20.;
         fsimu_lowgain_pedestal_DefaultPed = -999.;
@@ -548,6 +549,10 @@ void VEvndispRunParameter::print( int iEv )
 			cout << "using pedestal events for pedestal calculation" << endl;
 		}
 	}
+        if( fsimu_HILO_from_simFile )
+        {
+                cout << "reading hilo multiplier from MC run header" << endl;
+        }
 	if( frunmode == 6 )
 	{
 		cout << "using low gain events only for pedestal calculation" << endl;

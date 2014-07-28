@@ -59,6 +59,8 @@ void VMonteCarloRunHeader::reset()
 	corsika_low_E_detail = 0;
 	corsika_high_E_detail = 0;
 	detector_Simulator = "NOSET";
+
+        fFADC_hilo_multipler = -999.;
 	
 	combined_runHeader = false;
 }

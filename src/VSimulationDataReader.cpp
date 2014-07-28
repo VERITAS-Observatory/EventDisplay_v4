@@ -124,7 +124,7 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
 	iMCRunHeader->obsheight = ( double )h->fObsAltitudeM;
 	
 	// read long string of fSimConfigFile and extract all the necessary information
-	// (very dependent on structure of string -> will soon be replace by a VGrisuSimulationRunHeader)
+	// (very dependent on structure of string)
 	if( h->fSimConfigFile.size() > 0 )
 	{
 		istringstream is_stream( h->fSimConfigFile );
@@ -403,6 +403,23 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
 						iMCRunHeader->viewcone[1] = atof( iTemp.c_str() );
 					}
 				}
+                                // read low gain multiplier
+                                else if( iTemp == "FADCS" )
+                                {
+                                   for( int kk = 0; kk < 7; kk ++ )
+                                   {
+                                      if( !is_stream.eof() ) is_stream >> iTemp;
+                                   }
+                                   if( !is_stream.eof() )
+                                   {
+                                        is_stream >> iTemp;
+                                        iMCRunHeader->fFADC_hilo_multipler = atof( iTemp.c_str() );
+                                   }
+                                   else
+                                   {
+                                       iMCRunHeader->fFADC_hilo_multipler = -999.;
+                                   }
+                                }
 			}
 			
 		}

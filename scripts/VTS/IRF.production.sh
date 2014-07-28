@@ -109,7 +109,8 @@ else
              ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Soft.dat 
              ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Hard.dat 
              ANASUM.GammaHadron-Cut-NTel3-PointSource-Moderate.dat 
-             ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard.dat"
+             ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard.dat
+             ANASUM.GammaHadron-Cut-NTel3-ExtendedSource-SuperHard.dat"
 #     CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat"
 fi
 
