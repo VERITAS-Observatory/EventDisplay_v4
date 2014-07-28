@@ -169,7 +169,7 @@ do
     elif [[ $SUBC == *parallel* ]]; then
         echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.$SECONDS.dat
         echo "RUN $AFILE OLOG $FSCRIPT.log"
-    elif [[ "$SUBC" == "" ]] ; then
+    elif [[ "$SUBC" == *simple* ]] ; then
 	"$FSCRIPT.sh" |& tee "$FSCRIPT.log"	
     fi
 done
