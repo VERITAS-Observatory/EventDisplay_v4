@@ -47,8 +47,6 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 # Load runlist functions
 source "$EVNDISPSYS/scripts/VTS/helper_scripts/RUNLIST.run_info_functions.sh"
 
-ATMO="21"
-
 # Parse command line arguments
 RLIST=$1
 ODIR=$2
@@ -95,7 +93,7 @@ else
     exit 1
 fi
 CUTFILE="ANASUM.GammaHadron-Cut-${CUT}.dat"
-EFFAREA="effArea-${IRFVERSION}-${SIMTYPE}-Cut-${CUT}-ID${BASEID}-VX-ATM${ATMO}-TX.root"
+EFFAREA="effArea-${IRFVERSION}-${SIMTYPE}-Cut-${CUT}-ID${BASEID}-VX-ATMXX-TX.root"
 RADACC="radialAcceptance-${IRFVERSION}-Cut-${CUT}-ID${BASEID}-VX-TX.root"
 # preliminary: use ID0 for all data
 RADACC="radialAcceptance-${IRFVERSION}-Cut-${CUT}-ID0-VX-TX.root"
@@ -158,7 +156,7 @@ for RUN in ${RUNS[@]}; do
     # get array epoch and atmosphere for the run
     EPOCH=`getRunArrayVersion $RUN`
     ATMO=`getRunAtmosphere $RUN $INDIR/$RUN.mscw.root`
-    ATMO="21"
+    # ATMO="21"
     if [[ $ATMO == "error" ]]; then
        echo "error finding atmosphere; skipping run $RUN"
        continue
@@ -170,7 +168,7 @@ for RUN in ${RUNS[@]}; do
     # do string replacements
     EFFAREA=${EFFAREA/VX/$EPOCH}
     EFFAREA=${EFFAREA/TX/$TELTOANA}
-#    EFFAREA=${EFFAREA/ATMXX/$ATMO}
+    EFFAREA=${EFFAREA/ATMXX/$ATMO}
     RADACC=${RADACC/VX/$EPOCH}
     RADACC=${RADACC/TX/$TELTOANA}
     

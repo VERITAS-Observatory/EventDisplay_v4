@@ -94,6 +94,8 @@ echo -e "Log files will be written to:\n $LOGDIR"
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/ANALYSIS.mscw_energy_sub"
 
+SECONDS=`date +"%s"`
+
 #########################################
 # loop over all files in files loop
 for AFILE in $FILES
@@ -115,6 +117,7 @@ do
     # run locally or on cluster
     SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
     SUBC=`eval "echo \"$SUBC\""`
+    echo "Submission command: $SUBC"
     if [[ $SUBC == *qsub* ]]; then
         JOBID=`$SUBC $FSCRIPT.sh`
         
@@ -131,14 +134,16 @@ do
             echo "RUN $AFILE ELOG $FSCRIPT.sh.e$JOBID"
         fi
     elif [[ $SUBC == *parallel* ]]; then
-        echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
+        echo "$FSCRIPT.sh &> $FSCRIPT.log" >>| $LOGDIR/runscripts.$SECONDS.dat
         echo "RUN $AFILE OLOG $FSCRIPT.log"
+    elif [[ "$SUBC" == *simple* ]] ; then
+	$FSCRIPT.sh |& tee "$FSCRIPT.log"
     fi
 done
 
 # Execute all FSCRIPTs locally in parallel
 if [[ $SUBC == *parallel* ]]; then
-    cat $LOGDIR/runscripts.dat | $SUBC
+    cat $LOGDIR/runscripts.$SECONDS.dat | $SUBC
 fi
 
 exit

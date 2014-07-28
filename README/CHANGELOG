@@ -2,6 +2,12 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140728 (HF)
+script updates:
+ANALYSIS.evndisp.sh script now takes runparameter file as a command line option.
+all ANALYSIS.... scripts now support simple sequential execution of scripts (if no parallel computing available)
+Fix of GNU parallels submission option
+
 * 20140728 (GM)
 read hilo ratio from VBF run header file 
 (used currently for grisudet simulations only)

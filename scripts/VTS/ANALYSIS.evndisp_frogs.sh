@@ -68,6 +68,9 @@ mkdir -p $ODIR
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/ANALYSIS.evndisp_frogs_sub"
 
+SECONDS=`date +"%s"`
+
+
 # loop over all files in files loop
 for RUN in $RUNNUMS; do
     echo "Now starting run $RUN"
@@ -105,13 +108,16 @@ for RUN in $RUNNUMS; do
             echo "RUN $RUN ELOG $FSCRIPT.sh.e$JOBID"
         fi
     elif [[ $SUBC == *parallel* ]]; then
-        echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
+        echo "$FSCRIPT.sh &> $FSCRIPT.log" >>| $LOGDIR/runscripts.$SECONDS.dat
+    fi
+    elif [[ "$SUBC" == *simple* ]] ; then
+    	"$FSCRIPT.sh" |& tee "$FSCRIPT.log"
     fi
 done
 
 # Execute all FSCRIPTs locally in parallel
 if [[ $SUBC == *parallel* ]]; then
-    cat $LOGDIR/runscripts.dat | $SUBC
+    cat $LOGDIR/runscripts.$SECONDS.dat | $SUBC
 fi
 
 exit

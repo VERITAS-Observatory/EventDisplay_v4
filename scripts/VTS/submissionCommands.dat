@@ -4,11 +4,14 @@
 # are asterisked, the last command will be used
 ###
 
+# Choose this if you don't have access to a batch farm nor an installation of GNU parallel
+  simple
+
 # generic qsub with logging
   qsub -V -terse -o $LOGDIR/ -e $LOGDIR/
 
 # DESY batch farm
-* qsub -V -terse -l os=sl6 -l h_cpu=$h_cpu -l h_vmem=$h_vmem -l tmpdir_size=$tmpdir_size -o $LOGDIR/ -e $LOGDIR/
+ qsub -V -terse -l os=sl6 -l h_cpu=$h_cpu -l h_vmem=$h_vmem -l tmpdir_size=$tmpdir_size -o $LOGDIR/ -e $LOGDIR/
 
 # DESY batch farm -- high priority
  qsub -P cta_high -V -terse -l os=sl6 -l h_cpu=$h_cpu -l h_vmem=$h_vmem -l tmpdir_size=$tmpdir_size -o $LOGDIR/ -e $LOGDIR/
@@ -25,3 +28,4 @@
 
 # Local parallel execution using GNU parallel
   parallel --no-notice -j `grep -ic ^processor /proc/cpuinfo`
+

@@ -13,6 +13,7 @@ MODEL3D=USEMODEL3D
 CALIBFILE=USECALIBLIST
 TELTOANA=TELTOANACOMB
 LOGDIR="$ODIR"
+ACUTS=RECONSTRUCTIONRUNPARAMETERFILE
 
 # temporary (scratch) directory
 if [[ -n $TMPDIR ]]; then
@@ -24,17 +25,9 @@ echo "Scratch dir: $TEMPDIR"
 mkdir -p $TEMPDIR
 
 #################################
-# eventdisplay reconstruction parameter
-if [[ "$SCIPIPE_USEDISP" == "yes" ]] ; then
-	# disp, long integration window
-	echo "Using Disp Method"
-	ACUTS="EVNDISP.reconstruction.runparameter.DISP"
-else
-	# no disp, long integration window
-	echo "Not using Disp Method"
-	ACUTS="EVNDISP.reconstruction.runparameter"
-fi
-ACUTS="EVNDISP.reconstruction.runparameter.DISP"
+
+echo "Using run parameter file $ACUTS"
+
 # no disp, short integration window
 #ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
 # disp, short integration window
@@ -46,13 +39,16 @@ ACUTS="EVNDISP.reconstruction.runparameter.DISP"
 # pedestal calculation
 if [[ $CALIB == "1" || ( $CALIB == "2" || $CALIB == "4" ) ]]; then
     rm -f $LOGDIR/$RUN.ped.log
-    $EVNDISPSYS/bin/evndisp -runmode=1 -runnumber=$RUN -reconstructionparameter $ACUTS &> $LOGDIR/$RUN.ped.log
+    $EVNDISPSYS/bin/evndisp -runmode=1 -runnumber=$RUN -reconstructionparameter $ACUTS &> $LOGDIR/$RUN.ped.log 
     echo "RUN$RUN PEDLOG $LOGDIR/$RUN.ped.log"
 fi
 
 #########################################
 
-if [[ $CALIB == "4" ]]; then
+## use text file for calibration information
+if [[ "$SCIPIPE_MANUALLASER" == "yes" ]] ; then
+	OPT+=( -calibrationfile "$SCIPIPE_MANUALLASERFILE" )
+elif [[ $CALIB == "4" ]]; then
 	## use text file for calibration information
 	OPT+=( -calibrationfile $CALIBFILE )
 else
@@ -81,7 +77,7 @@ fi
 # average tzero calculation
 if [[ $CALIB == "1" || ( $CALIB == "3" || $CALIB == "4" ) ]]; then
     rm -f $LOGDIR/$RUN.tzero.log
-    $EVNDISPSYS/bin/evndisp -runnumber=$RUN -runmode=7 -reconstructionparameter $ACUT ${OPT[@]} &> $LOGDIR/$RUN.tzero.log
+    $EVNDISPSYS/bin/evndisp -runnumber=$RUN -runmode=7 -reconstructionparameter $ACUTS ${OPT[@]} &> $LOGDIR/$RUN.tzero.log 
 	echo "RUN$RUN TZEROLOG $LOGDIR/$RUN.tzero.log"
 fi
 
@@ -99,10 +95,7 @@ fi
 ## OFF data run
 # OPT+=( -raoffset=6.25 )
 #
-## use text file for calibration information
-if [[ "$SCIPIPE_MANUALLASER" == "yes" ]] ; then
-	OPT+=( -calibrationfile "$SCIPIPE_MANUALLASERFILE" )
-fi
+
 #
 ## double pass correction
 # OPT+=( -nodp2005 )
@@ -121,7 +114,7 @@ fi
 # run eventdisplay
 LOGFILE="$LOGDIR/$RUN.log"
 rm -f $LOGDIR/$RUN.log
-$EVNDISPSYS/bin/evndisp -runnumber=$RUN -noshorttree -reconstructionparameter $ACUT -outputfile $TEMPDIR/$RUN.root ${OPT[@]} &> "$LOGFILE"
+$EVNDISPSYS/bin/evndisp -runnumber=$RUN -reconstructionparameter $ACUTS -outputfile $TEMPDIR/$RUN.root ${OPT[@]} &> "$LOGFILE"
 # DST $EVNDISPSYS/bin/evndisp -runnumber=$RUN -nevents=250000 -runmode=4 -readcalibdb -dstfile $TEMPDIR/$RUN.dst.root -reconstructionparameter $ACUTS -outputfile $TEMPDIR/$RUN.root ${OPT[@]} &> "$LOGFILE"
 echo "RUN$RUN EVNDISPLOG $LOGFILE"
 
