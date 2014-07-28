@@ -8,8 +8,7 @@ echo "
 EVNDISP runlist script: generate a simple run list (one run per line)
 with quality cuts for a given VERITAS source name
 
-RUNLIST.generate.sh <source name> [allow 3-tel] [worst weather]
- [min duration] [start date] [end date]
+RUNLIST.generate.sh <source name> [allow 3-tel] [worst weather] [min duration] [start date] [end date] [runmode] [DQM category]
 
 required parameters:
 
@@ -31,6 +30,15 @@ optional parameters:
     [end date]              select all runs on or before this date
                             (default: none, format = YYYY-MM-DD)
 
+    [runmode]		    use runs taken with this runmode
+			    (default: observing = regular runs). 
+			    Use 'obsLowHV' or 'obsFilter' 
+                            to select only reduced HV/only filter runs. 
+			    Use '%' for all runs.
+
+    [DQM category]	    use runs taken with this DQM category.
+			    Default: science. Other options: 
+			    calibration, engineering, moonfilter, reducedhv, special.
 --------------------------------------------------------------------------------
 "
 #end help message
@@ -48,6 +56,8 @@ SOURCE_NAME=$1
 [[ "$4" ]] && MIN_DURATION=$4    || MIN_DURATION=15
 [[ "$5" ]] && START_DATE=$5" 00:00:00" || START_DATE="2011-01-01 00:00:00"
 [[ "$6" ]] && END_DATE_STR="and db_end_time <= '$6 00:00:00'"
+[[ "$7" ]] && MODE="$7" || MODE="observing"
+[[ "$8" ]] && DQMCATEGORY="$8" || DQMCATEGORY="science"
 
 # Configuration for number of telescopes
 if [[ $ALLOW_THREE_TEL == 0 ]]; then
@@ -82,7 +92,7 @@ while read -r RUNID; do
 	if [[ "$RUNID" =~ ^[0-9]+$ ]]; then
 		RUNINFOARRAY+=("$RUNID")
 	fi
-done < <($MYSQL -e " select run_id from VERITAS.tblRun_Info where source_id = '$SOURCE_NAME' and run_type = 'observing' and observing_mode = 'wobble' and weather <= $WEATHER and duration >= '00:${MIN_DURATION}:00' and db_start_time >= '$START_DATE' $END_DATE_STR and config_mask in $TEL_MASKS ;")
+done < <($MYSQL -e " select run_id from VERITAS.tblRun_Info where source_id = '$SOURCE_NAME' and run_type LIKE \"$MODE\" and observing_mode = 'wobble' and weather <= $WEATHER and duration >= '00:${MIN_DURATION}:00' and db_start_time >= '$START_DATE' $END_DATE_STR and config_mask in $TEL_MASKS ;")
 
 # check if VERITAS.tblRun_Info had 0 runs for us
 if (( ${#RUNINFOARRAY[@]} <= 0 )) ; then
@@ -101,6 +111,6 @@ while read -r RUNID; do
 		FINALARRAY+=("$RUNID")
 		echo "$RUNID"
 	fi
-done < <($MYSQL -e "select run_id from VOFFLINE.tblRun_Analysis_Comments where status = 'good_run' and (tel_cut_mask is NULL or tel_cut_mask in $TEL_CUT_MASKS) and data_category = 'science' and usable_duration >= '00:${MIN_DURATION}:00' and run_id in ${RUN_IDS[@]}")
+done < <($MYSQL -e "select run_id from VOFFLINE.tblRun_Analysis_Comments where status = 'good_run' and (tel_cut_mask is NULL or tel_cut_mask in $TEL_CUT_MASKS) and ( data_category like \"$DQMCATEGORY\" or ( \"$DQMCATEGORY\" = \"%\" and data_category is null )  ) and usable_duration >= '00:${MIN_DURATION}:00' and run_id in ${RUN_IDS[@]}")
 
 exit
