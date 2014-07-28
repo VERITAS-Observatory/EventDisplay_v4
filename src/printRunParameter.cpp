@@ -61,6 +61,10 @@ bool readRunParameter( TFile* fIn, string iPara )
         {
                cout << fPar->fInstrumentEpoch << endl;
         }
+        else if( iPara == "-runtype" )
+        {
+               cout << fPar->fDBRunType << endl;
+        }
 	
 	return true;
 }
@@ -128,6 +132,7 @@ int main( int argc, char* argv[] )
                 cout << "      -date         print date of run" << endl;
                 cout << "      -epoch        print epoch of this run" << endl;
                 cout << "      -atmosphere   print corsika ID of atmospheric condition of this run" << endl;
+                cout << "      -runtype      print run type, eg observing, obsFilter etc." << endl;
                 cout << "      -teltoana     print telescope combination used in analysis" << endl;
 		cout << endl;
 		exit( 0 );

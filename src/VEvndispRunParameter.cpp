@@ -457,7 +457,7 @@ void VEvndispRunParameter::print( int iEv )
 			cout << " use database" << endl;
 		}
 	}
-        cout << "Instrument epoch: " << fInstrumentEpoch << "  Atmosphere (corsika ID): " << fAtmosphereID << endl;
+        cout << "Run type: " << fDBRunType << " Instrument epoch: " << fInstrumentEpoch << "  Atmosphere (corsika ID): " << fAtmosphereID << endl;
         if( fEpochFile.size() > 0 ) cout << "(epochs read from " << fEpochFile << ")" << endl;
 	if( fDBCameraRotationMeasurements )
 	{
