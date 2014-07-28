@@ -140,7 +140,7 @@ for ((i=1; i <= $NLINES; i++)); do
                 echo "RUN $RUN ELOG $FSCRIPT.sh.e$JOBID"
             fi
         elif [[ $SUBC == *parallel* ]]; then
-            echo "$FSCRIPT.sh &> $FSCRIPT.log" >>| $LOGDIRTEMP/runscripts.$SECONDS.dat
+            echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIRTEMP/runscripts.$SECONDS.dat
         fi
 	elif [[ "$SUBC" == *simple* ]] ; then
 	    "$FSCRIPT.sh" |& tee "$FSCRIPT.log"

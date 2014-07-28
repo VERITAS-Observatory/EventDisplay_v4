@@ -167,7 +167,7 @@ do
             echo "RUN $AFILE ELOG $FSCRIPT.sh.e$JOBID"
         fi
     elif [[ $SUBC == *parallel* ]]; then
-        echo "$FSCRIPT.sh &> $FSCRIPT.log" >>| $LOGDIR/runscripts.$SECONDS.dat
+        echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.$SECONDS.dat
         echo "RUN $AFILE OLOG $FSCRIPT.log"
     elif [[ "$SUBC" == "" ]] ; then
 	"$FSCRIPT.sh" |& tee "$FSCRIPT.log"	

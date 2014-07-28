@@ -102,7 +102,7 @@ if [[ $SUBC == *qsub* ]]; then
     echo "RUN $AFILE JOBID $JOBID"
     
 elif [[ $SUBC == *parallel* ]]; then
-    echo "$FSCRIPT.sh &> $FSCRIPT.log" >>| $LOGDIR/runscripts.$SECONDS.dat
+    echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.$SECONDS.dat
     cat $LOGDIR/runscripts.$SECONDS.dat | $SUBC
 fi
 
