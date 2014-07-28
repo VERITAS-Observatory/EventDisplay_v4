@@ -35,10 +35,10 @@ RUNNUM=$1
 # Set proper options for low gain or high gain analysis
 if [[ $LOWGAIN == "64" ]]; then
     # low gain run with 64 samples
-    OPT="-calibrationsumwindow=20 -calibrationsumfirst=40 -runmode=6 -nevents=5000 -reconstructionparameter EVNDISP.reconstruction.LGCalibration.runparameter"
+    OPT="-calibrationsumwindow=20 -calibrationsumfirst=40 -runmode=6 -reconstructionparameter EVNDISP.reconstruction.LGCalibration.runparameter"
 elif [[ $LOWGAIN == "128" ]]; then
     # low gain run with 128 samples
-    OPT="-calibrationsumwindow=20 -calibrationsumfirst=80 -runmode=6 -nevents=5000 -reconstructionparameter EVNDISP.reconstruction.LGCalibration.runparameter"
+    OPT="-calibrationsumwindow=20 -calibrationsumfirst=100 -runmode=6 -reconstructionparameter EVNDISP.reconstruction.LGCalibration.runparameter"
 elif [[ $LOWGAIN == "0" ]]; then
     OPT="-runmode=1 -calibrationsumwindow=20 -calibrationsumfirst=0"
 else
