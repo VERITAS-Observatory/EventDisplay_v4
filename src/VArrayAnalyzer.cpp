@@ -2371,9 +2371,9 @@ void VArrayAnalyzer::initializeDispAnalyzer( unsigned int iStereoMethodID )
          unsigned int iMethodID = (unsigned int)atoi( iTemp.substr( iTemp.rfind( "_" )+1, iTemp.size() ).c_str() );
          cout << "initializing TMVA disp analyzer for array reconstruction method " << iStereoMethodID;
          cout << " using disp analyser from method " << iMethodID << endl;
-         if( iMethodID < fDispAnalyzer.size() )
+         if( iMethodID < fDispAnalyzer.size() && fDispAnalyzer[iMethodID] )
          {
-             fDispAnalyzer.push_back( fDispAnalyzer[11] );
+             fDispAnalyzer.push_back( fDispAnalyzer[iMethodID] );
          }
          else
          {
@@ -2388,6 +2388,7 @@ void VArrayAnalyzer::initializeDispAnalyzer( unsigned int iStereoMethodID )
      {
             fDispAnalyzer.push_back( new VDispAnalyzer() );
             fDispAnalyzer.back()->setTelescopeTypeList( getDetectorGeometry()->getTelType_list() );
+	    // initialize disp with BDTs from closest zenith angle
             if( !fDispAnalyzer.back()->initialize( getTMVAFileNameForAngularReconstruction( iStereoMethodID ), "TMVABDT" ) )
             {
                     cout << "VArrayAnalyzer::initAnalysis() error initializing MVA-BDT (method " << iStereoMethodID << ")" << endl;

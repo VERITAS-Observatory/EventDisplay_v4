@@ -541,8 +541,12 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
 		{
                         for( unsigned int ze = 0; ze < fTMVAFileName[m].size(); ze++ )
                         {
-                            if( fTMVAFileName[m][ze].size() > 0 )
+                            if( fTMVAFileName[m][ze].size() > 0 && fTMVAFileName[m][ze].find( "USE_BDT_METHOD" ) != string::npos )
                             {
+                                cout << "\t\t TMVA (BDT) file used from method " << fTMVAFileName[m][ze] << endl;
+                            }
+			    else
+			    {
                                 cout << "\t\t TMVA (BDT) file for zenith angle ";
                                 cout << fMTVAZenithBin[m][ze] << " deg: ";
                                 cout << fTMVAFileName[m][ze] << endl;
