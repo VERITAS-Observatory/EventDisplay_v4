@@ -141,10 +141,10 @@ for ((i=1; i <= $NLINES; i++)); do
             fi
         elif [[ $SUBC == *parallel* ]]; then
             echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIRTEMP/runscripts.$SECONDS.dat
-        fi
-	elif [[ "$SUBC" == *simple* ]] ; then
+        elif [[ "$SUBC" == *simple* ]] ; then
 	    "$FSCRIPT.sh" |& tee "$FSCRIPT.log"
 	fi
+    fi
 done
 
 # Execute all FSCRIPTs locally in parallel
