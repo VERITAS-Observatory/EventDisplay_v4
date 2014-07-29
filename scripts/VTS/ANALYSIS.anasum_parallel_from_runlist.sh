@@ -168,7 +168,7 @@ for RUN in ${RUNS[@]}; do
     # do string replacements
     EFFAREA=${EFFAREA/VX/$EPOCH}
     EFFAREA=${EFFAREA/TX/$TELTOANA}
-    EFFAREA=${EFFAREA/ATMXX/$ATMO}
+    EFFAREA=${EFFAREA/XX/$ATMO}
     RADACC=${RADACC/VX/$EPOCH}
     RADACC=${RADACC/TX/$TELTOANA}
     
