@@ -1118,6 +1118,11 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                         {
                             return fNMethods;
                         }
+			// check for non-MC exist statement
+			if( iTemp == "MCONLY" && !fRunPara->isMC() )
+                        {
+                            return fNMethods;
+                        }
 
 			
 			/////////////////////////////////////////////////
