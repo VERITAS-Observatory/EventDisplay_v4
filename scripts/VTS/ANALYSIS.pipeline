@@ -130,9 +130,20 @@ export AUXFILE_SRCEXT="PointSource"
 
 # Do you want to use the DISP feature?
 # This will change how image axes and their intersection
-# are handled.
+# are calculated.
 # (yes/no)
 export SCIPIPE_USEDISP="yes"
+# if you said yes, you should also make sure to use the right
+# event display reconstruction parameter file, stored in
+# $VERITAS_EVNDISP_AUX_DIR/ParameterFiles
+# Availible files are:
+#   EVNDISP.reconstruction.runparameter.DISP
+#   EVNDISP.reconstruction.runparameter.SumWindow6-noDISP
+#   EVNDISP.reconstruction.runparameter.SumWindow6-DISP
+# SumWindow:
+#   SumWindow6     should be used with grisu-derived IRF files
+#   non-SumWindow6 should be used with care-derived  IRF files
+export EVNDISPRECONFILE="EVNDISP.reconstruction.runparameter.SumWindow6-DISP"
 
 # For your Effective Area files, your Radial Acceptance Files, and your
 # Table files, which event display version should they have been made with?
@@ -172,43 +183,6 @@ export AUXVER_TABLE="auxv01"
 #                   ^^^^^^
 # Should have the format 'auxv##', e.g. 'auxv01' or 'auxv31'
 export AUXVER_EFFAREA="auxv01"
-
-
-# For the radial acceptance file, what date should be used
-# in the radial acceptance filename?
-# e.g. radialAcceptance-d20131115-cut-N3-Point-005CU-Soft-V5-T234.root
-#                        ^^^^^^^^
-# (all other parts of filename will be figured out automatically)
-# format: YYYYMMDD
-# Takes effect in the anpar stage.
-#RADECDATE="20131115"
-
-# For the mscw lookup tables, what date should be used in the filename?
-# e.g. table_d20131115_GrIsuDec12_ATM22_V5_ID0
-#             ^^^^^^^^
-# (all other parts of filename will be figured out automatically)
-# format: YYYYMMDD
-# Takes effect in the mscw stage.
-#TABLEDATE="20131115"
-
-# For the effective area file, what two dates should be used in the filename? 
-# effArea-d20131031-cut-N3-Point-005CU-Soft-ATM22-V5-T1234-d20131115.root
-#          ^EFDATE1                                         ^EFDATE2
-# (all other parts of filename will be figured out automatically)
-# format: YYYYMMDD
-# Takes effect in the anpar stage.
-#EFDATE1="20131031"
-#EFDATE2="20131115"
-
-# For the gamma-hadron cut file, what date should be used in the filename?
-# ANASUM.GammaHadron.d20130411-cut-N2-Point-005CU-Soft.dat
-#                     ^^^^^^^^
-# (all other parts of filename will be figured out automatically)
-# format: YYYYMMDD
-# Takes effect in the anpar stage.
-#GAMHADCUTDATE="20130411"
-#GAMHADCUTDATE="20131031"
-
 
 # Which directory should we keep the morphed ctools datafiles?
 # Takes effect in the mutate stage.
@@ -523,7 +497,7 @@ if [[ "$STAGE" == "evndisp" ]] ; then
         VPM=1 ## on by default
         if [[ "$USEMODEL3D" == "yes" ]] ; then MODEL3D=1
         else                                   MODEL3D=0 ; fi
-		QSUBDATA=$(./ANALYSIS.evndisp.sh $RUNLIST $EVNDISPOUTPUTDIR $CALIBCODE $VPM $MODEL3D | tee >(cat - >&5) )
+		QSUBDATA=$(./ANALYSIS.evndisp.sh $RUNLIST $EVNDISPOUTPUTDIR $EVNDISPRECONFILE $CALIBCODE $MODEL3D | tee >(cat - >&5) )
 		rm -rf "$EVNJOBSUB"
 		echo "$QSUBDATA" > "$EVNJOBSUB"
 		updateRunningJobFile "$QSUBDATA"

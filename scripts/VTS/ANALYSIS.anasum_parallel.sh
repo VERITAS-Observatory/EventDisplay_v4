@@ -145,7 +145,6 @@ for ((i=1; i <= $NLINES; i++)); do
 	elif [[ "$SUBC" == *simple* ]] ; then
 	    "$FSCRIPT.sh" |& tee "$FSCRIPT.log"
 	fi
-    fi
 done
 
 # Execute all FSCRIPTs locally in parallel
