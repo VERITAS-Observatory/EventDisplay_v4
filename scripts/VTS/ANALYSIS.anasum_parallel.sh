@@ -154,4 +154,19 @@ fi
 
 rm -f $TEMPLIST
 
+echo ""
+echo "============================================================================================"
+
+echo "After all runs have been analysed, please combine the results, eg by calling"
+echo "$EVNDISPSYS/scripts/VTS/ANALYSIS.anasum_combine.sh \\"
+echo "	$FLIST \\"
+echo "	$ODIR \\"
+echo "	anasumCombined.root \\"
+echo "	$RUNP"
+echo "============================================================================================"
+echo ""
+
+
+
+
 exit

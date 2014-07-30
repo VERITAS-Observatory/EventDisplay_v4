@@ -12,10 +12,6 @@ ONAME=OUTNAME
 RUNP=RUNPARAM
 RUNNUM=RUNNNNN
 
-# temporary (scratch) directory
-TEMPDIR=$TMPDIR/ANASUM/
-mkdir -p $TEMPDIR
-
 # run anasum
 OUTPUTDATAFILE="$ODIR/$ONAME.root"
 OUTPUTLOGFILE="$ODIR/$ONAME.log"
@@ -24,7 +20,7 @@ $EVNDISPSYS/bin/anasum   \
     -l $FLIST            \
     -d $INDIR            \
     -o $OUTPUTDATAFILE   \
-    &> $OUTPUTLOGFILE
+    |& tee $OUTPUTLOGFILE
 echo "RUN$RUNNUM ANPARLOG $OUTPUTLOGFILE"
 echo "RUN$RUNNUM ANPARDATA $OUTPUTDATAFILE"
 

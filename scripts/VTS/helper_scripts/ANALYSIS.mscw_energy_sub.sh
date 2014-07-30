@@ -33,7 +33,7 @@ $EVNDISPSYS/bin/mscw_energy         \
     -arrayrecid=$RECID              \
     -inputfile $TEMPDIR/$BFILE.root \
     -writeReconstructedEventsOnly=1 \
-    &> $MSCWLOGFILE
+    |& tee $MSCWLOGFILE
 
 # move output file from scratch and clean up
 MSCWDATAFILE="$ODIR/$BFILE.mscw.root"

@@ -104,7 +104,6 @@ if [[ $SUBC == *qsub* ]]; then
 elif [[ $SUBC == *parallel* ]]; then
     echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.$SECONDS.dat
     cat $LOGDIR/runscripts.$SECONDS.dat | $SUBC
-fi
 
 elif [[ $SUBC == *simple* ]]; then
 	"$FSCRIPT.sh" |& tee $FSCRIPT.log
