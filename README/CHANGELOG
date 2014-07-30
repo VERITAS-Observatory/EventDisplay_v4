@@ -2,6 +2,9 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140730 (HF)
+Fixed uncorrelated skymaps.
+
 * 20140728 (HF)
 script updates:
 ANALYSIS.evndisp.sh script now takes runparameter file as a command line option.

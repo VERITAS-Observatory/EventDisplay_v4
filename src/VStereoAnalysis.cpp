@@ -1090,15 +1090,17 @@ double VStereoAnalysis::combineHistograms()
 		// UNCORRELATED PLOTS
 		int nxbin = fHistoTot->hmap_stereoUC->GetNbinsX();
 		int nybin = fHistoTot->hmap_stereoUC->GetNbinsY();
+		float i_exposure = 0.;
+		if( fHisto[h]->getRunNumber() > 0  ) i_exposure = getEffectiveExposure( fHisto[h]->getRunNumber() );
 		for( int i = 1; i <= nxbin; i++ )
 		{
 			for( int j = 1; j <= nybin; j++ )
 			{
-				if( fHisto[h]->hmap_alpha_offUC && fHisto[h]->hmap_alpha_offUC->GetBinContent( i, j ) > 0. )
+				fHistoTot->hmap_stereoUC->SetBinContent( i, j, fHisto[h]->hmap_stereoUC->GetBinContent( i, j ) + fHistoTot->hmap_stereoUC->GetBinContent( i, j ) );
+				// average normalization (alpha) factor
+				if( fHisto[h]->hmap_alphaUC && fHisto[h]->hmap_alphaUC->GetBinContent( i, j ) > 0. )
 				{
-					fHistoTot->hmap_stereoUC->SetBinContent( i, j, fHisto[h]->hmap_stereoUC->GetBinContent( i, j ) + fHistoTot->hmap_stereoUC->GetBinContent( i, j ) );
-					fHistoTot->hmap_alphaUC->SetBinContent( i, j, 1. / fHisto[h]->hmap_alphaUC->GetBinContent( i, j )*fHisto[h]->hmap_stereoUC->GetBinContent( i, j )
-															+ fHistoTot->hmap_alphaUC->GetBinContent( i, j ) );
+				    fHistoTot->hmap_alphaUC->SetBinContent( i, j, fHisto[h]->hmap_alphaUC->GetBinContent( i, j )*i_exposure + fHistoTot->hmap_alphaUC->GetBinContent( i, j ) );
 				}
 			}
 		}
@@ -1107,7 +1109,7 @@ double VStereoAnalysis::combineHistograms()
 		// CORRELATED PLOTS
 		nxbin = fHistoTot->hmap_stereo->GetNbinsX();
 		nybin = fHistoTot->hmap_stereo->GetNbinsY();
-		float i_exposure = 0.;
+		i_exposure = 0.;
 		if( fHisto[h]->getRunNumber() > 0  ) i_exposure = getEffectiveExposure( fHisto[h]->getRunNumber() );
 		for( int i = 1; i <= nxbin; i++ )
 		{
