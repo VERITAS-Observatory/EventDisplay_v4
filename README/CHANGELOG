@@ -2,6 +2,10 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140801 (GM)
+changes reflecting the new quality cuts in the 
+reconstruction files
+
 * 20140730 (HF)
 Fixed uncorrelated skymaps.
 
