@@ -60,19 +60,16 @@ AUX="auxv01"
 # simulation types and definition of parameter space
 if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
     # GrISU simulation parameters
-    ZENITH_ANGLES=( 00 20 30 35 40 )
     ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 60 65 )
     NSB_LEVELS=( 075 100 150 200 250 325 425 550 750 1000 )
-#   Y NSB_LEVELS=( 200 )
     WOBBLE_OFFSETS=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
-    WOBBLE_OFFSETS=( 0.5 )
     if [[ $IRFTYPE == "MVAEVNDISP" ]]; then
        NSB_LEVELS=( 200 )
        WOBBLE_OFFSETS=( 0.5 )
     fi
 elif [ ${SIMTYPE:0:4} = "CARE" ]; then
     # CARE simulation parameters
-    ZENITH_ANGLES=( 00 20 30 35 40 )
+    ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 60 65 )
     NSB_LEVELS=( 50 80 120 170 230 290 370 450 )
     WOBBLE_OFFSETS=( 0.5 )
     if [[ $IRFTYPE == "MVAEVNDISP" ]]; then
