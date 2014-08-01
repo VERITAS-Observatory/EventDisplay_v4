@@ -18,16 +18,6 @@ required parameters:
 optional parameters:
     
     [output directory]      directory where output ROOT files will be stored
-
-    [calibration]
-	  0		    neither tzero nor pedestal calculation is performed, must have the calibration results
-				already in $VERITAS_EVENTDISPLAY_AUX_DIR/Calibration/Tel_?
-          1                 pedestal & average tzero calculation (default)
-          2                 pedestal calculation only
-          3                 average tzero calculation only
-          4                 pedestal & average tzero calculation are performed;
-				laser run number is taken from calibration file,
-				gains taken from $VERITAS_EVENTDISPLAY_AUX_DIR/Calibration/Tel_?/<laserrun>.gain.root 
 	 
     [runparameter file]    file with integration window size and reconstruction cuts/methods, expected in $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/
 
@@ -40,6 +30,16 @@ optional parameters:
 										 
 			   EVNDISP.reconstruction.runparameter.SumWindow6-noDISP (short sumwindow -> for use with grisu IRFs; DISP disabled)
 			   EVNDISP.reconstruction.runparameter.SumWindow6-DISP	 (short sumwindow -> for use with grisu IRFs; DISP enabled [RecID 11])
+
+    [calibration]
+	  0		    neither tzero nor pedestal calculation is performed, must have the calibration results
+				already in $VERITAS_EVENTDISPLAY_AUX_DIR/Calibration/Tel_?
+          1                 pedestal & average tzero calculation (default)
+          2                 pedestal calculation only
+          3                 average tzero calculation only
+          4                 pedestal & average tzero calculation are performed;
+				laser run number is taken from calibration file,
+				gains taken from $VERITAS_EVENTDISPLAY_AUX_DIR/Calibration/Tel_?/<laserrun>.gain.root 
 			
     [Model3D]               set to 1 to switch on 3D model (default is off)
 
