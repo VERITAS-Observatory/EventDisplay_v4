@@ -26,7 +26,7 @@ RUN="$2"
 #   _M_ = -; _X_ = " "
 QSUBOPT=""
 QSUBOPT="_M_P_X_cta_high"
-QSUBOPT="_M_P_X_cta_high_X__M_js_X_90000"
+QSUBOPT="_M_P_X_cta_high_X__M_js_X_100"
 
 #####################################
 # output directory for script parameter files
@@ -35,11 +35,9 @@ mkdir -p $PDIR
 
 #####################################
 # analysis dates and table dates
-DATE="d20140225"
-TDATE="d20140225"
 
-DATE="d20140309"
 TDATE="d20140309"
+DATE="d20140718"
 
 #####################################
 # reconstruction IDs
@@ -65,26 +63,27 @@ then
    ARRAY="subArray.2a-noLST.list"
 # data sets with trgmask files
    SITE=( "prod2-Aar-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-Leoncito-NS" )
-# tmp
-   SITE=( "prod2-Leoncito-NS" "prod2-Aar-NS" "prod2-Aar-lowE-NS" )
 # 40 deg data sets
    SITE=( "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" )
-   SITE=( "prod2-Aar-40deg-NS" "prod2-Leoncito-40deg-NS" "prod2-LeoncitoPP-40deg-NS" )
-   SITE=( "prod2-Aar-NS" )
-   SITE=( "prod2-LeoncitoPP-40deg-NS" "prod2-LeoncitoPP-NS" "prod2-Aar-40deg-NS" "prod2-Leoncito-40deg-NS" )
-   SITE=( "prod2-SAC100-NS" "prod2-Leoncito-NS" "prod2-Aar-lowE-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS"  "prod2-Aar-500m-NS" "prod2-SAC084-NS" "prod2-Aar-NS" )
-   SITE=( "prod2-Aar-lowE-NS" "prod2-Aar-NS" "prod2-Leoncito-NS" )
-   SITE=( "prod2-LeoncitoPP-NS" "prod2-Aar-lowE-NS" "prod2-Aar-NS" )
+# survey sets
+   SITE=( "prod2-LeoncitoPP-NS" "prod2-Aar-NS" "prod2-Aar-lowE-NS" )
+   ARRAY="subArray.2a.list"
+# NSB data set
+   SITE=( "CL5040-prod2-Leoncito-NSB-x1.00-NS" "CL5040-prod2-Leoncito-NSB-x1.30-NS" "CL5040-prod2-Leoncito-NSB-x1.50-NS" )
+   ARRAY="subArray.2a.v2.list"
+# reduced arrays data sets
    SITE=( "prod2-LeoncitoPP-NS" )
-   ARRAY="subArray.prod2-RC-PP.list"
-   SITE=( "prod2-Aar-lowE-NS" "prod2-Aar-NS" )
-   ARRAY="subArray.prod2-RC.list"
+   ARRAY="subArray.20140730.list"
 ############################
 # NORTH
 elif [[ $P2 == "N" ]]
 then
    SITE=( "prod2-US-NS" "prod2-SPM-NS" "prod2-Tenerife-NS" )
+   SITE=( "prod2-SPM-NS" "prod2-Tenerife-NS" )
+   SITE=( "prod2-SPM-NS" )
    ARRAY="subArray.2NN-fullList.list"
+   ARRAY="subArray.2NN-LG.list"
+   ARRAY="subArray.2NN.list"
 elif [[ $P2 == "P1" ]]
 then
   SITE=( "prod1-cta-ultra3" )
@@ -92,8 +91,14 @@ then
   RECID="2"
   DATE="d20130415"
   MCAZ=( "" )
+elif [[ $P2 == "MS" ]]
+then
+  SITE=( "MS-TrigSimProd2SumD" )
+  ARRAY=( "subArray.MS.list" )
+  MCAZ=( "" )
 else
    echo "error: unknown site; allowed are N or S"
+   echo $P2
    exit
 fi
 
@@ -115,6 +120,7 @@ NIMAGESMIN="2"
 OBSTIME=( "5h" "30m" "10m" "1m" "20s" )
 OBSTIME=( "100h" "500h" "1000h" )
 OBSTIME=( "50h" "5h" "30m" "10m" "1m" "20s" )
+OBSTIME=( "50h" "40h" "30h" "25h" "20h" "15h" "10h" "5h" )
 OBSTIME=( "50h" )
 
 
@@ -163,6 +169,7 @@ do
 	  N=${PARTICLE[$i]}
 	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/40deg/$S.$N"".dcache.list
 	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/40deg/$S.$N"".grid.list.fullList
+	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/NSB/$S.$N"_20deg".list
 	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/$S.$N"_20deg".list
           echo $LIST
 
@@ -174,7 +181,7 @@ do
 # loop over all reconstruction IDs
     for ID in $RECID
     do
-       MSCWSUBDIRECTORY="Analysis-ID$ID-$DATE"
+       MSCWSUBDIRECTORY="Analysis-ID$ID-$TDATE"
 ##########################################
 # make tables
        if [[ $RUN == "MAKETABLES" ]]
@@ -224,6 +231,7 @@ do
 	  EFFDIR="/lustre/fs9/group/cta/users/maierg/CTA/analysis/AnalysisData/$S/$EFFDIR/"
 ##########################################
 # train BDTs   
+# (note: BDT training does not need to be done for all observing periods)
 	  if [[ $RUN == "TRAIN" ]]
 	  then
 	    echo "$AZ " 
@@ -248,12 +256,12 @@ do
 # IRFs: effective areas after gamma/hadron cuts
 	  elif [[ $RUN == "CUTS" ]]
 	  then
-	    ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.TMVA $PARA BDT.R1.$DATE $S 0 $QSUBOPT $AZ
+	    ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.TMVA $PARA BDT.L1.$DATE $S 0 $QSUBOPT $AZ
 ##########################################
 # CTA WP Phys files
 	  elif [[ $RUN == "PHYS" ]]
 	  then
-	    ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.R1.$DATE $OOTIME DESY.$DATE.Erec$EREC.R2.ID$ID$AZ$NTYPF.$S 1 $ID $S $QSUBOPT
+	    ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.L1.$DATE $OOTIME DESY.$DATE.Erec$EREC.L1.ID$ID$AZ$NTYPF.$S 1 $ID $S $QSUBOPT
 # unknown run set
 	  elif [[ $RUN != "EVNDISP" ]]
 	  then
