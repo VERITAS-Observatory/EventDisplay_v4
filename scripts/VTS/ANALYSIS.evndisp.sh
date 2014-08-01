@@ -26,10 +26,10 @@ optional parameters:
 			   other options:
 
 			   EVNDISP.reconstruction.runparameter.DISP		 (long sumwindow -> for use with CARE IRFs;
-										  DISP enabled, use RecID 11 in later stages to access it)
+										  DISP enabled, use RecID 1 in later stages to access it)
 										 
 			   EVNDISP.reconstruction.runparameter.SumWindow6-noDISP (short sumwindow -> for use with grisu IRFs; DISP disabled)
-			   EVNDISP.reconstruction.runparameter.SumWindow6-DISP	 (short sumwindow -> for use with grisu IRFs; DISP enabled [RecID 11])
+			   EVNDISP.reconstruction.runparameter.SumWindow6-DISP	 (short sumwindow -> for use with grisu IRFs; DISP enabled [RecID 1])
 
     [calibration]
 	  0		    neither tzero nor pedestal calculation is performed, must have the calibration results

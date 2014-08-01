@@ -360,7 +360,7 @@ fi
 
 function setupFilteredRunlists {
 	if [[ "$SCIPIPE_USEDISP" == "yes" ]] ; then
-		TABLEDISPCODE="ID11"
+		TABLEDISPCODE="ID1"
 	else
 		TABLEDISPCODE="ID0"
 	fi

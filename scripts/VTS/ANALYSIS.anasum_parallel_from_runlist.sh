@@ -30,7 +30,7 @@ optional parameters:
 
     [sim type]              use IRFs derived from this simulation type (e.g. GRISU, CARE)
 
-    [baseID]                (should be 0 or 11 in the current release candidate)
+    [baseID]                (should be 0 or 1 in the current release)
 
 IMPORTANT! Run ANALYSIS.anasum_combine.sh once all parallel jobs have finished!
 

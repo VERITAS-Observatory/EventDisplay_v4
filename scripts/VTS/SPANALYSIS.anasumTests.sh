@@ -32,20 +32,19 @@ LIST="runlist_releaseTesting"
 # for C in soft softExt moderateExt2tel hard2Exttel
 
 # object
-for O in Crab M82 PKS1424p240 Tycho
+# for O in Crab M82 PKS1424p240 Tycho
+for O in Tycho PKS1424p240 M82
 do
     # cut
 #    for C in moderate2tel
-#    for C in moderate2tel superhard hard2tel soft moderateopen softopen hardopen moderate3tel hard3tel softExt moderateExt2tel hard2Exttel
     for C in moderate2tel superhard hard2tel soft moderateopen softopen hardopen moderate3tel hard3tel softExt moderateExt2tel hard2Exttel
     do
         # reconstruction ID
-        for ID in 0 11
+        for ID in 0 1
         do 
            for D in v447
            do
-#              for BC in RE RB
-             for BC in RB
+              for BC in RE RB
               do
                     IDIR="$VERITAS_USER_DATA_DIR/analysis/Results/${D}/$O/${DATE}/${D}/RecID${ID}_${SIMTYPE}"
                     ODIR="$VERITAS_USER_DATA_DIR/analysis/Results/${D}/$O/${DATE}/${D}_${EPOCH}_anasum/${D}_ID${ID}_${C}_${BC}"
@@ -58,8 +57,8 @@ do
                     echo $RLIST
 
                     rm -f $ODIR.log
-#               $EVNDISPSYS/bin/anasum -d $ODIR -i 1 -f $RUNPAR -l $ODIR/$C.anasum.dat -o $ODIR.root > $ODIR.log  
-                   ./ANALYSIS.anasum_parallel_from_runlist.sh ${RLIST} $ODIR $C ${BC} $RUNPAR $IDIR $SIMTYPE $ID
+               $EVNDISPSYS/bin/anasum -d $ODIR -i 1 -f $RUNPAR -l $ODIR/$C.anasum.dat -o $ODIR.root > $ODIR.log  
+#                   ./ANALYSIS.anasum_parallel_from_runlist.sh ${RLIST} $ODIR $C ${BC} $RUNPAR $IDIR $SIMTYPE $ID
                    echo "DONE $ODIR"
                done
            done

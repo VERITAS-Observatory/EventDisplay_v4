@@ -96,15 +96,16 @@ SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.effective_area_combine_sub
 
 # telescope combinations
 [[ $RECID == 0 ]] && T="1234"
-[[ $RECID == 1 ]] && T="234"
-[[ $RECID == 2 ]] && T="134"
-[[ $RECID == 3 ]] && T="124"
-[[ $RECID == 4 ]] && T="123"
-[[ $RECID == 11 ]] && T="1234"
-[[ $RECID == 12 ]] && T="234"
-[[ $RECID == 13 ]] && T="134"
-[[ $RECID == 14 ]] && T="124"
-[[ $RECID == 15 ]] && T="123"
+[[ $RECID == 2 ]] && T="234"
+[[ $RECID == 3 ]] && T="134"
+[[ $RECID == 4 ]] && T="124"
+[[ $RECID == 5 ]] && T="123"
+[[ $RECID == 6 ]] && T="12"
+[[ $RECID == 1 ]] && T="1234"
+[[ $RECID == 7 ]] && T="234"
+[[ $RECID == 8 ]] && T="134"
+[[ $RECID == 9 ]] && T="124"
+[[ $RECID == 10 ]] && T="123"
 
 # loop over all files/cases
 echo "Processing epoch $EPOCH, atmosphere ATM$ATMOS, RecID $RECID (telescope combination T${T})"

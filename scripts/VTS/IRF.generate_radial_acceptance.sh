@@ -91,21 +91,16 @@ for CUTS in ${CUTLIST[@]}; do
 
             # telescope combinations
             [[ $ID == "0" ]] && TELES="1234"
-            [[ $ID == "1" ]] && TELES="234"
-            [[ $ID == "2" ]] && TELES="134"
-            [[ $ID == "3" ]] && TELES="124"
-            [[ $ID == "4" ]] && TELES="123"
-            [[ $ID == "5" ]] && TELES="12"
-            [[ $ID == "6" ]] && TELES="1234"
+            [[ $ID == "2" ]] && TELES="234"
+            [[ $ID == "3" ]] && TELES="134"
+            [[ $ID == "4" ]] && TELES="124"
+            [[ $ID == "5" ]] && TELES="123"
+            [[ $ID == "7" ]] && TELES="12"
+            [[ $ID == "1" ]] && TELES="1234"
             [[ $ID == "7" ]] && TELES="234"
             [[ $ID == "8" ]] && TELES="134"
             [[ $ID == "9" ]] && TELES="124"
             [[ $ID == "10" ]] && TELES="123"
-            [[ $RECID == 11 ]] && TELES="1234"
-            [[ $RECID == 12 ]] && TELES="234"
-            [[ $RECID == 13 ]] && TELES="134"
-            [[ $RECID == 14 ]] && TELES="124"
-            [[ $RECID == 15 ]] && TELES="123"
 
             # Check that cuts file exists
             CUTSNAME=${CUTS%%.dat}.dat
