@@ -221,10 +221,22 @@ fi
 if $HELPFLAG ; then
 	echo
 	echo "`basename $0`:"
-	echo " Turn a runlist into a list of Effective Area, GammaHadron, and Radial Acceptance files"
-	echo "  $ `basename $0` [soft|moderate|hard] <GHdatecode> <RAdatecode> <EFdatecode1> <EFdatecode2> <TAdatecode> <ntel> <runlist>" ; echo
-	echo " Example:"
-	echo "  $ `basename $0` soft 20130411 3 myrunlist.dat" ; echo
+	echo " Turn a runlist and settings into a list of Effective Area, GammaHadron, and Radial Acceptance files"
+	echo "  $ `basename $0` <settingsline> <runlist>" ; echo
+	echo " <settingsline> has the following format:"
+	echo "    -optionname:optionval-optionname:optionval-optionname:optionval-"
+	echo "    options for optionname include:"
+	echo "        CUTS           : cutname"
+	echo "        AUXVERRADEC    : 'auxv##', for radacc file"
+	echo "        AUXVEREFFAREA  : 'auxv##', for effarea file"
+	echo "        AUXVERTABLE    : 'auxv##', for table file"
+	echo "        AUXFILEEVNVER  : 'v###', for event display version"
+	echo "        AUXFILESIMDATE : simulation type and date, 'CARE_########' or 'GRISU_########'"
+	echo "        AUXFILEMINTEL  : minimum number of telescopes"
+	echo "        AUXFILESRCEXT  : source extension, either 'ExtendedSource' or 'Point'"
+	echo "        AUXFILEDISP    : whether disp was used or not, 'yes' for disp, 'no' for not-disp"
+	echo "        USEFROGS       : whether frogs was used or not, 'yes' for frogs, 'no' for not-frogs"
+	echo
 	echo " Output will have the format:"
 	echo
 	echo "R65742 ANASUM.GammaHadron.d20130411-cut-N3-Point-005CU-Soft.dat radialAcceptance-d20130411-cut-N3-Point-005CU-Soft-V6-T1234.root effArea-d20130411-cut-N3-Point-005CU-Soft-ATM21-V6-T1234-d20130521.root table_d20130521_GrIsuDec12_ATM21_V6_ID0"
@@ -425,10 +437,13 @@ MAXEPOCH=$( echo "$EPOCHTHRESH" | awk '{ print $3 }' | grep -oP "\d" | awk '{ if
 #echo "MINEPOCH:$MINEPOCH"
 #echo "MAXEPOCH:$MAXEPOCH"
 DISPCODE="DISPCODE_ERROR"
+METHCODE="METHCODE_ERROR"
 if [[ "$AUXFILE_DISP" == "yes" ]] ; then
-	DISPCODE="ID11"
+	#DISPCODE="DISP"
+	METHCODE="DISP"
 else
-	DISPCODE="ID0"
+	#DISPCODE="GEO"
+	METHCODE="GEO"
 fi
 
 # Loop over all runs in runlist
@@ -481,12 +496,6 @@ for i in ${RUNLIST[@]} ; do
 		FROGSCODE=""
 	fi
 
-	# array version
-	# HARDCODE
-	#if   [ "$i" -le "46641"                     ] ; then VERSIONCODE="V4"
-	#elif [ "$i" -ge "46642" -a "$i" -le "63372" ] ; then VERSIONCODE="V5"
-	#elif [                     "$i" -ge "63373" ] ; then VERSIONCODE="V6" ; fi
-	
 	# loop through all epochs between min and max
 	for epoch in $(seq $MINEPOCH $MAXEPOCH) ; do
 		
@@ -514,20 +523,25 @@ for i in ${RUNLIST[@]} ; do
 	GHCUTFILE="ANASUM.GammaHadron-Cut-${NTELCODE}-${AUXFILE_SRCEXT}-${ENERGYCODE}.dat"
 	huntForParameterFileName "GammaHadronCutFiles" "$GHCUTFILE" "$i"
 
+	CUTSNAME="Cut-${NTELCODE}-${AUXFILE_SRCEXT}-${ENERGYCODE}"
+	
 	# Example: RadialAcceptances/radialAcceptance-d20130411-cut-N3-Point-005CU-Soft-V5-T234.root
 	#ACCEPFILE="radialAcceptance-d${RADATECODE}-cut-${NTELCODE}-Point-005CU-${ENERGYCODE}-${VERSIONCODE}-${TELCOMBOCODE}.root"
-	ACCEPFILE="radialAcceptance-${AUXFILE_EVNVER}-${AUXVER_RADACC}-Cut-${NTELCODE}-${AUXFILE_SRCEXT}-${ENERGYCODE}-${DISPCODE}-${VERSIONCODE}-${TELCOMBOCODE}.root"
+	#ACCEPFILE="radialAcceptance-${AUXFILE_EVNVER}-${AUXVER_RADACC}-Cut-${NTELCODE}-${AUXFILE_SRCEXT}-${ENERGYCODE}-${DISPCODE}-${VERSIONCODE}-${TELCOMBOCODE}.root"
+	ACCEPFILE="radialAcceptance-${AUXFILE_EVNVER}-${AUXVER_RADACC}-$CUTSNAME-$METHCODE-${VERSIONCODE}-${TELCOMBOCODE}.root"
 	huntForParameterFileName "RadialAcceptances" "$ACCEPFILE" "$i"
 
 	# Example: EffectiveAreas/effArea-d20130411-cut-N3-Point-005CU-Soft-ATM22-V5-T1234-d20130521.root
 	#echo -e "${COTYELLOW}Warning, Effective area probably depends on if we're using frogs or not.  Fix!!!!$CONORM" >&2
 	#AREAFILE="effArea-d${EFDATECODE1}-cut-${NTELCODE}-Point-005CU-${ENERGYCODE}-${ATMOCODE}-${VERSIONCODE}-${TELCOMBOCODE}-d${EFDATECODE2}.root"
-	AREAFILE="effArea-${AUXFILE_EVNVER}-${AUXVER_EFFAREA}-${AUXFILE_SIMDATE}-Cut-${NTELCODE}-${AUXFILE_SRCEXT}-${ENERGYCODE}-${DISPCODE}-${VERSIONCODE}-${ATMOCODE}-${TELCOMBOCODE}.root"
+	#AREAFILE="effArea-${AUXFILE_EVNVER}-${AUXVER_EFFAREA}-${AUXFILE_SIMDATE}-Cut-${NTELCODE}-${AUXFILE_SRCEXT}-${ENERGYCODE}-${DISPCODE}-${VERSIONCODE}-${ATMOCODE}-${TELCOMBOCODE}.root"
+	AREAFILE="effArea-${AUXFILE_EVNVER}-${AUXVER_EFFAREA}-${AUXFILE_SIMDATE}-$CUTSNAME-$METHCODE-${VERSIONCODE}-${ATMOCODE}-${TELCOMBOCODE}.root"
 	huntForParameterFileName "EffectiveAreas" "$AREAFILE" "$i"
 
 	# Example: Tables/table_d20130521_GrIsuDec12_ATM22_V5_ID0
 	#TABLEFILE="table_d${TADATECODE}_GrIsuDec12_${ATMOCODE}_${VERSIONCODE}_ID0"
-	TABLEFILE="table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-${ATMOCODE}-${VERSIONCODE}-${DISPCODE}"
+	#TABLEFILE="table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-${ATMOCODE}-${VERSIONCODE}-${DISPCODE}"
+	TABLEFILE="table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-${ATMOCODE}-${VERSIONCODE}-${METHCODE}"
 	huntForParameterFileName "Tables" "${TABLEFILE}.root" "$i"
 
 	# output format, print to screen, for each run:
@@ -540,7 +554,9 @@ if ! $ALLFILESGOOD ; then
 	echoerr ""
 	echoerr "${CORED}Warning! Some needed files do not exist anywhere in \$VERITAS_EVNDISP_AUX_DIR or in the global dir `readlink -m $VERITAS_EVNDISP_AUX_DIR/GlobalDir`." >&2
 	echoerr "${CORED}List of missing files:"
-	for i in "${MISSINGFILELIST[@]}" ; do
+	#for i in "${MISSINGFILELIST[@]}" ; do
+	
+	for i in `echo "${MISSINGFILELIST[@]}" | sort | uniq` ; do
 		echoerr "${COTRED}$i${CONORM}"
 	done
 	echoerr "   Please check that the red files exist, and if not, TELL SOMEONE!!${CONORM}" >&2
