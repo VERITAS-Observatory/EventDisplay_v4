@@ -95,7 +95,7 @@ for CUTS in ${CUTLIST[@]}; do
             [[ $ID == "3" ]] && TELES="134"
             [[ $ID == "4" ]] && TELES="124"
             [[ $ID == "5" ]] && TELES="123"
-            [[ $ID == "7" ]] && TELES="12"
+            [[ $ID == "6" ]] && TELES="12"
             [[ $ID == "1" ]] && TELES="1234"
             [[ $ID == "7" ]] && TELES="234"
             [[ $ID == "8" ]] && TELES="134"
@@ -114,9 +114,9 @@ for CUTS in ${CUTLIST[@]}; do
             fi
             
 			# Used Method (GEO or DISP)
-			if [[ $RECID == "0" || $RECID == "2" || $RECID == "3" || $RECID == "4" || $RECID == "5" || $RECID == "6" ]];then
+			if [[ $ID == "0" || $ID == "2" || $ID == "3" || $ID == "4" || $ID == "5" || $ID == "6" ]];then
 				METH = "GEO"
-			elif [[ $RECID == "1" || $RECID == "7" || $RECID == "8" || $RECID == "9" || $RECID == "10" ]]; then 
+			elif [[ $ID == "1" || $ID == "7" || $ID == "8" || $ID == "9" || $ID == "10" ]]; then 
 				METH = "DISP"
 			fi
 
