@@ -84,6 +84,13 @@ fi
 # (REC ID is set later)
 TABLEFILE="table-${EDVERSION}-${AUX}-${SIMTYPE}-ATM${ATMOS}-${EPOCH}-ID"
 
+# combined table file name
+if [[ $RECID == "0" || $RECID == "2" || $RECID == "3" || $RECID == "4" || $RECID == "5" || $RECID == "6" ]];then
+    METH = "GEO"
+elif [[ $RECID == "1" || $RECID == "7" || $RECID == "8" || $RECID == "9" || $RECID == "10" ]]; then 
+    METH = "DISP"
+fi
+TABLECOM="table-${EDVERSION}-${AUX}-${SIMTYPE}-ATM${ATMOS}-${EPOCH}-${METH}"
 
 # Set gamma/hadron cuts
 if [[ $CUTSLISTFILE != "" ]]; then
@@ -118,10 +125,10 @@ for VX in $EPOCH; do
        ######################
        # combine lookup tables
        if [[ $IRFTYPE == "COMBINETABLES" ]]; then
-            TFIL="${TABLEFILE/VX/$VX}"
+            TFIL="${TABLECOM}"
             for ID in $RECID; do
                 echo "combine lookup tables"
-                ./IRF.combine_lookup_table_parts.sh "${TFIL}${ID}" $VX $ATM $ID $SIMTYPE
+                ./IRF.combine_lookup_table_parts.sh "${TFIL}" $VX $ATM $ID $SIMTYPE 
             done
             continue
        fi

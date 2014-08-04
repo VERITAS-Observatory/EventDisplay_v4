@@ -3,10 +3,10 @@
 
 ## HARD-CODED VALUES
 # evndisp reconstruction runparamter
-ACUT="EVNDISP.reconstruction.SW18_noDoublePass.runparameter"
-ACUT="EVNDISP.reconstruction.runparameter"
+ACUTS="EVNDISP.reconstruction.SW18_noDoublePass.runparameter"
+ACUTS="EVNDISP.reconstruction.runparameter"
 # run options
-OPT="-display=1 -reconstructionparameter $ACUT -vbfnsamples "
+OPT="-display=1 -reconstructionparameter $ACUTS -vbfnsamples "
 ## END OF HARD-CODED VALUES
 
 if [ ! -n "$1" ] || [ "$1" = "-h" ]; then

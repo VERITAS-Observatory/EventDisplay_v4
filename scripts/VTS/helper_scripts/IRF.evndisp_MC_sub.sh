@@ -38,13 +38,13 @@ fi
 #################################
 # detector configuration and cuts
 # no disp, long integration window
-# ACUT="EVNDISP.reconstruction.runparameter"
+# ACUTS="EVNDISP.reconstruction.runparameter"
 # disp, long integration window
-ACUT="EVNDISP.reconstruction.runparameter.DISP"
+ACUTS="EVNDISP.reconstruction.runparameter.DISP"
 # no disp, short integration window
-#ACUT="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
+#ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
 # disp, short integration window
-# ACUT="EVNDISP.reconstruction.runparameter.SumWindow6-DISP"
+# ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-DISP"
 
 
 DEAD="EVNDISP.validchannels.dat"
@@ -166,7 +166,7 @@ fi
 # calculate tzeros
 if [[ $USEFROGS != "1" ]]; then
     echo "Calculating average tzeros for run $RUNNUM"
-    MCOPT="-runmode=7 -sourcetype=2 -epoch $EPOCH -camera=$CFG -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo -calibrationnevents=100000 -calibrationdirectory $ODIR -reconstructionparameter $ACUT -pedestalnoiselevel=$NOISE "
+    MCOPT="-runmode=7 -sourcetype=2 -epoch $EPOCH -camera=$CFG -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo -calibrationnevents=100000 -calibrationdirectory $ODIR -reconstructionparameter $ACUTS -pedestalnoiselevel=$NOISE "
     rm -f $ODIR/$RUNNUM.tzero.log
     ### eventdisplay GRISU run options
     if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
@@ -189,7 +189,7 @@ if [[ $USEFROGS == "1" ]]; then
     FROGS="-frogs $MSCWDIR/$MSCWFILE -frogid 0 -nevents=$NEVENTS -firstevent=$FIRSTEVENT"
 fi
 # run options
-MCOPT=" -runnumber=$RUNNUM -sourcetype=2 -epoch $EPOCH -camera=$CFG -reconstructionparameter $ACUT -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory $ODIR"
+MCOPT=" -runnumber=$RUNNUM -sourcetype=2 -epoch $EPOCH -camera=$CFG -reconstructionparameter $ACUTS -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -arraycuts $ACUTS -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory $ODIR"
 # special options for GRISU
 if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     MCOPT="$MCOPT -simu_hilo_from_simfile -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"

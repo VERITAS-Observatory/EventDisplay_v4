@@ -51,9 +51,9 @@ OPT="-display=1 -simu_hilo_from_simfile -runnumber=$RUNNUM -plotmethod=0 -source
 # DEAD="deadChannelDefinition_VERITAS_MC_d20101110.dat"
 
 # array analysis cuts
-ACUT="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
+ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
 
 # $EVNDISPSYS/bin/evndisp -sourcefile $SIMFILE -pedestalfile $NOISE -deadchannelfile $DEAD -pedestalDefaultPedestal=$PEDLEV -arraycuts $ACUTS $OPT
-$EVNDISPSYS/bin/evndisp -nodp2005 -donotusedbinfo -sourcefile $SIMFILE -pedestalfile $NOISEFILE -pedestalDefaultPedestal=$PEDLEV $OPT -reconstructionparameter $ACUT
+$EVNDISPSYS/bin/evndisp -nodp2005 -donotusedbinfo -sourcefile $SIMFILE -pedestalfile $NOISEFILE -pedestalDefaultPedestal=$PEDLEV $OPT -reconstructionparameter $ACUTS
 
 exit

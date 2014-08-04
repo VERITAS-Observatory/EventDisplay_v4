@@ -110,9 +110,14 @@ SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.effective_area_combine_sub
 # loop over all files/cases
 echo "Processing epoch $EPOCH, atmosphere ATM$ATMOS, RecID $RECID (telescope combination T${T})"
 
-
 # output effective area name
-OFILE="effArea-${EDVERSION}-${EANAME}-$SIMTYPE-${CUTS_NAME}-ID${RECID}-${EPOCH}-ATM${ATMOS}-T${T}"
+#OFILE="effArea-${EDVERSION}-${EANAME}-$SIMTYPE-${CUTS_NAME}-ID${RECID}-${EPOCH}-ATM${ATMOS}-T${T}"
+if [[ $RECID == "0" || $RECID == "2" || $RECID == "3" || $RECID == "4" || $RECID == "5" || $RECID == "6" ]];then
+    METH = "GEO"
+elif [[ $RECID == "1" || $RECID == "7" || $RECID == "8" || $RECID == "9" || $RECID == "10" ]]; then 
+    METH = "DISP"
+fi
+OFILE="effArea-${EDVERSION}-${EANAME}-$SIMTYPE-${CUTS_NAME}-${METH}-${EPOCH}-ATM${ATMOS}-T${T}"
 
 FSCRIPT="$LOGDIR/COMB-EFFAREA-$CUTSFILE-ATM$ATMOS-$EPOCH-ID$RECID"
 rm -f $FSCRIPT.sh
