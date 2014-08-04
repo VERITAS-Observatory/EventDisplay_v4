@@ -13,18 +13,21 @@ ANALYSIS.mscw_energy.sh <table file> <runlist> [evndisp directory] [Rec ID] [out
 
 required parameters:
 
-    <table file>            mscw_energy lookup table file
-
-    <runlist>               simple run list with one run number per line
-    
+    <table file>            mscw_energy lookup table file. Expected in $VERITAS_EVENTDISPLAY_AUX_DIR/Tables.
+				For example:
+				table-v451-auxv01-CARE-ATM21-V6-DISP.root
+				table-v451-auxv01-GRISU-SW6-ATM22-V5-GEO.root
+			
+    <runlist>               simple run list with one run number per line.    
     
 optional parameters:
     
     [evndisp directory]     directory containing evndisp output ROOT files
 
-    [Rec ID]                reconstruction ID
+    [Rec ID]                reconstruction ID. Default 0.
                             (see EVNDISP.reconstruction.runparameter)
-                            Set to 0 for all telescopes, 1 to cut T1, etc.
+                            Use 0 for geometrical reconstruction (with GEO table)
+			    Use 1 for disp reconstruction (with DISP table).
     
     [output directory]      directory where mscw.root files are written
                             default: <evndisp directory>

@@ -6,7 +6,7 @@ if [[ $# < 4 ]]; then
 echo "
 ANASUM parallel data analysis: submit jobs using a simple run list
 
-ANALYSIS.anasum_parallel_from_runlist.sh <run list> <output directory> <cut set> <background model> [run parameter file] [mscw directory] [sim type] [baseID]
+ANALYSIS.anasum_parallel_from_runlist.sh <run list> <output directory> <cut set> <background model> [run parameter file] [mscw directory] [sim type] [method] [force atmosphere] 
 
 required parameters:
 
@@ -15,7 +15,7 @@ required parameters:
     <output directory>      anasum output files are written to this directory
                         
     <cut set>               hardcoded cut sets predefined in the script
-                            (e.g., soft, moderate, etc.)
+                            (e.g., soft2tel, moderate3tel, etc.)
     
     <background model>      background model
                             (RE = reflected region, RB = ring background)
@@ -26,11 +26,18 @@ optional parameters:
                             \$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/;
                             default is ANASUM.runparameter)
 
-    [mscw directory]        directory containing the mscw.root files
+    [mscw directory]        directory containing the mscw.root files.
+			    Default: $VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/RecID0
 
-    [sim type]              use IRFs derived from this simulation type (e.g. GRISU, CARE)
+    [sim type]              use IRFs derived from this simulation type (GRISU-SW6 or CARE)
+			    Default: CARE
 
-    [baseID]                (should be 0 or 1 in the current release)
+    [method]                reconstruction method: GEO or DISP.
+			    Default: GEO
+
+    [force atmosphere]	    use EAs generated with this atmospheric model.
+			    Default: Atmosphere determined from run date for each run.				
+			    Attention: Must use the same atmospere that was used for the lookup tables!
 
 IMPORTANT! Run ANALYSIS.anasum_combine.sh once all parallel jobs have finished!
 
@@ -39,6 +46,14 @@ IMPORTANT! Run ANALYSIS.anasum_combine.sh once all parallel jobs have finished!
 #end help message
 exit
 fi
+
+# EventDisplay version
+EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .`
+
+###########################
+# IRFs
+IRFVERSION="v451"
+AUXVERSION="auxv01"
 
 # Run init script
 bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
@@ -54,12 +69,10 @@ CUTS=$3
 BACKGND=$4
 [[ "$5" ]] && RUNP=$5  || RUNP="ANASUM.runparameter"
 [[ "$6" ]] && INDIR=$6 || INDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/RecID0"
-[[ "$7" ]] && SIMTYPE=$7 || SIMTYPE="GRISU"
-[[ "$8" ]] && BASEID=$8 || BASEID="0"
+[[ "$7" ]] && SIMTYPE=$7 || SIMTYPE="CARE"
+[[ "$8" ]] && METH=$8 || METH="GEO"
+[[ "$9" ]] && FORCEDATMO=$9 
 
-###########################
-# IRFs
-IRFVERSION="v447-auxv01"
 
 # cut definitions (note: VX to be replaced later in script)
 if [[ $CUTS == *superhard* ]]; then
@@ -93,10 +106,13 @@ else
     exit 1
 fi
 CUTFILE="ANASUM.GammaHadron-Cut-${CUT}.dat"
-EFFAREA="effArea-${IRFVERSION}-${SIMTYPE}-Cut-${CUT}-ID${BASEID}-VX-ATMXX-TX.root"
-RADACC="radialAcceptance-${IRFVERSION}-Cut-${CUT}-ID${BASEID}-VX-TX.root"
+# EFFAREA="effArea-${IRFVERSION}-${SIMTYPE}-Cut-${CUT}-ID${BASEID}-VX-ATMXX-TX.root"
+# RADACC="radialAcceptance-${IRFVERSION}-Cut-${CUT}-ID${BASEID}-VX-TX.root"
 # preliminary: use ID0 for all data
-RADACC="radialAcceptance-${IRFVERSION}-Cut-${CUT}-ID0-VX-TX.root"
+# RADACC="radialAcceptance-${IRFVERSION}-Cut-${CUT}-ID0-VX-TX.root"
+
+EFFAREA="effArea-${IRFVERSION}-${AUXVERSION}-$SIMTYPE-Cut-${CUT}-${METH}-VX-ATMXX-TX.root"
+RADACC="radialAcceptance-${IRFVERSION}-${AUXVERSION}-Cut-${CUT}-${METH}-VX-TX.root"
 
 echo $CUTFILE
 echo $EFFAREA
@@ -155,13 +171,13 @@ RUNS=`cat $RLIST`
 for RUN in ${RUNS[@]}; do
     # get array epoch and atmosphere for the run
     EPOCH=`getRunArrayVersion $RUN`
-    ATMO=`getRunAtmosphere $RUN $INDIR/$RUN.mscw.root`
-    # ATMO="21"
+    ATMO=${FORCEDATMO:-`getRunAtmosphere $RUN $INDIR/$RUN.mscw.root`} 
     if [[ $ATMO == "error" ]]; then
        echo "error finding atmosphere; skipping run $RUN"
        continue
     fi
     echo "RUN $RUN at epoch $EPOCH and atmosphere $ATMO"
+ 
     TELTOANA=`$EVNDISPSYS/bin/printRunParameter $INDIR/$RUN.mscw.root -teltoana`
     TELTOANA="T$TELTOANA"
     
