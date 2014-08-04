@@ -113,10 +113,18 @@ for CUTS in ${CUTLIST[@]}; do
                 exit 1
             fi
             
+			# Used Method (GEO or DISP)
+			if [[ $RECID == "0" || $RECID == "2" || $RECID == "3" || $RECID == "4" || $RECID == "5" || $RECID == "6" ]];then
+				METH = "GEO"
+			elif [[ $RECID == "1" || $RECID == "7" || $RECID == "8" || $RECID == "9" || $RECID == "10" ]]; then 
+				METH = "DISP"
+			fi
+
             # Generate base file name based on cuts file
             CUTSNAME=${CUTSNAME##ANASUM.GammaHadron-}
             CUTSNAME=${CUTSNAME%%.dat}
-            OFILE="radialAcceptance-${EDVERSION}-${AUX}-$CUTSNAME-ID${RECID}-$VX-T$TELES"
+            #OFILE="radialAcceptance-${EDVERSION}-${AUX}-$CUTSNAME-ID${RECID}-$VX-T$TELES"
+			OFILE="radialAcceptance-${EDVERSION}-${AUX}-$CUTSNAME-${METH}-$VX-T$TELES"
             ODIR="$VERITAS_IRFPRODUCTION_DIR/RadialAcceptances"
             mkdir -p $ODIR
 			chmod -R g+w $ODIR
