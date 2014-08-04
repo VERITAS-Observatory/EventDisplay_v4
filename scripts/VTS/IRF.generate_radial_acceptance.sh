@@ -123,7 +123,6 @@ for CUTS in ${CUTLIST[@]}; do
             # Generate base file name based on cuts file
             CUTSNAME=${CUTSNAME##ANASUM.GammaHadron-}
             CUTSNAME=${CUTSNAME%%.dat}
-            #OFILE="radialAcceptance-${EDVERSION}-${AUX}-$CUTSNAME-ID${RECID}-$VX-T$TELES"
 			OFILE="radialAcceptance-${EDVERSION}-${AUX}-$CUTSNAME-${METH}-$VX-T$TELES"
             ODIR="$VERITAS_IRFPRODUCTION_DIR/RadialAcceptances"
             mkdir -p $ODIR
