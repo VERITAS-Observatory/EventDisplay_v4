@@ -99,7 +99,7 @@ if [[ $CUTSLISTFILE != "" ]]; then
         exit 1
     fi
     # read file containing list of cuts
-    IFS=$'\r\n' CUTLIST=($(cat $CUTLISTFILE))
+    IFS=$'\r\n' CUTLIST=($(cat $CUTSLISTFILE))
 else
     # default list of cuts
     CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat 
