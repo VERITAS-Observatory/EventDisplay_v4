@@ -9,7 +9,7 @@ if [[ $# < 2 ]]; then
 echo "
 EVNDISP DST maker: submit jobs from a simple run list
 
-UTILITY.make_DST.sh <runlist> <summation window> [pedestal calculation]
+UTILITY.make_DST.sh <runlist> <summation window> [pedestal calculation] [LMULT] [output dir] [run parameter file]
 
 required parameters:
 
@@ -19,9 +19,17 @@ required parameters:
 
 optional parameters:
 
-    [pedestal calculation]  flag to specify if pedestals are calculated
+    [pedestal calculation]  flag to specify if pedestals/tzeros are calculated
                             (default = 1 = on)
 
+    [LMULT]		    Make DSTs for LMULT calculation (use all events, special low gain calib file) 
+			    Default: 0 (off), only the first 5000 events are analysed.
+
+    [output dir] 	    Output directory
+			    Default: \$VERITAS_USER_DATA_DIR/analysis/EVD400_DST/\$SUMW/
+
+    [runparameter file]     file with integration window size and reconstruction cuts/methods, expected in $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/
+			    Default: EVNDISP.reconstruction.LMULT.SWXX.runparameter, sed -e \"s/XX/\$SUMW/g\"
 --------------------------------------------------------------------------------   
 "
 #end help message
@@ -36,6 +44,9 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 RLIST=$1
 SUMW=$2
 [[ "$3" ]] && PED=$3 || PED="1"
+[[ "$4" ]] && LMULT=$4 || LMULT="0"
+[[ "$5" ]] && ODIR=$5 || ODIR="$VERITAS_USER_DATA_DIR/analysis/EVD400_DST/$SUMW/"
+[[ "$6" ]] && RUNPFILE=$6 
 
 # Read runlist
 if [[ ! -f "$RLIST" ]]; then
@@ -50,6 +61,22 @@ LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/EVNDISP.ANADATA"
 echo -e "Log files will be written to:\n $LOGDIR"
 mkdir -p $LOGDIR
 
+
+# check for the existence of a run parameter file corresponding
+# to the given summation window; if it exists, remove it and replace it
+# with the LOWGAIN runparameter file, modified for the given sum window
+RUNPDIR="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/"
+
+if [[ -z $RUNPFILE ]]; then
+
+	RUNPFILE="EVNDISP.reconstruction.LMULT.SW$SUMW.runparameter"
+
+	if [ ! -e "$RUNPDIR/$RUNPFILE" ]; then
+    		sed -e "s|XX|$SUMW|g" $RUNPDIR/EVNDISP.reconstruction.LMULT.SWXX.runparameter > $RUNPDIR/$RUNPFILE
+	fi
+fi
+
+
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.make_DST_sub"
 
@@ -61,6 +88,9 @@ for RUN in $RUNNUMS; do
 
     sed -e "s|RUNFILE|$RUN|" \
         -e "s|PEDESTALS|$PED|" \
+        -e "s|LLLOWGAIN|$LMULT|" \
+        -e "s|OUTPUTDIR|$ODIR|" \
+        -e "s|RRRRPFILE|$RUNPFILE|" \
         -e "s|SUMWINDOW|$SUMW|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
     chmod u+x $FSCRIPT.sh
@@ -74,6 +104,8 @@ for RUN in $RUNNUMS; do
 		echo "RUN $RUN: JOBID $JOBID"
     elif [[ $SUBC == *parallel* ]]; then
         echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
+    elif [[ $SUBC == *simple* ]]; then
+        $FSCRIPT.sh |& tee $FSCRIPT.log
     fi
 done
 
