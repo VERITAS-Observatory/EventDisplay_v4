@@ -944,7 +944,7 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
 			{
 				i_sT.fBackgroundModel = eRINGMODEL;
 			}
-			else if( temp == "OO" )
+			else if( temp == "OO" || temp == "ONOFF" )
 			{
 				i_sT.fBackgroundModel = eONOFF;
 			}

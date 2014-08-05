@@ -2,6 +2,10 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140805 (GM)
+fixed handling of observing time in anasum
+to correct on/off analysis
+
 * 20140801 (GM)
 changes reflecting the new quality cuts in the 
 reconstruction files

@@ -513,14 +513,16 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	}
 	
 	// calculate normalisation taking into account different length of on and off runs
-	double i_norm = 1.;;
+        // (values are in [s]
+	double i_normObsTime = 1.;
+        // safety net for very short runs (<10 s)
 	if( iexp_off < 10. )
 	{
-		i_norm = 1.;    // safety net for very short runs (<10 s)
+		i_normObsTime = 1.;
 	}
 	else
 	{
-		i_norm = iexp_on / iexp_off;
+		i_normObsTime = iexp_on / iexp_off;
 	}
 	
 	if( onrun != -1 && offrun != -1 )
@@ -528,9 +530,9 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 		cout << endl << "Mean properties for this pair: ON=" << onrun;
 		cout << ", OFF=" << offrun << " -----------------------------" << endl;
 	}
-	cout << "\t Exposure ON=" << iexp_on << " secs (" << iexp_on / 60. << "min)";
-	cout <<               "  OFF=" << iexp_off << " secs (" << iexp_off / 60. << "min),";
-	cout << " Normalization=" << i_norm << endl;
+	cout << "\t Exposure ON=" << iexp_on << " secs (" << iexp_on / 60. << " min)";
+	cout <<               "  OFF=" << iexp_off << " secs (" << iexp_off / 60. << " min),";
+	cout << " Normalization (due to run length differences between on/off)=" << i_normObsTime << endl;
 	cout << "\t Az range ON [" << fRunAzMinOn[onrun] << "," << fRunAzMaxOn[onrun] << "],";
 	cout << " OFF [" << fRunAzMinOff[offrun] << "," << fRunAzMaxOff[offrun] << "]" << endl;
 	
@@ -598,13 +600,13 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	}
 	////////////////////////////////////////////////////////////
 	// create alpha histogram for significance calculations
-	fStereoOff->scaleAlpha( i_norm, fStereoOn->getAlpha(), fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(),
+	fStereoOff->scaleAlpha( i_normObsTime, fStereoOn->getAlpha(), fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(),
 							fStereoOn->getMeanSignalBackgroundAreaRatio(), false, icounter );
-	fStereoOff->scaleAlpha( i_norm, fStereoOn->getAlphaUC(), fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(),
+	fStereoOff->scaleAlpha( i_normObsTime, fStereoOn->getAlphaUC(), fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(),
 							fStereoOn->getMeanSignalBackgroundAreaRatioUC(), true, icounter );
 							
 	////////////////////////////////////////////////////////////
-	// calulate significance in central bin (source bin)
+	// calulate significance in source bin
 	
 	// number of on events
 	double i_nevts_on = fStereoOn->getStereoSkyMap()->GetBinContent( fStereoOn->getStereoSkyMap()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ),
@@ -613,8 +615,8 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	double i_nevts_off = fStereoOff->getStereoSkyMap()->GetBinContent( fStereoOff->getStereoSkyMap()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ),
 						 fStereoOff->getStereoSkyMap()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
 	// normalization
-	double i_norm_alpha = i_norm * fStereoOff->getAlphaNorm()->GetBinContent( fStereoOff->getAlphaNorm()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ),
-						  fStereoOff->getAlphaNorm()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
+	double i_norm_alpha = fStereoOff->getAlphaNorm()->GetBinContent( fStereoOff->getAlphaNorm()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ),
+						                         fStereoOff->getAlphaNorm()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
 
 	double i_sig = VStatistics::calcSignificance( i_nevts_on, i_nevts_off, i_norm_alpha );
 	double i_rate = 0.;
@@ -624,7 +626,7 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	{
 		i_rate = ( i_nevts_on - i_norm_alpha * i_nevts_off ) * 60. / iexp_on;       // rates in 1/min
 		i_rateOFF = i_norm_alpha * i_nevts_off * 60. / iexp_off;                    // rates in 1/min
-                i_rateE = sqrt( i_nevts_on + i_norm * i_norm * i_norm_alpha * i_norm_alpha * i_nevts_off ) * 60. / iexp_on;
+                i_rateE = sqrt( i_nevts_on + i_norm_alpha * i_norm_alpha * i_nevts_off ) * 60. / iexp_on;
 	}
 	
 	cout << endl;
@@ -638,27 +640,19 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	cout << endl;
 	
 	////////////////////////////////////////////////////////////
-	// ON OFF Analysis
+	// ON / OFF Analysis
 	////////////////////////////////////////////////////////////
-	
-	////////////////////////////////////////////////////////////
-	// on-off analysis
-	
 	VOnOff* fstereo_onoff = new VOnOff();
 	
 	// 1D histograms
 	fstereo_onoff->doOnOffforParameterHistograms( fStereoOn->getParameterHistograms(),
 			fStereoOff->getParameterHistograms(),
-			i_norm, i_norm_alpha, ( onrun == -1 ) );
+			1., i_norm_alpha, ( onrun == -1 ) );
 			
 	// correlated maps
-	fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( false ),
-											fStereoOff->getSkyHistograms( false ),
-											i_norm, fStereoOff->getAlphaNorm() );
+	fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( false ), fStereoOff->getSkyHistograms( false ), 1., fStereoOff->getAlphaNorm() );
 	// uncorrelated maps
-	fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( true ),
-											fStereoOff->getSkyHistograms( true ),
-											i_norm, fStereoOff->getAlphaNormUC() );
+	fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( true ), fStereoOff->getSkyHistograms( true ), 1., fStereoOff->getAlphaNormUC() );
 											
 	// print out maximum in maps
 	cout << "\t Maximum in CORRELATED maps: " << endl;
@@ -667,12 +661,12 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	TH2D* hStSigUC = ( TH2D* )fstereo_onoff->do2DSignificance( fStereoOn->getStereoSkyMapUC(), fStereoOff->getStereoSkyMapUC(), fStereoOff->getAlphaNormUC() );
 	
 	// calculate q-factors
-	fstereo_onoff->doQfactors( fStereoOn->getParameterHistograms(), fStereoOff->getParameterHistograms(), i_norm );
+	fstereo_onoff->doQfactors( fStereoOn->getParameterHistograms(), fStereoOff->getParameterHistograms(), 1. );
 	
 	// fill rate graphs by run
 	if( onrun != -1 )
 	{
-		fRatePlots->fill( onrun, fStereoOn->getMJD( onrun ), i_sig, hStSig->GetMaximum(), i_nevts_on, i_nevts_off * i_norm, i_rate );
+		fRatePlots->fill( onrun, fStereoOn->getMJD( onrun ), i_sig, hStSig->GetMaximum(), i_nevts_on, i_nevts_off * 1. , i_rate );
 	}
 	
 	// rate graphs by interval

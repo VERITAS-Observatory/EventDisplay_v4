@@ -918,7 +918,7 @@ void VStereoAnalysis::writeDebugHistograms()
     this should only be called for OFF stereo analysis
 
 */
-void VStereoAnalysis::scaleAlpha( double inorm, TH2D* halpha_on, TH2D* h_ON, TH2D* h_OFF, TH1D* h_alpha_ratio, bool bUC, int icounter )
+void VStereoAnalysis::scaleAlpha( double inormObsTime, TH2D* halpha_on, TH2D* h_ON, TH2D* h_OFF, TH1D* h_alpha_ratio, bool bUC, int icounter )
 {
 	TH2D* halpha_off = 0;
 	TH2D* hmap_stereo_off = 0;
@@ -989,11 +989,12 @@ void VStereoAnalysis::scaleAlpha( double inorm, TH2D* halpha_on, TH2D* h_ON, TH2
 	// halpha_on: on alpha histogram
 	// halpha_off: off alpha histogram
 	// hmap_alphaNorm: alpha histogram used in significance calculations (alphaNorm)
-	halpha_off->Scale( inorm );
 	
         // individual runs
         if( fHisCounter > -1 )
         {
+               // take scaling according to observing time into account
+// !               halpha_off->Scale( inormObsTime );
 	       double iSignalBackgroundRatio = 1.;
 	       // normalize alpha (essentially 1./alpha_off)
 	       for( int i = 1; i <= halpha_off->GetNbinsX(); i++ )
@@ -1011,18 +1012,7 @@ void VStereoAnalysis::scaleAlpha( double inorm, TH2D* halpha_on, TH2D* h_ON, TH2
 					       iSignalBackgroundRatio = 1.;
 				       }
 				       // this one is used for the sky maps
-				       hmap_alphaNorm->SetBinContent( i, j, iSignalBackgroundRatio * halpha_on->GetBinContent( i, j ) / halpha_off->GetBinContent( i, j ) );
-				       // keep alpha off for debugging
-/*				       if( halpha_on->GetBinContent( i, j ) > 0. )
-				       {
-					       halpha_off->SetBinContent( i, j, halpha_off->GetBinContent( i, j ) / ( iSignalBackgroundRatio * halpha_on->GetBinContent( i, j ) ) );
-				       }
-				       else
-				       {
-					       halpha_off->SetBinContent( i, j, 0. );
-				       }
-				       // alpha on is only set if all off histos are set
-				       halpha_on->SetBinContent( i, j, iSignalBackgroundRatio ); */
+				       hmap_alphaNorm->SetBinContent( i, j, iSignalBackgroundRatio * halpha_on->GetBinContent( i, j ) / halpha_off->GetBinContent( i, j ) * inormObsTime );
 			       }
 			       else
 			       {
