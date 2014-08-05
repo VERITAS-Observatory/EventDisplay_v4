@@ -641,8 +641,6 @@ void VTableLookup::fillLookupTable()
 	//////////////////////////////////////////////////////////////////////////////////////
 	cout << "start event loop " << endl;
 	// read next event
-	// (read only parameters which are needed from file, VEvndispData::getNextEvent must be adjusted if additional
-	//  parameters are used while writing tables)
 	while( fData->getNextEvent( true ) )
 	{
 		fevent = fData->getEventCounter();
