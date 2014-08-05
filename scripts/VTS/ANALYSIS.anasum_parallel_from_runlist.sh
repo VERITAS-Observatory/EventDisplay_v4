@@ -106,11 +106,6 @@ else
     exit 1
 fi
 CUTFILE="ANASUM.GammaHadron-Cut-${CUT}.dat"
-# EFFAREA="effArea-${IRFVERSION}-${SIMTYPE}-Cut-${CUT}-ID${BASEID}-VX-ATMXX-TX.root"
-# RADACC="radialAcceptance-${IRFVERSION}-Cut-${CUT}-ID${BASEID}-VX-TX.root"
-# preliminary: use ID0 for all data
-# RADACC="radialAcceptance-${IRFVERSION}-Cut-${CUT}-ID0-VX-TX.root"
-
 EFFAREA="effArea-${IRFVERSION}-${AUXVERSION}-$SIMTYPE-Cut-${CUT}-${METH}-VX-ATMXX-TX.root"
 RADACC="radialAcceptance-${IRFVERSION}-${AUXVERSION}-Cut-${CUT}-${METH}-VX-TX.root"
 
