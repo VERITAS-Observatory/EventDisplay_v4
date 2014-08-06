@@ -114,11 +114,11 @@ for CUTS in ${CUTLIST[@]}; do
             fi
             
 			# Used Method (GEO or DISP)
-			if [[ $ID == "0" || $ID == "2" || $ID == "3" || $ID == "4" || $ID == "5" || $ID == "6" ]];then
-				METH = "GEO"
-			elif [[ $ID == "1" || $ID == "7" || $ID == "8" || $ID == "9" || $ID == "10" ]]; then 
-				METH = "DISP"
-			fi
+            if [[ $ID == "0" ]] || [[ $ID == "2" ]] || [[ $ID == "3" ]] || [[ $ID == "4" ]] || [[ $ID == "5" ]] || [[ $ID == "6" ]]; then
+		        METH="GEO"
+            elif [[ $ID == "1" ]] || [[ $ID == "7" ]] || [[ $ID == "8" ]] || [[ $ID == "9" ]] || [[ $ID == "10" ]]; then 
+		        METH="DISP"
+		    fi
 
             # Generate base file name based on cuts file
             CUTSNAME=${CUTSNAME##ANASUM.GammaHadron-}
