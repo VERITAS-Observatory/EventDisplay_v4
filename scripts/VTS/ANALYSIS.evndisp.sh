@@ -126,7 +126,7 @@ do
     echo $FSCRIPT.sh
 	# output selected input during submission:
 
-	echo "Using runparameter file $VERITAS_EVNDISP_AUX_DIR/$ACUTS"
+	echo "Using runparameter file $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/$ACUTS"
 
 	if [[ $MODEL3D == "0" ]]; then
 	echo "VPM is switched on (default)"
