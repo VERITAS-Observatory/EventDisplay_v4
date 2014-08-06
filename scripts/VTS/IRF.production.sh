@@ -85,12 +85,8 @@ fi
 TABLEFILE="table-${EDVERSION}-${AUX}-${SIMTYPE}-ATM${ATMOS}-${EPOCH}-ID"
 
 # combined table file name
-if [[ $RECID == "0" || $RECID == "2" || $RECID == "3" || $RECID == "4" || $RECID == "5" || $RECID == "6" ]];then
-    METH = "GEO"
-elif [[ $RECID == "1" || $RECID == "7" || $RECID == "8" || $RECID == "9" || $RECID == "10" ]]; then 
-    METH = "DISP"
-fi
-TABLECOM="table-${EDVERSION}-${AUX}-${SIMTYPE}-ATM${ATMOS}-${EPOCH}-${METH}"
+# (METHOD "DISP" or "GEO" is set later)
+TABLECOM="table-${EDVERSION}-${AUX}-${SIMTYPE}-ATM${ATMOS}-${EPOCH}-"
 
 # Set gamma/hadron cuts
 if [[ $CUTSLISTFILE != "" ]]; then
@@ -128,7 +124,12 @@ for VX in $EPOCH; do
             TFIL="${TABLECOM}"
             for ID in $RECID; do
                 echo "combine lookup tables"
-                ./IRF.combine_lookup_table_parts.sh "${TFIL}" $VX $ATM $ID $SIMTYPE 
+                if [[ $ID == "0" ]] || [[ $ID == "2" ]] || [[ $ID == "3" ]] || [[ $ID == "4" ]] || [[ $ID == "5" ]] || [[ $ID == "6" ]]; then
+		            METH="GEO"
+                elif [[ $ID == "1" ]] || [[ $ID == "7" ]] || [[ $ID == "8" ]] || [[ $ID == "9" ]] || [[ $ID == "10" ]]; then 
+		            METH="DISP"
+		        fi
+                ./IRF.combine_lookup_table_parts.sh "${TFIL}${METH}" $VX $ATM $ID $SIMTYPE 
             done
             continue
        fi
@@ -180,14 +181,14 @@ for VX in $EPOCH; do
                         TFIL="${TABLEFILE/VX/$VX}"
                         # note: the IDs dependent on what is written in EVNDISP.reconstruction.runparameter
                         for ID in $RECID; do
-                           if [ "$ID" -le "5" ]; then
-                               TFILID=${TFIL}0
-                           elif [ "$ID" -le "10" ]; then
-                               TFILID=${TFIL}6
-                           else       
-                               TFILID=${TFIL}11
-                           fi
-                           ./IRF.mscw_energy_MC.sh $TFILID $VX $ATM $ZA $WOBBLE $NOISE $ID $SIMTYPE
+                            if [[ $ID == "0" ]] || [[ $ID == "2" ]] || [[ $ID == "3" ]] || [[ $ID == "4" ]] || [[ $ID == "5" ]] || [[ $ID == "6" ]]; then
+			                    METH="GEO"
+				                TFILID=$TFIL$METH
+			                elif [[ $ID == "1" ]] || [[ $ID == "7" ]] || [[ $ID == "8" ]] || [[ $ID == "9" ]] || [[ $ID == "10" ]]; then 
+				                METH="DISP"
+				                TFILID=$TFIL$METH
+			                fi
+			                ./IRF.mscw_energy_MC.sh $TFILID $VX $ATM $ZA $WOBBLE $NOISE $ID $SIMTYPE
                         done
                     ######################
                     # analyse effective areas

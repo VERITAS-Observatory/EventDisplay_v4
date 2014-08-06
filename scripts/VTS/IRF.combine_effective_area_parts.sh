@@ -73,7 +73,7 @@ if [[ ! -d $INDIR ]]; then
     echo "$INDIR"
     exit 1
 fi
-INFILES="$INDIR/*ID${RECID}*.root"
+INFILES="$INDIR/*ID${RECID}-*.root"
 echo "Input file directory: $INDIR"
 echo "Input files: $INFILES"
 
@@ -112,11 +112,13 @@ echo "Processing epoch $EPOCH, atmosphere ATM$ATMOS, RecID $RECID (telescope com
 
 # output effective area name
 #OFILE="effArea-${EDVERSION}-${EANAME}-$SIMTYPE-${CUTS_NAME}-ID${RECID}-${EPOCH}-ATM${ATMOS}-T${T}"
-if [[ $RECID == "0" || $RECID == "2" || $RECID == "3" || $RECID == "4" || $RECID == "5" || $RECID == "6" ]];then
-    METH = "GEO"
-elif [[ $RECID == "1" || $RECID == "7" || $RECID == "8" || $RECID == "9" || $RECID == "10" ]]; then 
-    METH = "DISP"
-fi
+for ID in $RECID;do
+    if [[ $ID == "0" ]] || [[ $ID == "2" ]] || [[ $ID == "3" ]] || [[ $ID == "4" ]] || [[ $ID == "5" ]] || [[ $ID == "6" ]]; then
+        METH="GEO" 
+    elif [[ $ID == "1" ]] || [[ $ID == "7" ]] || [[ $ID == "8" ]] || [[ $ID == "9" ]] || [[ $ID == "10" ]]; then 
+        METH="DISP"
+    fi
+done
 OFILE="effArea-${EDVERSION}-${EANAME}-$SIMTYPE-${CUTS_NAME}-${METH}-${EPOCH}-ATM${ATMOS}-T${T}"
 
 FSCRIPT="$LOGDIR/COMB-EFFAREA-$CUTSFILE-ATM$ATMOS-$EPOCH-ID$RECID"
