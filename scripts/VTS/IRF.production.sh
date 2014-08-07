@@ -178,7 +178,7 @@ for VX in $EPOCH; do
                     ######################
                     # analyse table files
                     elif [[ $IRFTYPE == "ANALYSETABLES" ]]; then
-                        TFIL="${TABLEFILE/VX/$VX}"
+                        TFIL="${TABLECOM}"
                         # note: the IDs dependent on what is written in EVNDISP.reconstruction.runparameter
                         for ID in $RECID; do
                             if [[ $ID == "0" ]] || [[ $ID == "2" ]] || [[ $ID == "3" ]] || [[ $ID == "4" ]] || [[ $ID == "5" ]] || [[ $ID == "6" ]]; then
