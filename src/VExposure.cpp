@@ -1213,7 +1213,7 @@ TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy,
 		cGal->SetGridy( 0 );
 		h->SetZTitle( "exposure [h]" );
 	}
-	gStyle->SetPalette( iPalette )
+	gStyle->SetPalette( iPalette );
 	h->Draw( "A colz" );
 	
 	// plot axis
