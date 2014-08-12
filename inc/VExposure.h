@@ -153,7 +153,7 @@ class VExposure : public TObject, public VGlobalRunParameter
 						   TH2* h = 0, bool bAitoff = false, int iMarkerStyle = 5, int iMarkerColor = 1, double iTextAngle = 45. );
 		TCanvas* plot2DGalactic( string iName, string iTitle, int ix, int iy, int iwx, int iwy, TH2* h,
 								 double ibmin = -90., double ibmax = 90., double ilmin = -180., double ilmax = 180.,
-								 bool bAitoff = false );
+								 bool bAitoff = false, int iPalette = 1 );
 		void plotVTSObjects( bool bAitoff = false, double ibmin = -90., double ibmax = 90., double ilmin = -180., double ilmax = 180.,
 							 int iMarkerStyle = 5, int iMarkerColor = 1, double iTextAngle = 45., TH2* h = 0 );
 		void set_plot_style();
@@ -176,7 +176,7 @@ class VExposure : public TObject, public VGlobalRunParameter
 			return fRadAccMapGal2D;
 		}
 		void  plotMarker( double l, double b, double r = 0., string iText = "", int iMarkerStyle = 5, int iMarkerColor = 1, int iMarkerSize = 1 );
-		TCanvas* plot( double ilmin = -180., double ilmax = 180., double ibmin = -90., double ibmax = 90., unsigned int iReturnCanvas = 0 );
+		TCanvas* plot( double ilmin = -180., double ilmax = 180., double ibmin = -90., double ibmax = 90., unsigned int iReturnCanvas = 0, int iPalette = 1 );
 		void     plot_HESSSkySurvey( TCanvas* c );
 		void plotTimeDifferencesbetweenRuns();
 		void printListOfRuns( string iCatalogue, double iR = 2.5, double iMinDuration = 600., string iTeVCatalogue = "",

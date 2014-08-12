@@ -245,9 +245,13 @@ void VImageBaseAnalyzer::calcTZeros( int fFirst, int fLast )
 			}
 		}
 		catch( ... )
-		{
-			cout << "VImageBaseAnalyzer::calcTZeros(), index out of range (fReader->getHitID) " << i;
-			cout << "(Telescope " << getTelID() + 1 << ", event " << getEventNumber() << ")" << endl;
+		{			
+		    if( getDebugLevel() == 0 )
+			{
+				cout << "VImageBaseAnalyzer::calcTZeros, index out of range " << i;
+				cout << "(Telescope " << getTelID() + 1 << ", event " << getEventNumber() << ")" << endl;
+				setDebugLevel( 1 );
+			}
 			continue;
 		}
 	}
@@ -585,7 +589,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 			{
 				cout << "VImageBaseAnalyzer::calcTZerosSums, index out of range " << i;
 				cout << "(Telescope " << getTelID() + 1 << ", event " << getEventNumber() << ")" << endl;
-				setDebugLevel( 1 );
+				setDebugLevel( 0 );
 			}
 			continue;
 		}

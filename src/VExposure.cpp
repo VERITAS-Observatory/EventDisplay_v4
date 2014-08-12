@@ -1132,19 +1132,19 @@ void VExposure::fillExposureMap()
 }
 
 
-TCanvas* VExposure::plot( double ilmin, double ilmax, double ibmin, double ibmax, unsigned int iReturnCanvas )
+TCanvas* VExposure::plot( double ilmin, double ilmax, double ibmin, double ibmax, unsigned int iReturnCanvas, int iPalette )
 {
 	fPlottingCanvas.clear();
-	fPlottingCanvas.push_back( plot2DGalactic( "cGal", "Exposure", 10, 10, 600, 400, fMapGal2D, ibmin, ibmax, ilmin, ilmax, false ) );
-	fPlottingCanvas.push_back( plot2DGalactic( "cGal_aitoff", "Exposure (aitoff)", 10, 450, 600, 400, fMapGal2D_aitoff, ibmin, ibmax, ilmin, ilmax, true ) );
+	fPlottingCanvas.push_back( plot2DGalactic( "cGal", "Exposure", 10, 10, 600, 400, fMapGal2D, ibmin, ibmax, ilmin, ilmax, false, iPalette ) );
+	fPlottingCanvas.push_back( plot2DGalactic( "cGal_aitoff", "Exposure (aitoff)", 10, 450, 600, 400, fMapGal2D_aitoff, ibmin, ibmax, ilmin, ilmax, true, iPalette ) );
 	if( fAcceptance )
 	{
 		fPlottingCanvas.push_back( plot2DGalactic( "cAccGal", "Acceptance corrected exposure", 650, 10, 600, 400,
-								   fRadAccMapGal2D, ibmin, ibmax, ilmin, ilmax, false ) );
+												   fRadAccMapGal2D, ibmin, ibmax, ilmin, ilmax, false, iPalette ) );
 		fPlottingCanvas.push_back( plot2DGalactic( "cAccGal_aitoff", "Acceptance corrected exposure (aitoff)", 650, 450, 600, 400,
-								   fRadAccMapGal2D_aitoff, ibmin, ibmax, ilmin, ilmax, true ) );
-	}
-	
+												   fRadAccMapGal2D_aitoff, ibmin, ibmax, ilmin, ilmax, true, iPalette ) );
+	}	
+
 	if( iReturnCanvas < fPlottingCanvas.size() )
 	{
 		return fPlottingCanvas[iReturnCanvas];
@@ -1183,7 +1183,7 @@ void VExposure::plot_HESSSkySurvey( TCanvas* c )
 
 
 TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy, int iwx, int iwy, TH2* h,
-									double ibmin, double ibmax, double ilmin, double ilmax, bool bAitoff )
+									double ibmin, double ibmax, double ilmin, double ilmax, bool bAitoff, int iPalette )
 {
 	if( !h )
 	{
@@ -1213,6 +1213,7 @@ TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy,
 		cGal->SetGridy( 0 );
 		h->SetZTitle( "exposure [h]" );
 	}
+	gStyle->SetPalette( iPalette )
 	h->Draw( "A colz" );
 	
 	// plot axis
