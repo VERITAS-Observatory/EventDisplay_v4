@@ -16,7 +16,7 @@ required parameters:
     <runlist>               simple format run list with one run number per line
 
     <input directory>       directory containing mscw_energy ROOT files from a
-                            gamma-ray dark region of the sky (data, not MC)
+                            gamma-ray dark region of the sky (data, not MC), minus the RecID* part
         
     <cuts list file>        file containing one gamma/hadron cuts file per line
         
@@ -53,7 +53,7 @@ RLIST=$1
 MSCWDIR=$2
 CUTLISTFILE=$3
 EPOCH=$4
-RECID=$5
+RECID="$5"
 # make radial acceptance version
 EDVERSION=`$EVNDISPSYS/bin/makeRadialAcceptance --version | tr -d .`
 # version string for aux files
@@ -72,7 +72,7 @@ if [[ ! -f "$CUTLISTFILE" ]]; then
     echo $CUTLISTFILE
     exit 1
 fi
-IFS=$'\r\n' CUTLIST=($(cat $CUTLISTFILE))
+CUTLIST=$(IFS=$'\r\n'; cat $CUTLISTFILE)
 
 # run scripts and logs are written into this directory
 DATE=`date +"%y%m%d"`
@@ -103,9 +103,9 @@ for CUTS in ${CUTLIST[@]}; do
             [[ $ID == "10" ]] && TELES="123"
 
             # Check that cuts file exists
-            CUTSNAME=${CUTS%%.dat}.dat
-            if [[ "$CUTSNAME" == `basename $CUTSNAME` ]]; then
-                CUTSFILE="$VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles/$CUTSNAME"
+            CUTSFILE=${CUTS%%.dat}.dat
+            if [[ "$CUTSFILE" == `basename $CUTSFILE` ]]; then
+                CUTSFILE="$VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles/$CUTSFILE"
             fi
             if [[ ! -f "$CUTSFILE" ]]; then
                 echo "Error, gamma/hadron cuts file not found, exiting..."
@@ -119,7 +119,7 @@ for CUTS in ${CUTLIST[@]}; do
             elif [[ $ID == "1" ]] || [[ $ID == "7" ]] || [[ $ID == "8" ]] || [[ $ID == "9" ]] || [[ $ID == "10" ]]; then 
 		        METH="DISP"
 		    fi
-
+	    CUTSNAME=`basename $CUTSFILE`
             # Generate base file name based on cuts file
             CUTSNAME=${CUTSNAME##ANASUM.GammaHadron-}
             CUTSNAME=${CUTSNAME%%.dat}
@@ -132,7 +132,7 @@ for CUTS in ${CUTLIST[@]}; do
             
             FSCRIPT="$LOGDIR/RADIAL-$CUTSNAME-$VX-$ID"
             sed -e "s|RUNLIST|$RLIST|"     \
-                -e "s|INPUTDIR|$MSCWDIR|"  \
+                -e "s|INPUTDIR|$MSCWDIR/RecID$ID|"  \
                 -e "s|CUTSFILE|$CUTSFILE|" \
                 -e "s|OUTPUTDIR|$ODIR|"    \
                 -e "s|IEPO|$VX|" \
@@ -147,10 +147,8 @@ for CUTS in ${CUTLIST[@]}; do
             echo $LOGDIR
             SUBC=`eval "echo \"$SUBC\""`
             if [[ $SUBC == *qsub* ]]; then
-                echo $FSCRIPT.sh
-#                JOBID=`$SUBC $FSCRIPT.sh`
-                #### (GM) for some odd reason the normal way of getting the submission command does not work ####
-                JOBID=`qsub -P cta_high -js 10000 -V -terse -l os=sl6 -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=10G -o $LOGDIR -e $LOGDIR $FSCRIPT.sh`
+                echo $SUBC $FSCRIPT.sh
+                JOBID=`$SUBC $FSCRIPT.sh`
                 echo "JOBID: $JOBID"
             elif [[ $SUBC == *parallel* ]]; then
                 echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
