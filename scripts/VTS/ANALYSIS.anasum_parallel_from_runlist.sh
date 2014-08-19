@@ -27,10 +27,10 @@ optional parameters:
                             default is ANASUM.runparameter)
 
     [mscw directory]        directory containing the mscw.root files.
-			    Default: $VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/RecID0
+			    Default: $VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION
 
-    [sim type]              use IRFs derived from this simulation type (GRISU-SW6 or CARE)
-			    Default: CARE
+    [sim type]              use IRFs derived from this simulation type (GRISU-SW6 or CARE_June1425)
+			    Default: CARE_June1425
 
     [method]                reconstruction method: GEO or DISP.
 			    Default: GEO
@@ -59,17 +59,14 @@ AUXVERSION="auxv01"
 bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
-# Load runlist functions
-source "$EVNDISPSYS/scripts/VTS/helper_scripts/RUNLIST.run_info_functions.sh"
-
 # Parse command line arguments
 RLIST=$1
 ODIR=$2
 CUTS=$3
 BACKGND=$4
 [[ "$5" ]] && RUNP=$5  || RUNP="ANASUM.runparameter"
-[[ "$6" ]] && INDIR=$6 || INDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/RecID0"
-[[ "$7" ]] && SIMTYPE=$7 || SIMTYPE="CARE"
+[[ "$6" ]] && INDIR=$6 || INDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/"
+[[ "$7" ]] && SIMTYPE=$7 || SIMTYPE="CARE_June1425"
 [[ "$8" ]] && METH=$8 || METH="GEO"
 [[ "$9" ]] && FORCEDATMO=$9 
 
@@ -106,7 +103,7 @@ else
     exit 1
 fi
 CUTFILE="ANASUM.GammaHadron-Cut-${CUT}.dat"
-EFFAREA="effArea-${IRFVERSION}-${AUXVERSION}-$SIMTYPE-Cut-${CUT}-${METH}-VX-ATMXX-TX.root"
+EFFAREA="effArea-${IRFVERSION}-${AUXVERSION}-${SIMTYPE}-Cut-${CUT}-${METH}-VX-ATMXX-TX.root"
 RADACC="radialAcceptance-${IRFVERSION}-${AUXVERSION}-Cut-${CUT}-${METH}-VX-TX.root"
 
 echo $CUTFILE
@@ -165,9 +162,9 @@ RUNS=`cat $RLIST`
 
 for RUN in ${RUNS[@]}; do
     # get array epoch and atmosphere for the run
-    EPOCH=`getRunArrayVersion $RUN`
-    ATMO=${FORCEDATMO:-`getRunAtmosphere $RUN $INDIR/$RUN.mscw.root`} 
-    if [[ $ATMO == "error" ]]; then
+    EPOCH=`$EVNDISPSYS/bin/printRunParameter $INDIR/$RUN.mscw.root -epoch`
+    ATMO=${FORCEDATMO:-`$EVNDISPSYS/bin/printRunParameter $INDIR/$RUN.mscw.root -atmosphere`} 
+    if [[ $ATMO == *error* ]]; then
        echo "error finding atmosphere; skipping run $RUN"
        continue
     fi
@@ -177,15 +174,15 @@ for RUN in ${RUNS[@]}; do
     TELTOANA="T$TELTOANA"
     
     # do string replacements
-    EFFAREA=${EFFAREA/VX/$EPOCH}
-    EFFAREA=${EFFAREA/TX/$TELTOANA}
-    EFFAREA=${EFFAREA/XX/$ATMO}
-    RADACC=${RADACC/VX/$EPOCH}
-    RADACC=${RADACC/TX/$TELTOANA}
+    EFFAREARUN=${EFFAREA/VX/$EPOCH}
+    EFFAREARUN=${EFFAREARUN/TX/$TELTOANA}
+    EFFAREARUN=${EFFAREARUN/XX/$ATMO}
+    RADACCRUN=${RADACC/VX/$EPOCH}
+    RADACCRUN=${RADACCRUN/TX/$TELTOANA}
     
     # write line to file
-    echo "* $RUN $RUN 0 $CUTFILE $BM $EFFAREA $BMPARAMS $RADACC" >> $ANARUNLIST
-    echo "* $RUN $RUN 0 $CUTFILE $BM $EFFAREA $BMPARAMS $RADACC"
+    echo "* $RUN $RUN 0 $CUTFILE $BM $EFFAREARUN $BMPARAMS $RADACCRUN" >> $ANARUNLIST
+    echo "* $RUN $RUN 0 $CUTFILE $BM $EFFAREARUN $BMPARAMS $RADACCRUN"
 done
 
 # submit the job
