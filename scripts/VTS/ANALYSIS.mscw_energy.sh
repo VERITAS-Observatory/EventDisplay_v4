@@ -4,6 +4,9 @@
 # qsub parameters
 h_cpu=00:29:00; h_vmem=2000M; tmpdir_size=4G
 
+# EventDisplay version
+EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .`
+
 if [ $# -lt 2 ]; then
 # begin help message
 echo "
@@ -13,16 +16,17 @@ ANALYSIS.mscw_energy.sh <table file> <runlist> [evndisp directory] [Rec ID] [out
 
 required parameters:
 
-    <table file>            mscw_energy lookup table file. Expected in $VERITAS_EVENTDISPLAY_AUX_DIR/Tables.
-				For example:
-				table-v451-auxv01-CARE-ATM21-V6-DISP.root
+    <table file>            mscw_energy lookup table file. Expected in $VERITAS_EVNDISP_AUX_DIR/Tables/ .
+			    For example:
+				table-v451-auxv01-CARE_June1425-ATM21-V6-DISP.root
 				table-v451-auxv01-GRISU-SW6-ATM22-V5-GEO.root
 			
     <runlist>               simple run list with one run number per line.    
     
 optional parameters:
     
-    [evndisp directory]     directory containing evndisp output ROOT files
+    [evndisp directory]     directory containing evndisp output ROOT files.
+			    Default: $VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/
 
     [Rec ID]                reconstruction ID. Default 0.
                             (see EVNDISP.reconstruction.runparameter)
@@ -31,7 +35,7 @@ optional parameters:
     
     [output directory]      directory where mscw.root files are written
                             default: <evndisp directory>
-                            default with Rec ID: <evndisp directory>/RecID#
+                            If RecID given: <evndisp directory>/RecID#
 
 --------------------------------------------------------------------------------
 "

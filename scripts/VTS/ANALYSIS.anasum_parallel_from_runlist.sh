@@ -1,6 +1,9 @@
 #!/bin/bash
 # script to analyse data files with anasum (parallel analysis) from a simple run list
 
+# EventDisplay version
+EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .`
+
 if [[ $# < 4 ]]; then
 # begin help message
 echo "
@@ -35,9 +38,9 @@ optional parameters:
     [method]                reconstruction method: GEO or DISP.
 			    Default: GEO
 
-    [force atmosphere]	    use EAs generated with this atmospheric model.
+    [force atmosphere]	    use EAs generated with this atmospheric model (21 or 22).
 			    Default: Atmosphere determined from run date for each run.				
-			    Attention: Must use the same atmospere that was used for the lookup tables!
+			    Attention: Must use the same atmospere for EAs as was used for the lookup tables in the mscw_energy stage!
 
 IMPORTANT! Run ANALYSIS.anasum_combine.sh once all parallel jobs have finished!
 
@@ -46,9 +49,6 @@ IMPORTANT! Run ANALYSIS.anasum_combine.sh once all parallel jobs have finished!
 #end help message
 exit
 fi
-
-# EventDisplay version
-EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .`
 
 ###########################
 # IRFs

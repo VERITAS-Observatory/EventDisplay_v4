@@ -4,6 +4,9 @@
 # qsub parameters
 h_cpu=11:59:00; h_vmem=2000M; tmpdir_size=25G
 
+# EventDisplay version
+EDVERSION=`$EVNDISPSYS/bin/evndisp --version | tr -d .`
+
 if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 # begin help message
 echo "
@@ -17,7 +20,8 @@ required parameters:
     
 optional parameters:
     
-    [output directory]      directory where output ROOT files will be stored
+    [output directory]      directory where output ROOT files will be stored.
+			    Default: $VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/
 	 
     [runparameter file]    file with integration window size and reconstruction cuts/methods, expected in $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/
 
@@ -31,7 +35,7 @@ optional parameters:
 			   EVNDISP.reconstruction.runparameter.SumWindow6-noDISP (short sumwindow -> for use with grisu IRFs; DISP disabled)
 			   EVNDISP.reconstruction.runparameter.SumWindow6-DISP	 (short sumwindow -> for use with grisu IRFs; DISP enabled [RecID 1])
 
-    [calibration]
+    [calibration]	   
 	  0		    neither tzero nor pedestal calculation is performed, must have the calibration results
 				already in $VERITAS_EVENTDISPLAY_AUX_DIR/Calibration/Tel_?
           1                 pedestal & average tzero calculation (default)
@@ -45,11 +49,12 @@ optional parameters:
 
     [teltoana]              restrict telescope combination to be analyzed:
                             e.g.: teltoana=123 (for tel. 1,2,3), 234, ...
-                            default is 1234 (all telescopes)
+                            Default is to use the telescope combination from the DB. Telescopes that were not in the array
+			    or have been cut by DQM are not analysed.
 
     [calibration file name] only used with calibration=4 option
 			    to specify a which runs should be used for pedestal/tzero/gain calibration.
-                            standard calibration file name is calibrationlist.dat
+                            Default is calibrationlist.dat
                             file is expected in $VERITAS_EVNDISP_ANA_DIR/Calibration
 
 --------------------------------------------------------------------------------
@@ -61,9 +66,6 @@ fi
 # Run init script
 bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
-
-# EventDisplay version
-EDVERSION=`$EVNDISPSYS/bin/evndisp --version | tr -d .`
 
 # create extra stdout for duplication of command output
 # look for ">&5" below
