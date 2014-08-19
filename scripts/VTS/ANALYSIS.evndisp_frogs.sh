@@ -36,11 +36,6 @@ fi
 bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
-# Load runlist functions
-source "$EVNDISPSYS/scripts/VTS/helper_scripts/RUNLIST.run_info_functions.sh"
-
-echo "which getRunArrayVersion `which getRunArrayVersion`"
-
 # Parse command line arguments
 RLIST=$1
 [[ "$2" ]] && ODIR=$2    || ODIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/"
@@ -77,7 +72,11 @@ for RUN in $RUNNUMS; do
     FSCRIPT="$LOGDIR/EVN.data-$RUN"
     
     # get run array epoch using a run info function
-    EPOCH=`getRunArrayVersion $RUN`
+    EPOCH=`$EVNDISPSYS/bin/printRunParameter $MSCWDIR/$RUN.mscw.root -epoch`
+    if [[ $EPOCH == *error* ]]; then
+       echo "error finding array type; does mscw file exist? Skipping run $RUN"
+       continue
+    fi
 
     sed -e "s|RUNFILE|$RUN|"             \
         -e "s|CALIBRATIONOPTION|$CALIB|" \
@@ -109,7 +108,6 @@ for RUN in $RUNNUMS; do
         fi
     elif [[ $SUBC == *parallel* ]]; then
         echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.$SECONDS.dat
-    fi
     elif [[ "$SUBC" == *simple* ]] ; then
     	"$FSCRIPT.sh" |& tee "$FSCRIPT.log"
     fi
