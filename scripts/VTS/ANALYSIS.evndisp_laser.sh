@@ -99,6 +99,8 @@ for RUN in $RUNNUMS; do
             echo "RUN $RUN: JOBID $JOBID"
         elif [[ $SUBC == *parallel* ]]; then
             echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
+        elif [[ "$SUBC" == *simple* ]] ; then
+	    "$FSCRIPT.sh" |& tee "$FSCRIPT.log"	
         fi
     fi
 done
