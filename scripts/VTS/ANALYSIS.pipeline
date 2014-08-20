@@ -21,8 +21,8 @@ CWD=$PWD
 
 #############################################################################
 #
-# ANALYSIS SETTINGS:
-#
+# // do not change the stuff in the square brackets in the next line, it is needed for the 'options' keyword
+# [BEGIN ANALYSIS SETTINGS 3823984]
 
 # OPTIONAL: Which event display installation do you want to use?
 # if you leave this commented out, you must have EVNDISPSYS defined ($ echo "$EVNDISPSYS" )
@@ -198,68 +198,82 @@ export SCIPIPE_MANUALLASER="no"
 # and should have the same format as calibrationlist.dat in that directory.
 export SCIPIPE_MANUALLASERFILE="calibrationlist.dat"
 
-# Optionally, you can place any of the above settings into
-# a separate config file 'analysis.config' to override their settings.
+# Any of the above options can be put into a separate config 
+#   file 'analysis.config' to override the above default settings.
+# A blank 'analysis.config' file can be created via:
+#   $ ANALYSIS.pipeline newconfig
 # This config file should be in the same directory as the 
-# ANALYSIS.pipeline script.  If you do this, these options must
-# each be preceded by 'export', like so:
+#   ANALYSIS.pipeline script (or a link to the pipeline).
+# If you do this, these options must each be preceded by 'export', like so:
 # export RUNLIST="$CWD/runlist.cygnus.dat"
 # export BACKGROUND="refl"
 # export REFLWOBOFF="0.8"
 # export CUTS="soft"
 
-#
-# END ANALYSIS SETTINGS
+
+# [END ANALYSIS SETTINGS 843230239] 
+# // do not change the stuff in the square brackets,
+# // doing so will interfere with the 'options' keyword
+# // the number is random so the regex doesn't match itself
 #
 ###########################################################################################
 
 
-BINNAME="$0"
-if [[ $# < 1 || ! $1 =~ (evndisp|mscw|frogs|anpar|anmer|mutate|jobs|kill|xxf) ]] ; then 
+ANAPIPENAME="$0"
+if [[ $# < 1 || ! $1 =~ (evndisp|mscw|frogs|anpar|anmer|mutate|options|newconfig|jobs|kill|xxf) ]] ; then 
     echo "
 HOW DO I USE THIS ?                             
 
-   1. Make a new directory, and make a soft link to ANALYIS.pipeline, via
-       $ ln -s \$EVNDISPSYS/scripts/VTS/ANALYSIS.pipeline
+   1. Make a project directory, and make a soft link to \$EVNDISPSYS/scripts/VTS/ANALYSIS.pipeline, via
+      $ ln -s \$EVNDISPSYS/scripts/VTS/ANALYSIS.pipeline
 
-   2. Add your runlist file to that directory,        
+   2. Add your runlist file to your project directory
 
-   3. Read the 'ANALYSIS SETTINGS' section within ANALYSIS.pipeline,
-      and add any settings you want to a new file 'analysis.config', in the
-      same directory as your runlist.  You will probably need to at least
-      tell 'analysis.config' the name of your runlist file, and the cuts
-      you want, via the lines:
-	  export RUNLIST=$PWD/crab.runlist
+   3. Create a new analysis config file 'analysis.config' in your project directory:
+      $ ./$ANAPIPENAME newconfig
+
+   4. View all the options you can add to 'analysis.config':
+      $ ./$ANAPIPENAME options
+	
+   5. Add your runlist filename and any options to your 'analysis.config'.
+      Options should have the same format as in a bash file:
+
+      export RUNLIST=crab.runlist
       export CUTS="Moderate"
 
-   4. Run a stage of the analysis:
+      etc.
+
+   6. Run a stage of the analysis:
 		
         i) Submit stage jobs to the cluster:
-        $ $BINNAME [evndisp|mscw|frogs|anpar|anmer|mutate]                
+        $ $ANAPIPENAME [evndisp|mscw|frogs|anpar|anmer|mutate]                
 		
         ii) Check if jobs are done:
-        $ $BINNAME jobs
+        $ $ANAPIPENAME jobs
 		
         iii) Check the results of the stage for errors
-        $ $BINNAME [evndisp|mscw|frogs|anpar|anmer|mutate] check
+        $ $ANAPIPENAME [evndisp|mscw|frogs|anpar|anmer|mutate] check
 		
 
-Stages of Event Display: (evndisp, mscw, frogs, anpar, anmer) please,
+Stages of Event Display: [evndisp|mscw|frogs|anpar|anmer],
   (optional 'check' afterwards)
-  $ $BINNAME evndisp         # run the 'event display' stage
-  $ $BINNAME evndisp check   # after evndisp, check its log and datafiles for problems
-  $ $BINNAME mscw            # run the 'mean scaled width' stage
-  $ $BINNAME mscw check      # after mscw, check its log and datafiles for problems
-  $ $BINNAME frogs           # run the 'frogs image reconstruction' stage
-  $ $BINNAME frogs check     # after frogs, check its log and datafiles for problems
-  $ $BINNAME anpar           # run the 'anasum parallel' stage
-  $ $BINNAME anpar check     # after anpar, check its log and datafiles for problems
-  $ $BINNAME mutate          # after anpar, convert anasum parallel files to ctool's fits format
-  $ $BINNAME mutate check    # after anpar, check the mutate stage's log and datafiles
-  $ $BINNAME anmer           # after anpar, merge the anasum parallel files to one anasum file
+  $ $ANAPIPENAME evndisp         # run the 'event display' stage
+  $ $ANAPIPENAME evndisp check   # after evndisp, check its log and datafiles for problems
+  $ $ANAPIPENAME mscw            # run the 'mean scaled width' stage
+  $ $ANAPIPENAME mscw check      # after mscw, check its log and datafiles for problems
+  $ $ANAPIPENAME frogs           # run the 'frogs image reconstruction' stage
+  $ $ANAPIPENAME frogs check     # after frogs, check its log and datafiles for problems
+  $ $ANAPIPENAME anpar           # run the 'anasum parallel' stage
+  $ $ANAPIPENAME anpar check     # after anpar, check its log and datafiles for problems
+  $ $ANAPIPENAME mutate          # after anpar, convert anasum parallel files to ctool's fits format
+  $ $ANAPIPENAME mutate check    # after anpar, check the mutate stage's log and datafiles
+  $ $ANAPIPENAME anmer           # after anpar, merge the anasum parallel files to one anasum file
+
 Other commands:
-  $ $BINNAME jobs   # show progress of all of this project's jobs, updating every 90 seconds, until all jobs are done
-  $ $BINNAME kill   # halt all of this project's jobs
+  $ $ANAPIPENAME options   # print descriptions of all analysis options
+  $ $ANAPIPENAME newconfig # create a new (blank) analysis.config file, will refuse to overwrite any existing one
+  $ $ANAPIPENAME jobs      # show progress of all of this project's jobs, updating every 90 seconds, until all jobs are done
+  $ $ANAPIPENAME kill      # halt all of this project's jobs
 "
 	exit 1
 fi
@@ -281,8 +295,73 @@ DEBUGREGEX="WHITEBOARD"
 # to allow for very fast testing
 export SCIPIPE_FASTDEVMODE="no"
 
-# settings file, any settings in this file will override the above settings
+STAGE=$1
+CHK=$2
+if [ "$CHK" = "check" ] ; then
+	CHECKFLAG=true
+else
+	CHECKFLAG=false
+fi
+
 SETTINGSFILE="analysis.config"
+
+if [ "$STAGE" = "newconfig" ] ; then
+	if [ -f "$SETTINGSFILE" ] ; then
+		echo "Error, config file '$SETTINGSFILE' already exists.  Please move or rename the existing one before creating a new '$SETTINGSFILE' file.  Exiting..." 2>&1
+		exit 1
+	else
+		BASHPATH=$( which bash )
+
+		echo "#!${BASHPATH}"                              >> "$SETTINGSFILE"
+		echo "export RUNLIST=\"YourRunlistFileNameHere\"" >> "$SETTINGSFILE"
+		echo "export CUTS=\"Moderate\"                  " >> "$SETTINGSFILE"
+		echo "export BACKGROUND=\"reflected\"           " >> "$SETTINGSFILE"
+		
+		echo
+		echo "Now creating '$SETTINGSFILE' for you... done."
+		echo
+		echo "You should now edit '$SETTINGSFILE' to contain your runlist filename and any other options you want in your analysis."
+		echo
+		echo "All options can be shown by doing '$ $ANAPIPENAME options'"
+		echo
+	fi
+	
+	exit 0
+fi
+
+if [ "$STAGE" = "options" ] ; then
+	echo
+	echo "#####################################################"
+	echo "Analysis Options that you can add to '$SETTINGSFILE':"
+	echo "#####################################################"
+	DOPRINT=false
+
+	# print all the lines of this script that are between 
+	# the BEGIN ANALYSIS SETTINGS and END ANALYSIS SETTINGS
+	# (followed with a number)
+	OPTLINES=$( cat "$ANAPIPENAME" | sed -n '/\[BEGIN ANALYSIS SETTINGS [0-9]\+\]/,/\[END ANALYSIS SETTINGS [0-9]\+\]/p' | tail -n +2 | head -n -1)
+	
+	# only first 15 lines of options, for debugging
+	#OPTLINES=$( cat "$ANAPIPENAME" | sed -n '/\[BEGIN ANALYSIS SETTINGS [0-9]\+\]/,/\[END ANALYSIS SETTINGS [0-9]\+\]/p' | tail -n +2 | head -n 15 | head -n -1)
+	
+	OPTBLUE='\033[22;34m'
+	OPTGREE='\033[22;32m'
+	OPTNORM='\033[0m'
+	while read -r line ; do
+		#echo "line: '$line'"
+		
+		# if the line starts with a comment '#', make it blue, otherwise print the line green
+		if [[ "$line" =~ ^# ]] ; then 
+			echo -e "${OPTBLUE}${line}${OPTNORM}"
+		else
+			echo -e "${OPTGREE}${line}${OPTNORM}"
+		fi
+	done <<< "$OPTLINES"
+	echo 
+	exit 0
+fi
+
+# settings file, any settings in this file will override the above settings
 if [ -f "$SETTINGSFILE" ] ; then
 	echo "Loading additional pipeline settings from '$SETTINGSFILE'..."
 	source "$SETTINGSFILE"
@@ -300,13 +379,6 @@ fi
 
 # needed to transfer files from evndisp to mscw stage and to anpar stage
 
-STAGE=$1
-CHK=$2
-if [ "$CHK" = "check" ] ; then
-	CHECKFLAG=true
-else
-	CHECKFLAG=false
-fi
 
 # directory for storing information about stages, jobs, etc
 SCIDIR="$CWD/.pipeline"
@@ -476,6 +548,7 @@ function stageBanner {
 	echo -e "${COTBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~$CONORM"
 }
 
+# test stage for just making the param file, and nothing else
 if [[ "$STAGE" == "xxf" ]] ; then
 	stageBanner
 	echo "\$VERITAS_EVNDISP_AUX_DIR:$VERITAS_EVNDISP_AUX_DIR"
@@ -483,6 +556,10 @@ if [[ "$STAGE" == "xxf" ]] ; then
 	makeParamFile
 	exit 0
 fi
+
+# print out the chunk of this script that describes all
+# of the analysis options the user can use
+
 
 # s1 event display
 if [[ "$STAGE" == "evndisp" ]] ; then
