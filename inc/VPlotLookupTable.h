@@ -73,7 +73,7 @@ class VPlotLookupTable : public VPlotUtilities, public VHistogramUtilities
 		VPlotLookupTable();
 		~VPlotLookupTable() {}
 		
-		bool  addLookupTable( string iLookupTableFile, string iTable = "mscw", int ze = 20, int az = 0, int telID = 1, int noise = 524, int woff = 500 );
+		bool  addLookupTable( string iLookupTableFile, string iTable = "mscw", int ze = 20, int az = 0, int telID = 1, int noise = 455, int woff = 500 );
 		
 		void  printLookupTables();
 		void  plotLookupTables( unsigned int iSetID = 0, double i_ymin = -999. );
