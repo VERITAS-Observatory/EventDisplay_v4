@@ -127,7 +127,7 @@ bool VPlotRadialAcceptance::openAcceptanceFile( string iFile, unsigned int iZeBi
     plot acceptance curves
 
 */
-TCanvas* VPlotRadialAcceptance::plotRadialAcceptance( TCanvas* cX )
+TCanvas* VPlotRadialAcceptance::plotRadialAcceptance( TCanvas* cX , int iColor )
 {
 	if( !fAcceptanceFile || fAcceptanceFile->IsZombie() )
 	{
@@ -161,7 +161,8 @@ TCanvas* VPlotRadialAcceptance::plotRadialAcceptance( TCanvas* cX )
 		fAcceptanceHisto->SetMaximum( fAxis_y_max );
 		fAcceptanceHisto->SetAxisRange( fAxis_x_min, fAxis_x_max );
 		fAcceptanceHisto->SetTitle( "" );
-		setHistogramPlottingStyle( fAcceptanceHisto, getPlottingColor(), 1., 1.0, 20 );
+		//setHistogramPlottingStyle( fAcceptanceHisto, getPlottingColor(), 1., 1.0, 20 );
+		setHistogramPlottingStyle( fAcceptanceHisto, iColor, 1., 1.0, 20 );
 		if( bPlotSame )
 		{
 			fAcceptanceHisto->Draw( "e same" );
@@ -174,7 +175,8 @@ TCanvas* VPlotRadialAcceptance::plotRadialAcceptance( TCanvas* cX )
 	}
 	if( fAcceptanceFunction )
 	{
-		setFunctionPlottingStyle( fAcceptanceFunction, getPlottingColor() );
+	  //setFunctionPlottingStyle( fAcceptanceFunction, getPlottingColor() );
+		setFunctionPlottingStyle( fAcceptanceFunction, iColor );
 		fAcceptanceFunction->Draw( "same" );
 	}
 	
