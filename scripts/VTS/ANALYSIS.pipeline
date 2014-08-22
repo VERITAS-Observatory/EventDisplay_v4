@@ -24,61 +24,58 @@ CWD=$PWD
 # // do not change the stuff in the square brackets in the next line, it is needed for the 'options' keyword
 # [BEGIN ANALYSIS SETTINGS 3823984]
 
-# OPTIONAL: Which event display installation do you want to use?
-# if you leave this commented out, you must have EVNDISPSYS defined ($ echo "$EVNDISPSYS" )
-# (full path please)
-#export EVNDISPSYS="/afs/ifh.de/user/n/nkelhos/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk"
-
+## Which Runlist file should we use?
 # Which runlist do you want to use?
 # It should be a simple list of veritas runnumbers,
 # one per line.  Used in all stages.
 # (full path please)
 export RUNLIST="$CWD/runlist.crab.dat"
 
-## use Model3D (yes/no)##
+## Should we use the Model3D feature?
+# use Model3D feature(yes/no)
 # Takes effect in the evndisp stage.
 export USEMODEL3D="no"
 
-# What kind of cuts do you want to use?
+## What kind of cuts do you want to use?
 # Currently supports:
-# 'Soft', 'Moderate', 'Hard', 
-# 'SoftOpen', 'ModerateOpen', 'SuperHard'
+#    'Soft', 'Moderate', 'Hard', 
+#    'SoftOpen', 'ModerateOpen', 'SuperHard'
 # Takes effect in the anpar stage.
 export CUTS="Moderate"
 
-# What kind of background do you want to use?
+## What kind of background do you want to use?
 # 'ring' or 'refl' (for reflected)
 # Takes effect in the anpar stage.
 export BACKGROUND="refl" # ring or [refl, reflect, reflected]
-
-# IF USING 'ring' BACKGROUND:
-# how how big should the radius of the the 'on' region be, in degrees?
+#
+# If using the 'ring' background method:
+# How how big should the radius of the the 'on' region be, in degrees?
 export RINGCENT="0.5"
 # and how big should the 'off' ring be, in units of 'on'-region areas?
 export RINGAREA="10"
-
-# IF USING 'refl' BACKGROUND:
+#
+# If using the reflected(refl) background method:
 # what should be the minimum distance between off region edges, in degrees?
 export REFLWOBOFF="0.5"
-# whats the minimum number of off regions we should use?
+# whats the minimum number of off regions we require?
 export REFLMINREG="1"
-# and the maximum number of off regions to use?
+# and the maximum number of off regions we require?
 export REFLMAXREG="10"
 
-# Should we produce the tzero and pedestal files first?
+## Should we produce the tzero and pedestal files first?
 # These are required to do an analysis.
 # Takes effect in the evndisp stage.
 # yes/no
 export DOCALIB=yes
 
-# Where should we store the evndisp and mscw output files?
+## Where should we store the evndisp and mscw output files?
 # Takes effect in the evndisp stage.
 # (full path please)
 # evndisp files will be: $EVNDISPOUTPUTDIR/#####.root, #####.tzero.root, etc
 # mscw files will be put in RecIDX within this directory (see next option)
 export EVNDISPOUTPUTDIR="$VERITAS_USER_DATA_DIR/analysis/Results/EVD-v423/"
 
-# Which Reconstruction ID (RecID) should we use?
+## Which Reconstruction ID (RecID) should we use?
 # 0, 1, 2, 3, or 4
 # 0 = do mscw stage with all available images
 # 1 = do mscw stage without using T1 images
@@ -86,49 +83,50 @@ export EVNDISPOUTPUTDIR="$VERITAS_USER_DATA_DIR/analysis/Results/EVD-v423/"
 # 3 = do mscw stage without using T3 images
 # 4 = do mscw stage without using T4 images
 # Takes effect in the mscw stage.
-# For regular data analysis, this should be 0
+## For regular data analysis, this should be 0
 export RECID=0
 
+## Should we use the frogs feature?
 # In the anasum stage, should we use frogs datafiles as the input?
 # If no, we will use the mscw datafiles instead.
 # To create the frogs datafiles, just run the 'frogs' stage.
-# ATTENTION: AFTER THE 'mscw' STAGE, YOU MUST RUN 
-# THE 'frogs' STAGE FOR THIS OPTION TO FULLY TAKE EFFECT
+## Attention: To use this feature properly, after the 'mscw' stage, 
+## you must run the 'frogs' stage for this option to fully take effect.
 # yes/no
 export USEFROGS="no"
 
-# Where should the frogs's output files be stored?
+## Where should the frogs's output files be stored?
 # Takes effect in the frogs stage.
 # (full path please)
 export FROGSOUTPUTDIR="$EVNDISPOUTPUTDIR/frogs"
 
-# Where should we put the anasum output files (parallel and merged)?
+## Where should we put the anasum output files (parallel and merged)?
 # Takes effect in the anpar stage.
 # (full path please)
 export ANASUMOUTPUTDIR="$CWD/arf"
 
-# What should we name the final merged anasum
+## What should we name the final merged anasum
 # output root file? It will be put in $ANASUMOUTPUTDIR
 # Takes effect in the anmer stage.
 # Filename only, not full path.
 export FINALOUTPUT="anmer.output.root"
 
-# Which anasum runparameter file should we use?
+## Which anasum runparameter file should we use?
 # Takes effect in the anpar stage.
 # (full path please)
 export RUNPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.Crab"
 
-# For the Effective Area and Radial Acceptance Files, whats the minimum
-# number of telescopes we require?
+## For the Effective Area and Radial Acceptance Files, whats the minimum
+## number of telescopes we require?
 # Should be 2, 3, or 4.
 export AUXFILE_MINTEL="2"
 
-# Are we analysing a point source, or an extended source?
+## Are we analysing a point source, or an extended source?
 # The Effective Area and Radial Acceptance files depend on this setting.
 # Either 'PointSource' or 'ExtendedSource'
 export AUXFILE_SRCEXT="PointSource"
 
-# Do you want to use the DISP feature?
+## Do you want to use the DISP feature?
 # This will change how image axes and their intersection
 # are calculated.
 # (yes/no)
@@ -145,8 +143,9 @@ export SCIPIPE_USEDISP="yes"
 #   non-SumWindow6 should be used with care-derived  IRF files
 export EVNDISPRECONFILE="EVNDISP.reconstruction.runparameter.SumWindow6-DISP"
 
-# For your Effective Area files, your Radial Acceptance Files, and your
-# Table files, which event display version should they have been made with?
+## For your Effective Area, Radial Acceptance, and Table IRF files:
+#
+# Which event display version should they have been made with?
 # e.g. effArea-v447-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
 #              ^^^^
 # radialAcceptance-v447-auxv01-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root
@@ -155,40 +154,37 @@ export EVNDISPRECONFILE="EVNDISP.reconstruction.runparameter.SumWindow6-DISP"
 #       ^^^^
 # Should have the format 'v###', like 'v447' or 'v525', etc.
 export AUXFILE_EVNVER="v447"
-
-# For your Effective Area files, your Radial Acceptance Files, and your
-# Table files, which simulation type should they have been made with?
+#
+# Which simulation type should they have been made with?
 # e.g. effArea-v447-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
 #                          ^^^^^^^^^^^^^
-# Should have the format '<simtype>_<month><year><day>', like 'CARE_June1425' or 'GRISU_March1327'
+# Should have the format '<simtype>_<month><year><day>', like 'CARE_June1425' 
+# or for grisu just 'GRISU-SW6'
 export AUXFILE_SIMDATE="CARE_June1425"
-
-# For the radial acceptance file, what aux-file-version should we use
-# in the radial acceptance filename?
+#
+# For the radial acceptance IRF file, what aux-file-version should we use?
 # e.g. radialAcceptance-v447-auxv01-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root
 #                            ^^^^^^
 # Should have the format 'auxv##', e.g. 'auxv01' or 'auxv31'
 export AUXVER_RADEC="auxv01"
-
-# For the table file, what aux-file-version shoudl we use in the
-# table filename?
+#
+# For the table IRF file, what aux-file-version should we use?
 # e.g. table-v447-auxv01-CARE_June1425-ATM21-V6-ID0.root
 #                 ^^^^^^
 # Should have the format 'auxv##', e.g. 'auxv01' or 'auxv31'
 export AUXVER_TABLE="auxv01"
-
-# For the effective area file, what aux-file-version should we use in
-# the effective area filename?
+#
+# For the effective area IRF file, what aux-file-version should we use?
 # e.g. effArea-v447-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
 #                   ^^^^^^
 # Should have the format 'auxv##', e.g. 'auxv01' or 'auxv31'
 export AUXVER_EFFAREA="auxv01"
 
-# Which directory should we keep the morphed ctools datafiles?
+## Which directory should we keep any ctools datafiles we produce with the 'mutate' command?
 # Takes effect in the mutate stage.
 export CTOOLSDIR="$CWD/ctoolsdata"
 
-# Should we use manually-defined laser runs for some runs?
+## Should we use manually-defined laser runs for some runs?
 # Takes effect in the evndisp stage.
 # (yes/no)
 export SCIPIPE_MANUALLASER="no"
@@ -198,13 +194,14 @@ export SCIPIPE_MANUALLASER="no"
 # and should have the same format as calibrationlist.dat in that directory.
 export SCIPIPE_MANUALLASERFILE="calibrationlist.dat"
 
-# Any of the above options can be put into a separate config 
-#   file 'analysis.config' to override the above default settings.
+## The above options should be put into a separate config 
+## file 'analysis.config' to override the above default settings.
 # A blank 'analysis.config' file can be created via:
 #   $ ANALYSIS.pipeline newconfig
 # This config file should be in the same directory as the 
 #   ANALYSIS.pipeline script (or a link to the pipeline).
-# If you do this, these options must each be preceded by 'export', like so:
+# The config file is a 'bash' script, obeying all 'bash' syntax.
+# These options must each be preceded by 'export', like so:
 # export RUNLIST="$CWD/runlist.cygnus.dat"
 # export BACKGROUND="refl"
 # export REFLWOBOFF="0.8"
@@ -212,7 +209,7 @@ export SCIPIPE_MANUALLASERFILE="calibrationlist.dat"
 
 
 # [END ANALYSIS SETTINGS 843230239] 
-# // do not change the stuff in the square brackets,
+# // do not change the line above,
 # // doing so will interfere with the 'options' keyword
 # // the number is random so the regex doesn't match itself
 #
@@ -220,7 +217,7 @@ export SCIPIPE_MANUALLASERFILE="calibrationlist.dat"
 
 
 ANAPIPENAME="$0"
-if [[ $# < 1 || ! $1 =~ (evndisp|mscw|frogs|anpar|anmer|mutate|options|newconfig|jobs|kill|xxf) ]] ; then 
+if [[ $# < 1 || ! $1 =~ (evndisp|mscw|frogs|anpar|anmer|mutate|options|settings|newconfig|jobs|kill|devopts|xxf) ]] ; then 
     echo "
 HOW DO I USE THIS ?                             
 
@@ -270,30 +267,51 @@ Stages of Event Display: [evndisp|mscw|frogs|anpar|anmer],
   $ $ANAPIPENAME anmer           # after anpar, merge the anasum parallel files to one anasum file
 
 Other commands:
-  $ $ANAPIPENAME options   # print descriptions of all analysis options
+  $ $ANAPIPENAME options   # print descriptions of all analysis options ('settings' also works)
   $ $ANAPIPENAME newconfig # create a new (blank) analysis.config file, will refuse to overwrite any existing one
   $ $ANAPIPENAME jobs      # show progress of all of this project's jobs, updating every 90 seconds, until all jobs are done
   $ $ANAPIPENAME kill      # halt all of this project's jobs
+  $ $ANAPIPENAME devopts   # see developer options
 "
 	exit 1
 fi
 
 exec 5>&1 # extra place to duplicate output to stdout, look for >&5
 
-# keyword to search log files for,
-# any lines matching $DEBUGREGEX will be
-# shown in blue when 'check'ing stages
-# e.g. DEBUGREGEX="NKH|WHITEBOARD"
-# will highlight any "NKH" or any "WHITEBOARD"
-# that shows up in the log files.
-# it is used as a Perl-style Regex, aka:
-# grep -P $DEBUGREGEX logfilename
-DEBUGREGEX="WHITEBOARD"
+# don't change the next line, doing so will mess up the 'devopts' pipeline keyword
+# [BEGIN DEVELOPER OPTIONS 348234]
 
+## To scan the logfiles for custom keywords:
+# any lines matching $SCIPIPE_DEBUGREGEX will be
+# shown in blue when 'check'ing stages
+# It is a regex pattern(google it), 
+# e.g. "NKH|WHITEBOARD" will highlight any 
+# logfile lines containing "NKH" or "WHITEBOARD" .
+# It is used as a Perl-style Regex, aka:
+#   $ grep -P $SCIPIPE_DEBUGREGEX logfilename
+# This will work in addition to the warning and
+#   error scanning.
+export SCIPIPE_DEBUGREGEX="WHITEBOARD"
+
+## To only test the first 10000 events:
 # if set to yes, some stages will only run
 # for the first few hundred events
 # to allow for very fast testing
+# Do not set this to 'yes' and expect good science!
 export SCIPIPE_FASTDEVMODE="no"
+
+## If you want the pipeline to not use colored text:
+# you can use the SCIPIPE_COLOROPT environment variable.
+# To only turn off colors in the command $ ANALYSIS.pipeline options, (or 'settings') use
+# export SCIPIPE_COLOROPT="nooptions"
+# To only turn off colors in the output of the stage 'check's, use 
+# export SCIPIPE_COLOROPT="nologs"
+# To turn off both, use 
+# export SCIPIPE_COLOROPT="nooptions:nologs"
+export SCIPIPE_COLOROPT=""
+
+# [END DEVELOPER OPTIONS 385239482]
+# don't change the above line, doing so will mess up the 'devopts' pipeline keyword
 
 STAGE=$1
 CHK=$2
@@ -316,11 +334,14 @@ if [ "$STAGE" = "newconfig" ] ; then
 		echo "export RUNLIST=\"YourRunlistFileNameHere\"" >> "$SETTINGSFILE"
 		echo "export CUTS=\"Moderate\"                  " >> "$SETTINGSFILE"
 		echo "export BACKGROUND=\"reflected\"           " >> "$SETTINGSFILE"
+		echo "export RUNPARAMFILE=\"$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.Crab\"" >> "$SETTINGSFILE"
 		
 		echo
 		echo "Now creating '$SETTINGSFILE' for you... done."
 		echo
-		echo "You should now edit '$SETTINGSFILE' to contain your runlist filename and any other options you want in your analysis."
+		echo "You should now edit '$SETTINGSFILE' to contain your runlist"
+		echo "  filename, your anasum parameter file (RUNPARAMFILE), and any"
+		echo "  other options you want in your analysis."
 		echo
 		echo "All options can be shown by doing '$ $ANAPIPENAME options'"
 		echo
@@ -329,37 +350,37 @@ if [ "$STAGE" = "newconfig" ] ; then
 	exit 0
 fi
 
-if [ "$STAGE" = "options" ] ; then
-	echo
-	echo "#####################################################"
-	echo "Analysis Options that you can add to '$SETTINGSFILE':"
-	echo "#####################################################"
-	DOPRINT=false
+function colorOutput {
+	
+	local OPTLINES="$1"
 
-	# print all the lines of this script that are between 
-	# the BEGIN ANALYSIS SETTINGS and END ANALYSIS SETTINGS
-	# (followed with a number)
-	OPTLINES=$( cat "$ANAPIPENAME" | sed -n '/\[BEGIN ANALYSIS SETTINGS [0-9]\+\]/,/\[END ANALYSIS SETTINGS [0-9]\+\]/p' | tail -n +2 | head -n -1)
-	
-	# only first 15 lines of options, for debugging
-	#OPTLINES=$( cat "$ANAPIPENAME" | sed -n '/\[BEGIN ANALYSIS SETTINGS [0-9]\+\]/,/\[END ANALYSIS SETTINGS [0-9]\+\]/p' | tail -n +2 | head -n 15 | head -n -1)
-	
-	OPTBLUE='\033[22;34m'
-	OPTGREE='\033[22;32m'
-	OPTNORM='\033[0m'
+	# check for color settings, don't print color text if 'noptions' is in SCIPIPE_COLOROPT
+	if [[ "$SCIPIPE_COLOROPT" =~ nooptions ]] ; then
+		OPTREDD=''
+		OPTBLUE=''
+		OPTGREE=''
+		OPTNORM=''
+	else
+		OPTREDD='\033[22;31m'
+		OPTBLUE='\033[22;34m'
+		OPTGREE='\033[22;32m'
+		OPTNORM='\033[0m'
+	fi
+
 	while read -r line ; do
 		#echo "line: '$line'"
-		
 		# if the line starts with a comment '#', make it blue, otherwise print the line green
-		if [[ "$line" =~ ^# ]] ; then 
+		if [[ "$line" =~ ^## ]] ; then 
+			line2=$( echo "$line" | sed -E 's/^##/#/' )
+			echo -e "${OPTREDD}${line2}${OPTNORM}"
+		elif [[ "$line" =~ ^# ]] ; then
 			echo -e "${OPTBLUE}${line}${OPTNORM}"
 		else
 			echo -e "${OPTGREE}${line}${OPTNORM}"
 		fi
 	done <<< "$OPTLINES"
-	echo 
-	exit 0
-fi
+
+}
 
 # settings file, any settings in this file will override the above settings
 if [ -f "$SETTINGSFILE" ] ; then
@@ -367,18 +388,61 @@ if [ -f "$SETTINGSFILE" ] ; then
 	source "$SETTINGSFILE"
 fi
 
+
+#if [ "$STAGE" = "options" ] ; then
+if [[ "$STAGE" =~ (options|settings) ]] ; then
+	echo
+	echo "#######################################################"
+	echo "Analysis Options that you can add to '$SETTINGSFILE':"
+	echo "#######################################################"
+
+	# print all the lines of this script that are between 
+	# the BEGIN ANALYSIS SETTINGS and END ANALYSIS SETTINGS
+	# (followed with a number)
+	OPTLINES=$( cat "$ANAPIPENAME" | sed -n '/\[BEGIN ANALYSIS SETTINGS [0-9]\+\]/,/\[END ANALYSIS SETTINGS [0-9]\+\]/p' | tail -n +2 | head -n -1)
+
+	# print with colors
+	colorOutput "$OPTLINES"
+	echo
+	
+	exit 0
+fi
+
+if [[ "$STAGE" =~ devopts ]] ; then
+	echo
+	echo "########################################################"
+	echo "Developer Options that you can add to '$SETTINGSFILE':"
+	echo "########################################################"
+
+	# print all the lines of this script that are between 
+	# the BEGIN ANALYSIS SETTINGS and END ANALYSIS SETTINGS
+	# (followed with a number)
+	OPTLINES=$( cat "$ANAPIPENAME" | sed -n '/\[BEGIN DEVELOPER OPTIONS [0-9]\+\]/,/\[END DEVELOPER OPTIONS [0-9]\+\]/p'  | tail -n +2 | head -n -1 )
+	
+	# print with colors
+	colorOutput "$OPTLINES"
+	echo
+	
+	exit 0
+fi
+
+# check that $EVNDISPSYS is sane
 if [ ! -d "$EVNDISPSYS" ] ; then
-	echo "error, \$EVNDISPSYS=$EVNDISPSYS isn't a valid directory, exiting..."
+	echo "error, \$EVNDISPSYS='$EVNDISPSYS' isn't a valid directory, exiting..." 2>&1
 	exit 1
 fi
 
-if [ ! -e "$RUNLIST" ] ; then
-	echo "error, \$RUNLIST=$RUNLIST needs to be a valid file, exiting..."
+# check that $VERITAS_EVNDISP_AUX_DIR is sane
+if [ ! -d "$VERITAS_EVNDISP_AUX_DIR" ] ; then
+	echo "error, \$VERITAS_EVNDISP_AUX_DIR='$VERITAS_EVNDISP_AUX_DIR' isn't a valid directory, exiting..." 2>&1
+	exit 1
 fi
 
-
-# needed to transfer files from evndisp to mscw stage and to anpar stage
-
+# check that the runlist is sane
+if [ ! -e "$RUNLIST" ] ; then
+	echo "error, \$RUNLIST=$RUNLIST needs to be a valid file, exiting..." 2>&1
+	exit 1
+fi
 
 # directory for storing information about stages, jobs, etc
 SCIDIR="$CWD/.pipeline"
@@ -589,7 +653,7 @@ if [[ "$STAGE" == "evndisp" ]] ; then
         
         # check qsub submission text for problems
         echo -e "${COTBLUE}checking job submission text...${CONORM}"
-        checkLogFileForProblems "$EVNJOBSUB" $DEBUGREGEX
+        checkLogFileForProblems "$EVNJOBSUB" $SCIPIPE_DEBUGREGEX
         echo
         
         # check batch jobs, if we can
@@ -604,25 +668,25 @@ if [[ "$STAGE" == "evndisp" ]] ; then
             
 			OLOG=$(    echo "$RUNDATA"  | grep "RUN $ARUN OLOG"   | awk '{ print $4 }')
             if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$EVNJOBSUB"        ; then continue ; fi
-			checkLogFileForProblems "$OLOG" $DEBUGREGEX
+			checkLogFileForProblems "$OLOG" $SCIPIPE_DEBUGREGEX
             
 			ELOG=$(    echo "$RUNDATA"  | grep "RUN $ARUN ELOG"   | awk '{ print $4 }')
             if filenameIsNotHealthy "$ELOG" "ELOG" "$HUMANBATCHSTDERR" "$EVNJOBSUB"        ; then continue ; fi
-			checkLogFileForProblems "$ELOG" $DEBUGREGEX
+			checkLogFileForProblems "$ELOG" $SCIPIPE_DEBUGREGEX
             
             if [ "$DOCALIB" == "yes" ] ; then
                 PEDLOG=$(   cat "$OLOG" | grep "RUN$ARUN PEDLOG"   | awk '{ print $3 }' )
                 if filenameIsNotHealthy "$PEDLOG" "PEDLOG" "pedestal log file" "$OLOG"        ; then continue ; fi
-                checkLogFileForProblems "$PEDLOG" $DEBUGREGEX
+                checkLogFileForProblems "$PEDLOG" $SCIPIPE_DEBUGREGEX
                 
                 TZEROLOG=$( cat "$OLOG" | grep "RUN$ARUN TZEROLOG" | awk '{ print $3 }' )
                 if filenameIsNotHealthy "$TZEROLOG" "TZEROLOG" "tzero log file" "$OLOG"       ; then continue ; fi
-                checkLogFileForProblems "$TZEROLOG" $DEBUGREGEX
+                checkLogFileForProblems "$TZEROLOG" $SCIPIPE_DEBUGREGEX
             fi
 
             EVNDISPLOG=$(   cat "$OLOG" | grep "RUN$ARUN EVNDISPLOG" | awk '{ print $3 }' )
             if filenameIsNotHealthy "$EVNDISPLOG" "EVNDISPLOG" "evndisp log file" "$OLOG"  ; then continue ; fi
-            checkLogFileForProblems "$EVNDISPLOG" $DEBUGREGEX
+            checkLogFileForProblems "$EVNDISPLOG" $SCIPIPE_DEBUGREGEX
             
             checkLogFileForStageSuccess "$EVNDISPLOG" "Final checks on result file (seems to be OK):"
 		done < $RUNLIST
@@ -718,7 +782,7 @@ if [[ "$STAGE" == "mscw" ]] ; then
         
         # check qsub submission text for problems
         echo -e "${COTBLUE}checking job submission text...${CONORM}"
-        checkLogFileForProblems "$MSCWJOBSUB" $DEBUGREGEX
+        checkLogFileForProblems "$MSCWJOBSUB" $SCIPIPE_DEBUGREGEX
         echo
         
         # check batch jobs, if we can
@@ -733,15 +797,15 @@ if [[ "$STAGE" == "mscw" ]] ; then
             
 			OLOG=$(    echo "$RUNDATA"  | grep "RUN $ARUN OLOG"   | awk '{ print $4 }' )
             if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$MSCWJOBSUB"        ; then continue ; fi
-			checkLogFileForProblems "$OLOG" $DEBUGREGEX
+			checkLogFileForProblems "$OLOG" $SCIPIPE_DEBUGREGEX
             
 			ELOG=$(    echo "$RUNDATA"  | grep "RUN $ARUN ELOG"   | awk '{ print $4 }' )
             if filenameIsNotHealthy "$ELOG" "ELOG" "$HUMANBATCHSTDERR" "$EVNJOBSUB"        ; then continue ; fi
-			checkLogFileForProblems "$ELOG" $DEBUGREGEX
+			checkLogFileForProblems "$ELOG" $SCIPIPE_DEBUGREGEX
             
             MSCWLOG=$(   cat "$OLOG" | grep "RUN$ARUN MSCWLOG"   | awk '{ print $3 }' )
             if filenameIsNotHealthy "$MSCWLOG" "MSCWLOG" "mscw log file" "$OLOG"  ; then continue ; fi
-            checkLogFileForProblems "$MSCWLOG" $DEBUGREGEX
+            checkLogFileForProblems "$MSCWLOG" $SCIPIPE_DEBUGREGEX
             
             checkLogFileForStageSuccess "$MSCWLOG" "...outputfile closed"
 		done < $RUNLIST
@@ -808,7 +872,7 @@ if [[ "$STAGE" == "frogs" ]] ; then
         
         # check qsub submission text for problems
         echo -e "${COTBLUE}checking job submission text...${CONORM}"
-        checkLogFileForProblems "$FROGSJOBSUB" $DEBUGREGEX
+        checkLogFileForProblems "$FROGSJOBSUB" $SCIPIPE_DEBUGREGEX
         echo
         
         # check batch jobs, if we can
@@ -824,15 +888,15 @@ if [[ "$STAGE" == "frogs" ]] ; then
             
 			OLOG=$(    echo "$RUNDATA"  | grep "RUN $ARUN OLOG"   | awk '{ print $4 }' )
             if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$FROGSJOBSUB"        ; then continue ; fi
-			checkLogFileForProblems "$OLOG" $DEBUGREGEX
+			checkLogFileForProblems "$OLOG" $SCIPIPE_DEBUGREGEX
             
 			ELOG=$(    echo "$RUNDATA"  | grep "RUN $ARUN ELOG"   | awk '{ print $4 }' )
             if filenameIsNotHealthy "$ELOG" "ELOG" "$HUMANBATCHSTDERR" "$FROGSJOBSUB"        ; then continue ; fi
-			checkLogFileForProblems "$ELOG" $DEBUGREGEX
+			checkLogFileForProblems "$ELOG" $SCIPIPE_DEBUGREGEX
             
             FROGSLOG=$( cat "$OLOG" | grep "RUN$ARUN FROGSLOG"  | awk '{ print $3 }' )
             if filenameIsNotHealthy "$FROGSLOG" "FROGSLOG" "frogs log file" "$OLOG"  ; then continue ; fi
-            checkLogFileForProblems "$FROGSLOG" $DEBUGREGEX
+            checkLogFileForProblems "$FROGSLOG" $SCIPIPE_DEBUGREGEX
             
             checkLogFileForStageSuccess "$FROGSLOG" "Final checks on result file (seems to be OK)"
 		done < $RUNLIST
@@ -905,7 +969,7 @@ if [[ "$STAGE" == "anpar" ]] ; then
         
         # check qsub submission text for problems
         echo -e "${COTBLUE}checking job submission text...${CONORM}"
-        checkLogFileForProblems "$ANPARJOBSUB" $DEBUGREGEX
+        checkLogFileForProblems "$ANPARJOBSUB" $SCIPIPE_DEBUGREGEX
         echo
         
         # check batch jobs, if we can
@@ -920,15 +984,15 @@ if [[ "$STAGE" == "anpar" ]] ; then
             
 			OLOG=$( echo "$RUNDATA" | grep "RUN $ARUN OLOG" | awk '{ print $4 }' )
             if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$ANPARJOBSUB" ; then continue ; fi
-			checkLogFileForProblems "$OLOG" $DEBUGREGEX
+			checkLogFileForProblems "$OLOG" $SCIPIPE_DEBUGREGEX
             
 			ELOG=$( echo "$RUNDATA" | grep "RUN $ARUN ELOG" | awk '{ print $4 }' )
-			checkLogFileForProblems "$ELOG" $DEBUGREGEX
+			checkLogFileForProblems "$ELOG" $SCIPIPE_DEBUGREGEX
             if filenameIsNotHealthy "$ELOG" "ELOG" "$HUMANBATCHSTDERR" "$ANPARJOBSUB" ; then continue ; fi
             
             ANPARLOG=$( cat "$OLOG" | grep "RUN$ARUN ANPARLOG" | awk '{ print $3 }' )
             if filenameIsNotHealthy "$ANPARLOG" "ANPARLOG" "anasum parallel log file" "$OLOG" ; then continue ; fi
-            checkLogFileForProblems "$ANPARLOG" $DEBUGREGEX
+            checkLogFileForProblems "$ANPARLOG" $SCIPIPE_DEBUGREGEX
              
             checkLogFileForStageSuccess "$ANPARLOG" "analysis results written to"
 		done < $RUNLIST
@@ -985,7 +1049,7 @@ if [[ "$STAGE" == "anmer" ]] ; then
 		stageBanner
 		# anmer check ######################################################################
         if filenameIsNotHealthy "$FINALOUTPUTLOG" "(filename constructed in ANALYSIS.pipeline)" "merged anasum log file" "ANALYSIS.pipeline"  ; then continue ; fi
-		checkLogFileForProblems $FINALOUTPUTLOG $DEBUGREGEX
+		checkLogFileForProblems $FINALOUTPUTLOG $SCIPIPE_DEBUGREGEX
         
 		DATAFILE="${ANASUMOUTPUTDIR}/${FINALOUTPUT}"
         if filenameIsNotHealthy "$DATAFILE" "FINALOUTPUT" "merge anasum datafile" "ANALYSIS.pipeline"  ; then continue ; fi
@@ -1039,7 +1103,7 @@ if [[ "$STAGE" == "mutate" ]] ; then
         while read ARUN ; do
 			echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~" ; echo -e "~~~~~~~~~~~ Run:$ARUN${CONORM}"
             CTOOLSLOG="$CTOOLSDIR/$ARUN.ctools.log"
-            checkLogFileForProblems     "$CTOOLSLOG" $DEBUGREGEX
+            checkLogFileForProblems     "$CTOOLSLOG" $SCIPIPE_DEBUGREGEX
             checkLogFileForStageSuccess "$CTOOLSLOG" "Conversion from .* complete"
         done < $RUNLIST
         
