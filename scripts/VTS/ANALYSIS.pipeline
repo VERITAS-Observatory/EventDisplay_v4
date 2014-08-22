@@ -116,6 +116,12 @@ export FINALOUTPUT="anmer.output.root"
 # (full path please)
 export RUNPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.Crab"
 
+## Do you want to automatically generate the anasum runlist? (recommended)
+# If so, leave ANRUNLIST blank
+# If you want to use your own anasum runlist, put the full path to your
+# custom anasum runlist here.
+export ANRUNLIST=""
+
 ## For the Effective Area and Radial Acceptance Files, whats the minimum
 ## number of telescopes we require?
 # Should be 2, 3, or 4.
@@ -334,7 +340,7 @@ if [ "$STAGE" = "newconfig" ] ; then
 		echo "export RUNLIST=\"YourRunlistFileNameHere\"" >> "$SETTINGSFILE"
 		echo "export CUTS=\"Moderate\"                  " >> "$SETTINGSFILE"
 		echo "export BACKGROUND=\"reflected\"           " >> "$SETTINGSFILE"
-		echo "export RUNPARAMFILE=\"$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.Crab\"" >> "$SETTINGSFILE"
+		echo "export RUNPARAMFILE=\"fullPathToYourAnasumRunparameterFile\"" >> "$SETTINGSFILE"
 		
 		echo
 		echo "Now creating '$SETTINGSFILE' for you... done."
@@ -535,55 +541,65 @@ function setupFilteredRunlists {
 
 # make list of run-specific parameter files
 PARAMFILELIST="$SCIDIR/paramfilelist.dat"
-ANASUMRUNLIST="$CWD/AnasumRunList.dat"
+
+if [[ -z "$ANRUNLIST" ]] ; then
+	ANASUMRUNLIST="$CWD/AnasumRunList.dat"
+else
+	ANASUMRUNLIST="$ANRUNLIST"
+fi
 RUNNUMBERS=`cat $RUNLIST`
 function makeParamFile {
-    rm -rf $PARAMFILELIST
-    rm -rf $ANASUMRUNLIST
-    # generate basic param files
-	#$EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_generateParamFiles.sh "$CUTS" "$GAMHADCUTDATE" "$RADECDATE" "$EFDATE1" "$EFDATE2" "$TABLEDATE" 3 "$USEFROGS" "$RUNLIST" > "$PARAMFILELIST"
 	
-	# Pack all the settings into a one-line argument.
-	# Characters that will break this: if any options have '~' or ':' or ' ' in them, 
-	# as these are used as delimiters in this packing technique.
-	SETTINGLINE="~CUTS:$CUTS~AUXFILEEVNVER:$AUXFILE_EVNVER~AUXFILESIMDATE:$AUXFILE_SIMDATE~AUXVERRADEC:$AUXVER_RADEC~AUXVEREFFAREA:$AUXVER_EFFAREA~AUXVERTABLE:$AUXVER_TABLE~AUXFILEMINTEL:$AUXFILE_MINTEL~USEFROGS:$USEFROGS~AUXFILESRCEXT:$AUXFILE_SRCEXT~AUXFILEDISP:$SCIPIPE_USEDISP~"
-	#echo "SETTINGLINE:'$SETTINGLINE'"
-	$EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_generateParamFiles.sh "$SETTINGLINE" "$RUNLIST" > "$PARAMFILELIST"
-	PARAMEXIT="$?"
-	#echo "PARAMEXIT:$PARAMEXIT" # =0 if ok, !=0 if bad things happened
-	if [[ "$PARAMEXIT" != "0" ]] ; then # had a problem generating param files
-		echoerr "${COTRED}Error, had a problem generating parameter files (see above text), exiting pipeline...$CONORM"
-		exit 1
-	fi
-    
-    # now put these filenames in the AnasumRunList format
-    # fill AnasumRunList with each run's info
-    # GENERATE ANASUMRUNLIST
-    #echo "" > $ANASUMRUNLIST
-    rm -rf "$ANASUMRUNLIST"
-	echo "Making Param File, using $BACKGROUND background method"
-    for ARUN in $RUNNUMBERS ; do
-        ARCUTSFILE=$(      grep "RUN$ARUN" "$PARAMFILELIST" | grep -oE "\S*ANASUM.GammaHadron\S*" )
-        AREFFAREAFILE=$(   grep "RUN$ARUN" "$PARAMFILELIST" | grep -oE "\S*effArea\S*"            )
-        ARRADIALACCFILE=$( grep "RUN$ARUN" "$PARAMFILELIST" | grep -oE "\S*radialAcceptance\S*"   ) 
-		if [[ -z "$ARCUTSFILE" || -z "$AREFFAREAFILE" || -z "$ARRADIALACCFILE" ]] ; then
-			echo -e "${COTRED}Error, couldn't determine an IRF file for Run $ARUN :"
-			if [[ -z "$ARCUTSFILE"      ]] ; then echo -e "${COTRED}   GammaHadronCut   File:'$ARCUTSFILE'      $CONORM" ; fi
-			if [[ -z "$AREFFAREAFILE"   ]] ; then echo -e "${COTRED}   EffectiveArea    File:'$AREFFAREAFILE'   $CONORM" ; fi
-			if [[ -z "$ARRADIALACCFILE" ]] ; then echo -e "${COTRED}   RadialAcceptance File:'$ARRADIALACCFILE' $CONORM" ; fi
+	# only automatically make the anasum runlist if the user specified so in the options
+	# otherwise, skip this step
+	if [[ -z "$ANRUNLIST" ]] ; then
+		rm -rf $PARAMFILELIST
+		rm -rf $ANASUMRUNLIST
+		# generate basic param files
+		#$EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_generateParamFiles.sh "$CUTS" "$GAMHADCUTDATE" "$RADECDATE" "$EFDATE1" "$EFDATE2" "$TABLEDATE" 3 "$USEFROGS" "$RUNLIST" > "$PARAMFILELIST"
+		
+		# Pack all the settings into a one-line argument.
+		# Characters that will break this: if any options have '~' or ':' or ' ' in them, 
+		# as these are used as delimiters in this packing technique.
+		SETTINGLINE="~CUTS:$CUTS~AUXFILEEVNVER:$AUXFILE_EVNVER~AUXFILESIMDATE:$AUXFILE_SIMDATE~AUXVERRADEC:$AUXVER_RADEC~AUXVEREFFAREA:$AUXVER_EFFAREA~AUXVERTABLE:$AUXVER_TABLE~AUXFILEMINTEL:$AUXFILE_MINTEL~USEFROGS:$USEFROGS~AUXFILESRCEXT:$AUXFILE_SRCEXT~AUXFILEDISP:$SCIPIPE_USEDISP~"
+		#echo "SETTINGLINE:'$SETTINGLINE'"
+		$EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_generateParamFiles.sh "$SETTINGLINE" "$RUNLIST" > "$PARAMFILELIST"
+		PARAMEXIT="$?"
+		#echo "PARAMEXIT:$PARAMEXIT" # =0 if ok, !=0 if bad things happened
+		if [[ "$PARAMEXIT" != "0" ]] ; then # had a problem generating param files
+			echoerr "${COTRED}Error, had a problem generating parameter files (see above text), exiting pipeline...$CONORM"
 			exit 1
 		fi
+		
+		# now put these filenames in the AnasumRunList format
+		# fill AnasumRunList with each run's info
+		# GENERATE ANASUMRUNLIST
+		#echo "" > $ANASUMRUNLIST
+		rm -rf "$ANASUMRUNLIST"
+		echo "Making Param File, using $BACKGROUND background method"
+		for ARUN in $RUNNUMBERS ; do
+			ARCUTSFILE=$(      grep "RUN$ARUN" "$PARAMFILELIST" | grep -oE "\S*ANASUM.GammaHadron\S*" )
+			AREFFAREAFILE=$(   grep "RUN$ARUN" "$PARAMFILELIST" | grep -oE "\S*effArea\S*"            )
+			ARRADIALACCFILE=$( grep "RUN$ARUN" "$PARAMFILELIST" | grep -oE "\S*radialAcceptance\S*"   ) 
+			if [[ -z "$ARCUTSFILE" || -z "$AREFFAREAFILE" || -z "$ARRADIALACCFILE" ]] ; then
+				echo -e "${COTRED}Error, couldn't determine an IRF file for Run $ARUN :"
+				if [[ -z "$ARCUTSFILE"      ]] ; then echo -e "${COTRED}   GammaHadronCut   File:'$ARCUTSFILE'      $CONORM" ; fi
+				if [[ -z "$AREFFAREAFILE"   ]] ; then echo -e "${COTRED}   EffectiveArea    File:'$AREFFAREAFILE'   $CONORM" ; fi
+				if [[ -z "$ARRADIALACCFILE" ]] ; then echo -e "${COTRED}   RadialAcceptance File:'$ARRADIALACCFILE' $CONORM" ; fi
+				exit 1
+			fi
 
-        #ARRADIALACCFILE="imgselAcceptFile.root"
-		if [[ $BACKGROUND == ring ]] ; then
-            echo "* $ARUN $ARUN 0 $ARCUTSFILE 1 $AREFFAREAFILE $RINGCENT $RINGAREA $ARRADIALACCFILE" >> $ANASUMRUNLIST
-		elif [[ $BACKGROUND == refl* ]] ; then
-            echo "* $ARUN $ARUN 0 $ARCUTSFILE 2 $AREFFAREAFILE $REFLWOBOFF $REFLMINREG $REFLMAXREG $ARRADIALACCFILE" >> $ANASUMRUNLIST
-		else
-			echo -e "${COTRED}Error, unrecognized background keyword '$BACKGROUND', must be 'ring' or 'refl', exiting...${CONORM}"
-			exit 1
-        fi
-    done
+			#ARRADIALACCFILE="imgselAcceptFile.root"
+			if [[ $BACKGROUND == ring ]] ; then
+				echo "* $ARUN $ARUN 0 $ARCUTSFILE 1 $AREFFAREAFILE $RINGCENT $RINGAREA $ARRADIALACCFILE" >> $ANASUMRUNLIST
+			elif [[ $BACKGROUND == refl* ]] ; then
+				echo "* $ARUN $ARUN 0 $ARCUTSFILE 2 $AREFFAREAFILE $REFLWOBOFF $REFLMINREG $REFLMAXREG $ARRADIALACCFILE" >> $ANASUMRUNLIST
+			else
+				echo -e "${COTRED}Error, unrecognized background keyword '$BACKGROUND', must be 'ring' or 'refl', exiting...${CONORM}"
+				exit 1
+			fi
+		done
+	fi
 }
 
 

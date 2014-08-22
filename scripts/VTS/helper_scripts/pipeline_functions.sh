@@ -6,13 +6,24 @@
 # ANALYSIS.pipeline and SIMULATION.pipeline
 #
 
-CONORM="\033[0;00m"
-CORED="\033[1;31m"    ; COTRED="\033[0;31m"
-COPURPLE="\033[1;35m" ; COTPURPLE="\033[0;35m"
-COGREEN="\033[1;32m"  ; COTGREEN="\033[0;32m"
-COYELLOW="\033[1;33m" ; COTYELLOW="\033[0;33m"
-COCYAN="\033[1;36m"   ; COTCYAN="\033[0;36m"
-COBLUE="\033[1;34m"   ; COTBLUE="\033[0;34m"
+
+if [[ "$SCIPIPE_COLOROPT" =~ nologs ]] ; then
+	CONORM=""
+	CORED=""    ; COTRED=""
+	COPURPLE="" ; COTPURPLE=""
+	COGREEN=""  ; COTGREEN=""
+	COYELLOW="" ; COTYELLOW=""
+	COCYAN=""   ; COTCYAN=""
+	COBLUE=""   ; COTBLUE=""
+else
+	CONORM="\033[0;00m"
+	CORED="\033[1;31m"    ; COTRED="\033[0;31m"
+	COPURPLE="\033[1;35m" ; COTPURPLE="\033[0;35m"
+	COGREEN="\033[1;32m"  ; COTGREEN="\033[0;32m"
+	COYELLOW="\033[1;33m" ; COTYELLOW="\033[0;33m"
+	COCYAN="\033[1;36m"   ; COTCYAN="\033[0;36m"
+	COBLUE="\033[1;34m"   ; COTBLUE="\033[0;34m"
+fi
 
 # to let people know where functions are
 BINNAME="$EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_functions.sh"
