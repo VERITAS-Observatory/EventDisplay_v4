@@ -1974,6 +1974,12 @@ TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierInde
 	l.setPlottingStyle( 8, 2, 2, 25 );
 	l.listValues( 7 );
 	l.plot( 7, c );
+	if( l.isValidID( 10 ) )
+	{
+	   l.setPlottingStyle( 47, 2, 2, 25 );
+	   l.listValues( 10 );
+	   l.plot( 10, c );
+        }
 	
 	plot( c );
 	
