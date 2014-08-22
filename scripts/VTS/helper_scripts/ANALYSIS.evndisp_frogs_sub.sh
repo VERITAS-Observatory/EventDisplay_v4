@@ -101,9 +101,9 @@ OPT+=( -frogs $TEMPDIR/$INPUTMSCW             )
 OPT+=( -frogsid 0                            )
 OPT+=( -templatelistforfrogs "$TEMPLATELIST" )
 
-if [[ "$FASTDEVMODE" == "yes" ]]; then
-    OPT+=( -nevents=50 )
-    echo "Warning, \$FASTDEVMODE=yes, only processing the first 50 events..."
+if [[ "$SCIPIPE_NEVENTS" =~ ^[0-9]+$ ]]; then
+    OPT+=( -nevents=$SCIPIPE_NEVENTS )
+    echo "Warning, \$SCIPIPE_NEVENTS=$SCIPIPE_NEVENTS, only processing the first $SCIPIPE_NEVENTS events..."
 fi
 
 echo "using frogs options '${OPT[@]}'"

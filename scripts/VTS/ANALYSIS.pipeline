@@ -299,12 +299,12 @@ exec 5>&1 # extra place to duplicate output to stdout, look for >&5
 #   error scanning.
 export SCIPIPE_DEBUGREGEX="WHITEBOARD"
 
-## To only test the first 10000 events:
-# if set to yes, some stages will only run
-# for the first few hundred events
-# to allow for very fast testing
-# Do not set this to 'yes' and expect good science!
-export SCIPIPE_FASTDEVMODE="no"
+## To only process the first X events:
+# if set to an integer X, some stages (evndisp,frogs) 
+# will only run for the first X events,
+# to allow for very fast testing and debugging.
+# Do not use this option and expect good science!
+export SCIPIPE_NEVENTS=""
 
 ## If you want the pipeline to not use colored text:
 # you can use the SCIPIPE_COLOROPT environment variable.
@@ -444,7 +444,7 @@ if [ ! -d "$VERITAS_EVNDISP_AUX_DIR" ] ; then
 	exit 1
 fi
 
-# render the runlist file to its full pathname
+# render the runlist filename to its full pathname
 RUNLIST=$( readlink -m $RUNLIST )
 
 # check that the runlist is sane
@@ -459,10 +459,6 @@ mkdir -p $SCIDIR
 
 # extra functions
 source $EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_functions.sh
-
-if [[ "$SCIPIPE_FASTDEVMODE" == "yes" ]] ; then
-	echo -e "${COTYELLOW}Warning, \$SCIPIPE_FASTDEVMODE is set to 'yes', evndisp stage will only process the first 2000 events...$CONORM"
-fi
 
 # evndisp output directory
 mkdir -p $EVNDISPOUTPUTDIR
@@ -485,10 +481,10 @@ if [[ "$SCIPIPE_MANUALLASER" == "yes" ]] ; then
 	fi
 fi
 
-# alert the user if they are using FASTDEVMODE
-function checkForFASTDEVMODE {
-    if [ "$FASTDEVMODE" = "yes" ] ; then
-        echo -e "${COTYELLOW}Warning, \$FASTDEVMODE=yes, not all events will be processed (this variable is set in ANALYSIS.pipeline)...${CONORM}"
+# alert the user if they are using SCIPIPE_NEVENTS
+function checkForSciPipeNevents {
+    if [ "$SCIPIPE_NEVENTS" =~ ^[0-9]+$ ] ; then
+		echo -e "${COTYELLOW}Warning, \$SCIPIPE_NEVENTS=$SCIPIPE_NEVENTS, not all events will be processed (this variable is set in $SETTINGSFILE)...${CONORM}"
     fi
 }
 
@@ -653,7 +649,7 @@ if [[ "$STAGE" == "evndisp" ]] ; then
 		# evndisp #########################################################
 		echo "$STAGE" > "$STAGEFILE"
 		makeParamFile
-        checkForFASTDEVMODE
+        checkForSciPipeNevents
 		cd $EVNDISPSYS/scripts/VTS
         if [[ "$DOCALIB" = yes ]] ; then CALIBCODE=1
         else                             CALIBCODE=0 ; fi
@@ -767,7 +763,7 @@ if [[ "$STAGE" == "mscw" ]] ; then
 		stageBanner
 		# mscw #########################################################
 		echo "$STAGE" > "$STAGEFILE"
-        checkForFASTDEVMODE
+        checkForSciPipeNevents
 		setupFilteredRunlists
 		makeParamFile
 		cd $EVNDISPSYS/scripts/VTS
@@ -873,7 +869,7 @@ if [[ "$STAGE" == "frogs" ]] ; then
 		# frogs #################################################################
 		echo "$STAGE" > "$STAGEFILE"
 		cd $EVNDISPSYS/scripts/VTS
-        checkForFASTDEVMODE
+        checkForSciPipeNevents
 		setupFilteredRunlists
 		makeParamFile
         
@@ -964,7 +960,7 @@ if [[ "$STAGE" == "anpar" ]] ; then
 		# anpar #########################################################
 		makeParamFile
 		echo "$STAGE" > "$STAGEFILE"
-        checkForFASTDEVMODE
+        checkForSciPipeNevents
 		cd $EVNDISPSYS/scripts/VTS
 		
 		# decide input directory

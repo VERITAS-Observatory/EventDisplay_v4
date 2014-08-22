@@ -105,8 +105,8 @@ if [[ $MODEL3D == "1" ]]; then
     OPT+=( -model3d -lnlfile "$VERITAS_EVNDISP_AUX_DIR/Model3D/table_Model3D_Likelihood.root" )
 fi
 
-if [[ "$SCIPIPE_FASTDEVMODE" == "yes" ]] ; then
-	OPT+=( -nevents=10000 ) 
+if [[ "$SCIPIPE_NEVENTS" =~ ^[0-9]+$ ]] ; then
+	OPT+=( -nevents=$SCIPIPE_NEVENTS ) 
 fi
 
 
