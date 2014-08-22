@@ -89,7 +89,7 @@ void VOnOff::createHistograms( TList* ion, TList* il )
 }
 
 
-void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, double i_norm, double i_norm_alpha, bool isCombined )
+void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, double i_norm_alpha, bool isCombined )
 {
 	if( fDebug )
 	{
@@ -98,9 +98,6 @@ void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, d
 	string itemp;
 	
 	hPList->Clear();
-	
-	// update normalisation factor
-	i_norm_alpha *= i_norm;
 	
 	///////////////////////////////////////////////////////////////
 	// fill parameter histograms
@@ -124,7 +121,7 @@ void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, d
 		// htheta2 histogram (note: calculated from one reflected region only!)
 		if( itemp.find( "htheta2" ) == 0 )
 		{
-			hTemp->Add( hon, hoff, 1., -1.*i_norm );
+			hTemp->Add( hon, hoff, 1., -1. );
 			hTheta2_diff = ( TH1D* )hTemp;
 		}
 		// energy histogram with x-axis in logE or linE
@@ -169,7 +166,7 @@ void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, d
     on - alpha * off for sky histograms
 
 */
-void VOnOff::doOnOffforSkyHistograms( TList* ionlist, TList* iofflist, double i_norm, TH2D* ialpha )
+void VOnOff::doOnOffforSkyHistograms( TList* ionlist, TList* iofflist, TH2D* ialpha )
 {
 	if( fDebug )
 	{

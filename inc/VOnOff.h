@@ -50,8 +50,8 @@ class VOnOff
 		VOnOff();
 		~VOnOff();
 		void doOnOff( TList* ion, TList* ioff, double i_norm );
-		void doOnOffforParameterHistograms( TList* ipon, TList* ipoff, double i_norm, double i_norm_alpha, bool isCombined );
-		void doOnOffforSkyHistograms( TList* ipon, TList* ipoff, double i_norm, TH2D* ialpha );
+		void doOnOffforParameterHistograms( TList* ipon, TList* ipoff, double i_norm_alpha, bool isCombined );
+		void doOnOffforSkyHistograms( TList* ipon, TList* ipoff, TH2D* ialpha );
 		void doQfactors( TList* ion, TList* ioff, double i_norm );
 		TH2D* do2DSignificance( TH2D* ion, TH2D* ioff, double i_norm );
 		TH2D* do2DSignificance( TH2D* ion, TH2D* ioff, TH2D* halpha );

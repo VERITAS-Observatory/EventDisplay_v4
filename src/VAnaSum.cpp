@@ -601,9 +601,9 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	////////////////////////////////////////////////////////////
 	// create alpha histogram for significance calculations
 	fStereoOff->scaleAlpha( i_normObsTime, fStereoOn->getAlpha(), fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(),
-							fStereoOn->getMeanSignalBackgroundAreaRatio(), false, icounter );
+				fStereoOn->getMeanSignalBackgroundAreaRatio(), false, icounter );
 	fStereoOff->scaleAlpha( i_normObsTime, fStereoOn->getAlphaUC(), fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(),
-							fStereoOn->getMeanSignalBackgroundAreaRatioUC(), true, icounter );
+				fStereoOn->getMeanSignalBackgroundAreaRatioUC(), true, icounter );
 							
 	////////////////////////////////////////////////////////////
 	// calulate significance in source bin
@@ -645,14 +645,12 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	VOnOff* fstereo_onoff = new VOnOff();
 	
 	// 1D histograms
-	fstereo_onoff->doOnOffforParameterHistograms( fStereoOn->getParameterHistograms(),
-			fStereoOff->getParameterHistograms(),
-			1., i_norm_alpha, ( onrun == -1 ) );
+	fstereo_onoff->doOnOffforParameterHistograms( fStereoOn->getParameterHistograms(), fStereoOff->getParameterHistograms(), i_norm_alpha, ( onrun == -1 ) );
 			
 	// correlated maps
-	fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( false ), fStereoOff->getSkyHistograms( false ), 1., fStereoOff->getAlphaNorm() );
+	fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( false ), fStereoOff->getSkyHistograms( false ), fStereoOff->getAlphaNorm() );
 	// uncorrelated maps
-	fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( true ), fStereoOff->getSkyHistograms( true ), 1., fStereoOff->getAlphaNormUC() );
+	fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( true ), fStereoOff->getSkyHistograms( true ), fStereoOff->getAlphaNormUC() );
 											
 	// print out maximum in maps
 	cout << "\t Maximum in CORRELATED maps: " << endl;

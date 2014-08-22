@@ -1105,10 +1105,10 @@ double VStereoAnalysis::combineHistograms()
 		{
 			for( int j = 1; j <= nybin; j++ )
 			{
-				fHistoTot->hmap_stereo->SetBinContent( i, j, fHisto[h]->hmap_stereo->GetBinContent( i, j ) + fHistoTot->hmap_stereo->GetBinContent( i, j ) );
 				// average normalization (alpha) factor
-				if( fHisto[h]->hmap_alpha && fHisto[h]->hmap_alpha->GetBinContent( i, j ) > 0. )
+				if( fHisto[h]->hmap_alpha && fHisto[h]->hmap_alpha->GetBinContent( i, j ) > 0. && fHisto[h]->hmap_alpha_off->GetBinContent( i, j ) > 0. )
 				{
+				   fHistoTot->hmap_stereo->SetBinContent( i, j, fHisto[h]->hmap_stereo->GetBinContent( i, j ) + fHistoTot->hmap_stereo->GetBinContent( i, j ) );
 				   fHistoTot->hmap_alpha->SetBinContent( i, j, fHisto[h]->hmap_alpha->GetBinContent( i, j ) * i_exposure + fHistoTot->hmap_alpha->GetBinContent( i, j ) );
                                 }
 			}
