@@ -444,6 +444,9 @@ if [ ! -d "$VERITAS_EVNDISP_AUX_DIR" ] ; then
 	exit 1
 fi
 
+# render the runlist file to its full pathname
+RUNLIST=$( readlink -m $RUNLIST )
+
 # check that the runlist is sane
 if [ ! -e "$RUNLIST" ] ; then
 	echo "error, \$RUNLIST=$RUNLIST needs to be a valid file, exiting..." 2>&1
