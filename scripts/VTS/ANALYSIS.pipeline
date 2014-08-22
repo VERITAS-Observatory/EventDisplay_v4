@@ -483,7 +483,7 @@ fi
 
 # alert the user if they are using SCIPIPE_NEVENTS
 function checkForSciPipeNevents {
-    if [ "$SCIPIPE_NEVENTS" =~ ^[0-9]+$ ] ; then
+    if [[ "$SCIPIPE_NEVENTS" =~ ^[0-9]+$ ]] ; then
 		echo -e "${COTYELLOW}Warning, \$SCIPIPE_NEVENTS=$SCIPIPE_NEVENTS, not all events will be processed (this variable is set in $SETTINGSFILE)...${CONORM}"
     fi
 }
