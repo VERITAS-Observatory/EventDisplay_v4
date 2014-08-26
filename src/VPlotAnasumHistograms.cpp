@@ -458,7 +458,7 @@ void VPlotAnasumHistograms::plot_qualityHistograms( double iSourceStrength, bool
  *
  *
  */
-TCanvas* VPlotAnasumHistograms::plot_skyPlots( string iPlotMode, bool iSingleCanvases )
+TCanvas* VPlotAnasumHistograms::plot_skyPlots( string iPlotMode, bool iSingleCanvases, double excess_min, double excess_max, double sig_min, double sig_max )
 {
 	char hname[200];
 	char htitle[200];
@@ -499,6 +499,14 @@ TCanvas* VPlotAnasumHistograms::plot_skyPlots( string iPlotMode, bool iSingleCan
 	}
 	hmap_stereo_diff = ( TH2D* )getHistogram( hname, fRunNumber, "skyHistograms" );
 	setHistogramPlottingStyle( hmap_stereo_diff, 1.5 );
+        if( excess_min > -9999. )
+        {
+            hmap_stereo_diff->SetMinimum( excess_min );
+        }
+        if( excess_max > -9999. )
+        {
+            hmap_stereo_diff->SetMaximum( excess_max );
+        }
 	
 	TH2D* hmap_alpha_on = 0;
 	if( fPlotCorrelated )
@@ -547,6 +555,14 @@ TCanvas* VPlotAnasumHistograms::plot_skyPlots( string iPlotMode, bool iSingleCan
 	}
 	hmap_stereo_sig = ( TH2D* )getHistogram( hname, fRunNumber, "skyHistograms" );
 	setHistogramPlottingStyle( hmap_stereo_sig, 1.5 );
+        if( sig_min > -999. )
+        {
+            hmap_stereo_sig->SetMinimum( sig_min );
+        }
+        if( sig_max > -999. )
+        {
+            hmap_stereo_sig->SetMaximum( sig_max );
+        }
 	
 	// plotting canvas
 	TCanvas* c_skyAll = 0;
