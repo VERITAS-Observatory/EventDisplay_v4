@@ -73,6 +73,8 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool fprintdeadpixelinfo ; 		 // DEADCHAN if true, will print list of dead pixels
 		// at end of run to evndisp.log
 		
+		bool fSaveDeadPixelRegistry ; // will save an extra tree containing info about the dead pixels
+		
 		bool fForceLLImageFit ; 		 // FORCELL if true, will use log-likelihood image fitting
 		// on all images, irregardless of if they are near the
 		// edge of the camera or not.  Set in

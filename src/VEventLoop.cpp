@@ -118,6 +118,23 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	fDeadTime = new VDeadTime();
 	fDeadTime->defineHistograms( fRunPar->fRunDuration );
 	
+	// create dead pixel organizer
+	if ( fRunPar->fSaveDeadPixelRegistry ) {
+		fDeadPixelOrganizer = new VDeadPixelOrganizer( 
+			fRunPar->fNTelescopes, fDetectorGeo->getNumChannels(), fDetectorGeo, 
+			fRunPar->fDBDataStartTimeMJD, fRunPar->fDBDataStartTimeSecOfDay,
+			fRunPar->fDBDataStoppTimeMJD, fRunPar->fDBDataStoppTimeSecOfDay,
+			"deadPixelRegistry", getRunNumber() ) ;
+		
+		//fDeadPixelOrganizer->printSummary() ;
+		//cout << "NKH Exiting Now!" << endl;
+		//exit(0) ;
+	}
+	else
+	{
+		fDeadPixelOrganizer = 0 ;
+	}
+	
 #ifndef NOGSL
 	// Frogs Stuff
 	fFrogs = new VFrogs();
@@ -773,6 +790,18 @@ void VEventLoop::shutdown()
                                    cout << endl;
                                 }
 			}
+			
+			// orgainze and write out tree
+			if ( fRunPar->frunmode == R_ANA && fDeadPixelOrganizer ) 
+			{
+				cout << "NKH Finish Up VDeadPixelOrganizer" << endl;
+				fDeadPixelOrganizer->printSummary() ;
+
+				// copy tree to output root file
+				fDeadPixelOrganizer->finalize() ;
+				
+			} 
+			
 			// write array analysis results to output file
 			if( fArrayAnalyzer )
 			{
@@ -1483,6 +1512,45 @@ int VEventLoop::analyzeEvent()
 			}
 		}
 	}
+	
+	// add dead pixel states to VDeadPixelOrganizer
+	if ( fDeadPixelOrganizer )
+	{
+		// get this event's info
+		int    eventMJD    = fArrayEventMJD  ;
+		double eventTime   = fArrayEventTime ;
+		int    eventNumber = fEventNumber    ;
+		
+		// set up some initial variables
+		bool   lowGain   = true  ;
+		bool   higGain   = false ;
+		PixelStateInt lowGainState = 121212 ;
+			
+		
+		// loop over all telescopes
+		// itel is from 0-3
+		for ( unsigned int itel = 0 ; itel < getTeltoAna().size() ; itel++ )
+		{
+			setTelID( getTeltoAna()[itel] ) ;
+			
+			// loop over all? lowgain pixels
+			// ipix is from 0-498
+			//cout << coutprefix << "getDead(highGain).size:" << getDead(higGain).size() << endl;
+			for ( unsigned int ipix = 0 ; ipix < getDead( higGain ).size() ; ipix++ )
+			{
+				lowGainState  = (PixelStateInt) getDead( higGain )[ipix] ; 
+
+				fDeadPixelOrganizer->UpdatePixelState( itel+1, ipix+1, higGain,  eventMJD, eventTime,  lowGainState ) ;
+			}
+
+		} // endfor: no more telescopes
+		
+		fDeadPixelOrganizer->updatePreviousEventInfo( eventNumber, eventMJD, eventTime ) ;
+
+	} // endif: fDeadPixelOrganizer doesn't exist
+
+
+	//}
 	
 	return i_cut;
 }

@@ -284,22 +284,31 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 			   TFile* oldfile = new TFile( i_temp1 );
 			   if( !oldfile->IsZombie() )
 			   {
-				// copy TTree telconfig to anasum.root file
-				TTree* iTree = ( TTree* )oldfile->Get( "telconfig" );
-				if( iTree )
-				{
-				        fStereoRunDir[j]->cd();
-					TTree* newtree = iTree->CloneTree();
-					newtree->Write();
-				}
-				// copy TTree pointingDataReduced to anasum.root file
-				TTree* jTree = ( TTree* )oldfile->Get( "pointingDataReduced" );
-				if( jTree )
-				{
-					fStereoRunDir[j]->cd();
-					TTree* newtreej = jTree->CloneTree();
-					newtreej->Write();
-				}
+					// copy TTree telconfig to anasum.root file
+					TTree* iTree = ( TTree* )oldfile->Get( "telconfig" );
+					if( iTree )
+					{
+							fStereoRunDir[j]->cd();
+						TTree* newtree = iTree->CloneTree();
+						newtree->Write();
+					}
+					// copy TTree pointingDataReduced to anasum.root file
+					TTree* jTree = ( TTree* )oldfile->Get( "pointingDataReduced" );
+					if( jTree )
+					{
+						fStereoRunDir[j]->cd();
+						TTree* newtreej = jTree->CloneTree();
+						newtreej->Write();
+					}
+					
+					// copy TTree deadPixelRegistry to anasum.root file
+					TTree * kTree = ( TTree* )oldfile->Get( "deadPixelRegistry" ) ;
+					if ( kTree )
+					{
+						fStereoRunDir[j]->cd();
+						TTree* newtreek = kTree->CloneTree();
+						newtreek->Write();
+					}
 			   }
 			   // copy VEvndispRunParameter 'runparameterV2' to anasum.root file
 			   fStereoRunDir[j]->cd();

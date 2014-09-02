@@ -1483,7 +1483,7 @@ bool VTableLookupDataHandler::terminate( TNamed* iM )
 		}
 		
 		///////////////////////////////////////////////////////////////////////////
-		// copy TTree 'pointingDataReduced' from evndisp.<>.root to mscw.<>.root
+		// copy TTree 'pointingDataReduced' and 'deadPixelRegistry' from evndisp.<>.root to mscw.<>.root
 		if( finputfile.size() > 1 )
 		{
 			cout << "Warning, VTableLookupDataHandler->finputfile.size() isn't 1, not sure which input file to copy TTree 'pointingDataReduced' from, copying from file finputfile[0]:" << finputfile[0] << endl;
@@ -1496,6 +1496,16 @@ bool VTableLookupDataHandler::terminate( TNamed* iM )
 			TTree* newtree     = iTree->CloneTree();
 			fOutFile->cd();
 			newtree->Write();
+			
+			TTree * jTree = ( TTree* )inpMscwFile->Get("deadPixelRegistry" ) ;
+			// deadPixelRegistry may not exist, only try to copy it if it's there
+			if ( jTree )
+			{
+				TTree * newtree2 = jTree->CloneTree() ;
+				fOutFile->cd() ;
+				newtree2->Write() ;
+			}
+			
 		}
 		else if( !fIsMC )
 		{

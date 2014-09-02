@@ -331,7 +331,8 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VSkyCoordinatesUtilities.o \
 		./obj/VHoughTransform.o \
 		./obj/VDB_PixelDataReader.o \
-		./obj/VDisplay.o  
+		./obj/VDisplay.o \
+		./obj/VDeadPixelOrganizer.o 
 
 FROGSOBJECTS =	./obj/VFrogs.o \
                 ./obj/frogs.o \
@@ -822,7 +823,6 @@ PRINTBINARYOBJ=		./obj/VASlalib.o ./obj/printBinaryOrbitalPhase.o
 printBinaryOrbitalPhase:	$(PRINTBINARYOBJ)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
-
 
 ########################################################
 # writeCTAEventListFromAnasum
