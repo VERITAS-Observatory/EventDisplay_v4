@@ -2,7 +2,7 @@
 # script to analyse data files with anasum (parallel analysis) from a simple run list
 
 # EventDisplay version
-EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .`
+EDVERSION=`$EVNDISPSYS/bin/anasum --version | tr -d .`
 
 if [[ $# < 4 ]]; then
 # begin help message
