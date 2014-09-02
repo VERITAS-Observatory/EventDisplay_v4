@@ -61,21 +61,26 @@ void VOnOff::setTitles( TH1* his, string iname, string ititle, string ytitle )
 	}
 }
 
-
+/*
+ *
+ *
+ */
 void VOnOff::createHistograms( TList* ion, TList* il )
 {
 	string itemp;
+        string ihname;
 	TIter next_on( ion );
 	while( TH1* hon = ( TH1* )next_on() )
 	{
 		itemp = hon->ClassName();
+                ihname = hon->GetName();
 		if( itemp == "TH1D" )
 		{
 			il->Add( new TH1D( *( ( TH1D* )hon ) ) );
 		}
 		else if( itemp == "TH2D" )
 		{
-			il->Add( new TH2D( *( ( TH2D* )hon ) ) );
+                        il->Add( new TH2D( *( ( TH2D* )hon ) ) );
 		}
 		else if( itemp == "TProfile" )
 		{
@@ -168,21 +173,12 @@ void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, d
 */
 void VOnOff::doOnOffforSkyHistograms( TList* ionlist, TList* iofflist, TH2D* ialpha )
 {
-	if( fDebug )
-	{
-		cout << "VOnOff::doOnOff" << endl;
-	}
-	string itemp;
-	
 	hSList->Clear();
-	
-	//////////////////////////////////////////////
-	
-	// fill sky maps
 	
 	// create diff histograms
 	createHistograms( ionlist, hSList );
 	
+	string itemp;
 	TIter next( hSList );
 	TIter n_on( ionlist );
 	TIter n_off( iofflist );
@@ -227,43 +223,16 @@ void VOnOff::doOnOffforSkyHistograms( TList* ionlist, TList* iofflist, TH2D* ial
 		{
 			cout << "VOnOff::doOnOffforSkyHistograms: error, unknown histogram type " << hTemp->GetName() << "\t" << itemp << endl;
 		}
-		hList->Add( hTemp );
-		hListSkyHistograms->Add( hTemp );
+                // add histogram to the corresponding list
+                // (we don't want to use alpha histograms)
+                itemp = hTemp->GetName();
+                if( itemp.find( "alpha" ) == string::npos )
+                {
+                    hList->Add( hTemp );
+                    hListSkyHistograms->Add( hTemp );
+                }
 	}
 	
-	if( fDebug )
-	{
-		cout << "\t VOnOff::doOnOff" << endl;
-	}
-}
-
-
-void VOnOff::doOnOff( TList* ionlist, TList* iofflist, double i_norm )
-{
-	if( fDebug )
-	{
-		cout << "VOnOff::doOnOff" << endl;
-	}
-	hList->Clear();
-	
-	createHistograms( ionlist, hList );
-	
-	TIter next( hList );
-	TIter n_on( ionlist );
-	TIter n_off( iofflist );
-	while( TH1* hTemp = ( TH1* )next() )
-	{
-		hTemp->Reset();
-		setTitles( hTemp, "diff", " (ON-OFF)", "" );
-		// get on/off histograms
-		TH1* hon  = ( TH1* )n_on();
-		TH1* hoff = ( TH1* )n_off();
-		
-		// calculate difference
-		hTemp->Add( hon, hoff, 1., -1.*i_norm );
-		
-		hList->Add( hTemp );
-	}
 	if( fDebug )
 	{
 		cout << "\t VOnOff::doOnOff" << endl;
@@ -352,12 +321,6 @@ void VOnOff::doQfactors( TList* ionlist, TList* iofflist, double i_norm )
 }
 
 
-TH2D* VOnOff::do2DSignificance( TH2D* ion, TH2D* ioff, TH2D* ialpha )
-{
-	return do2DSignificance( ion, ioff, ialpha, "" );
-}
-
-
 TH2D* VOnOff::do2DSignificance( TH2D* ion, TH2D* ioff, TH2D* ialpha, string ititle )
 {
 	if( fDebug )
@@ -435,73 +398,7 @@ TH2D* VOnOff::do2DSignificance( TH2D* ion, TH2D* ioff, TH2D* ialpha, string itit
 }
 
 
-TH2D* VOnOff::do2DSignificance( TH2D* ion, TH2D* ioff, double i_norm )
-{
-	if( fDebug )
-	{
-		cout << "VOnOff::do2DSignificance" << endl;
-	}
-	hmap_stereo_sig = new TH2D( *ion );
-	hmap_stereo_sig->Reset();
-	hList->Add( hmap_stereo_sig );
-	
-	double i_sigmax = 0.;
-	double i_sigon = 0.;
-	double i_sigoff = 0.;
-	double i_sigx = 0.;
-	double i_sigy = 0.;
-	
-	for( int j = 0; j < hmap_stereo_sig->GetNbinsX(); j++ )
-	{
-		for( int k = 0; k < hmap_stereo_sig->GetNbinsY(); k++ )
-		{
-			double on  = ion->GetBinContent( j, k );
-			double off = ioff->GetBinContent( j, k );
-			if( ( on + off ) > 0. )
-			{
-				hmap_stereo_sig->SetBinContent( j, k, VStatistics::calcSignificance( on, off, i_norm ) );
-			}
-			else
-			{
-				hmap_stereo_sig->SetBinContent( j, k, 0. );
-			}
-			if( hmap_stereo_sig->GetBinContent( j, k ) > i_sigmax )
-			{
-				i_sigmax = hmap_stereo_sig->GetBinContent( j, k );
-				i_sigon = on;
-				i_sigoff = off;
-				i_sigx = hmap_stereo_sig->GetXaxis()->GetBinCenter( j );
-				i_sigy = hmap_stereo_sig->GetYaxis()->GetBinCenter( k );
-			}
-		}
-	}
-	setTitles( hmap_stereo_sig, "sig", " (Significance ON-OFF)", "" );
-	
-	// write maximum significance to screen
-	if( i_sigmax > 0. )
-	{
-		cout << "\t " << i_sigmax << " (On: " << i_sigon << ", Off: " << i_sigoff << ", Norm: " << i_norm << ")";
-		cout << " at ( x=" << i_sigx << ", y=" << i_sigy << ")" << endl;
-	}
-	
-	if( fDebug )
-	{
-		cout << "\t VOnOff::do2DSignificance" << endl;
-	}
-	return hmap_stereo_sig;
-}
-
-
-void VOnOff::writeMonoHistograms()
-{
-	if( hList )
-	{
-		hList->Write();
-	}
-}
-
-
-void VOnOff::writeHistograms( TH2D* hSig, TH2D* hSigUC )
+void VOnOff::writeHistograms( TH2D* hSig, TH2D* hSigUC, TH2D *hDiff, TH2D *hDiffUC )
 {
 	TDirectory* iDir = gDirectory;
 	
@@ -530,6 +427,14 @@ void VOnOff::writeHistograms( TH2D* hSig, TH2D* hSigUC )
 	{
 		hSigUC->Write();
 	}
+        if( hDiff )
+        {
+                hDiff->Write();
+        }
+        if( hDiffUC )
+        {
+                hDiffUC->Write();
+        }
 	
 	// write all stereo parameter histograms
 	iDir->cd();
@@ -610,6 +515,8 @@ void VOnOff::fill1DSignificanceHistogram( double rmax )
 	h1Dsig->SetXTitle( "significance" );
 	h1Dsig->SetYTitle( "entries" );
 	hList->Add( h1Dsig );
+
+        if( !hmap_stereo_sig ) return;
 	
 	double ir = 0.;
 	for( int j = 0; j < hmap_stereo_sig->GetNbinsX(); j++ )
@@ -631,101 +538,6 @@ void VOnOff::fill1DSignificanceHistogram( double rmax )
 TList* VOnOff::getEnergyHistograms()
 {
 	return hListEnergyHistograms;
-}
-
-
-/*
-
-    clean up edges of sky maps
-
-    (NOTE: CURRENTLY NOT USED; NEEDS SOME WORK)
-
-*/
-void VOnOff::cleanSigHistogram( TH2D* h, double imin )
-{
-	if( !h )
-	{
-		return;
-	}
-	
-	// do nothing for uncorrelated plots
-	string itemp;
-	itemp = h->GetName();
-	if( itemp.find( "UC" ) < itemp.size() )
-	{
-		return;
-	}
-	
-	map< int, bool > i_null;
-	
-	int i_del = 0;
-	
-	// code 2D bins by xbin*100000 + j
-	
-	// from bottom to top
-	for( int i = 1; i <= h->GetNbinsX(); i++ )
-	{
-		for( int j = 1; j <= h->GetNbinsY(); j++ )
-		{
-			if( h->GetBinContent( i, j ) > imin )
-			{
-				i_del = i * 100000 + j;
-				i_null[i_del] = true;
-				break;
-			}
-		}
-	}
-	// from left to right
-	for( int j = 1; j <= h->GetNbinsY(); j++ )
-	{
-		for( int i = 1; i <= h->GetNbinsX(); i++ )
-		{
-			if( h->GetBinContent( i, j ) > imin )
-			{
-				i_del = i * 100000 + j;
-				i_null[i_del] = true;
-				break;
-			}
-		}
-	}
-	// from right to left
-	for( int j = h->GetNbinsY(); j > 0; j-- )
-	{
-		for( int i = h->GetNbinsX(); i > 0; i-- )
-		{
-			if( h->GetBinContent( i, j ) > imin )
-			{
-				i_del = i * 100000 + j;
-				i_null[i_del] = true;
-				break;
-			}
-		}
-	}
-	// from top to bottom
-	for( int i = h->GetNbinsX(); i > 0; i-- )
-	{
-		for( int j = h->GetNbinsY(); j > 0; j-- )
-		{
-			if( h->GetBinContent( i, j ) > imin )
-			{
-				i_del = i * 100000 + j;
-				i_null[i_del] = true;
-				break;
-			}
-		}
-	}
-	
-	// now reset the outer bins
-	for( int i = 1; i <= h->GetNbinsX(); i++ )
-	{
-		for( int j = 1; j <= h->GetNbinsY(); j++ )
-		{
-			if( i_null.find( i * 100000 + j ) != i_null.end() )
-			{
-				h->SetBinContent( i, j, -999999. );
-			}
-		}
-	}
 }
 
 double VOnOff::getMaxSigma()

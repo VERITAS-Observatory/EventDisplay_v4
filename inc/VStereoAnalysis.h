@@ -46,7 +46,7 @@ class VStereoAnalysis
 		VStereoAnalysis( bool isOnrun, string i_hsuffix, VAnaSumRunParameter* irunpara,
 						 vector< TDirectory* > iRDir, TDirectory* iDir, string iDataDir, int iRandomSeed, bool iTotalAnalysisOnly );
 		~VStereoAnalysis() {}
-		double fillHistograms( int icounter, int irun, double AzMin, double AzMax, double iPedVar );
+		double fillHistograms( int icounter, int irun, double AzMin = -1.e3, double AzMax = 1.e3, double iPedVar = -1. );
 		TH2D*  getAlpha();
 		TH2D*  getAlphaUC();
 		TH2D*  getAlphaNorm();
@@ -95,8 +95,7 @@ class VStereoAnalysis
 		{
 			return fTreeSelectedEvents;
 		}
-		void   scaleAlpha( double inorm, TH2D* halpha_on, TH2D* h_ON, TH2D* h_OFF, TH1D* hMSR, bool buc, int incounter );
-		void   setAlphaOff( TH2D* ih, TH2D* ihUC );
+		void   scaleAlpha( TH2D* halpha_on, bool bUC );
 		void   setCuts( VAnaSumRunParameterDataClass iL, int irun );
 		void   setNoSkyPlots( bool iS )
 		{

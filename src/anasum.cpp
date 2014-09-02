@@ -104,20 +104,15 @@ int main( int argc, char* argv[] )
 	anasum->initialize( listfilename, listShortfilename, singletel - 1, runType, outfile, fRandomSeed, fRunParameterfile );
 	cout << endl;
 	
-	// mono analysis (GM: THIS HAS NOT BEEN USED SINCE PROTOTYPE TIMES - PROBABLY DOES NOT WORK ANYMORE)
-	if( analysisType == 0 || analysisType == 1 )
-	{
-		anasum->doMonoAnalysis( ( analysisType == 1 ) || ( analysisType == 5 ) );
-	}
 	// stereo analysis (default)
-	else if( analysisType == 3 || analysisType == 4 )
+	if( analysisType == 3 || analysisType == 4 )
 	{
 		anasum->doStereoAnalysis( ( analysisType == 3 ) || ( analysisType == 5 ) );
 	}
 	else
 	{
 		cout << endl << "error: unknown run analysisType" << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	// clean up and write results to disk
 	anasum->terminate();

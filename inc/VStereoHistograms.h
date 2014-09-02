@@ -98,15 +98,19 @@ class VStereoHistograms
 		// sky maps (uncorrelated)
 		TH2D* hmap_stereoUC;                      //!< Sky map (correlated bins)
 		TH2D* hmap_alphaUC;                       //!< Background normalisation map (correlated bins)
-		TH2D* hmap_alpha_offUC;                   //!< Background normalisation map, off map for on run (correlated bins)
 		TH2D* hmap_alphaNormUC;                   //!< Background normalisation map  (correlated bins)
+		TH2D* h_combine_map_alpha_offUC;                   //!< Background normalisation map, off map for on run (correlated bins)
+                TH2D* h_combine_map_stereo_onUC;
+                TH2D* h_combine_map_stereo_offUC;
 		
 		// sky maps (correlated)
 		TH2D* hxyoff_stereo;                      //!< xyoff map on camera
 		TH2D* hmap_stereo;                        //!< Sky map (correlated bins)
 		TH2D* hmap_alpha;                         //!< Background normalisation map (correlated bins)
-		TH2D* hmap_alpha_off;                     //!< Background normalisation map, off map for on run (correlated bins)
 		TH2D* hmap_alphaNorm;                     //!< Background normalisation map  (correlated bins)
+                TH2D* h_combine_map_alpha_off;
+                TH2D* h_combine_map_stereo_on;
+                TH2D* h_combine_map_stereo_off;
 		
 		// rate lists
 		TList* hisRateList;
@@ -124,7 +128,6 @@ class VStereoHistograms
 		bool readParameterHistograms();
 		bool readSkyPlots();
 		void scaleDistributions( double );
-		void setAlphaOff( TH2D* ioff, bool iuc );
 		void setRunNumber( int iRun ) { fRunNumber = iRun; }
 		void setSkyMapSize( double xmin, double xmax, double ymin, double ymax );
 		void writeObjects( string, string, TObject* );

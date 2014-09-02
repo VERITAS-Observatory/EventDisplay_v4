@@ -3,7 +3,6 @@
 #ifndef VANASUM_H
 #define VANASUM_H
 
-#include "VMonoPlots.h"
 #include "VOnOff.h"
 #include "VRatePlots.h"
 #include "VAnaSumRunParameter.h"
@@ -46,7 +45,6 @@ class VAnaSum
 		VAnaSum( string i_datadir, unsigned int fMode );
 		~VAnaSum() {}
 		
-		void doMonoAnalysis( bool iFull );
 		void doStereoAnalysis( bool iSkyPlots );
 		void initialize( string i_longlistfilename, string i_shortlistfilename, int i_singletel, unsigned int iRunType,
 						 string i_outfile, int iRandomSeed, string fRunParameterfile );
@@ -56,7 +54,6 @@ class VAnaSum
 	
 		void copyDirectory( TDirectory* );
 		void doLightCurves( TDirectory* iDir, double ialpha, VStereoAnalysis* ion, VStereoAnalysis* ioff );
-		void doMonoAnalysis( int irunon, int irunoff, double iexp_on, double i_exp_off, vector<TDirectory*> idir );
 		void doStereoAnalysis( int icounter, int irunon, int irunoff, TDirectory* idir );
 		void fillRunSummary( int onrun, int offrun, double iexp_on, double iexp_off,
 							 double i_nevts_on, double i_nevts_off, double i_norm_alpha,
@@ -104,15 +101,9 @@ class VAnaSum
 		vector< TDirectory* > fRunDir;            //!< directory with results per run
 		
 		TDirectory* fStereoTotalDir;              //!< directory with combined stereo results
-		vector<TDirectory*> fMonoTotalDir;        //!< directory with combined mono results (one per telescope)
 		
 		vector< TDirectory* > fStereoRunDir;      //!< directory with stereo results per run
 		//!< single telescope directories, one per run and telescope (first index: run, second index: telescope)
-		vector< vector< TDirectory* > > fMonoRunDir;
-		
-		// Mono Analysis
-		vector<VMonoPlots*> fMonoOn;              //!< Mono analysis plots for ON source (one per telescope)
-		vector<VMonoPlots*> fMonoOff;             //!< Mono analysis plots for OFF source (one per telescope)
 		
 		// Stereo analysis
 		VStereoAnalysis* fStereoOn;               //!< Analysis plots for stereo parameters
@@ -120,7 +111,6 @@ class VAnaSum
 		
 		// summary
 		VRatePlots* fRatePlots;                   //!< significance and rate plots vs time
-		vector< VRatePlots* > fMonoRatePlots;
 		VRunSummary* fRunSummary;
 		
 		double fMeanRawRateOn;

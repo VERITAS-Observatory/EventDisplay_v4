@@ -31,8 +31,6 @@ VAnaSum::VAnaSum( string i_datadir, unsigned int iAnalysisType )
 
    check run mode
 
-   NOTE: mono analysis might not work anymore
-
 */
 void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename, int i_singletel, unsigned int iRunType, string i_outfile, int iRandomSeed, string iRunParameterfile )
 {
@@ -45,7 +43,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 	// merging analysis
 	if( fAnalysisRunMode == 1 )
 	{
-		cout << "merging analysis" << endl << endl;
+		cout << "merging analysis results" << endl << endl;
 	}
 	// sequentiell analysis
 	else
@@ -136,18 +134,6 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 		exit( EXIT_FAILURE );
 	}
 	
-	// make mono directories
-	if( fAnalysisType == 0 || fAnalysisType == 1 || fAnalysisType == 5 )
-	{
-		for( int i = 0; i < fNumTels; i++ )
-		{
-			sprintf( i_temp, "mono_Tel_%d", i + 1 + fTelOffset );
-			sprintf( i_title, "combined mono results for telescope %d", i + 1 + fTelOffset );
-			fTotalDir->cd();
-			fMonoTotalDir.push_back( fTotalDir->mkdir( i_temp, i_title ) );
-		}
-	}
-	
 	// directories with run wise results
 	for( unsigned int j = 0; j < fRunPara->fRunList.size(); j++ )
 	{
@@ -212,7 +198,6 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 	// STANDARD ANALYSIS (analysis all individual runs; sequentiell)
 	else
 	{
-		vector< TDirectory*> i_monoDir;
 		for( unsigned int j = 0; j < fRunPara->fRunList.size(); j++ )
 		{
 			sprintf( i_temp, "run_%d", fRunPara->fRunList[j].fRunOn );
@@ -248,19 +233,6 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 					cout << i_temp << " in output file " << fOPfile->GetName() << endl;
 					cout << "(run " << fRunPara->fRunList[j].fRunOn << ")" << endl;
 					exit( EXIT_FAILURE );
-				}
-				// mono directories
-				if( fAnalysisType == 0 || fAnalysisType == 1 || fAnalysisType == 5 )
-				{
-					i_monoDir.clear();
-					for( int i = 0; i < fNumTels; i++ )
-					{
-						sprintf( i_temp, "mono_Tel_%d", i + 1 + fTelOffset );
-						sprintf( i_title, "mono results for run %d and telescope %d", fRunPara->fRunList[j].fRunOn, i + 1 + fTelOffset );
-						fRunDir.back()->cd();
-						i_monoDir.push_back( fRunDir.back()->mkdir( i_temp, i_title ) );
-					}
-					fMonoRunDir.push_back( i_monoDir );
 				}
 			}
 		}
@@ -337,19 +309,6 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 			}
 			
 		}
-		
-		// set up mono plots
-		if( fAnalysisType == 0 || fAnalysisType == 1 || fAnalysisType == 5 )
-		{
-			for( int i = 0; i < fNumTels; i++ )
-			{
-				sprintf( i_temp, "on_%d", i + 1 );
-				fMonoOn.push_back( new VMonoPlots( true, 0, i_temp, fRunPara, i ) );
-				
-				sprintf( i_temp, "off_%d", i + 1 );
-				fMonoOff.push_back( new VMonoPlots( false, 0, i_temp, fRunPara, i ) );
-			}
-		}
 	}
 	cout << "-----------------------------------------------------------------------(5)" << endl;
 	
@@ -357,21 +316,14 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 	/////////////////////////////////////////////////////////////
 	// VStereoAnalysis will check validity of the data trees.
 	fStereoOn = new VStereoAnalysis( true, "on", fRunPara, fStereoRunDir, fStereoTotalDir, fDatadir, iRandomSeed, ( fAnalysisRunMode == 1 ) );
-	fRunExposureOn = fStereoOn->getRunDuration(); // Default exposure is run duration (only really necessary for MONO analysis)
+	fRunExposureOn = fStereoOn->getRunDuration(); // Default exposure is run duration
 	fStereoOff = new VStereoAnalysis( false, "off", fRunPara, fStereoRunDir, fStereoTotalDir, fDatadir, iRandomSeed, ( fAnalysisRunMode == 1 ) );
-	// Default exposure is run duration (only really necessary for MONO analysis)
+	// Default exposure is run duration
 	fRunExposureOff = fStereoOff->getRunDuration();
 	
 	// rate plots and run summary
 	// (rate plot times are relevant for ON runs only)
 	fRatePlots = new VRatePlots( fRunPara, fStereoOn->getRunMJD() );
-	if( fAnalysisType == 0 || fAnalysisType == 1 || fAnalysisType == 5 )
-	{
-		for( int i = 0; i < fNumTels; i++ )
-		{
-			fMonoRatePlots.push_back( new VRatePlots( fRunPara, fStereoOn->getRunMJD() ) );
-		}
-	}
 	fRunSummary = new VRunSummary();
 	
 	fMeanRawRateOn = 0.;
@@ -466,7 +418,7 @@ void VAnaSum::doStereoAnalysis( bool iSkyPlots )
 
 
 /*
- * run stereo analysis for the given run (sky map and histogram filling, on-off)
+ *  run stereo analysis for the given run (sky map and histogram filling, on-off)
  *
  */
 
@@ -479,26 +431,11 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	
 	////////////////////////////////////////////////////////////
 	// fill on and off histograms and sky maps
-	if( onrun  == -1 )
-	{
-		fStereoOn->fillHistograms( icounter, onrun, -1.e3, 1.e3, -1. );
-	}
-	else
-	{
-		fStereoOn->fillHistograms( icounter, onrun, fRunAzMinOn[onrun], fRunAzMaxOn[onrun], fRunPedVarsOn[onrun] );
-	}
-	
-	if( offrun == -1 )
-	{
-		fStereoOff->fillHistograms( icounter, offrun, -1.e3, 1.e3, -1. );
-	}
-	else
-	{
-		fStereoOff->fillHistograms( icounter, offrun, fRunAzMinOff[offrun], fRunAzMaxOff[offrun], fRunPedVarsOff[offrun] );
-	}
+        fStereoOn->fillHistograms( icounter, onrun, fRunAzMinOn[onrun], fRunAzMaxOn[onrun], fRunPedVarsOn[onrun] );
+        fStereoOff->fillHistograms( icounter, offrun, fRunAzMinOff[offrun], fRunAzMaxOff[offrun], fRunPedVarsOff[offrun] );
 	
 	////////////////////////////////////////////////////////////
-	// get exposures
+	// get and print exposures
 	double iexp_on    = fTotalExposureOn;
 	double iexp_off   = fTotalExposureOff;
 	if( onrun != -1 )
@@ -512,19 +449,6 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 		fTotalExposureOff += iexp_off;
 	}
 	
-	// calculate normalisation taking into account different length of on and off runs
-        // (values are in [s]
-	double i_normObsTime = 1.;
-        // safety net for very short runs (<10 s)
-	if( iexp_off < 10. )
-	{
-		i_normObsTime = 1.;
-	}
-	else
-	{
-		i_normObsTime = iexp_on / iexp_off;
-	}
-	
 	if( onrun != -1 && offrun != -1 )
 	{
 		cout << endl << "Mean properties for this pair: ON=" << onrun;
@@ -532,7 +456,6 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	}
 	cout << "\t Exposure ON=" << iexp_on << " secs (" << iexp_on / 60. << " min)";
 	cout <<               "  OFF=" << iexp_off << " secs (" << iexp_off / 60. << " min),";
-	cout << " Normalization (due to run length differences between on/off)=" << i_normObsTime << endl;
 	cout << "\t Az range ON [" << fRunAzMinOn[onrun] << "," << fRunAzMaxOn[onrun] << "],";
 	cout << " OFF [" << fRunAzMinOff[offrun] << "," << fRunAzMaxOff[offrun] << "]" << endl;
 	
@@ -592,19 +515,34 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	}
 	
 	////////////////////////////////////////////////////////////
-	// give analyzers pointers to alpha histograms
-	if( onrun != -1 )
-	{
-		fStereoOn->setAlphaOff( fStereoOff->getAlpha(), fStereoOff->getAlphaUC() );
-		fStereoOff->setAlphaOff( fStereoOff->getAlpha(), fStereoOff->getAlphaUC() );
-	}
-	////////////////////////////////////////////////////////////
 	// create alpha histogram for significance calculations
-	fStereoOff->scaleAlpha( i_normObsTime, fStereoOn->getAlpha(), fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(),
-				fStereoOn->getMeanSignalBackgroundAreaRatio(), false, icounter );
-	fStereoOff->scaleAlpha( i_normObsTime, fStereoOn->getAlphaUC(), fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(),
-				fStereoOn->getMeanSignalBackgroundAreaRatioUC(), true, icounter );
-							
+        // (called for correlated and uncorrelated histograms)
+	fStereoOff->scaleAlpha( fStereoOn->getAlpha(), false );
+	fStereoOff->scaleAlpha( fStereoOn->getAlphaUC(), true );
+        
+	////////////////////////////////////////////////////////////
+	// ON / OFF Analysis
+	////////////////////////////////////////////////////////////
+	VOnOff* fstereo_onoff = new VOnOff();
+
+	// normalization at target position
+	double i_norm_alpha = fStereoOff->getAlphaNorm()->GetBinContent( fStereoOff->getAlphaNorm()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ),
+						                         fStereoOff->getAlphaNorm()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
+	
+	// on-off for 1D histograms
+	fstereo_onoff->doOnOffforParameterHistograms( fStereoOn->getParameterHistograms(), fStereoOff->getParameterHistograms(), i_norm_alpha, ( onrun == -1 ) );
+
+        // on-off for correlated maps
+        fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( false ), fStereoOff->getSkyHistograms( false ), fStereoOff->getAlphaNorm() );
+        // on-off for uncorrelated maps
+        fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( true ), fStereoOff->getSkyHistograms( true ), fStereoOff->getAlphaNormUC() );
+                                                                                    
+        // print out maximum in maps
+        cout << "\t Maximum in CORRELATED maps: " << endl;
+        TH2D* hStSig = ( TH2D* )fstereo_onoff->do2DSignificance( fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(), fStereoOff->getAlphaNorm() );
+        cout << "\t Maximum in UNCORRELATED maps: " << endl;
+        TH2D* hStSigUC = ( TH2D* )fstereo_onoff->do2DSignificance( fStereoOn->getStereoSkyMapUC(), fStereoOff->getStereoSkyMapUC(), fStereoOff->getAlphaNormUC() );
+        
 	////////////////////////////////////////////////////////////
 	// calulate significance in source bin
 	
@@ -614,9 +552,6 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	// number of off events
 	double i_nevts_off = fStereoOff->getStereoSkyMap()->GetBinContent( fStereoOff->getStereoSkyMap()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ),
 						 fStereoOff->getStereoSkyMap()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
-	// normalization
-	double i_norm_alpha = fStereoOff->getAlphaNorm()->GetBinContent( fStereoOff->getAlphaNorm()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ),
-						                         fStereoOff->getAlphaNorm()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
 
 	double i_sig = VStatistics::calcSignificance( i_nevts_on, i_nevts_off, i_norm_alpha );
 	double i_rate = 0.;
@@ -639,30 +574,11 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	cout << "\t background rate: " << i_rateOFF << " CR/min" << endl;
 	cout << endl;
 	
-	////////////////////////////////////////////////////////////
-	// ON / OFF Analysis
-	////////////////////////////////////////////////////////////
-	VOnOff* fstereo_onoff = new VOnOff();
-	
-	// 1D histograms
-	fstereo_onoff->doOnOffforParameterHistograms( fStereoOn->getParameterHistograms(), fStereoOff->getParameterHistograms(), i_norm_alpha, ( onrun == -1 ) );
-			
-	// correlated maps
-	fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( false ), fStereoOff->getSkyHistograms( false ), fStereoOff->getAlphaNorm() );
-	// uncorrelated maps
-	fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( true ), fStereoOff->getSkyHistograms( true ), fStereoOff->getAlphaNormUC() );
-											
-	// print out maximum in maps
-	cout << "\t Maximum in CORRELATED maps: " << endl;
-	TH2D* hStSig = ( TH2D* )fstereo_onoff->do2DSignificance( fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(), fStereoOff->getAlphaNorm() );
-	cout << "\t Maximum in UNCORRELATED maps: " << endl;
-	TH2D* hStSigUC = ( TH2D* )fstereo_onoff->do2DSignificance( fStereoOn->getStereoSkyMapUC(), fStereoOff->getStereoSkyMapUC(), fStereoOff->getAlphaNormUC() );
-	
 	// calculate q-factors
 	fstereo_onoff->doQfactors( fStereoOn->getParameterHistograms(), fStereoOff->getParameterHistograms(), 1. );
 	
 	// fill rate graphs by run
-	if( onrun != -1 )
+	if( onrun != -1 && hStSig )
 	{
 		fRatePlots->fill( onrun, fStereoOn->getMJD( onrun ), i_sig, hStSig->GetMaximum(), i_nevts_on, i_nevts_off * 1. , i_rate );
 	}
@@ -696,126 +612,9 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	fStereoOn->terminate();
 	fStereoOff->terminate();
 	
-	
 	// clean up
 	delete fstereo_onoff;
 }
-
-/*
-
-    single telescope analysis
-
-    (NOTE: PROBABLY DOES NOT WORK ANY MORE; NEED SOME WORK)
-
-
-*/
-void VAnaSum::doMonoAnalysis( bool bFull )
-{
-	// do stereo anlysis for all runs
-	cout << "Mono Analysis" << endl;
-	cout << "---------------" << endl << endl;
-	
-	// do mono analysis for each run
-	if( bFull )
-	{
-		for( unsigned int i = 0; i < fRunPara->fRunList.size(); i++ )
-		{
-			cout << endl;
-			cout << "Mono analysis for runs: " << fRunPara->fRunList[i].fRunOn << "\t" << fRunPara->fRunList[i].fRunOff << endl;
-			cout << "---------------------------------------" << endl;
-			// analyze run
-			doMonoAnalysis( fRunPara->fRunList[i].fRunOn, fRunPara->fRunList[i].fRunOff, fRunExposureOn[fRunPara->fRunList[i].fRunOn], fRunExposureOff[fRunPara->fRunList[i].fRunOff], fMonoRunDir[i] );
-			fTotalExposureOn += fRunExposureOn[fRunPara->fRunList[i].fRunOn];
-			fTotalExposureOff += fRunExposureOff[fRunPara->fRunList[i].fRunOff];
-		}
-		for( unsigned int i = 0; i < fMonoRatePlots.size(); i++ )
-		{
-			fMonoTotalDir[i]->cd();
-			fMonoRatePlots[i]->write();
-		}
-	}
-	
-	cout << endl;
-	cout << "Mono analysis for all runs:" << endl;
-	cout << "---------------------------" << endl << endl;
-	
-	doMonoAnalysis( -1, -1, fTotalExposureOn, fTotalExposureOff, fMonoTotalDir );
-}
-
-
-/*!
- *   mono analysis only on/off
- *
- */
-void VAnaSum::doMonoAnalysis( int irunon, int irunoff, double iexp_on, double iexp_off, vector<TDirectory*> irundir )
-{
-	fOPfile->cd();
-	
-	double i_norm;
-	
-	if( iexp_off < 10. )
-	{
-		i_norm = 1.;
-	}
-	else
-	{
-		i_norm = iexp_on / iexp_off;
-	}
-	cout << "Total Exposure ON=" << iexp_on << " secs  OFF=" << iexp_off << " secs";
-	cout << ", Normalization=" << i_norm << endl;
-	
-	// On/Off analysis
-	vector< VOnOff* > fmono_onoff;
-	
-	TDirectory* iDir = gDirectory;
-	
-	for( int i = 0; i < fNumTels; i++ )
-	{
-		iDir->cd();
-		
-		// fill all histograms and maps
-		double i_nevts_on  = fMonoOn[i]->fillHistograms( i, irunon );
-		double i_nevts_off = fMonoOff[i]->fillHistograms( i, irunoff );
-		
-		double i_sig = VStatistics::calcSignificance( i_nevts_on, i_nevts_off, i_norm );
-		double i_rate = 0.;
-		if( iexp_on > 0. )
-		{
-			i_rate = ( i_nevts_on - i_norm * i_nevts_off ) * 60. / iexp_on;
-		}
-		
-		cout << endl;
-		cout << "\t --------- RESULTS ------------" << endl;
-		cout << "\t ON:" << i_nevts_on << "  OFF:" << i_nevts_off* i_norm;
-		cout << ",  " <<  i_sig << " Sigma  " << i_rate << "+/-" << i_rate / i_sig << " gammas/min" << endl;
-		
-		fmono_onoff.push_back( new VOnOff() );
-		
-		fmono_onoff.back()->doOnOff( fMonoOn[i]->getHisList(), fMonoOff[i]->getHisList(), i_norm );
-		
-		fmono_onoff.back()->doQfactors( fMonoOn[i]->getHisList(), fMonoOff[i]->getHisList(), i_norm );
-		
-		cout << "\t maximum in 2D sky plots: " << endl;
-		TH2D* hMoSig = ( TH2D* )fmono_onoff.back()->do2DSignificance( fMonoOn[i]->getSkyMap(), fMonoOff[i]->getSkyMap(), i_norm );
-		
-		irundir[i]->cd();
-		
-		if( irunon != -1 )
-		{
-			if( i < ( int )fMonoRatePlots.size() )
-			{
-				fMonoRatePlots[i]->fill( irunon, i_sig, hMoSig->GetMaximum(), i_nevts_on, i_nevts_off * i_norm, i_rate );
-			}
-		}
-		
-		fMonoOn[i]->writeHistograms();
-		fMonoOff[i]->writeHistograms();
-		fmono_onoff.back()->writeMonoHistograms();
-		hMoSig->Write();
-		cout << "\t ------------------------------" << endl;
-	}
-}
-
 
 /*!
  *

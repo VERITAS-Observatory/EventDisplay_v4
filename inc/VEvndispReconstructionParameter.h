@@ -98,6 +98,6 @@ class VEvndispReconstructionParameter : public TNamed
 			fDebug = iD;
 		}
 		
-		ClassDef( VEvndispReconstructionParameter, 19 );
+		ClassDef( VEvndispReconstructionParameter, 20 );
 };
 #endif

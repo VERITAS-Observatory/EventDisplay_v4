@@ -65,6 +65,17 @@ bool readRunParameter( TFile* fIn, string iPara )
         {
                cout << fPar->fDBRunType << endl;
         }
+        else if( iPara == "-runinfo" )
+        {
+              cout << fPar->fInstrumentEpoch << "\t";
+              cout << fPar->fAtmosphereID << "\t";
+              cout << fPar->fDBRunType << "\t";
+              for( unsigned int i = 0; i < fPar->fTelToAnalyze.size(); i++ )
+              {
+                  cout << fPar->fTelToAnalyze[i]+1;
+              }
+              cout << endl;
+        }
 	
 	return true;
 }

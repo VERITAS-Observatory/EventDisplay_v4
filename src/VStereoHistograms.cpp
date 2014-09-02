@@ -19,11 +19,13 @@ VStereoHistograms::VStereoHistograms( string i_hsuffix, double ibinsize, double 
 
 	fRunNumber = -99;
 	
+        // this is probably overwritten later 
 	fSkyMapSizeXmin = -2.;
 	fSkyMapSizeXmax =  2.;
 	fSkyMapSizeYmin = -2.;
 	fSkyMapSizeYmax =  2.;
 	
+        // histogram lists
 	hisList = new TList();
 	hListParameterHistograms = new TList();
 	hListStereoParameterHistograms = new TList();
@@ -34,7 +36,10 @@ VStereoHistograms::VStereoHistograms( string i_hsuffix, double ibinsize, double 
 	hisRateList = new TList();
 }
 
-
+/*
+ * set sky map bin size [deg]
+ *
+ */
 void VStereoHistograms::setSkyMapSize( double xmin, double xmax, double ymin, double ymax )
 {
 	fSkyMapSizeXmin = xmin;
@@ -49,8 +54,13 @@ void VStereoHistograms::defineHistograms()
 	char i_key[800];
 	char i_name[800];
 	
-	hmap_alpha_off = 0;
-	hmap_alpha_offUC = 0;
+// points required in VStereoAnalysis::combineHistograms()
+	h_combine_map_alpha_off = 0;
+	h_combine_map_alpha_offUC = 0;
+        h_combine_map_stereo_on = 0;
+        h_combine_map_stereo_onUC = 0;
+        h_combine_map_stereo_off = 0;
+        h_combine_map_stereo_offUC = 0;
 	
 	///////////////////////////////////
 	// limits of 2D sky plots (uneven to get a bin exactly on the source position)
@@ -200,14 +210,8 @@ void VStereoHistograms::defineHistograms()
 	hmap_alphaNorm = new TH2D( i_key, i_name, xbin, xmin, xmax, ybin, ymin, ymax );
 	hmap_alphaNorm->SetXTitle( "X-position on Sky (#circ)" );
 	hmap_alphaNorm->SetYTitle( "Y-position on Sky (#circ)" );
-	if( hisList )
-	{
-		hisList->Add( hmap_alphaNorm );
-	}
-	if( hListSkyMaps )
-	{
-		hListSkyMaps->Add( hmap_alphaNorm );
-	}
+        hisList->Add( hmap_alphaNorm );
+        hListSkyMaps->Add( hmap_alphaNorm );
 	hListNameofSkyMaps.push_back( i_key );
 	
 	sprintf( i_key, "hmap_MeanSignalBackgroundAreaRatio_%s", fHisSuffix.c_str() );
@@ -215,10 +219,7 @@ void VStereoHistograms::defineHistograms()
 	hmap_MeanSignalBackgroundAreaRatio = new TH1D( i_key, i_name, 500, 0., 1. );
 	hmap_MeanSignalBackgroundAreaRatio->SetXTitle( "mean signal to background ratio" );
 	hisList->Add( hmap_MeanSignalBackgroundAreaRatio );
-	if( hListSkyMaps )
-	{
-		hListSkyMaps->Add( hmap_MeanSignalBackgroundAreaRatio );
-	}
+        hListSkyMaps->Add( hmap_MeanSignalBackgroundAreaRatio );
 	hListNameofSkyMaps.push_back( i_key );
 	
 	
@@ -248,10 +249,7 @@ void VStereoHistograms::defineHistograms()
 	hmap_MeanSignalBackgroundAreaRatioUC = new TH1D( i_key, i_name, 500, 0., 1. );
 	hmap_MeanSignalBackgroundAreaRatioUC->SetXTitle( "mean signal to background ratio" );
 	hisList->Add( hmap_MeanSignalBackgroundAreaRatioUC );
-	if( hListSkyMaps )
-	{
-		hListSkyMaps->Add( hmap_MeanSignalBackgroundAreaRatioUC );
-	}
+        hListSkyMaps->Add( hmap_MeanSignalBackgroundAreaRatioUC );
 	hListNameofSkyMaps.push_back( i_key );
 	
 	sprintf( i_key, "hmap_alphaNormUC_%s", fHisSuffix.c_str() );
@@ -500,22 +498,6 @@ void VStereoHistograms::defineHistograms()
 }
 
 
-void VStereoHistograms::setAlphaOff( TH2D* ioff, bool bUncorrelated )
-{
-	if( ioff )
-	{
-		if( !bUncorrelated )
-		{
-			hmap_alpha_off   = ioff;
-		}
-		else
-		{
-			hmap_alpha_offUC = ioff;
-		}
-	}
-}
-
-
 void VStereoHistograms::scaleDistributions( double is )
 {
 	TIter next( hListParameterHistograms );
@@ -713,12 +695,15 @@ bool VStereoHistograms::readHistograms( TList* iL, string iDir )
 	return true;
 }
 
-
+/*
+ * access all run directories and read sky maps from disk
+ *
+ */
 bool VStereoHistograms::readSkyPlots()
 {
 	TDirectory* wDir = 0;
 	
-	// write all sky plots into sky histogram directory
+	// sky histogram directory
 	wDir = ( TDirectory* )gDirectory->Get( "skyHistograms" );
 	if( !wDir )
 	{
@@ -730,17 +715,24 @@ bool VStereoHistograms::readSkyPlots()
 		return false;
 	}
 	wDir->cd();
+
+	h_combine_map_alpha_off = 0;
+	h_combine_map_alpha_offUC = 0;
+        h_combine_map_stereo_on = 0;
+        h_combine_map_stereo_onUC = 0;
+        h_combine_map_stereo_off = 0;
+        h_combine_map_stereo_offUC = 0;
 	
+        //////////////////////////////////////////
+        // loop over all histograms in directory
 	string iTemp;
 	TIter next( wDir->GetListOfKeys() );
 	while( TKey* key = ( TKey* )next() )
 	{
-		TNamed* ho = ( TNamed* )key->ReadObj();
-		iTemp = ho->GetName();
-		// get only on and off histograms
+		iTemp = key->GetName();
+		// skip difference and significance histograms
 		if( iTemp.find( "_diff" ) < iTemp.size() || iTemp.find( "_sig" ) < iTemp.size() )
 		{
-			ho->Delete();
 			continue;
 		}
 		
@@ -753,82 +745,61 @@ bool VStereoHistograms::readSkyPlots()
 		{
 			bFill = true;
 		}
-		if( iTemp.find( "hmap_alphaUC_off" ) < iTemp.size() )
-		{
-			bFill = true;
-		}
-		if( iTemp.find( "hmap_alpha_off" ) < iTemp.size() )
-		{
-			bFill = true;
-		}
-		
-		if( bFill )
-		{
-			if( iTemp.find( "UC" ) < iTemp.size() )
-			{
-				if( iTemp.find( "hmap_alphaUC_off" ) < iTemp.size() )
-				{
-					hmap_alpha_offUC = ( TH2D* )ho;
-					if( !bIsOn )
-					{
-						hmap_alphaUC = ( TH2D* )ho;
-						hListSkyMapsUC->Add( ho );
-					}
-				}
-				else
-				{
-					hListSkyMapsUC->Add( ho );
-					if( iTemp.find( "hmap_stereoUC" ) < iTemp.size() )
-					{
-						hmap_stereoUC = ( TH2D* )ho;
-					}
-					if( iTemp.find( "hmap_alphaNormUC" ) < iTemp.size() )
-					{
-						hmap_alphaNormUC = ( TH2D* )ho;
-					}
-					if( iTemp.find( "hmap_alphaUC" ) < iTemp.size() )
-					{
-						hmap_alphaUC = ( TH2D* )ho;
-					}
-				}
-			}
-			else
-			{
-				if( iTemp.find( "hmap_alpha_off" ) < iTemp.size() )
-				{
-					hmap_alpha_off = ( TH2D* )ho;
-					if( !bIsOn )
-					{
-						hListSkyMaps->Add( ho );
-						hmap_alpha = ( TH2D* )ho;
-					}
-				}
-				else
-				{
-					hListSkyMaps->Add( ho );
-					if( iTemp.find( "hmap_stereo" ) < iTemp.size() )
-					{
-						hmap_stereo = ( TH2D* )ho;
-					}
-					else if( iTemp.find( "hmap_alphaNorm" ) < iTemp.size() )
-					{
-						hmap_alphaNorm = ( TH2D* )ho;
-					}
-					else if( iTemp.find( "hmap_alpha" ) < iTemp.size() )
-					{
-						hmap_alpha = ( TH2D* )ho;
-					}
-					else if( iTemp.find( "hxyoff_stereo" ) < iTemp.size() )
-					{
-						hxyoff_stereo = ( TH2D* )ho;
-					}
-				}
-			}
-		}
-		else
-		{
-			ho->Delete();
-		}
+
+                // read object from disk
+                TNamed* ho = ( TNamed* )key->ReadObj();
+
+                // histogram needed for VStereoAnalysis::combineHistograms()
+                if( iTemp.find( "hmap_alphaNorm_off" ) < iTemp.size() )   h_combine_map_alpha_off = ( TH2D* )ho;
+                if( iTemp.find( "hmap_stereo_on" ) < iTemp.size() )       h_combine_map_stereo_on = ( TH2D* )ho;
+                if( iTemp.find( "hmap_stereo_off" ) < iTemp.size() )      h_combine_map_stereo_off = ( TH2D* )ho;
+                if( iTemp.find( "hmap_alphaNormUC_off" ) < iTemp.size() ) h_combine_map_alpha_offUC = ( TH2D* )ho;
+                if( iTemp.find( "hmap_stereoUC_on" ) < iTemp.size() )     h_combine_map_stereo_onUC = ( TH2D* )ho;
+                if( iTemp.find( "hmap_stereoUC_off" ) < iTemp.size() )    h_combine_map_stereo_offUC = ( TH2D* )ho;
+
+                if( !bFill ) continue;
+
+                /////////////////////////////
+                // all other sky histograms
+                
+                // uncorrelated histograms
+                if( iTemp.find( "UC" ) < iTemp.size() )
+                {
+                    hListSkyMapsUC->Add( ho );
+                    if( iTemp.find( "hmap_stereoUC" ) < iTemp.size() )
+                    {
+                            hmap_stereoUC = ( TH2D* )ho;
+                    }
+                    if( iTemp.find( "hmap_alphaNormUC" ) < iTemp.size() )
+                    {
+                            hmap_alphaNormUC = ( TH2D* )ho;
+                    }
+                    if( iTemp.find( "hmap_alphaUC" ) < iTemp.size() )
+                    {
+                            hmap_alphaUC = ( TH2D* )ho;
+                    }
+                }
+                // correlated histograms
+                else
+                {
+                    hListSkyMaps->Add( ho );
+                    if( iTemp.find( "hmap_stereo" ) < iTemp.size() )
+                    {
+                            hmap_stereo = ( TH2D* )ho;
+                    }
+                    else if( iTemp.find( "hmap_alphaNorm" ) < iTemp.size() )
+                    {
+                            hmap_alphaNorm = ( TH2D* )ho;
+                    }
+                    else if( iTemp.find( "hmap_alpha" ) < iTemp.size() )
+                    {
+                            hmap_alpha = ( TH2D* )ho;
+                    }
+                    else if( iTemp.find( "hxyoff_stereo" ) < iTemp.size() )
+                    {
+                            hxyoff_stereo = ( TH2D* )ho;
+                    }
+                }
 	}
 	return true;
 }
