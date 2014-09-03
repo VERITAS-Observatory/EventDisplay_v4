@@ -2,6 +2,13 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140903 (KB, JG, GM)
+added timetwolevelcleaning
+
+* 20140903 (GM)
+new calculation of average sensitivity
+using a modified Li & Ma calculation
+
 * 20140805 (GM)
 fixed handling of observing time in anasum
 to correct on/off analysis
