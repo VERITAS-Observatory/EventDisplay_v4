@@ -1046,6 +1046,21 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				}
 				continue;
 			}
+			else if( iTemp == "TIMETWOLEVELPARAMETERS" && fRunPara )
+			{
+				for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
+				{
+					if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+					{
+						if( i < fRunPara->fImageCleaningParameters.size() )
+						{
+							fRunPara->fImageCleaningParameters[i]->ftimediff = atof( iTemp2.c_str() );
+						}
+					}
+				}
+				continue;
+			}
+
 			else if( iTemp == "BRIGHTSTARS" && fRunPara )
 			{
 				fRunPara->fStarCatalogueName = iTemp2;

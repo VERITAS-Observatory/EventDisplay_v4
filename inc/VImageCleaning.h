@@ -29,6 +29,9 @@ class VImageCleaning
 		void cleanImageFixed( double iimagethresh, double iborderthresh, double brightthresh = -999. );
 		void cleanImagePedvars( double hithresh, double lothresh, double brightthresh );
 		
+		// time tailcut cleaning
+		void cleanImagePedvarsTimeDiff( double hithresh, double lothresh, double brightthresh, double timediff ); 
+
 		// time cluster cleaning
 		void cleanImageFixedWithTiming( double, double, double, double, double, int, int );
 		void cleanImagePedvarsWithTiming( double, double, double, double, double, int, int );

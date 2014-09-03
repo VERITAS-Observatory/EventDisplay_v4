@@ -14,7 +14,7 @@ class VImageCleaningRunParameter
 	
 		unsigned int fTelID;
 		
-		unsigned int fImageCleaningMethod;   // 0: standard two level cleaning; 1: time cluster cleaning, 2: Maxim..., 3: trace correlation method
+		unsigned int fImageCleaningMethod;   // 0: standard two level cleaning; 1: time cluster cleaning, 2: Maxim..., 3: trace correlation method, 4: time two-level
 		
 		// standard two-level image/border cleaning
 		double fimagethresh;              // parameter for image threshold
@@ -35,6 +35,9 @@ class VImageCleaningRunParameter
 		int    fCorrelationCleanNpixThresh;   //  Maximum Number of pixels to apply correlation cleaning to (eg 10-15)
 		
 		
+		// time two-level
+		double ftimediff;                 // parameter for time constraint between next neighbor pixels 
+
 		VImageCleaningRunParameter();
 		~VImageCleaningRunParameter() {};
 		

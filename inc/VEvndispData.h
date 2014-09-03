@@ -226,6 +226,17 @@ class VEvndispData
 				return 0.;
 			}
 		}
+		double              getTimeTwoLevelCleaningTimeDiff()
+		{
+			if( getImageCleaningParameter() )
+			{
+				return getImageCleaningParameter()->ftimediff;
+			}
+			else
+			{
+				return 0.;
+			}
+		}
 		VCalibrationData*   getCalData()
 		{
 			return fCalData[fTelID];

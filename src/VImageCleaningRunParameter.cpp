@@ -28,6 +28,9 @@ VImageCleaningRunParameter::VImageCleaningRunParameter()
 	fCorrelationCleanBoardThresh = 1.0; //AMc S/N ratio of 1
 	fCorrelationCleanCorrelThresh = 0.75; //AMc Sample correlation coefficient of 0.75
 	fCorrelationCleanNpixThresh = 15;  //AMc Images whose number of pixels is above this value will skip correlation cleaning
+        
+	// time two-level cleaning
+	ftimediff = 1.0;  
 }
 
 bool VImageCleaningRunParameter::initialize()
@@ -52,12 +55,15 @@ void VImageCleaningRunParameter::print()
 		cout << "\t Tpixel/Tcluster/nMin/nLoops \t" << ftimecutpixel << "/" << ftimecutcluster
 			 << "/" << fminpixelcluster << "/" << floops << endl;
 	}
-	
 	if( getImageCleaningMethodIndex() == 3 )
 	{
 		cout << "\t Using trace correlation cleaning: " << fCorrelationCleanBoardThresh << "/";
 		cout << fCorrelationCleanCorrelThresh << "/" << fCorrelationCleanNpixThresh << "\t";
 		cout << "BorderThresh/CorrelationThresh/MaxPixThresh" << endl;
+	}
+	if( getImageCleaningMethodIndex() == 4 )
+	{
+		cout << "time constraint between next neighbor pixels: " << ftimediff << endl;
 	}
 }
 
@@ -75,6 +81,10 @@ string VImageCleaningRunParameter::getImageCleaningMethod()
 	else if( fImageCleaningMethod == 3 )
 	{
 		return "TWOLEVELANDCORRELATION";
+	}
+	else if( fImageCleaningMethod == 4 )
+	{
+		return "TIMETWOLEVEL";
 	}
 	
 	return "TWOLEVELCLEANING";
@@ -97,6 +107,10 @@ bool VImageCleaningRunParameter::setImageCleaningMethod( string iMethod )
 	else if( iMethod == "TWOLEVELANDCORRELATION" )
 	{
 		fImageCleaningMethod = 3;
+	}
+	else if( iMethod == "TIMETWOLEVEL" )
+	{
+	        fImageCleaningMethod = 4;
 	}
 	else
 	{
