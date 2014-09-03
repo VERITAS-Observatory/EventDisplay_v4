@@ -22,6 +22,6 @@ rm -f "$ODIR/$TABFILE.root"
 rm -f "$ODIR/$TABFILE.log"
 
 # make the table part
-$EVNDISPSYS/bin/mscw_energy -filltables=1 -write1DHistograms -inputfile "$INDIR/*[0-9].root" -tablefile "$ODIR/$TABFILE.root" -ze=$ZA -arrayrecid=$RECID -woff=$WOBBLE &> "$ODIR/$TABFILE.log"
+$EVNDISPSYS/bin/mscw_energy -filltables=1 -limitEnergyReconstruction -write1DHistograms -inputfile "$INDIR/*[0-9].root" -tablefile "$ODIR/$TABFILE.root" -ze=$ZA -arrayrecid=$RECID -woff=$WOBBLE &> "$ODIR/$TABFILE.log"
 
 exit
