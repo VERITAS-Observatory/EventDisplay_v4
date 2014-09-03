@@ -164,7 +164,7 @@ for RUN in ${RUNS[@]}; do
     # get array epoch, atmosphere and telescope combination for this run
     RUNINFO=`$EVNDISPSYS/bin/printRunParameter $INDIR/$RUN.mscw.root -runinfo`
     EPOCH=`echo $RUNINFO | awk '{print $(1)}'`
-    ATMO=${FORCEDATMO:-`echo $RUNINFO | awk '{print $(1)}'`}
+    ATMO=${FORCEDATMO:-`echo $RUNINFO | awk '{print $(2)}'`}
     if [[ $ATMO == *error* ]]; then
        echo "error finding atmosphere; skipping run $RUN"
        continue
