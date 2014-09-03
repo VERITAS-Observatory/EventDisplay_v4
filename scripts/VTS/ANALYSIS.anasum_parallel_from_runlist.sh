@@ -161,17 +161,16 @@ echo "" >> $ANARUNLIST
 RUNS=`cat $RLIST`
 
 for RUN in ${RUNS[@]}; do
-    # get array epoch and atmosphere for the run
-    EPOCH=`$EVNDISPSYS/bin/printRunParameter $INDIR/$RUN.mscw.root -epoch`
-    ATMO=${FORCEDATMO:-`$EVNDISPSYS/bin/printRunParameter $INDIR/$RUN.mscw.root -atmosphere`} 
+    # get array epoch, atmosphere and telescope combination for this run
+    RUNINFO=`$EVNDISPSYS/bin/printRunParameter $INDIR/$RUN.mscw.root -runinfo`
+    EPOCH=`echo $RUNINFO | awk '{print $(1)}'`
+    ATMO=${FORCEDATMO:-`echo $RUNINFO | awk '{print $(1)}'`}
     if [[ $ATMO == *error* ]]; then
        echo "error finding atmosphere; skipping run $RUN"
        continue
     fi
-    echo "RUN $RUN at epoch $EPOCH and atmosphere $ATMO"
- 
-    TELTOANA=`$EVNDISPSYS/bin/printRunParameter $INDIR/$RUN.mscw.root -teltoana`
-    TELTOANA="T$TELTOANA"
+    TELTOANA=`echo $RUNINFO | awk '{print "T"$(4)}'`
+    echo "RUN $RUN at epoch $EPOCH and atmosphere $ATMO (Telescopes $TELTOANA)"
     
     # do string replacements
     EFFAREARUN=${EFFAREA/VX/$EPOCH}
