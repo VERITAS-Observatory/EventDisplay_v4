@@ -56,7 +56,11 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     # Input files (observe that these might need some adjustments)
     if [[ $EPOCH == "V4" ]]; then
         if [[ $PARTICLE == "1" ]]; then
-            VBFNAME="Oct2012_oa_ATM${ATM}_${ZA}deg_${WOG}"
+           if [[ $ATM == "21" ]]; then
+            VBFNAME="Oct2012_oa_ATM21_${ZA}deg_${WOG}"
+           elif
+            VBFNAME="gamma_V4_Oct2012_SummerV4ForProcessing_20130611_v420_ATM${ATM}_${ZA}deg_${WOG}wobb.vbf.bz2"
+           fi
         elif [[ $PARTICLE == "14" ]]; then
             VBFNAME="proton_${ZA}deg_750m_wobble${WOB}_2008_2009_"
         fi
