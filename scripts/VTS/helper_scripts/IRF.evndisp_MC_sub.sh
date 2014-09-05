@@ -59,7 +59,7 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
            if [[ $ATM == "21" ]]; then
             VBFNAME="Oct2012_oa_ATM21_${ZA}deg_${WOG}"
            else
-            VBFNAME="gamma_V4_Oct2012_SummerV4ForProcessing_20130611_v420_ATM${ATM}_${ZA}deg_${WOG}wobb.vbf.bz2"
+            VBFNAME="gamma_V4_Oct2012_SummerV4ForProcessing_20130611_v420_ATM${ATM}_${ZA}deg_${WOG}"
            fi
         elif [[ $PARTICLE == "14" ]]; then
             VBFNAME="proton_${ZA}deg_750m_wobble${WOB}_2008_2009_"
