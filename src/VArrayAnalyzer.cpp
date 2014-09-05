@@ -2322,10 +2322,10 @@ string VArrayAnalyzer::getTMVAFileNameForAngularReconstruction( unsigned int iSt
             }
         }
 // this is the closest bin
-        if( iStereoMethodID < getEvndispReconstructionParameter()->fTMVAFileName.size() &&
-            iBinSelected < getEvndispReconstructionParameter()->fTMVAFileName[iStereoMethodID].size() )
+        if( iStereoMethodID < getEvndispReconstructionParameter()->fTMVAFileNameVector.size() &&
+            iBinSelected < getEvndispReconstructionParameter()->fTMVAFileNameVector[iStereoMethodID].size() )
         {
-            iName = getEvndispReconstructionParameter()->fTMVAFileName[iStereoMethodID][iBinSelected];
+            iName = getEvndispReconstructionParameter()->fTMVAFileNameVector[iStereoMethodID][iBinSelected];
         }
     }
 //////////////
@@ -2363,11 +2363,11 @@ void VArrayAnalyzer::initializeDispAnalyzer( unsigned int iStereoMethodID )
 {
 // first check if we can 'reuse' a MVA from another, previously defined method
 //   this is indicated by a single TMVABDTFILE BDT file with the file name USE_BDT_METHOD_<methodID>
-     if( iStereoMethodID < getEvndispReconstructionParameter()->fTMVAFileName.size() && 
-         getEvndispReconstructionParameter()->fTMVAFileName[iStereoMethodID].size() == 1 &&
-         getEvndispReconstructionParameter()->fTMVAFileName[iStereoMethodID][0].find( "USE_BDT_METHOD_" ) != string::npos )
+     if( iStereoMethodID < getEvndispReconstructionParameter()->fTMVAFileNameVector.size() && 
+         getEvndispReconstructionParameter()->fTMVAFileNameVector[iStereoMethodID].size() == 1 &&
+         getEvndispReconstructionParameter()->fTMVAFileNameVector[iStereoMethodID][0].find( "USE_BDT_METHOD_" ) != string::npos )
      {
-         string iTemp = getEvndispReconstructionParameter()->fTMVAFileName[iStereoMethodID][0];
+         string iTemp = getEvndispReconstructionParameter()->fTMVAFileNameVector[iStereoMethodID][0];
          unsigned int iMethodID = (unsigned int)atoi( iTemp.substr( iTemp.rfind( "_" )+1, iTemp.size() ).c_str() );
          cout << "initializing TMVA disp analyzer for array reconstruction method " << iStereoMethodID;
          cout << " using disp analyser from method " << iMethodID << endl;

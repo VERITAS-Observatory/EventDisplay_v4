@@ -2,6 +2,10 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140905 (GM)
+fixed segfaults due to missing
+initialization of variables
+
 * 20140903 (KB, JG, GM)
 added timetwolevelcleaning
 

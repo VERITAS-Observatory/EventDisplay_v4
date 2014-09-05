@@ -72,7 +72,7 @@ class VEvndispReconstructionParameter : public TNamed
 		
 		vector< string > fMLPFileName;
                 vector< vector< double > > fMTVAZenithBin;
-		vector< vector< string > > fTMVAFileName;
+		vector< vector< string > > fTMVAFileNameVector;
 		vector< string > fDispFileName;
 		
 		vector< float >  fMODDISP_MinAngleForDisp;
@@ -98,6 +98,6 @@ class VEvndispReconstructionParameter : public TNamed
 			fDebug = iD;
 		}
 		
-		ClassDef( VEvndispReconstructionParameter, 20 );
+		ClassDef( VEvndispReconstructionParameter, 22 );
 };
 #endif

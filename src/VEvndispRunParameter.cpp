@@ -67,6 +67,8 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fPrintGrisuHeader = 0;
 
 	fprintdeadpixelinfo = false ; // DEADCHAN if true, print list of dead pixels to evndisp.log
+
+        fSaveDeadPixelRegistry = false;
 	
 	// geometry/calibration parameters
 	fNTelescopes = 4;                             // there is always at least one telescope
@@ -220,6 +222,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	ffrogsmscwfile = "";
 	ffrogsmode = false;
 	ffrogsRecID = -1;
+        ffrogstemplatelist = "";
 	
 	// Model3D parameters, JG
 	fUseModel3D = false;

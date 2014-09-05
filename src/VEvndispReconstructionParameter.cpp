@@ -16,7 +16,10 @@ ClassImp( VEvndispReconstructionParameter )
 
 VEvndispReconstructionParameter::VEvndispReconstructionParameter()
 {
-	reset();
+	fDebug = false;
+        fNTel_type = 0;
+	fRunPara = 0;
+	fNMethods = 0;
 }
 
 
@@ -40,6 +43,7 @@ VEvndispReconstructionParameter::VEvndispReconstructionParameter( vector< ULong6
 void VEvndispReconstructionParameter::reset()
 {
 	fDebug = false;
+        fNTel_type = 0;
 	fRunPara = 0;
 	fNMethods = 0;
 }
@@ -371,7 +375,7 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
 	fAxesAngles_min.push_back( 0. );
 	fMLPFileName.push_back( "" );
         vector< string > i_temp_string;
-	fTMVAFileName.push_back( i_temp_string );
+	fTMVAFileNameVector.push_back( i_temp_string );
         vector< double > i_temp_double;
         fMTVAZenithBin.push_back( i_temp_double );
 	fDispFileName.push_back( "" );
@@ -537,19 +541,19 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
 		{
 			cout << "\t\t MLP file: " << fMLPFileName[m] << endl;
 		}
-		if( fTMVAFileName[m].size() > 0 )
+		if( m < fTMVAFileNameVector.size() && fTMVAFileNameVector[m].size() > 0 )
 		{
-                        for( unsigned int ze = 0; ze < fTMVAFileName[m].size(); ze++ )
+                        for( unsigned int ze = 0; ze < fTMVAFileNameVector[m].size(); ze++ )
                         {
-                            if( fTMVAFileName[m][ze].size() > 0 && fTMVAFileName[m][ze].find( "USE_BDT_METHOD" ) != string::npos )
+                            if( fTMVAFileNameVector[m][ze].size() > 0 && fTMVAFileNameVector[m][ze].find( "USE_BDT_METHOD" ) != string::npos )
                             {
-                                cout << "\t\t TMVA (BDT) file used from method " << fTMVAFileName[m][ze] << endl;
+                                cout << "\t\t TMVA (BDT) file used from method " << fTMVAFileNameVector[m][ze] << endl;
                             }
 			    else
 			    {
                                 cout << "\t\t TMVA (BDT) file for zenith angle ";
-                                cout << fMTVAZenithBin[m][ze] << " deg: ";
-                                cout << fTMVAFileName[m][ze] << endl;
+                                if( m < fMTVAZenithBin.size() && ze < fMTVAZenithBin[m].size() ) cout << fMTVAZenithBin[m][ze] << " deg: ";
+                                cout << fTMVAFileNameVector[m][ze] << endl;
                             }
                         }
 		}
@@ -1198,7 +1202,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                                 fMTVAZenithBin[m_temp].push_back( atof( iTemp2.c_str() ) );
                                 if( iTemp3.size() > 0 )
                                 {
-                                    fTMVAFileName[m_temp].push_back( iTemp3 );
+                                    fTMVAFileNameVector[m_temp].push_back( iTemp3 );
                                 }
 			}
 			else if( iTemp == "DISPFILE" )
