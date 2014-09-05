@@ -590,20 +590,28 @@ void VTableLookupRunParameter::setCTA_MC_offaxisBins()
 	
 	fCTA_MC_offaxisBin_min.push_back( 0.0 );
 	fCTA_MC_offaxisBin_max.push_back( 1.0 );
+
 	fCTA_MC_offaxisBin_min.push_back( 1.0 );
 	fCTA_MC_offaxisBin_max.push_back( 2.0 );
+
 	fCTA_MC_offaxisBin_min.push_back( 2.0 );
 	fCTA_MC_offaxisBin_max.push_back( 3.0 );
+
 	fCTA_MC_offaxisBin_min.push_back( 3.0 );
 	fCTA_MC_offaxisBin_max.push_back( 3.5 );
+
 	fCTA_MC_offaxisBin_min.push_back( 3.5 );
 	fCTA_MC_offaxisBin_max.push_back( 4.0 );
+
 	fCTA_MC_offaxisBin_min.push_back( 4.0 );
 	fCTA_MC_offaxisBin_max.push_back( 4.5 );
+
 	fCTA_MC_offaxisBin_min.push_back( 4.5 );
 	fCTA_MC_offaxisBin_max.push_back( 5.0 );
+
 	fCTA_MC_offaxisBin_min.push_back( 5.0 );
 	fCTA_MC_offaxisBin_max.push_back( 5.5 );
+
 	fCTA_MC_offaxisBin_min.push_back( 5.5 );
 	fCTA_MC_offaxisBin_max.push_back( 6.0 );
 }
