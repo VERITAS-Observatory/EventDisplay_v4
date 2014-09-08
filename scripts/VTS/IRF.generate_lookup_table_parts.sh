@@ -30,7 +30,7 @@ required parameters:
     <Rec ID>                reconstruction ID
                             (see EVNDISP.reconstruction.runparameter)
     
-    <sim type>              simulation type (e.g. GRISU, CARE)
+    <sim type>              simulation type (e.g. GRISU-SW6, CARE_June1425)
     
 --------------------------------------------------------------------------------
 "

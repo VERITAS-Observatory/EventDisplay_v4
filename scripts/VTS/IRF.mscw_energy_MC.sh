@@ -31,8 +31,8 @@ required parameters:
     <Rec ID>                reconstruction ID (can be a list of recids)
                             (see EVNDISP.reconstruction.runparameter)
                             Set to 0 for all telescopes, 1 to cut T1, etc.
-    
-    <sim type>              simulation type (e.g. GRISU, CARE)
+
+    <sim type>              simulation type (e.g. GRISU-SW6, CARE_June1425)
 
 optional parameters:
     

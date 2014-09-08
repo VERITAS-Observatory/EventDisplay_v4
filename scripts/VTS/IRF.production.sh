@@ -11,7 +11,7 @@ IRF.production.sh <sim type> <IRF type> [epoch] [atmosphere] [Rec ID] [cuts list
 
 required parameters:
 
-    <sim type>              original VBF file simulation type (e.g. GRISU, CARE)
+    <sim type>              original VBF file simulation type (e.g. GRISU-SW6, CARE_June1425)
     
     <IRF type>              type of instrument response function to produce
                             (e.g. EVNDISP, MAKETABLES, COMBINETABLES,
