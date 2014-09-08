@@ -2,7 +2,7 @@
 # script to analyse MC files with lookup tables
 
 # qsub parameters
-h_cpu=00:29:00; h_vmem=6000M; tmpdir_size=100G
+h_cpu=10:29:00; h_vmem=6000M; tmpdir_size=100G
 
 if [[ $# < 8 ]]; then
 # begin help message
@@ -28,7 +28,7 @@ required parameters:
 
     <NSB level>             NSB level of simulations [MHz]
     
-    <Rec ID>                reconstruction ID
+    <Rec ID>                reconstruction ID (can be a list of recids)
                             (see EVNDISP.reconstruction.runparameter)
                             Set to 0 for all telescopes, 1 to cut T1, etc.
     
@@ -96,11 +96,9 @@ mkdir -p $LOGDIR
 
 # Output file directory
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/MSCW_RECID$RECID"
+    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}"
 fi
 echo -e "Output files will be written to:\n $ODIR"
-mkdir -p $ODIR
-chmod -R g+w $ODIR
 
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.mscw_energy_MC_sub"
@@ -108,7 +106,7 @@ SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.mscw_energy_MC_sub"
 echo "Now processing zenith angle $ZA, wobble $WOBBLE, noise level $NOISE"
 
 # make run script
-FSCRIPT="$LOGDIR/MSCW-$EPOCH-$RECID-$ZA-$WOBBLE-$NOISE-$PARTICLE"
+FSCRIPT="$LOGDIR/MSCW-$EPOCH-$ZA-$WOBBLE-$NOISE-$PARTICLE"
 sed -e "s|INPUTDIR|$INDIR|" \
     -e "s|OUTPUTDIR|$ODIR|" \
     -e "s|TABLEFILE|$TABFILE|" \

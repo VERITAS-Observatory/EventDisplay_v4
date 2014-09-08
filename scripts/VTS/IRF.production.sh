@@ -80,13 +80,6 @@ else
     echo "Invalid simulation type. Exiting..."
     exit 1
 fi
-# table file name
-# (REC ID is set later)
-TABLEFILE="table-${EDVERSION}-${AUX}-${SIMTYPE}-ATM${ATMOS}-${EPOCH}-ID"
-
-# combined table file name
-# (METHOD "DISP" or "GEO" is set later)
-TABLECOM="table-${EDVERSION}-${AUX}-${SIMTYPE}-ATM${ATMOS}-${EPOCH}-"
 
 # Set gamma/hadron cuts
 if [[ $CUTSLISTFILE != "" ]]; then
@@ -101,23 +94,28 @@ else
     CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat 
              ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft.dat 
              ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard.dat 
-             ANASUM.GammaHadron-Cut-NTel3-PointSource-SuperHard.dat 
+             ANASUM.GammaHadron-Cut-NTel3-PointSource-SuperHard.dat
              ANASUM.GammaHadron-Cut-NTel2-PointSource-ModerateOpen.dat
-             ANASUM.GammaHadron-Cut-NTel2-PointSource-SoftOpen.dat 
-             ANASUM.GammaHadron-Cut-NTel2-PointSource-HardOpen.dat 
-             ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Moderate.dat 
-             ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Soft.dat 
-             ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Hard.dat 
-             ANASUM.GammaHadron-Cut-NTel3-PointSource-Moderate.dat 
-             ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard.dat
-             ANASUM.GammaHadron-Cut-NTel3-ExtendedSource-SuperHard.dat"
+             ANASUM.GammaHadron-Cut-NTel2-PointSource-SoftOpen.dat"
+#             ANASUM.GammaHadron-Cut-NTel2-PointSource-HardOpen.dat 
+#             ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Moderate.dat 
+#             ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Soft.dat 
+#             ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Hard.dat 
+#             ANASUM.GammaHadron-Cut-NTel3-PointSource-Moderate.dat 
+#             ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard.dat
+#             ANASUM.GammaHadron-Cut-NTel3-ExtendedSource-SuperHard.dat" 
 #     CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat"
 fi
+CUTLIST=`echo $CUTLIST |tr '\r' ' '`
 
 ############################################################
 # loop over complete parameter space and submit production
 for VX in $EPOCH; do
     for ATM in $ATMOS; do
+       ######################
+       # set lookup table files
+       # (METHOD "DISP" or "GEO" is set later)
+       TABLECOM="table-${EDVERSION}-${AUX}-${SIMTYPE}-ATM${ATM}-${VX}-"
        ######################
        # combine lookup tables
        if [[ $IRFTYPE == "COMBINETABLES" ]]; then
@@ -180,24 +178,30 @@ for VX in $EPOCH; do
                     elif [[ $IRFTYPE == "ANALYSETABLES" ]]; then
                         TFIL="${TABLECOM}"
                         # note: the IDs dependent on what is written in EVNDISP.reconstruction.runparameter
+                        # warning: do not mix disp and geo
+                        METH="NOTSET"
                         for ID in $RECID; do
                             if [[ $ID == "0" ]] || [[ $ID == "2" ]] || [[ $ID == "3" ]] || [[ $ID == "4" ]] || [[ $ID == "5" ]] || [[ $ID == "6" ]]; then
-			                    METH="GEO"
-				                TFILID=$TFIL$METH
-			                elif [[ $ID == "1" ]] || [[ $ID == "7" ]] || [[ $ID == "8" ]] || [[ $ID == "9" ]] || [[ $ID == "10" ]]; then 
-				                METH="DISP"
-				                TFILID=$TFIL$METH
-			                fi
-			                ./IRF.mscw_energy_MC.sh $TFILID $VX $ATM $ZA $WOBBLE $NOISE $ID $SIMTYPE
+                               if [[ $METH != "NOTSET" ]] && [[ $METH != "GEO" ]]; then
+                                   echo "invalid RECID combination, do not mix GEO and DISP"
+                                   exit
+                               fi
+                               METH="GEO"
+			    elif [[ $ID == "1" ]] || [[ $ID == "7" ]] || [[ $ID == "8" ]] || [[ $ID == "9" ]] || [[ $ID == "10" ]]; then 
+                               if [[ $METH != "NOTSET" ]] || [[ $METH != "DISP" ]]; then
+                                   echo "invalid RECID combination, do not mix GEO and DISP"
+                                   exit
+                               fi
+			       METH="DISP"
+			    fi
                         done
+                        TFILID=$TFIL$METH
+			./IRF.mscw_energy_MC.sh $TFILID $VX $ATM $ZA $WOBBLE $NOISE "$RECID" $SIMTYPE
                     ######################
                     # analyse effective areas
                     elif [[ $IRFTYPE == "EFFECTIVEAREAS" ]]; then
                         for ID in $RECID; do
-                            for CUTS in ${CUTLIST[@]}; do
-                                echo "effective areas $CUTS"
-                               ./IRF.generate_effective_area_parts.sh $CUTS $VX $ATM $ZA $WOBBLE $NOISE $ID $SIMTYPE
-                            done #cuts
+                            ./IRF.generate_effective_area_parts.sh "$CUTLIST" $VX $ATM $ZA $WOBBLE $NOISE $ID $SIMTYPE
                         done #recID
                     fi
                 done #wobble
