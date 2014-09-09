@@ -2,7 +2,7 @@
 # script to run eventdisplay analysis with FROGS
 
 # qsub parameters
-h_cpu=14:29:00; h_vmem=2000M; tmpdir_size=10G
+h_cpu=72:00:00; h_vmem=2000M; tmpdir_size=10G
 
 if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 # begin help message
@@ -35,6 +35,11 @@ fi
 # Run init script
 bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
+
+# Load runlist functions
+source "$EVNDISPSYS/scripts/VTS/helper_scripts/RUNLIST.run_info_functions.sh"
+
+echo "which getRunArrayVersion `which getRunArrayVersion`"
 
 # Parse command line arguments
 RLIST=$1
@@ -72,11 +77,7 @@ for RUN in $RUNNUMS; do
     FSCRIPT="$LOGDIR/EVN.data-$RUN"
     
     # get run array epoch using a run info function
-    EPOCH=`$EVNDISPSYS/bin/printRunParameter $MSCWDIR/$RUN.mscw.root -epoch`
-    if [[ $EPOCH == *error* ]]; then
-       echo "error finding array type; does mscw file exist? Skipping run $RUN"
-       continue
-    fi
+    EPOCH=`getRunArrayVersion $RUN`
 
     sed -e "s|RUNFILE|$RUN|"             \
         -e "s|CALIBRATIONOPTION|$CALIB|" \
@@ -93,7 +94,7 @@ for RUN in $RUNNUMS; do
     SUBC=`eval "echo \"$SUBC\""`
     if [[ $SUBC == *qsub* ]]; then
         JOBID=`$SUBC $FSCRIPT.sh`
-    
+    fi
         # account for -terse changing the job number format
         if [[ $SUBC != *-terse* ]] ; then
             echo "without -terse!"      # need to match VVVVVVVV  8539483  and 3843483.1-4:2
@@ -106,11 +107,14 @@ for RUN in $RUNNUMS; do
             echo "RUN $RUN OLOG $FSCRIPT.sh.o$JOBID"
             echo "RUN $RUN ELOG $FSCRIPT.sh.e$JOBID"
         fi
-    elif [[ $SUBC == *parallel* ]]; then
+        
+        if [[ $SUBC == *parallel* ]]; then
         echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.$SECONDS.dat
-    elif [[ "$SUBC" == *simple* ]] ; then
+        fi
+
+        if [[ "$SUBC" == *simple* ]] ; then
     	"$FSCRIPT.sh" |& tee "$FSCRIPT.log"
-    fi
+        fi
 done
 
 # Execute all FSCRIPTs locally in parallel

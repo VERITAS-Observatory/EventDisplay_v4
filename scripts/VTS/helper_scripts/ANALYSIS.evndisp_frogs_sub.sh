@@ -23,7 +23,8 @@ echo "Scratch dir: $TEMPDIR"
 mkdir -p $TEMPDIR
 
 # eventdisplay reconstruction parameter
-ACUTS="EVNDISP.reconstruction.runparameter"
+#ACUTS="EVNDISP.reconstruction.runparameter"
+ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
 
 # template list file
 if [[ "$ARRAYVERS" =~ ^(V5|V6)$ ]]; then
@@ -101,9 +102,9 @@ OPT+=( -frogs $TEMPDIR/$INPUTMSCW             )
 OPT+=( -frogsid 0                            )
 OPT+=( -templatelistforfrogs "$TEMPLATELIST" )
 
-if [[ "$SCIPIPE_NEVENTS" =~ ^[0-9]+$ ]]; then
-    OPT+=( -nevents=$SCIPIPE_NEVENTS )
-    echo "Warning, \$SCIPIPE_NEVENTS=$SCIPIPE_NEVENTS, only processing the first $SCIPIPE_NEVENTS events..."
+if [[ "$FASTDEVMODE" == "yes" ]]; then
+    OPT+=( -nevents=50 )
+    echo "Warning, \$FASTDEVMODE=yes, only processing the first 50 events..."
 fi
 
 echo "using frogs options '${OPT[@]}'"
@@ -120,10 +121,13 @@ $EVNDISPSYS/bin/evndisp             \
     &> $LOGFILE
 echo "RUN$RUN FROGSLOG $LOGFILE"
 
-# move data file from tmp dir to data dir
+# move data & mscw files from tmp dir to data dir
 DATAFILE="$ODIR/$RUN.root"
+MSCWFILE="$ODIR/$RUN.mscw.root"
 cp -f -v $TEMPDIR/$RUN.root $DATAFILE
+cp -f -v $TEMPDIR/$INPUTMSCW $MSCWFILE
 rm -f $TEMPDIR/$RUN.root
-echo "RUN$RUN FROGSDATA $DATAFILE"
+rm -f $TEMPDIR/$RUN.mscw.root
+echo "RUN$RUN FROGSDATA $DATAFILE $MSCWFILE"
 
 exit
