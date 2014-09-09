@@ -205,6 +205,10 @@ $EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS &> $ODIR/$ONAME.log
 
 # remove temporary files
 cp -f -v $DDIR/$ONAME.root $ODIR/$ONAME.root
+chmod g+w $ODIR/$ONAME.root
+chmod g+w $ODIR/$ONAME.log
+chmod g+w $ODIR/$ONAME.tzero.log
+chmod -R g+w $ODIR/Calibration
 rm -f -v $DDIR/$ONAME.root
 rm -f -v $VBF_FILE
 
