@@ -126,7 +126,7 @@ for CUTS in ${CUTLIST[@]}; do
 			OFILE="radialAcceptance-${EDVERSION}-${AUX}-$CUTSNAME-${METH}-$VX-T$TELES"
             ODIR="$VERITAS_IRFPRODUCTION_DIR/RadialAcceptances"
             mkdir -p $ODIR
-			chmod -R g+w $ODIR
+	    chmod g+w $ODIR
             echo -e "Output files will be written to:\n$ODIR"
             echo "Output file name $OFILE"
             
