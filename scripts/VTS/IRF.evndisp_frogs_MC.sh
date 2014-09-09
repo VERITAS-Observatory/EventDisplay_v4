@@ -29,7 +29,7 @@ required parameters:
 
     <NSB level>             NSB level of simulations [MHz]
     
-    <sim type>              file simulation type (e.g. GRISU, CARE)
+    <sim type>              file simulation type (e.g. GRISU-SW6, CARE_June1425)
                             (recognized are also types like GRISU_d201404, or CARE_V1)
 
 optional parameters:
