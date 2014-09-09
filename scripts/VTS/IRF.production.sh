@@ -26,7 +26,7 @@ optional parameters:
     [atmosphere]            atmosphere model(s) (21 = winter, 22 = summer)
                             (default: \"21 22\")
                             
-    [Rec ID]                reconstruction ID(s) (default: \"0 1 2 3 4\")
+    [Rec ID]                reconstruction ID(s) (default: \"0 2 3 4 5\")
                             (see EVNDISP.reconstruction.runparameter)
     
     [cuts list file]        file containing one gamma/hadron cuts file per line
@@ -49,7 +49,7 @@ SIMTYPE=$1
 IRFTYPE=$2
 [[ "$3" ]] && EPOCH=$3 || EPOCH="V4 V5 V6"
 [[ "$4" ]] && ATMOS=$4 || ATMOS="21 22"
-[[ "$5" ]] && RECID=$5 || RECID="0 1 2 3 4"
+[[ "$5" ]] && RECID=$5 || RECID="0 2 3 4 5"
 [[ "$6" ]] && CUTSLISTFILE=$6 || CUTSLISTFILE=""
 [[ "$7" ]] && SIMDIR=$7 || SIMDIR=""
 # evndisplay version
