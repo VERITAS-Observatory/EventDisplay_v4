@@ -1522,7 +1522,6 @@ int VEventLoop::analyzeEvent()
 		int    eventNumber = fEventNumber    ;
 		
 		// set up some initial variables
-		bool   lowGain   = true  ;
 		bool   higGain   = false ;
 		PixelStateInt lowGainState = 121212 ;
 			
