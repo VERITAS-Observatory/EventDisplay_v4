@@ -20,12 +20,60 @@
 VFrogs::VFrogs()
 {
 
-	fFrogParameters = new VFrogParameters();
+	fFrogsParameters = new VFrogsParameters();
 	frogsRecID = getRunParameter()->ffrogsRecID;
-        templatelistname = getRunParameter()->ffrogstemplatelist ;
+	templatelistname = getRunParameter()->ffrogstemplatelist ;
 	
+	reset();
+	
+}
+
+void VFrogs::reset()
+{
+	frogsRecID = 0;
+	templatelistname = "";
+	frogsEventID = 0;
+	frogsGSLConStat = 0;
+	frogsNB_iter = 0;
+	frogsNImages = 0;
+	frogsXS = 0.;
+	frogsXSerr = 0.;
+	frogsYS = 0.;
+	frogsYSerr = 0.;
+	frogsXP = 0.;
+	frogsXPerr = 0.;
+	frogsYP = 0.;
+	frogsYPerr = 0.;
+	frogsXPGC = 0.;
+	frogsYPGC = 0.;
+	frogsEnergy = 0.;
+	frogsEnergyerr = 0.;
+	frogsLambda = 0.;
+	frogsLambdaerr = 0.;
+	frogsGoodnessImg = 0.;
+	frogsNpixImg = 0;
+	frogsGoodnessBkg = 0.;
+	frogsNpixBkg = 0;
+	frogsXPStart = 0.;
+	frogsYPStart = 0.;
+	frogsXPED = 0.;
+	frogsYPED = 0.;
+	frogsXSStart = 0.;
+	frogsYSStart = 0.;
 	fInitialized = false;
-	
+	fStartEnergyLoop = 0;
+	for( int i = 0; i < 500; i++ )
+	{
+		frogsTemplateMu0[i] = 0.;
+		frogsTemplateMu1[i] = 0.;
+		frogsTemplateMu2[i] = 0.;
+		frogsTemplateMu3[i] = 0.;
+	}
+	for( int i = 0; i < 4; i++ )
+	{
+		frogsTelGoodnessImg[i] = 0.;
+		frogsTelGoodnessBkg[i] = 0.;
+	}
 }
 
 VFrogs::~VFrogs()
@@ -39,7 +87,7 @@ void VFrogs::doFrogsStuff( int eventNumber )
 {
 
 	int i = 0;
-        int j = 0;
+	int j = 0;
 	
 	// only at first call in the analysis run: initialize data class, set trees
 	if( !fInitialized )
@@ -50,7 +98,7 @@ void VFrogs::doFrogsStuff( int eventNumber )
 		fStartEnergyLoop = 0;
 	}
 	
-	initFrogEvent();
+	initFrogsEvent();
 	
 	int adc = 2;
 	double inEnergy = getFrogsStartEnergy( eventNumber );
@@ -82,13 +130,13 @@ void VFrogs::doFrogsStuff( int eventNumber )
 		struct frogs_imgtmplt_out output;
 		//output = frogs_img_tmplt( &d );
 		char templatelistnamecstr[FROGS_FILE_NAME_MAX_LENGTH] ;
-                int maxchar     = FROGS_FILE_NAME_MAX_LENGTH - 1 ;
-        
-                // 'formatbuff' is so we only put the first "FROGS_FILE_NAME_MAX_LENGTH-1" characters of the templatelistname string into the char array 'templatelistnamecstr'
-                char formatbuff[20] ;
-                sprintf( formatbuff, "%%.%ds", maxchar ) ; 
-                sprintf( templatelistnamecstr, formatbuff, templatelistname.c_str() ) ;
-        
+		int maxchar     = FROGS_FILE_NAME_MAX_LENGTH - 1 ;
+		
+		// 'formatbuff' is so we only put the first "FROGS_FILE_NAME_MAX_LENGTH-1" characters of the templatelistname string into the char array 'templatelistnamecstr'
+		char formatbuff[20] ;
+		sprintf( formatbuff, "%%.%ds", maxchar ) ;
+		sprintf( templatelistnamecstr, formatbuff, templatelistname.c_str() ) ;
+		
 		output = frogs_img_tmplt( &d, templatelistnamecstr );
 		
 		frogsEventID     = output.event_id;
@@ -151,46 +199,46 @@ void VFrogs::doFrogsStuff( int eventNumber )
 		//frogsXSStart     = getShowerParameters()->fShower_Xoffset[frogsRecID];
 		frogsYSStart     = -1.0 * fData->getShowerParameters()->fShower_Yoffset[frogsRecID];
 		
-		getFrogParameters()->frogsEventID = getFrogsEventID();
-		getFrogParameters()->frogsGSLConStat = getFrogsGSLConStat();
-		getFrogParameters()->frogsNB_iter = getFrogsNB_iter();
-		getFrogParameters()->frogsNImages = getFrogsNImages();
-		getFrogParameters()->frogsXS = getFrogsXS();
-		getFrogParameters()->frogsXSerr = getFrogsXSerr();
-		getFrogParameters()->frogsYS = getFrogsYS();
-		getFrogParameters()->frogsYSerr = getFrogsYSerr();
-		getFrogParameters()->frogsXP = getFrogsXP();
-		getFrogParameters()->frogsXPerr = getFrogsXPerr();
-		getFrogParameters()->frogsYP = getFrogsYP();
-		getFrogParameters()->frogsXPGC = getFrogsXPGC();
-		getFrogParameters()->frogsYPGC = getFrogsYPGC();
-		getFrogParameters()->frogsYPerr = getFrogsYPerr();
-		getFrogParameters()->frogsEnergy = getFrogsEnergy();
-		getFrogParameters()->frogsEnergyerr = getFrogsEnergyerr();
-		getFrogParameters()->frogsLambda = getFrogsLambda();
-		getFrogParameters()->frogsLambdaerr = getFrogsLambdaerr();
-		getFrogParameters()->frogsGoodnessImg = getFrogsGoodnessImg();
-		getFrogParameters()->frogsNpixImg = getFrogsNpixImg();
-		getFrogParameters()->frogsGoodnessBkg = getFrogsGoodnessBkg();
-		getFrogParameters()->frogsNpixBkg = getFrogsNpixBkg();
+		getFrogsParameters()->frogsEventID = getFrogsEventID();
+		getFrogsParameters()->frogsGSLConStat = getFrogsGSLConStat();
+		getFrogsParameters()->frogsNB_iter = getFrogsNB_iter();
+		getFrogsParameters()->frogsNImages = getFrogsNImages();
+		getFrogsParameters()->frogsXS = getFrogsXS();
+		getFrogsParameters()->frogsXSerr = getFrogsXSerr();
+		getFrogsParameters()->frogsYS = getFrogsYS();
+		getFrogsParameters()->frogsYSerr = getFrogsYSerr();
+		getFrogsParameters()->frogsXP = getFrogsXP();
+		getFrogsParameters()->frogsXPerr = getFrogsXPerr();
+		getFrogsParameters()->frogsYP = getFrogsYP();
+		getFrogsParameters()->frogsXPGC = getFrogsXPGC();
+		getFrogsParameters()->frogsYPGC = getFrogsYPGC();
+		getFrogsParameters()->frogsYPerr = getFrogsYPerr();
+		getFrogsParameters()->frogsEnergy = getFrogsEnergy();
+		getFrogsParameters()->frogsEnergyerr = getFrogsEnergyerr();
+		getFrogsParameters()->frogsLambda = getFrogsLambda();
+		getFrogsParameters()->frogsLambdaerr = getFrogsLambdaerr();
+		getFrogsParameters()->frogsGoodnessImg = getFrogsGoodnessImg();
+		getFrogsParameters()->frogsNpixImg = getFrogsNpixImg();
+		getFrogsParameters()->frogsGoodnessBkg = getFrogsGoodnessBkg();
+		getFrogsParameters()->frogsNpixBkg = getFrogsNpixBkg();
 		
-		getFrogParameters()->frogsXPStart = getFrogsXPStart();
-		getFrogParameters()->frogsYPStart = getFrogsYPStart();
-		getFrogParameters()->frogsXPED = getFrogsXPED();
-		getFrogParameters()->frogsYPED = getFrogsYPED();
-		getFrogParameters()->frogsXSStart = getFrogsXSStart();
-		getFrogParameters()->frogsYSStart = getFrogsYSStart();
+		getFrogsParameters()->frogsXPStart = getFrogsXPStart();
+		getFrogsParameters()->frogsYPStart = getFrogsYPStart();
+		getFrogsParameters()->frogsXPED = getFrogsXPED();
+		getFrogsParameters()->frogsYPED = getFrogsYPED();
+		getFrogsParameters()->frogsXSStart = getFrogsXSStart();
+		getFrogsParameters()->frogsYSStart = getFrogsYSStart();
 		
-		getFrogParameters()->frogsTelGoodnessImg0 = getFrogsTelGoodnessImg( 0 );
-		getFrogParameters()->frogsTelGoodnessImg1 = getFrogsTelGoodnessImg( 1 );
-		getFrogParameters()->frogsTelGoodnessImg2 = getFrogsTelGoodnessImg( 2 );
-		getFrogParameters()->frogsTelGoodnessImg3 = getFrogsTelGoodnessImg( 3 );
-		getFrogParameters()->frogsTelGoodnessBkg0 = getFrogsTelGoodnessBkg( 0 );
-		getFrogParameters()->frogsTelGoodnessBkg1 = getFrogsTelGoodnessBkg( 1 );
-		getFrogParameters()->frogsTelGoodnessBkg2 = getFrogsTelGoodnessBkg( 2 );
-		getFrogParameters()->frogsTelGoodnessBkg3 = getFrogsTelGoodnessBkg( 3 );
+		getFrogsParameters()->frogsTelGoodnessImg0 = getFrogsTelGoodnessImg( 0 );
+		getFrogsParameters()->frogsTelGoodnessImg1 = getFrogsTelGoodnessImg( 1 );
+		getFrogsParameters()->frogsTelGoodnessImg2 = getFrogsTelGoodnessImg( 2 );
+		getFrogsParameters()->frogsTelGoodnessImg3 = getFrogsTelGoodnessImg( 3 );
+		getFrogsParameters()->frogsTelGoodnessBkg0 = getFrogsTelGoodnessBkg( 0 );
+		getFrogsParameters()->frogsTelGoodnessBkg1 = getFrogsTelGoodnessBkg( 1 );
+		getFrogsParameters()->frogsTelGoodnessBkg2 = getFrogsTelGoodnessBkg( 2 );
+		getFrogsParameters()->frogsTelGoodnessBkg3 = getFrogsTelGoodnessBkg( 3 );
 		
-		getFrogParameters()->getTree()->Fill();
+		getFrogsParameters()->getTree()->Fill();
 		
 		valarray<double> a0( frogsTemplateMu0, 500 );
 		valarray<double> a1( frogsTemplateMu1, 500 );
@@ -231,7 +279,7 @@ void VFrogs::doFrogsStuff( int eventNumber )
 }
 //================================================================
 //================================================================
-void VFrogs::initFrogEvent()
+void VFrogs::initFrogsEvent()
 {
 }
 //================================================================
@@ -239,7 +287,7 @@ void VFrogs::initFrogEvent()
 void VFrogs::initAnalysis()
 {
 	initOutput();
-	initFrogTree();
+	initFrogsTree();
 }
 //================================================================
 //================================================================
@@ -276,7 +324,7 @@ void VFrogs::initOutput()
 }
 //================================================================
 //================================================================
-void VFrogs::initFrogTree()
+void VFrogs::initFrogsTree()
 {
 
 	if( FROGSDEBUG )
@@ -293,7 +341,7 @@ void VFrogs::initFrogTree()
 	{
 		sprintf( i_textTitle, "%s (short tree)", i_textTitle );
 	}
-	fFrogParameters->initTree( i_text, i_textTitle );
+	fFrogsParameters->initTree( i_text, i_textTitle );
 	
 }
 //================================================================
@@ -302,7 +350,7 @@ void VFrogs::readTableFrogs()
 {
 
 	int eventNumber = 0;
-	double Erec = 0.;
+	double ErecS = 0.;
 	
 	string fmscwFrogsFile = getRunParameter()->ffrogsmscwfile;
 	cout << "FROGS readTableFrogs " << getRunParameter()->ffrogsmscwfile << endl;
@@ -317,40 +365,40 @@ void VFrogs::readTableFrogs()
 	
 	TTree* mscwTreeFrogs = ( TTree* )mscwFrogsFile->Get( "data" );
 	mscwTreeFrogs->SetBranchAddress( "eventNumber", &eventNumber );
-	mscwTreeFrogs->SetBranchAddress( "Erec", &Erec );
-
-        int nentries = mscwTreeFrogs->GetEntries();
-        fTableRunNumber.reserve( nentries );
-        fTableEnergy.reserve( nentries );
+	mscwTreeFrogs->SetBranchAddress( "ErecS", &ErecS );
+	
+	int nentries = mscwTreeFrogs->GetEntries();
+	fTableEventNumber.reserve( nentries );
+	fTableEnergy.reserve( nentries );
 	
 	for( int i = 0 ; i < nentries; i++ )
 	{
 		mscwTreeFrogs->GetEntry( i );
-		fTableRunNumber.push_back( eventNumber );
-		fTableEnergy.push_back( Erec );
+		fTableEventNumber.push_back( eventNumber );
+		fTableEnergy.push_back( ErecS );
 	}
 	
 	mscwFrogsFile->Close();
 	
-	cout << "Finished Reading: " << fTableRunNumber.size() << " with size " << fTableEnergy.size() << endl;
+	cout << "Finished Reading: " << fTableEventNumber.size() << " with size " << fTableEnergy.size() << endl;
 	
 }
 //================================================================
 //================================================================
-// (GM) expect here that fTableRunNumber.size() == fTableEnergy.size() (should this be checked?)
+// (GM) expect here that fTableEventNumber.size() == fTableEnergy.size() (should this be checked?)
 double VFrogs::getFrogsStartEnergy( int eventNumber )
 {
 
-	int mscwTotal = fTableRunNumber.size();
+	int mscwTotal = fTableEventNumber.size();
 	
 	for( int i = fStartEnergyLoop ; i < mscwTotal ; i++ )
 	{
-		if( eventNumber == fTableRunNumber[i] )
+		if( eventNumber == fTableEventNumber[i] )
 		{
 			fStartEnergyLoop = i - 1;
 			return fTableEnergy[i];
 		}
-		else if( eventNumber < fTableRunNumber[i] )
+		else if( eventNumber < fTableEventNumber[i] )
 		{
 			return FROGS_BAD_NUMBER;
 		}
@@ -483,7 +531,7 @@ float VFrogs::transformPosition( float i_ze, float i_az, float x, float y, float
 void VFrogs::terminate()
 {
 
-	getFrogParameters()->getTree()->Write();
+	getFrogsParameters()->getTree()->Write();
 	
 }
 
@@ -532,8 +580,20 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc
 	struct frogs_imgtmplt_in rtn;
 	
 	//Tracked elevation from telescope 0
-	rtn.elevation = fData->getShowerParameters()->fTelElevation[0];
-	rtn.azimuth   = fData->getShowerParameters()->fTelAzimuth[0];
+	//rtn.elevation = fData->getShowerParameters()->fTelElevation[0];
+	//rtn.azimuth   = fData->getShowerParameters()->fTelAzimuth[0];
+	//rtn.event_id  = eventNumber;
+	
+	if( getArrayPointing() )
+	{
+		rtn.elevation = fData->getArrayPointing()->getTelElevation();
+		rtn.azimuth   = fData->getArrayPointing()->getTelAzimuth();
+	}
+	else
+	{
+		rtn.elevation = 0.;
+		rtn.azimuth   = 0.;
+	}
 	rtn.event_id  = eventNumber;
 	
 	//Telescopes
