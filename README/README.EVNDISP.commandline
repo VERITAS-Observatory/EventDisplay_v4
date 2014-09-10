@@ -136,6 +136,13 @@ Image calculation:
 	 -logl=0/1/2 				 perform loglikelihood image parameterisation 0=off,1=on,2=on with minuit output (default=off)
 	 -fuifactor=FLOAT 			 fraction of image/border pixel under image ellipse fact (default=2)
 
+Frogs image template analysis (optional):
+-----------------------------------------
+	 -frogs 				 use frogs template analysis
+         -frogsid                                (STEPHANESTEPHANE)
+         -templatelistforfrogs                   (STEPHANESTEPHANE)
+        
+
 Parallaxwidth calculation
 --------------------------
 	 -PWmethod=-1/0/1/2, 			 default = -1
@@ -193,7 +200,6 @@ Muon analysis:
 Others:
 -------
 	 -debug 				 print lots of debug output
-	 -frogs 				 use frogs template analysis
 	 -user USERNAME 			 username
 
 

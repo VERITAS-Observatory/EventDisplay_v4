@@ -126,9 +126,6 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 			fRunPar->fDBDataStoppTimeMJD, fRunPar->fDBDataStoppTimeSecOfDay,
 			"deadPixelRegistry", getRunNumber() ) ;
 		
-		//fDeadPixelOrganizer->printSummary() ;
-		//cout << "NKH Exiting Now!" << endl;
-		//exit(0) ;
 	}
 	else
 	{
@@ -136,15 +133,16 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	}
 	
 #ifndef NOGSL
-	// Frogs Stuff
+	// FROGS
 	fFrogs = new VFrogs();
 #endif
+        // Model3D
 	fModel3D = new VModel3D();
 	if( fRunPar->fUseModel3D && fRunPar->fCreateLnLTable )
 	{
 		fModel3D->createLnLTable();
 		fRunPar->fUseModel3D = false;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	// reset cut strings and variables
 	resetRunOptions();
@@ -880,6 +878,7 @@ void VEventLoop::shutdown()
 			cout << endl << "Final checks on result file (seems to be OK): " << fRunPar->foutputfileName << endl;
 		}
                 // FROGS finishing here
+                // (GM) not clear why this has to happen at this point in the program
 #ifndef NOGSL
 		if( fRunPar->ffrogsmode )
 		{
@@ -1442,6 +1441,7 @@ int VEventLoop::analyzeEvent()
 #endif
 		{
 			fArrayAnalyzer->doAnalysis();
+                        // Model3D analysis
 			if( fRunPar->fUseModel3D && fReader->hasArrayTrigger() )
 			{
 				fModel3D->doModel3D();

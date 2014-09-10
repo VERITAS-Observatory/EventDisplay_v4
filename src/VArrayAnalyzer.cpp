@@ -167,8 +167,7 @@ void VArrayAnalyzer::doAnalysis()
 			getShowerParameters()->fDec[i] = getArrayPointing()->getTelDec() + getShowerParameters()->fShower_YoffsetDeRot[i];
 			if( cos( getShowerParameters()->fDec[i] / TMath::RadToDeg() ) != 0. )
 			{
-				getShowerParameters()->fRA[i] = getArrayPointing()->getTelRA()
-												+ getShowerParameters()->fShower_XoffsetDeRot[i] / cos( getShowerParameters()->fDec[i] / TMath::RadToDeg() );
+				getShowerParameters()->fRA[i] = getArrayPointing()->getTelRA() + getShowerParameters()->fShower_XoffsetDeRot[i] / cos( getShowerParameters()->fDec[i] / TMath::RadToDeg() );
 			}
 			else
 			{

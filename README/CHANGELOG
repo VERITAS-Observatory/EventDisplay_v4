@@ -6,6 +6,13 @@ Change log eventdisplay analysis package
 fixed segfaults due to missing
 initialization of variables
 
+*************************************************************
+******* 20140909 release of v4.51; trunk is now v4.60 *******
+*************************************************************
+
+* 20140909 (GM, MK)
+several updates for IRF production scripts
+
 * 20140903 (KB, JG, GM)
 added timetwolevelcleaning
 
@@ -38,9 +45,9 @@ read hilo ratio from VBF run header file
 important bug fix in evndisp, disp angular reconstruction:
 telescope event selection was wrong (severe bug)
 
-*************************************************************
-******* 20140717 release of v4.50; trunk is now v4.60 *******
-*************************************************************
+************************************************
+******* 20140717 release of v4.50 **************
+************************************************
 
 * 20140714 (GM)
 ring background model validation and fixes in 

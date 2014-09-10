@@ -22,7 +22,7 @@ VFrogs::VFrogs()
 
 	fFrogParameters = new VFrogParameters();
 	frogsRecID = getRunParameter()->ffrogsRecID;
-    templatelistname = getRunParameter()->ffrogstemplatelist ;
+        templatelistname = getRunParameter()->ffrogstemplatelist ;
 	
 	fInitialized = false;
 	
@@ -38,7 +38,8 @@ VFrogs::~VFrogs()
 void VFrogs::doFrogsStuff( int eventNumber )
 {
 
-	int i, j;
+	int i = 0;
+        int j = 0;
 	
 	// only at first call in the analysis run: initialize data class, set trees
 	if( !fInitialized )
@@ -81,12 +82,12 @@ void VFrogs::doFrogsStuff( int eventNumber )
 		struct frogs_imgtmplt_out output;
 		//output = frogs_img_tmplt( &d );
 		char templatelistnamecstr[FROGS_FILE_NAME_MAX_LENGTH] ;
-        int maxchar     = FROGS_FILE_NAME_MAX_LENGTH - 1 ;
+                int maxchar     = FROGS_FILE_NAME_MAX_LENGTH - 1 ;
         
-        // 'formatbuff' is so we only put the first "FROGS_FILE_NAME_MAX_LENGTH-1" characters of the templatelistname string into the char array 'templatelistnamecstr'
-        char formatbuff[20] ;
-        sprintf( formatbuff, "%%.%ds", maxchar ) ; 
-        sprintf( templatelistnamecstr, formatbuff, templatelistname.c_str() ) ;
+                // 'formatbuff' is so we only put the first "FROGS_FILE_NAME_MAX_LENGTH-1" characters of the templatelistname string into the char array 'templatelistnamecstr'
+                char formatbuff[20] ;
+                sprintf( formatbuff, "%%.%ds", maxchar ) ; 
+                sprintf( templatelistnamecstr, formatbuff, templatelistname.c_str() ) ;
         
 		output = frogs_img_tmplt( &d, templatelistnamecstr );
 		
@@ -300,25 +301,29 @@ void VFrogs::initFrogTree()
 void VFrogs::readTableFrogs()
 {
 
-	int eventNumber;
-	double Erec;
+	int eventNumber = 0;
+	double Erec = 0.;
 	
 	string fmscwFrogsFile = getRunParameter()->ffrogsmscwfile;
-	cout << "FROGS readTableFrogs " << getRunParameter()->ffrogsmscwfile.c_str() << endl;
+	cout << "FROGS readTableFrogs " << getRunParameter()->ffrogsmscwfile << endl;
 	
 	TFile* mscwFrogsFile = new TFile( fmscwFrogsFile.c_str() , "READ" );
 	
 	if( mscwFrogsFile->IsZombie() )
 	{
-		cout << "VFrogs::readTableFrogs error: File " << fmscwFrogsFile.c_str() << " does not exist!" << endl;
-		exit( -1 );
+		cout << "VFrogs::readTableFrogs error: File " << fmscwFrogsFile << " does not exist!" << endl;
+		exit( EXIT_FAILURE );
 	}
 	
 	TTree* mscwTreeFrogs = ( TTree* )mscwFrogsFile->Get( "data" );
 	mscwTreeFrogs->SetBranchAddress( "eventNumber", &eventNumber );
 	mscwTreeFrogs->SetBranchAddress( "Erec", &Erec );
+
+        unsigned int nentries = mscwTreeFrogs->GetEntries();
+        fTableRunNumber.reserve( nentries );
+        fTableEnergy.reserve( nentries );
 	
-	for( int i = 0 ; i < mscwTreeFrogs->GetEntries() ; i++ )
+	for( int i = 0 ; i < nentries; i++ )
 	{
 		mscwTreeFrogs->GetEntry( i );
 		fTableRunNumber.push_back( eventNumber );
@@ -332,6 +337,7 @@ void VFrogs::readTableFrogs()
 }
 //================================================================
 //================================================================
+// (GM) expect here that fTableRunNumber.size() == fTableEnergy.size() (should this be checked?)
 double VFrogs::getFrogsStartEnergy( int eventNumber )
 {
 
@@ -493,7 +499,7 @@ void VFrogs::finishFrogs( TFile* f )
 	{
 		cout << "Finish Frogs:" << endl;
 		cout << "VFrogs::readTableFrogs error: File " << fmscwFrogsFile.c_str() << " does not exist!" << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	
 	// Clone tree to mscw file checking it opened
@@ -706,7 +712,7 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc
 	{
 		rtn.worthy_event = FROGS_NOTOK;
 	}
-	//Count the number of telescopes with more than 300dc in their image
+	//Count the number of telescopes with more than 200dc in their image
 	int ngoodimages = 0;
 	for( int tel = 0; tel < rtn.ntel; tel++ )
 	{

@@ -121,8 +121,8 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				i++;
 			}
 		}
+                /////////////////////////////////////////////////////////
 		// Frogs mode
-		//else if( iTemp.find( "frogs" ) < iTemp.size() )
 		else if( iTemp1 == "-frogs" )
 		{
 			fRunPara->ffrogsmode = 1;
@@ -136,7 +136,6 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->ffrogsmscwfile = "";
 			}
 		}
-		//else if( iTemp.find( "frogid" ) < iTemp.size() && fRunPara->ffrogsmode == 1 )
 		else if( iTemp1 == "-frogsid" ) 
 		{
 			if( iTemp2.size() > 0 )
@@ -149,7 +148,6 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->ffrogsRecID = -1;
 			}
 		}
-		//else if( iTemp.find( "templatelistforfrogs" ) < iTemp.size() && fRunPara->ffrogsmode == 1 )
 		else if( iTemp1 == "-templatelistforfrogs" ) 
 		{
 			if( iTemp2.size() > 0 )
@@ -162,6 +160,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->ffrogstemplatelist = "" ;
 			}
 		}
+                /////////////////////////////////////////////////////////
 		// Model3D
 		else if( iTemp.find( "model3d" ) < iTemp.size() )
 		{
