@@ -336,7 +336,7 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 
 FROGSOBJECTS =	./obj/VFrogs.o \
                 ./obj/frogs.o \
-                ./obj/VFrogParameters.o
+                ./obj/VFrogsParameters.o
 
 MODELOBJECTS =  ./obj/VMinimizer.o \
 		./obj/VModel3DFn.o \
