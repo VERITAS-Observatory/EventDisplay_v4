@@ -1556,6 +1556,8 @@ $(vtspara).runfiles.tar.gz:
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter.DISP $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter.SumWindow6-DISP $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter.SumWindow6-noDISP $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter.allCutSets $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter.SumWindow6.allCutSets $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.SW18_noDoublePass.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.SWXX_DoublePass.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.LMULT.SWXX.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
