@@ -820,7 +820,8 @@ int main( int argc, char* argv[] )
 	recGTI.writeHeader( "TSTOP"   , tstop ) ;
 	recGTI.writeHeader( "TIMESYS" , string( "TT" ) ) ;
 	recGTI.writeHeader( "TIMEREF" , string( "local" ) ) ;
-	recGTI.writeHeader( "TIMEUNIT", string( "days" ) ) ;
+	//recGTI.writeHeader( "TIMEUNIT", string( "days" ) ) ;
+	recGTI.writeHeader( "TIMEUNIT", string( "s" ) ) ;
 	float gti_start  = 0.0 ;
 	float gti_stop   = 0.0 ;
 	recGTI.mapColumnToVar( "START" , gti_start );
