@@ -686,7 +686,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						TGraph* g = ( TGraph* )TFile( fFileNameFrogsCut.c_str(), "READ" ).Get( "gShowerGoodness" );
 						if( !g )
 						{
-							cout << "VGammaHadronCuts::readCuts error while reading shower goodness graph from " << fFileNameFrogsCut << endl;
+							cout << "VGammaHadronCuts::readCuts error while reading shower goodness graph (frogs) from " << fFileNameFrogsCut << endl;
 							cout << "exiting..." << endl;
 							exit( EXIT_FAILURE );
 						}
@@ -703,7 +703,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						TGraph* g = ( TGraph* )TFile( fFileNameFrogsCut.c_str(), "READ" ).Get( "gBackgroundGoodness" );
 						if( !g )
 						{
-							cout << "VGammaHadronCuts::readCuts error while reading background goodness graph from " << fFileNameFrogsCut << endl;
+							cout << "VGammaHadronCuts::readCuts error while reading background goodness graph (frogs) from " << fFileNameFrogsCut << endl;
 							cout << "exiting..." << endl;
 							exit( EXIT_FAILURE );
 						}
@@ -720,7 +720,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						TGraph* g = ( TGraph* )TFile( fFileNameFrogsCut.c_str(), "READ" ).Get( "gMSCW" );
 						if( !g )
 						{
-							cout << "VGammaHadronCuts::readCuts error while reading MSCW graph from " << fFileNameFrogsCut << endl;
+							cout << "VGammaHadronCuts::readCuts error while reading MSCW graph (frogs) from " << fFileNameFrogsCut << endl;
 							cout << "exiting..." << endl;
 							exit( EXIT_FAILURE );
 						}
@@ -737,7 +737,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						TGraph* g = ( TGraph* )TFile( fFileNameFrogsCut.c_str(), "READ" ).Get( "gMSCL" );
 						if( !g )
 						{
-							cout << "VGammaHadronCuts::readCuts error while reading MSCL graph from " << fFileNameFrogsCut << endl;
+							cout << "VGammaHadronCuts::readCuts error while reading MSCL graph (frogs) from " << fFileNameFrogsCut << endl;
 							cout << "exiting..." << endl;
 							exit( EXIT_FAILURE );
 						}
@@ -1633,7 +1633,7 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 	}
 	
 	double ShowerGoodnessCut_max = -99.;
-	if( fFrogsShowerGoodness->GetN() > 0 )
+	if( fFrogsShowerGoodness && fFrogsShowerGoodness->GetN() > 0 )
 	{
 		ShowerGoodnessCut_max = getShowerGoodnessCut_max( fData->frogsEnergy );
 		double fMeanShowerGoodness =
@@ -1645,7 +1645,7 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 	}
 	
 	double BackgroundGoodnessCut_max = -99.;
-	if( fFrogsBackgroundGoodness->GetN() > 0 )
+	if( fFrogsBackgroundGoodness && fFrogsBackgroundGoodness->GetN() > 0 )
 	{
 		BackgroundGoodnessCut_max = getBackgroundGoodnessCut_max( fData->frogsEnergy );
 		double fMeanBackgroundGoodness =
@@ -1657,7 +1657,7 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 	}
 	
 	double MSCWCut_max = -99.;
-	if( fFrogsMSCW->GetN() > 0 )
+	if( fFrogsMSCW && fFrogsMSCW->GetN() > 0 )
 	{
 		MSCWCut_max = getMSCWCut_max( fData->frogsEnergy );
 		if( fData->MSCW > MSCWCut_max )
@@ -1667,7 +1667,7 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 	}
 	
 	double MSCLCut_max = -99.;
-	if( fFrogsMSCL->GetN() > 0 )
+	if( fFrogsMSCL && fFrogsMSCL->GetN() > 0 )
 	{
 		MSCLCut_max = getMSCLCut_max( fData->frogsEnergy );
 		if( fData->MSCL > MSCLCut_max )
@@ -2891,22 +2891,22 @@ bool VGammaHadronCuts::applyPhaseCut( int i )
 void VGammaHadronCuts::printFrogsCuts( string iVariableNameFrogsCut )
 {
 	cout << "Frogs cut variable: " << iVariableNameFrogsCut << endl;
-	if( iVariableNameFrogsCut == "fSG" )
+	if( iVariableNameFrogsCut == "fSG" && fFrogsShowerGoodness )
 	{
 		cout << "Number of points: " << fFrogsShowerGoodness->GetN() << endl;
 		fFrogsShowerGoodness->Print();
 	}
-	if( iVariableNameFrogsCut == "fBG" )
+	if( iVariableNameFrogsCut == "fBG" && fFrogsBackgroundGoodness )
 	{
 		cout << "Number of points: " << fFrogsBackgroundGoodness->GetN() << endl;
 		fFrogsBackgroundGoodness->Print();
 	}
-	if( iVariableNameFrogsCut == "fMSCW" )
+	if( iVariableNameFrogsCut == "fMSCW" && fFrogsMSCW )
 	{
 		cout << "Number of points: " << fFrogsMSCW->GetN() << endl;
 		fFrogsMSCW->Print();
 	}
-	if( iVariableNameFrogsCut == "fMSCL" )
+	if( iVariableNameFrogsCut == "fMSCL" && fFrogsMSCL )
 	{
 		cout << "Number of points: " << fFrogsMSCL->GetN() << endl;
 		fFrogsMSCL->Print();
@@ -2916,6 +2916,7 @@ void VGammaHadronCuts::printFrogsCuts( string iVariableNameFrogsCut )
 double VGammaHadronCuts::getShowerGoodnessCut_max( double le )
 {
 	double shower_goodness_cut_max = -1.;
+        if( !fFrogsShowerGoodness ) return shower_goodness_cut_max;
 	
 	//shower_goodness_cut_max = fFrogsShowerGoodness->Eval( le );
 	
@@ -2946,6 +2947,7 @@ double VGammaHadronCuts::getShowerGoodnessCut_max( double le )
 double VGammaHadronCuts::getBackgroundGoodnessCut_max( double le )
 {
 	double background_goodness_cut_max = -1.;
+        if( !fFrogsBackgroundGoodness ) return background_goodness_cut_max;
 	
 	//background_goodness_cut_max = fFrogsBackgroundGoodness->Eval( le );
 	
@@ -2976,6 +2978,7 @@ double VGammaHadronCuts::getBackgroundGoodnessCut_max( double le )
 double VGammaHadronCuts::getMSCWCut_max( double le )
 {
 	double MSCW_cut_max = -1.;
+        if( !fFrogsMSCW ) return MSCW_cut_max;
 	
 	//MSCW_cut_max = fFrogsMSCW->Eval( le );
 	
@@ -3006,6 +3009,7 @@ double VGammaHadronCuts::getMSCWCut_max( double le )
 double VGammaHadronCuts::getMSCLCut_max( double le )
 {
 	double MSCL_cut_max = -1.;
+        if( !fFrogsMSCL ) return MSCL_cut_max;
 	
 	//MSCL_cut_max = fFrogsMSCL->Eval( le );
 	
