@@ -319,7 +319,7 @@ void VFrogs::readTableFrogs()
 	mscwTreeFrogs->SetBranchAddress( "eventNumber", &eventNumber );
 	mscwTreeFrogs->SetBranchAddress( "Erec", &Erec );
 
-        unsigned int nentries = mscwTreeFrogs->GetEntries();
+        int nentries = mscwTreeFrogs->GetEntries();
         fTableRunNumber.reserve( nentries );
         fTableEnergy.reserve( nentries );
 	
