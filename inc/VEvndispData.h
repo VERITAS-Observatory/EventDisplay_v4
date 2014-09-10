@@ -22,8 +22,8 @@
 #include <VFitTraceHandler.h>
 #include <VStarCatalogue.h>
 #include <VShowerParameters.h>
-#include <VFrogParameters.h>
-//#include <VFrogImageData.h>
+#include <VFrogsParameters.h>
+//#include <VFrogsImageData.h>
 #include <VModel3DParameters.h>
 #include <VPointing.h>
 #include <VArrayPointing.h>
@@ -127,8 +127,8 @@ class VEvndispData
 		static vector< VImageAnalyzerData* > fAnaData; //!< data class with analysis results for each telescope
 		//!< data class with analysis results from all telescopes
 		static VShowerParameters* fShowerParameters;
-		static VFrogParameters* fFrogParameters;
-		//	static vector< VFrogImageData* > fFrogData;    //!< frogs Template tube information
+		static VFrogsParameters* fFrogsParameters;
+		//	static vector< VFrogImageData* > fFrogsData;    //!< frogs Template tube information
 		static VModel3DParameters* fModel3DParameters;
 		static VMCParameters* fMCParameters;      //!< data class with MC parameters
 		
@@ -199,7 +199,7 @@ class VEvndispData
 		{
 			return fAnalysisTelescopeEventStatus;
 		}
-                double getAverageElevation();
+		double getAverageElevation();
 		vector<bool>&       getBorder()
 		{
 			return fAnaData[fTelID]->fBorder;
@@ -609,11 +609,14 @@ class VEvndispData
 		{
 			return fCalData[fTelID]->fBoolLowGainTOff;
 		}
-                double              getSumWindowMaxTimeDifferenceLGtoHG()
-                {
-                                    if( fTelID < fRunPar->fSumWindowMaxTimeDifferenceLGtoHG.size() ) return fRunPar->fSumWindowMaxTimeDifferenceLGtoHG[fTelID];
-                                    return -999.;
-                }
+		double              getSumWindowMaxTimeDifferenceLGtoHG()
+		{
+			if( fTelID < fRunPar->fSumWindowMaxTimeDifferenceLGtoHG.size() )
+			{
+				return fRunPar->fSumWindowMaxTimeDifferenceLGtoHG[fTelID];
+			}
+			return -999.;
+		}
 		VMCParameters*      getMCParameters()
 		{
 			return fMCParameters;
@@ -802,9 +805,9 @@ class VEvndispData
 		{
 			return fShowerParameters;
 		}
-		VFrogParameters*    getFrogParameters()
+		VFrogsParameters*    getFrogsParameters()
 		{
-			return fFrogParameters;
+			return fFrogsParameters;
 		}
 		VModel3DParameters* getModel3DParameters()
 		{
@@ -1367,7 +1370,10 @@ class VEvndispData
 		}
 		void	setLowGainMultiplier_Trace( unsigned int iTelID, double lmult )
 		{
-			if( iTelID < fCalData.size() ) fCalData[iTelID]->setLowGainMultiplier_Trace( lmult );
+			if( iTelID < fCalData.size() )
+			{
+				fCalData[iTelID]->setLowGainMultiplier_Trace( lmult );
+			}
 		}
 		void	setLowGainPedestalFile( string file )
 		{

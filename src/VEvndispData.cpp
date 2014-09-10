@@ -501,42 +501,42 @@ void VEvndispData::endOfRunInfo()
 //if iGrepAble == true, prints DEADCHAN at beginning of line. Prints list of dead pixels, some properties, and the reason why they are dead.
 void VEvndispData::printDeadChannels( bool iLowGain, bool iGrepAble )
 {
-	TString mode = iLowGain ? " low" : "high" ; 
-
+	TString mode = iLowGain ? " low" : "high" ;
+	
 	unsigned int idead = 0;
 	cout << endl;
-
+	
 	cout << "Dead channel list (" << mode << " gain) for Telescope " << getTelID() + 1 << endl;
 	cout << "==================================" << endl;
-
+	
 	for( unsigned int i = 0; i < getDead( iLowGain ).size(); i++ )
 	{
 		if( getDead( iLowGain )[i] > 0 )
 		{
 			bitset<16 * sizeof( uint32_t )> i_dead = getDead( iLowGain )[i];
 			TString linestart, extrainfo ;
-			if ( iGrepAble ) 
+			if( iGrepAble )
 			{
-				linestart.Form("DEADCHAN Tel %d, Channel %3d, %s gain, run %d: ", getTelID() + 1, i, mode.Data(), getRunNumber() ) ;
+				linestart.Form( "DEADCHAN Tel %d, Channel %3d, %s gain, run %d: ", getTelID() + 1, i, mode.Data(), getRunNumber() ) ;
 			}
-			else 
+			else
 			{
-				linestart.Form("\t%3d: ", i );
+				linestart.Form( "\t%3d: ", i );
 			}
-
-			if( i_dead.test(9) ) //L2 channel
-			{ 
+			
+			if( i_dead.test( 9 ) ) //L2 channel
+			{
 				cout << linestart  << fDeadChannelText[9] << endl;
 			}
-			else if (  i_dead.test(11) ) //user set 
-			{ 
+			else if( i_dead.test( 11 ) ) //user set
+			{
 				cout << linestart  << fDeadChannelText[11] << endl;
 			}
 			else //set dead by eventdisplay
 			{
-				extrainfo.Form("(pedestal %5.1f, pedvar %5.1f, rel. gain %3.2f, gainvar %3.2f, L1 rate %.2e Hz, HV %4d V, I %4.1f muA)", getPeds( iLowGain )[i] , getPedvars( ( bool )iLowGain, getSumWindow() )[ i ], getGains( iLowGain )[i] , getGainvars( iLowGain )[i] , getL1Rate(i), (int)getHV(i), getCurrent(i) );
-			
-				cout << linestart << extrainfo ; 
+				extrainfo.Form( "(pedestal %5.1f, pedvar %5.1f, rel. gain %3.2f, gainvar %3.2f, L1 rate %.2e Hz, HV %4d V, I %4.1f muA)", getPeds( iLowGain )[i] , getPedvars( ( bool )iLowGain, getSumWindow() )[ i ], getGains( iLowGain )[i] , getGainvars( iLowGain )[i] , getL1Rate( i ), ( int )getHV( i ), getCurrent( i ) );
+				
+				cout << linestart << extrainfo ;
 				for( unsigned j = 0; j < i_dead.size(); j++ )
 				{
 					if( i_dead.test( j ) && j < fDeadChannelText.size() )
@@ -548,7 +548,7 @@ void VEvndispData::printDeadChannels( bool iLowGain, bool iGrepAble )
 				idead++;
 				
 			}
-
+			
 		}
 	}
 	cout << "Total number of dead channels (" << mode << " gain) for Telescope " << getTelID() + 1 << ": " << idead << endl;
@@ -1072,17 +1072,17 @@ double VEvndispData::getAverageElevation()
 		double iN = 0.;
 		double ze  = 0.;
 		double az = 0.;
-                float i_start = getRunParameter()->fDBDataStartTimeSecOfDay;
-                if( getRunParameter()->fTimeCutsMin_min > 0 )
-                {
-                    i_start += (float)(getRunParameter()->fTimeCutsMin_min) * 60.;
-                }
-                float i_stopp = getRunParameter()->fDBDataStoppTimeSecOfDay;
-                if( getRunParameter()->fTimeCutsMin_max > 0 && getRunParameter()->fDBDataStartTimeSecOfDay + getRunParameter()->fTimeCutsMin_max*60 < getRunParameter()->fDBDataStoppTimeSecOfDay )
-                {
-                    i_stopp = getRunParameter()->fDBDataStartTimeSecOfDay + (float)(getRunParameter()->fTimeCutsMin_max) * 60.;
-                }
-
+		float i_start = getRunParameter()->fDBDataStartTimeSecOfDay;
+		if( getRunParameter()->fTimeCutsMin_min > 0 )
+		{
+			i_start += ( float )( getRunParameter()->fTimeCutsMin_min ) * 60.;
+		}
+		float i_stopp = getRunParameter()->fDBDataStoppTimeSecOfDay;
+		if( getRunParameter()->fTimeCutsMin_max > 0 && getRunParameter()->fDBDataStartTimeSecOfDay + getRunParameter()->fTimeCutsMin_max * 60 < getRunParameter()->fDBDataStoppTimeSecOfDay )
+		{
+			i_stopp = getRunParameter()->fDBDataStartTimeSecOfDay + ( float )( getRunParameter()->fTimeCutsMin_max ) * 60.;
+		}
+		
 		for( float i = i_start; i < i_stopp; i++ )
 		{
 			VSkyCoordinatesUtilities::getHorizontalCoordinates( getRunParameter()->fDBDataStartTimeMJD, i,
@@ -1176,7 +1176,7 @@ vector< VImageAnalyzerData* > VEvndispData::fAnaData;
 VShowerParameters* VEvndispData::fShowerParameters = 0;
 VMCParameters* VEvndispData::fMCParameters = 0;
 VEvndispReconstructionParameter* VEvndispData::fEvndispReconstructionParameter = 0;
-VFrogParameters* VEvndispData::fFrogParameters = 0;
+VFrogsParameters* VEvndispData::fFrogsParameters = 0;
 //vector< VFrogImageData* > VEvndispData::fFrogData;
 VModel3DParameters* VEvndispData::fModel3DParameters = 0;
 

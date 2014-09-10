@@ -99,13 +99,13 @@ struct frogs_imgtmplt_out frogs_img_tmplt( struct frogs_imgtmplt_in* d, char tem
 		firstcall = 0;
 		frogs_fill_prob_density( &prob_array );
 	}
-    
+	
 	//If needed read the template file according to elevation
 	if( d->elevation > tmplt.elevmax || d->elevation < tmplt.elevmin )
 	{
 		tmplt = frogs_read_template_elev( d->elevation, templatelistname );
 	}
-    
+	
 	//Optimize the likelihood
 	rtn = frogs_likelihood_optimization( d, &tmplt, &calib, &prob_array );
 	
@@ -1104,7 +1104,7 @@ struct frogs_imgtemplate frogs_read_template_elev( float elevation, char templat
 		{
 			fclose( fu ); //Closes the template filename list
 			//fprintf(stdout,"%f %f %s\n",minel,maxel,fname);
-            fprintf( stderr, "      line found! using template '%s'\n", fname ) ;
+			fprintf( stderr, "      line found! using template '%s'\n", fname ) ;
 			rtn = frogs_read_template_file( fname );
 			rtn.elevmin = minel;
 			rtn.elevmax = maxel;
@@ -1116,7 +1116,7 @@ struct frogs_imgtemplate frogs_read_template_elev( float elevation, char templat
 		{
 			fclose( fu ); //Closes the template filename list
 			//fprintf(stdout,"%f %f %s\n",minel,maxel,fname);
-            fprintf( stderr, "      line found! using template '%s'\n", fname ) ;
+			fprintf( stderr, "      line found! using template '%s'\n", fname ) ;
 			rtn = frogs_read_template_file( fname );
 			rtn.elevmin = minel;
 			rtn.elevmax = maxel;
@@ -1184,7 +1184,7 @@ frogs_read_template_file(
 	   as an argument.*/
 	FILE* fu; //file pointer
 	//open file
-    
+	
 	char* itemp = 0;
 	if( getenv( "VERITAS_EVNDISP_AUX_DIR" ) )
 	{
@@ -1194,9 +1194,9 @@ frogs_read_template_file(
 	{
 		itemp = getenv( "VERITAS_EVNDISP_ANA_DIR" );
 	}
-    char fullfname[FROGS_FILE_NAME_MAX_LENGTH] ; 
-    sprintf( fullfname, "%s/Templates/%s", itemp, fname ) ;
-    
+	char fullfname[FROGS_FILE_NAME_MAX_LENGTH] ;
+	sprintf( fullfname, "%s/Templates/%s", itemp, fname ) ;
+	
 	if( ( fu = fopen( fullfname, "r" ) ) == NULL )
 	{
 		printf( "%s\n", fullfname );
@@ -2494,21 +2494,21 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			  It is filled once at the beginning of the analysis. */
 			
 			fprintf( stderr, "\nFROGS: Filling Probability Density Table ......... \n" );
-            int bincount = 0 ;
+			int bincount = 0 ;
 			for( int i = 0; i < BIN1; i++ )
 			{
 				double q = ( ( double )i * ( RANGE1 - MIN1 ) / BIN1 + MIN1 );
-                fprintf( stderr, "Now on i-bin # %5d, q=%f\n", bincount, q) ;
-                bincount++ ;
+				fprintf( stderr, "Now on i-bin # %5d, q=%f\n", bincount, q ) ;
+				bincount++ ;
 				for( int j = 0; j < BIN2; j++ )
 				{
 					double mu = ( ( double )j * ( RANGE2 - MIN2 ) / BIN2 + MIN2 );
 					for( int k = 0; k < BIN3; k++ )
 					{
 						double ped = ( double )k * ( RANGE3 - MIN3 ) / BIN3 + MIN3;
-                        //printf( "  ped = %f\n", ped ) ;
+						//printf( "  ped = %f\n", ped ) ;
 						parray->prob_density_table[i][j][k] = frogs_probability_density( q, mu, ped, 0.35 );
-                        //printf( "  found probability density for bin [%d][%d][%d]\n", i, j, k ) ;
+						//printf( "  found probability density for bin [%d][%d][%d]\n", i, j, k ) ;
 						if( parray->prob_density_table[i][j][k] < 0. )
 						{
 							printf( "q %f mu %f ped %f pd %f\n", q, mu, ped, parray->prob_density_table[i][j][k] );
@@ -3764,6 +3764,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 					return FROGS_BAD_NUMBER;
 				}
 			}
+			
 			
 			
 			

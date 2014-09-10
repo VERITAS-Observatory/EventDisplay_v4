@@ -11,7 +11,7 @@
 
 #include "VEvndispData.h"
 #include "VShowerParameters.h"
-#include "VFrogParameters.h"
+#include "VFrogsParameters.h"
 #include <VEvndispRunParameter.h>
 #include <VDetectorGeometry.h>
 #include <VGrIsuAnalyzer.h>
@@ -33,7 +33,7 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 		~VFrogs();
 		
 		// vectors for readTableFrogs mscw runNumber and Erec
-		vector<int>    fTableRunNumber;
+		vector<int>    fTableEventNumber;
 		vector<double> fTableEnergy;
 		
 		vector<int>    fAnasumRunNumber;
@@ -162,9 +162,10 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 		}
 		
 		void initAnalysis();
-		void initFrogTree();
+		void initFrogsTree();
 		void initOutput();
-		void initFrogEvent();
+		void initFrogsEvent();
+		void reset();
 		void terminate();
 		float transformTelescopePosition( int iTel, float i_ze, float i_az, int axis );
 		float transformShowerPosition( float i_ze, float i_az, float xcore, float ycore, int axis );
@@ -186,7 +187,7 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 		//VVirtualDataReader   *fReader;
 		
 		int frogsRecID;
-        string templatelistname ;
+		string templatelistname;
 		
 		int   frogsEventID;
 		int   frogsGSLConStat;
