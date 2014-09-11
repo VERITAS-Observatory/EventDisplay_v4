@@ -65,6 +65,10 @@ bool readRunParameter( TFile* fIn, string iPara )
         {
                cout << fPar->fDBRunType << endl;
         }
+        else if( iPara == "-evndispreconstructionparameterfile" )
+        {
+              cout << fPar->freconstructionparameterfile << endl;
+        }
         else if( iPara == "-runinfo" )
         {
               cout << fPar->fInstrumentEpoch << "\t";
@@ -145,6 +149,7 @@ int main( int argc, char* argv[] )
                 cout << "      -atmosphere   print corsika ID of atmospheric condition of this run" << endl;
                 cout << "      -runtype      print run type, eg observing, obsFilter etc." << endl;
                 cout << "      -teltoana     print telescope combination used in analysis" << endl;
+                cout << "      -evndispreconstructionparameterfile print evndisp reconstruction parameter file" << endl;
                 cout << "      -runinfo      print relevant run info in one line" << endl;
 		cout << endl;
 		exit( 0 );
