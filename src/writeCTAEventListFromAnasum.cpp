@@ -695,6 +695,7 @@ int main( int argc, char* argv[] )
 	
 	//printf( "%6s %7s %6s %6s %6s %6s %6s %6s\n", "ObsID", "EventID", "RA  ", "DEC ", "Xoff", "Yoff", "MSCW", "MSCL") ;
 	//printf( "HEAD %6s %8s %4s %17s %6s %6s %6s %6s %5s %12s\n", "OBS_ID", "EVENT_ID", "MASK", "TIME(MET)", "RA  ", "DEC ", "AZ", "EL", "MJD", "Time") ;
+    double mjd ;
 	for( unsigned int i = 0; i <= totalEvents - 1 ; i++ )
 	{
 		//if ( i > 20 ) break ;
@@ -726,7 +727,7 @@ int main( int argc, char* argv[] )
 		shlength    = -9999.9        ;
 			
 		if ( rawEventsFlag ) {
-			printf( "EVENT %d %d %f %f\n", obs_id, event_id, ra, dec ) ;
+			printf( "EVENT %lu %lu %f %f\n", obs_id, event_id, ra, dec ) ;
 		}
 		
 		// set the telmask
@@ -740,6 +741,10 @@ int main( int argc, char* argv[] )
 		//event_time  = VSkyCoordinatesUtilities::getUTC( MJD, Time ) ; // using MJD epoch (time in seconds since MJD=0.0)
 		//event_time  = (MJD*86400.0) + Time - met_zero ;
 		event_time  = ( ( MJD - met_zero ) * 86400.0 ) + Time ;
+        if ( event_id < 3000 ) {
+            mjd = (double)MJD + (Time/86400.0) ;
+            printf( "i:%4lu mjd:%f\n", event_id, mjd ) ;
+        }
 		
 		//
 		recEVENTS.write() ;
@@ -826,13 +831,25 @@ int main( int argc, char* argv[] )
 	float gti_stop   = 0.0 ;
 	recGTI.mapColumnToVar( "START" , gti_start );
 	recGTI.mapColumnToVar( "STOP"  , gti_stop );
-	for( unsigned int i = 0 ; i < gti_Beginning.size() ; i++ )
-	{
-		gti_start = gti_Beginning[i] ;
-		gti_stop  = gti_Ending[i]    ;
-		recGTI.write() ;
-		printf( " writing GTI: %9.4f to %9.4f \n", gti_Beginning[i], gti_Ending[i] ) ;
-	}
+    
+    printf( "gti_Beginning.size():%d\n", (int)gti_Beginning.size() ) ;
+    
+    // if we have entries to add to the GTI, add them
+    if ( gti_Beginning.size() > 0 ) {
+        for( unsigned int i = 0 ; i < gti_Beginning.size() ; i++ )
+        {
+            gti_start = gti_Beginning[i] ;
+            gti_stop  = gti_Ending[i]    ;
+            recGTI.write() ;
+            printf( " writing GTI: %9.4f to %9.4f \n", gti_Beginning[i], gti_Ending[i] ) ;
+        }
+    } else {
+        // otherwise, just use the start and ends of the run
+        gti_start = tstart ;
+        gti_stop  = tstop  ;
+        recGTI.write() ;
+        printf( " writing GTI: %9.4f to %9.4f \n", gti_start, gti_stop ) ;
+    }
 	
 	// cleanup
 	recEVENTS.finishWriting();
