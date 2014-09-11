@@ -39,8 +39,6 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 # Load runlist functions
 source "$EVNDISPSYS/scripts/VTS/helper_scripts/RUNLIST.run_info_functions.sh"
 
-echo "which getRunArrayVersion `which getRunArrayVersion`"
-
 # Parse command line arguments
 RLIST=$1
 [[ "$2" ]] && ODIR=$2    || ODIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/"
@@ -70,20 +68,19 @@ SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/ANALYSIS.evndisp_frogs_sub"
 
 SECONDS=`date +"%s"`
 
+NRUNS=`cat $RLIST | wc -l ` 
+echo "total number of runs to analyze: $NRUNS"
+echo
 
 # loop over all files in files loop
 for RUN in $RUNNUMS; do
     echo "Now starting run $RUN"
     FSCRIPT="$LOGDIR/EVN.data-$RUN"
     
-    # get run array epoch using a run info function
-    EPOCH=`getRunArrayVersion $RUN`
-
     sed -e "s|RUNFILE|$RUN|"             \
         -e "s|CALIBRATIONOPTION|$CALIB|" \
         -e "s|OUTPUTDIRECTORY|$ODIR|"    \
         -e "s|MSCWDIRECTORY|$MSCWDIR|"   \
-        -e "s|ARRAYEPOCH|$EPOCH|"        \
         -e "s|USEVPMPOINTING|$VPM|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
     chmod u+x $FSCRIPT.sh

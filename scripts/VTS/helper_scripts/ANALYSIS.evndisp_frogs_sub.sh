@@ -10,7 +10,6 @@ CALIB=CALIBRATIONOPTION
 ODIR=OUTPUTDIRECTORY
 MSCWDIR=MSCWDIRECTORY
 VPM=USEVPMPOINTING
-ARRAYVERS=ARRAYEPOCH
 LOGDIR="$ODIR"
 
 # temporary (scratch) directory
@@ -22,9 +21,11 @@ fi
 echo "Scratch dir: $TEMPDIR"
 mkdir -p $TEMPDIR
 
-# eventdisplay reconstruction parameter
-#ACUTS="EVNDISP.reconstruction.runparameter"
-ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
+# eventdisplay reconstruction parameter (same as used in mscw file)
+ACUTS=`$EVNDISPSYS/printRunParameter $MSCWDIR/$RUN.mscw.root -evndispreconstructionparameterfile`
+
+# epoch
+ARRAYVERS=`$EVNDISPSYS/printRunParameter $MSCWDIR/$RUN.mscw.root -epoch`
 
 # template list file
 if [[ "$ARRAYVERS" =~ ^(V5|V6)$ ]]; then
