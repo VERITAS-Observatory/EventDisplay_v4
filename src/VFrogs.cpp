@@ -21,10 +21,11 @@ VFrogs::VFrogs()
 {
 
 	fFrogsParameters = new VFrogsParameters();
-	frogsRecID = getRunParameter()->ffrogsRecID;
-	templatelistname = getRunParameter()->ffrogstemplatelist ;
 	
 	reset();
+
+	frogsRecID = getRunParameter()->ffrogsRecID;
+	templatelistname = getRunParameter()->ffrogstemplatelist ;
 	
 }
 
@@ -353,7 +354,7 @@ void VFrogs::readTableFrogs()
 	double ErecS = 0.;
 	
 	string fmscwFrogsFile = getRunParameter()->ffrogsmscwfile;
-	cout << "FROGS readTableFrogs " << getRunParameter()->ffrogsmscwfile << endl;
+	cout << "FROGS readTableFrogs for starting values from: " << getRunParameter()->ffrogsmscwfile << endl;
 	
 	TFile* mscwFrogsFile = new TFile( fmscwFrogsFile.c_str() , "READ" );
 	
@@ -380,7 +381,7 @@ void VFrogs::readTableFrogs()
 	
 	mscwFrogsFile->Close();
 	
-	cout << "Finished Reading: " << fTableEventNumber.size() << " with size " << fTableEnergy.size() << endl;
+	cout << "Finished Reading: " << fTableEventNumber.size() << "/" << fTableEnergy.size() << " events from mscw_energy file " << endl;
 	
 }
 //================================================================
