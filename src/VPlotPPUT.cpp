@@ -46,11 +46,13 @@ void VPlotPPUT::getMergedFigureOfMerits( VSiteData* iSite, float* fom, float* fo
 	VPlotWPPhysSensitivity b;
 	// change second argument to select goal sensitivity
 	b.setCTARequirements( iSite->fSiteRequirementID, false);
-	cout << iSite->fSiteName << "\t" << iDirectionString << endl;
+	cout << "====================================================" << endl;
 	b.printSensitivityFigureOfMerit( iGraphSensitivity, f_pput_Energy_linTeV_min, f_pput_Energy_linTeV_max, iSite->fSiteName );
-	
 	*fom = b.getSensitivityFOM();
 	*fom_error = b.getSensitivityFOM_error();
+
+	cout << iSite->fSiteName << "\t" << iDirectionString << "\t PPUT: " << *fom << "+-" << *fom_error <<  endl;
+	
 }
 
 void VPlotPPUT::setPPUTRange( float pput_min, float pput_max )
