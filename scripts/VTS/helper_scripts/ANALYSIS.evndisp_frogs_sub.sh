@@ -22,10 +22,10 @@ echo "Scratch dir: $TEMPDIR"
 mkdir -p $TEMPDIR
 
 # eventdisplay reconstruction parameter (same as used in mscw file)
-ACUTS=`$EVNDISPSYS/printRunParameter $MSCWDIR/$RUN.mscw.root -evndispreconstructionparameterfile`
+ACUTS=`$EVNDISPSYS/bin/printRunParameter $MSCWDIR/$RUN.mscw.root -evndispreconstructionparameterfile`
 
 # epoch
-ARRAYVERS=`$EVNDISPSYS/printRunParameter $MSCWDIR/$RUN.mscw.root -epoch`
+ARRAYVERS=`$EVNDISPSYS/bin/printRunParameter $MSCWDIR/$RUN.mscw.root -epoch`
 
 # template list file
 if [[ "$ARRAYVERS" =~ ^(V5|V6)$ ]]; then
