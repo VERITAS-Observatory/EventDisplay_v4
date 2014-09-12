@@ -240,7 +240,8 @@ all VTS:	evndisp \
 	VTS.getRunListFromDB \
 	VTS.getLaserRunFromDB \
 	VTS.getRun_TimeElevAzim \
-	VTS.next_day
+	VTS.next_day \
+	printRunParameter
 
 CTA:	evndisp \
         CTA.convert_hessio_to_VDST \
@@ -251,7 +252,8 @@ CTA:	evndisp \
 	trainTMVAforGammaHadronSeparation \
 	slib \
 	writeCTAWPPhysSensitivityFiles \
-	writeParticleRateFilesFromEffectiveAreas
+	writeParticleRateFilesFromEffectiveAreas \
+	printRunParameter
 
 ###############################################################################################################################
 # core eventdisplay package
