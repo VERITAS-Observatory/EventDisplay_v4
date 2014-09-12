@@ -24,7 +24,7 @@ void help()
 	cout << "VTS.next_day (version " << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
 	cout << "===========================" << endl;
 	cout << endl;
-	cout << "VERITAS_next_day <anasum input file> <output file (.dat and .fits)> <target name>";
+	cout << "VTS.next_day <anasum input file> <output file (.dat and .fits)> <target name>";
 	cout << "[merge information into one FITS-file=0/1 (default=1)] [debug=0/1 (default=0)]" << endl;
 	cout << endl;
 	exit( 0 );
