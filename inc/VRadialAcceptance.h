@@ -149,7 +149,7 @@ class VRadialAcceptance
 			fAzCut_min = iAzMin;    //!< cut on Az (shower directory)
 			fAzCut_max = iAzMax;
 		}
-		void   setEnergyReconstructionMethod( unsigned int iEMethod = 0 )
+		void   setEnergyReconstructionMethod( unsigned int iEMethod = 1 )
 		{
 			fEnergyReconstructionMethod = iEMethod;
 		}
