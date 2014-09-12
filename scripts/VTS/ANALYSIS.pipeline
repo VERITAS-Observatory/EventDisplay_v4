@@ -566,7 +566,7 @@ function makeParamFile {
 		PARAMEXIT="$?"
 		#echo "PARAMEXIT:$PARAMEXIT" # =0 if ok, !=0 if bad things happened
 		if [[ "$PARAMEXIT" != "0" ]] ; then # had a problem generating param files
-			echoerr "${COTRED}Error, had a problem generating parameter files (see above text), exiting pipeline...$CONORM"
+			echoerr "${COTRED}Error, had a problem generating and/or finding some parameter files (see above text), exiting pipeline...$CONORM"
 			exit 1
 		fi
 		
@@ -617,14 +617,54 @@ function updateRunningJobFile {
 }
 
 function stageBanner {
+    
+    # assemble the list of stages, which can depend on some settings
+    stageList=()
+    stageList+=(evndisp)
+    stageList+=(mscw)
+    if [[ "$USEFROGS" == "yes" ]] ; then
+        stageList+=(frogs)
+    fi
+    stageList+=(anpar)
+    stageList+=(anmer)
+    
+    # the basic border line.  justify some lines to be the 
+    # same length as this line
+    line="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    
+    # first displayed line
+	echo -e "${COTBLUE}$line$CONORM"
+
+    # show progress through the stages
+    echo -en "${COTBLUE} Progress: "
+    i=1
+    for stg in ${stageList[@]} ; do
+        if [[ $stg == $STAGE ]] ; then echo -en "$COTGREEN" ; fi
+        echo -en "$stg"
+        if [[ $stg == $STAGE ]] ; then echo -en "$COTBLUE" ; fi
+        if [ $i != ${#stageList[@]} ] ; then echo -en " -> " ; fi
+        i=$((i+1))
+    done
+    echo -e "$CONORM"
+
+    # middle displayed line
+	echo -e "${COTBLUE}${line}${CONORM}"
+
+    # assemble the second banner showing which stage and the action (run/check)
 	if $CHECKFLAG ; then
-		BANNER="Checking the $STAGE Stage ~~~~~~~~~~~"
+        ACTION="Checking"
 	else
-		BANNER="Running the $STAGE Stage ~~~~~~~~~~~~"
+        ACTION="Running"
 	fi
-	echo -e "${COTBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~$CONORM"
-	echo -e "${COTBLUE}~~~~ $BANNER$CONORM"
-	echo -e "${COTBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~$CONORM"
+    BANNER="~~~~ $ACTION the $STAGE Stage "
+    echo -en "$COTBLUE"
+    
+    # pad it out to the same length as $line
+    echo -en "$BANNER${line:${#BANNER}}"
+    echo -e "$CONORM"
+    
+    # final displayed line
+	echo -e "${COTBLUE}${line}${CONORM}"
 }
 
 # test stage for just making the param file, and nothing else
@@ -632,7 +672,7 @@ if [[ "$STAGE" == "xxf" ]] ; then
 	stageBanner
 	echo "\$VERITAS_EVNDISP_AUX_DIR:$VERITAS_EVNDISP_AUX_DIR"
 	echo "\$EVNDISPSYS:$EVNDISPSYS"
-	makeParamFile
+	#makeParamFile
 	exit 0
 fi
 
