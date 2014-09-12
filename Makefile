@@ -239,7 +239,8 @@ all VTS:	evndisp \
 	compareDatawithMC \
 	VTS.getRunListFromDB \
 	VTS.getLaserRunFromDB \
-	VTS.getRun_TimeElevAzim
+	VTS.getRun_TimeElevAzim \
+	VTS.next_day
 
 CTA:	evndisp \
         CTA.convert_hessio_to_VDST \
