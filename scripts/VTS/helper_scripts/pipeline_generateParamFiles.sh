@@ -305,23 +305,25 @@ SETTINGLINE="$1"
 # parse settings from first argument
 # SETTINGLINE must have the format:
 # -OPTIONNAME:OPTIONVAL-OPTIONNAME:OPTIONVAL-OPTIONNAME:OPTIONVAL-OPTIONNAME:OPTIONVAL- etc.
-ENERGYCODE=$(      echo "$SETTINGLINE" | grep -oP "~CUTS:\w+~"              | grep -oP ":.+~" | tr -d ':' | tr -d '~')
-AUXVER_RADACC=$(   echo "$SETTINGLINE" | grep -oP "~AUXVERRADEC:auxv\d+~"   | grep -oP ":.+~" | tr -d ':' | tr -d '~')
-AUXVER_EFFAREA=$(  echo "$SETTINGLINE" | grep -oP "~AUXVEREFFAREA:auxv\d+~" | grep -oP ":.+~" | tr -d ':' | tr -d '~')
-AUXVER_TABLE=$(    echo "$SETTINGLINE" | grep -oP "~AUXVERTABLE:auxv\d+~"   | grep -oP ":.+~" | tr -d ':' | tr -d '~')
-AUXFILE_EVNVER=$(  echo "$SETTINGLINE" | grep -oP "~AUXFILEEVNVER:v\d+~"    | grep -oP ":.+~" | tr -d ':' | tr -d '~')
-AUXFILE_SIMDATE=$( echo "$SETTINGLINE" | grep -oP "~AUXFILESIMDATE:\w+~"    | grep -oP ":.+~" | tr -d ':' | tr -d '~')
-AUXFILE_MINTEL=$(  echo "$SETTINGLINE" | grep -oP "~AUXFILEMINTEL:\d+~"     | grep -oP ":.+~" | tr -d ':' | tr -d '~')
-AUXFILE_SRCEXT=$(  echo "$SETTINGLINE" | grep -oP "~AUXFILESRCEXT:\w+~"     | grep -oP ":.+~" | tr -d ':' | tr -d '~')
-AUXFILE_DISP=$(    echo "$SETTINGLINE" | grep -oP "~AUXFILEDISP:\w+~"       | grep -oP ":.+~" | tr -d ':' | tr -d '~')
-USEFROGS=$(        echo "$SETTINGLINE" | grep -oP "~USEFROGS:\w+~"          | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+ENERGYCODE=$(         echo "$SETTINGLINE" | grep -oP "~CUTS:\w+~"                        | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+AUXVER_RADACC=$(      echo "$SETTINGLINE" | grep -oP "~AUXVERRADEC:auxv\d+~"             | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+AUXVER_EFFAREA=$(     echo "$SETTINGLINE" | grep -oP "~AUXVEREFFAREA:auxv\d+~"           | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+AUXVER_TABLE=$(       echo "$SETTINGLINE" | grep -oP "~AUXVERTABLE:auxv\d+~"             | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+AUXFILE_EVNVER=$(     echo "$SETTINGLINE" | grep -oP "~AUXFILEEVNVER:v\d+~"              | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+AUXFILE_SIMDATE_GR=$( echo "$SETTINGLINE" | grep -oP "~AUXFILESIMDATEGR:[a-zA-Z0-9\-]+~" | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+AUXFILE_SIMDATE_CA=$( echo "$SETTINGLINE" | grep -oP "~AUXFILESIMDATECA:\w+~"            | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+AUXFILE_MINTEL=$(     echo "$SETTINGLINE" | grep -oP "~AUXFILEMINTEL:\d+~"               | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+AUXFILE_SRCEXT=$(     echo "$SETTINGLINE" | grep -oP "~AUXFILESRCEXT:\w+~"               | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+AUXFILE_DISP=$(       echo "$SETTINGLINE" | grep -oP "~AUXFILEDISP:\w+~"                 | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+USEFROGS=$(           echo "$SETTINGLINE" | grep -oP "~USEFROGS:\w+~"                    | grep -oP ":.+~" | tr -d ':' | tr -d '~')
 
 #echoerr "ENERGYCODE:      '$ENERGYCODE'"
 #echoerr "AUXVER_RADACC:   '$AUXVER_RADACC'"
 #echoerr "AUXVER_EFFAREA:  '$AUXVER_EFFAREA'"
 #echoerr "AUXVER_TABLE:    '$AUXVER_TABLE'"
 #echoerr "AUXFILE_EVNVER:  '$AUXFILE_EVNVER'"
-#echoerr "AUXFILE_SIMDATE: '$AUXFILE_SIMDATE'"
+#echoerr "AUXFILE_SIMDATE_GR: '$AUXFILE_SIMDATE_GR'"
+#echoerr "AUXFILE_SIMDATE_CA: '$AUXFILE_SIMDATE_CA'"
 #echoerr "AUXFILE_MINTEL:  '$AUXFILE_MINTEL'"
 #echoerr "AUXFILE_SRCEXT:  '$AUXFILE_SRCEXT'"
 #echoerr "AUXFILE_DISP:    '$AUXFILE_DISP'"
@@ -354,8 +356,12 @@ if [[ -z "$AUXFILE_EVNVER" ]] ; then
 	EXITFLAG=true
 fi
 
-if [[ -z "$AUXFILE_SIMDATE" ]] ; then
-	echoerr "Error, Unrecognized option in 'AUXFILE_SIMDATE', exiting..."
+if [[ -z "$AUXFILE_SIMDATE_GR" ]] ; then
+	echoerr "Error, Unrecognized option in 'AUXFILE_SIMDATE_GR', exiting..."
+	EXITFLAG=true
+fi
+if [[ -z "$AUXFILE_SIMDATE_CA" ]] ; then
+	echoerr "Error, Unrecognized option in 'AUXFILE_SIMDATE_CA', exiting..."
 	EXITFLAG=true
 fi
 
@@ -515,6 +521,15 @@ for i in ${RUNLIST[@]} ; do
 	#echoerr "  '$VERSIONCODE'"
 	
 	
+    if [[ "$VERSIONCODE" == "V4" || "$VERSIONCODE" == "V5" ]] ; then
+        SIMDATE="$AUXFILE_SIMDATE_GR"
+    elif [[ "$VERSIONCODE" == "V6" ]] ; then
+        SIMDATE="$AUXFILE_SIMDATE_CA"
+    else
+        echoerr "Error, unrecognized \$VERSIONCODE='$VERSIONCODE', exiting..."
+        exit 1
+    fi
+    
 	#echo "r${i}"
 	
 	
@@ -535,13 +550,13 @@ for i in ${RUNLIST[@]} ; do
 	#echo -e "${COTYELLOW}Warning, Effective area probably depends on if we're using frogs or not.  Fix!!!!$CONORM" >&2
 	#AREAFILE="effArea-d${EFDATECODE1}-cut-${NTELCODE}-Point-005CU-${ENERGYCODE}-${ATMOCODE}-${VERSIONCODE}-${TELCOMBOCODE}-d${EFDATECODE2}.root"
 	#AREAFILE="effArea-${AUXFILE_EVNVER}-${AUXVER_EFFAREA}-${AUXFILE_SIMDATE}-Cut-${NTELCODE}-${AUXFILE_SRCEXT}-${ENERGYCODE}-${DISPCODE}-${VERSIONCODE}-${ATMOCODE}-${TELCOMBOCODE}.root"
-	AREAFILE="effArea-${AUXFILE_EVNVER}-${AUXVER_EFFAREA}-${AUXFILE_SIMDATE}-$CUTSNAME-$METHCODE-${VERSIONCODE}-${ATMOCODE}-${TELCOMBOCODE}.root"
+	AREAFILE="effArea-${AUXFILE_EVNVER}-${AUXVER_EFFAREA}-${SIMDATE}-$CUTSNAME-$METHCODE-${VERSIONCODE}-${ATMOCODE}-${TELCOMBOCODE}.root"
 	huntForParameterFileName "EffectiveAreas" "$AREAFILE" "$i"
 
 	# Example: Tables/table_d20130521_GrIsuDec12_ATM22_V5_ID0
 	#TABLEFILE="table_d${TADATECODE}_GrIsuDec12_${ATMOCODE}_${VERSIONCODE}_ID0"
 	#TABLEFILE="table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-${ATMOCODE}-${VERSIONCODE}-${DISPCODE}"
-	TABLEFILE="table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-${ATMOCODE}-${VERSIONCODE}-${METHCODE}"
+	TABLEFILE="table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${SIMDATE}-${ATMOCODE}-${VERSIONCODE}-${METHCODE}"
 	huntForParameterFileName "Tables" "${TABLEFILE}.root" "$i"
 
 	# output format, print to screen, for each run:

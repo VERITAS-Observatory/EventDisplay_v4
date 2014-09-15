@@ -152,36 +152,38 @@ export EVNDISPRECONFILE="EVNDISP.reconstruction.runparameter.SumWindow6-DISP"
 ## For your Effective Area, Radial Acceptance, and Table IRF files:
 #
 # Which event display version should they have been made with?
-# e.g. effArea-v447-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
+# e.g. effArea-v451-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
 #              ^^^^
-# radialAcceptance-v447-auxv01-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root
+# radialAcceptance-v451-auxv01-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root
 #                  ^^^^
-# table-v447-auxv01-CARE_June1425-ATM21-V6-ID0.root
+# table-v451-auxv01-CARE_June1425-ATM21-V6-ID0.root
 #       ^^^^
-# Should have the format 'v###', like 'v447' or 'v525', etc.
-export AUXFILE_EVNVER="v447"
+# Should have the format 'v###', like 'v451' or 'v525', etc.
+export AUXFILE_EVNVER="v451"
 #
-# Which simulation type should they have been made with?
-# e.g. effArea-v447-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
+# Which simulation date should they have been made with?
+# Grisu is used for all V4/V5 runs, and CARE is used for V6 runs.
+# e.g. effArea-v451-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
 #                          ^^^^^^^^^^^^^
-# Should have the format '<simtype>_<month><year><day>', like 'CARE_June1425' 
-# or for grisu just 'GRISU-SW6'
-export AUXFILE_SIMDATE="CARE_June1425"
+# for Care (_CA), Should have the format '<simtype>_<month><year><day>', like 'CARE_June1425' 
+# for Grisu(_GR), just 'GRISU-SW6'
+export AUXFILE_SIMDATE_GR="GRISU-SW6"
+export AUXFILE_SIMDATE_CA="CARE_June1425"
 #
 # For the radial acceptance IRF file, what aux-file-version should we use?
-# e.g. radialAcceptance-v447-auxv01-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root
+# e.g. radialAcceptance-v451-auxv01-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root
 #                            ^^^^^^
 # Should have the format 'auxv##', e.g. 'auxv01' or 'auxv31'
 export AUXVER_RADEC="auxv01"
 #
 # For the table IRF file, what aux-file-version should we use?
-# e.g. table-v447-auxv01-CARE_June1425-ATM21-V6-ID0.root
+# e.g. table-v451-auxv01-CARE_June1425-ATM21-V6-ID0.root
 #                 ^^^^^^
 # Should have the format 'auxv##', e.g. 'auxv01' or 'auxv31'
 export AUXVER_TABLE="auxv01"
 #
 # For the effective area IRF file, what aux-file-version should we use?
-# e.g. effArea-v447-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
+# e.g. effArea-v451-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
 #                   ^^^^^^
 # Should have the format 'auxv##', e.g. 'auxv01' or 'auxv31'
 export AUXVER_EFFAREA="auxv01"
@@ -476,7 +478,7 @@ mkdir -p $CTOOLSDIR
 # file in $VERITAS_EVNDISP_AUX_DIR/Calibration
 if [[ "$SCIPIPE_MANUALLASER" == "yes" ]] ; then
 	if [[ ! -f "$VERITAS_EVNDISP_AUX_DIR/Calibration/$SCIPIPE_MANUALLASERFILE" ]] ; then
-		echo -e "${COTRED}Error, you specified 'SCIPIPE_MANUALLASER=yes', but the file specified by 'SCIPIPE_MANUALLASERFILE=$SCIPIPE_MANUALLASERFILE' doesn't seem to exist.  Use 'SCIPIPE_MANUALLASER=no', or figure out the right file for SCIPIPE_MANUALLASERFILE, exiting...$CONORM"
+		echo -e "${COTRED}Error, you specified 'SCIPIPE_MANUALLASER=yes', but the file specified by 'SCIPIPE_MANUALLASERFILE=$SCIPIPE_MANUALLASERFILE' doesn't seem to exist.  Use 'SCIPIPE_MANUALLASER=no', or figure out the right file for SCIPIPE_MANUALLASERFILE, exiting...${CONORM}"
 		exit 1
 	fi
 fi
@@ -515,12 +517,12 @@ function setupFilteredRunlists {
 	#TABLEFILEWINTV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-ATM21-V6-${TABLEDISPCODE}"
 	#TABLEFILESUMMV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-ATM22-V6-${TABLEDISPCODE}"
 
-	TABLEFILEWINTV4="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-ATM21-V4-$METHCODE"
-	TABLEFILESUMMV4="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-ATM22-V4-$METHCODE"
-	TABLEFILEWINTV5="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-ATM21-V5-$METHCODE"
-	TABLEFILESUMMV5="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-ATM22-V5-$METHCODE"
-	TABLEFILEWINTV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-ATM21-V6-$METHCODE"
-	TABLEFILESUMMV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE}-ATM22-V6-$METHCODE"
+	TABLEFILEWINTV4="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE_GR}-ATM21-V4-$METHCODE"
+	TABLEFILESUMMV4="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE_GR}-ATM22-V4-$METHCODE"
+	TABLEFILEWINTV5="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE_GR}-ATM21-V5-$METHCODE"
+	TABLEFILESUMMV5="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE_GR}-ATM22-V5-$METHCODE"
+	TABLEFILEWINTV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE_CA}-ATM21-V6-$METHCODE"
+	TABLEFILESUMMV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE_CA}-ATM22-V6-$METHCODE"
 
 	RUNLISTSUMMV4="$SCIDIR/runlist.summer.V4"
 	RUNLISTWINTV4="$SCIDIR/runlist.winter.V4"
@@ -560,7 +562,7 @@ function makeParamFile {
 		# Pack all the settings into a one-line argument.
 		# Characters that will break this: if any options have '~' or ':' or ' ' in them, 
 		# as these are used as delimiters in this packing technique.
-		SETTINGLINE="~CUTS:$CUTS~AUXFILEEVNVER:$AUXFILE_EVNVER~AUXFILESIMDATE:$AUXFILE_SIMDATE~AUXVERRADEC:$AUXVER_RADEC~AUXVEREFFAREA:$AUXVER_EFFAREA~AUXVERTABLE:$AUXVER_TABLE~AUXFILEMINTEL:$AUXFILE_MINTEL~USEFROGS:$USEFROGS~AUXFILESRCEXT:$AUXFILE_SRCEXT~AUXFILEDISP:$SCIPIPE_USEDISP~"
+		SETTINGLINE="~CUTS:$CUTS~AUXFILEEVNVER:$AUXFILE_EVNVER~AUXFILESIMDATEGR:$AUXFILE_SIMDATE_GR~AUXFILESIMDATECA:$AUXFILE_SIMDATE_CA~AUXVERRADEC:$AUXVER_RADEC~AUXVEREFFAREA:$AUXVER_EFFAREA~AUXVERTABLE:$AUXVER_TABLE~AUXFILEMINTEL:$AUXFILE_MINTEL~USEFROGS:$USEFROGS~AUXFILESRCEXT:$AUXFILE_SRCEXT~AUXFILEDISP:$SCIPIPE_USEDISP~"
 		#echo "SETTINGLINE:'$SETTINGLINE'"
 		$EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_generateParamFiles.sh "$SETTINGLINE" "$RUNLIST" > "$PARAMFILELIST"
 		PARAMEXIT="$?"
@@ -672,7 +674,7 @@ if [[ "$STAGE" == "xxf" ]] ; then
 	stageBanner
 	echo "\$VERITAS_EVNDISP_AUX_DIR:$VERITAS_EVNDISP_AUX_DIR"
 	echo "\$EVNDISPSYS:$EVNDISPSYS"
-	#makeParamFile
+	makeParamFile
 	exit 0
 fi
 
