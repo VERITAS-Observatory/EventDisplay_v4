@@ -94,10 +94,6 @@ cp $MSCWDIR/$INPUTMSCW $TEMPDIR/$INPUTMSCW
 # the output is this file, after evndisp edits it
 chmod u+w $TEMPDIR/$INPUTMSCW 
 
-echo
-ll -ahrt $TEMPDIR
-echo
-
 #OPT+=( -frogs $MSCWDIR/$RUN.mscw.root       )
 OPT+=( -frogs $TEMPDIR/$INPUTMSCW             )
 OPT+=( -frogsid 0                            )
