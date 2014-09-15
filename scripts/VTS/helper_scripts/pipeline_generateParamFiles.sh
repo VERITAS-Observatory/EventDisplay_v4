@@ -197,7 +197,7 @@ function huntForParameterFileName {
             echoerr " "
 			rm -rf "$LINKNAME" ; ln -sf "$LINKTARG" "$LINKNAME" # delete the link if it exists, and make it
 		else # the file doesnt exist anywhere, and the user needs to know
-			echoerr "${CORED}Error: For run $RRRUN Param File Does Not Exist! \$VERITAS_EVNDISP_AUX_DIR/$PFDIR/$PF ${CONORM}"
+			echoerr "${CORED}Error: For run $RRRUN Param File Does Not Exist: \$VERITAS_EVNDISP_AUX_DIR/$PFDIR/$PF ${CONORM}"
 			ALLFILESGOOD=false
 			addMissing "\$VERITAS_EVNDISP_AUX_DIR/$PFDIR/$PF"
 		fi
@@ -554,11 +554,11 @@ if ! $ALLFILESGOOD ; then
 	echoerr ""
 	echoerr "${CORED}Warning! Some needed files do not exist anywhere in \$VERITAS_EVNDISP_AUX_DIR or in the global dir `readlink -m $VERITAS_EVNDISP_AUX_DIR/GlobalDir`." >&2
 	echoerr "${CORED}List of missing files:"
-	#for i in "${MISSINGFILELIST[@]}" ; do
 	
-	for i in `echo "${MISSINGFILELIST[@]}" | sort | uniq` ; do
-		echoerr "${COTRED}$i${CONORM}"
-	done
+    # sort the unique missing files, for easy human reading
+    REORDER="`echo ${MISSINGFILELIST[@]} | sed -e 's/ /\n/g' | sort`"
+    echoerr "${COTRED}${REORDER}${CONORM}"
+    
 	echoerr "   Please check that the red files exist, and if not, TELL SOMEONE!!${CONORM}" >&2
 	echoerr ""
 	exit 1
