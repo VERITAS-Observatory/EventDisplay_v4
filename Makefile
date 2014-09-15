@@ -184,7 +184,7 @@ endif
 ########################################################
 ifneq ($(FITS),FALSE)
 GLIBS		+= -L$(FITSSYS)/lib -lcfitsio
-CXXFLAGS	+= -I $(FITSSYS)/include/
+CXXFLAGS	+= -I$(FITSSYS)/include/
 endif
 ########################################################
 # HESSIO 
@@ -667,7 +667,7 @@ ifeq ($(ROOT_MINUIT2),yes)
 endif
 
 ifneq ($(FITS),FALSE)
-  SHAREDOBJS	+= ./obj/VFITS.o # ../obj/VFITS_Dict.o
+  SHAREDOBJS	+= ./obj/VFITS.o  ./obj/VFITS_Dict.o
 endif
 
 slib lsib ./lib/libVAnaSum.so:   $(SHAREDOBJS)
@@ -1348,6 +1348,11 @@ endif
 ########################################################
 # dictionaries (which don't follow the implicit rule)
 ########################################################
+./obj/VFITS_Dict.o:
+	@echo "A Generating dictionary $@.."
+	@echo rootcint -f $(basename $@).cpp  -c -p -I$(FITSSYS)/include inc/VFITS.h inc/VFITSLinkDef.h
+	@rootcint -f $(basename $@).cpp  -c -p -I$(FITSSYS)/include inc/VFITS.h inc/VFITSLinkDef.h
+	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 
 ./obj/VDisplay_Dict.o:	
 	@echo "A Generating dictionary $@.."
