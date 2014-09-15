@@ -143,7 +143,7 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
 	// read L1 rates
 	
 	sprintf( c_query, "select timestamp, telescope_id, pixel_id, rate from tblL1_TriggerInfo, tblRun_Info where timestamp" );
-	sprintf( c_query, "%s > tblRun_Info.data_start_time AND timestamp <  tblRun_Info.data_end_time AND tblRun_Info.run_id=%d", c_query, runNumber );
+	sprintf( c_query, "%s >= tblRun_Info.data_start_time - INTERVAL 1 MINUTE AND timestamp <=  tblRun_Info.data_end_time + INTERVAL 1 MINUTE AND tblRun_Info.run_id=%d", c_query, runNumber );
 	
 	if( !my_connection.make_query( c_query ) )
 	{
@@ -185,7 +185,7 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
 	for( unsigned int i = 0; i < getNTel(); i++ )
 	{
 		sprintf( c_query, "select * FROM tblHV_Telescope%d_Status WHERE channel > 0 AND", i );
-		sprintf( c_query, "%s (db_start_time > \"%s\") AND (db_start_time < \"%s\")", c_query, iDBStartTimeSQL.c_str(), fDBRunStoppTimeSQL.c_str() );
+		sprintf( c_query, "%s (db_start_time >= \"%s\" - INTERVAL 1 MINUTE) AND (db_start_time <= \"%s\" )", c_query, iDBStartTimeSQL.c_str(), fDBRunStoppTimeSQL.c_str() );
 		
 		if( !my_connection.make_query( c_query ) )
 		{
