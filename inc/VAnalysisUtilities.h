@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "CRunSummary.h"
+#include "VGlobalRunParameter.h"
 #include "VRunList.h"
 #include "VStatistics.h"
 
@@ -46,6 +47,8 @@ class VAnalysisUtilities : public TNamed
 		
 		// anasum data file
 		TFile* fAnasumDataFile;                                                //!
+		// evndisplay version
+		string fEVNDISPVersion;
 		
 		// run list
 		double fRunList_MJD_min;

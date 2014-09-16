@@ -2,6 +2,11 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140916 (HF, GM)
+included VFITS into shared library
+improved reading of EVNDISP version
+into VFITS
+
 * 20140905 (GM)
 fixed segfaults due to missing
 initialization of variables
