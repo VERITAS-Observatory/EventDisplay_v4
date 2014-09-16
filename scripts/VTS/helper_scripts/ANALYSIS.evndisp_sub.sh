@@ -58,9 +58,10 @@ fi
 
 # restrict telescope combination to be analyzed:
 if [[ $TELTOANA == "1234" ]]; then
-	echo "Analyzed telescopes: $TELTOANA (all telescopes)"
+	echo "Telescope combination saved in the DB is analyzed (default)"
 else
 	OPT+=( -teltoana=$TELTOANA )
+	echo "Analyzed telescope configuration: $TELTOANA "
 fi
 
 # None of the following command line options is needed for the standard analysis!
