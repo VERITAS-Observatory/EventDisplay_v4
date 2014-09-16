@@ -6,8 +6,7 @@ VFITS::VFITS( string anasum_file, string fits_file, string object_name, bool iOn
 	fFile_anasum = anasum_file;
 	fFile_FITS   = fits_file;
 	fWriteOneFile = iOneFile;
-	
-	fEVDversion = "EVENTDISPLAY_4.30";
+
 	fTarget_Name = object_name;
 	fTarget_Exposure = 0.;
 	fTarget_RAJ2000 = 0.;
@@ -15,7 +14,7 @@ VFITS::VFITS( string anasum_file, string fits_file, string object_name, bool iOn
 	ctRunSum = 0;
 	if( !readAnasumFile( iPrint ) )
 	{
-		exit( 1 );
+		exit( EXIT_FAILURE );
 	}
 }
 
@@ -1045,7 +1044,7 @@ bool VFITS::writeFITSInfo( bool iPrint )
 	delete time;
 	
 	char iCreator[100];
-	sprintf( iCreator, "%s", fEVDversion.c_str() );
+	sprintf( iCreator, "EVENTDISPLAY_%s", fEVNDISPVersion.c_str() );
 	if( fits_update_key( fptr, TSTRING, ( char* )"CREATOR", iCreator, ( char* )"Software package and version creating file", &status ) )
 	{
 		return printerror( status );

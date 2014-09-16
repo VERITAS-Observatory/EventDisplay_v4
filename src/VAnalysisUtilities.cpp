@@ -26,6 +26,7 @@ VAnalysisUtilities::VAnalysisUtilities()
 	fRunList_MJD_max = 0.;
 	
 	fAnasumDataFile = 0;
+	fEVNDISPVersion = "noVersionSet";
 	
 	setRunListMJDRange();
 	setPhaseFoldingValues();
@@ -44,6 +45,12 @@ bool VAnalysisUtilities::openFile( string iname, int irun, bool iStereo, bool iP
 		bZombie = true;
 		return false;
 	}
+	VGlobalRunParameter *iPar = (VGlobalRunParameter*)fAnasumDataFile->Get( "anasumRunParameter" );
+	if( iPar )
+	{
+	     fEVNDISPVersion = iPar->getEVNDISP_VERSION();
+        }
+	   
 	
 	if( iStereo )
 	{
