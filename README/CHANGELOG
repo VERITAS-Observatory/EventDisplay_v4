@@ -7,6 +7,9 @@ included VFITS into shared library
 improved reading of EVNDISP version
 into VFITS
 
+* 20140912 (SV, GM)
+a bit of cleanup in the frogs classes
+
 * 20140905 (GM)
 fixed segfaults due to missing
 initialization of variables
