@@ -130,7 +130,7 @@ do
 
 	echo "Using runparameter file $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/$ACUTS"
 
-	if [[ $MODEL3D == "0" ]]; then
+	if [[ $VPM == "1" ]]; then
 	echo "VPM is switched on (default)"
 	else
 	echo "VPM bool is set to $VPM (switched off)"
