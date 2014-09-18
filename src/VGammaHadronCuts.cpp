@@ -1022,7 +1022,7 @@ void VGammaHadronCuts::printCutSummary()
 {
 	cout << "-----------------------------------------------------------------------------------------" << endl;
 	cout << "VGammaHadronCuts::printCutSummary()";
-	cout << " (ntel=" << fNTel << "): ";
+	cout << " (ntel=" << fTelToAnalyze.size() << ": T" << getTelToAnalyzeString() << ") ";
 	cout << endl;
 	cout << "Gamma/hadron cut selector: " << fGammaHadronCutSelector << endl;
 	if( fInstrumentEpoch != "NOT_SET" )

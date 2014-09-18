@@ -2,6 +2,11 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140918 (HF)
+Fixed treatment of 3-Telescope runs when selecting telescope combinations in gamma/hadron cuts.
+Trunk not compatible with v451 IRFs in 3-telelescope runs anymore, bug fix release to follow.
+More info: http://veritash.sao.arizona.edu:8081/Eventdisplay-WG/1270
+
 * 20140916 (HF, GM)
 included VFITS into shared library
 improved reading of EVNDISP version

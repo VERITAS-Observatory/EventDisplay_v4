@@ -307,13 +307,12 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 	
 	//////////////////////////////////////////////////////////////////////////////////////
 	// fill some parameters
-	
 	// read run parameters from this file
 	if( !readRunParameters( fdatafile ) )
 	{
+		cout << "VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile: Reading run parameter from " << fdatafile << " failed. " << endl;
 		return false;
 	}
-	
 	// read spectral energy parameters
 	if( !readCRSpectralParameters() )
 	{
@@ -434,11 +433,12 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
         if( i_runPara )
         {
             fInstrumentEpoch = i_runPara->fInstrumentEpoch;
+	    fTelToAnalyse = i_runPara->fTelToAnalyze;
         }
         else
         {
-            cout << "VInstrumentResponseFunctionRunParameter::readRunParameters() warning: cannot read instrument epoch from MC event file" << endl;
-            cout << "this might lead to a wrong choice in the gamma/hadron cuts - please check" << endl;
+            cout << "VInstrumentResponseFunctionRunParameter::readRunParameters() warning: cannot read instrument epoch and active telecopes from MC event file" << endl;
+            cout << "this might lead to a wrong choice in the gamma/hadron cuts - please check" << endl; 
             fInstrumentEpoch = "NOT_FOUND";
         }
         // get NSB (pedvar) level
@@ -454,9 +454,9 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
 		fnoise = fR->fNoiseLevel;
 	}
 	fpedvar = fR->meanpedvars;
-        // get list of telescopes to be analyzed
-        fTelToAnalyse = fR->fTelToAnalyse;
-	
+        // get list of telescopes to be analyzed -> now from EvndispRunParameter
+	//fTelToAnalyse = fR->fTelToAnalyse;
+
 	// get wobble offset from first event in file
 	// (should not change during a simulation run!)
 	TTree* i_data = ( TTree* )iFile->Get( "data" );

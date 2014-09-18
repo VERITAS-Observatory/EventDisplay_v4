@@ -301,7 +301,8 @@ class VStereoAnalysis
 		TTree* fDataFrogsTree;
 		TFile* fDataFile;
                 string fInstrumentEpoch;
-		
+		vector< unsigned int > fTelToAnalyze;
+
 		vector< VSkyCoordinates* > fAstro;        //!< Astronomical source parameters for this analysis
 		VGammaHadronCuts* fCuts;                  //!< Parameter Cuts
 		VTimeMask* fTimeMask;                     //!< Time Cuts

@@ -1365,11 +1365,34 @@ bool VTableLookupDataHandler::readRunParameter()
 				fOutFile->cd();
 				iR->Write();
 			}
-			iR = ( TNamed* )ifInput.Get( "runparameterV2" );
-			if( iR )
+			VEvndispRunParameter* iPar = (VEvndispRunParameter*) ifInput.Get( "runparameterV2" );
+			VEvndispReconstructionParameter *iA = (VEvndispReconstructionParameter*)ifInput.Get( "EvndispReconstructionParameter" );
+			vector< unsigned int > iTelToAnalyze;
+    			if( iPar) 
 			{
+				if ( fTLRunParameter->fTelToAnalyse.size() > 0 ) {
+					iPar->fTelToAnalyze = fTLRunParameter->fTelToAnalyse;
+				}
+    				else if( iA )
+    				{
+					//copied from VTableLookupRunParameter.cpp
+					vector< unsigned int > iRunParT = iPar->fTelToAnalyze;
+        				// this works only if number of telescopes = number of telescope types
+        				if( fTLRunParameter->rec_method < (int)iA->fLocalUseImage.size() && iPar->fNTelescopes == iA->fLocalUseImage[fTLRunParameter->rec_method].size() )
+        				{
+           					for( unsigned int i = 0; i < iRunParT.size(); i++ )
+            					{
+                					if( iRunParT[i] < iA->fLocalUseImage[fTLRunParameter->rec_method].size() && iA->fLocalUseImage[fTLRunParameter->rec_method][iRunParT[i]] )
+							{
+								iTelToAnalyze.push_back( iRunParT[i] );
+							}
+						} 
+					}
+					iPar->fTelToAnalyze = iTelToAnalyze;
+				}
+
 				fOutFile->cd();
-				iR->Write();
+				iPar->Write();
 			}
 		}
 		ifInput.Close();
