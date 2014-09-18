@@ -1726,37 +1726,37 @@ endif
 ifeq ($(strip $(VERITAS_EVNDISP_AUX_DIR)),)
 	@echo "VERITAS_EVNDISP_AUX_DIR not set (see README/INSTALL)"
 else
-	@echo "VERITAS_EVNDISP_AUX_DIR set to $(EVNDISPSYS)"
+	@echo "VERITAS_EVNDISP_AUX_DIR set to $(VERITAS_EVNDISP_AUX_DIR)"
 endif
 ifeq ($(strip $(VERITAS_DATA_DIR)),)
 	@echo "VERITAS_DATA_DIR not set (see README/INSTALL)"
 else
-	@echo "VERITAS_DATA_DIR set to $(EVNDISPSYS)"
+	@echo "VERITAS_DATA_DIR set to $(VERITAS_DATA_DIR)"
 endif
 ifeq ($(strip $(VERITAS_USER_DATA_DIR)),)
 	@echo "VERITAS_USER_DATA_DIR not set (see README/INSTALL)"
 else
-	@echo "VERITAS_USER_DATA_DIR set to $(EVNDISPSYS)"
+	@echo "VERITAS_USER_DATA_DIR set to $(VERITAS_USER_DATA_DIR)"
 endif
 ifeq ($(strip $(VERITAS_IRFPRODUCTION_DIR)),)
 	@echo "VERITAS_IRFPRODUCTION_DIR not set (see README/INSTALL)"
 else
-	@echo "VERITAS_IRFPRODUCTION_DIR set to $(EVNDISPSYS)"
+	@echo "VERITAS_IRFPRODUCTION_DIR set to $(VERITAS_IRFPRODUCTION_DIR)"
 endif
 ifeq ($(strip $(CTA_EVNDISP_AUX_DIR)),)
 	@echo "CTA_EVNDISP_AUX_DIR not set (see README/INSTALL)"
 else
-	@echo "CTA_EVNDISP_AUX_DIR set to $(EVNDISPSYS)"
+	@echo "CTA_EVNDISP_AUX_DIR set to $(CTA_EVNDISP_AUX_DIR)"
 endif
 ifeq ($(strip $(CTA_DATA_DIR)),)
 	@echo "CTA_DATA_DIR not set (see README/INSTALL)"
 else
-	@echo "CTA_DATA_DIR set to $(EVNDISPSYS)"
+	@echo "CTA_DATA_DIR set to $(CTA_DATA_DIR)"
 endif
 ifeq ($(strip $(CTA_USER_DATA_DIR)),)
 	@echo "CTA_USER_DATA_DIR not set (see README/INSTALL)"
 else
-	@echo "CTA_USER_DATA_DIR set to $(EVNDISPSYS)"
+	@echo "CTA_USER_DATA_DIR set to $(CTA_USER_DATA_DIR)"
 endif
 
 
