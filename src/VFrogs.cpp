@@ -665,7 +665,9 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc
 			//(GH) modify to remove LG pixels
 			//if(fData->getDead()[pix]!=0)
 			//if(fData->getDead()[pix]!=0 || fData->getData()->getHiLo()[pix]==1 )
-			if( fData->getDead( fData->getData()->getHiLo()[pix] )[pix] != 0 )//(SV)
+			//exclude channels that are dead or where the integration window falls outside the readout window or where the pedvar is 0
+			if( fData->getDead( fData->getData()->getHiLo()[pix] )[pix] != 0 || fData->getCurrentSumWindow_2()[pix] == 0  ||
+				fData->getData()->getPedvars( fData->getData()->getHiLo()[pix], fData->getCurrentSumWindow_2()[pix] )[pix]  == 0 )//(SV)
 			{
 				rtn.scope[tel].pixinuse[pix] = FROGS_NOTOK;
 			}
