@@ -110,7 +110,7 @@ fi
 DATE=`date +"%y%m%d"`
 LDIR=$CTA_USER_LOG_DIR/$DATE/TMVATRAINING/
 mkdir -p $LDIR
-#QDIR=$LDIR
+# QDIR=$LDIR
 QDIR="/dev/null"
 echo "log directory: " $LDIR
 echo "queue log directory: " $QDIR
@@ -155,6 +155,7 @@ do
 	 echo $RFIL
 	 rm -f $RFIL
 	 echo "* ENERGYBINS $EREC ${EMIN[$i]} ${EMAX[$i]}" > $RFIL.runparameter
+         echo "* ZENITHBINS 0 90" >> $RFIL.runparameter
 	 echo "* MCXYOFF (MCxoff*MCxoff+MCyoff*MCyoff)>=${OFFMIN[$W]}*${OFFMIN[$W]}&&(MCxoff*MCxoff+MCyoff*MCyoff)<${OFFMAX[$W]}*${OFFMAX[$W]}" >> $RFIL.runparameter
          echo "* MCXYCUTSignalOnly 1" >> $RFIL.runparameter
 	 grep "*" $RPAR.runparameter | grep -v ENERGYBINS | grep -v OUTPUTFILE | grep -v SIGNALFILE | grep -v BACKGROUNDFILE | grep -v MCXYOFF >> $RFIL.runparameter
@@ -168,7 +169,6 @@ do
 	    echo "* BACKGROUNDFILE $arg" >> $RFIL.runparameter
 	 done
 # setting the cuts correctly in the run parameter file
-         sed -i "s|MINIMAGES|$NIMAGESMIN|" $RFIL.runparameter
          if [ -z $NTYPEMIN_0 ]
          then
 	    TYPECUT="(NImages_Ttype[0]>=0)"
@@ -181,17 +181,13 @@ do
          else
 	    TYPECUT="(NImages_Ttype[0]>="$NTYPEMIN_0"\|\|NImages_Ttype[1]>="$NTYPEMIN_1"\|\|NImages_Ttype[2]>="$NTYPEMIN_2")"
          fi
-	 sed -i "s|MINIMAGETYPECUT|$TYPECUT|" $RFIL.runparameter
+         sed -i "s|MINIMAGES|$NIMAGESMIN|;s|MINIMAGETYPECUT|$TYPECUT|" $RFIL.runparameter
 # setting the chosen energy variable
 	 if [ $EREC = "0" ]
 	 then
-	    sed -i 's|ENERGYVARIABLE|Erec|' $RFIL.runparameter
-	    sed -i 's|ENERGYCHI2VARIABLE|EChi2|g' $RFIL.runparameter
-	    sed -i 's|ENERGYDEVARIABLE|dE|g' $RFIL.runparameter
+	    sed -i 's|ENERGYVARIABLE|Erec|;s|ENERGYCHI2VARIABLE|EChi2|g;s|ENERGYDEVARIABLE|dE|g' $RFIL.runparameter
          else
-	    sed -i 's|ENERGYVARIABLE|ErecS|' $RFIL.runparameter
-	    sed -i 's|ENERGYCHI2VARIABLE|EChi2S|g' $RFIL.runparameter
-	    sed -i 's|ENERGYDEVARIABLE|dES|g' $RFIL.runparameter
+	    sed -i 's|ENERGYVARIABLE|ErecS|;s|ENERGYCHI2VARIABLE|EChi2S|g;s|ENERGYDEVARIABLE|dES|g' $RFIL.runparameter
          fi
 
 # run script
