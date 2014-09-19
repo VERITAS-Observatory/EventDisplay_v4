@@ -9,6 +9,7 @@ TABFILE=TABLEFILE
 RECID=RECONSTRUCTIONID
 ODIR=OUTPUTDIRECTORY
 INFILE=EVNDISPFILE
+ENERGY3D=USEENERGY3D
 
 INDIR=`dirname $INFILE`
 BFILE=`basename $INFILE .root`
@@ -23,23 +24,56 @@ mkdir -p $TEMPDIR
 
 #################################
 # run analysis
+
 MSCWLOGFILE="$ODIR/$BFILE.mscw.log"
 rm -f $MSCWLOGFILE
 cp -f -v $INFILE $TEMPDIR
 
-$EVNDISPSYS/bin/mscw_energy         \
-    -tablefile $TABFILE             \
-    -noshorttree                    \
-    -arrayrecid=$RECID              \
-    -inputfile $TEMPDIR/$BFILE.root \
-    -writeReconstructedEventsOnly=1 \
-    |& tee $MSCWLOGFILE
-
-# move output file from scratch and clean up
 MSCWDATAFILE="$ODIR/$BFILE.mscw.root"
-cp -f -v $TEMPDIR/$BFILE.mscw.root $MSCWDATAFILE
-rm -f $TEMPDIR/$BFILE.mscw.root
-rm -f $TEMPDIR/$BFILE.root
+
+if [ "$ENERGY3D" == "no" ] ; then
+
+    $EVNDISPSYS/bin/mscw_energy         \
+        -tablefile $TABFILE             \
+        -noshorttree                    \
+        -arrayrecid=$RECID              \
+        -inputfile $TEMPDIR/$BFILE.root \
+        -writeReconstructedEventsOnly=1 \
+        |& tee $MSCWLOGFILE
+
+    # move output file from scratch and clean up
+    cp -f -v $TEMPDIR/$BFILE.mscw.root $MSCWDATAFILE
+    rm -f $TEMPDIR/$BFILE.mscw.root
+    rm -f $TEMPDIR/$BFILE.root
+    
+# nils' energy3d step
+elif [ "$ENERGY3D" == "yes" ] ; then
+    
+    OUTPUTFILE="$BFILE.energy3d"    
+    
+    EPOCH=$( $EVNDISPSYS/bin/printRunParameter $TEMPDIR/$BFILE.root -epoch      )
+    ATMO=$(  $EVNDISPSYS/bin/printRunParameter $TEMPDIR/$BFILE.root -atmosphere )
+    
+    TEMPLATEFNAME="Template3D_V${EPOCH}_ATM${ATMO}.root"
+    cp $VERITAS_EVNDISP_AUX_DIR/Energy3DTemplates/$TEMPLATEFNAME $TEMPDIR/$TEMPLATEFNAME
+
+    $EVNDISPSYS/bin/energy3d \
+        -inputfile   $TEMPDIR/$BFILE.root      \
+        -outputfile  $TEMPDIR/$OUTPUTFILE.root \
+        -template    $TEMPDIR/$TEMPLATEFNAME   \
+        |& tee $MCWLOGFILE
+    
+    echo
+    echo "Here's whats in the temporary directory!"
+    ls -l $TEMPDIR/
+    echo
+
+    cp -f -v $TEMPDIR/$OUTPUTFILE.root $MSCWDATAFILE
+    rm -f $TEMPDIR/$BFILE.mscw.root
+    rm -f $TEMPDIR/$BFILE.root
+    rm -f $TEMPDIR/$TEMPLATEFNAME
+    
+fi
 
 # write info to log
 echo "RUN$BFILE MSCWLOG $MSCWLOGFILE"

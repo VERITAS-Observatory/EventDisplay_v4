@@ -36,6 +36,12 @@ export RUNLIST="$CWD/runlist.crab.dat"
 # Takes effect in the evndisp stage.
 export USEMODEL3D="no"
 
+## Should we use the Energy3D feature?
+## This feature is not *yet* functional, contact
+## nils for more information.
+# takes effect in the mscw stage.
+export USEENERGY3D="no"
+
 ## What kind of cuts do you want to use?
 # Currently supports:
 #    'Soft', 'Moderate', 'Hard', 
@@ -809,26 +815,34 @@ if [[ "$STAGE" == "mscw" ]] ; then
 		setupFilteredRunlists
 		makeParamFile
 		cd $EVNDISPSYS/scripts/VTS
+        
+        # convert energy3d code
+        if [[ $USEENERGY3D == "yes" ]] ; then ENERGY3D=1 ;
+        else                                  ENERGY3D=0 ;
+        fi
+
 		#./VTS.MSCW_ENERGY.sub_analyse_data.sh $TABLEFILE $EVNDISPOUTPUTDIR $RUNLIST
 		QSUBDATA=""
 		NRUNS=$( cat $RUNLISTWINTV4 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $TABLEFILEWINTV4 $RUNLISTWINTV4 "$EVNDISPOUTPUTDIR" $RECID "${EVNDISPOUTPUTDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $TABLEFILEWINTV4 $RUNLISTWINTV4 "$EVNDISPOUTPUTDIR" $RECID "${EVNDISPOUTPUTDIR}/RecID${RECID}" "$ENERGY3D" | tee >(cat ->&5) ) ; fi
 		NRUNS=$( cat $RUNLISTSUMMV4 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $TABLEFILESUMMV4 $RUNLISTSUMMV4 "$EVNDISPOUTPUTDIR" $RECID "${EVNDISPOUTPUTDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $TABLEFILESUMMV4 $RUNLISTSUMMV4 "$EVNDISPOUTPUTDIR" $RECID "${EVNDISPOUTPUTDIR}/RecID${RECID}" "$ENERGY3D" | tee >(cat ->&5) ) ; fi
 		NRUNS=$( cat $RUNLISTWINTV5 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $TABLEFILEWINTV5 $RUNLISTWINTV5 "$EVNDISPOUTPUTDIR" $RECID "${EVNDISPOUTPUTDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $TABLEFILEWINTV5 $RUNLISTWINTV5 "$EVNDISPOUTPUTDIR" $RECID "${EVNDISPOUTPUTDIR}/RecID${RECID}" "$ENERGY3D" | tee >(cat ->&5) ) ; fi
 		NRUNS=$( cat $RUNLISTSUMMV5 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $TABLEFILESUMMV5 $RUNLISTSUMMV5 "$EVNDISPOUTPUTDIR" $RECID "${EVNDISPOUTPUTDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $TABLEFILESUMMV5 $RUNLISTSUMMV5 "$EVNDISPOUTPUTDIR" $RECID "${EVNDISPOUTPUTDIR}/RecID${RECID}" "$ENERGY3D" | tee >(cat ->&5) ) ; fi
 		NRUNS=$( cat $RUNLISTWINTV6 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $TABLEFILEWINTV6 $RUNLISTWINTV6 "$EVNDISPOUTPUTDIR" $RECID "${EVNDISPOUTPUTDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $TABLEFILEWINTV6 $RUNLISTWINTV6 "$EVNDISPOUTPUTDIR" $RECID "${EVNDISPOUTPUTDIR}/RecID${RECID}" "$ENERGY3D" | tee >(cat ->&5) ) ; fi
 		NRUNS=$( cat $RUNLISTSUMMV6 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $TABLEFILESUMMV6 $RUNLISTSUMMV6 "$EVNDISPOUTPUTDIR" $RECID "${EVNDISPOUTPUTDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $TABLEFILESUMMV6 $RUNLISTSUMMV6 "$EVNDISPOUTPUTDIR" $RECID "${EVNDISPOUTPUTDIR}/RecID${RECID}" "$ENERGY3D" | tee >(cat ->&5) ) ; fi
+
+export USEENERGY3D="no"
 		rm -rf "$MSCWJOBSUB"
 		echo "$QSUBDATA" > "$MSCWJOBSUB"
 		updateRunningJobFile "$QSUBDATA"
