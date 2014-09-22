@@ -26,11 +26,12 @@ TELTOANA="1234"
 # Output file name
 ONAME="$RUNNUM"
 
-# FROGS-specific variables (these need to be checked by a FROGS expert...)
-ITER=$((SGE_TASK_ID - 1))
-FIRSTEVENT=$(($ITER * $NEVENTS))
-MSCWFILE="gamma_${ZA}deg_750m_w${WOB}_ID0_ana${TELTOANA}_NOISE${NOISE}_1_${ITER}.root"
 if [[ $USEFROGS == "1" ]]; then
+     ITER=$((SGE_TASK_ID - 1))
+     FIRSTEVENT=$(($ITER * $NEVENTS))
+     # Output file name
+     ONAME="${RUNNUM}_$ITER"
+     MSCWFILE="${ZA}deg_${WOB}wob_NOISE${NOISE}_${ITER}.mscw.root"
     echo -e "FROGS MSCW Dir:\n $MSCWDIR"
     echo -e "FROGS MSCW File:\n $MSCWFILE"
     echo "FROGS NEvents: $NEVENTS"
@@ -197,7 +198,7 @@ if [[ $USEMODEL3D == "1" ]]; then
 fi
 # FROGS
 if [[ $USEFROGS == "1" ]]; then
-    FROGS="-frogs $MSCWDIR/$MSCWFILE -frogid 0 -nevents=$NEVENTS -firstevent=$FIRSTEVENT"
+    FROGS="-frogs $MSCWDIR/$MSCWFILE -frogsid 0 -templatelistforfrogs "$TEMPLATELIST" -nevents=$NEVENTS -firstevent=$FIRSTEVENT"
 fi
 # run options
 MCOPT=" -runnumber=$RUNNUM -sourcetype=2 -epoch $EPOCH -camera=$CFG -reconstructionparameter $ACUTS -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -arraycuts $ACUTS -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory $ODIR"
