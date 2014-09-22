@@ -96,8 +96,8 @@ elif [[ $CUTS = *hard2tel* ]]; then
     CUT="NTel2-PointSource-Hard"
 elif [[ $CUTS = *hard3tel* ]]; then
     CUT="NTel3-PointSource-Hard"
-elif [[ $CUTS = *hard2Exttel* ]]; then
-    CUT="NTel2-ExtendedSource-Moderate"
+elif [[ $CUTS = *hardExt2tel* ]]; then
+    CUT="NTel2-ExtendedSource-Hard"
 else
     echo "ERROR: unknown cut definition: $CUTS"
     exit 1
