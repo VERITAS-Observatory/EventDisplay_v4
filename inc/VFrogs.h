@@ -39,7 +39,7 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 		vector<int>    fAnasumRunNumber;
 		vector<int>    fAnasumEventNumber;
 		
-		void  doFrogsStuff( int );                      //!< do the actual analysis (called for each event)
+		void  doFrogsStuff( int, string );                      //!< do the actual analysis (called for each event)
 		int   getFrogsEventID()
 		{
 			return frogsEventID;
@@ -180,7 +180,7 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 		
 		
 	private:
-		struct 		     frogs_imgtmplt_in frogs_convert_from_ed( int eventNumber, int adc_type, double inEnergy );
+		struct 		     frogs_imgtmplt_in frogs_convert_from_ed( int eventNumber, int adc_type, double inEnergy, string fArrayEpoch );
 		VEvndispData*         fData;                    //!< pointer to data class
 		//VShowerParameters    *fShowerParam;
 		//VEvndispRunParameter *fRunPara;                //!< data class for all run parameters

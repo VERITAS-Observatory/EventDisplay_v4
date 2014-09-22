@@ -75,13 +75,17 @@
 
 #define frogs_pedwidth_correction 1.00
 
+// Charge correction for V6, V5 & V4
+static const double mu_correction_lower_threshold[3] = {400, 1E18, 1E18};
+static const double mu_correction_first_parameter[3] = { -2.9628E3, 0., 0.};
+static const double mu_correction_second_parameter[3] = {5.566444E2, 0.  , 0. };
+
 // Conversion values for table
 #define cone_eff    0.81 // Wintson Cone Collection efficency NOTE: CARE sims have this set = 1 instead of 0.81
 #define telarea     94.0 // Mirror Effective Area m^2
 #define extra_noise 0.35 // PMT electronic noise
 #define dc2pe       5.3  // d.c. to p.e. conversion
 
-// Frogs Calibration Correction 2012 03 13
 
 #define lmuMAX  2.0
 #define lmuMIN -6.0
@@ -134,8 +138,9 @@ struct frogs_imgtmplt_in
 {
 	//Holds all the data needed for the template analysis
 	int event_id; //Event identification number
-	float elevation;  //Elevation in degrees
-	float azimuth;  //Azimuth in degrees
+	const char* epoch_id; //Epoch array identification (V4, V5, V6)
+	float elevation; //Elevation in degrees
+	float azimuth;   //Azimuth in degrees
 	int nb_live_pix_total; //Number of used pixel in the array
 	struct frogs_reconstruction startpt; //Starting point for the optimization
 	int ntel;  //Number of telescopes
@@ -217,7 +222,7 @@ struct frogs_gsl_func_param
 	  the average log-likelihood*/
 	double ped;     //Pedestal with of a given pixel
 	double exnoise; //Excess noise of a given pixel
-	double mu;  //Expectation valus for a given pixel
+	double mu;  //Expectation values for a given pixel
 	struct frogs_probability_array* probarray; // probability density array
 };
 //================================================================
@@ -329,10 +334,12 @@ int frogs_image_or_background( int tel, int pix, struct frogs_imgtmplt_in* d, do
 float frogs_get_overlapping_area( gsl_rng* r, float x, float y, float pixradius,
 								  float X, float Y, float dX, float dY );
 float floatwrap( float x, float min, float max );
+double frogs_mu_correction( double mu, const char epoch_id[20] );
 // Functions dealing with probability density lookup tables:
 void frogs_fill_prob_density( struct frogs_probability_array* prob_array );
 double frogs_read_prob_array_table( struct frogs_probability_array* prob_array, double q, double mu, double ped );
 float frogs_change_coordinate_system( float i_ze, float i_az, float x, float y, float z, int axis, bool bInv );
+
 
 //=======================================================================
 //=======================================================================

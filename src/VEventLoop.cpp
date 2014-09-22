@@ -43,13 +43,13 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	bMCSetAtmosphericID = false;
 	fBoolPrintSample.assign( fNTel, true );
 	fGPSClockWarnings.assign( fNTel, 0 );
-        fTimeCut_RunStartSeconds = 0;
+	fTimeCut_RunStartSeconds = 0;
 	
 	fAnalyzeMode = true;
 	fRunMode = ( E_runmode )fRunPar->frunmode;
 	fEventNumber = 0;
 	fNextEventStatus = false;
-        fTimeCutsfNextEventStatus = false;
+	fTimeCutsfNextEventStatus = false;
 	fEndCalibrationRunNow = false;
 	fBoolSumWindowChangeWarning = 0;
 	fLowGainMultiplierWarning = 0;
@@ -119,13 +119,14 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	fDeadTime->defineHistograms( fRunPar->fRunDuration );
 	
 	// create dead pixel organizer
-	if ( fRunPar->fSaveDeadPixelRegistry ) {
-		fDeadPixelOrganizer = new VDeadPixelOrganizer( 
-			fRunPar->fNTelescopes, fDetectorGeo->getNumChannels(), fDetectorGeo, 
+	if( fRunPar->fSaveDeadPixelRegistry )
+	{
+		fDeadPixelOrganizer = new VDeadPixelOrganizer(
+			fRunPar->fNTelescopes, fDetectorGeo->getNumChannels(), fDetectorGeo,
 			fRunPar->fDBDataStartTimeMJD, fRunPar->fDBDataStartTimeSecOfDay,
 			fRunPar->fDBDataStoppTimeMJD, fRunPar->fDBDataStoppTimeSecOfDay,
 			"deadPixelRegistry", getRunNumber() ) ;
-		
+			
 	}
 	else
 	{
@@ -136,7 +137,7 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	// FROGS
 	fFrogs = new VFrogs();
 #endif
-        // Model3D
+	// Model3D
 	fModel3D = new VModel3D();
 	if( fRunPar->fUseModel3D && fRunPar->fCreateLnLTable )
 	{
@@ -597,7 +598,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 		getRunParameter()->fTargetDec = getArrayPointing()->getTargetDecJ2000();
 		getRunParameter()->fTargetRA  = getArrayPointing()->getTargetRAJ2000();
 	}
-
+	
 	return true;
 }
 
@@ -694,22 +695,25 @@ void VEventLoop::initializeAnalyzers()
 */
 void VEventLoop::shutdown()
 {
-        // additional output for writing to disk (MC only)
-        bool fDebug_writing = false;
-        if( isMC() ) fDebug_writing = true;
+	// additional output for writing to disk (MC only)
+	bool fDebug_writing = false;
+	if( isMC() )
+	{
+		fDebug_writing = true;
+	}
 	if( fDebug )
 	{
 		cout << "VEventLoop::shutdown()" << endl;
-                fDebug_writing = fDebug;
+		fDebug_writing = fDebug;
 	}
 	endOfRunInfo();
 	cout << endl << "-----------------------------------------------" << endl;
-
+	
 	// if we have the proper settings,
 	// print the dead pixel information
 	if( fRunPar->frunmode == R_ANA && fRunPar->fprintdeadpixelinfo )  // DEADCHAN
 	{
-		for( unsigned int i = 0; i < getTeltoAna().size(); i++ ) 
+		for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
 		{
 			cout << endl;
 			setTelID( getTeltoAna()[i] );
@@ -718,135 +722,144 @@ void VEventLoop::shutdown()
 		}
 	}
 	
-		// write detector parameter tree to disk
-		if( fOutputfile != 0 && fRunPar->foutputfileName != "-1" )
+	// write detector parameter tree to disk
+	if( fOutputfile != 0 && fRunPar->foutputfileName != "-1" )
+	{
+		fOutputfile->cd();
+	}
+	else if( fRunPar->frunmode == R_DST && fDST && fDST->getDSTFile() )
+	{
+		fDST->getDSTFile()->cd();
+	}
+	else if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_PEDLOW
+			 && fRunMode != R_GTO && fRunMode != R_GTOLOW
+			 && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
+	{
+		cout << "VEventLoop::shutdown: Error accessing output file" << endl;
+	}
+	// write run parameter to disk
+	if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_GTO && fRunPar->frunmode != R_GTOLOW
+			&& fRunPar->frunmode != R_PEDLOW && fRunPar->frunmode != R_TZERO && fRunPar->frunmode != R_TZEROLOW )
+	{
+		int i_nbytes = fRunPar->Write();
+		if( fDebug_writing )
+		{
+			cout << "WRITEDEBUG: runparameters (nbytes " << i_nbytes << "):";
+			if( fOutputfile )
+			{
+				cout << fOutputfile->Get( "runparameterV2" );
+			}
+			cout << endl;
+		}
+	}
+	// analysis or trace library mode
+	if( fRunPar->frunmode == R_ANA )
+	{
+		// write information about detector to disk
+		if( getDetectorTree() )
+		{
+			if( fDebug )
+			{
+				cout << "\t writing detector tree: " << getDetectorTree()->GetName() << endl;
+			}
+			int i_nbytes = getDetectorTree()->Write();
+			if( fDebug_writing )
+			{
+				cout << "WRITEDEBUG: detector tree (nbytes " << i_nbytes << "):";
+				if( fOutputfile )
+				{
+					cout << fOutputfile->Get( "telconfig" );
+				}
+				cout << endl;
+			}
+		}
+		// write pedestal variation calculations to output file
+		if( ( fRunPar->frunmode == R_ANA ) && fRunPar->fPedestalsInTimeSlices && fPedestalCalculator )
+		{
+			fPedestalCalculator->terminate( true, fDebug_writing );
+		}
+		// calculate and write deadtime calculation to disk
+		if( fDeadTime && !isMC() )
+		{
+			fDeadTime->calculateDeadTime();
+			fDeadTime->printDeadTime();
+			fDeadTime->writeHistograms( fDebug_writing );
+		}
+		// write MC run header to output file
+		if( getReader()->getMonteCarloHeader() )
 		{
 			fOutputfile->cd();
-		}
-                else if( fRunPar->frunmode == R_DST && fDST && fDST->getDSTFile() )
-                {
-                    fDST->getDSTFile()->cd();
-                }
-		else if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_PEDLOW
-				 && fRunMode != R_GTO && fRunMode != R_GTOLOW
-				 && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
-		{
-			cout << "VEventLoop::shutdown: Error accessing output file" << endl;
-		}
-		// write run parameter to disk
-		if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_GTO && fRunPar->frunmode != R_GTOLOW
-				&& fRunPar->frunmode != R_PEDLOW && fRunPar->frunmode != R_TZERO && fRunPar->frunmode != R_TZEROLOW )
-		{
-			int i_nbytes = fRunPar->Write();
-                        if( fDebug_writing )
-                        {
-                            cout << "WRITEDEBUG: runparameters (nbytes " << i_nbytes << "):";
-                            if( fOutputfile ) cout << fOutputfile->Get( "runparameterV2" );
-                            cout << endl;
-                        }
-		} 
-		// analysis or trace library mode
-		if( fRunPar->frunmode == R_ANA )
-		{
-			// write information about detector to disk
-			if( getDetectorTree() )
+			getReader()->getMonteCarloHeader()->print();
+			int i_nbytes = getReader()->getMonteCarloHeader()->Write();
+			if( fDebug_writing )
 			{
-				if( fDebug )
+				cout << "WRITEDEBUG: MC run header(nbytes " << i_nbytes << "):";
+				if( fOutputfile )
 				{
-					cout << "\t writing detector tree: " << getDetectorTree()->GetName() << endl;
+					cout << fOutputfile->Get( "MC_runheader" );
 				}
-				int i_nbytes = getDetectorTree()->Write();
-                                if( fDebug_writing )
-                                {
-                                    cout << "WRITEDEBUG: detector tree (nbytes " << i_nbytes << "):";
-                                    if( fOutputfile ) cout << fOutputfile->Get( "telconfig" );
-                                    cout << endl;
-                                }
+				cout << endl;
 			}
-			// write pedestal variation calculations to output file
-			if( ( fRunPar->frunmode == R_ANA ) && fRunPar->fPedestalsInTimeSlices && fPedestalCalculator )
-			{
-				fPedestalCalculator->terminate( true, fDebug_writing );
-			}
-			// calculate and write deadtime calculation to disk
-			if( fDeadTime && !isMC() )
-			{
-				fDeadTime->calculateDeadTime();
-				fDeadTime->printDeadTime();
-				fDeadTime->writeHistograms( fDebug_writing );
-			}
-			// write MC run header to output file
-			if( getReader()->getMonteCarloHeader() )
-			{
-				fOutputfile->cd();
-				getReader()->getMonteCarloHeader()->print();
-				int i_nbytes = getReader()->getMonteCarloHeader()->Write();
-                                if( fDebug_writing )
-                                {
-                                   cout << "WRITEDEBUG: MC run header(nbytes " << i_nbytes << "):";
-                                   if( fOutputfile ) cout << fOutputfile->Get( "MC_runheader" ); 
-                                   cout << endl;
-                                }
-			}
+		}
+		
+		// orgainze and write out tree
+		if( fRunPar->frunmode == R_ANA && fDeadPixelOrganizer )
+		{
+			cout << "NKH Finish Up VDeadPixelOrganizer" << endl;
+			fDeadPixelOrganizer->printSummary() ;
 			
-			// orgainze and write out tree
-			if ( fRunPar->frunmode == R_ANA && fDeadPixelOrganizer ) 
-			{
-				cout << "NKH Finish Up VDeadPixelOrganizer" << endl;
-				fDeadPixelOrganizer->printSummary() ;
-
-				// copy tree to output root file
-				fDeadPixelOrganizer->finalize() ;
-				
-			} 
+			// copy tree to output root file
+			fDeadPixelOrganizer->finalize() ;
 			
-			// write array analysis results to output file
-			if( fArrayAnalyzer )
-			{
-				fArrayAnalyzer->terminate( fDebug_writing );
-			}
-			if( fRunPar->fUseModel3D && fModel3D )
-			{
-				fModel3D->terminate();
-			}
+		}
+		
+		// write array analysis results to output file
+		if( fArrayAnalyzer )
+		{
+			fArrayAnalyzer->terminate( fDebug_writing );
+		}
+		if( fRunPar->fUseModel3D && fModel3D )
+		{
+			fModel3D->terminate();
+		}
 #ifndef NOGSL
-			if( fRunPar->ffrogsmode )
-			{
-				fFrogs->terminate();
-			}
+		if( fRunPar->ffrogsmode )
+		{
+			fFrogs->terminate();
+		}
 #endif
-			// write analysis results for each telescope to output file
-			if( fAnalyzer )
-			{
-				for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
-				{
-					fAnalyzer->setTelID( fRunPar->fTelToAnalyze[i] );
-					fAnalyzer->terminate( fDebug_writing );
-				} 
-			}
-			// close output file here (!! CLOSE OUTPUT FILE FOREVER !!)
-			fAnalyzer->shutdown();
-		}
-		// write calibration/analysis results for each telescope
-		else if( fRunPar->frunmode == R_PED || fRunPar->frunmode == R_GTO || fRunPar->frunmode == R_GTOLOW || fRunPar->frunmode == R_PEDLOW
-				 || fRunPar->frunmode == R_TZERO || fRunPar->frunmode == R_TZEROLOW )
+		// write analysis results for each telescope to output file
+		if( fAnalyzer )
 		{
-			VPedestalCalculator* iP = 0;
-			if( fRunPar->frunmode == R_PED && fRunPar->fPedestalsInTimeSlices && fPedestalCalculator )
+			for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
 			{
-				iP = fPedestalCalculator;
-				fPedestalCalculator->terminate( false );
-			}
-			if( fCalibrator )
-			{
-				fCalibrator->terminate( iP );
+				fAnalyzer->setTelID( fRunPar->fTelToAnalyze[i] );
+				fAnalyzer->terminate( fDebug_writing );
 			}
 		}
-		// write data summary
-		else if( fDST && fRunPar->frunmode == R_DST )
+		// close output file here (!! CLOSE OUTPUT FILE FOREVER !!)
+		fAnalyzer->shutdown();
+	}
+	// write calibration/analysis results for each telescope
+	else if( fRunPar->frunmode == R_PED || fRunPar->frunmode == R_GTO || fRunPar->frunmode == R_GTOLOW || fRunPar->frunmode == R_PEDLOW
+			 || fRunPar->frunmode == R_TZERO || fRunPar->frunmode == R_TZEROLOW )
+	{
+		VPedestalCalculator* iP = 0;
+		if( fRunPar->frunmode == R_PED && fRunPar->fPedestalsInTimeSlices && fPedestalCalculator )
 		{
-			fDST->terminate();
+			iP = fPedestalCalculator;
+			fPedestalCalculator->terminate( false );
 		}
+		if( fCalibrator )
+		{
+			fCalibrator->terminate( iP );
+		}
+	}
+	// write data summary
+	else if( fDST && fRunPar->frunmode == R_DST )
+	{
+		fDST->terminate();
+	}
 	// delete readers
 	if( fRunPar->fsourcetype != 0 && fGrIsuReader )
 	{
@@ -877,8 +890,8 @@ void VEventLoop::shutdown()
 		{
 			cout << endl << "Final checks on result file (seems to be OK): " << fRunPar->foutputfileName << endl;
 		}
-                // FROGS finishing here
-                // (GM) not clear why this has to happen at this point in the program
+		// FROGS finishing here
+		// (GM) not clear why this has to happen at this point in the program
 #ifndef NOGSL
 		if( fRunPar->ffrogsmode )
 		{
@@ -1025,7 +1038,7 @@ bool VEventLoop::nextEvent()
 		cout << "VEventLoop::nextEvent()" << endl;
 	}
 	int i_Analysis_cut = 1;
-        int i_Time_cut = 1;
+	int i_Time_cut = 1;
 	do                                            // => while( i_Analysis_cut == 0 );
 	{
 		// get next event from data reader and check
@@ -1062,22 +1075,22 @@ bool VEventLoop::nextEvent()
 				getRunParameter()->fTraceIntegrationMethod[i] = 0;
 			}
 		}
-                // grisu sims only (currently)
-                // set FADC hilo mulitplier as read from simulation run header in the vbf file
-                // do this only for the first event
-                if( getRunParameter()->fsimu_HILO_from_simFile && fReader->getMonteCarloHeader() )
-                {
-                    if( fReader->getMonteCarloHeader()->fFADC_hilo_multipler > 0 )
-                    {
-                        getRunParameter()->fsimu_HILO_from_simFile = false;
-                        for( unsigned int i = 0; i < getNTel(); i++ )
-                        {
-                            setLowGainMultiplier_Trace( i, fReader->getMonteCarloHeader()->fFADC_hilo_multipler );
-                            getDetectorGeometry()->setLowGainMultiplier_Trace( i, fReader->getMonteCarloHeader()->fFADC_hilo_multipler );
-                        }
-                        cout << "Lowgain multiplier (trace) read from MC run header: " << fReader->getMonteCarloHeader()->fFADC_hilo_multipler << endl;
-                    }
-                }
+		// grisu sims only (currently)
+		// set FADC hilo mulitplier as read from simulation run header in the vbf file
+		// do this only for the first event
+		if( getRunParameter()->fsimu_HILO_from_simFile && fReader->getMonteCarloHeader() )
+		{
+			if( fReader->getMonteCarloHeader()->fFADC_hilo_multipler > 0 )
+			{
+				getRunParameter()->fsimu_HILO_from_simFile = false;
+				for( unsigned int i = 0; i < getNTel(); i++ )
+				{
+					setLowGainMultiplier_Trace( i, fReader->getMonteCarloHeader()->fFADC_hilo_multipler );
+					getDetectorGeometry()->setLowGainMultiplier_Trace( i, fReader->getMonteCarloHeader()->fFADC_hilo_multipler );
+				}
+				cout << "Lowgain multiplier (trace) read from MC run header: " << fReader->getMonteCarloHeader()->fFADC_hilo_multipler << endl;
+			}
+		}
 		fillTriggerVectors();
 		///////////////////////////////////////////////////////////
 		// set eventnumbers
@@ -1101,19 +1114,19 @@ bool VEventLoop::nextEvent()
 			fReader->setTelescopeID( getTeltoAna()[i] );
 			getTelescopeEventNumber()[getTeltoAna()[i]] = fReader->getEventNumber();
 		}
-                // set event time from data reader
-                setEventTimeFromReader();
-                // check time into the run 
-                i_Time_cut = checkTimeCuts();
-                if( i_Time_cut == 2 )
-                {
-                    fTimeCutsfNextEventStatus = 0;
-                    return false;
-                }
-                else if( i_Time_cut == 1 )
-                {
-                    continue;
-                }
+		// set event time from data reader
+		setEventTimeFromReader();
+		// check time into the run
+		i_Time_cut = checkTimeCuts();
+		if( i_Time_cut == 2 )
+		{
+			fTimeCutsfNextEventStatus = 0;
+			return false;
+		}
+		else if( i_Time_cut == 1 )
+		{
+			continue;
+		}
 		///////////////////////////////////////////////////////////
 		// in displaymode, look for user interaction
 		if( fRunPar->fdisplaymode )
@@ -1127,7 +1140,7 @@ bool VEventLoop::nextEvent()
 		}
 	}
 	while( i_Analysis_cut == 0 && fNextEventStatus );
-        fTimeCutsfNextEventStatus = true;
+	fTimeCutsfNextEventStatus = true;
 	// user cut failed
 	if( i_Analysis_cut < 0 )
 	{
@@ -1157,11 +1170,11 @@ int VEventLoop::analyzeEvent()
 	if( fRunMode == R_DST && fDST )
 	{
 #ifndef NOVBF
-	        if( fReader->getATEventType() != VEventType::PED_TRIGGER )
+		if( fReader->getATEventType() != VEventType::PED_TRIGGER )
 #endif
 		{
-		   fDST->fill();
-		   return 1;
+			fDST->fill();
+			return 1;
 		}
 	}
 	
@@ -1171,16 +1184,16 @@ int VEventLoop::analyzeEvent()
 	for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
 	{
 		setTelID( fRunPar->fTelToAnalyze[i] );
-
-                if( isMC() && !bMCSetAtmosphericID )
-                {
-                    
-                    if( fRunPar->fAtmosphereID == 0 && getReader()->getMonteCarloHeader() )
-                    {
-                        fRunPar->fAtmosphereID = getReader()->getMonteCarloHeader()->atmosphere;
-                    }
-                    bMCSetAtmosphericID = true;
-                }
+		
+		if( isMC() && !bMCSetAtmosphericID )
+		{
+		
+			if( fRunPar->fAtmosphereID == 0 && getReader()->getMonteCarloHeader() )
+			{
+				fRunPar->fAtmosphereID = getReader()->getMonteCarloHeader()->atmosphere;
+			}
+			bMCSetAtmosphericID = true;
+		}
 		
 		// check number of samples
 		if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isDST_MC() )
@@ -1441,7 +1454,7 @@ int VEventLoop::analyzeEvent()
 #endif
 		{
 			fArrayAnalyzer->doAnalysis();
-                        // Model3D analysis
+			// Model3D analysis
 			if( fRunPar->fUseModel3D && fReader->hasArrayTrigger() )
 			{
 				fModel3D->doModel3D();
@@ -1450,7 +1463,8 @@ int VEventLoop::analyzeEvent()
 #ifndef NOGSL
 			if( fRunPar->ffrogsmode )
 			{
-				fFrogs->doFrogsStuff( fEventNumber );
+				string fArrayEpoch = getRunParameter()->fInstrumentEpoch;
+				fFrogs->doFrogsStuff( fEventNumber, fArrayEpoch );
 			}
 #endif
 		}
@@ -1514,7 +1528,7 @@ int VEventLoop::analyzeEvent()
 	}
 	
 	// add dead pixel states to VDeadPixelOrganizer
-	if ( fDeadPixelOrganizer )
+	if( fDeadPixelOrganizer )
 	{
 		// get this event's info
 		int    eventMJD    = fArrayEventMJD  ;
@@ -1524,31 +1538,31 @@ int VEventLoop::analyzeEvent()
 		// set up some initial variables
 		bool   higGain   = false ;
 		PixelStateInt lowGainState = 121212 ;
-			
+		
 		
 		// loop over all telescopes
 		// itel is from 0-3
-		for ( unsigned int itel = 0 ; itel < getTeltoAna().size() ; itel++ )
+		for( unsigned int itel = 0 ; itel < getTeltoAna().size() ; itel++ )
 		{
 			setTelID( getTeltoAna()[itel] ) ;
 			
 			// loop over all? lowgain pixels
 			// ipix is from 0-498
 			//cout << coutprefix << "getDead(highGain).size:" << getDead(higGain).size() << endl;
-			for ( unsigned int ipix = 0 ; ipix < getDead( higGain ).size() ; ipix++ )
+			for( unsigned int ipix = 0 ; ipix < getDead( higGain ).size() ; ipix++ )
 			{
-				lowGainState  = (PixelStateInt) getDead( higGain )[ipix] ; 
-
-				fDeadPixelOrganizer->UpdatePixelState( itel+1, ipix+1, higGain,  eventMJD, eventTime,  lowGainState ) ;
+				lowGainState  = ( PixelStateInt ) getDead( higGain )[ipix] ;
+				
+				fDeadPixelOrganizer->UpdatePixelState( itel + 1, ipix + 1, higGain,  eventMJD, eventTime,  lowGainState ) ;
 			}
-
+			
 		} // endfor: no more telescopes
 		
 		fDeadPixelOrganizer->updatePreviousEventInfo( eventNumber, eventMJD, eventTime ) ;
-
+		
 	} // endif: fDeadPixelOrganizer doesn't exist
-
-
+	
+	
 	//}
 	
 	return i_cut;
@@ -1622,8 +1636,8 @@ int VEventLoop::checkCuts()
 		int muonValid;
 		unsigned short int eventType;
 		int houghMuonValid, houghNpix; //Hough
-                int fitStat = 0;
-                float loss = 0.;
+		int fitStat = 0;
+		float loss = 0.;
 		
 		i_tree.Branch( "eventType", &eventType, "eventType/s" );
 		i_tree.Branch( "cen_x", &cen_x, "cen_x/F" );
@@ -1640,8 +1654,8 @@ int VEventLoop::checkCuts()
 		i_tree.Branch( "phi", &phi, "phi/F" );
 		i_tree.Branch( "cosphi", &cosphi, "cosphi/F" );
 		i_tree.Branch( "sinphi", &sinphi, "sinphi/F" );
-                i_tree.Branch( "loss", &loss, "loss/F" );
-                i_tree.Branch( "fitStat", &fitStat, "fitStat/I" );
+		i_tree.Branch( "loss", &loss, "loss/F" );
+		i_tree.Branch( "fitStat", &fitStat, "fitStat/I" );
 		i_tree.Branch( "nlowgain", &nlowgain, "nlowgain/s" );
 		i_tree.Branch( "nsat", &nsat, "nsat/s" );
 		i_tree.Branch( "ntubes", &ntubes, "ntubes/s" );
@@ -1707,8 +1721,8 @@ int VEventLoop::checkCuts()
 		miss = fAnalyzer->getImageParameters()->phi;
 		cosphi = fAnalyzer->getImageParameters()->cosphi;
 		sinphi = fAnalyzer->getImageParameters()->sinphi;
-                loss = fAnalyzer->getImageParameters()->loss;
-                fitStat = fAnalyzer->getImageParameters()->Fitstat;
+		loss = fAnalyzer->getImageParameters()->loss;
+		fitStat = fAnalyzer->getImageParameters()->Fitstat;
 		ntubes = fAnalyzer->getImageParameters()->ntubes;
 		nsat = fAnalyzer->getImageParameters()->nsat;
 		nlowgain = fAnalyzer->getImageParameters()->nlowgain;
@@ -2082,21 +2096,21 @@ void VEventLoop::setEventTimeFromReader()
 
 int VEventLoop::checkTimeCuts()
 {
-    if( fTimeCut_RunStartSeconds == 0 ) 
-    {
-        fTimeCut_RunStartSeconds = fArrayEventTime;
-    }
-
-    if( getRunParameter()->fTimeCutsMin_min > 0 && ( fArrayEventTime - fTimeCut_RunStartSeconds ) < getRunParameter()->fTimeCutsMin_min * 60 )
-    {
-        return 1;
-    }
-    if( getRunParameter()->fTimeCutsMin_max > 0 && ( fArrayEventTime - fTimeCut_RunStartSeconds ) > getRunParameter()->fTimeCutsMin_max * 60 )
-    {
-        return 2;
-    }
-     
-    return 0;
+	if( fTimeCut_RunStartSeconds == 0 )
+	{
+		fTimeCut_RunStartSeconds = fArrayEventTime;
+	}
+	
+	if( getRunParameter()->fTimeCutsMin_min > 0 && ( fArrayEventTime - fTimeCut_RunStartSeconds ) < getRunParameter()->fTimeCutsMin_min * 60 )
+	{
+		return 1;
+	}
+	if( getRunParameter()->fTimeCutsMin_max > 0 && ( fArrayEventTime - fTimeCut_RunStartSeconds ) > getRunParameter()->fTimeCutsMin_max * 60 )
+	{
+		return 2;
+	}
+	
+	return 0;
 }
 
 

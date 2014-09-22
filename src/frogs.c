@@ -1890,7 +1890,10 @@ double frogs_img_model( int pix, int tel, struct frogs_reconstruction pnt,
 	rtn = rtn * telarea;
 #endif
 	
-	//return rtn;
+	/* The image templates do not take into PMT non-linearity and saturation.
+		We apply corrections to the mu-value to correct for that */
+	rtn = frogs_mu_correction( rtn, d->epoch_id );
+	
 	return rtn;
 }
 //================================================================
@@ -1908,27 +1911,27 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 	{
 #endif
 		/*This function return an evaluation of the Cherenkov ight density for
-		  the given values of lambda the depth of the first interaction point,
-		  log10e = log10(E/TeV), b the impact parameter to the telescope, x and
-		  y the longitudinal and transverse coordinate with respect to the source
-		  and the direction of development of the shower image. The evaluation is
-		  obtained by linear interpolation in lambda,log10e and b in that order.
-		  When the parameters fall outside the range covered by the template table,
-		  the value is linearly extrapolated.
-		  For x and y the closest table values are simply used.
+		the given values of lambda the depth of the first interaction point,
+		log10e = log10(E/TeV), b the impact parameter to the telescope, x and
+		y the longitudinal and transverse coordinate with respect to the source
+		and the direction of development of the shower image. The evaluation is
+		obtained by linear interpolation in lambda,log10e and b in that order.
+		When the parameters fall outside the range covered by the template table,
+		the value is linearly extrapolated.
+		For x and y the closest table values are simply used.
 		*/
 		/* Note:in the template data table, the index to parameter
-		  correspondance is as follows
-		  0 --- lambda = 1st interaction depth in interaction lengths
-		  1 --- log10e = log10(E/1TeV)
-		  2 --- b      = impact parameter to the considered telescope
-		  3 --- x      = x coordinate of the pixel (see note)
-		  4 --- y      = y coordinate of the pixel (see note)
-		  This has nothing to do with the order in which the parameters are
-		  entered in GSL for the likelihood optimization.
-		  (x and y measured in degrees. x along the image major axis from
-		  the source and increasing with the age of the shower. y in a
-		  perpendicular direction. )*/
+		 correspondance is as follows
+		 0 --- lambda = 1st interaction depth in interaction lengths
+		 1 --- log10e = log10(E/1TeV)
+		 2 --- b      = impact parameter to the considered telescope
+		 3 --- x      = x coordinate of the pixel (see note)
+		 4 --- y      = y coordinate of the pixel (see note)
+		 This has nothing to do with the order in which the parameters are
+		 entered in GSL for the likelihood optimization.
+		 (x and y measured in degrees. x along the image major axis from
+		 the source and increasing with the age of the shower. y in a
+		 perpendicular direction. )*/
 		
 		// index for x we will not interpolate
 		int ix = ( int )floor( ( x - tmplt->min[3] ) / tmplt->step[3] );
@@ -1950,7 +1953,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 		*intemplate = FROGS_OK;
 		
 		/*For lambda we will proceed to a linear interpolation. We need two
-		  bracketing indices*/
+		bracketing indices*/
 		int il1 = ( int )floor( ( lambda - tmplt->min[0] ) / tmplt->step[0] );
 		int il2 = il1 + 1;
 		if( il1 < 0 )
@@ -2055,15 +2058,15 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			  For x and y the closest table values are simply used.
 			*/
 			/* Note:in the template data table, the index to parameter
-			  correspondance is as follows
-			  0 --- lambda = 1st interaction depth in intaraction lengths
-			  1 --- log10e = log10(E/1TeV)
-			  2 --- b      = impact parameter to the considered telescope
-			  3 --- x      = x coordinate of the pixel (see note)
-			  4 --- y      = y coordinate of the pixel (see note)
-			  (note: x and y measured in degrees. x along the image major axis from
-			  the source and increasing with the age of the shower. y in a
-			  perpendicular direction. )*/
+				correspondance is as follows
+				0 --- lambda = 1st interaction depth in intaraction lengths
+				1 --- log10e = log10(E/1TeV)
+				2 --- b      = impact parameter to the considered telescope
+				3 --- x      = x coordinate of the pixel (see note)
+				4 --- y      = y coordinate of the pixel (see note)
+				(note: x and y measured in degrees. x along the image major axis from
+				the source and increasing with the age of the shower. y in a
+				perpendicular direction. )*/
 			
 			// ixc, iyc: indices of pixel center
 			int ixc = ( int )floor( ( x - tmplt->min[3] ) / tmplt->step[3] );
@@ -2321,7 +2324,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 		{
 			/*The template table is stored in a one dimensional table. This
 			  function is used to return the template table content for the given
-			  indices for each of the entry parameters: il,iloge, ib, ix and iy*/
+				  indices for each of the entry parameters: il,iloge, ib, ix and iy*/
 			/* Note:in the template data table, the index to parameter
 			  correspondance is as follows
 			  0 --- lambda = 1st interaction depth in intaraction lengths
@@ -2591,6 +2594,30 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			return p;
 		}
 		
+		//================================================================
+		//================================================================
+		
+		double frogs_mu_correction( double mu, const char epoch_id[20] )
+		{
+			/* this function applies correction to mu
+			  to correct for non-linearity and saturation effects */
+			if( strcmp( epoch_id, "V6" ) == 0 )
+			{
+				if( mu > mu_correction_lower_threshold[0] )
+				{
+					return mu_correction_first_parameter[0] + mu_correction_second_parameter[0] * log( mu );
+					//return -2.9628E3 + 5.566444E2 * log( mu );
+				}
+			}
+			else if( strcmp( epoch_id, "V5" ) == 0 )
+			{
+				if( mu > mu_correction_lower_threshold[1] )
+				{
+					return mu_correction_first_parameter[1] + mu_correction_second_parameter[1] * log( mu );
+				}
+			}
+			return mu;
+		}
 		
 		//================================================================
 		//================================================================
@@ -3764,6 +3791,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 					return FROGS_BAD_NUMBER;
 				}
 			}
+			
 			
 			
 			
