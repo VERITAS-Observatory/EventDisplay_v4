@@ -55,7 +55,7 @@ optional parameters:
     [FROGS]                 set to 1 to use FROGS (GrISU only! default: off)
     
     [events]                FROGS ONLY: number of events per division
-                            (default: 5000000)
+                            (default: -1)
                             
 Note: zenith angles, wobble offsets, and noise values are hard-coded into script
 
@@ -84,7 +84,7 @@ SIMTYPE=$7
 [[ "$9" ]] && PARTICLE=$9 || PARTICLE=1
 [[ "${10}" ]] && USEMODEL3D=${10} || USEMODEL3D=0
 [[ "${11}" ]] && USEFROGS=${11} || USEFROGS=0
-[[ "${12}" ]] && NEVENTS=${12}  || NEVENTS=5000000
+[[ "${12}" ]] && NEVENTS=${12}  || NEVENTS=-1
 
 # Particle names
 PARTICLE_NAMES=( [1]=gamma [2]=electron [14]=proton [402]=alpha )
@@ -157,7 +157,7 @@ SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
 SUBC=`eval "echo \"$SUBC\""`
 if [[ $SUBC == *qsub* ]]; then
     JOBID=`$SUBC $FSCRIPT.sh`
-     if [[ $USEFROGS != 0 ]]
+     if [[ $NEVENTS > 0 ]]
           JOBID=`$SUBC -t 1-10 $FSCRIPT.sh`
      fi      
     echo "RUN $RUNNUM: JOBID $JOBID"
