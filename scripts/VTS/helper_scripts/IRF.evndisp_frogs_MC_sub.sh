@@ -13,6 +13,7 @@ WOG=INTEGERWOBBLE
 NOISE=NOISELEVEL
 EPOCH=ARRAYEPOCH
 ATM=ATMOSPHERE
+ACUTS=RECONSTRUCTIONRUNPARAMETERFILE
 PARTICLE=PARTICLETYPE
 SIMTYPE=SIMULATIONTYPE
 ODIR=OUTPUTDIR
@@ -43,10 +44,19 @@ if [[ $USEFROGS == "1" ]]; then
     echo "FROGS NEvents: $NEVENTS"
 fi
 
+#################################
 # detector configuration and cuts
- ACUT="EVNDISP.reconstruction.runparameter"
-# ACUT="EVNDISP.reconstruction.runparameter.noDISP"
-# ACUT="EVNDISP.reconstruction.runparameter.DISP"
+
+echo "Using run parameter file $ACUTS"
+# no disp, long integration window
+# ACUTS="EVNDISP.reconstruction.runparameter"
+# disp, long integration window
+# ACUTS="EVNDISP.reconstruction.runparameter.DISP"
+# no disp, short integration window
+# ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
+# disp, short integration window
+# ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-DISP"
+
 
 DEAD="EVNDISP.validchannels.dat"
 PEDLEV="16."
@@ -151,8 +161,13 @@ VBF_FILE="$DDIR/$VBF_FILE"
 # Low gain calibration
 mkdir -p $ODIR/Calibration
 if [[ ! -f $ODIR/Calibration/calibrationlist.LowGain.dat ]]; then
-    cp -f $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGainForCare.dat $ODIR/Calibration/calibrationlist.LowGain.dat
+    if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
+        cp -f $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGain.dat $ODIR/Calibration/calibrationlist.LowGain.dat
+    elif [ ${SIMTYPE:0:4} = "CARE" ]; then
+        cp -f $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGainForCare.dat $ODIR/Calibration/calibrationlist.LowGainForCare.dat
+    fi
 fi
+
 
 ###############################################
 # calculate pedestals
@@ -167,7 +182,7 @@ fi
 # calculate tzeros
 if [[ $USEFROGS != "1" ]]; then
     echo "Calculating average tzeros for run $RUNNUM"
-    MCOPT="-runmode=7 -sourcetype=2 -epoch $EPOCH -camera=$CFG -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo -calibrationnevents=100000 -calibrationdirectory $ODIR -reconstructionparameter $ACUT -pedestalnoiselevel=$NOISE "
+    MCOPT="-runmode=7 -sourcetype=2 -epoch $EPOCH -camera=$CFG -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo -calibrationnevents=100000 -calibrationdirectory $ODIR -reconstructionparameter $ACUTS -pedestalnoiselevel=$NOISE "
     rm -f $ODIR/$RUNNUM.tzero.log
     ### eventdisplay GRISU run options
     if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
@@ -190,7 +205,7 @@ if [[ $USEFROGS == "1" ]]; then
     FROGS="-frogs $MSCWDIR/$MSCWFILE -frogsid 0 -templatelistforfrogs "$TEMPLATELIST" -nevents=$NEVENTS -firstevent=$FIRSTEVENT"
 fi
 # run options
-MCOPT=" -nevents=$NEVENTS -firstevent=$FIRSTEVENT -runnumber=$RUNNUM -sourcetype=2 -epoch $EPOCH -camera=$CFG -reconstructionparameter $ACUT -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory $ODIR"
+MCOPT=" -nevents=$NEVENTS -firstevent=$FIRSTEVENT -runnumber=$RUNNUM -sourcetype=2 -epoch $EPOCH -camera=$CFG -reconstructionparameter $ACUTS -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -arraycuts $ACUTS -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory $ODIR"
 # special options for GRISU
 if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     MCOPT="$MCOPT -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"

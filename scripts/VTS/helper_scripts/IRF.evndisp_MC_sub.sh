@@ -13,6 +13,7 @@ WOG=INTEGERWOBBLE
 NOISE=NOISELEVEL
 EPOCH=ARRAYEPOCH
 ATM=ATMOSPHERE
+ACUTS=RECONSTRUCTIONRUNPARAMETERFILE
 PARTICLE=PARTICLETYPE
 SIMTYPE=SIMULATIONTYPE
 ODIR=OUTPUTDIR
@@ -37,12 +38,14 @@ fi
 
 #################################
 # detector configuration and cuts
+
+echo "Using run parameter file $ACUTS"
 # no disp, long integration window
 # ACUTS="EVNDISP.reconstruction.runparameter"
 # disp, long integration window
-ACUTS="EVNDISP.reconstruction.runparameter.DISP"
+# ACUTS="EVNDISP.reconstruction.runparameter.DISP"
 # no disp, short integration window
-#ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
+# ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
 # disp, short integration window
 # ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-DISP"
 
@@ -153,8 +156,12 @@ VBF_FILE="$DDIR/$VBF_FILE"
 
 # Low gain calibration
 mkdir -p $ODIR/Calibration
-if [[ ! -f $ODIR/Calibration/calibrationlist.LowGain.dat ]]; then
-    cp -f $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGainForCare.dat $ODIR/Calibration/calibrationlist.LowGain.dat
+if [[ ! -f $ODIR/Calibration/calibrationlist.LowGain.dat ]]; then 
+    if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
+        cp -f $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGain.dat $ODIR/Calibration/calibrationlist.LowGain.dat
+    elif [ ${SIMTYPE:0:4} = "CARE" ]; then
+        cp -f $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGainForCare.dat $ODIR/Calibration/calibrationlist.LowGainForCare.dat
+    fi
 fi
 
 ###############################################

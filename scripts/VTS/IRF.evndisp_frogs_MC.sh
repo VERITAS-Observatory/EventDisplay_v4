@@ -10,7 +10,7 @@ if [ $# -lt 7 ]; then
 echo "
 IRF generation: analyze simulation VBF files using evndisp 
 
-IRF.evndisp_MC.sh <sim directory> <epoch> <atmosphere> <zenith> <offset angle> <NSB level> <sim type> [particle] [Model3D] [FROGS] [events] [Rec ID]
+IRF.evndisp_frogs_MC.sh <sim directory> <epoch> <atmosphere> <zenith> <offset angle> <NSB level> <sim type> <runparameter file> [particle] [Model3D] [FROGS] [events] [Rec ID]
 
 required parameters:
 
@@ -31,6 +31,18 @@ required parameters:
     
     <sim type>              file simulation type (e.g. GRISU-SW6, CARE_June1425)
                             (recognized are also types like GRISU_d201404, or CARE_V1)
+
+    <runparameter file>     file with integration window size and reconstruction cuts/methods, expected in $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/
+
+                            Default: EVNDISP.reconstruction.runparameter (long sumwindow -> for use with CARE IRFs; DISP disabled )
+
+                            other options:
+
+                            EVNDISP.reconstruction.runparameter.DISP              (long sumwindow -> for use with CARE IRFs;
+                                                                                  DISP enabled, use RecID 1 in later stages to access it)
+                                                                                 
+                            EVNDISP.reconstruction.runparameter.SumWindow6-noDISP (short sumwindow -> for use with grisu IRFs; DISP disabled)
+                            EVNDISP.reconstruction.runparameter.SumWindow6-DISP   (short sumwindow -> for use with grisu IRFs; DISP enabled [RecID 1])
 
 optional parameters:
     
@@ -78,11 +90,12 @@ ZA=$4
 WOBBLE=$5
 NOISE=$6
 SIMTYPE=$7
-[[ "$8" ]] && PARTICLE=$8 || PARTICLE=1
-[[ "$9" ]] && USEMODEL3D=$9 || USEMODEL3D=0
-[[ "${10}" ]] && USEFROGS=${10} || USEFROGS=0
-[[ "${11}" ]] && NEVENTS=${11}  || NEVENTS=5000000
-[[ "${12}" ]] && RECID=${12}  || RECID=-1
+[[ "$8" ]] && ACUTS=$8 || ACUTS=EVNDISP.reconstruction.runparameter
+[[ "$9" ]] && PARTICLE=$9 || PARTICLE=1
+[[ "${10}" ]] && USEMODEL3D=${10} || USEMODEL3D=0
+[[ "${11}" ]] && USEFROGS=${11} || USEFROGS=0
+[[ "${12}" ]] && NEVENTS=${12}  || NEVENTS=5000000
+[[ "${13}" ]] && RECID=${13}  || RECID=-1
 
 # Particle names
 PARTICLE_NAMES=( [1]=gamma [2]=electron [14]=proton [402]=alpha )
@@ -103,6 +116,8 @@ mkdir -p $OPDIR
 echo -e "Output files will be written to:\n $OPDIR"
 
 [[ $USEFROGS != 0 ]] && ODIR="${ODIR}_FROGS" && MSCWDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/MSCW_RECID$RECID"
+
+echo "Using runparameter file $ACUTS"
 
 # Create a unique set of run numbers
 if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
@@ -140,6 +155,7 @@ sed -e "s|DATADIR|$SIMDIR|" \
     -e "s|FROGSFROGS|$USEFROGS|" \
     -e "s|FROGSMSCWDIR|$MSCWDIR|" \
     -e "s|FROGSEVENTS|$NEVENTS|" \
+    -e "s|RECONSTRUCTIONRUNPARAMETERFILE|$ACUTS|" \
     -e "s|SIMULATIONTYPE|$SIMTYPE|" \
     -e "s|PARTICLETYPE|$PARTICLE|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
