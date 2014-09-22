@@ -184,9 +184,10 @@ if [[ $USEFROGS != "1" ]]; then
     if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
         MCOPT="$MCOPT -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
     else
-       MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV"
+       MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV -lowgaincalibrationfile calibrationlist.LowGainForCare.dat"
     fi
-    $EVNDISPSYS/bin/evndisp $MCOPT &> $ODIR/$RUNNUM.tzero.log
+    echo "$EVNDISPSYS/bin/evndisp $MCOPT" &> $ODIR/$RUNNUM.tzero.log
+    $EVNDISPSYS/bin/evndisp $MCOPT &>> $ODIR/$RUNNUM.tzero.log
 fi
 
 ###############################################
@@ -201,15 +202,16 @@ if [[ $USEFROGS == "1" ]]; then
     FROGS="-frogs $MSCWDIR/$MSCWFILE -frogsid 0 -templatelistforfrogs "$TEMPLATELIST" -nevents=$NEVENTS -firstevent=$FIRSTEVENT"
 fi
 # run options
-MCOPT=" -runnumber=$RUNNUM -sourcetype=2 -epoch $EPOCH -camera=$CFG -reconstructionparameter $ACUTS -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -arraycuts $ACUTS -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory $ODIR"
+MCOPT=" -runnumber=$RUNNUM -sourcetype=2 -epoch $EPOCH -camera=$CFG -reconstructionparameter $ACUTS -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory $ODIR"
 # special options for GRISU
 if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     MCOPT="$MCOPT -simu_hilo_from_simfile -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
 else
-    MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV"
+    MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV -lowgaincalibrationfile calibrationlist.LowGainForCare.dat"
 fi
 echo "Analysing MC file for run $RUNNUM"
-$EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS &> $ODIR/$ONAME.log
+echo "$EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS" &> $ODIR/$ONAME.log
+$EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS &>> $ODIR/$ONAME.log
 
 # remove temporary files
 cp -f -v $DDIR/$ONAME.root $ODIR/$ONAME.root
