@@ -23,7 +23,7 @@ VFrogs::VFrogs()
 	fFrogsParameters = new VFrogsParameters();
 	
 	reset();
-
+	
 	frogsRecID = getRunParameter()->ffrogsRecID;
 	templatelistname = getRunParameter()->ffrogstemplatelist ;
 	
@@ -84,7 +84,7 @@ VFrogs::~VFrogs()
 
 //================================================================
 //================================================================
-void VFrogs::doFrogsStuff( int eventNumber )
+void VFrogs::doFrogsStuff( int eventNumber, string fArrayEpoch )
 {
 
 	int i = 0;
@@ -117,7 +117,7 @@ void VFrogs::doFrogsStuff( int eventNumber )
 	{
 	
 		struct frogs_imgtmplt_in d;
-		d = frogs_convert_from_ed( eventNumber, adc, inEnergy );
+		d = frogs_convert_from_ed( eventNumber, adc, inEnergy, fArrayEpoch );
 		
 		//Print out the data contained in the FROGS structure frogs_imgtmplt_in
 		//This is useful when developing a frogs_convert_from_XXXX function
@@ -301,13 +301,13 @@ void VFrogs::initOutput()
 	// check if root outputfile exist
 	if( fOutputfile != 0 )
 	{
-		printf( "FROGPUT: Frogs Output File Exists\n" );
+		printf( "FROGSPUT: Frogs Output File Exists\n" );
 		return;
 	}
 	// otherwise create it
 	if( fRunPar->foutputfileName != "-1" )
 	{
-		printf( "FROGPUT: Frogs foutputfileName = -1 : Attempt to create file\n" );
+		printf( "FROGSPUT: Frogs foutputfileName = -1 : Attempt to create file\n" );
 		char i_textTitle[300];
 		sprintf( i_textTitle, "VERSION %d", getRunParameter()->getEVNDISP_TREE_VERSION() );
 		if( getRunParameter()->fShortTree )
@@ -569,7 +569,7 @@ void VFrogs::finishFrogs( TFile* f )
 }
 //================================================================
 //================================================================
-struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc_type, double inEnergy )
+struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc_type, double inEnergy, string fArrayEpoch )
 {
 	/* The frogs_convert_from_grisu function is called with
 	   arguments containing all the data necessary to the image template
@@ -596,6 +596,7 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc
 		rtn.azimuth   = 0.;
 	}
 	rtn.event_id  = eventNumber;
+	rtn.epoch_id  = fArrayEpoch.c_str();
 	
 	//Telescopes
 	rtn.ntel = fData->getNTel(); //Number of telescopes
@@ -667,7 +668,7 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc
 			//if(fData->getDead()[pix]!=0 || fData->getData()->getHiLo()[pix]==1 )
 			//exclude channels that are dead or where the integration window falls outside the readout window or where the pedvar is 0
 			if( fData->getDead( fData->getData()->getHiLo()[pix] )[pix] != 0 || fData->getCurrentSumWindow_2()[pix] == 0  ||
-				fData->getData()->getPedvars( fData->getData()->getHiLo()[pix], fData->getCurrentSumWindow_2()[pix] )[pix]  == 0 )//(SV)
+					fData->getData()->getPedvars( fData->getData()->getHiLo()[pix], fData->getCurrentSumWindow_2()[pix] )[pix]  == 0 )//(SV)
 			{
 				rtn.scope[tel].pixinuse[pix] = FROGS_NOTOK;
 			}
@@ -775,18 +776,18 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc
 	{
 		rtn.worthy_event = FROGS_NOTOK;
 	}
-	//Count the number of telescopes with more than 200dc in their image
+	//Count the number of telescopes with more than 100dc in their image
 	int ngoodimages = 0;
 	for( int tel = 0; tel < rtn.ntel; tel++ )
 	{
 		setTelID( tel );
-		if( fData->getImageParameters()->size > 200.0 )
+		if( fData->getImageParameters()->size > 100.0 )
 		{
 			ngoodimages = ngoodimages + 1;
 		}
 	}
-	//Require the number of telescopes with more than 300dc to be at least 3
-	if( ngoodimages < 3 )
+	//Require the number of telescopes with more than 100dc to be at least 3
+	if( ngoodimages < 2 )
 	{
 		rtn.worthy_event = FROGS_NOTOK;
 	}
@@ -821,7 +822,7 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc
 			}
 		}
 		
-		//Require the number of telescopes with more than 200dc to be at least 2
+		//Require the number of telescopes with more than 100dc to be at least 2
 		if( ngoodimages > 1 && dummy < 200.0 )
 		{
 			rtn.worthy_event = FROGS_OK;
