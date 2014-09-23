@@ -26,7 +26,7 @@ TELTOANA="1234"
 # Output file name
 ONAME="$RUNNUM"
 
-if [[ $USEFROGS == "1" ]]; then
+if [[ $NEVENTS > 0 ]]; then
      ITER=$((SGE_TASK_ID - 1))
      FIRSTEVENT=$(($ITER * $NEVENTS))
      # Output file name
