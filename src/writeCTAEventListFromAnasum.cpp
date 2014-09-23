@@ -555,7 +555,8 @@ int main( int argc, char* argv[] )
 	recEVENTS.writeHeader( "TIME_OBS", string( timeobs ) ) ;
 	recEVENTS.writeHeader( "TIMEREF" , string( "local" ) ) ;
 	recEVENTS.writeHeader( "TIMESYS" , string( "TT" ) ) ;
-	recEVENTS.writeHeader( "TIMEUNIT", string( "days" ) ) ;
+	//recEVENTS.writeHeader( "TIMEUNIT", string( "days" ) ) ;
+	recEVENTS.writeHeader( "TIMEUNIT", string( "s" ) ) ;
 	recEVENTS.writeHeader( "MJDREFI" , mjdrefi ) ;
 	recEVENTS.writeHeader( "MJDREFF" , mjdreff ) ;
 	recEVENTS.writeHeader( "TSTART"  , tstart ) ;
