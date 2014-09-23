@@ -2,7 +2,7 @@
 # script to run eventdisplay analysis with FROGS
 
 # qsub parameters
-h_cpu=72:00:00; h_vmem=2000M; tmpdir_size=10G
+h_cpu=48:00:00; h_vmem=2000M; tmpdir_size=10G
 
 if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 # begin help message
@@ -35,9 +35,6 @@ fi
 # Run init script
 bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
-
-# Load runlist functions
-source "$EVNDISPSYS/scripts/VTS/helper_scripts/RUNLIST.run_info_functions.sh"
 
 # Parse command line arguments
 RLIST=$1
