@@ -364,7 +364,7 @@ frogs_likelihood_optimization( struct frogs_imgtmplt_in* d,
 	/*Calculate the image and background goodness for the convergence point.*/
 	if( frogs_goodness( &rtn, d, tmplt, calib, prob_array ) != FROGS_OK )
 	{
-		frogs_showxerror( "Problem encountered in the convergence goodness calculation" );
+		frogs_showxerror( "Error: Problem encountered in the convergence goodness calculation" );
 	}
 	
 	gsl_multifit_fdfsolver_free( s );
@@ -694,7 +694,7 @@ int frogs_gdns_calibr_out( int event_id, int tel, int pix, float q,  float ped, 
 		calib = fopen( "%s/frogs_calibration/frogs_goodness_calibration.frogs", "w" );
 		if( calib == NULL )
 		{
-			frogs_showxerror( "Failed opening the file frogs_goodness_calibration.frogs for writing" );
+			frogs_showxerror( "Error: Failed opening the file frogs_goodness_calibration.frogs for writing" );
 		}
 	}
 	
@@ -713,7 +713,7 @@ int frogs_gdns_calibr_out( int event_id, int tel, int pix, float q,  float ped, 
 		//Close the file
 		fclose( calib );
 		//Stop the execussion
-		frogs_showxerror( "Done writing the calibration file data in frogs_goodness_calibration.frogs" );
+		frogs_showxerror( "Error: Done writing the calibration file data in frogs_goodness_calibration.frogs" );
 		
 		return FROGS_OK;
 	}
@@ -749,7 +749,7 @@ int frogs_event_display( int event_id, float q, float mu, float xtel,
 		display = fopen( "frogs_display.kumac", "w" );
 		if( display == NULL )
 		{
-			frogs_showxerror( "Failed opening the file frogs_goodness_calibration.frogs for writing" );
+			frogs_showxerror( "Error: Failed opening the file frogs_goodness_calibration.frogs for writing" );
 		}
 	}
 	
@@ -759,7 +759,7 @@ int frogs_event_display( int event_id, float q, float mu, float xtel,
 		//Close the file
 		fclose( display );
 		//Stop the execussion
-		frogs_showxerror( "Done writing the event display file  frogs_display.kumac" );
+		frogs_showxerror( "Error: Done writing the event display file  frogs_display.kumac" );
 		return FROGS_OK;
 	}
 	
@@ -1047,7 +1047,7 @@ double frogs_integrand_for_averaging( double q, void* par )
 	
 	if( !frogs_is_a_good_number( loglikelihood * proba_density ) )
 	{
-		frogs_showxerror( "NaN resulted from calculations in frogs_integrand_for_averaging" );
+		frogs_showxerror( "Error: NaN resulted from calculations in frogs_integrand_for_averaging" );
 	}
 	//Returns the log-likelihood multiplied by the probability it is achieved
 	return loglikelihood * proba_density;
@@ -1087,7 +1087,7 @@ struct frogs_imgtemplate frogs_read_template_elev( float elevation, char templat
 	if( ( fu = fopen( FROGS_TEMPLATE_LIST_PATH, "r" ) ) == NULL )
 	{
 		fprintf( stderr, "FROGS template file list: %s\n", FROGS_TEMPLATE_LIST_PATH );
-		frogs_showxerror( "Failed opening the template files list file" );
+		frogs_showxerror( "Error: Failed opening the template files list file" );
 	}
 	
 	/*Read the file until the end is encountered unless a matching
@@ -1126,7 +1126,7 @@ struct frogs_imgtemplate frogs_read_template_elev( float elevation, char templat
 	}
 	fclose( fu ); //Closes the template filename list
 	fprintf( stderr, "Elevation %f, check file %s\n", elevation, FROGS_TEMPLATE_LIST_PATH );
-	frogs_showxerror( "FROGS could not find a matching template file" );
+	frogs_showxerror( "Error: FROGS could not find a matching template file" );
 	return rtn;
 }
 //================================================================
@@ -1170,7 +1170,7 @@ struct frogs_imgtemplate frogs_read_template_elev_old( float elevation )
 	
 	//If we arrive here, that means no appropriate template file was found
 	fprintf( stderr, "Elevation=%f\n", elevation );
-	frogs_showxerror( "Could not find an appropriate template file" );
+	frogs_showxerror( "Error: Could not find an appropriate template file" );
 	
 	return rtn;
 }
@@ -1200,7 +1200,7 @@ frogs_read_template_file(
 	if( ( fu = fopen( fullfname, "r" ) ) == NULL )
 	{
 		printf( "%s\n", fullfname );
-		frogs_showxerror( "Failed opening the template file" );
+		frogs_showxerror( "Error: Failed opening the template file" );
 	}
 	
 	frogs_printfrog();
@@ -1460,7 +1460,7 @@ double frogs_pix_lkhd_deriv_2ndorder( int pix, int tel,
 						  d, tmplt, &pix_in_template );
 	if( mu == FROGS_BAD_NUMBER )
 	{
-		frogs_showxerror( "frogs_img_model() invoked for an invalid pixel" );
+		frogs_showxerror( "Error: frogs_img_model() invoked for an invalid pixel" );
 	}
 	
 	if( mu > 1.e-18 && mu < FROGS_LARGE_PE_SIGNAL )
@@ -1478,7 +1478,7 @@ double frogs_pix_lkhd_deriv_2ndorder( int pix, int tel,
 						  d, tmplt, &pix_in_template );
 	if( mu == FROGS_BAD_NUMBER )
 	{
-		frogs_showxerror( "frogs_img_model() invoked for an invalid pixel" );
+		frogs_showxerror( "Error: frogs_img_model() invoked for an invalid pixel" );
 	}
 	
 	if( mu > 1.e-18 && mu < FROGS_LARGE_PE_SIGNAL )
@@ -1519,7 +1519,7 @@ double frogs_pix_lkhd_deriv_2ndorder( int pix, int tel,
 	}
 	if( delta_param == 0 )
 	{
-		frogs_showxerror( "Bad parameter identifier in pix_lkhd_deriv_2ndorder" );
+		frogs_showxerror( "Error: Bad parameter identifier in pix_lkhd_deriv_2ndorder" );
 	}
 	rtn = ( pix_lkhd_plus - pix_lkhd_minus ) / ( 2.0 * delta_param );
 	
@@ -1549,7 +1549,7 @@ double frogs_pix_lkhd_deriv_4thorder( int pix, int tel,
 						  d, tmplt, &pix_in_template );
 	if( mu == FROGS_BAD_NUMBER )
 	{
-		frogs_showxerror( "frogs_img_model() invoked for an invalid pixel" );
+		frogs_showxerror( "Error: frogs_img_model() invoked for an invalid pixel" );
 	}
 	
 	if( mu > 1.e-18 && mu < FROGS_LARGE_PE_SIGNAL )
@@ -1566,7 +1566,7 @@ double frogs_pix_lkhd_deriv_4thorder( int pix, int tel,
 						  d, tmplt, &pix_in_template );
 	if( mu == FROGS_BAD_NUMBER )
 	{
-		frogs_showxerror( "frogs_img_model() invoked for an invalid pixel" );
+		frogs_showxerror( "Error: frogs_img_model() invoked for an invalid pixel" );
 	}
 	
 	if( mu > 1.e-18 && mu < FROGS_LARGE_PE_SIGNAL )
@@ -1583,7 +1583,7 @@ double frogs_pix_lkhd_deriv_4thorder( int pix, int tel,
 						  d, tmplt, &pix_in_template );
 	if( mu == FROGS_BAD_NUMBER )
 	{
-		frogs_showxerror( "frogs_img_model() invoked for an invalid pixel" );
+		frogs_showxerror( "Error: frogs_img_model() invoked for an invalid pixel" );
 	}
 	
 	if( mu > 1.e-18 && mu < FROGS_LARGE_PE_SIGNAL )
@@ -1600,7 +1600,7 @@ double frogs_pix_lkhd_deriv_4thorder( int pix, int tel,
 						  d, tmplt, &pix_in_template );
 	if( mu == FROGS_BAD_NUMBER )
 	{
-		frogs_showxerror( "frogs_img_model() invoked for an invalid pixel" );
+		frogs_showxerror( "Error: frogs_img_model() invoked for an invalid pixel" );
 	}
 	
 	if( mu > 1.e-18 && mu < FROGS_LARGE_PE_SIGNAL )
@@ -1641,7 +1641,7 @@ double frogs_pix_lkhd_deriv_4thorder( int pix, int tel,
 	}
 	if( delta_param == 0 )
 	{
-		frogs_showxerror( "Bad parameter identifier in pix_lkhd_deriv_2ndorder" );
+		frogs_showxerror( "Error: Bad parameter identifier in pix_lkhd_deriv_2ndorder" );
 	}
 	rtn = ( -pix_lkhd_plus_plus + 8 * pix_lkhd_plus - 8 * pix_lkhd_minus + pix_lkhd_minus_minus ) / ( 12 * delta_param );
 	
@@ -1670,7 +1670,7 @@ double frogs_pix_lkhd_deriv_4thorder_old( int pix, int tel,
 						  d, tmplt, &pix_in_template );
 	if( mu == FROGS_BAD_NUMBER )
 	{
-		frogs_showxerror( "frogs_img_model() invoked for an invalid pixel" );
+		frogs_showxerror( "Error: frogs_img_model() invoked for an invalid pixel" );
 	}
 	pd = frogs_probability_density( d->scope[tel].q[pix], mu,
 									d->scope[tel].ped[pix],
@@ -1681,7 +1681,7 @@ double frogs_pix_lkhd_deriv_4thorder_old( int pix, int tel,
 						  d, tmplt, &pix_in_template );
 	if( mu == FROGS_BAD_NUMBER )
 	{
-		frogs_showxerror( "frogs_img_model() invoked for an invalid pixel" );
+		frogs_showxerror( "Error: frogs_img_model() invoked for an invalid pixel" );
 	}
 	pd = frogs_probability_density( d->scope[tel].q[pix], mu,
 									d->scope[tel].ped[pix],
@@ -1692,7 +1692,7 @@ double frogs_pix_lkhd_deriv_4thorder_old( int pix, int tel,
 						  d, tmplt, &pix_in_template );
 	if( mu == FROGS_BAD_NUMBER )
 	{
-		frogs_showxerror( "frogs_img_model() invoked for an invalid pixel" );
+		frogs_showxerror( "Error: frogs_img_model() invoked for an invalid pixel" );
 	}
 	pd = frogs_probability_density( d->scope[tel].q[pix], mu,
 									d->scope[tel].ped[pix],
@@ -1703,7 +1703,7 @@ double frogs_pix_lkhd_deriv_4thorder_old( int pix, int tel,
 						  d, tmplt, &pix_in_template );
 	if( mu == FROGS_BAD_NUMBER )
 	{
-		frogs_showxerror( "frogs_img_model() invoked for an invalid pixel" );
+		frogs_showxerror( "Error: frogs_img_model() invoked for an invalid pixel" );
 	}
 	pd = frogs_probability_density( d->scope[tel].q[pix], mu,
 									d->scope[tel].ped[pix],
@@ -1738,7 +1738,7 @@ double frogs_pix_lkhd_deriv_4thorder_old( int pix, int tel,
 	}
 	if( delta_param == 0 )
 	{
-		frogs_showxerror( "Bad parameter identifier in pix_lkhd_deriv_2ndorder" );
+		frogs_showxerror( "Error: Bad parameter identifier in pix_lkhd_deriv_2ndorder" );
 	}
 	rtn = ( -pix_lkhd_plus_plus + 8 * pix_lkhd_plus - 8 * pix_lkhd_minus + pix_lkhd_minus_minus ) / ( 12 * delta_param );
 	
@@ -2208,7 +2208,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 					area = frogs_get_overlapping_area( r, x, fabs( y ), pixradius, X, Y, tmplt->step[3], tmplt->step[4] );
 					if( area < 0 || area > ( tmplt->step[3] ) * ( tmplt->step[4] ) )
 					{
-						frogs_showxerror( "Problem encountered in the intersection area calculation" );
+						frogs_showxerror( "Error: Problem encountered in the intersection area calculation" );
 					}
 					
 					if( area > 0. )
@@ -2339,7 +2339,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			if( index < 0 || index >= tmplt->sz )
 			{
 				fprintf( stderr, "frogs_get_tmplt_val: %d %d %d %d %d\n", il, iloge, ib, ix, iy );
-				frogs_showxerror( "Index out of range in frogs_get_tmplt_val" );
+				frogs_showxerror( "Error: Index out of range in frogs_get_tmplt_val" );
 			}
 			double rtn = tmplt->c[index];
 			return rtn;
@@ -2383,7 +2383,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			double rtn;
 			if( x1 == x2 )
 			{
-				frogs_showxerror( "Error in two point linear lagrange interpolation" );
+				frogs_showxerror( "Error: Problem encountered in two point linear lagrange interpolation" );
 			}
 			rtn = y1 * ( x - x2 ) / ( x1 - x2 ) + y2 * ( x - x1 ) / ( x2 - x1 );
 			return rtn;
@@ -2398,7 +2398,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			double rtn;
 			if( x1 == x2 || x1 == x3 || x2 == x3 )
 			{
-				frogs_showxerror( "Error in three point quadratic Lagrange interpolation" );
+				frogs_showxerror( "Error: Problem encountered in three point quadratic Lagrange interpolation" );
 			}
 			rtn = y1 * ( x - x2 ) * ( x - x3 ) / ( ( x1 - x2 ) * ( x1 - x3 ) )
 				  + y2 * ( x - x1 ) * ( x - x3 ) / ( ( x2 - x1 ) * ( x2 - x3 ) )
@@ -2430,7 +2430,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			float rtn;
 			if( min > max )
 			{
-				frogs_showxerror( "In floatwrap, min>max" );
+				frogs_showxerror( "Error: In floatwrap, min>max" );
 			}
 			float range = max - min;
 			float dumx = x - min;
@@ -2678,12 +2678,12 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			//gi_D=6 {xs, ys, xp, yp, logE, lambda}
 			if( gi_D > MAXDIM )
 			{
-				frogs_showxerror( "Problem encountered in the differential evolution: Error! too many parameters" );
+				frogs_showxerror( "Error: Problem encountered in the differential evolution: Error! too many parameters" );
 			}
 			
 			if( gi_NP > MAXPOP )
 			{
-				frogs_showxerror( "Problem encountered in the differential evolution: Error! too many points" );
+				frogs_showxerror( "Error: Problem encountered in the differential evolution: Error! too many points" );
 			}
 			
 			/*fa_minbound[0]=-.5; fa_maxbound[0]=+.5;//xs
@@ -3791,6 +3791,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 					return FROGS_BAD_NUMBER;
 				}
 			}
+			
 			
 			
 			
