@@ -159,6 +159,8 @@ if [[ $SUBC == *qsub* ]]; then
     JOBID=`$SUBC $FSCRIPT.sh`
      if [[ $NEVENTS > 0 ]]; then
           JOBID=`$SUBC -t 1-10 $FSCRIPT.sh`
+     elif [[ $NEVENTS < 0 ]]; then
+          JOBID=`$SUBC $FSCRIPT.sh`
      fi      
     echo "RUN $RUNNUM: JOBID $JOBID"
 elif [[ $SUBC == *parallel* ]]; then
