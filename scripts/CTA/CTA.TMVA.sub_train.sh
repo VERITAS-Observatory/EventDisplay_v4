@@ -191,14 +191,13 @@ do
          fi
 
 # run script
-	 FNAM=$LDIR/$FSCRIPT.$DSET.$ARRAY.$2."_$i"
+	 FNAM=$LDIR/$FSCRIPT.$DSET.$ARRAY.$2"_$i"
 
 	 sed -e "s|RUNPARA|$RFIL|" \
 	     -e "s|OFIL|$ODIR/$OFIL"_$i"|" $FSCRIPT.sh  > $FNAM.sh
-	 rm -f $FNAM-1.sh
 
 	 chmod u+x $FNAM.sh
-	 echo $FNAM.sh
+	 echo "SCRIPT $FNAM.sh"
 
 #################################
 # submit job to queue
