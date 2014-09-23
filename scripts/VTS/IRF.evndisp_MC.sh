@@ -157,7 +157,7 @@ SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
 SUBC=`eval "echo \"$SUBC\""`
 if [[ $SUBC == *qsub* ]]; then
     JOBID=`$SUBC $FSCRIPT.sh`
-     if [[ $NEVENTS > 0 ]]
+     if [[ $NEVENTS > 0 ]]; then
           JOBID=`$SUBC -t 1-10 $FSCRIPT.sh`
      fi      
     echo "RUN $RUNNUM: JOBID $JOBID"
