@@ -83,11 +83,16 @@ void VDB_PixelDataReader::print()
 		cout << "# tel=" << fPixelData[i].size();
 		if( fPixelData[i].size() > 0 )
 		{
-			cout << ", # pixel = " << fPixelData[i][0].size();
-			if( fPixelData[i][0].size() > 0 )
+			cout << ", # pixels: " << fPixelData[i][0].size();
+			cout << ", # time stamps: " ;
+			for(unsigned int iTel = 0; iTel < fPixelData[i].size(); iTel++ )
 			{
-				cout << ", # time stamps " << fPixelData[i][0][0]->fMJD.size() << endl;
+				if( fPixelData[i][iTel].size() > 0 )
+				{
+					cout << fPixelData[i][iTel][0]->fMJD.size() << " " ;
+				}
 			}
+			cout << endl;
 		}
 	}
 }
