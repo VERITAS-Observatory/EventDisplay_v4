@@ -1049,7 +1049,11 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 			}
 			cout << "channels on telescope " << getTelID() + 1 << " (at first event):\t" << n_dead << endl;
 		}
-		
+		//dump list of dead channels
+		if( fRunPar->fprintdeadpixelinfo ) 
+		{
+			printDeadChannels( iLowGain , true );
+		}
 		// do not allow to run eventdisplay with all channels dead in the low channels one of the telescopes
 		// (GM) why low-gain channels?? Why not all?
 		//        if( iLowGain && getNDead( iLowGain ) == getNChannels() )
