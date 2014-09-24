@@ -118,10 +118,11 @@ bool VDB_Connection::make_query( const char* the_query )
 int  VDB_Connection::Get_Nb_Connection()
 {
 
-	if( f_db )
+	if( f_db && f_db->Query( "show processlist" ) )
 	{
 		fNumb_Connection = f_db->Query( "show processlist" )->GetRowCount();
 	}
+	else return -111;
 	
 	return fNumb_Connection;
 	
