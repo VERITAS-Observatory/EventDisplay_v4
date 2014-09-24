@@ -11,6 +11,7 @@ TABFILE=TABLEFILE
 ZA=ZENITHANGLE
 NOISE=NOISELEVEL
 WOBBLE=WOBBLEOFFSET
+NROOTFILES=NFILES
 RECID="RECONSTRUCTIONID"
 
 #loop over all reconstruction IDs
@@ -41,15 +42,26 @@ for ID in $RECID; do
     echo "MSCW options: $MOPT"
 
 # run mscw_energy
-    rm -f $OSUBDIR/$OFILE.log
-    $EVNDISPSYS/bin/mscw_energy $MOPT -inputfile "$INDIR/*[0-9].root" -outputfile "$DDIR/$OFILE.mscw.root" -noise=$NOISE &> $OSUBDIR/$OFILE.log
-
+	 if [[ $NROOTFILES == 1 ]]; then
+		  rm -f $OSUBDIR/$OFILE.log
+		  inputfilename="$INDIR/*[0-9].root"
+		  outputfilename="$DDIR/$OFILE.mscw.root"
+		  logfile="$OSUBDIR/$OFILE.log"
+	 elif	[[ $NROOTFILES > 1 ]]; then
+		  ITER=$((SGE_TASK_ID - 1))
+		  rm -f $OSUBDIR/${OFILE}_$ITER.log
+		  inputfilename="$INDIR/*[0-9]_$ITER.root"
+		  outputfilename="$DDIR/${OFILE}_$ITER.mscw.root"
+		  logfile="$OSUBDIR/${OFILE}_$ITER.log"
+	 fi
+	 $EVNDISPSYS/bin/mscw_energy $MOPT -inputfile $inputfilename -outputfile $outputfilename -noise=$NOISE &> $logfile
 # cp results file back to data directory and clean up
-    cp -f -v $DDIR/$OFILE.mscw.root $OSUBDIR/$OFILE.mscw.root
-    rm -f $DDIR/$OFILE.mscw.root
+	 outputbasename=$( basename $outputfilename )
+    cp -f -v $outputfilename $OSUBDIR/$outputbasename
+    rm -f $outputfilename
     rmdir $DDIR
-    chmod g+w $OSUBDIR/$OFILE.mscw.root
-    chmod g+w $OSUBDIR/$OFILE.log
+    chmod g+w $OSUBDIR/$outputbasename
+    chmod g+w $logfile
 done
 
 exit

@@ -88,6 +88,9 @@ if [[ ! -d $INDIR ]]; then
 fi
 echo "Input file directory: $INDIR"
 
+NROOTFILES=$( ls -l $INDIR/*.root | wc -l )
+echo "NROOTFILES $NROOTFILES"
+
 # directory for run scripts
 DATE=`date +"%y%m%d"`
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/MSCW.ANATABLES/"
@@ -113,6 +116,7 @@ sed -e "s|INPUTDIR|$INDIR|" \
     -e "s|ZENITHANGLE|$ZA|" \
     -e "s|NOISELEVEL|$NOISE|" \
     -e "s|WOBBLEOFFSET|$WOBBLE|" \
+	 -e "s|NFILES|$NROOTFILES|" \
     -e "s|RECONSTRUCTIONID|$RECID|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
 chmod u+x $FSCRIPT.sh
@@ -122,8 +126,12 @@ echo "Run script written to: $FSCRIPT"
 SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
 SUBC=`eval "echo \"$SUBC\""`
 if [[ $SUBC == *qsub* ]]; then
-    JOBID=`$SUBC $FSCRIPT.sh`
-    echo "JOBID: $JOBID"
+    if [[ $NROOTFILES > 1 ]]; then
+      JOBID=`$SUBC -t 1-$NROOTFILES $FSCRIPT.sh`
+	 elif [[ $NROOTFILES == 1 ]]; then
+	   JOBID=`$SUBC $FSCRIPT.sh`
+    fi
+    echo "JOBID: $JOBID"	  
 elif [[ $SUBC == *parallel* ]]; then
     echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
 fi
