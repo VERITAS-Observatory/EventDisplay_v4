@@ -10,7 +10,7 @@ if [ $# -lt 7 ]; then
 echo "
 IRF generation: analyze simulation VBF files using evndisp 
 
-IRF.evndisp_MC.sh <sim directory> <epoch> <atmosphere> <zenith> <offset angle> <NSB level> <sim type> <runparameter file>  [particle] [Model3D] [FROGS] [events]
+IRF.evndisp_MC.sh <sim directory> <epoch> <atmosphere> <zenith> <offset angle> <NSB level> <sim type> <runparameter file>  [particle] [Model3D] [FROGS] [events] [Rec ID]
 
 required parameters:
 
@@ -56,7 +56,9 @@ optional parameters:
     
     [events]                FROGS ONLY: number of events per division
                             (default: -1)
-                            
+
+    [Rec ID]                FROGS ONLY: reconstruction ID used at the MSCW stage                         
+
 Note: zenith angles, wobble offsets, and noise values are hard-coded into script
 
 --------------------------------------------------------------------------------
@@ -85,6 +87,7 @@ SIMTYPE=$7
 [[ "${10}" ]] && USEMODEL3D=${10} || USEMODEL3D=0
 [[ "${11}" ]] && USEFROGS=${11} || USEFROGS=0
 [[ "${12}" ]] && NEVENTS=${12}  || NEVENTS=-1
+[[ "${13}" ]] && RECID=${13}  || RECID=0
 
 # Particle names
 PARTICLE_NAMES=( [1]=gamma [2]=electron [14]=proton [402]=alpha )
@@ -105,7 +108,7 @@ mkdir -p $OPDIR
 chmod -R g+w $OPDIR
 echo -e "Output files will be written to:\n $OPDIR"
 
-[[ $USEFROGS != 0 ]] && ODIR="${ODIR}_FROGS"
+[[ $USEFROGS != 0 ]] && ODIR="${ODIR}_FROGS" && MSCWDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/MSCW_RECID$RECID"
 
 echo "Using runparameter file $ACUTS"
 
@@ -156,7 +159,6 @@ echo $FSCRIPT.sh
 SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
 SUBC=`eval "echo \"$SUBC\""`
 if [[ $SUBC == *qsub* ]]; then
-    JOBID=`$SUBC $FSCRIPT.sh`
      if [[ $NEVENTS > 0 ]]; then
           JOBID=`$SUBC -t 1-10 $FSCRIPT.sh`
      elif [[ $NEVENTS < 0 ]]; then

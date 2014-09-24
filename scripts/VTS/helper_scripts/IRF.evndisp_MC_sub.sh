@@ -26,15 +26,24 @@ TELTOANA="1234"
 # Output file name
 ONAME="$RUNNUM"
 
+# template list file
+if [[ "$EPOCH" =~ ^(V5|V6)$ && $USEFROGS != 0 ]]; then
+    TEMPLATELIST="EVNDISP.frogs_template_file_list.$EPOCH.txt"
+else
+    echo "Error (helper_scripts/IRF.evndisp_MC_sub.sh), no frogs template list defined for \$EPOCH='$EPOCH', exiting..."
+    exit 1
+fi
+echo "Using template list file '$TEMPLATELIST'..."
+
 if [[ $NEVENTS > 0 ]]; then
      ITER=$((SGE_TASK_ID - 1))
      FIRSTEVENT=$(($ITER * $NEVENTS))
      # Output file name
      ONAME="${RUNNUM}_$ITER"
      MSCWFILE="${ZA}deg_${WOB}wob_NOISE${NOISE}_${ITER}.mscw.root"
-    echo -e "FROGS MSCW Dir:\n $MSCWDIR"
-    echo -e "FROGS MSCW File:\n $MSCWFILE"
-    echo "FROGS NEvents: $NEVENTS"
+     echo -e "FROGS MSCW Dir:\n $MSCWDIR"
+     echo -e "FROGS MSCW File:\n $MSCWFILE"
+     echo "FROGS NEvents: $NEVENTS"
 fi
 
 #################################
@@ -199,6 +208,7 @@ if [[ $USEMODEL3D == "1" ]]; then
 fi
 # FROGS
 if [[ $USEFROGS == "1" ]]; then
+	 echo "$MSCWDIR/$MSCWFILE $NEVENTS $FIRSTEVENT"
     FROGS="-frogs $MSCWDIR/$MSCWFILE -frogsid 0 -templatelistforfrogs "$TEMPLATELIST" -nevents=$NEVENTS -firstevent=$FIRSTEVENT"
 fi
 # run options
