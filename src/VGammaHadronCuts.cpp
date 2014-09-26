@@ -54,6 +54,7 @@ VGammaHadronCuts::VGammaHadronCuts()
 	
 	fStats = 0;
 	
+        fAnalysisType = GEO;
 	fGammaHadronCutSelector = 0;
 	fDirectionCutSelector = 0;
 	bMCCuts = false;
@@ -82,7 +83,7 @@ VGammaHadronCuts::VGammaHadronCuts()
 	
 	// phase cuts
 	fOrbitalPhase_min = -1.;
-	fOrbitalPhase_max = 1.e99;
+	fOrbitalPhase_max = 1.e10;
 	fUseOrbitalPhaseCuts = false;
 	
 	// model3D parameters
@@ -107,7 +108,6 @@ VGammaHadronCuts::VGammaHadronCuts()
 	fTMVAOptimizeSignalEfficiencyObservationTime_h = 50.;
 	fTMVAFixedSignalEfficiencyMax = 1.;
 	fTMVAFixedThetaCutMin = 0.;
-	fTMVABoxCut_Theta2_max = 0;
 	fTMVA_EvaluationResult = -99.;
 	fTMVAEvaluatorResults = 0;
 	
@@ -118,18 +118,13 @@ VGammaHadronCuts::VGammaHadronCuts()
 	fF1AngRes = 0;
 	fAngRes_ScalingFactor = 1.;
 	fAngRes_AbsoluteMinimum = 0.;
-	fAngRes_AbsoluteMaximum = 1.e99;
-	fIRFAngRes = 0;
+	fAngRes_AbsoluteMaximum = 1.e10;
 	fAngResContainmentProbability = 0;
 	
 	//////////////////////////
 	// FROGS
 	fFileNameFrogsCut        = "";
-	fFrogsShowerGoodness     = 0;
-	fFrogsBackgroundGoodness = 0;
-	fFrogsMSCW               = 0;
-	fFrogsMSCL               = 0;
-	
+
 	setArrayCentre();
 }
 
@@ -158,28 +153,11 @@ void VGammaHadronCuts::resetCutStatistics()
 
 void VGammaHadronCuts::resetCutValues()
 {
-	// single telescope cuts
-	//! Best cuts for data from telescope 1 (as of 2005)
-	fAlpha_min = 0.0;
-	fAlpha_max = 8.0;
-	fDistance_min = 0.27;
-	fDistance_max = 1.06;
-	fLos_min = 0.0;
-	fLos_max = 0.00017;
-	fLength_min = 0.12;
-	fLength_max = 0.38;
-	fWidth_min = 0.05;
-	fWidth_max = 0.12;
-	fAsymm_min = 0.0;
-	fAsymm_max = 10.0;
-	fSize_min = -1000;
-	fSize_max = 1.e99;
-	
 	// array cuts
 	fCut_Theta2_min = -100.;
 	fCut_Theta2_max = 100.;
 	fCut_Chi2_min = -1.e6;
-	fCut_Chi2_max = 1.e99;
+	fCut_Chi2_max = 1.e10;
 	fCut_MeanImageDistance_min = -100;
 	fCut_MeanImageDistance_max = 100;
 	fCut_MeanImageLength_min = -100;
@@ -187,7 +165,7 @@ void VGammaHadronCuts::resetCutValues()
 	fCut_MeanImageWidth_min = -100;
 	fCut_MeanImageWidth_max = 100;
 	fCut_Size_min = -1000;
-	fCut_Size_max = 1e99;
+	fCut_Size_max = 1e10;
 	fCut_Ntubes_min = 4;
 	fCut_Ntubes_max = 50000;
 	fCut_MSCW_min   = -1.;
@@ -215,15 +193,15 @@ void VGammaHadronCuts::resetCutValues()
 	
 	fCut_AverageCoreDistanceToTelescopes_min = -99.;
 	fCut_AverageCoreDistanceToTelescopes_max = 99999.;
-	fCut_MinimumCoreDistanceToTelescopes_max = 1.e99;
+	fCut_MinimumCoreDistanceToTelescopes_max = 1.e10;
 	
 	fCut_SizeSecondMax_min = -1000;
-	fCut_SizeSecondMax_max = 1.e99;
+	fCut_SizeSecondMax_max = 1.e10;
 	
 	fProbabilityCut = 0.5;
 	
 	fOrbitalPhase_min = -1.;
-	fOrbitalPhase_max = 1.e99;
+	fOrbitalPhase_max = 1.e10;
 	
 	fCut_Depth3D_min = -1.;
 	fCut_Depth3D_max = 9999.;
@@ -295,57 +273,6 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				{
 					is_stream >> fDirectionCutSelector;
 				}
-			}
-			/////////////////////////////////////
-			// single telescope cuts
-			else if( iCutVariable == "alpha" )
-			{
-				is_stream >> temp;
-				fAlpha_min = ( atof( temp.c_str() ) );
-				is_stream >> temp;
-				fAlpha_max = ( atof( temp.c_str() ) );
-			}
-			else if( iCutVariable == "length" )
-			{
-				is_stream >> temp;
-				fLength_min = ( atof( temp.c_str() ) );
-				is_stream >> temp;
-				fLength_max = ( atof( temp.c_str() ) );
-			}
-			else if( iCutVariable == "width" )
-			{
-				is_stream >> temp;
-				fWidth_min = ( atof( temp.c_str() ) );
-				is_stream >> temp;
-				fWidth_max = ( atof( temp.c_str() ) );
-			}
-			else if( iCutVariable == "los" )
-			{
-				is_stream >> temp;
-				fLos_min = ( atof( temp.c_str() ) );
-				is_stream >> temp;
-				fLos_max = ( atof( temp.c_str() ) );
-			}
-			else if( iCutVariable == "asymm" )
-			{
-				is_stream >> temp;
-				fAsymm_min = ( atof( temp.c_str() ) );
-				is_stream >> temp;
-				fAsymm_max = ( atof( temp.c_str() ) );
-			}
-			else if( iCutVariable == "distance" )
-			{
-				is_stream >> temp;
-				fDistance_min = ( atof( temp.c_str() ) );
-				is_stream >> temp;
-				fDistance_max = ( atof( temp.c_str() ) );
-			}
-			else if( iCutVariable == "size" )
-			{
-				is_stream >> temp;
-				fSize_min = ( atof( temp.c_str() ) );
-				is_stream >> temp;
-				fSize_max = ( atof( temp.c_str() ) );
 			}
 			/////////////////////////////////////
 			// stereo ('array') telescope cuts
@@ -552,7 +479,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				}
 				else
 				{
-					fOrbitalPhase_max = 1.e99;
+					fOrbitalPhase_max = 1.e10;
 				}
 				fUseOrbitalPhaseCuts = true;
 			}
@@ -631,10 +558,18 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			}
 			else if( iCutVariable == "sizesecondmax" )
 			{
-				is_stream >> temp;
-				float isize_min = atof( temp.c_str() );
-				is_stream >> temp;
-				float isize_max = atof( temp.c_str() );
+				float isize_min = -1000.;
+                                float isize_max = 1.e10;
+                                if( !is_stream.eof() )
+                                {
+                                    is_stream >> temp;
+                                    isize_min = atof( temp.c_str() );
+                                }
+                                if( !is_stream.eof() )
+                                {
+                                    is_stream >> temp;
+                                    isize_max = atof( temp.c_str() );
+                                }
 				// check instrument epoch
 				if( !is_stream.eof() )
 				{
@@ -681,74 +616,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				{
 					string iVariableNameFrogsCut;
 					is_stream >> iVariableNameFrogsCut;
-					if( iVariableNameFrogsCut == "fSG" )
-					{
-						TGraph* g = ( TGraph* )TFile( fFileNameFrogsCut.c_str(), "READ" ).Get( "gShowerGoodness" );
-						if( !g )
-						{
-							cout << "VGammaHadronCuts::readCuts error while reading shower goodness graph (frogs) from " << fFileNameFrogsCut << endl;
-							cout << "exiting..." << endl;
-							exit( EXIT_FAILURE );
-						}
-						else
-						{
-							fFrogsShowerGoodness = ( TGraph* )g->Clone();
-							fFrogsShowerGoodness->SetName( "FrogsShowerGoodness" );
-							// print results
-							printFrogsCuts( iVariableNameFrogsCut );
-						}
-					}
-					if( iVariableNameFrogsCut == "fBG" )
-					{
-						TGraph* g = ( TGraph* )TFile( fFileNameFrogsCut.c_str(), "READ" ).Get( "gBackgroundGoodness" );
-						if( !g )
-						{
-							cout << "VGammaHadronCuts::readCuts error while reading background goodness graph (frogs) from " << fFileNameFrogsCut << endl;
-							cout << "exiting..." << endl;
-							exit( EXIT_FAILURE );
-						}
-						else
-						{
-							fFrogsBackgroundGoodness = ( TGraph* )g->Clone();
-							fFrogsBackgroundGoodness->SetName( "FrogsBackgroundGoodness" );
-							// print results
-							printFrogsCuts( iVariableNameFrogsCut );
-						}
-					}
-					if( iVariableNameFrogsCut == "fMSCW" )
-					{
-						TGraph* g = ( TGraph* )TFile( fFileNameFrogsCut.c_str(), "READ" ).Get( "gMSCW" );
-						if( !g )
-						{
-							cout << "VGammaHadronCuts::readCuts error while reading MSCW graph (frogs) from " << fFileNameFrogsCut << endl;
-							cout << "exiting..." << endl;
-							exit( EXIT_FAILURE );
-						}
-						else
-						{
-							fFrogsMSCW = ( TGraph* )g->Clone();
-							fFrogsMSCW->SetName( "FrogsMSCW" );
-							// print results
-							printFrogsCuts( iVariableNameFrogsCut );
-						}
-					}
-					if( iVariableNameFrogsCut == "fMSCL" )
-					{
-						TGraph* g = ( TGraph* )TFile( fFileNameFrogsCut.c_str(), "READ" ).Get( "gMSCL" );
-						if( !g )
-						{
-							cout << "VGammaHadronCuts::readCuts error while reading MSCL graph (frogs) from " << fFileNameFrogsCut << endl;
-							cout << "exiting..." << endl;
-							exit( EXIT_FAILURE );
-						}
-						else
-						{
-							fFrogsMSCL = ( TGraph* )g->Clone();
-							fFrogsMSCL->SetName( "FrogsMSCL" );
-							// print results
-							printFrogsCuts( iVariableNameFrogsCut );
-						}
-					}
+                                        getEnergyDependentCutFromFile( fFileNameFrogsCut, iVariableNameFrogsCut );
 				}
 			}
 			////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -928,13 +796,28 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			////////////////////////////////////////////////////////////////////////////////////////////////////
 		}
 	}
+        // check cut selection
+        if( fGammaHadronCutSelector / 10 == 5 )
+        {
+            fAnalysisType = FROGS;
+        }
+        else if( fGammaHadronCutSelector / 10 == 6 ) 
+        {
+            fAnalysisType = MODEL3D;
+        } 
+        else if( fGammaHadronCutSelector / 10 == 4 ) 
+        {
+            fAnalysisType = MVAAnalysis;
+        } 
+
+        // initialize theta2 cut (energy dependent)
 	if( fFileNameAngRes.size() > 0 )
 	{
 		if( !initAngularResolutionFile() )
 		{
 			cout << "VGammaHadronCuts::readCuts error: error initializing angular resolution file" << endl;
 			cout << "exiting..." << endl;
-			exit( -1 );
+			exit( EXIT_FAILURE );
 		}
 	}
 	return true;
@@ -974,13 +857,13 @@ void VGammaHadronCuts::printDirectionCuts()
 		cout << "(" << fF1AngRes->GetName() << ")";
 	}
 	// theta cut from IRF graph (energy depedendent)
-	else if( fIRFAngRes || fDirectionCutSelector == 2 )
+	else if( getTheta2Cut_IRF_Max() || fDirectionCutSelector == 2 )
 	{
 		cout << "Direction cut from IRF graph " << endl;
-		if( fIRFAngRes )
+		if( getTheta2Cut_IRF_Max() )
 		{
-			cout << "Number of points: " << fIRFAngRes->GetN() << endl;
-			fIRFAngRes->Print();
+			cout << "Number of points: " << getTheta2Cut_IRF_Max()->GetN() << endl;
+			getTheta2Cut_IRF_Max()->Print();
 		}
 		else if( getAngularResolutionContainmentRadius() > 0. )
 		{
@@ -1006,9 +889,9 @@ void VGammaHadronCuts::printDirectionCuts()
 		}
 		if( fDirectionCutSelector == 5 )
 		{
-			if( fDirectionCutSelector == 5 && fTMVABoxCut_Theta2_max )
+			if( fDirectionCutSelector == 5 && getTheta2Cut_TMVA_max() )
 			{
-				fTMVABoxCut_Theta2_max->Print();
+				getTheta2Cut_TMVA_max()->Print();
 			}
 		}
 	}
@@ -1084,14 +967,14 @@ void VGammaHadronCuts::printCutSummary()
 		cout << "Orbital Phase bin ( " << fOrbitalPhase_min << ", " << fOrbitalPhase_max << " )";
 	}
 	// model3D cuts
-	if( fGammaHadronCutSelector / 10 == 6 )
+	if( useModel3DCuts() )
 	{
 		cout << " Model3D cuts ( ";
 		cout << fCut_Depth3D_min << " < Depth3D < " << fCut_Depth3D_max;
 		cout << ", " << fCut_RWidth3D_min << " < RWidth3D < " << fCut_RWidth3D_max << " )";
 	}
 	// TMVA cuts
-	if( fGammaHadronCutSelector / 10 == 4 )
+	if( useTMVACuts() )
 	{
 		cout << endl;
 		cout << "TMVA gamma/hadron separation with MVA method " << fTMVA_MVAMethod;
@@ -1127,10 +1010,6 @@ void VGammaHadronCuts::printCutSummary()
 	cout << "SizeSecondMax: " << fCut_SizeSecondMax_min << " < SizeSecondMax < " << fCut_SizeSecondMax_max;
 	cout << ", " << fCut_Emmission_min << " < Emission height < " << fCut_Emmission_max;
 	cout << endl;
-	/*    cout << "Fiducial area (shower core): [" << fCut_CoreDistanceToArrayCentreX_min - fCut_CoreDistanceEdgeSize << ",";
-	    cout << fCut_CoreDistanceToArrayCentreX_max + fCut_CoreDistanceEdgeSize;
-	    cout << "," << fCut_CoreDistanceToArrayCentreY_min - fCut_CoreDistanceEdgeSize << ",";
-	    cout << fCut_CoreDistanceToArrayCentreY_max + fCut_CoreDistanceEdgeSize << "] m"; */
 	cout << "NImage cut: " << fCut_NImages_min << " <= Ntel <= " << fCut_NImages_max;
 	cout << endl;
 	if( bMCCuts )
@@ -1158,6 +1037,7 @@ void VGammaHadronCuts::printCutSummary()
 			fNTelTypeCut[j]->print();
 		}
 	}
+        printEnergyDependentCuts();
 	cout << "-----------------------------------------------------------------------------------------" << endl;
 }
 
@@ -1218,73 +1098,43 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 		
 		/////////////////////////////////////////////////////////////////////////////////
 		// check energy reconstruction
-		if( iEnergyReconstructionMethod == 0 )
-		{
-			if( fData->Erec > 0. && fData->EChi2 <= 0. )
-			{
-				if( bCount && fStats )
-				{
-					fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
-					fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
-				}
-				return false;
-			}
-			if( fData->Erec < fCut_Erec_min )
-			{
-				if( bCount && fStats )
-				{
-					fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
-					fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
-				}
-				return false;
-			}
-			if( fData->Erec > fCut_Erec_max )
-			{
-				if( bCount && fStats )
-				{
-					fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
-					fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
-				}
-				return false;
-			}
-		}
-		else if( iEnergyReconstructionMethod == 1 || iEnergyReconstructionMethod == 2 )
-		{
-			if( fData->ErecS > 0. && fData->EChi2S <= 0. )
-			{
-				if( bCount && fStats )
-				{
-					fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
-					fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
-				}
-				return false;
-			}
-			if( fData->ErecS < fCut_Erec_min )
-			{
-				if( bCount && fStats )
-				{
-					fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
-					fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
-				}
-				return false;
-			}
-			if( fData->ErecS > fCut_Erec_max )
-			{
-				if( bCount && fStats )
-				{
-					fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
-					fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
-				}
-				return false;
-			}
-		}
+                double iErec  = getReconstructedEnergy( iEnergyReconstructionMethod );
+                double iEchi2 = getReconstructedEnergyChi2( iEnergyReconstructionMethod );
+
+                if( iErec > 0. && iEchi2 <= 0. )
+                {
+                        if( bCount && fStats )
+                        {
+                                fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+                                fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
+                        }
+                        return false;
+                }
+                if( iErec < fCut_Erec_min )
+                {
+                        if( bCount && fStats )
+                        {
+                                fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+                                fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
+                        }
+                        return false;
+                }
+                if( iErec > fCut_Erec_max )
+                {
+                        if( bCount && fStats )
+                        {
+                                fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+                                fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
+                        }
+                        return false;
+                }
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////
 	// check core positions
 	// (average distance to telescopes with images)
 	double iR = 0.;
-	double iR_min = 1.e99;
+	double iR_min = 1.e10;
 	double iNTR = 0.;
 	for( int i = 0; i < fData->NImages; i++ )
 	{
@@ -1392,104 +1242,39 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 */
 bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnergyReconstructionMethod, bool bCount )
 {
-	if( iEnergyReconstructionMethod == 0 )
-	{
-		if( fData->EChi2 < fCut_EChi2_min || fData->EChi2 > fCut_EChi2_max )
-		{
-			if( bCount && fStats )
-			{
-				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
-			}
-			return false;
-		}
-		if( fData->Erec < fCut_Erec_min || fData->Erec > fCut_Erec_max )
-		{
-			if( bCount && fStats )
-			{
-				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
-			}
-			return false;
-		}
-		if( fData->dE < fCut_dE_min || fData->dE > fCut_dE_max )
-		{
-			if( bCount && fStats )
-			{
-				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
-			}
-			return false;
-		}
-		if( fData->dE > fCut_dE_max )
-		{
-			return false;
-		}
-	}
-	else if( iEnergyReconstructionMethod == 1 )
-	{
-		if( fData->EChi2S < fCut_EChi2_min || fData->EChi2S > fCut_EChi2_max )
-		{
-			if( bCount && fStats )
-			{
-				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
-			}
-			return false;
-		}
-		if( fData->ErecS < fCut_Erec_min || fData->ErecS > fCut_Erec_max )
-		{
-			if( bCount && fStats )
-			{
-				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
-			}
-			return false;
-		}
-		if( fData->dES < fCut_dE_min || fData->dES > fCut_dE_max )
-		{
-			if( bCount && fStats )
-			{
-				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
-			}
-			return false;
-		}
-	}
-	else if( iEnergyReconstructionMethod == 2 )
-	{
-		if( fData->EChi2S < fCut_EChi2_min || fData->EChi2S > fCut_EChi2_max )
-		{
-			if( bCount && fStats )
-			{
-				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
-			}
-			return false;
-		}
-		if( fData->ErecS < fCut_Erec_min || fData->ErecS > fCut_Erec_max )
-		{
-			if( bCount && fStats )
-			{
-				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
-			}
-			return false;
-		}
-		if( fData->dES < fCut_dE_min || fData->dES > fCut_dE_max )
-		{
-			if( bCount && fStats )
-			{
-				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
-			}
-			return false;
-		}
-	}
-	else if( iEnergyReconstructionMethod == 100 )
+        double iErec = getReconstructedEnergy( iEnergyReconstructionMethod );
+        double iErecChi2 = getReconstructedEnergyChi2( iEnergyReconstructionMethod );
+        double idE = getReconstructedEnergydE( iEnergyReconstructionMethod );
+
+        if( iEnergyReconstructionMethod == 100 )
 	{
 		return true;
 	}
-	// unknown reconstruction method
-	else
-	{
-		if( bCount && fStats )
-		{
-			fStats->updateCutCounter( VGammaHadronCutsStatistics::eError );
-		}
-		return false;
-	}
+
+        if( iErecChi2 < fCut_EChi2_min || iErecChi2 > fCut_EChi2_max )
+        {
+                if( bCount && fStats )
+                {
+                        fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
+                }
+                return false;
+        }
+        if( iErec < fCut_Erec_min || iErec > fCut_Erec_max )
+        {
+                if( bCount && fStats )
+                {
+                        fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
+                }
+                return false;
+        }
+        if( idE < fCut_dE_min || idE > fCut_dE_max )
+        {
+                if( bCount && fStats )
+                {
+                        fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
+                }
+                return false;
+        }
 	
 	return true;
 }
@@ -1544,7 +1329,7 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
 	}
 	/////////////////////////////////////////////////////////////////////////////
 	// apply cut using TMVA reader
-	else if( fGammaHadronCutSelector / 10 == 4 )
+	else if( useTMVACuts() )
 	{
 		if( fDebug )
 		{
@@ -1561,7 +1346,7 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
 	}
 	/////////////////////////////////////////////////////////////////////////////
 	// apply Frogs Cuts
-	else if( fGammaHadronCutSelector / 10 == 5 )
+	else if( useFrogsCuts() )
 	{
 		if( !applyFrogsCut( i, fIsOn ) )
 		{
@@ -1573,7 +1358,7 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
 		}
 	}
 	// apply Model3D Cuts
-	else if( fGammaHadronCutSelector / 10 == 6 )
+	else if( useModel3DCuts() )
 	{
 		if( !applyModel3DCut( i, fIsOn ) )
 		{
@@ -1615,29 +1400,23 @@ bool VGammaHadronCuts::applyTMVACut( int i )
 }
 
 /*
-   appy Cuts to frogs data.
+   apply Cuts to frogs data.
 */
 
 bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 {
-	/*	if( fData && !fData->isFrogs() )
-	{
-		cout << "VGammaHadronCuts::applyFrogsCut error: input data (mscw file) without frogs data" << endl;
-		cout << "exiting..." << endl;
-		exit( EXIT_FAILURE );
-		}*/
-	
 	if( fData->frogsEnergy < -99. || fabs( fData->frogsEnergy ) < 1E-18 || fData->frogsNImages < 1 )
 	{
 		return false;
 	}
 	
 	double ShowerGoodnessCut_max = -99.;
-	if( fFrogsShowerGoodness && fFrogsShowerGoodness->GetN() > 0 )
+        if( getEnergyDependentCut( "ShowerGoodness" ) && getEnergyDependentCut( "ShowerGoodness" )->GetN() > 0 )
 	{
-		ShowerGoodnessCut_max = getShowerGoodnessCut_max( fData->frogsEnergy );
+                ShowerGoodnessCut_max = getEnergyDependentCut( fData->frogsEnergy, getEnergyDependentCut( "ShowerGoodness" ), false, true );
+
 		double fMeanShowerGoodness =
-			getMeanGoodness( fData->frogsTelGoodnessImg0, fData->frogsTelGoodnessImg1, fData->frogsTelGoodnessImg2, fData->frogsTelGoodnessImg3 );
+			getMeanGoodness( fData->frogsTelGoodnessImg0, fData->frogsTelGoodnessImg1, fData->frogsTelGoodnessImg2, fData->frogsTelGoodnessImg3, fData->frogsEventID );
 		if( fMeanShowerGoodness > ShowerGoodnessCut_max )
 		{
 			return false;
@@ -1645,11 +1424,11 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 	}
 	
 	double BackgroundGoodnessCut_max = -99.;
-	if( fFrogsBackgroundGoodness && fFrogsBackgroundGoodness->GetN() > 0 )
+	if( getEnergyDependentCut( "BackgroundGoodness" ) && getEnergyDependentCut( "BackgroundGoodness" )->GetN() > 0 )
 	{
-		BackgroundGoodnessCut_max = getBackgroundGoodnessCut_max( fData->frogsEnergy );
+                BackgroundGoodnessCut_max = getEnergyDependentCut( fData->frogsEnergy, getEnergyDependentCut( "BackgroundGoodness" ), false, true );
 		double fMeanBackgroundGoodness =
-			getMeanGoodness( fData->frogsTelGoodnessBkg0, fData->frogsTelGoodnessBkg1, fData->frogsTelGoodnessBkg2, fData->frogsTelGoodnessBkg3 );
+			getMeanGoodness( fData->frogsTelGoodnessBkg0, fData->frogsTelGoodnessBkg1, fData->frogsTelGoodnessBkg2, fData->frogsTelGoodnessBkg3, fData->frogsEventID );
 		if( fMeanBackgroundGoodness > BackgroundGoodnessCut_max )
 		{
 			return false;
@@ -1657,9 +1436,9 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 	}
 	
 	double MSCWCut_max = -99.;
-	if( fFrogsMSCW && fFrogsMSCW->GetN() > 0 )
+	if( getEnergyDependentCut( "MSCW" ) && getEnergyDependentCut( "MSCW" )->GetN() > 0 )
 	{
-		MSCWCut_max = getMSCWCut_max( fData->frogsEnergy );
+		MSCWCut_max = getEnergyDependentCut( fData->frogsEnergy, getEnergyDependentCut( "MSCW" ), false, true );
 		if( fData->MSCW > MSCWCut_max )
 		{
 			return false;
@@ -1667,9 +1446,9 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 	}
 	
 	double MSCLCut_max = -99.;
-	if( fFrogsMSCL && fFrogsMSCL->GetN() > 0 )
+	if( getEnergyDependentCut( "MSCL" ) && getEnergyDependentCut( "MSCL" )->GetN() > 0 )
 	{
-		MSCLCut_max = getMSCLCut_max( fData->frogsEnergy );
+		MSCLCut_max = getEnergyDependentCut( fData->frogsEnergy, getEnergyDependentCut( "MSCL" ), false, true );
 		if( fData->MSCL > MSCLCut_max )
 		{
 			return false;
@@ -1678,73 +1457,6 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 	
 	return true;
 	
-	/********* back of fag packet cuts ********/
-	if( fData->MSCW > 0.35 )
-	{
-		return false;
-	}
-	if( fData->MSCL > 0.70 )
-	{
-		return false;
-	}
-	double mean = ( fData->frogsTelGoodnessImg0 + fData->frogsTelGoodnessImg1 + fData->frogsTelGoodnessImg2 + fData->frogsTelGoodnessImg3 ) / 4.;
-	if( fData->frogsEnergy > -1.30 && fData->frogsEnergy <= -0.60 )
-	{
-		if( mean > 0.29 )
-		{
-			return false;
-		}
-		return true;
-	}
-	else if( fData->frogsEnergy > -0.60 && fData->frogsEnergy <= -0.40 )
-	{
-		if( mean > 0.55 )
-		{
-			return false;
-		}
-		return true;
-	}
-	else if( fData->frogsEnergy > -0.40 && fData->frogsEnergy <= -0.22 )
-	{
-		if( mean > 0.75 )
-		{
-			return false;
-		}
-		return true;
-	}
-	else if( fData->frogsEnergy > -0.22 && fData->frogsEnergy <= -0.10 )
-	{
-		if( mean > 1.08 )
-		{
-			return false;
-		}
-		return true;
-	}
-	else if( fData->frogsEnergy > -0.10 && fData->frogsEnergy <= 0.0 )
-	{
-		if( mean > 1.98 )
-		{
-			return false;
-		}
-		return true;
-	}
-	else if( fData->frogsEnergy > 0.00 && fData->frogsEnergy <= 0.30 )
-	{
-		if( mean > 4.50 )
-		{
-			return false;
-		}
-		return true;
-	}
-	else if( fData->frogsEnergy > 0.30 )
-	{
-		if( mean > 4.50 )
-		{
-			return false;
-		}
-		return true;
-	}
-	return false;
 }
 
 /*
@@ -2013,14 +1725,14 @@ void VGammaHadronCuts::initializeCuts( int irun, string iFile )
 		}
 	}
 	// TMVA cuts
-	else if( fGammaHadronCutSelector / 10 == 4 )
+	else if( useTMVACuts() )
 	{
 		if( !initTMVAEvaluator( fTMVAWeightFile, fTMVAWeightFileIndex_min, fTMVAWeightFileIndex_max ) )
 		{
 			cout << "VGammaHadronCuts::initializeCuts: failed setting TMVA reader for " << fTMVAWeightFile;
 			cout << "(" << fTMVAWeightFileIndex_min << "," << fTMVAWeightFileIndex_max << ")" << endl;
 			cout << "exiting..." << endl;
-			exit( -1 );
+			exit( EXIT_FAILURE );
 		}
 	}
 	// phase cuts
@@ -2038,7 +1750,7 @@ void VGammaHadronCuts::initializeCuts( int irun, string iFile )
 		{
 			cout << "VGammaHadronCuts::initializeCuts: failed setting phase cuts for " << irun << " " << iFile << endl;
 			cout << "exiting..." << endl;
-			exit( -1 );
+			exit( EXIT_FAILURE );
 		}
 	}
 }
@@ -2100,11 +1812,11 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
 	{
 		fTMVAEvaluator->setIgnoreTheta2Cut( true );
 	}
-	fTMVABoxCut_Theta2_max = fTMVAEvaluator->getOptimalTheta2Cut_Graph();
-	if( fTMVABoxCut_Theta2_max )
+        fEnergyDependentCut[ "TMVABoxCut_Theta2_max" ] = fTMVAEvaluator->getOptimalTheta2Cut_Graph();
+        if( getTheta2Cut_TMVA_max() )
 	{
 		cout << "VGammaHadronCuts::initTMVAEvaluator: found theta2_max graph from TMVA" << endl;
-		fTMVABoxCut_Theta2_max->SetName( "TMVAtheta2" );
+		getTheta2Cut_TMVA_max()->SetName( "TMVAtheta2" );
 	}
 	
 	if( cDir )
@@ -2226,14 +1938,7 @@ bool VGammaHadronCuts::initPhaseCuts( string iDir )
 bool VGammaHadronCuts::applyInsideFiducialAreaCut( bool bCount )
 {
 
-	if( fData->fFrogs == 1 )
-	{
-		return applyInsideFiducialAreaCut( fData->frogsXS, fData->frogsYS, bCount );
-	}
-	else
-	{
-		return applyInsideFiducialAreaCut( fData->Xoff, fData->Yoff, bCount );
-	}
+        return applyInsideFiducialAreaCut( getReconstructedXoff(), getReconstructedYoff(), bCount );
 }
 
 bool VGammaHadronCuts::applyInsideFiducialAreaCut( float Xoff, float Yoff, bool bCount )
@@ -2333,7 +2038,7 @@ bool VGammaHadronCuts::applyTelTypeTest( bool bCount )
 
 /*!
 
-  NOTE: THIS IS NOTE USED
+  NOTE: THIS IS NOT USED
 
   check if core is inside a certain area relative to centre of array (ground, not shower coordinates)
 
@@ -2345,8 +2050,8 @@ bool VGammaHadronCuts::applyTelTypeTest( bool bCount )
 */
 bool VGammaHadronCuts::applyShowerCoreCuts( bool iMC )
 {
-	double xcore = fData->Xcore - fArrayCentre_X;
-	double ycore = fData->Ycore - fArrayCentre_Y;
+	double xcore = getReconstructedXcore() - fArrayCentre_X;
+	double ycore = getReconstructedYcore( )- fArrayCentre_Y;
 	// use MC core position
 	if( iMC )
 	{
@@ -2443,20 +2148,12 @@ bool VGammaHadronCuts::applyDirectionCuts( unsigned int fEnergyReconstructionMet
 	}
 	
 	// calculate theta2
-	theta2 = ( fData->Xoff - x0 ) * ( fData->Xoff - x0 ) + ( fData->Yoff - y0 ) * ( fData->Yoff - y0 );
+	theta2 = ( getReconstructedXoff() - x0 ) * ( getReconstructedXoff() - x0 ) + ( getReconstructedYoff() - y0 ) * ( getReconstructedYoff()- y0 );
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// fetch theta2 cut (max) (might be energy dependent)
-	double i_theta2_cut_max = -1.;
-	if( fEnergyReconstructionMethod == 0 )
-	{
-		i_theta2_cut_max = getTheta2Cut_max( fData->Erec );
-	}
-	else if( fEnergyReconstructionMethod == 1 )
-	{
-		i_theta2_cut_max = getTheta2Cut_max( fData->ErecS );
-	}
-	
+	double i_theta2_cut_max = getTheta2Cut_max( getReconstructedEnergy( fEnergyReconstructionMethod ) );
+
 	// direction cut (ring around center of camera)
 	if( theta2 < i_theta2_cut_max && theta2 > fCut_Theta2_min )
 	{
@@ -2469,6 +2166,46 @@ bool VGammaHadronCuts::applyDirectionCuts( unsigned int fEnergyReconstructionMet
 	}
 	
 	return false;
+}
+
+double VGammaHadronCuts::getEnergyDependentCut( double energy_TeV, TGraph *iG, bool bUseEvalue, bool bMaxCut )
+{
+        double i_cut_value = 99999;
+        if( !bMaxCut ) i_cut_value = -1;
+        if( !iG )
+        {
+            return i_cut_value;
+        }
+        // use TGraph::Eval
+        if( bUseEvalue )
+        {
+            i_cut_value  = iG->Eval( energy_TeV );
+        }    
+        // return value at this point without interpolation
+        else
+        {
+            for( int i = 0; i < iG->GetN() - 1; i++ )
+            {
+                    if( energy_TeV >= iG->GetX()[i] && energy_TeV < iG->GetX()[i + 1 ] )
+                    {
+                            i_cut_value = iG->GetY()[i + 1 ];
+                    }
+            }
+        }
+            
+        // for e outside of graph range, return edge values
+        if( iG->GetN() > 0 && iG->GetX() && iG->GetY() )
+        {
+                if( energy_TeV < iG->GetX()[0] )
+                {
+                        i_cut_value = iG->GetY()[0];
+                }
+                if( energy_TeV > iG->GetX()[iG->GetN() - 1] )
+                {
+                        i_cut_value = iG->GetY()[iG->GetN() - 1];
+                }
+        }
+        return i_cut_value;
 }
 
 /*
@@ -2513,35 +2250,11 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
 		}
 		/////////////////////////////////////////////
 		// use IRF graph for angular resolution
-		else if( ( fDirectionCutSelector == 1 || fDirectionCutSelector == 2 ) && fIRFAngRes )
+		else if( ( fDirectionCutSelector == 1 || fDirectionCutSelector == 2 ) && getTheta2Cut_IRF_Max() )
 		{
 			// get theta2 cut
-			theta_cut_max  = fIRFAngRes->Eval( e );
-			
-			if( fData && fData->isFrogs() == 1 )
-			{
-				for( int i = 0; i < fIRFAngRes->GetN() - 1; i++ )
-				{
-					if( e >= fIRFAngRes->GetX()[i] && e < fIRFAngRes->GetX()[i + 1 ] )
-					{
-						theta_cut_max = fIRFAngRes->GetY()[i + 1 ];
-					}
-				}
-			}
-			
-			
-			// for e outside of graph range, return edge values
-			if( fIRFAngRes->GetN() > 0 && fIRFAngRes->GetX() && fIRFAngRes->GetY() )
-			{
-				if( e < fIRFAngRes->GetX()[0] )
-				{
-					theta_cut_max = fIRFAngRes->GetY()[0];
-				}
-				if( e > fIRFAngRes->GetX()[fIRFAngRes->GetN() - 1] )
-				{
-					theta_cut_max = fIRFAngRes->GetY()[fIRFAngRes->GetN() - 1];
-				}
-			}
+
+			theta_cut_max  = getEnergyDependentCut( e, getTheta2Cut_IRF_Max(), !useFrogsCuts() );
 		}
 		/////////////////////////////////////////////
 		// use TMVA determined cut
@@ -2564,21 +2277,9 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
 		}
 		/////////////////////////////////////////////
 		// use a graph with theta2 cuts
-		else if( fDirectionCutSelector == 5 && fTMVABoxCut_Theta2_max )
+		else if( fDirectionCutSelector == 5 && getTheta2Cut_TMVA_max() )
 		{
-			theta_cut_max = fTMVABoxCut_Theta2_max->Eval( e );
-			// for e outside of graph range, return edge values
-			if( fTMVABoxCut_Theta2_max->GetN() > 0 && fTMVABoxCut_Theta2_max->GetX() && fTMVABoxCut_Theta2_max->GetY() )
-			{
-				if( e < fTMVABoxCut_Theta2_max->GetX()[0] )
-				{
-					theta_cut_max = fTMVABoxCut_Theta2_max->GetY()[0];
-				}
-				if( e > fTMVABoxCut_Theta2_max->GetX()[fTMVABoxCut_Theta2_max->GetN() - 1] )
-				{
-					theta_cut_max = fTMVABoxCut_Theta2_max->GetY()[fTMVABoxCut_Theta2_max->GetN() - 1];
-				}
-			}
+			theta_cut_max = getEnergyDependentCut( e, getTheta2Cut_TMVA_max(), true, true );
 			if( theta_cut_max < 0. )
 			{
 				theta_cut_max = 0.;
@@ -2681,15 +2382,21 @@ bool VGammaHadronCuts::initAngularResolutionFile()
 		TBranch* br = t->GetBranch( "IRF" );
 		br->SetAddress( &c );
 		t->GetEntry( 0 );
-		if( c && c->fResolutionGraph.size() > VInstrumentResponseFunctionData::E_DIFF + 1 && c->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF] )
+		if( c && c->fResolutionGraph.size() > VInstrumentResponseFunctionData::E_DIFF + 1 
+                      && c->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF] )
 		{
-			fIRFAngRes = ( TGraphErrors* )c->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF]->Clone();
-			if( !fIRFAngRes )
+                        TGraph *iG = (TGraph*)c->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF]->Clone();
+                        if( iG )
+                        {
+                            iG->SetName( "IRFAngRes" );
+                            fEnergyDependentCut[ "IRFAngRes" ] = iG;
+                        }
+                        else
 			{
-				cout << "VGammaHadronCuts::initAngularResolutionFile error: reading angular resolution graph from " << fF1AngResName << endl;
+				cout << "VGammaHadronCuts::initAngularResolutionFile error: reading angular resolution graph from ";
+                                cout << fF1AngResName << endl;
 				return false;
 			}
-			fIRFAngRes->SetName( "IRFAngRes" );
 		}
 	}
 	// read a single graph with angular resolution from file
@@ -2718,17 +2425,19 @@ bool VGammaHadronCuts::setIRFGraph( TGraphErrors* g )
 		cout << "VGammaHadronCuts::setIRFGraph warning: IRF pointer is zero" << endl;
 		return false;
 	}
+        
 	
-	fIRFAngRes = new TGraphErrors( 1 );
+	TGraphErrors *iG = new TGraphErrors( 1 );
 	double x = 0.;
 	double y = 0.;
 	for( int i = 0; i < g->GetN(); i++ )
 	{
 		g->GetPoint( i, x, y );
-		fIRFAngRes->SetPoint( i, x, y );
-		fIRFAngRes->SetPointError( i, g->GetErrorX( i ), g->GetErrorY( i ) );
+		iG->SetPoint( i, x, y );
+		iG->SetPointError( i, g->GetErrorX( i ), g->GetErrorY( i ) );
 	}
-	fIRFAngRes->SetName( "IRFAngRes" );
+	iG->SetName( "IRFAngRes" );
+        fEnergyDependentCut[ "IRFAngRes" ] = iG;
 	
 	// print results
 	cout << "replaced IRF graph for direction cut" << endl;
@@ -2885,159 +2594,27 @@ bool VGammaHadronCuts::applyPhaseCut( int i )
 	
 }
 
-//////////////////////
-// FROGS
-
-void VGammaHadronCuts::printFrogsCuts( string iVariableNameFrogsCut )
+void VGammaHadronCuts::printEnergyDependentCuts()
 {
-	cout << "Frogs cut variable: " << iVariableNameFrogsCut << endl;
-	if( iVariableNameFrogsCut == "fSG" && fFrogsShowerGoodness )
-	{
-		cout << "Number of points: " << fFrogsShowerGoodness->GetN() << endl;
-		fFrogsShowerGoodness->Print();
-	}
-	if( iVariableNameFrogsCut == "fBG" && fFrogsBackgroundGoodness )
-	{
-		cout << "Number of points: " << fFrogsBackgroundGoodness->GetN() << endl;
-		fFrogsBackgroundGoodness->Print();
-	}
-	if( iVariableNameFrogsCut == "fMSCW" && fFrogsMSCW )
-	{
-		cout << "Number of points: " << fFrogsMSCW->GetN() << endl;
-		fFrogsMSCW->Print();
-	}
-	if( iVariableNameFrogsCut == "fMSCL" && fFrogsMSCL )
-	{
-		cout << "Number of points: " << fFrogsMSCL->GetN() << endl;
-		fFrogsMSCL->Print();
-	}
+        map< string, TGraph* >::iterator it;
+        for( it = fEnergyDependentCut.begin(); it != fEnergyDependentCut.end(); ++it )
+        {
+            if( it->second )
+            {
+                double x = 0.;
+                double y = 0.;
+                cout << "Energy dependent cut variable " << it->first << ": " << endl;
+                for( int i = 0; i < it->second->GetN(); i++ )
+                {
+                     it->second->GetPoint( i, x, y );
+                     cout <<  "[" << x << ",>" << y << "] ";
+                }
+                cout << endl;
+            }
+        }
 }
 
-double VGammaHadronCuts::getShowerGoodnessCut_max( double le )
-{
-	double shower_goodness_cut_max = -1.;
-        if( !fFrogsShowerGoodness ) return shower_goodness_cut_max;
-	
-	//shower_goodness_cut_max = fFrogsShowerGoodness->Eval( le );
-	
-	for( int i = 0; i < fFrogsShowerGoodness->GetN() - 1; i++ )
-	{
-		if( le >= fFrogsShowerGoodness->GetX()[i] && le < fFrogsShowerGoodness->GetX()[i + 1 ] )
-		{
-			shower_goodness_cut_max = fFrogsShowerGoodness->GetY()[i + 1 ];
-		}
-	}
-	
-	// for logE outside of graph range, return edge values
-	if( fFrogsShowerGoodness->GetN() > 0 && fFrogsShowerGoodness->GetX() && fFrogsShowerGoodness->GetY() )
-	{
-		if( le < fFrogsShowerGoodness->GetX()[0] )
-		{
-			shower_goodness_cut_max = fFrogsShowerGoodness->GetY()[0];
-		}
-		if( le > fFrogsShowerGoodness->GetX()[fFrogsShowerGoodness->GetN() - 1] )
-		{
-			shower_goodness_cut_max = fFrogsShowerGoodness->GetY()[fFrogsShowerGoodness->GetN() - 1];
-		}
-	}
-	
-	return shower_goodness_cut_max;
-}
-
-double VGammaHadronCuts::getBackgroundGoodnessCut_max( double le )
-{
-	double background_goodness_cut_max = -1.;
-        if( !fFrogsBackgroundGoodness ) return background_goodness_cut_max;
-	
-	//background_goodness_cut_max = fFrogsBackgroundGoodness->Eval( le );
-	
-	for( int i = 0; i < fFrogsBackgroundGoodness->GetN() - 1; i++ )
-	{
-		if( le >= fFrogsBackgroundGoodness->GetX()[i] && le < fFrogsBackgroundGoodness->GetX()[i + 1 ] )
-		{
-			background_goodness_cut_max = fFrogsBackgroundGoodness->GetY()[i + 1 ];
-		}
-	}
-	
-	// for logE outside of graph range, return edge values
-	if( fFrogsBackgroundGoodness->GetN() > 0 && fFrogsBackgroundGoodness->GetX() && fFrogsBackgroundGoodness->GetY() )
-	{
-		if( le < fFrogsBackgroundGoodness->GetX()[0] )
-		{
-			background_goodness_cut_max = fFrogsBackgroundGoodness->GetY()[0];
-		}
-		if( le > fFrogsBackgroundGoodness->GetX()[fFrogsBackgroundGoodness->GetN() - 1] )
-		{
-			background_goodness_cut_max = fFrogsBackgroundGoodness->GetY()[fFrogsBackgroundGoodness->GetN() - 1];
-		}
-	}
-	
-	return background_goodness_cut_max;
-}
-
-double VGammaHadronCuts::getMSCWCut_max( double le )
-{
-	double MSCW_cut_max = -1.;
-        if( !fFrogsMSCW ) return MSCW_cut_max;
-	
-	//MSCW_cut_max = fFrogsMSCW->Eval( le );
-	
-	for( int i = 0; i < fFrogsMSCW->GetN() - 1; i++ )
-	{
-		if( le >= fFrogsMSCW->GetX()[i] && le < fFrogsMSCW->GetX()[i + 1 ] )
-		{
-			MSCW_cut_max = fFrogsMSCW->GetY()[i + 1 ];
-		}
-	}
-	
-	// for logE outside of graph range, return edge values
-	if( fFrogsMSCW->GetN() > 0 && fFrogsMSCW->GetX() && fFrogsMSCW->GetY() )
-	{
-		if( le < fFrogsMSCW->GetX()[0] )
-		{
-			MSCW_cut_max = fFrogsMSCW->GetY()[0];
-		}
-		if( le > fFrogsMSCW->GetX()[fFrogsMSCW->GetN() - 1] )
-		{
-			MSCW_cut_max = fFrogsMSCW->GetY()[fFrogsMSCW->GetN() - 1];
-		}
-	}
-	
-	return MSCW_cut_max;
-}
-
-double VGammaHadronCuts::getMSCLCut_max( double le )
-{
-	double MSCL_cut_max = -1.;
-        if( !fFrogsMSCL ) return MSCL_cut_max;
-	
-	//MSCL_cut_max = fFrogsMSCL->Eval( le );
-	
-	for( int i = 0; i < fFrogsMSCL->GetN() - 1; i++ )
-	{
-		if( le >= fFrogsMSCL->GetX()[i] && le < fFrogsMSCL->GetX()[i + 1 ] )
-		{
-			MSCL_cut_max = fFrogsMSCL->GetY()[i + 1 ];
-		}
-	}
-	
-	// for logE outside of graph range, return edge values
-	if( fFrogsMSCL->GetN() > 0 && fFrogsMSCL->GetX() && fFrogsMSCL->GetY() )
-	{
-		if( le < fFrogsMSCL->GetX()[0] )
-		{
-			MSCL_cut_max = fFrogsMSCL->GetY()[0];
-		}
-		if( le > fFrogsMSCL->GetX()[fFrogsMSCL->GetN() - 1] )
-		{
-			MSCL_cut_max = fFrogsMSCL->GetY()[fFrogsMSCL->GetN() - 1];
-		}
-	}
-	
-	return MSCL_cut_max;
-}
-
-double VGammaHadronCuts::getMeanGoodness( double G0, double G1, double G2, double G3 )
+double VGammaHadronCuts::getMeanGoodness( double G0, double G1, double G2, double G3, int iFrogsEventID )
 {
 	int N = 0;
 	double sum = 0.;
@@ -3065,6 +2642,7 @@ double VGammaHadronCuts::getMeanGoodness( double G0, double G1, double G2, doubl
 	if( N == 0 )
 	{
 		cout << "VGammaHadronCuts::getMeanGoodness error: none of the goodness-of-fit values have a good number (good number means > -99) " << endl;
+                cout << "\t failure at frogs event ID " << iFrogsEventID << endl;
 		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
 	}
@@ -3083,6 +2661,177 @@ string VGammaHadronCuts::getTelToAnalyzeString()
 	return iTemp.str();
 }
 
+double VGammaHadronCuts::getReconstructedEnergy( unsigned int iEnergyReconstructionMethod )
+{
+       if( !fData ) 
+       {
+           return -99.;
+       }
+       if( useFrogsCuts() )
+       {
+            if( fData->frogsEnergy > -99. ) return TMath::Power( 10., fData->frogsEnergy );
+            else                            return -99.;
+       }
+       else if( iEnergyReconstructionMethod == 0 )
+       {
+           return fData->Erec;
+       }
+       else if( iEnergyReconstructionMethod == 1 )
+       {
+           return fData->ErecS;
+       }
+       return -99.;
+}
+
+double VGammaHadronCuts::getReconstructedEnergyChi2( unsigned int iEnergyReconstructionMethod )
+{
+       if( !fData ) 
+       {
+           return -99.;
+       }
+       if( useFrogsCuts() )
+       {
+            if( fData->frogsEnergy > -99. ) return 1.;
+            else                            return -99.;
+       }
+       else if( iEnergyReconstructionMethod == 0 )
+       {
+           return fData->EChi2;
+       }
+       else if( iEnergyReconstructionMethod == 1 )
+       {
+           return fData->EChi2S;
+       }
+       return -99.;
+}
+
+double VGammaHadronCuts::getReconstructedEnergydE( unsigned int iEnergyReconstructionMethod )
+{
+       if( !fData ) 
+       {
+           return -99.;
+       }
+       if( useFrogsCuts() )
+       {
+            if( fData->frogsEnergy > -99. ) return 1.;
+            else                            return -99.;
+       }
+       else if( iEnergyReconstructionMethod == 0 )
+       {
+           return fData->dE;
+       }
+       else if( iEnergyReconstructionMethod == 1 )
+       {
+           return fData->dES;
+       }
+       return -99.;
+}
+
+double VGammaHadronCuts::getReconstructedXoff()
+{
+      if( !fData )
+      {
+         return -9999.;
+      }
+
+      if( useFrogsCuts() )
+      {
+          return fData->frogsXS;
+      }
+      else if( useModel3DCuts() )
+      {
+          return fData->Xoff3D;
+      }
+
+      return fData->Xoff;
+}
+
+double VGammaHadronCuts::getReconstructedYoff()
+{
+      if( !fData )
+      {
+         return -9999.;
+      }
+
+      if( useFrogsCuts() )
+      {
+          // -1 sign difference for frogs ED
+          return -1.*fData->frogsYS;
+      }
+      else if( useModel3DCuts() )
+      {
+          return fData->Yoff3D;
+      }
+
+      return fData->Yoff;
+}
+
+double VGammaHadronCuts::getReconstructedXcore()
+{
+      if( !fData )
+      {
+         return -9999.;
+      }
+
+      if( useFrogsCuts() )
+      {
+          return fData->frogsXP;
+      }
+      else if( useModel3DCuts() )
+      {
+          return fData->Xcore3D;
+      }
+
+      return fData->Xcore;
+}
+
+double VGammaHadronCuts::getReconstructedYcore()
+{
+      if( !fData )
+      {
+         return -9999.;
+      }
+
+      if( useFrogsCuts() )
+      {
+          return fData->frogsYP;
+      }
+      else if( useModel3DCuts() )
+      {
+          return fData->Ycore3D;
+      }
+
+      return fData->Ycore;
+}
+
+TGraph* VGammaHadronCuts::getEnergyDependentCut( string iCutName )
+{
+      if( fEnergyDependentCut.find( iCutName ) != fEnergyDependentCut.end() )
+      {
+           return fEnergyDependentCut[iCutName];
+      }
+
+      return 0;
+}
+
+bool VGammaHadronCuts::getEnergyDependentCutFromFile( string iFileName, string iVariable )
+{
+     string iTemp = "g" + iVariable;
+     TGraph* g = ( TGraph* )TFile( iFileName.c_str(), "READ" ).Get( iTemp.c_str() );
+     if( !g )
+     {
+            cout << "VGammaHadronCuts::readCuts error while reading energy dependent cut: " << iTemp << endl;
+            cout << "exiting..." << endl;
+            exit( EXIT_FAILURE );
+     }
+     else
+     {
+            TGraph *iG = ( TGraph* )g->Clone();
+            iG->SetName( iVariable.c_str() );
+            fEnergyDependentCut[iVariable] = iG;
+     }
+     return true;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

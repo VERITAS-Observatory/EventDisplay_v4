@@ -147,8 +147,6 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	
 	fWriteEventTreeForCtools = false ;
 	
-	// frogs analysis
-	fFrogs = false;
 	// model3D analysis
 	fModel3D = false; // MODEL3DANALYSIS
 	fDirectionModel3D = false; //USEDIRECTIONMODEL3D
@@ -635,12 +633,6 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				{
 					fDirectionModel3D = true;
 				}
-			}
-			////////////////////////////////////////////////////////////
-			// Frogs Analysis
-			else if( temp == "FROGSANALYSIS" )
-			{
-				fFrogs = (bool)atoi( temp2.c_str() );
 			}
 			else
 			{

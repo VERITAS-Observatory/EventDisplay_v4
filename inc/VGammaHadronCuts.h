@@ -30,6 +30,11 @@
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
+// analysis types
+////////////////////////////////////////////////////////////////////////////////
+enum E_AnalysisType { GEO = 0, MVAAnalysis = 1, FROGS = 2, MODEL3D = 3 };
+
+////////////////////////////////////////////////////////////////////////////////
 // class for telescope type dependent multiplicity  cut
 ////////////////////////////////////////////////////////////////////////////////
 class VNTelTypeCut : public TNamed
@@ -89,6 +94,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		// cut selector
 		int fGammaHadronCutSelector;                            // see description at beginning of VGammaHadronCuts.cpp
 		int fDirectionCutSelector;
+                E_AnalysisType fAnalysisType;
 		
 		// array characteristics (number of telescopes, centre of array)
 		unsigned int fNTel;
@@ -130,7 +136,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		double          fTMVAOptimizeSignalEfficiencyObservationTime_h;
 		double          fTMVAFixedSignalEfficiencyMax;
 		double          fTMVAFixedThetaCutMin;
-		TGraph*         fTMVABoxCut_Theta2_max;
 		double          fTMVA_EvaluationResult;
 		VTMVAEvaluatorResults* fTMVAEvaluatorResults;
 		// TMVA results read from the
@@ -150,23 +155,25 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		double       fAngRes_AbsoluteMinimum;
 		double       fAngRes_AbsoluteMaximum;
 		unsigned int fAngResContainmentProbability;
-		// energy dependent theta2 cuts from IRF file
-		TGraphErrors* fIRFAngRes;
 		
 		//////////////////////////
 		// FROGS
 		string  fFileNameFrogsCut;
-		TGraph* fFrogsShowerGoodness;     // shower goodness cuts
-		TGraph* fFrogsBackgroundGoodness; // background goodness cuts
-		TGraph* fFrogsMSCW;               // mscw cuts
-		TGraph* fFrogsMSCL;               // mscl cuts
-		
+
+		//////////////////////////
+                // energy dependent cuts
+                map< string, TGraph* > fEnergyDependentCut;
+		 
 		// cut statistics
 		VGammaHadronCutsStatistics* fStats;                       //!
 		
 		bool   applyProbabilityCut( int i, bool fIsOn );
 		bool   applyFrogsCut( int i, bool fIsOn );
 		bool   applyModel3DCut( int i, bool fIsOn );
+                double getEnergyDependentCut( double energy_TeV, TGraph *iG, bool bUseEvalue = true, bool bMaxCut = true );
+                TGraph* getEnergyDependentCut( string iCutName );
+                bool   getEnergyDependentCutFromFile( string iFileName, string iVariable );
+                double getMeanGoodness( double, double, double, double, int );
 		bool   initAngularResolutionFile();
 		bool   initPhaseCuts( int irun );
 		bool   initPhaseCuts( string iDir );
@@ -180,24 +187,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		////////////////////////////////////////////////////////////////////////////////
 		
 	public:
-	
-	
-		// cut variable values
-		// mono cuts
-		double fAlpha_min;
-		double fAlpha_max;
-		double fDistance_min;
-		double fDistance_max;
-		double fLos_min;
-		double fLos_max;
-		double fLength_min;
-		double fLength_max;
-		double fWidth_min;
-		double fWidth_max;
-		double fAsymm_min;
-		double fAsymm_max;
-		double fSize_min;
-		double fSize_max;
 		// stereo cuts
 		double fCut_MeanImageDistance_min;
 		double fCut_MeanImageDistance_max;
@@ -280,15 +269,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		bool   applyTMVACut( int i );
 		bool   applyTelTypeTest( bool bCount = false );
 		
-		//////////////////////////
-		// FROGS
-		void   printFrogsCuts( string );
-		double getShowerGoodnessCut_max( double );
-		double getBackgroundGoodnessCut_max( double );
-		double getMSCWCut_max( double );
-		double getMSCLCut_max( double );
-		double getMeanGoodness( double, double, double, double );
-		
 		TF1*   getAngularResolutionFunction()
 		{
 			return fF1AngRes;
@@ -313,6 +293,13 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		{
 			return fArrayCentre_Y;
 		}
+                double getReconstructedEnergy( unsigned int iEnergyReconstructionMethod = 0 );
+                double getReconstructedEnergyChi2( unsigned int iEnergyReconstructionMethod = 0 );
+                double getReconstructedEnergydE( unsigned int iEnergyReconstructionMethod = 0. );
+                double getReconstructedXoff();
+                double getReconstructedYoff();
+                double getReconstructedXcore();
+                double getReconstructedYcore();
 		int    getDirectionCutSelector()
 		{
 			return fDirectionCutSelector;
@@ -367,12 +354,12 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		double getTheta2Cut_max( double e );                           // get theta2 max cut (might be energy dependent)    [TeV] energy (linear)
 		TGraph* getTheta2Cut_TMVA_max()
 		{
-			return fTMVABoxCut_Theta2_max;
+                        return getEnergyDependentCut( "TMVABoxCut_Theta2_max" );
 		}
 		TGraph* getTheta2Cut_IRF_Max()
 		{
-			return fIRFAngRes;
-		}
+                        return getEnergyDependentCut( "IRFAngRes" );
+                }
 		double getTMVA_EvaluationResult()
 		{
 			return fTMVA_EvaluationResult;
@@ -401,6 +388,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			}
 		}
 		void   printDirectionCuts();
+                void   printEnergyDependentCuts();
 		void   printSignalEfficiency();
 		void   printTMVA_MVACut();
 		bool   readCuts( string i_cutfilename, int iPrint = 1 );
@@ -446,11 +434,23 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			fCut_Theta2_max = it2;
 		}
 		void   terminate();
+                bool   useModel3DCuts()
+                {
+                       return (fAnalysisType == MODEL3D);
+                }
+                bool   useFrogsCuts()
+                {
+                       return (fAnalysisType == FROGS);
+                }
+                bool   useTMVACuts()
+                {
+                       return (fAnalysisType == MVAAnalysis);
+                }
 		bool   useOrbitalPhaseCuts()
 		{
 			return fUseOrbitalPhaseCuts;
 		}
 		
-		ClassDef( VGammaHadronCuts, 49 );
+		ClassDef( VGammaHadronCuts, 51 );
 };
 #endif

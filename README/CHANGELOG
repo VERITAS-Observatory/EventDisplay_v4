@@ -2,6 +2,17 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140925 (GM)
+removed obsolte VMonoPlots class
+
+* 20140925 (GM)
+significant updated to VGammaHadronCuts to simplify
+handling of different analaysis
+cleanup of cuts
+
+* 20140924 (GM)
+added additional pointer checks in VDB_Connection
+
 * 20140918 (HF)
 Fixed treatment of 3-Telescope runs when selecting telescope combinations in gamma/hadron cuts.
 Trunk not compatible with v451 IRFs in 3-telelescope runs anymore, bug fix release to follow.

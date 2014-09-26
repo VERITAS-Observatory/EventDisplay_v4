@@ -538,7 +538,7 @@ makeEffectiveArea:	$(EFFOBJECT) ./obj/VASlalib.o ./obj/makeEffectiveArea.o
 ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \
                 ./obj/VStereoHistograms.o \
 		./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
-                ./obj/VStereoAnalysis.o ./obj/VMonoPlots.o \
+                ./obj/VStereoAnalysis.o \
                 ./obj/VSkyCoordinates.o \
                 ./obj/VOnOff.o ./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
 		./obj/VStereoMaps.o ./obj/VRatePlots.o \

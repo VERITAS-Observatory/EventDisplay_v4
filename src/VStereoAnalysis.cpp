@@ -424,6 +424,8 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	double iErec = 0.;
 	double iErecChi2 = 0.;
 	double iPedVar_temp = 0.;
+        double iXoff = 0.;
+        double iYoff = 0.;
 	// for time-check save old-time and new-time
 	double oldtime = 0.;
 	double newtime = 0.;
@@ -501,26 +503,12 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			}
 			
 			// get energy (depending on energy reconstruction method)
-			if( fRunPara->fFrogs )
-			{
-				iErec = ( float )( fDataRun->frogsEnergy );
-				iErec = pow( 10.0, iErec );
-				iErecChi2 = 0.0;
-			}
-			else
-			{
-				if( fRunPara->fEnergyReconstructionMethod == 0 )
-				{
-					iErec = fDataRun->Erec;
-					iErecChi2 = fDataRun->EChi2;
-				}
-				else if( fRunPara->fEnergyReconstructionMethod == 1 )
-				{
-					iErec = fDataRun->ErecS;
-					iErecChi2 = fDataRun->EChi2S;
-				}
-			}
-			
+                        iErec = fCuts->getReconstructedEnergy( fRunPara->fEnergyReconstructionMethod );
+                        iErecChi2 = fCuts->getReconstructedEnergyChi2( fRunPara->fEnergyReconstructionMethod );
+                        // get shower direction (depending on shower reconstruction method)
+                        iXoff = fCuts->getReconstructedXoff();
+                        iYoff = fCuts->getReconstructedYoff();
+
 			////////////////////////////////////////////////
 			// apply all quality cuts
 			//
@@ -541,10 +529,10 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			fHisto[fHisCounter]->hImagePatternBeforeCuts->Fill( fDataRun->ImgSel );
 			
 			// direction offset
-			iDirectionOffset = sqrt( getXoff() * getXoff() + getYoff() * getYoff() );
+			iDirectionOffset = sqrt(iXoff*iXoff + iYoff*iYoff );
 			
 			// derotate coordinates
-			getDerotatedCoordinates( icounter, i_UTC, getXoff(), fEVDVersionSign * getYoff(),  i_xderot, i_yderot );
+			getDerotatedCoordinates( icounter, i_UTC, iXoff, fEVDVersionSign * iYoff,  i_xderot, i_yderot );
 			
 			// gamma/hadron cuts
 			bIsGamma = fCuts->isGamma( i, false, fIsOn );
@@ -588,7 +576,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			// histograms after shape (or other gamma/hadron separation cuts) cuts only
 			if( bIsGamma )
 			{
-				fHisto[fHisCounter]->hxyoff_stereo->Fill( getXoff(), getYoff() );
+				fHisto[fHisCounter]->hxyoff_stereo->Fill( iXoff, iYoff );
 			}
 			
 			/////////////////////////////////////////////////////////
@@ -673,7 +661,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 				fHisto[fHisCounter]->hTriggerPatternAfterCuts->Fill( fDataRun->LTrig );
 				fHisto[fHisCounter]->hImagePatternAfterCuts->Fill( fDataRun->ImgSel );
 				// make core plots
-				fHisto[fHisCounter]->hcore->Fill( getXcore(), getYcore() );
+				fHisto[fHisCounter]->hcore->Fill( fCuts->getReconstructedXcore(), fCuts->getReconstructedYcore() );
 				// ##################################
 				// spectral energy reconstruction
 				// apply energy reconstruction cuts
@@ -1860,17 +1848,17 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
                         cout << "exiting..." << endl;
 			exit( EXIT_FAILURE );
 		}
-		if( fRunPara->fFrogs )
-		{
-			fDataFrogsTree = ( TTree* )fDataFile->Get( "frogspars" );
-			if( !fDataFrogsTree )
-			{
-				cout << "VStereoAnalysis::getDataFromFile() error: cannot find frogspars tree in " << iFileName << endl;
-                                cout << "exiting..." << endl;
-				exit( EXIT_FAILURE );
-			}
-			fDataRunTree->AddFriend( fDataFrogsTree );
-		}
+                fDataFrogsTree = ( TTree* )fDataFile->Get( "frogspars" );
+                if( !fDataFrogsTree )
+                {
+                        cout << "VStereoAnalysis::getDataFromFile() error: cannot find frogspars tree in " << iFileName << endl;
+                        cout << "exiting..." << endl;
+                        exit( EXIT_FAILURE );
+                }
+                else
+                {
+                       fDataRunTree->AddFriend( fDataFrogsTree );
+                }
 		c = new CData( fDataRunTree );
                 // read current epoch from data file
                 VEvndispRunParameter *i_runPara = (VEvndispRunParameter*)fDataFile->Get("runparameterV2");
@@ -1965,7 +1953,7 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
 	fTreeSelectedEvents->Branch( "MVA", &fTreeSelected_MVA, "MVA/D" );
 	fTreeSelectedEvents->Branch( "IsGamma", &fTreeSelected_IsGamma, "IsGamma/i" );
 	
-	if( fRunPara->fModel3D )
+	if( fCuts && fCuts->useModel3DCuts() )
 	{
 		fTreeSelectedEvents->Branch( "Smax3D", &fTreeSelected_Smax3D, "Smax3D/D" );
 		fTreeSelectedEvents->Branch( "sigmaL3D", &fTreeSelected_sigmaL3D, "sigmaL3D/D" );
@@ -1984,7 +1972,7 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
 		fTreeSelectedEvents->Branch( "Converged3D", &fTreeSelected_Converged3D, "Converged3D/b" );
 	}
 	
-	if( fRunPara->fFrogs )
+	if( fCuts && fCuts->useFrogsCuts() )
 	{
 		fTreeSelectedEvents->Branch( "frogsEventID", &fTreeSelescted_frogsEventID, "frogsEventID/I" );
 		fTreeSelectedEvents->Branch( "frogsGSLConStat", &fTreeSelescted_frogsGSLConStat, "frogsGSLConStat/I" );
@@ -2362,8 +2350,6 @@ void VStereoAnalysis::fill_TreeWithAllGamma( CData* c , double i_xderot, double 
 	fTreeAll_MWR         = c->MWR ;
 	fTreeAll_MLR         = c->MLR ;
 	
-	
-	//getDerotatedCoordinates( icounter, i_UTC, getXoff(), fEVDVersionSign * getYoff(),  i_xderot, i_yderot );
 	
 	// Observation Target RA and DEC (deg)
 	fTreeAll_TargetRA  = 0.0; //fRunPara->fRunList[0].fTargetRAJ2000  + fRunPara->fRunList[0].fRaOffset  ;

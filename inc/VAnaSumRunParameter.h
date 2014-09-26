@@ -187,7 +187,6 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		// advanced analysis codes
 		bool fModel3D;
 		bool fDirectionModel3D;
-		bool fFrogs;
 		
 		// vector with all run parameters
 		vector< VAnaSumRunParameterDataClass > fRunList;
