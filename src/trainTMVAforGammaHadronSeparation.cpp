@@ -1,9 +1,9 @@
 /*! \file  trainTMVAforGammaHadronSeparation.cpp
     \brief  use TMVA methods for gamma/hadron separation
 
-    \author Gernot Maier
 */
 
+#include "TChain.h"
 #include "TCut.h"
 #include "TFile.h"
 #include "TH1D.h"
@@ -25,9 +25,9 @@
 
 using namespace std;
 
-bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iGammaHadronSeparation );
-bool trainGammaHadronSeparation( VTMVARunData* iRun, unsigned int iEnergyBin );
-bool trainReconstructionQuality( VTMVARunData* iRun, unsigned int iEnergyBin );
+bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin, bool iGammaHadronSeparation );
+bool trainGammaHadronSeparation( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin );
+bool trainReconstructionQuality( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin );
 
 /*
    check if a training variable is constant
@@ -54,7 +54,7 @@ double checkIfVariableIsConstant( VTMVARunData* iRun, TCut iCut, string iVariabl
 		cout << " background";
 	}
 	cout << " variable " << iVariable << " for consistency " << endl;
-	vector< TTree* > iTreeVector;
+	vector< TChain* > iTreeVector;
 	if( iSignal )
 	{
 		iTreeVector = iRun->fSignalTree;
@@ -65,8 +65,7 @@ double checkIfVariableIsConstant( VTMVARunData* iRun, TCut iCut, string iVariabl
 	}
 	
 	// add cut on number of telescope (per type) for
-	if( iVariable.find( "NImages_Ttype" ) != string::npos
-			|| iVariable.find( "EmissionHeightChi2" ) != string::npos )
+	if( iVariable.find( "NImages_Ttype" ) != string::npos || iVariable.find( "EmissionHeightChi2" ) != string::npos )
 	{
 		sprintf( hname, "%s >=2 ", iVariable.c_str() );
 		if( iVariable.find( "NImages_Ttype" ) != string::npos )
@@ -148,18 +147,18 @@ double checkIfVariableIsConstant( VTMVARunData* iRun, TCut iCut, string iVariabl
 
 */
 
-bool trainGammaHadronSeparation( VTMVARunData* iRun, unsigned int iEnergyBin )
+bool trainGammaHadronSeparation( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin )
 {
-	return train( iRun, iEnergyBin, true );
+	return train( iRun, iEnergyBin, iZenithBin, true );
 }
 
-bool trainReconstructionQuality( VTMVARunData* iRun, unsigned int iEnergyBin )
+bool trainReconstructionQuality( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin )
 {
-	return train( iRun, iEnergyBin, false );
+	return train( iRun, iEnergyBin, iZenithBin, false );
 }
 
 
-bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronSeparation )
+bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin, bool iTrainGammaHadronSeparation )
 {
 	// sanity checks
 	if( !iRun )
@@ -169,7 +168,11 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 	if( iRun->fEnergyCutData.size() <= iEnergyBin || iRun->fOutputFile.size() <= iEnergyBin )
 	{
 		cout << "error in train: energy bin out of range " << iEnergyBin;
-		cout << "\t" << iRun->fEnergyCutData.size() << "\t" << iRun->fOutputFile.size() << endl;
+		return false;
+	}
+	if( iRun->fZenithCutData.size() < iZenithBin || iRun->fOutputFile[0].size() < iZenithBin )
+	{
+		cout << "error in train: zenith bin out of range " << iZenithBin;
 		return false;
 	}
 	
@@ -183,7 +186,7 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 	
 	//////////////////////////////////////////
 	// defining training class
-	TMVA::Factory* factory = new TMVA::Factory( iRun->fOutputFileName.c_str(), iRun->fOutputFile[iEnergyBin], "V" );
+	TMVA::Factory* factory = new TMVA::Factory( iRun->fOutputFile[iEnergyBin][iZenithBin]->GetTitle(), iRun->fOutputFile[iEnergyBin][iZenithBin], "V" );
 	
 	////////////////////////////
 	// train gamma/hadron separation
@@ -210,10 +213,13 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 		factory->AddRegressionTarget( iRun->fReconstructionQualityTarget.c_str(), iRun->fReconstructionQualityTargetName.c_str() );
 	}
 	
-	// quality cuts before filling
-	TCut iCutSignal = iRun->fQualityCuts && iRun->fMCxyoffCut && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut;
-        TCut iCutBck = iRun->fQualityCuts && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut;
-        if( !iRun->fMCxyoffCutSignalOnly ) iCutBck = iCutBck && iRun->fMCxyoffCut;
+	// quality cuts before training
+	TCut iCutSignal = iRun->fQualityCuts && iRun->fMCxyoffCut && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut && iRun->fZenithCutData[iZenithBin]->fZenithCut;
+	TCut iCutBck = iRun->fQualityCuts && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut && iRun->fZenithCutData[iZenithBin]->fZenithCut;
+	if( !iRun->fMCxyoffCutSignalOnly )
+	{
+		iCutBck = iCutBck && iRun->fMCxyoffCut;
+	}
 	
 	// adding training variables
 	if( iRun->fTrainingVariable.size() != iRun->fTrainingVariableType.size() )
@@ -245,6 +251,7 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 				// require at least 2 image per telescope type
 				iTempCut << iTemp.str() << ">1";
 				TCut iCutCC = iTempCut.str().c_str();
+				
 				double iSignalMean = checkIfVariableIsConstant( iRun, iCutSignal && iCutCC, iTemp.str(), true, iSplitBlock );
 				double iBckMean    = checkIfVariableIsConstant( iRun, iCutBck && iCutCC, iTemp.str(), false, iSplitBlock );
 				// check if the training variable is constant
@@ -268,6 +275,7 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 			// check if the training variable is constant
 			double iSignalMean = checkIfVariableIsConstant( iRun, iCutSignal, iRun->fTrainingVariable[i].c_str(), true, iSplitBlock );
 			double iBckMean    = checkIfVariableIsConstant( iRun, iCutBck, iRun->fTrainingVariable[i].c_str(), false, iSplitBlock );
+			
 			cout << "\t mean values " << iSignalMean << "\t" << iBckMean << endl;
 			if( TMath::Abs( iSignalMean - iBckMean ) > 1.e-6
 					|| TMath::Abs( iSignalMean + 9999. ) < 1.e-2 || TMath::Abs( iBckMean + 9999. ) < 1.e-2 )
@@ -290,8 +298,9 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 	//////////////////////////////////////////
 	// prepare training events
 	// nTrain Signal=5000:nTrain Background=5000: nTest Signal=4000:nTest Background=5000
+	
 	factory->PrepareTrainingAndTestTree( iCutSignal, iCutBck, iRun->fPrepareTrainingOptions );
-										 
+	
 	//////////////////////////////////////////
 	// book all methods
 	char hname[6000];
@@ -305,11 +314,11 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 		{
 			if( iTrainGammaHadronSeparation )
 			{
-				sprintf( htitle, "BDT_%d", iEnergyBin );
+                                sprintf( htitle, "BDT_0" );
 			}
 			else
 			{
-				sprintf( htitle, "BDT_RecQuality_%d", iEnergyBin );
+			        sprintf( htitle, "BDT_RecQuality_0" );
 			}
 			if( i < iRun->fMVAMethod_Options.size() )
 			{
@@ -326,11 +335,11 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 		{
 			if( iTrainGammaHadronSeparation )
 			{
-				sprintf( htitle, "MLP_%d", iEnergyBin );
+				sprintf( htitle, "MLP_0" );
 			}
 			else
 			{
-				sprintf( htitle, "MLP_RecQuality_%d", iEnergyBin );
+				sprintf( htitle, "MLP_RecQuality_0" );
 			}
 			if( i < iRun->fMVAMethod_Options.size() )
 			{
@@ -343,7 +352,7 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 		}
 		//////////////////////////
 		// BOX CUTS
-		// (note: box cuts needs additional checking, as it might be outdated)
+		// (note: box cuts needs additional checking, as the code might be outdated)
 		else if( iRun->fMVAMethod[i] == "BOXCUTS" )
 		{
 			if( i < iRun->fMVAMethod_Options.size() )
@@ -363,7 +372,7 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 			{
 				sprintf( hname, "%s:VarProp[%d]=%s", hname, i, iRun->fTrainingVariable_VarProp[i].c_str() );
 			}
-			sprintf( htitle, "BOXCUTS_%d", iEnergyBin );
+			sprintf( htitle, "BOXCUTS_%d_%d", iEnergyBin, iZenithBin );
 			factory->BookMethod( TMVA::Types::kCuts, htitle, hname );
 		}
 	}
@@ -399,9 +408,12 @@ int main( int argc, char* argv[] )
 		{
 			VGlobalRunParameter fRunPara;
 			cout << fRunPara.getEVNDISP_VERSION() << endl;
-			exit( 0 );
+			exit( EXIT_SUCCESS );
 		}
 	}
+        cout << endl;
+        cout << "trainTMVAforGammaHadronSeparation " << VGlobalRunParameter::getEVNDISP_VERSION() << endl;
+        cout << "----------------------------------------" << endl;
 	if( argc != 2 )
 	{
 		cout << endl;
@@ -412,10 +424,6 @@ int main( int argc, char* argv[] )
 		cout << endl;
 		exit( EXIT_SUCCESS );
 	}
-	
-	cout << endl;
-	cout << "trainTMVAforGammaHadronSeparation " << endl;
-	cout << "=================================" << endl;
 	cout << endl;
 	
 	//////////////////////////////////////
@@ -449,19 +457,22 @@ int main( int argc, char* argv[] )
 	cout << "================================" << endl << endl;
 	for( unsigned int i = 0; i < fData->fEnergyCutData.size(); i++ )
 	{
-		if( fData->fEnergyCutData[i]->fEnergyCut )
+		for( unsigned int j = 0; j < fData->fZenithCutData.size(); j++ )
 		{
-			cout << "Training energy bin " << fData->fEnergyCutData[i]->fEnergyCut << endl;
-			cout << "===================================================================================" << endl;
-			cout << endl;
-		}
-		if( fData->fTrainGammaHadronSeparation )
-		{
-			trainGammaHadronSeparation( fData, i );
-		}
-		if( fData->fTrainReconstructionQuality )
-		{
-			trainReconstructionQuality( fData, i );
+			if( fData->fEnergyCutData[i]->fEnergyCut && fData->fZenithCutData[j]->fZenithCut )
+			{
+				cout << "Training energy bin " << fData->fEnergyCutData[i]->fEnergyCut << " zenith bin " << fData->fZenithCutData[j]->fZenithCut << endl;
+				cout << "===================================================================================" << endl;
+				cout << endl;
+			}
+			if( fData->fTrainGammaHadronSeparation )
+			{
+				trainGammaHadronSeparation( fData, i, j );
+			}
+			if( fData->fTrainReconstructionQuality )
+			{
+				trainReconstructionQuality( fData, i, j );
+			}
 		}
 	}
 	

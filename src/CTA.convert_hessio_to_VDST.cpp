@@ -795,12 +795,12 @@ TTree* DST_fillCalibrationTree( VDSTTree* fData, AllHessData* hsdata, map< unsig
 		cout << " (using data from simtelarray file)";
 	}
 	cout << endl;
-        if( iNSBScaling <= 0. )
-        {
-            cout << "DST_fillCalibrationTree: invalid NSB scaling factor (should be >0): iNSBScaling" << endl;
-            cout << "exiting..." << endl;
-            exit( EXIT_FAILURE );
-        }
+	if( iNSBScaling <= 0. )
+	{
+		cout << "DST_fillCalibrationTree: invalid NSB scaling factor (should be >0): iNSBScaling" << endl;
+		cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
+	}
 	
 	int fTelID = 0;
 	
@@ -915,7 +915,7 @@ TTree* DST_fillCalibrationTree( VDSTTree* fData, AllHessData* hsdata, map< unsig
 				if( !iT )
 				{
 					cout << "DST_fillCalibrationTree error: pedestal tree not found for telescope " << itel << " (type " <<  fTelescopeType[itel] << ")" << endl;
-                                        return 0;
+					return 0;
 				}
 				// now copy values over
 				iT->SetBranchAddress( "nsumwindows", &fnum_sumwindow );
@@ -925,7 +925,7 @@ TTree* DST_fillCalibrationTree( VDSTTree* fData, AllHessData* hsdata, map< unsig
 				if( iT->GetEntries() < nPixel )
 				{
 					cout << "DST_fillCalibrationTree error: number of pixels different in pedestal tree: " << nPixel << "\t" << iT->GetEntries() << endl;
-                                        return 0;
+					return 0;
 				}
 				
 				for( unsigned int p = 0; p < nPixel; p++ )
@@ -1267,7 +1267,7 @@ int main( int argc, char** argv )
 	bool   fWriteFADC = false;           // fill FADC traces into converter
 	unsigned int fDynamicRange = 0;      // dynamic range (for decision of high/low gain)
 	bool   fApplyCameraScaling = true;   // apply camera plate scaling according for DC telescopes
-        float  fNSB_scaling = 1.;            // pedvar scaling due to higher NSB
+	float  fNSB_scaling = 1.;            // pedvar scaling due to higher NSB
 	
 	static AllHessData* hsdata;
 	

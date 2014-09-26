@@ -16,7 +16,7 @@ VStereoHistograms::VStereoHistograms( string i_hsuffix, double ibinsize, double 
 	fBinSizeTime = iTimeBinSize;
 	fTimeMin = iTimeMin;
 	fTimeMax = iTimeMax;
-
+	
 	fRunNumber = -99;
 	
         // this is probably overwritten later 
@@ -98,11 +98,14 @@ void VStereoHistograms::defineHistograms()
 	double i_tmin = fTimeMin;
 	double i_tmax = fTimeMax;
 	int i_tbin = int( ( i_tmax - i_tmin ) / fBinSizeTime + 0.5 );
-	if( i_tbin <= 0 ) i_tbin = 1;
-        // distance to camera centre axis
-        double i_t_offmin = 0.;
-        double i_t_offmax = 4.;
-        int i_t_offbin = TMath::Nint( (i_t_offmax-i_t_offmin)/0.25 );
+	if( i_tbin <= 0 )
+	{
+		i_tbin = 1;
+	}
+	// distance to camera centre axis
+	double i_t_offmin = 0.;
+	double i_t_offmax = 4.;
+	int i_t_offbin = TMath::Nint( ( i_t_offmax - i_t_offmin ) / 0.25 );
 	
 	sprintf( i_key, "htheta2_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "#theta^{2} Histogram (%s)", fHisSuffix.c_str() );
@@ -303,7 +306,7 @@ void VStereoHistograms::defineHistograms()
 	hListParameterHistograms->Add( hmscl );
 	hListStereoParameterHistograms->Add( hmscl );
 	hListNameofParameterHistograms["hmscl"] = hmscl;
-
+	
 	//! setup rf histogram
 	sprintf( i_key, "hrf_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "rf Histogram (%s)", fHisSuffix.c_str() );
@@ -314,7 +317,7 @@ void VStereoHistograms::defineHistograms()
 	hListParameterHistograms->Add( hrf );
 	hListRandomForestParameterHistograms->Add( hrf );
 	hListNameofParameterHistograms["hrf"] = hrf;
-
+	
 	sprintf( i_key, "herecCounts2D_vs_distance_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "counting histogram (energy vs distance to camera centre [deg]) (%s)", fHisSuffix.c_str() );
 	herecCounts2D_vs_distance = new TH2D( i_key, i_name, i_ebin, i_emin, i_emax, i_t_offbin, i_t_offmin, i_t_offmax );
@@ -387,7 +390,7 @@ void VStereoHistograms::defineHistograms()
 	hListParameterHistograms->Add( hLinerecCounts2DtimeBinned );
 	hListEnergyHistograms->Add( hLinerecCounts2DtimeBinned );
 	hListNameofParameterHistograms["hLinerecCounts2DtimeBinned"] = hLinerecCounts2DtimeBinned;
-     
+	
 	sprintf( i_key, "hLinerecWeights_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "effective area vs. raw energy (%s)", fHisSuffix.c_str() );
 	hLinerecWeights = new TH2D( i_key, i_name, i_Linebin, i_Linemin, i_Linemax, 140, 1., 7. );
@@ -423,7 +426,7 @@ void VStereoHistograms::defineHistograms()
 	hisRateList->Add( hrate_10sec );
 	
 	sprintf( i_key, "hrate_1min_%s", fHisSuffix.c_str() );
-	hrate_1min = new TH1D( i_key, "One Minute Count rate", 50, i_emin, i_emax ); 
+	hrate_1min = new TH1D( i_key, "One Minute Count rate", 50, i_emin, i_emax );
 	hrate_1min->SetXTitle( "Time [MJD]" );
 	hrate_1min->SetYTitle( "Rate (per minute)" );
 	hisRateList->Add( hrate_1min );

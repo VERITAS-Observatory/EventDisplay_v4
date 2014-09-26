@@ -95,8 +95,10 @@ VGammaHadronCuts::VGammaHadronCuts()
 	// TMVA evaluator
 	fTMVAEvaluator = 0;
 	fTMVA_MVAMethod = "";
-	fTMVAWeightFileIndex_min = 0;
-	fTMVAWeightFileIndex_max = 0;
+	fTMVAWeightFileIndex_Emin = 0;
+	fTMVAWeightFileIndex_Emax = 0;
+	fTMVAWeightFileIndex_Zmin = 0;
+	fTMVAWeightFileIndex_Zmax = 0;
 	fTMVAWeightFile = "";
 	fTMVASignalEfficiency.clear();
 	fTMVA_MVACut.clear();
@@ -394,7 +396,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				if( fNTel == 0 || fNTel > 10 )
 				{
 					cout << "VGammaHadronCuts::readCuts warning: cut identifier " << temp << " ignored for ";
-					cout << "current telescope configuration ( " << fNTel << " telescopes)" << endl;
+					cout << "current telescope configuration ( " << fNTel << "telescopes)" << endl;
 					continue;
 				}
 				// calculate how many possible telescope combinations exist (16 for 4 telescopes)
@@ -625,29 +627,52 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			{
 				if( !is_stream.eof() )
 				{
-					is_stream >> fTMVA_MVAMethod;
+					is_stream >> temp;
+					if( temp == fInstrumentEpoch )
+					{
+						while( !is_stream.eof() )
+						{
+							if( !is_stream.eof() )
+							{
+								is_stream >> fTMVA_MVAMethod;
+							}
+							// files should have endings _fTMVAWeightFileIndex_min to _fTMVAWeightFileIndex_max
+							if( !is_stream.eof() )
+							{
+								is_stream >> fTMVAWeightFileIndex_Emin;
+							}
+							if( !is_stream.eof() )
+							{
+								is_stream >> fTMVAWeightFileIndex_Emax;
+							}
+							if( !is_stream.eof() )
+							{
+								is_stream >> fTMVAWeightFileIndex_Zmin;
+							}
+							if( !is_stream.eof() )
+							{
+								is_stream >> fTMVAWeightFileIndex_Zmax;
+							}
+							string iWeightFileDirectory;
+							if( !is_stream.eof() )
+							{
+								is_stream >> iWeightFileDirectory;
+							}
+							string iWeightFileName;
+							if( !is_stream.eof() )
+							{
+								is_stream >> iWeightFileName;
+							}
+							fTMVAWeightFile = gSystem->ExpandPathName( iWeightFileDirectory.c_str() );
+							fTMVAWeightFile += iWeightFileName;
+						}
+					}
+                                        else
+                                        {
+                                            cout << "VGammaHadronCuts::readCuts: skipping TMVAPARAMETER due to epoch mismatch:";
+                                            cout << " required: " << fInstrumentEpoch << ", is: " << temp << endl;
+                                        }
 				}
-				// files should have endings _fTMVAWeightFileIndex_min to _fTMVAWeightFileIndex_max
-				if( !is_stream.eof() )
-				{
-					is_stream >> fTMVAWeightFileIndex_min;
-				}
-				if( !is_stream.eof() )
-				{
-					is_stream >> fTMVAWeightFileIndex_max;
-				}
-				string iWeightFileDirectory;
-				if( !is_stream.eof() )
-				{
-					is_stream >> iWeightFileDirectory;
-				}
-				string iWeightFileName;
-				if( !is_stream.eof() )
-				{
-					is_stream >> iWeightFileName;
-				}
-				fTMVAWeightFile = gSystem->ExpandPathName( iWeightFileDirectory.c_str() );
-				fTMVAWeightFile += iWeightFileName;
 			}
 			else if( iCutVariable == "TMVACUTS" )
 			{
@@ -692,36 +717,53 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				}
 				if( !is_stream.eof() )
 				{
+					is_stream >> fTMVAMinSourceStrength;
+				}
+				if( !is_stream.eof() )
+				{
 					is_stream >> fTMVAFixedThetaCutMin;
 				}
 			}
 			else if( iCutVariable == "TMVASignalEfficiency" )
 			{
-				unsigned int iE = 0;
-				double iS = 0.;
-				if( !is_stream.eof() )
+				while( !is_stream.eof() )
 				{
-					is_stream >> iE;
+					unsigned int iKey = 0;
+					double iS = 0.;
+					if( !is_stream.eof() )
+					{
+						is_stream >> iKey;
+					}
+					if( !is_stream.eof() )
+					{
+						is_stream >> iS;
+					}
+					fTMVASignalEfficiency[iKey] = iS;
 				}
-				if( !is_stream.eof() )
-				{
-					is_stream >> iS;
-				}
-				fTMVASignalEfficiency[iE] = iS;
 			}
 			else if( iCutVariable == "TMVA_MVACut" )
 			{
-				unsigned int iE = 0;
-				double iS = 0.;
 				if( !is_stream.eof() )
 				{
-					is_stream >> iE;
+					is_stream >> temp;
+					if( temp == fInstrumentEpoch )
+					{
+						while( !is_stream.eof() )
+						{
+							unsigned int iKey = 0;
+							double iS = 0.;
+							if( !is_stream.eof() )
+							{
+								is_stream >> iKey;
+							}
+							if( !is_stream.eof() )
+							{
+								is_stream >> iS;
+							}
+							fTMVA_MVACut[iKey] = iS;
+						}
+					}
 				}
-				if( !is_stream.eof() )
-				{
-					is_stream >> iS;
-				}
-				fTMVA_MVACut[iE] = iS;
 				////////////////////////////////////////////////////////////////////////////////////////////////////
 			}
 			////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -910,12 +952,12 @@ void VGammaHadronCuts::printCutSummary()
 	cout << "Gamma/hadron cut selector: " << fGammaHadronCutSelector << endl;
 	if( fInstrumentEpoch != "NOT_SET" )
 	{
-	    cout << "Instrument epoch selected: " << fInstrumentEpoch << endl;
-        }
-        else
-        {
-            cout << "Instrument epoch not set" << endl;
-        }
+		cout << "Instrument epoch selected: " << fInstrumentEpoch << endl;
+	}
+	else
+	{
+		cout << "Instrument epoch not set" << endl;
+	}
 	
 	// direction cuts
 	printDirectionCuts();
@@ -979,7 +1021,9 @@ void VGammaHadronCuts::printCutSummary()
 		cout << endl;
 		cout << "TMVA gamma/hadron separation with MVA method " << fTMVA_MVAMethod;
 		cout << endl;
-		cout << "weight files: " << fTMVAWeightFile << " (" << fTMVAWeightFileIndex_min << "," << fTMVAWeightFileIndex_max << ")" << endl;
+		cout << "weight files: " << fTMVAWeightFile;
+		cout << " (" << fTMVAWeightFileIndex_Emin << "," << fTMVAWeightFileIndex_Emax << ")";
+		cout << " (" << fTMVAWeightFileIndex_Zmin << "," << fTMVAWeightFileIndex_Zmax << ")" << endl;
 		if( fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
 		{
 			cout << "using optimal signal efficiency with a requirement of ";
@@ -988,6 +1032,7 @@ void VGammaHadronCuts::printCutSummary()
 			cout << fTMVAOptimizeSignalEfficiencyObservationTime_h << " h observing time" << endl;
 			cout << "reading particle counts from " << fTMVAOptimizeSignalEfficiencyParticleNumberFile << endl;
 			cout << "   (max signal efficiency: " << fTMVAFixedSignalEfficiencyMax << ")" << endl;
+			cout << "   (min source strength: " << fTMVAMinSourceStrength << ")" << endl;
 		}
 		else
 		{
@@ -1727,10 +1772,11 @@ void VGammaHadronCuts::initializeCuts( int irun, string iFile )
 	// TMVA cuts
 	else if( useTMVACuts() )
 	{
-		if( !initTMVAEvaluator( fTMVAWeightFile, fTMVAWeightFileIndex_min, fTMVAWeightFileIndex_max ) )
+		if( !initTMVAEvaluator( fTMVAWeightFile, fTMVAWeightFileIndex_Emin, fTMVAWeightFileIndex_Emax, fTMVAWeightFileIndex_Zmin, fTMVAWeightFileIndex_Zmax ) )
 		{
 			cout << "VGammaHadronCuts::initializeCuts: failed setting TMVA reader for " << fTMVAWeightFile;
-			cout << "(" << fTMVAWeightFileIndex_min << "," << fTMVAWeightFileIndex_max << ")" << endl;
+			cout << "(" << fTMVAWeightFileIndex_Emin << "," << fTMVAWeightFileIndex_Emax << ")" << endl;
+			cout << "(" << fTMVAWeightFileIndex_Zmin << "," << fTMVAWeightFileIndex_Zmax << ")" << endl;
 			cout << "exiting..." << endl;
 			exit( EXIT_FAILURE );
 		}
@@ -1755,15 +1801,28 @@ void VGammaHadronCuts::initializeCuts( int irun, string iFile )
 	}
 }
 
-bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_min, unsigned int iTMVAWeightFileIndex_max )
+bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_Emin, unsigned int iTMVAWeightFileIndex_Emax,
+		unsigned int iTMVAWeightFileIndex_Zmin, unsigned int iTMVAWeightFileIndex_Zmax )
 {
 	TDirectory* cDir = gDirectory;
 	
 	fTMVAEvaluator = new VTMVAEvaluator();
+	
+	//EP turn off theta2 optimization except for TMVA direction cut selector flags
+	if( fDirectionCutSelector == 3 || fDirectionCutSelector == 4 || fDirectionCutSelector == 5 )
+	{
+		fTMVAEvaluator->setOptimizeAngularContainment( true );
+	}
+	else
+	{
+		fTMVAEvaluator->setOptimizeAngularContainment( false );
+	}
+	
 	fTMVAEvaluator->setDebug( fDebug );
 	// smoothing of MVA values
 	fTMVAEvaluator->setSmoothAndInterPolateMVAValues( true );
 	// set parameters for optimal MVA cut value search
+        // (always assume an alpha value of 0.2)
 	if( fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
 	{
 		fTMVAEvaluator->setSensitivityOptimizationParameters( fTMVAOptimizeSignalEfficiencySignificance_Min,
@@ -1772,6 +1831,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
 				1. / 5. );
 		fTMVAEvaluator->setSensitivityOptimizationFixedSignalEfficiency( fTMVAFixedSignalEfficiencyMax );
 		fTMVAEvaluator->setParticleNumberFile( fTMVAOptimizeSignalEfficiencyParticleNumberFile );
+		fTMVAEvaluator->setSensitivityOptimizationMinSourceStrength( fTMVAMinSourceStrength );
 	}
 	// set a constant signal efficiency
 	else if( fTMVASignalEfficiency.size() > 0 )
@@ -1789,17 +1849,19 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
 		cout << "\t fTMVASignalEfficiency: " << fTMVASignalEfficiency.size() << endl;
 		cout << "\t fTMVAProbabilityThreshold: " << fTMVA_MVACut.size() << endl;
 		cout << "exiting... " << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	fTMVAEvaluator->setTMVAMethod( fTMVA_MVAMethod );
 	fTMVAEvaluator->setTMVAAngularContainmentThetaFixedMinRadius( fTMVAFixedThetaCutMin );
 	// read MVA weight files; set MVA cut values (e.g. find optimal values)
-	if( !fTMVAEvaluator->initializeWeightFiles( iTMVAFile, iTMVAWeightFileIndex_min, iTMVAWeightFileIndex_max ) )
+	if( !fTMVAEvaluator->initializeWeightFiles( iTMVAFile, iTMVAWeightFileIndex_Emin, iTMVAWeightFileIndex_Emax,
+	              		                    iTMVAWeightFileIndex_Zmin, iTMVAWeightFileIndex_Zmax, fInstrumentEpoch ) )
 	{
 		cout << "VGammaHadronCuts::initTMVAEvaluator: error while initializing TMVA weight files" << endl;
 		cout << "exiting... " << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
+	
 	fTMVAEvaluatorResults = fTMVAEvaluator->getTMVAEvaluatorResults();
 	fTMVAEvaluator->printSignalEfficiency();
 	fTMVAEvaluator->printAngularContainmentRadius();
@@ -2535,7 +2597,7 @@ void VGammaHadronCuts::printSignalEfficiency()
 {
 	if( fTMVASignalEfficiency.size() == 0 )
 	{
-		cout << "no signal efficiency set" << endl;
+		cout << "no signal efficiency set, already optimized?" << endl;
 		return;
 	}
 	
@@ -2558,7 +2620,7 @@ void VGammaHadronCuts::printTMVA_MVACut()
 	map< unsigned int, double >::iterator iIter;
 	for( iIter = fTMVA_MVACut.begin(); iIter != fTMVA_MVACut.end(); iIter++ )
 	{
-		cout << "MVA cut for energy bin " << iIter->first << ": ";
+		cout << "MVA cut for energy/zenith bin " << iIter->first << ": ";
 		cout << iIter->second << endl;
 	}
 }

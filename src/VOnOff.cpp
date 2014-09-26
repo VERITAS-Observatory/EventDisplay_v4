@@ -206,11 +206,11 @@ void VOnOff::doOnOffforSkyHistograms( TList* ionlist, TList* iofflist, TH2D* ial
 					if( ialpha->GetBinContent( i_a, j_a ) != 0. && hon->GetBinContent( i, j ) > 0. )
 					{
 						hTemp->SetBinContent( i, j, hon->GetBinContent( i, j ) - hoff->GetBinContent( i, j )*ialpha->GetBinContent( i_a, j_a ) );
-						float iE = hon->GetBinContent( i, j ) + ialpha->GetBinContent( i_a, j_a )*ialpha->GetBinContent( i_a, j_a )*hoff->GetBinContent( i, j );
+						float iE = hon->GetBinContent( i, j ) + ialpha->GetBinContent( i_a, j_a ) * ialpha->GetBinContent( i_a, j_a ) * hoff->GetBinContent( i, j );
 						if( iE > 0. )
 						{
-						   hTemp->SetBinError( i, j, sqrt( iE ) );
-                                                }
+							hTemp->SetBinError( i, j, sqrt( iE ) );
+						}
 					}
 					else
 					{

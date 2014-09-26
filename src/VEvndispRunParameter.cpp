@@ -54,18 +54,18 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
         fsimu_HILO_from_simFile = false;
 	fsimu_noiselevel   = 250;
 	fsimu_pedestalfile_DefaultPed = 20.;
-        fsimu_lowgain_pedestal_DefaultPed = -999.;
+	fsimu_lowgain_pedestal_DefaultPed = -999.;
 	fPedestalSingleRootFile = false;
 	fnevents = -10000;
 	fFirstEvent = -10000;
-        fTimeCutsMin_min = -99;
-        fTimeCutsMin_max = -99;
+	fTimeCutsMin_min = -99;
+	fTimeCutsMin_max = -99;
 	fIsMC = 0;
 	fIgnoreCFGversions = false;
 	fPrintAnalysisProgress = 25000;
 	fRunDuration = 60. * 3600.;        // default run duration is 1 h (reset by DBRunInfo)
 	fPrintGrisuHeader = 0;
-
+	
 	fprintdeadpixelinfo = false ; // DEADCHAN if true, print list of dead pixels to evndisp.log
 
         fSaveDeadPixelRegistry = false;
@@ -85,7 +85,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fTZeroFileNumber.push_back( 0 );
 	fLowGainMultiplierFileNumber.push_back( 0 );
 	fPedLowGainFileNumber.push_back( 0 );
-        fPedLowGainFile = "";
+	fPedLowGainFile = "";
 	fGainLowGainFileNumber.push_back( 0 );
 	fTOffLowGainFileNumber.push_back( 0 );
 	fTZeroLowGainFileNumber.push_back( 0 );
@@ -96,10 +96,10 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fTelToAnalyze.push_back( 0 );
 	
 	fDeadChannelFile = "EVNDISP.validchannels.dat";
-
-        fEpochFile = "VERITAS.Epochs.runparameter";
-        fInstrumentEpoch = "noepoch";
-        fAtmosphereID = 0;
+	
+	fEpochFile = "VERITAS.Epochs.runparameter";
+	fInstrumentEpoch = "noepoch";
+	fAtmosphereID = 0;
 	fEpochGain.resize( fNTelescopes, 5.5 );
 	
 	fCameraCoordinateTransformX = 1.;
@@ -171,7 +171,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fTraceIntegrationMethod.push_back( 1 );
 	fTraceIntegrationMethod_pass1.push_back( 1 );
 	fSumWindowMaxTimedifferenceToDoublePassPosition.push_back( 10. );
-        fSumWindowMaxTimeDifferenceLGtoHG.push_back( -5. );
+	fSumWindowMaxTimeDifferenceLGtoHG.push_back( -5. );
 	fSmoothDead = false;
 	fUsePedEvents = true;
 	fFADCChargeUnit = "DC";
@@ -230,7 +230,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fCreateLnLTable = false;
 	fLnLTableFile = "";
 	fIDstartDirectionModel3D = 0;
-
+	
 	// output parameters
 	ffillhistos = false;                          // obsolete
 	foutputfileName = "";
@@ -493,14 +493,14 @@ void VEvndispRunParameter::print( int iEv )
 	{
 		cout << "number of events to analyse: " << fnevents << endl;
 	}
-        if( fTimeCutsMin_min > 0 )
-        {
-                cout << "start analysing at minute " << fTimeCutsMin_min << endl;
-        }
-        if( fTimeCutsMin_max > 0 )
-        {
-                cout << "stop analysing at minute " << fTimeCutsMin_max << endl;
-        }
+	if( fTimeCutsMin_min > 0 )
+	{
+		cout << "start analysing at minute " << fTimeCutsMin_min << endl;
+	}
+	if( fTimeCutsMin_max > 0 )
+	{
+		cout << "stop analysing at minute " << fTimeCutsMin_max << endl;
+	}
 	if( fNCalibrationEvents > 0 )
 	{
 		cout << "number of events in calibration analysis: " << fNCalibrationEvents << endl;
@@ -533,7 +533,7 @@ void VEvndispRunParameter::print( int iEv )
 			cout << "calculate pedestals from " << fsimu_pedestalfile;
 			cout << " with noise level " << fsimu_noiselevel;
 			cout << " (default ped: " << fsimu_pedestalfile_DefaultPed;
-                        cout << ")" << endl;
+			cout << ")" << endl;
 		}
 		else if( fsourcetype == 1 )
 		{
@@ -674,7 +674,10 @@ void VEvndispRunParameter::print( int iEv )
 	{
 		cout << "\t tracelib file: " << ftracefile << endl;
 	}
-        if( fsimu_lowgain_pedestal_DefaultPed > 0. ) cout << "Low gain ped assumed: " << fsimu_lowgain_pedestal_DefaultPed;
+	if( fsimu_lowgain_pedestal_DefaultPed > 0. )
+	{
+		cout << "Low gain ped assumed: " << fsimu_lowgain_pedestal_DefaultPed;
+	}
 	if( fsourcetype == 1 || fsourcetype == 5 )
 	{
 		cout << "telescope numbering offset: " << ftelescopeNOffset << endl;

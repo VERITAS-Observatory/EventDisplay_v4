@@ -124,6 +124,9 @@ class VShowerParameters
 		float fShowerYcore_SC[VDST_MAXRECMETHODS];//!< shower core in shower coordinates
 		float fShower_stdP[VDST_MAXRECMETHODS];   //!<  std (radius) about impact point
 		float fShower_Chi2[VDST_MAXRECMETHODS];   //!<  chi2 value where appropriate, < 0. for no reconstruction (-99. or angle between lines for two-images events)
+
+		float fDispDiff[VDST_MAXRECMETHODS];      //!< difference in disp event direction between telescopes
+
 		int MCprimary;
 		float MCenergy;                           //!< MC energy in [TeV]
 		float MCxcore;                            //!< MC core position in ground coordinates (x)
@@ -139,7 +142,7 @@ class VShowerParameters
 		float MCxcore_SC;                         //!< MC core position in shower coordinates
 		float MCycore_SC;                         //!< MC core position in shower coordinates
 		float MCzcore_SC;                         //!< MC core position in shower coordinates
-		
+
 		VShowerParameters( int iNTel = 4, unsigned int iShortTree = 0, unsigned int iNMethods = 1 );
 		~VShowerParameters();
 		

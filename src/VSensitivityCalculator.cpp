@@ -697,13 +697,13 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
 	}
 	else if( bNewCanvas )
 	{
-	    cSensitivity->cd();
-	    cSensitivity = plotCanvas_SensitivityvsEnergy( bUnit, ( dE_Log10 < 0. ), bNewCanvas );
-        }
-        if( !cSensitivity )
-        {
-	       return 0;
-        }
+		cSensitivity->cd();
+		cSensitivity = plotCanvas_SensitivityvsEnergy( bUnit, ( dE_Log10 < 0. ), bNewCanvas );
+	}
+	if( !cSensitivity )
+	{
+		return 0;
+	}
 	cSensitivity->cd();
 	if( !gSensitivityvsEnergy )
 	{
@@ -1055,19 +1055,22 @@ bool VSensitivityCalculator::printSensitivity()
 TCanvas* VSensitivityCalculator::plotCanvas_SensitivityvsEnergy( string bUnit, bool bIntegralSensitivity, bool bNewCanvas )
 {
 	char htitle[400];
-	TCanvas *iCanvas = 0;
+	TCanvas* iCanvas = 0;
 	if( !bNewCanvas )
 	{
-	   iCanvas = new TCanvas( fPlot_CanvasName.c_str(), fPlot_CanvasTitle.c_str(), 10, 10, fPlot_CanvasSize_x, fPlot_CanvasSize_y );
-	   iCanvas->SetGridx( 0 );
-	   iCanvas->SetGridy( 0 );
-	   iCanvas->SetLeftMargin( 0.15 );
-        }
+		iCanvas = new TCanvas( fPlot_CanvasName.c_str(), fPlot_CanvasTitle.c_str(), 10, 10, fPlot_CanvasSize_x, fPlot_CanvasSize_y );
+		iCanvas->SetGridx( 0 );
+		iCanvas->SetGridy( 0 );
+		iCanvas->SetLeftMargin( 0.15 );
+	}
 	else
 	{
-	   iCanvas = (TCanvas*)gPad;
-        }
-	if( !iCanvas ) return 0;
+		iCanvas = ( TCanvas* )gPad;
+	}
+	if( !iCanvas )
+	{
+		return 0;
+	}
 	
 	hnull = new TH1D( "hnullSens", "", 10, fEnergy_min_Log, fEnergy_max_Log );
 	hnull->SetStats( 0 );
@@ -1466,13 +1469,25 @@ void VSensitivityCalculator::plot_guidingLines( double x, TGraph* g, bool iHours
 	char hname[600];
 	if( iHours )
 	{
-		if( x > 1.e-2 ) sprintf( hname, "%d%% Crab in %d h", ( int )( x * 100. ), ( int )( i_y + 0.5 ) );
-		else            sprintf( hname, "%.2f%% Crab in %d h", x*100., ( int )( i_y + 0.5 ) );
+		if( x > 1.e-2 )
+		{
+			sprintf( hname, "%d%% Crab in %d h", ( int )( x * 100. ), ( int )( i_y + 0.5 ) );
+		}
+		else
+		{
+			sprintf( hname, "%.2f%% Crab in %d h", x * 100., ( int )( i_y + 0.5 ) );
+		}
 	}
 	else
 	{
-		if( x > 1.e-2 ) sprintf( hname, "%d%% Crab in %d min", ( int )( x * 100. ), ( int )( i_y * 60. + 0.5 ) );
-		else            sprintf( hname, "%.2f%% Crab in %d h", x*100., ( int )( i_y + 0.5 ) );
+		if( x > 1.e-2 )
+		{
+			sprintf( hname, "%d%% Crab in %d min", ( int )( x * 100. ), ( int )( i_y * 60. + 0.5 ) );
+		}
+		else
+		{
+			sprintf( hname, "%.2f%% Crab in %d h", x * 100., ( int )( i_y + 0.5 ) );
+		}
 	}
 	TText* iT = new TText( x * 1.5, i_y, hname );
 	iT->SetTextSize( iT->GetTextSize() * 0.8 );
@@ -2664,7 +2679,7 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 	if( fTMVAEvaluatorResults )
 	{
 		cout << "read TMVAEvaluatorResults from effective area file (";
-		cout << fTMVAEvaluatorResults->fTMVAOptimumCutValueFound.size() << " bins)" << endl;
+		cout << fTMVAEvaluatorResults->fTMVAData.size() << " bins)" << endl;
 	}
 	
 	return true;
@@ -3230,12 +3245,12 @@ TCanvas* VSensitivityCalculator::plotSignalBackgroundRates( TCanvas* c, bool bPl
 		c->SetRightMargin( 0.07 );
 		c->Draw();
 		bNewCanvas = true;
-        }
+	}
 	else
 	{
 		c->cd();
 	}
-
+	
 	if( !c->GetListOfPrimitives()->FindObject( "hnullSignalParticleRates" ) )
 	{
 		TH1D* h = new TH1D( "hnullSignalParticleRates", "", 10, fEnergy_min_Log, fEnergy_max_Log );
@@ -3246,7 +3261,7 @@ TCanvas* VSensitivityCalculator::plotSignalBackgroundRates( TCanvas* c, bool bPl
 		h->SetYTitle( "background rate [1/s]" );
 		plot_nullHistogram( c, h, true, true, 1.7, TMath::Power( 10., fEnergy_min_Log ), TMath::Power( 10., fEnergy_max_Log ) );
 		c->SetLogy( 1 );
-        }
+	}
 	
 	if( gBGRate )
 	{
@@ -3369,30 +3384,27 @@ bool VSensitivityCalculator::checkCutOptimization( double iEnergy )
 		{
 			return false;
 		}
-		for( unsigned int i = 0; i < fTMVAEvaluatorResults->fEnergyCut_Log10TeV_min.size(); i++ )
+		for( unsigned int i = 0; i < fTMVAEvaluatorResults->fTMVAData.size(); i++ )
 		{
-			if( i >= fTMVAEvaluatorResults->fEnergyCut_Log10TeV_max.size() )
+			if( !fTMVAEvaluatorResults->fTMVAData[i] )
 			{
-				return false;
+				continue;
 			}
 			
-			if( iEnergy > fTMVAEvaluatorResults->fEnergyCut_Log10TeV_min[i]
-					&& iEnergy < fTMVAEvaluatorResults->fEnergyCut_Log10TeV_max[i] )
+			if( iEnergy > fTMVAEvaluatorResults->fTMVAData[i]->fEnergyCut_Log10TeV_min
+					&& iEnergy < fTMVAEvaluatorResults->fTMVAData[i]->fEnergyCut_Log10TeV_max )
 			{
-				if( i < fTMVAEvaluatorResults->fTMVAOptimumCutValueFound.size() )
+				if( fTMVAEvaluatorResults->fTMVAData[i]->fTMVAOptimumCutValueFound )
 				{
-					if( fTMVAEvaluatorResults->fTMVAOptimumCutValueFound[i] )
-					{
-						return true;
-					}
-					else
-					{
-						cout << "VSensitivityCalculator::checkCutOptimization: ignore energy bin ";
-						cout << "[" << fTMVAEvaluatorResults->fEnergyCut_Log10TeV_min[i] << ", ";
-						cout << fTMVAEvaluatorResults->fEnergyCut_Log10TeV_max[i] << "] (";
-						cout << iEnergy << "): cuts not optimized " << endl;
-						return false;
-					}
+					return true;
+				}
+				else
+				{
+					cout << "VSensitivityCalculator::checkCutOptimization: ignore energy bin ";
+					cout << "[" << fTMVAEvaluatorResults->fTMVAData[i]->fEnergyCut_Log10TeV_min << ", ";
+					cout << fTMVAEvaluatorResults->fTMVAData[i]->fEnergyCut_Log10TeV_max << "] (";
+					cout << iEnergy << "): cuts not optimized " << endl;
+					return false;
 				}
 			}
 		}
@@ -3402,12 +3414,12 @@ bool VSensitivityCalculator::checkCutOptimization( double iEnergy )
 
 TGraph* VSensitivityCalculator::getObservationTimevsFluxGraph( unsigned int ID )
 {
-    if( fGraphObsvsTime.find( ID ) == fGraphObsvsTime.end() )
-    {
-        return 0;
-    }
-
-    return fGraphObsvsTime[ID];
+	if( fGraphObsvsTime.find( ID ) == fGraphObsvsTime.end() )
+	{
+		return 0;
+	}
+	
+	return fGraphObsvsTime[ID];
 }
 
 

@@ -374,10 +374,10 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
 	fNImages_min.push_back( 2 );
 	fAxesAngles_min.push_back( 0. );
 	fMLPFileName.push_back( "" );
-        vector< string > i_temp_string;
+	vector< string > i_temp_string;
 	fTMVAFileNameVector.push_back( i_temp_string );
-        vector< double > i_temp_double;
-        fMTVAZenithBin.push_back( i_temp_double );
+	vector< double > i_temp_double;
+	fMTVAZenithBin.push_back( i_temp_double );
 	fDispFileName.push_back( "" );
 	fMODDISP_MinAngleForDisp.push_back( 25. );
 	fMODDISP_MinAngleExpFactor.push_back( 0.02 );
@@ -862,9 +862,9 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				{
 					fRunPara->fDoublePassErrorWeighting2005 = !( bool )atoi( iTemp5.c_str() );
 				}
-                                // set maximal allowed time difference (in samples) between lg and hg T0
-                                if( iTemp6.size() > 0 )
-                                {
+				// set maximal allowed time difference (in samples) between lg and hg T0
+				if( iTemp6.size() > 0 )
+				{
 					for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
 					{
 						if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
@@ -875,8 +875,8 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 							}
 						}
 					}
-                                }
-                                       
+				}
+				
 				continue;
 			}
 			else if( iTemp == "FADCSUMMATIONWINDOW" && fRunPara )
@@ -1127,14 +1127,14 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				cout << endl;
 				continue;
 			}
-
+			
 			// Model3D: reconstruction ID for starting values
 			else if( iTemp == "MODEL3DSTARTID" && fRunPara )
 			{
-			        fRunPara->fIDstartDirectionModel3D = atoi( iTemp2.c_str() );
+				fRunPara->fIDstartDirectionModel3D = atoi( iTemp2.c_str() );
 				continue;
 			}
-
+			
 			/////////////////////////////////////////////////
                         // check for exit statement
                         if( iTemp == "EXIT" )

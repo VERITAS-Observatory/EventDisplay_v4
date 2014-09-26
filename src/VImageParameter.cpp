@@ -28,7 +28,7 @@ VImageParameter::~VImageParameter()
 
 void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL, bool iMuon, bool iHough )
 {
-		
+
 	tpars = new TTree( iName.c_str(), iTitle.c_str() );
 	tpars->SetMaxTreeSize( 1000 * Long64_t( 2000000000 ) );
 	tpars->SetAutoSave( 150000000 );               // autosave when 150 Mbytes written
@@ -108,7 +108,7 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL,
 		tpars->Branch( "lossAndDead", &lossAndDead, "lossAndDead/F" );
 		tpars->Branch( "fui", &fui, "fui/F" );
 	}
-        tpars->Branch( "fracLow", &fracLow, "fracLow/F" );
+	tpars->Branch( "fracLow", &fracLow, "fracLow/F" );
 	tpars->Branch( "dist", &dist, "dist/F" );
 	if( fShortTree < 1 )
 	{

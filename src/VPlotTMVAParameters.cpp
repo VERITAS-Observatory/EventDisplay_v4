@@ -30,7 +30,7 @@ void VPlotTMVAParameters::plot( bool iPrint )
 	
 		// signal and background efficiency
 		sprintf( hname, "cTMVA_S_BC_%d", i );
-		sprintf( htitle, "signal/background efficiency distribution (energy bin %d)", i );
+		sprintf( htitle, "signal/background efficiency distribution (energy/zenith bin %d)", i );
 		TCanvas* c = new TCanvas( hname, htitle, 100 + i * 20, 100 + i * 20, 400, 400 );
 		c->SetGridx( 0 );
 		c->SetGridy( 0 );
@@ -38,13 +38,13 @@ void VPlotTMVAParameters::plot( bool iPrint )
 		if( hSignalEfficiency[i] )
 		{
 			hSignalEfficiency[i]->Draw();
-			cout << "Signal efficiency in energy bin " << i << ": ";
+			cout << "Signal efficiency in energy/zenith bin " << i << ": ";
 			cout << hSignalEfficiency[i]->GetMean() << " +- " << hSignalEfficiency[i]->GetRMS() << endl;
 		}
 		if( i < hBackgroundEfficiency.size() && hBackgroundEfficiency[i] && hBackgroundEfficiency[i]->GetEntries() > 0 )
 		{
 			hBackgroundEfficiency[i]->Draw( "same" );
-			cout << "\t Background efficiency in energy bin " << i << ": ";
+			cout << "\t Background efficiency in energy/zenith bin " << i << ": ";
 			cout << hBackgroundEfficiency[i]->GetMean() << " +- " << hBackgroundEfficiency[i]->GetRMS() << endl;
 		}
 		if( iPrint )
@@ -56,7 +56,7 @@ void VPlotTMVAParameters::plot( bool iPrint )
 		
 		// MVA cut variable
 		sprintf( hname, "cTMVA_MVA_%d", i );
-		sprintf( htitle, "MVA cut variable(energy bin %d)", i );
+		sprintf( htitle, "MVA cut variable(energy/zenith bin %d)", i );
 		TCanvas* d = new TCanvas( hname, htitle, 600 + i * 20, 100 + i * 20, 400, 400 );
 		d->SetGridx( 0 );
 		d->SetGridy( 0 );
@@ -64,7 +64,7 @@ void VPlotTMVAParameters::plot( bool iPrint )
 		if( i < hMVA.size() )
 		{
 			hMVA[i]->Draw();
-			cout << "\t MVA cut in energy bin " << i << ": ";
+			cout << "\t MVA cut in energy/zenith bin " << i << ": ";
 			cout << hMVA[i]->GetMean() << " +- " << hMVA[i]->GetRMS() << endl;
 		}
 		if( iPrint )
@@ -75,7 +75,7 @@ void VPlotTMVAParameters::plot( bool iPrint )
 	}
 }
 
-bool VPlotTMVAParameters::initializeHistograms( unsigned int iWeightFileIndex_min, unsigned int iWeightFileIndex_max )
+bool VPlotTMVAParameters::initializeHistograms( unsigned int iEnergyWeightFileIndex_min, unsigned int iEnergyWeightFileIndex_max, unsigned int iZenithWeightFileIndex_min, unsigned int iZenithWeightFileIndex_max )
 {
 	char hname[2000];
 	
@@ -83,33 +83,35 @@ bool VPlotTMVAParameters::initializeHistograms( unsigned int iWeightFileIndex_mi
 	hBackgroundEfficiency.clear();
 	hMVA.clear();
 	
-	for( unsigned int i = iWeightFileIndex_min; i <= iWeightFileIndex_max; i++ )
+	for( unsigned int i = iEnergyWeightFileIndex_min; i <= iEnergyWeightFileIndex_max; i++ )
 	{
-		sprintf( hname, "hSignalEfficiency_%d", i );
-		hSignalEfficiency.push_back( new TH1D( hname, "", 100, 0., 1. ) );
-		hSignalEfficiency.back()->SetXTitle( "efficiency" );
-		hSignalEfficiency.back()->SetLineWidth( 2 );
-		
-		sprintf( hname, "hBackgroundEfficiency_%d", i );
-		hBackgroundEfficiency.push_back( new TH1D( hname, "", 100, 0., 1. ) );
-		hBackgroundEfficiency.back()->SetXTitle( "efficiency" );
-		hBackgroundEfficiency.back()->SetLineWidth( 2 );
-		hBackgroundEfficiency.back()->SetLineColor( 2 );
-		
-		sprintf( hname, "hMVA_%d", i );
-		hMVA.push_back( new TH1D( hname, "", 100, -1., 1. ) );
-		hMVA.back()->SetXTitle( "MVA variable" );
-		hMVA.back()->SetLineWidth( 2 );
-		hMVA.back()->SetLineColor( 4 );
+		for( unsigned int j = iZenithWeightFileIndex_min; j <= iEnergyWeightFileIndex_max; j++ )
+		{
+			sprintf( hname, "hSignalEfficiency_%d_%d", i, j );
+			hSignalEfficiency.push_back( new TH1D( hname, "", 100, 0., 1. ) );
+			hSignalEfficiency.back()->SetXTitle( "efficiency" );
+			hSignalEfficiency.back()->SetLineWidth( 2 );
+			
+			sprintf( hname, "hBackgroundEfficiency_%d_%d", i, j );
+			hBackgroundEfficiency.push_back( new TH1D( hname, "", 100, 0., 1. ) );
+			hBackgroundEfficiency.back()->SetXTitle( "efficiency" );
+			hBackgroundEfficiency.back()->SetLineWidth( 2 );
+			hBackgroundEfficiency.back()->SetLineColor( 2 );
+			
+			sprintf( hname, "hMVA_%d_%d", i, j );
+			hMVA.push_back( new TH1D( hname, "", 100, -1., 1. ) );
+			hMVA.back()->SetXTitle( "MVA variable" );
+			hMVA.back()->SetLineWidth( 2 );
+			hMVA.back()->SetLineColor( 4 );
+		}
 	}
 	
 	return true;
 }
 
-void VPlotTMVAParameters::initializeWeightFiles( string iDirectory, string iTMVADirectory,
-		unsigned int iWeightFileIndex_min, unsigned int iWeightFileIndex_max )
+void VPlotTMVAParameters::initializeWeightFiles( string iDirectory, string iTMVADirectory, unsigned int iEnergyWeightFileIndex_min, unsigned int iEnergyWeightFileIndex_max, unsigned int iZenithWeightFileIndex_min, unsigned int iZenithWeightFileIndex_max )
 {
-	if( !initializeHistograms( iWeightFileIndex_min, iWeightFileIndex_max ) )
+	if( !initializeHistograms( iEnergyWeightFileIndex_min, iEnergyWeightFileIndex_max, iZenithWeightFileIndex_min, iZenithWeightFileIndex_max ) )
 	{
 		cout << "VPlotTMVAParameters::initializeWeightFiles error initializing histograms" << endl;
 		return;
@@ -123,7 +125,7 @@ void VPlotTMVAParameters::initializeWeightFiles( string iDirectory, string iTMVA
 		sprintf( hname, "%s/ParticleNumbers.%s.00.root", fDataDirectory.c_str(), fSubArrays[i].c_str() );
 		a.setParticleNumberFile( hname );
 		sprintf( hname, "%s/%s/%s", iDirectory.c_str(), fSubArrays[i].c_str(), iTMVADirectory.c_str() );
-		a.initializeWeightFiles( hname, iWeightFileIndex_min, iWeightFileIndex_max );
+		a.initializeWeightFiles( hname, iEnergyWeightFileIndex_min, iEnergyWeightFileIndex_max, iZenithWeightFileIndex_min, iZenithWeightFileIndex_max );
 		
 		for( unsigned int j = 0; j < a.getOptimumCutValueFound().size(); j++ )
 		{

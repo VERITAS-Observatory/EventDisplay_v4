@@ -298,7 +298,7 @@ TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormaliz
 	sprintf( hname, "%s_CUMU", iH_in->GetName() );
 	TH1D* iH_out = ( TH1D* )iH_in->Clone( hname );
 	iH_out->Reset();
-
+	
 	float z = 0.;
 	
 	if( iLeft_to_right )
@@ -309,9 +309,9 @@ TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormaliz
 		{
 			if( iH_in->GetBinCenter( i ) > iMax )
 			{
-			   z = i-1;
-			   break;
-                        }
+				z = i - 1;
+				break;
+			}
 			iH_out->SetBinContent( i, iH_in->GetBinContent( i ) + iH_out->GetBinContent( i - 1 ) );
 		}
 	}
@@ -387,7 +387,7 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 	nbin = 100;
 	
 	char regioncode_histname[100] = "" ;
-	if ( regioncode.length() > 0 )
+	if( regioncode.length() > 0 )
 	{
 		sprintf( regioncode_histname, "_%s", regioncode.c_str() ) ;
 	}
@@ -414,17 +414,17 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 	{
 		h1D = new TH1D( hname, "", nbin, xmin, xmax );
 	}
-
+	
 	// setup regioncode flags
-	string regioncode_a = "a" ; 
+	string regioncode_a = "a" ;
 	bool   regioncodeflag_a = false ;
-	if ( regioncode_a.compare( regioncode ) == 0 )
+	if( regioncode_a.compare( regioncode ) == 0 )
 	{
 		regioncodeflag_a = true ;
 	}
 	string regioncode_b = "b" ;
 	bool   regioncodeflag_b = false ;
-	if ( regioncode_b.compare( regioncode ) == 0 )
+	if( regioncode_b.compare( regioncode ) == 0 )
 	{
 		regioncodeflag_b = true ;
 	}
@@ -450,17 +450,17 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 			
 			// regioncode cuts
 			// regioncode = "a" , exclude x<0
-			if ( regioncodeflag_a )
+			if( regioncodeflag_a )
 			{
-				if ( x_r < 0 )
+				if( x_r < 0 )
 				{
 					continue ;
 				}
 			}
 			// regioncode = "b" , exclude x>0
-			else if ( regioncodeflag_b ) 
+			else if( regioncodeflag_b )
 			{
-				if ( x_r > 0 )
+				if( x_r > 0 )
 				{
 					continue ;
 				}

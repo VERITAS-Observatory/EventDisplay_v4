@@ -109,6 +109,7 @@ class Cshowerpars
 		Float_t         Ycore_SC[VDST_MAXRECMETHODS];
 		Float_t         stdp[VDST_MAXRECMETHODS]; //[NMethods]
 		Float_t         Chi2[VDST_MAXRECMETHODS]; //[NMethods]
+		Float_t         DispDiff[VDST_MAXRECMETHODS];
 		Int_t           MCprim;
 		Float_t        MCe0;
 		Float_t        MCxcore;
@@ -172,6 +173,7 @@ class Cshowerpars
 		TBranch*        b_Ycore_SC;               //!
 		TBranch*        b_stdp;                   //!
 		TBranch*        b_Chi2;                   //!
+		TBranch*        b_DispDiff;               //!
 		TBranch*        b_MCprim;                 //!
 		TBranch*        b_MCe0;                   //!
 		TBranch*        b_MCxcore;                //!
@@ -493,7 +495,17 @@ void Cshowerpars::Init( TTree* tree )
 		}
 	}
 	fChain->SetBranchAddress( "Chi2", Chi2 );
-	
+        if( fChain->GetBranchStatus( "DispDiff" ) )
+        {
+            fChain->SetBranchAddress( "DispDiff", DispDiff );
+        }
+        else
+        {
+            for( unsigned int i = 0; i < VDST_MAXRECMETHODS; i++ )
+            {
+                DispDiff[i] = 0.;
+            }
+        }
 	if( bMC )
 	{
 		if( fVersion > 7 )
@@ -658,6 +670,7 @@ Bool_t Cshowerpars::Notify()
 	}
 	
 	b_Chi2 = fChain->GetBranch( "Chi2" );
+	b_DispDiff = fChain->GetBranch( "DispDiff" );
 	if( bMC )
 	{
 		if( !bShort )

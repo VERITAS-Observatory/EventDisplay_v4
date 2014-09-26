@@ -3,6 +3,7 @@
 #ifndef VTMVARunData_H
 #define VTMVARunData_H
 
+#include "TChain.h"
 #include "TCut.h"
 #include "TFile.h"
 #include "TEntryList.h"
@@ -19,6 +20,7 @@
 #include <vector>
 
 #include "VTMVARunDataEnergyCut.h"
+#include "VTMVARunDataZenithCut.h"
 #include "VUtilities.h"
 
 using namespace std;
@@ -43,17 +45,15 @@ class VTMVARunData : public TNamed
 		// output file
 		string            fOutputFileName;
 		string            fOutputDirectoryName;
-		vector< TFile* >  fOutputFile;
+		vector< vector< TFile* > >  fOutputFile;
 		
 		// training data
 		double            fSignalWeight;
 		vector< string >  fSignalFileName;
-		vector< TFile* >  fSignalFile;
-		vector< TTree* >  fSignalTree;
+		vector< TChain* > fSignalTree;
 		double            fBackgroundWeight;
 		vector< string >  fBackgroundFileName;
-		vector< TFile* >  fBackgroundFile;
-		vector< TTree* >  fBackgroundTree;
+		vector< TChain* > fBackgroundTree;
 		
 		// list of training variables
 		vector< string >  fTrainingVariable;
@@ -65,14 +65,16 @@ class VTMVARunData : public TNamed
 		// spectator variables
 		vector< string > fSpectatorVariable;
 		
-		// quality and energy cuts
+		// quality and energy and zenith cuts
 		unsigned int      fMinSignalEvents;
 		unsigned int      fMinBackgroundEvents;
 		TCut              fQualityCuts;
+		TCut              fQualityCutsBkg;
 		TCut              fMCxyoffCut;
                 bool              fMCxyoffCutSignalOnly;
 		string            fPrepareTrainingOptions;
 		vector< VTMVARunDataEnergyCut* > fEnergyCutData;
+		vector< VTMVARunDataZenithCut* > fZenithCutData;
 		
 		// analysis variables
 		int               fNTtype;

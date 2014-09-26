@@ -1801,6 +1801,9 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp )
 	// impact point, from perpen. minimization
 	float xs = 0.;
 	float ys = 0.;
+
+	// dispdiff gamma/hadron parameter
+	float dispdiff = 0.;
 	
 	float ximp = 0.;
 	float yimp = 0.;
@@ -1855,7 +1858,10 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp )
 			v_weight.push_back( getImageParameters( getRunParameter()->fImageLL )->ntubes * (1. - getImageParameters( getRunParameter()->fImageLL )->width / getImageParameters( getRunParameter()->fImageLL )->length ) );
 		}
 	}
-	fDispAnalyzer[iMethod]->calculateMeanDirection( xs, ys, x, y, cosphi, sinphi, v_disp, v_weight );
+	fDispAnalyzer[iMethod]->calculateMeanDirection( xs, ys, x, y, cosphi, sinphi, v_disp, v_weight, dispdiff );
+
+	getShowerParameters()->fDispDiff[iMethod] = dispdiff;
+
 	for( unsigned int ii = 0; ii < m.size(); ii++ )
 	{
 		getShowerParameters()->addDISPPoint( telID[ii], iMethod, fDispAnalyzer[iMethod]->getXcoordinate_disp( ii, x[ii], cosphi[ii] ),
@@ -2005,6 +2011,9 @@ int VArrayAnalyzer::rcs_method_9( unsigned int iMethod )
 	float ys = 0.;
 	float xd = 0.;
 	float yd = 0.;
+
+	// dispdiff gamma/hadron parameter
+	float dispdiff = 0.;
 	
 	float ximp = 0.;                              /* impact point, from perpen. minimization */
 	float yimp = 0.;
@@ -2136,7 +2145,7 @@ int VArrayAnalyzer::rcs_method_9( unsigned int iMethod )
 				{
 					v_weight[1] = 1.;
 				}
-				fDispAnalyzer[iMethod]->calculateMeanDirection( xd, yd, v_x, v_y, v_cosphi, v_sinphi, v_disp, v_weight );
+				fDispAnalyzer[iMethod]->calculateMeanDirection( xd, yd, v_x, v_y, v_cosphi, v_sinphi, v_disp, v_weight, dispdiff );
 			}
 			else
 			{

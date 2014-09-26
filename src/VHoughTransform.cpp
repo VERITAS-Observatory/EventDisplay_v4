@@ -502,7 +502,7 @@ void VHoughTransform::analysis( VEvndispData* fData, VImageParameter* fParGeo )
 	
 	//	cout << "Muon found on T" << ( fData->getTelID() + 1 ) << " at event " << fData->getEventNumber() << endl;
 	//	cout << "Total: " << fNumberOfMuons << endl;
-		
+	
 	//}
 	
 	
@@ -513,7 +513,7 @@ void VHoughTransform::analysis( VEvndispData* fData, VImageParameter* fParGeo )
 	fParGeo->houghTD = fTD;
 	fParGeo->houghNpix = fNpix;
 	fParGeo->houghCN = fCN;
-	fParGeo->houghContained = fContained/fPMTDiameter[ fData->getTelID() ];//Divide by PMT diameter.
+	fParGeo->houghContained = fContained / fPMTDiameter[ fData->getTelID() ]; //Divide by PMT diameter.
 	//In muon analysis macro, use houghContained < 11.0
 	
 }//End of analysis method
@@ -900,7 +900,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	if( !is )
 	{
 	
-	//	cout << "VHoughTransform::readHTParameterFile error while opening parameter file: " << ifile << endl;
+		//	cout << "VHoughTransform::readHTParameterFile error while opening parameter file: " << ifile << endl;
 		
 	}//End of if the parameter file is not opened
 	
@@ -1080,7 +1080,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	//{
 	
 	//	cout << "RMINT" << fTelID + 1 <<  " set to " << fRMinDpmt[fTelID] << endl;
-		
+	
 	//}
 	
 	if( fRMinDpmtIsSet == 0 )
@@ -1101,7 +1101,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	//{
 	
 	//	cout << "RMAXT" << fTelID + 1 <<  " set to " << fRMaxDpmt[fTelID] << endl;
-		
+	
 	//}
 	
 	if( fRMaxDpmtIsSet == 0 )
@@ -1122,7 +1122,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	//{
 	
 	//	cout << "STEPSPERPMTDIAMETERT" << fTelID + 1 <<  " set to " << fStepsPerPMTDiameter[fTelID] << endl;
-		
+	
 	//}
 	
 	if( fStepsPerPMTDiameterIsSet == 0 )
@@ -1143,7 +1143,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	//{
 	
 	//	cout << "NPIXMINT" << fTelID + 1 <<  " set to " << fNpixMin[fTelID] << endl;
-		
+	
 	//}
 	
 	if( fNpixMinIsSet == 0 )
@@ -1164,7 +1164,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	//{
 	
 	//	cout << "NPIXMAXT" << fTelID + 1 <<  " set to " << fNpixMax[fTelID] << endl;
-		
+	
 	//}
 	
 	if( fNpixMaxIsSet == 0 )
@@ -1185,7 +1185,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	//{
 	
 	//	cout << "ALPHAT" << fTelID + 1 <<  " set to " << fAlpha[fTelID] << endl;
-		
+	
 	//}
 	
 	if( fAlphaIsSet == 0 )
@@ -1206,7 +1206,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	//{
 	
 	//	cout << "BETAT" << fTelID + 1 <<  " set to " << fBeta[fTelID] << endl;
-		
+	
 	//}
 	
 	if( fBetaIsSet == 0 )
@@ -1227,7 +1227,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	//{
 	
 	//	cout << "GAMMAT" << fTelID + 1 <<  " set to " << fGamma[fTelID] << endl;
-		
+	
 	//}
 	
 	if( fGammaIsSet == 0 )
@@ -1248,7 +1248,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	//{
 	
 	//	cout << "ETAT" << fTelID + 1 <<  " set to " << fEta[fTelID] << endl;
-		
+	
 	//}
 	
 	if( fEtaIsSet == 0 )
@@ -1269,7 +1269,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	//{
 	
 	//	cout << "CAMERARADIUST" << fTelID + 1 <<  " set to " << fCameraRadius[fTelID] << endl;
-		
+	
 	//}
 	
 	if( fCameraRadiusIsSet == 0 )
@@ -1290,21 +1290,23 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 }//End of readHTParameterFile method
 
 
-//Getter methods 
+//Getter methods
 
 //Gets the minimum number of hit pixels cut
-int VHoughTransform::getNpixMin( unsigned int fTelID ) {
+int VHoughTransform::getNpixMin( unsigned int fTelID )
+{
 
-return fNpixMin[fTelID];
-
+	return fNpixMin[fTelID];
+	
 }//End of getNpixMin
 
 
 //Gets the maximum number of hit pixels cut
-int VHoughTransform::getNpixMax( unsigned int fTelID ) {
+int VHoughTransform::getNpixMax( unsigned int fTelID )
+{
 
-return fNpixMax[fTelID];
-
+	return fNpixMax[fTelID];
+	
 }//End of getNpixMax
 
 

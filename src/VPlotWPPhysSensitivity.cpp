@@ -18,7 +18,7 @@ VPlotWPPhysSensitivity::VPlotWPPhysSensitivity()
 	fSensitivityFOM_error = -1.;
 	
 	fPlotCTARequirementsID = -99;
-
+	
 	fUseIntegratedSensitivityForOffAxisPlots = false;
 }
 
@@ -92,7 +92,7 @@ bool VPlotWPPhysSensitivity::addDataSets( string iDataSettxtFile, string iDirect
    plot IRFs for all data sets
 
 */
-bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double iEffAreaMax, double iEnergyResolutionMax, TPad *iEffAreaPad, TPad *iAngResPad, TPad *iEResPad )
+bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double iEffAreaMax, double iEnergyResolutionMax, TPad* iEffAreaPad, TPad* iAngResPad, TPad* iEResPad )
 {
 	fIRF = new VPlotInstrumentResponseFunction();
 	
@@ -192,21 +192,21 @@ void VPlotWPPhysSensitivity::initialProjectedSensitivityPlots()
 	// (hard coded energies here...not good)
 	if( !fUseIntegratedSensitivityForOffAxisPlots )
 	{
-	   fProjectionEnergy_min_logTeV.push_back( log10( 10.0 ) );
-	   fProjectionEnergy_max_logTeV.push_back( log10( 10.0 ) );
-	   fProjectionEnergy_min_logTeV.push_back( log10( 1.0 ) );
-	   fProjectionEnergy_max_logTeV.push_back( log10( 3.0 ) );
-	   fProjectionEnergy_min_logTeV.push_back( log10( 0.4 ) );
-	   fProjectionEnergy_max_logTeV.push_back( log10( 0.6 ) );
-	   fProjectionEnergy_min_logTeV.push_back( log10( 0.10 ) );
-	   fProjectionEnergy_max_logTeV.push_back( log10( 0.125 ) ); 
-        }
+		fProjectionEnergy_min_logTeV.push_back( log10( 10.0 ) );
+		fProjectionEnergy_max_logTeV.push_back( log10( 10.0 ) );
+		fProjectionEnergy_min_logTeV.push_back( log10( 1.0 ) );
+		fProjectionEnergy_max_logTeV.push_back( log10( 3.0 ) );
+		fProjectionEnergy_min_logTeV.push_back( log10( 0.4 ) );
+		fProjectionEnergy_max_logTeV.push_back( log10( 0.6 ) );
+		fProjectionEnergy_min_logTeV.push_back( log10( 0.10 ) );
+		fProjectionEnergy_max_logTeV.push_back( log10( 0.125 ) );
+	}
 	// integrated sensitivity
 	else
 	{
-           fProjectionEnergy_min_logTeV.push_back( log10( 0.128 ) ); // choose 128 GeV the be at the lower end of the corresponding bin on the log axis)
-   	   fProjectionEnergy_max_logTeV.push_back( log10( 0.128 ) );
-        }
+		fProjectionEnergy_min_logTeV.push_back( log10( 0.128 ) ); // choose 128 GeV the be at the lower end of the corresponding bin on the log axis)
+		fProjectionEnergy_max_logTeV.push_back( log10( 0.128 ) );
+	}
 	// graphs
 	for( unsigned int i = 0; i < fData.size(); i++ )
 	{
@@ -359,7 +359,7 @@ TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas* c, double 
 			}
 		}
 	}
-        // 
+	//
 	if( iColor < 0 && fProjectionEnergy_min_logTeV.size() > 1 )
 	{
 		iL->Draw();
@@ -368,32 +368,44 @@ TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas* c, double 
 	return cC;
 }
 
-bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, double ymax, bool iRatoToGoal, TPad *iSensRatio )
+bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, double ymax, bool iRatoToGoal, TPad* iSensRatio )
 {
 	char hname[200];
 	char htitle[200];
-	sprintf( hname, "cSensRatio_%d", (int)iRatoToGoal );
-	if( iRatoToGoal ) sprintf( htitle, "ratio of sensitivities (to goal)" );
-	else              sprintf( htitle, "ratio of sensitivities (to requirement)" );
+	sprintf( hname, "cSensRatio_%d", ( int )iRatoToGoal );
+	if( iRatoToGoal )
+	{
+		sprintf( htitle, "ratio of sensitivities (to goal)" );
+	}
+	else
+	{
+		sprintf( htitle, "ratio of sensitivities (to requirement)" );
+	}
 	TCanvas* cSensRatio = 0;
 	if( !iSensRatio )
 	{
-	    cSensRatio = new TCanvas( hname, htitle, 200, 200, 900, 600 );
-	    cSensRatio->SetGridy( 0 );
-	    cSensRatio->SetGridx( 0 );
-        }
+		cSensRatio = new TCanvas( hname, htitle, 200, 200, 900, 600 );
+		cSensRatio->SetGridy( 0 );
+		cSensRatio->SetGridx( 0 );
+	}
 	else
 	{
-	    cSensRatio = (TCanvas*)iSensRatio;
-        }
+		cSensRatio = ( TCanvas* )iSensRatio;
+	}
 	cSensRatio->cd();
 	
-	sprintf( hname, "hSensRatio_%d", (int)iRatoToGoal );
+	sprintf( hname, "hSensRatio_%d", ( int )iRatoToGoal );
 	TH1D* hNull = new TH1D( hname, "", 10, log10( fMinEnergy_TeV ), log10( fMaxEnergy_TeV ) );
 	hNull->SetStats( 0 );
 	hNull->SetXTitle( "log_{10} energy [TeV]" );
-	if( iRatoToGoal ) hNull->SetYTitle( "Sensitivity ratio to goal sensitivity" );
-	else              hNull->SetYTitle( "Sensitivity ratio to required sensitivity" );
+	if( iRatoToGoal )
+	{
+		hNull->SetYTitle( "Sensitivity ratio to goal sensitivity" );
+	}
+	else
+	{
+		hNull->SetYTitle( "Sensitivity ratio to required sensitivity" );
+	}
 	hNull->SetMinimum( ymin );
 	hNull->SetMaximum( ymax );
 	hNull->Draw( "" );
@@ -409,8 +421,14 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
 	TGraph* gRelG = 0;
 	if( fPlotCTARequirements )
 	{
-		if( !iRatoToGoal ) gRelG = fPlotCTARequirements->getRequiredDifferentalSensitivity();
-		else               gRelG = fPlotCTARequirements->getGoalDifferentialSensitivity();
+		if( !iRatoToGoal )
+		{
+			gRelG = fPlotCTARequirements->getRequiredDifferentalSensitivity();
+		}
+		else
+		{
+			gRelG = fPlotCTARequirements->getGoalDifferentialSensitivity();
+		}
 		if( !gRelG )
 		{
 			return false;
@@ -452,8 +470,14 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
 	if( fPlotCTARequirementGoals )
 	{
 		TGraphAsymmErrors* gRelGoal = 0;
-		if(  !iRatoToGoal ) gRelGoal = ( TGraphAsymmErrors* )fPlotCTARequirements->getGoalDifferentialSensitivity();
-		else               gRelGoal = ( TGraphAsymmErrors* )fPlotCTARequirements->getRequiredDifferentalSensitivity();
+		if( !iRatoToGoal )
+		{
+			gRelGoal = ( TGraphAsymmErrors* )fPlotCTARequirements->getGoalDifferentialSensitivity();
+		}
+		else
+		{
+			gRelGoal = ( TGraphAsymmErrors* )fPlotCTARequirements->getRequiredDifferentalSensitivity();
+		}
 		if( gRelGoal )
 		{
 			TGraphAsymmErrors* g = new TGraphAsymmErrors();
@@ -476,8 +500,14 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
 		if( iPrint.size() > 0 )
 		{
 			char hname[2000];
-			if( iRatoToGoal )  sprintf( hname, "%s-SensitivityRatioGoal.pdf", iPrint.c_str() );
-			else               sprintf( hname, "%s-SensitivityRatio.pdf", iPrint.c_str() );
+			if( iRatoToGoal )
+			{
+				sprintf( hname, "%s-SensitivityRatioGoal.pdf", iPrint.c_str() );
+			}
+			else
+			{
+				sprintf( hname, "%s-SensitivityRatio.pdf", iPrint.c_str() );
+			}
 			if( cSensRatio )
 			{
 				cSensRatio->Print( hname );
@@ -538,8 +568,14 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( TGraphAsymmErrors* g
 			// south 50h
 			if( fPlotCTARequirementsID == 0 )
 			{
-				if( !fPlotCTARequirementGoals ) req = VCTASensitivityRequirements::Flux_req50_E2erg_south( TMath::Power( 10., x ) );
-				else                            req = VCTASensitivityRequirements::Flux_goal50_E2erg_south( TMath::Power( 10., x ) );
+				if( !fPlotCTARequirementGoals )
+				{
+					req = VCTASensitivityRequirements::Flux_req50_E2erg_south( TMath::Power( 10., x ) );
+				}
+				else
+				{
+					req = VCTASensitivityRequirements::Flux_goal50_E2erg_south( TMath::Power( 10., x ) );
+				}
 			}
 			// south 5 h
 			else if( fPlotCTARequirementsID == 1 )
@@ -595,12 +631,12 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( TGraphAsymmErrors* g
     plot sensitivities and data rates for different data sets
 
 */
-bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitivity, double iMaxSensitivity, string iUnit, TPad *iSensitivityPad, TPad *iSensitivityRatioPad, TPad *iBckPad )
+bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitivity, double iMaxSensitivity, string iUnit, TPad* iSensitivityPad, TPad* iSensitivityRatioPad, TPad* iBckPad )
 {
 	TCanvas* cIntSens = 0;
 	TCanvas* cSens = 0;
-	TCanvas* cSensInter = (TCanvas*)iSensitivityPad;
-	TCanvas* cBck = (TCanvas*)iBckPad;
+	TCanvas* cSensInter = ( TCanvas* )iSensitivityPad;
+	TCanvas* cBck = ( TCanvas* )iBckPad;
 	
 	initialProjectedSensitivityPlots();
 	
@@ -642,7 +678,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
 			//	 c_temp = a->plotIntegralSensitivityvsEnergyFromCrabSpectrum( cIntSens, "CTA-PHYS", fData[i]->fPlottingColor[j], iUnit,
 			//	  		                                                  fData[i]->fSiteFile_Emin[j], fData[i]->fSiteFile_Emax[j] );
 			//	 if( c_temp ) cIntSens = c_temp;
-			c_temp = a->plotSignalBackgroundRates( cBck, (z==0), 2.e-7, 14. );    // plot also protons and electrons
+			c_temp = a->plotSignalBackgroundRates( cBck, ( z == 0 ), 2.e-7, 14. ); // plot also protons and electrons
 			if( c_temp )
 			{
 				cBck = c_temp;
@@ -669,20 +705,20 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
 			{
 				b->setPlottingStyle( fData[i]->fPlottingColor[0], fData[i]->fPlottingLineStyle[0], 2., 1, 2., fData[i]->fPlottingFillStyle[0] );
 			}
-			cSensInter = b->plotSensitivityvsEnergyFromCrabSpectrum( cSensInter, i + 1, iUnit, 0.2, (i==0) );
+			cSensInter = b->plotSensitivityvsEnergyFromCrabSpectrum( cSensInter, i + 1, iUnit, 0.2, ( i == 0 ) );
 			if( fPlotCTARequirementsID >= 0 && fPlotCTARequirements )
 			{
 				fPlotCTARequirements->plotRequirement_DifferentialSensitivity( cSensInter, fPlotCTARequirementGoals, iUnit );
 			}
 			if( fUseIntegratedSensitivityForOffAxisPlots )
 			{
-			   TGraphAsymmErrors* iGraphIntegratedSensitivity = fData[i]->getCombinedSensitivityGraph( true, "", true );
-			   fillProjectedSensitivityPlot( i, iGraphIntegratedSensitivity );
-                        }
+				TGraphAsymmErrors* iGraphIntegratedSensitivity = fData[i]->getCombinedSensitivityGraph( true, "", true );
+				fillProjectedSensitivityPlot( i, iGraphIntegratedSensitivity );
+			}
 			else
 			{
-			   fillProjectedSensitivityPlot( i, iGraphSensitivity );
-                        }
+				fillProjectedSensitivityPlot( i, iGraphSensitivity );
+			}
 		}
 	}
 	/////////////////////////////

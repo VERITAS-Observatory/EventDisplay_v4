@@ -135,14 +135,14 @@ bool VSkyCoordinates::setTargetJ2000( double iDec, double iRA )
 */
 bool VSkyCoordinates::setTarget( string iTargetName )
 {
-        cout << endl;
-        cout << "======================================================================================= " << endl;
-        cout << "WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING " << endl;
-        cout << endl;
-        cout << "the -target <targetname> option should not be used; the pointing will be wrong" << endl;
-        cout << endl;
-        cout << "WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING " << endl;
-        cout << "======================================================================================= " << endl;
+	cout << endl;
+	cout << "======================================================================================= " << endl;
+	cout << "WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING " << endl;
+	cout << endl;
+	cout << "the -target <targetname> option should not be used; the pointing will be wrong" << endl;
+	cout << endl;
+	cout << "WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING " << endl;
+	cout << "======================================================================================= " << endl;
 	VTargets iTarget;
 	if( iTarget.selectTargetbyName( iTargetName ) )
 	{
@@ -179,17 +179,17 @@ void VSkyCoordinates::updatePointing( int MJD, double time )
 	
 	double az = 0.;
 	double el = 0.;
-
+	
 	// telescope elevation/azimuth calculated from source coordinates and time
-        VSkyCoordinatesUtilities::getHorizontalCoordinates( MJD, time, fTelDec*TMath::RadToDeg(), fTelRA*TMath::RadToDeg(), az, el );
-        el = 90. - el;
+	VSkyCoordinatesUtilities::getHorizontalCoordinates( MJD, time, fTelDec * TMath::RadToDeg(), fTelRA * TMath::RadToDeg(), az, el );
+	el = 90. - el;
 	fTelAzimuthCalculated   = ( float )az;
 	fTelElevationCalculated = ( float )el;
 	fTelElevation = fTelElevationCalculated;
 	fTelAzimuth   = fTelAzimuthCalculated;
 	
 	// set target azimuth/elevation
-        VSkyCoordinatesUtilities::getHorizontalCoordinates( MJD, time, fTargetDec*TMath::RadToDeg(), fTargetRA*TMath::RadToDeg(), fTargetAzimuth, fTargetElevation );
+	VSkyCoordinatesUtilities::getHorizontalCoordinates( MJD, time, fTargetDec * TMath::RadToDeg(), fTargetRA * TMath::RadToDeg(), fTargetAzimuth, fTargetElevation );
 	fTargetElevation = 90. - fTargetElevation;
 }
 

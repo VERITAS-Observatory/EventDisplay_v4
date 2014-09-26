@@ -466,7 +466,7 @@ VStar* VStarCatalogue::readCommaSeparatedLine_FAVA( string iLine, int zid, VStar
 	string iT1;
 	string iT2;
 	string iT3;
-
+	
 	i_Star->fStarID = zid;
 	i_Star->fBrightness_V = 9999.;
 	i_Star->fBrightness_B = 9999.;
@@ -482,7 +482,7 @@ VStar* VStarCatalogue::readCommaSeparatedLine_FAVA( string iLine, int zid, VStar
 	i_Star->fStarName = iTemp.substr( 0, iTemp.find( "," ) );
 	
 	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
-
+	
 	// ra, dec
 	istringstream is_stream( iTemp );
 	is_stream >> iT1;
@@ -498,13 +498,13 @@ VStar* VStarCatalogue::readCommaSeparatedLine_FAVA( string iLine, int zid, VStar
 	cout << "Dec " << zid << " " << iT1.c_str() << " " << iT2.c_str() << " " << iT3.c_str() << endl;
 	if( iT1.find( "-", 0 ) != string::npos )
 	{
-		 i_Star->fDec2000 = atof( iT1.c_str() ) - atof( iT2.c_str() ) / 60. - atof( iT3.c_str() ) / 3600.;
+		i_Star->fDec2000 = atof( iT1.c_str() ) - atof( iT2.c_str() ) / 60. - atof( iT3.c_str() ) / 3600.;
 	}
 	else
 	{
-		 i_Star->fDec2000 = atof( iT1.c_str() ) + atof( iT2.c_str() ) / 60. + atof( iT3.c_str() ) / 3600.;
+		i_Star->fDec2000 = atof( iT1.c_str() ) + atof( iT2.c_str() ) / 60. + atof( iT3.c_str() ) / 3600.;
 	}
-
+	
 	return i_Star;
 }
 
@@ -578,23 +578,23 @@ VStar* VStarCatalogue::readCommaSeparatedLine_Fermi2nd_Catalogue( string iLine, 
 	i_Star->fFluxError.push_back( atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() ) );
 	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
 	
-        iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
-        iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
 	// spectral type
 	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
 	i_Star->fSpectrumType = iTemp.substr( 0, iTemp.find( "," ) );
-
+	
 	for( unsigned int i = 0; i < 18; i++ )
 	{
 		iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
 	}
-
+	
 	// cutoff energy
 	i_Star->fCutOff_MeV = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
 	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
 	i_Star->fCutOffError_MeV = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
 	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
-
+	
 	for( unsigned int i = 0; i < 6; i++ )
 	{
 		iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
@@ -666,7 +666,7 @@ VStar* VStarCatalogue::readCommaSeparatedLine_Fermi2nd_Catalogue( string iLine, 
 	{
 		iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
 	}
-
+	
 	// classification
 	if( iTemp.substr( 0, iTemp.find( "," ) ).size() > 1 && iTemp.substr( 0, iTemp.find( "," ) ) != "  " )
 	{
@@ -691,7 +691,7 @@ VStar* VStarCatalogue::readCommaSeparatedLine_Fermi2nd_Catalogue( string iLine, 
 			iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
 		}
 	}
-	i_Star->fQualityFlag = atoi( iTemp.substr( iTemp.rfind( "," )+1, iTemp.size() ).c_str() );
+	i_Star->fQualityFlag = atoi( iTemp.substr( iTemp.rfind( "," ) + 1, iTemp.size() ).c_str() );
 	return i_Star;
 }
 
@@ -852,7 +852,7 @@ VStar* VStarCatalogue::readCommaSeparatedLine_Fermi_Catalogue( string iLine, int
 			iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
 		}
 	}
-	i_Star->fQualityFlag = atoi( iTemp.substr( iTemp.rfind( "," )+1, iTemp.size() ).c_str() );
+	i_Star->fQualityFlag = atoi( iTemp.substr( iTemp.rfind( "," ) + 1, iTemp.size() ).c_str() );
 	return i_Star;
 }
 

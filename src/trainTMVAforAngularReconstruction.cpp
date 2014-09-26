@@ -112,11 +112,11 @@ bool trainTMVA( string iOutputDir, string iOutputName )
 		factory->AddVariable( "length", 'F' );
 		factory->AddVariable( "size", 'F' );
 		factory->AddVariable( "tgrad_x*tgrad_x", 'F' );
-		factory->AddVariable( "cross", 'F' );       
+		factory->AddVariable( "cross", 'F' );
 		factory->AddVariable( "asym", 'F' );
-		factory->AddVariable( "loss", 'F' );		
+		factory->AddVariable( "loss", 'F' );
 		factory->AddTarget( "disp", 'F' );
-//		factory->AddTarget( "dispEnergy", 'F' );
+		//		factory->AddTarget( "dispEnergy", 'F' );
 		
 		factory->AddRegressionTree( fMapOfTrainingTree_iter->second, 1. );
 		
@@ -166,39 +166,39 @@ bool writeTrainingFile( string iInputFile )
 	
 	// training trees (one per telescope type)
 	
-            int runNumber = -1;
-            int eventNumber = -1;
-	    float cen_x = -1.;
-	    float cen_y = -1.;
-	    float sinphi = -1.;
-	    float cosphi = -1.;
-	    float size = -1.;
-	    float ntubes = -1.;
-	    float loss = -1.;
-	    float asym = -1.;
-	    float width = -1.;
-	    float length = -1.;
-	    float MCe0 = -1.;
-	    float MCxoff = -1.;
-	    float MCyoff = -1.;
-	    float MCxcore = -1.;
-	    float MCycore = -1.;
-	    float Xcore = -1.;
-	    float Ycore = -1.;
-	    float Xoff = -1.;
-	    float Yoff = -1.;
-	    float LTrig = -1.;
-	    float MCaz = -1.;
-	    float disp = -1.;
-	    float NImages = -1.;
-	    float cross = -1.;
-	    float dispPhi = -1.;
-            float dispEnergy = -1.;
-	    float dist = -1.;
-	    float tgrad_x = -1.;
-	    float meanPedvar_Image = -1.;
-	    float ze = -1.;
-	    float az = -1.;
+	int runNumber = -1;
+	int eventNumber = -1;
+	float cen_x = -1.;
+	float cen_y = -1.;
+	float sinphi = -1.;
+	float cosphi = -1.;
+	float size = -1.;
+	float ntubes = -1.;
+	float loss = -1.;
+	float asym = -1.;
+	float width = -1.;
+	float length = -1.;
+	float MCe0 = -1.;
+	float MCxoff = -1.;
+	float MCyoff = -1.;
+	float MCxcore = -1.;
+	float MCycore = -1.;
+	float Xcore = -1.;
+	float Ycore = -1.;
+	float Xoff = -1.;
+	float Yoff = -1.;
+	float LTrig = -1.;
+	float MCaz = -1.;
+	float disp = -1.;
+	float NImages = -1.;
+	float cross = -1.;
+	float dispPhi = -1.;
+	float dispEnergy = -1.;
+	float dist = -1.;
+	float tgrad_x = -1.;
+	float meanPedvar_Image = -1.;
+	float ze = -1.;
+	float az = -1.;
 	
 	fMapOfTrainingTree.clear();
 	cout << "total number of telescopes: " << i_ntel << endl;
@@ -214,39 +214,39 @@ bool writeTrainingFile( string iInputFile )
 			iTreeTitle << "training tree for modified disp method (telescope type " << i_tel.TelType << ")";
 			fMapOfTrainingTree[i_tel.TelType] = new TTree( iTreeName.str().c_str(), iTreeTitle.str().c_str() );
 			
-                          fMapOfTrainingTree[i_tel.TelType]->Branch( "runNumber", &runNumber, "runNumber/I" );
-                          fMapOfTrainingTree[i_tel.TelType]->Branch( "eventNumber", &eventNumber, "eventNumber/I" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "cen_x", &cen_x, "cen_x/F" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "cen_y", &cen_y, "cen_y/F" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "sinphi", &sinphi, "sinphi/F" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "cosphi", &cosphi, "cosphi/F" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "size", &size, "size/F" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "ntubes", &ntubes, "ntubes/F" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "loss", &loss, "loss/F" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "asym", &asym, "asym/F" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "width", &width, "width/F" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "length", &length, "length/F" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "dist", &dist, "dist/F" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "tgrad_x", &tgrad_x, "tgrad_x/F" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "meanPedvar_Image", &meanPedvar_Image, "meanPedvar_Image/F" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "MCe0", &MCe0, "MCe0/F" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "MCxoff", &MCxoff, "MCxoff/F " );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "MCyoff", &MCyoff, "MCyoff/F " );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "MCxcore", &MCxcore, "MCxcore/F " );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "MCycore", &MCycore, "MCycore/F " );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "Xcore", &Xcore, "Xcore/F " );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "Ycore", &Ycore, "Ycore/F " );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "Xoff", &Xoff, "Xoff/F " );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "Yoff", &Yoff, "Yoff/F " );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "LTrig", &LTrig, "LTrig/F " );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "NImages", &NImages, "NImages/F " );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "MCaz", &MCaz, "MCaz/F " );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "Ze", &ze, "Ze/F " );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "Az", &az, "Az/F " );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "disp", &disp, "disp/F" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "cross", &cross, "cross/F" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "dispPhi", &dispPhi, "dispPhi/F" );
-			  fMapOfTrainingTree[i_tel.TelType]->Branch( "dispEnergy", &dispEnergy, "dispEnergy/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "runNumber", &runNumber, "runNumber/I" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "eventNumber", &eventNumber, "eventNumber/I" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "cen_x", &cen_x, "cen_x/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "cen_y", &cen_y, "cen_y/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "sinphi", &sinphi, "sinphi/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "cosphi", &cosphi, "cosphi/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "size", &size, "size/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "ntubes", &ntubes, "ntubes/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "loss", &loss, "loss/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "asym", &asym, "asym/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "width", &width, "width/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "length", &length, "length/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "dist", &dist, "dist/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "tgrad_x", &tgrad_x, "tgrad_x/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "meanPedvar_Image", &meanPedvar_Image, "meanPedvar_Image/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCe0", &MCe0, "MCe0/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCxoff", &MCxoff, "MCxoff/F " );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCyoff", &MCyoff, "MCyoff/F " );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCxcore", &MCxcore, "MCxcore/F " );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCycore", &MCycore, "MCycore/F " );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "Xcore", &Xcore, "Xcore/F " );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "Ycore", &Ycore, "Ycore/F " );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "Xoff", &Xoff, "Xoff/F " );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "Yoff", &Yoff, "Yoff/F " );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "LTrig", &LTrig, "LTrig/F " );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "NImages", &NImages, "NImages/F " );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCaz", &MCaz, "MCaz/F " );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "Ze", &ze, "Ze/F " );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "Az", &az, "Az/F " );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "disp", &disp, "disp/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "cross", &cross, "cross/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispPhi", &dispPhi, "dispPhi/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispEnergy", &dispEnergy, "dispEnergy/F" );
 			
 		}
 	}
@@ -283,42 +283,42 @@ bool writeTrainingFile( string iInputFile )
 				continue;
 			}
 			
-                          runNumber = i_showerpars.runNumber;
-                          eventNumber = i_showerpars.eventNumber;
-			  cen_x = i_tpars.cen_x;
-			  cen_y = i_tpars.cen_y;
-			  sinphi = i_tpars.sinphi;
-			  cosphi = i_tpars.cosphi;
-			  size = i_tpars.size;
-			  ntubes = i_tpars.ntubes;
-			  loss = i_tpars.loss;
-			  asym = i_tpars.asymmetry;
-			  width = i_tpars.width;
-			  length = i_tpars.length;
-			  dist = i_tpars.dist;
-			  tgrad_x = i_tpars.tgrad_x;
-			  meanPedvar_Image = i_tpars.meanPedvar_Image;
-			  ze = 90.-i_showerpars.TelElevation[i];
-			  az = i_showerpars.TelAzimuth[i];
-			  MCe0 = i_showerpars.MCe0;
-			  MCxoff = i_showerpars.MCxoff;
-			  MCyoff = i_showerpars.MCyoff;
-			  MCxcore = i_showerpars.MCxcore;
-			  MCycore = i_showerpars.MCycore;
-			  Xoff = i_showerpars.Xoff[0];
-			  Yoff = i_showerpars.Yoff[0];
-			  Xcore = i_showerpars.Xcore[0];
-			  Ycore = i_showerpars.Ycore[0];
-			  LTrig = i_showerpars.LTrig;
-			  NImages = i_showerpars.NImages[0];
-			  MCaz = i_showerpars.MCaz;
+			runNumber = i_showerpars.runNumber;
+			eventNumber = i_showerpars.eventNumber;
+			cen_x = i_tpars.cen_x;
+			cen_y = i_tpars.cen_y;
+			sinphi = i_tpars.sinphi;
+			cosphi = i_tpars.cosphi;
+			size = i_tpars.size;
+			ntubes = i_tpars.ntubes;
+			loss = i_tpars.loss;
+			asym = i_tpars.asymmetry;
+			width = i_tpars.width;
+			length = i_tpars.length;
+			dist = i_tpars.dist;
+			tgrad_x = i_tpars.tgrad_x;
+			meanPedvar_Image = i_tpars.meanPedvar_Image;
+			ze = 90. - i_showerpars.TelElevation[i];
+			az = i_showerpars.TelAzimuth[i];
+			MCe0 = i_showerpars.MCe0;
+			MCxoff = i_showerpars.MCxoff;
+			MCyoff = i_showerpars.MCyoff;
+			MCxcore = i_showerpars.MCxcore;
+			MCycore = i_showerpars.MCycore;
+			Xoff = i_showerpars.Xoff[0];
+			Yoff = i_showerpars.Yoff[0];
+			Xcore = i_showerpars.Xcore[0];
+			Ycore = i_showerpars.Ycore[0];
+			LTrig = i_showerpars.LTrig;
+			NImages = i_showerpars.NImages[0];
+			MCaz = i_showerpars.MCaz;
 			
 			// calculate disp (observe sign convention for MCyoff)
 			disp = sqrt( ( cen_y + MCyoff ) * ( cen_y + MCyoff ) + ( cen_x - MCxoff ) * ( cen_x - MCxoff ) );
-			cross = sqrt( (cen_y+Yoff)*(cen_y+Yoff) + (cen_x-Xoff)*(cen_x-Xoff) );
+			cross = sqrt( ( cen_y + Yoff ) * ( cen_y + Yoff ) + ( cen_x - Xoff ) * ( cen_x - Xoff ) );
 			dispPhi = TMath::ATan2( sinphi, cosphi ) - TMath::ATan2( cen_y + MCyoff, cen_x - MCxoff );
-
-                        dispEnergy = i_showerpars.MCe0;
+			
+			dispEnergy = i_showerpars.MCe0;
 			
 			if( fMapOfTrainingTree.find( i_tel.TelType ) != fMapOfTrainingTree.end() )
 			{
@@ -346,7 +346,7 @@ int main( int argc, char* argv[] )
 		}
 	}
 	cout << endl;
-        // print help text
+	// print help text
 	if( argc < 4 )
 	{
 		cout << "./trainTMVAforAngularReconstruction <input eventdisplay file (MC)> <output directory> <training file name>" << endl;
@@ -356,13 +356,13 @@ int main( int argc, char* argv[] )
 	string fInputFile = argv[1];
 	string fOutputDir = argv[2];
 	string fOutputName = argv[3];
-
-        cout << "trainTMVAforAngularReconstruction (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
-        cout << "------------------------------------" << endl;
-        cout << endl;
-        cout << "input evndisp file with training events: " << endl;
-        cout << fInputFile << endl;
-        cout << endl;
+	
+	cout << "trainTMVAforAngularReconstruction (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
+	cout << "------------------------------------" << endl;
+	cout << endl;
+	cout << "input evndisp file with training events: " << endl;
+	cout << fInputFile << endl;
+	cout << endl;
 	
 	// output file
 	ostringstream iFileName;
@@ -371,14 +371,14 @@ int main( int argc, char* argv[] )
 	if( iO.IsZombie() )
 	{
 		cout << "Error creating output file: " << iFileName.str() << endl;
-                cout << "exiting..." << endl;
+		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
 	}
 	// fill training file
 	if( !writeTrainingFile( fInputFile ) )
 	{
 		cout << "error writing training file " << endl;
-                cout << "exiting..." << endl;
+		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
 	}
 	// write training tree to output file

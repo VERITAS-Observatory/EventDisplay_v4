@@ -92,7 +92,7 @@ void VEnergySpectrum::initializeRunVariables()
 	setSignificanceParameters();
 	setEnergyThresholdDefinition();
 	setErrorCalculationMethod();
-        setOffsetdistance();
+	setOffsetdistance();
 	
 	// set default fitting parameters
 	setSpectralFitFunction();
@@ -291,7 +291,10 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 		else
 		{
 			hname = "herecCounts_on";
-                        if( fOffsetDistance > -998. ) hname = "herecCounts2D_vs_distance_on";
+			if( fOffsetDistance > -998. )
+			{
+				hname = "herecCounts2D_vs_distance_on";
+			}
 		}
 		TH1D* i_hErecCountsOn = ( TH1D* )getHistogram( hname, fRunList[i].runnumber, "energyHistograms", fOffsetDistance );
 		// differential counting histogram 'off'
@@ -302,7 +305,10 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 		else
 		{
 			hname = "herecCounts_off";
-                        if( fOffsetDistance > -998. ) hname = "herecCounts2D_vs_distance_off";
+			if( fOffsetDistance > -998. )
+			{
+				hname = "herecCounts2D_vs_distance_off";
+			}
 		}
 		TH1D* i_hErecCountOff = ( TH1D* )getHistogram( hname, fRunList[i].runnumber, "energyHistograms", fOffsetDistance );
 		// histogram with systematic errors (same for on and off)
@@ -808,7 +814,7 @@ void VEnergySpectrum::rebinEnergySpectrum( TH1D* h, double iER, bool bLinearX )
 	{
 		return;
 	}
-
+	
 	// counting and timing histograms are simply rebinned
 	if( itemp.find( "Counts" ) < itemp.size() || itemp.find( "TotalTime" ) < itemp.size() )
 	{
@@ -1059,10 +1065,10 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			double i_ndiff = i_flux.NOn - i_flux.NOff * fTotalNormalisationFactor;
 			if( fErrorCalculationMethod == "Rolke" )
 			{
-			   // this is wrong, but people want to have a mean value instead of a 1 sigma range
-			   i_Rolke.SetCLSigmas( 1.e-4 );
-			   i_ndiff = 0.5*(i_Rolke.GetLowerLimit()+i_Rolke.GetUpperLimit());
-                        }
+				// this is wrong, but people want to have a mean value instead of a 1 sigma range
+				i_Rolke.SetCLSigmas( 1.e-4 );
+				i_ndiff = 0.5 * ( i_Rolke.GetLowerLimit() + i_Rolke.GetUpperLimit() );
+			}
 			i_flux.DifferentialFlux  = i_ndiff;
 			i_flux.DifferentialFlux /= i_flux.dE;
 			i_flux.DifferentialFlux /= i_flux.ObsTime;
@@ -1078,8 +1084,8 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			i_Rolke.SetCLSigmas( 1. );
 			if( i_ndiff != 0. )
 			{
-				i_flux.DifferentialFluxError_low = TMath::Abs(( i_ndiff - i_Rolke.GetLowerLimit() ) * i_flux.DifferentialFlux / i_ndiff);
-				i_flux.DifferentialFluxError_up  = TMath::Abs((i_Rolke.GetUpperLimit() - i_ndiff ) * i_flux.DifferentialFlux  / i_ndiff);
+				i_flux.DifferentialFluxError_low = TMath::Abs( ( i_ndiff - i_Rolke.GetLowerLimit() ) * i_flux.DifferentialFlux / i_ndiff );
+				i_flux.DifferentialFluxError_up  = TMath::Abs( ( i_Rolke.GetUpperLimit() - i_ndiff ) * i_flux.DifferentialFlux  / i_ndiff );
 				// recalculate poissonian flux error
 				i_flux.DifferentialFluxError =  sqrt( i_flux.NOn + fTotalNormalisationFactor * fTotalNormalisationFactor * i_flux.NOff )
 												* i_flux.DifferentialFlux / i_ndiff;
@@ -1503,7 +1509,7 @@ void VEnergySpectrum::plotFitValues()
     plot residuals between fit function and differential energy spectrum
 
 */
-TCanvas* VEnergySpectrum::plotResiduals( TCanvas* c, TF1 *f )
+TCanvas* VEnergySpectrum::plotResiduals( TCanvas* c, TF1* f )
 {
 	if( !fSpectralFitter )
 	{
@@ -1519,15 +1525,15 @@ TCanvas* VEnergySpectrum::plotResiduals( TCanvas* c, TF1 *f )
 	gEnergySpectrumFitResiduals->SetLineColor( fPlottingColor );
 	gEnergySpectrumFitResiduals->SetMarkerSize( fPlottingMarkerSize );
 	gEnergySpectrumFitResiduals->SetMarkerStyle( fPlottingMarkerStyle );
-
+	
 	if( fSpectralFitter && !f )
 	{
-	   f = fSpectralFitter->getSpectralFitFunction();
-	   if( !f )
-	   {
-		   return 0;
-	   }
-        }
+		f = fSpectralFitter->getSpectralFitFunction();
+		if( !f )
+		{
+			return 0;
+		}
+	}
 	
 	double x, y;
 	double ye_l = 0.;
@@ -1537,14 +1543,14 @@ TCanvas* VEnergySpectrum::plotResiduals( TCanvas* c, TF1 *f )
 		gEnergySpectrum->GetPoint( i, x, y );
 		if( fErrorCalculationMethod == "Poisson" )
 		{
-		   ye_l = gEnergySpectrum->GetErrorY( i );
-		   ye_u = gEnergySpectrum->GetErrorY( i );
-                }
+			ye_l = gEnergySpectrum->GetErrorY( i );
+			ye_u = gEnergySpectrum->GetErrorY( i );
+		}
 		else
 		{
-		   ye_l = gEnergySpectrum->GetErrorYlow( i );
-		   ye_u = gEnergySpectrum->GetErrorYhigh( i );
-                }
+			ye_l = gEnergySpectrum->GetErrorYlow( i );
+			ye_u = gEnergySpectrum->GetErrorYhigh( i );
+		}
 		if( f->Eval( x ) > 0. )
 		{
 			gEnergySpectrumFitResiduals->SetPoint( i, x, ( y - f->Eval( x ) ) / f->Eval( x ) );
@@ -1606,8 +1612,14 @@ TCanvas* VEnergySpectrum::plotMeanEffectiveArea( TCanvas* c, double i_effMin, do
 		hNullGT->SetYTitle( "effective area [m^{2}" );
 		hNullGT->GetYaxis()->SetTitleOffset( 1.3 );
 		hNullGT->SetMinimum( i_effMin );
-		if( i_effMax < 0. ) hNullGT->SetMaximum( hEffArea->GetMaximum() * 1.2 );
-		else                hNullGT->SetMaximum( i_effMax );
+		if( i_effMax < 0. )
+		{
+			hNullGT->SetMaximum( hEffArea->GetMaximum() * 1.2 );
+		}
+		else
+		{
+			hNullGT->SetMaximum( i_effMax );
+		}
 		hNullGT->SetMinimum( 0.5 );
 		hNullGT->Draw();
 	}

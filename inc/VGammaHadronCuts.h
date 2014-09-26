@@ -49,7 +49,7 @@ class VNTelTypeCut : public TNamed
 		void print();
 		bool test( CData* );
 		
-		ClassDef( VNTelTypeCut, 1 );
+		ClassDef( VNTelTypeCut, 2 );
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ class VGammaHadronCutsStats : public TNamed
 		void printCutStatistics() {}
 		void reset() {}
 		
-		ClassDef( VGammaHadronCutsStats, 2 );
+		ClassDef( VGammaHadronCutsStats, 3 );
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -125,8 +125,10 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		VTMVAEvaluator* fTMVAEvaluator;                             //!
 		string          fTMVA_MVAMethod;
 		string          fTMVAWeightFile;
-		unsigned int    fTMVAWeightFileIndex_min;
-		unsigned int    fTMVAWeightFileIndex_max;
+		unsigned int    fTMVAWeightFileIndex_Emin;
+		unsigned int    fTMVAWeightFileIndex_Emax;
+		unsigned int    fTMVAWeightFileIndex_Zmin;
+		unsigned int    fTMVAWeightFileIndex_Zmax;
 		map< unsigned int, double > fTMVASignalEfficiency;
 		map< unsigned int, double > fTMVA_MVACut;
 		double          fTMVAProbabilityThreshold;
@@ -135,6 +137,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		double          fTMVAOptimizeSignalEfficiencySignalEvents_Min;
 		double          fTMVAOptimizeSignalEfficiencyObservationTime_h;
 		double          fTMVAFixedSignalEfficiencyMax;
+		double          fTMVAMinSourceStrength;
 		double          fTMVAFixedThetaCutMin;
 		double          fTMVA_EvaluationResult;
 		VTMVAEvaluatorResults* fTMVAEvaluatorResults;
@@ -179,7 +182,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		bool   initPhaseCuts( string iDir );
 		bool   initProbabilityCuts( int irun );
 		bool   initProbabilityCuts( string iDir );
-		bool   initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_min, unsigned int iTMVAWeightFileIndex_max );
+		bool   initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_Emin, unsigned int iTMVAWeightFileIndex_Emax, unsigned int iTMVAWeightFileIndex_Zmin, unsigned int iTMVAWeightFileIndex_Zmax );
                 string getTelToAnalyzeString();
 
 		
@@ -375,10 +378,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			return bMCCuts;
 		}
 		void   newEvent( bool iFillStats = true );
-		void   print()
-		{
-			printCutSummary();
-		}
 		void   printCutSummary();
 		void   printCutStatistics()
 		{

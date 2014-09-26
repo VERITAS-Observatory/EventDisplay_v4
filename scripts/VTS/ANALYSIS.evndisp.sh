@@ -21,7 +21,7 @@ required parameters:
 optional parameters:
     
     [output directory]      directory where output ROOT files will be stored.
-			    Default: $VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/
+			   Default: $VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/
 	 
     [runparameter file]    file with integration window size and reconstruction cuts/methods, expected in $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/
 
@@ -30,30 +30,30 @@ optional parameters:
 			   other options:
 
 			   EVNDISP.reconstruction.runparameter.DISP		 (long sumwindow -> for use with CARE IRFs;
-										  DISP enabled, use RecID 1 in later stages to access it)
+										                      DISP enabled, use RecID 1 in later stages to access it)
 										 
 			   EVNDISP.reconstruction.runparameter.SumWindow6-noDISP (short sumwindow -> for use with grisu IRFs; DISP disabled)
 			   EVNDISP.reconstruction.runparameter.SumWindow6-DISP	 (short sumwindow -> for use with grisu IRFs; DISP enabled [RecID 1])
 
     [calibration]	   
-	  0		    neither tzero nor pedestal calculation is performed, must have the calibration results
-				already in $VERITAS_EVENTDISPLAY_AUX_DIR/Calibration/Tel_?
+	      0		            neither tzero nor pedestal calculation is performed, must have the calibration results
+			   	            already in $VERITAS_EVENTDISPLAY_AUX_DIR/Calibration/Tel_?
           1                 pedestal & average tzero calculation (default)
           2                 pedestal calculation only
           3                 average tzero calculation only
           4                 pedestal & average tzero calculation are performed;
-				laser run number is taken from calibration file,
-				gains taken from $VERITAS_EVENTDISPLAY_AUX_DIR/Calibration/Tel_?/<laserrun>.gain.root 
-			
+				            laser run number is taken from calibration file,
+				            gains taken from $VERITAS_EVENTDISPLAY_AUX_DIR/Calibration/Tel_?/<laserrun>.gain.root 
+
     [Model3D]               set to 1 to switch on 3D model (default is off)
 
     [teltoana]              restrict telescope combination to be analyzed:
                             e.g.: teltoana=123 (for tel. 1,2,3), 234, ...
                             Default is to use the telescope combination from the DB. Telescopes that were not in the array
-			    or have been cut by DQM are not analysed.
+			                or have been cut by DQM are not analysed.
 
     [calibration file name] only used with calibration=4 option
-			    to specify a which runs should be used for pedestal/tzero/gain calibration.
+			                to specify a which runs should be used for pedestal/tzero/gain calibration.
                             Default is calibrationlist.dat
                             file is expected in $VERITAS_EVNDISP_ANA_DIR/Calibration
 

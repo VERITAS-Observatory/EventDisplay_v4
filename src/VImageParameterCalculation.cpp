@@ -509,14 +509,14 @@ void VImageParameterCalculation::sizeInMuonRing()
 	//	fParGeo->muonSize = 0.0;
 	//	fParGeo->muonIPCorrectedSize = 0.0;
 	//	return;
-	//} 
+	//}
 	
 	if( fParGeo->muonValid == 0 && fParGeo->houghNpix == 0 )//Calculates size for muonValid or if HT was run.
 	{
 		fParGeo->muonSize = 0.0;
 		fParGeo->muonIPCorrectedSize = 0.0;
 		return;
-	} 
+	}
 	
 	if( fData->getSums().size() == 0 || fParGeo->muonRadius == 0.0 )
 	{
@@ -765,7 +765,7 @@ float VImageParameterCalculation::correctSizeInMuonRing()
 void VImageParameterCalculation::houghInitialization()
 {
 
-fHoughTransform = new VHoughTransform( getDetectorGeo() );
+	fHoughTransform = new VHoughTransform( getDetectorGeo() );
 	
 }
 
@@ -842,11 +842,11 @@ void VImageParameterCalculation::houghMuonPixelDistribution()
 	//Read pixel cut values from the Hough transform object
 	int npixMaxVal = 0;
 	int npixMinVal = 0;
-
+	
 	npixMaxVal = fHoughTransform->getNpixMax( fData->getTelID() );//Get the npixmax cut for the given telescope
 	npixMinVal = fHoughTransform->getNpixMin( fData->getTelID() );//Get the npixmin cut for the given telescope
 	
-	//Initial pixel cut. Runthe Hough transform analysis if the event passes the pixel cut. 
+	//Initial pixel cut. Runthe Hough transform analysis if the event passes the pixel cut.
 	if( iNpix >= npixMinVal && iNpix <= npixMaxVal )
 	{
 		fHoughTransform->analysis( fData, fParGeo );    //Pass pointers to the data and tree parameters to the Hough transform analysis method and perform analysis.
@@ -1037,7 +1037,7 @@ void VImageParameterCalculation::calcParameters()
 			
 			const double si = ( double )fData->getSums()[j]; // charge (dc)
 			sumsig += si;
-                        const double si2 = ( double )fData->getSums2()[j];
+			const double si2 = ( double )fData->getSums2()[j];
 			sumsig_2 += si2;
 			// sum in outer ring
 			if( getDetectorGeo()->getNNeighbours()[j] < getDetectorGeo()->getMaxNeighbour() )
@@ -1051,7 +1051,7 @@ void VImageParameterCalculation::calcParameters()
 				for( unsigned int n = 0; n < getDetectorGeo()->getNeighbours()[j].size(); n++ )
 				{
 					unsigned int k = getDetectorGeo()->getNeighbours()[j][n];
-					if( k < fData->getDead().size() && fData->getDead(k, fData->getHiLo()[k] ) )
+					if( k < fData->getDead().size() && fData->getDead( k, fData->getHiLo()[k] ) )
 					{
 						sumDeadRing += si;
 						iDead = true;

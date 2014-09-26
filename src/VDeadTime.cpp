@@ -223,10 +223,10 @@ void VDeadTime::defineHistograms( float iRunDuration, bool iNoWarning )
 		hScalarDeadTimeFraction->Sumw2();
 		hisList->Add( hScalarDeadTimeFraction );
 	}
-        else if( !iNoWarning )
-        {
-           cout << "Warning: scalars not used for dead time calculation, run duration zero (" << iRunDuration << ")" << endl;
-        }
+	else if( !iNoWarning )
+	{
+		cout << "Warning: scalars not used for dead time calculation, run duration zero (" << iRunDuration << ")" << endl;
+	}
 	
 }
 
@@ -518,12 +518,12 @@ TList* VDeadTime::getDeadTimeHistograms()
 */
 double VDeadTime::getDeadTimeFraction( double iT_run_s, bool iTimeDiff )
 {
-        // method of time difference: no time dependence
-        if( iTimeDiff )
-        {
-                return fDeadTimeFrac;
-        }
-        // dead time fraction from scalars
+	// method of time difference: no time dependence
+	if( iTimeDiff )
+	{
+		return fDeadTimeFrac;
+	}
+	// dead time fraction from scalars
 	if( hScalarDeadTimeFraction )
 	{
 		int nbin = hScalarDeadTimeFraction->FindBin( iT_run_s );
@@ -582,10 +582,10 @@ void VDeadTime::writeHistograms( bool iDebug_IO )
 	if( hisList )
 	{
 		int i_nbytes = hisList->Write();
-                if( iDebug_IO )
-                {
-                   cout << "WRITEDEBUG: dead time histograms (nbytes " << i_nbytes << ")" << endl;
-                }
+		if( iDebug_IO )
+		{
+			cout << "WRITEDEBUG: dead time histograms (nbytes " << i_nbytes << ")" << endl;
+		}
 	}
 	
 	// remove all objects created with new in this class

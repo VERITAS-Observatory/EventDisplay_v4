@@ -389,10 +389,10 @@ void VDST::terminate()
 				}
 				getDetectorTree()->Write();
 			}
-                        if( fDebug )
-                        {
-                                cout << "\t writing mean pulses " << endl;
-                        }
+			if( fDebug )
+			{
+				cout << "\t writing mean pulses " << endl;
+			}
 			// write pulse shape histograms
 			if( fDSTfile->mkdir( "meanPulses" )->cd() )
 			{
@@ -426,10 +426,10 @@ void VDST::terminate()
 
 bool VDST::writeCalibrationData()
 {
-        if( fDebug )
-        {
-                cout << "VDST::writeCalibrationData()" << endl;
-        }
+	if( fDebug )
+	{
+		cout << "VDST::writeCalibrationData()" << endl;
+	}
 	if( fDSTfile )
 	{
 		fDSTfile->cd();
@@ -492,9 +492,12 @@ bool VDST::writeCalibrationData()
 	{
 		setTelID( itel );
 		fTelID = getTelID();
-
-                // correct number of samples 
-                if( getNSamples() < fnum_sumwindow ) fnum_sumwindow = getNSamples();
+		
+		// correct number of samples
+		if( getNSamples() < fnum_sumwindow )
+		{
+			fnum_sumwindow = getNSamples();
+		}
 		
 		nPixel = ( unsigned int )getNChannels();
 		if( VDST_MAXCHANNELS < nPixel )
@@ -521,11 +524,11 @@ bool VDST::writeCalibrationData()
 		t->Fill();
 	}
 	t->Write();
-
-        if( fDebug )
-        {
-                cout << "END VDST::writeCalibrationData()" << endl;
-        }
+	
+	if( fDebug )
+	{
+		cout << "END VDST::writeCalibrationData()" << endl;
+	}
 	
 	return true;
 }

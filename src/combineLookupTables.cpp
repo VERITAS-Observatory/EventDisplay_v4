@@ -38,30 +38,30 @@ void copyDirectory( TDirectory* source, const char* hx = 0 );
  */
 string check_for_similar_noise_values( const char* hx )
 {
-    string iTemp = hx;
-
-    if( iTemp.find( "_" ) != string::npos )
-    {
-        int i_noise = atoi( iTemp.substr( iTemp.find( "_" )+1, iTemp.size() ).c_str() );
-        for( unsigned int i = 0; i < fNoiseLevel.size(); i++ )
-        {
-            if( TMath::Abs( fNoiseLevel[i] - i_noise ) < 10 )
-            {
-                char hname[200];
-                sprintf( hname, "NOISE_%05d", fNoiseLevel[i] );
-                iTemp = hname;
-                cout << "\t found similar noise level, save into directory: " << iTemp << "\t" << fNoiseLevel[i];
-                cout << " (" << fNoiseLevel.size() << ")" << endl;
-                return iTemp;
-            }
-        }
-        fNoiseLevel.push_back( i_noise );
-        cout << "\t new noise level directory: " << iTemp << "(" << fNoiseLevel.size() << ")" << endl;
-    }
-
-    return iTemp;
-
-
+	string iTemp = hx;
+	
+	if( iTemp.find( "_" ) != string::npos )
+	{
+		int i_noise = atoi( iTemp.substr( iTemp.find( "_" ) + 1, iTemp.size() ).c_str() );
+		for( unsigned int i = 0; i < fNoiseLevel.size(); i++ )
+		{
+			if( TMath::Abs( fNoiseLevel[i] - i_noise ) < 10 )
+			{
+				char hname[200];
+				sprintf( hname, "NOISE_%05d", fNoiseLevel[i] );
+				iTemp = hname;
+				cout << "\t found similar noise level, save into directory: " << iTemp << "\t" << fNoiseLevel[i];
+				cout << " (" << fNoiseLevel.size() << ")" << endl;
+				return iTemp;
+			}
+		}
+		fNoiseLevel.push_back( i_noise );
+		cout << "\t new noise level directory: " << iTemp << "(" << fNoiseLevel.size() << ")" << endl;
+	}
+	
+	return iTemp;
+	
+	
 }
 
 vector< string > readListOfFiles( string iFile )
@@ -102,8 +102,8 @@ int main( int argc, char* argv[] )
 			exit( 0 );
 		}
 	}
-
-
+	
+	
 	VGlobalRunParameter* iT = new VGlobalRunParameter();
 	cout << endl;
 	cout << "combineLookupTables (" << iT->getEVNDISP_VERSION() << ")" << endl;
@@ -175,8 +175,8 @@ int main( int argc, char* argv[] )
 	}
 	
 	fROFile->Close();
-        cout << endl;
-        cout << "total number of noise levels found: " << fNoiseLevel.size() << " (is this ok? check!)" << endl;
+	cout << endl;
+	cout << "total number of noise levels found: " << fNoiseLevel.size() << " (is this ok? check!)" << endl;
 	cout << "finished..." << endl;
 }
 
@@ -195,7 +195,7 @@ void copyDirectory( TDirectory* source, const char* hx )
 	// 1. case: top directory exists (NOISE_...)
 	if( hx )
 	{
-                string noise_dir = check_for_similar_noise_values( hx );
+		string noise_dir = check_for_similar_noise_values( hx );
 		adir = ( TDirectory* )savdir->Get( noise_dir.c_str() );
 	}
 	else

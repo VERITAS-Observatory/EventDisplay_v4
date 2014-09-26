@@ -29,7 +29,7 @@ void VModel3D::doModel3D()
 	//// initialized only at first call in the analysis run ////
 	if( !fInitialized3D )
 	{
-		initOutput(); 
+		initOutput();
 		initModel3DTree(); // initialize the output tree
 		vector<unsigned int> iNpix3D;
 		iNpix3D.resize( fData->getNTel(), 0 );
@@ -138,17 +138,17 @@ void VModel3D::readLnLTable()
 
 void VModel3D::setGain()
 {
-        /// set gain for each telescope ///
-        for( unsigned int iTel = 0; iTel < fData->getNTel(); iTel++ )
-        {
-	     fData3D->fDCPE[iTel] = fRunPar->fEpochGain[iTel];
-	     cout<<"telescope absolute gains: "<< fRunPar->fInstrumentEpoch <<" "<< iTel+1 <<" "<< fData3D->fDCPE[iTel] <<endl;
+	/// set gain for each telescope ///
+	for( unsigned int iTel = 0; iTel < fData->getNTel(); iTel++ )
+	{
+		fData3D->fDCPE[iTel] = fRunPar->fEpochGain[iTel];
+		cout << "telescope absolute gains: " << fRunPar->fInstrumentEpoch << " " << iTel + 1 << " " << fData3D->fDCPE[iTel] << endl;
 	}
 }
 
 void VModel3D::getDetector()
 {
-        ///// HARD-WIRED to VERITAS /////////////
+	///// HARD-WIRED to VERITAS /////////////
 	/// get telescope locations on ground ///
 	for( unsigned int iTel = 0; iTel < fData->getNTel(); iTel++ )
 	{
@@ -299,9 +299,12 @@ void VModel3D::calcStartParameters()
 {
 	/////// Get model starting point ///////////
 	/////// use reconstruction method 0 as default ////////////
-        /////// or set with MODEL3DSTARTID in runparameter file ///
-        unsigned int iID = fRunPar->fIDstartDirectionModel3D;
-	if( fRunPar->fIDstartDirectionModel3D > getEvndispReconstructionParameter()->fNMethods ) iID = 0;
+	/////// or set with MODEL3DSTARTID in runparameter file ///
+	unsigned int iID = fRunPar->fIDstartDirectionModel3D;
+	if( fRunPar->fIDstartDirectionModel3D > getEvndispReconstructionParameter()->fNMethods )
+	{
+		iID = 0;
+	}
 	
 	fData3D->fStartXcore3D = fData->getShowerParameters()->fShowerXcore[iID];
 	fData3D->fStartYcore3D = fData->getShowerParameters()->fShowerYcore[iID];

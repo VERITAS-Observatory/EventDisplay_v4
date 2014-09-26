@@ -215,7 +215,7 @@ bool VStereoMaps::fillOn( double x, double y, double ze, double erec, int irun, 
 			return false;
 		}
 		// fill 2D stereo Maps for all models (ON map)
-		makeTwoDStereo_BoxSmooth( x-fRunList.fWobbleWestMod, y-fRunList.fWobbleNorthMod, i_weight, sqrt( fTheta2Cut_Max ), i_MeanSignalBackgroundAreaRatio );
+		makeTwoDStereo_BoxSmooth( x - fRunList.fWobbleWestMod, y - fRunList.fWobbleNorthMod, i_weight, sqrt( fTheta2Cut_Max ), i_MeanSignalBackgroundAreaRatio );
 	}
 	
 	// direction cut
@@ -378,7 +378,7 @@ void VStereoMaps::makeTwoDStereo_BoxSmooth( double i_xderot, double i_yderot, do
 			i_ybin = hmap_stereo->GetYaxis()->GetBinCenter( j + 1 );
 			// test if this position is inside maximum accepted distance from camera center
 			if( sqrt( ( i_xbin + fRunList.fWobbleWestMod ) * ( i_xbin + fRunList.fWobbleWestMod ) +
-				  ( i_ybin + fRunList.fWobbleNorthMod ) * ( i_ybin + fRunList.fWobbleNorthMod ) ) > fRunList.fmaxradius )
+					  ( i_ybin + fRunList.fWobbleNorthMod ) * ( i_ybin + fRunList.fWobbleNorthMod ) ) > fRunList.fmaxradius )
 			{
 				continue;
 			}
@@ -532,12 +532,18 @@ void VStereoMaps::RM_getAlpha( bool iIsOn )
 	double cx = 0.;
 	double cy = 0.;
 	double cr = 0.;
-        // expected number of bins in source region
-        // (assume also that x and y binning is the same;
+	// expected number of bins in source region
+	// (assume also that x and y binning is the same;
 	//  this assumption is not critical)
 	double iNB_expected = 1.;
-	if( x_w > 0. ) iNB_expected = i_rS*i_rS*TMath::Pi() / x_w / x_w;
-	if( iNB_expected <= 0. ) iNB_expected = 1.;
+	if( x_w > 0. )
+	{
+		iNB_expected = i_rS * i_rS * TMath::Pi() / x_w / x_w;
+	}
+	if( iNB_expected <= 0. )
+	{
+		iNB_expected = 1.;
+	}
 	
 	double i_acc = 0.;
 	
@@ -700,21 +706,21 @@ void VStereoMaps::RE_getAlpha( bool iIsOn )
 			else
 			{
 				// correlated maps
-			        if( !bUncorrelatedSkyMaps && i < (int)fRE_off.size() && j < (int)fRE_off[i].size() )
+				if( !bUncorrelatedSkyMaps && i < ( int )fRE_off.size() && j < ( int )fRE_off[i].size() )
 				{
-				    hmap_alpha->SetBinContent( hmap_alpha->GetXaxis()->FindBin( hmap_alpha->GetXaxis()->GetBinCenter( i ) - fRunList.fWobbleWestMod ),
-				                               hmap_alpha->GetYaxis()->FindBin( hmap_alpha->GetYaxis()->GetBinCenter( j ) - fRunList.fWobbleNorthMod ),
-				                               ( double )fRE_off[i][j].noff );
-                                }
+					hmap_alpha->SetBinContent( hmap_alpha->GetXaxis()->FindBin( hmap_alpha->GetXaxis()->GetBinCenter( i ) - fRunList.fWobbleWestMod ),
+											   hmap_alpha->GetYaxis()->FindBin( hmap_alpha->GetYaxis()->GetBinCenter( j ) - fRunList.fWobbleNorthMod ),
+											   ( double )fRE_off[i][j].noff );
+				}
 				// uncorrelated maps
 				else if( hmap_stereo->GetBinContent( i, j ) > 0. )
 				{
-				    hmap_alpha->SetBinContent( i, j, hmap_alpha->GetBinContent( i, j ) / hmap_stereo->GetBinContent( i, j ) );
-                                }
+					hmap_alpha->SetBinContent( i, j, hmap_alpha->GetBinContent( i, j ) / hmap_stereo->GetBinContent( i, j ) );
+				}
 				else
 				{
 					hmap_alpha->SetBinContent( i, j, 0. );
-				} 
+				}
 			}
 		}
 	}
@@ -1089,7 +1095,7 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
 			
 			// bin is outside confidence region (distance of bin + off source radius)
 			// and bin is too close to center of camera
-//			if( ids < ( fRunList.fmaxradius - fRE_roffTemp ) && ids > fRE_roffTemp && fRE_roffTemp != 0. )
+			//			if( ids < ( fRunList.fmaxradius - fRE_roffTemp ) && ids > fRE_roffTemp && fRE_roffTemp != 0. )
 			if( ids < ( fRunList.fmaxradius ) && ids > fRE_roffTemp && fRE_roffTemp != 0. )
 			{
 				// angular size of the on region seen from the observation position
@@ -1145,8 +1151,8 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
 								{
 									// vXTOEXCLUDE and vYTOEXCLUDE are relative to sky map centre in rotated camera coordinates
 									if( ( x_t - vXTOEXCLUDE[ex] - fRunList.fWobbleWestMod ) * ( x_t - vXTOEXCLUDE[ex] - fRunList.fWobbleWestMod )
-									  + ( y_t - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod ) * ( y_t - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod )
-									    < ( vRTOEXCLUDE[ex] + fRE_roffTemp ) * ( vRTOEXCLUDE[ex] + fRE_roffTemp ) )
+											+ ( y_t - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod ) * ( y_t - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod )
+											< ( vRTOEXCLUDE[ex] + fRE_roffTemp ) * ( vRTOEXCLUDE[ex] + fRE_roffTemp ) )
 									{
 										bExclude = true;
 									}

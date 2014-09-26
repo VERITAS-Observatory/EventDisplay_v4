@@ -158,7 +158,7 @@ int main( int argc, char* argv[] )
 		cout << "(some parameter and parameter ranges are hard-coded)" << endl;
 		exit( 0 );
 	}
-        bool bReducedWidth = false;
+	bool bReducedWidth = false;
 	
 	// Histograms
 	TList* hOn = new TList();
@@ -234,32 +234,32 @@ int main( int argc, char* argv[] )
 	float emissionHeightChi2 = 0.;
 	int NImages = 0;
 	tOn->SetBranchAddress( "NImages", &NImages );
-        if( !bReducedWidth )
-        {
-            tOn->SetBranchAddress( "MSCW", &MSCW );
-            tOn->SetBranchAddress( "MSCL", &MSCL );
-        }
-        else
-        {
-            tOn->SetBranchAddress( "MWR", &MSCW );
-            tOn->SetBranchAddress( "MLR", &MSCL );
-        }
+	if( !bReducedWidth )
+	{
+		tOn->SetBranchAddress( "MSCW", &MSCW );
+		tOn->SetBranchAddress( "MSCL", &MSCL );
+	}
+	else
+	{
+		tOn->SetBranchAddress( "MWR", &MSCW );
+		tOn->SetBranchAddress( "MLR", &MSCL );
+	}
 	tOn->SetBranchAddress( "theta2", &theta2 );
 	tOn->SetBranchAddress( "EChi2S", &echi2 );
 	tOn->SetBranchAddress( "SizeSecondMax", &size2ndmax );
 	tOn->SetBranchAddress( "EmissionHeight", &emissionHeight );
 	tOn->SetBranchAddress( "EmissionHeightChi2", &emissionHeightChi2 );
 	tOff->SetBranchAddress( "NImages", &NImages );
-        if( !bReducedWidth )
-        {
-            tOff->SetBranchAddress( "MSCW", &MSCW );
-            tOff->SetBranchAddress( "MSCL", &MSCL );
-        }
-        else
-        {
-            tOff->SetBranchAddress( "MWR", &MSCW );
-            tOff->SetBranchAddress( "MLR", &MSCL );
-        }
+	if( !bReducedWidth )
+	{
+		tOff->SetBranchAddress( "MSCW", &MSCW );
+		tOff->SetBranchAddress( "MSCL", &MSCL );
+	}
+	else
+	{
+		tOff->SetBranchAddress( "MWR", &MSCW );
+		tOff->SetBranchAddress( "MLR", &MSCL );
+	}
 	tOff->SetBranchAddress( "theta2", &theta2 );
 	tOff->SetBranchAddress( "EChi2S", &echi2 );
 	tOff->SetBranchAddress( "SizeSecondMax", &size2ndmax );
@@ -277,12 +277,12 @@ int main( int argc, char* argv[] )
 	double mscl_step = 0.05;
 	unsigned int    mscl_max_n = 1;
 	double mscl_max_start =  0.7;
-
-        if( bReducedWidth )
-        {
-            mscw_max_start = 1.;
-            mscl_max_start = 1.;
-        }
+	
+	if( bReducedWidth )
+	{
+		mscw_max_start = 1.;
+		mscl_max_start = 1.;
+	}
 	
 	// size2ndmax
 	double size_step = 100.;
@@ -312,22 +312,22 @@ int main( int argc, char* argv[] )
 	double echi2_max_start = -1.5;
 	
 	bool fQuickTest = false;
-//	fQuickTest = true;
+	//	fQuickTest = true;
 	if( fQuickTest )
 	{
-/*		mscw_max_n = 1;
-		mscw_max_start = 0.7;
-		mscl_max_n = 1;
-		mscl_max_start = 0.7; */
+		/*		mscw_max_n = 1;
+				mscw_max_start = 0.7;
+				mscl_max_n = 1;
+				mscl_max_start = 0.7; */
 		size_n = 1;
 		size_start = 700;
 		emm_min_n = 1;
 		emm_max_n = 1;
 		emm_max_start = 1.e99;
-/*		emmChi2_start = 10.;
-		emmChi2_n = 1;
-		echi2_n = 1;
-		echi2_max_start = 1.e99;  */
+		/*		emmChi2_start = 10.;
+				emmChi2_n = 1;
+				echi2_n = 1;
+				echi2_max_start = 1.e99;  */
 	}
 	
 	// size of parameter space

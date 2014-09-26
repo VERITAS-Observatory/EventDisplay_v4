@@ -112,7 +112,7 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	fEnergySpectrumBinSize = 0.05;
 	fEnergyEffectiveAreaSmoothingIterations = -1;
 	fEnergyEffectiveAreaSmoothingThreshold = -1.;
-        fDeadTimeCalculationMethod = 0;
+	fDeadTimeCalculationMethod = 0;
 	
 	// background model
 	fTMPL_fBackgroundModel = 0;
@@ -150,7 +150,7 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	// model3D analysis
 	fModel3D = false; // MODEL3DANALYSIS
 	fDirectionModel3D = false; //USEDIRECTIONMODEL3D
-
+	
 	// if 0, use default 1D radial acceptance
 	// if >0, use alternate 2D-dependent acceptance
 	f2DAcceptanceMode = 0 ; // USE2DACCEPTANCE
@@ -362,7 +362,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				if( checkNumberOfArguments( is_line ) != 4 )
 				{
 					return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line,
-								"* SKYMAPCENTRE_RADECJ2000_DEG (RA(deg) DEC(deg)" );
+											"* SKYMAPCENTRE_RADECJ2000_DEG (RA(deg) DEC(deg)" );
 				}
 				fSkyMapCentreRAJ2000 = atof( temp2.c_str() );
 				is_stream >> temp2;
@@ -373,7 +373,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				if( checkNumberOfArguments( is_line ) != 8 )
 				{
 					return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line,
-				                                 "* SKYMAPCENTRE_RADECJ2000_HOUR RA(Hour Min Sec)  DEC(Deg Min Sec)" );
+											"* SKYMAPCENTRE_RADECJ2000_HOUR RA(Hour Min Sec)  DEC(Deg Min Sec)" );
 				}
 				double d_tt = 0.;
 				d_tt += atof( temp2.c_str() );
@@ -469,7 +469,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				}
 				fExclusionRegions.push_back( new VAnaSumRunParameterListOfExclusionRegions() );
 				
-                                // ra
+				// ra
 				double d_tt = 0.;
 				d_tt += ( double )atof( temp2.c_str() );
 				is_stream >> temp2;
@@ -477,18 +477,33 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				is_stream >> temp2;
 				d_tt += ( double )atof( temp2.c_str() ) / 3600.;
 				fExclusionRegions.back()->fExcludeFromBackground_RAJ2000 = d_tt / 24. * 360.;
-                                // dec
-                                bool bNeg = false;
+				// dec
+				bool bNeg = false;
 				d_tt = 0.;
 				is_stream >> temp2;
 				d_tt += ( double )atof( temp2.c_str() );
-                                if( d_tt < 0 ) bNeg = true;
+				if( d_tt < 0 )
+				{
+					bNeg = true;
+				}
 				is_stream >> temp2;
-				if( !bNeg ) d_tt += ( double )atof( temp2.c_str() ) / 60.;
-                                else        d_tt -= ( double )atof( temp2.c_str() ) / 60.;
+				if( !bNeg )
+				{
+					d_tt += ( double )atof( temp2.c_str() ) / 60.;
+				}
+				else
+				{
+					d_tt -= ( double )atof( temp2.c_str() ) / 60.;
+				}
 				is_stream >> temp2;
-				if( !bNeg ) d_tt += ( double )atof( temp2.c_str() ) / 3600.;
-                                else        d_tt -= ( double )atof( temp2.c_str() ) / 3600.;
+				if( !bNeg )
+				{
+					d_tt += ( double )atof( temp2.c_str() ) / 3600.;
+				}
+				else
+				{
+					d_tt -= ( double )atof( temp2.c_str() ) / 3600.;
+				}
 				fExclusionRegions.back()->fExcludeFromBackground_DecJ2000 = d_tt;
 				is_stream >> temp2;
 				fExclusionRegions.back()->fExcludeFromBackground_Radius = ( double )atof( temp2.c_str() );
@@ -517,24 +532,24 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			else if( temp == "ENERGYRECONSTRUCTIONMETHOD" )
 			{
 				fEnergyReconstructionMethod = ( unsigned int )atoi( temp2.c_str() );
-                                // print a clear warning if method 0 is selected
-                                if( fEnergyReconstructionMethod == 0 )
-                                {
-                                        cout << endl;
-                                        cout << "WARNING: energy reconstruction 0 is no longer valid. For any standard analysise, please use method 1 by:" << endl;
-                                        cout << "  open your anasum run parameter file and replace " << endl;
-                                        cout << "* ENERGYRECONSTRUCTIONMETHOD 0" << endl;
-                                        cout << "   by " << endl;
-                                        cout << "* ENERGYRECONSTRUCTIONMETHOD 1" << endl;
-                                        cout << "(if you really want to use method 0, you will have to look into the code to find the detour" << endl;
-                                        return 0;
-                                }
-                                // horrible detour to make sure that users don't use the wrong method
-                                else if( fEnergyReconstructionMethod == 100 )
-                                {
-                                    cout << "Warning: using energy reconstruction method 0" << endl;
-                                    fEnergyReconstructionMethod = 0;
-                                }
+				// print a clear warning if method 0 is selected
+				if( fEnergyReconstructionMethod == 0 )
+				{
+					cout << endl;
+					cout << "WARNING: energy reconstruction 0 is no longer valid. For any standard analysise, please use method 1 by:" << endl;
+					cout << "  open your anasum run parameter file and replace " << endl;
+					cout << "* ENERGYRECONSTRUCTIONMETHOD 0" << endl;
+					cout << "   by " << endl;
+					cout << "* ENERGYRECONSTRUCTIONMETHOD 1" << endl;
+					cout << "(if you really want to use method 0, you will have to look into the code to find the detour" << endl;
+					return 0;
+				}
+				// horrible detour to make sure that users don't use the wrong method
+				else if( fEnergyReconstructionMethod == 100 )
+				{
+					cout << "Warning: using energy reconstruction method 0" << endl;
+					fEnergyReconstructionMethod = 0;
+				}
 				else if( fEnergyReconstructionMethod > 1 )
 				{
 					cout << "Unknown parameter for ENERGYRECONSTRUCTIONMETHOD in parameter file " << i_filename << ": " << temp2 << endl;
@@ -542,15 +557,15 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 					return 0;
 				}
 			}
-                        else if( temp == "DEADTIMECALCULATIONMETHOD" )
-                        {
-                                fDeadTimeCalculationMethod = atoi( temp2.c_str() );
-                                if( fDeadTimeCalculationMethod != 0 && fDeadTimeCalculationMethod != 1 )
-                                {
-                                    cout << "Unknown dead time calculation method (0=scalar method, 1=time difference)" << endl;
-                                    return 0;
-                                }
-                        }
+			else if( temp == "DEADTIMECALCULATIONMETHOD" )
+			{
+				fDeadTimeCalculationMethod = atoi( temp2.c_str() );
+				if( fDeadTimeCalculationMethod != 0 && fDeadTimeCalculationMethod != 1 )
+				{
+					cout << "Unknown dead time calculation method (0=scalar method, 1=time difference)" << endl;
+					return 0;
+				}
+			}
 			else if( temp == "RATEINTERVALLLENGTH" )
 			{
 				fTimeIntervall = atof( temp2.c_str() ) * 60.;
@@ -628,7 +643,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			/// use Model3D direction ///
 			else if( temp == "USEDIRECTIONMODEL3D" )
 			{
-			        unsigned int tmpDirectionModel3D = ( unsigned int )atoi( temp2.c_str() ) ;
+				unsigned int tmpDirectionModel3D = ( unsigned int )atoi( temp2.c_str() ) ;
 				if( tmpDirectionModel3D == 1 )
 				{
 					fDirectionModel3D = true;
@@ -1133,9 +1148,15 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
 			cout << " (use effective area A_REC)";
 		}
 		cout << ", Method " << fEnergyReconstructionMethod << endl;
-                cout << "\t dead time calculation method: ";
-                if( fDeadTimeCalculationMethod == 0 ) cout << "scalar method" << endl;
-                else                                  cout << "tdiff method" << endl;
+		cout << "\t dead time calculation method: ";
+		if( fDeadTimeCalculationMethod == 0 )
+		{
+			cout << "scalar method" << endl;
+		}
+		else
+		{
+			cout << "tdiff method" << endl;
+		}
 		
 		cout << "\t background model: ";
 		if( fRunList[i].fBackgroundModel == eONOFF )

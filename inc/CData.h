@@ -137,7 +137,7 @@ class CData
 		UInt_t          NTelPairs;
 		//[NTelPairs]
 		Float_t         EmissionHeightT[VDST_MAXTELESCOPES* VDST_MAXTELESCOPES];
-		
+		Double_t        DispDiff;  // from disp method
 		/// model3D parameters ///
 		Double_t         Smax3D;
 		Double_t         sigmaL3D;
@@ -280,7 +280,7 @@ class CData
 		TBranch*        b_EmissionHeightChi2;     //!
 		TBranch*        b_NTelPairs;              //!
 		TBranch*        b_EmissionHeightT;        //!
-		
+		TBranch*        b_DispDiff; //disp		
 		/// model3D parameters ///
 		TBranch*        b_Smax3D;
 		TBranch*        b_sigmaL3D;
@@ -900,7 +900,14 @@ void CData::Init( TTree* tree )
 			EmissionHeightT[i] = 0.;
 		}
 	}
-	
+        if( fChain->GetBranchStatus( "DispDiff" ) )
+        {
+            fChain->SetBranchAddress( "DispDiff", &DispDiff );	
+        }
+        else
+        {
+            DispDiff = 0.;
+        }
 	if( fModel3D )
 	{
 		fChain->SetBranchAddress( "Smax3D", &Smax3D );
@@ -1080,7 +1087,14 @@ Bool_t CData::Notify()
 		b_NTelPairs = 0;
 		b_EmissionHeightT = 0;
 	}
-	
+        if( fChain->GetBranchStatus( "DispDiff" ) )
+        {
+            b_DispDiff = fChain->GetBranch( "DispDiff" );
+        }
+        else
+        {
+            b_DispDiff = 0;
+        }
 	if( fModel3D )
 	{
 		b_Smax3D = fChain->GetBranch( "Smax3D" );

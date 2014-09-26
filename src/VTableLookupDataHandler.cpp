@@ -242,7 +242,7 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
 		
 		if( !fIsMC )
 		{
-			ftheta2 = ( fXoff * fXoff + fYoff * fYoff );
+			ftheta2 = ( fYoff_derot - fWobbleN ) * ( fYoff_derot - fWobbleN ) + ( fXoff_derot - fWobbleE ) * ( fXoff_derot - fWobbleE );
 		}
 		else
 		{
@@ -381,7 +381,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 	fYoff = fshowerpars->Yoff[fMethod];
 	fXoff_derot = fshowerpars->XoffDeRot[fMethod];
 	fYoff_derot = fshowerpars->YoffDeRot[fMethod];
-	
+	fDispDiff = fshowerpars->DispDiff[fMethod];
 	// fill Model3D parameters
 	if( fIsModel3D )
 	{
@@ -490,7 +490,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			fsize[i] = ftpars[i]->size;
 			fsize2[i] = ftpars[i]->size2;
 			floss[i] = ftpars[i]->loss;
-                        ffracLow[i] = ftpars[i]->fracLow;
+			ffracLow[i] = ftpars[i]->fracLow;
 			fwidth[i] = ftpars[i]->width;
 			flength[i] = ftpars[i]->length;
 			
@@ -1081,14 +1081,8 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 	{
 		fOTree->Branch( "TargetRA", &fTargetRA, "TargetRA/D" );
 	}
-	if( !fShortTree )
-	{
-		fOTree->Branch( "WobbleN", &fWobbleN, "WobbleN/D" );
-	}
-	if( !fShortTree )
-	{
-		fOTree->Branch( "WobbleE", &fWobbleE, "WobbleE/D" );
-	}
+        fOTree->Branch( "WobbleN", &fWobbleN, "WobbleN/D" );
+        fOTree->Branch( "WobbleE", &fWobbleE, "WobbleE/D" );
 	
 	// MC parameters
 	if( fIsMC )
@@ -1231,6 +1225,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 		sprintf( iTT, "Fitstat[%d]/I", fNTel );
 		fOTree->Branch( "Fitstat", fFitstat, iTT );
 	}
+	fOTree->Branch( "DispDiff", &fDispDiff, "DispDiff/D" );
 	// Model3D parameters
 	if( fIsModel3D )
 	{
@@ -1818,7 +1813,7 @@ void VTableLookupDataHandler::resetImageParameters( unsigned int i )
 	fsize[i] = 0.;
 	fsize2[i] = 0.;
 	floss[i] = 0.;
-        ffracLow[i] = 0.;
+	ffracLow[i] = 0.;
 	fwidth[i] = 0.;
 	flength[i] = 0.;
 	fmeanPedvar_ImageT[i] = 0.;
@@ -2000,7 +1995,7 @@ void VTableLookupDataHandler::resetAll()
 		fsizeCorr[i] = 0.;
 		fsize_telType[i] = 0.;
 		floss[i] = 0.;
-                ffracLow[i] = 0.;
+		ffracLow[i] = 0.;
 		fmax1[i] = 0.;
 		fmax2[i] = 0.;
 		fmax3[i] = 0.;
@@ -2064,7 +2059,7 @@ void VTableLookupDataHandler::resetAll()
 	
 	fMC_distance_to_cameracenter_min = 0.;
 	fMC_distance_to_cameracenter_max = 1.e10;
-	
+	fDispDiff = 0;
 	// Model3D parameters
 	fSmax3D = 0;
 	fsigmaL3D = 0;
@@ -2259,15 +2254,15 @@ double VTableLookupDataHandler::getTelElevation()
 	// get telescope with maximum votes
 	unsigned int i_max = 0;
 	for( unsigned int i = 0; i < i_votes.size(); i++ )
-        {
-                if( i_votes[i] > i_votes[i_max] )
+	{
+		if( i_votes[i] > i_votes[i_max] )
 		{
 			i_max = i;
 		}
-        }
-		
+	}
+	
 	cout << "\treading telescope elevation from telescope " << i_max + 1 << " (from vote casting): ";
-        cout << fTelElevation[i_max] << " deg" << endl;
+	cout << fTelElevation[i_max] << " deg" << endl;
 	
 	return fTelElevation[i_max];
 }

@@ -414,8 +414,8 @@ bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vec
 						if( iClass == "TH1F" )
 						{
 							iHis2D[iHisName2D] = new TH2F( iHisName2D.c_str(), hisList[i]->GetTitle(),
-                                                                                       hisList[i]->GetNbinsX(), hisList[i]->GetXaxis()->GetXmin(), hisList[i]->GetXaxis()->GetXmax(),
-									   	       nbins_woff, woff );
+														   hisList[i]->GetNbinsX(), hisList[i]->GetXaxis()->GetXmin(), hisList[i]->GetXaxis()->GetXmax(),
+														   nbins_woff, woff );
 							iHis2D[iHisName2D]->SetXTitle( hisList[i]->GetXaxis()->GetTitle() );
 							iHis2D[iHisName2D]->SetYTitle( "off-axis angle [deg]" );
 							iHis2D[iHisName2D]->SetZTitle( hisList[i]->GetYaxis()->GetTitle() );
@@ -829,7 +829,7 @@ bool VWPPhysSensitivityFile::terminate()
 				hisListToDisk[i]->Write();
 			}
 		}
-                cout << endl;
+		cout << endl;
 		// debug histograms
 		TDirectory* iD = fOutFile->mkdir( "debug", "additional debug histograms" );
 		if( iD && iD->cd() )
@@ -842,7 +842,7 @@ bool VWPPhysSensitivityFile::terminate()
 					hisListToDiskDebug[i]->Write();
 				}
 			}
-                        cout << endl;
+			cout << endl;
 		}
 		
 		fOutFile->Close();

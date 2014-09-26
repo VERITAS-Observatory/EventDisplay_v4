@@ -1008,8 +1008,8 @@ void VTableLookup::readLookupTable()
 			// calculate mean width ratio (mean scaled variables)
 			imr = 0.;
 			inr = 0.;
-                        // require size2 > 0 (to use only selected images for the MWR/MWL calculation)
-                        double* i_s2 = fData->getSize2( 1., fTLRunParameter->fUseSelectedImagesOnly );
+			// require size2 > 0 (to use only selected images for the MWR/MWL calculation)
+			double* i_s2 = fData->getSize2( 1., fTLRunParameter->fUseSelectedImagesOnly );
 			for( unsigned int j = 0; j < s_N->fNTel; j++ )
 			{
 				if( s_N->mscw_T[j] > 0. && fData->getWidth() && i_s2 && i_s2[j] > 0. )
@@ -1506,13 +1506,16 @@ bool VTableLookup::initialize( VTableLookupRunParameter* iTLRunParameter )
 		}
 		
 		string iTitle = ihname;
-                int i_mean_pedvarlevel = (int)(fData->getMeanNoiseLevel()*100);
-                cout << "setting mean pedvar level for table selection to : " << fData->getMeanNoiseLevel() << endl;
-                cout << "   (pedvar levels per telescopes are ";
-                for( unsigned int i = 0; i < fData->getNoiseLevel().size(); i++ ) cout << " " << fData->getNoiseLevel()[i];
-                cout << ")" << endl;
+		int i_mean_pedvarlevel = ( int )( fData->getMeanNoiseLevel() * 100 );
+		cout << "setting mean pedvar level for table selection to : " << fData->getMeanNoiseLevel() << endl;
+		cout << "   (pedvar levels per telescopes are ";
+		for( unsigned int i = 0; i < fData->getNoiseLevel().size(); i++ )
+		{
+			cout << " " << fData->getNoiseLevel()[i];
+		}
+		cout << ")" << endl;
 		setMCTableFiles( fTLRunParameter->tablefile, fTLRunParameter->ze, fTLRunParameter->fWobbleOffset,
-				 i_mean_pedvarlevel, "tb", ihname, fTLRunParameter->fWrite1DHistograms );
+						 i_mean_pedvarlevel, "tb", ihname, fTLRunParameter->fWrite1DHistograms );
 						 
 		// set min/max distance to camera center
 		if( fData )

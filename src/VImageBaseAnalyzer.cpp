@@ -133,7 +133,7 @@ void VImageBaseAnalyzer::calcSums( int iFirst, int iLast, bool iMakingPeds, bool
 				continue;
 			}
 			
-			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( i_channelHitID, getHiLo()[i_channelHitID]) ) 
+			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( i_channelHitID, getHiLo()[i_channelHitID] ) )
 			{
 				fReader->selectHitChan( i );
 				if( iMakingPeds )
@@ -228,8 +228,8 @@ void VImageBaseAnalyzer::calcTZeros( int fFirst, int fLast )
 		try
 		{
 			i_channelHitID = fReader->getHitID( i );
-
-			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( i_channelHitID, getHiLo()[i_channelHitID]) ) 
+			
+			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( i_channelHitID, getHiLo()[i_channelHitID] ) )
 			{
 				if( getDebugFlag() )
 				{
@@ -448,8 +448,8 @@ void VImageBaseAnalyzer::calcTCorrectedSums( int iFirst, int iLast )
 		try
 		{
 			i_channelHitID = fReader->getHitID( i );
-
-			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( i_channelHitID, getHiLo()[i_channelHitID]) ) 
+			
+			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( i_channelHitID, getHiLo()[i_channelHitID] ) )
 			{
 				fReader->selectHitChan( i );
 				fTraceHandler->setTrace( fReader, getNSamples(), getPeds( getHiLo()[i_channelHitID] )[i_channelHitID],
@@ -596,7 +596,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 		/////////////////////////////////////////////////////////////////
 		// calculate tzero and sums for good channels only
 		/////////////////////////////////////////////////////////////////
-		if( i_channelHitID < ndead_size && !getDead( i_channelHitID, getHiLo()[i_channelHitID]) ) 
+		if( i_channelHitID < ndead_size && !getDead( i_channelHitID, getHiLo()[i_channelHitID] ) )
 		{
 			// initialize trace handler
 			fTraceHandler->setTrace( fReader, getNSamples(),
@@ -650,7 +650,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 			///////////////////////////////////////////
 			// integrate trace
 			setSums( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) * getLowGainSumCorrection( iLastSum - iFirstSum , corrlast - corrfirst, getHiLo()[i_channelHitID] ) );
-
+			
 			// fill parameters characterizing the trace
 			setTCorrectedSumFirst( i_channelHitID, fTraceHandler->getTraceIntegrationFirst() );
 			setTCorrectedSumLast( i_channelHitID, fTraceHandler->getTraceIntegrationLast() );
@@ -1249,14 +1249,14 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 	setTCorrectedSumFirst( getSumFirst() );
 	// set dynamic integration window
 	// (depending on the measured integrated charge in first pass)
-        // (not implemented yet)
+	// (not implemented yet)
 	for( unsigned int i = 0; i < nhits; i++ )
 	{
 		unsigned int i_channelHitID = 0;
 		try
 		{
 			i_channelHitID = fReader->getHitID( i );
-			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( i_channelHitID, getHiLo()[i_channelHitID]) ) 
+			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( i_channelHitID, getHiLo()[i_channelHitID] ) )
 			{
 				if( getRunParameter()->fDynamicIntegrationWindow )
 				{
@@ -1305,7 +1305,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 		{
 			i_channelHitID = fReader->getHitID( i );
 			// dead channels are excluded
-			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( i_channelHitID, getHiLo()[i_channelHitID]) ) 
+			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( i_channelHitID, getHiLo()[i_channelHitID] ) )
 			{
 				// trace handler
 				fTraceHandler->setTrace( fReader, getNSamples(), getPeds( getHiLo()[i_channelHitID] )[i_channelHitID],
@@ -1360,43 +1360,43 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 				// low gain channel have different time -> use tzero (do not do this for DST sims)
 				if( getHiLo()[i_channelHitID] && getRunParameter()->fsourcetype != 7 )
 				{
-                                        // integrate low-gain pulse only if prediction window start is before the end of the readout window
-                                        if( corrfirst < (int)getNSamples() )
-                                        {
-                                            // get new tzero for sumwindow starting at corrfirst to the end of the window
-                                            // assume that high and low gain timing is not more than 5 samples off
-                                            if( getSumWindowMaxTimeDifferenceLGtoHG() > -998. )
-                                            {
-                                                 corrfirst += getSumWindowMaxTimeDifferenceLGtoHG();
-                                            }
-                                            else
-                                            {
-                                                 corrfirst = 0;
-                                            } 
-                                            try
-                                            {
-                                                    float iT0 = fTraceHandler->getPulseTiming( corrfirst, getNSamples(), corrfirst, getNSamples() ).at( getRunParameter()->fpulsetiming_tzero_index );
-                                                    if( fTraceHandler->getPulseTimingStatus() )
-                                                    {
-                                                        if( corrfirst - iT0 < getSumWindowMaxTimedifferenceToDoublePassPosition() )
-                                                        {
-                                                                corrfirst = TMath::Nint( iT0 ) + getSumWindowShift();
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                       corrfirst = getNSamples();
-                                                    }
-                                            }
-                                            catch( const std::out_of_range& oor )
-                                            {
-                                                    cout << "VImageBaseAnalyzer::calcSecondTZerosSums: out of Range error: " << oor.what() << endl;
-                                            }
-                                            if( corrfirst < 0 )
-                                            {
-                                                    corrfirst = 0;
-                                            }
-                                         }
+					// integrate low-gain pulse only if prediction window start is before the end of the readout window
+					if( corrfirst < ( int )getNSamples() )
+					{
+						// get new tzero for sumwindow starting at corrfirst to the end of the window
+						// assume that high and low gain timing is not more than 5 samples off
+						if( getSumWindowMaxTimeDifferenceLGtoHG() > -998. )
+						{
+							corrfirst += getSumWindowMaxTimeDifferenceLGtoHG();
+						}
+						else
+						{
+							corrfirst = 0;
+						}
+						try
+						{
+							float iT0 = fTraceHandler->getPulseTiming( corrfirst, getNSamples(), corrfirst, getNSamples() ).at( getRunParameter()->fpulsetiming_tzero_index );
+							if( fTraceHandler->getPulseTimingStatus() )
+							{
+								if( corrfirst - iT0 < getSumWindowMaxTimedifferenceToDoublePassPosition() )
+								{
+									corrfirst = TMath::Nint( iT0 ) + getSumWindowShift();
+								}
+							}
+							else
+							{
+								corrfirst = getNSamples();
+							}
+						}
+						catch( const std::out_of_range& oor )
+						{
+							cout << "VImageBaseAnalyzer::calcSecondTZerosSums: out of Range error: " << oor.what() << endl;
+						}
+						if( corrfirst < 0 )
+						{
+							corrfirst = 0;
+						}
+					}
 				}
 				////////////////////
 				// high gain channel

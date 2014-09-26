@@ -2,8 +2,13 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+******* 20140926 significant changes (merging of branch BDTSelection-v2, trunk is now v4.61 *******
+
+* 20140926 (MK, EP)
+BDT Gamma-hadron cuts integration
+
 * 20140925 (GM)
-removed obsolte VMonoPlots class
+removed obsolete VMonoPlots class
 
 * 20140925 (GM)
 significant updated to VGammaHadronCuts to simplify

@@ -908,13 +908,13 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	}
 	cout << "  black:   without source region and exclusion regions" << endl;
 	cout << "           (use entire skymap, except the ON region and the excluded regions)" << endl;
-
+	
 	bool regioncodeflag = true ;
-
+	
 	// Top half of skymap ONLY
 	TH1D* hsig_1DTopOnly = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on, iN, v_x, v_y, v_r , "a" );
 	// if ( regioncode.find( "a" ) != std::string::npos )
-	if ( regioncodeflag ) 
+	if( regioncodeflag )
 	{
 		setHistogramPlottingStyle( hsig_1DTopOnly, kMagenta, 2, 2, 1, 1, 0 );
 		if( hsig_1DTopOnly )
@@ -928,9 +928,9 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	// Bottom half of skymap ONLY
 	TH1D* hsig_1DBottomOnly = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on, iN, v_x, v_y, v_r , "b" );
 	//if ( regioncode.find( "b" ) != std::string::npos )
-	if ( regioncodeflag ) 
+	if( regioncodeflag )
 	{
-		setHistogramPlottingStyle( hsig_1DBottomOnly, kGreen+3, 2, 2, 1, 1, 0 );
+		setHistogramPlottingStyle( hsig_1DBottomOnly, kGreen + 3, 2, 2, 1, 1, 0 );
 		if( hsig_1DBottomOnly )
 		{
 			hsig_1DBottomOnly->SetStats( 1 );
@@ -938,7 +938,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 		cout << "dark green:  without source region and exclusion regions, Bottom Half Only" << endl;
 		cout << "             (use bottom half of skymap, except the ON region and the excluded regions)" << endl;
 	}
-
+	
 	delete v_x;
 	delete v_y;
 	delete v_r;
@@ -999,9 +999,9 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 		hsig_1DAll->Draw( "e hist same" );
 		hsig_1D->Draw( "e hist same" );
 		
-		if ( regioncodeflag )
+		if( regioncodeflag )
 		{
-			hsig_1DTopOnly->Draw(    "e hist same" );
+			hsig_1DTopOnly->Draw( "e hist same" );
 			hsig_1DBottomOnly->Draw( "e hist same" );
 		}
 		
@@ -1183,8 +1183,8 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 		{
 			y2 = hmap->GetYaxis()->GetXmax();
 		}
-		hmap->GetXaxis()->SetRangeUser( x1, x2);
-		hmap->GetYaxis()->SetRangeUser( y1, y2);
+		hmap->GetXaxis()->SetRangeUser( x1, x2 );
+		hmap->GetYaxis()->SetRangeUser( y1, y2 );
 		
 		if( zmin > -1000. )
 		{
@@ -1331,7 +1331,7 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 		{
 			// set time offsets to midnight
 			iRA_hrs += fPlotZeroHours;
-                        TTimeStamp dt( 2000, 01, 01, iRA_hrs, iRA_min, iRA_sec );
+			TTimeStamp dt( 2000, 01, 01, iRA_hrs, iRA_min, iRA_sec );
 			raLowerAxis->SetTimeOffset( dt.GetSec(), "gmt" );
 			raLowerAxis->SetTimeFormat( TmpTimeFormat );
 			raLowerAxis->SetOption( "t" );
@@ -1666,14 +1666,14 @@ vector<sSource> VPlotAnasumHistograms::plot_catalogue( TCanvas* c, string iCatal
 						float iB = s.getStarBrightness( i, iBand );
 						if( iB > -50. && iB < 999 )
 						{
-						   char hname1[100];
-						   sprintf( hname1, "%sMag:%.1f", iBand.c_str(), iB );
-						   TText*  t1 = new TText( x + 0.19, y + 0.06, hname1 );
-						   t1->SetTextAngle( iTextAngle );
-						   t1->SetTextSize( t1->GetTextSize() * 0.5 );
-						   t1->SetTextColor( iColor );
-						   t1->Draw();
-                                                }
+							char hname1[100];
+							sprintf( hname1, "%sMag:%.1f", iBand.c_str(), iB );
+							TText*  t1 = new TText( x + 0.19, y + 0.06, hname1 );
+							t1->SetTextAngle( iTextAngle );
+							t1->SetTextSize( t1->GetTextSize() * 0.5 );
+							t1->SetTextColor( iColor );
+							t1->Draw();
+						}
 					}
 					// draw a circle for extended sources
 					if( s.getStarMajorDiameter( i ) > 0. )
@@ -2604,40 +2604,40 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
 		{
 			hsig_1D->Fit( fG, "Q" );
 			hsig_1D->Fit( "gaus", "Q" );
-                        cout << "RUN " << getRunList()[i].runnumber;
-                        if( hsig_1D->GetFunction( "gaus" ) )
-                        {
-                            hsig_1D->GetFunction( "gaus" )->SetLineColor( 8 );
-                            hsig_1D->GetFunction( "gaus" )->SetLineStyle( 2 );
-                            hsig_1D->GetFunction( "gaus" )->Draw( "same" );
-                            fG->Draw( "same" );
-                            cout << " ,fit results: mean " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetParameter( 1 );
-                            cout << " +- " << setprecision( 4 ) << hsig_1D->GetFunction( "gaus" )->GetParError( 1 );
-                            cout << ", RMS " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetParameter( 2 );
-                            cout << " +- " << setprecision( 4 ) <<  hsig_1D->GetFunction( "gaus" )->GetParError( 2 );
-                            cout << ", probability " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetProb();
-                            cout << ", Chi2/N " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetChisquare() / hsig_1D->GetFunction( "gaus" )->GetNDF();
-                            cout << endl;
-                        }
-                        else
-                        {
-                            cout << ", error retrieving fit function" << endl;
-                        }
+			cout << "RUN " << getRunList()[i].runnumber;
+			if( hsig_1D->GetFunction( "gaus" ) )
+			{
+				hsig_1D->GetFunction( "gaus" )->SetLineColor( 8 );
+				hsig_1D->GetFunction( "gaus" )->SetLineStyle( 2 );
+				hsig_1D->GetFunction( "gaus" )->Draw( "same" );
+				fG->Draw( "same" );
+				cout << " ,fit results: mean " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetParameter( 1 );
+				cout << " +- " << setprecision( 4 ) << hsig_1D->GetFunction( "gaus" )->GetParError( 1 );
+				cout << ", RMS " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetParameter( 2 );
+				cout << " +- " << setprecision( 4 ) <<  hsig_1D->GetFunction( "gaus" )->GetParError( 2 );
+				cout << ", probability " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetProb();
+				cout << ", Chi2/N " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetChisquare() / hsig_1D->GetFunction( "gaus" )->GetNDF();
+				cout << endl;
+			}
+			else
+			{
+				cout << ", error retrieving fit function" << endl;
+			}
 		}
-                if( hsig_1D->GetFunction( "gaus" ) )
-                {
-                    TLine* iM = new TLine( hsig_1D->GetFunction( "gaus" )->GetParameter( 1 ), hsig_1D->GetYaxis()->GetXmin(),
-                                                               hsig_1D->GetFunction( "gaus" )->GetParameter( 1 ), hsig_1D->GetYaxis()->GetXmax() );
-                    iM->SetLineStyle( 2 );
-                    iM->SetLineColor( 3 );
-                    iM->Draw();
-                }
-                hsig_1D->Draw( "e hist same" );
+		if( hsig_1D->GetFunction( "gaus" ) )
+		{
+			TLine* iM = new TLine( hsig_1D->GetFunction( "gaus" )->GetParameter( 1 ), hsig_1D->GetYaxis()->GetXmin(),
+								   hsig_1D->GetFunction( "gaus" )->GetParameter( 1 ), hsig_1D->GetYaxis()->GetXmax() );
+			iM->SetLineStyle( 2 );
+			iM->SetLineColor( 3 );
+			iM->Draw();
+		}
+		hsig_1D->Draw( "e hist same" );
 		hsig_1DAll->Draw( "e hist same" );
 		TLine* iL = new TLine( 0., hsig_1D->GetYaxis()->GetXmin(), 0., hsig_1D->GetMaximum() );
 		iL->SetLineStyle( 2 );
 		iL->Draw();
-                
+		
 		// run number
 		iT->Draw();
 		
@@ -2677,9 +2677,9 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
 	TLine* lFitRMS = new TLine( 1., 0., 1., hFit_width->GetMaximum() );
 	lFitRMS->SetLineStyle( 2 );
 	lFitRMS->Draw();
-
-        // reset run number
-        setRunNumber( -1 );
+	
+	// reset run number
+	setRunNumber( -1 );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -2695,7 +2695,7 @@ void VPlotAnasumHistograms::plot_theta2Correction()
 		cout << endl;
 		cout << "  this plotting routine works only for individual runs, use VPlotAnasumHistograms::setRunNumber( <run number> ); to select a run" <<  endl;
 		return;
-        }
+	}
 	char itemp[200];
 	TH1D* hon = ( TH1D* )getHistogram( "hAux_theta2On", fRunNumber, "debug" );
 	TH1D* hoff = ( TH1D* )getHistogram( "hAux_theta2Off", fRunNumber, "debug" );

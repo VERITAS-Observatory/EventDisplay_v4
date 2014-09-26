@@ -135,7 +135,7 @@ void merge( string ifile, char* outputfile, bool bFull = false )
 	// merge all log files
 	if( ifile.find( ".root" ) != string::npos )
 	{
-		sprintf( hname, "cat %s*.log > %s.combine.log", ifile.substr( 0, ifile.size()-5 ).c_str(), outputfile );
+		sprintf( hname, "cat %s*.log > %s.combine.log", ifile.substr( 0, ifile.size() - 5 ).c_str(), outputfile );
 	}
 	else
 	{

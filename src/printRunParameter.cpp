@@ -41,26 +41,26 @@ bool readRunParameter( TFile* fIn, string iPara )
 	{
 		cout << fPar->fsourcefile << endl;
 	}
-        else if( iPara == "-date" )
-        { 
-                cout << fPar->fDBRunStartTimeSQL << endl;
-        }
-        else if( iPara == "-teltoana" )
-        {
-               for( unsigned int i = 0; i < fPar->fTelToAnalyze.size(); i++ )
-               {
-                   cout << fPar->fTelToAnalyze[i]+1;
-               }
-               cout << endl;
-        }
-        else if( iPara == "-atmosphere" )
-        {
-               cout << fPar->fAtmosphereID << endl;
-        }
-        else if( iPara == "-epoch" )
-        {
-               cout << fPar->fInstrumentEpoch << endl;
-        }
+	else if( iPara == "-date" )
+	{
+		cout << fPar->fDBRunStartTimeSQL << endl;
+	}
+	else if( iPara == "-teltoana" )
+	{
+		for( unsigned int i = 0; i < fPar->fTelToAnalyze.size(); i++ )
+		{
+			cout << fPar->fTelToAnalyze[i] + 1;
+		}
+		cout << endl;
+	}
+	else if( iPara == "-atmosphere" )
+	{
+		cout << fPar->fAtmosphereID << endl;
+	}
+	else if( iPara == "-epoch" )
+	{
+		cout << fPar->fInstrumentEpoch << endl;
+	}
         else if( iPara == "-runtype" )
         {
                cout << fPar->fDBRunType << endl;
@@ -129,7 +129,7 @@ int main( int argc, char* argv[] )
 			exit( 0 );
 		}
 	}
-
+	
 	if( argc != 2 && argc != 3 )
 	{
 		cout << endl;
@@ -144,11 +144,11 @@ int main( int argc, char* argv[] )
 		cout << "      -mcaz         print MC azimuth angle" << endl;
 		cout << "      -runnumber    print MC run number" << endl;
 		cout << "      -mcsourcefile print source file name" << endl;
-                cout << "      -date         print date of run" << endl;
-                cout << "      -epoch        print epoch of this run" << endl;
-                cout << "      -atmosphere   print corsika ID of atmospheric condition of this run" << endl;
-                cout << "      -runtype      print run type, eg observing, obsFilter etc." << endl;
-                cout << "      -teltoana     print telescope combination used in analysis" << endl;
+        cout << "      -date         print date of run" << endl;
+        cout << "      -epoch        print epoch of this run" << endl;
+		cout << "      -atmosphere   print corsika ID of atmospheric condition of this run" << endl;
+		cout << "      -runtype      print run type, eg observing, obsFilter etc." << endl;
+		cout << "      -teltoana     print telescope combination used in analysis" << endl;
                 cout << "      -evndispreconstructionparameterfile print evndisp reconstruction parameter file" << endl;
                 cout << "      -runinfo      print relevant run info in one line" << endl;
 		cout << endl;

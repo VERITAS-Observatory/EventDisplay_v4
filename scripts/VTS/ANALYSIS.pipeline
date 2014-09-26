@@ -140,20 +140,9 @@ export AUXFILE_SRCEXT="PointSource"
 
 ## Do you want to use the DISP feature?
 # This will change how image axes and their intersection
-# are calculated.
+# are handled.
 # (yes/no)
 export SCIPIPE_USEDISP="yes"
-# if you said yes, you should also make sure to use the right
-# event display reconstruction parameter file, stored in
-# $VERITAS_EVNDISP_AUX_DIR/ParameterFiles
-# Availible files are:
-#   EVNDISP.reconstruction.runparameter.DISP
-#   EVNDISP.reconstruction.runparameter.SumWindow6-noDISP
-#   EVNDISP.reconstruction.runparameter.SumWindow6-DISP
-# SumWindow:
-#   SumWindow6     should be used with grisu-derived IRF files
-#   non-SumWindow6 should be used with care-derived  IRF files
-export EVNDISPRECONFILE="EVNDISP.reconstruction.runparameter.SumWindow6-DISP"
 
 ## For your Effective Area, Radial Acceptance, and Table IRF files:
 #
@@ -704,7 +693,7 @@ if [[ "$STAGE" == "evndisp" ]] ; then
         VPM=1 ## on by default
         if [[ "$USEMODEL3D" == "yes" ]] ; then MODEL3D=1
         else                                   MODEL3D=0 ; fi
-		QSUBDATA=$(./ANALYSIS.evndisp.sh $RUNLIST $EVNDISPOUTPUTDIR $EVNDISPRECONFILE $CALIBCODE $MODEL3D | tee >(cat - >&5) )
+		QSUBDATA=$(./ANALYSIS.evndisp.sh $RUNLIST $EVNDISPOUTPUTDIR $CALIBCODE $VPM $MODEL3D | tee >(cat - >&5) )
 		rm -rf "$EVNJOBSUB"
 		echo "$QSUBDATA" > "$EVNJOBSUB"
 		updateRunningJobFile "$QSUBDATA"

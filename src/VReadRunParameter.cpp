@@ -136,7 +136,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->ffrogsmscwfile = "";
 			}
 		}
-		else if( iTemp1 == "-frogsid" ) 
+		else if( iTemp1 == "-frogsid" )
 		{
 			if( iTemp2.size() > 0 )
 			{
@@ -148,7 +148,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->ffrogsRecID = -1;
 			}
 		}
-		else if( iTemp1 == "-templatelistforfrogs" ) 
+		else if( iTemp1 == "-templatelistforfrogs" )
 		{
 			if( iTemp2.size() > 0 )
 			{
@@ -253,10 +253,10 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fsimu_pedestalfile_DefaultPed = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-                else if( iTemp.find( "lowgainpedestallevel" ) < iTemp.size()  )
-                {
-                        fRunPara->fsimu_lowgain_pedestal_DefaultPed = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-                }
+		else if( iTemp.find( "lowgainpedestallevel" ) < iTemp.size() )
+		{
+			fRunPara->fsimu_lowgain_pedestal_DefaultPed = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
 		// calibration file
 		else if( iTemp.find( "calibrationfi" ) < iTemp.size() && !( iTemp.find( "lowgain" ) < iTemp.size() ) )
 		{
@@ -270,8 +270,8 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			{
 				fRunPara->fcalibrationfile = "";
 			}
-                        // no reading of DB in case of external calibration file
-                        fRunPara->fNoCalibNoPb = true;
+			// no reading of DB in case of external calibration file
+			fRunPara->fNoCalibNoPb = true;
 			
 		}
 		else if( iTemp.find( "readcalibdb" ) < iTemp.size() )
@@ -281,7 +281,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			if( iTemp2.size() > 0 && VUtilities::isInteger( iTemp2 ) )
 			{
 				fRunPara->freadCalibfromDB_versionquery = atoi( iTemp2.c_str() );
-                                i++;
+				i++;
 			}
 			else
 			{
@@ -298,7 +298,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			if( iTemp2.size() > 0 )
 			{
 				fRunPara->freadCalibfromDB_versionquery = atoi( iTemp2.c_str() );
-                                i++;
+				i++;
 			}
 			else
 			{
@@ -481,26 +481,26 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->frunnumber = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-                else if( iTemp.rfind ( "epochfile" ) < iTemp.size() )
-                {
-                        if( iTemp2.size() > 0 )
-                        {
-                            fRunPara->fEpochFile = iTemp2;
-                            i++;
-                        }
-                }
-                else if( iTemp.rfind( "epoch" ) < iTemp.size() && !( iTemp.find( "epochfile" ) < iTemp.size() ) )
-                {
-                        if( iTemp2.size() > 0 )
-                        {
-                            fRunPara->fInstrumentEpoch = iTemp2;
-                            i++;
-                        }
-                }
-                else if( iTemp.rfind( "atmosphereid" ) < iTemp.size() )
-                {
-                        fRunPara->fAtmosphereID = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-                } 
+		else if( iTemp.rfind( "epochfile" ) < iTemp.size() )
+		{
+			if( iTemp2.size() > 0 )
+			{
+				fRunPara->fEpochFile = iTemp2;
+				i++;
+			}
+		}
+		else if( iTemp.rfind( "epoch" ) < iTemp.size() && !( iTemp.find( "epochfile" ) < iTemp.size() ) )
+		{
+			if( iTemp2.size() > 0 )
+			{
+				fRunPara->fInstrumentEpoch = iTemp2;
+				i++;
+			}
+		}
+		else if( iTemp.rfind( "atmosphereid" ) < iTemp.size() )
+		{
+			fRunPara->fAtmosphereID = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
 		else if( iTemp.rfind( "gaincorrection" ) < iTemp.size() )
 		{
 			fRunPara->fGainCorrection[0] = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -707,17 +707,17 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->fFirstEvent = -10000;
 			}
 		}
-                // start analyzing at this minute
-                else if( iTemp.find( "timecutmin" ) < iTemp.size() )
-                {
-                      fRunPara->fTimeCutsMin_min = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-                }
-                // stopp analyzing at this minute
-                else if( iTemp.find( "timecutmax" ) < iTemp.size() )
-                {
-                      fRunPara->fTimeCutsMin_max = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-                }
-
+		// start analyzing at this minute
+		else if( iTemp.find( "timecutmin" ) < iTemp.size() )
+		{
+			fRunPara->fTimeCutsMin_min = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
+		// stopp analyzing at this minute
+		else if( iTemp.find( "timecutmax" ) < iTemp.size() )
+		{
+			fRunPara->fTimeCutsMin_max = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
+		
 		// check if the user wants to print the list of dead pixels for this run
 		else if( iTemp.rfind( "printdeadpixelinfo" ) < iTemp.size() ) // DEADCHAN
 		{
@@ -1046,11 +1046,11 @@ void VReadRunParameter::test_and_adjustParams()
 		fRunPara->fDBCameraRotationMeasurements = false;
 		// this is for example required for Grisudet sims, when low gains are read from
 		// the cfg file
-		if( fRunPara->fLowGainCalibrationFile == "NOFILE" || (fRunPara->fsourcetype == 4 || fRunPara->fsourcetype == 7 ) )
+		if( fRunPara->fLowGainCalibrationFile == "NOFILE" || ( fRunPara->fsourcetype == 4 || fRunPara->fsourcetype == 7 ) )
 		{
 			fRunPara->fLowGainCalibrationFile = "";
 		}
-                fRunPara->fEpochFile = "";
+		fRunPara->fEpochFile = "";
 	}
 	
 	// CTA/AGIS adjustments
@@ -1298,12 +1298,12 @@ void VReadRunParameter::test_and_adjustParams()
 			exit( EXIT_FAILURE );
 		}
 	}
-        if( !readEpochsAndAtmospheres() )
-        {
-             cout << "exiting..." << endl;
-             exit( EXIT_FAILURE );
-        }
-		
+	if( !readEpochsAndAtmospheres() )
+	{
+		cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
+	}
+	
 	/////////////////////////////////////////////////////////////////
 	// check if sourcefile is given
 	if( fRunPara->fsourcefile.size() < 1 )
@@ -1461,7 +1461,7 @@ void VReadRunParameter::test_and_adjustParams()
 			fRunPara->fLogLikelihoodLoss_min.push_back( fRunPara->fLogLikelihoodLoss_min[0] );
 			fRunPara->fLogLikelihood_Ntubes_min.push_back( fRunPara->fLogLikelihood_Ntubes_min[0] );
 			fRunPara->fSumWindowMaxTimedifferenceToDoublePassPosition.push_back( fRunPara->fSumWindowMaxTimedifferenceToDoublePassPosition[0] );
-                        fRunPara->fSumWindowMaxTimeDifferenceLGtoHG.push_back( fRunPara->fSumWindowMaxTimeDifferenceLGtoHG[0] );
+			fRunPara->fSumWindowMaxTimeDifferenceLGtoHG.push_back( fRunPara->fSumWindowMaxTimeDifferenceLGtoHG[0] );
 		}
 	}
 	
@@ -1929,133 +1929,169 @@ bool VReadRunParameter::readTrigSimInputCard( TString card )
  */
 bool VReadRunParameter::readEpochsAndAtmospheres()
 {
-     if( !fRunPara ) return false;
-
-     if( fRunPara->fEpochGain.size() != fRunPara->fNTelescopes )
-     {
-        fRunPara->fEpochGain.resize( fRunPara->fNTelescopes, 5.5 );
-     }
-
-     if( fRunPara->fEpochFile.size() == 0 ) return true;
-
+	if( !fRunPara )
+	{
+		return false;
+	}
+	
+	if( fRunPara->fEpochGain.size() != fRunPara->fNTelescopes )
+	{
+		fRunPara->fEpochGain.resize( fRunPara->fNTelescopes, 5.5 );
+	}
+	
+	if( fRunPara->fEpochFile.size() == 0 )
+	{
+		return true;
+	}
+	
 	ifstream is;
 	is.open( fRunPara->fEpochFile.c_str(), ifstream::in );
 	if( !is )
 	{
-                string iTemp = fRunPara->getDirectory_EVNDISPParameterFiles() + fRunPara->fEpochFile;
-                is.open( iTemp.c_str(), ifstream::in );
-                if( !is )
-                {
-                    cout << "error opening epoch parameter file " << fRunPara->fEpochFile << endl;
-                    cout << iTemp << endl;
-                    exit( EXIT_FAILURE );
-                }
+		string iTemp = fRunPara->getDirectory_EVNDISPParameterFiles() + fRunPara->fEpochFile;
+		is.open( iTemp.c_str(), ifstream::in );
+		if( !is )
+		{
+			cout << "error opening epoch parameter file " << fRunPara->fEpochFile << endl;
+			cout << iTemp << endl;
+			exit( EXIT_FAILURE );
+		}
 	}
 	string is_line;
 	string temp;
 	cout << endl;
 	cout << "========================================" << endl;
-        cout << "reading epoch for given run and date from " << fRunPara->fEpochFile << endl;
-
-     if( fRunPara->fInstrumentEpoch != "noepoch" )
-     {
-         cout << "   (epoch is set from command line - ignoring values in epoch parameter file" << endl;
-     }
-     if( fRunPara->fAtmosphereID != 0 )
-     {
-         cout << "   (atmosphere ID is set from command line - ignoring values in epoch parameter file" << endl;
-     }
-
+	cout << "reading epoch for given run and date from " << fRunPara->fEpochFile << endl;
+	
+	if( fRunPara->fInstrumentEpoch != "noepoch" )
+	{
+		cout << "   (epoch is set from command line - ignoring values in epoch parameter file" << endl;
+	}
+	if( fRunPara->fAtmosphereID != 0 )
+	{
+		cout << "   (atmosphere ID is set from command line - ignoring values in epoch parameter file" << endl;
+	}
+	
 	
 	while( getline( is, is_line ) )
 	{
 		if( is_line.size() > 0 )
 		{
 			istringstream is_stream( is_line );
-
-                        int run_min = 0;
-                        int run_max = 0;
-
+			
+			int run_min = 0;
+			int run_max = 0;
+			
 			is_stream >> temp;
 			if( temp != "*" )
 			{
 				continue;
 			}
-                        if( is_stream.eof() ) continue;
+			if( is_stream.eof() )
+			{
+				continue;
+			}
 			is_stream >> temp;
 			// EPOCH (e.g. V4, V5 and V6)
-                        // * EPOCH V6 <run min> <run max>
+			// * EPOCH V6 <run min> <run max>
 			if( temp == "EPOCH" && fRunPara->fInstrumentEpoch == "noepoch" )
 			{
-                                string iTemp = "";
-                                if( !is_stream.eof() ) is_stream >> iTemp;
-                                if( !is_stream.eof() ) is_stream >> run_min;
-                                if( !is_stream.eof() ) is_stream >> run_max;
-
-                                if( fRunPara->frunnumber >= run_min && fRunPara->frunnumber <= run_max )
-                                {
-                                     fRunPara->fInstrumentEpoch = iTemp;
-                                }
-                        }
-                        // atmosphere (e.g. summer or winter)
-                        //    expect input string in sql format without hours: 2014-06-16)
-                        //  * ATMOSPHERE 21 2014-06-01 2014-06-16
-                        else if( temp == "ATMOSPHERE" && fRunPara->fAtmosphereID == 0 )
-                        {
-                                string iTemp = "";
-                                string date_min = "";
-                                string date_max = "";
-                                double imjd_min = 0.;
-                                double isec_min = 0.;
-                                double imjd_max = 0.;
-                                double isec_max = 0.;
-                                if( !is_stream.eof() ) is_stream >> iTemp;
-                                if( !is_stream.eof() ) is_stream >> date_min;
-                                if( !is_stream.eof() ) is_stream >> date_max;
-                                date_min += " 12:00:00";
-                                date_max += " 12:00:00";
-                                if( VSkyCoordinatesUtilities::getMJD_from_SQLstring( date_min, imjd_min, isec_min ) != 0 )
-                                {
-                                    cout << "VReadRunParameter::readEpochsAndAtmospheres() error: invalid date string: " << date_min << endl;
-                                    return false;
-                                }
-                                if( VSkyCoordinatesUtilities::getMJD_from_SQLstring( date_max, imjd_max, isec_max ) != 0 )
-                                {
-                                    cout << "VReadRunParameter::readEpochsAndAtmospheres() error: invalid date string: " << date_max << endl;
-                                    return false;
-                                }
-                                if( fRunPara->fDBDataStartTimeMJD >= imjd_min && fRunPara->fDBDataStartTimeMJD <= imjd_max )
-                                {
-                                     fRunPara->fAtmosphereID = atoi( iTemp.c_str() );
-                                }
-                        }
+				string iTemp = "";
+				if( !is_stream.eof() )
+				{
+					is_stream >> iTemp;
+				}
+				if( !is_stream.eof() )
+				{
+					is_stream >> run_min;
+				}
+				if( !is_stream.eof() )
+				{
+					is_stream >> run_max;
+				}
+				
+				if( fRunPara->frunnumber >= run_min && fRunPara->frunnumber <= run_max )
+				{
+					fRunPara->fInstrumentEpoch = iTemp;
+				}
+			}
+			// atmosphere (e.g. summer or winter)
+			//    expect input string in sql format without hours: 2014-06-16)
+			//  * ATMOSPHERE 21 2014-06-01 2014-06-16
+			else if( temp == "ATMOSPHERE" && fRunPara->fAtmosphereID == 0 )
+			{
+				string iTemp = "";
+				string date_min = "";
+				string date_max = "";
+				double imjd_min = 0.;
+				double isec_min = 0.;
+				double imjd_max = 0.;
+				double isec_max = 0.;
+				if( !is_stream.eof() )
+				{
+					is_stream >> iTemp;
+				}
+				if( !is_stream.eof() )
+				{
+					is_stream >> date_min;
+				}
+				if( !is_stream.eof() )
+				{
+					is_stream >> date_max;
+				}
+				date_min += " 12:00:00";
+				date_max += " 12:00:00";
+				if( VSkyCoordinatesUtilities::getMJD_from_SQLstring( date_min, imjd_min, isec_min ) != 0 )
+				{
+					cout << "VReadRunParameter::readEpochsAndAtmospheres() error: invalid date string: " << date_min << endl;
+					return false;
+				}
+				if( VSkyCoordinatesUtilities::getMJD_from_SQLstring( date_max, imjd_max, isec_max ) != 0 )
+				{
+					cout << "VReadRunParameter::readEpochsAndAtmospheres() error: invalid date string: " << date_max << endl;
+					return false;
+				}
+				if( fRunPara->fDBDataStartTimeMJD >= imjd_min && fRunPara->fDBDataStartTimeMJD <= imjd_max )
+				{
+					fRunPara->fAtmosphereID = atoi( iTemp.c_str() );
+				}
+			}
 			// absolute gains (dc/pe) for each VERITAS epoch
 			//  * GAIN V4 1 5.11
-                        else if( temp == "GAIN" )
-                        {
-                                string iEpoch = "";
-                                string iTel = "";
-                                string iGain = "";
-                                if( !is_stream.eof() ) is_stream >> iEpoch;
-				if( !is_stream.eof() ) is_stream >> iTel;
-				if( !is_stream.eof() ) is_stream >> iGain;
+			else if( temp == "GAIN" )
+			{
+				string iEpoch = "";
+				string iTel = "";
+				string iGain = "";
+				if( !is_stream.eof() )
+				{
+					is_stream >> iEpoch;
+				}
+				if( !is_stream.eof() )
+				{
+					is_stream >> iTel;
+				}
+				if( !is_stream.eof() )
+				{
+					is_stream >> iGain;
+				}
 				unsigned int iTelNum = 0;
-
+				
 				if( iEpoch == fRunPara->fInstrumentEpoch )
 				{
-				     iTelNum = atoi( iTel.c_str() );
-				     for( unsigned int i = 0; i < fRunPara->fNTelescopes; i++ )
-		                     {
-				          if( iTelNum == i+1 ) 
-					  {
-					       fRunPara->fEpochGain[i] = atof( iGain.c_str() );
-					  }
-				     }  
+					iTelNum = atoi( iTel.c_str() );
+					for( unsigned int i = 0; i < fRunPara->fNTelescopes; i++ )
+					{
+						if( iTelNum == i + 1 )
+						{
+							fRunPara->fEpochGain[i] = atof( iGain.c_str() );
+						}
+					}
 				}
 			}
 		}
-        }
-     is.close();
-
-     return true;
+	}
+	is.close();
+	
+	return true;
 }

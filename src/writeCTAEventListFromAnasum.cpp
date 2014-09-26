@@ -726,8 +726,9 @@ int main( int argc, char* argv[] )
 		dety        = Yoff           ;
 		shwidth     = -9999.9        ;
 		shlength    = -9999.9        ;
-			
-		if ( rawEventsFlag ) {
+		
+		if( rawEventsFlag )
+		{
 			printf( "EVENT %lu %lu %f %f\n", obs_id, event_id, ra, dec ) ;
 		}
 		

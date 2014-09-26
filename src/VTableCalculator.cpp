@@ -620,9 +620,9 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 					if( fWrite1DHistograms && ir < ( int )Oh[is].size() )
 					{
 						if( !Oh[is][ir] && !create1DHistogram( is, ir, w[tel] ) )
-                                                {
-                                                        continue;
-                                                }
+						{
+							continue;
+						}
 						// fill width/length/energy into a 1D and 2D histogram
 						// (chi2 is here an external weight (from e.g. spectral weighting))
 						//============================================================================================================
@@ -773,7 +773,7 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 						if( w[tel] > 0. )
 						{
 							value  += ( w[tel] - med ) / sigma * ( med * med ) / ( sigma * sigma );
-                                                        weight += ( med * med ) / ( sigma * sigma ); 
+							weight += ( med * med ) / ( sigma * sigma );
 						}
 					}
 					///////////////////////////////////////////////////////////////////////////////////////////////////////

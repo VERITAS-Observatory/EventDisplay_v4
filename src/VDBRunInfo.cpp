@@ -174,14 +174,14 @@ unsigned int VDBRunInfo::readRunDQM( string iDBserver, int run_number , unsigned
 		bitset<4> bitNewConfig = bitConfig & bitNDQM;
 		
 		for( int i = 0; i < ( int )bitNewConfig.size(); i++ )
-                {
+		{
 			if( bitNewConfig.test( i ) )
 			{
 				ConfigMaskNew += ( unsigned int )pow( 2., i );
 			}
-                }
-			
-			
+		}
+		
+		
 		config_mask = ConfigMaskNew;
 		
 	}
@@ -308,15 +308,15 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 	{
 		fDuration = 0;
 	}
-        if( TMath::Abs( fDuration < 1.e-4 ) )
-        {
-                double mjd = 0.;
-                double isec_start = 0.;
-                double isec_stopp = 0.;
-                VSkyCoordinatesUtilities::getMJD_from_SQLstring( fDataStartTimeSQL, mjd, isec_start );
-                VSkyCoordinatesUtilities::getMJD_from_SQLstring( fDataStoppTimeSQL, mjd, isec_stopp ); 
-                fDuration = isec_stopp - isec_start;
-        }
+	if( TMath::Abs( fDuration < 1.e-4 ) )
+	{
+		double mjd = 0.;
+		double isec_start = 0.;
+		double isec_stopp = 0.;
+		VSkyCoordinatesUtilities::getMJD_from_SQLstring( fDataStartTimeSQL, mjd, isec_start );
+		VSkyCoordinatesUtilities::getMJD_from_SQLstring( fDataStoppTimeSQL, mjd, isec_stopp );
+		fDuration = isec_stopp - isec_start;
+	}
 	
 	if( db_row->GetField( 19 ) )
 	{

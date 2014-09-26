@@ -178,7 +178,7 @@ VMonoPlots::VMonoPlots( bool ison, CData* tree, string i_hsuffix, VAnaSumRunPara
 	
 	//! define the cuts
 	fCuts = new VGammaHadronCuts();
-        cout << "NO EPOCH SET !!! " << endl;
+	cout << "NO EPOCH SET !!! " << endl;
 	fCuts->resetCutValues();
 }
 

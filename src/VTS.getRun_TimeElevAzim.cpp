@@ -16,19 +16,26 @@
 void getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip );
 
 // remove any spaces at the beginning of the line (LeftTrim)
-static inline std::string &ltrim( std::string &s) {
-	s.erase( s.begin(), std::find_if( s.begin(), s.end(), std::not1( std::ptr_fun<int, int>(std::isspace)))) ;
+static inline std::string& ltrim( std::string& s )
+{
+	s.erase( s.begin(), std::find_if( s.begin(), s.end(), std::not1( std::ptr_fun<int, int>( std::isspace ) ) ) ) ;
 	return s ;
 }
-static inline std::string &rchop( std::string &s ) {
-	if ( s.find_first_of(" ") != std::string::npos ) {
-		s.erase( s.begin() + s.find_first_of(" "), s.end() ) ;
+static inline std::string& rchop( std::string& s )
+{
+	if( s.find_first_of( " " ) != std::string::npos )
+	{
+		s.erase( s.begin() + s.find_first_of( " " ), s.end() ) ;
 	}
 	return s ;
 }
-bool is_number( const std::string& s) {
+bool is_number( const std::string& s )
+{
 	std::string::const_iterator it = s.begin();
-	while ( it != s.end() && std::isdigit(*it)) ++it;
+	while( it != s.end() && std::isdigit( *it ) )
+	{
+		++it;
+	}
 	return !s.empty() && it == s.end() ;
 }
 
@@ -66,7 +73,7 @@ int main( int argc, char* argv[] )
 	int IFILE = 2; // 2 is for simple list of runnumbers
 	//cout << "IRUN:  " << IRUN << endl;
 	//cout << "IFILE: " << IFILE << endl;
-	int  inputmode     = 0 ; 
+	int  inputmode     = 0 ;
 	int  c             = 0 ;
 	int  inputrun      = 0 ;
 	string inputfile ;
@@ -100,43 +107,54 @@ int main( int argc, char* argv[] )
 	//cout << "inputrun : " << inputrun  << endl;
 	//cout << "inputfile: " << inputfile << endl;
 	//cout << endl;
-
+	
 	int runnumber = 0 ;
 	vector<int> runlist ;
-	if ( inputmode == IRUN ) {
+	if( inputmode == IRUN )
+	{
 		runlist.push_back( inputrun ) ;
 	}
-	if ( inputmode == IFILE ) {
+	if( inputmode == IFILE )
+	{
 		ifstream fin( inputfile.c_str() ) ;
 		string   file_line ;
-		if ( fin.good() ) {
-			while ( std::getline( fin, file_line ) ) {
+		if( fin.good() )
+		{
+			while( std::getline( fin, file_line ) )
+			{
 				//cout << "line:    '" << file_line << "'" << endl;
-				ltrim(file_line) ; // clean up the line
+				ltrim( file_line ) ; // clean up the line
 				//cout << "    ltrim:'" << file_line << "'" << endl;
-				rchop(file_line) ; // clean up the line
+				rchop( file_line ) ; // clean up the line
 				//cout << "    rchop:'" << file_line << "'" << endl;
-				if ( is_number( file_line ) ) {
+				if( is_number( file_line ) )
+				{
 					runnumber = atoi( file_line.c_str() ) ;
 					if( runnumber < 9999 or runnumber > 99999 )
 					{
 						cout << "Error, '" << file_line << "' needs to be a valid runnumber (9999-99999)" << endl;
 						return 1 ;
-					} else {
+					}
+					else
+					{
 						runlist.push_back( runnumber ) ;
 					}
-				} else {
+				}
+				else
+				{
 					cout << "Error, '" << file_line << "' needs to be a valid runnumber (9999-99999)" << endl;
 					return 1 ;
 				}
 			}
-		} else {
+		}
+		else
+		{
 			cout << "Error, file '" << inputfile << "' could not be read, exiting..." << endl;
 			return 1;
 		}
 	}
 	//cout << "runlist.size(): " << runlist.size() << endl;
-
+	
 	VGlobalRunParameter* blah = new VGlobalRunParameter() ;
 	//cout << " VGlobal->getDBServer(): " << blah->getDBServer() << endl;
 	// start connection
@@ -153,7 +171,8 @@ int main( int argc, char* argv[] )
 		return -1;
 	}
 	
-	for ( unsigned int i_run=0 ; i_run<runlist.size() ; i_run++ ) {
+	for( unsigned int i_run = 0 ; i_run < runlist.size() ; i_run++ )
+	{
 		cout << "Downloading observatory data for run " << runlist[i_run] << "..." << endl;
 		runnumber = runlist[i_run] ;
 		
@@ -353,8 +372,8 @@ int main( int argc, char* argv[] )
 			}
 			*/
 		}
-	
-	
+		
+		
 	}
 	
 	return 0 ;

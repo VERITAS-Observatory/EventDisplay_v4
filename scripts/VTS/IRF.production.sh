@@ -7,7 +7,7 @@ if [ $# -lt 2 ]; then
 echo "
 IRF generation: produce a full set of instrument response functions (IRFs)
 
-IRF.production.sh <sim type> <IRF type> [epoch] [atmosphere] [Rec ID] [cuts list file] [sim directory]
+IRF.production.sh <sim type> <IRF type> [epoch] [atmosphere] [Rec ID] [BDT cuts] [cuts list file] [sim directory]
 
 required parameters:
 
@@ -28,6 +28,9 @@ optional parameters:
                             
     [Rec ID]                reconstruction ID(s) (default: \"0 2 3 4 5\")
                             (see EVNDISP.reconstruction.runparameter)
+
+    [BDT cuts]              using cuts list for BDT cuts (e.g. 0=not used, 1=used)
+                            (default: \"0\")
     
     [cuts list file]        file containing one gamma/hadron cuts file per line
                             (default: hard-coded standard EventDisplay cuts)
@@ -50,8 +53,9 @@ IRFTYPE=$2
 [[ "$3" ]] && EPOCH=$3 || EPOCH="V4 V5 V6"
 [[ "$4" ]] && ATMOS=$4 || ATMOS="21 22"
 [[ "$5" ]] && RECID=$5 || RECID="0 2 3 4 5"
-[[ "$6" ]] && CUTSLISTFILE=$6 || CUTSLISTFILE=""
-[[ "$7" ]] && SIMDIR=$7 || SIMDIR=""
+[[ "$6" ]] && BDTCUTS=$6 || BDTCUTS="0"
+[[ "$7" ]] && CUTSLISTFILE=$7 || CUTSLISTFILE=""
+[[ "$8" ]] && SIMDIR=$8 || SIMDIR=""
 # evndisplay version
 EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .`
 # version string for aux files
@@ -90,6 +94,7 @@ if [[ $CUTSLISTFILE != "" ]]; then
     # read file containing list of cuts
     IFS=$'\r\n' CUTLIST=($(cat $CUTSLISTFILE))
 else
+	if [[ $BDTCUTS == "0"  ]]; then
     # default list of cuts
     CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat 
              ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft.dat 

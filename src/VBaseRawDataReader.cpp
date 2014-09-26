@@ -32,7 +32,7 @@ VBaseRawDataReader::VBaseRawDataReader( string sourcefile, int isourcetype, unsi
 	fNoiseFileReader = 0;
 	fNoiseFilePedestal = 0;
 	fNoiseFileFADCRange = 250;
-
+	
 	// source types
 	if( isourcetype == 2 )
 	{
@@ -282,8 +282,11 @@ bool VBaseRawDataReader::initTraceNoiseGenerator( unsigned int iType, string iT,
 		cout << "VBaseRawDataReader::initTraceNoiseGenerator " << endl;
 	}
 	fNoiseFileReader = new VNoiseFileReader( iType, iT );
-	fNoiseFilePedestal = (uint8_t)iDefaultPed;
-	if( iD && iD->getFADCRange() < 255 ) fNoiseFileFADCRange = (uint8_t)iD->getFADCRange();
+	fNoiseFilePedestal = ( uint8_t )iDefaultPed;
+	if( iD && iD->getFADCRange() < 255 )
+	{
+		fNoiseFileFADCRange = ( uint8_t )iD->getFADCRange();
+	}
 	
 	// preliminary: use value from Telescope 1 for all telescopes
 	double iCorrection = 1.;
@@ -331,7 +334,7 @@ uint8_t VBaseRawDataReader::getSample( unsigned channel, unsigned sample, bool i
 	}
 	
 	// add noise from external noise library to traces
-	// (e.g. VTS grisu MC are simulated without noise, noise is added here to the samples) 
+	// (e.g. VTS grisu MC are simulated without noise, noise is added here to the samples)
 	if( fNoiseFileReader && !getHiLo( channel ) )
 	{
 		uint8_t iNoiseSampleValue = fNoiseFileReader->getNoiseSample( fTelID, channel, sample, iNewNoiseTrace );
@@ -369,14 +372,14 @@ std::vector< uint8_t > VBaseRawDataReader::getSamplesVec()
 			{
 				for( unsigned int i = 0; i < i_temp.size(); i++ )
 				{
-				        if( i_temp[i] > fNoiseFileFADCRange - i_pedV[i] + fNoiseFilePedestal )
+					if( i_temp[i] > fNoiseFileFADCRange - i_pedV[i] + fNoiseFilePedestal )
 					{
-					    i_temp[i] = fNoiseFileFADCRange;
-                                        }
+						i_temp[i] = fNoiseFileFADCRange;
+					}
 					else
 					{
-					    i_temp[i] += i_pedV[i] - fNoiseFilePedestal;
-                                        }
+						i_temp[i] += i_pedV[i] - fNoiseFilePedestal;
+					}
 				}
 			}
 			return i_temp;

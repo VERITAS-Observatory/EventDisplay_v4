@@ -231,11 +231,11 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 			feffFract_50p = getEnergy_MaxEffectiveAreaFraction( hG, 0.50 );
 			feffFract_90p = getEnergy_MaxEffectiveAreaFraction( hG, 0.90 );
 		}
-                if( TMath::Abs( fEffArea->index - 2.4 ) < 1.e-3 && TMath::Abs( fEffArea->azMax - 1000. ) < 1.e-3 )
-                {
-                    cout << "Threshold for index " << fEffArea->index << ": ";
-                    cout << feth << " TeV, 10\% sys: " << fesys_10p << endl;
-                }
+		if( TMath::Abs( fEffArea->index - 2.4 ) < 1.e-3 && TMath::Abs( fEffArea->azMax - 1000. ) < 1.e-3 )
+		{
+			cout << "Threshold for index " << fEffArea->index << ": ";
+			cout << feth << " TeV, 10\% sys: " << fesys_10p << endl;
+		}
 		fTreeEth->Fill();
 	}
 	return true;

@@ -291,7 +291,7 @@ class VTableLookupDataHandler
 		
 		double fSizeSecondMax;
 		double ftheta2_All[25];
-		
+		double fDispDiff; // difference in disp event direction between telescopes
 		// Model3D parameters (JG)
 		bool fIsModel3D;  // data contains Model3D parameters
 		double fSmax3D;   // height of shower maximum (along the shower axis)

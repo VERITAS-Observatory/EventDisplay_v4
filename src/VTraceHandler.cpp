@@ -24,7 +24,7 @@ VTraceHandler::VTraceHandler()
 	fpTrazeSize = 0;
 	fpulsetiming_maxPV = 0;
 	fpulsetiminglevels_size = 0;
-        fFindPulseTiming = false;
+	fFindPulseTiming = false;
 	
 	fTraceIntegrationMethod = 1;
 	
@@ -80,14 +80,14 @@ void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSample
 		}
 	}
 	else for( unsigned int i = 0; i < iNSamples; i++ )
-        {
 		{
-			fpTrace[i] = iReader->getSample_double( iHitID, i + fMC_FADCTraceStart, ( i == 0 ) );
+			{
+				fpTrace[i] = iReader->getSample_double( iHitID, i + fMC_FADCTraceStart, ( i == 0 ) );
+			}
 		}
-        }
 		
 	fpTrazeSize = int( fpTrace.size() );
-        fHiLo = apply_lowgain( iHiLo );
+	fHiLo = apply_lowgain( iHiLo );
 }
 
 void VTraceHandler::setTrace( vector<uint16_t> pTrace, double ped, double pedrms, unsigned int iChanID, double iHiLo )
@@ -131,14 +131,14 @@ void VTraceHandler::setTrace( vector<uint8_t> pTrace, double ped, double pedrms,
 			fpTrace.push_back( ( double )pTrace[i] );
 		}
 	}
-	else 
-        {
-                for( unsigned int i = 0; i < i_tsize; i++ )
+	else
+	{
+		for( unsigned int i = 0; i < i_tsize; i++ )
 		{
 			fpTrace[i] = ( double )pTrace[i];
 		}
-        }
-		
+	}
+	
 	fpTrazeSize = int( fpTrace.size() );
 	fHiLo = apply_lowgain( iHiLo );
 }
@@ -329,7 +329,7 @@ vector< float >& VTraceHandler::getPulseTiming( int fFirst, int fLast, int fTFir
 	// first half of the pulse
 	// (loop backwards over pulse)
 	bool bBreak = false;
-        fFindPulseTiming = false;
+	fFindPulseTiming = false;
 	for( int i = maxpos; i >= fTFirst ; i-- )
 	{
 		i_trace = fpTrace[i] - fPed;
@@ -344,7 +344,7 @@ vector< float >& VTraceHandler::getPulseTiming( int fFirst, int fLast, int fTFir
 					fpulsetiming[m_pos] = getLinInterpol( fpulsetiminglevels[m_pos] * trace_max, i, i_trace, i + 1, fpTrace[i + 1] - fPed );
 					if( m_pos == 0 )
 					{
-                                                fFindPulseTiming = true;
+						fFindPulseTiming = true;
 						bBreak = true;
 					}
 				}
@@ -423,8 +423,8 @@ void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpo
 		}
 	}
 	// low gain channel
-        // (needs special treatment as end of the high gain pulse is
-        //  occassionally at the beginning of the readout window)
+	// (needs special treatment as end of the high gain pulse is
+	//  occassionally at the beginning of the readout window)
 	else
 	{
 		if( fFirst >= 0 && fFirst < fLast && fLast <= fpTrazeSize )
@@ -445,7 +445,7 @@ void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpo
 					tmax = it;
 					maxpos = i;
 				}
-                                // do some rough counting of saturation
+				// do some rough counting of saturation
 				if( nMax > 0 && it > nMax )
 				{
 					n255++;

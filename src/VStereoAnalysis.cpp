@@ -11,7 +11,7 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 	fDebug = false;
 	
 	fDataFile = 0;
-        fInstrumentEpoch = "NOT_SET";
+	fInstrumentEpoch = "NOT_SET";
 	fDirTot = iDirTot;
 	fDirTotRun = iDirRun;
 	bTotalAnalysisOnly = iTotalAnalysisOnly;
@@ -64,7 +64,7 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 	// combined results
 	iDirTot->cd();
 	fHistoTot = new VStereoHistograms( i_hsuffix, fRunPara->fSkyMapBinSize, fRunPara->fSkyMapBinSizeUC,
-					   fRunPara->fEnergySpectrumBinSize, fRunPara->fTimeIntervall, -1, -1, fIsOn );
+									   fRunPara->fEnergySpectrumBinSize, fRunPara->fTimeIntervall, -1, -1, fIsOn );
 	fHistoTot->setSkyMapSize( fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax, fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax );
 	
 	// one set of histograms for each run
@@ -85,9 +85,15 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 						  f_t_in_s_max[fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff], fIsOn ) );
 		fHisto.back()->setSkyMapSize( fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax,
 									  fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax );
-                if( fIsOn ) fHisto.back()->setRunNumber( fRunPara->fRunList[i].fRunOn );
-                else        fHisto.back()->setRunNumber( fRunPara->fRunList[i].fRunOff );
-									  
+		if( fIsOn )
+		{
+			fHisto.back()->setRunNumber( fRunPara->fRunList[i].fRunOn );
+		}
+		else
+		{
+			fHisto.back()->setRunNumber( fRunPara->fRunList[i].fRunOff );
+		}
+		
 		// define dead time calculators
 		fDeadTime.push_back( new VDeadTime( fIsOn ) );
 		
@@ -336,17 +342,17 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	// get effective area time bin vector
 	int i_t_bins = int( ( f_t_in_s_max[irun] - f_t_in_s_min[irun] ) / fRunPara->fTimeIntervall + 0.5 );
 	double i_time_intervall = 0.;
-        if( i_t_bins != 0. )
-        {
-            i_time_intervall = ( f_t_in_s_max[irun] - f_t_in_s_min[irun] ) / ( ( double )i_t_bins );
-        }
-        else
-        {
-            cout << "VStereoAnalysis::fillHistograms error: 0 time bins for effective area vector" << endl;
-            cout << "exiting..." << endl;
-            exit( EXIT_FAILURE );
-        }
-
+	if( i_t_bins != 0. )
+	{
+		i_time_intervall = ( f_t_in_s_max[irun] - f_t_in_s_min[irun] ) / ( ( double )i_t_bins );
+	}
+	else
+	{
+		cout << "VStereoAnalysis::fillHistograms error: 0 time bins for effective area vector" << endl;
+		cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
+	}
+	
 	
 	double iEffAreaTimeBin[i_t_bins + 1];
 	for( int i = 0; i < i_t_bins + 1; i++ )
@@ -1064,29 +1070,29 @@ double VStereoAnalysis::combineHistograms()
 		fHisto[h]->deleteSkyPlots();
 		iDir->cd();
 	}  // (end loop over all histograms)
-
+	
 	//////////////////////////////////////
 	// errors in sky maps (counting error)
 	for( int i = 1; i <= fHistoTot->hmap_stereoUC->GetNbinsX(); i++ )
 	{
-	    for( int j = 1; j <= fHistoTot->hmap_stereoUC->GetNbinsY(); j++ )
-	    {
-	        if( fHistoTot->hmap_stereoUC->GetBinContent( i, j ) > 0 )
+		for( int j = 1; j <= fHistoTot->hmap_stereoUC->GetNbinsY(); j++ )
 		{
-		     fHistoTot->hmap_stereoUC->SetBinError( i, j, sqrt( fHistoTot->hmap_stereoUC->GetBinContent( i, j ) ) );
-                }
-            }
-        }
+			if( fHistoTot->hmap_stereoUC->GetBinContent( i, j ) > 0 )
+			{
+				fHistoTot->hmap_stereoUC->SetBinError( i, j, sqrt( fHistoTot->hmap_stereoUC->GetBinContent( i, j ) ) );
+			}
+		}
+	}
 	for( int i = 1; i <= fHistoTot->hmap_stereo->GetNbinsX(); i++ )
 	{
-	    for( int j = 1; j <= fHistoTot->hmap_stereo->GetNbinsY(); j++ )
-	    {
-	        if( fHistoTot->hmap_stereo->GetBinContent( i, j ) > 0 )
+		for( int j = 1; j <= fHistoTot->hmap_stereo->GetNbinsY(); j++ )
 		{
-		     fHistoTot->hmap_stereo->SetBinError( i, j, sqrt( fHistoTot->hmap_stereo->GetBinContent( i, j ) ) );
-                }
-            }
-        }
+			if( fHistoTot->hmap_stereo->GetBinContent( i, j ) > 0 )
+			{
+				fHistoTot->hmap_stereo->SetBinError( i, j, sqrt( fHistoTot->hmap_stereo->GetBinContent( i, j ) ) );
+			}
+		}
+	}
 	
 	//////////////////////////////////////
 	// combine parameter (1D) histograms
@@ -1706,7 +1712,7 @@ void VStereoAnalysis::setCuts( VAnaSumRunParameterDataClass iL, int irun )
 		else
 		{
 			fCuts->setNTel( iL.fMaxTelID );
-                        fCuts->setInstrumentEpoch( fInstrumentEpoch );
+			fCuts->setInstrumentEpoch( fInstrumentEpoch );
                         fCuts->setTelToAnalyze( fTelToAnalyze );
 			fCuts->readCuts( iL.fCutFile );
 			fCuts->setTheta2Cut( iL.fSourceRadius );
@@ -1838,14 +1844,14 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
 		if( fDataFile->IsZombie() )
 		{
 			cout << "VStereoAnalysis::getDataFromFile() error opening file " << iFileName << endl;
-                        cout << "exiting..." << endl;
+			cout << "exiting..." << endl;
 			exit( EXIT_FAILURE );
 		}
 		fDataRunTree = ( TTree* )fDataFile->Get( "data" );
 		if( !fDataRunTree )
 		{
 			cout << "VStereoAnalysis::getDataFromFile() error: cannot find data tree in " << iFileName << endl;
-                        cout << "exiting..." << endl;
+			cout << "exiting..." << endl;
 			exit( EXIT_FAILURE );
 		}
                 fDataFrogsTree = ( TTree* )fDataFile->Get( "frogspars" );
@@ -2484,7 +2490,7 @@ void VStereoAnalysis::fill_TreeWithEventsForCtools( CData* c , double i_xderot, 
 	fTreeCTOOLS_MLR            = c->MLR ;
 	fTreeCTOOLS_EmissionHeight = c->EmissionHeight ; // height of shower maximum (in km) above telescope z-plane
 	fTreeCTOOLS_Acceptance     = fCTOOLSAcceptance->getAcceptance( i_xderot, i_yderot ) ;
-
+	
 	// RA- and DEC-aligned Wobbles
 	fTreeCTOOLS_WobbleWest  = getWobbleWest()  ;
 	fTreeCTOOLS_WobbleNorth = getWobbleNorth() ;
@@ -2494,7 +2500,7 @@ void VStereoAnalysis::fill_TreeWithEventsForCtools( CData* c , double i_xderot, 
 	fTreeCTOOLS_TargetDEC = fRunPara->fRunList[0].fTargetDecJ2000 ;
 	
 	// need the telescope pointing for the TangentPoint (RA/DEC of Telescope Pointing?)
-	double CenterPoint_RA  = ( fTreeCTOOLS_TargetRA  + -1.0*fTreeCTOOLS_WobbleWest ) ;
+	double CenterPoint_RA  = ( fTreeCTOOLS_TargetRA  + -1.0 * fTreeCTOOLS_WobbleWest ) ;
 	double CenterPoint_DEC = ( fTreeCTOOLS_TargetDEC + fTreeCTOOLS_WobbleNorth ) ;
 	CenterPoint_RA      *= TMath::DegToRad() ;
 	CenterPoint_DEC     *= TMath::DegToRad() ;
@@ -2516,7 +2522,7 @@ void VStereoAnalysis::fill_TreeWithEventsForCtools( CData* c , double i_xderot, 
 	double Spherical_DEC_deg = Spherical_DEC * TMath::RadToDeg() ;
 	fVsky->setTargetJ2000( Spherical_DEC_deg , Spherical_RA_deg ) ;
 	fVsky->precessTarget( fTreeCTOOLS_MJD, 0 ) ;
-
+	
 	// calculate new param
 	fVsky->updatePointing( fTreeCTOOLS_MJD, fTreeCTOOLS_Time ) ;
 	Az_deg = fVsky->getTargetAzimuth() ;
@@ -2544,7 +2550,7 @@ void VStereoAnalysis::save_TreeWithEventsForCtools() // WRITEEVENTTREEFORCTOOLS
 {
 	// save our ctools tree
 	fTreeWithEventsForCtools->Write() ; // or maybe ->AutoSave() ?
-
+	
 	fRunPara->SetName( "VAnaSumRunParameter" );
 	fRunPara->Write() ;
 	

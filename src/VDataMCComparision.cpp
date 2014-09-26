@@ -7,47 +7,65 @@
 
 VDataMCComparisionHistogramData::VDataMCComparisionHistogramData( string iName, string iHistogramType, unsigned int iTelescopeID )
 {
-    fVarName = iName;
-    fHistogramType = iHistogramType;
-    fTelescopeID = iTelescopeID;
-    fHis1D = 0;
-    fHis2D = 0;
+	fVarName = iName;
+	fHistogramType = iHistogramType;
+	fTelescopeID = iTelescopeID;
+	fHis1D = 0;
+	fHis2D = 0;
 }
 
 bool VDataMCComparisionHistogramData::initHistogram( string iXTitle, int iNbins, double ix_min, double ix_max )
 {
-     char hname[200];
-
-     if( fTelescopeID > 0 ) sprintf( hname, "h%s_%d_%s", fVarName.c_str(), fTelescopeID, fHistogramType.c_str() );
-     else                   sprintf( hname, "h%s_%s", fVarName.c_str(), fHistogramType.c_str() );
-
-     fHis1D = new TH1D( hname, "", iNbins, ix_min, ix_max );
-     fHis1D->SetXTitle( iXTitle.c_str() );
-     fHis1D->Sumw2();
-
-     if( fTelescopeID > 0 ) sprintf( hname, "h%sErec_%d_%s", fVarName.c_str(), fTelescopeID, fHistogramType.c_str() );
-     else                   sprintf( hname, "h%sErec_%s", fVarName.c_str(), fHistogramType.c_str() );
-
-     fHis2D = new TH2D( hname, "",  6, -1., 1., iNbins, ix_min, ix_max );
-     fHis2D->SetXTitle( "log_{10} energy_{rec} [TeV]" );
-     fHis2D->SetYTitle( iXTitle.c_str() );
-     fHis2D->Sumw2();
-
-     if( fHistogramType == "OFF" )
-     {
-        fHis1D->SetLineColor( 2 );
-        fHis1D->SetMarkerColor( 2 );
-        fHis2D->SetLineColor( 2 );
-        fHis2D->SetMarkerColor( 2 );
-     }
-
-     return true;
+	char hname[200];
+	
+	if( fTelescopeID > 0 )
+	{
+		sprintf( hname, "h%s_%d_%s", fVarName.c_str(), fTelescopeID, fHistogramType.c_str() );
+	}
+	else
+	{
+		sprintf( hname, "h%s_%s", fVarName.c_str(), fHistogramType.c_str() );
+	}
+	
+	fHis1D = new TH1D( hname, "", iNbins, ix_min, ix_max );
+	fHis1D->SetXTitle( iXTitle.c_str() );
+	fHis1D->Sumw2();
+	
+	if( fTelescopeID > 0 )
+	{
+		sprintf( hname, "h%sErec_%d_%s", fVarName.c_str(), fTelescopeID, fHistogramType.c_str() );
+	}
+	else
+	{
+		sprintf( hname, "h%sErec_%s", fVarName.c_str(), fHistogramType.c_str() );
+	}
+	
+	fHis2D = new TH2D( hname, "",  6, -1., 1., iNbins, ix_min, ix_max );
+	fHis2D->SetXTitle( "log_{10} energy_{rec} [TeV]" );
+	fHis2D->SetYTitle( iXTitle.c_str() );
+	fHis2D->Sumw2();
+	
+	if( fHistogramType == "OFF" )
+	{
+		fHis1D->SetLineColor( 2 );
+		fHis1D->SetMarkerColor( 2 );
+		fHis2D->SetLineColor( 2 );
+		fHis2D->SetMarkerColor( 2 );
+	}
+	
+	return true;
 }
 
 void VDataMCComparisionHistogramData::fill( double iV, double iWeight, double iLogEnergy_TeV )
 {
-    if( fHis1D ) fHis1D->Fill( iV, iWeight );
-    if( fHis2D && iLogEnergy_TeV > -98. ) fHis2D->Fill( iLogEnergy_TeV, iV, iWeight );
+	if( fHis1D )
+	{
+		fHis1D->Fill( iV, iWeight );
+	}
+	if( fHis2D && iLogEnergy_TeV > -98. )
+	{
+		fHis2D->Fill( iLogEnergy_TeV, iV, iWeight );
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -77,12 +95,12 @@ VDataMCComparision::VDataMCComparision( string iname, bool iBackgroundData, int 
 	
 	// setting all variables
 	hisList = 0;
-
-        // 2D histograms
+	
+	// 2D histograms
 	hXYcore = 0;
 	hAzYcore = 0;
 	hYt2 = 0;
-
+	
 	fAzRange = false;
 	fAzMin = 0.;
 	fAzMax = 0.;
@@ -137,65 +155,65 @@ void VDataMCComparision::defineHistograms()
 	hisList = new TList();
 	char hname[200];
 	
-        double core_max = 350.;
+	double core_max = 350.;
 	
-        fHistoArray[ETHETA2] = new VDataMCComparisionHistogramData( "theta2", fName, 0 );
-        fHistoArray[ETHETA2]->initHistogram( "#theta^{2} [deg^{2}]", 100, 0., 0.3 );
-
-        fHistoArray[ELTHETA2] = new VDataMCComparisionHistogramData( "ltheta2", fName, 0 );
-        fHistoArray[ELTHETA2]->initHistogram( "log_{10} #theta^{2} [deg^{2}]", 30, -5., 2. );
-
-        fHistoArray[EMSCW] = new VDataMCComparisionHistogramData( "MSCW", fName, 0 );
-        fHistoArray[EMSCW]->initHistogram( "mean reduced scaled width [deg]", 500, -5., 10. );
-
-        fHistoArray[EMSCL] = new VDataMCComparisionHistogramData( "MSCL", fName, 0 );
-        fHistoArray[EMSCL]->initHistogram( "mean reduced scaled length [deg]", 500, -5., 10. );
-
-        fHistoArray[EMWR] = new VDataMCComparisionHistogramData( "MWR", fName, 0 );
-        fHistoArray[EMWR]->initHistogram( "mean scaled width [deg]", 500, -5., 5. );
-
-        fHistoArray[EMLR] = new VDataMCComparisionHistogramData( "MLR", fName, 0 );
-        fHistoArray[EMLR]->initHistogram( "mean scaled length [deg]", 500, -5., 5. );
-
-        fHistoArray[EXCORE] = new VDataMCComparisionHistogramData( "Xcore", fName, 0 );
-        fHistoArray[EXCORE]->initHistogram( "core position x [m]", 200, -1.*core_max, core_max );
-
-        fHistoArray[EYCORE] = new VDataMCComparisionHistogramData( "Ycore", fName, 0 );
-        fHistoArray[EYCORE]->initHistogram( "core position y [m]", 200, -1.*core_max, core_max );
+	fHistoArray[ETHETA2] = new VDataMCComparisionHistogramData( "theta2", fName, 0 );
+	fHistoArray[ETHETA2]->initHistogram( "#theta^{2} [deg^{2}]", 100, 0., 0.3 );
 	
-        fHistoArray[ENIMAGES] = new VDataMCComparisionHistogramData( "NImages", fName, 0 );
-        fHistoArray[ENIMAGES]->initHistogram( "number of images", 5, 0., 5. );
-
-        fHistoArray[EIMGSEL] = new VDataMCComparisionHistogramData( "ImgSel", fName, 0 );
-        fHistoArray[EIMGSEL]->initHistogram( "telescope combinations", 16, 0., 16. );
-
-        fHistoArray[EEMISSIONHEIGHT] = new VDataMCComparisionHistogramData( "EmissionHeight", fName, 0 );
-        fHistoArray[EEMISSIONHEIGHT]->initHistogram( "estimated height of maximum emission [km]", 100, 0., 200. );
-
-        fHistoArray[EEREC] = new VDataMCComparisionHistogramData( "Erec", fName, 0 );
-        fHistoArray[EEREC]->initHistogram( "log_{10} energy_{MC}", 50, -2., 2. );
-
-        fHistoArray[EMVA] = new VDataMCComparisionHistogramData( "MVA", fName, 0 );
-        fHistoArray[EMVA]->initHistogram( "MVA variable", 100, -1., 1. );
-
+	fHistoArray[ELTHETA2] = new VDataMCComparisionHistogramData( "ltheta2", fName, 0 );
+	fHistoArray[ELTHETA2]->initHistogram( "log_{10} #theta^{2} [deg^{2}]", 30, -5., 2. );
+	
+	fHistoArray[EMSCW] = new VDataMCComparisionHistogramData( "MSCW", fName, 0 );
+	fHistoArray[EMSCW]->initHistogram( "mean reduced scaled width [deg]", 500, -5., 10. );
+	
+	fHistoArray[EMSCL] = new VDataMCComparisionHistogramData( "MSCL", fName, 0 );
+	fHistoArray[EMSCL]->initHistogram( "mean reduced scaled length [deg]", 500, -5., 10. );
+	
+	fHistoArray[EMWR] = new VDataMCComparisionHistogramData( "MWR", fName, 0 );
+	fHistoArray[EMWR]->initHistogram( "mean scaled width [deg]", 500, -5., 5. );
+	
+	fHistoArray[EMLR] = new VDataMCComparisionHistogramData( "MLR", fName, 0 );
+	fHistoArray[EMLR]->initHistogram( "mean scaled length [deg]", 500, -5., 5. );
+	
+	fHistoArray[EXCORE] = new VDataMCComparisionHistogramData( "Xcore", fName, 0 );
+	fHistoArray[EXCORE]->initHistogram( "core position x [m]", 200, -1.*core_max, core_max );
+	
+	fHistoArray[EYCORE] = new VDataMCComparisionHistogramData( "Ycore", fName, 0 );
+	fHistoArray[EYCORE]->initHistogram( "core position y [m]", 200, -1.*core_max, core_max );
+	
+	fHistoArray[ENIMAGES] = new VDataMCComparisionHistogramData( "NImages", fName, 0 );
+	fHistoArray[ENIMAGES]->initHistogram( "number of images", 5, 0., 5. );
+	
+	fHistoArray[EIMGSEL] = new VDataMCComparisionHistogramData( "ImgSel", fName, 0 );
+	fHistoArray[EIMGSEL]->initHistogram( "telescope combinations", 16, 0., 16. );
+	
+	fHistoArray[EEMISSIONHEIGHT] = new VDataMCComparisionHistogramData( "EmissionHeight", fName, 0 );
+	fHistoArray[EEMISSIONHEIGHT]->initHistogram( "estimated height of maximum emission [km]", 100, 0., 200. );
+	
+	fHistoArray[EEREC] = new VDataMCComparisionHistogramData( "Erec", fName, 0 );
+	fHistoArray[EEREC]->initHistogram( "log_{10} energy_{MC}", 50, -2., 2. );
+	
+	fHistoArray[EMVA] = new VDataMCComparisionHistogramData( "MVA", fName, 0 );
+	fHistoArray[EMVA]->initHistogram( "MVA variable", 100, -1., 1. );
+	
 	//these histograms are only filled for Model3D analysis
-         
-        fHistoArray[ESIGMAT3D] = new VDataMCComparisionHistogramData( "sigmaT3D", fName, 0 );
-        fHistoArray[ESIGMAT3D]->initHistogram( "3D width [m]", 100, 0., 50. );
-
-        fHistoArray[ENC3D] = new VDataMCComparisionHistogramData( "Nc3D", fName, 0 );
-        fHistoArray[ENC3D]->initHistogram( "ln(Nc)", 100, 0., 20. );
-        
-        fHistoArray[EDEPTH3D] = new VDataMCComparisionHistogramData( "Depth3D", fName, 0 );
-        fHistoArray[EDEPTH3D]->initHistogram( "depth of shower (3D) [g cm^{-2}]", 100, 0., 1000. );
-
-        fHistoArray[ERWIDTH3D] = new VDataMCComparisionHistogramData( "RWidth3D", fName, 0 );
-        fHistoArray[ERWIDTH3D]->initHistogram( "reduced 3D width [m]", 100, 0, 10. );
-
-        fHistoArray[EERRRWIDTH3D] = new VDataMCComparisionHistogramData( "ErrRWidth3D", fName, 0 );
-        fHistoArray[EERRRWIDTH3D]->initHistogram( "error in reduced 3D width [m]", 100, 0., 0.2 );
-
-        // additional 2D histograms 
+	
+	fHistoArray[ESIGMAT3D] = new VDataMCComparisionHistogramData( "sigmaT3D", fName, 0 );
+	fHistoArray[ESIGMAT3D]->initHistogram( "3D width [m]", 100, 0., 50. );
+	
+	fHistoArray[ENC3D] = new VDataMCComparisionHistogramData( "Nc3D", fName, 0 );
+	fHistoArray[ENC3D]->initHistogram( "ln(Nc)", 100, 0., 20. );
+	
+	fHistoArray[EDEPTH3D] = new VDataMCComparisionHistogramData( "Depth3D", fName, 0 );
+	fHistoArray[EDEPTH3D]->initHistogram( "depth of shower (3D) [g cm^{-2}]", 100, 0., 1000. );
+	
+	fHistoArray[ERWIDTH3D] = new VDataMCComparisionHistogramData( "RWidth3D", fName, 0 );
+	fHistoArray[ERWIDTH3D]->initHistogram( "reduced 3D width [m]", 100, 0, 10. );
+	
+	fHistoArray[EERRRWIDTH3D] = new VDataMCComparisionHistogramData( "ErrRWidth3D", fName, 0 );
+	fHistoArray[EERRRWIDTH3D]->initHistogram( "error in reduced 3D width [m]", 100, 0., 0.2 );
+	
+	// additional 2D histograms
 	sprintf( hname, "hXYcore_%s", fName.c_str() );
 	hXYcore = new TH2D( hname, "", 75, -1.*core_max, core_max, 75, -core_max, core_max );
 	hXYcore->SetXTitle( "core position X [m]" );
@@ -213,75 +231,75 @@ void VDataMCComparision::defineHistograms()
 	hYt2->SetXTitle( "log_{10} #Theta^{2}" );
 	hYt2->SetYTitle( "core position Y [m]" );
 	hisList->Add( hYt2 );
-        
+	
 	// telescope numbering starts at 1!
 	for( int i = 1; i <= fNTel; i++ )
 	{
-                fHistoSingleTel[ELENGTH].push_back( new VDataMCComparisionHistogramData( "length", fName, i ));
-                fHistoSingleTel[ELENGTH].back()->initHistogram( "length [deg]",  100, 0., 0.5 );
-
-                fHistoSingleTel[EWIDTH].push_back( new VDataMCComparisionHistogramData( "width", fName, i ));
-                fHistoSingleTel[EWIDTH].back()->initHistogram( "width [deg]",  100, 0., 0.25 );
-
-                fHistoSingleTel[EDIST].push_back( new VDataMCComparisionHistogramData( "dist", fName, i ));
-                fHistoSingleTel[EDIST].back()->initHistogram( "dist [deg]",  100, 0., 2.0 );
-
-                fHistoSingleTel[EALPHA].push_back( new VDataMCComparisionHistogramData( "alpha", fName, i ));
-                fHistoSingleTel[EALPHA].back()->initHistogram( "alpha [deg]",  100, 0., 25 );
-
-                fHistoSingleTel[ENTUBES].push_back( new VDataMCComparisionHistogramData( "ntubes", fName, i ));
-                fHistoSingleTel[ENTUBES].back()->initHistogram( "ntubes",  100, 0., 200. );
-
-                fHistoSingleTel[ENLOWGAIN].push_back( new VDataMCComparisionHistogramData( "nlowgain", fName, i ));
-                fHistoSingleTel[ENLOWGAIN].back()->initHistogram( "nlowgain",  100, 0., 100. );
-
-                fHistoSingleTel[ESIZE].push_back( new VDataMCComparisionHistogramData( "size", fName, i ));
-                fHistoSingleTel[ESIZE].back()->initHistogram( "log_{10} size [d.c.]",  100, 1., 8. );
-
-                fHistoSingleTel[ESIZE2].push_back( new VDataMCComparisionHistogramData( "size2", fName, i ));
-                fHistoSingleTel[ESIZE2].back()->initHistogram( "log_{10} size2 [d.c.]",  100, 1., 8. );
-
-                fHistoSingleTel[ESIZELG].push_back( new VDataMCComparisionHistogramData( "sizeLG", fName, i ));
-                fHistoSingleTel[ESIZELG].back()->initHistogram( "log_{10} sizeLG [d.c.]",  100, 1., 8. );
+		fHistoSingleTel[ELENGTH].push_back( new VDataMCComparisionHistogramData( "length", fName, i ) );
+		fHistoSingleTel[ELENGTH].back()->initHistogram( "length [deg]",  100, 0., 0.5 );
 		
-                fHistoSingleTel[EFRACLOW].push_back( new VDataMCComparisionHistogramData( "fraclow", fName, i ));
-                fHistoSingleTel[EFRACLOW].back()->initHistogram( "fraclow",  100, 0., 1. );
-
-                fHistoSingleTel[EMAX1].push_back( new VDataMCComparisionHistogramData( "max1", fName, i ));
-                fHistoSingleTel[EMAX1].back()->initHistogram( "log_{10} size_{max1} [d.c.]",  100, 1., 4. );
-
-                fHistoSingleTel[EMAX2].push_back( new VDataMCComparisionHistogramData( "max2", fName, i ));
-                fHistoSingleTel[EMAX2].back()->initHistogram( "log_{10} size_{max2} [d.c.]",  100, 1., 4. );
+		fHistoSingleTel[EWIDTH].push_back( new VDataMCComparisionHistogramData( "width", fName, i ) );
+		fHistoSingleTel[EWIDTH].back()->initHistogram( "width [deg]",  100, 0., 0.25 );
 		
-                fHistoSingleTel[EMAX3].push_back( new VDataMCComparisionHistogramData( "max3", fName, i ));
-                fHistoSingleTel[EMAX3].back()->initHistogram( "log_{10} size_{max3} [d.c.]",  100, 1., 4. );
-
-                fHistoSingleTel[ELOSS].push_back( new VDataMCComparisionHistogramData( "loss", fName, i ));
-                fHistoSingleTel[ELOSS].back()->initHistogram( "loss",  100, 0., 1. );
-
-                fHistoSingleTel[ELOS].push_back( new VDataMCComparisionHistogramData( "los", fName, i ));
-                fHistoSingleTel[ELOS].back()->initHistogram( "length/size [deg] x 1000",  100, 0., 1. );
-
-                fHistoSingleTel[EASYM].push_back( new VDataMCComparisionHistogramData( "asym", fName, i ));
-                fHistoSingleTel[EASYM].back()->initHistogram( "asymmetry",  100, -2., 2. );
-
-                fHistoSingleTel[ECENX].push_back( new VDataMCComparisionHistogramData( "cen_x", fName, i ));
-                fHistoSingleTel[ECENX].back()->initHistogram( "image centroid (x) [deg]",  100, -2., 2. );
-
-                fHistoSingleTel[ECENY].push_back( new VDataMCComparisionHistogramData( "cen_y", fName, i ));
-                fHistoSingleTel[ECENY].back()->initHistogram( "image centroid (y) [deg]",  100, -2., 2. );
-
-                fHistoSingleTel[ETGRADX].push_back( new VDataMCComparisionHistogramData( "tgrad_x", fName, i ));
-                fHistoSingleTel[ETGRADX].back()->initHistogram( "time gradient (x)",  100, -30., 30. );
-
-                fHistoSingleTel[EMSCWT].push_back( new VDataMCComparisionHistogramData( "mscwt", fName, i ));
-                fHistoSingleTel[EMSCWT].back()->initHistogram( "expected width",  100, 0., 2. );
-
-                fHistoSingleTel[EMSCLT].push_back( new VDataMCComparisionHistogramData( "msclt", fName, i ));
-                fHistoSingleTel[EMSCLT].back()->initHistogram( "expected length",  100, 0., 2. );
-
-                fHistoSingleTel[ETELDIST].push_back( new VDataMCComparisionHistogramData( "r", fName, i ));
-                fHistoSingleTel[ETELDIST].back()->initHistogram( "distance telescope - core [m]",  100, 0., 300. );
+		fHistoSingleTel[EDIST].push_back( new VDataMCComparisionHistogramData( "dist", fName, i ) );
+		fHistoSingleTel[EDIST].back()->initHistogram( "dist [deg]",  100, 0., 2.0 );
+		
+		fHistoSingleTel[EALPHA].push_back( new VDataMCComparisionHistogramData( "alpha", fName, i ) );
+		fHistoSingleTel[EALPHA].back()->initHistogram( "alpha [deg]",  100, 0., 25 );
+		
+		fHistoSingleTel[ENTUBES].push_back( new VDataMCComparisionHistogramData( "ntubes", fName, i ) );
+		fHistoSingleTel[ENTUBES].back()->initHistogram( "ntubes",  100, 0., 200. );
+		
+		fHistoSingleTel[ENLOWGAIN].push_back( new VDataMCComparisionHistogramData( "nlowgain", fName, i ) );
+		fHistoSingleTel[ENLOWGAIN].back()->initHistogram( "nlowgain",  100, 0., 100. );
+		
+		fHistoSingleTel[ESIZE].push_back( new VDataMCComparisionHistogramData( "size", fName, i ) );
+		fHistoSingleTel[ESIZE].back()->initHistogram( "log_{10} size [d.c.]",  100, 1., 8. );
+		
+		fHistoSingleTel[ESIZE2].push_back( new VDataMCComparisionHistogramData( "size2", fName, i ) );
+		fHistoSingleTel[ESIZE2].back()->initHistogram( "log_{10} size2 [d.c.]",  100, 1., 8. );
+		
+		fHistoSingleTel[ESIZELG].push_back( new VDataMCComparisionHistogramData( "sizeLG", fName, i ) );
+		fHistoSingleTel[ESIZELG].back()->initHistogram( "log_{10} sizeLG [d.c.]",  100, 1., 8. );
+		
+		fHistoSingleTel[EFRACLOW].push_back( new VDataMCComparisionHistogramData( "fraclow", fName, i ) );
+		fHistoSingleTel[EFRACLOW].back()->initHistogram( "fraclow",  100, 0., 1. );
+		
+		fHistoSingleTel[EMAX1].push_back( new VDataMCComparisionHistogramData( "max1", fName, i ) );
+		fHistoSingleTel[EMAX1].back()->initHistogram( "log_{10} size_{max1} [d.c.]",  100, 1., 4. );
+		
+		fHistoSingleTel[EMAX2].push_back( new VDataMCComparisionHistogramData( "max2", fName, i ) );
+		fHistoSingleTel[EMAX2].back()->initHistogram( "log_{10} size_{max2} [d.c.]",  100, 1., 4. );
+		
+		fHistoSingleTel[EMAX3].push_back( new VDataMCComparisionHistogramData( "max3", fName, i ) );
+		fHistoSingleTel[EMAX3].back()->initHistogram( "log_{10} size_{max3} [d.c.]",  100, 1., 4. );
+		
+		fHistoSingleTel[ELOSS].push_back( new VDataMCComparisionHistogramData( "loss", fName, i ) );
+		fHistoSingleTel[ELOSS].back()->initHistogram( "loss",  100, 0., 1. );
+		
+		fHistoSingleTel[ELOS].push_back( new VDataMCComparisionHistogramData( "los", fName, i ) );
+		fHistoSingleTel[ELOS].back()->initHistogram( "length/size [deg] x 1000",  100, 0., 1. );
+		
+		fHistoSingleTel[EASYM].push_back( new VDataMCComparisionHistogramData( "asym", fName, i ) );
+		fHistoSingleTel[EASYM].back()->initHistogram( "asymmetry",  100, -2., 2. );
+		
+		fHistoSingleTel[ECENX].push_back( new VDataMCComparisionHistogramData( "cen_x", fName, i ) );
+		fHistoSingleTel[ECENX].back()->initHistogram( "image centroid (x) [deg]",  100, -2., 2. );
+		
+		fHistoSingleTel[ECENY].push_back( new VDataMCComparisionHistogramData( "cen_y", fName, i ) );
+		fHistoSingleTel[ECENY].back()->initHistogram( "image centroid (y) [deg]",  100, -2., 2. );
+		
+		fHistoSingleTel[ETGRADX].push_back( new VDataMCComparisionHistogramData( "tgrad_x", fName, i ) );
+		fHistoSingleTel[ETGRADX].back()->initHistogram( "time gradient (x)",  100, -30., 30. );
+		
+		fHistoSingleTel[EMSCWT].push_back( new VDataMCComparisionHistogramData( "mscwt", fName, i ) );
+		fHistoSingleTel[EMSCWT].back()->initHistogram( "expected width",  100, 0., 2. );
+		
+		fHistoSingleTel[EMSCLT].push_back( new VDataMCComparisionHistogramData( "msclt", fName, i ) );
+		fHistoSingleTel[EMSCLT].back()->initHistogram( "expected length",  100, 0., 2. );
+		
+		fHistoSingleTel[ETELDIST].push_back( new VDataMCComparisionHistogramData( "r", fName, i ) );
+		fHistoSingleTel[ETELDIST].back()->initHistogram( "distance telescope - core [m]",  100, 0., 300. );
 		
 		sprintf( hname, "hcen_xy%d_%s", i, fName.c_str() );
 		hcen_xy.push_back( new TH2D( hname, "", 100, -2., 2., 100, -2., 2. ) );
@@ -289,7 +307,7 @@ void VDataMCComparision::defineHistograms()
 		hcen_xy.back()->SetYTitle( "image centroid (y) [deg]" );
 		hTel2D.push_back( hcen_xy.back() );
 		hisList->Add( hcen_xy.back() );
-
+		
 		sprintf( hname, "hdistR%d_%s", i, fName.c_str() );
 		hdistR.push_back( new TH2D( hname, "", 20, 0., 300., 20, 0., 2. ) );
 		sprintf( hname, "distance to T%d [m]", i );
@@ -298,25 +316,25 @@ void VDataMCComparision::defineHistograms()
 		hisList->Add( hdistR.back() );
 		hTel2D.push_back( hdistR.back() );
 	}
-
-        // add all histograms to list of histograms (for 1D and 2D)
-        for( map <E_varname, vector< VDataMCComparisionHistogramData* > >::iterator it = fHistoSingleTel.begin(); it != fHistoSingleTel.end(); it++ )
-        {
-             for( unsigned int i = 0; i < it->second.size(); i++ )
-             {
-                 hisList->Add( it->second[i]->fHis1D );
-                 hisList->Add( it->second[i]->fHis2D );
-                 hTel.push_back( it->second[i]->fHis1D );
-                 hTel2D.push_back( it->second[i]->fHis2D );
-             }
-        }
-        for( map <E_varname, VDataMCComparisionHistogramData* >::iterator it = fHistoArray.begin(); it != fHistoArray.end(); it++ )
-        {
-             hisList->Add( it->second->fHis1D );
-             hisList->Add( it->second->fHis2D );
-             hTel.push_back( it->second->fHis1D );
-             hTel2D.push_back( it->second->fHis2D );
-        }
+	
+	// add all histograms to list of histograms (for 1D and 2D)
+	for( map <E_varname, vector< VDataMCComparisionHistogramData* > >::iterator it = fHistoSingleTel.begin(); it != fHistoSingleTel.end(); it++ )
+	{
+		for( unsigned int i = 0; i < it->second.size(); i++ )
+		{
+			hisList->Add( it->second[i]->fHis1D );
+			hisList->Add( it->second[i]->fHis2D );
+			hTel.push_back( it->second[i]->fHis1D );
+			hTel2D.push_back( it->second[i]->fHis2D );
+		}
+	}
+	for( map <E_varname, VDataMCComparisionHistogramData* >::iterator it = fHistoArray.begin(); it != fHistoArray.end(); it++ )
+	{
+		hisList->Add( it->second->fHis1D );
+		hisList->Add( it->second->fHis2D );
+		hTel.push_back( it->second->fHis1D );
+		hTel2D.push_back( it->second->fHis2D );
+	}
 	
 }
 
@@ -347,7 +365,7 @@ bool VDataMCComparision::setOnOffHistograms( VDataMCComparision* on, VDataMCComp
 	{
 		hTel2D[j]->Add( on->hTel2D[j], off->hTel2D[j], 1., norm );
 	}
-
+	
 	
 	return true;
 }
@@ -356,13 +374,13 @@ void VDataMCComparision::setEntries( TH1D* iH )
 {
 	double ie = 0.;
 	for( int i = 1; i <= iH->GetNbinsX(); i++ )
-        {
-            if( iH->GetBinContent( i ) > 0. )
-            {
-                    ie += iH->GetBinContent( i );
-            }
-         }
-		
+	{
+		if( iH->GetBinContent( i ) > 0. )
+		{
+			ie += iH->GetBinContent( i );
+		}
+	}
+	
 	iH->SetEntries( ie );
 }
 
@@ -614,36 +632,42 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 		if( fInput == 0 )
 		{
 			theta2 = ( fData->Yoff - fData->MCyoff ) * ( fData->Yoff - fData->MCyoff )
-			       + ( fData->Xoff - fData->MCxoff ) * ( fData->Xoff - fData->MCxoff );
+					 + ( fData->Xoff - fData->MCxoff ) * ( fData->Xoff - fData->MCxoff );
 		}
-                else
-                {
-                        float on_x = fData->Xoff_derot + fWobbleEast;
-                        float on_y = fData->Yoff_derot + fWobbleNorth;
-                        // off data
-                        if( fInput == 2 )
-                        {
-                            // loop over 5 off regions and use the smallest theta2
-                            theta2 = 1.e5;
-                            float off_theta = 90. * TMath::DegToRad();
-                            for( unsigned int th = 0; th < 5; th++ )
-                            {
-                                float off_x = cos( off_theta ) * fWobbleEast - sin( off_theta ) * fWobbleNorth + fData->Xoff_derot;
-                                float off_y = sin( off_theta ) * fWobbleEast + cos( off_theta ) * fWobbleNorth + fData->Yoff_derot;
-                                if( off_x * off_x + off_y * off_y < theta2 ) theta2 = off_x * off_x + off_y * off_y;
-                                off_theta += 45. * TMath::DegToRad();
-                            }
-                        }
-                        else 
-                        {
-                            theta2 = on_x * on_x + on_y * on_y;
-                        }
+		else
+		{
+			float on_x = fData->Xoff_derot + fWobbleEast;
+			float on_y = fData->Yoff_derot + fWobbleNorth;
+			// off data
+			if( fInput == 2 )
+			{
+				// loop over 5 off regions and use the smallest theta2
+				theta2 = 1.e5;
+				float off_theta = 90. * TMath::DegToRad();
+				for( unsigned int th = 0; th < 5; th++ )
+				{
+					float off_x = cos( off_theta ) * fWobbleEast - sin( off_theta ) * fWobbleNorth + fData->Xoff_derot;
+					float off_y = sin( off_theta ) * fWobbleEast + cos( off_theta ) * fWobbleNorth + fData->Yoff_derot;
+					if( off_x * off_x + off_y * off_y < theta2 )
+					{
+						theta2 = off_x * off_x + off_y * off_y;
+					}
+					off_theta += 45. * TMath::DegToRad();
+				}
+			}
+			else
+			{
+				theta2 = on_x * on_x + on_y * on_y;
+			}
 		}
 		
 		// MC energy and spectral weight is filled for simulations only
 		if( fInput == 0 && fData->MCe0 > 0 )
 		{
-                        if( fHistoArray[EEREC] ) fHistoArray[EEREC]->fill( log10( fData->MCe0 ), 1., -99. );
+			if( fHistoArray[EEREC] )
+			{
+				fHistoArray[EEREC]->fill( log10( fData->MCe0 ), 1., -99. );
+			}
 			if( fSpectralWeight )
 			{
 				weight = fSpectralWeight->getSpectralWeight( fData->MCe0 );
@@ -717,47 +741,86 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 		if( fSingleTelescopeCuts != -1
 				|| ( theta2 >= 0. && fData->MSCW < msw_max && fData->MSCW > msw_min && fData->MSCL > msl_min && fData->MSCL < msl_max ) )
 		{
-                        if( fHistoArray[ETHETA2] ) fHistoArray[ETHETA2]->fill( theta2, weight, log10( fData->ErecS ) );
-                        if( fHistoArray[ELTHETA2] ) fHistoArray[ELTHETA2]->fill( log10( theta2 ), weight, log10( fData->ErecS ) );
+			if( fHistoArray[ETHETA2] )
+			{
+				fHistoArray[ETHETA2]->fill( theta2, weight, log10( fData->ErecS ) );
+			}
+			if( fHistoArray[ELTHETA2] )
+			{
+				fHistoArray[ELTHETA2]->fill( log10( theta2 ), weight, log10( fData->ErecS ) );
+			}
 			hYt2->Fill( log10( theta2 ), fData->Ycore, weight );
 		}
 		if( fSingleTelescopeCuts != -1 || ( theta2 >= theta2_min && theta2 < theta2_cut &&  fData->MSCL < msl_max && fData->MSCL > msl_min ) )
 		{
-                        if( fHistoArray[EMSCW] ) fHistoArray[EMSCW]->fill( fData->MSCW, weight, log10( fData->ErecS ) );
+			if( fHistoArray[EMSCW] )
+			{
+				fHistoArray[EMSCW]->fill( fData->MSCW, weight, log10( fData->ErecS ) );
+			}
 			for( int j = 0; j < fNTel; j++ )
-                        {
-                            if( fData->MSCWT[j] > 0. && fHistoSingleTel[EMSCWT].size() > 0 && fHistoSingleTel[EMSCWT][j] )
-                            {
-                                    fHistoSingleTel[EMSCWT][j]->fill( fData->width[j] / fData->MSCWT[j], weight, log10( fData->ErecS ) );
-                            }
-                        }
-                        if( fHistoArray[EMWR] ) fHistoArray[EMWR]->fill( fData->MWR, weight, log10( fData->ErecS ) );
+			{
+				if( fData->MSCWT[j] > 0. && fHistoSingleTel[EMSCWT].size() > 0 && fHistoSingleTel[EMSCWT][j] )
+				{
+					fHistoSingleTel[EMSCWT][j]->fill( fData->width[j] / fData->MSCWT[j], weight, log10( fData->ErecS ) );
+				}
+			}
+			if( fHistoArray[EMWR] )
+			{
+				fHistoArray[EMWR]->fill( fData->MWR, weight, log10( fData->ErecS ) );
+			}
 			//3D//
-                        if( fHistoArray[ESIGMAT3D] ) fHistoArray[ESIGMAT3D]->fill( fData->sigmaT3D, weight, log10( fData->ErecS ) );
-                        if( fHistoArray[ENC3D] ) fHistoArray[ENC3D]->fill(  fData->Nc3D, weight, log10( fData->ErecS ) );
-                        if( fHistoArray[EDEPTH3D] ) fHistoArray[EDEPTH3D]->fill( fData->Depth3D, weight, log10( fData->ErecS ) );
-                        if( fHistoArray[ERWIDTH3D] ) fHistoArray[ERWIDTH3D]->fill( fData->RWidth3D, weight, log10( fData->ErecS ) );
-                        if( fHistoArray[EERRRWIDTH3D] ) fHistoArray[EERRRWIDTH3D]->fill( fData->ErrRWidth3D, weight, log10( fData->ErecS ) );
-
+			if( fHistoArray[ESIGMAT3D] )
+			{
+				fHistoArray[ESIGMAT3D]->fill( fData->sigmaT3D, weight, log10( fData->ErecS ) );
+			}
+			if( fHistoArray[ENC3D] )
+			{
+				fHistoArray[ENC3D]->fill( fData->Nc3D, weight, log10( fData->ErecS ) );
+			}
+			if( fHistoArray[EDEPTH3D] )
+			{
+				fHistoArray[EDEPTH3D]->fill( fData->Depth3D, weight, log10( fData->ErecS ) );
+			}
+			if( fHistoArray[ERWIDTH3D] )
+			{
+				fHistoArray[ERWIDTH3D]->fill( fData->RWidth3D, weight, log10( fData->ErecS ) );
+			}
+			if( fHistoArray[EERRRWIDTH3D] )
+			{
+				fHistoArray[EERRRWIDTH3D]->fill( fData->ErrRWidth3D, weight, log10( fData->ErecS ) );
+			}
+			
 		}
 		if( fSingleTelescopeCuts != -1
 				|| ( theta2 >= theta2_min && theta2 < theta2_cut  &&  fData->MSCW < msw_max && fData->MSCW > msw_min ) )
 		{
-                        if( fHistoArray[EMSCL] ) fHistoArray[EMSCL]->fill( fData->MSCL, weight, log10( fData->ErecS ) );
+			if( fHistoArray[EMSCL] )
+			{
+				fHistoArray[EMSCL]->fill( fData->MSCL, weight, log10( fData->ErecS ) );
+			}
 			for( int j = 0; j < fNTel; j++ )
-                        {
-                            if( fData->MSCLT[j] > 0. && fHistoSingleTel[EMSCLT].size() > 0 && fHistoSingleTel[EMSCLT][j] )
-                            {
-                                    fHistoSingleTel[EMSCLT][j]->fill( fData->length[j] / fData->MSCLT[j], weight, log10( fData->ErecS ) );
-                            }
-                        }
-                        if( fHistoArray[EMLR] ) fHistoArray[EMLR]->fill( fData->MLR, weight, log10( fData->ErecS ) );
+			{
+				if( fData->MSCLT[j] > 0. && fHistoSingleTel[EMSCLT].size() > 0 && fHistoSingleTel[EMSCLT][j] )
+				{
+					fHistoSingleTel[EMSCLT][j]->fill( fData->length[j] / fData->MSCLT[j], weight, log10( fData->ErecS ) );
+				}
+			}
+			if( fHistoArray[EMLR] )
+			{
+				fHistoArray[EMLR]->fill( fData->MLR, weight, log10( fData->ErecS ) );
+			}
 			if( fData->EmissionHeight > 0. && fHistoArray[EEMISSIONHEIGHT] )
 			{
 				fHistoArray[EEMISSIONHEIGHT]->fill( fData->EmissionHeight, weight, log10( fData->ErecS ) );
 			}
-                        if( fHistoArray[ENIMAGES] )fHistoArray[ENIMAGES]->fill( fData->NImages, weight, log10( fData->ErecS ) );
-                        if( fHistoArray[EIMGSEL] )fHistoArray[EIMGSEL]->fill( fData->ImgSel, weight, log10( fData->ErecS ) );
+			if( fHistoArray[ENIMAGES] )
+			{
+				fHistoArray[ENIMAGES]->fill( fData->NImages, weight, log10( fData->ErecS ) );
+			}
+			if( fHistoArray[EIMGSEL] )
+			{
+				fHistoArray[EIMGSEL]->fill( fData->ImgSel, weight, log10( fData->ErecS ) );
+			}
 			
 			if( fCuts )
 			{
@@ -765,7 +828,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 				fCuts->applyTMVACut( i );
 				if( fCuts->getTMVA_EvaluationResult() > -90. && fHistoArray[EMVA] )
 				{
-                                        fHistoArray[EMVA]->fill( fCuts->getTMVA_EvaluationResult(), weight, log10( fData->ErecS ) );
+					fHistoArray[EMVA]->fill( fCuts->getTMVA_EvaluationResult(), weight, log10( fData->ErecS ) );
 				}
 			}
 		}
@@ -776,16 +839,25 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 				|| ( theta2 >= theta2_min && theta2 < theta2_cut
 					 && fData->MSCW < msw_max && fData->MSCW > msw_min && fData->MSCL < msl_max && fData->MSCL > msl_min ) )
 		{
-                        if( fHistoArray[EXCORE] ) fHistoArray[EXCORE]->fill( fData->Xcore, weight, log10( fData->ErecS ) );
+			if( fHistoArray[EXCORE] )
+			{
+				fHistoArray[EXCORE]->fill( fData->Xcore, weight, log10( fData->ErecS ) );
+			}
 			if( fInput == 0 )
 			{
-                                if( fHistoArray[EYCORE] ) fHistoArray[EYCORE]->fill( -1.*fData->Ycore, weight, log10( fData->ErecS ) );
+				if( fHistoArray[EYCORE] )
+				{
+					fHistoArray[EYCORE]->fill( -1.*fData->Ycore, weight, log10( fData->ErecS ) );
+				}
 				hXYcore->Fill( fData->Xcore, -1.*fData->Ycore, weight );
 				hAzYcore->Fill( fData->Az, -1.*fData->Ycore , weight );
 			}
 			else
 			{
-                                if( fHistoArray[EYCORE] ) fHistoArray[EYCORE]->fill( fData->Ycore, weight, log10( fData->ErecS ) );
+				if( fHistoArray[EYCORE] )
+				{
+					fHistoArray[EYCORE]->fill( fData->Ycore, weight, log10( fData->ErecS ) );
+				}
 				hXYcore->Fill( fData->Xcore, fData->Ycore, weight );
 				hAzYcore->Fill( fData->Az, fData->Ycore , weight );
 			}
@@ -813,27 +885,90 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 				
 				if( fData->ntubes[j] > ntubes_min && fData->size[j] > 0. && fData->size2[j] > 0. && fData->ErecS > 0. )
 				{
-                                        if( fHistoSingleTel[ELENGTH][j] ) fHistoSingleTel[ELENGTH][j]->fill( fData->length[j], weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[EWIDTH][j] )  fHistoSingleTel[EWIDTH][j]->fill( fData->width[j], weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[ENTUBES][j] ) fHistoSingleTel[ENTUBES][j]->fill( fData->ntubes[j], weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[ENLOWGAIN][j] && fData->nlowgain[j] ) fHistoSingleTel[ENLOWGAIN][j]->fill( fData->nlowgain[j], weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[EDIST][j] ) fHistoSingleTel[EDIST][j]->fill( fData->dist[j], weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[ESIZE][j] ) fHistoSingleTel[ESIZE][j]->fill( log10( fData->size[j] ), weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[ESIZE2][j] ) fHistoSingleTel[ESIZE2][j]->fill( log10( fData->size2[j] ), weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[ESIZELG][j] &&fData->fraclow[j] > 0. ) fHistoSingleTel[ESIZELG][j]->fill( log10( fData->size2[j]*fData->fraclow[j] ), weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[EFRACLOW][j] ) fHistoSingleTel[EFRACLOW][j]->fill( fData->fraclow[j], weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[EMAX1][j] && fData->max1[j] > 0. ) fHistoSingleTel[EMAX1][j]->fill( log10( fData->max1[j] ), weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[EMAX2][j] && fData->max2[j] > 0. ) fHistoSingleTel[EMAX2][j]->fill( log10( fData->max2[j] ), weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[EMAX3][j] && fData->max3[j] > 0. ) fHistoSingleTel[EMAX3][j]->fill( log10( fData->max3[j] ), weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[EALPHA][j] ) fHistoSingleTel[EALPHA][j]->fill( fData->alpha[j], weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[ELOS][j] ) fHistoSingleTel[ELOS][j]->fill( fData->length[j] / fData->size[j] * 1000., weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[ELOSS][j] ) fHistoSingleTel[ELOSS][j]->fill( fData->loss[j], weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[EASYM][j] ) fHistoSingleTel[EASYM][j]->fill( fData->asym[j], weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[ECENX][j] ) fHistoSingleTel[ECENX][j]->fill( fData->cen_x[j], weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[ECENY][j] ) fHistoSingleTel[ECENY][j]->fill( fData->cen_y[j], weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[ETGRADX][j] ) fHistoSingleTel[ETGRADX][j]->fill( fData->tgrad_x[j], weight, log10( fData->ErecS ) );
-                                        if( fHistoSingleTel[ETELDIST][j] ) fHistoSingleTel[ETELDIST][j]->fill( fData->R[j], weight, log10( fData->ErecS ) );
-                                        if( hcen_xy[j] ) hcen_xy[j]->Fill( fData->cen_x[j], fData->cen_y[j], weight );
+					if( fHistoSingleTel[ELENGTH][j] )
+					{
+						fHistoSingleTel[ELENGTH][j]->fill( fData->length[j], weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[EWIDTH][j] )
+					{
+						fHistoSingleTel[EWIDTH][j]->fill( fData->width[j], weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[ENTUBES][j] )
+					{
+						fHistoSingleTel[ENTUBES][j]->fill( fData->ntubes[j], weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[ENLOWGAIN][j] && fData->nlowgain[j] )
+					{
+						fHistoSingleTel[ENLOWGAIN][j]->fill( fData->nlowgain[j], weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[EDIST][j] )
+					{
+						fHistoSingleTel[EDIST][j]->fill( fData->dist[j], weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[ESIZE][j] )
+					{
+						fHistoSingleTel[ESIZE][j]->fill( log10( fData->size[j] ), weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[ESIZE2][j] )
+					{
+						fHistoSingleTel[ESIZE2][j]->fill( log10( fData->size2[j] ), weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[ESIZELG][j] && fData->fraclow[j] > 0. )
+					{
+						fHistoSingleTel[ESIZELG][j]->fill( log10( fData->size2[j]*fData->fraclow[j] ), weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[EFRACLOW][j] )
+					{
+						fHistoSingleTel[EFRACLOW][j]->fill( fData->fraclow[j], weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[EMAX1][j] && fData->max1[j] > 0. )
+					{
+						fHistoSingleTel[EMAX1][j]->fill( log10( fData->max1[j] ), weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[EMAX2][j] && fData->max2[j] > 0. )
+					{
+						fHistoSingleTel[EMAX2][j]->fill( log10( fData->max2[j] ), weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[EMAX3][j] && fData->max3[j] > 0. )
+					{
+						fHistoSingleTel[EMAX3][j]->fill( log10( fData->max3[j] ), weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[EALPHA][j] )
+					{
+						fHistoSingleTel[EALPHA][j]->fill( fData->alpha[j], weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[ELOS][j] )
+					{
+						fHistoSingleTel[ELOS][j]->fill( fData->length[j] / fData->size[j] * 1000., weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[ELOSS][j] )
+					{
+						fHistoSingleTel[ELOSS][j]->fill( fData->loss[j], weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[EASYM][j] )
+					{
+						fHistoSingleTel[EASYM][j]->fill( fData->asym[j], weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[ECENX][j] )
+					{
+						fHistoSingleTel[ECENX][j]->fill( fData->cen_x[j], weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[ECENY][j] )
+					{
+						fHistoSingleTel[ECENY][j]->fill( fData->cen_y[j], weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[ETGRADX][j] )
+					{
+						fHistoSingleTel[ETGRADX][j]->fill( fData->tgrad_x[j], weight, log10( fData->ErecS ) );
+					}
+					if( fHistoSingleTel[ETELDIST][j] )
+					{
+						fHistoSingleTel[ETELDIST][j]->fill( fData->R[j], weight, log10( fData->ErecS ) );
+					}
+					if( hcen_xy[j] )
+					{
+						hcen_xy[j]->Fill( fData->cen_x[j], fData->cen_y[j], weight );
+					}
 				}
 			}
 		}

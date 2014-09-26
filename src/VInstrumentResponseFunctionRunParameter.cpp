@@ -9,8 +9,8 @@
 VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter()
 {
 	fFillingMode = 0;
-
-        fInstrumentEpoch = "NOT_SET";
+	
+	fInstrumentEpoch = "NOT_SET";
 	
 	fNSpectralIndex = 1;
 	fSpectralIndexMin = 2.0;
@@ -448,15 +448,12 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
 		cout << "VInstrumentResponseFunctionRunParameter::readRunParameters() error: cannot find tablelookup run parameters in " << ifilename << endl;
 		return false;
 	}
-	if( !fIsotropicArrivalDirections )   
+	if( !fIsotropicArrivalDirections )
 	{
 		fze = fR->ze;
 		fnoise = fR->fNoiseLevel;
 	}
 	fpedvar = fR->meanpedvars;
-        // get list of telescopes to be analyzed -> now from EvndispRunParameter
-	//fTelToAnalyse = fR->fTelToAnalyse;
-
 	// get wobble offset from first event in file
 	// (should not change during a simulation run!)
 	TTree* i_data = ( TTree* )iFile->Get( "data" );
@@ -476,12 +473,12 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
 	}
 	else
 	{
-		if( fWobbleIsotropic != 0. )   
+		if( fWobbleIsotropic != 0. )
 		{
-			fXoff = fWobbleIsotropic; 
-			fYoff = 0.;  
+			fXoff = fWobbleIsotropic;
+			fYoff = 0.;
 		}
-		else     
+		else
 		{
 			fXoff = 0.;
 			fYoff = 0.;
@@ -567,14 +564,14 @@ void VInstrumentResponseFunctionRunParameter::print()
 	{
 		cout << "  gamma/hadron probabilities: " << fGammaHadronProbabilityFile << endl;
 	}
-        if( fInstrumentEpoch != "NOT_SET" )
-        {
-            cout << "Instrument epoch: " << fInstrumentEpoch << endl;
-        }
-        else
-        {
-            cout << "Instrument epoch not set" << endl;
-        }
+	if( fInstrumentEpoch != "NOT_SET" )
+	{
+		cout << "Instrument epoch: " << fInstrumentEpoch << endl;
+	}
+	else
+	{
+		cout << "Instrument epoch not set" << endl;
+	}
 	
 	cout << endl;
 	cout << "cuts: ";
@@ -601,7 +598,7 @@ void VInstrumentResponseFunctionRunParameter::print()
 	cout << "energy reconstruction method " << fEnergyReconstructionMethod << endl;
 	cout << endl;
 	
-	cout << "input Monte Carlo with following parameters (might be modified later): " << endl;
+	cout << "input Monte Carlo with following parameters (will be modified later): " << endl;
 	cout << "\t core range: " << fCoreScatterRadius;
 	if( fCoreScatterMode.size() > 0 )
 	{
@@ -640,7 +637,7 @@ void VInstrumentResponseFunctionRunParameter::print()
 	{
 		cout << endl;
 		cout << "CR energy spectrum used for weighted rate histogram: ";
-		cout << fCREnergySpectrumFile << "(ID" << fCREnergySpectrumID << ")" << endl;
+		cout << fCREnergySpectrumFile << " (ID" << fCREnergySpectrumID << ")" << endl;
 	}
 	cout << endl << endl;
 }

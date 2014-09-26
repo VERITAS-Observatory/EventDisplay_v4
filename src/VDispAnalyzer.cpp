@@ -101,8 +101,8 @@ void VDispAnalyzer::terminate()
 }
 
 float VDispAnalyzer::evaluate( float iWidth, float iLength, float iAsymm, float iDist, float iSize,
-	                       float iPedvar, float iTGrad, float iLoss, float icen_x, float icen_y, 
-                               float xoff_4, float yoff_4, ULong64_t iTelType, float iZe, float iAz, bool b2D)
+							   float iPedvar, float iTGrad, float iLoss, float icen_x, float icen_y,
+							   float xoff_4, float yoff_4, ULong64_t iTelType, float iZe, float iAz, bool b2D )
 {
 	f_disp = -99.;
 	
@@ -122,12 +122,11 @@ float VDispAnalyzer::evaluate( float iWidth, float iLength, float iAsymm, float 
 	
 }
 
-void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys, vector< float > x, vector< float > y,
-		vector< float > cosphi, vector< float > sinphi, vector< float > v_disp, vector< float > v_weight )
+void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys, vector< float > x, vector< float > y, vector< float > cosphi, vector< float > sinphi, vector< float > v_disp, vector< float > v_weight, float& dispdiff )
 {
 	if( fDispTableAnalyzer )
 	{
-		fDispTableAnalyzer->calculateMeanDirection( xs, ys, x, y, cosphi, sinphi, v_disp, v_weight );
+	  fDispTableAnalyzer->calculateMeanDirection( xs, ys, x, y, cosphi, sinphi, v_disp, v_weight );
 	}
 	else
 	{
@@ -324,29 +323,34 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys, vector< float 
 			
 		}
 		
-		if( v_weight.size() == 2 && ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) < 0.07 )
+		if( v_weight.size() == 2 ) // 2 images
 		{
 			xs = ixs;
 			ys = iys;
-			
+			dispdiff = ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb );
 		}
 		
-		else if( v_weight.size() == 3 && ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) < 0.21 )
+		else if( v_weight.size() == 3 ) // 3 images
 		{
 			xs = ( xa * v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) ) + xb * v_weight[1] * v_weight[1] / ( ( xb - xa ) * ( xb - xa ) + ( yb - ya ) * ( yb - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) ) + xc * v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xc - xb ) * ( xc - xb ) + ( yc - yb ) * ( yc - yb ) ) ) / ( v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) ) + v_weight[1] * v_weight[1] / ( ( xb - xa ) * ( xb - xa ) + ( yb - ya ) * ( yb - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) ) + v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xc - xb ) * ( xc - xb ) + ( yc - yb ) * ( yc - yb ) ) );
 			ys = ( ya * v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) ) + yb * v_weight[1] * v_weight[1] / ( ( xb - xa ) * ( xb - xa ) + ( yb - ya ) * ( yb - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) ) + yc * v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xc - xb ) * ( xc - xb ) + ( yc - yb ) * ( yc - yb ) ) ) / ( v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) ) + v_weight[1] * v_weight[1] / ( ( xb - xa ) * ( xb - xa ) + ( yb - ya ) * ( yb - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) ) + v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xc - xb ) * ( xc - xb ) + ( yc - yb ) * ( yc - yb ) ) );
+
+			dispdiff = ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc );
 		}
 		
-		else if( v_weight.size() == 4 && ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) ) < 0.36 )
+		else if( v_weight.size() == 4 ) // 4 images
 		{
 			xs = ( xa * v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) + ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) ) + xb * v_weight[1] * v_weight[1] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) ) + xc * v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) ) + xd * v_weight[3] * v_weight[3] / ( ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) ) ) / ( v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) + ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) ) + v_weight[1] * v_weight[1] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) ) + v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) ) + v_weight[3] * v_weight[3] / ( ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) ) );
 			ys = ( ya * v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) + ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) ) + yb * v_weight[1] * v_weight[1] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) ) + yc * v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) ) + yd * v_weight[3] * v_weight[3] / ( ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) ) ) / ( v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) + ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) ) + v_weight[1] * v_weight[1] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) ) + v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) ) + v_weight[3] * v_weight[3] / ( ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) ) );
+
+			dispdiff = ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) );
 		}
 		
 		else
 		{
 			xs = -99999.;
 			ys = -99999.;
+			dispdiff = -9999.;
 		}
 		
 	}

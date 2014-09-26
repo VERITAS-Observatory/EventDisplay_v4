@@ -47,7 +47,7 @@ int main( int argc, char* argv[] )
 			exit( EXIT_SUCCESS );
 		}
 	}
-
+	
 	VAnaSumRunParameter* fRunPara = new VAnaSumRunParameter();
 	
 	cout << endl;
@@ -83,7 +83,7 @@ int main( int argc, char* argv[] )
 	
 	// read gamma/hadron cuts from cut file
 	VGammaHadronCuts* fCuts = new VGammaHadronCuts();
-        fCuts->setInstrumentEpoch( fInstrumentEpoch );
+	fCuts->setInstrumentEpoch( fInstrumentEpoch );
 	fCuts->setNTel( ntel );
 	if( cutfilename.size() > 0 )
 	{
@@ -197,10 +197,10 @@ int main( int argc, char* argv[] )
 			}
 		}
 		
-		// pointer to data tree
-		fCuts->setDataTree( d );
 		// set gamma/hadron cuts
 		fCuts->initializeCuts( fRunPara->fRunList[i].fRunOff, datadir );
+		// pointer to data tree
+		fCuts->setDataTree( d );
 		
 		if( !d )
 		{
@@ -269,7 +269,7 @@ int main( int argc, char* argv[] )
 	}
 	
 	fo->Close();
-        cout << "closing radial acceptance file: " << fo->GetName() << endl;
+	cout << "closing radial acceptance file: " << fo->GetName() << endl;
 	
 	cout << "exiting.." << endl;
 }
@@ -289,7 +289,7 @@ int parseOptions( int argc, char* argv[] )
 			{"srunlist", required_argument, 0, 's'},
 			{"cutfile", required_argument, 0, 'c'},
 			{"instrumentepoch", required_argument, 0, 'i'},
-                        {"maxdistance", required_argument, 0, 'm'},
+			{"maxdistance", required_argument, 0, 'm'},
 			{"outfile", required_argument, 0, 'o'},
 			{"entries", required_argument, 0, 'n'},
 			{"datadir", required_argument, 0, 'd'},
@@ -298,12 +298,12 @@ int parseOptions( int argc, char* argv[] )
 		};
 		int option_index = 0;
 		int c = getopt_long( argc, argv, "ht:s:l:e:m:o:i:d:n:c:w:", long_options, &option_index );
-                if( optopt != 0 )
-                {
-                    cout << "error: unknown option" << endl;
-                    cout << "exiting..." << endl;
-                    exit( EXIT_FAILURE );
-                }
+		if( optopt != 0 )
+		{
+			cout << "error: unknown option" << endl;
+			cout << "exiting..." << endl;
+			exit( EXIT_FAILURE );
+		}
 		if( argc == 1 )
 		{
 			c = 'h';
@@ -332,11 +332,11 @@ int parseOptions( int argc, char* argv[] )
 				cout << "-l --runlist [anasum-style run list file name, runlist on/off like]" << endl;
 				cout << "-s --srunlist [simple run list file name]" << endl;
 				cout << "-c --cutfile [cut file name]" << endl;
-                                cout << "-i --instrumentepoch [instrument epoch (e.g. V6)" << endl;
+				cout << "-i --instrumentepoch [instrument epoch (e.g. V6)" << endl;
 				cout << "-d --datadir [directory for input mscw root files]" << endl;
 				cout << "-o --outfile [output ROOT file name]" << endl;
 				cout << "-e --entries [number of entries]" << endl;
-                                cout << "-m --maxdist [max distance from camera centre (deg)]" << endl;
+				cout << "-m --maxdist [max distance from camera centre (deg)]" << endl;
 				cout << "-w --writehists [directory]" << endl ;
 				cout << endl;
 				exit( EXIT_SUCCESS );
@@ -361,10 +361,10 @@ int parseOptions( int argc, char* argv[] )
 				cutfilename = optarg;
 				cout << "Cut File Name is " << cutfilename << endl;
 				break;
-                        case 'm':
-                                fMaxDistanceAllowed = atof( optarg );
-                                cout << "Maximum allowed distance from camera centre: " << fMaxDistanceAllowed << endl;
-                                break;
+			case 'm':
+				fMaxDistanceAllowed = atof( optarg );
+				cout << "Maximum allowed distance from camera centre: " << fMaxDistanceAllowed << endl;
+				break;
 			case 'i':
 				fInstrumentEpoch = optarg;
 				cout << "Instrument epoch is " << fInstrumentEpoch << endl;

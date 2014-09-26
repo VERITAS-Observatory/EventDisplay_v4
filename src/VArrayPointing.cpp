@@ -82,18 +82,18 @@ void VArrayPointing::terminate( bool iDebug_IO )
 	if( fPointingTree )
 	{
 		int i_nbytes = fPointingTree->Write();
-                if( iDebug_IO )
-                {
-                    cout <<  "WRITEDEBUG: pointing tree (nbytes " << i_nbytes << ")" << endl;
-                }
+		if( iDebug_IO )
+		{
+			cout <<  "WRITEDEBUG: pointing tree (nbytes " << i_nbytes << ")" << endl;
+		}
 	}
 	if( fPntReduced )
 	{
 		int i_nbytes = fPntReduced->Write() ;
-                if( iDebug_IO )
-                {
-                    cout <<  "WRITEDEBUG: pointing tree (reduced) (nbytes " << i_nbytes << ")" << endl;
-                }
+		if( iDebug_IO )
+		{
+			cout <<  "WRITEDEBUG: pointing tree (reduced) (nbytes " << i_nbytes << ")" << endl;
+		}
 	}
 }
 

@@ -101,16 +101,16 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
 		exit( EXIT_FAILURE );
 	}
 	// maximum distance to camera center for which events are taken into account:
-        if( iMaxDistanceAllowed > 0. )
-        {
-             fCut_CameraFiducialSize_max = iMaxDistanceAllowed;
-             fCuts->fCut_CameraFiducialSize_max = iMaxDistanceAllowed;
-        
-        }
-        else
-        {
-            fCut_CameraFiducialSize_max = fCuts->fCut_CameraFiducialSize_max;
-        }
+	if( iMaxDistanceAllowed > 0. )
+	{
+		fCut_CameraFiducialSize_max = iMaxDistanceAllowed;
+		fCuts->fCut_CameraFiducialSize_max = iMaxDistanceAllowed;
+		
+	}
+	else
+	{
+		fCut_CameraFiducialSize_max = fCuts->fCut_CameraFiducialSize_max;
+	}
 	
 	fRunPar = irunpar;
 	

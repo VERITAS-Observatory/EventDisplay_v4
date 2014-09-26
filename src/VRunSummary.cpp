@@ -306,8 +306,8 @@ bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_director
 			i_runSum.GetEntry( n );
 			if( i_runSum.runOn == iRunList[i].fRunOn )
 			{
-                                runOn = iRunList[i].fRunOn;
-                                runOff = iRunList[i].fRunOff;
+				runOn = iRunList[i].fRunOn;
+				runOff = iRunList[i].fRunOff;
 				// copy entries to new run summary tree
 				fRunSummaryTree->CopyAddresses( i_runSumTree );
 				fRunSummaryTree->CopyEntries( i_runSumTree, 1 );

@@ -86,8 +86,8 @@ int main( int argc, char* argv[] )
 	fRunPara->SetName( "makeEffectiveArea_runparameter" );
 	if( !fRunPara->readRunParameterFromTextFile( argv[1] ) )
 	{
-                cout << "error reading runparameters from text file" << endl;
-                cout << "exiting..." << endl;
+		cout << "error reading runparameters from text file" << endl;
+		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
 	}
 	fRunPara->print();
@@ -98,7 +98,7 @@ int main( int argc, char* argv[] )
 	if( fOutputfile->IsZombie() )
 	{
 		cout << "Error in opening output file: " << fOutputfile->GetName() << endl;
-                cout << "exiting..." << endl;
+		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
 	}
 	
@@ -111,7 +111,7 @@ int main( int argc, char* argv[] )
 	fCuts->setTelToAnalyze( fRunPara->fTelToAnalyse );
 	if( !fCuts->readCuts( fRunPara->fCutFileName, 2 ) )
 	{
-                cout << "exiting..." << endl;
+		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE ) ;
 	}
 	fRunPara->fGammaHadronCutSelector = fCuts->getGammaHadronCutSelector();

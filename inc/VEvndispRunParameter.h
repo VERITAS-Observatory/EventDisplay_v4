@@ -335,6 +335,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fuseDB;
 		}
 		
-		ClassDef( VEvndispRunParameter, 156 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 160 ); //(increase this number)
 };
 #endif

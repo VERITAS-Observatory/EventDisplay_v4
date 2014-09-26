@@ -370,8 +370,14 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 		fMeanRawRateOff = fRunSummary->fMeanRawRateOff;
 		fMeanPedVarsOn  = fRunSummary->fMeanPedVarsOn;
 		fMeanPedVarsOff = fRunSummary->fMeanPedVarsOff;
-                if( fStereoOn )  fStereoOn->setRunExposure( fRunExposureOn );
-                if( fStereoOff ) fStereoOff->setRunExposure( fRunExposureOff );
+		if( fStereoOn )
+		{
+			fStereoOn->setRunExposure( fRunExposureOn );
+		}
+		if( fStereoOff )
+		{
+			fStereoOff->setRunExposure( fRunExposureOff );
+		}
 	}
 }
 
@@ -561,10 +567,10 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	// number of off events
 	double i_nevts_off = fStereoOff->getStereoSkyMap()->GetBinContent( fStereoOff->getStereoSkyMap()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ),
 						 fStereoOff->getStereoSkyMap()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
-
+						  
 	double i_sig = VStatistics::calcSignificance( i_nevts_on, i_nevts_off, i_norm_alpha );
 	double i_rate = 0.;
-        double i_rateE = 0.;
+	double i_rateE = 0.;
 	double i_rateOFF = 0.;
 	if( iexp_on > 0. && iexp_off > 0. )
 	{
@@ -578,7 +584,7 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	cout << "\t RESULTS FOR SOURCE POSITION: " << endl;
 	cout << "\t ---------------------------- " << endl;
 	cout << "\t ON:" << i_nevts_on << "  OFF:" << setprecision( 4 ) << i_nevts_off* i_norm_alpha << " (";
-        cout << "off " << i_nevts_off << ", alpha=" << i_norm_alpha << ")" << endl;
+	cout << "off " << i_nevts_off << ", alpha=" << i_norm_alpha << ")" << endl;
 	cout << "\t " << setprecision( 4 ) <<  i_sig << " Sigma  " << i_rate << "+/-" << i_rateE << " gammas/min" << endl;
 	cout << "\t background rate: " << i_rateOFF << " CR/min" << endl;
 	cout << endl;

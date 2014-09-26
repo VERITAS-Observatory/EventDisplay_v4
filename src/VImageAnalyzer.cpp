@@ -60,32 +60,32 @@ VImageAnalyzer::VImageAnalyzer()
 	//VImageParameterCalculation
 	if( fRunPar->fhoughmuonmode )
 	{
-		
-	#ifndef NOGSL
-	cout << "Using GSL libraries for muon analysis." << endl;
-	#else
-	cout << "Warning! No GSL libraries found. Muon impact parameter corrected Size will not be calculated." << endl;
-	#endif	
-
-	cout << "" << endl;
-
-	fVImageParameterCalculation->houghInitialization();
 	
+#ifndef NOGSL
+		cout << "Using GSL libraries for muon analysis." << endl;
+#else
+		cout << "Warning! No GSL libraries found. Muon impact parameter corrected Size will not be calculated." << endl;
+#endif
+		
+		cout << "" << endl;
+		
+		fVImageParameterCalculation->houghInitialization();
+		
 	}
-
+	
 	if( fRunPar->fmuonmode )
 	{
+	
+#ifndef NOGSL
+		cout << "Using GSL libraries for muon analysis." << endl;
+#else
+		cout << "Warning! No GSL libraries found. Muon impact parameter corrected Size will not be calculated." << endl;
+#endif
 		
-	#ifndef NOGSL
-	cout << "Using GSL libraries for muon analysis." << endl;
-	#else
-	cout << "Warning! No GSL libraries found. Muon impact parameter corrected Size will not be calculated." << endl;
-	#endif	
-
-	cout << "" << endl;
-
+		cout << "" << endl;
+		
 	}
-
+	
 }
 
 
@@ -475,10 +475,10 @@ void VImageAnalyzer::terminate( bool iDebug_IO )
 		if( getImageParameters()->getTree() )
 		{
 			int i_nbytes = getImageParameters()->getTree()->Write();
-                        if( iDebug_IO )
-                        {
-                           cout << "WRITEDEBUG: tpars trees (nbytes " << i_nbytes << ")" << endl;
-                        }
+			if( iDebug_IO )
+			{
+				cout << "WRITEDEBUG: tpars trees (nbytes " << i_nbytes << ")" << endl;
+			}
 		}
 		if( fRunPar->fImageLL )
 		{
@@ -772,9 +772,9 @@ void VImageAnalyzer::smoothDeadTubes()
 			continue;
 		}
 		// exclude low gain channel from this estimation
-                // (GM) not clear why low-gain channels are excluded
+		// (GM) not clear why low-gain channels are excluded
 		// if( getHiLo()[i] )
-	 	// {
+		// {
 		//	continue;
 		// }
 		
@@ -900,10 +900,13 @@ void VImageAnalyzer::shutdown()
 	}
 	if( fOutputfile && fOutputfile->IsOpen() )
 	{
-                fOutputfile->Flush();
-                cout << "closing evndisp output file, final contents: ";
-                if( fReader->isMC() ) fOutputfile->ls();
-                cout << "\t file size: " << fOutputfile->GetSize() << endl;
+		fOutputfile->Flush();
+		cout << "closing evndisp output file, final contents: ";
+		if( fReader->isMC() )
+		{
+			fOutputfile->ls();
+		}
+		cout << "\t file size: " << fOutputfile->GetSize() << endl;
 		fOutputfile->Close();
 	}
 }

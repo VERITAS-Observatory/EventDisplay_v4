@@ -37,7 +37,7 @@ ARCH = $(shell uname)
 # basic numbers 
 #############################
 package = EVNDISP
-version = 460
+version = 461
 # version of auxiliary files
 auxversion = $(version)-auxv01
 distdir = $(package)-$(version)
@@ -440,6 +440,7 @@ ACCOBJECT = 	./obj/makeRadialAcceptance.o \
 		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 		./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
 		./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+		./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
 		./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
 		./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
 		./obj/VRunList.o ./obj/VRunList_Dict.o \
@@ -478,6 +479,7 @@ ACCOBJECT = ./obj/VTS.getRun_TimeElevAzim.o \
 		./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
 		./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
 		./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+		./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
 		./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
 		./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
 		./obj/VRunList.o ./obj/VRunList_Dict.o \
@@ -518,6 +520,7 @@ EFFOBJECT =	./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o
 		./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
 		./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
 		./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+		./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 		./obj/VSkyCoordinatesUtilities.o ./obj/VUtilities.o \
 		./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
@@ -557,6 +560,7 @@ ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_
 		./obj/VTMVARunData.o ./obj/VTMVARunData_Dict.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/Ctelconfig.o ./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+		./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o ./obj/VTableLookupRunParameter.o \
 		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		./obj/VTableLookupRunParameter_Dict.o ./obj/VTargets.o ./obj/VASlalib.o \
@@ -637,6 +641,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 		./obj/VTMVARunData.o ./obj/VTMVARunData_Dict.o \
 		./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+		./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
 		./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
 		./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
@@ -802,6 +807,7 @@ COMPAREDATAMCOBJ=	./obj/VTargets.o \
 		     	./obj/VInstrumentResponseFunctionData.o ./obj/VInstrumentResponseFunctionData_Dict.o \
 			./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
 			./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+			./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
 			./obj/VRunList.o ./obj/VRunList_Dict.o ./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
 			./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o ./obj/Ctelconfig.o \
 			./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
@@ -873,6 +879,7 @@ WRITECTAPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 			./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
 			./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
 			./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+			./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
 			./obj/VSpectralFitter.o ./obj/VSpectralFitter_Dict.o \
 			./obj/VEnergyThreshold.o ./obj/VEnergyThreshold_Dict.o \
 			./obj/VRunList.o ./obj/VRunList_Dict.o \
@@ -955,6 +962,7 @@ WRITECTAPHYSOBJ=	./obj/writeParticleRateFilesFromEffectiveAreas.o \
 			./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
 			./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
 			./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+			./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
 			./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
 			./obj/Ctelconfig.o  \
 			./obj/VSpectralFitter.o ./obj/VSpectralFitter_Dict.o \
@@ -976,7 +984,46 @@ writeParticleRateFilesFromEffectiveAreas:	$(WRITECTAPHYSOBJ)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
+########################################################
+# writeParticleRateFilesForTMVA
+########################################################
+WRITECTAPHYSOBJ=	./obj/writeParticleRateFilesForTMVA.o \
+			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+			./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
+			./obj/VASlalib.o \
+			./obj/VInstrumentResponseFunctionReader.o ./obj/VInstrumentResponseFunctionReader_Dict.o \
+			./obj/VSensitivityCalculator.o ./obj/VSensitivityCalculator_Dict.o \
+			./obj/CEffArea.o ./obj/CEffArea_Dict.o \
+			./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
+			./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
+			./obj/VInstrumentResponseFunctionData.o ./obj/VInstrumentResponseFunctionData_Dict.o \
+			./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
+			./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o \
+			./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
+			./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
+			./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+			./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
+			./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
+			./obj/Ctelconfig.o  \
+			./obj/VSpectralFitter.o ./obj/VSpectralFitter_Dict.o \
+			./obj/VEnergyThreshold.o ./obj/VEnergyThreshold_Dict.o \
+			./obj/VRunList.o ./obj/VRunList_Dict.o \
+			./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
+			./obj/VEnergySpectrum.o ./obj/VEnergySpectrum_Dict.o \
+			./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o  \
+			./obj/VDifferentialFlux.o ./obj/VDifferentialFlux_Dict.o \
+			./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
+			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
+			./obj/VStatistics_Dict.o \
+			./obj/VUtilities.o 
 
+./obj/writeParticleRateFilesForTMVA.o: 	./src/writeParticleRateFilesForTMVA.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+writeParticleRateFilesForTMVA:	$(WRITECTAPHYSOBJ)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+	
 ########################################################
 # combineLookupTables
 ########################################################
@@ -1068,6 +1115,7 @@ combineEffectiveAreas:	 ./obj/combineEffectiveAreas.o  \
 			 ./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
 			 ./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
 			 ./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+			./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
 			 ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			 ./obj/VSkyCoordinatesUtilities.o ./obj/VUtilities.o \
 			 ./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
@@ -1090,6 +1138,7 @@ MAKEOPTCUTTMVAOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.
 			./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 			./obj/VTMVARunData.o ./obj/VTMVARunData_Dict.o \
 			./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+			./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VUtilities.o \
 			./obj/trainTMVAforGammaHadronSeparation.o
