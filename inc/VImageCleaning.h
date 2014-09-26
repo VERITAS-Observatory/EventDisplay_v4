@@ -30,8 +30,8 @@ class VImageCleaning
 		void cleanImagePedvars( double hithresh, double lothresh, double brightthresh );
 		
 		// time tailcut cleaning
-		void cleanImagePedvarsTimeDiff( double hithresh, double lothresh, double brightthresh, double timediff ); 
-
+		void cleanImagePedvarsTimeDiff( double hithresh, double lothresh, double brightthresh, double timediff );
+		
 		// time cluster cleaning
 		void cleanImageFixedWithTiming( double, double, double, double, double, int, int );
 		void cleanImagePedvarsWithTiming( double, double, double, double, double, int, int );
@@ -45,7 +45,7 @@ class VImageCleaning
 		TObjArray* fProb2nnCurves;
 		TObjArray* fProbBoundCurves;
 		
-                int   VALIDITY[VDST_MAXCHANNELS];      //   Flags for pixels, accepted by nn-image cleaning. VALIDITY[i]=2-6 : core pixels, VALIDITY[i]>6 :boundary pixels
+		int   VALIDITY[VDST_MAXCHANNELS];      //   Flags for pixels, accepted by nn-image cleaning. VALIDITY[i]=2-6 : core pixels, VALIDITY[i]>6 :boundary pixels
 		int   VALIDITYBOUND[VDST_MAXCHANNELS]; //
 		int   VALIDITYBUF[VDST_MAXCHANNELS];   //
 		unsigned int nRings;
@@ -75,15 +75,15 @@ class VImageCleaning
 		void  cleanNNImagePedvars();
 		bool  InitNNImageCleaning();
 		int   getTrigSimTelType( unsigned int fTelType );
-                void  DiscardTimeOutlayers( int type );
-                void  DiscardLocalTimeOutlayers(int type,float NNthresh[6]); // use this function
+		void  DiscardTimeOutlayers( int type );
+		void  DiscardLocalTimeOutlayers( int type, float NNthresh[6] ); // use this function
 		void  DiscardIsolatedPixels( int type );
 		void  FillIPR( unsigned int teltype );
 		void  FillPreThresholds( TGraph* gipr, float NNthresh[6] ); // defines pre-search thresholds for nn-groups (below this threshold group is not searched)
 		TGraphErrors* GetIPRGraph( unsigned int teltype, float ScanWidow );
-                void  CalcSliceRMS();
-                void  SetNeighborRings(int type, unsigned short* VALIDITYBOUNDBUF, float* TIMESReSearch, float* REFTHRESH);
-// MS
+		void  CalcSliceRMS();
+		void  SetNeighborRings( int type, unsigned short* VALIDITYBOUNDBUF, float* TIMESReSearch, float* REFTHRESH );
+		// MS
 		void cleanTriggerFixed( double hithresh, double lothresh );
 		
 		void addImageChannel( unsigned int iChannel );                      // add this pixel to image

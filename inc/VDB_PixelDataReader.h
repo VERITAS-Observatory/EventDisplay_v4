@@ -129,11 +129,11 @@ class VDB_PixelDataReader
 		}
 		int getFADC_module( unsigned int iTel, unsigned int iChannel )
 		{
-			return getValue( 3, iTel, iChannel, 0, 0);
+			return getValue( 3, iTel, iChannel, 0, 0 );
 		}
 		int getFADC_channel( unsigned int iTel, unsigned int iChannel )
 		{
-			return getValue( 4, iTel, iChannel, 0, 0);
+			return getValue( 4, iTel, iChannel, 0, 0 );
 		}
 		unsigned int    getNTel()
 		{

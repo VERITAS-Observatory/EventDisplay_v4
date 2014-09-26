@@ -245,8 +245,8 @@ void VImageBaseAnalyzer::calcTZeros( int fFirst, int fLast )
 			}
 		}
 		catch( ... )
-		{			
-		    if( getDebugLevel() == 0 )
+		{
+			if( getDebugLevel() == 0 )
 			{
 				cout << "VImageBaseAnalyzer::calcTZeros, index out of range " << i;
 				cout << "(Telescope " << getTelID() + 1 << ", event " << getEventNumber() << ")" << endl;
@@ -1050,7 +1050,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 			cout << "channels on telescope " << getTelID() + 1 << " (at first event):\t" << n_dead << endl;
 		}
 		//dump list of dead channels
-		if( fRunPar->fprintdeadpixelinfo ) 
+		if( fRunPar->fprintdeadpixelinfo )
 		{
 			printDeadChannels( iLowGain , true );
 		}

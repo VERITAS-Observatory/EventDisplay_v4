@@ -206,7 +206,7 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
 		{
 			if( i < fTLRunParameter->fCTA_MC_offaxisBin_max.size() )
 			{
-				i_woff_vector.push_back( ( int )( 0.5 * ( fTLRunParameter->fCTA_MC_offaxisBin_min[i] + fTLRunParameter->fCTA_MC_offaxisBin_max[i]) * 1000. + 0.5 ) );
+				i_woff_vector.push_back( ( int )( 0.5 * ( fTLRunParameter->fCTA_MC_offaxisBin_min[i] + fTLRunParameter->fCTA_MC_offaxisBin_max[i] ) * 1000. + 0.5 ) );
 			}
 		}
 	}
@@ -1539,7 +1539,7 @@ bool VTableLookup::initialize( VTableLookupRunParameter* iTLRunParameter )
 
 unsigned int VTableLookup::getWobbleBin( double w )
 {
-        // no wobble bins defined - return 0 (first vector element)
+	// no wobble bins defined - return 0 (first vector element)
 	if( fTLRunParameter->fCTA_MC_offaxisBin_min.size() == 0 )
 	{
 		return 0;

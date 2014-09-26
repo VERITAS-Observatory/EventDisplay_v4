@@ -68,7 +68,7 @@ class VPlotCompareDataWithMC : public VHistogramUtilities
 		void msc_vs_energy_plots( int iRebin = 2, double xmin = -1.5, double xmax = 1.5 );
 		void mwr_vs_energy_plots( int iRebin = 2, double xmin =  0.7, double xmax = 1.3 );
 		void widthlength_vs_energy_plots( int iTelescope = 1, int iRebin = 2, double xmin =  0., double xmax = 0.5 );
-		void model3D_vs_energy_plots(); 
+		void model3D_vs_energy_plots();
 		void multiplicity_plots();
 		bool openDataFile( string ifile );
 		void plot( string iPrintName = "" );

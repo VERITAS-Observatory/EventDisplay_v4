@@ -36,7 +36,7 @@ class VModel3D : public VEvndispData
 		
 		/// FUNCTIONS ///
 		void doFit();              // do LnL fit
-		void initOutput(); 
+		void initOutput();
 		void initModel3DTree();    // initialize tree for output parameters
 		void readLnLTable();       // read lookup table for likelihood
 		void setGain();            // get dc/pe ratio

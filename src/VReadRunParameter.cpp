@@ -121,7 +121,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				i++;
 			}
 		}
-                /////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////
 		// Frogs mode
 		else if( iTemp1 == "-frogs" )
 		{
@@ -160,7 +160,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->ffrogstemplatelist = "" ;
 			}
 		}
-                /////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////
 		// Model3D
 		else if( iTemp.find( "model3d" ) < iTemp.size() )
 		{
@@ -239,11 +239,11 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				i++;
 			}
 		}
-                // hilo from MC run her
-                else if( iTemp.find( "simu_hilo_from_simfile" ) < iTemp.size()  )
-                {
-                        fRunPara->fsimu_HILO_from_simFile = true;
-                }
+		// hilo from MC run her
+		else if( iTemp.find( "simu_hilo_from_simfile" ) < iTemp.size() )
+		{
+			fRunPara->fsimu_HILO_from_simFile = true;
+		}
 		// noise level of external grisu pedestal file
 		else if( iTemp.find( "pedestalnoiselevel" ) < iTemp.size() )
 		{
@@ -462,7 +462,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			fRunPara->fuseDB = false;
 		}
 		else if( iTemp.find( "-savedeadpixelregistry" ) < iTemp.size() )
-		{	
+		{
 			fRunPara->fSaveDeadPixelRegistry = true ;
 			cout << "NKH fRunPara->fSaveDeadPixelRegistry = true !" << endl;
 		}

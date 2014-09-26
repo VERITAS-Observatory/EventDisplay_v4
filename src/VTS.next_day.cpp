@@ -189,7 +189,7 @@ int main( int argc, char* argv[] )
 					fResults << setw( 18 ) << left << tOn_total ;
 					fResults << setw( 12 ) << left << c->Signi ;
 					//fResults << setw( 8  ) << left <<  ( c->tOn == 0 ? 0.0 : 1.0 - tOn_total / c->tOn );
-					fResults << setw( 8  ) << left << c->OffNorm ;
+					fResults << setw( 8 ) << left << c->OffNorm ;
 					fResults << setw( 15 ) << left << c->Rate ;
 					fResults << setw( 15 ) << left << c->RateE ;
 					fResults << setw( 12 ) << left << iFlux ;
@@ -215,7 +215,7 @@ int main( int argc, char* argv[] )
 		f.writeSignificanceSkyMap( fDebug );
 		f.writeExcessSkyMap( fDebug );
 		f.writeNightlyFlux( fDebug, ( fOUTFile + ".flux" ).c_str() );
-		//f.writeEnergySpectrum( fDebug ); //Uncomment this to include the energy spectrum. Obs that this function can fail quietly, in which case the energy spectrum won't get written.    
+		//f.writeEnergySpectrum( fDebug ); //Uncomment this to include the energy spectrum. Obs that this function can fail quietly, in which case the energy spectrum won't get written.
 		f.writeFITSFile( fDebug );
 		
 	}

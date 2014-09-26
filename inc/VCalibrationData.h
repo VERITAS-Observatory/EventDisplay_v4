@@ -321,7 +321,7 @@ class VCalibrationData
 		unsigned int getTSTimeIndex( double iTime, unsigned int& i1, unsigned int& i2, double& ifrac1, double& ifrac2 );
 		
 		void     recoverLowGainPedestals();
-		bool 	setLowGainPedestalFile( string file ) 
+		bool 	setLowGainPedestalFile( string file )
 		{
 			fLowGainPedestalFile = file;
 			return true;

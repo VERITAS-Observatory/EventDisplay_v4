@@ -126,7 +126,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys, vector< float 
 {
 	if( fDispTableAnalyzer )
 	{
-	  fDispTableAnalyzer->calculateMeanDirection( xs, ys, x, y, cosphi, sinphi, v_disp, v_weight );
+		fDispTableAnalyzer->calculateMeanDirection( xs, ys, x, y, cosphi, sinphi, v_disp, v_weight );
 	}
 	else
 	{
@@ -292,11 +292,11 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys, vector< float 
 					ya = y2;
 					yb = y4;
 					yc = y6;
-				}				
+				}
 				ixs = ( xa * v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) ) + xb * v_weight[1] * v_weight[1] / ( ( xb - xa ) * ( xb - xa ) + ( yb - ya ) * ( yb - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) ) + xc * v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xc - xb ) * ( xc - xb ) + ( yc - yb ) * ( yc - yb ) ) ) / ( v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) ) + v_weight[1] * v_weight[1] / ( ( xb - xa ) * ( xb - xa ) + ( yb - ya ) * ( yb - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) ) + v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xc - xb ) * ( xc - xb ) + ( yc - yb ) * ( yc - yb ) ) );
 				iys = ( ya * v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) ) + yb * v_weight[1] * v_weight[1] / ( ( xb - xa ) * ( xb - xa ) + ( yb - ya ) * ( yb - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) ) + yc * v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xc - xb ) * ( xc - xb ) + ( yc - yb ) * ( yc - yb ) ) ) / ( v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) ) + v_weight[1] * v_weight[1] / ( ( xb - xa ) * ( xb - xa ) + ( yb - ya ) * ( yb - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) ) + v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xc - xb ) * ( xc - xb ) + ( yc - yb ) * ( yc - yb ) ) );
-
-	
+				
+				
 			}
 			if( ii == 3 )
 			{
@@ -334,7 +334,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys, vector< float 
 		{
 			xs = ( xa * v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) ) + xb * v_weight[1] * v_weight[1] / ( ( xb - xa ) * ( xb - xa ) + ( yb - ya ) * ( yb - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) ) + xc * v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xc - xb ) * ( xc - xb ) + ( yc - yb ) * ( yc - yb ) ) ) / ( v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) ) + v_weight[1] * v_weight[1] / ( ( xb - xa ) * ( xb - xa ) + ( yb - ya ) * ( yb - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) ) + v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xc - xb ) * ( xc - xb ) + ( yc - yb ) * ( yc - yb ) ) );
 			ys = ( ya * v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) ) + yb * v_weight[1] * v_weight[1] / ( ( xb - xa ) * ( xb - xa ) + ( yb - ya ) * ( yb - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) ) + yc * v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xc - xb ) * ( xc - xb ) + ( yc - yb ) * ( yc - yb ) ) ) / ( v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) ) + v_weight[1] * v_weight[1] / ( ( xb - xa ) * ( xb - xa ) + ( yb - ya ) * ( yb - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) ) + v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xc - xb ) * ( xc - xb ) + ( yc - yb ) * ( yc - yb ) ) );
-
+			
 			dispdiff = ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc );
 		}
 		
@@ -342,7 +342,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys, vector< float 
 		{
 			xs = ( xa * v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) + ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) ) + xb * v_weight[1] * v_weight[1] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) ) + xc * v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) ) + xd * v_weight[3] * v_weight[3] / ( ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) ) ) / ( v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) + ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) ) + v_weight[1] * v_weight[1] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) ) + v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) ) + v_weight[3] * v_weight[3] / ( ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) ) );
 			ys = ( ya * v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) + ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) ) + yb * v_weight[1] * v_weight[1] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) ) + yc * v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) ) + yd * v_weight[3] * v_weight[3] / ( ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) ) ) / ( v_weight[0] * v_weight[0] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) + ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) ) + v_weight[1] * v_weight[1] / ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) ) + v_weight[2] * v_weight[2] / ( ( xc - xa ) * ( xc - xa ) + ( yc - ya ) * ( yc - ya ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) ) + v_weight[3] * v_weight[3] / ( ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) ) );
-
+			
 			dispdiff = ( ( xa - xb ) * ( xa - xb ) + ( ya - yb ) * ( ya - yb ) + ( xa - xc ) * ( xa - xc ) + ( ya - yc ) * ( ya - yc ) + ( xb - xc ) * ( xb - xc ) + ( yb - yc ) * ( yb - yc ) + ( xa - xd ) * ( xa - xd ) + ( ya - yd ) * ( ya - yd ) + ( xb - xd ) * ( xb - xd ) + ( yb - yd ) * ( yb - yd ) + ( xc - xd ) * ( xc - xd ) + ( yc - yd ) * ( yc - yd ) );
 		}
 		

@@ -1024,11 +1024,11 @@ void VImageAnalyzer::imageCleaning()
 		}
 		else if( getImageCleaningParameter()->getImageCleaningMethod() == "TWOLEVELANDCORRELATION" )
 		{
-		        fVImageCleaning->cleanImageTraceCorrelate( getImageCleaningParameter()->fCorrelationCleanBoardThresh, getImageCleaningParameter()->fCorrelationCleanCorrelThresh, getImageCleaningParameter()->fCorrelationCleanNpixThresh );
+			fVImageCleaning->cleanImageTraceCorrelate( getImageCleaningParameter()->fCorrelationCleanBoardThresh, getImageCleaningParameter()->fCorrelationCleanCorrelThresh, getImageCleaningParameter()->fCorrelationCleanNpixThresh );
 		}
 		else if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMETWOLEVEL" )
 		{
-		        fVImageCleaning->cleanImagePedvarsTimeDiff( getImageThresh(), getBorderThresh(), getBrightNonImageThresh(), getTimeTwoLevelCleaningTimeDiff() );
+			fVImageCleaning->cleanImagePedvarsTimeDiff( getImageThresh(), getBorderThresh(), getBrightNonImageThresh(), getTimeTwoLevelCleaningTimeDiff() );
 		}
 		else
 		{

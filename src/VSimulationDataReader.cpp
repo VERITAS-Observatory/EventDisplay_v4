@@ -403,23 +403,26 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
 						iMCRunHeader->viewcone[1] = atof( iTemp.c_str() );
 					}
 				}
-                                // read low gain multiplier
-                                else if( iTemp == "FADCS" )
-                                {
-                                   for( int kk = 0; kk < 7; kk ++ )
-                                   {
-                                      if( !is_stream.eof() ) is_stream >> iTemp;
-                                   }
-                                   if( !is_stream.eof() )
-                                   {
-                                        is_stream >> iTemp;
-                                        iMCRunHeader->fFADC_hilo_multipler = atof( iTemp.c_str() );
-                                   }
-                                   else
-                                   {
-                                       iMCRunHeader->fFADC_hilo_multipler = -999.;
-                                   }
-                                }
+				// read low gain multiplier
+				else if( iTemp == "FADCS" )
+				{
+					for( int kk = 0; kk < 7; kk ++ )
+					{
+						if( !is_stream.eof() )
+						{
+							is_stream >> iTemp;
+						}
+					}
+					if( !is_stream.eof() )
+					{
+						is_stream >> iTemp;
+						iMCRunHeader->fFADC_hilo_multipler = atof( iTemp.c_str() );
+					}
+					else
+					{
+						iMCRunHeader->fFADC_hilo_multipler = -999.;
+					}
+				}
 			}
 			
 		}

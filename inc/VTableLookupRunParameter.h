@@ -27,7 +27,7 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 	
 		bool fillInputFile_fromList( string iList );
 		void printCTA_MC_offaxisBins();
-                bool readTelescopeToAnalyze( string iFile );
+		bool readTelescopeToAnalyze( string iFile );
 		void setCTA_MC_offaxisBins();
 		
 	public:
@@ -66,8 +66,8 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		double fSpectralIndex;
 		int fWobbleOffset;
 		int fNoiseLevel;
-
-                vector< unsigned int > fTelToAnalyse;             // telescopes used in analysis
+		
+		vector< unsigned int > fTelToAnalyse;             // telescopes used in analysis
 		
 		unsigned int fTableFillingCut_NImages_min;
 		double       fTableFillingCut_WobbleCut_max;

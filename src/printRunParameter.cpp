@@ -61,25 +61,25 @@ bool readRunParameter( TFile* fIn, string iPara )
 	{
 		cout << fPar->fInstrumentEpoch << endl;
 	}
-        else if( iPara == "-runtype" )
-        {
-               cout << fPar->fDBRunType << endl;
-        }
-        else if( iPara == "-evndispreconstructionparameterfile" )
-        {
-              cout << fPar->freconstructionparameterfile << endl;
-        }
-        else if( iPara == "-runinfo" )
-        {
-              cout << fPar->fInstrumentEpoch << "\t";
-              cout << fPar->fAtmosphereID << "\t";
-              cout << fPar->fDBRunType << "\t";
-              for( unsigned int i = 0; i < fPar->fTelToAnalyze.size(); i++ )
-              {
-                  cout << fPar->fTelToAnalyze[i]+1;
-              }
-              cout << endl;
-        }
+	else if( iPara == "-runtype" )
+	{
+		cout << fPar->fDBRunType << endl;
+	}
+	else if( iPara == "-evndispreconstructionparameterfile" )
+	{
+		cout << fPar->freconstructionparameterfile << endl;
+	}
+	else if( iPara == "-runinfo" )
+	{
+		cout << fPar->fInstrumentEpoch << "\t";
+		cout << fPar->fAtmosphereID << "\t";
+		cout << fPar->fDBRunType << "\t";
+		for( unsigned int i = 0; i < fPar->fTelToAnalyze.size(); i++ )
+		{
+			cout << fPar->fTelToAnalyze[i] + 1;
+		}
+		cout << endl;
+	}
 	
 	return true;
 }
@@ -144,13 +144,13 @@ int main( int argc, char* argv[] )
 		cout << "      -mcaz         print MC azimuth angle" << endl;
 		cout << "      -runnumber    print MC run number" << endl;
 		cout << "      -mcsourcefile print source file name" << endl;
-        cout << "      -date         print date of run" << endl;
-        cout << "      -epoch        print epoch of this run" << endl;
+		cout << "      -date         print date of run" << endl;
+		cout << "      -epoch        print epoch of this run" << endl;
 		cout << "      -atmosphere   print corsika ID of atmospheric condition of this run" << endl;
 		cout << "      -runtype      print run type, eg observing, obsFilter etc." << endl;
 		cout << "      -teltoana     print telescope combination used in analysis" << endl;
-                cout << "      -evndispreconstructionparameterfile print evndisp reconstruction parameter file" << endl;
-                cout << "      -runinfo      print relevant run info in one line" << endl;
+		cout << "      -evndispreconstructionparameterfile print evndisp reconstruction parameter file" << endl;
+		cout << "      -runinfo      print relevant run info in one line" << endl;
 		cout << endl;
 		exit( 0 );
 	}

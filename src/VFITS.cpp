@@ -6,7 +6,7 @@ VFITS::VFITS( string anasum_file, string fits_file, string object_name, bool iOn
 	fFile_anasum = anasum_file;
 	fFile_FITS   = fits_file;
 	fWriteOneFile = iOneFile;
-
+	
 	fTarget_Name = object_name;
 	fTarget_Exposure = 0.;
 	fTarget_RAJ2000 = 0.;
@@ -159,12 +159,12 @@ bool VFITS::writeNightlyFlux( bool iPrint, string outfile )
 		{
 			mjd = gFlux->GetX()[i];
 			flx = gFlux->GetY()[i];
-			flxE= (gFlux->GetErrorYhigh(i)+gFlux->GetErrorYlow(i))/2.0;
-
-			flxCrab = flux2.getFluxVsCrab( flx, 0.2, 2.5);
-			flxCrabE = flux2.getFluxVsCrab( flxE, 0.2, 2.5);
-
-			line.Form( "%d\t%.3e\t%.3e\t%.2f\t%.2f\n", (int)mjd, flx, flxE, flxCrab, flxCrabE); 
+			flxE = ( gFlux->GetErrorYhigh( i ) + gFlux->GetErrorYlow( i ) ) / 2.0;
+			
+			flxCrab = flux2.getFluxVsCrab( flx, 0.2, 2.5 );
+			flxCrabE = flux2.getFluxVsCrab( flxE, 0.2, 2.5 );
+			
+			line.Form( "%d\t%.3e\t%.3e\t%.2f\t%.2f\n", ( int )mjd, flx, flxE, flxCrab, flxCrabE );
 			out << line ;
 			
 		}
@@ -172,8 +172,8 @@ bool VFITS::writeNightlyFlux( bool iPrint, string outfile )
 		flxCrab = flux2.getFluxVsCrab( flx, 0.2, 2.5 );
 		flxCrabE = flux2.getFluxVsCrab( flxE, 0.2, 2.5 );
 		
-		line.Form( "Total:\t%.3e\t%.3e\t%.2f\t%.2f\n", flx, flxE, flxCrab, flxCrabE);  
-		out << line << endl;		
+		line.Form( "Total:\t%.3e\t%.3e\t%.2f\t%.2f\n", flx, flxE, flxCrab, flxCrabE );
+		out << line << endl;
 	}
 	
 	return true;

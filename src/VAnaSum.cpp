@@ -278,17 +278,17 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 			// cp some information over to anasum file from mscw file
 			if( j < fStereoRunDir.size() && fStereoRunDir[j] )
 			{
-			   fStereoRunDir[j]->cd();
-			   char i_temp1[2000];
-			   sprintf( i_temp1, "%s%s%d%s", fDatadir.c_str(), fPrefix.c_str(), fRunPara->fRunList[j].fRunOn, fSuffix.c_str() );
-			   TFile* oldfile = new TFile( i_temp1 );
-			   if( !oldfile->IsZombie() )
-			   {
+				fStereoRunDir[j]->cd();
+				char i_temp1[2000];
+				sprintf( i_temp1, "%s%s%d%s", fDatadir.c_str(), fPrefix.c_str(), fRunPara->fRunList[j].fRunOn, fSuffix.c_str() );
+				TFile* oldfile = new TFile( i_temp1 );
+				if( !oldfile->IsZombie() )
+				{
 					// copy TTree telconfig to anasum.root file
 					TTree* iTree = ( TTree* )oldfile->Get( "telconfig" );
 					if( iTree )
 					{
-							fStereoRunDir[j]->cd();
+						fStereoRunDir[j]->cd();
 						TTree* newtree = iTree->CloneTree();
 						newtree->Write();
 					}
@@ -302,19 +302,19 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 					}
 					
 					// copy TTree deadPixelRegistry to anasum.root file
-					TTree * kTree = ( TTree* )oldfile->Get( "deadPixelRegistry" ) ;
-					if ( kTree )
+					TTree* kTree = ( TTree* )oldfile->Get( "deadPixelRegistry" ) ;
+					if( kTree )
 					{
 						fStereoRunDir[j]->cd();
 						TTree* newtreek = kTree->CloneTree();
 						newtreek->Write();
 					}
-			   }
-			   // copy VEvndispRunParameter 'runparameterV2' to anasum.root file
-			   fStereoRunDir[j]->cd();
-			   VEvndispRunParameter* evnrunpar = ( VEvndispRunParameter* )oldfile->Get( "runparameterV2" );
-			   evnrunpar->Write();
-			   delete oldfile;
+				}
+				// copy VEvndispRunParameter 'runparameterV2' to anasum.root file
+				fStereoRunDir[j]->cd();
+				VEvndispRunParameter* evnrunpar = ( VEvndispRunParameter* )oldfile->Get( "runparameterV2" );
+				evnrunpar->Write();
+				delete oldfile;
 			}
 			
 		}
@@ -446,8 +446,8 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	
 	////////////////////////////////////////////////////////////
 	// fill on and off histograms and sky maps
-        fStereoOn->fillHistograms( icounter, onrun, fRunAzMinOn[onrun], fRunAzMaxOn[onrun], fRunPedVarsOn[onrun] );
-        fStereoOff->fillHistograms( icounter, offrun, fRunAzMinOff[offrun], fRunAzMaxOff[offrun], fRunPedVarsOff[offrun] );
+	fStereoOn->fillHistograms( icounter, onrun, fRunAzMinOn[onrun], fRunAzMaxOn[onrun], fRunPedVarsOn[onrun] );
+	fStereoOff->fillHistograms( icounter, offrun, fRunAzMinOff[offrun], fRunAzMaxOff[offrun], fRunPedVarsOff[offrun] );
 	
 	////////////////////////////////////////////////////////////
 	// get and print exposures
@@ -531,33 +531,33 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	
 	////////////////////////////////////////////////////////////
 	// create alpha histogram for significance calculations
-        // (called for correlated and uncorrelated histograms)
+	// (called for correlated and uncorrelated histograms)
 	fStereoOff->scaleAlpha( fStereoOn->getAlpha(), false );
 	fStereoOff->scaleAlpha( fStereoOn->getAlphaUC(), true );
-        
+	
 	////////////////////////////////////////////////////////////
 	// ON / OFF Analysis
 	////////////////////////////////////////////////////////////
 	VOnOff* fstereo_onoff = new VOnOff();
-
+	
 	// normalization at target position
 	double i_norm_alpha = fStereoOff->getAlphaNorm()->GetBinContent( fStereoOff->getAlphaNorm()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ),
-						                         fStereoOff->getAlphaNorm()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
-	
+						  fStereoOff->getAlphaNorm()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
+						  
 	// on-off for 1D histograms
 	fstereo_onoff->doOnOffforParameterHistograms( fStereoOn->getParameterHistograms(), fStereoOff->getParameterHistograms(), i_norm_alpha, ( onrun == -1 ) );
-
-        // on-off for correlated maps
-        fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( false ), fStereoOff->getSkyHistograms( false ), fStereoOff->getAlphaNorm() );
-        // on-off for uncorrelated maps
-        fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( true ), fStereoOff->getSkyHistograms( true ), fStereoOff->getAlphaNormUC() );
-                                                                                    
-        // print out maximum in maps
-        cout << "\t Maximum in CORRELATED maps: " << endl;
-        TH2D* hStSig = ( TH2D* )fstereo_onoff->do2DSignificance( fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(), fStereoOff->getAlphaNorm() );
-        cout << "\t Maximum in UNCORRELATED maps: " << endl;
-        TH2D* hStSigUC = ( TH2D* )fstereo_onoff->do2DSignificance( fStereoOn->getStereoSkyMapUC(), fStereoOff->getStereoSkyMapUC(), fStereoOff->getAlphaNormUC() );
-        
+	
+	// on-off for correlated maps
+	fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( false ), fStereoOff->getSkyHistograms( false ), fStereoOff->getAlphaNorm() );
+	// on-off for uncorrelated maps
+	fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( true ), fStereoOff->getSkyHistograms( true ), fStereoOff->getAlphaNormUC() );
+	
+	// print out maximum in maps
+	cout << "\t Maximum in CORRELATED maps: " << endl;
+	TH2D* hStSig = ( TH2D* )fstereo_onoff->do2DSignificance( fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(), fStereoOff->getAlphaNorm() );
+	cout << "\t Maximum in UNCORRELATED maps: " << endl;
+	TH2D* hStSigUC = ( TH2D* )fstereo_onoff->do2DSignificance( fStereoOn->getStereoSkyMapUC(), fStereoOff->getStereoSkyMapUC(), fStereoOff->getAlphaNormUC() );
+	
 	////////////////////////////////////////////////////////////
 	// calulate significance in source bin
 	
@@ -567,7 +567,7 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	// number of off events
 	double i_nevts_off = fStereoOff->getStereoSkyMap()->GetBinContent( fStereoOff->getStereoSkyMap()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ),
 						 fStereoOff->getStereoSkyMap()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
-						  
+						 
 	double i_sig = VStatistics::calcSignificance( i_nevts_on, i_nevts_off, i_norm_alpha );
 	double i_rate = 0.;
 	double i_rateE = 0.;
@@ -576,7 +576,7 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	{
 		i_rate = ( i_nevts_on - i_norm_alpha * i_nevts_off ) * 60. / iexp_on;       // rates in 1/min
 		i_rateOFF = i_norm_alpha * i_nevts_off * 60. / iexp_off;                    // rates in 1/min
-                i_rateE = sqrt( i_nevts_on + i_norm_alpha * i_norm_alpha * i_nevts_off ) * 60. / iexp_on;
+		i_rateE = sqrt( i_nevts_on + i_norm_alpha * i_norm_alpha * i_nevts_off ) * 60. / iexp_on;
 	}
 	
 	cout << endl;

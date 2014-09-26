@@ -45,12 +45,12 @@ bool VAnalysisUtilities::openFile( string iname, int irun, bool iStereo, bool iP
 		bZombie = true;
 		return false;
 	}
-	VGlobalRunParameter *iPar = (VGlobalRunParameter*)fAnasumDataFile->Get( "anasumRunParameter" );
+	VGlobalRunParameter* iPar = ( VGlobalRunParameter* )fAnasumDataFile->Get( "anasumRunParameter" );
 	if( iPar )
 	{
-	     fEVNDISPVersion = iPar->getEVNDISP_VERSION();
-        }
-	   
+		fEVNDISPVersion = iPar->getEVNDISP_VERSION();
+	}
+	
 	
 	if( iStereo )
 	{

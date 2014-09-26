@@ -51,7 +51,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fDBRunStartTimeSQL = "";
 	fDBRunStoppTimeSQL = "";
 	fsimu_pedestalfile = "";
-        fsimu_HILO_from_simFile = false;
+	fsimu_HILO_from_simFile = false;
 	fsimu_noiselevel   = 250;
 	fsimu_pedestalfile_DefaultPed = 20.;
 	fsimu_lowgain_pedestal_DefaultPed = -999.;
@@ -67,8 +67,8 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fPrintGrisuHeader = 0;
 	
 	fprintdeadpixelinfo = false ; // DEADCHAN if true, print list of dead pixels to evndisp.log
-
-        fSaveDeadPixelRegistry = false;
+	
+	fSaveDeadPixelRegistry = false;
 	
 	// geometry/calibration parameters
 	fNTelescopes = 4;                             // there is always at least one telescope
@@ -222,7 +222,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	ffrogsmscwfile = "";
 	ffrogsmode = false;
 	ffrogsRecID = -1;
-        ffrogstemplatelist = "";
+	ffrogstemplatelist = "";
 	
 	// Model3D parameters, JG
 	fUseModel3D = false;
@@ -460,8 +460,11 @@ void VEvndispRunParameter::print( int iEv )
 			cout << " use database" << endl;
 		}
 	}
-        cout << "Run type: " << fDBRunType << " Instrument epoch: " << fInstrumentEpoch << "  Atmosphere (corsika ID): " << fAtmosphereID << endl;
-        if( fEpochFile.size() > 0 ) cout << "(epochs read from " << fEpochFile << ")" << endl;
+	cout << "Run type: " << fDBRunType << " Instrument epoch: " << fInstrumentEpoch << "  Atmosphere (corsika ID): " << fAtmosphereID << endl;
+	if( fEpochFile.size() > 0 )
+	{
+		cout << "(epochs read from " << fEpochFile << ")" << endl;
+	}
 	if( fDBCameraRotationMeasurements )
 	{
 		cout << "using camera rotation values from DB" << endl;
@@ -552,10 +555,10 @@ void VEvndispRunParameter::print( int iEv )
 			cout << "using pedestal events for pedestal calculation" << endl;
 		}
 	}
-        if( fsimu_HILO_from_simFile )
-        {
-                cout << "reading hilo multiplier from MC run header" << endl;
-        }
+	if( fsimu_HILO_from_simFile )
+	{
+		cout << "reading hilo multiplier from MC run header" << endl;
+	}
 	if( frunmode == 6 )
 	{
 		cout << "using low gain events only for pedestal calculation" << endl;

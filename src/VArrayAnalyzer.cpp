@@ -417,7 +417,7 @@ void VArrayAnalyzer::initAnalysis()
 			}
 			else if( getEvndispReconstructionParameter()->fMethodID[i] == 7 )
 			{
-                                initializeDispAnalyzer( i );
+				initializeDispAnalyzer( i );
 			}
 			else
 			{
@@ -546,12 +546,15 @@ void VArrayAnalyzer::terminate( bool iWriteDebug )
 		cout << getShowerParameters()->getTree()->GetEntries();
 		cout << " entries) to : " << fOutputfile->GetName() << endl;
 		int i_nbytes = getShowerParameters()->getTree()->Write();
-                if( iWriteDebug )
-                {
-                   cout << "WRITEDEBUG: showerpars tree (nbytes " << i_nbytes << "): ";
-                   if( fOutputfile ) cout << fOutputfile->Get( "showerpars" );
-                   cout << endl;
-                }
+		if( iWriteDebug )
+		{
+			cout << "WRITEDEBUG: showerpars tree (nbytes " << i_nbytes << "): ";
+			if( fOutputfile )
+			{
+				cout << fOutputfile->Get( "showerpars" );
+			}
+			cout << endl;
+		}
 		///////////////////////////////////////////////////////////////
 		// MC tree and histograms
 		if( isMC() )
@@ -618,12 +621,15 @@ void VArrayAnalyzer::terminate( bool iWriteDebug )
 				iMC_histos.fill( i_ze, i_tMC, true );
 				iMC_histos.print();
 				int i_nbytes = iMC_histos.Write();
-                                if( iWriteDebug )
-                                {
-                                   cout << "WRITEDEBUG: MC histograms (nbytes " << i_nbytes << "):";
-                                   if( fOutputfile ) cout << fOutputfile->Get( "MChistos" );
-                                   cout << endl;
-                                }
+				if( iWriteDebug )
+				{
+					cout << "WRITEDEBUG: MC histograms (nbytes " << i_nbytes << "):";
+					if( fOutputfile )
+					{
+						cout << fOutputfile->Get( "MChistos" );
+					}
+					cout << endl;
+				}
 				// END: filling of MC histograms
 				////////////////////////////////////////////////////////////
 			}
@@ -631,12 +637,15 @@ void VArrayAnalyzer::terminate( bool iWriteDebug )
 		if( getEvndispReconstructionParameter() )
 		{
 			int i_nbytes = getEvndispReconstructionParameter()->Write();
-                        if( iWriteDebug )
-                        {
-                           cout << "WRITEDEBUG: evndisp reconstruction parameters (nbytes " << i_nbytes << "): ";
-                           if( fOutputfile ) cout << fOutputfile->Get( "EvndispReconstructionParameter" );
-                           cout << endl;
-                        }
+			if( iWriteDebug )
+			{
+				cout << "WRITEDEBUG: evndisp reconstruction parameters (nbytes " << i_nbytes << "): ";
+				if( fOutputfile )
+				{
+					cout << fOutputfile->Get( "EvndispReconstructionParameter" );
+				}
+				cout << endl;
+			}
 		}
 		if( getArrayPointing() )
 		{
@@ -1534,14 +1543,14 @@ bool VArrayAnalyzer::fillShowerDirection( unsigned int iMethod, float xs, float 
 		getShowerParameters()->fShowerZe[iMethod] = -99999.;
 		getShowerParameters()->fShowerAz[iMethod] = -99999.;
 		getShowerParameters()->fShower_stdS[iMethod] = -99999.;
-                getShowerParameters()->fShower_Chi2[iMethod] = -99999.;
+		getShowerParameters()->fShower_Chi2[iMethod] = -99999.;
 		
 		return false;
 	}
-        if( xs < -9998. || ys < -9998. )
-        {
-             getShowerParameters()->fShower_Chi2[iMethod] = -99999.;
-        }
+	if( xs < -9998. || ys < -9998. )
+	{
+		getShowerParameters()->fShower_Chi2[iMethod] = -99999.;
+	}
 	
 	getShowerParameters()->fShower_Xoffset[iMethod] = xs;
 	if( getDetectorGeo()->getGrIsuVersion() >= 412 )
@@ -1706,12 +1715,12 @@ void VArrayAnalyzer::prepareforDirectionReconstruction( unsigned int iMethodInde
 			dist.push_back( getImageParameters( getRunParameter()->fImageLL )->dist );
 			pedvar.push_back( getImageParameters( getRunParameter()->fImageLL )->fmeanPedvar_Image );
 			tgrad.push_back( getImageParameters( getRunParameter()->fImageLL )->tgrad_x );
-			cen_x.push_back(  getImageParameters( getRunParameter()->fImageLL )->cen_x );
-			cen_y.push_back(  getImageParameters( getRunParameter()->fImageLL )->cen_y );
+			cen_x.push_back( getImageParameters( getRunParameter()->fImageLL )->cen_x );
+			cen_y.push_back( getImageParameters( getRunParameter()->fImageLL )->cen_y );
 			xcore.push_back( getShowerParameters()->fShowerXcore[0] );
 			ycore.push_back( getShowerParameters()->fShowerYcore[0] );
-			Xoff.push_back(  getShowerParameters()->fShower_Xoffset[0] );
-			Yoff.push_back(  getShowerParameters()->fShower_Xoffset[0] );
+			Xoff.push_back( getShowerParameters()->fShower_Xoffset[0] );
+			Yoff.push_back( getShowerParameters()->fShower_Xoffset[0] );
 			ltrig.push_back( getShowerParameters()->fLTrig );
 			ze.push_back( 90. - getShowerParameters()->fTelElevation[tel] );
 			az.push_back( getShowerParameters()->fTelAzimuth[tel] );
@@ -1801,7 +1810,7 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp )
 	// impact point, from perpen. minimization
 	float xs = 0.;
 	float ys = 0.;
-
+	
 	// dispdiff gamma/hadron parameter
 	float dispdiff = 0.;
 	
@@ -1812,11 +1821,11 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp )
 	num_images = getShowerParameters()->fShowerNumImages[iMethod];
 	
 	rcs_method_4( iMethod );
-
+	
 	float xoff_4 = getShowerParameters()->fShower_Xoffset[iMethod];
 	float yoff_4 = getShowerParameters()->fShower_Yoffset[iMethod];
-
-       
+	
+	
 	// are there enough images the run an array analysis
 	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] )
 	{
@@ -1855,13 +1864,13 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp )
 		else
 		{
 			setTelID( telID[ii] );
-			v_weight.push_back( getImageParameters( getRunParameter()->fImageLL )->ntubes * (1. - getImageParameters( getRunParameter()->fImageLL )->width / getImageParameters( getRunParameter()->fImageLL )->length ) );
+			v_weight.push_back( getImageParameters( getRunParameter()->fImageLL )->ntubes * ( 1. - getImageParameters( getRunParameter()->fImageLL )->width / getImageParameters( getRunParameter()->fImageLL )->length ) );
 		}
 	}
 	fDispAnalyzer[iMethod]->calculateMeanDirection( xs, ys, x, y, cosphi, sinphi, v_disp, v_weight, dispdiff );
-
+	
 	getShowerParameters()->fDispDiff[iMethod] = dispdiff;
-
+	
 	for( unsigned int ii = 0; ii < m.size(); ii++ )
 	{
 		getShowerParameters()->addDISPPoint( telID[ii], iMethod, fDispAnalyzer[iMethod]->getXcoordinate_disp( ii, x[ii], cosphi[ii] ),
@@ -1887,10 +1896,10 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp )
 	fillShowerCore( iMethod, ximp, yimp );
 	getShowerParameters()->fShower_stdP[iMethod] = stdp;
 	/* indicates fit ok */
-        if( xs > -9998. && ys > -9998. )
-        {
-            getShowerParameters()->fShower_Chi2[iMethod] = 0.0;
-        }
+	if( xs > -9998. && ys > -9998. )
+	{
+		getShowerParameters()->fShower_Chi2[iMethod] = 0.0;
+	}
 	
 	return 0;
 }
@@ -2011,7 +2020,7 @@ int VArrayAnalyzer::rcs_method_9( unsigned int iMethod )
 	float ys = 0.;
 	float xd = 0.;
 	float yd = 0.;
-
+	
 	// dispdiff gamma/hadron parameter
 	float dispdiff = 0.;
 	
@@ -2117,7 +2126,7 @@ int VArrayAnalyzer::rcs_method_9( unsigned int iMethod )
 			{
 				// P1
 				v_disp[0] = fDispAnalyzer[iMethod]->evaluate( width[ii], length[ii], asym[ii], dist[ii], w[ii], pedvar[ii],
-	                                                     tgrad[ii], loss[ii], cen_y[ii], cen_x[ii], Xoff[ii], Yoff[ii], teltype[ii], ze[ii], az[ii], true );
+							tgrad[ii], loss[ii], cen_y[ii], cen_x[ii], Xoff[ii], Yoff[ii], teltype[ii], ze[ii], az[ii], true );
 				v_x[0] = x[ii];
 				v_y[0] = y[ii];
 				v_cosphi[0] = cosphi[ii];
@@ -2132,7 +2141,7 @@ int VArrayAnalyzer::rcs_method_9( unsigned int iMethod )
 				}
 				// P2
 				v_disp[1] = fDispAnalyzer[iMethod]->evaluate( width[jj], length[jj], asym[ii], dist[ii], w[jj], pedvar[jj],
-	                                                     tgrad[jj], loss[jj], cen_y[jj], cen_x[jj], Xoff[ii], Yoff[ii], teltype[jj], ze[jj], az[jj], true );
+							tgrad[jj], loss[jj], cen_y[jj], cen_x[jj], Xoff[ii], Yoff[ii], teltype[jj], ze[jj], az[jj], true );
 				v_x[1] = x[jj];
 				v_y[1] = y[jj];
 				v_cosphi[1] = cosphi[jj];
@@ -2310,99 +2319,99 @@ void VArrayAnalyzer::updatePointingToArbitraryTime( int iMJD, double iTime )
  */
 string VArrayAnalyzer::getTMVAFileNameForAngularReconstruction( unsigned int iStereoMethodID, string iBDTFileName )
 {
-    string iName = "";
-
-// use cos(ze) to determine the closest ze bin
-    double iAverageZenith = cos( (90.-getAverageElevation()) * TMath::DegToRad() );
-
-// loop over all zenith angles and files given in the reconstructionparameter file
-    if( getEvndispReconstructionParameter() && iStereoMethodID < getEvndispReconstructionParameter()->fMTVAZenithBin.size() )
-    {
-        unsigned int iBinSelected = 0;
-        double iDiff = 1.e20;
-        for( unsigned int i = 0; i < getEvndispReconstructionParameter()->fMTVAZenithBin[iStereoMethodID].size(); i++ )
-        {
-            double iZe = cos( getEvndispReconstructionParameter()->fMTVAZenithBin[iStereoMethodID][i] * TMath::DegToRad() );
-            if( TMath::Abs( iZe - iAverageZenith ) < iDiff )
-            {
-                iDiff = TMath::Abs( iZe - iAverageZenith );
-                iBinSelected = i;
-            }
-        }
-// this is the closest bin
-        if( iStereoMethodID < getEvndispReconstructionParameter()->fTMVAFileNameVector.size() &&
-            iBinSelected < getEvndispReconstructionParameter()->fTMVAFileNameVector[iStereoMethodID].size() )
-        {
-            iName = getEvndispReconstructionParameter()->fTMVAFileNameVector[iStereoMethodID][iBinSelected];
-        }
-    }
-//////////////
-// check if full file name is given, otherwise adjust it
-
-// full path given
-    if( iName.find( "/" ) != string::npos )
-    {
-        iName += "/" + iBDTFileName;
-    }
-// no full path given - expect file to be at the default location
-// $OBS_EVNDISP_ANA_DIR/DISP_BDTs/VX/ze...
-    else
-    {
-        string iFullFileName = getRunParameter()->getDirectory_EVNDISPAnaData() + "/DISP_BDTs/" + getRunParameter()->fInstrumentEpoch + "/";
-        iName = iFullFileName + iName + "/" + iBDTFileName;
-    }
-    cout << "initializing TMVA disp analyzer for average zenith angle in current run: " << 90.-getAverageElevation() << endl;
-    if( fDebug )
-    {
-        cout << "TMVA BDTs available for: " << endl;
-        if( getEvndispReconstructionParameter() && iStereoMethodID < getEvndispReconstructionParameter()->fMTVAZenithBin.size() )
-        {
-            for( unsigned int i = 0; i < getEvndispReconstructionParameter()->fMTVAZenithBin[iStereoMethodID].size(); i++ )
-            {
-                cout << "\t" << getEvndispReconstructionParameter()->fMTVAZenithBin[iStereoMethodID][i] << endl;
-            }
-        }
-    }
-
-    return iName;
+	string iName = "";
+	
+	// use cos(ze) to determine the closest ze bin
+	double iAverageZenith = cos( ( 90. - getAverageElevation() ) * TMath::DegToRad() );
+	
+	// loop over all zenith angles and files given in the reconstructionparameter file
+	if( getEvndispReconstructionParameter() && iStereoMethodID < getEvndispReconstructionParameter()->fMTVAZenithBin.size() )
+	{
+		unsigned int iBinSelected = 0;
+		double iDiff = 1.e20;
+		for( unsigned int i = 0; i < getEvndispReconstructionParameter()->fMTVAZenithBin[iStereoMethodID].size(); i++ )
+		{
+			double iZe = cos( getEvndispReconstructionParameter()->fMTVAZenithBin[iStereoMethodID][i] * TMath::DegToRad() );
+			if( TMath::Abs( iZe - iAverageZenith ) < iDiff )
+			{
+				iDiff = TMath::Abs( iZe - iAverageZenith );
+				iBinSelected = i;
+			}
+		}
+		// this is the closest bin
+		if( iStereoMethodID < getEvndispReconstructionParameter()->fTMVAFileNameVector.size() &&
+				iBinSelected < getEvndispReconstructionParameter()->fTMVAFileNameVector[iStereoMethodID].size() )
+		{
+			iName = getEvndispReconstructionParameter()->fTMVAFileNameVector[iStereoMethodID][iBinSelected];
+		}
+	}
+	//////////////
+	// check if full file name is given, otherwise adjust it
+	
+	// full path given
+	if( iName.find( "/" ) != string::npos )
+	{
+		iName += "/" + iBDTFileName;
+	}
+	// no full path given - expect file to be at the default location
+	// $OBS_EVNDISP_ANA_DIR/DISP_BDTs/VX/ze...
+	else
+	{
+		string iFullFileName = getRunParameter()->getDirectory_EVNDISPAnaData() + "/DISP_BDTs/" + getRunParameter()->fInstrumentEpoch + "/";
+		iName = iFullFileName + iName + "/" + iBDTFileName;
+	}
+	cout << "initializing TMVA disp analyzer for average zenith angle in current run: " << 90. - getAverageElevation() << endl;
+	if( fDebug )
+	{
+		cout << "TMVA BDTs available for: " << endl;
+		if( getEvndispReconstructionParameter() && iStereoMethodID < getEvndispReconstructionParameter()->fMTVAZenithBin.size() )
+		{
+			for( unsigned int i = 0; i < getEvndispReconstructionParameter()->fMTVAZenithBin[iStereoMethodID].size(); i++ )
+			{
+				cout << "\t" << getEvndispReconstructionParameter()->fMTVAZenithBin[iStereoMethodID][i] << endl;
+			}
+		}
+	}
+	
+	return iName;
 }
 
 void VArrayAnalyzer::initializeDispAnalyzer( unsigned int iStereoMethodID )
 {
-// first check if we can 'reuse' a MVA from another, previously defined method
-//   this is indicated by a single TMVABDTFILE BDT file with the file name USE_BDT_METHOD_<methodID>
-     if( iStereoMethodID < getEvndispReconstructionParameter()->fTMVAFileNameVector.size() && 
-         getEvndispReconstructionParameter()->fTMVAFileNameVector[iStereoMethodID].size() == 1 &&
-         getEvndispReconstructionParameter()->fTMVAFileNameVector[iStereoMethodID][0].find( "USE_BDT_METHOD_" ) != string::npos )
-     {
-         string iTemp = getEvndispReconstructionParameter()->fTMVAFileNameVector[iStereoMethodID][0];
-         unsigned int iMethodID = (unsigned int)atoi( iTemp.substr( iTemp.rfind( "_" )+1, iTemp.size() ).c_str() );
-         cout << "initializing TMVA disp analyzer for array reconstruction method " << iStereoMethodID;
-         cout << " using disp analyser from method " << iMethodID << endl;
-         if( iMethodID < fDispAnalyzer.size() && fDispAnalyzer[iMethodID] )
-         {
-             fDispAnalyzer.push_back( fDispAnalyzer[iMethodID] );
-         }
-         else
-         {
-                    cout << "VArrayAnalyzer::initAnalysis() error initializing MVA-BDT (method " << iStereoMethodID << ")" << endl;
-                    cout << "\t could not find disp analyzer from previous method " << iMethodID << endl;
-                    cout << "exiting..." << endl;
-                    exit( EXIT_FAILURE );
-         }
-     }
-// initialize disp analyzer
-     else
-     {
-            fDispAnalyzer.push_back( new VDispAnalyzer() );
-            fDispAnalyzer.back()->setTelescopeTypeList( getDetectorGeometry()->getTelType_list() );
-	    // initialize disp with BDTs from closest zenith angle
-            if( !fDispAnalyzer.back()->initialize( getTMVAFileNameForAngularReconstruction( iStereoMethodID ), "TMVABDT" ) )
-            {
-                    cout << "VArrayAnalyzer::initAnalysis() error initializing MVA-BDT (method " << iStereoMethodID << ")" << endl;
-                    cout << "\t file " << getTMVAFileNameForAngularReconstruction( iStereoMethodID ) << endl;
-                    cout << "exiting..." << endl;
-                    exit( EXIT_FAILURE );
-            }
-      }
+	// first check if we can 'reuse' a MVA from another, previously defined method
+	//   this is indicated by a single TMVABDTFILE BDT file with the file name USE_BDT_METHOD_<methodID>
+	if( iStereoMethodID < getEvndispReconstructionParameter()->fTMVAFileNameVector.size() &&
+			getEvndispReconstructionParameter()->fTMVAFileNameVector[iStereoMethodID].size() == 1 &&
+			getEvndispReconstructionParameter()->fTMVAFileNameVector[iStereoMethodID][0].find( "USE_BDT_METHOD_" ) != string::npos )
+	{
+		string iTemp = getEvndispReconstructionParameter()->fTMVAFileNameVector[iStereoMethodID][0];
+		unsigned int iMethodID = ( unsigned int )atoi( iTemp.substr( iTemp.rfind( "_" ) + 1, iTemp.size() ).c_str() );
+		cout << "initializing TMVA disp analyzer for array reconstruction method " << iStereoMethodID;
+		cout << " using disp analyser from method " << iMethodID << endl;
+		if( iMethodID < fDispAnalyzer.size() && fDispAnalyzer[iMethodID] )
+		{
+			fDispAnalyzer.push_back( fDispAnalyzer[iMethodID] );
+		}
+		else
+		{
+			cout << "VArrayAnalyzer::initAnalysis() error initializing MVA-BDT (method " << iStereoMethodID << ")" << endl;
+			cout << "\t could not find disp analyzer from previous method " << iMethodID << endl;
+			cout << "exiting..." << endl;
+			exit( EXIT_FAILURE );
+		}
+	}
+	// initialize disp analyzer
+	else
+	{
+		fDispAnalyzer.push_back( new VDispAnalyzer() );
+		fDispAnalyzer.back()->setTelescopeTypeList( getDetectorGeometry()->getTelType_list() );
+		// initialize disp with BDTs from closest zenith angle
+		if( !fDispAnalyzer.back()->initialize( getTMVAFileNameForAngularReconstruction( iStereoMethodID ), "TMVABDT" ) )
+		{
+			cout << "VArrayAnalyzer::initAnalysis() error initializing MVA-BDT (method " << iStereoMethodID << ")" << endl;
+			cout << "\t file " << getTMVAFileNameForAngularReconstruction( iStereoMethodID ) << endl;
+			cout << "exiting..." << endl;
+			exit( EXIT_FAILURE );
+		}
+	}
 }

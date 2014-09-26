@@ -68,7 +68,7 @@ class Ctpars
 		Float_t         size;
 		Float_t         size2;
 		Float_t         loss;
-                Float_t         fracLow;
+		Float_t         fracLow;
 		Float_t         fui;
 		Float_t         dist;
 		Float_t         azwidth;
@@ -195,7 +195,7 @@ class Ctpars
 		TBranch*        b_size;                   //!
 		TBranch*        b_size2;                  //!
 		TBranch*        b_loss;                   //!
-                TBranch*        b_fracLow;                //!
+		TBranch*        b_fracLow;                //!
 		TBranch*        b_fui;                    //!
 		TBranch*        b_dist;                   //!
 		TBranch*        b_azwidth;                //!
@@ -391,9 +391,9 @@ void Ctpars::Init( TTree* tree )
 		{
 			loss = 0.;
 		}
-                if( fChain->GetBranchStatus( "fracLow" ) )
-                {
-                       
+		if( fChain->GetBranchStatus( "fracLow" ) )
+		{
+		
 			fChain->SetBranchAddress( "fracLow", &fracLow );
 		}
 		else
@@ -473,7 +473,7 @@ Bool_t Ctpars::Notify()
 	b_cen_x = 0;
 	b_cen_y = 0;
 	b_loss = 0;
-        b_fracLow = 0;
+	b_fracLow = 0;
 	b_alpha = 0;
 	b_los = 0;
 	b_phi = 0;
@@ -531,7 +531,7 @@ Bool_t Ctpars::Notify()
 			fChain->AddBranchToCache( b_loss );
 		}
 		if( fVersion > 6 && fChain->GetBranchStatus( "fracLow" ) )
-                {
+		{
 			b_fracLow = fChain->GetBranch( "fracLow" );
 			fChain->AddBranchToCache( b_fracLow );
 		}

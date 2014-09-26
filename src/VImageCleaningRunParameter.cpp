@@ -28,9 +28,9 @@ VImageCleaningRunParameter::VImageCleaningRunParameter()
 	fCorrelationCleanBoardThresh = 1.0; //AMc S/N ratio of 1
 	fCorrelationCleanCorrelThresh = 0.75; //AMc Sample correlation coefficient of 0.75
 	fCorrelationCleanNpixThresh = 15;  //AMc Images whose number of pixels is above this value will skip correlation cleaning
-        
+	
 	// time two-level cleaning
-	ftimediff = 1.0;  
+	ftimediff = 1.0;
 }
 
 bool VImageCleaningRunParameter::initialize()
@@ -110,7 +110,7 @@ bool VImageCleaningRunParameter::setImageCleaningMethod( string iMethod )
 	}
 	else if( iMethod == "TIMETWOLEVEL" )
 	{
-	        fImageCleaningMethod = 4;
+		fImageCleaningMethod = 4;
 	}
 	else
 	{

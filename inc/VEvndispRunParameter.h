@@ -67,8 +67,8 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		string fsourcefile;                       // name of data file
 		int    fnevents;                          // total number of events to be analyzed
 		int    fFirstEvent;                       // skip up till this event
-                int    fTimeCutsMin_min;                  // start to analyse run at this min
-                int    fTimeCutsMin_max;                  // stop to analyse this run at this min
+		int    fTimeCutsMin_min;                  // start to analyse run at this min
+		int    fTimeCutsMin_max;                  // stop to analyse this run at this min
 		
 		bool fprintdeadpixelinfo ; 		 // DEADCHAN if true, will print list of dead pixels
 		// at end of run to evndisp.log
@@ -79,11 +79,11 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		// on all images, irregardless of if they are near the
 		// edge of the camera or not.  Set in
 		// EVNDISP.reconstruction.runparameter
-                
-                string fInstrumentEpoch;                  // Instrumental epoch (e.g. for VTS V5 or V6)
-                unsigned int fAtmosphereID;               // corsika ID of atmosphere
+		
+		string fInstrumentEpoch;                  // Instrumental epoch (e.g. for VTS V5 or V6)
+		unsigned int fAtmosphereID;               // corsika ID of atmosphere
 		vector< float > fEpochGain;               // absolute gain (dc/pe) during epoch (e.g. for VTS V5 or V6)
-                string fEpochFile;                        // file with list of epochs and atmospheres
+		string fEpochFile;                        // file with list of epochs and atmospheres
 		
 		float  fRunDuration;                      // duration of runs in [s]
 		
@@ -133,7 +133,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool freadCalibfromDB_save_file;          // calibration information read from the DB are stored in VGlobalRunParameter::getDirectory_EVNDISPCalibrationData() +/Tel_?
 		bool fNoCalibNoPb;                        // if true, when no information for gain and toff can be found, the analysis is done filling thenm with 1 and 0 respectively (in VCalibrator)
 		bool fNextDayGainHack;			  //if true, and > 100 channels in one telescope have gain=0, all gains in that tel will be set to 1; gains won't be tested in the dead channel finder.
-		bool fWriteExtraCalibTree;		  // write additional tree into .gain.root file with channel charges/monitor charge/nHiLo for each event 
+		bool fWriteExtraCalibTree;		  // write additional tree into .gain.root file with channel charges/monitor charge/nHiLo for each event
 		string fLowGainCalibrationFile;           // file with file name for low-gain calibration
 		int fNCalibrationEvents;                  // events to be used for calibration
 		float faverageTZeroFiducialRadius;        // fiducial radius for average tzero calculation (DST), in fraction of FOV
@@ -183,7 +183,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   fDynamicIntegrationWindow;         // use a dynamic integration window (doublepass only)
 		vector< int >    fTraceWindowShift;       // shift the summation window by value (in doublepass: low gain channels only, default: 0 )
 		vector< bool >   fsumfirst_start_at_T0;   // start the summation window at T0 (+shift; not for doublepass)
-                vector< double > fSumWindowMaxTimeDifferenceLGtoHG;   // maximum difference between lg and hg window in doublepass method
+		vector< double > fSumWindowMaxTimeDifferenceLGtoHG;   // maximum difference between lg and hg window in doublepass method
 		vector< double > fSumWindowMaxTimedifferenceToDoublePassPosition; // maximum difference between doublepass calculated window start and t0 (in samples, default: 10 )
 		double ftracefit;                         // tracefit mode or getquick mode (-1.=no fitting, 0=fit all PMTs, else: fit only PMTs with maximum ftracefit x tracerms
 		string ftracefitfunction;                 // number of tracefit function (default=ev, others: grisu);
@@ -230,8 +230,8 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		string fsimu_pedestalfile;                // use external pedestal file for MC
 		int    fsimu_noiselevel;                  // noise level used for this external file
 		double fsimu_pedestalfile_DefaultPed;     // default pedestal for Grisu MC (must be the same is in grisu .cfg file)
-                double fsimu_lowgain_pedestal_DefaultPed; // default low-gain pedestal level for MC
-                bool   fsimu_HILO_from_simFile;           // read hilo multiplier from MC header in vbf file
+		double fsimu_lowgain_pedestal_DefaultPed; // default low-gain pedestal level for MC
+		bool   fsimu_HILO_from_simFile;           // read hilo multiplier from MC header in vbf file
 		int    fIsMC;                             // source data is Monte Carlo (==1 write all MC events, ==2 write only triggered events)
 		bool   fIgnoreCFGversions;                // ignore configuration file versions
 		
@@ -276,8 +276,8 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool ffrogsmode;                          // for Frogs template Analysis, GH
 		string ffrogsmscwfile;			  // frogs file for getting table energy
 		int ffrogsRecID;			  // RecID or Cut_ID Frogs Uses - combine with table
-                string ffrogstemplatelist ;               // text file containing the elevation and 
-                                                          //   elevation-dependant template file names
+		string ffrogstemplatelist ;               // text file containing the elevation and
+		//   elevation-dependant template file names
 		
 		// Model3D
 		bool fUseModel3D;                         // use Model3D analysis, JG

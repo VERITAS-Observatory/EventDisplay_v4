@@ -25,7 +25,7 @@ class VTraceHandler
 		unsigned int fpulsetiminglevels_size;
 		vector< float > fpulsetiminglevels;       //!< levels in fraction of maximum for pulse timing calculation
 		vector< float > fpulsetiming;             //!< pulse timing vector (refilled for each call)
-                bool fFindPulseTiming;                    //!< true if pulse timing finder was successfull
+		bool fFindPulseTiming;                    //!< true if pulse timing finder was successfull
 		int fpTrazeSize;                          //!< length of the FADC trace
 		double fMax;                              //!< Max value for this trace
 		double fPed;                              //!< Ped value for this trace
@@ -118,7 +118,10 @@ class VTraceHandler
 			return getQuickTZero( fFirst, fLast, fTFirst );
 		}
 		virtual vector< float >& getPulseTiming( int fFirst, int fLast, int fTFirst, int fTLast );
-                virtual bool   getPulseTimingStatus() { return fFindPulseTiming; }
+		virtual bool   getPulseTimingStatus()
+		{
+			return fFindPulseTiming;
+		}
 		virtual double getTraceMax();
 		virtual double getTraceMax( unsigned int& n255, double iHiLo = 6. ); // get maximum value in trace
 		virtual void   getTraceMax( double&, double& );

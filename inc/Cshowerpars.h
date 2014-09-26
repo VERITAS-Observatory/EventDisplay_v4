@@ -495,17 +495,17 @@ void Cshowerpars::Init( TTree* tree )
 		}
 	}
 	fChain->SetBranchAddress( "Chi2", Chi2 );
-        if( fChain->GetBranchStatus( "DispDiff" ) )
-        {
-            fChain->SetBranchAddress( "DispDiff", DispDiff );
-        }
-        else
-        {
-            for( unsigned int i = 0; i < VDST_MAXRECMETHODS; i++ )
-            {
-                DispDiff[i] = 0.;
-            }
-        }
+	if( fChain->GetBranchStatus( "DispDiff" ) )
+	{
+		fChain->SetBranchAddress( "DispDiff", DispDiff );
+	}
+	else
+	{
+		for( unsigned int i = 0; i < VDST_MAXRECMETHODS; i++ )
+		{
+			DispDiff[i] = 0.;
+		}
+	}
 	if( bMC )
 	{
 		if( fVersion > 7 )
@@ -645,9 +645,15 @@ Bool_t Cshowerpars::Notify()
 	if( !bShort )
 	{
 		b_stds = fChain->GetBranch( "stds" );
-        }
-        if( fChain->GetBranchStatus( "dec" ) ) b_dec = fChain->GetBranch( "dec" );
-        if( fChain->GetBranchStatus( "ra" ) ) b_ra = fChain->GetBranch( "ra" );
+	}
+	if( fChain->GetBranchStatus( "dec" ) )
+	{
+		b_dec = fChain->GetBranch( "dec" );
+	}
+	if( fChain->GetBranchStatus( "ra" ) )
+	{
+		b_ra = fChain->GetBranch( "ra" );
+	}
 	else
 	{
 		b_stds = 0;

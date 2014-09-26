@@ -138,7 +138,10 @@ class VPlotRunSummary : public VPlotUtilities, public TObject
 		}
 		void makeNewPhaseRunList( string ifile, string ilist );
 		TCanvas* plot_stats();
-                TCanvas* plot_cumulativeSignificance_vs_time() { return plot_cumSignificance(); }
+		TCanvas* plot_cumulativeSignificance_vs_time()
+		{
+			return plot_cumSignificance();
+		}
 		TCanvas* plot_cumSignificance();
 		TCanvas* plot_dailyRates( bool iDeadTimeCorrection = false );
 		TCanvas* plot_rates( bool iOff = false );

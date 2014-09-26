@@ -1140,11 +1140,11 @@ TCanvas* VExposure::plot( double ilmin, double ilmax, double ibmin, double ibmax
 	if( fAcceptance )
 	{
 		fPlottingCanvas.push_back( plot2DGalactic( "cAccGal", "Acceptance corrected exposure", 650, 10, 600, 400,
-												   fRadAccMapGal2D, ibmin, ibmax, ilmin, ilmax, false, iPalette ) );
+								   fRadAccMapGal2D, ibmin, ibmax, ilmin, ilmax, false, iPalette ) );
 		fPlottingCanvas.push_back( plot2DGalactic( "cAccGal_aitoff", "Acceptance corrected exposure (aitoff)", 650, 450, 600, 400,
-												   fRadAccMapGal2D_aitoff, ibmin, ibmax, ilmin, ilmax, true, iPalette ) );
-	}	
-
+								   fRadAccMapGal2D_aitoff, ibmin, ibmax, ilmin, ilmax, true, iPalette ) );
+	}
+	
 	if( iReturnCanvas < fPlottingCanvas.size() )
 	{
 		return fPlottingCanvas[iReturnCanvas];

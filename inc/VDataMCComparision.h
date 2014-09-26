@@ -26,29 +26,30 @@ using namespace std;
 
 class VDataMCComparisionHistogramData
 {
-      public:
-
-      string fVarName;
-      string fHistogramType;
-      unsigned int fTelescopeID;                    // 0 = array variable
-
-      TH1D*  fHis1D;
-      TH2D*  fHis2D;
-
-      VDataMCComparisionHistogramData( string iVarName = "", string iHistogramType = "", unsigned int iTelescopeID = 0 );
-     ~VDataMCComparisionHistogramData() {}
-      bool   initHistogram( string iXTitle, int iNbins, double ix_min, double ix_max );
-      void   fill( double iV, double iWeight = 1., double iLogEnergy_TeV = -99. );  
+	public:
+	
+		string fVarName;
+		string fHistogramType;
+		unsigned int fTelescopeID;                    // 0 = array variable
+		
+		TH1D*  fHis1D;
+		TH2D*  fHis2D;
+		
+		VDataMCComparisionHistogramData( string iVarName = "", string iHistogramType = "", unsigned int iTelescopeID = 0 );
+		~VDataMCComparisionHistogramData() {}
+		bool   initHistogram( string iXTitle, int iNbins, double ix_min, double ix_max );
+		void   fill( double iV, double iWeight = 1., double iLogEnergy_TeV = -99. );
 };
 
 class VDataMCComparision
 {
 	private:
-
-                enum E_varname { ELENGTH, EWIDTH, EDIST, EALPHA, ENTUBES, ENLOWGAIN, ESIZE, ESIZE2, ESIZELG, EFRACLOW, EMAX1, EMAX2, EMAX3, ELOSS, ELOS, EASYM,
-                                 ECENX, ECENY, ETGRADX, EMSCWT, EMSCLT, ETELDIST, ETHETA2, ELTHETA2, EMSCW, EMSCL, EMWR, EMLR, EXCORE, EYCORE, EEREC, ENIMAGES,
-                                 EIMGSEL, EEMISSIONHEIGHT, EMVA, ESIGMAT3D, ENC3D, EDEPTH3D, ERWIDTH3D, EERRRWIDTH3D };
 	
+		enum E_varname { ELENGTH, EWIDTH, EDIST, EALPHA, ENTUBES, ENLOWGAIN, ESIZE, ESIZE2, ESIZELG, EFRACLOW, EMAX1, EMAX2, EMAX3, ELOSS, ELOS, EASYM,
+						 ECENX, ECENY, ETGRADX, EMSCWT, EMSCLT, ETELDIST, ETHETA2, ELTHETA2, EMSCW, EMSCL, EMWR, EMLR, EXCORE, EYCORE, EEREC, ENIMAGES,
+						 EIMGSEL, EEMISSIONHEIGHT, EMVA, ESIGMAT3D, ENC3D, EDEPTH3D, ERWIDTH3D, EERRRWIDTH3D
+					   };
+					   
 		string fName;
 		int fNTel;
 		
@@ -81,16 +82,16 @@ class VDataMCComparision
 		TList* hisList;
 		vector<TH1D* > hTel;
 		vector<TH2D* > hTel2D;
-
-                // histogram classes
-                map< E_varname, vector< VDataMCComparisionHistogramData* > > fHistoSingleTel; 
-                map< E_varname, VDataMCComparisionHistogramData* > fHistoArray; 
-
+		
+		// histogram classes
+		map< E_varname, vector< VDataMCComparisionHistogramData* > > fHistoSingleTel;
+		map< E_varname, VDataMCComparisionHistogramData* > fHistoArray;
+		
 		// stereo histograms
 		TH2D* hXYcore;
 		TH2D* hAzYcore;
 		TH2D* hYt2;
-                vector<TH2D* > hcen_xy;
+		vector<TH2D* > hcen_xy;
 		vector< TH2D* > hdistR;
 		
 		void setEntries( TH1D* );
@@ -101,7 +102,7 @@ class VDataMCComparision
 	public:
 	
 		VDataMCComparision( string, bool, int );
-	       ~VDataMCComparision() {}
+		~VDataMCComparision() {}
 		void defineHistograms();
 		bool fillHistograms( string ifile, int iSingleTelescopeCuts );
 		bool fillHistograms( string ifile, int iSingleTelescopeCuts, double iWobbleNorth, double iWobbleEast );

@@ -34,7 +34,10 @@ class VDST : public VImageBaseAnalyzer, public VDSTTree
 		VDST( bool iMode, bool iMC );
 		~VDST();
 		void fill();                              //!< fill dst tree
-                TFile *getDSTFile() { return fDSTfile; }
+		TFile* getDSTFile()
+		{
+			return fDSTfile;
+		}
 		void initialize();
 		void terminate();                         //!< write dst tree do disk
 };

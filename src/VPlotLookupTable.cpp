@@ -108,16 +108,16 @@ TH2F* VPlotLookupTable::divide2DHistograms( TH2F* h1, TH2F* h2, char* hname )
 	hMM->SetXTitle( h1->GetXaxis()->GetTitle() );
 	hMM->SetYTitle( h1->GetYaxis()->GetTitle() );
 	hMM->SetZTitle( h1->GetZaxis()->GetTitle() );
-
-        int ii = 0;
-        int jj = 0;
+	
+	int ii = 0;
+	int jj = 0;
 	
 	for( int i = 1; i <= hMM->GetNbinsX(); i++ )
 	{
 		for( int j = 1; j <= hMM->GetNbinsY(); j++ )
 		{
-                        ii = h2->GetXaxis()->FindBin( h1->GetXaxis()->GetBinCenter( i ) );
-                        jj = h2->GetYaxis()->FindBin( h1->GetYaxis()->GetBinCenter( j ) );
+			ii = h2->GetXaxis()->FindBin( h1->GetXaxis()->GetBinCenter( i ) );
+			jj = h2->GetYaxis()->FindBin( h1->GetYaxis()->GetBinCenter( j ) );
 			if( h2->GetBinContent( ii, jj ) > 0. )
 			{
 				hMM->SetBinContent( i, j, h1->GetBinContent( i, j ) / h2->GetBinContent( ii, jj ) );

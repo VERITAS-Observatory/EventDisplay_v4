@@ -175,7 +175,7 @@ TCanvas* VPlotRadialAcceptance::plotRadialAcceptance( TCanvas* cX , int iColor )
 	}
 	if( fAcceptanceFunction )
 	{
-	  //setFunctionPlottingStyle( fAcceptanceFunction, getPlottingColor() );
+		//setFunctionPlottingStyle( fAcceptanceFunction, getPlottingColor() );
 		setFunctionPlottingStyle( fAcceptanceFunction, iColor );
 		fAcceptanceFunction->Draw( "same" );
 	}

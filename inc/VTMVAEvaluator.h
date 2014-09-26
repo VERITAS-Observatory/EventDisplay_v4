@@ -137,7 +137,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		float    fMLR;
 		float    fEmissionHeight;
 		float    fEmissionHeightChi2_log10;
-                unsigned int fEnergyReconstructionMethod;
+		unsigned int fEnergyReconstructionMethod;
 		float    fEChi2S;
 		float    fEChi2S_log10;
 		float    fdES;
@@ -145,10 +145,10 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		float    fTheta2;
 		float    fCoreDist;
 		float    fImages_Ttype[VDST_MAXTELESCOPES];
-                float    fRWidth3D;    //model3D
-                float    fErrRWidth3D; //model3D
-                float    fDepth3D;     //model3D
-                float    fDispDiff;
+		float    fRWidth3D;    //model3D
+		float    fErrRWidth3D; //model3D
+		float    fDepth3D;     //model3D
+		float    fDispDiff;
 		float    fDummy;
 		
 		bool     bPlotEfficiencyPlotsPerBin;
@@ -156,7 +156,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		TH1F*            getEfficiencyHistogram( string iName, TFile* iF, string iMethodTag_2 );
 		double           getMeanEnergyAfterCut( TFile* f, double iCut, unsigned int iDataBin );
 		bool             optimizeSensitivity( unsigned int iDataBin );
-                TGraph*          fillfromGraph2D( TObject *i_G, double i_ze_min, double i_ze_max );
+		TGraph*          fillfromGraph2D( TObject* i_G, double i_ze_min, double i_ze_max );
 		void             fillTMVAEvaluatorResults();
 		unsigned int     getDataBin();
 		unsigned int     getDataBin( double iErec_log10TeV, double iZe );
@@ -167,22 +167,22 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 										  unsigned int iZenithBin, double iZ_min, double iZ_max, string iVariable );
 		vector< string > getTrainingVariables( string iFile, vector< bool >& iSpectator );
 		void             getOptimalAngularContainmentRadius( double effS, double effB, double Ndif, double Nof,
-				         TH2D* iHAngContainment, double iEnergy_log10_TeV,
-				        double& i_Signal_to_sqrtNoise, double& i_AngularContainmentRadius,
-				        double& i_AngularContainmentFraction );
+				TH2D* iHAngContainment, double iEnergy_log10_TeV,
+				double& i_Signal_to_sqrtNoise, double& i_AngularContainmentRadius,
+				double& i_AngularContainmentFraction );
 		void             plotEfficiencyPlotsPerBin( unsigned int iBin,
-				        TGraph* iGSignal_to_sqrtNoise, TGraph* iGSignal_to_sqrtNoise_Smooth,
-				        TH1F* hEffS, TH1F* hEffB,
-				        TGraph* iGSignalEvents, TGraph* iGBackgroundEvents,
-				        TGraph* iGOpt_AngularContainmentRadius, TGraph* iGOpt_AngularContainmentFraction );
-                TGraph*          readNonNoffGraphsFromFile( TFile *iF, double i_ze_min, double i_ze_max, bool bIsOn = true );
+				TGraph* iGSignal_to_sqrtNoise, TGraph* iGSignal_to_sqrtNoise_Smooth,
+				TH1F* hEffS, TH1F* hEffB,
+				TGraph* iGSignalEvents, TGraph* iGBackgroundEvents,
+				TGraph* iGOpt_AngularContainmentRadius, TGraph* iGOpt_AngularContainmentFraction );
+		TGraph*          readNonNoffGraphsFromFile( TFile* iF, double i_ze_min, double i_ze_max, bool bIsOn = true );
 		void             reset();
 		void             smoothAndInterPolateMVAValue( TH1F*, TH1F* );
 		
 	public:
 	
 		VTMVAEvaluator();
-	       ~VTMVAEvaluator() {};
+		~VTMVAEvaluator() {};
 		
 		bool    evaluate();
 		TGraph* getOptimalTheta2Cut_Graph();
@@ -204,7 +204,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 			return fTMVA_EvaluationResult;
 		}
 		bool   initializeWeightFiles( string iWeightFileName, unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
-								      unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax, string iInstrumentEpoch = "noepoch" );
+									  unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax, string iInstrumentEpoch = "noepoch" );
 		bool   initializeDataStrutures( CData* iC );
 		bool   IsZombie()
 		{

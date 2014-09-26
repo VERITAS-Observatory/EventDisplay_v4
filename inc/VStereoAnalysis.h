@@ -101,7 +101,10 @@ class VStereoAnalysis
 		{
 			fNoSkyPlots = iS;
 		}
-                void   setRunExposure( map< int, double > iExpl ) { fRunExposure = iExpl; }
+		void   setRunExposure( map< int, double > iExpl )
+		{
+			fRunExposure = iExpl;
+		}
 		void   setRunMJD( map< int, double > iRunMJD )
 		{
 			fRunMJD = iRunMJD;
@@ -228,7 +231,7 @@ class VStereoAnalysis
 		int     fTreeCTOOLS_GregDay   ;
 		double  fTreeCTOOLS_Acceptance ;
 		VRadialAcceptance* fCTOOLSAcceptance ;
-
+		
 		TTree* fCDataTreeClone ;
 		double  fDeadTimeStorage ;
 		//double fullMJD ;
@@ -300,9 +303,9 @@ class VStereoAnalysis
 		TTree* fDataRunTree;
 		TTree* fDataFrogsTree;
 		TFile* fDataFile;
-                string fInstrumentEpoch;
+		string fInstrumentEpoch;
 		vector< unsigned int > fTelToAnalyze;
-
+		
 		vector< VSkyCoordinates* > fAstro;        //!< Astronomical source parameters for this analysis
 		VGammaHadronCuts* fCuts;                  //!< Parameter Cuts
 		VTimeMask* fTimeMask;                     //!< Time Cuts

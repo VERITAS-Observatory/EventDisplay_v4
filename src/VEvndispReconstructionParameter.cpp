@@ -17,7 +17,7 @@ ClassImp( VEvndispReconstructionParameter )
 VEvndispReconstructionParameter::VEvndispReconstructionParameter()
 {
 	fDebug = false;
-        fNTel_type = 0;
+	fNTel_type = 0;
 	fRunPara = 0;
 	fNMethods = 0;
 }
@@ -43,7 +43,7 @@ VEvndispReconstructionParameter::VEvndispReconstructionParameter( vector< ULong6
 void VEvndispReconstructionParameter::reset()
 {
 	fDebug = false;
-        fNTel_type = 0;
+	fNTel_type = 0;
 	fRunPara = 0;
 	fNMethods = 0;
 }
@@ -543,19 +543,22 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
 		}
 		if( m < fTMVAFileNameVector.size() && fTMVAFileNameVector[m].size() > 0 )
 		{
-                        for( unsigned int ze = 0; ze < fTMVAFileNameVector[m].size(); ze++ )
-                        {
-                            if( fTMVAFileNameVector[m][ze].size() > 0 && fTMVAFileNameVector[m][ze].find( "USE_BDT_METHOD" ) != string::npos )
-                            {
-                                cout << "\t\t TMVA (BDT) file used from method " << fTMVAFileNameVector[m][ze] << endl;
-                            }
-			    else
-			    {
-                                cout << "\t\t TMVA (BDT) file for zenith angle ";
-                                if( m < fMTVAZenithBin.size() && ze < fMTVAZenithBin[m].size() ) cout << fMTVAZenithBin[m][ze] << " deg: ";
-                                cout << fTMVAFileNameVector[m][ze] << endl;
-                            }
-                        }
+			for( unsigned int ze = 0; ze < fTMVAFileNameVector[m].size(); ze++ )
+			{
+				if( fTMVAFileNameVector[m][ze].size() > 0 && fTMVAFileNameVector[m][ze].find( "USE_BDT_METHOD" ) != string::npos )
+				{
+					cout << "\t\t TMVA (BDT) file used from method " << fTMVAFileNameVector[m][ze] << endl;
+				}
+				else
+				{
+					cout << "\t\t TMVA (BDT) file for zenith angle ";
+					if( m < fMTVAZenithBin.size() && ze < fMTVAZenithBin[m].size() )
+					{
+						cout << fMTVAZenithBin[m][ze] << " deg: ";
+					}
+					cout << fTMVAFileNameVector[m][ze] << endl;
+				}
+			}
 		}
 		if( fDispFileName[m].size() > 0 )
 		{
@@ -1064,7 +1067,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				}
 				continue;
 			}
-
+			
 			else if( iTemp == "BRIGHTSTARS" && fRunPara )
 			{
 				fRunPara->fStarCatalogueName = iTemp2;
@@ -1136,24 +1139,24 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 			}
 			
 			/////////////////////////////////////////////////
-                        // check for exit statement
-                        if( iTemp == "EXIT" )
-                        {
-                            return fNMethods;
-                        }
+			// check for exit statement
+			if( iTemp == "EXIT" )
+			{
+				return fNMethods;
+			}
 			// check for non-MC exit statement
-			if( iTemp == "MCONLY" ) 
-                        {
-			    if( !fRunPara->isMC() )
-			    {
-                            	return fNMethods;
-			    }
-			    else
-			    {
-				continue;
-			    }
-                        }
-
+			if( iTemp == "MCONLY" )
+			{
+				if( !fRunPara->isMC() )
+				{
+					return fNMethods;
+				}
+				else
+				{
+					continue;
+				}
+			}
+			
 			
 			/////////////////////////////////////////////////
 			/////////////////////////////////////////////////
@@ -1206,11 +1209,11 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 			}
 			else if( iTemp == "TMVABDTFILE" )
 			{
-                                fMTVAZenithBin[m_temp].push_back( atof( iTemp2.c_str() ) );
-                                if( iTemp3.size() > 0 )
-                                {
-                                    fTMVAFileNameVector[m_temp].push_back( iTemp3 );
-                                }
+				fMTVAZenithBin[m_temp].push_back( atof( iTemp2.c_str() ) );
+				if( iTemp3.size() > 0 )
+				{
+					fTMVAFileNameVector[m_temp].push_back( iTemp3 );
+				}
 			}
 			else if( iTemp == "DISPFILE" )
 			{

@@ -47,7 +47,7 @@ class VOnOff
 		
 	public:
 		VOnOff();
-	       ~VOnOff();
+		~VOnOff();
 		void   doOnOffforParameterHistograms( TList* ipon, TList* ipoff, double i_norm_alpha, bool isCombined );
 		void   doOnOffforSkyHistograms( TList* ipon, TList* ipoff, TH2D* ialpha );
 		void   doQfactors( TList* ion, TList* ioff, double i_norm );
@@ -59,8 +59,8 @@ class VOnOff
 		double getMaxSigmaY();
 		TH1D*  getTheta2()
 		{
-		       return hTheta2_diff;
+			return hTheta2_diff;
 		}
-		void   writeHistograms( TH2D *hSig = 0, TH2D *hSigUC = 0, TH2D *hDiff = 0, TH2D *hDiffUC = 0 );
+		void   writeHistograms( TH2D* hSig = 0, TH2D* hSigUC = 0, TH2D* hDiff = 0, TH2D* hDiffUC = 0 );
 };
 #endif

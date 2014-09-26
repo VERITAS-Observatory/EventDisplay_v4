@@ -45,7 +45,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
 		int fPlotCTARequirementsID;
 		bool fPlotCTARequirementGoals;
 		VCTARequirements* fPlotCTARequirements;
-
+		
 		bool fUseIntegratedSensitivityForOffAxisPlots;
 		
 		// FOM variables
@@ -82,10 +82,10 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
 		{
 			return fData;
 		}
-		bool plotIRF( string iPrint = "", double iEffAreaMin = 50., double iEffAreaMax = 5.e7, double iEnergyResolutionMax = 0.5, TPad *iEffAreaPad = 0, TPad *iAngResPad = 0, TPad *iEResPad = 0 );
+		bool plotIRF( string iPrint = "", double iEffAreaMin = 50., double iEffAreaMax = 5.e7, double iEnergyResolutionMax = 0.5, TPad* iEffAreaPad = 0, TPad* iAngResPad = 0, TPad* iEResPad = 0 );
 		TCanvas* plotProjectedSensitivities( TCanvas*, double iMaxOffset, int iColor = -1 );
-		bool plotSensitivity( string iPrint = "", double iMinSensitivity = 4.e-14, double iMaxSensitivity = 2.5e-10, string iUnit = "ENERGY", TPad *iSensitivityPad = 0, TPad *iSensitivityRatioPad = 0, TPad *iBckPad = 0 );
-		bool plotSensitivityRatio( string iPrint, double ymin = 0.01, double ymax = 2., bool iRatoToGoal = false, TPad *iSensRatio = 0 );
+		bool plotSensitivity( string iPrint = "", double iMinSensitivity = 4.e-14, double iMaxSensitivity = 2.5e-10, string iUnit = "ENERGY", TPad* iSensitivityPad = 0, TPad* iSensitivityRatioPad = 0, TPad* iBckPad = 0 );
+		bool plotSensitivityRatio( string iPrint, double ymin = 0.01, double ymax = 2., bool iRatoToGoal = false, TPad* iSensRatio = 0 );
 		void printSensitivityFigureOfMerit( TGraphAsymmErrors* gSensitivity, double iEmin_TeV = 0.03, double iEmax_TeV = 100., string iAnalysis = "" );
 		void printSensitivityFigureOfMerit( double iEmin_TeV = 0.03, double iEmax_TeV = 100. );
 		void reset();
@@ -108,7 +108,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
 		}
 		void setUseIntegratedSensitivityForOffAxisPlots( bool iUseIntegratedSensitivityForOffAxisPlots = false )
 		{
-		       fUseIntegratedSensitivityForOffAxisPlots = iUseIntegratedSensitivityForOffAxisPlots;
+			fUseIntegratedSensitivityForOffAxisPlots = iUseIntegratedSensitivityForOffAxisPlots;
 		}
 };
 

@@ -68,19 +68,19 @@ void VOnOff::setTitles( TH1* his, string iname, string ititle, string ytitle )
 void VOnOff::createHistograms( TList* ion, TList* il )
 {
 	string itemp;
-        string ihname;
+	string ihname;
 	TIter next_on( ion );
 	while( TH1* hon = ( TH1* )next_on() )
 	{
 		itemp = hon->ClassName();
-                ihname = hon->GetName();
+		ihname = hon->GetName();
 		if( itemp == "TH1D" )
 		{
 			il->Add( new TH1D( *( ( TH1D* )hon ) ) );
 		}
 		else if( itemp == "TH2D" )
 		{
-                        il->Add( new TH2D( *( ( TH2D* )hon ) ) );
+			il->Add( new TH2D( *( ( TH2D* )hon ) ) );
 		}
 		else if( itemp == "TProfile" )
 		{
@@ -223,14 +223,14 @@ void VOnOff::doOnOffforSkyHistograms( TList* ionlist, TList* iofflist, TH2D* ial
 		{
 			cout << "VOnOff::doOnOffforSkyHistograms: error, unknown histogram type " << hTemp->GetName() << "\t" << itemp << endl;
 		}
-                // add histogram to the corresponding list
-                // (we don't want to use alpha histograms)
-                itemp = hTemp->GetName();
-                if( itemp.find( "alpha" ) == string::npos )
-                {
-                    hList->Add( hTemp );
-                    hListSkyHistograms->Add( hTemp );
-                }
+		// add histogram to the corresponding list
+		// (we don't want to use alpha histograms)
+		itemp = hTemp->GetName();
+		if( itemp.find( "alpha" ) == string::npos )
+		{
+			hList->Add( hTemp );
+			hListSkyHistograms->Add( hTemp );
+		}
 	}
 	
 	if( fDebug )
@@ -398,7 +398,7 @@ TH2D* VOnOff::do2DSignificance( TH2D* ion, TH2D* ioff, TH2D* ialpha, string itit
 }
 
 
-void VOnOff::writeHistograms( TH2D* hSig, TH2D* hSigUC, TH2D *hDiff, TH2D *hDiffUC )
+void VOnOff::writeHistograms( TH2D* hSig, TH2D* hSigUC, TH2D* hDiff, TH2D* hDiffUC )
 {
 	TDirectory* iDir = gDirectory;
 	
@@ -427,14 +427,14 @@ void VOnOff::writeHistograms( TH2D* hSig, TH2D* hSigUC, TH2D *hDiff, TH2D *hDiff
 	{
 		hSigUC->Write();
 	}
-        if( hDiff )
-        {
-                hDiff->Write();
-        }
-        if( hDiffUC )
-        {
-                hDiffUC->Write();
-        }
+	if( hDiff )
+	{
+		hDiff->Write();
+	}
+	if( hDiffUC )
+	{
+		hDiffUC->Write();
+	}
 	
 	// write all stereo parameter histograms
 	iDir->cd();
@@ -515,8 +515,11 @@ void VOnOff::fill1DSignificanceHistogram( double rmax )
 	h1Dsig->SetXTitle( "significance" );
 	h1Dsig->SetYTitle( "entries" );
 	hList->Add( h1Dsig );
-
-        if( !hmap_stereo_sig ) return;
+	
+	if( !hmap_stereo_sig )
+	{
+		return;
+	}
 	
 	double ir = 0.;
 	for( int j = 0; j < hmap_stereo_sig->GetNbinsX(); j++ )

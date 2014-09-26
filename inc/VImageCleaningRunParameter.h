@@ -36,8 +36,8 @@ class VImageCleaningRunParameter
 		
 		
 		// time two-level
-		double ftimediff;                 // parameter for time constraint between next neighbor pixels 
-
+		double ftimediff;                 // parameter for time constraint between next neighbor pixels
+		
 		VImageCleaningRunParameter();
 		~VImageCleaningRunParameter() {};
 		

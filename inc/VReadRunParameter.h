@@ -44,7 +44,7 @@ class VReadRunParameter
 		bool checkSecondArgument( std::string, std::string, bool );
 		void isCompiledWithDB();
 		bool getRunParametersFromDST();
-                bool readEpochsAndAtmospheres();
+		bool readEpochsAndAtmospheres();
 		bool readTrigSimInputCard( TString card );
 		void setDirectories();
 		

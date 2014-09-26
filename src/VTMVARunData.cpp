@@ -93,87 +93,87 @@ bool VTMVARunData::openDataFiles()
 	///////////////////////////////////////////////////////////////////
 	// check how many events there are in signal and background trees (after cuts)
 	
-        if( fMinSignalEvents > 0 && fMinBackgroundEvents > 0 )
-        {
-            TEntryList* i_j_SignalList = 0;
-            TEntryList* i_j_BackgroundList = 0;
-            bool iEnoughEvents = true;
-        
-            // loop over all energy and zenith bins
-            for( unsigned int i = 0; i < fEnergyCutData.size(); i++ )
-            {
-                    for( unsigned int j = 0; j < fZenithCutData.size(); j++ )
-                    {
-                            if( fMinSignalEvents > 0 )
-                            {
-                                for( unsigned int k = 0; k < fSignalTree.size(); k++ )
-                                {
-                                        if( fSignalTree[k] )
-                                        {
-                                                fSignalTree[k]->Draw( ">>+signalList", fQualityCuts && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut && fZenithCutData[j]->fZenithCut, "entrylist" );
-                                                i_j_SignalList = ( TEntryList* )gDirectory->Get( "signalList" );
-                                        }
-                                }
-                                
-                                if( i_j_SignalList )
-                                {
-                                        cout << "number of signal events in energy bin " << i << " zenith bin " << j << ": ";
-                                        cout << i_j_SignalList->GetN() << "\t required > " << fMinSignalEvents << endl;
-                                        cout << "  (cuts are " << fQualityCuts << "&&" << fMCxyoffCut;
-                                        cout << "&&" << fEnergyCutData[i]->fEnergyCut  << "&&" << fZenithCutData[j]->fZenithCut << ")" << endl;
-                                        if( i_j_SignalList->GetN() < fMinSignalEvents )
-                                        {
-                                                iEnoughEvents = false;
-                                        }
-                                        i_j_SignalList->Reset();
-                                }
-                            }
-                            // background events
-                            if( fMinBackgroundEvents > 0 )
-                            {
-                                for( unsigned int k = 0; k < fBackgroundTree.size(); k++ )
-                                {
-                                  if( fMCxyoffCutSignalOnly ) // Do we need this?
-                                        {
-                                            fBackgroundTree[k]->Draw( ">>+BackgroundList", fQualityCuts && fQualityCutsBkg && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut && fZenithCutData[j]->fZenithCut, "entrylist" );
-                                                i_j_BackgroundList = ( TEntryList* )gDirectory->Get( "BackgroundList" );
-                                        }
-                                  else if( fBackgroundTree[k] )
-                                        {
-                                                fBackgroundTree[k]->Draw( ">>+BackgroundList", fQualityCuts && fQualityCutsBkg && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut && fZenithCutData[j]->fZenithCut, "entrylist" );
-                                                i_j_BackgroundList = ( TEntryList* )gDirectory->Get( "BackgroundList" );
-                                        }
-                                }
-                                if( i_j_BackgroundList )
-                                {
-                                        cout << "number of background events in energy bin " << i <<  " zenith bin " << j << ": ";
-                                        cout << i_j_BackgroundList->GetN();
-                                        cout << "\t required > " << fMinBackgroundEvents << endl;
-                                        cout << "  (cuts are " << fQualityCuts << "&&" << fQualityCutsBkg << "&&" << fMCxyoffCut;
-                                        if( fMCxyoffCutSignalOnly ) // Do we need this?
-                                          {
-                                                cout << " (signal only) " ;
-                                          }
-                                        cout << "&&" << fEnergyCutData[i]->fEnergyCut  << "&&" << fZenithCutData[j]->fZenithCut << ")" << endl;
-                                        if( i_j_BackgroundList->GetN() < fMinBackgroundEvents )
-                                        {
-                                                iEnoughEvents = false;
-                                        }
-                                        i_j_BackgroundList->Reset();
-                                }
-                           }
-                    }
-            } 
-            if( !iEnoughEvents )
-            {
-                    cout << endl;
-                    cout << "ERROR: not enough signal or/and background events" << endl;
-                    cout << "please adjust energy intervals " << endl;
-                    cout << "exiting..." << endl;
-                    exit( EXIT_FAILURE );
-            }
-        }    
-            
+	if( fMinSignalEvents > 0 && fMinBackgroundEvents > 0 )
+	{
+		TEntryList* i_j_SignalList = 0;
+		TEntryList* i_j_BackgroundList = 0;
+		bool iEnoughEvents = true;
+		
+		// loop over all energy and zenith bins
+		for( unsigned int i = 0; i < fEnergyCutData.size(); i++ )
+		{
+			for( unsigned int j = 0; j < fZenithCutData.size(); j++ )
+			{
+				if( fMinSignalEvents > 0 )
+				{
+					for( unsigned int k = 0; k < fSignalTree.size(); k++ )
+					{
+						if( fSignalTree[k] )
+						{
+							fSignalTree[k]->Draw( ">>+signalList", fQualityCuts && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut && fZenithCutData[j]->fZenithCut, "entrylist" );
+							i_j_SignalList = ( TEntryList* )gDirectory->Get( "signalList" );
+						}
+					}
+					
+					if( i_j_SignalList )
+					{
+						cout << "number of signal events in energy bin " << i << " zenith bin " << j << ": ";
+						cout << i_j_SignalList->GetN() << "\t required > " << fMinSignalEvents << endl;
+						cout << "  (cuts are " << fQualityCuts << "&&" << fMCxyoffCut;
+						cout << "&&" << fEnergyCutData[i]->fEnergyCut  << "&&" << fZenithCutData[j]->fZenithCut << ")" << endl;
+						if( i_j_SignalList->GetN() < fMinSignalEvents )
+						{
+							iEnoughEvents = false;
+						}
+						i_j_SignalList->Reset();
+					}
+				}
+				// background events
+				if( fMinBackgroundEvents > 0 )
+				{
+					for( unsigned int k = 0; k < fBackgroundTree.size(); k++ )
+					{
+						if( fMCxyoffCutSignalOnly ) // Do we need this?
+						{
+							fBackgroundTree[k]->Draw( ">>+BackgroundList", fQualityCuts && fQualityCutsBkg && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut && fZenithCutData[j]->fZenithCut, "entrylist" );
+							i_j_BackgroundList = ( TEntryList* )gDirectory->Get( "BackgroundList" );
+						}
+						else if( fBackgroundTree[k] )
+						{
+							fBackgroundTree[k]->Draw( ">>+BackgroundList", fQualityCuts && fQualityCutsBkg && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut && fZenithCutData[j]->fZenithCut, "entrylist" );
+							i_j_BackgroundList = ( TEntryList* )gDirectory->Get( "BackgroundList" );
+						}
+					}
+					if( i_j_BackgroundList )
+					{
+						cout << "number of background events in energy bin " << i <<  " zenith bin " << j << ": ";
+						cout << i_j_BackgroundList->GetN();
+						cout << "\t required > " << fMinBackgroundEvents << endl;
+						cout << "  (cuts are " << fQualityCuts << "&&" << fQualityCutsBkg << "&&" << fMCxyoffCut;
+						if( fMCxyoffCutSignalOnly ) // Do we need this?
+						{
+							cout << " (signal only) " ;
+						}
+						cout << "&&" << fEnergyCutData[i]->fEnergyCut  << "&&" << fZenithCutData[j]->fZenithCut << ")" << endl;
+						if( i_j_BackgroundList->GetN() < fMinBackgroundEvents )
+						{
+							iEnoughEvents = false;
+						}
+						i_j_BackgroundList->Reset();
+					}
+				}
+			}
+		}
+		if( !iEnoughEvents )
+		{
+			cout << endl;
+			cout << "ERROR: not enough signal or/and background events" << endl;
+			cout << "please adjust energy intervals " << endl;
+			cout << "exiting..." << endl;
+			exit( EXIT_FAILURE );
+		}
+	}
+	
 	///////////////////////////////////////////////////////////////////
 	// open output file
 	cout << "output file name size " << fOutputFileName.size() << endl;
@@ -190,22 +190,22 @@ bool VTMVARunData::openDataFiles()
 				if( fEnergyCutData.size() > 1 && fZenithCutData.size() > 1 )
 				{
 					iTempS << fOutputDirectoryName << "/" << fOutputFileName << "_" << i << "_" << j << ".root";    // append a _# at the file name
-                                        iTempS2 << fOutputFileName << "_" << i << "_" << j;
+					iTempS2 << fOutputFileName << "_" << i << "_" << j;
 				}
-				else if( fEnergyCutData.size() > 1 && fZenithCutData.size() <= 1)
+				else if( fEnergyCutData.size() > 1 && fZenithCutData.size() <= 1 )
 				{
-				        iTempS << fOutputDirectoryName << "/" << fOutputFileName << "_" << i << ".root";    // append a _# at the file name
-                                        iTempS2 << fOutputFileName << "_" << i;
+					iTempS << fOutputDirectoryName << "/" << fOutputFileName << "_" << i << ".root";    // append a _# at the file name
+					iTempS2 << fOutputFileName << "_" << i;
 				}
-				else if( fZenithCutData.size() > 1 &&  fEnergyCutData.size() <= 1)
+				else if( fZenithCutData.size() > 1 &&  fEnergyCutData.size() <= 1 )
 				{
 					iTempS << fOutputDirectoryName << "/" << fOutputFileName << "_0_" << j << ".root";    // append a _# at the file name
-                                        iTempS2 << fOutputFileName << "_0_" << i;
+					iTempS2 << fOutputFileName << "_0_" << i;
 				}
 				else
 				{
 					iTempS << fOutputDirectoryName << "/" << fOutputFileName << ".root";
-                                        iTempS2 << fOutputFileName;
+					iTempS2 << fOutputFileName;
 				}
 				output_zenith.push_back( new TFile( iTempS.str().c_str(), "RECREATE" ) );
 				if( output_zenith.back()->IsZombie() )
@@ -214,7 +214,7 @@ bool VTMVARunData::openDataFiles()
 					cout << "aborting..." << endl;
 					return false;
 				}
-                                output_zenith.back()->SetTitle( iTempS2.str().c_str() );
+				output_zenith.back()->SetTitle( iTempS2.str().c_str() );
 				if( fEnergyCutData[i] )
 				{
 					fEnergyCutData[i]->Write();
@@ -601,7 +601,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				vector< double > iEnergyCut_Log10TeV_max;
 				vector< TCut > iEnergyCut;
 				
-                                // energy reconstruction method (should be 1, unless you know it better)
+				// energy reconstruction method (should be 1, unless you know it better)
 				unsigned int iEMethod;
 				if( !is_stream.eof() )
 				{
@@ -621,7 +621,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				if( iEnergyCut_Log10TeV_min.size() < 2 )
 				{
 					cout << cout << "VTMVARunData::readConfigurationFile error: need at least two energy bins " << iEnergyCut_Log10TeV_min.size() << endl;
-                                        return false;
+					return false;
 				}
 				// fill maximum bins
 				for( unsigned int i = 1; i < iEnergyCut_Log10TeV_min.size(); i++ )
@@ -677,7 +677,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				if( iZenithCut_min.size() < 2 )
 				{
 					cout << cout << "VTMVARunData::readConfigurationFile error: need at least one zenith bin " << iZenithCut_min.size() << endl;
-                                        return false;
+					return false;
 				}
 				// fill maximum bins
 				for( unsigned int i = 1; i < iZenithCut_min.size(); i++ )

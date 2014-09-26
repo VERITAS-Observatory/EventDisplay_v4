@@ -441,9 +441,9 @@ TCanvas* VPlotCTAArrayLayout::plot_array( string iname, double xmax, double ymax
 	}
 	if( iPrintCanvas.size() > 0 )
 	{
-	    sprintf( hname, "%s.%s", iname.c_str(), iPrintCanvas.c_str() );
-	    c->Print( hname );
-        }
+		sprintf( hname, "%s.%s", iname.c_str(), iPrintCanvas.c_str() );
+		c->Print( hname );
+	}
 	
 	return c;
 }

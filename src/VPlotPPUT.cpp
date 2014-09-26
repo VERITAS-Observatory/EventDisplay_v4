@@ -50,7 +50,7 @@ void VPlotPPUT::getMergedFigureOfMerits( VSiteData* iSite, float* fom, float* fo
 	b.printSensitivityFigureOfMerit( iGraphSensitivity, f_pput_Energy_linTeV_min, f_pput_Energy_linTeV_max, iSite->fSiteName );
 	*fom = b.getSensitivityFOM();
 	*fom_error = b.getSensitivityFOM_error();
-
+	
 	cout << iSite->fSiteName << "\t" << iDirectionString << "\t PPUT: " << *fom << "+-" << *fom_error <<  endl;
 	
 }

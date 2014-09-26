@@ -176,14 +176,14 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		int    fEnergyEffectiveAreaSmoothingIterations;
 		double fEnergyEffectiveAreaSmoothingThreshold;
 		vector< double > fMCZe;                   // zenith angle intervall for Monte Carlo
-
-                // dead time calculation method
-                int  fDeadTimeCalculationMethod;
+		
+		// dead time calculation method
+		int  fDeadTimeCalculationMethod;
 		
 		bool fWriteAllGammaToTree ; // WRITEALLGAMMATOTREE
 		int f2DAcceptanceMode ; // USE2DACCEPTANCE
 		bool fWriteEventTreeForCtools ; // WRITEEVENTTREEFORCTOOLS
-
+		
 		// advanced analysis codes
 		bool fModel3D;
 		bool fDirectionModel3D;

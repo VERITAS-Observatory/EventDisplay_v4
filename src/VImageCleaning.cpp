@@ -179,63 +179,78 @@ void VImageCleaning::cleanImagePedvars( double hithresh, double lothresh, double
 */
 void VImageCleaning::cleanImagePedvarsTimeDiff( double hithresh, double lothresh, double brightthresh, double timediff )
 {
-    if( fData->getDebugFlag() ) cout << "VImageCleaning::cleanImagePedvarsTimeDiff " << fData->getTelID() << endl;
-
-    fData->setImage( false );
-    fData->setBorder( false );
-    fData->setBrightNonImage( false );
-    fData->setImageBorderNeighbour( false );
-    unsigned int i_nchannel = fData->getNChannels();
-    double i_pedvars_i = 0.;
-    double i_pedvars_k = 0.;
-    double i_pedvars_l = 0.;
-    unsigned int k = 0;
-    unsigned int l = 0;
-
-    for ( unsigned int i = 0; i < i_nchannel; i++)
-    {
-        if (fData->getDetectorGeo()->getAnaPixel()[i] < 1 || fData->getDead(fData->getHiLo()[i])[i]) continue;
-        i_pedvars_i = fData->getPedvars( fData->getCurrentSumWindow()[i], fData->getHiLo()[i])[i];
-
-        if( fData->getSums()[i] > hithresh * i_pedvars_i )
-        {
-          for( unsigned int z = 0; z < fData->getDetectorGeo()->getNNeighbours()[i]; z++ )
-            {
-	    l = fData->getDetectorGeo()->getNeighbours()[i][z];
-	     if( l < i_nchannel )
-                {
-                  i_pedvars_l = fData->getPedvars( fData->getCurrentSumWindow()[l], fData->getHiLo()[l])[l];
-		  if( fData->getSums()[l] > lothresh * i_pedvars_l  &&  fabs( fData->getTZeros()[i] - fData->getTZeros()[l] ) < timediff ) fData->setImage( i, true );
-                }
-	    fData->setBorder( i, false );
-            for( unsigned int j = 0; j < fData->getDetectorGeo()->getNNeighbours()[i]; j++ )
-            {
-                k = fData->getDetectorGeo()->getNeighbours()[i][j];
-                if( k < i_nchannel )
-                {
-                    i_pedvars_k = fData->getPedvars( fData->getCurrentSumWindow()[k], fData->getHiLo()[k])[k];
-                    if( !fData->getImage()[k] && fData->getSums()[k] > lothresh * i_pedvars_k  &&  fabs( fData->getTZeros()[i] - fData->getTZeros()[k] ) < timediff ) fData->setBorder( k, true );
-                }
-            }
-	    }
-        }
-        if( fData->getSums()[i] > brightthresh  * i_pedvars_i ) fData->setBrightNonImage( i, true );
-    }
-
-// (preli) set the trigger vector in MC case (preli)
-// trigger vector are image/border tubes
-    if( fData->getReader() )
-    {
-       if( fData->getReader()->getDataFormatNum() == 1 || fData->getReader()->getDataFormatNum() == 4 
-        || fData->getReader()->getDataFormatNum() == 6 )
+	if( fData->getDebugFlag() )
 	{
-	   fData->getReader()->setTrigger( fData->getImage(), fData->getBorder() );
-        }
-    }
-// (end of preli)
-
-    recoverImagePixelNearDeadPixel();
-    fillImageBorderNeighbours();
+		cout << "VImageCleaning::cleanImagePedvarsTimeDiff " << fData->getTelID() << endl;
+	}
+	
+	fData->setImage( false );
+	fData->setBorder( false );
+	fData->setBrightNonImage( false );
+	fData->setImageBorderNeighbour( false );
+	unsigned int i_nchannel = fData->getNChannels();
+	double i_pedvars_i = 0.;
+	double i_pedvars_k = 0.;
+	double i_pedvars_l = 0.;
+	unsigned int k = 0;
+	unsigned int l = 0;
+	
+	for( unsigned int i = 0; i < i_nchannel; i++ )
+	{
+		if( fData->getDetectorGeo()->getAnaPixel()[i] < 1 || fData->getDead( fData->getHiLo()[i] )[i] )
+		{
+			continue;
+		}
+		i_pedvars_i = fData->getPedvars( fData->getCurrentSumWindow()[i], fData->getHiLo()[i] )[i];
+		
+		if( fData->getSums()[i] > hithresh * i_pedvars_i )
+		{
+			for( unsigned int z = 0; z < fData->getDetectorGeo()->getNNeighbours()[i]; z++ )
+			{
+				l = fData->getDetectorGeo()->getNeighbours()[i][z];
+				if( l < i_nchannel )
+				{
+					i_pedvars_l = fData->getPedvars( fData->getCurrentSumWindow()[l], fData->getHiLo()[l] )[l];
+					if( fData->getSums()[l] > lothresh * i_pedvars_l  &&  fabs( fData->getTZeros()[i] - fData->getTZeros()[l] ) < timediff )
+					{
+						fData->setImage( i, true );
+					}
+				}
+				fData->setBorder( i, false );
+				for( unsigned int j = 0; j < fData->getDetectorGeo()->getNNeighbours()[i]; j++ )
+				{
+					k = fData->getDetectorGeo()->getNeighbours()[i][j];
+					if( k < i_nchannel )
+					{
+						i_pedvars_k = fData->getPedvars( fData->getCurrentSumWindow()[k], fData->getHiLo()[k] )[k];
+						if( !fData->getImage()[k] && fData->getSums()[k] > lothresh * i_pedvars_k  &&  fabs( fData->getTZeros()[i] - fData->getTZeros()[k] ) < timediff )
+						{
+							fData->setBorder( k, true );
+						}
+					}
+				}
+			}
+		}
+		if( fData->getSums()[i] > brightthresh  * i_pedvars_i )
+		{
+			fData->setBrightNonImage( i, true );
+		}
+	}
+	
+	// (preli) set the trigger vector in MC case (preli)
+	// trigger vector are image/border tubes
+	if( fData->getReader() )
+	{
+		if( fData->getReader()->getDataFormatNum() == 1 || fData->getReader()->getDataFormatNum() == 4
+				|| fData->getReader()->getDataFormatNum() == 6 )
+		{
+			fData->getReader()->setTrigger( fData->getImage(), fData->getBorder() );
+		}
+	}
+	// (end of preli)
+	
+	recoverImagePixelNearDeadPixel();
+	fillImageBorderNeighbours();
 }
 
 //*****************************************************************************************************

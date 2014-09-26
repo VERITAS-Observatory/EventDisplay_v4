@@ -122,7 +122,10 @@ int  VDB_Connection::Get_Nb_Connection()
 	{
 		fNumb_Connection = f_db->Query( "show processlist" )->GetRowCount();
 	}
-	else return -111;
+	else
+	{
+		return -111;
+	}
 	
 	return fNumb_Connection;
 	

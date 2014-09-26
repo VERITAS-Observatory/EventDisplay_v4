@@ -44,26 +44,26 @@ class VCalibrator : public VImageBaseAnalyzer
 		vector<TProfile* > htcpulse;
 		vector<TH1F* > htoff;
 		vector<TProfile* > htoff_vs_sum;
-
+		
 		//Extra calib output.
-		TTree * tExtra_ChargeTree;
-		vector<double> * fExtra_sum;
-		vector<double> * fExtra_tzero;
-		vector<short> * fExtra_HiLo;
-		vector<short> * fExtra_sumfirst;
-		vector<short> * fExtra_sumwindow;
-		vector<short> * fExtra_dead;
-		vector<short> * fExtra_use;
-		vector<double> * fExtra_ped;
-		vector<double> * fExtra_pedVar;
+		TTree* tExtra_ChargeTree;
+		vector<double>* fExtra_sum;
+		vector<double>* fExtra_tzero;
+		vector<short>* fExtra_HiLo;
+		vector<short>* fExtra_sumfirst;
+		vector<short>* fExtra_sumwindow;
+		vector<short>* fExtra_dead;
+		vector<short>* fExtra_use;
+		vector<double>* fExtra_ped;
+		vector<double>* fExtra_pedVar;
 		double fExtra_QMon;
 		double fExtra_TZeroMon;
-		int fExtra_nHiLo;	
-		int fExtra_nMon;	
-		int fExtra_nPix;	
+		int fExtra_nHiLo;
+		int fExtra_nMon;
+		int fExtra_nPix;
 		int fExtra_eventNumber;
-			
-
+		
+		
 		// average Tzero calculation
 		vector< TFile* > fTZeroOutFile;
 		// one histogram per telescope and channel

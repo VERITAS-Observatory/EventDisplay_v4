@@ -88,7 +88,7 @@ class VStereoMaps
 		double fRE_roffTemp;                      //!< radius of off source region
 		
 		bool fill_ReflectedRegionModel( double, double, int, bool );
-		bool fill_ReflectedRegionModel( double, double, int, bool, double &i_theta2 );
+		bool fill_ReflectedRegionModel( double, double, int, bool, double& i_theta2 );
 		void RE_getAlpha( bool iIsOn );
 		bool initialize_ReflectedRegionModel();
 		void initialize_ReflectedRegionHistograms();
@@ -116,10 +116,10 @@ class VStereoMaps
 		bool   defineAcceptance();
 		//!< return if event is in on region
 		bool   fillOn( double x_sky, double y_sky, double ze, double erec, int irun, bool ishapecuts );
-		bool   fillOn( double x_sky, double y_sky, double ze, double erec, int irun, bool ishapecuts, double &i_theta2 );
+		bool   fillOn( double x_sky, double y_sky, double ze, double erec, int irun, bool ishapecuts, double& i_theta2 );
 		//!< return if event is in off region
 		bool   fillOff( double x_sky, double y_sky, double ze, double erec, int irun, bool ishapecuts );
-		bool   fillOff( double x_sky, double y_sky, double ze, double erec, int irun, bool ishapecuts, double &i_theta2 );
+		bool   fillOff( double x_sky, double y_sky, double ze, double erec, int irun, bool ishapecuts, double& i_theta2 );
 		double phiInt( double );
 		
 	public:
@@ -132,7 +132,7 @@ class VStereoMaps
 		
 		void              calculateTheta2( bool, double, double );
 		bool              fill( bool is_on, double x_sky, double y_sky, double theta2CutMax, double ze,
-										double erec, int irun, bool ishapecuts, double &i_theta2 );
+								double erec, int irun, bool ishapecuts, double& i_theta2 );
 		void              finalize( bool iIsOn , double OnOff_Alpha = 1.0 );
 		VRadialAcceptance*      getAcceptance()
 		{

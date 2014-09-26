@@ -94,7 +94,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		// cut selector
 		int fGammaHadronCutSelector;                            // see description at beginning of VGammaHadronCuts.cpp
 		int fDirectionCutSelector;
-                E_AnalysisType fAnalysisType;
+		E_AnalysisType fAnalysisType;
 		
 		// array characteristics (number of telescopes, centre of array)
 		unsigned int fNTel;
@@ -103,9 +103,9 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		
 		// number of possible telescope combinations
 		unsigned int fNLTrigs;
-
-                // telescope used in analysis (optional)
-                vector< unsigned int > fTelToAnalyze;
+		
+		// telescope used in analysis (optional)
+		vector< unsigned int > fTelToAnalyze;
 		
 		// values calculated from shower/image parameter
 		double fMeanImageDistance;
@@ -162,29 +162,29 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		//////////////////////////
 		// FROGS
 		string  fFileNameFrogsCut;
-
+		
 		//////////////////////////
-                // energy dependent cuts
-                map< string, TGraph* > fEnergyDependentCut;
-		 
+		// energy dependent cuts
+		map< string, TGraph* > fEnergyDependentCut;
+		
 		// cut statistics
 		VGammaHadronCutsStatistics* fStats;                       //!
 		
 		bool   applyProbabilityCut( int i, bool fIsOn );
 		bool   applyFrogsCut( int i, bool fIsOn );
 		bool   applyModel3DCut( int i, bool fIsOn );
-                double getEnergyDependentCut( double energy_TeV, TGraph *iG, bool bUseEvalue = true, bool bMaxCut = true );
-                TGraph* getEnergyDependentCut( string iCutName );
-                bool   getEnergyDependentCutFromFile( string iFileName, string iVariable );
-                double getMeanGoodness( double, double, double, double, int );
+		double getEnergyDependentCut( double energy_TeV, TGraph* iG, bool bUseEvalue = true, bool bMaxCut = true );
+		TGraph* getEnergyDependentCut( string iCutName );
+		bool   getEnergyDependentCutFromFile( string iFileName, string iVariable );
+		double getMeanGoodness( double, double, double, double, int );
 		bool   initAngularResolutionFile();
 		bool   initPhaseCuts( int irun );
 		bool   initPhaseCuts( string iDir );
 		bool   initProbabilityCuts( int irun );
 		bool   initProbabilityCuts( string iDir );
 		bool   initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_Emin, unsigned int iTMVAWeightFileIndex_Emax, unsigned int iTMVAWeightFileIndex_Zmin, unsigned int iTMVAWeightFileIndex_Zmax );
-                string getTelToAnalyzeString();
-
+		string getTelToAnalyzeString();
+		
 		
 		////////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////
@@ -296,13 +296,13 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		{
 			return fArrayCentre_Y;
 		}
-                double getReconstructedEnergy( unsigned int iEnergyReconstructionMethod = 0 );
-                double getReconstructedEnergyChi2( unsigned int iEnergyReconstructionMethod = 0 );
-                double getReconstructedEnergydE( unsigned int iEnergyReconstructionMethod = 0. );
-                double getReconstructedXoff();
-                double getReconstructedYoff();
-                double getReconstructedXcore();
-                double getReconstructedYcore();
+		double getReconstructedEnergy( unsigned int iEnergyReconstructionMethod = 0 );
+		double getReconstructedEnergyChi2( unsigned int iEnergyReconstructionMethod = 0 );
+		double getReconstructedEnergydE( unsigned int iEnergyReconstructionMethod = 0. );
+		double getReconstructedXoff();
+		double getReconstructedYoff();
+		double getReconstructedXcore();
+		double getReconstructedYcore();
 		int    getDirectionCutSelector()
 		{
 			return fDirectionCutSelector;
@@ -357,12 +357,12 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		double getTheta2Cut_max( double e );                           // get theta2 max cut (might be energy dependent)    [TeV] energy (linear)
 		TGraph* getTheta2Cut_TMVA_max()
 		{
-                        return getEnergyDependentCut( "TMVABoxCut_Theta2_max" );
+			return getEnergyDependentCut( "TMVABoxCut_Theta2_max" );
 		}
 		TGraph* getTheta2Cut_IRF_Max()
 		{
-                        return getEnergyDependentCut( "IRFAngRes" );
-                }
+			return getEnergyDependentCut( "IRFAngRes" );
+		}
 		double getTMVA_EvaluationResult()
 		{
 			return fTMVA_EvaluationResult;
@@ -387,7 +387,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			}
 		}
 		void   printDirectionCuts();
-                void   printEnergyDependentCuts();
+		void   printEnergyDependentCuts();
 		void   printSignalEfficiency();
 		void   printTMVA_MVACut();
 		bool   readCuts( string i_cutfilename, int iPrint = 1 );
@@ -424,27 +424,27 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			fArrayCentre_X = iX;
 			fArrayCentre_Y = iY;
 		}
-                void   setTelToAnalyze( vector< unsigned int > iTelToAnalyze )
-                {
-                        fTelToAnalyze = iTelToAnalyze;
-                }
+		void   setTelToAnalyze( vector< unsigned int > iTelToAnalyze )
+		{
+			fTelToAnalyze = iTelToAnalyze;
+		}
 		void   setTheta2Cut( double it2 )
 		{
 			fCut_Theta2_max = it2;
 		}
 		void   terminate();
-                bool   useModel3DCuts()
-                {
-                       return (fAnalysisType == MODEL3D);
-                }
-                bool   useFrogsCuts()
-                {
-                       return (fAnalysisType == FROGS);
-                }
-                bool   useTMVACuts()
-                {
-                       return (fAnalysisType == MVAAnalysis);
-                }
+		bool   useModel3DCuts()
+		{
+			return ( fAnalysisType == MODEL3D );
+		}
+		bool   useFrogsCuts()
+		{
+			return ( fAnalysisType == FROGS );
+		}
+		bool   useTMVACuts()
+		{
+			return ( fAnalysisType == MVAAnalysis );
+		}
 		bool   useOrbitalPhaseCuts()
 		{
 			return fUseOrbitalPhaseCuts;

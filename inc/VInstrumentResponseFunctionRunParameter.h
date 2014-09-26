@@ -34,8 +34,8 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
 		unsigned int    fFillingMode;              // filling mode
 		
 		string          fCutFileName;
-                string          fInstrumentEpoch;
-                vector< unsigned int > fTelToAnalyse;             // telescopes used in analysis (optional, not always filled)
+		string          fInstrumentEpoch;
+		vector< unsigned int > fTelToAnalyse;             // telescopes used in analysis (optional, not always filled)
 		int             fGammaHadronCutSelector;
 		int             fDirectionCutSelector;
 		

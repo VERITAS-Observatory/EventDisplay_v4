@@ -71,7 +71,7 @@ class VTMVARunData : public TNamed
 		TCut              fQualityCuts;
 		TCut              fQualityCutsBkg;
 		TCut              fMCxyoffCut;
-                bool              fMCxyoffCutSignalOnly;
+		bool              fMCxyoffCutSignalOnly;
 		string            fPrepareTrainingOptions;
 		vector< VTMVARunDataEnergyCut* > fEnergyCutData;
 		vector< VTMVARunDataZenithCut* > fZenithCutData;

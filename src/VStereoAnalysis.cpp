@@ -430,8 +430,8 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	double iErec = 0.;
 	double iErecChi2 = 0.;
 	double iPedVar_temp = 0.;
-        double iXoff = 0.;
-        double iYoff = 0.;
+	double iXoff = 0.;
+	double iYoff = 0.;
 	// for time-check save old-time and new-time
 	double oldtime = 0.;
 	double newtime = 0.;
@@ -509,12 +509,12 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			}
 			
 			// get energy (depending on energy reconstruction method)
-                        iErec = fCuts->getReconstructedEnergy( fRunPara->fEnergyReconstructionMethod );
-                        iErecChi2 = fCuts->getReconstructedEnergyChi2( fRunPara->fEnergyReconstructionMethod );
-                        // get shower direction (depending on shower reconstruction method)
-                        iXoff = fCuts->getReconstructedXoff();
-                        iYoff = fCuts->getReconstructedYoff();
-
+			iErec = fCuts->getReconstructedEnergy( fRunPara->fEnergyReconstructionMethod );
+			iErecChi2 = fCuts->getReconstructedEnergyChi2( fRunPara->fEnergyReconstructionMethod );
+			// get shower direction (depending on shower reconstruction method)
+			iXoff = fCuts->getReconstructedXoff();
+			iYoff = fCuts->getReconstructedYoff();
+			
 			////////////////////////////////////////////////
 			// apply all quality cuts
 			//
@@ -535,7 +535,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			fHisto[fHisCounter]->hImagePatternBeforeCuts->Fill( fDataRun->ImgSel );
 			
 			// direction offset
-			iDirectionOffset = sqrt(iXoff*iXoff + iYoff*iYoff );
+			iDirectionOffset = sqrt( iXoff * iXoff + iYoff * iYoff );
 			
 			// derotate coordinates
 			getDerotatedCoordinates( icounter, i_UTC, iXoff, fEVDVersionSign * iYoff,  i_xderot, i_yderot );
@@ -916,12 +916,12 @@ void VStereoAnalysis::writeDebugHistograms()
 */
 void VStereoAnalysis::scaleAlpha( TH2D* halpha_on, bool bUC )
 {
-        if( fIsOn )
-        {
-             cout << "VStereoAnalysis::scaleAlpha() error: this function should only be called for OFF stereo analysis" << endl;
-             cout << "(this must be a coding error, please report)" << endl;
-             exit( EXIT_FAILURE );
-        }
+	if( fIsOn )
+	{
+		cout << "VStereoAnalysis::scaleAlpha() error: this function should only be called for OFF stereo analysis" << endl;
+		cout << "(this must be a coding error, please report)" << endl;
+		exit( EXIT_FAILURE );
+	}
 	TH2D* halpha_off = 0;
 	TH2D* hmap_alphaNorm = 0;
 	// uncorrelated maps
@@ -962,22 +962,22 @@ void VStereoAnalysis::scaleAlpha( TH2D* halpha_on, bool bUC )
 	// halpha_on: on alpha histogram
 	// halpha_off: off alpha histogram
 	// hmap_alphaNorm: alpha histogram used in significance calculations (alphaNorm)
-        // (this is slightly different for average alpha calculation)
-        for( int i = 1; i <= halpha_off->GetNbinsX(); i++ )
-        {
-               for( int j = 1; j <= halpha_off->GetNbinsY(); j++ )
-               {
-                       if( halpha_off->GetBinContent( i, j ) > 0. )
-                       {
-                               // this one is used for the sky maps
-                               hmap_alphaNorm->SetBinContent( i, j, halpha_on->GetBinContent( i, j ) / halpha_off->GetBinContent( i, j ) );
-                       }
-                       else
-                       {
-                               hmap_alphaNorm->SetBinContent( i, j, 0. );
-                       }
-               }
-        }
+	// (this is slightly different for average alpha calculation)
+	for( int i = 1; i <= halpha_off->GetNbinsX(); i++ )
+	{
+		for( int j = 1; j <= halpha_off->GetNbinsY(); j++ )
+		{
+			if( halpha_off->GetBinContent( i, j ) > 0. )
+			{
+				// this one is used for the sky maps
+				hmap_alphaNorm->SetBinContent( i, j, halpha_on->GetBinContent( i, j ) / halpha_off->GetBinContent( i, j ) );
+			}
+			else
+			{
+				hmap_alphaNorm->SetBinContent( i, j, 0. );
+			}
+		}
+	}
 }
 
 
@@ -993,7 +993,7 @@ double VStereoAnalysis::combineHistograms()
 	TDirectory* iDir = gDirectory;
 	fDirTot->cd();
 	fHistoTot->defineHistograms();
-
+	
 	// list of trees with selected events
 	iDir->cd();
 	
@@ -1004,7 +1004,7 @@ double VStereoAnalysis::combineHistograms()
 		fDirTotRun[h]->cd();
 		// read in sky plots from disk
 		fHisto[h]->readSkyPlots();
-
+		
 		/////////////////////////////
 		// UNCORRELATED PLOTS
 		int nxbin = fHistoTot->hmap_stereoUC->GetNbinsX();
@@ -1015,25 +1015,25 @@ double VStereoAnalysis::combineHistograms()
 			{
 				// calculate average normalization (alpha) factor
 				if( fHisto[h]->hmap_alphaUC && fHisto[h]->hmap_alphaUC->GetBinContent( i, j ) > 0.
-				 && fHisto[h]->h_combine_map_alpha_offUC && fHisto[h]->h_combine_map_alpha_offUC->GetBinContent( i, j ) > 0. )
+						&& fHisto[h]->h_combine_map_alpha_offUC && fHisto[h]->h_combine_map_alpha_offUC->GetBinContent( i, j ) > 0. )
 				{
-				   fHistoTot->hmap_stereoUC->SetBinContent( i, j, fHisto[h]->hmap_stereoUC->GetBinContent( i, j ) + fHistoTot->hmap_stereoUC->GetBinContent( i, j ) );
-                                   // calculate average alpha
-                                   if( fHisto[h]->h_combine_map_stereo_onUC && fHisto[h]->h_combine_map_stereo_offUC )
-                                   {
-                                       float alphaUC = 0.;
-                                       if( fIsOn && fHisto[h]->h_combine_map_alpha_offUC->GetBinContent( i, j ) != -1. )
-                                       {
-                                           alphaUC = fHisto[h]->h_combine_map_alpha_offUC->GetBinContent( i, j ) / (1.+fHisto[h]->h_combine_map_alpha_offUC->GetBinContent( i, j ));
-                                       }
-                                       else if( !fIsOn )
-                                       {
-                                           alphaUC = 1./(1.+fHisto[h]->h_combine_map_alpha_offUC->GetBinContent( i, j ));
-                                       }
-                                       alphaUC *= (fHisto[h]->h_combine_map_stereo_onUC->GetBinContent( i, j )+fHisto[h]->h_combine_map_stereo_offUC->GetBinContent( i, j ));
-                                       fHistoTot->hmap_alphaUC->SetBinContent( i, j, fHistoTot->hmap_alphaUC->GetBinContent( i, j ) + alphaUC );
-                                   }
-                                }
+					fHistoTot->hmap_stereoUC->SetBinContent( i, j, fHisto[h]->hmap_stereoUC->GetBinContent( i, j ) + fHistoTot->hmap_stereoUC->GetBinContent( i, j ) );
+					// calculate average alpha
+					if( fHisto[h]->h_combine_map_stereo_onUC && fHisto[h]->h_combine_map_stereo_offUC )
+					{
+						float alphaUC = 0.;
+						if( fIsOn && fHisto[h]->h_combine_map_alpha_offUC->GetBinContent( i, j ) != -1. )
+						{
+							alphaUC = fHisto[h]->h_combine_map_alpha_offUC->GetBinContent( i, j ) / ( 1. + fHisto[h]->h_combine_map_alpha_offUC->GetBinContent( i, j ) );
+						}
+						else if( !fIsOn )
+						{
+							alphaUC = 1. / ( 1. + fHisto[h]->h_combine_map_alpha_offUC->GetBinContent( i, j ) );
+						}
+						alphaUC *= ( fHisto[h]->h_combine_map_stereo_onUC->GetBinContent( i, j ) + fHisto[h]->h_combine_map_stereo_offUC->GetBinContent( i, j ) );
+						fHistoTot->hmap_alphaUC->SetBinContent( i, j, fHistoTot->hmap_alphaUC->GetBinContent( i, j ) + alphaUC );
+					}
+				}
 			}
 		}
 		//////////////////////////////
@@ -1046,25 +1046,25 @@ double VStereoAnalysis::combineHistograms()
 			{
 				// calculate average normalization (alpha) factor
 				if( fHisto[h]->hmap_alpha && fHisto[h]->hmap_alpha->GetBinContent( i, j ) > 0.
-				 && fHisto[h]->h_combine_map_alpha_off && fHisto[h]->h_combine_map_alpha_off->GetBinContent( i, j ) > 0. )
+						&& fHisto[h]->h_combine_map_alpha_off && fHisto[h]->h_combine_map_alpha_off->GetBinContent( i, j ) > 0. )
 				{
-				   fHistoTot->hmap_stereo->SetBinContent( i, j, fHisto[h]->hmap_stereo->GetBinContent( i, j ) + fHistoTot->hmap_stereo->GetBinContent( i, j ) );
-                                   // calculate average alpha
-                                   if( fHisto[h]->h_combine_map_stereo_on && fHisto[h]->h_combine_map_stereo_off )
-                                   {
-                                       float alpha = 0.;
-                                       if( fIsOn && fHisto[h]->h_combine_map_alpha_off->GetBinContent( i, j ) != -1. )
-                                       {
-                                           alpha = fHisto[h]->h_combine_map_alpha_off->GetBinContent( i, j ) / (1.+fHisto[h]->h_combine_map_alpha_off->GetBinContent( i, j ));
-                                       }
-                                       else if( !fIsOn )
-                                       {
-                                           alpha = 1./(1.+fHisto[h]->h_combine_map_alpha_off->GetBinContent( i, j ));
-                                       }
-                                       alpha *= (fHisto[h]->h_combine_map_stereo_on->GetBinContent( i, j )+fHisto[h]->h_combine_map_stereo_off->GetBinContent( i, j ));
-                                       fHistoTot->hmap_alpha->SetBinContent( i, j, fHistoTot->hmap_alpha->GetBinContent( i, j ) + alpha );
-                                   }
-                                }
+					fHistoTot->hmap_stereo->SetBinContent( i, j, fHisto[h]->hmap_stereo->GetBinContent( i, j ) + fHistoTot->hmap_stereo->GetBinContent( i, j ) );
+					// calculate average alpha
+					if( fHisto[h]->h_combine_map_stereo_on && fHisto[h]->h_combine_map_stereo_off )
+					{
+						float alpha = 0.;
+						if( fIsOn && fHisto[h]->h_combine_map_alpha_off->GetBinContent( i, j ) != -1. )
+						{
+							alpha = fHisto[h]->h_combine_map_alpha_off->GetBinContent( i, j ) / ( 1. + fHisto[h]->h_combine_map_alpha_off->GetBinContent( i, j ) );
+						}
+						else if( !fIsOn )
+						{
+							alpha = 1. / ( 1. + fHisto[h]->h_combine_map_alpha_off->GetBinContent( i, j ) );
+						}
+						alpha *= ( fHisto[h]->h_combine_map_stereo_on->GetBinContent( i, j ) + fHisto[h]->h_combine_map_stereo_off->GetBinContent( i, j ) );
+						fHistoTot->hmap_alpha->SetBinContent( i, j, fHistoTot->hmap_alpha->GetBinContent( i, j ) + alpha );
+					}
+				}
 			}
 		}
 		fHisto[h]->deleteSkyPlots();
@@ -1713,7 +1713,7 @@ void VStereoAnalysis::setCuts( VAnaSumRunParameterDataClass iL, int irun )
 		{
 			fCuts->setNTel( iL.fMaxTelID );
 			fCuts->setInstrumentEpoch( fInstrumentEpoch );
-                        fCuts->setTelToAnalyze( fTelToAnalyze );
+			fCuts->setTelToAnalyze( fTelToAnalyze );
 			fCuts->readCuts( iL.fCutFile );
 			fCuts->setTheta2Cut( iL.fSourceRadius );
 		}
@@ -1854,32 +1854,32 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
 			cout << "exiting..." << endl;
 			exit( EXIT_FAILURE );
 		}
-                fDataFrogsTree = ( TTree* )fDataFile->Get( "frogspars" );
-                if( !fDataFrogsTree )
-                {
-                        cout << "VStereoAnalysis::getDataFromFile() error: cannot find frogspars tree in " << iFileName << endl;
-                        cout << "exiting..." << endl;
-                        exit( EXIT_FAILURE );
-                }
-                else
-                {
-                       fDataRunTree->AddFriend( fDataFrogsTree );
-                }
+		fDataFrogsTree = ( TTree* )fDataFile->Get( "frogspars" );
+		if( !fDataFrogsTree )
+		{
+			cout << "VStereoAnalysis::getDataFromFile() error: cannot find frogspars tree in " << iFileName << endl;
+			cout << "exiting..." << endl;
+			exit( EXIT_FAILURE );
+		}
+		else
+		{
+			fDataRunTree->AddFriend( fDataFrogsTree );
+		}
 		c = new CData( fDataRunTree );
-                // read current epoch from data file
-                VEvndispRunParameter *i_runPara = (VEvndispRunParameter*)fDataFile->Get("runparameterV2");
-                if( i_runPara )
-                {
-                    fInstrumentEpoch = i_runPara->fInstrumentEpoch;
-                    fTelToAnalyze = i_runPara->fTelToAnalyze;
-                }
-                else
-                {
-                    cout << "VStereoAnalysis::getDataFromFile() warning: epoch of current file " << endl;
-		    cout << "and active telescope combination cannot be determined; " << endl;
-                    cout << "this might lead to a wrong choice in the gamma/hadron cuts - please check" << endl;
-                    fInstrumentEpoch = "NOT_FOUND";
-                }
+		// read current epoch from data file
+		VEvndispRunParameter* i_runPara = ( VEvndispRunParameter* )fDataFile->Get( "runparameterV2" );
+		if( i_runPara )
+		{
+			fInstrumentEpoch = i_runPara->fInstrumentEpoch;
+			fTelToAnalyze = i_runPara->fTelToAnalyze;
+		}
+		else
+		{
+			cout << "VStereoAnalysis::getDataFromFile() warning: epoch of current file " << endl;
+			cout << "and active telescope combination cannot be determined; " << endl;
+			cout << "this might lead to a wrong choice in the gamma/hadron cuts - please check" << endl;
+			fInstrumentEpoch = "NOT_FOUND";
+		}
 	}
 	return c;
 }

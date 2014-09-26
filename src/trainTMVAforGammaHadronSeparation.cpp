@@ -314,11 +314,11 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 		{
 			if( iTrainGammaHadronSeparation )
 			{
-                                sprintf( htitle, "BDT_0" );
+				sprintf( htitle, "BDT_0" );
 			}
 			else
 			{
-			        sprintf( htitle, "BDT_RecQuality_0" );
+				sprintf( htitle, "BDT_RecQuality_0" );
 			}
 			if( i < iRun->fMVAMethod_Options.size() )
 			{
@@ -411,9 +411,9 @@ int main( int argc, char* argv[] )
 			exit( EXIT_SUCCESS );
 		}
 	}
-        cout << endl;
-        cout << "trainTMVAforGammaHadronSeparation " << VGlobalRunParameter::getEVNDISP_VERSION() << endl;
-        cout << "----------------------------------------" << endl;
+	cout << endl;
+	cout << "trainTMVAforGammaHadronSeparation " << VGlobalRunParameter::getEVNDISP_VERSION() << endl;
+	cout << "----------------------------------------" << endl;
 	if( argc != 2 )
 	{
 		cout << endl;

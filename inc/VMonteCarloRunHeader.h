@@ -56,8 +56,8 @@ class VMonteCarloRunHeader : public TNamed
 		/* ... + detector MC specific ... */
 		string detector_Simulator;
 		bool combined_runHeader;  // incomplete run header from several simtel input files
-
-                float fFADC_hilo_multipler;
+		
+		float fFADC_hilo_multipler;
 		
 		VMonteCarloRunHeader();
 		~VMonteCarloRunHeader() {}

@@ -272,8 +272,8 @@ void VShowerParameters::reset( unsigned int iNTel )
 		fShower_stdP[i] = 0.;
 		fShower_Chi2[i] = -1.;
 		fiangdiff[i] = 0.0;
-		fDispDiff[i] = -9999.;		
-
+		fDispDiff[i] = -9999.;
+		
 		fShower_NPair = 0;
 		fShower_PairXS[i] = 0.;
 		fShower_PairYS[i] = 0.;

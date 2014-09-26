@@ -428,20 +428,20 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
 		cout << "VInstrumentResponseFunctionRunParameter::readRunParameters() error reading simulation file: " << ifilename << endl;
 		return false;
 	}
-        // read instrument epoch from run parameters
-        VEvndispRunParameter *i_runPara = (VEvndispRunParameter*)iFile->Get("runparameterV2");
-        if( i_runPara )
-        {
-            fInstrumentEpoch = i_runPara->fInstrumentEpoch;
-	    fTelToAnalyse = i_runPara->fTelToAnalyze;
-        }
-        else
-        {
-            cout << "VInstrumentResponseFunctionRunParameter::readRunParameters() warning: cannot read instrument epoch and active telecopes from MC event file" << endl;
-            cout << "this might lead to a wrong choice in the gamma/hadron cuts - please check" << endl; 
-            fInstrumentEpoch = "NOT_FOUND";
-        }
-        // get NSB (pedvar) level
+	// read instrument epoch from run parameters
+	VEvndispRunParameter* i_runPara = ( VEvndispRunParameter* )iFile->Get( "runparameterV2" );
+	if( i_runPara )
+	{
+		fInstrumentEpoch = i_runPara->fInstrumentEpoch;
+		fTelToAnalyse = i_runPara->fTelToAnalyze;
+	}
+	else
+	{
+		cout << "VInstrumentResponseFunctionRunParameter::readRunParameters() warning: cannot read instrument epoch and active telecopes from MC event file" << endl;
+		cout << "this might lead to a wrong choice in the gamma/hadron cuts - please check" << endl;
+		fInstrumentEpoch = "NOT_FOUND";
+	}
+	// get NSB (pedvar) level
 	VTableLookupRunParameter* fR = ( VTableLookupRunParameter* )iFile->Get( "TLRunParameter" );
 	if( !fR )
 	{

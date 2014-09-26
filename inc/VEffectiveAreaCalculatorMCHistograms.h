@@ -62,8 +62,8 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
 		TProfile* getHistogram_EmcWeight( unsigned int iAz, unsigned int iIndex );
 		void      initializeHistograms();
 		void      initializeHistograms( vector< double > iAzMin, vector< double > iAzMax,
-        			                vector< double > iSpectralIndex,
-						int nbins = 60, double iMin = -2., double iMax = 4. );
+										vector< double > iSpectralIndex,
+										int nbins = 60, double iMin = -2., double iMax = 4. );
 		bool      isMCCuts()
 		{
 			return fMCCuts;

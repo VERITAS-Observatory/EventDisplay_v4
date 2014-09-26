@@ -31,20 +31,20 @@ class VWPPhysSensitivityPlotsMaker
 		
 		int   fPlotCTARequirements;
 		bool  fPlotCTARequirementGoals;
-
-                // pads for plotAllInOneCanvas()
-		TCanvas *fPlotAllInOneCanvas;
-		TPad *fSensitivityPad;
-		TPad *fSensitivityRatioPad;
-		TPad *fEffAreaPad;
-		TPad *fBckRatesPad;
-		TPad *fERes;
-		TPad *fAngRes;
+		
+		// pads for plotAllInOneCanvas()
+		TCanvas* fPlotAllInOneCanvas;
+		TPad* fSensitivityPad;
+		TPad* fSensitivityRatioPad;
+		TPad* fEffAreaPad;
+		TPad* fBckRatesPad;
+		TPad* fERes;
+		TPad* fAngRes;
 		
 	public:
 	
 		VWPPhysSensitivityPlotsMaker();
-	       ~VWPPhysSensitivityPlotsMaker() {}
+		~VWPPhysSensitivityPlotsMaker() {}
 		
 		void compareDataSets( string iDataSetFile, string iDirectionString = "", bool IntegratedSensitivityForOffAxisPlots = false );
 		void compareOffAxisSensitivities( string iSubArray, vector< string > iDataSet );
