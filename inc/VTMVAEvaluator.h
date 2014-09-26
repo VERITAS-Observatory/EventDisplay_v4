@@ -113,7 +113,6 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		double                  fOptimizationMinBackGroundEvents;
 		double                  fOptimizationBackgroundAlpha;
 		double                  fOptimizationObservingTime_h;
-		double                  fTMVAOptimizationStepsizeE;
 		double                  fTMVAAngularContainmentThetaFixedMinRadius;
 		
 		bool     fTMVAIgnoreTheta2Cut;           // ignore theta2 cut in TMVA
@@ -204,7 +203,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 			return fTMVA_EvaluationResult;
 		}
 		bool   initializeWeightFiles( string iWeightFileName, unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
-									  unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax, string iInstrumentEpoch = "noepoch" );
+									  unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax, double iEnergyStepSize=0.2, string iInstrumentEpoch = "noepoch" );
 		bool   initializeDataStrutures( CData* iC );
 		bool   IsZombie()
 		{
@@ -265,10 +264,6 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		{
 			fTMVAngularContainmentRadiusMax = iC;
 		}
-		void   setTMVAOptimizationEnergyStepSize( double iStep = 0.20 )
-		{
-			fTMVAOptimizationStepsizeE = iStep;
-		}
 		void   setTMVACutValue( double iE = -99. );
 		void   setTMVACutValue( map< unsigned int, double > iMVA );
 		void   setTMVAErrorFraction( double iTMVAErrorFraction_min = 0.2 )
@@ -281,7 +276,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		}
 		void   setTMVAMethod( string iMethodName = "BDT" );
 		
-		ClassDef( VTMVAEvaluator, 26 );
+		ClassDef( VTMVAEvaluator, 27 );
 };
 
 #endif

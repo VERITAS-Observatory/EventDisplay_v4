@@ -57,10 +57,8 @@ void VTMVAEvaluator::reset()
 	setSensitivityOptimizationParameters();
 	setSensitivityOptimizationFixedSignalEfficiency();
 	setSensitivityOptimizationMinSourceStrength();
-	setTMVAOptimizationEnergyStepSize();
 	setTMVAAngularContainmentThetaFixedMinRadius();
 	setTMVAMethod();
-	setOptimizeAngularContainment();
 	// default: don't expect that the theta2 cut is performed here
 	setTMVAThetaCutVariable( false );
 	setTMVAErrorFraction();
@@ -140,7 +138,7 @@ vector< string > VTMVAEvaluator::getTrainingVariables( string iXMLFile, vector< 
 */
 bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
 		unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax,
-		string iInstrumentEpoch )
+		double iEnergyStepSize, string iInstrumentEpoch )
 {
 	//////////////////////////////
 	// sanity checks
@@ -300,7 +298,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 			//    - one VTMVAEvaluatorData per energy bin
 			//    - bins are set for the energy interval read from the root file:
 			//      [iEnergyData->fEnergyCut_Log10TeV_min, iEnergyData->fEnergyCut_Log10TeV_max]
-			//    - sub-bins given by fTMVAOptimizationStepsizeE;
+			//    - sub-bins given by iEnergyStepSize;
 			double e = iEnergyData->fEnergyCut_Log10TeV_min;
 			do
 			{
@@ -308,9 +306,9 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 				fTMVAData.push_back( new VTMVAEvaluatorData() );
 				// find e_min and e_max
 				fTMVAData.back()->fEnergyCut_Log10TeV_min = e;
-				if( fTMVAOptimizationStepsizeE > 0. )
+				if( iEnergyStepSize > 0. )
 				{
-					fTMVAData.back()->fEnergyCut_Log10TeV_max = e + fTMVAOptimizationStepsizeE;
+					fTMVAData.back()->fEnergyCut_Log10TeV_max = e + iEnergyStepSize;
 				}
 				else
 				{
@@ -374,7 +372,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 				fTMVAData.back()->fTMVAFileName = iFullFileName.str();
 				fTMVAData.back()->fTMVAFileNameXML = iFullFileNameXML.str();
 				
-				if( fTMVAOptimizationStepsizeE < 0. )
+				if( iEnergyStepSize < 0. )
 				{
 					break;
 				}

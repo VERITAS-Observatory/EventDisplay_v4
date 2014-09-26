@@ -129,6 +129,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		unsigned int    fTMVAWeightFileIndex_Emax;
 		unsigned int    fTMVAWeightFileIndex_Zmin;
 		unsigned int    fTMVAWeightFileIndex_Zmax;
+		double          fTMVAEnergyStepSize;
 		map< unsigned int, double > fTMVASignalEfficiency;
 		map< unsigned int, double > fTMVA_MVACut;
 		double          fTMVAProbabilityThreshold;
@@ -182,7 +183,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		bool   initPhaseCuts( string iDir );
 		bool   initProbabilityCuts( int irun );
 		bool   initProbabilityCuts( string iDir );
-		bool   initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_Emin, unsigned int iTMVAWeightFileIndex_Emax, unsigned int iTMVAWeightFileIndex_Zmin, unsigned int iTMVAWeightFileIndex_Zmax );
+		bool   initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_Emin, unsigned int iTMVAWeightFileIndex_Emax, unsigned int iTMVAWeightFileIndex_Zmin, unsigned int iTMVAWeightFileIndex_Zmax, double iTMVAEnergy_StepSize );
 		string getTelToAnalyzeString();
 		
 		
@@ -450,6 +451,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			return fUseOrbitalPhaseCuts;
 		}
 		
-		ClassDef( VGammaHadronCuts, 51 );
+		ClassDef( VGammaHadronCuts, 52 );
 };
 #endif

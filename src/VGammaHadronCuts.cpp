@@ -99,6 +99,7 @@ VGammaHadronCuts::VGammaHadronCuts()
 	fTMVAWeightFileIndex_Emax = 0;
 	fTMVAWeightFileIndex_Zmin = 0;
 	fTMVAWeightFileIndex_Zmax = 0;
+	fTMVAEnergyStepSize = 0.2;
 	fTMVAWeightFile = "";
 	fTMVASignalEfficiency.clear();
 	fTMVA_MVACut.clear();
@@ -652,6 +653,10 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 							if( !is_stream.eof() )
 							{
 								is_stream >> fTMVAWeightFileIndex_Zmax;
+							}
+							if( !is_stream.eof() )
+							{
+								is_stream >> fTMVAEnergyStepSize;
 							}
 							string iWeightFileDirectory;
 							if( !is_stream.eof() )
@@ -1772,7 +1777,7 @@ void VGammaHadronCuts::initializeCuts( int irun, string iFile )
 	// TMVA cuts
 	else if( useTMVACuts() )
 	{
-		if( !initTMVAEvaluator( fTMVAWeightFile, fTMVAWeightFileIndex_Emin, fTMVAWeightFileIndex_Emax, fTMVAWeightFileIndex_Zmin, fTMVAWeightFileIndex_Zmax ) )
+	        if( !initTMVAEvaluator( fTMVAWeightFile, fTMVAWeightFileIndex_Emin, fTMVAWeightFileIndex_Emax, fTMVAWeightFileIndex_Zmin, fTMVAWeightFileIndex_Zmax, fTMVAEnergyStepSize ) )
 		{
 			cout << "VGammaHadronCuts::initializeCuts: failed setting TMVA reader for " << fTMVAWeightFile;
 			cout << "(" << fTMVAWeightFileIndex_Emin << "," << fTMVAWeightFileIndex_Emax << ")" << endl;
@@ -1802,7 +1807,7 @@ void VGammaHadronCuts::initializeCuts( int irun, string iFile )
 }
 
 bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_Emin, unsigned int iTMVAWeightFileIndex_Emax,
-		unsigned int iTMVAWeightFileIndex_Zmin, unsigned int iTMVAWeightFileIndex_Zmax )
+		unsigned int iTMVAWeightFileIndex_Zmin, unsigned int iTMVAWeightFileIndex_Zmax,  double iTMVAEnergy_StepSize )
 {
 	TDirectory* cDir = gDirectory;
 	
@@ -1855,7 +1860,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
 	fTMVAEvaluator->setTMVAAngularContainmentThetaFixedMinRadius( fTMVAFixedThetaCutMin );
 	// read MVA weight files; set MVA cut values (e.g. find optimal values)
 	if( !fTMVAEvaluator->initializeWeightFiles( iTMVAFile, iTMVAWeightFileIndex_Emin, iTMVAWeightFileIndex_Emax,
-			iTMVAWeightFileIndex_Zmin, iTMVAWeightFileIndex_Zmax, fInstrumentEpoch ) )
+			iTMVAWeightFileIndex_Zmin, iTMVAWeightFileIndex_Zmax, iTMVAEnergy_StepSize, fInstrumentEpoch ) )
 	{
 		cout << "VGammaHadronCuts::initTMVAEvaluator: error while initializing TMVA weight files" << endl;
 		cout << "exiting... " << endl;
