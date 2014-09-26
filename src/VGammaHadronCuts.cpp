@@ -610,7 +610,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 					fFileNameFrogsCut = iFileNameFrogsCut;
 				}
 			}
-			else if( iCutVariable == "frogscutsvariable" )
+			else if( iCutVariable == "energydependentcuts" )
 			{
 				while( !is_stream.eof() )
 				{
