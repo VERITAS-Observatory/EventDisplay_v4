@@ -1857,12 +1857,12 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
 		fDataFrogsTree = ( TTree* )fDataFile->Get( "frogspars" );
 		if( !fDataFrogsTree )
 		{
-			cout << "VStereoAnalysis::getDataFromFile() error: cannot find frogspars tree in " << iFileName << endl;
-			cout << "exiting..." << endl;
-			exit( EXIT_FAILURE );
+			cout << "VStereoAnalysis::getDataFromFile() info: cannot find frogspars tree in " << iFileName << endl;
+                        cout << "(this will lead to a failure for the frogs analysis)" << endl;
 		}
 		else
 		{
+                        cout << "VStereoAnalysis::getDataFromFile() info: found frogspars tree" << endl;
 			fDataRunTree->AddFriend( fDataFrogsTree );
 		}
 		c = new CData( fDataRunTree );
