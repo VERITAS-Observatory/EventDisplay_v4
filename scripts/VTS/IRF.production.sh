@@ -94,23 +94,29 @@ if [[ $CUTSLISTFILE != "" ]]; then
     # read file containing list of cuts
     IFS=$'\r\n' CUTLIST=($(cat $CUTSLISTFILE))
 else
-	if [[ $BDTCUTS == "0"  ]]; then
+    if [[ $BDTCUTS == "0"  ]]; then
     # default list of cuts
-    CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat 
-             ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft.dat 
-             ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard.dat 
-             ANASUM.GammaHadron-Cut-NTel3-PointSource-SuperHard.dat
-             ANASUM.GammaHadron-Cut-NTel2-PointSource-ModerateOpen.dat
-             ANASUM.GammaHadron-Cut-NTel2-PointSource-SoftOpen.dat"
-#             ANASUM.GammaHadron-Cut-NTel2-PointSource-HardOpen.dat 
-#             ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Moderate.dat 
-#             ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Soft.dat 
-#             ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Hard.dat 
-#             ANASUM.GammaHadron-Cut-NTel3-PointSource-Moderate.dat 
-#             ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard.dat
-#             ANASUM.GammaHadron-Cut-NTel3-ExtendedSource-SuperHard.dat" 
-#     CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat"
-       fi
+        CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat 
+                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft.dat 
+                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard.dat 
+                 ANASUM.GammaHadron-Cut-NTel3-PointSource-SuperHard.dat
+                 ANASUM.GammaHadron-Cut-NTel2-PointSource-ModerateOpen.dat
+                 ANASUM.GammaHadron-Cut-NTel2-PointSource-SoftOpen.dat"
+#                 ANASUM.GammaHadron-Cut-NTel2-PointSource-HardOpen.dat 
+#                 ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Moderate.dat 
+#                 ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Soft.dat 
+#                 ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Hard.dat 
+#                 ANASUM.GammaHadron-Cut-NTel3-PointSource-Moderate.dat 
+#                 ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard.dat
+#                 ANASUM.GammaHadron-Cut-NTel3-ExtendedSource-SuperHard.dat" 
+#       CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat"
+    else
+    #BDT TMVA list of cuts
+        CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA.dat 
+                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft-TMVA.dat 
+                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard-TMVA.dat" 
+#       CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat"
+    fi
 fi
 CUTLIST=`echo $CUTLIST |tr '\r' ' '`
 
@@ -132,7 +138,7 @@ for VX in $EPOCH; do
 		            METH="GEO"
                 elif [[ $ID == "1" ]] || [[ $ID == "7" ]] || [[ $ID == "8" ]] || [[ $ID == "9" ]] || [[ $ID == "10" ]]; then 
 		            METH="DISP"
-		        fi
+	        fi
                 ./IRF.combine_lookup_table_parts.sh "${TFIL}${METH}" $VX $ATM $ID $SIMTYPE 
             done
             continue

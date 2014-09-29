@@ -168,22 +168,26 @@ do
           for (( l=0; l < ${#ZENITH_ANGLES[@]}; l++ ))
           do
              if (( $(echo "${ZEBINARRAY[$j]} <= ${ZENITH_ANGLES[$l]}" | bc ) && $(echo "${ZEBINARRAY[$j+1]} >= ${ZENITH_ANGLES[$l]}" | bc ) ));then
-                 SIGNALLIST=`ls -1 $SDIR/${ZENITH_ANGLES[$l]}deg_0.5wob_NOISE{100,150,200,250,325,425,550}.mscw.root`
-                 for arg in $SIGNALLIST
-                 do
-                     echo "* SIGNALFILE $arg" >> $RFIL.runparameter
-                 done
+                 if (( "${ZENITH_ANGLES[$l]}" != "00" && "${ZENITH_ANGLES[$l]}" != "60" && "${ZENITH_ANGLES[$l]}" != "65" )); then 
+                     SIGNALLIST=`ls -1 $SDIR/${ZENITH_ANGLES[$l]}deg_0.5wob_NOISE{100,150,200,250,325,425,550}.mscw.root`
+                     for arg in $SIGNALLIST
+                     do
+                         echo "* SIGNALFILE $arg" >> $RFIL.runparameter
+                     done
+                 fi
              fi
           done
       else
           for (( l=0; l < ${#ZENITH_ANGLES[@]}; l++ ))
           do
              if (( $(echo "${ZEBINARRAY[$j]} <= ${ZENITH_ANGLES[$l]}" | bc ) && $(echo "${ZEBINARRAY[$j+1]} >= ${ZENITH_ANGLES[$l]}" | bc ) ));then
-                 SIGNALLIST=`ls -1 $SDIR/${ZENITH_ANGLES[$l]}deg_0.5wob_NOISE{50,80,120,170,230}.mscw.root`
-                 for arg in $SIGNALLIST
-                 do
-                     echo "* SIGNALFILE $arg" >> $RFIL.runparameter
-                 done
+                 if (( "${ZENITH_ANGLES[$l]}" != "00" && "${ZENITH_ANGLES[$l]}" != "60" && "${ZENITH_ANGLES[$l]}" != "65" )); then
+                     SIGNALLIST=`ls -1 $SDIR/${ZENITH_ANGLES[$l]}deg_0.5wob_NOISE{50,80,120,170,230}.mscw.root`
+                     for arg in $SIGNALLIST
+                     do
+                         echo "* SIGNALFILE $arg" >> $RFIL.runparameter
+                     done
+                 fi
              fi
           done
       fi
