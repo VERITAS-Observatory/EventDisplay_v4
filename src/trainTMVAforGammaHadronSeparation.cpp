@@ -132,9 +132,6 @@ double checkIfVariableIsConstant( VTMVARunData* iRun, TCut iCut, string iVariabl
 	if( h )
 	{
 		i_mean = h->GetMean();
-	}
-	if( h )
-	{
 		h->Delete();
 	}
 	
@@ -252,11 +249,14 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 				iTempCut << iTemp.str() << ">1";
 				TCut iCutCC = iTempCut.str().c_str();
 				
-				double iSignalMean = checkIfVariableIsConstant( iRun, iCutSignal && iCutCC, iTemp.str(), true, iSplitBlock );
-				double iBckMean    = checkIfVariableIsConstant( iRun, iCutBck && iCutCC, iTemp.str(), false, iSplitBlock );
-				// check if the training variable is constant
-				// (checkIfVariableIsConstant returns -9999 if RMS of variable is >0)
-				cout << "\t mean values " << iSignalMean << "\t" << iBckMean << endl;
+				double iSignalMean = 1.;
+				double iBckMean    = -1.;
+                                if( iRun->fCheckValidityOfInputVariables )
+                                {
+                                    iSignalMean = checkIfVariableIsConstant( iRun, iCutSignal && iCutCC, iTemp.str(), true, iSplitBlock );
+                                    iBckMean    = checkIfVariableIsConstant( iRun, iCutBck && iCutCC, iTemp.str(), false, iSplitBlock );
+                                    cout << "\t mean values " << iSignalMean << "\t" << iBckMean << endl;
+                                }
 				if( ( TMath::Abs( iSignalMean - iBckMean ) > 1.e-6
 						|| TMath::Abs( iSignalMean + 9999. ) < 1.e-2 || TMath::Abs( iBckMean + 9999. ) < 1.e-2 )
 						&& iSignalMean != 0 && iBckMean != 0 )
@@ -273,10 +273,15 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 		else
 		{
 			// check if the training variable is constant
-			double iSignalMean = checkIfVariableIsConstant( iRun, iCutSignal, iRun->fTrainingVariable[i].c_str(), true, iSplitBlock );
-			double iBckMean    = checkIfVariableIsConstant( iRun, iCutBck, iRun->fTrainingVariable[i].c_str(), false, iSplitBlock );
+			double iSignalMean = 1.;
+			double iBckMean    = -1.;
+                        if( iRun->fCheckValidityOfInputVariables )
+                        {
+                            checkIfVariableIsConstant( iRun, iCutSignal, iRun->fTrainingVariable[i].c_str(), true, iSplitBlock );
+                            checkIfVariableIsConstant( iRun, iCutBck, iRun->fTrainingVariable[i].c_str(), false, iSplitBlock );
+                            cout << "\t mean values " << iSignalMean << "\t" << iBckMean << endl;
+                        }
 			
-			cout << "\t mean values " << iSignalMean << "\t" << iBckMean << endl;
 			if( TMath::Abs( iSignalMean - iBckMean ) > 1.e-6
 					|| TMath::Abs( iSignalMean + 9999. ) < 1.e-2 || TMath::Abs( iBckMean + 9999. ) < 1.e-2 )
 			{

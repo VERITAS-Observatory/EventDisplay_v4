@@ -13,6 +13,8 @@ VTMVARunData::VTMVARunData()
 	
 	fTrainGammaHadronSeparation = true;
 	fTrainReconstructionQuality = false;  // in development: please ignore
+
+        fCheckValidityOfInputVariables = true;
 	
 	fOutputDirectoryName = "";
 	fOutputFileName = "";
@@ -523,6 +525,16 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 					return false;
 				}
 			}
+                        // check event validity
+                        if( temp == "CHECKEVENTVALIDITY" )
+                        {
+                            if( !is_stream.eof() )
+                            {
+                                 int iT = 0;
+                                 is_stream >> iT;
+                                 fCheckValidityOfInputVariables = (bool)iT;
+                            }
+                        }
 			// signal weight
 			if( temp == "SIGNALWEIGHT" )
 			{
