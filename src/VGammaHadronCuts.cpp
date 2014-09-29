@@ -656,7 +656,11 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 							}
 							if( !is_stream.eof() )
 							{
-								is_stream >> fTMVAEnergyStepSize;
+							       if( !(is_stream >> fTMVAEnergyStepSize) )
+							       {
+							              cout << "VGammaHadronCuts::readCuts: missing TMVAPARAMETER energy step size  " << endl;
+							              break;
+							       }
 							}
 							string iWeightFileDirectory;
 							if( !is_stream.eof() )
