@@ -110,6 +110,7 @@ else
 #             ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard.dat
 #             ANASUM.GammaHadron-Cut-NTel3-ExtendedSource-SuperHard.dat" 
 #     CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat"
+       fi
 fi
 CUTLIST=`echo $CUTLIST |tr '\r' ' '`
 
