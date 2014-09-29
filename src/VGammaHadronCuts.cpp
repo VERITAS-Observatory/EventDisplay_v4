@@ -673,10 +673,22 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 								is_stream >> iWeightFileName;
 							}
 							fTMVAWeightFile = gSystem->ExpandPathName( iWeightFileDirectory.c_str() );
+                                                        // check of path name is complete
+                                                        if( gSystem->AccessPathName( fTMVAWeightFile.c_str() ) )
+                                                        {
+                                                             fTMVAWeightFile = VGlobalRunParameter::getDirectory_EVNDISPAnaData() + fTMVAWeightFile;
+                                                             if( gSystem->AccessPathName( fTMVAWeightFile.c_str() ) )
+                                                             {
+                                                                 cout << "VGammaHadronCuts::readCuts error,";
+                                                                 cout << " weight file directory not found: ";
+                                                                 cout << fTMVAWeightFile << endl;
+                                                             }
+                                                        }
 							fTMVAWeightFile += iWeightFileName;
+                                                        break;
 						}
 					}
-					else
+					else if( iPrint != 0 )
 					{
 						cout << "VGammaHadronCuts::readCuts: skipping TMVAPARAMETER due to epoch mismatch:";
 						cout << " required: " << fInstrumentEpoch << ", is: " << temp << endl;
@@ -847,6 +859,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			////////////////////////////////////////////////////////////////////////////////////////////////////
 		}
 	}
+        cout << "========================================" << endl;
 	// check cut selection
 	if( fGammaHadronCutSelector / 10 == 5 )
 	{

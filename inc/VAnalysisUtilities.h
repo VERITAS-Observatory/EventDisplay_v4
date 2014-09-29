@@ -145,6 +145,6 @@ class VAnalysisUtilities : public TNamed
 		void     setRunListCutPhaseRange( double iPhaseMin = -1., double iPhaseMax = -1. );
 		void     setRunListCutPhaseRangeVector( vector< double > iPhaseMinV, vector< double > iPhaseMaxV );
 		
-		ClassDef( VAnalysisUtilities, 13 );
+		ClassDef( VAnalysisUtilities, 14 );
 };
 #endif
