@@ -106,6 +106,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		double                      fTMVACutValueNoVec;
 		
 		string                  fParticleNumberFileName;          // particle numbers are read from this file
+                double                  fParticleNumberFile_Conversion_Rate_to_seconds;
 		double                  fOptimizationSourceSignificance;
 		double                  fOptimizationFixedSignalEfficiency;
 		double                  fOptimizationMinSourceStrength;
@@ -238,9 +239,10 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		{
 			fTMVA_OptimizeAngularContainment = iO;
 		}
-		void   setParticleNumberFile( string iParticleNumberFile = "" )
+		void   setParticleNumberFile( string iParticleNumberFile = "", double iConversionFactor_to_seconds = 60. )
 		{
 			fParticleNumberFileName = iParticleNumberFile;
+                        fParticleNumberFile_Conversion_Rate_to_seconds = iConversionFactor_to_seconds;
 		}
 		void   setPlotEfficiencyPlotsPerBin( bool iB = false )
 		{
@@ -276,7 +278,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		}
 		void   setTMVAMethod( string iMethodName = "BDT" );
 		
-		ClassDef( VTMVAEvaluator, 27 );
+		ClassDef( VTMVAEvaluator, 28 );
 };
 
 #endif

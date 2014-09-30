@@ -33,8 +33,7 @@ class VPlotTMVAParameters
 		VPlotTMVAParameters();
 		~VPlotTMVAParameters() {}
 		
-		void initializeWeightFiles( string iDirectory, string iTMVADirectory,
-									unsigned int iEnergyWeightFileIndex_min, unsigned int iEnergyWeightFileIndex_max, unsigned int iZenithWeightFileIndex_min, unsigned int iZenithWeightFileIndex_max );
+		void initializeWeightFiles( string iDirectory, string iTMVADirectory, unsigned int iEnergyWeightFileIndex_min, unsigned int iEnergyWeightFileIndex_max, unsigned int iZenithWeightFileIndex_min, unsigned int iZenithWeightFileIndex_max, double iParticleNumberFile_Conversion_Rate_to_seconds = 60. );
 		void plot( bool iPrint = false );
 		void setDirectories( string iDataDirectory )
 		{

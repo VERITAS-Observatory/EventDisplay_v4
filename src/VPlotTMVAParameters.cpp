@@ -109,7 +109,7 @@ bool VPlotTMVAParameters::initializeHistograms( unsigned int iEnergyWeightFileIn
 	return true;
 }
 
-void VPlotTMVAParameters::initializeWeightFiles( string iDirectory, string iTMVADirectory, unsigned int iEnergyWeightFileIndex_min, unsigned int iEnergyWeightFileIndex_max, unsigned int iZenithWeightFileIndex_min, unsigned int iZenithWeightFileIndex_max )
+void VPlotTMVAParameters::initializeWeightFiles( string iDirectory, string iTMVADirectory, unsigned int iEnergyWeightFileIndex_min, unsigned int iEnergyWeightFileIndex_max, unsigned int iZenithWeightFileIndex_min, unsigned int iZenithWeightFileIndex_max, double iParticleNumberFile_Conversion_Rate_to_seconds )
 {
 	if( !initializeHistograms( iEnergyWeightFileIndex_min, iEnergyWeightFileIndex_max, iZenithWeightFileIndex_min, iZenithWeightFileIndex_max ) )
 	{
@@ -123,7 +123,7 @@ void VPlotTMVAParameters::initializeWeightFiles( string iDirectory, string iTMVA
 	{
 		VTMVAEvaluator a;
 		sprintf( hname, "%s/ParticleNumbers.%s.00.root", fDataDirectory.c_str(), fSubArrays[i].c_str() );
-		a.setParticleNumberFile( hname );
+		a.setParticleNumberFile( hname, iParticleNumberFile_Conversion_Rate_to_seconds );
 		sprintf( hname, "%s/%s/%s", iDirectory.c_str(), fSubArrays[i].c_str(), iTMVADirectory.c_str() );
 		a.initializeWeightFiles( hname, iEnergyWeightFileIndex_min, iEnergyWeightFileIndex_max, iZenithWeightFileIndex_min, iZenithWeightFileIndex_max );
 		

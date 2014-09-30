@@ -1571,13 +1571,14 @@ $(ctapara):
 # VTS.Model3D (optional)
 #
 
-VTS.auxfiles:	$(vtspara).runfiles.tar.gz $(vtspara).calibration.tar.gz $(vtspara).lookuptables.tar.gz $(vtspara).effectiveareas.tar.gz $(vtspara).radialacceptances.tar.gz $(vtspara).dispBDTs.tar.gz $(vtspara).Model3D.tar.gz
+VTS.auxfiles:	$(vtspara).runfiles.tar.gz $(vtspara).calibration.tar.gz $(vtspara).lookuptables.tar.gz $(vtspara).effectiveareas.tar.gz $(vtspara).radialacceptances.tar.gz VTS.GammaHadron_BDTs $(vtspara).dispBDTs.tar.gz $(vtspara).Model3D.tar.gz
 
 VTS.runfiles:	$(vtspara).runfiles.tar.gz
 VTS.calibration:	$(vtspara).calibration.tar.gz
 VTS.lookuptables:	$(vtspara).lookuptables.tar.gz
 VTS.effectiveareas:	$(vtspara).effectiveareas.tar.gz
 VTS.radialacceptances:	$(vtspara).radialacceptances.tar.gz
+VTS.GammaHadronBDTs:	$(vtspara).GammaHadron_BDTs.tar.gz
 VTS.dispBDTs:	$(vtspara).dispBDTs.tar.gz
 VTS.Model3D:	$(vtspara).Model3D.tar.gz
 
@@ -1710,6 +1711,18 @@ $(vtspara).dispBDTs.tar.gz:
 	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/DISP_BDTs/V* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/DISP_BDTs/
 #	make tar file
 	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).dispBDTs.tar.gz . && cd ..
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
+
+######
+# VTS gamma/hadron BDTs
+
+$(vtspara).GammaHadron_BDTs.tar.gz:
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).GammaHadron_BDTs.tar.gz  >/dev/null 2>&1
+	rm -rf $(distdir) >/dev/null 2>&1
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/GammaHadron_BDTs
+	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/GammaHadron_BDTs/V* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/GammaHadron_BDTs/
+#	make tar file
+	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).GammaHadron_BDTs.tar.gz . && cd ..
 	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
 
 ######

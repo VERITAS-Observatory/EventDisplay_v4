@@ -106,6 +106,7 @@ VGammaHadronCuts::VGammaHadronCuts()
 	// Note: for TMVA is this not the probability threshold but the MVA cut value
 	fTMVAProbabilityThreshold = -99.;
 	fTMVAOptimizeSignalEfficiencyParticleNumberFile = "";
+        fTMVAParticleNumberFile_Conversion_Rate_to_seconds = 60.;
 	fTMVAOptimizeSignalEfficiencySignificance_Min = 5.;
 	fTMVAOptimizeSignalEfficiencySignalEvents_Min = 10.;
 	fTMVAOptimizeSignalEfficiencyObservationTime_h = 50.;
@@ -744,6 +745,10 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				{
 					is_stream >> fTMVAFixedThetaCutMin;
 				}
+				if( !is_stream.eof() )
+				{
+					is_stream >> fTMVAParticleNumberFile_Conversion_Rate_to_seconds;
+                                }
 			}
 			else if( iCutVariable == "TMVASignalEfficiency" )
 			{
@@ -1052,7 +1057,8 @@ void VGammaHadronCuts::printCutSummary()
 			cout << fTMVAOptimizeSignalEfficiencySignificance_Min << " sigma and at least ";
 			cout << fTMVAOptimizeSignalEfficiencySignalEvents_Min << " signal events in ";
 			cout << fTMVAOptimizeSignalEfficiencyObservationTime_h << " h observing time" << endl;
-			cout << "reading particle counts from " << fTMVAOptimizeSignalEfficiencyParticleNumberFile << endl;
+			cout << "reading particle counts from " << fTMVAOptimizeSignalEfficiencyParticleNumberFile;
+                        cout << " (unit of rate graphs: " << fTMVAParticleNumberFile_Conversion_Rate_to_seconds << ")" << endl;
 			cout << "   (max signal efficiency: " << fTMVAFixedSignalEfficiencyMax << ")" << endl;
 			cout << "   (min source strength: " << fTMVAMinSourceStrength << ")" << endl;
 		}
@@ -1852,7 +1858,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
 				fTMVAOptimizeSignalEfficiencyObservationTime_h,
 				1. / 5. );
 		fTMVAEvaluator->setSensitivityOptimizationFixedSignalEfficiency( fTMVAFixedSignalEfficiencyMax );
-		fTMVAEvaluator->setParticleNumberFile( fTMVAOptimizeSignalEfficiencyParticleNumberFile );
+		fTMVAEvaluator->setParticleNumberFile( fTMVAOptimizeSignalEfficiencyParticleNumberFile, fTMVAParticleNumberFile_Conversion_Rate_to_seconds );
 		fTMVAEvaluator->setSensitivityOptimizationMinSourceStrength( fTMVAMinSourceStrength );
 	}
 	// set a constant signal efficiency

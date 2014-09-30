@@ -1356,8 +1356,8 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 	// Convert the observing time in seconds as the particle rate is given in 1/seconds
 	// Get the value of the middle of the energy and zenith angle bin
 	// TODODODODO minutes or seconds?
-	Non = i_on->Eval( fTMVAData[iDataBin]->fSpectralWeightedMeanEnergy_Log10TeV ) * fOptimizationObservingTime_h * 60.;
-	Nof = i_of->Eval( fTMVAData[iDataBin]->fSpectralWeightedMeanEnergy_Log10TeV ) * fOptimizationObservingTime_h * 60.;
+	Non = i_on->Eval( fTMVAData[iDataBin]->fSpectralWeightedMeanEnergy_Log10TeV ) * fOptimizationObservingTime_h * fParticleNumberFile_Conversion_Rate_to_seconds;
+	Nof = i_of->Eval( fTMVAData[iDataBin]->fSpectralWeightedMeanEnergy_Log10TeV ) * fOptimizationObservingTime_h * fParticleNumberFile_Conversion_Rate_to_seconds;
 	
 	if( Nof < 0. )
 	{
