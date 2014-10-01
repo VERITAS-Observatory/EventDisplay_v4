@@ -241,7 +241,8 @@ all VTS:	evndisp \
 	VTS.getLaserRunFromDB \
 	VTS.getRun_TimeElevAzim \
 	VTS.next_day \
-	printRunParameter
+	printRunParameter \
+        writeParticleRateFilesForTMVA
 
 CTA:	evndisp \
         CTA.convert_hessio_to_VDST \

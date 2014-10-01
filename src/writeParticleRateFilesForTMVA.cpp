@@ -46,12 +46,12 @@ using namespace std;
 */
 int main( int argc, char* argv[] )
 {
-	if( argc != 4 )
+	if( argc < 2 )
 	{
 		cout << endl;
 		cout << "writeParticleRateFilesForTMVA <combined anasum root file> <outputfile>";
-		cout << " [qsub options]" << endl;
-		cout << argc << endl;
+		//cout << " [qsub options]" << endl;
+		//cout << argc << endl;
 		cout << endl;
 		exit( 0 );
 	}
@@ -131,8 +131,8 @@ int main( int argc, char* argv[] )
 	
 		RunSum->GetEntry( i );
 		alphaNorm = OffNorm;
-		iZenithperrun = 90.0 - elevationOn;
-		
+		//iZenithperrun = 90.0 - elevationOn;
+                iZenithperrun = 90.0 - elevationOff; 	        
 		sprintf( histnameOn, "run_%d/stereo/energyHistograms/herecCounts_on", runOn );
 		sprintf( histnameOff, "run_%d/stereo/energyHistograms/herecCounts_off", runOn );
 		TH1D* t1 = ( TH1D* )f1->Get( histnameOn );
