@@ -23,8 +23,10 @@
 #include <string>
 #include <vector>
 #include <valarray>
+#include <sstream>
 
 using namespace std;
+#define VFROGSNEPOCH 10
 
 class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 {
@@ -188,6 +190,7 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 		
 		int frogsRecID;
 		string templatelistname;
+		string fparamfile;
 		
 		int   frogsEventID;
 		int   frogsGSLConStat;
@@ -230,5 +233,23 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 		float frogsTelGoodnessImg[4];
 		float frogsTelGoodnessBkg[4];
 		
+		//const int nepoch = 10 ; // limit on how many epochs we should consider
+		double frogsLowerThresh[VFROGSNEPOCH]; // must be same as nepoch!
+		double frogsFirstParam[ VFROGSNEPOCH];
+		double frogsSecondParam[VFROGSNEPOCH];
+		double frogsDCtoPE[VFROGSNEPOCH];
+		double frogsPMTNoise[VFROGSNEPOCH]; //pmt electronic noise
+		bool   frogsMinimization;
+		double frogsDeltaXS;
+		double frogsDeltaYS;
+		double frogsDeltaXP;
+		double frogsDeltaYP;
+		double frogsDeltaLog10e;
+		double frogsDeltaLambda;
+		int    frogsInterpOrder;
+		bool   frogsCheating;
+		int    frogsNBEventCalib;
+		
+		void processParamFile() ;
 };
 #endif

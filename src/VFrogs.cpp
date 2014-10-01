@@ -6,9 +6,9 @@
 
 /*! /class VFrogs
 
-\brief  Called from VEventLoop. Opens templates and does minimization.
+  \brief  Called from VEventLoop. Opens templates and does minimization.
 
-\author S Vincent, G Hughes.
+  \author S Vincent, G Hughes.
 
 */
 
@@ -24,44 +24,225 @@ VFrogs::VFrogs()
 	
 	reset();
 	
-	frogsRecID = getRunParameter()->ffrogsRecID;
+	frogsRecID		  = getRunParameter()->ffrogsRecID;
 	templatelistname = getRunParameter()->ffrogstemplatelist ;
+	fparamfile		  = getRunParameter()->ffrogsparameterfile ;
+	processParamFile() ;
 	
 }
 
+void VFrogs::processParamFile()
+{
+	cout << "VFrogs::processParamFile()!!" << endl;
+	//istream
+	// open file 'fparamfile'
+	// loop over each line
+	// 	if line begins with star, and
+	// 	if line keyword matches *
+	// 		save value to variable
+	
+	char* itemp = 0;
+	if( getenv( "VERITAS_EVNDISP_AUX_DIR" ) )
+	{
+		itemp = getenv( "VERITAS_EVNDISP_AUX_DIR" );
+	}
+	else if( getenv( "VERITAS_EVNDISP_ANA_DIR" ) )
+	{
+		itemp = getenv( "VERITAS_EVNDISP_ANA_DIR" );
+	}
+	char FROGS_PARAMETER[500];
+	ifstream is;
+	sprintf( FROGS_PARAMETER, "%s/FrogsParameterFiles/%s", itemp, fparamfile.c_str() );
+	is.open( FROGS_PARAMETER, ifstream::in );
+	if( !is )
+	{
+		cerr << "Error, could not open frogs parameter file  '" << fparamfile << "', exiting...." << endl;
+		exit( 1 ) ;
+	}
+	
+	string is_line ;
+	string temp  ;
+	string temp2 ;
+	string tmpEpoch ;
+	double tmpLowerThresh ;
+	double tmpFirstParam  ;
+	double tmpSecondParam ;
+	double tmpDCtoPE ;
+	double tmpPMTNoise ;
+	while( getline( is, is_line ) )
+	{
+		if( is_line.size() > 0 )
+		{
+			istringstream is_stream( is_line );
+			is_stream >> temp;
+			if( temp != "*" )
+			{
+				continue;
+			}
+			// print runparameter to stdout
+			if( !is_stream.eof() )
+			{
+				is_stream >> temp;
+				if( temp == "DCTOPE" )
+				{
+					is_stream >> tmpEpoch ;
+					is_stream >> tmpDCtoPE ;
+					if( tmpEpoch == "V4" )
+					{
+						frogsDCtoPE[4] = tmpDCtoPE ;
+					}
+					else if( tmpEpoch == "V5" )
+					{
+						frogsDCtoPE[5] = tmpDCtoPE ;
+					}
+					else if( tmpEpoch == "V6" )
+					{
+						frogsDCtoPE[6] = tmpDCtoPE ;
+					}
+					else
+					{
+						cerr << "Error, in file '" << fparamfile
+							 << "'', keyword DCTOPE has a bad epoch (2nd column) value '"
+							 << tmpEpoch << "', which VFrogs doesn't know how to handle (only supports V4, V5, and V6), so we're exiting!" << endl;
+					}
+				}
+				else if( temp == "MUCORRECT" )
+				{
+					is_stream >> tmpEpoch ;
+					is_stream >> tmpLowerThresh ;
+					is_stream >> tmpFirstParam ; // TODO: needs better name!
+					is_stream >> tmpSecondParam ;
+					if( tmpEpoch == "V4" )
+					{
+						frogsLowerThresh[4] = tmpLowerThresh  ;
+						frogsFirstParam[4]  = tmpFirstParam   ;
+						frogsSecondParam[4] = tmpSecondParam  ;
+					}
+					else if( tmpEpoch == "V5" )
+					{
+						frogsLowerThresh[5] = tmpLowerThresh ;
+						frogsFirstParam[5]  = tmpFirstParam  ;
+						frogsSecondParam[5] = tmpSecondParam ;
+					}
+					else if( tmpEpoch == "V6" )
+					{
+						frogsLowerThresh[6] = tmpLowerThresh ;
+						frogsFirstParam[6]  = tmpFirstParam  ;
+						frogsSecondParam[6] = tmpSecondParam ;
+					}
+					else
+					{
+						cerr << "Error, in file '" << fparamfile << "'', keyword MUCORRECT has a bad epoch (2nd column) value '"
+							 << tmpEpoch << "', which VFrogs doesn't know how to handle (only supports V4, V5, and V6), so we're exiting!" << endl;
+					}
+				}
+				else if( temp == "PMTNOISE" )
+				{
+					is_stream >> tmpEpoch;
+					is_stream >> tmpPMTNoise;
+					if( tmpEpoch == "V4" )
+					{
+						frogsPMTNoise[4] = tmpPMTNoise;
+					}
+					else if( tmpEpoch == "V5" )
+					{
+						frogsPMTNoise[5] = tmpPMTNoise;
+					}
+					else if( tmpEpoch == "V6" )
+					{
+						frogsPMTNoise[6] = tmpPMTNoise;
+					}
+					else
+					{
+						cerr << "Error, in file '" << fparamfile << "'', keyword PMTNOISE has a bad epoch (2nd column) value '"
+							 << tmpEpoch << "', which VFrogs doesn't know how to handle (only supports V4, V5, and V6), so we're exiting!" << endl;
+					}
+				}
+				else if( temp == "MINIMIZATION" )
+				{
+					is_stream >> temp2;
+					if( temp2 == "ON" )
+					{
+						frogsMinimization = true;
+						is_stream >> frogsDeltaXS;
+						is_stream >> frogsDeltaYS;
+						is_stream >> frogsDeltaXP;
+						is_stream >> frogsDeltaYP;
+						is_stream >> frogsDeltaLog10e;
+						is_stream >> frogsDeltaLambda;
+					}
+					else if( temp2 == "OFF" )
+					{
+						frogsMinimization = false;
+						frogsDeltaXS      = 1E-15;
+						frogsDeltaYS      = 1E-15;
+						frogsDeltaXP      = 1E-15;
+						frogsDeltaYP      = 1E-15;
+						frogsDeltaLog10e  = 1E-15;
+						frogsDeltaLambda  = 1E-15;
+					}
+				}
+				else if( temp == "CHEATMODE" )
+				{
+					frogsCheating = true;
+				}
+				else if( temp == "EXPORTDATA" )
+				{
+					is_stream >> frogsNBEventCalib;
+				}
+			}
+		}
+	}
+	// print out to check sanity
+	for( int i = 0; i < VFROGSNEPOCH; i++ )
+	{
+		cout << "frogs params: epoch V" << i << " frogsLowerThresh[" << i << "]=" << frogsLowerThresh[i] << endl;
+		cout << "frogs params: epoch V" << i << " frogsFirstParam[ " << i << "]=" << frogsFirstParam[i] << endl;
+		cout << "frogs params: epoch V" << i << " frogsSecondParam[" << i << "]=" << frogsSecondParam[i] << endl;
+		cout << "frogs params: epoch V" << i << " frogsDCtoPE[" << i << "]=" << frogsDCtoPE[i] << endl;
+	}
+	cout << "frogs params: minimization mode ( 1 = ON, 0 = OFF )    : " << frogsMinimization << endl;
+	cout << "              stepsize (xs, ys, xp, yp, log10e, lambda): ( " << frogsDeltaXS << ", " << frogsDeltaYS << ", " << frogsDeltaXP << ", "
+		 << frogsDeltaYP << ", " << frogsDeltaLog10e << ", " << frogsDeltaLambda << " )" << endl;
+	cout << "frogs params: interpolation mode ( 0 = no interpolation, 1 = linear, 2 = quadratic ): " << frogsInterpOrder << endl;
+}
+
+//================================================================
+//================================================================
+
 void VFrogs::reset()
 {
-	frogsRecID = 0;
+	frogsRecID       = 0;
 	templatelistname = "";
-	frogsEventID = 0;
-	frogsGSLConStat = 0;
-	frogsNB_iter = 0;
-	frogsNImages = 0;
-	frogsXS = 0.;
-	frogsXSerr = 0.;
-	frogsYS = 0.;
-	frogsYSerr = 0.;
-	frogsXP = 0.;
-	frogsXPerr = 0.;
-	frogsYP = 0.;
-	frogsYPerr = 0.;
-	frogsXPGC = 0.;
-	frogsYPGC = 0.;
-	frogsEnergy = 0.;
-	frogsEnergyerr = 0.;
-	frogsLambda = 0.;
-	frogsLambdaerr = 0.;
+	frogsEventID     = 0;
+	frogsGSLConStat  = 0;
+	frogsNB_iter     = 0;
+	frogsNImages     = 0;
+	frogsXS          = 0.;
+	frogsXSerr       = 0.;
+	frogsYS          = 0.;
+	frogsYSerr       = 0.;
+	frogsXP          = 0.;
+	frogsXPerr       = 0.;
+	frogsYP          = 0.;
+	frogsYPerr       = 0.;
+	frogsXPGC        = 0.;
+	frogsYPGC        = 0.;
+	frogsEnergy      = 0.;
+	frogsEnergyerr   = 0.;
+	frogsLambda      = 0.;
+	frogsLambdaerr   = 0.;
 	frogsGoodnessImg = 0.;
-	frogsNpixImg = 0;
+	frogsNpixImg     = 0;
 	frogsGoodnessBkg = 0.;
-	frogsNpixBkg = 0;
-	frogsXPStart = 0.;
-	frogsYPStart = 0.;
-	frogsXPED = 0.;
-	frogsYPED = 0.;
-	frogsXSStart = 0.;
-	frogsYSStart = 0.;
-	fInitialized = false;
+	frogsNpixBkg     = 0;
+	frogsXPStart     = 0.;
+	frogsYPStart     = 0.;
+	frogsXPED        = 0.;
+	frogsYPED        = 0.;
+	frogsXSStart     = 0.;
+	frogsYSStart     = 0.;
+	fInitialized     = false;
 	fStartEnergyLoop = 0;
 	for( int i = 0; i < 500; i++ )
 	{
@@ -75,7 +256,28 @@ void VFrogs::reset()
 		frogsTelGoodnessImg[i] = 0.;
 		frogsTelGoodnessBkg[i] = 0.;
 	}
+	for( int i = 0; i < VFROGSNEPOCH; i++ )
+	{
+		frogsLowerThresh[i] = 0.;
+		frogsFirstParam[i]  = 0.;
+		frogsSecondParam[i] = 0.;
+		frogsDCtoPE[i]		  = 0.;
+		frogsPMTNoise[i]	  = 0.;
+	}
+	frogsMinimization	= true;
+	frogsDeltaXS		= 0.02;
+	frogsDeltaYS		= 0.02;
+	frogsDeltaXP		= 5.0;
+	frogsDeltaYP		= 5.0;
+	frogsDeltaLog10e	= 0.03;
+	frogsDeltaLambda	= 0.2;
+	frogsInterpOrder	= 2;
+	frogsCheating		= false;
+	frogsNBEventCalib = 0;
 }
+
+//================================================================
+//================================================================
 
 VFrogs::~VFrogs()
 {
@@ -131,7 +333,7 @@ void VFrogs::doFrogsStuff( int eventNumber, string fArrayEpoch )
 		struct frogs_imgtmplt_out output;
 		//output = frogs_img_tmplt( &d );
 		char templatelistnamecstr[FROGS_FILE_NAME_MAX_LENGTH] ;
-		int maxchar     = FROGS_FILE_NAME_MAX_LENGTH - 1 ;
+		int maxchar = FROGS_FILE_NAME_MAX_LENGTH - 1 ;
 		
 		// 'formatbuff' is so we only put the first "FROGS_FILE_NAME_MAX_LENGTH-1" characters of the templatelistname string into the char array 'templatelistnamecstr'
 		char formatbuff[20] ;
@@ -192,41 +394,41 @@ void VFrogs::doFrogsStuff( int eventNumber, string fArrayEpoch )
 			}
 		}
 		
-		frogsXPStart     = getShowerParameters()->fShowerXcore_SC[frogsRecID];
-		frogsYPStart     = getShowerParameters()->fShowerYcore_SC[frogsRecID];
-		frogsXPED        = getShowerParameters()->fShowerXcore[frogsRecID];
-		frogsYPED        = getShowerParameters()->fShowerYcore[frogsRecID];
-		frogsXSStart     = fData->getShowerParameters()->fShower_Xoffset[frogsRecID]; //TEMP GH
-		//frogsXSStart     = getShowerParameters()->fShower_Xoffset[frogsRecID];
-		frogsYSStart     = -1.0 * fData->getShowerParameters()->fShower_Yoffset[frogsRecID];
+		frogsXPStart   = getShowerParameters()->fShowerXcore_SC[frogsRecID];
+		frogsYPStart   = getShowerParameters()->fShowerYcore_SC[frogsRecID];
+		frogsXPED      = getShowerParameters()->fShowerXcore[frogsRecID];
+		frogsYPED      = getShowerParameters()->fShowerYcore[frogsRecID];
+		frogsXSStart   = fData->getShowerParameters()->fShower_Xoffset[frogsRecID]; //TEMP GH
+		//frogsXSStart = getShowerParameters()->fShower_Xoffset[frogsRecID];
+		frogsYSStart   = -1.0 * fData->getShowerParameters()->fShower_Yoffset[frogsRecID];
 		
-		getFrogsParameters()->frogsEventID = getFrogsEventID();
-		getFrogsParameters()->frogsGSLConStat = getFrogsGSLConStat();
-		getFrogsParameters()->frogsNB_iter = getFrogsNB_iter();
-		getFrogsParameters()->frogsNImages = getFrogsNImages();
-		getFrogsParameters()->frogsXS = getFrogsXS();
-		getFrogsParameters()->frogsXSerr = getFrogsXSerr();
-		getFrogsParameters()->frogsYS = getFrogsYS();
-		getFrogsParameters()->frogsYSerr = getFrogsYSerr();
-		getFrogsParameters()->frogsXP = getFrogsXP();
-		getFrogsParameters()->frogsXPerr = getFrogsXPerr();
-		getFrogsParameters()->frogsYP = getFrogsYP();
-		getFrogsParameters()->frogsXPGC = getFrogsXPGC();
-		getFrogsParameters()->frogsYPGC = getFrogsYPGC();
-		getFrogsParameters()->frogsYPerr = getFrogsYPerr();
-		getFrogsParameters()->frogsEnergy = getFrogsEnergy();
-		getFrogsParameters()->frogsEnergyerr = getFrogsEnergyerr();
-		getFrogsParameters()->frogsLambda = getFrogsLambda();
-		getFrogsParameters()->frogsLambdaerr = getFrogsLambdaerr();
+		getFrogsParameters()->frogsEventID		= getFrogsEventID();
+		getFrogsParameters()->frogsGSLConStat	= getFrogsGSLConStat();
+		getFrogsParameters()->frogsNB_iter		= getFrogsNB_iter();
+		getFrogsParameters()->frogsNImages		= getFrogsNImages();
+		getFrogsParameters()->frogsXS				= getFrogsXS();
+		getFrogsParameters()->frogsXSerr			= getFrogsXSerr();
+		getFrogsParameters()->frogsYS				= getFrogsYS();
+		getFrogsParameters()->frogsYSerr			= getFrogsYSerr();
+		getFrogsParameters()->frogsXP				= getFrogsXP();
+		getFrogsParameters()->frogsXPerr			= getFrogsXPerr();
+		getFrogsParameters()->frogsYP				= getFrogsYP();
+		getFrogsParameters()->frogsXPGC			= getFrogsXPGC();
+		getFrogsParameters()->frogsYPGC			= getFrogsYPGC();
+		getFrogsParameters()->frogsYPerr			= getFrogsYPerr();
+		getFrogsParameters()->frogsEnergy		= getFrogsEnergy();
+		getFrogsParameters()->frogsEnergyerr	= getFrogsEnergyerr();
+		getFrogsParameters()->frogsLambda		= getFrogsLambda();
+		getFrogsParameters()->frogsLambdaerr	= getFrogsLambdaerr();
 		getFrogsParameters()->frogsGoodnessImg = getFrogsGoodnessImg();
-		getFrogsParameters()->frogsNpixImg = getFrogsNpixImg();
+		getFrogsParameters()->frogsNpixImg		= getFrogsNpixImg();
 		getFrogsParameters()->frogsGoodnessBkg = getFrogsGoodnessBkg();
-		getFrogsParameters()->frogsNpixBkg = getFrogsNpixBkg();
+		getFrogsParameters()->frogsNpixBkg		= getFrogsNpixBkg();
 		
 		getFrogsParameters()->frogsXPStart = getFrogsXPStart();
 		getFrogsParameters()->frogsYPStart = getFrogsYPStart();
-		getFrogsParameters()->frogsXPED = getFrogsXPED();
-		getFrogsParameters()->frogsYPED = getFrogsYPED();
+		getFrogsParameters()->frogsXPED	  = getFrogsXPED();
+		getFrogsParameters()->frogsYPED	  = getFrogsYPED();
 		getFrogsParameters()->frogsXSStart = getFrogsXSStart();
 		getFrogsParameters()->frogsYSStart = getFrogsYSStart();
 		
@@ -319,7 +521,7 @@ void VFrogs::initOutput()
 	
 	if( FROGSDEBUG )
 	{
-		printf( "FROGPUT Are we initOutput??\n" );
+		printf( "FROGSPUT Are we initOutput??\n" );
 	}
 	
 }
@@ -330,14 +532,14 @@ void VFrogs::initFrogsTree()
 
 	if( FROGSDEBUG )
 	{
-		printf( "FROGPUT Check in initTree\n" );
+		printf( "FROGSPUT Check in initTree\n" );
 	}
 	
 	char i_text[300];
 	char i_textTitle[300];
 	sprintf( i_text, "frogspars" );
 	// tree versioning numbers used in mscw_energy
-	sprintf( i_textTitle, "FROGPUT: Frogs Parameters (VERSION %d)\n", getRunParameter()->getEVNDISP_TREE_VERSION() );
+	sprintf( i_textTitle, "FROGSPUT: Frogs Parameters (VERSION %d)\n", getRunParameter()->getEVNDISP_TREE_VERSION() );
 	if( getRunParameter()->fShortTree )
 	{
 		sprintf( i_textTitle, "%s (short tree)", i_textTitle );
@@ -595,14 +797,29 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc
 		rtn.elevation = 0.;
 		rtn.azimuth   = 0.;
 	}
-	rtn.event_id  = eventNumber;
-	rtn.epoch_id  = fArrayEpoch.c_str();
+	rtn.event_id				  = eventNumber;
+	rtn.epoch_id				  = fArrayEpoch.c_str();
+	string		 isub			  = fArrayEpoch.substr( 1, 1 );
+	int			 epoch_as_int = atoi( isub.c_str() );
+	rtn.lowerthresh			  = frogsLowerThresh[ epoch_as_int ];
+	rtn.firstparam				  = frogsFirstParam [ epoch_as_int ];
+	rtn.secondparam			  = frogsSecondParam[ epoch_as_int ];
+	
+	rtn.delta_xs	  = frogsDeltaXS;
+	rtn.delta_ys	  = frogsDeltaYS;
+	rtn.delta_xp	  = frogsDeltaXP;
+	rtn.delta_yp	  = frogsDeltaXP;
+	rtn.delta_log10e = frogsDeltaLog10e;
+	rtn.delta_lambda = frogsDeltaLambda;
+	
+	rtn.interporder	  = frogsInterpOrder;
+	rtn.nb_events_calib = frogsNBEventCalib;
 	
 	//Telescopes
 	rtn.ntel = fData->getNTel(); //Number of telescopes
 	
-	rtn.scope = new struct frogs_telescope [rtn.ntel];
-	rtn.nb_live_pix_total = 0; //Total number or pixels in use
+	rtn.scope				 = new struct frogs_telescope [rtn.ntel];
+	rtn.nb_live_pix_total = 0;	//Total number or pixels in use
 	for( int tel = 0; tel < rtn.ntel; tel++ )
 	{
 		initializeDataReader();
@@ -639,15 +856,15 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc
 		rtn.scope[tel].npix = fData->getDetectorGeo()->getNChannels()[tel];
 		
 		//Set the dimension of the pixel parameter arrays
-		rtn.scope[tel].xcam = new float [rtn.scope[tel].npix];
-		rtn.scope[tel].ycam = new float [rtn.scope[tel].npix];
-		rtn.scope[tel].q = new float [rtn.scope[tel].npix];
-		rtn.scope[tel].ped = new float [rtn.scope[tel].npix];
-		rtn.scope[tel].exnoise = new float [rtn.scope[tel].npix];
-		rtn.scope[tel].pixinuse = new int [rtn.scope[tel].npix];
+		rtn.scope[tel].xcam		  = new float [rtn.scope[tel].npix];
+		rtn.scope[tel].ycam		  = new float [rtn.scope[tel].npix];
+		rtn.scope[tel].q			  = new float [rtn.scope[tel].npix];
+		rtn.scope[tel].ped		  = new float [rtn.scope[tel].npix];
+		rtn.scope[tel].exnoise	  = new float [rtn.scope[tel].npix];
+		rtn.scope[tel].pixinuse	  = new int [rtn.scope[tel].npix];
 		rtn.scope[tel].telpixarea = new float [rtn.scope[tel].npix];
-		rtn.scope[tel].pixradius = new float [rtn.scope[tel].npix]; //(SV)
-		float foclen = 1000.0 * fData->getDetectorGeo()->getFocalLength()[tel]; //(SV) Focal length in mm
+		rtn.scope[tel].pixradius  = new float [rtn.scope[tel].npix];
+		float		 foclen			  = 1000.0 * fData->getDetectorGeo()->getFocalLength()[tel]; //Focal length in mm
 		
 		//Initialize the number of live pixel in the telescope
 		rtn.scope[tel].nb_live_pix = 0;
@@ -660,15 +877,13 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc
 			rtn.scope[tel].ycam[pix] = fData->getDetectorGeo()->getY()[pix];
 			
 			//Excess noise
-			rtn.scope[tel].exnoise[pix] = extra_noise;
+			rtn.scope[tel].exnoise[pix] = frogsPMTNoise[epoch_as_int];
 			//Pixel dead or alive
 			rtn.scope[tel].pixinuse[pix] = FROGS_OK;
-			//(GH) modify to remove LG pixels
-			//if(fData->getDead()[pix]!=0)
-			//if(fData->getDead()[pix]!=0 || fData->getData()->getHiLo()[pix]==1 )
 			//exclude channels that are dead or where the integration window falls outside the readout window or where the pedvar is 0
-			if( fData->getDead( fData->getData()->getHiLo()[pix] )[pix] != 0 || fData->getCurrentSumWindow_2()[pix] == 0  ||
-					fData->getData()->getPedvars( fData->getData()->getHiLo()[pix], fData->getCurrentSumWindow_2()[pix] )[pix]  == 0 )//(SV)
+			if( fData->getDead( fData->getData()->getHiLo()[pix] )[pix]																		  != 0||
+					fData->getCurrentSumWindow_2()[pix]																								  == 0||
+					fData->getData()->getPedvars( fData->getData()->getHiLo()[pix], fData->getCurrentSumWindow_2()[pix] )[pix] == 0 )
 			{
 				rtn.scope[tel].pixinuse[pix] = FROGS_NOTOK;
 			}
@@ -678,30 +893,27 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc
 				rtn.scope[tel].nb_live_pix++;
 			}
 			//Pixel effective collecting area in square degrees
-			float tmppixarea = fData->getDetectorGeo()->getTubeRadius_MM( tel )[pix] * FROGS_DEG_PER_RAD / foclen; //(SV)
-			tmppixarea = FROGS_PI * tmppixarea * tmppixarea;
-			rtn.scope[tel].telpixarea[pix] = telarea * tmppixarea * cone_eff;
+			//float tmppixarea = fData->getDetectorGeo()->getTubeRadius_MM( tel )[pix] * FROGS_DEG_PER_RAD / foclen; //still being used?
+			//tmppixarea = FROGS_PI * tmppixarea * tmppixarea; //still being used?
+			//rtn.scope[tel].telpixarea[pix] = telarea * tmppixarea * cone_eff; //still being used?
 			//Pixel radius in degree
-			rtn.scope[tel].pixradius[pix] = fData->getDetectorGeo()->getTubeRadius_MM( tel )[pix] * FROGS_DEG_PER_RAD / foclen; //(SV)
+			//rtn.scope[tel].pixradius[pix] = fData->getDetectorGeo()->getTubeRadius_MM( tel )[pix] * FROGS_DEG_PER_RAD / foclen; //(SV)
 			
 			//Initialize the pixel signal and pedestal width to zero
-			rtn.scope[tel].q[pix] = 0;
+			rtn.scope[tel].q[pix]	= 0;
 			rtn.scope[tel].ped[pix] = 0;
 			//Set them to their values in p.e. if the d.c./p.e. factor is non zero
-			if( dc2pe != 0 )
+			if( frogsDCtoPE[epoch_as_int] != 0 )
 			{
-				rtn.scope[tel].q[pix] = fData->getData()->getSums2()[pix] / dc2pe;
-				//rtn.scope[tel].ped[pix]=
-				//fData->getData()->getPedvars( fData->getData()->getHiLo()[pix], fData->getCurrentSumWindow_2()[pix] )[pix]*fData->getData()->getLowGainMultiplier()[pix]*frogs_pedwidth_correction/dc2pe;
-				
-				//rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]/dc2pe;
+				rtn.scope[tel].q[pix] = fData->getData()->getSums2()[pix] / frogsDCtoPE[epoch_as_int];
+				//rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix] / frogsDCtoPE[epoch_as_int];
 				if( fData->getData()->getHiLo()[pix] == 1 )
 				{
 					//rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]*fData->getData()->getLowGainMultiplier()[pix]/dc2pe;
 					//rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]/dc2pe; //(SV): getLowGainMultiplier removed
 					//rtn.scope[tel].ped[pix]=fData->getData()->getPedvars(true,18)[pix]*frogs_pedwidth_correction/dc2pe;
 					rtn.scope[tel].ped[pix] =
-						fData->getData()->getPedvars( fData->getData()->getHiLo()[pix], fData->getCurrentSumWindow_2()[pix] )[pix] / dc2pe;
+						fData->getData()->getPedvars( fData->getData()->getHiLo()[pix], fData->getCurrentSumWindow_2()[pix] )[pix] / frogsDCtoPE[epoch_as_int];
 				}
 				else
 				{
@@ -709,7 +921,7 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc
 					//rtn.scope[tel].ped[pix]=fData->getData()->getPedvars(false,18)[pix]*frogs_pedwidth_correction/dc2pe;
 					//rtn.scope[tel].ped[pix]=fData->getData()->getPedvars()[pix]*frogs_pedwidth_correction/dc2pe;
 					rtn.scope[tel].ped[pix] =
-						fData->getData()->getPedvars( fData->getData()->getHiLo()[pix], fData->getCurrentSumWindow_2()[pix] )[pix] / dc2pe;
+						fData->getData()->getPedvars( fData->getData()->getHiLo()[pix], fData->getCurrentSumWindow_2()[pix] )[pix] / frogsDCtoPE[epoch_as_int];
 				}
 			}
 		}
@@ -718,20 +930,25 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc
 	}
 	
 	//Optimization starting point todo y -> -y ??
-	rtn.startpt.xs = 1.0 * fData->getShowerParameters()->fShower_Xoffset[frogsRecID]; //(SV) starting points set to ED parameters
+	rtn.startpt.xs =  1.0 * fData->getShowerParameters()->fShower_Xoffset[frogsRecID]; //(SV) starting points set to ED parameters
 	rtn.startpt.ys = -1.0 * fData->getShowerParameters()->fShower_Yoffset[frogsRecID]; //(SV) starting points set to ED parameters
-	
-	//rtn.startpt.xs=1.0*fData->getShowerParameters()->MCTel_Xoff; //(SV) starting points set to MC parameters
-	//rtn.startpt.ys=-1.0*fData->getShowerParameters()->MCTel_Yoff; //(SV) starting points set to MC parameters
 	
 	rtn.startpt.xp = fData->getShowerParameters()->fShowerXcore_SC[frogsRecID]; //(SV) starting points set to ED parameters
 	rtn.startpt.yp = fData->getShowerParameters()->fShowerYcore_SC[frogsRecID]; //(SV) starting points set to ED parameters
 	
-	//rtn.startpt.xp=fData->getShowerParameters()->MCxcore_SC; //(SV) starting points set to MC parameters
-	//rtn.startpt.yp=fData->getShowerParameters()->MCycore_SC; //(SV) starting points set to MC parameters
+	rtn.startpt.log10e = inEnergy; //(SV) inEnergy from ED
 	
-	//rtn.startpt.xp=fData->getShowerParameters()->MCxcore; //(SV) starting points set to MC parameters (Ground Coord)
-	//rtn.startpt.yp=fData->getShowerParameters()->MCycore; //(SV) starting points set to MC parameters (Ground Coord)
+	if( frogsCheating == true )
+	{
+		//the starting parameter values for the minimization are set to MC values
+		rtn.startpt.xs		 = 1.0 * fData->getShowerParameters()->MCTel_Xoff;
+		rtn.startpt.ys		 = -1.0 * fData->getShowerParameters()->MCTel_Yoff;
+		rtn.startpt.xp		 = fData->getShowerParameters()->MCxcore_SC;
+		rtn.startpt.yp		 = fData->getShowerParameters()->MCycore_SC;
+		//rtn.startpt.xp	 =	fData->getShowerParameters()->MCxcore; //(Ground Coord) useful?
+		//rtn.startpt.yp	 =	fData->getShowerParameters()->MCycore; //(Ground Coord) useful?
+		rtn.startpt.log10e = log10( fData->getShowerParameters()->MCenergy );
+	}
 	
 	if( FROGSDEBUG )
 	{
@@ -744,7 +961,6 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc
 	
 	rtn.startpt.lambda = 1.0; //(SV) We use a fixed value by lack of information.
 	
-	rtn.startpt.log10e = inEnergy; //(SV) inEnergy from ED
 	if( rtn.startpt.log10e > 0.0 )
 	{
 		rtn.startpt.log10e = log10( rtn.startpt.log10e );
@@ -753,8 +969,6 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc
 	{
 		rtn.startpt.log10e = FROGS_BAD_NUMBER;
 	}
-	
-	//rtn.startpt.log10e = log10(fData->getShowerParameters()->MCenergy); //(SV) starting points set to MC parameters (inEnergy from MC)
 	
 	//Decides if the event is worth analysing.
 	rtn.worthy_event = FROGS_OK;

@@ -274,10 +274,11 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		
 		// Frogs parameters
 		bool ffrogsmode;                          // for Frogs template Analysis, GH
-		string ffrogsmscwfile;			  // frogs file for getting table energy
-		int ffrogsRecID;			  // RecID or Cut_ID Frogs Uses - combine with table
-		string ffrogstemplatelist ;               // text file containing the elevation and
+		string ffrogsmscwfile;			            // frogs file for getting table energy
+		int ffrogsRecID;			                  // RecID or Cut_ID Frogs Uses - combine with table
+		string ffrogstemplatelist;                // text file containing the elevation and
 		//   elevation-dependant template file names
+		string ffrogsparameterfile;               // parameter file for frogs settings
 		
 		// Model3D
 		bool fUseModel3D;                         // use Model3D analysis, JG
@@ -335,6 +336,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fuseDB;
 		}
 		
-		ClassDef( VEvndispRunParameter, 160 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 161 ); //(increase this number)
 };
 #endif

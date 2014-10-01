@@ -160,6 +160,18 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->ffrogstemplatelist = "" ;
 			}
 		}
+		else if( iTemp1 == "-frogsparameterfile" )
+		{
+			if( iTemp2.size() > 0 )
+			{
+				fRunPara->ffrogsparameterfile = iTemp2 ;
+				i++;
+			}
+			else
+			{
+				fRunPara->ffrogsparameterfile = "" ;
+			}
+		}
 		/////////////////////////////////////////////////////////
 		// Model3D
 		else if( iTemp.find( "model3d" ) < iTemp.size() )

@@ -51,16 +51,13 @@
 #define FROGS_NUMBER_OF_SIGMA 10.0      /*Number of standard deviations to be 
 				    explored around a signal. 15 is 
 				    certainly too large*/
-#define FROGS_INTERP_ORDER 2    /*Interpolation order should be set to 
-				  0 (no interpolation) 1 (linear) or 2 (quadratic)*/
-#define FROGS_NBEVENT_GDNS_CALIBR 0 /*Number of events used to build a goodness 
-				  calibration file. Must be set to a positive 
-				  number to activate the good ness 
-				  calibration output. */
-#define FROGS_NBEVENT_DISPLAY 0 /*Number of eents used to build a goodness 
-				  calibration file. Must be set to a positive 
-				  number to activate the good ness 
-				  calibration output. */
+//#define FROGS_INTERP_ORDER 2    /*Interpolation order should be set to
+//				  0 (no interpolation) 1 (linear) or 2 (quadratic)*/
+//#define FROGS_NBEVENT_GDNS_CALIBR 0 /*Number of events used to build a goodness
+//				  calibration file. Must be set to a positive
+//				  number to activate the good ness
+//				  calibration output. */
+#define FROGS_NBEVENT_DISPLAY 0 //is it used?
 #define FROGS_XS 0     //These tags are used to specify the parameter with 
 #define FROGS_YS 1     //respect to which the derivative of the likelihood is 
 #define FROGS_XP 2     //calculated. Because of GLS, the Ttags should have 
@@ -68,23 +65,23 @@
 #define FROGS_LOG10E 4 //minus one so 5 in our case. 
 #define FROGS_LAMBDA 5
 
-#define FROGS_HITHRESH 5.0   //Higher threshold to define the picture
-#define FROGS_LOTHRESH 2.5   //Lower threshold to define the picture 
-#define FROGS_PICTRAD  0.35  //Radius defining the picture
-#define FROGS_NEIGHBORAD 0.16 //Pixels separated by less than that are neighbors
+//#define FROGS_HITHRESH 5.0   //Higher threshold to define the picture
+//#define FROGS_LOTHRESH 2.5   //Lower threshold to define the picture
+//#define FROGS_PICTRAD  0.35  //Radius defining the picture
+//#define FROGS_NEIGHBORAD 0.16 //Pixels separated by less than that are neighbors
 
-#define frogs_pedwidth_correction 1.00
+//#define frogs_pedwidth_correction 1.00
 
 // Charge correction for V6, V5 & V4
-static const double mu_correction_lower_threshold[3] = {400, 1E18, 1E18};
-static const double mu_correction_first_parameter[3] = { -2.9628E3, 0., 0.};
-static const double mu_correction_second_parameter[3] = {5.566444E2, 0.  , 0. };
+//static const double mu_correction_lower_threshold[3] = {400, 1E18, 1E18};
+//static const double mu_correction_first_parameter[3] = { -2.9628E3, 0., 0.};
+//static const double mu_correction_second_parameter[3] = {5.566444E2, 0.  , 0. };
 
 // Conversion values for table
-#define cone_eff    0.81 // Wintson Cone Collection efficency NOTE: CARE sims have this set = 1 instead of 0.81
-#define telarea     94.0 // Mirror Effective Area m^2
-#define extra_noise 0.35 // PMT electronic noise
-#define dc2pe       5.3  // d.c. to p.e. conversion
+//#define cone_eff    0.81 // Wintson Cone Collection efficency NOTE: CARE sims have this set = 1 instead of 0.81
+//#define telarea     94.0 // Mirror Effective Area m^2
+//#define extra_noise 0.35 // PMT electronic noise
+//#define dc2pe       5.3  // d.c. to p.e. conversion
 
 
 #define lmuMAX  2.0
@@ -146,6 +143,18 @@ struct frogs_imgtmplt_in
 	int ntel;  //Number of telescopes
 	struct frogs_telescope* scope;
 	int worthy_event; //FROGS_OK if event is to be analysed FROGS_NOTOK otherwise
+	double lowerthresh ;
+	double firstparam  ;
+	double secondparam ;
+	double delta_xs ;
+	double delta_ys ;
+	double delta_xp ;
+	double delta_yp ;
+	double delta_log10e ;
+	double delta_lambda ;
+	int interporder ;
+	int nb_events_calib;
+	//
 };
 //----------------------------------------------------------------
 struct frogs_telescope
@@ -325,7 +334,9 @@ double frogs_pix_lkhd_deriv_4thorder_old( int pix, int tel,
 struct frogs_reconstruction frogs_param_step( struct frogs_reconstruction pnt,
 		struct frogs_reconstruction delta,
 		int gsl_par_id, float mult );
-int frogs_gdns_calibr_out( int event_id, int tel, int pix, float q, float ped, float mu,
+//int frogs_gdns_calibr_out( int event_id, int tel, int pix, float q, float ped, float mu,
+//double pix_goodness, double energy, double xp, double yp, double xcam, double ycam );
+int frogs_gdns_calibr_out( int nb_evens_printed_out, int event_id, int tel, int pix, float q, float ped, float mu,
 						   double pix_goodness, double energy, double xp, double yp, double xcam, double ycam );
 int frogs_event_display( int event_id, float q, float mu, float xtel,
 						 float ytel, float xpix, float ypix, int pix_in_img );
@@ -334,7 +345,8 @@ int frogs_image_or_background( int tel, int pix, struct frogs_imgtmplt_in* d, do
 float frogs_get_overlapping_area( gsl_rng* r, float x, float y, float pixradius,
 								  float X, float Y, float dX, float dY );
 float floatwrap( float x, float min, float max );
-double frogs_mu_correction( double mu, const char epoch_id[20] );
+double frogs_mu_correction( double mu, const char epoch_id[20], double mu_correction_lower_threshold,
+							double mu_correction_first_parameter, double mu_correction_second_parameter );
 // Functions dealing with probability density lookup tables:
 void frogs_fill_prob_density( struct frogs_probability_array* prob_array );
 double frogs_read_prob_array_table( struct frogs_probability_array* prob_array, double q, double mu, double ped );

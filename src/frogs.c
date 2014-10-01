@@ -195,31 +195,31 @@ struct frogs_imgtmplt_out frogs_null_imgtmplt_out()
 	//Used to set the image template analysis output to some null values
 	//when the analysis failed.
 	struct frogs_imgtmplt_out rtn;
-	rtn.nb_iter = FROGS_BAD_NUMBER;
-	rtn.goodness_img = FROGS_BAD_NUMBER;
-	rtn.npix_img = FROGS_BAD_NUMBER;
-	rtn.goodness_bkg = FROGS_BAD_NUMBER;
-	rtn.npix_bkg = FROGS_BAD_NUMBER;
-	rtn.cvrgpt.xs = FROGS_BAD_NUMBER;
-	rtn.cvrgpt.ys = FROGS_BAD_NUMBER;
-	rtn.cvrgpt.xp = FROGS_BAD_NUMBER;
-	rtn.cvrgpt.yp = FROGS_BAD_NUMBER;
-	rtn.cvrgpt.log10e = FROGS_BAD_NUMBER;
-	rtn.cvrgpt.lambda = FROGS_BAD_NUMBER;
-	rtn.cvrgpterr.xs = FROGS_BAD_NUMBER;
-	rtn.cvrgpterr.ys = FROGS_BAD_NUMBER;
-	rtn.cvrgpterr.xp = FROGS_BAD_NUMBER;
-	rtn.cvrgpterr.yp = FROGS_BAD_NUMBER;
-	rtn.cvrgpterr.log10e = FROGS_BAD_NUMBER;
-	rtn.cvrgpterr.lambda = FROGS_BAD_NUMBER;
-	rtn.tel_goodnessImg[0] = FROGS_BAD_NUMBER;
-	rtn.tel_goodnessImg[1] = FROGS_BAD_NUMBER;
-	rtn.tel_goodnessImg[2] = FROGS_BAD_NUMBER;
-	rtn.tel_goodnessImg[3] = FROGS_BAD_NUMBER;
-	rtn.tel_goodnessBkg[0] = FROGS_BAD_NUMBER;
-	rtn.tel_goodnessBkg[1] = FROGS_BAD_NUMBER;
-	rtn.tel_goodnessBkg[2] = FROGS_BAD_NUMBER;
-	rtn.tel_goodnessBkg[3] = FROGS_BAD_NUMBER;
+	rtn.nb_iter						  = FROGS_BAD_NUMBER;
+	rtn.goodness_img				  = FROGS_BAD_NUMBER;
+	rtn.npix_img					  = FROGS_BAD_NUMBER;
+	rtn.goodness_bkg				  = FROGS_BAD_NUMBER;
+	rtn.npix_bkg					  = FROGS_BAD_NUMBER;
+	rtn.cvrgpt.xs					  = FROGS_BAD_NUMBER;
+	rtn.cvrgpt.ys					  = FROGS_BAD_NUMBER;
+	rtn.cvrgpt.xp					  = FROGS_BAD_NUMBER;
+	rtn.cvrgpt.yp					  = FROGS_BAD_NUMBER;
+	rtn.cvrgpt.log10e				  = FROGS_BAD_NUMBER;
+	rtn.cvrgpt.lambda				  = FROGS_BAD_NUMBER;
+	rtn.cvrgpterr.xs				  = FROGS_BAD_NUMBER;
+	rtn.cvrgpterr.ys				  = FROGS_BAD_NUMBER;
+	rtn.cvrgpterr.xp				  = FROGS_BAD_NUMBER;
+	rtn.cvrgpterr.yp				  = FROGS_BAD_NUMBER;
+	rtn.cvrgpterr.log10e			  = FROGS_BAD_NUMBER;
+	rtn.cvrgpterr.lambda			  = FROGS_BAD_NUMBER;
+	rtn.tel_goodnessImg[0]		  = FROGS_BAD_NUMBER;
+	rtn.tel_goodnessImg[1]		  = FROGS_BAD_NUMBER;
+	rtn.tel_goodnessImg[2]		  = FROGS_BAD_NUMBER;
+	rtn.tel_goodnessImg[3]		  = FROGS_BAD_NUMBER;
+	rtn.tel_goodnessBkg[0]		  = FROGS_BAD_NUMBER;
+	rtn.tel_goodnessBkg[1]		  = FROGS_BAD_NUMBER;
+	rtn.tel_goodnessBkg[2]		  = FROGS_BAD_NUMBER;
+	rtn.tel_goodnessBkg[3]		  = FROGS_BAD_NUMBER;
 	return rtn;
 }
 //================================================================
@@ -258,20 +258,20 @@ frogs_likelihood_optimization( struct frogs_imgtmplt_in* d,
 	//Prepare function minimization
 	const size_t n = d->nb_live_pix_total;  //Number of pixels used
 	gsl_multifit_function_fdf func;
-	func.n = n;  //number of pixels used
-	func.p = p;  //Dimension of the parameter space
-	func.f = &frogs_likelihood; //frogs_likelihood: function to be minimized
-	func.df = &frogs_likelihood_derivative; //frogs_likelihood_derivative
-	func.fdf = &frogs_likelihood_fdf;  //Weird function GSL wants to see
+	func.n	= n;					  //number of pixels used
+	func.p	= p;					  //Dimension of the parameter space
+	func.f	= &frogs_likelihood;			 //frogs_likelihood: function to be minimized
+	func.df	= &frogs_likelihood_derivative;		//frogs_likelihood_derivative
+	func.fdf	= &frogs_likelihood_fdf;	 //Weird function GSL wants to see
 	//Construct a structure with all the data to be passed to the image model
 	struct  frogs_gsl_data_wrapper data;
-	data.tmplt = tmplt; //template data
-	data.data = d;     //telescope data
-	data.probarray = prob_array;
-	func.params = ( void* )&data; /*This will be passed to the functions
-  				frogs_likelihood and
-  				frogs_likelihood_derivative
-  				as a pointer to a void*/
+	data.tmplt		= tmplt;		  //template data
+	data.data		= d;			  //telescope data
+	data.probarray	= prob_array;
+	func.params		= ( void* )&data; /*This will be passed to the functions
+														  frogs_likelihood and
+														  frogs_likelihood_derivative
+														  as a pointer to a void*/
 	const gsl_multifit_fdfsolver_type* T;
 	gsl_multifit_fdfsolver* s;
 	T = gsl_multifit_fdfsolver_lmsder;
@@ -296,10 +296,10 @@ frogs_likelihood_optimization( struct frogs_imgtmplt_in* d,
 	//If the maximum number of iteration was reached, we return a null result.
 	if( iter == FROGS_MAX_ITER_NBR )
 	{
-		rtn = frogs_null_imgtmplt_out();
-		rtn.gsl_convergence_status = status;
-		rtn.event_id = d->event_id;
-		rtn.nb_iter = iter;
+		rtn										 = frogs_null_imgtmplt_out();
+		rtn.gsl_convergence_status			 = status;
+		rtn.event_id							 = d->event_id;
+		rtn.nb_iter								 = iter;
 		gsl_multifit_fdfsolver_free( s );
 		return rtn;
 	}
@@ -392,9 +392,9 @@ int frogs_goodness( struct frogs_imgtmplt_out* tmplanlz,
 	/*Initialize goodnesses and the number of pixels for both image
 	  and background regions*/
 	tmplanlz->goodness_img = 0;
-	tmplanlz->npix_img = 0;
+	tmplanlz->npix_img	  = 0;
 	tmplanlz->goodness_bkg = 0;
-	tmplanlz->npix_bkg = 0;
+	tmplanlz->npix_bkg	  = 0;
 	
 	/* Calculates the telescope image goodness and the telescope background goodness.
 	   The goodness-of-fit per telescope are initially set to 0. To prevent fake "good"
@@ -449,18 +449,17 @@ int frogs_goodness( struct frogs_imgtmplt_out* tmplanlz,
 					double pix_goodness = -2.0 * log( pd ) - mean_lkhd;
 					
 					//If requested we produce a calibration output
-					if( FROGS_NBEVENT_GDNS_CALIBR > 0 )
-						frogs_gdns_calibr_out( d->event_id, tel, pix, d->scope[tel].q[pix], d->scope[tel].ped[pix], mu,
+					//if( FROGS_NBEVENT_GDNS_CALIBR > 0 )
+					if( d->nb_events_calib > 0 )
+						frogs_gdns_calibr_out( d->nb_events_calib, d->event_id, tel, pix, d->scope[tel].q[pix], d->scope[tel].ped[pix], mu,
 											   pix_goodness, tmplanlz->cvrgpt.log10e, tmplanlz->cvrgpt.xp, tmplanlz->cvrgpt.yp, d->scope[tel].xcam[pix], d->scope[tel].ycam[pix] );
 											   
 					/*Apply the single pixel goodness correction according to the
 					  pixel pedestal width and the model value mu*/
-					
 					//frogs_goodness_correction(pix_goodness,d->scope[tel].ped[pix],mu);
 					
 					/*Decides if the pixel should be counted in the image
 					  or background region*/
-					
 					//int pix_in_img=frogs_image_or_background(tel,pix,d);
 					int pix_in_img = frogs_image_or_background( tel, pix, d, mu );
 					
@@ -582,7 +581,7 @@ int frogs_image_or_background( int tel, int pix, struct frogs_imgtmplt_in* d, do
 	  in the bacground region.
 	  If a pixel signal exceeds FROGS_HITHRESH passes the cleaning.
 	  If a pixel signal exceeds FROGS_LOTHRESH it passes the cleaning if
-	  it has a direct neighbor whose signal exceeds FROGS_HITHRESH. The
+	  it has a drect neighbor whose signal exceeds FROGS_HITHESH. The
 	  thesholds FROGS_HITHRESH and FROGS_LOTHRESH are expressed in units
 	  of pedestal standard deviations.
 	*/
@@ -602,71 +601,71 @@ int frogs_image_or_background( int tel, int pix, struct frogs_imgtmplt_in* d, do
 	return FROGS_NOTOK;
 	
 	
-	if( d->scope[tel].q[pix] > FROGS_HITHRESH * d->scope[tel].ped[pix] )
-	{
-		return FROGS_OK;
-	}
+	//if( d->scope[tel].q[pix] > FROGS_HITHRESH * d->scope[tel].ped[pix] )
+	//{
+	//return FROGS_OK;
+	//}
 	
 	//Get the square of the radius defining the picture region
-	float d2max = FROGS_PICTRAD * FROGS_PICTRAD;
+	//float d2max = FROGS_PICTRAD * FROGS_PICTRAD;
 	
 	//Loop over the pixels
-	for( int p = 0; p < d->scope[tel].npix; p++ )
-	{
-		//Only for pixels in use
-		if( d->scope[tel].pixinuse[p] == FROGS_OK )
-		{
-			//Distance to the tested pixel
-			float d2 = ( d->scope[tel].xcam[pix] - d->scope[tel].xcam[p] ) *
-					   ( d->scope[tel].xcam[pix] - d->scope[tel].xcam[p] ) +
-					   ( d->scope[tel].ycam[pix] - d->scope[tel].ycam[p] ) *
-					   ( d->scope[tel].ycam[pix] - d->scope[tel].ycam[p] );
-			//If the distance is less than the picture definition radius
-			if( d2 < d2max )
-			{
-				/*If the pixel has a signal exceeding the higher threshold, the
-				  tested pixel is counted in the image. */
-				if( d->scope[tel].q[p] > FROGS_HITHRESH * d->scope[tel].ped[p] )
-				{
-					return FROGS_OK;
-				}
-				/*If the pixel has a signal exceeding the lower threshold but not
-				  the higher, it needs to have a direct neighbor exceeding the
-				  higher threshold for the tested pixel to be part of the picture
-				  region*/
-				if( d->scope[tel].q[p] > FROGS_LOTHRESH * d->scope[tel].ped[p] )
-				{
-					//Square of the maximal distance for pixels to be neighbors
-					float dnb2max = FROGS_NEIGHBORAD * FROGS_NEIGHBORAD;
-					//Loop over the pixels
-					for( int pnb = 0; pnb < d->scope[tel].npix; pnb++ )
-					{
-						//Only for pixels in use
-						if( d->scope[tel].pixinuse[pnb] == FROGS_OK )
-						{
-							float dnb2 = ( d->scope[tel].xcam[p] - d->scope[tel].xcam[pnb] ) *
-										 ( d->scope[tel].xcam[p] - d->scope[tel].xcam[pnb] ) +
-										 ( d->scope[tel].ycam[p] - d->scope[tel].ycam[pnb] ) *
-										 ( d->scope[tel].ycam[p] - d->scope[tel].ycam[pnb] );
-							//if pixels p and pnb are neighbors
-							if( dnb2 < dnb2max )
-								/*if the neighbor of p has a signal in excess of the high
-								  threshold the tested pixel is counted in the picture. */
-								if( d->scope[tel].q[pnb] > FROGS_HITHRESH * d->scope[tel].ped[pnb] )
-								{
-									return FROGS_OK;
-								}
-						} //end of the pixinuse test in the search for neighbors of pixel p
-					} //End of the loop searching for neighbors of pixel p
-				} //End of the test for LOTHRESH
-			}//End of test on the distance
-		}//End of the test of pixel being in use
-	}//End of the main loop on pixels
-	return FROGS_NOTOK;
+	//for( int p = 0; p < d->scope[tel].npix; p++ )
+	//{
+	//Only for pixels in use
+	//if( d->scope[tel].pixinuse[p] == FROGS_OK )
+	//{
+	//Distance to the tested pixel
+	//float d2 = ( d->scope[tel].xcam[pix] - d->scope[tel].xcam[p] ) *
+	//( d->scope[tel].xcam[pix] - d->scope[tel].xcam[p] ) +
+	//( d->scope[tel].ycam[pix] - d->scope[tel].ycam[p] ) *
+	//( d->scope[tel].ycam[pix] - d->scope[tel].ycam[p] );
+	//If the distance is less than the picture definition radius
+	//if( d2 < d2max )
+	//{
+	/*If the pixel has a signal exceeding the higher threshold, the
+	  tested pixel is counted in the image. */
+	//	 if( d->scope[tel].q[p] > FROGS_HITHRESH * d->scope[tel].ped[p] )
+	//		{
+	//		  return FROGS_OK;
+	//		}
+	/*If the pixel has a signal exceeding the lower threshold but not
+	  the higher, it needs to have a direct neighbor exceeding the
+	  higher threshold for the tested pixel to be part of the picture
+	  region*/
+	//	 if( d->scope[tel].q[p] > FROGS_LOTHRESH * d->scope[tel].ped[p] )
+	//		{
+	//Square of the maximal distance for pixels to be neighbors
+	//		  float dnb2max = FROGS_NEIGHBORAD * FROGS_NEIGHBORAD;
+	//Loop over the pixels
+	//		  for( int pnb = 0; pnb < d->scope[tel].npix; pnb++ )
+	//			 {
+	//Only for pixels in use
+	//if( d->scope[tel].pixinuse[pnb] == FROGS_OK )
+	//				  {
+	//					 float dnb2 = ( d->scope[tel].xcam[p] - d->scope[tel].xcam[pnb] ) *
+	//						( d->scope[tel].xcam[p] - d->scope[tel].xcam[pnb] ) +
+	//						( d->scope[tel].ycam[p] - d->scope[tel].ycam[pnb] ) *
+	//						( d->scope[tel].ycam[p] - d->scope[tel].ycam[pnb] );
+	//if pixels p and pnb are neighbors
+	//					 if( dnb2 < dnb2max )
+	/*if the neighbor of p has a signal in excess of the high
+	  threshold the tested pixel is counted in the picture. */
+	//						if( d->scope[tel].q[pnb] > FROGS_HITHRESH * d->scope[tel].ped[pnb] )
+	//{
+	//	return FROGS_OK;
+	//						  }
+	//				  } //end of the pixinuse test in the search for neighbors of pixel p
+	//			 } //End of the loop searching for neighbors of pixel p
+	//		} //End of the test for LOTHRESH
+	//}//End of test on the distance
+	//}//End of the test of pixel being in use
+	//}//End of the main loop on pixels
+	//return FROGS_NOTOK;
 }
 //================================================================
 //================================================================
-int frogs_gdns_calibr_out( int event_id, int tel, int pix, float q,  float ped, float mu,
+int frogs_gdns_calibr_out( int nb_evens_printed_out, int event_id, int tel, int pix, float q,  float ped, float mu,
 						   double pix_goodness, double energy, double xp, double yp, double xcam, double ycam )
 {
 	/*This funtion is used to print out information used to establish the
@@ -674,7 +673,7 @@ int frogs_gdns_calibr_out( int event_id, int tel, int pix, float q,  float ped, 
 	  values. On the first time it is called, it opens a file named
 	  frogs_goodness_calibration.frogs and starts counting events, printing
 	  calibration data for each pixel. When the number of events exceeds
-	  FROGS_NBEVENT_GDNS_CALIBR it closes the file and stops the program
+	  FROGS_NBENT_GDNS_CALIBR it closes the file and stops the program
 	  This function should be called from the function frogs_goodness*/
 	
 	static int last_event_id = FROGS_NOTOK; //Stores the last event id.
@@ -708,7 +707,8 @@ int frogs_gdns_calibr_out( int event_id, int tel, int pix, float q,  float ped, 
 	}
 	
 	//If we collected enough events we ned to stop
-	if( nbrevt_calib > FROGS_NBEVENT_GDNS_CALIBR )
+	//if( nbrevt_calib > FROGS_NBEVENT_GDNS_CALIBR )
+	if( nbrevt_calib > nb_evens_printed_out )
 	{
 		//Close the file
 		fclose( calib );
@@ -1358,16 +1358,13 @@ int frogs_likelihood_derivative( const gsl_vector* v, void* ptr, gsl_matrix* J )
 	  coming in the frogs_gsl_data_wrapper structure*/
 	struct frogs_reconstruction delta;
 	
-	delta.xs = 0.02;
-	delta.ys = 0.02;
-	delta.xp = 5.0;
-	delta.yp = 5.0;
-	delta.log10e = 0.03;
-	delta.lambda = 0.2;
-	
-	//Set stepsize to small value (no convergence)
-	//delta.xs=1E-15; delta.ys=1E-15; delta.xp=1E-15; delta.yp=1E-15; delta.log10e=1E-15; delta.lambda=1E-15;
-	
+	delta.xs = dwrap->data->delta_xs;
+	delta.ys = dwrap->data->delta_ys;
+	delta.xp = dwrap->data->delta_xp;
+	delta.yp = dwrap->data->delta_yp;
+	delta.log10e = dwrap->data->delta_log10e;
+	delta.lambda = dwrap->data->delta_lambda;
+		
 	int gsl_pix_id = 0; //This counter is used as a pixel identified for gsl
 	for( int tel = 0; tel < dwrap->data->ntel; tel++ )
 	{
@@ -1848,18 +1845,18 @@ double frogs_img_model( int pix, int tel, struct frogs_reconstruction pnt,
 	double rtn = 0.;
 	
 #ifdef CONVOLUTION
-	if( FROGS_INTERP_ORDER == 0 ) rtn = frogs_chertemplate_no_int( pnt.lambda, pnt.log10e,
-											timp, tmpltxpix,
-											tmpltypix, tmplt,
-											intemplate );
-	if( FROGS_INTERP_ORDER == 1 ) rtn = frogs_chertemplate_lin( pnt.lambda, pnt.log10e,
-											timp, tmpltxpix,
-											tmpltypix, tmplt,
-											intemplate );
-	if( FROGS_INTERP_ORDER == 2 ) rtn = frogs_chertemplate_quad( pnt.lambda, pnt.log10e,
-											timp, tmpltxpix,
-											tmpltypix, tmplt,
-											intemplate );
+	if( d->interporder == 0 ) rtn = frogs_chertemplate_no_int( pnt.lambda, pnt.log10e,
+										timp, tmpltxpix,
+										tmpltypix, tmplt,
+										intemplate );
+	if( d->interporder == 1 ) rtn = frogs_chertemplate_lin( pnt.lambda, pnt.log10e,
+										timp, tmpltxpix,
+										tmpltypix, tmplt,
+										intemplate );
+	if( d->interporder == 2 ) rtn = frogs_chertemplate_quad( pnt.lambda, pnt.log10e,
+										timp, tmpltxpix,
+										tmpltypix, tmplt,
+										intemplate );
 	/* The image template data is in photo-electrons per square meter and per
 	   square degree. We muliply this density by the telescope area and by the
 	   pixel area. */
@@ -1873,26 +1870,26 @@ double frogs_img_model( int pix, int tel, struct frogs_reconstruction pnt,
 	//float pixradius=d->scope[tel].pixradius[pix];
 	float pixradius = 0.080; //(0.075 - 0.085 - 0.080)
 	
-	if( FROGS_INTERP_ORDER == 0 ) rtn = frogs_chertemplate_no_int( pnt.lambda, pnt.log10e,
-											timp, tmpltxpix,
-											tmpltypix, tmplt,
-											intemplate, pixradius );
-	if( FROGS_INTERP_ORDER == 1 ) rtn = frogs_chertemplate_lin( pnt.lambda, pnt.log10e,
-											timp, tmpltxpix,
-											tmpltypix, tmplt,
-											intemplate, pixradius );
-	if( FROGS_INTERP_ORDER == 2 ) rtn = frogs_chertemplate_quad( pnt.lambda, pnt.log10e,
-											timp, tmpltxpix,
-											tmpltypix, tmplt,
-											intemplate, pixradius );
+	if( d->interporder == 0 ) rtn = frogs_chertemplate_no_int( pnt.lambda, pnt.log10e,
+										timp, tmpltxpix,
+										tmpltypix, tmplt,
+										intemplate, pixradius );
+	if( d->interporder == 1 ) rtn = frogs_chertemplate_lin( pnt.lambda, pnt.log10e,
+										timp, tmpltxpix,
+										tmpltypix, tmplt,
+										intemplate, pixradius );
+	if( d->interporder == 2 ) rtn = frogs_chertemplate_quad( pnt.lambda, pnt.log10e,
+										timp, tmpltxpix,
+										tmpltypix, tmplt,
+										intemplate, pixradius );
 	/* The image template data is in photo-electrons per square meter and per
 	   square degree. We muliply this density by the telescope area. */
-	rtn = rtn * telarea;
+	//rtn = rtn * telarea;
 #endif
 	
 	/* The image templates do not take into PMT non-linearity and saturation.
 		We apply corrections to the mu-value to correct for that */
-	rtn = frogs_mu_correction( rtn, d->epoch_id );
+	rtn = frogs_mu_correction( rtn, d->epoch_id, d->lowerthresh, d->firstparam, d->secondparam );
 	
 	return rtn;
 }
@@ -2597,12 +2594,21 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 		//================================================================
 		//================================================================
 		
-		double frogs_mu_correction( double mu, const char epoch_id[20] )
+		double frogs_mu_correction( double mu, const char epoch_id[20],
+									double mu_correction_lower_threshold,
+									double mu_correction_first_parameter,
+									double mu_correction_second_parameter )
 		{
 			/* this function applies correction to mu
 			  to correct for non-linearity and saturation effects */
-			if( strcmp( epoch_id, "V6" ) == 0 )
+			if( mu > mu_correction_lower_threshold )
 			{
+				return mu_correction_first_parameter + mu_correction_second_parameter * log( mu );
+			}
+			return mu;
+			
+			/*if( strcmp( epoch_id, "V6" ) == 0 )
+			 {
 				if( mu > mu_correction_lower_threshold[0] )
 				{
 					return mu_correction_first_parameter[0] + mu_correction_second_parameter[0] * log( mu );
@@ -2616,7 +2622,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 					return mu_correction_first_parameter[1] + mu_correction_second_parameter[1] * log( mu );
 				}
 			}
-			return mu;
+			return mu;*/
 		}
 		
 		//================================================================
@@ -3791,6 +3797,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 					return FROGS_BAD_NUMBER;
 				}
 			}
+			
 			
 			
 			
