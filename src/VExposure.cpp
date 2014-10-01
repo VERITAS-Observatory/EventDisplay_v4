@@ -2908,8 +2908,8 @@ TString VExposure::calcMD5sum( int date, int run ) {
 	ENVIR_VAR = getenv( "VERITAS_DATA_DIR" );
 
 	datafilename.Form( "%s/data/d%d/%d.cvbf", ENVIR_VAR, date, run );
-	resultfilename.Form( "%s/data/d%d/DESY_sumd%d", ENVIR_VAR, date, date );
-	tempfilename.Form( "%s/data/d%d/DESY_sumd%d_%d", ENVIR_VAR, date, run, (int)time(0) );
+	resultfilename.Form( "%s/data/d%d/LOCAL_sumd%d", ENVIR_VAR, date, date );
+	tempfilename.Form( "%s/data/d%d/TEMP_sum_%d_%d", ENVIR_VAR, date, run, (int)time(0) );
 	filepath.Form( "%s/data/d%d/", ENVIR_VAR, date );
 
 	//check if input file exists
@@ -2940,6 +2940,8 @@ TString VExposure::calcMD5sum( int date, int run ) {
 		if( system( command.Data() ) == 0 )
 		{
 			command.Form("rm %s", tempfilename.Data() );
+			system( command.Data() );
+			command.Form("chmod g+w %s", resultfilename.Data() );
 			system( command.Data() );
 		} 
 	}

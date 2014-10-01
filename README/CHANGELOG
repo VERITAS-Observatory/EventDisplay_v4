@@ -6,7 +6,7 @@ Change log eventdisplay analysis package
 
 Added md5 checksum testing of downloaded cvbf files to VExposure. 
 Turned on by default in VTS.getRunlistFromDB, use  VTS.getRunlistFromDB -n to disable.
-See elog ...
+See elog http://veritash.sao.arizona.edu:8081/Eventdisplay-WG/1297 .
 
 ******* 20140926 significant changes (merging of branch BDTSelection-v2, trunk is now v4.61 *******
 
