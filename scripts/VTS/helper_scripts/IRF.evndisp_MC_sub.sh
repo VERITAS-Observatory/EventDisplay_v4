@@ -2,7 +2,7 @@
 # script to run evndisp for simulations on one of the cluster nodes (VBF)
 
 # set observatory environmental variables
-source $EVNDISPSYS/setObservatory.sh VTS
+source $TRUNK/setObservatory.sh VTS
 
 # parameters replaced by parent script using sed
 RUNNUM=RUNNUMBER
@@ -26,24 +26,12 @@ TELTOANA="1234"
 # Output file name
 ONAME="$RUNNUM"
 
-# template list file
-if [[ "$EPOCH" =~ ^(V5|V6)$ && $USEFROGS != 0 ]]; then
-    TEMPLATELIST="EVNDISP.frogs_template_file_list.$EPOCH.txt"
-else
-    echo "Error (helper_scripts/IRF.evndisp_MC_sub.sh), no frogs template list defined for \$EPOCH='$EPOCH', exiting..."
-    exit 1
-fi
-echo "Using template list file '$TEMPLATELIST'..."
-
 if [[ $NEVENTS > 0 ]]; then
-     ITER=$((SGE_TASK_ID - 1))
-     FIRSTEVENT=$(($ITER * $NEVENTS))
-     # Output file name
-     ONAME="${RUNNUM}_$ITER"
-     MSCWFILE="${ZA}deg_${WOB}wob_NOISE${NOISE}_${ITER}.mscw.root"
-     echo -e "FROGS MSCW Dir:\n $MSCWDIR"
-     echo -e "FROGS MSCW File:\n $MSCWFILE"
-     echo "FROGS NEvents: $NEVENTS"
+    ITER=$((SGE_TASK_ID - 1))
+    FIRSTEVENT=$(($ITER * $NEVENTS))
+    # Output file name
+    ONAME="${RUNNUM}_$ITER"
+    echo -e "ITER $ITER NEVENTS $NEVENTS FIRSTEVENT $FIRSTEVENT"
 fi
 
 #################################
@@ -180,7 +168,7 @@ fi
 if [[ ${SIMTYPE:0:4} == "CARE" ]]; then
     echo "Calculating pedestals for run $RUNNUM"
     rm -f $ODIR/$RUNNUM.ped.log
-    $EVNDISPSYS/bin/evndisp -runmode=1 -sourcetype=2 -epoch $EPOCH -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo -calibrationdirectory $ODIR &> $ODIR/$RUNNUM.ped.log
+    $TRUNK/bin/evndisp -runmode=1 -sourcetype=2 -epoch $EPOCH -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo -calibrationdirectory $ODIR &> $ODIR/$RUNNUM.ped.log
 fi    
 
 ###############################################
@@ -195,8 +183,8 @@ if [[ $USEFROGS != "1" ]]; then
     else
        MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV -lowgaincalibrationfile calibrationlist.LowGainForCare.dat"
     fi
-    echo "$EVNDISPSYS/bin/evndisp $MCOPT" &> $ODIR/$RUNNUM.tzero.log
-    $EVNDISPSYS/bin/evndisp $MCOPT &>> $ODIR/$RUNNUM.tzero.log
+    echo "$TRUNK/bin/evndisp $MCOPT" &> $ODIR/$RUNNUM.tzero.log
+    $TRUNK/bin/evndisp $MCOPT &>> $ODIR/$RUNNUM.tzero.log
 fi
 
 ###############################################
@@ -208,8 +196,20 @@ if [[ $USEMODEL3D == "1" ]]; then
 fi
 # FROGS
 if [[ $USEFROGS == "1" ]]; then
-	 echo "$MSCWDIR/$MSCWFILE $NEVENTS $FIRSTEVENT"
-    FROGS="-frogs $MSCWDIR/$MSCWFILE -frogsid 0 -templatelistforfrogs "$TEMPLATELIST" -nevents=$NEVENTS -firstevent=$FIRSTEVENT"
+	 MSCWFILE="${ZA}deg_${WOB}wob_NOISE${NOISE}_${ITER}.mscw.root"
+    echo -e "FROGS MSCW Dir:\n $MSCWDIR"
+    echo -e "FROGS MSCW File:\n $MSCWFILE"
+    echo "FROGS NEvents: $NEVENTS"
+   # template list file
+   if [[ "$EPOCH" =~ ^(V5|V6)$ ]]; then
+      TEMPLATELIST="EVNDISP.frogs_template_file_list.$EPOCH.txt"
+   else
+      echo "Error (helper_scripts/IRF.evndisp_MC_sub.sh), no frogs template list defined for $EPOCH='$EPOCH', exiting..."
+      exit 1
+   fi
+   echo "Using template list file '$TEMPLATELIST'..."
+	echo "$MSCWDIR/$MSCWFILE $NEVENTS $FIRSTEVENT"
+   FROGS="-frogs $MSCWDIR/$MSCWFILE -frogsid 0 -templatelistforfrogs "$TEMPLATELIST" -frogsparameterfile FROGS.runparameter"
 fi
 # run options
 MCOPT=" -runnumber=$RUNNUM -sourcetype=2 -epoch $EPOCH -camera=$CFG -reconstructionparameter $ACUTS -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory $ODIR"
@@ -219,9 +219,12 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
 else
     MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV -lowgaincalibrationfile calibrationlist.LowGainForCare.dat"
 fi
+if [[ $NEVENTS > 0 ]]; then
+	 MCOPT="-nevents=$NEVENTS -firstevent=$FIRSTEVENT $MCOPT"
+fi
 echo "Analysing MC file for run $RUNNUM"
-echo "$EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS" &> $ODIR/$ONAME.log
-$EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS &>> $ODIR/$ONAME.log
+echo "$TRUNK/bin/evndisp $MCOPT $MODEL3D $FROGS" &> $ODIR/$ONAME.log
+$TRUNK/bin/evndisp $MCOPT $MODEL3D $FROGS &>> $ODIR/$ONAME.log
 
 # remove temporary files
 cp -f -v $DDIR/$ONAME.root $ODIR/$ONAME.root

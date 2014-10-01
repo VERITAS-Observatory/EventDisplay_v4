@@ -72,7 +72,7 @@ bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # EventDisplay version
-EDVERSION=`$EVNDISPSYS/bin/evndisp --version | tr -d .`
+EDVERSION=`$TRUNK/bin/evndisp --version | tr -d .`
 
 # Parse command line arguments
 SIMDIR=$1
@@ -124,7 +124,7 @@ elif [ ${SIMTYPE:0:4} = "CARE" ]; then
 fi
 
 # Job submission script
-SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.evndisp_MC_sub"
+SUBSCRIPT="$TRUNK/scripts/VTS/helper_scripts/IRF.evndisp_MC_sub"
 
 INT_WOBBLE=`echo "$WOBBLE*100" | bc | awk -F '.' '{print $1}'`
 if [[ ${#INT_WOBBLE} -lt 2 ]]; then
@@ -156,14 +156,14 @@ chmod u+x $FSCRIPT.sh
 echo $FSCRIPT.sh
 
 # run locally or on cluster
-SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
+SUBC=`$TRUNK/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
 SUBC=`eval "echo \"$SUBC\""`
 if [[ $SUBC == *qsub* ]]; then
-     if [[ $NEVENTS > 0 ]]; then
-          JOBID=`$SUBC -t 1-10 $FSCRIPT.sh`
-     elif [[ $NEVENTS < 0 ]]; then
-          JOBID=`$SUBC $FSCRIPT.sh`
-     fi      
+    if [[ $NEVENTS > 0 ]]; then
+		  JOBID=`$SUBC -t 1-10 $FSCRIPT.sh`
+    elif [[ $NEVENTS == -1 ]]; then
+        JOBID=`$SUBC $FSCRIPT.sh`
+    fi      
     echo "RUN $RUNNUM: JOBID $JOBID"
 elif [[ $SUBC == *parallel* ]]; then
     echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat

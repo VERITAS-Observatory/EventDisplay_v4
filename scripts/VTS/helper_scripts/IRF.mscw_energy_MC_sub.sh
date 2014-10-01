@@ -2,7 +2,7 @@
 # script to analyse MC files with lookup tables
 
 # set observatory environmental variables
-source $EVNDISPSYS/setObservatory.sh VTS
+source $TRUNK/setObservatory.sh VTS
 
 # parameters replaced by parent script using sed
 INDIR=INPUTDIR
@@ -54,7 +54,7 @@ for ID in $RECID; do
 		  outputfilename="$DDIR/${OFILE}_$ITER.mscw.root"
 		  logfile="$OSUBDIR/${OFILE}_$ITER.log"
 	 fi
-	 $EVNDISPSYS/bin/mscw_energy $MOPT -inputfile $inputfilename -outputfile $outputfilename -noise=$NOISE &> $logfile
+	 $TRUNK/bin/mscw_energy $MOPT -inputfile $inputfilename -outputfile $outputfilename -noise=$NOISE &> $logfile
 # cp results file back to data directory and clean up
 	 outputbasename=$( basename $outputfilename )
     cp -f -v $outputfilename $OSUBDIR/$outputbasename
