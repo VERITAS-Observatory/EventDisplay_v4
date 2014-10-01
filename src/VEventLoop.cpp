@@ -135,15 +135,20 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	
 #ifndef NOGSL
 	// FROGS
-	fFrogs = new VFrogs();
+	if( fRunPar->ffrogsmode )
+	{
+		fFrogs = new VFrogs();
+	} 
 #endif
 	// Model3D
-	fModel3D = new VModel3D();
-	if( fRunPar->fUseModel3D && fRunPar->fCreateLnLTable )
-	{
-		fModel3D->createLnLTable();
-		fRunPar->fUseModel3D = false;
-		exit( EXIT_FAILURE );
+	if( fRunPar->fUseModel3D) { 
+		fModel3D = new VModel3D();
+		if( fRunPar->fCreateLnLTable )
+		{
+			fModel3D->createLnLTable();
+			fRunPar->fUseModel3D = false;
+			exit( EXIT_FAILURE ); 
+		}
 	}
 	// reset cut strings and variables
 	resetRunOptions();
