@@ -844,7 +844,8 @@ map< unsigned int, float> VDSTTree::readArrayConfig( string iFile )
 			}
 			else
 			{
-				iT2 = "1.5";
+				// default FOV
+				iT2 = "12.5";
 			}
 			fDST_list_of_telescopes[atoi( iT1.c_str() )] = atof( iT2.c_str() );
 		}
