@@ -37,6 +37,7 @@
 #include <TStyle.h>
 #include <TText.h>
 #include <TTree.h>
+#include <TString.h>
 
 using namespace std;
 
@@ -78,6 +79,11 @@ class VExposure : public TObject, public VGlobalRunParameter
 		
 		bool fPlotExtendedSources;
 		bool fPlotSourceNames;
+	
+		bool fDoCheckSums;
+		vector<int> fRunsNoChecksum;
+		vector<int> fRunsGoodChecksum;
+		vector<int> fRunsBadChecksum;
 		
 		// list of sources from DB
 		VDB_ObservingSources* fVDB_ObservingSources;
@@ -197,6 +203,10 @@ class VExposure : public TObject, public VGlobalRunParameter
 		{
 			fPlotSourceNames = iB;
 		}
+		void setDoCheckSums( bool iB = true )
+		{
+			fDoCheckSums = iB;
+		}
 		void setMaximumIntegrationRadius( double iR = 1.5 )
 		{
 			fMaximumIntegrationRadius = iR;    // FOV (VERITAS is 3.5 deg, this is the (optimistic) region of constant radial acceptance)
@@ -232,7 +242,13 @@ class VExposure : public TObject, public VGlobalRunParameter
 		void addCatalogue( string, int iMarker = 5, int iColor = 50, double iAngle = 45. );
 		void listCatalogues();
 		bool removeCataloge( unsigned int iB );
-		
-		ClassDef( VExposure, 7 );
+
+		TString getArchiveMD5sum( int date, int run, bool force_download = false);
+		TString calcMD5sum( int date, int run );
+		TString readMD5sumFromFile( TString filename, int run, bool warn = true);
+		int checkMD5sum( int date, int run, bool force_download = false) ;
+		void printChecksumSummary();
+
+		ClassDef( VExposure, 8 );
 };
 #endif

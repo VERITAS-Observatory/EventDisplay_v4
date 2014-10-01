@@ -2,6 +2,12 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20141001 (HF)
+
+Added md5 checksum testing of downloaded cvbf files to VExposure. 
+Turned on by default in VTS.getRunlistFromDB, use  VTS.getRunlistFromDB -n to disable.
+See elog ...
+
 ******* 20140926 significant changes (merging of branch BDTSelection-v2, trunk is now v4.61 *******
 
 * 20140926 (MK, EP)

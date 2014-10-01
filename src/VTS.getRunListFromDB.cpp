@@ -32,6 +32,7 @@ int getRuns = 0;
 int timemask = 0;
 int verbose = 0;
 unsigned int runnumber = 0;
+bool bCheckSums = true;
 
 int main( int argc, char* argv[] )
 {
@@ -45,14 +46,8 @@ int main( int argc, char* argv[] )
 		return 0;
 	}
 	
-	if( bOBSMODE )
-	{
-		a.setObservingMode( true );
-	}
-	else
-	{
-		a.setObservingMode( false );
-	}
+	a.setObservingMode( bOBSMODE );
+	a.setDoCheckSums( bCheckSums );
 	
 	
 	if( runnumber != 0 )
@@ -83,8 +78,8 @@ int main( int argc, char* argv[] )
 		if( bANASUM )
 		{
 			a.outputAnasumRunlist( fAnasumFile );
-		}
-		
+		}		
+
 		return 0;
 		
 	}
@@ -119,6 +114,7 @@ int main( int argc, char* argv[] )
 			a.outputAnasumRunlist( fAnasumFile );
 		}
 		
+		a.printChecksumSummary();
 		
 		return 0;
 		
@@ -140,6 +136,7 @@ int main( int argc, char* argv[] )
 		{
 			a.outputAnasumRunlist( fAnasumFile );
 		}
+		a.printChecksumSummary();
 		
 		return 0;
 		
@@ -176,7 +173,9 @@ int main( int argc, char* argv[] )
 		{
 			a.outputAnasumRunlist( fAnasumFile );
 		}
-		
+
+		a.printChecksumSummary();
+
 		return 0;
 		
 	}
@@ -205,11 +204,15 @@ void parseOptions( int argc, char* argv[] )
 			{"timemask", no_argument, NULL, 't'},
 			{"verbose", no_argument, NULL, 'v'},
 			{"run", required_argument, 0, 'r'},
+			{"anasumtemplate", required_argument, 0, 'a'},
+			{"check", no_argument, NULL, 'c'},
+			{"includefilter", no_argument, NULL, 'f'},
+			{"nomd5sum", no_argument, NULL, 'n'},
 			{ 0, 0, 0, 0 }
 		};
 		
 		int option_index = 0;
-		int c = getopt_long( argc, argv, "ho:l:m:b:e:s:z:d:xgtvr:a:cf", long_options, &option_index );
+		int c = getopt_long( argc, argv, "ho:l:m:b:e:s:z:d:xgtvr:a:cfn", long_options, &option_index );
 		if( optopt != 0 )
 		{
 			cout << "error: unknown option" << endl;
@@ -299,6 +302,9 @@ void parseOptions( int argc, char* argv[] )
 				break;
 			case 'f':
 				bOBSMODE = true;
+				break;
+			case 'n':
+				bCheckSums = false;
 				break;
 			case '?':
 				break;
