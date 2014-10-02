@@ -377,7 +377,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 					break;
 				}
 			}
-			while( e < iEnergyData->fEnergyCut_Log10TeV_max );
+			while( e < (iEnergyData->fEnergyCut_Log10TeV_max-0.0001) );
 			
 			iF.Close();
 		}//end loop on zenith bins
