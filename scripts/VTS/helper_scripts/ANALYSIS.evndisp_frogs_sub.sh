@@ -25,7 +25,7 @@ mkdir -p $TEMPDIR
 ACUTS=`$EVNDISPSYS/bin/printRunParameter $MSCWDIR/$RUN.mscw.root -evndispreconstructionparameterfile`
 
 # epoch
-ARRAYVERS=`$EVNDISPSYS/bin/printRunParameter $MSCWDIR/$RUN.mscw.root -epoch`
+ARRAYVERS=$($EVNDISPSYS/bin/printRunParameter $MSCWDIR/$RUN.mscw.root -epoch)
 
 # template list file
 if [[ "$ARRAYVERS" =~ ^(V5|V6)$ ]]; then
@@ -98,6 +98,11 @@ chmod u+w $TEMPDIR/$INPUTMSCW
 OPT+=( -frogs $TEMPDIR/$INPUTMSCW             )
 OPT+=( -frogsid 0                            )
 OPT+=( -templatelistforfrogs "$TEMPLATELIST" )
+FROGSPARAM="FROGS.runparameter"
+if [ ! -e "$FROGSPARAM"] ; then
+	echo "Error, could not find frogs parameter file '$FROGSPARAM', exiting..."
+fi
+OPT+=( -frogsparameterfile "$FROGSPARAM")
 
 if [[ "$FASTDEVMODE" == "yes" ]]; then
     OPT+=( -nevents=50 )

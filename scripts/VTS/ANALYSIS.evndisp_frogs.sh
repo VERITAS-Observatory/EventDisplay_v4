@@ -9,8 +9,7 @@ if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 echo "
 EVNDISP data analysis: evndisp FROGS analysis for a simple run list
 
-ANALYSIS.evndisp_frogs.sh <runlist> [output directory] [mscw directory] 
- [pedestals] [VPM]
+ANALYSIS.evndisp_frogs.sh <runlist> [output directory] [mscw directory] [runparameter file] [pedestals] [VPM]
 
 required parameters:
 
@@ -18,13 +17,22 @@ required parameters:
 
 optional parameters:
 
-    [output directory]      directory where output ROOT files will be stored
+    [output directory]    directory where output ROOT files will be stored
     
-    [mscw directory]        directory which contains mscw_energy files
+    [mscw directory]      directory which contains mscw_energy files
     
-    [pedestals]             calculate pedestals (default); set to 0 to skip
+    [runparameter file]   file with integration window size and reconstruction cuts/methods, expected in $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/
 
-    [VPM]                   set to 0 to switch off (default is on)
+                          Default: EVNDISP.reconstruction.runparameter (long sumwindow -> for use with CARE IRFs; DISP disabled )
+
+                          other options:
+
+                          EVNDISP.reconstruction.runparameter.DISP              (long sumwindow -> for use with CARE IRFs;
+                                                                                 DISP enabled, use RecID 1 in later stages to access it)
+
+    [pedestals]           calculate pedestals (default); set to 0 to skip
+
+    [VPM]                 set to 0 to switch off (default is on)
 
 --------------------------------------------------------------------------------
 "
@@ -39,9 +47,10 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 # Parse command line arguments
 RLIST=$1
 [[ "$2" ]] && ODIR=$2    || ODIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/"
-[[ "$3" ]] && MSCWDIR=$3 || MSCWDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/RecID0/"
-[[ "$4" ]] && CALIB=$4   || CALIB=1
-[[ "$5" ]] && VPM=$5     || VPM=1
+[[ "$3" ]] && MSCWDIR=$3 || MSCWDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/"
+[[ "$4" ]] && ACUTS=$4   || ACUTS=EVNDISP.reconstruction.runparameter
+[[ "$4" ]] && CALIB=$5   || CALIB=5
+[[ "$5" ]] && VPM=$6     || VPM=1
 
 # Read runlist
 if [ ! -f "$RLIST" ] ; then
@@ -52,7 +61,7 @@ RUNNUMS=`cat $RLIST`
 
 # Log file directory
 DATE=`date +"%y%m%d"`
-LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/frogs"
+LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/FROGS"
 echo -e "Log files will be written to:\n $LOGDIR"
 mkdir -p $LOGDIR
 
@@ -73,7 +82,10 @@ echo
 for RUN in $RUNNUMS; do
     echo "Now starting run $RUN"
     FSCRIPT="$LOGDIR/EVN.data-$RUN"
-    
+
+    # get run array epoch using a run info function
+    #EPOCH=`getRunArrayVersion $RUN`
+
     sed -e "s|RUNFILE|$RUN|"             \
         -e "s|CALIBRATIONOPTION|$CALIB|" \
         -e "s|OUTPUTDIRECTORY|$ODIR|"    \
