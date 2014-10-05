@@ -159,12 +159,12 @@ echo $FSCRIPT.sh
 SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
 SUBC=`eval "echo \"$SUBC\""`
 if [[ $SUBC == *qsub* ]]; then
-#    if [[ $NEVENTS > 0 ]]; then
-#		  JOBID=`$SUBC -t 1-10 $FSCRIPT.sh`
-#    elif [[ $NEVENTS == -1 ]]; then
+    if [[ $NEVENTS -gt 0 ]]; then
+		  JOBID=`$SUBC -t 1-10 $FSCRIPT.sh`
+    elif [[ $NEVENTS -lt 0 ]]; then
         JOBID=`$SUBC $FSCRIPT.sh`
-#    fi      
-#    echo "RUN $RUNNUM: JOBID $JOBID"
+    fi      
+    echo "RUN $RUNNUM: JOBID $JOBID"
 elif [[ $SUBC == *parallel* ]]; then
     echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
 fi

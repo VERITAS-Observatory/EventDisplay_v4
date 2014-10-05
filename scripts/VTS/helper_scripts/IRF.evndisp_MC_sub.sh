@@ -26,13 +26,13 @@ TELTOANA="1234"
 # Output file name
 ONAME="$RUNNUM"
 
-#if [[ $NEVENTS > 0 ]]; then
-#    ITER=$((SGE_TASK_ID - 1))
-#    FIRSTEVENT=$(($ITER * $NEVENTS))
-#    # Output file name
-#    ONAME="${RUNNUM}_$ITER"
-#    echo -e "ITER $ITER NEVENTS $NEVENTS FIRSTEVENT $FIRSTEVENT"
-#fi
+if [[ $NEVENTS -gt 0 ]]; then
+    ITER=$((SGE_TASK_ID - 1))
+    FIRSTEVENT=$(($ITER * $NEVENTS))
+    # Output file name
+    ONAME="${RUNNUM}_$ITER"
+    echo -e "ITER $ITER NEVENTS $NEVENTS FIRSTEVENT $FIRSTEVENT"
+fi
 
 #################################
 # detector configuration and cuts
@@ -219,9 +219,9 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
 else
     MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV -lowgaincalibrationfile calibrationlist.LowGainForCare.dat"
 fi
-# if [[ $NEVENTS > 0 ]]; then
-#	 MCOPT="-nevents=$NEVENTS -firstevent=$FIRSTEVENT $MCOPT"
-# fi
+if [[ $NEVENTS -gt 0 ]]; then
+	 MCOPT="-nevents=$NEVENTS -firstevent=$FIRSTEVENT $MCOPT"
+fi
 echo "Analysing MC file for run $RUNNUM"
 echo "$EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS" &> $ODIR/$ONAME.log
 $EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS &>> $ODIR/$ONAME.log
