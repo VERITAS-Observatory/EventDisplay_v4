@@ -51,7 +51,7 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # EventDisplay version
-EDVERSION=`$TRUNK/bin/mscw_energy --version | tr -d .`
+EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .`
 
 # Parse command line arguments
 TABFILE=$1
@@ -104,7 +104,7 @@ fi
 echo -e "Output files will be written to:\n $ODIR"
 
 # Job submission script
-SUBSCRIPT="$TRUNK/scripts/VTS/helper_scripts/IRF.mscw_energy_MC_sub"
+SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.mscw_energy_MC_sub"
 
 echo "Now processing zenith angle $ZA, wobble $WOBBLE, noise level $NOISE"
 
@@ -123,7 +123,7 @@ chmod u+x $FSCRIPT.sh
 echo "Run script written to: $FSCRIPT"
 
 # run locally or on cluster
-SUBC=`$TRUNK/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
+SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
 SUBC=`eval "echo \"$SUBC\""`
 if [[ $SUBC == *qsub* ]]; then
     if [[ $NROOTFILES > 1 ]]; then

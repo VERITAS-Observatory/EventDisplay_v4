@@ -2,7 +2,7 @@
 # script to run evndisp for simulations on one of the cluster nodes (VBF)
 
 # set observatory environmental variables
-source $TRUNK/setObservatory.sh VTS
+source $EVNDISPSYS/setObservatory.sh VTS
 
 # parameters replaced by parent script using sed
 RUNNUM=RUNNUMBER
@@ -26,13 +26,13 @@ TELTOANA="1234"
 # Output file name
 ONAME="$RUNNUM"
 
-if [[ $NEVENTS > 0 ]]; then
-    ITER=$((SGE_TASK_ID - 1))
-    FIRSTEVENT=$(($ITER * $NEVENTS))
-    # Output file name
-    ONAME="${RUNNUM}_$ITER"
-    echo -e "ITER $ITER NEVENTS $NEVENTS FIRSTEVENT $FIRSTEVENT"
-fi
+#if [[ $NEVENTS > 0 ]]; then
+#    ITER=$((SGE_TASK_ID - 1))
+#    FIRSTEVENT=$(($ITER * $NEVENTS))
+#    # Output file name
+#    ONAME="${RUNNUM}_$ITER"
+#    echo -e "ITER $ITER NEVENTS $NEVENTS FIRSTEVENT $FIRSTEVENT"
+#fi
 
 #################################
 # detector configuration and cuts
@@ -168,7 +168,7 @@ fi
 if [[ ${SIMTYPE:0:4} == "CARE" ]]; then
     echo "Calculating pedestals for run $RUNNUM"
     rm -f $ODIR/$RUNNUM.ped.log
-    $TRUNK/bin/evndisp -runmode=1 -sourcetype=2 -epoch $EPOCH -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo -calibrationdirectory $ODIR &> $ODIR/$RUNNUM.ped.log
+    $EVNDISPSYS/bin/evndisp -runmode=1 -sourcetype=2 -epoch $EPOCH -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo -calibrationdirectory $ODIR &> $ODIR/$RUNNUM.ped.log
 fi    
 
 ###############################################
@@ -183,8 +183,8 @@ if [[ $USEFROGS != "1" ]]; then
     else
        MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV -lowgaincalibrationfile calibrationlist.LowGainForCare.dat"
     fi
-    echo "$TRUNK/bin/evndisp $MCOPT" &> $ODIR/$RUNNUM.tzero.log
-    $TRUNK/bin/evndisp $MCOPT &>> $ODIR/$RUNNUM.tzero.log
+    echo "$EVNDISPSYS/bin/evndisp $MCOPT" &> $ODIR/$RUNNUM.tzero.log
+    $EVNDISPSYS/bin/evndisp $MCOPT &>> $ODIR/$RUNNUM.tzero.log
 fi
 
 ###############################################
@@ -219,12 +219,12 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
 else
     MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV -lowgaincalibrationfile calibrationlist.LowGainForCare.dat"
 fi
-if [[ $NEVENTS > 0 ]]; then
-	 MCOPT="-nevents=$NEVENTS -firstevent=$FIRSTEVENT $MCOPT"
-fi
+# if [[ $NEVENTS > 0 ]]; then
+#	 MCOPT="-nevents=$NEVENTS -firstevent=$FIRSTEVENT $MCOPT"
+# fi
 echo "Analysing MC file for run $RUNNUM"
-echo "$TRUNK/bin/evndisp $MCOPT $MODEL3D $FROGS" &> $ODIR/$ONAME.log
-$TRUNK/bin/evndisp $MCOPT $MODEL3D $FROGS &>> $ODIR/$ONAME.log
+echo "$EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS" &> $ODIR/$ONAME.log
+$EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS &>> $ODIR/$ONAME.log
 
 # remove temporary files
 cp -f -v $DDIR/$ONAME.root $ODIR/$ONAME.root
