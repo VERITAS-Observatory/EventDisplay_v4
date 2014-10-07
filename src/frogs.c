@@ -690,7 +690,10 @@ int frogs_gdns_calibr_out( int nb_evens_printed_out, int event_id, int tel, int 
 		{
 			itemp = getenv( "VERITAS_USER_DATA_DIR" );
 		}
-		calib = fopen( "%s/frogs_calibration/frogs_goodness_calibration.frogs", "w" );
+		char FROGS_CALIBRATION_PATH[500];
+		sprintf( FROGS_CALIBRATION_PATH, "%s/frogs_calibration/frogs_goodness_calibration.frogs", itemp );
+		//calib = fopen( "%s/frogs_calibration/frogs_goodness_calibration.frogs", "w" );
+		calib = fopen( FROGS_CALIBRATION_PATH, "w" );
 		if( calib == NULL )
 		{
 			frogs_showxerror( "Error: Failed opening the file frogs_goodness_calibration.frogs for writing" );
