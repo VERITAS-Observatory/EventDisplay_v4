@@ -52,7 +52,8 @@ void VFrogs::processParamFile()
 	}
 	char FROGS_PARAMETER[500];
 	ifstream is;
-	sprintf( FROGS_PARAMETER, "%s/FrogsParameterFiles/%s", itemp, fparamfile.c_str() );
+	//sprintf( FROGS_PARAMETER, "%s/FrogsParameterFiles/%s", itemp, fparamfile.c_str() );
+	sprintf( FROGS_PARAMETER, "%s/Frogs/%s", itemp, fparamfile.c_str() );
 	is.open( FROGS_PARAMETER, ifstream::in );
 	if( !is )
 	{
