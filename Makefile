@@ -581,6 +581,17 @@ anasum:	$(ANASUMOBJECTS)
 	@echo "$@ done"
 
 ########################################################
+# energy3d (alternative for mscw_energy (better?))
+########################################################
+./obj/energy3d.o:	./src/energy3d.cpp ./inc/energy3d.h
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+ENERGY3DOBJECTS = ./obj/energy3d.o
+
+energy3d: $(ENERGY3DOBJECTS)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+
+########################################################
 # shared library for root analysis
 ########################################################
 
