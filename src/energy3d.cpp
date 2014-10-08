@@ -14,7 +14,7 @@
 #include "TMath.h"
 #include "TProfile2D.h"
 
-#include "energy3D.h"
+#include "energy3d.h"
 
 //For the Inputfile, leaves
 Float_t		InOutSel3D;		// elevation of shower direction (deg)
@@ -129,8 +129,9 @@ Float_t OutEnergy = 0;		//the best fitting energy value going to be saved in the
 
 int ChangeValues = 0;		//position for the best fitting value on the "Main Search Parameter" 
 
-
 char TempNoiseName[100];
+
+using namespace std ;
 
 bool sortingfloat(const pair<Float_t,Float_t>&i, const pair<Float_t,Float_t>&j)
 {
@@ -141,26 +142,26 @@ bool sortingfloat(const pair<Float_t,Float_t>&i, const pair<Float_t,Float_t>&j)
 int main(int argc, char *argv[]){
 
 	string Inputfilename;
-	string Outputfilename;
+	//string Outputfilename;
 	string Templatefilename;
 	char *InName=new char[ Inputfilename.size()+1 ]; 
-	char *OutName=new char[ Outputfilename.size()+1 ]; 
+	//char *OutName=new char[ Outputfilename.size()+1 ]; 
 	char *TempName=new char[ Templatefilename.size()+1 ]; 
 
 	for ( int i = 0 ; i<argc ; i++ ) {
 		if ( strcmp( argv[i], "-inputfile" ) == 1 ) {
 			Inputfilename=argv[i+1];
 		}
-		else if ( strcmp( argv[i], "-outputfile" ) == 1) {
-			Outputfilename = argv[i+1] ;
-		}
+	//	else if ( strcmp( argv[i], "-outputfile" ) == 1) {
+	//		Outputfilename = argv[i+1] ;
+	//	}
 		else if ( strcmp( argv[i], "-template" ) == 1 ) {
 			Templatefilename = argv[i+1] ;
 		}
 	}
-  	if (argc==4) {
+  	if (argc==3) {
    		Inputfilename=argv[1];
- 		Outputfilename=argv[2];
+ 		//Outputfilename=argv[2];
    		Templatefilename=argv[3];		
   	}
 	else {
