@@ -36,16 +36,13 @@ optional parameters:
     [output directory]      directory where mscw.root files are written
                             default: <evndisp directory>
                             If RecID given: <evndisp directory>/RecID#
-    
+
+    [energy3d]              use energy3d reconstruction method
+	                    default: 0 (no)
+	       	            1 = yes
 
 --------------------------------------------------------------------------------
 "
-
-# for future work, nils should add this to above when energy3d is ready
-#
-# [use energy3d]          use energy3d reconstruction method
-#                         default: 0 (no)
-#                         1 = yes
 
 #end help message
 exit
@@ -81,6 +78,7 @@ ENERGY3D='no'
 if [[ "$6" ]] ; then
     if [[ "$6" == 1 ]] ; then
         ENERGY3D='yes'
+	echo "Using energy3d option!"
     fi
 fi
     
