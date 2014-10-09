@@ -2774,24 +2774,37 @@ void VExposure::printChecksumSummary()
 	if( fRunsGoodChecksum.size() == ntot && ntot > 0 ) 
 	{
 		cout << "Congratulations, all runs survived the checksum test. " << endl;
+	
 	}
-	if( fRunsNoChecksum.size() > 0 ) 
-	{
-		cout << "Warning, checksums could not be compared for " << fRunsNoChecksum.size() << " run(s), see above for details. (Checksums are not available from the archive for old or very new runs.)"  << endl << "Bad run(s): " ;
-		for( unsigned int i=0; i<  fRunsNoChecksum.size() ; i++ ) 
-		{
-			cout << fRunsNoChecksum.at(i) << "\t" ;
+	else {  
+		if( fRunsGoodChecksum.size() > 0 ) {
+			cout << "Got good checksums for " << fRunsGoodChecksum.size() << " run(s)."  << endl << "Good runs:\t" ;
+			for( unsigned int i=0; i<  fRunsGoodChecksum.size() ; i++ ) 
+			{
+				cout << fRunsGoodChecksum.at(i) << "\t" ;
+			}
+			cout << endl << endl;
 		}
-		cout << endl << endl;
-	}
-	if( fRunsBadChecksum.size() > 0 ) 
-	{
-		cout << "Warning, wrong checksums for " << fRunsBadChecksum.size() << " run(s), see above for details. "  << endl << "Bad run(s): " ;
-		for( unsigned int i=0; i<  fRunsBadChecksum.size() ; i++ ) 
+
+		if( fRunsNoChecksum.size() > 0 ) 
 		{
-			cout << fRunsBadChecksum.at(i) << "\t" ;
+			cout << "Warning, checksums could not be compared for " << fRunsNoChecksum.size();
+			cout << " run(s), see above for details. (Checksums are not available from the archive for old or very new runs.)"  << endl << "Not checked:\t" ;
+			for( unsigned int i=0; i<  fRunsNoChecksum.size() ; i++ ) 
+			{
+				cout << fRunsNoChecksum.at(i) << "\t" ;
+			}
+			cout << endl << endl;
 		}
-		cout << endl << endl;
+		if( fRunsBadChecksum.size() > 0 ) 
+		{
+			cout << "Warning, wrong checksums for " << fRunsBadChecksum.size() << " run(s), see above for details. "  << endl << "Bad run(s): " ;
+			for( unsigned int i=0; i<  fRunsBadChecksum.size() ; i++ ) 
+			{
+				cout << fRunsBadChecksum.at(i) << "\t" ;
+			}
+			cout << endl << endl;
+		}
 	}
 
 }
