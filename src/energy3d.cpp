@@ -144,31 +144,37 @@ int main(int argc, char *argv[]){
 	string Inputfilename;
 	//string Outputfilename;
 	string Templatefilename;
-	char *InName=new char[ Inputfilename.size()+1 ]; 
-	//char *OutName=new char[ Outputfilename.size()+1 ]; 
-	char *TempName=new char[ Templatefilename.size()+1 ]; 
 
-	for ( int i = 0 ; i<argc ; i++ ) {
-		if ( strcmp( argv[i], "-inputfile" ) == 1 ) {
-			Inputfilename=argv[i+1];
-		}
+
+	if (argc==7) {
+		for ( int i = 0 ; i<argc ; i++ ) {
+			if ( string(argv[i]) == "-inputfile" ) {
+				Inputfilename = argv[i+1] ; 
+			}
 	//	else if ( strcmp( argv[i], "-outputfile" ) == 1) {
 	//		Outputfilename = argv[i+1] ;
 	//	}
-		else if ( strcmp( argv[i], "-template" ) == 1 ) {
-			Templatefilename = argv[i+1] ;
+			else if ( string(argv[i]) == "-template" ) {
+				Templatefilename = argv[i+1] ; 
+			}
 		}
+         	cout << "Inputfilename: " << Inputfilename << endl  ;
+          	cout << "Templatefilename: "<< Templatefilename << endl ;
 	}
-  	if (argc==3) {
-   		Inputfilename=argv[1];
- 		//Outputfilename=argv[2];
-   		Templatefilename=argv[3];		
-  	}
 	else {
-    		cout <<"Usage: ./energy3d -inputfilename -outputfilename -templatefilename"<<endl;
+    		cout <<"Usage: ./energy3d -inputfilename <filename> -outputfilename <filename> -templatefilename <filename>"<<endl;
 		cout <<"Example: ./energy3d -inputfilename <filedirectory/12345.root> -outputfilename <filedirectory/12345_energy3d.root> -templatefilename <templatedir/Merged/Template3D_V6_ATM21_123.root>"<<endl;    		
 		return 0;
   	}
+
+	char *InName=new char[ Inputfilename.length()+1 ]; 
+	//char *OutName=new char[ Outputfilename.size()+1 ]; 
+	char *TempName=new char[ Templatefilename.length()+1 ]; 
+	strcpy(InName, Inputfilename.c_str());
+	strcpy(TempName, Templatefilename.c_str());
+	cout << "InName: " << InName << endl;
+	cout << "TempName: " << TempName << endl;
+	
 
 	// The Inputfile //
 	TFile *InTfile = new TFile( InName );
@@ -306,7 +312,7 @@ int main(int argc, char *argv[]){
 	vector< Float_t > TempRow;
 	vector < vector < Float_t > > TwoDTempVector;
 	TFile *TempTfile = new TFile(TempName);
-	sprintf( TempNoiseName, "Model3DPars_NOICE%s", Noise[ noiseloop ] );
+	sprintf( TempNoiseName, "ModelPars3D_NOISE%s", Noise[ noiseloop ] );
 	TTree *PointerToTempTtreeM = (TTree*)TempTfile->Get( TempNoiseName );
 
 	int NTemp = PointerToTempTtreeM->GetEntries();	
@@ -482,6 +488,8 @@ int main(int argc, char *argv[]){
 	}
 	// save only the new version of the tree
 	InTfile->Write("", TObject::kOverwrite);
+	delete[] TempName;
+	delete[] InName;
 	delete TempTfile;
 	delete InTfile;
 	TwoDTempVector.clear();

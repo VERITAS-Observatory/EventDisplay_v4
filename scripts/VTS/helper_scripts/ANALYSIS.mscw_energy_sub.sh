@@ -57,12 +57,15 @@ elif [ "$ENERGY3D" == "yes" ] ; then
     echo "\$ENERGY3D = yes!"
     OUTPUTFILE="$BFILE.energy3d"    
     
-    EPOCH=$(     $EVNDISPSYS/bin/printRunParameter $TEMPDIR/$BFILE.root -epoch      )
-    ATMO=$(      $EVNDISPSYS/bin/printRunParameter $TEMPDIR/$BFILE.root -atmosphere )
+  #  EPOCH=$(     $EVNDISPSYS/bin/printRunParameter $TEMPDIR/$BFILE.root -epoch      )	#Not working, why?
+  #  ATMO=$(      $EVNDISPSYS/bin/printRunParameter $TEMPDIR/$BFILE.root -atmosphere )	#Not working, why?
+    EPOCH="6"	
+    ATMO="21"
     TELTOANA=$(  $EVNDISPSYS/bin/printRunParameter $TEMPDIR/$BFILE.root -teltoana   )
     
-    TEMPLATEFNAME="Template3D_V${EPOCH}_ATM${ATMO}_${TELTOANA}.root"
-    cp $VERITAS_EVNDISP_AUX_DIR/Energy3DTemplates/Merged/$TEMPLATEFNAME $TEMPDIR/$TEMPLATEFNAME
+    TEMPLATEFNAME="Template3D_V${EPOCH}_ATM${ATMO}_${TELTOANA}_10P.root"
+    #cp $VERITAS_EVNDISP_AUX_DIR/Energy3DTemplates/$TEMPLATEFNAME $TEMPDIR/$TEMPLATEFNAME	#For the future
+    cp $VERITAS_USER_DATA_DIR/Templates3DFull/Merged/$TEMPLATEFNAME $TEMPDIR/$TEMPLATEFNAME
 
     $EVNDISPSYS/bin/energy3d \
         -inputfile   $TEMPDIR/$BFILE.root      \
