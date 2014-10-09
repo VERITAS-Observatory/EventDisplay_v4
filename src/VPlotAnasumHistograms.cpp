@@ -962,6 +962,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	{
 		hsig_1DExcluded->SetXTitle( "significance #sigma" );
 		hsig_1DExcluded->SetYTitle( "# of entries" );
+		hsig_1DExcluded->GetXaxis()->SetRangeUser( xmin, xmax );
 		if( !cCanvas )
 		{
 			if( fPlotCorrelated )
