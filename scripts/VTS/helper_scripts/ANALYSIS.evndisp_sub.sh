@@ -25,15 +25,7 @@ echo "Scratch dir: $TEMPDIR"
 mkdir -p $TEMPDIR
 
 #################################
-
 echo "Using run parameter file $ACUTS"
-
-# no disp, short integration window
-#ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
-# disp, short integration window
-#ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-DISP"
-
-# DST ACUTS="EVNDISP.reconstruction.SW18_noDoublePass.runparameter"
 
 #########################################
 # pedestal calculation
