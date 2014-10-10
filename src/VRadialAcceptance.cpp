@@ -803,8 +803,8 @@ bool VRadialAcceptance::terminate( TDirectory* iDirectory )
 		ffit->SetParameter( 1, -0.6 );
 		ffit->SetParameter( 2, +0.6 );
 		ffit->SetParameter( 3, -0.2 );
-		ffit->SetParameter( 4, 0.2 );
-		ffit->SetParLimits( 4, 0., 0.5 );
+		ffit->SetParameter( 4, 0.0 );
+		ffit->SetParLimits( 4, 0., 1.0 );
 		hList->Add( ffit );
 		// fit histogram
 		i_hname = h->GetName();
@@ -824,6 +824,7 @@ bool VRadialAcceptance::terminate( TDirectory* iDirectory )
 		cout << "fitting acceptance curves (" << h->GetName() << ") ..." << endl << endl;
 		double i_eval = 0.;
 		hfit->Fit( ffit, "0REM" );
+		//ffit->GetParameter(4);
 		hfit->SetBins( 1000, 0., 5. );
 		// replace bin content by values from the fit function (set max to 1 and min to 0)
 		for( int j = 1; j < hfit->GetNbinsX(); j++ )
