@@ -35,7 +35,7 @@ optional parameters:
     [sim type]              use IRFs derived from this simulation type (GRISU-SW6 or CARE_June1425)
 			    Default: CARE_June1425
 
-    [method]                reconstruction method: GEO or DISP.
+    [method]                reconstruction method: GEO, DISP, FROGS.
 			    Default: GEO
 
     [force atmosphere]	    use EAs generated with this atmospheric model (21 or 22).
@@ -98,6 +98,10 @@ elif [[ $CUTS = *hard3tel* ]]; then
     CUT="NTel3-PointSource-Hard"
 elif [[ $CUTS = *hardExt2tel* ]]; then
     CUT="NTel2-ExtendedSource-Hard"
+elif [[ $CUTS = *frogs* ]]; then
+    CUT="N2_001-003-005CU_index4.3"
+elif [[ $CUTS = *BDT-moderate* ]]; then
+    CUT="NTel2-PointSource-Moderate-TMVA-BDT"
 else
     echo "ERROR: unknown cut definition: $CUTS"
     exit 1
@@ -178,6 +182,11 @@ for RUN in ${RUNS[@]}; do
     EFFAREARUN=${EFFAREARUN/XX/$ATMO}
     RADACCRUN=${RADACC/VX/$EPOCH}
     RADACCRUN=${RADACCRUN/TX/$TELTOANA}
+
+    if [[ $CUTS = *frogs* ]]; then
+       RADACCRUN="radialAcceptance-v451-auxv01-Cut-NTel2-PointSource-Moderate-GEO-V6-T1234.root"
+    fi
+
     
     # write line to file
     echo "* $RUN $RUN 0 $CUTFILE $BM $EFFAREARUN $BMPARAMS $RADACCRUN" >> $ANARUNLIST
