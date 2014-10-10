@@ -2,7 +2,7 @@
 # script to train BDTs with TMVA
 
 # qsub parameters
-h_cpu=11:59:59; h_vmem=12000M; tmpdir_size=24G
+h_cpu=11:59:59; h_vmem=11599M; tmpdir_size=24G
 
 if [[ $# < 10 ]]; then
 # begin help message
@@ -60,7 +60,7 @@ ONAME=$4
 SIMTYPE=$5
 if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
     SIMTYPE="GRISU-SW6"
-elif [ ${SIMTYPE:0:4} = "CARE" ]; then 
+elif [[ ${SIMTYPE:0:4} = "CARE" ]]; then 
     SIMTYPE="CARE_June1425"
 else
     echo "Invalid simulation type. Exiting..."
@@ -123,7 +123,8 @@ NZEW=$((${#ZEBINARRAY[@]}-$count1)) #get number of bins
 
 #####################################
 # zenith angle bins of MC simulation files
-ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 60 65 )
+# ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 60 65 )
+ZENITH_ANGLES=( 20 30 35 40 45 50 55 )
 
 #####################################
 # directory for run scripts
