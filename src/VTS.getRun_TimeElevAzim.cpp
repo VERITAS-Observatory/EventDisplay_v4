@@ -158,8 +158,6 @@ int main( int argc, char* argv[] )
 	VGlobalRunParameter* blah = new VGlobalRunParameter() ;
 	//cout << " VGlobal->getDBServer(): " << blah->getDBServer() << endl;
 	// start connection
-	//string db_name = "mysql://romulus.ucsc.edu/" ;
-	//TSQLServer * f_db = TSQLServer::Connect( db_name.c_str(), "readonly" , "" );
 	// fixed below to follow the party line
 	string tmpdb_ver;
 	tmpdb_ver = blah->getDBServer() + "/VERITAS" ;
