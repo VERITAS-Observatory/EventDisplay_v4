@@ -10,9 +10,7 @@
 #include "frogs.h"
 
 #include "VEvndispData.h"
-#include "VShowerParameters.h"
 #include "VFrogsParameters.h"
-#include <VEvndispRunParameter.h>
 #include <VDetectorGeometry.h>
 #include <VGrIsuAnalyzer.h>
 
@@ -184,9 +182,6 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 	private:
 		struct 		     frogs_imgtmplt_in frogs_convert_from_ed( int eventNumber, int adc_type, double inEnergy, string fArrayEpoch );
 		VEvndispData*         fData;                    //!< pointer to data class
-		//VShowerParameters    *fShowerParam;
-		//VEvndispRunParameter *fRunPara;                //!< data class for all run parameters
-		//VVirtualDataReader   *fReader;
 		
 		int frogsRecID;
 		string templatelistname;

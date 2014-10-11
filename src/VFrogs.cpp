@@ -41,24 +41,14 @@ void VFrogs::processParamFile()
 	// 	if line keyword matches *
 	// 		save value to variable
 	
-	char* itemp = 0;
-	if( getenv( "VERITAS_EVNDISP_AUX_DIR" ) )
-	{
-		itemp = getenv( "VERITAS_EVNDISP_AUX_DIR" );
-	}
-	else if( getenv( "VERITAS_EVNDISP_ANA_DIR" ) )
-	{
-		itemp = getenv( "VERITAS_EVNDISP_ANA_DIR" );
-	}
-	char FROGS_PARAMETER[500];
+	string iFROGS_PARAMETER = getRunParameter()->getDirectory_EVNDISPAnaData() + "/Frogs/" + fparamfile;
 	ifstream is;
-	//sprintf( FROGS_PARAMETER, "%s/FrogsParameterFiles/%s", itemp, fparamfile.c_str() );
-	sprintf( FROGS_PARAMETER, "%s/Frogs/%s", itemp, fparamfile.c_str() );
-	is.open( FROGS_PARAMETER, ifstream::in );
+	is.open( iFROGS_PARAMETER.c_str(), ifstream::in );
 	if( !is )
 	{
-		cerr << "Error, could not open frogs parameter file  '" << fparamfile << "', exiting...." << endl;
-		exit( 1 ) ;
+		cerr << "Error, could not open frogs parameter file:  " << iFROGS_PARAMETER << endl;
+		cout << "exiting...." << endl;
+		exit( EXIT_FAILURE ) ;
 	}
 	
 	string is_line ;
