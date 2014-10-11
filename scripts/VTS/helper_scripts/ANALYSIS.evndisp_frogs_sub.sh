@@ -99,7 +99,7 @@ OPT+=( -frogs $TEMPDIR/$INPUTMSCW             )
 OPT+=( -frogsid 0                            )
 OPT+=( -templatelistforfrogs "$TEMPLATELIST" )
 FROGSPARAM="FROGS.runparameter"
-if [ ! -e "$FROGSPARAM"] ; then
+if [[ ! -e "$FROGSPARAM" ]] ; then
 	echo "Error, could not find frogs parameter file '$FROGSPARAM', exiting..."
 fi
 OPT+=( -frogsparameterfile "$FROGSPARAM")
