@@ -1319,7 +1319,7 @@ calculateBinaryPhases:	./obj/CData.o \
 ./obj/VTS.next_day.o:	./src/VTS.next_day.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-VTS.next_day:	./obj/VFITS.o \
+VTS.next_day:	./obj/VFITS.o ./obj/VFITS_Dict.o \
 		./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
 		./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
 		./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
