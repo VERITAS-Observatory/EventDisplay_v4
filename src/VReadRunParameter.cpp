@@ -283,7 +283,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->fcalibrationfile = "";
 			}
 			// no reading of DB in case of external calibration file
-			fRunPara->fNoCalibNoPb = true;
+			fRunPara->freadCalibfromDB = false;
 			
 		}
 		else if( iTemp.find( "readcalibdb" ) < iTemp.size() )
@@ -1021,7 +1021,7 @@ void VReadRunParameter::test_and_adjustParams()
 	if( fRunPara->frunmode == 0 && fRunPara->getObservatory().find( "VERITAS" ) != string::npos
 			&& fRunPara->fIsMC == 0 )
 	{
-		if( !fRunPara->fNoCalibNoPb )
+		if( !fRunPara->fNoCalibNoPb && fRunPara->fcalibrationfile == "" )
 		{
 			fRunPara->freadCalibfromDB = true;
 		}
