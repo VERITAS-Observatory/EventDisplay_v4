@@ -28,12 +28,12 @@ VFrogs::VFrogs()
 	templatelistname = getRunParameter()->ffrogstemplatelist ;
 	fparamfile		  = getRunParameter()->ffrogsparameterfile ;
 	processParamFile() ;
-	
+	frogs_seed_gsl_rng( ffrogsRandomSeed );
 }
 
 void VFrogs::processParamFile()
 {
-	cout << "VFrogs::processParamFile()!!" << endl;
+	cout << "VFrogs::processParamFile() !! " ;
 	//istream
 	// open file 'fparamfile'
 	// loop over each line
@@ -46,11 +46,12 @@ void VFrogs::processParamFile()
 	is.open( iFROGS_PARAMETER.c_str(), ifstream::in );
 	if( !is )
 	{
-		cerr << "Error, could not open frogs parameter file:  " << iFROGS_PARAMETER << endl;
-		cout << "exiting...." << endl;
+		cerr << "\nError, could not open frogs parameter file:  " << iFROGS_PARAMETER << endl;
+		cout << "\nexiting...." << endl;
 		exit( EXIT_FAILURE ) ;
 	}
-	
+	cout << iFROGS_PARAMETER << endl;
+
 	string is_line ;
 	string temp  ;
 	string temp2 ;
@@ -181,6 +182,10 @@ void VFrogs::processParamFile()
 				{
 					is_stream >> frogsNBEventCalib;
 				}
+				else if( temp == "RANDOMSEED" )
+				{
+					is_stream >> ffrogsRandomSeed;
+				}
 			}
 		}
 	}
@@ -196,6 +201,15 @@ void VFrogs::processParamFile()
 	cout << "              stepsize (xs, ys, xp, yp, log10e, lambda): ( " << frogsDeltaXS << ", " << frogsDeltaYS << ", " << frogsDeltaXP << ", "
 		 << frogsDeltaYP << ", " << frogsDeltaLog10e << ", " << frogsDeltaLambda << " )" << endl;
 	cout << "frogs params: interpolation mode ( 0 = no interpolation, 1 = linear, 2 = quadratic ): " << frogsInterpOrder << endl;
+	cout << "frogs params: random seed for differential evolution" ;
+	if( ffrogsRandomSeed > 0 ) 
+	{ 
+		cout <<": " << ffrogsRandomSeed << endl; 
+	}
+	else 
+	{
+		cout << " will be set to system time." << endl;
+	}
 }
 
 //================================================================
@@ -265,6 +279,7 @@ void VFrogs::reset()
 	frogsInterpOrder	= 2;
 	frogsCheating		= false;
 	frogsNBEventCalib = 0;
+	ffrogsRandomSeed = 0;
 }
 
 //================================================================
@@ -731,6 +746,9 @@ void VFrogs::terminate()
 
 void VFrogs::finishFrogs( TFile* f )
 {
+
+	//free random number generator
+	frogs_free_gsl_rng();
 
 	// Open outfile again to copy frogs tree to mscw file.
 	

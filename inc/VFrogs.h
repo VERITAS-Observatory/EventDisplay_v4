@@ -244,7 +244,8 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 		int    frogsInterpOrder;
 		bool   frogsCheating;
 		int    frogsNBEventCalib;
-		
+		unsigned long ffrogsRandomSeed;            	 // random seed for frogs differential evolution.
+
 		void processParamFile() ;
 };
 #endif

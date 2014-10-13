@@ -352,6 +352,9 @@ void frogs_fill_prob_density( struct frogs_probability_array* prob_array );
 double frogs_read_prob_array_table( struct frogs_probability_array* prob_array, double q, double mu, double ped );
 float frogs_change_coordinate_system( float i_ze, float i_az, float x, float y, float z, int axis, bool bInv );
 
+void frogs_seed_gsl_rng( unsigned long seed );
+void frogs_free_gsl_rng();
+
 
 //=======================================================================
 //=======================================================================

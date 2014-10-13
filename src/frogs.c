@@ -14,6 +14,8 @@
 
 #include "frogs.h"
 
+gsl_rng * frogs_gsl_rng;
+
 #define FROGS_TEST 0
 //================================================================
 //================================================================
@@ -2807,14 +2809,16 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			//for (int i=0; i<gi_D; i++)
 			//fprintf(stderr,"i %d fa_minbound %f fa_maxbound %f\n", i, fa_minbound[i], fa_maxbound[i]);
 			
-			//set up GSL Random Number Generation
-			unsigned long seed;
-			srand( time( NULL ) );
-			seed = rand();
-			gsl_rng* r;
-			gsl_rng_env_setup();
-			r = gsl_rng_alloc( gsl_rng_mt19937 ); //Select random number generator
-			gsl_rng_set( r, seed );
+			if( !frogs_gsl_rng ) //something must have gone wrong earlier. We can try to reseed with the system time...
+			{
+				fprintf( stderr, "frogs_differential_evolution Warning: Random number generator not set, try to set and reseed with system time.\n" );
+				frogs_seed_gsl_rng( 0 );
+				if( !frogs_gsl_rng ) 
+				{ 
+					frogs_showxerror("Could not set random number generator for differential evolution." );
+				}
+			}
+
 			
 			long  gl_nfeval = 0;     //number of function evaluations
 			t_pop gta_pop[2 * MAXPOP]; //the two populations are put into one array side by side
@@ -2842,7 +2846,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 				   gta_pop[0].fa_vector[i] is the ith component of a random vector
 				   the components of the vector are randomly distributed between
 				   fa_maxbound[i] and fa_minbound[i] */
-				gta_pop[0].fa_vector[i] = fa_minbound[i] + gsl_rng_uniform( r ) * ( fa_maxbound[i] - fa_minbound[i] );
+				gta_pop[0].fa_vector[i] = fa_minbound[i] + gsl_rng_uniform( frogs_gsl_rng ) * ( fa_maxbound[i] - fa_minbound[i] );
 				//fprintf(stderr,"i %d %f %f gta %f\n",
 				//i, fa_minbound[i], fa_maxbound[i], gta_pop[0].fa_vector[i]);
 			}
@@ -2854,7 +2858,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			{
 				for( int j = 0; j < gi_D; j++ )
 				{
-					gta_pop[i].fa_vector[j] = fa_minbound[j] + gsl_rng_uniform( r ) * ( fa_maxbound[j] - fa_minbound[j] );
+					gta_pop[i].fa_vector[j] = fa_minbound[j] + gsl_rng_uniform( frogs_gsl_rng ) * ( fa_maxbound[j] - fa_minbound[j] );
 				}
 				gta_pop[i] = frogs_evaluate( d, tmplt, prob_array, gi_D, gta_pop[i], &gl_nfeval, &gta_pop[0], gi_NP );
 				
@@ -2883,12 +2887,12 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 				gi_gen++;
 				
 				//----computer dithering factor (if needed)-----------------
-				f_dither = f_weight + gsl_rng_uniform( r ) * ( 1.0 - f_weight );
+				f_dither = f_weight + gsl_rng_uniform( frogs_gsl_rng ) * ( 1.0 - f_weight );
 				
 				//----start of loop through ensemble------------------------
 				for( int i = 0; i < gi_NP; i++ )
 				{
-					frogs_permute( r, ia_urn2, URN_DEPTH, gi_NP, i ); //Pick 4 random and distinct
+					frogs_permute( frogs_gsl_rng, ia_urn2, URN_DEPTH, gi_NP, i ); //Pick 4 random and distinct
 					i_r1 = ia_urn2[1];                           //population members
 					i_r2 = ia_urn2[2];
 					i_r3 = ia_urn2[3];
@@ -2922,7 +2926,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 					if( gi_strategy == 1 )
 					{
 						frogs_assigna2b( gi_D, gpta_old[i].fa_vector, t_tmp.fa_vector );
-						int j = ( int )( gsl_rng_uniform( r ) * gi_D ); // random parameter
+						int j = ( int )( gsl_rng_uniform( frogs_gsl_rng ) * gi_D ); // random parameter
 						int k = 0;
 						do
 						{
@@ -2932,7 +2936,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 							j = ( j + 1 ) % gi_D;
 							k++;
 						}
-						while( ( gsl_rng_uniform( r ) < f_cross ) && ( k < gi_D ) );
+						while( ( gsl_rng_uniform( frogs_gsl_rng ) < f_cross ) && ( k < gi_D ) );
 #ifdef BOUND_CONSTR
 						frogs_assigna2b( gi_D, gpta_old[i_r1].fa_vector, t_origin.fa_vector );
 #endif//BOUND_CONSTR
@@ -2941,7 +2945,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 					else if( gi_strategy == 2 )
 					{
 						frogs_assigna2b( gi_D, gpta_old[i].fa_vector, t_tmp.fa_vector );
-						int j = ( int )( gsl_rng_uniform( r ) * gi_D ); // random parameter
+						int j = ( int )( gsl_rng_uniform( frogs_gsl_rng ) * gi_D ); // random parameter
 						int k = 0;
 						do
 						{
@@ -2953,7 +2957,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 							j = ( j + 1 ) % gi_D;
 							k++;
 						}
-						while( ( gsl_rng_uniform( r ) < f_cross ) && ( k < gi_D ) );
+						while( ( gsl_rng_uniform( frogs_gsl_rng ) < f_cross ) && ( k < gi_D ) );
 #ifdef BOUND_CONSTR
 						frogs_assigna2b( gi_D, t_tmp.fa_vector, t_origin.fa_vector );
 #endif//BOUND_CONSTR
@@ -2962,12 +2966,12 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 					else if( gi_strategy == 3 )
 					{
 						frogs_assigna2b( gi_D, gpta_old[i].fa_vector, t_tmp.fa_vector );
-						int j = ( int )( gsl_rng_uniform( r ) * gi_D ); // random parameter
+						int j = ( int )( gsl_rng_uniform( frogs_gsl_rng ) * gi_D ); // random parameter
 						int k = 0;
 						do
 						{
 							// add fluctuation to random target
-							f_jitter = ( 0.0001 * gsl_rng_uniform( r ) + f_weight );
+							f_jitter = ( 0.0001 * gsl_rng_uniform( frogs_gsl_rng ) + f_weight );
 							t_tmp.fa_vector[j] =
 								t_bestit.fa_vector[j]
 								+ f_jitter * ( gpta_old[i_r1].fa_vector[j] - gpta_old[i_r2].fa_vector[j] );
@@ -2975,7 +2979,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 							j = ( j + 1 ) % gi_D;
 							k++;
 						}
-						while( ( gsl_rng_uniform( r ) < f_cross ) && ( k < gi_D ) );
+						while( ( gsl_rng_uniform( frogs_gsl_rng ) < f_cross ) && ( k < gi_D ) );
 #ifdef BOUND_CONSTR
 						frogs_assigna2b( gi_D, t_tmp.fa_vector, t_origin.fa_vector );
 #endif//BOUND_CONSTR
@@ -2984,20 +2988,20 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 					else if( gi_strategy == 4 )
 					{
 						frogs_assigna2b( gi_D, gpta_old[i].fa_vector, t_tmp.fa_vector );
-						int j = ( int )( gsl_rng_uniform( r ) * gi_D ); // random parameter
+						int j = ( int )( gsl_rng_uniform( frogs_gsl_rng ) * gi_D ); // random parameter
 						int k = 0;
 						do
 						{
 							// add fluctuation to random target
 							
 							t_tmp.fa_vector[j] = gpta_old[i_r1].fa_vector[j] +
-												 ( f_weight + gsl_rng_uniform( r ) * ( 1.0 - f_weight ) ) *
+												 ( f_weight + gsl_rng_uniform( frogs_gsl_rng ) * ( 1.0 - f_weight ) ) *
 												 ( gpta_old[i_r2].fa_vector[j] - gpta_old[i_r3].fa_vector[j] );
 												 
 							j = ( j + 1 ) % gi_D;
 							k++;
 						}
-						while( ( gsl_rng_uniform( r ) < f_cross ) && ( k < gi_D ) );
+						while( ( gsl_rng_uniform( frogs_gsl_rng ) < f_cross ) && ( k < gi_D ) );
 #ifdef BOUND_CONSTR
 						frogs_assigna2b( gi_D, t_tmp.fa_vector, t_origin.fa_vector );
 #endif//BOUND_CONSTR
@@ -3006,7 +3010,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 					else if( gi_strategy == 5 )
 					{
 						frogs_assigna2b( gi_D, gpta_old[i].fa_vector, t_tmp.fa_vector );
-						int j = ( int )( gsl_rng_uniform( r ) * gi_D ); // random parameter
+						int j = ( int )( gsl_rng_uniform( frogs_gsl_rng ) * gi_D ); // random parameter
 						int k = 0;
 						do
 						{
@@ -3017,7 +3021,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 							j = ( j + 1 ) % gi_D;
 							k++;
 						}
-						while( ( gsl_rng_uniform( r ) < f_cross ) && ( k < gi_D ) );
+						while( ( gsl_rng_uniform( frogs_gsl_rng ) < f_cross ) && ( k < gi_D ) );
 #ifdef BOUND_CONSTR
 						frogs_assigna2b( gi_D, t_tmp.fa_vector, t_origin.fa_vector );
 #endif//BOUND_CONSTR
@@ -3026,9 +3030,9 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 					else
 					{
 						frogs_assigna2b( gi_D, gpta_old[i].fa_vector, t_tmp.fa_vector );
-						int j = ( int )( gsl_rng_uniform( r ) * gi_D ); // random parameter
+						int j = ( int )( gsl_rng_uniform( frogs_gsl_rng ) * gi_D ); // random parameter
 						int k = 0;
-						if( gsl_rng_uniform( r ) < 0.5 ) //Pmu = 0.5
+						if( gsl_rng_uniform( frogs_gsl_rng ) < 0.5 ) //Pmu = 0.5
 						{
 							//differential mutation
 							do
@@ -3040,7 +3044,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 								j = ( j + 1 ) % gi_D;
 								k++;
 							}
-							while( ( gsl_rng_uniform( r ) < f_cross ) && ( k < gi_D ) );
+							while( ( gsl_rng_uniform( frogs_gsl_rng ) < f_cross ) && ( k < gi_D ) );
 						}
 						else
 						{
@@ -3055,7 +3059,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 								j = ( j + 1 ) % gi_D;
 								k++;
 							}
-							while( ( gsl_rng_uniform( r ) < f_cross ) && ( k < gi_D ) );
+							while( ( gsl_rng_uniform( frogs_gsl_rng ) < f_cross ) && ( k < gi_D ) );
 						}
 #ifdef BOUND_CONSTR
 						frogs_assigna2b( gi_D, gpta_old[i_r1].fa_vector, t_origin.fa_vector );
@@ -3068,11 +3072,11 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 						//----and bounce back----------------------------------------
 						if( t_tmp.fa_vector[j] < fa_minbound[j] )
 						{
-							t_tmp.fa_vector[j] = fa_minbound[j] + gsl_rng_uniform( r ) * ( t_origin.fa_vector[j] - fa_minbound[j] );
+							t_tmp.fa_vector[j] = fa_minbound[j] + gsl_rng_uniform( frogs_gsl_rng ) * ( t_origin.fa_vector[j] - fa_minbound[j] );
 						}
 						if( t_tmp.fa_vector[j] > fa_maxbound[j] )
 						{
-							t_tmp.fa_vector[j] = fa_maxbound[j] + gsl_rng_uniform( r ) * ( t_origin.fa_vector[j] - fa_maxbound[j] );
+							t_tmp.fa_vector[j] = fa_maxbound[j] + gsl_rng_uniform( frogs_gsl_rng ) * ( t_origin.fa_vector[j] - fa_maxbound[j] );
 						}
 					}
 #endif//BOUND_CONSTR
@@ -3179,8 +3183,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 				d->startpt.log10e = gt_best.fa_vector[4];
 				d->startpt.lambda = gt_best.fa_vector[5];
 			}
-			
-			gsl_rng_free( r ); //Free the memory associated with r
+
 		}
 		
 		
@@ -3801,6 +3804,26 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 					return FROGS_BAD_NUMBER;
 				}
 			}
+			
+			
+			
+	
+void frogs_seed_gsl_rng(unsigned long seed) 
+{
+	//set up GSL Random Number Generation
+	if( !seed) seed = time(0) ;		//seed with system time if no seed given
+	gsl_rng_env_setup();
+	frogs_gsl_rng = gsl_rng_alloc( gsl_rng_mt19937 ); //Select random number generator
+	gsl_rng_set( frogs_gsl_rng, seed );
+	fprintf( stderr, "frogs info: GSL random number generator seed %lu\n" , seed);	
+
+}		
+			
+	
+void frogs_free_gsl_rng() 
+{
+	if(frogs_gsl_rng) gsl_rng_free( frogs_gsl_rng ); //Free the memory associated with r
+}		
 			
 			
 			
