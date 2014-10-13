@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# analysis submission for production 2 analysis
+# analysis submission for production 2 (prod2) analysis
 #
 # this script is optimized for the DESY analysis
 #
@@ -10,9 +10,9 @@
 if [ $# -ne 2 ] 
 then
    echo 
-   echo "./CTA.runProd2Analysis.sh <N/S/P1> <run mode>"
+   echo "./CTA.runProd2Analysis.sh <N/S/SM/P1> <run mode>"
    echo
-   echo "  N=prod2-North, S=prod2-South, P1=prod1"
+   echo "  N=prod2-North, S=prod2-South, SM=prod2-South-merged P1=prod1"
    echo
    echo "  possible run modes are EVNDISP MAKETABLES ANATABLES TRAIN ANGRES QC PARTFIL CUTS PHYS "
    echo
@@ -24,9 +24,8 @@ RUN="$2"
 #####################################
 # qsub options
 #   _M_ = -; _X_ = " "
-QSUBOPT=""
 QSUBOPT="_M_P_X_cta_high"
-QSUBOPT="_M_P_X_cta_high_X__M_js_X_100"
+QSUBOPT="_M_P_X_cta_high_X__M_js_X_5000"
 
 #####################################
 # output directory for script parameter files
@@ -53,28 +52,39 @@ MCAZ=( "_180deg" "_0deg" "" )
 #####################################
 # sites & sub array lists
 
-############################
+##########################################################
 # SOUTH
 if [[ $P2 == "S" ]]
 then
+##########################################################
 # data sets without trgmask files
-   SITE=( "prod2-LeoncitoPP-NS" "prod2-Aar-lowE-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS"  "prod2-Aar-500m-NS" )
-# array settings
-   ARRAY="subArray.2a-noLST.list"
+#   SITE=( "prod2-Aar2014-NS" "prod2-LeoncitoPP-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS"  "prod2-Aar-500m-NS" )
+##########################################################
+# 40 deg data sets 
+# (change run list directories!)
+#   SITE=( "prod2-Aar-40deg-NS" "prod2-Leoncito-40deg-NS" "prod2-LeoncitoPP-40deg-NS" )
+##########################################################
+# NSB data sets
+# (change run list directories!)
+#   SITE=( "CL5040-prod2-Leoncito-NSB-x1.00-NS" "CL5040-prod2-Leoncito-NSB-x1.30-NS" "CL5040-prod2-Leoncito-NSB-x1.50-NS" )
 # data sets with trgmask files
-   SITE=( "prod2-Aar-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-Leoncito-NS" )
-# 40 deg data sets
-   SITE=( "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" )
-# survey sets
-   SITE=( "prod2-LeoncitoPP-NS" "prod2-Aar-NS" "prod2-Aar-lowE-NS" )
-   ARRAY="subArray.2a.list"
-# NSB data set
-   SITE=( "CL5040-prod2-Leoncito-NSB-x1.00-NS" "CL5040-prod2-Leoncito-NSB-x1.30-NS" "CL5040-prod2-Leoncito-NSB-x1.50-NS" )
-   ARRAY="subArray.2a.v2.list"
+#   SITE=( "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-Leoncito-NS" )
+##########################################################
+# super-seeded Aar 20deg data set (without trgmask file)
+#   SITE=( "prod2-Aar-lowE-NS" )
+# super-seeded Aar 20deg data set
+#   SITE=( "prod2-Aar-NS" )
+##########################################################
 # reduced arrays data sets
    SITE=( "prod2-LeoncitoPP-NS" )
-   ARRAY="subArray.20140730.list"
-############################
+   ARRAY="subArray.2a.list"
+##########################################################
+# SOUTH - merged simulation files
+elif [[ $P2 == "SM" ]]
+then
+   SITE="prod2-Aar2014-NS"
+   ARRAY="subArray.SM.dat"
+##########################################################
 # NORTH
 elif [[ $P2 == "N" ]]
 then
@@ -84,6 +94,8 @@ then
    ARRAY="subArray.2NN-fullList.list"
    ARRAY="subArray.2NN-LG.list"
    ARRAY="subArray.2NN.list"
+############################
+# prod1
 elif [[ $P2 == "P1" ]]
 then
   SITE=( "prod1-cta-ultra3" )
@@ -91,6 +103,8 @@ then
   RECID="2"
   DATE="d20130415"
   MCAZ=( "" )
+############################
+# prod2-MS (trigsim)
 elif [[ $P2 == "MS" ]]
 then
   SITE=( "MS-TrigSimProd2SumD" )
@@ -167,13 +181,24 @@ do
       for ((i = 0; i < ${#PARTICLE[@]}; i++ ))
       do
 	  N=${PARTICLE[$i]}
+          # run list for 40 deg files on dcache
 	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/40deg/$S.$N"".dcache.list
+          # run list for 40 deg files on lustre
 	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/40deg/$S.$N"".grid.list.fullList
+          # run list for 20 deg high NSB files on lustre
 	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/NSB/$S.$N"_20deg".list
+          # run list for 20 deg files on lustre (default data sets)
 	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/$S.$N"_20deg".list
           echo $LIST
 
-          ./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.prod2.sh $ARRAY $LIST $N $S 0 $i $QSUBOPT $TRG
+          # analysis of merged evndisp files
+          if [[ $P2 == "SM" ]]
+          then
+               ./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.prod2_merge.sh $ARRAY $LIST $N $S 0 $i $QSUBOPT
+          # standard evndisplay analysis
+          else
+               ./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.prod2.sh $ARRAY $LIST $N $S 0 $i $QSUBOPT $TRG
+          fi 
        done
        continue
     fi
