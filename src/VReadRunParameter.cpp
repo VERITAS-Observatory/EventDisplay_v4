@@ -1620,6 +1620,14 @@ void VReadRunParameter::test_and_adjustParams()
 		exit( -1 );
 	}
 	
+	//don't start frogs analysis unless it's a 4-Telescope run
+	if( fRunPara->ffrogsmode && fRunPara->fTelToAnalyze.size() != 4 )
+	{
+		cout << "Error: You requested a frogs analysis for " << fRunPara->fTelToAnalyze.size() << " telescopes; will only do frogs analysis for exactly 4 telescopes!" << endl;
+		exit( EXIT_FAILURE );  
+	}
+
+
 	if( fPrintOutputFile )
 	{
 		cout << fRunPara->foutputfileName << endl;
