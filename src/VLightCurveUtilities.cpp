@@ -59,11 +59,16 @@ bool VLightCurveUtilities::writeASCIIFile( string iFile, vector< VLightCurveData
 	return true;
 }
 
+/* 
+
+    read light curve data from ASCII file for the given period in MJD
+
+*/
 bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double iMJDMax, double iFluxMultiplier )
 {
 	resetLightCurveData();
 	
-	// read in ascii file
+	// open ascii file
 	ifstream is( iFile.c_str() );
 	if( !is )
 	{
@@ -72,6 +77,10 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 		return false;
 	}
 	cout << "VLightCurveUtilities::readASCIIFile(): reading " << iFile << endl;
+	if( fXRTTimeSettings )
+	{
+	    cout << "\t XRT Time settings: time offset is " << fXRTMissionTimeStart << " [s]" << endl;
+        }
 	
 	double iTemp1 = 0.;
 	double iTemp2 = 0.;
@@ -80,6 +89,9 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 	
 	string is_line;
 	
+	//////////////////////
+	// loop over all lines
+	//   (take differences in file format into account)
 	while( getline( is, is_line ) )
 	{
 		if( is_line.size() == 0 )
@@ -89,17 +101,26 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 		
 		istringstream is_stream( is_line );
 		
-		//! no errors are catched here..
-		is_stream >> iTemp1;     // second since fXRTMissionTimeStart or MJD (depends on fXRTTimeSettings)
+		// little errors catching here...
+
+		// a '!' in the first column is a comment
+		is_stream >> iTemp4;     // second since fXRTMissionTimeStart or MJD (depends on fXRTTimeSettings)
+		if( iTemp4.size() == 0 || iTemp4.substr( 0, 1 ) == "!" ) 
+		{
+		    continue;
+                }
+		iTemp1 = atof( iTemp4.c_str() );
 		is_stream >> iTemp2;     // error [s]
 		
-		// times are given in XRT mission sec.
+		// times are given in XRT mission in seconds
+		// convert to days and add mission start offsets (in days)
 		if( fXRTTimeSettings )
 		{
+			is_stream >> iTemp3;     // (ignore for now)
 			iTemp1  = fXRTMissionTimeStart + iTemp1 / ( 24.0 * 60.0 * 60.0 );
 			iTemp2 /= ( 24.0 * 60.0 * 60.0 );
 		}
-		
+		// from here on: iTemp1 and iTemp2 are given in units of MJD
 		if( iMJDMin > 0. && iTemp1 - iTemp2 < iMJDMin )
 		{
 			continue;
@@ -144,8 +165,13 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 			fLightCurveMJD_max = fLightCurveData.back()->fMJD_Data_min;
 		}
 		
+		//////////////////////////////////
+		// read in rates or fluxes + errors
+
 		is_stream >> iTemp1;     // rate or flux
 		is_stream >> iTemp2;     // rate or flux error
+
+		// upper error (if available)
 		if( !is_stream )
 		{
 			is_stream >> iTemp3;
@@ -159,11 +185,13 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 		iTemp2 *= iFluxMultiplier;
 		iTemp3 *= iFluxMultiplier;
 		
+		// flux state (if available)
 		if( !is_stream.eof() )
 		{
 			is_stream >> iTemp4;
 		}
 		
+		// fill light curve data element
 		if( iTemp2 > 0. && iTemp3 > 0. )
 		{
 			fLightCurveData.back()->fFlux = iTemp1;

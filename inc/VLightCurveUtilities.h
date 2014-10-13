@@ -86,11 +86,12 @@ class VLightCurveUtilities
 			fASCIIFormSecondColumnIsObservingInterval = iB;
 		}
 		void   setPhaseFoldingValues( double iZeroPhase_MJD = -99., double iPhase_Days = 99.,
-									  double iPhaseError_low_Days = 0., double iPhaseError_up_Days = 0., bool bPlotPhase = true );
+					      double iPhaseError_low_Days = 0., double iPhaseError_up_Days = 0.,
+					      bool bPlotPhase = true );
 		void   setXRTTimeSettings( bool iB = true, double iMJDMissionTimeStart = 54857.09977457897 )
 		{
 			fXRTTimeSettings = iB;
-			fXRTMissionTimeStart = iMJDMissionTimeStart;
+			fXRTMissionTimeStart = iMJDMissionTimeStart;             // MJD of time = 0
 		}
 		bool   updatePhaseFoldingValues();
 		bool   writeASCIIFile( string iFile );
