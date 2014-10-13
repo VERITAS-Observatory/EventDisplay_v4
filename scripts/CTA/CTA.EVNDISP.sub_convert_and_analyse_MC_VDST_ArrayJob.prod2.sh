@@ -11,7 +11,7 @@
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ]
 then
    echo
-   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.prod2.sh <sub array list> <list of simtelarray files> <particle> <data set> [keep simtel.root files (default off=0)] [log file directory counter] [qsub options] [TRIGGER MASK DIRECTORY]"
+   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.prod2.sh <sub array list> <list of sim_telarray files> <particle> <data set> [keep simtel.root files (default off=0)] [log file directory counter] [qsub options] [TRIGGER MASK DIRECTORY]"
    echo
    echo "CTA PROD2 ANALYSIS"
    echo
@@ -108,7 +108,7 @@ PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Aar/Calibration/Aar.peds.
 # get run list and number of runs
 if [ ! -e $RUNLIST ]
 then
-  echo "list of simtelarray files not found: $RUNLIST"
+  echo "list of sim_telarray files not found: $RUNLIST"
   exit
 fi
 RUNLISTN=`basename $RUNLIST`
@@ -142,7 +142,6 @@ do
 # smaller step size for on source gammas
     NARRAY=`wc -l $ARRAY`
     echo $NARRAY
-#    if [[ $NARRAY > 2 ]] && [[ $PART == "gamma_onSource" ]]
     if [[ $PART == "gamma_onSource" ]]
     then
        STEPSIZE=5

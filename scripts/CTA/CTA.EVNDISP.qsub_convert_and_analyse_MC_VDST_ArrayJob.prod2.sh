@@ -26,14 +26,17 @@ STEPSIZE=STST
 # set array
 FIELD=$SUBA
 
+###################################
 # converter command line parameter
+# settings for increased NSB
 # COPT="-NSB 1.5 -f 1 -c $PEDFILE"
+# default settings
 COPT="-f 1 -c $PEDFILE"
 
 # eventdisplay command line parameter
 OPT="-averagetzerofiducialradius=0.5 -shorttree -l2setspecialchannels nofile -writenoMCTree -reconstructionparameter $ACUT $PPOP"
 
-# set timtelarray file and cp simtelarray.gz file to TMPDIR
+# set simtelarray file and cp simtelarray.gz file to TMPDIR
 if [ ! -e $ILIST ]
 then
    echo "ERROR: list of simulation files does not exist: $ILIST"
@@ -95,35 +98,6 @@ if [[ ! -z "$TRGMASKDIR" ]] && [[ "$TRGMASKDIR" == "TRUE" ]]
 then
    COPT="$COPT -t $TRGMASKDIR"
 fi
-#   if [[ $DSET == *Leoncito* ]] || [[ $DSET == *Aar* ]]
-#   then
-#      FFIL=`basename $TMPDIR/$OFIL.gz .simtel.gz`
-#      echo "FIL $FFIL"
-#   elif [[ $DSET == *SAC* ]]
-#   then
-#      if [[ $PART == "gamma_cone" ]] && [[  $DSET == *SAC084* ]]
-#      then
-#	FFIL=`basename $TMPDIR/$OFIL.gz ___cta-prod2_desert-SACx0.84_cone10.simtel.gz`
-#      else
-#	FFIL=`basename $TMPDIR/$OFIL.gz .simtel.gz`
-#      fi
-#   fi
-#   TRIGF=`find $TRGMASKDIR -name $FFIL*trgmask*`
-#   if [ -n "$TRIGF" ] && [ -e "$TRIGF" ]
-#   then
-#      COPT="$COPT -t $TRIGF"
-#      echo "CONVERTER OPTIONS: $COPT"
-#   else
-#      ELOG="$CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$DATE-$LOGF/$OFIL.error.trg.log"
-#      rm -f $ELOG
-#      touch $ELOG
-#      echo "COULD NOT FIND TRGMASK FILE for SIMTEL FILE " $IFIL >> $ELOG
-#      echo "search directory: $TRGMASKDIR" >> $ELOG
-#      echo "search string: $FFIL" >> $ELOG
-#      echo "found: $TRIGF" >> $ELOG
-#      echo "error, cannot analyse this file..." >> $ELOG
-#      exit
-#   fi
 
 ####################################################################
 # loop over all arrays
@@ -153,7 +127,7 @@ do
   cp -v -f $TMPDIR/[0-9]*.root $ODIR/$RUNN"_"$ILINE"_"$MCAZ"deg.root"
 
 ####################################################################
-# move dst (if required ) and evndisp files to data directory
+# move dst (if required) and evndisp files to data directory
    if [ "$KEEP" == "1" ]
    then
       mkdir -p $ODIR/VDST
