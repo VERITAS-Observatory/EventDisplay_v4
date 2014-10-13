@@ -1083,7 +1083,7 @@ struct frogs_imgtemplate frogs_read_template_elev( float elevation, char templat
 		itemp = getenv( "VERITAS_EVNDISP_ANA_DIR" );
 	}
 	//sprintf( FROGS_TEMPLATE_LIST_PATH, "%s/ParameterFiles/EVNDISP.frogs_template_file_list.txt", itemp );
-	sprintf( FROGS_TEMPLATE_LIST_PATH, "%s/ParameterFiles/%s", itemp, templatelistname );
+	sprintf( FROGS_TEMPLATE_LIST_PATH, "%s/Frogs/%s", itemp, templatelistname );
 	
 	//Open the template files list file
 	FILE* fu; //file pointer
@@ -1198,7 +1198,8 @@ frogs_read_template_file(
 		itemp = getenv( "VERITAS_EVNDISP_ANA_DIR" );
 	}
 	char fullfname[FROGS_FILE_NAME_MAX_LENGTH] ;
-	sprintf( fullfname, "%s/Templates/%s", itemp, fname ) ;
+	//sprintf( fullfname, "%s/Templates/%s", itemp, fname ) ;
+	sprintf( fullfname, "%s/Frogs/Templates/%s", itemp, fname ) ;
 	
 	if( ( fu = fopen( fullfname, "r" ) ) == NULL )
 	{
