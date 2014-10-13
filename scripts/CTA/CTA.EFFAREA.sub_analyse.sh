@@ -248,7 +248,8 @@ then
    else
       OFIL=proton_onSource."$ARRAY"_ID"$RECID".eff
       THETA2MIN=( 0. )
-      THETA2MAX=( 1. )
+      THETA2MAX=( 2.5 )
+# VALID      THETA2MAX=( 1. )
       OFFMEA=( 0.0 )
    fi
    ISOTROPY="1"
