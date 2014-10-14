@@ -1581,9 +1581,10 @@ $(ctapara):
 # VTS.radialacceptances (required)
 # VTS.dispBDTs (optional)
 # VTS.Model3D (optional)
+# VTS.Frogs (optional) : Frogs related templates and parameter files
 #
 
-VTS.auxfiles:	$(vtspara).runfiles.tar.gz $(vtspara).calibration.tar.gz $(vtspara).lookuptables.tar.gz $(vtspara).effectiveareas.tar.gz $(vtspara).radialacceptances.tar.gz VTS.GammaHadron_BDTs $(vtspara).dispBDTs.tar.gz $(vtspara).Model3D.tar.gz
+VTS.auxfiles:	$(vtspara).runfiles.tar.gz $(vtspara).calibration.tar.gz $(vtspara).lookuptables.tar.gz $(vtspara).effectiveareas.tar.gz $(vtspara).radialacceptances.tar.gz VTS.GammaHadron_BDTs $(vtspara).dispBDTs.tar.gz $(vtspara).Model3D.tar.gz $(vtspara).Frogs.tar.gz
 
 VTS.runfiles:	$(vtspara).runfiles.tar.gz
 VTS.calibration:	$(vtspara).calibration.tar.gz
@@ -1593,6 +1594,7 @@ VTS.radialacceptances:	$(vtspara).radialacceptances.tar.gz
 VTS.GammaHadronBDTs:	$(vtspara).GammaHadron_BDTs.tar.gz
 VTS.dispBDTs:	$(vtspara).dispBDTs.tar.gz
 VTS.Model3D:	$(vtspara).Model3D.tar.gz
+VTS.Frogs:	$(vtspara).Frogs.tar.gz
 
 ######
 # VTS runparameter files
@@ -1639,7 +1641,6 @@ $(vtspara).runfiles.tar.gz:
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/SENSITIVITY.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/VISIBILITY.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/VERITAS.*.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.frogs_template_file_list* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
 # make package
 	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).runfiles.tar.gz . && cd ..
 	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
@@ -1749,7 +1750,22 @@ $(vtspara).Model3D.tar.gz:
 	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).Model3D.tar.gz . && cd ..
 	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
 
+######
+# VTS Frogs template and parameter files
 
+$(vtspara).Frogs.tar.gz:
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).Frogs.tar.gz  >/dev/null 2>&1
+	rm -rf $(distdir) >/dev/null 2>&1
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs
+	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/Frogs/*.txt $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs/
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs/Templates/V6
+	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/Frogs/Templates/V6/frogs* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs/Templates/V6/
+#	make tar file
+	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).Frogs.tar.gz . && cd ..
+	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
+
+######
+# VTS Frogs template and parameter files
 
 ###############################################################################################################################
 # print environment and compilation parameters

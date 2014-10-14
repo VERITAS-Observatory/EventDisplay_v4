@@ -400,6 +400,12 @@ void VFrogs::doFrogsStuff( int eventNumber, string fArrayEpoch )
 			}
 		}
 		
+                if( frogsRecID < 0 || frogsRecID >= (int)getShowerParameters()->fNMethods )
+                {
+                    cout << "VFrogs: error: invalid frogsRecID (should be in the range [0," << getShowerParameters()->fNMethods << "]" << endl;
+                    cout << "exiting..." << endl;
+                    exit( EXIT_FAILURE );
+                }
 		frogsXPStart   = getShowerParameters()->fShowerXcore_SC[frogsRecID];
 		frogsYPStart   = getShowerParameters()->fShowerYcore_SC[frogsRecID];
 		frogsXPED      = getShowerParameters()->fShowerXcore[frogsRecID];
@@ -873,7 +879,7 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc
 		rtn.scope[tel].pixinuse	  = new int [rtn.scope[tel].npix];
 		rtn.scope[tel].telpixarea = new float [rtn.scope[tel].npix];
 		rtn.scope[tel].pixradius  = new float [rtn.scope[tel].npix];
-		float		 foclen			  = 1000.0 * fData->getDetectorGeo()->getFocalLength()[tel]; //Focal length in mm
+//		float		 foclen			  = 1000.0 * fData->getDetectorGeo()->getFocalLength()[tel]; //Focal length in mm
 		
 		//Initialize the number of live pixel in the telescope
 		rtn.scope[tel].nb_live_pix = 0;

@@ -130,6 +130,16 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			{
 				fRunPara->ffrogsmscwfile = iTemp2;
 				i++;
+                                // setting default parameters for frogs
+                                // (might be overwritten by the following command lines)
+                                if( fRunPara->ffrogsparameterfile.size() == 0 )
+                                {
+                                    fRunPara->ffrogsparameterfile = "FROGS.runparameter";
+                                }
+                                if( fRunPara->ffrogsRecID < 0 )
+                                {
+                                    fRunPara->ffrogsRecID = 0;
+                                }
 			}
 			else
 			{
@@ -145,7 +155,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			}
 			else
 			{
-				fRunPara->ffrogsRecID = -1;
+				fRunPara->ffrogsRecID = 0;
 			}
 		}
 		else if( iTemp1 == "-templatelistforfrogs" )

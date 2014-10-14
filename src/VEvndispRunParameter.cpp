@@ -221,7 +221,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	// Frogs parameters
 	ffrogsmscwfile = "";
 	ffrogsmode = false;
-	ffrogsRecID = -1;
+	ffrogsRecID = 0;
 	ffrogstemplatelist = "";
 	
 	// Model3D parameters, JG
