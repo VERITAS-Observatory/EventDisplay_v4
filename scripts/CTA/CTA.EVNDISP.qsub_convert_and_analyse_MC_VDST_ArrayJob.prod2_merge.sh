@@ -158,7 +158,7 @@ done
 ####################################################################
 # tar the log files
 cd $TMPDIR
-tar -czvf $OFIL.tar.gz *.log
-mv -v -f $OFIL.tar.gz $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$DATE-$LOGF/
+tar -czvf $OFIL.merge.tar.gz *.log
+mv -v -f $OFIL.merge.tar.gz $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$DATE-$LOGF/
 
 exit
