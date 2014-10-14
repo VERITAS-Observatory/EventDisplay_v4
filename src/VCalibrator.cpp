@@ -2378,6 +2378,11 @@ bool VCalibrator::readAverageTZeros( bool iLowGain )
 		{
 			cout << " VCalibrator::readAverageTZeros error finding data tree in average tzero file: " << endl;
 			cout << "\t" << iFile << endl;
+			if( !getRunParameter()->fNoCalibNoPb ) 
+			{
+				cout << "Exiting..." << endl;
+				exit( EXIT_FAILURE );
+			}
 			return false;
 		}
 		cout << "Telescope " << getTelID() + 1;
