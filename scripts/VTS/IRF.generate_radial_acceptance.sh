@@ -120,10 +120,17 @@ for CUTS in ${CUTLIST[@]}; do
 		        METH="DISP"
 		    fi
 	    CUTSNAME=`basename $CUTSFILE`
-            # Generate base file name based on cuts file
+            # Generate base file name based on cuts file, extended and point source radial acceptances are the same
             CUTSNAME=${CUTSNAME##ANASUM.GammaHadron-}
             CUTSNAME=${CUTSNAME%%.dat}
-			OFILE="radialAcceptance-${EDVERSION}-${AUX}-$CUTSNAME-${METH}-$VX-T$TELES"
+            if [[ $CUTSNAME == *PointSource-* ]] ; then
+                CUTSNAME=${CUTSNAME/-PointSource-/"-"}
+                echo $CUTSNAME
+            elif [[ $CUTSNAME == *ExtendedSource-* ]]; then
+                CUTSNAME=${CUTSNAME/-ExtendedSource-/"-"}
+                echo $CUTSNAME
+            fi
+            OFILE="radialAcceptance-${EDVERSION}-${AUX}-$CUTSNAME-${METH}-$VX-T$TELES"
             ODIR="$VERITAS_IRFPRODUCTION_DIR/RadialAcceptances"
             mkdir -p $ODIR
 	    chmod g+w $ODIR
@@ -143,7 +150,6 @@ for CUTS in ${CUTLIST[@]}; do
             
             # run locally or on cluster
             SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
-            echo "$SUBC"
             echo $LOGDIR
             SUBC=`eval "echo \"$SUBC\""`
             if [[ $SUBC == *qsub* ]]; then
