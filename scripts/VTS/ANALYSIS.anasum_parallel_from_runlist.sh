@@ -108,7 +108,16 @@ else
 fi
 CUTFILE="ANASUM.GammaHadron-Cut-${CUT}.dat"
 EFFAREA="effArea-${IRFVERSION}-${AUXVERSION}-${SIMTYPE}-Cut-${CUT}-${METH}-VX-ATMXX-TX.root"
-RADACC="radialAcceptance-${IRFVERSION}-${AUXVERSION}-Cut-${CUT}-${METH}-VX-TX.root"
+
+# remove PointSource and ExtendedSource string from cut file name for radial acceptances names
+if [[ $CUT == *PointSource-* ]] ; then
+    CUTRADACC=${CUT/-PointSource-/"-"}
+    echo $CUTRACACC
+elif [[ $CUT == *ExtendedSource-* ]]; then
+    CUTRADACC=${CUT/-ExtendedSource-/"-"}
+    echo $CUTRADACC
+fi
+RADACC="radialAcceptance-${IRFVERSION}-${AUXVERSION}-Cut-${CUTRADACC}-${METH}-VX-TX.root"
 
 echo $CUTFILE
 echo $EFFAREA
