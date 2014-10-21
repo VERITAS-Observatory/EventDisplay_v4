@@ -33,6 +33,8 @@ string histdir = "" ;
 struct stat sb ;
 string fInstrumentEpoch = "NOT_SET";
 double fMaxDistanceAllowed = 2.5;
+string teltoanastring = "1234";
+vector<unsigned int> teltoana;
 
 int main( int argc, char* argv[] )
 {
@@ -58,6 +60,13 @@ int main( int argc, char* argv[] )
 	// read options from command line
 	parseOptions( argc, argv );
 	
+	//find telescopes to analyße
+	for( unsigned int i = 0; i<teltoanastring.length(); i++ ) 
+	{
+		char tel=teltoanastring.at(i);
+		teltoana.push_back(atoi ( &tel ) - 1 );
+	}	
+
 	// read file list from run list file
 	if( listfilename.size() > 0 )
 	{
@@ -84,6 +93,7 @@ int main( int argc, char* argv[] )
 	// read gamma/hadron cuts from cut file
 	VGammaHadronCuts* fCuts = new VGammaHadronCuts();
 	fCuts->setInstrumentEpoch( fInstrumentEpoch );
+	fCuts->setTelToAnalyze( teltoana );
 	fCuts->setNTel( ntel );
 	if( cutfilename.size() > 0 )
 	{
@@ -189,10 +199,10 @@ int main( int argc, char* argv[] )
 		VEvndispRunParameter* iParV2 = ( VEvndispRunParameter* )fTest.Get( "runparameterV2" );
 		if( iParV2 )
 		{
-			if( ntel != iParV2->fTelToAnalyze.size() )
+			if( teltoana.size() != iParV2->fTelToAnalyze.size() ||  !equal( teltoana.begin(), teltoana.end(), iParV2->fTelToAnalyze.begin() ) )
 			{
 				cout << endl;
-				cout << "error: Number of Telecopes ntel " << ntel << " does not equal number in run " << iParV2->fTelToAnalyze.size() << " (defaul ntel 4)." << endl;
+				cout << "error: Requested telescopes " << teltoanastring << " do not equal telescopes in run " << ifile << endl;
 				exit( EXIT_FAILURE );
 			}
 		}
@@ -294,10 +304,11 @@ int parseOptions( int argc, char* argv[] )
 			{"entries", required_argument, 0, 'n'},
 			{"datadir", required_argument, 0, 'd'},
 			{"writehists", optional_argument, 0, 'w'},
+			{"teltoana", required_argument, 0, 't'},
 			{0, 0, 0, 0}
 		};
 		int option_index = 0;
-		int c = getopt_long( argc, argv, "ht:s:l:e:m:o:i:d:n:c:w:", long_options, &option_index );
+		int c = getopt_long( argc, argv, "ht:s:l:e:m:o:i:d:n:c:w:t:", long_options, &option_index );
 		if( optopt != 0 )
 		{
 			cout << "error: unknown option" << endl;
@@ -338,6 +349,7 @@ int parseOptions( int argc, char* argv[] )
 				cout << "-e --entries [number of entries]" << endl;
 				cout << "-m --maxdist [max distance from camera centre (deg)]" << endl;
 				cout << "-w --writehists [directory]" << endl ;
+				cout << "-t --teltoana <telescopes>" << endl;
 				cout << endl;
 				exit( EXIT_SUCCESS );
 				break;
@@ -375,6 +387,11 @@ int parseOptions( int argc, char* argv[] )
 			case 'w':
 				histdir = optarg;
 				cout << "Extra histograms will be written to " << histdir << endl;
+				break;
+			case 't':
+				teltoanastring = optarg;
+				cout << "Telescopes to analyse: " << teltoanastring << endl;
+				break;
 			case '?':
 				break;
 			default:

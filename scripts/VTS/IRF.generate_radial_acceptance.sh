@@ -143,6 +143,7 @@ for CUTS in ${CUTLIST[@]}; do
                 -e "s|CUTSFILE|$CUTSFILE|" \
                 -e "s|OUTPUTDIR|$ODIR|"    \
                 -e "s|IEPO|$VX|" \
+		-e "s|TELTOANA|$TELES|" \
                 -e "s|OUTPUTFILE|$OFILE|" $SUBSCRIPT > $FSCRIPT.sh
             
             chmod u+x $FSCRIPT.sh
