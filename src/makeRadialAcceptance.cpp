@@ -32,7 +32,7 @@ int entries = -1;
 string histdir = "" ;
 struct stat sb ;
 string fInstrumentEpoch = "NOT_SET";
-double fMaxDistanceAllowed = 2.5;
+double fMaxDistanceAllowed = 2.0;
 string teltoanastring = "1234";
 vector<unsigned int> teltoana;
 
