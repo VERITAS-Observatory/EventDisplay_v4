@@ -688,7 +688,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				// check sanity
 				if( iZenithCut_min.size() < 2 )
 				{
-					cout << cout << "VTMVARunData::readConfigurationFile error: need at least one zenith bin " << iZenithCut_min.size() << endl;
+					cout << "VTMVARunData::readConfigurationFile error: need at least one zenith bin " << iZenithCut_min.size() << endl;
 					return false;
 				}
 				// fill maximum bins

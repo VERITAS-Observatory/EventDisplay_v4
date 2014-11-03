@@ -2192,8 +2192,7 @@ void VExposure::listCatalogues()
 	for( unsigned int i = 0; i < fCatalogue.size(); i++ )
 	{
 		cout << i << "\t" << fCatalogue[i] << "\t" << fCatalogueMarkerColor[i] << "\t";
-		cout << fCatalogueMarkerStyle[i] << "\t" << fCatalogueTextAngle[i] <<
-			 cout << endl;
+		cout << fCatalogueMarkerStyle[i] << "\t" << fCatalogueTextAngle[i] << endl;
 	}
 }
 
