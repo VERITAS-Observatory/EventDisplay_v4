@@ -81,11 +81,14 @@ bool bool_EVNDanalysis_done = false;
 bool bool_EVNDcalib_good = false;
 
 //--- hard coded values
-TString fServer = "mysql://romulus.ucsc.edu";
+TString fServer = "";
+
+
+
 int flong_char_query = 10000;
 int fmax_number_tel = 4;
 //lucie: this calib dir should be an option, if someone else use the script
-TString fCalib_dir = "/lustre/fs5/group/cta/users/lgerard/VERITAS//analysis/AnalysisData-VTS-v400/Calibration";
+TString fCalib_dir = "./";
 //--- Tool-global-parameters
 int fcurrent_run = -10;
 int fcurrent_tel = -10;
@@ -201,7 +204,16 @@ int main( int argc, char* argv[] )
 	// they are the same for the all run list, which have to be homogeneous in this respect
 	// name could be change at the parse ooption level (but for this would be good to have option instroduced with more than one letter).
 	
-	
+	std::cout<<"======================================================================"<<std::endl;
+	VGlobalRunParameter* blah = new VGlobalRunParameter() ;
+	fServer = blah->getDBServer();
+	cout << "Using server " << fServer << endl;
+	std::cout<<"======================================================================"<<std::endl;
+	std::cout<<"ATTENTION: make sure the Calib_dir is correctly defined (option -b). This is were the output of the .gain .ped ,toff will be "<<std::endl;
+	std::cout<<"in this directory there should be one directory per telescope (Tel_1, Tel_2, ...) "<<std::endl;
+	std::cout<<"Calib_dir  "<<fCalib_dir<<std::endl;
+	std::cout<<"======================================================================"<<std::endl;
+
 	Set_the_time();
 	//------------ getting the list of new laser run (present in the veritas DB but not in the VOFFLINE)
 	TString new_laser_run_list_name = "";
@@ -929,15 +941,15 @@ int parseOptions( int argc, char* argv[] )
 			{"do_ana_all", no_argument, 0, 'a'},
 			{"calib_test", no_argument, 0, 'c'},
 			{"write_DB", no_argument, 0, 'w'},
-			{"old_calib", no_argument, 0, 'o'},
 			{"write_only", required_argument, 0, 'f'},
 			{"run_list", required_argument, 0, 'l'},
 			{"time_start", required_argument, 0, 't'},
 			{"req_version", required_argument, 0, 'v'},
+			{"cal_dir", required_argument, 0, 'b'},
 			{0, 0, 0, 0}
 		};
 		int option_index = 0;
-		int c = getopt_long( argc, argv, "hgsdpeacwof:l:t:v:", long_options, &option_index );
+		int c = getopt_long( argc, argv, "hgsdpeacwf:l:t:v:b:", long_options, &option_index );
 		if( argc == 1 )
 		{
 			c = 'h';
@@ -956,12 +968,14 @@ int parseOptions( int argc, char* argv[] )
 				//                    printf (" with arg %s", optarg);
 				printf( "\n" );
 				break;
+			case 'b':
+				 fCalib_dir = optarg;
 			case 'h':
 				// EVNDISP standard way to show the option without having to recompile the whole thing
 				// should work together with a script that call the binary of this compiled file
 				// the scripts has to call set observatory
 				char* ENV;
-				ENV = getenv( "OBS_EVNDISP_ANA_DIR" );
+				ENV = getenv( "OBS_EVNDISP_AUX_DIR" );
 				char readme[500];
 				sprintf( readme, "cat %s/ParameterFiles/EVNDISP.updateDBlaserRUN.runparameter", ENV );
 				system( readme );
@@ -997,10 +1011,6 @@ int parseOptions( int argc, char* argv[] )
 				ftestEVNDcalib = true;
 				fdoEVNDanalysis = true;
 				fprepareEVNDanalysis = true;
-				break;
-			case 'o':
-				fold_calib = true;
-				fCalib_dir = "/lustre/fs5/group/cta/users/lgerard/VERITAS//analysis/AnalysisData-VTS-v400/Calibration_save";
 				break;
 			case 'f':
 				// lucie warning = this is test mode. This option should not exist

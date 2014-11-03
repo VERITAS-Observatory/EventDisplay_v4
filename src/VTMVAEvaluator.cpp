@@ -2270,6 +2270,7 @@ double VTMVAEvaluator::getMeanEnergyAfterCut( TFile* f, double iCut, unsigned in
 		iCutName.clear();
 		iCutName.str( std::string() );
 		iCutName << fTMVAMethodName << "_0";
+		t->SetBranchAddress( iCutName.str().c_str(), &iMVA );
 	}
 	t->SetBranchAddress( "classID", &classID );
 	

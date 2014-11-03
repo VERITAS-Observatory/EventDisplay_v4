@@ -169,18 +169,14 @@ bool VGlobalRunParameter::setDirectories()
 	//////////////////////////////////////////////////////////////////////
 	// get directories with all analysis data
 	string data_dir = "";
-	if( gSystem->Getenv( "OBS_EVNDISP_ANA_DIR" ) )
+	if( gSystem->Getenv( "OBS_EVNDISP_AUX_DIR" ) )
 	{
-		data_dir = gSystem->Getenv( "OBS_EVNDISP_ANA_DIR" );
+		data_dir = gSystem->Getenv( "OBS_EVNDISP_AUX_DIR" );
 	}
 	// assume that by default a VERITAS analysis is requested
 	else if( gSystem->Getenv( "VERITAS_EVNDISP_AUX_DIR" ) )
 	{
 		data_dir = gSystem->Getenv( "VERITAS_EVNDISP_AUX_DIR" );
-	}
-	else if( gSystem->Getenv( "VERITAS_EVNDISP_ANA_DIR" ) )
-	{
-		data_dir = gSystem->Getenv( "VERITAS_EVNDISP_ANA_DIR" );    // backwards compatibility
 	}
 	if( data_dir.size() != 0 )
 	{
@@ -192,7 +188,7 @@ bool VGlobalRunParameter::setDirectories()
 	{
 		cout << "VGlobalRunParameter::setDirectories(): cannot find directory with EVNDISP analysis data" << endl;
 		cout << "\t looking for " << fEVNDISPAnaDataDirectory << endl;
-		cout << "\t is environmental variable $OBS_EVNDISP_ANA_DIR (or $VERITAS_EVNDISP_AUX_DIR or $CTA_EVNDISP_AUX_DIR) set?" << endl;
+		cout << "\t is environmental variable $OBS_EVNDISP_AUX_DIR (or $VERITAS_EVNDISP_AUX_DIR or $CTA_EVNDISP_AUX_DIR) set?" << endl;
 		cout << "\t (see README/INSTALL)" << endl;
 		cout << "exiting..." << endl;
 		exit( -1 );

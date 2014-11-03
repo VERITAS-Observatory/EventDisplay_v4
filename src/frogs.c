@@ -1071,18 +1071,12 @@ struct frogs_imgtemplate frogs_read_template_elev( float elevation, char templat
 	   3) The file name for that template
 	*/
 	
-	char* EVN;
 	char FROGS_TEMPLATE_LIST_PATH[500];
-	EVN = getenv( "EVNDISPSYS" );
 	
 	char* itemp = 0;
 	if( getenv( "VERITAS_EVNDISP_AUX_DIR" ) )
 	{
 		itemp = getenv( "VERITAS_EVNDISP_AUX_DIR" );
-	}
-	else if( getenv( "VERITAS_EVNDISP_ANA_DIR" ) )
-	{
-		itemp = getenv( "VERITAS_EVNDISP_ANA_DIR" );
 	}
 	//sprintf( FROGS_TEMPLATE_LIST_PATH, "%s/ParameterFiles/EVNDISP.frogs_template_file_list.txt", itemp );
 	sprintf( FROGS_TEMPLATE_LIST_PATH, "%s/Frogs/%s", itemp, templatelistname );
@@ -1194,10 +1188,6 @@ frogs_read_template_file(
 	if( getenv( "VERITAS_EVNDISP_AUX_DIR" ) )
 	{
 		itemp = getenv( "VERITAS_EVNDISP_AUX_DIR" );
-	}
-	else if( getenv( "VERITAS_EVNDISP_ANA_DIR" ) )
-	{
-		itemp = getenv( "VERITAS_EVNDISP_ANA_DIR" );
 	}
 	char fullfname[FROGS_FILE_NAME_MAX_LENGTH] ;
 	//sprintf( fullfname, "%s/Templates/%s", itemp, fname ) ;
@@ -2663,7 +2653,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 #define URN_DEPTH   5   //4 + one index to avoid
 		
 			//variable declarations
-			int i_r1, i_r2, i_r3, i_r4;  // placeholders for random indexes
+			int i_r1, i_r2, i_r3;  // placeholders for random indexes
 			
 			int gi_gen; // generation counter
 			int i_genmax = gi_genmax;
@@ -2896,7 +2886,6 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 					i_r1 = ia_urn2[1];                           //population members
 					i_r2 = ia_urn2[2];
 					i_r3 = ia_urn2[3];
-					i_r4 = ia_urn2[4];
 					
 					/*
 					//---this is an alternative way to pick population members---
@@ -2915,10 +2904,6 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 					i_r3 = (int)(genrand()*gi_NP);
 					}while((i_r3==i) || (i_r3==i_r1) || (i_r3==i_r2));
 					
-					do                        // Pick a random population member
-					{
-					i_r4 = (int)(genrand()*gi_NP);
-					}while((i_r4==i) || (i_r4==i_r1) || (i_r4==i_r2) || (i_r4==i_r3));
 					*/
 					
 					//========Choice of strategy=======================================================

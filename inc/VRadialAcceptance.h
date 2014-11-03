@@ -46,6 +46,10 @@ class VRadialAcceptance
 		vector<double> fXE;
 		vector<double> fYE;
 		vector<double> fRE;
+		// for ellipsoidal region
+		vector<double> fR1E;
+		vector<double> fR2E;
+		vector<double> fAngE;
 		
 		// calculate acceptance from data
 		VGammaHadronCuts*    fCuts;
@@ -155,6 +159,8 @@ class VRadialAcceptance
 		}
 		void   setSource( double x, double y, double r, double idist, double imaxdist = 5. ); //!< set source position, radius, and minimal distance between source and background
 		void   setRegionToExcludeAcceptance( vector<double> x, vector<double> y, vector<double> r ); //set the region to be exclude in the analysis
+		// for ellipsoidal region
+		void   setRegionToExcludeAcceptance( vector<double> x, vector<double> y, vector<double> r1, vector<double> r2, vector<double> theta ); //set the region to be exclude in the analysis
 		bool   terminate( TDirectory* iDirectory );
 		
 		

@@ -2,6 +2,22 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+************************************************
+******* 20141103 release of v4.70 ****
+************************************************
+
+* 20141103 (GM)
+some additions to allow compilation with C++11/clang
+
+* 20141029 (GM)
+removed all references to obsolete VERITAS_EVNDISP_ANA_DIR
+(should be VERITAS_EVNDISP_AUX_DIR)
+
+* 20141027 (GM)
+clang++ is now the default compiler on Mac OS X
+(to allow compiliation on 10.10)
+minor changes in many files to compile without warnings in gcc 4.9 
+
 * 20141001 (HF)
 
 Added md5 checksum testing of downloaded cvbf files to VExposure. 

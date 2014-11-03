@@ -186,6 +186,10 @@ void VFrogs::processParamFile()
 				{
 					is_stream >> ffrogsRandomSeed;
 				}
+				else if( temp == "INTERPOLATION" )
+				{
+					is_stream >> frogsInterpOrder;
+				}
 			}
 		}
 	}
@@ -962,7 +966,7 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed( int eventNumber, int adc
 		rtn.startpt.yp		 = fData->getShowerParameters()->MCycore_SC;
 		//rtn.startpt.xp	 =	fData->getShowerParameters()->MCxcore; //(Ground Coord) useful?
 		//rtn.startpt.yp	 =	fData->getShowerParameters()->MCycore; //(Ground Coord) useful?
-		rtn.startpt.log10e = log10( fData->getShowerParameters()->MCenergy );
+		rtn.startpt.log10e =  fData->getShowerParameters()->MCenergy;
 	}
 	
 	if( FROGSDEBUG )

@@ -112,7 +112,7 @@ class VEnergySpectrumfromLiterature : public VPlotUtilities
 		void listValues( unsigned int iID );
 		TCanvas* plot( unsigned int iID = 0, TCanvas* c = 0, bool iPlotY = true );
 		TCanvas* plot( string iselection, TCanvas* c = 0 );
-		bool readValuesFromFile( string ifile = "$OBS_EVNDISP_ANA_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues.dat", bool iPrint = true );
+		bool readValuesFromFile( string ifile = "$OBS_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues.dat", bool iPrint = true );
 		
 		void setPlottingLogEnergyAxis( bool iB = true )
 		{

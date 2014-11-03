@@ -125,10 +125,6 @@ VGammaHadronCuts::VGammaHadronCuts()
 	fAngRes_AbsoluteMaximum = 1.e10;
 	fAngResContainmentProbability = 0;
 	
-	//////////////////////////
-	// FROGS
-	fFileNameFrogsCut        = "";
-	
 	setArrayCentre();
 }
 
@@ -232,6 +228,9 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 	// reset trigger vector
 	fNLTrigs = 0;
 	fCut_ImgSelect.clear();
+        // frogs cuts
+        string iFileNameFrogsCut;
+        vector< string > iVariableNameFrogsCut;
 	
 	// open text file
 	ifstream is;
@@ -609,18 +608,16 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			{
 				if( !is_stream.eof() )
 				{
-					string iFileNameFrogsCut;
 					is_stream >> iFileNameFrogsCut;
-					fFileNameFrogsCut = iFileNameFrogsCut;
 				}
 			}
 			else if( iCutVariable == "energydependentcuts" )
 			{
 				while( !is_stream.eof() )
 				{
-					string iVariableNameFrogsCut;
-					is_stream >> iVariableNameFrogsCut;
-					getEnergyDependentCutFromFile( fFileNameFrogsCut, iVariableNameFrogsCut );
+                                        string iT;
+					is_stream >> iT;
+                                        iVariableNameFrogsCut.push_back( iT );
 				}
 			}
 			////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -864,6 +861,13 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			////////////////////////////////////////////////////////////////////////////////////////////////////
 		}
 	}
+        // read energy dependent gamma/hadron cuts
+        for( unsigned int i = 0; i < iVariableNameFrogsCut.size(); i++ )
+        {
+            getEnergyDependentCutFromFile( iFileNameFrogsCut, iVariableNameFrogsCut[i] );
+        }
+
+        // printouts
         cout << "========================================" << endl;
 	// check cut selection
 	if( fGammaHadronCutSelector / 10 == 5 )
@@ -1482,6 +1486,7 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 	{
 		return false;
 	}
+        return true;
 	
 	double ShowerGoodnessCut_max = -99.;
 	if( getEnergyDependentCut( "ShowerGoodness" ) && getEnergyDependentCut( "ShowerGoodness" )->GetN() > 0 )
@@ -2928,10 +2933,24 @@ TGraph* VGammaHadronCuts::getEnergyDependentCut( string iCutName )
 bool VGammaHadronCuts::getEnergyDependentCutFromFile( string iFileName, string iVariable )
 {
 	string iTemp = "g" + iVariable;
-	TGraph* g = ( TGraph* )TFile( iFileName.c_str(), "READ" ).Get( iTemp.c_str() );
+        if( gSystem->AccessPathName( iFileName.c_str() ) )
+        {
+            string iTempFileL = VGlobalRunParameter::getDirectory_EVNDISPAnaData();
+            iFileName = iTempFileL + "/GammaHadronCutFiles/" + iFileName;
+        }
+        TFile *i_f = new TFile( iFileName.c_str(), "READ" );
+        if( i_f->IsZombie() )
+        {
+            cout << "VGammaHadronCuts::getEnergyDependentCutFromFile error opening file with energy dependent cut: " << iFileName << endl;
+            cout << "exiting..." << endl;
+            exit( EXIT_FAILURE );
+        }
+
+	TGraph* g = ( TGraph* )i_f->Get( iTemp.c_str() );
 	if( !g )
 	{
-		cout << "VGammaHadronCuts::readCuts error while reading energy dependent cut: " << iTemp << endl;
+		cout << "VGammaHadronCuts::getEnergyDependentCutFromFile error while reading energy dependent cut: " << iTemp << endl;
+                cout << "\t tried to read from " << iFileName << endl;
 		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
 	}
@@ -2941,6 +2960,7 @@ bool VGammaHadronCuts::getEnergyDependentCutFromFile( string iFileName, string i
 		iG->SetName( iVariable.c_str() );
 		fEnergyDependentCut[iVariable] = iG;
 	}
+        i_f->Close();
 	return true;
 }
 

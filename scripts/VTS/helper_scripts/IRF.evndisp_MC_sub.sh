@@ -65,7 +65,7 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
         elif [[ $PARTICLE == "14" ]]; then
             VBFNAME="proton_${ZA}deg_750m_wobble${WOB}_2008_2009_"
         fi
-        NOISEFILE="$OBS_EVNDISP_ANA_DIR/NOISE/NOISE$NOISE.grisu"
+        NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE$NOISE.grisu"
         echo "Noise File: $NOISEFILE"
     elif [[ $EPOCH == "V5" ]]; then
         if [[ $PARTICLE == "1" ]]; then
@@ -75,7 +75,7 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
         elif [[ $PARTICLE == "402" ]]; then
             VBFNAME="helium_${ZA}deg_w${WOB}_"
         fi
-        NOISEFILE="$OBS_EVNDISP_ANA_DIR/NOISE/NOISE$NOISE.grisu"
+        NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE$NOISE.grisu"
         echo "Noise File: $NOISEFILE"
     elif [[ $EPOCH == "V6" ]]; then
         if [[ $PARTICLE == "1" ]]; then
@@ -92,7 +92,7 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
         elif [[ $PARTICLE == "402" ]]; then
             VBFNAME="helium_${ZA}deg_w${WOB}_"
         fi
-        NOISEFILE="$OBS_EVNDISP_ANA_DIR/NOISE/NOISE${NOISE}_20120827_v420.grisu"
+        NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE${NOISE}_20120827_v420.grisu"
         echo "Noise File: $NOISEFILE"
     fi
 elif [ ${SIMTYPE:0:4} == "CARE" ]; then

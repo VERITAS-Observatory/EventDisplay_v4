@@ -830,8 +830,8 @@ bool VPointingDB::readPointingFromDB()
 	int fNRows = db_res->GetRowCount();
 	
 	// loop over all db entries
-	int iMJD;
-	double iTime;
+	int iMJD = 0;
+	double iTime = 0.;
 	
 	cout << "Reading pointing data from VERITAS database for telescope " << getTelID() + 1;
 	cout << ": found " << fNRows << " rows in database" << endl;

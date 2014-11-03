@@ -1242,9 +1242,13 @@ void VCameraRead::resetNeighbourLists( bool bMaxN )
 */
 bool VCameraRead::makeNeighbourList()
 {
+	////////////////////////////////////
+	// loop over all telescopes in list
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
+		/////////////////////////////////////////
 		// check if all tubes have the same size
+		// (algorithm works only for tubes with the same size)
 		double i_TubeRadius_0 = 0.;
 		
 		if( getTubeRadius_MM( i ).size() > 0 )
@@ -1264,6 +1268,7 @@ bool VCameraRead::makeNeighbourList()
 		{
 			continue;
 		}
+		//////////////////////////////////////
 		// get minimum distance between tubes
 		double iTubeDistance_min = 1.e5;
 		for( unsigned int j = 0; j < getTubeRadius_MM( i ).size(); j++ )
@@ -1271,7 +1276,7 @@ bool VCameraRead::makeNeighbourList()
 			for( unsigned int k = 0; k < j; k++ )
 			{
 				double itemp = sqrt( ( getX_MM( i )[j] - getX_MM( i )[k] ) * ( getX_MM( i )[j] - getX_MM( i )[k] )
-									 + ( getY_MM( i )[j] - getY_MM( i )[k] ) * ( getY_MM( i )[j] - getY_MM( i )[k] ) );
+						   + ( getY_MM( i )[j] - getY_MM( i )[k] ) * ( getY_MM( i )[j] - getY_MM( i )[k] ) );
 				if( itemp < iTubeDistance_min )
 				{
 					iTubeDistance_min = itemp;
@@ -1287,7 +1292,7 @@ bool VCameraRead::makeNeighbourList()
 			for( unsigned int k = 0; k < j; k++ )
 			{
 				double itemp = sqrt( ( getX_MM( i )[j] - getX_MM( i )[k] ) * ( getX_MM( i )[j] - getX_MM( i )[k] )
-									 + ( getY_MM( i )[j] - getY_MM( i )[k] ) * ( getY_MM( i )[j] - getY_MM( i )[k] ) );
+						   + ( getY_MM( i )[j] - getY_MM( i )[k] ) * ( getY_MM( i )[j] - getY_MM( i )[k] ) );
 				if( itemp < 2.1 * sqrt( 2. )*iTubeDistance_min )
 				{
 					if( getAnaPixel( i )[k] > 0 )

@@ -439,10 +439,9 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			
 			else if( temp == "REGIONTOEXCLUDE" || temp == "REGIONTOEXCLUDE_RADECJ2000_DEG" )
 			{
-				if( checkNumberOfArguments( is_line ) != 5 )
+				if( checkNumberOfArguments( is_line ) < 5 )
 				{
-					return returnWithError( "VAnaSumRunparameter: not enough parameters: ",
-											is_line, "* REGIONTOEXCLUDE (West(deg)  North(deg)  Radius(deg)) (or * REGIONTOEXCLUDE_RADECJ2000_DEG (RA(deg) DEC(deg) Radius(deg))" );
+					return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REGIONTOEXCLUDE (West(deg)  North(deg)  Radius(deg)) (or * REGIONTOEXCLUDE_RADECJ2000_DEG (RA(deg) DEC(deg) Radius(deg)) OR * REGIONTOEXCLUDE (West(deg)  North(deg)  Radius1(deg) Radius2(deg) RotAngle(deg)) (or * REGIONTOEXCLUDE_RADECJ2000_DEG (RA(deg) DEC(deg) Radius1(deg) Radius2(deg) RotAngle(deg)). Check if you want extended or point source!" );
 				}
 				fExclusionRegions.push_back( new VAnaSumRunParameterListOfExclusionRegions() );
 				
@@ -458,14 +457,38 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 					is_stream >> temp2;
 					fExclusionRegions.back()->fExcludeFromBackground_DecJ2000 = ( double )atof( temp2.c_str() );
 				}
-				is_stream >> temp2;
-				fExclusionRegions.back()->fExcludeFromBackground_Radius = ( double )atof( temp2.c_str() );
+				// for circular region
+				if( checkNumberOfArguments( is_line ) == 5 )
+				{
+					is_stream >> temp2;
+                                	fExclusionRegions.back()->fExcludeFromBackground_Radius1 = ( double )atof( temp2.c_str() );
+					fExclusionRegions.back()->fExcludeFromBackground_Radius2 = fExclusionRegions.back()->fExcludeFromBackground_Radius1;
+					fExclusionRegions.back()->fExcludeFromBackground_RotAngle = 0.;
+				}
+				// for ellipsoidal region
+				else if( checkNumberOfArguments( is_line ) == 7 )
+				{
+					is_stream >> temp2;
+					fExclusionRegions.back()->fExcludeFromBackground_Radius1 = ( double )atof( temp2.c_str() );
+					is_stream >> temp2;
+					fExclusionRegions.back()->fExcludeFromBackground_Radius2 = ( double )atof( temp2.c_str() );
+					is_stream >> temp2;
+					fExclusionRegions.back()->fExcludeFromBackground_RotAngle = ( double ) atof( temp2.c_str() );
+				}
+				else if( checkNumberOfArguments( is_line ) == 6 )
+				{
+					return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REGIONTOEXCLUDE (West(deg)  North(deg)  Radius1(deg) Radius2(deg) RotAngle(deg) (or * REGIONTOEXCLUDE_RADECJ2000_DEG (RA(deg) DEC(deg) Radius1(deg) Radius2(deg) RotAngle(deg))" );
+				}
+				else
+                                {
+                                        return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "Check if you want point or extended source in AnasumRunParameter file!" );
+                                }
 			}
 			else if( temp == "REGIONTOEXCLUDE_RADECJ2000_HOUR" )
 			{
-				if( checkNumberOfArguments( is_line ) != 9 )
+				if( checkNumberOfArguments( is_line ) < 9 )
 				{
-					return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REGIONTOEXCLUDE_RADECJ2000_HOUR (RA(Hour Min Sec)  DEC(Deg Min Sec)  Radius(deg))" );
+					return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REGIONTOEXCLUDE_RADECJ2000_HOUR (RA(Hour Min Sec)  DEC(Deg Min Sec)  Radius(deg)) OR * REGIONTOEXCLUDE_RADECJ2000_HOUR (RA(Hour Min Sec)  DEC(Deg Min Sec)  Radius1(deg) Radius2(deg) RotAngle(deg)). Check if you want extended or point source!" );
 				}
 				fExclusionRegions.push_back( new VAnaSumRunParameterListOfExclusionRegions() );
 				
@@ -505,8 +528,29 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 					d_tt -= ( double )atof( temp2.c_str() ) / 3600.;
 				}
 				fExclusionRegions.back()->fExcludeFromBackground_DecJ2000 = d_tt;
-				is_stream >> temp2;
-				fExclusionRegions.back()->fExcludeFromBackground_Radius = ( double )atof( temp2.c_str() );
+				// for circular region
+				if( checkNumberOfArguments( is_line ) == 9 )
+                                {
+                                        is_stream >> temp2;
+                                        fExclusionRegions.back()->fExcludeFromBackground_Radius1 = ( double )atof( temp2.c_str() );
+                                        fExclusionRegions.back()->fExcludeFromBackground_Radius2 = fExclusionRegions.back()->fExcludeFromBackground_Radius1;
+					fExclusionRegions.back()->fExcludeFromBackground_RotAngle = 0.;
+					cout << "Rotation angle of circular exclusion region is " << fExclusionRegions.back()->fExcludeFromBackground_RotAngle << endl;
+                                }
+				// for ellipsoidal region
+				else if( checkNumberOfArguments( is_line ) == 11 )
+                                {
+                                        is_stream >> temp2;
+                                        fExclusionRegions.back()->fExcludeFromBackground_Radius1 = ( double )atof( temp2.c_str() );
+                                        is_stream >> temp2;
+                                        fExclusionRegions.back()->fExcludeFromBackground_Radius2 = ( double )atof( temp2.c_str() );
+					is_stream >> temp2;
+					fExclusionRegions.back()->fExcludeFromBackground_RotAngle = ( double )atof( temp2.c_str() );
+                                }
+                                else
+                                {
+                                        cout << "Error: Not enough events for point or extended source! Check the arguments of circular and ellipsoidal regions!" << endl;
+                                }
 			}
 			else if( temp == "ENERGYBINSIZE" )
 			{
@@ -1121,7 +1165,8 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
 				cout << "\t       ";
 				cout << ( l + 1 ) << ":region to exclude: (N " << fExclusionRegions[l]->fExcludeFromBackground_North;
 				cout <<                             ", W " << fExclusionRegions[l]->fExcludeFromBackground_West;
-				cout << ", R " << fExclusionRegions[l]->fExcludeFromBackground_Radius << ", ID " << fExclusionRegions[l]->fExcludeFromBackground_StarID;
+				//cout << ", R " << fExclusionRegions[l]->fExcludeFromBackground_Radius << ", ID " << fExclusionRegions[l]->fExcludeFromBackground_StarID;
+				cout << ", R1 " << fExclusionRegions[l]->fExcludeFromBackground_Radius1 << ", R2 " << fExclusionRegions[l]->fExcludeFromBackground_Radius2 << ", theta " << fExclusionRegions[l]->fExcludeFromBackground_RotAngle << ", ID " << fExclusionRegions[l]->fExcludeFromBackground_StarID;
 				if( fExclusionRegions[l]->fExcludeFromBackground_StarName.size() > 0 )
 				{
 					cout << " (" << fExclusionRegions[l]->fExcludeFromBackground_StarName << ")";
@@ -1284,9 +1329,11 @@ void VAnaSumRunParameter::checkNumberOfArguments( int im, int narg, string i_lis
 		cout << "error: not enough/too many parameter in " << i_listfilename << ": " << endl;
 		cout << is_line << endl;
 		cout << "expected " << n_tot << " parameter, found " << narg << " parameters" << endl;
-		cout << "(" << im << ", " << narg << ", " << iversion << ", " << bShortList << ")" << endl;
+		cout << "(" << im << ", " << narg << ", run list version " << iversion;
+                if( bShortList ) cout << ", shortlist";
+                cout << ")" << endl;
 		cout << "exiting..." << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 }
 
@@ -1714,7 +1761,10 @@ bool VAnaSumRunParameter::writeListOfExcludedSkyRegions()
 	TTree tEx( "tExcludedRegions", "list of regions excluded from background calculation" );
 	float x = 0.;
 	float y = 0.;
-	float r = 0.;
+	//float r = 0.;
+	float r1 = 0.;
+	float r2 = 0.;
+	float theta = 0;
 	float decJ2000 = 0.;
 	float raJ2000 = 0.;
 	int id = 0;
@@ -1722,9 +1772,12 @@ bool VAnaSumRunParameter::writeListOfExcludedSkyRegions()
 	float iStarBrightness_B = 0;
 	tEx.Branch( "x", &x, "x/F" );
 	tEx.Branch( "y", &y, "y/F" );
-	tEx.Branch( "r", &r, "r/F" );
+	//tEx.Branch( "r", &r, "r/F" );
+	tEx.Branch( "r1", &r1, "r1/F");
+	tEx.Branch( "r2", &r2, "r2/F");
+	tEx.Branch( "theta", &theta, "theta/F");
 	tEx.Branch( "decj2000", &decJ2000, "decJ2000/F" );
-	tEx.Branch( "raj2000", &decJ2000, "raJ2000/F" );
+	tEx.Branch( "raj2000", &raJ2000, "raJ2000/F" );
 	tEx.Branch( "star_id", &id, "star_id/I" );
 	tEx.Branch( "Vmag", &iStarBrightness_V, "Vmag/F" );
 	tEx.Branch( "Bmag", &iStarBrightness_B, "Bmag/F" );
@@ -1733,7 +1786,10 @@ bool VAnaSumRunParameter::writeListOfExcludedSkyRegions()
 	{
 		x = fExclusionRegions[i]->fExcludeFromBackground_West;
 		y = fExclusionRegions[i]->fExcludeFromBackground_North;
-		r = fExclusionRegions[i]->fExcludeFromBackground_Radius;
+		//r = fExclusionRegions[i]->fExcludeFromBackground_Radius;
+		r1 = fExclusionRegions[i]->fExcludeFromBackground_Radius1;
+		r2 = fExclusionRegions[i]->fExcludeFromBackground_Radius2;
+		theta = fExclusionRegions[i]->fExcludeFromBackground_RotAngle;
 		decJ2000 = fExclusionRegions[i]->fExcludeFromBackground_DecJ2000;
 		raJ2000 = fExclusionRegions[i]->fExcludeFromBackground_RAJ2000;
 		id = fExclusionRegions[i]->fExcludeFromBackground_StarID;
@@ -1768,7 +1824,10 @@ bool VAnaSumRunParameter::getListOfExcludedSkyRegions( TFile* f )
 	
 	float x = 0.;
 	float y = 0.;
-	float r = 0.;
+	float r1 = 0.;
+	float r2 = -99.;
+	float theta = 0.;
+        bool  bOldStyleExclusionRegions = false;
 	float decJ2000 = 0.;
 	float raJ2000 = 0.;
 	int id = 0;
@@ -1776,7 +1835,19 @@ bool VAnaSumRunParameter::getListOfExcludedSkyRegions( TFile* f )
 	float iB = 0.;
 	tEx->SetBranchAddress( "x", &x );
 	tEx->SetBranchAddress( "y", &y );
-	tEx->SetBranchAddress( "r", &r );
+        // keep backwards compatibility to circular exclusion regions
+        if( tEx->GetBranchStatus( "r" ) )
+        {
+	    tEx->SetBranchAddress( "r", &r1 );
+            theta = 0.;
+            bOldStyleExclusionRegions = true;
+        }
+        else
+        {
+            tEx->SetBranchAddress( "r1", &r1 );
+            tEx->SetBranchAddress( "r2", &r2 );
+            tEx->SetBranchAddress( "theta", &theta );
+        }
 	tEx->SetBranchAddress( "star_id", &id );
 	if( tEx->GetBranch( "decj2000" ) )
 	{
@@ -1801,7 +1872,16 @@ bool VAnaSumRunParameter::getListOfExcludedSkyRegions( TFile* f )
 		fExclusionRegions.push_back( new VAnaSumRunParameterListOfExclusionRegions() );
 		fExclusionRegions.back()->fExcludeFromBackground_West = x;
 		fExclusionRegions.back()->fExcludeFromBackground_North = y;
-		fExclusionRegions.back()->fExcludeFromBackground_Radius = r;
+		fExclusionRegions.back()->fExcludeFromBackground_Radius1 = r1;
+                if( bOldStyleExclusionRegions )
+                {
+                    fExclusionRegions.back()->fExcludeFromBackground_Radius2 = r1;
+                }
+                else
+                {
+                    fExclusionRegions.back()->fExcludeFromBackground_Radius2 = r2;
+                }
+		fExclusionRegions.back()->fExcludeFromBackground_RotAngle = theta;
 		fExclusionRegions.back()->fExcludeFromBackground_StarID = id;
 		fExclusionRegions.back()->fExcludeFromBackground_DecJ2000 = decJ2000;
 		fExclusionRegions.back()->fExcludeFromBackground_RAJ2000  = raJ2000;
@@ -1822,7 +1902,10 @@ VAnaSumRunParameterListOfExclusionRegions::VAnaSumRunParameterListOfExclusionReg
 {
 	fExcludeFromBackground_West  = -9999.;
 	fExcludeFromBackground_North = -9999.;
-	fExcludeFromBackground_Radius = 0.;
+	//fExcludeFromBackground_Radius = 0.;
+	fExcludeFromBackground_Radius1 = 0.;
+	fExcludeFromBackground_Radius2 = 0.;
+	fExcludeFromBackground_RotAngle = 0.;
 	fExcludeFromBackground_StarID = -1;
 	fExcludeFromBackground_StarName = "";
 	fExcludeFromBackground_DecJ2000 = -9999.;

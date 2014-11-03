@@ -690,10 +690,12 @@ bool DST_fillEvent( VDSTTree* fData, AllHessData* hsdata, map< unsigned int, flo
 							{
 								fData->fDSTpulsetiming[i_ntel_data][getTimingLevelIndex( t )][p] = hsdata->event.teldata[telID].pixtm->timval[p][t];
 								if( getTimingLevelIndex( t ) == 1 && fData->fDSTsums[i_ntel_data][p] > fData->getDSTMeanPulseTimingMinLightLevel()
-										&& hsdata->event.teldata[telID].pixtm->timval[p][t] > 1.e-1 )
+								 && hsdata->event.teldata[telID].pixtm->timval[p][t] > 1.e-1 )
 								{
-									fData->fillDSTMeanPulseTiming( telID, p, hsdata->event.teldata[telID].pixtm->timval[p][t],
-																   hsdata->event.teldata[telID].raw->num_samples );
+//									fData->fillDSTMeanPulseTiming( telID, p, hsdata->event.teldata[telID].pixtm->timval[p][t],
+//													         hsdata->event.teldata[telID].raw->num_samples );
+									fData->fillDSTMeanPulseTiming( telID, p, hsdata->event.teldata[telID].pixtm->peak_global,
+													         hsdata->event.teldata[telID].raw->num_samples );
 								}
 							}
 						}
@@ -883,10 +885,12 @@ TTree* DST_fillCalibrationTree( VDSTTree* fData, AllHessData* hsdata, map< unsig
 		// select telescopes for this analysis
 		if( telescope_list.size() == 0 || telescope_list.find( fTelID ) != telescope_list.end() )
 		{
+                        cout << "Telescope: " << itel << "\t" << fTelID << "\t" << telescope_list[fTelID] << endl;
 			nPixel = ( unsigned int )hsdata->tel_moni[itel].num_pixels;
 			if( VDST_MAXCHANNELS < nPixel )
 			{
-				cout << "DST_fillCalibrationTree error: number of pixels (" << nPixel << ") exeeds allowed range (" << VDST_MAXCHANNELS << ")" << endl;
+				cout << "DST_fillCalibrationTree error: number of pixels (" << nPixel;
+                                cout << ") exeeds allowed range (" << VDST_MAXCHANNELS << ")" << endl;
 				cout << "\t adjust arrays..." << endl;
 				exit( EXIT_FAILURE );
 			}
@@ -914,7 +918,8 @@ TTree* DST_fillCalibrationTree( VDSTTree* fData, AllHessData* hsdata, map< unsig
 				TTree* iT = ( TTree* )iPedFile->Get( iSname.str().c_str() );
 				if( !iT )
 				{
-					cout << "DST_fillCalibrationTree error: pedestal tree not found for telescope " << itel << " (type " <<  fTelescopeType[itel] << ")" << endl;
+					cout << "DST_fillCalibrationTree error: pedestal tree not found for telescope ";
+                                        cout << itel << " (type " <<  fTelescopeType[itel] << ")" << endl;
 					return 0;
 				}
 				// now copy values over
@@ -924,7 +929,8 @@ TTree* DST_fillCalibrationTree( VDSTTree* fData, AllHessData* hsdata, map< unsig
 				
 				if( iT->GetEntries() < nPixel )
 				{
-					cout << "DST_fillCalibrationTree error: number of pixels different in pedestal tree: " << nPixel << "\t" << iT->GetEntries() << endl;
+					cout << "DST_fillCalibrationTree error: number of pixels different in pedestal tree: ";
+                                        cout << nPixel << "\t" << iT->GetEntries() << endl;
 					return 0;
 				}
 				

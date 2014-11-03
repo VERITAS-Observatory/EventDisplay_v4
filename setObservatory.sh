@@ -61,11 +61,7 @@ then
   if [[ $2 != "-q" ]]; then
 	echo "setting observatory to VERITAS"
   fi
-  if [ -z "${VERITAS_EVNDISP_AUX_DIR+xxx}" ]; then 
-     export OBS_EVNDISP_ANA_DIR=$VERITAS_EVNDISP_ANA_DIR
-  else
-     export OBS_EVNDISP_ANA_DIR=$VERITAS_EVNDISP_AUX_DIR
-  fi
+  export OBS_EVNDISP_AUX_DIR=$VERITAS_EVNDISP_AUX_DIR
   export OBS_DATA_DIR=$VERITAS_DATA_DIR
   export OBS_USER_DATA_DIR=$VERITAS_USER_DATA_DIR
   export OBS_USER_LOG_DIR=$VERITAS_USER_LOG_DIR
@@ -76,11 +72,7 @@ then
   if [[ $2 != "-q" ]]; then
   	echo "setting observatory to CTA"
   fi	
-  if [ -z "${CTA_EVNDISP_AUX_DIR+xxx}" ]; then 
-     export OBS_EVNDISP_ANA_DIR=$CTA_EVNDISP_ANA_DIR
-  else
-     export OBS_EVNDISP_ANA_DIR=$CTA_EVNDISP_AUX_DIR
-  fi
+  export OBS_EVNDISP_AUX_DIR=$CTA_EVNDISP_AUX_DIR
   export OBS_DATA_DIR=$CTA_DATA_DIR
   export OBS_USER_DATA_DIR=$CTA_USER_DATA_DIR
   export OBS_USER_LOG_DIR=$CTA_USER_LOG_DIR

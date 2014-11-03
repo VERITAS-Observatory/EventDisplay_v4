@@ -1681,7 +1681,7 @@ int VEventLoop::checkCuts()
 		}
 		if( i_tree.GetBranchStatus( "muonIPCorrectedSize" ) )
 		{
-			i_tree.Branch( "muonIPCorrectedSize", &muonSize, "muonIPCorrectedSize/F" );
+			i_tree.Branch( "muonIPCorrectedSize", &muonIPCorrectedSize, "muonIPCorrectedSize/F" );
 		}
 		if( i_tree.GetBranchStatus( "muonValid" ) )
 		{

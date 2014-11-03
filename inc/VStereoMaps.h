@@ -44,6 +44,10 @@ class VStereoMaps
 		vector<double> vXTOEXCLUDE;
 		vector<double> vYTOEXCLUDE;
 		vector<double> vRTOEXCLUDE;
+		// for ellipsoidal region
+		vector<double> vR1TOEXCLUDE;
+		vector<double> vR2TOEXCLUDE;
+		vector<double> vAngTOEXCLUDE;
 		vector<double> vXTOEXCLUDE_CameraCoordinates;
 		vector<double> vYTOEXCLUDE_CameraCoordinates;
 		

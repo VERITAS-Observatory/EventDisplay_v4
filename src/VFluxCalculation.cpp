@@ -1821,7 +1821,6 @@ void VFluxCalculation::plotFluxesVSPedvars()
 	gFluxPedvars->SetLineWidth( 2 );
 	
 	int z = 0;
-	double iMeanFlux = 0.;
 	for( unsigned int i = 0; i < fRunMJD.size(); i++ )
 	{
 		if( fRunMJD[i] > 10 )
@@ -1829,10 +1828,6 @@ void VFluxCalculation::plotFluxesVSPedvars()
 			gFluxPedvars->SetPoint( z, fRunPedvars[i], fRunFlux[i] );
 			gFluxPedvars->SetPointError( z, 0., fRunFluxE[i] );
 			z++;
-		}
-		else
-		{
-			iMeanFlux = fRunFlux[i];
 		}
 	}
 	char hname[200];
@@ -1868,7 +1863,6 @@ void VFluxCalculation::plotFluxesVSWobbleOffset()
 	gFluxWobbleOffset->SetLineWidth( 2 );
 	
 	int z = 0;
-	double iMeanFlux = 0.;
 	for( unsigned int i = 0; i < fRunMJD.size(); i++ )
 	{
 		if( fRunMJD[i] > 10 )
@@ -1876,10 +1870,6 @@ void VFluxCalculation::plotFluxesVSWobbleOffset()
 			gFluxWobbleOffset->SetPoint( z, fRunWobbleOffset[i], fRunFlux[i] );
 			gFluxWobbleOffset->SetPointError( z, 0., fRunFluxE[i] );
 			z++;
-		}
-		else
-		{
-			iMeanFlux = fRunFlux[i];
 		}
 	}
 	char hname[200];
@@ -1919,7 +1909,6 @@ TGraphErrors* VFluxCalculation::plotFluxesVSElevation( bool iDraw, double iConst
 	gFluxElevation->SetLineWidth( 2 );
 	
 	int z = 0;
-	double iMeanFlux = 0.;
 	for( unsigned int i = 0; i < fRunMJD.size(); i++ )
 	{
 		if( fRunMJD[i] > 10 )
@@ -1927,10 +1916,6 @@ TGraphErrors* VFluxCalculation::plotFluxesVSElevation( bool iDraw, double iConst
 			gFluxElevation->SetPoint( z, 90. - fRunZe[i], fRunFlux[i] );
 			gFluxElevation->SetPointError( z, 0., fRunFluxE[i] );
 			z++;
-		}
-		else
-		{
-			iMeanFlux = fRunFlux[i];
 		}
 	}
 	char hname[200];
@@ -2000,7 +1985,6 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char* iTex, double iMJDOffset, 
 	vector< double > iV_Flux;
 	vector< double > iV_FluxE;
 	
-	double iMeanFlux = 0.;
 	double iMinFlux = 1.e90;
 	
 	int z = 0;
@@ -2027,10 +2011,6 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char* iTex, double iMJDOffset, 
 			{
 				iMinFlux = fRunFlux[i] - fRunFluxE[i];
 			}
-		}
-		else
-		{
-			iMeanFlux = fRunFlux[i];
 		}
 	}
 	
@@ -2118,8 +2098,6 @@ TGraphErrors* VFluxCalculation::plotFluxesInBINs( int run, char* iTex, double iM
 	vector< double > iV_Flux;
 	vector< double > iV_FluxE;
 	
-	double iMeanFlux = 0.;
-	
 	int z = 0;
 	
 	// double flux=0;
@@ -2146,10 +2124,6 @@ TGraphErrors* VFluxCalculation::plotFluxesInBINs( int run, char* iTex, double iM
 						iV_Flux.push_back( fIntraRunFlux[i][t] );
 						iV_FluxE.push_back( fIntraRunFluxE[i][t] );
 					}
-					else
-					{
-						iMeanFlux = fIntraRunFlux[i][t];
-					}
 				}
 			}
 		}
@@ -2174,10 +2148,6 @@ TGraphErrors* VFluxCalculation::plotFluxesInBINs( int run, char* iTex, double iM
 				iV_Run.push_back( ( int )fRunList[iRunIndex] );
 				iV_Flux.push_back( fIntraRunFlux[iRunIndex][t] );
 				iV_FluxE.push_back( fIntraRunFluxE[iRunIndex][t] );
-			}
-			else
-			{
-				iMeanFlux = fIntraRunFlux[iRunIndex][t];
 			}
 		}
 	}
@@ -2319,8 +2289,6 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJDDaily( char* iTex, double iMJDOff
 	map< int, double > iFluxDay;
 	map< int, double > iFluxDayError;
 	
-	double iMeanFlux = 0.;
-	
 	for( unsigned int i = 0; i < fRunMJD.size(); i++ )
 	{
 		if( iTDay.find( ( int )fRunMJD[i] ) != iTDay.end() )
@@ -2334,10 +2302,6 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJDDaily( char* iTex, double iMJDOff
 			iTDay[( int )fRunMJD[i]] = fRunTOn[i];
 			iFluxDay[( int )fRunMJD[i]] = fRunFlux[i] * fRunTOn[i];
 			iFluxDayError[( int )fRunMJD[i]] = fRunFluxE[i] * fRunFluxE[i] * fRunTOn[i] * fRunTOn[i];
-		}
-		if( fRunMJD[i] < 10 )
-		{
-			iMeanFlux = fRunFlux[i];
 		}
 	}
 	

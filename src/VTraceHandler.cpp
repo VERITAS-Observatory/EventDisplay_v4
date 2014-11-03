@@ -6,6 +6,7 @@
 */
 
 #include "VTraceHandler.h"
+#include "TMath.h"
 
 VTraceHandler::VTraceHandler()
 {
@@ -179,7 +180,7 @@ double VTraceHandler::getQuickSum( int fFirst, int fLast, bool fRaw )
 			}
 		}
 	}
-	if( isnan( sum ) )
+	if( TMath::IsNaN( sum ) )
 	{
 		sum = 0.;
 	}
@@ -1260,7 +1261,6 @@ double VTraceHandler::getMaxSumWithOverSampling( unsigned int iSearchStart, unsi
 
 double VTraceHandler::getMaximumSums( float AmplThresh, int* integwindows, float* charges, float* arrtimes, bool fRaw )
 {
-	int   saturflag = -1;
 	fRaw = false;
 	unsigned int n = fpTrace.size();
 	float muxBINS[n], FADC[n];
@@ -1282,10 +1282,6 @@ double VTraceHandler::getMaximumSums( float AmplThresh, int* integwindows, float
 		if( FADC[i] >= AmplThresh )
 		{
 			intwin++;
-		}
-		if( FADC[i] >= SaturLimit )
-		{
-			saturflag = i;
 		}
 		if( intwin > 0 && FADC[i] < AmplThresh )
 		{

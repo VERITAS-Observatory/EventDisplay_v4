@@ -12,7 +12,7 @@ VTMVARunDataEnergyCut::VTMVARunDataEnergyCut()
 	fEnergyCut_Log10TeV_min = 0.;
 	fEnergyCut_Log10TeV_max = 0;
 	fEnergyCut = "";
-	fEnergyReconstructionMethod = 0;
+	fEnergyReconstructionMethod = 1;
 }
 
 void VTMVARunDataEnergyCut::print()

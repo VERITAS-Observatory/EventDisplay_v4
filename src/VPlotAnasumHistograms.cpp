@@ -1259,11 +1259,6 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 		ymax = hmap->GetYaxis()->GetBinLowEdge( hmap->GetYaxis()->FindBin( y1 ) );
 		iXRange = xmax - xmin;
 		
-		double iRArange = 0.;
-		if( cos( ( dec - iYRange / 2. ) * TMath::Pi() / 180. ) )
-		{
-			iRArange = iXRange / cos( ( dec - iYRange / 2. ) * TMath::Pi() / 180. );
-		}
 		double Xmin = -1.*ra;
 		double Xmax = -1.*ra;
 		
@@ -1791,7 +1786,6 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
 		return;
 	}
 	
-	TPad* gP = 0;
 	TH2D* hNull = 0;
 	
 	if( iC == 0 )
@@ -1807,7 +1801,6 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
 	{
 		iC->cd();
 	}
-	gP = ( TPad* )gPad;
 	
 	// get tree with reflected regions
 	TTree* iT = ( TTree* )gDirectory->Get( "tRE" );
@@ -1974,12 +1967,29 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas* c, int iLineColor )
 	}
 	float x = 0.;
 	float y = 0.;
-	float r = 0.;
+        float r1 = 0.;
+	float r2 = 0.;
+	float theta = 0.;
 	float Vmag = 0.;
 	float Bmag = 0.;
 	t->SetBranchAddress( "x", &x );
 	t->SetBranchAddress( "y", &y );
-	t->SetBranchAddress( "r", &r );
+        // keep backwards compatibility to circular exclusion regions
+        if( t->GetBranchStatus( "r" ) )
+        {
+	    t->SetBranchAddress( "r", &r1 );
+	    t->SetBranchAddress( "r", &r2 );
+            theta = 0.;
+        }
+        else
+        {
+            t->SetBranchAddress( "r1", &r1 );
+            t->SetBranchAddress( "r2", &r2 );
+            t->SetBranchAddress( "theta", &theta );
+        }
+	t->SetBranchAddress( "r1", &r1 );
+	t->SetBranchAddress( "r2", &r2 );
+	t->SetBranchAddress( "theta", &theta );
 	t->SetBranchAddress( "Vmag", &Vmag );
 	t->SetBranchAddress( "Bmag", &Bmag );
 	
@@ -1993,11 +2003,13 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas* c, int iLineColor )
 	for( int i = 0; i < t->GetEntries(); i++ )
 	{
 		t->GetEntry( i );
-		TEllipse* e = new TEllipse( iSign * x, y, r );
+		//TEllipse* e = new TEllipse( iSign * x, y, r );
+		TEllipse* e = new TEllipse( iSign * x, y, r1, r2, 0, 360, theta );
 		e->SetFillStyle( 0 );
 		e->SetLineColor( iLineColor );
 		e->Draw();
-		cout << "#" << i << " Vmag " << Vmag << ", Bmag " << Bmag << " (" << x << ", " << y << ", " << r << ")" << endl;
+		//cout << "#" << i << " Vmag " << Vmag << ", Bmag " << Bmag << " (" << x << ", " << y << ", " << r << ")" << endl;
+		cout << "#" << i << " Vmag " << Vmag << ", Bmag " << Bmag << " (" << x << ", " << y << ", " << r1 << ", " << r2 << ", " << theta << ")" << endl;
 	}
 	if( f1 )
 	{

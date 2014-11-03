@@ -292,8 +292,6 @@ void VFitTraceHandler::fitTrace( unsigned int chanID )
 	double ipeak = 0.;
 	int ipeakpos = 0;
 	getQuickMax( 0, fpTrace.size(), ipeak, ipeakpos );
-	int ipeakStartX = 0;
-	ipeakStartX = ( int )getQuickTZero( 0, fpTrace.size() );
 	
 	// fit only if peak value of trace is above threshold
 	if( ipeak > fFitThresh * fPedrms )

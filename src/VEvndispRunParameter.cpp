@@ -23,6 +23,8 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fEventDisplayBuildROOTVersion = "";
 	fEventDisplayBuildROOTVersionInt = 0;
 	fEventDisplaySystemInfo = 0;
+
+        fSGE_TASK_ID = 0;
 	
 	// debug parameters
 	fDebug = false;
@@ -432,6 +434,10 @@ void VEvndispRunParameter::print( int iEv )
 	{
 		cout << "ROOT version " << fEventDisplayBuildROOTVersion << endl;
 	}
+        if( fSGE_TASK_ID > 0 )
+        {
+                cout << "SGE TASK ID " << fSGE_TASK_ID << endl;
+        }
 	
 	cout << endl;
 	if( fTargetName.size() > 0 )
@@ -873,4 +879,10 @@ void VEvndispRunParameter::setSystemParameters()
 	// get root info
 	fEventDisplayBuildROOTVersion = gROOT->GetVersion();
 	fEventDisplayBuildROOTVersionInt = gROOT->GetVersionInt();
+
+        const char* i_sge = gSystem->Getenv( "SGE_TASK_ID" );
+        if( i_sge )
+        {
+              fSGE_TASK_ID = atoi( i_sge );
+        }
 }

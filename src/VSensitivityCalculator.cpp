@@ -3235,7 +3235,6 @@ bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F
 
 TCanvas* VSensitivityCalculator::plotSignalBackgroundRates( TCanvas* c, bool bPlotParticleBackground, double iRateMinimum, double iRateMaximum )
 {
-	bool bNewCanvas = false;
 	if( !c )
 	{
 		c = new TCanvas( "cSignalBackgroundRates", "background rates", 0, 0, 400, 400 );
@@ -3244,7 +3243,6 @@ TCanvas* VSensitivityCalculator::plotSignalBackgroundRates( TCanvas* c, bool bPl
 		c->SetLeftMargin( 0.15 );
 		c->SetRightMargin( 0.07 );
 		c->Draw();
-		bNewCanvas = true;
 	}
 	else
 	{

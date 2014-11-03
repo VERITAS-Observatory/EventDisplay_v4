@@ -56,7 +56,7 @@ optional parameters:
     [calibration file name] only used with calibration=4 option
 			   to specify a which runs should be used for pedestal/tzero/gain calibration.
                            Default is calibrationlist.dat
-                           file is expected in $VERITAS_EVNDISP_ANA_DIR/Calibration
+                           file is expected in $VERITAS_EVNDISP_AUX_DIR/Calibration
 
 --------------------------------------------------------------------------------
 "

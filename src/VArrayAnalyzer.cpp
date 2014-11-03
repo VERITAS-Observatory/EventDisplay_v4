@@ -1152,8 +1152,7 @@ double VArrayAnalyzer::getMeanPointingMismatch( unsigned int iTel )
 	{
 		return -2.;
 	}
-	
-	if( isnan( fMeanPointingMismatch[iTel] ) == 0 && isnan( fNMeanPointingMismatch[iTel] ) == 0 )
+        if( TMath::IsNaN( fMeanPointingMismatch[iTel] ) == 0 && TMath::IsNaN( fNMeanPointingMismatch[iTel] ) == 0 )
 	{
 		if( fNMeanPointingMismatch[iTel] > 0. )
 		{
@@ -1430,8 +1429,6 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
 	float b2 = 0.;
 	
 	double i_weight_max = 0.;
-	unsigned int i_telID_ii_max = 0;
-	unsigned int i_telID_jj_max = 0;
 	
 	for( unsigned int ii = 0; ii < m.size(); ii++ )
 	{
@@ -1475,8 +1472,6 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
 			if( iweight > i_weight_max )
 			{
 				i_weight_max = iweight;
-				i_telID_ii_max = telID[ii];
-				i_telID_jj_max = telID[jj];
 			}
 			
 			/*  DEBUG for reconstruction
@@ -1493,7 +1488,6 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
 			itotweight += iweight;
 		}
 	}
-	// DEBUG    cout << "WEIGHTMAX " << i_weight_max << ", " << i_telID_ii_max << ", " << i_telID_jj_max << endl;
 	if( itotweight > 0. )
 	{
 		xs = ixs / itotweight;
@@ -1535,8 +1529,7 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
 
 bool VArrayAnalyzer::fillShowerDirection( unsigned int iMethod, float xs, float ys, float stds )
 {
-
-	if( isnan( xs ) || isnan( ys ) )
+	if( TMath::IsNaN( xs ) || TMath::IsNaN( ys ) )
 	{
 		getShowerParameters()->fShower_Xoffset[iMethod] = -99999.;
 		getShowerParameters()->fShower_Yoffset[iMethod] = -99999.;
@@ -1569,11 +1562,11 @@ bool VArrayAnalyzer::fillShowerDirection( unsigned int iMethod, float xs, float 
 		getArrayPointing()->getRotatedShowerDirection( -1.*getShowerParameters()->fShower_Yoffset[iMethod],
 				-1.*getShowerParameters()->fShower_Xoffset[iMethod], ze, az );
 	}
-	if( isnan( ze ) )
+        if( TMath::IsNaN( ze ) )
 	{
 		ze = -99999.;
 	}
-	if( isnan( az ) )
+        if( TMath::IsNaN( az ) )
 	{
 		az = -99999.;
 	}
@@ -2354,7 +2347,7 @@ string VArrayAnalyzer::getTMVAFileNameForAngularReconstruction( unsigned int iSt
 		iName += "/" + iBDTFileName;
 	}
 	// no full path given - expect file to be at the default location
-	// $OBS_EVNDISP_ANA_DIR/DISP_BDTs/VX/ze...
+	// $OBS_EVNDISP_AUX_DIR/DISP_BDTs/VX/ze...
 	else
 	{
 		string iFullFileName = getRunParameter()->getDirectory_EVNDISPAnaData() + "/DISP_BDTs/" + getRunParameter()->fInstrumentEpoch + "/";

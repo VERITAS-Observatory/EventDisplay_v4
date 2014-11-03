@@ -184,7 +184,6 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 	//////////////////////////////////////////
 	// defining training class
 	TMVA::Factory* factory = new TMVA::Factory( iRun->fOutputFile[iEnergyBin][iZenithBin]->GetTitle(), iRun->fOutputFile[iEnergyBin][iZenithBin], "V" );
-	
 	////////////////////////////
 	// train gamma/hadron separation
 	if( iTrainGammaHadronSeparation )
@@ -478,10 +477,65 @@ int main( int argc, char* argv[] )
 			{
 				trainReconstructionQuality( fData, i, j );
 			}
+                        stringstream iTempS;
+			stringstream iTempS2;
+                        if( fData->fEnergyCutData.size() > 1 && fData->fZenithCutData.size() > 1 )
+                        {
+                                iTempS << fData->fOutputDirectoryName << "/" << fData->fOutputFileName << "_" << i << "_" << j << ".bin.root";
+                        	iTempS2 << "/" << fData->fOutputFileName << "_" << i << "_" << j << ".root";
+			}
+                        else if( fData->fEnergyCutData.size() > 1 && fData->fZenithCutData.size() <= 1 )
+                        {
+                                iTempS << fData->fOutputDirectoryName << "/" << fData->fOutputFileName << "_" << i << ".bin.root";
+                        	iTempS2 << "/" << fData->fOutputFileName << "_" << i << ".root";
+			}
+                        else if( fData->fZenithCutData.size() > 1 &&  fData->fEnergyCutData.size() <= 1 )
+                        {
+                                iTempS << fData->fOutputDirectoryName << "/" << fData->fOutputFileName << "_0_" << j << ".bin.root";
+                        	iTempS2 << "/" << fData->fOutputFileName << "_0_" << j << ".root";
+			}
+                        else
+                        {
+                                iTempS << fData->fOutputDirectoryName << "/" << fData->fOutputFileName << ".bin.root";
+				iTempS2 << fData->fOutputFileName << ".root";
+                        }
+			
+			// create small root file with necessary information for user
+			TFile *root_file = fData->fOutputFile[i][j];			
+                        TFile* short_root_file = TFile::Open( iTempS.str().c_str() , "RECREATE");
+                        VTMVARunDataEnergyCut* fDataEnergyCut = (VTMVARunDataEnergyCut*)root_file->Get("fDataEnergyCut");
+                        VTMVARunDataZenithCut* fDataZenithCut = (VTMVARunDataZenithCut*)root_file->Get("fDataZenithCut");
+			TH1D* MVA_BDT_0_effS = (TH1D*)root_file->Get("Method_BDT/BDT_0/MVA_BDT_0_effS");
+			TH1D* MVA_BDT_0_effB = (TH1D*)root_file->Get("Method_BDT/BDT_0/MVA_BDT_0_effB");
+			fDataEnergyCut->Write();
+                        fDataZenithCut->Write();
+			TDirectory *Method_BDT = short_root_file->mkdir("Method_BDT");
+			Method_BDT->cd();
+			TDirectory *BDT_0 = Method_BDT->mkdir("BDT_0");
+			BDT_0->cd();
+                        MVA_BDT_0_effS->Write();
+			MVA_BDT_0_effB->Write();
+			short_root_file->GetList();
+                        short_root_file->Write();
+                        short_root_file->Close();
+		
+			// copy complete TMVA output root-file to another directory	
+			string iOutputFileName( fData->fOutputDirectoryName + "/"+iTempS2.str() );
+			string iOutputFileNameCompleteSubDir( "complete_BDTroot" );
+			string iOutputFileNameCompleteDir( fData->fOutputDirectoryName + "/" + iOutputFileNameCompleteSubDir + "/" );
+			gSystem->mkdir( iOutputFileNameCompleteDir.c_str() );
+			string iOutputFileNameComplete( iOutputFileNameCompleteDir + iTempS2.str() );
+			rename( iOutputFileName.c_str(), iOutputFileNameComplete.c_str() );
+			cout << iOutputFileName << " " << iOutputFileNameCompleteSubDir << " " << iOutputFileNameCompleteDir << " "<< iOutputFileNameComplete << endl;
+			cout << "Complete TMVA output root-file: " << iOutputFileNameComplete << endl;
+
+			// rename .bin.root file to .root-file
+			string iFinalRootFileName( iTempS.str() );
+			string iBinRootString( ".bin.root" );
+			iFinalRootFileName.replace( iFinalRootFileName.find( iBinRootString ), iBinRootString.length(), ".root" );
+			rename( iTempS.str().c_str() , iFinalRootFileName.c_str() );
 		}
 	}
-	
 	return 0;
 }
-
 

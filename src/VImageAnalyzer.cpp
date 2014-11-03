@@ -1026,6 +1026,7 @@ void VImageAnalyzer::imageCleaning()
 		{
 			fVImageCleaning->cleanImageTraceCorrelate( getImageCleaningParameter()->fCorrelationCleanBoardThresh, getImageCleaningParameter()->fCorrelationCleanCorrelThresh, getImageCleaningParameter()->fCorrelationCleanNpixThresh );
 		}
+		// simple time two-level cleaning
 		else if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMETWOLEVEL" )
 		{
 			fVImageCleaning->cleanImagePedvarsTimeDiff( getImageThresh(), getBorderThresh(), getBrightNonImageThresh(), getTimeTwoLevelCleaningTimeDiff() );

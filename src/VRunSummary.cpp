@@ -294,12 +294,6 @@ bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_director
 		double iTargetDec = 0.;
 		double iTargetRAJ2000 = 0.;
 		double iTargetDecJ2000 = 0.;
-		double iSkyMapCentreRAJ2000 = 0.;
-		double iSkyMapCentreDecJ2000 = 0.;
-		double iTargetShiftRAJ2000 = 0.;
-		double iTargetShiftDecJ2000 = 0.;
-		double iTargetShiftWest = 0.;
-		double iTargetShiftNorth = 0.;
 		
 		for( int n = 0; n < i_runSum.fChain->GetEntries(); n++ )
 		{
@@ -338,12 +332,6 @@ bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_director
 					iTargetDec = i_runSum.TargetDec;
 					iTargetRAJ2000 = i_runSum.TargetRAJ2000;
 					iTargetDecJ2000 = i_runSum.TargetDecJ2000;
-					iSkyMapCentreRAJ2000 = i_runSum.SkyMapCentreRAJ2000;
-					iSkyMapCentreDecJ2000 = i_runSum.SkyMapCentreDecJ2000;
-					iTargetShiftRAJ2000 = i_runSum.TargetShiftRAJ2000;
-					iTargetShiftDecJ2000 = i_runSum.TargetShiftDecJ2000;
-					iTargetShiftWest = i_runSum.TargetShiftWest;
-					iTargetShiftNorth = i_runSum.TargetShiftNorth;
 				}
 				else if( iTargetRA != fTargetRA || iTargetDec != fTargetDec )
 				{
@@ -351,12 +339,6 @@ bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_director
 					iTargetDec = 0.;
 					iTargetRAJ2000 = 0.;
 					iTargetDecJ2000 = 0.;
-					iSkyMapCentreRAJ2000 = 0.;
-					iSkyMapCentreDecJ2000 = 0.;
-					iTargetShiftRAJ2000 = 0.;
-					iTargetShiftDecJ2000 = 0.;
-					iTargetShiftWest = 0.;
-					iTargetShiftNorth = 0.;
 				}
 				break;
 			}

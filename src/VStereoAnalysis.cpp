@@ -541,7 +541,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			getDerotatedCoordinates( icounter, i_UTC, iXoff, fEVDVersionSign * iYoff,  i_xderot, i_yderot );
 			
 			// gamma/hadron cuts
-			bIsGamma = fCuts->isGamma( i, false, fIsOn );
+//			bIsGamma = fCuts->isGamma( i, false, fIsOn );
 			
 			// fill on/offstereo maps and direction cut
 			i_theta2 = -99;
@@ -549,10 +549,10 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 										 fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma, i_theta2 );
 			bDirectionCuts = fMapUC->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max( iErec ),
 										   fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma, i_theta2 );
-										   
+
 			// energy reconstruction cut
 			bEnergyQualityCuts = fCuts->applyEnergyReconstructionQualityCuts( fRunPara->fEnergyReconstructionMethod );
-			
+
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
 			// following histograms (theta2, mscw, mscl, core position, etc.)  assume source at given target position
 			
@@ -1545,11 +1545,11 @@ void VStereoAnalysis::defineAstroSource()
 		// ON/OFF observation mode
 		// define offset for off run (usually 30. min, specified in runlist file)
 		// offset is as well defined for on run if on and off runnumber are the same
-		double i_off = 0.;
+/*		double i_off = 0.;
 		if( !fIsOn || fRunPara->fRunList[i].fRunOn == fRunPara->fRunList[i].fRunOff )
 		{
 			i_off = fRunPara->fRunList[i].fPairOffset / 60. / 24.*360. / TMath::RadToDeg();
-		}
+		} */
 		//////////////////////////////////
 		
 		// =============================================================
@@ -1635,7 +1635,9 @@ void VStereoAnalysis::defineAstroSource()
 								fRunPara->fExclusionRegions.push_back( new VAnaSumRunParameterListOfExclusionRegions() );
 								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_RAJ2000 = iStarCatalogue->getListOfStarsinFOV()[i]->fRA2000;
 								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_DecJ2000 = iStarCatalogue->getListOfStarsinFOV()[i]->fDec2000;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_Radius = fRunPara->fStarExlusionRadius;
+								//fRunPara->fExclusionRegions.back()->fExcludeFromBackground_Radius = fRunPara->fStarExlusionRadius;
+								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_Radius1 = fRunPara->fStarExlusionRadius;
+								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_Radius2 = fRunPara->fStarExlusionRadius;
 								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_North = 0.;
 								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_West = 0.;
 								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarID = ( int )iStarCatalogue->getListOfStarsinFOV()[i]->fStarID;
@@ -1858,7 +1860,7 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
 		if( !fDataFrogsTree )
 		{
 			cout << "VStereoAnalysis::getDataFromFile() info: cannot find frogspars tree in " << iFileName << endl;
-                        cout << "(this will lead to a failure for the frogs analysis)" << endl;
+                        cout << "(this will lead to a failure for the frogs analysis (in case you run a frogs analysis))" << endl;
 		}
 		else
 		{

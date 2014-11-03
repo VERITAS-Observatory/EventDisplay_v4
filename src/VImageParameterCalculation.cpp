@@ -531,7 +531,7 @@ void VImageParameterCalculation::sizeInMuonRing()
 	}
 	
 	unsigned int i;
-	double xi, yi, rp, size = 0.0, x0, y0, radius, rsigma, si;
+	double xi, yi, rp, size = 0.0, x0, y0, radius, si;
 	int totalPixels = 0;
 	int offPixels = 0;
 	double xc = 0.; //Centroid x coordinate
@@ -539,7 +539,6 @@ void VImageParameterCalculation::sizeInMuonRing()
 	x0 = fParGeo->muonX0;
 	y0 = fParGeo->muonY0;
 	radius = fParGeo->muonRadius;
-	rsigma = fParGeo->muonRSigma;
 	
 	for( i = 0; i < fData->getSums().size(); i++ )
 	{
@@ -547,7 +546,6 @@ void VImageParameterCalculation::sizeInMuonRing()
 		yi = getDetectorGeo()->getY()[i];
 		rp = sqrt( pow( xi - x0 , 2 ) + pow( yi - y0, 2 ) );
 		
-		//      if( rp > radius - 1.5* rsigma && rp < radius + 1.5* rsigma  )
 		if( rp > radius - 0.15 && rp < radius + 0.15 )
 		{
 			if( fData->getBorder()[i] || fData->getImage()[i] )
@@ -714,9 +712,6 @@ float VImageParameterCalculation::correctSizeInMuonRing()
 	float exi; //Imapct parameter correction factor
 	exi = 0.0;
 	
-	float xi = 0.0; //Impact parameter
-	xi = 0.0;
-	
 	float kTest = 0.0;
 	kTest = 0.0;
 	
@@ -751,7 +746,6 @@ float VImageParameterCalculation::correctSizeInMuonRing()
 		if( fabs( 1.0 - kTest_tmp ) < fabs( 1.0 - kTest ) )
 		{
 			exi = ngExi[i];
-			xi = xi_tmp;
 			kTest = kTest_tmp;
 		} //End of if
 		

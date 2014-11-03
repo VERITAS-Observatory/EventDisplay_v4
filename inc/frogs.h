@@ -251,7 +251,7 @@ void read_calibration_file( struct calibration_file* calib );
 struct frogs_imgtmplt_out frogs_img_tmplt( struct frogs_imgtmplt_in* d, char templatelistname[FROGS_FILE_NAME_MAX_LENGTH] );
 //struct frogs_imgtmplt_out frogs_img_tmplt( struct frogs_imgtmplt_in* d );
 struct frogs_imgtmplt_in frogs_convert_from_grisu( struct array_event* taevnt,
-		struct array* ta,
+		struct telarray* ta,
 		int adc_type,
 		struct array_ped* taped );
 //struct frogs_imgtemplate frogs_read_template_elev( float elevation );

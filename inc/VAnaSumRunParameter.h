@@ -35,6 +35,9 @@ class VAnaSumRunParameterListOfExclusionRegions
 		double fExcludeFromBackground_DecJ2000; //[deg]
 		double fExcludeFromBackground_RAJ2000;  //[deg]
 		double fExcludeFromBackground_Radius;   //[deg]
+		double fExcludeFromBackground_Radius1;   //[deg]
+		double fExcludeFromBackground_Radius2;   //[deg]
+		double fExcludeFromBackground_RotAngle;  //[deg]
 		int    fExcludeFromBackground_StarID;
 		string fExcludeFromBackground_StarName;
 		double fExcludeFromBackground_StarBrightness_V;
@@ -252,6 +255,6 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		bool writeListOfExcludedSkyRegions();
 		bool getListOfExcludedSkyRegions( TFile* f );
 		
-		ClassDef( VAnaSumRunParameter, 6 ) ;
+		ClassDef( VAnaSumRunParameter, 7 ) ;
 };
 #endif

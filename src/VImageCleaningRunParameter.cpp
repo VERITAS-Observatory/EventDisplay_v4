@@ -63,7 +63,7 @@ void VImageCleaningRunParameter::print()
 	}
 	if( getImageCleaningMethodIndex() == 4 )
 	{
-		cout << "time constraint between next neighbor pixels: " << ftimediff << endl;
+		cout << "\t time constraint between next neighbor pixels (samples): " << ftimediff << endl;
 	}
 }
 

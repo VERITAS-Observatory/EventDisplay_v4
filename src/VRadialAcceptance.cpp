@@ -378,7 +378,10 @@ void VRadialAcceptance::reset()
 	
 	fXE.clear();
 	fYE.clear();
-	fRE.clear();
+	//fRE.clear();
+	fR1E.clear();
+	fR2E.clear();
+	fAngE.clear();
 	
 	hXYAccImgSel.clear();
 	hXYAccNImages.clear();
@@ -509,13 +512,14 @@ bool VRadialAcceptance::isExcludedfromBackground( double x, double y )
 	}
 	
 	//Other regions to exclude from background (read from runparameter)
-	for( unsigned int i = 0; i < fXE.size(); i ++ )
-	{
-		if( ( x - fXE[i] ) * ( x - fXE[i] ) + ( y - fYE[i] ) * ( y - fYE[i] ) < fRE[i]*fRE[i] )
-		{
-			return true;
-		}
-	}
+        for( unsigned int i = 0; i < fXE.size(); i ++ )
+        {
+                if( ( ( x * TMath::Cos( fAngE[i] * TMath::DegToRad() ) - y * TMath::Sin( fAngE[i] * TMath::DegToRad() ) - fXE[i] ) * ( x * TMath::Cos( fAngE[i] * TMath::DegToRad() ) - y * TMath::Sin( fAngE[i] * TMath::DegToRad() ) - fXE[i] ) / ( fR1E[i] * fR1E[i] ) ) + ( ( x * TMath::Sin( fAngE[i] * TMath::DegToRad() ) + y * TMath::Cos( fAngE[i] * TMath::DegToRad() ) - fYE[i] ) * ( x * TMath::Sin( fAngE[i] * TMath::DegToRad() ) + y * TMath::Cos( fAngE[i] * TMath::DegToRad() ) - fYE[i] ) / ( fR2E[i] * fR2E[i] ) ) < 1. )
+                {
+                        return true;
+                }
+        }
+
 	return false;
 }
 
@@ -542,16 +546,19 @@ void VRadialAcceptance::setSource( double x, double y, double r, double idist, d
 	fMaxDistanceAllowed = imaxdist;
 }
 
-void VRadialAcceptance::setRegionToExcludeAcceptance( vector<double> x, vector<double> y, vector<double> r )
+void VRadialAcceptance::setRegionToExcludeAcceptance( vector<double> x, vector<double> y, vector<double> r1, vector<double> r2, vector<double> theta )
 {
 	fXE = x;
 	fYE = y;
-	fRE = r;
-	if( fXE.size() != fYE.size() || fXE.size() != fRE.size() )
-	{
-		cout << "VRadialAcceptance::setRegionToExcludeAcceptance: error: vectors of exclusion regions have different size: ";
-		cout << fXE.size() << " " << fYE.size() << " " << fRE.size() << endl;
-	}
+	
+        fR1E = r1;
+        fR2E = r2;
+	fAngE = theta;
+	if( fXE.size() != fYE.size() || fXE.size() != fR1E.size() || fXE.size() != fR2E.size() || fXE.size() != fAngE.size() )
+        {
+                cout << "VRadialAcceptance::setRegionToExcludeAcceptance: error: vectors of exclusion regions have different size: ";
+                cout << fXE.size() << " " << fYE.size() << " " << fR1E.size() << " " << fR2E.size() << " " << fAngE.size() << endl;
+        }
 }
 
 /*

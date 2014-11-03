@@ -2759,7 +2759,8 @@ int VExposure::checkMD5sum( int date, int run, bool force_download) {
 		fRunsBadChecksum.push_back( run );
 		return 1;
 	} 
-	cout << "VExposure::checkMD5sum: Run " << run << " survived the testsum check " << endl;
+	cout << "VExposure::checkMD5sum: Run " << run << " survived the testsum check." << endl;
+	cout << "Checksum from archive: " << archive_sum << ", calculated checksum: " << desy_sum << endl;
 	fRunsGoodChecksum.push_back( run );
 	return 0;
 }
@@ -2831,18 +2832,28 @@ TString VExposure::getArchiveMD5sum( int date, int run, bool force_download  ) {
 	TString UTAH_sumfilename = TString::Format( "%s/data/d%d/CHPC_sumd%d", ENVIR_VAR, date, date );
 	TString UCLA_sumfilename = TString::Format( "%s/data/d%d/UCLA_sumd%d", ENVIR_VAR, date, date );
 	TString UCLA2_sumfilename = TString::Format( "%s/data/d%d/UCLA_sum", ENVIR_VAR, date );
+	TString UCLA_new_sumfilename = TString::Format( "%s/data/d%d/UCLA_new_sum", ENVIR_VAR, date ); 	
+	//see elog http://veritash.sao.arizona.edu:8081/VERITAS-Operations/11544 . Some runs were reprocessed on disk at ucla to correct 2 rows of swapped signal cables.
 
 	TString dlcommand = TString::Format("bbftp -V -S -p 12 -u bbftp -e \"mget /veritas/data/d%d/*sum* %s/data/d%d/\" %s", date, ENVIR_VAR, date, getRawDataServer().c_str() );
 	TString chmodcommand = TString::Format( "chmod g+w %s/data/d%d/*sum*", ENVIR_VAR, date );
 
+	bool use_new_ucla_sumfile = ( run >= 69474 && run <= 69641 );
+
 	TString checksum = "";
 	//attempt to find checksum on disk
 	if( !force_download) {
-		checksum = readMD5sumFromFile( basecamp_sumfilename, run, !attempt_download );
-		if(checksum == "") checksum = readMD5sumFromFile( UCLA_sumfilename, run, !attempt_download );
-		if(checksum == "") checksum = readMD5sumFromFile( UCLA2_sumfilename, run, !attempt_download );
-		if(checksum == "") checksum = readMD5sumFromFile( UTAH_sumfilename, run, !attempt_download );
-
+		if( use_new_ucla_sumfile ) 
+		{
+			checksum = readMD5sumFromFile( UCLA_new_sumfilename, run, !attempt_download);
+		} 
+		else 
+		{
+			checksum = readMD5sumFromFile( basecamp_sumfilename, run, !attempt_download );
+			if(checksum == "") checksum = readMD5sumFromFile( UCLA_sumfilename, run, !attempt_download );
+			if(checksum == "") checksum = readMD5sumFromFile( UCLA2_sumfilename, run, !attempt_download );
+			if(checksum == "") checksum = readMD5sumFromFile( UTAH_sumfilename, run, !attempt_download );
+		}
 		if(checksum != "" ) return checksum;
 
 	}
@@ -2855,12 +2866,17 @@ TString VExposure::getArchiveMD5sum( int date, int run, bool force_download  ) {
 			cout << "VExposure::getArchiveMD5sum Error: Problem executing command : " << dlcommand << endl;
 		}
 		system(chmodcommand.Data() );
-
-		checksum = readMD5sumFromFile( basecamp_sumfilename, run );
-		if(checksum == "") checksum = readMD5sumFromFile( UCLA_sumfilename, run );
-		if(checksum == "") checksum = readMD5sumFromFile( UCLA2_sumfilename, run );
-		if(checksum == "") checksum = readMD5sumFromFile( UTAH_sumfilename, run );
-		
+		if( use_new_ucla_sumfile ) 
+		{
+			checksum = readMD5sumFromFile( UCLA_new_sumfilename, run);
+		} 
+		else 
+		{
+			checksum = readMD5sumFromFile( basecamp_sumfilename, run );
+			if(checksum == "") checksum = readMD5sumFromFile( UCLA_sumfilename, run );
+			if(checksum == "") checksum = readMD5sumFromFile( UCLA2_sumfilename, run );
+			if(checksum == "") checksum = readMD5sumFromFile( UTAH_sumfilename, run );
+		}	
 		if( checksum != "" ) return checksum;
 	}
 	
@@ -2871,10 +2887,11 @@ TString VExposure::getArchiveMD5sum( int date, int run, bool force_download  ) {
 TString VExposure::readMD5sumFromFile( TString filename, int run, bool warn ) {
 	
 	ifstream intemp(filename.Data() );
+	string linestring;
 	TString iChecksum;
 	TString iFile;
 
-	TString search = TString::Format("/%d.cvbf", run);
+	TString search = TString::Format("%d.cvbf", run);
 	TString checksum = "";
 
 	if (! intemp.is_open() )
@@ -2887,7 +2904,10 @@ TString VExposure::readMD5sumFromFile( TString filename, int run, bool warn ) {
 	}
 	else
 	{
-		while( intemp >> iChecksum >> iFile ) {
+		while( getline( intemp, linestring) )
+		{
+			stringstream line( linestring );			
+			line >> iChecksum >> iFile;
 			if( iFile.EndsWith(search.Data() )  )
 			{
 				checksum = iChecksum;
@@ -2936,7 +2956,7 @@ TString VExposure::calcMD5sum( int date, int run ) {
 	itemp.close();
 
 	//now do the checksum.
-	TString command = TString::Format( "md5sum %s > %s", datafilename.Data(), tempfilename.Data() );
+	TString command = TString::Format( "md5sum %s | tr \"\\n\" \" \" > %s ; date >> %s", datafilename.Data(), tempfilename.Data(), tempfilename.Data() );
 	cout << command << endl;
 	if( system( command.Data() ) != 0 ) 
 	{ 

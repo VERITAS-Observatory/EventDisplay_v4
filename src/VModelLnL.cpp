@@ -149,7 +149,7 @@ void VModelLnL::scopeLnL( unsigned int iscope, const vector<double>& a, double& 
 			pixelLnL_lookup( s, pixel_var, pixel_nsb, mu, pix_lnl, dlnl, d2lnl ); //JG: Poisson
 			/////pixelLnL(s,pixel_var,pixel_nsb,fSinglePEvar,mu,pix_lnl,dlnl,d2lnl); //JG: Poisson
 			
-			if( isnan( mu ) )
+			if( TMath::IsNaN( mu ) )
 			{
 				cout << "Mu NaN: T" << iscope + 1 << " ch" << ichan << " mu " << mu << " s " << s << " var " << pixel_var << " lnl " << pix_lnl << " dlnl " << dlnl << " d2lnl " << d2lnl << endl;
 				pix_lnl = 0;

@@ -1,4 +1,4 @@
-##########################################################################
+#########################################################################
 # Makefile for eventdisplay analysis package
 ##########################################################################
 #
@@ -135,7 +135,9 @@ SOFLAGS       = -shared
 endif
 # Apple OS X flags
 ifeq ($(ARCH),Darwin)
-CXXFLAGS    += -Wdeprecated-declarations -stdlib=libc++
+CXX           = clang++
+LD            = clang++
+CXXFLAGS    += -Wdeprecated-declarations -stdlib=libc++ -std=c++11
 LDFLAGS       = -bind_at_load
 DllSuf        = dylib
 UNDEFOPT      = dynamic_lookup
@@ -146,6 +148,7 @@ endif
 # CXX FLAGS (taken from root)
 ########################################################
 ROOTCFLAGS   = $(shell root-config --auxcflags)
+ROOTCFLAGS   = -pthread -m64
 CXXFLAGS     += $(ROOTCFLAGS)
 CXXFLAGS     += -I$(shell root-config --incdir) -I$(shell root-config --incdir)/TMVA 
 ########################################################
@@ -240,7 +243,6 @@ all VTS:	evndisp \
 	VTS.getRunListFromDB \
 	VTS.getLaserRunFromDB \
 	VTS.getRun_TimeElevAzim \
-	VTS.next_day \
 	printRunParameter \
         writeParticleRateFilesForTMVA
 
@@ -253,6 +255,7 @@ CTA:	evndisp \
 	trainTMVAforGammaHadronSeparation \
 	slib \
 	writeCTAWPPhysSensitivityFiles \
+	writeCTAWPPhysSensitivityTree \
 	writeParticleRateFilesFromEffectiveAreas \
 	printRunParameter
 
@@ -913,6 +916,20 @@ writeCTAWPPhysSensitivityFiles:	$(WRITECTAPHYSOBJ)
 	@echo "$@ done"
 
 ########################################################
+#  writeCTAWPPhysSensitivityTree
+########################################################
+
+WRITESENSTREE=	./obj/writeCTAWPPhysSensitivityTree.o
+
+./obj/writeCTAWPPhysSensitivityTree.o: 	./src/writeCTAWPPhysSensitivityTree.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+writeCTAWPPhysSensitivityTree:	$(WRITESENSTREE)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+
+########################################################
 # writeVTSWPPhysSensitivityFiles 
 ########################################################
 WRITEVTSPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
@@ -1035,7 +1052,7 @@ WRITECTAPHYSOBJ=	./obj/writeParticleRateFilesForTMVA.o \
 writeParticleRateFilesForTMVA:	$(WRITECTAPHYSOBJ)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
-	
+
 ########################################################
 # combineLookupTables
 ########################################################
@@ -1084,22 +1101,20 @@ trainTMVAforAngularReconstruction:	./obj/trainTMVAforAngularReconstruction.o \
 ########################################################
 # updateDBlaserRUN
 ########################################################
-UPDATEDBLASERRUN=	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
+./obj/updateDBlaserRUN.o: ./src/updateDBlaserRUN.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+updateDBlaserRUN:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
+			./obj/VExposure.o ./obj/VExposure_Dict.o \
 			./obj/VStar.o ./obj/VStar_Dict.o \
 			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
-			./obj/VExposure.o ./obj/VExposure_Dict.o \
 			./obj/VDB_Connection.o \
 			./obj/VASlalib.o \
+			./obj/VSkyCoordinatesUtilities.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VUtilities.o \
 			./obj/VDB_CalibrationInfo.o \
 			./obj/updateDBlaserRUN.o
-
-./obj/updateDBlaserRUN.o: ./src/updateDBlaserRUN.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-#updateDBlaserRUN: ./obj/updateDBlaserRUN.o
-updateDBlaserRUN: $(UPDATEDBLASERRUN)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "Done updateDBlaserRUN"
 
@@ -1285,10 +1300,10 @@ VTS.getRunListFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 			./obj/VExposure.o ./obj/VExposure_Dict.o \
 			./obj/VDB_Connection.o \
 			./obj/VASlalib.o \
-                        ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
-                        ./obj/VStar.o ./obj/VStar_Dict.o \
-                        ./obj/VUtilities.o \
-                        ./obj/VSkyCoordinatesUtilities.o \
+         ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+         ./obj/VStar.o ./obj/VStar_Dict.o \
+         ./obj/VUtilities.o \
+         ./obj/VSkyCoordinatesUtilities.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VUtilities.o \
 			./obj/VTS.getRunListFromDB.o

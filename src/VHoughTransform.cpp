@@ -136,11 +136,9 @@ void VHoughTransform::analysis( VEvndispData* fData, VImageParameter* fParGeo )
 	
 	double fMaxBinValue = 0; //Value of the bin of the accumulator array with the highest value
 	double fSecondMaxBinValue = 0; //Value of the bin of the accumulator array with the second highest value
-	double fThirdMaxBinValue = 0; //Value of the bin of the accumulator array with the third highest value
 	
 	int fMaxBin = 0; //Bin number of the max bin of the accumulator array
 	int fSecondMaxBin = 0; //Bin number of the second max bin of the accumulator array
-	int fThirdMaxBin = 0; //Bin number of the third max bin of the accumulator array
 	
 	double fDistance1 = 0; //Hyper-distance between the best and second best parametrizations
 	double fDistance2 = 0; //Hyper-distance between the best and third best parametrizations
@@ -250,11 +248,9 @@ void VHoughTransform::analysis( VEvndispData* fData, VImageParameter* fParGeo )
 	//Set the value of the second max bin of the accumulator array to zero. Do this to use the GetMaximumBin() method.
 	fAccumulatorArray[ fData->getTelID() ]->SetBinContent( fAccumulatorBins[0], fAccumulatorBins[1], fAccumulatorBins[2], 0 );
 	
-	fThirdMaxBin = fAccumulatorArray[ fData->getTelID() ]->GetMaximumBin( fAccumulatorBins[0], fAccumulatorBins[1], fAccumulatorBins[2] ); //Get the third max bin of the accumulator array
 	fThirdBestParametrization[0] = fAccumulatorArray[ fData->getTelID() ]->GetXaxis()->GetBinCenter( fAccumulatorBins[0] ); //Get the x coordinate of the third max bin
 	fThirdBestParametrization[1] = fAccumulatorArray[ fData->getTelID() ]->GetYaxis()->GetBinCenter( fAccumulatorBins[1] ); //Get the x coordinate of the third max bin
 	fThirdBestParametrization[2] = fAccumulatorArray[ fData->getTelID() ]->GetZaxis()->GetBinCenter( fAccumulatorBins[2] ); //Get the x coordinate of the third max bin
-	fThirdMaxBinValue = fAccumulatorArray[ fData->getTelID() ]->GetBinContent( fAccumulatorBins[0], fAccumulatorBins[1], fAccumulatorBins[2] ); //Get the value of the third max bin
 	
 	//Refill the bins of the accumulator that were set to zero.
 	fAccumulatorArray[ fData->getTelID() ]->SetBinContent( fMaxBin, fMaxBinValue ); //Replace the bin content of the max bin

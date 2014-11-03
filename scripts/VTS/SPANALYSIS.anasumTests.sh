@@ -58,7 +58,7 @@ do
         then
             IDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$VERSION/${O}/${DATE}/${D}/${VERSION}/RecID${ID}_${SIMTYPE}"
         else
-            IDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$VERSION/${O}/${DATE}/${D}/${VERSION}_frogs/"
+            IDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$VERSION/${O}/${DATE}/${D}/${VERSION}_Frogs/"
         fi
         RM=${RECMETHODS[$ID]}
         ########### START MSCW
@@ -66,8 +66,8 @@ do
 #        continue
         ########### END MSCW
         # cut
-#        for C in moderate2tel moderate3tel hard2tel soft 
 #        for C in BDT-moderate moderate2tel moderate3tel hard2tel soft
+#        for C in moderate2tel moderate3tel hard2tel soft 
         for C in frogs
         do 
 #              for BC in RE RB
@@ -82,7 +82,7 @@ do
                     echo $RLIST
 
                     rm -f $ODIR.log
-#                     $EVNDISPSYS/bin/anasum -d $ODIR -i 1 -f $RUNPAR -l $ODIR/$C.anasum.dat -o $ODIR.root > $ODIR.log  
+#                    $EVNDISPSYS/bin/anasum -d $ODIR -i 1 -f $RUNPAR -l $ODIR/$C.anasum.dat -o $ODIR.root > $ODIR.log
                    ./ANALYSIS.anasum_parallel_from_runlist.sh ${RLIST} $ODIR $C ${BC} $RUNPAR $IDIR $SIMTYPE $ANAMETHOD 21
                    echo "DONE $ODIR"
                done

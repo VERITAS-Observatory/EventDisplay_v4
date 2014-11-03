@@ -19,8 +19,7 @@ $EVNDISPSYS/bin/anasum   \
     -f $RUNP             \
     -l $FLIST            \
     -d $INDIR            \
-    -o $OUTPUTDATAFILE   \
-    |& tee $OUTPUTLOGFILE
+    -o $OUTPUTDATAFILE   &> $OUTPUTLOGFILE
 echo "RUN$RUNNUM ANPARLOG $OUTPUTLOGFILE"
 echo "RUN$RUNNUM ANPARDATA $OUTPUTDATAFILE"
 

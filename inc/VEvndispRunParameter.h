@@ -46,6 +46,9 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		// root parameters
 		string fEventDisplayBuildROOTVersion;
 		int    fEventDisplayBuildROOTVersionInt;
+
+                // JOB ids
+                int    fSGE_TASK_ID;
 		
 		// DB parameters
 		bool   fuseDB;
@@ -336,6 +339,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fuseDB;
 		}
 		
-		ClassDef( VEvndispRunParameter, 161 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 162 ); //(increase this number)
 };
 #endif

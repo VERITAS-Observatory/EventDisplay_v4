@@ -31,6 +31,8 @@ cp -f -v $INFILE $TEMPDIR
 
 MSCWDATAFILE="$ODIR/$BFILE.mscw.root"
 
+
+
 echo
 echo "\$ENERGY3D:'$ENERGY3D'"
 echo
@@ -43,8 +45,7 @@ if [ "$ENERGY3D" == "no" ] ; then
         -noshorttree                    \
         -arrayrecid=$RECID              \
         -inputfile $TEMPDIR/$BFILE.root \
-        -writeReconstructedEventsOnly=1 \
-        |& tee $MSCWLOGFILE
+        -writeReconstructedEventsOnly=1 &> $MSCWLOGFILE
 
     # move output file from scratch and clean up
     cp -f -v $TEMPDIR/$BFILE.mscw.root $MSCWDATAFILE
@@ -70,8 +71,7 @@ elif [ "$ENERGY3D" == "yes" ] ; then
     $EVNDISPSYS/bin/energy3d \
         -inputfile   $TEMPDIR/$BFILE.root      \
         -outputfile  $TEMPDIR/$OUTPUTFILE.root \
-        -template    $TEMPDIR/$TEMPLATEFNAME   \
-        |& tee $MCWLOGFILE
+        -template    $TEMPDIR/$TEMPLATEFNAME   &> $MSCWLOGFILE
     
     echo
     echo "Here's whats in the temporary directory!"

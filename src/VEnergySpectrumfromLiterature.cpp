@@ -279,16 +279,6 @@ TGraphAsymmErrors* VEnergySpectrumfromLiterature::getEnergySpectrumWithErrors( u
 	g->SetFillColor( fPlottingColor );
 	g->SetTitle( "" );
 	
-	double i_normEnergy = 0.;
-	if( bLogEnergy )
-	{
-		i_normEnergy = log10( fData[iID].Parameter[0] );
-	}
-	else
-	{
-		i_normEnergy = fData[iID].Parameter[0];
-	}
-	
 	int nPara = f->GetNpar();
 	
 	double x = 0.;

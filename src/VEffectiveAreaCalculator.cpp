@@ -998,7 +998,6 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 	unsigned int i_index_noise = 0;
 	bool i_index_F = false;
 	unsigned int i_index_index = 0;
-	double i_index_index_selected = 0.;
 	
 	double iInvMax = 1.e5;
 	int iIndexAz = 0;
@@ -1146,7 +1145,6 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 							{
 								i_index_index = s;
 								i_index_F = true;
-								i_index_index_selected = fEff_SpectralIndex[i_index_ze][i_index_woff][i_index_noise][s];
 								break;
 							}
 						}
@@ -1154,7 +1152,6 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 						{
 							fEff_SpectralIndex[i_index_ze][i_index_woff][i_index_noise].push_back( index );
 							i_index_index = fEff_SpectralIndex[i_index_ze][i_index_woff][i_index_noise].size() - 1;
-							i_index_index_selected = fEff_SpectralIndex[i_index_ze][i_index_woff][i_index_noise][i_index_index];
 						}
 					}
 					else
@@ -1163,7 +1160,6 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 						itemp.push_back( index );
 						fEff_SpectralIndex[i_index_ze][i_index_woff].push_back( itemp );
 						i_index_index = fEff_SpectralIndex[i_index_ze][i_index_woff][i_index_noise].size() - 1;
-						i_index_index_selected = fEff_SpectralIndex[i_index_ze][i_index_woff][i_index_noise][i_index_index];
 					}
 				}
 				else
@@ -1174,7 +1170,6 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 					iitemp.push_back( itemp );
 					fEff_SpectralIndex[i_index_ze].push_back( iitemp );
 					i_index_index = fEff_SpectralIndex[i_index_ze][i_index_woff][i_index_noise].size() - 1;
-					i_index_index_selected = fEff_SpectralIndex[i_index_ze][i_index_woff][i_index_noise][i_index_index];
 				}
 			}
 			else
@@ -1187,7 +1182,6 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 				iiitemp.push_back( iitemp );
 				fEff_SpectralIndex.push_back( iiitemp );
 				i_index_index = fEff_SpectralIndex[i_index_ze][i_index_woff][i_index_noise].size() - 1;
-				i_index_index_selected = fEff_SpectralIndex[i_index_ze][i_index_woff][i_index_noise][i_index_index];
 			}
 			unsigned int i_ID = i_index_index + 100 * ( i_index_noise + 100 * ( i_index_woff + 100 * i_index_ze ) );
 			if( fLotsOfPrintOuts )

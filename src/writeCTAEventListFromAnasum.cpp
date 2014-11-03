@@ -98,7 +98,6 @@ int main( int argc, char* argv[] )
 				rawEventsFlag = true ;
 				break ;
 			default:
-				//cout << "unknown option '" << c << "', aborting!" << endl;
 				printf( "unknown option '%c', exiting!\n", c ) ;
 				exit( 1 ) ;
 				break ;
@@ -120,7 +119,6 @@ int main( int argc, char* argv[] )
 		cout << "      -o <fname> : output fits filename" << endl ;
 		cout << "      -h         : prints help text" << endl << endl;;
 		cout << "   Optional:" << endl;
-		cout << "      -m <int>   : only load first <int> ttrees from anasum root file, for debugging."    << endl ;
 		cout << "      -n <int>   : only read at most <int> events total, for debugging."                  << endl ;
 		cout << "      -f         : clobber, will forcably overwrite existing output fits file."           << endl ;
 		cout << "                   otherwise error out if file already exists."                           << endl ;
@@ -272,9 +270,7 @@ int main( int argc, char* argv[] )
 	
 	// FITS records' template file
 	string EVNDISPSYS = get_env_var( "EVNDISPSYS" ) ;
-	//cout << "EVNDISPSYS:" << EVNDISPSYS << endl;
 	char evlTemplateChar[200] = "" ;
-	//sprintf( evlTemplateChar, "%s/templates/evl/1.0.0/EventList.tpl", EVNDISPSYS.c_str() ) ;
 	sprintf( evlTemplateChar, "%s/templates/EventList.tpl", EVNDISPSYS.c_str() ) ;
 	string evlTemplate( evlTemplateChar ) ;
 	
@@ -342,18 +338,6 @@ int main( int argc, char* argv[] )
 		return 1 ;
 	}
 	
-	/*
-	sprintf( objName, "run_%d/stereo/VASRPDC", runid ) ;
-	VAnaSumRunParameterDataClass * varpdc = (VAnaSumRunParameterDataClass*)obsInfoFile->Get( objName ) ;
-	if ( varpdc ) {
-	    cout << "VASRPDC:" << varpdc << endl;
-	    cout << "VASRPDC->fRunOn:" << varpdc->fRunOn << endl;
-	} else {
-	    cout << "VAnaSumRunParameterDataClass failed to load... exiting!" << endl;
-	    return 1 ;
-	}
-	*/
-	
 	//////////////////////////////////////////////////////////////////////////////////
 	// get VAnaSumRunParameter object from file
 	VAnaSumRunParameter* anasumRunPar = 0 ;
@@ -368,10 +352,6 @@ int main( int argc, char* argv[] )
 	{
 		cout << "Loaded VAnaSumRunParameter object '" << objName << "' ..." << endl;
 	}
-	//cout << "anasumRunPar->fEnergySpectrumBinSize: " << anasumRunPar->fEnergySpectrumBinSize << endl;
-	//cout << "anasumRunPar->fRunList[0]: " << anasumRunPar->fRunList[0] << endl;
-	//cout << "anasumRunPar->fRunList.size(): "     << anasumRunPar->fRunList.size() << endl;
-	//cout << "anasumRunPar->fScalarDeadTimeFrac: " << anasumRunPar->fScalarDeadTimeFrac << endl;
 	double deadtimefrac = anasumRunPar->fScalarDeadTimeFrac ;
 	
 	char progname[100] = "" ;
@@ -422,10 +402,7 @@ int main( int argc, char* argv[] )
 	double startMJD = 0.0 ;
 	double stopMJD  = 0.0 ;
 	getRunTimes( evndispRunPar, met_zero, tstart, tstop, telapse, startMJD, stopMJD ) ;
-	//cout << "  telapse     :" << telapse << endl;
-	//cout << "  deadtimefrac:" << deadtimefrac << endl;
 	double livetime = telapse * ( 1.0 - deadtimefrac ) ;
-	//cout << "  livetime    :" << livetime << endl;
 	
 	// calculate average RA, Dec, Alt, Az
 	// just by a straight average
@@ -438,16 +415,13 @@ int main( int argc, char* argv[] )
 	calc_Avg_AltAz_from_Pointing( chainPointData, alt_pnt, az_pnt ) ;
 	cout << "  ra_pnt :" << ra_pnt  << endl;
 	cout << "  dec_pnt:" << dec_pnt << endl;
-	//cout << "  alt_pnt:" << alt_pnt << endl;
-	//cout << "  az_pnt :" << az_pnt  << endl;
 	
 	// load time mask, get good time intervals
-	//cout << endl;
-	//cout << "Attempting to load VTimeMask" << endl;
 	string timemaskfile = "/afs/ifh.de/user/n/nkelhos/scratch/ConvertVeritasDataToCTOOLs/testzone/ANASUM.timemask.dat" ;
-	//string timemaskfile = "" ;
-	//cout << "  Using time mask file: " << timemaskfile << endl;
 	VTimeMask* vtm = 0 ;
+    
+    // vtmode: 1 = use hardcoded timemask file for testing purposes only
+    //         2 = load VTimeMask object straight from the anasum file
 	int vtmmode = 2 ;
 	if( vtmmode == 1 )
 	{
@@ -455,7 +429,6 @@ int main( int argc, char* argv[] )
 		sprintf( objName, "/run_%d/stereo/timeMask", runid ) ;
 		myfile->cd( objName ) ;
 		TDirectory* tdir = myfile->CurrentDirectory();
-		//cout << "  pwd:" << tdir->GetPath() << endl;
 		vtm->readObjects( tdir ) ;
 		vtm->setMask( runid, startMJD, stopMJD, timemaskfile ) ;
 	}
@@ -482,29 +455,7 @@ int main( int argc, char* argv[] )
 		cout << "Loaded VTimeMask directory " << objName << "..." << endl;
 	}
 	
-	//cout << "  vtm->getMaskStatus():" << vtm->getMaskStatus() << "   (true=" << true << ", false=" << false << ")" << endl;
-	
-	// loop over entire run, display time mask
-	//printf( "  startMJD:%11.5f\n", startMJD ) ;
-	//printf( "  stopMJD :%11.5f\n", stopMJD  ) ;
-	//printf( "  mask_file:%s\n",    vtm->getMaskFileName().c_str() ) ;
-	//printf( "  mask.size():%d\n",  vtm->getMask().size()          ) ;
-	//cout << "  mask.size():" << vtm->getMask().size() << " seconds (or bits)" << endl;
-	/*
-	double currMJD = 0.0 ;
-	bool   stat    = false ;
-	for ( int i_dur=0 ; i_dur<10000 ; i_dur++ ) {
-	    currMJD = startMJD + (i_dur/(24.*60.*60.)) ;
-	    if ( currMJD > stopMJD ) break ;
-	    if ( i_dur % 60 == 0 ) printf( "\n  currMJD:%11.5f : sec %4d : ", currMJD, i_dur ) ;
-	    stat = false ;
-	    stat = vtm->checkAgainstMask( currMJD ) ;
-	    cout << stat ;
-	}
-	*/
 	cout << endl;
-	//vtm->printMask() ;
-	//cout << endl;
 	cout << "displayMask()" ;
 	vtm->displayMask( cout ) ;
 	cout << endl;
@@ -544,18 +495,19 @@ int main( int argc, char* argv[] )
 	recEVENTS.writeHeader( "DATE_OBS", string( dateobs ) ) ;        // human readable run-start date string
 	recEVENTS.writeHeader( "DEC_OBJ" , evndispRunPar->fTargetDec ) ;  // Dec of the target object in view
 	recEVENTS.writeHeader( "EQUINOX" , 2000.0 ) ;                   // which JXXXX RA/Dec epoch to use for all RA/Dec in here
-	//recEVENTS.writeHeader( "EXTNAME" , string( "events" ) ) ;
 	recEVENTS.writeHeader( "EXTNAME" , string( "EVENTS" ) ) ;
 	recEVENTS.writeHeader( "OBJECT"  , evndispRunPar->fTargetName ) ;
 	recEVENTS.writeHeader( "OBS_ID"  , runid ) ;
 	recEVENTS.writeHeader( "RA_OBJ"  , evndispRunPar->fTargetRA ) ;
-	recEVENTS.writeHeader( "RADECSYS", string( "fk5" ) ) ;          // something related to the precession-rotation standard
+
+    // fk5 = something related to a precession-rotation standard
+	recEVENTS.writeHeader( "RADECSYS", string( "fk5" ) ) ;
+    
 	recEVENTS.writeHeader( "TELESCOP", string( "VERITAS" ) ) ;
 	recEVENTS.writeHeader( "TIME_END", string( timeend ) ) ;
 	recEVENTS.writeHeader( "TIME_OBS", string( timeobs ) ) ;
 	recEVENTS.writeHeader( "TIMEREF" , string( "local" ) ) ;
 	recEVENTS.writeHeader( "TIMESYS" , string( "TT" ) ) ;
-	//recEVENTS.writeHeader( "TIMEUNIT", string( "days" ) ) ;
 	recEVENTS.writeHeader( "TIMEUNIT", string( "s" ) ) ;
 	recEVENTS.writeHeader( "MJDREFI" , mjdrefi ) ;
 	recEVENTS.writeHeader( "MJDREFF" , mjdreff ) ;
@@ -569,13 +521,6 @@ int main( int argc, char* argv[] )
 	recEVENTS.writeHeader( "AZ_PNT"  , az_pnt ) ;
 	recEVENTS.writeHeader( "DEADC"   , deadtimefrac ) ;
 	recEVENTS.writeHeader( "LIVETIME", livetime ) ;
-	/*
-	*/
-	
-	//recEVENTS.writeHeader( "CON_DEP" , 9999.9                   ) ; // ignore, not defined in template
-	//recEVENTS.writeHeader( "OBSERVER", string("null")           ) ; // ignore, not defined in template
-	//recEVENTS.writeHeader( "PNTMODE" , string("track")          ) ; // ignore, not defined in template
-	//recEVENTS.writeHeader( "TIMEDEL" , 1.0                      ) ; // ignore, not defined in template
 	
 	// VERITAS Event Parameters (start with caps?)
 	int    RunNumber        =     0   ;
@@ -621,20 +566,6 @@ int main( int argc, char* argv[] )
 	chainEventList->SetBranchAddress( "Yoff"          , &Yoff ) ;
 	chainEventList->SetBranchAddress( "ImgSel"        , &ImgSel ) ;
 	
-	//double Xderot      = 0.0 ;
-	//double Yderot      = 0.0 ;
-	//double timeOfDay   = 0.0 ;
-	//int    dayMJD      = 0   ;
-	//double MSCW        = 0.0 ;
-	//double MSCL        = 0.0 ;
-	//chainEventList->SetBranchAddress( "Xderot"      , &Xderot      ) ;
-	//chainEventList->SetBranchAddress( "Yderot"      , &Yderot      ) ;
-	//chainEventList->SetBranchAddress( "timeOfDay"   , &timeOfDay   ) ;
-	//chainEventList->SetBranchAddress( "dayMJD"      , &dayMJD      ) ;
-	//chainEventList->SetBranchAddress( "MSCW"        , &MSCW        ) ;
-	//chainEventList->SetBranchAddress( "MSCL"        , &MSCL        ) ;
-	//chainEventList->SetBranchAddress( ""    , &    ) ;
-	
 	// CTOOLs Event Parameters
 	long  int obs_id      = 0   ;
 	long  int event_id    = 0   ;
@@ -670,7 +601,6 @@ int main( int argc, char* argv[] )
 	recEVENTS.mapColumnToVar( "DIR_ERR"    , dir_err ) ;
 	recEVENTS.mapColumnToVar( "COREX"      , corex ) ;
 	recEVENTS.mapColumnToVar( "COREY"      , corey ) ;
-	//recEVENTS.mapColumnToVar( "COR_ERR"    , cor_err   ) ;
 	recEVENTS.mapColumnToVar( "ENERGY"     , energy ) ;
 	recEVENTS.mapColumnToVar( "ENERGY_ERR" , energyerr ) ;
 	recEVENTS.mapColumnToVar( "AZ"         , az ) ;
@@ -684,23 +614,15 @@ int main( int argc, char* argv[] )
 	recEVENTS.mapColumnToVar( "TELMASK"    , telmask ) ;
 	recEVENTS.mapColumnToVar( "DETX"       , detx ) ;
 	recEVENTS.mapColumnToVar( "DETY"       , dety ) ;
-	//recEVENTS.mapColumnToVar( "SHWIDTH"    , shwidth     ) ;
-	//recEVENTS.mapColumnToVar( "SHLENGTH"   , shlength    ) ;
 	
 	// Transcribe events to FITSRecord EVENTS Table
 	unsigned int totalEvents = chainEventList->GetEntries() ;
-	//if ( maxEventsFlag && maxEvents < totalEvents ) totalEvents = maxEvents ;
 	
-	//cout << endl;
-	//cout << "Looping over " << totalEvents << " Events..." << endl;
-	
-	//printf( "%6s %7s %6s %6s %6s %6s %6s %6s\n", "ObsID", "EventID", "RA  ", "DEC ", "Xoff", "Yoff", "MSCW", "MSCL") ;
-	//printf( "HEAD %6s %8s %4s %17s %6s %6s %6s %6s %5s %12s\n", "OBS_ID", "EVENT_ID", "MASK", "TIME(MET)", "RA  ", "DEC ", "AZ", "EL", "MJD", "Time") ;
 	double mjd ;
 	for( unsigned int i = 0; i <= totalEvents - 1 ; i++ )
 	{
-		//if ( i > 20 ) break ;
 		chainEventList->GetEntry( i );
+        
 		// variable names in all lowercase are CTOOLs
 		// variable names with any capital letters are VERITAS variables
 		obs_id      = RunNumber      ;
@@ -740,8 +662,6 @@ int main( int argc, char* argv[] )
 		}
 		
 		// convert MJD and Time to UTC
-		//event_time  = VSkyCoordinatesUtilities::getUTC( MJD, Time ) ; // using MJD epoch (time in seconds since MJD=0.0)
-		//event_time  = (MJD*86400.0) + Time - met_zero ;
 		event_time  = ( ( MJD - met_zero ) * 86400.0 ) + Time ;
 		if( event_id < 3000 )
 		{
@@ -751,9 +671,6 @@ int main( int argc, char* argv[] )
 		
 		//
 		recEVENTS.write() ;
-		//printf( "DATA %6d %8d %4s %17.7f %6.1f %6.1f %6.2f %6.2f %5d %12f\n", (int)obs_id, (int)event_id, telmask_to_string(telmask).c_str(), event_time, ra, dec, Az, El, MJD, Time) ;
-		//printf( "%3d: Event %6d to %s\n", i, EventNumber, outfile ) ;
-		//if ( i==0 ) recEVENTS.writeHeader( "OBS_ID", RunNumber ) ;
 	}
 	printf( "RunNumber %d, %d events written.\n", RunNumber, totalEvents ) ;
 	
@@ -762,14 +679,7 @@ int main( int argc, char* argv[] )
 	// -TELARRAY Table
 	recTELARRAY.writeHeader( "TELESCOP", string( "VERITAS" ) ) ;
 	recTELARRAY.writeHeader( "ARRAY"   , string( "null" ) ) ;
-	/*
-	recTELARRAY.writeHeader( "OBS_ID"  ,  ) ;
-	recTELARRAY.writeHeader( "GEOLAT"  ,  ) ;
-	recTELARRAY.writeHeader( "GEOLON"  ,  ) ;
-	recTELARRAY.writeHeader( "ALTITUDE",  ) ;
-	*/
 	short int telid    = 0   ;
-	//long long int telclass = 0   ;
 	long long int subclass = 0   ;
 	double posx  = 0.0 ;
 	double posy  = 0.0 ;
@@ -779,7 +689,6 @@ int main( int argc, char* argv[] )
 	double focal_length = 0.0 ;
 	double fieldofview  = 0.0 ;
 	recTELARRAY.mapColumnToVar( "TELID"    , telid );
-	//recTELARRAY.mapColumnToVar( "TELCLASS" , telclass     );
 	recTELARRAY.mapColumnToVar( "SUBCLASS" , subclass );
 	recTELARRAY.mapColumnToVar( "POSX"     , posx );
 	recTELARRAY.mapColumnToVar( "POSY"     , posy );
@@ -788,9 +697,6 @@ int main( int argc, char* argv[] )
 	recTELARRAY.mapColumnToVar( "CAMAREA"  , cam_area );
 	recTELARRAY.mapColumnToVar( "FOCLEN"   , focal_length );
 	recTELARRAY.mapColumnToVar( "FOV"      , fieldofview );
-	//recTELARRAY.mapColumnToVar( "N_PIX"    , npix         );
-	//recTELARRAY.mapColumnToVar( "PIX_SIZE" , pix_size     );
-	//recTELARRAY.mapColumnToVar( "PIX_SEP"  , pix_sep      );
 	
 	totalEvents = chainTelConfig->GetEntries() ;
 	for( unsigned int i = 0 ; i <= totalEvents - 1 ; i++ )
@@ -828,7 +734,6 @@ int main( int argc, char* argv[] )
 	recGTI.writeHeader( "TSTOP"   , tstop ) ;
 	recGTI.writeHeader( "TIMESYS" , string( "TT" ) ) ;
 	recGTI.writeHeader( "TIMEREF" , string( "local" ) ) ;
-	//recGTI.writeHeader( "TIMEUNIT", string( "days" ) ) ;
 	recGTI.writeHeader( "TIMEUNIT", string( "s" ) ) ;
 	float gti_start  = 0.0 ;
 	float gti_stop   = 0.0 ;
@@ -856,11 +761,14 @@ int main( int argc, char* argv[] )
 		recGTI.write() ;
 		printf( " writing GTI: %9.4f to %9.4f \n", gti_start, gti_stop ) ;
 	}
+    
+    
 	
-	// cleanup
+	// cleanup event list records
 	recEVENTS.finishWriting();
 	recTELARRAY.finishWriting();
 	recGTI.finishWriting();
+    
 	anasumfile->Close();
 	
 	// check output file
@@ -1086,12 +994,8 @@ void calc_Avg_RADec_from_Pointing( TChain* ch, double& ra, double& dec )
 	{
 		cout << "calc_Avg_RADec_from_Pointing()" << endl;
 	}
-	//int    readMJD = 0   ;
-	//double readTi  = 0.0 ;  // time in seconds since beginning of day 'readMJD'
 	double readRA  = 0.0 ;
 	double readDE  = 0.0 ;
-	//ch->SetBranchAddress( "MJD"         , &readMJD ) ;
-	//ch->SetBranchAddress( "Time"        , &readTi  ) ;
 	ch->SetBranchAddress( "TelRAJ2000"  , &readRA ) ;
 	ch->SetBranchAddress( "TelDecJ2000" , &readDE ) ;
 	unsigned int npts = ch->GetEntries() ;
@@ -1279,49 +1183,6 @@ void calc_Avg_AltAz_from_Pointing( TChain* ch, double& alt, double& az )
 	}
 	az  = totAZ / npts ;
 	alt = totEL / npts ;
-	
-	/*
-	THE FOLLOWING IS NOT USED
-	FINDS THE ALT/AZIM AT THE MEDIAN TIME OF THE RUN
-	MAY SOMETIMES PICK LESS-THAN-USEFUL ALT/AZIM
-	
-	// Finding The 'middle' time/az/el
-	// aka, find the median time in the run,
-	// and grab that time's az/el
-	
-	// the row times in pointingDataReduced are from
-	// the whole seconds since the beginning of the
-	// run, so they might be as much as 0.999
-	// seconds off from the beginning of the run, so
-	// we're just going to get the
-	// Floor(numberOfRows/2)'th row and call it good
-	// for now.
-	int igrab = (int)(npts/2) ;
-	if (debug) cout << "  npts:" << npts  << endl;
-	if (debug) cout << "  grab:" << igrab << endl;
-	ch->GetEntry(igrab);
-	az  = AZ ;
-	alt = EL ;
-	if (debug) printf( "  az :%8.4f\n", az  ) ;
-	if (debug) printf( "  alt:%8.4f\n", alt ) ;
-	if (debug) cout << "  MJD:" << MJD << endl ;
-	if (debug) cout << "  TIM:" << TIM << endl ;
-	
-	// display middle 10 rows, for debugging
-	if (debug) {
-	    int debugmin = ((int)(npts/2)) - 4 ;
-	    int debugmax = ((int)(npts/2)) + 4 ;
-	    int i        = 0                   ;
-	    string mark = "blah" ;
-	    for( i=debugmin; i<=debugmax ; i++ ) {
-	        if ( i == igrab ) mark = ">" ;
-	        else              mark = " " ;
-	        ch->GetEntry(i);
-	        printf( " %si:%3d  MJD:%5d  Time:%7.4f  Az:%7.3f  El:%7.4f\n",
-	                mark.c_str(), i, MJD, TIM, AZ, EL ) ;
-	    }
-	}
-	*/
 	
 	// ResetBranchAddresses() of the chain we just used.
 	// Because if we dont, it will silently fail,

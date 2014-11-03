@@ -7,11 +7,10 @@ Author: Henrike Fleischhack
 To be used with CINT.
 
 */
-void calib_combine_lowgainpedestalfiles( TString list = "", TString calibdir = "" )
+void calib_combine_lowgainpedestalfiles( TString file = "", TString calibdir = "" )
 {
 	gSystem->Load( "$EVNDISPSYS/lib/libVAnaSum.so" );
-	
-	if( list = "" )
+	if( file == "" )
 	{
 		cout << "Usage: root calib_combine_lowgainpedestalfiles\( TString list [, TString calibdir ] \)" << endl ;
 		cout << "list should be the filename of a textfile containing two low gain calib runs per line " << endl;
@@ -33,7 +32,7 @@ void calib_combine_lowgainpedestalfiles( TString list = "", TString calibdir = "
 		TString name = run1;
 		name.Append( run2( 3, 4 ).Data() );
 		cout << name << endl;
-		a.combineLowGainPedestalFileForAllTelescopes( ntel , dir.Data(), run1.Data() , run2.Data() , name.Data() ) ;
+		a.combineLowGainPedestalFileForAllTelescopes( ntel , calibdir.Data(), run1.Data() , run2.Data() , name.Data() ) ;
 	}
 }
 

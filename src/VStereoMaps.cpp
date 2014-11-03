@@ -78,14 +78,20 @@ void VStereoMaps::setRegionToExclude( vector< VAnaSumRunParameterListOfExclusion
 {
 	vXTOEXCLUDE.clear();
 	vYTOEXCLUDE.clear();
-	vRTOEXCLUDE.clear();
+	//vRTOEXCLUDE.clear();
+	vR1TOEXCLUDE.clear();
+	vR2TOEXCLUDE.clear();
+	vAngTOEXCLUDE.clear();
 	for( unsigned int i = 0; i < iF.size(); i++ )
 	{
 		if( iF[i] )
 		{
 			vXTOEXCLUDE.push_back( iF[i]->fExcludeFromBackground_West );
 			vYTOEXCLUDE.push_back( iF[i]->fExcludeFromBackground_North );
-			vRTOEXCLUDE.push_back( iF[i]->fExcludeFromBackground_Radius );
+			//vRTOEXCLUDE.push_back( iF[i]->fExcludeFromBackground_Radius );
+			vR1TOEXCLUDE.push_back( iF[i]->fExcludeFromBackground_Radius1 );
+			vR2TOEXCLUDE.push_back( iF[i]->fExcludeFromBackground_Radius2 );
+			vAngTOEXCLUDE.push_back( iF[i]->fExcludeFromBackground_RotAngle );
 		}
 	}
 }
@@ -810,22 +816,11 @@ bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool 
 		double i_cy = 0.;
 		double i_binDist = 0.;
 		unsigned int i_nr = 0;
-		double i_rx1 = 0.;
-		double i_ry1 = 0.;
 		
 		for( int i = f_RE_xstart; i <= f_RE_xstopp; i++ )
 		{
-			i_rx1 = hmap_stereo->GetXaxis()->GetBinLowEdge( i );
-			
 			for( int j = f_RE_ystart; j <= f_RE_ystopp; j++ )
 			{
-				i_ry1 = hmap_stereo->GetYaxis()->GetBinLowEdge( j );
-				
-				// (GM - 20130327) introduces artifacts into the sky maps
-				//                 reason: bins are [x_low,x_up[, TRandom::Uniform(x1,x2) is ]x1,x2]
-				//                i_cx = fRandom->Uniform( i_rx1, i_rx1+f_RE_binXW );
-				//                i_cy = fRandom->Uniform( i_ry1, i_ry1+f_RE_binYW );
-				
 				i_cx =  hmap_stereo->GetXaxis()->GetBinCenter( i );
 				i_cy =  hmap_stereo->GetYaxis()->GetBinCenter( j );
 				
@@ -932,7 +927,10 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
 	int n_ex = 0;
 	double x_ex[1000];
 	double y_ex[1000];
-	double r_ex[1000];
+	//double r_ex[1000];
+	double r1_ex[1000];
+	double r2_ex[1000];
+	double ang_ex[1000];
 	for( unsigned int i = 0; i < 1000; i++ )
 	{
 		x_re[i] = 0.;
@@ -940,7 +938,10 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
 		r_re[i] = 0.;
 		x_ex[i] = 0.;
 		y_ex[i] = 0.;
-		r_ex[i] = 0.;
+		//r_ex[i] = 0.;
+		r1_ex[i] = 0.;
+		r2_ex[i] = 0.;
+		ang_ex[i] = 0;
 	}
 	
 	// tree with all reflected regions (only for correlated maps)
@@ -964,7 +965,10 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
 		hRE_regions->Branch( "n_ex", &n_ex, "n_ex/I" );
 		hRE_regions->Branch( "x_ex", x_ex, "x_ex[n_ex]/D" );
 		hRE_regions->Branch( "y_ex", y_ex, "y_ex[n_ex]/D" );
-		hRE_regions->Branch( "r_ex", r_ex, "r_ex[n_ex]/D" );
+		//hRE_regions->Branch( "r_ex", r_ex, "r_ex[n_ex]/D" );
+		hRE_regions->Branch( "r1_ex", r1_ex, "r1_ex[n_ex]/D" );
+		hRE_regions->Branch( "r2_ex", r2_ex, "r2_ex[n_ex]/D" );
+		hRE_regions->Branch( "ang_ex", ang_ex, "ang_ex[n_ex]/D" );
 		if( hAuxHisList )
 		{
 			hAuxHisList->Add( hRE_regions );
@@ -980,7 +984,10 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
 	{
 		x_ex[i] = vXTOEXCLUDE[i];
 		y_ex[i] = vYTOEXCLUDE[i];
-		r_ex[i] = vRTOEXCLUDE[i];
+		//r_ex[i] = vRTOEXCLUDE[i];
+		r1_ex[i] = vR1TOEXCLUDE[i];
+		r2_ex[i] = vR2TOEXCLUDE[i];
+		ang_ex[i] = vAngTOEXCLUDE[i];
 	}
 	
 	// off region parameters
@@ -1150,9 +1157,9 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
 								for( unsigned int ex = 0; ex < vXTOEXCLUDE.size(); ex++ )
 								{
 									// vXTOEXCLUDE and vYTOEXCLUDE are relative to sky map centre in rotated camera coordinates
-									if( ( x_t - vXTOEXCLUDE[ex] - fRunList.fWobbleWestMod ) * ( x_t - vXTOEXCLUDE[ex] - fRunList.fWobbleWestMod )
-											+ ( y_t - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod ) * ( y_t - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod )
-											< ( vRTOEXCLUDE[ex] + fRE_roffTemp ) * ( vRTOEXCLUDE[ex] + fRE_roffTemp ) )
+									if( ( x_t * TMath::Cos( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) - y_t * TMath::Sin( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) - vXTOEXCLUDE[ex] - fRunList.fWobbleWestMod ) * ( x_t * TMath::Cos( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) - y_t * TMath::Sin( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) - vXTOEXCLUDE[ex] - fRunList.fWobbleWestMod ) / ( ( vR1TOEXCLUDE[ex] + fRE_roffTemp ) * ( vR1TOEXCLUDE[ex] + fRE_roffTemp ) )
+                                                                                        + ( x_t * TMath::Sin( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) + y_t * TMath::Cos( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod ) * ( x_t * TMath::Sin( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) + y_t * TMath::Cos( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod ) / ( ( vR2TOEXCLUDE[ex] + fRE_roffTemp ) * ( vR2TOEXCLUDE[ex] + fRE_roffTemp ) )
+                                                                                        < 1. )
 									{
 										bExclude = true;
 									}
@@ -1738,7 +1745,7 @@ bool VStereoMaps::defineAcceptance()
 		vYTOEXCLUDE_CameraCoordinates.push_back( vYTOEXCLUDE[i] + fRunList.fWobbleNorthMod );
 	}
 	
-	fAcceptance->setRegionToExcludeAcceptance( vXTOEXCLUDE_CameraCoordinates, vYTOEXCLUDE_CameraCoordinates, vRTOEXCLUDE );
+	fAcceptance->setRegionToExcludeAcceptance( vXTOEXCLUDE_CameraCoordinates, vYTOEXCLUDE_CameraCoordinates, vR1TOEXCLUDE, vR2TOEXCLUDE, vAngTOEXCLUDE );
 	
 	fAcceptance->setSource( fRunList.fWobbleWestMod + fTargetShiftWest, fRunList.fWobbleNorthMod + fTargetShiftNorth,
 							sqrt( fRunList.fSourceRadius ), -1., fRunList.fmaxradius );

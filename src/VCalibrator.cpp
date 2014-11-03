@@ -794,7 +794,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 			tExtra_ChargeTree->Branch( "dead", &fExtra_dead->at( 0 ), "dead[nPix]/S" );
 			tExtra_ChargeTree->Branch( "use", &fExtra_use->at( 0 ), "use[nPix]/S" );
 			tExtra_ChargeTree->Branch( "HiLo", &fExtra_HiLo->at( 0 ), "HiLo[nPix]/S" );
-			tExtra_ChargeTree->Branch( "tzero", &fExtra_tzero->at( 0 ), "tzero[nPix]/S" );
+			tExtra_ChargeTree->Branch( "tzero", &fExtra_tzero->at( 0 ), "tzero[nPix]/D" );
 			
 		}
 		
@@ -1295,13 +1295,15 @@ void VCalibrator::readCalibrationData()
 			getmeanRMSPedvarsAllSumWindow( true ) = getmeanRMSPedvarsAllSumWindow( false );
 		}
 		// read low gain pedestals
-		else if( fNewLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
-		{
-			readPeds( fNewLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow() );
-		}
+		//old version (low gain run number)
 		else if( fLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
 		{
 			readPeds( fLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow() );
+		}
+		//new version (combined file)
+		else if ( fNewLowGainPedFileNameC[getTeltoAna()[i]].size() > 0  )
+		{
+			readPeds( fNewLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow() );
 		}
 		// no low gain peds available -> set low gain peds to high gain peds (not sure if this is a good idea)
 		else
@@ -1351,13 +1353,15 @@ void VCalibrator::readCalibrationData()
 		}
 		
 		// read low gain pedestals
-		else if( fNewLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
-		{
-			readPeds( fNewLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow_2() );
-		}
+		//old version (low gain run number)
 		else if( fLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
 		{
-			readPeds( fLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow_2() );
+			readPeds( fLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow() );
+		}
+		//new version (combined file)
+		else if ( fNewLowGainPedFileNameC[getTeltoAna()[i]].size() > 0  )
+		{
+			readPeds( fNewLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow() );
 		}
 		// (preli) fill high gain value if low value is not available
 		else
@@ -1931,17 +1935,18 @@ bool VCalibrator::readPeds_from_combinedfile( string iFile, bool iLowGain, unsig
 		}
 		
 	}//channel
-	
+
 	if( i_testCounter > 40 )
 	{
-		cout << "VCalibrator::readPeds_from_combinedfile(): Warning: did not find valid pedestal for " << i_testCounter << " channels, trying traditional pedestal text file." << endl;
+		cout << "VCalibrator::readPeds_from_combinedfile(): Warning: did not find valid pedestals for " << i_testCounter << " channels in " << iFile << ", trying traditional pedestal text file." << endl;
 		return false;
 	}
 	else
 	{
-		cout << "VCalibrator::readPeds_from_combinedfile(): did not find valid pedestal for " << i_testCounter << " channels " << endl;
+		cout << "VCalibrator::readPeds_from_combinedfile(): found valid pedestals for " << getPedvars( iLowGain, i_SumWindow, -99. ).size() - i_testCounter << " channels in " << iFile << "." << endl;
 		return true;
 	}
+
 }
 
 bool VCalibrator::readPeds_from_grisufile( bool iLowGain, unsigned int i_SumWindow )
@@ -2897,6 +2902,7 @@ void VCalibrator::getCalibrationRunNumbers()
 			for( unsigned int i = 0; i < getNTel(); i++ )
 			{
 				fPedFileNameC[i] = "";
+				fLowGainPedFileNameC[i] = "";
 			}
 		}
 		// calibration run numbers are taken from DB

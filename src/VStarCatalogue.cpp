@@ -210,10 +210,6 @@ bool VStarCatalogue::readCatalogue()
 		{
 			itemp = gSystem->Getenv( "VERITAS_EVNDISP_AUX_DIR" );
 		}
-		else if( gSystem->Getenv( "VERITAS_EVNDISP_ANA_DIR" ) )
-		{
-			itemp = gSystem->Getenv( "VERITAS_EVNDISP_ANA_DIR" );
-		}
 		if( itemp.size() > 0 )
 		{
 			fCatalogue   = itemp + "/AstroData/Catalogues/" + fCatalogue;

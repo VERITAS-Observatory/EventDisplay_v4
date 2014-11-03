@@ -24,8 +24,8 @@ RUN="$2"
 #####################################
 # qsub options
 #   _M_ = -; _X_ = " "
+QSUBOPT="_M_P_X_cta_high_X__M_js_X_8000"
 QSUBOPT="_M_P_X_cta_high"
-QSUBOPT="_M_P_X_cta_high_X__M_js_X_5000"
 
 #####################################
 # output directory for script parameter files
@@ -36,7 +36,7 @@ mkdir -p $PDIR
 # analysis dates and table dates
 
 TDATE="d20140309"
-DATE="d20140718"
+DATE="d20141027"
 
 #####################################
 # reconstruction IDs
@@ -78,6 +78,7 @@ then
 # reduced arrays data sets
    SITE=( "prod2-LeoncitoPP-NS" )
    ARRAY="subArray.2a.list"
+   ARRAY="subArray.20141011.dat"
 ##########################################################
 # SOUTH - merged simulation files
 elif [[ $P2 == "SM" ]]

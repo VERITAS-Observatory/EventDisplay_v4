@@ -172,10 +172,13 @@ void VImageCleaning::cleanImagePedvars( double hithresh, double lothresh, double
 /*!
    simple time cleaning
 
-   \par hithresh image threshold
-   \par lothresh border threshold
-   \par brightthresh bright pixel threshold
+   Image cleaning method keyword in runparameter file: "TIMETWOLEVEL"
+
+   \par hithresh     image threshold
+   \par lothresh     border threshold
+   \par brightthresh bright pixel threshold (for which time difference is calculated)
    \par timediff time constraint between next neighbor pixels
+
 */
 void VImageCleaning::cleanImagePedvarsTimeDiff( double hithresh, double lothresh, double brightthresh, double timediff )
 {
@@ -197,25 +200,33 @@ void VImageCleaning::cleanImagePedvarsTimeDiff( double hithresh, double lothresh
 	
 	for( unsigned int i = 0; i < i_nchannel; i++ )
 	{
+		// check if pixel is valid
 		if( fData->getDetectorGeo()->getAnaPixel()[i] < 1 || fData->getDead( fData->getHiLo()[i] )[i] )
 		{
 			continue;
 		}
 		i_pedvars_i = fData->getPedvars( fData->getCurrentSumWindow()[i], fData->getHiLo()[i] )[i];
 		
+		//////////////////
+		// image pixel
 		if( fData->getSums()[i] > hithresh * i_pedvars_i )
 		{
+			// loop over all neighbours
 			for( unsigned int z = 0; z < fData->getDetectorGeo()->getNNeighbours()[i]; z++ )
 			{
 				l = fData->getDetectorGeo()->getNeighbours()[i][z];
 				if( l < i_nchannel )
 				{
 					i_pedvars_l = fData->getPedvars( fData->getCurrentSumWindow()[l], fData->getHiLo()[l] )[l];
+					// image pixel has:
+					//   - one neighbour pixels above the border threshold AND
+					//     with a time difference smaller than timediff
 					if( fData->getSums()[l] > lothresh * i_pedvars_l  &&  fabs( fData->getTZeros()[i] - fData->getTZeros()[l] ) < timediff )
 					{
 						fData->setImage( i, true );
 					}
 				}
+				// border pixel
 				fData->setBorder( i, false );
 				for( unsigned int j = 0; j < fData->getDetectorGeo()->getNNeighbours()[i]; j++ )
 				{
@@ -223,7 +234,11 @@ void VImageCleaning::cleanImagePedvarsTimeDiff( double hithresh, double lothresh
 					if( k < i_nchannel )
 					{
 						i_pedvars_k = fData->getPedvars( fData->getCurrentSumWindow()[k], fData->getHiLo()[k] )[k];
-						if( !fData->getImage()[k] && fData->getSums()[k] > lothresh * i_pedvars_k  &&  fabs( fData->getTZeros()[i] - fData->getTZeros()[k] ) < timediff )
+						// border pixel has:
+						//   - one neighbour pixels above the border threshold AND
+						//     with a time difference smaller than timediff
+						if( !fData->getImage()[k] && fData->getSums()[k] > lothresh * i_pedvars_k
+						 &&  fabs( fData->getTZeros()[i] - fData->getTZeros()[k] ) < timediff )
 						{
 							fData->setBorder( k, true );
 						}
@@ -231,12 +246,14 @@ void VImageCleaning::cleanImagePedvarsTimeDiff( double hithresh, double lothresh
 				}
 			}
 		}
+		// bright pixel threshold
 		if( fData->getSums()[i] > brightthresh  * i_pedvars_i )
 		{
 			fData->setBrightNonImage( i, true );
 		}
 	}
 	
+	////////////////////////////////////////////////////////////////////////////////////
 	// (preli) set the trigger vector in MC case (preli)
 	// trigger vector are image/border tubes
 	if( fData->getReader() )
@@ -670,7 +687,7 @@ int VImageCleaning::NNGroupSearchProbCurve( int type, TF1* fProbCurve, float Pre
 				double dt2 = fabs( TIMES[PixNum2] - TIMES[idxp] );
 				float charges2[2] = {mincharge, INTENSITY[idxp]};
 				LocMin( 2, charges2, mincharge );
-				float times2[2] = {dT, dt2};
+				float times2[2] = {(float)dT, (float)dt2 };
 				float maxtime = 1E6;
 				LocMax( 2, times2, maxtime );
 				if( maxtime > CoincWinLimit || maxtime > fProbCurve->Eval( mincharge ) )
@@ -711,7 +728,7 @@ int VImageCleaning::NNGroupSearchProbCurve( int type, TF1* fProbCurve, float Pre
 					double dt3 = fabs( TIMES[idxp] - TIMES[idxm] );
 					float charges3[2] = {mincharge, INTENSITY[idxm]};
 					LocMin( 2, charges3, mincharge );
-					float times3[4] = {maxtime, dT, dt2, dt3};
+					float times3[4] = { (float)maxtime, (float)dT, (float)dt2, (float)dt3 };
 					LocMax( 4, times3, maxtime );
 					
 					if( maxtime > CoincWinLimit || maxtime > fProbCurve->Eval( mincharge ) )
@@ -836,7 +853,7 @@ int VImageCleaning::NNGroupSearchProbCurveRelaxed( int type, TF1* fProbCurve, fl
 				dt3 = fabs( TIMES[pix1] - TIMES[pix3] );
 				float charges2[3] = {mincharge, INTENSITY[pix3], INTENSITY[pix2]};
 				LocMin( 3, charges2, mincharge );
-				float times2[3] = {dT, dt2, dt3};
+				float times2[3] = {(float)dT, (float)dt2, (float)dt3};
 				LocMax( 3, times2, maxtime );
 				
 				if( maxtime < CoincWinLimit && maxtime < fProbCurve->Eval( mincharge ) )
@@ -1311,7 +1328,7 @@ float VImageCleaning::ImageCleaningCharge( int type, int& ngroups )
 	unsigned int numpix = fData->getDetectorGeo()->getNumChannels();
 	float corr = 1.;
 	//                 [p.e.]4nn   2+1      3nn       2nn      Bound.   Bound Ref Charge
-	float PreThresh[6] = {2.0 / corr, 3.0 / corr, 2.8 / corr, 5.2 / corr, 1.8 / corr, 4.0 / corr};
+	float PreThresh[6] = { (float)(2.0 / corr), (float)(3.0 / corr), (float)(2.8 / corr), (float)(5.2 / corr), (float)(1.8 / corr), (float)(4.0 / corr) };
 	// GMGM hardcoded number of telescope type, why is this not an array?
 	if( type == 1 )
 	{
@@ -1480,16 +1497,6 @@ float VImageCleaning::ImageCleaningCharge( int type, int& ngroups )
 			ncorepix++;
 		}
 	}
-	float imagecharges[ncorepix];
-	int cnt = 0;
-	for( unsigned int p = 0; p < numpix; p++ )
-	{
-		if( VALIDITY[p] > 1.9 && VALIDITY[p] < 6.1 )
-		{
-			imagecharges[cnt] = INTENSITY[p];
-			cnt++;
-		}
-	}
 	
 	//set rings of boundaries for newly found core pixels
 	SetNeighborRings( type, &VALIDITYBOUNDBUF[0], &TIMESReSearch[0], &REFTHRESH[0] );
@@ -1596,7 +1603,7 @@ float VImageCleaning::ImageCleaningCharge( int type, int& ngroups )
 				float dT = fabs( TIMES[idx] - TIMESReSearch[idx] );
 				//fProbCurveBound->SetParameter( 1, PreThresh[5] );
 				fProbCurveBound->SetParameter( 1, charge );
-				float charges[2] = {INTENSITY[idx], fProbCurveBound->GetParameter( 1 )};
+				float charges[2] = {INTENSITY[idx], (float)fProbCurveBound->GetParameter( 1 )};
 				float refth = 0.;
 				LocMin( 2, charges, refth );
 				//fProbCurveBound->SetParameter( 2, 2.*( 1. + ncorepix * ( iRing )*pow( double( iRing + 1 ), 2. ) ) );
@@ -1685,7 +1692,6 @@ void VImageCleaning::cleanNNImageFixed()
 	
 	int type = getTrigSimTelType( fData->getTelType( fData->getTelID() ) );
 	
-	float sizecheck = 0;
 	int ngroups = 0;
 	
 	//measure IPR
@@ -1717,7 +1723,6 @@ void VImageCleaning::cleanNNImageFixed()
 			}
 		}
 	}
-	sizecheck = ImageCleaningCharge( type, ngroups );
 	//set pixel's flags
 	unsigned int ncorepix = 0;
 	//    unsigned int nimagepix=0;
@@ -1736,9 +1741,7 @@ void VImageCleaning::cleanNNImageFixed()
 			}
 		}
 		
-		//        float BorderEdge=2.*sqrt(fNSBscale)/sqrt(0.6)*pow(sizecheck/40.,0.76);
 		//float BorderEdge=2.*sqrt(fNSBscale)/sqrt(0.6)*pow(maxcharge/7.,0.76);
-		//cout<<"BorderEdge:"<<BorderEdge<<" maxcharge:"<<maxcharge<<" ratio:"<<maxcharge/sizecheck<<endl;
 		for( unsigned int i = 0; i < i_nchannel; i++ )
 		{
 			fData->setImage( i, false );
@@ -1878,16 +1881,10 @@ void VImageCleaning::FillIPR( unsigned int type ) //tel type
 	float  gIPRUp = 1500.; //charge in FADC counts
 	float  gIPRLo = 0.;
 	float  gIPRStep = ( gIPRUp - gIPRLo ) / float( fIPRdim );
-	float THRESH[fIPRdim];
 	float RATE[fIPRdim];
-	float RATEFlashCam[fIPRdim];
-	float RATEall[fIPRdim];
 	for( unsigned int thbin = 0; thbin < fIPRdim; thbin++ )
 	{
 		RATE[thbin] = 0;
-		RATEall[thbin] = 0;
-		RATEFlashCam[thbin] = 0;
-		THRESH[thbin] = gIPRLo + float( thbin ) * gIPRStep;
 	}
 	
 	//loop over pixels
@@ -1911,9 +1908,6 @@ void VImageCleaning::FillIPR( unsigned int type ) //tel type
 				{
 					IPR[type][thbin] += 1.;
 				}
-				//if(INTENSITYFLASH[p]>val) RATEFlashCam[thbin]+=1.;
-				//if((INTENSITY[p]>val || INTENSITIES[1][p])){cout<<val<<" Cnts (max/all):"<<RATE[thbin]<<"/"<<RATEall[thbin]<<endl;}
-				//for(int s=0;s<INTENSITIES[0][p];s++){if(INTENSITIES[s+1][p]>val) RATEall[thbin]+=1.;}
 			}
 			
 		}
@@ -1922,7 +1916,6 @@ void VImageCleaning::FillIPR( unsigned int type ) //tel type
 	std::cout<<"IPR scan  (TelTypes):  Type1   Type2   Type3   Type4"<<std::endl;
 	for(unsigned int th=0;th<fIPRdim;th++)
 	{
-	    //std::cout<<"Thresh[fadc]"<<float(th)*gIPRStep<<"  Cnts: "<<IPR[1][th]<<" "<<IPR[2][th]<<" "<<IPR[3][th]<<" "<<IPR[4][th]<<std::endl;
 	    if(th==0) printf("NumOfmeasurements:      %5.0f  %5.0f  %5.0f  %5.0f \n",IPR[1][th],IPR[2][th],IPR[3][th],IPR[4][th]);
 	    if(th>0 ) printf("DT[fadc]:%3.2f counts:  %5.0f  %5.0f  %5.0f  %5.0f \n",IPR[0][th],IPR[1][th],IPR[2][th],IPR[3][th],IPR[4][th]);
 	}
@@ -1972,7 +1965,7 @@ TGraphErrors* VImageCleaning::GetIPRGraph( unsigned int type, float ScanWindow )
 
 /*!
   Image cleaning routine using pixel timing information
-  based on Nepomuks PhD thesis time-cluster cleaning algorithm
+  based on Nepomuk's PhD thesis time-cluster cleaning algorithm
    - uses fixed time differences for discrimination of pixels/clusters
    - adjusts time difference according to the time gradient
    - handles single core pixel
@@ -1981,7 +1974,7 @@ TGraphErrors* VImageCleaning::GetIPRGraph( unsigned int type, float ScanWindow )
    \par hithresh image threshold
    \par lothresh border threshold
    \par brightthresh bright pixel threshold
-   \par timeCutPixel time diffeence between pixels
+   \par timeCutPixel time difference between pixels
    \par timeCutCluster time difference between clusters
    \par minNumPixel minimum number of pixels in a cluster
    \par loop_max number of loops

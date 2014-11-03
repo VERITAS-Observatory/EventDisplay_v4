@@ -1197,8 +1197,6 @@ void VPlotRunSummary::writeRunTable( string ioutfile, bool iPhases, bool iSignif
 	}
 	fillDailyRates( iCorrectForDeadTimes );
 	
-	double ig = 1.;
-	
 	is << "\\documentclass[a4paper]{article}" << endl;
 	is << "\\usepackage{longtable}" << endl;
 	is << "\\usepackage{lscape}" << endl;
@@ -1304,7 +1302,7 @@ void VPlotRunSummary::writeRunTable( string ioutfile, bool iPhases, bool iSignif
 				{
 					is << fDayRate[t] << "$\\pm$" << fDayRateE[t] << " & ";
 					// mean Crab rates for September 2006 (2-tel)
-					if( c->runOn < 31600 )
+/*					if( c->runOn < 31600 )
 					{
 						ig = 3.9;
 					}
@@ -1330,7 +1328,7 @@ void VPlotRunSummary::writeRunTable( string ioutfile, bool iPhases, bool iSignif
 					}
 					//		  is << fDayRate[t]/ig << "$\\pm$";
 					// don't print daily rate in Crab units
-					//		  is << fDayRateE[t]/ig << " & ";
+					//		  is << fDayRateE[t]/ig << " & "; */
 					if( !iSignificancePerHour )
 					{
 						is << fDaySigni[t];

@@ -265,14 +265,10 @@ double VEmissionHeightCalculator::getTelescopeDistanceSC( unsigned int iTel1, un
 		return -999.;
 	}
 	
-	double s[3], t1[3], t2[3];
+	double t1[3], t2[3];
 	
 	az /= TMath::RadToDeg();
 	z  /= TMath::RadToDeg();
-	
-	s[0]    = sin( z ) * cos( az );
-	s[1]    = sin( z ) * sin( az );
-	s[2]    = cos( z );
 	
 	t1[0] = fTelX[iTel1];
 	t1[1] = fTelY[iTel1];

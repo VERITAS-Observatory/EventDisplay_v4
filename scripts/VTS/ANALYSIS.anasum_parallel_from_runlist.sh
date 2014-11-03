@@ -99,7 +99,7 @@ elif [[ $CUTS = *hard3tel* ]]; then
 elif [[ $CUTS = *hardExt2tel* ]]; then
     CUT="NTel2-ExtendedSource-Hard"
 elif [[ $CUTS = *frogs* ]]; then
-    CUT="N2_001-003-005CU_index4.3"
+    CUT="FROGS_NTel2_001-003-005CU_index2.5"
 elif [[ $CUTS = *BDT-moderate* ]]; then
     CUT="NTel2-PointSource-Moderate-TMVA-BDT"
 else
@@ -184,6 +184,7 @@ for RUN in ${RUNS[@]}; do
     fi
     TELTOANA=`echo $RUNINFO | awk '{print "T"$(4)}'`
     echo "RUN $RUN at epoch $EPOCH and atmosphere $ATMO (Telescopes $TELTOANA)"
+    echo "File $INDIR/$RUN.mscw.root"
     
     # do string replacements
     EFFAREARUN=${EFFAREA/VX/$EPOCH}
@@ -194,6 +195,7 @@ for RUN in ${RUNS[@]}; do
 
     if [[ $CUTS = *frogs* ]]; then
        RADACCRUN="radialAcceptance-v451-auxv01-Cut-NTel2-PointSource-Moderate-GEO-V6-T1234.root"
+       EFFAREARUN="effArea-v461-141017-CARE-N2_001-003-005CU_index2.5-GEO-V6-ATM21-T1234.root"
     fi
 
     

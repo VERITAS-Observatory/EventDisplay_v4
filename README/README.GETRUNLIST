@@ -39,6 +39,7 @@ Optional Flags:
 	-g	Get/Download Runs
 		or
 	-c	Checks to see if run(s) is(are) on disk
+	-n	(With -g or -c) do *not* check md5 sums
 	-x	Find Laser Runs - these will be downloaded too
 	-t	Output ED style Time Mask
 	-f	Also display/download UV Filter and Reduced HV Runs

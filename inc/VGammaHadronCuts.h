@@ -162,10 +162,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		unsigned int fAngResContainmentProbability;
 		
 		//////////////////////////
-		// FROGS
-		string  fFileNameFrogsCut;
-		
-		//////////////////////////
 		// energy dependent cuts
 		map< string, TGraph* > fEnergyDependentCut;
 		
@@ -452,6 +448,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			return fUseOrbitalPhaseCuts;
 		}
 		
-		ClassDef( VGammaHadronCuts, 52 );
+		ClassDef( VGammaHadronCuts, 54 );
 };
 #endif

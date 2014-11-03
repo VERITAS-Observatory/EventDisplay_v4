@@ -276,11 +276,6 @@ void VDSTReader::setTrigger( vector<bool> iImage, vector<bool> iBorder )
 	       fNumberofFullTrigger[fTelID]++;
 	}
 	*/
-	double x = 0.;
-	if( iImage.size() != iBorder.size() )
-	{
-		x = 5.;
-	}
 }
 
 VMonteCarloRunHeader* VDSTReader::getMonteCarloHeader()

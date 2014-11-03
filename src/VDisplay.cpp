@@ -1390,7 +1390,12 @@ void VDisplay::setFADCText()
 		iFADCtext.Form( ", FADC %d/%d", iFADCmodule, iFADCchannel );
 	}
 	
-	sprintf( cTemp, "telescope %d channel %d%s (NN %d)", fTelescope + 1, fSelectedChan - 200000, iFADCtext.Data(), fEventLoop->getDetectorGeometry()->getNNeighbours()[iChannel] );
+	sprintf( cTemp, "telescope %d channel %d%s (NN %d: ", fTelescope + 1, fSelectedChan - 200000, iFADCtext.Data(), fEventLoop->getDetectorGeometry()->getNNeighbours()[iChannel] );
+	for( unsigned int n = 0; n < fEventLoop->getDetectorGeometry()->getNNeighbours()[iChannel]; n++ )
+	{
+	    sprintf( cTemp, "%s %d", cTemp, fEventLoop->getDetectorGeometry()->getNeighbours()[iChannel][n] );
+        }
+	sprintf( cTemp, "%s)", cTemp );
 	fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 	// L1/HV/currents (if available)
 	if( fEventLoop->getDBPixelDataReader() && fEventLoop->getDBPixelDataReader()->getDBStatus() )
@@ -3312,10 +3317,10 @@ void VDisplay::dumpImageBorderPixels()
 		{
 			fEventLoop->setTelID( fEventLoop->getTeltoAna()[i] );
 			
-			map< int, unsigned int > i_ImagePixel;
-			map< int, unsigned int >::iterator it_ImagePixel;
-			map< int, unsigned int > i_BorderPixel;
-			map< int, unsigned int >::iterator it_BorderPixel;
+			multimap< double, unsigned int > i_ImagePixel;
+			multimap< double, unsigned int >::iterator it_ImagePixel;
+			multimap< double, unsigned int > i_BorderPixel;
+			multimap< double, unsigned int >::iterator it_BorderPixel;
 			for( unsigned int j = 0; j < fEventLoop->getImage().size(); j++ )
 			{
 				if( j >= fEventLoop->getSums().size() )
@@ -3328,11 +3333,11 @@ void VDisplay::dumpImageBorderPixels()
 				}
 				if( fEventLoop->getImage()[j] )
 				{
-					i_ImagePixel[( int )fEventLoop->getSums()[j]] = j;
+					i_ImagePixel.insert( make_pair( fEventLoop->getSums()[j], j ) );
 				}
 				if( fEventLoop->getBorder()[j] )
 				{
-					i_BorderPixel[( int )fEventLoop->getSums()[j]] = j;
+					i_BorderPixel.insert( make_pair( fEventLoop->getSums()[j], j ) );
 				}
 			}
 			if( i_ImagePixel.size() > 0 )

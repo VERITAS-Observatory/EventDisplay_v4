@@ -65,10 +65,8 @@ int main( int argc, char* argv[] )
 	string iOutFil = argv[2];
 	
 	Int_t runOn;
-	Int_t nON, nOFF;
-	nON = nOFF = 0;
 	Double_t OffNorm, elevationOn, elevationOff, azimuthOn, azimuthOff;
-	Double_t tOn;
+	Double_t tOn = 0.;
 	Double_t tObs, alphaNorm;
 	tObs = 0.;
 	alphaNorm = 0.;
