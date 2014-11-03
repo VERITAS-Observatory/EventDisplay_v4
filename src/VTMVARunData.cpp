@@ -632,7 +632,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				// check sanity
 				if( iEnergyCut_Log10TeV_min.size() < 2 )
 				{
-					cout << cout << "VTMVARunData::readConfigurationFile error: need at least two energy bins " << iEnergyCut_Log10TeV_min.size() << endl;
+					cout << "VTMVARunData::readConfigurationFile error: need at least two energy bins " << iEnergyCut_Log10TeV_min.size() << endl;
 					return false;
 				}
 				// fill maximum bins
