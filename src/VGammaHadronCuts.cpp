@@ -1486,7 +1486,6 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 	{
 		return false;
 	}
-        return true;
 	
 	double ShowerGoodnessCut_max = -99.;
 	if( getEnergyDependentCut( "ShowerGoodness" ) && getEnergyDependentCut( "ShowerGoodness" )->GetN() > 0 )

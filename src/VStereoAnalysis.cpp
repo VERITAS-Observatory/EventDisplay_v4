@@ -541,7 +541,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			getDerotatedCoordinates( icounter, i_UTC, iXoff, fEVDVersionSign * iYoff,  i_xderot, i_yderot );
 			
 			// gamma/hadron cuts
-//			bIsGamma = fCuts->isGamma( i, false, fIsOn );
+			bIsGamma = fCuts->isGamma( i, false, fIsOn );
 			
 			// fill on/offstereo maps and direction cut
 			i_theta2 = -99;
