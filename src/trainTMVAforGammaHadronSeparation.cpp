@@ -526,7 +526,6 @@ int main( int argc, char* argv[] )
 			gSystem->mkdir( iOutputFileNameCompleteDir.c_str() );
 			string iOutputFileNameComplete( iOutputFileNameCompleteDir + iTempS2.str() );
 			rename( iOutputFileName.c_str(), iOutputFileNameComplete.c_str() );
-			cout << iOutputFileName << " " << iOutputFileNameCompleteSubDir << " " << iOutputFileNameCompleteDir << " "<< iOutputFileNameComplete << endl;
 			cout << "Complete TMVA output root-file: " << iOutputFileNameComplete << endl;
 
 			// rename .bin.root file to .root-file
