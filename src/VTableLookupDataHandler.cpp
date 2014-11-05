@@ -1511,17 +1511,31 @@ bool VTableLookupDataHandler::terminate( TNamed* iM )
 		if( finputfile.size() > 0 && !fIsMC )
 		{
 			TFile* inpMscwFile = new TFile( finputfile[0].c_str(), "READ" ) ;
-			TTree* iTree       = ( TTree* )inpMscwFile->Get( "pointingDataReduced" );
-			TTree* newtree     = iTree->CloneTree();
 			fOutFile->cd();
-			newtree->Write();
-			
+			TTree* iTree       = ( TTree* )inpMscwFile->Get( "pointingDataReduced" );
+			if( iTree ) 
+			{
+				TTree* newtree     = iTree->CloneTree();
+				if( newtree ) 
+				{
+					newtree->Write();
+				}
+				else 
+				{
+					cout << "VTableLookupDataHandler::terminate Warning: Unable to clone tree " << iTree->GetName() << endl;
+				}
+			}
+			else 
+			{
+				cout << "VTableLookupDataHandler::terminate Warning: Unable to find tree pointingDataReduced in file " << inpMscwFile->GetName() << endl;
+			}	
+
 			TTree* jTree = ( TTree* )inpMscwFile->Get( "deadPixelRegistry" ) ;
 			// deadPixelRegistry may not exist, only try to copy it if it's there
 			if( jTree )
 			{
-				TTree* newtree2 = jTree->CloneTree() ;
 				fOutFile->cd() ;
+				TTree* newtree2 = jTree->CloneTree() ;
 				newtree2->Write() ;
 			}
 			
