@@ -52,7 +52,7 @@ fi
 
 ###########################
 # IRFs
-IRFVERSION="v451"
+IRFVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .`
 AUXVERSION="auxv01"
 
 # Run init script
