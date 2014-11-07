@@ -84,6 +84,7 @@ class VStereoHistograms
 		
 		// energy histograms (logarithmic energy axis)
 		TH1D* herecCounts;                        //!< reconstructed energy
+		TH1D* hRealDuration1DtimeBinned;          //!< duration of the time bin taking time mask and dead time fraction into account
 		TH2D* herecCounts2DtimeBinned;            //!< reconstructed energy vs observing time (2D)
 		TH2D* herecCounts2D_vs_distance;              //!< reconstructed energy vs distance to camera centre
 		//time-dependent differential energy spectrum

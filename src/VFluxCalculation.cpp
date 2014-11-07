@@ -103,6 +103,8 @@ void VFluxCalculation::resetRunList()
 	fRunList.clear();
 	fRunMJD.clear();
 	fRunTOn.clear();
+	fIntraRunTOn.clear();
+	fTimeBinDuration.clear();
 	fRunDeadTime.clear();
 	fRunZe.clear();
 	fRunWobbleOffset.clear();
@@ -250,7 +252,9 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
 		fRunList.push_back( fData->runOn );
 		fRunMJD.push_back( fData->MJDOn );
 		fRunTOn.push_back( fData->tOn );
+
 		fRunDeadTime.push_back( fData->DeadTimeFracOn );
+
 		// mean zenith angle for this run
 		if( fData->elevationOn > 1. )
 		{
@@ -547,7 +551,6 @@ void VFluxCalculation::getIntegralEffectiveArea()
 			double ieff_mean = 0.;
 			double ieff_meanA = 0.;
 			double x0, x1, x2;
-			
 			/////////////////////////////////////////////////////////////////////
 			// calculate spectral weighted integral effective area
 			fRunEffArea[i] = 0.;
@@ -586,7 +589,11 @@ void VFluxCalculation::getIntegralEffectiveArea()
 			if( fTimebinned )
 			{
 				vector < double > i_IntraEffArea;
-				
+				vector < double > i_IntraEffArea_before;
+				//--- this vector must have the same number of entry as there is time bin
+				for(unsigned int ii = 0 ; ii < fIntraRunTOn[i].size(); ii++){
+					 i_IntraEffArea.push_back(0.);
+				}
 				// read effective area graphs for time binned intra run light curves
 				TGraph2DErrors* g_time = ( TGraph2DErrors* )gDirectory->Get( "gTimeBinnedMeanEffectiveArea" );
 				// find 2D graph with time dependent effective areas
@@ -609,45 +616,72 @@ void VFluxCalculation::getIntegralEffectiveArea()
 				double* Zaxis = g_time->GetZ();
 				double InterEffArea = 0.;
 				
-				// Time of first bin
-				double Time = 0.;
-				if( Zaxis )
+				double Uedge_time_bin = fTimeBinDuration[i];
+				int time_bin_counter = 0;
+
+				// loop over the different point of the 2D graph with Mean effective area per time bin
+				//----- during the integration process mixing of effective area value corresponding to different time bin is avoided with the condition:  ieff_int > 0
+				for(int pt_2Dgraph = 1 ; pt_2Dgraph<g_time->GetN()-1; pt_2Dgraph++)
 				{
-					Time = Zaxis[0];
+					 //int pt_2Dgraph = 1 + (i_time)*nb_en_bin ;
+					 double Time = 	Zaxis[pt_2Dgraph];
+					 // Finding the time bin corresponding to the current Time effective area
+					 if(Time > Uedge_time_bin){
+						  Uedge_time_bin+=fTimeBinDuration[i];
+						  time_bin_counter++;
+						  InterEffArea=0;
+						  // Some time bin might be empty of events, there is no effective area for this time bin, so this time bin must be skipped
+						  while(Time>Uedge_time_bin){
+								Uedge_time_bin+=fTimeBinDuration[i];
+								time_bin_counter++;
+								InterEffArea=0;
+						  }
+					 }
+					 x0 = Xaxis[pt_2Dgraph-1];
+					 x2 = Xaxis[pt_2Dgraph+1];
+					 x1 = Xaxis[pt_2Dgraph];
+					 ieff_mean = Yaxis[pt_2Dgraph];
+					 					 
+					 ieff_int = integrateEffectiveAreaInterval( x0, x1, x2, ieff_mean );
+					 
+					 if( ieff_int > 0. ){	
+						  InterEffArea += ieff_int;
+					 }
+					 else{
+						  continue;
+					 }
+					 i_IntraEffArea[time_bin_counter]=InterEffArea;
 				}
 				
-				// loop over all points in effective area histogram
-				for( int b = 1; b < g_time->GetN(); b++ )
-				{
-					// get energies and effective areas
-					x0 = Xaxis[b - 1];
-					x2 = Xaxis[b + 1];
-					x1 = Xaxis[b];
-					ieff_mean = Yaxis[b];
-					
-					ieff_int = integrateEffectiveAreaInterval( x0, x1, x2, ieff_mean );
-					if( ieff_int > 0. )
-					{
-						InterEffArea += ieff_int;
-					}
-					else
-					{
-						continue;
-					}
-					
-					// increment time bin counter
-					if( Zaxis[b] > Time )
-					{
-						Time = Zaxis[b];
-						i_IntraEffArea.push_back( InterEffArea );
-						InterEffArea = 0;
-					}
-				}
-				i_IntraEffArea.push_back( InterEffArea );
 				fIntraRunEffArea.push_back( i_IntraEffArea );
+				
+/*
+				double mean_run_eff_area = 0;
+				double total_on = 0;
+				double total_off = 0;
+				double total_diff = 0;
+				for(unsigned int ii = 0 ; ii < i_IntraEffArea.size(); ii++){
+					 std::cout<<"i_IntraEffArea["<<ii<<"] "<<i_IntraEffArea[ii]<<" NOn "<< fIntraRunNon[i][ii] <<" Noff "<<fIntraRunNoff[i][ii] <<std::endl;;
+					 mean_run_eff_area +=i_IntraEffArea[ii]*fIntraRunNon[i][ii];
+					 total_on += fIntraRunNon[i][ii];
+					 total_off += fIntraRunNoff[i][ii];
+					 total_diff += fIntraRunNdiff[i][ii];
+				}
+				std::cout<<"RUN "<<fRunList[i] <<std::endl;
+				std::cout<<"mean_run_eff_area "<<mean_run_eff_area/total_on <<std::endl;
+				std::cout<<"run eff area      "<<fRunEffArea[i] <<std::endl;
+				std::cout<<"total Non from time binned "<<total_on <<" from run "<< fRunNon[i]<<std::endl;
+				std::cout<<"total Noff from time binned "<<total_off <<" from run "<< fRunNoff[i]<<std::endl;
+				std::cout<<"total Ndiff from time binned "<<total_diff <<" from run "<< fRunNdiff[i]<<std::endl;
+*/
 			}
+
+
+
 		}
 	}
+
+
 	
 	//////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////
@@ -655,6 +689,7 @@ void VFluxCalculation::getIntegralEffectiveArea()
 	
 	// calculate mean effective area for all runs (weighted by observation time)
 	// (expect run = -1 in last element of vector)
+	//(why not weighting by number of event in run since the effective area for the run in average event wise?)
 	double iTTot = 0.;
 	for( unsigned int i = 0; i < fRunList.size(); i++ )
 	{
@@ -974,16 +1009,18 @@ void VFluxCalculation::calculateFluxes()
 		// Time BINs
 		if( i < fIntraRunEffArea.size() )
 		{
+
 			for( unsigned int t = 0; t < fIntraRunEffArea[i].size(); t++ )
 			{
-				// effective area * observation time / dead time
+
 				if( fRunList[i] > 0 )
 				{
-					iEffNorm = fIntraRunEffArea[i][t] * fRunTOn[i] * ( 1. - fRunDeadTime[i] ) / ( double )( fIntraRunEffArea[i].size() );
+					 iEffNorm = fIntraRunEffArea[i][t] * fIntraRunTOn[i][t] ;
 				}
 				else
 				{
-					iEffNorm = fIntraRunEffArea[i][t] * iTot / ( double )( fIntraRunEffArea[i].size() );
+					 iEffNorm = fIntraRunEffArea[i][t] * fIntraRunTOn[i][t] ;
+					 //iEffNorm = fIntraRunEffArea[i][t] * iTot / ( double )( fIntraRunEffArea[i].size() );
 				}
 				
 				
@@ -992,8 +1029,8 @@ void VFluxCalculation::calculateFluxes()
 				{
 					if( fIntraRunUFL[i][t] < 0. )
 					{
-						IntraFluxConstant.push_back( fIntraRunNdiff[i][t] / iEffNorm / 1.e4 );            // m^2 to cm^2
-						IntraFluxConstantE.push_back( fIntraRunNdiffE[i][t] / iEffNorm / 1.e4 );
+						 IntraFluxConstant.push_back( fIntraRunNdiff[i][t] / iEffNorm / 1.e4 );            // m^2 to cm^2
+						 IntraFluxConstantE.push_back( fIntraRunNdiffE[i][t] / iEffNorm / 1.e4 );
 					}
 					else
 					{
@@ -1024,7 +1061,7 @@ void VFluxCalculation::calculateFluxes()
 						IntraFluxE.push_back( -1. / ( fAlpha + 1. ) * IntraFluxConstantE[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
 						IntraFluxCI_lo_1sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_lo_1sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
 						IntraFluxCI_up_1sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_up_1sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
-						IntraFluxCI_lo_3sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_lo_3sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+ 						IntraFluxCI_lo_3sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_lo_3sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
 						IntraFluxCI_up_3sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_up_3sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
 					}
 					else if( fIntraRunFluxConstantE[i][t] > 0. )
@@ -1193,11 +1230,19 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 		TH2D* hon2DtimeBinned = 0;
 		TH1D* hoff = 0;
 		TH2D* hoff2DtimeBinned = 0;
-		
+		TH1D* honDuration1DtimeBinned = 0;
+		TH1D* hoffDuration1DtimeBinned = 0;
+		//TH1D* honDeadTimeFraction1DtimeBinned = 0;
+
+
 		vector < double > IntraNon;
 		vector < double > IntraNoff;
 		vector < double > IntraNdiff;
 		vector < double > IntraNdiffE;
+
+		vector < double > IntraTOn;
+		vector < double > IntraDeadTime;
+
 		
 		char hname[200];
 		///////////////////////////////////////////////////
@@ -1205,11 +1250,13 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 		for( unsigned int i = 0; i < fRunList.size(); i++ )
 		{
 			IntraNon.clear();
+			IntraTOn.clear();
+			IntraDeadTime.clear();
 			IntraNoff.clear();
 			IntraNdiff.clear();
 			IntraNdiffE.clear();
-			
 			// calculate number of events above given energy threshold for this run
+			// also get the time and deadtime fraction for each time bin
 			if( ( int )fRunList[i] > 0 )
 			{
 				sprintf( hname, "run_%d/stereo/energyHistograms", ( int )fRunList[i] );
@@ -1224,6 +1271,7 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 					cout << "error finding directory " << hname << endl;
 					return;
 				}
+
 				hon = ( TH1D* )gDirectory->Get( "hLinerecCounts_on" );
 				hoff = ( TH1D* )gDirectory->Get( "hLinerecCounts_off" );
 				if( !hon || !hoff )
@@ -1235,10 +1283,13 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 				{
 					hon2DtimeBinned = ( TH2D* )gDirectory->Get( "hLinerecCounts2DtimeBinned_on" );
 					hoff2DtimeBinned = ( TH2D* )gDirectory->Get( "hLinerecCounts2DtimeBinned_off" );
-					if( !hon2DtimeBinned || !hoff2DtimeBinned )
+					honDuration1DtimeBinned = ( TH1D* )gDirectory->Get( "hRealDuration1DtimeBinned_on" );
+					hoffDuration1DtimeBinned = ( TH1D* )gDirectory->Get( "hRealDuration1DtimeBinned_off" );
+					//honDeadTimeFraction1DtimeBinned
+					if( !hon2DtimeBinned || !hoff2DtimeBinned || !honDuration1DtimeBinned || !hoffDuration1DtimeBinned)
 					{
 						cout << "error finding time binned 2D counting histogram (energy): ";
-						cout << hon2DtimeBinned << "\t" << hoff2DtimeBinned << "\t" << ( int )fRunList[i] << endl;
+						cout << hon2DtimeBinned << "\t" << hoff2DtimeBinned << "\t" << honDuration1DtimeBinned << "\t" << hoffDuration1DtimeBinned << "\t" <<( int )fRunList[i] << endl;
 						return;
 					}
 				}
@@ -1281,6 +1332,18 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 					}
 				}
 				
+
+				// get time duration for each time bin
+				if( fTimebinned && honDuration1DtimeBinned )
+				{
+					 for( int t = 0; t < honDuration1DtimeBinned->GetNbinsX(); t++ )
+					{
+						 IntraTOn.push_back(honDuration1DtimeBinned->GetBinContent(t+1));
+					}
+					 fTimeBinDuration.push_back(honDuration1DtimeBinned->GetBinWidth(1));
+					 
+				}
+
 				// get number of off events above energy threshold
 				fRunNoff[i] = 0.;
 				for( int b = hoff->GetNbinsX(); b > 0; b-- )
@@ -1378,6 +1441,10 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 			fIntraRunNoff.push_back( IntraNoff );
 			fIntraRunNdiff.push_back( IntraNdiff );
 			fIntraRunNdiffE.push_back( IntraNdiffE );
+			fIntraRunTOn.push_back( IntraTOn);
+
+
+
 		}
 		fFile[f]->cd();
 	}                                             // end loop over all files
@@ -1423,6 +1490,8 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
 		cout << "threshold significance is " << fThresholdSignificance << " sigma or less than " << fMinEvents << " events" << endl;
 		cout << endl;
 	}
+
+		cout << "threshold significance is " << fThresholdSignificance << " sigma or less than " << fMinEvents << " events" << endl;
 	
 	for( unsigned int i = 0; i < fRunList.size(); i++ )
 	{
@@ -1617,6 +1686,7 @@ void VFluxCalculation::calculateIntegralFlux( double iMinEnergy )
 	calculateSignificancesAndUpperLimits();
 	
 	// calculate integrated spectral weighted effective areas
+	std::cout<<"getIntegralEffectiveArea() "<<std::endl;
 	getIntegralEffectiveArea();
 	
 	// calculate fluxes and upper flux limits
@@ -1987,6 +2057,9 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char* iTex, double iMJDOffset, 
 	
 	double iMinFlux = 1.e90;
 	
+	double mean_flux = 0;
+	double total_time = 0;
+
 	int z = 0;
 	for( unsigned int i = 0; i < fRunMJD.size(); i++ )
 	{
@@ -2004,6 +2077,9 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char* iTex, double iMJDOffset, 
 			gFluxMJD->SetPoint( z, fRunMJD[i] - iMJDOffset, fRunFlux[i] );
 			gFluxMJD->SetPointError( z, fRunTOn[i] / 86400. / 2., fRunFluxE[i] );
 			z++;
+			mean_flux += fRunFlux[i]*(fRunTOn[i] * ( 1. - fRunDeadTime[i] ));
+			total_time += (fRunTOn[i] * ( 1. - fRunDeadTime[i] ));
+
 			iV_Run.push_back( ( int )fRunList[i] );
 			iV_Flux.push_back( fRunFlux[i] );
 			iV_FluxE.push_back( fRunFluxE[i] );
@@ -2014,6 +2090,11 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char* iTex, double iMJDOffset, 
 		}
 	}
 	
+
+		 printf("mean_flux from run by run %.3e \n Total time = %.3e \n total time including dead time %.3e \n",mean_flux/total_time,total_time,fRunTOn[fRunNorm.size() - 1]);
+
+
+
 	if( bDrawAxis )
 	{
 		gFluxMJD->Draw( "ap" );
@@ -2097,61 +2178,113 @@ TGraphErrors* VFluxCalculation::plotFluxesInBINs( int run, char* iTex, double iM
 	vector< int > iV_Run;
 	vector< double > iV_Flux;
 	vector< double > iV_FluxE;
-	
+
 	int z = 0;
 	
-	// double flux=0;
-	
+	unsigned int i_run_min = 0;
+	unsigned int i_run_max = fRunMJD.size()-1;
+
 	if( run < 0 )
 	{
-		cout << "plotFluxesInBINs( int run = -1, char *iTex = 0, double iMJDOffset = 0., TCanvas *c = 0, int iMarkerColor = 1, int iMarkerStyle = 8, bool bDrawAxis = false )" << endl;
-		cout << "WARNING: run variable < 0 - all runs are plotted " << endl;
-		cout << "run = 0 ... Nruns" << endl;
-		
-		for( unsigned int i = 0; i < fRunMJD.size(); i++ )
-		{
-			if( i < fIntraRunFluxE.size() )
-			{
-				for( unsigned int t = 0; t < fIntraRunFlux[i].size(); t++ )
-				{
+		 cout << "plotFluxesInBINs( int run = -1, char *iTex = 0, double iMJDOffset = 0., TCanvas *c = 0, int iMarkerColor = 1, int iMarkerStyle = 8, bool bDrawAxis = false )" << endl;
+		 cout << "WARNING: run variable < 0 - all runs are plotted " << endl;
+		 cout << "run = 0 ... Nruns" << endl;
+	}else if( run > 0 ){
+		 // get run number
+		 unsigned iRunIndex = getIndexOfRun( run );
+		 if( iRunIndex >= fIntraRunFlux.size() )
+		 {
+			  cout << "run not found " << run << endl;
+			  return 0;
+		 }
+		 i_run_min = iRunIndex;
+		 i_run_max = i_run_min+1;
+	}
+	
+	double mean_flux = 0;
+	double total_time = 0;
+
+	for( unsigned int i = i_run_min; i < i_run_max; i++ )
+	{
+
+		 //double full_run_duration = fTimeBinDuration[i]*fIntraRunFlux[i].size();
+		 // fRunMJD is in the middle of the filled region of the bin. 
+		 // Need to know the duration of this region to access the MJD start of the run. Start at first time bin filled
+		 //--- duration between  first and last bin filled.
+		 //-------------------------------- time bin filled |x| ; time bin cut | |
+		 // | | | |x|x|x|x|
+		 //           ^
+		 //           |
+		 //         RunMJD
+		 // |x|x| | | |x|x|
+		 //        ^
+		 //        |
+		 //      RunMJD
+		 //-----------------------------------------------------
+
+		 bool first_time = true;
+		 int first_filled_bin = 0;
+		 int last_filled_bin = 0;
+		 for(unsigned int i_t = 0 ; i_t < fIntraRunTOn[i].size() ; i_t++){
+
+					if(first_time && fIntraRunTOn[i][i_t]>0){
+						 first_filled_bin = i_t;
+						 first_time = false;
+					}
+					if(fIntraRunTOn[i][i_t]>0){
+						 last_filled_bin = i_t;
+					}
+			  }
+					
+					int nb_bin = 1 + last_filled_bin - first_filled_bin;			
+			  double full_run_duration = nb_bin*fTimeBinDuration[i] ; // duration between the first and the last bin filled
+			  double MJD_start = fRunMJD[i] - (full_run_duration/2.)/86400.;
+			  
+			  
+			  //printf("%d %.2f | %.2f / %d = %.2f | %.2f | MJD-d/2 = %.4f MJD %.4f MJD+d/2 = %.4f \n",( int )fRunList[i],fTimeBinDuration[i], fRunTOn[i],fIntraRunFlux[i].size() , fRunTOn[i]/fIntraRunFlux[i].size(),full_run_duration,fRunMJD[i]-(full_run_duration/2.)/86400. ,fRunMJD[i],fRunMJD[i]+(full_run_duration/2.)/86400.);
+
+
+		 if( i < fIntraRunFluxE.size() )
+		 {
+			  unsigned int t_c = 0 ; // counting the time bin from first filled
+				  for( unsigned int t = first_filled_bin; t < fIntraRunFlux[i].size(); t++ )
+			  {
 					if( fRunMJD[i] > 10 )
 					{
 					
-						gFluxInBINs->SetPoint( z, fRunMJD[i] - iMJDOffset + ( t - ( double )( fIntraRunFlux[i].size() ) / 2 )*fRunTOn[i] / ( double )( fIntraRunFlux[i].size() ) / 86400., fIntraRunFlux[i][t] );
-						gFluxInBINs->SetPointError( z, fRunTOn[i] / ( double )( fIntraRunFlux[i].size() ) / 86400. / 2., fIntraRunFluxE[i][t] );
-						z++;
-						iV_Run.push_back( ( int )fRunList[i] );
-						iV_Flux.push_back( fIntraRunFlux[i][t] );
-						iV_FluxE.push_back( fIntraRunFluxE[i][t] );
+						 if(fIntraRunTOn[i][t]>0){
+							  double temps = MJD_start  - iMJDOffset + (t_c + 0.5)*fTimeBinDuration[i] / 86400.;// t_c just here, because we are counting from the first bin filled. 
+							  t_c++;
+							  gFluxInBINs->SetPoint( z, temps, fIntraRunFlux[i][t] );
+							  gFluxInBINs->SetPointError( z,  fTimeBinDuration[i] / 86400. / 2., fIntraRunFluxE[i][t] );
+							  mean_flux+=fIntraRunFlux[i][t]*fIntraRunTOn[i][t];
+							  z++;
+							  iV_Run.push_back( ( int )fRunList[i] );
+							  iV_Flux.push_back( fIntraRunFlux[i][t] );
+							  iV_FluxE.push_back( fIntraRunFluxE[i][t] );
+
+
+							  /*
+							  printf("*****************             RUN %d %.3f tps %.4f t %d %.3f %.3e \n",( int )fRunList[i],( (t + 0.5)*fTimeBinDuration[i] ),temps,t,fIntraRunTOn[i][t],fIntraRunFlux[i][t]);	
+
+							  if(fIntraRunFlux[i][t] < 1.e-11){
+									printf("***************************** RUN %d %.3f tps %.4f t %d %.3f %.3e \n",( int )fRunList[i],(t + 0.5)*fTimeBinDuration[i],temps,t,fIntraRunTOn[i][t],fIntraRunFlux[i][t]);	
+							  }
+							  */
+
+						 }		
+						 total_time+=fIntraRunTOn[i][t];
+
+						 
 					}
-				}
-			}
-		}
-	}
-	else if( run > 0 )
-	{
-		// get run number
-		unsigned iRunIndex = getIndexOfRun( run );
-		if( iRunIndex >= fIntraRunFlux.size() )
-		{
-			cout << "run not found " << run << endl;
-			return 0;
-		}
-		// loop over all time bins
-		for( unsigned int t = 0; t < fIntraRunFlux[iRunIndex].size(); t++ )
-		{
-			if( fRunMJD[iRunIndex] > 10 )
-			{
-				gFluxInBINs->SetPoint( z, fRunMJD[iRunIndex] - iMJDOffset + ( t - ( double )( fIntraRunFlux[iRunIndex].size() ) / 2 )*fRunTOn[iRunIndex] / ( double )( fIntraRunFlux[iRunIndex].size() ) / 86400. , fIntraRunFlux[iRunIndex][t] );
-				gFluxInBINs->SetPointError( z, fRunTOn[iRunIndex] / ( double )( fIntraRunFlux[iRunIndex].size() ) / 86400. / 2., fIntraRunFluxE[iRunIndex][t] );
-				z++;
-				iV_Run.push_back( ( int )fRunList[iRunIndex] );
-				iV_Flux.push_back( fIntraRunFlux[iRunIndex][t] );
-				iV_FluxE.push_back( fIntraRunFluxE[iRunIndex][t] );
-			}
-		}
+			  }
+		 }
 	}
 	
+
+	   printf("mean_flux from time binned %.3e \n  Total time = %.3e \n",mean_flux/total_time, total_time);	
+
+
 	if( bDrawAxis )
 	{
 		gFluxInBINs->Draw( "ap" );
@@ -2291,17 +2424,24 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJDDaily( char* iTex, double iMJDOff
 	
 	for( unsigned int i = 0; i < fRunMJD.size(); i++ )
 	{
+			 double run_duration = (fRunTOn[i] * ( 1. - fRunDeadTime[i] ));
 		if( iTDay.find( ( int )fRunMJD[i] ) != iTDay.end() )
 		{
-			iTDay[( int )fRunMJD[i]] += fRunTOn[i];
+			 iTDay[( int )fRunMJD[i]] += fRunTOn[i];
+			 //iTDay[( int )fRunMJD[i]] += run_duration;
 			iFluxDay[( int )fRunMJD[i]] += fRunFlux[i] * fRunTOn[i];
+			//iFluxDay[( int )fRunMJD[i]] += fRunFlux[i] * run_duration ;
 			iFluxDayError[( int )fRunMJD[i]] += fRunFluxE[i] * fRunFluxE[i] * fRunTOn[i] * fRunTOn[i];
+			//iFluxDayError[( int )fRunMJD[i]] += fRunFluxE[i] * run_duration * run_duration;
 		}
 		else
 		{
-			iTDay[( int )fRunMJD[i]] = fRunTOn[i];
+			 iTDay[( int )fRunMJD[i]] = fRunTOn[i];
+			 //iTDay[( int )fRunMJD[i]] = run_duration;
 			iFluxDay[( int )fRunMJD[i]] = fRunFlux[i] * fRunTOn[i];
+			//iFluxDay[( int )fRunMJD[i]] = fRunFlux[i] * run_duration;
 			iFluxDayError[( int )fRunMJD[i]] = fRunFluxE[i] * fRunFluxE[i] * fRunTOn[i] * fRunTOn[i];
+			//iFluxDayError[( int )fRunMJD[i]] = fRunFluxE[i] * fRunFluxE[i] * run_duration * run_duration;
 		}
 	}
 	
@@ -2314,6 +2454,10 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJDDaily( char* iTex, double iMJDOff
 	
 	int z = 0;
 	typedef map< int, double >::const_iterator CI;
+
+	double mean_flux = 0;
+	double total_time = 0;
+
 	for( CI p = iTDay.begin(); p != iTDay.end(); ++p )
 	{
 		if( p->first > 10 )
@@ -2326,6 +2470,8 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJDDaily( char* iTex, double iMJDOff
 				// fluxes in 1/[cm2 s ]
 				gFluxMJDDay->SetPoint( z, p->first - iMJDOffset, iFluxDay[p->first] * fluxMult );
 				gFluxMJDDay->SetPointError( z, 0., iFluxDayError[p->first] * fluxMult );
+				mean_flux+=iFluxDay[p->first] * fluxMult * iTDay[p->first] ;
+				total_time+=iTDay[p->first];
 				z++;
 			}
 			else
@@ -2335,6 +2481,12 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJDDaily( char* iTex, double iMJDOff
 		}
 	}
 	
+
+			 printf("mean_flux from MJD binned %.3e \n Total time = %.3e \n",mean_flux/total_time,total_time);	
+	
+
+
+
 	TCanvas* cFMJDDay = new TCanvas( "cFMJDDay", "flux per day vs MJD", 610, 10, 600, 400 );
 	cFMJDDay->SetGridx( 0 );
 	cFMJDDay->SetGridy( 0 );

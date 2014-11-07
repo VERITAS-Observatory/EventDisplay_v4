@@ -339,6 +339,16 @@ void VStereoHistograms::defineHistograms()
 	hListParameterHistograms->Add( herecCounts2DtimeBinned );
 	hListEnergyHistograms->Add( herecCounts2DtimeBinned );
 	hListNameofParameterHistograms["herecCounts2DtimeBinned"] = herecCounts2DtimeBinned;
+
+	sprintf( i_key, "hRealDuration1DtimeBinned_%s", fHisSuffix.c_str() );
+	sprintf( i_name, "Real Duration histogram (%s)", fHisSuffix.c_str() );
+	hRealDuration1DtimeBinned = new TH1D( i_key, i_name, i_tbin, 0, i_tmax - i_tmin );
+	hRealDuration1DtimeBinned->SetZTitle( "Real Duration [s]" );
+	hRealDuration1DtimeBinned->SetXTitle( "time [s]" );
+	hisList->Add( hRealDuration1DtimeBinned );
+	hListParameterHistograms->Add( hRealDuration1DtimeBinned );
+	hListEnergyHistograms->Add( hRealDuration1DtimeBinned );
+	hListNameofParameterHistograms["hRealDuration1DtimeBinned"] = hRealDuration1DtimeBinned;
 	
 	sprintf( i_key, "herecCounts_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "counting histogram (energy) (%s)", fHisSuffix.c_str() );
@@ -350,6 +360,8 @@ void VStereoHistograms::defineHistograms()
 	hListEnergyHistograms->Add( herecCounts );
 	hListNameofParameterHistograms["herecCounts"] = herecCounts;
 	
+
+
 	sprintf( i_key, "herecWeights_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "effective area vs. raw energy (%s)", fHisSuffix.c_str() );
 	herecWeights = new TH2D( i_key, i_name, i_ebin, i_emin, i_emax, 140, 1., 7. );
@@ -450,6 +462,10 @@ void VStereoHistograms::defineHistograms()
 	hImagePatternAfterCuts = new TH1D( i_key, "image pattern After cuts", 16, 0., 16. );
 	hImagePatternAfterCuts->SetYTitle( "number of events" );
 	hisRateList->Add( hImagePatternAfterCuts );
+
+
+
+
 	
 	// set xtitles for trigger pattern histograms
 	vector< string > i_xtitle;
@@ -557,6 +573,7 @@ void VStereoHistograms::writeHistograms()
 	{
 		wDir->cd();
 	}
+	std::cout<<"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ hListEnergyHistograms->Write"<<std::endl;
 	hListEnergyHistograms->Write();
 	
 	// write all random forest histograms
@@ -689,6 +706,7 @@ bool VStereoHistograms::readHistograms( TList* iL, string iDir )
 			}
 			hListParameterHistograms->Add( ho );
 			iL->Add( ho );
+			
 		}
 		else
 		{

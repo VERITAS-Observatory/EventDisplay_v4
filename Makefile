@@ -1245,6 +1245,20 @@ VTS.calculateCrabRateFromMC:	./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
+########################################################
+# VTS.analyzeMuonRings
+########################################################
+./obj/VTS.analyzeMuonRings.o:	./src/VTS.analyzeMuonRings.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+VTS.analyzeMuonRings:		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+				./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
+				./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+		                ./obj/VDB_Connection.o \
+				./obj/Ctelconfig.o ./obj/Cshowerpars.o ./obj/Ctpars.o \
+				./obj/VTS.analyzeMuonRings.o
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
 
 ########################################################
 # VTS.calculateExposureFromDB
@@ -1529,6 +1543,8 @@ $(distdir):	FORCEDISTDIR
 	cp -r macros/CTA/*.C $(distdir)/macros/CTA
 	mkdir -p $(distdir)/macros/VTS
 	cp -r macros/VTS/*.C $(distdir)/macros/VTS
+	cp -r macros/VTS/*.pl $(distdir)/macros/VTS
+	cp -r macros/VTS/*.sh $(distdir)/macros/VTS
 	mkdir -p $(distdir)/scripts/VTS
 	mkdir -p $(distdir)/scripts/VTS/helper_scripts
 	mkdir -p $(distdir)/scripts/CTA
@@ -1539,7 +1555,8 @@ $(distdir):	FORCEDISTDIR
 	cp -r scripts/CTA/grid-tools/* $(distdir)/scripts/CTA/grid-tools
 	cp -r scripts/VTS/*.sh $(distdir)/scripts/VTS
 	cp -r scripts/VTS/submissionCommands.dat $(distdir)/scripts/VTS
-	cp -r scripts/VTS/helper_scripts/*.sh $(distdir)/scripts/VTS/helper_scripts
+	cp -r scripts/VTS/ANALYSIS.pipeline $(distdir)/scripts/VTS
+	cp -r scripts/VTS/helper_scripts/* $(distdir)/scripts/VTS/helper_scripts
 	mkdir -p $(distdir)/templates
 	cp -r templates/* $(distdir)/templates
 
@@ -1567,6 +1584,7 @@ $(ctapara):
 	mkdir -p $(ctapara)
 	mkdir -p $(ctapara)/AstroData
 	cp -r $(CTA_EVNDISP_AUX_DIR)/AstroData/TeV_data $(ctapara)/AstroData
+	mkdir -p $(ctapara)/Calibration
 	mkdir -p $(ctapara)/DetectorGeometry
 	cp -r $(CTA_EVNDISP_AUX_DIR)/DetectorGeometry/prod1 $(ctapara)/DetectorGeometry
 	cp -r $(CTA_EVNDISP_AUX_DIR)/DetectorGeometry/CTA.prod2* $(ctapara)/DetectorGeometry
@@ -1631,6 +1649,7 @@ $(vtspara).runfiles.tar.gz:
 # gamma hadron files
 	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/GammaHadronCutFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/GammaHadronCutFiles/ANASUM.GammaHadron-Cut* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/GammaHadronCutFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/GammaHadronCutFiles/FROGS* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/GammaHadronCutFiles
 # run parameter files
 	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
@@ -1773,8 +1792,12 @@ $(vtspara).Frogs.tar.gz:
 	rm -rf $(distdir) >/dev/null 2>&1
 	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs
 	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/Frogs/*.txt $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs/
+	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/Frogs/*.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs/
 	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs/Templates/V6
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs/Templates/V5
+	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs/Templates/V4
 	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/Frogs/Templates/V6/frogs* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs/Templates/V6/
+	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/Frogs/Templates/V5/frogs* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs/Templates/V5/
 #	make tar file
 	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).Frogs.tar.gz . && cd ..
 	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)

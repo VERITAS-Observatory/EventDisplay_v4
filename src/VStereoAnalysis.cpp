@@ -433,8 +433,9 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	double iXoff = 0.;
 	double iYoff = 0.;
 	// for time-check save old-time and new-time
-	double oldtime = 0.;
-	double newtime = 0.;
+	// variable to set the real duration of each time bin 
+	double time_of_EVENT = 0;
+	int index_time_bin_NOW  = 1;
 	
 	double i_UTC = 0.;
 	double i_xderot = -99.;
@@ -697,29 +698,25 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 						fHisto[fHisCounter]->herecCounts2DtimeBinned->Fill( log10( iErec ), ( ( double )fDataRun->Time - f_t_in_s_min[irun] ) );
 						fHisto[fHisCounter]->hLinerecCounts->Fill( iErec );
 						fHisto[fHisCounter]->hLinerecCounts2DtimeBinned->Fill( iErec , ( ( double )fDataRun->Time - f_t_in_s_min[irun] ) );
-						
-						// write the Effective Area to disk for each Time BIN
-						// Therefore if ((double)fDataRun->Time crosses the binning limit, start new EffectiveArea in Time BIN - reset and get Mean
-						oldtime = newtime;
-						newtime = ( ( double )fDataRun->Time );
-						
-						for( int bini = 1; bini < i_t_bins + 1; bini++ )
-						{
-							if( oldtime < iEffAreaTimeBin[bini] )
-							{
-								if( newtime >= iEffAreaTimeBin[bini] )
-								{
-									// get mean effective area in Time BIN
-									fEnergy.setTimeBin( iEffAreaTimeBin[bini] - i_time_intervall / 2 - f_t_in_s_min[irun] );
-									fEnergy.setTimeBinnedMeanEffectiveArea();
-									fEnergy.resetTimeBin();
-								}
-							}
-						}
 						fHisto[fHisCounter]->herecWeights->Fill( log10( iErec ), log10( 1. / iEnergyWeighting ) );
 						fHisto[fHisCounter]->hLinerecWeights->Fill( iErec, log10( 1. / iEnergyWeighting ) );
 						fHisto[fHisCounter]->herecEffectiveArea->Fill( log10( iErec ), 1. / iEnergyWeighting );
 						fHisto[fHisCounter]->hLinerecEffectiveArea->Fill( iErec, 1. / iEnergyWeighting );
+						// filling the effective area for each time bin 
+						double time_of_previous_EVENT = time_of_EVENT; 
+						time_of_EVENT = ( ( double )fDataRun->Time - f_t_in_s_min[irun]);
+						double index_time_bin_PREVIOUS_EVENT = index_time_bin_NOW;
+						index_time_bin_NOW = fHisto[fHisCounter]->hRealDuration1DtimeBinned->FindFixBin(time_of_EVENT);
+					
+						if(time_of_previous_EVENT>time_of_EVENT) std::cout<<"ERROR events are not ordered chronolically "<<std::endl;
+						
+						if(index_time_bin_PREVIOUS_EVENT != index_time_bin_NOW){
+						 //--- we just got into a new time bin
+						 // getting the effective area for the time bin we just left
+						 fEnergy.setTimeBin( fHisto[fHisCounter]->hRealDuration1DtimeBinned->GetBinCenter(index_time_bin_PREVIOUS_EVENT) );
+						 fEnergy.setTimeBinnedMeanEffectiveArea();
+						 fEnergy.resetTimeBin();
+						}
 					}
 				}
 				// mean azimuth and elevation (telescope orientation)
@@ -747,10 +744,25 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	// END: loop over all entries/events in the data tree
 	/////////////////////////////////////////////////////////////////////
 	
-	fEnergy.setTimeBin( iEffAreaTimeBin[i_t_bins] - i_time_intervall / 2 - f_t_in_s_min[irun] );
-	fEnergy.setTimeBinnedMeanEffectiveArea();
-	fEnergy.resetTimeBin();
-	
+	// filling the effective area for last time bin 
+	// fill energy histograms: require a valid effective area value
+		if( iEnergyWeighting > 0. )
+					{
+						 fEnergy.setTimeBin( fHisto[fHisCounter]->hRealDuration1DtimeBinned->GetBinCenter(index_time_bin_NOW) );
+						 fEnergy.setTimeBinnedMeanEffectiveArea();
+						 fEnergy.resetTimeBin();			 
+					}
+		// filling the histo with the duration of the time bin
+		// looping over the mask seconds
+		for(unsigned int i_s = 0 ; i_s < fTimeMask->getMaskSize() ; i_s++){
+			 if(fTimeMask->getMask()[i_s]){
+				  // dead time is taken into account for each second
+				  double dead_time_fraction = fDeadTime[fHisCounter]->getDeadTimeFraction( ( double )i_s + 0.5,fRunPara->fDeadTimeCalculationMethod );
+				  fHisto[fHisCounter]->hRealDuration1DtimeBinned->Fill(i_s,1-dead_time_fraction);
+			 }
+
+		}
+	  
 	// fill rate vectors
 	fTimeMask->getIntervalRates( iRateCounts, iRateTime, iRateTimeIntervall, fRunPara->fTimeIntervall );
 	fRateCounts[fHisCounter] = iRateCounts;
@@ -1113,6 +1125,10 @@ double VStereoAnalysis::combineHistograms()
 			
 			string iTemp = h1->GetName();
 			if( iTemp.find( "2D" ) != string::npos )
+			{
+				continue;
+			}
+			if( iTemp.find( "RealDuration1DtimeBinned" ) != string::npos )
 			{
 				continue;
 			}
@@ -1541,15 +1557,6 @@ void VStereoAnalysis::defineAstroSource()
 			cout << endl;
 		}
 		
-		//////////////////////////////////
-		// ON/OFF observation mode
-		// define offset for off run (usually 30. min, specified in runlist file)
-		// offset is as well defined for on run if on and off runnumber are the same
-/*		double i_off = 0.;
-		if( !fIsOn || fRunPara->fRunList[i].fRunOn == fRunPara->fRunList[i].fRunOff )
-		{
-			i_off = fRunPara->fRunList[i].fPairOffset / 60. / 24.*360. / TMath::RadToDeg();
-		} */
 		//////////////////////////////////
 		
 		// =============================================================

@@ -78,6 +78,8 @@ class VFluxCalculation : public TObject
 		vector< double > fRunList;                //!< run number
 		vector< double > fRunMJD;                 //!< MJD
 		vector< double > fRunTOn;                 //!< life time [s]
+		vector< double > fTimeBinDuration;        //!< size of time bin [s]
+		vector< vector< double > > fIntraRunTOn;  //!< life time [s] of each time bin (time mask and deadtime already taken into account)
 		vector< double > fRunDeadTime;            //!< dead time fraction
 		vector< double > fRunZe;                  //!< mean zenith angle [deg]
 		vector< double > fRunWobbleOffset;        //!< wobble offset [deg]

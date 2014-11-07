@@ -3,8 +3,11 @@ Change log eventdisplay analysis package
 (please observe the wiki syntax for this file)
 
 ************************************************
-******* 20141103 release of v4.70 ****
+******* 20141107 release of v4.70 ****
 ************************************************
+
+* 20141107 (LG)
+bug fixes in intra-run light curves
 
 * 20141103 (GM)
 some additions to allow compilation with C++11/clang

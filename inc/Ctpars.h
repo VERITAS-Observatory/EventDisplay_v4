@@ -99,7 +99,9 @@ class Ctpars
 		Float_t         muonRadius;
 		Float_t         muonRSigma;
 		Float_t         muonSize;
+		Float_t         muonIPCorrectedSize;
 		Int_t           muonValid;
+		Int_t           houghMuonValid;
 		Int_t           Fitstat;
 #else
 		Int_t           telID;
@@ -227,6 +229,14 @@ class Ctpars
 		TBranch*        b_tmax;                   //!
 		TBranch*        b_tmean;                  //!
 		TBranch*        b_Fitstat;                  //!
+		TBranch*        b_muonX0;
+		TBranch*        b_muonY0;
+		TBranch*        b_muonRadius;
+		TBranch*        b_muonRSigma;
+		TBranch*        b_muonSize;
+		TBranch*        b_muonIPCorrectedSize;
+		TBranch*        b_muonValid;
+		TBranch*        b_houghMuonValid;
 		
 		Ctpars( TTree* tree = 0, bool iMC = false, int iVersion = 2, unsigned int iShort = false );
 		virtual ~Ctpars();
@@ -265,7 +275,6 @@ Ctpars::Ctpars( TTree* tree, bool iMC, int iVersion, unsigned int iShort )
 	{
 		return;
 	}
-	
 	bMC = iMC;
 	bShort = iShort;
 	fVersion = iVersion;
@@ -336,7 +345,6 @@ void Ctpars::Init( TTree* tree )
 	fChain = tree;
 	fCurrent = -1;
 	fChain->SetMakeClass( 1 );
-	
 	/////////////////////////////////////////////////
 	//    bShort = 2:  read limited number of branched needed for lookup table filling
 	if( bShort <= 2 )
@@ -443,6 +451,81 @@ void Ctpars::Init( TTree* tree )
 		index_of_max[1] = 0;
 		index_of_max[2] = 0;
 		tchisq_x = 0.;
+
+		//muon analysis//
+		if( fChain->GetBranchStatus( "muonX0" ) )
+		{
+			fChain->SetBranchAddress( "muonX0", &muonX0 );
+		}
+		else
+		{
+			muonX0 = 0;
+		}
+		if( fChain->GetBranchStatus( "muonY0" ) )
+		{
+			fChain->SetBranchAddress( "muonY0", &muonY0 );
+		}
+		else
+		{
+			muonY0 = 0;
+		}
+		if( fChain->GetBranchStatus( "muonRadius" ) )
+		{
+			fChain->SetBranchAddress( "muonRadius", &muonRadius );
+		}
+		else
+		{
+			muonRadius = 0;
+		}
+		if( fChain->GetBranchStatus( "muonRSigma" ) )
+		{
+			fChain->SetBranchAddress( "muonRSigma", &muonRSigma );
+		}
+		else
+		{
+			muonRSigma = 0;
+		}
+		if( fChain->GetBranchStatus( "muonSize" ) )
+		{
+			fChain->SetBranchAddress( "muonSize", &muonSize );
+		}
+		else
+		{
+			muonSize = 0;
+		}
+		if( fChain->GetBranchStatus( "muonSize" ) )
+		{
+			fChain->SetBranchAddress( "muonSize", &muonSize );
+		}
+		else
+		{
+			muonSize = 0;
+		}
+		if( fChain->GetBranchStatus( "muonIPCorrectedSize" ) )
+		{
+			fChain->SetBranchAddress( "muonIPCorrectedSize", &muonIPCorrectedSize );
+		}
+		else
+		{
+			muonIPCorrectedSize = 0;
+		}
+		if( fChain->GetBranchStatus( "muonValid" ) )
+		{
+			fChain->SetBranchAddress( "muonValid", &muonValid );
+		}
+		else
+		{
+			muonValid = 0;
+		}
+		if( fChain->GetBranchStatus( "houghMuonValid" ) )
+		{
+			fChain->SetBranchAddress( "houghMuonValid", &houghMuonValid );
+		}
+		else
+		{
+			houghMuonValid = 0;
+		}
+
 	}
 	// bShort == 0: read all branches
 	if( bShort == 0 )
@@ -486,6 +569,14 @@ Bool_t Ctpars::Notify()
 	b_index_of_max = 0;
 	b_tchisq_x = 0;
 	b_Fitstat = 0;
+	b_muonX0 = 0;
+	b_muonY0 = 0;
+	b_muonRadius = 0;
+	b_muonRSigma = 0;
+	b_muonSize = 0;
+	b_muonIPCorrectedSize = 0;
+	b_muonValid = 0;
+	b_houghMuonValid = 0;
 	
 	// get branch pointers
 	if( bShort <= 2 )
@@ -560,6 +651,47 @@ Bool_t Ctpars::Notify()
 		fChain->AddBranchToCache( b_tgrad_x );
 		b_Fitstat = fChain->GetBranch( "Fitstat" );
 		fChain->AddBranchToCache( b_Fitstat );
+		//muon
+		if( fChain->GetBranchStatus( "muonX0" ) )
+		{
+			b_muonX0 = fChain->GetBranch( "muonX0" );
+			fChain->AddBranchToCache( b_muonX0 );
+		}
+		if( fChain->GetBranchStatus( "muonY0" ) )
+		{
+			b_muonY0 = fChain->GetBranch( "muonY0" );
+			fChain->AddBranchToCache( b_muonY0 );
+		}
+		if( fChain->GetBranchStatus( "muonRadius" ) )
+		{
+			b_muonRadius = fChain->GetBranch( "muonRadius" );
+			fChain->AddBranchToCache( b_muonRadius );
+		}
+		if( fChain->GetBranchStatus( "muonRSigma" ) )
+		{
+			b_muonRSigma = fChain->GetBranch( "muonRSigma" );
+			fChain->AddBranchToCache( b_muonRSigma );
+		}
+		if( fChain->GetBranchStatus( "muonSize" ) )
+		{
+			b_muonSize = fChain->GetBranch( "muonSize" );
+			fChain->AddBranchToCache( b_muonSize );
+		}
+		if( fChain->GetBranchStatus( "muonIPCorrectedSize" ) )
+		{
+			b_muonIPCorrectedSize = fChain->GetBranch( "muonIPCorrectedSize" );
+			fChain->AddBranchToCache( b_muonIPCorrectedSize );
+		}
+		if( fChain->GetBranchStatus( "muonValid" ) )
+		{
+			b_muonValid = fChain->GetBranch( "muonValid" );
+			fChain->AddBranchToCache( b_muonValid );
+		}
+		if( fChain->GetBranchStatus( "houghMuonValid" ) )
+		{
+			b_houghMuonValid = fChain->GetBranch( "houghMuonValid" );
+			fChain->AddBranchToCache( b_houghMuonValid );
+		}
 	}
 	if( bShort == 0 )
 	{
