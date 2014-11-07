@@ -2424,7 +2424,7 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJDDaily( char* iTex, double iMJDOff
 	
 	for( unsigned int i = 0; i < fRunMJD.size(); i++ )
 	{
-			 double run_duration = (fRunTOn[i] * ( 1. - fRunDeadTime[i] ));
+			 //double run_duration = (fRunTOn[i] * ( 1. - fRunDeadTime[i] ));
 		if( iTDay.find( ( int )fRunMJD[i] ) != iTDay.end() )
 		{
 			 iTDay[( int )fRunMJD[i]] += fRunTOn[i];
