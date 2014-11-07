@@ -573,7 +573,6 @@ void VStereoHistograms::writeHistograms()
 	{
 		wDir->cd();
 	}
-	std::cout<<"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ hListEnergyHistograms->Write"<<std::endl;
 	hListEnergyHistograms->Write();
 	
 	// write all random forest histograms
