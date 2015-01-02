@@ -816,11 +816,11 @@ TCanvas* VPlotAnasumHistograms::plot_theta2( double t2min, double t2max, int irb
     rmax:        maximum distance to sky plot centre of bins to be taken into account
     rSource:     minimum distance to sky plot centre of bins to be taken into account (exclude the source region)
     xmin, xmax:  plotting range (significances)
-	regioncode:  extra specifier for additional region cuts
-				 'a' - exclude x<0 (only use top    half of skymap)
-				 'b' - exclude x>0 (only use bottom half of skymap)
+    regioncode:  extra specifier for additional region cuts
+				 - exclude x<0 (only use top    half of skymap)
+				 - exclude x>0 (only use bottom half of skymap)
 */
-TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, double rSource, double xmin, double xmax, TCanvas* cCanvas , string regioncode )
+TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, double rSource, double xmin, double xmax, TCanvas* cCanvas, bool regioncodeflag )
 {
 	char hname[200];
 	char htitle[200];
@@ -860,15 +860,28 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	}
 	float x = 0.;
 	float y = 0.;
-	float r = 0.;
+	//float r = 0.;
+	float r1 = 0.;
+	float r2 = -99.;
+	bool  bOldStyleExclusionRegions = false;
 	t->SetBranchAddress( "x", &x );
 	t->SetBranchAddress( "y", &y );
-	t->SetBranchAddress( "r", &r );
-	
+	// backward compatability with circular exclusion region
+	if( t->GetBranchStatus( "r" ) )
+        {
+            t->SetBranchAddress( "r", &r1 );
+            bOldStyleExclusionRegions = true;
+        }
+        else
+        {
+            t->SetBranchAddress( "r1", &r1 );
+            t->SetBranchAddress( "r2", &r2 );
+        }
 	const int iN = t->GetEntries();
 	float* v_x = new float[iN];
 	float* v_y = new float[iN];
-	float* v_r = new float[iN];
+	float* v_r1 = new float[iN];
+	float* v_r2 = new float[iN];
 	cout << "Found " << iN << " exclusion regions" << endl;
 	
 	for( int i = 0; i < iN; i++ )
@@ -876,11 +889,21 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 		t->GetEntry( i );
 		v_x[i] = x;
 		v_y[i] = y;
-		v_r[i] = r;
+		v_r1[i] = r1;
+                if( bOldStyleExclusionRegions )
+                {
+                    v_r2[i] = r1;
+                }
+                else
+                {
+                    v_r2[i] = r2;
+                }
 	}
 	
 	/////////////////////////
 	// get 1D significance distributions
+
+	// all entries in sky map
 	TH1D* hsig_1DAll  = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, 0., false, hmap_stereo_on );
 	setHistogramPlottingStyle( hsig_1DAll, 2, 2, 2, 1, 1, 0 );
 	if( hsig_1DAll )
@@ -891,6 +914,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	cout << "  red  :   with source region" << endl;
 	cout << "           (use entire significance skymap)" << endl;
 	
+	// all entries in sky map excluding the source (ON region)
 	TH1D* hsig_1D  = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on );
 	setHistogramPlottingStyle( hsig_1D, 4, 2, 1, 1, 1, 0 );
 	if( hsig_1D )
@@ -900,7 +924,8 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	cout << "  blue :   without source region" << endl;
 	cout << "           (use entire skymap, except the ON region)" << endl;
 	
-	TH1D* hsig_1DExcluded = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on, iN, v_x, v_y, v_r );
+	// all entries in sky map excluding the source and the exclusion regions
+	TH1D* hsig_1DExcluded = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on, iN, v_x, v_y, v_r1, v_r2 );
 	setHistogramPlottingStyle( hsig_1DExcluded, 1, 2, 2, 1, 1, 0 );
 	if( hsig_1DExcluded )
 	{
@@ -908,12 +933,11 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	}
 	cout << "  black:   without source region and exclusion regions" << endl;
 	cout << "           (use entire skymap, except the ON region and the excluded regions)" << endl;
+	cout << "  green-dot-dashed: Gauss(0,1)" << endl;
 	
-	bool regioncodeflag = true ;
-	
+	///////////////////////////
 	// Top half of skymap ONLY
-	TH1D* hsig_1DTopOnly = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on, iN, v_x, v_y, v_r , "a" );
-	// if ( regioncode.find( "a" ) != std::string::npos )
+	TH1D* hsig_1DTopOnly = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on, iN, v_x, v_y, v_r1, v_r2 , "a" );
 	if( regioncodeflag )
 	{
 		setHistogramPlottingStyle( hsig_1DTopOnly, kMagenta, 2, 2, 1, 1, 0 );
@@ -925,9 +949,9 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 		cout << "               (use top half of skymap, except the ON region and the excluded regions)" << endl;
 	}
 	
+	///////////////////////////
 	// Bottom half of skymap ONLY
-	TH1D* hsig_1DBottomOnly = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on, iN, v_x, v_y, v_r , "b" );
-	//if ( regioncode.find( "b" ) != std::string::npos )
+	TH1D* hsig_1DBottomOnly = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on, iN, v_x, v_y, v_r1, v_r2 , "b" );
 	if( regioncodeflag )
 	{
 		setHistogramPlottingStyle( hsig_1DBottomOnly, kGreen + 3, 2, 2, 1, 1, 0 );
@@ -941,7 +965,8 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	
 	delete v_x;
 	delete v_y;
-	delete v_r;
+	delete v_r1;
+	delete v_r2;
 	
 	gStyle->SetOptStat( "mr" );
 	gStyle->SetOptFit( 1111 );
@@ -992,8 +1017,9 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 		}
 		
 		// fit
-		hsig_1DExcluded->Draw( "e hist" );
 		hsig_1DExcluded->Fit( fND );
+		hsig_1DExcluded->Draw( "e hist" );
+		fND->Draw( "same" );
 		
 		hsig_1DExcluded->Draw( "e hist same" );
 		
@@ -1005,17 +1031,6 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 			hsig_1DTopOnly->Draw( "e hist same" );
 			hsig_1DBottomOnly->Draw( "e hist same" );
 		}
-		
-		/*
-		if ( regioncode.find( "a" ) != std::string::npos )
-		{
-			hsig_1DTopOnly->Draw(    "e hist same" );
-		}
-		if ( regioncode.find( "b" ) != std::string::npos )
-		{
-			hsig_1DBottomOnly->Draw( "e hist same" );
-		}
-		*/
 		
 		plotHistogramTitle( hsig_1DExcluded );
 		
@@ -1163,7 +1178,6 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 		hmap->SetTitle( "" );
 		
 		double iYRange = 0.;
-		double iXRange  = 0.;
 		double x1 = -1.*rmax - xcenter;
 		double x2 = rmax - xcenter;
 		double y1 = -1.*rmax - ycenter;
@@ -1257,7 +1271,6 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 		ymin = hmap->GetYaxis()->GetBinLowEdge( hmap->GetYaxis()->FindBin( y1 ) );
 		xmax = hmap->GetXaxis()->GetBinLowEdge( hmap->GetXaxis()->FindBin( x2 ) );
 		ymax = hmap->GetYaxis()->GetBinLowEdge( hmap->GetYaxis()->FindBin( y1 ) );
-		iXRange = xmax - xmin;
 		
 		double Xmin = -1.*ra;
 		double Xmax = -1.*ra;
@@ -1508,14 +1521,12 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 			}
 			c_skysigY->Update();
 			
-			iXRange  = h1->GetXaxis()->GetXmax() - h1->GetXaxis()->GetXmin();
 			iYRange  = h1->GetYaxis()->GetXmax() - h1->GetYaxis()->GetXmin();
 			if( bProjX )
 			{
 				TGaxis* decAxis1D = ( TGaxis* )decAxis->Clone();
 				decAxis1D->SetTitleOffset( 1.0 );
 				
-				//       TGaxis *raLowerAxis = new TGaxis( c_skysigY->GetUxmin()-iXRange/2. -hmap->GetYaxis()->GetBinWidth( 1 )/2., c_skysigY->GetUymin()-iYRange/2. -hmap->GetXaxis()->GetBinWidth( 1 )/2., c_skysigY->GetUxmin()+iXRange/2. + hmap->GetYaxis()->GetBinWidth( 1 )/2., c_skysigY->GetUymin()-iYRange/2.  -hmap->GetXaxis()->GetBinWidth( 1 )/2., "IncValues", 4 );
 				decAxis1D->DrawAxis( c_skysigY->GetUxmin(), c_skysigY->GetUymin(), c_skysigY->GetUxmax(), c_skysigY->GetUymin(), dec - iYRange / 2., dec + iYRange / 2., 505 );
 			}
 			else
@@ -1524,7 +1535,6 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 				
 				raLowerAxis1D->Draw();
 				
-				//	  raLowerAxis1D->DrawAxis( gPad->GetUxmin(), gPad->GetUymin()-iYRange/2., gPad->GetUxmax(), gPad->GetUymin()-iYRange/2., "IncValues", 4 );
 			}
 			TGaxis* h1YAxis = new TGaxis( c_skysigY->GetUxmin(), c_skysigY->GetUymin(), c_skysigY->GetUxmin(), c_skysigY->GetUymax(), c_skysigY->GetUymin(), c_skysigY->GetUymax(), 505 );
 			h1YAxis->SetNdivisions( decAxis->GetNdiv() );
@@ -1978,7 +1988,7 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas* c, int iLineColor )
         if( t->GetBranchStatus( "r" ) )
         {
 	    t->SetBranchAddress( "r", &r1 );
-	    t->SetBranchAddress( "r", &r2 );
+	    r2=-1;		//in the TEllipse constructor:  if (r2 <= 0) fR2 = fR1;
             theta = 0.;
         }
         else
@@ -1987,9 +1997,6 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas* c, int iLineColor )
             t->SetBranchAddress( "r2", &r2 );
             t->SetBranchAddress( "theta", &theta );
         }
-	t->SetBranchAddress( "r1", &r1 );
-	t->SetBranchAddress( "r2", &r2 );
-	t->SetBranchAddress( "theta", &theta );
 	t->SetBranchAddress( "Vmag", &Vmag );
 	t->SetBranchAddress( "Bmag", &Bmag );
 	

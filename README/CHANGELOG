@@ -3,6 +3,13 @@ Change log eventdisplay analysis package
 (please observe the wiki syntax for this file)
 
 ************************************************
+******* 20150102 release of v4.70a ****
+************************************************
+
+* 20150102
+fix plotting of exclusion regions in VPlotAnasumHistograms
+
+************************************************
 ******* 20141107 release of v4.70 ****
 ************************************************
 
