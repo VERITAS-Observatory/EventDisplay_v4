@@ -117,7 +117,7 @@ elif [[ $CUT == *ExtendedSource-* ]]; then
     CUTRADACC=${CUT/-ExtendedSource-/"-"}
     echo $CUTRADACC
 fi
-RADACC="radialAcceptance-${IRFVERSION}-${AUXVERSION}-Cut-${CUTRADACC}-${METH}-VX-TX.root"
+RADACC="radialAcceptance-${IRFVERSION}-${AUXVERSION}-${SIMTYPE}-Cut-${CUTRADACC}-${METH}-VX-TX.root"
 
 echo $CUTFILE
 echo $EFFAREA
