@@ -3,7 +3,7 @@
 
 # qsub parameters
 # h_cpu=11:29:00; h_vmem=4000M; tmpdir_size=1G
-h_cpu=0:29:00; h_vmem=4000M; tmpdir_size=1G
+h_cpu=0:59:00; h_vmem=4000M; tmpdir_size=1G
 
 if [ $# -ne 4 ]; then
 # begin help message

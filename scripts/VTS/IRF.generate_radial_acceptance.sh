@@ -9,7 +9,7 @@ if [[ $# != 5 ]]; then
 echo "
 IRF generation: create radial acceptances for a set of cuts
 
-IRF.generate_radial_acceptance.sh <runlist> <input directory> <cuts list file> <epoch> <Rec ID>
+IRF.generate_radial_acceptance.sh <runlist> <input directory> <cuts list file> <epoch> <SIM> <Rec ID>
 
 required parameters:
 
@@ -24,6 +24,8 @@ required parameters:
                             V4: array before T1 move (before Fall 2009)
                             V5: array after T1 move (Fall 2009 - Fall 2012)
                             V6: array after camera update (after Fall 2012)
+
+    <SIM>                   Sims used to generate lookup table with which the data was analysed
     
     <Rec ID>                reconstruction ID(s)
                             (see EVNDISP.reconstruction.runparameter)
@@ -33,10 +35,10 @@ required parameters:
 
 examples:
 ./IRF.generate_radial_acceptance.sh ~/runlist.dat \
- \$VERITAS_USER_DATA_DIR/rad_accept ~/cutset.dat V6 0
+ \$VERITAS_USER_DATA_DIR/rad_accept ~/cutset.dat V6 CARE_June1425 0
     
 ./IRF.generate_radial_acceptance.sh ~/runlist.dat \
- \$VERITAS_USER_DATA_DIR/rad_accept ~/cutset.dat \"V4 V5 V6\" \"0 1 2 3 4\"
+ \$VERITAS_USER_DATA_DIR/rad_accept ~/cutset.dat \"V4 V5 V6\" GRISU-SW6 \"0 1 2 3 4\"
     
 --------------------------------------------------------------------------------
 "
@@ -53,9 +55,10 @@ RLIST=$1
 MSCWDIR=$2
 CUTLISTFILE=$3
 EPOCH=$4
-RECID="$5"
+SIM=$5
+RECID="$6"
 # make radial acceptance version
-EDVERSION=`$EVNDISPSYS/bin/makeRadialAcceptance --version | tr -d .`
+EDVERSION=`$EVNDISPSYS/bin/makeRadialAcceptance --version | tr -d . | sed -e 's/[a-Z]*$//' `
 # version string for aux files
 AUX="auxv01"
 
@@ -130,7 +133,7 @@ for CUTS in ${CUTLIST[@]}; do
                 CUTSNAME=${CUTSNAME/-ExtendedSource-/"-"}
                 echo $CUTSNAME
             fi
-            OFILE="radialAcceptance-${EDVERSION}-${AUX}-$CUTSNAME-${METH}-$VX-T$TELES"
+            OFILE="radialAcceptance-${EDVERSION}-${AUX}-${SIM}-$CUTSNAME-${METH}-$VX-T$TELES"
             ODIR="$VERITAS_IRFPRODUCTION_DIR/RadialAcceptances"
             mkdir -p $ODIR
 	    chmod g+w $ODIR
