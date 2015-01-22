@@ -3,6 +3,13 @@ Change log eventdisplay analysis package
 (please observe the wiki syntax for this file)
 
 ************************************************
+******* 20150123 release of v4.70b ****
+************************************************
+
+* 20150121 
+We now distribute separate radial acceptance files for GRISU and CARE lookup tables; naming scheme for radial acceptance files & analysis scripts have been changed to reflect this.
+
+************************************************
 ******* 20150102 release of v4.70a ****
 ************************************************
 
