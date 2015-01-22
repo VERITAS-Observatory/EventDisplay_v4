@@ -194,7 +194,7 @@ for RUN in ${RUNS[@]}; do
     RADACCRUN=${RADACCRUN/TX/$TELTOANA}
 
     if [[ $CUTS = *frogs* ]]; then
-       RADACCRUN="radialAcceptance-v451-auxv01-Cut-NTel2-PointSource-Moderate-GEO-V6-T1234.root"
+       RADACCRUN="radialAcceptance-v470-auxv01-CARE_June1425-Cut-NTel2-PointSource-Moderate-GEO-V6-T1234.root"
        EFFAREARUN="effArea-v461-141017-CARE-N2_001-003-005CU_index2.5-GEO-V6-ATM21-T1234.root"
     fi
 
