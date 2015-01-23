@@ -4,7 +4,7 @@
 # qsub parameters
 h_cpu=00:29:00; h_vmem=6000M; tmpdir_size=10G
 
-if [[ $# != 5 ]]; then
+if [[ $# != 6 ]]; then
 # begin help message
 echo "
 IRF generation: create radial acceptances for a set of cuts
