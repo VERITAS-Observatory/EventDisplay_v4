@@ -211,7 +211,7 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 	
 	// quality cuts before training
 	TCut iCutSignal = iRun->fQualityCuts && iRun->fMCxyoffCut && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut && iRun->fZenithCutData[iZenithBin]->fZenithCut;
-	TCut iCutBck = iRun->fQualityCuts && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut && iRun->fZenithCutData[iZenithBin]->fZenithCut;
+	TCut iCutBck = iRun->fQualityCuts && iRun->fQualityCutsBkg && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut && iRun->fZenithCutData[iZenithBin]->fZenithCut;
 	if( !iRun->fMCxyoffCutSignalOnly )
 	{
 		iCutBck = iCutBck && iRun->fMCxyoffCut;
