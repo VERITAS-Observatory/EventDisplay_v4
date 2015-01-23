@@ -57,7 +57,8 @@ IRFTYPE=$2
 [[ "$7" ]] && CUTSLISTFILE=$7 || CUTSLISTFILE=""
 [[ "$8" ]] && SIMDIR=$8 || SIMDIR=""
 # evndisplay version
-EDVERSION=`$EVNDISPSYS/bin/makeRadialAcceptance --version | tr -d . | sed -e 's/[a-Z]*$//' `
+EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d . | sed -e 's/[a-Z]*$//' `
+
 # version string for aux files
 AUX="auxv01"
 
