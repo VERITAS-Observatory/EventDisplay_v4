@@ -57,7 +57,7 @@ IRFTYPE=$2
 [[ "$7" ]] && CUTSLISTFILE=$7 || CUTSLISTFILE=""
 [[ "$8" ]] && SIMDIR=$8 || SIMDIR=""
 # evndisplay version
-EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .`
+EDVERSION=`$EVNDISPSYS/bin/makeRadialAcceptance --version | tr -d . | sed -e 's/[a-Z]*$//' `
 # version string for aux files
 AUX="auxv01"
 
@@ -112,9 +112,9 @@ else
 #       CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat"
     else
     #BDT TMVA list of cuts
-        CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-BDT.dat 
-                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft-TMVA-BDT.dat 
-                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard-TMVA-BDT.dat" 
+        CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-BDT.dat" 
+               #  ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft-TMVA-BDT.dat 
+               #  ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard-TMVA-BDT.dat" 
 #       CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat"
     fi
 fi
