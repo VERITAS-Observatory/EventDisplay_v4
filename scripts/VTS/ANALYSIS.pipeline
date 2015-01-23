@@ -122,6 +122,12 @@ export FINALOUTPUT="anmer.output.root"
 # (full path please)
 export RUNPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.Crab"
 
+## Which event display reconstruction runparameter file should we use?
+# CA is for runs that use CARE-derived IRFs
+# GR is for runs that use GRISU-derived IRFs
+export EVNRECONFILE_CA="EVNDISP.reconstruction.runparameter"
+export EVNRECONFILE_GR="EVNDISP.reconstruction.SumWindow-noDisp"
+
 ## Do you want to automatically generate the anasum runlist? (recommended)
 # If so, leave ANRUNLIST blank
 # If you want to use your own anasum runlist, put the full path to your
@@ -532,6 +538,17 @@ function setupFilteredRunlists {
 	RUNLIST.whichRunsAreAtmosphere.sh w $RUNLIST | RUNLIST.whichRunsAreArrayEpoch.sh 5 > $RUNLISTWINTV5
 	RUNLIST.whichRunsAreAtmosphere.sh s $RUNLIST | RUNLIST.whichRunsAreArrayEpoch.sh 6 > $RUNLISTSUMMV6
 	RUNLIST.whichRunsAreAtmosphere.sh w $RUNLIST | RUNLIST.whichRunsAreArrayEpoch.sh 6 > $RUNLISTWINTV6
+
+  # grisu and care require separate runlists in evndisp stage
+  RUNLISTCARE="$SCIDIR/runlist.grisu"
+  RUNLISTGRIS="$SCIDIR/runlist.care"
+  cat $RUNLISTSUMMV4 >  $RUNLISTGRIS
+  cat $RUNLISTWINTV4 >> $RUNLISTGRIS
+  cat $RUNLISTSUMMV5 >> $RUNLISTGRIS
+  cat $RUNLISTWINTV5 >> $RUNLISTGRIS
+  cat $RUNLISTSUMMV6 >> $RUNLISTGRIS
+  cat $RUNLISTWINTV6 >  $RUNLISTCARE # only V6 winter gets to use CARE for now
+
 	cd $CWD
 }
 
@@ -685,15 +702,28 @@ if [[ "$STAGE" == "evndisp" ]] ; then
 		stageBanner
 		# evndisp #########################################################
 		echo "$STAGE" > "$STAGEFILE"
+		setupFilteredRunlists
 		makeParamFile
-        checkForSciPipeNevents
+    checkForSciPipeNevents
 		cd $EVNDISPSYS/scripts/VTS
-        if [[ "$DOCALIB" = yes ]] ; then CALIBCODE=1
-        else                             CALIBCODE=0 ; fi
-        VPM=1 ## on by default
-        if [[ "$USEMODEL3D" == "yes" ]] ; then MODEL3D=1
-        else                                   MODEL3D=0 ; fi
-		QSUBDATA=$(./ANALYSIS.evndisp.sh $RUNLIST $EVNDISPOUTPUTDIR $CALIBCODE $VPM $MODEL3D | tee >(cat - >&5) )
+    if [[ "$DOCALIB" = yes ]] ; then CALIBCODE=1
+    else                             CALIBCODE=0 ; fi
+    VPM=1 ## on by default
+    if [[ "$USEMODEL3D" == "yes" ]] ; then MODEL3D=1
+    else                                   MODEL3D=0 ; fi
+    
+    # new, GRISU/CARE dependent evndisp command:
+    QSUBDATA=""
+    NRUNS=$( cat $RUNLISTGRIS | wc -l )
+    if [ "$NRUNS" -gt "0" ] ; then
+      QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp.sh $RUNLISTGRIS $EVNDISPOUTPUTDIR $EVNRECONFILE_GR $CALIBCODE $MODEL3D | tee >(cat - >&5) ) ; fi
+    NRUNS=$( cat $RUNLISTCARE | wc -l )
+    if [ "$NRUNS" -gt "0" ] ; then
+      QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp.sh $RUNLISTCARE $EVNDISPOUTPUTDIR $EVNRECONFILE_CA $CALIBCODE $MODEL3D | tee >(cat - >&5) ) ; fi
+
+    # old, simulation-independent command
+		#QSUBDATA=$(./ANALYSIS.evndisp.sh $RUNLIST $EVNDISPOUTPUTDIR $CALIBCODE $VPM $MODEL3D | tee >(cat - >&5) )
+    
 		rm -rf "$EVNJOBSUB"
 		echo "$QSUBDATA" > "$EVNJOBSUB"
 		updateRunningJobFile "$QSUBDATA"
