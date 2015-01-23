@@ -25,7 +25,8 @@ required parameters:
                             V5: array after T1 move (Fall 2009 - Fall 2012)
                             V6: array after camera update (after Fall 2012)
 
-    <SIM>                   Sims used to generate lookup table with which the data was analysed
+    <SIM>                   Sims used to generate lookup table with which the data was analysed,
+                            same ones as used for the table in mscw-stage
     
     <Rec ID>                reconstruction ID(s)
                             (see EVNDISP.reconstruction.runparameter)
