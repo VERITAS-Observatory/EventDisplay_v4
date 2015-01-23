@@ -1467,6 +1467,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 	// loop over different source strengths (in Crab Units)
 	// (hardwired: start at 0.001 CU to 30 CU)
 	unsigned int iSourceStrengthStepSizeN = ( unsigned int )( ( log10( 30. ) - log10( fOptimizationMinSourceStrength ) ) / 0.005 );
+	cout << "VTVMAEvaluator::optimizeSensitivity(), source strength steps: " << iSourceStrengthStepSizeN << endl;
 	for( unsigned int s = 0; s < iSourceStrengthStepSizeN; s++ )
 	{
 		double iSourceStrength = log10( fOptimizationMinSourceStrength ) + s * 0.005;
