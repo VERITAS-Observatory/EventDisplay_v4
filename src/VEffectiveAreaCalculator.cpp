@@ -1541,7 +1541,7 @@ bool VEffectiveAreaCalculator::getMonteCarloSpectra( VEffectiveAreaCalculatorMCH
 					}
 					if( hVEmc[s][i_az] && fRunPara && fRunPara->fIgnoreFractionOfEvents > 0. )
 					{
-						hVEmc[s][i_az]->Scale( fRunPara->fIgnoreFractionOfEvents );
+					  hVEmc[s][i_az]->Scale( ( 1.0 - fRunPara->fIgnoreFractionOfEvents ) );
 					}
 				}
 				else
@@ -1561,7 +1561,7 @@ bool VEffectiveAreaCalculator::getMonteCarloSpectra( VEffectiveAreaCalculatorMCH
 					}
 					if( hVEmcSWeight[s][i_az] && fRunPara && fRunPara->fIgnoreFractionOfEvents > 0. )
 					{
-						hVEmcSWeight[s][i_az]->Scale( fRunPara->fIgnoreFractionOfEvents );
+					  hVEmcSWeight[s][i_az]->Scale( ( 1.0 - fRunPara->fIgnoreFractionOfEvents ) );
 					}
 				}
 				else
@@ -3267,7 +3267,7 @@ double VEffectiveAreaCalculator::getCRWeight( double iEMC_TeV_lin, TH1* h, bool 
 	{
 		c_ig = fRunPara->fIgnoreFractionOfEvents;
 	}
-	double c_mc = c_ig * h->GetEntries()
+	double c_mc = ( 1.0 - c_ig ) * h->GetEntries()
 				  * ( -1.*TMath::Abs( fRunPara->fMCEnergy_index ) + 1. )
 				  / ( TMath::Power( fRunPara->fMCEnergy_max, -1.*TMath::Abs( fRunPara->fMCEnergy_index ) + 1. )
 					  - TMath::Power( fRunPara->fMCEnergy_min, -1.*TMath::Abs( fRunPara->fMCEnergy_index ) + 1. ) );
