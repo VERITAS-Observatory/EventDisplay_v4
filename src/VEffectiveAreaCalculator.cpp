@@ -3262,7 +3262,7 @@ double VEffectiveAreaCalculator::getCRWeight( double iEMC_TeV_lin, TH1* h, bool 
 	
 	
 	// normalization of MC spectrum
-	double c_ig = 1.;
+	double c_ig = 0.;
 	if( fRunPara->fIgnoreFractionOfEvents > 0. )
 	{
 		c_ig = fRunPara->fIgnoreFractionOfEvents;
