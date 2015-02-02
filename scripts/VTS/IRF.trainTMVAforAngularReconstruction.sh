@@ -38,7 +38,7 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # EventDisplay version
-EDVERSION=`$EVNDISPSYS/bin/trainTMVAforAngularReconstruction --version | tr -d . | sed -e 's/[a-Z]*$//' `
+EDVERSION=`$EVNDISPSYS/bin/trainTMVAforAngularReconstruction --version | tr -d .`
 
 # Parse command line arguments
 EPOCH=$1

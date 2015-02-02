@@ -72,7 +72,7 @@ fi
 
 PARTICLE_TYPE="gamma"
 # evndisplay version
-EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d . | sed -e 's/[a-Z]*$//' `
+EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .`
 
 [[ "$9" ]] && SDIR=$9 || SDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/MSCW_RECID${RECID}"
 echo "Signal input directory: $SDIR"

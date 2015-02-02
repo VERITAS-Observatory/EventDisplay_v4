@@ -59,7 +59,7 @@ EPOCH=$4
 SIM=$5
 RECID="$6"
 # make radial acceptance version
-EDVERSION=`$EVNDISPSYS/bin/makeRadialAcceptance --version | tr -d . | sed -e 's/[a-Z]*$//' `
+EDVERSION=`$EVNDISPSYS/bin/makeRadialAcceptance --version | tr -d .`
 # version string for aux files
 AUX="auxv01"
 
