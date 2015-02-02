@@ -47,7 +47,7 @@ for CUTSFILE in $CUTSLIST; do
     mkdir -p $OSUBDIR
     chmod -R g+w $OSUBDIR
 
-# parameter file template
+# parameter file template, change IGNOREFRACTIONOFEVENTS if needed
     PARAMFILE="
     * FILLINGMODE 0
     * ENERGYRECONSTRUCTIONMETHOD 1
@@ -57,6 +57,7 @@ for CUTSFILE in $CUTSLIST; do
     * ENERGYSPECTRUMINDEX 40 1.5 0.1
     * FILLMONTECARLOHISTOS 0
     * CUTFILE $CUTSFILE
+    * IGNOREFRACTIONOFEVENTS 0.5        
     * SIMULATIONFILE_DATA $MCFILE"
 
     # create makeEffectiveArea parameter file

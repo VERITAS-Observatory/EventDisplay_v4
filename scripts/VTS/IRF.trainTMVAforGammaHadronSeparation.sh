@@ -74,7 +74,7 @@ PARTICLE_TYPE="gamma"
 # evndisplay version
 EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .`
 
-[[ "$9" ]] && SDIR=$9 || SDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/MSCW_RECID${RECID}"
+[[ "$9" ]] && SDIR=$9 || SDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/TMVA/MSCW_RECID${RECID}"
 echo "Signal input directory: $SDIR"
 # Input directory of MC simulations
 if [[ ! -d $SDIR ]]; then
