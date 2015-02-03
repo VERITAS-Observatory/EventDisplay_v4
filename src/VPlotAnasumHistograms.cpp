@@ -124,117 +124,68 @@ void VPlotAnasumHistograms::help()
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 /*
+ *  calulate RA/Dec J2000 for a given x_derot, y_derot in camera coordinates
  *
+ *  x_deg on RA axis, y_deg in dec axis
+ *
+ *  all coordinates in degrees
+ *
+ *  input and output in [deg]
  *
  */
 
-void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x, double y , double xerr, double yerr )
+void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x_deg, double y_deg, double xerr_deg, double yerr_deg )
 {
-	//cout << "(this is preliminary)" << endl << endl;
-	
 	cout << "Sky map centre: " << fSkyMapCentreRAJ2000 << " " << fSkyMapCentreDecJ2000 << endl;
+
+	double ra      = 0.;
+	double dec     = 0.;
+	double ra_err_deg  = 0.;
+	double dec_err_deg = 0.;
+
+	x_deg *= -1.;
 	
-	double i_decDiff = 0.;
-	double i_raDiff = 0.;
+	slaDtp2s( x_deg*TMath::DegToRad(), y_deg*TMath::DegToRad(), fSkyMapCentreRAJ2000*TMath::DegToRad(), fSkyMapCentreDecJ2000*TMath::DegToRad(), &ra, &dec );
+	slaDtp2s( (x_deg+xerr_deg)*TMath::DegToRad(), (y_deg+yerr_deg)*TMath::DegToRad(), fSkyMapCentreRAJ2000*TMath::DegToRad(), fSkyMapCentreDecJ2000*TMath::DegToRad(), &ra_err_deg, &dec_err_deg );
 	
-	if( x > 0 )
-	{
-		VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( y, -1.*x, fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
-	}
+	ra          *= TMath::RadToDeg();
+	dec         *= TMath::RadToDeg();
+	ra_err_deg  *= TMath::RadToDeg();
+	dec_err_deg *= TMath::RadToDeg();
+
+	ra_err_deg  = TMath::Abs( ra - ra_err_deg );
+	dec_err_deg = TMath::Abs( dec - dec_err_deg );
 	
-	if( x < 0 )
-	{
-		VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( y, 1.*x, fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
-	}
-	
-	cout << "i_raDiff " << i_raDiff << " i_decDiff " << i_decDiff << endl;
-	double ra = fSkyMapCentreRAJ2000 + i_raDiff;
-	double dec = fSkyMapCentreDecJ2000 + i_decDiff;
-	
-	
-	double ra_err = 0.;
-	double dec_err = 0.;
-	
-	if( xerr != 0 && yerr != 0 )
-	{
-		i_decDiff = 0.;
-		i_raDiff = 0.;
-		
-		if( y < 0 )
-		{
-			yerr = -1 * yerr;
-		}
-		
-		if( x > 0 )
-		{
-			VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( y + yerr, -1.*( x + xerr ), fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
-		}
-		if( x < 0 )
-		{
-			VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( y + yerr, ( x - xerr ), fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
-		}
-		
-		ra_err  =  abs( fSkyMapCentreRAJ2000 + i_raDiff - ra );
-		dec_err =  fSkyMapCentreDecJ2000 + i_decDiff - dec;
-	}
-	
-	
-	if( xerr == 0 && yerr == 0 )
-	{
-		cout << "(RA,Dec) (J2000) for (x,y)=(" << x << "," << y << "): ";
-		cout << "(" << ra << "," << dec << ")" << endl;
-		double hours = ( double )( ( int )( ra * 24. / 360. ) );
-		double min   = ( double )( ( int )( 60.*( ra * 24. / 360. - hours ) ) );
-		double sec   = ( ra - hours * 360. / 24. - min * 360. / 24. / 60. ) * 24. / 360.*60.*60.;
-		double dec_d = ( double )( int )( dec );
-		double dec_m = ( double )( int )( ( dec - dec_d ) * 60. );
-		double dec_s = ( dec - dec_d - dec_m / 60. ) * 3600.;
-		cout << "(Ra,Dec) (J2000) for (x,y)=(" << x << "," << y << "): ";
-		cout << "(" << hours << "h " << min << "' " << sec << "''";
-		cout << ", ";
-		if( dec_d > 0 )
-		{
-			cout << "+";
-		}
-		cout << dec_d << " " << dec_m << " " << dec_s;
-		cout << ")" << endl;
-	}
-	else
-	{
-	
-		cout << "(RA,Dec) (J2000) for (x,y)=( " << x << "+/-" << xerr << " , " << y << "+-" << yerr << " ): ";
-		cout << "( " << ra << "+/-" << ra_err << " , " << dec << "+/-" << dec_err <<  " )" << endl;
-		
-		double hours = ( double )( ( int )( ra * 24. / 360. ) );
-		double min   = ( double )( ( int )( 60.*( ra * 24. / 360. - hours ) ) );
-		double sec   = ( ra - hours * 360. / 24. - min * 360. / 24. / 60. ) * 24. / 360.*60.*60.;
-		double dec_d = ( double )( int )( dec );
-		double dec_m = ( double )( int )( ( dec - dec_d ) * 60. );
-		double dec_s = ( dec - dec_d - dec_m / 60. ) * 3600.;
-		
-		double hours_err = ( double )( ( int )( ra_err * 24. / 360. ) );
-		double min_err   = ( double )( ( int )( 60.*( ra_err * 24. / 360. - hours_err ) ) );
-		double sec_err   = ( ra_err - hours_err * 360. / 24. - min_err * 360. / 24. / 60. ) * 24. / 360.*60.*60.;
-		double dec_d_err = ( double )( int )( dec_err );
-		double dec_m_err = ( double )( int )( ( dec_err - dec_d_err ) * 60. );
-		double dec_s_err = ( dec_err - dec_d_err - dec_m_err / 60. ) * 3600.;
-		
-		
-		cout << "(RA,Dec) (J2000) for (x,y)=( " << x << "+/-" << xerr << " , " << y << "+-" << yerr << " ): ";
-		cout << "( " << hours << "h " << min << "' " << sec << "''" << " +/- " << hours_err << "h " << min_err << "' " << sec_err << "''" ;
-		cout << ", ";
-		if( dec_d > 0 )
-		{
-			cout << "+";
-		}
-		cout << dec_d << " " << dec_m << " " << dec_s << " +/- " << dec_d_err << " " << dec_m_err << " " << dec_s_err << " ";
-		cout << " )" << endl;
-		
-	}
-	
-	
-	/// calculating and printing the offset of the centroid wrt camera center
-	double offset = sqrt( x * x + y * y );
+        cout << "(RA,Dec) (J2000) for (x,y)=( " << x_deg << "+/-" << xerr_deg << " , " << y_deg << "+-" << yerr_deg << " ): ";
+        cout << "( " << ra << "+/-" << ra_err_deg << " , " << dec << "+/-" << dec_err_deg <<  " )" << endl;
+       
+        double hours = ( double )( ( int )( ra * 24. / 360. ) );
+        double min   = ( double )( ( int )( 60.*( ra * 24. / 360. - hours ) ) );
+        double sec   = ( ra - hours * 360. / 24. - min * 360. / 24. / 60. ) * 24. / 360.*60.*60.;
+        double dec_d = ( double )( int )( dec );
+        double dec_m = ( double )( int )( ( dec - dec_d ) * 60. );
+        double dec_s = ( dec - dec_d - dec_m / 60. ) * 3600.;
+       
+        double hours_err = ( double )( ( int )( ra_err_deg * 24. / 360. ) );
+        double min_err   = ( double )( ( int )( 60.*( ra_err_deg * 24. / 360. - hours_err ) ) );
+        double sec_err   = ( ra_err_deg - hours_err * 360. / 24. - min_err * 360. / 24. / 60. ) * 24. / 360.*60.*60.;
+        double dec_d_err = ( double )( int )( dec_err_deg );
+        double dec_m_err = ( double )( int )( ( dec_err_deg - dec_d_err ) * 60. );
+        double dec_s_err = ( dec_err_deg - dec_d_err - dec_m_err / 60. ) * 3600.;
+       
+       
+        cout << "(RA,Dec) (J2000) for (x,y)=( " << x_deg << "+/-" << xerr_deg << " , " << y_deg << "+-" << yerr_deg << " ): ";
+        cout << "( " << hours << "h " << min << "' " << sec << "''" << " +/- " << hours_err << "h " << min_err << "' " << sec_err << "''" ;
+        cout << ", ";
+        if( dec_d > 0 )
+        {
+	       cout << "+";
+        }
+        cout << dec_d << " " << dec_m << " " << dec_s << " +/- " << dec_d_err << " " << dec_m_err << " " << dec_s_err << " ";
+        cout << " )" << endl;
+       
+	// calculating and printing the offset of the position wrt camera center
+	double offset = sqrt( x_deg * x_deg + y_deg * y_deg );
 	cout << "Offset from camera center = " << offset << " deg" << endl;
 	
 }
@@ -817,8 +768,8 @@ TCanvas* VPlotAnasumHistograms::plot_theta2( double t2min, double t2max, int irb
     rSource:     minimum distance to sky plot centre of bins to be taken into account (exclude the source region)
     xmin, xmax:  plotting range (significances)
     regioncode:  extra specifier for additional region cuts
-				 - exclude x<0 (only use top    half of skymap)
-				 - exclude x>0 (only use bottom half of skymap)
+		  - exclude x<0 (only use top    half of skymap)
+		  - exclude x>0 (only use bottom half of skymap)
 */
 TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, double rSource, double xmin, double xmax, TCanvas* cCanvas, bool regioncodeflag )
 {
@@ -967,7 +918,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	delete v_y;
 	delete v_r1;
 	delete v_r2;
-	
+
 	gStyle->SetOptStat( "mr" );
 	gStyle->SetOptFit( 1111 );
 	
