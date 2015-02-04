@@ -84,7 +84,7 @@ elif [[ $CUTS == *hardopen* ]]; then
     CUT="NTel2-PointSource-HardOpen"
 elif [[ $CUTS == *softExt* ]]; then
     CUT="NTel2-ExtendedSource-Soft"
-elif [[ $CUTS == *soft* ]]; then
+elif [[ $CUTS == *soft2tel* ]]; then
     CUT="NTel2-PointSource-Soft"
 elif [[ $CUTS = *moderate2tel* ]]; then
     CUT="NTel2-PointSource-Moderate"
@@ -100,8 +100,12 @@ elif [[ $CUTS = *hardExt2tel* ]]; then
     CUT="NTel2-ExtendedSource-Hard"
 elif [[ $CUTS = *frogs* ]]; then
     CUT="FROGS_NTel2_001-003-005CU_index2.5"
-elif [[ $CUTS = *BDT-moderate* ]]; then
+elif [[ $CUTS = *BDTmoderate* ]]; then
     CUT="NTel2-PointSource-Moderate-TMVA-BDT"
+elif [[ $CUTS = *BDTsoft* ]]; then
+    CUT="NTel2-PointSource-Soft-TMVA-BDT"
+elif [[ $CUTS = *BDThard* ]]; then
+    CUT="NTel2-PointSource-Hard-TMVA-BDT"
 else
     echo "ERROR: unknown cut definition: $CUTS"
     exit 1
