@@ -181,13 +181,13 @@ int main( int argc, char* argv[] )
 	cout << "compareDatawithMC (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
 	cout << "==========================" << endl << endl;
 	
-	if( argc != 4 )
+	if( argc < 4 )
 	{
 		cout << "compare MC simulations with excess events from data runs " << endl;
 		cout << "(e.g.from Crab Nebula or Mrk 421 observations)" << endl;
 		cout << endl;
 		cout << endl;
-		cout << "compareDatawithMC <input file list> <cut> <outputfile>" << endl;
+		cout << "compareDatawithMC <input file list> <cut> <outputfile> [BDT gamma/hadron cuts]" << endl;
 		cout << endl;
 		cout << "\t input file list: see example file COMPAREMC.runparameter in the parameter files directory" << endl;
 		cout << "\t cuts: " << endl;
@@ -198,6 +198,9 @@ int main( int argc, char* argv[] )
 		cout << endl;
 		cout << "\t output file:     results are written to this file" << endl;
 		cout << "\t                  (use  plot_stereo_compare.C for to plot)" << endl;
+		cout << endl;
+		cout << "\t use BDT cuts for gamma/hadron separation: 0 = no (default), 1 = yes" << endl;
+		cout << "\t cut file needs to be indicated within VDataMCComparision::initialGammaHadronCuts()" << endl;
 		cout << endl;
 		cout << "Note: most cuts are hardwired in VDataMCComparision::fillHistograms()" << endl;
 		cout << endl;
@@ -210,6 +213,13 @@ int main( int argc, char* argv[] )
 	int fSingleTelescopeCuts = atoi( argv[2] );
 	
 	string fOutputfile = argv[3];
+
+	bool fCalculateMVACut = false; 
+
+	if( argv[4] && atoi( argv[4] ) == 1 )
+	{
+		fCalculateMVACut = true;
+	}
 	
 	// test number of telescopes
 	int iNT = 0;
@@ -244,7 +254,7 @@ int main( int argc, char* argv[] )
 	{
 		cout << fInputData[i].fType << endl;
 		cout << "----" << endl;
-		fStereoCompare.push_back( new VDataMCComparision( fInputData[i].fType, false, fInputData[i].fNTelescopes ) );
+		fStereoCompare.push_back( new VDataMCComparision( fInputData[i].fType, false, fInputData[i].fNTelescopes, fCalculateMVACut ) );
 		fStereoCompare.back()->setAzRange( fInputData[i].fAz_deg_min, fInputData[i].fAz_deg_max );
 		// get telescope coordinates
 		fStereoCompare.back()->resetTelescopeCoordinates();
@@ -277,7 +287,7 @@ int main( int argc, char* argv[] )
 	// calculate difference histograms
 	cout << "DIFF" << endl;
 	cout << "----" << endl;
-	VDataMCComparision* fDiff = new VDataMCComparision( "DIFF", false, iNT );
+	VDataMCComparision* fDiff = new VDataMCComparision( "DIFF", false, iNT, fCalculateMVACut );
 	// assume 5 background regions
 	fDiff->setOnOffHistograms( fStereoCompareOn, fStereoCompareOff, 1. / 5. );
 	fDiff->writeHistograms( fout );

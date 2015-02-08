@@ -101,7 +101,7 @@ class VDataMCComparision
 		
 	public:
 	
-		VDataMCComparision( string, bool, int );
+		VDataMCComparision( string, bool, int, bool );
 		~VDataMCComparision() {}
 		void defineHistograms();
 		bool fillHistograms( string ifile, int iSingleTelescopeCuts );

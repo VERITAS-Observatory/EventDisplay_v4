@@ -32,16 +32,17 @@ void VPlotCompareDataWithMC::help()
 	cout << "compare image and shower parameter distribution of simulations and on/off data" << endl;
 	cout << "------------------------------------------------------------------------------" << endl;
 	cout << endl;
-	cout << "shower parameter distributions:  stereo_parameter()  " << endl << endl;
-	cout << "mscw/mscl energy dependent:      msc_vs_energy_plots()  " << endl << endl;
-	cout << "mwr/mlr energy dependent:        mwr_vs_energy_plots()  " << endl << endl;
-	cout << "multiplicity plots:              multiplicity_plots() " << endl << endl;
-	cout << "emission height:                 emission_height()" << endl << endl;
+	cout << "shower parameter distributions:  stereo_parameter()  " << endl;
+	cout << "mscw/mscl energy dependent:      msc_vs_energy_plots()  " << endl;
+	cout << "mwr/mlr energy dependent:        mwr_vs_energy_plots()  " << endl;
+	cout << "multiplicity plots:              multiplicity_plots() " << endl;
+	cout << "emission height:                 emission_height()" << endl;
 	cout << "core plots:                      core_plots()" << endl;
-	cout << "core distance plots:             distance_plots()" << endl << endl;
-	cout << "centroid plots:                  centroids()" << endl << endl;
-	cout << "image parameter distributions:   single_telescope()" << endl << endl;
-	cout << "width/length energy dependent:   widthlength_vs_energy_plots()" << endl << endl;
+	cout << "core distance plots:             distance_plots()" << endl;
+	cout << "centroid plots:                  centroids()" << endl;
+	cout << "image parameter distributions:   single_telescope()" << endl;
+	cout << "width/length energy dependent:   widthlength_vs_energy_plots()" << endl;
+	cout << "mva energy dependent:            mva_vs_energy_plots()" << endl;
 	cout << endl;
 }
 
@@ -671,6 +672,23 @@ void VPlotCompareDataWithMC::msc_vs_energy_plots( int iRebin, double xmin, doubl
 	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax , "REL" );
 	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax );
 	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax );
+}
+
+/*
+
+    plot mva energy dependent
+
+*/
+void VPlotCompareDataWithMC::mva_vs_energy_plots( int iRebin, double xmin, double xmax )
+{
+        if( !fDataFile )
+        {
+                return;
+        }
+
+        plot_energyDependentDistributions( "MVA", iRebin, xmin, xmax , "CUMU" );
+        plot_energyDependentDistributions( "MVA", iRebin, xmin, xmax , "REL" );
+        plot_energyDependentDistributions( "MVA", iRebin, xmin, xmax );
 }
 
 /*

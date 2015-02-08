@@ -70,11 +70,12 @@ void VDataMCComparisionHistogramData::fill( double iV, double iWeight, double iL
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
-VDataMCComparision::VDataMCComparision( string iname, bool iBackgroundData, int intel )
+VDataMCComparision::VDataMCComparision( string iname, bool iBackgroundData, int intel, bool iMVAValues )
 {
 	bBckData = iBackgroundData;    // use histogram binning for background data
 	fNTel = intel;
 	fName = iname;
+	fCalculateMVAValues = iMVAValues;
 	if( fName != "ON" && fName != "OFF" && fName != "SIMS" && fName != "DIFF" )
 	{
 		cout << "error: unknown data type: " << fName << endl;
@@ -85,7 +86,6 @@ VDataMCComparision::VDataMCComparision( string iname, bool iBackgroundData, int 
 	
 	fData = 0;
 	fCuts = 0;
-	fCalculateMVAValues = false;
 	
 	// spectral weighting (will be set later correctly, as it is run from MC run header)
 	fSpectralWeight = new VSpectralWeight();
@@ -123,7 +123,8 @@ void VDataMCComparision::initialGammaHadronCuts()
 	fCuts->initialize();
 	fCuts->resetCutValues();
 	// HARDWIRED CUT FILE
-	if( !fCuts->readCuts( "$VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles/ANASUM.GammaHadron.TMVA.BDT.T2Fixed.dat" ) )
+	//if( !fCuts->readCuts( "$VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles/ANASUM.GammaHadron.TMVA.BDT.T2Fixed.dat" ) )
+	if( !fCuts->readCuts( "$VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles/ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-BDT.dat" ) )
 	{
 		cout << "exiting..." << endl;
 		exit( -1 );
