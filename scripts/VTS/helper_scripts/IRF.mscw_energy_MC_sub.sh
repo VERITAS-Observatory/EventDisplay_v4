@@ -36,8 +36,8 @@ for ID in $RECID; do
     echo "Temporary directory: $DDIR"
 
 # mscw_energy command line options
-    MOPT="-noNoTrigger -shorttree -nomctree -writeReconstructedEventsOnly=1 -arrayrecid=$ID -tablefile $TABFILE"
-# use short output tree
+    MOPT="-noNoTrigger -nomctree -writeReconstructedEventsOnly=1 -arrayrecid=$ID -tablefile $TABFILE"
+# use short output tree (use -noshorttree for Data/MC comparison)
     # MOPT="-shorttree $MOPT"
     echo "MSCW options: $MOPT"
 
