@@ -113,9 +113,9 @@ else
 #       CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat"
     else
     #BDT TMVA list of cuts
-        CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-BDT.dat" 
-               #  ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft-TMVA-BDT.dat 
-               #  ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard-TMVA-BDT.dat" 
+        CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-BDT.dat 
+                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft-TMVA-BDT.dat 
+                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard-TMVA-BDT.dat" 
 #       CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat"
     fi
 fi
