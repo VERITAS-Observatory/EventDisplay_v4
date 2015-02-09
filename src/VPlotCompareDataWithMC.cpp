@@ -345,7 +345,7 @@ TF1* VPlotCompareDataWithMC::do_theta2Fit( TH1D* h, int icolor, int istyle )
 	return fTheta2;
 }
 
-void VPlotCompareDataWithMC::plotCummulativePlot( TH1D* h1, TH1D* h2, double xmin, double xmax )
+void VPlotCompareDataWithMC::plotCummulativePlot( TH1D* h1, TH1D* h2, double xmin, double xmax, bool iLeftToRight, double iBinValue )
 {
 	if( !h1 || !h2 )
 	{
@@ -361,8 +361,8 @@ void VPlotCompareDataWithMC::plotCummulativePlot( TH1D* h1, TH1D* h2, double xmi
 		xmax = h1->GetXaxis()->GetXmax();
 	}
 	
-	TH1D* hCumu_1 = VHistogramUtilities::get_Cumulative_Histogram( h1, true, true, 1.5 );
-	TH1D* hCumu_2 = VHistogramUtilities::get_Cumulative_Histogram( h2, true, true, 1.5 );
+	TH1D* hCumu_1 = VHistogramUtilities::get_Cumulative_Histogram( h1, true, iLeftToRight, iBinValue );
+	TH1D* hCumu_2 = VHistogramUtilities::get_Cumulative_Histogram( h2, true, iLeftToRight, iBinValue );
 	if( !hCumu_1 || !hCumu_2 )
 	{
 		return;
@@ -825,7 +825,14 @@ void VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVariable
 		}
 		else if( iPlot == "CUMU" )
 		{
-			plotCummulativePlot( hSims, hDiff, x_min, x_max );
+			if( iVariable == "MCSW" || iVariable == "MSCL"  )
+			{
+				plotCummulativePlot( hSims, hDiff, x_min, x_max, true, 1.5 );
+			}
+			else if( iVariable == "MVA" )
+			{
+				plotCummulativePlot( hSims, hDiff, x_min, x_max, false, -0.95 );
+			}
 		}
 		
 		
