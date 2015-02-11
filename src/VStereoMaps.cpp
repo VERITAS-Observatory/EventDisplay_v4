@@ -819,9 +819,10 @@ bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool 
 		
 		for( int i = f_RE_xstart; i <= f_RE_xstopp; i++ )
 		{
+		        i_cx =  hmap_stereo->GetXaxis()->GetBinCenter( i );
+
 			for( int j = f_RE_ystart; j <= f_RE_ystopp; j++ )
 			{
-				i_cx =  hmap_stereo->GetXaxis()->GetBinCenter( i );
 				i_cy =  hmap_stereo->GetYaxis()->GetBinCenter( j );
 				
 				// check if event is in the same ring as this bin (all off regions are in a ring around the camera center)
@@ -1470,9 +1471,11 @@ bool VStereoMaps::fill_RingBackgroundModel( double x, double y, double ze, doubl
 		{
 			for( int j = iy_start; j <= iy_stopp; j++ )
 			{
+                                i_cx = hmap_stereo->GetXaxis()->GetBinCenter( i );
+                                i_cy = hmap_stereo->GetYaxis()->GetBinCenter( j );
 				// get bin coordinates (source test position) (source test position)
-				i_cx = fRandom->Uniform( hmap_stereo->GetXaxis()->GetBinLowEdge( i ), hmap_stereo->GetXaxis()->GetBinUpEdge( i ) );
-				i_cy = fRandom->Uniform( hmap_stereo->GetYaxis()->GetBinLowEdge( j ), hmap_stereo->GetYaxis()->GetBinUpEdge( j ) );
+//				i_cx = fRandom->Uniform( hmap_stereo->GetXaxis()->GetBinLowEdge( i ), hmap_stereo->GetXaxis()->GetBinUpEdge( i ) );
+//				i_cy = fRandom->Uniform( hmap_stereo->GetYaxis()->GetBinLowEdge( j ), hmap_stereo->GetYaxis()->GetBinUpEdge( j ) );
 				
 				// check if bin is inside fiducial area
 				if( sqrt( i_cx * i_cx + i_cy * i_cy ) > fRunList.fmaxradius )

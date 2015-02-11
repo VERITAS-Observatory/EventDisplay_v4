@@ -9,6 +9,9 @@ Change log eventdisplay analysis package
 * 20150220
 Analysis with BDT Gamma/Hadron Separation is possible.
 
+* 20150211 (GM)
+removed random smoothing of ring center position for ring-background method
+
 * 20150202 (GM)
 fixed conversion from camera to sky coordinates in
 VPlotAnasumHistograms::convert_derotated_RADECJ2000()
