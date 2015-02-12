@@ -31,18 +31,19 @@ void VPlotCompareDataWithMC::help()
 	cout << endl;
 	cout << "compare image and shower parameter distribution of simulations and on/off data" << endl;
 	cout << "------------------------------------------------------------------------------" << endl;
-	cout << endl;
-	cout << "shower parameter distributions:  stereo_parameter()  " << endl;
-	cout << "mscw/mscl energy dependent:      msc_vs_energy_plots()  " << endl;
-	cout << "mwr/mlr energy dependent:        mwr_vs_energy_plots()  " << endl;
-	cout << "multiplicity plots:              multiplicity_plots() " << endl;
-	cout << "emission height:                 emission_height()" << endl;
-	cout << "core plots:                      core_plots()" << endl;
-	cout << "core distance plots:             distance_plots()" << endl;
-	cout << "centroid plots:                  centroids()" << endl;
-	cout << "image parameter distributions:   single_telescope()" << endl;
-	cout << "width/length energy dependent:   widthlength_vs_energy_plots()" << endl;
-	cout << "mva energy dependent:            mva_vs_energy_plots()" << endl;
+	cout << endl << endl;
+	cout << "shower parameter distributions:  stereo_parameter()  " << endl << endl;
+	cout << "mscw/mscl energy dependent:      msc_vs_energy_plots()  " << endl << endl;
+	cout << "mwr/mlr energy dependent:        mwr_vs_energy_plots()  " << endl << endl;
+	cout << "multiplicity plots:              multiplicity_plots() " << endl << endl;
+	cout << "emission height:                 emission_height()" << endl << endl;
+	cout << "core plots:                      core_plots()" << endl << endl;
+	cout << "core distance plots:             distance_plots()" << endl << endl;
+	cout << "centroid plots:                  centroids()" << endl << endl;
+	cout << "image parameter distributions:   single_telescope()" << endl << endl;
+	cout << "width/length energy dependent:   widthlength_vs_energy_plots()" << endl << endl;
+	cout << "mva energy dependent:            mva_vs_energy_plots()" << endl << endl;
+	cout << "mva parameter distribution:      mva_parameter()" << endl << endl;
 	cout << endl;
 }
 
@@ -409,8 +410,10 @@ void VPlotCompareDataWithMC::plotRelativePlot( TH1D* h1, TH1D* h2, double xmin, 
 	setHistogramAtt( hRel, 1, 1, 1, 20, 1 );
 	hRel->SetAxisRange( xmin, xmax );
 	hRel->SetYTitle( "sims/data" );
-	hRel->SetMinimum( fRelatePlotRange_min );
-	hRel->SetMaximum( fRelatePlotRange_max );
+	hRel->SetMinimum( -4 );
+	hRel->SetMaximum( 4 );
+	//hRel->SetMinimum( fRelatePlotRange_min );
+	//hRel->SetMaximum( fRelatePlotRange_max );
 	
 	hRel->Draw();
 	
@@ -1052,6 +1055,82 @@ void VPlotCompareDataWithMC::stereo_parameter( int msc_rebin )
 		sprintf( hn, "%s-StereoRel.pdf", fPrintName.c_str() );
 		cOO->Print( hn );
 	}
+}
+
+/*
+* 
+* plot mva parameter
+*
+*/
+
+void VPlotCompareDataWithMC::mva_parameter( int mva_rebin )
+{
+        if( !fDataFile )
+        {
+                return;
+        }
+	        
+	char hname[600];
+        char htitle[600];
+        TCanvas* cOO = new TCanvas( "cOO", "relative plots (mva parameter)", 100, 10, 600, 600 );
+        cOO->SetGridx( 0 );
+        cOO->SetGridy( 0 );
+
+        sprintf( hname, "cSD_%s", fDataFileName.c_str() );
+        sprintf( htitle, "sims/diff (mva parameter, %s)", fDataFileName.c_str() );
+        TCanvas* cSD = new TCanvas( hname, htitle, 10, 10, 600, 600 );
+        cSD->SetGridx( 0 );
+        cSD->SetGridy( 0 );
+
+	TH1D* hmva_sims = ( TH1D* )fDataFile->Get( "hMVA_SIMS" );
+        setHistogramAtt( hmva_sims, 2, 3, 1, 20, 2 );
+        hmva_sims->SetYTitle( "number of events per bin" );
+
+        TH1D* hmva_diff = ( TH1D* )fDataFile->Get( "hMVA_DIFF" );
+        setHistogramAtt( hmva_diff, 1, 3, 1, 21, 2 );
+        hmva_diff->SetLineWidth( 3 );
+        hmva_diff->SetStats( 0 );
+
+	// scaling of the histograms
+	double s_sims = 1.;
+        double s_diff = 1.;
+
+        hmva_sims->SetAxisRange( -1., 1. );
+        getScaling( s_sims, s_diff, "MVA", 1, -0.75, 0.75 );
+        if( hmva_sims->GetEntries() > 0 )
+        {
+                hmva_sims->Scale( s_sims );
+        }
+        if( hmva_diff->GetEntries() > 0 )
+        {
+                hmva_diff->Scale( s_diff );
+        }
+
+        cSD->cd();
+        gPad->SetLeftMargin( 0.14 );
+        gPad->SetBottomMargin( 0.12 );
+        hmva_sims->GetYaxis()->SetTitleOffset( 1.3 );
+        hmva_sims->SetMaximum( hmva_sims->GetMaximum() * 1.5 );
+        hmva_sims->Draw();
+        hmva_diff->Draw( "same" );
+        TLine* lmva = new TLine( 0., hmva_sims->GetMinimum(), 0., hmva_sims->GetMaximum() );
+        lmva->SetLineStyle( 2 );
+        lmva->Draw();
+        drawMatchingTests( hmva_sims, hmva_diff, -1., 1. );
+
+        cOO->cd();
+        gPad->SetLeftMargin( 0.14 );
+        gPad->SetBottomMargin( 0.12 );
+        plotRelativePlot( hmva_sims, hmva_diff, -1., 1. );
+
+	if( fPrintName.size() > 0 )
+        {
+                char hn[200];
+                sprintf( hn, "%s-Stereo.pdf", fPrintName.c_str() );
+                cSD->Print( hn );
+                sprintf( hn, "%s-StereoRel.pdf", fPrintName.c_str() );
+                cOO->Print( hn );
+        }
 }
 
 void VPlotCompareDataWithMC::core_plots( int iRebin, int iScaling )

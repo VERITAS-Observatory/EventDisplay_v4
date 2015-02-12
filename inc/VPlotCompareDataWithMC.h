@@ -78,7 +78,8 @@ class VPlotCompareDataWithMC : public VHistogramUtilities
 		void single_telescope( int telid, string iPlot, bool iOneCanvas = true,
 							   int iScalingMethod = 1, int i_rebin = 1 );
 		void stereo_parameter( int msc_rebin = 1 );
-		
+		void mva_parameter( int mva_rebin = 1);
+			
 		void setDebug( bool iB = false )
 		{
 			fDebug = iB;
