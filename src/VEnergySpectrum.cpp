@@ -1322,10 +1322,10 @@ TGraphAsymmErrors* VEnergySpectrum::getEnergySpectrumGraph()
 		}
 		z++;
 	}
-	gEnergySpectrum->Print();
 	// return graph
-	if( z > 0 )
+	if( z > 0 && gEnergySpectrum )
 	{
+                gEnergySpectrum->Print();
 		return gEnergySpectrum;
 	}
 	
