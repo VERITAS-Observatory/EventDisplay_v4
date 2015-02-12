@@ -410,10 +410,8 @@ void VPlotCompareDataWithMC::plotRelativePlot( TH1D* h1, TH1D* h2, double xmin, 
 	setHistogramAtt( hRel, 1, 1, 1, 20, 1 );
 	hRel->SetAxisRange( xmin, xmax );
 	hRel->SetYTitle( "sims/data" );
-	hRel->SetMinimum( -4 );
-	hRel->SetMaximum( 4 );
-	//hRel->SetMinimum( fRelatePlotRange_min );
-	//hRel->SetMaximum( fRelatePlotRange_max );
+	hRel->SetMinimum( fRelatePlotRange_min );
+	hRel->SetMaximum( fRelatePlotRange_max );
 	
 	hRel->Draw();
 	
