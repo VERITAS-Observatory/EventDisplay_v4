@@ -21,67 +21,132 @@ CWD=$PWD
 
 #############################################################################
 #
+# Syntax rules for the below section:
+#   1. lines that begin with 'export' are the options
+#   2. lines that start with '#%' are special properties read in by the 
+#      options browser parser, and ignored by the print-to-terminal parser
+#   3. in the options-browser parser, empty lines will reset all option properties
+#
 # // do not change the stuff in the square brackets in the next line, it is needed for the 'options' keyword
 # [BEGIN ANALYSIS SETTINGS 3823984]
 
 ## Which Runlist file should we use?
+#% GroupName Runlist Filename
+#% ActiveStage evndisp
+#% OptionComplexity Common
+#% Description Which runlist file should be used?  One runnumber per line.
 # Which runlist do you want to use?
 # It should be a simple list of veritas runnumbers,
 # one per line.  Used in all stages.
 # (full path please)
+#% OptionArgType full path
 export RUNLIST="$CWD/runlist.crab.dat"
 
+## Should we use the TMVA-BDTs feature?
+#% GroupName TMVABDT Feature
+#% ActiveStage anpar
+#% OptionComplexity Common
+#% Description Should the TMVA-BDTs feature be used?
+# use TMVA-BDT feature(yes/no)
+# takes effect in the anpar stage
+#% OptionArgType yes|no
+export USETMVABDT="no"
+
 ## Should we use the Model3D feature?
+#% GroupName Model3D Feature
+#% ActiveStage model3d
+#% OptionComplexity Uncommon
+#% Description Should the Model3D feature be used?  (Warning: ot fully implemented yet)
 # use Model3D feature(yes/no)
 # Takes effect in the evndisp stage.
+#% OptionArgType yes|no
 export USEMODEL3D="no"
 
 ## Should we use the Energy3D feature?
+#% GroupName Energy3D Feature
+#% ActiveStage energy3d
+#% OptionComplexity Uncommon
+#% Description Should the Energy3D feature be used?
 ## This feature is not *yet* functional, contact
 ## nils for more information.
 # takes effect in the mscw stage.
+#% OptionArgType yes|no
 export USEENERGY3D="no"
 
 ## What kind of cuts do you want to use?
+#% GroupName Energy Cuts
+#% ActiveStage anpar
+#% OptionComplexity Common
+#% Description What kind of energy cuts should be used?<br>Soft will have higher sensitivity to low-energy events,<br>while Hard will have higher sensitivity to high-energy events.
 # Currently supports:
 #    'Soft', 'Moderate', 'Hard', 
 #    'SoftOpen', 'ModerateOpen', 'SuperHard'
 # Takes effect in the anpar stage.
+#% OptionArgType Soft|Moderate|Hard
 export CUTS="Moderate"
 
 ## What kind of background do you want to use?
+#% GroupName Anasum Background Type
+#% ActiveStage anpar
+#% OptionComplexity Common
+#% Description Do you want to use the ring or the reflected region background method?
 # 'ring' or 'refl' (for reflected)
 # Takes effect in the anpar stage.
-export BACKGROUND="refl" # ring or [refl, reflect, reflected]
+#% OptionArgType ring|(refl|reflect|reflected)
+export BACKGROUND="refl"
 #
 # If using the 'ring' background method:
 # How how big should the radius of the the 'on' region be, in degrees?
+#% Description How big should the radius of the 'on' region be, in degrees?
+#% OptionArgType float
 export RINGCENT="0.5"
 # and how big should the 'off' ring be, in units of 'on'-region areas?
+#% Description How big should the 'off' ring be, in units of on-region-areas (when using the Ring Background method).
+#% OptionArgType integer
 export RINGAREA="10"
 #
 # If using the reflected(refl) background method:
 # what should be the minimum distance between off region edges, in degrees?
+#% Description Minimum distance between region edges when using the Reflected region background method.
+#% OptionArgType float
 export REFLWOBOFF="0.5"
 # whats the minimum number of off regions we require?
+#% Description Minimum number of regions required when using the Reflected region background method.
+#% OptionArgType integer
 export REFLMINREG="1"
 # and the maximum number of off regions we require?
+#% Description Maximum number of regions required when using the Reflected region background method.
+#% OptionArgType integer
 export REFLMAXREG="10"
 
 ## Should we produce the tzero and pedestal files first?
+#% GroupName Process Calibration Files
+#% ActiveStage evndisp
+#% OptionComplexity Common
+#% Description Should the tzero and pedestal files be generated?
 # These are required to do an analysis.
 # Takes effect in the evndisp stage.
 # yes/no
+#% OptionArgType yes|no
 export DOCALIB=yes
 
 ## Where should we store the evndisp and mscw output files?
+#% ActiveStage evndisp
+#% OptionComplexity Uncommon
+#% GroupName MSCW Output File Storage Directory
+#% Description Where we should store the evndisp and mscw output files.
 # Takes effect in the evndisp stage.
 # (full path please)
 # evndisp files will be: $EVNDISPOUTPUTDIR/#####.root, #####.tzero.root, etc
 # mscw files will be put in RecIDX within this directory (see next option)
+#% OptionArgType full path
 export EVNDISPOUTPUTDIR="$VERITAS_USER_DATA_DIR/analysis/Results/EVD-v423/"
 
 ## Which Reconstruction ID (RecID) should we use?
+#% GroupName MSCW Telescope Exclusion
+#% ActiveStage mscw
+#% OptionComplexity Uncommon
+#% Description Do we want to exclude any telescopes images when analysing the mscw stage?<br>0=normal, 1=exlclude T1 images, 2=exclude T2 images, etc.<br>For regular data analysis, this should be 0.
 # 0, 1, 2, 3, or 4
 # 0 = do mscw stage with all available images
 # 1 = do mscw stage without using T1 images
@@ -90,37 +155,63 @@ export EVNDISPOUTPUTDIR="$VERITAS_USER_DATA_DIR/analysis/Results/EVD-v423/"
 # 4 = do mscw stage without using T4 images
 # Takes effect in the mscw stage.
 ## For regular data analysis, this should be 0
+#% OptionArgType 0|1|2|3|4
 export RECID=0
 
 ## Should we use the frogs feature?
+#% GroupName Frogs Feature
+#% ActiveStage frogs
+#% OptionComplexity Uncommon
+#% Description Should we use the frogs feature?
 # In the anasum stage, should we use frogs datafiles as the input?
 # If no, we will use the mscw datafiles instead.
 # To create the frogs datafiles, just run the 'frogs' stage.
 ## Attention: To use this feature properly, after the 'mscw' stage, 
 ## you must run the 'frogs' stage for this option to fully take effect.
 # yes/no
+#% OptionArgType yes|no
 export USEFROGS="no"
 
 ## Where should the frogs's output files be stored?
+#% GroupName Frogs Output File Storage Directory
+#% ActiveStage frogs
+#% OptionComplexity Uncommon
+#% Description Directory for storing the frogs output files.
 # Takes effect in the frogs stage.
 # (full path please)
+#% OptionArgType full path
 export FROGSOUTPUTDIR="$EVNDISPOUTPUTDIR/frogs"
 
 ## Where should we put the anasum output files (parallel and merged)?
+#% GroupName Anasum Parallel Output File Storage Directory
+#% ActiveStage anpar
+#% OptionComplexity Uncommon
+#% Description Directory for storing the anasum parallel output files.
 # Takes effect in the anpar stage.
 # (full path please)
+#% OptionArgType full path
 export ANASUMOUTPUTDIR="$CWD/arf"
 
 ## What should we name the final merged anasum
+#% GroupName Merged Anasum Filename
+#% ActiveStage anmer
+#% OptionComplexity Common
+#% Description What should we name our final merged anasum root file?  Will be overwritten by 'anmer' stage if it exsts.
 # output root file? It will be put in $ANASUMOUTPUTDIR
 # Takes effect in the anmer stage.
 # Filename only, not full path.
+#% OptionArgType filename within project dir (not full path)
 export FINALOUTPUT="anmer.output.root"
 
 ## Which anasum runparameter file should we use?
+#% GroupName Anasum Runparameter File
+#% ActiveStage anpar
+#% OptionComplexity Uncommon
+#% Description Which anasum runparameter file should be used?
 # Takes effect in the anpar stage.
 # (full path please)
-export RUNPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.Crab"
+#% OptionArgType full path
+export RUNPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter"
 
 ## Which event display reconstruction runparameter file should we use?
 # CA is for runs that use CARE-derived IRFs
@@ -129,71 +220,158 @@ export EVNRECONFILE_CA="EVNDISP.reconstruction.runparameter"
 export EVNRECONFILE_GR="EVNDISP.reconstruction.SumWindow-noDisp"
 
 ## Do you want to automatically generate the anasum runlist? (recommended)
+#% GroupName Auto-generate Anasum Runlist
+#% ActiveStage anpar
+#% OptionComplexity Uncommon
+#% Description Should the anasum runlist be automatically generated? (recommended)
 # If so, leave ANRUNLIST blank
 # If you want to use your own anasum runlist, put the full path to your
 # custom anasum runlist here.
+#% OptionArgType full path
 export ANRUNLIST=""
 
 ## For the Effective Area and Radial Acceptance Files, whats the minimum
 ## number of telescopes we require?
+#% GroupName Minimum Number of Telescopes
+#% ActiveStage anpar
+#% OptionComplexity Uncommon
+#% Description For the IRF files, whats the minimum number of telescopes we require?
 # Should be 2, 3, or 4.
+#% OptionArgType 2|3|4
 export AUXFILE_MINTEL="2"
 
 ## Are we analysing a point source, or an extended source?
-# The Effective Area and Radial Acceptance files depend on this setting.
+#% GroupName Source Extension
+#% ActiveStage anpar
+#% Description Are we analysing a point source, or an extended source?
+#% OptionComplexity Uncommon
+# The Effective Area file depends on this setting.
 # Either 'PointSource' or 'ExtendedSource'
+#% OptionArgType PointSource|ExtendedSource
 export AUXFILE_SRCEXT="PointSource"
 
 ## Do you want to use the DISP feature?
+#% GroupName Disp Feature
+#% ActiveStage evndisp
+#% OptionComplexity Uncommon
+#% Description Should we use the DISP feature? (improved shower image intersection reconstruction)
 # This will change how image axes and their intersection
 # are handled.
 # (yes/no)
-export SCIPIPE_USEDISP="yes"
+#% OptionArgType yes|no
+export SCIPIPE_USEDISP="no"
 
 ## For your Effective Area, Radial Acceptance, and Table IRF files:
+#% GroupName Auxillary File Preferences
+#% ActiveStage mscw
+#% OptionComplexity Uncommon
+#% Description Which event display version's aux files should be used.  Older version auxfiles  may not be compatible with current release. <br>(effArea-<b>v470</b>-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root)
 #
 # Which event display version should they have been made with?
-# e.g. effArea-v451-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
+# e.g. effArea-v470-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
 #              ^^^^
-# radialAcceptance-v451-auxv01-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root
+# radialAcceptance-v470-auxv01-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root
 #                  ^^^^
-# table-v451-auxv01-CARE_June1425-ATM21-V6-ID0.root
+# table-v470-auxv01-CARE_June1425-ATM21-V6-ID0.root
 #       ^^^^
-# Should have the format 'v###', like 'v451' or 'v525', etc.
-export AUXFILE_EVNVER="v451"
+# Should have the format 'v###', like 'v470' or 'v525', etc.
+#% OptionArgType v###
+export AUXFILE_EVNVER="v470"
 #
+#% Description Which simulation files should be used? <br>(effArea-v470-auxv01-<b>CARE_June1425</b>-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root)
 # Which simulation date should they have been made with?
 # Grisu is used for all V4/V5 runs, and CARE is used for V6 runs.
-# e.g. effArea-v451-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
+# e.g. effArea-v470-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
 #                          ^^^^^^^^^^^^^
 # for Care (_CA), Should have the format '<simtype>_<month><year><day>', like 'CARE_June1425' 
 # for Grisu(_GR), just 'GRISU-SW6'
+#% OptionArgType simdatestring
 export AUXFILE_SIMDATE_GR="GRISU-SW6"
 export AUXFILE_SIMDATE_CA="CARE_June1425"
 #
-# For the radial acceptance IRF file, what aux-file-version should we use?
-# e.g. radialAcceptance-v451-auxv01-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root
+#% Description Aux file version to try to use for Radial Acceptance files.<br>(radialAcceptance-v470-<b>auxv01</b>-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root)
+# For the radial acceptance IRF file, what aux-file-version should be used?
+# e.g. radialAcceptance-v470-auxv01-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root
 #                            ^^^^^^
 # Should have the format 'auxv##', e.g. 'auxv01' or 'auxv31'
+#% OptionArgType auxv##
 export AUXVER_RADEC="auxv01"
 #
-# For the table IRF file, what aux-file-version should we use?
-# e.g. table-v451-auxv01-CARE_June1425-ATM21-V6-ID0.root
+#% Description Aux file version to try to use for Table files.<br>(table-v470-<b>auxv01</b>-CARE_June1425-ATM21-V6-ID0.root)
+# For the table IRF file, what aux-file-version should be used?
+# e.g. table-v470-auxv01-CARE_June1425-ATM21-V6-ID0.root
 #                 ^^^^^^
 # Should have the format 'auxv##', e.g. 'auxv01' or 'auxv31'
+#% OptionArgType auxv##
 export AUXVER_TABLE="auxv01"
 #
-# For the effective area IRF file, what aux-file-version should we use?
-# e.g. effArea-v451-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
+#% Description Aux file version to try to use for Effective Area Files.<br>(effArea-v470-<b>auxv01</b>-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root)
+# For the effective area IRF file, what aux-file-version should be used?
+# e.g. effArea-v470-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
 #                   ^^^^^^
 # Should have the format 'auxv##', e.g. 'auxv01' or 'auxv31'
+#% OptionArgType auxv##
 export AUXVER_EFFAREA="auxv01"
 
 ## Which directory should we keep any ctools datafiles we produce with the 'mutate' command?
+#% GroupName ctools
+#% ActiveStage mutate
+#% OptionComplexity Uncommon
+#% OptionArgType full path
+#% Description Directory for storing output ctools fits files.
 # Takes effect in the mutate stage.
 export CTOOLSDIR="$CWD/ctoolsdata"
 
+## To scan the logfiles for custom keywords:
+#% GroupName Logfile Search String
+#% ActiveStage evndisp
+#% OptionComplexity Developer
+#% OptionArgType string|regex
+#% Description During any 'ANALYSIS.pipeline * check' command, also search for any lines that contain SCIPIPE_DEBUGREGEX, for easier debugging.
+# any lines matching $SCIPIPE_DEBUGREGEX will be
+# shown in blue when 'check'ing stages
+# It is a regex pattern(google it), 
+# e.g. "NKH|WHITEBOARD" will highlight any 
+# logfile lines containing "NKH" or "WHITEBOARD" .
+# It is used as a Perl-style Regex, aka:
+#   $ grep -P $SCIPIPE_DEBUGREGEX logfilename
+# This will work in addition to the warning and
+#   error scanning.
+export SCIPIPE_DEBUGREGEX="WHITEBOARD"
+
+## To only process the first X events:
+#% GroupName Only Process X Events
+#% ActiveStage evndisp
+#% OptionComplexity Developer
+#% OptionArgType integer
+#% Description Only process the first SCIPIPE_NEVENTS events, for fast code development/testing/debugging.  Obviously, this will not produce good science.  Set to "" for normal operation.
+# if set to an integer X, some stages (evndisp,frogs) 
+# will only run for the first X events,
+# to allow for very fast testing and debugging.
+# Do not use this option and expect good science!
+export SCIPIPE_NEVENTS=""
+
+## If you want the pipeline to not use colored text:
+#% GroupName Terminal Coloring Options
+#% ActiveStage evndisp
+#% OptionComplexity Uncommon
+#% OptionArgType nooptions|nologs|nooptions:nologs
+#% Description Disable color output of terminal text.<br>nooptions for boring colors with 'ANALYSIS.pipeline options',<br>nologs for boring colors in any 'check' command,<br> or both.
+# you can use the SCIPIPE_COLOROPT environment variable.
+# To only turn off colors in the command $ ANALYSIS.pipeline options, (or 'settings') use
+# export SCIPIPE_COLOROPT="nooptions"
+# To only turn off colors in the output of the stage 'check's, use 
+# export SCIPIPE_COLOROPT="nologs"
+# To turn off both, use 
+# export SCIPIPE_COLOROPT="nooptions:nologs"
+export SCIPIPE_COLOROPT=""
+
 ## Should we use manually-defined laser runs for some runs?
+#% GroupName Laser Run Designatiion
+#% ActiveStage evndisp
+#% OptionComplexity Uncommon
+#% OptionArgType yes|no
+#% Description For manually defining which laser runs to use with which data runs.  no=automatic,<br>yes=use runnumber-lasernumber file specified by SCIPIPE_MANUALLASERFILE .
 # Takes effect in the evndisp stage.
 # (yes/no)
 export SCIPIPE_MANUALLASER="no"
@@ -201,6 +379,8 @@ export SCIPIPE_MANUALLASER="no"
 # which runs have which laser runs?
 # The calibration file should be in $VERITAS_EVNDISP_AUX_DIR/Calibration ,
 # and should have the same format as calibrationlist.dat in that directory.
+#% OptionArgType filename within $VERITAS_EVNDISP_AUX_DIR/Calibration/
+#% Description If SCIPIPEMANUALLASER=yes, then use this file for picking which laser runs to use.
 export SCIPIPE_MANUALLASERFILE="calibrationlist.dat"
 
 ## The above options should be put into a separate config 
@@ -226,7 +406,7 @@ export SCIPIPE_MANUALLASERFILE="calibrationlist.dat"
 
 
 ANAPIPENAME="$0"
-if [[ $# < 1 || ! $1 =~ (evndisp|mscw|frogs|anpar|anmer|mutate|options|settings|newconfig|jobs|kill|devopts|xxf) ]] ; then 
+if [[ $# < 1 || ! $1 =~ (evndisp|mscw|frogs|anpar|anmer|mutate|options|options_browser|settings|newconfig|jobs|kill|xxf) ]] ; then 
     echo "
 HOW DO I USE THIS ?                             
 
@@ -276,51 +456,17 @@ Stages of Event Display: [evndisp|mscw|frogs|anpar|anmer],
   $ $ANAPIPENAME anmer           # after anpar, merge the anasum parallel files to one anasum file
 
 Other commands:
-  $ $ANAPIPENAME options   # print descriptions of all analysis options ('settings' also works)
-  $ $ANAPIPENAME newconfig # create a new (blank) analysis.config file, will refuse to overwrite any existing one
-  $ $ANAPIPENAME jobs      # show progress of all of this project's jobs, updating every 90 seconds, until all jobs are done
-  $ $ANAPIPENAME kill      # halt all of this project's jobs
-  $ $ANAPIPENAME devopts   # see developer options
+  $ $ANAPIPENAME options         # print descriptions of all analysis options ('settings' also works)
+  $ $ANAPIPENAME options_browser # display the options in a fancy webpage, with the browser set by 'export PIPELINE_BROWSER=/path/to/browser'
+  $ $ANAPIPENAME newconfig       # create a new (blank) analysis.config file, will refuse to overwrite any existing one
+  $ $ANAPIPENAME jobs            # show progress of all of this project's jobs, updating every 90 seconds, until all jobs are done
+  $ $ANAPIPENAME kill            # halt all of this project's jobs
 "
 	exit 1
 fi
 
 exec 5>&1 # extra place to duplicate output to stdout, look for >&5
 
-# don't change the next line, doing so will mess up the 'devopts' pipeline keyword
-# [BEGIN DEVELOPER OPTIONS 348234]
-
-## To scan the logfiles for custom keywords:
-# any lines matching $SCIPIPE_DEBUGREGEX will be
-# shown in blue when 'check'ing stages
-# It is a regex pattern(google it), 
-# e.g. "NKH|WHITEBOARD" will highlight any 
-# logfile lines containing "NKH" or "WHITEBOARD" .
-# It is used as a Perl-style Regex, aka:
-#   $ grep -P $SCIPIPE_DEBUGREGEX logfilename
-# This will work in addition to the warning and
-#   error scanning.
-export SCIPIPE_DEBUGREGEX="WHITEBOARD"
-
-## To only process the first X events:
-# if set to an integer X, some stages (evndisp,frogs) 
-# will only run for the first X events,
-# to allow for very fast testing and debugging.
-# Do not use this option and expect good science!
-export SCIPIPE_NEVENTS=""
-
-## If you want the pipeline to not use colored text:
-# you can use the SCIPIPE_COLOROPT environment variable.
-# To only turn off colors in the command $ ANALYSIS.pipeline options, (or 'settings') use
-# export SCIPIPE_COLOROPT="nooptions"
-# To only turn off colors in the output of the stage 'check's, use 
-# export SCIPIPE_COLOROPT="nologs"
-# To turn off both, use 
-# export SCIPIPE_COLOROPT="nooptions:nologs"
-export SCIPIPE_COLOROPT=""
-
-# [END DEVELOPER OPTIONS 385239482]
-# don't change the above line, doing so will mess up the 'devopts' pipeline keyword
 
 STAGE=$1
 CHK=$2
@@ -343,7 +489,6 @@ if [ "$STAGE" = "newconfig" ] ; then
 		echo "export RUNLIST=\"YourRunlistFileNameHere\"" >> "$SETTINGSFILE"
 		echo "export CUTS=\"Moderate\"                  " >> "$SETTINGSFILE"
 		echo "export BACKGROUND=\"reflected\"           " >> "$SETTINGSFILE"
-		echo "export RUNPARAMFILE=\"fullPathToYourAnasumRunparameterFile\"" >> "$SETTINGSFILE"
 		
 		echo
 		echo "Now creating '$SETTINGSFILE' for you... done."
@@ -376,10 +521,13 @@ function colorOutput {
 		OPTNORM='\033[0m'
 	fi
 
+	# parse and color the options text, optimized for the terminal
 	while read -r line ; do
 		#echo "line: '$line'"
 		# if the line starts with a comment '#', make it blue, otherwise print the line green
-		if [[ "$line" =~ ^## ]] ; then 
+		if [[ "$line" =~ ^#%[[:space:]] ]] ; then
+			continue
+		elif [[ "$line" =~ ^## ]] ; then 
 			line2=$( echo "$line" | sed -E 's/^##/#/' )
 			echo -e "${OPTREDD}${line2}${OPTNORM}"
 		elif [[ "$line" =~ ^# ]] ; then
@@ -395,44 +543,6 @@ function colorOutput {
 if [ -f "$SETTINGSFILE" ] ; then
 	echo "Loading additional pipeline settings from '$SETTINGSFILE'..."
 	source "$SETTINGSFILE"
-fi
-
-
-#if [ "$STAGE" = "options" ] ; then
-if [[ "$STAGE" =~ (options|settings) ]] ; then
-	echo
-	echo "#######################################################"
-	echo "Analysis Options that you can add to '$SETTINGSFILE':"
-	echo "#######################################################"
-
-	# print all the lines of this script that are between 
-	# the BEGIN ANALYSIS SETTINGS and END ANALYSIS SETTINGS
-	# (followed with a number)
-	OPTLINES=$( cat "$ANAPIPENAME" | sed -n '/\[BEGIN ANALYSIS SETTINGS [0-9]\+\]/,/\[END ANALYSIS SETTINGS [0-9]\+\]/p' | tail -n +2 | head -n -1)
-
-	# print with colors
-	colorOutput "$OPTLINES"
-	echo
-	
-	exit 0
-fi
-
-if [[ "$STAGE" =~ devopts ]] ; then
-	echo
-	echo "########################################################"
-	echo "Developer Options that you can add to '$SETTINGSFILE':"
-	echo "########################################################"
-
-	# print all the lines of this script that are between 
-	# the BEGIN ANALYSIS SETTINGS and END ANALYSIS SETTINGS
-	# (followed with a number)
-	OPTLINES=$( cat "$ANAPIPENAME" | sed -n '/\[BEGIN DEVELOPER OPTIONS [0-9]\+\]/,/\[END DEVELOPER OPTIONS [0-9]\+\]/p'  | tail -n +2 | head -n -1 )
-	
-	# print with colors
-	colorOutput "$OPTLINES"
-	echo
-	
-	exit 0
 fi
 
 # check that $EVNDISPSYS is sane
@@ -459,6 +569,30 @@ fi
 # directory for storing information about stages, jobs, etc
 SCIDIR="$CWD/.pipeline"
 mkdir -p $SCIDIR
+
+#if [ "$STAGE" = "options" ] ; then
+if [[ "$STAGE" =~ (options|opt|options_browser|settings) ]] ; then
+	echo
+	echo "#######################################################"
+	echo "Analysis Options that you can add to '$SETTINGSFILE':"
+	echo "#######################################################"
+
+	# print all the lines of this script that are between 
+	# the BEGIN ANALYSIS SETTINGS and END ANALYSIS SETTINGS
+	# (followed with a number)
+	OPTLINES=$( cat "$ANAPIPENAME" | sed -n '/\[BEGIN ANALYSIS SETTINGS [0-9]\+\]/,/\[END ANALYSIS SETTINGS [0-9]\+\]/p' | tail -n +2 | head -n -1)
+
+	# print with colors
+	if [[ "$STAGE" =~ (options_browser) ]] ; then
+		#$EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_optionsBrowser.py "$OPTLINES"
+		$EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_optionsBrowser.sh "$SCIDIR" "$OPTLINES" 
+	else
+		colorOutput "$OPTLINES"
+	fi
+	echo
+	
+	exit 0
+fi
 
 # extra functions
 source $EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_functions.sh
@@ -523,7 +657,7 @@ function setupFilteredRunlists {
 	TABLEFILEWINTV5="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE_GR}-ATM21-V5-$METHCODE"
 	TABLEFILESUMMV5="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE_GR}-ATM22-V5-$METHCODE"
 	TABLEFILEWINTV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE_CA}-ATM21-V6-$METHCODE"
-	TABLEFILESUMMV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE_CA}-ATM22-V6-$METHCODE"
+	TABLEFILESUMMV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table-${AUXFILE_EVNVER}-${AUXVER_TABLE}-${AUXFILE_SIMDATE_GR}-ATM22-V6-$METHCODE"
 
 	RUNLISTSUMMV4="$SCIDIR/runlist.summer.V4"
 	RUNLISTWINTV4="$SCIDIR/runlist.winter.V4"
@@ -574,7 +708,7 @@ function makeParamFile {
 		# Pack all the settings into a one-line argument.
 		# Characters that will break this: if any options have '~' or ':' or ' ' in them, 
 		# as these are used as delimiters in this packing technique.
-		SETTINGLINE="~CUTS:$CUTS~AUXFILEEVNVER:$AUXFILE_EVNVER~AUXFILESIMDATEGR:$AUXFILE_SIMDATE_GR~AUXFILESIMDATECA:$AUXFILE_SIMDATE_CA~AUXVERRADEC:$AUXVER_RADEC~AUXVEREFFAREA:$AUXVER_EFFAREA~AUXVERTABLE:$AUXVER_TABLE~AUXFILEMINTEL:$AUXFILE_MINTEL~USEFROGS:$USEFROGS~AUXFILESRCEXT:$AUXFILE_SRCEXT~AUXFILEDISP:$SCIPIPE_USEDISP~"
+		SETTINGLINE="~CUTS:$CUTS~AUXFILEEVNVER:$AUXFILE_EVNVER~AUXFILESIMDATEGR:$AUXFILE_SIMDATE_GR~AUXFILESIMDATECA:$AUXFILE_SIMDATE_CA~AUXVERRADEC:$AUXVER_RADEC~AUXVEREFFAREA:$AUXVER_EFFAREA~AUXVERTABLE:$AUXVER_TABLE~AUXFILEMINTEL:$AUXFILE_MINTEL~USEFROGS:$USEFROGS~AUXFILESRCEXT:$AUXFILE_SRCEXT~AUXFILEDISP:$SCIPIPE_USEDISP~USETMVABDT:$USETMVABDT~"
 		#echo "SETTINGLINE:'$SETTINGLINE'"
 		$EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_generateParamFiles.sh "$SETTINGLINE" "$RUNLIST" > "$PARAMFILELIST"
 		PARAMEXIT="$?"
@@ -680,6 +814,17 @@ function stageBanner {
     # final displayed line
 	echo -e "${COTBLUE}${line}${CONORM}"
 }
+
+# check that the submission script has a properly selected job mode (qsub desy, qsub ucla, etc)
+SUBCMD=$( $EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh )
+if [[ $SUBCMD == *ERROR* ]] ; then
+	echo
+	echo $SUBCMD
+	echo "Please check that '\$EVNDISPSYS/scripts/VTS/submissionCommands.dat' has a submission command selected with '*', exiting..."
+	echo
+	exit 1
+fi
+
 
 # test stage for just making the param file, and nothing else
 if [[ "$STAGE" == "xxf" ]] ; then
@@ -830,7 +975,7 @@ if [[ "$STAGE" == "mscw" ]] ; then
 		stageBanner
 		# mscw #########################################################
 		echo "$STAGE" > "$STAGEFILE"
-        checkForSciPipeNevents
+    checkForSciPipeNevents
 		setupFilteredRunlists
 		makeParamFile
 		cd $EVNDISPSYS/scripts/VTS

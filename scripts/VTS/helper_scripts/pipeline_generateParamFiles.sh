@@ -316,6 +316,7 @@ AUXFILE_MINTEL=$(     echo "$SETTINGLINE" | grep -oP "~AUXFILEMINTEL:\d+~"      
 AUXFILE_SRCEXT=$(     echo "$SETTINGLINE" | grep -oP "~AUXFILESRCEXT:\w+~"               | grep -oP ":.+~" | tr -d ':' | tr -d '~')
 AUXFILE_DISP=$(       echo "$SETTINGLINE" | grep -oP "~AUXFILEDISP:\w+~"                 | grep -oP ":.+~" | tr -d ':' | tr -d '~')
 USEFROGS=$(           echo "$SETTINGLINE" | grep -oP "~USEFROGS:\w+~"                    | grep -oP ":.+~" | tr -d ':' | tr -d '~')
+USETMVABDT=$(         echo "$SETTINGLINE" | grep -oP "~USETMVABDT:\w+~"                  | grep -oP ":.+~" | tr -d ':' | tr -d '~')
 
 #echoerr "ENERGYCODE:      '$ENERGYCODE'"
 #echoerr "AUXVER_RADACC:   '$AUXVER_RADACC'"
@@ -383,6 +384,11 @@ fi
 if [[ -z "$USEFROGS" ]] ; then
 	echoerr "Error, Unrecognized option in 'USEFROGS', exiting..."
 	EXITFLAG=true
+fi
+
+if [[ -z "$USETMVABDT" ]] ; then
+	echoerr "Error, Unrecognized option in 'USETMVABDT', exiting..."
+  EXITFLAG=true
 fi
 
 if $EXITFLAG ; then
@@ -502,6 +508,12 @@ for i in ${RUNLIST[@]} ; do
 		FROGSCODE=""
 	fi
 
+  if [ "$USETMVABDT" == "yes" ] ; then
+    TMVABDTCODE="-TMVA-BDT"
+  else
+    TMVABDTCODE=""
+  fi
+
 	# loop through all epochs between min and max
 	for epoch in $(seq $MINEPOCH $MAXEPOCH) ; do
 		
@@ -520,25 +532,18 @@ for i in ${RUNLIST[@]} ; do
 	done
 	#echoerr "  '$VERSIONCODE'"
 	
-	
-    if [[ "$VERSIONCODE" == "V4" || "$VERSIONCODE" == "V5" ]] ; then
-        SIMDATE="$AUXFILE_SIMDATE_GR"
-    elif [[ "$VERSIONCODE" == "V6" ]] ; then
-        SIMDATE="$AUXFILE_SIMDATE_CA"
-    else
-        echoerr "Error, unrecognized \$VERSIONCODE='$VERSIONCODE', exiting..."
-        exit 1
-    fi
+  if [[ "$VERSIONCODE" == "V6" && "$VERSIONCODE" == "ATM21" ]] ; then
+    SIMDATE="$AUXFILE_SIMDATE_CA"
+  else
+    SIMDATE="$AUXFILE_SIMDATE_GR"
+  fi
     
 	#echo "r${i}"
 	
-	
 	# Example: GammaHadronCutFiles/ANASUM.GammaHadron.d20120322-cut-N2-Point-005CU-Soft.dat
 	#GHCUTFILE="ANASUM.GammaHadron.d${GHCUTDATECODE}-cut-${NTELCODE}-Point-005CU-${ENERGYCODE}${FROGSCODE}.dat"
-	GHCUTFILE="ANASUM.GammaHadron-Cut-${NTELCODE}-${AUXFILE_SRCEXT}-${ENERGYCODE}.dat"
+	GHCUTFILE="ANASUM.GammaHadron-Cut-${NTELCODE}-${AUXFILE_SRCEXT}-${ENERGYCODE}${TMVABDTCODE}.dat"
 	huntForParameterFileName "GammaHadronCutFiles" "$GHCUTFILE" "$i"
-
-	CUTSNAME="Cut-${NTELCODE}-${AUXFILE_SRCEXT}-${ENERGYCODE}"
 	CUTSNAMERADACC="Cut-${NTELCODE}-${ENERGYCODE}"
 	# Example: RadialAcceptances/radialAcceptance-d20130411-cut-N3-Point-005CU-Soft-V5-T234.root
 	#ACCEPFILE="radialAcceptance-d${RADATECODE}-cut-${NTELCODE}-Point-005CU-${ENERGYCODE}-${VERSIONCODE}-${TELCOMBOCODE}.root"
@@ -547,12 +552,14 @@ for i in ${RUNLIST[@]} ; do
 	#ACCEPFILE="radialAcceptance-${AUXFILE_EVNVER}-${AUXVER_RADACC}-$CUTSNAMERADACC-$METHCODE-${VERSIONCODE}-${TELCOMBOCODE}.root"
 	ACCEPFILE="radialAcceptance-${AUXFILE_EVNVER}-${AUXVER_RADACC}-${SIMDATE}-$CUTSNAMERADACC-$METHCODE-${VERSIONCODE}-${TELCOMBOCODE}.root"
 	huntForParameterFileName "RadialAcceptances" "$ACCEPFILE" "$i"
+	
+	CUTSNAME="Cut-${NTELCODE}-${AUXFILE_SRCEXT}-${ENERGYCODE}"
 
 	# Example: EffectiveAreas/effArea-d20130411-cut-N3-Point-005CU-Soft-ATM22-V5-T1234-d20130521.root
 	#echo -e "${COTYELLOW}Warning, Effective area probably depends on if we're using frogs or not.  Fix!!!!$CONORM" >&2
 	#AREAFILE="effArea-d${EFDATECODE1}-cut-${NTELCODE}-Point-005CU-${ENERGYCODE}-${ATMOCODE}-${VERSIONCODE}-${TELCOMBOCODE}-d${EFDATECODE2}.root"
 	#AREAFILE="effArea-${AUXFILE_EVNVER}-${AUXVER_EFFAREA}-${AUXFILE_SIMDATE}-Cut-${NTELCODE}-${AUXFILE_SRCEXT}-${ENERGYCODE}-${DISPCODE}-${VERSIONCODE}-${ATMOCODE}-${TELCOMBOCODE}.root"
-	AREAFILE="effArea-${AUXFILE_EVNVER}-${AUXVER_EFFAREA}-${SIMDATE}-$CUTSNAME-$METHCODE-${VERSIONCODE}-${ATMOCODE}-${TELCOMBOCODE}.root"
+	AREAFILE="effArea-${AUXFILE_EVNVER}-${AUXVER_EFFAREA}-${SIMDATE}-$CUTSNAME${TMVABDTCODE}-${METHCODE}-${VERSIONCODE}-${ATMOCODE}-${TELCOMBOCODE}.root"
 	huntForParameterFileName "EffectiveAreas" "$AREAFILE" "$i"
 
 	# Example: Tables/table_d20130521_GrIsuDec12_ATM22_V5_ID0
