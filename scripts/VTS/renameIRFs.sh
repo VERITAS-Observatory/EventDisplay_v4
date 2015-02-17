@@ -32,7 +32,10 @@ do
 	do
 		name=`basename $file`
 		newname=${name/v470/v480}
-		$COM -v $OLD/$dir/$name $NEW/$dir/$newname 
+		if [[ "$name" != "$newname" ]]
+		then
+			$COM -v $OLD/$dir/$name $NEW/$dir/$newname 
+		fi
 	done
 done
 
