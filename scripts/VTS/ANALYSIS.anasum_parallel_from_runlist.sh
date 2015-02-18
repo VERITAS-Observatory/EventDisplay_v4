@@ -100,12 +100,26 @@ elif [[ $CUTS = *hardExt2tel* ]]; then
     CUT="NTel2-ExtendedSource-Hard"
 elif [[ $CUTS = *frogs* ]]; then
     CUT="FROGS_NTel2_001-003-005CU_index2.5"
-elif [[ $CUTS = *BDTmoderate* ]]; then
+elif [[ $CUTS = *BDTmoderate2tel* ]]; then
     CUT="NTel2-PointSource-Moderate-TMVA-BDT"
-elif [[ $CUTS = *BDTsoft* ]]; then
+elif [[ $CUTS = *BDTsoft2tel* ]]; then
     CUT="NTel2-PointSource-Soft-TMVA-BDT"
-elif [[ $CUTS = *BDThard* ]]; then
+elif [[ $CUTS = *BDThard2tel* ]]; then 
     CUT="NTel2-PointSource-Hard-TMVA-BDT"
+elif [[ $CUTS = *BDTmoderate3tel* ]]; then
+    CUT="NTel3-PointSource-Moderate-TMVA-BDT"
+elif [[ $CUTS = *BDThard3tel* ]]; then
+    CUT="NTel3-PointSource-Hard-TMVA-BDT"
+elif [[ $CUTS = *BDTmoderateExt2tel* ]]; then
+    CUT="NTel2-ExtendedSource-Moderate-TMVA-BDT"
+elif [[ $CUTS = *BDTsoftExt2tel* ]]; then
+    CUT="NTel2-ExtendedSource-Soft-TMVA-BDT"
+elif [[ $CUTS = *BDThardExt2tel* ]]; then
+    CUT="NTel2-ExtendedSource-Hard-TMVA-BDT"
+elif [[ $CUTS = *BDTmoderateExt3tel* ]]; then
+    CUT="NTel3-ExtendedSource-Moderate-TMVA-BDT"
+elif [[ $CUTS = *BDThardExt3tel* ]]; then
+    CUT="NTel3-ExtendedSource-Hard-TMVA-BDT"
 else
     echo "ERROR: unknown cut definition: $CUTS"
     exit 1
