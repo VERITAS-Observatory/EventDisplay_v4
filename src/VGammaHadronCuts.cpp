@@ -1068,8 +1068,11 @@ void VGammaHadronCuts::printCutSummary()
 		}
 		else
 		{
-			printSignalEfficiency();
-			printTMVA_MVACut();
+		  if( fDebug )
+		    {
+		      printSignalEfficiency();
+		      printTMVA_MVACut();
+		    }
 		}
 	}
 	// other cut parameters

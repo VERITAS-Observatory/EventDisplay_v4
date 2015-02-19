@@ -77,10 +77,11 @@ void VTMVAEvaluator::reset()
 vector< string > VTMVAEvaluator::getTrainingVariables( string iXMLFile, vector< bool >& iSpectator )
 {
 	vector< string > iVar;
-	
-	cout << endl;
-	cout << "reading list of variables from TMVA XML file: " << iXMLFile << endl;
-	
+	if( fDebug )
+	{
+	  cout << endl;
+	  cout << "reading list of variables from TMVA XML file: " << iXMLFile << endl;
+	}
 	// open TMVA XML file
 	// NOTE: extreme dependendence on the structure of the TMVA XML file
 	ifstream is;
@@ -402,8 +403,10 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	for( unsigned int b = 0; b < fTMVAData.size(); b++ )
 	{
 		fTMVAData[b]->fTMVAReader = new TMVA::Reader();
-		cout << "INITIALIZE TMVA file: " << fTMVAData[b]->fTMVAFileName << endl;
-		
+		if( fDebug )
+		{
+		  cout << "INITIALIZE TMVA file: " << fTMVAData[b]->fTMVAFileName << endl;
+		}
 		//////////////////////////////////////////
 		// set TMVA cut value
 		// (optimization later)
@@ -529,17 +532,19 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 				fTMVAData[b]->fTMVAReader->AddSpectator( iTrainingVariables[t].c_str(), &fDummy );
 			}
 		}
-		cout << "Following " << iTrainingVariables.size() << " variables have been found and are used for TMVA separation: " << endl;
-		for( unsigned int t = 0; t < iTrainingVariables.size(); t++ )
+		if( fDebug )
 		{
-			cout << "\t" << iTrainingVariables[t];
-			if( iVariableIsASpectator[t] )
-			{
-				cout << " (spectator)";
-			}
-			cout << endl;
+		  cout << "Following " << iTrainingVariables.size() << " variables have been found and are used for TMVA separation: " << endl;
+		  for( unsigned int t = 0; t < iTrainingVariables.size(); t++ )
+		  {
+		    cout << "\t" << iTrainingVariables[t];
+		    if( iVariableIsASpectator[t] )
+		    {
+		      cout << " (spectator)";
+		    }
+		    cout << endl;
+		  }
 		}
-		
 		if( !fTMVAData[b]->fTMVAReader->BookMVA( fTMVAData[b]->fTMVAMethodTag_2.c_str(), fTMVAData[b]->fTMVAFileNameXML.c_str() ) )
 		{
 			cout << "VTMVAEvaluator::initializeWeightFiles: error while initializing TMVA reader from weight file ";
@@ -675,8 +680,10 @@ bool VTMVAEvaluator::getValuesFromEfficiencyHistograms( unsigned int b )
 		return false;
 	}
 	
-	cout << "VTMVAEvaluator::getValuesFromEfficiencyHistograms: evaluating " << iTMVAFile.GetName() << endl;
-	
+	if( fDebug )
+	{
+	  cout << "VTMVAEvaluator::getValuesFromEfficiencyHistograms: evaluating " << iTMVAFile.GetName() << endl;
+	}
 	// get MVA cut for a given signal efficiency
 	if( fTMVAData[b]->fSignalEfficiency > 0. )
 	{
@@ -692,8 +699,11 @@ bool VTMVAEvaluator::getValuesFromEfficiencyHistograms( unsigned int b )
 		fTMVAData[b]->fSignalEfficiency     = effS->GetBinContent( effS->GetXaxis()->FindBin( fTMVAData[b]->fTMVACutValue ) );
 		fTMVAData[b]->fBackgroundEfficiency = effB->GetBinContent( effB->GetXaxis()->FindBin( fTMVAData[b]->fTMVACutValue ) );
 		
-		cout << "Signal efficiency for TMVA cut value " << fTMVAData[b]->fTMVACutValue << ": " << fTMVAData[b]->fSignalEfficiency;
-		cout << " (bin " << effS->GetXaxis()->FindBin( fTMVAData[b]->fTMVACutValue ) << ")" << endl;
+		if( fDebug )
+		{
+		  cout << "Signal efficiency for TMVA cut value " << fTMVAData[b]->fTMVACutValue << ": " << fTMVAData[b]->fSignalEfficiency;
+		  cout << " (bin " << effS->GetXaxis()->FindBin( fTMVAData[b]->fTMVACutValue ) << ")" << endl;
+		}
 	}
 	// get MVA cut for a given background efficiency
 	else if( fTMVAData[b]->fBackgroundEfficiency > 0. )
