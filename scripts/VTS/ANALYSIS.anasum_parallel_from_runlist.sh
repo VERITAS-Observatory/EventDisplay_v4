@@ -18,7 +18,7 @@ required parameters:
     <output directory>      anasum output files are written to this directory
                         
     <cut set>               hardcoded cut sets predefined in the script
-                            (e.g., soft2tel, moderate3tel, etc.)
+                            (e.g., soft2tel, moderate3tel, moderateExt2tel, BDTmoderatel2tel, etc.)
     
     <background model>      background model
                             (RE = reflected region, RB = ring background)
@@ -72,53 +72,53 @@ BACKGND=$4
 
 
 # cut definitions (note: VX to be replaced later in script)
-if [[ $CUTS == *superhard* ]]; then
+if [[ $CUTS == superhard ]]; then
     CUT="NTel3-PointSource-SuperHard"
-elif [[ $CUTS == *super* ]]; then
+elif [[ $CUTS == super ]]; then
     CUT="NTel2-PointSource-SuperSoftSpectrum"
-elif [[ $CUTS == *moderateopen* ]]; then
+elif [[ $CUTS == moderateopen ]]; then
     CUT="NTel2-PointSource-ModerateOpen"
-elif [[ $CUTS == *softopen* ]]; then
+elif [[ $CUTS == softopen ]]; then
     CUT="NTel2-PointSource-SoftOpen"
-elif [[ $CUTS == *hardopen* ]]; then
+elif [[ $CUTS == hardopen ]]; then
     CUT="NTel2-PointSource-HardOpen"
-elif [[ $CUTS == *softExt* ]]; then
+elif [[ $CUTS == softExt ]]; then
     CUT="NTel2-ExtendedSource-Soft"
-elif [[ $CUTS == *soft2tel* ]]; then
+elif [[ $CUTS == soft2tel ]]; then
     CUT="NTel2-PointSource-Soft"
-elif [[ $CUTS = *moderate2tel* ]]; then
+elif [[ $CUTS = moderate2tel ]]; then
     CUT="NTel2-PointSource-Moderate"
-elif [[ $CUTS = *moderateExt2tel* ]]; then
+elif [[ $CUTS = moderateExt2tel ]]; then
     CUT="NTel2-ExtendedSource-Moderate"
-elif [[ $CUTS = *moderate3tel* ]]; then
+elif [[ $CUTS = moderate3tel ]]; then
     CUT="NTel3-PointSource-Moderate"
-elif [[ $CUTS = *hard2tel* ]]; then
+elif [[ $CUTS = hard2tel ]]; then
     CUT="NTel2-PointSource-Hard"
-elif [[ $CUTS = *hard3tel* ]]; then
+elif [[ $CUTS = hard3tel ]]; then
     CUT="NTel3-PointSource-Hard"
-elif [[ $CUTS = *hardExt2tel* ]]; then
+elif [[ $CUTS = hardExt2tel ]]; then
     CUT="NTel2-ExtendedSource-Hard"
-elif [[ $CUTS = *frogs* ]]; then
+elif [[ $CUTS = frogs ]]; then
     CUT="FROGS_NTel2_001-003-005CU_index2.5"
-elif [[ $CUTS = *BDTmoderate2tel* ]]; then
+elif [[ $CUTS = BDTmoderate2tel ]]; then
     CUT="NTel2-PointSource-Moderate-TMVA-BDT"
-elif [[ $CUTS = *BDTsoft2tel* ]]; then
+elif [[ $CUTS = BDTsoft2tel ]]; then
     CUT="NTel2-PointSource-Soft-TMVA-BDT"
-elif [[ $CUTS = *BDThard2tel* ]]; then 
+elif [[ $CUTS = BDThard2tel ]]; then 
     CUT="NTel2-PointSource-Hard-TMVA-BDT"
-elif [[ $CUTS = *BDTmoderate3tel* ]]; then
+elif [[ $CUTS = BDTmoderate3tel ]]; then
     CUT="NTel3-PointSource-Moderate-TMVA-BDT"
-elif [[ $CUTS = *BDThard3tel* ]]; then
+elif [[ $CUTS = BDThard3tel ]]; then
     CUT="NTel3-PointSource-Hard-TMVA-BDT"
-elif [[ $CUTS = *BDTmoderateExt2tel* ]]; then
+elif [[ $CUTS = BDTmoderateExt2tel ]]; then
     CUT="NTel2-ExtendedSource-Moderate-TMVA-BDT"
-elif [[ $CUTS = *BDTsoftExt2tel* ]]; then
+elif [[ $CUTS = BDTsoftExt2tel ]]; then
     CUT="NTel2-ExtendedSource-Soft-TMVA-BDT"
-elif [[ $CUTS = *BDThardExt2tel* ]]; then
+elif [[ $CUTS = BDThardExt2tel ]]; then
     CUT="NTel2-ExtendedSource-Hard-TMVA-BDT"
-elif [[ $CUTS = *BDTmoderateExt3tel* ]]; then
+elif [[ $CUTS = BDTmoderateExt3tel ]]; then
     CUT="NTel3-ExtendedSource-Moderate-TMVA-BDT"
-elif [[ $CUTS = *BDThardExt3tel* ]]; then
+elif [[ $CUTS = BDThardExt3tel ]]; then
     CUT="NTel3-ExtendedSource-Hard-TMVA-BDT"
 else
     echo "ERROR: unknown cut definition: $CUTS"

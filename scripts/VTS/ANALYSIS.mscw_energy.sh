@@ -18,8 +18,8 @@ required parameters:
 
     <table file>            mscw_energy lookup table file. Expected in $VERITAS_EVNDISP_AUX_DIR/Tables/ .
 			    For example:
-				table-v470-auxv01-CARE_June1425-ATM21-V6-GEO.root
-				table-v470-auxv01-GRISU-SW6-ATM22-V5-GEO.root
+				table-v480-auxv01-CARE_June1425-ATM21-V6-GEO.root
+				table-v480-auxv01-GRISU-SW6-ATM22-V5-GEO.root
 			
     <runlist>               simple run list with one run number per line.    
     
