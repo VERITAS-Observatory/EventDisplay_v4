@@ -1963,7 +1963,7 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerBin( unsigned int iBin, TGraph* iGSig
 		hEffS->SetTitle( "" );
 		hEffS->SetLineWidth( 3 );
 		hEffS->GetYaxis()->SetTitleOffset( 1.5 );
-		hEffS->SetXTitle( "cut value" );
+		hEffS->SetXTitle( "MVA value #Tau" );
 		hEffS->SetYTitle( "signal/background efficiency" );
 		hEffS->DrawCopy();
 		
@@ -2000,7 +2000,7 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerBin( unsigned int iBin, TGraph* iGSig
 		
 		iGSignal_to_sqrtNoise->Draw( "apl" );
 		iGSignal_to_sqrtNoise->GetHistogram()->GetYaxis()->SetTitleOffset( 1.5 );
-		iGSignal_to_sqrtNoise->GetHistogram()->SetXTitle( "cut value" );
+		iGSignal_to_sqrtNoise->GetHistogram()->SetXTitle( "MVA value #Tau" );
 		iGSignal_to_sqrtNoise->GetHistogram()->SetYTitle( "significance" );
 		
 		if( iGSignal_to_sqrtNoise_Smooth )

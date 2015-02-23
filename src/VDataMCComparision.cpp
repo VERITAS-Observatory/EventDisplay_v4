@@ -195,7 +195,7 @@ void VDataMCComparision::defineHistograms()
 	fHistoArray[EEREC]->initHistogram( "log_{10} energy_{MC}", 50, -2., 2. );
 	
 	fHistoArray[EMVA] = new VDataMCComparisionHistogramData( "MVA", fName, 0 );
-	fHistoArray[EMVA]->initHistogram( "MVA variable", 100, -1., 1. );
+	fHistoArray[EMVA]->initHistogram( "MVA value #Tau", 100, -1., 1. );
 	
 	//these histograms are only filled for Model3D analysis
 	
