@@ -573,7 +573,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	// smooth and interpolate
 	if( fParticleNumberFileName.size() > 0 && fSmoothAndInterpolateMVAValues )
 	{
-		smoothAndInterPolateMVAValue( 0, 0 );
+		smoothAndInterPolateMVAValue( 0, 0, iWeightFileIndex_Emin, iWeightFileIndex_Emax, iWeightFileIndex_Zmin, iWeightFileIndex_Zmax );
 	}
 	
 	// print some info to screen
@@ -1814,37 +1814,190 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
  note: signal and background efficiencies are not updated
 
 */
-void VTMVAEvaluator::smoothAndInterPolateMVAValue( TH1F* effS, TH1F* effB )
+void VTMVAEvaluator::smoothAndInterPolateMVAValue( TH1F* effS, TH1F* effB, unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax, unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax )
 {
 	if( fTMVAData.size() == 0 )
 	{
 		return;
 	}
-	
+
 	cout << "Smooth and interpolate MVA cut values" << endl;
 	
-	// fill graph to be smoothed
-	TGraph* iG = new TGraph( 1 );
 	int z = 0;
-	for( unsigned int i = 0; i < fTMVAData.size(); i++ )
+	
+	// take zenith angle dependence into account
+	unsigned int Ebins = iWeightFileIndex_Emax - iWeightFileIndex_Emin + 1;
+	unsigned int ZEbins = iWeightFileIndex_Zmax - iWeightFileIndex_Zmin + 1; 
+	
+	// only energy dependent
+	if( ZEbins == 1 )
 	{
-		if( fTMVAData[i] )
+		// fill graph to be smoothed	
+		TGraph* iG = new TGraph( 1 );
+		for( unsigned int i = 0; i < fTMVAData.size(); i++ )
 		{
-			if( fTMVAData[i]->fTMVAOptimumCutValueFound )
+			if( fTMVAData[i] )
 			{
-				iG->SetPoint( z, fTMVAData[i]->fSpectralWeightedMeanEnergy_Log10TeV, fTMVAData[i]->fTMVACutValue );
+				if( fTMVAData[i]->fTMVAOptimumCutValueFound )
+				{
+					iG->SetPoint( z, fTMVAData[i]->fSpectralWeightedMeanEnergy_Log10TeV, fTMVAData[i]->fTMVACutValue );
+					z++;
+				}
+			}
+		}
+		// smooth graph
+		TGraph* iGout = new TGraph( 1 );
+        	TGraphSmooth* iGSmooth = new TGraphSmooth( "t" );
+        	iGout = ( TGraph* )iGSmooth->SmoothKern( iG, "normal", 0.5, 100 );
+        	//iGout = ( TGraph* )iGSmooth->SmoothLowess( iG, " ", 0.90 );
+
+		// fill smoothed and interpolated values into MVA vector
+	        // set all points to 'optimized'
+	        for( unsigned int i = 0; i < fTMVAData.size(); i++ )
+        	{       
+                	if( fTMVAData[i] )
+                	{
+                        	cout << "\t TMVA values: unsmoothed at " << TMath::Power( 10., fTMVAData[i]->fSpectralWeightedMeanEnergy_Log10TeV );
+                        	cout << " TeV, \t" << fTMVAData[i]->fTMVACutValue;
+                        	fTMVAData[i]->fTMVACutValue = iGout->Eval( fTMVAData[i]->fSpectralWeightedMeanEnergy_Log10TeV );
+                        	cout << ", smoothed " << fTMVAData[i]->fTMVACutValue;
+                        	if( !fTMVAData[i]->fTMVAOptimumCutValueFound )
+                        	{
+                                	cout << " (interpolated non-optimal value)";
+                        	}
+                        	cout << " (" << i << ")" << endl;
+                       	 	fTMVAData[i]->fTMVAOptimumCutValueFound = true;
+
+				// get efficiency histograms
+				TFile iTMVAFile( fTMVAData[i]->fTMVAFileName.c_str() );
+                		TH1F* effS = getEfficiencyHistogram( "effS", &iTMVAFile, fTMVAData[i]->fTMVAMethodTag_2 );
+                		TH1F* effB = getEfficiencyHistogram( "effB", &iTMVAFile, fTMVAData[i]->fTMVAMethodTag_2 );	
+
+                        	if( effS )
+                        	{
+                                	fTMVAData[i]->fSignalEfficiency = effS->GetBinContent( effS->FindBin( fTMVAData[i]->fTMVACutValue ) );
+                                	cout << "eff S " << fTMVAData[i]->fSignalEfficiency << endl;
+                        	}
+                        	if( effB )
+                        	{
+                                	fTMVAData[i]->fBackgroundEfficiency = effB->GetBinContent( effB->FindBin( fTMVAData[i]->fTMVACutValue ) );
+                                	// background efficiency might be zero -> fill it with first non-zero value
+                        		if( fTMVAData[i]->fBackgroundEfficiency < 1.e-8 )
+                                	{
+                                        	int iS = effB->FindBin( fTMVAData[i]->fTMVACutValue );
+                                        	for( int j = iS; j > 0; j-- )
+                                        	{
+                                                	if( effB->GetBinContent( j ) > 0. )
+                                                	{
+                                                        	fTMVAData[i]->fBackgroundEfficiency = effB->GetBinContent( j );
+                                                        	break;
+                                                	}
+                                        	}
+                                	}
+                        	}
+                	}
+        	}
+	}
+	// energy and zenith angle dependent
+	else
+	{
+		TH2D* iH2 = new TH2D("h1", "Smooth cut values", Ebins, iWeightFileIndex_Emin, iWeightFileIndex_Emax, ZEbins, iWeightFileIndex_Zmin, iWeightFileIndex_Zmax);
+		// fill 2D histogram to be smoothed (energy and zenith angle dependence)
+		Double_t effS_value[Ebins*ZEbins];
+		for( unsigned int l = 0; l < fTMVAData.size(); l++ )
+                {
+                        if( fTMVAData[l] )
+                        {	
+				TFile iTMVAFile( fTMVAData[l]->fTMVAFileName.c_str() );
+                                TH1F* effS = getEfficiencyHistogram( "effS", &iTMVAFile, fTMVAData[l]->fTMVAMethodTag_2 );
+				effS_value[l] = effS->GetBinContent( effS->FindBin( fTMVAData[l]->fTMVACutValue ) );
+			}
+		}
+		for( unsigned int i = 0; i < Ebins; i++ )
+        	{
+                	for( unsigned int j = 0; j < ZEbins; j++ )
+			{
+				if( fTMVAData[z] )
+				{
+					// get signal efficiency histograms and cut values
+					TFile iTMVAFile( fTMVAData[z]->fTMVAFileName.c_str() );
+                               		TH1F* effS = getEfficiencyHistogram( "effS", &iTMVAFile, fTMVAData[z]->fTMVAMethodTag_2 );
+					if( fTMVAData[z]->fTMVAOptimumCutValueFound )
+                                	{	
+						iH2->SetBinContent( i, j, fTMVAData[z]->fTMVACutValue );
+					}
+					// bins without optimal cut value and not in highest energy bin
+					else if( !fTMVAData[z]->fTMVAOptimumCutValueFound &&  ( j < ZEbins ) && ( i != Ebins - 1) )
+					{
+						for( int k = 0; k < effS->GetNbinsX(); k++ )
+						{	
+							if( TMath::Abs( effS->GetBinContent(k) - effS_value[z-1] ) < 0.0001 )
+							{
+								fTMVAData[z]->fTMVACutValue = effS->GetBinCenter(k);
+								effS_value[z] = effS->GetBinContent(k);
+							}
+                                        	}
+					}
+					// bins without optimal cut value and in highest energy bin
+					else if( !fTMVAData[z]->fTMVAOptimumCutValueFound && ( j < ZEbins ) && ( i == Ebins - 1 ) )
+					{
+						for( int k = 0; k < effS->GetNbinsX(); k++ )
+                                                {
+                                                        if( TMath::Abs( effS->GetBinContent(k) - effS_value[fTMVAData.size()-1] ) < 0.0001 )
+                                                        {
+                                                                fTMVAData[z]->fTMVACutValue = effS->GetBinCenter(k);
+								effS_value[z] = effS->GetBinContent(k);
+							}
+						}
+					}
+					cout << "\t TMVA values: at " << TMath::Power( 10., fTMVAData[z]->fSpectralWeightedMeanEnergy_Log10TeV );
+                                        cout << " TeV, \t" << fTMVAData[z]->fTMVACutValue; 
+					if( !fTMVAData[z]->fTMVAOptimumCutValueFound )
+                                	{
+                                        	cout << " (interpolated non-optimal value)";
+                                	}
+					cout << ", signal efficiency: " << effS_value[z];
+					cout << " (" << z << ")" << endl;
+				}
 				z++;
 			}
 		}
+
+		// smooth the histogram and draw it
+		/*
+		iH2->Smooth();
+		iH2->Draw("colz");
+  		int t = 0;
+  		for( unsigned int i = 0; i < Ebins; i++ )
+       		{
+                	for( unsigned int j = 0; j < ZEbins; j++ )
+                	{
+				
+				cout << "\t TMVA values: unsmoothed at " << TMath::Power( 10., fTMVAData[t]->fSpectralWeightedMeanEnergy_Log10TeV );
+                                cout << " TeV, \t" << fTMVAData[t]->fTMVACutValue;
+                                cout << ", smoothed " << iH2->GetBinContent( i, j, fTMVAData[t]->fTMVACutValue);
+                                if( !fTMVAData[t]->fTMVAOptimumCutValueFound )
+                                {
+                                        cout << " (interpolated non-optimal value)";
+                                }
+                                cout << " (" << t << ")" << endl;	
+				t++;
+                	}
+        	}*/	
 	}
+/*
+ 	OLD 1D smoothing!!!	
 	// smooth graph
 	TGraph* iGout = new TGraph( 1 );
 	TGraphSmooth* iGSmooth = new TGraphSmooth( "t" );
-	iGout = ( TGraph* )iGSmooth->SmoothKern( iG, "normal", 0.5, 100 );
+	//iGout = ( TGraph* )iGSmooth->SmoothKern( iG, "normal", 0.5, 100 );
+	iGout = ( TGraph* )iGSmooth->SmoothLowess( iG, " ", 0.90 );
+
 	// fill smoothed and interpolated values into MVA vector
 	// set all points to 'optimized'
+	
 	for( unsigned int i = 0; i < fTMVAData.size(); i++ )
-	{
+	{	
 		if( fTMVAData[i] )
 		{
 			cout << "\t TMVA values: unsmoothed at " << TMath::Power( 10., fTMVAData[i]->fSpectralWeightedMeanEnergy_Log10TeV );
@@ -1880,6 +2033,7 @@ void VTMVAEvaluator::smoothAndInterPolateMVAValue( TH1F* effS, TH1F* effB )
 			}
 		}
 	}
+*/
 }
 
 void VTMVAEvaluator::getOptimalAngularContainmentRadius( double effS, double effB, double Ndif, double Nof,

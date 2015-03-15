@@ -177,7 +177,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 				TGraph* iGOpt_AngularContainmentRadius, TGraph* iGOpt_AngularContainmentFraction );
 		TGraph*          readNonNoffGraphsFromFile( TFile* iF, double i_ze_min, double i_ze_max, bool bIsOn = true );
 		void             reset();
-		void             smoothAndInterPolateMVAValue( TH1F*, TH1F* );
+		void             smoothAndInterPolateMVAValue( TH1F*, TH1F*, unsigned int iE_min, unsigned int iE_max, unsigned int iZ_min, unsigned int iZ_max );
 		
 	public:
 	
