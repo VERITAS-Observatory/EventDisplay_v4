@@ -278,7 +278,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		}
 		void   setTMVAMethod( string iMethodName = "BDT" );
 		
-		ClassDef( VTMVAEvaluator, 30 );
+		ClassDef( VTMVAEvaluator, 31 );
 };
 
 #endif
