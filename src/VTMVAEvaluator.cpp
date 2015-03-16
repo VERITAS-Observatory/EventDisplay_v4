@@ -1930,25 +1930,36 @@ void VTMVAEvaluator::smoothAndInterPolateMVAValue( TH1F* effS, TH1F* effB, unsig
 					else if( !fTMVAData[z]->fTMVAOptimumCutValueFound &&  ( j < ZEbins ) && ( i != Ebins - 1) )
 					{
 						for( int k = 0; k < effS->GetNbinsX(); k++ )
-						{	
-							if( TMath::Abs( effS->GetBinContent(k) - effS_value[z-1] ) < 0.0001 )
+						{
+							if( TMath::Abs( effS->GetBinContent(k) - effS_value[z-1] ) < 0.001 )
 							{
 								fTMVAData[z]->fTMVACutValue = effS->GetBinCenter(k);
 								effS_value[z] = effS->GetBinContent(k);
+								//cout << effS_value[z-1] << " " << effS_value[z] << endl;
 							}
                                         	}
 					}
 					// bins without optimal cut value and in highest energy bin
 					else if( !fTMVAData[z]->fTMVAOptimumCutValueFound && ( j < ZEbins ) && ( i == Ebins - 1 ) )
 					{
-						for( int k = 0; k < effS->GetNbinsX(); k++ )
-                                                {
-                                                        if( TMath::Abs( effS->GetBinContent(k) - effS_value[fTMVAData.size()-1] ) < 0.0001 )
-                                                        {
-                                                                fTMVAData[z]->fTMVACutValue = effS->GetBinCenter(k);
-								effS_value[z] = effS->GetBinContent(k);
+						for( int l = 0; l < ZEbins; l++ )
+						{
+							if( effS_value[fTMVAData.size()-l] > 1.e-10 )
+							{
+								for( int k = 0; k < effS->GetNbinsX(); k++ )
+                                                		{
+                                                        		if( TMath::Abs( effS->GetBinContent(k) - effS_value[fTMVAData.size()-l] ) < 0.0001 )
+                                                        		{
+                                                                		fTMVAData[z]->fTMVACutValue = effS->GetBinCenter(k);
+										effS_value[z] = effS->GetBinContent(k);
+									}
+								}
 							}
 						}
+					}
+					if( fTMVAData[z]->fTMVACutValue == -99 )
+					{
+						cout << "Error: no optimal cut value found for this bin" << endl;
 					}
 					cout << "\t TMVA values: at " << TMath::Power( 10., fTMVAData[z]->fSpectralWeightedMeanEnergy_Log10TeV );
                                         cout << " TeV, \t" << fTMVAData[z]->fTMVACutValue; 
@@ -1985,55 +1996,6 @@ void VTMVAEvaluator::smoothAndInterPolateMVAValue( TH1F* effS, TH1F* effB, unsig
                 	}
         	}*/	
 	}
-/*
- 	OLD 1D smoothing!!!	
-	// smooth graph
-	TGraph* iGout = new TGraph( 1 );
-	TGraphSmooth* iGSmooth = new TGraphSmooth( "t" );
-	//iGout = ( TGraph* )iGSmooth->SmoothKern( iG, "normal", 0.5, 100 );
-	iGout = ( TGraph* )iGSmooth->SmoothLowess( iG, " ", 0.90 );
-
-	// fill smoothed and interpolated values into MVA vector
-	// set all points to 'optimized'
-	
-	for( unsigned int i = 0; i < fTMVAData.size(); i++ )
-	{	
-		if( fTMVAData[i] )
-		{
-			cout << "\t TMVA values: unsmoothed at " << TMath::Power( 10., fTMVAData[i]->fSpectralWeightedMeanEnergy_Log10TeV );
-			cout << " TeV, \t" << fTMVAData[i]->fTMVACutValue;
-			fTMVAData[i]->fTMVACutValue = iGout->Eval( fTMVAData[i]->fSpectralWeightedMeanEnergy_Log10TeV );
-			cout << ", smoothed " << fTMVAData[i]->fTMVACutValue;
-			if( !fTMVAData[i]->fTMVAOptimumCutValueFound )
-			{
-				cout << " (interpolated non-optimal value)";
-			}
-			cout << " (" << i << ")" << endl;
-			fTMVAData[i]->fTMVAOptimumCutValueFound = true;
-			if( effS )
-			{
-				fTMVAData[i]->fSignalEfficiency = effS->GetBinContent( effS->FindBin( fTMVAData[i]->fTMVACutValue ) );
-			}
-			if( effB )
-			{
-				fTMVAData[i]->fBackgroundEfficiency = effB->GetBinContent( effB->FindBin( fTMVAData[i]->fTMVACutValue ) );
-				// background efficiency might be zero -> fill it with first non-zero value
-				if( fTMVAData[i]->fBackgroundEfficiency < 1.e-8 )
-				{
-					int iS = effB->FindBin( fTMVAData[i]->fTMVACutValue );
-					for( int j = iS; j > 0; j-- )
-					{
-						if( effB->GetBinContent( j ) > 0. )
-						{
-							fTMVAData[i]->fBackgroundEfficiency = effB->GetBinContent( j );
-							break;
-						}
-					}
-				}
-			}
-		}
-	}
-*/
 }
 
 void VTMVAEvaluator::getOptimalAngularContainmentRadius( double effS, double effB, double Ndif, double Nof,
