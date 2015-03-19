@@ -1935,14 +1935,13 @@ void VTMVAEvaluator::smoothAndInterPolateMVAValue( TH1F* effS, TH1F* effB, unsig
 							{
 								fTMVAData[z]->fTMVACutValue = effS->GetBinCenter(k);
 								effS_value[z] = effS->GetBinContent(k);
-								//cout << effS_value[z-1] << " " << effS_value[z] << endl;
 							}
                                         	}
 					}
 					// bins without optimal cut value and in highest energy bin
 					else if( !fTMVAData[z]->fTMVAOptimumCutValueFound && ( j < ZEbins ) && ( i == Ebins - 1 ) )
 					{
-						for( int l = 0; l < ZEbins; l++ )
+						for( unsigned int l = 0; l < ZEbins; l++ )
 						{
 							if( effS_value[fTMVAData.size()-l] > 1.e-10 )
 							{
