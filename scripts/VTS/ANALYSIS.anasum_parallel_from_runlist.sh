@@ -18,7 +18,7 @@ required parameters:
     <output directory>      anasum output files are written to this directory
                         
     <cut set>               hardcoded cut sets predefined in the script
-                            (e.g., soft2tel, moderate3tel, moderateExt2tel, BDTmoderatel2tel, etc.)
+                            (e.g., soft2tel, moderate3tel, moderateExt2tel, BDTmoderate2tel, etc.)
     
     <background model>      background model
                             (RE = reflected region, RB = ring background)
