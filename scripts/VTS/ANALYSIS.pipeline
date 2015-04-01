@@ -51,6 +51,10 @@ export RUNLIST="$CWD/runlist.crab.dat"
 # takes effect in the anpar stage
 #% OptionArgType yes|no
 export USETMVABDT="no"
+#% OptionComplexity Common
+#% Description Should the TMVA-BDT weak cuts feature be used?
+#% OptionArgType yes|no
+export USETMVABDTWEAK="no"
 
 ## Should we use the Model3D feature?
 #% GroupName Model3D Feature
