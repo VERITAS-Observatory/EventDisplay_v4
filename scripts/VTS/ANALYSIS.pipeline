@@ -220,9 +220,13 @@ export RUNPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter
 ## Which event display reconstruction runparameter file should we use?
 # CA is for runs that use CARE-derived IRFs
 # GR is for runs that use GRISU-derived IRFs
-#% ActiveStage anpar
+#% GroupName evndisp reconstruction runparameter file
+#% ActiveStage evndisp
 #% OptionComplexity Uncommon
+#% OptionArgType filename within $VERITAS_EVNDISP_AUX_DIR/ParameterFiles
+#% Description Which reconstruction file should we use with care-derived irf files?
 export EVNRECONFILE_CA="EVNDISP.reconstruction.runparameter"
+#% Description Which reconstruction file should we use with grisu-derived irf files?
 export EVNRECONFILE_GR="EVNDISP.reconstruction.SumWindow-noDISP"
 
 ## Do you want to automatically generate the anasum runlist? (recommended)
@@ -271,23 +275,23 @@ export SCIPIPE_USEDISP="no"
 #% GroupName Auxillary File Preferences
 #% ActiveStage mscw
 #% OptionComplexity Uncommon
-#% Description Which event display version's aux files should be used.  Older version auxfiles  may not be compatible with current release. <br>(effArea-<b>v470</b>-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root)
+#% Description Which event display version's aux files should be used.  Older version auxfiles  may not be compatible with current release. <br>(effArea-<b>v480</b>-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root)
 #
 # Which event display version should they have been made with?
-# e.g. effArea-v470-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
+# e.g. effArea-v480-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
 #              ^^^^
-# radialAcceptance-v470-auxv01-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root
+# radialAcceptance-v480-auxv01-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root
 #                  ^^^^
-# table-v470-auxv01-CARE_June1425-ATM21-V6-ID0.root
+# table-v480-auxv01-CARE_June1425-ATM21-V6-ID0.root
 #       ^^^^
-# Should have the format 'v###', like 'v470' or 'v525', etc.
+# Should have the format 'v###', like 'v480' or 'v525', etc.
 #% OptionArgType v###
-export AUXFILE_EVNVER="v470"
+export AUXFILE_EVNVER="v480"
 #
-#% Description Which simulation files should be used? <br>(effArea-v470-auxv01-<b>CARE_June1425</b>-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root)
+#% Description Which simulation files should be used? <br>(effArea-v480-auxv01-<b>CARE_June1425</b>-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root)
 # Which simulation date should they have been made with?
 # Grisu is used for all V4/V5 runs, and CARE is used for V6 runs.
-# e.g. effArea-v470-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
+# e.g. effArea-v480-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
 #                          ^^^^^^^^^^^^^
 # for Care (_CA), Should have the format '<simtype>_<month><year><day>', like 'CARE_June1425' 
 # for Grisu(_GR), just 'GRISU-SW6'
@@ -295,25 +299,25 @@ export AUXFILE_EVNVER="v470"
 export AUXFILE_SIMDATE_GR="GRISU-SW6"
 export AUXFILE_SIMDATE_CA="CARE_June1425"
 #
-#% Description Aux file version to try to use for Radial Acceptance files.<br>(radialAcceptance-v470-<b>auxv01</b>-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root)
+#% Description Aux file version to try to use for Radial Acceptance files.<br>(radialAcceptance-v480-<b>auxv01</b>-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root)
 # For the radial acceptance IRF file, what aux-file-version should be used?
-# e.g. radialAcceptance-v470-auxv01-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root
+# e.g. radialAcceptance-v480-auxv01-Cut-NTel2-ExtendedSource-Hard-ID0-V6-T1234.root
 #                            ^^^^^^
 # Should have the format 'auxv##', e.g. 'auxv01' or 'auxv31'
 #% OptionArgType auxv##
 export AUXVER_RADEC="auxv01"
 #
-#% Description Aux file version to try to use for Table files.<br>(table-v470-<b>auxv01</b>-CARE_June1425-ATM21-V6-ID0.root)
+#% Description Aux file version to try to use for Table files.<br>(table-v480-<b>auxv01</b>-CARE_June1425-ATM21-V6-ID0.root)
 # For the table IRF file, what aux-file-version should be used?
-# e.g. table-v470-auxv01-CARE_June1425-ATM21-V6-ID0.root
+# e.g. table-v480-auxv01-CARE_June1425-ATM21-V6-ID0.root
 #                 ^^^^^^
 # Should have the format 'auxv##', e.g. 'auxv01' or 'auxv31'
 #% OptionArgType auxv##
 export AUXVER_TABLE="auxv01"
 #
-#% Description Aux file version to try to use for Effective Area Files.<br>(effArea-v470-<b>auxv01</b>-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root)
+#% Description Aux file version to try to use for Effective Area Files.<br>(effArea-v480-<b>auxv01</b>-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root)
 # For the effective area IRF file, what aux-file-version should be used?
-# e.g. effArea-v470-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
+# e.g. effArea-v480-auxv01-CARE_June1425-Cut-NTel2-PointSource-SoftOpen-ID0-V6-ATM21-T1234.root
 #                   ^^^^^^
 # Should have the format 'auxv##', e.g. 'auxv01' or 'auxv31'
 #% OptionArgType auxv##
