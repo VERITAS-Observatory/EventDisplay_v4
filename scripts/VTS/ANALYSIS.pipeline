@@ -220,8 +220,10 @@ export RUNPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter
 ## Which event display reconstruction runparameter file should we use?
 # CA is for runs that use CARE-derived IRFs
 # GR is for runs that use GRISU-derived IRFs
+#% ActiveStage anpar
+#% OptionComplexity Uncommon
 export EVNRECONFILE_CA="EVNDISP.reconstruction.runparameter"
-export EVNRECONFILE_GR="EVNDISP.reconstruction.SumWindow-noDisp"
+export EVNRECONFILE_GR="EVNDISP.reconstruction.SumWindow-noDISP"
 
 ## Do you want to automatically generate the anasum runlist? (recommended)
 #% GroupName Auto-generate Anasum Runlist
