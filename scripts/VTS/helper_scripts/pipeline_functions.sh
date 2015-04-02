@@ -498,11 +498,31 @@ function simplifyToVULD {
     echo "$OUTPUT"
 }
 
+# if part of the input path matches the path of $EVNDISPSYS, replace the match with "$EVNDISPSYS"
+function simplifyToEVNDISPSYS {
+    local INPUT="$1"      # so that when it is printed to a terminal, it's much simpler for a human to read
+    local CLEANINPUT=$( readlink -m "$INPUT"      ) # clean up directory (no extra //'s)
+	local CLEANMATCH=$( readlink -m "$EVNDISPSYS" )
+    local OUTPUT=$( echo "$CLEANINPUT" | sed -e 's:'$CLEANMATCH':$EVNDISPSYS/:g' )
+    echo "$OUTPUT"
+}
+
+# if part of the input path matches the path of $VERITAS_EVNDISP_AUX_DIR, replace the match with "$VERITAS_EVNDISP_AUX_DIR"
+function simplifyToAUXDir {
+    local INPUT="$1"      # so that when it is printed to a terminal, it's much simpler for a human to read
+    local CLEANINPUT=$( readlink -m "$INPUT"      ) # clean up directory (no extra //'s)
+	local CLEANMATCH=$( readlink -m "$VERITAS_EVNDISP_AUX_DIR" )
+    local OUTPUT=$( echo "$CLEANINPUT" | sed -e 's:'$CLEANMATCH':$VERITAS_EVNDISP_AUX_DIR:g' )
+    echo "$OUTPUT"
+}
+
+
 # convert a raw file size in bytes
 # to 'XXXkb, XXXMb, XXXGb
 function formatFileSize {
     local BYTESIZE="$1"
     local OUTSTRING=""
+    if [ -z "$BYTESIZE" ] ; then BYTESIZE=0 ; fi
     if   (( $BYTESIZE < 1000          )) ; then OUTSTRING=$( printf "%3dB " $(( BYTESIZE            )) )
     elif (( $BYTESIZE < 1000000       )) ; then OUTSTRING=$( printf "%3dKB" $(( BYTESIZE/1000       )) )
     elif (( $BYTESIZE < 1000000000    )) ; then OUTSTRING=$( printf "%3dMB" $(( BYTESIZE/1000000    )) )
