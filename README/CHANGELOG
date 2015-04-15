@@ -3,6 +3,13 @@ Change log eventdisplay analysis package
 (please observe the wiki syntax for this file)
 
 ************************************************
+******* 20150415 release of v4.80a ****
+************************************************
+
+* 20150413 (MK, HF)
+Bug fixes for elliptical exclusion regions, improved plotting of exclusion regions and reflected regions.
+
+************************************************
 ******* 20150327 release of v4.80 ****
 ************************************************
 
