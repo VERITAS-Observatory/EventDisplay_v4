@@ -514,7 +514,7 @@ bool VRadialAcceptance::isExcludedfromBackground( double x, double y )
 	//Other regions to exclude from background (read from runparameter)
         for( unsigned int i = 0; i < fXE.size(); i ++ )
         {
-                if( ( ( x * TMath::Cos( fAngE[i] * TMath::DegToRad() ) - y * TMath::Sin( fAngE[i] * TMath::DegToRad() ) - fXE[i] ) * ( x * TMath::Cos( fAngE[i] * TMath::DegToRad() ) - y * TMath::Sin( fAngE[i] * TMath::DegToRad() ) - fXE[i] ) / ( fR1E[i] * fR1E[i] ) ) + ( ( x * TMath::Sin( fAngE[i] * TMath::DegToRad() ) + y * TMath::Cos( fAngE[i] * TMath::DegToRad() ) - fYE[i] ) * ( x * TMath::Sin( fAngE[i] * TMath::DegToRad() ) + y * TMath::Cos( fAngE[i] * TMath::DegToRad() ) - fYE[i] ) / ( fR2E[i] * fR2E[i] ) ) < 1. )
+		if( TMath::Power( ( ( x - fXE[i] ) * TMath::Cos( fAngE[i] * TMath::DegToRad() ) + ( y - fYE[i] ) * TMath::Sin( fAngE[i] * TMath::DegToRad() ) ) / fR1E[i], 2 ) + TMath::Power( ( ( x - fXE[i] ) * TMath::Sin( fAngE[i] * TMath::DegToRad() ) - ( y - fYE[i] ) * TMath::Cos( fAngE[i] * TMath::DegToRad() ) ) / fR2E[i] , 2 ) < 1 )
                 {
                         return true;
                 }

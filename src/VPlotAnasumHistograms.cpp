@@ -1715,7 +1715,7 @@ void VPlotAnasumHistograms::plot_RBM_ring( double r, double iA, double t2, doubl
 /*
  *   plot reflected regions from the Refl Reg Background estimation
  *
- *   observe that this has to be used with the non-reflected histograms (not with plot_radec)
+ *   Can be used both with reflected (ra_dec) and non-reflected (camera coordinates) histograms.
  */
 void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, int iColor )
 {
@@ -1787,8 +1787,16 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
 	int n_ex = 0;
 	double x_ex[1000];
 	double y_ex[1000];
-	double r_ex[1000];
-	
+	double r1_ex[1000];
+	double r2_ex[1000];
+	double theta_ex[1000];
+
+	for(int iLoop=0; iLoop<1000;iLoop++) 
+	{
+		r2_ex[iLoop]=-1;	
+		theta_ex[iLoop]=0;
+	}
+
 	iT->SetBranchAddress( "x_wobble", &x );
 	iT->SetBranchAddress( "y_wobble", &y );
 	iT->SetBranchAddress( "x", &x_n );
@@ -1807,9 +1815,36 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
 		iT->SetBranchAddress( "n_ex", &n_ex );
 		iT->SetBranchAddress( "x_ex", x_ex );
 		iT->SetBranchAddress( "y_ex", y_ex );
-		iT->SetBranchAddress( "r_ex", r_ex );
+	}
+	if( iT->GetBranch( "r1_ex" ) )
+	{
+		iT->SetBranchAddress( "r1_ex", r1_ex );
+		iT->SetBranchAddress( "r2_ex", r2_ex );
+		iT->SetBranchAddress( "ang_ex", &theta_ex );
+	}
+	if( iT->GetBranch( "r_ex" ) )
+	{
+		iT->SetBranchAddress( "r_ex", r1_ex );
 	}
 	
+
+	double iSign = 1.;
+
+	//figure out if we've plotted a reflected histogram (with a proper RA axis) or a histogram in derotated camera coordinates.
+	//TList::FindObject( char * ) returns 0 if no object with that name is found. No wildcards. 
+
+	if ( iC->GetListOfPrimitives()->FindObject( "hmap_stereo_sig_REFLECTED" ) ||  iC->GetListOfPrimitives()->FindObject( "hmap_stereo_diff_REFLECTED" ) 
+		||  iC->GetListOfPrimitives()->FindObject( "hmap_stereo_on_REFLECTED" ) ||  iC->GetListOfPrimitives()->FindObject( "hmap_stereo_off_REFLECTED" )
+		||  iC->GetListOfPrimitives()->FindObject( "hmap_stereoUC_sig_REFLECTED" ) ||  iC->GetListOfPrimitives()->FindObject( "hmap_stereoUC_diff_REFLECTED" ) 
+		||  iC->GetListOfPrimitives()->FindObject( "hmap_stereoUC_on_REFLECTED" ) ||  iC->GetListOfPrimitives()->FindObject( "hmap_stereoUC_off_REFLECTED" ) 
+	)
+	{
+		iSign *= -1.;
+	}
+	
+	
+
+
 	bool bFound = false;
 	for( int n = 0; n < iT->GetEntries(); n++ )
 	{
@@ -1823,14 +1858,14 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
 	}
 	if( !bFound )
 	{
-		cout << "no reflected regions defined for this bins" << endl;
+		cout << "no reflected regions defined for this bin." << endl;
 		return;
 	}
 	cout << "n_r \t r \t x \t y \t x_bin \t y_bin \t x_bin_wobble \t y_bin_wobble" << endl;
 	cout << n_r << "\t" << r << "\t" << x << "\t" << y << "\t" << x_bin << "\t" << y_bin << "\t" << x_bin_wobble << "\t" << y_bin_wobble << endl;
 	
 	// source region
-	TEllipse* iR = new TEllipse( x, y, r, r );
+	TEllipse* iR = new TEllipse( iSign*x, y, r, r );
 	iR->SetFillStyle( 3004 );
 	iR->SetFillColor( 2 );
 	iR->SetLineColor( 2 );
@@ -1841,7 +1876,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
 	
 	
 	// region around camera center
-	TEllipse* iLC = new TEllipse( x - x_n, y - y_n, r, r );
+	TEllipse* iLC = new TEllipse( iSign*(x - x_n), y - y_n, r, r );
 	iLC->SetFillStyle( 0 );
 	iLC->SetLineStyle( 2 );
 	iLC->Draw();
@@ -1849,7 +1884,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
 	for( int n = 0; n < n_r; n++ )
 	{
 		cout << "\t" << n << "\t" << x_r[n] << "\t" << y_r[n] << "\t" << r_r[n] << endl;
-		TEllipse* iL = new TEllipse( x_r[n], y_r[n], r_r[n], r_r[n] );
+		TEllipse* iL = new TEllipse( iSign*x_r[n], y_r[n], r_r[n], r_r[n] );
 		iL->SetFillStyle( 0 );
 		iL->SetLineWidth( 2 );
 		iL->SetLineColor( iColor );
@@ -1870,13 +1905,13 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
 	// excluded regions
 	for( int e = 0; e < n_ex; e++ )
 	{
-		TEllipse* iEx = new TEllipse( x_ex[e], y_ex[e], r_ex[e], r_ex[e] );
+		TEllipse* iEx = new TEllipse( iSign*x_ex[e], y_ex[e], r1_ex[e], r2_ex[e], 0, 360, iSign*theta_ex[e] );
 		iEx->SetFillStyle( 0 );
 		iEx->SetLineStyle( 3 );
 		iEx->SetLineWidth( 2 );
 		iEx->SetLineColor( 6 );
 		iEx->Draw();
-		cout << "\t exclusion regions: " << e << " " << x_ex[e] << " " << y_ex[e] << " " << r_ex[e] << endl;
+		cout << "\t exclusion regions: " << e << " " << x_ex[e] << " " << y_ex[e] << " " << r1_ex[e] << " " << r2_ex[e] << " " << theta_ex[e] << endl;
 		
 		if( e == 0 )
 		{
@@ -1952,8 +1987,15 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas* c, int iLineColor )
 	t->SetBranchAddress( "Bmag", &Bmag );
 	
 	double iSign = 1.;
-	TH2D* h = ( TH2D* )c->GetListOfPrimitives()->FindObject( "hmap_stereo_sig_REFLECTED" );
-	if( h )
+
+	//figure out if we've plotted a reflected histogram (with a proper RA axis) or a histogram in derotated camera coordinates.
+	//TList::FindObject( char * ) returns 0 if no object with that name is found. No wildcards. 
+
+	if ( c->GetListOfPrimitives()->FindObject( "hmap_stereo_sig_REFLECTED" ) ||  c->GetListOfPrimitives()->FindObject( "hmap_stereo_diff_REFLECTED" ) 
+		||  c->GetListOfPrimitives()->FindObject( "hmap_stereo_on_REFLECTED" ) ||  c->GetListOfPrimitives()->FindObject( "hmap_stereo_off_REFLECTED" )
+		||  c->GetListOfPrimitives()->FindObject( "hmap_stereoUC_sig_REFLECTED" ) ||  c->GetListOfPrimitives()->FindObject( "hmap_stereoUC_diff_REFLECTED" ) 
+		||  c->GetListOfPrimitives()->FindObject( "hmap_stereoUC_on_REFLECTED" ) ||  c->GetListOfPrimitives()->FindObject( "hmap_stereoUC_off_REFLECTED" ) 
+	)
 	{
 		iSign *= -1.;
 	}
@@ -1961,12 +2003,10 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas* c, int iLineColor )
 	for( int i = 0; i < t->GetEntries(); i++ )
 	{
 		t->GetEntry( i );
-		//TEllipse* e = new TEllipse( iSign * x, y, r );
-		TEllipse* e = new TEllipse( iSign * x, y, r1, r2, 0, 360, theta );
+		TEllipse* e = new TEllipse( iSign * x, y, r1, r2, 0, 360, iSign*theta );
 		e->SetFillStyle( 0 );
 		e->SetLineColor( iLineColor );
 		e->Draw();
-		//cout << "#" << i << " Vmag " << Vmag << ", Bmag " << Bmag << " (" << x << ", " << y << ", " << r << ")" << endl;
 		cout << "#" << i << " Vmag " << Vmag << ", Bmag " << Bmag << " (" << x << ", " << y << ", " << r1 << ", " << r2 << ", " << theta << ")" << endl;
 	}
 	if( f1 )

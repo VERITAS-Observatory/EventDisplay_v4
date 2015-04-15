@@ -1158,9 +1158,7 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
 								for( unsigned int ex = 0; ex < vXTOEXCLUDE.size(); ex++ )
 								{
 									// vXTOEXCLUDE and vYTOEXCLUDE are relative to sky map centre in rotated camera coordinates
-									if( ( x_t * TMath::Cos( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) - y_t * TMath::Sin( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) - vXTOEXCLUDE[ex] - fRunList.fWobbleWestMod ) * ( x_t * TMath::Cos( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) - y_t * TMath::Sin( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) - vXTOEXCLUDE[ex] - fRunList.fWobbleWestMod ) / ( ( vR1TOEXCLUDE[ex] + fRE_roffTemp ) * ( vR1TOEXCLUDE[ex] + fRE_roffTemp ) )
-                                                                                        + ( x_t * TMath::Sin( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) + y_t * TMath::Cos( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod ) * ( x_t * TMath::Sin( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) + y_t * TMath::Cos( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod ) / ( ( vR2TOEXCLUDE[ex] + fRE_roffTemp ) * ( vR2TOEXCLUDE[ex] + fRE_roffTemp ) )
-                                                                                        < 1. )
+									if( TMath::Power( ( ( x_t - vXTOEXCLUDE[ex] - fRunList.fWobbleWestMod ) * TMath::Cos( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) + ( y_t - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod  ) * TMath::Sin( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) ) / ( vR1TOEXCLUDE[ex] + fRE_roffTemp ), 2 ) + TMath::Power( ( ( x_t - vXTOEXCLUDE[ex] - fRunList.fWobbleWestMod ) * TMath::Sin( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) - ( y_t - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod ) * TMath::Cos( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) ) / ( vR2TOEXCLUDE[ex] + fRE_roffTemp  ), 2 ) < 1. )
 									{
 										bExclude = true;
 									}
