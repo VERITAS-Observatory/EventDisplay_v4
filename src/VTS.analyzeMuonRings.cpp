@@ -27,9 +27,9 @@ int main( int argc, char* argv[] )
 	cout << endl;
 	cout << "VTS.analyzeMuonRings (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
 	cout << "--------------------------------" << endl;
-	if( argc != 4 )
+	if( argc < 6 )
 	{
-		cout << "VTS.analyzeMuonRings <input file> <create plot (yes/no)> <write to DB (yes/no)>" << endl;
+		cout << "VTS.analyzeMuonRings <input file> <create plot (yes/no)> <write to DB (yes/no)> <DB user name> <DB password> [plot dir]" << endl;
 		cout << endl;
 		exit( 0 );
 	}
@@ -38,6 +38,13 @@ int main( int argc, char* argv[] )
 	string ifile = argv[1];
 	string iplot = argv[2];
 	string iDB = argv[3];
+        string iDB_user = argv[4];
+        string iDB_passwd = argv[5];
+	string dir=".";
+	if(argc >= 7 ) 
+	{
+	  dir = argv[6];
+	}
 
 	bool bplot = false;
 	bool bDB = false;
@@ -116,17 +123,19 @@ int main( int argc, char* argv[] )
 	char hname[500];
 	for( unsigned int i = 0; i < ntel; i++ )
 	{
+         	nMuons[i] = 0;
+		/// read tpars tree
 		sprintf( hname, "Tel_%d/tpars", i + 1 );
 		TTree* t = ( TTree* )f->Get( hname );
 		if( !t )
 		{
-			cout << "error finding tree tpars for telescope " << i + 1 << endl;
-			exit( 0 );
+		        cout << "no tree tpars for telescope " << i+1 <<" skipping this telescope"<<endl;
+		        continue;
 		}
 		Ctpars* c = new Ctpars( t, false, 6, 1 );
 		if( !c )
 		{
-		       exit( 0 );		
+		        exit( 0 );		
 		}
 		if( m->fChain->GetEntries() != c->fChain->GetEntries() )
 		{
@@ -151,25 +160,27 @@ int main( int argc, char* argv[] )
 			xe[k] = 0;
 			ye[k] = 0;
 		}
-		cout << "\t (looping over " << Nentries << " entries)" <<endl;
+		cout << "\t (looping over entries)" <<endl;
 		for( int n = 0; n < Nentries; n++ )
 		{
-		  ///m->GetEntry( n );
 			c->GetEntry( n );
 			//// apply cuts ////
 			if( c->muonValid != CUTmuonValid && c->houghMuonValid != CUThoughMuonValid) continue;
-
 			if( ( c->muonValid == CUTmuonValid && c->muonRadius > CUTLOmuonRadius && c->muonRSigma < CUTUPmuonRSigma && ( sqrt( pow( c->muonX0 ,2 ) + pow( c->muonY0 ,2 ) ) + c->muonRadius < CUTUPmuonRadius ) && c->muonSize < CUTUPmuonSize ) || c->houghMuonValid == CUThoughMuonValid )
 			{
+			  if( j > 10000) {
+			    cout << "VTS.analyzeMuonRings Warning: Found more than 10000 muon rings. Will ignore the rest of the muons for now" << endl;
+			    break;
+			  }
         			x[j] = c->muonIPCorrectedSize;
 				y[j] = c->muonRadius;
 				xe[j] = 0.0; //no error on the size
 				ye[j] = c->muonRSigma;
 				j++;
-			        //////cout<<"TEST: "<< c->muonSize <<endl;
 			}
 		}
 		gRadiusSize[i] = new TGraphErrors(j,x,y,xe,ye);
+		nMuons[i] = j;
 		cout<<"\t events passing cuts: "<< j <<endl;
 	}
 
@@ -182,8 +193,6 @@ int main( int argc, char* argv[] )
 		slope[i] = 0;
 		slopeErr[i] = 0;	
 		bMinEvents[i] = false;
-	        j = gRadiusSize[i]->GetN();
-		nMuons[i] = j;
 	        if( nMuons[i] > minEvents ) 
 		{
         		bMinEvents[i] = true;
@@ -203,6 +212,7 @@ int main( int argc, char* argv[] )
 		TF1 *fitRadiusSize[ntel];
 	        for( unsigned int i = 0; i < ntel; i++ )
 		{
+		        if( !bMinEvents[i] ) continue;
 			sprintf( ctitle, "muon_tel_%i", i+1 );
 			canRadiusSize[i] = new TCanvas(ctitle,ctitle,10,10,600,600);
 			canRadiusSize[i]->cd();
@@ -221,11 +231,14 @@ int main( int argc, char* argv[] )
 			gRadiusSize[i]->SetMarkerStyle(20);
 			gRadiusSize[i]->SetMarkerSize(1.0);
 			fitRadiusSize[i] = gRadiusSize[i]->GetFunction("g2");
-			fitRadiusSize[i]->SetLineColor(1);
-			fitRadiusSize[i]->SetLineStyle(2);
-			fitRadiusSize[i]->SetRange(0.0, 11000.0 );
+			if(fitRadiusSize[i])
+			{
+			    fitRadiusSize[i]->SetLineColor(1);
+			    fitRadiusSize[i]->SetLineStyle(2);
+			    fitRadiusSize[i]->SetRange(0.0, 11000.0 );
+			}
 			gRadiusSize[i]->Draw("APZ");
-			sprintf( ctitle, "muon_%i_T%i.pdf", RunNumber, i+1 );
+			sprintf( ctitle, "%s/muon_%i_T%i.pdf", dir.c_str(), RunNumber, i+1 );
 			canRadiusSize[i]->Print( ctitle );
 		}
 	}
@@ -238,7 +251,7 @@ int main( int argc, char* argv[] )
 	        string DBstring = DBserver + "/VOFFLINE?local";
 	        cout << "writing to database: "<< DBstring <<endl;
 
-	        VDB_Connection my_connection( DBstring.c_str(), "readwrite", "AmadoScope" );
+	        VDB_Connection my_connection( DBstring.c_str(), iDB_user.c_str(), iDB_passwd.c_str() );
 	        if( !my_connection.Get_Connection_Status() )
 	        {
 		     cout << "error: no connection to database, exiting" <<endl;
