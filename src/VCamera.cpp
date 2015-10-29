@@ -2018,7 +2018,7 @@ void VCamera::drawStarsInFOV()
 			double x = 0.;
 			if( cos( iTel_dec * TMath::DegToRad() ) != 0. )
 			{
-				x = -1. * ( iStar[i]->fRACurrentEpoch - iTel_ra ) / cos( iTel_dec * TMath::DegToRad() );
+				x = -1. * ( iStar[i]->fRACurrentEpoch - iTel_ra ) * cos( iTel_dec * TMath::DegToRad() );
 			}
 			fData->getArrayPointing()->derotateCoords( fData->getEventMJD(), fData->getEventTime(), x, y, x_rot, y_rot );
 			

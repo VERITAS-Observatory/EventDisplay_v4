@@ -1578,7 +1578,7 @@ double VStarCatalogue::getDistanceToClosestStar( double x_cam_deg, double y_cam_
 		double x = 0.;
 		if( cos( fTel_dec * TMath::DegToRad() ) != 0. )
 		{
-			x = -1. * ( fStarsinFOV[i]->fRACurrentEpoch - fTel_ra ) / cos( fTel_dec * TMath::DegToRad() );
+			x = -1. * ( fStarsinFOV[i]->fRACurrentEpoch - fTel_ra ) * cos( fTel_dec * TMath::DegToRad() );
 		}
 		x_rot = x;
 		y_rot = y;
