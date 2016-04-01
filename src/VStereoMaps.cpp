@@ -527,7 +527,16 @@ void VStereoMaps::RM_getAlpha( bool iIsOn )
 	
 	double i_rS = sqrt( fRunList.fSourceRadius );
 	
-	double x = 0.;
+    // check if background region does not overlap with source region
+    if( i_rL < i_rS )
+    {
+        cout << "VStereoMaps::RM_getAlpha error: background region overlaps with source region ";
+        cout << "inner ring radius " << i_rL << " < source radius " << i_rS << endl;
+        cout << "Check your RBM parameters! " << endl;
+        return;
+    }
+	
+    double x = 0.;
 	double x_w = hmap_stereo->GetXaxis()->GetBinWidth( 2 );
 	int ix_start = 0;
 	int ix_stopp = 0;
@@ -555,8 +564,8 @@ void VStereoMaps::RM_getAlpha( bool iIsOn )
 	
 	// all calculations are with camera center at (0,0), but alpha histograms are
 	// filled with source center at (0,0)
-	int i_xoff =  hmap_stereo->GetXaxis()->FindBin( fRunList.fWobbleWestMod ) - hmap_stereo->GetXaxis()->FindBin( 0. );
-	int j_yoff =  hmap_stereo->GetYaxis()->FindBin( fRunList.fWobbleNorthMod ) - hmap_stereo->GetYaxis()->FindBin( 0. );
+	int i_xoff =  TMath::Nint( fRunList.fWobbleWestMod / x_w );
+	int j_yoff =  TMath::Nint( fRunList.fWobbleNorthMod / y_w );
 	
 	// loop over all possible source positions,
 	// calculate alpha for source or ring positions

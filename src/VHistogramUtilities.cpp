@@ -347,7 +347,7 @@ regioncode:  extra specifier for additional region cuts
 
 */
 TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, double rSource, bool iDiff, TH2D* hTest,
-		int iExcN, float* iExcX, float* iExcY, float* iExcR1, float* iExcR2, string regioncode )
+		int iExcN, float* iExcX, float* iExcY, float* iExcR1, float* iExcR2, float* iExcTheta, string regioncode )
 {
 	if( !h )
 	{
@@ -475,7 +475,7 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 			bool iBBreak = false;
 			for( int e = 0; e < iExcN; e++ )
 			{
-				if( ( x_r - iExcX[e] ) * ( x_r - iExcX[e] ) / ( iExcR1[e]*iExcR1[e] ) + ( y_r - iExcY[e] ) * ( y_r - iExcY[e] ) / ( iExcR2[e]*iExcR2[e] ) < 1. )
+				if( TMath::Power( ( ( x_r - iExcX[e] ) * TMath::Cos( iExcTheta[e] * TMath::DegToRad() ) + ( y_r - iExcY[e] ) * TMath::Sin( iExcTheta[e] * TMath::DegToRad() ) ) / iExcR1[e], 2 ) + TMath::Power( ( ( x_r - iExcX[e] ) * TMath::Sin( iExcTheta[e] * TMath::DegToRad() ) - ( y_r - iExcY[e] ) * TMath::Cos( iExcTheta[e] * TMath::DegToRad() ) ) / iExcR2[e] , 2 ) < 1. )
 				{
 					iBBreak = true;
 					break;
