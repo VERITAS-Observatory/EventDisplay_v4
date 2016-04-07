@@ -69,7 +69,7 @@ fi
 
 PARTICLE_TYPE="gamma"
 # evndisplay version
-EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .`
+EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .| sed -e 's/[a-Z]*$//'`
 
 # Check that list of background files exists
 if [[ ! -f "$BLIST" ]]; then
