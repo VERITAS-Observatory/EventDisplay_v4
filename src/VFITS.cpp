@@ -912,8 +912,8 @@ bool VFITS::writeFITSimageInfo( long naxis, long* naxes, TH2D* hSkyMap , string 
 	{
 		return printerror( status );
 	}
-	
-	float pix1_origin = naxes[0] / 2;
+
+    float pix1_origin = hSkyMap->GetNbinsX() - hSkyMap->GetXaxis()->FindFixBin(0.) + 1;
 	if( fits_update_key( fptr, TFLOAT, "CRPIX1", &pix1_origin, ( char* )"Reference point of pixel location axis 1", &status ) )
 	{
 		return printerror( status );
@@ -937,8 +937,7 @@ bool VFITS::writeFITSimageInfo( long naxis, long* naxes, TH2D* hSkyMap , string 
 		return printerror( status );
 	}
 	
-	
-	float pix2_origin = naxes[1] / 2;
+    float pix2_origin = hSkyMap->GetYaxis()->FindFixBin(0.);	
 	if( fits_update_key( fptr, TFLOAT, "CRPIX2", &pix2_origin, ( char* )"Reference point of pixel location axis 2", &status ) )
 	{
 		return printerror( status );
