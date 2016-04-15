@@ -1,6 +1,12 @@
 Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
+************************************************
+******* 20160415 release of v4.80b ****
+************************************************
+
+* 20160415 (MK)
+Bug fixes for analyses when the camera center of the run is outside the skymap center.
 
 ************************************************
 ******* 20150415 release of v4.80a ****
