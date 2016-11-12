@@ -35,7 +35,8 @@ bool VEnergySpectrum::openDataFile( string iFile, int irun, bool iSourceTypeIsAs
 {
 	fTotalRun = irun;
 	bAsciiDataFile = iSourceTypeIsAscii;
-	
+	setConfidenceLevel(0.68);
+
 	// open anasum file
 	if( !bAsciiDataFile )
 	{
@@ -114,7 +115,8 @@ void VEnergySpectrum::initializeRunVariables()
 	
 	gEnergySpectrum = 0;
 	fEnergySpectrumFit = 0;
-	
+	setConfidenceLevel(0.68);
+
 }
 
 
@@ -1358,6 +1360,7 @@ TF1* VEnergySpectrum::fitEnergySpectrum( string iname, bool bDraw )
 	
 	// get energy spectrum
 	gEnergySpectrum = getEnergySpectrumGraph();
+	fSpectralFitter->setCL(fCL);
 	if( gEnergySpectrum )
 	{
 		// perform the fit

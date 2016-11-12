@@ -10,6 +10,7 @@
 #include "TMath.h"
 #include "TVirtualFitter.h"
 #include "TMatrixD.h"
+#include "TGraphErrors.h"
 
 #include <iomanip>
 #include <iostream>
@@ -26,6 +27,8 @@ class VSpectralFitter : public TObject
 		double* fFitFunction_CovarianceMatrix;         // covariance matrix from fit
 		TFitResult* fFitResult;
 		string fFitName;
+		TGraphErrors* fConfidenceInterval;				// Fit Confidence Interval 
+		Double_t fCL; 									// Confidince Level
 		
 		int    fSpectralFitFunction;
 		double fSpectralFitFluxNormalisationEnergy;      // [TeV] linear axis
@@ -76,6 +79,16 @@ class VSpectralFitter : public TObject
 			fPlottingEnergySpectrumLineColor = iColor;
 			fPlottingEnergySpectrumLineStyle = iStyle;
 			fPlottingEnergySpectrumLineWidth = iWidth;
+		}
+
+		// Setting fit CL (default 68%)
+		void setCL(double i_CL = 0.68)
+		{
+			fCL = i_CL;
+		}
+		TGraphErrors* getConfidenceInterval()
+		{
+			return fConfidenceInterval;
 		}
 		
 		ClassDef( VSpectralFitter, 1 );

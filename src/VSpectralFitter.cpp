@@ -15,11 +15,13 @@ VSpectralFitter::VSpectralFitter( string fitname )
 	fFitFunction_lin = 0;
 	fFitFunction_CovarianceMatrix = 0;
 	fFitName = fitname;
+	fConfidenceInterval = 0;
 	
 	setSpectralFitFunction();
 	setSpectralFitFluxNormalisationEnergy();
 	setSpectralFitRangeLin();
 	setPlottingStyle();
+	setCL();
 }
 
 
@@ -45,6 +47,8 @@ TF1* VSpectralFitter::fit( TGraph* g, string fitname )
 		fFitName = fitname;
 	}
 	
+	cout << "VSpectralFitter::fit Applying Fit\n";
+
 	// define fit function
 	defineFitFunction();
 	
@@ -69,6 +73,24 @@ TF1* VSpectralFitter::fit( TGraph* g, string fitname )
 		g->Fit( fFitFunction, "0MNER" );
 	}
 	
+
+	// Getting Fit Confidince interval.
+	fConfidenceInterval = new TGraphErrors(g->GetX()[g->GetN()-1]/0.001);
+	int i_tmp = 0;
+	double i_energy = log10(fSpectralFitEnergy_min);
+	while  (i_energy  <= log10(fSpectralFitEnergy_max))
+	{
+    	fConfidenceInterval->SetPoint(i_tmp,i_energy , 0);
+    	i_tmp++;
+    	i_energy += 0.001;
+    }
+	
+	cout << "VSpectralFitter::fit Getting Confidence Interval (cl = "<< fCL << ")\n";
+	(TVirtualFitter::GetFitter())->GetConfidenceIntervals(fConfidenceInterval,fCL);
+
+	fConfidenceInterval->SetFillColorAlpha(kRed,0.5);
+    fConfidenceInterval->SetFillStyle(1001);
+
 	// covariance matrix
 	if( fitter )
 	{
