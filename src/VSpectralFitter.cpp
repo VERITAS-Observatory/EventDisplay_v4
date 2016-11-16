@@ -88,8 +88,8 @@ TF1* VSpectralFitter::fit( TGraph* g, string fitname )
 	cout << "VSpectralFitter::fit Getting Confidence Interval (cl = "<< fCL << ")\n";
 	(TVirtualFitter::GetFitter())->GetConfidenceIntervals(fConfidenceInterval,fCL);
 
-	fConfidenceInterval->SetFillColorAlpha(kRed,0.5);
-    fConfidenceInterval->SetFillStyle(1001);
+//	fConfidenceInterval->SetFillColorAlpha(kRed,0.5);
+        fConfidenceInterval->SetFillStyle(1001);
 
 	// covariance matrix
 	if( fitter )
