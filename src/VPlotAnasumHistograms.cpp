@@ -919,11 +919,11 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 		cout << "             (use bottom half of skymap, except the ON region and the excluded regions)" << endl;
 	}
 	
-	delete v_x;
-	delete v_y;
-	delete v_r1;
-	delete v_r2;
-    delete v_theta;
+	delete [] v_x;
+	delete [] v_y;
+	delete [] v_r1;
+	delete [] v_r2;
+        delete [] v_theta;
 
 	gStyle->SetOptStat( "mr" );
 	gStyle->SetOptFit( 1111 );

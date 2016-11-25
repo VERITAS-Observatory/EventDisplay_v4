@@ -3,6 +3,11 @@
 #ifndef VFITS_H
 #define VFITS_H
 
+#if defined(__CINT__)
+#define _SYS_TYPES_H_
+#endif
+
+
 #include <ctime>
 #include <iostream>
 #include <fstream>

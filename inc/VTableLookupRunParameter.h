@@ -81,7 +81,7 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		vector< double > fCTA_MC_offaxisBin_max;
 		vector< double > fAddMC_spectral_index;
 		
-		int fNentries;
+		Long64_t fNentries;
 		double fMaxRunTime;
 		
 		// parameters to be used in anasum

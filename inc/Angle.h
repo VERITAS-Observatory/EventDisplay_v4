@@ -398,7 +398,7 @@ namespace SEphem
 			}
 			void rotateRot( double a )
 			{
-				rotateRot( frRot( a ) );
+				rotateRad( frRot( a ) );
 			}
 			void rotateHrs( double a )
 			{

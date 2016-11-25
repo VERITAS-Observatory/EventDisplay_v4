@@ -2822,7 +2822,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			gta_pop[0].fa_vector[3] = d->startpt.yp;
 			gta_pop[0].fa_vector[4] = d->startpt.log10e;
 			gta_pop[0].fa_vector[5] = d->startpt.lambda;
-			double lkhd0 = fabs( FROGS_BAD_NUMBER ); //FROGS_BAD_NUMBER = -9999
+			double lkhd0 = fabs( (double)FROGS_BAD_NUMBER ); //FROGS_BAD_NUMBER = -9999
 			if( d->startpt.log10e != FROGS_BAD_NUMBER )
 			{
 				gta_pop[0] = frogs_evaluate( d, tmplt, prob_array, gi_D, gta_pop[0], &gl_nfeval, &gta_pop[0], gi_NP );
