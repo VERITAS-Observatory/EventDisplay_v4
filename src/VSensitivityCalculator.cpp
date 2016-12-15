@@ -574,8 +574,8 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
 			}
 			i_GraphCrabFlux->SetPoint( p, iE, iY );
 		}
-		delete x;
-		delete y;
+		delete [] x;
+		delete [] y;
 	}
 	/////////////////////////////////////////////////////
 	// calculate differental spectrum
