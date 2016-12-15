@@ -1,6 +1,25 @@
 Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
+
+************************************************
+******* 20161215 release of v4.80d ****
+************************************************
+
+* 20161215 (GM)
+allow compilation with gsl version >= 2.0 
+
+************************************************
+******* 20161116 release of v4.80c ****
+************************************************
+
+* 20161116
+correct error handling in the source localization fitter
+* 20161116
+added confidence interval calculation in spectral fitter, see Eventdisplay_Manual:_Energy_spectra#Plotting_energy_spectra_with_confidence_intervals
+* 20161116 (GM)
+minor change to ANALYSIS.anasum_parallel_from_runlist.sh to be more robust to different locale environment
+
 ************************************************
 ******* 20160415 release of v4.80b ****
 ************************************************
