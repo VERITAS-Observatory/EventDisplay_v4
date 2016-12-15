@@ -323,7 +323,15 @@ frogs_likelihood_optimization( struct frogs_imgtmplt_in* d,
 	rtn.cvrgpt.lambda = floatwrap( rtn.cvrgpt.lambda, tmplt->min[0], maxlambda );
 	
 	gsl_matrix* covar = gsl_matrix_alloc( p, p );
+// necessary updates for gsl version 2.0 and newer
+// follow entry in https://sft.its.cern.ch/jira/browse/ROOT-7776
+#ifdef GSL2
+        gsl_matrix *J = gsl_matrix_alloc( s->fdf->n, s->fdf->p);
+        gsl_multifit_fdfsolver_jac(s, J);
+        gsl_multifit_covar(J, 0.0, covar);
+# else
 	gsl_multifit_covar( s->J, 0.0, covar );
+#endif
 	
 	
 	//Get the error for each parameter
