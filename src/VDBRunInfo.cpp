@@ -121,8 +121,8 @@ unsigned int VDBRunInfo::readRunDQM( string iDBserver, int run_number , unsigned
 	stringstream iTempS;
 	iTempS << iDBserver << "/VOFFLINE";
 	char c_query[1000];
-	sprintf( c_query, "SELECT * from tblRun_Analysis_Comments where run_id=%d", run_number );
-	
+	sprintf( c_query, "SELECT run_id , data_category   , status   , status_reason , tel_cut_mask , usable_duration , time_cut_mask , light_level , vpm_config_mask , authors  , comment from tblRun_Analysis_Comments where run_id=%d", run_number );
+
 	//std::cout<<"VDBRunInfo::readRunDQM "<<std::endl;
 	VDB_Connection my_connection( iTempS.str().c_str(), "readonly", "" ) ;
 	if( !my_connection.Get_Connection_Status() )

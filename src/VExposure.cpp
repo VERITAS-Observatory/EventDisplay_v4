@@ -3116,8 +3116,7 @@ void VExposure::readRunCommentsFromDB()
 	for( unsigned int i = 0; i < fRun.size(); i++ )
 	{
 	
-		sprintf( c_query, "SELECT * from tblRun_Analysis_Comments where run_id=%d", fRun[i] );
-		
+	    sprintf( c_query, "SELECT run_id , data_category   , status   , status_reason , tel_cut_mask , usable_duration , time_cut_mask , light_level , vpm_config_mask , authors  , comment from tblRun_Analysis_Comments where run_id=%d", fRun[i] );	
 		if( !my_connection.make_query( c_query ) )
 		{
 			return;
