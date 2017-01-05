@@ -504,7 +504,7 @@ TList*  VInstrumentResponseFunctionData::calculateResolution( TH2D* iHistogram, 
 		sprintf( iname, "log_{10} E_{0} = %.2f", iHistogram->GetXaxis()->GetBinCenter( i ) );
 		iTemp->SetTitle( iname );
 		
-		i_energy = iHistogram->GetBinCenter( i );
+		i_energy = iHistogram->GetXaxis()->GetBinCenter( i );
 		
 		//////////////////////////////////////////////////////////
 		// calculate containment
