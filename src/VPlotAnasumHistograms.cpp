@@ -143,7 +143,8 @@ void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x_deg, double y
 	double ra_err_deg  = 0.;
 	double dec_err_deg = 0.;
 
-	x_deg *= -1.;
+        // sign error; see http://veritash.sao.arizona.edu:8081/Eventdisplay-WG/1912
+	// x_deg *= -1.;
 	
 	slaDtp2s( x_deg*TMath::DegToRad(), y_deg*TMath::DegToRad(), fSkyMapCentreRAJ2000*TMath::DegToRad(), fSkyMapCentreDecJ2000*TMath::DegToRad(), &ra, &dec );
 	slaDtp2s( (x_deg+xerr_deg)*TMath::DegToRad(), (y_deg+yerr_deg)*TMath::DegToRad(), fSkyMapCentreRAJ2000*TMath::DegToRad(), fSkyMapCentreDecJ2000*TMath::DegToRad(), &ra_err_deg, &dec_err_deg );
