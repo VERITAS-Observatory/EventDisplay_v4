@@ -1105,13 +1105,13 @@ TGraphAsymmErrors* VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLo
 	{
 		setGraphPlottingStyle( igBck, 2, 1., 21 );
 	}
-	if( igBckOpt > 0 )
+	if( igBckOpt )
 	{
 		setGraphPlottingStyle( igBckOpt, 2, 1., 25 );
 	}
 	
 	igSignal->Draw( "pl" );
-	if( z_noOpt > 0 )
+	if( z_noOpt )
 	{
 		igSignalOpt->Draw( "pl" );
 	}
