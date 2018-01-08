@@ -65,6 +65,7 @@ endif
 #############################
 ROOT_MLP=$(shell root-config --has-xml)
 ROOT_MINUIT2=$(shell root-config --has-minuit2)
+ROOT_MINUIT2=no
 ROOT_MYSQL=$(shell root-config --has-mysql)
 ROOT_DCACHE=$(shell root-config --has-dcache)
 #############################
