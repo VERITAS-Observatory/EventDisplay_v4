@@ -12,6 +12,9 @@
 #include "TTree.h"
 
 #include "TMVA/Config.h"
+#ifdef ROOT6
+#include "TMVA/DataLoader.h"
+#endif
 #include "TMVA/Factory.h"
 #include "TMVA/Reader.h"
 #include "TMVA/Tools.h"
@@ -184,6 +187,11 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 	//////////////////////////////////////////
 	// defining training class
 	TMVA::Factory* factory = new TMVA::Factory( iRun->fOutputFile[iEnergyBin][iZenithBin]->GetTitle(), iRun->fOutputFile[iEnergyBin][iZenithBin], "V" );
+#ifdef ROOT6
+        TMVA::DataLoader *dataloader = new TMVA::DataLoader("dataset");
+#else
+        TMVA::Factory *dataloader = factory;
+#endif
 	////////////////////////////
 	// train gamma/hadron separation
 	if( iTrainGammaHadronSeparation )
@@ -191,11 +199,11 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 		// adding signal and background trees
 		for( unsigned int i = 0; i < iRun->fSignalTree.size(); i++ )
 		{
-			factory->AddSignalTree( iRun->fSignalTree[i], iRun->fSignalWeight );
+			dataloader->AddSignalTree( iRun->fSignalTree[i], iRun->fSignalWeight );
 		}
 		for( unsigned int i = 0; i < iRun->fBackgroundTree.size(); i++ )
 		{
-			factory->AddBackgroundTree( iRun->fBackgroundTree[i], iRun->fBackgroundWeight );
+			dataloader->AddBackgroundTree( iRun->fBackgroundTree[i], iRun->fBackgroundWeight );
 		}
 	}
 	////////////////////////////
@@ -204,9 +212,9 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 	{
 		for( unsigned int i = 0; i < iRun->fSignalTree.size(); i++ )
 		{
-			factory->AddRegressionTree( iRun->fSignalTree[i], iRun->fSignalWeight );
+			dataloader->AddRegressionTree( iRun->fSignalTree[i], iRun->fSignalWeight );
 		}
-		factory->AddRegressionTarget( iRun->fReconstructionQualityTarget.c_str(), iRun->fReconstructionQualityTargetName.c_str() );
+		dataloader->AddRegressionTarget( iRun->fReconstructionQualityTarget.c_str(), iRun->fReconstructionQualityTargetName.c_str() );
 	}
 	
 	// quality cuts before training
@@ -260,12 +268,12 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 						|| TMath::Abs( iSignalMean + 9999. ) < 1.e-2 || TMath::Abs( iBckMean + 9999. ) < 1.e-2 )
 						&& iSignalMean != 0 && iBckMean != 0 )
 				{
-					factory->AddVariable( iTemp.str().c_str(), iRun->fTrainingVariableType[i] );
+					dataloader->AddVariable( iTemp.str().c_str(), iRun->fTrainingVariableType[i] );
 				}
 				else
 				{
 					cout << "warning: removed constant variable " << iTemp.str() << " from training (added to spectators)" << endl;
-					factory->AddSpectator( iTemp.str().c_str() );
+					dataloader->AddSpectator( iTemp.str().c_str() );
 				}
 			}
 		}
@@ -284,26 +292,26 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 			if( TMath::Abs( iSignalMean - iBckMean ) > 1.e-6
 					|| TMath::Abs( iSignalMean + 9999. ) < 1.e-2 || TMath::Abs( iBckMean + 9999. ) < 1.e-2 )
 			{
-				factory->AddVariable( iRun->fTrainingVariable[i].c_str(), iRun->fTrainingVariableType[i] );
+				dataloader->AddVariable( iRun->fTrainingVariable[i].c_str(), iRun->fTrainingVariableType[i] );
 			}
 			else
 			{
 				cout << "warning: removed constant variable " << iRun->fTrainingVariable[i] << " from training (added to spectators)" << endl;
-				factory->AddSpectator( iRun->fTrainingVariable[i].c_str() );
+				dataloader->AddSpectator( iRun->fTrainingVariable[i].c_str() );
 			}
 		}
 	}
 	// adding spectator variables
 	for( unsigned int i = 0; i < iRun->fSpectatorVariable.size(); i++ )
 	{
-		factory->AddSpectator( iRun->fSpectatorVariable[i].c_str() );
+		dataloader->AddSpectator( iRun->fSpectatorVariable[i].c_str() );
 	}
 	
 	//////////////////////////////////////////
 	// prepare training events
 	// nTrain Signal=5000:nTrain Background=5000: nTest Signal=4000:nTest Background=5000
 	
-	factory->PrepareTrainingAndTestTree( iCutSignal, iCutBck, iRun->fPrepareTrainingOptions );
+        dataloader->PrepareTrainingAndTestTree( iCutSignal, iCutBck, iRun->fPrepareTrainingOptions );
 	
 	//////////////////////////////////////////
 	// book all methods
@@ -326,11 +334,19 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 			}
 			if( i < iRun->fMVAMethod_Options.size() )
 			{
+#ifdef ROOT6
+				factory->BookMethod( dataloader, TMVA::Types::kBDT, htitle, iRun->fMVAMethod_Options[i].c_str() );
+#else
 				factory->BookMethod( TMVA::Types::kBDT, htitle, iRun->fMVAMethod_Options[i].c_str() );
+#endif
 			}
 			else
 			{
+#ifdef ROOT6
+				factory->BookMethod( dataloader, TMVA::Types::kBDT, htitle );
+#else
 				factory->BookMethod( TMVA::Types::kBDT, htitle );
+#endif
 			}
 		}
 		//////////////////////////
@@ -347,11 +363,19 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 			}
 			if( i < iRun->fMVAMethod_Options.size() )
 			{
+#ifdef ROOT6
+				factory->BookMethod( dataloader, TMVA::Types::kMLP, htitle, iRun->fMVAMethod_Options[i].c_str() );
+#else
 				factory->BookMethod( TMVA::Types::kMLP, htitle, iRun->fMVAMethod_Options[i].c_str() );
+#endif
 			}
 			else
 			{
+#ifdef ROOT6
+				factory->BookMethod( dataloader, TMVA::Types::kMLP, htitle );
+#else
 				factory->BookMethod( TMVA::Types::kMLP, htitle );
+#endif
 			}
 		}
 		//////////////////////////
@@ -377,7 +401,11 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 				sprintf( hname, "%s:VarProp[%d]=%s", hname, i, iRun->fTrainingVariable_VarProp[i].c_str() );
 			}
 			sprintf( htitle, "BOXCUTS_%d_%d", iEnergyBin, iZenithBin );
+#ifdef ROOT6
+			factory->BookMethod( dataloader, TMVA::Types::kCuts, htitle, hname );
+#else
 			factory->BookMethod( TMVA::Types::kCuts, htitle, hname );
+#endif
 		}
 	}
 	

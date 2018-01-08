@@ -37,22 +37,29 @@ ARCH = $(shell uname)
 # basic numbers 
 #############################
 package = EVNDISP
-version = 480d
+version = 480e
 # version of auxiliary files
 auxversion = $(version)-auxv01
 distdir = $(package)-$(version)
 ctapara = $(distdir).CTA.runparameter
 vtspara = $(package)-$(auxversion).VTS.aux
 #############################
-# check compiler
-GCCVERSION=$(shell gcc -dumpversion)
-GCCMACHINE=$(shell gcc -dumpmachine)
-#############################
 #############################
 # check root version number
 #############################
 ROOTVERSION=$(shell root-config --version)
-ROOT528=$(shell expr 5.28 \>= `root-config --version | cut -f1 -d \/`)
+# check if this is root 6 (or later)
+ROOT6=$(shell expr 5.99 \>= `root-config --version | cut -f1 -d \/`)
+ifeq ($(ROOT6),0)
+  ROOT6FLAG=-DROOT6
+endif
+ifeq ($(ROOT6),0)
+  ROOT_CntCln = rootcling
+  ROOT6_message = "Using ROOT6 - make sure to add `pwd`/obj to LD_LIBRARY_PATH"
+else
+  ROOT6_message = ""
+  ROOT_CntCln = rootcint
+endif
 #############################
 # check for root libraries
 #############################
@@ -99,11 +106,17 @@ ifeq ($(origin GSLSYS), undefined)
   ifeq ($(strip $(GSLTEST)),)
     GSLFLAG=-DNOGSL
   endif
+  ifeq ($(strip $(GSLTEST)),"")
+    GSLFLAG=-DNOGSL
+  endif
 endif
+
+ifneq ($(GSLFLAG),-DNOGSL)
 # check GSL version
-GSLV2=$(shell expr 2.0 \>= `gsl-config --version`)
-ifeq ($(GSLV2),0)
+  GSLV2=$(shell expr 2.0 \>= `gsl-config --version`)
+  ifeq ($(GSLV2),0)
     GSL2FLAG=-DGSL2
+  endif
 endif
 #####################
 # CTA HESSIO INPUT
@@ -128,15 +141,20 @@ endif
 CXX           = g++
 CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
 CXXFLAGS     += -I. -I./inc/
-CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG) $(GSL2FLAG) $(DCACHEFLAG) 
+CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(ROOT6FLAG) $(GSLFLAG) $(GSL2FLAG) $(DCACHEFLAG)
 LD            = g++ 
 OutPutOpt     = -o
 INCLUDEFLAGS  = -I. -I./inc/
 
 # linux depending flags
 ifeq ($(ARCH),Linux)
-LDFLAGS       = -O
-SOFLAGS       = -shared
+	LDFLAGS       = -O
+	SOFLAGS       = -shared
+	ifeq ($(ROOT6FLAG),-DROOT6)
+		ifeq ($(GCC_GT_4_8),true)
+		  $(error PAY ATTENTION. YOU USE THE WRONG GCC COMPILER $(GCCVERSION) FOR THIS ROOT VERSION $(ROOTVERSION)!)
+		endif
+	endif
 endif
 # Apple OS X flags
 ifeq ($(ARCH),Darwin)
@@ -148,7 +166,19 @@ DllSuf        = dylib
 UNDEFOPT      = dynamic_lookup
 SOFLAGS       = -dynamiclib -single_module -undefined $(UNDEFOPT)
 endif
-
+# check compiler
+GCCVERSION=$(shell $(CXX) -dumpversion)
+GCCMACHINE=$(shell $(CXX) -dumpmachine)
+# ROOT 6 and check correct compiler version
+ifeq ($(ROOT6FLAG),-DROOT6)
+      # get major version of gcc, e.g. '4' in '4.6.'
+      GCC_VER_MAJOR := $(shell echo $(GCCVERSION) | cut -f1 -d.)
+      # get minor version of gcc, e.g. '6' in '4.6' 
+      GCC_VER_MINOR := $(shell echo $(GCCVERSION) | cut -f2 -d.)
+      # check if gcc version is smaller than 4.8.
+      GCC_GT_4_8 := $(shell [ $(GCC_VER_MAJOR) -lt 3 -o \( $(GCC_VER_MAJOR) -eq 4 -a $(GCC_VER_MINOR) -lt 8 \) ] && echo true)
+CXXFLAGS    += -Wdeprecated-declarations -std=c++11
+endif
 ########################################################
 # CXX FLAGS (taken from root)
 ########################################################
@@ -185,7 +215,7 @@ ifneq ($(GSLFLAG),-DNOGSL)
 GSLCFLAGS    = $(shell gsl-config --cflags)
 GSLLIBS      = $(shell gsl-config --libs)
 GLIBS        += $(GSLLIBS)
-CXXFLAGS     += $(GSLCFLAGS)
+CXXFLAGS     += $(GSLCFLAGS) $(GSL2FLAG)
 endif
 ########################################################
 # FITS
@@ -1427,8 +1457,8 @@ endif
 
 ./obj/%_Dict.o:	./inc/%.h ./inc/%LinkDef.h
 	@echo "Generating dictionary $@.."
-	@echo rootcint -f $(basename $@).cpp -c -p $?
-	@rootcint -f $(basename $@).cpp -c -p $?
+	@echo ${ROOT_CntCln} -f $(basename $@).cpp -c -p $(ROOT6FLAG) $?
+	${ROOT_CntCln} -f $(basename $@).cpp -c -p $(ROOT6FLAG) $?
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 
 $(TARGET):	$(OBJECTS) 
@@ -1445,26 +1475,26 @@ endif
 ########################################################
 ./obj/VFITS_Dict.o:
 	@echo "A Generating dictionary $@.."
-	@echo rootcint -f $(basename $@).cpp  -c -p -I$(FITSSYS)/include inc/VFITS.h inc/VFITSLinkDef.h
-	@rootcint -f $(basename $@).cpp  -c -p -I$(FITSSYS)/include inc/VFITS.h inc/VFITSLinkDef.h
+	@echo ${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I$(FITSSYS)/include inc/VFITS.h inc/VFITSLinkDef.h
+	${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I$(FITSSYS)/include inc/VFITS.h inc/VFITSLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 
 ./obj/VDisplay_Dict.o:	
 	@echo "A Generating dictionary $@.."
-	@echo rootcint -f $(basename $@).cpp  -c -p -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG)  ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
-	@rootcint -f $(basename $@).cpp  -c -p -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
+	@echo ${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) $(ROOT6FLAG) ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
+	${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) $(ROOT6FLAG) ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 
 ./obj/VLightCurve_Dict.o:	
 	@echo "Generating dictionary $@..."
-	@echo rootcint -f $(basename $@).cpp -c -p ./inc/VLightCurve.h ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
-	@rootcint -f $(basename $@).cpp -c -p ./inc/VLightCurve.h ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
+	@echo ${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) $(ROOT6FLAG) ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
+	${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) $(ROOT6FLAG) ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 
 ./obj/VZDCF_Dict.o:	
 	@echo "Generating dictionary $@..."
-	@echo rootcint -f $(basename $@).cpp -c -p ./inc/VZDCF.h ./inc/VZDCFData.h ./inc/VZDCFLinkDef.h
-	@rootcint -f $(basename $@).cpp -c -p ./inc/VZDCF.h ./inc/VZDCFData.h ./inc/VZDCFLinkDef.h
+	@echo ${ROOT_CntCln} -f $(basename $@).cpp -c -p $(ROOT6FLAG) ./inc/VZDCF.h ./inc/VZDCFData.h ./inc/VZDCFLinkDef.h
+	${ROOT_CntCln} -f $(basename $@).cpp -c -p $(ROOT6FLAG) ./inc/VZDCF.h ./inc/VZDCFData.h ./inc/VZDCFLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 
 ###############################################################################################################################

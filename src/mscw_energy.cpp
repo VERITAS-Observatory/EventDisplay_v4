@@ -96,10 +96,7 @@ int main( int argc, char* argv[] )
 	}
 	
 	cout << endl << "loop over all events ";
-	if( fTLook->getNEntries() != TChain::kBigNumber )
-	{
-		cout << "(in total " << fTLook->getNEntries() << ")";
-	}
+        cout << "(in total " << fTLook->getNEntries() << ")";
 	cout << endl;
 	if( fTLook->getMaxTotalTime() < 1.e8 )
 	{
