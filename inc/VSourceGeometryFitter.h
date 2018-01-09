@@ -16,7 +16,7 @@
 #include "TLine.h"
 #include "TMath.h"
 #include "Minuit2/FCNBase.h"
-#include "TFitterMinuit.h"
+// #include "TFitterMinuit.h"
 #include "TMinuit.h"
 
 #include <iostream>

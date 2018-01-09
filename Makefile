@@ -738,6 +738,10 @@ ifeq ($(FITS),FALSE)
 else
 	@echo "SHARED LIBRARIES WITH FITS SUPPORT"
 endif
+ifeq ($(ROOT6),0)
+	@echo "COPYING pcm FILES TO lib"
+	cp -f ./obj/*.pcm ./lib/
+endif
 	@echo "$@ done"
 
 ########################################################
@@ -1488,8 +1492,8 @@ endif
 
 ./obj/VLightCurve_Dict.o:	
 	@echo "Generating dictionary $@..."
-	@echo ${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) $(ROOT6FLAG) ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
-	${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) $(ROOT6FLAG) ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
+	@echo ${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) $(ROOT6FLAG) ./inc/VLightCurve.h ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
+	${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) $(ROOT6FLAG) ./inc/VLightCurve.h ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 
 ./obj/VZDCF_Dict.o:	
@@ -1940,7 +1944,7 @@ install:	all
 
 ###############################################################################################################################
 clean:
-	-rm -f ./obj/*.o ./obj/*_Dict.cpp ./obj/*_Dict.h 
+	-rm -f ./obj/*.o ./obj/*_Dict.cpp ./obj/*_Dict.h ./lib/*.pcm
 ###############################################################################################################################
 
 .PHONY: all clean install FORCEDISTDIR dist TESTHESSIO TESTFITS configuration
