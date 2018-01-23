@@ -384,7 +384,6 @@ void CEffArea::Init( TTree* tree )
 		hEsysMC = 0;
 		hEsysMCRelative = 0;
 		hEsysMCRelativeRMS = 0;
-		hEsysMCRelative2D = 0;
 		hEsys2D = 0;
 		hEmcCutCTA = 0;
 		hResponseMatrix = 0;
