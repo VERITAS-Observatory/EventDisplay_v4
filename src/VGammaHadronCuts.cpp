@@ -775,15 +775,10 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						{
 							unsigned int iKey = 0;
 							double iS = 0.;
-							if( !is_stream.eof() )
+							if( is_stream >> iKey && is_stream >> iS )
 							{
-								is_stream >> iKey;
+								fTMVA_MVACut[iKey] = iS;
 							}
-							if( !is_stream.eof() )
-							{
-								is_stream >> iS;
-							}
-							fTMVA_MVACut[iKey] = iS;
 						}
 					}
 				}
