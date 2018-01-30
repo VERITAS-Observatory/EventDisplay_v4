@@ -139,6 +139,7 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		
 		int checkNumberOfArguments( string is );
 		void checkNumberOfArguments( int im, int narg, string isf, string isl, int iversion, bool ishortlist );
+                double getDeclinationFromStrings( string iDec1, string iDec2, string iDec3 );
 		double getRingWidth( double sr, double rr, double rat );
 		bool   readCutParameter( string ifile, double& iSourceRadius, double& iMaximumDistance );
 		bool   checkAnasumParameter( string ifile );
@@ -255,6 +256,6 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		bool writeListOfExcludedSkyRegions();
 		bool getListOfExcludedSkyRegions( TFile* f );
 		
-		ClassDef( VAnaSumRunParameter, 7 ) ;
+		ClassDef( VAnaSumRunParameter, 8 ) ;
 };
 #endif

@@ -382,14 +382,14 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				is_stream >> temp2;
 				d_tt += atof( temp2.c_str() ) / 3600.;
 				fSkyMapCentreRAJ2000 = d_tt / 24. * 360.;
-				d_tt = 0.;
-				is_stream >> temp2;
-				d_tt += atof( temp2.c_str() );
-				is_stream >> temp2;
-				d_tt += atof( temp2.c_str() ) / 60.;
-				is_stream >> temp2;
-				d_tt += atof( temp2.c_str() ) / 3600.;
-				fSkyMapCentreDecJ2000 = d_tt;
+				// dec
+                                string iDec1;
+                                string iDec2;
+                                string iDec3;
+				is_stream >> iDec1;
+				is_stream >> iDec2;
+				is_stream >> iDec3;
+                                fSkyMapCentreDecJ2000 = getDeclinationFromStrings( iDec1, iDec2, iDec3 );
 			}
 			else if( temp == "TARGETXYSHIFT" )
 			{
@@ -427,14 +427,14 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				is_stream >> temp2;
 				d_tt += atof( temp2.c_str() ) / 3600.;
 				fTargetShiftRAJ2000 = d_tt / 24. * 360.;
-				d_tt = 0.;
-				is_stream >> temp2;
-				d_tt += atof( temp2.c_str() );
-				is_stream >> temp2;
-				d_tt += atof( temp2.c_str() ) / 60.;
-				is_stream >> temp2;
-				d_tt += atof( temp2.c_str() ) / 3600.;
-				fTargetShiftDecJ2000 = d_tt;
+				// dec
+                                string iDec1;
+                                string iDec2;
+                                string iDec3;
+				is_stream >> iDec1;
+				is_stream >> iDec2;
+				is_stream >> iDec3;
+                                fTargetShiftDecJ2000 = getDeclinationFromStrings( iDec1, iDec2, iDec3 );
 			}
 			
 			else if( temp == "REGIONTOEXCLUDE" || temp == "REGIONTOEXCLUDE_RADECJ2000_DEG" )
@@ -501,33 +501,13 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				d_tt += ( double )atof( temp2.c_str() ) / 3600.;
 				fExclusionRegions.back()->fExcludeFromBackground_RAJ2000 = d_tt / 24. * 360.;
 				// dec
-				bool bNeg = false;
-				d_tt = 0.;
-				is_stream >> temp2;
-				d_tt += ( double )atof( temp2.c_str() );
-				if( d_tt < 0 )
-				{
-					bNeg = true;
-				}
-				is_stream >> temp2;
-				if( !bNeg )
-				{
-					d_tt += ( double )atof( temp2.c_str() ) / 60.;
-				}
-				else
-				{
-					d_tt -= ( double )atof( temp2.c_str() ) / 60.;
-				}
-				is_stream >> temp2;
-				if( !bNeg )
-				{
-					d_tt += ( double )atof( temp2.c_str() ) / 3600.;
-				}
-				else
-				{
-					d_tt -= ( double )atof( temp2.c_str() ) / 3600.;
-				}
-				fExclusionRegions.back()->fExcludeFromBackground_DecJ2000 = d_tt;
+                                string iDec1;
+                                string iDec2;
+                                string iDec3;
+				is_stream >> iDec1;
+				is_stream >> iDec2;
+				is_stream >> iDec3;
+                                fExclusionRegions.back()->fExcludeFromBackground_DecJ2000 = getDeclinationFromStrings( iDec1, iDec2, iDec3 );
 				// for circular region
 				if( checkNumberOfArguments( is_line ) == 9 )
                                 {
@@ -1893,6 +1873,27 @@ bool VAnaSumRunParameter::getListOfExcludedSkyRegions( TFile* f )
 	
 	return true;
 }
+
+/* 
+ * calculate declination from hour string
+ *
+*/
+double VAnaSumRunParameter::getDeclinationFromStrings( string iDec1, string iDec2, string iDec3 )
+{
+    double d_tt = 0.;
+    if( atof( iDec1.c_str() ) < 0. )
+    {
+         d_tt = atof( iDec1.c_str() ) - atof( iDec2.c_str() ) / 60. - atof( iDec3.c_str() ) / 3600.;
+    }
+    else
+    {
+         d_tt = atof( iDec1.c_str() ) + atof( iDec2.c_str() ) / 60. + atof( iDec3.c_str() ) / 3600.;
+    }
+    return d_tt;
+}
+
+
+
 
 //==================================================================================
 // list of exclusion regions
