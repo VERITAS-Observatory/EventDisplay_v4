@@ -719,7 +719,9 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VPlotOptimalCut.o ./obj/VPlotOptimalCut_Dict.o
 
 ifeq ($(ROOT_MINUIT2),yes)
-  SHAREDOBJS	+= ./obj/VSourceGeometryFitter.o ./obj/VSourceGeometryFitter_Dict.o
+  ifneq ($(ROOT6),0)
+    SHAREDOBJS	+= ./obj/VSourceGeometryFitter.o ./obj/VSourceGeometryFitter_Dict.o
+  endif
 endif
 
 ifneq ($(FITS),FALSE)
