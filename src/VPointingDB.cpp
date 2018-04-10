@@ -428,7 +428,6 @@ bool VPointingDB::readPointingFromVPMTextFile( string iDirectory )
 	}
 	
 	char fname[1200];
-	//   sprintf( fname, "%s/pointing_t%d_%d.txt", iDirectory.c_str(), getTelID()+1, fRunNumber );
 	sprintf( fname, "%s/pointing_VPM.%d.t%d.dat", iDirectory.c_str(), fRunNumber, getTelID() + 1 );
 	
 	ifstream is;
@@ -901,7 +900,10 @@ void VPointingDB::getDBSourceCoordinates( string iSource, float& iEVNTargetDec, 
 	return;
 }
 
-
+/*
+ * tree with pointing values as given by DB
+ *
+ */
 TTree* VPointingDB::getTreePointingDB()
 {
 	char hname[200];
@@ -921,10 +923,13 @@ TTree* VPointingDB::getTreePointingDB()
 	TTree* tD = new TTree( hname, htitle );
 	tD->Branch( "MJD", &MJD, "MJD/i" );
 	tD->Branch( "Time", &Time, "Time/D" );
+        // elevation / azimuth before application of tracking corrections
 	tD->Branch( "ElRaw", &iTelElR, "ElRaw/F" );
 	tD->Branch( "AzRaw", &iTelAzR, "AzRaw/F" );
+        // elevation / azimuth after application of tracking corrections
 	tD->Branch( "El", &iTelEl, "El/F" );
 	tD->Branch( "Az", &iTelAz, "Az/F" );
+        // expected elevation / azimuth (value requested by pointing software)
 	tD->Branch( "ElTelExpected", &iTelElT, "ElTelExpected/F" );
 	tD->Branch( "AzTelExpected", &iTelAzT, "AzTelExpected/F" );
 	
