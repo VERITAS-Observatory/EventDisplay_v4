@@ -103,7 +103,7 @@ mkdir -p $LOGDIR
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/ANALYSIS.evndisp_sub"
 
-SECONDS=`date +"%s"`
+TIMETAG=`date +"%s"`
 
 NRUNS=`cat $RLIST | wc -l ` 
 echo "total number of runs to analyze: $NRUNS"
@@ -170,7 +170,7 @@ do
             echo "RUN $AFILE ELOG $FSCRIPT.sh.e$JOBID"
         fi
     elif [[ $SUBC == *parallel* ]]; then
-        echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.$SECONDS.dat
+        echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.$TIMETAG.dat
         echo "RUN $AFILE OLOG $FSCRIPT.log"
     elif [[ "$SUBC" == *simple* ]] ; then
 	"$FSCRIPT.sh" |& tee "$FSCRIPT.log"	
@@ -179,7 +179,7 @@ done
 
 # Execute all FSCRIPTs locally in parallel
 if [[ $SUBC == *parallel* ]]; then
-    cat $LOGDIR/runscripts.$SECONDS.dat | sort -u | $SUBC
+    cat $LOGDIR/runscripts.$TIMETAG.dat | sort -u | $SUBC
 fi
 
 exit
