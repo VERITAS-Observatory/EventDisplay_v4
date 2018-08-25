@@ -86,7 +86,7 @@ echo "Total number of runs to analyse: $NRUNS"
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/ANALYSIS.anasum_sub"
 
-SECONDS=`date +"%s"`
+TIMETAG=`date +"%s"`
 
 # loop over all runs
 for ((i=1; i <= $NLINES; i++)); do
@@ -140,7 +140,7 @@ for ((i=1; i <= $NLINES; i++)); do
                 echo "RUN $RUN ELOG $FSCRIPT.sh.e$JOBID"
             fi
         elif [[ $SUBC == *parallel* ]]; then
-            echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIRTEMP/runscripts.$SECONDS.dat
+            echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIRTEMP/runscripts.$TIMETAG.dat
         elif [[ "$SUBC" == *simple* ]] ; then
 	    "$FSCRIPT.sh" |& tee "$FSCRIPT.log"
 	fi
@@ -149,7 +149,7 @@ done
 
 # Execute all FSCRIPTs locally in parallel
 if [[ $SUBC == *parallel* ]]; then
-    cat $LOGDIRTEMP/runscripts.$SECONDS.dat | $SUBC
+    cat $LOGDIRTEMP/runscripts.$TIMETAG.dat | $SUBC
 fi
 
 rm -f $TEMPLIST

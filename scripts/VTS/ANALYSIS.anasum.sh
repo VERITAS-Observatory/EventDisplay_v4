@@ -75,7 +75,7 @@ mkdir -p $ODIR
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/ANALYSIS.anasum_sub"
 
-SECONDS=`date +"%s"`
+TIMETAG=`date +"%s"`
 
 FSCRIPT="$LOGDIR/ANA.$ONAME"
 sed -e "s|FILELIST|$FLIST|" \
@@ -102,8 +102,8 @@ if [[ $SUBC == *qsub* ]]; then
     echo "RUN $AFILE JOBID $JOBID"
     
 elif [[ $SUBC == *parallel* ]]; then
-    echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.$SECONDS.dat
-    cat $LOGDIR/runscripts.$SECONDS.dat | $SUBC
+    echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.$TIMETAG.dat
+    cat $LOGDIR/runscripts.$TIMETAG.dat | $SUBC
 
 elif [[ $SUBC == *simple* ]]; then
 	"$FSCRIPT.sh" |& tee $FSCRIPT.log
