@@ -124,7 +124,7 @@ class VTableLookup
 		{
 			return fData->getMaxTotalTime();
 		}
-		int    getNEntries()
+		Long64_t  getNEntries()
 		{
 			if( fData )
 			{
