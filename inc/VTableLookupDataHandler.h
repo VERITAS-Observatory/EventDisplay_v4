@@ -52,7 +52,7 @@ class VTableLookupDataHandler
 		
 		unsigned int fNTel;                       //!< number of telescopes
 		unsigned int fNTelComb;                   //!< number of telescope combinations
-		int fNEntries;                            //!< total number of events in input tree
+		Long64_t fNEntries;                            //!< total number of events in input tree
 		int fEventCounter;                        //!< event counter for input tree
 		int fMethod;                              //!< which direction and core reconstruction method data should be used
 		
@@ -434,7 +434,7 @@ class VTableLookupDataHandler
 		{
 			return fSpectralIndex;
 		}
-		int  getNEntries()
+		Long64_t getNEntries()
 		{
 			return fNEntries;
 		}
