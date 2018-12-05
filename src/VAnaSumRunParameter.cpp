@@ -1235,6 +1235,10 @@ int VAnaSumRunParameter::checkNumberOfArguments( string is )
 	{
 		is = is.substr( 0, is.size() - 1 );
 	}
+	// Need to remove newline character from the string
+	// since it is counted as an additional parameter 
+	is.erase(std::remove(is.begin(), is.end(), '\n'), is.end());
+	is.erase(std::remove(is.begin(), is.end(), '\r'), is.end());
 	istringstream is_stream( is );
 	string itemp;
 	int z = 0;
