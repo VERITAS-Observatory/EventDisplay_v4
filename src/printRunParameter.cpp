@@ -45,6 +45,10 @@ bool readRunParameter( TFile* fIn, string iPara )
 	{
 		cout << fPar->fDBRunStartTimeSQL << endl;
 	}
+	else if( iPara == "-mjd" )
+	{
+		cout << fPar->fDBDataStartTimeMJD << endl;
+	}
 	else if( iPara == "-teltoana" )
 	{
 		for( unsigned int i = 0; i < fPar->fTelToAnalyze.size(); i++ )
@@ -145,6 +149,7 @@ int main( int argc, char* argv[] )
 		cout << "      -runnumber    print MC run number" << endl;
 		cout << "      -mcsourcefile print source file name" << endl;
 		cout << "      -date         print date of run" << endl;
+		cout << "      -mjd          print mjd of run" << endl;
 		cout << "      -epoch        print epoch of this run" << endl;
 		cout << "      -atmosphere   print corsika ID of atmospheric condition of this run" << endl;
 		cout << "      -runtype      print run type, eg observing, obsFilter etc." << endl;

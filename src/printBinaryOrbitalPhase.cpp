@@ -16,7 +16,7 @@ using namespace std;
 
 int main( int argc, char* argv[] )
 {
-	if( argc != 6 && argc != 8 )
+	if( argc != 6 && argc != 8 && argc != 7 )
 	{
 		cout << "printBinaryOrbitalPhase <year> <month> <day> <MJD> <Object> [orbit] [T0]" << endl;
 		cout << endl;
@@ -64,9 +64,12 @@ int main( int argc, char* argv[] )
 		t0 = 54857.;
 	}
 	// user given timing parameters
-	if( argc == 8 )
+	if( argc == 7 )
 	{
 		orbit = atof( argv[6] );
+        }
+	if( argc == 8 )
+	{
 		t0 = atof( argv[7] );
 	}
 	
@@ -83,7 +86,16 @@ int main( int argc, char* argv[] )
 		{
 			// calculate orbital phase
 			cout << "Orbital phase of " << object << " for " << year << "-" << month << "-" << day << ", MJD " << djm << ": ";
-			cout << ( djm - t0 ) / orbit - ( int )( ( djm - t0 ) / orbit ) << endl;
+                        cout << endl;
+                        double iP = ( djm - t0 ) / orbit - ( int )( ( djm - t0 ) / orbit );
+                        if( iP < 0. )
+                        {
+                             cout << 1. + iP << endl;
+                        }
+                        else
+                        {
+                             cout << iP << endl;
+                        }
 		}
 		else
 		{
@@ -101,7 +113,8 @@ int main( int argc, char* argv[] )
 					cout << year << "/" << month << "/" << day << endl;
 				}
 				slaDjcl( djm, &year, &month, &day, &fd, &j );
-				cout << "Orbital phase of " << object << " for " << year << "-" << month << "-" << day << ", MJD " << djm << ": ";
+				cout << "Orbital phase of " << object << " for ";
+                                cout << year << "-" << month << "-" << day << ", MJD " << djm << ": ";
 				cout << ( djm - t0 ) / orbit - ( int )( ( djm - t0 ) / orbit ) << endl;
 				p_old = p;
 				djm_old = djm;
@@ -114,5 +127,4 @@ int main( int argc, char* argv[] )
 		cout << "failed calculation of MJD" << endl;
 		exit( -1 );
 	}
-	cout << endl;
 }
