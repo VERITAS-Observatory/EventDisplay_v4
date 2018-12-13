@@ -867,6 +867,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	{
 		hsig_1DAll->SetStats( 0 );
 	}
+        hsig_1DAll->SetFillStyle( 0 );
 	cout << "Plot Legend:" << endl;
 	cout << "  red  :   with source region" << endl;
 	cout << "           (use entire significance skymap)" << endl;
@@ -2596,9 +2597,9 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
 		TH2D* hSig = ( TH2D* )getHistogram( "hmap_stereo_sig", getRunList()[i].runnumber, "skyHistograms" );
 		TH2D* hOn = ( TH2D* )getHistogram( "hmap_stereo_on", getRunList()[i].runnumber, "skyHistograms" );
 		TH1D* hsig_1D  = get_Bin_Distribution( hSig, getRunList()[i].runnumber, rmax, rSource, false, hOn );
-		setHistogramPlottingStyle( hsig_1D, 1, 1, 1 );
+		setHistogramPlottingStyle( hsig_1D, 1, 1, 1, 1, 1, 0 );
 		TH1D* hsig_1DAll  = get_Bin_Distribution( hSig, getRunList()[i].runnumber, rmax, 0., false, hOn );
-		setHistogramPlottingStyle( hsig_1DAll, 2, 2, 1 );
+		setHistogramPlottingStyle( hsig_1DAll, 2, 2, 1, 1, 1, 0 );
 		if( hsig_1DAll )
 		{
 			hsig_1DAll->SetStats( 0 );
@@ -2628,6 +2629,7 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
 				hsig_1D->GetFunction( "gaus" )->SetLineColor( 8 );
 				hsig_1D->GetFunction( "gaus" )->SetLineStyle( 2 );
 				hsig_1D->GetFunction( "gaus" )->Draw( "same" );
+                                fG->SetParameter( 0, hsig_1D->GetFunction( "gaus" )->GetParameter( 0 ) );
 				fG->Draw( "same" );
 				cout << " ,fit results: mean " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetParameter( 1 );
 				cout << " +- " << setprecision( 4 ) << hsig_1D->GetFunction( "gaus" )->GetParError( 1 );
