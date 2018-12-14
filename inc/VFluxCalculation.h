@@ -141,6 +141,7 @@ class VFluxCalculation : public TObject
 		double fMinEvents;
 		double fUpperLimit;
 		int    fUpperLimitMethod;
+                bool   fFluxCalculationUseRolke;
 		
 		// X-ray data
 		VXRayData* fRXTE;
@@ -189,6 +190,7 @@ class VFluxCalculation : public TObject
 			return bZombie;
 		}
 		void          getFlux( int irun, double& iFlux, double& iFluxE, double& iFluxUL );
+		void          getBoundedFlux( int irun, double& iFlux, double& iFluxE_low, double& iFLuxE_up, double& iFluxUL );
 		void          getFluxConfidenceInterval( int irun, double& iFlux_low, double& iFlux_up, bool b1Sigma = true );
 		vector< double > getFlux()
 		{
@@ -263,6 +265,10 @@ class VFluxCalculation : public TObject
 		{
 			fDebug = iB;
 		}
+                void          setFluxCalculationMethod( bool i_bRolke = false )
+                {
+                        fFluxCalculationUseRolke = i_bRolke;
+                }
 		void          setSpectralParameters( double iMinEnergy_TeV = 0., double E0 = 1., double alpha = -2.5, double iMaxEnergy_TeV = MAX_SAFE_MC_ENERGY );
 		void          setSignificanceParameters( double iThresholdSignificance = 3., double iMinEvents = 5,
 				double iUpperLimit = 0.99, int iUpperlimitMethod = 0, int iLiMaEqu = 17 );
@@ -272,6 +278,6 @@ class VFluxCalculation : public TObject
 		}
 		void          writeResults( char* ifile );
 		
-		ClassDef( VFluxCalculation, 13 );
+		ClassDef( VFluxCalculation, 14 );
 };
 #endif

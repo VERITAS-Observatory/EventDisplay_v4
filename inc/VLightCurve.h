@@ -46,6 +46,7 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
 		double fMaxEnergy;   //!< maximum energy to be taken into account [TeV]
 		double fE0;          //!< calculate flux at this energy [TeV]
 		double fAlpha;       //!< assumed spectral index
+                bool   fFluxCalculationUseRolke;   //!< use Rolke for flux calculation
 		
 		// significance and upper flux limit parameters
 		int    fLiMaEqu;
@@ -123,9 +124,13 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
 		{
 			fName = iName;
 		}
+                void     setFluxCalculationMethod( bool i_bRolke = false )
+                {
+                      fFluxCalculationUseRolke = i_bRolke;
+                }
 		void     setSpectralParameters( double iMinEnergy = 0., double E0 = 1., double alpha = -2.5, double iMaxEnergy = MAX_SAFE_MC_ENERGY );
 		
-		ClassDef( VLightCurve, 8 );
+		ClassDef( VLightCurve, 9 );
 };
 
 #endif

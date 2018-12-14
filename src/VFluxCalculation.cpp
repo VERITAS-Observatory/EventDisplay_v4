@@ -88,6 +88,9 @@ void VFluxCalculation::reset()
 	
 	// significance parameters: decide when to calculate fluxes and when upper limits
 	setSignificanceParameters( 3., 5., 0.99, 0, 17 );
+
+        // default flux calulation method is Poissonian (unbounded)
+        setFluxCalculationMethod();
 	
 	// graphs
 	gFluxElevation = 0;
@@ -737,7 +740,16 @@ void VFluxCalculation::printDebugSummary()
 		cout << setprecision( 2 ) << fRunMJD[i] << "\t";
 		cout << setprecision( 1 ) <<  fRunZe[i] << "\t";
 		cout << setprecision( 1 ) << showpos << fRunSigni[i] << "\t";
-		cout << scientific << setprecision( 2 ) << fRunFlux[i] << " +- " << noshowpos << fRunFluxE[i] << endl;
+                if( fFluxCalculationUseRolke )
+                {
+                    cout << scientific << setprecision( 2 ) << fRunFlux[i] << " +- " << noshowpos << fRunFluxE[i] << endl;
+                }
+                else
+                {
+                    cout << scientific << setprecision( 2 ) << fRunFlux[i];
+                    cout << " + "<< noshowpos << fRunFluxCI_up_1sigma[i];
+                    cout << " - "<< noshowpos << fRunFluxCI_lo_1sigma[i] << endl;
+                }
 	}
 	cout << endl << endl;
 }
@@ -1407,9 +1419,25 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 			}
 			////////////////////////
 			// calculate N_diff
-			fRunNdiff[i] = fRunNon[i] - fRunNoff[i] * fRunNorm[i];
-			// assuming poisson errors
-			fRunNdiffE[i] = sqrt( fRunNon[i] + fRunNoff[i] * fRunNorm[i] * fRunNorm[i] );
+
+                        // Rolke
+                        if( fFluxCalculationUseRolke )
+                        {
+                            TRolke i_Rolke;
+                            i_Rolke.SetCLSigmas( 1.e-4 );
+                            i_Rolke.SetPoissonBkgKnownEff( ( int )fRunNon[i], ( int )fRunNoff[i], 1. / fRunNorm[i], 1. );
+                            fRunNdiff[i] = 0.5 * ( i_Rolke.GetLowerLimit() + i_Rolke.GetUpperLimit() );
+                            // symmetric error bar is meaning less for low counts
+                            i_Rolke.SetCLSigmas( 1. );
+                            fRunNdiffE[i] =  0.5 * ( i_Rolke.GetLowerLimit() + i_Rolke.GetUpperLimit() );
+                        }
+                        // Poisson
+                        else
+                        {
+                            fRunNdiff[i] = fRunNon[i] - fRunNoff[i] * fRunNorm[i];
+                            // assuming poisson errors
+                            fRunNdiffE[i] = sqrt( fRunNon[i] + fRunNoff[i] * fRunNorm[i] * fRunNorm[i] );
+                        }
 			if( fRunTOn[i] > 0. )
 			{
 				fRunRate[i] = fRunNdiff[i] / fRunTOn[i] * 60.;
@@ -1491,7 +1519,7 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
 		cout << endl;
 	}
 
-		cout << "threshold significance is " << fThresholdSignificance << " sigma or less than " << fMinEvents << " events" << endl;
+        cout << "threshold significance is " << fThresholdSignificance << " sigma or less than " << fMinEvents << " events" << endl;
 	
 	for( unsigned int i = 0; i < fRunList.size(); i++ )
 	{
@@ -1637,7 +1665,10 @@ void VFluxCalculation::getFluxConfidenceInterval( int irun, double& iFlux_low, d
 	}
 }
 
-
+/*
+ * 'traditional' method allowing for negative flux
+ *
+ */
 void VFluxCalculation::getFlux( int irun, double& iFlux, double& iFluxE, double& iFluxUL )
 {
 	iFlux = -99.;
@@ -1664,6 +1695,39 @@ void VFluxCalculation::getFlux( int irun, double& iFlux, double& iFluxE, double&
 		}
 	}
 }
+
+/*
+ * bounded flux
+ *
+ */
+void VFluxCalculation::getBoundedFlux( int irun, double& iFlux, double& iFluxE_low, double& iFluxE_up, double& iFluxUL )
+{
+     iFlux = -99.;
+     iFluxE_low = -99.;
+     iFluxE_up = -99.;
+     iFluxUL = -99.;
+     for( unsigned int i = 0; i < fRunList.size(); i++ )
+     {
+           if( irun == fRunList[i] )
+           {
+                if( fRunUFL[i] < 0. )
+                {
+                     iFlux = fRunFlux[i];
+                     iFluxE_low = TMath::Abs( fRunFlux[i] - fRunFluxCI_lo_1sigma[i] );
+                     iFluxE_up = TMath::Abs( fRunFlux[i] - fRunFluxCI_up_1sigma[i] );
+                }
+                else
+                {
+                     iFlux = -99.;
+                     iFluxE_low = -99.;
+                     iFluxE_up = -99.;
+                     iFluxUL = fRunFluxCI_up_3sigma[i];
+		}
+		break;
+            }
+	}
+}
+
 
 /*
 

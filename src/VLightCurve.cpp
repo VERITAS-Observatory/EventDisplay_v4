@@ -31,6 +31,7 @@ VLightCurve::VLightCurve()
 	fRateAxisTitleUnSet = false;
 	setLightCurveAxis();
 	setPhaseFoldingValues( -99., -99., false );
+        setFluxCalculationMethod();
 }
 
 /*
@@ -252,7 +253,8 @@ bool VLightCurve::fillTeV_anasum( bool iPrint )
 		{
 			fLightCurveData[i]->setFluxCalculationEnergyInterval( fEnergy_min_TeV, fEnergy_max_TeV );
 			fLightCurveData[i]->fillTeVEvndispData( fAnaSumFile, fThresholdSignificance, fMinEvents,
-													fUpperLimit, fUpperLimitMethod, fLiMaEqu, fMinEnergy, fE0, fAlpha );
+				   			        fUpperLimit, fUpperLimitMethod, fLiMaEqu, fMinEnergy, fE0, fAlpha,
+                                                                fFluxCalculationUseRolke );
 		}
 	}
 	
@@ -423,7 +425,7 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 					iMJD_error = 0.3;
 				}
 				fLightCurveGraph->SetPointError( z, iMJD_error, iMJD_error,
-												 iFMean - fLightCurveData[i]->fRunFluxCI_lo_1sigma, fLightCurveData[i]->fRunFluxCI_up_1sigma - iFMean );
+	           		           iFMean - fLightCurveData[i]->fRunFluxCI_lo_1sigma, fLightCurveData[i]->fRunFluxCI_up_1sigma - iFMean );
 			}
 			z++;
 		}

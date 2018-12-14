@@ -369,6 +369,7 @@ void VLightCurveUtilities::printLightCurve( int bFullDetail )
 			if( fLightCurveData[i]->fNon >= 0. )
 			{
 				cout << "\tNon " << fLightCurveData[i]->fNon << "\tNoff " << fLightCurveData[i]->fNoff;
+                                cout << "\tAlpha " << fLightCurveData[i]->fNoffAlpha;
 			}
 			cout << "\t Significance: " << fLightCurveData[i]->fSignificance;
 			cout << "\t Tot Time [h]: " << fLightCurveData[i]->fRunTime / 3600.;

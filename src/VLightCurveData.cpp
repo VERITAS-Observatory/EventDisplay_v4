@@ -89,7 +89,7 @@ void VLightCurveData::setFluxCalculationEnergyInterval( double iEMin, double iEM
 
 */
 bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdSignificance, double iMinEvents, double iUpperLimit,
-		int iUpperlimitMethod, int iLiMaEqu, double iMinEnergy, double E0, double alpha )
+		int iUpperlimitMethod, int iLiMaEqu, double iMinEnergy, double E0, double alpha, bool i_bRolke )
 {
 	fDataFileName = iAnaSumFile;
 	
@@ -100,6 +100,7 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
 		bIsZombie = true;
 		return false;
 	}
+        fFluxCalculation.setFluxCalculationMethod( i_bRolke );
 	fFluxCalculation.setTimeBinnedAnalysis( false );
 	fFluxCalculation.setDebug( false );
 	fFluxCalculation.setSignificanceParameters( -999., -999. );
@@ -144,9 +145,20 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
 	fRunTime  = fFluxCalculation.getRunTime( -1 );
 	fRunElevation = fFluxCalculation.getRunElevation( -1 );
 	fSignificance = fFluxCalculation.getSignificance( -1 );
+
+        //////////////////////////////////////
+        // get fluxes and errors
 	double iFluxError = 0;
-	fFluxCalculation.getFlux( -1, fFlux, iFluxError, fUpperFluxLimit );
-	setFluxError( iFluxError );
+        // 'traditional' method allowing for negative flux
+        if( !i_bRolke )
+        {
+            fFluxCalculation.getFlux( -1, fFlux, iFluxError, fUpperFluxLimit );
+            setFluxError( iFluxError );
+        }
+        else
+        {
+            fFluxCalculation.getBoundedFlux( -1, fFlux, fFluxErrorDown, fFluxErrorUp, fUpperFluxLimit );
+        }
 	fFluxCalculation.getFluxConfidenceInterval( -1, fRunFluxCI_lo_1sigma, fRunFluxCI_up_1sigma, true );
 	fFluxCalculation.getFluxConfidenceInterval( -1, fRunFluxCI_lo_3sigma, fRunFluxCI_up_3sigma, false );
 	
