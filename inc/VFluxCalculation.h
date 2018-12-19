@@ -73,6 +73,8 @@ class VFluxCalculation : public TObject
 		bool fDebug;
 		
 		bool fTimebinned;
+                double fMJD_min;
+                double fMJD_max;
 		
 		// input parameters read from anasum file (from run summary tree)
 		vector< double > fRunList;                //!< run number
@@ -259,6 +261,7 @@ class VFluxCalculation : public TObject
 		unsigned int  loadRunList( int iRunMin = 0, int iRunMax = 100000, unsigned int iTot = 1, double iMJDMin = -99., double iMJDMax = -99. );
 		void          printResults();
 		void          printRunList();
+                void          printECSVLine();
 		void          printDebugSummary();
 		bool          readRXTE( string ifile );
 		void          setDebug( bool iB )
@@ -278,6 +281,6 @@ class VFluxCalculation : public TObject
 		}
 		void          writeResults( char* ifile );
 		
-		ClassDef( VFluxCalculation, 14 );
+		ClassDef( VFluxCalculation, 15 );
 };
 #endif

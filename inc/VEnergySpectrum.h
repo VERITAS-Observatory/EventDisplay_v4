@@ -25,6 +25,7 @@
 #include "TRolke.h"
 #include "TTree.h"
 
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -72,7 +73,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		double fSpectralFitFluxNormalisationEnergy;
 		double fSpectralFitEnergy_min;
 		double fSpectralFitEnergy_max;
-		double fCL;								// Confidince Level
+		double fCL;								// Confidence Level
 
 		double fOffsetDistance;                  // offset distance to get correct counting histograms
 		
@@ -163,6 +164,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 			return hErecCountsOff;
 		}
 		TGraphAsymmErrors* getEnergySpectrumGraph();
+                double  getUpperEdgeofLastFilledEnergyBin( double iMinNon  = 1. );
 		TH1D* getTotalTimeHistogram( bool iDeadtimeCorrected = false )
 		{
 			if( iDeadtimeCorrected )
@@ -306,8 +308,9 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 			fPlottingYaxisMin = iMin;
 			fPlottingYaxisMax = iMax;
 		}
+                bool writeSpectralPointsToCSVFile( string iOFileName );
 		
 		
-		ClassDef( VEnergySpectrum, 15 );
+		ClassDef( VEnergySpectrum, 16 );
 };
 #endif

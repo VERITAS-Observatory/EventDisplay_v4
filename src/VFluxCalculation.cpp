@@ -71,6 +71,9 @@ void VFluxCalculation::reset()
 {
 	fFile.clear();
 	fData = 0;
+
+        fMJD_min = -999.;
+        fMJD_max = -999.;
 	
 	// long printout
 	fDebug = true;
@@ -172,6 +175,9 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
 	{
 		return 0;
 	}
+
+        fMJD_min = iMJDMin;
+        fMJD_max = iMJDMax;
 	
 	resetRunList();
 	
@@ -754,6 +760,30 @@ void VFluxCalculation::printDebugSummary()
 	cout << endl << endl;
 }
 
+/*
+ * print single line with results
+ *
+ */
+void VFluxCalculation::printECSVLine()
+{
+     cout << fixed << setprecision( 2 ) << fMinEnergy;
+     for( unsigned int i = 0; i < fRunList.size(); i++ )
+     {
+          if( fRunList[i] < 0 )
+          {
+               cout << "   " << fixed << setprecision( 1 ) <<  fMJD_min;
+               cout << "   " << fixed << setprecision( 1 ) << fMJD_max;
+               cout << fixed << setprecision( 4 ) << "   " << fRunTOn[i]/3600.;
+               cout << scientific << "   " << fRunFlux[i];
+               cout << scientific << "   " << fRunFluxE[i];
+               cout << fixed << "   " << fRunNon[i];
+               cout << fixed << "   " << fRunNoff[i];
+               cout << fixed << "   " << fRunNorm[i];
+               cout << fixed << "   " << fRunSigni[i];
+          }
+     }
+     cout << endl;
+}
 
 /*
 
@@ -1519,8 +1549,6 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
 		cout << endl;
 	}
 
-        cout << "threshold significance is " << fThresholdSignificance << " sigma or less than " << fMinEvents << " events" << endl;
-	
 	for( unsigned int i = 0; i < fRunList.size(); i++ )
 	{
 		IntraUFL.clear();
@@ -1750,7 +1778,6 @@ void VFluxCalculation::calculateIntegralFlux( double iMinEnergy )
 	calculateSignificancesAndUpperLimits();
 	
 	// calculate integrated spectral weighted effective areas
-	std::cout<<"getIntegralEffectiveArea() "<<std::endl;
 	getIntegralEffectiveArea();
 	
 	// calculate fluxes and upper flux limits

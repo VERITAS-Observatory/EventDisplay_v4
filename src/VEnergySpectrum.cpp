@@ -1009,10 +1009,14 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 		if( bEnergyAxisLinear )
 		{
 			i_flux.dE = hErecCountsOn->GetXaxis()->GetBinUpEdge( i ) - hErecCountsOn->GetXaxis()->GetBinLowEdge( i );
+                        i_flux.Energy_lowEdge = hErecCountsOn->GetXaxis()->GetBinLowEdge( i );
+                        i_flux.Energy_upEdge = hErecCountsOn->GetXaxis()->GetBinUpEdge( i );
 		}
 		else
 		{
 			i_flux.dE = TMath::Power( 10., hErecCountsOn->GetXaxis()->GetBinUpEdge( i ) ) - TMath::Power( 10., hErecCountsOn->GetXaxis()->GetBinLowEdge( i ) );
+                        i_flux.Energy_lowEdge =  TMath::Power( 10., hErecCountsOn->GetXaxis()->GetBinLowEdge( i ) );
+                        i_flux.Energy_upEdge =  TMath::Power( 10., hErecCountsOn->GetXaxis()->GetBinUpEdge( i ) );
 		}
 		
 		// get on and off numbers for this bin
@@ -1229,7 +1233,7 @@ TCanvas* VEnergySpectrum::plot( TCanvas* c )
 	plot_energySpectrum();
 	
 	fPlottingCanvas = c;
-	
+
 	return c;
 }
 
@@ -1866,6 +1870,27 @@ bool VEnergySpectrum::setEnergyInBinDefinition( unsigned int iEF )
 	return false;
 }
 
+/*
+ *  get energy of upper edge of the last filled bin 
+ *
+ */
+double VEnergySpectrum::getUpperEdgeofLastFilledEnergyBin( double iMinNon )
+{
+      if( fDifferentialFlux.size() > 0 )
+      {
+          for( unsigned int i = fDifferentialFlux.size()-1; i >= 0; i-- )
+          {
+              if( fDifferentialFlux[i].NOn > iMinNon )
+              {
+                   return fDifferentialFlux[i].Energy_upEdge;
+              }
+           }
+      }
+
+      return 9999.;
+} 
+
+
 void VEnergySpectrum::printEnergyBins()
 {
 	if( hErecCountsOn )
@@ -1999,4 +2024,43 @@ TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierInde
 	plot( c );
 	
 	return c;
+}
+
+bool VEnergySpectrum::writeSpectralPointsToCSVFile( string iOFileName )
+{
+       ofstream os;
+       os.open( iOFileName.c_str() );
+       if( !os )
+       {
+            cout << "VEnergySpectrum::writeSpectralPointsToCSVFile error opening " << iOFileName << endl;
+            return false;
+       }
+       cout << "writing ecsv file " << iOFileName << endl;
+
+       os << "# \%ECSV 0.9" << endl;
+       os << "# ---" << endl;
+       os << "# datatype:" << endl;
+       os << "# - {name: e_ref, unit: TeV, datatype: float32}" << endl;
+       os << "# - {name: e_min, unit: TeV, datatype: float32}" << endl;
+       os << "# - {name: e_max, unit: TeV, datatype: float32}" << endl;
+       os << "# - {name: dnde, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
+       os << "# - {name: dnde_errn, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
+       os << "# - {name: dnde_errp, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
+       os << "# - {name: signi, datatype: float32}" << endl;
+       os << "# meta: !!omap" << endl;
+       os << "e_ref e_min e_max dnde dnde_errp dnde_errn signi" << endl;
+       for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ )
+       {
+            os << fDifferentialFlux[i].Energy << "    ";
+            os << fDifferentialFlux[i].Energy_lowEdge << "    ";
+            os << fDifferentialFlux[i].Energy_upEdge << "    ";
+            os << fDifferentialFlux[i].DifferentialFlux << "    ";
+            os << fDifferentialFlux[i].DifferentialFluxError_low << "    ";
+            os << fDifferentialFlux[i].DifferentialFluxError_up << "    ";
+            os << fDifferentialFlux[i].Significance;
+            os << endl;
+       }
+       os.close();
+
+       return true;
 }
