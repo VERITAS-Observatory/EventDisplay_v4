@@ -28,6 +28,7 @@
 #include "TMath.h"
 #include "TProfile.h"
 #include "TTree.h"
+#include "TMinuit.h"
 
 #include <iomanip>
 #include <iostream>
@@ -42,6 +43,7 @@ class VEffectiveAreaCalculator
 	private:
 	
 		vector< vector< double > > fEffArea_time;
+		vector< vector< double > > fEffAreaMC_time;
 		vector< double > timebins;
 		
 		float fMC_ScatterArea;
@@ -49,6 +51,7 @@ class VEffectiveAreaCalculator
 		bool bNOFILE;
 		TDirectory* fGDirectory;
 		
+		TFile *fCloneTreeFile;
 		vector< double > fZe;
 		vector< double > fMCZe;
 		vector< vector< double > > fEff_WobbleOffsets;
@@ -59,17 +62,34 @@ class VEffectiveAreaCalculator
 		unsigned int fNBins;
 		vector< double > fEff_E0;
 		map< unsigned int, vector< double > > fEffArea_map;
-		
+		map< unsigned int, vector< double > > fEffAreaMC_map;
+		map< unsigned int, unsigned int > fEntry_map;
+
+		map< unsigned int, vector< double > > fResMat_MC_map;
+		map< unsigned int, vector< double > > fResMat_Rec_map;
+		map< unsigned int, vector< double > > fResMat_Rec_Err_map;
+
 		vector< double >                      fEff_EsysMCRelative_EnergyAxis;
 		map< unsigned int, vector< double > > fEff_EsysMCRelative;
 		map< unsigned int, vector< double > > fEff_EsysMCRelativeE;
 		unsigned int     fNMeanEffectiveArea;
+		unsigned int     fNMeanEffectiveAreaMC;
+		unsigned int     fNMeanResponseMatrix;
+
 		unsigned int     fNTimeBinnedMeanEffectiveArea;
+		unsigned int     fNTimeBinnedMeanEffectiveAreaMC;
+
 		vector< double > fVMeanEffectiveArea;
+		vector< double > fVMeanEffectiveAreaMC;
+
 		vector< double > fVTimeBinnedMeanEffectiveArea;
+		vector< double > fVTimeBinnedMeanEffectiveAreaMC;
+
 		TGraphAsymmErrors* gMeanEffectiveArea;
 		TGraph2DErrors*    gTimeBinnedMeanEffectiveArea;
 		
+		TGraphAsymmErrors* gMeanEffectiveAreaMC;
+		TH2D*			   hMeanResponseMatrix;
 		TGraphErrors* gMeanSystematicErrorGraph;
 		
 		// unique event counting
@@ -149,7 +169,11 @@ class VEffectiveAreaCalculator
 		vector< TH1D* > hEcutSub;                //! events after individual cuts
 		
 		int fEffectiveAreaVsEnergyMC;            // 0 = vs MC energy, 1 = vs rec energy (approx. method), 2 = vs rec energy (default)
+		bool bLikelihoodAnalysis;
+
 		TTree* fEffArea;
+		TTree* fEffTree;
+
 		double ze;
 		int fAzBin;                               //!< az bin: definitions see getEffectiveArea
 		double fMinAz;
@@ -164,6 +188,9 @@ class VEffectiveAreaCalculator
 		int nbins;
 		double e0[1000];
 		double eff[1000];
+		int nbins_MC;
+		double e0_MC[1000];
+		double eff_MC[1000];
 		double seff_L[1000];
 		double seff_U[1000];
 		int Rec_nbins;
@@ -171,7 +198,11 @@ class VEffectiveAreaCalculator
 		double Rec_eff[1000];
 		double Rec_seff_L[1000];
 		double Rec_seff_U[1000];
-		
+		int nbins_ResMat;
+		double ResMat_MC[1000];
+		double ResMat_Rec[1000];
+		double ResMat_Rec_Err[1000];
+
 		TTree* fAcceptance_AfterCuts_tree;       //Information for all the events after cuts to construct the background map
 		double fXoff_aC;
 		double fYoff_aC;
@@ -204,6 +235,11 @@ class VEffectiveAreaCalculator
 		// effective areas fit functions
 		vector< TF1* > fEffAreaFitFunction;
 		
+		TF1 *fGauss;
+		double hres_binw;
+        	double* hres_bins;
+        	vector <double> hres_binc;
+           	int hres_nbins;
 		TGraphAsymmErrors* applyResponseMatrix( TH2* h, TGraphAsymmErrors* g );
 		bool   binomialDivide( TGraphAsymmErrors* g, TH1D* hrec, TH1D* hmc );
 		void   copyProfileHistograms( TProfile*,  TProfile* );
@@ -213,14 +249,16 @@ class VEffectiveAreaCalculator
 		bool   getEffectiveAreasFromFitFunction( TTree*, double azmin, double azmax, double ispectralindex );
 		void   getEffectiveAreasFromFitFunction( unsigned int, unsigned int, double, double&, double& );
 		double getEffectiveAreasFromHistograms( double erec, double ze, double woff, double iPedVar,
-												double iSpectralIndex, bool bAddtoMeanEffectiveArea = true,
-												int iEffectiveAreaVsEnergyMC = 2 );
+							double iSpectralIndex, bool bAddtoMeanEffectiveArea = true,
+							int iEffectiveAreaVsEnergyMC = 2 );
 		bool   getMonteCarloSpectra( VEffectiveAreaCalculatorMCHistograms* );
 		double getMCSolidAngleNormalization();
 		vector< unsigned int > getUpperLowBins( vector< double > i_values, double d );
 		bool   initializeEffectiveAreasFromHistograms( TTree*, TH1D*, double azmin, double azmax, double ispectralindex, double ipedvar );
 		vector< double > interpolate_effectiveArea( double iV, double iVLower, double iVupper,
 				vector< double > iEL, vector< double > iEU, bool iCos = true );
+		TH2D*  interpolate_responseMatrix( double iV, double iVLower, double iVupper, TH2D *iElower, TH2D *iEupper, bool iCos = true );
+
 		void   reset();
 		void   smoothEffectiveAreas( map< unsigned int, vector< double > > );
 		
@@ -228,7 +266,7 @@ class VEffectiveAreaCalculator
 	
 		VEffectiveAreaCalculator( string ieffFile, double azmin, double azmax, double iPedVar, double iIndex,
 								  vector< double> fMCZe, int iSmoothIter = -1, double iSmoothThreshold = 1.,
-								  int iEffectiveAreaVsEnergyMC = 2 );
+								  int iEffectiveAreaVsEnergyMC = 2, bool iLikelihoodAnalysis = false );
 		VEffectiveAreaCalculator( VInstrumentResponseFunctionRunParameter*, VGammaHadronCuts* );
 		~VEffectiveAreaCalculator();
 		
@@ -256,7 +294,25 @@ class VEffectiveAreaCalculator
 								 bool bAddtoMeanEffectiveArea = true, int iEffectiveAreaVsEnergyMC = 2 );
 		TGraphAsymmErrors* getMeanEffectiveArea();
 		TGraph2DErrors*    getTimeBinnedMeanEffectiveArea();
+		TGraphAsymmErrors* getMeanEffectiveAreaMC();
+
+
+
+		void addMeanResponseMatrix( vector <double> i_emc, vector <double> i_erec , vector <double> i_erec_err );
+
+		TH2D* getMeanResponseMatrix()
+		{
+                        VHistogramUtilities::normalizeTH2D_y(hMeanResponseMatrix);
+                        if( hMeanResponseMatrix )
+                        {
+                            return (TH2D*)hMeanResponseMatrix->Clone();
+                        }
+                        return 0;
+		}
+
 		void setTimeBinnedMeanEffectiveArea();
+		void setTimeBinnedMeanEffectiveAreaMC( double i_time );
+
 		void initializeHistograms( vector< double > iAzMin, vector< double > iAzMax, vector< double > iSpectralIndex );
 		void resetHistograms( unsigned int iZe );
 		void resetHistogramsVectors( unsigned int iZe );

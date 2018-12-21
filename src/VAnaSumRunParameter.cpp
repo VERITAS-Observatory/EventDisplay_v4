@@ -673,6 +673,20 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 					fDirectionModel3D = true;
 				}
 			}
+			/// enable likelihood analysis ///
+			else if (temp == "ENABLELIKELIHOOD")
+			{
+				unsigned int tmpLikelihood = ( unsigned int )atoi( temp2.c_str() ) ;
+				if( tmpLikelihood == 1)
+				{
+					fLikelihoodAnalysis = true;
+				}
+				else 
+				{
+					fLikelihoodAnalysis = false;
+				}
+				
+			}
 			else
 			{
 				cout << "Warning: unknown line in parameter file " << i_filename << ": " << endl;

@@ -291,7 +291,7 @@ void VLightCurveUtilities::printLightCurveWiki( double iMinEnergy_TeV )
 	cout << "!Non" << endl;
 	cout << "!Noff" << endl;
 	cout << "!Alpha" << endl;
-	cout << "!Flux (>" << setprecision( 2 ) << iMinEnergy_TeV << " TeV) [cm^-2 s^-1]" << endl;
+	cout << "!Flux (>" << setprecision( 2 ) << fLightCurveData[0]->fEnergy_min_TeV << " TeV) [cm^-2 s^-1]" << endl;
 	
 	for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
 	{

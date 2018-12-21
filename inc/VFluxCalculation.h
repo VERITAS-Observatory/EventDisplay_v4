@@ -260,6 +260,7 @@ class VFluxCalculation : public TObject
 		double        getSignificance( int irun );
 		unsigned int  loadRunList( int iRunMin = 0, int iRunMax = 100000, unsigned int iTot = 1, double iMJDMin = -99., double iMJDMax = -99. );
 		void          printResults();
+		void          printResultsJSON();
 		void          printRunList();
                 void          printECSVLine();
 		void          printDebugSummary();
@@ -281,6 +282,6 @@ class VFluxCalculation : public TObject
 		}
 		void          writeResults( char* ifile );
 		
-		ClassDef( VFluxCalculation, 15 );
+		ClassDef( VFluxCalculation, 16 );
 };
 #endif

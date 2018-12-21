@@ -76,6 +76,13 @@ void merge( string ifile, char* outputfile, bool bFull = false )
 		//        f.SetBranchStatus( "hEmc", 1 );
 		// needed for systematic error calculation
 		f.SetBranchStatus( "hEsysMCRelative", 1 );
+		// needed for binned likelihood analysis
+		f.SetBranchStatus( "hResponseMatrixFineQC", 0);
+
+		f.SetBranchStatus( "nbins_ResMat", 1 );
+		f.SetBranchStatus( "ResMat_MC", 1 );
+		f.SetBranchStatus( "ResMat_Rec", 1 );
+		f.SetBranchStatus( "ResMat_Rec_Err", 1 );
 	}
 	f.Merge( hname );
 	cout << "done.." << endl;

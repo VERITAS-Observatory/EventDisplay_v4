@@ -131,6 +131,9 @@ class VStereoAnalysis
 		TGraph2DErrors*    gTimeBinnedMeanEffectiveArea;
 		TGraphErrors*      gMeanEsys_MC;
 		
+		TGraphAsymmErrors* gMeanEffectiveAreaMC;
+		TH2D*			   hResponseMatrix;
+
 		VStereoMaps* fMap;
 		VStereoMaps* fMapUC;
 		int fHisCounter;

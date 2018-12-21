@@ -846,6 +846,90 @@ void VFluxCalculation::printResults()
 	}
 }
 
+
+/*
+
+   print results for each run in JSON format
+
+*/
+
+void VFluxCalculation::printResultsJSON()
+{
+	cout << "[" << endl;
+	for( unsigned int i = 0; i < fRunList.size(); i++ )
+	{
+		// (GM) how can this happen?
+		if( i >= fRunEffArea.size() )
+		{
+			cout << "FluxCalculation::printResultsJSON() error: i >= fRunEffArea.size(): " << fRunEffArea.size() << "\t" << fRunList.size() << endl;
+			break;
+		}
+
+		cout << "\t{" << endl;
+		printf( "\t  \"RUN\":%d,", ( int )fRunList[i] );
+		cout << endl;
+		printf( "\t  \"MJD\":%0.4f,", fRunMJD[i] );
+		cout << endl;
+		printf( "\t  \"MJD Err\":%0.4f,", fRunTOn[i] / 60. / 60. / 24. );
+		cout << endl;
+		printf( "\t  \"Energy Threshold\":%0.3f,", fMinEnergy );
+		cout << endl;
+		// ( int )fRunNon[i], ( int )fRunNoff[i], fRunNorm[i] , fRunNdiff[i], fRunNdiffE[i]
+		printf( "\t  \"NOn\":%d,", ( int )fRunNon[i] );
+		cout << endl;
+		printf( "\t  \"NOff\":%d,", ( int )fRunNoff[i] );
+		cout << endl;
+		printf( "\t  \"Alpha\":%0.3f,", fRunNorm[i] );
+		cout << endl;
+		printf( "\t  \"Excess\":%0.3f,", fRunNdiff[i] );
+		cout << endl;
+		printf( "\t  \"Excess Error\":%0.3f,", fRunNdiffE[i] );
+		cout << endl;
+		printf( "\t  \"Significance\":%0.3f,", fRunSigni[i] );
+		cout << endl;
+		printf( "\t  \"Rate\":%0.3f,", fRunRate[i] );
+		cout << endl;
+		printf( "\t  \"Rate Error\":%0.3f,", fRunRateE[i] );
+		cout << endl;
+
+		if (fRunUFL[i] < 0.)
+		{
+			printf(	"\t  \"Upper Limit\":0," );
+			cout << endl;
+			printf(	"\t  \"Upper Limit Level\":0," );
+			cout << endl;
+			printf( "\t  \"Flux [cm^-2 s^-1]\":%0.3e,", fRunFlux[i] );
+			cout << endl;
+			printf( "\t  \"Flux Error [cm^-2 s^-1]\":%0.3e,", fRunFluxE[i] );
+			cout << endl;
+			printf( "\t  \"Flux Crab [Crab]\":%0.3f,", getFluxInCrabUnits( fRunFlux[i], fMinEnergy ));
+			cout << endl;
+			printf( "\t  \"Flux Error [Crab]\":%0.3f", getFluxInCrabUnits( fRunFluxE[i], fMinEnergy ));
+			cout << endl;
+		}
+
+		else
+		{
+			printf(	"\t  \"Upper Limit\":1," );
+			cout << endl;
+			printf(	"\t  \"Upper Limit Level\":%0.3f,", fUpperLimit );
+			cout << endl;
+			printf( "\t  \"Flux [cm^-2 s^-1]\":%0.3e,", fRunFlux[i] );
+			cout << endl;
+			printf( "\t  \"Flux Error [cm^-2 s^-1]\":%0.3e,", 0. );
+			cout << endl;
+			printf( "\t  \"Flux Crab [Crab]\":%d,", (int)getFluxInCrabUnits( fRunFlux[i], fMinEnergy ));
+			cout << endl;
+			printf( "\t  \"Flux Error [Crab]\":%d", 0);
+			cout << endl;
+		}
+		cout << "\t}" << endl;
+
+	}
+	cout << "]" << endl;
+
+}
+
 /*
 
    get flux in Crab Nebula units; using Whipple 1998 result

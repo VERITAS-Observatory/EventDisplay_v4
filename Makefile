@@ -649,6 +649,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VSpectralFitter.o ./obj/VSpectralFitter_Dict.o \
 		./obj/VEnergyThreshold.o ./obj/VEnergyThreshold_Dict.o \
 		./obj/VEnergySpectrum.o ./obj/VEnergySpectrum_Dict.o \
+		./obj/VLikelihoodFitter.o ./obj/VLikelihoodFitter_Dict.o  \
 		./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 		./obj/VStar.o ./obj/VStar_Dict.o \
 		./obj/VASlalib.o ./obj/VASlalib_Dict.o \
@@ -996,6 +997,7 @@ WRITEVTSPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 			./obj/VRunList.o ./obj/VRunList_Dict.o \
 			./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
 			./obj/VEnergySpectrum.o ./obj/VEnergySpectrum_Dict.o \
+			./obj/VLikelihoodFitter.o ./obj/VLikelihoodFitter_Dict.o \
 			./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o  \
 			./obj/VDifferentialFlux.o ./obj/VDifferentialFlux_Dict.o \
 			./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \

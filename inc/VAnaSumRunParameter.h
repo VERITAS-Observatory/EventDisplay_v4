@@ -216,6 +216,9 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		double fTMPL_maxradius;
 		string fTMPL_AcceptanceFile;
 		string fTMPL_EffectiveAreaFile;
+
+		// Likelihood Spectral Analysis
+		bool fLikelihoodAnalysis;
 		
 		vector< VAnaSumRunParameterListOfExclusionRegions* > fExclusionRegions;   // list of exclusion regions
 		
@@ -256,6 +259,6 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		bool writeListOfExcludedSkyRegions();
 		bool getListOfExcludedSkyRegions( TFile* f );
 		
-		ClassDef( VAnaSumRunParameter, 8 ) ;
+		ClassDef( VAnaSumRunParameter, 9 ) ;
 };
 #endif
