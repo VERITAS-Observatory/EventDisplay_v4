@@ -1873,14 +1873,20 @@ bool VEnergySpectrum::setEnergyInBinDefinition( unsigned int iEF )
 /*
  *  get energy of upper edge of the last filled bin 
  *
+ *  require at least two bins filled
+ *
  */
-double VEnergySpectrum::getUpperEdgeofLastFilledEnergyBin( double iMinNon )
+double VEnergySpectrum::getUpperEdgeofLastFilledEnergyBin( double iMinNdiff, double iSignificance )
 {
-      if( fDifferentialFlux.size() > 0 )
+      if( fDifferentialFlux.size() > 1 )
       {
-          for( unsigned int i = fDifferentialFlux.size()-1; i >= 0; i-- )
+          for( unsigned int i = fDifferentialFlux.size()-1; i > 1; i-- )
           {
-              if( fDifferentialFlux[i].NOn > iMinNon )
+              double n_diff1 = fDifferentialFlux[i].NOn - fDifferentialFlux[i].NOff_alpha * fDifferentialFlux[i].NOff;
+              double n_diff2 = fDifferentialFlux[i-1].NOn - fDifferentialFlux[i-1].NOff_alpha * fDifferentialFlux[i-1].NOff;
+              if( n_diff1 > iMinNdiff && n_diff2 > iMinNdiff
+              && fDifferentialFlux[i].Significance > iSignificance 
+              && fDifferentialFlux[i-1].Significance > iSignificance )
               {
                    return fDifferentialFlux[i].Energy_upEdge;
               }
@@ -1889,6 +1895,27 @@ double VEnergySpectrum::getUpperEdgeofLastFilledEnergyBin( double iMinNon )
 
       return 9999.;
 } 
+
+/*
+ *  get energy of lower edge of the first filled bin 
+ *
+ */
+double VEnergySpectrum::getLowerEdgeofFirstFilledEnergyBin( double iMinNdiff, double iSignificance )
+{
+      if( fDifferentialFlux.size() > 0 )
+      {
+          for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ )
+          {
+              double n_diff = fDifferentialFlux[i].NOn - fDifferentialFlux[i].NOff_alpha * fDifferentialFlux[i].NOff;
+              if( n_diff > iMinNdiff && fDifferentialFlux[i].Significance > iSignificance )
+              {
+                   return fDifferentialFlux[i].Energy_lowEdge;
+              }
+           }
+      }
+
+      return 9999.;
+}
 
 
 void VEnergySpectrum::printEnergyBins()
