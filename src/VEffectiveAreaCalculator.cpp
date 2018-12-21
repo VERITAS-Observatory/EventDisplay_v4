@@ -655,7 +655,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( string iInputFile, double az
 	fEffectiveAreaVsEnergyMC = iEffectiveAreaVsEnergyMC;
 
 	// likelihood analysis true/false
-  bLikelihoodAnalysis = iLikelihoodAnalysis;
+        bLikelihoodAnalysis = iLikelihoodAnalysis;
 	hMeanResponseMatrix = 0;
 	hres_bins = 0;
 	// mean effective area
@@ -2952,20 +2952,20 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 	// Setting Mean MC EffectiveAreas and Response Matrix
 	if ( bLikelihoodAnalysis )
 	{
-			// Adding to mean effective area (MC)
-			if( bAddtoMeanEffectiveArea && fVTimeBinnedMeanEffectiveAreaMC.size() == i_eff_MC_temp.size())
-			{
-				for (unsigned int i = 0; i < fEff_E0.size() ; i++)
-				{
-							if ( i_eff_MC_temp[i] > 1.e-9 )
-							{
-									fVTimeBinnedMeanEffectiveAreaMC[i] += i_eff_MC_temp[i];
-							}
-				}
-				fNTimeBinnedMeanEffectiveAreaMC++;
-			}
-			// adding to mean response matrix
-			addMeanResponseMatrix(i_ResMat_MC_temp, i_ResMat_Rec_temp, i_ResMat_Rec_Err_temp);
+                // Adding to mean effective area (MC)
+                if( bAddtoMeanEffectiveArea && fVTimeBinnedMeanEffectiveAreaMC.size() == i_eff_MC_temp.size())
+                {
+                        for (unsigned int i = 0; i < fEff_E0.size() ; i++)
+                        {
+                                if ( i_eff_MC_temp[i] > 1.e-9 )
+                                {
+                                        fVTimeBinnedMeanEffectiveAreaMC[i] += i_eff_MC_temp[i];
+                                }
+                        }
+                        fNTimeBinnedMeanEffectiveAreaMC++;
+                }
+                // adding to mean response matrix
+		addMeanResponseMatrix(i_ResMat_MC_temp, i_ResMat_Rec_temp, i_ResMat_Rec_Err_temp);
 	}
 
 
@@ -3893,7 +3893,7 @@ void VEffectiveAreaCalculator::addMeanResponseMatrix( vector <double> i_emc, vec
     // If not then the binning hasn't been initialized
     if ( !hMeanResponseMatrix )
     {
-			hres_binw = i_emc[1] - i_emc[0] ;
+	hres_binw = i_emc[1] - i_emc[0] ;
     	hres_bins = new double[i_emc.size() + 1];
     	hres_binc.resize(i_emc.size(),0);
     	hres_bins[0] = i_emc[0] - hres_binw/2.;
@@ -3902,17 +3902,14 @@ void VEffectiveAreaCalculator::addMeanResponseMatrix( vector <double> i_emc, vec
         	hres_binc[i] = i_emc[i];
         	hres_bins[i+1] = hres_bins[i] + hres_binw;
     	}
-	    hres_nbins = hres_binc.size();
-
+        hres_nbins = hres_binc.size();
     }
-    //cout << "Making hist " << endl;
     TH2D *i_hist = new TH2D("i_hist", "i_hist", hres_nbins , hres_bins, hres_nbins, hres_bins );
     TF1 *i_gaussian = new TF1("i_gaussian", "gaus", -2,2.5);
 
     // Filling Histograms
     for (int  i = 0; i < i_hist->GetYaxis()->GetNbins(); i++ )
     {
-
         for (unsigned int j = 0; j < i_emc.size(); j++)
         {
             // Assuming a gaussian shape
@@ -3945,9 +3942,6 @@ void VEffectiveAreaCalculator::addMeanResponseMatrix( vector <double> i_emc, vec
                 }
             }
         }
-
-
-
     }
 
     // Checking if mean histogram exists
@@ -3959,17 +3953,13 @@ void VEffectiveAreaCalculator::addMeanResponseMatrix( vector <double> i_emc, vec
         cout << "\t\t\tVEffectiveAreaCalculator::addMeanResponseMatrix Creating new histogram" << endl;
 
         hMeanResponseMatrix = new TH2D("hMeanResponseMatrix", "hMeanResponseMatrix", hres_nbins , hres_bins, hres_nbins, hres_bins  );
+        hMeanResponseMatrix->Sumw2();
         hMeanResponseMatrix->Add(i_hist);
-				hMeanResponseMatrix->Sumw2();
     }
-
-
     else
     {
-
-			hMeanResponseMatrix->Add(i_hist);
-			VHistogramUtilities::normalizeTH2D_y(hMeanResponseMatrix);
-
+        hMeanResponseMatrix->Add(i_hist);
+        VHistogramUtilities::normalizeTH2D_y(hMeanResponseMatrix);
     }
 
     delete i_hist;

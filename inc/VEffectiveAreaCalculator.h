@@ -303,11 +303,12 @@ class VEffectiveAreaCalculator
 		TH2D* getMeanResponseMatrix()
 		{
                         VHistogramUtilities::normalizeTH2D_y(hMeanResponseMatrix);
-                        if( hMeanResponseMatrix )
+/*                        if( hMeanResponseMatrix )
                         {
                             return (TH2D*)hMeanResponseMatrix->Clone();
-                        }
-                        return 0;
+                        } */
+                        return hMeanResponseMatrix;
+                        // return 0;
 		}
 
 		void setTimeBinnedMeanEffectiveArea();

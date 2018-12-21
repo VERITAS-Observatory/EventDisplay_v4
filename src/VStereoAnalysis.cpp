@@ -811,21 +811,27 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 		}
 
 		hResponseMatrix = ( TH2D* ) fEnergy.getMeanResponseMatrix();
-
 		if ( hResponseMatrix )
 		{
 			hResponseMatrix = ( TH2D* )hResponseMatrix->Clone();
-		}
-
+                }
                 // (GM) actualy not sure what to do
                 // (SOB) Output an empty TH2D and later check for entries
                 else
                 {
                         cout << "\t error: no response matrix found" << endl;
-												cout << "\t Creating empty TH2D" << endl;
+			cout << "\t Creating empty TH2D" << endl;
                         // Create empty TH2D
                         // VLikelihoodFitter will pick this up
-												hResponseMatrix = new TH2D("hResponseMatrix", "hResponseMatrix", 10, -1, 1, 10 , -1 , 1 );
+			hResponseMatrix = new TH2D("hResponseMatrix", "hResponseMatrix", 10, -1, 1, 10 , -1 , 1 );
+                }
+                if( fIsOn )
+                {
+                     hResponseMatrix->SetName( "hResponseMatrix_on" );
+                }
+                else
+                {
+                     hResponseMatrix->SetName( "hResponseMatrix_off" );
                 }
 	}
 
@@ -938,27 +944,22 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveArea );
 
 			// Both MC and REC  effective areas are required for Binned Likelihood analysis
-      // (SOB) A set of Off MC effective areas and response matrix are used as a back up
-      // If zero On counts the Off set will be used
+                        // (SOB) A set of Off MC effective areas and response matrix are used as a back up
+                        // If zero On counts the Off set will be used
 			if ( fRunPara->fLikelihoodAnalysis )
 			{
-
-																if( gMeanEffectiveAreaMC )
-																{
-
-
-																		gMeanEffectiveAreaMC->SetTitle("gMeanEffectiveAreaMC_off");
-																		gMeanEffectiveAreaMC->SetName("gMeanEffectiveAreaMC_off");
-
-																		fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveAreaMC );
-																}
-																if( hResponseMatrix )
-																{
-
-																		hResponseMatrix->SetTitle("hResponseMatrix_off");
-																		hResponseMatrix->SetName("hResponseMatrix_off");
-																		fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", hResponseMatrix );
-																}
+				if( gMeanEffectiveAreaMC )
+				{
+					gMeanEffectiveAreaMC->SetTitle("gMeanEffectiveAreaMC_off");
+					gMeanEffectiveAreaMC->SetName("gMeanEffectiveAreaMC_off");
+					fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveAreaMC );
+				}
+				if( hResponseMatrix )
+				{
+					hResponseMatrix->SetTitle("hResponseMatrix_off");
+					hResponseMatrix->SetName("hResponseMatrix_off");
+					fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", hResponseMatrix );
+				}
 			}
 		}
 		if( fTreeSelectedEvents )
