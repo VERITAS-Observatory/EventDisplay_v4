@@ -2053,7 +2053,14 @@ TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierInde
 	return c;
 }
 
-bool VEnergySpectrum::writeSpectralPointsToCSVFile( string iOFileName )
+/*
+ *  write spectral points to csv file
+ *
+ *  for iDiffFlux == 0: use differential flux vector
+ *
+ */
+bool VEnergySpectrum::writeSpectralPointsToCSVFile( string iOFileName,
+                                                    TGraphAsymmErrors* iDiffFlux )
 {
        ofstream os;
        os.open( iOFileName.c_str() );
@@ -2075,17 +2082,34 @@ bool VEnergySpectrum::writeSpectralPointsToCSVFile( string iOFileName )
        os << "# - {name: dnde_errp, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
        os << "# - {name: signi, datatype: float32}" << endl;
        os << "# meta: !!omap" << endl;
-       os << "e_ref e_min e_max dnde dnde_errp dnde_errn signi" << endl;
-       for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ )
+       os << "e_ref e_min e_max dnde dnde_errn dnde_errp signi" << endl;
+       if( iDiffFlux == 0 )
        {
-            os << fDifferentialFlux[i].Energy << "    ";
-            os << fDifferentialFlux[i].Energy_lowEdge << "    ";
-            os << fDifferentialFlux[i].Energy_upEdge << "    ";
-            os << fDifferentialFlux[i].DifferentialFlux << "    ";
-            os << fDifferentialFlux[i].DifferentialFluxError_low << "    ";
-            os << fDifferentialFlux[i].DifferentialFluxError_up << "    ";
-            os << fDifferentialFlux[i].Significance;
-            os << endl;
+           for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ )
+           {
+                os << fDifferentialFlux[i].Energy << "    ";
+                os << fDifferentialFlux[i].Energy_lowEdge << "    ";
+                os << fDifferentialFlux[i].Energy_upEdge << "    ";
+                os << fDifferentialFlux[i].DifferentialFlux << "    ";
+                os << fDifferentialFlux[i].DifferentialFluxError_low << "    ";
+                os << fDifferentialFlux[i].DifferentialFluxError_up << "    ";
+                os << fDifferentialFlux[i].Significance;
+                os << endl;
+           }
+       }
+       else
+       {
+           for (int i = 0 ; i < iDiffFlux->GetN(); i++)
+           {
+               os << iDiffFlux->GetX()[i] << "    ";
+               os << iDiffFlux->GetX()[i] - iDiffFlux->GetErrorXlow(i) << "    ";
+               os << iDiffFlux->GetX()[i] + iDiffFlux->GetErrorXhigh(i) << "    ";
+               os << iDiffFlux->GetY()[i] << "    ";
+               os << iDiffFlux->GetErrorYlow(i) << "    ";
+               os << iDiffFlux->GetErrorYhigh(i) << "    ";
+               os << 999.;
+               os << endl;
+           }
        }
        os.close();
 

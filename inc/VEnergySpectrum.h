@@ -309,7 +309,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 			fPlottingYaxisMin = iMin;
 			fPlottingYaxisMax = iMax;
 		}
-                bool writeSpectralPointsToCSVFile( string iOFileName );
+                bool writeSpectralPointsToCSVFile( string iOFileName, TGraphAsymmErrors* iDiffFlux = 0 );
 		
 		
 		ClassDef( VEnergySpectrum, 16 );
