@@ -49,7 +49,9 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	fMC_distance_to_cameracenter_min =  0.;
 	fMC_distance_to_cameracenter_max =  1.e10;
 	
-	fNentries = TChain::kBigNumber;
+	//	fNentries = TChain::kBigNumber;
+	// Setting to ROOT 5 value to prevent ROOT 6 Errors
+	fNentries = 1234567890;
 	fMaxRunTime = 1.e9;
 	
 	printpara = "";
