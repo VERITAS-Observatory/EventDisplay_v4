@@ -2080,9 +2080,11 @@ bool VEnergySpectrum::writeSpectralPointsToCSVFile( string iOFileName,
        os << "# - {name: dnde, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
        os << "# - {name: dnde_errn, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
        os << "# - {name: dnde_errp, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
+       os << "# - {name: dnde_ul, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
        os << "# - {name: signi, datatype: float32}" << endl;
+       os << "# - UL_CONF: 0.95" << endl;
        os << "# meta: !!omap" << endl;
-       os << "e_ref e_min e_max dnde dnde_errn dnde_errp signi" << endl;
+       os << "e_ref e_min e_max dnde dnde_errn dnde_errp dnde_ul signi" << endl;
        if( iDiffFlux == 0 )
        {
            for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ )
@@ -2090,9 +2092,18 @@ bool VEnergySpectrum::writeSpectralPointsToCSVFile( string iOFileName,
                 os << fDifferentialFlux[i].Energy << "    ";
                 os << fDifferentialFlux[i].Energy_lowEdge << "    ";
                 os << fDifferentialFlux[i].Energy_upEdge << "    ";
-                os << fDifferentialFlux[i].DifferentialFlux << "    ";
-                os << fDifferentialFlux[i].DifferentialFluxError_low << "    ";
-                os << fDifferentialFlux[i].DifferentialFluxError_up << "    ";
+                if( fDifferentialFlux[i].DifferentialFluxError_low > 0. )
+                {
+                    os << fDifferentialFlux[i].DifferentialFlux << "    ";
+                    os << fDifferentialFlux[i].DifferentialFluxError_low << "    ";
+                    os << fDifferentialFlux[i].DifferentialFluxError_up << "    ";
+                    os << "nan     ";
+                }
+                else
+                {
+                    os << "nan     nan nan    ";
+                    os << fDifferentialFlux[i].DifferentialFlux << "    ";
+                }
                 os << fDifferentialFlux[i].Significance;
                 os << endl;
            }
