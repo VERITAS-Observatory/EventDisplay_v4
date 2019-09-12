@@ -265,7 +265,7 @@ vector <TGraphAsymmErrors*> VLikelihoodFitter::getEffectiveAreasMCFromFile()
         else if (i_offValid)
         {
 
-          cout << "On MC Effective Area faild. Using Off MC effective Area (Run: " <<  fRunList[i].runnumber << ")" << endl;
+          cout << "On MC Effective Area failed. Using Off MC effective Area (Run: " <<  fRunList[i].runnumber << ")" << endl;
           i_gMeanEffectiveArea = (TGraphAsymmErrors*)i_gMeanEffectiveArea_off->Clone();
         }
 
@@ -1740,7 +1740,7 @@ double VLikelihoodFitter::getLogL_internal( const double* parms)
     // Default is 1 time bin with bin edges bins MJD min/max
     // Only one instance of when this is not 1 time bin
     // That is when used to get time-aveged (yet temporally binned) fit
-    for (int ntimebin = 0 ; ntimebin < fNRunsInBin.size(); ntimebin++ )
+    for( unsigned int ntimebin = 0 ; ntimebin < fNRunsInBin.size(); ntimebin++ )
     {
 
       // Checking bin has data
@@ -2605,9 +2605,7 @@ TGraphAsymmErrors* VLikelihoodFitter::getEnergySpectrum(TF1 *iBestFit, bool bPri
     for (unsigned int i = 0; i < fNParms; i++)
     {
         cout << fParmName[i] << " : " << parms[i] << endl;
-
     }
-
 
     // Deleting any previous saved spectra
     if (fEnergySpectrum)
@@ -2620,7 +2618,8 @@ TGraphAsymmErrors* VLikelihoodFitter::getEnergySpectrum(TF1 *iBestFit, bool bPri
     for (int i = 0 ; i < fNEnergyBins; i++)
     {
         // Excluding bins outside of the minimum and maximum energy range
-        if ( ( fEnergyBins[i] < iGlobalMin ) ||   (fEnergyBins[i] > iGlobalMax || fEnergyBins[i+1] > iGlobalMax)  )
+        // if ( ( fEnergyBins[i] < iGlobalMin ) ||   (fEnergyBins[i] > iGlobalMax || fEnergyBins[i+1] > iGlobalMax)  )
+        if ( ( fEnergyBins[i] < iGlobalMin ) ||   (fEnergyBins[i] > iGlobalMax)  )
         {
             continue;
         }
@@ -2642,8 +2641,6 @@ TGraphAsymmErrors* VLikelihoodFitter::getEnergySpectrum(TF1 *iBestFit, bool bPri
     setEnergyFitMinMaxLog(iGlobalMin, iGlobalMax);
     setNormalisationEnergyLinear(iGlobalNorm);
     setModel(fModelID, iGlobalNorm);
-
-
 
     cout << "Bin No.\tE\t\tEMin\t\tEMax\tdN/dE\terr(dN/dE)_low\terr(dN/dE)_high\tTS\tLog-Likelihood\tFitStatus\n";
 

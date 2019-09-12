@@ -150,6 +150,9 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	// model3D analysis
 	fModel3D = false; // MODEL3DANALYSIS
 	fDirectionModel3D = false; //USEDIRECTIONMODEL3D
+
+        // likelihood analysis
+        fLikelihoodAnalysis = false;
 	
 	// if 0, use default 1D radial acceptance
 	// if >0, use alternate 2D-dependent acceptance
