@@ -987,10 +987,13 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 			iEffArea->SetBranchAddress( "e0", e0_MC );
 			iEffArea->SetBranchAddress( "eff", eff_MC );
 			// Response Matrix
-			iEffArea->SetBranchAddress( "nbins_ResMat", &nbins_ResMat );
-			iEffArea->SetBranchAddress( "ResMat_MC" , ResMat_MC );
-			iEffArea->SetBranchAddress( "ResMat_Rec" , ResMat_Rec );
-			iEffArea->SetBranchAddress( "ResMat_Rec_Err" , ResMat_Rec_Err );
+                        if( iEffArea->GetBranchStatus( "nbins_ResMat" ) )
+                        {
+                            iEffArea->SetBranchAddress( "nbins_ResMat", &nbins_ResMat );
+                            iEffArea->SetBranchAddress( "ResMat_MC" , ResMat_MC );
+                            iEffArea->SetBranchAddress( "ResMat_Rec" , ResMat_Rec );
+                            iEffArea->SetBranchAddress( "ResMat_Rec_Err" , ResMat_Rec_Err );
+                        }
 	}
 
 	if( iEffArea->GetBranchStatus( "hEsysMCRelative" ) )
