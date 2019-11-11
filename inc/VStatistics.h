@@ -210,7 +210,7 @@ namespace VStatistics
 	
 	    CL    = confidence limit (e.g. 0.99 for 99% probability)
 	*/
-	inline double calcUpperLimit( double nOn, double nOff, double ratio, double CL, int iMethod = 0 )
+	inline double calcUpperLimit( double nOn, double nOff, double ratio, double CL, int iMethod = 0, int iBoundedLimits = true )
 	{
 		// Helene taking ratio into account
 		if( iMethod == 0 || iMethod == 2 )
@@ -269,6 +269,7 @@ namespace VStatistics
 		{
 			TRolke i_Rolke;
 			i_Rolke.SetCL( CL );
+            i_Rolke.SetBounding( iBoundedLimits );
 			
 			double sdb = ratio * sqrt( nOff );
 			
@@ -282,6 +283,7 @@ namespace VStatistics
 		{
 			TRolke i_Rolke;
 			i_Rolke.SetCL( CL );
+            i_Rolke.SetBounding( iBoundedLimits );
 			i_Rolke.SetPoissonBkgKnownEff( ( int )nOn, ( int )nOff, 1. / ratio, 1. );
 			
 			return i_Rolke.GetUpperLimit();
