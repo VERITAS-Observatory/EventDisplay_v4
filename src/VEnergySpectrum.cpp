@@ -1472,7 +1472,7 @@ void VEnergySpectrum::plotFitValues()
 		i_ecutoffE = fEnergy->GetParError( 2 );
 		
 		// 2) power law with exponential cutoff
-		sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f}e^{E/(%.2f#pm%.2f)} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE, i_ecutoffV, i_ecutoffE );
+		sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f}e^{-E/(%.2f#pm%.2f)} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE, i_ecutoffV, i_ecutoffE );
 	}
 	else if( fSpectralFitFunction == 2 )
 	{

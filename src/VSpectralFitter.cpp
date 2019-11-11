@@ -260,6 +260,25 @@ void VSpectralFitter::print()
 		}
 		cout << endl;
 	}
+        else if( fSpectralFitFunction == 1 )
+	{
+		cout << "Results for power law fit with exponential cutoff: " << endl;
+		cout << "--------------------------" << endl;
+		cout << "dN/dE = I x (E/" << fSpectralFitFluxNormalisationEnergy << " TeV)^{-Gamma}" << endl;
+		cout << "I = " << scientific << setprecision( 2 ) << fFitFunction->GetParameter( 0 );
+		cout << " +- " << fFitFunction->GetParError( 0 ) << " cm^-2s^-1TeV^-1" << endl;
+		cout << "Gamma = " << fixed << setprecision( 2 ) << fFitFunction->GetParameter( 1 );
+		cout << " +- " << fFitFunction->GetParError( 1 ) << endl;
+                cout << "Ecut = " << fixed << setprecision( 2 ) << fFitFunction->GetParameter( 2 );
+                cout << " +- " << fFitFunction->GetParError( 2 ) << " TeV" << endl;
+		cout << "Chi2 " << setprecision( 2 ) << fFitFunction->GetChisquare();
+		cout << ", N = " << fFitFunction->GetNDF();
+		if( fFitFunction->GetNDF() > 0. )
+		{
+			cout << " (Chi2/N=" << fFitFunction->GetChisquare() / fFitFunction->GetNDF() << ")" << endl;
+		}
+		cout << endl;
+        }
 }
 
 /*
