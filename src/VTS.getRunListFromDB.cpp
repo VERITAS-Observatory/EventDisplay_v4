@@ -32,7 +32,7 @@ int getRuns = 0;
 int timemask = 0;
 int verbose = 0;
 unsigned int runnumber = 0;
-bool bCheckSums = true;
+bool bCheckSums = false;
 
 int main( int argc, char* argv[] )
 {
