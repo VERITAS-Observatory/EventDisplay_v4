@@ -50,6 +50,7 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 
 # EventDisplay version
 EDVERSION=`$EVNDISPSYS/bin/makeEffectiveArea --version | tr -d .| sed -e 's/[a-Z]*$//'`
+EDVERSION=`$EVNDISPSYS/bin/makeEffectiveArea --version | tr -d .`
 
 # Parse command line arguments
 CUTSFILE="$1"
