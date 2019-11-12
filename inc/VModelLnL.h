@@ -1,4 +1,4 @@
-//! VModelLnL (adapted from Matthew Wood's SLAC analysis)
+//! VModelLnL 
 //! Poisson likelihood function for a model analysis.
 
 #ifndef VMODELLNL_H

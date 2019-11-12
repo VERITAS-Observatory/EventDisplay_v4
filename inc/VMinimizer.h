@@ -1,4 +1,4 @@
-//! VMinimizer (adapted from Matthew Wood's SLAC analysis)
+//! VMinimizer 
 
 #ifndef VMINIMIZER_H
 #define VMINIMIZER_H
@@ -237,7 +237,7 @@ class VSVD
 class VMinimizerFactory
 {
 	private:
-		static auto_ptr<VMinimizerFactory> fInstance;
+		static unique_ptr<VMinimizerFactory> fInstance;
 		static string       fDefaultMinimizer;
 		static double       fDefaultTolerance;
 		static unsigned int fDefaultMaxIterations;
