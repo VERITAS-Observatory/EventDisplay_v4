@@ -111,6 +111,7 @@ ifeq ($(origin GSLSYS), undefined)
     GSLFLAG=-DNOGSL
   endif
 endif
+GSLFLAG=-DNOGSL
 
 ifneq ($(GSLFLAG),-DNOGSL)
 # check GSL version
@@ -205,13 +206,14 @@ endif
 ########################################################
 ifneq ($(VBFFLAG),-DNOVBF)
 VBFCFLAGS     = -I$(VBFSYS)/include/VBF/
-VBFLIBS       = $(shell vbfConfig --ldflags --libs)
+VBFLIBS       = $(shell $(VBFSYS)/bin/vbfConfig --ldflags --libs)
 CXXFLAGS     += $(VBFCFLAGS)
 #GLIBS        += $(VBFLIBS)
 endif
 ########################################################
 # GSL FLAGS
 ########################################################
+GSLFLAG=-DNOGSL
 ifneq ($(GSLFLAG),-DNOGSL)
 GSLCFLAGS    = $(shell gsl-config --cflags)
 GSLLIBS      = $(shell gsl-config --libs)
