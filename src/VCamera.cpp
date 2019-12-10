@@ -1685,10 +1685,9 @@ void VCamera::drawAnaResults()
 				fMCShowerDir->SetMarkerSize( 2. );
 				fMCShowerDir->Draw();
 			}
-			// JG: draw Model3D shower
 			if( fData->getRunParameter()->fUseDisplayModel3D )
 			{
-				fModel3DShowerDir = new TMarker( convertX( fData->getModel3DParameters()->fXoffModel3D ), convertY( -1.*fData->getModel3DParameters()->fYoffModel3D ), 29 );
+				fModel3DShowerDir = new TMarker( 0, 0, 29 );
 				fModel3DShowerDir->SetMarkerColor( 3 );
 				fModel3DShowerDir->SetMarkerSize( 2. );
 				fModel3DShowerDir->Draw();

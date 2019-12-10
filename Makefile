@@ -383,15 +383,6 @@ FROGSOBJECTS =	./obj/VFrogs.o \
                 ./obj/frogs.o \
                 ./obj/VFrogsParameters.o
 
-MODELOBJECTS =  ./obj/VMinimizer.o \
-		./obj/VModel3DFn.o \
-		./obj/VModel3DData.o \
-		./obj/VModel3DParameters.o \
-		./obj/VModelLnL.o \
-		./obj/VModel3D.o \
-		./obj/VEmissionHeightCalculator.o
-
-EVNOBJECTS += $(MODELOBJECTS) 
 
 ifneq ($(ARCH),Darwin)
 EVNOBJECTS += ./obj/VDisplay_Dict.o
@@ -433,7 +424,7 @@ endif
 ########################################################
 # lookup table code (mscw_energy)
 ########################################################
-MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Cmodel3Dpars.o ./obj/Ctpars.o \
+MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o \
                 ./obj/Ctelconfig.o ./obj/VTableLookupDataHandler.o ./obj/VTableCalculator.o \
 		./obj/VTableEnergyCalculator.o ./obj/VTableLookup.o ./obj/VTablesToRead.o \
 		./obj/VEmissionHeightCalculator.o \
@@ -622,17 +613,6 @@ anasum:	$(ANASUMOBJECTS)
 	@echo "$@ done"
 
 ########################################################
-# energy3d (alternative for mscw_energy (better?))
-########################################################
-./obj/energy3d.o:	./src/energy3d.cpp ./inc/energy3d.h
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-ENERGY3DOBJECTS = ./obj/energy3d.o
-
-energy3d: $(ENERGY3DOBJECTS)
-	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
-
-########################################################
 # shared library for root analysis
 ########################################################
 
@@ -706,7 +686,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VUtilities.o \
 		./obj/VPlotRadialAcceptance.o ./obj/VPlotRadialAcceptance_Dict.o \
 		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
-		./obj/Cshowerpars.o ./obj/Cmodel3Dpars.o \
+		./obj/Cshowerpars.o \
 		./obj/Ctpars.o \
 		./obj/VPlotEvndispReconstructionParameter.o ./obj/VPlotEvndispReconstructionParameter_Dict.o \
 		./obj/VImageParameter.o  \
@@ -1659,11 +1639,10 @@ $(ctapara):
 # VTS.effectiveareas (required)
 # VTS.radialacceptances (required)
 # VTS.dispBDTs (optional)
-# VTS.Model3D (optional)
 # VTS.Frogs (optional) : Frogs related templates and parameter files
 #
 
-VTS.auxfiles:	$(vtspara).runfiles.tar.gz $(vtspara).calibration.tar.gz $(vtspara).lookuptables.tar.gz $(vtspara).effectiveareas.tar.gz $(vtspara).radialacceptances.tar.gz $(vtspara).VTS.GammaHadron_BDTs $(vtspara).dispBDTs.tar.gz $(vtspara).Model3D.tar.gz $(vtspara).Frogs.tar.gz
+VTS.auxfiles:	$(vtspara).runfiles.tar.gz $(vtspara).calibration.tar.gz $(vtspara).lookuptables.tar.gz $(vtspara).effectiveareas.tar.gz $(vtspara).radialacceptances.tar.gz $(vtspara).VTS.GammaHadron_BDTs $(vtspara).dispBDTs.tar.gz 
 
 VTS.runfiles:	$(vtspara).runfiles.tar.gz
 VTS.calibration:	$(vtspara).calibration.tar.gz
@@ -1672,8 +1651,6 @@ VTS.effectiveareas:	$(vtspara).effectiveareas.tar.gz
 VTS.radialacceptances:	$(vtspara).radialacceptances.tar.gz
 VTS.GammaHadronBDTs:	$(vtspara).GammaHadron_BDTs.tar.gz
 VTS.dispBDTs:	$(vtspara).dispBDTs.tar.gz
-VTS.Model3D:	$(vtspara).Model3D.tar.gz
-VTS.Frogs:	$(vtspara).Frogs.tar.gz
 
 ######
 # VTS runparameter files
@@ -1816,18 +1793,6 @@ $(vtspara).GammaHadron_BDTs.tar.gz:
 	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/GammaHadron_BDTs/V* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/GammaHadron_BDTs/
 #	make tar file
 	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).GammaHadron_BDTs.tar.gz . && cd ..
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
-
-######
-# VTS Model3D files
-
-$(vtspara).Model3D.tar.gz:
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).Model3D.tar.gz  >/dev/null 2>&1
-	rm -rf $(distdir) >/dev/null 2>&1
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Model3D
-	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/Model3D/*.root $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Model3D/
-#	make tar file
-	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).Model3D.tar.gz . && cd ..
 	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
 
 ######

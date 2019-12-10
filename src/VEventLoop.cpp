@@ -140,16 +140,6 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 		fFrogs = new VFrogs();
 	} 
 #endif
-	// Model3D
-	if( fRunPar->fUseModel3D) { 
-		fModel3D = new VModel3D();
-		if( fRunPar->fCreateLnLTable )
-		{
-			fModel3D->createLnLTable();
-			fRunPar->fUseModel3D = false;
-			exit( EXIT_FAILURE ); 
-		}
-	}
 	// reset cut strings and variables
 	resetRunOptions();
 }
@@ -823,10 +813,6 @@ void VEventLoop::shutdown()
 		{
 			fArrayAnalyzer->terminate( fDebug_writing );
 		}
-		if( fRunPar->fUseModel3D && fModel3D )
-		{
-			fModel3D->terminate();
-		}
 #ifndef NOGSL
 		if( fRunPar->ffrogsmode )
 		{
@@ -1459,11 +1445,6 @@ int VEventLoop::analyzeEvent()
 #endif
 		{
 			fArrayAnalyzer->doAnalysis();
-			// Model3D analysis
-			if( fRunPar->fUseModel3D && fReader->hasArrayTrigger() )
-			{
-				fModel3D->doModel3D();
-			}
 			// Frogs Analysis
 #ifndef NOGSL
 			if( fRunPar->ffrogsmode )
