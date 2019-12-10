@@ -24,7 +24,6 @@
 #include "TKey.h"
 
 #include "Cshowerpars.h"
-#include "Cmodel3Dpars.h"
 #include "Ctelconfig.h"
 #include "Ctpars.h"
 
@@ -84,7 +83,6 @@ class VTableLookupDataHandler
 		TChain* fTshowerpars;
 		Cshowerpars* fshowerpars;
 		TChain* fTmodel3Dpars;
-		Cmodel3Dpars* fmodel3Dpars;
 		TKey* fKeyModel3D;
 		TChain* fTtelconfig;
 		Ctelconfig* ftelconfig;

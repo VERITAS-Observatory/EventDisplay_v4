@@ -22,7 +22,6 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	fTshowerpars = 0;
 	fshowerpars = 0;
 	fTmodel3Dpars = 0;
-	fmodel3Dpars = 0;
 	fOTree = 0;
 	fShortTree = fTLRunParameter->bShortTree;
 	bWriteMCPars = fTLRunParameter->bWriteMCPars;
@@ -272,11 +271,6 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 	{
 		return -1;
 	}
-	if( fIsModel3D )
-	{
-		fmodel3Dpars->GetEntry( fEventCounter );
-	}
-	
 	// count all events
 	fNStats_All++;
 	////////////////////////////////////////////////////
@@ -382,25 +376,6 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 	fXoff_derot = fshowerpars->XoffDeRot[fMethod];
 	fYoff_derot = fshowerpars->YoffDeRot[fMethod];
 	fDispDiff = fshowerpars->DispDiff[fMethod];
-	// fill Model3D parameters
-	if( fIsModel3D )
-	{
-		fSmax3D = fmodel3Dpars->Smax3D;
-		fsigmaL3D = fmodel3Dpars->sigmaL3D;
-		fsigmaT3D = fmodel3Dpars->sigmaT3D;
-		fNc3D = fmodel3Dpars->Nc3D;
-		fXcore3D = fmodel3Dpars->Xcore3D;
-		fYcore3D = fmodel3Dpars->Ycore3D;
-		fXoff3D = fmodel3Dpars->Xoff3D;
-		fYoff3D = fmodel3Dpars->Yoff3D;
-		fXoffDeRot3D = fmodel3Dpars->XoffDeRot3D;
-		fYoffDeRot3D = fmodel3Dpars->YoffDeRot3D;
-		fGoodness3D = fmodel3Dpars->Goodness3D;
-		fDepth3D = fmodel3Dpars->Depth3D;
-		fRWidth3D = fmodel3Dpars->RWidth3D;
-		fErrRWidth3D = fmodel3Dpars->ErrRWidth3D;
-		fConverged3D = fmodel3Dpars->Converged3D;
-	}
 	
 	fImgSel = ( ULong64_t )fshowerpars->ImgSel[fMethod];
 	unsigned int ii = 0;
@@ -833,7 +808,6 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 			cout << "input data is of eventdisplay short tree output format (" << bShort << ")" << endl;
 		}
 		fshowerpars = new Cshowerpars( fTshowerpars, fIsMC, fEventDisplayFileFormat, bShort );
-		fmodel3Dpars = new Cmodel3Dpars( fTmodel3Dpars );
 		fIsMC = fshowerpars->isMC();
 	}
 	else
