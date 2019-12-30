@@ -21,7 +21,7 @@ required parameters:
                             (e.g., soft2tel, moderate3tel, moderateExt2tel, BDTmoderate2tel, etc.)
     
     <background model>      background model
-                            (RE = reflected region, RB = ring background)
+                            (RE = reflected region, RB = ring background, IGNOREACCEPTANCE = RE without ACCEPTANCE)
     
 optional parameters:
 
@@ -139,6 +139,7 @@ elif [[ $CUT == *ExtendedSource-* ]]; then
     CUTRADACC=${CUT/-ExtendedSource-/"-"}
     echo $CUTRADACC
 fi
+
 RADACC="radialAcceptance-${IRFVERSION}-${AUXVERSION}-${SIMTYPE}-Cut-${CUTRADACC}-${METH}-VX-TX.root"
 
 echo $CUTFILE
@@ -149,6 +150,10 @@ echo $RADACC
 if [[ "$BACKGND" == *RB* ]]; then
     BM="RB"
     BMPARAMS="0.6 20"
+elif [[ "$BACKGND" == *IGNOREACCEPTANCE* ]]; then
+    BM="RE"
+    BMPARAMS="0.1 2 6"
+    RADACC="IGNOREACCEPTANCE"
 elif [[ "$BACKGND" == *RE* ]]; then
     BM="RE"
     BMPARAMS="0.1 2 6"
@@ -212,9 +217,13 @@ for RUN in ${RUNS[@]}; do
     EFFAREARUN=${EFFAREA/VX/$EPOCH}
     EFFAREARUN=${EFFAREARUN/TX/$TELTOANA}
     EFFAREARUN=${EFFAREARUN/XX/$ATMO}
-    RADACCRUN=${RADACC/VX/$EPOCH}
-    RADACCRUN=${RADACCRUN/TX/$TELTOANA}
-
+    if [ "$RADACC" != "IGNOREACCEPTANCE" ]; then 
+        RADACCRUN=${RADACC/VX/$EPOCH}
+        RADACCRUN=${RADACCRUN/TX/$TELTOANA}
+    else
+        RADACCRUN=$RADACC
+    fi
+    
     if [[ $CUTS = *frogs* ]]; then
        RADACCRUN="radialAcceptance-v470-auxv01-CARE_June1425-Cut-NTel2-PointSource-Moderate-GEO-V6-T1234.root"
        EFFAREARUN="effArea-v461-141017-CARE-N2_001-003-005CU_index2.5-GEO-V6-ATM21-T1234.root"
