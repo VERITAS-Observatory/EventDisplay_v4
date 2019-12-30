@@ -40,9 +40,9 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	fmaxdist = 50000.;
 	fSelectRandom = -1.;
 	fSelectRandomSeed = 17;
-	fMSCWSizecorrection = 1.;
-	fMSCLSizecorrection = 1.;
-	fEnergySizecorrection = 1.;
+	//fMSCWSizecorrection = 1.;
+	//fMSCLSizecorrection = 1.;
+	//fEnergySizecorrection = 1.;
 	
 	fLimitEnergyReconstruction = false;
 	
@@ -256,17 +256,67 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 				writeoption = "recreate";
 			}
 		}
+		else if( iTemp.find( "-sizecorrect" ) < iTemp.size() )
+		{
+                        float _scale;
+                        iTemp = iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() );
+                        for (unsigned long int k=0; k<999; k++)
+                        {
+                            _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+                            fMSCWSizecorrection.push_back(_scale);
+                            fMSCLSizecorrection.push_back(_scale);
+                            fEnergySizecorrection.push_back(_scale);
+                            if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
+                            {
+                                break;
+                            }
+                            iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+                        }
+		}
 		else if( iTemp.find( "-sizemscwcorrect" ) < iTemp.size() )
 		{
-			fMSCWSizecorrection = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+                        float _scale;
+                        iTemp = iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() );
+                        for (unsigned long int k=0; k<999; k++)
+                        {
+                            _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+                            fMSCWSizecorrection.push_back(_scale);
+                            if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
+                            {
+                                break;
+                            }
+                            iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+                        }
 		}
 		else if( iTemp.find( "-sizemsclcorrect" ) < iTemp.size() )
 		{
-			fMSCLSizecorrection = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+                        float _scale;
+                        iTemp = iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() );
+                        for (unsigned long int k=0; k<999; k++)
+                        {
+                            _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+                            fMSCLSizecorrection.push_back(_scale);
+                            if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
+                            {
+                                break;
+                            }
+                            iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+                        }
 		}
 		else if( iTemp.find( "-sizeenergycorrect" ) < iTemp.size() )
 		{
-			fEnergySizecorrection = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+                        float _scale;
+                        iTemp = iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() );
+                        for (unsigned long int k=0; k<999; k++)
+                        {
+                            _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+                            fEnergySizecorrection.push_back(_scale);
+                            if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
+                            {
+                                break;
+                            }
+                            iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+                        }
 		}
 		else if( iTemp.find( "-noNo" ) < iTemp.size() )
 		{
@@ -527,18 +577,29 @@ void VTableLookupRunParameter::print( int iP )
 		        else if( fInterpolate == 2 ) fInterpolateString = "gaussian";
 		        cout << "interpolate lookup tables: " << fInterpolateString << endl; */
 	}
-	if( TMath::Abs( fMSCWSizecorrection - 1. ) > 1.e-2 )
-	{
-		cout << "size correction for mscw tables: " << fMSCWSizecorrection << endl;
-	}
-	if( TMath::Abs( fMSCLSizecorrection - 1. ) > 1.e-2 )
-	{
-		cout << "size correction for mscl tables: " << fMSCLSizecorrection << endl;
-	}
-	if( TMath::Abs( fEnergySizecorrection - 1. ) > 1.e-2 )
-	{
-		cout << "size correction for energy tables: " << fEnergySizecorrection << endl;
-	}
+       
+        // Check the average scaling factors among all telescopes. If it deviates from 1, print it 
+        if( fMSCWSizecorrection.size()>0 )
+        {
+        double_t fMSCWSizecorrection_sum=0;
+        for (unsigned int iS = 0; iS<fMSCWSizecorrection.size(); iS++) fMSCWSizecorrection_sum+=fMSCWSizecorrection[iS];
+        double_t fMSCLSizecorrection_sum=0;
+        for (unsigned int iS = 0; iS<fMSCLSizecorrection.size(); iS++) fMSCLSizecorrection_sum+=fMSCLSizecorrection[iS];
+        double_t fEnergySizecorrection_sum=0;
+        for (unsigned int iS = 0; iS<fEnergySizecorrection.size(); iS++) fEnergySizecorrection_sum+=fEnergySizecorrection[iS];
+            if( TMath::Abs( fMSCWSizecorrection_sum/fMSCWSizecorrection.size() -1 ) > 1.e-2 )
+            {
+                    cout << "Mean size correction for mscw tables: " << fMSCWSizecorrection_sum/fMSCWSizecorrection.size() << endl;
+            }
+            if( TMath::Abs( fMSCLSizecorrection_sum/fMSCLSizecorrection.size() - 1. ) > 1.e-2 )
+            {
+                    cout << "Mean size correction for mscl tables: " << fMSCLSizecorrection_sum/fMSCLSizecorrection.size() << endl;
+            }
+            if( TMath::Abs( fEnergySizecorrection_sum/fEnergySizecorrection.size() - 1. ) > 1.e-2 )
+            {
+                    cout << "Mean size correction for energy tables: " << fEnergySizecorrection_sum/fEnergySizecorrection.size() << endl;
+            }
+        }
 	
 	if( iP >= 1 )
 	{

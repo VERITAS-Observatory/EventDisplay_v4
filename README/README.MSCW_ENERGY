@@ -76,6 +76,12 @@ Additional options for table filling:
 	 -mindistancetocameracenter=FLOAT  minimum distance of events from camera center (MC distance, default = -1.e10)
 	 -maxdistancetocameracenter=FLOAT  maximum distance of events from camera center (MC distance, default =  1.e10)
 	 -minImages=INT          minimum number of images required per event (comparator geq, default=2)
+         (general corrections, optional)
+         -sizecorrect=FLOAT,FLOAT,FLOAT,...      apply correction to the size in the mscw/mscl/energy table [experimental]
+         (individual corrections, optional, overwrites general corrections)
+         -sizemscwcorrect=FLOAT,FLOAT,FLOAT,...  apply correction to the size in the mscw table, per telescope  [experimental]
+         -sizemsclcorrect=FLOAT,FLOAT,FLOAT,...  apply correction to the size in the mscl table     [experimental]
+         -sizeenergycorrect=FLOAT,FLOAT,FLOAT,...  apply correction to the size in the energy table [experimental]
 
 Additional options for table reading:
 

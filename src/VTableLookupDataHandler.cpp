@@ -2270,6 +2270,7 @@ double* VTableLookupDataHandler::getDistanceToCore( ULong64_t iTelType )
 	return fR_telType;
 }
 
+// Old classes (global one-for-all-telescope scaling)
 double* VTableLookupDataHandler::getSize( double iSizeCorrection, bool iSelectedImagesOnly, bool iSize2 )
 {
 	for( unsigned int i = 0; i < getNTel(); i++ )
@@ -2311,6 +2312,64 @@ double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTe
 			else
 			{
 				fsize_telType[z] = fsize2[i] * iSizeCorrection;
+			}
+			z++;
+		}
+	}
+	return fsize_telType;
+}
+
+double* VTableLookupDataHandler::getSize( vector<double> iSizeCorrection, bool iSelectedImagesOnly, bool iSize2 )
+{
+        while (iSizeCorrection.size() < getNTel())
+        {
+            //std::cout << "Warning, not enough size scales, appending 1. " << std::endl;
+            iSizeCorrection.push_back(1);
+        }
+	for( unsigned int i = 0; i < getNTel(); i++ )
+	{
+		if( iSelectedImagesOnly && !fImgSel_list[i] )
+		{
+			fsizeCorr[i] = -99.;
+			continue;
+		}
+		if( !iSize2 )
+		{
+			fsizeCorr[i] = fsize[i] * iSizeCorrection[i];
+		}
+		else
+		{
+			fsizeCorr[i] = fsize2[i] * iSizeCorrection[i];
+		}
+	}
+	return fsizeCorr;
+}
+
+double* VTableLookupDataHandler::getSize( vector<double> iSizeCorrection,  ULong64_t iTelType, bool iSelectedImagesOnly, bool iSize2 )
+{
+	unsigned int z = 0;
+        while (iSizeCorrection.size() < getNTel())
+        {
+            //std::cout << "Warning, not enough size scales, required " << getNTel() << ", have " << iSizeCorrection.size() << ", appending 1. " << std::endl;
+            iSizeCorrection.push_back(1);
+        }
+	for( unsigned int i = 0; i < getNTel(); i++ )
+	{
+		if( fTel_type[i] == iTelType )
+		{
+			if( iSelectedImagesOnly && !fImgSel_list[i] )
+			{
+				fsize_telType[z] = -99.;
+				z++;
+				continue;
+			}
+			if( !iSize2 )
+			{
+				fsize_telType[z] = fsize[i] * iSizeCorrection[i];
+			}
+			else
+			{
+				fsize_telType[z] = fsize2[i] * iSizeCorrection[i];
 			}
 			z++;
 		}

@@ -13,8 +13,10 @@ if [[ "$ISPIPEFILE" =~ ^/dev/pts/[0-9]{1,2} ]] ; then # its a terminal (not a pi
 		echo "    $ `basename $0` 4 <file of runs>"
 		echo "  for just V5 runs, do"
 		echo "    $ `basename $0` 5 <file of runs>"
+		echo "  for just V6_2014 and V6_2015 (scaling tests, do not use in production) runs, do"
+		echo "    $ `basename $0` 6_2014,6_2015 <file of runs>"
 		echo "  to print all V5 and V6 runs, do"
-		echo "    $ `basename $0` 56 <file of runs>"
+		echo "    $ `basename $0` 5,6 <file of runs>"
 		exit
 	fi
 fi
@@ -32,9 +34,35 @@ RUNLIST=`cat $RUNFILE`
 
 # how should we get the array epochs?
 # only change this if you know what you're doing!
-METHOD="useparamfile"
+METHOD="irfperiod"
 
-#Paramfile method
+if [[ "$METHOD" == "irfperiod" ]]; then	
+    # epoch file to load
+    PARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/VERITAS.Epochs.runparameter"
+	
+    # get only lines that start with '*'
+    EPOCHTHRESH=$( cat $PARAMFILE | grep -P "^\s??\*" | grep "IRFPERIOD" | grep -P "V\d" )
+    AVAILABLEEPOCHS=$( echo "$EPOCHTHRESH" | awk '{ print $3 }' )
+    DESIREDPERIODS=$( echo "$INPUTEPOCH" | sed 's/\,/ /g' | sed 's/\;/ /g' | tr " " "\n" )
+    # loop over runs in runlist
+    for run in ${RUNLIST[@]}; do
+        # loop through all epochs in the list of available epochs
+        for epoch in $AVAILABLEEPOCHS; do
+            # check if the run is in the list of desired epochs
+            for period in $DESIREDPERIODS; do
+                MINRUN=$( echo "$EPOCHTHRESH" | grep -P "V$period " | awk '{ print $4 }' | grep -oP "\d+" )
+                MAXRUN=$( echo "$EPOCHTHRESH" | grep -P "V$period " | awk '{ print $5 }' | grep -oP "\d+" )
+                # check if the run number is within the limits of the given period.
+                if (( "$run" <= "$MAXRUN" )) && (( "$run" >= "$MINRUN" )) ; then
+		    echo "$run"
+                    break 2 # break the period and epoch loops
+		fi
+            done
+        done
+    done
+fi   
+
+#Paramfile method, hardware major periods (old)
 if [[ "$METHOD" == "useparamfile" ]] ; then
 	
 	# epoch file to load
@@ -87,13 +115,9 @@ fi
 if [[ "$METHOD" == "hardcoded" ]] ; then
 
 	# if we find 4, 5, or 6 in $1, then set appropriate flags
-	V4FLAG=false
-	V5FLAG=false
-	V6FLAG=false
 	if [[ "$INPUTEPOCH" == *4* ]] ; then V4FLAG=true ; fi
 	if [[ "$INPUTEPOCH" == *5* ]] ; then V5FLAG=true ; fi
-	if [[ "$INPUTEPOCH" == *6* ]] ; then V6FLAG=true ; fi
-
+        if [[ "$INPUTEPOCH" == *6* ]] ; then V6FLAG=true ; fi
 	# first run of V5 : 46642 
 	# first run of V6 : 63373  
 	for i in ${RUNLIST[@]} ; do

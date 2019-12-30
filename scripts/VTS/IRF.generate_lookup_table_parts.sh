@@ -55,9 +55,53 @@ RECID=$6
 SIMTYPE=$7
 PARTICLE_TYPE="gamma"
 
+# Hack to scale sizes based on epochs to approx. correct for drop in reflectivity+gain.
+_sizecallineraw=$(grep "* T " ${VERITAS_EVNDISP_AUX_DIR}/ParameterFiles/MSCW.sizecal.runparameter | grep " ${EPOCH} ")
+EPOCH_LABEL=$(echo "$_sizecallineraw" | awk '{print $3}')
+EPOCH_RUNSTART=$(echo "$_sizecallineraw" | awk '{print $4}')
+EPOCH_RUNSTOP=$(echo "$_sizecallineraw" | awk '{print $5}')
+EPOCH_T1SCALE=$(echo "$_sizecallineraw" | awk '{print $6}')
+EPOCH_T2SCALE=$(echo "$_sizecallineraw" | awk '{print $7}')
+EPOCH_T3SCALE=$(echo "$_sizecallineraw" | awk '{print $8}')
+EPOCH_T4SCALE=$(echo "$_sizecallineraw" | awk '{print $9}')
+EPOCH_SIMS=$(echo "$EPOCH_LABEL" | awk -F"_" '{print $1}')
+
+# Validation of the line
+if [ "${EPOCH_SIMS}" != "V4" ]&&[ "${EPOCH_SIMS}" != "V5" ]&&[ "${EPOCH_SIMS}" != "V6" ]; then
+    echo "$EPOCH LABEL ${EPOCH_LABEL} should include either V4, V5 or V6 plus maybe a suffix separated by _"
+    exit 1
+fi
+if ! [[ "${EPOCH_RUNSTART}" > 0 ]]&&[[ "${EPOCH_RUNSTART}" < 999999 ]]; then
+    echo "RUNSTART ${EPOCH_RUNSTART} should be an integer"
+    exit 1
+fi
+if ! [[ "${EPOCH_RUNSTOP}" > 0 ]]&&[[ "${EPOCH_RUNSTOP}" < 999999 ]]; then
+    echo "RUNSTART ${EPOCH_RUNSTART} should be an integer"
+    exit 1
+fi
+if ! [ $(echo ${EPOCH_T1SCALE} | awk '$1>0.0 && $1<2.0 {print 1}')==1 ]; then
+    echo "T1 SCALING ${EPOCH_T1SCALE} is invalid"
+    exit 1
+fi
+if ! [ $(echo ${EPOCH_T2SCALE} | awk '$1>0.0 && $1<2.0 {print 1}')==1 ]; then
+    echo "T2 SCALING ${EPOCH_T2SCALE} is invalid"
+    exit 1
+fi
+if ! [ $(echo ${EPOCH_T3SCALE} | awk '$1>0.0 && $1<2.0 {print 1}')==1 ]; then
+    echo "T3 SCALING ${EPOCH_T3SCALE} is invalid"
+    exit 1
+fi
+if ! [ $(echo ${EPOCH_T4SCALE} | awk '$1>0.0 && $1<2.0 {print 1}')==1 ]; then
+    echo "T4 SCALING ${EPOCH_T4SCALE} is invalid"
+    exit 1
+fi
+
+SIZESCALING="$EPOCH_T1SCALE,$EPOCH_T2SCALE,$EPOCH_T3SCALE,$EPOCH_T4SCALE"
+
 # input directory containing evndisp products
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-    INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
+    #INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
+    INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH_SIMS}_ATM${ATM}_${PARTICLE_TYPE}/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
 fi
 if [[ ! -d $INDIR ]]; then
     echo "Error, could not locate input directory. Locations searched:"
@@ -68,7 +112,7 @@ echo "Input file directory: $INDIR"
 
 # Output file directory
 if [[ ! -z $VERITAS_IRFPRODUCTION_DIR ]]; then
-    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/Tables"
+    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH_LABEL}_ATM${ATM}_${PARTICLE_TYPE}/Tables"
 fi
 echo "Output file directory: $ODIR"
 mkdir -p $ODIR
@@ -95,6 +139,7 @@ sed -e "s|ZENITHANGLE|$ZA|" \
     -e "s|ATMOSPHERE|$ATM|" \
     -e "s|RECONSTRUCTIONID|$RECID|" \
     -e "s|SIMULATIONTYPE|$SIMTYPE|" \
+    -e "s|SIZESCALING|$SIZESCALING|" \
     -e "s|INPUTDIR|$INDIR|" \
     -e "s|OUTPUTDIR|$ODIR|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
