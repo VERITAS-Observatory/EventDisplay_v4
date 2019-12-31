@@ -12,6 +12,7 @@
 
 # DESY batch farm
   qsub -V -terse -l os=sl6 -l h_cpu=$h_cpu -l h_rss=$h_vmem -l tmpdir_size=$tmpdir_size -o $LOGDIR/ -e $LOGDIR/
+  qsub -V -terse -l os=sl7 -l h_cpu=$h_cpu -l h_rss=$h_vmem -l tmpdir_size=$tmpdir_size -o $LOGDIR/ -e $LOGDIR/
 
 # DESY batch farm -- high priority
  qsub -P cta_high -V -terse -l os=sl6 -l h_cpu=$h_cpu -l h_vmem=$h_vmem -l tmpdir_size=$tmpdir_size -o $LOGDIR/ -e $LOGDIR/

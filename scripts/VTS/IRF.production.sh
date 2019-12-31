@@ -43,6 +43,11 @@ optional parameters:
 exit
 fi
 
+# We need to be in the IRF.production.sh directory so that subscripts are called
+# (we call them ./).
+olddir=$(pwd)
+cd $(dirname "$0")
+
 # Run init script
 bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
@@ -72,8 +77,13 @@ if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
        NSB_LEVELS=( 200 )
        WOBBLE_OFFSETS=( 0.5 )
     fi
+elif [ "${SIMTYPE}" = "CARE_June1702" ]; then
+    # CARE_June1702 simulation parameters
+    ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 )
+    NSB_LEVELS=( 50 75 100 130 160 200 250 300 350 400 450 )
+    WOBBLE_OFFSETS=( 0.5 )
 elif [ ${SIMTYPE:0:4} = "CARE" ]; then
-    # CARE simulation parameters
+    # Older CARE simulation parameters
     ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 60 65 )
     NSB_LEVELS=( 50 80 120 170 230 290 370 450 )
     WOBBLE_OFFSETS=( 0.5 )
@@ -89,7 +99,7 @@ fi
 # Set gamma/hadron cuts
 if [[ $CUTSLISTFILE != "" ]]; then
     if [ ! -f $CUTSLISTFILE ]; then
-        echo "Error, cuts list file not found, exiting..."
+        echo "Error, cuts list file $CUTSLISTFILE not found, exiting..."
         exit 1
     fi
     # read file containing list of cuts
@@ -223,5 +233,7 @@ for VX in $EPOCH; do
     done #ATM
 done  #VX
 
+# Go back to the original user directory.
+cd $olddir
 exit
 
