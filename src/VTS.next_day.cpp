@@ -214,8 +214,9 @@ int main( int argc, char* argv[] )
 		f.writeThetaSquareDistribution( fDebug );
 		f.writeSignificanceSkyMap( fDebug );
 		f.writeExcessSkyMap( fDebug );
-		f.writeNightlyFlux( fDebug, ( fOUTFile + ".flux" ).c_str() );
-		//f.writeEnergySpectrum( fDebug ); //Uncomment this to include the energy spectrum. Obs that this function can fail quietly, in which case the energy spectrum won't get written.
+		f.writeEnergySpectrum( fDebug ); //Uncomment this to include the energy spectrum. Obs that this function can fail quietly, in which case the energy spectrum won't get written.
+		f.writeNightlyFlux( fDebug, ( fOUTFile + "_nightly.flux" ).c_str() );
+		f.writeMonthlyFlux( fDebug, ( fOUTFile + "_monthly.flux" ).c_str() );
 		f.writeFITSFile( fDebug );
 		
 	}
