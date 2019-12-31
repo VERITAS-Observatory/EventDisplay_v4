@@ -51,9 +51,9 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		
 		bool  fUseSelectedImagesOnly;
 		
-		double fMSCWSizecorrection;
-		double fMSCLSizecorrection;
-		double fEnergySizecorrection;
+		vector<double> fMSCWSizecorrection;
+		vector<double> fMSCLSizecorrection;
+		vector<double> fEnergySizecorrection;
 		string writeoption;
 		bool bNoNoTrigger;
 		int  bWriteReconstructedEventsOnly;

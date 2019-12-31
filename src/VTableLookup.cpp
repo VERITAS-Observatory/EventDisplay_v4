@@ -674,10 +674,13 @@ void VTableLookup::fillLookupTable()
 				// get telescope type
 				ULong64_t t = iter_i_list_of_Tel_type->first;
 				
-				double* i_s2 = fData->getSize2( 1., t, fTLRunParameter->fUseSelectedImagesOnly );
+				//double* i_s2 = fData->getSize2( 1., t, fTLRunParameter->fUseSelectedImagesOnly );
 				double* i_r = fData->getDistanceToCore( t );
 				unsigned int i_type = fData->getNTel_type( t );
-				
+                                // Corrected size values ... 
+                                double* i_s2_fMSCWcorr   = fData->getSize2( fTLRunParameter->fMSCWSizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly ); 
+                                double* i_s2_fMSCLcorr   = fData->getSize2( fTLRunParameter->fMSCLSizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly ); 
+                                double* i_s2_fEnergycorr = fData->getSize2( fTLRunParameter->fEnergySizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly ); 
 				////////////////////////////////////////////////
 				// for zenith-angle == 0 deg fill all az bins
 				if( fabs( fData->getMCZe() ) < 3. )
@@ -686,16 +689,16 @@ void VTableLookup::fillLookupTable()
 					for( unsigned int a = 0; a < fTableAzBins; a++ )
 					{
 						// fill tables (get arrays filled for corresponding telescope type; one table per type)
-						fmscw[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2,
+						fmscw[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2_fMSCWcorr,
 								fData->getWidth( t ), idummy1, iEventWeight, idummy3, idummy1 );
-						fmscl[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2,
+						fmscl[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2_fMSCLcorr,
 								fData->getLength( t ), idummy1, iEventWeight, idummy3, idummy1 );
-						fenergySizevsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2, fData->getMCEnergyArray(),
-								idummy1, iEventWeight, idummy3, idummy1 );
+						fenergySizevsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2_fEnergycorr, 
+                                                                fData->getMCEnergyArray(), idummy1, iEventWeight, idummy3, idummy1 );
 						if( !fTLRunParameter->fLimitEnergyReconstruction )
 						{
 							fenergyEnergyvsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, fData->getMCEnergy(),
-									i_r, i_s2, idummy1, iEventWeight, idummy3, 0. );
+									i_r, i_s2_fEnergycorr, idummy1, iEventWeight, idummy3, 0. );
 						}
 					}
 				}
@@ -705,17 +708,17 @@ void VTableLookup::fillLookupTable()
 				{
 					unsigned int a = getAzBin( fData->getMCAz() );
 					// fill tables (get arrays filled for corresponding telescope type; one table per type)
-					fmscw[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2,
+					fmscw[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2_fMSCWcorr,
 							fData->getWidth( t ), idummy1, iEventWeight, idummy3, idummy1 );
-					fmscl[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2,
+					fmscl[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2_fMSCLcorr,
 							fData->getLength( t ), idummy1, iEventWeight, idummy3, idummy1 );
-					fenergySizevsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2, fData->getMCEnergyArray(),
-							idummy1, iEventWeight, idummy3, idummy1 );
+					fenergySizevsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2_fEnergycorr, 
+                                                        fData->getMCEnergyArray(), idummy1, iEventWeight, idummy3, idummy1 );
 							
 					if( !fTLRunParameter->fLimitEnergyReconstruction )
 					{
 						fenergyEnergyvsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, fData->getMCEnergy(),
-								i_r, i_s2, idummy1, iEventWeight, idummy3, 0. );
+								i_r, i_s2_fEnergycorr, idummy1, iEventWeight, idummy3, 0. );
 					}
 				}
 				i_Tel_type_counter++;
@@ -1439,30 +1442,35 @@ void VTableLookup::calculateMSFromTables( VTablesToRead* s, double esys )
 		return;
 	}
 	double i_dummy = 0.;
-	
-	double* i_s2 = fData->getSize2( 1., fTLRunParameter->fUseSelectedImagesOnly );
+
+        // Raw sizes, without scaling. 
+	//double* i_s2 = fData->getSize2( 1., fTLRunParameter->fUseSelectedImagesOnly );
+        // APPLY it only for MC, getSize2 gives the pointer to an array.
+        double* i_s2_fMSCWcorr   = fData->getSize2( fTLRunParameter->fMSCWSizecorrection, fTLRunParameter->fUseSelectedImagesOnly ); 
+        double* i_s2_fMSCLcorr   = fData->getSize2( fTLRunParameter->fMSCLSizecorrection, fTLRunParameter->fUseSelectedImagesOnly ); 
+        double* i_s2_fEnergycorr = fData->getSize2( fTLRunParameter->fEnergySizecorrection, fTLRunParameter->fUseSelectedImagesOnly ); 
 	
 	f_calc_msc->setCalculateEnergies( false );
 	// calculate mscw
 	f_calc_msc->setVHistograms( s->hmscwMedian );
 	s->mscw = f_calc_msc->calc( ( int )fData->getNTel(), fData->getDistanceToCore(),
-								i_s2, fData->getWidth(),
+								i_s2_fMSCWcorr, fData->getWidth(),
 								s->mscw_T, i_dummy, i_dummy, s->mscw_Tsigma );
 	// calculate mscl
 	f_calc_msc->setVHistograms( s->hmsclMedian );
 	s->mscl = f_calc_msc->calc( ( int )fData->getNTel(), fData->getDistanceToCore(),
-								i_s2, fData->getLength(),
+								i_s2_fMSCLcorr, fData->getLength(),
 								s->mscl_T, i_dummy, i_dummy, s->mscl_Tsigma );
 	// calculate energy (method 1)
 	f_calc_energySR->setCalculateEnergies( true );
 	f_calc_energySR->setVHistograms( s->henergySRMedian );
 	s->energySR = f_calc_energySR->calc( ( int )fData->getNTel(), fData->getDistanceToCore(),
-										 i_s2, 0,
+										 i_s2_fEnergycorr, 0,
 										 s->energySR_T, s->energySR_Chi2, s->energySR_dE, s->energySR_Tsigma );
 	// calculate energy (method 0)
 	f_calc_energy->setVHistograms( s->henergyERMedian );
 	s->energyER = f_calc_energy->calc( ( int )fData->getNTel(), fData->getMCEnergy(), fData->getDistanceToCore(),
-									   i_s2, s->energyER_T, s->energyER_Chi2, s->energyER_dE, esys );
+									   i_s2_fEnergycorr, s->energyER_T, s->energyER_Chi2, s->energyER_dE, esys );
 }
 
 
