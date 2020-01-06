@@ -43,6 +43,9 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	//fMSCWSizecorrection = 1.;
 	//fMSCLSizecorrection = 1.;
 	//fEnergySizecorrection = 1.;
+        fMSCWSizecorrection_mean=0;
+        fMSCLSizecorrection_mean=0;
+        fEnergySizecorrection_mean=0;
 	
         for (Int_t k=0; k<200; k++){
             // Allow for a large (200) number of telescopes. For VTS only the first 4 will be used
@@ -268,63 +271,141 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		else if( iTemp.find( "-sizecorrect" ) < iTemp.size() )
 		{
                         float _scale;
+                        int   sizecorr_ntel=0;
                         iTemp = iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() );
-                        for (unsigned long int k=0; k<999; k++)
+                        if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size() ) 
                         {
+                            // special case, user set only 1 value, assuming it is the same for all telescopes
                             _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
-                            fMSCWSizecorrection[k] = _scale;
-                            fMSCLSizecorrection[k] = _scale;
-                            fEnergySizecorrection[k] = _scale;
-                            if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
-                            {
-                                break;
+                            for (unsigned long int k=0; k<200; k++){
+                                fMSCWSizecorrection[k] = _scale;
+                                fMSCLSizecorrection[k] = _scale;
+                                fEnergySizecorrection[k] = _scale;
+                            
                             }
-                            iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+                            fMSCWSizecorrection_mean = _scale;
+                            fMSCLSizecorrection_mean = _scale;
+                            fEnergySizecorrection_mean = _scale;
+                        }                
+                        else 
+                        {                                                            
+                            // read comma separated corrections
+                            for (unsigned long int k=0; k<200; k++)
+                            {
+                                _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+                                fMSCWSizecorrection[k] = _scale;
+                                fMSCLSizecorrection[k] = _scale;
+                                fEnergySizecorrection[k] = _scale;
+                                fMSCWSizecorrection_mean += _scale;
+                                fMSCLSizecorrection_mean += _scale;
+                                fEnergySizecorrection_mean += _scale;
+                                sizecorr_ntel++;
+                                if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
+                                {
+                                    break;
+                                }
+                                iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+                            }
+                            fMSCWSizecorrection_mean = fMSCWSizecorrection_mean/sizecorr_ntel;
+                            fMSCLSizecorrection_mean = fMSCLSizecorrection_mean/sizecorr_ntel;
+                            fEnergySizecorrection_mean = fEnergySizecorrection_mean/sizecorr_ntel;
                         }
 		}
 		else if( iTemp.find( "-sizemscwcorrect" ) < iTemp.size() )
 		{
                         float _scale;
+                        int   sizecorr_ntel=0;
                         iTemp = iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() );
-                        for (unsigned long int k=0; k<200; k++)
+
+                        if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size() ) 
                         {
+                            // special case, user set only 1 value, assuming it is the same for all telescopes
                             _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
-                            fMSCWSizecorrection[k] = _scale;
-                            if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
-                            {
-                                break;
+                            for (unsigned long int k=0; k<200; k++){
+                                fMSCWSizecorrection[k] = _scale;
+                            
                             }
-                            iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+                            fMSCWSizecorrection_mean = _scale;
+                        }                
+                        else 
+                        {                                                           
+                            // read comma separated corrections
+                            for (unsigned long int k=0; k<200; k++)
+                            {
+                                _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+                                fMSCWSizecorrection[k] = _scale;
+                                fMSCWSizecorrection_mean += _scale;
+                                sizecorr_ntel++;
+                                if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size() )
+                                {
+                                    break;
+                                }
+                                iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+                            }
+                            fMSCWSizecorrection_mean = fMSCWSizecorrection_mean/sizecorr_ntel;
                         }
 		}
 		else if( iTemp.find( "-sizemsclcorrect" ) < iTemp.size() )
 		{
                         float _scale;
                         iTemp = iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() );
-                        for (unsigned long int k=0; k<200; k++)
+                        if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size() ) 
                         {
+                            // special case, user set only 1 value, assuming it is the same for all telescopes
                             _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
-                            fMSCLSizecorrection[k] = _scale;
-                            if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
-                            {
-                                break;
+                            for (unsigned long int k=0; k<200; k++){
+                                fMSCLSizecorrection[k] = _scale;
+                            
                             }
-                            iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+                            fMSCLSizecorrection_mean = _scale;
+                        }                
+                        else
+                        {
+                            // read comma separated corrections
+                            for (unsigned long int k=0; k<200; k++)
+                            {
+                                _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+                                fMSCLSizecorrection[k] = _scale;
+                                fMSCLSizecorrection_mean += _scale;
+                                sizecorr_ntel++;
+                                if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
+                                {
+                                    break;
+                                }
+                                iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+                            }
+                            fMSCLSizecorrection_mean = fMSCLSizecorrection_mean/sizecorr_ntel;
                         }
 		}
 		else if( iTemp.find( "-sizeenergycorrect" ) < iTemp.size() )
 		{
                         float _scale;
                         iTemp = iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() );
-                        for (unsigned long int k=0; k<200; k++)
+                        if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size() ) 
                         {
+                            // special case, user set only 1 value, assuming it is the same for all telescopes
                             _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
-                            fEnergySizecorrection[k]=_scale;
-                            if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
-                            {
-                                break;
+                            for (unsigned long int k=0; k<200; k++){
+                                fEnergySizecorrection[k] = _scale;
+                            
                             }
-                            iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+                            fEnergySizecorrection_mean = _scale;
+                        }                
+                        else
+                        {
+                            // read comma separated corrections
+                            for (unsigned long int k=0; k<200; k++)
+                            {
+                                _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+                                fEnergySizecorrection[k] = _scale;
+                                fEnergySizecorrection_mean += _scale;
+                                if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
+                                {
+                                    break;
+                                }
+                                iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+                            }
+                            fEnergySizecorrection_mean = fEnergySizecorrection_mean/sizecorr_ntel;
                         }
 		}
 		else if( iTemp.find( "-noNo" ) < iTemp.size() )
@@ -588,26 +669,17 @@ void VTableLookupRunParameter::print( int iP )
 	}
        
         // Check the average scaling factors among all telescopes. If it deviates from 1, print it 
-        if( fMSCWSizecorrection.size()>0 )
+        if( fMSCWSizecorrection_mean!=0 && TMath::Abs( fMSCWSizecorrection_mean - 1. ) > 1.e-2 )
         {
-        double_t fMSCWSizecorrection_sum=0;
-        for (unsigned int iS = 0; iS<fMSCWSizecorrection.size(); iS++) fMSCWSizecorrection_sum+=fMSCWSizecorrection[iS];
-        double_t fMSCLSizecorrection_sum=0;
-        for (unsigned int iS = 0; iS<fMSCLSizecorrection.size(); iS++) fMSCLSizecorrection_sum+=fMSCLSizecorrection[iS];
-        double_t fEnergySizecorrection_sum=0;
-        for (unsigned int iS = 0; iS<fEnergySizecorrection.size(); iS++) fEnergySizecorrection_sum+=fEnergySizecorrection[iS];
-            if( TMath::Abs( fMSCWSizecorrection_sum/fMSCWSizecorrection.size() -1 ) > 1.e-2 )
-            {
-                    cout << "Mean size correction for mscw tables: " << fMSCWSizecorrection_sum/fMSCWSizecorrection.size() << endl;
-            }
-            if( TMath::Abs( fMSCLSizecorrection_sum/fMSCLSizecorrection.size() - 1. ) > 1.e-2 )
-            {
-                    cout << "Mean size correction for mscl tables: " << fMSCLSizecorrection_sum/fMSCLSizecorrection.size() << endl;
-            }
-            if( TMath::Abs( fEnergySizecorrection_sum/fEnergySizecorrection.size() - 1. ) > 1.e-2 )
-            {
-                    cout << "Mean size correction for energy tables: " << fEnergySizecorrection_sum/fEnergySizecorrection.size() << endl;
-            }
+                cout << "Mean size correction for mscw tables: " << fMSCWSizecorrection_mean << endl;
+        }
+        if( fMSCLSizecorrection_mean!=0 && TMath::Abs( fMSCLSizecorrection_mean - 1. ) > 1.e-2 )
+        {
+                cout << "Mean size correction for mscl tables: " << fMSCLSizecorrection_mean << endl;
+        }
+        if( fEnergySizecorrection_mean!=0 && TMath::Abs( fEnergySizecorrection_mean - 1. ) > 1.e-2 )
+        {
+                cout << "Mean size correction for energy tables: " << fEnergySizecorrection_mean << endl;
         }
 	
 	if( iP >= 1 )
