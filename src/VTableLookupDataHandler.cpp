@@ -2321,11 +2321,6 @@ double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTe
 
 double* VTableLookupDataHandler::getSize( vector<double> iSizeCorrection, bool iSelectedImagesOnly, bool iSize2 )
 {
-        while (iSizeCorrection.size() < getNTel())
-        {
-            //std::cout << "Warning, not enough size scales, appending 1. " << std::endl;
-            iSizeCorrection.push_back(1);
-        }
 	for( unsigned int i = 0; i < getNTel(); i++ )
 	{
 		if( iSelectedImagesOnly && !fImgSel_list[i] )
@@ -2348,11 +2343,6 @@ double* VTableLookupDataHandler::getSize( vector<double> iSizeCorrection, bool i
 double* VTableLookupDataHandler::getSize( vector<double> iSizeCorrection,  ULong64_t iTelType, bool iSelectedImagesOnly, bool iSize2 )
 {
 	unsigned int z = 0;
-        while (iSizeCorrection.size() < getNTel())
-        {
-            //std::cout << "Warning, not enough size scales, required " << getNTel() << ", have " << iSizeCorrection.size() << ", appending 1. " << std::endl;
-            iSizeCorrection.push_back(1);
-        }
 	for( unsigned int i = 0; i < getNTel(); i++ )
 	{
 		if( fTel_type[i] == iTelType )

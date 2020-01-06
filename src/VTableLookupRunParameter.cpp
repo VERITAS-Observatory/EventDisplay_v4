@@ -44,6 +44,15 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	//fMSCLSizecorrection = 1.;
 	//fEnergySizecorrection = 1.;
 	
+        for (Int_t k=0; k<200; k++){
+            // Allow for a large (200) number of telescopes. For VTS only the first 4 will be used
+            // Default scalings set to 1. Will be replaced later with data from a runparameter file
+	    fMSCWSizecorrection.push_back(1.);
+            fMSCLSizecorrection.push_back(1.);
+            fEnergySizecorrection.push_back(1.);
+        }
+
+
 	fLimitEnergyReconstruction = false;
 	
 	fMC_distance_to_cameracenter_min =  0.;
@@ -263,9 +272,9 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
                         for (unsigned long int k=0; k<999; k++)
                         {
                             _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
-                            fMSCWSizecorrection.push_back(_scale);
-                            fMSCLSizecorrection.push_back(_scale);
-                            fEnergySizecorrection.push_back(_scale);
+                            fMSCWSizecorrection[k] = _scale;
+                            fMSCLSizecorrection[k] = _scale;
+                            fEnergySizecorrection[k] = _scale;
                             if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
                             {
                                 break;
@@ -277,10 +286,10 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		{
                         float _scale;
                         iTemp = iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() );
-                        for (unsigned long int k=0; k<999; k++)
+                        for (unsigned long int k=0; k<200; k++)
                         {
                             _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
-                            fMSCWSizecorrection.push_back(_scale);
+                            fMSCWSizecorrection[k] = _scale;
                             if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
                             {
                                 break;
@@ -292,10 +301,10 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		{
                         float _scale;
                         iTemp = iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() );
-                        for (unsigned long int k=0; k<999; k++)
+                        for (unsigned long int k=0; k<200; k++)
                         {
                             _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
-                            fMSCLSizecorrection.push_back(_scale);
+                            fMSCLSizecorrection[k] = _scale;
                             if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
                             {
                                 break;
@@ -307,10 +316,10 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		{
                         float _scale;
                         iTemp = iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() );
-                        for (unsigned long int k=0; k<999; k++)
+                        for (unsigned long int k=0; k<200; k++)
                         {
                             _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
-                            fEnergySizecorrection.push_back(_scale);
+                            fEnergySizecorrection[k]=_scale;
                             if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
                             {
                                 break;
