@@ -47,7 +47,7 @@ VTableLookupRunParameter::VTableLookupRunParameter()
         fMSCLSizecorrection_mean=0;
         fEnergySizecorrection_mean=0;
 	
-        for (Int_t k=0; k<200; k++){
+        for (Int_t k=0; k<VDST_MAXTELESCOPES; k++){
             // Allow for a large (200) number of telescopes. For VTS only the first 4 will be used
             // Default scalings set to 1. Will be replaced later with data from a runparameter file
 	    fMSCWSizecorrection.push_back(1.);
@@ -277,7 +277,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
                         {
                             // special case, user set only 1 value, assuming it is the same for all telescopes
                             _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
-                            for (unsigned long int k=0; k<200; k++){
+                            for (unsigned long int k=0; k<VDST_MAXTELESCOPES; k++){
                                 fMSCWSizecorrection[k] = _scale;
                                 fMSCLSizecorrection[k] = _scale;
                                 fEnergySizecorrection[k] = _scale;
@@ -290,7 +290,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
                         else 
                         {                                                            
                             // read comma separated corrections
-                            for (unsigned long int k=0; k<200; k++)
+                            for (unsigned long int k=0; k<VDST_MAXTELESCOPES; k++)
                             {
                                 _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
                                 fMSCWSizecorrection[k] = _scale;
@@ -321,7 +321,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
                         {
                             // special case, user set only 1 value, assuming it is the same for all telescopes
                             _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
-                            for (unsigned long int k=0; k<200; k++){
+                            for (unsigned long int k=0; k<VDST_MAXTELESCOPES; k++){
                                 fMSCWSizecorrection[k] = _scale;
                             
                             }
@@ -330,7 +330,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
                         else 
                         {                                                           
                             // read comma separated corrections
-                            for (unsigned long int k=0; k<200; k++)
+                            for (unsigned long int k=0; k<VDST_MAXTELESCOPES; k++)
                             {
                                 _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
                                 fMSCWSizecorrection[k] = _scale;
@@ -353,7 +353,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
                         {
                             // special case, user set only 1 value, assuming it is the same for all telescopes
                             _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
-                            for (unsigned long int k=0; k<200; k++){
+                            for (unsigned long int k=0; k<VDST_MAXTELESCOPES; k++){
                                 fMSCLSizecorrection[k] = _scale;
                             
                             }
@@ -362,7 +362,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
                         else
                         {
                             // read comma separated corrections
-                            for (unsigned long int k=0; k<200; k++)
+                            for (unsigned long int k=0; k<VDST_MAXTELESCOPES; k++)
                             {
                                 _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
                                 fMSCLSizecorrection[k] = _scale;
@@ -385,7 +385,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
                         {
                             // special case, user set only 1 value, assuming it is the same for all telescopes
                             _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
-                            for (unsigned long int k=0; k<200; k++){
+                            for (unsigned long int k=0; k<VDST_MAXTELESCOPES; k++){
                                 fEnergySizecorrection[k] = _scale;
                             
                             }
@@ -394,7 +394,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
                         else
                         {
                             // read comma separated corrections
-                            for (unsigned long int k=0; k<200; k++)
+                            for (unsigned long int k=0; k<VDST_MAXTELESCOPES; k++)
                             {
                                 _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
                                 fEnergySizecorrection[k] = _scale;
