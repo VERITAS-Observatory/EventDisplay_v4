@@ -54,6 +54,11 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		vector<double> fMSCWSizecorrection;
 		vector<double> fMSCLSizecorrection;
 		vector<double> fEnergySizecorrection;
+		double fMSCWSizecorrection_mean;
+		double fMSCLSizecorrection_mean;
+		double fEnergySizecorrection_mean;
+                int sizecorr_ntel;
+
 		string writeoption;
 		bool bNoNoTrigger;
 		int  bWriteReconstructedEventsOnly;
