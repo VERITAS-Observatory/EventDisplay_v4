@@ -464,7 +464,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			fdist[i] = ftpars[i]->dist;
                         // MNR: We need to correct here the sizes too.
 			fsize[i] = ftpars[i]->size * fTLRunParameter->fEnergySizecorrection[i];
-			fsize2[i] = ftpars[i]->size2 * fTLRunParameter->fEnergySizecorrection[i]*fTLRunParameter->fEnergySizecorrection[i];
+			fsize2[i] = ftpars[i]->size2 * fTLRunParameter->fEnergySizecorrection[i];
 			floss[i] = ftpars[i]->loss;
 			ffracLow[i] = ftpars[i]->fracLow;
 			fwidth[i] = ftpars[i]->width;
@@ -2287,7 +2287,7 @@ double* VTableLookupDataHandler::getSize( double iSizeCorrection, bool iSelected
 		}
 		else
 		{
-			fsizeCorr[i] = fsize2[i] * iSizeCorrection*iSizeCorrection;
+			fsizeCorr[i] = fsize2[i] * iSizeCorrection;
 		}
 	}
 	return fsizeCorr;
@@ -2312,7 +2312,7 @@ double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTe
 			}
 			else
 			{
-				fsize_telType[z] = fsize2[i] * iSizeCorrection*iSizeCorrection;
+				fsize_telType[z] = fsize2[i] * iSizeCorrection;
 			}
 			z++;
 		}
@@ -2335,7 +2335,7 @@ double* VTableLookupDataHandler::getSize( vector<double> iSizeCorrection, bool i
 		}
 		else
 		{
-			fsizeCorr[i] = fsize2[i] * iSizeCorrection[i]*iSizeCorrection[i];
+			fsizeCorr[i] = fsize2[i] * iSizeCorrection[i];
 		}
 	}
 	return fsizeCorr;
@@ -2360,7 +2360,7 @@ double* VTableLookupDataHandler::getSize( vector<double> iSizeCorrection,  ULong
 			}
 			else
 			{
-				fsize_telType[z] = fsize2[i] * iSizeCorrection[i]*iSizeCorrection[i];
+				fsize_telType[z] = fsize2[i] * iSizeCorrection[i];
 			}
 			z++;
 		}
