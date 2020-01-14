@@ -462,8 +462,9 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			ftpars[i]->GetEntry( fEventCounter );
 			
 			fdist[i] = ftpars[i]->dist;
-			fsize[i] = ftpars[i]->size;
-			fsize2[i] = ftpars[i]->size2;
+                        // MNR: We need to correct here the sizes too.
+			fsize[i] = ftpars[i]->size * fTLRunParameter->fEnergySizecorrection[i];
+			fsize2[i] = ftpars[i]->size2 * fTLRunParameter->fEnergySizecorrection[i];
 			floss[i] = ftpars[i]->loss;
 			ffracLow[i] = ftpars[i]->fracLow;
 			fwidth[i] = ftpars[i]->width;
