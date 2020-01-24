@@ -76,6 +76,7 @@ void merge( string ifile, char* outputfile, bool bFull = false )
 		//        f.SetBranchStatus( "hEmc", 1 );
 		// needed for systematic error calculation
 		f.SetBranchStatus( "hEsysMCRelative", 1 );
+		f.SetBranchStatus( "hEsysMCRelative2D", 1 );
 		// needed for binned likelihood analysis
 		f.SetBranchStatus( "hResponseMatrixFineQC", 0);
 

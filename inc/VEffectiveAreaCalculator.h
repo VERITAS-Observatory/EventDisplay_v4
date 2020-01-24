@@ -125,9 +125,11 @@ class VEffectiveAreaCalculator
 		vector< vector< TH1D* > > hVEmc;
 		vector< vector< TH1D* > > hVEcut;
 		vector< vector< TH1D* > > hVEcutLin;
+		vector< vector< TH1D* > > hVEcutNoTh2;
 		vector< vector< TH1D* > > hVEcutRec;
 		vector< vector< TH1D* > > hVEcutUW;
-		vector< vector< TH1D* > > hVEcutRecUW;
+                vector< vector< TH1D* > > hVEcutRecUW;
+		vector< vector< TH1D* > > hVEcutRecNoTh2;
 		vector< vector< TProfile* > > hVEmcSWeight;
 		vector< vector< TH1D* > > hVEcut500;
 		vector< vector< TProfile* > > hVEsysRec;
@@ -137,12 +139,30 @@ class VEffectiveAreaCalculator
 		vector< vector< TH2D* > > hVEsysMCRelative2D;
 		vector< vector< TH2D* > > hVEsys2D;
 		vector< vector< TH2D* > > hVResponseMatrix;
+		vector< vector< TH2D* > > hVResponseMatrixFine;
 		vector< vector< TProfile* > > hVResponseMatrixProfile;
 		vector< vector< TH2D* > > hVResponseMatrixQC;
 		vector< vector< TH2D* > > hVEmcCutCTA;
 		vector< vector< TH2D* > > hVResponseMatrixFineQC;
+                vector< vector< TH2D* > > hVResponseMatrixNoDirectionCut;
+                vector< vector< TH2D* > > hVResponseMatrixFineNoDirectionCut;
+                vector< vector< TH2D* > > hVEsysMCRelative2DNoDirectionCut;
+                vector< vector< TH2D* > > hVAngErec2D;            // direction reconstruction
+                vector< vector< TH2D* > > hVAngMC2D;            // direction reconstruction
+
 		vector< vector< TH1D* > > hVWeightedRate;
-		
+
+                // angular resolution graphs (vector in az)
+                vector< TGraphErrors* > fGraph_AngularResolution68p;
+                vector< TGraphErrors* > fGraph_AngularResolution80p;
+                vector< TGraphErrors* > fGraph_AngularResolutionKingSigma;
+                vector< TGraphErrors* > fGraph_AngularResolutionKingGamma;
+                vector< TH2D* >         hVAngularDiff_2D;
+                vector< TH2D* >         hVAngularDiffEmc_2D;
+                vector< TH2D* >         hVAngularLogDiff_2D;
+                vector< TH2D* >         hVAngularLogDiffEmc_2D;
+
+                // written to the EffArea tree
 		TList* hisTreeList;
 		TH1D* hEmc;
 		TH1D* hEcut;
@@ -153,6 +173,8 @@ class VEffectiveAreaCalculator
 		TH1D* hEcutRecUW;
 		TGraphAsymmErrors* gEffAreaMC;
 		TGraphAsymmErrors* gEffAreaRec;
+                TGraphAsymmErrors* gEffAreaNoTh2MC;
+                TGraphAsymmErrors* gEffAreaNoTh2Rec;
 		TProfile* hEmcSWeight;
 		TProfile* hEsysRec;
 		TProfile* hEsysMC;
@@ -161,12 +183,23 @@ class VEffectiveAreaCalculator
 		TH2D* hEsysMCRelative2D;
 		TH2D* hEsys2D;
 		TH2D* hEmcCutCTA;
+		TH2D* hResponseMatrixFine;
 		TH2D* hResponseMatrixFineQC;
 		TH2D* hResponseMatrix;
 		TProfile* hResponseMatrixProfile;
 		TH2D* hResponseMatrixQC;
+
+                TH2D* hEsysMCRelative2DNoDirectionCut;
+                TH2D* hResponseMatrixNoDirectionCut;
+                TH2D* hResponseMatrixFineNoDirectionCut;
+
 		TH1D* hWeightedRate;
 		vector< TH1D* > hEcutSub;                //! events after individual cuts
+    
+                TH2D *hAngularDiff_2D;
+                TH2D *hAngularDiffEmc_2D;
+                TH2D *hAngularLogDiff_2D;
+                TH2D *hAngularLogDiffEmc_2D;
 		
 		int fEffectiveAreaVsEnergyMC;            // 0 = vs MC energy, 1 = vs rec energy (approx. method), 2 = vs rec energy (default)
 		bool bLikelihoodAnalysis;
@@ -193,6 +226,10 @@ class VEffectiveAreaCalculator
 		double eff_MC[1000];
 		double seff_L[1000];
 		double seff_U[1000];
+                
+                float eff_error[1000];
+                float esys_rel[1000];
+
 		int Rec_nbins;
 		double Rec_e0[1000];
 		double Rec_eff[1000];
@@ -202,6 +239,13 @@ class VEffectiveAreaCalculator
 		double ResMat_MC[1000];
 		double ResMat_Rec[1000];
 		double ResMat_Rec_Err[1000];
+
+                float Rec_eff_error[1000];
+                float Rec_angRes_p68[1000];
+                float Rec_angRes_p80[1000];
+                float Rec_angRes_kingSigma[1000];
+                float Rec_angRes_kingGamma[1000];
+
 
 		TTree* fAcceptance_AfterCuts_tree;       //Information for all the events after cuts to construct the background map
 		double fXoff_aC;
@@ -244,6 +288,7 @@ class VEffectiveAreaCalculator
 		bool   binomialDivide( TGraphAsymmErrors* g, TH1D* hrec, TH1D* hmc );
 		void   copyProfileHistograms( TProfile*,  TProfile* );
 		void   copyHistograms( TH1*,  TH1*, bool );
+                void   fillAngularResolution( unsigned int i_az, bool iContaintment_80p );
 		double getAzMean( double azmin, double azmax );
 		double getCRWeight( double iEMC_TeV_log10, TH1* h , bool for_back_map = false );
 		bool   getEffectiveAreasFromFitFunction( TTree*, double azmin, double azmax, double ispectralindex );
@@ -259,6 +304,7 @@ class VEffectiveAreaCalculator
 				vector< double > iEL, vector< double > iEU, bool iCos = true );
 		TH2D*  interpolate_responseMatrix( double iV, double iVLower, double iVupper, TH2D *iElower, TH2D *iEupper, bool iCos = true );
 
+                void   multiplyByScatterArea( TGraphAsymmErrors* g );
 		void   reset();
 		void   smoothEffectiveAreas( map< unsigned int, vector< double > > );
 		
@@ -317,6 +363,11 @@ class VEffectiveAreaCalculator
 		void initializeHistograms( vector< double > iAzMin, vector< double > iAzMax, vector< double > iSpectralIndex );
 		void resetHistograms( unsigned int iZe );
 		void resetHistogramsVectors( unsigned int iZe );
+                void setAngularResolution2D( unsigned int i_az, vector< TH2D* > );
+                void setAngularResolutionGraph( unsigned int i_az, TGraphErrors* g, bool iAngContainment_80p );
+                void setAngularResolutionKingSigmaGraph( unsigned int i_az, TGraphErrors* g );
+                void setAngularResolutionKingGammaGraph( unsigned int i_az, TGraphErrors* g );
+
 		void setAzimuthCut( int iAzBin, double iAzMin, double iAzMax );
 		void setEffectiveArea( int iMC )
 		{

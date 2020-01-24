@@ -167,6 +167,17 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	hEsysMCRelative2D->SetYTitle( "energy bias E_{rec}/E_{MC}" );
 	hisTreeList->Add( hEsysMCRelative2D );
 
+        // use CTA WP Phys binning
+        sprintf( hname, "hEsysMCRelative2DNoDirectionCut" );
+        hEsysMCRelative2DNoDirectionCut = new TH2D( hname, 
+            "energy reconstruction, after gamma-selection cuts",
+            nbins, fEnergyAxis_minimum_defaultValue, 
+            fEnergyAxis_maximum_defaultValue,
+            300, 0., 3. );
+        hEsysMCRelative2DNoDirectionCut->SetXTitle( "energy_{MC} [TeV]" );
+        hEsysMCRelative2DNoDirectionCut->SetYTitle( "energy bias E_{rec}/E_{MC}" );
+        hisTreeList->Add( hEsysMCRelative2DNoDirectionCut );
+
 	sprintf( hname, "hEsys2D" );
 	hEsys2D = new TH2D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 100, -0.98, 2.02 );
 	hEsys2D->SetXTitle( "energy_{MC} [TeV]" );
@@ -194,8 +205,8 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	hResponseMatrixQC->SetYTitle( "energy_{MC} [TeV]" );
 	hResponseMatrixQC->SetXTitle( "energy_{rec} [TeV]" );
 	hisTreeList->Add( hResponseMatrixQC );
-
-	// following CTA WP Phys binning convention
+	
+        // following CTA WP Phys binning convention
 	sprintf( hname, "hEmcCutCTA" );
 	hEmcCutCTA = new TH2D( hname, htitle, 500, -2.3, 2.7, 500, -2.3, 2.7 );
 	hEmcCutCTA->SetYTitle( "energy_{MC} [TeV]" );
@@ -207,6 +218,49 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	hResponseMatrixFineQC->SetYTitle( "energy_{MC} [TeV]" );
 	hResponseMatrixFineQC->SetXTitle( "energy_{rec} [TeV]" );
 	hisTreeList->Add( hResponseMatrixFineQC );
+
+        // response matrix after gamma/hadron separation but
+        // without direction cut
+        sprintf( hname, "hResponseMatrixNoDirectionCut" );
+        hResponseMatrixNoDirectionCut = new TH2D( hname, "migration matrix, after gamma-selection cuts",
+                nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue,
+                nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
+        hResponseMatrixNoDirectionCut->SetYTitle( "energy_{MC} [TeV]" );
+        hResponseMatrixNoDirectionCut->SetXTitle( "energy_{rec} [TeV]" );
+        hisTreeList->Add( hResponseMatrixNoDirectionCut );
+
+        sprintf( hname, "hResponseMatrixFineNoDirectionCut" );
+        hResponseMatrixFineNoDirectionCut = new TH2D( hname, "migration matrix, after gamma-selection cuts, fine binning", 500, -2.3, 2.7, 500, -2.3, 2.7 );
+        hResponseMatrixFineNoDirectionCut->SetYTitle( "energy_{MC} [TeV]" );
+        hResponseMatrixFineNoDirectionCut->SetXTitle( "energy_{rec} [TeV]" );
+        hisTreeList->Add( hResponseMatrixFineNoDirectionCut );
+
+            // angular difference histogram (vs reconstructed energy)
+        sprintf( hname, "hAngularDiff_2D" );
+        hAngularDiff_2D = new TH2D( hname, "angular difference histogram (vs reconstructed energy)",
+                                          25, -1.9, 3.5,
+                                          9000, 0., 4.5 );
+        hAngularDiff_2D->SetXTitle( "energy_{rec} [TeV]" );
+        hAngularDiff_2D->SetYTitle( "angular diff. (R,MC) [deg]" );
+        hisTreeList->Add( hAngularDiff_2D );
+       
+        // angular difference histogram (vs true energy)
+        sprintf( hname, "hAngularDiffEmc_2D" );
+        hAngularDiffEmc_2D = new TH2D( hname, "angular difference histogram (vs true energy)",
+                                          25, -1.9, 3.5,
+                                          9000, 0., 4.5 );
+        hAngularDiffEmc_2D->SetXTitle( "energy_{MC} [TeV]" );
+        hAngularDiffEmc_2D->SetYTitle( "angular diff. (R,MC) [deg]" );
+        hisTreeList->Add( hAngularDiffEmc_2D );
+
+        // log angular difference histogram (vs reconstructed energy)
+        sprintf( hname, "hAngularLogDiff_2D" );
+        hAngularLogDiff_2D = new TH2D( hname, "log angular difference histogram (vs reconstructed energy)",
+                                          25, -1.9, 3.5,
+                                          100, -4., 1. );
+        hAngularLogDiff_2D->SetXTitle( "energy_{rec} [TeV]" );
+        hAngularLogDiff_2D->SetYTitle( "log_{10}(angular diff. (R,MC) [deg])" );
+        hisTreeList->Add( hAngularLogDiff_2D );
 
 	// weighted rate
 	// (use CTA binning, 5 bins per decade)
@@ -259,8 +313,15 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	fEffArea->Branch( "Rec_nbins", &Rec_nbins, "Rec_nbins/I" );
 	fEffArea->Branch( "Rec_e0", Rec_e0, "Rec_e0[Rec_nbins]/D" ); // log10( energy ) in [TeV]
 	fEffArea->Branch( "Rec_eff", Rec_eff, "Rec_eff[Rec_nbins]/D" ); // effective area vs reconstructed energy (approximation)
+        fEffArea->Branch( "eff_error", eff_error, "eff_error[nbins]/F" );
+        fEffArea->Branch( "esys_rel", esys_rel, "esys_rel[nbins]/F" );
 	fEffArea->Branch( "Rec_seff_L", Rec_seff_L, "Rec_seff_L[Rec_nbins]/D" );
 	fEffArea->Branch( "Rec_seff_U", Rec_seff_U, "Rec_seff_U[Rec_nbins]/D" );
+
+        fEffArea->Branch( "Rec_angRes_p68", Rec_angRes_p68, "Rec_angRes_p68[Rec_nbins]/F" );
+        fEffArea->Branch( "Rec_angRes_p80", Rec_angRes_p80, "Rec_angRes_p80[Rec_nbins]/F" );
+        fEffArea->Branch( "Rec_angRes_kingSigma", Rec_angRes_kingSigma, "Rec_angRes_kingSigma[Rec_nbins]/F" );
+        fEffArea->Branch( "Rec_angRes_kingGamma", Rec_angRes_kingGamma, "Rec_angRes_kingGamma[Rec_nbins]/F" );
 
 	// For reconstructing the response matrices
 	fEffArea->Branch( "nbins_ResMat", &nbins_ResMat, "nbins_ResMat/I" );
@@ -507,6 +568,21 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
 			}
 		}
 		hVEsysMCRelative2D.push_back( iT_TH2D );
+		
+                iT_TH2D.clear();
+		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
+		{
+			sprintf( hname, "hVEsysMCRelative2DNoDirectionCut_%d_%d", i, j );
+			if( hEsysMCRelative2DNoDirectionCut )
+			{
+				iT_TH2D.push_back( ( TH2D* )hEsysMCRelative2DNoDirectionCut->Clone( hname ) );
+			}
+			else
+			{
+				iT_TH2D.push_back( 0 );
+			}
+		}
+		hVEsysMCRelative2DNoDirectionCut.push_back( iT_TH2D );
 
 		iT_TH2D.clear();
 		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
@@ -537,21 +613,8 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
 			}
 		}
 		hVEmcCutCTA.push_back( iT_TH2D );
+		
 
-		iT_TH2D.clear();
-		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
-		{
-			sprintf( hname, "hVResponseMatrixFineQC_%d_%d", i, j );
-			if( hResponseMatrixFineQC )
-			{
-				iT_TH2D.push_back( ( TH2D* )hResponseMatrixFineQC->Clone( hname ) );
-			}
-			else
-			{
-				iT_TH2D.push_back( 0 );
-			}
-		}
-		hVResponseMatrixFineQC.push_back( iT_TH2D );
 
 		iT_TH2D.clear();
 		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
@@ -567,6 +630,36 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
 			}
 		}
 		hVResponseMatrix.push_back( iT_TH2D );
+		
+                iT_TH2D.clear();
+		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
+		{
+			sprintf( hname, "hVResponseMatrixFine_%d_%d", i, j );
+			if( hResponseMatrixFine )
+			{
+				iT_TH2D.push_back( ( TH2D* )hResponseMatrixFine->Clone( hname ) );
+			}
+			else
+			{
+				iT_TH2D.push_back( 0 );
+			}
+		}
+		hVResponseMatrixFine.push_back( iT_TH2D );
+                
+                iT_TH2D.clear();
+		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
+		{
+			sprintf( hname, "hVResponseMatrixFineNoDirectionCut_%d_%d", i, j );
+			if( hResponseMatrixFine )
+			{
+				iT_TH2D.push_back( ( TH2D* )hResponseMatrixFine->Clone( hname ) );
+			}
+			else
+			{
+				iT_TH2D.push_back( 0 );
+			}
+		}
+		hVResponseMatrixFineNoDirectionCut.push_back( iT_TH2D );
 
 		iT_TProfile.clear();
 		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
@@ -597,6 +690,24 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
 			}
 		}
 		hVResponseMatrixQC.push_back( iT_TH2D );
+		
+                iT_TH2D.clear();
+		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
+		{
+			sprintf( hname, "hVResponseMatrixFineQC_%d_%d", i, j );
+			if( hResponseMatrixFineQC )
+			{
+				iT_TH2D.push_back( ( TH2D* )hResponseMatrixFineQC->Clone( hname ) );
+			}
+			else
+			{
+				iT_TH2D.push_back( 0 );
+			}
+		}
+		hVResponseMatrixFineQC.push_back( iT_TH2D );
+
+                
+
 
 		iT_TH1D.clear();
 		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
@@ -848,6 +959,188 @@ bool VEffectiveAreaCalculator::getEffectiveAreasFromFitFunction( TTree* iEffFit,
 	return true;
 }
 
+void VEffectiveAreaCalculator::multiplyByScatterArea( TGraphAsymmErrors* g )
+{
+    if( !g )
+    {
+        return;
+    }
+    double x = 0.;
+    double y = 0.;
+    for( int i = 0; i < g->GetN(); i++ )
+    {
+        g->GetPoint( i, x, y );
+        y *= fMC_ScatterArea;
+        g->SetPoint( i, x, y );
+        g->SetPointEYlow( i, g->GetErrorYlow( i ) * fMC_ScatterArea );
+        g->SetPointEYhigh( i, g->GetErrorYhigh( i ) * fMC_ScatterArea );
+    }
+}
+
+/*
+
+   copy angular resolution values to tree variable
+
+*/
+void VEffectiveAreaCalculator::fillAngularResolution( unsigned int i_az, bool iContainment_80p )
+{
+    if( iContainment_80p && i_az < fGraph_AngularResolution68p.size() && fGraph_AngularResolution68p[i_az] )
+    {
+        // get first and last energy bin
+        double i_emin = 1.e5;
+        double i_emax = 1.e-5;
+        double x = 0.;
+        double y = 0.;
+        for( int i = 0; i < fGraph_AngularResolution80p[i_az]->GetN(); i++ )
+        {
+            fGraph_AngularResolution80p[i_az]->GetPoint( i, x, y );
+            if( x < i_emin )
+            {
+                i_emin = x;
+            }
+            if( x > i_emax )
+            {
+                i_emax = x;
+            }
+        }
+        for( int i = 0; i < Rec_nbins; i++ )
+        {
+            if( Rec_e0[i] > i_emin && Rec_e0[i] < i_emax )
+            {
+                Rec_angRes_p80[i]  = fGraph_AngularResolution80p[i_az]->Eval( Rec_e0[i] );
+            }
+        }
+    }
+    else if( !iContainment_80p && i_az < fGraph_AngularResolution68p.size() && fGraph_AngularResolution68p[i_az] )
+    {
+        double i_emin = 0.;
+        double i_emax = 0.;
+        double x = 0.;
+        double y = 0.;
+        for( int i = 0; i < fGraph_AngularResolution68p[i_az]->GetN(); i++ )
+        {
+            fGraph_AngularResolution68p[i_az]->GetPoint( i, x, y );
+            if( x < i_emin )
+            {
+                i_emin = x;
+            }
+            if( x > i_emax )
+            {
+                i_emax = x;
+            }
+        }
+        fGraph_AngularResolution68p[i_az]->GetPoint( 0, i_emin, y );
+        fGraph_AngularResolution68p[i_az]->GetPoint( fGraph_AngularResolution68p[i_az]->GetN(), i_emax, y );
+        for( int i = 0; i < Rec_nbins; i++ )
+        {
+            if( Rec_e0[i] > i_emin && Rec_e0[i] < i_emax )
+            {
+                Rec_angRes_p68[i] = fGraph_AngularResolution68p[i_az]->Eval( Rec_e0[i] );
+            }
+        }
+    }
+   // if on 68% containment, also fill king gamma/sigma parameters
+    // (so they only get filled once, not twice (once for each containment radius) )
+    if( !iContainment_80p )
+    {
+
+        // fill sigma parameter
+        double i_emin = 0.;
+        double i_emax = 0.;
+        double x = 0.;
+        double y = 0.;
+        for( int i = 0; i < fGraph_AngularResolutionKingSigma[i_az]->GetN(); i++ )
+        {
+            fGraph_AngularResolutionKingSigma[i_az]->GetPoint( i, x, y );
+            if( x < i_emin )
+            {
+                i_emin = x;
+            }
+            if( x > i_emax )
+            {
+                i_emax = x;
+            }
+        }
+        fGraph_AngularResolutionKingSigma[i_az]->GetPoint( 0, i_emin, y );
+        fGraph_AngularResolutionKingSigma[i_az]->GetPoint( fGraph_AngularResolutionKingSigma[i_az]->GetN(), i_emax, y );
+        for( int i = 0; i < Rec_nbins; i++ )
+        {
+            if( Rec_e0[i] > i_emin && Rec_e0[i] < i_emax )
+            {
+                Rec_angRes_kingSigma[i] = fGraph_AngularResolutionKingSigma[i_az]->Eval( Rec_e0[i] );
+            }
+        }
+       // fill gamma parameter
+        i_emin = 0.;
+        i_emax = 0.;
+        x = 0.;
+        y = 0.;
+        for( int i = 0; i < fGraph_AngularResolutionKingGamma[i_az]->GetN(); i++ )
+        {
+            fGraph_AngularResolutionKingGamma[i_az]->GetPoint( i, x, y );
+            if( x < i_emin )
+            {
+                i_emin = x;
+            }
+            if( x > i_emax )
+            {
+                i_emax = x;
+            }
+        }
+        fGraph_AngularResolutionKingGamma[i_az]->GetPoint( 0, i_emin, y );
+        fGraph_AngularResolutionKingGamma[i_az]->GetPoint( fGraph_AngularResolutionKingGamma[i_az]->GetN(), i_emax, y );
+        for( int i = 0; i < Rec_nbins; i++ )
+        {
+            if( Rec_e0[i] > i_emin && Rec_e0[i] < i_emax )
+            {
+                Rec_angRes_kingGamma[i] = fGraph_AngularResolutionKingGamma[i_az]->Eval( Rec_e0[i] );
+            }
+        }
+
+    }
+}
+
+void VEffectiveAreaCalculator::setAngularResolution2D(  unsigned int i_az, vector< TH2D* > h )
+{
+    if( i_az < hVAngularDiff_2D.size() && h.size() == 4 )
+    {
+          hVAngularDiff_2D[i_az] = h[0];
+          hVAngularLogDiff_2D[i_az] = h[1];
+          hVAngularDiffEmc_2D[i_az] = h[2];
+          hVAngularLogDiffEmc_2D[i_az] = h[3];
+    }
+}
+
+void VEffectiveAreaCalculator::setAngularResolutionGraph( unsigned int i_az, TGraphErrors* g, bool iAngContainment_80p )
+{
+    if( i_az < fGraph_AngularResolution68p.size() && g )
+    {
+        if( iAngContainment_80p )
+        {
+            fGraph_AngularResolution80p[i_az] = g;
+        }
+        else
+        {
+            fGraph_AngularResolution68p[i_az] = g;
+        }
+    }
+}
+
+void VEffectiveAreaCalculator::setAngularResolutionKingSigmaGraph( unsigned int i_az, TGraphErrors* g )
+{
+    if( i_az < fGraph_AngularResolutionKingSigma.size() && g )
+    {
+        fGraph_AngularResolutionKingSigma[i_az] = g;
+    }
+}
+
+void VEffectiveAreaCalculator::setAngularResolutionKingGammaGraph( unsigned int i_az, TGraphErrors* g )
+{
+    if( i_az < fGraph_AngularResolutionKingGamma.size() && g )
+    {
+        fGraph_AngularResolutionKingGamma[i_az] = g;
+    }
+}
 
 vector< double > VEffectiveAreaCalculator::interpolate_effectiveArea( double iV, double iVLower, double iVupper,
 		vector< double > iElower, vector< double > iEupper, bool iCos )
@@ -976,6 +1269,8 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 		iEffArea->SetBranchAddress( "Rec_e0", e0 );
 		iEffArea->SetBranchAddress( "Rec_eff", eff );
 	}
+        // bias in energy reconstruction
+        iEffArea->SetBranchAddress( "esys_rel", esys_rel );
 
 	// Binned likelihood analysis requires
 	// MC effective areas and response matrix
@@ -1338,8 +1633,18 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 						i_temp_Eff[e] = eff[j];
 					}
 				}
+                                i_temp_Esys[e] = 0.;
+                                for( int j = 0; j < nbins_MC; j++ )
+                                {
+                                        if( TMath::Abs( e0_MC[j] - fEff_E0[e] ) < 1.e-5 )
+                                        {
+                                                i_temp_Esys[e]  = esys_rel[j];
+                                        }                     
+                                }
+
 			}
 			fEffArea_map[i_ID] = i_temp_Eff;
+                        fEff_EsysMCRelative[i_ID]  = i_temp_Esys;
 
 			if ( bLikelihoodAnalysis )
 			{
@@ -1620,12 +1925,20 @@ void VEffectiveAreaCalculator::reset()
 	hEsysMC = 0;
 	hEsysMCRelative = 0;
 	hEsysMCRelative2D = 0;
+        hEsysMCRelative2DNoDirectionCut = 0;
 	hEsys2D = 0;
 	hResponseMatrix = 0;
 	hResponseMatrixProfile = 0;
 	hResponseMatrixQC = 0;
 	hEmcCutCTA = 0;
+	hResponseMatrixNoDirectionCut = 0;
+	hResponseMatrixFine = 0;
 	hResponseMatrixFineQC = 0;
+	hResponseMatrixFineNoDirectionCut = 0;
+        hAngularDiff_2D = 0;
+        hAngularDiffEmc_2D = 0;
+        hAngularLogDiff_2D = 0;
+        hAngularLogDiffEmc_2D = 0;
 	fEffArea = 0;
 	hisTreeList = 0;
 	bEffectiveAreasareFunctions = false;
@@ -1641,15 +1954,23 @@ void VEffectiveAreaCalculator::reset()
 	{
 		e0[i] = 0.;
 		eff[i] = 0.;
+                eff_error[i] = 0.;
+                esys_rel[i] = 0.;
 		seff_L[i] = 0.;
 		seff_U[i] = 0.;
 		Rec_e0[i] = 0.;
 		Rec_eff[i] = 0.;
+                Rec_eff_error[i] = 0.;
 		Rec_seff_L[i] = 0.;
 		Rec_seff_U[i] = 0.;
 		ResMat_MC[i] = 0.;
 		ResMat_Rec[i] = 0.;
 		ResMat_Rec_Err[i] = 0.;
+                Rec_angRes_p68[i] = 0.;
+                Rec_angRes_p80[i] = 0.;
+                Rec_angRes_kingSigma[i] = 0.;
+                Rec_angRes_kingGamma[i] = 0.;
+
 	}
 
 	fEffectiveAreas_meanZe = 0.;
@@ -1965,11 +2286,12 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 		// apply direction cut
 		//
 		// point source cut; use MC shower direction as reference direction
+                bool bDirectionCut = false;
 		if( !fIsotropicArrivalDirections )
 		{
 			if( !fCuts->applyDirectionCuts( iMethod, true ) )
 			{
-				continue;
+				bDirectionCut = true;
 			}
 		}
 		// background cut; use (0,0) as reference direction
@@ -1978,10 +2300,15 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 		{
 			if( !fCuts->applyDirectionCuts( iMethod, true, 0., 0. ) )
 			{
-				continue;
+				bDirectionCut = true;
 			}
 		}
-		hEcutSub[4]->Fill( eMC, 1. );
+                
+
+                if ( !bDirectionCut ) 
+                {
+                        hEcutSub[4]->Fill( eMC, 1. );
+                }
 
 		//////////////////////////////////////
 		// apply energy reconstruction quality cut
@@ -1996,7 +2323,11 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				continue;
 			}
 		}
-		hEcutSub[5]->Fill( eMC, 1. );
+                
+                if ( !bDirectionCut ) 
+                {
+                        hEcutSub[5]->Fill( eMC, 1. );
+                }
 
 		// skip event if no energy has been reconstructed
 		// get energy according to which reconstruction method
@@ -2023,47 +2354,50 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 		///////////////////////////////////////////
 		// fill response matrix after quality cuts
 
-		// loop over all az bins
-		for( unsigned int i_az = 0; i_az < fVMinAz.size(); i_az++ )
-		{
-			// check at what azimuth bin we are
-			if( fZe[ize] > 3. )
-			{
-				// confine MC az to -180., 180.
-				if( d->MCaz > 180. )
-				{
-					d->MCaz -= 360.;
-				}
-				// expect bin like [135,-135]
-				if( fVMinAz[i_az] > fVMaxAz[i_az] )
-				{
-					if( d->MCaz < fVMinAz[i_az] && d->MCaz > fVMaxAz[i_az] )
-					{
-						continue;
-					}
-				}
-				// expect bin like [-135,-45.]
-				else
-				{
-					if( d->MCaz < fVMinAz[i_az] || d->MCaz > fVMaxAz[i_az] )
-					{
-						continue;
-					}
-				}
-			}
-			// loop over all spectral index
-			for( unsigned int s = 0; s < fVSpectralIndex.size(); s++ )
-			{
-				if( hVResponseMatrixQC[s][i_az] )
-				{
-					hVResponseMatrixQC[s][i_az]->Fill( eRec, eMC );
-				}
-				if( hVResponseMatrixFineQC[s][i_az] )
-				{
-					hVResponseMatrixFineQC[s][i_az]->Fill( eRec, eMC );
-				}
-			}
-		}
+                if( !bDirectionCut )
+                {
+                    // loop over all az bins
+                    for( unsigned int i_az = 0; i_az < fVMinAz.size(); i_az++ )
+                    {
+                            // check at what azimuth bin we are
+                            if( fZe[ize] > 3. )
+                            {
+                                    // confine MC az to -180., 180.
+                                    if( d->MCaz > 180. )
+                                    {
+                                            d->MCaz -= 360.;
+                                    }
+                                    // expect bin like [135,-135]
+                                    if( fVMinAz[i_az] > fVMaxAz[i_az] )
+                                    {
+                                            if( d->MCaz < fVMinAz[i_az] && d->MCaz > fVMaxAz[i_az] )
+                                            {
+                                                    continue;
+                                            }
+                                    }
+                                    // expect bin like [-135,-45.]
+                                    else
+                                    {
+                                            if( d->MCaz < fVMinAz[i_az] || d->MCaz > fVMaxAz[i_az] )
+                                            {
+                                                    continue;
+                                            }
+                                    }
+                            }
+                            // loop over all spectral index
+                            for( unsigned int s = 0; s < fVSpectralIndex.size(); s++ )
+                            {
+                                    if( hVResponseMatrixQC[s][i_az] )
+                                    {
+                                            hVResponseMatrixQC[s][i_az]->Fill( eRec, eMC );
+                                    }
+                                    if( hVResponseMatrixFineQC[s][i_az] )
+                                    {
+                                            hVResponseMatrixFineQC[s][i_az]->Fill( eRec, eMC );
+                                    }
+                            }
+                    }
+                }
 
 		//////////////////////////////////////
 		// apply gamma hadron cuts
@@ -2075,11 +2409,15 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 		{
 			continue;
 		}
-		hEcutSub[6]->Fill( eMC, 1. );
+                if( !bDirectionCut )
+                {
+		        hEcutSub[6]->Fill( eMC, 1. );
+                }
+
 
 		// unique event counter
 		// (make sure that map doesn't get too big)
-		if( iSuccessfullEventStatistics >= 0 )
+		if( !bDirectionCut && iSuccessfullEventStatistics >= 0 )
 		{
 			iSuccessfullEventStatistics++;
 			if( fUniqueEventCounter.size() < 100000 )
@@ -2134,7 +2472,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			}
 
 			//fill tree with acceptance information after cuts (needed to construct background model in ctools)
-			if( fRunPara->fgetXoff_Yoff_afterCut )
+			if( !bDirectionCut && fRunPara->fgetXoff_Yoff_afterCut )
 			{
 				fXoff_aC = d->Xoff;
 				fYoff_aC = d->Yoff;
@@ -2161,6 +2499,42 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				{
 					i_weight = 0.;
 				}
+
+                                ////////////////////////////////////////////
+                                // fill effective areas before direction cut
+                                if( hVEcutNoTh2[s][i_az] )
+                                {
+                                    hVEcutNoTh2[s][i_az]->Fill( eMC, i_weight );
+                                }
+                                if( hVEcutRecNoTh2[s][i_az] )
+                                {
+                                    hVEcutRecNoTh2[s][i_az]->Fill( eRec, i_weight );
+                                }
+                                // fill response matrix (migration matrix) before
+                                // direction cut
+                                if( hVResponseMatrixNoDirectionCut[s][i_az] )
+                                {
+                                    hVResponseMatrixNoDirectionCut[s][i_az]->Fill( eRec, eMC, i_weight );
+                                }
+                                if( hVResponseMatrixFineNoDirectionCut[s][i_az] )
+                                {
+                                    hVResponseMatrixFineNoDirectionCut[s][i_az]->Fill( eRec, eMC, i_weight );
+                                }
+                                if( hVEsysMCRelative2DNoDirectionCut[s][i_az] )
+                                {
+                                    hVEsysMCRelative2DNoDirectionCut[s][i_az]->Fill( eMC, eRecLin / d->MCe0 );
+                                }
+
+                                /////////////////////////
+                                // apply direction cut
+                                if( bDirectionCut )
+                                {
+                                    continue;
+                                }
+
+                                /////////////////////////////////////////////
+                                // after gamma/hadron and after direction cut
+
 				// fill true MC energy (hVEmc is in true MC energies)
 				if( hVEcut[s][i_az] )
 				{
@@ -2214,10 +2588,17 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				{
 					hVEmcCutCTA[s][i_az]->Fill( eRec, eMC );
 				}
+                                // migration matrix (coarse binning)
 				if( hVResponseMatrix[s][i_az] )
 				{
 					hVResponseMatrix[s][i_az]->Fill( eRec, eMC );
 				}
+                                // migration matrix (fine binning)
+                                if( hVResponseMatrixFine[s][i_az] )
+                                {
+                                        hVResponseMatrixFine[s][i_az]->Fill( eRec, eMC, i_weight );
+                                }
+
 				if( hVResponseMatrixProfile[s][i_az] )
 				{
 					hVResponseMatrixProfile[s][i_az]->Fill( eRec, eMC );
@@ -2273,19 +2654,38 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				cout << "VEffectiveAreaCalculator::fill: error calculating effective area vs rec energy" << endl;
 				cout << "s : " << s << " , az: " << i_az << endl;
 			}
+                        if( !binomialDivide( gEffAreaNoTh2MC, hVEcutNoTh2[s][i_az], hVEmc[s][i_az] ) )
+                        {
+                                cout << "VEffectiveAreaCalculator::fill: error calculating effective area vs MC energy" << endl;
+                                cout << "s : " << s << " , az: " << i_az << endl;
+                        }
+                        if( !binomialDivide( gEffAreaNoTh2Rec, hVEcutRecNoTh2[s][i_az], hVEmc[s][i_az] ) )
+                        {
+                                cout << "VEffectiveAreaCalculator::fill: error calculating effective area vs rec energy" << endl;
+                                cout << "s : " << s << " , az: " << i_az << endl;
+                        }
+                        // normalize response matrices
 			VHistogramUtilities::normalizeTH2D_y( hVResponseMatrix[s][i_az] );
 			VHistogramUtilities::normalizeTH2D_y( hVResponseMatrixQC[s][i_az] );
+			VHistogramUtilities::normalizeTH2D_y( hVResponseMatrixNoDirectionCut[s][i_az] );
 
 			for( int i = 0; i < 1000; i++ )
 			{
 				e0[i] = 0.;
 				eff[i] = 0.;
+                                eff_error[i] = 0.;
+                                esys_rel[i] = 0.;
 				seff_L[i] = 0.;
 				seff_U[i] = 0.;
 				Rec_e0[i] = 0.;
 				Rec_eff[i] = 0.;
 				Rec_seff_L[i] = 0.;
 				Rec_seff_U[i] = 0.;
+                                Rec_eff_error[i] = 0.;
+                                Rec_angRes_p68[i] = 0.;
+                                Rec_angRes_p80[i] = 0.;
+                                Rec_angRes_kingSigma[i] = 0.;
+                                Rec_angRes_kingGamma[i] = 0.;
 			}
 			double x = 0.;
 			double y = 0.;
@@ -2298,9 +2698,16 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				eff[i] = y * fMC_ScatterArea;
 				seff_L[i] = gEffAreaMC->GetErrorYlow( i ) * fMC_ScatterArea;
 				seff_U[i] = gEffAreaMC->GetErrorYhigh( i ) * fMC_ScatterArea;
+                                eff_error[i] = 0.5 * ( seff_L[i] + seff_U[i] );
 				gEffAreaMC->SetPoint( i, x, eff[i] );
 				gEffAreaMC->SetPointEYlow( i, seff_L[i] );
 				gEffAreaMC->SetPointEYhigh( i, seff_U[i] );
+                                if( hVEsysMCRelative[s][i_az] )
+                                {
+                                    esys_rel[i] = hVEsysMCRelative[s][i_az]->GetBinContent( 
+                                        hVEsysMCRelative[s][i_az]->GetXaxis()->FindBin( e0[i] ) );
+                                }
+
 			}
 
 			// effective area vs reconstructed energy (approx)
@@ -2313,10 +2720,14 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				Rec_eff[i] = y * fMC_ScatterArea;
 				Rec_seff_L[i] = gEffAreaRec->GetErrorYlow( i ) * fMC_ScatterArea;
 				Rec_seff_U[i] = gEffAreaRec->GetErrorYhigh( i ) * fMC_ScatterArea;
+                                Rec_eff_error[i] = 0.5 * ( Rec_seff_L[i] + Rec_seff_U[i] );
 				gEffAreaRec->SetPoint( i, x, Rec_eff[i] );
 				gEffAreaRec->SetPointEYlow( i, Rec_seff_L[i] );
 				gEffAreaRec->SetPointEYhigh( i, Rec_seff_U[i] );
 			}
+
+                        multiplyByScatterArea( gEffAreaNoTh2MC );
+                        multiplyByScatterArea( gEffAreaNoTh2Rec );
 
 			// copy all histograms
 			resetHistograms( ize );
@@ -2333,12 +2744,25 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			copyProfileHistograms( hEsysMCRelative, hVEsysMCRelative[s][i_az] );
 			copyHistograms( hEsysMCRelativeRMS, hVEsysMCRelativeRMS[s][i_az], true );
 			copyHistograms( hEsysMCRelative2D, hVEsysMCRelative2D[s][i_az], true );
+			copyHistograms( hEsysMCRelative2DNoDirectionCut, hVEsysMCRelative2DNoDirectionCut[s][i_az], true );
 			copyHistograms( hEsys2D, hVEsys2D[s][i_az], true );
 			copyHistograms( hEmcCutCTA, hVEmcCutCTA[s][i_az], true );
-			copyHistograms( hResponseMatrixFineQC, hVResponseMatrixFineQC[s][i_az], true );
 			copyHistograms( hResponseMatrix, hVResponseMatrix[s][i_az], true );
 			copyHistograms( hResponseMatrixQC, hVResponseMatrixQC[s][i_az], true );
+			copyHistograms( hResponseMatrixNoDirectionCut, hVResponseMatrixNoDirectionCut[s][i_az], true );
 			copyProfileHistograms( hResponseMatrixProfile, hVResponseMatrixProfile[s][i_az] );
+			copyHistograms( hResponseMatrixFine, hVResponseMatrixFine[s][i_az], true );
+			copyHistograms( hResponseMatrixFineQC, hVResponseMatrixFineQC[s][i_az], true );
+			copyHistograms( hResponseMatrixFineNoDirectionCut, hVResponseMatrixFineNoDirectionCut[s][i_az], true );
+
+                        copyHistograms( hAngularDiff_2D, hVAngularDiff_2D[i_az], true );
+                        copyHistograms( hAngularDiffEmc_2D, hVAngularDiffEmc_2D[i_az], true );
+                        copyHistograms( hAngularLogDiff_2D, hVAngularLogDiff_2D[i_az], true );
+                        copyHistograms( hAngularLogDiffEmc_2D, hVAngularLogDiffEmc_2D[i_az], true );
+                        // fill angular resolution vs energy
+                        fillAngularResolution( i_az, false );
+                        fillAngularResolution( i_az, true );
+
 			copyHistograms( hWeightedRate, hVWeightedRate[s][i_az], false );
 
 
@@ -3620,6 +4044,16 @@ void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
 			}
 		}
 	}
+	for( unsigned int i = 0; i < hVEsysMCRelative2DNoDirectionCut.size(); i++ )
+	{
+		for( unsigned int j = 0; j < hVEsysMCRelative2DNoDirectionCut[i].size(); j++ )
+		{
+			if( hVEsysMCRelative2DNoDirectionCut[i][j] )
+			{
+				hVEsysMCRelative2DNoDirectionCut[i][j]->Reset();
+			}
+		}
+	}
 	for( unsigned int i = 0; i < hVEsys2D.size(); i++ )
 	{
 		for( unsigned int j = 0; j < hVEsys2D[i].size(); j++ )
@@ -3650,6 +4084,36 @@ void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
 			}
 		}
 	}
+        for( unsigned int i = 0; i < hVResponseMatrixFine.size(); i++ )
+	{
+		for( unsigned int j = 0; j < hVResponseMatrixFine[i].size(); j++ )
+		{
+			if( hVResponseMatrixFine[i][j] )
+			{
+				hVResponseMatrixFine[i][j]->Reset();
+			}
+		}
+	}
+	for( unsigned int i = 0; i < hVResponseMatrixNoDirectionCut.size(); i++ )
+	{
+		for( unsigned int j = 0; j < hVResponseMatrixNoDirectionCut[i].size(); j++ )
+		{
+			if( hVResponseMatrixNoDirectionCut[i][j] )
+			{
+				hVResponseMatrixNoDirectionCut[i][j]->Reset();
+			}
+		}
+	}
+        for( unsigned int i = 0; i < hVResponseMatrixFineNoDirectionCut.size(); i++ )
+	{
+		for( unsigned int j = 0; j < hVResponseMatrixFineNoDirectionCut[i].size(); j++ )
+		{
+			if( hVResponseMatrixFineNoDirectionCut[i][j] )
+			{
+				hVResponseMatrixFineNoDirectionCut[i][j]->Reset();
+			}
+		}
+	}
 	for( unsigned int i = 0; i < hVResponseMatrixProfile.size(); i++ )
 	{
 		for( unsigned int j = 0; j < hVResponseMatrixProfile[i].size(); j++ )
@@ -3669,6 +4133,44 @@ void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
 				hVResponseMatrixQC[i][j]->Reset();
 			}
 		}
+	}
+        for( unsigned int i = 0; i < hVResponseMatrixFineQC.size(); i++ )
+	{
+		for( unsigned int j = 0; j < hVResponseMatrixFineQC[i].size(); j++ )
+		{
+			if( hVResponseMatrixFineQC[i][j] )
+			{
+				hVResponseMatrixFineQC[i][j]->Reset();
+			}
+		}
+	}
+        for( unsigned int i = 0; i < hVAngularDiff_2D.size(); i++ )
+	{
+                if( hVAngularDiff_2D[i] )
+                {
+                        hVAngularDiff_2D[i]->Reset();
+                }
+	}
+        for( unsigned int i = 0; i < hVAngularDiffEmc_2D.size(); i++ )
+	{
+                if( hVAngularDiffEmc_2D[i] )
+                {
+                        hVAngularDiffEmc_2D[i]->Reset();
+                }
+	}
+        for( unsigned int i = 0; i < hVAngularLogDiff_2D.size(); i++ )
+	{
+                if( hVAngularLogDiff_2D[i] )
+                {
+                        hVAngularLogDiff_2D[i]->Reset();
+                }
+	}
+        for( unsigned int i = 0; i < hVAngularLogDiffEmc_2D.size(); i++ )
+	{
+                if( hVAngularLogDiffEmc_2D[i] )
+                {
+                        hVAngularLogDiffEmc_2D[i]->Reset();
+                }
 	}
 	for( unsigned int i = 0; i < hVWeightedRate.size(); i++ )
 	{
