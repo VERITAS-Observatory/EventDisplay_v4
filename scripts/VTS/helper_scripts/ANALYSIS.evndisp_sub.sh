@@ -14,6 +14,7 @@ CALIBFILE=USECALIBLIST
 TELTOANA=TELTOANACOMB
 LOGDIR="$ODIR"
 ACUTS=RECONSTRUCTIONRUNPARAMETERFILE
+PARS=EXTRAPARS
 
 # temporary (scratch) directory
 if [[ -n $TMPDIR ]]; then
@@ -107,7 +108,7 @@ fi
 # run eventdisplay
 LOGFILE="$LOGDIR/$RUN.log"
 rm -f $LOGDIR/$RUN.log
-$EVNDISPSYS/bin/evndisp -runnumber=$RUN -reconstructionparameter $ACUTS -outputfile $TEMPDIR/$RUN.root ${OPT[@]} &> "$LOGFILE"
+$EVNDISPSYS/bin/evndisp $PARS -runnumber=$RUN -reconstructionparameter $ACUTS -outputfile $TEMPDIR/$RUN.root ${OPT[@]} &> "$LOGFILE"
 # DST $EVNDISPSYS/bin/evndisp -runnumber=$RUN -nevents=250000 -runmode=4 -readcalibdb -dstfile $TEMPDIR/$RUN.dst.root -reconstructionparameter $ACUTS -outputfile $TEMPDIR/$RUN.root ${OPT[@]} &> "$LOGFILE"
 echo "RUN$RUN EVNDISPLOG $LOGFILE"
 
