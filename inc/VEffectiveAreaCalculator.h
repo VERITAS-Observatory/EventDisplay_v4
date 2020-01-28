@@ -155,12 +155,16 @@ class VEffectiveAreaCalculator
                 // angular resolution graphs (vector in az)
                 vector< TGraphErrors* > fGraph_AngularResolution68p;
                 vector< TGraphErrors* > fGraph_AngularResolution80p;
-                vector< TGraphErrors* > fGraph_AngularResolutionKingSigma;
-                vector< TGraphErrors* > fGraph_AngularResolutionKingGamma;
-                vector< TH2D* >         hVAngularDiff_2D;
-                vector< TH2D* >         hVAngularDiffEmc_2D;
-                vector< TH2D* >         hVAngularLogDiff_2D;
-                vector< TH2D* >         hVAngularLogDiffEmc_2D;
+                /*
+                vector< vector< TH2D* > > hVAngularDiff_2D;
+                vector< vector< TH2D* > > hVAngularDiffEmc_2D;
+                vector< vector< TH2D* > > hVAngularLogDiff_2D;
+                vector< vector< TH2D* > > hVAngularLogDiffEmc_2D;
+                */
+                vector< TH2D* > hVAngularDiff_2D;
+                vector< TH2D* > hVAngularDiffEmc_2D;
+                vector< TH2D* > hVAngularLogDiff_2D;
+                vector< TH2D* > hVAngularLogDiffEmc_2D;
 
                 // written to the EffArea tree
 		TList* hisTreeList;
@@ -171,6 +175,8 @@ class VEffectiveAreaCalculator
 		TH1D* hEcutRec;
 		TH1D* hEcutUW;
 		TH1D* hEcutRecUW;
+		TH1D* hEcutNoTh2;
+		TH1D* hEcutRecNoTh2;
 		TGraphAsymmErrors* gEffAreaMC;
 		TGraphAsymmErrors* gEffAreaRec;
                 TGraphAsymmErrors* gEffAreaNoTh2MC;
@@ -365,8 +371,6 @@ class VEffectiveAreaCalculator
 		void resetHistogramsVectors( unsigned int iZe );
                 void setAngularResolution2D( unsigned int i_az, vector< TH2D* > );
                 void setAngularResolutionGraph( unsigned int i_az, TGraphErrors* g, bool iAngContainment_80p );
-                void setAngularResolutionKingSigmaGraph( unsigned int i_az, TGraphErrors* g );
-                void setAngularResolutionKingGammaGraph( unsigned int i_az, TGraphErrors* g );
 
 		void setAzimuthCut( int iAzBin, double iAzMin, double iAzMax );
 		void setEffectiveArea( int iMC )

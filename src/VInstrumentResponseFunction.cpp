@@ -111,6 +111,17 @@ bool VInstrumentResponseFunction::initialize( string iName, string iType, unsign
 
 bool VInstrumentResponseFunction::fill()
 {
+    if( !fillEventData() )
+    {   
+        return false;
+    }   
+        
+    return fillResolutionGraphs( getIRFData() );
+}
+
+
+bool VInstrumentResponseFunction::fillEventData()
+{
 	// data is needed
 	if( !fData )
 	{
@@ -222,6 +233,12 @@ bool VInstrumentResponseFunction::fill()
 		}
 	}
 	//    fAnaCuts->printCutStatistics();
+        return true;
+}
+
+bool VInstrumentResponseFunction::fillResolutionGraphs( vector< vector< VInstrumentResponseFunctionData* > > iIRFData )
+{
+        fIRFData = iIRFData;
 	
 	// fill resolution graphs
 	cout << "VInstrumentResponseFunction::terminate ";
@@ -272,6 +289,7 @@ void VInstrumentResponseFunction::setHistogrambinning( int iN, double iMin, doub
 	}
 }
 
+
 void VInstrumentResponseFunction::setDataTree( CData* iData )
 {
 	fData = iData;
@@ -320,7 +338,27 @@ void VInstrumentResponseFunction::setCuts( VGammaHadronCuts* iCuts )
 		}
 	}
 }
+TGraphErrors* VInstrumentResponseFunction::getAngularResolutionGraph( unsigned int iAzBin, unsigned int iSpectralIndexBin )
+{
+    if( iSpectralIndexBin < fIRFData.size() && iAzBin < fIRFData[iSpectralIndexBin].size()
+            && fIRFData[iSpectralIndexBin][iAzBin] )
+    {
+        return fIRFData[iSpectralIndexBin][iAzBin]->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF];
+    }
+    
+    cout << "VInstrumentResponseFunction::getAngularResolutionGraph: warning index out of range ";
+    cout << iAzBin << "\t" << iSpectralIndexBin << "\t";
+    cout << "(" << fIRFData.size();
+    if( iSpectralIndexBin < fIRFData.size() )
+    {
+        cout << "\t" << fIRFData[iSpectralIndexBin].size();
+    }
+    cout << ")" << endl;
+    
+    return 0;
+}
 
+/* //// MNR: WRONG ????? why first iAzBin???
 TGraphErrors* VInstrumentResponseFunction::getAngularResolutionGraph( unsigned int iAzBin, unsigned int iSpectralIndexBin )
 {
 	if( iAzBin < fIRFData.size() && iSpectralIndexBin < fIRFData[iAzBin].size() && fIRFData[iAzBin][iSpectralIndexBin] )
@@ -339,3 +377,40 @@ TGraphErrors* VInstrumentResponseFunction::getAngularResolutionGraph( unsigned i
 	
 	return 0;
 }
+*/
+
+vector< TH2D* > VInstrumentResponseFunction::getAngularResolution2D( unsigned int iAzBin, unsigned int iSpectralIndexBin )
+{
+    vector< TH2D* > h;
+    if( iSpectralIndexBin < fIRFData.size() && iAzBin < fIRFData[iSpectralIndexBin].size() && fIRFData[iSpectralIndexBin][iAzBin] )
+    {   
+        h.push_back( fIRFData[iSpectralIndexBin][iAzBin]->f2DHisto[VInstrumentResponseFunctionData::E_DIFF] );
+        h.push_back( fIRFData[iSpectralIndexBin][iAzBin]->f2DHisto[VInstrumentResponseFunctionData::E_LOGDIFF] );
+        h.push_back( fIRFData[iSpectralIndexBin][iAzBin]->f2DHisto[VInstrumentResponseFunctionData::E_DIFF_MC] );
+        h.push_back( fIRFData[iSpectralIndexBin][iAzBin]->f2DHisto[VInstrumentResponseFunctionData::E_LOGDIFF_MC] );
+        return h;
+    }   
+    
+    cout << "VInstrumentResponseFunction::getAngularResolution2D: warning index out of range ";
+    cout << iAzBin << "\t" << iSpectralIndexBin << "\t";
+    cout << "(" << fIRFData.size();
+    if( iSpectralIndexBin < fIRFData.size() )
+    {   
+        cout << "\t" << fIRFData[iSpectralIndexBin].size();
+    }
+    cout << ")" << endl;
+
+    return h;
+}
+
+void VInstrumentResponseFunction::setDuplicationID( unsigned int iID )
+{
+    if( iID != 9999 )
+    {   
+        cout << "Setting duplication ID for " << fName << " (" << fType << "):" << iID << endl;
+    }   
+    fDuplicationID = iID;
+}
+
+
+
