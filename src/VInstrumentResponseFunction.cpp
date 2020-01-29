@@ -109,6 +109,10 @@ bool VInstrumentResponseFunction::initialize( string iName, string iType, unsign
 	return true;
 }
 
+/*
+ * fill resolution histograms
+ *
+*/
 bool VInstrumentResponseFunction::fill()
 {
     if( !fillEventData() )
@@ -119,10 +123,14 @@ bool VInstrumentResponseFunction::fill()
     return fillResolutionGraphs( getIRFData() );
 }
 
-
+/*
+ *
+ * loop over all events in data tree and fill histograms
+ *
+*/
 bool VInstrumentResponseFunction::fillEventData()
 {
-	// data is needed
+	// data tree is needed to do anything
 	if( !fData )
 	{
 		return false;
@@ -338,27 +346,30 @@ void VInstrumentResponseFunction::setCuts( VGammaHadronCuts* iCuts )
 		}
 	}
 }
+
+
+// This is how it is defined in v502: fIRFData[iSpectralIndexBin][iAzBin]. Also matches getAngularResolution2D
 TGraphErrors* VInstrumentResponseFunction::getAngularResolutionGraph( unsigned int iAzBin, unsigned int iSpectralIndexBin )
 {
-    if( iSpectralIndexBin < fIRFData.size() && iAzBin < fIRFData[iSpectralIndexBin].size()
-            && fIRFData[iSpectralIndexBin][iAzBin] )
-    {
-        return fIRFData[iSpectralIndexBin][iAzBin]->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF];
-    }
-    
-    cout << "VInstrumentResponseFunction::getAngularResolutionGraph: warning index out of range ";
-    cout << iAzBin << "\t" << iSpectralIndexBin << "\t";
-    cout << "(" << fIRFData.size();
-    if( iSpectralIndexBin < fIRFData.size() )
-    {
-        cout << "\t" << fIRFData[iSpectralIndexBin].size();
-    }
-    cout << ")" << endl;
-    
-    return 0;
+        if( iSpectralIndexBin < fIRFData.size() && iAzBin < fIRFData[iSpectralIndexBin].size()
+                && fIRFData[iSpectralIndexBin][iAzBin] )
+        {
+                return fIRFData[iSpectralIndexBin][iAzBin]->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF];
+        }
+        
+        cout << "VInstrumentResponseFunction::getAngularResolutionGraph: warning index out of range ";
+        cout << iAzBin << "\t" << iSpectralIndexBin << "\t";
+        cout << "(" << fIRFData.size();
+        if( iSpectralIndexBin < fIRFData.size() )
+        {
+                cout << "\t" << fIRFData[iSpectralIndexBin].size();
+        }
+        cout << ")" << endl;
+        
+        return 0;
 }
 
-/* //// MNR: WRONG ????? why first iAzBin???
+/* //// This is how it is defined in v480e, iAzBin, iSpectralIndexBin seem to be reversed as in v502.
 TGraphErrors* VInstrumentResponseFunction::getAngularResolutionGraph( unsigned int iAzBin, unsigned int iSpectralIndexBin )
 {
 	if( iAzBin < fIRFData.size() && iSpectralIndexBin < fIRFData[iAzBin].size() && fIRFData[iAzBin][iSpectralIndexBin] )

@@ -141,6 +141,18 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	gEffAreaRec->SetName( hname );
 	gEffAreaRec->SetTitle( htitle );
 	hisTreeList->Add( gEffAreaRec );
+	
+        sprintf( hname, "gEffAreaNoTh2MC" );
+	gEffAreaNoTh2MC = new TGraphAsymmErrors( 1 );
+	gEffAreaNoTh2MC->SetName( hname );
+	gEffAreaNoTh2MC->SetTitle( htitle );
+	hisTreeList->Add( gEffAreaNoTh2MC );
+
+	sprintf( hname, "gEffAreaNoTh2Rec" );
+	gEffAreaNoTh2Rec = new TGraphAsymmErrors( 1 );
+	gEffAreaNoTh2Rec->SetName( hname );
+	gEffAreaNoTh2Rec->SetTitle( htitle );
+	hisTreeList->Add( gEffAreaNoTh2Rec );
 
 	// spectral weight
 	sprintf( hname, "hEmcSWeight" );
@@ -281,6 +293,15 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
         hAngularLogDiff_2D->SetXTitle( "energy_{rec} [TeV]" );
         hAngularLogDiff_2D->SetYTitle( "log_{10}(angular diff. (R,MC) [deg])" );
         hisTreeList->Add( hAngularLogDiff_2D );
+        
+        // log angular difference histogram (vs true energy)
+        sprintf( hname, "hAngularLogDiffEmc_2D" );
+        hAngularLogDiffEmc_2D = new TH2D( hname, "log angular difference histogram (vs true energy)",
+                                          25, -1.9, 3.5,
+                                          100, -4., 1. );
+        hAngularLogDiffEmc_2D->SetXTitle( "energy_{MC} [TeV]" );
+        hAngularLogDiffEmc_2D->SetYTitle( "log_{10}(angular diff. (R,MC) [deg])" );
+        hisTreeList->Add( hAngularLogDiffEmc_2D );
 
 	// weighted rate
 	// (use CTA binning, 5 bins per decade)
@@ -2657,12 +2678,12 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			}
                         if( !binomialDivide( gEffAreaNoTh2MC, hVEcutNoTh2[s][i_az], hVEmc[s][i_az] ) )
                         {
-                                cout << "VEffectiveAreaCalculator::fill: error calculating effective area vs MC energy" << endl;
+                                cout << "VEffectiveAreaCalculator::fill: error calculating effective area before cuts vs MC energy" << endl;
                                 cout << "s : " << s << " , az: " << i_az << endl;
                         }
                         if( !binomialDivide( gEffAreaNoTh2Rec, hVEcutRecNoTh2[s][i_az], hVEmc[s][i_az] ) )
                         {
-                                cout << "VEffectiveAreaCalculator::fill: error calculating effective area vs rec energy" << endl;
+                                cout << "VEffectiveAreaCalculator::fill: error calculating effective area before cuts vs rec energy" << endl;
                                 cout << "s : " << s << " , az: " << i_az << endl;
                         }
                         // normalize response matrices
@@ -3555,11 +3576,9 @@ void VEffectiveAreaCalculator::resetHistograms( unsigned int ize )
 	sprintf( htitle, "migration matrix (%.1f deg)", fZe[ize] );
 	hResponseMatrixProfile->SetTitle( htitle );
 
-
 	hEmcSWeight->Reset();
 	sprintf( htitle, "spectral weights (%.1f deg)", fZe[ize] );
 	hEmcSWeight->SetTitle( htitle );
-
 }
 
 
@@ -4243,7 +4262,6 @@ void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
                         hVAngularLogDiffEmc_2D[i]->Reset();
                 }
 	}
-        */
 
 	for( unsigned int i = 0; i < hVWeightedRate.size(); i++ )
 	{
@@ -4255,6 +4273,7 @@ void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
                         }
                 }
 	}
+        */
 }
 
 

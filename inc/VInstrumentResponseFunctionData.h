@@ -109,7 +109,8 @@ class VInstrumentResponseFunctionData : public TObject, public VHistogramUtiliti
 		}
 		bool   terminate( double iContainmentProbability, double iContainmentProbabilityError );
 		
-		ClassDef( VInstrumentResponseFunctionData, 6 );
+                // Set ClassDef to match that one of v502 (note that there are however no King function entries)
+		ClassDef( VInstrumentResponseFunctionData, 8 );
 };
 
 #endif
