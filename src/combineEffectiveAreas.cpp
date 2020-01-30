@@ -71,7 +71,7 @@ void merge( string ifile, char* outputfile, bool bFull = false )
 		f.SetBranchStatus( "Rec_nbins", 1 );
 		f.SetBranchStatus( "Rec_e0", 1 );
 		f.SetBranchStatus( "Rec_eff", 1 );
-		f.SetBranchStatus( "Rec_eff_error", 1 );
+		//f.SetBranchStatus( "Rec_eff_error", 1 );
                 f.SetBranchStatus( "Rec_angRes_p68", 1 );
                 f.SetBranchStatus( "Rec_angRes_p80", 1 );
                 // errors not needed for standard analysis

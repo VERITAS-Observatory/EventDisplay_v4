@@ -365,6 +365,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	fEffArea->Branch( "Rec_nbins", &Rec_nbins, "Rec_nbins/I" );
 	fEffArea->Branch( "Rec_e0", Rec_e0, "Rec_e0[Rec_nbins]/D" ); // log10( energy ) in [TeV]
 	fEffArea->Branch( "Rec_eff", Rec_eff, "Rec_eff[Rec_nbins]/D" ); // effective area vs reconstructed energy (approximation)
+	fEffArea->Branch( "Rec_eff_error", Rec_eff_error, "Rec_eff_error[Rec_nbins]/D" ); // effective area vs reconstructed energy (approximation, error)
         fEffArea->Branch( "eff_error", eff_error, "eff_error[nbins]/F" );
         fEffArea->Branch( "esys_rel", esys_rel, "esys_rel[nbins]/F" );
 	fEffArea->Branch( "Rec_seff_L", Rec_seff_L, "Rec_seff_L[Rec_nbins]/D" );
@@ -1282,12 +1283,14 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 		iEffArea->SetBranchAddress( "nbins", &nbins );
 		iEffArea->SetBranchAddress( "e0", e0 );
 		iEffArea->SetBranchAddress( "eff", eff );
+		iEffArea->SetBranchAddress( "eff_error", eff_error );
 	}
 	else if( fEffectiveAreaVsEnergyMC == 1 )
 	{
 		iEffArea->SetBranchAddress( "Rec_nbins", &nbins );
 		iEffArea->SetBranchAddress( "Rec_e0", e0 );
 		iEffArea->SetBranchAddress( "Rec_eff", eff );
+		iEffArea->SetBranchAddress( "Rec_eff_error", eff_error );
 	}
         // bias in energy reconstruction
         iEffArea->SetBranchAddress( "esys_rel", esys_rel );
