@@ -22,6 +22,8 @@ VInstrumentResponseFunction::VInstrumentResponseFunction()
 	fDataProduct = 0;
 	
 	setContainmentProbability();
+        setTelescopeTypeCuts();
+        setDuplicationID();
 }
 
 void VInstrumentResponseFunction::setRunParameter( VInstrumentResponseFunctionRunParameter* iRunPara )
@@ -34,6 +36,7 @@ void VInstrumentResponseFunction::setRunParameter( VInstrumentResponseFunctionRu
 	fEnergyReconstructionMethod = iRunPara->fEnergyReconstructionMethod;
 	setEnergyReconstructionMethod( iRunPara->fEnergyReconstructionMethod );
 	setMonteCarloEnergyRange( iRunPara->fMCEnergy_min, iRunPara->fMCEnergy_max, TMath::Abs( iRunPara->fMCEnergy_index ) );
+        setTelescopeTypeCuts( iRunPara->fTelescopeTypeCuts );
 	
 	fVMinAz = iRunPara->fAzMin;
 	fVMaxAz = iRunPara->fAzMax;

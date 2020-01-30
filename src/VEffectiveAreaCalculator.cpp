@@ -372,8 +372,6 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 
         fEffArea->Branch( "Rec_angRes_p68", Rec_angRes_p68, "Rec_angRes_p68[Rec_nbins]/F" );
         fEffArea->Branch( "Rec_angRes_p80", Rec_angRes_p80, "Rec_angRes_p80[Rec_nbins]/F" );
-        fEffArea->Branch( "Rec_angRes_kingSigma", Rec_angRes_kingSigma, "Rec_angRes_kingSigma[Rec_nbins]/F" );
-        fEffArea->Branch( "Rec_angRes_kingGamma", Rec_angRes_kingGamma, "Rec_angRes_kingGamma[Rec_nbins]/F" );
 
 	// For reconstructing the response matrices
 	fEffArea->Branch( "nbins_ResMat", &nbins_ResMat, "nbins_ResMat/I" );
@@ -1990,8 +1988,6 @@ void VEffectiveAreaCalculator::reset()
 		ResMat_Rec_Err[i] = 0.;
                 Rec_angRes_p68[i] = 0.;
                 Rec_angRes_p80[i] = 0.;
-                Rec_angRes_kingSigma[i] = 0.;
-                Rec_angRes_kingGamma[i] = 0.;
 
 	}
 
@@ -2706,8 +2702,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
                                 Rec_eff_error[i] = 0.;
                                 Rec_angRes_p68[i] = 0.;
                                 Rec_angRes_p80[i] = 0.;
-                                Rec_angRes_kingSigma[i] = 0.;
-                                Rec_angRes_kingGamma[i] = 0.;
 			}
 			double x = 0.;
 			double y = 0.;
