@@ -151,6 +151,8 @@ class VEffectiveAreaCalculator
                 vector< vector< TH2D* > > hVAngMC2D;            // direction reconstruction
 
 		vector< vector< TH1D* > > hVWeightedRate;
+		vector< vector< TH1D* > > hVWeightedRate005;
+		vector< vector< vector < TH1D* > > > hVEcutSub;
 
                 // angular resolution graphs (vector in az)
                 vector< TGraphErrors* > fGraph_AngularResolution68p;
@@ -200,6 +202,7 @@ class VEffectiveAreaCalculator
                 TH2D* hResponseMatrixFineNoDirectionCut;
 
 		TH1D* hWeightedRate;
+		TH1D* hWeightedRate005;
 		vector< TH1D* > hEcutSub;                //! events after individual cuts
     
                 TH2D *hAngularDiff_2D;

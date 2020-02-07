@@ -222,7 +222,6 @@ int main( int argc, char* argv[] )
 	
 	CData d( c, true, 6, true );
 	fCuts->setDataTree( &d );
-	
 	TH1D* hE0mc = ( TH1D* )gDirectory->Get( "hE0mc" );
 	
 	/////////////////////////////////////////////////////////////////////////////
@@ -340,6 +339,7 @@ int main( int argc, char* argv[] )
                         {
                             for( unsigned int i = 0; i < fRunPara->fAzMin.size(); i++ )
                             {
+			        //cout << "copy/setAngularResolution (" << f << " " << i << ")" << endl;
                                 fEffectiveAreaCalculator.setAngularResolutionGraph( i,
                                         f_IRF[f]->getAngularResolutionGraph( i, 0 ),
                                         false );

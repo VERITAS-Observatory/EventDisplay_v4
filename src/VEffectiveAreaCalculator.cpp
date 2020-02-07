@@ -312,6 +312,15 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	hWeightedRate->SetYTitle( "entries" );
 	hisTreeList->Add( hWeightedRate );
 
+        // weighted rate
+        // (finner binning, primarily used for VTS analysis)
+        sprintf( hname, "hWeightedRate005" );
+        hWeightedRate005 = new TH1D( hname, "weighted rates (005 binning)", 120, -2.9, 3.1 );
+        hWeightedRate005->Sumw2();
+        hWeightedRate005->SetXTitle( "energy_{rec} [TeV]" );
+        hWeightedRate005->SetYTitle( "entries" );
+        hisTreeList->Add( hWeightedRate005 );
+
         // angular resolution graphs
         for( unsigned int i = 0; i < fRunPara->fAzMin.size(); i++ )
         {    
@@ -365,7 +374,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	fEffArea->Branch( "Rec_nbins", &Rec_nbins, "Rec_nbins/I" );
 	fEffArea->Branch( "Rec_e0", Rec_e0, "Rec_e0[Rec_nbins]/D" ); // log10( energy ) in [TeV]
 	fEffArea->Branch( "Rec_eff", Rec_eff, "Rec_eff[Rec_nbins]/D" ); // effective area vs reconstructed energy (approximation)
-	fEffArea->Branch( "Rec_eff_error", Rec_eff_error, "Rec_eff_error[Rec_nbins]/D" ); // effective area vs reconstructed energy (approximation, error)
+	fEffArea->Branch( "Rec_eff_error", Rec_eff_error, "Rec_eff_error[Rec_nbins]/F" ); // effective area vs reconstructed energy (approximation, error)
         fEffArea->Branch( "eff_error", eff_error, "eff_error[nbins]/F" );
         fEffArea->Branch( "esys_rel", esys_rel, "esys_rel[nbins]/F" );
 	fEffArea->Branch( "Rec_seff_L", Rec_seff_L, "Rec_seff_L[Rec_nbins]/D" );
@@ -802,9 +811,6 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
 		}
 		hVResponseMatrixFineQC.push_back( iT_TH2D );
 
-                
-
-
 		iT_TH1D.clear();
 		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
 		{
@@ -819,6 +825,40 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
 			}
 		}
 		hVWeightedRate.push_back( iT_TH1D );
+		iT_TH1D.clear();
+		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
+		{
+			sprintf( hname, "hVWeightedRate005_%d_%d", i, j );
+			if( hWeightedRate005 )
+			{
+				iT_TH1D.push_back( ( TH1D* )hWeightedRate005->Clone( hname ) );
+			}
+			else
+			{
+				iT_TH1D.push_back( 0 );
+			}
+		}
+                hVWeightedRate005.push_back( iT_TH1D );
+
+                vector< vector< TH1D* > > i_temp;
+                for( unsigned int e = 0; e < hEcutSub.size(); e++ )
+                {
+                        sprintf( hname, "hV%s", hEcutSub[e]->GetName() );
+                        iT_TH1D.clear();
+                        for( unsigned int j = 0; j < fVMinAz.size(); j++ )
+                        {
+                                if ( hEcutSub[e] )
+                                {
+                                        iT_TH1D.push_back( ( TH1D* )hEcutSub[e]->Clone( hname ) );
+                                }
+                                else
+                                {
+                                        iT_TH1D.push_back( 0 );
+                                }
+                        }
+                        i_temp.push_back( iT_TH1D );
+                }
+                hVEcutSub.push_back( i_temp );
 	}
 }
 
@@ -2629,6 +2669,10 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				{
 					hVWeightedRate[s][i_az]->Fill( eRec, getCRWeight( d->MCe0, hVEmc[s][i_az] ) );
 				}
+				if( hVWeightedRate005[s][i_az] )
+				{
+					hVWeightedRate005[s][i_az]->Fill( eRec, getCRWeight( d->MCe0, hVEmc[s][i_az] ) );
+				}
 			}
 		}
 		// don't do anything between here and the end of the loop! Never!
@@ -2773,13 +2817,14 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			copyHistograms( hResponseMatrixFine, hVResponseMatrixFine[s][i_az], true );
 			copyHistograms( hResponseMatrixFineQC, hVResponseMatrixFineQC[s][i_az], true );
 			copyHistograms( hResponseMatrixFineNoDirectionCut, hVResponseMatrixFineNoDirectionCut[s][i_az], true );
+			
+                        copyHistograms( hWeightedRate, hVWeightedRate[s][i_az], false );
+                        copyHistograms( hWeightedRate005, hVWeightedRate005[s][i_az], false );
+                        for( unsigned int e = 0; e < hEcutSub.size(); e++ )
+                        {
+                            copyHistograms( hEcutSub[e], hVEcutSub[s][e][i_az], false );
+                        }
 
-                        /*
-                        copyHistograms( hAngularDiff_2D, hVAngularDiff_2D[s][i_az], true );
-                        copyHistograms( hAngularDiffEmc_2D, hVAngularDiffEmc_2D[s][i_az], true );
-                        copyHistograms( hAngularLogDiff_2D, hVAngularLogDiff_2D[s][i_az], true );
-                        copyHistograms( hAngularLogDiffEmc_2D, hVAngularLogDiffEmc_2D[s][i_az], true );
-                        */
                         copyHistograms( hAngularDiff_2D, hVAngularDiff_2D[i_az], true );
                         copyHistograms( hAngularDiffEmc_2D, hVAngularDiffEmc_2D[i_az], true );
                         copyHistograms( hAngularLogDiff_2D, hVAngularLogDiff_2D[i_az], true );
@@ -2788,7 +2833,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
                         fillAngularResolution( i_az, false );
                         fillAngularResolution( i_az, true );
 
-			copyHistograms( hWeightedRate, hVWeightedRate[s][i_az], false );
 
 
 			// Assuming that the error on the energy reconstruction is aprroximatly gaussian
