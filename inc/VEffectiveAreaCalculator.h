@@ -230,6 +230,7 @@ class VEffectiveAreaCalculator
 		int nbins;
 		double e0[1000];
 		double eff[1000];
+		double effNoTh2[1000];
 		int nbins_MC;
 		double e0_MC[1000];
 		double eff_MC[1000];
@@ -237,24 +238,25 @@ class VEffectiveAreaCalculator
 		double seff_U[1000];
                 
                 float eff_error[1000];
+                float effNoTh2_error[1000];
                 float esys_rel[1000];
 
 		int Rec_nbins;
 		double Rec_e0[1000];
 		double Rec_eff[1000];
+		double Rec_effNoTh2[1000];
 		double Rec_seff_L[1000];
 		double Rec_seff_U[1000];
 		int nbins_ResMat;
 		double ResMat_MC[1000];
 		double ResMat_Rec[1000];
 		double ResMat_Rec_Err[1000];
-
+                
                 float Rec_eff_error[1000];
+                float Rec_effNoTh2_error[1000];
+
                 float Rec_angRes_p68[1000];
                 float Rec_angRes_p80[1000];
-                float Rec_angRes_kingSigma[1000];
-                float Rec_angRes_kingGamma[1000];
-
 
 		TTree* fAcceptance_AfterCuts_tree;       //Information for all the events after cuts to construct the background map
 		double fXoff_aC;

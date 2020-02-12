@@ -54,8 +54,8 @@ void merge( string ifile, char* outputfile, bool bFull = false )
 		f.SetBranchStatus( "az", 1 );
 		f.SetBranchStatus( "azMin", 1 );
 		f.SetBranchStatus( "azMax", 1 );
-		f.SetBranchStatus( "Xoff", 1 ); // removed in v502
-		f.SetBranchStatus( "Yoff", 1 ); // removed in v502
+		  //f.SetBranchStatus( "Xoff", 1 ); // removed in v502
+		  //f.SetBranchStatus( "Yoff", 1 ); // removed in v502
 		f.SetBranchStatus( "Woff", 1 );
 		f.SetBranchStatus( "noise", 1 );
 		f.SetBranchStatus( "pedvar", 1 );
@@ -63,7 +63,9 @@ void merge( string ifile, char* outputfile, bool bFull = false )
 		f.SetBranchStatus( "nbins", 1 );
 		f.SetBranchStatus( "e0", 1 );
 		f.SetBranchStatus( "eff", 1 );
-                f.SetBranchStatus( "eff_error", 1 );
+		f.SetBranchStatus( "effNoTh2", 1 );
+                  //f.SetBranchStatus( "eff_error", 1 );
+                  //f.SetBranchStatus( "effNoTh2_error", 1 );
                 f.SetBranchStatus( "esys_rel", 1 );
 		// errors not needed for standard analysis
 		//f.SetBranchStatus( "seff_L", 1 ); // removed in v502
@@ -71,7 +73,9 @@ void merge( string ifile, char* outputfile, bool bFull = false )
 		f.SetBranchStatus( "Rec_nbins", 1 );
 		f.SetBranchStatus( "Rec_e0", 1 );
 		f.SetBranchStatus( "Rec_eff", 1 );
-		f.SetBranchStatus( "Rec_eff_error", 1 );  // removed in v502
+		f.SetBranchStatus( "Rec_effNoTh2", 1 );
+		  //f.SetBranchStatus( "Rec_eff_error", 1 );  // removed in v502
+		  //f.SetBranchStatus( "Rec_effNoTh2_error", 1 );  // removed in v502
                 f.SetBranchStatus( "Rec_angRes_p68", 1 );
                 f.SetBranchStatus( "Rec_angRes_p80", 1 );
                 // errors not needed for standard analysis
@@ -84,13 +88,13 @@ void merge( string ifile, char* outputfile, bool bFull = false )
                 // Full histograms for DL3
 		f.SetBranchStatus( "hEsysMCRelative2D", 1 );
                 f.SetBranchStatus( "hEsysMCRelative2DNoDirectionCut", 1 );
-                //f.SetBranchStatus( "hAngularDiff_2D", 1 );
-                f.SetBranchStatus( "hAngularDiffEmc_2D", 1 );
+                  //f.SetBranchStatus( "hAngularDiff_2D", 1 );
+                  //f.SetBranchStatus( "hAngularDiffEmc_2D", 1 );
                 f.SetBranchStatus( "hAngularLogDiffEmc_2D", 1 );
-                f.SetBranchStatus( "gEffAreaNoTh2MC", 1 );
-                f.SetBranchStatus( "gEffAreaNoTh2Rec", 1 );
+                  //f.SetBranchStatus( "gEffAreaNoTh2MC", 1 );  // replaced by effNoTh2 and Rec_effNoTh2
+                  //f.SetBranchStatus( "gEffAreaNoTh2Rec", 1 );
 		// needed for binned likelihood analysis
-		f.SetBranchStatus( "hResponseMatrixFineQC", 0); // removed in v502
+		//f.SetBranchStatus( "hResponseMatrixFineQC", 0); // removed in v502
 		f.SetBranchStatus( "nbins_ResMat", 1 );
 		f.SetBranchStatus( "ResMat_MC", 1 );
 		f.SetBranchStatus( "ResMat_Rec", 1 );
