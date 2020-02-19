@@ -28,6 +28,9 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	// no effective area file present
 	bNOFILE = true;
 
+        // Observatory type: defines the binning. VTS=1, CTA=0 (and otherwise)
+        fObservatory = iRunPara->fObservatory;
+
 	// number of bins for histograms
 	nbins = fRunPara->fEnergyAxisBins_log10;
 
@@ -181,31 +184,39 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	hisTreeList->Add( hEsysMCRelative );
 
 	sprintf( hname, "hEsysMCRelativeRMS" );
-	hEsysMCRelativeRMS = new TH2D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 3000, -5., 5. );
+	hEsysMCRelativeRMS = new TH2F( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 3000, -5., 5. );
 	hEsysMCRelativeRMS->SetXTitle( "energy_{MC} [TeV]" );
 	hEsysMCRelativeRMS->SetYTitle( "energy bias (E_{rec}-E_{MC})/E_{MC}" );
 	hisTreeList->Add( hEsysMCRelativeRMS );
 
-	// use CTA WP Phys binning
-	sprintf( hname, "hEsysMCRelative2D" );
-	hEsysMCRelative2D = new TH2D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 300, 0., 3. );
-	hEsysMCRelative2D->SetXTitle( "energy_{MC} [TeV]" );
-	hEsysMCRelative2D->SetYTitle( "energy bias E_{rec}/E_{MC}" );
-	hisTreeList->Add( hEsysMCRelative2D );
+        if( fObservatory == 1 ) // In VTS we do not need that much resolution
+        {
+            fBiasBin = 150;
+        }
+        else
+        {
+            // Assume CTA and use CTA WP Phys binning
+            fBiasBin = 300;
+        }    
+        sprintf( hname, "hEsysMCRelative2D" );
+        hEsysMCRelative2D = new TH2F( hname, htitle, 
+            nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 
+            fBiasBin, 0., 3. );
+        hEsysMCRelative2D->SetXTitle( "energy_{MC} [TeV]" );
+        hEsysMCRelative2D->SetYTitle( "energy bias E_{rec}/E_{MC}" );
+        hisTreeList->Add( hEsysMCRelative2D );
 
-        // use CTA WP Phys binning
         sprintf( hname, "hEsysMCRelative2DNoDirectionCut" );
-        hEsysMCRelative2DNoDirectionCut = new TH2D( hname, 
-            "energy reconstruction, after gamma-selection cuts",
-            nbins, fEnergyAxis_minimum_defaultValue, 
-            fEnergyAxis_maximum_defaultValue,
-            300, 0., 3. );
+        hEsysMCRelative2DNoDirectionCut = new TH2F( hname, 
+            "energy reconstruction, after gamma-selection cuts", 
+            nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 
+            fBiasBin, 0., 3. ); // default binning y:300 -> 150
         hEsysMCRelative2DNoDirectionCut->SetXTitle( "energy_{MC} [TeV]" );
         hEsysMCRelative2DNoDirectionCut->SetYTitle( "energy bias E_{rec}/E_{MC}" );
         hisTreeList->Add( hEsysMCRelative2DNoDirectionCut );
 
 	sprintf( hname, "hEsys2D" );
-	hEsys2D = new TH2D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 100, -0.98, 2.02 );
+	hEsys2D = new TH2F( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 100, -0.98, 2.02 );
 	hEsys2D->SetXTitle( "energy_{MC} [TeV]" );
 	hEsys2D->SetYTitle( "log_{10} E_{rec} - log_{10} E_{MC}" );
 	hisTreeList->Add( hEsys2D );
@@ -269,7 +280,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 
         // angular difference histogram (vs reconstructed energy)
         sprintf( hname, "hAngularDiff_2D" );
-        hAngularDiff_2D = new TH2D( hname, "angular difference histogram (vs reconstructed energy)",
+        hAngularDiff_2D = new TH2F( hname, "angular difference histogram (vs reconstructed energy)",
                                           25, -1.9, 3.5,
                                           9000, 0., 4.5 );
         hAngularDiff_2D->SetXTitle( "energy_{rec} [TeV]" );
@@ -278,7 +289,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
        
         // angular difference histogram (vs true energy)
         sprintf( hname, "hAngularDiffEmc_2D" );
-        hAngularDiffEmc_2D = new TH2D( hname, "angular difference histogram (vs true energy)",
+        hAngularDiffEmc_2D = new TH2F( hname, "angular difference histogram (vs true energy)",
                                           25, -1.9, 3.5,
                                           9000, 0., 4.5 );
         hAngularDiffEmc_2D->SetXTitle( "energy_{MC} [TeV]" );
@@ -287,7 +298,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 
         // log angular difference histogram (vs reconstructed energy)
         sprintf( hname, "hAngularLogDiff_2D" );
-        hAngularLogDiff_2D = new TH2D( hname, "log angular difference histogram (vs reconstructed energy)",
+        hAngularLogDiff_2D = new TH2F( hname, "log angular difference histogram (vs reconstructed energy)",
                                           25, -1.9, 3.5,
                                           100, -4., 1. );
         hAngularLogDiff_2D->SetXTitle( "energy_{rec} [TeV]" );
@@ -296,7 +307,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
         
         // log angular difference histogram (vs true energy)
         sprintf( hname, "hAngularLogDiffEmc_2D" );
-        hAngularLogDiffEmc_2D = new TH2D( hname, "log angular difference histogram (vs true energy)",
+        hAngularLogDiffEmc_2D = new TH2F( hname, "log angular difference histogram (vs true energy)",
                                           25, -1.9, 3.5,
                                           100, -4., 1. );
         hAngularLogDiffEmc_2D->SetXTitle( "energy_{MC} [TeV]" );
@@ -425,6 +436,7 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
 
 	vector< TH1D* > iT_TH1D;
 	vector< TH2D* > iT_TH2D;
+	vector< TH2F* > iT_TH2F;
 	vector< TProfile* > iT_TProfile;
 
 	for( unsigned int i = 0; i < fVSpectralIndex.size(); i++ )
@@ -629,66 +641,66 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
 		}
 		hVEsysMCRelative.push_back( iT_TProfile );
 
-		iT_TH2D.clear();
+		iT_TH2F.clear();
 		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
 		{
 			sprintf( hname, "hVEsysMCRelativeRMS_%d_%d", i, j );
 			if( hEsysMCRelativeRMS )
 			{
-				iT_TH2D.push_back( ( TH2D* )hEsysMCRelativeRMS->Clone( hname ) );
+				iT_TH2F.push_back( ( TH2F* )hEsysMCRelativeRMS->Clone( hname ) );
 			}
 			else
 			{
-				iT_TH2D.push_back( 0 );
+				iT_TH2F.push_back( 0 );
 			}
 		}
-		hVEsysMCRelativeRMS.push_back( iT_TH2D );
+		hVEsysMCRelativeRMS.push_back( iT_TH2F );
 
 
-		iT_TH2D.clear();
+		iT_TH2F.clear();
 		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
 		{
 			sprintf( hname, "hVEsysMCRelative2D_%d_%d", i, j );
 			if( hEsysMCRelative2D )
 			{
-				iT_TH2D.push_back( ( TH2D* )hEsysMCRelative2D->Clone( hname ) );
+				iT_TH2F.push_back( ( TH2F* )hEsysMCRelative2D->Clone( hname ) );
 			}
 			else
 			{
-				iT_TH2D.push_back( 0 );
+				iT_TH2F.push_back( 0 );
 			}
 		}
-		hVEsysMCRelative2D.push_back( iT_TH2D );
+		hVEsysMCRelative2D.push_back( iT_TH2F );
 		
-                iT_TH2D.clear();
+                iT_TH2F.clear();
 		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
 		{
 			sprintf( hname, "hVEsysMCRelative2DNoDirectionCut_%d_%d", i, j );
 			if( hEsysMCRelative2DNoDirectionCut )
 			{
-				iT_TH2D.push_back( ( TH2D* )hEsysMCRelative2DNoDirectionCut->Clone( hname ) );
+				iT_TH2F.push_back( ( TH2F* )hEsysMCRelative2DNoDirectionCut->Clone( hname ) );
 			}
 			else
 			{
-				iT_TH2D.push_back( 0 );
+				iT_TH2F.push_back( 0 );
 			}
 		}
-		hVEsysMCRelative2DNoDirectionCut.push_back( iT_TH2D );
+		hVEsysMCRelative2DNoDirectionCut.push_back( iT_TH2F );
 
-		iT_TH2D.clear();
+		iT_TH2F.clear();
 		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
 		{
 			sprintf( hname, "hVEsys2D_%d_%d", i, j );
 			if( hEsys2D )
 			{
-				iT_TH2D.push_back( ( TH2D* )hEsys2D->Clone( hname ) );
+				iT_TH2F.push_back( ( TH2F* )hEsys2D->Clone( hname ) );
 			}
 			else
 			{
-				iT_TH2D.push_back( 0 );
+				iT_TH2F.push_back( 0 );
 			}
 		}
-		hVEsys2D.push_back( iT_TH2D );
+		hVEsys2D.push_back( iT_TH2F );
 
 		iT_TH2D.clear();
 		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
@@ -1008,7 +1020,7 @@ double VEffectiveAreaCalculator::getAzMean( double azmin, double azmax )
 
 
 /*
- *  CALLED TO USE EFFECTIVE AREAS
+ *  CALLED TO READ/USE EFFECTIVE AREAS
  */
 bool VEffectiveAreaCalculator::getEffectiveAreasFromFitFunction( TTree* iEffFit, double azmin, double azmax, double iSpectralIndex )
 {
@@ -1107,8 +1119,7 @@ void VEffectiveAreaCalculator::multiplyByScatterArea( TGraphAsymmErrors* g )
     for( int i = 0; i < g->GetN(); i++ )
     {
         g->GetPoint( i, x, y );
-        y *= fMC_ScatterArea;
-        g->SetPoint( i, x, y );
+        g->SetPoint( i, x, y*fMC_ScatterArea );
         g->SetPointEYlow( i, g->GetErrorYlow( i ) * fMC_ScatterArea );
         g->SetPointEYhigh( i, g->GetErrorYhigh( i ) * fMC_ScatterArea );
     }
@@ -1182,10 +1193,10 @@ void VEffectiveAreaCalculator::setAngularResolution2D(  unsigned int i_az, vecto
 {
     if( i_az < hVAngularDiff_2D.size() && h.size() == 4 )
     {
-          hVAngularDiff_2D[i_az] = h[0];
-          hVAngularLogDiff_2D[i_az] = h[1];
-          hVAngularDiffEmc_2D[i_az] = h[2];
-          hVAngularLogDiffEmc_2D[i_az] = h[3];
+          hVAngularDiff_2D[i_az] = (TH2F*) h[0];
+          hVAngularLogDiff_2D[i_az] = (TH2F*) h[1];
+          hVAngularDiffEmc_2D[i_az] = (TH2F*) h[2];
+          hVAngularLogDiffEmc_2D[i_az] = (TH2F*) h[3];
     }
 }
 
@@ -1222,6 +1233,7 @@ vector< double > VEffectiveAreaCalculator::interpolate_effectiveArea( double iV,
 }
 
 
+/*
 // Interpolating between two response matrices
 TH2D *VEffectiveAreaCalculator::interpolate_responseMatrix( double iV, double iVLower, double iVupper,
         TH2D *iElower, TH2D *iEupper, bool iCos  )
@@ -1248,6 +1260,7 @@ TH2D *VEffectiveAreaCalculator::interpolate_responseMatrix( double iV, double iV
         }
     return hTemp;
 }
+*/
 
 /*
  *
@@ -1324,14 +1337,14 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 		iEffArea->SetBranchAddress( "nbins", &nbins );
 		iEffArea->SetBranchAddress( "e0", e0 );
 		iEffArea->SetBranchAddress( "eff", eff );
-		iEffArea->SetBranchAddress( "eff_error", eff_error );
+		//iEffArea->SetBranchAddress( "eff_error", eff_error );
 	}
 	else if( fEffectiveAreaVsEnergyMC == 1 )
 	{
 		iEffArea->SetBranchAddress( "Rec_nbins", &nbins );
 		iEffArea->SetBranchAddress( "Rec_e0", e0 );
 		iEffArea->SetBranchAddress( "Rec_eff", eff );
-		iEffArea->SetBranchAddress( "Rec_eff_error", eff_error );
+		//iEffArea->SetBranchAddress( "Rec_eff_error", eff_error );
 	}
         // bias in energy reconstruction
         iEffArea->SetBranchAddress( "esys_rel", esys_rel );
@@ -2791,7 +2804,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
                                     esys_rel[i] = hVEsysMCRelative[s][i_az]->GetBinContent( 
                                         hVEsysMCRelative[s][i_az]->GetXaxis()->FindBin( e0[i] ) );
                                 }
-
 			}
 			
 
@@ -2812,12 +2824,14 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			}
                         */
 
-                        // New version, hopefully more compact.
+                        // New version, hopefully more compact. 
+			// 1) Multiply effective areas by scatter area.
                         multiplyByScatterArea( gEffAreaMC );
                         multiplyByScatterArea( gEffAreaRec );
                         multiplyByScatterArea( gEffAreaNoTh2MC );
                         multiplyByScatterArea( gEffAreaNoTh2Rec );
-
+			
+			// 2) Fetch from the graph the eff area arrays and errors.
                         for( int i = 0; i < nbins; i++ )
                         {
                                 gEffAreaMC->GetPoint( i, x, y );
@@ -2838,7 +2852,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
                                                             gEffAreaNoTh2MC->GetErrorYhigh( i ) 
                                                           );
                         }
-                        
                         for( int i = 0; i < Rec_nbins; i++ )
                         {
 				gEffAreaRec->GetPoint( i, x, y );
@@ -2894,10 +2907,10 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
                         copyHistograms( hAngularDiffEmc_2D, hVAngularDiffEmc_2D[i_az], true );
                         copyHistograms( hAngularLogDiff_2D, hVAngularLogDiff_2D[i_az], true );
                         copyHistograms( hAngularLogDiffEmc_2D, hVAngularLogDiffEmc_2D[i_az], true );
-                        // fill angular resolution vs energy
+                        
+			// fill angular resolution vs energy
                         fillAngularResolution( i_az, false );
                         fillAngularResolution( i_az, true );
-
 
 
 			// Assuming that the error on the energy reconstruction is aprroximatly gaussian
@@ -3641,6 +3654,12 @@ void VEffectiveAreaCalculator::resetHistograms( unsigned int ize )
 
 	sprintf( htitle, "effective area vs E_{rec} (%.1f deg)", fZe[ize] );
 	gEffAreaRec->SetTitle( htitle );
+	
+        sprintf( htitle, "effective area before cuts vs E_{MC} (%.1f deg)", fZe[ize] );
+	gEffAreaNoTh2MC->SetTitle( htitle );
+
+	sprintf( htitle, "effective area before cuts vs E_{rec} (%.1f deg)", fZe[ize] );
+	gEffAreaNoTh2Rec->SetTitle( htitle );
 
 	hEsysRec->Reset();
 	sprintf( htitle, "energy reconstruction (%.1f deg)", fZe[ize] );
@@ -4338,37 +4357,7 @@ void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
                 }
 	}
         */
-
-        /*
-        for( unsigned int i = 0; i < hVAngularDiff_2D.size(); i++ )
-	{
-                if( hVAngularDiff_2D[i] )
-                {
-                        hVAngularDiff_2D[i]->Reset();
-                }
-	}
-        for( unsigned int i = 0; i < hVAngularDiffEmc_2D.size(); i++ )
-	{
-                if( hVAngularDiffEmc_2D[i] )
-                {
-                        hVAngularDiffEmc_2D[i]->Reset();
-                }
-	}
-        for( unsigned int i = 0; i < hVAngularLogDiff_2D.size(); i++ )
-	{
-                if( hVAngularLogDiff_2D[i] )
-                {
-                        hVAngularLogDiff_2D[i]->Reset();
-                }
-	}
-        for( unsigned int i = 0; i < hVAngularLogDiffEmc_2D.size(); i++ )
-	{
-                if( hVAngularLogDiffEmc_2D[i] )
-                {
-                        hVAngularLogDiffEmc_2D[i]->Reset();
-                }
-	}
-
+	
 	for( unsigned int i = 0; i < hVWeightedRate.size(); i++ )
 	{
                 for( unsigned int j = 0; j < hVWeightedRate[i].size(); j++ )
@@ -4379,7 +4368,7 @@ void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
                         }
                 }
 	}
-        */
+        
 }
 
 

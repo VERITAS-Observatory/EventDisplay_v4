@@ -45,7 +45,8 @@ class VEffectiveAreaCalculator
 		vector< vector< double > > fEffArea_time;
 		vector< vector< double > > fEffAreaMC_time;
 		vector< double > timebins;
-		
+                unsigned int fObservatory;		
+
 		float fMC_ScatterArea;
 		
 		bool bNOFILE;
@@ -59,6 +60,7 @@ class VEffectiveAreaCalculator
 		vector< vector< vector< vector< double > > > > fEff_SpectralIndex;
 		
 		// effective areas (reading of effective areas)
+                unsigned int fBiasBin;
 		unsigned int fNBins;
 		vector< double > fEff_E0;
 		map< unsigned int, vector< double > > fEffArea_map;
@@ -135,9 +137,10 @@ class VEffectiveAreaCalculator
 		vector< vector< TProfile* > > hVEsysRec;
 		vector< vector< TProfile* > > hVEsysMC;
 		vector< vector< TProfile* > > hVEsysMCRelative;
-		vector< vector< TH2D* > > hVEsysMCRelativeRMS;
-		vector< vector< TH2D* > > hVEsysMCRelative2D;
-		vector< vector< TH2D* > > hVEsys2D;
+		vector< vector< TH2F* > > hVEsysMCRelativeRMS;
+		vector< vector< TH2F* > > hVEsysMCRelative2D;
+                vector< vector< TH2F* > > hVEsysMCRelative2DNoDirectionCut;
+		vector< vector< TH2F* > > hVEsys2D;
 		vector< vector< TH2D* > > hVResponseMatrix;
 		vector< vector< TH2D* > > hVResponseMatrixFine;
 		vector< vector< TProfile* > > hVResponseMatrixProfile;
@@ -146,7 +149,6 @@ class VEffectiveAreaCalculator
 		vector< vector< TH2D* > > hVResponseMatrixFineQC;
                 vector< vector< TH2D* > > hVResponseMatrixNoDirectionCut;
                 vector< vector< TH2D* > > hVResponseMatrixFineNoDirectionCut;
-                vector< vector< TH2D* > > hVEsysMCRelative2DNoDirectionCut;
                 vector< vector< TH2D* > > hVAngErec2D;            // direction reconstruction
                 vector< vector< TH2D* > > hVAngMC2D;            // direction reconstruction
 
@@ -158,15 +160,15 @@ class VEffectiveAreaCalculator
                 vector< TGraphErrors* > fGraph_AngularResolution68p;
                 vector< TGraphErrors* > fGraph_AngularResolution80p;
                 /*
-                vector< vector< TH2D* > > hVAngularDiff_2D;
-                vector< vector< TH2D* > > hVAngularDiffEmc_2D;
-                vector< vector< TH2D* > > hVAngularLogDiff_2D;
-                vector< vector< TH2D* > > hVAngularLogDiffEmc_2D;
+                vector< vector< TH2F* > > hVAngularDiff_2D;
+                vector< vector< TH2F* > > hVAngularDiffEmc_2D;
+                vector< vector< TH2F* > > hVAngularLogDiff_2D;
+                vector< vector< TH2F* > > hVAngularLogDiffEmc_2D;
                 */
-                vector< TH2D* > hVAngularDiff_2D;
-                vector< TH2D* > hVAngularDiffEmc_2D;
-                vector< TH2D* > hVAngularLogDiff_2D;
-                vector< TH2D* > hVAngularLogDiffEmc_2D;
+                vector< TH2F* > hVAngularDiff_2D;
+                vector< TH2F* > hVAngularDiffEmc_2D;
+                vector< TH2F* > hVAngularLogDiff_2D;
+                vector< TH2F* > hVAngularLogDiffEmc_2D;
 
                 // written to the EffArea tree
 		TList* hisTreeList;
@@ -187,9 +189,9 @@ class VEffectiveAreaCalculator
 		TProfile* hEsysRec;
 		TProfile* hEsysMC;
 		TProfile* hEsysMCRelative;
-		TH2D* hEsysMCRelativeRMS;
-		TH2D* hEsysMCRelative2D;
-		TH2D* hEsys2D;
+		TH2F* hEsysMCRelativeRMS;
+		TH2F* hEsysMCRelative2D;
+		TH2F* hEsys2D;
 		TH2D* hEmcCutCTA;
 		TH2D* hResponseMatrixFine;
 		TH2D* hResponseMatrixFineQC;
@@ -197,7 +199,7 @@ class VEffectiveAreaCalculator
 		TProfile* hResponseMatrixProfile;
 		TH2D* hResponseMatrixQC;
 
-                TH2D* hEsysMCRelative2DNoDirectionCut;
+                TH2F* hEsysMCRelative2DNoDirectionCut;
                 TH2D* hResponseMatrixNoDirectionCut;
                 TH2D* hResponseMatrixFineNoDirectionCut;
 
@@ -205,10 +207,10 @@ class VEffectiveAreaCalculator
 		TH1D* hWeightedRate005;
 		vector< TH1D* > hEcutSub;                //! events after individual cuts
     
-                TH2D *hAngularDiff_2D;
-                TH2D *hAngularDiffEmc_2D;
-                TH2D *hAngularLogDiff_2D;
-                TH2D *hAngularLogDiffEmc_2D;
+                TH2F *hAngularDiff_2D;
+                TH2F *hAngularDiffEmc_2D;
+                TH2F *hAngularLogDiff_2D;
+                TH2F *hAngularLogDiffEmc_2D;
 		
 		int fEffectiveAreaVsEnergyMC;            // 0 = vs MC energy, 1 = vs rec energy (approx. method), 2 = vs rec energy (default)
 		bool bLikelihoodAnalysis;
@@ -313,8 +315,10 @@ class VEffectiveAreaCalculator
 		bool   initializeEffectiveAreasFromHistograms( TTree*, TH1D*, double azmin, double azmax, double ispectralindex, double ipedvar );
 		vector< double > interpolate_effectiveArea( double iV, double iVLower, double iVupper,
 				vector< double > iEL, vector< double > iEU, bool iCos = true );
-		TH2D*  interpolate_responseMatrix( double iV, double iVLower, double iVupper, TH2D *iElower, TH2D *iEupper, bool iCos = true );
-
+		
+                /*
+                TH2D*  interpolate_responseMatrix( double iV, double iVLower, double iVupper, TH2D *iElower, TH2D *iEupper, bool iCos = true );
+                */
                 void   multiplyByScatterArea( TGraphAsymmErrors* g );
 		void   reset();
 		void   smoothEffectiveAreas( map< unsigned int, vector< double > > );
