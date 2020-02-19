@@ -1337,6 +1337,11 @@ bool VTableLookupDataHandler::readRunParameter()
 			}
 			VEvndispRunParameter* iPar = ( VEvndispRunParameter* ) ifInput.Get( "runparameterV2" );
 			VEvndispReconstructionParameter* iA = ( VEvndispReconstructionParameter* )ifInput.Get( "EvndispReconstructionParameter" );
+                        VMonteCarloRunHeader* iMC = ( VMonteCarloRunHeader* )ifInput.Get( "MC_runheader" );
+                        if( iMC )
+                        {
+                             fTLRunParameter->ze = iMC->getMeanZenithAngle_Deg();
+                        }
 			vector< unsigned int > iTelToAnalyze;
 			if( iPar )
 			{

@@ -13,7 +13,7 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	
 	outputfile = "";
 	tablefile = "";
-	ze = 0.;
+	ze = -1.;
 	isMC = false;
 	fInterpolate = 0;
 	fUseMedianEnergy = 1;
