@@ -54,8 +54,9 @@ void merge( string ifile, char* outputfile, bool bFull = false )
 		f.SetBranchStatus( "az", 1 );
 		f.SetBranchStatus( "azMin", 1 );
 		f.SetBranchStatus( "azMax", 1 );
-		  //f.SetBranchStatus( "Xoff", 1 ); // removed in v502
-		  //f.SetBranchStatus( "Yoff", 1 ); // removed in v502
+                // Xoff and Yoff are removed in v502, but addInstrumentResponseData requests them
+		f.SetBranchStatus( "Xoff", 1 ); // removed in v502
+		f.SetBranchStatus( "Yoff", 1 ); // removed in v502
 		f.SetBranchStatus( "Woff", 1 );
 		f.SetBranchStatus( "noise", 1 );
 		f.SetBranchStatus( "pedvar", 1 );

@@ -62,6 +62,7 @@ class VEffectiveAreaCalculator
 		// effective areas (reading of effective areas)
                 unsigned int fBiasBin;
 		unsigned int fNBins;
+		unsigned int fhistoNEbins;
 		vector< double > fEff_E0;
 		map< unsigned int, vector< double > > fEffArea_map;
 		map< unsigned int, vector< double > > fEffAreaMC_map;
@@ -316,9 +317,7 @@ class VEffectiveAreaCalculator
 		vector< double > interpolate_effectiveArea( double iV, double iVLower, double iVupper,
 				vector< double > iEL, vector< double > iEU, bool iCos = true );
 		
-                /*
                 TH2D*  interpolate_responseMatrix( double iV, double iVLower, double iVupper, TH2D *iElower, TH2D *iEupper, bool iCos = true );
-                */
                 void   multiplyByScatterArea( TGraphAsymmErrors* g );
 		void   reset();
 		void   smoothEffectiveAreas( map< unsigned int, vector< double > > );

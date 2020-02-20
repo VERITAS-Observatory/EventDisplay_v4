@@ -33,6 +33,18 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 
 	// number of bins for histograms
 	nbins = fRunPara->fEnergyAxisBins_log10;
+        
+        if( fObservatory == 1 ) // In VTS we do not need that much resolution
+        {
+            fBiasBin = 150; // bins in the bias (Y-axis)
+	    fhistoNEbins = nbins/2;
+        }
+        else
+        {
+            // Assume CTA and use CTA WP Phys binning
+            fBiasBin = 300; // bins in the bias (Y-axis)
+	    fhistoNEbins = nbins;
+        }    
 
 	fGauss = new TF1("fGauss", "gaus", -2.5,2.5);
 
@@ -166,41 +178,32 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 
 	// histograms for energy reconstruction quality
 	sprintf( hname, "hEsysRec" );
-	hEsysRec = new TProfile( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, -1000., 1000., "s" );
+	hEsysRec = new TProfile( hname, htitle, fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, -1000., 1000., "s" );
 	hEsysRec->SetXTitle( "energy_{rec} [TeV]" );
 	hEsysRec->SetYTitle( "log_{10} E_{rec} - log_{10} E_{MC}" );
 	hisTreeList->Add( hEsysRec );
 
 	sprintf( hname, "hEsysMC" );
-	hEsysMC = new TProfile( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, -1000., 1000., "s" );
+	hEsysMC = new TProfile( hname, htitle, fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, -1000., 1000., "s" );
 	hEsysMC->SetXTitle( "energy_{MC} [TeV]" );
 	hEsysMC->SetYTitle( "log_{10} E_{rec} - log_{10} E_{MC}" );
 	hisTreeList->Add( hEsysMC );
 
 	sprintf( hname, "hEsysMCRelative" );
-	hEsysMCRelative = new TProfile( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, -1000., 1000., "s" );
+	hEsysMCRelative = new TProfile( hname, htitle, fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, -1000., 1000., "s" );
 	hEsysMCRelative->SetXTitle( "energy_{MC} [TeV]" );
 	hEsysMCRelative->SetYTitle( "energy bias (E_{rec}-E_{MC})/E_{MC}" );
 	hisTreeList->Add( hEsysMCRelative );
 
 	sprintf( hname, "hEsysMCRelativeRMS" );
-	hEsysMCRelativeRMS = new TH2F( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 3000, -5., 5. );
+	hEsysMCRelativeRMS = new TH2F( hname, htitle, fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 3000, -5., 5. );
 	hEsysMCRelativeRMS->SetXTitle( "energy_{MC} [TeV]" );
 	hEsysMCRelativeRMS->SetYTitle( "energy bias (E_{rec}-E_{MC})/E_{MC}" );
 	hisTreeList->Add( hEsysMCRelativeRMS );
 
-        if( fObservatory == 1 ) // In VTS we do not need that much resolution
-        {
-            fBiasBin = 150;
-        }
-        else
-        {
-            // Assume CTA and use CTA WP Phys binning
-            fBiasBin = 300;
-        }    
         sprintf( hname, "hEsysMCRelative2D" );
         hEsysMCRelative2D = new TH2F( hname, htitle, 
-            nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 
+            fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 
             fBiasBin, 0., 3. );
         hEsysMCRelative2D->SetXTitle( "energy_{MC} [TeV]" );
         hEsysMCRelative2D->SetYTitle( "energy bias E_{rec}/E_{MC}" );
@@ -209,36 +212,36 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
         sprintf( hname, "hEsysMCRelative2DNoDirectionCut" );
         hEsysMCRelative2DNoDirectionCut = new TH2F( hname, 
             "energy reconstruction, after gamma-selection cuts", 
-            nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 
+            fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 
             fBiasBin, 0., 3. ); // default binning y:300 -> 150
         hEsysMCRelative2DNoDirectionCut->SetXTitle( "energy_{MC} [TeV]" );
         hEsysMCRelative2DNoDirectionCut->SetYTitle( "energy bias E_{rec}/E_{MC}" );
         hisTreeList->Add( hEsysMCRelative2DNoDirectionCut );
 
 	sprintf( hname, "hEsys2D" );
-	hEsys2D = new TH2F( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 100, -0.98, 2.02 );
+	hEsys2D = new TH2F( hname, htitle, fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 100, -0.98, 2.02 );
 	hEsys2D->SetXTitle( "energy_{MC} [TeV]" );
 	hEsys2D->SetYTitle( "log_{10} E_{rec} - log_{10} E_{MC}" );
 	hisTreeList->Add( hEsys2D );
 
 	sprintf( hname, "hResponseMatrix" );
-	hResponseMatrix = new TH2D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue,
-								nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
+	hResponseMatrix = new TH2D( hname, htitle, fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue,
+								fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
 
 	hResponseMatrix->SetYTitle( "energy_{MC} [TeV]" );
 	hResponseMatrix->SetXTitle( "energy_{rec} [TeV]" );
 	hisTreeList->Add( hResponseMatrix );
 
 	sprintf( hname, "hResponseMatrixProfile" );
-	hResponseMatrixProfile = new TProfile( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue,
+	hResponseMatrixProfile = new TProfile( hname, htitle, fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue,
 										   fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
 	hResponseMatrixProfile->SetYTitle( "energy_{MC} [TeV]" );
 	hResponseMatrixProfile->SetXTitle( "energy_{rec} [TeV]" );
 	hisTreeList->Add( hResponseMatrixProfile );
 
 	sprintf( hname, "hResponseMatrixQC" );
-	hResponseMatrixQC = new TH2D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue,
-								  nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
+	hResponseMatrixQC = new TH2D( hname, htitle, fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue,
+								  fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
 	hResponseMatrixQC->SetYTitle( "energy_{MC} [TeV]" );
 	hResponseMatrixQC->SetXTitle( "energy_{rec} [TeV]" );
 	hisTreeList->Add( hResponseMatrixQC );
@@ -266,8 +269,8 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
         // without direction cut
         sprintf( hname, "hResponseMatrixNoDirectionCut" );
         hResponseMatrixNoDirectionCut = new TH2D( hname, "migration matrix, after gamma-selection cuts",
-                nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue,
-                nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
+                fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue,
+                fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
         hResponseMatrixNoDirectionCut->SetYTitle( "energy_{MC} [TeV]" );
         hResponseMatrixNoDirectionCut->SetXTitle( "energy_{rec} [TeV]" );
         //hisTreeList->Add( hResponseMatrixNoDirectionCut );
@@ -281,7 +284,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
         // angular difference histogram (vs reconstructed energy)
         sprintf( hname, "hAngularDiff_2D" );
         hAngularDiff_2D = new TH2F( hname, "angular difference histogram (vs reconstructed energy)",
-                                          25, -1.9, 3.5,
+                                          fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, //25, -1.9, 3.5,
                                           9000, 0., 4.5 );
         hAngularDiff_2D->SetXTitle( "energy_{rec} [TeV]" );
         hAngularDiff_2D->SetYTitle( "angular diff. (R,MC) [deg]" );
@@ -290,7 +293,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
         // angular difference histogram (vs true energy)
         sprintf( hname, "hAngularDiffEmc_2D" );
         hAngularDiffEmc_2D = new TH2F( hname, "angular difference histogram (vs true energy)",
-                                          25, -1.9, 3.5,
+                                          fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, //25, -1.9, 3.5,
                                           9000, 0., 4.5 );
         hAngularDiffEmc_2D->SetXTitle( "energy_{MC} [TeV]" );
         hAngularDiffEmc_2D->SetYTitle( "angular diff. (R,MC) [deg]" );
@@ -299,7 +302,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
         // log angular difference histogram (vs reconstructed energy)
         sprintf( hname, "hAngularLogDiff_2D" );
         hAngularLogDiff_2D = new TH2F( hname, "log angular difference histogram (vs reconstructed energy)",
-                                          25, -1.9, 3.5,
+                                          fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, //25, -1.9, 3.5,
                                           100, -4., 1. );
         hAngularLogDiff_2D->SetXTitle( "energy_{rec} [TeV]" );
         hAngularLogDiff_2D->SetYTitle( "log_{10}(angular diff. (R,MC) [deg])" );
@@ -308,7 +311,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
         // log angular difference histogram (vs true energy)
         sprintf( hname, "hAngularLogDiffEmc_2D" );
         hAngularLogDiffEmc_2D = new TH2F( hname, "log angular difference histogram (vs true energy)",
-                                          25, -1.9, 3.5,
+                                          fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, //25, -1.9, 3.5,
                                           100, -4., 1. );
         hAngularLogDiffEmc_2D->SetXTitle( "energy_{MC} [TeV]" );
         hAngularLogDiffEmc_2D->SetYTitle( "log_{10}(angular diff. (R,MC) [deg])" );
@@ -878,7 +881,7 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
 
 /*!
  *
- *  CALLED TO USE EFFECTIVE AREAS
+ *  CALLED TO USE (READ) EFFECTIVE AREAS
  *
  *  this constructor is called to GET the effective area from a file and calculate energy spectra
  *
@@ -893,7 +896,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( string iInputFile, double az
 
 	fRunPara = 0;
 
-	// MC intervalls
+	// MC intervals
 	fMCZe = iMCZe;
 
 	// no effective area file present
@@ -1710,10 +1713,14 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 						i_temp_Eff[e] = eff[j];
 					}
 				}
+			}
+			// energy bias histos may have different binning (i.e. to avoid artifacts and save up space) than the effective areas.
+			for (unsigned int e = 0; e < i_hEsysMCRelative->GetNbinsX(); e++ )
+                        {
                                 i_temp_Esys[e] = 0.;
                                 for( int j = 0; j < nbins_MC; j++ )
                                 {
-                                        if( TMath::Abs( e0_MC[j] - fEff_E0[e] ) < 1.e-5 )
+                                        if( TMath::Abs( e0_MC[j] - fEff_EsysMCRelative_EnergyAxis[e] ) < 1.e-5 )
                                         {
                                                 i_temp_Esys[e]  = esys_rel[j];
                                         }                     
@@ -1856,7 +1863,7 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 		cout << "Error: no effective areas found in effective area tree" << endl;
 		exit( -1 );
 	}
-	cout << "\t use histograms for effective areas (number of zenith angle intervalls: " << fZe.size() << "; ";
+	cout << "\t use histograms for effective areas (number of zenith angle intervals: " << fZe.size() << "; ";
 	for( unsigned int i = 0; i < fZe.size() - 1; i++ )
 	{
 		cout << fZe[i] << ", ";
@@ -2507,6 +2514,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 		if( !bDirectionCut && iSuccessfullEventStatistics >= 0 )
 		{
 			iSuccessfullEventStatistics++;
+			/* This was removed in v502, is it necessary? 
 			if( fUniqueEventCounter.size() < 100000 )
 			{
 				unsigned int iUIEnergy = ( unsigned int )( d->MCe0 * 1.e5 );
@@ -2523,6 +2531,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			{
 				iSuccessfullEventStatistics *= -1;
 			}
+			*/
 		}
 		else
 		{
@@ -2597,8 +2606,8 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
                                 {
                                     hVEcutRecNoTh2[s][i_az]->Fill( eRec, i_weight );
                                 }
-                                // fill response matrix (migration matrix) before
-                                // direction cut
+                                // fill response matrix (migration matrix) before 
+				// direction cut
                                 if( hVResponseMatrixNoDirectionCut[s][i_az] )
                                 {
                                     hVResponseMatrixNoDirectionCut[s][i_az]->Fill( eRec, eMC, i_weight );
@@ -2787,7 +2796,8 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			// effective area vs reconstructed energy (approx)
 			Rec_nbins = gEffAreaRec->GetN();
                         
-                        /*
+                        /* 
+                        // Old version 
 			for( int i = 0; i < nbins; i++ )
 			{
 				gEffAreaMC->GetPoint( i, x, y );
@@ -2804,9 +2814,14 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
                                     esys_rel[i] = hVEsysMCRelative[s][i_az]->GetBinContent( 
                                         hVEsysMCRelative[s][i_az]->GetXaxis()->FindBin( e0[i] ) );
                                 }
+				// Save also the NoDirectionCut eff areas
+                                gEffAreaNoTh2MC->GetPoint( i, x, y );
+                                effNoTh2[i] = y * fMC_ScatterArea;
+                                effNoTh2_error[i] = 0.5 * ( gEffAreaNoTh2MC->GetErrorYlow( i ) + 
+                                                            gEffAreaNoTh2MC->GetErrorYhigh( i ) 
+                                                          ) * fMC_ScatterArea;;
+					
 			}
-			
-
 			// effective area vs reconstructed energy (approx)
 			Rec_nbins = gEffAreaRec->GetN();
 			for( int i = 0; i < Rec_nbins; i++ )
@@ -2821,9 +2836,15 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				gEffAreaRec->SetPoint( i, x, Rec_eff[i] );
 				gEffAreaRec->SetPointEYlow( i, Rec_seff_L[i] );
 				gEffAreaRec->SetPointEYhigh( i, Rec_seff_U[i] );
+				// Save also the NoDirectionCut eff areas
+                                gEffAreaNoTh2Rec->GetPoint( i, x, y );
+                                Rec_effNoTh2[i] = y * fMC_ScatterArea;
+                                Rec_effNoTh2_error[i] = 0.5 * ( gEffAreaNoTh2Rec->GetErrorYlow( i ) + 
+                                                                gEffAreaNoTh2Rec->GetErrorYhigh( i ) 
+                                                              ) * fMC_ScatterArea;
 			}
                         */
-
+			
                         // New version, hopefully more compact. 
 			// 1) Multiply effective areas by scatter area.
                         multiplyByScatterArea( gEffAreaMC );
@@ -2868,7 +2889,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
                                                                 gEffAreaNoTh2Rec->GetErrorYhigh( i ) 
                                                               );
                         }
-                        
+                       
 
 			// copy all histograms
 			resetHistograms( ize );
