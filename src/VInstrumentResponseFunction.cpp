@@ -22,6 +22,8 @@ VInstrumentResponseFunction::VInstrumentResponseFunction()
 	fDataProduct = 0;
 	
 	setContainmentProbability();
+        setTelescopeTypeCuts();
+        setDuplicationID();
 }
 
 void VInstrumentResponseFunction::setRunParameter( VInstrumentResponseFunctionRunParameter* iRunPara )
@@ -34,6 +36,7 @@ void VInstrumentResponseFunction::setRunParameter( VInstrumentResponseFunctionRu
 	fEnergyReconstructionMethod = iRunPara->fEnergyReconstructionMethod;
 	setEnergyReconstructionMethod( iRunPara->fEnergyReconstructionMethod );
 	setMonteCarloEnergyRange( iRunPara->fMCEnergy_min, iRunPara->fMCEnergy_max, TMath::Abs( iRunPara->fMCEnergy_index ) );
+        setTelescopeTypeCuts( iRunPara->fTelescopeTypeCuts );
 	
 	fVMinAz = iRunPara->fAzMin;
 	fVMaxAz = iRunPara->fAzMax;
@@ -111,7 +114,22 @@ bool VInstrumentResponseFunction::initialize( string iName, string iType, unsign
 
 bool VInstrumentResponseFunction::fill()
 {
-	// data is needed
+    if( !fillEventData() )
+    {   
+        return false;
+    }   
+        
+    return fillResolutionGraphs( getIRFData() );
+}
+
+/*
+ *
+ * loop over all events in data tree and fill histograms
+ *
+*/
+bool VInstrumentResponseFunction::fillEventData()
+{
+	// data tree is needed to do anything
 	if( !fData )
 	{
 		return false;
@@ -222,6 +240,12 @@ bool VInstrumentResponseFunction::fill()
 		}
 	}
 	//    fAnaCuts->printCutStatistics();
+        return true;
+}
+
+bool VInstrumentResponseFunction::fillResolutionGraphs( vector< vector< VInstrumentResponseFunctionData* > > iIRFData )
+{
+        fIRFData = iIRFData;
 	
 	// fill resolution graphs
 	cout << "VInstrumentResponseFunction::terminate ";
@@ -323,19 +347,54 @@ void VInstrumentResponseFunction::setCuts( VGammaHadronCuts* iCuts )
 
 TGraphErrors* VInstrumentResponseFunction::getAngularResolutionGraph( unsigned int iAzBin, unsigned int iSpectralIndexBin )
 {
-	if( iAzBin < fIRFData.size() && iSpectralIndexBin < fIRFData[iAzBin].size() && fIRFData[iAzBin][iSpectralIndexBin] )
-	{
-		return fIRFData[iAzBin][iSpectralIndexBin]->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF];
-	}
-	
-	cout << "VInstrumentResponseFunction::getAngularResolutionGraph: warning index out of range ";
-	cout << iAzBin << "\t" << iSpectralIndexBin << "\t";
-	cout << "(" << fIRFData[iAzBin].size();
-	if( fIRFData.size() )
-	{
-		cout << "\t" << fIRFData[iAzBin].size();
-	}
-	cout << ")" << endl;
-	
-	return 0;
+        if( iSpectralIndexBin < fIRFData.size() && iAzBin < fIRFData[iSpectralIndexBin].size()
+                && fIRFData[iSpectralIndexBin][iAzBin] )
+        {
+                return fIRFData[iSpectralIndexBin][iAzBin]->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF];
+        }
+        
+        cout << "VInstrumentResponseFunction::getAngularResolutionGraph: warning index out of range ";
+        cout << iAzBin << "\t" << iSpectralIndexBin << "\t";
+        cout << "(" << fIRFData.size();
+        if( iSpectralIndexBin < fIRFData.size() )
+        {
+                cout << "\t" << fIRFData[iSpectralIndexBin].size();
+        }
+        cout << ")" << endl;
+        
+        return 0;
 }
+
+vector< TH2D* > VInstrumentResponseFunction::getAngularResolution2D( unsigned int iAzBin, unsigned int iSpectralIndexBin )
+{
+    vector< TH2D* > h;
+    if( iSpectralIndexBin < fIRFData.size() && iAzBin < fIRFData[iSpectralIndexBin].size() && fIRFData[iSpectralIndexBin][iAzBin] )
+    {   
+        h.push_back( fIRFData[iSpectralIndexBin][iAzBin]->f2DHisto[VInstrumentResponseFunctionData::E_DIFF] );
+        h.push_back( fIRFData[iSpectralIndexBin][iAzBin]->f2DHisto[VInstrumentResponseFunctionData::E_LOGDIFF] );
+        h.push_back( fIRFData[iSpectralIndexBin][iAzBin]->f2DHisto[VInstrumentResponseFunctionData::E_DIFF_MC] );
+        h.push_back( fIRFData[iSpectralIndexBin][iAzBin]->f2DHisto[VInstrumentResponseFunctionData::E_LOGDIFF_MC] );
+        return h;
+    }   
+    
+    cout << "VInstrumentResponseFunction::getAngularResolution2D: warning index out of range ";
+    cout << iAzBin << "\t" << iSpectralIndexBin << "\t";
+    cout << "(" << fIRFData.size();
+    if( iSpectralIndexBin < fIRFData.size() )
+    {   
+        cout << "\t" << fIRFData[iSpectralIndexBin].size();
+    }
+    cout << ")" << endl;
+
+    return h;
+}
+
+void VInstrumentResponseFunction::setDuplicationID( unsigned int iID )
+{
+    if( iID != 9999 )
+    {   
+        cout << "Setting duplication ID for " << fName << " (" << fType << "):" << iID << endl;
+    }   
+    fDuplicationID = iID;
+}
+

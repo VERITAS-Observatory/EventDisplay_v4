@@ -88,6 +88,16 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 45000 );
 		iHisYmin.push_back( 0. );
 		iHisYmax.push_back( 5. );
+                // log(angular difference) vs reconstructed energy
+                iHisName.push_back( "AngE0Log_" + fName );
+                iHisXaxisName.push_back( "log_{10} energy_{rec} [TeV]" );
+                iHisYaxisName.push_back( "log(angular diff. (R,MC) [deg])" );
+                iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
+                iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
+                iHisXmax.push_back( fHistogrambinningEnergy_Max_Tev_Log );
+                iHisNbinsY.push_back( 100 );
+                iHisYmin.push_back( -4. );
+                iHisYmax.push_back( 1. );
 		// angular resolution vs number of images per telescope
 		iHisName.push_back( "AngNImages" + fName );
 		iHisXaxisName.push_back( "number of images" );
@@ -128,14 +138,44 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 1 );
 		iHisYmin.push_back( -5. );
 		iHisYmax.push_back( 5. );
+                // angular difference vs. true energy
+                iHisName.push_back( "AngEMC_" + fName );
+                iHisXaxisName.push_back( "log_{10} energy_{MC} [TeV]" );
+                iHisYaxisName.push_back( "angular diff. (R,MC) [deg]" );
+                iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
+                iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
+                iHisXmax.push_back( fHistogrambinningEnergy_Max_Tev_Log );
+                iHisNbinsY.push_back( 9000 );
+                iHisYmin.push_back( 0. );
+                iHisYmax.push_back( 4.5 );
+                // (angular difference)^2 vs. true energy
+                iHisName.push_back( "AngEMC_2_" + fName );
+                iHisXaxisName.push_back( "log_{10} energy_{MC} [TeV]" );
+                iHisYaxisName.push_back( "(angular diff.)^{2} (R,MC) [deg^{2}]" );
+                iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
+                iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
+                iHisXmax.push_back( fHistogrambinningEnergy_Max_Tev_Log );
+                iHisNbinsY.push_back( 9000 );
+                iHisYmin.push_back( 0. );
+                iHisYmax.push_back( 4.5 );
+                // log(angular difference) vs true energy
+                iHisName.push_back( "AngEMCLog_" + fName );
+                iHisXaxisName.push_back( "log_{10} energy_{MC} [TeV]" );
+                iHisYaxisName.push_back( "log(angular diff. (R,MC) [deg])" );
+                iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
+                iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
+                iHisXmax.push_back( fHistogrambinningEnergy_Max_Tev_Log );
+                iHisNbinsY.push_back( 100 );
+                iHisYmin.push_back( -4. );
+                iHisYmax.push_back( 1. );
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	// core resolution plots
 	else if( fType == "core_resolution" )
 	{
-		// core position difference vs. energy
+                // core position difference vs. reconstructed energy
 		iHisName.push_back( "CoreE0_" + fName );
-		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
+                iHisXaxisName.push_back( "log_{10} energy_{rec} [TeV]" );
 		iHisYaxisName.push_back( "core position diff. (R,MC) [m]" );
 		iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
 		iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
@@ -143,9 +183,9 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 45000 );
 		iHisYmin.push_back( 0. );
 		iHisYmax.push_back( 300. );
-		// (core position difference)^2 vs. energy
+                // (core position difference)^2 vs. reconstructed energy
 		iHisName.push_back( "CoreE0_2_" + fName );
-		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
+                iHisXaxisName.push_back( "log_{10} energy_{rec} [TeV]" );
 		iHisYaxisName.push_back( "(core position diff.)^{2} (R,MC) [m^{2}]" );
 		iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
 		iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
@@ -153,6 +193,16 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 45000 );
 		iHisYmin.push_back( 0. );
 		iHisYmax.push_back( 300.*300. );
+                // log(angular difference) vs reconstructed energy
+                iHisName.push_back( "CoreE0Log_" + fName );
+                iHisXaxisName.push_back( "log_{10} energy_{rec} [TeV]" );
+                iHisYaxisName.push_back( "log(core position diff. (R,MC) [m]" );
+                iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
+                iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
+                iHisXmax.push_back( fHistogrambinningEnergy_Max_Tev_Log );
+                iHisNbinsY.push_back( 100 );
+                iHisYmin.push_back( -1. );
+                iHisYmax.push_back( 3. );
 		// core position resolution vs number of images per telescope
 		iHisName.push_back( "CoreNImages" + fName );
 		iHisXaxisName.push_back( "number of images" );
@@ -175,7 +225,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisYmax.push_back( 300. );
 		// core position error vs energy
 		iHisName.push_back( "CoreErrorE0_" + fName );
-		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
+                iHisXaxisName.push_back( "log_{10} energy_{rec} [TeV]" );
 		iHisYaxisName.push_back( "core position error (R,MC) [m]" );
 		iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
 		iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
@@ -185,7 +235,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisYmax.push_back( 300. );
 		// not defined here
 		iHisName.push_back( "CoreRelativeErrorE0_" + fName );
-		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
+                iHisXaxisName.push_back( "log_{10} energy_{rec} [TeV]" );
 		iHisYaxisName.push_back( "core position angular error (R,MC)" );
 		iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
 		iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
@@ -193,14 +243,44 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 1 );
 		iHisYmin.push_back( -5. );
 		iHisYmax.push_back( 5. );
+                // core position difference vs. true energy
+                iHisName.push_back( "CoreEMC_" + fName );
+                iHisXaxisName.push_back( "log_{10} energy_{MC} [TeV]" );
+                iHisYaxisName.push_back( "core position diff. (R,MC) [m]" );
+                iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
+                iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
+                iHisXmax.push_back( fHistogrambinningEnergy_Max_Tev_Log );
+                iHisNbinsY.push_back( 300 );
+                iHisYmin.push_back( 0. );
+                iHisYmax.push_back( 300. );
+                // (core position difference)^2 vs. true energy
+                iHisName.push_back( "CoreEMC_2_" + fName );
+                iHisXaxisName.push_back( "log_{10} energy_{MC} [TeV]" );
+                iHisYaxisName.push_back( "(core position diff.)^{2} (R,MC) [m^{2}]" );
+                iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
+                iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
+                iHisXmax.push_back( fHistogrambinningEnergy_Max_Tev_Log );
+                iHisNbinsY.push_back( 900 );
+                iHisYmin.push_back( 0. );
+                iHisYmax.push_back( 300.*300. );
+                // log(angular difference) vs true energy
+                iHisName.push_back( "CoreEMCLog_" + fName );
+                iHisXaxisName.push_back( "log_{10} energy_{MC} [TeV]" );
+                iHisYaxisName.push_back( "log(core position diff. (R,MC) [m]" );
+                iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
+                iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
+                iHisXmax.push_back( fHistogrambinningEnergy_Max_Tev_Log );
+                iHisNbinsY.push_back( 100 );
+                iHisYmin.push_back( -1. );
+                iHisYmax.push_back( 3. );
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	// energy resolution plots
 	else if( fType == "energy_resolution" )
 	{
-		// energy difference vs. energy
+                // energy difference vs. reconstructed energy
 		iHisName.push_back( "EnergE0_" + fName );
-		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
+                iHisXaxisName.push_back( "log_{10} energy_{rec} [TeV]" );
 		iHisYaxisName.push_back( "log_{10} E_{rec} - log_{10} E_{MC}" );
 		iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
 		iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
@@ -208,9 +288,9 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 45000 );
 		iHisYmin.push_back( -2. );
 		iHisYmax.push_back( 2. );
-		// (energy difference)^2 vs. energy
+                // (energy difference)^2 vs. reconstructed energy
 		iHisName.push_back( "EnergE0_2_" + fName );
-		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
+                iHisXaxisName.push_back( "log_{10} energy_{rec} [TeV]" );
 		iHisYaxisName.push_back( "(log_{10} E_{rec} - log_{10} E_{MC})^2" );
 		iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
 		iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
@@ -218,6 +298,16 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 45000 );
 		iHisYmin.push_back( 0. );
 		iHisYmax.push_back( 4. );
+                // log(angular difference) vs true energy (probably useless)
+                iHisName.push_back( "EnergyE0Log_" + fName );
+                iHisXaxisName.push_back( "log_{10} energy_{rec} [TeV]" );
+                iHisYaxisName.push_back( "log(log_{10} E_{rec} - log_{10} E_{MC})" );
+                iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
+                iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
+                iHisXmax.push_back( fHistogrambinningEnergy_Max_Tev_Log );
+                iHisNbinsY.push_back( 100 );
+                iHisYmin.push_back( -1. );
+                iHisYmax.push_back( 3. );
 		// energy resolution vs number of images per telescope
 		iHisName.push_back( "EnergNImages" + fName );
 		iHisXaxisName.push_back( "number of images" );
@@ -240,7 +330,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisYmax.push_back( 2. );
 		// energy reconstruction error vs. energy (used for energy systematics)
 		iHisName.push_back( "EnergErrorE0_" + fName );
-		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
+                iHisXaxisName.push_back( "log_{10} energy_{rec} [TeV]" );
 		iHisYaxisName.push_back( "log_{10} E_{rec} - log_{10} E_{MC}" );
 		iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
 		iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
@@ -250,7 +340,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisYmax.push_back( 2. );
 		// not defined here
 		iHisName.push_back( "EnergyRelativeErrorE0_" + fName );
-		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
+                iHisXaxisName.push_back( "log_{10} energy_{rec} [TeV]" );
 		iHisYaxisName.push_back( "#Delta energy resolution" );
 		iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
 		iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
@@ -258,6 +348,36 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 2500 );
 		iHisYmin.push_back( -2. );
 		iHisYmax.push_back( 2. );
+                // energy difference vs. true energy
+                iHisName.push_back( "EnergEMC_" + fName );
+                iHisXaxisName.push_back( "log_{10} energy_{MC} [TeV]" );
+                iHisYaxisName.push_back( "log_{10} E_{rec} - log_{10} E_{MC}" );
+                iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
+                iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
+                iHisXmax.push_back( fHistogrambinningEnergy_Max_Tev_Log );
+                iHisNbinsY.push_back( 4500 );
+                iHisYmin.push_back( -2. );
+                iHisYmax.push_back( 2. );
+                // (energy difference)^2 vs. true energy
+                iHisName.push_back( "EnergEMC_2_" + fName );
+                iHisXaxisName.push_back( "log_{10} energy_{MC} [TeV]" );
+                iHisYaxisName.push_back( "(log_{10} E_{rec} - log_{10} E_{MC})^2" );
+                iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
+                iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
+                iHisXmax.push_back( fHistogrambinningEnergy_Max_Tev_Log );
+                iHisNbinsY.push_back( 4500 );
+                iHisYmin.push_back( 0. );
+                iHisYmax.push_back( 4. );
+                // log(angular difference) vs true energy (probably useless)
+                iHisName.push_back( "EnergyEMCLog_" + fName );
+                iHisXaxisName.push_back( "log_{10} energy_{MC} [TeV]" );
+                iHisYaxisName.push_back( "log(log_{10} E_{rec} - log_{10} E_{MC})" );
+                iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
+                iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
+                iHisXmax.push_back( fHistogrambinningEnergy_Max_Tev_Log );
+                iHisNbinsY.push_back( 100 );
+                iHisYmin.push_back( -1. );
+                iHisYmax.push_back( 3. );
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	// create histograms
@@ -407,13 +527,31 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
 	{
 		f2DHisto[E_DIFF]->Fill( log10( iErec_lin ), iDiff, iWeight );
 	}
-	
+        // difference vs true energy
+        if( E_DIFF_MC < f2DHisto.size() && f2DHisto[E_DIFF_MC] )
+        {
+                f2DHisto[E_DIFF_MC]->Fill( log10( fData->MCe0 ), iDiff, iWeight );
+        }
 	// squared difference vs energy
 	if( E_DIFF2 < f2DHisto.size() && f2DHisto[E_DIFF2] )
 	{
 		f2DHisto[E_DIFF2]->Fill( log10( iErec_lin ), iDiff * iDiff, iWeight );
 	}
-	
+        // squared difference vs true energy
+        if( E_DIFF2_MC < f2DHisto.size() && f2DHisto[E_DIFF2_MC] )
+        {
+                f2DHisto[E_DIFF2_MC]->Fill( log10( fData->MCe0 ), iDiff * iDiff, iWeight );
+        }
+        // log10 difference vs energy
+        if( E_LOGDIFF < f2DHisto.size() && f2DHisto[E_LOGDIFF] && iDiff > 0. )
+        {
+                f2DHisto[E_LOGDIFF]->Fill( log10( iErec_lin ), log10(iDiff), iWeight );
+        }
+        // log10 difference vs true energy
+        if( E_LOGDIFF_MC < f2DHisto.size() && f2DHisto[E_LOGDIFF_MC] && iDiff > 0. )
+        {
+                f2DHisto[E_LOGDIFF_MC]->Fill( log10( fData->MCe0 ), log10(iDiff), iWeight );
+        }
 	// difference vs number of images
 	if( E_NIMAG < f2DHisto.size() && f2DHisto[E_NIMAG] )
 	{

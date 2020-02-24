@@ -8,6 +8,7 @@
 
 VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter()
 {
+        fObservatory = 0;
 	fFillingMode = 0;
 	
 	fInstrumentEpoch = "NOT_SET";
@@ -105,7 +106,14 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 			cout << is_line << endl;
 			is_stream >> temp;
 			// ENERGYSPECTRUMINDEX <number of indexes> <minimum spectral index> <step size>
-			if( temp == "ENERGYSPECTRUMINDEX" )
+			if( temp == "OBSERVATORY" )
+			{
+				if( !is_stream.eof() )
+                                {
+				    is_stream >> fObservatory;
+                                }
+			}
+			else if( temp == "ENERGYSPECTRUMINDEX" )
 			{
 				is_stream >> fNSpectralIndex;
 				is_stream >> fSpectralIndexMin;
@@ -525,6 +533,8 @@ void VInstrumentResponseFunctionRunParameter::print()
 	cout << endl;
 	cout << "run parameters for calculation of instrument response functions: " << endl;
 	cout << "-----------------------------------------------------------------" << endl;
+	cout << endl;
+	cout << "observatory (VTS=1, CTA=0) " << fObservatory << endl;
 	cout << endl;
 	cout << "filling mode " << fFillingMode;
 	if( fFillingMode == 0 )
