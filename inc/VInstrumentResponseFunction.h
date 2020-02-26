@@ -4,10 +4,13 @@
 #define VInstrumentResponseFunction_H
 
 #include "TGraphErrors.h"
+#include "TF1.h"
+#include "TH1D.h"
 #include "TH2D.h"
 #include "TList.h"
 #include "TMath.h"
 #include "TTree.h"
+#include "TRandom.h"
 
 #include <iostream>
 #include <string>
@@ -26,9 +29,10 @@ class VInstrumentResponseFunction
 	private:
 	
 		bool  fDebug;
-		
-		string fName;
-		string fType;
+                
+                // basic data
+                string  fName;
+                string  fType;                // descripes type of response function (e.g. angular resolution or core resolution)
 		
 		// data tree
 		CData*   fData;
@@ -36,14 +40,18 @@ class VInstrumentResponseFunction
 		// return data tree
 		TTree*    fDataProduct;
 		VInstrumentResponseFunctionData* fIRFData_Tree;
-		
-		unsigned int fEnergyReconstructionMethod;
-		
+            
+                // histograms are not re-filled but duplicated
+                unsigned int fDuplicationID;
+
+                unsigned int fEnergyReconstructionMethod;
+	
 		// histograms and data
 		vector< vector< VInstrumentResponseFunctionData* > > fIRFData;
 		
 		// cuts
 		VGammaHadronCuts* fAnaCuts;
+                bool    fTelescopeTypeCutsSet;
 		
 		// effective area calculation
 		vector< double > fVMinAz;
@@ -57,12 +65,22 @@ class VInstrumentResponseFunction
 		double  fContainmentProbabilityError;
 		
 		bool    defineHistograms();
+                bool    fillEventData();
 		
 	public:
-	
+
 		VInstrumentResponseFunction();
 		~VInstrumentResponseFunction() {}
+                bool   doNotDuplicateIRFs()
+                {
+                    if( fDuplicationID == 9999 )
+                    {
+                        return true;
+                    }
+                    return false;
+                }
 		bool   fill();
+                bool   fillResolutionGraphs( vector< vector< VInstrumentResponseFunctionData* > > iIRFData );
 		double getContainmentProbability()
 		{
 			return fContainmentProbability;
@@ -71,8 +89,30 @@ class VInstrumentResponseFunction
 		{
 			return fDataProduct;
 		}
+
+
+                vector< TH2D* > getAngularResolution2D( unsigned int iAzBin, unsigned int iSpectralIndexBin );
 		TGraphErrors* getAngularResolutionGraph( unsigned int iAzBin, unsigned int iSpectralIndexBin );
-		bool   initialize( string iName, string iType, unsigned int iNTel, double iMCMaxCoreRadius, double iZe, int iNoise, double iPedvars, double iXoff, double iYoff );
+                unsigned int getDuplicationID()
+                {
+                    return fDuplicationID;
+                }
+                vector< vector< VInstrumentResponseFunctionData* > > getIRFData()
+                {
+                    return fIRFData;
+                }
+                string getName()
+                {
+                    return fName;
+                }
+                string getResolutionType()
+                {
+                    return fType;
+                }
+                
+		bool   initialize( string iName, string iType, unsigned int iNTel, double iMCMaxCoreRadius, 
+                                   double iZe, int iNoise, double iPedvars, double iXoff, double iYoff );
+                void   setDuplicationID( unsigned int iDuplicationID = 9999 );
 		void   setEnergyReconstructionMethod( unsigned int iMethod );
 		void   setCuts( VGammaHadronCuts* iCuts );
 		void   setContainmentProbability( double iP = 0.68, double iPError = 0.95 )
@@ -81,9 +121,14 @@ class VInstrumentResponseFunction
 			fContainmentProbabilityError = iPError;
 		}
 		void   setDataTree( CData* iData );
-		void   setHistogrambinning( int iN = 20, double iMin = -2., double iMax = 2. );
 		void   setMonteCarloEnergyRange( double iMin, double iMax, double iMCIndex = 2. );
+                void   setTelescopeTypeCuts( bool iB = true )
+                {
+                    fTelescopeTypeCutsSet = iB; 
+                }
+		void   setHistogrambinning( int iN = 20, double iMin = -2., double iMax = 2. );
 		void   setRunParameter( VInstrumentResponseFunctionRunParameter* );
+
 };
 
 #endif

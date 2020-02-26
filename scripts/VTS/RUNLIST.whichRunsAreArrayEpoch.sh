@@ -50,6 +50,7 @@ if [[ "$METHOD" == "irfperiod" ]]; then
         for epoch in $AVAILABLEEPOCHS; do
             # check if the run is in the list of desired epochs
             for period in $DESIREDPERIODS; do
+                period=$(echo "$period" | sed 's/^V//g' | sed 's/^v//g')
                 MINRUN=$( echo "$EPOCHTHRESH" | grep -P "V$period " | awk '{ print $4 }' | grep -oP "\d+" )
                 MAXRUN=$( echo "$EPOCHTHRESH" | grep -P "V$period " | awk '{ print $5 }' | grep -oP "\d+" )
                 # check if the run number is within the limits of the given period.

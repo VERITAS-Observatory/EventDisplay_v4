@@ -9,7 +9,7 @@
 VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter()
 {
 	fFillingMode = 0;
-	
+        	
 	fInstrumentEpoch = "NOT_SET";
 	
 	fNSpectralIndex = 1;
@@ -432,6 +432,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
 	VEvndispRunParameter* i_runPara = ( VEvndispRunParameter* )iFile->Get( "runparameterV2" );
 	if( i_runPara )
 	{
+                fObservatory = i_runPara->getObservatory();
 		fInstrumentEpoch = i_runPara->fInstrumentEpoch;
 		fTelToAnalyse = i_runPara->fTelToAnalyze;
 	}
@@ -526,6 +527,8 @@ void VInstrumentResponseFunctionRunParameter::print()
 	cout << "run parameters for calculation of instrument response functions: " << endl;
 	cout << "-----------------------------------------------------------------" << endl;
 	cout << endl;
+	cout << "observatory " << fObservatory << endl;
+        cout << endl;
 	cout << "filling mode " << fFillingMode;
 	if( fFillingMode == 0 )
 	{

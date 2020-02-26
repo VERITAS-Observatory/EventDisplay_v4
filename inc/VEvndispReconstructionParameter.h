@@ -43,6 +43,7 @@ class VEvndispReconstructionParameter : public TNamed
 		vector< unsigned int > fRecordCounter;
 		vector< unsigned int > fMethodID;
 		vector< int > fNImages_min;
+		vector< int > fNImages_max;
 		vector< double > fAxesAngles_min;
 		
 		// [methodID][telescope type] (not telescope number!!)

@@ -31,6 +31,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
 		
 	public:
 	
+		string fObservatory;
 		unsigned int    fFillingMode;              // filling mode
 		
 		string          fCutFileName;

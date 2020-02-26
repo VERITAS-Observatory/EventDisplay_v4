@@ -372,6 +372,7 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
 	// standard array reconstruction method is '0'
 	fMethodID.push_back( 0 );
 	fNImages_min.push_back( 2 );
+	fNImages_max.push_back( VDST_MAXTELESCOPES ); // MNR: goal event types, separate 2- 3- 4- telescope data
 	fAxesAngles_min.push_back( 0. );
 	fMLPFileName.push_back( "" );
 	vector< string > i_temp_string;
@@ -536,6 +537,10 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
 		}
 		cout << endl;
 		cout << "\t\t minimum number of images: " << fNImages_min[m] << endl;
+                if (fNImages_max[m] < VDST_MAXTELESCOPES)
+                {
+		    cout << "\t\t maximum number of images: " << fNImages_max[m] << endl;
+                }
 		cout << "\t\t minimum angle between image axes [deg]: " << fAxesAngles_min[m] << endl;
 		if( fMLPFileName[m].size() > 0 )
 		{
@@ -1198,6 +1203,11 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 			else if( iTemp == "MNIMAGE" )
 			{
 				fNImages_min[m_temp] = atoi( iTemp2.c_str() );
+			}
+                        // MNR Allow to cut in the maximum number of images (goal: event types)
+			else if( iTemp == "MXIMAGE" )
+			{
+				fNImages_max[m_temp] = atoi( iTemp2.c_str() );
 			}
 			else if( iTemp == "MINANGLE" )
 			{

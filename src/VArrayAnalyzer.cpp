@@ -915,8 +915,9 @@ int VArrayAnalyzer::rcs_method_0( unsigned int iMethod )
 	
 	num_images = getShowerParameters()->fShowerNumImages[iMethod];
 	
-	// are there enough images the run an array analysis
-	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] )
+	// are there enough images the run an array analysis. Also check for less images in order to do event-type analyses.
+	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] && 
+            num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod])
 	{
 		prepareforDirectionReconstruction( iMethod, 0 );
 	}
@@ -1232,7 +1233,8 @@ int VArrayAnalyzer::rcs_method_3( unsigned int iMethod )
 	num_images = getShowerParameters()->fShowerNumImages[iMethod];
 	
 	// are there enough images the run an array analysis
-	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] )
+	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] && 
+            num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod])
 	{
 		prepareforDirectionReconstruction( iMethod, 3 );
 	}
@@ -1387,7 +1389,8 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
 	num_images = getShowerParameters()->fShowerNumImages[iMethod];
 	
 	// are there enough images the run an array analysis
-	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] )
+	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] && 
+            num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod])
 	{
 		prepareforDirectionReconstruction( iMethod, 4 );
 	}
@@ -1820,7 +1823,8 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp )
 	
 	
 	// are there enough images the run an array analysis
-	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] )
+	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] && 
+            num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod])
 	{
 		prepareforDirectionReconstruction( iMethod, 5 );
 	}
@@ -2024,7 +2028,8 @@ int VArrayAnalyzer::rcs_method_9( unsigned int iMethod )
 	num_images = getShowerParameters()->fShowerNumImages[iMethod];
 	
 	// cut on minimum number of images
-	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] )
+	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] && 
+            num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod])
 	{
 		prepareforDirectionReconstruction( iMethod, 4 );
 	}

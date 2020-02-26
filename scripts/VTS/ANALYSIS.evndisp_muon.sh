@@ -94,7 +94,8 @@ fi
 [[ "$5" ]] && MODEL3D=$5 || MODEL3D=0
 [[ "$6" ]] && TELTOANA=$6 || TELTOANA=1234
 [[ "$7" ]] && CALIBFILE=$7 || CALIBFILE=calibrationlist.dat
-#[[ "$8" ]] && EXTRAPARS="-muon -hough" || EXTRAPARS=""
+
+EXTRAPARS="-muon -hough"
 
 VPM=1
 
@@ -137,8 +138,8 @@ do
         -e "s|RECONSTRUCTIONRUNPARAMETERFILE|$ACUTS|" \
         -e "s|TELTOANACOMB|$TELTOANA|"                   \
         -e "s|USECALIBLIST|$CALIBFILE|"                  \
-        -e "s|USEMODEL3D|$MODEL3D|"                   \
-        -e "s|EXTRAPARS|$EXTRAPARS|" $SUBSCRIPT.sh > $FSCRIPT.sh
+        -e "s|USEMODEL3D|$MODEL3D|"                      \
+        -e "s|EXTRAPARS|\"$EXTRAPARS\"|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
     chmod u+x $FSCRIPT.sh
     echo $FSCRIPT.sh
