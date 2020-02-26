@@ -1630,7 +1630,7 @@ void VPlotRunSummary::setListofExcludedRuns( string iList )
 	
 	string itemp;
 	istringstream is_stream( iList );
-	while( !is_stream.eof() )
+	while( !(is_stream>>std::ws).eof() )
 	{
 		is_stream >> itemp;
 		fListofExcludedRuns.push_back( ( int )atoi( itemp.c_str() ) );

@@ -1898,7 +1898,7 @@ bool VReadRunParameter::readTrigSimInputCard( TString card )
 	std::string datastring;
 	std::string name;
 	std::string path;
-	while( !file.eof() )
+	while( !(file>>std::ws).eof() )
 	{
 		if( getline( file, datastring ) )
 		{
@@ -2017,7 +2017,7 @@ bool VReadRunParameter::readEpochsAndAtmospheres()
 			{
 				continue;
 			}
-			if( is_stream.eof() )
+			if( (is_stream>>std::ws).eof() )
 			{
 				continue;
 			}
@@ -2027,15 +2027,15 @@ bool VReadRunParameter::readEpochsAndAtmospheres()
 			if( temp == "EPOCH" && fRunPara->fInstrumentEpoch == "noepoch" )
 			{
 				string iTemp = "";
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> iTemp;
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> run_min;
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> run_max;
 				}
@@ -2057,15 +2057,15 @@ bool VReadRunParameter::readEpochsAndAtmospheres()
 				double isec_min = 0.;
 				double imjd_max = 0.;
 				double isec_max = 0.;
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> iTemp;
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> date_min;
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> date_max;
 				}
@@ -2093,15 +2093,15 @@ bool VReadRunParameter::readEpochsAndAtmospheres()
 				string iEpoch = "";
 				string iTel = "";
 				string iGain = "";
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> iEpoch;
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> iTel;
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> iGain;
 				}

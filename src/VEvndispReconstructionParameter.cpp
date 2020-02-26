@@ -778,7 +778,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 			is_stream >> iTemp;
 			iTemp = VUtilities::upperCase( iTemp );
 			is_stream >> iTemp2;
-			if( !is_stream.eof() )
+			if( !(is_stream>>std::ws).eof() )
 			{
 				is_stream >> iTemp3;
 			}
@@ -786,7 +786,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 			{
 				iTemp3 = "";
 			}
-			if( !is_stream.eof() )
+			if( !(is_stream>>std::ws).eof() )
 			{
 				is_stream >> iTemp4;
 			}
@@ -794,7 +794,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 			{
 				iTemp4 = "";
 			}
-			if( !is_stream.eof() )
+			if( !(is_stream>>std::ws).eof() )
 			{
 				is_stream >> iTemp5;
 			}
@@ -802,7 +802,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 			{
 				iTemp5 = "";
 			}
-			if( !is_stream.eof() )
+			if( !(is_stream>>std::ws).eof() )
 			{
 				is_stream >> iTemp6;
 			}

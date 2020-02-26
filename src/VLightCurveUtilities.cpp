@@ -186,7 +186,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 		iTemp3 *= iFluxMultiplier;
 		
 		// flux state (if available)
-		if( !is_stream.eof() )
+		if( !(is_stream>>std::ws).eof() )
 		{
 			is_stream >> iTemp4;
 		}

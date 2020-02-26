@@ -203,7 +203,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 						double iT = 0.;
 						istringstream is_stream( is_line );
 						iT = -9999.;
-						if( !is_stream.eof() )
+						if( !(is_stream>>std::ws).eof() )
 						{
 							is_stream >> iT;
 						}
@@ -216,7 +216,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 							fData.back()->fPressure_Pa.push_back( -9999. );
 						}
 						iT = -9999.;
-						if( !is_stream.eof() )
+						if( !(is_stream>>std::ws).eof() )
 						{
 							is_stream >> iT;
 						}
@@ -229,7 +229,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 							fData.back()->fHeight_m.push_back( -9999. );
 						}
 						iT = -9999.;
-						if( !is_stream.eof() )
+						if( !(is_stream>>std::ws).eof() )
 						{
 							is_stream >> iT;
 							iT += 273.15;
@@ -244,7 +244,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 						}
 						
 						iT = -9999.;
-						if( !is_stream.eof() )
+						if( !(is_stream>>std::ws).eof() )
 						{
 							is_stream >> iT;
 							iT += 273.15;
@@ -259,7 +259,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 						}
 						
 						iT = -9999.;
-						if( !is_stream.eof() )
+						if( !(is_stream>>std::ws).eof() )
 						{
 							is_stream >> iT;
 							iT /= 1.e2;                // % to fraction
@@ -274,7 +274,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 						}
 						// mixing ratio
 						iT = -9999.;
-						if( !is_stream.eof() )
+						if( !(is_stream>>std::ws).eof() )
 						{
 							is_stream >> iT;
 						}
@@ -288,7 +288,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 						}
 						// wind direction
 						iT = -9999.;
-						if( !is_stream.eof() )
+						if( !(is_stream>>std::ws).eof() )
 						{
 							is_stream >> iT;
 						}
@@ -302,7 +302,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 						}
 						// wind speed
 						iT = -9999.;
-						if( !is_stream.eof() )
+						if( !(is_stream>>std::ws).eof() )
 						{
 							is_stream >> iT;
 							iT *= 0.514444;  // [knots] to [m/s]
