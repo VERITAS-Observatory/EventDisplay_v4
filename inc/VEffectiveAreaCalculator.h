@@ -45,7 +45,6 @@ class VEffectiveAreaCalculator
 		vector< vector< double > > fEffArea_time;
 		vector< vector< double > > fEffAreaMC_time;
 		vector< double > timebins;
-                unsigned int fObservatory;		
 
 		float fMC_ScatterArea;
 		

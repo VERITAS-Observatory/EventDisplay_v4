@@ -28,13 +28,11 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	// no effective area file present
 	bNOFILE = true;
 
-        // Observatory type: defines the binning. VTS=1, CTA=0 (and otherwise)
-        fObservatory = iRunPara->fObservatory;
-
 	// number of bins for histograms
 	nbins = fRunPara->fEnergyAxisBins_log10;
         
-        if( fObservatory == 1 ) // In VTS we do not need that much resolution
+        // In VTS we do not need that much resolution
+        if( iRunPara->fObservatory.find( "VERITAS" ) != string::npos )
         {
             fBiasBin = 150; // bins in the bias (Y-axis)
 	    fhistoNEbins = nbins/2;
