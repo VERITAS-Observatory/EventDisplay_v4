@@ -233,7 +233,15 @@ int main( int argc, char* argv[] )
 		{
 			f_IRF[i]->setDataTree( &d );
 			f_IRF[i]->setCuts( fCuts );
+                        if( f_IRF[i]->doNotDuplicateIRFs() )
+                        {
 			f_IRF[i]->fill();
+                        }
+                        else if ( f_IRF[i]->getDuplicationID() < f_IRF.size() && f_IRF[f_IRF[i]->getDuplicationID()] )
+                        {
+                            f_IRF[i]->fillResolutionGraphs( f_IRF[f_IRF[i]->getDuplicationID()]->getIRFData() );
+                        }
+                        
 			if( fCuts_AngularResolutionName.size() > 0 && f_IRF_Name[i] == fCuts_AngularResolutionName )
 			{
 				if( fCuts->getDirectionCutSelector() == 2 )
@@ -320,6 +328,38 @@ int main( int argc, char* argv[] )
 	if( !fRunPara->fFillMCHistograms && fRunPara->fFillingMode != 1 && fRunPara->fFillingMode != 2 )
 	{
 		fOutputfile->cd();
+
+                // copy angular resolution graphs to effective areas
+                // assume same az bins in resolution and effective area calculation
+                // use first spectral index bin
+                for( unsigned int f = 0; f < f_IRF.size(); f++ )
+                {
+                    if( f_IRF[f] && f_IRF[f]->getResolutionType() == "angular_resolution" )
+                    {
+                        if( TMath::Abs( f_IRF[f]->getContainmentProbability() - 0.68 ) < 1.e-4 )
+                        {
+                            for( unsigned int i = 0; i < fRunPara->fAzMin.size(); i++ )
+                            {
+			        //cout << "copy/setAngularResolution (" << f << " " << i << ")" << endl;
+                                fEffectiveAreaCalculator.setAngularResolutionGraph( i,
+                                        f_IRF[f]->getAngularResolutionGraph( i, 0 ),
+                                        false );
+                                fEffectiveAreaCalculator.setAngularResolution2D( i,
+                                        f_IRF[f]->getAngularResolution2D( i, 0 ) );
+                            }
+                        }
+                        else if( TMath::Abs( f_IRF[f]->getContainmentProbability() - 0.80 ) < 1.e-4 )
+                        {
+                            for( unsigned int i = 0; i < fRunPara->fAzMin.size(); i++ )
+                            {
+                                fEffectiveAreaCalculator.setAngularResolutionGraph( i,
+                                        f_IRF[f]->getAngularResolutionGraph( i, 0 ),
+                                        true );
+                            }
+                        }
+                    }
+                }
+
 		fEffectiveAreaCalculator.fill( hE0mc, &d, fMC_histo, fRunPara->fEnergyReconstructionMethod );
 		fStopWatch.Print();
 	}
