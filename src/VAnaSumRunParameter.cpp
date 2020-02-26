@@ -218,12 +218,12 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			}
 			// print runparameter to stdout
 			cout << is_line << endl;
-			if( is_stream.eof() )
+			if( (is_stream>>std::ws).eof() )
 			{
 				return returnWithError( "VAnaSumRunParameter::readRunParameter: not enough parameters", is_line );
 			}
 			is_stream >> temp;
-			if( is_stream.eof() )
+			if( (is_stream>>std::ws).eof() )
 			{
 				return returnWithError( "VAnaSumRunParameter::readRunParameter: not enough parameters", is_line );
 			}
@@ -268,7 +268,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			{
 				fTMPL_fBackgroundModel = eREFLECTEDREGION;
 				fTMPL_RE_distanceSourceOff = atof( temp2.c_str() );
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp2;
 					fTMPL_RE_nMinoffsource = atoi( temp2.c_str() );
@@ -277,7 +277,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				{
 					returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REFLECTEDREGION dist noff_min noff_max" );
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp2;
 					fTMPL_RE_nMaxoffsource = atoi( temp2.c_str() );
@@ -289,7 +289,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			}
 			else if( temp == "REFLECTEDREGION_OFFREMOVAL" )
 			{
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp2;
 					fTMPL_RE_RemoveOffRegionsRandomly = bool( atoi( temp2.c_str() ) );
@@ -299,7 +299,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			{
 				fTMPL_fBackgroundModel = eRINGMODEL;
 				fTMPL_RM_RingRadius = atof( temp2.c_str() );
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp2;
 					fTMPL_RM_RingWidth = atof( temp2.c_str() );
@@ -1259,7 +1259,7 @@ int VAnaSumRunParameter::checkNumberOfArguments( string is )
 	istringstream is_stream( is );
 	string itemp;
 	int z = 0;
-	while( !is_stream.eof() )
+	while( !(is_stream>>std::ws).eof() )
 	{
 		is_stream >> itemp;
 		z++;

@@ -268,11 +268,11 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// choose gamma/hadron cut selectors and direction cut selector
 			if( iCutVariable == "cutselection" )
 			{
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fGammaHadronCutSelector;
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fDirectionCutSelector;
 				}
@@ -379,7 +379,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			}
 			else if( iCutVariable == "telcoredistance" )
 			{
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fCut_MinimumCoreDistanceToTelescopes_max;
 				}
@@ -423,7 +423,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				int i_select = atoi( temp.c_str() );
 				// check epoch
 				bool i_useTheseCuts = true;
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					if( temp != fInstrumentEpoch )
@@ -432,7 +432,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 					}
 				}
 				// check telescope combinations
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					if( fTelToAnalyze.size() > 0 && temp != getTelToAnalyzeString() )
@@ -446,7 +446,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 					if( index < 0 )
 					{
 						for( unsigned int i = 0; i < fCut_ImgSelect.size(); i++ )
-						{
+                                                {
 							fCut_ImgSelect[i] = i_select;
 						}
 					}
@@ -461,7 +461,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			{
 				is_stream >> temp;
 				fProbabilityCut = ( atof( temp.c_str() ) );
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					fProbabilityCut_ProbID = atoi( temp.c_str() );
@@ -476,7 +476,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			{
 				is_stream >> temp;
 				fOrbitalPhase_min = atof( temp.c_str() );
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					fOrbitalPhase_max = atof( temp.c_str() );
 				}
@@ -505,7 +505,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// to define the lower bounds in probablity cut ranges  (e.g. random forest)
 			else if( iCutVariable == "RFCutLowerVals" )
 			{
-				while( !is_stream.eof() )
+				while( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					fProbabilityCutRangeLower.push_back( atof( temp.c_str() ) );
@@ -515,7 +515,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// to define the upper bounds in probablity cut ranges  (e.g. random forest)
 			else if( iCutVariable == "RFCutUpperVals" )
 			{
-				while( !is_stream.eof() )
+				while( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					fProbabilityCutRangeUpper.push_back( atof( temp.c_str() ) );
@@ -563,18 +563,18 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			{
 				float isize_min = -1000.;
 				float isize_max = 1.e10;
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					isize_min = atof( temp.c_str() );
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					isize_max = atof( temp.c_str() );
 				}
 				// check instrument epoch
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					if( temp == fInstrumentEpoch )
@@ -596,7 +596,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				fNTelTypeCut.push_back( new VNTelTypeCut() );
 				is_stream >> temp;
 				fNTelTypeCut.back()->fNTelType_min = atoi( temp.c_str() );
-				while( !is_stream.eof() )
+				while( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					fNTelTypeCut.back()->fTelType_counter.push_back( atoi( temp.c_str() ) );
@@ -606,14 +606,14 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// FROGS values
 			else if( iCutVariable == "frogscutsfile" )
 			{
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> iFileNameFrogsCut;
 				}
 			}
 			else if( iCutVariable == "energydependentcuts" )
 			{
-				while( !is_stream.eof() )
+				while( !(is_stream>>std::ws).eof() )
 				{
                                         string iT;
 					is_stream >> iT;
@@ -624,35 +624,35 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// TMVA values
 			else if( iCutVariable == "TMVAPARAMETER" )
 			{
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					if( temp == fInstrumentEpoch )
 					{
-						while( !is_stream.eof() )
+						while( !(is_stream>>std::ws).eof() )
 						{
-							if( !is_stream.eof() )
+							if( !(is_stream>>std::ws).eof() )
 							{
 								is_stream >> fTMVA_MVAMethod;
 							}
 							// files should have endings _fTMVAWeightFileIndex_min to _fTMVAWeightFileIndex_max
-							if( !is_stream.eof() )
+							if( !(is_stream>>std::ws).eof() )
 							{
 								is_stream >> fTMVAWeightFileIndex_Emin;
 							}
-							if( !is_stream.eof() )
+							if( !(is_stream>>std::ws).eof() )
 							{
 								is_stream >> fTMVAWeightFileIndex_Emax;
 							}
-							if( !is_stream.eof() )
+							if( !(is_stream>>std::ws).eof() )
 							{
 								is_stream >> fTMVAWeightFileIndex_Zmin;
 							}
-							if( !is_stream.eof() )
+							if( !(is_stream>>std::ws).eof() )
 							{
 								is_stream >> fTMVAWeightFileIndex_Zmax;
 							}
-							if( !is_stream.eof() )
+							if( !(is_stream>>std::ws).eof() )
 							{
 							       if( !(is_stream >> fTMVAEnergyStepSize) )
 							       {
@@ -661,12 +661,12 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 							       }
 							}
 							string iWeightFileDirectory;
-							if( !is_stream.eof() )
+							if( !(is_stream>>std::ws).eof() )
 							{
 								is_stream >> iWeightFileDirectory;
 							}
 							string iWeightFileName;
-							if( !is_stream.eof() )
+							if( !(is_stream>>std::ws).eof() )
 							{
 								is_stream >> iWeightFileName;
 							}
@@ -695,15 +695,15 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			}
 			else if( iCutVariable == "TMVACUTS" )
 			{
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fTMVAOptimizeSignalEfficiencySignificance_Min;
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fTMVAOptimizeSignalEfficiencySignalEvents_Min;
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					// observing time is given as "50h", or "5m", "5s"
@@ -726,38 +726,38 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						fTMVAOptimizeSignalEfficiencyObservationTime_h = atof( temp.c_str() );
 					}
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fTMVAOptimizeSignalEfficiencyParticleNumberFile;
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fTMVAFixedSignalEfficiencyMax;
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fTMVAMinSourceStrength;
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fTMVAFixedThetaCutMin;
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fTMVAParticleNumberFile_Conversion_Rate_to_seconds;
                                 }
 			}
 			else if( iCutVariable == "TMVASignalEfficiency" )
 			{
-				while( !is_stream.eof() )
+				while( !(is_stream>>std::ws).eof() )
 				{
 					unsigned int iKey = 0;
 					double iS = 0.;
-					if( !is_stream.eof() )
+					if( !(is_stream>>std::ws).eof() )
 					{
 						is_stream >> iKey;
 					}
-					if( !is_stream.eof() )
+					if( !(is_stream>>std::ws).eof() )
 					{
 						is_stream >> iS;
 					}
@@ -765,13 +765,13 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				}
 			}
 			else if( iCutVariable == "TMVA_MVACut" )
-			{
-				if( !is_stream.eof() )
+			{       
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					if( temp == fInstrumentEpoch )
 					{
-						while( !is_stream.eof() )
+						while( !(is_stream>>std::ws).eof() )
 						{
 							unsigned int iKey = 0;
 							double iS = 0.;
@@ -801,7 +801,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// (note that fF1AngResName == "IRF" means that the graph from the IRF file is extrapolated)
 			else if( iCutVariable == "theta2file" )
 			{
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					string iFileNameAngRes;
 					is_stream >> iFileNameAngRes;
@@ -814,7 +814,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						fFileNameAngRes = iFileNameAngRes;
 					}
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fF1AngResName;
 				}
@@ -827,7 +827,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// use angular resolution calculated for example from same data with makeEffectiveArea
 			else if( iCutVariable == "angres" )
 			{
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fAngResContainmentProbability;    // should be an integer; probability x 100
 				}
@@ -836,17 +836,17 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// * theta2scaling <scale factor> <minimum theta> <maximum theta>
 			else if( iCutVariable == "theta2scaling" )
 			{
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					fAngRes_ScalingFactor = atof( temp.c_str() );
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					fAngRes_AbsoluteMinimum = atof( temp.c_str() );
 				}
-				if( !is_stream.eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					fAngRes_AbsoluteMaximum = atof( temp.c_str() );
