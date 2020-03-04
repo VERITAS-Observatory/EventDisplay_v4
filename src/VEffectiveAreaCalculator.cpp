@@ -1713,7 +1713,7 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 				}
 			}
 			// energy bias histos may have different binning (i.e. to avoid artifacts and save up space) than the effective areas.
-			for (unsigned int e = 0; e < i_hEsysMCRelative->GetNbinsX(); e++ )
+			for( int e = 0; e < i_hEsysMCRelative->GetNbinsX(); e++ )
                         {
                                 i_temp_Esys[e] = 0.;
                                 for( int j = 0; j < nbins_MC; j++ )
