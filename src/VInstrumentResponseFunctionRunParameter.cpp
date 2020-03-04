@@ -683,3 +683,11 @@ bool VInstrumentResponseFunctionRunParameter::readCRSpectralParameters()
 	return true;
 }
 
+string VInstrumentResponseFunctionRunParameter::getInstrumentEpoch( bool iMajor )
+{
+        if( iMajor )
+        {
+             return fInstrumentEpoch.substr( 0, fInstrumentEpoch.find( "_" ) );
+        }
+        return fInstrumentEpoch;
+} 

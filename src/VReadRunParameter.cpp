@@ -2002,7 +2002,6 @@ bool VReadRunParameter::readEpochsAndAtmospheres()
 		cout << "   (atmosphere ID is set from command line - ignoring values in epoch parameter file" << endl;
 	}
 	
-	
 	while( getline( is, is_line ) )
 	{
 		if( is_line.size() > 0 )
