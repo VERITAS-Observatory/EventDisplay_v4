@@ -9,7 +9,6 @@ TABFILE=TABLEFILE
 RECID=RECONSTRUCTIONID
 ODIR=OUTPUTDIRECTORY
 INFILE=EVNDISPFILE
-ENERGY3D=USEENERGY3D
 
 INDIR=`dirname $INFILE`
 BFILE=`basename $INFILE .root`
@@ -31,60 +30,18 @@ cp -f -v $INFILE $TEMPDIR
 
 MSCWDATAFILE="$ODIR/$BFILE.mscw.root"
 
+$EVNDISPSYS/bin/mscw_energy         \
+    -tablefile $TABFILE             \
+    -noshorttree                    \
+    -arrayrecid=$RECID              \
+    -inputfile $TEMPDIR/$BFILE.root \
+    -writeReconstructedEventsOnly=1 &> $MSCWLOGFILE
 
-
-echo
-echo "\$ENERGY3D:'$ENERGY3D'"
-echo
-
-if [ "$ENERGY3D" == "no" ] ; then
-
-    echo "\$ENERGY3D = no :("
-    $EVNDISPSYS/bin/mscw_energy         \
-        -tablefile $TABFILE             \
-        -noshorttree                    \
-        -arrayrecid=$RECID              \
-        -inputfile $TEMPDIR/$BFILE.root \
-        -writeReconstructedEventsOnly=1 &> $MSCWLOGFILE
-
-    # move output file from scratch and clean up
-    cp -f -v $TEMPDIR/$BFILE.mscw.root $MSCWDATAFILE
-    rm -f $TEMPDIR/$BFILE.mscw.root
-    rm -f $TEMPDIR/$BFILE.root
+# move output file from scratch and clean up
+cp -f -v $TEMPDIR/$BFILE.mscw.root $MSCWDATAFILE
+rm -f $TEMPDIR/$BFILE.mscw.root
+rm -f $TEMPDIR/$BFILE.root
     
-# nils' energy3d step
-elif [ "$ENERGY3D" == "yes" ] ; then
-    
-    echo "\$ENERGY3D = yes!"
-    OUTPUTFILE="$BFILE.energy3d"    
-    
-  #  EPOCH=$(     $EVNDISPSYS/bin/printRunParameter $TEMPDIR/$BFILE.root -epoch      )	#Not working, why?
-  #  ATMO=$(      $EVNDISPSYS/bin/printRunParameter $TEMPDIR/$BFILE.root -atmosphere )	#Not working, why?
-    EPOCH="6"	
-    ATMO="21"
-    TELTOANA=$(  $EVNDISPSYS/bin/printRunParameter $TEMPDIR/$BFILE.root -teltoana   )
-    
-    TEMPLATEFNAME="Template3D_V${EPOCH}_ATM${ATMO}_${TELTOANA}_10P.root"
-    #cp $VERITAS_EVNDISP_AUX_DIR/Energy3DTemplates/$TEMPLATEFNAME $TEMPDIR/$TEMPLATEFNAME	#For the future
-    cp $VERITAS_USER_DATA_DIR/Templates3DFull/Merged/$TEMPLATEFNAME $TEMPDIR/$TEMPLATEFNAME
-
-    $EVNDISPSYS/bin/energy3d \
-        -inputfile   $TEMPDIR/$BFILE.root      \
-        -outputfile  $TEMPDIR/$OUTPUTFILE.root \
-        -template    $TEMPDIR/$TEMPLATEFNAME   &> $MSCWLOGFILE
-    
-    echo
-    echo "Here's whats in the temporary directory!"
-    ls -l $TEMPDIR/
-    echo
-
-    cp -f -v $TEMPDIR/$OUTPUTFILE.root $MSCWDATAFILE
-    rm -f $TEMPDIR/$BFILE.mscw.root
-    rm -f $TEMPDIR/$BFILE.root
-    rm -f $TEMPDIR/$TEMPLATEFNAME
-    
-fi
-
 # write info to log
 echo "RUN$BFILE MSCWLOG $MSCWLOGFILE"
 echo "RUN$BFILE MSCWDATA $MSCWDATAFILE"
