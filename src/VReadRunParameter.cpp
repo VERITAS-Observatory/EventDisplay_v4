@@ -2107,7 +2107,7 @@ bool VReadRunParameter::readEpochsAndAtmospheres()
 				}
 				unsigned int iTelNum = 0;
 				
-				if( iEpoch == fRunPara->fInstrumentEpoch )
+				if( iEpoch == fRunPara->getInstrumentEpoch( true ) )
 				{
 					iTelNum = atoi( iTel.c_str() );
 					for( unsigned int i = 0; i < fRunPara->fNTelescopes; i++ )
