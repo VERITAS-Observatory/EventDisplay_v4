@@ -466,7 +466,11 @@ void VEvndispRunParameter::print( int iEv )
 			cout << " use database" << endl;
 		}
 	}
-	cout << "Run type: " << fDBRunType << " Instrument epoch: " << fInstrumentEpoch << "  Atmosphere (corsika ID): " << fAtmosphereID << endl;
+        if( fDBRunType.size() > 0 )
+        {
+            cout << "Run type: " << fDBRunType << endl;
+        }
+        cout << "Instrument epoch: " << fInstrumentEpoch << "  Atmosphere (corsika ID): " << fAtmosphereID << endl;
 	if( fEpochFile.size() > 0 )
 	{
 		cout << "(epochs read from " << fEpochFile << ")" << endl;
@@ -886,3 +890,20 @@ void VEvndispRunParameter::setSystemParameters()
               fSGE_TASK_ID = atoi( i_sge );
         }
 }
+
+/*
+ * return instrument epoch
+ *
+ * for VTS, expect this to be in the format
+ * MAJOR_MINOR epoch, e.g. V6_2016
+ *
+ */
+string VEvndispRunParameter::getInstrumentEpoch( bool iMajor )
+{
+        if( iMajor )
+        {
+             return fInstrumentEpoch.substr( 0, fInstrumentEpoch.find( "_" ) );
+        }
+        return fInstrumentEpoch;
+}
+

@@ -92,13 +92,14 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
 		
 		VInstrumentResponseFunctionRunParameter();
 		~VInstrumentResponseFunctionRunParameter() {}
-		
+
+	        string                getInstrumentEpoch( bool iMajor = false );	
 		void                  print();
 		VMonteCarloRunHeader* readMCRunHeader();
 		bool                  readRunParameterFromTextFile( string iFile );
 		bool                  testRunparameters();
 		
-		ClassDef( VInstrumentResponseFunctionRunParameter, 14 );
+		ClassDef( VInstrumentResponseFunctionRunParameter, 15 );
 };
 
 #endif

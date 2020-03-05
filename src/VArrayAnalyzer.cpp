@@ -2355,7 +2355,7 @@ string VArrayAnalyzer::getTMVAFileNameForAngularReconstruction( unsigned int iSt
 	// $OBS_EVNDISP_AUX_DIR/DISP_BDTs/VX/ze...
 	else
 	{
-		string iFullFileName = getRunParameter()->getDirectory_EVNDISPAnaData() + "/DISP_BDTs/" + getRunParameter()->fInstrumentEpoch + "/";
+		string iFullFileName = getRunParameter()->getDirectory_EVNDISPAnaData() + "/DISP_BDTs/" + getRunParameter()->getInstrumentEpoch( true ) + "/";
 		iName = iFullFileName + iName + "/" + iBDTFileName;
 	}
 	cout << "initializing TMVA disp analyzer for average zenith angle in current run: " << 90. - getAverageElevation() << endl;

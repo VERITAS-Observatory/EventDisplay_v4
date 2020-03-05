@@ -28,6 +28,13 @@ VRadialAcceptance::VRadialAcceptance()
 VRadialAcceptance::VRadialAcceptance( string ifile )
 {
 	reset();
+
+        // ignore acceptance files (getacceptance will always return 1)
+        if( ifile == "IGNOREACCEPTANCE" || ifile == "simu" )
+        {
+            fAcceptanceFunctionDefined = false;
+            return;
+        }
 	
 	ifile = VUtilities::testFileLocation( ifile, "RadialAcceptances/", true );
 	if( ifile.size() == 0 )

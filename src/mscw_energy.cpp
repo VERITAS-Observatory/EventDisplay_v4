@@ -96,7 +96,10 @@ int main( int argc, char* argv[] )
 	}
 	
 	cout << endl << "loop over all events ";
-        cout << "(in total " << fTLook->getNEntries() << ")";
+        if( fTLook->getNEntries() != 1234567890 )
+        {
+            cout << "(in total " << fTLook->getNEntries() << ")";
+        }
 	cout << endl;
 	if( fTLook->getMaxTotalTime() < 1.e8 )
 	{

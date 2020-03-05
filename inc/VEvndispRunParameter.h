@@ -328,6 +328,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		{
 			return fperformFADCAnalysis;
 		}
+                string       getInstrumentEpoch(  bool iMajor = false );
 		bool         isMC()
 		{
 			return fIsMC;
@@ -339,6 +340,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fuseDB;
 		}
 		
-		ClassDef( VEvndispRunParameter, 162 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 163 ); //(increase this number)
 };
 #endif
