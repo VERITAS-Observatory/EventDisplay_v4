@@ -922,7 +922,8 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 			}
 
 
-			if( fRunPara->fRunList[fHisCounter].fAcceptanceFile.size() > 0 )
+			if( fRunPara->fRunList[fHisCounter].fAcceptanceFile.size() > 0 
+                        && fRunPara->fRunList[fHisCounter].fAcceptanceFile != "IGNOREACCEPTANCE" )
 			{
 				fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fAcceptanceFile, "RadialAcceptances", 0 );
 			}
