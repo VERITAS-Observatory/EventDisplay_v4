@@ -12,14 +12,9 @@ if [ $# -lt 2 ]; then
 echo "
 MSCW_ENERGY data analysis: submit jobs from a simple run list
 
-ANALYSIS.mscw_energy.sh <table file> <runlist> [evndisp directory] [Rec ID] [output directory] [energy3d]
+ANALYSIS.mscw_energy.sh <runlist> [evndisp directory] [Rec ID] [output directory] [sim type] [ATM]
 
 required parameters:
-
-    <table file>            mscw_energy lookup table file. Expected in $VERITAS_EVNDISP_AUX_DIR/Tables/ .
-			    For example:
-				table-v481-auxv01-CARE_June1425-ATM21-V6-GEO.root
-				table-v481-auxv01-GRISU-SW6-ATM22-V5-GEO.root
 			
     <runlist>               simple run list with one run number per line.    
     
@@ -37,9 +32,9 @@ optional parameters:
                             default: <evndisp directory>
                             If RecID given: <evndisp directory>/RecID#
 
-    [energy3d]              use energy3d reconstruction method
-	                    default: 0 (no)
-	       	            1 = yes
+    [simulation type]       e.g. CARE_June1702
+
+    [ATM]                   set atmosphere ID (don't use value from evndisp file)
 
 --------------------------------------------------------------------------------
 "
@@ -60,28 +55,19 @@ bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
 exec 5>&1
 
 # Parse command line arguments
-RLIST=$2
-TABFILE=$1
-TABFILE=${TABFILE%%.root}.root
-[[ "$3" ]] && INPUTDIR=$3 || INPUTDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/"
-[[ "$4" ]] && ID=$4 || ID=0
-if [[ "$5" ]]; then
-    ODIR=$5
-elif [[ "$4" ]]; then
+RLIST=$1
+[[ "$2" ]] && INPUTDIR=$2 || INPUTDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/"
+[[ "$3" ]] && ID=$3 || ID=0
+if [[ "$4" ]]; then
+    ODIR=$4
+elif [[ "$3" ]]; then
     # user passed a Rec ID value
     ODIR=$INPUTDIR/RecID$ID
 else
     ODIR=$INPUTDIR
 fi
-
-ENERGY3D='no'
-if [[ "$6" ]] ; then
-    if [[ "$6" == 1 ]] ; then
-        ENERGY3D='yes'
-	echo "Using energy3d option!"
-    fi
-fi
-    
+[[ "$5" ]] && SIMTYPE=$5 || SIMTYPE="CARE_June1702"
+[[ "$6" ]] && FORCEDATMO=$6
 
 # Read runlist
 if [ ! -f "$RLIST" ] ; then
@@ -93,14 +79,6 @@ FILES=`cat $RLIST`
 NRUNS=`cat $RLIST | wc -l ` 
 echo "total number of runs to analyze: $NRUNS"
 echo
-# Check that table file exists
-if [[ "$TABFILE" == `basename $TABFILE` ]]; then
-    TABFILE="$VERITAS_EVNDISP_AUX_DIR/Tables/$TABFILE"
-fi
-if [ ! -f "$TABFILE" ]; then
-    echo "Error, table file '$TABFILE' not found, exiting..."
-    exit 1
-fi
 
 # make output directory if it doesn't exist
 mkdir -p $ODIR
@@ -124,14 +102,32 @@ do
     BFILE="$INPUTDIR/$AFILE.root"
     echo "Now analysing $BFILE (ID=$ID)"
 
+    RUNINFO=`$EVNDISPSYS/bin/printRunParameter $BFILE -runinfo`
+    EPOCH=`echo $RUNINFO | awk '{print $(1)}'`
+    ATMO=${FORCEDATMO:-`echo $RUNINFO | awk '{print $(3)}'`}
+    if [[ $ATMO == *error* ]]; then
+        echo "error finding atmosphere; skipping run $BFILE"
+        continue
+    fi
+
+    TABFILE=table-${EDVERSION}-auxv01-${SIMTYPE}-ATM${ATMO}-${EPOCH}-GEO.root
+    echo $TABFILE
+    # Check that table file exists
+    if [[ "$TABFILE" == `basename $TABFILE` ]]; then
+        TABFILE="$VERITAS_EVNDISP_AUX_DIR/Tables/$TABFILE"
+    fi
+    if [ ! -f "$TABFILE" ]; then
+        echo "Error, table file '$TABFILE' not found, exiting..."
+        exit 1
+    fi
+
     FSCRIPT="$LOGDIR/MSCW.data-ID$ID-$AFILE"
     rm -f $FSCRIPT.sh
 
     sed -e "s|TABLEFILE|$TABFILE|" \
         -e "s|RECONSTRUCTIONID|$ID|" \
         -e "s|OUTPUTDIRECTORY|$ODIR|" \
-        -e "s|EVNDISPFILE|$BFILE|" \
-        -e "s|USEENERGY3D|$ENERGY3D|" $SUBSCRIPT.sh > $FSCRIPT.sh
+        -e "s|EVNDISPFILE|$BFILE|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
     chmod u+x $FSCRIPT.sh
     echo $FSCRIPT.sh
