@@ -133,6 +133,16 @@ if [[ ! -f "$DDIR/$VBF_FILE" ]]; then
         cp -f "$SIMDIR/$VBF_FILE.gz" $DDIR/
         echo " (vbf file copied, was gzipped)"
         gunzip -f -q "$DDIR/$VBF_FILE.gz"
+    elif [[ -e "$SIMDIR/$VBF_FILE.zst" ]]; then
+        # check if zstd if installed
+        if hash zstd 2>/dev/null; then
+            echo "Unzipping $SIMDIR/${VBF_FILE}.zst to $DDIR"
+            ls -l "$SIMDIR/$VBF_FILE.zst" 
+            zstd -d -f "$SIMDIR/$VBF_FILE.zst" -o "$DDIR/$VBF_FILE"
+        else
+            echo "no zstd installed; exiting"
+            exit
+        fi
     elif [[ -e "$SIMDIR/$VBF_FILE.bz2" ]]; then
         echo "Copying $SIMDIR/$VBF_FILE.bz2 to $DDIR"
         cp -f "$SIMDIR/$VBF_FILE.bz2" $DDIR/
