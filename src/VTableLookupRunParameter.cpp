@@ -40,15 +40,11 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	fmaxdist = 50000.;
 	fSelectRandom = -1.;
 	fSelectRandomSeed = 17;
-	//fMSCWSizecorrection = 1.;
-	//fMSCLSizecorrection = 1.;
-	//fEnergySizecorrection = 1.;
         fMSCWSizecorrection_mean=0;
         fMSCLSizecorrection_mean=0;
         fEnergySizecorrection_mean=0;
 	
         for (Int_t k=0; k<VDST_MAXTELESCOPES; k++){
-            // Allow for a large (200) number of telescopes. For VTS only the first 4 will be used
             // Default scalings set to 1. Will be replaced later with data from a runparameter file
 	    fMSCWSizecorrection.push_back(1.);
             fMSCLSizecorrection.push_back(1.);
