@@ -36,8 +36,7 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # EventDisplay version
-EDVERSION=`$EVNDISPSYS/bin/combineLookupTables --version | tr -d .| sed -e 's/[a-Z]*$//'`
-#EDVERSION=`$EVNDISPSYS/bin/combineLookupTables --version | tr -d .`
+IRFVERSION=`$EVNDISPSYS/bin/combineLookupTables --version | tr -d .| sed -e 's/[a-Z]*$//'`
 
 # Parse command line arguments
 OFILE=$1
@@ -48,7 +47,7 @@ SIMTYPE=$5
 
 # input directory containing partial table files
 if [[ -n $VERITAS_IRFPRODUCTION_DIR ]]; then
-    INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATM}_gamma/Tables/"
+    INDIR="$VERITAS_IRFPRODUCTION_DIR/$IRFVERSION/${SIMTYPE}/${EPOCH}_ATM${ATM}_gamma/Tables/"
 fi
 if [[ ! -d $INDIR ]]; then
     echo -e "Error, could not locate input directory. Locations searched:\n $INDIR"
@@ -58,7 +57,7 @@ echo "Input file directory: $INDIR"
 
 # Output file directory
 if [[ -n $VERITAS_IRFPRODUCTION_DIR ]]; then
-    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/Tables/"
+    ODIR="$VERITAS_IRFPRODUCTION_DIR/$IRFVERSION/Tables/"
 fi
 echo -e "Output files will be written to:\n$ODIR"
 mkdir -p $ODIR

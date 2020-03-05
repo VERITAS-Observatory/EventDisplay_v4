@@ -48,8 +48,7 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # EventDisplay version
-EDVERSION=`$EVNDISPSYS/bin/combineEffectiveAreas --version | tr -d .| sed -e 's/[a-Z]*$//'`
-#EDVERSION=`$EVNDISPSYS/bin/combineEffectiveAreas --version | tr -d .`
+IRFVERSION=`$EVNDISPSYS/bin/combineEffectiveAreas --version | tr -d .| sed -e 's/[a-Z]*$//'`
 
 # Parse command line arguments
 CUTSFILE=$1
@@ -67,7 +66,7 @@ CUTS_NAME=${CUTS_NAME%%.dat}
 
 # input directory with effective areas
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-    INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATMOS}_${PARTICLE_TYPE}/EffectiveAreas_${CUTS_NAME}"
+    INDIR="$VERITAS_IRFPRODUCTION_DIR/$IRFVERSION/$SIMTYPE/${EPOCH}_ATM${ATMOS}_${PARTICLE_TYPE}/EffectiveAreas_${CUTS_NAME}"
 fi
 if [[ ! -d $INDIR ]]; then
     echo "Error, could not locate input directory. Locations searched:"
@@ -80,7 +79,7 @@ echo "Input files: $INFILES"
 
 # Output file directory
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATMOS}_${PARTICLE_TYPE}/EffectiveAreas"
+    ODIR="$VERITAS_IRFPRODUCTION_DIR/$IRFVERSION/$SIMTYPE/${EPOCH}_ATM${ATMOS}_${PARTICLE_TYPE}/EffectiveAreas"
 fi
 echo -e "Output files will be written to:\n $ODIR"
 mkdir -p $ODIR
@@ -112,7 +111,7 @@ SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.effective_area_combine_sub
 echo "Processing epoch $EPOCH, atmosphere ATM$ATMOS, RecID $RECID (telescope combination T${T})"
 
 # output effective area name
-#OFILE="effArea-${EDVERSION}-${EANAME}-$SIMTYPE-${CUTS_NAME}-ID${RECID}-${EPOCH}-ATM${ATMOS}-T${T}"
+#OFILE="effArea-${IRFVERSION}-${EANAME}-$SIMTYPE-${CUTS_NAME}-ID${RECID}-${EPOCH}-ATM${ATMOS}-T${T}"
 for ID in $RECID;do
     if [[ $ID == "0" ]] || [[ $ID == "2" ]] || [[ $ID == "3" ]] || [[ $ID == "4" ]] || [[ $ID == "5" ]] || [[ $ID == "6" ]]; then
         METH="GEO" 
@@ -120,7 +119,7 @@ for ID in $RECID;do
         METH="DISP"
     fi
 done
-OFILE="effArea-${EDVERSION}-${EANAME}-$SIMTYPE-${CUTS_NAME}-${METH}-${EPOCH}-ATM${ATMOS}-T${T}"
+OFILE="effArea-${IRFVERSION}-${EANAME}-$SIMTYPE-${CUTS_NAME}-${METH}-${EPOCH}-ATM${ATMOS}-T${T}"
 
 FSCRIPT="$LOGDIR/COMB-EFFAREA-$CUTSFILE-ATM$ATMOS-$EPOCH-ID$RECID"
 rm -f $FSCRIPT.sh

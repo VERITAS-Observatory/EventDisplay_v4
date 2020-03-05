@@ -49,8 +49,7 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # EventDisplay version
-EDVERSION=`$EVNDISPSYS/bin/makeEffectiveArea --version | tr -d .| sed -e 's/[a-Z]*$//'`
-#EDVERSION=`$EVNDISPSYS/bin/makeEffectiveArea --version | tr -d .` # this is inconsistent with the mscw command
+IRFVERSION=`$EVNDISPSYS/bin/makeEffectiveArea --version | tr -d .| sed -e 's/[a-Z]*$//'`
 
 # Parse command line arguments
 CUTSFILE="$1"
@@ -65,7 +64,7 @@ PARTICLE_TYPE="gamma"
 
 # input directory containing mscw_energy_MC products
 if [[ -n $VERITAS_IRFPRODUCTION_DIR ]]; then
-    INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/MSCW_RECID${RECID}"
+    INDIR="$VERITAS_IRFPRODUCTION_DIR/$IRFVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/MSCW_RECID${RECID}"
 fi
 if [[ ! -d $INDIR ]]; then
     echo -e "Error, could not locate input directory. Locations searched:\n $INDIR"
@@ -75,7 +74,7 @@ echo "Input file directory: $INDIR"
 
 # Output file directory
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/"
+    ODIR="$VERITAS_IRFPRODUCTION_DIR/$IRFVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/"
 fi
 echo -e "Output files will be written to:\n $ODIR"
 mkdir -p $ODIR

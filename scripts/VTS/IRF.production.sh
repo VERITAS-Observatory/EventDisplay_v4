@@ -62,7 +62,7 @@ IRFTYPE=$2
 [[ "$7" ]] && CUTSLISTFILE=$7 || CUTSLISTFILE=""
 [[ "$8" ]] && SIMDIR=$8 || SIMDIR=""
 # evndisplay version
-EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .| sed -e 's/[a-Z]*$//'`
+IRFVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .| sed -e 's/[a-Z]*$//'`
 
 # version string for aux files
 AUX="auxv01"
@@ -138,7 +138,7 @@ for VX in $EPOCH; do
        ######################
        # set lookup table files
        # (METHOD "DISP" or "GEO" is set later)
-       TABLECOM="table-${EDVERSION}-${AUX}-${SIMTYPE}-ATM${ATM}-${VX}-"
+       TABLECOM="table-${IRFVERSION}-${AUX}-${SIMTYPE}-ATM${ATM}-${VX}-"
        ######################
        # combine lookup tables
        if [[ $IRFTYPE == "COMBINETABLES" ]]; then

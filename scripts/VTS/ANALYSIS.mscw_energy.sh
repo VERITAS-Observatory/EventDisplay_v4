@@ -45,6 +45,7 @@ fi
 
 # EventDisplay version
 EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .`
+IRFVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d . | sed -e 's/[a-zA-Z]*$//'`
 
 # Run init script
 bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
@@ -110,7 +111,7 @@ do
         continue
     fi
 
-    TABFILE=table-${EDVERSION}-auxv01-${SIMTYPE}-ATM${ATMO}-${EPOCH}-GEO.root
+    TABFILE=table-${IRFVERSION}-auxv01-${SIMTYPE}-ATM${ATMO}-${EPOCH}-GEO.root
     echo $TABFILE
     # Check that table file exists
     if [[ "$TABFILE" == `basename $TABFILE` ]]; then

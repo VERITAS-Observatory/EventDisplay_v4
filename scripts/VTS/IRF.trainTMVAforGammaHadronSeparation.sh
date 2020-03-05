@@ -69,7 +69,7 @@ fi
 
 PARTICLE_TYPE="gamma"
 # evndisplay version
-EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .| sed -e 's/[a-Z]*$//'`
+IRFVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .| sed -e 's/[a-Z]*$//'`
 
 # Check that list of background files exists
 if [[ ! -f "$BLIST" ]]; then
@@ -201,7 +201,7 @@ do
       echo "#######################################################################################" >> $RFIL.runparameter
       # signal and background files (depending on on-axis or cone data set)
       for ATMX in $ATM; do
-          SDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATMX}_${PARTICLE_TYPE}/MSCW_RECID${RECID}"
+          SDIR="$VERITAS_IRFPRODUCTION_DIR/$IRFVERSION/$SIMTYPE/${EPOCH}_ATM${ATMX}_${PARTICLE_TYPE}/MSCW_RECID${RECID}"
           echo "Signal input directory: $SDIR"
           if [[ ! -d $SDIR ]]; then
               echo -e "Error, could not locate directory of simulation files (input). Locations searched:\n $SDIR"

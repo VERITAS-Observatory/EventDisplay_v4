@@ -38,7 +38,7 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # EventDisplay version
-EDVERSION=`$EVNDISPSYS/bin/trainTMVAforAngularReconstruction --version | tr -d .| sed -e 's/[a-Z]*$//'`
+IRFVERSION=`$EVNDISPSYS/bin/trainTMVAforAngularReconstruction --version | tr -d .| sed -e 's/[a-Z]*$//'`
 
 # Parse command line arguments
 EPOCH=$1
@@ -52,7 +52,7 @@ PARTICLE_TYPE="gamma"
 
 # input directory containing evndisp products
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-    INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
+    INDIR="$VERITAS_IRFPRODUCTION_DIR/$IRFVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
 fi
 if [[ ! -d $INDIR ]]; then
     echo -e "Error, could not locate input directory. Locations searched:\n $INDIR"
@@ -62,7 +62,7 @@ echo "Input file directory: $INDIR"
 
 # Output file directory
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/TMVA_AngularReconstruction/ze${ZA}deg_offset${WOBBLE}deg/"
+    ODIR="$VERITAS_IRFPRODUCTION_DIR/$IRFVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/TMVA_AngularReconstruction/ze${ZA}deg_offset${WOBBLE}deg/"
 fi
 echo -e "Output files will be written to:\n $ODIR"
 mkdir -p $ODIR

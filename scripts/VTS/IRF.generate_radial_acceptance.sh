@@ -59,7 +59,7 @@ EPOCH=$4
 SIM=$5
 RECID="$6"
 # make radial acceptance version
-EDVERSION=`$EVNDISPSYS/bin/makeRadialAcceptance --version | tr -d . | sed -e 's/[a-Z]*$//'`
+IRFVERSION=`$EVNDISPSYS/bin/makeRadialAcceptance --version | tr -d . | sed -e 's/[a-Z]*$//'`
 # version string for aux files
 AUX="auxv01"
 
@@ -134,7 +134,7 @@ for CUTS in ${CUTLIST[@]}; do
                 CUTSNAME=${CUTSNAME/-ExtendedSource-/"-"}
                 echo $CUTSNAME
             fi
-            OFILE="radialAcceptance-${EDVERSION}-${AUX}-${SIM}-$CUTSNAME-${METH}-$VX-T$TELES"
+            OFILE="radialAcceptance-${IRFVERSION}-${AUX}-${SIM}-$CUTSNAME-${METH}-$VX-T$TELES"
             ODIR="$VERITAS_IRFPRODUCTION_DIR/RadialAcceptances"
             mkdir -p $ODIR
 	    chmod g+w $ODIR
