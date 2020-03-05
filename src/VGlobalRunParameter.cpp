@@ -73,7 +73,7 @@ bool VGlobalRunParameter::readRunparameterFile( string i_filename )
 				continue;
 			}
 			// print runparameter to stdout
-			if( !is_stream.eof() )
+			if( !(is_stream>>std::ws).eof() )
 			{
 				is_stream >> temp;
 				if( temp == "OBSERVATORY" )
@@ -82,15 +82,15 @@ bool VGlobalRunParameter::readRunparameterFile( string i_filename )
 				}
 				else if( temp == "OBSERVATORY_COORDINATES" )
 				{
-					if( !is_stream.eof() )
+					if( !(is_stream>>std::ws).eof() )
 					{
 						is_stream >> fObservatory_Latitude_deg;
 					}
-					if( !is_stream.eof() )
+					if( !(is_stream>>std::ws).eof() )
 					{
 						is_stream >> fObservatory_Longitude_deg;
 					}
-					if( !is_stream.eof() )
+					if( !(is_stream>>std::ws).eof() )
 					{
 						is_stream >> fObservatory_Height_m;
 					}
@@ -351,7 +351,7 @@ void VGlobalRunParameter::printGlobalRunParameter()
 string VGlobalRunParameter::fObservatory = "Whipple";
 bool VGlobalRunParameter::bReadRunParameter = false;
 unsigned int VGlobalRunParameter::fEVNDISP_TREE_VERSION = 9;
-string VGlobalRunParameter::fEVNDISP_VERSION = "v.4.80g";
+string VGlobalRunParameter::fEVNDISP_VERSION = "v.4.81";
 string VGlobalRunParameter::fEVNDISP_SVNREVISION = "$Revision: 3624$";
 string VGlobalRunParameter::fDBServer = "";
 string VGlobalRunParameter::fRawDataServer = "";

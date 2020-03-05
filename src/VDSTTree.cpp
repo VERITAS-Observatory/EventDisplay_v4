@@ -851,7 +851,7 @@ map< unsigned int, float> VDSTTree::readArrayConfig( string iFile )
 		{
 			istringstream is_stream( iLine );
 			is_stream >> iT1;
-			if( !is_stream.eof() )
+			if( !(is_stream>>std::ws).eof() )
 			{
 				is_stream >> iT2;
 			}

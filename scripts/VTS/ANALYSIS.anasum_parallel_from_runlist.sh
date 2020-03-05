@@ -32,13 +32,13 @@ optional parameters:
     [mscw directory]        directory containing the mscw.root files.
 			    Default: $VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION
 
-    [sim type]              use IRFs derived from this simulation type (GRISU-SW6 or CARE_June1425)
-			    Default: CARE_June1425
+    [sim type]              use IRFs derived from this simulation type (GRISU-SW6 or CARE_June1702)
+			    Default: CARE_June1702
 
     [method]                reconstruction method: GEO, DISP, FROGS.
 			    Default: GEO
 
-    [force atmosphere]	    use EAs generated with this atmospheric model (21 or 22).
+    [force atmosphere]	    use EAs generated with this atmospheric model (61 or 62).
 			    Default: Atmosphere determined from run date for each run.				
 			    Attention: Must use the same atmospere for EAs as was used for the lookup tables in the mscw_energy stage!
 
@@ -66,7 +66,7 @@ CUTS=$3
 BACKGND=$4
 [[ "$5" ]] && RUNP=$5  || RUNP="ANASUM.runparameter"
 [[ "$6" ]] && INDIR=$6 || INDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/"
-[[ "$7" ]] && SIMTYPE=$7 || SIMTYPE="CARE_June1425"
+[[ "$7" ]] && SIMTYPE=$7 || SIMTYPE="CARE_June1702"
 [[ "$8" ]] && METH=$8 || METH="GEO"
 [[ "$9" ]] && FORCEDATMO=$9 
 
@@ -204,12 +204,13 @@ for RUN in ${RUNS[@]}; do
     # get array epoch, atmosphere and telescope combination for this run
     RUNINFO=`$EVNDISPSYS/bin/printRunParameter $INDIR/$RUN.mscw.root -runinfo`
     EPOCH=`echo $RUNINFO | awk '{print $(1)}'`
-    ATMO=${FORCEDATMO:-`echo $RUNINFO | awk '{print $(2)}'`}
+    MAJOREPOCH=`echo $RUNINFO | awk '{print $(2)}'`
+    ATMO=${FORCEDATMO:-`echo $RUNINFO | awk '{print $(3)}'`}
     if [[ $ATMO == *error* ]]; then
        echo "error finding atmosphere; skipping run $RUN"
        continue
     fi
-    TELTOANA=`echo $RUNINFO | awk '{print "T"$(4)}'`
+    TELTOANA=`echo $RUNINFO | awk '{print "T"$(5)}'`
     echo "RUN $RUN at epoch $EPOCH and atmosphere $ATMO (Telescopes $TELTOANA)"
     echo "File $INDIR/$RUN.mscw.root"
     
@@ -218,7 +219,7 @@ for RUN in ${RUNS[@]}; do
     EFFAREARUN=${EFFAREARUN/TX/$TELTOANA}
     EFFAREARUN=${EFFAREARUN/XX/$ATMO}
     if [ "$RADACC" != "IGNOREACCEPTANCE" ]; then 
-        RADACCRUN=${RADACC/VX/$EPOCH}
+        RADACCRUN=${RADACC/VX/$MAJOREPOCH}
         RADACCRUN=${RADACCRUN/TX/$TELTOANA}
     else
         RADACCRUN=$RADACC

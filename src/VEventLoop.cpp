@@ -1449,7 +1449,7 @@ int VEventLoop::analyzeEvent()
 #ifndef NOGSL
 			if( fRunPar->ffrogsmode )
 			{
-				string fArrayEpoch = getRunParameter()->fInstrumentEpoch;
+				string fArrayEpoch = getRunParameter()->getInstrumentEpoch( true );
 				fFrogs->doFrogsStuff( fEventNumber, fArrayEpoch );
 			}
 #endif

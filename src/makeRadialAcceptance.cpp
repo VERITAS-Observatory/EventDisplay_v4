@@ -343,7 +343,7 @@ int parseOptions( int argc, char* argv[] )
 				cout << "-l --runlist [anasum-style run list file name, runlist on/off like]" << endl;
 				cout << "-s --srunlist [simple run list file name]" << endl;
 				cout << "-c --cutfile [cut file name]" << endl;
-				cout << "-i --instrumentepoch [instrument epoch (e.g. V6)" << endl;
+				cout << "-i --instrumentepoch [major instrument epoch (e.g. V6)" << endl;
 				cout << "-d --datadir [directory for input mscw root files]" << endl;
 				cout << "-o --outfile [output ROOT file name]" << endl;
 				cout << "-e --entries [number of entries]" << endl;
@@ -379,7 +379,9 @@ int parseOptions( int argc, char* argv[] )
 				break;
 			case 'i':
 				fInstrumentEpoch = optarg;
-				cout << "Instrument epoch is " << fInstrumentEpoch << endl;
+                                // make sure that major epoch is used
+                                fInstrumentEpoch = fInstrumentEpoch.substr( 0, fInstrumentEpoch.find( "_" ) );
+				cout << "(Major) instrument epoch is " << fInstrumentEpoch << endl;
 				break;
 			case 'e':
 				entries = ( int )atoi( optarg );

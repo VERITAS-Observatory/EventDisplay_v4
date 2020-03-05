@@ -922,7 +922,8 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 			}
 
 
-			if( fRunPara->fRunList[fHisCounter].fAcceptanceFile.size() > 0 )
+			if( fRunPara->fRunList[fHisCounter].fAcceptanceFile.size() > 0 
+                        && fRunPara->fRunList[fHisCounter].fAcceptanceFile != "IGNOREACCEPTANCE" )
 			{
 				fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fAcceptanceFile, "RadialAcceptances", 0 );
 			}
@@ -1958,11 +1959,11 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
 			fDataRunTree->AddFriend( fDataFrogsTree );
 		}
 		c = new CData( fDataRunTree );
-		// read current epoch from data file
+		// read current (major) epoch from data file
 		VEvndispRunParameter* i_runPara = ( VEvndispRunParameter* )fDataFile->Get( "runparameterV2" );
 		if( i_runPara )
 		{
-			fInstrumentEpoch = i_runPara->fInstrumentEpoch;
+			fInstrumentEpoch = i_runPara->getInstrumentEpoch( true );
 			fTelToAnalyze = i_runPara->fTelToAnalyze;
 		}
 		else
