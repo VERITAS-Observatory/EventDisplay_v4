@@ -667,15 +667,49 @@ void VTableLookupRunParameter::print( int iP )
         // Check the average scaling factors among all telescopes. If it deviates from 1, print it 
         if( fMSCWSizecorrection_mean!=0 && TMath::Abs( fMSCWSizecorrection_mean - 1. ) > 1.e-2 )
         {
-                cout << "Mean size correction for mscw tables: " << fMSCWSizecorrection_mean << endl;
+                cout << "Mean size correction for mscw tables: " << fMSCWSizecorrection_mean;
+                // print (for good reasons) first four corrections
+                if( 4 < fMSCWSizecorrection.size() )
+                {
+                    cout << " (";
+                    for( unsigned int t = 0; t < 4; t++ )
+                    {
+                        cout << "T" << t+1 << ": ";
+                        cout << fMSCWSizecorrection[t] << "  ";
+                    }
+                    cout << ")";
+                }
+                cout << endl;
         }
         if( fMSCLSizecorrection_mean!=0 && TMath::Abs( fMSCLSizecorrection_mean - 1. ) > 1.e-2 )
         {
-                cout << "Mean size correction for mscl tables: " << fMSCLSizecorrection_mean << endl;
+                cout << "Mean size correction for mscl tables: " << fMSCLSizecorrection_mean;
+                if( 4 < fMSCLSizecorrection.size() )
+                {
+                    cout << " (";
+                    for( unsigned int t = 0; t < 4; t++ )
+                    {
+                        cout << "T" << t+1 << ": ";
+                        cout << fMSCLSizecorrection[t] << "  ";
+                    }
+                    cout << ")";
+                }
+                cout << endl;
         }
         if( fEnergySizecorrection_mean!=0 && TMath::Abs( fEnergySizecorrection_mean - 1. ) > 1.e-2 )
         {
-                cout << "Mean size correction for energy tables: " << fEnergySizecorrection_mean << endl;
+                cout << "Mean size correction for energy tables: " << fEnergySizecorrection_mean;
+                if( 4 < fEnergySizecorrection.size() )
+                {
+                    cout << " (";
+                    for( unsigned int t = 0; t < 4; t++ )
+                    {
+                        cout << "T" << t+1 << ": ";
+                        cout << fEnergySizecorrection[t] << "  ";
+                    }
+                    cout << ")";
+                }
+                cout << endl;
         }
 	
 	if( iP >= 1 )
