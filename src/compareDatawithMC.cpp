@@ -33,6 +33,8 @@ struct sInputData
 	vector< double > fTelZ;
 	double fAz_deg_min;
 	double fAz_deg_max;
+        double fZe_deg_min;
+        double fZe_deg_max;
 };
 
 vector< sInputData > fInputData;
@@ -119,10 +121,10 @@ void readInputfile( string fInputFile )
 				is_check >> temp;
 				z++;
 			}
-			if( z != 8 )
+			if( z != 10 )
 			{
 				cout << "error reading input file, not enough parameters in this line: " << endl << is_line << endl;
-				cout << "require 6, found " << z << endl;
+				cout << "require 10, found " << z << endl;
 				cout << "...exiting" << endl;
 				exit( EXIT_FAILURE );
 			}
@@ -152,7 +154,16 @@ void readInputfile( string fInputFile )
 			{
 				is_stream >> a.fAz_deg_max;
 			}
-			
+                        // ze range
+                        if( !(is_stream>>std::ws).eof() )
+                        {
+                            is_stream >> a.fZe_deg_min;
+                        }
+                        if( !(is_stream>>std::ws).eof() )
+                        {
+                            is_stream >> a.fZe_deg_max;
+                        }
+                                    
 			getTelescopePositions( a.fFileName, a.fTelX, a.fTelY, a.fTelZ, a.fNTelescopes );
 			
 			fInputData.push_back( a );
@@ -192,6 +203,7 @@ int main( int argc, char* argv[] )
 		cout << "\t input file list: see example file COMPAREMC.runparameter in the parameter files directory" << endl;
 		cout << "\t cuts: " << endl;
 		cout << "\t\t cut=-3:        theta2 cut only" << endl;
+                cout << "\t\t in most cases, the following cuts should not be used: " << endl;
 		cout << "\t\t cut=-2:        no cuts" << endl;
 		cout << "\t\t cut=-1:        stereo cuts (MSCW, etc.)" << endl;
 		cout << "\t\t cut=1,2,...:   single telescope cuts on telescope 1,2" << endl;
@@ -216,10 +228,15 @@ int main( int argc, char* argv[] )
 
 	bool fCalculateMVACut = false; 
 
-	if( argv[4] && atoi( argv[4] ) == 1 )
+        if( argc > 4 && atoi( argv[4] ) == 1 )
 	{
 		fCalculateMVACut = true;
 	}
+    double fShowerMaxZe_deg = 20.;
+    if( argc > 5 )
+    {
+        fShowerMaxZe_deg = atof( argv[5] );
+    }
 	
 	// test number of telescopes
 	int iNT = 0;
@@ -256,6 +273,8 @@ int main( int argc, char* argv[] )
 		cout << "----" << endl;
 		fStereoCompare.push_back( new VDataMCComparision( fInputData[i].fType, false, fInputData[i].fNTelescopes, fCalculateMVACut ) );
 		fStereoCompare.back()->setAzRange( fInputData[i].fAz_deg_min, fInputData[i].fAz_deg_max );
+                fStereoCompare.back()->setZeRange( fInputData[i].fZe_deg_min, fInputData[i].fZe_deg_max );
+                fStereoCompare.back()->setShowerMaximZe_deg( fShowerMaxZe_deg );
 		// get telescope coordinates
 		fStereoCompare.back()->resetTelescopeCoordinates();
 		for( int t = 0; t < fInputData[i].fNTelescopes; t++ )

@@ -67,6 +67,8 @@ class VDataMCComparision
 		double fAzMin;
 		double fAzMax;
 		bool fAzRange;
+                double fZeMin;
+                double fZeMax;
 		
 		// spectral weighting
 		VSpectralWeight* fSpectralWeight;
@@ -94,9 +96,12 @@ class VDataMCComparision
 		vector<TH2D* > hcen_xy;
 		vector< TH2D* > hdistR;
 		
+                // angle for shower max correction
+                double fShowerMaxZe_deg;
 		void setEntries( TH1D* );
 		void setEntries( TH2D* );
 		
+                double getCorrectedEmissionHeight( double iEM, double iZe );
 		void initialGammaHadronCuts();
 		
 	public:
@@ -109,7 +114,12 @@ class VDataMCComparision
 		void resetTelescopeCoordinates();
 		void scaleHistograms( string );
 		void setAzRange( double iAzMin, double iAzMax );
+                void setZeRange( double iZeMin, double iZeMax );
 		bool setOnOffHistograms( VDataMCComparision*, VDataMCComparision*, double norm );
+                void setShowerMaximZe_deg( double iZe = 20. )
+                {
+                    fShowerMaxZe_deg = iZe;
+                }
 		bool setTelescopeCoordinates( double x, double y, double z = 0. );
 		void setWobbleFromDataTree()
 		{

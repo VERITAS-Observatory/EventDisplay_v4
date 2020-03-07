@@ -104,11 +104,15 @@ VDataMCComparision::VDataMCComparision( string iname, bool iBackgroundData, int 
 	fAzRange = false;
 	fAzMin = 0.;
 	fAzMax = 0.;
+    fZeMin = 0.;
+    fZeMax = 90.;
 	
 	fWobbleNorth = 0.;
 	fWobbleEast  = 0.;
 	fWobbleFromDataTree = false;
 	
+    setShowerMaximZe_deg();
+    
 	defineHistograms();
 }
 
@@ -624,6 +628,11 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 		{
 			continue;
 		}
+        // zenith cut (as we can use only one MC file)
+        if( fData->Ze < fZeMin || fData->Ze > fZeMax )
+        {
+            continue;
+        }
 		
 		/////////////////////////////////////////////////
 		// direction cut
@@ -812,7 +821,8 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 			}
 			if( fData->EmissionHeight > 0. && fHistoArray[EEMISSIONHEIGHT] )
 			{
-				fHistoArray[EEMISSIONHEIGHT]->fill( fData->EmissionHeight, weight, log10( fData->ErecS ) );
+                                fHistoArray[EEMISSIONHEIGHT]->fill( getCorrectedEmissionHeight( fData->EmissionHeight, 90. - fData->TelElevation[0] ),
+                                                                    weight, log10( fData->ErecS ) );
 			}
 			if( fHistoArray[ENIMAGES] )
 			{
@@ -1017,6 +1027,12 @@ bool VDataMCComparision::writeHistograms( TDirectory* iOut )
 	return true;
 }
 
+void VDataMCComparision::setZeRange( double iMin, double iMax )
+{
+    fZeMin = iMin;
+    fZeMax = iMax;
+}
+
 void VDataMCComparision::setAzRange( double iMin, double iMax )
 {
 	fAzMin = 0.;
@@ -1031,3 +1047,17 @@ void VDataMCComparision::setAzRange( double iMin, double iMax )
 	}
 }
 
+/*
+ * correct emission height for different zenith angle
+ * of observations
+ *
+ */
+double VDataMCComparision::getCorrectedEmissionHeight( double iEM, double iZe )
+{
+    double iCorr = 1.;
+    if( cos( fShowerMaxZe_deg * TMath::DegToRad() ) != 0. )
+    {
+        iCorr = cos( iZe * TMath::DegToRad() ) / cos( fShowerMaxZe_deg * TMath::DegToRad() );
+    }
+    return iEM * iCorr;
+}
