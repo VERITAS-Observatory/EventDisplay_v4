@@ -185,9 +185,9 @@ for VX in $EPOCH; do
                        if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
                           SIMDIR=$VERITAS_DATA_DIR/simulations/"$VX"_FLWO/grisu/ATM"$ATM"
                        elif [[ ${SIMTYPE:0:13} = "CARE_June1425" ]]; then
-                          SIMDIR=$VERITAS_DATA_DIR/simulations/"$VX"_FLWO/CARE_June1425/
+                          SIMDIR=$VERITAS_DATA_DIR/simulations/"${VX:0:2}"_FLWO/CARE_June1425/
                        elif [[ ${SIMTYPE:0:4} = "CARE" ]]; then
-                          SIMDIR=$VERITAS_DATA_DIR/simulations/"$VX"_FLWO/${SIMTYPE}
+                          SIMDIR=$VERITAS_DATA_DIR/simulations/"${VX:0:2}"_FLWO/${SIMTYPE}
                        fi
                         ./IRF.evndisp_MC.sh $SIMDIR $VX $ATM $ZA $WOBBLE $NOISE $SIMTYPE
                     ######################

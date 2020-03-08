@@ -229,6 +229,7 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
 else
     MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV -lowgaincalibrationfile calibrationlist.LowGainForCare.dat"
 fi
+MCOPT="$MCOPT -throughputcorrection MSCW.sizecal.runparameter"
 if [[ $NEVENTS -gt 0 ]]; then
 	 MCOPT="-nevents=$NEVENTS -firstevent=$FIRSTEVENT $MCOPT"
 fi
