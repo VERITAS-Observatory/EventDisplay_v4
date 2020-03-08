@@ -655,11 +655,15 @@ void VEventLoop::initializeAnalyzers()
 			fAnaData.back()->setTraceIntegrationMethod( getRunParameter()->fTraceIntegrationMethod[i] );
 		}
 		// reading special channels for all requested telescopes
+                // reading throughput correction for all requested telescopes
 		for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
 		{
 			if( getTeltoAna()[i] < fAnaData.size() && fAnaData[getTeltoAna()[i]] )
 			{
-				fAnaData[getTeltoAna()[i]]->readSpecialChannels( getRunNumber(), fRunPar->fsetSpecialChannels, getRunParameter()->getDirectory_EVNDISPParameterFiles() );
+				fAnaData[getTeltoAna()[i]]->readSpecialChannels( getRunNumber(), fRunPar->getInstrumentEpoch(),
+                                                        fRunPar->fsetSpecialChannels,
+                                                        fRunPar->fthroughputCorrectionFile,
+                                                        getRunParameter()->getDirectory_EVNDISPParameterFiles() );
 			}
 		}
 		// initialize cleaning

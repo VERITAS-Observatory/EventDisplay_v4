@@ -188,6 +188,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fCalibrationIntSumMin = 50.;
 	fL2TimeCorrect = true;
 	fsetSpecialChannels = "EVNDISP.specialchannels.dat";
+        fthroughputCorrectionFile = "";
 	ftracefit = -1.;
 	ftracefitfunction = "ev";
 	freconstructionparameterfile = "EVNDISP.reconstruction.runparameter";
@@ -601,6 +602,10 @@ void VEvndispRunParameter::print( int iEv )
 		}
 		cout << endl;
 		cout << "setting special channels (e.g. with L2 signal): " << fsetSpecialChannels << endl;
+                if( fthroughputCorrectionFile.size() > 0 )
+                {
+                    cout << "setting throughput correction from file: " << fthroughputCorrectionFile << endl;
+                }
 		cout << "pulse timing levels: ";
 		for( unsigned int i = 0; i < fpulsetiminglevels.size(); i++ )
 		{

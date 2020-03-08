@@ -903,6 +903,18 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				i++;
 			}
 		}
+		else if( iTemp.find( "throughputcorrection" ) < iTemp.size() )
+		{
+			if( iTemp2.size() > 0 )
+			{
+				fRunPara->fthroughputCorrectionFile = iTemp2;
+				if( fRunPara->fthroughputCorrectionFile == "nofile" )
+				{
+					fRunPara->fthroughputCorrectionFile = "";
+				}
+				i++;
+			}
+		}
 		else if( iTemp.find( "tracelib" ) < iTemp.size() )
 		{
 			if( iTemp2.size() > 0 )
@@ -1080,6 +1092,7 @@ void VReadRunParameter::test_and_adjustParams()
 			|| fRunPara->getObservatory().find( "agis" ) != string::npos || fRunPara->getObservatory().find( "AGIS" ) != string::npos )
 	{
 		fRunPara->fsetSpecialChannels = "";
+                fRunPara->fthroughputCorrectionFile = "";
 		fRunPara->fDeadChannelFile = "";
 	}
 	

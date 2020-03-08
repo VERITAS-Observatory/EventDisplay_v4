@@ -168,6 +168,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		int    fCalibrationSumFirst;              // starting point all calibration calculation
 		float  fCalibrationIntSumMin;             // minimum integrated charge in a channel and event to be taken into account in gain or tzero calibration runs
 		string fsetSpecialChannels;               // set channels with L2 channels to correct for FADC crate time offsets (file name of channel settings)
+                string fthroughputCorrectionFile;         // throughput correction (e.g., mirror reflectivity or gain loss)
 		bool   fL2TimeCorrect;                    // use L2 pulses to correct FADC times (default: on )
 		unsigned fCalibrationDataType;            // for DSTs: kind of calibration data available: 1: full (peds, pedvars, etc). 0: (no calibration data)
 		
@@ -340,6 +341,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fuseDB;
 		}
 		
-		ClassDef( VEvndispRunParameter, 163 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 164 ); //(increase this number)
 };
 #endif
