@@ -114,13 +114,13 @@ echo "Using runparameter file $ACUTS"
 
 # Create a unique set of run numbers
 if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
-    [[ $EPOCH == "V4" ]] && RUNNUM="946500"
-    [[ $EPOCH == "V5" ]] && RUNNUM="956500"
-    [[ $EPOCH == "V6" ]] && RUNNUM="966500"
+    [[ ${EPOCH:0:2} == "V4" ]] && RUNNUM="946500"
+    [[ ${EPOCH:0:2} == "V5" ]] && RUNNUM="956500"
+    [[ ${EPOCH:0:2} == "V6" ]] && RUNNUM="966500"
 elif [ ${SIMTYPE:0:4} = "CARE" ]; then
-    [[ $EPOCH == "V4" ]] && RUNNUM="941200"
-    [[ $EPOCH == "V5" ]] && RUNNUM="951200"
-    [[ $EPOCH == "V6" ]] && RUNNUM="961200"
+    [[ ${EPOCH:0:2} == "V4" ]] && RUNNUM="941200"
+    [[ ${EPOCH:0:2} == "V5" ]] && RUNNUM="951200"
+    [[ ${EPOCH:0:2} == "V6" ]] && RUNNUM="961200"
 fi
 
 # Job submission script
