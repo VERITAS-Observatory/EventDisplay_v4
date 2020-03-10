@@ -53,6 +53,9 @@ PEDLEV="16."
 # LOWPEDLEV="8."
 LOWPEDLEV="16."
 
+# Amplitude correction factor options
+AMPCORR="-traceamplitudecorrection MSCW.sizecal.runparameter -pedestalDefaultPedestal=$PEDLEV"
+
 if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     # Input files (observe that these might need some adjustments)
     if [[ ${EPOCH:0:2} == "V4" ]]; then
@@ -178,7 +181,7 @@ fi
 if [[ ${SIMTYPE:0:4} == "CARE" ]]; then
     echo "Calculating pedestals for run $RUNNUM"
     rm -f $ODIR/$RUNNUM.ped.log
-    $EVNDISPSYS/bin/evndisp -runmode=1 -sourcetype=2 -epoch $EPOCH -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo -calibrationdirectory $ODIR &> $ODIR/$RUNNUM.ped.log
+    $EVNDISPSYS/bin/evndisp -runmode=1 -sourcetype=2 -epoch $EPOCH -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo $AMPCORR -calibrationdirectory $ODIR &> $ODIR/$RUNNUM.ped.log
 fi    
 
 ###############################################
@@ -194,7 +197,7 @@ if [[ $USEFROGS != "1" ]]; then
        MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV -lowgaincalibrationfile calibrationlist.LowGainForCare.dat"
     fi
     echo "$EVNDISPSYS/bin/evndisp $MCOPT" &> $ODIR/$RUNNUM.tzero.log
-    $EVNDISPSYS/bin/evndisp $MCOPT &>> $ODIR/$RUNNUM.tzero.log
+    $EVNDISPSYS/bin/evndisp $MCOPT $AMPCORR &>> $ODIR/$RUNNUM.tzero.log
 fi
 
 ###############################################
@@ -229,13 +232,15 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
 else
     MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV -lowgaincalibrationfile calibrationlist.LowGainForCare.dat"
 fi
-MCOPT="$MCOPT -throughputcorrection MSCW.sizecal.runparameter"
+# throughput correction after trace integration
+# do not combine with corretion of FADC values (!)
+# MCOPT="$MCOPT -throughputcorrection MSCW.sizecal.runparameter"
 if [[ $NEVENTS -gt 0 ]]; then
 	 MCOPT="-nevents=$NEVENTS -firstevent=$FIRSTEVENT $MCOPT"
 fi
 echo "Analysing MC file for run $RUNNUM"
 echo "$EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS" &> $ODIR/$ONAME.log
-$EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS &>> $ODIR/$ONAME.log
+$EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS $AMPCORR &>> $ODIR/$ONAME.log
 
 # remove temporary files
 cp -f -v $DDIR/$ONAME.root $ODIR/$ONAME.root

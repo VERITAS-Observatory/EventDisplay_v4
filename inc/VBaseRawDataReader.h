@@ -44,7 +44,9 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
 		VNoiseFileReader* fNoiseFileReader;
 		uint8_t           fNoiseFilePedestal;
 		uint8_t           fNoiseFileFADCRange;
-		
+
+                // trace amplitude correction
+                vector< float > fTraceAmplitudeCorrection;
 		
 		VMonteCarloRunHeader* fMonteCarloHeader;
 		
@@ -302,6 +304,7 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
 		vector< valarray<double> >& getPedvarsAllSumWindows();
 		valarray<double>&          getPedRMS();
 		bool                       initTraceNoiseGenerator( unsigned int, string, VDetectorGeometry*, vector<int>, bool, int, double, vector<double> );
+                bool                       initThroughputCorrection( double , vector< float > );
 		void                       setSumWindow( unsigned int iTelID, int isw );
 		
 		//      vector< bool >&             getLocalTrigger() { return getSLocalTrigger(); }

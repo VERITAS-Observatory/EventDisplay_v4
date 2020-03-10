@@ -189,6 +189,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fL2TimeCorrect = true;
 	fsetSpecialChannels = "EVNDISP.specialchannels.dat";
         fthroughputCorrectionFile = "";
+        ftraceamplitudecorrectionFile = "";
 	ftracefit = -1.;
 	ftracefitfunction = "ev";
 	freconstructionparameterfile = "EVNDISP.reconstruction.runparameter";
@@ -605,6 +606,11 @@ void VEvndispRunParameter::print( int iEv )
                 if( fthroughputCorrectionFile.size() > 0 )
                 {
                     cout << "setting throughput correction from file: " << fthroughputCorrectionFile << endl;
+                }
+                if( ftraceamplitudecorrectionFile.size() )
+                {
+                    cout << "setting throughput correction from file (FADC): ";
+                    cout << ftraceamplitudecorrectionFile << endl;
                 }
 		cout << "pulse timing levels: ";
 		for( unsigned int i = 0; i < fpulsetiminglevels.size(); i++ )

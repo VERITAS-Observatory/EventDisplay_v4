@@ -274,6 +274,17 @@ bool VBaseRawDataReader::getHiLo( uint32_t i )
 	return false;
 }
 
+bool VBaseRawDataReader::initThroughputCorrection( double iMCPed, vector< float > iCorrections )
+{
+     fTraceAmplitudeCorrection = iCorrections;
+     fNoiseFilePedestal = ( uint8_t )iMCPed;
+     if( fTraceAmplitudeCorrection.size() != fNTel )
+     {
+          return false;
+     }
+     return true;
+}
+
 
 bool VBaseRawDataReader::initTraceNoiseGenerator( unsigned int iType, string iT, VDetectorGeometry* iD, vector<int> iSW, bool iDebug, int iseed, double iDefaultPed, vector<double> iFADCCorrect )
 {
@@ -344,6 +355,10 @@ uint8_t VBaseRawDataReader::getSample( unsigned channel, unsigned sample, bool i
 		}
 		return iSampleValue + iNoiseSampleValue - fNoiseFilePedestal;
 	}
+        if( fTraceAmplitudeCorrection.size() > 0 && fTelID < fTraceAmplitudeCorrection.size() )
+        {
+             return fTraceAmplitudeCorrection[fTelID] * ( iSampleValue-fNoiseFilePedestal) + fNoiseFilePedestal;
+        }
 	return iSampleValue;
 }
 

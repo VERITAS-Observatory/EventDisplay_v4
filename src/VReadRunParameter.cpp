@@ -915,6 +915,18 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				i++;
 			}
 		}
+		else if( iTemp.find( "traceamplitudecorrection" ) < iTemp.size() )
+		{
+			if( iTemp2.size() > 0 )
+			{
+				fRunPara->ftraceamplitudecorrectionFile = iTemp2;
+				if( fRunPara->ftraceamplitudecorrectionFile == "nofile" )
+				{
+					fRunPara->ftraceamplitudecorrectionFile = "";
+				}
+				i++;
+			}
+                }
 		else if( iTemp.find( "tracelib" ) < iTemp.size() )
 		{
 			if( iTemp2.size() > 0 )
@@ -1013,6 +1025,12 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 	
 	// test and adjust some parameters
 	test_and_adjustParams();
+
+        // read trace amplitude corrections
+        if( fRunPara->ftraceamplitudecorrectionFile.size() > 0 )
+        {
+                readTraceAmplitudeCorrections( fRunPara->ftraceamplitudecorrectionFile );
+        }
 	
 	// read trigsim input card
 	if( fRunPara->fTrigSimInputcard.Length() > 0 )
@@ -1895,6 +1913,68 @@ bool VReadRunParameter::checkSecondArgument( string iPara1, string iPara2, bool 
 	}
 	
 	return true;
+}
+
+bool VReadRunParameter::readTraceAmplitudeCorrections( string ifile )
+{
+       if( ifile.size() == 0 )
+       {
+            return true;
+       }
+       string iEpoch = fRunPara->getInstrumentEpoch();
+       string iDirectory = fRunPara->getDirectory_EVNDISPParameterFiles();
+       ifile = iDirectory + "/" + ifile;
+       ifstream is;
+       is.open( ifile.c_str(), ifstream::in );
+       if( !is )
+       {
+            cout << "error reading amplitude correction for telescope from " << ifile << endl;
+            return false;
+       }
+       cout << "reading amplitude correction from: ";
+       cout << ifile << endl;
+
+       fRunPara->ftraceamplitudecorrection.clear();
+
+       string is_line;
+       string is_temp;
+       while( getline( is, is_line ) )
+       {
+            if( is_line.size() <= 0 )
+            {
+                    continue;
+            }
+            if( is_line.substr( 0, 1 ) != "*" )
+            {
+                    continue;
+            }
+            
+            istringstream is_stream( is_line );
+            is_stream >> is_temp;
+
+            // check epoch
+            is_stream >> is_temp;
+            if( is_temp == "T" )
+            {
+                is_stream >> is_temp;
+                if( is_temp == iEpoch )
+                {
+                    double iSFactor = 1.;
+                    do
+                    {
+                        is_stream >> iSFactor;
+                        fRunPara->ftraceamplitudecorrection.push_back( iSFactor );
+                    } while( !is_stream.eof() );
+                }
+            }
+       }
+       cout << "\t amplitude scaling factors: ";
+       for( unsigned int i = 0; i < fRunPara->ftraceamplitudecorrection.size(); i++ )
+       {
+           cout << "T" << i+1 << ": " << fRunPara->ftraceamplitudecorrection[i] << " ";
+       }
+       cout << endl;
+       return true;
 }
 
 bool VReadRunParameter::readTrigSimInputCard( TString card )
