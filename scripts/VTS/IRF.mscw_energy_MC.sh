@@ -85,13 +85,7 @@ EPOCH_T1SCALE=$(echo "$_sizecallineraw" | awk '{print $4}')
 EPOCH_T2SCALE=$(echo "$_sizecallineraw" | awk '{print $5}')
 EPOCH_T3SCALE=$(echo "$_sizecallineraw" | awk '{print $6}')
 EPOCH_T4SCALE=$(echo "$_sizecallineraw" | awk '{print $7}')
-EPOCH_SIMS=$(echo "$EPOCH_LABEL" | awk -F"_" '{print $1}')
 
-# Validation of the line
-if [ "${EPOCH_SIMS}" != "V4" ]&&[ "${EPOCH_SIMS}" != "V5" ]&&[ "${EPOCH_SIMS}" != "V6" ]; then
-    echo "$EPOCH LABEL ${EPOCH_LABEL} should include either V4, V5 or V6 plus maybe a suffix separated by _"
-    exit 1
-fi
 if ! [ $(echo ${EPOCH_T1SCALE} | awk '$1>0.0 && $1<2.0 {print 1}')==1 ]; then
     echo "T1 SCALING ${EPOCH_T1SCALE} is invalid"
     exit 1
@@ -113,8 +107,7 @@ SIZESCALING="$EPOCH_T1SCALE,$EPOCH_T2SCALE,$EPOCH_T3SCALE,$EPOCH_T4SCALE"
 
 # input directory containing evndisp products
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-    #INDIR="$VERITAS_IRFPRODUCTION_DIR/$IRFVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
-    INDIR="$VERITAS_IRFPRODUCTION_DIR/$IRFVERSION/$SIMTYPE/${EPOCH_SIMS}_ATM${ATM}_${PARTICLE_TYPE}/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
+    INDIR="$VERITAS_IRFPRODUCTION_DIR/$IRFVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
 fi
 if [[ ! -d $INDIR ]]; then
     echo -e "Error, could not locate input directory. Locations searched:\n $INDIR"

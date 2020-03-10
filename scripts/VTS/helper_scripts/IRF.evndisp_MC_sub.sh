@@ -55,7 +55,7 @@ LOWPEDLEV="16."
 
 if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     # Input files (observe that these might need some adjustments)
-    if [[ $EPOCH == "V4" ]]; then
+    if [[ ${EPOCH:0:2} == "V4" ]]; then
         if [[ $PARTICLE == "1" ]]; then
            if [[ $ATM == "21" ]]; then
             VBFNAME="Oct2012_oa_ATM21_${ZA}deg_${WOG}"
@@ -67,7 +67,7 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
         fi
         NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE$NOISE.grisu"
         echo "Noise File: $NOISEFILE"
-    elif [[ $EPOCH == "V5" ]]; then
+    elif [[ ${EPOCH:0:2} == "V5" ]]; then
         if [[ $PARTICLE == "1" ]]; then
             VBFNAME="gamma_V5_Oct2012_newArrayConfig_20121027_v420_ATM${ATM}_${ZA}deg_${WOG}"
         elif [[ $PARTICLE == "14" ]]; then
@@ -77,7 +77,7 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
         fi
         NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE$NOISE.grisu"
         echo "Noise File: $NOISEFILE"
-    elif [[ $EPOCH == "V6" ]]; then
+    elif [[ ${EPOCH:0:2} == "V6" ]]; then
         if [[ $PARTICLE == "1" ]]; then
             VBFNAME="gamma_V6_Upgrade_20121127_v420_ATM${ATM}_${ZA}deg_${WOG}"
             if [[ $ATM == "21-redHV" ]]; then
@@ -103,9 +103,9 @@ elif [ ${SIMTYPE:0:4} == "CARE" ]; then
 
 fi
 # detector configuration
-[[ $EPOCH == "V4" ]] && CFG="EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt"
-[[ $EPOCH == "V5" ]] && CFG="EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt"
-[[ $EPOCH == "V6" ]] && CFG="EVN_V6_Upgrade_20121127_v420.txt"
+[[ ${EPOCH:0:2} == "V4" ]] && CFG="EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt"
+[[ ${EPOCH:0:2} == "V5" ]] && CFG="EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt"
+[[ ${EPOCH:0:2} == "V6" ]] && CFG="EVN_V6_Upgrade_20121127_v420.txt"
     
 
 # temporary directory
