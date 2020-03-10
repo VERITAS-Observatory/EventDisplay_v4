@@ -55,7 +55,7 @@ for ID in $RECID; do
 		  outputfilename="$DDIR/${OFILE}_$ITER.mscw.root"
 		  logfile="$OSUBDIR/${OFILE}_$ITER.log"
 	 fi
-	 $EVNDISPSYS/bin/mscw_energy $MOPT -inputfile $inputfilename -outputfile $outputfilename -sizecorrect=$SSCALING -noise=$NOISE &> $logfile
+	 $EVNDISPSYS/bin/mscw_energy $MOPT -inputfile $inputfilename -outputfile $outputfilename -noise=$NOISE &> $logfile
 # cp results file back to data directory and clean up
 	 outputbasename=$( basename $outputfilename )
     cp -f -v $outputfilename $OSUBDIR/$outputbasename

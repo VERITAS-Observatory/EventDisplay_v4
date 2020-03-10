@@ -22,9 +22,7 @@ TABFILE="table_${SIMTYPE}_${ZA}deg_${WOBBLE}wob_noise${NOISE}_${EPOCH}_ATM${ATM}
 rm -f "$ODIR/$TABFILE.root"
 rm -f "$ODIR/$TABFILE.log"
 
-echo "----------> Debug: size scaling set to $SSCALING"
-
 # make the table part
-$EVNDISPSYS/bin/mscw_energy -filltables=1 -limitEnergyReconstruction -write1DHistograms -inputfile "$INDIR/*[0-9].root" -tablefile "$ODIR/$TABFILE.root" -ze=$ZA -arrayrecid=$RECID -woff=$WOBBLE -sizecorrection=$SSCALING &> "$ODIR/$TABFILE.log"
+$EVNDISPSYS/bin/mscw_energy -filltables=1 -limitEnergyReconstruction -write1DHistograms -inputfile "$INDIR/*[0-9].root" -tablefile "$ODIR/$TABFILE.root" -ze=$ZA -arrayrecid=$RECID -woff=$WOBBLE  &> "$ODIR/$TABFILE.log"
 
 exit
