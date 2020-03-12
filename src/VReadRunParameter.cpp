@@ -417,6 +417,15 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			fRunPara->fUsePedestalsInTimeSlices = true;
 			fRunPara->fLowGainUsePedestalsInTimeSlices = true;
 		}
+                // inject Gaussian noise
+                else if( iTemp.find( "injectgaussiannoise" ) < iTemp.size() && !( iTemp.find( "injectgaussiannoiseseed" ) < iTemp.size() ) )
+                {
+                        fRunPara->finjectGaussianNoise = double( atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() ) );
+                }
+                else if( iTemp.find( "injectgaussiannoiseseed" ) < iTemp.size() )
+                {
+                        fRunPara->finjectGaussianNoiseSeed = UInt_t( atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() ) );
+                }
 		else if( iTemp.find( "nopedestalsintimeslices" ) < iTemp.size() )
 		{
 			fRunPara->fPedestalsInTimeSlices = false;
@@ -1934,7 +1943,7 @@ bool VReadRunParameter::readTraceAmplitudeCorrections( string ifile )
        cout << "reading amplitude correction from: ";
        cout << ifile << endl;
 
-       fRunPara->ftraceamplitudecorrection.clear();
+       fRunPara->fthroughoutCorrectionSFactor.clear();
 
        string is_line;
        string is_temp;
@@ -1954,26 +1963,44 @@ bool VReadRunParameter::readTraceAmplitudeCorrections( string ifile )
 
             // check epoch
             is_stream >> is_temp;
-            if( is_temp == "T" )
+            if( is_temp == "s" )
             {
                 is_stream >> is_temp;
                 if( is_temp == iEpoch )
                 {
                     double iSFactor = 1.;
-                    do
+                    while( !is_stream.eof() )
                     {
                         is_stream >> iSFactor;
-                        fRunPara->ftraceamplitudecorrection.push_back( iSFactor );
-                    } while( !is_stream.eof() );
+                        fRunPara->fthroughoutCorrectionSFactor.push_back( iSFactor );
+                    };
+                }
+            }
+            else if( is_temp == "G" )
+            {
+                is_stream >> is_temp;
+                if( is_temp == iEpoch )
+                {
+                    double iGFactor = 1.;
+                    while( !is_stream.eof() )
+                    {
+                        is_stream >> iGFactor;
+                        fRunPara->fthroughoutCorrectionGFactor.push_back( iGFactor );
+                    };
                 }
             }
        }
-       cout << "\t amplitude scaling factors: ";
-       for( unsigned int i = 0; i < fRunPara->ftraceamplitudecorrection.size(); i++ )
+       cout << "\t amplitude scaling s-factors: ";
+       for( unsigned int i = 0; i < fRunPara->fthroughoutCorrectionSFactor.size(); i++ )
        {
-           cout << "T" << i+1 << ": " << fRunPara->ftraceamplitudecorrection[i] << " ";
+           cout << "T" << i+1 << ": " << fRunPara->fthroughoutCorrectionSFactor[i] << " ";
        }
        cout << endl;
+       cout << "\t amplitude scaling G-factors: ";
+       for( unsigned int i = 0; i < fRunPara->fthroughoutCorrectionGFactor.size(); i++ )
+       {
+           cout << "T" << i+1 << ": " << fRunPara->fthroughoutCorrectionGFactor[i] << " ";
+       }
        return true;
 }
 

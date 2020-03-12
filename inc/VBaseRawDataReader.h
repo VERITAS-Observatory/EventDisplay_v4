@@ -11,6 +11,8 @@
 #include <VVirtualDataReader.h>
 #include <VSimulationDataReader.h>
 
+#include "TRandom3.h"
+
 #include <iostream>
 #include <stdint.h>
 #include <string>
@@ -45,8 +47,12 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
 		uint8_t           fNoiseFilePedestal;
 		uint8_t           fNoiseFileFADCRange;
 
+                double            finjectGaussianNoise;
+                TRandom3*         fRandomInjectGaussianNoise;
+
                 // trace amplitude correction
-                vector< float > fTraceAmplitudeCorrection;
+                vector< float > fTraceAmplitudeCorrectionS;
+                vector< float > fTraceAmplitudeCorrectionG;
 		
 		VMonteCarloRunHeader* fMonteCarloHeader;
 		
@@ -304,7 +310,8 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
 		vector< valarray<double> >& getPedvarsAllSumWindows();
 		valarray<double>&          getPedRMS();
 		bool                       initTraceNoiseGenerator( unsigned int, string, VDetectorGeometry*, vector<int>, bool, int, double, vector<double> );
-                bool                       initThroughputCorrection( double , vector< float > );
+                void                       injectGaussianNoise( double injectGaussianNoise, UInt_t seed = 0 );
+                bool                       initThroughputCorrection( double , vector< float >, vector< float > );
 		void                       setSumWindow( unsigned int iTelID, int isw );
 		
 		//      vector< bool >&             getLocalTrigger() { return getSLocalTrigger(); }

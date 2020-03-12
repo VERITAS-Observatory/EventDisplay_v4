@@ -32,6 +32,10 @@ VBaseRawDataReader::VBaseRawDataReader( string sourcefile, int isourcetype, unsi
 	fNoiseFileReader = 0;
 	fNoiseFilePedestal = 0;
 	fNoiseFileFADCRange = 250;
+
+        // additional Gaussian noise
+        finjectGaussianNoise = -1.;
+        fRandomInjectGaussianNoise = 0;
 	
 	// source types
 	if( isourcetype == 2 )
@@ -274,15 +278,56 @@ bool VBaseRawDataReader::getHiLo( uint32_t i )
 	return false;
 }
 
-bool VBaseRawDataReader::initThroughputCorrection( double iMCPed, vector< float > iCorrections )
+/*
+ * throughput correction 
+ * per telescope
+ *
+ * fadc amplitudes are modified by these values
+ *
+ */
+bool VBaseRawDataReader::initThroughputCorrection( double iMCPed, 
+                                                   vector< float > iCorrectionsS,
+                                                   vector< float > iCorrectionsG )
 {
-     fTraceAmplitudeCorrection = iCorrections;
-     fNoiseFilePedestal = ( uint8_t )iMCPed;
-     if( fTraceAmplitudeCorrection.size() != fNTel )
+     fTraceAmplitudeCorrectionS = iCorrectionsS;
+     if( fTraceAmplitudeCorrectionS.size() != 0
+     && fTraceAmplitudeCorrectionS.size() != fNTel )
      {
-          return false;
+         cout << "VBaseRawDataReader::initThroughputCorrection error: ";
+         cout << "inconsistent S factor (";
+         cout << fTraceAmplitudeCorrectionS.size() << ", " << fNTel << ")" << endl;
+         return false;
      }
+     fTraceAmplitudeCorrectionG = iCorrectionsG;
+     if( fTraceAmplitudeCorrectionG.size() != 0
+     && fTraceAmplitudeCorrectionG.size() != fNTel )
+     {
+         cout << "VBaseRawDataReader::initThroughputCorrection error: ";
+         cout << "inconsistent G factor (";
+         cout << fTraceAmplitudeCorrectionG.size() << ", " << fNTel << ")" << endl;
+         return false;
+     }
+
+     fNoiseFilePedestal = ( uint8_t )iMCPed;
+
      return true;
+}
+
+/*
+ * inject Gaussian noise
+ *
+ * set std dev in units of dc
+ *
+ */
+
+void VBaseRawDataReader::injectGaussianNoise( double injectGaussianNoise,  UInt_t seed )
+{
+    finjectGaussianNoise = injectGaussianNoise;
+
+    if( !fRandomInjectGaussianNoise )
+    {
+        fRandomInjectGaussianNoise = new TRandom3( seed );
+    }
 }
 
 
@@ -355,10 +400,52 @@ uint8_t VBaseRawDataReader::getSample( unsigned channel, unsigned sample, bool i
 		}
 		return iSampleValue + iNoiseSampleValue - fNoiseFilePedestal;
 	}
-        if( fTraceAmplitudeCorrection.size() > 0 && fTelID < fTraceAmplitudeCorrection.size() )
+        // add gaussian noise
+        // (only important if this has been not added on the simulation level)
+        double iNoiseGaus = 0.;
+        if( finjectGaussianNoise > 0. && fRandomInjectGaussianNoise && !getHiLo( channel ) )
         {
-             return fTraceAmplitudeCorrection[fTelID] * ( iSampleValue-fNoiseFilePedestal) + fNoiseFilePedestal;
+            // electronic noise is corrected for gain loss
+            if( fTraceAmplitudeCorrectionG.size() > 0 && fTelID < fTraceAmplitudeCorrectionG.size() )
+            {
+                iNoiseGaus = fRandomInjectGaussianNoise->Gaus(  0., 
+                                            finjectGaussianNoise * fTraceAmplitudeCorrectionG[fTelID] );
+            }
+            else
+            {
+                iNoiseGaus = fRandomInjectGaussianNoise->Gaus(  0., finjectGaussianNoise );
+            }
         }
+        // throughput correction
+        if( fTraceAmplitudeCorrectionS.size() > 0 && fTelID < fTraceAmplitudeCorrectionS.size() )
+        {
+             double iS = fTraceAmplitudeCorrectionS[fTelID] * ( iSampleValue-fNoiseFilePedestal) + fNoiseFilePedestal;
+             if( finjectGaussianNoise > 0. && fRandomInjectGaussianNoise && !getHiLo( channel ) )
+             {
+                 iS += iNoiseGaus;
+             }
+
+             if( iS < 256 )
+             {
+                  return iS;
+             }
+             else
+             {
+                  return 255;
+             }
+        }
+        else if( finjectGaussianNoise > 0. && fRandomInjectGaussianNoise && !getHiLo( channel ) )
+        {
+             if( iSampleValue + iNoiseGaus < 256 )
+             {
+                  return iSampleValue + iNoiseGaus;
+             }
+             else
+             {
+                  return iSampleValue;
+             }
+        }
+            
 	return iSampleValue;
 }
 

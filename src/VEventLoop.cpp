@@ -357,13 +357,17 @@ bool VEventLoop::initEventLoop( string iFileName )
 				fRawDataReader->initTraceNoiseGenerator( 0, fRunPar->fsimu_pedestalfile, getDetectorGeo(), fRunPar->fsumwindow_1,
 						fDebug, fRunPar->fgrisuseed, fRunPar->fsimu_pedestalfile_DefaultPed, fRunPar->fGainCorrection );
 			}
-                        // allow for FADC trace amplitude correction
-                        if( fRawDataReader && fRunPar->ftraceamplitudecorrection.size() > 0 )
+                        if( fRawDataReader && fRunPar->finjectGaussianNoise > 0. )
                         {
-                                if(  fRawDataReader->initThroughputCorrection( fRunPar->fsimu_pedestalfile_DefaultPed,
-                                                                          fRunPar->ftraceamplitudecorrection ) )
+                             fRawDataReader->injectGaussianNoise( fRunPar->finjectGaussianNoise, fRunPar->finjectGaussianNoiseSeed );
+                        }
+                        // allow for FADC trace amplitude correction
+                        if( fRawDataReader && fRunPar->fthroughoutCorrectionSFactor.size() > 0 )
+                        {
+                                if( !fRawDataReader->initThroughputCorrection( fRunPar->fsimu_pedestalfile_DefaultPed,
+                                                                          fRunPar->fthroughoutCorrectionSFactor,
+                                                                          fRunPar->fthroughoutCorrectionGFactor ) )
                                 {
-                                      cout << "VEventLoop::initEventLoop error: inconsistent setting of trace amplitude correction factors" << endl;
                                       exit( EXIT_FAILURE );
                                 }
                         }

@@ -55,6 +55,15 @@ LOWPEDLEV="16."
 
 # Amplitude correction factor options
 AMPCORR="-traceamplitudecorrection MSCW.sizecal.runparameter -pedestalDefaultPedestal=$PEDLEV"
+# CARE simulations: add Gaussian noise of 3.6 mV/ (7.84 mV/dc)  / 2
+# Current (2018) CARE simulations:
+#    no electronic noise included - therefore add
+#    Gaussian noise with the given width
+#    Derived for GrIsu many years ago - source not entirely clear
+#    add Gaussian noise of 3.6 mV/ (7.84 mV/dc)  / 2
+if [[ ${SIMTYPE:0:4} == "CARE" ]]; then
+    AMPCORR="$AMPCORR -injectGaussianNoise=0.229592"
+fi
 
 if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     # Input files (observe that these might need some adjustments)
