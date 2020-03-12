@@ -79,7 +79,7 @@ if [[ ! -f "$TABFILE" ]]; then
 fi
 
 # Hack to scale sizes based on epochs to approx. correct for drop in reflectivity+gain.
-_sizecallineraw=$(grep "* T " ${VERITAS_EVNDISP_AUX_DIR}/ParameterFiles/MSCW.sizecal.runparameter | grep " ${EPOCH} ")
+_sizecallineraw=$(grep "* s " ${VERITAS_EVNDISP_AUX_DIR}/ParameterFiles/MSCW.sizecal.runparameter | grep " ${EPOCH} ")
 EPOCH_LABEL=$(echo "$_sizecallineraw" | awk '{print $3}')
 EPOCH_T1SCALE=$(echo "$_sizecallineraw" | awk '{print $4}')
 EPOCH_T2SCALE=$(echo "$_sizecallineraw" | awk '{print $5}')

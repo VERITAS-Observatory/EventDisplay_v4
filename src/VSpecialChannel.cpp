@@ -258,7 +258,7 @@ bool VSpecialChannel::readThroughput( string iEpoch, string ifile, string iDirec
 
             // check epoch
             is_stream >> is_temp;
-            if( is_temp == "T" )
+            if( is_temp == "s" )
             {
                 is_stream >> is_temp;
                 if( is_temp == iEpoch )
