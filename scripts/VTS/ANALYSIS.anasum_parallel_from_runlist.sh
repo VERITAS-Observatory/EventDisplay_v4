@@ -124,6 +124,10 @@ elif [[ $CUTS = BDTmoderateExt3tel ]]; then
     CUT="NTel3-ExtendedSource-Moderate-TMVA-BDT"
 elif [[ $CUTS = BDThardExt3tel ]]; then
     CUT="NTel3-ExtendedSource-Hard-TMVA-BDT"
+elif [[ $CUTS = NTel2ModeratePre ]]; then
+    CUT="NTel2-PointSource-Moderate-TMVA-Preselection"
+elif [[ $CUTS = NTel2SoftPre ]]; then
+    CUT="NTel2-PointSource-Soft-TMVA-Preselection"
 else
     echo "ERROR: unknown cut definition: $CUTS"
     exit 1
