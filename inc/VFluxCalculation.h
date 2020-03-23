@@ -183,8 +183,8 @@ class VFluxCalculation : public TObject
 		TGraphErrors* plotFluxesVSMJD( char* iTex = 0, double iMJDOffset = 0., TCanvas* c = 0, int iMarkerColor = 1, int iMarkerStyle = 7, bool bDrawAxis = false, double iMinMJD = -1., double iMaxMJD = -1. );
 		TGraphErrors* plotFluxesInBINs( int run = -1, char* iTex = 0, double iMJDOffset = 0., TCanvas* c = 0, int iMarkerColor = 1, int iMarkerStyle = 7, bool bDrawAxis = false );
 		TGraphErrors* plotFluxesVSMJDDaily( char* iTex = 0, double iMJDOffset = 0. );
-		TGraphErrors* plotFluxesVSElevation( bool iDraw = true, double iConstantValueLine = -1. );
-		void          plotFluxesVSPedvars();
+		TCanvas* plotFluxesVSElevation( bool iDraw = true, double iConstantValueLine = -1. );
+		TCanvas* plotFluxesVSPedvars();
 		void          plotFluxesVSWobbleOffset();
 		bool          IsInRunList( int iRun );
 		bool          IsZombie()
@@ -282,6 +282,6 @@ class VFluxCalculation : public TObject
 		}
 		void          writeResults( char* ifile );
 		
-		ClassDef( VFluxCalculation, 16 );
+		ClassDef( VFluxCalculation, 17 );
 };
 #endif
