@@ -62,7 +62,7 @@ IRFTYPE=$2
 [[ "$7" ]] && CUTSLISTFILE=$7 || CUTSLISTFILE=""
 [[ "$8" ]] && SIMDIR=$8 || SIMDIR=""
 # evndisplay version
-IRFVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .| sed -e 's/[a-Z]*$//'`
+IRFVERSION=`$EVNDISPSYS/bin/printRunParameter --version | tr -d .| sed -e 's/[a-Z]*$//'`
 
 # version string for aux files
 AUX="auxv01"
@@ -107,12 +107,18 @@ if [[ $CUTSLISTFILE != "" ]]; then
 else
     if [[ $BDTCUTS == "0"  ]]; then
     # default list of cuts
-        CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat 
-                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft.dat 
-                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard.dat 
-                 ANASUM.GammaHadron-Cut-NTel3-PointSource-SuperHard.dat
-                 ANASUM.GammaHadron-Cut-NTel2-PointSource-ModerateOpen.dat
-                 ANASUM.GammaHadron-Cut-NTel2-PointSource-SoftOpen.dat"
+#        CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat 
+#                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft.dat 
+#                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard.dat 
+#                 ANASUM.GammaHadron-Cut-NTel3-PointSource-SuperHard.dat
+#                 ANASUM.GammaHadron-Cut-NTel2-PointSource-ModerateOpen.dat
+#                 ANASUM.GammaHadron-Cut-NTel2-PointSource-SoftOpen.dat"
+        CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-Preselection.dat
+                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft-TMVA-Preselection.dat
+                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft.dat
+                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat 
+                 ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard-TMVA-BDT.dat
+                 ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard.dat"
 #                 ANASUM.GammaHadron-Cut-NTel2-PointSource-HardOpen.dat 
 #                 ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Moderate.dat 
 #                 ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Soft.dat 
