@@ -41,7 +41,7 @@ if [[ "$METHOD" == "irfperiod" ]]; then
     PARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/VERITAS.Epochs.runparameter"
 	
     # get only lines that start with '*'
-    EPOCHTHRESH=$( cat $PARAMFILE | grep -P "^\s??\*" | grep "IRFPERIOD" | grep -P "V\d" )
+    EPOCHTHRESH=$( cat $PARAMFILE | grep -P "^\s??\*" | grep "EPOCH" | grep -P "V\d" )
     AVAILABLEEPOCHS=$( echo "$EPOCHTHRESH" | awk '{ print $3 }' )
     DESIREDPERIODS=$( echo "$INPUTEPOCH" | sed 's/\,/ /g' | sed 's/\;/ /g' | tr " " "\n" )
     # loop over runs in runlist
