@@ -1,6 +1,10 @@
 #!/bin/bash
 # IRF production script (VERITAS)
 #
+# full list of epcochs:
+# V6_2012_2013 V6_2013_2014 V6_2014_2015 V6_2015_2016 V6_2016_2017 V6_2017_2018 V6_2018_2019 V6
+#
+#
 
 if [ $# -lt 2 ]; then
 # begin help message
@@ -107,32 +111,17 @@ if [[ $CUTSLISTFILE != "" ]]; then
 else
     if [[ $BDTCUTS == "0"  ]]; then
     # default list of cuts
-#        CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat 
-#                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft.dat 
-#                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard.dat 
-#                 ANASUM.GammaHadron-Cut-NTel3-PointSource-SuperHard.dat
-#                 ANASUM.GammaHadron-Cut-NTel2-PointSource-ModerateOpen.dat
-#                 ANASUM.GammaHadron-Cut-NTel2-PointSource-SoftOpen.dat"
         CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-Preselection.dat
                  ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft-TMVA-Preselection.dat
                  ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft.dat
                  ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat 
                  ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard-TMVA-BDT.dat
                  ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard.dat"
-#                 ANASUM.GammaHadron-Cut-NTel2-PointSource-HardOpen.dat 
-#                 ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Moderate.dat 
-#                 ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Soft.dat 
-#                 ANASUM.GammaHadron-Cut-NTel2-ExtendedSource-Hard.dat 
-#                 ANASUM.GammaHadron-Cut-NTel3-PointSource-Moderate.dat 
-#                 ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard.dat
-#                 ANASUM.GammaHadron-Cut-NTel3-ExtendedSource-SuperHard.dat" 
-#       CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat"
     else
     #BDT TMVA list of cuts
         CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-BDT.dat 
                  ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft-TMVA-BDT.dat 
                  ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard-TMVA-BDT.dat" 
-#       CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat"
     fi
 fi
 CUTLIST=`echo $CUTLIST |tr '\r' ' '`
