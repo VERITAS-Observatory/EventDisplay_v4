@@ -680,6 +680,8 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                                                                  cout << "VGammaHadronCuts::readCuts error,";
                                                                  cout << " weight file directory not found: ";
                                                                  cout << fTMVAWeightFile << endl;
+                                                                 cout << "exiting..." << endl;
+                                                                 exit( EXIT_FAILURE );
                                                              }
                                                         }
 							fTMVAWeightFile += iWeightFileName;
