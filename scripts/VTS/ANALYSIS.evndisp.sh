@@ -123,6 +123,14 @@ NRUNS=`cat $RLIST | wc -l `
 echo "total number of runs to analyze: $NRUNS"
 echo
 
+# sleep required for large data sets to avoid overload
+# of database and many jobs running in parallel
+SLEEPABIT="1s"
+if [ "$NRUNS" -gt "100" ] ; then
+   SLEEPABIT="30s"
+   echo "Long list of runs (${NRUNS}), will sleep after each run for ${SLEEPABIT}"
+fi
+
 #########################################
 # loop over all files in files loop
 for AFILE in $FILES
@@ -190,6 +198,8 @@ do
     elif [[ "$SUBC" == *simple* ]] ; then
 	"$FSCRIPT.sh" |& tee "$FSCRIPT.log"	
     fi
+
+    sleep ${SLEEPABIT}
 done
 
 # Execute all FSCRIPTs locally in parallel
