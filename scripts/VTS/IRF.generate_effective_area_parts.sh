@@ -104,7 +104,7 @@ echo "Processing Zenith = $ZA, Noise = $NOISE, Wobble = $WOBBLE"
             
 echo $CUTSFILE
 # set parameters in run script
-FSCRIPT="$LOGDIR/EA.ID${RECID}.$DATE.MC"
+FSCRIPT="$LOGDIR/EA.ID${RECID}.$DATE.MC_$(date +%s)"
 sed -e "s|OUTPUTDIR|$ODIR|" \
     -e "s|EFFFILE|$EFFAREAFILE|" \
     -e "s|DATAFILE|$MCFILE|" \

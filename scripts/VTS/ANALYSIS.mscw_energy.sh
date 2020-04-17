@@ -111,7 +111,14 @@ do
         continue
     fi
 
-    TABFILE=table-${IRFVERSION}-auxv01-${SIMTYPE}-ATM${ATMO}-${EPOCH}-GEO.root
+    if [ "$EPOCH" == "V4" ]||[ "$EPOCH" == "V5" ]; then
+        SIMTYPE_RUN="GRISU"
+        ATMO=$[${ATMO}-40]
+    else
+        SIMTYPE_RUN="$SIMTYPE"
+    fi
+
+    TABFILE=table-${IRFVERSION}-auxv01-${SIMTYPE_RUN}-ATM${ATMO}-${EPOCH}-GEO.root
     echo $TABFILE
     # Check that table file exists
     if [[ "$TABFILE" == `basename $TABFILE` ]]; then

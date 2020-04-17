@@ -230,7 +230,11 @@ for VX in $EPOCH; do
                     # analyse effective areas
                     elif [[ $IRFTYPE == "EFFECTIVEAREAS" ]]; then
                         for ID in $RECID; do
-                            ./IRF.generate_effective_area_parts.sh "$CUTLIST" $VX $ATM $ZA $WOBBLE $NOISE $ID $SIMTYPE
+                            #./IRF.generate_effective_area_parts.sh "$CUTLIST" $VX $ATM $ZA $WOBBLE $NOISE $ID $SIMTYPE
+                            for CUTS in ${CUTLIST[@]}; do
+                                echo "combine effective areas $CUTS"
+                               ./IRF.generate_effective_area_parts.sh $CUTS $VX $ATM $ZA $WOBBLE $NOISE $ID $SIMTYPE
+                            done # cuts
                         done #recID
                     fi
                 done #wobble
