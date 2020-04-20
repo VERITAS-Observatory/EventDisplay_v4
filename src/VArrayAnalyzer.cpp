@@ -479,10 +479,6 @@ void VArrayAnalyzer::initTree()
 	sprintf( i_text, "showerpars" );
 	// tree versioning numbers used in mscw_energy
 	sprintf( i_textTitle, "Shower Parameters (VERSION %d)", getRunParameter()->getEVNDISP_TREE_VERSION() );
-	if( getRunParameter()->fShortTree )
-	{
-		sprintf( i_textTitle, "%s (short tree)", i_textTitle );
-	}
 	fShowerParameters->initTree( i_text, i_textTitle, fReader->isMC() );
 	if( isMC() && fMCParameters )
 	{
@@ -604,14 +600,15 @@ void VArrayAnalyzer::terminate( bool iWriteDebug )
 				cout << "filling MC histograms" << endl;
 				VEffectiveAreaCalculatorMCHistograms iMC_histos;
 				// set energy range for spectral weighting
+				double i_ze = 999.;
 				if( getReader()->getMonteCarloHeader() )
 				{
 					iMC_histos.setMonteCarloEnergyRange( getReader()->getMonteCarloHeader()->E_range[0], getReader()->getMonteCarloHeader()->E_range[1],
 														 TMath::Abs( getReader()->getMonteCarloHeader()->spectral_index ) );
+                                        i_ze = getReader()->getMonteCarloHeader()->getMeanZenithAngle_Deg();
 				}
 				iMC_histos.setDefaultValues();
 				iMC_histos.initializeHistograms();
-				double i_ze = getReader()->getMonteCarloHeader()->getMeanZenithAngle_Deg();
 				// backwards compatibility: no ze in MC run header for old files
 				if( TMath::Abs( i_ze - 90. ) < 1.e-3 )
 				{
