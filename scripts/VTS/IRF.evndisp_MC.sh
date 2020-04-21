@@ -34,15 +34,7 @@ required parameters:
 
     <runparameter file>     file with integration window size and reconstruction cuts/methods, expected in $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/
 
-                            Default: EVNDISP.reconstruction.runparameter (long sumwindow -> for use with CARE IRFs; DISP disabled )
-
-                            other options:
-
-                            EVNDISP.reconstruction.runparameter.DISP              (long sumwindow -> for use with CARE IRFs;
-                                                                                  DISP enabled, use RecID 1 in later stages to access it)
-                                                                                 
-                            EVNDISP.reconstruction.runparameter.SumWindow6-noDISP (short sumwindow -> for use with grisu IRFs; DISP disabled)
-                            EVNDISP.reconstruction.runparameter.SumWindow6-DISP   (short sumwindow -> for use with grisu IRFs; DISP enabled [RecID 1])
+                            Default: EVNDISP.reconstruction.runparameter (DISP disabled )
 
 optional parameters:
     
