@@ -36,17 +36,7 @@ fi
 
 #################################
 # detector configuration and cuts
-
 echo "Using run parameter file $ACUTS"
-# no disp, long integration window
-# ACUTS="EVNDISP.reconstruction.runparameter"
-# disp, long integration window
-# ACUTS="EVNDISP.reconstruction.runparameter.DISP"
-# no disp, short integration window
-# ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
-# disp, short integration window
-# ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-DISP"
-
 
 DEAD="EVNDISP.validchannels.dat"
 PEDLEV="16."
@@ -112,7 +102,6 @@ elif [ ${SIMTYPE:0:4} == "CARE" ]; then
     [[ $PARTICLE == "1" ]]  && VBFNAME="gamma_${ZA}deg_750m_${WOB}wob_${NOISE}mhz_up_ATM${ATM}_part0"
     [[ $PARTICLE == "2" ]]  && VBFNAME="electron_${ZA}deg_noise${NOISE}MHz___"
     [[ $PARTICLE == "14" ]] && VBFNAME="proton_${ZA}deg_noise${NOISE}MHz___"
-
 fi
 # detector configuration
 [[ ${EPOCH:0:2} == "V4" ]] && CFG="EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt"
