@@ -510,6 +510,10 @@ void VEvndispRunParameter::print( int iEv )
 	{
 		cout << "number of events to analyse: " << fnevents << endl;
 	}
+        if( fFirstEvent > 0 )
+        {
+               cout << "starting analysis at event:  " << fFirstEvent << endl;
+        }
 	if( fTimeCutsMin_min > 0 )
 	{
 		cout << "start analysing at minute " << fTimeCutsMin_min << endl;
