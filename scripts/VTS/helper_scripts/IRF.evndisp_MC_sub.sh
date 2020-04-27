@@ -17,22 +17,28 @@ ACUTS=RECONSTRUCTIONRUNPARAMETERFILE
 PARTICLE=PARTICLETYPE
 SIMTYPE=SIMULATIONTYPE
 ODIR=OUTPUTDIR
-USEMODEL3D=USEMODEL3DMETHOD
-USEFROGS=FROGSFROGS
-MSCWDIR=FROGSMSCWDIR
-NEVENTS=FROGSEVENTS
+NEVENTS=NENEVENT
 TELTOANA="1234"
+VBFNAME=VBFFFILE
+NOISEFILE=NOISEFFILE
 
-# Output file name
-ONAME="$RUNNUM"
+#TMPTMP
+PEDNEVENTS="200000"
+TZERONEVENTS="100000"
 
 if [[ $NEVENTS -gt 0 ]]; then
     ITER=$((SGE_TASK_ID - 1))
     FIRSTEVENT=$(($ITER * $NEVENTS))
+    # increase run number
+    RUNNUM=$((RUNNUM + $ITER))
     # Output file name
-    ONAME="${RUNNUM}_$ITER"
+    #ONAME="${RUNNUM}_$ITER"
     echo -e "ITER $ITER NEVENTS $NEVENTS FIRSTEVENT $FIRSTEVENT"
 fi
+
+# Output file name
+ONAME="$RUNNUM"
+echo "Runnumber $RUNNUM"
 
 #################################
 # detector configuration and cuts
@@ -55,54 +61,6 @@ if [[ ${SIMTYPE:0:4} == "CARE" ]]; then
     AMPCORR="$AMPCORR -injectGaussianNoise=0.229592"
 fi
 
-if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
-    # Input files (observe that these might need some adjustments)
-    if [[ ${EPOCH:0:2} == "V4" ]]; then
-        if [[ $PARTICLE == "1" ]]; then
-           if [[ $ATM == "21" ]]; then
-            VBFNAME="Oct2012_oa_ATM21_${ZA}deg_${WOG}"
-           else
-            VBFNAME="gamma_V4_Oct2012_SummerV4ForProcessing_20130611_v420_ATM${ATM}_${ZA}deg_${WOG}"
-           fi
-        elif [[ $PARTICLE == "14" ]]; then
-            VBFNAME="proton_${ZA}deg_750m_wobble${WOB}_2008_2009_"
-        fi
-        NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE$NOISE.grisu"
-        echo "Noise File: $NOISEFILE"
-    elif [[ ${EPOCH:0:2} == "V5" ]]; then
-        if [[ $PARTICLE == "1" ]]; then
-            VBFNAME="gamma_V5_Oct2012_newArrayConfig_20121027_v420_ATM${ATM}_${ZA}deg_${WOG}"
-        elif [[ $PARTICLE == "14" ]]; then
-            VBFNAME="proton_${ZA}deg_w${WOB}_"
-        elif [[ $PARTICLE == "402" ]]; then
-            VBFNAME="helium_${ZA}deg_w${WOB}_"
-        fi
-        NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE$NOISE.grisu"
-        echo "Noise File: $NOISEFILE"
-    elif [[ ${EPOCH:0:2} == "V6" ]]; then
-        if [[ $PARTICLE == "1" ]]; then
-            VBFNAME="gamma_V6_Upgrade_20121127_v420_ATM${ATM}_${ZA}deg_${WOG}"
-            if [[ $ATM == "21-redHV" ]]; then
-                VBFNAME="gamma_V6_Upgrade_ReducedHV_20121211_v420_ATM21_${ZA}deg_${WOG}"
-            elif [[ $ATM == "21-UV" ]]; then
-                VBFNAME="gamma_V6_Upgrade_UVfilters_20121211_v420_ATM21_${ZA}deg_${WOG}"
-            elif [[ $ATM == "21-SNR" ]]; then
-                VBFNAME="gamma_V6_201304_SN2013ak_v420_ATM21_${ZA}deg_${WOG}"
-            fi
-        elif [[ $PARTICLE == "14" ]]; then
-            VBFNAME="proton_${ZA}deg_w${WOB}_"
-        elif [[ $PARTICLE == "402" ]]; then
-            VBFNAME="helium_${ZA}deg_w${WOB}_"
-        fi
-        NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE${NOISE}_20120827_v420.grisu"
-        echo "Noise File: $NOISEFILE"
-    fi
-elif [ ${SIMTYPE:0:4} == "CARE" ]; then
-    # input files (observe that these might need some adjustments)
-    [[ $PARTICLE == "1" ]]  && VBFNAME="gamma_${ZA}deg_750m_${WOB}wob_${NOISE}mhz_up_ATM${ATM}_part0"
-    [[ $PARTICLE == "2" ]]  && VBFNAME="electron_${ZA}deg_noise${NOISE}MHz___"
-    [[ $PARTICLE == "14" ]] && VBFNAME="proton_${ZA}deg_noise${NOISE}MHz___"
-fi
 # detector configuration
 [[ ${EPOCH:0:2} == "V4" ]] && CFG="EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt"
 [[ ${EPOCH:0:2} == "V5" ]] && CFG="EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt"
@@ -179,49 +137,40 @@ fi
 if [[ ${SIMTYPE:0:4} == "CARE" ]]; then
     echo "Calculating pedestals for run $RUNNUM"
     rm -f $ODIR/$RUNNUM.ped.log
-    $EVNDISPSYS/bin/evndisp -runmode=1 -sourcetype=2 -epoch $EPOCH -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo $AMPCORR -calibrationdirectory $ODIR &> $ODIR/$RUNNUM.ped.log
+    $EVNDISPSYS/bin/evndisp -runmode=1 -sourcetype=2 -epoch $EPOCH -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo $AMPCORR -calibrationnevents=${PEDNEVENTS} -calibrationdirectory $ODIR &> $ODIR/$RUNNUM.ped.log
+    if grep -Fq "END OF ANALYSIS, exiting" $ODIR/$RUNNUM.ped.log;
+    then
+        echo "   successful pedestal analysis"
+    else
+        echo "   echo in pedestal analysis"
+        exit
+    fi
 fi    
 
 ###############################################
 # calculate tzeros
-if [[ $USEFROGS != "1" ]]; then
-    echo "Calculating average tzeros for run $RUNNUM"
-    MCOPT="-runmode=7 -sourcetype=2 -epoch $EPOCH -camera=$CFG -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo -calibrationnevents=100000 -calibrationdirectory $ODIR -reconstructionparameter $ACUTS -pedestalnoiselevel=$NOISE "
-    rm -f $ODIR/$RUNNUM.tzero.log
-    ### eventdisplay GRISU run options
-    if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
-        MCOPT="$MCOPT -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
-    else
-       MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV -lowgaincalibrationfile calibrationlist.LowGainForCare.dat"
-    fi
-    echo "$EVNDISPSYS/bin/evndisp $MCOPT" &> $ODIR/$RUNNUM.tzero.log
-    $EVNDISPSYS/bin/evndisp $MCOPT $AMPCORR &>> $ODIR/$RUNNUM.tzero.log
+echo "Calculating average tzeros for run $RUNNUM"
+MCOPT="-runmode=7 -sourcetype=2 -epoch $EPOCH -camera=$CFG -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo -calibrationnevents=${TZERONEVENTS} -calibrationdirectory $ODIR -reconstructionparameter $ACUTS -pedestalnoiselevel=$NOISE "
+rm -f $ODIR/$RUNNUM.tzero.log
+### eventdisplay GRISU run options
+if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
+    MCOPT="$MCOPT -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
+else
+   MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV -lowgaincalibrationfile calibrationlist.LowGainForCare.dat"
+fi
+echo "$EVNDISPSYS/bin/evndisp $MCOPT" &> $ODIR/$RUNNUM.tzero.log
+$EVNDISPSYS/bin/evndisp $MCOPT $AMPCORR &>> $ODIR/$RUNNUM.tzero.log
+if grep -Fq "END OF ANALYSIS, exiting" $ODIR/$RUNNUM.tzero.log;
+then
+    echo "   successful tzero analysis"
+else
+    echo "   echo in tzero analysis"
+    exit
 fi
 
 ###############################################
 # run eventdisplay
 ###############################################
-# model 3D
-if [[ $USEMODEL3D == "1" ]]; then
-    MODEL3D="-model3d -lnlfile $VERITAS_EVNDISP_AUX_DIR/Model3D/table_Model3D_Likelihood.root"
-fi
-# FROGS
-if [[ $USEFROGS == "1" ]]; then
-	 MSCWFILE="${ZA}deg_${WOB}wob_NOISE${NOISE}_${ITER}.mscw.root"
-    echo -e "FROGS MSCW Dir:\n $MSCWDIR"
-    echo -e "FROGS MSCW File:\n $MSCWFILE"
-    echo "FROGS NEvents: $NEVENTS"
-   # template list file
-   if [[ "$EPOCH" =~ ^(V5|V6)$ ]]; then
-      TEMPLATELIST="EVNDISP.frogs_template_file_list.$EPOCH.txt"
-   else
-      echo "Error (helper_scripts/IRF.evndisp_MC_sub.sh), no frogs template list defined for $EPOCH='$EPOCH', exiting..."
-      exit 1
-   fi
-   echo "Using template list file '$TEMPLATELIST'..."
-	echo "$MSCWDIR/$MSCWFILE $NEVENTS $FIRSTEVENT"
-   FROGS="-frogs $MSCWDIR/$MSCWFILE -frogsid 0 -templatelistforfrogs "$TEMPLATELIST" -frogsparameterfile FROGS.runparameter"
-fi
 # run options
 MCOPT=" -runnumber=$RUNNUM -sourcetype=2 -epoch $EPOCH -camera=$CFG -reconstructionparameter $ACUTS -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory $ODIR"
 # special options for GRISU
@@ -237,8 +186,8 @@ if [[ $NEVENTS -gt 0 ]]; then
 	 MCOPT="-nevents=$NEVENTS -firstevent=$FIRSTEVENT $MCOPT"
 fi
 echo "Analysing MC file for run $RUNNUM"
-echo "$EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS" &> $ODIR/$ONAME.log
-$EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS $AMPCORR &>> $ODIR/$ONAME.log
+echo "$EVNDISPSYS/bin/evndisp $MCOPT" &> $ODIR/$ONAME.log
+$EVNDISPSYS/bin/evndisp $MCOPT $AMPCORR &>> $ODIR/$ONAME.log
 
 # remove temporary files
 cp -f -v $DDIR/$ONAME.root $ODIR/$ONAME.root
