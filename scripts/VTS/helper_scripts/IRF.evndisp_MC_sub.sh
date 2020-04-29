@@ -107,6 +107,11 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
         NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE${NOISE}_20120827_v420.grisu"
         echo "Noise File: $NOISEFILE"
     fi
+elif [ ${SIMTYPE:0:10} == "CARE_RedHV" ]; then
+    #gamma_V6_PMTUpgrade_RHV_CARE_v1.6.2_12_ATM61_zen40deg_050wob_150MHz.cvbf.zst
+    WOFFSET=$(awk -v myvar=$WOB 'BEGIN { printf("%03d",100*myvar) }')
+    LBL="PMTUpgrade_RHV_CARE_v1.6.2_12"
+    [[ $PARTICLE == "1" ]]  && VBFNAME="gamma_V6_${LBL}_ATM${ATM}_zen${ZA}deg_${WOFFSET}wob_${NOISE}MHz"
 elif [ ${SIMTYPE:0:4} == "CARE" ]; then
     # input files (observe that these might need some adjustments)
     [[ $PARTICLE == "1" ]]  && VBFNAME="gamma_${ZA}deg_750m_${WOB}wob_${NOISE}mhz_up_ATM${ATM}_part0"
@@ -132,6 +137,8 @@ echo "Temporary directory: $DDIR"
 # loop over simulation files
 if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     VBF_FILE=$VBFNAME"wobb.vbf"
+elif [[ ${SIMTYPE:0:10} == "CARE_RedHV" ]]; then
+    VBF_FILE="$VBFNAME.cvbf.zst"
 elif [[ ${SIMTYPE:0:4} == "CARE" ]]; then
     VBF_FILE="$VBFNAME.cvbf"
 fi

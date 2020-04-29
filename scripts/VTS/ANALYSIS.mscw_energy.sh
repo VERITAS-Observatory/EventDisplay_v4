@@ -67,8 +67,13 @@ elif [[ "$3" ]]; then
 else
     ODIR=$INPUTDIR
 fi
-[[ "$5" ]] && SIMTYPE=$5 || SIMTYPE="CARE_June1702"
+[[ "$5" ]] && SIMTYPE=$5 || SIMTYPE=""
 [[ "$6" ]] && FORCEDATMO=$6
+
+SIMTYPE_DEFAULT_V4="GRISU"
+SIMTYPE_DEFAULT_V5="GRISU"
+SIMTYPE_DEFAULT_V6="CARE_June1702"
+
 
 # Read runlist
 if [ ! -f "$RLIST" ] ; then
@@ -103,6 +108,11 @@ do
     BFILE="$INPUTDIR/$AFILE.root"
     echo "Now analysing $BFILE (ID=$ID)"
 
+    if [ ! -e "$BFILE" ]; then
+        echo "ERR: File $BFILE does not exist !!!" >> mscw.errors.log
+        continue
+    fi
+
     RUNINFO=`$EVNDISPSYS/bin/printRunParameter $BFILE -runinfo`
     EPOCH=`echo $RUNINFO | awk '{print $(1)}'`
     ATMO=${FORCEDATMO:-`echo $RUNINFO | awk '{print $(3)}'`}
@@ -111,9 +121,20 @@ do
         continue
     fi
 
-    if [ "$EPOCH" == "V4" ]||[ "$EPOCH" == "V5" ]; then
-        SIMTYPE_RUN="GRISU"
-        ATMO=$[${ATMO}-40]
+    if [ "$SIMTYPE" == "" ]
+    then
+        if [ "$EPOCH" == "V4" ]
+        then
+            SIMTYPE_RUN="$SIMTYPE_DEFAULT_V4"
+            ATMO=$[${ATMO}-40]
+        elif [ "$EPOCH" == "V5" ]
+        then
+            SIMTYPE_RUN="$SIMTYPE_DEFAULT_V5"
+            ATMO=$[${ATMO}-40]
+        else
+            SIMTYPE_RUN="$SIMTYPE_DEFAULT_V6"
+            ATMO=61 #### Workaround use winter everywhere for now
+        fi
     else
         SIMTYPE_RUN="$SIMTYPE"
     fi

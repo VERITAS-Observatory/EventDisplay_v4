@@ -53,7 +53,8 @@ fi
 exec 5>&1
 
 # Check that run parameter file exists
-if [[ "$RUNP" == `basename $RUNP` ]]; then
+if [[ ! -e "$RUNP" ]]; then
+    #if [[ "$RUNP" == `basename $RUNP` ]]; then
     RUNP="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/$RUNP"
 fi
 if [ ! -f "$RUNP" ]; then
