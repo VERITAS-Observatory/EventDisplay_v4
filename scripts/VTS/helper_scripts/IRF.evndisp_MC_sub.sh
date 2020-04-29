@@ -17,37 +17,33 @@ ACUTS=RECONSTRUCTIONRUNPARAMETERFILE
 PARTICLE=PARTICLETYPE
 SIMTYPE=SIMULATIONTYPE
 ODIR=OUTPUTDIR
-USEMODEL3D=USEMODEL3DMETHOD
-USEFROGS=FROGSFROGS
-MSCWDIR=FROGSMSCWDIR
-NEVENTS=FROGSEVENTS
+NEVENTS=NENEVENT
 TELTOANA="1234"
+VBFNAME=VBFFFILE
+NOISEFILE=NOISEFFILE
 
 # Output file name
-ONAME="$RUNNUM"
+PEDNEVENTS="200000"
+TZERONEVENTS="100000"
 
 if [[ $NEVENTS -gt 0 ]]; then
     ITER=$((SGE_TASK_ID - 1))
     FIRSTEVENT=$(($ITER * $NEVENTS))
     # Output file name
-    ONAME="${RUNNUM}_$ITER"
+    RUNNUM=$((RUNNUM + $ITER))
+    # Output file name
+    #ONAME="${RUNNUM}_$ITER"
     echo -e "ITER $ITER NEVENTS $NEVENTS FIRSTEVENT $FIRSTEVENT"
 fi
 
+# Output file name
+ONAME="$RUNNUM"
+echo "Runnumber $RUNNUM"
 #################################
 # detector configuration and cuts
 
 echo "Using run parameter file $ACUTS"
 # no disp, long integration window
-# ACUTS="EVNDISP.reconstruction.runparameter"
-# disp, long integration window
-# ACUTS="EVNDISP.reconstruction.runparameter.DISP"
-# no disp, short integration window
-# ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-noDISP"
-# disp, short integration window
-# ACUTS="EVNDISP.reconstruction.runparameter.SumWindow6-DISP"
-
-
 DEAD="EVNDISP.validchannels.dat"
 PEDLEV="16."
 # LOWPEDLEV="8."
@@ -65,60 +61,6 @@ if [[ ${SIMTYPE:0:4} == "CARE" ]]; then
     AMPCORR="$AMPCORR -injectGaussianNoise=0.229592"
 fi
 
-if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
-    # Input files (observe that these might need some adjustments)
-    if [[ ${EPOCH:0:2} == "V4" ]]; then
-        if [[ $PARTICLE == "1" ]]; then
-           if [[ $ATM == "21" ]]; then
-            VBFNAME="Oct2012_oa_ATM21_${ZA}deg_${WOG}"
-           else
-            VBFNAME="gamma_V4_Oct2012_SummerV4ForProcessing_20130611_v420_ATM${ATM}_${ZA}deg_${WOG}"
-           fi
-        elif [[ $PARTICLE == "14" ]]; then
-            VBFNAME="proton_${ZA}deg_750m_wobble${WOB}_2008_2009_"
-        fi
-        NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE$NOISE.grisu"
-        echo "Noise File: $NOISEFILE"
-    elif [[ ${EPOCH:0:2} == "V5" ]]; then
-        if [[ $PARTICLE == "1" ]]; then
-            VBFNAME="gamma_V5_Oct2012_newArrayConfig_20121027_v420_ATM${ATM}_${ZA}deg_${WOG}"
-        elif [[ $PARTICLE == "14" ]]; then
-            VBFNAME="proton_${ZA}deg_w${WOB}_"
-        elif [[ $PARTICLE == "402" ]]; then
-            VBFNAME="helium_${ZA}deg_w${WOB}_"
-        fi
-        NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE$NOISE.grisu"
-        echo "Noise File: $NOISEFILE"
-    elif [[ ${EPOCH:0:2} == "V6" ]]; then
-        if [[ $PARTICLE == "1" ]]; then
-            VBFNAME="gamma_V6_Upgrade_20121127_v420_ATM${ATM}_${ZA}deg_${WOG}"
-            if [[ $ATM == "21-redHV" ]]; then
-                VBFNAME="gamma_V6_Upgrade_ReducedHV_20121211_v420_ATM21_${ZA}deg_${WOG}"
-            elif [[ $ATM == "21-UV" ]]; then
-                VBFNAME="gamma_V6_Upgrade_UVfilters_20121211_v420_ATM21_${ZA}deg_${WOG}"
-            elif [[ $ATM == "21-SNR" ]]; then
-                VBFNAME="gamma_V6_201304_SN2013ak_v420_ATM21_${ZA}deg_${WOG}"
-            fi
-        elif [[ $PARTICLE == "14" ]]; then
-            VBFNAME="proton_${ZA}deg_w${WOB}_"
-        elif [[ $PARTICLE == "402" ]]; then
-            VBFNAME="helium_${ZA}deg_w${WOB}_"
-        fi
-        NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE${NOISE}_20120827_v420.grisu"
-        echo "Noise File: $NOISEFILE"
-    fi
-elif [ ${SIMTYPE:0:10} == "CARE_RedHV" ]; then
-    #gamma_V6_PMTUpgrade_RHV_CARE_v1.6.2_12_ATM61_zen40deg_050wob_150MHz.cvbf.zst
-    WOFFSET=$(awk -v myvar=$WOB 'BEGIN { printf("%03d",100*myvar) }')
-    LBL="PMTUpgrade_RHV_CARE_v1.6.2_12"
-    [[ $PARTICLE == "1" ]]  && VBFNAME="gamma_V6_${LBL}_ATM${ATM}_zen${ZA}deg_${WOFFSET}wob_${NOISE}MHz"
-elif [ ${SIMTYPE:0:4} == "CARE" ]; then
-    # input files (observe that these might need some adjustments)
-    [[ $PARTICLE == "1" ]]  && VBFNAME="gamma_${ZA}deg_750m_${WOB}wob_${NOISE}mhz_up_ATM${ATM}_part0"
-    [[ $PARTICLE == "2" ]]  && VBFNAME="electron_${ZA}deg_noise${NOISE}MHz___"
-    [[ $PARTICLE == "14" ]] && VBFNAME="proton_${ZA}deg_noise${NOISE}MHz___"
-
-fi
 # detector configuration
 [[ ${EPOCH:0:2} == "V4" ]] && CFG="EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt"
 [[ ${EPOCH:0:2} == "V5" ]] && CFG="EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt"

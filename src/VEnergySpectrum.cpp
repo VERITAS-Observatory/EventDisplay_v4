@@ -2014,16 +2014,41 @@ TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierInde
 	// plot & fit
 	TCanvas* c = plot();
 	
-        setSpectralFitFunction( iFitFunctionID );
-	setSpectralFitFluxNormalisationEnergy( 1. );
-	setSpectralFitRangeLin( i_FitStart_TevLin, i_FitStop_TeVLin );
-	fitEnergySpectrum();
-	if( iPlottingMultiplierIndex < 2. )
-	{
-		plotFitValues();
-		plotEventNumbers();
-	}
-	plotResiduals();
+        if( iFitFunctionID >= 0 )
+        {
+            setSpectralFitFunction( iFitFunctionID );
+            setSpectralFitFluxNormalisationEnergy( 1. );
+            // set fit range
+            if( i_FitStart_TevLin > 0. && i_FitStop_TeVLin > 0. )
+            {
+                setSpectralFitRangeLin( i_FitStart_TevLin, i_FitStop_TeVLin );
+            }
+            // set fit range from first to last point
+            else
+            {
+                if( gEnergySpectrum )
+                {
+                    double x, y;
+                    double i_xmin = 1.e9;
+                    double i_xmax = -1.e9;
+                    for( int p = 0; p < gEnergySpectrum->GetN(); p++ )
+                    {
+                         gEnergySpectrum->GetPoint( p, x , y );
+                         x = TMath::Power( 10., x );
+                         if( x > i_xmax ) i_xmax = x;
+                         if( x < i_xmin ) i_xmin = x;
+                    }
+                    setSpectralFitRangeLin( i_xmin, i_xmax );
+                }
+            }
+            fitEnergySpectrum();
+            if( iPlottingMultiplierIndex < 2. )
+            {
+                    plotFitValues();
+                    plotEventNumbers();
+            }
+            plotResiduals();
+        }
 	plotLifeTimevsEnergy();
 	plotCountingHistograms();
 	plotMeanEffectiveArea();

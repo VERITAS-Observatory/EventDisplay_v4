@@ -667,12 +667,12 @@ void VPlotCompareDataWithMC::msc_vs_energy_plots( int iRebin, double xmin, doubl
 		return;
 	}
 	
-	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax , "CUMU" );
 	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax , "CUMU" );
-	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax , "REL" );
+	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax , "CUMU" );
 	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax , "REL" );
-	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax );
+	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax , "REL" );
 	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax );
+	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax );
 }
 
 /*
@@ -702,6 +702,7 @@ void VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVariable
 	{
 		return;
 	}
+        cout << "Plotting " << iVariable << "\t" << iPlot << "\t"<< iTelescope << endl;
 	
 	double KSProb = 0;
 	double KSSig = 0;
@@ -826,7 +827,7 @@ void VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVariable
 		}
 		else if( iPlot == "CUMU" )
 		{
-			if( iVariable == "MCSW" || iVariable == "MSCL"  )
+			if( iVariable == "MSCW" || iVariable == "MSCL"  )
 			{
 				plotCummulativePlot( hSims, hDiff, x_min, x_max, true, 1.5 );
 			}
@@ -857,6 +858,7 @@ void VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVariable
 	// print the canvas
 	if( fPrintName.size() > 0 )
 	{
+                c_MS->Update();
 		if( iTelescope > 0 )
 		{
 			sprintf( hname, "%s-%s-T%d-%s.pdf", fPrintName.c_str(), iVariable.c_str(), iTelescope, iPlot.c_str() );
