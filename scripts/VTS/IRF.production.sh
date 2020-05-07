@@ -97,6 +97,10 @@ elif [ "${SIMTYPE}" = "CARE_June1702" ]; then
     NSB_LEVELS=( 50 75 100 130 160 200 250 300 350 400 450 )
     WOBBLE_OFFSETS=( 0.5 )
     NEVENTS="15000000"
+elif [ "${SIMTYPE}" = "CARE_RedHV" ]; then
+    ZENITH_ANGLES=$(ls $VERITAS_DATA_DIR/simulations/V6_FLWO/CARE_June1702_RHV/*.zst | awk -F "_zen" '{print $2}' | awk -F "deg." '{print $1}' | sort | uniq) 
+    NSB_LEVELS=$(ls $VERITAS_DATA_DIR/simulations/V6_FLWO/CARE_June1702_RHV/*.zst | awk -F "wob_" '{print $2}' | awk -F "MHz." '{print $1}' | sort | uniq)
+    WOBBLE_OFFSETS=( 0.5 ) 
 elif [ ${SIMTYPE:0:4} = "CARE" ]; then
     # Older CARE simulation parameters
     ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 60 65 )
@@ -192,6 +196,8 @@ for VX in $EPOCH; do
                           SIMDIR=$VERITAS_DATA_DIR/simulations/"$VX"_FLWO/grisu/ATM"$ATM"
                        elif [[ ${SIMTYPE:0:13} = "CARE_June1425" ]]; then
                           SIMDIR=$VERITAS_DATA_DIR/simulations/"${VX:0:2}"_FLWO/CARE_June1425/
+                       elif [[ ${SIMTYPE:0:10} = "CARE_RedHV" ]]; then
+                          SIMDIR=$VERITAS_DATA_DIR/simulations/"${VX:0:2}"_FLWO/CARE_June1702_RHV/
                        elif [[ ${SIMTYPE:0:4} = "CARE" ]]; then
                           SIMDIR=$VERITAS_DATA_DIR/simulations/"${VX:0:2}"_FLWO/${SIMTYPE}
                        fi
@@ -230,7 +236,11 @@ for VX in $EPOCH; do
                     # analyse effective areas
                     elif [[ $IRFTYPE == "EFFECTIVEAREAS" ]]; then
                         for ID in $RECID; do
-                            ./IRF.generate_effective_area_parts.sh "$CUTLIST" $VX $ATM $ZA $WOBBLE $NOISE $ID $SIMTYPE
+                            #./IRF.generate_effective_area_parts.sh "$CUTLIST" $VX $ATM $ZA $WOBBLE $NOISE $ID $SIMTYPE
+                            for CUTS in ${CUTLIST[@]}; do
+                                echo "combine effective areas $CUTS"
+                               ./IRF.generate_effective_area_parts.sh $CUTS $VX $ATM $ZA $WOBBLE $NOISE $ID $SIMTYPE
+                            done # cuts
                         done #recID
                     fi
                 done #wobble

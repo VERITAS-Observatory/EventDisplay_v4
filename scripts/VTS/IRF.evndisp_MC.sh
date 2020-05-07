@@ -159,6 +159,11 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
         fi
         NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE${NOISE}_20120827_v420.grisu"
     fi
+elif [ ${SIMTYPE:0:10} == "CARE_RedHV" ]; then
+    # example gamma_V6_PMTUpgrade_RHV_CARE_v1.6.2_12_ATM61_zen40deg_050wob_150MHz.cvbf.zst
+    WOFFSET=$(awk -v WB=$WOBBLE 'BEGIN { printf("%03d",100*WB) }')
+    LBL="PMTUpgrade_RHV_CARE_v1.6.2_12"
+    [[ $PARTICLE == "1" ]]  && VBFNAME="gamma_V6_${LBL}_ATM${ATM}_zen${ZA}deg_${WOFFSET}wob_${NOISE}MHz"
 elif [ ${SIMTYPE:0:4} == "CARE" ]; then
     # input files (observe that these might need some adjustments)
     [[ $PARTICLE == "1" ]]  && VBFNAME="gamma_${ZA}deg_750m_${WOBBLE}wob_${NOISE}mhz_up_ATM${ATM}_part0"
