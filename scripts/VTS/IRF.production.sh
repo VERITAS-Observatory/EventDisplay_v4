@@ -71,6 +71,12 @@ IRFVERSION=`$EVNDISPSYS/bin/printRunParameter --version | tr -d .| sed -e 's/[a-
 # version string for aux files
 AUX="auxv01"
 
+# number of events per evndisp analysis
+NEVENTS="-1"
+
+# Default run parameter file for evndisp analysis
+ACUTS="EVNDISP.reconstruction.runparameter"
+
 # simulation types and definition of parameter space
 if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
     # GrISU simulation parameters
@@ -83,9 +89,14 @@ if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
     fi
 elif [ "${SIMTYPE}" = "CARE_June1702" ]; then
     # CARE_June1702 simulation parameters
-    ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 )
+    if [[ $ATMOS == "62" ]]; then
+        ZENITH_ANGLES=( 00 20 30 35 40 45 50 )
+    else
+        ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 )
+    fi
     NSB_LEVELS=( 50 75 100 130 160 200 250 300 350 400 450 )
     WOBBLE_OFFSETS=( 0.5 )
+    NEVENTS="15000000"
 elif [ "${SIMTYPE}" = "CARE_RedHV" ]; then
     ZENITH_ANGLES=$(ls $VERITAS_DATA_DIR/simulations/V6_FLWO/CARE_June1702_RHV/*.zst | awk -F "_zen" '{print $2}' | awk -F "deg." '{print $1}' | sort | uniq) 
     NSB_LEVELS=$(ls $VERITAS_DATA_DIR/simulations/V6_FLWO/CARE_June1702_RHV/*.zst | awk -F "wob_" '{print $2}' | awk -F "MHz." '{print $1}' | sort | uniq)
@@ -190,7 +201,7 @@ for VX in $EPOCH; do
                        elif [[ ${SIMTYPE:0:4} = "CARE" ]]; then
                           SIMDIR=$VERITAS_DATA_DIR/simulations/"${VX:0:2}"_FLWO/${SIMTYPE}
                        fi
-                        ./IRF.evndisp_MC.sh $SIMDIR $VX $ATM $ZA $WOBBLE $NOISE $SIMTYPE
+                        ./IRF.evndisp_MC.sh $SIMDIR $VX $ATM $ZA $WOBBLE $NOISE $SIMTYPE $ACUTS 1 $NEVENTS
                     ######################
                     # make tables
                     elif [[ $IRFTYPE == "MAKETABLES" ]]; then

@@ -22,14 +22,14 @@ TELTOANA="1234"
 VBFNAME=VBFFFILE
 NOISEFILE=NOISEFFILE
 
-# Output file name
+#TMPTMP
 PEDNEVENTS="200000"
 TZERONEVENTS="100000"
 
 if [[ $NEVENTS -gt 0 ]]; then
     ITER=$((SGE_TASK_ID - 1))
     FIRSTEVENT=$(($ITER * $NEVENTS))
-    # Output file name
+    # increase run number
     RUNNUM=$((RUNNUM + $ITER))
     # Output file name
     #ONAME="${RUNNUM}_$ITER"
@@ -39,11 +39,11 @@ fi
 # Output file name
 ONAME="$RUNNUM"
 echo "Runnumber $RUNNUM"
+
 #################################
 # detector configuration and cuts
-
 echo "Using run parameter file $ACUTS"
-# no disp, long integration window
+
 DEAD="EVNDISP.validchannels.dat"
 PEDLEV="16."
 # LOWPEDLEV="8."
@@ -137,49 +137,40 @@ fi
 if [[ ${SIMTYPE:0:4} == "CARE" ]]; then
     echo "Calculating pedestals for run $RUNNUM"
     rm -f $ODIR/$RUNNUM.ped.log
-    $EVNDISPSYS/bin/evndisp -runmode=1 -sourcetype=2 -epoch $EPOCH -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo $AMPCORR -calibrationdirectory $ODIR &> $ODIR/$RUNNUM.ped.log
+    $EVNDISPSYS/bin/evndisp -runmode=1 -sourcetype=2 -epoch $EPOCH -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo $AMPCORR -calibrationnevents=${PEDNEVENTS} -calibrationdirectory $ODIR &> $ODIR/$RUNNUM.ped.log
+    if grep -Fq "END OF ANALYSIS, exiting" $ODIR/$RUNNUM.ped.log;
+    then
+        echo "   successful pedestal analysis"
+    else
+        echo "   echo in pedestal analysis"
+        exit
+    fi
 fi    
 
 ###############################################
 # calculate tzeros
-if [[ $USEFROGS != "1" ]]; then
-    echo "Calculating average tzeros for run $RUNNUM"
-    MCOPT="-runmode=7 -sourcetype=2 -epoch $EPOCH -camera=$CFG -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo -calibrationnevents=100000 -calibrationdirectory $ODIR -reconstructionparameter $ACUTS -pedestalnoiselevel=$NOISE "
-    rm -f $ODIR/$RUNNUM.tzero.log
-    ### eventdisplay GRISU run options
-    if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
-        MCOPT="$MCOPT -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
-    else
-       MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV -lowgaincalibrationfile calibrationlist.LowGainForCare.dat"
-    fi
-    echo "$EVNDISPSYS/bin/evndisp $MCOPT" &> $ODIR/$RUNNUM.tzero.log
-    $EVNDISPSYS/bin/evndisp $MCOPT $AMPCORR &>> $ODIR/$RUNNUM.tzero.log
+echo "Calculating average tzeros for run $RUNNUM"
+MCOPT="-runmode=7 -sourcetype=2 -epoch $EPOCH -camera=$CFG -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo -calibrationnevents=${TZERONEVENTS} -calibrationdirectory $ODIR -reconstructionparameter $ACUTS -pedestalnoiselevel=$NOISE "
+rm -f $ODIR/$RUNNUM.tzero.log
+### eventdisplay GRISU run options
+if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
+    MCOPT="$MCOPT -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
+else
+   MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV -lowgaincalibrationfile calibrationlist.LowGainForCare.dat"
+fi
+echo "$EVNDISPSYS/bin/evndisp $MCOPT" &> $ODIR/$RUNNUM.tzero.log
+$EVNDISPSYS/bin/evndisp $MCOPT $AMPCORR &>> $ODIR/$RUNNUM.tzero.log
+if grep -Fq "END OF ANALYSIS, exiting" $ODIR/$RUNNUM.tzero.log;
+then
+    echo "   successful tzero analysis"
+else
+    echo "   echo in tzero analysis"
+    exit
 fi
 
 ###############################################
 # run eventdisplay
 ###############################################
-# model 3D
-if [[ $USEMODEL3D == "1" ]]; then
-    MODEL3D="-model3d -lnlfile $VERITAS_EVNDISP_AUX_DIR/Model3D/table_Model3D_Likelihood.root"
-fi
-# FROGS
-if [[ $USEFROGS == "1" ]]; then
-	 MSCWFILE="${ZA}deg_${WOB}wob_NOISE${NOISE}_${ITER}.mscw.root"
-    echo -e "FROGS MSCW Dir:\n $MSCWDIR"
-    echo -e "FROGS MSCW File:\n $MSCWFILE"
-    echo "FROGS NEvents: $NEVENTS"
-   # template list file
-   if [[ "$EPOCH" =~ ^(V5|V6)$ ]]; then
-      TEMPLATELIST="EVNDISP.frogs_template_file_list.$EPOCH.txt"
-   else
-      echo "Error (helper_scripts/IRF.evndisp_MC_sub.sh), no frogs template list defined for $EPOCH='$EPOCH', exiting..."
-      exit 1
-   fi
-   echo "Using template list file '$TEMPLATELIST'..."
-	echo "$MSCWDIR/$MSCWFILE $NEVENTS $FIRSTEVENT"
-   FROGS="-frogs $MSCWDIR/$MSCWFILE -frogsid 0 -templatelistforfrogs "$TEMPLATELIST" -frogsparameterfile FROGS.runparameter"
-fi
 # run options
 MCOPT=" -runnumber=$RUNNUM -sourcetype=2 -epoch $EPOCH -camera=$CFG -reconstructionparameter $ACUTS -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory $ODIR"
 # special options for GRISU
@@ -195,8 +186,8 @@ if [[ $NEVENTS -gt 0 ]]; then
 	 MCOPT="-nevents=$NEVENTS -firstevent=$FIRSTEVENT $MCOPT"
 fi
 echo "Analysing MC file for run $RUNNUM"
-echo "$EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS" &> $ODIR/$ONAME.log
-$EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS $AMPCORR &>> $ODIR/$ONAME.log
+echo "$EVNDISPSYS/bin/evndisp $MCOPT" &> $ODIR/$ONAME.log
+$EVNDISPSYS/bin/evndisp $MCOPT $AMPCORR &>> $ODIR/$ONAME.log
 
 # remove temporary files
 cp -f -v $DDIR/$ONAME.root $ODIR/$ONAME.root
