@@ -133,7 +133,6 @@ do
             ATMO=$[${ATMO}-40]
         else
             SIMTYPE_RUN="$SIMTYPE_DEFAULT_V6"
-            ATMO=61 #### Workaround use winter everywhere for now
         fi
     else
         SIMTYPE_RUN="$SIMTYPE"
