@@ -171,18 +171,19 @@ echo "SIMDIR: $SIMDIR"
 echo "VBFILE: ${VBFNAME} $FF"
 echo "NOISEFILE: ${NOISEFILE}"
 # tmpdir requires a safety factor of 2.5 (from unzipping VBF file)
-TMSF=$(echo "${FF%?}*2.5" | bc)
+TMSF=$(echo "${FF%?}*3.0" | bc)
+if [[ ${NOISE} -eq 50 ]]; then
+   TMSF=$(echo "${FF%?}*5.0" | bc)
+fi
 TMUNI=$(echo "${FF: -1}")
 tmpdir_size=${TMSF%.*}$TMUNI
 echo "Setting TMPDIR_SIZE to $tmpdir_size"
 # determine number of jobs required
 # (avoid many empty jobs)
-if [[ ${TMSF%.*} < 40 ]]; then
+if [[ ${TMSF%.*} -lt 40 ]]; then
    NEVENTS="-1"
 fi
 echo "Number of events per job: $NEVENTS"
-
-exit
 
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.evndisp_MC_sub"
