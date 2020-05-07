@@ -122,7 +122,7 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
 	}
 	iMCRunHeader->atmosphere = ( int )h->fAtmosphericModel;
 	iMCRunHeader->obsheight = ( double )h->fObsAltitudeM;
-	
+
 	// read long string of fSimConfigFile and extract all the necessary information
 	// (very dependent on structure of string)
 	if( h->fSimConfigFile.size() > 0 )
@@ -136,7 +136,7 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
 			{
 				is_stream >> iTemp;
 			}
-			
+
 			if( iTemp == "corsikaIOreader" )
 			{
 				if( !(is_stream>>std::ws).eof() )
@@ -219,6 +219,28 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
 					is_stream >> iMCRunHeader->E_range[1];
 				}
 			}
+                        // fudge for very old simulations processed with
+                        // corsikaIOreader 1.10 or earlier
+                        else if( iTemp == "Primary" )
+                        {
+                             if( !(is_stream>>std::ws).eof() )
+                             {
+                                 is_stream >> iTemp;
+                                 if( iTemp == "zenith" )
+                                 {
+                                      string iTemp_ze;
+                                      for( unsigned int p = 0; p < 4; p++ )
+                                      {
+                                          if( !(is_stream>>std::ws).eof() )
+                                          {
+                                              is_stream >> iTemp_ze;
+                                          }
+                                      }
+                                      iMCRunHeader->alt_range[0] = (90. - atof( iTemp_ze.c_str() )) / ( 45. / atan( 1. ) );
+                                      iMCRunHeader->alt_range[1] = (90. - atof( iTemp_ze.c_str() )) / ( 45. / atan( 1. ) );
+                                  }
+                             }
+                        }
 			else if( iTemp == "ZENITH_MIN" )
 			{
 				if( !(is_stream>>std::ws).eof() )
