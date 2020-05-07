@@ -3,7 +3,8 @@
 #
 
 # qsub parameters
-h_cpu=47:59:00; h_vmem=6000M; tmpdir_size=250G
+#h_cpu=47:59:00; h_vmem=6000M; tmpdir_size=250G
+h_cpu=47:59:00; h_vmem=6000M; tmpdir_size=450G
 
 if [ $# -lt 7 ]; then
 # begin help message
@@ -171,7 +172,7 @@ elif [ ${SIMTYPE:0:4} == "CARE" ]; then
     [[ $PARTICLE == "14" ]] && VBFNAME="proton_${ZA}deg_noise${NOISE}MHz___"
 fi
 # size of VBF file
-FF=$(find $SIMDIR -maxdepth 1 -name "${VBFNAME}*" -exec ls -ls -Llh {} \; | awk '{print $1}')
+FF=$(find $SIMDIR -maxdepth 1 \( -iname "${VBFNAME}*.zst" -o -iname "${VBFNAME}*.bz2" -o -iname "${VBFNAME}*.vbf" -o -iname "${VBFNAME}*.gz" \) -exec ls -ls -Llh {} \; | awk '{print $1}')
 echo "SIMDIR: $SIMDIR"
 echo "VBFILE: ${VBFNAME} $FF"
 echo "NOISEFILE: ${NOISEFILE}"
@@ -186,8 +187,6 @@ if [[ ${TMSF%.*} < 40 ]]; then
    NEVENTS="-1"
 fi
 echo "Number of events per job: $NEVENTS"
-
-exit
 
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.evndisp_MC_sub"

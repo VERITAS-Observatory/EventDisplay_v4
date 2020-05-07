@@ -79,8 +79,6 @@ echo "Temporary directory: $DDIR"
 # loop over simulation files
 if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     VBF_FILE=$VBFNAME"wobb.vbf"
-elif [[ ${SIMTYPE:0:10} == "CARE_RedHV" ]]; then
-    VBF_FILE="$VBFNAME.cvbf.zst"
 elif [[ ${SIMTYPE:0:4} == "CARE" ]]; then
     VBF_FILE="$VBFNAME.cvbf"
 fi
@@ -91,24 +89,24 @@ echo "Now processing $VBF_FILE"
 if [[ ! -f "$DDIR/$VBF_FILE" ]]; then
     if [[ -e "$SIMDIR/$VBF_FILE.gz" ]]; then
         echo "Copying $SIMDIR/${VBF_FILE}.gz to $DDIR"
-        cp -f "$SIMDIR/$VBF_FILE.gz" $DDIR/
+        cp -f "$SIMDIR/${VBF_FILE}.gz" $DDIR/
         echo " (vbf file copied, was gzipped)"
-        gunzip -f -q "$DDIR/$VBF_FILE.gz"
-    elif [[ -e "$SIMDIR/$VBF_FILE.zst" ]]; then
+        gunzip -f -q "$DDIR/${VBF_FILE}.gz"
+    elif [[ -e "$SIMDIR/${VBF_FILE}.zst" ]]; then
         # check if zstd if installed
         if hash zstd 2>/dev/null; then
             echo "Unzipping $SIMDIR/${VBF_FILE}.zst to $DDIR"
-            ls -l "$SIMDIR/$VBF_FILE.zst" 
-            zstd -d -f "$SIMDIR/$VBF_FILE.zst" -o "$DDIR/$VBF_FILE"
+            ls -l "$SIMDIR/${VBF_FILE}.zst" 
+            zstd -d -f "$SIMDIR/${VBF_FILE}.zst" -o "$DDIR/$VBF_FILE"
         else
             echo "no zstd installed; exiting"
             exit
         fi
-    elif [[ -e "$SIMDIR/$VBF_FILE.bz2" ]]; then
+    elif [[ -e "$SIMDIR/${VBF_FILE}.bz2" ]]; then
         echo "Copying $SIMDIR/$VBF_FILE.bz2 to $DDIR"
-        cp -f "$SIMDIR/$VBF_FILE.bz2" $DDIR/
+        cp -f "$SIMDIR/${VBF_FILE}.bz2" $DDIR/
         echo " (vbf file copied, was bzipped)"
-        bunzip2 -f -q "$DDIR/$VBF_FILE.bz2"
+        bunzip2 -f -q "$DDIR/${VBF_FILE}.bz2"
     elif [[ -e "$SIMDIR/$VBF_FILE" ]]; then
         echo "Copying $VBF_FILE to $DDIR"
         cp -f "$SIMDIR/$VBF_FILE" $DDIR/
