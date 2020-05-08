@@ -172,7 +172,7 @@ elif [ ${SIMTYPE:0:4} == "CARE" ]; then
     [[ $PARTICLE == "14" ]] && VBFNAME="proton_${ZA}deg_noise${NOISE}MHz___"
 fi
 # size of VBF file
-FF=$(find $SIMDIR -maxdepth 1 \( -iname "${VBFNAME}*.zst" -o -iname "${VBFNAME}*.bz2" -o -iname "${VBFNAME}*.vbf" -o -iname "${VBFNAME}*.gz" \) -exec ls -ls -Llh {} \; | awk '{print $1}')
+FF=$(find $SIMDIR -maxdepth 1 \( -iname "${VBFNAME}*.zst" -o -iname "${VBFNAME}*.bz2" -o -iname "${VBFNAME}*.vbf" -o -iname "${VBFNAME}*.gz" \) -exec ls -ls -Llh {} \; | awk '{print $1}' | sed 's/,/./g')
 echo "SIMDIR: $SIMDIR"
 echo "VBFILE: ${VBFNAME} $FF"
 echo "NOISEFILE: ${NOISEFILE}"
