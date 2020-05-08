@@ -103,7 +103,7 @@ if [[ ! -f "$DDIR/$VBF_FILE" ]]; then
             exit
         fi
     elif [[ -e "$SIMDIR/${VBF_FILE}.bz2" ]]; then
-        echo "Copying $SIMDIR/$VBF_FILE.bz2 to $DDIR"
+        echo "Copying $SIMDIR/${VBF_FILE}.bz2 to $DDIR"
         cp -f "$SIMDIR/${VBF_FILE}.bz2" $DDIR/
         echo " (vbf file copied, was bzipped)"
         bunzip2 -f -q "$DDIR/${VBF_FILE}.bz2"

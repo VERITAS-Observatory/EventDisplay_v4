@@ -181,6 +181,11 @@ TMSF=$(echo "${FF%?}*3.0" | bc)
 if [[ ${NOISE} -eq 50 ]]; then
    TMSF=$(echo "${FF%?}*5.0" | bc)
 fi
+if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
+   # GRISU files are bzipped and need more space (factor of ~14)
+   TMSF=$(echo "${FF%?}*25.0" | bc)
+fi
+
 TMUNI=$(echo "${FF: -1}")
 tmpdir_size=${TMSF%.*}$TMUNI
 echo "Setting TMPDIR_SIZE to $tmpdir_size"
