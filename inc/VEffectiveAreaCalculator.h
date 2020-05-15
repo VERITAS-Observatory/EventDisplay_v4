@@ -59,9 +59,12 @@ class VEffectiveAreaCalculator
 		vector< vector< vector< vector< double > > > > fEff_SpectralIndex;
 		
 		// effective areas (reading of effective areas)
-                unsigned int fBiasBin;
-		unsigned int fNBins;
-		unsigned int fhistoNEbins;
+                unsigned int fBiasBin;     // bins in the energy bias
+		unsigned int fNBins;       // bins in the true energy of MC (fEff_E0)
+		unsigned int fhistoNEbins; // bins for histograms (fRunPara->fEnergyAxisBins_log10 or half) 
+                unsigned int fCTAEbinning; // bins for response matrices. 500 for CTA.
+                unsigned int fLogAngularBin; // bins for the log10(angular diff R,MC [deg])
+
 		vector< double > fEff_E0;
 		map< unsigned int, vector< double > > fEffArea_map;
 		map< unsigned int, vector< double > > fEffAreaMC_map;
@@ -141,16 +144,16 @@ class VEffectiveAreaCalculator
 		vector< vector< TH2F* > > hVEsysMCRelative2D;
                 vector< vector< TH2F* > > hVEsysMCRelative2DNoDirectionCut;
 		vector< vector< TH2F* > > hVEsys2D;
-		vector< vector< TH2D* > > hVResponseMatrix;
-		vector< vector< TH2D* > > hVResponseMatrixFine;
+		vector< vector< TH2F* > > hVResponseMatrix;
+		vector< vector< TH2F* > > hVResponseMatrixFine;
 		vector< vector< TProfile* > > hVResponseMatrixProfile;
-		vector< vector< TH2D* > > hVResponseMatrixQC;
-		vector< vector< TH2D* > > hVEmcCutCTA;
-		vector< vector< TH2D* > > hVResponseMatrixFineQC;
-                vector< vector< TH2D* > > hVResponseMatrixNoDirectionCut;
-                vector< vector< TH2D* > > hVResponseMatrixFineNoDirectionCut;
-                vector< vector< TH2D* > > hVAngErec2D;            // direction reconstruction
-                vector< vector< TH2D* > > hVAngMC2D;            // direction reconstruction
+		vector< vector< TH2F* > > hVResponseMatrixQC;
+		vector< vector< TH2F* > > hVEmcCutCTA;
+		vector< vector< TH2F* > > hVResponseMatrixFineQC;
+                vector< vector< TH2F* > > hVResponseMatrixNoDirectionCut;
+                vector< vector< TH2F* > > hVResponseMatrixFineNoDirectionCut;
+                vector< vector< TH2F* > > hVAngErec2D;            // direction reconstruction
+                vector< vector< TH2F* > > hVAngMC2D;            // direction reconstruction
 
 		vector< vector< TH1D* > > hVWeightedRate;
 		vector< vector< TH1D* > > hVWeightedRate005;
@@ -192,16 +195,16 @@ class VEffectiveAreaCalculator
 		TH2F* hEsysMCRelativeRMS;
 		TH2F* hEsysMCRelative2D;
 		TH2F* hEsys2D;
-		TH2D* hEmcCutCTA;
-		TH2D* hResponseMatrixFine;
-		TH2D* hResponseMatrixFineQC;
-		TH2D* hResponseMatrix;
+		TH2F* hEmcCutCTA;
+		TH2F* hResponseMatrixFine;
+		TH2F* hResponseMatrixFineQC;
+		TH2F* hResponseMatrix;
 		TProfile* hResponseMatrixProfile;
-		TH2D* hResponseMatrixQC;
+		TH2F* hResponseMatrixQC;
 
                 TH2F* hEsysMCRelative2DNoDirectionCut;
-                TH2D* hResponseMatrixNoDirectionCut;
-                TH2D* hResponseMatrixFineNoDirectionCut;
+                TH2F* hResponseMatrixNoDirectionCut;
+                TH2F* hResponseMatrixFineNoDirectionCut;
 
 		TH1D* hWeightedRate;
 		TH1D* hWeightedRate005;
