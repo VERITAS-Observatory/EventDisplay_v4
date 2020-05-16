@@ -28,25 +28,14 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	// no effective area file present
 	bNOFILE = true;
 
-	// number of bins for histograms
+	// number of energy bins (general)
 	nbins = fRunPara->fEnergyAxisBins_log10;
-        
-        // In VTS we do not need that much resolution
-        if( iRunPara->fObservatory.find( "VERITAS" ) != string::npos )
-        {
-            fBiasBin = 75; // bins in the bias (Y-axis) // width of the profiles is ~0.14-0.19
-            fLogAngularBin = 40; // width of the profiles is ~0.35, 40 bins gives 0.125 width
-            fCTAEbinning = 200; // bins in the ResponseMatrices
-	    fhistoNEbins = nbins/2.; // group every two bins into one. This only affects some histograms.
-        }
-        else
-        {
-            // Assume CTA and use CTA WP Phys binning
-            fBiasBin = 300; // bins in the bias (Y-axis)
-            fLogAngularBin = 100;
-            fCTAEbinning = 500; // bins in the ResponseMatrices
-	    fhistoNEbins = nbins;
-        }    
+
+        // bin definition for 2D histograms (allows coarser binning in energy)
+        fBiasBin       = fRunPara->fBiasBin;      
+        fhistoNEbins   = fRunPara->fhistoNEbins; 
+        fLogAngularBin = fRunPara->fLogAngularBin; 
+        fResponseMatricesEbinning = fRunPara->fResponseMatricesEbinning;
 
 	fGauss = new TF1("fGauss", "gaus", -2.5,2.5);
 
@@ -250,19 +239,19 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	
         // following CTA WP Phys binning convention
 	sprintf( hname, "hEmcCutCTA" );
-	hEmcCutCTA = new TH2F( hname, htitle, fCTAEbinning, -2.3, 2.7, fCTAEbinning, -2.3, 2.7 );
+	hEmcCutCTA = new TH2F( hname, htitle, fResponseMatricesEbinning, -2.3, 2.7, fResponseMatricesEbinning, -2.3, 2.7 );
 	hEmcCutCTA->SetYTitle( "energy_{MC} [TeV]" );
 	hEmcCutCTA->SetXTitle( "energy_{rec} [TeV]" );
 	hisTreeList->Add( hEmcCutCTA );
 	
         sprintf( hname, "hResponseMatrixFine" );
-	hResponseMatrixFine = new TH2F( hname, htitle, fCTAEbinning, -2.3, 2.7, fCTAEbinning, -2.3, 2.7 );
+	hResponseMatrixFine = new TH2F( hname, htitle, fResponseMatricesEbinning, -2.3, 2.7, fResponseMatricesEbinning, -2.3, 2.7 );
 	hResponseMatrixFine->SetYTitle( "energy_{MC} [TeV]" );
 	hResponseMatrixFine->SetXTitle( "energy_{rec} [TeV]" );
 	//hisTreeList->Add( hResponseMatrixFine );
 
 	sprintf( hname, "hResponseMatrixFineQC" );
-	hResponseMatrixFineQC = new TH2F( hname, htitle, fCTAEbinning, -2.3, 2.7, fCTAEbinning, -2.3, 2.7 );
+	hResponseMatrixFineQC = new TH2F( hname, htitle, fResponseMatricesEbinning, -2.3, 2.7, fResponseMatricesEbinning, -2.3, 2.7 );
 	hResponseMatrixFineQC->SetYTitle( "energy_{MC} [TeV]" );
 	hResponseMatrixFineQC->SetXTitle( "energy_{rec} [TeV]" );
 	hisTreeList->Add( hResponseMatrixFineQC );
@@ -278,7 +267,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
         //hisTreeList->Add( hResponseMatrixNoDirectionCut );
 
         sprintf( hname, "hResponseMatrixFineNoDirectionCut" );
-        hResponseMatrixFineNoDirectionCut = new TH2F( hname, "migration matrix, after gamma-selection cuts, fine binning", fCTAEbinning, -2.3, 2.7, fCTAEbinning, -2.3, 2.7 );
+        hResponseMatrixFineNoDirectionCut = new TH2F( hname, "migration matrix, after gamma-selection cuts, fine binning", fResponseMatricesEbinning, -2.3, 2.7, fResponseMatricesEbinning, -2.3, 2.7 );
         hResponseMatrixFineNoDirectionCut->SetYTitle( "energy_{MC} [TeV]" );
         hResponseMatrixFineNoDirectionCut->SetXTitle( "energy_{rec} [TeV]" );
         //hisTreeList->Add( hResponseMatrixFineNoDirectionCut );
