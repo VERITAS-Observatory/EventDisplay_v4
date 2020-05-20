@@ -57,7 +57,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
                 unsigned int fBiasBin;                       // Energy bias (bias bins)
                 unsigned int fLogAngularBin;                 // Angular resolution Log10 (bins)
                 unsigned int fResponseMatricesEbinning;      // bins in the ResponseMatrices 
-                unsigned int fEnergyAxisBins_log10;          // E binning (affects 2D histograms only)
+                unsigned int fhistoNEbins;                   // E binning (affects 2D histograms only)
 		
 		string          fCoreScatterMode;
 		double          fCoreScatterRadius;

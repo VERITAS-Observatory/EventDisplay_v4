@@ -96,10 +96,10 @@ void merge( string ifile, char* outputfile, bool bFull = false )
                   //f.SetBranchStatus( "gEffAreaNoTh2Rec", 1 );
 		// needed for binned likelihood analysis
 		//f.SetBranchStatus( "hResponseMatrixFineQC", 0); // removed in v502
-		f.SetBranchStatus( "nbins_ResMat", 1 );
-		f.SetBranchStatus( "ResMat_MC", 1 );
-		f.SetBranchStatus( "ResMat_Rec", 1 );
-		f.SetBranchStatus( "ResMat_Rec_Err", 1 );
+		//f.SetBranchStatus( "nbins_ResMat", 1 );
+		//f.SetBranchStatus( "ResMat_MC", 1 );
+		//f.SetBranchStatus( "ResMat_Rec", 1 );
+		//f.SetBranchStatus( "ResMat_Rec_Err", 1 );
 	}
 	f.Merge( hname );
 	cout << "done.." << endl;

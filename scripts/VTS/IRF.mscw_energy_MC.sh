@@ -74,7 +74,7 @@ if [[ "$TABFILE" == `basename $TABFILE` ]]; then
     TABFILE="$VERITAS_EVNDISP_AUX_DIR/Tables/$TABFILE"
 fi
 if [[ ! -f "$TABFILE" ]]; then
-    echo "Error, table file not found, exiting..."
+    echo "Error, table file $TABFILE not found, exiting..."
     exit 1
 fi
 

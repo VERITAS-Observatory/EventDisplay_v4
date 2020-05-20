@@ -59,11 +59,11 @@ class VEffectiveAreaCalculator
 		vector< vector< vector< vector< double > > > > fEff_SpectralIndex;
 		
 		// effective areas (reading of effective areas)
-                unsigned int fBiasBin;     // bins in the energy bias
-		unsigned int fNBins;       // bins in the true energy of MC (fEff_E0)
-		unsigned int fhistoNEbins; // bins for histograms (fRunPara->fEnergyAxisBins_log10 or half) 
-                unsigned int fCTAEbinning; // bins for response matrices. 500 for CTA.
-                unsigned int fLogAngularBin; // bins for the log10(angular diff R,MC [deg])
+		unsigned int fNBins;                    // bins in the true energy of MC (fEff_E0)
+                unsigned int fBiasBin;                  // bins in the energy bias
+		unsigned int fhistoNEbins;              // energy bins for histograms only
+                unsigned int fResponseMatricesEbinning; // fine bins for response matrices. Likelihood analysis.
+                unsigned int fLogAngularBin;            // bins for the log10(angular diff R,MC [deg])
 
 		vector< double > fEff_E0;
 		map< unsigned int, vector< double > > fEffArea_map;
