@@ -72,8 +72,6 @@ SIMTYPE=$7
 [[ "$8" ]] && ACUTS=$8 || ACUTS=EVNDISP.reconstruction.runparameter
 [[ "$9" ]] && PARTICLE=$9 || PARTICLE=1
 [[ "${10}" ]] && NEVENTS=${10}  || NEVENTS=-1
-# TMPTMPTMP
-NEVENTS=15000000
 
 # Particle names
 PARTICLE_NAMES=( [1]=gamma [2]=electron [14]=proton [402]=alpha )
