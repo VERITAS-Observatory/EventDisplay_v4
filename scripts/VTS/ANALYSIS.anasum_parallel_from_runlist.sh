@@ -215,6 +215,9 @@ for RUN in ${RUNS[@]}; do
        continue
     fi
     TELTOANA=`echo $RUNINFO | awk '{print "T"$(5)}'`
+    if [[ $EPOCH == *"V4"* ]] || [[ $EPOCH == *"V5"* ]]; then
+        ATMO=${ATMO/6/2}
+    fi
     echo "RUN $RUN at epoch $EPOCH and atmosphere $ATMO (Telescopes $TELTOANA)"
     echo "File $INDIR/$RUN.mscw.root"
     
@@ -228,12 +231,6 @@ for RUN in ${RUNS[@]}; do
     else
         RADACCRUN=$RADACC
     fi
-    
-    if [[ $CUTS = *frogs* ]]; then
-       RADACCRUN="radialAcceptance-v470-auxv01-CARE_June1425-Cut-NTel2-PointSource-Moderate-GEO-V6-T1234.root"
-       EFFAREARUN="effArea-v461-141017-CARE-N2_001-003-005CU_index2.5-GEO-V6-ATM21-T1234.root"
-    fi
-
     
     # write line to file
     echo "* $RUN $RUN 0 $CUTFILE $BM $EFFAREARUN $BMPARAMS $RADACCRUN" >> $ANARUNLIST
