@@ -105,7 +105,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
 		bool                  readRunParameterFromTextFile( string iFile );
 		bool                  testRunparameters();
 		
-		ClassDef( VInstrumentResponseFunctionRunParameter, 15 );
+		ClassDef( VInstrumentResponseFunctionRunParameter, 16 );
 };
 
 #endif
