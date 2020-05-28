@@ -130,13 +130,13 @@ else
                  ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft-TMVA-Preselection.dat
                  ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft.dat
                  ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat 
-                 ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard-TMVA-BDT.dat
                  ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard.dat"
     else
     #BDT TMVA list of cuts
         CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-BDT.dat 
                  ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft-TMVA-BDT.dat 
-                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard-TMVA-BDT.dat" 
+                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard-TMVA-BDT.dat
+                 ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard-TMVA-BDT.dat"
     fi
 fi
 CUTLIST=`echo $CUTLIST |tr '\r' ' '`
