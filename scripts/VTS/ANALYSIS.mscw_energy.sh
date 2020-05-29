@@ -73,6 +73,7 @@ fi
 SIMTYPE_DEFAULT_V4="GRISU"
 SIMTYPE_DEFAULT_V5="GRISU"
 SIMTYPE_DEFAULT_V6="CARE_June1702"
+SIMTYPE_DEFAULT_V6_REDHV="CARE_RedHV"
 
 
 # Read runlist
@@ -116,6 +117,7 @@ do
     RUNINFO=`$EVNDISPSYS/bin/printRunParameter $BFILE -runinfo`
     EPOCH=`echo $RUNINFO | awk '{print $(1)}'`
     ATMO=${FORCEDATMO:-`echo $RUNINFO | awk '{print $(3)}'`}
+    HVSETTINGS=`echo $RUNINFO | awk '{print $(4)}'`
     if [[ $ATMO == *error* ]]; then
         echo "error finding atmosphere; skipping run $BFILE"
         continue
@@ -132,7 +134,10 @@ do
             SIMTYPE_RUN="$SIMTYPE_DEFAULT_V5"
             ATMO=$[${ATMO}-40]
         else
-            SIMTYPE_RUN="$SIMTYPE_DEFAULT_V6"
+            if [ "$HVSETTINGS" == "obsLowHV" ]; then
+                SIMTYPE_RUN="$SIMTYPE_DEFAULT_V6_REDHV"
+            else:
+                SIMTYPE_RUN="$SIMTYPE_DEFAULT_V6"
         fi
     else
         SIMTYPE_RUN="$SIMTYPE"
