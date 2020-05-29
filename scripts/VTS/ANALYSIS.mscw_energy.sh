@@ -136,8 +136,9 @@ do
         else
             if [ "$HVSETTINGS" == "obsLowHV" ]; then
                 SIMTYPE_RUN="$SIMTYPE_DEFAULT_V6_REDHV"
-            else:
+            else
                 SIMTYPE_RUN="$SIMTYPE_DEFAULT_V6"
+            fi
         fi
     else
         SIMTYPE_RUN="$SIMTYPE"
