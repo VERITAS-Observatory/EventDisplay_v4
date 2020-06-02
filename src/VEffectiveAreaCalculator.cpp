@@ -125,7 +125,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
         sprintf( hname, "hEcutNoTh2" );
 	hEcutNoTh2 = new TH1D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
 	hEcutNoTh2->Sumw2();
-	hEcutNoTh2->SetXTitle( "energy_{rec} [TeV]" );
+	hEcutNoTh2->SetXTitle( "energy_{MC} [TeV]" );
 	hEcutNoTh2->SetYTitle( "entries" );
 	hisTreeList->Add( hEcutNoTh2 );
 
