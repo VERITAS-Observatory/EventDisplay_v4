@@ -2884,22 +2884,22 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 
 			// copy all histograms
 			resetHistograms( ize );
-			//copyHistograms( hEmc, hVEmc[s][i_az], false );
-			//copyHistograms( hEcut, hVEcut[s][i_az], false );
-			//copyHistograms( hEcutUW, hVEcutUW[s][i_az], false );
-			//copyHistograms( hEcut500, hVEcut500[s][i_az], false );
-			//copyHistograms( hEcutLin, hVEcutLin[s][i_az], false );
+			copyHistograms( hEmc, hVEmc[s][i_az], false );
+			copyHistograms( hEcut, hVEcut[s][i_az], false );
+			copyHistograms( hEcutUW, hVEcutUW[s][i_az], false );
+			copyHistograms( hEcut500, hVEcut500[s][i_az], false );
+			copyHistograms( hEcutLin, hVEcutLin[s][i_az], false );
 			copyHistograms( hEcutRec, hVEcutRec[s][i_az], false );
 			copyHistograms( hEcutRecUW, hVEcutRecUW[s][i_az], false );
-			//copyProfileHistograms( hEmcSWeight, hVEmcSWeight[s][i_az] );
+			copyProfileHistograms( hEmcSWeight, hVEmcSWeight[s][i_az] );
 			copyProfileHistograms( hEsysRec,  hVEsysRec[s][i_az] );
-			//copyProfileHistograms( hEsysMC, hVEsysMC[s][i_az] );
-			//copyProfileHistograms( hEsysMCRelative, hVEsysMCRelative[s][i_az] );
-			//copyHistograms( hEsysMCRelativeRMS, hVEsysMCRelativeRMS[s][i_az], true );
-			//copyHistograms( hEsysMCRelative2D, hVEsysMCRelative2D[s][i_az], true );
-			//copyHistograms( hEsysMCRelative2DNoDirectionCut, hVEsysMCRelative2DNoDirectionCut[s][i_az], true );
-			//copyHistograms( hEsys2D, hVEsys2D[s][i_az], true );
-			//copyHistograms( hEmcCutCTA, hVEmcCutCTA[s][i_az], true );
+			copyProfileHistograms( hEsysMC, hVEsysMC[s][i_az] );
+			copyProfileHistograms( hEsysMCRelative, hVEsysMCRelative[s][i_az] );
+			copyHistograms( hEsysMCRelativeRMS, hVEsysMCRelativeRMS[s][i_az], true );
+			copyHistograms( hEsysMCRelative2D, hVEsysMCRelative2D[s][i_az], true );
+			copyHistograms( hEsysMCRelative2DNoDirectionCut, hVEsysMCRelative2DNoDirectionCut[s][i_az], true );
+			copyHistograms( hEsys2D, hVEsys2D[s][i_az], true );
+			copyHistograms( hEmcCutCTA, hVEmcCutCTA[s][i_az], true );
 			copyHistograms( hResponseMatrix, hVResponseMatrix[s][i_az], true );
 			copyHistograms( hResponseMatrixQC, hVResponseMatrixQC[s][i_az], true );
 			copyHistograms( hResponseMatrixNoDirectionCut, hVResponseMatrixNoDirectionCut[s][i_az], true );
@@ -2910,21 +2910,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			
                         copyHistograms( hWeightedRate, hVWeightedRate[s][i_az], false );
                         copyHistograms( hWeightedRate005, hVWeightedRate005[s][i_az], false );
-
-                        // histograms w.r.t to true energy (only first index is filled and we should be able in the future to remove the index axis)
-			copyHistograms( hEmc, hVEmc[s][i_az], false );
-			copyHistograms( hEcut, hVEcut[s][i_az], false );
-			copyHistograms( hEcutUW, hVEcutUW[s][i_az], false );
-			copyHistograms( hEcut500, hVEcut500[s][i_az], false );
-			copyHistograms( hEcutLin, hVEcutLin[s][i_az], false );
-			copyProfileHistograms( hEmcSWeight, hVEmcSWeight[s][i_az] );
-			copyProfileHistograms( hEsysMC, hVEsysMC[s][i_az] );
-			copyProfileHistograms( hEsysMCRelative, hVEsysMCRelative[s][i_az] );
-			copyHistograms( hEsysMCRelativeRMS, hVEsysMCRelativeRMS[s][i_az], true );
-			copyHistograms( hEsysMCRelative2D, hVEsysMCRelative2D[s][i_az], true );
-			copyHistograms( hEsysMCRelative2DNoDirectionCut, hVEsysMCRelative2DNoDirectionCut[s][i_az], true );
-			copyHistograms( hEsys2D, hVEsys2D[s][i_az], true );
-                        copyHistograms( hEmcCutCTA, hVEmcCutCTA[s][i_az], true );
                         for( unsigned int e = 0; e < hEcutSub.size(); e++ )
                         {
                             copyHistograms( hEcutSub[e], hVEcutSub[s][e][i_az], false );
