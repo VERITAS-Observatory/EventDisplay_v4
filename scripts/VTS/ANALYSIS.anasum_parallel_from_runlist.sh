@@ -225,30 +225,35 @@ for RUN in ${RUNS[@]}; do
     fi
     if [[ $SIMTYPE == "DEFAULT" ]]; then
         if [[ $EPOCH == *"V4"* ]]; then
-            REPLACESIMTYPE=${SIMTYPE_DEFAULT_V4}
+            REPLACESIMTYPEEff=${SIMTYPE_DEFAULT_V4}
+            REPLACESIMTYPERad=${SIMTYPE_DEFAULT_V4}
         elif [[ $EPOCH == *"V5"* ]]; then
-            REPLACESIMTYPE=${SIMTYPE_DEFAULT_V5}
+            REPLACESIMTYPEEff=${SIMTYPE_DEFAULT_V5}
+            REPLACESIMTYPERad=${SIMTYPE_DEFAULT_V5}
         elif [[ $EPOCH == *"V6"* ]] && [[ $OBSL == "obsLowHV" ]]; then
-            REPLACESIMTYPE=${SIMTYPE_DEFAULT_V6redHV}
+            REPLACESIMTYPEEff=${SIMTYPE_DEFAULT_V6redHV}
+            REPLACESIMTYPERad=${SIMTYPE_DEFAULT_V6}
         else
-            REPLACESIMTYPE=${SIMTYPE_DEFAULT_V6}
+            REPLACESIMTYPEEff=${SIMTYPE_DEFAULT_V6}
+            REPLACESIMTYPERad=${SIMTYPE_DEFAULT_V6}
         fi
      else
-        REPLACESIMTYPE=${SIMTYPE}
+        REPLACESIMTYPEEff=${SIMTYPE}
+        REPLACESIMTYPERad=${SIMTYPE}
      fi
 
-    echo "RUN $RUN at epoch $EPOCH and atmosphere $ATMO (Telescopes $TELTOANA SIMTYPE $REPLACESIMTYPE)"
+    echo "RUN $RUN at epoch $EPOCH and atmosphere $ATMO (Telescopes $TELTOANA SIMTYPE $REPLACESIMTYPEEff $REPLACESIMTYPERad)"
     echo "File $INDIR/$RUN.mscw.root"
     
     # do string replacements
     EFFAREARUN=${EFFAREA/VX/$EPOCH}
     EFFAREARUN=${EFFAREARUN/TX/$TELTOANA}
     EFFAREARUN=${EFFAREARUN/XX/$ATMO}
-    EFFAREARUN=${EFFAREARUN/SX/$REPLACESIMTYPE}
+    EFFAREARUN=${EFFAREARUN/SX/$REPLACESIMTYPEEff}
     if [ "$RADACC" != "IGNOREACCEPTANCE" ]; then 
         RADACCRUN=${RADACC/VX/$MAJOREPOCH}
         RADACCRUN=${RADACCRUN/TX/$TELTOANA}
-        RADACCRUN=${RADACCRUN/SX/$REPLACESIMTYPE}
+        RADACCRUN=${RADACCRUN/SX/$REPLACESIMTYPERad}
     else
         RADACCRUN=$RADACC
     fi
@@ -256,6 +261,7 @@ for RUN in ${RUNS[@]}; do
     # write line to file
     echo "* $RUN $RUN 0 $CUTFILE $BM $EFFAREARUN $BMPARAMS $RADACCRUN" >> $ANARUNLIST
     echo "* $RUN $RUN 0 $CUTFILE $BM $EFFAREARUN $BMPARAMS $RADACCRUN"
+
 done
 
 # submit the job
