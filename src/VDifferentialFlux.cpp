@@ -22,6 +22,7 @@ VDifferentialFlux::VDifferentialFlux()
 	Energy_Hz = 0.;
 	EnergyWeightedMean = 0.;
 	dE = 0.;
+        EffectiveArea = 0.;
 	DifferentialFlux = 0.;
 	DifferentialFluxError = 0.;
 	DifferentialFluxError_low = 0.;
@@ -67,6 +68,7 @@ void VDifferentialFlux::print( bool bSED )
 		cout << setprecision( 2 ) << " (alpha=" << NOff_alpha << ")";
 		cout << setw( 7 ) << fixed << setprecision( 1 ) << "\tSign.: " << Significance << " sigma";
 		cout << setw( 7 ) << fixed << setprecision( 1 ) << "\tObs.Time: " << ObsTime << "[s]";
+                cout << setw( 7 ) << fixed << setprecision( 1 ) << "\t Eff.Area: " << EffectiveArea << "[m^2]";
 		cout << endl;
 	}
 	else
@@ -112,6 +114,7 @@ void VDifferentialFlux::printClean( bool bSED )
 		cout << setprecision( 2 ) << "     " << NOff_alpha ;
 		cout << setw( 7 ) << fixed << setprecision( 1 ) << "    " << Significance ;
 		cout << setw( 7 ) << fixed << setprecision( 1 ) << "    " << ObsTime ;
+                cout << setw( 7 ) << fixed << setprecision( 1 ) << "\t Eff.Area: " << EffectiveArea << "[m^2]";
 		cout << endl;
 	}
 	else

@@ -1081,6 +1081,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			if( hEffArea && hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) ) > 0. )
 			{
 				i_flux.DifferentialFlux /= ( hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) ) * 1.e4 );
+                                i_flux.EffectiveArea = hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) );
 			}
 			else
 			{
@@ -1117,6 +1118,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 					i_flux.DifferentialFlux /= i_flux.dE;
 					i_flux.DifferentialFlux /= i_flux.ObsTime;
 					i_flux.DifferentialFlux /= ( hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) ) * 1.e4 );
+                                        i_flux.EffectiveArea = hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) );
 				}
 			}
 			else

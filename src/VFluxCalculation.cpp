@@ -812,6 +812,7 @@ void VFluxCalculation::printResults()
 		printf( "\t NOn: %d, NOff: %d, Norm: %.2f, NDiff: %.1f +- %.1f", ( int )fRunNon[i], ( int )fRunNoff[i], fRunNorm[i] , fRunNdiff[i], fRunNdiffE[i] );
 		printf( ", Rate: %.2f +- %.2f gammas/min", fRunRate[i], fRunRateE[i] );
 		cout << endl;
+                printf( "\t Effective area %.1f m^2", fRunEffArea[i] );
 		printf( "\t Significance: %.1f", fRunSigni[i] );
 		cout << endl;
 		if( fRunUFL[i] < 0. )
