@@ -121,7 +121,7 @@ int main( int argc, char* argv[] )
 	if( fo->IsZombie() )
 	{
 		cout << "makeRadialAcceptances: error opening output file " << outfile << endl;
-		return false;
+		return 0;
 	}
 	cout << endl << "writing acceptance curves to " << fo->GetName() << endl;
 	TDirectory* facc_dir = ( TDirectory* )fo;
@@ -140,7 +140,7 @@ int main( int argc, char* argv[] )
 		else
 		{
 			cout << "Error, directory specified by makeRadialAcceptance -w option '" << histdir << "' does not exist, exiting..." << endl;
-			return false ;
+			return 0;
 		}
 	}
 	
@@ -215,7 +215,7 @@ int main( int argc, char* argv[] )
 		if( !d )
 		{
 			cout << "makeRadialAcceptance: no data tree defined: run " << fRunPara->fRunList[i].fRunOff << endl;
-			return false;
+			return 0;
 		}
 		// data trees and cuts
 		int nentries = d->fChain->GetEntries();
