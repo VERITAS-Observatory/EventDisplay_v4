@@ -34,6 +34,11 @@ class VInstrumentResponseFunctionData : public TObject, public VHistogramUtiliti
 		double  fHistogrambinningEnergy_Min_Tev_Log;
 		double  fHistogrambinningEnergy_Max_Tev_Log;
 		
+                // angular binning
+                int     fHistogrambinningAngular_Log;
+		double  fHistogrambinningAngular_Min_Log;
+		double  fHistogrambinningAngular_Max_Log;
+		
 		// array centre
 		double  fArrayCentre_X;
 		double  fArrayCentre_Y;
@@ -101,11 +106,17 @@ class VInstrumentResponseFunctionData : public TObject, public VHistogramUtiliti
 			fEnergyReconstructionMethod = iMethod;
 		}
 		void   setPlottingStyle( int icolor, double iwidth = 1., int imarker = 20, double isize = 1., int iFillStyle = 0, int iLineStyle = 1 );
-		void   setHistogrambinning( int iN = 20, double iMin = -1.9, double iMax = 2.1 )
+		void   setHistogramEbinning( int iN = 60, double iMin = -2.0, double iMax = 4.0 )
 		{
 			fHistogrambinningEnergy_TeV_Log = iN;
 			fHistogrambinningEnergy_Min_Tev_Log = iMin;
 			fHistogrambinningEnergy_Max_Tev_Log = iMax;
+		}
+		void   setHistogramLogAngbinning( int iN = 20, double iMin = -4.0, double iMax = 1.0 )
+		{
+			fHistogrambinningAngular_Log = iN;
+			fHistogrambinningAngular_Min_Log = iMin;
+			fHistogrambinningAngular_Max_Log = iMax;
 		}
 		bool   terminate( double iContainmentProbability, double iContainmentProbabilityError );
 		
