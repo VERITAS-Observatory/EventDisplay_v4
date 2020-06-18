@@ -37,6 +37,12 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
         fLogAngularBin = fRunPara->fLogAngularBin; 
         fResponseMatricesEbinning = fRunPara->fResponseMatricesEbinning;
 
+        // this should not be changed
+        fEnergyAxis_minimum_defaultValue = -2.;
+        fEnergyAxis_maximum_defaultValue =  4.;
+        fLogAngular_minimum_defaultValue = -4.;
+        fLogAngular_maximum_defaultValue =  1.;
+
 	fGauss = new TF1("fGauss", "gaus", -2.5,2.5);
 
 	// cuts
