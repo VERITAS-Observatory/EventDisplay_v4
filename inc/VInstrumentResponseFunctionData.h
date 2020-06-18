@@ -120,7 +120,7 @@ class VInstrumentResponseFunctionData : public TObject, public VHistogramUtiliti
 		}
 		bool   terminate( double iContainmentProbability, double iContainmentProbabilityError );
 		
-		ClassDef( VInstrumentResponseFunctionData, 8 );
+		ClassDef( VInstrumentResponseFunctionData, 9 );
 };
 
 #endif
