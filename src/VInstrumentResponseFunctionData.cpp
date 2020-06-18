@@ -25,7 +25,8 @@ VInstrumentResponseFunctionData::VInstrumentResponseFunctionData()
 	setEnergyReconstructionMethod();
 	
 	fHistogramList = 0;
-	setHistogrambinning();
+	setHistogramEbinning();
+	setHistogramLogAngbinning();
 	setArrayCentre();
 }
 
@@ -98,9 +99,9 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
                 iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
                 iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
                 iHisXmax.push_back( fHistogrambinningEnergy_Max_Tev_Log );
-                iHisNbinsY.push_back( 100 );
-                iHisYmin.push_back( -4. );
-                iHisYmax.push_back( 1. );
+                iHisNbinsY.push_back( fHistogrambinningAngular_Log );
+                iHisYmin.push_back( fHistogrambinningAngular_Min_Log );
+                iHisYmax.push_back( fHistogrambinningAngular_Max_Log );
 		// angular resolution vs number of images per telescope
 		iHisName.push_back( "AngNImages" + fName );
 		iHisXaxisName.push_back( "number of images" );
@@ -168,9 +169,9 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
                 iHisNbinsX.push_back( fHistogrambinningEnergy_TeV_Log );
                 iHisXmin.push_back( fHistogrambinningEnergy_Min_Tev_Log );
                 iHisXmax.push_back( fHistogrambinningEnergy_Max_Tev_Log );
-                iHisNbinsY.push_back( 100 );
-                iHisYmin.push_back( -4. );
-                iHisYmax.push_back( 1. );
+                iHisNbinsY.push_back( fHistogrambinningAngular_Log );
+                iHisYmin.push_back( fHistogrambinningAngular_Min_Log );
+                iHisYmax.push_back( fHistogrambinningAngular_Max_Log );
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	// core resolution plots

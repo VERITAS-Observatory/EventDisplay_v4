@@ -95,7 +95,8 @@ bool VInstrumentResponseFunction::initialize( string iName, string iType, unsign
 			}
 			
 			i_irf.back()->setData( iZe, ( int )j, fVMinAz[j], fVMaxAz[j], iNoise, iPedvars, fVSpectralIndex[i], iXoff, iYoff );
-			i_irf.back()->setHistogrambinning();
+			i_irf.back()->setHistogramEbinning();
+			i_irf.back()->setHistogramLogAngbinning();
 			i_irf.back()->setEnergyReconstructionMethod( fEnergyReconstructionMethod );
 		}
 		fIRFData.push_back( i_irf );
@@ -286,7 +287,7 @@ bool VInstrumentResponseFunction::fillResolutionGraphs( vector< vector< VInstrum
 	return true;
 }
 
-void VInstrumentResponseFunction::setHistogrambinning( int iN, double iMin, double iMax )
+void VInstrumentResponseFunction::setHistogramEbinning( int iN, double iMin, double iMax )
 {
 	for( unsigned int i = 0; i < fIRFData.size(); i++ )
 	{
@@ -294,7 +295,20 @@ void VInstrumentResponseFunction::setHistogrambinning( int iN, double iMin, doub
 		{
 			if( fIRFData[i][j] )
 			{
-				fIRFData[i][j]->setHistogrambinning( iN, iMin, iMax );
+				fIRFData[i][j]->setHistogramEbinning( iN, iMin, iMax );
+			}
+		}
+	}
+}
+void VInstrumentResponseFunction::setHistogramLogAngbinning( int iN, double iMin, double iMax )
+{
+	for( unsigned int i = 0; i < fIRFData.size(); i++ )
+	{
+		for( unsigned int j = 0; j < fIRFData[i].size(); j++ )
+		{
+			if( fIRFData[i][j] )
+			{
+				fIRFData[i][j]->setHistogramLogAngbinning( iN, iMin, iMax );
 			}
 		}
 	}

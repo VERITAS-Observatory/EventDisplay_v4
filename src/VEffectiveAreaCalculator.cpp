@@ -37,6 +37,12 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
         fLogAngularBin = fRunPara->fLogAngularBin; 
         fResponseMatricesEbinning = fRunPara->fResponseMatricesEbinning;
 
+        // this should not be changed
+        fEnergyAxis_minimum_defaultValue = -2.;
+        fEnergyAxis_maximum_defaultValue =  4.;
+        fLogAngular_minimum_defaultValue = -4.;
+        fLogAngular_maximum_defaultValue =  1.;
+
 	fGauss = new TF1("fGauss", "gaus", -2.5,2.5);
 
 	// cuts
@@ -294,7 +300,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
         sprintf( hname, "hAngularLogDiff_2D" );
         hAngularLogDiff_2D = new TH2F( hname, "log angular difference histogram (vs reconstructed energy)",
                                           fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, //25, -1.9, 3.5,
-                                          fLogAngularBin, -4., 1. );
+                                          fLogAngularBin, fLogAngular_minimum_defaultValue, fLogAngular_maximum_defaultValue );
         hAngularLogDiff_2D->SetXTitle( "energy_{rec} [TeV]" );
         hAngularLogDiff_2D->SetYTitle( "log_{10}(angular diff. (R,MC) [deg])" );
         //hisTreeList->Add( hAngularLogDiff_2D );
@@ -303,7 +309,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
         sprintf( hname, "hAngularLogDiffEmc_2D" );
         hAngularLogDiffEmc_2D = new TH2F( hname, "log angular difference histogram (vs true energy)",
                                           fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, //25, -1.9, 3.5,
-                                          fLogAngularBin, -4., 1. );
+                                          fLogAngularBin, fLogAngular_minimum_defaultValue, fLogAngular_maximum_defaultValue );
         hAngularLogDiffEmc_2D->SetXTitle( "energy_{MC} [TeV]" );
         hAngularLogDiffEmc_2D->SetYTitle( "log_{10}(angular diff. (R,MC) [deg])" );
         hisTreeList->Add( hAngularLogDiffEmc_2D );

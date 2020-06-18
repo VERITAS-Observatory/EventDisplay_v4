@@ -126,7 +126,8 @@ class VInstrumentResponseFunction
                 {
                     fTelescopeTypeCutsSet = iB; 
                 }
-		void   setHistogrambinning( int iN = 20, double iMin = -2., double iMax = 2. );
+		void   setHistogramEbinning( int iN = 60, double iMin = -2., double iMax = 4. );
+		void   setHistogramLogAngbinning( int iN = 60, double iMin = -2., double iMax = 4. );
 		void   setRunParameter( VInstrumentResponseFunctionRunParameter* );
 
 };

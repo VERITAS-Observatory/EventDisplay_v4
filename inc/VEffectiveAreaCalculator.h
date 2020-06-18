@@ -106,9 +106,12 @@ class VEffectiveAreaCalculator
 		vector< double > fYWobble;                //!< wobble offset in camera coordinates (grisudet)
 		vector< int >    fNoise;
 		vector< double > fPedVar;
-		
+                
 		double fEnergyAxis_minimum_defaultValue;
 		double fEnergyAxis_maximum_defaultValue;
+
+                double fLogAngular_minimum_defaultValue;
+                double fLogAngular_maximum_defaultValue;
 		
 		VInstrumentResponseFunctionRunParameter* fRunPara;
 		
@@ -343,6 +346,10 @@ class VEffectiveAreaCalculator
 		TTree* getAcceptance_AfterCuts()
 		{
 			return fAcceptance_AfterCuts_tree;
+		}
+		int getEnergyAxis_nbins_defaultValue()
+		{
+			return fhistoNEbins;
 		}
 		double getEnergyAxis_minimum_defaultValue()
 		{
