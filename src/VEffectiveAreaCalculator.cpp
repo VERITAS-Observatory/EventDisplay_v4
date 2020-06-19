@@ -30,6 +30,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 
 	// number of energy bins (general)
 	nbins = fRunPara->fEnergyAxisBins_log10;
+	nbins_MC = fRunPara->fEnergyAxisBins_log10;
 
         // bin definition for 2D histograms (allows coarser binning in energy)
         fBiasBin       = fRunPara->fBiasBin;      
@@ -2037,6 +2038,7 @@ void VEffectiveAreaCalculator::reset()
 	fEffArea = 0;
 	ze = 0.;
 	nbins = 60;
+	nbins_MC = 60;
 	Rec_nbins = 0;
 	for( int i = 0; i < 1000; i++ )
 	{
