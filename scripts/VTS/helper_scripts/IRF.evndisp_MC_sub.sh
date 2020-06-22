@@ -81,6 +81,9 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     VBF_FILE=$VBFNAME"wobb.vbf"
 elif [[ ${SIMTYPE:0:4} == "CARE" ]]; then
     VBF_FILE="$VBFNAME.cvbf"
+    if [[ ! -f "$DDIR/$VBF_FILE" ]]; then
+        VBF_FILE="$VBFNAME"
+    fi
 fi
 echo 
 echo "Now processing $VBF_FILE"
@@ -110,8 +113,20 @@ if [[ ! -f "$DDIR/$VBF_FILE" ]]; then
     elif [[ -e "$SIMDIR/$VBF_FILE" ]]; then
         echo "Copying $VBF_FILE to $DDIR"
         cp -f "$SIMDIR/$VBF_FILE" $DDIR/
+    elif [[ -e ${VBF_FILE} ]]; then
+        # check if zstd if installed
+        if hash zstd 2>/dev/null; then
+            echo "Unzipping (2) ${VBF_FILE} to $DDIR"
+            ls -l "${VBF_FILE}" 
+            V=$(basename $VBF_FILE .zst)
+            zstd -d -f "${VBF_FILE}" -o "$DDIR/$V"
+        else
+            echo "no zstd installed; exiting"
+            exit
+        fi
     fi
 fi
+VBF_FILE=$(basename $VBF_FILE .zst)
 
 # check that the uncompressed vbf file exists
 if [[ ! -f "$DDIR/$VBF_FILE" ]]; then

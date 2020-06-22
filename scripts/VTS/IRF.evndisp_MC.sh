@@ -163,73 +163,90 @@ elif [ ${SIMTYPE:0:10} == "CARE_RedHV" ]; then
     WOFFSET=$(awk -v WB=$WOBBLE 'BEGIN { printf("%03d",100*WB) }')
     LBL="PMTUpgrade_RHV_CARE_v1.6.2_12"
     [[ $PARTICLE == "1" ]]  && VBFNAME="gamma_V6_${LBL}_ATM${ATM}_zen${ZA}deg_${WOFFSET}wob_${NOISE}MHz"
+elif [ ${SIMTYPE} == "CARE_June2020" ]; then
+    VBFNAME=$(find ${SIMDIR}/Zd${ZA}/merged/Data/ -name "*_${WOBBLE}wob_${NOISE}MHz*.zst")
+    echo _${WOFFSET}wob_${NOISE}MHz
+    echo $SIMDIR/Zd${ZA}/merged/Data/
 elif [ ${SIMTYPE:0:4} == "CARE" ]; then
     # input files (observe that these might need some adjustments)
     [[ $PARTICLE == "1" ]]  && VBFNAME="gamma_${ZA}deg_750m_${WOBBLE}wob_${NOISE}mhz_up_ATM${ATM}_part0"
     [[ $PARTICLE == "2" ]]  && VBFNAME="electron_${ZA}deg_noise${NOISE}MHz___"
     [[ $PARTICLE == "14" ]] && VBFNAME="proton_${ZA}deg_noise${NOISE}MHz___"
 fi
-# size of VBF file
-FF=$(find $SIMDIR -maxdepth 1 \( -iname "${VBFNAME}*.zst" -o -iname "${VBFNAME}*.bz2" -o -iname "${VBFNAME}*.vbf" -o -iname "${VBFNAME}*.gz" \) -exec ls -ls -Llh {} \; | awk '{print $1}' | sed 's/,/./g')
-echo "SIMDIR: $SIMDIR"
-echo "VBFILE: ${VBFNAME} $FF"
-echo "NOISEFILE: ${NOISEFILE}"
-# tmpdir requires a safety factor of 2.5 (from unzipping VBF file)
-TMSF=$(echo "${FF%?}*3.0" | bc)
-if [[ ${NOISE} -eq 50 ]]; then
-   TMSF=$(echo "${FF%?}*5.0" | bc)
-fi
-if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
-   # GRISU files are bzipped and need more space (factor of ~14)
-   TMSF=$(echo "${FF%?}*25.0" | bc)
-fi
+#####################################
+# Loop over all VBFFiles
+for V in ${VBFNAME}
+do
+    echo "Processing ${V}"
 
-TMUNI=$(echo "${FF: -1}")
-tmpdir_size=${TMSF%.*}$TMUNI
-echo "Setting TMPDIR_SIZE to $tmpdir_size"
-# determine number of jobs required
-# (avoid many empty jobs)
-if [[ ${TMSF%.*} -lt 40 ]]; then
-   NEVENTS="-1"
-fi
-echo "Number of events per job: $NEVENTS"
+    # size of VBF file
+    if [ ${SIMTYPE} == "CARE_June2020" ]; then
+        FF=$(ls -ls -Llh ${V} | awk '{print $1}' | sed 's/,/./g')
+    else
+        FF=$(find $SIMDIR -maxdepth 1 \( -iname "${V}*.zst" -o -iname "${V}*.bz2" -o -iname "${V}*.vbf" -o -iname "${V}*.gz" \) -exec ls -ls -Llh {} \; | awk '{print $1}' | sed 's/,/./g')
+    fi
+    echo "SIMDIR: $SIMDIR"
+    echo "VBFILE: ${V} $FF"
+    echo "NOISEFILE: ${NOISEFILE}"
+    # tmpdir requires a safety factor of 2.5 (from unzipping VBF file)
+    TMSF=$(echo "${FF%?}*3.0" | bc)
+    if [[ ${NOISE} -eq 50 ]]; then
+       TMSF=$(echo "${FF%?}*5.0" | bc)
+    fi
+    if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
+       # GRISU files are bzipped and need more space (factor of ~14)
+       TMSF=$(echo "${FF%?}*25.0" | bc)
+    fi
 
-# Job submission script
-SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.evndisp_MC_sub"
+    TMUNI=$(echo "${FF: -1}")
+    tmpdir_size=${TMSF%.*}$TMUNI
+    echo "Setting TMPDIR_SIZE to $tmpdir_size"
+    # determine number of jobs required
+    # (avoid many empty jobs)
+    if [[ ${TMSF%.*} -lt 40 ]]; then
+       NEVENTS="-1"
+    fi
+    echo "Number of events per job: $NEVENTS"
 
-# make run script
-FSCRIPT="$LOGDIR/evn-$EPOCH-$SIMTYPE-$ZA-$WOBBLE-$NOISE-ATM$ATM"
-sed -e "s|DATADIR|$SIMDIR|" \
-    -e "s|RUNNUMBER|$RUNNUM|" \
-    -e "s|ZENITHANGLE|$ZA|" \
-    -e "s|ATMOSPHERE|$ATM|" \
-    -e "s|OUTPUTDIR|$OPDIR|" \
-    -e "s|DECIMALWOBBLE|$WOBBLE|" \
-    -e "s|INTEGERWOBBLE|$INT_WOBBLE|" \
-    -e "s|NOISELEVEL|$NOISE|" \
-    -e "s|ARRAYEPOCH|$EPOCH|" \
-    -e "s|NENEVENT|$NEVENTS|" \
-    -e "s|RECONSTRUCTIONRUNPARAMETERFILE|$ACUTS|" \
-    -e "s|SIMULATIONTYPE|$SIMTYPE|" \
-    -e "s|VBFFFILE|$VBFNAME|" \
-    -e "s|NOISEFFILE|$NOISEFILE|" \
-    -e "s|PARTICLETYPE|$PARTICLE|" $SUBSCRIPT.sh > $FSCRIPT.sh
+    # Job submission script
+    SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.evndisp_MC_sub"
 
-chmod u+x $FSCRIPT.sh
-echo $FSCRIPT.sh
+    # make run script
+    FSCRIPT="$LOGDIR/evn-$EPOCH-$SIMTYPE-$ZA-$WOBBLE-$NOISE-ATM$ATM-${RUNNUM}"
+    sed -e "s|DATADIR|$SIMDIR|" \
+        -e "s|RUNNUMBER|$RUNNUM|" \
+        -e "s|ZENITHANGLE|$ZA|" \
+        -e "s|ATMOSPHERE|$ATM|" \
+        -e "s|OUTPUTDIR|$OPDIR|" \
+        -e "s|DECIMALWOBBLE|$WOBBLE|" \
+        -e "s|INTEGERWOBBLE|$INT_WOBBLE|" \
+        -e "s|NOISELEVEL|$NOISE|" \
+        -e "s|ARRAYEPOCH|$EPOCH|" \
+        -e "s|NENEVENT|$NEVENTS|" \
+        -e "s|RECONSTRUCTIONRUNPARAMETERFILE|$ACUTS|" \
+        -e "s|SIMULATIONTYPE|$SIMTYPE|" \
+        -e "s|VBFFFILE|$V|" \
+        -e "s|NOISEFFILE|$NOISEFILE|" \
+        -e "s|PARTICLETYPE|$PARTICLE|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
-# run locally or on cluster
-SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
-SUBC=`eval "echo \"$SUBC\""`
-if [[ $SUBC == *qsub* ]]; then
-    if [[ $NEVENTS -gt 0 ]]; then
-	JOBID=`$SUBC -t 1-10 $FSCRIPT.sh`
-    elif [[ $NEVENTS -lt 0 ]]; then
-        JOBID=`$SUBC $FSCRIPT.sh`
-    fi      
-    echo "RUN $RUNNUM: JOBID $JOBID"
-elif [[ $SUBC == *parallel* ]]; then
-    echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
-fi
-                
+    chmod u+x $FSCRIPT.sh
+    echo $FSCRIPT.sh
+
+    let "RUNNUM = ${RUNNUM} + 100"
+
+    # run locally or on cluster
+    SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
+    SUBC=`eval "echo \"$SUBC\""`
+    if [[ $SUBC == *qsub* ]]; then
+        if [[ $NEVENTS -gt 0 ]]; then
+            JOBID=`$SUBC -t 1-10 $FSCRIPT.sh`
+        elif [[ $NEVENTS -lt 0 ]]; then
+            JOBID=`$SUBC $FSCRIPT.sh`
+        fi      
+        echo "RUN $RUNNUM: JOBID $JOBID"
+    elif [[ $SUBC == *parallel* ]]; then
+        echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
+    fi
+done
+
 exit

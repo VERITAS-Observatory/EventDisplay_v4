@@ -18,10 +18,11 @@ required parameters:
 			
     <runlist>               simple run list with one run number per line.    
     
-optional parameters:
     
-    [evndisp directory]     directory containing evndisp output ROOT files.
+    <evndisp directory>     directory containing evndisp output ROOT files.
 			    Default: $VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/
+
+optional parameters:
 
     [Rec ID]                reconstruction ID. Default 0.
                             (see EVNDISP.reconstruction.runparameter)

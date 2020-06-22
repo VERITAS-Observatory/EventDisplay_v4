@@ -101,6 +101,14 @@ elif [ "${SIMTYPE}" = "CARE_RedHV" ]; then
     ZENITH_ANGLES=$(ls $VERITAS_DATA_DIR/simulations/V6_FLWO/CARE_June1702_RHV/*.zst | awk -F "_zen" '{print $2}' | awk -F "deg." '{print $1}' | sort | uniq) 
     NSB_LEVELS=$(ls $VERITAS_DATA_DIR/simulations/V6_FLWO/CARE_June1702_RHV/*.zst | awk -F "wob_" '{print $2}' | awk -F "MHz." '{print $1}' | sort | uniq)
     WOBBLE_OFFSETS=( 0.5 ) 
+elif [[ "${SIMTYPE}" = "CARE_June2020" ]]; then
+    DDIR="$VERITAS_DATA_DIR/simulations/V6_FLWO/${SIMTYPE}/Atmosphere${ATMOS}/"
+    ZENITH_ANGLES=$(ls $DDIR/ | awk -F "Zd" '{print $2}' | sort | uniq)
+    set -- $ZENITH_ANGLES
+    NSB_LEVELS=$(ls ${DDIR}/Zd$1/merged/Data/*.zst | awk -F "_" '{print $10}' |  awk -F MHz '{print $1}' | sort -u)
+    WOBBLE_OFFSETS=$(ls ${DDIR}/Zd$1/merged/Data/*.zst | awk -F "_" '{print $9}' |  awk -F wob '{print $1}' | sort -u)
+    ZENITH_ANGLES=( 20 30 )
+    NEVENTS="15000000"
 elif [ ${SIMTYPE:0:4} = "CARE" ]; then
     # Older CARE simulation parameters
     ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 60 65 )
@@ -114,6 +122,9 @@ else
     echo "Invalid simulation type. Exiting..."
     exit 1
 fi
+echo "Zenith Angles: ${ZENITH_ANGLES}"
+echo "NSB levels: ${NSB_LEVELS}"
+echo "Wobble offsets: $WOBBLE_OFFSETS"
 
 # Set gamma/hadron cuts
 if [[ $CUTSLISTFILE != "" ]]; then
@@ -198,10 +209,12 @@ for VX in $EPOCH; do
                           SIMDIR=$VERITAS_DATA_DIR/simulations/"${VX:0:2}"_FLWO/CARE_June1425/
                        elif [[ ${SIMTYPE:0:10} = "CARE_RedHV" ]]; then
                           SIMDIR=$VERITAS_DATA_DIR/simulations/"${VX:0:2}"_FLWO/CARE_June1702_RHV/
+                       elif [[ ${SIMTYPE:0:13} = "CARE_June2020" ]]; then
+                          SIMDIR="$VERITAS_DATA_DIR/simulations/V6_FLWO/${SIMTYPE}/Atmosphere${ATMOS}/"
                        elif [[ ${SIMTYPE:0:4} = "CARE" ]]; then
                           SIMDIR=$VERITAS_DATA_DIR/simulations/"${VX:0:2}"_FLWO/${SIMTYPE}
                        fi
-                        ./IRF.evndisp_MC.sh $SIMDIR $VX $ATM $ZA $WOBBLE $NOISE $SIMTYPE $ACUTS 1 $NEVENTS
+                       ./IRF.evndisp_MC.sh $SIMDIR $VX $ATM $ZA $WOBBLE $NOISE $SIMTYPE $ACUTS 1 $NEVENTS
                     ######################
                     # make tables
                     elif [[ $IRFTYPE == "MAKETABLES" ]]; then
