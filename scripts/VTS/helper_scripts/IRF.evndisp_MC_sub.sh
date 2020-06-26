@@ -14,7 +14,6 @@ NOISE=NOISELEVEL
 EPOCH=ARRAYEPOCH
 ATM=ATMOSPHERE
 ACUTS=RECONSTRUCTIONRUNPARAMETERFILE
-PARTICLE=PARTICLETYPE
 SIMTYPE=SIMULATIONTYPE
 ODIR=OUTPUTDIR
 NEVENTS=NENEVENT
@@ -76,62 +75,37 @@ fi
 mkdir -p $DDIR
 echo "Temporary directory: $DDIR"
 
-# loop over simulation files
-if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
-    VBF_FILE=$VBFNAME"wobb.vbf"
-elif [[ ${SIMTYPE:0:4} == "CARE" ]]; then
-    VBF_FILE="$VBFNAME.cvbf"
-    if [[ ! -f "$DDIR/$VBF_FILE" ]]; then
-        VBF_FILE="$VBFNAME"
-    fi
-fi
-echo 
-echo "Now processing $VBF_FILE"
-
+##################3
 # unzip vbf file to local scratch directory
-if [[ ! -f "$DDIR/$VBF_FILE" ]]; then
-    if [[ -e "$SIMDIR/$VBF_FILE.gz" ]]; then
-        echo "Copying $SIMDIR/${VBF_FILE}.gz to $DDIR"
-        cp -f "$SIMDIR/${VBF_FILE}.gz" $DDIR/
-        echo " (vbf file copied, was gzipped)"
-        gunzip -f -q "$DDIR/${VBF_FILE}.gz"
-    elif [[ -e "$SIMDIR/${VBF_FILE}.zst" ]]; then
-        # check if zstd if installed
-        if hash zstd 2>/dev/null; then
-            echo "Unzipping $SIMDIR/${VBF_FILE}.zst to $DDIR"
-            ls -l "$SIMDIR/${VBF_FILE}.zst" 
-            zstd -d -f "$SIMDIR/${VBF_FILE}.zst" -o "$DDIR/$VBF_FILE"
-        else
+if [[ -f "${SIMDIR}/$VBFNAME" ]]; then
+   ZTYPE=${VBFNAME##*.}
+   if [[ $ZTYPE == "gz" ]]; then
+       echo " (vbf is gzipped)"
+       VBF_FILE=$(basename $SIMDIR/${VBFNAME} .gz)
+       gunzip -f -q -c $SIMDIR/${VBFNAME} > ${DDIR}/${VBF_FILE}
+   elif [[ $ZTYPE == "bz2" ]]; then
+       echo " (vbf is bzipped)"
+       VBF_FILE=$(basename $SIMDIR/${VBFNAME} .bz2)
+       bunzip2 -f -q -c $SIMDIR/${VBFNAME} > ${DDIR}/${VBF_FILE}
+   elif [[ $ZTYPE == "zst" ]]; then
+       echo " (vbf is zst-compressed)"
+       if hash zstd 2>/dev/null; then
+           VBF_FILE=$(basename $SIMDIR/${VBFNAME} .zst)
+           zstd -d -f ${SIMDIR}/${VBFNAME} -o ${DDIR}/${VBF_FILE}
+       else
             echo "no zstd installed; exiting"
             exit
-        fi
-    elif [[ -e "$SIMDIR/${VBF_FILE}.bz2" ]]; then
-        echo "Copying $SIMDIR/${VBF_FILE}.bz2 to $DDIR"
-        cp -f "$SIMDIR/${VBF_FILE}.bz2" $DDIR/
-        echo " (vbf file copied, was bzipped)"
-        bunzip2 -f -q "$DDIR/${VBF_FILE}.bz2"
-    elif [[ -e "$SIMDIR/$VBF_FILE" ]]; then
-        echo "Copying $VBF_FILE to $DDIR"
-        cp -f "$SIMDIR/$VBF_FILE" $DDIR/
-    elif [[ -e ${VBF_FILE} ]]; then
-        # check if zstd if installed
-        if hash zstd 2>/dev/null; then
-            echo "Unzipping (2) ${VBF_FILE} to $DDIR"
-            ls -l "${VBF_FILE}" 
-            V=$(basename $VBF_FILE .zst)
-            zstd -d -f "${VBF_FILE}" -o "$DDIR/$V"
-        else
-            echo "no zstd installed; exiting"
-            exit
-        fi
+       fi
+    else
+       echo "Unknown file extension $ZTYPE ,exiting"
+       exit
     fi
-fi
-VBF_FILE=$(basename $VBF_FILE .zst)
+fi          
 
 # check that the uncompressed vbf file exists
 if [[ ! -f "$DDIR/$VBF_FILE" ]]; then
     echo "No source file found: $DDIR/$VBF_FILE"
-    echo "$SIMDIR/$VBF_FILE*"
+    echo "Simulation file was: $SIMDIR/$VBFNAME"
     exit 1
 fi
 VBF_FILE="$DDIR/$VBF_FILE"

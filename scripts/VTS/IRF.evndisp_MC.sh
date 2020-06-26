@@ -60,6 +60,7 @@ bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
 
 # EventDisplay version
 EDVERSION=`$EVNDISPSYS/bin/evndisp --version | tr -d .`
+EDVERSION="v483"
 
 # Parse command line arguments
 SIMDIR=$1
@@ -119,72 +120,60 @@ fi
 VBFNAME="NO_VBFNAME"
 NOISEFILE="NO_NOISEFILE"
 
+# GRISU simulations
 if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     # Input files (observe that these might need some adjustments)
     if [[ ${EPOCH:0:2} == "V4" ]]; then
-        if [[ $PARTICLE == "1" ]]; then
-           if [[ $ATM == "21" ]]; then
-            VBFNAME="Oct2012_oa_ATM21_${ZA}deg_${INT_WOBBLE}"
-           else
-            VBFNAME="gamma_V4_Oct2012_SummerV4ForProcessing_20130611_v420_ATM${ATM}_${ZA}deg_${INT_WOBBLE}"
-           fi
-        elif [[ $PARTICLE == "14" ]]; then
-            VBFNAME="proton_${ZA}deg_750m_wobble${WOBBLE}_2008_2009_"
+        if [[ $ATM == "21" ]]; then
+            VBFNAME=$(find ${SIMDIR}/ -maxdepth 1 -name "Oct2012_oa_ATM21_${ZA}deg_${INT_WOBBLE}*")
+        else
+            VBFNAME=$(find ${SIMDIR}/ -maxdepth 1 -name "gamma_V4_Oct2012_SummerV4ForProcessing_20130611_v420_ATM${ATM}_${ZA}deg_${INT_WOBBLE}*")
         fi
         NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE$NOISE.grisu"
     elif [[ ${EPOCH:0:2} == "V5" ]]; then
-        if [[ $PARTICLE == "1" ]]; then
-            VBFNAME="gamma_V5_Oct2012_newArrayConfig_20121027_v420_ATM${ATM}_${ZA}deg_${INT_WOBBLE}"
-        elif [[ $PARTICLE == "14" ]]; then
-            VBFNAME="proton_${ZA}deg_w${WOBBLE}_"
-        elif [[ $PARTICLE == "402" ]]; then
-            VBFNAME="helium_${ZA}deg_w${WOBBLE}_"
-        fi
+        VBFNAME=$(find ${SIMDIR}/ -maxdepth 1 -name "gamma_V5_Oct2012_newArrayConfig_20121027_v420_ATM${ATM}_${ZA}deg_${INT_WOBBLE}*")
         NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE$NOISE.grisu"
     elif [[ ${EPOCH:0:2} == "V6" ]]; then
-        if [[ $PARTICLE == "1" ]]; then
-            VBFNAME="gamma_V6_Upgrade_20121127_v420_ATM${ATM}_${ZA}deg_${INT_WOBBLE}"
             if [[ $ATM == "21-redHV" ]]; then
-                VBFNAME="gamma_V6_Upgrade_ReducedHV_20121211_v420_ATM21_${ZA}deg_${INT_WOBBLE}"
+                VBFNAME=$(find ${SIMDIR}/ -maxdepth 1 -name "gamma_V6_Upgrade_ReducedHV_20121211_v420_ATM21_${ZA}deg_${INT_WOBBLE}*")
             elif [[ $ATM == "21-UV" ]]; then
-                VBFNAME="gamma_V6_Upgrade_UVfilters_20121211_v420_ATM21_${ZA}deg_${INT_WOBBLE}"
+                VBFNAME=$(find ${SIMDIR}/ -maxdepth 1 -name "gamma_V6_Upgrade_UVfilters_20121211_v420_ATM21_${ZA}deg_${INT_WOBBLE}*")
             elif [[ $ATM == "21-SNR" ]]; then
-                VBFNAME="gamma_V6_201304_SN2013ak_v420_ATM21_${ZA}deg_${INT_WOBBLE}"
+                VBFNAME=$(find ${SIMDIR}/ -maxdepth 1 -name "gamma_V6_201304_SN2013ak_v420_ATM21_${ZA}deg_${INT_WOBBLE}*")
+            else
+                VBFNAME=$(find ${SIMDIR}/ -maxdepth 1 -name "gamma_V6_Upgrade_20121127_v420_ATM${ATM}_${ZA}deg_${INT_WOBBLE}*")
             fi
-        elif [[ $PARTICLE == "14" ]]; then
-            VBFNAME="proton_${ZA}deg_w${WOBBLE}_"
-        elif [[ $PARTICLE == "402" ]]; then
-            VBFNAME="helium_${ZA}deg_w${WOBBLE}_"
-        fi
         NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE${NOISE}_20120827_v420.grisu"
     fi
 elif [ ${SIMTYPE:0:10} == "CARE_RedHV" ]; then
     # example gamma_V6_PMTUpgrade_RHV_CARE_v1.6.2_12_ATM61_zen40deg_050wob_150MHz.cvbf.zst
     WOFFSET=$(awk -v WB=$WOBBLE 'BEGIN { printf("%03d",100*WB) }')
     LBL="PMTUpgrade_RHV_CARE_v1.6.2_12"
-    [[ $PARTICLE == "1" ]]  && VBFNAME="gamma_V6_${LBL}_ATM${ATM}_zen${ZA}deg_${WOFFSET}wob_${NOISE}MHz"
+    VBFNAME=$(find ${SIMDIR}/ -maxdepth 1 -name "gamma_V6_${LBL}_ATM${ATM}_zen${ZA}deg_${WOFFSET}wob_${NOISE}MHz*")
 elif [ ${SIMTYPE} == "CARE_June2020" ]; then
     VBFNAME=$(find ${SIMDIR}/Zd${ZA}/merged/Data/ -name "*_${WOBBLE}wob_${NOISE}MHz*.zst")
     echo _${WOFFSET}wob_${NOISE}MHz
     echo $SIMDIR/Zd${ZA}/merged/Data/
 elif [ ${SIMTYPE:0:4} == "CARE" ]; then
     # input files (observe that these might need some adjustments)
-    [[ $PARTICLE == "1" ]]  && VBFNAME="gamma_${ZA}deg_750m_${WOBBLE}wob_${NOISE}mhz_up_ATM${ATM}_part0"
-    [[ $PARTICLE == "2" ]]  && VBFNAME="electron_${ZA}deg_noise${NOISE}MHz___"
-    [[ $PARTICLE == "14" ]] && VBFNAME="proton_${ZA}deg_noise${NOISE}MHz___"
+    if [[ $PARTICLE == "1" ]]; then
+       VBFNAME=$(find ${SIMDIR}/ -name "gamma_${ZA}deg*${WOBBLE}wob_${NOISE}mhz*ATM${ATM}*.zst")
+    elif [[ $PARTICLE == "2" ]]; then
+       VBFNAME=$(find ${SIMDIR} -name "electron_${ZA}deg*${WOBBLE}wob_${NOISE}mhz*ATM${ATM}*.zst")
+    elif [[ $PARTICLE == "14" ]]; then
+       VBFNAME=$(find ${SIMDIR} -name "proton_${ZA}deg*${WOBBLE}wob_${NOISE}mhz*ATM${ATM}*.zst")
+    fi
 fi
 #####################################
 # Loop over all VBFFiles
 for V in ${VBFNAME}
 do
     echo "Processing ${V}"
+    SIMDIR=$(dirname ${V})
 
     # size of VBF file
-    if [ ${SIMTYPE} == "CARE_June2020" ]; then
-        FF=$(ls -ls -Llh ${V} | awk '{print $1}' | sed 's/,/./g')
-    else
-        FF=$(find $SIMDIR -maxdepth 1 \( -iname "${V}*.zst" -o -iname "${V}*.bz2" -o -iname "${V}*.vbf" -o -iname "${V}*.gz" \) -exec ls -ls -Llh {} \; | awk '{print $1}' | sed 's/,/./g')
-    fi
+    FF=$(ls -ls -Llh ${V} | awk '{print $1}' | sed 's/,/./g')
+    V=$(basename ${V})
     echo "SIMDIR: $SIMDIR"
     echo "VBFILE: ${V} $FF"
     echo "NOISEFILE: ${NOISEFILE}"
@@ -226,8 +215,7 @@ do
         -e "s|RECONSTRUCTIONRUNPARAMETERFILE|$ACUTS|" \
         -e "s|SIMULATIONTYPE|$SIMTYPE|" \
         -e "s|VBFFFILE|$V|" \
-        -e "s|NOISEFFILE|$NOISEFILE|" \
-        -e "s|PARTICLETYPE|$PARTICLE|" $SUBSCRIPT.sh > $FSCRIPT.sh
+        -e "s|NOISEFFILE|$NOISEFILE|"  $SUBSCRIPT.sh > $FSCRIPT.sh
 
     chmod u+x $FSCRIPT.sh
     echo $FSCRIPT.sh

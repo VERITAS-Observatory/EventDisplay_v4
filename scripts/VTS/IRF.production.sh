@@ -34,7 +34,7 @@ optional parameters:
                             (see EVNDISP.reconstruction.runparameter)
 
     [BDT cuts]              using cuts list for BDT cuts (e.g. 0=not used, 1=used)
-                            (default: \"0\")
+                            (default: \"2\")
     
     [cuts list file]        file containing one gamma/hadron cuts file per line
                             (default: hard-coded standard EventDisplay cuts)
@@ -62,7 +62,7 @@ IRFTYPE=$2
 [[ "$3" ]] && EPOCH=$3 || EPOCH="V4 V5 V6"
 [[ "$4" ]] && ATMOS=$4 || ATMOS="21 22"
 [[ "$5" ]] && RECID=$5 || RECID="0 2 3 4 5"
-[[ "$6" ]] && BDTCUTS=$6 || BDTCUTS="0"
+[[ "$6" ]] && BDTCUTS=$6 || BDTCUTS="1"
 [[ "$7" ]] && CUTSLISTFILE=$7 || CUTSLISTFILE=""
 [[ "$8" ]] && SIMDIR=$8 || SIMDIR=""
 # evndisplay version
@@ -107,7 +107,6 @@ elif [[ "${SIMTYPE}" = "CARE_June2020" ]]; then
     set -- $ZENITH_ANGLES
     NSB_LEVELS=$(ls ${DDIR}/Zd$1/merged/Data/*.zst | awk -F "_" '{print $10}' |  awk -F MHz '{print $1}' | sort -u)
     WOBBLE_OFFSETS=$(ls ${DDIR}/Zd$1/merged/Data/*.zst | awk -F "_" '{print $9}' |  awk -F wob '{print $1}' | sort -u)
-    ZENITH_ANGLES=( 20 30 )
     NEVENTS="15000000"
 elif [ ${SIMTYPE:0:4} = "CARE" ]; then
     # Older CARE simulation parameters
