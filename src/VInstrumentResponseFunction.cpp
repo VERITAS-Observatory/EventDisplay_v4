@@ -24,13 +24,14 @@ VInstrumentResponseFunction::VInstrumentResponseFunction()
 	setContainmentProbability();
         setTelescopeTypeCuts();
         setDuplicationID();
+        setRunParameter();
 }
 
 void VInstrumentResponseFunction::setRunParameter( VInstrumentResponseFunctionRunParameter* iRunPara )
 {
+        fRunPara = iRunPara;
 	if( !iRunPara )
 	{
-		cout << "VInstrumentResponseFunction::setRunParameter error: no run parameter given" << endl;
 		return;
 	}
 	fEnergyReconstructionMethod = iRunPara->fEnergyReconstructionMethod;
@@ -89,14 +90,14 @@ bool VInstrumentResponseFunction::initialize( string iName, string iType, unsign
 		{
 			sprintf( hname, "%s_%d_%d", iName.c_str(), i, j );
 			i_irf.push_back( new VInstrumentResponseFunctionData() );
+			i_irf.back()->setHistogramLogAngbinning( fRunPara->fLogAngularBin );
+			i_irf.back()->setHistogramEbinning( fRunPara->fhistoNEbins );
 			if( !i_irf.back()->initialize( hname, iType, iNTel, iMCMaxCoreRadius ) )
 			{
 				return false;
 			}
 			
 			i_irf.back()->setData( iZe, ( int )j, fVMinAz[j], fVMaxAz[j], iNoise, iPedvars, fVSpectralIndex[i], iXoff, iYoff );
-			i_irf.back()->setHistogramEbinning();
-			i_irf.back()->setHistogramLogAngbinning();
 			i_irf.back()->setEnergyReconstructionMethod( fEnergyReconstructionMethod );
 		}
 		fIRFData.push_back( i_irf );
@@ -286,34 +287,6 @@ bool VInstrumentResponseFunction::fillResolutionGraphs( vector< vector< VInstrum
 	
 	return true;
 }
-
-void VInstrumentResponseFunction::setHistogramEbinning( int iN, double iMin, double iMax )
-{
-	for( unsigned int i = 0; i < fIRFData.size(); i++ )
-	{
-		for( unsigned int j = 0; j < fIRFData[i].size(); j++ )
-		{
-			if( fIRFData[i][j] )
-			{
-				fIRFData[i][j]->setHistogramEbinning( iN, iMin, iMax );
-			}
-		}
-	}
-}
-void VInstrumentResponseFunction::setHistogramLogAngbinning( int iN, double iMin, double iMax )
-{
-	for( unsigned int i = 0; i < fIRFData.size(); i++ )
-	{
-		for( unsigned int j = 0; j < fIRFData[i].size(); j++ )
-		{
-			if( fIRFData[i][j] )
-			{
-				fIRFData[i][j]->setHistogramLogAngbinning( iN, iMin, iMax );
-			}
-		}
-	}
-}
-
 
 void VInstrumentResponseFunction::setDataTree( CData* iData )
 {

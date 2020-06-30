@@ -189,11 +189,11 @@ int main( int argc, char* argv[] )
 		}
 		else
 		{
-			f_IRF.back()->setContainmentProbability( f_IRF_ContainmentProbability[i] );
+		 	f_IRF.back()->setContainmentProbability( f_IRF_ContainmentProbability[i] );
 		}
 		f_IRF.back()->initialize( f_IRF_Name[i], f_IRF_Type[i],
-								  fRunPara->telconfig_ntel, fRunPara->fCoreScatterRadius,
-								  fRunPara->fze, fRunPara->fnoise, fRunPara->fpedvar, fRunPara->fXoff, fRunPara->fYoff );
+                                          fRunPara->telconfig_ntel, fRunPara->fCoreScatterRadius,
+                                          fRunPara->fze, fRunPara->fnoise, fRunPara->fpedvar, fRunPara->fXoff, fRunPara->fYoff );
 	}
 	
 	
