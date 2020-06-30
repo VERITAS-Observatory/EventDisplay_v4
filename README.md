@@ -1,6 +1,6 @@
 # Eventdisplay source code (v4xx version only)
 
-**this is an unreleased eventdisplay version - not for science analysis**
+**released eventdisplay version - to be used for science analysis**
 
 New in this version:
 - pixel amplitudes (integrated sums) can be scaled by a factor given in parameter file (-throughputcorrection)
