@@ -117,7 +117,7 @@ echo "Input file directory: $INDIR"
 
 # directory for run scripts
 DATE=`date +"%y%m%d"`
-LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/MSCW.ANATABLES/"
+LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/MSCW.ANATABLES/$(date +%s | cut -c -8)/"
 echo -e "Log files will be written to:\n $LOGDIR"
 mkdir -p $LOGDIR
 

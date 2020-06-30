@@ -386,27 +386,7 @@ TGraphErrors* VInstrumentResponseFunction::getAngularResolutionGraph( unsigned i
         return 0;
 }
 
-/* //// This is how it is defined in v480e, iAzBin, iSpectralIndexBin seem to be reversed as in v502.
-TGraphErrors* VInstrumentResponseFunction::getAngularResolutionGraph( unsigned int iAzBin, unsigned int iSpectralIndexBin )
-{
-	if( iAzBin < fIRFData.size() && iSpectralIndexBin < fIRFData[iAzBin].size() && fIRFData[iAzBin][iSpectralIndexBin] )
-	{
-		return fIRFData[iAzBin][iSpectralIndexBin]->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF];
-	}
-	
-	cout << "VInstrumentResponseFunction::getAngularResolutionGraph: warning index out of range ";
-	cout << iAzBin << "\t" << iSpectralIndexBin << "\t";
-	cout << "(" << fIRFData[iAzBin].size();
-	if( fIRFData.size() )
-	{
-		cout << "\t" << fIRFData[iAzBin].size();
-	}
-	cout << ")" << endl;
-	
-	return 0;
-}
-*/
-
+// In v480e  iAzBin, iSpectralIndexBin seem to be reversed.
 vector< TH2D* > VInstrumentResponseFunction::getAngularResolution2D( unsigned int iAzBin, unsigned int iSpectralIndexBin )
 {
     vector< TH2D* > h;

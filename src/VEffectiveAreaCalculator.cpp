@@ -2795,55 +2795,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			// effective area vs reconstructed energy (approx)
 			Rec_nbins = gEffAreaRec->GetN();
                         
-                        /* 
-                        // Old version 
-			for( int i = 0; i < nbins; i++ )
-			{
-				gEffAreaMC->GetPoint( i, x, y );
-				e0[i] = x;
-				eff[i] = y * fMC_ScatterArea;
-				seff_L[i] = gEffAreaMC->GetErrorYlow( i ) * fMC_ScatterArea;
-				seff_U[i] = gEffAreaMC->GetErrorYhigh( i ) * fMC_ScatterArea;
-                                eff_error[i] = 0.5 * ( seff_L[i] + seff_U[i] );
-				gEffAreaMC->SetPoint( i, x, eff[i] );
-				gEffAreaMC->SetPointEYlow( i, seff_L[i] );
-				gEffAreaMC->SetPointEYhigh( i, seff_U[i] );
-                                if( hVEsysMCRelative[s][i_az] )
-                                {
-                                    esys_rel[i] = hVEsysMCRelative[s][i_az]->GetBinContent( 
-                                        hVEsysMCRelative[s][i_az]->GetXaxis()->FindBin( e0[i] ) );
-                                }
-				// Save also the NoDirectionCut eff areas
-                                gEffAreaNoTh2MC->GetPoint( i, x, y );
-                                effNoTh2[i] = y * fMC_ScatterArea;
-                                effNoTh2_error[i] = 0.5 * ( gEffAreaNoTh2MC->GetErrorYlow( i ) + 
-                                                            gEffAreaNoTh2MC->GetErrorYhigh( i ) 
-                                                          ) * fMC_ScatterArea;;
-					
-			}
-			// effective area vs reconstructed energy (approx)
-			Rec_nbins = gEffAreaRec->GetN();
-			for( int i = 0; i < Rec_nbins; i++ )
-			{
-				gEffAreaRec->GetPoint( i, x, y );
-				Rec_e0[i] = x;
-				// this is an approximation, since scatter area is defined over E_MC (GM: don't understand this comment)
-				Rec_eff[i] = y * fMC_ScatterArea;
-				Rec_seff_L[i] = gEffAreaRec->GetErrorYlow( i ) * fMC_ScatterArea;
-				Rec_seff_U[i] = gEffAreaRec->GetErrorYhigh( i ) * fMC_ScatterArea;
-                                Rec_eff_error[i] = 0.5 * ( Rec_seff_L[i] + Rec_seff_U[i] );
-				gEffAreaRec->SetPoint( i, x, Rec_eff[i] );
-				gEffAreaRec->SetPointEYlow( i, Rec_seff_L[i] );
-				gEffAreaRec->SetPointEYhigh( i, Rec_seff_U[i] );
-				// Save also the NoDirectionCut eff areas
-                                gEffAreaNoTh2Rec->GetPoint( i, x, y );
-                                Rec_effNoTh2[i] = y * fMC_ScatterArea;
-                                Rec_effNoTh2_error[i] = 0.5 * ( gEffAreaNoTh2Rec->GetErrorYlow( i ) + 
-                                                                gEffAreaNoTh2Rec->GetErrorYhigh( i ) 
-                                                              ) * fMC_ScatterArea;
-			}
-                        */
-			
                         // New version, hopefully more compact. 
 			// 1) Multiply effective areas by scatter area.
                         multiplyByScatterArea( gEffAreaMC );
