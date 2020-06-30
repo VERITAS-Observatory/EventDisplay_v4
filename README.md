@@ -2,13 +2,11 @@
 
 **released eventdisplay version - to be used for science analysis**
 
-New in this version:
-- pixel amplitudes (integrated sums) can be scaled by a factor given in parameter file (-throughputcorrection)
-- typically, this is the MSCW.sizecal.runparameter 
+Main changes with respect to v480 is the implementation of the correction factors to take the lower throughput / gains into account
 
-Release page: (none)
+Release page: https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_v483
 
-Repository for the Eventdisplay code for the v4xx version. This repository exists mostly for legacy reasons, the development of Eventdisplay is continuing here: (to be filled).
+Repository for the Eventdisplay code for the v483 version. 
 
 Corresponding analysis files: (none)
 
