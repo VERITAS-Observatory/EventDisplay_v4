@@ -2272,8 +2272,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 	double eRecLin = 0.;
 	// MC energy (TeV, log10)
 	double eMC = 0.;
-        // fill with zeros while copying? (useful for histos with eMC in the X-axis)
-        bool fill_zeros = false;
 
 	////////////////////////////////////////////////////////////////////////////
 	// get MC histograms
