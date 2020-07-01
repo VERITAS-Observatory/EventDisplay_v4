@@ -2853,9 +2853,9 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 
                         // Histograms that depend on EMC -> add only the ones for the first index.
                         if ( s == 0 )
-                            fill_zeros = true;
-                        else
                             fill_zeros = false;
+                        else
+                            fill_zeros = true;
                         
                         copyHistograms( hEmc, hVEmc[s][i_az], false, fill_zeros );
                         copyHistograms( hEcut, hVEcut[s][i_az], false, fill_zeros );
