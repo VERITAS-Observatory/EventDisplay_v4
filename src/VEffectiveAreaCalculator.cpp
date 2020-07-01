@@ -2272,6 +2272,8 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 	double eRecLin = 0.;
 	// MC energy (TeV, log10)
 	double eMC = 0.;
+        // fill with zeros while copying? (useful for histos with eMC in the X-axis)
+        bool fill_zeros = false;
 
 	////////////////////////////////////////////////////////////////////////////
 	// get MC histograms
@@ -2843,41 +2845,49 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 
 			// copy all histograms
 			resetHistograms( ize );
-			copyHistograms( hEmc, hVEmc[s][i_az], false );
-			copyHistograms( hEcut, hVEcut[s][i_az], false );
-			copyHistograms( hEcutUW, hVEcutUW[s][i_az], false );
-			copyHistograms( hEcut500, hVEcut500[s][i_az], false );
-			copyHistograms( hEcutLin, hVEcutLin[s][i_az], false );
-			copyHistograms( hEcutRec, hVEcutRec[s][i_az], false );
-			copyHistograms( hEcutRecUW, hVEcutRecUW[s][i_az], false );
-			copyProfileHistograms( hEmcSWeight, hVEmcSWeight[s][i_az] );
-			copyProfileHistograms( hEsysRec,  hVEsysRec[s][i_az] );
-			copyProfileHistograms( hEsysMC, hVEsysMC[s][i_az] );
-			copyProfileHistograms( hEsysMCRelative, hVEsysMCRelative[s][i_az] );
-			copyHistograms( hEsysMCRelativeRMS, hVEsysMCRelativeRMS[s][i_az], true );
-			copyHistograms( hEsysMCRelative2D, hVEsysMCRelative2D[s][i_az], true );
-			copyHistograms( hEsysMCRelative2DNoDirectionCut, hVEsysMCRelative2DNoDirectionCut[s][i_az], true );
-			copyHistograms( hEsys2D, hVEsys2D[s][i_az], true );
-			copyHistograms( hEmcCutCTA, hVEmcCutCTA[s][i_az], true );
-			copyHistograms( hResponseMatrix, hVResponseMatrix[s][i_az], true );
-			copyHistograms( hResponseMatrixQC, hVResponseMatrixQC[s][i_az], true );
-			copyHistograms( hResponseMatrixNoDirectionCut, hVResponseMatrixNoDirectionCut[s][i_az], true );
-			copyProfileHistograms( hResponseMatrixProfile, hVResponseMatrixProfile[s][i_az] );
-			copyHistograms( hResponseMatrixFine, hVResponseMatrixFine[s][i_az], true );
-			copyHistograms( hResponseMatrixFineQC, hVResponseMatrixFineQC[s][i_az], true );
-			copyHistograms( hResponseMatrixFineNoDirectionCut, hVResponseMatrixFineNoDirectionCut[s][i_az], true );
-			
-                        copyHistograms( hWeightedRate, hVWeightedRate[s][i_az], false );
-                        copyHistograms( hWeightedRate005, hVWeightedRate005[s][i_az], false );
+                        
+                        // Histograms that depend on Erec -> add them depending on the index
+			copyHistograms( hEcutRec, hVEcutRec[s][i_az], false, false );
+			copyHistograms( hEcutRecUW, hVEcutRecUW[s][i_az], false, false );
+			copyProfileHistograms( hEsysRec,  hVEsysRec[s][i_az], false );
+
+                        // Histograms that depend on EMC -> add only the ones for the first index.
+                        if ( s == 0 )
+                            fill_zeros = true;
+                        else
+                            fill_zeros = false;
+                        
+                        copyHistograms( hEmc, hVEmc[s][i_az], false, fill_zeros );
+                        copyHistograms( hEcut, hVEcut[s][i_az], false, fill_zeros );
+                        copyHistograms( hEcutUW, hVEcutUW[s][i_az], false, fill_zeros );
+                        copyHistograms( hEcut500, hVEcut500[s][i_az], false, fill_zeros );
+                        copyHistograms( hEcutLin, hVEcutLin[s][i_az], false, fill_zeros );
+                        copyProfileHistograms( hEmcSWeight, hVEmcSWeight[s][i_az], fill_zeros );
+                        copyProfileHistograms( hEsysMC, hVEsysMC[s][i_az], fill_zeros );
+                        copyProfileHistograms( hEsysMCRelative, hVEsysMCRelative[s][i_az], fill_zeros );
+                        copyHistograms( hEsysMCRelativeRMS, hVEsysMCRelativeRMS[s][i_az], true, fill_zeros );
+                        copyHistograms( hEsysMCRelative2D, hVEsysMCRelative2D[s][i_az], true, fill_zeros );
+                        copyHistograms( hEsysMCRelative2DNoDirectionCut, hVEsysMCRelative2DNoDirectionCut[s][i_az], true, fill_zeros );
+                        copyHistograms( hEmcCutCTA, hVEmcCutCTA[s][i_az], true, fill_zeros );
+                        copyHistograms( hEsys2D, hVEsys2D[s][i_az], true, fill_zeros );
+                        copyHistograms( hResponseMatrix, hVResponseMatrix[s][i_az], true, fill_zeros );
+                        copyHistograms( hResponseMatrixQC, hVResponseMatrixQC[s][i_az], true, fill_zeros );
+                        copyHistograms( hResponseMatrixNoDirectionCut, hVResponseMatrixNoDirectionCut[s][i_az], true, fill_zeros );
+                        copyProfileHistograms( hResponseMatrixProfile, hVResponseMatrixProfile[s][i_az], fill_zeros );
+                        copyHistograms( hResponseMatrixFine, hVResponseMatrixFine[s][i_az], true, fill_zeros );
+                        copyHistograms( hResponseMatrixFineQC, hVResponseMatrixFineQC[s][i_az], true, fill_zeros );
+                        copyHistograms( hResponseMatrixFineNoDirectionCut, hVResponseMatrixFineNoDirectionCut[s][i_az], true, fill_zeros );
+                        copyHistograms( hWeightedRate, hVWeightedRate[s][i_az], false, fill_zeros );
+                        copyHistograms( hWeightedRate005, hVWeightedRate005[s][i_az], false, fill_zeros );
                         for( unsigned int e = 0; e < hEcutSub.size(); e++ )
                         {
-                            copyHistograms( hEcutSub[e], hVEcutSub[s][e][i_az], false );
+                            copyHistograms( hEcutSub[e], hVEcutSub[s][e][i_az], false, fill_zeros );
                         }
 
-                        copyHistograms( hAngularDiff_2D, hVAngularDiff_2D[i_az], true );
-                        copyHistograms( hAngularDiffEmc_2D, hVAngularDiffEmc_2D[i_az], true );
-                        copyHistograms( hAngularLogDiff_2D, hVAngularLogDiff_2D[i_az], true );
-                        copyHistograms( hAngularLogDiffEmc_2D, hVAngularLogDiffEmc_2D[i_az], true );
+                        copyHistograms( hAngularDiff_2D, hVAngularDiff_2D[i_az], true, false );
+                        copyHistograms( hAngularDiffEmc_2D, hVAngularDiffEmc_2D[i_az], true, false );
+                        copyHistograms( hAngularLogDiff_2D, hVAngularLogDiff_2D[i_az], true, false );
+                        copyHistograms( hAngularLogDiffEmc_2D, hVAngularLogDiffEmc_2D[i_az], true, false );
                         
 			// fill angular resolution vs energy
                         fillAngularResolution( i_az, false );
@@ -3839,7 +3849,7 @@ void VEffectiveAreaCalculator::smoothEffectiveAreas( map< unsigned int, vector< 
 }
 
 
-void VEffectiveAreaCalculator::copyProfileHistograms( TProfile* h1,  TProfile* h2 )
+void VEffectiveAreaCalculator::copyProfileHistograms( TProfile* h1,  TProfile* h2, bool fill_with_zeros=false )
 {
 	if( !h1 || !h2 )
 	{
@@ -3850,7 +3860,10 @@ void VEffectiveAreaCalculator::copyProfileHistograms( TProfile* h1,  TProfile* h
 
 	for( int b = 0; b <= h2->GetNbinsX(); b++ )
 	{
-		h1->SetBinContent( b, h2->GetBinContent( b ) * h2->GetBinEntries( b ) );
+                if ( !fill_with_zeros )
+        		h1->SetBinContent( b, h2->GetBinContent( b ) * h2->GetBinEntries( b ) );
+                else
+                        h1->SetBinContent( b, 0 );
 
 		if( TMath::Abs( h2->GetBinError( b ) ) < 1.e-4 )
 		{
@@ -3866,20 +3879,29 @@ void VEffectiveAreaCalculator::copyProfileHistograms( TProfile* h1,  TProfile* h
 				{
 					iE = h2->GetBinError( b ) * sqrt( h2->GetBinEntries( b ) );
 				}
-				h1->SetBinError( b,  sqrt( h2->GetBinEntries( b ) * ( h2->GetBinContent( b ) *  h2->GetBinContent( b ) + iE * iE ) ) );
+                                if ( !fill_with_zeros )
+				        h1->SetBinError( b,  sqrt( h2->GetBinEntries( b ) * ( h2->GetBinContent( b ) *  h2->GetBinContent( b ) + iE * iE ) ) );
+                                else
+                                        h1->SetBinError( b, 0 );
 			}
 			else
 			{
 				h1->SetBinError( b, 0. );
 			}
 		}
-		h1->SetBinEntries( b, h2->GetBinEntries( b ) );
+                if ( !fill_with_zeros )
+        		h1->SetBinEntries( b, h2->GetBinEntries( b ) );
+                else
+                        h1->SetBinEntries( b, 0 );
 	}
-	h1->SetEntries( h2->GetEntries() );
+        if ( !fill_with_zeros )
+        	h1->SetEntries( h2->GetEntries() );
+        else
+                h1->SetEntries( 0 );
 }
 
 
-void VEffectiveAreaCalculator::copyHistograms( TH1* h1,  TH1* h2, bool b2D )
+void VEffectiveAreaCalculator::copyHistograms( TH1* h1,  TH1* h2, bool b2D, bool fill_with_zeros=false )
 {
 	if( !h1 || !h2 )
 	{
@@ -3890,8 +3912,16 @@ void VEffectiveAreaCalculator::copyHistograms( TH1* h1,  TH1* h2, bool b2D )
 	{
 		for( int b = 0; b <= h2->GetNbinsX(); b++ )
 		{
-			h1->SetBinContent( b, h2->GetBinContent( b ) );
-			h1->SetBinError( b, h2->GetBinError( b ) );
+                        if ( !fill_with_zeros )
+                        {
+            			h1->SetBinContent( b, h2->GetBinContent( b ) );
+			        h1->SetBinError( b, h2->GetBinError( b ) );
+                        }
+                        else
+                        {
+                                h1->SetBinContent( b, 0 );
+                                h1->SetBinError( b, 0 );
+                        }
 		}
 	}
 	else
@@ -3900,12 +3930,24 @@ void VEffectiveAreaCalculator::copyHistograms( TH1* h1,  TH1* h2, bool b2D )
 		{
 			for( int b2 = 0; b2 <= h2->GetNbinsY(); b2++ )
 			{
-				h1->SetBinContent( b, b2, h2->GetBinContent( b, b2 ) );
-				h1->SetBinError( b, b2, h2->GetBinError( b, b2 ) );
+                                if ( !fill_with_zeros )
+                                {
+                                        h1->SetBinContent( b, b2, h2->GetBinContent( b, b2 ) );
+            				h1->SetBinError( b, b2, h2->GetBinError( b, b2 ) );
+                                }
+                                else
+                                {
+                                        h1->SetBinContent( b, b2, 0 );
+                                        h1->SetBinError( b, b2, 0 );
+                                }
 			}
 		}
 	}
-	h1->SetEntries( h2->GetEntries() );
+        if ( !fill_with_zeros )
+        	h1->SetEntries( h2->GetEntries() );
+        else
+                h1->SetEntries( 0 );
+        
 }
 
 
