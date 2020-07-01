@@ -2878,9 +2878,13 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
                         }
 
                         copyHistograms( hAngularDiff_2D, hVAngularDiff_2D[i_az], true );
-                        copyHistograms( hAngularDiffEmc_2D, hVAngularDiffEmc_2D[i_az], true );
                         copyHistograms( hAngularLogDiff_2D, hVAngularLogDiff_2D[i_az], true );
-                        copyHistograms( hAngularLogDiffEmc_2D, hVAngularLogDiffEmc_2D[i_az], true );
+                        if ( s == 0 )
+                        {
+                            // Fill only for the first index.
+                            copyHistograms( hAngularDiffEmc_2D, hVAngularDiffEmc_2D[i_az], true );
+                            copyHistograms( hAngularLogDiffEmc_2D, hVAngularLogDiffEmc_2D[i_az], true );
+                        }
                         
 			// fill angular resolution vs energy
                         fillAngularResolution( i_az, false );
@@ -3678,6 +3682,22 @@ void VEffectiveAreaCalculator::resetHistograms( unsigned int ize )
 	hEmcSWeight->Reset();
 	sprintf( htitle, "spectral weights (%.1f deg)", fZe[ize] );
 	hEmcSWeight->SetTitle( htitle );
+        
+        hAngularDiff_2D->Reset();
+        sprintf( htitle, "hAngularDiff_2D" );
+        hAngularDiff_2D->SetTitle( htitle );
+
+        hAngularDiffEmc_2D->Reset();
+        sprintf( htitle, "hAngularDiffEmc_2D" );
+        hAngularDiffEmc_2D->SetTitle( htitle );
+        
+        hAngularLogDiff_2D->Reset();
+        sprintf( htitle, "hAngularLogDiff_2D" );
+        hAngularLogDiff_2D->SetTitle( htitle );
+
+        hAngularLogDiffEmc_2D->Reset();
+        sprintf( htitle, "hAngularLogDiffEmc_2D" );
+        hAngularLogDiffEmc_2D->SetTitle( htitle );
 }
 
 
@@ -4290,48 +4310,6 @@ void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
 			}
 		}
 	}
-        /*
-        for( unsigned int i = 0; i < hVAngularDiff_2D.size(); i++ )
-	{
-                for( unsigned int j = 0; j < hVAngularDiff_2D[i].size(); j++ )
-                {
-                        if( hVAngularDiff_2D[i][j] )
-                        {
-                                hVAngularDiff_2D[i][j]->Reset();
-                        }
-                }
-	}
-        for( unsigned int i = 0; i < hVAngularDiffEmc_2D.size(); i++ )
-	{
-                for( unsigned int j = 0; j < hVAngularDiffEmc_2D[i].size(); j++ )
-                {
-                        if( hVAngularDiffEmc_2D[i][j] )
-                        {
-                                hVAngularDiffEmc_2D[i][j]->Reset();
-                        }
-                }
-	}
-        for( unsigned int i = 0; i < hVAngularLogDiff_2D.size(); i++ )
-	{
-                for( unsigned int j = 0; j < hVAngularLogDiff_2D[i].size(); j++ )
-                {
-                        if( hVAngularLogDiff_2D[i][j] )
-                        {
-                                hVAngularLogDiff_2D[i][j]->Reset();
-                        }
-                }
-	}
-        for( unsigned int i = 0; i < hVAngularLogDiffEmc_2D.size(); i++ )
-	{
-                for( unsigned int j = 0; j < hVAngularLogDiffEmc_2D[i].size(); j++ )
-                {
-                        if( hVAngularLogDiffEmc_2D[i][j] )
-                        {
-                                hVAngularLogDiffEmc_2D[i][j]->Reset();
-                        }
-                }
-	}
-        */
 	
 	for( unsigned int i = 0; i < hVWeightedRate.size(); i++ )
 	{
