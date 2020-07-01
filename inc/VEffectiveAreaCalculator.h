@@ -305,8 +305,8 @@ class VEffectiveAreaCalculator
            	int hres_nbins;
 		TGraphAsymmErrors* applyResponseMatrix( TH2* h, TGraphAsymmErrors* g );
 		bool   binomialDivide( TGraphAsymmErrors* g, TH1D* hrec, TH1D* hmc );
-		void   copyProfileHistograms( TProfile*,  TProfile*, bool );
-		void   copyHistograms( TH1*,  TH1*, bool, bool );
+		void   copyProfileHistograms( TProfile*,  TProfile* );
+		void   copyHistograms( TH1*,  TH1*, bool );
                 void   fillAngularResolution( unsigned int i_az, bool iContaintment_80p );
 		double getAzMean( double azmin, double azmax );
 		double getCRWeight( double iEMC_TeV_log10, TH1* h , bool for_back_map = false );
