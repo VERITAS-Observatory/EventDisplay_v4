@@ -60,7 +60,7 @@ bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
 
 # EventDisplay version
 EDVERSION=`$EVNDISPSYS/bin/evndisp --version | tr -d .`
-EDVERSION="v483"
+EDVERSION="v484"
 
 # Parse command line arguments
 SIMDIR=$1
