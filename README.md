@@ -8,8 +8,7 @@ Release page: ...
 
 Repository for the Eventdisplay code for the v483 version. 
 
-Corresponding analysis files: ...
-
+Corresponding analysis files: https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles/tree/v483
 
 For older versions of Eventdisplay, see the release pages on the VERITAS wiki:
 https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual#Versions_of_eventdisplay
