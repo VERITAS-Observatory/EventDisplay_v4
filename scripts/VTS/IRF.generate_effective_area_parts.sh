@@ -3,7 +3,7 @@
 # (output need to be combined afterwards)
 
 # qsub parameters
-h_cpu=11:29:00; h_vmem=12000M; tmpdir_size=10G
+h_cpu=13:29:00; h_vmem=15000M; tmpdir_size=20G
 
 if [[ $# != 8 ]]; then
 # begin help message
@@ -62,6 +62,10 @@ RECID=$7
 SIMTYPE=$8
 PARTICLE_TYPE="gamma"
 
+CUTS_NAME=`basename $CUTSFILE`
+CUTS_NAME=${CUTS_NAME##ANASUM.GammaHadron-}
+CUTS_NAME=${CUTS_NAME%%.dat}
+
 # input directory containing mscw_energy_MC products
 if [[ -n $VERITAS_IRFPRODUCTION_DIR ]]; then
     INDIR="$VERITAS_IRFPRODUCTION_DIR/$IRFVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/MSCW_RECID${RECID}"
@@ -82,7 +86,7 @@ chmod g+w $ODIR
 
 # run scripts and output are written into this directory
 DATE=`date +"%y%m%d"`
-LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/EFFAREA/${ZA}deg_${WOBBLE}wob_NOISE${NOISE}_${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}_${RECID}/"
+LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/EFFAREA/$(date +%s | cut -c -8)/${ZA}deg_${WOBBLE}wob_NOISE${NOISE}_${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}_${RECID}/"
 echo -e "Log files will be written to:\n $LOGDIR"
 mkdir -p $LOGDIR
 
@@ -104,7 +108,7 @@ echo "Processing Zenith = $ZA, Noise = $NOISE, Wobble = $WOBBLE"
             
 echo $CUTSFILE
 # set parameters in run script
-FSCRIPT="$LOGDIR/EA.ID${RECID}.$DATE.MC"
+FSCRIPT="$LOGDIR/EA.ID${RECID}.${CUTS_NAME}.$DATE.MC_$(date +%s)"
 sed -e "s|OUTPUTDIR|$ODIR|" \
     -e "s|EFFFILE|$EFFAREAFILE|" \
     -e "s|DATAFILE|$MCFILE|" \

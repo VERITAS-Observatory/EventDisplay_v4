@@ -33,6 +33,9 @@ class VInstrumentResponseFunction
                 // basic data
                 string  fName;
                 string  fType;                // descripes type of response function (e.g. angular resolution or core resolution)
+
+                // run parameter
+                VInstrumentResponseFunctionRunParameter *fRunPara;
 		
 		// data tree
 		CData*   fData;
@@ -126,8 +129,7 @@ class VInstrumentResponseFunction
                 {
                     fTelescopeTypeCutsSet = iB; 
                 }
-		void   setHistogrambinning( int iN = 20, double iMin = -2., double iMax = 2. );
-		void   setRunParameter( VInstrumentResponseFunctionRunParameter* );
+		void   setRunParameter( VInstrumentResponseFunctionRunParameter* iRunPar = 0 );
 
 };
 

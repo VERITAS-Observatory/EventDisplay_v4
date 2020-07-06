@@ -77,19 +77,9 @@ RLIST=$1
 [[ "$2" ]] && ODIR=$2 || ODIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/"
 mkdir -p $ODIR
 
-# Try to use the correct reconstruction runparameters. For V4 and V5 the default is GRISU / SumWindow6-noDISP.
-if [[ "$SIMTYPE" == "CARE"* ]]; then
-    ACUTS_AUTO=EVNDISP.reconstruction.runparameter
-elif [[ "$SIMTYPE" == "GRISU"* ]]; then 
-    ACUTS_AUTO=EVNDISP.reconstruction.runparameter.SumWindow6-noDISP
-else
-    echo "WARNING: Unknown simulation type $SIMTYPE, please check ..."
-    sleep 2
-    ACUTS_AUTO=EVNDISP.reconstruction.runparameter
-fi
+ACUTS_AUTO=EVNDISP.reconstruction.runparameter
 
 [[ "$3" ]] && ACUTS=$3 || ACUTS=$ACUTS_AUTO #EVNDISP.reconstruction.runparameter
-#[[ "$3" ]] && ACUTS=$3 || ACUTS=EVNDISP.reconstruction.runparameter
 [[ "$4" ]] && CALIB=$4 || CALIB=1
 [[ "$5" ]] && MODEL3D=$5 || MODEL3D=0
 [[ "$6" ]] && TELTOANA=$6 || TELTOANA=1234
@@ -122,6 +112,14 @@ TIMETAG=`date +"%s"`
 NRUNS=`cat $RLIST | wc -l ` 
 echo "total number of runs to analyze: $NRUNS"
 echo
+
+# sleep required for large data sets to avoid overload
+# of database and many jobs running in parallel
+SLEEPABIT="1s"
+if [ "$NRUNS" -gt "100" ] ; then
+   SLEEPABIT="30s"
+   echo "Long list of runs (${NRUNS}), will sleep after each run for ${SLEEPABIT}"
+fi
 
 #########################################
 # loop over all files in files loop
@@ -190,6 +188,8 @@ do
     elif [[ "$SUBC" == *simple* ]] ; then
 	"$FSCRIPT.sh" |& tee "$FSCRIPT.log"	
     fi
+
+    sleep ${SLEEPABIT}
 done
 
 # Execute all FSCRIPTs locally in parallel

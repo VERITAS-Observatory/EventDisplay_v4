@@ -70,7 +70,7 @@ fi
 
 # run scripts and output are written into this directory
 DATE=`date +"%y%m%d"`
-LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/MSCW.MAKETABLES"
+LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/MSCW.MAKETABLES/$(date +%s | cut -c -8)/"
 echo -e "Log files will be written to:\n$LOGDIR"
 mkdir -p $LOGDIR
 

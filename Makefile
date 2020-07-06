@@ -37,7 +37,7 @@ ARCH = $(shell uname)
 # basic numbers 
 #############################
 package = EVNDISP
-version = 481
+version = 483
 # version of auxiliary files
 auxversion = $(version)-auxv01
 distdir = $(package)-$(version)
@@ -631,7 +631,6 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VSpectralFitter.o ./obj/VSpectralFitter_Dict.o \
 		./obj/VEnergyThreshold.o ./obj/VEnergyThreshold_Dict.o \
 		./obj/VEnergySpectrum.o ./obj/VEnergySpectrum_Dict.o \
-		./obj/VLikelihoodFitter.o ./obj/VLikelihoodFitter_Dict.o  \
 		./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 		./obj/VStar.o ./obj/VStar_Dict.o \
 		./obj/VASlalib.o ./obj/VASlalib_Dict.o \
@@ -705,6 +704,9 @@ ifeq ($(ROOT_MINUIT2),yes)
   ifneq ($(ROOT6),0)
     SHAREDOBJS	+= ./obj/VSourceGeometryFitter.o ./obj/VSourceGeometryFitter_Dict.o
   endif
+endif
+ifneq ($(GSLFLAG),-DNOGSL)
+  SHAREDOBJS	+= ./obj/VLikelihoodFitter.o ./obj/VLikelihoodFitter_Dict.o
 endif
 
 ifneq ($(FITS),FALSE)
@@ -979,7 +981,6 @@ WRITEVTSPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 			./obj/VRunList.o ./obj/VRunList_Dict.o \
 			./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
 			./obj/VEnergySpectrum.o ./obj/VEnergySpectrum_Dict.o \
-			./obj/VLikelihoodFitter.o ./obj/VLikelihoodFitter_Dict.o \
 			./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o  \
 			./obj/VDifferentialFlux.o ./obj/VDifferentialFlux_Dict.o \
 			./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
@@ -991,6 +992,10 @@ WRITEVTSPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 			./obj/VStatistics_Dict.o \
 			./obj/VUtilities.o \
 			./obj/Ctelconfig.o
+
+ifneq ($(GSLFLAG),-DNOGSL)
+  WRITEVTSPHYSOBJ	+= ./obj/VLikelihoodFitter.o ./obj/VLikelihoodFitter_Dict.o
+endif
 
 ./obj/writeVTSWPPhysSensitivityFiles.o: 	./src/writeVTSWPPhysSensitivityFiles.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -1830,7 +1835,7 @@ printconfig configuration config:
 	@echo "    compiled with MLP: $(ROOT_MLP), MINUIT2: $(ROOT_MINUIT2), MYSQL: $(ROOT_MYSQL), DCACHE: $(ROOT_DCACHE), MATHMORE: $(ROOT_MATHMORE)"
 	@echo ""
 ifeq ($(GSLFLAG),-DNOGSL)
-	@echo "evndisp without GSL libraries (no frogs, no Hough muon calibration)"
+	@echo "evndisp without GSL libraries (no frogs, no Hough muon calibration, no likelihood fitter)"
 else
 	@echo "evndisp with GSL libraries (used in frogs, Hough muon calibration)"
 endif

@@ -28,6 +28,7 @@ class VDifferentialFlux : public TObject
 		double Energy_Hz;                         // [Hz]
 		double EnergyWeightedMean;                // [TeV]
 		double dE;                                // size of energy bin (in TeV)
+                double EffectiveArea;                     // [m2]
 		double DifferentialFlux;                  // [1/cm2/s/TeV]
 		double DifferentialFluxError;             // [1/cm2/s/TeV]
 		double DifferentialFluxError_up;             // [1/cm2/s/TeV]
@@ -55,6 +56,6 @@ class VDifferentialFlux : public TObject
 		double convertPhotonFlux_to_Ergs( double energy_TeV, double flux_photons_per_cm2_s, bool bLin = true );
 		double nuFnu( double F, double gamma, double e1, double e2, double e3 = -9999. );
 		
-		ClassDef( VDifferentialFlux, 7 ); // Bagmeet: added a function to print differential flux outputs cleanly
+		ClassDef( VDifferentialFlux, 8 );
 };
 #endif

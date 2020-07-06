@@ -2,7 +2,6 @@
 # script to analyse data files with anasum (parallel analysis)
 
 # qsub parameters
-# h_cpu=11:29:00; h_vmem=4000M; tmpdir_size=1G
 h_cpu=0:59:00; h_vmem=4000M; tmpdir_size=1G
 
 if [ $# -ne 4 ]; then
@@ -53,7 +52,8 @@ fi
 exec 5>&1
 
 # Check that run parameter file exists
-if [[ "$RUNP" == `basename $RUNP` ]]; then
+if [[ ! -e "$RUNP" ]]; then
+    #if [[ "$RUNP" == `basename $RUNP` ]]; then
     RUNP="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/$RUNP"
 fi
 if [ ! -f "$RUNP" ]; then

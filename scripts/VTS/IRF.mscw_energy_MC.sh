@@ -74,24 +74,18 @@ if [[ "$TABFILE" == `basename $TABFILE` ]]; then
     TABFILE="$VERITAS_EVNDISP_AUX_DIR/Tables/$TABFILE"
 fi
 if [[ ! -f "$TABFILE" ]]; then
-    echo "Error, table file not found, exiting..."
+    echo "Error, table file $TABFILE not found, exiting..."
     exit 1
 fi
 
 # Hack to scale sizes based on epochs to approx. correct for drop in reflectivity+gain.
-_sizecallineraw=$(grep "* T " ${VERITAS_EVNDISP_AUX_DIR}/ParameterFiles/MSCW.sizecal.runparameter | grep " ${EPOCH} ")
+_sizecallineraw=$(grep "* s " ${VERITAS_EVNDISP_AUX_DIR}/ParameterFiles/MSCW.sizecal.runparameter | grep " ${EPOCH} ")
 EPOCH_LABEL=$(echo "$_sizecallineraw" | awk '{print $3}')
 EPOCH_T1SCALE=$(echo "$_sizecallineraw" | awk '{print $4}')
 EPOCH_T2SCALE=$(echo "$_sizecallineraw" | awk '{print $5}')
 EPOCH_T3SCALE=$(echo "$_sizecallineraw" | awk '{print $6}')
 EPOCH_T4SCALE=$(echo "$_sizecallineraw" | awk '{print $7}')
-EPOCH_SIMS=$(echo "$EPOCH_LABEL" | awk -F"_" '{print $1}')
 
-# Validation of the line
-if [ "${EPOCH_SIMS}" != "V4" ]&&[ "${EPOCH_SIMS}" != "V5" ]&&[ "${EPOCH_SIMS}" != "V6" ]; then
-    echo "$EPOCH LABEL ${EPOCH_LABEL} should include either V4, V5 or V6 plus maybe a suffix separated by _"
-    exit 1
-fi
 if ! [ $(echo ${EPOCH_T1SCALE} | awk '$1>0.0 && $1<2.0 {print 1}')==1 ]; then
     echo "T1 SCALING ${EPOCH_T1SCALE} is invalid"
     exit 1
@@ -113,8 +107,7 @@ SIZESCALING="$EPOCH_T1SCALE,$EPOCH_T2SCALE,$EPOCH_T3SCALE,$EPOCH_T4SCALE"
 
 # input directory containing evndisp products
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-    #INDIR="$VERITAS_IRFPRODUCTION_DIR/$IRFVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
-    INDIR="$VERITAS_IRFPRODUCTION_DIR/$IRFVERSION/$SIMTYPE/${EPOCH_SIMS}_ATM${ATM}_${PARTICLE_TYPE}/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
+    INDIR="$VERITAS_IRFPRODUCTION_DIR/$IRFVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
 fi
 if [[ ! -d $INDIR ]]; then
     echo -e "Error, could not locate input directory. Locations searched:\n $INDIR"
@@ -122,12 +115,9 @@ if [[ ! -d $INDIR ]]; then
 fi
 echo "Input file directory: $INDIR"
 
-NROOTFILES=$( ls -l $INDIR/*.root | wc -l )
-echo "NROOTFILES $NROOTFILES"
-
 # directory for run scripts
 DATE=`date +"%y%m%d"`
-LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/MSCW.ANATABLES/"
+LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/MSCW.ANATABLES/$(date +%s | cut -c -8)/"
 echo -e "Log files will be written to:\n $LOGDIR"
 mkdir -p $LOGDIR
 
@@ -150,7 +140,6 @@ sed -e "s|INPUTDIR|$INDIR|" \
     -e "s|ZENITHANGLE|$ZA|" \
     -e "s|NOISELEVEL|$NOISE|" \
     -e "s|WOBBLEOFFSET|$WOBBLE|" \
-    -e "s|NFILES|$NROOTFILES|" \
     -e "s|SIZESCALING|$SIZESCALING|" \
     -e "s|RECONSTRUCTIONID|$RECID|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
@@ -161,11 +150,7 @@ echo "Run script written to: $FSCRIPT"
 SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
 SUBC=`eval "echo \"$SUBC\""`
 if [[ $SUBC == *qsub* ]]; then
-    if [[ $NROOTFILES > 1 ]]; then
-      JOBID=`$SUBC -t 1-$NROOTFILES $FSCRIPT.sh`
-	 elif [[ $NROOTFILES == 1 ]]; then
-	   JOBID=`$SUBC $FSCRIPT.sh`
-    fi
+    JOBID=`$SUBC $FSCRIPT.sh`
     echo "JOBID: $JOBID"	  
 elif [[ $SUBC == *parallel* ]]; then
     echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat

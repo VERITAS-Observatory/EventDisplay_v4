@@ -18,10 +18,11 @@ required parameters:
 			
     <runlist>               simple run list with one run number per line.    
     
-optional parameters:
     
-    [evndisp directory]     directory containing evndisp output ROOT files.
+    <evndisp directory>     directory containing evndisp output ROOT files.
 			    Default: $VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/
+
+optional parameters:
 
     [Rec ID]                reconstruction ID. Default 0.
                             (see EVNDISP.reconstruction.runparameter)
@@ -67,8 +68,14 @@ elif [[ "$3" ]]; then
 else
     ODIR=$INPUTDIR
 fi
-[[ "$5" ]] && SIMTYPE=$5 || SIMTYPE="CARE_June1702"
+[[ "$5" ]] && SIMTYPE=$5 || SIMTYPE=""
 [[ "$6" ]] && FORCEDATMO=$6
+
+SIMTYPE_DEFAULT_V4="GRISU"
+SIMTYPE_DEFAULT_V5="GRISU"
+SIMTYPE_DEFAULT_V6="CARE_June1702"
+SIMTYPE_DEFAULT_V6_REDHV="CARE_RedHV"
+
 
 # Read runlist
 if [ ! -f "$RLIST" ] ; then
@@ -103,15 +110,43 @@ do
     BFILE="$INPUTDIR/$AFILE.root"
     echo "Now analysing $BFILE (ID=$ID)"
 
+    if [ ! -e "$BFILE" ]; then
+        echo "ERR: File $BFILE does not exist !!!" >> mscw.errors.log
+        continue
+    fi
+
     RUNINFO=`$EVNDISPSYS/bin/printRunParameter $BFILE -runinfo`
     EPOCH=`echo $RUNINFO | awk '{print $(1)}'`
     ATMO=${FORCEDATMO:-`echo $RUNINFO | awk '{print $(3)}'`}
+    HVSETTINGS=`echo $RUNINFO | awk '{print $(4)}'`
     if [[ $ATMO == *error* ]]; then
         echo "error finding atmosphere; skipping run $BFILE"
         continue
     fi
 
-    TABFILE=table-${IRFVERSION}-auxv01-${SIMTYPE}-ATM${ATMO}-${EPOCH}-GEO.root
+    if [ "$SIMTYPE" == "" ]
+    then
+        if [ "$EPOCH" == "V4" ]
+        then
+            SIMTYPE_RUN="$SIMTYPE_DEFAULT_V4"
+            ATMO=$[${ATMO}-40]
+        elif [ "$EPOCH" == "V5" ]
+        then
+            SIMTYPE_RUN="$SIMTYPE_DEFAULT_V5"
+            ATMO=$[${ATMO}-40]
+        else
+            if [ "$HVSETTINGS" == "obsLowHV" ]; then
+                SIMTYPE_RUN="$SIMTYPE_DEFAULT_V6_REDHV"
+                ATMO="61"
+            else
+                SIMTYPE_RUN="$SIMTYPE_DEFAULT_V6"
+            fi
+        fi
+    else
+        SIMTYPE_RUN="$SIMTYPE"
+    fi
+
+    TABFILE=table-${IRFVERSION}-auxv01-${SIMTYPE_RUN}-ATM${ATMO}-${EPOCH}-GEO.root
     echo $TABFILE
     # Check that table file exists
     if [[ "$TABFILE" == `basename $TABFILE` ]]; then

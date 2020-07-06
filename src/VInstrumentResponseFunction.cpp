@@ -24,13 +24,14 @@ VInstrumentResponseFunction::VInstrumentResponseFunction()
 	setContainmentProbability();
         setTelescopeTypeCuts();
         setDuplicationID();
+        setRunParameter();
 }
 
 void VInstrumentResponseFunction::setRunParameter( VInstrumentResponseFunctionRunParameter* iRunPara )
 {
+        fRunPara = iRunPara;
 	if( !iRunPara )
 	{
-		cout << "VInstrumentResponseFunction::setRunParameter error: no run parameter given" << endl;
 		return;
 	}
 	fEnergyReconstructionMethod = iRunPara->fEnergyReconstructionMethod;
@@ -89,13 +90,14 @@ bool VInstrumentResponseFunction::initialize( string iName, string iType, unsign
 		{
 			sprintf( hname, "%s_%d_%d", iName.c_str(), i, j );
 			i_irf.push_back( new VInstrumentResponseFunctionData() );
+			i_irf.back()->setHistogramLogAngbinning( fRunPara->fLogAngularBin );
+			i_irf.back()->setHistogramEbinning( fRunPara->fhistoNEbins );
 			if( !i_irf.back()->initialize( hname, iType, iNTel, iMCMaxCoreRadius ) )
 			{
 				return false;
 			}
 			
 			i_irf.back()->setData( iZe, ( int )j, fVMinAz[j], fVMaxAz[j], iNoise, iPedvars, fVSpectralIndex[i], iXoff, iYoff );
-			i_irf.back()->setHistogrambinning();
 			i_irf.back()->setEnergyReconstructionMethod( fEnergyReconstructionMethod );
 		}
 		fIRFData.push_back( i_irf );
@@ -286,21 +288,6 @@ bool VInstrumentResponseFunction::fillResolutionGraphs( vector< vector< VInstrum
 	return true;
 }
 
-void VInstrumentResponseFunction::setHistogrambinning( int iN, double iMin, double iMax )
-{
-	for( unsigned int i = 0; i < fIRFData.size(); i++ )
-	{
-		for( unsigned int j = 0; j < fIRFData[i].size(); j++ )
-		{
-			if( fIRFData[i][j] )
-			{
-				fIRFData[i][j]->setHistogrambinning( iN, iMin, iMax );
-			}
-		}
-	}
-}
-
-
 void VInstrumentResponseFunction::setDataTree( CData* iData )
 {
 	fData = iData;
@@ -372,27 +359,7 @@ TGraphErrors* VInstrumentResponseFunction::getAngularResolutionGraph( unsigned i
         return 0;
 }
 
-/* //// This is how it is defined in v480e, iAzBin, iSpectralIndexBin seem to be reversed as in v502.
-TGraphErrors* VInstrumentResponseFunction::getAngularResolutionGraph( unsigned int iAzBin, unsigned int iSpectralIndexBin )
-{
-	if( iAzBin < fIRFData.size() && iSpectralIndexBin < fIRFData[iAzBin].size() && fIRFData[iAzBin][iSpectralIndexBin] )
-	{
-		return fIRFData[iAzBin][iSpectralIndexBin]->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF];
-	}
-	
-	cout << "VInstrumentResponseFunction::getAngularResolutionGraph: warning index out of range ";
-	cout << iAzBin << "\t" << iSpectralIndexBin << "\t";
-	cout << "(" << fIRFData[iAzBin].size();
-	if( fIRFData.size() )
-	{
-		cout << "\t" << fIRFData[iAzBin].size();
-	}
-	cout << ")" << endl;
-	
-	return 0;
-}
-*/
-
+// In v480e  iAzBin, iSpectralIndexBin seem to be reversed.
 vector< TH2D* > VInstrumentResponseFunction::getAngularResolution2D( unsigned int iAzBin, unsigned int iSpectralIndexBin )
 {
     vector< TH2D* > h;

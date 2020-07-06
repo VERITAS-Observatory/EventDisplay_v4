@@ -168,6 +168,10 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		int    fCalibrationSumFirst;              // starting point all calibration calculation
 		float  fCalibrationIntSumMin;             // minimum integrated charge in a channel and event to be taken into account in gain or tzero calibration runs
 		string fsetSpecialChannels;               // set channels with L2 channels to correct for FADC crate time offsets (file name of channel settings)
+                string fthroughputCorrectionFile;         // throughput correction (e.g., mirror reflectivity or gain loss) --> applied after pixel integration
+                string ftraceamplitudecorrectionFile;     // throughput correction file (e.g., mirror reflectivity or gain loss) --> applied to FADC values
+                vector< float > fthroughoutCorrectionSFactor; // throughput correction (e.g., mirror reflectivity and gain loss) --> applied to FADC values
+                vector< float > fthroughoutCorrectionGFactor; // throughput correction (e.g., gain loss) --> applied to FADC values
 		bool   fL2TimeCorrect;                    // use L2 pulses to correct FADC times (default: on )
 		unsigned fCalibrationDataType;            // for DSTs: kind of calibration data available: 1: full (peds, pedvars, etc). 0: (no calibration data)
 		
@@ -237,6 +241,8 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   fsimu_HILO_from_simFile;           // read hilo multiplier from MC header in vbf file
 		int    fIsMC;                             // source data is Monte Carlo (==1 write all MC events, ==2 write only triggered events)
 		bool   fIgnoreCFGversions;                // ignore configuration file versions
+                double finjectGaussianNoise;              // add Gaussian noise to trace (standard deviation in units of DC)
+                UInt_t finjectGaussianNoiseSeed;          // seed for random Gaussian noise to trace adding
 		
 		int fgrisuseed;
 		int ftelescopeNOffset;                    // offset in telescope numbering (default: first tele = 0 ), for GrIsu Reader
@@ -340,6 +346,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fuseDB;
 		}
 		
-		ClassDef( VEvndispRunParameter, 163 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 166 ); //(increase this number)
 };
 #endif

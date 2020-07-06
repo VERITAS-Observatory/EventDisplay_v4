@@ -3,14 +3,15 @@
 #
 
 # qsub parameters
-h_cpu=47:59:00; h_vmem=6000M; tmpdir_size=250G
+#h_cpu=47:59:00; h_vmem=6000M; tmpdir_size=250G
+h_cpu=47:59:00; h_vmem=6000M; tmpdir_size=450G
 
 if [ $# -lt 7 ]; then
 # begin help message
 echo "
 IRF generation: analyze simulation VBF files using evndisp 
 
-IRF.evndisp_MC.sh <sim directory> <epoch> <atmosphere> <zenith> <offset angle> <NSB level> <sim type> <runparameter file>  [particle] [Model3D] [FROGS] [events] [Rec ID]
+IRF.evndisp_MC.sh <sim directory> <epoch> <atmosphere> <zenith> <offset angle> <NSB level> <sim type> <runparameter file>  [particle] [events]
 
 required parameters:
 
@@ -34,15 +35,7 @@ required parameters:
 
     <runparameter file>     file with integration window size and reconstruction cuts/methods, expected in $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/
 
-                            Default: EVNDISP.reconstruction.runparameter (long sumwindow -> for use with CARE IRFs; DISP disabled )
-
-                            other options:
-
-                            EVNDISP.reconstruction.runparameter.DISP              (long sumwindow -> for use with CARE IRFs;
-                                                                                  DISP enabled, use RecID 1 in later stages to access it)
-                                                                                 
-                            EVNDISP.reconstruction.runparameter.SumWindow6-noDISP (short sumwindow -> for use with grisu IRFs; DISP disabled)
-                            EVNDISP.reconstruction.runparameter.SumWindow6-DISP   (short sumwindow -> for use with grisu IRFs; DISP enabled [RecID 1])
+                            Default: EVNDISP.reconstruction.runparameter (DISP disabled )
 
 optional parameters:
     
@@ -50,14 +43,8 @@ optional parameters:
                             gamma = 1, electron = 2, proton = 14, helium = 402
                             (default = 1  -->  gamma)
 
-    [Model3D]               set to 1 to use Model3D (default: off)
-    
-    [FROGS]                 set to 1 to use FROGS (GrISU only! default: off)
-    
-    [events]                FROGS ONLY: number of events per division
+    [events]                number of events per division
                             (default: -1)
-
-    [Rec ID]                FROGS ONLY: reconstruction ID used at the MSCW stage                         
 
 Note: zenith angles, wobble offsets, and noise values are hard-coded into script
 
@@ -73,6 +60,7 @@ bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
 
 # EventDisplay version
 EDVERSION=`$EVNDISPSYS/bin/evndisp --version | tr -d .`
+EDVERSION="v483"
 
 # Parse command line arguments
 SIMDIR=$1
@@ -84,10 +72,7 @@ NOISE=$6
 SIMTYPE=$7
 [[ "$8" ]] && ACUTS=$8 || ACUTS=EVNDISP.reconstruction.runparameter
 [[ "$9" ]] && PARTICLE=$9 || PARTICLE=1
-[[ "${10}" ]] && USEMODEL3D=${10} || USEMODEL3D=0
-[[ "${11}" ]] && USEFROGS=${11} || USEFROGS=0
-[[ "${12}" ]] && NEVENTS=${12}  || NEVENTS=-1
-[[ "${13}" ]] && RECID=${13}  || RECID=0
+[[ "${10}" ]] && NEVENTS=${10}  || NEVENTS=-1
 
 # Particle names
 PARTICLE_NAMES=( [1]=gamma [2]=electron [14]=proton [402]=alpha )
@@ -108,23 +93,18 @@ mkdir -p $OPDIR
 chmod -R g+w $OPDIR
 echo -e "Output files will be written to:\n $OPDIR"
 
-[[ $USEFROGS != 0 ]] && ODIR="${ODIR}_FROGS" && MSCWDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/MSCW_RECID$RECID"
-
 echo "Using runparameter file $ACUTS"
 
 # Create a unique set of run numbers
 if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
-    [[ $EPOCH == "V4" ]] && RUNNUM="946500"
-    [[ $EPOCH == "V5" ]] && RUNNUM="956500"
-    [[ $EPOCH == "V6" ]] && RUNNUM="966500"
+    [[ ${EPOCH:0:2} == "V4" ]] && RUNNUM="946500"
+    [[ ${EPOCH:0:2} == "V5" ]] && RUNNUM="956500"
+    [[ ${EPOCH:0:2} == "V6" ]] && RUNNUM="966500"
 elif [ ${SIMTYPE:0:4} = "CARE" ]; then
-    [[ $EPOCH == "V4" ]] && RUNNUM="941200"
-    [[ $EPOCH == "V5" ]] && RUNNUM="951200"
-    [[ $EPOCH == "V6" ]] && RUNNUM="961200"
+    [[ ${EPOCH:0:2} == "V4" ]] && RUNNUM="941200"
+    [[ ${EPOCH:0:2} == "V5" ]] && RUNNUM="951200"
+    [[ ${EPOCH:0:2} == "V6" ]] && RUNNUM="961200"
 fi
-
-# Job submission script
-SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.evndisp_MC_sub"
 
 INT_WOBBLE=`echo "$WOBBLE*100" | bc | awk -F '.' '{print $1}'`
 if [[ ${#INT_WOBBLE} -lt 2 ]]; then
@@ -133,40 +113,128 @@ elif [[ ${#INT_WOBBLE} -lt 3 ]]; then
    INT_WOBBLE="0$INT_WOBBLE"
 fi
 
-# make run script
-FSCRIPT="$LOGDIR/evn-$EPOCH-$SIMTYPE-$ZA-$WOBBLE-$NOISE-ATM$ATM"
-sed -e "s|DATADIR|$SIMDIR|" \
-    -e "s|RUNNUMBER|$RUNNUM|" \
-    -e "s|ZENITHANGLE|$ZA|" \
-    -e "s|ATMOSPHERE|$ATM|" \
-    -e "s|OUTPUTDIR|$OPDIR|" \
-    -e "s|DECIMALWOBBLE|$WOBBLE|" \
-    -e "s|INTEGERWOBBLE|$INT_WOBBLE|" \
-    -e "s|NOISELEVEL|$NOISE|" \
-    -e "s|ARRAYEPOCH|$EPOCH|" \
-    -e "s|USEMODEL3DMETHOD|$USEMODEL3D|" \
-    -e "s|FROGSFROGS|$USEFROGS|" \
-    -e "s|FROGSMSCWDIR|$MSCWDIR|" \
-    -e "s|FROGSEVENTS|$NEVENTS|" \
-    -e "s|RECONSTRUCTIONRUNPARAMETERFILE|$ACUTS|" \
-    -e "s|SIMULATIONTYPE|$SIMTYPE|" \
-    -e "s|PARTICLETYPE|$PARTICLE|" $SUBSCRIPT.sh > $FSCRIPT.sh
+################################################################
+# Find simulation file depending on the type of simulations
+# VBFNAME - name of VBF file
+# NOISEFILE - noise library (in grisu format)
+VBFNAME="NO_VBFNAME"
+NOISEFILE="NO_NOISEFILE"
 
-chmod u+x $FSCRIPT.sh
-echo $FSCRIPT.sh
-
-# run locally or on cluster
-SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
-SUBC=`eval "echo \"$SUBC\""`
-if [[ $SUBC == *qsub* ]]; then
-    if [[ $NEVENTS -gt 0 ]]; then
-		  JOBID=`$SUBC -t 1-10 $FSCRIPT.sh`
-    elif [[ $NEVENTS -lt 0 ]]; then
-        JOBID=`$SUBC $FSCRIPT.sh`
-    fi      
-    echo "RUN $RUNNUM: JOBID $JOBID"
-elif [[ $SUBC == *parallel* ]]; then
-    echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
+# GRISU simulations
+if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
+    # Input files (observe that these might need some adjustments)
+    if [[ ${EPOCH:0:2} == "V4" ]]; then
+        if [[ $ATM == "21" ]]; then
+            VBFNAME=$(find ${SIMDIR}/ -maxdepth 1 -name "Oct2012_oa_ATM21_${ZA}deg_${INT_WOBBLE}*")
+        else
+            VBFNAME=$(find ${SIMDIR}/ -maxdepth 1 -name "gamma_V4_Oct2012_SummerV4ForProcessing_20130611_v420_ATM${ATM}_${ZA}deg_${INT_WOBBLE}*")
+        fi
+        NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE$NOISE.grisu"
+    elif [[ ${EPOCH:0:2} == "V5" ]]; then
+        VBFNAME=$(find ${SIMDIR}/ -maxdepth 1 -name "gamma_V5_Oct2012_newArrayConfig_20121027_v420_ATM${ATM}_${ZA}deg_${INT_WOBBLE}*")
+        NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE$NOISE.grisu"
+    elif [[ ${EPOCH:0:2} == "V6" ]]; then
+            if [[ $ATM == "21-redHV" ]]; then
+                VBFNAME=$(find ${SIMDIR}/ -maxdepth 1 -name "gamma_V6_Upgrade_ReducedHV_20121211_v420_ATM21_${ZA}deg_${INT_WOBBLE}*")
+            elif [[ $ATM == "21-UV" ]]; then
+                VBFNAME=$(find ${SIMDIR}/ -maxdepth 1 -name "gamma_V6_Upgrade_UVfilters_20121211_v420_ATM21_${ZA}deg_${INT_WOBBLE}*")
+            elif [[ $ATM == "21-SNR" ]]; then
+                VBFNAME=$(find ${SIMDIR}/ -maxdepth 1 -name "gamma_V6_201304_SN2013ak_v420_ATM21_${ZA}deg_${INT_WOBBLE}*")
+            else
+                VBFNAME=$(find ${SIMDIR}/ -maxdepth 1 -name "gamma_V6_Upgrade_20121127_v420_ATM${ATM}_${ZA}deg_${INT_WOBBLE}*")
+            fi
+        NOISEFILE="$OBS_EVNDISP_AUX_DIR/NOISE/NOISE${NOISE}_20120827_v420.grisu"
+    fi
+elif [ ${SIMTYPE:0:10} == "CARE_RedHV" ]; then
+    # example gamma_V6_PMTUpgrade_RHV_CARE_v1.6.2_12_ATM61_zen40deg_050wob_150MHz.cvbf.zst
+    WOFFSET=$(awk -v WB=$WOBBLE 'BEGIN { printf("%03d",100*WB) }')
+    LBL="PMTUpgrade_RHV_CARE_v1.6.2_12"
+    VBFNAME=$(find ${SIMDIR}/ -maxdepth 1 -name "gamma_V6_${LBL}_ATM${ATM}_zen${ZA}deg_${WOFFSET}wob_${NOISE}MHz*")
+elif [ ${SIMTYPE} == "CARE_June2020" ]; then
+    VBFNAME=$(find ${SIMDIR}/Zd${ZA}/merged/Data/ -name "*_${WOBBLE}wob_${NOISE}MHz*.zst")
+    echo _${WOFFSET}wob_${NOISE}MHz
+    echo $SIMDIR/Zd${ZA}/merged/Data/
+elif [ ${SIMTYPE:0:4} == "CARE" ]; then
+    # input files (observe that these might need some adjustments)
+    if [[ $PARTICLE == "1" ]]; then
+       VBFNAME=$(find ${SIMDIR}/ -name "gamma_${ZA}deg*${WOBBLE}wob_${NOISE}mhz*ATM${ATM}*.zst")
+    elif [[ $PARTICLE == "2" ]]; then
+       VBFNAME=$(find ${SIMDIR} -name "electron_${ZA}deg*${WOBBLE}wob_${NOISE}mhz*ATM${ATM}*.zst")
+    elif [[ $PARTICLE == "14" ]]; then
+       VBFNAME=$(find ${SIMDIR} -name "proton_${ZA}deg*${WOBBLE}wob_${NOISE}mhz*ATM${ATM}*.zst")
+    fi
 fi
-                
+#####################################
+# Loop over all VBFFiles
+for V in ${VBFNAME}
+do
+    echo "Processing ${V}"
+    SIMDIR=$(dirname ${V})
+
+    # size of VBF file
+    FF=$(ls -ls -Llh ${V} | awk '{print $1}' | sed 's/,/./g')
+    V=$(basename ${V})
+    echo "SIMDIR: $SIMDIR"
+    echo "VBFILE: ${V} $FF"
+    echo "NOISEFILE: ${NOISEFILE}"
+    # tmpdir requires a safety factor of 2.5 (from unzipping VBF file)
+    TMSF=$(echo "${FF%?}*3.0" | bc)
+    if [[ ${NOISE} -eq 50 ]]; then
+       TMSF=$(echo "${FF%?}*5.0" | bc)
+    fi
+    if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
+       # GRISU files are bzipped and need more space (factor of ~14)
+       TMSF=$(echo "${FF%?}*25.0" | bc)
+    fi
+
+    TMUNI=$(echo "${FF: -1}")
+    tmpdir_size=${TMSF%.*}$TMUNI
+    echo "Setting TMPDIR_SIZE to $tmpdir_size"
+    # determine number of jobs required
+    # (avoid many empty jobs)
+    if [[ ${TMSF%.*} -lt 40 ]]; then
+       NEVENTS="-1"
+    fi
+    echo "Number of events per job: $NEVENTS"
+
+    # Job submission script
+    SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.evndisp_MC_sub"
+
+    # make run script
+    FSCRIPT="$LOGDIR/evn-$EPOCH-$SIMTYPE-$ZA-$WOBBLE-$NOISE-ATM$ATM-${RUNNUM}"
+    sed -e "s|DATADIR|$SIMDIR|" \
+        -e "s|RUNNUMBER|$RUNNUM|" \
+        -e "s|ZENITHANGLE|$ZA|" \
+        -e "s|ATMOSPHERE|$ATM|" \
+        -e "s|OUTPUTDIR|$OPDIR|" \
+        -e "s|DECIMALWOBBLE|$WOBBLE|" \
+        -e "s|INTEGERWOBBLE|$INT_WOBBLE|" \
+        -e "s|NOISELEVEL|$NOISE|" \
+        -e "s|ARRAYEPOCH|$EPOCH|" \
+        -e "s|NENEVENT|$NEVENTS|" \
+        -e "s|RECONSTRUCTIONRUNPARAMETERFILE|$ACUTS|" \
+        -e "s|SIMULATIONTYPE|$SIMTYPE|" \
+        -e "s|VBFFFILE|$V|" \
+        -e "s|NOISEFFILE|$NOISEFILE|"  $SUBSCRIPT.sh > $FSCRIPT.sh
+
+    chmod u+x $FSCRIPT.sh
+    echo $FSCRIPT.sh
+
+    let "RUNNUM = ${RUNNUM} + 100"
+
+    # run locally or on cluster
+    SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
+    SUBC=`eval "echo \"$SUBC\""`
+    if [[ $SUBC == *qsub* ]]; then
+        if [[ $NEVENTS -gt 0 ]]; then
+            JOBID=`$SUBC -t 1-10 $FSCRIPT.sh`
+        elif [[ $NEVENTS -lt 0 ]]; then
+            JOBID=`$SUBC $FSCRIPT.sh`
+        fi      
+        echo "RUN $RUNNUM: JOBID $JOBID"
+    elif [[ $SUBC == *parallel* ]]; then
+        echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
+    fi
+done
+
 exit

@@ -812,6 +812,7 @@ void VFluxCalculation::printResults()
 		printf( "\t NOn: %d, NOff: %d, Norm: %.2f, NDiff: %.1f +- %.1f", ( int )fRunNon[i], ( int )fRunNoff[i], fRunNorm[i] , fRunNdiff[i], fRunNdiffE[i] );
 		printf( ", Rate: %.2f +- %.2f gammas/min", fRunRate[i], fRunRateE[i] );
 		cout << endl;
+                printf( "\t Effective area %.1f m^2", fRunEffArea[i] );
 		printf( "\t Significance: %.1f", fRunSigni[i] );
 		cout << endl;
 		if( fRunUFL[i] < 0. )
@@ -2052,9 +2053,9 @@ void VFluxCalculation::writeResults( char* ofile )
 }
 
 
-void VFluxCalculation::plotFluxesVSPedvars()
+TCanvas* VFluxCalculation::plotFluxesVSPedvars()
 {
-	TCanvas* cFPedvars = new TCanvas( "cFPedvars", "fluxes vs pedvars", 400, 10, 400, 400 );
+	TCanvas* cFPedvars = new TCanvas( "cFPedvars", "fluxes vs pedvars", 400, 10, 1100, 700 );
 	cFPedvars->SetGridx( 0 );
 	cFPedvars->SetGridy( 0 );
 	cFPedvars->Draw();
@@ -2091,6 +2092,8 @@ void VFluxCalculation::plotFluxesVSPedvars()
 	TLine* iL2 = new TLine( gFluxPedvars->GetHistogram()->GetXaxis()->GetXmin(), 0., gFluxPedvars->GetHistogram()->GetXaxis()->GetXmax(), 0. );
 	iL2->SetLineStyle( 2 );
 	iL2->Draw();
+
+        return cFPedvars;
 }
 
 
@@ -2136,12 +2139,12 @@ void VFluxCalculation::plotFluxesVSWobbleOffset()
 }
 
 
-TGraphErrors* VFluxCalculation::plotFluxesVSElevation( bool iDraw, double iConstantValueLine )
+TCanvas* VFluxCalculation::plotFluxesVSElevation( bool iDraw, double iConstantValueLine )
 {
 	TCanvas* cCanvas_FElevation = 0;
 	if( iDraw )
 	{
-		cCanvas_FElevation = new TCanvas( "cCanvas_FElevation", "fluxes vs elevation", 400, 10, 400, 400 );
+		cCanvas_FElevation = new TCanvas( "cCanvas_FElevation", "fluxes vs elevation", 40, 10, 1100, 700 );
 		cCanvas_FElevation->SetGridx( 0 );
 		cCanvas_FElevation->SetGridy( 0 );
 		cCanvas_FElevation->Draw();
@@ -2191,7 +2194,7 @@ TGraphErrors* VFluxCalculation::plotFluxesVSElevation( bool iDraw, double iConst
 		}
 	}
 	
-	return gFluxElevation;
+	return cCanvas_FElevation;
 }
 
 

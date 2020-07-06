@@ -32,8 +32,14 @@ VOnOff::VOnOff()
 VOnOff::~VOnOff()
 {
 	// remove all objects in hList
-	hList->Delete();
-	// remove hList
+        TIter next(hList);
+        while (TObject *obj = next())
+        {
+            if( obj && obj->TestBit( kCanDelete ) )
+            {
+               obj->Delete();
+            }
+        }
 	delete hList;
 }
 
@@ -123,6 +129,18 @@ void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, d
 		
 		// calculate difference
 		itemp = hon->GetName();
+                string i_className = hon->ClassName();
+                if( i_className.find( "TH1" ) != string::npos
+                  && TMath::Abs( hon->GetXaxis()->GetXmax() - hon->GetXaxis()->GetXmin() ) < 1.e3 )
+                {
+                     continue;
+                }
+                if( i_className.find( "TH2" ) != string::npos
+                  && TMath::Abs( hon->GetYaxis()->GetXmax() - hon->GetYaxis()->GetXmin() ) < 1.e3 )
+                {
+                     continue;
+                }
+
 		// htheta2 histogram (note: calculated from one reflected region only!)
 		if( itemp.find( "htheta2" ) == 0 )
 		{
@@ -163,7 +181,15 @@ void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, d
 		}
 		hList->Add( hTemp );
 	}
-	hList->Add( hPList );
+        TIter next(hPList);
+        while (TObject *obj = next())
+        {
+            if( obj )
+            {
+               hList->Add( obj );
+            }
+        }
+
 }
 
 /*

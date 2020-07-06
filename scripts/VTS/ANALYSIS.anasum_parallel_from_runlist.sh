@@ -18,7 +18,7 @@ required parameters:
     <output directory>      anasum output files are written to this directory
                         
     <cut set>               hardcoded cut sets predefined in the script
-                            (e.g., soft2tel, moderate3tel, moderateExt2tel, BDTmoderate2tel, etc.)
+                            (e.g., BDTmoderate2tel, BDTsoft2tel, BDThard3tel etc.)
     
     <background model>      background model
                             (RE = reflected region, RB = ring background, IGNOREACCEPTANCE = RE without ACCEPTANCE)
@@ -66,10 +66,14 @@ CUTS=$3
 BACKGND=$4
 [[ "$5" ]] && RUNP=$5  || RUNP="ANASUM.runparameter"
 [[ "$6" ]] && INDIR=$6 || INDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/"
-[[ "$7" ]] && SIMTYPE=$7 || SIMTYPE="CARE_June1702"
+[[ "$7" ]] && SIMTYPE=$7 || SIMTYPE="DEFAULT"
 [[ "$8" ]] && METH=$8 || METH="GEO"
 [[ "$9" ]] && FORCEDATMO=$9 
 
+SIMTYPE_DEFAULT_V4="GRISU"
+SIMTYPE_DEFAULT_V5="GRISU"
+SIMTYPE_DEFAULT_V6="CARE_June1702"
+SIMTYPE_DEFAULT_V6redHV="CARE_RedHV"
 
 # cut definitions (note: VX to be replaced later in script)
 if [[ $CUTS == superhard ]]; then
@@ -124,12 +128,16 @@ elif [[ $CUTS = BDTmoderateExt3tel ]]; then
     CUT="NTel3-ExtendedSource-Moderate-TMVA-BDT"
 elif [[ $CUTS = BDThardExt3tel ]]; then
     CUT="NTel3-ExtendedSource-Hard-TMVA-BDT"
+elif [[ $CUTS = NTel2ModeratePre ]]; then
+    CUT="NTel2-PointSource-Moderate-TMVA-Preselection"
+elif [[ $CUTS = NTel2SoftPre ]]; then
+    CUT="NTel2-PointSource-Soft-TMVA-Preselection"
 else
     echo "ERROR: unknown cut definition: $CUTS"
     exit 1
 fi
 CUTFILE="ANASUM.GammaHadron-Cut-${CUT}.dat"
-EFFAREA="effArea-${IRFVERSION}-${AUXVERSION}-${SIMTYPE}-Cut-${CUT}-${METH}-VX-ATMXX-TX.root"
+EFFAREA="effArea-${IRFVERSION}-${AUXVERSION}-SX-Cut-${CUT}-${METH}-VX-ATMXX-TX.root"
 
 # remove PointSource and ExtendedSource string from cut file name for radial acceptances names
 if [[ $CUT == *PointSource-* ]] ; then
@@ -140,7 +148,7 @@ elif [[ $CUT == *ExtendedSource-* ]]; then
     echo $CUTRADACC
 fi
 
-RADACC="radialAcceptance-${IRFVERSION}-${AUXVERSION}-${SIMTYPE}-Cut-${CUTRADACC}-${METH}-VX-TX.root"
+RADACC="radialAcceptance-${IRFVERSION}-${AUXVERSION}-SX-Cut-${CUTRADACC}-${METH}-VX-TX.root"
 
 echo $CUTFILE
 echo $EFFAREA
@@ -210,30 +218,50 @@ for RUN in ${RUNS[@]}; do
        echo "error finding atmosphere; skipping run $RUN"
        continue
     fi
+    OBSL=$(echo $RUNINFO | awk '{print $4}')
     TELTOANA=`echo $RUNINFO | awk '{print "T"$(5)}'`
-    echo "RUN $RUN at epoch $EPOCH and atmosphere $ATMO (Telescopes $TELTOANA)"
+    if [[ $EPOCH == *"V4"* ]] || [[ $EPOCH == *"V5"* ]]; then
+        ATMO=${ATMO/6/2}
+    fi
+    if [[ $SIMTYPE == "DEFAULT" ]]; then
+        if [[ $EPOCH == *"V4"* ]]; then
+            REPLACESIMTYPEEff=${SIMTYPE_DEFAULT_V4}
+            REPLACESIMTYPERad=${SIMTYPE_DEFAULT_V4}
+        elif [[ $EPOCH == *"V5"* ]]; then
+            REPLACESIMTYPEEff=${SIMTYPE_DEFAULT_V5}
+            REPLACESIMTYPERad=${SIMTYPE_DEFAULT_V5}
+        elif [[ $EPOCH == *"V6"* ]] && [[ $OBSL == "obsLowHV" ]]; then
+            REPLACESIMTYPEEff=${SIMTYPE_DEFAULT_V6redHV}
+            REPLACESIMTYPERad=${SIMTYPE_DEFAULT_V6}
+        else
+            REPLACESIMTYPEEff=${SIMTYPE_DEFAULT_V6}
+            REPLACESIMTYPERad=${SIMTYPE_DEFAULT_V6}
+        fi
+     else
+        REPLACESIMTYPEEff=${SIMTYPE}
+        REPLACESIMTYPERad=${SIMTYPE}
+     fi
+
+    echo "RUN $RUN at epoch $EPOCH and atmosphere $ATMO (Telescopes $TELTOANA SIMTYPE $REPLACESIMTYPEEff $REPLACESIMTYPERad)"
     echo "File $INDIR/$RUN.mscw.root"
     
     # do string replacements
     EFFAREARUN=${EFFAREA/VX/$EPOCH}
     EFFAREARUN=${EFFAREARUN/TX/$TELTOANA}
     EFFAREARUN=${EFFAREARUN/XX/$ATMO}
+    EFFAREARUN=${EFFAREARUN/SX/$REPLACESIMTYPEEff}
     if [ "$RADACC" != "IGNOREACCEPTANCE" ]; then 
         RADACCRUN=${RADACC/VX/$MAJOREPOCH}
         RADACCRUN=${RADACCRUN/TX/$TELTOANA}
+        RADACCRUN=${RADACCRUN/SX/$REPLACESIMTYPERad}
     else
         RADACCRUN=$RADACC
     fi
     
-    if [[ $CUTS = *frogs* ]]; then
-       RADACCRUN="radialAcceptance-v470-auxv01-CARE_June1425-Cut-NTel2-PointSource-Moderate-GEO-V6-T1234.root"
-       EFFAREARUN="effArea-v461-141017-CARE-N2_001-003-005CU_index2.5-GEO-V6-ATM21-T1234.root"
-    fi
-
-    
     # write line to file
     echo "* $RUN $RUN 0 $CUTFILE $BM $EFFAREARUN $BMPARAMS $RADACCRUN" >> $ANARUNLIST
     echo "* $RUN $RUN 0 $CUTFILE $BM $EFFAREARUN $BMPARAMS $RADACCRUN"
+
 done
 
 # submit the job

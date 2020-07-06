@@ -93,6 +93,55 @@ bool readRunParameter( TFile* fIn, string iPara )
 	return true;
 }
 
+bool readMeanElevation( TFile *fIn )
+{
+	if( !fIn )
+	{
+		return false;
+	}
+        TTree *data = (TTree*)fIn->Get( "data" );
+        if( data )
+        {
+            Double_t TelElevation[VDST_MAXTELESCOPES];
+            data->SetBranchAddress( "TelElevation", TelElevation );
+            data->GetEntry( 0 );
+            double iMean_f = 0.;
+            double iMeanN = 0.;
+            for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
+            {
+                if( TelElevation[i] > 5. )
+                {
+                    iMean_f += TelElevation[i];
+                    iMeanN++;
+                }
+            }
+            if( data->GetEntries() > 1 )
+            {
+                data->GetEntry( data->GetEntries() - 1 );
+                for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
+                {
+                    if( TelElevation[i] > 5. )
+                    {
+                        iMean_f += TelElevation[i];
+                        iMeanN++;
+                    }
+                }
+            }
+            if( iMeanN > 0. )
+            {
+                iMean_f /= iMeanN;
+                cout << "Average elevation: " << iMean_f << endl;
+            }
+        }
+        else
+        {
+            cout << "not implemented" << endl;
+        }
+
+        return true;
+}
+	
+
 
 bool readMCParameter( TFile* fIn, string iPara )
 {
@@ -162,6 +211,7 @@ int main( int argc, char* argv[] )
 		cout << "      -teltoana     print telescope combination used in analysis" << endl;
 		cout << "      -evndispreconstructionparameterfile print evndisp reconstruction parameter file" << endl;
 		cout << "      -runinfo      print relevant run info in one line" << endl;
+                cout << "      -elevation    print (rough) average elevation" << endl;
 		cout << endl;
 		exit( 0 );
 	}
@@ -189,7 +239,11 @@ int main( int argc, char* argv[] )
 	
 	if( fOption.size() > 0 )
 	{
-		if( fOption == "-mcaz" || fOption == "-runnumber" )
+                if( fOption == "-elevation" )
+                {
+                        readMeanElevation( fIn );
+                }
+		else if( fOption == "-mcaz" || fOption == "-runnumber" )
 		{
 			readMCParameter( fIn, fOption );
 		}

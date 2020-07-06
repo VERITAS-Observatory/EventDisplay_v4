@@ -1,12 +1,14 @@
 # Eventdisplay source code (v4xx version only)
 
-Release page: https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_v480
+**released eventdisplay version - to be used for science analysis**
 
-Repository for the Eventdisplay code for the v4xx version. This repository exists mostly for legacy reasons, the development of Eventdisplay is continuing here: (to be filled).
+Main changes with respect to v480 is the implementation of the correction factors to take the lower throughput / gains into account
 
-Corresponding analysis files: https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles/tree/v480
+Release page: https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_v483
 
-Recommended ROOT version is 5.34/32 (this Eventdisplay version is not tested for ROOT 6)
+Repository for the Eventdisplay code for the v483 version. 
+
+Corresponding analysis files: https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles/tree/v483
 
 For older versions of Eventdisplay, see the release pages on the VERITAS wiki:
 https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual#Versions_of_eventdisplay

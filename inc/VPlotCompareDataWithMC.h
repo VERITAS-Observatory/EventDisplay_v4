@@ -72,6 +72,14 @@ class VPlotCompareDataWithMC : public VHistogramUtilities
 		void model3D_vs_energy_plots();
 		void multiplicity_plots();
 		bool openDataFile( string ifile );
+                bool isZombie()
+                {
+                     if( fDataFile )
+                     {
+                         return fDataFile->IsZombie();
+                     }
+                     return true;
+                }
 		void plot( string iPrintName = "" );
 		void plot_energyDependentDistributions( string iVariable, int iRebin = 1, double x_min = 0., double x_max = 1., string iPlot = "SIMSDIFF", int iTelescope = 0 );
 		void single_telescope( int telid = -1 );

@@ -189,11 +189,11 @@ int main( int argc, char* argv[] )
 		}
 		else
 		{
-			f_IRF.back()->setContainmentProbability( f_IRF_ContainmentProbability[i] );
+		 	f_IRF.back()->setContainmentProbability( f_IRF_ContainmentProbability[i] );
 		}
 		f_IRF.back()->initialize( f_IRF_Name[i], f_IRF_Type[i],
-								  fRunPara->telconfig_ntel, fRunPara->fCoreScatterRadius,
-								  fRunPara->fze, fRunPara->fnoise, fRunPara->fpedvar, fRunPara->fXoff, fRunPara->fYoff );
+                                          fRunPara->telconfig_ntel, fRunPara->fCoreScatterRadius,
+                                          fRunPara->fze, fRunPara->fnoise, fRunPara->fpedvar, fRunPara->fXoff, fRunPara->fYoff );
 	}
 	
 	
@@ -311,7 +311,7 @@ int main( int argc, char* argv[] )
 			fMC_histo = new VEffectiveAreaCalculatorMCHistograms();
 			fMC_histo->setMonteCarloEnergyRange( fRunPara->fMCEnergy_min, fRunPara->fMCEnergy_max, TMath::Abs( fRunPara->fMCEnergy_index ) );
 			fMC_histo->initializeHistograms( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex,
-											 fRunPara->fEnergyAxisBins_log10,
+											 fEffectiveAreaCalculator.getEnergyAxis_nbins_defaultValue(),
 											 fEffectiveAreaCalculator.getEnergyAxis_minimum_defaultValue(),
 											 fEffectiveAreaCalculator.getEnergyAxis_maximum_defaultValue() );
 			fMC_histo->fill( fRunPara->fze, c2, fRunPara->fAzimuthBins );

@@ -86,13 +86,13 @@ function IsWinter {
 			if (( "$date" >= "$MINDATE" )) && (( "$date" <= "$MAXDATE" )) ; then
 				
 				# winter
-				if [[ "$ATMOCODE" == "21" ]] ; then
+				if [[ "$ATMOCODE" == "61" ]] || [[ "$ATMOCODE" == "21" ]] ; then
 					echo 1 	
 					#echoerr "$date - winter!"
 					FOUNDATMO=true
 					break
 				# summer
-				elif [[ "$ATMOCODE" == "22" ]] ; then
+				elif [[ "$ATMOCODE" == "62" ]] || [[ "$ATMOCODE" == "22" ]] ; then
 					echo 2
 					#echoerr "$date - summer!"
 					FOUNDATMO=true

@@ -342,27 +342,6 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	vector< double > iRateTime;
 	vector< double > iRateTimeIntervall;
 
-	// get effective area time bin vector
-	int i_t_bins = int( ( f_t_in_s_max[irun] - f_t_in_s_min[irun] ) / fRunPara->fTimeIntervall + 0.5 );
-	double i_time_intervall = 0.;
-	if( i_t_bins != 0. )
-	{
-		i_time_intervall = ( f_t_in_s_max[irun] - f_t_in_s_min[irun] ) / ( ( double )i_t_bins );
-	}
-	else
-	{
-		cout << "VStereoAnalysis::fillHistograms error: 0 time bins for effective area vector" << endl;
-		cout << "exiting..." << endl;
-		exit( EXIT_FAILURE );
-	}
-
-
-	double iEffAreaTimeBin[i_t_bins + 1];
-	for( int i = 0; i < i_t_bins + 1; i++ )
-	{
-		iEffAreaTimeBin[i] = f_t_in_s_min[irun] + i * i_time_intervall;
-	}
-
 	// initialize time mask
 	fTimeMask->setMask( irun, iMJDStart, iMJDStopp, fRunPara->fTimeMaskFile );
 

@@ -67,6 +67,8 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fPrintAnalysisProgress = 25000;
 	fRunDuration = 60. * 3600.;        // default run duration is 1 h (reset by DBRunInfo)
 	fPrintGrisuHeader = 0;
+        finjectGaussianNoise = -1.;
+        finjectGaussianNoiseSeed = 0;
 	
 	fprintdeadpixelinfo = false ; // DEADCHAN if true, print list of dead pixels to evndisp.log
 	
@@ -188,6 +190,8 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fCalibrationIntSumMin = 50.;
 	fL2TimeCorrect = true;
 	fsetSpecialChannels = "EVNDISP.specialchannels.dat";
+        fthroughputCorrectionFile = "";
+        ftraceamplitudecorrectionFile = "";
 	ftracefit = -1.;
 	ftracefitfunction = "ev";
 	freconstructionparameterfile = "EVNDISP.reconstruction.runparameter";
@@ -506,6 +510,10 @@ void VEvndispRunParameter::print( int iEv )
 	{
 		cout << "number of events to analyse: " << fnevents << endl;
 	}
+        if( fFirstEvent > 0 )
+        {
+               cout << "starting analysis at event:  " << fFirstEvent << endl;
+        }
 	if( fTimeCutsMin_min > 0 )
 	{
 		cout << "start analysing at minute " << fTimeCutsMin_min << endl;
@@ -565,6 +573,12 @@ void VEvndispRunParameter::print( int iEv )
 			cout << "using pedestal events for pedestal calculation" << endl;
 		}
 	}
+        if( finjectGaussianNoise > 0. )
+        {
+                 cout << "Injecting Gaussian noise with standard deviation " << finjectGaussianNoise;
+                 cout << " (seed " << finjectGaussianNoiseSeed << ")";
+                 cout << endl;
+        }
 	if( fsimu_HILO_from_simFile )
 	{
 		cout << "reading hilo multiplier from MC run header" << endl;
@@ -601,6 +615,15 @@ void VEvndispRunParameter::print( int iEv )
 		}
 		cout << endl;
 		cout << "setting special channels (e.g. with L2 signal): " << fsetSpecialChannels << endl;
+                if( fthroughputCorrectionFile.size() > 0 )
+                {
+                    cout << "setting throughput correction from file: " << fthroughputCorrectionFile << endl;
+                }
+                if( ftraceamplitudecorrectionFile.size() )
+                {
+                    cout << "setting throughput correction from file (FADC): ";
+                    cout << ftraceamplitudecorrectionFile << endl;
+                }
 		cout << "pulse timing levels: ";
 		for( unsigned int i = 0; i < fpulsetiminglevels.size(); i++ )
 		{

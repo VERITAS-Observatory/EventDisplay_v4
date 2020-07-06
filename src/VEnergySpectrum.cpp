@@ -1081,6 +1081,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			if( hEffArea && hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) ) > 0. )
 			{
 				i_flux.DifferentialFlux /= ( hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) ) * 1.e4 );
+                                i_flux.EffectiveArea = hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) );
 			}
 			else
 			{
@@ -1117,6 +1118,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 					i_flux.DifferentialFlux /= i_flux.dE;
 					i_flux.DifferentialFlux /= i_flux.ObsTime;
 					i_flux.DifferentialFlux /= ( hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) ) * 1.e4 );
+                                        i_flux.EffectiveArea = hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) );
 				}
 			}
 			else
@@ -1377,6 +1379,7 @@ TF1* VEnergySpectrum::fitEnergySpectrum( string iname, bool bDraw )
 				f->Draw( "same" );
 			}
 			// print results
+                        cout << "Fit Results" << endl;
 			fSpectralFitter->print();
 			// return pointer to fit function
 			return f;
@@ -1494,6 +1497,15 @@ void VEnergySpectrum::plotFitValues()
 		// 4) curved power law
 		sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f + (%.2f#pm%.2f)E} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE, i_curvatureV, i_curvatureE );
 	}
+	else if( fSpectralFitFunction == 4 )
+	{
+		// get curvature index
+		i_curvatureV = fEnergy->GetParameter( 2 );
+		i_curvatureE = fEnergy->GetParError( 2 );
+		
+		// 4) curved power law
+		sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f + (%.2f#pm%.2f)lg E/%.2f} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE, i_curvatureV, i_curvatureE, fSpectralFitter->getSpectralFitNormalisationEnergy() );
+        }
 	
 	
 	tL2->SetNDC( 1 );
@@ -1985,7 +1997,7 @@ int VEnergySpectrum::getRebinningGrouping( TH1* h, double iNewBinWidth )
    short cut to plot the Crab Nebula spectra (sets axis correctly, etc)
 
 */
-TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierIndex, double i_FitStart_TevLin, double i_FitStop_TeVLin, double i_EnergyBinningLog10 )
+TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierIndex, double i_FitStart_TevLin, double i_FitStop_TeVLin, double i_EnergyBinningLog10, int iFitFunctionID )
 {
 	// binning and statistics
 	setEnergyBinning( i_EnergyBinningLog10 );
@@ -2004,15 +2016,41 @@ TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierInde
 	// plot & fit
 	TCanvas* c = plot();
 	
-	setSpectralFitFluxNormalisationEnergy( 1. );
-	setSpectralFitRangeLin( i_FitStart_TevLin, i_FitStop_TeVLin );
-	fitEnergySpectrum();
-	if( iPlottingMultiplierIndex < 2. )
-	{
-		plotFitValues();
-		plotEventNumbers();
-	}
-	plotResiduals();
+        if( iFitFunctionID >= 0 )
+        {
+            setSpectralFitFunction( iFitFunctionID );
+            setSpectralFitFluxNormalisationEnergy( 1. );
+            // set fit range
+            if( i_FitStart_TevLin > 0. && i_FitStop_TeVLin > 0. )
+            {
+                setSpectralFitRangeLin( i_FitStart_TevLin, i_FitStop_TeVLin );
+            }
+            // set fit range from first to last point
+            else
+            {
+                if( gEnergySpectrum )
+                {
+                    double x, y;
+                    double i_xmin = 1.e9;
+                    double i_xmax = -1.e9;
+                    for( int p = 0; p < gEnergySpectrum->GetN(); p++ )
+                    {
+                         gEnergySpectrum->GetPoint( p, x , y );
+                         x = TMath::Power( 10., x );
+                         if( x > i_xmax ) i_xmax = x;
+                         if( x < i_xmin ) i_xmin = x;
+                    }
+                    setSpectralFitRangeLin( i_xmin, i_xmax );
+                }
+            }
+            fitEnergySpectrum();
+            if( iPlottingMultiplierIndex < 2. )
+            {
+                    plotFitValues();
+                    plotEventNumbers();
+            }
+            plotResiduals();
+        }
 	plotLifeTimevsEnergy();
 	plotCountingHistograms();
 	plotMeanEffectiveArea();
@@ -2047,6 +2085,9 @@ TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierInde
 		l.listValues( 10 );
 		l.plot( 10, c );
 	}
+        l.setPlottingStyle( 800, 4, 4, 25 );
+        l.listValues( 11 );
+        l.plot( 11, c );
 	
 	plot( c );
 	

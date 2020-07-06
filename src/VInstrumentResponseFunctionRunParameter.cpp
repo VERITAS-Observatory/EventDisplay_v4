@@ -23,6 +23,12 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
 	fMCEnergy_min = -99.;
 	fMCEnergy_max = -99.;
 	fMCEnergy_index = 5.;
+
+        // IRF histogram bin definition
+        fBiasBin = 300;                       // Energy bias (bias bins)
+        fLogAngularBin = 100;                 // Angular resolution Log10 (bins)
+        fResponseMatricesEbinning = 500;      // bins in the ResponseMatrices 
+        fhistoNEbins = fEnergyAxisBins_log10; // E binning (affects 2D histograms only)
 	
 	fCutFileName = "";
 	fGammaHadronCutSelector = -1;
@@ -159,7 +165,39 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 				{
 					is_stream >> fEnergyAxisBins_log10;
 				}
-			}
+    			}
+			// number of bins on log10 energy axis - IRF histograms only (allows re-binning)
+			else if( temp == "ENERGYAXISBINHISTOS" )
+			{
+				if( !(is_stream>>std::ws).eof() )
+				{
+					is_stream >> fhistoNEbins;
+				}
+    			}
+			// number of bins on energy bias - IRF histograms only
+			else if( temp == "EBIASBINHISTOS" )
+			{
+				if( !(is_stream>>std::ws).eof() )
+				{
+					is_stream >> fBiasBin;
+				}
+    			}
+			// number of bins on angular resolution - IRF histograms only
+			else if( temp == "ANGULARRESOLUTIONBINHISTOS" )
+			{
+				if( !(is_stream>>std::ws).eof() )
+				{
+					is_stream >> fLogAngularBin;
+				}
+    			}
+			// number of fine-bins for the response matrices (likelihood analysis)
+			else if( temp == "RESPONSEMATRICESEBINS" )
+			{
+				if( !(is_stream>>std::ws).eof() )
+				{
+					is_stream >> fResponseMatricesEbinning;
+				}
+    			}
 			// energy reconstruction quality
 			else if( temp == "ENERGYRECONSTRUCTIONQUALITY" )
 			{
