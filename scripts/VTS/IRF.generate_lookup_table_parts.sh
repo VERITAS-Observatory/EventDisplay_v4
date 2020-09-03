@@ -112,7 +112,7 @@ SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.lookup_table_parallel_sub"
 # loop over all zenith angles, wobble offsets, and noise bins
 echo "Processing Zenith = $ZA, Wobble = $WOBBLE, Noise = $NOISE"
 
-FSCRIPT="$LOGDIR/$EPOCH-MK-TBL.$DATE.MC-$ZA-$WOBBLE-$NOISE-$EPOCH-$ATM-$RECID"
+FSCRIPT="$LOGDIR/$EPOCH-MK-TBL.$DATE.MC-$SIMTYPE-$ZA-$WOBBLE-$NOISE-$EPOCH-$ATM-$RECID"
 rm -f $FSCRIPT.sh
 
 sed -e "s|ZENITHANGLE|$ZA|" \

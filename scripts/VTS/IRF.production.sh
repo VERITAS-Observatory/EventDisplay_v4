@@ -121,9 +121,6 @@ else
     echo "Invalid simulation type. Exiting..."
     exit 1
 fi
-echo "Zenith Angles: ${ZENITH_ANGLES}"
-echo "NSB levels: ${NSB_LEVELS}"
-echo "Wobble offsets: $WOBBLE_OFFSETS"
 
 # Set gamma/hadron cuts
 if [[ $CUTSLISTFILE != "" ]]; then
