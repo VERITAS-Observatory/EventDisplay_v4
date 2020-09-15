@@ -2184,7 +2184,7 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c, double i_xderot, do
 	fTreeSelected_Time = c->Time;
 	fTreeSelected_NImages = c->NImages;
 	fTreeSelected_ImgSel = c->ImgSel;
-	fTreeSelected_theta2 = c->theta2;
+	fTreeSelected_theta2 = i_theta2;
 	fTreeSelected_Xoff = c->Xoff;
 	fTreeSelected_Yoff = c->Yoff;
 	fTreeSelected_Xoff_derot = c->Xoff_derot;
