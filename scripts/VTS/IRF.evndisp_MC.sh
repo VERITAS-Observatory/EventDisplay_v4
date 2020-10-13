@@ -169,7 +169,6 @@ if [ -e $OPDIR ]; then
     if [ ! -e $OPDIR/${RUNNUM}.root ]; then
         toexec=1
     else
-        
         for edlog in $OPDIR/*.ped.log; do
             rootfile="${edlog%.ped.log}.root"
             if [ ! -e $rootfile ]; then
@@ -186,6 +185,7 @@ fi
 
 if [ "$toexec" == "0" ]; then
     # skip this run, the root file exists and seems to be healthy
+    echo "Skipping $rootfile (looks healthy)"
     exit
 fi
 
