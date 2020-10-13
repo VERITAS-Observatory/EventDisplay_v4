@@ -88,9 +88,7 @@ ACUTS_AUTO=EVNDISP.reconstruction.runparameter
 
 VPM=1
 
-
 echo "Using runparameter file $ACUTS"
-
 
 # Read runlist
 if [ ! -f "$RLIST" ] ; then
