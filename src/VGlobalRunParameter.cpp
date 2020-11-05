@@ -308,7 +308,7 @@ void VGlobalRunParameter::printGlobalRunParameter()
 	cout << "reading global run parameters from " << getDirectory_EVNDISPParameterFiles();
 	cout << "EVNDISP.global.runparameter" << endl;
 	cout << endl;
-	cout << "VERSION " << fEVNDISP_VERSION << " (tree version " << fEVNDISP_TREE_VERSION << ")";
+	cout << "VERSION " << fEVNDISP_VERSION << " (tree version " << fEVNDISP_TREE_VERSION << ")" << endl;
 	cout << "Observatory: " << fObservatory;
 	if( TMath::Abs( fObservatory_Longitude_deg ) > 1.e-5
 			&& TMath::Abs( fObservatory_Latitude_deg ) > 1.e-5
