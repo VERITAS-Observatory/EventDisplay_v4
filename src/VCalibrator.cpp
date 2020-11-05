@@ -2981,6 +2981,9 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 	int iRunMin = 0;
 	int iRunMax = 0;
 	int iTel = -1;
+
+        // calib file format changed with version 5
+        bool iVersion5 = false;
 	
 	string iValueString;
 	for( unsigned int i = 0; i < fBlockTel.size(); i++ )
@@ -3005,6 +3008,10 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 				continue;
 			}
 			is_stream >> is_Temp;
+                        if( is_Temp == "VERSION5" )
+                        {
+                            iVersion5 = true;
+                        }
 			if( is_Temp == iVariable )
 			{
 				if( (is_stream>>std::ws).eof() )
@@ -3086,6 +3093,10 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 						else if( iVariable == "LOWGAINMULTIPLIER_SUM" && atoi( iValueString.c_str() ) > 0. && iTel == ( int )iTelescopeSelect )
 						{
 							int isum = atoi( iValueString.c_str() );
+                                                        if( iVersion5 )
+                                                        {
+                                                            is_stream >> isum;
+                                                        }
 							getLowGainDefaultSumWindows().push_back( isum );
 							int jmin = 0;
 							int jmax = 0;
