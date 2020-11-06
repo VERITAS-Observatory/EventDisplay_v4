@@ -2975,6 +2975,10 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 		cout <<  is_Temp << endl;
 		exit( -1 );
 	}
+        cout << "Telescope " << getTelID()+1 << ": ";
+        cout << "VCalibrator::readLowGainCalibrationValues_fromCalibFile: ";
+        cout << "reading " << iVariable << " from: " << endl;
+        cout << "\t" << is_Temp << endl;
 	
 	string is_line;
 	string is_tempstring;
