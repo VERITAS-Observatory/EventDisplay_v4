@@ -72,6 +72,8 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 	fTE_mscw_max = 0.;
 	fTE_mscl_min = 0.;
 	fTE_mscl_max = 0.;
+
+        f2DAcceptanceMode = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
