@@ -34,7 +34,6 @@ class VAnaSumRunParameterListOfExclusionRegions
 		double fExcludeFromBackground_West;     //[deg]
 		double fExcludeFromBackground_DecJ2000; //[deg]
 		double fExcludeFromBackground_RAJ2000;  //[deg]
-		double fExcludeFromBackground_Radius;   //[deg]
 		double fExcludeFromBackground_Radius1;   //[deg]
 		double fExcludeFromBackground_Radius2;   //[deg]
 		double fExcludeFromBackground_RotAngle;  //[deg]
@@ -122,7 +121,6 @@ class VAnaSumRunParameterDataClass : public TNamed
 		double fTE_mscw_max;
 		double fTE_mscl_min;
 		double fTE_mscl_max;
-		
 		
 		int f2DAcceptanceMode ; // USE2DACCEPTANCE
 		

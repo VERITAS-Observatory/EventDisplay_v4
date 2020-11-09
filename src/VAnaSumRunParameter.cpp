@@ -10,7 +10,9 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 	fEventDisplayVersion = "";
 	
 	fRunOn = 0;
+        fRunOnFileName = "";
 	fRunOff = 0;
+        fRunOffFileName = "";
 	
 	fMJDOn = 0.;
 	fMJDOff = 0.;
@@ -39,6 +41,7 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 	fTargetShiftDecJ2000 = 0.;
 	
 	fNTel = 4;
+        fTelToAna = "";
 	fMaxTelID = fNTel;
 	
 	fBackgroundModel = 0;
@@ -50,7 +53,6 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 	fAcceptanceFile = "";
 	
 	fEffectiveAreaFile = "";                      // file with effective areas, use NOFILE if not avaible
-	
 	
 	// smoothing algorithm (don't use it if you don't know it)
 	fNBoxSmooth = 0;
