@@ -876,32 +876,6 @@ printBinaryOrbitalPhase:	$(PRINTBINARYOBJ)
 	@echo "$@ done"
 
 ########################################################
-# writeCTAEventListFromAnasum
-# for converting post-cuts event lists to CTA's format
-########################################################
-
-# remove ./obj/VTargets.o AS SOON AS POSSIBLE!
-writeCTAEventListFromAnasumOBJ  = $(SHAREDOBJS)
-writeCTAEventListFromAnasumOBJ += ./obj/Angle.o
-writeCTAEventListFromAnasumOBJ += ./obj/CorrectionParameters.o
-writeCTAEventListFromAnasumOBJ += ./obj/FITSRecord.o 
-writeCTAEventListFromAnasumOBJ += ./obj/PointingMonitor.o
-writeCTAEventListFromAnasumOBJ += ./obj/VDBRunInfo.o
-writeCTAEventListFromAnasumOBJ += ./obj/VPointingDB.o
-writeCTAEventListFromAnasumOBJ += ./obj/VTargets.o
-writeCTAEventListFromAnasumOBJ += ./obj/VTimeMask.o
-writeCTAEventListFromAnasumOBJ += ./obj/VTimeMask_Dict.o
-writeCTAEventListFromAnasumOBJ += ./obj/VTrackingCorrections.o
-writeCTAEventListFromAnasumOBJ += ./obj/writeCTAEventListFromAnasum.o
-
-./obj/writeCTAEventListFromAnasum.o:   ./src/writeCTAEventListFromAnasum.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-writeCTAEventListFromAnasum:   $(writeCTAEventListFromAnasumOBJ)
-	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
-	@echo "$@ done"
-
-########################################################
 # writeCTAWPPhysSensitivityFiles 
 ########################################################
 WRITECTAPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
@@ -1224,33 +1198,6 @@ MAKEOPTCUTTMVATRAININGOBJ= 	./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHea
 trainTMVAforGammaHadronSeparation_TrainingFile:	$(MAKEOPTCUTTMVATRAININGOBJ) 	
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "Done"
-
-########################################################
-# makeOptimizeBoxCutsbyParameterSpaceSearch
-########################################################
-./obj/makeOptimizeBoxCutsbyParameterSpaceSearch.o:	./src/makeOptimizeBoxCutsbyParameterSpaceSearch.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-makeOptimizeBoxCutsbyParameterSpaceSearch:	./obj/CData.o \
-						./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
-						./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-						./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
-						./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
-						./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o  \
-						./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
-						./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
-						./obj/VRunList_Dict.o ./obj/VRunList.o \
-					        ./obj/VSkyCoordinatesUtilities.o \
-				                ./obj/VASlalib.o \
-			                        ./obj/VUtilities.o  \
-						./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
-						./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
-						./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
-						./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
-						./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \
-						./obj/makeOptimizeBoxCutsbyParameterSpaceSearch.o 
-	$(LD) $(LDFLAGS) $^ $(GLIBS) -L./lib $(OutPutOpt) ./bin/$@
-	@echo "$@ done"
 
 ########################################################
 # VTS.calculateCrabRateFromMC
