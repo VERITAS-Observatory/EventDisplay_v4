@@ -175,30 +175,6 @@ class VStereoAnalysis
 		double fTreeSelected_SizeSecondMax;
 		UInt_t fTreeSelected_IsGamma;
 		
-		TTree* fTreeWithAllGamma;  // WRITEALLGAMMATOTREE
-		int    fTreeAll_runNumber;
-		int    fTreeAll_eventNumber;
-		double fTreeAll_Time;
-		int    fTreeAll_MJD;
-		double fTreeAll_Xoff;
-		double fTreeAll_Yoff;
-		double fTreeAll_Xderot;
-		double fTreeAll_Yderot;
-		double fTreeAll_TargetRA;
-		double fTreeAll_TargetDEC;
-		double fTreeAll_RA;
-		double fTreeAll_DEC;
-		double fTreeAll_Energy;
-		double fTreeAll_EnergyError;
-		double fTreeAll_XGroundCore;
-		double fTreeAll_YGroundCore;
-		int    fTreeAll_NImages;
-		int    fTreeAll_ImgSel;
-		double fTreeAll_MSCW;
-		double fTreeAll_MSCL;
-		double fTreeAll_MWR;
-		double fTreeAll_MLR;
-		
 		TTree* fTreeWithEventsForCtools ;
 		int     fTreeCTOOLS_runNumber;
 		int     fTreeCTOOLS_eventNumber;
@@ -235,64 +211,11 @@ class VStereoAnalysis
 		double  fTreeCTOOLS_Acceptance ;
 		VRadialAcceptance* fCTOOLSAcceptance ;
 		
-		TTree* fCDataTreeClone ;
 		double  fDeadTimeStorage ;
 		//double fullMJD ;
 		VSkyCoordinates* fVsky ;  // for RADec to AzimElev conversion
 		
 		double fTreeSelected_MVA;
-		
-		/// model3D parameters ///
-		double fTreeSelected_Smax3D;
-		double fTreeSelected_sigmaL3D;
-		double fTreeSelected_sigmaT3D;
-		double fTreeSelected_Nc3D;
-		double fTreeSelected_Xcore3D;
-		double fTreeSelected_Ycore3D;
-		double fTreeSelected_Xoff3D;
-		double fTreeSelected_Yoff3D;
-		double fTreeSelected_XoffDeRot3D;
-		double fTreeSelected_YoffDeRot3D;
-		double fTreeSelected_Goodness3D;
-		double fTreeSelected_Depth3D;
-		double fTreeSelected_RWidth3D;
-		double fTreeSelected_ErrRWidth3D;
-		bool fTreeSelected_Converged3D;
-		
-		/// frogs ///
-		int   fTreeSelescted_frogsEventID;
-		int   fTreeSelescted_frogsGSLConStat;
-		int   fTreeSelescted_frogsNB_iter;
-		int   fTreeSelescted_frogsNImages;
-		double fTreeSelescted_frogsXS;
-		double fTreeSelescted_frogsXSerr;
-		double fTreeSelescted_frogsYS;
-		double fTreeSelescted_frogsYSerr;
-		double fTreeSelescted_frogsXP;
-		double fTreeSelescted_frogsXPerr;
-		double fTreeSelescted_frogsYP;
-		double fTreeSelescted_frogsYPerr;
-		double fTreeSelescted_frogsXPGC;
-		double fTreeSelescted_frogsYPGC;
-		double fTreeSelescted_frogsEnergy;
-		double fTreeSelescted_frogsEnergyerr;
-		double fTreeSelescted_frogsLambda;
-		double fTreeSelescted_frogsLambdaerr;
-		double fTreeSelescted_frogsGoodnessImg;
-		int   fTreeSelescted_frogsNpixImg;
-		double fTreeSelescted_frogsGoodnessBkg;
-		int   fTreeSelescted_frogsNpixBkg;
-		double fTreeSelescted_frogsTelGoodnessImg0;
-		double fTreeSelescted_frogsTelGoodnessImg1;
-		double fTreeSelescted_frogsTelGoodnessImg2;
-		double fTreeSelescted_frogsTelGoodnessImg3;
-		double fTreeSelescted_frogsTelGoodnessBkg0;
-		double fTreeSelescted_frogsTelGoodnessBkg1;
-		double fTreeSelescted_frogsTelGoodnessBkg2;
-		double fTreeSelescted_frogsTelGoodnessBkg3;
-		double fTreeSelescted_frogsXS_derot;
-		double fTreeSelescted_frogsYS_derot;
-		double fTreeSelescted_frogs_theta2;
 		
 		double fTotCount;
 		
@@ -336,10 +259,6 @@ class VStereoAnalysis
 		void fill_TreeWithSelectedEvents( CData*, double, double, double );
 		bool init_TreeWithSelectedEvents( int, bool );
 		void reset_TreeWithSelectedEvents();
-		
-		void fill_TreeWithAllGamma( CData* c , double i_xderot, double i_yderot, unsigned int icounter, double i_UTC , double fEVDVersionSign ) ; // WRITEALLGAMMATOTREE
-		bool init_TreeWithAllGamma( int irun ) ; // WRITEALLGAMMATOTREE
-		void reset_TreeWithAllGamma() ; // WRITEALLGAMMATOTREE
 		
 		void fill_TreeWithEventsForCtools( CData* c , double i_xderot, double i_yderot, unsigned int icounter, double i_UTC , double fEVDVersionSign ) ; // WRITEEVENTTREEFORCTOOLS
 		bool init_TreeWithEventsForCtools( int irun ) ; // WRITEEVENTTREEFORCTOOLS

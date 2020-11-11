@@ -37,8 +37,6 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 
 	fTreeSelectedEvents = 0;
 
-	fTreeWithAllGamma = 0 ; // WRITEALLGAMMATOTREE
-
 	fRunPara = irunpara;
 	fTreeWithEventsForCtools = 0 ; // WRITEEVENTTREEFORCTOOLS
 	fDeadTimeStorage = 0.0 ;
@@ -47,7 +45,6 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 	fVsky->supressStdoutText( true ) ;
 	fVsky->setObservatory( VGlobalRunParameter::getObservatory_Longitude_deg(),
 						   VGlobalRunParameter::getObservatory_Latitude_deg() );
-
 
 	// calculating run start, end and duration (verifies data trees)
 	if( !bTotalAnalysisOnly )
@@ -392,12 +389,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	// tree with selected events
 	init_TreeWithSelectedEvents( irun, fIsOn );
 
-	if( fIsOn && fRunPara->fWriteAllGammaToTree )  // WRITEALLGAMMATOTREE
-	{
-		init_TreeWithAllGamma( irun );
-	}
-
-	if( fIsOn && fRunPara->fWriteEventTreeForCtools )  // WRITEEVENTTREEFORCTOOLS
+	if( fIsOn )
 	{
 		init_TreeWithEventsForCtools( irun );
 	}
@@ -612,13 +604,8 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 				fill_TreeWithSelectedEvents( fDataRun, i_xderot, i_yderot, i_theta2 );
 			}
 
-			if( fIsOn && bIsGamma && fRunPara->fWriteAllGammaToTree )  // WRITEALLGAMMATOTREE
-			{
-				fill_TreeWithAllGamma( fDataRun, i_xderot, i_yderot, icounter, i_UTC, fEVDVersionSign );
-			}
-
-			// fill a tree with current event for ctools converter
-			if( fIsOn && bIsGamma && fRunPara->fWriteEventTreeForCtools )
+			// fill a tree with current event for DL3 converter
+			if( fIsOn && bIsGamma )
 			{
 				fill_TreeWithEventsForCtools( fDataRun, i_xderot, i_yderot, icounter, i_UTC, fEVDVersionSign );
 			}
@@ -947,12 +934,7 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 			fTreeSelectedEvents->AutoSave();
 		}
 
-		if( fTreeWithAllGamma && fIsOn && fRunPara->fWriteAllGammaToTree )  // WRITEALLGAMMATOTREE
-		{
-			fTreeWithAllGamma->Write() ; // or maybe ->AutoSave() ?
-		}
-
-		if( fTreeWithEventsForCtools && fIsOn && fRunPara->fWriteEventTreeForCtools )  // WRITEEVENTTREEFORCTOOLS
+		if( fTreeWithEventsForCtools && fIsOn )
 		{
 			save_TreeWithEventsForCtools() ;
 		}
@@ -2031,62 +2013,6 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
 	fTreeSelectedEvents->Branch( "MVA", &fTreeSelected_MVA, "MVA/D" );
 	fTreeSelectedEvents->Branch( "IsGamma", &fTreeSelected_IsGamma, "IsGamma/i" );
 
-	if( fCuts && fCuts->useModel3DCuts() )
-	{
-		fTreeSelectedEvents->Branch( "Smax3D", &fTreeSelected_Smax3D, "Smax3D/D" );
-		fTreeSelectedEvents->Branch( "sigmaL3D", &fTreeSelected_sigmaL3D, "sigmaL3D/D" );
-		fTreeSelectedEvents->Branch( "sigmaT3D", &fTreeSelected_sigmaT3D, "sigmaT3D/D" );
-		fTreeSelectedEvents->Branch( "Nc3D", &fTreeSelected_Nc3D, "Nc3D/D" );
-		fTreeSelectedEvents->Branch( "Xcore3D", &fTreeSelected_Xcore3D, "Xcore3D/D" );
-		fTreeSelectedEvents->Branch( "Ycore3D", &fTreeSelected_Ycore3D, "Ycore3D/D" );
-		fTreeSelectedEvents->Branch( "Xoff3D", &fTreeSelected_Xoff3D, "Xoff3D/D" );
-		fTreeSelectedEvents->Branch( "Yoff3D", &fTreeSelected_Yoff3D, "Yoff3D/D" );
-		fTreeSelectedEvents->Branch( "XoffDeRot3D", &fTreeSelected_XoffDeRot3D, "fXoffDeRot3D/D" );
-		fTreeSelectedEvents->Branch( "YoffDeRot3D", &fTreeSelected_YoffDeRot3D, "fYoffDeRot3D/D" );
-		fTreeSelectedEvents->Branch( "Goodness3D", &fTreeSelected_Goodness3D, "Goodness3D/D" );
-		fTreeSelectedEvents->Branch( "Depth3D", &fTreeSelected_Depth3D, "Depth3D/D" );
-		fTreeSelectedEvents->Branch( "RWidth3D", &fTreeSelected_RWidth3D, "RWidth3D/D" );
-		fTreeSelectedEvents->Branch( "ErrRWidth3D", &fTreeSelected_ErrRWidth3D, "ErrRWidth3D/D" );
-		fTreeSelectedEvents->Branch( "Converged3D", &fTreeSelected_Converged3D, "Converged3D/b" );
-	}
-
-	if( fCuts && fCuts->useFrogsCuts() )
-	{
-		fTreeSelectedEvents->Branch( "frogsEventID", &fTreeSelescted_frogsEventID, "frogsEventID/I" );
-		fTreeSelectedEvents->Branch( "frogsGSLConStat", &fTreeSelescted_frogsGSLConStat, "frogsGSLConStat/I" );
-		fTreeSelectedEvents->Branch( "frogsNB_iter", &fTreeSelescted_frogsNB_iter, "frogsNB_iter/I" );
-		fTreeSelectedEvents->Branch( "frogsNImages", &fTreeSelescted_frogsNImages, "frogsNImages/I" );
-		fTreeSelectedEvents->Branch( "frogsXS", &fTreeSelescted_frogsXS, "frogsXS/D" );
-		fTreeSelectedEvents->Branch( "frogsXSerr", &fTreeSelescted_frogsXSerr, "frogsXSerr/D" );
-		fTreeSelectedEvents->Branch( "frogsYS", &fTreeSelescted_frogsYS, "frogsYS/D" );
-		fTreeSelectedEvents->Branch( "frogsYSerr", &fTreeSelescted_frogsYSerr, "frogsYSerr/D" );
-		fTreeSelectedEvents->Branch( "frogsXP", &fTreeSelescted_frogsXP, "frogsXP/D" );
-		fTreeSelectedEvents->Branch( "frogsXPerr", &fTreeSelescted_frogsXPerr, "frogsXPerr/D" );
-		fTreeSelectedEvents->Branch( "frogsYP", &fTreeSelescted_frogsYP, "frogsYP/D" );
-		fTreeSelectedEvents->Branch( "frogsYPerr", &fTreeSelescted_frogsYPerr, "frogsYPerr/D" );
-		fTreeSelectedEvents->Branch( "frogsXPGC", &fTreeSelescted_frogsXPGC, "frogsXPGC/D" );
-		fTreeSelectedEvents->Branch( "frogsYPYC", &fTreeSelescted_frogsYPGC, "frogsYPGC/D" );
-		fTreeSelectedEvents->Branch( "frogsEnergy", &fTreeSelescted_frogsEnergy, "frogsEnergy/D" );
-		fTreeSelectedEvents->Branch( "frogsEnergyerr", &fTreeSelescted_frogsEnergyerr, "frogsEnergyerr/D" );
-		fTreeSelectedEvents->Branch( "frogsLambda", &fTreeSelescted_frogsLambda, "frogsLambda/D" );
-		fTreeSelectedEvents->Branch( "frogsLambdaerr", &fTreeSelescted_frogsLambdaerr, "frogsLambdaerr/D" );
-		fTreeSelectedEvents->Branch( "frogsGoodnessImg", &fTreeSelescted_frogsGoodnessImg, "frogsGoodnessImg/D" );
-		fTreeSelectedEvents->Branch( "frogsNpixImg", &fTreeSelescted_frogsNpixImg, "frogsNpixImg/I" );
-		fTreeSelectedEvents->Branch( "frogsGoodnessBkg", &fTreeSelescted_frogsGoodnessBkg, "frogsGoodnessBkg/D" );
-		fTreeSelectedEvents->Branch( "frogsNpixBkg", &fTreeSelescted_frogsNpixBkg, "frogsNpixBkg/I" );
-		fTreeSelectedEvents->Branch( "frogsTelGoodnessImg0", &fTreeSelescted_frogsTelGoodnessImg0, "frogsTelGoodnessImg0/D" );
-		fTreeSelectedEvents->Branch( "frogsTelGoodnessImg1", &fTreeSelescted_frogsTelGoodnessImg1, "frogsTelGoodnessImg1/D" );
-		fTreeSelectedEvents->Branch( "frogsTelGoodnessImg2", &fTreeSelescted_frogsTelGoodnessImg2, "frogsTelGoodnessImg2/D" );
-		fTreeSelectedEvents->Branch( "frogsTelGoodnessImg3", &fTreeSelescted_frogsTelGoodnessImg3, "frogsTelGoodnessImg3/D" );
-		fTreeSelectedEvents->Branch( "frogsTelGoodnessBkg0", &fTreeSelescted_frogsTelGoodnessBkg0, "frogsTelGoodnessBkg0/D" );
-		fTreeSelectedEvents->Branch( "frogsTelGoodnessBkg1", &fTreeSelescted_frogsTelGoodnessBkg1, "frogsTelGoodnessBkg1/D" );
-		fTreeSelectedEvents->Branch( "frogsTelGoodnessBkg2", &fTreeSelescted_frogsTelGoodnessBkg2, "frogsTelGoodnessBkg2/D" );
-		fTreeSelectedEvents->Branch( "frogsTelGoodnessBkg3", &fTreeSelescted_frogsTelGoodnessBkg3, "frogsTelGoodnessBkg3/D" );
-		fTreeSelectedEvents->Branch( "frogsXS_derot", &fTreeSelescted_frogsXS_derot, "frogsXS_derot/D" );
-		fTreeSelectedEvents->Branch( "frogsYS_derot", &fTreeSelescted_frogsYS_derot, "frogsYS_derot/D" );
-		fTreeSelectedEvents->Branch( "frogs_theta2", &fTreeSelescted_frogs_theta2, "frogs_theta2/D" );
-	}
-
 	return true;
 }
 
@@ -2118,57 +2044,6 @@ void VStereoAnalysis::reset_TreeWithSelectedEvents()
 	fTreeSelected_SizeSecondMax = 0.;
 	fTreeSelected_MVA = -99.;
 	fTreeSelected_IsGamma = 0;
-
-	/// model3D parameters ///
-	fTreeSelected_Smax3D = 0;
-	fTreeSelected_sigmaL3D = 0;
-	fTreeSelected_sigmaT3D = 0;
-	fTreeSelected_Nc3D = 0;
-	fTreeSelected_Xcore3D = 0;
-	fTreeSelected_Ycore3D = 0;
-	fTreeSelected_Xoff3D = 0;
-	fTreeSelected_Yoff3D = 0;
-	fTreeSelected_XoffDeRot3D = 0;
-	fTreeSelected_YoffDeRot3D = 0;
-	fTreeSelected_Goodness3D = 0;
-	fTreeSelected_Depth3D = 0;
-	fTreeSelected_RWidth3D = 0;
-	fTreeSelected_ErrRWidth3D = 0;
-	fTreeSelected_Converged3D = 0;
-	/// frogs ///
-	fTreeSelescted_frogsEventID = 0;
-	fTreeSelescted_frogsGSLConStat = 0;
-	fTreeSelescted_frogsNB_iter = 0;
-	fTreeSelescted_frogsNImages = 0;
-	fTreeSelescted_frogsXS = 0.;
-	fTreeSelescted_frogsXSerr = 0.;
-	fTreeSelescted_frogsYS = 0.;
-	fTreeSelescted_frogsYSerr = 0.;
-	fTreeSelescted_frogsXP = 0.;
-	fTreeSelescted_frogsXPerr = 0.;
-	fTreeSelescted_frogsYP = 0.;
-	fTreeSelescted_frogsYPerr = 0.;
-	fTreeSelescted_frogsXPGC = 0.;
-	fTreeSelescted_frogsYPGC = 0.;
-	fTreeSelescted_frogsEnergy = 0.;
-	fTreeSelescted_frogsEnergyerr = 0.;
-	fTreeSelescted_frogsLambda = 0.;
-	fTreeSelescted_frogsLambdaerr = 0.;
-	fTreeSelescted_frogsGoodnessImg = 0.;
-	fTreeSelescted_frogsNpixImg = 0;
-	fTreeSelescted_frogsGoodnessBkg = 0.;
-	fTreeSelescted_frogsNpixBkg = 0;
-	fTreeSelescted_frogsTelGoodnessImg0 = 0.;
-	fTreeSelescted_frogsTelGoodnessImg1 = 0.;
-	fTreeSelescted_frogsTelGoodnessImg2 = 0.;
-	fTreeSelescted_frogsTelGoodnessImg3 = 0.;
-	fTreeSelescted_frogsTelGoodnessBkg0 = 0.;
-	fTreeSelescted_frogsTelGoodnessBkg1 = 0.;
-	fTreeSelescted_frogsTelGoodnessBkg2 = 0.;
-	fTreeSelescted_frogsTelGoodnessBkg3 = 0.;
-	fTreeSelescted_frogsXS_derot = 0.;
-	fTreeSelescted_frogsYS_derot = 0.;
-	fTreeSelescted_frogs_theta2  = 0.;
 }
 
 void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c, double i_xderot, double i_yderot, double i_theta2 )
@@ -2220,57 +2095,6 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c, double i_xderot, do
 		fTreeSelected_IsGamma = 0;
 	}
 
-	/// model3D parameters ///
-	fTreeSelected_Smax3D = c->Smax3D;
-	fTreeSelected_sigmaL3D = c->sigmaL3D;
-	fTreeSelected_sigmaT3D = c->sigmaT3D;
-	fTreeSelected_Nc3D = c->Nc3D;
-	fTreeSelected_Xcore3D = c->Xcore3D;
-	fTreeSelected_Ycore3D = c->Ycore3D;
-	fTreeSelected_Xoff3D = c->Xoff3D;
-	fTreeSelected_Yoff3D = c->Yoff3D;
-	fTreeSelected_XoffDeRot3D = c->XoffDeRot3D;
-	fTreeSelected_YoffDeRot3D = c->YoffDeRot3D;
-	fTreeSelected_Goodness3D = c->Goodness3D;
-	fTreeSelected_Depth3D = c->Depth3D;
-	fTreeSelected_RWidth3D = c->RWidth3D;
-	fTreeSelected_ErrRWidth3D = c->ErrRWidth3D;
-	fTreeSelected_Converged3D = c->Converged3D;
-	/// frogs ///
-	fTreeSelescted_frogsEventID     = c->frogsEventID;
-	fTreeSelescted_frogsGSLConStat  = c->frogsGSLConStat;
-	fTreeSelescted_frogsNB_iter     = c->frogsNB_iter;
-	fTreeSelescted_frogsNImages     = c->frogsNImages;
-	fTreeSelescted_frogsXS          = c->frogsXS;
-	fTreeSelescted_frogsXSerr       = c->frogsXSerr;
-	fTreeSelescted_frogsYS          = c->frogsYS;
-	fTreeSelescted_frogsYSerr       = c->frogsYSerr;
-	fTreeSelescted_frogsXP          = c->frogsXP;
-	fTreeSelescted_frogsXPerr       = c->frogsXPerr;
-	fTreeSelescted_frogsYP          = c->frogsYP;
-	fTreeSelescted_frogsYPerr       = c->frogsYPerr;
-	fTreeSelescted_frogsXPGC        = c->frogsXPGC;
-	fTreeSelescted_frogsYPGC        = c->frogsYPGC;
-	fTreeSelescted_frogsEnergy      = c->frogsEnergy;
-	fTreeSelescted_frogsEnergyerr   = c->frogsEnergyerr;
-	fTreeSelescted_frogsLambda      = c->frogsLambda;
-	fTreeSelescted_frogsLambdaerr   = c->frogsLambdaerr;
-	fTreeSelescted_frogsGoodnessImg = c->frogsGoodnessImg;
-	fTreeSelescted_frogsNpixImg     = c->frogsNpixImg;
-	fTreeSelescted_frogsGoodnessBkg = c->frogsGoodnessBkg;
-	fTreeSelescted_frogsNpixBkg     = c->frogsNpixBkg;
-	fTreeSelescted_frogsTelGoodnessImg0 = c->frogsTelGoodnessImg0;
-	fTreeSelescted_frogsTelGoodnessImg1 = c->frogsTelGoodnessImg1;
-	fTreeSelescted_frogsTelGoodnessImg2 = c->frogsTelGoodnessImg2;
-	fTreeSelescted_frogsTelGoodnessImg3 = c->frogsTelGoodnessImg3;
-	fTreeSelescted_frogsTelGoodnessBkg0 = c->frogsTelGoodnessBkg0;
-	fTreeSelescted_frogsTelGoodnessBkg1 = c->frogsTelGoodnessBkg1;
-	fTreeSelescted_frogsTelGoodnessBkg2 = c->frogsTelGoodnessBkg2;
-	fTreeSelescted_frogsTelGoodnessBkg3 = c->frogsTelGoodnessBkg3;
-	fTreeSelescted_frogsXS_derot = i_xderot;
-	fTreeSelescted_frogsYS_derot = i_yderot;
-	fTreeSelescted_frogs_theta2  = i_theta2;
-
 	if( fTreeSelectedEvents )
 	{
 		fTreeSelectedEvents->Fill();
@@ -2313,155 +2137,6 @@ double VStereoAnalysis::getWobbleWest()
 	}
 
 	return 0.;
-}
-
-bool VStereoAnalysis::init_TreeWithAllGamma( int irun ) // WRITEALLGAMMATOTREE
-{
-
-	cout << endl;
-	cout << " :: init_TreeWithAllGamma( " << irun << " )" << endl;
-	cout << endl;
-
-	if( fTreeWithAllGamma )
-	{
-		delete fTreeWithAllGamma;
-	}
-	if( !fRunPara )
-	{
-		return false;
-	}
-
-	char hname[200];
-	char htitle[200];
-	sprintf( hname, "TreeWithAllGamma" );
-	sprintf( htitle, "all gamma events with X,Y and Time for run %d", irun );
-
-	fTreeWithAllGamma = new TTree( hname, htitle );
-
-	fTreeWithAllGamma->Branch( "runNumber",   &fTreeAll_runNumber,   "runNumber/I" );
-	fTreeWithAllGamma->Branch( "eventNumber", &fTreeAll_eventNumber, "eventNumber/I" );
-	fTreeWithAllGamma->Branch( "timeOfDay",   &fTreeAll_Time,        "timeOfDay/D" );
-	fTreeWithAllGamma->Branch( "dayMJD",      &fTreeAll_MJD,         "dayMJD/I" );
-	fTreeWithAllGamma->Branch( "Energy",      &fTreeAll_Energy,      "Energy/D" );
-	fTreeWithAllGamma->Branch( "EnergyError", &fTreeAll_EnergyError, "EnergyError/D" );
-	fTreeWithAllGamma->Branch( "XGroundCore", &fTreeAll_XGroundCore, "XGroundCore/D" );
-	fTreeWithAllGamma->Branch( "YGroundCore", &fTreeAll_YGroundCore, "YGroundCore/D" );
-	fTreeWithAllGamma->Branch( "Xderot",      &fTreeAll_Xderot,      "Xderot/D" );
-	fTreeWithAllGamma->Branch( "Yderot",      &fTreeAll_Yderot,      "Yderot/D" );
-	fTreeWithAllGamma->Branch( "NImages",     &fTreeAll_NImages,     "NImages/I" );
-	fTreeWithAllGamma->Branch( "ImgSel",      &fTreeAll_ImgSel,      "ImgSel/I" );
-	fTreeWithAllGamma->Branch( "MSCW",        &fTreeAll_MSCW,        "MSCW/D" );
-	fTreeWithAllGamma->Branch( "MSCL",        &fTreeAll_MSCL,        "MSCL/D" );
-	fTreeWithAllGamma->Branch( "MWR",         &fTreeAll_MWR,         "MWR/D" );
-	fTreeWithAllGamma->Branch( "MLR",         &fTreeAll_MLR,         "MLR/D" );
-
-	cout << endl;
-
-	cout << " :: init_TreeWithAllGamma()" << endl;
-	cout << endl;
-	return true;
-}
-
-void VStereoAnalysis::reset_TreeWithAllGamma() // WRITEALLGAMMATOTREE
-{
-	cout << endl;
-	cout << " :: reset_TreeWithAllGamma()" << endl;
-	fTreeAll_runNumber = 0;
-	fTreeAll_eventNumber = 0;
-	fTreeAll_Time = 0.;
-	fTreeAll_MJD  = 0;
-	fTreeAll_Xoff = 0.;
-	fTreeAll_Yoff = 0.;
-	fTreeAll_Xderot = 0.;
-	fTreeAll_Yderot = 0.;
-	fTreeAll_TargetRA = 0.;
-	fTreeAll_TargetDEC = 0.;
-	fTreeAll_RA = 0.;
-	fTreeAll_DEC = 0.;
-	fTreeAll_Energy = 0.;
-	fTreeAll_EnergyError = 0. ;
-	fTreeAll_XGroundCore = 0. ;
-	fTreeAll_YGroundCore = 0. ;
-	fTreeAll_NImages = 0 ;
-	fTreeAll_ImgSel  = 0 ;
-	fTreeAll_MSCW = 0. ;
-	fTreeAll_MSCL = 0. ;
-	fTreeAll_MWR = 0. ;
-	fTreeAll_MLR = 0. ;
-
-	fTreeAll_TargetRA  = 0.0;
-	fTreeAll_TargetDEC = 0.0;
-
-	// True Gamma Point-Of-Origin (deg)
-	fTreeAll_RA  = 0.0 ; // fTreeAll_Xderot + fTreeAll_WobbleWest  + fTreeAll_TargetRA  ; // ?
-	fTreeAll_DEC = 0.0 ; // fTreeAll_Yderot + fTreeAll_WobbleNorth + fTreeAll_TargetDEC ; // ?
-
-	cout << " :: reset_TreeWithAllGamma()" << endl;
-	cout << endl;
-}
-
-void VStereoAnalysis::fill_TreeWithAllGamma( CData* c , double i_xderot, double i_yderot, unsigned int icounter, double i_UTC , double fEVDVersionSign ) // WRITEALLGAMMATOTREE
-{
-	//cout << endl;
-	//cout << " -- fill_TreeWithAllGamma()" << endl;
-	if( !c )
-	{
-		return;
-	}
-
-	fTreeAll_runNumber   = c->runNumber;    // Run Number
-	fTreeAll_eventNumber = c->eventNumber;  // Event Number
-	fTreeAll_Time        = c->Time;         // Time of day (seconds) of gamma ray event
-	fTreeAll_MJD         = c->MJD;          // Day of epoch (days)
-	fTreeAll_Xoff        = c->Xoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
-	fTreeAll_Yoff        = c->Yoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
-	fTreeAll_Xderot      = i_xderot;        // Derotated Gamma Point-Of-Origin (deg, RA)
-	fTreeAll_Yderot      = i_yderot;        // Derotated Gamma Point-Of-Origin (deg, DEC)
-	fTreeAll_Energy      = c->Erec;         // Reconstructed Gamma Energy (TeV)
-	fTreeAll_EnergyError = c->EChi2;        // Error on Energy (TeV, Gaussian, 1 standard deviation)
-	fTreeAll_XGroundCore = c->Xcore;        // Gamma Ray Core-Ground intersection location (north?)
-	fTreeAll_YGroundCore = c->Ycore;        // Gamma Ray Core-Ground intersection location (east?)
-	fTreeAll_NImages     = c->NImages;      // Number of images used in reconstruction?
-	fTreeAll_ImgSel      = c->ImgSel;       // 4-bit binary code describing which telescopes had images
-	fTreeAll_MSCW        = c->MSCW ;
-	fTreeAll_MSCL        = c->MSCL ;
-	fTreeAll_MWR         = c->MWR ;
-	fTreeAll_MLR         = c->MLR ;
-
-
-	// Observation Target RA and DEC (deg)
-	fTreeAll_TargetRA  = 0.0; //fRunPara->fRunList[0].fTargetRAJ2000  + fRunPara->fRunList[0].fRaOffset  ;
-	fTreeAll_TargetDEC = 0.0; //fRunPara->fRunList[0].fTargetDecJ2000 + fRunPara->fRunList[0].fDecOffset ;
-
-	// True Gamma Point-Of-Origin (deg)
-	fTreeAll_RA  = 0.0 ; // fTreeAll_Xderot + fTreeAll_WobbleWest  + fTreeAll_TargetRA ;
-	fTreeAll_DEC = 0.0 ; // fTreeAll_Yderot + fTreeAll_WobbleNorth + fTreeAll_TargetDEC ;
-
-	//cout << " --   runNumber:   " << fTreeAll_runNumber   << endl;
-	//cout << " --   eventNumber: " << fTreeAll_eventNumber << endl;
-	//cout << " --   MJD:         " << fTreeAll_MJD         << endl;
-	//cout << " --   Time:        " << fTreeAll_Time        << endl;
-	//cout << " --   Xderot:      " << fTreeAll_Xderot      << endl;
-	//cout << " --   Yderot:      " << fTreeAll_Yderot      << endl;
-	//cout << " --   WobbleNorth  " << fTreeAll_WobbleNorth << endl;
-	//cout << " --   WobbleWest   " << fTreeAll_WobbleWest  << endl;
-	//cout << " --   TargetRA:    " << fTreeAll_TargetRA    << endl;
-	//cout << " --   TargetDEC:   " << fTreeAll_TargetDEC   << endl;
-	//cout << " --   RA:          " << fTreeAll_RA          << endl;
-	//cout << " --   DEC:         " << fTreeAll_DEC         << endl;
-	//cout << " --   Energy:      " << fTreeAll_Energy      << endl;
-	//cout << " --   EnergyError: " << fTreeAll_EnergyError << endl;
-	//cout << " --   c->Xcore:    " << fTreeAll_XGroundCore << endl;
-	//cout << " --   c->Ycore:    " << fTreeAll_YGroundCore << endl;
-	//cout << " --   c->NImages:  " << fTreeAll_NImages     << endl;
-	//cout << " --   c->ImgSel:   " << fTreeAll_ImgSel      << endl;
-	//cout << " --" << endl;
-
-	if( fTreeWithAllGamma )
-	{
-		fTreeWithAllGamma->Fill();
-	}
-
 }
 
 bool VStereoAnalysis::init_TreeWithEventsForCtools( int irun ) // WRITEEVENTTREEFORCTOOLS
@@ -2626,10 +2301,5 @@ void VStereoAnalysis::save_TreeWithEventsForCtools() // WRITEEVENTTREEFORCTOOLS
 	fRunPara->SetName( "VAnaSumRunParameter" );
 	fRunPara->Write() ;
 
-	fCDataTreeClone = fDataRunTree->CloneTree() ;
-	fCDataTreeClone->SetName( "cdatatree" );
-	fCDataTreeClone->Write();
 	//fDataRunTree->Write() ;
-	// see VStereoAnalysis::getDataFromFile() for figuring out the CData
-
 }
