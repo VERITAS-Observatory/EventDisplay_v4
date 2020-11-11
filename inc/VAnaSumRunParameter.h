@@ -182,9 +182,7 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		// dead time calculation method
 		int  fDeadTimeCalculationMethod;
 		
-		bool fWriteAllGammaToTree ; // WRITEALLGAMMATOTREE
 		int f2DAcceptanceMode ; // USE2DACCEPTANCE
-		bool fWriteEventTreeForCtools ; // WRITEEVENTTREEFORCTOOLS
 		
 		// advanced analysis codes
 		bool fModel3D;
@@ -226,7 +224,7 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		string fStarBand;
 		double fStarExlusionRadius;
 		
-		// for saving the deadtime fraction for ctools
+		// for saving the deadtime fraction
 		double fScalarDeadTimeFrac ;
 		
 		string fTimeMaskFile;
@@ -257,6 +255,6 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		bool writeListOfExcludedSkyRegions();
 		bool getListOfExcludedSkyRegions( TFile* f );
 		
-		ClassDef( VAnaSumRunParameter, 9 ) ;
+		ClassDef( VAnaSumRunParameter, 11 ) ;
 };
 #endif

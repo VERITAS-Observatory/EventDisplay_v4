@@ -145,12 +145,6 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	// length of time intervalls in seconds for rate plots and short term histograms
 	fTimeIntervall = 4. * 60.;
 	
-	// should a full tree of all gamma-like events be written?
-	// or do we only keep the ones that pass ON/OFF region cuts?
-	fWriteAllGammaToTree = false ; // WRITEALLGAMMATOTREE
-	
-	fWriteEventTreeForCtools = false ;
-	
 	// model3D analysis
 	fModel3D = false; // MODEL3DANALYSIS
 	fDirectionModel3D = false; //USEDIRECTIONMODEL3D
@@ -162,7 +156,7 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	// if >0, use alternate 2D-dependent acceptance
 	f2DAcceptanceMode = 0 ; // USE2DACCEPTANCE
 	
-	// for deadtime fraction storage CTOOLS
+	// for deadtime fraction storage
 	fScalarDeadTimeFrac = 0.0 ;
 	
 	// set monte carlo zenith angles
@@ -615,29 +609,6 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			{
 				fEnergyEffectiveAreaSmoothingThreshold = atof( temp2.c_str() );
 			}
-			
-			// for saving all gamma-like events, regardless of ON/OFF regions
-			// WRITEALLGAMMATOTREE
-			// When option is used in ANASUM.runparameter like:
-			// * WRITEALLGAMMATOTREE 1
-			// A new tree will be created in the <runnumber>.anasum.root file
-			// run_<runnumber>/stereo/TreeWithAllGamma which will contain
-			// all gamma-like events (after MSCW/MSCL cuts), but before
-			// ON/OFF region cuts.
-			// Tree contains basic information about each event, which is
-			// chosen in the functions
-			// VStereoAnalysis::init_TreeWithAllGamma()
-			// VStereoAnalysis::fill_TreeWithAllGamma()
-			// grep for WRITEALLGAMMATOTREE to see all the involved code blocks
-			else if( temp == "WRITEALLGAMMATOTREE" )
-			{
-				unsigned int tmpWriteAll = ( unsigned int )atoi( temp2.c_str() ) ;
-				if( tmpWriteAll == 1 )
-				{
-					fWriteAllGammaToTree = true ;
-				}
-			}
-			
 			////////////////////////////////////////////
 			// Option USE2DACCEPTANCE within ANASUM.runparameter
 			// * USE2DACCEPTANCE 0
@@ -648,20 +619,6 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			{
 				f2DAcceptanceMode = ( unsigned int )atoi( temp2.c_str() ) ;
 			}
-			
-			///////////////////////////////////////////////////////////
-			// WRITEEVENTTREEFORCTOOLS
-			// adds an extra tree "run_#####/stereo/TreeWithEventsForCtools" to anasum.#####.root,
-			// containing info for converting veritas data to CTOOLs event list format
-			else if( temp == "WRITEEVENTTREEFORCTOOLS" )
-			{
-				unsigned int tmpWriteAll = ( unsigned int )atoi( temp2.c_str() ) ;
-				if( tmpWriteAll == 1 )
-				{
-					fWriteEventTreeForCtools = true ;
-				}
-			}
-			
 			/// use Model3D analysis ///
 			else if( temp == "MODEL3DANALYSIS" )
 			{
