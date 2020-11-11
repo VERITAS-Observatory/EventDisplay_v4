@@ -38,8 +38,8 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 	fTreeSelectedEvents = 0;
 
 	fRunPara = irunpara;
-	fTreeWithEventsForCtools = 0 ; // WRITEEVENTTREEFORCTOOLS
-	fDeadTimeStorage = 0.0 ;
+	fDL3EventTree = 0;
+	fDeadTimeStorage = 0.;
 
 	fVsky = new VSkyCoordinates() ;
 	fVsky->supressStdoutText( true ) ;
@@ -391,7 +391,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 
 	if( fIsOn )
 	{
-		init_TreeWithEventsForCtools( irun );
+		init_DL3Tree( irun, fHisCounter );
 	}
 
 	// spectral energy reconstruction (effective areas, etc.)
@@ -607,7 +607,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			// fill a tree with current event for DL3 converter
 			if( fIsOn && bIsGamma )
 			{
-				fill_TreeWithEventsForCtools( fDataRun, i_xderot, i_yderot, icounter, i_UTC, fEVDVersionSign );
+				fill_DL3Tree( fDataRun, i_xderot, i_yderot, icounter, i_UTC );
 			}
 			/////////////////////////////////////////////////////////
 			// histograms after gamma and energy reconstruction cuts
@@ -853,7 +853,6 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 		fHisto[fHisCounter]->writeHistograms();
 
 		// need to grab fScalarDeadTimeFrac while fDeadTime histograms are intact,
-		// fScalarDeadTimeFrac is needed in  save_TreeWithEventsForCtools()
 		fRunPara->fScalarDeadTimeFrac = fDeadTime[fHisCounter]->getDeadTimeFraction( fTimeMask->getMask(), fRunPara->fDeadTimeCalculationMethod );
 
 		fDeadTime[fHisCounter]->writeHistograms();
@@ -867,10 +866,8 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 			// Both MC and REC  effective areas are required for Binned Likelihood analysis
 			if ( fRunPara->fLikelihoodAnalysis )
 			{
-
                                 if( gMeanEffectiveAreaMC )
                                 {
-
                                     // (SOB) When nOn = 0 gMeanEffectiveAreaMC_on(E) = 0
                                     // VLikelihoodFitter will check gMeanEffectiveAreaMC_on::integral > 1
                                     gMeanEffectiveAreaMC->SetTitle("gMeanEffectiveAreaMC_on");
@@ -880,14 +877,11 @@ void VStereoAnalysis::writeHistograms( bool bOn )
                                 }
                                 if( hResponseMatrix )
                                 {
-
                                     hResponseMatrix->SetTitle("hResponseMatrix_on");
                                     hResponseMatrix->SetName("hResponseMatrix_on");
                                     fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", hResponseMatrix );
                                 }
 			}
-
-
 			if( fRunPara->fRunList[fHisCounter].fAcceptanceFile.size() > 0 
                         && fRunPara->fRunList[fHisCounter].fAcceptanceFile != "IGNOREACCEPTANCE" )
 			{
@@ -929,16 +923,10 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 				}
 			}
 		}
-		if( fTreeSelectedEvents )
+		if( fDL3EventTree && fIsOn )
 		{
-			fTreeSelectedEvents->AutoSave();
+		     write_DL3Tree() ;
 		}
-
-		if( fTreeWithEventsForCtools && fIsOn )
-		{
-			save_TreeWithEventsForCtools() ;
-		}
-
 	}
 }
 
@@ -2139,167 +2127,172 @@ double VStereoAnalysis::getWobbleWest()
 	return 0.;
 }
 
-bool VStereoAnalysis::init_TreeWithEventsForCtools( int irun ) // WRITEEVENTTREEFORCTOOLS
+/*
+ * initialize event tree for DL3
+*/
+bool VStereoAnalysis::init_DL3Tree( int irun, int icounter )
 {
 
 	cout << endl;
-	cout << " :: init_TreeWithEventsForCtools( " << irun << " )" << endl;
+	cout << " :: init_DL3Tree( " << irun << " )" << endl;
 	cout << endl;
 
 
-	if( fTreeWithEventsForCtools )
+	if( fDL3EventTree )
 	{
-		delete fTreeWithEventsForCtools;
+		delete fDL3EventTree;
 	}
 	if( !fRunPara )
 	{
 		return false;
 	}
 
-	char hname[200];
 	char htitle[200];
-	sprintf( hname, "TreeWithEventsForCtools" );
-	sprintf( htitle, "all gamma events with X,Y and Time for run %d, in a format for CTOOL's Event List format", irun );
+	sprintf( htitle, "DL3 event list for run %d", irun );
+	fDL3EventTree = new TTree( "DL3EventTree", htitle );
 
-	fTreeWithEventsForCtools = new TTree( hname, htitle );
-
-	fTreeWithEventsForCtools->Branch( "runNumber",      &fTreeCTOOLS_runNumber,      "runNumber/I" );
-	fTreeWithEventsForCtools->Branch( "eventNumber",    &fTreeCTOOLS_eventNumber,    "eventNumber/I" );
-	fTreeWithEventsForCtools->Branch( "timeOfDay",      &fTreeCTOOLS_Time,           "timeOfDay/D" );
-	fTreeWithEventsForCtools->Branch( "dayMJD",         &fTreeCTOOLS_MJD,            "dayMJD/I" );
-	fTreeWithEventsForCtools->Branch( "Energy",         &fTreeCTOOLS_Erec,           "Erec/D" );
-	fTreeWithEventsForCtools->Branch( "EnergyS",        &fTreeCTOOLS_ErecS,          "ErecS/D" );
-	fTreeWithEventsForCtools->Branch( "Energy_Err",     &fTreeCTOOLS_Erec_Err,       "Erec_Err/D" );
-	fTreeWithEventsForCtools->Branch( "EnergyS_Err",    &fTreeCTOOLS_ErecS_Err,      "ErecS_Err/D" );
-	fTreeWithEventsForCtools->Branch( "XGroundCore",    &fTreeCTOOLS_XGroundCore,    "XGroundCore/D" );
-	fTreeWithEventsForCtools->Branch( "YGroundCore",    &fTreeCTOOLS_YGroundCore,    "YGroundCore/D" );
-	fTreeWithEventsForCtools->Branch( "Xderot",         &fTreeCTOOLS_Xderot,         "Xderot/D" );
-	fTreeWithEventsForCtools->Branch( "Yderot",         &fTreeCTOOLS_Yderot,         "Yderot/D" );
-	fTreeWithEventsForCtools->Branch( "NImages",        &fTreeCTOOLS_NImages,        "NImages/I" );
-	fTreeWithEventsForCtools->Branch( "ImgSel",         &fTreeCTOOLS_ImgSel,         "ImgSel/I" );
-	fTreeWithEventsForCtools->Branch( "MSCW",           &fTreeCTOOLS_MSCW,           "MSCW/D" );
-	fTreeWithEventsForCtools->Branch( "MSCL",           &fTreeCTOOLS_MSCL,           "MSCL/D" );
-	fTreeWithEventsForCtools->Branch( "MWR"           , &fTreeCTOOLS_MWR,            "MWR/D" );
-	fTreeWithEventsForCtools->Branch( "MLR"           , &fTreeCTOOLS_MLR,            "MLR/D" );
-	fTreeWithEventsForCtools->Branch( "TargetRA"      , &fTreeCTOOLS_TargetRA,       "TargetRA/D" );
-	fTreeWithEventsForCtools->Branch( "TargetDEC"     , &fTreeCTOOLS_TargetDEC,      "TargetDEC/D" );
-	fTreeWithEventsForCtools->Branch( "RA"            , &fTreeCTOOLS_RA,             "RA/D" );
-	fTreeWithEventsForCtools->Branch( "DEC"           , &fTreeCTOOLS_DEC,            "DEC/D" );
-	fTreeWithEventsForCtools->Branch( "Az"            , &fTreeCTOOLS_Az,             "Az/D" );
-	fTreeWithEventsForCtools->Branch( "El"            , &fTreeCTOOLS_El,             "El/D" );
-	fTreeWithEventsForCtools->Branch( "EmissionHeight", &fTreeCTOOLS_EmissionHeight, "EmissionHeight/D" );
-	fTreeWithEventsForCtools->Branch( "Xoff"          , &fTreeCTOOLS_Xoff          , "Xoff/D" );
-	fTreeWithEventsForCtools->Branch( "Yoff"          , &fTreeCTOOLS_Yoff          , "Yoff/D" );
-	fTreeWithEventsForCtools->Branch( "GregYear"      , &fTreeCTOOLS_GregYear      , "GregYear/D" );
-	fTreeWithEventsForCtools->Branch( "GregMonth"     , &fTreeCTOOLS_GregMonth     , "GregMonth/D" );
-	fTreeWithEventsForCtools->Branch( "GregDay"       , &fTreeCTOOLS_GregDay       , "GregDay/D" );
-	fTreeWithEventsForCtools->Branch( "Acceptance"    , &fTreeCTOOLS_Acceptance    , "Acceptance/D" );
+	fDL3EventTree->Branch( "runNumber",      &fDL3EventTree_runNumber,      "runNumber/I" );
+	fDL3EventTree->Branch( "eventNumber",    &fDL3EventTree_eventNumber,    "eventNumber/I" );
+	fDL3EventTree->Branch( "timeOfDay",      &fDL3EventTree_Time,           "timeOfDay/D" );
+	fDL3EventTree->Branch( "MJD",            &fDL3EventTree_MJD,            "MJD/I" );
+	fDL3EventTree->Branch( "Energy",         &fDL3EventTree_Erec,           "Erec/D" );
+	fDL3EventTree->Branch( "Energy_Err",     &fDL3EventTree_Erec_Err,       "Erec_Err/D" );
+	fDL3EventTree->Branch( "XCore",          &fDL3EventTree_XGroundCore,    "XCore/D" );
+	fDL3EventTree->Branch( "YCore",          &fDL3EventTree_YGroundCore,    "YCore/D" );
+	fDL3EventTree->Branch( "Xderot",         &fDL3EventTree_Xderot,         "Xderot/D" );
+	fDL3EventTree->Branch( "Yderot",         &fDL3EventTree_Yderot,         "Yderot/D" );
+	fDL3EventTree->Branch( "NImages",        &fDL3EventTree_NImages,        "NImages/I" );
+	fDL3EventTree->Branch( "ImgSel",         &fDL3EventTree_ImgSel,         "ImgSel/l" );
+	fDL3EventTree->Branch( "MSCW",           &fDL3EventTree_MSCW,           "MSCW/D" );
+	fDL3EventTree->Branch( "MSCL",           &fDL3EventTree_MSCL,           "MSCL/D" );
+	fDL3EventTree->Branch( "RA"            , &fDL3EventTree_RA,             "RA/D" );
+	fDL3EventTree->Branch( "DEC"           , &fDL3EventTree_DEC,            "DEC/D" );
+	fDL3EventTree->Branch( "Az"            , &fDL3EventTree_Az,             "Az/D" );
+	fDL3EventTree->Branch( "El"            , &fDL3EventTree_El,             "El/D" );
+	fDL3EventTree->Branch( "EmissionHeight", &fDL3EventTree_EmissionHeight, "EmissionHeight/D" );
+	fDL3EventTree->Branch( "Xoff"          , &fDL3EventTree_Xoff          , "Xoff/D" );
+	fDL3EventTree->Branch( "Yoff"          , &fDL3EventTree_Yoff          , "Yoff/D" );
+	fDL3EventTree->Branch( "Acceptance"    , &fDL3EventTree_Acceptance    , "Acceptance/D" );
 	cout << endl;
 
-	// init acceptance critter
-	fCTOOLSAcceptance = new VRadialAcceptance( fRunPara->fRunList[0].fAcceptanceFile ) ;
-	fCTOOLSAcceptance->Set2DAcceptanceMode( fRunPara->fRunList[0].f2DAcceptanceMode ) ;
+	// init radial acceptance class
+        if( icounter < (int)fRunPara->fRunList.size() )
+        {
+            fDL3_Acceptance = new VRadialAcceptance( fRunPara->fRunList[icounter].fAcceptanceFile ) ;
+            fDL3_Acceptance->Set2DAcceptanceMode( fRunPara->fRunList[icounter].f2DAcceptanceMode ) ;
+        }
+        else
+        {
+            fDL3_Acceptance = 0;
+        }
 
-	cout << " :: init_TreeWithEventsForCtools()" << endl;
+	cout << " :: init_DL3Tree()" << endl;
 	cout << endl;
 
 	return true;
 }
 
-void VStereoAnalysis::fill_TreeWithEventsForCtools( CData* c , double i_xderot, double i_yderot, unsigned int icounter, double i_UTC , double fEVDVersionSign ) // WRITEEVENTTREEFORCTOOLS
+/*
+ *  fill a new event into the DL3 tree
+ */
+void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot, unsigned int icounter, double i_UTC )
 {
-	//cout << endl;
-	//cout << " -- fill_TreeWithAllGamma()" << endl;
 	if( !c )
 	{
 		return;
 	}
 
-	fTreeCTOOLS_runNumber      = c->runNumber;    // Run Number
-	fTreeCTOOLS_eventNumber    = c->eventNumber;  // Event Number
-	fTreeCTOOLS_Time           = c->Time;         // Time of day (seconds) of gamma ray event
-	fTreeCTOOLS_MJD            = c->MJD;          // Day of epoch (days)
-	fTreeCTOOLS_Xoff           = c->Xoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
-	fTreeCTOOLS_Yoff           = c->Yoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
-	fTreeCTOOLS_Xderot         = i_xderot;        // Derotated Gamma Point-Of-Origin (deg, RA)
-	fTreeCTOOLS_Yderot         = i_yderot;        // Derotated Gamma Point-Of-Origin (deg, DEC)
-	fTreeCTOOLS_Erec           = c->Erec;         // Reconstructed Gamma Energy (TeV)
-	fTreeCTOOLS_Erec_Err       = c->dE;           // Reconstructed Gamma Energy (TeV) Error
-	fTreeCTOOLS_ErecS          = c->ErecS;        // Reconstructed Gamma Energy (TeV)
-	fTreeCTOOLS_ErecS_Err      = c->dES;          // Reconstructed Gamma Energy (TeV) Error
-	fTreeCTOOLS_XGroundCore    = c->Xcore;        // Gamma Ray Core-Ground intersection location (north?)
-	fTreeCTOOLS_YGroundCore    = c->Ycore;        // Gamma Ray Core-Ground intersection location (east?)
-	fTreeCTOOLS_NImages        = c->NImages;      // Number of images used in reconstruction?
-	fTreeCTOOLS_ImgSel         = c->ImgSel;       // 4-bit binary code describing which telescopes had images
-	fTreeCTOOLS_MSCW           = c->MSCW ;        // mean scaled width
-	fTreeCTOOLS_MSCL           = c->MSCL ;        // mean scaled length
-	fTreeCTOOLS_MWR            = c->MWR ;
-	fTreeCTOOLS_MLR            = c->MLR ;
-	fTreeCTOOLS_EmissionHeight = c->EmissionHeight ; // height of shower maximum (in km) above telescope z-plane
-	fTreeCTOOLS_Acceptance     = fCTOOLSAcceptance->getAcceptance( i_xderot, i_yderot ) ;
+	fDL3EventTree_runNumber      = c->runNumber;    // Run Number
+	fDL3EventTree_eventNumber    = c->eventNumber;  // Event Number
+	fDL3EventTree_Time           = c->Time;         // Time of day (seconds) of gamma ray event
+	fDL3EventTree_MJD            = c->MJD;          // Day of epoch (days)
+	fDL3EventTree_Xoff           = c->Xoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
+	fDL3EventTree_Yoff           = c->Yoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
+	fDL3EventTree_Xderot         = i_xderot;        // Derotated Gamma Point-Of-Origin (deg, RA)
+	fDL3EventTree_Yderot         = i_yderot;        // Derotated Gamma Point-Of-Origin (deg, DEC)
+        if( fCuts )
+        {
+            fDL3EventTree_Erec       = fCuts->getReconstructedEnergy( fRunPara->fEnergyReconstructionMethod );        // Reconstructed Gamma Energy (TeV)
+            fDL3EventTree_Erec_Err   = fCuts->getReconstructedEnergydE( fRunPara->fEnergyReconstructionMethod );          // Reconstructed Gamma Energy (TeV) Error
+        }
+        else
+        {
+            fDL3EventTree_Erec       = 0.;
+            fDL3EventTree_Erec_Err   = 0.;
+        }
+	fDL3EventTree_XGroundCore    = c->Xcore;        // Gamma Ray Core-Ground intersection location (north)
+	fDL3EventTree_YGroundCore    = c->Ycore;        // Gamma Ray Core-Ground intersection location (east)
+	fDL3EventTree_NImages        = c->NImages;      // Number of images used in reconstruction?
+	fDL3EventTree_ImgSel         = c->ImgSel;       // binary code describing which telescopes had images
+	fDL3EventTree_MSCW           = c->MSCW;        // mean scaled width
+	fDL3EventTree_MSCL           = c->MSCL;        // mean scaled length
+	fDL3EventTree_EmissionHeight = c->EmissionHeight ; // height of shower maximum (in km) above telescope z-plane
+        if( fDL3_Acceptance )
+        {
+            fDL3EventTree_Acceptance     = fDL3_Acceptance->getAcceptance( c->Xoff, c->Yoff );
+        }
+        else
+        {
+            fDL3EventTree_Acceptance     = 0.;
+        }
+        // get event ra and dec
+        if( icounter < fRunPara->fRunList.size() )
+        {
+            double i_centerpoint_RA = ( fRunPara->fRunList[icounter].fTargetRAJ2000 + -1.0 * getWobbleWest() );
+            double i_centerpoint_dec = ( fRunPara->fRunList[icounter].fTargetDecJ2000 + getWobbleNorth() );
+            double i_Spherical_RA  = 0.;
+            double i_Spherical_DEC = 0.;
+            slaDtp2s( fDL3EventTree_Xderot * TMath::DegToRad(),
+                      fDL3EventTree_Yderot * TMath::DegToRad(),
+                      i_centerpoint_RA * TMath::DegToRad(), 
+                      i_centerpoint_dec * TMath::DegToRad(),
+                      &i_Spherical_RA, &i_Spherical_DEC);
+            fDL3EventTree_RA  = i_Spherical_RA * TMath::RadToDeg();
+            fDL3EventTree_DEC = i_Spherical_DEC * TMath::RadToDeg();
 
-	// RA- and DEC-aligned Wobbles
-	fTreeCTOOLS_WobbleWest  = getWobbleWest()  ;
-	fTreeCTOOLS_WobbleNorth = getWobbleNorth() ;
+            // Convert from spherical RA and DEC to Azimuth and Zenith
+            // convert to degrees and do calculation
+            fVsky->setTargetJ2000( i_Spherical_DEC * TMath::RadToDeg(), i_Spherical_RA * TMath::RadToDeg() );
+            fVsky->precessTarget( fDL3EventTree_MJD, 0 ) ;
 
-	// pointing target
-	fTreeCTOOLS_TargetRA  = fRunPara->fRunList[0].fTargetRAJ2000  ;
-	fTreeCTOOLS_TargetDEC = fRunPara->fRunList[0].fTargetDecJ2000 ;
+            // calculate new param
+            fVsky->updatePointing( fDL3EventTree_MJD, fDL3EventTree_Time ) ;
+            fDL3EventTree_Az = fVsky->getTargetAzimuth();
+            fDL3EventTree_El = fVsky->getTargetElevation();
 
-	// need the telescope pointing for the TangentPoint (RA/DEC of Telescope Pointing?)
-	double CenterPoint_RA  = ( fTreeCTOOLS_TargetRA  + -1.0 * fTreeCTOOLS_WobbleWest ) ;
-	double CenterPoint_DEC = ( fTreeCTOOLS_TargetDEC + fTreeCTOOLS_WobbleNorth ) ;
-	CenterPoint_RA      *= TMath::DegToRad() ;
-	CenterPoint_DEC     *= TMath::DegToRad() ;
-	double Spherical_RA  = 0.0 ;
-	double Spherical_DEC = 0.0 ;
-	slaDtp2s( fTreeCTOOLS_Xderot * TMath::DegToRad(),
-			  fTreeCTOOLS_Yderot * TMath::DegToRad(),
-			  CenterPoint_RA,   CenterPoint_DEC,
-			  &Spherical_RA,    &Spherical_DEC ) ;
-	fTreeCTOOLS_RA  = Spherical_RA  * TMath::RadToDeg() ;
-	fTreeCTOOLS_DEC = Spherical_DEC * TMath::RadToDeg() ;;
+            cout << "TMPTMPTMP needs to be solved" << endl;
 
-	// Convert from spherical RA and DEC to Azimuth and Zenith
-	double Az_deg = 0.0 ;
-	double El_deg = 0.0 ;
+            cout << "Elevation: " << std::setprecision(6) << fDL3EventTree_El << "\t" << 90.-c->Ze << "\t" << c->TelElevation[0] << endl;
+            cout << "\t" << fDL3EventTree_El - ( 90.-c->Ze) << "\t" << fDL3EventTree_El-c->TelElevation[0] << endl;
+            cout << "Azimuth: " << std::setprecision(6) << fDL3EventTree_Az << "\t" << c->Az << "\t" << c->TelAzimuth[0] << endl;
+            cout << "\t" << fDL3EventTree_Az - c->Az << "\t" << fDL3EventTree_Az - c->TelAzimuth[0] << endl;
+        }
+        else
+        {
+            fDL3EventTree_RA = 0.;
+            fDL3EventTree_DEC = 0.;
+        }
 
-	// convert to degrees and do calculation
-	double Spherical_RA_deg  = Spherical_RA  * TMath::RadToDeg() ;
-	double Spherical_DEC_deg = Spherical_DEC * TMath::RadToDeg() ;
-	fVsky->setTargetJ2000( Spherical_DEC_deg , Spherical_RA_deg ) ;
-	fVsky->precessTarget( fTreeCTOOLS_MJD, 0 ) ;
-
-	// calculate new param
-	fVsky->updatePointing( fTreeCTOOLS_MJD, fTreeCTOOLS_Time ) ;
-	Az_deg = fVsky->getTargetAzimuth() ;
-	El_deg = fVsky->getTargetElevation() ;
-	fTreeCTOOLS_Az = Az_deg ;
-	fTreeCTOOLS_El = El_deg ;
-
-	// Convert MJD to Year, Month, and Day
-	fTreeCTOOLS_GregYear  = 0 ;
-	fTreeCTOOLS_GregMonth = 0 ;
-	fTreeCTOOLS_GregDay   = 0 ;
-	double junk1 = 0.0 ;
-	int junk2 = 0 ;
-	slaDjcl( c->MJD, &fTreeCTOOLS_GregYear, &fTreeCTOOLS_GregMonth, &fTreeCTOOLS_GregDay, &junk1, &junk2 ) ;
-
-
-	if( fTreeWithEventsForCtools )
+	if( fDL3EventTree )
 	{
-		fTreeWithEventsForCtools->Fill();
+		fDL3EventTree->Fill();
 	}
-
 }
 
-void VStereoAnalysis::save_TreeWithEventsForCtools() // WRITEEVENTTREEFORCTOOLS
+/*
+ * write tree with events for DL3 export
+ *
+*/
+void VStereoAnalysis::write_DL3Tree()
 {
-	// save our ctools tree
-	fTreeWithEventsForCtools->Write() ; // or maybe ->AutoSave() ?
+	fDL3EventTree->Write();
 
 	fRunPara->SetName( "VAnaSumRunParameter" );
 	fRunPara->Write() ;
 
-	//fDataRunTree->Write() ;
+        // cleanup
+        if( fDL3_Acceptance )
+        {
+            delete fDL3_Acceptance;
+        }
 }
