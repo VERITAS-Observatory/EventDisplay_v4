@@ -771,7 +771,6 @@ void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp
 	}
         if( onrun != -1 )
         {
-               cout << "XXXX " << fRunPara->fMapRunList[onrun].fTarget << endl;
                if( fRunPara->fMapRunList[onrun].fTarget.size() < 300 )
                {
                     sprintf( fRunSummary->fTargetName, "%s", fRunPara->fMapRunList[onrun].fTarget.c_str() );
