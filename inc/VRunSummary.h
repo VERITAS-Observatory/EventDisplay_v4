@@ -35,6 +35,7 @@ class VRunSummary
 		int runOff;
 		double MJDOn;
 		double MJDOff;
+                Char_t fTargetName[300];
 		double fTargetRA;
 		double fTargetDec;
 		double fTargetRAJ2000;

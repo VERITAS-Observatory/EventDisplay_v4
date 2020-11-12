@@ -742,8 +742,8 @@ void VAnaSum::copyDirectory( TDirectory* source )
 
 */
 void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp_off,
-							  double i_nevts_on, double i_nevts_off, double i_norm_alpha,
-							  double i_sig, double i_rate, double i_rateOFF, VOnOff* fstereo_onoff )
+		              double i_nevts_on, double i_nevts_off, double i_norm_alpha,
+			      double i_sig, double i_rate, double i_rateOFF, VOnOff* fstereo_onoff )
 {
 	if( !fRunSummary )
 	{
@@ -769,6 +769,18 @@ void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp
 	{
 		fRunSummary->MJDOff = 0.;
 	}
+        if( onrun != -1 )
+        {
+               cout << "XXXX " << fRunPara->fMapRunList[onrun].fTarget << endl;
+               if( fRunPara->fMapRunList[onrun].fTarget.size() < 300 )
+               {
+                    sprintf( fRunSummary->fTargetName, "%s", fRunPara->fMapRunList[onrun].fTarget.c_str() );
+               }
+               else
+               {
+                    sprintf( fRunSummary->fTargetName, "%s", fRunPara->fMapRunList[onrun].fTarget.substr( 0, 299 ).c_str() );
+               }
+        }
 	if( onrun != -1 && fRunPara->fMapRunList.find( onrun ) != fRunPara->fMapRunList.end() )
 	{
 		fRunSummary->fTargetRA = fRunPara->fMapRunList[onrun].fTargetRA;

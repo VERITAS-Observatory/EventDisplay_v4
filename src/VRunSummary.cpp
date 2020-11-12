@@ -25,6 +25,7 @@ bool VRunSummary::setBranches()
 	fRunSummaryTree->Branch( "runOff", &runOff, "runOff/I" );
 	fRunSummaryTree->Branch( "MJDOn", &MJDOn, "MJDOn/D" );
 	fRunSummaryTree->Branch( "MJDOff", &MJDOff, "MJDOff/D" );
+        fRunSummaryTree->Branch( "TargetName", &fTargetName, "TargetName/C"  );
 	fRunSummaryTree->Branch( "TargetRA", &fTargetRA, "TargetRA/D" );
 	fRunSummaryTree->Branch( "TargetDec", &fTargetDec, "TargetDec/D" );
 	fRunSummaryTree->Branch( "TargetRAJ2000", &fTargetRAJ2000, "TargetRAJ2000/D" );
@@ -75,6 +76,7 @@ void VRunSummary::init()
 	runOff = 0;
 	MJDOn = 0.;
 	MJDOff = 0.;
+        sprintf( fTargetName, "NOTSET" );
 	fTargetDec = 0.;
 	fTargetRA = 0.;
 	fTargetDecJ2000 = 0.;
@@ -371,6 +373,7 @@ bool VRunSummary::initTree()
 	fRunSummaryTree->SetBranchAddress( "runOff", &runOff );
 	fRunSummaryTree->SetBranchAddress( "MJDOn", &MJDOn );
 	fRunSummaryTree->SetBranchAddress( "MJDOff", &MJDOff );
+	fRunSummaryTree->SetBranchAddress( "TargetName", &fTargetName );
 	fRunSummaryTree->SetBranchAddress( "TargetRA", &fTargetRA );
 	fRunSummaryTree->SetBranchAddress( "TargetDec", &fTargetDec );
 	fRunSummaryTree->SetBranchAddress( "TargetRAJ2000", &fTargetRAJ2000 );

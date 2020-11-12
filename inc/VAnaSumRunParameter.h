@@ -249,12 +249,12 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		void printStereoParameter( int irun );
 		int  readRunParameter( string i_filename );
 		bool setSkyMapCentreJ2000( unsigned int i, double ra, double dec );
-		bool setTargetRADecJ2000( unsigned int i, double ra, double dec );
+		bool setTargetRADecJ2000( unsigned int i, double ra, double dec, string iTargetName );
 		bool setTargetRADec_currentEpoch( unsigned int i, double ra, double dec );
 		bool setTargetShifts( unsigned int i, double west, double north, double ra, double dec );
 		bool writeListOfExcludedSkyRegions();
 		bool getListOfExcludedSkyRegions( TFile* f );
 		
-		ClassDef( VAnaSumRunParameter, 11 ) ;
+		ClassDef( VAnaSumRunParameter, 12 ) ;
 };
 #endif

@@ -1566,7 +1566,9 @@ void VStereoAnalysis::defineAstroSource()
 		fRunPara->fRunList[i].fWobbleWestMod  = i_WobbleJ2000_West  - fRunPara->fRunList[i].fSkyMapCentreWest;
 
 		// fill run parameter values
-		fRunPara->setTargetRADecJ2000( i, fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000 );
+		fRunPara->setTargetRADecJ2000( i, fRunPara->fRunList[i].fTargetRAJ2000, 
+                                                  fRunPara->fRunList[i].fTargetDecJ2000,
+                                                  fRunPara->fRunList[i].fTarget );
 		fRunPara->setTargetShifts( i, fRunPara->fRunList[i].fTargetShiftWest, fRunPara->fRunList[i].fTargetShiftNorth,
 								   fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
 		fRunPara->setSkyMapCentreJ2000( i, fRunPara->fRunList[i].fSkyMapCentreRAJ2000, fRunPara->fRunList[i].fSkyMapCentreDecJ2000 );
@@ -2260,12 +2262,10 @@ void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot,
             fDL3EventTree_Az = fVsky->getTargetAzimuth();
             fDL3EventTree_El = fVsky->getTargetElevation();
 
-            cout << "TMPTMPTMP needs to be solved" << endl;
-
-            cout << "Elevation: " << std::setprecision(6) << fDL3EventTree_El << "\t" << 90.-c->Ze << "\t" << c->TelElevation[0] << endl;
-            cout << "\t" << fDL3EventTree_El - ( 90.-c->Ze) << "\t" << fDL3EventTree_El-c->TelElevation[0] << endl;
-            cout << "Azimuth: " << std::setprecision(6) << fDL3EventTree_Az << "\t" << c->Az << "\t" << c->TelAzimuth[0] << endl;
-            cout << "\t" << fDL3EventTree_Az - c->Az << "\t" << fDL3EventTree_Az - c->TelAzimuth[0] << endl;
+            //cout << "Elevation: " << std::setprecision(6) << fDL3EventTree_El << "\t" << 90.-c->Ze << "\t" << c->TelElevation[0] << endl;
+            //cout << "\t" << fDL3EventTree_El - ( 90.-c->Ze) << "\t" << fDL3EventTree_El-c->TelElevation[0] << endl;
+            //cout << "Azimuth: " << std::setprecision(6) << fDL3EventTree_Az << "\t" << c->Az << "\t" << c->TelAzimuth[0] << endl;
+            //cout << "\t" << fDL3EventTree_Az - c->Az << "\t" << fDL3EventTree_Az - c->TelAzimuth[0] << endl;
         }
         else
         {

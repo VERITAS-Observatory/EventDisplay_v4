@@ -1528,16 +1528,18 @@ bool VAnaSumRunParameter::setSkyMapCentreJ2000( unsigned int i, double ra, doubl
 }
 
 
-bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i, double ra, double dec )
+bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i, double ra, double dec, string iTargetName )
 {
 	if( i < fRunList.size() )
 	{
 		fRunList[i].fTargetRAJ2000 = ra;
 		fRunList[i].fTargetDecJ2000 = dec;
+                fRunList[i].fTarget = iTargetName;
 		if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
 		{
 			fMapRunList[fRunList[i].fRunOn].fTargetRAJ2000 = ra;
 			fMapRunList[fRunList[i].fRunOn].fTargetDecJ2000 = dec;
+                        fMapRunList[fRunList[i].fRunOn].fTarget = iTargetName;
 		}
 		// set centre of stereo maps (if this parameter is not set in the file runparameter.dat)
 		if( TMath::Abs( fSkyMapCentreNorth ) < 1.e-8 && TMath::Abs( fSkyMapCentreWest ) < 1.e-8
@@ -1547,6 +1549,7 @@ bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i, double ra, double
 			fRunList[i].fSkyMapCentreWest     = 0.;
 			fRunList[i].fSkyMapCentreRAJ2000  = ra;
 			fRunList[i].fSkyMapCentreDecJ2000 = dec;
+
 			if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
 			{
 				fMapRunList[fRunList[i].fRunOn].fSkyMapCentreNorth    = 0.;
