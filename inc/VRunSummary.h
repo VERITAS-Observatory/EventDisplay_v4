@@ -51,6 +51,7 @@ class VRunSummary
 		double fWobbleNorth;
 		double fWobbleWest;
 		unsigned int fNTel;
+                Char_t fTelList[300];
 		double tOn;
 		double tOff;
 		double elevationOn;

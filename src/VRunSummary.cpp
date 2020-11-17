@@ -41,6 +41,7 @@ bool VRunSummary::setBranches()
 	fRunSummaryTree->Branch( "WobbleNorth", &fWobbleNorth, "WobbleNorth/D" );
 	fRunSummaryTree->Branch( "WobbleWest", &fWobbleWest, "WobbleWest/D" );
 	fRunSummaryTree->Branch( "NTel", &fNTel, "NTel/i" );
+        fRunSummaryTree->Branch( "TelList", &fTelList, "TelList/C"  );
 	fRunSummaryTree->Branch( "tOn", &tOn, "tOn/D" );
 	fRunSummaryTree->Branch( "tOff", &tOff, "tOff/D" );
 	fRunSummaryTree->Branch( "elevationOn", &elevationOn, "elevationOn/D" );
@@ -81,6 +82,7 @@ void VRunSummary::init()
         MJDrunstart = 0.;
         MJDrunstop = 0.;
         sprintf( fTargetName, "NOTSET" );
+        sprintf( fTelList, "NOTSET" );
 	fTargetDec = 0.;
 	fTargetRA = 0.;
 	fTargetDecJ2000 = 0.;
@@ -393,6 +395,7 @@ bool VRunSummary::initTree()
 	fRunSummaryTree->SetBranchAddress( "WobbleNorth", &fWobbleNorth );
 	fRunSummaryTree->SetBranchAddress( "WobbleWest", &fWobbleWest );
 	fRunSummaryTree->SetBranchAddress( "NTel", &fNTel );
+	fRunSummaryTree->SetBranchAddress( "TelList", &fTelList );
 	fRunSummaryTree->SetBranchAddress( "tOn", &tOn );
 	fRunSummaryTree->SetBranchAddress( "tOff", &tOff );
 	fRunSummaryTree->SetBranchAddress( "elevationOn", &elevationOn );

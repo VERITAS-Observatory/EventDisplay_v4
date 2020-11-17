@@ -855,10 +855,31 @@ void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp
 	if( onrun != -1 )
 	{
 		fRunSummary->fNTel = fRunPara->fMapRunList[onrun].fNTel;
+                for( unsigned int p = 0; p < fRunPara->fRunList.size(); p++ )
+                {
+                    stringstream iTelCombination;
+                    if( fRunPara->fRunList[p].fRunOn == onrun )
+                    {
+                        for( unsigned int t = 0; t < fRunPara->fRunList[p].fTelToAnalyze.size(); t++ )
+                        {
+                            iTelCombination << "T";
+                            iTelCombination << fRunPara->fRunList[p].fTelToAnalyze[t]+1;
+                        }
+                        if( iTelCombination.str().size() < 300 )
+                        {
+                            sprintf( fRunSummary->fTelList, "%s", iTelCombination.str().c_str() );
+                        }
+                        else
+                        {
+                            sprintf( fRunSummary->fTelList, "%s", iTelCombination.str().substr(0,299).c_str() );
+                        }
+                    }    
+                }
 	}
 	else
 	{
 		fRunSummary->fNTel = 0;
+                sprintf( fRunSummary->fTelList, "NOTSET" );
 	}
 	fRunSummary->tOn = iexp_on;
 	fRunSummary->tOff = iexp_off;
