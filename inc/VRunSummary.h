@@ -58,6 +58,7 @@ class VRunSummary
 		double azimuthOn;
 		double elevationOff;
 		double azimuthOff;
+                double fTheta2Max;
 		double RawRateOn;
 		double RawRateOff;
 		double pedvarsOn;

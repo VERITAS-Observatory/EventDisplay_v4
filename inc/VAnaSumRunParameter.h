@@ -129,7 +129,7 @@ class VAnaSumRunParameterDataClass : public TNamed
 		
 		VAnaSumRunParameterDataClass();
 		~VAnaSumRunParameterDataClass() {}
-		ClassDef( VAnaSumRunParameterDataClass, 1 );
+		ClassDef( VAnaSumRunParameterDataClass, 2 );
 };
 
 class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter

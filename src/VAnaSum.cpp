@@ -915,6 +915,10 @@ void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp
 	{
 		fRunSummary->azimuthOff = fMeanAzimuthOff;
 	}
+        if( onrun != -1 )
+        {
+            fRunSummary->fTheta2Max = fRunPara->fMapRunList[onrun].fSourceRadius;
+        }
 	if( onrun != -1 )
 	{
 		if( iexp_on > 0. )

@@ -48,6 +48,7 @@ bool VRunSummary::setBranches()
 	fRunSummaryTree->Branch( "azimuthOn", &azimuthOn, "azimuthOn/D" );
 	fRunSummaryTree->Branch( "elevationOff", &elevationOff, "elevationOff/D" );
 	fRunSummaryTree->Branch( "azimuthOff", &azimuthOff, "azimuthOff/D" );
+	fRunSummaryTree->Branch( "Theta2Max", &fTheta2Max, "Theta2Max/D" );
 	fRunSummaryTree->Branch( "RawRateOn", &RawRateOn, "RawRateOn/D" );
 	fRunSummaryTree->Branch( "RawRateOff", &RawRateOff, "RawRateOff/D" );
 	fRunSummaryTree->Branch( "pedvarsOn", &pedvarsOn, "pedvarsOn/D" );
@@ -102,6 +103,7 @@ void VRunSummary::init()
 	elevationOff = 0.;
 	azimuthOn  = 0.;
 	azimuthOff = 0.;
+        fTheta2Max = 0.;
 	RawRateOn = 0.;
 	RawRateOff = 0.;
 	pedvarsOn = 0.;
@@ -402,6 +404,7 @@ bool VRunSummary::initTree()
 	fRunSummaryTree->SetBranchAddress( "elevationOff", &elevationOff );
 	fRunSummaryTree->SetBranchAddress( "azimuthOn", &azimuthOn );
 	fRunSummaryTree->SetBranchAddress( "azimuthOff", &azimuthOff );
+	fRunSummaryTree->SetBranchAddress( "Theta2Max", &fTheta2Max );
 	fRunSummaryTree->SetBranchAddress( "RawRateOn", &RawRateOn );
 	fRunSummaryTree->SetBranchAddress( "RawRateOff", &RawRateOff );
 	fRunSummaryTree->SetBranchAddress( "pedvarsOn", &pedvarsOn );
