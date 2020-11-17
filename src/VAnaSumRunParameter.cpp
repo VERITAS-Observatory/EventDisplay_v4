@@ -16,6 +16,9 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 	
 	fMJDOn = 0.;
 	fMJDOff = 0.;
+
+        fMJDOnStart = 0.;
+        fMJDOnStop = 0.;
 	
 	fTarget = "";
 	fTargetRAJ2000 = 0.;
@@ -1525,6 +1528,22 @@ bool VAnaSumRunParameter::setSkyMapCentreJ2000( unsigned int i, double ra, doubl
 		return true;
 	}
 	return false;
+}
+
+bool VAnaSumRunParameter::setRunTimes( unsigned int i, double iMJDStart, double iMJDStopp )
+{
+       if( i >= fRunList.size() )
+       {
+            return false;
+       }
+       fRunList[i].fMJDOnStart = iMJDStart;
+       fRunList[i].fMJDOnStop = iMJDStopp;
+       if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
+       {
+           fMapRunList[fRunList[i].fRunOn].fMJDOnStart = iMJDStart;
+           fMapRunList[fRunList[i].fRunOn].fMJDOnStop = iMJDStopp;
+       }
+       return true;
 }
 
 

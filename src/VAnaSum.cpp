@@ -756,10 +756,14 @@ void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp
 	if( onrun != -1 )
 	{
 		fRunSummary->MJDOn = fStereoOn->getMJD( onrun );
+                fRunSummary->MJDrunstart = fRunPara->fMapRunList[onrun].fMJDOnStart;
+                fRunSummary->MJDrunstop = fRunPara->fMapRunList[onrun].fMJDOnStop ;
 	}
 	else
 	{
-		fRunSummary->MJDOn = 0.;    //Could make this the mean MJD of all ON runs included in the summed analysis
+		fRunSummary->MJDOn = 0.;
+                fRunSummary->MJDrunstart = 0.;
+                fRunSummary->MJDrunstop = 0.;
 	}
 	if( offrun != -1 )
 	{

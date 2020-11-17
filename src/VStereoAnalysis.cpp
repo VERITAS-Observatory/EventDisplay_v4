@@ -341,6 +341,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 
 	// initialize time mask
 	fTimeMask->setMask( irun, iMJDStart, iMJDStopp, fRunPara->fTimeMaskFile );
+        fRunPara->setRunTimes( icounter, iMJDStart, iMJDStopp );
 
 	// initialize cuts
 	setCuts( fRunPara->fRunList[fHisCounter], irun );
@@ -1899,12 +1900,7 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
 			exit( EXIT_FAILURE );
 		}
 		fDataFrogsTree = ( TTree* )fDataFile->Get( "frogspars" );
-		if( !fDataFrogsTree )
-		{
-			cout << "VStereoAnalysis::getDataFromFile() info: cannot find frogspars tree in " << iFileName << endl;
-                        cout << "(this will lead to a failure for the frogs analysis (in case you run a frogs analysis))" << endl;
-		}
-		else
+		if( fDataFrogsTree )
 		{
                         cout << "VStereoAnalysis::getDataFromFile() info: found frogspars tree" << endl;
 			fDataRunTree->AddFriend( fDataFrogsTree );
@@ -2134,12 +2130,6 @@ double VStereoAnalysis::getWobbleWest()
 */
 bool VStereoAnalysis::init_DL3Tree( int irun, int icounter )
 {
-
-	cout << endl;
-	cout << " :: init_DL3Tree( " << irun << " )" << endl;
-	cout << endl;
-
-
 	if( fDL3EventTree )
 	{
 		delete fDL3EventTree;
@@ -2187,10 +2177,6 @@ bool VStereoAnalysis::init_DL3Tree( int irun, int icounter )
         {
             fDL3_Acceptance = 0;
         }
-
-	cout << " :: init_DL3Tree()" << endl;
-	cout << endl;
-
 	return true;
 }
 
