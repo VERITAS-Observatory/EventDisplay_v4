@@ -1,4 +1,4 @@
-# Eventdisplay source code (v4xx version only)
+# Eventdisplay source code (v483)
 
 **released eventdisplay version - to be used for science analysis**
 
