@@ -1,4 +1,4 @@
-# Eventdisplay source code (v4xx version only)
+# Eventdisplay source code (v483b version only)
 
 **released eventdisplay version - to be used for science analysis**
 
@@ -10,8 +10,13 @@ Repository for the Eventdisplay code for the v483 version.
 
 Corresponding analysis files: (none)
 
-
 For older versions of Eventdisplay, see the release pages on the VERITAS wiki:
 https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual#Versions_of_eventdisplay
 
 For any questions, contact Gernot Maier (gernot.maier@desy.de)
+
+# Release Notes
+
+Changes compared to v483:
+
+- added more debugging options for IRFs in energy threshold code
