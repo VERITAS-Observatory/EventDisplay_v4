@@ -3,7 +3,8 @@
 # (output need to be combined afterwards)
 
 # qsub parameters
-h_cpu=13:29:00; h_vmem=15000M; tmpdir_size=20G
+#h_cpu=13:29:00; h_vmem=15000M; tmpdir_size=20G
+h_cpu=11:29:00; h_vmem=8000M; tmpdir_size=5G
 
 if [[ $# != 8 ]]; then
 # begin help message
