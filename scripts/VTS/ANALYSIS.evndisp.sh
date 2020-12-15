@@ -12,7 +12,7 @@ if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 echo "
 EVNDISP data analysis: submit jobs from a simple run list
 
-ANALYSIS.evndisp.sh <runlist> [output directory] [runparameter file] [calibration] [Model3D] [teltoana] [calibration file name]
+ANALYSIS.evndisp.sh <runlist> [output directory] [runparameter file] [calibration] [calibration directory] [teltoana] [calibration file name]
 
 required parameters:
 
@@ -117,7 +117,7 @@ echo
 # of database and many jobs running in parallel
 SLEEPABIT="1s"
 if [ "$NRUNS" -gt "100" ] ; then
-   SLEEPABIT="30s"
+   SLEEPABIT="10s"
    echo "Long list of runs (${NRUNS}), will sleep after each run for ${SLEEPABIT}"
 fi
 
