@@ -216,9 +216,9 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 		feffFract_50p = 0;
 		feffFract_90p = 0;
 
-                feff_300GeV = 0.;
-                feff_500GeV = 0.;
-                feff_1TeV = 0.;
+        feff_300GeV = 0.;
+        feff_500GeV = 0.;
+        feff_1TeV = 0.;
 		
 		copyEntry();
 		
@@ -227,24 +227,24 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 		{
 			feth = getEnergyThreshold( hLin, true, bFit );
 		}
-                else
+        else
+        {
+                if( fEffArea->nbins > 1 )
                 {
-                        if( fEffArea->nbins > 1 )
-                        {
-                            double idE = fEffArea->e0[1] - fEffArea->e0[0];
-                            TH1D hLin( "hLin", "", fEffArea->nbins,
-                                      fEffArea->e0[0] - idE,
-                                      fEffArea->e0[fEffArea->nbins-1] + idE );
-                            for( int b = 0; b < fEffArea->nbins; b++ )
-                            {
-                                hLin.SetBinContent( b+1, fEffArea->e0[b],
-                                                  fEffArea->eff[b] *
-                                                  TMath::Power( TMath::Power( 10., fEffArea->e0[b] ),
-                                                  -1.*fEffArea->index ) );
-                            }
-                            feth = getEnergyThreshold( &hLin, true, bFit );
-                        }
+                    double idE = fEffArea->e0[1] - fEffArea->e0[0];
+                    TH1D hLin( "hLin", "", fEffArea->nbins,
+                              fEffArea->e0[0] - idE,
+                              fEffArea->e0[fEffArea->nbins-1] + idE );
+                    for( int b = 0; b < fEffArea->nbins; b++ )
+                    {
+                        hLin.SetBinContent( b+1, fEffArea->e0[b],
+                                          fEffArea->eff[b] *
+                                          TMath::Power( TMath::Power( 10., fEffArea->e0[b] ),
+                                          -1.*fEffArea->index ) );
+                    }
+                    feth = getEnergyThreshold( &hLin, true, bFit );
                 }
+        }
 
 		
 		TProfile* hSys = fEffArea->hEsysMCRelative;
@@ -255,17 +255,17 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 			fesys_20p = getEnergy_maxSystematic( hSys, 0.20 );
 		}
 		TGraph* hG = fEffArea->gEffAreaRec;
-                if( !hG )
-                {
-                     hG = new TGraph( 1 );
-                     for( int b = 0; b < fEffArea->nbins; b++ )
-                     {
-                         hG->SetPoint( b, fEffArea->e0[b], fEffArea->eff[b] );
-                     }
-                     feff_300GeV = hG->Eval( log10( 0.3 ) );
-                     feff_500GeV = hG->Eval( log10( 0.5 ) );
-                     feff_1TeV = hG->Eval( log10( 1. ) );
-                }
+        if( !hG )
+        {
+             hG = new TGraph( 1 );
+             for( int b = 0; b < fEffArea->nbins; b++ )
+             {
+                 hG->SetPoint( b, fEffArea->e0[b], fEffArea->eff[b] );
+             }
+             feff_300GeV = hG->Eval( log10( 0.3 ) );
+             feff_500GeV = hG->Eval( log10( 0.5 ) );
+             feff_1TeV = hG->Eval( log10( 1. ) );
+        }
 		if( hG )
 		{
 			feffFract_05p = getEnergy_MaxEffectiveAreaFraction( hG, 0.05 );
