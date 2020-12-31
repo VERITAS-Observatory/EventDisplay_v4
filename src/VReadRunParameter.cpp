@@ -495,7 +495,6 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		else if( iTemp.find( "-savedeadpixelregistry" ) < iTemp.size() )
 		{
 			fRunPara->fSaveDeadPixelRegistry = true ;
-			cout << "NKH fRunPara->fSaveDeadPixelRegistry = true !" << endl;
 		}
 		// ignore configuration file versions
 		else if( iTemp.find( "ignorecfgversions" ) < iTemp.size() )

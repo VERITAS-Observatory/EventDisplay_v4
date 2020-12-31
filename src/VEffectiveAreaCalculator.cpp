@@ -1760,20 +1760,7 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 				fResMat_Rec_map[i_ID] = i_ResMat_Rec;
 				fResMat_Rec_Err_map[i_ID] = i_ResMat_Rec_Err;
 
-				// cout << nbins_MC << " " << nbins << " " << endl;
-				// Getting MC effective areas too
 				i_temp_Eff_MC.assign(fNBins, 0);
-				// cout << "i_temp_Eff_MC.size() : " << i_temp_Eff_MC.size() << " " <<  << endl;
-				// for( int j = 0; j < nbins_MC; j++ )
-				// {
-				// 	i_temp_Eff_MC[j] = 0.;
-				// 	if( TMath::Abs( eff_MC[j]  ) > 1.e-5 )
-				// 	{
-				// 		i_temp_Eff_MC[j] = eff_MC[j];
-				// 		//cout << i_temp_Eff_MC[j] << " " << eff_MC[j] << endl;
-				// 	}
-				// }
-
 
 				for( unsigned int e = 0; e < fNBins; e++ )
 				{
@@ -1783,24 +1770,12 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 						if( TMath::Abs( e0_MC[j] - fEff_E0[e] ) < 1.e-5 )
 						{
 							i_temp_Eff_MC[e] = eff_MC[j];
-							// cout << "Blah " << e0_MC[j] << " " <<   fEff_E0[e] << " " << e0_MC[j] - fEff_E0[e] << " "
-							     // << i_temp_Eff_MC[e]    << " " << e0[j] <<" " << eff[j] << endl;
 						}
-						// else
-						// {
-						// 	cout << "Errors - Bins are going crazy again: " << e0_MC[j] << " " <<   fEff_E0[e] << " " << e0_MC[j] - fEff_E0[e] << " "  << i_temp_Eff_MC[e]  << " " << endl;
-
-						// }
 					}
 				}
 
 				fEffAreaMC_map[i_ID] = i_temp_Eff_MC;
 
-			//	cout << fEffAreaMC_map[i_ID].size() << " " << i_temp_Eff_MC.size() << " " << nbins_MC << endl;
-			//	for ( int j = 0; j < nbins_MC ; j++ )
-			//	{
-			//		cout << j << " " << fEffAreaMC_map[i_ID][j] << endl;
-			//	}
 			}
 
 
