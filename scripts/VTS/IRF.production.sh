@@ -95,6 +95,10 @@ elif [ "${SIMTYPE}" = "CARE_June1702" ]; then
         ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 )
     fi
     NSB_LEVELS=( 50 75 100 130 160 200 250 300 350 400 450 )
+    # TMPTMPMTP
+    #ZENITH_ANGLES=( 20 )
+    #NSB_LEVELS=( 200 )
+    # TMPTMPMTP
     WOBBLE_OFFSETS=( 0.5 )
     NEVENTS="15000000"
 elif [ "${SIMTYPE}" = "CARE_RedHV" ]; then
@@ -141,9 +145,11 @@ else
                  ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft.dat
                  ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat 
                  ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard.dat"
+        CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft.dat
+                 ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate.dat"
     else
     #BDT TMVA list of cuts
-        CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-BDT.dat 
+        CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-BDT.dat
                  ANASUM.GammaHadron-Cut-NTel2-PointSource-Soft-TMVA-BDT.dat 
                  ANASUM.GammaHadron-Cut-NTel2-PointSource-Hard-TMVA-BDT.dat
                  ANASUM.GammaHadron-Cut-NTel3-PointSource-Hard-TMVA-BDT.dat"
