@@ -67,6 +67,11 @@ for CUTSFILE in $CUTSLIST; do
 
     # create makeEffectiveArea parameter file
     EAPARAMS="$EFFAREAFILE-${CUTS_NAME}"
+    # TMPTMP
+    #if [[ -s $OSUBDIR/$EAPARAMS.root ]]; then
+    #    continue
+    #fi
+
     rm -f "$DDIR/$EAPARAMS.dat"
     eval "echo \"$PARAMFILE\"" > $DDIR/$EAPARAMS.dat
 
