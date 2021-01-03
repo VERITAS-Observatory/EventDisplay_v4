@@ -39,6 +39,11 @@ fi
 ONAME="$RUNNUM"
 echo "Runnumber $RUNNUM"
 
+#if [[ $RUNNUM != "961200" ]]; then
+#   echo "donnot do $RUNNUM"
+#   exit
+#fi
+
 #################################
 # detector configuration and cuts
 echo "Using run parameter file $ACUTS"
@@ -74,6 +79,9 @@ else
 fi
 mkdir -p $DDIR
 echo "Temporary directory: $DDIR"
+CALDIR=${DDIR}
+mkdir -p ${CALDIR}/Calibration
+echo "Calibration directory: ${CALDIR}"
 
 ##################3
 # unzip vbf file to local scratch directory
@@ -111,12 +119,11 @@ fi
 VBF_FILE="$DDIR/$VBF_FILE"
 
 # Low gain calibration
-mkdir -p $ODIR/Calibration
-if [[ ! -f $ODIR/Calibration/calibrationlist.LowGain.dat ]]; then 
+if [[ ! -f ${CALDIR}/Calibration/calibrationlist.LowGain.dat ]]; then 
     if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
-        cp -f $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGain.dat $ODIR/Calibration/calibrationlist.LowGain.dat
+        cp -f $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGain.dat  ${CALDIR}/Calibration/calibrationlist.LowGain.dat
     elif [ ${SIMTYPE:0:4} = "CARE" ]; then
-        cp -f $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGainForCare.dat $ODIR/Calibration/calibrationlist.LowGainForCare.dat
+        cp -f $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGainForCare.dat  ${CALDIR}/Calibration/calibrationlist.LowGainForCare.dat
     fi
 fi
 
@@ -126,7 +133,7 @@ fi
 if [[ ${SIMTYPE:0:4} == "CARE" ]]; then
     echo "Calculating pedestals for run $RUNNUM"
     rm -f $ODIR/$RUNNUM.ped.log
-    $EVNDISPSYS/bin/evndisp -runmode=1 -sourcetype=2 -epoch $EPOCH -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo $AMPCORR -calibrationnevents=${PEDNEVENTS} -calibrationdirectory $ODIR &> $ODIR/$RUNNUM.ped.log
+    $EVNDISPSYS/bin/evndisp -runmode=1 -sourcetype=2 -epoch $EPOCH -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo $AMPCORR -calibrationnevents=${PEDNEVENTS} -calibrationdirectory ${CALDIR} &> $ODIR/$RUNNUM.ped.log
     if grep -Fq "END OF ANALYSIS, exiting" $ODIR/$RUNNUM.ped.log;
     then
         echo "   successful pedestal analysis"
@@ -139,7 +146,7 @@ fi
 ###############################################
 # calculate tzeros
 echo "Calculating average tzeros for run $RUNNUM"
-MCOPT="-runmode=7 -sourcetype=2 -epoch $EPOCH -camera=$CFG -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo -calibrationnevents=${TZERONEVENTS} -calibrationdirectory $ODIR -reconstructionparameter $ACUTS -pedestalnoiselevel=$NOISE "
+MCOPT="-runmode=7 -sourcetype=2 -epoch $EPOCH -camera=$CFG -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo -calibrationnevents=${TZERONEVENTS} -calibrationdirectory ${CALDIR} -reconstructionparameter $ACUTS -pedestalnoiselevel=$NOISE "
 rm -f $ODIR/$RUNNUM.tzero.log
 ### eventdisplay GRISU run options
 if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
@@ -161,7 +168,7 @@ fi
 # run eventdisplay
 ###############################################
 # run options
-MCOPT=" -runnumber=$RUNNUM -sourcetype=2 -epoch $EPOCH -camera=$CFG -reconstructionparameter $ACUTS -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory $ODIR"
+MCOPT=" -runnumber=$RUNNUM -sourcetype=2 -epoch $EPOCH -camera=$CFG -reconstructionparameter $ACUTS -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory ${CALDIR}"
 # special options for GRISU
 if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     MCOPT="$MCOPT -simu_hilo_from_simfile -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
@@ -180,6 +187,7 @@ $EVNDISPSYS/bin/evndisp $MCOPT $AMPCORR &>> $ODIR/$ONAME.log
 
 # remove temporary files
 cp -f -v $DDIR/$ONAME.root $ODIR/$ONAME.root
+cp -r -f -v ${CALDIR}/Calibration $ODIR/
 chmod g+w $ODIR/$ONAME.root
 chmod g+w $ODIR/$ONAME.log
 chmod g+w $ODIR/$ONAME.tzero.log
