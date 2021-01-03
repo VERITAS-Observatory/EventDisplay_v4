@@ -164,6 +164,36 @@ elif [ ${SIMTYPE:0:4} == "CARE" ]; then
        VBFNAME=$(find ${SIMDIR} -name "proton_${ZA}deg*${WOBBLE}wob_${NOISE}mhz*ATM${ATM}*.zst")
     fi
 fi
+
+#######################################################
+# run analysis only of no reasonable good output file
+# exists
+toexec=0
+echo "Testing if production already exists"
+if [ -e $OPDIR ]; then
+    for edlog in $OPDIR/*.ped.log; do
+        rootfile="${edlog%.ped.log}.root"
+        if [ ! -e $rootfile ]; then
+            toexec=1
+            echo "   not found: $rootfile"
+        else
+            sh $( dirname "$0" )/helper_scripts/UTILITY.check_root_file_closed.sh $rootfile
+            if [ "$?" == "1" ]; then
+                echo "    corrupt $rootfile"
+                toexec=1
+            fi
+        fi
+    done
+fi
+
+if [ "$toexec" == "0" ]; then
+    # skip this run, the root file exists and seems to be healthy
+    echo "skipping this set (looks complete)"
+    exit
+else 
+    echo "starting analysis (incomplete or missing files)"
+fi
+
 #####################################
 # Loop over all VBFFiles
 for V in ${VBFNAME}
