@@ -176,6 +176,10 @@ class VFluxCalculation : public TObject
 		~VFluxCalculation();
 		
 		void          calculateIntegralFlux( double iMinEnergy_TeV );
+                TGraphErrors* getFluxvsElevation()
+                {
+                        return gFluxElevation;
+                }
 		TCanvas*      getFluxesVSMJDCanvas()
 		{
 			return fCanvasFluxesVSMJD;
