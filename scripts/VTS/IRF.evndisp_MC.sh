@@ -208,7 +208,7 @@ do
     echo "VBFILE: ${V} $FF"
     echo "NOISEFILE: ${NOISEFILE}"
     # tmpdir requires a safety factor of 2.5 (from unzipping VBF file)
-    TMSF=$(echo "${FF%?}*3.0" | bc)
+    TMSF=$(echo "${FF%?}*5.0" | bc)
     if [[ ${NOISE} -eq 50 ]]; then
        TMSF=$(echo "${FF%?}*5.0" | bc)
     fi
