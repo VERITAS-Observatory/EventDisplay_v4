@@ -64,10 +64,10 @@ class VEnergyThreshold : public TObject
 		double feffFract_20p;
 		double feffFract_50p;
 		double feffFract_90p;
-        // effective areas
-        double feff_300GeV;
-        double feff_500GeV;
-        double feff_1TeV;
+                // effective areas
+                double feff_300GeV;
+                double feff_500GeV;
+                double feff_1TeV;
 		
 		int fPlottingMarkerStyle;
 		int fPlottingMarkerColor;
@@ -88,8 +88,8 @@ class VEnergyThreshold : public TObject
 		VEnergyThreshold();
 		VEnergyThreshold( string ioutfilename );
 		VEnergyThreshold( double iEthFixed, string iInFile = "" );
-		~VEnergyThreshold() {}
-        bool closeOutputFile();
+		~VEnergyThreshold()
+                bool closeOutputFile();
 		bool openEffectiveAreaFile( string ifile );
 		bool calculateEnergyThreshold( bool bFit = true, int nentries = -1 );
 		double getEnergy_maxSystematic( TObject* h = 0, double iSys = 0.1 );

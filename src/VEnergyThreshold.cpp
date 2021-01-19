@@ -116,6 +116,14 @@ VEnergyThreshold::VEnergyThreshold( double iEnergyThresholdFixed, string iEnergy
 	setPlottingYaxis();
 }
 
+VEnergyThreshold::~VEnergyThreshold()
+{
+       if( fEffArea )
+       {
+            delete fEffArea;
+       }
+}
+
 bool VEnergyThreshold::closeOutputFile()
 {
        if( fOutFile )
@@ -216,10 +224,10 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 		feffFract_50p = 0;
 		feffFract_90p = 0;
 
-        feff_300GeV = 0.;
-        feff_500GeV = 0.;
-        feff_1TeV = 0.;
-		
+                feff_300GeV = 0.;
+                feff_500GeV = 0.;
+                feff_1TeV = 0.;
+                        
 		copyEntry();
 		
 		TH1D* hLin = fEffArea->hEcut500;
@@ -273,6 +281,7 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 			feffFract_20p = getEnergy_MaxEffectiveAreaFraction( hG, 0.20 );
 			feffFract_50p = getEnergy_MaxEffectiveAreaFraction( hG, 0.50 );
 			feffFract_90p = getEnergy_MaxEffectiveAreaFraction( hG, 0.90 );
+                        delete hG;
 		}
 		if( TMath::Abs( fEffArea->index - 2.4 ) < 1.e-3 && TMath::Abs( fEffArea->azMax - 1000. ) < 1.e-3 )
 		{
