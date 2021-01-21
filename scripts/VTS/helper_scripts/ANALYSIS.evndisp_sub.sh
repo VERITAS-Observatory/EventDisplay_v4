@@ -13,6 +13,7 @@ MODEL3D=USEMODEL3D
 CALIBFILE=USECALIBLIST
 TELTOANA=TELTOANACOMB
 LOGDIR="$ODIR"
+CALDIR="$ODIR"
 ACUTS=RECONSTRUCTIONRUNPARAMETERFILE
 PARS=EXTRAPARS
 
@@ -28,11 +29,27 @@ mkdir -p $TEMPDIR
 #################################
 echo "Using run parameter file $ACUTS"
 
+#################################
+# low gain calibration file
+mkdir -p $CALDIR/Calibration/
+if [[ -e "$VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGain.dat" ]]; then
+   cp -f -v $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGain.dat $CALDIR/Calibration/
+else
+   echo "error - low-gain calibration list not found ($VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGain.dat)"
+   exit
+fi
+if [[ -e "$VERITAS_EVNDISP_AUX_DIR/Calibration/LowGainPedestals.lped" ]]; then
+   cp -f -v $VERITAS_EVNDISP_AUX_DIR/Calibration/LowGainPedestals.lped $CALDIR/Calibration/
+else
+   echo "error - low-gain calibration list not found ($VERITAS_EVNDISP_AUX_DIR/Calibration/LowGainPedestals.lped)"
+   exit
+fi
+
 #########################################
 # pedestal calculation
 if [[ $CALIB == "1" || ( $CALIB == "2" || $CALIB == "4" ) ]]; then
     rm -f $LOGDIR/$RUN.ped.log
-    $EVNDISPSYS/bin/evndisp -runmode=1 -runnumber=$RUN -reconstructionparameter $ACUTS &> $LOGDIR/$RUN.ped.log 
+    $EVNDISPSYS/bin/evndisp -runmode=1 -runnumber="$RUN" -reconstructionparameter "$ACUTS" -calibrationdirectory "$CALDIR" &> "$LOGDIR/$RUN.ped.log"
     echo "RUN$RUN PEDLOG $LOGDIR/$RUN.ped.log"
 fi
 
@@ -45,7 +62,7 @@ elif [[ $CALIB == "4" ]]; then
 	## use text file for calibration information
 	OPT+=( -calibrationfile $CALIBFILE )
 else
-	# read gain and toffsets from VOFFLINE DB
+## read gain and toffsets from VOFFLINE DB (default)
 	OPT+=( "-readCalibDB" )
 fi
 
@@ -71,8 +88,8 @@ fi
 # average tzero calculation
 if [[ $CALIB == "1" || ( $CALIB == "3" || $CALIB == "4" ) ]]; then
     rm -f $LOGDIR/$RUN.tzero.log
-    $EVNDISPSYS/bin/evndisp -runnumber=$RUN -runmode=7 -reconstructionparameter $ACUTS ${OPT[@]} &> $LOGDIR/$RUN.tzero.log 
-	echo "RUN$RUN TZEROLOG $LOGDIR/$RUN.tzero.log"
+    $EVNDISPSYS/bin/evndisp -runnumber=$RUN -runmode=7 -reconstructionparameter $ACUTS ${OPT[@]} -calibrationdirectory "$CALDIR" &> $LOGDIR/$RUN.tzero.log 
+    echo "RUN$RUN TZEROLOG $LOGDIR/$RUN.tzero.log"
 fi
 
 #########################################
@@ -108,7 +125,7 @@ fi
 # run eventdisplay
 LOGFILE="$LOGDIR/$RUN.log"
 rm -f $LOGDIR/$RUN.log
-$EVNDISPSYS/bin/evndisp $PARS -runnumber=$RUN -reconstructionparameter $ACUTS -outputfile $TEMPDIR/$RUN.root ${OPT[@]} &> "$LOGFILE"
+$EVNDISPSYS/bin/evndisp $PARS -runnumber=$RUN -reconstructionparameter $ACUTS -outputfile $TEMPDIR/$RUN.root ${OPT[@]} -calibrationdirectory "$CALDIR" &> "$LOGFILE"
 # DST $EVNDISPSYS/bin/evndisp -runnumber=$RUN -nevents=250000 -runmode=4 -readcalibdb -dstfile $TEMPDIR/$RUN.dst.root -reconstructionparameter $ACUTS -outputfile $TEMPDIR/$RUN.root ${OPT[@]} &> "$LOGFILE"
 echo "RUN$RUN EVNDISPLOG $LOGFILE"
 
