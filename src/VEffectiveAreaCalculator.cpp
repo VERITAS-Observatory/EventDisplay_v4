@@ -1367,6 +1367,16 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
                             iEffArea->SetBranchAddress( "ResMat_Rec" , ResMat_Rec );
                             iEffArea->SetBranchAddress( "ResMat_Rec_Err" , ResMat_Rec_Err );
                         }
+                        else
+                        {
+                            nbins_ResMat = 0;
+                            for( unsigned int d = 0; d < 1000; d++ )
+                            {
+                                ResMat_MC[d] = 0;
+                                ResMat_Rec[d] = 0;
+                                ResMat_Rec_Err[d] = 0;
+                            } 
+                        }
 	}
 
 	if( iEffArea->GetBranchStatus( "hEsysMCRelative" ) )
@@ -4549,6 +4559,7 @@ void VEffectiveAreaCalculator::Calculate_Bck_solid_angle_norm()
 // Adding Response matrix to the time averaged
 void VEffectiveAreaCalculator::addMeanResponseMatrix( vector <double> i_emc, vector <double> i_erec , vector <double> i_erec_err )
 {
+    if( i_emc.size() == 0 || i_erec.size() == 0 || i_erec_err.size() == 0 ) return;
     // Getting binning
     hres_binc.resize(i_emc.size(),0);
 
