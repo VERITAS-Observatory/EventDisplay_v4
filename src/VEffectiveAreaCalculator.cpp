@@ -4510,6 +4510,7 @@ void VEffectiveAreaCalculator::Calculate_Bck_solid_angle_norm()
 // Adding Response matrix to the time averaged
 void VEffectiveAreaCalculator::addMeanResponseMatrix( vector <double> i_emc, vector <double> i_erec , vector <double> i_erec_err )
 {
+    if( i_emc.size() == 0 || i_erec.size() == 0 || i_erec_err.size() == 0 ) return;
     // Getting binning
     hres_binc.resize(i_emc.size(),0);
 
