@@ -99,6 +99,14 @@ bool readMeanElevation( TFile *fIn )
 	{
 		return false;
 	}
+        // get total number of telescopes available
+        TTree *telconfig = (TTree*)fIn->Get( "telconfig" );
+        if( !telconfig )
+        {
+            return false;
+        }
+        unsigned int iNTel = (unsigned int)telconfig->GetEntries();
+        if( iNTel >= VDST_MAXTELESCOPES ) iNTel = VDST_MAXTELESCOPES;
         TTree *data = (TTree*)fIn->Get( "data" );
         if( data )
         {
@@ -107,7 +115,7 @@ bool readMeanElevation( TFile *fIn )
             data->GetEntry( 0 );
             double iMean_f = 0.;
             double iMeanN = 0.;
-            for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
+            for( unsigned int i = 0; i < iNTel; i++ )
             {
                 if( TelElevation[i] > 5. )
                 {
@@ -118,7 +126,7 @@ bool readMeanElevation( TFile *fIn )
             if( data->GetEntries() > 1 )
             {
                 data->GetEntry( data->GetEntries() - 1 );
-                for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
+                for( unsigned int i = 0; i < iNTel; i++ )
                 {
                     if( TelElevation[i] > 5. )
                     {
