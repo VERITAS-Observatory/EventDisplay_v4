@@ -233,6 +233,8 @@ class VStereoAnalysis
 		int     fTreeCTOOLS_GregMonth ;
 		int     fTreeCTOOLS_GregDay   ;
 		double  fTreeCTOOLS_Acceptance ;
+        double  fTreeCTOOLS_MVA;
+        int     fTreeCTOOLS_IsGamma ;
 		VRadialAcceptance* fCTOOLSAcceptance ;
 		
 		TTree* fCDataTreeClone ;

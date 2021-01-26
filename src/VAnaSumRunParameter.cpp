@@ -657,7 +657,18 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 					fWriteEventTreeForCtools = true ;
 				}
 			}
-			
+		
+            // Write all events to DL3 tree. This will write out also hadronic events and
+            // add the MVA score and IsGamma to the tree.
+            else if ( temp == "WRITEHADRONICEVENTS" )
+            {
+                unsigned int tmpWriteAll = ( unsigned int )atoi( temp2.c_str() ) ;
+                if( tmpWriteAll == 1 )
+                {
+                    fWriteHadronicEvents = true ;
+                }
+            }
+
 			/// use Model3D analysis ///
 			else if( temp == "MODEL3DANALYSIS" )
 			{

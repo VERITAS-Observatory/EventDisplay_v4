@@ -187,7 +187,10 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		bool fWriteAllGammaToTree ; // WRITEALLGAMMATOTREE
 		int f2DAcceptanceMode ; // USE2DACCEPTANCE
 		bool fWriteEventTreeForCtools ; // WRITEEVENTTREEFORCTOOLS
-		
+		// write all events to DL3 tree (no gh cuts)
+        bool fWriteHadronicEvents ; 
+
+
 		// advanced analysis codes
 		bool fModel3D;
 		bool fDirectionModel3D;

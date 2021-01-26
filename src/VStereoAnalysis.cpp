@@ -618,7 +618,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			}
 
 			// fill a tree with current event for ctools converter
-			if( fIsOn && bIsGamma && fRunPara->fWriteEventTreeForCtools )
+			if( fIsOn && ( bIsGamma || fRunPara->fWriteHadronicEvents ) && fRunPara->fWriteEventTreeForCtools )
 			{
 				fill_TreeWithEventsForCtools( fDataRun, i_xderot, i_yderot, icounter, i_UTC, fEVDVersionSign );
 			}
@@ -2519,7 +2519,12 @@ bool VStereoAnalysis::init_TreeWithEventsForCtools( int irun ) // WRITEEVENTTREE
 	fTreeWithEventsForCtools->Branch( "GregMonth"     , &fTreeCTOOLS_GregMonth     , "GregMonth/D" );
 	fTreeWithEventsForCtools->Branch( "GregDay"       , &fTreeCTOOLS_GregDay       , "GregDay/D" );
 	fTreeWithEventsForCtools->Branch( "Acceptance"    , &fTreeCTOOLS_Acceptance    , "Acceptance/D" );
-	cout << endl;
+    if ( fRunPara->fWriteHadronicEvents )
+    {
+        fTreeWithEventsForCtools->Branch( "MVA"           , &fTreeCTOOLS_MVA           , "MVA/D" );
+        fTreeWithEventsForCtools->Branch( "IsGamma"       , &fTreeCTOOLS_IsGamma       , "IsGamma/I" );
+    }
+    cout << endl;
 
 	// init acceptance critter
 	fCTOOLSAcceptance = new VRadialAcceptance( fRunPara->fRunList[0].fAcceptanceFile ) ;
@@ -2562,6 +2567,20 @@ void VStereoAnalysis::fill_TreeWithEventsForCtools( CData* c , double i_xderot, 
 	fTreeCTOOLS_MLR            = c->MLR ;
 	fTreeCTOOLS_EmissionHeight = c->EmissionHeight ; // height of shower maximum (in km) above telescope z-plane
 	fTreeCTOOLS_Acceptance     = fCTOOLSAcceptance->getAcceptance( i_xderot, i_yderot ) ;
+
+    if( fCuts && fRunPara->fWriteHadronicEvents )
+    {
+        fTreeCTOOLS_MVA = fCuts->getTMVA_EvaluationResult();
+        // bIsGamma = fCuts->isGamma( i, false, fIsOn );
+        if (bIsGamma)
+        {
+            fTreeCTOOLS_IsGamma = 1;
+        }
+        else
+        {
+            fTreeCTOOLS_IsGamma = 0;
+        }
+    }
 
 	// RA- and DEC-aligned Wobbles
 	fTreeCTOOLS_WobbleWest  = getWobbleWest()  ;
