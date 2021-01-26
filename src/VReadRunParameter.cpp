@@ -495,7 +495,6 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		else if( iTemp.find( "-savedeadpixelregistry" ) < iTemp.size() )
 		{
 			fRunPara->fSaveDeadPixelRegistry = true ;
-			cout << "NKH fRunPara->fSaveDeadPixelRegistry = true !" << endl;
 		}
 		// ignore configuration file versions
 		else if( iTemp.find( "ignorecfgversions" ) < iTemp.size() )
@@ -1769,10 +1768,15 @@ void VReadRunParameter::setDirectories()
 				cout << "\t creating calibration directory for Telescope " << i + 1 << " : " << i_text << endl;
 				if( gSystem->mkdir( i_text, kTRUE ) != 0 )
 				{
-					cout << "VReadRunParameter::test_and_adjustParams() error: unable to create calibration directory for Telescope ";
-					cout << i + 1 << ": " << endl;
-					cout << i_text << endl;
-					exit( -1 );
+                                        // possibilitiy that many jobs try to do the same thing; repeat after sleep
+                                        gSystem->Sleep( gRandom->Uniform( 10., 60 ) );
+                                        if( gSystem->mkdir( i_text, kTRUE ) != 0 )
+                                        {
+                                            cout << "VReadRunParameter::test_and_adjustParams() error: unable to create calibration directory for Telescope ";
+                                            cout << i + 1 << ": " << endl;
+                                            cout << i_text << endl;
+                                            exit( -1 );
+                                        }
 				}
 			}
 		}

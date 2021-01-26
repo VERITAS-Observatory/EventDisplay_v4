@@ -34,7 +34,6 @@ class VAnaSumRunParameterListOfExclusionRegions
 		double fExcludeFromBackground_West;     //[deg]
 		double fExcludeFromBackground_DecJ2000; //[deg]
 		double fExcludeFromBackground_RAJ2000;  //[deg]
-		double fExcludeFromBackground_Radius;   //[deg]
 		double fExcludeFromBackground_Radius1;   //[deg]
 		double fExcludeFromBackground_Radius2;   //[deg]
 		double fExcludeFromBackground_RotAngle;  //[deg]
@@ -62,6 +61,9 @@ class VAnaSumRunParameterDataClass : public TNamed
 		
 		double fMJDOn;
 		double fMJDOff;
+
+                double fMJDOnStart;
+                double fMJDOnStop;
 		
 		string fTarget;
 		double fTargetRAJ2000;
@@ -123,12 +125,11 @@ class VAnaSumRunParameterDataClass : public TNamed
 		double fTE_mscl_min;
 		double fTE_mscl_max;
 		
-		
 		int f2DAcceptanceMode ; // USE2DACCEPTANCE
 		
 		VAnaSumRunParameterDataClass();
 		~VAnaSumRunParameterDataClass() {}
-		ClassDef( VAnaSumRunParameterDataClass, 1 );
+		ClassDef( VAnaSumRunParameterDataClass, 2 );
 };
 
 class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
@@ -184,9 +185,7 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		// dead time calculation method
 		int  fDeadTimeCalculationMethod;
 		
-		bool fWriteAllGammaToTree ; // WRITEALLGAMMATOTREE
 		int f2DAcceptanceMode ; // USE2DACCEPTANCE
-		bool fWriteEventTreeForCtools ; // WRITEEVENTTREEFORCTOOLS
 		
 		// advanced analysis codes
 		bool fModel3D;
@@ -228,7 +227,7 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		string fStarBand;
 		double fStarExlusionRadius;
 		
-		// for saving the deadtime fraction for ctools
+		// for saving the deadtime fraction
 		double fScalarDeadTimeFrac ;
 		
 		string fTimeMaskFile;
@@ -252,13 +251,14 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		void printStereoParameter( unsigned int icounter );
 		void printStereoParameter( int irun );
 		int  readRunParameter( string i_filename );
+                bool setRunTimes( unsigned int irun, double iMJDStart, double iMJDStopp );
 		bool setSkyMapCentreJ2000( unsigned int i, double ra, double dec );
-		bool setTargetRADecJ2000( unsigned int i, double ra, double dec );
+		bool setTargetRADecJ2000( unsigned int i, double ra, double dec, string iTargetName );
 		bool setTargetRADec_currentEpoch( unsigned int i, double ra, double dec );
 		bool setTargetShifts( unsigned int i, double west, double north, double ra, double dec );
 		bool writeListOfExcludedSkyRegions();
 		bool getListOfExcludedSkyRegions( TFile* f );
 		
-		ClassDef( VAnaSumRunParameter, 9 ) ;
+		ClassDef( VAnaSumRunParameter, 12 ) ;
 };
 #endif

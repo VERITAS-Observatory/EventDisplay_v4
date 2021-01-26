@@ -2139,7 +2139,8 @@ void VFluxCalculation::plotFluxesVSWobbleOffset()
 }
 
 
-TCanvas* VFluxCalculation::plotFluxesVSElevation( bool iDraw, double iConstantValueLine )
+TCanvas* VFluxCalculation::plotFluxesVSElevation( bool iDraw, 
+                                                  double iConstantValueLine )
 {
 	TCanvas* cCanvas_FElevation = 0;
 	if( iDraw )
@@ -2181,16 +2182,12 @@ TCanvas* VFluxCalculation::plotFluxesVSElevation( bool iDraw, double iConstantVa
 		}
 		gFluxElevation->GetHistogram()->SetYTitle( hname );
 		
-		TLine* iL2 = new TLine( gFluxElevation->GetHistogram()->GetXaxis()->GetXmin(), 0., gFluxElevation->GetHistogram()->GetXaxis()->GetXmax(), 0. );
-		iL2->SetLineStyle( 2 );
-		iL2->Draw();
-		
 		if( iConstantValueLine > 0. )
 		{
-			TLine* iL3 = new TLine( gFluxElevation->GetHistogram()->GetXaxis()->GetXmin(), iConstantValueLine,
-									gFluxElevation->GetHistogram()->GetXaxis()->GetXmax(), iConstantValueLine );
-			iL3->SetLineStyle( 2 );
-			iL3->Draw();
+		    TLine* iL3 = new TLine( gFluxElevation->GetHistogram()->GetXaxis()->GetXmin(), iConstantValueLine,
+						gFluxElevation->GetHistogram()->GetXaxis()->GetXmax(), iConstantValueLine );
+		    iL3->SetLineStyle( 1 );
+		    iL3->Draw();
 		}
 	}
 	

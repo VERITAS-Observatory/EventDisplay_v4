@@ -88,8 +88,8 @@ class VEnergyThreshold : public TObject
 		VEnergyThreshold();
 		VEnergyThreshold( string ioutfilename );
 		VEnergyThreshold( double iEthFixed, string iInFile = "" );
-		~VEnergyThreshold() {}
-                bool closeOutputFile();
+		~VEnergyThreshold();
+    bool closeOutputFile();
 		bool openEffectiveAreaFile( string ifile );
 		bool calculateEnergyThreshold( bool bFit = true, int nentries = -1 );
 		double getEnergy_maxSystematic( TObject* h = 0, double iSys = 0.1 );

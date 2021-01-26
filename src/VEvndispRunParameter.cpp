@@ -194,7 +194,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
         ftraceamplitudecorrectionFile = "";
 	ftracefit = -1.;
 	ftracefitfunction = "ev";
-	freconstructionparameterfile = "EVNDISP.reconstruction.runparameter";
+	freconstructionparameterfile = "EVNDISP.reconstruction.runparameter.v48x";
 	
 	////////////////////////////////////////////////////////////////////////////////
 	// pulse timing (fraction of maximum where times are determined)
