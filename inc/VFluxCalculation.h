@@ -84,6 +84,7 @@ class VFluxCalculation : public TObject
 		vector< vector< double > > fIntraRunTOn;  //!< life time [s] of each time bin (time mask and deadtime already taken into account)
 		vector< double > fRunDeadTime;            //!< dead time fraction
 		vector< double > fRunZe;                  //!< mean zenith angle [deg]
+                vector< double > fRunAz;                  //!< mean azumith angle[deg] (not not always well defined)
 		vector< double > fRunWobbleOffset;        //!< wobble offset [deg]
 		vector< double > fRunPedvars;             //!< pedvars
 		vector< double > fRunNdiff;               //!< N_on - alpha * N_off
@@ -150,6 +151,7 @@ class VFluxCalculation : public TObject
 		
 		// graphs
 		TGraphErrors* gFluxElevation;
+                TGraphErrors* gFluxAzimuth;
 		TCanvas* fCanvasFluxesVSMJD;
 		TCanvas* fCanvasFluxesInBINs;
 		
@@ -188,6 +190,7 @@ class VFluxCalculation : public TObject
 		TGraphErrors* plotFluxesInBINs( int run = -1, char* iTex = 0, double iMJDOffset = 0., TCanvas* c = 0, int iMarkerColor = 1, int iMarkerStyle = 7, bool bDrawAxis = false );
 		TGraphErrors* plotFluxesVSMJDDaily( char* iTex = 0, double iMJDOffset = 0. );
 		TCanvas* plotFluxesVSElevation( bool iDraw = true, double iConstantValueLine = -1. );
+		TCanvas* plotFluxesVSAzimuth( bool iDraw = true, double iConstantValueLine = -1. );
 		TCanvas* plotFluxesVSPedvars();
 		void          plotFluxesVSWobbleOffset();
 		bool          IsInRunList( int iRun );
@@ -286,6 +289,6 @@ class VFluxCalculation : public TObject
 		}
 		void          writeResults( char* ifile );
 		
-		ClassDef( VFluxCalculation, 17 );
+		ClassDef( VFluxCalculation, 18 );
 };
 #endif

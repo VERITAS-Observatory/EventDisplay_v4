@@ -97,6 +97,7 @@ void VFluxCalculation::reset()
 	
 	// graphs
 	gFluxElevation = 0;
+        gFluxAzimuth = 0;
 	fCanvasFluxesVSMJD = 0;
 	
 	fRXTE = 0;
@@ -113,6 +114,7 @@ void VFluxCalculation::resetRunList()
 	fTimeBinDuration.clear();
 	fRunDeadTime.clear();
 	fRunZe.clear();
+        fRunAz.clear();
 	fRunWobbleOffset.clear();
 	fRunPedvars.clear();
 	fRunNdiff.clear();
@@ -267,11 +269,13 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
 		// mean zenith angle for this run
 		if( fData->elevationOn > 1. )
 		{
-			fRunZe.push_back( 90. - fData->elevationOn );
+                    fRunZe.push_back( 90. - fData->elevationOn );
+                    fRunAz.push_back( fData->azimuthOn );
 		}
 		else
 		{
-			fRunZe.push_back( 90. - fData->elevationOff );
+                    fRunZe.push_back( 90. - fData->elevationOff );
+                    fRunAz.push_back( fData->azimuthOff );
 		}
 		fRunWobbleOffset.push_back( sqrt( fData->WobbleNorth * fData->WobbleNorth + fData->WobbleWest * fData->WobbleWest ) );
 		fRunPedvars.push_back( fData->pedvarsOn );
@@ -2193,6 +2197,67 @@ TCanvas* VFluxCalculation::plotFluxesVSElevation( bool iDraw,
 	
 	return cCanvas_FElevation;
 }
+
+/* 
+ * plot flux vs azimuth
+ *
+ */
+TCanvas* VFluxCalculation::plotFluxesVSAzimuth( bool iDraw, 
+                                                double iConstantValueLine )
+{
+	TCanvas* cCanvas_FAzimuth = 0;
+	if( iDraw )
+	{
+		cCanvas_FAzimuth = new TCanvas( "cCanvas_FAzimuth", "fluxes vs Azimuth", 40, 10, 1100, 700 );
+		cCanvas_FAzimuth->SetGridx( 0 );
+		cCanvas_FAzimuth->SetGridy( 0 );
+		cCanvas_FAzimuth->Draw();
+	}
+	
+	gFluxAzimuth = new TGraphErrors( ( int )fRunMJD.size() - 1 );
+	gFluxAzimuth->SetTitle( "" );
+	gFluxAzimuth->SetMarkerStyle( 20 );
+	gFluxAzimuth->SetMarkerSize( 1. );
+	gFluxAzimuth->SetLineWidth( 2 );
+	
+	int z = 0;
+	for( unsigned int i = 0; i < fRunMJD.size(); i++ )
+	{
+		if( fRunMJD[i] > 10 )
+		{
+			gFluxAzimuth->SetPoint( z, fRunAz[i], fRunFlux[i] );
+			gFluxAzimuth->SetPointError( z, 0., fRunFluxE[i] );
+			z++;
+		}
+	}
+	char hname[200];
+	if( iDraw )
+	{
+		gFluxAzimuth->Draw( "ap" );
+		gFluxAzimuth->GetHistogram()->SetXTitle( "azimuth [deg]" );
+		if( fMinEnergy < 1. )
+		{
+			sprintf( hname, "F(E>%d GeV) [cm^{-2}s^{-1}]", ( int )( fMinEnergy * 1.e3 ) );
+		}
+		else
+		{
+			sprintf( hname, "F(E>%.1f TeV) [cm^{-2}s^{-1}]", fMinEnergy );
+		}
+		gFluxAzimuth->GetHistogram()->SetYTitle( hname );
+		
+		if( iConstantValueLine > 0. )
+		{
+		    TLine* iL3 = new TLine( gFluxAzimuth->GetHistogram()->GetXaxis()->GetXmin(), iConstantValueLine,
+						gFluxAzimuth->GetHistogram()->GetXaxis()->GetXmax(), iConstantValueLine );
+		    iL3->SetLineStyle( 1 );
+		    iL3->Draw();
+		}
+	}
+	
+	return cCanvas_FAzimuth;
+}
+
+
 
 
 TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char* iTex, double iMJDOffset, TCanvas* cFMJD, int iMarkerColor, int iMarkerStyle, bool bDrawAxis, double iMinMJD, double iMaxMJD )
