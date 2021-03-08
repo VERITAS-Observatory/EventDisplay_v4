@@ -59,6 +59,7 @@ class VHistogramUtilities
 		
 		static TH2*      interpolateResponseMatrix( TH2*, string iNewHistoName = "" );
 		static bool      normalizeTH2D_y( TH2* h );
+		static bool      normalizeTH2D_x( TH2* h );
 		
 		void             setDebug( bool iB = true )
 		{

@@ -286,6 +286,37 @@ bool VHistogramUtilities::normalizeTH2D_y( TH2* h )
 	return true;
 }
 
+/*
+
+   normalize a matrix in each x-row
+
+*/
+bool VHistogramUtilities::normalizeTH2D_x( TH2* h )
+{
+	if( !h )
+	{
+		return false;
+	}
+	
+	double i_sum = 0.;
+	for( int i = 1; i <= h->GetNbinsX(); i++ )
+	{
+		i_sum = 0.;
+		for( int j = 1; j <= h->GetNbinsY(); j++ )
+		{
+			i_sum += h->GetBinContent( i, j );
+		}
+		if( i_sum > 0. )
+		{
+			for( int j = 1; j <= h->GetNbinsY(); j++ )
+			{
+			  h->SetBinContent( i, j, h->GetBinContent( i, j ) / i_sum );
+			}
+		}
+	}
+	return true;
+}
+
 TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormalize, bool iLeft_to_right, double i_bin_value )
 {
 	if( !iH_in )
