@@ -102,7 +102,7 @@ bool VLikelihoodFitter::setAnalysisBinning(int i_fNEnergyBins, vector <double> i
         return false;
     }
 
-    vector <TH2D*> i_hResponseMatrixRaw = getResponseMatrixRaw();
+    vector <TH2F*> i_hResponseMatrixRaw = getResponseMatrixRaw();
     // Checking if response matrix returned ok
     if ( !i_hResponseMatrixRaw[0] )
     {
@@ -137,11 +137,11 @@ bool VLikelihoodFitter::setAnalysisBinning(int i_fNEnergyBins, vector <double> i
         fLastOff.push_back(fOffRebinnedHistograms[i]->GetBinCenter(fOffRebinnedHistograms[i]->FindLastBinAbove(0.9)));
 
         // Response Matrix
-        // Define empty TH2D with desired analysis binning
+        // Define empty TH2F with desired analysis binning
         // Histogram is then filled from raw histograms
         ss.str(std::string());
         ss << "RebinnedResponseMatrix_" << fRunList[i].runnumber;
-        TH2D* i_htmp2D = new TH2D( ss.str().c_str(), ss.str().c_str(), fNEnergyBins, &(fEnergyBins)[0], fNEnergyBins, &(fEnergyBins)[0] );
+        TH2F* i_htmp2D = new TH2F( ss.str().c_str(), ss.str().c_str(), fNEnergyBins, &(fEnergyBins)[0], fNEnergyBins, &(fEnergyBins)[0] );
 
         TAxis *i_xAxis = i_hResponseMatrixRaw[i]->GetXaxis();
         TAxis *i_yAxis = i_hResponseMatrixRaw[i]->GetYaxis();
@@ -348,55 +348,115 @@ vector <TH1D*> VLikelihoodFitter::getCountingHistogramRaw(string onoff)
 
 
 
-// Getting Vectors of raw response matrix
-vector <TH2D*> VLikelihoodFitter::getResponseMatrixRaw()
+/*
+  Getting Vectors of raw response matrix
+  Require^1 histograms binned to minimum expected bin size.
+  By default the parameter files request 0.05.
+
+  Use TGraph2D::Interpolate to go from:
+  E_mc vs E_mc/E_rec -> E_rec vs E_mc
+
+  ^1 only require if we want to use histograms rather than another interpolator
+*/
+vector <TH2F*> VLikelihoodFitter::getResponseMatrixRaw()
 {
-    vector <TH2D*>iVtemp ;
+
+    vector <TH2F*>iVtemp ;
     string hname;
     std::ostringstream ss;
+
     // Looping over runs
     for( unsigned int i = 0; i < fRunList.size(); i++ )
     {
-
         // Getting response matrix from .anasum.root file
         hname =  "hResponseMatrix_on";
-        TH2D* i_hResponseMatrix_on = ( TH2D* )getHistogram( hname.c_str(), fRunList[i].runnumber, "EffectiveAreas", -9999 )->Clone();
+        TH2F* i_hResponseMatrix_on = ( TH2F* )getHistogram( hname.c_str(), fRunList[i].runnumber, "EffectiveAreas", -9999 )->Clone();
         hname =  "hResponseMatrix_off";
-        TH2D* i_hResponseMatrix_off = ( TH2D* )getHistogram( hname.c_str(), fRunList[i].runnumber, "EffectiveAreas", -9999 )->Clone();
+        TH2F* i_hResponseMatrix_off = ( TH2F* )getHistogram( hname.c_str(), fRunList[i].runnumber, "EffectiveAreas", -9999 )->Clone();
+
 
         // Renaming
         ss.str(std::string());
         ss << "hResponseMatrix_Interpolated_" << fRunList[i].runnumber;
 
-
         bool i_onValid = isPointerValid(i_hResponseMatrix_on);
         bool i_offValid = isPointerValid(i_hResponseMatrix_off);
 
 
-        if ( i_onValid )
+        // Reshape to required dimensions
+        // Bins should span -1, 2
+        int i_fNEnergyBins = int(3/0.05);
+        int i_fNEnergyBinsMC = int(3/0.05);
+
+        // Obtaining the energy bins
+        vector <double> i_fEnergyBins;
+
+        for (int i =0; i <= i_fNEnergyBins; i ++)
         {
-          i_hResponseMatrix_on->SetTitle( ss.str().c_str());
-          iVtemp.push_back((TH2D*)i_hResponseMatrix_on->Clone());
+            i_fEnergyBins.push_back(-1.1 + i*0.05);
         }
 
+
+        vector <double> i_fEnergyBinsMC;
+
+        for (int i =0; i <= i_fNEnergyBinsMC; i ++)
+        {
+            i_fEnergyBinsMC.push_back(-1.1 + i*0.05);
+        }
+
+        TH2F* ihres_tmp = new TH2F ("ihres_tmp", "Response Matrix; E_{Rec}; E_{MC}", i_fNEnergyBins, &(i_fEnergyBins[0]), i_fNEnergyBinsMC, &(i_fEnergyBinsMC[0]) );
+        float ieng_rc = 0;
+        float ieng_mc = 0;
+	float ebias = 0;
+
+	TGraph2D *igSys2d = 0;
+
+	/*
+	  On/Off check is required
+	  when 0 on/off counts the on/off effective areas/response matrices aren't filled.
+	*/
+	if ( i_onValid )
+        {
+	  // For interpolating
+          igSys2d = new TGraph2D (i_hResponseMatrix_on);
+        }
         else if ( i_offValid )
         {
-          cout << "VLikelihoodFitter::getResponseMatrixRaw On response matrix invalid, using Off response matrix (Run:" << fRunList[i].runnumber << ")" << endl;
-          i_hResponseMatrix_off->SetTitle( ss.str().c_str());
-          iVtemp.push_back((TH2D*)i_hResponseMatrix_off->Clone());
+	  // For interpolating                                                                                                                                                                                    
+          igSys2d = new TGraph2D (i_hResponseMatrix_off); 
         }
-
         else
         {
           cout << "VLikelihoodFitter::getResponseMatrixRaw error getting response matrix for run " << fRunList[i].runnumber << " On:" << i_onValid << " Off:" << i_offValid <<  endl;
           iVtemp.clear();
           iVtemp.push_back(0);
+	  continue;
         }
+	
+	for (int ierec = 0; ierec < ihres_tmp->GetXaxis()->GetNbins(); ierec++)
+          {
+            ieng_rc = ihres_tmp->GetXaxis()->GetBinCenter(ierec+1);
+            for (int jemc = 0; jemc < ihres_tmp->GetYaxis()->GetNbins(); jemc++)
+            {
+              ieng_mc = ihres_tmp->GetYaxis()->GetBinCenter(jemc+1);
+              ebias = TMath::Power(10, ieng_rc) / TMath::Power(10, ieng_mc);
 
+              float intep = igSys2d->Interpolate(ieng_mc, ebias);
+              ihres_tmp->SetBinContent(ierec+1, jemc+1, intep);
+            }
+          }
+	  // expect intergral over E_mc (Y) to be 1
+          VHistogramUtilities::normalizeTH2D_y(ihres_tmp);
+          ihres_tmp->SetTitle( ss.str().c_str());
+          iVtemp.push_back((TH2F*)ihres_tmp->Clone());
+	
     }
 
     return iVtemp;
+
 }
+
+
 
 
 // Printing some info about the runs
@@ -3230,7 +3290,7 @@ int VLikelihoodFitter::getLastCount( vector <double> ivec )
 
 
 // Check if response matrix is ok to use
-bool VLikelihoodFitter::isPointerValid(TH2D* i_obj)
+bool VLikelihoodFitter::isPointerValid(TH2F* i_obj)
 {
   bool i_notNull = false;
   bool i_hasCounts = false;

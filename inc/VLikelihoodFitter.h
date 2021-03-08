@@ -14,6 +14,7 @@
 #include "TF1.h"
 #include "TMath.h"
 #include "TGraphAsymmErrors.h"
+#include "TGraph2D.h"
 #include "TLine.h"
 #include <Math/GSLMinimizer.h>
 #include <Math/Functor.h>
@@ -187,7 +188,7 @@ public:
 
 
     // Get Response Matrix for the ith run
-    TH2D* getResponseMatrix(int i)
+    TH2F* getResponseMatrix(int i)
     {
 
         // Checking if index is in the range
@@ -515,7 +516,7 @@ private:
     // Data Vectors
     vector <TH1D*> fOnRebinnedHistograms;
     vector <TH1D*> fOffRebinnedHistograms;
-    vector <TH2D*> fResponseMatrixRebinned;
+    vector <TH2F*> fResponseMatrixRebinned;
     vector <TGraphAsymmErrors*> fMeanEffectiveAreaMC;
 
 
@@ -560,7 +561,7 @@ private:
     vector <TH1D*> getCountingHistogramRaw(string onoff);
 
     // Get response matrix from .anasum.root file
-    vector <TH2D*> getResponseMatrixRaw();
+    vector <TH2F*> getResponseMatrixRaw();
 
     // Save TH1D data as vectors
     vector < vector <double> > getCounts(vector <TH1D*> i_hTemp);
@@ -628,7 +629,7 @@ private:
 
     // Check if Object is valid
     bool isPointerValid(TGraphAsymmErrors* i_obj);
-    bool isPointerValid(TH2D* i_obj);
+    bool isPointerValid(TH2F* i_obj);
 
 
     // Generic functions to sum the runwise counts
