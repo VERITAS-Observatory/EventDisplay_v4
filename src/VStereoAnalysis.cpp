@@ -789,20 +789,20 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			gMeanEffectiveAreaMC = ( TGraphAsymmErrors* )gMeanEffectiveAreaMC->Clone();
 		}
 
-		hResponseMatrix = ( TH2D* ) fEnergy.getMeanResponseMatrix();
+		hResponseMatrix = ( TH2F* ) fEnergy.getMeanResponseMatrix();
 		if ( hResponseMatrix )
 		{
-			hResponseMatrix = ( TH2D* )hResponseMatrix->Clone();
+			hResponseMatrix = ( TH2F* )hResponseMatrix->Clone();
                 }
                 // (GM) actualy not sure what to do
-                // (SOB) Output an empty TH2D and later check for entries
+                // (SOB) Output an empty TH2F and later check for entries
                 else
                 {
                         cout << "\t error: no response matrix found" << endl;
 			cout << "\t Creating empty TH2D" << endl;
                         // Create empty TH2D
                         // VLikelihoodFitter will pick this up
-			hResponseMatrix = new TH2D("hResponseMatrix", "hResponseMatrix", 10, -1, 1, 10 , -1 , 1 );
+			hResponseMatrix = new TH2F("hResponseMatrix", "hResponseMatrix", 10, -1, 1, 10 , -1 , 1 );
                 }
                 if( fIsOn )
                 {

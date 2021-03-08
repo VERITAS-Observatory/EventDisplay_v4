@@ -132,7 +132,7 @@ class VStereoAnalysis
 		TGraphErrors*      gMeanEsys_MC;
 		
 		TGraphAsymmErrors* gMeanEffectiveAreaMC;
-		TH2D*			   hResponseMatrix;
+		TH2F*			   hResponseMatrix;
 
 		VStereoMaps* fMap;
 		VStereoMaps* fMapUC;
