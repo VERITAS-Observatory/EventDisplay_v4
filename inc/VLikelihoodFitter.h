@@ -366,6 +366,8 @@ public:
 
     // Set which last count definition (on,off,model)
     void setLastCountDefinition (string def);
+    // These are public for simulating spectra
+    // Would be safer for a set/reset counts option?
     vector < vector <double> > fOnCounts;
     vector < vector <double> > fOffCounts;
 

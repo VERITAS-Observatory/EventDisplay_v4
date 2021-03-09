@@ -1,6 +1,6 @@
 /*! class VLikelihoodFitter
     fit and plot spectral data using likelihood methods
-		based on Piron et al 2001 astro-ph/0106196
+    based on Piron et al 2001 astro-ph/0106196
 */
 
 
@@ -217,9 +217,7 @@ bool VLikelihoodFitter::setAnalysisBinning(int i_fNEnergyBins, vector <double> i
 
 // Getting Vector of effective areas
 // returns:
-// 		true  - MC (True) energy
-//		false - Rec (reconstructed) energy
-
+// 	  vector of MC energy effective areas
 vector <TGraphAsymmErrors*> VLikelihoodFitter::getEffectiveAreasMCFromFile()
 {
 
@@ -242,8 +240,6 @@ vector <TGraphAsymmErrors*> VLikelihoodFitter::getEffectiveAreasMCFromFile()
         TGraphAsymmErrors* i_gMeanEffectiveArea_on = 0;
         TGraphAsymmErrors* i_gMeanEffectiveArea_off = 0;
         TGraphAsymmErrors* i_gMeanEffectiveArea = 0;
-        // iMC == true -> MC Effective Area
-        // iMC == false -> Rec Effective Area
 
         hname = "gMeanEffectiveAreaMC_on";
         // Using VEnergySpectrum's code to get effective areas
@@ -983,7 +979,6 @@ TF1* VLikelihoodFitter::getLikelihoodFit( bool bContours )
     fModel_linear->SetParErrors(i_Errors);
 
     // Cloning a copy to be returned
-
     TF1 *i_BestFit = 0;
     if (fEBLAnalysis)
     {
@@ -991,8 +986,6 @@ TF1* VLikelihoodFitter::getLikelihoodFit( bool bContours )
       fModel_intrinsic_linear->SetParErrors(i_Errors);
       i_BestFit = (TF1*)fModel_intrinsic_linear->Clone();
     }
-
-
     else
     {
       i_BestFit = (TF1*)fModel_linear->Clone();
@@ -1008,7 +1001,6 @@ TF1* VLikelihoodFitter::getLikelihoodFit( bool bContours )
 
     for (unsigned int i = 0; i < fNParms; i++)
     {
-
         i_vec[i] = xs[i] ;
         double i_err_low = 0;
         double i_err_up = 0;
@@ -1076,17 +1068,8 @@ TF1* VLikelihoodFitter::getLikelihoodFit( bool bContours )
         delete fConfidenceInterval;
     }
 
-    // if (fEBLAnalysis)
-    // {
-    //   fConfidenceInterval = calculateConfidenceInterval(i_covmat, fModel, fModelID, fNParms);
-    //
-    // }
-    //
-    // else
-    // {
     fConfidenceInterval = calculateConfidenceInterval(i_covmat, fModel, fModelID, fNParms);
-    // }
-
+    
 
     // Calculating the model integrated flux
     // i_flux[0] = flux [photons/cm^2/s^1]
@@ -1115,7 +1098,6 @@ TF1* VLikelihoodFitter::getLikelihoodFit( bool bContours )
 
     // Getting Decorrelation Energy
     double E_d = fENorm * TMath::Exp( fMinimizer->CovMatrix(0,1) / xs[0] / i_Errors[1] / i_Errors[1] );
-
     cout << "Printing Decorrelation Energy (Assuming a Power Law Model, consider reapplying the fit.):\nE_d : " << E_d << endl;
 
 
@@ -1141,7 +1123,8 @@ bool VLikelihoodFitter::initializeMinimizer( double iNormGuess, int iPrintStatus
         delete fMinimizer;
     }
     // Using Minuit2 and Minos
-    fMinimizer = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Minos");
+    // Use Minuit not Minuit2
+    fMinimizer = ROOT::Math::Factory::CreateMinimizer("Minuit", "Minos");
 
     // // set tolerance , etc...
     fMinimizer->SetMaxFunctionCalls(10000); // for Minuit/Minuit2
@@ -1152,8 +1135,6 @@ bool VLikelihoodFitter::initializeMinimizer( double iNormGuess, int iPrintStatus
     // 2(log(l) - log(lmax)) ~ chi^2
     // therefore the erorrs are defined as 0.5
     fMinimizer->SetErrorDef(0.5);
-
-
 
     fMinimizer->SetPrintLevel(iPrintStatus);
 
@@ -1335,37 +1316,6 @@ bool VLikelihoodFitter::initializeMinimizer( double iNormGuess, int iPrintStatus
 
         }
     }
-
-
-    // Still useful but beyond the common ED-er...
-    // Source-wise alpha fits don't converge
-    // Need to combine a lot of sources
-    // // Scaled EBL model
-    // if (fModelID == 4)
-    // {
-    //     step[0] = 0.01*iNormGuess;
-    //     step[1] = 0.01;
-    //     step[2] = 0.01;
-    //     variable[0] = iNormGuess;
-    //     variable[1] = -2.5;
-    //     variable[2] = 1.0;
-    //     fParmName[0] = "Norm";
-    //     fParmName[1] = "Index";
-    //     fParmName[2] = "Alpha";
-    //     // Set the free variables to be minimized!
-    //     if (iFixShape)
-    //     {
-    //         fMinimizer->SetLimitedVariable(0, fParmName[0].c_str(),variable[0], step[0], 0, 1.E-5);
-    //         fMinimizer->SetVariable(1, fParmName[1].c_str(), fGlobalBestFitParameters[1], step[1]);
-    //         fMinimizer->SetVariable(2, fParmName[2].c_str(), fGlobalBestFitParameters[2], step[2]);
-    //     }
-    //     else
-    //     {
-    //         fMinimizer->SetLimitedVariable(0, fParmName[0].c_str(),variable[0], step[0], 0, 1.E-5);
-    //         fMinimizer->SetVariable(1, fParmName[1].c_str(), variable[1], step[1]);
-    //         fMinimizer->SetLimitedVariable(2, fParmName[2].c_str(), variable[2], step[2], 0., 2.0);
-    //     }
-    // }
 
 
     // Log Parabola with exp cutoff
@@ -1905,7 +1855,8 @@ double VLikelihoodFitter::getLogL_internal( const double* parms)
 * prediced_excess = On_observed - Alpha*Off_observed
 * Off_predicted = Off_observed
 */
-double VLikelihoodFitter::getLogL0 ( vector <double> iParms)
+//double VLikelihoodFitter::getLogL0 ( vector <double> iParms)
+double VLikelihoodFitter::getLogL0 ()
 {
 
     double LogLi = 0;
@@ -1915,8 +1866,8 @@ double VLikelihoodFitter::getLogL0 ( vector <double> iParms)
 
     double a, b, c, d;
 
-    vector < vector <double> > i_myModel = getModelPredictedExcess( iParms );
-    vector <double> i_total_Model = sumCounts( i_myModel );
+    //vector < vector <double> > i_myModel = getModelPredictedExcess( iParms );
+    //vector <double> i_total_Model = sumCounts( i_myModel );
 
     // Getting the last counts
     int iLastOn = getLastCount(i_total_On);
@@ -2094,21 +2045,9 @@ double VLikelihoodFitter::calculateIntrinsicSpectrum(Double_t *x, Double_t *parm
     {
         fModel_intrinsic->SetParameter(i,parm[i]);
     }
-    // // Note Spectral Model is in log and EBL lookup table is in linear space
-    // if (fModelID ==  )
-    // {
-    //     // cout  << scientific << parm[fNParms -1] << " "  << x[0] << " " << -parm[fNParms -1]*fEBLOpacityGraph->Eval(TMath::Power(10,x[0])) << " " << fModel_intrinsic->Eval(x[0])*TMath::Exp(-parm[fNParms -1]*fEBLOpacityGraph->Eval(TMath::Power(10,x[0]))) << endl;
-    //     // Returning dNdE * exp (-alpha * tau)
-    //     return fModel_intrinsic->Eval(x[0])*TMath::Exp(-parm[fNParms -1]*fEBLOpacityGraph->Eval(TMath::Power(10,x[0])));
-    //
-    // }
-    //
-    // else
-    // {
     // Returning dNdE * exp (- tau)
     return fModel_intrinsic->Eval(x[0])*TMath::Exp(-1*fEBLOpacityGraph->Eval(TMath::Power(10,x[0])));
 
-    // }
 }
 
 
@@ -2148,6 +2087,7 @@ double VLikelihoodFitter::brokenPowerLaw(Double_t *x, Double_t *parm)
 
 
 // Getting the confidince interval
+// SOB use TF1::Derivative ?
 TGraphAsymmErrors* VLikelihoodFitter::calculateConfidenceInterval( double* i_covmat, TF1 *i_fitfunction, int i_model, int i_fNparms)
 {
 
@@ -2257,18 +2197,8 @@ TGraphAsymmErrors* VLikelihoodFitter::calculateConfidenceInterval( double* i_cov
 
 
 
-        // if (fModel_intrinsicID == -999)
-        // {
-        // 	i_ConfidenceInterval->SetPoint(i, i_energy, i_flux);
-        // 	i_ConfidenceInterval->SetPointError(i, 0, TMath::Sqrt(i_flux_err) );
-        // }
-        //
-        // else
-        // {
         i_ConfidenceInterval->SetPoint(i, TMath::Power(10.,i_energy), i_flux  );
         i_ConfidenceInterval->SetPointError(i, 0, 0, i_flux_err, i_flux_err ) ;// * TMath::Exp(fEBLOpacityGraph->Eval( TMath::Power(10,i_energy) ) ) );
-
-        // }
 
 
     }
@@ -2424,7 +2354,7 @@ float* VLikelihoodFitter::getSpectralPoint( double BinMin, double BinMax, double
         fEnergySpectrum->SetPointError(npoints,
                                        ifENorm - TMath::Power(10.,BinMin),  // E Min
                                        TMath::Power(10.,BinMax) - ifENorm,  // E Max
-                                       abs(i_err_low), // dNdE err low
+                                       abs(i_err_low), // dNdE err low  SOB why abs?
                                        i_err_up); // dNdE err high
     }
 
@@ -3164,7 +3094,8 @@ float* VLikelihoodFitter::getIntegralFlux(double i_EMin, double i_EMax, TF1* i_M
  *  calculate flux in Crab units
  *
  *  (GM) which Crab is this? Whipple?
- *
+ *  (SOB) Yes Whipple 1998
+ *  ToDo: Implement different Crab spectra options
  */
 double VLikelihoodFitter::getCrabFlux( double iF, double i_EMin, double i_EMax, double i_Gamma)
 {
@@ -3364,8 +3295,8 @@ double VLikelihoodFitter::getMeanAlpha()
   Log(L) - This is the likelihood obtained when the normalization is allowed to vary
   Log(L0) - This is the likelihood obtained with the model paramters set to the best fit
 
-  Function returns -2 (Log(L) - Log(L0))
-  Confidince intervals should be obtained from simulations.
+  Function returns -2 (Log(L) - Log(L0)) ~chi^2 distributed 
+  Confidince intervals should be verified from simulations.
 
 
 */
@@ -3416,7 +3347,6 @@ double VLikelihoodFitter::getVariabilityIndex(double i_delT, TF1 *i_bestFit, dou
   {
     cout << "VLikeLihoodFitter::getVariabilityIndex null pointer passed as i_bestFit"
          << "\n\tExpected TF1* of best fit parameters" << endl;
-
     return 0;
   }
 
@@ -3425,7 +3355,6 @@ double VLikelihoodFitter::getVariabilityIndex(double i_delT, TF1 *i_bestFit, dou
   {
     cout << "VLikeLihoodFitter::getVariabilityIndex NPar != fNParms"
          << "\n\tExpected TF1* with NPar equal to the number of parameters of the model" << endl;
-
     return 0;
   }
 
@@ -3527,6 +3456,11 @@ double VLikelihoodFitter::getVariabilityIndex(double i_delT, TF1 *i_bestFit, dou
 
   // Getting LogL
   // do the minimization
+  /* Note: 
+     For TSVar to be correctly normalized the best fit is obtained by optimizing
+     the likelihood equation across each time bin, not from the total time averaged
+     dataset. This is a small but very important consideration.
+  */
   cout << "\t\t Checking Time binning: "  << fVarIndexTimeBins.size() << " " <<  fNRunsInBin.size() << endl;
   fMinimizer->Minimize();
   const double *xs_logl = fMinimizer->X();
@@ -3598,27 +3532,23 @@ double VLikelihoodFitter::getVariabilityIndex(double i_delT, TF1 *i_bestFit, dou
     {
       i_localFit->SetParameter(j, xs_logl[j]  );
       i_localFit->SetParError(j, i_Errors[j]  );
-
     }
 
     // Getting integral Flux
     float *i_flux = getIntegralFlux(fFitMin_logTeV, fFitMax_logTeV, i_localFit);
 
-
-
     fLCFlux.push_back( i_flux[0] );
     fLCFluxErr.push_back( i_flux[1] );
-
 
     vector <double> i_totalOn_vec = sumCounts(fOnCounts);
     double i_totalOn = sumCounts(i_totalOn_vec);
     vector <double> i_totalOff_vec = sumCounts(fOffCounts);
     double i_totalOff = sumCounts(i_totalOff_vec);
 
-
     fLCFluxTS.push_back( getBinTS( i_totalOn, i_totalOff, getMeanAlpha()) );
 
     // Gettin Upper limits (95%)
+    // (SOB) UL code needs work...
     if (i_ul)
     {
       double ul = 0;
