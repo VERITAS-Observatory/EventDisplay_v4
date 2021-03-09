@@ -70,9 +70,6 @@ class VEffectiveAreaCalculator
 		map< unsigned int, vector< double > > fEffAreaMC_map;
 		map< unsigned int, unsigned int > fEntry_map;
 
-  //map< unsigned int, vector< double > > fResMat_MC_map;
-  //		map< unsigned int, vector< double > > fResMat_Rec_map;
-  //		map< unsigned int, vector< double > > fResMat_Rec_Err_map;
                 map< unsigned int, TH2F* > fEsysMCRelative2D_map;
 
 		vector< double >                      fEff_EsysMCRelative_EnergyAxis;
@@ -368,18 +365,10 @@ class VEffectiveAreaCalculator
 
 
 
-  //void addMeanResponseMatrix( vector <double> i_emc, vector <double> i_erec , vector <double> i_erec_err );
-  void addMeanResponseMatrix( TH2F *i_hTmp ) ;
+                void addMeanResponseMatrix( TH2F *i_hTmp ) ;
 		TH2F* getMeanResponseMatrix()
 		{
-		  // Should of already been done...
-		  VHistogramUtilities::normalizeTH2D_x(hMeanResponseMatrix);
-/*                        if( hMeanResponseMatrix )
-                        {
-                            return (TH2D*)hMeanResponseMatrix->Clone();
-                        } */
-                        return hMeanResponseMatrix;
-                        // return 0;
+		  return hMeanResponseMatrix;
 		}
 
 		void setTimeBinnedMeanEffectiveArea();

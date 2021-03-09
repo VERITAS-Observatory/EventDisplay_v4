@@ -1245,7 +1245,8 @@ TH2F *VEffectiveAreaCalculator::interpolate_responseMatrix( double iV, double iV
             cout << "Invalid Axes\n";
 	    cout << iVlower << " " << iElower << " " << iElower->GetXaxis()->GetNbins() << " " << iElower->GetYaxis()->GetNbins() << endl;
 	    cout << iVupper << " " << iEupper << " " << iEupper->GetXaxis()->GetNbins() << " " << iEupper->GetYaxis()->GetNbins() << endl;
-            return 0;
+	    // This will cause anasum to crash later
+	    return 0;
 
         }
 
@@ -1254,7 +1255,6 @@ TH2F *VEffectiveAreaCalculator::interpolate_responseMatrix( double iV, double iV
         double tmpInt = 0;
         for (int i = 0 ; i < hTemp->GetXaxis()->GetNbins(); i++)
         {
-            // cout << i << endl;
             for (int j = 0; j < hTemp->GetYaxis()->GetNbins(); j++)
             {
                 tmpInt = VStatistics::interpolate( iElower->GetBinContent(i, j), iVlower, iEupper->GetBinContent(i, j), iVupper, iV, iCos, 0.5, -90. );
@@ -1386,15 +1386,8 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 	vector< double > i_temp_Eff_MC;
 
 
-	//vector< double > i_ResMat_MC;
-	//vector< double > i_ResMat_Rec;
-	//vector< double > i_ResMat_Rec_Err;
-
 	if ( bLikelihoodAnalysis )
 	{
-	  //i_ResMat_MC.resize(nbins_ResMat);
-	  //i_ResMat_Rec.resize(nbins_ResMat);
-	  //i_ResMat_Rec_Err.resize(nbins_ResMat);
 	  i_temp_Eff_MC.resize( nbins_MC );
 	  fVTimeBinnedMeanEffectiveAreaMC.assign( i_hEMC->GetNbinsX(), 0. );
 	}
@@ -1709,35 +1702,6 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 			if ( bLikelihoodAnalysis )
 			{
 				
-			  // Setting Values for the generating the migration matrix
-			  /*
-			  i_ResMat_MC.resize( nbins_ResMat, 0 );
-			  i_ResMat_Rec.resize( nbins_ResMat, 0 );
-			  i_ResMat_Rec_Err.resize( nbins_ResMat, 0 );
-			  
-			  for ( int j = 0; j < nbins_ResMat; j++ )
-			    {
-			      i_ResMat_MC[j] = 0;
-			      i_ResMat_Rec[j] = 0;
-			      i_ResMat_Rec_Err[j] = 0;
-			      
-			      if ( ResMat_Rec_Err[j] != 0 )
-				{
-				  i_ResMat_MC[j] = ResMat_MC[j];
-				  i_ResMat_Rec[j] = ResMat_Rec[j];
-				  i_ResMat_Rec_Err[j] = ResMat_Rec_Err[j];
-				  //cout << "Response Matrix, nbins_ResMat = " << nbins_ResMat << endl;
-				  //cout << j << " " << i_ResMat_MC[j] << " " << i_ResMat_Rec[j] << " " << i_ResMat_Rec_Err[j] << endl;
-				  //cout << j << " " << ResMat_MC[j] << " " << ResMat_Rec[j] << " " << ResMat_Rec_Err[j] << endl;
-				}
-			    }
-
-			  fResMat_MC_map[i_ID] = i_ResMat_MC;
-			  fResMat_Rec_map[i_ID] = i_ResMat_Rec;
-			  fResMat_Rec_Err_map[i_ID] = i_ResMat_Rec_Err;
-			  */
-			  
-			  // cout << nbins_MC << " " << nbins << " " << endl;
 			  // Getting MC effective areas too
 			  i_temp_Eff_MC.assign(fNBins, 0);
 			  
@@ -3156,23 +3120,7 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 		i_ze_eff_MC_temp.resize( 2 );
 		i_ze_eff_MC_temp[0].resize( i_eff_MC_temp.size() );
 		i_ze_eff_MC_temp[1].resize( i_eff_MC_temp.size() );
-
-		//i_ResMat_MC_temp.assign( nbins_ResMat, 0. );
-		//i_ResMat_Rec_temp.assign( nbins_ResMat, 0. );
-		//i_ResMat_Rec_Err_temp.assign( nbins_ResMat, 0. );
-
-		//i_ze_ResMat_MC_temp.resize( 2 );
-		//i_ze_ResMat_Rec_temp.resize( 2 );
-		//i_ze_ResMat_Rec_Err_temp.resize( 2 );
-
-		//i_ze_ResMat_MC_temp[0].resize( i_ResMat_MC_temp.size() );
-		//i_ze_ResMat_Rec_temp[0].resize( i_ResMat_Rec_temp.size() );
-		//i_ze_ResMat_Rec_Err_temp[0].resize( i_ResMat_Rec_Err_temp.size() );
-
-		//i_ze_ResMat_MC_temp[1].resize( i_ResMat_MC_temp.size() );
-		//i_ze_ResMat_Rec_temp[1].resize( i_ResMat_Rec_temp.size() );
-		//i_ze_ResMat_Rec_Err_temp[1].resize( i_ResMat_Rec_Err_temp.size() );
-
+		
 		i_ze_Res_temp.resize(2);
 	}
 
@@ -3187,31 +3135,15 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 			vector< vector< double > > i_woff_eff_temp( 2, i_eff_temp );
 			vector< vector< double > > i_woff_eff_MC_temp;
 
-			//vector< vector< double > > i_woff_ResMat_MC_temp;
-			//vector< vector< double > > i_woff_ResMat_Rec_temp;
-			//vector< vector< double > > i_woff_ResMat_Rec_Err_temp;
 			vector <TH2F*> i_woff_Res_temp;
 
 			if ( bLikelihoodAnalysis  )
 			{
 				// Temp EffectiveAreas Vector
-			        //i_woff_ResMat_MC_temp.resize( 2 );
-				//i_woff_ResMat_Rec_temp.resize( 2 );
-				//i_woff_ResMat_Rec_Err_temp.resize( 2 );
 				i_woff_eff_MC_temp.resize( 2 );
-
-				//i_woff_ResMat_MC_temp[0].resize( i_ResMat_MC_temp.size() );
-				//i_woff_ResMat_Rec_temp[0].resize( i_ResMat_Rec_temp.size() );
-				//i_woff_ResMat_Rec_Err_temp[0].resize( i_ResMat_Rec_Err_temp.size() );
-
 
 				i_woff_eff_MC_temp[0].resize( i_eff_MC_temp.size() );
 				i_woff_eff_MC_temp[1].resize( i_eff_MC_temp.size() );
-
-
-				//i_woff_ResMat_MC_temp[1].resize( i_ResMat_MC_temp.size() );
-				//i_woff_ResMat_Rec_temp[1].resize( i_ResMat_Rec_temp.size() );
-				//i_woff_ResMat_Rec_Err_temp[1].resize( i_ResMat_Rec_Err_temp.size() );
 
 				i_woff_Res_temp.resize(2);
 
@@ -3227,9 +3159,7 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 					vector< unsigned int > i_noise_bins = getUpperLowBins( fEff_Noise[i_ze_bins[i]][i_woff_bins[w]], iPedVar );
 					vector< vector< double > > i_noise_eff_temp( 2, i_eff_temp );
 					vector< vector< double > > i_noise_eff_MC_temp;
-					//vector< vector< double > > i_noise_ResMat_MC_temp;
-					//vector< vector< double > > i_noise_ResMat_Rec_temp;
-					//vector< vector< double > > i_noise_ResMat_Rec_Err_temp;
+
 					// (SOB) Noise is not needed...
 					vector <TH2F*> i_noise_Res_temp;
 
@@ -3237,20 +3167,10 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 					{
 						// Temp EffectiveAreas Vector
 						i_noise_eff_MC_temp.resize( 2 );
-						//i_noise_ResMat_MC_temp.resize( 2 );
-						//i_noise_ResMat_Rec_temp.resize( 2 );
-						//i_noise_ResMat_Rec_Err_temp.resize( 2 );
-
-						//i_noise_ResMat_MC_temp[0].resize( i_ResMat_MC_temp.size() );
-						//i_noise_ResMat_Rec_temp[0].resize( i_ResMat_Rec_temp.size() );
-						//i_noise_ResMat_Rec_Err_temp[0].resize( i_ResMat_Rec_Err_temp.size() );
 
 						i_noise_eff_MC_temp[0].resize( i_eff_MC_temp.size() );
 						i_noise_eff_MC_temp[1].resize( i_eff_MC_temp.size() );
 
-						//i_noise_ResMat_MC_temp[1].resize( i_ResMat_MC_temp.size() );
-						//i_noise_ResMat_Rec_temp[1].resize( i_ResMat_Rec_temp.size() );
-						//i_noise_ResMat_Rec_Err_temp[1].resize( i_ResMat_Rec_Err_temp.size() );
 						i_noise_Res_temp.resize(2);
 					}
 
@@ -3274,37 +3194,16 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 
 							if ( bLikelihoodAnalysis )
 							{
-								// vector < TH2D* > i_hResponse_tmp;
-								// i_hResponse_tmp.resize( 2 );
 								i_noise_eff_MC_temp[n] = interpolate_effectiveArea( iSpectralIndex,
 													  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
 													  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
 													  fEffAreaMC_map[i_ID_0],
 													  fEffAreaMC_map[i_ID_1], false );
 
-								//i_noise_ResMat_MC_temp[n] = interpolate_effectiveArea( iSpectralIndex,
-								//												  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
-								//												  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
-								//												  fResMat_MC_map[i_ID_0],
-								//												  fResMat_MC_map[i_ID_1], false );
-
-								//cout << "i_noise_ResMat_Rec_temp: " << n << endl;
-								//i_noise_ResMat_Rec_temp[n] = interpolate_effectiveArea( iSpectralIndex,
-								//												  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
-								//																  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
-								//												  fResMat_Rec_map[i_ID_0],
-								//												  fResMat_Rec_map[i_ID_1], false );
-
-								//cout << "i_noise_ResMat_Rec_Err_temp: " << n << endl;
-								//i_noise_ResMat_Rec_Err_temp[n] = interpolate_effectiveArea( iSpectralIndex,
-								//												  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
-								//fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
-								//												  fResMat_Rec_Err_map[i_ID_0],
-								//												  fResMat_Rec_Err_map[i_ID_1], false );
 								i_noise_Res_temp[n] = interpolate_responseMatrix( iSpectralIndex,
-														 fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
-														 fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
-														 fEsysMCRelative2D_map[i_ID_0],
+														  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
+														  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
+														  fEsysMCRelative2D_map[i_ID_0],
 														  fEsysMCRelative2D_map[i_ID_1], false);
 							}
 
@@ -3343,22 +3242,6 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 											 i_noise_eff_MC_temp[1], false );
 
 
-						//i_woff_ResMat_MC_temp[w] = interpolate_effectiveArea( iPedVar,
-						//				 fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]],
-						//				 fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[1]],
-						//				 i_noise_ResMat_MC_temp[0],
-						//				 i_noise_ResMat_MC_temp[1], false );
-						//i_woff_ResMat_Rec_temp[w] = interpolate_effectiveArea( iPedVar,
-						//				 fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]],
-						//				 fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[1]],
-						//				 i_noise_ResMat_Rec_temp[0],
-						//				 i_noise_ResMat_Rec_temp[1], false );
-						//i_woff_ResMat_Rec_Err_temp[w] = interpolate_effectiveArea( iPedVar,
-						//				 fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]],
-						//				 fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[1]],
-						//				 i_noise_ResMat_Rec_Err_temp[0],
-						//				 i_noise_ResMat_Rec_Err_temp[1], false );
-
 						i_woff_Res_temp[w] = interpolate_responseMatrix( iPedVar,
 												fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]],
 												fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[1]],
@@ -3392,24 +3275,10 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 								   i_woff_eff_MC_temp[1], false );
 
 
-				//i_ze_ResMat_MC_temp[i] = interpolate_effectiveArea( woff,
-				//				  fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[0]],
-				//				  fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[1]],
-				//				  i_woff_ResMat_MC_temp[0],
-				//				  i_woff_ResMat_MC_temp[1], false );
-				//i_ze_ResMat_Rec_temp[i] = interpolate_effectiveArea( woff,
-				//				  fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[0]],
-				//				  fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[1]],
-				//				  i_woff_ResMat_Rec_temp[0],
-				//				  i_woff_ResMat_Rec_temp[1], false );
-				//i_ze_ResMat_Rec_Err_temp[i] = interpolate_effectiveArea( woff,
-				//				  fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[0]],
-				//				  fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[1]],
-				//				  i_woff_ResMat_Rec_Err_temp[0],
-				//				  i_woff_ResMat_Rec_Err_temp[1], false );
 				i_ze_Res_temp[i] = interpolate_responseMatrix( woff,
 								  fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[0]],
-								  fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[1]],												i_woff_Res_temp[0], i_woff_Res_temp[1], false  );
+								  fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[1]],
+								  i_woff_Res_temp[0], i_woff_Res_temp[1], false  );
 			}
 
 		}
@@ -3425,10 +3294,6 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 	if ( bLikelihoodAnalysis )
 	{
 		i_eff_MC_temp = interpolate_effectiveArea( ze, fZe[i_ze_bins[0]], fZe[i_ze_bins[1]], i_ze_eff_MC_temp[0], i_ze_eff_MC_temp[1], true );
-
-		//i_ResMat_MC_temp = interpolate_effectiveArea( ze, fZe[i_ze_bins[0]], fZe[i_ze_bins[1]], i_ze_ResMat_MC_temp[0], i_ze_ResMat_MC_temp[1], true );
-		//i_ResMat_Rec_temp = interpolate_effectiveArea( ze, fZe[i_ze_bins[0]], fZe[i_ze_bins[1]], i_ze_ResMat_Rec_temp[0], i_ze_ResMat_Rec_temp[1], true );
-		//i_ResMat_Rec_Err_temp = interpolate_effectiveArea( ze, fZe[i_ze_bins[0]], fZe[i_ze_bins[1]], i_ze_ResMat_Rec_Err_temp[0], i_ze_ResMat_Rec_Err_temp[1], true );
 		i_Res_temp = interpolate_responseMatrix(ze, fZe[i_ze_bins[0]], fZe[i_ze_bins[1]],i_ze_Res_temp[0], i_ze_Res_temp[1], false  );
 	}
 
@@ -3475,7 +3340,6 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
                         fNTimeBinnedMeanEffectiveAreaMC++;
                 }
                 // adding to mean response matrix
-		//addMeanResponseMatrix(i_ResMat_MC_temp, i_ResMat_Rec_temp, i_ResMat_Rec_Err_temp);
 		addMeanResponseMatrix(i_Res_temp);
 		
 	}
@@ -4514,7 +4378,6 @@ void VEffectiveAreaCalculator::Calculate_Bck_solid_angle_norm()
 
 
 // Adding Response matrix to the time averaged
-//void VEffectiveAreaCalculator::addMeanResponseMatrix( vector <double> i_emc, vector <double> i_erec , vector <double> i_erec_err )
 void VEffectiveAreaCalculator::addMeanResponseMatrix( TH2F *i_hTmp )
 {
 
@@ -4523,7 +4386,7 @@ void VEffectiveAreaCalculator::addMeanResponseMatrix( TH2F *i_hTmp )
     // If hMeanResponseMatrix doesn't exist
     if ( !hMeanResponseMatrix )
     {
-        cout << "\t\t\tVEffectiveAreaCalculator::addMeanResponseMatrix Creating new histogram" << endl;
+      //cout << "\t\t\tVEffectiveAreaCalculator::addMeanResponseMatrix Creating new histogram" << endl;
 	VHistogramUtilities::normalizeTH2D_x(i_hTmp); 
 	hMeanResponseMatrix = (TH2F*)i_hTmp->Clone();
         hMeanResponseMatrix->Sumw2();
