@@ -131,12 +131,12 @@ void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, d
 		itemp = hon->GetName();
                 string i_className = hon->ClassName();
                 if( i_className.find( "TH1" ) != string::npos
-                  && TMath::Abs( hon->GetXaxis()->GetXmax() - hon->GetXaxis()->GetXmin() ) < 1.e3 )
+                  && TMath::Abs( hon->GetXaxis()->GetXmax() - hon->GetXaxis()->GetXmin() ) < 1.e-3 )
                 {
                      continue;
                 }
                 if( i_className.find( "TH2" ) != string::npos
-                  && TMath::Abs( hon->GetYaxis()->GetXmax() - hon->GetYaxis()->GetXmin() ) < 1.e3 )
+                  && TMath::Abs( hon->GetYaxis()->GetXmax() - hon->GetYaxis()->GetXmin() ) < 1.e-3 )
                 {
                      continue;
                 }
@@ -188,7 +188,7 @@ void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, d
             {
                hList->Add( obj );
             }
-        }
+        } 
 
 }
 
