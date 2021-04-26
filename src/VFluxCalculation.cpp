@@ -97,6 +97,8 @@ void VFluxCalculation::reset()
 	
 	// graphs
 	gFluxElevation = 0;
+        gFluxWobbleOffset = 0;
+        gFluxPedvars = 0;
         gFluxAzimuth = 0;
 	fCanvasFluxesVSMJD = 0;
 	
@@ -2064,7 +2066,7 @@ TCanvas* VFluxCalculation::plotFluxesVSPedvars()
 	cFPedvars->SetGridy( 0 );
 	cFPedvars->Draw();
 	
-	TGraphErrors* gFluxPedvars = new TGraphErrors( ( int )fRunMJD.size() - 1 );
+	gFluxPedvars = new TGraphErrors( ( int )fRunMJD.size() - 1 );
 	gFluxPedvars->SetTitle( "" );
 	gFluxPedvars->SetMarkerStyle( 20 );
 	gFluxPedvars->SetMarkerSize( 1. );
@@ -2093,22 +2095,18 @@ TCanvas* VFluxCalculation::plotFluxesVSPedvars()
 	}
 	gFluxPedvars->GetHistogram()->SetYTitle( hname );
 	
-	TLine* iL2 = new TLine( gFluxPedvars->GetHistogram()->GetXaxis()->GetXmin(), 0., gFluxPedvars->GetHistogram()->GetXaxis()->GetXmax(), 0. );
-	iL2->SetLineStyle( 2 );
-	iL2->Draw();
-
         return cFPedvars;
 }
 
 
-void VFluxCalculation::plotFluxesVSWobbleOffset()
+TCanvas* VFluxCalculation::plotFluxesVSWobbleOffset()
 {
-	TCanvas* cFWobbleOffset = new TCanvas( "cFWobbleOffset", "fluxes vs wobble offset", 400, 10, 400, 400 );
+	TCanvas* cFWobbleOffset = new TCanvas( "cFWobbleOffset", "fluxes vs wobble offset", 400, 10, 1100, 700 );
 	cFWobbleOffset->SetGridx( 0 );
 	cFWobbleOffset->SetGridy( 0 );
 	cFWobbleOffset->Draw();
 	
-	TGraphErrors* gFluxWobbleOffset = new TGraphErrors( ( int )fRunMJD.size() - 1 );
+	gFluxWobbleOffset = new TGraphErrors( ( int )fRunMJD.size() - 1 );
 	gFluxWobbleOffset->SetTitle( "" );
 	gFluxWobbleOffset->SetMarkerStyle( 20 );
 	gFluxWobbleOffset->SetMarkerSize( 1 );
@@ -2137,9 +2135,7 @@ void VFluxCalculation::plotFluxesVSWobbleOffset()
 	}
 	gFluxWobbleOffset->GetHistogram()->SetYTitle( hname );
 	
-	TLine* iL2 = new TLine( gFluxWobbleOffset->GetHistogram()->GetXaxis()->GetXmin(), 0., gFluxWobbleOffset->GetHistogram()->GetXaxis()->GetXmax(), 0. );
-	iL2->SetLineStyle( 2 );
-	iL2->Draw();
+        return cFWobbleOffset;
 }
 
 

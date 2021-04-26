@@ -152,6 +152,8 @@ class VFluxCalculation : public TObject
 		// graphs
 		TGraphErrors* gFluxElevation;
                 TGraphErrors* gFluxAzimuth;
+                TGraphErrors* gFluxWobbleOffset;
+                TGraphErrors* gFluxPedvars;
 		TCanvas* fCanvasFluxesVSMJD;
 		TCanvas* fCanvasFluxesInBINs;
 		
@@ -182,6 +184,14 @@ class VFluxCalculation : public TObject
                 {
                         return gFluxElevation;
                 }
+                TGraphErrors* getFluxvsWobbleOffset()
+                {
+                        return gFluxWobbleOffset;
+                }
+                TGraphErrors* getFluxvsPedvars()
+                {
+                        return gFluxPedvars;
+                }
 		TCanvas*      getFluxesVSMJDCanvas()
 		{
 			return fCanvasFluxesVSMJD;
@@ -192,7 +202,7 @@ class VFluxCalculation : public TObject
 		TCanvas* plotFluxesVSElevation( bool iDraw = true, double iConstantValueLine = -1. );
 		TCanvas* plotFluxesVSAzimuth( bool iDraw = true, double iConstantValueLine = -1. );
 		TCanvas* plotFluxesVSPedvars();
-		void          plotFluxesVSWobbleOffset();
+		TCanvas* plotFluxesVSWobbleOffset();
 		bool          IsInRunList( int iRun );
 		bool          IsZombie()
 		{
