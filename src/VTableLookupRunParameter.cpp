@@ -613,7 +613,7 @@ void VTableLookupRunParameter::print( int iP )
 		cout << "\t distance to camera: > " << fMC_distance_to_cameracenter_min << " [deg], <";
 		cout << fMC_distance_to_cameracenter_max << " [deg]" << endl;
 	}
-	if( iP == 2 )
+	if( iP == 2 && isMC )
 	{
 		cout << "zenith angle " << ze << " [deg], wobble offset " << fWobbleOffset / 100. << " [deg], noise level " << fNoiseLevel << endl;
 	}
