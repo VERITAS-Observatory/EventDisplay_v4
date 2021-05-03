@@ -23,14 +23,6 @@ VERITAS analysis
 
 (1.2) bbftp is needed to download data files from the VERITAs archive (see http://doc.in2p3.fr/bbftp/)
 
-CTA analysis
-------------
-
-(2.0) HESSIO libraries needed for the analysis of CTA Monte Carlo can be found here:
-   http://www.mpi-hd.mpg.de/hfm/CTA/internal/MC/Software/
-
-   (note: this side is password protected, usual CTA details)
-
 Optional
 --------
 
