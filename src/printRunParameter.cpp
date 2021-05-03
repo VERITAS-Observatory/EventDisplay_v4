@@ -93,6 +93,31 @@ bool readRunParameter( TFile* fIn, string iPara )
 	return true;
 }
 
+bool readWobbleOffset( TFile *fIn, bool printInteger )
+{
+	if( !fIn )
+	{
+		return false;
+	}
+	VEvndispRunParameter *fPar = ( VEvndispRunParameter* )fIn->Get( "runparameterV2" );
+        if( fPar )
+        {
+             cout << "Wobble offset: ";
+             if( printInteger )
+             {
+                 cout << TMath::Nint( sqrt( fPar->fWobbleNorth*fPar->fWobbleNorth + fPar->fWobbleEast*fPar->fWobbleEast ) * 100. );
+             }
+             else
+             {
+                 cout << sqrt( fPar->fWobbleNorth*fPar->fWobbleNorth + fPar->fWobbleEast*fPar->fWobbleEast );
+             }
+             cout << endl;
+             return true;
+        }
+        return false;
+}
+
+
 bool readMeanElevation( TFile *fIn )
 {
 	if( !fIn )
@@ -220,6 +245,8 @@ int main( int argc, char* argv[] )
 		cout << "      -evndispreconstructionparameterfile print evndisp reconstruction parameter file" << endl;
 		cout << "      -runinfo      print relevant run info in one line" << endl;
                 cout << "      -elevation    print (rough) average elevation" << endl;
+                cout << "      -wobble       print wobble offset" << endl;
+                cout << "      -wobbleInt    print wobble offset (as integer, x100)" << endl;
 		cout << endl;
 		exit( 0 );
 	}
@@ -250,6 +277,10 @@ int main( int argc, char* argv[] )
                 if( fOption == "-elevation" )
                 {
                         readMeanElevation( fIn );
+                }
+                else if( fOption.find( "-wobble" ) != string::npos )
+                {
+                       readWobbleOffset( fIn, (fOption.find( "-wobbleInt" ) != string::npos) );
                 }
 		else if( fOption == "-mcaz" || fOption == "-runnumber" )
 		{
