@@ -1707,16 +1707,16 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 			  
 
 			  for( unsigned int e = 0; e < fNBins; e++ )
-			    {
-			      i_temp_Eff_MC[e] = 0.;
-			      for( int j = 0; j < nbins_MC; j++ )
-				{
-				  if( TMath::Abs( e0_MC[j] - fEff_E0[e] ) < 1.e-5 )
-			       		{
-					  i_temp_Eff_MC[e] = eff_MC[j];
-					}
-				}
-			    }
+        {
+          i_temp_Eff_MC[e] = 0.;
+          for( int j = 0; j < nbins_MC; j++ )
+          {
+				    if( TMath::Abs( e0_MC[j] - fEff_E0[e] ) < 1.e-5 )
+            {
+					    i_temp_Eff_MC[e] = eff_MC[j];
+					  }
+			  	} 
+        }
 
 			  fEffAreaMC_map[i_ID] = i_temp_Eff_MC;
 			  i_hEsysMCRelative2D->SetDirectory(0);
@@ -2599,7 +2599,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				}
 				if( hVEsys2D[s][i_az] )
 				{
-					hVEsys2D[s][i_az]->Fill( eMC, eRec - eMC );
+					 hVEsys2D[s][i_az]->Fill( eMC, eRec - eMC );
 				}
 				if( hVEmcCutCTA[s][i_az] )
 				{
@@ -2686,9 +2686,9 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
                                 cout << "s : " << s << " , az: " << i_az << endl;
                         }
                         // normalize response matrices
-			VHistogramUtilities::normalizeTH2D_y( hVResponseMatrix[s][i_az] );
-			VHistogramUtilities::normalizeTH2D_y( hVResponseMatrixQC[s][i_az] );
-			VHistogramUtilities::normalizeTH2D_y( hVResponseMatrixNoDirectionCut[s][i_az] );
+                        VHistogramUtilities::normalizeTH2D_y( hVResponseMatrix[s][i_az] );
+                        VHistogramUtilities::normalizeTH2D_y( hVResponseMatrixQC[s][i_az] );
+                        VHistogramUtilities::normalizeTH2D_y( hVResponseMatrixNoDirectionCut[s][i_az] );
 
 			for( int i = 0; i < 1000; i++ )
 			{
@@ -2765,41 +2765,52 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 
 			// copy all histograms
 			resetHistograms( ize );
-			copyHistograms( hEmc, hVEmc[s][i_az], false );
-			copyHistograms( hEcut, hVEcut[s][i_az], false );
-			copyHistograms( hEcutUW, hVEcutUW[s][i_az], false );
-			copyHistograms( hEcut500, hVEcut500[s][i_az], false );
-			copyHistograms( hEcutLin, hVEcutLin[s][i_az], false );
+                        
+                        // Histograms that depend on Erec -> add them depending on the index
 			copyHistograms( hEcutRec, hVEcutRec[s][i_az], false );
 			copyHistograms( hEcutRecUW, hVEcutRecUW[s][i_az], false );
-			copyProfileHistograms( hEmcSWeight, hVEmcSWeight[s][i_az] );
 			copyProfileHistograms( hEsysRec,  hVEsysRec[s][i_az] );
-			copyProfileHistograms( hEsysMC, hVEsysMC[s][i_az] );
-			copyProfileHistograms( hEsysMCRelative, hVEsysMCRelative[s][i_az] );
-			copyHistograms( hEsysMCRelativeRMS, hVEsysMCRelativeRMS[s][i_az], true );
-			copyHistograms( hEsysMCRelative2D, hVEsysMCRelative2D[s][i_az], true );
-			copyHistograms( hEsysMCRelative2DNoDirectionCut, hVEsysMCRelative2DNoDirectionCut[s][i_az], true );
-			copyHistograms( hEsys2D, hVEsys2D[s][i_az], true );
-			copyHistograms( hEmcCutCTA, hVEmcCutCTA[s][i_az], true );
-			copyHistograms( hResponseMatrix, hVResponseMatrix[s][i_az], true );
-			copyHistograms( hResponseMatrixQC, hVResponseMatrixQC[s][i_az], true );
-			copyHistograms( hResponseMatrixNoDirectionCut, hVResponseMatrixNoDirectionCut[s][i_az], true );
-			copyProfileHistograms( hResponseMatrixProfile, hVResponseMatrixProfile[s][i_az] );
-			copyHistograms( hResponseMatrixFine, hVResponseMatrixFine[s][i_az], true );
-			copyHistograms( hResponseMatrixFineQC, hVResponseMatrixFineQC[s][i_az], true );
-			copyHistograms( hResponseMatrixFineNoDirectionCut, hVResponseMatrixFineNoDirectionCut[s][i_az], true );
-			
-                        copyHistograms( hWeightedRate, hVWeightedRate[s][i_az], false );
-                        copyHistograms( hWeightedRate005, hVWeightedRate005[s][i_az], false );
+
+                        // Histograms that depend on EMC -> add only the ones for the first index.
+                        if ( s == 0 )
+                        {
+                            copyHistograms( hEmc, hVEmc[s][i_az], false );
+                            copyHistograms( hEcut, hVEcut[s][i_az], false );
+                            copyHistograms( hEcutUW, hVEcutUW[s][i_az], false );
+                            copyHistograms( hEcut500, hVEcut500[s][i_az], false );
+                            copyHistograms( hEcutLin, hVEcutLin[s][i_az], false );
+                            copyProfileHistograms( hEmcSWeight, hVEmcSWeight[s][i_az] );
+                            copyProfileHistograms( hEsysMC, hVEsysMC[s][i_az] );
+                            copyProfileHistograms( hEsysMCRelative, hVEsysMCRelative[s][i_az] );
+                            copyHistograms( hEsysMCRelativeRMS, hVEsysMCRelativeRMS[s][i_az], true );
+                            copyHistograms( hEsysMCRelative2D, hVEsysMCRelative2D[s][i_az], true );
+                            copyHistograms( hEsysMCRelative2DNoDirectionCut, hVEsysMCRelative2DNoDirectionCut[s][i_az], true );
+                            copyHistograms( hEmcCutCTA, hVEmcCutCTA[s][i_az], true );
+                            copyHistograms( hEsys2D, hVEsys2D[s][i_az], true );
+                            copyHistograms( hResponseMatrix, hVResponseMatrix[s][i_az], true );
+                            copyHistograms( hResponseMatrixQC, hVResponseMatrixQC[s][i_az], true );
+                            copyHistograms( hResponseMatrixNoDirectionCut, hVResponseMatrixNoDirectionCut[s][i_az], true );
+                            copyProfileHistograms( hResponseMatrixProfile, hVResponseMatrixProfile[s][i_az] );
+                            copyHistograms( hResponseMatrixFine, hVResponseMatrixFine[s][i_az], true );
+                            copyHistograms( hResponseMatrixFineQC, hVResponseMatrixFineQC[s][i_az], true );
+                            copyHistograms( hResponseMatrixFineNoDirectionCut, hVResponseMatrixFineNoDirectionCut[s][i_az], true );
+                            copyHistograms( hWeightedRate, hVWeightedRate[s][i_az], false );
+                            copyHistograms( hWeightedRate005, hVWeightedRate005[s][i_az], false );
+                        }
+                        
                         for( unsigned int e = 0; e < hEcutSub.size(); e++ )
                         {
                             copyHistograms( hEcutSub[e], hVEcutSub[s][e][i_az], false );
                         }
 
                         copyHistograms( hAngularDiff_2D, hVAngularDiff_2D[i_az], true );
-                        copyHistograms( hAngularDiffEmc_2D, hVAngularDiffEmc_2D[i_az], true );
                         copyHistograms( hAngularLogDiff_2D, hVAngularLogDiff_2D[i_az], true );
-                        copyHistograms( hAngularLogDiffEmc_2D, hVAngularLogDiffEmc_2D[i_az], true );
+                        if ( s == 0 )
+                        {
+                            // Fill only for the first index.
+                            copyHistograms( hAngularDiffEmc_2D, hVAngularDiffEmc_2D[i_az], true );
+                            copyHistograms( hAngularLogDiffEmc_2D, hVAngularLogDiffEmc_2D[i_az], true );
+                        }
                         
 			// fill angular resolution vs energy
                         fillAngularResolution( i_az, false );
@@ -3506,6 +3517,22 @@ void VEffectiveAreaCalculator::resetHistograms( unsigned int ize )
 	hEmcSWeight->Reset();
 	sprintf( htitle, "spectral weights (%.1f deg)", fZe[ize] );
 	hEmcSWeight->SetTitle( htitle );
+        
+        hAngularDiff_2D->Reset();
+        sprintf( htitle, "hAngularDiff_2D" );
+        hAngularDiff_2D->SetTitle( htitle );
+
+        hAngularDiffEmc_2D->Reset();
+        sprintf( htitle, "hAngularDiffEmc_2D" );
+        hAngularDiffEmc_2D->SetTitle( htitle );
+        
+        hAngularLogDiff_2D->Reset();
+        sprintf( htitle, "hAngularLogDiff_2D" );
+        hAngularLogDiff_2D->SetTitle( htitle );
+
+        hAngularLogDiffEmc_2D->Reset();
+        sprintf( htitle, "hAngularLogDiffEmc_2D" );
+        hAngularLogDiffEmc_2D->SetTitle( htitle );
 }
 
 
@@ -3681,7 +3708,7 @@ void VEffectiveAreaCalculator::copyProfileHistograms( TProfile* h1,  TProfile* h
 
 	for( int b = 0; b <= h2->GetNbinsX(); b++ )
 	{
-		h1->SetBinContent( b, h2->GetBinContent( b ) * h2->GetBinEntries( b ) );
+                h1->SetBinContent( b, h2->GetBinContent( b ) * h2->GetBinEntries( b ) );
 
 		if( TMath::Abs( h2->GetBinError( b ) ) < 1.e-4 )
 		{
@@ -3697,16 +3724,16 @@ void VEffectiveAreaCalculator::copyProfileHistograms( TProfile* h1,  TProfile* h
 				{
 					iE = h2->GetBinError( b ) * sqrt( h2->GetBinEntries( b ) );
 				}
-				h1->SetBinError( b,  sqrt( h2->GetBinEntries( b ) * ( h2->GetBinContent( b ) *  h2->GetBinContent( b ) + iE * iE ) ) );
+                                h1->SetBinError( b,  sqrt( h2->GetBinEntries( b ) * ( h2->GetBinContent( b ) *  h2->GetBinContent( b ) + iE * iE ) ) );
 			}
 			else
 			{
 				h1->SetBinError( b, 0. );
 			}
 		}
-		h1->SetBinEntries( b, h2->GetBinEntries( b ) );
+                h1->SetBinEntries( b, h2->GetBinEntries( b ) );
 	}
-	h1->SetEntries( h2->GetEntries() );
+        h1->SetEntries( h2->GetEntries() );
 }
 
 
@@ -3721,8 +3748,8 @@ void VEffectiveAreaCalculator::copyHistograms( TH1* h1,  TH1* h2, bool b2D )
 	{
 		for( int b = 0; b <= h2->GetNbinsX(); b++ )
 		{
-			h1->SetBinContent( b, h2->GetBinContent( b ) );
-			h1->SetBinError( b, h2->GetBinError( b ) );
+                        h1->SetBinContent( b, h2->GetBinContent( b ) );
+                        h1->SetBinError( b, h2->GetBinError( b ) );
 		}
 	}
 	else
@@ -3731,12 +3758,13 @@ void VEffectiveAreaCalculator::copyHistograms( TH1* h1,  TH1* h2, bool b2D )
 		{
 			for( int b2 = 0; b2 <= h2->GetNbinsY(); b2++ )
 			{
-				h1->SetBinContent( b, b2, h2->GetBinContent( b, b2 ) );
-				h1->SetBinError( b, b2, h2->GetBinError( b, b2 ) );
+                                h1->SetBinContent( b, b2, h2->GetBinContent( b, b2 ) );
+                                h1->SetBinError( b, b2, h2->GetBinError( b, b2 ) );
 			}
 		}
 	}
-	h1->SetEntries( h2->GetEntries() );
+        h1->SetEntries( h2->GetEntries() );
+        
 }
 
 
@@ -4117,48 +4145,6 @@ void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
 			}
 		}
 	}
-        /*
-        for( unsigned int i = 0; i < hVAngularDiff_2D.size(); i++ )
-	{
-                for( unsigned int j = 0; j < hVAngularDiff_2D[i].size(); j++ )
-                {
-                        if( hVAngularDiff_2D[i][j] )
-                        {
-                                hVAngularDiff_2D[i][j]->Reset();
-                        }
-                }
-	}
-        for( unsigned int i = 0; i < hVAngularDiffEmc_2D.size(); i++ )
-	{
-                for( unsigned int j = 0; j < hVAngularDiffEmc_2D[i].size(); j++ )
-                {
-                        if( hVAngularDiffEmc_2D[i][j] )
-                        {
-                                hVAngularDiffEmc_2D[i][j]->Reset();
-                        }
-                }
-	}
-        for( unsigned int i = 0; i < hVAngularLogDiff_2D.size(); i++ )
-	{
-                for( unsigned int j = 0; j < hVAngularLogDiff_2D[i].size(); j++ )
-                {
-                        if( hVAngularLogDiff_2D[i][j] )
-                        {
-                                hVAngularLogDiff_2D[i][j]->Reset();
-                        }
-                }
-	}
-        for( unsigned int i = 0; i < hVAngularLogDiffEmc_2D.size(); i++ )
-	{
-                for( unsigned int j = 0; j < hVAngularLogDiffEmc_2D[i].size(); j++ )
-                {
-                        if( hVAngularLogDiffEmc_2D[i][j] )
-                        {
-                                hVAngularLogDiffEmc_2D[i][j]->Reset();
-                        }
-                }
-	}
-        */
 	
 	for( unsigned int i = 0; i < hVWeightedRate.size(); i++ )
 	{
@@ -4381,14 +4367,12 @@ void VEffectiveAreaCalculator::Calculate_Bck_solid_angle_norm()
 void VEffectiveAreaCalculator::addMeanResponseMatrix( TH2F *i_hTmp )
 {
 
-
-
     // If hMeanResponseMatrix doesn't exist
     if ( !hMeanResponseMatrix )
     {
-      //cout << "\t\t\tVEffectiveAreaCalculator::addMeanResponseMatrix Creating new histogram" << endl;
-	VHistogramUtilities::normalizeTH2D_x(i_hTmp); 
-	hMeanResponseMatrix = (TH2F*)i_hTmp->Clone();
+        //cout << "\t\t\tVEffectiveAreaCalculator::addMeanResponseMatrix Creating new histogram" << endl;
+	      VHistogramUtilities::normalizeTH2D_x(i_hTmp); 
+	      hMeanResponseMatrix = (TH2F*)i_hTmp->Clone();
         hMeanResponseMatrix->Sumw2();
 
     }

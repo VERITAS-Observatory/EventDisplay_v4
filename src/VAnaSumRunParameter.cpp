@@ -10,10 +10,15 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 	fEventDisplayVersion = "";
 	
 	fRunOn = 0;
+        fRunOnFileName = "";
 	fRunOff = 0;
+        fRunOffFileName = "";
 	
 	fMJDOn = 0.;
 	fMJDOff = 0.;
+
+        fMJDOnStart = 0.;
+        fMJDOnStop = 0.;
 	
 	fTarget = "";
 	fTargetRAJ2000 = 0.;
@@ -39,6 +44,7 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 	fTargetShiftDecJ2000 = 0.;
 	
 	fNTel = 4;
+        fTelToAna = "";
 	fMaxTelID = fNTel;
 	
 	fBackgroundModel = 0;
@@ -50,7 +56,6 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 	fAcceptanceFile = "";
 	
 	fEffectiveAreaFile = "";                      // file with effective areas, use NOFILE if not avaible
-	
 	
 	// smoothing algorithm (don't use it if you don't know it)
 	fNBoxSmooth = 0;
@@ -72,6 +77,8 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 	fTE_mscw_max = 0.;
 	fTE_mscl_min = 0.;
 	fTE_mscl_max = 0.;
+
+        f2DAcceptanceMode = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -141,12 +148,6 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	// length of time intervalls in seconds for rate plots and short term histograms
 	fTimeIntervall = 4. * 60.;
 	
-	// should a full tree of all gamma-like events be written?
-	// or do we only keep the ones that pass ON/OFF region cuts?
-	fWriteAllGammaToTree = false ; // WRITEALLGAMMATOTREE
-	
-	fWriteEventTreeForCtools = false ;
-	
 	// model3D analysis
 	fModel3D = false; // MODEL3DANALYSIS
 	fDirectionModel3D = false; //USEDIRECTIONMODEL3D
@@ -158,7 +159,7 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	// if >0, use alternate 2D-dependent acceptance
 	f2DAcceptanceMode = 0 ; // USE2DACCEPTANCE
 	
-	// for deadtime fraction storage CTOOLS
+	// for deadtime fraction storage
 	fScalarDeadTimeFrac = 0.0 ;
 	
 	// set monte carlo zenith angles
@@ -611,29 +612,6 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			{
 				fEnergyEffectiveAreaSmoothingThreshold = atof( temp2.c_str() );
 			}
-			
-			// for saving all gamma-like events, regardless of ON/OFF regions
-			// WRITEALLGAMMATOTREE
-			// When option is used in ANASUM.runparameter like:
-			// * WRITEALLGAMMATOTREE 1
-			// A new tree will be created in the <runnumber>.anasum.root file
-			// run_<runnumber>/stereo/TreeWithAllGamma which will contain
-			// all gamma-like events (after MSCW/MSCL cuts), but before
-			// ON/OFF region cuts.
-			// Tree contains basic information about each event, which is
-			// chosen in the functions
-			// VStereoAnalysis::init_TreeWithAllGamma()
-			// VStereoAnalysis::fill_TreeWithAllGamma()
-			// grep for WRITEALLGAMMATOTREE to see all the involved code blocks
-			else if( temp == "WRITEALLGAMMATOTREE" )
-			{
-				unsigned int tmpWriteAll = ( unsigned int )atoi( temp2.c_str() ) ;
-				if( tmpWriteAll == 1 )
-				{
-					fWriteAllGammaToTree = true ;
-				}
-			}
-			
 			////////////////////////////////////////////
 			// Option USE2DACCEPTANCE within ANASUM.runparameter
 			// * USE2DACCEPTANCE 0
@@ -644,20 +622,6 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			{
 				f2DAcceptanceMode = ( unsigned int )atoi( temp2.c_str() ) ;
 			}
-			
-			///////////////////////////////////////////////////////////
-			// WRITEEVENTTREEFORCTOOLS
-			// adds an extra tree "run_#####/stereo/TreeWithEventsForCtools" to anasum.#####.root,
-			// containing info for converting veritas data to CTOOLs event list format
-			else if( temp == "WRITEEVENTTREEFORCTOOLS" )
-			{
-				unsigned int tmpWriteAll = ( unsigned int )atoi( temp2.c_str() ) ;
-				if( tmpWriteAll == 1 )
-				{
-					fWriteEventTreeForCtools = true ;
-				}
-			}
-			
 			/// use Model3D analysis ///
 			else if( temp == "MODEL3DANALYSIS" )
 			{
@@ -1566,17 +1530,35 @@ bool VAnaSumRunParameter::setSkyMapCentreJ2000( unsigned int i, double ra, doubl
 	return false;
 }
 
+bool VAnaSumRunParameter::setRunTimes( unsigned int i, double iMJDStart, double iMJDStopp )
+{
+       if( i >= fRunList.size() )
+       {
+            return false;
+       }
+       fRunList[i].fMJDOnStart = iMJDStart;
+       fRunList[i].fMJDOnStop = iMJDStopp;
+       if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
+       {
+           fMapRunList[fRunList[i].fRunOn].fMJDOnStart = iMJDStart;
+           fMapRunList[fRunList[i].fRunOn].fMJDOnStop = iMJDStopp;
+       }
+       return true;
+}
 
-bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i, double ra, double dec )
+
+bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i, double ra, double dec, string iTargetName )
 {
 	if( i < fRunList.size() )
 	{
 		fRunList[i].fTargetRAJ2000 = ra;
 		fRunList[i].fTargetDecJ2000 = dec;
+                fRunList[i].fTarget = iTargetName;
 		if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
 		{
 			fMapRunList[fRunList[i].fRunOn].fTargetRAJ2000 = ra;
 			fMapRunList[fRunList[i].fRunOn].fTargetDecJ2000 = dec;
+                        fMapRunList[fRunList[i].fRunOn].fTarget = iTargetName;
 		}
 		// set centre of stereo maps (if this parameter is not set in the file runparameter.dat)
 		if( TMath::Abs( fSkyMapCentreNorth ) < 1.e-8 && TMath::Abs( fSkyMapCentreWest ) < 1.e-8
@@ -1586,6 +1568,7 @@ bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i, double ra, double
 			fRunList[i].fSkyMapCentreWest     = 0.;
 			fRunList[i].fSkyMapCentreRAJ2000  = ra;
 			fRunList[i].fSkyMapCentreDecJ2000 = dec;
+
 			if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
 			{
 				fMapRunList[fRunList[i].fRunOn].fSkyMapCentreNorth    = 0.;

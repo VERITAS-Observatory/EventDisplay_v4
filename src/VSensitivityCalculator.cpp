@@ -2583,7 +2583,7 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 										   c->hResponseMatrix->GetXaxis()->GetXmin(), c->hResponseMatrix->GetXaxis()->GetXmax(),
 										   c->hResponseMatrix->GetNbinsY(),
 										   c->hResponseMatrix->GetYaxis()->GetXmin(), c->hResponseMatrix->GetYaxis()->GetXmax() );
-		TH2D* i_hResponse = c->hResponseMatrix;
+		TH2D* i_hResponse = (TH2D*)c->hResponseMatrix;
 		// for cosmic rays: interpolate response matrix
 		if( iMCPara->fParticleID != 1 && iMCPara->fParticleID != 2 )
 		{

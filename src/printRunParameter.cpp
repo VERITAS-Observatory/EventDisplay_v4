@@ -93,12 +93,45 @@ bool readRunParameter( TFile* fIn, string iPara )
 	return true;
 }
 
+bool readWobbleOffset( TFile *fIn, bool printInteger )
+{
+	if( !fIn )
+	{
+		return false;
+	}
+	VEvndispRunParameter *fPar = ( VEvndispRunParameter* )fIn->Get( "runparameterV2" );
+        if( fPar )
+        {
+             cout << "Wobble offset: ";
+             if( printInteger )
+             {
+                 cout << TMath::Nint( sqrt( fPar->fWobbleNorth*fPar->fWobbleNorth + fPar->fWobbleEast*fPar->fWobbleEast ) * 100. );
+             }
+             else
+             {
+                 cout << sqrt( fPar->fWobbleNorth*fPar->fWobbleNorth + fPar->fWobbleEast*fPar->fWobbleEast );
+             }
+             cout << endl;
+             return true;
+        }
+        return false;
+}
+
+
 bool readMeanElevation( TFile *fIn )
 {
 	if( !fIn )
 	{
 		return false;
 	}
+        // get total number of telescopes available
+        TTree *telconfig = (TTree*)fIn->Get( "telconfig" );
+        if( !telconfig )
+        {
+            return false;
+        }
+        unsigned int iNTel = (unsigned int)telconfig->GetEntries();
+        if( iNTel >= VDST_MAXTELESCOPES ) iNTel = VDST_MAXTELESCOPES;
         TTree *data = (TTree*)fIn->Get( "data" );
         if( data )
         {
@@ -107,7 +140,7 @@ bool readMeanElevation( TFile *fIn )
             data->GetEntry( 0 );
             double iMean_f = 0.;
             double iMeanN = 0.;
-            for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
+            for( unsigned int i = 0; i < iNTel; i++ )
             {
                 if( TelElevation[i] > 5. )
                 {
@@ -118,7 +151,7 @@ bool readMeanElevation( TFile *fIn )
             if( data->GetEntries() > 1 )
             {
                 data->GetEntry( data->GetEntries() - 1 );
-                for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
+                for( unsigned int i = 0; i < iNTel; i++ )
                 {
                     if( TelElevation[i] > 5. )
                     {
@@ -212,6 +245,8 @@ int main( int argc, char* argv[] )
 		cout << "      -evndispreconstructionparameterfile print evndisp reconstruction parameter file" << endl;
 		cout << "      -runinfo      print relevant run info in one line" << endl;
                 cout << "      -elevation    print (rough) average elevation" << endl;
+                cout << "      -wobble       print wobble offset" << endl;
+                cout << "      -wobbleInt    print wobble offset (as integer, x100)" << endl;
 		cout << endl;
 		exit( 0 );
 	}
@@ -242,6 +277,10 @@ int main( int argc, char* argv[] )
                 if( fOption == "-elevation" )
                 {
                         readMeanElevation( fIn );
+                }
+                else if( fOption.find( "-wobble" ) != string::npos )
+                {
+                       readWobbleOffset( fIn, (fOption.find( "-wobbleInt" ) != string::npos) );
                 }
 		else if( fOption == "-mcaz" || fOption == "-runnumber" )
 		{

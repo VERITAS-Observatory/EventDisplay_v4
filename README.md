@@ -1,10 +1,10 @@
-# Eventdisplay source code (v483b version only)
+# Eventdisplay source code (master)
 
-**released eventdisplay version - to be used for science analysis**
+**Development version master - not to be used for science analysis**
 
-Main changes with respect to v480 is the implementation of the correction factors to take the lower throughput / gains into account
+Main changes with respect to earlier version is the implementation of the correction factors to take the lower throughput / gains into account
 
-Release page: https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_v483
+Release page: ...
 
 Repository for the Eventdisplay code for the v483 version. 
 

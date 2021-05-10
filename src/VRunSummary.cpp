@@ -25,6 +25,9 @@ bool VRunSummary::setBranches()
 	fRunSummaryTree->Branch( "runOff", &runOff, "runOff/I" );
 	fRunSummaryTree->Branch( "MJDOn", &MJDOn, "MJDOn/D" );
 	fRunSummaryTree->Branch( "MJDOff", &MJDOff, "MJDOff/D" );
+	fRunSummaryTree->Branch( "MJDrunstart", &MJDrunstart, "MJDrunstart/D" );
+	fRunSummaryTree->Branch( "MJDrunstop", &MJDrunstop, "MJDrunstop/D" );
+        fRunSummaryTree->Branch( "TargetName", &fTargetName, "TargetName/C"  );
 	fRunSummaryTree->Branch( "TargetRA", &fTargetRA, "TargetRA/D" );
 	fRunSummaryTree->Branch( "TargetDec", &fTargetDec, "TargetDec/D" );
 	fRunSummaryTree->Branch( "TargetRAJ2000", &fTargetRAJ2000, "TargetRAJ2000/D" );
@@ -38,12 +41,14 @@ bool VRunSummary::setBranches()
 	fRunSummaryTree->Branch( "WobbleNorth", &fWobbleNorth, "WobbleNorth/D" );
 	fRunSummaryTree->Branch( "WobbleWest", &fWobbleWest, "WobbleWest/D" );
 	fRunSummaryTree->Branch( "NTel", &fNTel, "NTel/i" );
+        fRunSummaryTree->Branch( "TelList", &fTelList, "TelList/C"  );
 	fRunSummaryTree->Branch( "tOn", &tOn, "tOn/D" );
 	fRunSummaryTree->Branch( "tOff", &tOff, "tOff/D" );
 	fRunSummaryTree->Branch( "elevationOn", &elevationOn, "elevationOn/D" );
 	fRunSummaryTree->Branch( "azimuthOn", &azimuthOn, "azimuthOn/D" );
 	fRunSummaryTree->Branch( "elevationOff", &elevationOff, "elevationOff/D" );
 	fRunSummaryTree->Branch( "azimuthOff", &azimuthOff, "azimuthOff/D" );
+	fRunSummaryTree->Branch( "Theta2Max", &fTheta2Max, "Theta2Max/D" );
 	fRunSummaryTree->Branch( "RawRateOn", &RawRateOn, "RawRateOn/D" );
 	fRunSummaryTree->Branch( "RawRateOff", &RawRateOff, "RawRateOff/D" );
 	fRunSummaryTree->Branch( "pedvarsOn", &pedvarsOn, "pedvarsOn/D" );
@@ -75,6 +80,10 @@ void VRunSummary::init()
 	runOff = 0;
 	MJDOn = 0.;
 	MJDOff = 0.;
+        MJDrunstart = 0.;
+        MJDrunstop = 0.;
+        sprintf( fTargetName, "NOTSET" );
+        sprintf( fTelList, "NOTSET" );
 	fTargetDec = 0.;
 	fTargetRA = 0.;
 	fTargetDecJ2000 = 0.;
@@ -94,6 +103,7 @@ void VRunSummary::init()
 	elevationOff = 0.;
 	azimuthOn  = 0.;
 	azimuthOff = 0.;
+        fTheta2Max = 0.;
 	RawRateOn = 0.;
 	RawRateOff = 0.;
 	pedvarsOn = 0.;
@@ -371,6 +381,9 @@ bool VRunSummary::initTree()
 	fRunSummaryTree->SetBranchAddress( "runOff", &runOff );
 	fRunSummaryTree->SetBranchAddress( "MJDOn", &MJDOn );
 	fRunSummaryTree->SetBranchAddress( "MJDOff", &MJDOff );
+	fRunSummaryTree->SetBranchAddress( "MJDrunstart", &MJDrunstart );
+	fRunSummaryTree->SetBranchAddress( "MJDrunstop", &MJDrunstop );
+	fRunSummaryTree->SetBranchAddress( "TargetName", &fTargetName );
 	fRunSummaryTree->SetBranchAddress( "TargetRA", &fTargetRA );
 	fRunSummaryTree->SetBranchAddress( "TargetDec", &fTargetDec );
 	fRunSummaryTree->SetBranchAddress( "TargetRAJ2000", &fTargetRAJ2000 );
@@ -384,12 +397,14 @@ bool VRunSummary::initTree()
 	fRunSummaryTree->SetBranchAddress( "WobbleNorth", &fWobbleNorth );
 	fRunSummaryTree->SetBranchAddress( "WobbleWest", &fWobbleWest );
 	fRunSummaryTree->SetBranchAddress( "NTel", &fNTel );
+	fRunSummaryTree->SetBranchAddress( "TelList", &fTelList );
 	fRunSummaryTree->SetBranchAddress( "tOn", &tOn );
 	fRunSummaryTree->SetBranchAddress( "tOff", &tOff );
 	fRunSummaryTree->SetBranchAddress( "elevationOn", &elevationOn );
 	fRunSummaryTree->SetBranchAddress( "elevationOff", &elevationOff );
 	fRunSummaryTree->SetBranchAddress( "azimuthOn", &azimuthOn );
 	fRunSummaryTree->SetBranchAddress( "azimuthOff", &azimuthOff );
+	fRunSummaryTree->SetBranchAddress( "Theta2Max", &fTheta2Max );
 	fRunSummaryTree->SetBranchAddress( "RawRateOn", &RawRateOn );
 	fRunSummaryTree->SetBranchAddress( "RawRateOff", &RawRateOff );
 	fRunSummaryTree->SetBranchAddress( "pedvarsOn", &pedvarsOn );

@@ -742,8 +742,8 @@ void VAnaSum::copyDirectory( TDirectory* source )
 
 */
 void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp_off,
-							  double i_nevts_on, double i_nevts_off, double i_norm_alpha,
-							  double i_sig, double i_rate, double i_rateOFF, VOnOff* fstereo_onoff )
+		              double i_nevts_on, double i_nevts_off, double i_norm_alpha,
+			      double i_sig, double i_rate, double i_rateOFF, VOnOff* fstereo_onoff )
 {
 	if( !fRunSummary )
 	{
@@ -756,10 +756,14 @@ void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp
 	if( onrun != -1 )
 	{
 		fRunSummary->MJDOn = fStereoOn->getMJD( onrun );
+                fRunSummary->MJDrunstart = fRunPara->fMapRunList[onrun].fMJDOnStart;
+                fRunSummary->MJDrunstop = fRunPara->fMapRunList[onrun].fMJDOnStop ;
 	}
 	else
 	{
-		fRunSummary->MJDOn = 0.;    //Could make this the mean MJD of all ON runs included in the summed analysis
+		fRunSummary->MJDOn = 0.;
+                fRunSummary->MJDrunstart = 0.;
+                fRunSummary->MJDrunstop = 0.;
 	}
 	if( offrun != -1 )
 	{
@@ -769,6 +773,17 @@ void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp
 	{
 		fRunSummary->MJDOff = 0.;
 	}
+        if( onrun != -1 )
+        {
+               if( fRunPara->fMapRunList[onrun].fTarget.size() < 300 )
+               {
+                    sprintf( fRunSummary->fTargetName, "%s", fRunPara->fMapRunList[onrun].fTarget.c_str() );
+               }
+               else
+               {
+                    sprintf( fRunSummary->fTargetName, "%s", fRunPara->fMapRunList[onrun].fTarget.substr( 0, 299 ).c_str() );
+               }
+        }
 	if( onrun != -1 && fRunPara->fMapRunList.find( onrun ) != fRunPara->fMapRunList.end() )
 	{
 		fRunSummary->fTargetRA = fRunPara->fMapRunList[onrun].fTargetRA;
@@ -840,10 +855,31 @@ void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp
 	if( onrun != -1 )
 	{
 		fRunSummary->fNTel = fRunPara->fMapRunList[onrun].fNTel;
+                for( unsigned int p = 0; p < fRunPara->fRunList.size(); p++ )
+                {
+                    stringstream iTelCombination;
+                    if( fRunPara->fRunList[p].fRunOn == onrun )
+                    {
+                        for( unsigned int t = 0; t < fRunPara->fRunList[p].fTelToAnalyze.size(); t++ )
+                        {
+                            iTelCombination << "T";
+                            iTelCombination << fRunPara->fRunList[p].fTelToAnalyze[t]+1;
+                        }
+                        if( iTelCombination.str().size() < 300 )
+                        {
+                            sprintf( fRunSummary->fTelList, "%s", iTelCombination.str().c_str() );
+                        }
+                        else
+                        {
+                            sprintf( fRunSummary->fTelList, "%s", iTelCombination.str().substr(0,299).c_str() );
+                        }
+                    }    
+                }
 	}
 	else
 	{
 		fRunSummary->fNTel = 0;
+                sprintf( fRunSummary->fTelList, "NOTSET" );
 	}
 	fRunSummary->tOn = iexp_on;
 	fRunSummary->tOff = iexp_off;
@@ -879,6 +915,10 @@ void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp
 	{
 		fRunSummary->azimuthOff = fMeanAzimuthOff;
 	}
+        if( onrun != -1 )
+        {
+            fRunSummary->fTheta2Max = fRunPara->fMapRunList[onrun].fSourceRadius;
+        }
 	if( onrun != -1 )
 	{
 		if( iexp_on > 0. )
