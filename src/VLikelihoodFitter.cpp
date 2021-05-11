@@ -1062,7 +1062,7 @@ TF1* VLikelihoodFitter::getLikelihoodFit( bool bContours )
     i_BestFit->SetChisquare( i_chi2 );
     i_BestFit->SetNDF( i_ndf );
 
-    // Getting the 1 sigma confidince interval
+    // Getting the 1 sigma confidence interval
     if (fConfidenceInterval)
     {
         delete fConfidenceInterval;
@@ -2086,7 +2086,7 @@ double VLikelihoodFitter::brokenPowerLaw(Double_t *x, Double_t *parm)
 }
 
 
-// Getting the confidince interval
+// Getting the confidence interval
 // SOB use TF1::Derivative ?
 TGraphAsymmErrors* VLikelihoodFitter::calculateConfidenceInterval( double* i_covmat, TF1 *i_fitfunction, int i_model, int i_fNparms)
 {
@@ -3296,7 +3296,7 @@ double VLikelihoodFitter::getMeanAlpha()
   Log(L0) - This is the likelihood obtained with the model paramters set to the best fit
 
   Function returns -2 (Log(L) - Log(L0)) ~chi^2 distributed 
-  Confidince intervals should be verified from simulations.
+  Confidence intervals should be verified from simulations.
 
 
 */
