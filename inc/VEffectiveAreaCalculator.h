@@ -70,9 +70,7 @@ class VEffectiveAreaCalculator
 		map< unsigned int, vector< double > > fEffAreaMC_map;
 		map< unsigned int, unsigned int > fEntry_map;
 
-		map< unsigned int, vector< double > > fResMat_MC_map;
-		map< unsigned int, vector< double > > fResMat_Rec_map;
-		map< unsigned int, vector< double > > fResMat_Rec_Err_map;
+                map< unsigned int, TH2F* > fEsysMCRelative2D_map;
 
 		vector< double >                      fEff_EsysMCRelative_EnergyAxis;
 		map< unsigned int, vector< double > > fEff_EsysMCRelative;
@@ -94,7 +92,7 @@ class VEffectiveAreaCalculator
 		TGraph2DErrors*    gTimeBinnedMeanEffectiveArea;
 		
 		TGraphAsymmErrors* gMeanEffectiveAreaMC;
-		TH2D*			   hMeanResponseMatrix;
+		TH2F*			   hMeanResponseMatrix;
 		TGraphErrors* gMeanSystematicErrorGraph;
 		
 		// unique event counting
@@ -322,7 +320,7 @@ class VEffectiveAreaCalculator
 		vector< double > interpolate_effectiveArea( double iV, double iVLower, double iVupper,
 				vector< double > iEL, vector< double > iEU, bool iCos = true );
 		
-                TH2D*  interpolate_responseMatrix( double iV, double iVLower, double iVupper, TH2D *iElower, TH2D *iEupper, bool iCos = true );
+                TH2F*  interpolate_responseMatrix( double iV, double iVLower, double iVupper, TH2F *iElower, TH2F *iEupper, bool iCos = true );
                 void   multiplyByScatterArea( TGraphAsymmErrors* g );
 		void   reset();
 		void   smoothEffectiveAreas( map< unsigned int, vector< double > > );
@@ -367,17 +365,10 @@ class VEffectiveAreaCalculator
 
 
 
-		void addMeanResponseMatrix( vector <double> i_emc, vector <double> i_erec , vector <double> i_erec_err );
-
-		TH2D* getMeanResponseMatrix()
+                void addMeanResponseMatrix( TH2F *i_hTmp ) ;
+		TH2F* getMeanResponseMatrix()
 		{
-                        VHistogramUtilities::normalizeTH2D_y(hMeanResponseMatrix);
-/*                        if( hMeanResponseMatrix )
-                        {
-                            return (TH2D*)hMeanResponseMatrix->Clone();
-                        } */
-                        return hMeanResponseMatrix;
-                        // return 0;
+		  return hMeanResponseMatrix;
 		}
 
 		void setTimeBinnedMeanEffectiveArea();
