@@ -888,7 +888,6 @@ bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool 
 			{
 				double t2temp = fTheta2_All[0];
 				fTheta2_All[0] = ( x - fRE_off[f_RE_WW][f_RE_WN].xoff[p] ) * ( x - fRE_off[f_RE_WW][f_RE_WN].xoff[p] ) +
-
 						 ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] ) * ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] );
                                 i_theta2 = fTheta2_All[0];
 				fTheta2_All[p] = t2temp;
