@@ -184,7 +184,14 @@ class VFluxCalculation : public TObject
                 {
                         return gFluxElevation;
                 }
-
+                TGraphErrors* getFluxvsWobbleOffset()
+                {
+                        return gFluxWobbleOffset;
+                }
+                TGraphErrors* getFluxvsPedvars()
+                {
+                        return gFluxPedvars;
+                }
 		TCanvas*      getFluxesVSMJDCanvas()
 		{
 			return fCanvasFluxesVSMJD;
