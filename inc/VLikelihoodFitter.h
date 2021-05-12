@@ -100,7 +100,7 @@ public:
         bStopOnLastOff = false;
         bStopOnLastModel = false;
 
-        bValidLiterature = loadSpectraFromLiterature();
+        loadSpectraFromLiterature();
         fCrabID = 1;  // Default to Whipple 1998 (same as VFluxCalculator)
     }
 
@@ -453,10 +453,14 @@ public:
       return iMJD;
     }
 
+    // Function to handle crab spectra from literature
+    void loadSpectraFromLiterature(string filename="");
     void setCrabSpectrum(int id)
     {
       fCrabID = id;
     }
+
+
 
 private:
 
@@ -674,7 +678,6 @@ private:
         fLastOff.clear();
     }
 
-    bool loadSpectraFromLiterature();
 
 };
 
