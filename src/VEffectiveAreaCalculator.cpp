@@ -1240,16 +1240,6 @@ TH2F *VEffectiveAreaCalculator::interpolate_responseMatrix( double iV, double iV
         TH2F *iElower, TH2F *iEupper, bool iCos  )
 {
 
-        if (iElower->GetXaxis()->GetNbins() != iEupper->GetXaxis()->GetNbins() && iElower->GetYaxis()->GetNbins() != iEupper->GetYaxis()->GetNbins())
-        {
-            cout << "Invalid Axes\n";
-	    cout << iVlower << " " << iElower << " " << iElower->GetXaxis()->GetNbins() << " " << iElower->GetYaxis()->GetNbins() << endl;
-	    cout << iVupper << " " << iEupper << " " << iEupper->GetXaxis()->GetNbins() << " " << iEupper->GetYaxis()->GetNbins() << endl;
-	    // This will cause anasum to crash later
-	    return 0;
-
-        }
-
         TH2F *hTemp = (TH2F*)iElower->Clone();
 
         double tmpInt = 0;
