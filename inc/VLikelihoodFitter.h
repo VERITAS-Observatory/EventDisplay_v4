@@ -20,6 +20,8 @@
 #include <Math/Functor.h>
 #include <Math/Factory.h>
 #include "VEnergySpectrum.h"
+#include "VEnergySpectrumfromLiterature.h"
+
 
 // #ifdef __CINT__
 
@@ -91,13 +93,15 @@ public:
         fFitStatus = 0;
         fFitfunction = 0;
         fEnergySpectrum = 0;
+        fLiteratureSpectra = 0;
         fEBLAnalysis = false;
 
         bStopOnLastOn = false;
         bStopOnLastOff = false;
         bStopOnLastModel = false;
 
-
+        bValidLiterature = loadSpectraFromLiterature();
+        fCrabID = 1;  // Default to Whipple 1998 (same as VFluxCalculator)
     }
 
 
@@ -257,7 +261,7 @@ public:
     * The form of this model is unknown, we just take the results
     * f_perfect ( E ) = dNdE_observed
     */
-    double getLogL0 (vector <double> iParms);
+    double getLogL0 ();
 
     /*
     * Calculate the Likelihood ratio:
@@ -449,6 +453,10 @@ public:
       return iMJD;
     }
 
+    void setCrabSpectrum(int id)
+    {
+      fCrabID = id;
+    }
 
 private:
 
@@ -501,8 +509,10 @@ private:
     double fFitMax_logTeV;				// Max energy of model (log scale)
     bool fEBLAnalysis;						// Enable fitting to EBL absorbed model
     double *fGlobalBestFitParameters; //Global copy of the current best fit parameters
-
     vector <double> fFixedParameters; // Vector of frozen parameters and their values
+    bool bValidLiterature;            // Valid spectral file read in
+    int fCrabID;
+    VEnergySpectrumfromLiterature* fLiteratureSpectra;
 
     map <string, vector< vector <double> > >fContourMap;
 
@@ -588,7 +598,7 @@ private:
 
     // Return the Crab flux
     // Whipple
-    double getCrabFlux( double iF, double i_EMin, double i_EMax, double i_Gamma = -2.49 );
+    double getCrabFlux( double iF, double i_EMin, double i_EMax );
 
     // Check if run is excluded
     bool   isRunExcluded( int iRun );
@@ -664,6 +674,7 @@ private:
         fLastOff.clear();
     }
 
+    bool loadSpectraFromLiterature();
 
 };
 
