@@ -3072,7 +3072,7 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 	vector< double > i_eff_temp( fNBins, 0. );
 
 	// These will need to be defined regardless
-	TH2F* i_Res_temp;
+	TH2F* i_Res_temp = 0;
 	vector< TH2F*  > i_ze_Res_temp;
 	vector< double > i_eff_MC_temp;
 
@@ -4356,6 +4356,7 @@ void VEffectiveAreaCalculator::Calculate_Bck_solid_angle_norm()
 // Adding Response matrix to the time averaged
 void VEffectiveAreaCalculator::addMeanResponseMatrix( TH2F *i_hTmp )
 {
+    if( !i_hTmp ) return;
 
     // If hMeanResponseMatrix doesn't exist
     if ( !hMeanResponseMatrix )
