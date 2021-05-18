@@ -321,14 +321,14 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			else if( temp == "SKYMAPSIZEX" )
 			{
 				fSkyMapSizeXmin = atof( temp2.c_str() );
-				is_stream >> temp2;
-				fSkyMapSizeXmax = atof( temp2.c_str() );
+                                fSkyMapSizeXmin = -1. *TMath::Abs( fSkyMapSizeXmin );
+                                fSkyMapSizeXmax = TMath::Abs( fSkyMapSizeXmin );
 			}
 			else if( temp == "SKYMAPSIZEY" )
 			{
 				fSkyMapSizeYmin = atof( temp2.c_str() );
-				is_stream >> temp2;
-				fSkyMapSizeYmax = atof( temp2.c_str() );
+                                fSkyMapSizeYmin = -1. *TMath::Abs( fSkyMapSizeYmin );
+                                fSkyMapSizeYmax = TMath::Abs( fSkyMapSizeYmin );
 			}
 			else if( temp == "BRIGHTSTARCATALOGUE" )
 			{
@@ -350,6 +350,23 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 					fStarExlusionRadius = 0.;
 				}
 			}
+                        else if( temp == "BRIGHTSTARSETTINGS" )
+                        {
+                                fStarMinBrightness = atof( temp2.c_str() );
+                                string iStarBand = "";
+                                if( !(is_stream>>std::ws).eof() )
+                                {
+                                    is_stream >> fStarExlusionRadius;
+                                }
+                                if( fStarExlusionRadius < 1.e-5 )
+                                {
+                                        fStarExlusionRadius = 0.;
+                                }
+                                if( !(is_stream>>std::ws).eof() )
+                                {
+                                    is_stream >> fStarBand;
+                                }
+                        }
 			else if( temp == "SKYMAPCENTRE_XY" )
 			{
 				if( checkNumberOfArguments( is_line ) != 4 )
