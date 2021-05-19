@@ -606,7 +606,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			}
 
 			// fill a tree with current event for DL3 converter
-			if( fIsOn && bIsGamma )
+			if( fIsOn && ( bIsGamma || fRunPara->fWriteAllEvents ))
 			{
 				fill_DL3Tree( fDataRun, i_xderot, i_yderot, icounter, i_UTC );
 			}
@@ -2165,6 +2165,11 @@ bool VStereoAnalysis::init_DL3Tree( int irun, int icounter )
 	fDL3EventTree->Branch( "Xoff"          , &fDL3EventTree_Xoff          , "Xoff/D" );
 	fDL3EventTree->Branch( "Yoff"          , &fDL3EventTree_Yoff          , "Yoff/D" );
 	fDL3EventTree->Branch( "Acceptance"    , &fDL3EventTree_Acceptance    , "Acceptance/D" );
+    if ( fRunPara->fWriteAllEvents )
+    {
+        fDL3EventTree->Branch( "MVA"       , &fDL3EventTree_MVA,            "MVA/D" );
+        fDL3EventTree->Branch( "IsGamma"   , &fDL3EventTree_IsGamma,        "IsGamma/I" );
+    }
 	cout << endl;
 
 	// init radial acceptance class
@@ -2258,6 +2263,19 @@ void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot,
             fDL3EventTree_RA = 0.;
             fDL3EventTree_DEC = 0.;
         }
+    if ( fCuts && fRunPara->fWriteAllEvents )
+    {
+        fDL3EventTree_MVA = fCuts->getTMVA_EvaluationResult();
+        if ( bIsGamma )
+        {
+            fDL3EventTree_IsGamma = 1;
+        }
+        else
+        {
+            fDL3EventTree_IsGamma = 0;
+        }
+    }
+
 
 	if( fDL3EventTree )
 	{
