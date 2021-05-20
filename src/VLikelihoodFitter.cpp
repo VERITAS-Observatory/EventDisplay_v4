@@ -418,8 +418,8 @@ vector <TH2F*> VLikelihoodFitter::getResponseMatrixRaw()
         }
         else if ( i_offValid )
         {
-	  // For interpolating                                                                                                                                                                                    
-          igSys2d = new TGraph2D (i_hResponseMatrix_off); 
+	  // For interpolating
+          igSys2d = new TGraph2D (i_hResponseMatrix_off);
         }
         else
         {
@@ -428,7 +428,7 @@ vector <TH2F*> VLikelihoodFitter::getResponseMatrixRaw()
           iVtemp.push_back(0);
 	  continue;
         }
-	
+
 	for (int ierec = 0; ierec < ihres_tmp->GetXaxis()->GetNbins(); ierec++)
           {
             ieng_rc = ihres_tmp->GetXaxis()->GetBinCenter(ierec+1);
@@ -445,7 +445,7 @@ vector <TH2F*> VLikelihoodFitter::getResponseMatrixRaw()
           VHistogramUtilities::normalizeTH2D_y(ihres_tmp);
           ihres_tmp->SetTitle( ss.str().c_str());
           iVtemp.push_back((TH2F*)ihres_tmp->Clone());
-	
+
     }
 
     return iVtemp;
@@ -1069,7 +1069,7 @@ TF1* VLikelihoodFitter::getLikelihoodFit( bool bContours )
     }
 
     fConfidenceInterval = calculateConfidenceInterval(i_covmat, fModel, fModelID, fNParms);
-    
+
 
     // Calculating the model integrated flux
     // i_flux[0] = flux [photons/cm^2/s^1]
@@ -1872,7 +1872,7 @@ double VLikelihoodFitter::getLogL0 ()
     // Getting the last counts
     int iLastOn = getLastCount(i_total_On);
     int iLastOff = getLastCount(i_total_Off);
-    int iLastModel = getLastCount(i_total_Model);
+    // int iLastModel = getLastCount(i_total_Model);
 
 
     // Looping over data bins
@@ -1901,11 +1901,11 @@ double VLikelihoodFitter::getLogL0 ()
           break;
         }
 
-        // Stopping on Last model count
-        if (bStopOnLastModel && (j == iLastModel))
-        {
-          break;
-        }
+        // // Stopping on Last model count
+        // if (bStopOnLastModel && (j == iLastModel))
+        // {
+        //   break;
+        // }
 
 
 
@@ -1955,7 +1955,7 @@ double VLikelihoodFitter::getChi2 ( vector <double> iParms)
     // Getting log(l)
     double logL = -1*getLogL(iParms);
     // Getting log(l_0)
-    double logL_0 = -1*getLogL0(iParms);
+    double logL_0 = -1*getLogL0();
     // Printing the total live time
     double i_TotalTime = 0;
     for (unsigned int i = 0; i < fRunList.size(); i++)
@@ -2700,7 +2700,6 @@ TCanvas* VLikelihoodFitter::getTotalCountsPlots()
         i_vModelOnCounts[i] = (i_vModelTotal[i]  + i_mean_alpha * i_vOffMLETotal[i]);
 
         i_OnRes [i] = (i_OnTotal[i] - i_vModelOnCounts[i]) / i_vModelOnCounts[i];
-
         i_OffRes [i] = 	( i_OffTotal[i] - i_vOffMLETotal[i] ) / i_vOffMLETotal[i];
 
 
@@ -3097,13 +3096,16 @@ float* VLikelihoodFitter::getIntegralFlux(double i_EMin, double i_EMax, TF1* i_M
  *  (SOB) Yes Whipple 1998
  *  ToDo: Implement different Crab spectra options
  */
-double VLikelihoodFitter::getCrabFlux( double iF, double i_EMin, double i_EMax, double i_Gamma)
+double VLikelihoodFitter::getCrabFlux( double iF, double i_EMin, double i_EMax)
 {
-    double i_N0 = 3.20e-11;
-    double i_Crab = i_N0 * (TMath::Power(i_EMax, i_Gamma +1 ) - TMath::Power(i_EMin, i_Gamma +1 ) ) /( i_Gamma +1);
-
-    return (iF/i_Crab);
-
+    // double i_N0 = 3.20e-11;
+    // double i_Crab = i_N0 * (TMath::Power(i_EMax, i_Gamma +1 ) - TMath::Power(i_EMin, i_Gamma +1 ) ) /( i_Gamma +1);
+    if (bValidLiterature)
+    {
+      double i_Crab = fLiteratureSpectra->getIntegralFlux(i_EMin, i_EMax, fCrabID);
+      return (iF/i_Crab);
+    }
+    return 0;
 }
 
 /*
@@ -3295,7 +3297,7 @@ double VLikelihoodFitter::getMeanAlpha()
   Log(L) - This is the likelihood obtained when the normalization is allowed to vary
   Log(L0) - This is the likelihood obtained with the model paramters set to the best fit
 
-  Function returns -2 (Log(L) - Log(L0)) ~chi^2 distributed 
+  Function returns -2 (Log(L) - Log(L0)) ~chi^2 distributed
   Confidence intervals should be verified from simulations.
 
 
@@ -3456,7 +3458,7 @@ double VLikelihoodFitter::getVariabilityIndex(double i_delT, TF1 *i_bestFit, dou
 
   // Getting LogL
   // do the minimization
-  /* Note: 
+  /* Note:
      For TSVar to be correctly normalized the best fit is obtained by optimizing
      the likelihood equation across each time bin, not from the total time averaged
      dataset. This is a small but very important consideration.
@@ -3796,4 +3798,54 @@ double VLikelihoodFitter::getLiveTime()
   }
 
   return i_totalLiveTime;
+}
+
+
+/*
+  Use a VEnergySpectrumfromLiterature instance to handle Crab Flux
+  by default w
+
+*/
+void VLikelihoodFitter::loadSpectraFromLiterature(string filename)
+{
+  if (fLiteratureSpectra) {delete fLiteratureSpectra;}
+
+  // This requires the specific AstroData to be loaded in.
+  if (filename == "")
+  {
+    fLiteratureSpectra = new VEnergySpectrumfromLiterature("$VERITAS_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat");
+  }
+  else
+  {
+    fLiteratureSpectra = new VEnergySpectrumfromLiterature(filename);
+  }
+  // "not" zombie as zombie suggests file couldn't be openned
+  // Invalid files will print a sane error without thowing errors
+  // Will use bValidLiterature to check we have a valid
+  bValidLiterature = !fLiteratureSpectra->isZombie();
+}
+
+
+
+float VLikelihoodFitter::getSignificance()
+{
+  // Use a mean alpha for simplicity
+  double i_mean_alpha = getMeanAlpha();
+  double i_totalOn_flat = 0;
+  double i_totalOff_flat = 0;
+  int fLiMaEqu = 17;
+
+  // sum across included runs
+  vector <double> i_total_On = sumCounts( fOnCounts );
+  vector <double> i_total_Off = sumCounts( fOffCounts );
+
+  // Sum across included energy bins
+  for (int i = 0; i < i_total_On.size(); i++)
+  {
+    // Fit min/max
+    if ((fEnergyBinCentres[i] < fFitMin_logTeV) || (fEnergyBinCentres[i] > fFitMax_logTeV)){continue;}
+    i_totalOn_flat += i_total_On[i];
+    i_totalOff_flat += i_total_Off[i];
+  }
+  return VStatistics::calcSignificance( i_totalOn_flat, i_totalOff_flat, i_mean_alpha, fLiMaEqu );
 }
