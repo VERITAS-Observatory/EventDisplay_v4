@@ -112,6 +112,7 @@ ifeq ($(origin GSLSYS), undefined)
   endif
 endif
 # GSLFLAG=-DNOGSL
+#FROGSFLAG=-DUSEFROGS
 
 ifneq ($(GSLFLAG),-DNOGSL)
 # check GSL version
@@ -143,7 +144,7 @@ endif
 CXX           = g++
 CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
 CXXFLAGS     += -I. -I./inc/
-CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(ROOT6FLAG) $(GSLFLAG) $(GSL2FLAG) $(DCACHEFLAG)
+CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(ROOT6FLAG) $(GSLFLAG) $(GSL2FLAG) $(FROGSFLAG) $(DCACHEFLAG)
 LD            = g++
 OutPutOpt     = -o
 INCLUDEFLAGS  = -I. -I./inc/
@@ -1781,9 +1782,9 @@ printconfig configuration config:
 	@echo "    compiled with MLP: $(ROOT_MLP), MINUIT2: $(ROOT_MINUIT2), MYSQL: $(ROOT_MYSQL), DCACHE: $(ROOT_DCACHE), MATHMORE: $(ROOT_MATHMORE)"
 	@echo ""
 ifeq ($(GSLFLAG),-DNOGSL)
-	@echo "evndisp without GSL libraries (no frogs, no Hough muon calibration, no likelihood fitter)"
+	@echo "evndisp without GSL libraries (no Hough muon calibration, no likelihood fitter)"
 else
-	@echo "evndisp with GSL libraries (used in frogs, Hough muon calibration)"
+	@echo "evndisp with GSL libraries (used in Hough muon calibration, likelihood fitter)"
 endif
 ifeq ($(VBFFLAG),-DNOVBF)
 	@echo "evndisp without VBF support"
