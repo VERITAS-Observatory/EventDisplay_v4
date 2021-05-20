@@ -3807,6 +3807,7 @@ double VLikelihoodFitter::getLiveTime()
 
 */
 void VLikelihoodFitter::loadSpectraFromLiterature(string filename)
+
 {
   if (fLiteratureSpectra) {delete fLiteratureSpectra;}
 
@@ -3848,4 +3849,5 @@ float VLikelihoodFitter::getSignificance()
     i_totalOff_flat += i_total_Off[i];
   }
   return VStatistics::calcSignificance( i_totalOn_flat, i_totalOff_flat, i_mean_alpha, fLiMaEqu );
+
 }
