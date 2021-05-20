@@ -34,7 +34,7 @@ SHELL = /bin/sh
 ARCH = $(shell uname)
 
 #############################
-# basic numbers 
+# basic numbers
 #############################
 package = EVNDISP
 version = 485
@@ -89,7 +89,7 @@ ifeq ($(DCTEST),yes)
   DCACHEFLAG=-DRUNWITHDCACHE
 endif
 #############################
-# VERITAS DATABASE 
+# VERITAS DATABASE
 # (necessary for VERITAS data analysis)
 #############################
 # check that root is compiled with mysql
@@ -111,7 +111,7 @@ ifeq ($(origin GSLSYS), undefined)
     GSLFLAG=-DNOGSL
   endif
 endif
-GSLFLAG=-DNOGSL
+# GSLFLAG=-DNOGSL
 
 ifneq ($(GSLFLAG),-DNOGSL)
 # check GSL version
@@ -144,7 +144,7 @@ CXX           = g++
 CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
 CXXFLAGS     += -I. -I./inc/
 CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(ROOT6FLAG) $(GSLFLAG) $(GSL2FLAG) $(DCACHEFLAG)
-LD            = g++ 
+LD            = g++
 OutPutOpt     = -o
 INCLUDEFLAGS  = -I. -I./inc/
 
@@ -175,11 +175,10 @@ GCCMACHINE=$(shell $(CXX) -dumpmachine)
 ifeq ($(ROOT6FLAG),-DROOT6)
       # get major version of gcc, e.g. '4' in '4.6.'
       GCC_VER_MAJOR := $(shell echo $(GCCVERSION) | cut -f1 -d.)
-      # get minor version of gcc, e.g. '6' in '4.6' 
+      # get minor version of gcc, e.g. '6' in '4.6'
       GCC_VER_MINOR := $(shell echo $(GCCVERSION) | cut -f2 -d.)
       # check if gcc version is smaller than 4.8.
       GCC_GT_4_8 := $(shell [ $(GCC_VER_MAJOR) -lt 3 -o \( $(GCC_VER_MAJOR) -eq 4 -a $(GCC_VER_MINOR) -lt 8 \) ] && echo true)
-CXXFLAGS    += -Wdeprecated-declarations -std=c++11
 endif
 ########################################################
 # CXX FLAGS (taken from root)
@@ -187,7 +186,7 @@ endif
 ROOTCFLAGS   = $(shell root-config --auxcflags)
 ROOTCFLAGS   = -pthread -m64
 CXXFLAGS     += $(ROOTCFLAGS)
-CXXFLAGS     += -I$(shell root-config --incdir) -I$(shell root-config --incdir)/TMVA 
+CXXFLAGS     += -I$(shell root-config --incdir) -I$(shell root-config --incdir)/TMVA
 ########################################################
 # root libs
 ########################################################
@@ -213,7 +212,7 @@ endif
 ########################################################
 # GSL FLAGS
 ########################################################
-GSLFLAG=-DNOGSL
+# GSLFLAG=-DNOGSL
 ifneq ($(GSLFLAG),-DNOGSL)
 GSLCFLAGS    = $(shell gsl-config --cflags)
 GSLLIBS      = $(shell gsl-config --libs)
@@ -228,7 +227,7 @@ GLIBS		+= -L$(FITSSYS)/lib -lcfitsio
 CXXFLAGS	+= -I$(FITSSYS)/include/
 endif
 ########################################################
-# HESSIO 
+# HESSIO
 ########################################################
 ifneq ($(HESSIO),FALSE)
 HESSIOINCLUDEFLAGS = -I $(HESSIOSYS)/include/
@@ -237,7 +236,7 @@ HESSIOINCLUDEFLAGS = -I $(HESSIOSYS)/include/
 # CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
 # 2011 PROD1 production for Leeds
 # CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_ULTRA
-# 2011 PROD1 SC 
+# 2011 PROD1 SC
 # CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_SC=2
 # 2013 PROD2
 CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_PROD2 -DCTA_PROD2_TRGMASK
@@ -377,7 +376,7 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VHoughTransform.o \
 		./obj/VDB_PixelDataReader.o \
 		./obj/VDisplay.o \
-		./obj/VDeadPixelOrganizer.o 
+		./obj/VDeadPixelOrganizer.o
 
 FROGSOBJECTS =	./obj/VFrogs.o \
                 ./obj/frogs.o \
@@ -388,16 +387,16 @@ ifneq ($(ARCH),Darwin)
 EVNOBJECTS += ./obj/VDisplay_Dict.o
 endif
 
-# add frogs objects
-ifneq ($(GSLFLAG),-DNOGSL)
-   EVNOBJECTS += $(FROGSOBJECTS)
-endif
+# # add frogs objects
+# ifneq ($(GSLFLAG),-DNOGSL)
+#    EVNOBJECTS += $(FROGSOBJECTS)
+# endif
 # add VBF objects
 ifneq ($(VBFFLAG),-DNOVBF)
    EVNOBJECTS +=    ./obj/VRawDataReader.o \
 		    ./obj/VBaseRawDataReader.o  \
 		    ./obj/VBFDataReader.o \
-	 	    ./obj/VSimulationDataReader.o 
+	 	    ./obj/VSimulationDataReader.o
 endif
 # finalize
 EVNOBJECTS += ./obj/evndisp.o
@@ -481,7 +480,7 @@ ACCOBJECT = 	./obj/makeRadialAcceptance.o \
 		./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
-		 ./obj/VUtilities.o 
+		 ./obj/VUtilities.o
 
 
 
@@ -524,7 +523,7 @@ ACCOBJECT = ./obj/VTS.getRun_TimeElevAzim.o \
 		./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 		./obj/VStar.o ./obj/VStar_Dict.o \
 		./obj/VDB_Connection.o \
-		./obj/VUtilities.o 
+		./obj/VUtilities.o
 
 ./obj/VTS.getRun_TimeElevAzim.o: ./src/VTS.getRun_TimeElevAzim.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -876,7 +875,7 @@ printBinaryOrbitalPhase:	$(PRINTBINARYOBJ)
 	@echo "$@ done"
 
 ########################################################
-# writeCTAWPPhysSensitivityFiles 
+# writeCTAWPPhysSensitivityFiles
 ########################################################
 WRITECTAPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 			./obj/writeCTAWPPhysSensitivityFiles.o \
@@ -931,7 +930,7 @@ writeCTAWPPhysSensitivityTree:	$(WRITESENSTREE)
 
 
 ########################################################
-# writeVTSWPPhysSensitivityFiles 
+# writeVTSWPPhysSensitivityFiles
 ########################################################
 WRITEVTSPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 			./obj/writeVTSWPPhysSensitivityFiles.o \
@@ -979,7 +978,7 @@ writeVTSWPPhysSensitivityFiles:	$(WRITEVTSPHYSOBJ)
 	@echo "$@ done"
 
 ########################################################
-# writeParticleRateFilesFromEffectiveAreas 
+# writeParticleRateFilesFromEffectiveAreas
 ########################################################
 WRITECTAPHYSOBJ=	./obj/writeParticleRateFilesFromEffectiveAreas.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
@@ -1009,7 +1008,7 @@ WRITECTAPHYSOBJ=	./obj/writeParticleRateFilesFromEffectiveAreas.o \
 			./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
 			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 			./obj/VStatistics_Dict.o \
-			./obj/VUtilities.o 
+			./obj/VUtilities.o
 
 ./obj/writeParticleRateFilesFromEffectiveAreas.o: 	./src/writeParticleRateFilesFromEffectiveAreas.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -1049,7 +1048,7 @@ WRITECTAPHYSOBJ=	./obj/writeParticleRateFilesForTMVA.o \
 			./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
 			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 			./obj/VStatistics_Dict.o \
-			./obj/VUtilities.o 
+			./obj/VUtilities.o
 
 ./obj/writeParticleRateFilesForTMVA.o: 	./src/writeParticleRateFilesForTMVA.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -1061,7 +1060,7 @@ writeParticleRateFilesForTMVA:	$(WRITECTAPHYSOBJ)
 ########################################################
 # combineLookupTables
 ########################################################
-./obj/combineLookupTables.o:	./src/combineLookupTables.cpp 
+./obj/combineLookupTables.o:	./src/combineLookupTables.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 combineLookupTables:	./obj/combineLookupTables.o ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
@@ -1076,7 +1075,7 @@ combineLookupTables:	./obj/combineLookupTables.o ./obj/VGlobalRunParameter.o ./o
 ./obj/checkAnalysisResultFile.o:	./src/checkAnalysisResultFile.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-checkAnalysisResultFile:	./obj/checkAnalysisResultFile.o 
+checkAnalysisResultFile:	./obj/checkAnalysisResultFile.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
@@ -1100,7 +1099,7 @@ trainTMVAforAngularReconstruction:	./obj/trainTMVAforAngularReconstruction.o \
 					./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
 					./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 					./obj/VUtilities.o \
-					./obj/Ctelconfig.o ./obj/Cshowerpars.o ./obj/Ctpars.o 
+					./obj/Ctelconfig.o ./obj/Cshowerpars.o ./obj/Ctpars.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 ########################################################
@@ -1152,7 +1151,7 @@ combineEffectiveAreas:	 ./obj/combineEffectiveAreas.o  \
 			 ./obj/VSkyCoordinatesUtilities.o ./obj/VUtilities.o \
 			 ./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
 			 ./obj/VASlalib.o \
-			 ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o 
+			 ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o
 
 
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
@@ -1195,7 +1194,7 @@ MAKEOPTCUTTMVATRAININGOBJ= 	./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHea
 ./obj/trainTMVAforGammaHadronSeparation_TrainingFile.o:	./src/trainTMVAforGammaHadronSeparation_TrainingFile.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-trainTMVAforGammaHadronSeparation_TrainingFile:	$(MAKEOPTCUTTMVATRAININGOBJ) 	
+trainTMVAforGammaHadronSeparation_TrainingFile:	$(MAKEOPTCUTTMVATRAININGOBJ)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "Done"
 
@@ -1257,7 +1256,7 @@ VTS.calculateExposureFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 				./obj/VUtilities.o \
 				./obj/VTS.calculateExposureFromDB.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
-	@echo "$@ done"	
+	@echo "$@ done"
 
 ########################################################
 # VTS.getLaserRunFromDB
@@ -1354,7 +1353,7 @@ ifeq ($(FITS),FALSE)
 	   @echo "----------------------------------------"
 	   @echo "NO FITSSYS ENVIRONMENTAL VARIABLE SET"
 	   @echo "----------------------------------------"
-	   @echo ""; 
+	   @echo "";
 endif
 
 ########################################################
@@ -1383,7 +1382,7 @@ ifeq ($(HESSIO),FALSE)
 	   @echo "----------------------------------------"
 	   @echo "NO HESSIOSYS ENVIRONMENTAL VARIABLE SET"
 	   @echo "----------------------------------------"
-	   @echo ""; 
+	   @echo "";
 endif
 
 ########################################################
@@ -1404,7 +1403,7 @@ endif
 	${ROOT_CntCln} -f $(basename $@).cpp -c -p $(ROOT6FLAG) $?
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 
-$(TARGET):	$(OBJECTS) 
+$(TARGET):	$(OBJECTS)
 ifeq ($(PLATFORM),macosx)
 	$(LD) $(SOFLAGS) $^ $(OutPutOpt) $@
 	ln -sf $@ $(subst .$(DllSuf),.so,$@)
@@ -1422,19 +1421,19 @@ endif
 	${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I$(FITSSYS)/include inc/VFITS.h inc/VFITSLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 
-./obj/VDisplay_Dict.o:	
+./obj/VDisplay_Dict.o:
 	@echo "A Generating dictionary $@.."
 	@echo ${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) $(ROOT6FLAG) ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
 	${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) $(ROOT6FLAG) ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 
-./obj/VLightCurve_Dict.o:	
+./obj/VLightCurve_Dict.o:
 	@echo "Generating dictionary $@..."
 	@echo ${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) $(ROOT6FLAG) ./inc/VLightCurve.h ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
 	${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) $(ROOT6FLAG) ./inc/VLightCurve.h ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 
-./obj/VZDCF_Dict.o:	
+./obj/VZDCF_Dict.o:
 	@echo "Generating dictionary $@..."
 	@echo ${ROOT_CntCln} -f $(basename $@).cpp -c -p $(ROOT6FLAG) ./inc/VZDCF.h ./inc/VZDCFData.h ./inc/VZDCFLinkDef.h
 	${ROOT_CntCln} -f $(basename $@).cpp -c -p $(ROOT6FLAG) ./inc/VZDCF.h ./inc/VZDCFData.h ./inc/VZDCFLinkDef.h
@@ -1442,7 +1441,7 @@ endif
 
 ###############################################################################################################################
 # code which requires the libnova package installed in $LIBNOVASYS
-# 
+#
 # (note: experimental state)
 ###############################################################################################################################
 
@@ -1455,13 +1454,13 @@ endif
 ./obj/VLibNovaSunAndMoon.o:	VLibNovaSunAndMoon.cpp VLibNovaSunAndMoon.h
 	$(CXX) $(CXXFLAGS) -I. -I  $(LIBNOVASYS)/include/ -c -o $@ $<
 
-binaryVisibility:	./obj/VLibNovaStar.o ./obj/VLibNovaSunAndMoon.o ./obj/binaryVisibility.o	
+binaryVisibility:	./obj/VLibNovaStar.o ./obj/VLibNovaSunAndMoon.o ./obj/binaryVisibility.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) -L$(LIBNOVASYS)/lib/ -lnova $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
 
 ########################################################
-# writeFITS_eventlist 
+# writeFITS_eventlist
 ########################################################
 writeFITS_eventlistOBJ	= ./obj/writeFITS_eventlist.o \
 			  ./obj/CData.o \
@@ -1594,7 +1593,7 @@ $(ctapara):
 # VTS.Frogs (optional) : Frogs related templates and parameter files
 #
 
-VTS.auxfiles:	$(vtspara).runfiles.tar.gz $(vtspara).calibration.tar.gz $(vtspara).lookuptables.tar.gz $(vtspara).effectiveareas.tar.gz $(vtspara).radialacceptances.tar.gz $(vtspara).VTS.GammaHadron_BDTs $(vtspara).dispBDTs.tar.gz 
+VTS.auxfiles:	$(vtspara).runfiles.tar.gz $(vtspara).calibration.tar.gz $(vtspara).lookuptables.tar.gz $(vtspara).effectiveareas.tar.gz $(vtspara).radialacceptances.tar.gz $(vtspara).VTS.GammaHadron_BDTs $(vtspara).dispBDTs.tar.gz
 
 VTS.runfiles:	$(vtspara).runfiles.tar.gz
 VTS.calibration:	$(vtspara).calibration.tar.gz
@@ -1607,11 +1606,11 @@ VTS.dispBDTs:	$(vtspara).dispBDTs.tar.gz
 ######
 # VTS runparameter files
 
-$(vtspara).runfiles.tar.gz:	
+$(vtspara).runfiles.tar.gz:
 	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).runfiles.tar.gz  >/dev/null 2>&1
 	rm -rf $(distdir) >/dev/null 2>&1
 	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
-# astrodata	
+# astrodata
 	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/AstroData
 	rsync -av --exclude=".*" $(VERITAS_EVNDISP_AUX_DIR)/AstroData/Catalogues $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/AstroData
 	rsync -av --exclude=".*"  $(VERITAS_EVNDISP_AUX_DIR)/AstroData/TeV_data $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/AstroData
