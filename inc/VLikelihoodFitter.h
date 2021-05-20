@@ -460,6 +460,9 @@ public:
       fCrabID = id;
     }
 
+    // Get the getSignificance of the selected data
+    float getSignificance();
+
 
 
 private:

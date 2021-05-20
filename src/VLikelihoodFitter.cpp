@@ -3806,14 +3806,48 @@ double VLikelihoodFitter::getLiveTime()
   by default w
 
 */
-bool VLikelihoodFitter::loadSpectraFromLiterature()
+void VLikelihoodFitter::loadSpectraFromLiterature(string filename)
+
 {
   if (fLiteratureSpectra) {delete fLiteratureSpectra;}
 
   // This requires the specific AstroData to be loaded in.
-  fLiteratureSpectra = new VEnergySpectrumfromLiterature("$VERITAS_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat");
-  // Return "not" zombie as zombie suggests file couldn't be openned
+  if (filename == "")
+  {
+    fLiteratureSpectra = new VEnergySpectrumfromLiterature("$VERITAS_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat");
+  }
+  else
+  {
+    fLiteratureSpectra = new VEnergySpectrumfromLiterature(filename);
+  }
+  // "not" zombie as zombie suggests file couldn't be openned
   // Invalid files will print a sane error without thowing errors
   // Will use bValidLiterature to check we have a valid
-  return !fLiteratureSpectra->isZombie();
+  bValidLiterature = !fLiteratureSpectra->isZombie();
+}
+
+
+
+float VLikelihoodFitter::getSignificance()
+{
+  // Use a mean alpha for simplicity
+  double i_mean_alpha = getMeanAlpha();
+  double i_totalOn_flat = 0;
+  double i_totalOff_flat = 0;
+  int fLiMaEqu = 17;
+
+  // sum across included runs
+  vector <double> i_total_On = sumCounts( fOnCounts );
+  vector <double> i_total_Off = sumCounts( fOffCounts );
+
+  // Sum across included energy bins
+  for (int i = 0; i < i_total_On.size(); i++)
+  {
+    // Fit min/max
+    if ((fEnergyBinCentres[i] < fFitMin_logTeV) || (fEnergyBinCentres[i] > fFitMax_logTeV)){continue;}
+    i_totalOn_flat += i_total_On[i];
+    i_totalOff_flat += i_total_Off[i];
+  }
+  return VStatistics::calcSignificance( i_totalOn_flat, i_totalOff_flat, i_mean_alpha, fLiMaEqu );
+
 }
