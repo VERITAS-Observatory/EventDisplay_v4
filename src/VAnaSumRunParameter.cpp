@@ -671,6 +671,16 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				}
 				
 			}
+            // Write all events to DL3 run. This will write out also hadronic events and
+            // add the MVA score and IsGamma to the tree.
+            else if ( temp == "WRITEALLEVENTS" )
+            {
+                unsigned int tmpWriteAll = ( unsigned int )atoi( temp2.c_str() ) ;
+                if( tmpWriteAll == 1 )
+                {
+                    fWriteAllEvents = true ;
+                }
+            }
 			else
 			{
 				cout << "Warning: unknown line in parameter file " << i_filename << ": " << endl;
