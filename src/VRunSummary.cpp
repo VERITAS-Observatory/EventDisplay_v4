@@ -232,14 +232,25 @@ void VRunSummary::print()
    called for summary runs only
 
 */
-bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_directory, vector< VAnaSumRunParameterDataClass > iRunList )
+bool VRunSummary::fill( string iDataDirectory, 
+                        string i_inputfile_total_directory, 
+                        vector< VAnaSumRunParameterDataClass > iRunList )
 {
+	char i_temp[2000];
 
 	// current directory
 	TDirectory* iCurrentDirectory = gDirectory;
-	
-	char i_temp[2000];
-	
+        // copy relevant entries
+        TChain *i_runSumChain = new TChain( "total_1/stereo/tRunSummary");
+        for( unsigned int i = 0; i < iRunList.size(); i++ )
+        {
+            sprintf( i_temp, "%s/%d.anasum.root", iDataDirectory.c_str(), iRunList[i].fRunOn );
+            i_runSumChain->Add( i_temp );
+        }
+        fRunSummaryTree = i_runSumChain->CopyTree( "runOn>0");
+        fRunSummaryTree->SetDirectory( iCurrentDirectory );
+        fRunSummaryTree->AutoSave();
+
 	// reset variables
 	fRunMJD.clear();
 	
@@ -258,112 +269,67 @@ bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_director
 	fMeanRawRateOff = 0.;
 	fMeanPedVarsOn = 0.;
 	fMeanPedVarsOff = 0.;
-	
-	// loop over all runs
-	for( unsigned int i = 0; i < iRunList.size(); i++ )
-	{
-		// open anasum file
-		sprintf( i_temp, "%s/%d.anasum.root", iDataDirectory.c_str(), iRunList[i].fRunOn );
-		
-		TFile iInputfile( i_temp );
-		if( iInputfile.IsZombie() )
-		{
-			cout << "VRunSummary::fill error file not found: " << iInputfile.GetName() << endl;
-			cout << "exiting..." << endl;
-			exit( EXIT_FAILURE );
-		}
-		if( !iInputfile.cd( ( i_inputfile_total_directory + "/stereo/" ).c_str() ) )
-		{
-			cout << "VRunSummary::fill error summary directory " << i_inputfile_total_directory << " not found " << endl;
-			cout << "exiting..." << endl;
-			exit( EXIT_FAILURE );
-		}
-		// read anasum tree from file
-		TTree* i_runSumTree = ( TTree* )gDirectory->Get( "tRunSummary" );
-		if( !i_runSumTree )
-		{
-			cout << "VRunSummary::fill error: run summary tree in " << iInputfile.GetName() << " not found" << endl;
-			cout << "exiting..." << endl;
-			exit( EXIT_FAILURE );
-		}
-		CRunSummary i_runSum( i_runSumTree );
-		
-		// create tree
-		// (this expects that trees from anasum file and runSummary tree defined here are the same)
-		if( i == 0 )
-		{
-			if( fRunSummaryTree )
-			{
-				fRunSummaryTree->Delete();
-			}
-			fRunSummaryTree = i_runSumTree->CloneTree( 0 );
-			fRunSummaryTree->SetDirectory( iCurrentDirectory );
-		}
-		
-		double iTargetRA = 0.;
-		double iTargetDec = 0.;
-		double iTargetRAJ2000 = 0.;
-		double iTargetDecJ2000 = 0.;
-		
-		for( int n = 0; n < i_runSum.fChain->GetEntries(); n++ )
-		{
-			i_runSum.GetEntry( n );
-			if( i_runSum.runOn == iRunList[i].fRunOn )
-			{
-				runOn = iRunList[i].fRunOn;
-				runOff = iRunList[i].fRunOff;
-				// copy entries to new run summary tree
-				fRunSummaryTree->CopyAddresses( i_runSumTree );
-				fRunSummaryTree->CopyEntries( i_runSumTree, 1 );
-				
-				// add values to run list
-				fRunMJD[runOn] = i_runSum.MJDOn;
-				fRunMJD[runOff] = i_runSum.MJDOff;
-				fTotalExposureOn += i_runSum.tOn;
-				fTotalExposureOff += i_runSum.tOff;
-				f_exposureOn[runOn] = i_runSum.tOn;
-				f_exposureOff[runOff] = i_runSum.tOff;
-				fMeanElevationOn += i_runSum.elevationOn;
-				fMeanElevationOff += i_runSum.elevationOff;
-				fMeanAzimuthOn  = VSkyCoordinatesUtilities::addToMeanAzimuth( fMeanAzimuthOn,  i_runSum.azimuthOn );
-				fMeanAzimuthOff = VSkyCoordinatesUtilities::addToMeanAzimuth( fMeanAzimuthOff, i_runSum.azimuthOff );
-				fMeanDeadTimeOn += i_runSum.DeadTimeFracOn * tOn;
-				fMeanDeadTimeOff += i_runSum.DeadTimeFracOff * tOff;
-				fMeanRawRateOn += i_runSum.RawRateOn;
-				fMeanRawRateOff += i_runSum.RawRateOff;
-				fMeanPedVarsOn += i_runSum.pedvarsOn;
-				fMeanPedVarsOff += i_runSum.pedvarsOff;
-				fNMeanElevation++;
-				
-				// check if all targets are the same in file
-				if( fNMeanElevation == 0. )
-				{
-					iTargetRA = i_runSum.TargetRA;
-					iTargetDec = i_runSum.TargetDec;
-					iTargetRAJ2000 = i_runSum.TargetRAJ2000;
-					iTargetDecJ2000 = i_runSum.TargetDecJ2000;
-				}
-				else if( iTargetRA != fTargetRA || iTargetDec != fTargetDec )
-				{
-					iTargetRA = 0.;
-					iTargetDec = 0.;
-					iTargetRAJ2000 = 0.;
-					iTargetDecJ2000 = 0.;
-				}
-				break;
-			}
-		}
-		fRunSummaryTree->AutoSave();
-		
-		// set target coordinates
-		fTotTargetRA = iTargetRA;
-		fTotTargetDec = iTargetDec;
-		fTotTargetRAJ2000 = iTargetRAJ2000;
-		fTotTargetDecJ2000 = iTargetDecJ2000;
-		
-		iInputfile.Close();
-	}
-	
+
+        CRunSummary i_runSum( i_runSumChain );
+        double iTargetRA = 0.;
+        double iTargetDec = 0.;
+        double iTargetRAJ2000 = 0.;
+        double iTargetDecJ2000 = 0.;
+        
+        for( int n = 0; n < i_runSum.fChain->GetEntries(); n++ )
+        {
+             i_runSum.GetEntry( n );
+             for( unsigned int i = 0; i < iRunList.size(); i++ )
+             {
+                if( i_runSum.runOn == iRunList[i].fRunOn )
+                {
+                    runOn = iRunList[i].fRunOn;
+                    runOff = iRunList[i].fRunOff;
+                        
+                    // add values to run list
+                    fRunMJD[runOn] = i_runSum.MJDOn;
+                    fRunMJD[runOff] = i_runSum.MJDOff;
+                    fTotalExposureOn += i_runSum.tOn;
+                    fTotalExposureOff += i_runSum.tOff;
+                    f_exposureOn[runOn] = i_runSum.tOn;
+                    f_exposureOff[runOff] = i_runSum.tOff;
+                    fMeanElevationOn += i_runSum.elevationOn;
+                    fMeanElevationOff += i_runSum.elevationOff;
+                    fMeanAzimuthOn  = VSkyCoordinatesUtilities::addToMeanAzimuth( fMeanAzimuthOn,  i_runSum.azimuthOn );
+                    fMeanAzimuthOff = VSkyCoordinatesUtilities::addToMeanAzimuth( fMeanAzimuthOff, i_runSum.azimuthOff );
+                    fMeanDeadTimeOn += i_runSum.DeadTimeFracOn * tOn;
+                    fMeanDeadTimeOff += i_runSum.DeadTimeFracOff * tOff;
+                    fMeanRawRateOn += i_runSum.RawRateOn;
+                    fMeanRawRateOff += i_runSum.RawRateOff;
+                    fMeanPedVarsOn += i_runSum.pedvarsOn;
+                    fMeanPedVarsOff += i_runSum.pedvarsOff;
+                    fNMeanElevation++;
+
+                    if( fNMeanElevation == 0. )
+                    {
+                            iTargetRA = i_runSum.TargetRA;
+                            iTargetDec = i_runSum.TargetDec;
+                            iTargetRAJ2000 = i_runSum.TargetRAJ2000;
+                            iTargetDecJ2000 = i_runSum.TargetDecJ2000;
+                    }
+                    else if( iTargetRA != fTargetRA || iTargetDec != fTargetDec )
+                    {
+                            iTargetRA = 0.;
+                            iTargetDec = 0.;
+                            iTargetRAJ2000 = 0.;
+                            iTargetDecJ2000 = 0.;
+                    }
+                    break;
+                }
+            }
+        }
+        
+        // set target coordinates
+        fTotTargetRA = iTargetRA;
+        fTotTargetDec = iTargetDec;
+        fTotTargetRAJ2000 = iTargetRAJ2000;
+        fTotTargetDecJ2000 = iTargetDecJ2000;
+
 	iCurrentDirectory->cd();
 	
 	return true;
