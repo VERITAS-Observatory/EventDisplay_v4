@@ -387,17 +387,17 @@ vector <TH2F*> VLikelihoodFitter::getResponseMatrixRaw()
         // Obtaining the energy bins
         vector <double> i_fEnergyBins;
 
-        for (int i =0; i <= i_fNEnergyBins; i ++)
+        for (int j =0; j <= i_fNEnergyBins; j ++)
         {
-            i_fEnergyBins.push_back(-1.1 + i*0.05);
+            i_fEnergyBins.push_back(-1.1 + j*0.05);
         }
 
 
         vector <double> i_fEnergyBinsMC;
 
-        for (int i =0; i <= i_fNEnergyBinsMC; i ++)
+        for (int j =0; j <= i_fNEnergyBinsMC; j ++)
         {
-            i_fEnergyBinsMC.push_back(-1.1 + i*0.05);
+            i_fEnergyBinsMC.push_back(-1.1 + j*0.05);
         }
 
         TH2F* ihres_tmp = new TH2F ("ihres_tmp", "Response Matrix; E_{Rec}; E_{MC}", i_fNEnergyBins, &(i_fEnergyBins[0]), i_fNEnergyBinsMC, &(i_fEnergyBinsMC[0]) );
@@ -2573,7 +2573,7 @@ TGraphAsymmErrors* VLikelihoodFitter::getEnergySpectrum(TF1 *iBestFit, bool bPri
     // Clear previous fit details
     clearSpectralPoints();
     // Checking parameters (note expecting 1 - nPar for broken pwl)
-    if ( (iBestFit->GetNpar() != fNParms)  && (fModelID != 6))
+    if ( (iBestFit->GetNpar() != (int)fNParms)  && (fModelID != 6))
     {
         cout << "VLikelihoodFitter::getEnergySpectrum Error invalid number of parameters!\n"
              << "\t\tExpected: " << fNParms << endl
@@ -2587,7 +2587,6 @@ TGraphAsymmErrors* VLikelihoodFitter::getEnergySpectrum(TF1 *iBestFit, bool bPri
     double iGlobalMax = fFitMax_logTeV;
     double iGlobalNorm = fENorm;
 
-    float *iFluxPoint;
     double ifENorm;
     double *parms = iBestFit->GetParameters();
     cout << "\n\nGetting Energy Spectrum\n";
@@ -2623,7 +2622,7 @@ TGraphAsymmErrors* VLikelihoodFitter::getEnergySpectrum(TF1 *iBestFit, bool bPri
         ifENorm = TMath::Power(10.,fEnergyBinCentres[i]);
 
         // Getting fit
-        iFluxPoint = getSpectralPoint( fEnergyBins[i], fEnergyBins[i+1], ifENorm, iBestFit, bPrintAll);
+        getSpectralPoint( fEnergyBins[i], fEnergyBins[i+1], ifENorm, iBestFit, bPrintAll);
 
     }
 
@@ -3353,7 +3352,7 @@ double VLikelihoodFitter::getVariabilityIndex(double i_delT, TF1 *i_bestFit, dou
   }
 
   // Checking dimensioality of i_bestFit
-  if (i_bestFit->GetNpar() != fNParms)
+  if (i_bestFit->GetNpar() != (int)fNParms)
   {
     cout << "VLikeLihoodFitter::getVariabilityIndex NPar != fNParms"
          << "\n\tExpected TF1* with NPar equal to the number of parameters of the model" << endl;
@@ -3841,7 +3840,7 @@ float VLikelihoodFitter::getSignificance()
   vector <double> i_total_Off = sumCounts( fOffCounts );
 
   // Sum across included energy bins
-  for (int i = 0; i < i_total_On.size(); i++)
+  for (unsigned int i = 0; i < i_total_On.size(); i++)
   {
     // Fit min/max
     if ((fEnergyBinCentres[i] < fFitMin_logTeV) || (fEnergyBinCentres[i] > fFitMax_logTeV)){continue;}
