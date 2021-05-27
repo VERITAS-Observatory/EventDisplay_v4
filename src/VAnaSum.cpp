@@ -725,8 +725,11 @@ void VAnaSum::copyDirectory( TDirectory* source )
 			source->cd();
 			TObject* obj = key->ReadObj();
 			adir->cd();
-			obj->Write();
-			delete obj;
+                        if( obj )
+                        {
+                            obj->Write();
+                            delete obj;
+                        }
 		}
 	}
 	adir->SaveSelf( kTRUE );

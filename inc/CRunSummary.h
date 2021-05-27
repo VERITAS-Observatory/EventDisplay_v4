@@ -18,8 +18,6 @@ class CRunSummary : public TObject
 		TTree*          fChain;                   //!pointer to the analyzed TTree or TChain
 		Int_t           fCurrent;                 //!current Tree number in a TChain
 		
-		unsigned int    fCVersion;
-		
 		// Declaration of leave types
 		Int_t           runOn;
 		Int_t           runOff;
@@ -27,28 +25,28 @@ class CRunSummary : public TObject
 		Double_t        MJDOff;
                 Double_t        MJDrunstart;
                 Double_t        MJDrunstop;
-               Char_t          TargetName[300];
-                            Double_t        TargetRA;
-                            Double_t        TargetDec;
-                            Double_t        TargetRAJ2000;
-                            Double_t        TargetDecJ2000;
-                            Double_t        SkyMapCentreRAJ2000;
-                            Double_t        SkyMapCentreDecJ2000;
-                            Double_t        TargetShiftRAJ2000;
+                Char_t          TargetName[300];
+                Double_t        TargetRA;
+                Double_t        TargetDec;
+                Double_t        TargetRAJ2000;
+                Double_t        TargetDecJ2000;
+                Double_t        SkyMapCentreRAJ2000;
+                Double_t        SkyMapCentreDecJ2000;
+                Double_t        TargetShiftRAJ2000;
 		Double_t        TargetShiftDecJ2000;
 		Double_t        TargetShiftWest;
 		Double_t        TargetShiftNorth;
 		Double_t        WobbleNorth;
 		Double_t        WobbleWest;
 		UInt_t          NTel;
-   Char_t          TelList[300];
+                Char_t          TelList[300];
 		Double_t        tOn;
 		Double_t        tOff;
 		Double_t        elevationOn;
 		Double_t        azimuthOn;
 		Double_t        elevationOff;
 		Double_t        azimuthOff;
-   Double_t        Theta2Max;
+                Double_t        Theta2Max;
 		Double_t        RawRateOn;
 		Double_t        RawRateOff;
 		Double_t        pedvarsOn;
@@ -73,9 +71,9 @@ class CRunSummary : public TObject
 		TBranch*        b_runOff;                 //!
 		TBranch*        b_MJDOn;                  //!
 		TBranch*        b_MJDOff;                 //!
-   TBranch        *b_MJDrunstart;   //!
-   TBranch        *b_MJDrunstop;   //!
-   TBranch        *b_TargetName;   //!
+                TBranch        *b_MJDrunstart;   //!
+                TBranch        *b_MJDrunstop;   //!
+                TBranch        *b_TargetName;   //!
 		TBranch*        b_TargetRA;               //!
 		TBranch*        b_TargetDec;              //!
 		TBranch*        b_TargetRAJ2000;          //!
@@ -89,14 +87,14 @@ class CRunSummary : public TObject
 		TBranch*        b_WobbleNorth;            //!
 		TBranch*        b_WobbleWest;             //!
 		TBranch*        b_NTel;                   //!
-   TBranch        *b_TelList;   //!
+                TBranch        *b_TelList;   //!
 		TBranch*        b_tOn;                    //!
 		TBranch*        b_tOff;                   //!
 		TBranch*        b_elevationOn;            //!
 		TBranch*        b_azimuthOn;              //!
 		TBranch*        b_elevationOff;           //!
 		TBranch*        b_azimuthOff;             //!
-   TBranch        *b_Theta2Max;   //!
+                TBranch        *b_Theta2Max;   //!
 		TBranch*        b_RawRateOn;              //!
 		TBranch*        b_RawRateOff;             //!
 		TBranch*        b_pedvarsOn;              //!
@@ -134,31 +132,17 @@ class CRunSummary : public TObject
 
 CRunSummary::CRunSummary( TTree* tree )
 {
-	fCVersion = 340;
-	// if parameter tree is not specified (or zero), connect the file
-	// used to generate this class and read the Tree.
-	if( tree == 0 )
-	{
-		TFile* f = ( TFile* )gROOT->GetListOfFiles()->FindObject( "output.root" );
-		if( !f )
-		{
-			f = new TFile( "output.root" );
-			f->cd( "output.root:/total/stereo" );
-		}
-		tree = ( TTree* )gDirectory->Get( "tRunSummary" );
-		
-	}
+        fChain = 0;
 	Init( tree );
 }
 
 
 CRunSummary::~CRunSummary()
 {
-	if( !fChain )
-	{
-		return;
-	}
-	delete fChain->GetCurrentFile();
+        if( fChain && fChain->GetCurrentFile() )
+        {
+            delete fChain->GetCurrentFile();
+        }
 }
 
 
@@ -220,9 +204,9 @@ void CRunSummary::Init( TTree* tree )
 	fChain->SetBranchAddress( "runOff", &runOff );
 	fChain->SetBranchAddress( "MJDOn", &MJDOn );
 	fChain->SetBranchAddress( "MJDOff", &MJDOff );
-   fChain->SetBranchAddress("MJDrunstart", &MJDrunstart, &b_MJDrunstart);
-   fChain->SetBranchAddress("MJDrunstop", &MJDrunstop, &b_MJDrunstop);
-   fChain->SetBranchAddress("TargetName", TargetName, &b_TargetName);
+        fChain->SetBranchAddress("MJDrunstart", &MJDrunstart, &b_MJDrunstart);
+        fChain->SetBranchAddress("MJDrunstop", &MJDrunstop, &b_MJDrunstop);
+        fChain->SetBranchAddress("TargetName", TargetName, &b_TargetName);
 	fChain->SetBranchAddress( "TargetRA", &TargetRA );
 	fChain->SetBranchAddress( "TargetDec", &TargetDec );
 	fChain->SetBranchAddress( "TargetRAJ2000", &TargetRAJ2000 );
@@ -236,14 +220,14 @@ void CRunSummary::Init( TTree* tree )
 	fChain->SetBranchAddress( "WobbleNorth", &WobbleNorth );
 	fChain->SetBranchAddress( "WobbleWest", &WobbleWest );
 	fChain->SetBranchAddress( "NTel", &NTel );
-   fChain->SetBranchAddress("TelList", TelList, &b_TelList);
+        fChain->SetBranchAddress("TelList", TelList, &b_TelList);
 	fChain->SetBranchAddress( "tOn", &tOn );
 	fChain->SetBranchAddress( "tOff", &tOff );
 	fChain->SetBranchAddress( "elevationOn", &elevationOn );
 	fChain->SetBranchAddress( "azimuthOn", &azimuthOn );
 	fChain->SetBranchAddress( "elevationOff", &elevationOff );
 	fChain->SetBranchAddress( "azimuthOff", &azimuthOff );
-   fChain->SetBranchAddress("Theta2Max", &Theta2Max, &b_Theta2Max);
+        fChain->SetBranchAddress("Theta2Max", &Theta2Max, &b_Theta2Max);
 	fChain->SetBranchAddress( "RawRateOn", &RawRateOn );
 	fChain->SetBranchAddress( "RawRateOff", &RawRateOff );
 	if( fChain->GetBranchStatus( "pedvarsOn" ) )
@@ -254,7 +238,6 @@ void CRunSummary::Init( TTree* tree )
 	// no pedvars given, assume galactic source
 	else
 	{
-		fCVersion = 300;
 		pedvarsOn = 8.1;
 		pedvarsOff = 8.1;
 	}
@@ -305,7 +288,7 @@ Bool_t CRunSummary::Notify()
 	b_NTel = fChain->GetBranch( "NTel" );
 	b_tOn = fChain->GetBranch( "tOn" );
 	b_tOff = fChain->GetBranch( "tOff" );
-	if( fCVersion > 300 )
+        if( fChain->GetBranchStatus( "pedvarsOn" ) )
 	{
 		b_pedvarsOn = fChain->GetBranch( "pedvarsOn" );
 		b_pedvarsOff = fChain->GetBranch( "pedvarsOff" );

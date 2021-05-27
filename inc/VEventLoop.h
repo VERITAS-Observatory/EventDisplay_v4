@@ -49,7 +49,7 @@ class VEventLoop : public VEvndispData
 		VImageAnalyzer* fAnalyzer;                     //!< default analyzer class
 		VArrayAnalyzer* fArrayAnalyzer;           //!< default array analyzer
 		VDST* fDST;                               //!< data summarizer
-#ifndef NOGSL
+#ifdef USEFROGS
 		VFrogs* fFrogs;                           //!< Frogs Analyzer
 #endif
 		

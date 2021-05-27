@@ -133,7 +133,7 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 		fDeadPixelOrganizer = 0 ;
 	}
 	
-#ifndef NOGSL
+#ifdef USEFROGS
 	// FROGS
 	if( fRunPar->ffrogsmode )
 	{
@@ -831,7 +831,7 @@ void VEventLoop::shutdown()
 		{
 			fArrayAnalyzer->terminate( fDebug_writing );
 		}
-#ifndef NOGSL
+#ifdef USEFROGS 
 		if( fRunPar->ffrogsmode )
 		{
 			fFrogs->terminate();
@@ -901,7 +901,7 @@ void VEventLoop::shutdown()
 		}
 		// FROGS finishing here
 		// (GM) not clear why this has to happen at this point in the program
-#ifndef NOGSL
+#ifdef USEFROGS
 		if( fRunPar->ffrogsmode )
 		{
 			fFrogs->finishFrogs( &f );
@@ -1464,7 +1464,7 @@ int VEventLoop::analyzeEvent()
 		{
 			fArrayAnalyzer->doAnalysis();
 			// Frogs Analysis
-#ifndef NOGSL
+#ifdef USEFROGS
 			if( fRunPar->ffrogsmode )
 			{
 				string fArrayEpoch = getRunParameter()->getInstrumentEpoch( true );
