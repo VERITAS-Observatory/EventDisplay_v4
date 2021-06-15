@@ -3361,3 +3361,50 @@ void VDisplay::dumpImageBorderPixels()
 		}
 	}
 }
+
+void VDisplay::makeFullMovie(){
+	if (fEventLoop->getRunParameter()->fMovieBool)
+	{
+		//step 1, click the next button
+		fEventLoop->setNextEventStatus( true );
+		processEvent();
+		fEventLoop->setNextEventStatus( false );
+		// Step 2, Process
+		string inFile = fEventLoop->getRunParameter()->fMovieInput;
+		string outDir = fEventLoop->getRunParameter()->fMovieOutputDir;
+		ifstream inputFile(inFile);
+		int eventNum = 0;
+		while(inputFile >> eventNum){
+			char c_ev[200];
+			sprintf( c_ev, "searching for event %d",eventNum );
+			fStatusBar->SetText( c_ev, 1 );
+			fEventLoop->gotoEvent( eventNum );
+			if( eventNum != 0 )
+			{
+				sprintf( c_ev, "now at event %d", fEventLoop->getEventNumber() );
+				fStatusBar->SetText( c_ev, 1 );
+				updateCamera( fCameraDisplay );
+				// update analysis tabs if necessary
+				if( fTabAna->GetCurrent() == 1 && !fCameraTiming )
+				{
+					drawFADC( false );
+				}
+				else if( fTabAna->GetCurrent() == 6 )
+				{
+					fBirdsEye->draw( fCanvasBird );
+				}
+				else if( fTabAna->GetCurrent() == 3 )
+				{
+					drawPixelHistos();
+				}
+			}
+			ostringstream os;
+			os << outDir << "/run_" << fEventLoop->getRunNumber() << "_event_" << fEventLoop->getEventNumber() << "." << fEventLoop->getRunParameter()->fMovieFrameOutput;
+			string outFile = os.str();
+			fCanvasCamera->Print(outFile.c_str());
+		}
+		inputFile.close();
+		//Step 3, click quit button
+		CloseWindow();
+	}
+}
