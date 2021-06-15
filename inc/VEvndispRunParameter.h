@@ -322,6 +322,12 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		float fPWcleanThreshold;                  // cleaning threshold to use to determine hit pixels from the summed FADC charge (dc)
 		int fPWlimit;                             // limits the number of pixels transmitted per sector, if =0, then the function is ignored and no cut is applied on the generation of the trigger map
 		
+		// Movie Parameters
+		bool fMovieBool;                           // Are we making a movie?
+		string fMovieInput;                        // The input file with the event numbers
+		string fMovieOutputDir;                    // Where are we outputting the movie? 
+		string fMovieFrameOutput;                  // What format should we output the images in?
+		
 		// functions
 		void print();
 		void print( int iEV );

@@ -103,6 +103,20 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fdisplaymode = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
+		// movie mode
+		// movie <input file>,<output dir>,<image format>
+		else if( iTemp.find( "movie" ) < iTemp.size())
+		{
+			fRunPara->fdisplaymode = 1;
+			fRunPara->fMovieBool = true;
+			size_t commaLoc = iTemp2.find( "," );
+			size_t commaLoc2 = iTemp2.rfind( "," );
+			size_t betSize = commaLoc2 - commaLoc;
+			fRunPara->fMovieInput = iTemp2.substr( 0, commaLoc );
+			fRunPara->fMovieOutputDir = iTemp2.substr( commaLoc + 1, betSize - 1 );
+			fRunPara->fMovieFrameOutput = iTemp2.substr( commaLoc2 + 1 );
+			i++;
+		}
 		// muon mode
 		else if( iTemp.find( "muon" ) < iTemp.size() )
 		{
