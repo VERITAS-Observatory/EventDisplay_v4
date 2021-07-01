@@ -21,6 +21,8 @@ VERITAS analysis
 
    > cvs co -P -d VBF software/common/VBF
 
+   (if no cvs login is available; ask for vbf using the elog)
+
 (1.2) bbftp is needed to download data files from the VERITAs archive (see http://doc.in2p3.fr/bbftp/)
 
 Optional
