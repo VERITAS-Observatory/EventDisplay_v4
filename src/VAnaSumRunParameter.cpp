@@ -155,6 +155,9 @@ VAnaSumRunParameter::VAnaSumRunParameter()
         // likelihood analysis
         fLikelihoodAnalysis = false;
 	
+	// Write all events to DL3 Tree
+	fWriteAllEvents = false;
+
 	// if 0, use default 1D radial acceptance
 	// if >0, use alternate 2D-dependent acceptance
 	f2DAcceptanceMode = 0 ; // USE2DACCEPTANCE
