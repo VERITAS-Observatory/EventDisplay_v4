@@ -296,6 +296,8 @@ class VDisplay : public TGMainFrame
 		void     selectChannel( Int_t, Int_t, Int_t, TObject* );
 		void     updateCamera( Int_t );           //!< update camera view with new event
 		
+		void     makeFullMovie();
+		
 #ifndef __APPLE__
 		ClassDef( VDisplay, 1 )
 #endif

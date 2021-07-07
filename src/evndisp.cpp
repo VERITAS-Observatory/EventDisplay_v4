@@ -75,7 +75,13 @@ int main( int argc, char* argv[] )
 		TApplication app( "app", &targv, argv );
 		VDisplay display( gClient->GetRoot(), fReadRunParameter->getRunParameter()->fw, fReadRunParameter->getRunParameter()->fh, &mainEventLoop );
 		display.Draw();
-		app.Run();
+		
+		if(fReadRunParameter->getRunParameter()->fMovieBool){			
+			display.makeFullMovie();
+		}else{
+			app.Run();
+		}
+		
 		
 	}
 	delete fReadRunParameter;

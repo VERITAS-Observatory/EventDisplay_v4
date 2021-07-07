@@ -311,6 +311,12 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fIPR3File = "";
 	fIPR4File = "";
 	
+	// movie
+	fMovieBool = false;
+	fMovieOutputDir = "";
+	fMovieInput = "";
+	fMovieFrameOutput = "";
+	
 }
 
 
