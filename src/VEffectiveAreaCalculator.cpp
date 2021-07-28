@@ -1324,7 +1324,7 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 	// Binned likelihood analysis requires
 	// MC effective areas and response matrix
 	// Getting MC eff
-	TH2F* i_hEsysMCRelative2D;
+	TH2F* i_hEsysMCRelative2D = 0;
 	if( bLikelihoodAnalysis )
 	{
 	  // MC effective areas
