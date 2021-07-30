@@ -1714,7 +1714,6 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 			  i_hEsysMCRelative2D->AddDirectory(kFALSE);
 			  
 			  
-			  //cout << "From key-- " << fEsysMCRelative2D_map[i_ID]->GetBinContent(10,10) << endl;
 			}
 
 
