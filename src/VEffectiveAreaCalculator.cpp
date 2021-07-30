@@ -1697,22 +1697,24 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 			  
 
 			  for( unsigned int e = 0; e < fNBins; e++ )
-        {
-          i_temp_Eff_MC[e] = 0.;
-          for( int j = 0; j < nbins_MC; j++ )
-          {
-				    if( TMath::Abs( e0_MC[j] - fEff_E0[e] ) < 1.e-5 )
-            {
-					    i_temp_Eff_MC[e] = eff_MC[j];
-					  }
+			    {
+			      i_temp_Eff_MC[e] = 0.;
+			      for( int j = 0; j < nbins_MC; j++ )
+				{
+				  if( TMath::Abs( e0_MC[j] - fEff_E0[e] ) < 1.e-5 )
+				    {
+				      i_temp_Eff_MC[e] = eff_MC[j];
+				    }
 			  	} 
-        }
+			    }
 
 			  fEffAreaMC_map[i_ID] = i_temp_Eff_MC;
+			  fEsysMCRelative2D_map[i_ID] = (TH2F*)i_hEsysMCRelative2D->Clone();
 			  i_hEsysMCRelative2D->SetDirectory(0);
 			  i_hEsysMCRelative2D->AddDirectory(kFALSE);
-			  fEsysMCRelative2D_map[i_ID] = (TH2F*)i_hEsysMCRelative2D->Clone();
-
+			  
+			  
+			  //cout << "From key-- " << fEsysMCRelative2D_map[i_ID]->GetBinContent(10,10) << endl;
 			}
 
 
@@ -3122,7 +3124,7 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 		i_ze_eff_MC_temp[0].resize( i_eff_MC_temp.size() );
 		i_ze_eff_MC_temp[1].resize( i_eff_MC_temp.size() );
 		
-		i_ze_Res_temp.resize(2);
+		i_ze_Res_temp.assign(2, 0);
 	}
 
 	for( unsigned int i = 0; i < i_ze_bins.size(); i++ )
@@ -3146,7 +3148,7 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 				i_woff_eff_MC_temp[0].resize( i_eff_MC_temp.size() );
 				i_woff_eff_MC_temp[1].resize( i_eff_MC_temp.size() );
 
-				i_woff_Res_temp.resize(2);
+				i_woff_Res_temp.assign(2, 0);
 
 			}
 
@@ -3161,7 +3163,6 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 					vector< vector< double > > i_noise_eff_temp( 2, i_eff_temp );
 					vector< vector< double > > i_noise_eff_MC_temp;
 
-					// (SOB) Noise is not needed...
 					vector <TH2F*> i_noise_Res_temp;
 
 					if ( bLikelihoodAnalysis )
@@ -3172,7 +3173,7 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 						i_noise_eff_MC_temp[0].resize( i_eff_MC_temp.size() );
 						i_noise_eff_MC_temp[1].resize( i_eff_MC_temp.size() );
 
-						i_noise_Res_temp.resize(2);
+						i_noise_Res_temp.assign(2, 0);
 					}
 
 					for( unsigned int n = 0; n < i_noise_bins.size(); n++ )
@@ -3195,19 +3196,18 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 
 							if ( bLikelihoodAnalysis )
 							{
-								i_noise_eff_MC_temp[n] = interpolate_effectiveArea( iSpectralIndex,
-													  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
-													  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
-													  fEffAreaMC_map[i_ID_0],
-													  fEffAreaMC_map[i_ID_1], false );
+							  i_index_bins.clear();
+							  // Response matrix only filled for first index bin
+							  i_index_bins = getUpperLowBins( fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]],
+											  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][0] );
+							  i_ID_0 = i_index_bins[0] + 100 * ( i_noise_bins[n] + 100 * ( i_woff_bins[w] + 100 * i_ze_bins[i] ) );
 
-								i_noise_Res_temp[n] = interpolate_responseMatrix( iSpectralIndex,
-														  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
-														  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
-														  fEsysMCRelative2D_map[i_ID_0],
-														  fEsysMCRelative2D_map[i_ID_1], false);
+							  i_noise_eff_MC_temp[n] = fEffAreaMC_map[i_ID_0];
+							  i_noise_Res_temp[n] = (TH2F*) fEsysMCRelative2D_map[i_ID_0]->Clone();
+							  
 							}
 
+						       
 
 						}
 						else
