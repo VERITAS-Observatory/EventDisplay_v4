@@ -2287,10 +2287,10 @@ void VArrayAnalyzer::updatePointingToArbitraryTime( int iMJD, double iTime )
 
 	// same conditions as above
 	if( !fReader->isMC() &&
-			!( getRunParameter()->felevation > 0.0 ) &&
-			!( getRunParameter()->fazimuth > 0.0 ) &&
-			getArrayPointing()->isSet() &&
-			( getArrayPointing()->getTargetName() != "laser" ) )
+    	    !( getRunParameter()->felevation > 0.0 ) &&
+   	    !( getRunParameter()->fazimuth > 0.0 ) &&
+     	       getArrayPointing()->isSet() &&
+    	     ( getArrayPointing()->getTargetName() != "laser" ) )
 	{
 	
 		getArrayPointing()->updatePointing( iMJD, iTime );
