@@ -341,7 +341,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 
 	// initialize time mask
 	fTimeMask->setMask( irun, iMJDStart, iMJDStopp, fRunPara->fTimeMaskFile );
-        fRunPara->setRunTimes( icounter, iMJDStart, iMJDStopp );
+    fRunPara->setRunTimes( icounter, iMJDStart, iMJDStopp );
 
 	// initialize cuts
 	setCuts( fRunPara->fRunList[fHisCounter], irun );
