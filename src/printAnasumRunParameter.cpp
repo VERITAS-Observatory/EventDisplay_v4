@@ -86,6 +86,14 @@ int main( int argc, char* argv[] )
                     {
                         cout << a->fMapRunList[fRunNumber].fCutFile << endl;
                     }
+                    else if( fOption == "-teltoana" )
+                    {
+                        cout << a->fMapRunList[fRunNumber].fTelToAna << endl;
+                    }
+                    else if( fOption == "-ntel" )
+                    {
+                        cout << a->fMapRunList[fRunNumber].fNTel << endl;
+                    }
                 }
             }
         }
