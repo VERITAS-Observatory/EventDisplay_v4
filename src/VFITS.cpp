@@ -767,7 +767,11 @@ int VFITS::createTableFitsFile( vector< vector<double> > Table , char* ttype[] ,
 {
 	int hdunum = -99;
 	int nRows = int( Table.size() );
-	int nCol = int( Table[0].size() );
+        int nCol = 0;
+        if( nRows > 0 )
+        {
+            nCol = int( Table[0].size() );
+        }
 	//    cout<<"NCol: "<<nCol<<endl;
 	int status = 0;
 	string fFileName = fFile_FITS;
