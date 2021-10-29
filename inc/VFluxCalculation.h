@@ -175,8 +175,8 @@ class VFluxCalculation : public TObject
 	public:
 	
 		VFluxCalculation();
-		VFluxCalculation( string ifile, unsigned int iTot = 1, int iRunMin = 0, int iRunMax = 100000, double iMJDMin = -99., double iMJDMax = -99., bool iDebug = false );
-		VFluxCalculation( vector< string > ifile, unsigned int iTot, int iRunMin = 0, int iRunMax = 100000, double iMJDMin = -99., double iMJDMax = -99. );
+		VFluxCalculation( string ifile, unsigned int iTot = 1, int iRunMin = 0, int iRunMax = 1000000, double iMJDMin = -99., double iMJDMax = -99., bool iDebug = false );
+		VFluxCalculation( vector< string > ifile, unsigned int iTot, int iRunMin = 0, int iRunMax = 1000000, double iMJDMin = -99., double iMJDMax = -99. );
 		~VFluxCalculation();
 		
 		void          calculateIntegralFlux( double iMinEnergy_TeV );
@@ -275,7 +275,7 @@ class VFluxCalculation : public TObject
 			}
 		}
 		double        getSignificance( int irun );
-		unsigned int  loadRunList( int iRunMin = 0, int iRunMax = 100000, unsigned int iTot = 1, double iMJDMin = -99., double iMJDMax = -99. );
+		unsigned int  loadRunList( int iRunMin = 0, int iRunMax = 1000000, unsigned int iTot = 1, double iMJDMin = -99., double iMJDMax = -99. );
 		void          printResults();
 		void          printResultsJSON();
 		void          printRunList();
