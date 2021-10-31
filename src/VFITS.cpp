@@ -623,7 +623,6 @@ int VFITS::writeTGraphFits( TGraph* g, string DiagName, string x_name, string y_
 {
 
 	//create a table
-	int HduNum = -99;
 	vector< double> runValues;
 	vector< vector<double> > table;
 	double x1 = 0.;
@@ -655,7 +654,7 @@ int VFITS::writeTGraphFits( TGraph* g, string DiagName, string x_name, string y_
 		cout << "   Set names, units and dataformats for different colums " << endl;
 	}
 	
-	HduNum = createTableFitsFile( table, tType, tUnit, tForm, DiagName, iPrint );
+	createTableFitsFile( table, tType, tUnit, tForm, DiagName, iPrint );
 	if( iPrint )
 	{
 		cout << "   Wrote table into FITS-table" << endl;
@@ -670,7 +669,6 @@ int VFITS::writeTGraphErrorsFits( TGraphErrors* g, string DiagName, string x_nam
 {
 
 	//create a table
-	int HduNum = -99;
 	vector< double> runValues;
 	vector< vector<double> > table;
 	double x1 = 0.;
@@ -703,7 +701,7 @@ int VFITS::writeTGraphErrorsFits( TGraphErrors* g, string DiagName, string x_nam
 		cout << "   Set names, units and dataformats for different colums " << endl;
 	}
 	
-	HduNum = createTableFitsFile( table, tType, tUnit, tForm, DiagName, iPrint );
+	createTableFitsFile( table, tType, tUnit, tForm, DiagName, iPrint );
 	if( iPrint )
 	{
 		cout << "   Wrote table into FITS-table" << endl;
@@ -716,7 +714,6 @@ int VFITS::writeTGraphAsymmErrorsFits( TGraphAsymmErrors* g, string DiagName, st
 {
 
 	//create a table
-	int HduNum = -99;
 	vector< double> runValues;
 	vector< vector<double> > table;
 	double x1 = 0.;
@@ -749,7 +746,7 @@ int VFITS::writeTGraphAsymmErrorsFits( TGraphAsymmErrors* g, string DiagName, st
 		cout << "   Set names, units and dataformats for different colums " << endl;
 	}
 	
-	HduNum = createTableFitsFile( table, tType, tUnit, tForm, DiagName, iPrint );
+	createTableFitsFile( table, tType, tUnit, tForm, DiagName, iPrint );
 	if( iPrint )
 	{
 		cout << "   Wrote table into FITS-table" << endl;
