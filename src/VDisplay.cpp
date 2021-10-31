@@ -3372,7 +3372,7 @@ void VDisplay::makeFullMovie(){
 		// Step 2, Process
 		string inFile = fEventLoop->getRunParameter()->fMovieInput;
 		string outDir = fEventLoop->getRunParameter()->fMovieOutputDir;
-		ifstream inputFile(inFile);
+		ifstream inputFile(inFile.c_str());
 		int eventNum = 0;
 		while(inputFile >> eventNum){
 			char c_ev[200];

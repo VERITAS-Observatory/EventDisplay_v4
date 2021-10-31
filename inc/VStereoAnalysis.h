@@ -198,8 +198,8 @@ class VStereoAnalysis
 		double  fDL3EventTree_El ;
 		double  fDL3EventTree_EmissionHeight ;
 		double  fDL3EventTree_Acceptance ;
-        double  fDL3EventTree_MVA;
-        UInt_t  fDL3EventTree_IsGamma;
+                double  fDL3EventTree_MVA;
+                UInt_t  fDL3EventTree_IsGamma;
 		VRadialAcceptance* fDL3_Acceptance;
 		
 		double  fDeadTimeStorage ;

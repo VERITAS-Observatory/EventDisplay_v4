@@ -129,17 +129,17 @@ void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, d
 		
 		// calculate difference
 		itemp = hon->GetName();
-                string i_className = hon->ClassName();
-                if( i_className.find( "TH1" ) != string::npos
-                  && TMath::Abs( hon->GetXaxis()->GetXmax() - hon->GetXaxis()->GetXmin() ) < 1.e-3 )
-                {
-                     continue;
-                }
-                if( i_className.find( "TH2" ) != string::npos
-                  && TMath::Abs( hon->GetYaxis()->GetXmax() - hon->GetYaxis()->GetXmin() ) < 1.e-3 )
-                {
-                     continue;
-                }
+        string i_className = hon->ClassName();
+        if( i_className.find( "TH1" ) != string::npos
+          && TMath::Abs( hon->GetXaxis()->GetXmax() - hon->GetXaxis()->GetXmin() ) < 1.e-3 )
+        {
+             continue;
+        }
+        if( i_className.find( "TH2" ) != string::npos
+          && TMath::Abs( hon->GetYaxis()->GetXmax() - hon->GetYaxis()->GetXmin() ) < 1.e-3 )
+        {
+             continue;
+        }
 
 		// htheta2 histogram (note: calculated from one reflected region only!)
 		if( itemp.find( "htheta2" ) == 0 )
@@ -181,15 +181,14 @@ void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, d
 		}
 		hList->Add( hTemp );
 	}
-        TIter next(hPList);
-        while (TObject *obj = next())
+    TIter next(hPList);
+    while (TObject *obj = next())
+    {
+        if( obj )
         {
-            if( obj )
-            {
-               hList->Add( obj );
-            }
+           hList->Add( obj );
         }
-
+    }
 }
 
 /*

@@ -731,6 +731,42 @@ ifeq ($(ROOT6),0)
 endif
 	@echo "$@ done"
 
+
+########################################################
+# printAnasumRunParameter
+########################################################
+PRINTANAOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+                ./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
+		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
+		./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o \
+		./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
+		./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
+		./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
+		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
+		./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
+		./obj/VUtilities.o \
+		./obj/VASlalib.o \
+		./obj/VSkyCoordinatesUtilities.o \
+		./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
+		./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
+		./obj/VRunList.o ./obj/VRunList_Dict.o \
+		./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
+		./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
+		./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+		./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
+		./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
+		./obj/printAnasumRunParameter.o
+
+./obj/printAnasumRunParameter.o:	./src/printAnasumRunParameter.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+printAnasumRunParameter:	$(PRINTANAOBJ)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+
+
 ########################################################
 # printRunParameter
 ########################################################
