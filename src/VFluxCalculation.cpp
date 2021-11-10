@@ -234,11 +234,11 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
 		fData->GetEntry( i );
 		
 		// check run min/max requirements
-		if( fData->runOn > 0 && fData->runOn < iRunMin )
+		if( fData->runOn > 0 && iRunMin >= 0 && fData->runOn < iRunMin )
 		{
 			continue;
 		}
-		if( fData->runOn > 0 && fData->runOn > iRunMax )
+		if( fData->runOn > 0 && iRunMax >= 0 && fData->runOn > iRunMax )
 		{
 			continue;
 		}
