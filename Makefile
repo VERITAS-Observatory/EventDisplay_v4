@@ -142,24 +142,12 @@ endif
 ########################################################################################################################
 # compiler and linker general values
 CXX           = g++
-CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
+CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE -std=c++11
 CXXFLAGS     += -I. -I./inc/
 CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(ROOT6FLAG) $(GSLFLAG) $(GSL2FLAG) $(FROGSFLAG) $(DCACHEFLAG)
 LD            = g++
 OutPutOpt     = -o
 INCLUDEFLAGS  = -I. -I./inc/
-
-# check compiler version
-GCCVERSION=$(shell $(CXX) -dumpversion)
-# get major version of gcc, e.g. '4' in '4.6.'
-GCC_VER_MAJOR := $(shell echo $(GCCVERSION) | cut -f1 -d.)
-# get minor version of gcc, e.g. '6' in '4.6'
-GCC_VER_MINOR := $(shell echo $(GCCVERSION) | cut -f2 -d.)
-# check if gcc version is smaller than 4.8.
-GCC_GT_4_8 := $(shell [ $(GCC_VER_MAJOR) -lt 3 -o \( $(GCC_VER_MAJOR) -eq 4 -a $(GCC_VER_MINOR) -lt 8 \) ] && echo true)
-# check if gcc version is smaller than 4.9.
-GCC_GT_4_9 := $(shell [ $(GCC_VER_MAJOR) -lt 3 -o \( $(GCC_VER_MAJOR) -eq 4 -a $(GCC_VER_MINOR) -lt 9 \) ] && echo true)
-GCCMACHINE=$(shell $(CXX) -dumpmachine)
 
 # linux depending flags
 ifeq ($(ARCH),Linux)
@@ -170,9 +158,6 @@ ifeq ($(ARCH),Linux)
 		  $(error PAY ATTENTION. YOU USE THE WRONG GCC COMPILER $(GCCVERSION) FOR THIS ROOT VERSION $(ROOTVERSION)!)
 		endif
 	endif
-	ifeq ($(GCC_GT_4_9),true)
-		CXXFLAGS += -std=c++11
-        endif
 endif
 # Apple OS X flags
 ifeq ($(ARCH),Darwin)
@@ -184,8 +169,17 @@ DllSuf        = dylib
 UNDEFOPT      = dynamic_lookup
 SOFLAGS       = -dynamiclib -single_module -undefined $(UNDEFOPT)
 endif
+# check compiler
+GCCVERSION=$(shell $(CXX) -dumpversion)
+GCCMACHINE=$(shell $(CXX) -dumpmachine)
 # ROOT 6 and check correct compiler version
 ifeq ($(ROOT6FLAG),-DROOT6)
+      # get major version of gcc, e.g. '4' in '4.6.'
+      GCC_VER_MAJOR := $(shell echo $(GCCVERSION) | cut -f1 -d.)
+      # get minor version of gcc, e.g. '6' in '4.6'
+      GCC_VER_MINOR := $(shell echo $(GCCVERSION) | cut -f2 -d.)
+      # check if gcc version is smaller than 4.8.
+      GCC_GT_4_8 := $(shell [ $(GCC_VER_MAJOR) -lt 3 -o \( $(GCC_VER_MAJOR) -eq 4 -a $(GCC_VER_MINOR) -lt 8 \) ] && echo true)
 endif
 ########################################################
 # CXX FLAGS (taken from root)
