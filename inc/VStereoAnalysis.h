@@ -192,6 +192,7 @@ class VStereoAnalysis
 		double  fDL3EventTree_YGroundCore;
 		int     fDL3EventTree_NImages;
 		ULong64_t fDL3EventTree_ImgSel;
+                double  fDL3EventTree_MeanPedvar;
 		double  fDL3EventTree_MSCW;
 		double  fDL3EventTree_MSCL;
 		double  fDL3EventTree_Az ;
