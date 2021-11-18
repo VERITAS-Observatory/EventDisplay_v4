@@ -44,6 +44,14 @@ distdir = $(package)-$(version)
 ctapara = $(distdir).CTA.runparameter
 vtspara = $(package)-$(auxversion).VTS.aux
 #############################
+############################
+# Ensure ROOT has the same c++ version as the system's
+############################
+CPPSTD=$(shell get_cpp_std.sh)
+ROOTCPPSTD=$(shell root-config --cflags | cut -f2 -d " " | cut -f2 -d "=")
+ifneq($(CPPSTD), $(ROOTCPPSTD))
+  $(error "System's C++ Standard is different than the one compiled with ROOT; please re-compile ROOT with the appropiate flags!")
+endif
 #############################
 # check root version number
 #############################
@@ -142,7 +150,7 @@ endif
 ########################################################################################################################
 # compiler and linker general values
 CXX           = g++
-CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE -std=c++11
+CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE -std=$(CPPSTD)
 CXXFLAGS     += -I. -I./inc/
 CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(ROOT6FLAG) $(GSLFLAG) $(GSL2FLAG) $(FROGSFLAG) $(DCACHEFLAG)
 LD            = g++
@@ -163,7 +171,7 @@ endif
 ifeq ($(ARCH),Darwin)
 CXX           = clang++
 LD            = clang++
-CXXFLAGS    += -Wdeprecated-declarations -stdlib=libc++ -std=c++11
+CXXFLAGS    += -Wdeprecated-declarations -stdlib=libc++ -std=$(CPPSTD)
 LDFLAGS       = -bind_at_load
 DllSuf        = dylib
 UNDEFOPT      = dynamic_lookup
