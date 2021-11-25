@@ -63,7 +63,6 @@ class VGlobalRunParameter
 	public:
 	
 		static string       fEVNDISP_VERSION;                             // EVNDISPLAY VERSION
-		static string       fEVNDISP_SVNREVISION;                         // SVN REVISION
 		
 		VGlobalRunParameter( bool bSetGlobalParameter = true );
 		virtual ~VGlobalRunParameter();
@@ -114,10 +113,6 @@ class VGlobalRunParameter
 		}
 		static unsigned int getEVNDISP_TREE_VERSION( TTree* );
 		static bool         getEVNDISP_TREE_isShort( TTree* );
-		static string       getSVN_VERSION()
-		{
-			return fEVNDISP_SVNREVISION;
-		}
 		string       getObservatory()
 		{
 			return fObservatory;
@@ -148,7 +143,7 @@ class VGlobalRunParameter
 		bool         setDirectory_EVNDISPCalibrationData( string iDir );
 		bool         update( TChain* ic );
 		
-		ClassDef( VGlobalRunParameter, 8 );
+		ClassDef( VGlobalRunParameter, 9 );
 };
 
 #endif
