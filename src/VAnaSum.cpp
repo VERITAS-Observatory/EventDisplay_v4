@@ -309,6 +309,20 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 						TTree* newtreek = kTree->CloneTree();
 						newtreek->Write();
 					}
+                                        // log information
+                                        TMacro* evndispLog = (TMacro*)oldfile->Get( "evndispLog" );
+                                        if( evndispLog )
+                                        {
+                                            fStereoRunDir[j]->cd();
+                                            evndispLog->Write( "evndispLog" );
+                                        }
+                                        TMacro* mscwTableLog = (TMacro*)oldfile->Get( "mscwTableLog" );
+                                        if( mscwTableLog )
+                                        {
+                                            fStereoRunDir[j]->cd();
+                                            mscwTableLog->Write( "mscwTableLog" );
+                                        }
+
 				}
 				// copy VEvndispRunParameter 'runparameterV2' to anasum.root file
 				fStereoRunDir[j]->cd();
