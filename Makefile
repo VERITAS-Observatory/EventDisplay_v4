@@ -282,7 +282,8 @@ all VTS:	evndisp \
 	VTS.getLaserRunFromDB \
 	VTS.getRun_TimeElevAzim \
 	printRunParameter \
-        writeParticleRateFilesForTMVA
+        writeParticleRateFilesForTMVA \
+	logFile
 
 CTA:	evndisp \
         CTA.convert_hessio_to_VDST \
@@ -565,6 +566,19 @@ EFFOBJECT =	./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 makeEffectiveArea:	$(EFFOBJECT) ./obj/VASlalib.o ./obj/makeEffectiveArea.o
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+########################################################
+# logFile
+########################################################
+LOGFILE =		./obj/logFile.o \
+					
+
+./obj/logFile.o:	./src/logFile.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+logFile:	$(LOGFILE)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
