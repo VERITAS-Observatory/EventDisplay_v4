@@ -742,6 +742,7 @@ endif
 ifeq ($(ROOT6),0)
 	@echo "COPYING pcm FILES TO lib"
 	cp -f ./obj/*.pcm ./lib/
+	cp -f ./obj/*.pcm ./bin/
 endif
 	@echo "$@ done"
 
