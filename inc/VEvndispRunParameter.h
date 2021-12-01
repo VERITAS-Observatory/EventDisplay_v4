@@ -340,11 +340,13 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		{
 			return fperformFADCAnalysis;
 		}
-                string       getInstrumentEpoch(  bool iMajor = false );
+                string       getInstrumentEpoch(  bool iMajor = false,
+                                                  bool iUpdateInstrumentEpoch = false );
 		bool         isMC()
 		{
 			return fIsMC;
 		}
+                bool         updateInstrumentEpochFromFile( string iEpocheFile = "usedefault" );
 		void         setPulseZeroIndex();
 		void         setSystemParameters();
 		bool         useDB()
@@ -352,6 +354,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fuseDB;
 		}
 		
-		ClassDef( VEvndispRunParameter, 167 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 168 ); //(increase this number)
 };
 #endif

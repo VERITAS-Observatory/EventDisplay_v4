@@ -927,8 +927,10 @@ void VEvndispRunParameter::setSystemParameters()
  * MAJOR_MINOR epoch, e.g. V6_2016
  *
  */
-string VEvndispRunParameter::getInstrumentEpoch( bool iMajor )
+string VEvndispRunParameter::getInstrumentEpoch( bool iMajor, bool iUpdateInstrumentEpoch )
 {
+        // re-read instrument epoch 
+        if( iUpdateInstrumentEpoch )  updateInstrumentEpochFromFile();
         if( iMajor )
         {
              return fInstrumentEpoch.substr( 0, fInstrumentEpoch.find( "_" ) );
@@ -936,3 +938,50 @@ string VEvndispRunParameter::getInstrumentEpoch( bool iMajor )
         return fInstrumentEpoch;
 }
 
+/*
+   read instrument epoch from file
+   (typically VERITAS.Epochs.runparameter)
+*/
+bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpocheFile )
+{
+       if( iEpocheFile != "usedefault" ) fEpochFile = iEpocheFile;
+       if( fEpochFile.size() == 0 ) return true;
+
+       ifstream is;
+       is.open( fEpochFile.c_str(), ifstream::in );
+       if( !is )
+       {
+            string iTemp = getDirectory_EVNDISPParameterFiles() + fEpochFile;
+            is.open( iTemp.c_str(), ifstream::in );
+            if( !is )
+            {
+                    cout << "error opening epoch parameter file " << fEpochFile << endl;
+                    cout << iTemp << endl;
+                    exit( EXIT_FAILURE );
+            }
+       }
+       string is_line;
+       string temp;
+       string itemp_epoch = "not_found";
+       int run_min = 0;
+       int run_max = 0;
+       while( getline( is, is_line ) )
+       {
+           if( is_line.size() == 0 ) continue;
+           istringstream is_stream( is_line );
+           is_stream >> temp >> temp;
+           if( temp == "EPOCH" )
+           { 
+               if( !(is_stream>>std::ws).eof() ) is_stream >> itemp_epoch;
+               if( !(is_stream>>std::ws).eof() ) is_stream >> run_min;
+               if( !(is_stream>>std::ws).eof() ) is_stream >> run_max;
+               if( frunnumber >= run_min && frunnumber <= run_max )
+               {
+                   break;
+               }
+           }
+       }
+       fInstrumentEpoch = itemp_epoch;
+       is.close();
+       return true;
+}

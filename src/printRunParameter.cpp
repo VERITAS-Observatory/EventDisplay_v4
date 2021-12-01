@@ -77,9 +77,10 @@ bool readRunParameter( TFile* fIn, string iPara )
 	{
 		cout << fPar->freconstructionparameterfile << endl;
 	}
-	else if( iPara == "-runinfo" )
+	else if( iPara.find( "runinfo" ) != string::npos )
 	{
-		cout << fPar->getInstrumentEpoch( false ) << "\t";
+		cout << fPar->getInstrumentEpoch( false,
+                                                  iPara.find( "updated-runinfo" ) != string::npos ) << "\t";
 		cout << fPar->getInstrumentEpoch( true ) << "\t";
 		cout << fPar->fAtmosphereID << "\t";
 		cout << fPar->fDBRunType << "\t";
@@ -244,6 +245,7 @@ int main( int argc, char* argv[] )
 		cout << "      -teltoana     print telescope combination used in analysis" << endl;
 		cout << "      -evndispreconstructionparameterfile print evndisp reconstruction parameter file" << endl;
 		cout << "      -runinfo      print relevant run info in one line" << endl;
+                cout << "      -updated-runinfo print relevant run info in one line (update epoch from VERITAS.Epochs.runparameter)" << endl;
                 cout << "      -elevation    print (rough) average elevation" << endl;
                 cout << "      -wobble       print wobble offset" << endl;
                 cout << "      -wobbleInt    print wobble offset (as integer, x100)" << endl;

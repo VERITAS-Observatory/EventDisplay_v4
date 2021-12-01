@@ -2110,6 +2110,11 @@ bool VReadRunParameter::readEpochsAndAtmospheres()
 	{
 		return true;
 	}
+        // use VEvndispRunParameter to read instrument epoch
+        if( fRunPara->fInstrumentEpoch == "noepoch" )
+        {
+            fRunPara->updateInstrumentEpochFromFile( fRunPara->fEpochFile );
+        }
 	
 	ifstream is;
 	is.open( fRunPara->fEpochFile.c_str(), ifstream::in );
@@ -2145,9 +2150,6 @@ bool VReadRunParameter::readEpochsAndAtmospheres()
 		{
 			istringstream is_stream( is_line );
 			
-			int run_min = 0;
-			int run_max = 0;
-			
 			is_stream >> temp;
 			if( temp != "*" )
 			{
@@ -2158,33 +2160,10 @@ bool VReadRunParameter::readEpochsAndAtmospheres()
 				continue;
 			}
 			is_stream >> temp;
-			// EPOCH (e.g. V4, V5 and V6)
-			// * EPOCH V6 <run min> <run max>
-			if( temp == "EPOCH" && fRunPara->fInstrumentEpoch == "noepoch" )
-			{
-				string iTemp = "";
-				if( !(is_stream>>std::ws).eof() )
-				{
-					is_stream >> iTemp;
-				}
-				if( !(is_stream>>std::ws).eof() )
-				{
-					is_stream >> run_min;
-				}
-				if( !(is_stream>>std::ws).eof() )
-				{
-					is_stream >> run_max;
-				}
-				
-				if( fRunPara->frunnumber >= run_min && fRunPara->frunnumber <= run_max )
-				{
-					fRunPara->fInstrumentEpoch = iTemp;
-				}
-			}
 			// atmosphere (e.g. summer or winter)
 			//    expect input string in sql format without hours: 2014-06-16)
 			//  * ATMOSPHERE 21 2014-06-01 2014-06-16
-			else if( temp == "ATMOSPHERE" && fRunPara->fAtmosphereID == 0 )
+			if( temp == "ATMOSPHERE" && fRunPara->fAtmosphereID == 0 )
 			{
 				string iTemp = "";
 				string date_min = "";
