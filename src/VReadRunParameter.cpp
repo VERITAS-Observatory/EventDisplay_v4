@@ -2101,142 +2101,29 @@ bool VReadRunParameter::readEpochsAndAtmospheres()
 		return false;
 	}
 	
-	if( fRunPara->fEpochGain.size() != fRunPara->fNTelescopes )
-	{
-		fRunPara->fEpochGain.resize( fRunPara->fNTelescopes, 5.5 );
-	}
-	
 	if( fRunPara->fEpochFile.size() == 0 )
 	{
 		return true;
 	}
-        // use VEvndispRunParameter to read instrument epoch
-        if( fRunPara->fInstrumentEpoch == "noepoch" )
-        {
-            fRunPara->updateInstrumentEpochFromFile( fRunPara->fEpochFile );
-        }
-	
-	ifstream is;
-	is.open( fRunPara->fEpochFile.c_str(), ifstream::in );
-	if( !is )
-	{
-		string iTemp = fRunPara->getDirectory_EVNDISPParameterFiles() + fRunPara->fEpochFile;
-		is.open( iTemp.c_str(), ifstream::in );
-		if( !is )
-		{
-			cout << "error opening epoch parameter file " << fRunPara->fEpochFile << endl;
-			cout << iTemp << endl;
-			exit( EXIT_FAILURE );
-		}
-	}
-	string is_line;
-	string temp;
 	cout << endl;
 	cout << "========================================" << endl;
 	cout << "reading epoch for given run and date from " << fRunPara->fEpochFile << endl;
-	
-	if( fRunPara->fInstrumentEpoch != "noepoch" )
+        if( fRunPara->fInstrumentEpoch == "noepoch" )
+        {
+            fRunPara->updateInstrumentEpochFromFile( fRunPara->fEpochFile, true );
+        }
+        else
+        {
+	    cout << "   (epoch is set from command line - ignoring values in epoch parameter file" << endl;
+        }
+	if( fRunPara->fAtmosphereID == 0 )
+        {
+           fRunPara->updateInstrumentEpochFromFile( fRunPara->fEpochFile, false );
+        }
+        else
 	{
-		cout << "   (epoch is set from command line - ignoring values in epoch parameter file" << endl;
+	    cout << "   (atmosphere ID is set from command line - ignoring values in epoch parameter file" << endl;
 	}
-	if( fRunPara->fAtmosphereID != 0 )
-	{
-		cout << "   (atmosphere ID is set from command line - ignoring values in epoch parameter file" << endl;
-	}
-	
-	while( getline( is, is_line ) )
-	{
-		if( is_line.size() > 0 )
-		{
-			istringstream is_stream( is_line );
-			
-			is_stream >> temp;
-			if( temp != "*" )
-			{
-				continue;
-			}
-			if( (is_stream>>std::ws).eof() )
-			{
-				continue;
-			}
-			is_stream >> temp;
-			// atmosphere (e.g. summer or winter)
-			//    expect input string in sql format without hours: 2014-06-16)
-			//  * ATMOSPHERE 21 2014-06-01 2014-06-16
-			if( temp == "ATMOSPHERE" && fRunPara->fAtmosphereID == 0 )
-			{
-				string iTemp = "";
-				string date_min = "";
-				string date_max = "";
-				double imjd_min = 0.;
-				double isec_min = 0.;
-				double imjd_max = 0.;
-				double isec_max = 0.;
-				if( !(is_stream>>std::ws).eof() )
-				{
-					is_stream >> iTemp;
-				}
-				if( !(is_stream>>std::ws).eof() )
-				{
-					is_stream >> date_min;
-				}
-				if( !(is_stream>>std::ws).eof() )
-				{
-					is_stream >> date_max;
-				}
-				date_min += " 12:00:00";
-				date_max += " 12:00:00";
-				if( VSkyCoordinatesUtilities::getMJD_from_SQLstring( date_min, imjd_min, isec_min ) != 0 )
-				{
-					cout << "VReadRunParameter::readEpochsAndAtmospheres() error: invalid date string: " << date_min << endl;
-					return false;
-				}
-				if( VSkyCoordinatesUtilities::getMJD_from_SQLstring( date_max, imjd_max, isec_max ) != 0 )
-				{
-					cout << "VReadRunParameter::readEpochsAndAtmospheres() error: invalid date string: " << date_max << endl;
-					return false;
-				}
-				if( fRunPara->fDBDataStartTimeMJD >= imjd_min && fRunPara->fDBDataStartTimeMJD <= imjd_max )
-				{
-					fRunPara->fAtmosphereID = atoi( iTemp.c_str() );
-				}
-			}
-			// absolute gains (dc/pe) for each VERITAS epoch
-			//  * GAIN V4 1 5.11
-			else if( temp == "GAIN" )
-			{
-				string iEpoch = "";
-				string iTel = "";
-				string iGain = "";
-				if( !(is_stream>>std::ws).eof() )
-				{
-					is_stream >> iEpoch;
-				}
-				if( !(is_stream>>std::ws).eof() )
-				{
-					is_stream >> iTel;
-				}
-				if( !(is_stream>>std::ws).eof() )
-				{
-					is_stream >> iGain;
-				}
-				unsigned int iTelNum = 0;
-				
-				if( iEpoch == fRunPara->getInstrumentEpoch( true ) )
-				{
-					iTelNum = atoi( iTel.c_str() );
-					for( unsigned int i = 0; i < fRunPara->fNTelescopes; i++ )
-					{
-						if( iTelNum == i + 1 )
-						{
-							fRunPara->fEpochGain[i] = atof( iGain.c_str() );
-						}
-					}
-				}
-			}
-		}
-	}
-	is.close();
 	
 	return true;
 }

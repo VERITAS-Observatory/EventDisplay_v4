@@ -82,7 +82,7 @@ bool readRunParameter( TFile* fIn, string iPara )
 		cout << fPar->getInstrumentEpoch( false,
                                                   iPara.find( "updated-runinfo" ) != string::npos ) << "\t";
 		cout << fPar->getInstrumentEpoch( true ) << "\t";
-		cout << fPar->fAtmosphereID << "\t";
+		cout << fPar->getAtmosphereID( iPara.find( "updated-runinfo" ) != string::npos ) << "\t";
 		cout << fPar->fDBRunType << "\t";
 		for( unsigned int i = 0; i < fPar->fTelToAnalyze.size(); i++ )
 		{

@@ -104,7 +104,6 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fEpochFile = "VERITAS.Epochs.runparameter";
 	fInstrumentEpoch = "noepoch";
 	fAtmosphereID = 0;
-	fEpochGain.resize( fNTelescopes, 5.5 );
 	
 	fCameraCoordinateTransformX = 1.;
 	fCameraCoordinateTransformY = 1.;
@@ -942,7 +941,8 @@ string VEvndispRunParameter::getInstrumentEpoch( bool iMajor, bool iUpdateInstru
    read instrument epoch from file
    (typically VERITAS.Epochs.runparameter)
 */
-bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpocheFile )
+bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpocheFile,
+                                                          bool iReadInstrumentEpoch )
 {
        if( iEpocheFile != "usedefault" ) fEpochFile = iEpocheFile;
        if( fEpochFile.size() == 0 ) return true;
@@ -963,6 +963,7 @@ bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpocheFile )
        string is_line;
        string temp;
        string itemp_epoch = "not_found";
+       int itemp_atmo = 0;
        int run_min = 0;
        int run_max = 0;
        while( getline( is, is_line ) )
@@ -970,7 +971,7 @@ bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpocheFile )
            if( is_line.size() == 0 ) continue;
            istringstream is_stream( is_line );
            is_stream >> temp >> temp;
-           if( temp == "EPOCH" )
+           if( iReadInstrumentEpoch && temp == "EPOCH" )
            { 
                if( !(is_stream>>std::ws).eof() ) is_stream >> itemp_epoch;
                if( !(is_stream>>std::ws).eof() ) is_stream >> run_min;
@@ -980,8 +981,30 @@ bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpocheFile )
                    break;
                }
            }
+           else if( temp == "ATMOSPHERE" )
+           {
+               if( !(is_stream>>std::ws).eof() ) is_stream >> itemp_atmo;
+               if( !(is_stream>>std::ws).eof() ) is_stream >> temp;
+               if( !(is_stream>>std::ws).eof() ) is_stream >> temp;
+               int mjd_min = 0;
+               if( !(is_stream>>std::ws).eof() ) is_stream >> mjd_min;
+               int mjd_max = 0;
+               if( !(is_stream>>std::ws).eof() ) is_stream >> mjd_max;
+               if( fDBDataStartTimeMJD >= mjd_min && fDBDataStoppTimeMJD <= mjd_max )
+               {
+                   break;
+               }
+           }
        }
-       fInstrumentEpoch = itemp_epoch;
+       if( iReadInstrumentEpoch ) fInstrumentEpoch = itemp_epoch;
+       else                       fAtmosphereID = itemp_atmo;
        is.close();
        return true;
+}
+
+unsigned int VEvndispRunParameter::getAtmosphereID( bool iUpdateInstrumentEpoch )
+{
+       if( iUpdateInstrumentEpoch ) updateInstrumentEpochFromFile( "usedefault", false );
+
+       return fAtmosphereID;
 }
