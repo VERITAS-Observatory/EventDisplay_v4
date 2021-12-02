@@ -1376,6 +1376,10 @@ bool VTableLookupDataHandler::readRunParameter()
                                      cout << "was: " << iPar->getInstrumentEpoch( false );
                                      cout << ", is: " << iPar->getInstrumentEpoch( false, true );
                                      cout << ")" << endl;
+                                     cout << "Evaluating atmosphere ID (";
+                                     cout << "was: " << iPar->getAtmosphereID( false );
+                                     cout << ", is: " << iPar->getAtmosphereID( true );
+                                     cout << ")" << endl;
                                 }
 				iPar->Write();
 			}
