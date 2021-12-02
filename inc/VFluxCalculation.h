@@ -292,13 +292,13 @@ class VFluxCalculation : public TObject
                 }
 		void          setSpectralParameters( double iMinEnergy_TeV = 0., double E0 = 1., double alpha = -2.5, double iMaxEnergy_TeV = MAX_SAFE_MC_ENERGY );
 		void          setSignificanceParameters( double iThresholdSignificance = 3., double iMinEvents = 5,
-				double iUpperLimit = 0.99, int iUpperlimitMethod = 0, int iLiMaEqu = 17 );
+				double iUpperLimit = 0.99, int iUpperlimitMethod = 5, int iLiMaEqu = 17 );
 		void          setTimeBinnedAnalysis( bool iB = true )
 		{
 			fTimebinned = iB;
 		}
 		void          writeResults( char* ifile );
 		
-		ClassDef( VFluxCalculation, 19 );
+		ClassDef( VFluxCalculation, 20 );
 };
 #endif
