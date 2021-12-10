@@ -108,6 +108,8 @@ class VLightCurveDataLessThan
 			
 			return false;
 		}
+                VLightCurveDataLessThan() {}
+               ~VLightCurveDataLessThan() {}
 };
 
 #endif
