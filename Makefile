@@ -282,7 +282,8 @@ all VTS:	evndisp \
 	VTS.getLaserRunFromDB \
 	VTS.getRun_TimeElevAzim \
 	printRunParameter \
-        writeParticleRateFilesForTMVA
+        writeParticleRateFilesForTMVA \
+	logFile
 
 CTA:	evndisp \
         CTA.convert_hessio_to_VDST \
@@ -569,6 +570,19 @@ makeEffectiveArea:	$(EFFOBJECT) ./obj/VASlalib.o ./obj/makeEffectiveArea.o
 	@echo "$@ done"
 
 ########################################################
+# logFile
+########################################################
+LOGFILE =		./obj/logFile.o \
+					
+
+./obj/logFile.o:	./src/logFile.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+logFile:	$(LOGFILE)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+########################################################
 # anasum
 ########################################################
 ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \
@@ -678,7 +692,8 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
 		./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-		./obj/VLightCurve.o ./obj/VLightCurve_Dict.o ./obj/VLightCurveData.o \
+		./obj/VLightCurve.o ./obj/VLightCurve_Dict.o \
+		./obj/VLightCurveData.o ./obj/VLightCurveData_Dict.o \
 		./obj/VLightCurveUtilities.o ./obj/VLightCurveUtilities_Dict.o \
 		./obj/VLombScargle.o ./obj/VLombScargle_Dict.o \
 		./obj/VZDCF.o ./obj/VZDCF_Dict.o ./obj/VZDCFData.o \
@@ -728,6 +743,7 @@ endif
 ifeq ($(ROOT6),0)
 	@echo "COPYING pcm FILES TO lib"
 	cp -f ./obj/*.pcm ./lib/
+	cp -f ./obj/*.pcm ./bin/
 endif
 	@echo "$@ done"
 

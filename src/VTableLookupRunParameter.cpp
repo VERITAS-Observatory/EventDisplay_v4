@@ -17,6 +17,7 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	isMC = false;
 	fInterpolate = 0;
 	fUseMedianEnergy = 1;
+        fUpdateInstrumentEpoch = true;
 	fPE = false;
 	fInterpolateString = "";
 	readwrite = 'R';
@@ -128,6 +129,10 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 			}
 			return true;
 		}
+                else if( iTemp.find( "updateEpoch" ) < iTemp.size() )
+                {
+                        fUpdateInstrumentEpoch = (bool)atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+                }
 		else if( iTemp.find( "useMedian" ) < iTemp.size() )
 		{
 			fUseMedianEnergy = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -659,9 +664,6 @@ void VTableLookupRunParameter::print( int iP )
 	if( fInterpolate > 0 )
 	{
 		cout << "WARNING: interpolation switched off for efficiency reasons" << endl;
-		/*        if( fInterpolate == 1 ) fInterpolateString = "simple";
-		        else if( fInterpolate == 2 ) fInterpolateString = "gaussian";
-		        cout << "interpolate lookup tables: " << fInterpolateString << endl; */
 	}
        
         // Check the average scaling factors among all telescopes. If it deviates from 1, print it 
@@ -710,6 +712,10 @@ void VTableLookupRunParameter::print( int iP )
                     cout << ")";
                 }
                 cout << endl;
+        }
+        if( fUpdateInstrumentEpoch )
+        {
+                cout << "updating instrument epoch from default epoch file" << endl;
         }
 	
 	if( iP >= 1 )

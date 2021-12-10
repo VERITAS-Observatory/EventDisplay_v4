@@ -22,6 +22,7 @@
 #include "TKey.h"
 #include "TLatex.h"
 #include "TLeaf.h"
+#include "TMacro.h"
 #include "TStyle.h"
 #include "TSystem.h"
 #include "TTree.h"

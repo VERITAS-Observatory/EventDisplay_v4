@@ -1368,6 +1368,19 @@ bool VTableLookupDataHandler::readRunParameter()
 				}
 				
 				fOutFile->cd();
+                                // update instrument epoch in evendisp run parameters
+                                // (might have been changed since the evndisp analysis)
+                                if( fTLRunParameter->fUpdateInstrumentEpoch )
+                                {
+                                     cout << "Evaluating instrument epoch (";
+                                     cout << "was: " << iPar->getInstrumentEpoch( false );
+                                     cout << ", is: " << iPar->getInstrumentEpoch( false, true );
+                                     cout << ")" << endl;
+                                     cout << "Evaluating atmosphere ID (";
+                                     cout << "was: " << iPar->getAtmosphereID( false );
+                                     cout << ", is: " << iPar->getAtmosphereID( true );
+                                     cout << ")" << endl;
+                                }
 				iPar->Write();
 			}
 		}

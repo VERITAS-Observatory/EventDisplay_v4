@@ -69,6 +69,7 @@ EXAMPLES:
 Additional options for table filling:
 
 	 -debug=UINT             debug output level (0=default, 1=low, 2=high)
+         -updateEpoch=0/1        re-read instrument epoch from VERITAS.Epochs.runparameter and update runparameters
 	 -minshowerperbin=INT    minimum number of showers per bin required for analysis (default=5)
 	 -write1DHistograms 	 write 1D-histograms for median determination to disk (default off)
 	 -selectRandom=[0,1] 	 selected events randomly (give probability)

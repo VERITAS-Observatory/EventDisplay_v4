@@ -1658,9 +1658,13 @@ bool VCalibrator::readPeds_from_textfile( string iFile, bool iLowGain, unsigned 
 	infile.open( iFile.c_str(), ifstream::in );
 	if( !infile )
 	{
-		cout << "VCalibrator::readPeds_from_textfile error: unable to open pedestal file " << iFile << endl;
-		cout << "\t exiting..." << endl;
-		exit( EXIT_FAILURE );
+                if( !infile )
+                {
+                    cout << "VCalibrator::readPeds_from_textfile error: unable to open pedestal file ";
+                    cout << iFile << endl;
+                    cout << "\t exiting..." << endl;
+                    exit( EXIT_FAILURE );
+                } 
 	}
 	
 	cout << "Telescope " << getTelID() + 1;
@@ -1782,8 +1786,18 @@ bool VCalibrator::readPeds_from_combinedfile( string iFile, bool iLowGain, unsig
 	infile.open( iFile.c_str(), ifstream::in );
 	if( !infile )
 	{
-		cout << "VCalibrator::readPeds_from_combinedfile error: unable to open pedestal file " << iFile << endl;
-		return false;
+		cout << "VCalibrator::readPeds_from_combinedfile error: unable to open pedestal file ";
+                cout << "\t" << iFile << endl;
+                cout << "\t trying aux directory" << endl;
+                string i_Temp = fRunPar->getDirectory_EVNDISPAnaData();
+                i_Temp += "/Calibration/";
+                i_Temp += gSystem->BaseName( iFile.c_str() );
+                infile.open( i_Temp.c_str(), ifstream::in );
+                if( !infile )
+                {
+                    cout << "VCalibrator::readPeds_from_combinedfile error: unable to open pedestal file " << i_Temp << endl;
+                    return false;
+                }
 	}
 	
 	cout << "Telescope " << getTelID() + 1;
@@ -2104,7 +2118,7 @@ string VCalibrator::getCalibrationFileName( int iTel, int irun, string iSuffix, 
 	iFileStr << "Tel_" << iTel + 1 << "/";
 	iFileStr << irun << ".";
 	iFileStr << iSuffix;
-	
+
 	return iFileStr.str();
 }
 
@@ -2971,9 +2985,22 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 	is.open( is_Temp.c_str(), ifstream::in );
 	if( !is )
 	{
-		cout << "VCalibrator::readLowGainCalibrationValues_fromCalibFile: error, calibration data file not found: ";
-		cout <<  is_Temp << endl;
-		exit( -1 );
+                cout << "VCalibrator::readLowGainCalibrationValues_fromCalibFile: ";
+                cout << " info, trying aux-directory, " << endl;
+                cout << "\t as calibration data file not found: ";
+                cout <<  is_Temp << endl;
+                // trying auxiliary directory
+                is_Temp = fRunPar->getDirectory_EVNDISPAnaData();
+                is_Temp += "/Calibration/";
+                is_Temp += getRunParameter()->fLowGainCalibrationFile;
+                is.open( is_Temp.c_str(), ifstream::in );
+                if( !is )
+                {
+                    cout << "VCalibrator::readLowGainCalibrationValues_fromCalibFile: ";
+                    cout << " error, calibration data file not found: ";
+                    cout <<  is_Temp << endl;
+                    exit( EXIT_FAILURE );
+                }
 	}
         cout << "Telescope " << getTelID()+1 << ": ";
         cout << "VCalibrator::readLowGainCalibrationValues_fromCalibFile: ";

@@ -90,7 +90,7 @@ void VFluxCalculation::reset()
 	fAlpha = -2.5;
 	
 	// significance parameters: decide when to calculate fluxes and when upper limits
-	setSignificanceParameters( 3., 5., 0.99, 0, 17 );
+	setSignificanceParameters( 3., 5., 0.99, 5, 17 );
 
         // default flux calulation method is Poissonian (unbounded)
         setFluxCalculationMethod();
