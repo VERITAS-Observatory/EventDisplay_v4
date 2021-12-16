@@ -1,8 +1,6 @@
 /*! \file combineLookupTables
     \brief combine different lookup tablefiles into a single tablefile
 
-    \author
-    Gernot Maier
 */
 
 #include "TClass.h"
@@ -32,7 +30,7 @@ void copyDirectory( TDirectory* source, const char* hx = 0 );
 
 /*
  * noise directory names are determined in the lookup table code using the
- * mean pedvar level. These can vary by a small avound from simulation to
+ * mean pedvar level. These can vary by a small around from simulation to
  * simulation file. We search here therefore for very similar noise levels,
  * and return those directory names if available
  */
@@ -74,7 +72,7 @@ vector< string > readListOfFiles( string iFile )
 	{
 		cout << "error while reading file list " << iFile << endl;
 		cout << "exiting...." << endl;
-		exit( 0 );
+		exit( EXIT_FAILURE );
 	}
 	string is_line;
 	
@@ -99,7 +97,7 @@ int main( int argc, char* argv[] )
 		{
 			VGlobalRunParameter fRunPara;
 			cout << fRunPara.getEVNDISP_VERSION() << endl;
-			exit( 0 );
+			exit( EXIT_FAILURE );
 		}
 	}
 	
@@ -115,7 +113,7 @@ int main( int argc, char* argv[] )
 		cout << "combine several tables from different files into one single table file" << endl << endl;
 		cout << "combineLookupTables <file with list of tables> <output file name>" << endl;
 		cout << endl;
-		exit( 0 );
+		exit( EXIT_FAILURE );
 	}
 	string fListOfFiles = argv[1];
 	string fOFile       = argv[2];
@@ -126,7 +124,7 @@ int main( int argc, char* argv[] )
 	{
 		cout << "error: no files in file list" << endl;
 		cout << "exiting...." << endl;
-		exit( 0 );
+		exit( EXIT_FAILURE );
 	}
 	cout << "combining " << nFiles << " table files into " << fOFile << endl;
 	
@@ -134,7 +132,7 @@ int main( int argc, char* argv[] )
 	if( fROFile->IsZombie() )
 	{
 		cout << "error while opening combined file: " << fOFile << endl;
-		exit( 0 );
+		exit( EXIT_FAILURE );
 	}
 	TFile* fIn = 0;
 	for( unsigned int f = 0; f < fInFiles.size(); f++ )
