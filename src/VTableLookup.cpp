@@ -1141,14 +1141,18 @@ void VTableLookup::terminate()
 	}
 	
 	////////////////////////////////////////////////////////////////////
-	// (GM): large amount of objects read from subdirectory of the tablefile might result in
-	//       excessive time needed to close the tablefile
-	//       tablefile is therefore only close in table writing mode
+	// large amount of objects read from subdirectory of the tablefile might result in
+	// excessive time needed to close the tablefile
+	// tablefile is therefore only close in table writing mode
 	if( freadwrite == 'w' || freadwrite == 'W' )
 	{
 		cout << "closing file..." << endl;
 		fLookupTableFile->Close();
 	}
+        else
+        {
+            gROOT->GetListOfFiles()->Remove( fLookupTableFile );
+        }
 	
 	cout << "exiting..." << endl;
 }
