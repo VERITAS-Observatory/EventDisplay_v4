@@ -26,7 +26,7 @@ using namespace std;
 // list with noise levels
 vector< int > fNoiseLevel;
 
-void copyDirectory( TDirectory* source, const char* hx = 0 );
+void copyDirectory( TDirectory* source, const char* hx, vector< string > hist_to_copy );
 
 /*
  * noise directory names are determined in the lookup table code using the
@@ -111,12 +111,47 @@ int main( int argc, char* argv[] )
 	if( argc < 2 )
 	{
 		cout << "combine several tables from different files into one single table file" << endl << endl;
-		cout << "combineLookupTables <file with list of tables> <output file name>" << endl;
+		cout << "combineLookupTables <file with list of tables> <output file name> [histogram types to copy]" << endl;
+                cout << endl;
+                cout << "[histogram types]:    all, mpv, median (default)" << endl;
 		cout << endl;
 		exit( EXIT_FAILURE );
 	}
 	string fListOfFiles = argv[1];
 	string fOFile       = argv[2];
+        string histogram_types = "median";
+        if( argc == 4 )
+        {
+            histogram_types = argv[3];
+        }
+        vector< string > hist_to_copy;
+        if( histogram_types == "all" )
+        {
+            hist_to_copy.push_back( "median" );
+            hist_to_copy.push_back( "Median" );
+            hist_to_copy.push_back( "mpv" );
+        }
+        else if( histogram_types == "median" )
+        {
+            hist_to_copy.push_back( "median" );
+            hist_to_copy.push_back( "Median" );
+        }
+        else if( histogram_types == "mpv" )
+        {
+            hist_to_copy.push_back( "mpv" );
+        }
+        else
+        {
+            cout << "unknown histogram type (use all/median/mpv)" << endl;
+            cout << "exiting..." << endl;
+            exit( EXIT_FAILURE );
+        }
+        cout << "Copying histograms of type: ";
+        for( unsigned int i = 0; i < hist_to_copy.size(); i++ )
+        {
+            cout << hist_to_copy[i] << "  ";
+        }
+        cout << endl;
 	
 	vector< string > fInFiles = readListOfFiles( fListOfFiles );
 	unsigned int nFiles = fInFiles.size();
@@ -166,7 +201,7 @@ int main( int argc, char* argv[] )
 				fROFile->cd();
 				const char* hname = iSource->GetName();
 				cout << "\t copying " << hname << endl;
-				copyDirectory( iSource, hname );
+				copyDirectory( iSource, hname, hist_to_copy );
 			}
 		}
 		fIn->Close();
@@ -184,7 +219,9 @@ int main( int argc, char* argv[] )
  *
  *   Author: Rene Brun
  */
-void copyDirectory( TDirectory* source, const char* hx )
+void copyDirectory( TDirectory* source, 
+                    const char* hx,
+                    vector< string > hist_to_copy )
 {
 	//copy all objects and subdirs of directory source as a subdir of the current directory
 	TDirectory* savdir = gDirectory;
@@ -216,7 +253,7 @@ void copyDirectory( TDirectory* source, const char* hx )
 		{
 			cout << "error while creating directory " << source->GetName() << endl;
 			cout << "exiting..." << endl;
-			exit( 0 );
+			exit( EXIT_FAILURE );
 		}
 	}
 	adir->cd();
@@ -241,7 +278,7 @@ void copyDirectory( TDirectory* source, const char* hx )
 			source->cd( key->GetName() );
 			TDirectory* subdir = gDirectory;
 			adir->cd();
-			copyDirectory( subdir );
+			copyDirectory( subdir, 0, hist_to_copy );
 			adir->cd();
 		}
 		else
@@ -255,14 +292,15 @@ void copyDirectory( TDirectory* source, const char* hx )
 				cout << gDirectory->GetPath() << endl;
 			}
 			// copy only median and mpv histogram
-			if( iName.find( "median" ) != string::npos
-					|| iName.find( "Median" ) != string::npos
-					|| iName.find( "mpv" ) != string::npos
-			  )
-			{
+                        for( unsigned int i = 0; i < hist_to_copy.size(); i++ )
+                        {
+                            if( iName.find( hist_to_copy[i].c_str() ) != string::npos )
+                            {
 				adir->cd();
 				obj->Write( iName.c_str() );
-			}
+                                break;
+                            }
+                        }
 			delete obj;
 		}
 	}
