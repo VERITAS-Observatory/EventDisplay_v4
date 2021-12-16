@@ -22,7 +22,7 @@
 using namespace std;
 
 
-void merge( string ifile, char* outputfile, bool bFull = false )
+void merge( string ifile, char* outputfile, string tree_type = "DL3" )
 {
 	char hname[2000];
 	
@@ -47,16 +47,15 @@ void merge( string ifile, char* outputfile, bool bFull = false )
 	cout << "merging " << i_nMerged << " files to " << hname << endl;
 	
 	// set branches to be included in merged files
-	if( !bFull )
+	if( tree_type == "anasum" || tree_type == "DL3" )
 	{
 		f.SetBranchStatus( "*", 0 );
 		f.SetBranchStatus( "ze", 1 );
 		f.SetBranchStatus( "az", 1 );
 		f.SetBranchStatus( "azMin", 1 );
 		f.SetBranchStatus( "azMax", 1 );
-                // Xoff and Yoff are removed in v502, but addInstrumentResponseData requests them
-		f.SetBranchStatus( "Xoff", 1 ); // removed in v502
-		f.SetBranchStatus( "Yoff", 1 ); // removed in v502
+		f.SetBranchStatus( "Xoff", 1 );
+		f.SetBranchStatus( "Yoff", 1 );
 		f.SetBranchStatus( "Woff", 1 );
 		f.SetBranchStatus( "noise", 1 );
 		f.SetBranchStatus( "pedvar", 1 );
@@ -64,42 +63,28 @@ void merge( string ifile, char* outputfile, bool bFull = false )
 		f.SetBranchStatus( "nbins", 1 );
 		f.SetBranchStatus( "e0", 1 );
 		f.SetBranchStatus( "eff", 1 );
-		f.SetBranchStatus( "effNoTh2", 1 );
-                  //f.SetBranchStatus( "eff_error", 1 );
-                  //f.SetBranchStatus( "effNoTh2_error", 1 );
                 f.SetBranchStatus( "esys_rel", 1 );
-		// errors not needed for standard analysis
-		//f.SetBranchStatus( "seff_L", 1 ); // removed in v502
-		//f.SetBranchStatus( "seff_U", 1 ); // removed in v502
 		f.SetBranchStatus( "Rec_nbins", 1 );
 		f.SetBranchStatus( "Rec_e0", 1 );
 		f.SetBranchStatus( "Rec_eff", 1 );
-		f.SetBranchStatus( "Rec_effNoTh2", 1 );
-		  //f.SetBranchStatus( "Rec_eff_error", 1 );  // removed in v502
-		  //f.SetBranchStatus( "Rec_effNoTh2_error", 1 );  // removed in v502
-                f.SetBranchStatus( "Rec_angRes_p68", 1 );
-                f.SetBranchStatus( "Rec_angRes_p80", 1 );
-                // errors not needed for standard analysis
-		//        f.SetBranchStatus( "Rec_seff_L", 1 );
-		//        f.SetBranchStatus( "Rec_seff_U", 1 );
-		// needed for compatibility to v3.30
-		//        f.SetBranchStatus( "hEmc", 1 );
-		// needed for systematic error calculation
-		f.SetBranchStatus( "hEsysMCRelative", 1 ); // removed in v502
-                // Full histograms for DL3
-		f.SetBranchStatus( "hEsysMCRelative2D", 1 );
-                f.SetBranchStatus( "hEsysMCRelative2DNoDirectionCut", 1 );
-                  //f.SetBranchStatus( "hAngularDiff_2D", 1 );
-                  //f.SetBranchStatus( "hAngularDiffEmc_2D", 1 );
-                f.SetBranchStatus( "hAngularLogDiffEmc_2D", 1 );
-                  //f.SetBranchStatus( "gEffAreaNoTh2MC", 1 );  // replaced by effNoTh2 and Rec_effNoTh2
-                  //f.SetBranchStatus( "gEffAreaNoTh2Rec", 1 );
-		// needed for binned likelihood analysis
-		//f.SetBranchStatus( "hResponseMatrixFineQC", 0); // removed in v502
-		//f.SetBranchStatus( "nbins_ResMat", 1 );
-		//f.SetBranchStatus( "ResMat_MC", 1 );
-		//f.SetBranchStatus( "ResMat_Rec", 1 );
-		//f.SetBranchStatus( "ResMat_Rec_Err", 1 );
+		f.SetBranchStatus( "hEsysMCRelative", 1 ); 
+                if( tree_type == "DL3" )
+                {
+                    f.SetBranchStatus( "effNoTh2", 1 );
+                    f.SetBranchStatus( "Rec_effNoTh2", 1 );
+                    f.SetBranchStatus( "Rec_angRes_p68", 1 );
+                    f.SetBranchStatus( "Rec_angRes_p80", 1 );
+                    // Full histograms for DL3
+                    f.SetBranchStatus( "hEsysMCRelative2D", 1 );
+                    f.SetBranchStatus( "hEsysMCRelative2DNoDirectionCut", 1 );
+                    f.SetBranchStatus( "hAngularLogDiffEmc_2D", 1 );
+                    // needed for binned likelihood analysis
+                    //f.SetBranchStatus( "hResponseMatrixFineQC", 0); // removed in v502
+                    //f.SetBranchStatus( "nbins_ResMat", 1 );
+                    //f.SetBranchStatus( "ResMat_MC", 1 );
+                    //f.SetBranchStatus( "ResMat_Rec", 1 );
+                    //f.SetBranchStatus( "ResMat_Rec_Err", 1 );
+                }
 	}
 	f.Merge( hname );
 	cout << "done.." << endl;
@@ -188,18 +173,23 @@ int main( int argc, char* argv[] )
 	if( argc < 4 )
 	{
 		cout << endl;
-		cout << "combineEffectiveAreas <effective area files> <combined file> <write all histograms (default value is=false)>" << endl;
+		cout << "combineEffectiveAreas <effective area files> <combined file> <tree type>" << endl; 
+                cout << endl;
+                cout << "  <tree type>  effective area tree type (defines size of combined tree)" << endl;
+                cout << "                - DL3 (default): entries required for DL3 analyis (large)" << endl;
+                cout << "                - all          : all entries of original trees (largest)" << endl;
+                cout << "                - anasum       : entries required for anasum analysis only (smallest)" << endl;
 		cout << endl;
 		cout << "   <effective area files>    without .root suffix (e.g. effArea*. Note need of \"...\")" << endl;
 		cout << endl;
-		exit( 0 );
+		exit( EXIT_FAILURE );
 	}
 	cout << endl;
 	cout << "combineEffectiveAreas (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
 	cout << "------------------------------------" << endl;
 	cout << endl;
 	
-	merge( argv[1], argv[2], ( bool )atoi( argv[3] ) );
+	merge( argv[1], argv[2], argv[3] );
 	
 	cout << endl << "end combineEffectiveAreas" << endl;
 	
