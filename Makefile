@@ -183,10 +183,10 @@ GCC_GT_4_9 := $(shell [ $(GCC_VER_MAJOR) -lt 3 -o \( $(GCC_VER_MAJOR) -eq 4 -a $
 ########################################################
 # CXX FLAGS (taken from root)
 ########################################################
-ROOTCFLAGS   = $(shell root-config --auxcflags)
-ROOTCFLAGS   = -pthread -m64
 ifeq ($(GCC_GT_4_9),true)
-   ROOTCFLAGS	+= -std=c++11
+   ROOTCFLAGS 	= -pthread -m64 -std=c++11
+else
+   ROOTCFLAGS   = $(shell root-config --auxcflags)
 endif
 CXXFLAGS     += $(ROOTCFLAGS)
 CXXFLAGS     += -I$(shell root-config --incdir) -I$(shell root-config --incdir)/TMVA
