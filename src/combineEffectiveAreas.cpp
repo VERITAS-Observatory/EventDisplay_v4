@@ -21,77 +21,79 @@
 
 using namespace std;
 
-
-void merge( string ifile, char* outputfile, string tree_type = "DL3" )
+void write_reduced_merged_tree( string file_name, 
+                                TChain *f )
 {
-	char hname[2000];
-	
+    if( f )
+    {
+       cout << "AAA " << f->GetName() << endl;
+    }
+
+
+}
+
+void merge( string ifile, string outputfile, string tree_type = "DL3" )
+{
 	TChain f( "fEffArea" );
-	if( ifile.find( ".root" ) != string::npos )
+	if( ifile.find( ".root" ) == string::npos )
 	{
-		sprintf( hname, "%s", ifile.c_str() );
-	}
-	else
-	{
-		sprintf( hname, "%s.root", ifile.c_str() );
-	}
-	int i_nMerged = f.Add( hname );
+                ifile += ".root";
+        }
+	int i_nMerged = f.Add( ifile.c_str() );
 	if( i_nMerged == 0 )
 	{
 		cout << "error: no files found to merge: " << endl;
-		cout << "\t" << hname << endl;
+		cout << "\t" << ifile << endl;
 		cout << "exiting.." << endl;
 		exit( EXIT_FAILURE );
 	}
-	sprintf( hname, "%s.root", outputfile );
-	cout << "merging " << i_nMerged << " files to " << hname << endl;
+        if( outputfile.find( ".root" ) == string::npos )
+        {
+            outputfile += ".root";
+        }
+	cout << "merging " << i_nMerged << " files to " << outputfile << endl;
 	
 	// set branches to be included in merged files
-	if( tree_type == "anasum" || tree_type == "DL3" )
-	{
-		f.SetBranchStatus( "*", 0 );
-		f.SetBranchStatus( "ze", 1 );
-		f.SetBranchStatus( "az", 1 );
-		f.SetBranchStatus( "azMin", 1 );
-		f.SetBranchStatus( "azMax", 1 );
-		f.SetBranchStatus( "Xoff", 1 );
-		f.SetBranchStatus( "Yoff", 1 );
-		f.SetBranchStatus( "Woff", 1 );
-		f.SetBranchStatus( "noise", 1 );
-		f.SetBranchStatus( "pedvar", 1 );
-		f.SetBranchStatus( "index", 1 );
-		f.SetBranchStatus( "nbins", 1 );
-		f.SetBranchStatus( "e0", 1 );
-		f.SetBranchStatus( "eff", 1 );
-                f.SetBranchStatus( "esys_rel", 1 );
-		f.SetBranchStatus( "Rec_nbins", 1 );
-		f.SetBranchStatus( "Rec_e0", 1 );
-		f.SetBranchStatus( "Rec_eff", 1 );
-		f.SetBranchStatus( "hEsysMCRelative", 1 ); 
-                if( tree_type == "DL3" )
-                {
-                    f.SetBranchStatus( "effNoTh2", 1 );
-                    f.SetBranchStatus( "Rec_effNoTh2", 1 );
-                    f.SetBranchStatus( "Rec_angRes_p68", 1 );
-                    f.SetBranchStatus( "Rec_angRes_p80", 1 );
-                    // Full histograms for DL3
-                    f.SetBranchStatus( "hEsysMCRelative2D", 1 );
-                    f.SetBranchStatus( "hEsysMCRelative2DNoDirectionCut", 1 );
-                    f.SetBranchStatus( "hAngularLogDiffEmc_2D", 1 );
-                    // needed for binned likelihood analysis
-                    //f.SetBranchStatus( "hResponseMatrixFineQC", 0); // removed in v502
-                    //f.SetBranchStatus( "nbins_ResMat", 1 );
-                    //f.SetBranchStatus( "ResMat_MC", 1 );
-                    //f.SetBranchStatus( "ResMat_Rec", 1 );
-                    //f.SetBranchStatus( "ResMat_Rec_Err", 1 );
-                }
-	}
-	f.Merge( hname );
+        f.SetBranchStatus( "*", 0 );
+        f.SetBranchStatus( "ze", 1 );
+        f.SetBranchStatus( "az", 1 );
+        f.SetBranchStatus( "azMin", 1 );
+        f.SetBranchStatus( "azMax", 1 );
+        f.SetBranchStatus( "Xoff", 1 );
+        f.SetBranchStatus( "Yoff", 1 );
+        f.SetBranchStatus( "Woff", 1 );
+        f.SetBranchStatus( "noise", 1 );
+        f.SetBranchStatus( "pedvar", 1 );
+        f.SetBranchStatus( "index", 1 );
+        f.SetBranchStatus( "nbins", 1 );
+        f.SetBranchStatus( "e0", 1 );
+        f.SetBranchStatus( "eff", 1 );
+        f.SetBranchStatus( "esys_rel", 1 );
+        f.SetBranchStatus( "Rec_nbins", 1 );
+        f.SetBranchStatus( "Rec_e0", 1 );
+        f.SetBranchStatus( "Rec_eff", 1 );
+        f.SetBranchStatus( "hEsysMCRelative", 1 ); 
+        if( tree_type == "DL3" )
+        {
+            f.SetBranchStatus( "effNoTh2", 1 );
+            f.SetBranchStatus( "Rec_effNoTh2", 1 );
+            f.SetBranchStatus( "Rec_angRes_p68", 1 );
+            f.SetBranchStatus( "Rec_angRes_p80", 1 );
+            // Full histograms for DL3
+            f.SetBranchStatus( "hEsysMCRelative2D", 1 );
+            f.SetBranchStatus( "hEsysMCRelative2DNoDirectionCut", 1 );
+            f.SetBranchStatus( "hAngularLogDiffEmc_2D", 1 );
+        }
+	f.Merge( outputfile.c_str() );
 	cout << "done.." << endl;
+        if( tree_type == "DL3reduced" )
+        {
+            write_reduced_merged_tree( outputfile, &f );
+         }
 	
 	// get one example of hEmc
 	// (this is needed later to get the binning right)
-	TFile* fO = new TFile( hname, "UPDATE" );
+	TFile* fO = new TFile( outputfile.c_str(), "UPDATE" );
 	if( fO->IsZombie() )
 	{
 		cout << "error writing hEmc to output file" << endl;
@@ -142,16 +144,18 @@ void merge( string ifile, char* outputfile, string tree_type = "DL3" )
 	fO->Close();
 	
 	// merge all log files
+        ostringstream i_sys;
 	if( ifile.find( ".root" ) != string::npos )
 	{
-		sprintf( hname, "cat %s*.log > %s.combine.log", ifile.substr( 0, ifile.size() - 5 ).c_str(), outputfile );
+                i_sys << "cat " << ifile.substr( 0, ifile.size() - 5 ).c_str() << "*.log > ";
 	}
 	else
 	{
-		sprintf( hname, "cat %s*.log > %s.combine.log", ifile.c_str(), outputfile );
+                i_sys << "cat " << ifile << "*.log > ";
 	}
-	cout << "merge log files into " << hname << endl;
-	system( hname );
+        i_sys << outputfile << ".combine.log";
+	cout << "merge log files into " << i_sys.str() << endl;
+	system( i_sys.str().c_str() );
 	cout << "done..";
 }
 
@@ -167,7 +171,7 @@ int main( int argc, char* argv[] )
 		{
 			VGlobalRunParameter fRunPara;
 			cout << fRunPara.getEVNDISP_VERSION() << endl;
-			exit( 0 );
+			exit( EXIT_FAILURE );
 		}
 	}
 	if( argc < 4 )
