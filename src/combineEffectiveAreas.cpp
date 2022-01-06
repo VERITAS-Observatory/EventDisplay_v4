@@ -1,8 +1,10 @@
 /*! \file combineEffectiveAreas.cpp
     \brief combine effective areas calculated for a one combination of ze,az,woff... into a single large file
 
+    Testing:
+    ./bin/combineEffectiveAreas "/lustre/fs23/group/veritas/IRFPRODUCTION/v486/CARE_June2020/V6_2012_2013a_ATM61_gamma/EffectiveAreas_DL3/Eff*" tt.root DL3reduced
 
-    \author Gernot Maier
+
 */
 
 #include "TChain.h"
@@ -21,15 +23,153 @@
 
 using namespace std;
 
-void write_reduced_merged_tree( string file_name, 
-                                TChain *f )
+/*
+ * convert TH2F histograms into arrays
+ *
+ *  hEsysMCRelative2D, hEsysMCRelative2DNoDirectionCut
+ *  x-axis: energy 30 bins
+ *  y-axis: energy bias E_{rec}/E_{MC} 75 
+ *
+ *  r e.g., hEsysMCRelative2D:
+ *
+ *  for the axes:
+ *
+ *  nbinsx --> number of bins
+ *  minx --> minimum of x-axis
+ *  maxx --> maximum of x-axis
+ *  (same for y-axis)
+ *  nbinsxy -> nbinsx x nbinsy
+ *  value -> histogram content (array of nbinsxy )
+ *
+ *  Meaning that the 2D histo is filled into a 1D array:
+ *
+ *  2d_array[0..nbinsx][0] = 1D_array[0… nbinsx]
+ *  ....
+ *  2d_array[0..nbinsx][3] = 1D_array[3 x nbinsx + 0… nbinsx]
+ *  and so on
+ */
+bool write_reduced_merged_tree( string inputfile,
+                                string outputfile,
+                                string tree_type = "DL3" )
 {
-    if( f )
+    if( tree_type != "DL3reduced" ) return true;
+
+    TChain f( "fEffArea" );
+    if( inputfile.find( ".root" ) == string::npos )
     {
-       cout << "AAA " << f->GetName() << endl;
+            inputfile += ".root";
+    }
+    int i_nMerged = f.Add( inputfile.c_str() );
+    if( !i_nMerged )
+    {
+       cout << "error writing reduced merged tree contents" << endl;
+       return false;
+    }
+    vector< string > hist_names;
+    hist_names.push_back( "hEsysMCRelative2D" );
+    hist_names.push_back( "hEsysMCRelative2DNoDirectionCut" );
+    hist_names.push_back( "hAngularLogDiffEmc_2D" );
+    vector< TH2F* > hist_to_read( hist_names.size(), 0 );
+    vector< int > nbinsx( hist_names.size(), 0 );
+    vector< float > min_x( hist_names.size(), 0. );
+    vector< float > max_x( hist_names.size(), 0. );
+    vector< int > nbinsy( hist_names.size(), 0 );
+    vector< float > min_y( hist_names.size(), 0. );
+    vector< float > max_y( hist_names.size(), 0. );
+    vector< int > nbinsxy( hist_names.size(), 0 );
+    const int max_nxy = 10000;
+    vector< float* > hist_value( hist_names.size(), new float[max_nxy] );
+
+    // initialize
+    for( unsigned int i = 0; i < hist_names.size(); i++ )
+    {
+        f.SetBranchAddress( hist_names[i].c_str(),
+                           &hist_to_read[i] );
     }
 
+    if( outputfile.find( ".root" ) == string::npos ) outputfile += ".root";
+    TFile* fO = new TFile( outputfile.c_str(), "UPDATE" );
+    if( fO->IsZombie() )
+    {
+            cout << "error writing hEmc to output file" << endl;
+            return false;
+    }
+    TTree *t = new TTree( "fEffAreaH2F",
+                          "effective area tree (2D histograms)" );
+  
+    // initialize branches
+    // assume that histograms are equivalent for all entries
+    f.GetEntry( 0 );
+    for( unsigned int h = 0; h < hist_names.size(); h++ )
+    {
+        t->Branch( (hist_names[h]+"_binsx").c_str(),
+                   &nbinsx[h],
+                   (hist_names[h]+"_binsx/I").c_str() );
+        t->Branch( (hist_names[h]+"_minx").c_str(),
+                   &min_x[h],
+                   (hist_names[h]+"_minx/F").c_str() );
+        t->Branch( (hist_names[h]+"_maxx").c_str(),
+                   &max_x[h],
+                   (hist_names[h]+"_maxx/F").c_str() );
+        if( hist_to_read[h] )
+        {
+            nbinsx[h] = hist_to_read[h]->GetXaxis()->GetNbins();
+            min_x[h] = hist_to_read[h]->GetXaxis()->GetXmin();
+            max_x[h] = hist_to_read[h]->GetXaxis()->GetXmax();
+        }
+        t->Branch( (hist_names[h]+"_binsy").c_str(),
+                   &nbinsy[h],
+                   (hist_names[h]+"_binsy/I").c_str() );
+        t->Branch( (hist_names[h]+"_miny").c_str(),
+                   &min_y[h],
+                   (hist_names[h]+"_miny/F").c_str() );
+        t->Branch( (hist_names[h]+"_maxy").c_str(),
+                   &max_y[h],
+                   (hist_names[h]+"_maxy/F").c_str() );
+        if( hist_to_read[h] )
+        {
+            nbinsy[h] = hist_to_read[h]->GetYaxis()->GetNbins();
+            min_y[h] = hist_to_read[h]->GetYaxis()->GetXmin();
+            max_y[h] = hist_to_read[h]->GetYaxis()->GetXmax();
+        }
+        t->Branch( (hist_names[h]+"_binsxy").c_str(),
+                   &nbinsxy[h],
+                   (hist_names[h]+"_binsxy/I").c_str() );
+        nbinsxy[h] = nbinsx[h] * nbinsy[h];
+        if( nbinsxy[h] > max_nxy )
+        {
+            cout << "error: histogram dimensions larger than hardwired values" << endl;
+            exit( EXIT_FAILURE );
+        }
+        t->Branch( (hist_names[h]+"_value").c_str(),
+                   hist_value[h],
+                   (hist_names[h]+"_value["+hist_names[h]+"_binsxy]/F").c_str() );
+    }
 
+    // loop over all entries and copy histograms to arrays
+    Long64_t nentries = f.GetEntries();
+    cout << "prepare reduced arrays for " << nentries << " entries" << endl;
+    int nxy = 0;
+    for( unsigned int i = 0; i < nentries; i++ )
+    {
+        f.GetEntry( i );
+        for( unsigned int h = 0; h < hist_to_read.size(); h++ )
+        {
+            if( !hist_to_read[h] ) continue;
+            for( int nx = 0; nx < hist_to_read[h]->GetXaxis()->GetNbins(); nx++ )
+            {
+                for( int ny = 0; ny < hist_to_read[h]->GetYaxis()->GetNbins(); ny++ )
+                {
+                    nxy = ny*hist_to_read[h]->GetXaxis()->GetNbins() + nx;
+                    hist_value[h][nxy] = hist_to_read[h]->GetBinContent( nx, ny );
+                }
+            }
+        }
+        t->Fill();
+     }
+     t->Write();
+     fO->Close();
+     return true;
 }
 
 void merge( string ifile, string outputfile, string tree_type = "DL3" )
@@ -86,10 +226,6 @@ void merge( string ifile, string outputfile, string tree_type = "DL3" )
         }
 	f.Merge( outputfile.c_str() );
 	cout << "done.." << endl;
-        if( tree_type == "DL3reduced" )
-        {
-            write_reduced_merged_tree( outputfile, &f );
-         }
 	
 	// get one example of hEmc
 	// (this is needed later to get the binning right)
@@ -117,7 +253,8 @@ void merge( string ifile, string outputfile, string tree_type = "DL3" )
 		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
 	}
-	VInstrumentResponseFunctionRunParameter* iRunPara = ( VInstrumentResponseFunctionRunParameter* )ifirst->Get( "makeEffectiveArea_runparameter" );
+	VInstrumentResponseFunctionRunParameter* iRunPara = 
+                   ( VInstrumentResponseFunctionRunParameter* )ifirst->Get( "makeEffectiveArea_runparameter" );
 	if( !iRunPara )
 	{
 		cout << "error copying VInstrumentResponseFunctionRunParameter to output file" << endl;
@@ -131,7 +268,8 @@ void merge( string ifile, string outputfile, string tree_type = "DL3" )
 	VGammaHadronCuts* iCuts = ( VGammaHadronCuts* )ifirst->Get( "GammaHadronCuts" );
 	if( iCuts )
 	{
-		cout << "copying gamma/hadron cuts from first file (" << ifirst->GetName() << ") into the output file" << endl;
+		cout << "copying gamma/hadron cuts from first file (";
+                cout << ifirst->GetName() << ") into the output file" << endl;
 		iCuts->Write();
 	}
 	else
@@ -142,7 +280,10 @@ void merge( string ifile, string outputfile, string tree_type = "DL3" )
 		exit( EXIT_FAILURE );
 	}
 	fO->Close();
-	
+}
+
+void write_log_files( string ifile, string outputfile )
+{
 	// merge all log files
         ostringstream i_sys;
 	if( ifile.find( ".root" ) != string::npos )
@@ -156,7 +297,7 @@ void merge( string ifile, string outputfile, string tree_type = "DL3" )
         i_sys << outputfile << ".combine.log";
 	cout << "merge log files into " << i_sys.str() << endl;
 	system( i_sys.str().c_str() );
-	cout << "done..";
+	cout << "done.." << endl;
 }
 
 
@@ -194,8 +335,8 @@ int main( int argc, char* argv[] )
 	cout << endl;
 	
 	merge( argv[1], argv[2], argv[3] );
+        write_reduced_merged_tree( argv[1], argv[2], argv[3] );
+        write_log_files( argv[1], argv[2] );
 	
 	cout << endl << "end combineEffectiveAreas" << endl;
-	
 }
-
