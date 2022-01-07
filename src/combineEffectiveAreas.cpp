@@ -48,23 +48,24 @@ using namespace std;
  *  2d_array[0..nbinsx][3] = 1D_array[3 x nbinsx + 0… nbinsx]
  *  and so on
  */
-bool write_reduced_merged_tree( string inputfile,
+bool write_reduced_merged_tree( vector< string > file_list,
                                 string outputfile,
                                 string tree_type = "DL3" )
 {
-    if( tree_type != "DL3reduced" ) return true;
+    if( tree_type != "DL3reduced" && tree_type != "DL3test" ) return true;
 
+    if( file_list.size() == 0 )
+    {
+            cout << "error: no files found to merge" << endl;
+            cout << "exiting.." << endl;
+            exit( EXIT_FAILURE );
+    }
     TChain f( "fEffArea" );
-    if( inputfile.find( ".root" ) == string::npos )
+    for( unsigned int i = 0; i < file_list.size(); i++ )
     {
-            inputfile += ".root";
+        f.Add( file_list[i].c_str() );
     }
-    int i_nMerged = f.Add( inputfile.c_str() );
-    if( !i_nMerged )
-    {
-       cout << "error writing reduced merged tree contents" << endl;
-       return false;
-    }
+
     vector< string > hist_names;
     hist_names.push_back( "hEsysMCRelative2D" );
     hist_names.push_back( "hEsysMCRelative2DNoDirectionCut" );
@@ -78,7 +79,11 @@ bool write_reduced_merged_tree( string inputfile,
     vector< float > max_y( hist_names.size(), 0. );
     vector< int > nbinsxy( hist_names.size(), 0 );
     const int max_nxy = 10000;
-    vector< float* > hist_value( hist_names.size(), new float[max_nxy] );
+    vector< float* > hist_value;
+    for( unsigned int i = 0; i < hist_names.size(); i++ )
+    {
+       hist_value.push_back( new float[max_nxy] );
+    }
 
     // initialize
     for( unsigned int i = 0; i < hist_names.size(); i++ )
@@ -144,7 +149,7 @@ bool write_reduced_merged_tree( string inputfile,
         t->Branch( (hist_names[h]+"_value").c_str(),
                    hist_value[h],
                    (hist_names[h]+"_value["+hist_names[h]+"_binsxy]/F").c_str() );
-    }
+     }
 
     // loop over all entries and copy histograms to arrays
     Long64_t nentries = f.GetEntries();
@@ -161,7 +166,7 @@ bool write_reduced_merged_tree( string inputfile,
                 for( int ny = 0; ny < hist_to_read[h]->GetYaxis()->GetNbins(); ny++ )
                 {
                     nxy = ny*hist_to_read[h]->GetXaxis()->GetNbins() + nx;
-                    hist_value[h][nxy] = hist_to_read[h]->GetBinContent( nx, ny );
+                    hist_value[h][nxy] = hist_to_read[h]->GetBinContent( nx+1, ny+1 );
                 }
             }
         }
@@ -172,26 +177,26 @@ bool write_reduced_merged_tree( string inputfile,
      return true;
 }
 
-void merge( string ifile, string outputfile, string tree_type = "DL3" )
+void merge( vector< string > file_list, 
+            string outputfile, 
+            string tree_type = "DL3" )
 {
-	TChain f( "fEffArea" );
-	if( ifile.find( ".root" ) == string::npos )
+	if( file_list.size() == 0 )
 	{
-                ifile += ".root";
-        }
-	int i_nMerged = f.Add( ifile.c_str() );
-	if( i_nMerged == 0 )
-	{
-		cout << "error: no files found to merge: " << endl;
-		cout << "\t" << ifile << endl;
+		cout << "error: no files found to merge" << endl;
 		cout << "exiting.." << endl;
 		exit( EXIT_FAILURE );
 	}
+	TChain f( "fEffArea" );
+        for( unsigned int i = 0; i < file_list.size(); i++ )
+        {
+            f.Add( file_list[i].c_str() );
+        }
         if( outputfile.find( ".root" ) == string::npos )
         {
             outputfile += ".root";
         }
-	cout << "merging " << i_nMerged << " files to " << outputfile << endl;
+	cout << "merging " << file_list.size() << " files to " << outputfile << endl;
 	
 	// set branches to be included in merged files
         f.SetBranchStatus( "*", 0 );
@@ -213,7 +218,7 @@ void merge( string ifile, string outputfile, string tree_type = "DL3" )
         f.SetBranchStatus( "Rec_e0", 1 );
         f.SetBranchStatus( "Rec_eff", 1 );
         f.SetBranchStatus( "hEsysMCRelative", 1 ); 
-        if( tree_type == "DL3" )
+        if( tree_type == "DL3" || tree_type == "DL3test" )
         {
             f.SetBranchStatus( "effNoTh2", 1 );
             f.SetBranchStatus( "Rec_effNoTh2", 1 );
@@ -226,6 +231,8 @@ void merge( string ifile, string outputfile, string tree_type = "DL3" )
         }
 	f.Merge( outputfile.c_str() );
 	cout << "done.." << endl;
+
+        // write_reduced_merged_tree( outputfile, outputfile, tree_type );
 	
 	// get one example of hEmc
 	// (this is needed later to get the binning right)
@@ -282,22 +289,55 @@ void merge( string ifile, string outputfile, string tree_type = "DL3" )
 	fO->Close();
 }
 
-void write_log_files( string ifile, string outputfile )
+void write_log_files( vector< string > file_list, string outputfile )
 {
 	// merge all log files
         ostringstream i_sys;
-	if( ifile.find( ".root" ) != string::npos )
-	{
-                i_sys << "cat " << ifile.substr( 0, ifile.size() - 5 ).c_str() << "*.log > ";
-	}
-	else
-	{
-                i_sys << "cat " << ifile << "*.log > ";
-	}
+        for( unsigned int i = 0; i < file_list.size(); i++ )
+        {
+            if( file_list[i].find( ".root" ) != string::npos )
+            {
+                    i_sys << "cat " << file_list[i].substr( 0, file_list[i].size() - 5 ).c_str() << ".log > ";
+            }
+            else
+            {
+                    i_sys << "cat " << file_list[i] << ".log > ";
+            }
+        }
+
         i_sys << outputfile << ".combine.log";
 	cout << "merge log files into " << i_sys.str() << endl;
 	system( i_sys.str().c_str() );
 	cout << "done.." << endl;
+}
+
+/*
+ * return list of effective area files
+ * to be merged
+ *
+ */
+vector< string > readListOfFiles( string iFile )
+{
+	vector< string > iList;
+	
+	ifstream is;
+	is.open( iFile.c_str() );
+	if( !is )
+	{
+		cout << "error while reading file list " << iFile << endl;
+		cout << "exiting...." << endl;
+		exit( EXIT_FAILURE );
+	}
+	string is_line;
+	
+	while( getline( is, is_line ) )
+	{
+		iList.push_back( is_line );
+	}
+	
+	is.close();
+	
+	return iList;
 }
 
 
@@ -324,6 +364,7 @@ int main( int argc, char* argv[] )
                 cout << "                - DL3 (default): entries required for DL3 analyis (large)" << endl;
                 cout << "                - all          : all entries of original trees (largest)" << endl;
                 cout << "                - anasum       : entries required for anasum analysis only (smallest)" << endl;
+                cout << "                - DL3reduced   : histograms are written as regular arrays for DL3 analysis" << endl;
 		cout << endl;
 		cout << "   <effective area files>    without .root suffix (e.g. effArea*. Note need of \"...\")" << endl;
 		cout << endl;
@@ -333,10 +374,12 @@ int main( int argc, char* argv[] )
 	cout << "combineEffectiveAreas (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
 	cout << "------------------------------------" << endl;
 	cout << endl;
+
+        vector< string > file_list = readListOfFiles( argv[1] );
 	
-	merge( argv[1], argv[2], argv[3] );
-        write_reduced_merged_tree( argv[1], argv[2], argv[3] );
-        write_log_files( argv[1], argv[2] );
+	merge( file_list, argv[2], argv[3] );
+        write_reduced_merged_tree( file_list, argv[2], argv[3] );
+        write_log_files( file_list, argv[2] );
 	
 	cout << endl << "end combineEffectiveAreas" << endl;
 }
