@@ -36,4 +36,4 @@ jobs:
         run: |
           root-config --version
           export EVNDISPSYS=$(echo $GITHUB_WORKSPACE)
-          make CTAnohessio
+          make VTS
