@@ -12,6 +12,7 @@
 #include "VMonteCarloRunHeader.h"
 
 #include "TFile.h"
+#include "TKey.h"
 #include "TTree.h"
 
 #include <iostream>
@@ -28,10 +29,26 @@ bool readRunParameter( TFile* fIn, string iPara )
 	VEvndispRunParameter* fPar = 0;
 	
 	fPar = ( VEvndispRunParameter* )fIn->Get( "runparameterV2" );
+        // possibly a DST file
 	if( !fPar )
 	{
 		fPar = ( VEvndispRunParameter* )fIn->Get( "runparameterDST" );
 	}
+        // possibly a anasum file -> check first (!) run directory
+        if( !fPar )
+        {
+           TIter next( fIn->GetListOfKeys() );
+           TKey *key = 0;
+           while( ( key = ( TKey * )next() ) )
+           {
+               string key_name = key->GetName();
+               if( key_name.find( "run_" ) != string::npos )
+               {
+                   fPar = ( VEvndispRunParameter* )fIn->Get( (key_name+"/stereo/runparameterV2").c_str() );
+                   break;
+               }
+           }
+        }
 	if( !fPar )
 	{
 		return false;
@@ -266,6 +283,7 @@ int main( int argc, char* argv[] )
 	}
 	
 	// open file
+        gErrorIgnoreLevel = kError;
 	TFile* fIn = new TFile( argv[1] );
 	if( fIn->IsZombie() )
 	{
@@ -302,6 +320,22 @@ int main( int argc, char* argv[] )
 	{
 		fPar = ( VEvndispRunParameter* )fIn->Get( "runparameterDST" );
 	}
+        // possibly a anasum file -> check first (!) run directory
+        if( !fPar )
+        {
+           TIter next( fIn->GetListOfKeys() );
+           TKey *key = 0;
+           while( ( key = ( TKey * )next() ) )
+           {
+               string key_name = key->GetName();
+               if( key_name.find( "run_" ) != string::npos )
+               {
+                   fPar = ( VEvndispRunParameter* )fIn->Get( (key_name+"/stereo/runparameterV2").c_str() );
+                   cout << "Reading run parameters from key_name" << endl;
+                   break;
+               }
+           }
+        }
 	
 	if( fPar )
 	{
