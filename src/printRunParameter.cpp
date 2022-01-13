@@ -266,7 +266,6 @@ int main( int argc, char* argv[] )
                 cout << "      -elevation    print (rough) average elevation" << endl;
                 cout << "      -wobble       print wobble offset" << endl;
                 cout << "      -wobbleInt    print wobble offset (as integer, x100)" << endl;
-                cout << "      -anasumrun <run number>" << endl;
 		cout << endl;
 		exit( 0 );
 	}
