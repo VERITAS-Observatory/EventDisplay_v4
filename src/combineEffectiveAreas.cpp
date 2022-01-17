@@ -81,6 +81,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
     Int_t nbins = 0;
     Double_t e0[1000];
     Double_t eff[1000];
+    Double_t effNoTh2[1000];
     Float_t esys_rel[1000];
     TH1D *hEcut = 0;
     f.SetBranchAddress( "ze", &ze );
@@ -94,6 +95,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
     f.SetBranchAddress( "index", &index );
     f.SetBranchAddress( "e0", e0 );
     f.SetBranchAddress( "eff", eff );
+    f.SetBranchAddress( "effNoTh2", effNoTh2 );
     f.SetBranchAddress( "esys_rel", esys_rel );
     f.SetBranchAddress( "hEcut", &hEcut );
     double min_index = 1.e10;
@@ -162,11 +164,13 @@ bool write_reduced_merged_tree( vector< string > file_list,
     UShort_t t_nbins = hEcut->GetNbinsX();
     Float_t t_e0[1000];
     Float_t t_eff[1000];
+    Float_t t_effNoTh2[1000];
     Float_t t_esys_rel[1000];
     for( unsigned int i = 0; i < t_nbins; i++ )
     {
         t_e0[i] = hEcut->GetXaxis()->GetBinCenter( i+1 );
         t_eff[i] = 0.;
+        t_effNoTh2[i] = 0.;
         t_esys_rel[i] = 0.;
     }
     t->Branch( "ze", &t_ze, "ze/F" );
@@ -179,6 +183,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
     t->Branch( "nbins", &t_nbins, "nbins/s" );
     t->Branch( "e0", t_e0, "e0[nbins]/F" );
     t->Branch( "eff", t_eff, "eff[nbins]/F" );
+    t->Branch( "effNoTh2", t_effNoTh2, "effNoTh2[nbins]/F" );
     t->Branch( "esys_rel", t_esys_rel, "esys_rel[nbins]/F" );
   
     // initialize branches
@@ -251,6 +256,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
         for( int b = 0; b < t_nbins; b++ )
         {
            t_eff[b] = 0.;
+           t_effNoTh2[b] = 0.;
            t_esys_rel[b] = 0.;
         }
         for( int b = 0; b < nbins; b++ )
@@ -259,6 +265,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
             if( ntemp_bin > 0 && ntemp_bin < t_nbins )
             {
                 t_eff[ntemp_bin-1] = eff[b];
+                t_effNoTh2[ntemp_bin-1] =  effNoTh2[b];
                 t_esys_rel[ntemp_bin-1] = esys_rel[b];
             }
         }
@@ -322,6 +329,7 @@ void merge( vector< string > file_list,
             f.SetBranchStatus( "e0", 1 );
             f.SetBranchStatus( "eff", 1 );
             f.SetBranchStatus( "esys_rel", 1 );
+            f.SetBranchStatus( "effNoTh2", 1 );
         }
         f.SetBranchStatus( "Rec_nbins", 1 );
         f.SetBranchStatus( "Rec_e0", 1 );
@@ -329,7 +337,6 @@ void merge( vector< string > file_list,
         // f.SetBranchStatus( "hEsysMCRelative", 1 ); 
         if( tree_type == "DL3" || tree_type == "DL3test" )
         {
-            f.SetBranchStatus( "effNoTh2", 1 );
             f.SetBranchStatus( "Rec_effNoTh2", 1 );
             f.SetBranchStatus( "Rec_angRes_p68", 1 );
             f.SetBranchStatus( "Rec_angRes_p80", 1 );
