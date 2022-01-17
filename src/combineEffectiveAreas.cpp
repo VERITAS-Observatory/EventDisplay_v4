@@ -25,6 +25,9 @@ using namespace std;
 
 /*
  * convert TH2F histograms into arrays
+ * 
+ *  energy axis is in all case 'true energy'
+ *  we skip therefore 
  *
  *  hEsysMCRelative2D, hEsysMCRelative2DNoDirectionCut
  *  x-axis: energy 30 bins
@@ -66,6 +69,54 @@ bool write_reduced_merged_tree( vector< string > file_list,
         f.Add( file_list[i].c_str() );
     }
 
+    // observational parameters and effective areas
+    Double_t ze = 0.;
+    Int_t az = 0;
+    Double_t azMin = 0.;
+    Double_t azMax = 0.;
+    Double_t Woff = 0.;
+    Double_t index = 0.;
+    Int_t noise = 0;
+    Double_t pedvar = 0.;
+    Int_t nbins = 0;
+    Double_t e0[1000];
+    Double_t eff[1000];
+    Float_t esys_rel[1000];
+    TH1D *hEcut = 0;
+    f.SetBranchAddress( "ze", &ze );
+    f.SetBranchAddress( "az", &az );
+    f.SetBranchAddress( "azMin", &azMin );
+    f.SetBranchAddress( "azMax", &azMax );
+    f.SetBranchAddress( "Woff", &Woff );
+    f.SetBranchAddress( "noise", &noise );
+    f.SetBranchAddress( "pedvar", &pedvar );
+    f.SetBranchAddress( "nbins", &nbins );
+    f.SetBranchAddress( "index", &index );
+    f.SetBranchAddress( "e0", e0 );
+    f.SetBranchAddress( "eff", eff );
+    f.SetBranchAddress( "esys_rel", esys_rel );
+    f.SetBranchAddress( "hEcut", &hEcut );
+    double min_index = 1.e10;
+    for( unsigned int i = 0; i < 1000; i++ )
+    {
+        f.GetEntry( i );
+        if( index < min_index ) min_index = index;
+    }
+    cout << "Min index for IRFs in true energy: " << min_index << endl;
+    if( hEcut ) 
+    {
+        cout << "Basic binning: " << hEcut->GetNbinsX();
+        cout << " [" << hEcut->GetXaxis()->GetXmin();
+        cout << ", " << hEcut->GetXaxis()->GetXmax() << "]" << endl;
+    }
+    else
+    {
+       cout << "Error: histogram hEcut not found for binning determination" << endl;
+       cout << "exiting..." << endl;
+       exit( EXIT_FAILURE );
+    }
+    
+    // histograms
     vector< string > hist_names;
     hist_names.push_back( "hEsysMCRelative2D" );
     hist_names.push_back( "hEsysMCRelative2DNoDirectionCut" );
@@ -101,6 +152,34 @@ bool write_reduced_merged_tree( vector< string > file_list,
     }
     TTree *t = new TTree( "fEffAreaH2F",
                           "effective area tree (2D histograms)" );
+    Float_t t_ze = 0;
+    UShort_t t_az = 0;
+    Float_t t_azMin = 0.;
+    Float_t t_azMax = 0.;
+    Float_t t_Woff = 0.;
+    UShort_t t_noise = 0;
+    Float_t t_pedvar = 0.;
+    UShort_t t_nbins = hEcut->GetNbinsX();
+    Float_t t_e0[1000];
+    Float_t t_eff[1000];
+    Float_t t_esys_rel[1000];
+    for( unsigned int i = 0; i < t_nbins; i++ )
+    {
+        t_e0[i] = hEcut->GetXaxis()->GetBinCenter( i+1 );
+        t_eff[i] = 0.;
+        t_esys_rel[i] = 0.;
+    }
+    t->Branch( "ze", &t_ze, "ze/F" );
+    t->Branch( "az", &t_az, "az/s" );
+    t->Branch( "azMin", &t_azMin, "azMin/F" );
+    t->Branch( "azMax", &t_azMax, "azMax/F" );
+    t->Branch( "Woff", &t_Woff, "Woff/F" );
+    t->Branch( "noise", &t_noise, "noise/s" );
+    t->Branch( "pedvar", &t_pedvar, "pedvar/F" );
+    t->Branch( "nbins", &t_nbins, "nbins/s" );
+    t->Branch( "e0", t_e0, "e0[nbins]/F" );
+    t->Branch( "eff", t_eff, "eff[nbins]/F" );
+    t->Branch( "esys_rel", t_esys_rel, "esys_rel[nbins]/F" );
   
     // initialize branches
     // assume that histograms are equivalent for all entries
@@ -155,9 +234,35 @@ bool write_reduced_merged_tree( vector< string > file_list,
     Long64_t nentries = f.GetEntries();
     cout << "prepare reduced arrays for " << nentries << " entries" << endl;
     int nxy = 0;
+    int ntemp_bin = 0;
     for( unsigned int i = 0; i < nentries; i++ )
     {
         f.GetEntry( i );
+        // IRFs as function of energy without spectral index dependence
+        if( TMath::Abs( index - min_index ) > 1.e-3 ) continue;
+        t_ze = ze;
+        t_az = az;
+        t_azMin = azMin;
+        t_azMax = azMax;
+        t_Woff = Woff;
+        t_noise = noise;
+        t_pedvar = pedvar;
+        // padding with zero
+        for( int b = 0; b < t_nbins; b++ )
+        {
+           t_eff[b] = 0.;
+           t_esys_rel[b] = 0.;
+        }
+        for( int b = 0; b < nbins; b++ )
+        {
+            ntemp_bin = hEcut->GetXaxis()->FindBin( e0[b] );
+            if( ntemp_bin > 0 && ntemp_bin < t_nbins )
+            {
+                t_eff[ntemp_bin-1] = eff[b];
+                t_esys_rel[ntemp_bin-1] = esys_rel[b];
+            }
+        }
+        // histograms
         for( unsigned int h = 0; h < hist_to_read.size(); h++ )
         {
             if( !hist_to_read[h] ) continue;
@@ -172,6 +277,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
         }
         t->Fill();
      }
+     cout << "\t reduced array tree size: " << t->GetEntries() << endl;
      t->Write();
      fO->Close();
      return true;
@@ -210,14 +316,17 @@ void merge( vector< string > file_list,
         f.SetBranchStatus( "noise", 1 );
         f.SetBranchStatus( "pedvar", 1 );
         f.SetBranchStatus( "index", 1 );
-        f.SetBranchStatus( "nbins", 1 );
-        f.SetBranchStatus( "e0", 1 );
-        f.SetBranchStatus( "eff", 1 );
-        f.SetBranchStatus( "esys_rel", 1 );
+        if( tree_type != "DL3reduced" )
+        {
+            f.SetBranchStatus( "nbins", 1 );
+            f.SetBranchStatus( "e0", 1 );
+            f.SetBranchStatus( "eff", 1 );
+            f.SetBranchStatus( "esys_rel", 1 );
+        }
         f.SetBranchStatus( "Rec_nbins", 1 );
         f.SetBranchStatus( "Rec_e0", 1 );
         f.SetBranchStatus( "Rec_eff", 1 );
-        f.SetBranchStatus( "hEsysMCRelative", 1 ); 
+        // f.SetBranchStatus( "hEsysMCRelative", 1 ); 
         if( tree_type == "DL3" || tree_type == "DL3test" )
         {
             f.SetBranchStatus( "effNoTh2", 1 );
@@ -379,7 +488,7 @@ int main( int argc, char* argv[] )
 	
 	merge( file_list, argv[2], argv[3] );
         write_reduced_merged_tree( file_list, argv[2], argv[3] );
-        write_log_files( file_list, argv[2] );
+        // write_log_files( file_list, argv[2] );
 	
 	cout << endl << "end combineEffectiveAreas" << endl;
 }
