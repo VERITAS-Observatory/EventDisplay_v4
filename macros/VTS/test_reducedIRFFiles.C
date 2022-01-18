@@ -91,6 +91,49 @@ TH2F* plot_array( TFile *f,
     return hA;
 }
 
+TGraph* get_effAreaGraph( TFile *f,
+                          string tree_name,
+                          string var_name,
+                          int iEntry )
+{
+    if( !f ) return 0;
+    TTree *t = (TTree*)f->Get( tree_name.c_str() );
+    if( !t ) return 0;
+
+    TGraph *g = new TGraph( 1 );
+    if( tree_name == "fEffArea" )
+    {
+        Int_t nbins;
+        Double_t e0[1000];
+        Double_t eff[1000];
+        t->SetBranchAddress( "nbins", &nbins );
+        t->SetBranchAddress( "e0", e0 );
+        t->SetBranchAddress( var_name.c_str(), eff );
+        t->GetEntry( iEntry );
+        g->SetMarkerStyle( 20 );
+        for( int i = 0; i < nbins; i++ )
+        {
+            g->SetPoint( i, e0[i], eff[i] );
+        }
+    }
+    else
+    {
+        UShort_t nbins;
+        Float_t e0[1000];
+        Float_t eff[1000];
+        t->SetBranchAddress( "nbins", &nbins );
+        t->SetBranchAddress( "e0", e0 );
+        t->SetBranchAddress( var_name.c_str(), eff );
+        t->GetEntry( iEntry );
+        g->SetMarkerStyle( 24 );
+        for( int i = 0; i < nbins; i++ )
+        {
+            g->SetPoint( i, e0[i], eff[i] );
+        }
+    }
+    return g;
+}
+
 void test_reducedIRFFiles( string iIRFFile,
                            string iHistogramName = "hEsysMCRelative2D",
                            int iEntry = 0 )
@@ -117,5 +160,27 @@ void test_reducedIRFFiles( string iIRFFile,
          h3->SetTitle( (iHistogramName + " (ratio)" ).c_str() );
          h3->DrawCopy( "colz" );
      }
+}
 
+void test_effectiveAreas( string iIRFFile,
+                          string iVariable = "effNoTh2",
+                           int iEntry = 0 )
+{
+     TFile *f = new TFile( iIRFFile.c_str() );
+     if( f->IsZombie() )
+     {
+        return 0;
+     }
+
+     TGraph *h1_eff = get_effAreaGraph( f, "fEffArea", iVariable, iEntry );
+     TGraph *h2_eff = get_effAreaGraph( f, "fEffAreaH2F", iVariable, iEntry );
+     if( h1_eff && h2_eff )
+     {
+         TCanvas *d = new TCanvas( "c_effNoTh2", "", 1380, 600, 600, 600 );
+         d->Draw();
+         d->cd();
+         h1_eff->Draw( "ap" );
+         h2_eff->SetMarkerColor(2);
+         h2_eff->Draw( "p" );
+    }
 }
