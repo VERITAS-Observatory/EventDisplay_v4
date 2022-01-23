@@ -323,12 +323,12 @@ void merge( vector< string > file_list,
         f.SetBranchStatus( "noise", 1 );
         f.SetBranchStatus( "pedvar", 1 );
         f.SetBranchStatus( "index", 1 );
+        f.SetBranchStatus( "nbins", 1 );
+        f.SetBranchStatus( "e0", 1 );
+        f.SetBranchStatus( "esys_rel", 1 );
         if( tree_type != "DL3reduced" )
         {
-            f.SetBranchStatus( "nbins", 1 );
-            f.SetBranchStatus( "e0", 1 );
             f.SetBranchStatus( "eff", 1 );
-            f.SetBranchStatus( "esys_rel", 1 );
             f.SetBranchStatus( "effNoTh2", 1 );
         }
         f.SetBranchStatus( "Rec_nbins", 1 );
