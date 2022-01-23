@@ -1,8 +1,6 @@
 /*! \class VEffectiveAreaCalculator
  *  \brief calculate effective areas and energy spectra
  *
- *  \author
- *  Gernot Maier
  */
 
 #include "VEffectiveAreaCalculator.h"
