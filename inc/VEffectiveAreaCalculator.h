@@ -308,6 +308,7 @@ class VEffectiveAreaCalculator
                 void   fillAngularResolution( unsigned int i_az, bool iContaintment_80p );
 		double getAzMean( double azmin, double azmax );
 		double getCRWeight( double iEMC_TeV_log10, TH1* h , bool for_back_map = false );
+                vector< double > get_irf_vector( int i_nbins, double *i_e0, double *i_irf, float *i_irfF = 0 );
 		bool   getEffectiveAreasFromFitFunction( TTree*, double azmin, double azmax, double ispectralindex );
 		void   getEffectiveAreasFromFitFunction( unsigned int, unsigned int, double, double&, double& );
 		double getEffectiveAreasFromHistograms( double erec, double ze, double woff, double iPedVar,

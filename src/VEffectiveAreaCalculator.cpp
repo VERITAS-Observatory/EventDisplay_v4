@@ -1254,6 +1254,32 @@ TH2F *VEffectiveAreaCalculator::interpolate_responseMatrix( double iV, double iV
     return hTemp;
 }
 
+/*
+ * align energy axis of an IRF  array (e.g. effective area)
+ *
+ */
+vector< double > VEffectiveAreaCalculator::get_irf_vector(
+                           int i_nbins,
+                           double *i_e0,
+                           double *i_irf,
+                           float  *i_irfF )
+{
+    vector< double > i_temp_IRF( fNBins, 0. );
+
+    for( unsigned int e = 0; e < fNBins; e++ )
+    {
+        for( int j = 0; j < i_nbins; j++ )
+        {
+            if( TMath::Abs( i_e0[j] - fEff_E0[e] ) < 1.e-5 )
+            {
+                if( i_irf ) i_temp_IRF[e] = i_irf[j];
+                else if( i_irfF ) i_temp_IRF[e] = i_irfF[j];
+            }
+        } 
+    }
+    return i_temp_IRF;
+}
+
 
 /*
  *
@@ -1304,20 +1330,12 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 	iEffArea->SetBranchAddress( "index", &index );
 	iEffArea->SetBranchAddress( "ze", &ze );
 	iEffArea->SetBranchAddress( "Woff", &fWoff );
-	if( fEffectiveAreaVsEnergyMC == 0 )
-	{
-		iEffArea->SetBranchAddress( "nbins", &nbins );
-		iEffArea->SetBranchAddress( "e0", e0 );
-		iEffArea->SetBranchAddress( "eff", eff );
-		//iEffArea->SetBranchAddress( "eff_error", eff_error );
-	}
-	else if( fEffectiveAreaVsEnergyMC == 1 )
-	{
-		iEffArea->SetBranchAddress( "Rec_nbins", &nbins );
-		iEffArea->SetBranchAddress( "Rec_e0", e0 );
-		iEffArea->SetBranchAddress( "Rec_eff", eff );
-		//iEffArea->SetBranchAddress( "Rec_eff_error", eff_error );
-	}
+        iEffArea->SetBranchAddress( "Rec_nbins", &nbins );
+        iEffArea->SetBranchAddress( "Rec_e0", e0 );
+        iEffArea->SetBranchAddress( "Rec_eff", eff );
+        // energy axes
+	iEffArea->SetBranchAddress( "nbins", &nbins_MC );
+	iEffArea->SetBranchAddress( "e0", e0_MC );
         // bias in energy reconstruction
         iEffArea->SetBranchAddress( "esys_rel", esys_rel );
 
@@ -1328,15 +1346,11 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 	if( bLikelihoodAnalysis )
 	{
 	  // MC effective areas
-	  iEffArea->SetBranchAddress( "nbins", &nbins_MC );
-	  iEffArea->SetBranchAddress( "e0", e0_MC );
 	  iEffArea->SetBranchAddress( "eff", eff_MC );
-
 	  // Response Matrix
 	  iEffArea->SetBranchAddress( "hEsysMCRelative2D" , &i_hEsysMCRelative2D );
 	}
-
-	if( iEffArea->GetBranchStatus( "hEsysMCRelative" ) )
+	else if( iEffArea->GetBranchStatus( "hEsysMCRelative" ) )
 	{
 		iEffArea->SetBranchAddress( "hEsysMCRelative", &i_hEsysMCRelative );
 	}
@@ -1369,34 +1383,9 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 	fVMeanEffectiveArea.assign( i_hEMC->GetNbinsX(), 0. );
 	fVMeanEffectiveAreaMC.assign( i_hEMC->GetNbinsX(), 0. );
 	fVTimeBinnedMeanEffectiveArea.assign( i_hEMC->GetNbinsX(), 0. );
-	vector< double > i_temp_Eff( i_hEMC->GetNbinsX(), 0. );
-	vector< double > i_temp_EffL( i_hEMC->GetNbinsX(), 0. );
-	vector< double > i_temp_EffU( i_hEMC->GetNbinsX(), 0. );
-	vector< double > i_temp_Esys;
-	vector< double > i_temp_Eff_MC;
-
-
 	if ( bLikelihoodAnalysis )
 	{
-	  i_temp_Eff_MC.resize( nbins_MC );
-	  fVTimeBinnedMeanEffectiveAreaMC.assign( i_hEMC->GetNbinsX(), 0. );
-	}
-
-	if( i_hEsysMCRelative )
-	{
-		i_temp_Esys.assign( i_hEsysMCRelative->GetNbinsX(), 0. );
-	}
-	vector< double > i_temp_EsysE;
-	if( i_hEsysMCRelative )
-	{
-		i_temp_EsysE.assign( i_hEsysMCRelative->GetNbinsX(), 0. );
-	}
-	if( i_hEsysMCRelative )
-	{
-		for( int i = 1; i <= i_hEsysMCRelative->GetNbinsX(); i++ )
-		{
-			fEff_EsysMCRelative_EnergyAxis.push_back( i_hEsysMCRelative->GetXaxis()->GetBinCenter( i ) );
-		}
+	    fVTimeBinnedMeanEffectiveAreaMC.assign( i_hEMC->GetNbinsX(), 0. );
 	}
 
 	cout << "\t selecting effective areas for mean az " << iAzMean << " deg, spectral index ";
@@ -1441,9 +1430,6 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 	double iInvMax = 1.e5;
 	int iIndexAz = 0;
 	double iInvMean = 0.;
-
-	bool fLotsOfPrintOuts = false;
-
 	///////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// loop over all entries in effective area tree
@@ -1455,7 +1441,8 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 		// check binning of effective areas
 		if( i_hEMC && ( int )i_hEMC->GetNbinsX() != ( int )fNBins )
 		{
-			cout << "VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms error: effective area curve with different binning";
+			cout << "VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms error:";
+                        cout << " effective area curve with different binning";
 			cout << " " << i_hEMC->GetNbinsX() << " " << fNBins << endl;
 			cout << "abort reading effective area tree..." << endl;
 			return false;
@@ -1485,9 +1472,6 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 					break;
 				}
 			}
-			// (GM) TODO check if it is really necessary to have the
-			//           zenith angles hardwired -> are they offset
-			//           by the wobble offset?
 			if( !i_ze_F )
 			{
 				for( unsigned int w = 0; w < fMCZe.size(); w++ )
@@ -1623,11 +1607,6 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 				i_index_index = fEff_SpectralIndex[i_index_ze][i_index_woff][i_index_noise].size() - 1;
 			}
 			unsigned int i_ID = i_index_index + 100 * ( i_index_noise + 100 * ( i_index_woff + 100 * i_index_ze ) );
-			if( fLotsOfPrintOuts )
-			{
-				cout << i_index_ze << " " << i_index_woff << " " << i_index_noise << " " << i_index_index << "\t" << i_ID << endl;
-			}
-
 			///////////////////////////////////////////////////
 			// read effective area and load into maps
 			///////////////////////////////////////////////////
@@ -1661,50 +1640,17 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 				cout << endl;
 				cout << "please check if this falls into your parameter space" << endl;
 			}
-			// effective areas vs energy (decision on vs MC, rec energy etc. has been made earlier)
-			for( unsigned int e = 0; e < fNBins; e++ )
-			{
-				i_temp_Eff[e] = 0.;
-				for( int j = 0; j < nbins; j++ )
-				{
-					if( TMath::Abs( e0[j] - fEff_E0[e] ) < 1.e-5 )
-					{
-						i_temp_Eff[e] = eff[j];
-					}
-				}
-			}
-			// energy bias histos may have different binning (i.e. to avoid artifacts and save up space) than the effective areas.
-                        TGraph *iG_temp_esys = new TGraph( 1 );
-                        for( int j = 0; j < nbins; j++ )
-                        {
-                            iG_temp_esys->SetPoint( j, e0[j], esys_rel[j] );
-                        }
-			for( int e = 0; e < i_hEsysMCRelative->GetNbinsX(); e++ )
-                        {
-                                i_temp_Esys[e] = iG_temp_esys->Eval( fEff_EsysMCRelative_EnergyAxis[e] );
-			}
-                        delete iG_temp_esys;
-			fEffArea_map[i_ID] = i_temp_Eff;
-                        fEff_EsysMCRelative[i_ID]  = i_temp_Esys;
+                        fEffArea_map[i_ID] = get_irf_vector( nbins, e0, eff);
+                        fEff_EsysMCRelative[i_ID]  = get_irf_vector( nbins_MC, 
+                                                                      e0_MC, 0,
+                                                                      esys_rel );
 
 			if ( bLikelihoodAnalysis )
 			{
 			  // Getting MC effective areas too
-			  i_temp_Eff_MC.assign(fNBins, 0);
-
-			  for( unsigned int e = 0; e < fNBins; e++ )
-			    {
-			      i_temp_Eff_MC[e] = 0.;
-			      for( int j = 0; j < nbins_MC; j++ )
-				{
-				  if( TMath::Abs( e0_MC[j] - fEff_E0[e] ) < 1.e-5 )
-				    {
-				      i_temp_Eff_MC[e] = eff_MC[j];
-				    }
-			  	} 
-			    }
-
-			  fEffAreaMC_map[i_ID] = i_temp_Eff_MC;
+			  fEffAreaMC_map[i_ID] = get_irf_vector( nbins_MC,
+                                                                 e0_MC,
+                                                                 eff_MC );
 			  fEsysMCRelative2D_map[i_ID] = (TH2F*)i_hEsysMCRelative2D->Clone();
 			  i_hEsysMCRelative2D->SetDirectory(0);
 			  i_hEsysMCRelative2D->AddDirectory(kFALSE);
@@ -1765,55 +1711,10 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 		cout << fZe[fZe.size() - 1];
 	}
 	cout << ")" << endl;
-	if( fEffectiveAreaVsEnergyMC == 0 )
-	{
-		cout << "\t (effective area vs MC energy)" << endl;
-	}
-	else
-	{
-		cout << "\t (effective area vs reconstructed energy)" << endl;
-	}
+        cout << "\t (effective area vs reconstructed energy)" << endl;
 	if( fSmoothIter > 0 )
 	{
 		smoothEffectiveAreas( fEffArea_map );
-	}
-	///////////////////////////////////////////////////
-	if( fLotsOfPrintOuts )
-	{
-		cout << "ze size " << fZe.size() << endl;
-		for( unsigned int z = 0; z < fZe.size(); z++ )
-		{
-			cout << "ze " << z << " " << fZe[z] << endl;
-			if( z < fEff_WobbleOffsets.size() )
-			{
-				cout << "\t woff size " << fEff_WobbleOffsets[z].size() << endl;
-				for( unsigned int w = 0; w < fEff_WobbleOffsets[z].size(); w++ )
-				{
-					cout << "\t woff " << w << " " << fEff_WobbleOffsets[z][w] << endl;
-					if( z < fEff_Noise.size() && w < fEff_Noise[z].size() )
-					{
-						cout << "\t\t noise size " << fEff_Noise[z][w].size() << endl;
-						for( unsigned n = 0; n < fEff_Noise[z][w].size(); n++ )
-						{
-							cout << "\t\t noise " << n << " " << fEff_Noise[z][w][n] << endl;
-							if( z < fEff_SpectralIndex.size() && w < fEff_SpectralIndex[z].size() && n < fEff_SpectralIndex[z][w].size() )
-							{
-								cout << "\t\t\t index size " << fEff_SpectralIndex[z][w][n].size() << endl;
-								for( unsigned s = 0; s < fEff_SpectralIndex[z][w][n].size(); s++ )
-								{
-									cout << "\t\t\t index " << s << " " << fEff_SpectralIndex[z][w][n][s] << endl;
-									unsigned int i_ID = s + 100 * ( n + 100 * ( w + 100 * z ) );
-									if( fEffArea_map.find( i_ID ) != fEffArea_map.end() )
-									{
-										cout << "\t\t\t map " << fEffArea_map[i_ID].size() << endl;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 	///////////////////////////////////////////////////
 	return true;
@@ -2705,6 +2606,10 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
                                 seff_L[i] = gEffAreaMC->GetErrorYlow( i );
                                 seff_U[i] = gEffAreaMC->GetErrorYhigh( i );
                                 eff_error[i] = 0.5 * ( seff_L[i] + seff_U[i] );
+                                // Note! 
+                                // hVEsysMCRelative with a different binning (lower)
+                                // than nbins; leads pairs of idential entries
+                                // in esys_rel
                                 if( hVEsysMCRelative[s][i_az] )
                                 {
                                     esys_rel[i] = hVEsysMCRelative[s][i_az]->GetBinContent( 
@@ -4145,6 +4050,7 @@ TH1D* VEffectiveAreaCalculator::getHistogramhEmc()
 
 TGraphErrors* VEffectiveAreaCalculator::getMeanSystematicErrorHistogram()
 {
+        cout << "BBB B" << fEffectiveAreas_meanN << endl;
 	if( fEffectiveAreas_meanN <= 0. )
 	{
 		return 0;
@@ -4158,7 +4064,6 @@ TGraphErrors* VEffectiveAreaCalculator::getMeanSystematicErrorHistogram()
 	gMeanSystematicErrorGraph->SetMarkerStyle( 20 );
 	vector< double > hX;
 	vector< double > i_eff_temp;
-	vector< double > i_eff_tempE;
 
 	////////////////////////////////////////////////////////
 	// get upper and lower zenith angle bins
@@ -4167,60 +4072,102 @@ TGraphErrors* VEffectiveAreaCalculator::getMeanSystematicErrorHistogram()
 	vector< vector< double > > i_ze_eff_temp( 2, hX );
 	for( unsigned int i = 0; i < i_ze_bins.size(); i++ )
 	{
-		////////////////////////////////////////////////////////
-		// get lower and upper wobble offset bins
-		////////////////////////////////////////////////////////
-		if( i_ze_bins[i] < fEff_WobbleOffsets.size() )
-		{
-			vector< unsigned int > i_woff_bins = getUpperLowBins( fEff_WobbleOffsets[i_ze_bins[i]], fEffectiveAreas_meanWoff );
-			vector< vector< double > > i_woff_eff_temp( 2, hX );
-			for( unsigned int w = 0; w < i_woff_bins.size(); w++ )
-			{
-				////////////////////////////////////////////////////////
-				// get lower and upper noise bins
-				////////////////////////////////////////////////////////
-				if( i_ze_bins[i] < fEff_Noise.size() && i_woff_bins[w] < fEff_Noise[i_ze_bins[i]].size() )
-				{
-					vector< unsigned int > i_noise_bins = getUpperLowBins( fEff_Noise[i_ze_bins[i]][i_woff_bins[w]], fEffectiveAreas_meanPedVar );
-					vector< vector< double > > i_noise_eff_temp( 2, hX );
-					for( unsigned int n = 0; n < i_noise_bins.size(); n++ )
-					{
-						////////////////////////////////////////////////////////
-						// get lower and upper spectral index bins
-						////////////////////////////////////////////////////////
-						if( i_ze_bins[i] < fEff_SpectralIndex.size() && i_woff_bins[w] < fEff_SpectralIndex[i_ze_bins[i]].size()
-								&& i_noise_bins[n] < fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]].size() )
-						{
-							vector< unsigned int > i_index_bins = getUpperLowBins( fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]],
-																  fEffectiveAreas_meanIndex );
-							unsigned int i_ID_0 = i_index_bins[0] + 100 * ( i_noise_bins[n] + 100 * ( i_woff_bins[w] + 100 * i_ze_bins[i] ) );
-							unsigned int i_ID_1 = i_index_bins[1] + 100 * ( i_noise_bins[n] + 100 * ( i_woff_bins[w] + 100 * i_ze_bins[i] ) );
-							i_noise_eff_temp[n] = interpolate_effectiveArea( fEffectiveAreas_meanIndex,
-												  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
-												  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
-												  fEff_EsysMCRelative[i_ID_0], fEff_EsysMCRelative[i_ID_1], false );
-							// don't interpolate errors, assume they are more or less constant
-							i_eff_tempE = fEff_EsysMCRelativeE[i_ID_0];
-						}
-					}
-					i_woff_eff_temp[w] = interpolate_effectiveArea( fEffectiveAreas_meanPedVar, fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]], fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[1]], i_noise_eff_temp[0], i_noise_eff_temp[1], false );
-				}
-			}
-			i_ze_eff_temp[i] = interpolate_effectiveArea( fEffectiveAreas_meanWoff, fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[0]], fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[1]], i_woff_eff_temp[0], i_woff_eff_temp[1], false );
-		}
-	}
-	i_eff_temp = interpolate_effectiveArea( fEffectiveAreas_meanZe, fZe[i_ze_bins[0]], fZe[i_ze_bins[1]], i_ze_eff_temp[0], i_ze_eff_temp[1], true );
-	if( fEff_EsysMCRelative_EnergyAxis.size() == i_eff_temp.size() )
-	{
-		unsigned int z = 0;
-		for( unsigned int i = 0; i < i_eff_temp.size(); i++ )
-		{
-                    gMeanSystematicErrorGraph->SetPoint( z, fEff_EsysMCRelative_EnergyAxis[i], i_eff_temp[i] );
-                    z++;
-		}
-	}
+            ////////////////////////////////////////////////////////
+            // get lower and upper wobble offset bins
+            ////////////////////////////////////////////////////////
+            if( i_ze_bins[i] >= fEff_WobbleOffsets.size() ) continue;
 
-	return gMeanSystematicErrorGraph;
+            vector< unsigned int > i_woff_bins = getUpperLowBins( fEff_WobbleOffsets[i_ze_bins[i]], fEffectiveAreas_meanWoff );
+            vector< vector< double > > i_woff_eff_temp( 2, hX );
+            for( unsigned int w = 0; w < i_woff_bins.size(); w++ )
+            {
+                ////////////////////////////////////////////////////////
+                // get lower and upper noise bins
+                ////////////////////////////////////////////////////////
+                if( i_ze_bins[i] >= fEff_Noise.size() ) continue;
+                if( i_woff_bins[w] >= fEff_Noise[i_ze_bins[i]].size() ) continue;
+                        
+                vector< unsigned int > i_noise_bins = getUpperLowBins( fEff_Noise[i_ze_bins[i]][i_woff_bins[w]], 
+                                                                       fEffectiveAreas_meanPedVar );
+                vector< vector< double > > i_noise_eff_temp( 2, hX );
+                for( unsigned int n = 0; n < i_noise_bins.size(); n++ )
+                {
+                    ////////////////////////////////////////////////////////
+                    // get lower and upper spectral index bins
+                    ////////////////////////////////////////////////////////
+                    if( i_ze_bins[i] >= fEff_SpectralIndex.size() ) continue;
+                    if( i_woff_bins[w] >= fEff_SpectralIndex[i_ze_bins[i]].size() ) continue;
+                    if( i_noise_bins[n] >= fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]].size() ) continue;
+                    vector< unsigned int > i_index_bins = getUpperLowBins( fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]],
+                                                                           fEffectiveAreas_meanIndex );
+                    unsigned int i_ID_0 = i_index_bins[0] + 100 * ( i_noise_bins[n] + 100 * ( i_woff_bins[w] + 100 * i_ze_bins[i] ) );
+                    unsigned int i_ID_1 = i_index_bins[1] + 100 * ( i_noise_bins[n] + 100 * ( i_woff_bins[w] + 100 * i_ze_bins[i] ) );
+                    i_noise_eff_temp[n] = interpolate_effectiveArea( 
+                                                   fEffectiveAreas_meanIndex,
+                                                   fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
+                                                   fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
+                                                   fEff_EsysMCRelative[i_ID_0], fEff_EsysMCRelative[i_ID_1], false );
+                }
+                i_woff_eff_temp[w] = interpolate_effectiveArea( fEffectiveAreas_meanPedVar, 
+                                                                fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]], 
+                                                                fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[1]], 
+                                                                i_noise_eff_temp[0], i_noise_eff_temp[1], false );
+        }
+        i_ze_eff_temp[i] = interpolate_effectiveArea( fEffectiveAreas_meanWoff, 
+                                                      fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[0]], 
+                                                      fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[1]], 
+                                                      i_woff_eff_temp[0], i_woff_eff_temp[1], false );
+    }
+
+
+    i_eff_temp = interpolate_effectiveArea( fEffectiveAreas_meanZe, 
+                                            fZe[i_ze_bins[0]],
+                                            fZe[i_ze_bins[1]], 
+                                            i_ze_eff_temp[0], i_ze_eff_temp[1], true );
+    if( i_eff_temp.size() == fEff_E0.size() && i_eff_temp.size() % 10 == 0 )
+    {
+        unsigned int z = 0;
+        double i_e = 0.;
+        double i_s = 0.;
+        // Note: error in filling e_sys_rel lead to duplications
+        // of points: check here first that this is the case
+        int iDuplicatedPoints = 0;
+        for( unsigned int i = 0; i < i_eff_temp.size(); i = i+2 )
+        {
+            if( TMath::Abs( i_eff_temp[i]-i_eff_temp[i+1]) < 1.e-4 )
+            {
+                iDuplicatedPoints++;
+            }
+        }
+        // Case 1: duplicated points
+        if( iDuplicatedPoints > 3 )
+        {
+            for( unsigned int i = 0; i < i_eff_temp.size(); i = i+2 )
+            {
+                i_e = 0.5*(fEff_E0[i] + fEff_E0[i+1]);
+                i_s = 0.5*(i_eff_temp[i] + i_eff_temp[i+1]);
+                if( TMath::Abs(i_s) > 1.e-5 )
+                {
+                    gMeanSystematicErrorGraph->SetPoint( z, i_e, i_s );
+                    z++;
+                }
+            }
+        }
+        // Case 2: no points duplicated
+        else
+        {
+           for( unsigned int i = 0; i < i_eff_temp.size(); i++ )
+           {
+               if( TMath::Abs(i_eff_temp[i]) > 1.e-5 )
+               {
+                  gMeanSystematicErrorGraph->SetPoint( z, fEff_E0[i], i_eff_temp[i] );
+                  z++;
+               }
+           }
+        }
+    }
+
+    return gMeanSystematicErrorGraph;
 }
 
 
