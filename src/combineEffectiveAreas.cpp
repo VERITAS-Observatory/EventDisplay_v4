@@ -84,6 +84,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
     Double_t effNoTh2[1000];
     Float_t esys_rel[1000];
     TH1D *hEcut = 0;
+    TProfile *hEsysMCRelative = 0;
     f.SetBranchAddress( "ze", &ze );
     f.SetBranchAddress( "az", &az );
     f.SetBranchAddress( "azMin", &azMin );
@@ -98,6 +99,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
     f.SetBranchAddress( "effNoTh2", effNoTh2 );
     f.SetBranchAddress( "esys_rel", esys_rel );
     f.SetBranchAddress( "hEcut", &hEcut );
+    f.SetBranchAddress( "hEsysMCRelative", &hEsysMCRelative );
     double min_index = 1.e10;
     for( unsigned int i = 0; i < 1000; i++ )
     {
@@ -165,12 +167,19 @@ bool write_reduced_merged_tree( vector< string > file_list,
     Float_t t_e0[1000];
     Float_t t_eff[1000];
     Float_t t_effNoTh2[1000];
+    // different binning for 
+    UShort_t t_esys_nbins = hEsysMCRelative->GetNbinsX();
+    Float_t t_esys_e0[1000];
     Float_t t_esys_rel[1000];
     for( unsigned int i = 0; i < t_nbins; i++ )
     {
         t_e0[i] = hEcut->GetXaxis()->GetBinCenter( i+1 );
         t_eff[i] = 0.;
         t_effNoTh2[i] = 0.;
+    }
+    for( unsigned int i = 0; i < t_esys_nbins; i++ )
+    {
+        t_esys_e0[i] = hEsysMCRelative->GetXaxis()->GetBinCenter( i+1 );
         t_esys_rel[i] = 0.;
     }
     t->Branch( "ze", &t_ze, "ze/F" );
@@ -184,7 +193,9 @@ bool write_reduced_merged_tree( vector< string > file_list,
     t->Branch( "e0", t_e0, "e0[nbins]/F" );
     t->Branch( "eff", t_eff, "eff[nbins]/F" );
     t->Branch( "effNoTh2", t_effNoTh2, "effNoTh2[nbins]/F" );
-    t->Branch( "esys_rel", t_esys_rel, "esys_rel[nbins]/F" );
+    t->Branch( "nbins_esys", &t_esys_nbins, "nbins_esys/s" );
+    t->Branch( "e0_esys", t_esys_e0, "e0_esys[nbins_esys]/F" );
+    t->Branch( "esys_rel", t_esys_rel, "esys_rel[nbins_esys]/F" );
   
     // initialize branches
     // assume that histograms are equivalent for all entries
@@ -252,11 +263,14 @@ bool write_reduced_merged_tree( vector< string > file_list,
         t_Woff = Woff;
         t_noise = noise;
         t_pedvar = pedvar;
-        // padding with zero
+        // padding with zeros
         for( int b = 0; b < t_nbins; b++ )
         {
            t_eff[b] = 0.;
            t_effNoTh2[b] = 0.;
+        }
+        for( int b = 0; b < t_esys_nbins; b++ )
+        {
            t_esys_rel[b] = 0.;
         }
         for( int b = 0; b < nbins; b++ )
@@ -266,9 +280,14 @@ bool write_reduced_merged_tree( vector< string > file_list,
             {
                 t_eff[ntemp_bin-1] = eff[b];
                 t_effNoTh2[ntemp_bin-1] =  effNoTh2[b];
-                t_esys_rel[ntemp_bin-1] = esys_rel[b];
             }
         }
+        // bias in energy reconstruction
+        for( int b = 0; b < t_esys_nbins; b++ )
+        {
+            t_esys_rel[b] = hEsysMCRelative->GetBinContent( b+1 );
+        }
+
         // histograms
         for( unsigned int h = 0; h < hist_to_read.size(); h++ )
         {
@@ -323,11 +342,11 @@ void merge( vector< string > file_list,
         f.SetBranchStatus( "noise", 1 );
         f.SetBranchStatus( "pedvar", 1 );
         f.SetBranchStatus( "index", 1 );
-        f.SetBranchStatus( "nbins", 1 );
-        f.SetBranchStatus( "e0", 1 );
-        f.SetBranchStatus( "esys_rel", 1 );
         if( tree_type != "DL3reduced" )
         {
+            f.SetBranchStatus( "nbins", 1 );
+            f.SetBranchStatus( "e0", 1 );
+            f.SetBranchStatus( "esys_rel", 1 );
             f.SetBranchStatus( "eff", 1 );
             f.SetBranchStatus( "effNoTh2", 1 );
         }
@@ -348,8 +367,6 @@ void merge( vector< string > file_list,
 	f.Merge( outputfile.c_str() );
 	cout << "done.." << endl;
 
-        // write_reduced_merged_tree( outputfile, outputfile, tree_type );
-	
 	// get one example of hEmc
 	// (this is needed later to get the binning right)
 	TFile* fO = new TFile( outputfile.c_str(), "UPDATE" );
