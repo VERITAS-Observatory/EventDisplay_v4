@@ -944,6 +944,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( string iInputFile, double az
 		gTimeBinnedMeanEffectiveArea->SetPoint( i, 0., 0., 0. );
 		gTimeBinnedMeanEffectiveArea->SetPointError( i, 0., 0., 0. );
 	}
+        fNTimeBinnedMeanEffectiveAreaMC = 0;
 
 
 	// current directory
