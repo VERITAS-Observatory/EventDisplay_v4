@@ -74,7 +74,6 @@ class VEffectiveAreaCalculator
 
 		vector< double >                      fEff_EsysMCRelative_EnergyAxis;
 		map< unsigned int, vector< double > > fEff_EsysMCRelative;
-		map< unsigned int, vector< double > > fEff_EsysMCRelativeE;
 		unsigned int     fNMeanEffectiveArea;
 		unsigned int     fNMeanEffectiveAreaMC;
 		unsigned int     fNMeanResponseMatrix;
@@ -237,9 +236,9 @@ class VEffectiveAreaCalculator
 		double e0[1000];
 		double eff[1000];
 		double effNoTh2[1000];
-		int nbins_MC;
-		double e0_MC[1000];
-		double eff_MC[1000];
+		UShort_t nbins_MC;
+		float e0_MC[1000];
+		float eff_MC[1000];
 		double seff_L[1000];
 		double seff_U[1000];
                 
@@ -263,6 +262,9 @@ class VEffectiveAreaCalculator
 
                 float Rec_angRes_p68[1000];
                 float Rec_angRes_p80[1000];
+
+                // H2F effective area tree
+                float fH2F_e0_esys[1000];
 
 		TTree* fAcceptance_AfterCuts_tree;       //Information for all the events after cuts to construct the background map
 		double fXoff_aC;
@@ -308,7 +310,8 @@ class VEffectiveAreaCalculator
                 void   fillAngularResolution( unsigned int i_az, bool iContaintment_80p );
 		double getAzMean( double azmin, double azmax );
 		double getCRWeight( double iEMC_TeV_log10, TH1* h , bool for_back_map = false );
-                vector< double > get_irf_vector( int i_nbins, double *i_e0, double *i_irf, float *i_irfF = 0 );
+                template <typename T> vector< T > get_irf_vector( int i_nbins, T* i_e0, T* i_irf );
+                TH2F*  get_irf2D_vector( int nx, float minx, float maxx, int ny, float miny, float maxy, float* value );
 		bool   getEffectiveAreasFromFitFunction( TTree*, double azmin, double azmax, double ispectralindex );
 		void   getEffectiveAreasFromFitFunction( unsigned int, unsigned int, double, double&, double& );
 		double getEffectiveAreasFromHistograms( double erec, double ze, double woff, double iPedVar,
@@ -317,7 +320,7 @@ class VEffectiveAreaCalculator
 		bool   getMonteCarloSpectra( VEffectiveAreaCalculatorMCHistograms* );
 		double getMCSolidAngleNormalization();
 		vector< unsigned int > getUpperLowBins( vector< double > i_values, double d );
-		bool   initializeEffectiveAreasFromHistograms( TTree*, TH1D*, double azmin, double azmax, double ispectralindex, double ipedvar );
+		bool   initializeEffectiveAreasFromHistograms( TTree*, TH1D*, double azmin, double azmax, double ispectralindex, double ipedvar, TTree *iEffAreaH2F = 0 );
 		vector< double > interpolate_effectiveArea( double iV, double iVLower, double iVupper,
 				vector< double > iEL, vector< double > iEU, bool iCos = true );
 		
