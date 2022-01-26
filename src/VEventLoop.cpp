@@ -517,22 +517,9 @@ bool VEventLoop::initEventLoop( string iFileName )
 	else
 	{
 		///////////////////////////////////////////////////////////////////////////////////////////
-		// set target by name (this means target coordinates must be hard wired into VTargets.cpp)
-		// (this should not be used in any serious analysis!!)
-		///////////////////////////////////////////////////////////////////////////////////////////
-		if( fRunPar->fTargetName.size() > 0 && fRunPar->fTargetDec < -90. )
-		{
-			if( !fArrayPointing->setTarget( fRunPar->fTargetName ) )
-			{
-				cout << endl;
-				cout << "...exiting" << endl;
-				exit( 0 );
-			}
-		}
-		///////////////////////////////////////////////////////////////////////////////////////////
 		// set target coordinates from command line or from DB
 		///////////////////////////////////////////////////////////////////////////////////////////
-		else if( fRunPar->fTargetDec > -99. && fRunPar->fTargetRA > -99. )
+		if( fRunPar->fTargetDec > -99. && fRunPar->fTargetRA > -99. )
 		{
 			fArrayPointing->setTargetName( fRunPar->fTargetName );
 			fArrayPointing->setTargetJ2000( fRunPar->fTargetDec, fRunPar->fTargetRA );
@@ -561,22 +548,9 @@ bool VEventLoop::initEventLoop( string iFileName )
 			else
 			{
 				///////////////////////////////////////////////////////////////////////////////////////////
-				// set target by name (this means target coordinates must be hard wired into VTargets.cpp)
-				// (this should not be used in any serious analysis!!)
-				///////////////////////////////////////////////////////////////////////////////////////////
-				if( fRunPar->fTargetName.size() > 0 && fRunPar->fTargetDec < -90. )
-				{
-					if( !fPointing.back()->setTarget( fRunPar->fTargetName ) )
-					{
-						cout << endl;
-						cout << "...exiting" << endl;
-						exit( 0 );
-					}
-				}
-				///////////////////////////////////////////////////////////////////////////////////////////
 				// set target coordinates from command line or from DB
 				///////////////////////////////////////////////////////////////////////////////////////////
-				else if( fRunPar->fTargetDec > -99. && fRunPar->fTargetRA > -99. )
+				if( fRunPar->fTargetDec > -99. && fRunPar->fTargetRA > -99. )
 				{
 					fPointing.back()->setTargetName( fRunPar->fTargetName );
 					fPointing.back()->setTargetJ2000( fRunPar->fTargetDec, fRunPar->fTargetRA );
