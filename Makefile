@@ -369,7 +369,6 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 	 	./obj/VPointingDB.o \
 		./obj/VSkyCoordinates.o \
 		./obj/VArrayPointing.o \
-		./obj/VTargets.o \
 		./obj/VStarCatalogue.o  ./obj/VStarCatalogue_Dict.o \
 		./obj/VStar.o ./obj/VStar_Dict.o \
 		./obj/VTrackingCorrections.o \
@@ -523,7 +522,6 @@ ACCOBJECT = ./obj/VTS.getRun_TimeElevAzim.o \
 		./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
-		./obj/VTargets.o \
 		./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 		./obj/VStar.o ./obj/VStar_Dict.o \
 		./obj/VDB_Connection.o \
@@ -612,7 +610,7 @@ ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_
 		./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o ./obj/VTableLookupRunParameter.o \
 		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
-		./obj/VTableLookupRunParameter_Dict.o ./obj/VTargets.o ./obj/VASlalib.o \
+		./obj/VTableLookupRunParameter_Dict.o ./obj/VASlalib.o \
 		./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 		./obj/VDB_Connection.o \
 		./obj/VStar.o ./obj/VStar_Dict.o \
@@ -879,8 +877,7 @@ printDISPTables:	$(PRINTDISPTABLESOBJ)
 ########################################################
 # compareDatawithMC
 ########################################################
-COMPAREDATAMCOBJ=	./obj/VTargets.o \
-                        ./obj/VASlalib.o \
+COMPAREDATAMCOBJ=	./obj/VASlalib.o \
 			./obj/CData.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
@@ -1525,7 +1522,6 @@ writeFITS_eventlistOBJ	= ./obj/writeFITS_eventlist.o \
 			  ./obj/VStarCatalogue.o  ./obj/VStarCatalogue_Dict.o \
 			  ./obj/VStar.o ./obj/VStar_Dict.o \
 			  ./obj/VASlalib.o \
-			  ./obj/VTargets.o \
 			  ./obj/VUtilities.o  \
 			  ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o
 
