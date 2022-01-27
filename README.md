@@ -2,8 +2,6 @@
 
 **Development version master - not to be used for science analysis**
 
-For development, please use the branch v485-dev2
-
 Main changes with respect to earlier version is the implementation of the correction factors to take the lower throughput / gains into account
 
 Release page: ...

@@ -1674,27 +1674,23 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 				}
 			}
 			// energy bias histos may have different binning (i.e. to avoid artifacts and save up space) than the effective areas.
+                        TGraph *iG_temp_esys = new TGraph( 1 );
+                        for( int j = 0; j < nbins; j++ )
+                        {
+                            iG_temp_esys->SetPoint( j, e0[j], esys_rel[j] );
+                        }
 			for( int e = 0; e < i_hEsysMCRelative->GetNbinsX(); e++ )
                         {
-                                i_temp_Esys[e] = 0.;
-                                for( int j = 0; j < nbins_MC; j++ )
-                                {
-                                        if( TMath::Abs( e0_MC[j] - fEff_EsysMCRelative_EnergyAxis[e] ) < 1.e-5 )
-                                        {
-                                                i_temp_Esys[e]  = esys_rel[j];
-                                        }                     
-                                }
-
+                                i_temp_Esys[e] = iG_temp_esys->Eval( fEff_EsysMCRelative_EnergyAxis[e] );
 			}
+                        delete iG_temp_esys;
 			fEffArea_map[i_ID] = i_temp_Eff;
                         fEff_EsysMCRelative[i_ID]  = i_temp_Esys;
 
 			if ( bLikelihoodAnalysis )
 			{
-				
 			  // Getting MC effective areas too
 			  i_temp_Eff_MC.assign(fNBins, 0);
-			  
 
 			  for( unsigned int e = 0; e < fNBins; e++ )
 			    {
@@ -1712,22 +1708,7 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 			  fEsysMCRelative2D_map[i_ID] = (TH2F*)i_hEsysMCRelative2D->Clone();
 			  i_hEsysMCRelative2D->SetDirectory(0);
 			  i_hEsysMCRelative2D->AddDirectory(kFALSE);
-			  
-			  
 			}
-
-
-			if( i_hEsysMCRelative )
-			{
-				for( int ti = 1; ti <= i_hEsysMCRelative->GetNbinsX(); ti++ )
-				{
-					i_temp_Esys[ti - 1] = i_hEsysMCRelative->GetBinContent( ti );
-					i_temp_EsysE[ti - 1] = i_hEsysMCRelative->GetBinError( ti );
-				}
-			}
-			fEff_EsysMCRelative[i_ID] = i_temp_Esys;
-			fEff_EsysMCRelativeE[i_ID] = i_temp_EsysE;
-
 			// this is neeeded only if there are no azimuth dependent effective areas
 			iIndexAz++;
 
@@ -4220,7 +4201,6 @@ TGraphErrors* VEffectiveAreaCalculator::getMeanSystematicErrorHistogram()
 												  fEff_EsysMCRelative[i_ID_0], fEff_EsysMCRelative[i_ID_1], false );
 							// don't interpolate errors, assume they are more or less constant
 							i_eff_tempE = fEff_EsysMCRelativeE[i_ID_0];
-
 						}
 					}
 					i_woff_eff_temp[w] = interpolate_effectiveArea( fEffectiveAreas_meanPedVar, fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]], fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[1]], i_noise_eff_temp[0], i_noise_eff_temp[1], false );
@@ -4235,12 +4215,8 @@ TGraphErrors* VEffectiveAreaCalculator::getMeanSystematicErrorHistogram()
 		unsigned int z = 0;
 		for( unsigned int i = 0; i < i_eff_temp.size(); i++ )
 		{
-			if( i_eff_tempE[i] > 0. )
-			{
-				gMeanSystematicErrorGraph->SetPoint( z, fEff_EsysMCRelative_EnergyAxis[i], i_eff_temp[i] );
-				gMeanSystematicErrorGraph->SetPointError( z, 0, i_eff_tempE[i] );
-				z++;
-			}
+                    gMeanSystematicErrorGraph->SetPoint( z, fEff_EsysMCRelative_EnergyAxis[i], i_eff_temp[i] );
+                    z++;
 		}
 	}
 

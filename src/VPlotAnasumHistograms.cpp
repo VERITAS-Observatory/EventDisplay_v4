@@ -1683,7 +1683,7 @@ void VPlotAnasumHistograms::plot_RBM_ring( double r, double iA, double t2, doubl
 		return;
 	}
 	// get ring width
-	double rw = iA / 4. / TMath::Pi() / r * t2 * 2.;
+	double rw = iA / 2. / r * t2;
 	rw /= 2.;
 	cout << "theta " << TMath::Sqrt( t2 ) << endl;
 	cout << "r " << r << endl;

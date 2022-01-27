@@ -44,6 +44,7 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		int fInterpolate;
 		string fInterpolateString;
 		char readwrite;
+                bool fUpdateInstrumentEpoch;
 		
 		bool  fLimitEnergyReconstruction;
 		
@@ -101,6 +102,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		void print( int iB = 0 );
 		void printHelp();
 		
-		ClassDef( VTableLookupRunParameter, 25 );
+		ClassDef( VTableLookupRunParameter, 26 );
 };
 #endif

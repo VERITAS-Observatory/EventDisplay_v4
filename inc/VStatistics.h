@@ -1,7 +1,4 @@
 /*!  \brief collection of useful analysis functions for significance and upper limit calculations
-    \author
-      Jamie Holder
-      Gernot Maier
 
 */
 
@@ -269,7 +266,7 @@ namespace VStatistics
 		{
 			TRolke i_Rolke;
 			i_Rolke.SetCL( CL );
-            i_Rolke.SetBounding( iBoundedLimits );
+                        i_Rolke.SetBounding( iBoundedLimits );
 			
 			double sdb = ratio * sqrt( nOff );
 			
@@ -283,7 +280,7 @@ namespace VStatistics
 		{
 			TRolke i_Rolke;
 			i_Rolke.SetCL( CL );
-            i_Rolke.SetBounding( iBoundedLimits );
+                        i_Rolke.SetBounding( iBoundedLimits );
 			i_Rolke.SetPoissonBkgKnownEff( ( int )nOn, ( int )nOff, 1. / ratio, 1. );
 			
 			return i_Rolke.GetUpperLimit();

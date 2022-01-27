@@ -172,20 +172,22 @@ endif
 # check compiler
 GCCVERSION=$(shell $(CXX) -dumpversion)
 GCCMACHINE=$(shell $(CXX) -dumpmachine)
-# ROOT 6 and check correct compiler version
-ifeq ($(ROOT6FLAG),-DROOT6)
-      # get major version of gcc, e.g. '4' in '4.6.'
-      GCC_VER_MAJOR := $(shell echo $(GCCVERSION) | cut -f1 -d.)
-      # get minor version of gcc, e.g. '6' in '4.6'
-      GCC_VER_MINOR := $(shell echo $(GCCVERSION) | cut -f2 -d.)
-      # check if gcc version is smaller than 4.8.
-      GCC_GT_4_8 := $(shell [ $(GCC_VER_MAJOR) -lt 3 -o \( $(GCC_VER_MAJOR) -eq 4 -a $(GCC_VER_MINOR) -lt 8 \) ] && echo true)
-endif
+# get major version of gcc, e.g. '4' in '4.6.'
+GCC_VER_MAJOR := $(shell echo $(GCCVERSION) | cut -f1 -d.)
+# get minor version of gcc, e.g. '6' in '4.6'
+GCC_VER_MINOR := $(shell echo $(GCCVERSION) | cut -f2 -d.)
+# check if gcc version is smaller than 4.8.
+GCC_GT_4_8 := $(shell [ $(GCC_VER_MAJOR) -lt 3 -o \( $(GCC_VER_MAJOR) -eq 4 -a $(GCC_VER_MINOR) -lt 8 \) ] && echo true)
+# check if gcc version is smaller than 4.9.
+GCC_GT_4_9 := $(shell [ $(GCC_VER_MAJOR) -lt 3 -o \( $(GCC_VER_MAJOR) -eq 4 -a $(GCC_VER_MINOR) -lt 9 \) ] && echo true)
 ########################################################
 # CXX FLAGS (taken from root)
 ########################################################
-ROOTCFLAGS   = $(shell root-config --auxcflags)
-ROOTCFLAGS   = -pthread -m64
+ifeq ($(GCC_GT_4_9),true)
+   ROOTCFLAGS 	= -pthread -m64 -std=c++11
+else
+   ROOTCFLAGS   = $(shell root-config --auxcflags)
+endif
 CXXFLAGS     += $(ROOTCFLAGS)
 CXXFLAGS     += -I$(shell root-config --incdir) -I$(shell root-config --incdir)/TMVA
 ########################################################
@@ -282,7 +284,8 @@ all VTS:	evndisp \
 	VTS.getLaserRunFromDB \
 	VTS.getRun_TimeElevAzim \
 	printRunParameter \
-        writeParticleRateFilesForTMVA
+        writeParticleRateFilesForTMVA \
+	logFile
 
 CTA:	evndisp \
         CTA.convert_hessio_to_VDST \
@@ -569,6 +572,19 @@ makeEffectiveArea:	$(EFFOBJECT) ./obj/VASlalib.o ./obj/makeEffectiveArea.o
 	@echo "$@ done"
 
 ########################################################
+# logFile
+########################################################
+LOGFILE =		./obj/logFile.o \
+					
+
+./obj/logFile.o:	./src/logFile.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+logFile:	$(LOGFILE)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+########################################################
 # anasum
 ########################################################
 ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \
@@ -678,7 +694,8 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
 		./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-		./obj/VLightCurve.o ./obj/VLightCurve_Dict.o ./obj/VLightCurveData.o \
+		./obj/VLightCurve.o ./obj/VLightCurve_Dict.o \
+		./obj/VLightCurveData.o ./obj/VLightCurveData_Dict.o \
 		./obj/VLightCurveUtilities.o ./obj/VLightCurveUtilities_Dict.o \
 		./obj/VLombScargle.o ./obj/VLombScargle_Dict.o \
 		./obj/VZDCF.o ./obj/VZDCF_Dict.o ./obj/VZDCFData.o \
@@ -728,6 +745,7 @@ endif
 ifeq ($(ROOT6),0)
 	@echo "COPYING pcm FILES TO lib"
 	cp -f ./obj/*.pcm ./lib/
+	cp -f ./obj/*.pcm ./bin/
 endif
 	@echo "$@ done"
 

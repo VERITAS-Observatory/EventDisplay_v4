@@ -341,7 +341,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 
 	// initialize time mask
 	fTimeMask->setMask( irun, iMJDStart, iMJDStopp, fRunPara->fTimeMaskFile );
-    fRunPara->setRunTimes( icounter, iMJDStart, iMJDStopp );
+        fRunPara->setRunTimes( icounter, iMJDStart, iMJDStopp );
 
 	// initialize cuts
 	setCuts( fRunPara->fRunList[fHisCounter], irun );
@@ -2155,6 +2155,7 @@ bool VStereoAnalysis::init_DL3Tree( int irun, int icounter )
 	fDL3EventTree->Branch( "Yderot",         &fDL3EventTree_Yderot,         "Yderot/D" );
 	fDL3EventTree->Branch( "NImages",        &fDL3EventTree_NImages,        "NImages/I" );
 	fDL3EventTree->Branch( "ImgSel",         &fDL3EventTree_ImgSel,         "ImgSel/l" );
+        fDL3EventTree->Branch( "MeanPedvar",     &fDL3EventTree_MeanPedvar,     "MeanPedvar/D" );
 	fDL3EventTree->Branch( "MSCW",           &fDL3EventTree_MSCW,           "MSCW/D" );
 	fDL3EventTree->Branch( "MSCL",           &fDL3EventTree_MSCL,           "MSCL/D" );
 	fDL3EventTree->Branch( "RA"            , &fDL3EventTree_RA,             "RA/D" );
@@ -2165,11 +2166,11 @@ bool VStereoAnalysis::init_DL3Tree( int irun, int icounter )
 	fDL3EventTree->Branch( "Xoff"          , &fDL3EventTree_Xoff          , "Xoff/D" );
 	fDL3EventTree->Branch( "Yoff"          , &fDL3EventTree_Yoff          , "Yoff/D" );
 	fDL3EventTree->Branch( "Acceptance"    , &fDL3EventTree_Acceptance    , "Acceptance/D" );
-    if ( fRunPara->fWriteAllEvents )
-    {
-        fDL3EventTree->Branch( "MVA"       , &fDL3EventTree_MVA,            "MVA/D" );
-        fDL3EventTree->Branch( "IsGamma"   , &fDL3EventTree_IsGamma,        "IsGamma/I" );
-    }
+        if ( fRunPara->fWriteAllEvents )
+        {
+            fDL3EventTree->Branch( "MVA"       , &fDL3EventTree_MVA,            "MVA/D" );
+            fDL3EventTree->Branch( "IsGamma"   , &fDL3EventTree_IsGamma,        "IsGamma/I" );
+        }
 	cout << endl;
 
 	// init radial acceptance class
@@ -2217,6 +2218,7 @@ void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot,
 	fDL3EventTree_YGroundCore    = c->Ycore;        // Gamma Ray Core-Ground intersection location (east)
 	fDL3EventTree_NImages        = c->NImages;      // Number of images used in reconstruction?
 	fDL3EventTree_ImgSel         = c->ImgSel;       // binary code describing which telescopes had images
+        fDL3EventTree_MeanPedvar     = c->meanPedvar_Image; // average pedvar
 	fDL3EventTree_MSCW           = c->MSCW;        // mean scaled width
 	fDL3EventTree_MSCL           = c->MSCL;        // mean scaled length
 	fDL3EventTree_EmissionHeight = c->EmissionHeight ; // height of shower maximum (in km) above telescope z-plane
@@ -2263,18 +2265,18 @@ void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot,
             fDL3EventTree_RA = 0.;
             fDL3EventTree_DEC = 0.;
         }
-    if ( fCuts && fRunPara->fWriteAllEvents )
-    {
-        fDL3EventTree_MVA = fCuts->getTMVA_EvaluationResult();
-        if ( bIsGamma )
+        if ( fCuts && fRunPara->fWriteAllEvents )
         {
-            fDL3EventTree_IsGamma = 1;
+            fDL3EventTree_MVA = fCuts->getTMVA_EvaluationResult();
+            if ( bIsGamma )
+            {
+                fDL3EventTree_IsGamma = 1;
+            }
+            else
+            {
+                fDL3EventTree_IsGamma = 0;
+            }
         }
-        else
-        {
-            fDL3EventTree_IsGamma = 0;
-        }
-    }
 
 
 	if( fDL3EventTree )

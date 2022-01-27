@@ -60,7 +60,7 @@ class VLightCurveData : public TObject
 		VLightCurveData( const VLightCurveData& );
 		~VLightCurveData() {}
 		bool   fillTeVEvndispData( string iAnaSumFile, double iThresholdSignificance = -99999., double iMinEvents = -9999.,
-								   double iUpperLimit = 0.99, int iUpperlimitMethod = 0, int iLiMaEqu = 17, double iMinEnergy = 0.,
+								   double iUpperLimit = 0.99, int iUpperlimitMethod = 5, int iLiMaEqu = 17, double iMinEnergy = 0.,
 								   double E0 = 1., double alpha = -2.5, bool i_bRolke = false );
 		double getFluxError();
 		double getFluxErrorDown()
@@ -108,6 +108,8 @@ class VLightCurveDataLessThan
 			
 			return false;
 		}
+                VLightCurveDataLessThan() {}
+               ~VLightCurveDataLessThan() {}
 };
 
 #endif

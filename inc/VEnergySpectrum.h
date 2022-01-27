@@ -239,7 +239,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 			fAnalysisMaxEffectiveAreaFraction = iMaxEff;
 		}
 		void setSignificanceParameters( double iSig = 2., double iMinOnEvents = 3., double iUpperLimit = 0.95,
-										int iLiAndMa = 17, int iULAlgo = 0 );
+										int iLiAndMa = 17, int iULAlgo = 5 );
 										
 		TF1* fitEnergySpectrum( string iname = "fit", bool bDraw = true );
 
