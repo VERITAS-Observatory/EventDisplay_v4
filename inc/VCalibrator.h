@@ -44,6 +44,7 @@ class VCalibrator : public VImageBaseAnalyzer
 		vector<TProfile* > htcpulse;
 		vector<TH1F* > htoff;
 		vector<TProfile* > htoff_vs_sum;
+        int fPedPerTelescopeTypeMinCnt;                         // statistical limit for IPR calculation
 		
 		//Extra calib output.
 		TTree* tExtra_ChargeTree;
@@ -95,6 +96,8 @@ class VCalibrator : public VImageBaseAnalyzer
 		bool readCalibrationDatafromDSTFiles( string iSourceFile );
 		void readfromVOFFLINE_DB( int gain_or_toff, string& iFile, vector< unsigned int >& VchannelList, vector< double >& Vmean, vector< double >& Vrms );
 		void readGains( bool iLowGain = false );
+                bool calculateIPRGraphs();
+                bool calculateIPRGraphs( string iPedFileName, unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel );
 		bool readLowGainMultiplier( );
 		bool readPeds( string iFile, bool, unsigned int );
 		bool readPeds_from_grisufile( bool, unsigned int );
