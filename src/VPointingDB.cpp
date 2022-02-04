@@ -389,27 +389,8 @@ bool VPointingDB::getDBRunInfo()
 		
 		float dist = atof( db_row->GetField( 17 ) );
 		float angl = atof( db_row->GetField( 18 ) );
-		
-		if( fabs( angl ) < 0.1 )
-		{
-			fDBWobbleNorth = dist;
-			fDBWobbleEast = 0.;
-		}
-		else if( fabs( angl - 90. ) < 0.1 )
-		{
-			fDBWobbleNorth = 0.;
-			fDBWobbleEast = dist;
-		}
-		else if( fabs( angl - 180. ) < 0.1 )
-		{
-			fDBWobbleNorth = -1.*dist;
-			fDBWobbleEast = 0.;
-		}
-		else if( fabs( angl - 270. ) < 0.1 )
-		{
-			fDBWobbleNorth = 0.;
-			fDBWobbleEast = -1.*dist;
-		}
+        fDBWobbleNorth = dist * cos( angl * TMath::DegToRad() );
+        fDBWobbleEast = dist * sin( angl * TMath::DegToRad() );
 	}
 	else
 	{
