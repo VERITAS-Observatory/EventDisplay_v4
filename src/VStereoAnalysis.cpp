@@ -1899,12 +1899,6 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
 			cout << "exiting..." << endl;
 			exit( EXIT_FAILURE );
 		}
-		fDataFrogsTree = ( TTree* )fDataFile->Get( "frogspars" );
-		if( fDataFrogsTree )
-		{
-                        cout << "VStereoAnalysis::getDataFromFile() info: found frogspars tree" << endl;
-			fDataRunTree->AddFriend( fDataFrogsTree );
-		}
 		c = new CData( fDataRunTree );
 		// read current (major) epoch from data file
 		VEvndispRunParameter* i_runPara = ( VEvndispRunParameter* )fDataFile->Get( "runparameterV2" );
