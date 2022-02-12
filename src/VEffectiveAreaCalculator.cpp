@@ -1300,7 +1300,6 @@ TH2F* VEffectiveAreaCalculator::get_irf2D_vector( int nbinsx, float x_min, float
     return h;
 }
 
-
 /*
  *
  *  CALLED TO USE EFFECTIVE AREAS
@@ -1310,7 +1309,7 @@ TH2F* VEffectiveAreaCalculator::get_irf2D_vector( int nbinsx, float x_min, float
 bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( 
                 TTree* iEffArea, TH1D* i_hEMC, 
                 double azmin, double azmax,
-		double iSpectralIndex, double ipedvar,
+                double iSpectralIndex, double ipedvar,
                 TTree* iEffAreaH2F )
 {
 	if( !iEffArea )
@@ -1328,17 +1327,13 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms(
 		cout << "---- End of Warning ----" << endl;
 		i_hEMC = new TH1D( "hEmc", "", nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
 	}
-
-
 	// mean azimuth angle
 	double iAzMean = getAzMean( azmin, azmax );
-	int i_az = 0;
 
 	////////////////////////////
 	// define input tree
 	double TazMin, TazMax, index;
 	double Tpedvar = 1.;
-	iEffArea->SetBranchAddress( "az", &i_az );
 	iEffArea->SetBranchAddress( "azMin", &TazMin );
 	iEffArea->SetBranchAddress( "azMax", &TazMax );
 	if( iEffArea->GetBranchStatus( "pedvar" ) )
@@ -1352,57 +1347,56 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms(
 	iEffArea->SetBranchAddress( "index", &index );
 	iEffArea->SetBranchAddress( "ze", &ze );
 	iEffArea->SetBranchAddress( "Woff", &fWoff );
-        iEffArea->SetBranchAddress( "Rec_nbins", &nbins );
-        iEffArea->SetBranchAddress( "Rec_e0", e0 );
-        iEffArea->SetBranchAddress( "Rec_eff", eff );
-        /////////////////////////////////////////////////
-        // reading of effective area tree with values
-        // as function of true energy
-        int fH2F_treecounter_offset = 0;
-        UShort_t fH2F_nbins_esys = 0;
-        float fH2F_esys_rel[1000];
-        int fH2F_EsysMCRelative2D_nbinsx = 0;
-        float fH2F_EsysMCRelative2D_minx = 0.;
-        float fH2F_EsysMCRelative2D_maxx = 0.;
-        int fH2F_EsysMCRelative2D_nbinsy = 0;
-        float fH2F_EsysMCRelative2D_miny = 0.;
-        float fH2F_EsysMCRelative2D_maxy = 0.;
-        int fH2F_EsysMCRelative2D_binsxy = 0;
-        float fH2F_EsysMCRelative2D_value[10000];
-        if( iEffAreaH2F )
+    iEffArea->SetBranchAddress( "Rec_nbins", &nbins );
+    iEffArea->SetBranchAddress( "Rec_e0", e0 );
+    iEffArea->SetBranchAddress( "Rec_eff", eff );
+    /////////////////////////////////////////////////
+    // reading of effective area tree with values
+    // as function of true energy
+    int fH2F_treecounter_offset = 0;
+    UShort_t fH2F_nbins_esys = 0;
+    float fH2F_esys_rel[1000];
+    int fH2F_EsysMCRelative2D_nbinsx = 0;
+    float fH2F_EsysMCRelative2D_minx = 0.;
+    float fH2F_EsysMCRelative2D_maxx = 0.;
+    int fH2F_EsysMCRelative2D_nbinsy = 0;
+    float fH2F_EsysMCRelative2D_miny = 0.;
+    float fH2F_EsysMCRelative2D_maxy = 0.;
+    int fH2F_EsysMCRelative2D_binsxy = 0;
+    float fH2F_EsysMCRelative2D_value[10000];
+    if( iEffAreaH2F )
+    {
+        fH2F_treecounter_offset = iEffArea->GetEntries() / iEffAreaH2F->GetEntries();
+        if( fH2F_treecounter_offset != 20 )
         {
-            fH2F_treecounter_offset = iEffArea->GetEntries() / iEffAreaH2F->GetEntries();
-            if( fH2F_treecounter_offset != 20 )
-            {
-                 cout << "Warning in effective area reading: expected ratio of entries between";
-                 cout << " effective area trees to be 20" << endl;
-            }
-            iEffAreaH2F->SetBranchAddress( "nbins_esys", &fH2F_nbins_esys );
-            iEffAreaH2F->SetBranchAddress( "e0_esys", &fH2F_e0_esys);
-            iEffAreaH2F->SetBranchAddress( "esys_rel", &fH2F_esys_rel );
-
-            // Binned likelihood analysis requires
-            // MC effective areas and response matrix
-            // Getting MC eff
-            if( bLikelihoodAnalysis )
-            {
-                // MC energies and effective areas
-                iEffAreaH2F->SetBranchAddress( "nbins", &nbins_MC );
-                iEffAreaH2F->SetBranchAddress( "e0", e0_MC );
-                iEffAreaH2F->SetBranchAddress( "eff", eff_MC );
-                // Response Matrix
-                iEffAreaH2F->SetBranchAddress( "hEsysMCRelative2D_binsx", &fH2F_EsysMCRelative2D_nbinsx );
-                iEffAreaH2F->SetBranchAddress( "hEsysMCRelative2D_minx", &fH2F_EsysMCRelative2D_minx );
-                iEffAreaH2F->SetBranchAddress( "hEsysMCRelative2D_maxx", &fH2F_EsysMCRelative2D_maxx );
-                iEffAreaH2F->SetBranchAddress( "hEsysMCRelative2D_binsy", &fH2F_EsysMCRelative2D_nbinsy );
-                iEffAreaH2F->SetBranchAddress( "hEsysMCRelative2D_miny", &fH2F_EsysMCRelative2D_miny );
-                iEffAreaH2F->SetBranchAddress( "hEsysMCRelative2D_maxy", &fH2F_EsysMCRelative2D_maxy );
-                iEffAreaH2F->SetBranchAddress( "hEsysMCRelative2D_binsxy", &fH2F_EsysMCRelative2D_binsxy );
-                iEffAreaH2F->SetBranchAddress( "hEsysMCRelative2D_value", fH2F_EsysMCRelative2D_value );
-                // iEffArea->SetBranchAddress( "hEsysMCRelative2D" , &i_hEsysMCRelative2D );
-            }
+             cout << "Warning in effective area reading: expected ratio of entries between";
+             cout << " effective area trees to be 20" << endl;
         }
-	if( iEffArea->GetEntries() == 0 )
+        iEffAreaH2F->SetBranchAddress( "nbins_esys", &fH2F_nbins_esys );
+        iEffAreaH2F->SetBranchAddress( "e0_esys", &fH2F_e0_esys);
+        iEffAreaH2F->SetBranchAddress( "esys_rel", &fH2F_esys_rel );
+
+        // Binned likelihood analysis requires
+        // MC effective areas and response matrix
+        // Getting MC eff
+        if( bLikelihoodAnalysis )
+        {
+            // MC energies and effective areas
+            iEffAreaH2F->SetBranchAddress( "nbins", &nbins_MC );
+            iEffAreaH2F->SetBranchAddress( "e0", e0_MC );
+            iEffAreaH2F->SetBranchAddress( "eff", eff_MC );
+            // Response Matrix
+            iEffAreaH2F->SetBranchAddress( "hEsysMCRelative2D_binsx", &fH2F_EsysMCRelative2D_nbinsx );
+            iEffAreaH2F->SetBranchAddress( "hEsysMCRelative2D_minx", &fH2F_EsysMCRelative2D_minx );
+            iEffAreaH2F->SetBranchAddress( "hEsysMCRelative2D_maxx", &fH2F_EsysMCRelative2D_maxx );
+            iEffAreaH2F->SetBranchAddress( "hEsysMCRelative2D_binsy", &fH2F_EsysMCRelative2D_nbinsy );
+            iEffAreaH2F->SetBranchAddress( "hEsysMCRelative2D_miny", &fH2F_EsysMCRelative2D_miny );
+            iEffAreaH2F->SetBranchAddress( "hEsysMCRelative2D_maxy", &fH2F_EsysMCRelative2D_maxy );
+            iEffAreaH2F->SetBranchAddress( "hEsysMCRelative2D_binsxy", &fH2F_EsysMCRelative2D_binsxy );
+            iEffAreaH2F->SetBranchAddress( "hEsysMCRelative2D_value", fH2F_EsysMCRelative2D_value );
+        }
+    }
+    if( iEffArea->GetEntries() == 0 )
 	{
 		return false;
 	}
@@ -1411,15 +1405,12 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms(
 	// prepare the energy vectors
 	// (binning should be the same for all entries in the effective area tree)
 	////////////////////////////////////////////////////////////////////////////////////
-
 	iEffArea->GetEntry( 0 );
-
 	if( !i_hEMC )
 	{
 		cout << "VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms error: no effective area histogram found" << endl;
 		return false;
 	}
-
 	fEff_E0.clear();
 	fEff_E0.swap( fEff_E0 );
 	for( int b = 1; b <= i_hEMC->GetNbinsX(); b++ )
@@ -1475,6 +1466,7 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms(
 	bool i_index_F = false;
 	unsigned int i_index_index = 0;
 
+    int count_max_az_bins = 0;
 	double iInvMax = 1.e5;
 	int iIndexAz = 0;
 	double iInvMean = 0.;
@@ -1485,28 +1477,24 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms(
 	for( int i = 0; i < iEffArea->GetEntries(); i++ )
 	{
 		iEffArea->GetEntry( i );
-                if( iEffAreaH2F )
-                {
-                    iEffAreaH2F->GetEntry( i % fH2F_treecounter_offset );
-                }
 
-		// check binning of effective areas
-		if( i_hEMC && ( int )i_hEMC->GetNbinsX() != ( int )fNBins )
-		{
-			cout << "VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms error:";
-                        cout << " effective area curve with different binning";
-			cout << " " << i_hEMC->GetNbinsX() << " " << fNBins << endl;
-			cout << "abort reading effective area tree..." << endl;
-			return false;
-		}
 		///////////////////////////////////////////////////
 		// check the azimuth range
 		///////////////////////////////////////////////////
 
 		// expect a couple of az bins and then a last bin with the average azimuth bin; typically [-1000., 1000.]
 		// this is the sign to read effective areas
+        // iIndexAz should be selected according to the mean az of the run
+        // (az is checked at the end of this loop
+        // effective areas used are those from iIndexAz
 		if( fabs( TazMin ) > 5.e2 || fabs( TazMax ) > 5.e2 )
 		{
+            // number of az bin required for access of iEffAreaH2F
+            if( count_max_az_bins == 0 )
+            {
+                count_max_az_bins = i;
+                cout << "\t\t number of az bin: " << count_max_az_bins << endl;
+            }
 			iInvMax = 1.e5;
 			iEffArea->GetEntry( iIndexAz );
 
@@ -1660,75 +1648,51 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms(
 			}
 			unsigned int i_ID = i_index_index + 100 * ( i_index_noise + 100 * ( i_index_woff + 100 * i_index_ze ) );
 			///////////////////////////////////////////////////
-			// read effective area and load into maps
+			// read effective area and load them into maps
 			///////////////////////////////////////////////////
-			if( nbins <= 0 )
-			{
-				cout << "WARNING : incomplete effective areas for id " << i_ID << endl;
-				cout << i_index_index << "\t" << i_index_noise << "\t" << i_index_woff << "\t" << i_index_ze << endl;
-				cout << "in bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms(";
-				cout << "TTree *iEffArea, double azmin, double azmax, double iSpectralIndex )" << endl;
-				cout << "Missing effective area:";
-				if( i_index_ze < fZe.size() )
-				{
-					cout << " ze = " << fZe[i_index_ze] << " [deg],";
-				}
-				if( i_index_ze < fEff_WobbleOffsets.size() && i_index_woff < fEff_WobbleOffsets[i_index_ze].size() )
-				{
-					cout << " woff = " << fEff_WobbleOffsets[i_index_ze][i_index_woff] << " [deg]";
-				}
-				if( i_index_ze < fEff_Noise.size() &&
-						i_index_woff < fEff_Noise[i_index_ze].size() &&
-						i_index_noise < fEff_Noise[i_index_ze][i_index_woff].size() )
-				{
-					cout << " noise = " << fEff_Noise[i_index_ze][i_index_woff][i_index_noise];
-				}
-				if( i_index_ze < fEff_SpectralIndex.size() && i_index_woff < fEff_SpectralIndex[i_index_ze].size() &&
-						i_index_noise < fEff_SpectralIndex[i_index_ze][i_index_woff].size() &&
-						i_index_index < fEff_SpectralIndex[i_index_ze][i_index_woff][i_index_noise].size() )
-				{
-					cout << " spectral index = " << fEff_SpectralIndex[i_index_ze][i_index_woff][i_index_noise][i_index_index];
-				}
-				cout << endl;
-				cout << "please check if this falls into your parameter space" << endl;
-			}
-                        fEffArea_map[i_ID] = get_irf_vector<double>( nbins, e0, eff);
+            //
+            fEffArea_map[i_ID] = get_irf_vector<double>( nbins, e0, eff);
 
-                        fEff_EsysMCRelative[i_ID].resize( fH2F_nbins_esys, 0. );
-                        for( unsigned int it = 0; it < fH2F_nbins_esys; it++ )
-                        {
-                            fEff_EsysMCRelative[i_ID][it] = fH2F_esys_rel[it];
-                        }
+            // read 2D histograms
+            if( iEffAreaH2F && count_max_az_bins > 0 )
+            {
+                iEffAreaH2F->GetEntry( iIndexAz / fH2F_treecounter_offset + iIndexAz % count_max_az_bins );
+            }
+
+            fEff_EsysMCRelative[i_ID].resize( fH2F_nbins_esys, 0. );
+            for( unsigned int it = 0; it < fH2F_nbins_esys; it++ )
+            {
+                fEff_EsysMCRelative[i_ID][it] = fH2F_esys_rel[it];
+            }
 
 			if ( bLikelihoodAnalysis )
 			{
-			    // Getting MC effective areas too
-                            
+			    // Getting MC effective areas
 			    vector< float > v_mc = get_irf_vector<float >( nbins_MC,
                                                                  e0_MC,
                                                                  eff_MC );
-                            fEffAreaMC_map[i_ID].resize( v_mc.size(), 0. );
-                            for( unsigned int it = 0; it < v_mc.size(); it++ )
-                            {
-                                 fEffAreaMC_map[i_ID][it] = v_mc[it];
-                            }
+                fEffAreaMC_map[i_ID].resize( v_mc.size(), 0. );
+                for( unsigned int it = 0; it < v_mc.size(); it++ )
+                {
+                     fEffAreaMC_map[i_ID][it] = v_mc[it];
+                }
 			    TH2F* i_hEsysMCRelative2D = get_irf2D_vector( fH2F_EsysMCRelative2D_nbinsx,
-                                                                            fH2F_EsysMCRelative2D_minx,
-                                                                            fH2F_EsysMCRelative2D_maxx,
-                                                                            fH2F_EsysMCRelative2D_nbinsy,
-                                                                            fH2F_EsysMCRelative2D_miny,
-                                                                            fH2F_EsysMCRelative2D_maxy,
-                                                                            fH2F_EsysMCRelative2D_value );
-                            if( i_hEsysMCRelative2D )
-                            {
-                                fEsysMCRelative2D_map[i_ID] = (TH2F*)i_hEsysMCRelative2D->Clone();
-                                i_hEsysMCRelative2D->SetDirectory(0);
-                                i_hEsysMCRelative2D->AddDirectory(kFALSE);
-                            }
-                            else
-                            {
-                                fEsysMCRelative2D_map[i_ID] = 0;
-                            }
+                                                              fH2F_EsysMCRelative2D_minx,
+                                                              fH2F_EsysMCRelative2D_maxx,
+                                                              fH2F_EsysMCRelative2D_nbinsy,
+                                                              fH2F_EsysMCRelative2D_miny,
+                                                              fH2F_EsysMCRelative2D_maxy,
+                                                              fH2F_EsysMCRelative2D_value );
+                if( i_hEsysMCRelative2D )
+                {
+                    fEsysMCRelative2D_map[i_ID] = (TH2F*)i_hEsysMCRelative2D->Clone();
+                    i_hEsysMCRelative2D->SetDirectory(0);
+                    i_hEsysMCRelative2D->AddDirectory(kFALSE);
+                }
+                else
+                {
+                    fEsysMCRelative2D_map[i_ID] = 0;
+                }
 			}
 			// this is neeeded only if there are no azimuth dependent effective areas
 			iIndexAz++;
@@ -1786,7 +1750,7 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms(
 		cout << fZe[fZe.size() - 1];
 	}
 	cout << ")" << endl;
-        cout << "\t (effective area vs reconstructed energy)" << endl;
+    cout << "\t (effective area vs reconstructed energy)" << endl;
 	if( fSmoothIter > 0 )
 	{
 		smoothEffectiveAreas( fEffArea_map );

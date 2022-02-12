@@ -60,17 +60,17 @@ class VEffectiveAreaCalculator
 		
 		// effective areas (reading of effective areas)
 		unsigned int fNBins;                    // bins in the true energy of MC (fEff_E0)
-                unsigned int fBiasBin;                  // bins in the energy bias
+        unsigned int fBiasBin;                  // bins in the energy bias
 		unsigned int fhistoNEbins;              // energy bins for histograms only
-                unsigned int fResponseMatricesEbinning; // fine bins for response matrices. Likelihood analysis.
-                unsigned int fLogAngularBin;            // bins for the log10(angular diff R,MC [deg])
+        unsigned int fResponseMatricesEbinning; // fine bins for response matrices. Likelihood analysis.
+        unsigned int fLogAngularBin;            // bins for the log10(angular diff R,MC [deg])
 
 		vector< double > fEff_E0;
 		map< unsigned int, vector< double > > fEffArea_map;
 		map< unsigned int, vector< double > > fEffAreaMC_map;
 		map< unsigned int, unsigned int > fEntry_map;
 
-                map< unsigned int, TH2F* > fEsysMCRelative2D_map;
+        map< unsigned int, TH2F* > fEsysMCRelative2D_map;
 
 		vector< double >                      fEff_EsysMCRelative_EnergyAxis;
 		map< unsigned int, vector< double > > fEff_EsysMCRelative;
@@ -107,8 +107,8 @@ class VEffectiveAreaCalculator
 		double fEnergyAxis_minimum_defaultValue;
 		double fEnergyAxis_maximum_defaultValue;
 
-                double fLogAngular_minimum_defaultValue;
-                double fLogAngular_maximum_defaultValue;
+        double fLogAngular_minimum_defaultValue;
+        double fLogAngular_maximum_defaultValue;
 		
 		VInstrumentResponseFunctionRunParameter* fRunPara;
 		
@@ -133,7 +133,7 @@ class VEffectiveAreaCalculator
 		vector< vector< TH1D* > > hVEcutNoTh2;
 		vector< vector< TH1D* > > hVEcutRec;
 		vector< vector< TH1D* > > hVEcutUW;
-                vector< vector< TH1D* > > hVEcutRecUW;
+        vector< vector< TH1D* > > hVEcutRecUW;
 		vector< vector< TH1D* > > hVEcutRecNoTh2;
 		vector< vector< TProfile* > > hVEmcSWeight;
 		vector< vector< TH1D* > > hVEcut500;
@@ -142,7 +142,7 @@ class VEffectiveAreaCalculator
 		vector< vector< TProfile* > > hVEsysMCRelative;
 		vector< vector< TH2F* > > hVEsysMCRelativeRMS;
 		vector< vector< TH2F* > > hVEsysMCRelative2D;
-                vector< vector< TH2F* > > hVEsysMCRelative2DNoDirectionCut;
+        vector< vector< TH2F* > > hVEsysMCRelative2DNoDirectionCut;
 		vector< vector< TH2F* > > hVEsys2D;
 		vector< vector< TH2F* > > hVResponseMatrix;
 		vector< vector< TH2F* > > hVResponseMatrixFine;
@@ -150,18 +150,18 @@ class VEffectiveAreaCalculator
 		vector< vector< TH2F* > > hVResponseMatrixQC;
 		vector< vector< TH2F* > > hVEmcCutCTA;
 		vector< vector< TH2F* > > hVResponseMatrixFineQC;
-                vector< vector< TH2F* > > hVResponseMatrixNoDirectionCut;
-                vector< vector< TH2F* > > hVResponseMatrixFineNoDirectionCut;
-                vector< vector< TH2F* > > hVAngErec2D;            // direction reconstruction
-                vector< vector< TH2F* > > hVAngMC2D;            // direction reconstruction
+        vector< vector< TH2F* > > hVResponseMatrixNoDirectionCut;
+        vector< vector< TH2F* > > hVResponseMatrixFineNoDirectionCut;
+        vector< vector< TH2F* > > hVAngErec2D;            // direction reconstruction
+        vector< vector< TH2F* > > hVAngMC2D;            // direction reconstruction
 
 		vector< vector< TH1D* > > hVWeightedRate;
 		vector< vector< TH1D* > > hVWeightedRate005;
 		vector< vector< vector < TH1D* > > > hVEcutSub;
 
                 // angular resolution graphs (vector in az)
-                vector< TGraphErrors* > fGraph_AngularResolution68p;
-                vector< TGraphErrors* > fGraph_AngularResolution80p;
+        vector< TGraphErrors* > fGraph_AngularResolution68p;
+        vector< TGraphErrors* > fGraph_AngularResolution80p;
                 /*
                 vector< vector< TH2F* > > hVAngularDiff_2D;
                 vector< vector< TH2F* > > hVAngularDiffEmc_2D;
