@@ -91,6 +91,18 @@ TH2F* plot_array( TFile *f,
     return hA;
 }
 
+void printEntry( string iname, int iEntry, double ze, int az, double Woff, double pedvar, double index )
+{
+    cout << iname << ": ";
+    cout << " entry: "<< iEntry;
+    cout << " ze: " << ze;
+    cout << " az: " << az;
+    cout << " Woff: " << Woff;
+    cout << " pedvar: " << pedvar;
+    cout << " index: " << index;
+    cout << endl;
+}
+
 TGraph* get_effAreaGraph( TFile *f,
                           string tree_name,
                           string var_name,
@@ -99,6 +111,7 @@ TGraph* get_effAreaGraph( TFile *f,
     if( !f ) return 0;
     TTree *t = (TTree*)f->Get( tree_name.c_str() );
     if( !t ) return 0;
+
 
     TGraph *g = new TGraph( 1 );
     if( tree_name == "fEffArea" )
@@ -118,13 +131,14 @@ TGraph* get_effAreaGraph( TFile *f,
     }
     else
     {
+        int iEntryH2F = iEntry / 340 * 17 + iEntry % 17;
         UShort_t nbins;
         Float_t e0[1000];
         Float_t eff[1000];
         t->SetBranchAddress( "nbins", &nbins );
         t->SetBranchAddress( "e0", e0 );
         t->SetBranchAddress( var_name.c_str(), eff );
-        t->GetEntry( iEntry );
+        t->GetEntry( iEntryH2F );
         g->SetMarkerStyle( 24 );
         for( int i = 0; i < nbins; i++ )
         {
@@ -146,7 +160,7 @@ void test_reducedIRFFiles( string iIRFFile,
 
      TH2F* h1 = plot_h2f( f, iHistogramName, iEntry );
 
-     TH2F* h2 = plot_array( f, iHistogramName, iEntry );
+     TH2F* h2 = plot_array( f, iHistogramName, iEntry / 20 + iEntry % 17 );
 
      if( h1 && h2 )
      {
@@ -164,7 +178,7 @@ void test_reducedIRFFiles( string iIRFFile,
 
 void test_effectiveAreas( string iIRFFile,
                           string iVariable = "effNoTh2",
-                           int iEntry = 0 )
+                          int iEntry = 0 )
 {
      TFile *f = new TFile( iIRFFile.c_str() );
      if( f->IsZombie() )
@@ -183,4 +197,59 @@ void test_effectiveAreas( string iIRFFile,
          h2_eff->SetMarkerColor(2);
          h2_eff->Draw( "p" );
     }
+}
+
+void sync_effectiveAreaTrees( string iIRFFile, int zmax = 100 )
+{
+
+    TFile *f = new TFile( iIRFFile.c_str() );
+    if( f->IsZombie() )
+    {
+        return 0;
+    }
+    TTree *fEffArea = (TTree*)f->Get( "fEffArea" );
+    if( !fEffArea ) return;
+    Double_t ze = 0.;
+    Int_t az = 0;
+    Double_t Woff = 0.;
+    Double_t pedvar = 0.;
+    Double_t index = 0.;
+    fEffArea->SetBranchAddress( "ze", &ze );
+    fEffArea->SetBranchAddress( "az", &az );
+    fEffArea->SetBranchAddress( "Woff", &Woff );
+    fEffArea->SetBranchAddress( "pedvar", &pedvar );
+    fEffArea->SetBranchAddress( "index", &index );
+
+    TTree *fEffAreaH2F = (TTree*)f->Get( "fEffAreaH2F" );
+    if( !fEffAreaH2F ) return;
+    Float_t ze2 = 0.;
+    UShort_t az2 = 0;
+    Float_t Woff2 = 0.;
+    Float_t pedvar2 = 0.;
+    fEffAreaH2F->SetBranchAddress( "ze", &ze2 );
+    fEffAreaH2F->SetBranchAddress( "az", &az2 );
+    fEffAreaH2F->SetBranchAddress( "Woff", &Woff2 );
+    fEffAreaH2F->SetBranchAddress( "pedvar", &pedvar2 );
+
+    int z = 0;
+    for( unsigned int i = 0; i < fEffArea->GetEntries(); i++ )
+    {
+        fEffArea->GetEntry( i );
+        printEntry( "EffArea", i, ze, az, Woff, pedvar, index );
+
+        for( unsigned int j = 0; j < fEffAreaH2F->GetEntries(); j++ )
+        {
+            fEffAreaH2F->GetEntry( j );
+
+            if( TMath::Abs( ze - ze2 ) > 1.e-2 ) continue;
+            if( TMath::Abs( Woff - Woff2 ) > 1.e-2 ) continue;
+            if( TMath::Abs( pedvar - pedvar2 ) > 1.e-2 ) continue;
+            if( az != az2 ) continue;
+            printEntry( "EffAreaH2", j, ze2, az2, Woff2, pedvar2, 0.);
+            cout << "H2 entry should be: " << i / 20 + i % 17 << endl;
+            cout << "===========================================" << endl;
+        }
+        z++;
+        if( z > zmax ) break;
+     }
 }
