@@ -140,13 +140,13 @@ bool write_reduced_merged_tree( vector< string > file_list,
        hist_value.push_back( new float[max_nxy] );
     }
 
-    // initialize
+    // initialize reading tree
     for( unsigned int i = 0; i < hist_names.size(); i++ )
     {
         f.SetBranchAddress( hist_names[i].c_str(),
                            &hist_to_read[i] );
     }
-
+    // output file
     if( outputfile.find( ".root" ) == string::npos ) outputfile += ".root";
     TFile* fO = new TFile( outputfile.c_str(), "UPDATE" );
     if( fO->IsZombie() )
@@ -154,6 +154,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
             cout << "error writing hEmc to output file" << endl;
             return false;
     }
+    // initialize writing tree
     TTree *t = new TTree( "fEffAreaH2F",
                           "effective area tree (2D histograms)" );
     Float_t t_ze = 0;
@@ -167,7 +168,6 @@ bool write_reduced_merged_tree( vector< string > file_list,
     Float_t t_e0[1000];
     Float_t t_eff[1000];
     Float_t t_effNoTh2[1000];
-    // different binning for 
     UShort_t t_esys_nbins = hEsysMCRelative->GetNbinsX();
     Float_t t_esys_e0[1000];
     Float_t t_esys_rel[1000];
@@ -511,7 +511,7 @@ int main( int argc, char* argv[] )
         vector< string > file_list = readListOfFiles( argv[1] );
 	
 	merge( file_list, argv[2], argv[3] );
-        write_reduced_merged_tree( file_list, argv[2], argv[3] );
+    write_reduced_merged_tree( file_list, argv[2], argv[3] );
         // write_log_files( file_list, argv[2] );
 	
 	cout << endl << "end combineEffectiveAreas" << endl;
