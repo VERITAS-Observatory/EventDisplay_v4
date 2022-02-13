@@ -341,7 +341,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 
 	// initialize time mask
 	fTimeMask->setMask( irun, iMJDStart, iMJDStopp, fRunPara->fTimeMaskFile );
-        fRunPara->setRunTimes( icounter, iMJDStart, iMJDStopp );
+    fRunPara->setRunTimes( icounter, iMJDStart, iMJDStopp );
 
 	// initialize cuts
 	setCuts( fRunPara->fRunList[fHisCounter], irun );
@@ -426,19 +426,6 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	fNMeanElevation = 0.;
 	double iDirectionOffset = 0.;
 
-	// sign change for eventdisplay v.343 and higher
-	// (do not change until you really know what it means)
-	double fEVDVersionSign = 1.;
-	if( fRunPara->fRunList[fHisCounter].fEventDisplayVersion.size() > 0 )
-	{
-		float i_Version = atof( fRunPara->fRunList[fHisCounter].fEventDisplayVersion.substr( 2,
-								fRunPara->fRunList[fHisCounter].fEventDisplayVersion.size() ).c_str() );
-		if( i_Version > 3.42 )
-		{
-			fEVDVersionSign = -1.;
-		}
-	}
-
 	// get number of entries from data tree
 	Int_t nentries = Int_t( fDataRun->fChain->GetEntries() );
 	if( fDebug )
@@ -517,7 +504,8 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			iDirectionOffset = sqrt( iXoff * iXoff + iYoff * iYoff );
 
 			// derotate coordinates
-			getDerotatedCoordinates( icounter, i_UTC, iXoff, fEVDVersionSign * iYoff,  i_xderot, i_yderot );
+            // (sign change in Y important - GrISU inspired coordinate system)
+			getDerotatedCoordinates( icounter, i_UTC, iXoff, -1.* iYoff,  i_xderot, i_yderot );
 
 			// gamma/hadron cuts
 			bIsGamma = fCuts->isGamma( i, false, fIsOn );
