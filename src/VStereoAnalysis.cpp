@@ -309,7 +309,8 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	double iMJDStopp = 0.;
 	if( getDataRunNumber() != irun )
 	{
-		cout << "VStereoAnalysis::fillHistograms warning: given run (" << irun << ") does not match run of given tree (" << getDataRunNumber() << ")" << endl;
+		cout << "VStereoAnalysis::fillHistograms warning: given run (" << irun;
+        cout << ") does not match run of given tree (" << getDataRunNumber() << ")" << endl;
 	}
 	else
 	{
@@ -375,7 +376,9 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	fMap->setRegionToExclude( fRunPara->fExclusionRegions );
 	fMap->setNoSkyPlots( fNoSkyPlots );
 	fMap->setRunList( fRunPara->fRunList[fHisCounter] );
-	fMap->setHistograms( fHisto[fHisCounter]->hmap_stereo, fHisto[fHisCounter]->hmap_alpha, fHisto[fHisCounter]->hmap_MeanSignalBackgroundAreaRatio );
+	fMap->setHistograms( fHisto[fHisCounter]->hmap_stereo, 
+                         fHisto[fHisCounter]->hmap_alpha, 
+                         fHisto[fHisCounter]->hmap_MeanSignalBackgroundAreaRatio );
 
 	fMapUC->setData( fDataRun );
 	fMapUC->setTargetShift( fRunPara->fRunList[fHisCounter].fTargetShiftWest, fRunPara->fRunList[fHisCounter].fTargetShiftNorth );
@@ -401,7 +404,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 				  fRunPara->fEnergyReconstructionSpectralIndex, fRunPara->fMCZe,
 				  fRunPara->fEnergyEffectiveAreaSmoothingIterations,
 				  fRunPara->fEnergyEffectiveAreaSmoothingThreshold, 
-                                  fRunPara->fEffectiveAreaVsEnergyMC,
+                  fRunPara->fEffectiveAreaVsEnergyMC,
 				  fRunPara->fLikelihoodAnalysis);
 
 	double iEnergyWeighting = 1.;
@@ -707,22 +710,24 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 
 	// filling the effective area for last time bin
 	// fill energy histograms: require a valid effective area value
-		if( iEnergyWeighting > 0. )
-					{
-						 fEnergy.setTimeBin( fHisto[fHisCounter]->hRealDuration1DtimeBinned->GetBinCenter(index_time_bin_NOW) );
-						 fEnergy.setTimeBinnedMeanEffectiveArea();
-						 fEnergy.resetTimeBin();
-					}
-		// filling the histo with the duration of the time bin
-		// looping over the mask seconds
-		for(unsigned int i_s = 0 ; i_s < fTimeMask->getMaskSize() ; i_s++){
-			 if(fTimeMask->getMask()[i_s]){
-				  // dead time is taken into account for each second
-				  double dead_time_fraction = fDeadTime[fHisCounter]->getDeadTimeFraction( ( double )i_s + 0.5,fRunPara->fDeadTimeCalculationMethod );
-				  fHisto[fHisCounter]->hRealDuration1DtimeBinned->Fill(i_s,1-dead_time_fraction);
-			 }
+    if( iEnergyWeighting > 0. )
+    {
+         fEnergy.setTimeBin( fHisto[fHisCounter]->hRealDuration1DtimeBinned->GetBinCenter(index_time_bin_NOW) );
+         fEnergy.setTimeBinnedMeanEffectiveArea();
+         fEnergy.resetTimeBin();
+    }
+    // filling the histo with the duration of the time bin
+    // looping over the mask seconds
+    for(unsigned int i_s = 0 ; i_s < fTimeMask->getMaskSize() ; i_s++)
+    {
+         if(fTimeMask->getMask()[i_s])
+         {
+              // dead time is taken into account for each second
+              double dead_time_fraction = fDeadTime[fHisCounter]->getDeadTimeFraction( ( double )i_s + 0.5,fRunPara->fDeadTimeCalculationMethod );
+              fHisto[fHisCounter]->hRealDuration1DtimeBinned->Fill(i_s,1-dead_time_fraction);
+         }
 
-		}
+    }
 
 	// fill rate vectors
 	fTimeMask->getIntervalRates( iRateCounts, iRateTime, iRateTimeIntervall, fRunPara->fTimeIntervall );
@@ -769,25 +774,21 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 		if ( hResponseMatrix )
 		{
 			hResponseMatrix = ( TH2F* )hResponseMatrix->Clone();
-                }
-                // (GM) actualy not sure what to do
-                // (SOB) Output an empty TH2F and later check for entries
-                else
-                {
-                        cout << "\t error: no response matrix found" << endl;
+        }
+        else
+        {
+            cout << "\t error: no response matrix found" << endl;
 			cout << "\t Creating empty TH2D" << endl;
-                        // Create empty TH2D
-                        // VLikelihoodFitter will pick this up
 			hResponseMatrix = new TH2F("hResponseMatrix", "hResponseMatrix", 10, -1, 1, 10 , -1 , 1 );
-                }
-                if( fIsOn )
-                {
-                     hResponseMatrix->SetName( "hResponseMatrix_on" );
-                }
-                else
-                {
-                     hResponseMatrix->SetName( "hResponseMatrix_off" );
-                }
+        }
+        if( fIsOn )
+        {
+             hResponseMatrix->SetName( "hResponseMatrix_on" );
+        }
+        else
+        {
+             hResponseMatrix->SetName( "hResponseMatrix_off" );
+        }
 	}
 
 	// get mean effective area for TIME BINs
