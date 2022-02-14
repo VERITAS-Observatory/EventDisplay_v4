@@ -1,6 +1,6 @@
 # Eventdisplay source code (master)
 
-**Development version master - not to be used for science analysis**
+**Development version main branch - not to be used for science analysis**
 
 Main changes with respect to earlier version is the implementation of the correction factors to take the lower throughput / gains into account
 
