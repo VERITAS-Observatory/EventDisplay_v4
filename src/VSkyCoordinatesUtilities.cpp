@@ -332,8 +332,14 @@ double VSkyCoordinatesUtilities::adjustAzimuthToRange( double az_deg )
 */
 double VSkyCoordinatesUtilities::getTargetShiftWest( double iTargetRA_deg, double iTargetDec_deg, double ira_deg, double idec_deg )
 {
-	double sep  = slaDsep( iTargetRA_deg * TMath::DegToRad(), iTargetDec_deg * TMath::DegToRad(), ira_deg * TMath::DegToRad(), idec_deg * TMath::DegToRad() );
-	double bear = slaDbear( iTargetRA_deg * TMath::DegToRad(), iTargetDec_deg * TMath::DegToRad(), ira_deg * TMath::DegToRad(), idec_deg * TMath::DegToRad() );
+	double sep  = slaDsep( iTargetRA_deg * TMath::DegToRad(), 
+                           iTargetDec_deg * TMath::DegToRad(), 
+                           ira_deg * TMath::DegToRad(), 
+                           idec_deg * TMath::DegToRad() );
+	double bear = slaDbear( iTargetRA_deg * TMath::DegToRad(), 
+                            iTargetDec_deg * TMath::DegToRad(), 
+                            ira_deg * TMath::DegToRad(), 
+                            idec_deg * TMath::DegToRad() );
 	
 	double iShift = sep * sin( bear ) * TMath::RadToDeg();
 	
@@ -348,8 +354,14 @@ double VSkyCoordinatesUtilities::getTargetShiftWest( double iTargetRA_deg, doubl
 
 double VSkyCoordinatesUtilities::getTargetShiftNorth( double iTargetRA_deg, double iTargetDec_deg, double ira_deg, double idec_deg )
 {
-	double sep  = slaDsep( iTargetRA_deg * TMath::DegToRad(), iTargetDec_deg * TMath::DegToRad(), ira_deg * TMath::DegToRad(), idec_deg * TMath::DegToRad() );
-	double bear = slaDbear( iTargetRA_deg * TMath::DegToRad(), iTargetDec_deg * TMath::DegToRad(), ira_deg * TMath::DegToRad(), idec_deg * TMath::DegToRad() );
+	double sep  = slaDsep( iTargetRA_deg * TMath::DegToRad(), 
+                           iTargetDec_deg * TMath::DegToRad(), 
+                           ira_deg * TMath::DegToRad(), 
+                           idec_deg * TMath::DegToRad() );
+	double bear = slaDbear( iTargetRA_deg * TMath::DegToRad(), 
+                            iTargetDec_deg * TMath::DegToRad(), 
+                            ira_deg * TMath::DegToRad(), 
+                            idec_deg * TMath::DegToRad() );
 	
 	double iShift = sep * cos( bear ) * TMath::RadToDeg();
 	
