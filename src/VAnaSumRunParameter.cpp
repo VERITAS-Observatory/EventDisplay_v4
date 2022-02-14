@@ -1703,53 +1703,6 @@ void VAnaSumRunParameter::getEventdisplayRunParameter( string fDatadir )
 	}
 }
 
-
-void VAnaSumRunParameter::getWobbleOffsets( string fDatadir )
-{
-	cout << "\t read wobble offsets from root files (may take a second...)" << endl;
-	char i_temp[200];
-	int i_run;
-	string i_treename = "data";
-	string fPrefix = "";
-	string fSuffix = ".mscw.root";
-	for( unsigned int i = 0; i < fRunList.size(); i++ )
-	{
-		i_run = fRunList[i].fRunOn;
-		
-		sprintf( i_temp, "%s%s%d%s", fDatadir.c_str(), fPrefix.c_str(), i_run, fSuffix.c_str() );
-		TFile* i_f = new TFile( i_temp );
-		if( i_f->IsZombie() )
-		{
-			cout << "VAnaSumRunParameter::getWobbleOffset fatal error: file not found, " << i_temp << endl;
-			exit( -1 );
-		}
-		
-		TTree* i_tree = ( TTree* )i_f->Get( i_treename.c_str() );
-		if( !i_tree )
-		{
-			cout << "VAnaSumRunParameter::getWobbleOffset tree not found " << i_treename << endl;
-		}
-		i_tree->GetEntry( 1 );
-		
-		if( i_tree->GetBranch( "WobbleN" ) && i_tree->GetBranch( "WobbleE" ) )
-		{
-			fRunList[i].fWobbleNorth = i_tree->GetBranch( "WobbleN" )->GetLeaf( "WobbleN" )->GetValue();
-			fRunList[i].fWobbleWest = -1.*i_tree->GetBranch( "WobbleE" )->GetLeaf( "WobbleE" )->GetValue();
-			fRunList[i].fWobbleNorthMod = i_tree->GetBranch( "WobbleN" )->GetLeaf( "WobbleN" )->GetValue();
-			fRunList[i].fWobbleWestMod = -1.*i_tree->GetBranch( "WobbleE" )->GetLeaf( "WobbleE" )->GetValue();
-		}
-		else
-		{
-			cout << endl;
-			cout << "VAnaSumRunParameter::getWobbleOffset error: cannot determine wobble offset for run " << fRunList[i].fRunOn << " from mscw_energy output file" << endl;
-			cout << "\t old file version?" << endl;
-			exit( 0 );
-		}
-		i_f->Close();
-	}
-}
-
-
 /*!
     observe that these are hardwired values according to the VERITAS simulation sets
 */

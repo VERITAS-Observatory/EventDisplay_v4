@@ -92,14 +92,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 	
 	if( fAnalysisRunMode != 1 )
 	{
-		if( fRunPara->getInputFileVersionNumber() > 3 )
-		{
-			fRunPara->getEventdisplayRunParameter( fDatadir );
-		}
-		else
-		{
-			fRunPara->getWobbleOffsets( fDatadir );
-		}
+        fRunPara->getEventdisplayRunParameter( fDatadir );
 	}
 	fNumTels = fRunPara->getMaxNumberofTelescopes();
 	fTelOffset = 0;

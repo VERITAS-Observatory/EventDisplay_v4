@@ -243,7 +243,6 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 			return fVersion;
 		}
 		void getEventdisplayRunParameter( string );
-		void getWobbleOffsets( string );
 		int  getRunListVersion()
 		{
 			return fVersion;
@@ -262,6 +261,6 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		bool writeListOfExcludedSkyRegions();
 		bool getListOfExcludedSkyRegions( TFile* f );
 		
-		ClassDef( VAnaSumRunParameter, 13 ) ;
+		ClassDef( VAnaSumRunParameter, 14 ) ;
 };
 #endif
