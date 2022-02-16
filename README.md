@@ -1,4 +1,4 @@
-# Eventdisplay source code (master)
+# Eventdisplay source code
 
 **Development version main branch - not to be used for science analysis**
 
