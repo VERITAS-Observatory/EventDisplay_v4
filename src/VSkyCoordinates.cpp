@@ -130,45 +130,6 @@ bool VSkyCoordinates::setTargetJ2000( double iDec, double iRA )
 
 /*
 
-    this shouldn't be used (or only if you know what you do)
-
-*/
-bool VSkyCoordinates::setTarget( string iTargetName )
-{
-	cout << endl;
-	cout << "======================================================================================= " << endl;
-	cout << "WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING " << endl;
-	cout << endl;
-	cout << "the -target <targetname> option should not be used; the pointing will be wrong" << endl;
-	cout << endl;
-	cout << "WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING " << endl;
-	cout << "======================================================================================= " << endl;
-	VTargets iTarget;
-	if( iTarget.selectTargetbyName( iTargetName ) )
-	{
-		fTargetName = iTargetName;
-		
-		fTargetDecJ2000 = iTarget.getTargetDecJ2000();
-		fTargetRAJ2000  = iTarget.getTargetRAJ2000();
-		fTargetDec = iTarget.getTargetDecJ2000();
-		fTargetRA  = iTarget.getTargetRAJ2000();
-		fTelRA = fTargetRA;
-		fTelDec = fTargetDec;
-		fTelRAJ2000 = fTargetRA;
-		fTelDecJ2000 = fTargetDec;
-		fSet = true;
-	}
-	else
-	{
-		cout << "VSkyCoordinates::setTarget invalid target: " << iTargetName << endl;
-		return false;
-	}
-	return true;
-}
-
-
-/*
-
     calculate azimuth and elevation of telescope pointing direction
     calculate azimuth and elevation of target
  */
