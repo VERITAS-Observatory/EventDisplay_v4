@@ -142,6 +142,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 	///////////////////////////////////////////////////////////////////////////////////////////
 	if( fAnalysisRunMode == 1 )
 	{
+        fRunPara->sortRunList();
 		// loop over all files in run list and copy histograms
 		for( unsigned int j = 0; j < fRunPara->fRunList.size(); j++ )
 		{

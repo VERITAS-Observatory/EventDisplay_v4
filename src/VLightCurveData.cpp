@@ -93,7 +93,7 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
 {
 	fDataFileName = iAnaSumFile;
 	
-	VFluxCalculation fFluxCalculation( fDataFileName, 1, 0, 100000, fMJD_min, fMJD_max, false );
+	VFluxCalculation fFluxCalculation( fDataFileName, 1, 0, 1000000, fMJD_min, fMJD_max, false );
 	if( fFluxCalculation.IsZombie() )
 	{
 		cout << "VLightCurveData::fill error reading anasum file: " << fDataFileName << endl;
