@@ -1879,7 +1879,10 @@ double VAnaSumRunParameter::getDeclinationFromStrings( string iDec1, string iDec
     return d_tt;
 }
 
-
+void VAnaSumRunParameter::sortRunList()
+{
+    sort( fRunList.begin(), fRunList.end() );
+}
 
 
 //==================================================================================
