@@ -25,6 +25,11 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 	fTargetDecJ2000 = -90.;
 	fTargetRA = 0.;
 	fTargetDec = 0.;
+
+    fArrayPointingRA = 0.;
+    fArrayPointingDec = 0.;
+    fArrayPointingRAJ2000 = 0.;
+    fArrayPointingDecJ2000 = 0.;
 	
 	fPairOffset = 0.;
 	
@@ -452,13 +457,13 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				d_tt += atof( temp2.c_str() ) / 3600.;
 				fTargetShiftRAJ2000 = d_tt / 24. * 360.;
 				// dec
-                                string iDec1;
-                                string iDec2;
-                                string iDec3;
+                string iDec1;
+                string iDec2;
+                string iDec3;
 				is_stream >> iDec1;
 				is_stream >> iDec2;
 				is_stream >> iDec3;
-                                fTargetShiftDecJ2000 = getDeclinationFromStrings( iDec1, iDec2, iDec3 );
+                fTargetShiftDecJ2000 = getDeclinationFromStrings( iDec1, iDec2, iDec3 );
 			}
 			
 			else if( temp == "REGIONTOEXCLUDE" || temp == "REGIONTOEXCLUDE_RADECJ2000_DEG" )
@@ -1607,6 +1612,25 @@ bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i )
 	return false;
 }
 
+void VAnaSumRunParameter::setArrayPointing( 
+        unsigned int i,
+        pair< double, double > i_radec,
+        pair< double, double > i_radecJ2000 )
+{
+    if( i >= fRunList.size() ) return;
+
+    fRunList[i].fArrayPointingRA = i_radec.first;
+    fRunList[i].fArrayPointingDec = i_radec.second;
+    fRunList[i].fArrayPointingRAJ2000 = i_radecJ2000.first;
+    fRunList[i].fArrayPointingDecJ2000 = i_radecJ2000.second;
+    if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
+    {
+       fMapRunList[fRunList[i].fRunOn].fArrayPointingRA = i_radec.first;
+       fMapRunList[fRunList[i].fRunOn].fArrayPointingDec = i_radec.second;
+       fMapRunList[fRunList[i].fRunOn].fArrayPointingRAJ2000 = i_radecJ2000.first;
+       fMapRunList[fRunList[i].fRunOn].fArrayPointingDecJ2000 = i_radecJ2000.second;
+    }
+}
 
 void VAnaSumRunParameter::setTargetRADec_currentEpoch( unsigned int i, double ra, double dec )
 {

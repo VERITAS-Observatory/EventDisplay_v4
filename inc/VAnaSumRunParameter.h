@@ -71,6 +71,12 @@ class VAnaSumRunParameterDataClass : public TNamed
 		double fTargetRA;                         // [deg], precessed
 		double fTargetDec;                        // [deg], precessed
 		double fPairOffset;
+
+        // centre of camera fov
+        double fArrayPointingRA;
+        double fArrayPointingDec;
+        double fArrayPointingRAJ2000;
+        double fArrayPointingDecJ2000;
 		
 		double fWobbleNorth;                      // [deg]
 		double fWobbleWest;                       // [deg]
@@ -258,6 +264,7 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		void printStereoParameter( unsigned int icounter );
 		void printStereoParameter( int irun );
 		int  readRunParameter( string i_filename );
+        void setArrayPointing(unsigned int, std::pair<double, double>, std::pair<double, double>);
         bool setRunTimes( unsigned int irun, double iMJDStart, double iMJDStopp );
 		bool setSkyMapCentreJ2000( unsigned int i );
 		bool setTargetRADecJ2000( unsigned int i );
