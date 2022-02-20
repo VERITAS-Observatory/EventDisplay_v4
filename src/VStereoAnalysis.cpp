@@ -275,7 +275,6 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 		fHisCounter = -1;
 		return combineHistograms();
 	}
-	////////////////////////////////////////////////
 
 	////////////////////////////////////////////////
 	// analyze individual run
@@ -503,12 +502,8 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			fHisto[fHisCounter]->hTriggerPatternBeforeCuts->Fill( fDataRun->LTrig );
 			fHisto[fHisCounter]->hImagePatternBeforeCuts->Fill( fDataRun->ImgSel );
 
-			// direction offset
 			iDirectionOffset = sqrt( iXoff * iXoff + iYoff * iYoff );
-
-			// derotate coordinates
-            // (sign change in Y important - GrISU inspired coordinate system)
-			getDerotatedCoordinates( icounter, i_UTC, iXoff, -1.* iYoff,  i_xderot, i_yderot );
+			getDerotatedCoordinates( icounter, i_UTC, iXoff, iYoff,  i_xderot, i_yderot );
 
 			// gamma/hadron cuts
 			bIsGamma = fCuts->isGamma( i, false, fIsOn );
@@ -1555,6 +1550,7 @@ void VStereoAnalysis::astro_calculate_modified_wobbleoffset( unsigned int runlis
         cout << "\tSky maps centred at (ra,dec (J2000)) (";
         cout << fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000 << ", ";
         cout << fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000 << ")";
+        cout << endl;
         cout << "\tTelescopes pointing to: (ra,dec (J2000)) (";
         cout << ra_dec_arraypointing.first << ", ";
         cout << ra_dec_arraypointing.second << ")";
@@ -1746,6 +1742,10 @@ void VStereoAnalysis::defineAstroSource()
         astro_calculate_ra_dec_currentEpoch( i );
         astro_print_pointing( i );
         astro_calculate_modified_wobbleoffset( i );
+        fRunPara->setArrayPointing(
+                i,
+                astro_get_arraypointing(i, false),
+                astro_get_arraypointingJ2000(i) );
 
 		// fill run parameter values
 		fRunPara->setTargetRADecJ2000( i );
@@ -2131,7 +2131,7 @@ void VStereoAnalysis::getDerotatedCoordinates( unsigned int icounter,  double i_
 
 	// (!!!! Y coordinate reflected in eventdisplay for version < v.3.43 !!!!)
 	// ( don't change signs if you don't know why! )
-	fAstro[icounter]->derotateCoords( i_UTC, x, y, x_derot, y_derot );
+	fAstro[icounter]->derotateCoords( i_UTC, x, -1.*y, x_derot, y_derot );
 	y_derot *= -1.;
 
 	VSkyCoordinatesUtilities::convert_derotatedCoordinates_to_J2000( i_UTC, 
@@ -2231,18 +2231,18 @@ void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot,
 		return;
 	}
 
-	fDL3EventTree_runNumber      = c->runNumber;    // Run Number
-	fDL3EventTree_eventNumber    = c->eventNumber;  // Event Number
+	fDL3EventTree_runNumber      = c->runNumber;
+	fDL3EventTree_eventNumber    = c->eventNumber;
 	fDL3EventTree_Time           = c->Time;         // Time of day (seconds) of gamma ray event
-	fDL3EventTree_MJD            = c->MJD;          // Day of epoch (days)
+	fDL3EventTree_MJD            = c->MJD;
 	fDL3EventTree_Xoff           = c->Xoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
 	fDL3EventTree_Yoff           = c->Yoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
 	fDL3EventTree_Xderot         = i_xderot;        // Derotated Gamma Point-Of-Origin (deg, RA)
 	fDL3EventTree_Yderot         = i_yderot;        // Derotated Gamma Point-Of-Origin (deg, DEC)
     if( fCuts )
     {
-       fDL3EventTree_Erec       = fCuts->getReconstructedEnergy( fRunPara->fEnergyReconstructionMethod );        // Reconstructed Gamma Energy (TeV)
-       fDL3EventTree_Erec_Err   = fCuts->getReconstructedEnergydE( fRunPara->fEnergyReconstructionMethod );          // Reconstructed Gamma Energy (TeV) Error
+       fDL3EventTree_Erec = fCuts->getReconstructedEnergy( fRunPara->fEnergyReconstructionMethod );
+       fDL3EventTree_Erec_Err = fCuts->getReconstructedEnergydE( fRunPara->fEnergyReconstructionMethod ); // Reconstructed Gamma Energy (TeV) Error
     }
     else
     {
@@ -2251,7 +2251,7 @@ void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot,
     }
 	fDL3EventTree_XGroundCore    = c->Xcore;        // Gamma Ray Core-Ground intersection location (north)
 	fDL3EventTree_YGroundCore    = c->Ycore;        // Gamma Ray Core-Ground intersection location (east)
-	fDL3EventTree_NImages        = c->NImages;      // Number of images used in reconstruction?
+	fDL3EventTree_NImages        = c->NImages;      // Number of images used in reconstruction
 	fDL3EventTree_ImgSel         = c->ImgSel;       // binary code describing which telescopes had images
     fDL3EventTree_MeanPedvar     = c->meanPedvar_Image; // average pedvar
 	fDL3EventTree_MSCW           = c->MSCW;        // mean scaled width
@@ -2265,27 +2265,22 @@ void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot,
     {
         fDL3EventTree_Acceptance     = 0.;
     }
-    // get event ra and dec
     if( icounter < fRunPara->fRunList.size() )
     {
-        double i_centerpoint_RA = ( fRunPara->fRunList[icounter].fTargetRAJ2000 + -1.0 * getWobbleWest() );
-        double i_centerpoint_dec = ( fRunPara->fRunList[icounter].fTargetDecJ2000 + getWobbleNorth() );
-        double i_Spherical_RA  = 0.;
-        double i_Spherical_DEC = 0.;
+        double i_RA  = 0.;
+        double i_DEC = 0.;
         slaDtp2s( fDL3EventTree_Xderot * TMath::DegToRad(),
                   fDL3EventTree_Yderot * TMath::DegToRad(),
-                  i_centerpoint_RA * TMath::DegToRad(), 
-                  i_centerpoint_dec * TMath::DegToRad(),
-                  &i_Spherical_RA, &i_Spherical_DEC);
-        fDL3EventTree_RA  = i_Spherical_RA * TMath::RadToDeg();
-        fDL3EventTree_DEC = i_Spherical_DEC * TMath::RadToDeg();
+                  fRunPara->fRunList[icounter].fArrayPointingRAJ2000 * TMath::DegToRad(), 
+                  fRunPara->fRunList[icounter].fArrayPointingDecJ2000 * TMath::DegToRad(),
+                  &i_RA, &i_DEC);
+        fDL3EventTree_RA  = i_RA * TMath::RadToDeg();
+        fDL3EventTree_DEC = i_DEC * TMath::RadToDeg();
 
-        // Convert from spherical RA and DEC to Azimuth and Zenith
-        // convert to degrees and do calculation
-        fVsky->setTargetJ2000( i_Spherical_DEC * TMath::RadToDeg(), i_Spherical_RA * TMath::RadToDeg() );
+        // Convert from RA and DEC to Azimuth and Zenith
+        fVsky->setTargetJ2000( i_DEC * TMath::RadToDeg(), i_RA * TMath::RadToDeg() );
         fVsky->precessTarget( fDL3EventTree_MJD, 0 ) ;
 
-        // calculate new param
         fVsky->updatePointing( fDL3EventTree_MJD, fDL3EventTree_Time ) ;
         fDL3EventTree_Az = fVsky->getTargetAzimuth();
         fDL3EventTree_El = fVsky->getTargetElevation();
@@ -2294,6 +2289,8 @@ void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot,
     {
         fDL3EventTree_RA = 0.;
         fDL3EventTree_DEC = 0.;
+        fDL3EventTree_Az = 0.;
+        fDL3EventTree_El = 0.;
     }
     if ( fCuts && fRunPara->fWriteAllEvents )
     {
