@@ -10,15 +10,15 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 	fEventDisplayVersion = "";
 	
 	fRunOn = 0;
-        fRunOnFileName = "";
+    fRunOnFileName = "";
 	fRunOff = 0;
-        fRunOffFileName = "";
+    fRunOffFileName = "";
 	
 	fMJDOn = 0.;
 	fMJDOff = 0.;
 
-        fMJDOnStart = 0.;
-        fMJDOnStop = 0.;
+    fMJDOnStart = 0.;
+    fMJDOnStop = 0.;
 	
 	fTarget = "";
 	fTargetRAJ2000 = 0.;
@@ -44,7 +44,7 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 	fTargetShiftDecJ2000 = 0.;
 	
 	fNTel = 4;
-        fTelToAna = "";
+    fTelToAna = "";
 	fMaxTelID = fNTel;
 	
 	fBackgroundModel = 0;
@@ -324,14 +324,14 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			else if( temp == "SKYMAPSIZEX" )
 			{
 				fSkyMapSizeXmin = atof( temp2.c_str() );
-                                fSkyMapSizeXmin = -1. *TMath::Abs( fSkyMapSizeXmin );
-                                fSkyMapSizeXmax = TMath::Abs( fSkyMapSizeXmin );
+                fSkyMapSizeXmin = -1. *TMath::Abs( fSkyMapSizeXmin );
+                fSkyMapSizeXmax = TMath::Abs( fSkyMapSizeXmin );
 			}
 			else if( temp == "SKYMAPSIZEY" )
 			{
 				fSkyMapSizeYmin = atof( temp2.c_str() );
-                                fSkyMapSizeYmin = -1. *TMath::Abs( fSkyMapSizeYmin );
-                                fSkyMapSizeYmax = TMath::Abs( fSkyMapSizeYmin );
+                fSkyMapSizeYmin = -1. *TMath::Abs( fSkyMapSizeYmin );
+                fSkyMapSizeYmax = TMath::Abs( fSkyMapSizeYmin );
 			}
 			else if( temp == "BRIGHTSTARCATALOGUE" )
 			{
@@ -1528,32 +1528,30 @@ unsigned int VAnaSumRunParameter::getMaxNumberofTelescopes()
 }
 
 
-bool VAnaSumRunParameter::setTargetShifts( unsigned int i, double west, double north, double ra, double dec )
+bool VAnaSumRunParameter::setTargetShifts( unsigned int i )
 {
 	if( i < fRunList.size() )
 	{
 		if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
 		{
-			fMapRunList[fRunList[i].fRunOn].fTargetShiftWest = west;
-			fMapRunList[fRunList[i].fRunOn].fTargetShiftNorth = north;
-			fMapRunList[fRunList[i].fRunOn].fTargetShiftRAJ2000 = ra;
-			fMapRunList[fRunList[i].fRunOn].fTargetShiftDecJ2000 = dec;
+			fMapRunList[fRunList[i].fRunOn].fTargetShiftWest = fRunList[i].fTargetShiftWest;
+			fMapRunList[fRunList[i].fRunOn].fTargetShiftNorth = fRunList[i].fTargetShiftNorth;
+			fMapRunList[fRunList[i].fRunOn].fTargetShiftRAJ2000 = fTargetShiftRAJ2000;
+			fMapRunList[fRunList[i].fRunOn].fTargetShiftDecJ2000 = fTargetShiftDecJ2000;
 		}
 		return true;
 	}
 	return false;
 }
 
-bool VAnaSumRunParameter::setSkyMapCentreJ2000( unsigned int i, double ra, double dec )
+bool VAnaSumRunParameter::setSkyMapCentreJ2000( unsigned int i )
 {
 	if( i < fRunList.size() )
 	{
-		fRunList[i].fSkyMapCentreRAJ2000  = ra;
-		fRunList[i].fSkyMapCentreDecJ2000 = dec;
 		if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
 		{
-			fMapRunList[fRunList[i].fRunOn].fSkyMapCentreRAJ2000  = ra;
-			fMapRunList[fRunList[i].fRunOn].fSkyMapCentreDecJ2000 = dec;
+			fMapRunList[fRunList[i].fRunOn].fSkyMapCentreRAJ2000  = fRunList[i].fSkyMapCentreRAJ2000;
+			fMapRunList[fRunList[i].fRunOn].fSkyMapCentreDecJ2000 = fRunList[i].fSkyMapCentreDecJ2000;
 		}
 		return true;
 	}
@@ -1577,18 +1575,15 @@ bool VAnaSumRunParameter::setRunTimes( unsigned int i, double iMJDStart, double 
 }
 
 
-bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i, double ra, double dec, string iTargetName )
+bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i )
 {
 	if( i < fRunList.size() )
 	{
-		fRunList[i].fTargetRAJ2000 = ra;
-		fRunList[i].fTargetDecJ2000 = dec;
-                fRunList[i].fTarget = iTargetName;
 		if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
 		{
-			fMapRunList[fRunList[i].fRunOn].fTargetRAJ2000 = ra;
-			fMapRunList[fRunList[i].fRunOn].fTargetDecJ2000 = dec;
-                        fMapRunList[fRunList[i].fRunOn].fTarget = iTargetName;
+			fMapRunList[fRunList[i].fRunOn].fTargetRAJ2000 = fRunList[i].fTargetRAJ2000;
+			fMapRunList[fRunList[i].fRunOn].fTargetDecJ2000 = fRunList[i].fTargetDecJ2000;
+            fMapRunList[fRunList[i].fRunOn].fTarget = fRunList[i].fTarget;
 		}
 		// set centre of stereo maps (if this parameter is not set in the file runparameter.dat)
 		if( TMath::Abs( fSkyMapCentreNorth ) < 1.e-8 && TMath::Abs( fSkyMapCentreWest ) < 1.e-8
@@ -1596,15 +1591,15 @@ bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i, double ra, double
 		{
 			fRunList[i].fSkyMapCentreNorth    = 0.;
 			fRunList[i].fSkyMapCentreWest     = 0.;
-			fRunList[i].fSkyMapCentreRAJ2000  = ra;
-			fRunList[i].fSkyMapCentreDecJ2000 = dec;
+			fRunList[i].fSkyMapCentreRAJ2000  = fRunList[i].fTargetRAJ2000;
+			fRunList[i].fSkyMapCentreDecJ2000 = fRunList[i].fTargetDecJ2000;
 
 			if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
 			{
 				fMapRunList[fRunList[i].fRunOn].fSkyMapCentreNorth    = 0.;
 				fMapRunList[fRunList[i].fRunOn].fSkyMapCentreWest     = 0.;
-				fMapRunList[fRunList[i].fRunOn].fSkyMapCentreRAJ2000  = ra;
-				fMapRunList[fRunList[i].fRunOn].fSkyMapCentreDecJ2000 = dec;
+				fMapRunList[fRunList[i].fRunOn].fSkyMapCentreRAJ2000  = fRunList[i].fTargetRAJ2000;;
+				fMapRunList[fRunList[i].fRunOn].fSkyMapCentreDecJ2000 = fRunList[i].fTargetDecJ2000;
 			}
 		}
 		return true;
@@ -1613,7 +1608,7 @@ bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i, double ra, double
 }
 
 
-bool VAnaSumRunParameter::setTargetRADec_currentEpoch( unsigned int i, double ra, double dec )
+void VAnaSumRunParameter::setTargetRADec_currentEpoch( unsigned int i, double ra, double dec )
 {
 	if( i < fRunList.size() )
 	{
@@ -1624,9 +1619,7 @@ bool VAnaSumRunParameter::setTargetRADec_currentEpoch( unsigned int i, double ra
 			fMapRunList[fRunList[i].fRunOn].fTargetRA = ra;
 			fMapRunList[fRunList[i].fRunOn].fTargetDec = dec;
 		}
-		return true;
 	}
-	return false;
 }
 
 
@@ -1660,6 +1653,10 @@ void VAnaSumRunParameter::getEventdisplayRunParameter( string fDatadir )
 			fRunList[i].fWobbleWest = -1.*iParV2->fWobbleEast;
 			fRunList[i].fWobbleNorthMod = iParV2->fWobbleNorth;
 			fRunList[i].fWobbleWestMod = -1.*iParV2->fWobbleEast;
+            cout << "Run " << fRunList[i].fRunOn << ":";
+            cout << "\t pointing from mscw file is ";
+            cout << " (ra,dec (J2000)) = (" << fRunList[i].fTargetRAJ2000 << ", " << fRunList[i].fTargetDecJ2000;
+            cout << ")" << endl;
 			fRunList[i].fNTel = ( int )iParV2->fTelToAnalyze.size();
 			fRunList[i].fTelToAnalyze = iParV2->fTelToAnalyze;
 		}
