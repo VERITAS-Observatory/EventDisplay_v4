@@ -1840,6 +1840,7 @@ ifeq ($(VBFFLAG),-DNOVBF)
 	@echo "evndisp without VBF support"
 else
 	@echo "evndisp with VBF support"
+	@echo "$(VBFSYS)"
 endif
 ifeq ($(DBFLAG),-DRUNWITHDB)
 	@echo "evndisp with database support"

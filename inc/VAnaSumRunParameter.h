@@ -62,8 +62,8 @@ class VAnaSumRunParameterDataClass : public TNamed
 		double fMJDOn;
 		double fMJDOff;
 
-                double fMJDOnStart;
-                double fMJDOnStop;
+        double fMJDOnStart;
+        double fMJDOnStop;
 		
 		string fTarget;
 		double fTargetRAJ2000;
@@ -153,6 +153,7 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		int  returnWithError( string iL, string iM, string iC = "" );
 		void reset( VAnaSumRunParameterDataClass );
 		void setMCZenith();
+        bool sortAnaSumRunParameterDataClass( VAnaSumRunParameterDataClass l1, VAnaSumRunParameterDataClass l2 );
 		
 	public:
 	
@@ -195,8 +196,8 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		bool fModel3D;
 		bool fDirectionModel3D;
 		
-                // add all events to DL3 tree, no gh cuts but add BDT score and IsGamma 
-                bool fWriteAllEvents;
+        // add all events to DL3 tree, no gh cuts but add BDT score and IsGamma 
+        bool fWriteAllEvents;
 
 		// vector with all run parameters
 		vector< VAnaSumRunParameterDataClass > fRunList;
@@ -257,7 +258,7 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		void printStereoParameter( unsigned int icounter );
 		void printStereoParameter( int irun );
 		int  readRunParameter( string i_filename );
-                bool setRunTimes( unsigned int irun, double iMJDStart, double iMJDStopp );
+        bool setRunTimes( unsigned int irun, double iMJDStart, double iMJDStopp );
 		bool setSkyMapCentreJ2000( unsigned int i, double ra, double dec );
 		bool setTargetRADecJ2000( unsigned int i, double ra, double dec, string iTargetName );
 		bool setTargetRADec_currentEpoch( unsigned int i, double ra, double dec );
