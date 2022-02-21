@@ -129,7 +129,11 @@ class VAnaSumRunParameterDataClass : public TNamed
 		
 		VAnaSumRunParameterDataClass();
 		~VAnaSumRunParameterDataClass() {}
-		ClassDef( VAnaSumRunParameterDataClass, 3 );
+        bool operator<(const VAnaSumRunParameterDataClass& x) const
+        {
+            return fRunOn < x.fRunOn;
+        }
+		ClassDef( VAnaSumRunParameterDataClass, 2 );
 };
 
 class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
@@ -258,9 +262,10 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		bool setTargetRADecJ2000( unsigned int i, double ra, double dec, string iTargetName );
 		bool setTargetRADec_currentEpoch( unsigned int i, double ra, double dec );
 		bool setTargetShifts( unsigned int i, double west, double north, double ra, double dec );
+        void sortRunList();
 		bool writeListOfExcludedSkyRegions();
 		bool getListOfExcludedSkyRegions( TFile* f );
 		
-		ClassDef( VAnaSumRunParameter, 14 ) ;
+		ClassDef( VAnaSumRunParameter, 15 ) ;
 };
 #endif
