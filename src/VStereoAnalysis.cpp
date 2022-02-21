@@ -275,7 +275,6 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 		fHisCounter = -1;
 		return combineHistograms();
 	}
-	////////////////////////////////////////////////
 
 	////////////////////////////////////////////////
 	// analyze individual run
@@ -503,12 +502,8 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			fHisto[fHisCounter]->hTriggerPatternBeforeCuts->Fill( fDataRun->LTrig );
 			fHisto[fHisCounter]->hImagePatternBeforeCuts->Fill( fDataRun->ImgSel );
 
-			// direction offset
 			iDirectionOffset = sqrt( iXoff * iXoff + iYoff * iYoff );
-
-			// derotate coordinates
-            // (sign change in Y important - GrISU inspired coordinate system)
-			getDerotatedCoordinates( icounter, i_UTC, iXoff, -1.* iYoff,  i_xderot, i_yderot );
+			getDerotatedCoordinates( icounter, i_UTC, iXoff, iYoff,  i_xderot, i_yderot );
 
 			// gamma/hadron cuts
 			bIsGamma = fCuts->isGamma( i, false, fIsOn );
@@ -1371,9 +1366,351 @@ double VStereoAnalysis::getDeadTimeFraction()
 	return 0.;
 }
 
+void VStereoAnalysis::astro_check_for_valid_coordinates( unsigned int runlist_iter )
+{
+    // (this is the target of observation)
+    /////////////////////////////////////////////////////////
+    if( fRunPara->fRunList[runlist_iter].fTargetDecJ2000 < -89.99 )
+    {
+        cout << "ERROR in VStereoAnalysis::astro_check_for_valid_coordinates: invalid target ";
+        cout << fRunPara->fRunList[runlist_iter].fTarget << endl;
+        cout << "\t run " << fRunPara->fRunList[runlist_iter].fRunOn << "\t" << fRunPara->fRunList[runlist_iter].fTarget;
+        cout << fRunPara->fRunList[runlist_iter].fTargetDecJ2000 << "\t" << fRunPara->fRunList[runlist_iter].fTargetShiftDecJ2000 << endl;
+        exit( EXIT_FAILURE );
+    }
+}
+
+void VStereoAnalysis::astro_set_skymap_center_from_runparameters( unsigned int runlist_iter )
+{
+    /////////////////////////////////////////////////////////
+    // Case 1: sky map centre is given as xy offset [deg] in runparameter file
+    if( TMath::Abs( fRunPara->fSkyMapCentreNorth ) > 1.e-8 || TMath::Abs( fRunPara->fSkyMapCentreWest ) > 1.e-8 )
+    {
+        fRunPara->fRunList[runlist_iter].fSkyMapCentreWest  = fRunPara->fSkyMapCentreWest;
+        fRunPara->fRunList[runlist_iter].fSkyMapCentreNorth = fRunPara->fSkyMapCentreNorth;
+        double i_decDiff =  0.;   // offset in dec
+        double i_raDiff = 0.;     // offset in ra
+        VSkyCoordinatesUtilities::getWobbleOffset_in_RADec(
+                fRunPara->fRunList[runlist_iter].fSkyMapCentreNorth,
+                fRunPara->fRunList[runlist_iter].fSkyMapCentreWest,
+                fRunPara->fRunList[runlist_iter].fTargetRAJ2000, fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
+                i_decDiff, i_raDiff );
+        fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000  = fRunPara->fRunList[runlist_iter].fTargetRAJ2000 + i_raDiff;
+        fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000 = fRunPara->fRunList[runlist_iter].fTargetDecJ2000 + i_decDiff;
+    }
+    // Case 2: sky map centre is given in J200 in runparameter file
+    // (this is in almost all analysis the usual/default case)
+    else if( TMath::Abs( fRunPara->fSkyMapCentreRAJ2000 ) > 1.e-8 )
+    {
+        fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000  = fRunPara->fSkyMapCentreRAJ2000;
+        fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000 = fRunPara->fSkyMapCentreDecJ2000;
+        fRunPara->fRunList[runlist_iter].fSkyMapCentreWest =
+            VSkyCoordinatesUtilities::getTargetShiftWest( 
+                    fRunPara->fRunList[runlist_iter].fTargetRAJ2000, fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
+                    fRunPara->fSkyMapCentreRAJ2000, fRunPara->fSkyMapCentreDecJ2000 ) * -1.;
+        fRunPara->fRunList[runlist_iter].fSkyMapCentreNorth =
+            VSkyCoordinatesUtilities::getTargetShiftNorth( 
+                    fRunPara->fRunList[runlist_iter].fTargetRAJ2000, fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
+                    fRunPara->fSkyMapCentreRAJ2000, fRunPara->fSkyMapCentreDecJ2000 );
+    }
+    // if not set in runparameter file: set to target direction
+    else
+    {
+        fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000 = fRunPara->fRunList[runlist_iter].fTargetRAJ2000;
+        fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000 = fRunPara->fRunList[runlist_iter].fTargetDecJ2000;
+        fRunPara->fSkyMapCentreRAJ2000 = fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000;
+        fRunPara->fSkyMapCentreDecJ2000 = fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000;
+    }
+}
+
+void VStereoAnalysis::astro_set_skymap_centershift_from_runparameters( unsigned int runlist_iter )
+{
+    /////////////////////////////////////////////////////////
+    // from runparameter file: set and get target shifts
+    // (calculated relative to sky map centre)
+    // (this is the position where all 1D histograms (theta2, energy spectra, etc) are calculated)
+    if( fIsOn )
+    {
+        if( TMath::Abs( fRunPara->fTargetShiftDecJ2000 ) > 1.e-8 || TMath::Abs( fRunPara->fTargetShiftRAJ2000 ) > 1.e-8 )
+        {
+            fRunPara->fRunList[runlist_iter].fTargetShiftWest = VSkyCoordinatesUtilities::getTargetShiftWest( 
+                    fRunPara->fRunList[runlist_iter].fTargetRAJ2000, fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
+                    fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
+            fRunPara->fRunList[runlist_iter].fTargetShiftNorth = -1.*VSkyCoordinatesUtilities::getTargetShiftNorth( 
+                    fRunPara->fRunList[runlist_iter].fTargetRAJ2000, fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
+                    fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
+
+            fRunPara->fRunList[runlist_iter].fTargetShiftWest  += fRunPara->fRunList[runlist_iter].fSkyMapCentreWest;
+            fRunPara->fRunList[runlist_iter].fTargetShiftNorth += fRunPara->fRunList[runlist_iter].fSkyMapCentreNorth;
+        }
+        else
+        {
+            fRunPara->fRunList[runlist_iter].fTargetShiftWest  = fRunPara->fTargetShiftWest;
+            fRunPara->fRunList[runlist_iter].fTargetShiftNorth = fRunPara->fTargetShiftNorth;
+        }
+        fRunPara->fRunList[runlist_iter].fTargetShiftWest *= -1.;
+        fRunPara->fTargetShiftWest = fRunPara->fRunList[runlist_iter].fTargetShiftWest;
+        fRunPara->fTargetShiftNorth = fRunPara->fRunList[runlist_iter].fTargetShiftNorth;
+        fRunPara->setTargetShifts( runlist_iter );
+    }
+}
+
+double VStereoAnalysis::astro_get_mjd( unsigned int runlist_iter )
+{
+    double iMJD = ( double )fRunPara->fRunList[runlist_iter].fMJDOn;
+    if( !fIsOn )
+    {
+        iMJD = ( double )fRunPara->fRunList[runlist_iter].fMJDOff;
+    }
+    return iMJD;
+}
 
 /*
-  (this is called for each run)
+ * convert wobble offsets from angle in the sky
+ * to offsets in RA/Dec
+ */
+pair< double, double > VStereoAnalysis::astro_get_wobbleoffset_radec( unsigned int runlist_iter, bool bPrint )
+{
+    // calculate wobble offset in ra/dec for current epoch
+    pair< double, double > i_radec_diff;
+
+    VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( 
+            fRunPara->fRunList[runlist_iter].fWobbleNorth, 
+            -1.*fRunPara->fRunList[runlist_iter].fWobbleWest,
+            fRunPara->fRunList[runlist_iter].fTargetDec,
+            fRunPara->fRunList[runlist_iter].fTargetRA,
+            i_radec_diff.second,
+            i_radec_diff.first );
+    if( i_radec_diff.first < -180. )
+    {
+        i_radec_diff.first += 360.;
+    }
+    if( fIsOn && bPrint )
+    {
+        cout << "\tWobble offsets (currE): N: ";
+        cout << fRunPara->fRunList[runlist_iter].fWobbleNorth;
+        cout << " W: " << fRunPara->fRunList[runlist_iter].fWobbleWest;
+        cout << ",  RA " << i_radec_diff.first << ", Dec " << i_radec_diff.second << endl;
+    }
+    return i_radec_diff;
+}
+
+/*
+ * array pointing (center of pointing FOV)
+ * in current epoch
+ */
+pair< double, double > VStereoAnalysis::astro_get_arraypointing( unsigned int runlist_iter, bool bPrint )
+{
+    pair< double, double > ra_dec_wobbleoffset = astro_get_wobbleoffset_radec( runlist_iter, bPrint );
+
+    pair< double, double > i_radec_arraypointing;
+    i_radec_arraypointing.first = fRunPara->fRunList[runlist_iter].fTargetRA   + ra_dec_wobbleoffset.first;
+    i_radec_arraypointing.second = fRunPara->fRunList[runlist_iter].fTargetDec + ra_dec_wobbleoffset.second;
+
+    return i_radec_arraypointing;
+}
+
+/*
+ * array pointing (center of pointing FOV)
+ * in J2000
+ */
+pair< double, double > VStereoAnalysis::astro_get_arraypointingJ2000( unsigned int runlist_iter )
+{
+    pair< double, double > i_radec_arraypointing = astro_get_arraypointing(runlist_iter);
+    // correct for precession (from current epoch to J2000=MJD51544)
+    VSkyCoordinatesUtilities::precessTarget( 
+            51544., 
+            i_radec_arraypointing.first, i_radec_arraypointing.second,
+            astro_get_mjd(runlist_iter), true );
+    return i_radec_arraypointing;
+}
+
+void VStereoAnalysis::astro_calculate_modified_wobbleoffset( unsigned int runlist_iter )
+{
+    pair< double, double > ra_dec_arraypointing = astro_get_arraypointingJ2000(runlist_iter);
+
+    double i_WobbleJ2000_West = VSkyCoordinatesUtilities::getTargetShiftWest( 
+                                fRunPara->fRunList[runlist_iter].fTargetRAJ2000, 
+                                fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
+                                ra_dec_arraypointing.first,
+                                ra_dec_arraypointing.second) * -1.;
+    double i_WobbleJ2000_North = VSkyCoordinatesUtilities::getTargetShiftNorth( 
+                                 fRunPara->fRunList[runlist_iter].fTargetRAJ2000, 
+                                 fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
+                                 ra_dec_arraypointing.first,
+                                 ra_dec_arraypointing.second);
+
+    // modify wobble offsets for centering of sky maps
+    fRunPara->fRunList[runlist_iter].fWobbleNorthMod = i_WobbleJ2000_North - fRunPara->fRunList[runlist_iter].fSkyMapCentreNorth;
+    fRunPara->fRunList[runlist_iter].fWobbleWestMod  = i_WobbleJ2000_West  - fRunPara->fRunList[runlist_iter].fSkyMapCentreWest;
+
+    if( fIsOn )
+    {
+        cout << "\tWobble offsets (J2000): N: " << i_WobbleJ2000_North << " W: " << i_WobbleJ2000_West << endl;
+        cout << "\tSky maps centred at (ra,dec (J2000)) (";
+        cout << fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000 << ", ";
+        cout << fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000 << ")";
+        cout << endl;
+        cout << "\tTelescopes pointing to: (ra,dec (J2000)) (";
+        cout << ra_dec_arraypointing.first << ", ";
+        cout << ra_dec_arraypointing.second << ")";
+        cout << ", N: " << fRunPara->fRunList[runlist_iter].fWobbleNorthMod;
+        cout << " W: " << fRunPara->fRunList[runlist_iter].fWobbleWestMod << endl;
+        cout << "\t1D-histograms calculated at (x,y): ";
+        cout << fRunPara->fRunList[runlist_iter].fTargetShiftNorth << ", " << fRunPara->fRunList[runlist_iter].fTargetShiftWest;
+        if( TMath::Abs( fRunPara->fTargetShiftDecJ2000 ) > 1.e-8 &&  TMath::Abs( fRunPara->fTargetShiftRAJ2000 ) > 1.e-8 )
+        {
+            cout << " (ra,dec (J2000)) " << fRunPara->fTargetShiftRAJ2000 << ", " << fRunPara->fTargetShiftDecJ2000;
+        }
+        cout << endl;
+    }
+}
+
+/*
+ * precess telescope pointing from J2000 to current epoch
+ * and return current epoch coordinates
+ */
+pair< double, double > VStereoAnalysis::astro_calculate_ra_dec_currentEpoch( unsigned int runlist_iter )
+{
+    pair< double, double > i_radec;
+    i_radec.first = fRunPara->fRunList[runlist_iter].fTargetRAJ2000 * TMath::DegToRad();
+    i_radec.second = fRunPara->fRunList[runlist_iter].fTargetDecJ2000 * TMath::DegToRad();
+
+    VSkyCoordinatesUtilities::precessTarget( astro_get_mjd( runlist_iter ), i_radec.first, i_radec.second );
+    // set target coordinates into run parameter list
+    fRunPara->setTargetRADec_currentEpoch( 
+            runlist_iter,
+            i_radec.first * TMath::RadToDeg(),
+            i_radec.second * TMath::RadToDeg() );
+
+    return i_radec;
+}
+
+void VStereoAnalysis::astro_print_pointing( unsigned int runlist_iter )
+{
+    if( !fIsOn ) return;
+    // print some information on targeting/pointing to screen
+    cout << "Run " << fRunPara->fRunList[runlist_iter].fRunOn << " ---------------------------" << endl;
+    // print target info to screen
+    cout << "\tTarget: " << fRunPara->fRunList[runlist_iter].fTarget << " (ra,dec)=(";
+    cout << fRunPara->fRunList[runlist_iter].fTargetRA << ", " << fRunPara->fRunList[runlist_iter].fTargetDec << ")";
+    cout << " (precessed, MJD=" << astro_get_mjd( runlist_iter ) << "), ";
+    cout << "(ra,dec (J2000)) = (";
+    cout << fRunPara->fRunList[runlist_iter].fTargetRAJ2000 << ", ";
+    cout << fRunPara->fRunList[runlist_iter].fTargetDecJ2000 << ")";
+    if( TMath::Abs( fRunPara->fRunList[runlist_iter].fPairOffset ) > 1.e-2 )
+    {
+        cout << ", pair offset [min]: " << fRunPara->fRunList[runlist_iter].fPairOffset;
+    }
+    cout << endl;
+}
+
+/*
+ * set and get the regions to exclude
+ * (these are calculated relative to the sky map centre)
+*/
+void VStereoAnalysis::astro_set_exclusionsregions( unsigned int runlist_iter )
+{
+    astro_setup_star_cataloge(runlist_iter);
+
+    for( unsigned int k = 0 ; k < fRunPara->fExclusionRegions.size(); k++ )
+    {
+        if( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 < -90. )
+        {
+            continue;
+        }
+        fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  = 
+             VSkyCoordinatesUtilities::getTargetShiftWest( 
+                fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000,
+                fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000,
+                fRunPara->fExclusionRegions[k]->fExcludeFromBackground_RAJ2000,
+                fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 );
+
+        fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North = 
+             VSkyCoordinatesUtilities::getTargetShiftNorth( 
+                fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000,
+                fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000,
+                fRunPara->fExclusionRegions[k]->fExcludeFromBackground_RAJ2000,
+                fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 );
+
+        if( TMath::Abs( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North ) < 1.e-8 )
+        {
+            fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North = 0.;
+        }
+        if( TMath::Abs( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West ) < 1.e-8 )
+        {
+                fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  = 0.;
+        }
+    }
+}
+
+/* 
+ * set up star catalogue and exclusion regions
+ * (all in J2000)
+ */
+void VStereoAnalysis::astro_setup_star_cataloge( unsigned int runlist_iter )
+{
+    if( !fIsOn ) return;
+
+    fAstro.back()->initStarCatalogue( 
+            fRunPara->fStarCatalogue,
+            astro_get_mjd(runlist_iter),
+            fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax,
+            fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax,
+            fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000, fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000 );
+    VStarCatalogue* iStarCatalogue = fAstro.back()->getStarCatalogue();
+    if( !iStarCatalogue )
+    {
+        cout << "VStereoAnalysis::astro_setup_star_cataloge() error: star catalogue not found: " << fRunPara->fStarCatalogue << endl;
+        cout << "exiting..." << endl;
+        exit( EXIT_FAILURE );
+    }
+    // remove double entries
+    iStarCatalogue->purge();
+    if( iStarCatalogue->getListOfStarsinFOV().size() == 0 ) return;
+
+    cout << "\tbright stars (magnitude brighter than " << fRunPara->fStarMinBrightness << ", exclusion radius ";
+    cout << fRunPara->fStarExlusionRadius << " deg, " << fRunPara->fStarBand << "-band) in field of view (J2000): " << endl;
+    cout << "\t\t ID \t RA \t Dec \t magnitude " << endl;
+    for( unsigned int i = 0; i < iStarCatalogue->getListOfStarsinFOV().size(); i++ )
+    {
+        if( !iStarCatalogue->getListOfStarsinFOV()[i]
+          || iStarCatalogue->getListOfStarsinFOV()[i]->getBrightness( fRunPara->fStarBand ) 
+              >= fRunPara->fStarMinBrightness
+          || fRunPara->fStarExlusionRadius <= 0. )
+        {
+            continue;
+        }
+        iStarCatalogue->getListOfStarsinFOV()[i]->printStar_for_anasum( fRunPara->fStarBand );
+
+        // check if this region is already excluded (avoid dublications)
+        bool b_isExcluded = false;
+        for( unsigned int e = 0; e < fRunPara->fExclusionRegions.size(); e++ )
+        {
+            if( fRunPara->fExclusionRegions[e]->fExcludeFromBackground_StarID >= 0
+             && fRunPara->fExclusionRegions[e]->fExcludeFromBackground_StarID == (int)iStarCatalogue->getListOfStarsinFOV()[i]->fStarID )
+            {
+                b_isExcluded = true;
+            }
+        }
+        if( b_isExcluded ) continue;
+        fRunPara->fExclusionRegions.push_back( new VAnaSumRunParameterListOfExclusionRegions() );
+        fRunPara->fExclusionRegions.back()->fExcludeFromBackground_RAJ2000 = iStarCatalogue->getListOfStarsinFOV()[i]->fRA2000;
+        fRunPara->fExclusionRegions.back()->fExcludeFromBackground_DecJ2000 = iStarCatalogue->getListOfStarsinFOV()[i]->fDec2000;
+        fRunPara->fExclusionRegions.back()->fExcludeFromBackground_Radius1 = fRunPara->fStarExlusionRadius;
+        fRunPara->fExclusionRegions.back()->fExcludeFromBackground_Radius2 = fRunPara->fStarExlusionRadius;
+        fRunPara->fExclusionRegions.back()->fExcludeFromBackground_North = 0.;
+        fRunPara->fExclusionRegions.back()->fExcludeFromBackground_West = 0.;
+        fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarID = ( int )iStarCatalogue->getListOfStarsinFOV()[i]->fStarID;
+        fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarName = iStarCatalogue->getListOfStarsinFOV()[i]->fStarName;
+        fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarBrightness_V = iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_V;
+        fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarBrightness_B = iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_B;
+    }
+    iStarCatalogue->purge();
+}
+
+/*
+  setup all coordinate systems
 
   - set targets
   - set sky map centres
@@ -1396,309 +1733,36 @@ void VStereoAnalysis::defineAstroSource()
 		cout << "Defining targets and exclusion regions" << endl;
 	}
 
-	/////////////////////////////////////////////////////////
-	// loop over all runs in runlist
 	for( unsigned int i = 0; i < fRunPara->fRunList.size(); i++ )
 	{
-		/////////////////////////////////////////////////////////
-		// check source coordinates
-		// (this is the target of observation)
-		/////////////////////////////////////////////////////////
-		if( fRunPara->fRunList[i].fTargetDecJ2000 < -89.99 )
-		{
-			cout << "ERROR in VStereoAnalysis::defineAstroSource: invalid target " << fRunPara->fRunList[i].fTarget << endl;
-			cout << "\t run " << fRunPara->fRunList[i].fRunOn << "\t" << fRunPara->fRunList[i].fTarget;
-			cout << fRunPara->fRunList[i].fTargetDecJ2000 << "\t" << fRunPara->fRunList[i].fTargetShiftDecJ2000 << endl;
-			exit( EXIT_FAILURE );
-		}
+        astro_check_for_valid_coordinates( i );
+        astro_set_skymap_center_from_runparameters( i );
+        astro_set_skymap_centershift_from_runparameters( i );
 
-		/////////////////////////////////////////////////////////
-		// Case 1: sky map centre is given as xy offset [deg] in runparameter file
-		if( TMath::Abs( fRunPara->fSkyMapCentreNorth ) > 1.e-8 || TMath::Abs( fRunPara->fSkyMapCentreWest ) > 1.e-8 )
-		{
-			fRunPara->fRunList[i].fSkyMapCentreWest  = fRunPara->fSkyMapCentreWest;
-			fRunPara->fRunList[i].fSkyMapCentreNorth = fRunPara->fSkyMapCentreNorth;
-			double i_decDiff =  0.;   // offset in dec
-			double i_raDiff = 0.;     // offset in ra
-			VSkyCoordinatesUtilities::getWobbleOffset_in_RADec(
-                    fRunPara->fRunList[i].fSkyMapCentreNorth,
-					fRunPara->fRunList[i].fSkyMapCentreWest,
-					fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
-					i_decDiff, i_raDiff );
-			fRunPara->fRunList[i].fSkyMapCentreRAJ2000  = fRunPara->fRunList[i].fTargetRAJ2000 + i_raDiff;
-			fRunPara->fRunList[i].fSkyMapCentreDecJ2000 = fRunPara->fRunList[i].fTargetDecJ2000 + i_decDiff;
-		}
-        // Case 2: sky map centre is given in J200 in runparameter file
-		// (this is in almost all analysis the usual/default case)
-		else if( TMath::Abs( fRunPara->fSkyMapCentreRAJ2000 ) > 1.e-8 )
-		{
-			fRunPara->fRunList[i].fSkyMapCentreRAJ2000  = fRunPara->fSkyMapCentreRAJ2000;
-			fRunPara->fRunList[i].fSkyMapCentreDecJ2000 = fRunPara->fSkyMapCentreDecJ2000;
-			fRunPara->fRunList[i].fSkyMapCentreWest =
-				VSkyCoordinatesUtilities::getTargetShiftWest( 
-                        fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
-						fRunPara->fSkyMapCentreRAJ2000, fRunPara->fSkyMapCentreDecJ2000 ) * -1.;
-			fRunPara->fRunList[i].fSkyMapCentreNorth =
-				VSkyCoordinatesUtilities::getTargetShiftNorth( 
-                        fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
-						fRunPara->fSkyMapCentreRAJ2000, fRunPara->fSkyMapCentreDecJ2000 );
-		}
-		// if not set in runparameter file: set to target direction
-		else
-		{
-			fRunPara->fRunList[i].fSkyMapCentreRAJ2000 = fRunPara->fRunList[i].fTargetRAJ2000;
-			fRunPara->fRunList[i].fSkyMapCentreDecJ2000 = fRunPara->fRunList[i].fTargetDecJ2000;
-			fRunPara->fSkyMapCentreRAJ2000 = fRunPara->fRunList[i].fSkyMapCentreRAJ2000;
-			fRunPara->fSkyMapCentreDecJ2000 = fRunPara->fRunList[i].fSkyMapCentreDecJ2000;
-		}
-
-		/////////////////////////////////////////////////////////
-		// from runparameter file: set and get target shifts
-		// (calculated relative to sky map centre)
-		// (this is the position where all 1D histograms (theta2, energy spectra, etc) are calculated)
-		if( fIsOn )
-		{
-			if( TMath::Abs( fRunPara->fTargetShiftDecJ2000 ) > 1.e-8 || TMath::Abs( fRunPara->fTargetShiftRAJ2000 ) > 1.e-8 )
-			{
-				fRunPara->fRunList[i].fTargetShiftWest = VSkyCoordinatesUtilities::getTargetShiftWest( 
-                        fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
-						fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
-				fRunPara->fRunList[i].fTargetShiftNorth = -1.*VSkyCoordinatesUtilities::getTargetShiftNorth( 
-                        fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
-						fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
-
-				fRunPara->fRunList[i].fTargetShiftWest  += fRunPara->fRunList[i].fSkyMapCentreWest;
-				fRunPara->fRunList[i].fTargetShiftNorth += fRunPara->fRunList[i].fSkyMapCentreNorth;
-			}
-			else
-			{
-				fRunPara->fRunList[i].fTargetShiftWest  = fRunPara->fTargetShiftWest;
-				fRunPara->fRunList[i].fTargetShiftNorth = fRunPara->fTargetShiftNorth;
-			}
-			fRunPara->fRunList[i].fTargetShiftWest *= -1.;
-			fRunPara->fTargetShiftWest = fRunPara->fRunList[i].fTargetShiftWest;
-			fRunPara->fTargetShiftNorth = fRunPara->fRunList[i].fTargetShiftNorth;
-			fRunPara->setTargetShifts( i, fRunPara->fRunList[i].fTargetShiftWest, fRunPara->fRunList[i].fTargetShiftNorth,
-									   fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
-		}
-		/////////////////////////////////////////////////////////
-		// precess target coordinates from J2000 to current epoch
-		// (direction of telescope pointing)
-		double i_dec = fRunPara->fRunList[i].fTargetDecJ2000 * TMath::DegToRad();
-		double i_ra  = fRunPara->fRunList[i].fTargetRAJ2000 * TMath::DegToRad();
-		double iMJD = ( double )fRunPara->fRunList[i].fMJDOn;
-		if( !fIsOn )
-		{
-			iMJD = ( double )fRunPara->fRunList[i].fMJDOff;
-		}
-		// (i_dec and i_ra are in current epoch coordinates in the following, not J2000)
-		VSkyCoordinatesUtilities::precessTarget( iMJD, i_ra, i_dec );
-
-		// print some information on targeting/pointing to screen
-		if( fIsOn )
-		{
-			cout << "Run " << fRunPara->fRunList[i].fRunOn << " ---------------------------" << endl;
-			// set target coordinates into run parameter list
-			fRunPara->setTargetRADec_currentEpoch( i, i_ra * TMath::RadToDeg(), i_dec * TMath::RadToDeg() );
-			// print target info to screen
-			cout << "\tTarget: " << fRunPara->fRunList[i].fTarget << " (ra,dec)=(";
-			cout << fRunPara->fRunList[i].fTargetRA << ", " << fRunPara->fRunList[i].fTargetDec << ")";
-			cout << " (precessed, MJD=" << iMJD << "), ";
-			cout << "(ra,dec (J2000)) = (" << fRunPara->fRunList[i].fTargetRAJ2000 << ", " << fRunPara->fRunList[i].fTargetDecJ2000 << ")";
-			if( TMath::Abs( fRunPara->fRunList[i].fPairOffset ) > 1.e-2 )
-			{
-				cout << ", pair offset [min]: " << fRunPara->fRunList[i].fPairOffset;
-			}
-			cout << endl;
-		}
-		/////////////////////////////////////
-		// calculate wobble offsets in J2000
-		// (this might be overcomplicated)
-		/////////////////////////////////////
-		// calculate wobble offset in ra/dec for current epoch
-		double i_decDiff = 0.;
-		double i_raDiff = 0.;
-		VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( 
-                fRunPara->fRunList[i].fWobbleNorth, -1.*fRunPara->fRunList[i].fWobbleWest,
-				i_dec * TMath::RadToDeg(), i_ra * TMath::RadToDeg(), i_decDiff, i_raDiff );
-		if( i_raDiff < -180. )
-		{
-			i_raDiff += 360.;
-		}
-		double i_decWobble = i_dec * TMath::RadToDeg() + i_decDiff;
-		double i_raWobble  = i_ra * TMath::RadToDeg()  + i_raDiff;
-		// correct for precession (from current epoch to J2000=MJD51544)
-		VSkyCoordinatesUtilities::precessTarget( 51544., i_raWobble, i_decWobble, iMJD, true );
-		double i_WobbleJ2000_West = VSkyCoordinatesUtilities::getTargetShiftWest( 
-                                    fRunPara->fRunList[i].fTargetRAJ2000, 
-                                    fRunPara->fRunList[i].fTargetDecJ2000,
-									i_raWobble, i_decWobble ) * -1.;
-		double i_WobbleJ2000_North = VSkyCoordinatesUtilities::getTargetShiftNorth( 
-                                     fRunPara->fRunList[i].fTargetRAJ2000, 
-                                     fRunPara->fRunList[i].fTargetDecJ2000,
-									 i_raWobble, i_decWobble );
-		// modify wobble offsets for centering of sky maps
-		fRunPara->fRunList[i].fWobbleNorthMod = i_WobbleJ2000_North - fRunPara->fRunList[i].fSkyMapCentreNorth;
-		fRunPara->fRunList[i].fWobbleWestMod  = i_WobbleJ2000_West  - fRunPara->fRunList[i].fSkyMapCentreWest;
+        astro_calculate_ra_dec_currentEpoch( i );
+        astro_print_pointing( i );
+        astro_calculate_modified_wobbleoffset( i );
+        fRunPara->setArrayPointing(
+                i,
+                astro_get_arraypointing(i, false),
+                astro_get_arraypointingJ2000(i) );
 
 		// fill run parameter values
-		fRunPara->setTargetRADecJ2000( i, fRunPara->fRunList[i].fTargetRAJ2000, 
-                                          fRunPara->fRunList[i].fTargetDecJ2000,
-                                          fRunPara->fRunList[i].fTarget );
-		fRunPara->setTargetShifts( i, fRunPara->fRunList[i].fTargetShiftWest, fRunPara->fRunList[i].fTargetShiftNorth,
-								   fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
-		fRunPara->setSkyMapCentreJ2000( i, fRunPara->fRunList[i].fSkyMapCentreRAJ2000, fRunPara->fRunList[i].fSkyMapCentreDecJ2000 );
+		fRunPara->setTargetRADecJ2000( i );
+		fRunPara->setTargetShifts( i );
+		fRunPara->setSkyMapCentreJ2000( i );
 
-		///////////////////////////////////////////////////////////////////
-		// some printout
-		if( fIsOn )
-		{
-			cout << "\tWobble offsets (currE): N: " << fRunPara->fRunList[i].fWobbleNorth << " W: " << fRunPara->fRunList[i].fWobbleWest;
-			cout << ",  RA " << i_raDiff << ", Dec " << i_decDiff << endl;
-			cout << "\tWobble offsets (J2000): N: " << i_WobbleJ2000_North << " W: " << i_WobbleJ2000_West << endl;
-			cout << "\tSky maps centred at (ra,dec (J2000)) (";
-			cout << fRunPara->fRunList[i].fSkyMapCentreRAJ2000 << ", " << fRunPara->fRunList[i].fSkyMapCentreDecJ2000 << ")";
-			cout << "\tTelescopes pointing to: (ra,dec (J2000)) (" << i_raWobble << ", " << i_decWobble << ")";
-			cout << ", N: " << fRunPara->fRunList[i].fWobbleNorthMod << " W: " << fRunPara->fRunList[i].fWobbleWestMod << endl;
-			cout << "\t1D-histograms calculated at (x,y): ";
-            cout << fRunPara->fRunList[i].fTargetShiftNorth << ", " << fRunPara->fRunList[i].fTargetShiftWest;
-			if( TMath::Abs( fRunPara->fTargetShiftDecJ2000 ) > 1.e-8 &&  TMath::Abs( fRunPara->fTargetShiftRAJ2000 ) > 1.e-8 )
-			{
-				cout << " (ra,dec (J2000)) " << fRunPara->fTargetShiftRAJ2000 << ", " << fRunPara->fTargetShiftDecJ2000;
-			}
-			cout << endl;
-		}
-
-		//////////////////////////////////
-
-		// =============================================================
 		// define source and tracking class
 		fAstro.push_back( new VSkyCoordinates() );
-		// get wobble offsets in ra,dec
-		i_dec = fRunPara->fRunList[i].fTargetDecJ2000 * TMath::DegToRad();
-		i_ra  = fRunPara->fRunList[i].fTargetRAJ2000 * TMath::DegToRad();
-		// precess target to current epoch
-		VSkyCoordinatesUtilities::precessTarget( iMJD, i_ra, i_dec );
-		double idec_T = 0.;
-		double ira_T = 0.;
-		VSkyCoordinatesUtilities::getWobbledDirection( fRunPara->fRunList[i].fWobbleNorth, fRunPara->fRunList[i].fWobbleWest,
-				i_dec * TMath::RadToDeg(), i_ra * TMath::RadToDeg(), idec_T, ira_T );
-		// setting telescope coordinates (in current epoch)
-		// (ignore pointing errors here (very small impact))
-		fAstro.back()->setTelDec_deg( idec_T );
-		fAstro.back()->setTelRA_deg( ira_T );
-		// set observatory position
-		fAstro.back()->setObservatory( fRunPara->getObservatory_Longitude_deg(), fRunPara->getObservatory_Latitude_deg() );
-		// =============================================================
-		// set up star catalogue and exclusion regions
-		// (all in J2000)
-		if( fIsOn )
-		{
-			fAstro.back()->initStarCatalogue( fRunPara->fStarCatalogue, iMJD, fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax,
-											  fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax,
-											  fRunPara->fRunList[i].fSkyMapCentreRAJ2000, fRunPara->fRunList[i].fSkyMapCentreDecJ2000 );
-			VStarCatalogue* iStarCatalogue = fAstro.back()->getStarCatalogue();
-			if( !iStarCatalogue )
-			{
-				cout << "VStereoAnalysis::defineAstroSource() error: star catalogue not found: " << fRunPara->fStarCatalogue << endl;
-				cout << "exiting..." << endl;
-				exit( EXIT_FAILURE );
-			}
-			// remove double entries
-			iStarCatalogue->purge();
-			if( iStarCatalogue->getListOfStarsinFOV().size() > 0 )
-			{
-				cout << "\tbright stars (magnitude brighter than " << fRunPara->fStarMinBrightness << ", exclusion radius ";
-				cout << fRunPara->fStarExlusionRadius << " deg, " << fRunPara->fStarBand << "-band) in field of view (J2000): " << endl;
-				cout << "\t\t ID \t RA \t Dec \t magnitude " << endl;
-				double i_brightness = 100.;
-				for( unsigned int i = 0; i < iStarCatalogue->getListOfStarsinFOV().size(); i++ )
-				{
-					if( !iStarCatalogue->getListOfStarsinFOV()[i] )
-					{
-						continue;
-					}
+        fAstro.back()->setTelRADec_deg( astro_get_arraypointing( i, false ) );
 
-					if( fRunPara->fStarBand == "V" )
-					{
-						i_brightness = iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_V;
-					}
-					else if( fRunPara->fStarBand == "B" )
-					{
-						i_brightness = iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_B;
-					}
+		fAstro.back()->setObservatory( 
+                fRunPara->getObservatory_Longitude_deg(), 
+                fRunPara->getObservatory_Latitude_deg() );
 
-					if( i_brightness < fRunPara->fStarMinBrightness )
-					{
-						cout << "\t\t" << iStarCatalogue->getListOfStarsinFOV()[i]->fStarID << "\t";
-						cout << iStarCatalogue->getListOfStarsinFOV()[i]->fRA2000 << "\t";
-						cout << iStarCatalogue->getListOfStarsinFOV()[i]->fDec2000 << "\t";
-						cout << i_brightness << " (" << fRunPara->fStarBand << " band)";
-						cout << "    " << iStarCatalogue->getListOfStarsinFOV()[i]->fStarName;
-						cout << endl;
-						// add this to set of exclusion regions
-						if( fRunPara->fStarExlusionRadius > 0. )
-						{
-							// check if this region is already excluded (avoid dublications)
-							bool b_isExcluded = false;
-							for( unsigned int e = 0; e < fRunPara->fExclusionRegions.size(); e++ )
-							{
-								if( fRunPara->fExclusionRegions[e]->fExcludeFromBackground_StarID >= 0
-							     && fRunPara->fExclusionRegions[e]->fExcludeFromBackground_StarID == ( int )iStarCatalogue->getListOfStarsinFOV()[i]->fStarID )
-								{
-									b_isExcluded = true;
-								}
-							}
-							if( !b_isExcluded )
-							{
-								fRunPara->fExclusionRegions.push_back( new VAnaSumRunParameterListOfExclusionRegions() );
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_RAJ2000 = iStarCatalogue->getListOfStarsinFOV()[i]->fRA2000;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_DecJ2000 = iStarCatalogue->getListOfStarsinFOV()[i]->fDec2000;
-								//fRunPara->fExclusionRegions.back()->fExcludeFromBackground_Radius = fRunPara->fStarExlusionRadius;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_Radius1 = fRunPara->fStarExlusionRadius;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_Radius2 = fRunPara->fStarExlusionRadius;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_North = 0.;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_West = 0.;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarID = ( int )iStarCatalogue->getListOfStarsinFOV()[i]->fStarID;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarName = iStarCatalogue->getListOfStarsinFOV()[i]->fStarName;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarBrightness_V = iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_V;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarBrightness_B = iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_B;
-							}
-						}
-					}
-				}
-			}
-			iStarCatalogue->purge();
-		}
-		// doesn't work if different sources are analyzed with RA <> 360 deg
-		/////////////////////////////////////////////////////////
-		// set and get the regions to exclude
-		// (these are calculated relative to the sky map centre)
-		for( unsigned int k = 0 ; k < fRunPara->fExclusionRegions.size(); k++ )
-		{
-			if( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 > -90. )
-			{
-				fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  = VSkyCoordinatesUtilities::getTargetShiftWest( fRunPara->fRunList[i].fSkyMapCentreRAJ2000,
-						fRunPara->fRunList[i].fSkyMapCentreDecJ2000,
-						fRunPara->fExclusionRegions[k]->fExcludeFromBackground_RAJ2000,
-						fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 );
-				fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North = VSkyCoordinatesUtilities::getTargetShiftNorth( fRunPara->fRunList[i].fSkyMapCentreRAJ2000,
-						fRunPara->fRunList[i].fSkyMapCentreDecJ2000,
-						fRunPara->fExclusionRegions[k]->fExcludeFromBackground_RAJ2000,
-						fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 );
-				if( TMath::Abs( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North ) < 1.e-4 )
-				{
-					fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North = 0.;
-				}
-				if( TMath::Abs( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West ) < 1.e-4 )
-				{
-					fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  = 0.;
-				}
-			}
-		}
+        astro_set_exclusionsregions( i );
 	}
 }
-/////////////////////////////////////////////////////////
 
 
 void VStereoAnalysis::setCuts( VAnaSumRunParameterDataClass iL, int irun )
@@ -2067,7 +2131,7 @@ void VStereoAnalysis::getDerotatedCoordinates( unsigned int icounter,  double i_
 
 	// (!!!! Y coordinate reflected in eventdisplay for version < v.3.43 !!!!)
 	// ( don't change signs if you don't know why! )
-	fAstro[icounter]->derotateCoords( i_UTC, x, y, x_derot, y_derot );
+	fAstro[icounter]->derotateCoords( i_UTC, x, -1.*y, x_derot, y_derot );
 	y_derot *= -1.;
 
 	VSkyCoordinatesUtilities::convert_derotatedCoordinates_to_J2000( i_UTC, 
@@ -2167,18 +2231,18 @@ void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot,
 		return;
 	}
 
-	fDL3EventTree_runNumber      = c->runNumber;    // Run Number
-	fDL3EventTree_eventNumber    = c->eventNumber;  // Event Number
+	fDL3EventTree_runNumber      = c->runNumber;
+	fDL3EventTree_eventNumber    = c->eventNumber;
 	fDL3EventTree_Time           = c->Time;         // Time of day (seconds) of gamma ray event
-	fDL3EventTree_MJD            = c->MJD;          // Day of epoch (days)
+	fDL3EventTree_MJD            = c->MJD;
 	fDL3EventTree_Xoff           = c->Xoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
 	fDL3EventTree_Yoff           = c->Yoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
 	fDL3EventTree_Xderot         = i_xderot;        // Derotated Gamma Point-Of-Origin (deg, RA)
 	fDL3EventTree_Yderot         = i_yderot;        // Derotated Gamma Point-Of-Origin (deg, DEC)
     if( fCuts )
     {
-       fDL3EventTree_Erec       = fCuts->getReconstructedEnergy( fRunPara->fEnergyReconstructionMethod );        // Reconstructed Gamma Energy (TeV)
-       fDL3EventTree_Erec_Err   = fCuts->getReconstructedEnergydE( fRunPara->fEnergyReconstructionMethod );          // Reconstructed Gamma Energy (TeV) Error
+       fDL3EventTree_Erec = fCuts->getReconstructedEnergy( fRunPara->fEnergyReconstructionMethod );
+       fDL3EventTree_Erec_Err = fCuts->getReconstructedEnergydE( fRunPara->fEnergyReconstructionMethod ); // Reconstructed Gamma Energy (TeV) Error
     }
     else
     {
@@ -2187,7 +2251,7 @@ void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot,
     }
 	fDL3EventTree_XGroundCore    = c->Xcore;        // Gamma Ray Core-Ground intersection location (north)
 	fDL3EventTree_YGroundCore    = c->Ycore;        // Gamma Ray Core-Ground intersection location (east)
-	fDL3EventTree_NImages        = c->NImages;      // Number of images used in reconstruction?
+	fDL3EventTree_NImages        = c->NImages;      // Number of images used in reconstruction
 	fDL3EventTree_ImgSel         = c->ImgSel;       // binary code describing which telescopes had images
     fDL3EventTree_MeanPedvar     = c->meanPedvar_Image; // average pedvar
 	fDL3EventTree_MSCW           = c->MSCW;        // mean scaled width
@@ -2201,27 +2265,22 @@ void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot,
     {
         fDL3EventTree_Acceptance     = 0.;
     }
-    // get event ra and dec
     if( icounter < fRunPara->fRunList.size() )
     {
-        double i_centerpoint_RA = ( fRunPara->fRunList[icounter].fTargetRAJ2000 + -1.0 * getWobbleWest() );
-        double i_centerpoint_dec = ( fRunPara->fRunList[icounter].fTargetDecJ2000 + getWobbleNorth() );
-        double i_Spherical_RA  = 0.;
-        double i_Spherical_DEC = 0.;
+        double i_RA  = 0.;
+        double i_DEC = 0.;
         slaDtp2s( fDL3EventTree_Xderot * TMath::DegToRad(),
                   fDL3EventTree_Yderot * TMath::DegToRad(),
-                  i_centerpoint_RA * TMath::DegToRad(), 
-                  i_centerpoint_dec * TMath::DegToRad(),
-                  &i_Spherical_RA, &i_Spherical_DEC);
-        fDL3EventTree_RA  = i_Spherical_RA * TMath::RadToDeg();
-        fDL3EventTree_DEC = i_Spherical_DEC * TMath::RadToDeg();
+                  fRunPara->fRunList[icounter].fArrayPointingRAJ2000 * TMath::DegToRad(), 
+                  fRunPara->fRunList[icounter].fArrayPointingDecJ2000 * TMath::DegToRad(),
+                  &i_RA, &i_DEC);
+        fDL3EventTree_RA  = i_RA * TMath::RadToDeg();
+        fDL3EventTree_DEC = i_DEC * TMath::RadToDeg();
 
-        // Convert from spherical RA and DEC to Azimuth and Zenith
-        // convert to degrees and do calculation
-        fVsky->setTargetJ2000( i_Spherical_DEC * TMath::RadToDeg(), i_Spherical_RA * TMath::RadToDeg() );
+        // Convert from RA and DEC to Azimuth and Zenith
+        fVsky->setTargetJ2000( i_DEC * TMath::RadToDeg(), i_RA * TMath::RadToDeg() );
         fVsky->precessTarget( fDL3EventTree_MJD, 0 ) ;
 
-        // calculate new param
         fVsky->updatePointing( fDL3EventTree_MJD, fDL3EventTree_Time ) ;
         fDL3EventTree_Az = fVsky->getTargetAzimuth();
         fDL3EventTree_El = fVsky->getTargetElevation();
@@ -2230,6 +2289,8 @@ void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot,
     {
         fDL3EventTree_RA = 0.;
         fDL3EventTree_DEC = 0.;
+        fDL3EventTree_Az = 0.;
+        fDL3EventTree_El = 0.;
     }
     if ( fCuts && fRunPara->fWriteAllEvents )
     {
