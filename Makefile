@@ -1174,6 +1174,20 @@ updateDBlaserRUN:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "Done updateDBlaserRUN"
 
+########################################################
+# updateDBlaserRUN
+# ########################################################
+writelaserinDBOBJ  = ./obj/VDB_CalibrationInfo.o
+writelaserinDBOBJ += ./obj/VDB_Connection.o
+writelaserinDBOBJ += ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o
+writelaserinDBOBJ += ./obj/writelaserinDB.o
+
+./obj/writelaserinDB.o : ./src/writelaserinDB.cpp
+	$(CXX) $(CXXFLAGS) -Wno-write-strings -Wno-unused-function -c -o $@ $<
+
+writelaserinDB : $(writelaserinDBOBJ)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
 
 ########################################################
 # combineEffectiveAreas
