@@ -284,7 +284,8 @@ all VTS:	evndisp \
 	VTS.getLaserRunFromDB \
 	VTS.getRun_TimeElevAzim \
 	printRunParameter \
-        writeParticleRateFilesForTMVA \
+	writeParticleRateFilesForTMVA \
+	writelaserinDB \
 	logFile
 
 CTA:	evndisp \
