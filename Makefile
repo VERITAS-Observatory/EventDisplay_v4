@@ -1179,7 +1179,6 @@ updateDBlaserRUN:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 # ########################################################
 writelaserinDBOBJ  = ./obj/VDB_CalibrationInfo.o
 writelaserinDBOBJ += ./obj/VDB_Connection.o
-writelaserinDBOBJ += ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o
 writelaserinDBOBJ += ./obj/writelaserinDB.o
 
 ./obj/writelaserinDB.o : ./src/writelaserinDB.cpp
