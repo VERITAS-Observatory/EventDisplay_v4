@@ -316,19 +316,27 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VPETree.o \
 		./obj/VPETree_Dict.o \
 		./obj/VNoiseFileReader.o \
-                ./obj/VCamera.o \
+         ./obj/VCamera.o \
 		./obj/VDisplayBirdsEye.o \
 		./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
 		./obj/VCameraRead.o \
 		./obj/VDetectorGeometry.o \
 		./obj/VDetectorTree.o \
-	        ./obj/VImageParameterCalculation.o \
+	    ./obj/VImageParameterCalculation.o \
 		./obj/VImageBaseAnalyzer.o \
 		./obj/VImageCleaning.o \
 		./obj/VDB_CalibrationInfo.o\
 		./obj/VDB_Connection.o\
+		./obj/VEvndispRunParameter.o  ./obj/VEvndispRunParameter_Dict.o \
+		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+		./obj/VReadRunParameter.o \
+		./obj/VEvndispData.o \
+		./obj/VImageAnalyzerData.o \
+		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
+		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
+		./obj/VCalibrationData.o \
 		./obj/VCalibrator.o \
-                ./obj/VImageAnalyzer.o \
+        ./obj/VImageAnalyzer.o \
 		./obj/VArrayAnalyzer.o \
 		./obj/VMLPAnalyzer.o \
 		./obj/VDispAnalyzer.o \
@@ -343,12 +351,8 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VTraceHandler.o \
 		./obj/VFitTraceHandler.o \
 		./obj/VImageAnalyzerHistograms.o \
-		./obj/VImageAnalyzerData.o \
-		./obj/VCalibrationData.o \
 		./obj/VDST.o \
 		./obj/VDSTTree.o \
-		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
-		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
@@ -356,11 +360,7 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VDeadChannelFinder.o \
 		./obj/VSpecialChannel.o \
 		./obj/VDeadTime.o \
-		./obj/VEvndispRunParameter.o  ./obj/VEvndispRunParameter_Dict.o \
-		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-		./obj/VReadRunParameter.o \
 		./obj/VEventLoop.o \
-		./obj/VEvndispData.o \
 		./obj/VDBRunInfo.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/VUtilities.o \

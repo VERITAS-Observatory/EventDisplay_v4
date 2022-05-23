@@ -24,7 +24,7 @@ VGlobalRunParameter::VGlobalRunParameter( bool bSetGlobalParameter )
 				cout << endl;
 				cout << "Parameter files are expected to be in the following directory: " << endl;
 				cout << getDirectory_EVNDISPParameterFiles() << endl;
-				exit( -1 );
+                exit( EXIT_FAILURE );
 			}
 			else
 			{
@@ -186,12 +186,12 @@ bool VGlobalRunParameter::setDirectories()
 	// test if directory exists
 	if( gSystem->AccessPathName( fEVNDISPAnaDataDirectory.c_str() ) )
 	{
-		cout << "VGlobalRunParameter::setDirectories(): cannot find directory with EVNDISP analysis data" << endl;
+        cout << "VGlobalRunParameter::setDirectories(): cannot find directory with EVNDISP aux data" << endl;
 		cout << "\t looking for " << fEVNDISPAnaDataDirectory << endl;
 		cout << "\t is environmental variable $OBS_EVNDISP_AUX_DIR (or $VERITAS_EVNDISP_AUX_DIR or $CTA_EVNDISP_AUX_DIR) set?" << endl;
 		cout << "\t (see README/INSTALL)" << endl;
 		cout << "exiting..." << endl;
-		exit( -1 );
+        exit( EXIT_FAILURE );
 	}
 	// by default: calibration directory = fEVNDISPAnaDataDirectory
 	if( fEVNDISPCalibrationDataDirectory.size() == 0 )
@@ -204,9 +204,6 @@ bool VGlobalRunParameter::setDirectories()
 	if( raw_dir )
 	{
 		fVBFRawDataDirectory = raw_dir;
-		// test if data directory exists
-		//       if( !gSystem->AccessPathName( (fVBFRawDataDirectory + "/data/").c_str() ) ) fVBFRawDataDirectory += "/data/";
-		
 	}
 	else
 	{
@@ -308,7 +305,8 @@ void VGlobalRunParameter::printGlobalRunParameter()
 	cout << "reading global run parameters from " << getDirectory_EVNDISPParameterFiles();
 	cout << "EVNDISP.global.runparameter" << endl;
 	cout << endl;
-	cout << "VERSION " << fEVNDISP_VERSION << " (tree version " << fEVNDISP_TREE_VERSION << ")" << endl;
+	cout << "VERSION " << fEVNDISP_VERSION << " (tree version " << fEVNDISP_TREE_VERSION << ")";
+    cout << endl;
 	cout << "Observatory: " << fObservatory;
 	if( TMath::Abs( fObservatory_Longitude_deg ) > 1.e-5
 			&& TMath::Abs( fObservatory_Latitude_deg ) > 1.e-5
@@ -329,19 +327,23 @@ void VGlobalRunParameter::printGlobalRunParameter()
 	cout << "Directories: " << endl;
 	if( fEVNDISPAnaDataDirectory.size() > 0 )
 	{
-		cout << "    for EVNDISP data: \t\t" << fEVNDISPAnaDataDirectory << endl;
+        cout << "    for EVNDISP aux data: \t\t" << fEVNDISPAnaDataDirectory << endl;
 	}
 	if( fVBFRawDataDirectory.size() > 0 )
 	{
-		cout << "    for VBF raw: \t\t" << fVBFRawDataDirectory << endl;
+		cout << "    for VBF raw: \t\t\t" << fVBFRawDataDirectory << endl;
 	}
-	if( fEVNDISPCalibrationDataDirectory.size() > 0 )
+    if( getDirectory_EVNDISPCalibrationData().size() > 0 )
 	{
-		cout << "    for Calibration data: \t" << fEVNDISPCalibrationDataDirectory << endl;
+        cout << "    for Calibration data: \t\t" << getDirectory_EVNDISPCalibrationData() << endl;
 	}
+    if( getDirectory_EVNDISPCalibrationData_perRun().size() > 0 )
+    {
+        cout << "    for Calibration data (per run): \t" << getDirectory_EVNDISPCalibrationData_perRun() << endl;
+    }
 	if( fEVNDISPOutputDirectory.size() > 0 )
 	{
-		cout << "    for EVNDISP output: \t" << fEVNDISPOutputDirectory << endl;
+        cout << "    for EVNDISP output: \t\t" << fEVNDISPOutputDirectory << endl;
 	}
 	cout << endl;
 }
@@ -354,7 +356,7 @@ void VGlobalRunParameter::printGlobalRunParameter()
 string VGlobalRunParameter::fObservatory = "Whipple";
 bool VGlobalRunParameter::bReadRunParameter = false;
 unsigned int VGlobalRunParameter::fEVNDISP_TREE_VERSION = 9;
-string VGlobalRunParameter::fEVNDISP_VERSION = "v.4.87";
+string VGlobalRunParameter::fEVNDISP_VERSION = "v.4.90";
 string VGlobalRunParameter::fDBServer = "";
 string VGlobalRunParameter::fRawDataServer = "";
 string VGlobalRunParameter::fEVNDISPAnaDataDirectory = "";

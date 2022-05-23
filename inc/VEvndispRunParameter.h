@@ -62,6 +62,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		
 		// run parameters
 		int    frunnumber;                        // runnumber
+        string fRunTitle;                         // run title (usually empty, useful for debugging)
 		int    frunmode;                          // run mode
 		//    (0=analysis, 1=pedestal calculation, 2=gain/toffset calculation,
 		//    5 = gain/toffset calculation for low gain channels, 6=pedestals for low gain channels)
@@ -139,6 +140,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		string fLowGainCalibrationFile;           // file with file name for low-gain calibration
 		int fNCalibrationEvents;                  // events to be used for calibration
 		float faverageTZeroFiducialRadius;        // fiducial radius for average tzero calculation (DST), in fraction of FOV
+        unsigned int fCombineChannelsForPedestalCalculation; // combine all channels per telescope type for the pedestal calculation
 		vector< int > fGainFileNumber;
 		vector< int > fTOffFileNumber;
 		vector< int > fPedFileNumber;
@@ -165,6 +167,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   fPedestalSingleRootFile;           // write pedestal trees and histograms into a single root file
 		int    fCalibrationSumWindow;             // sumwindow for all calibration calculation
 		int    fCalibrationSumFirst;              // starting point all calibration calculation
+        int    fCalibrationSumWindowAverageTime;  // sumwindow for average arrival time calculation
 		float  fCalibrationIntSumMin;             // minimum integrated charge in a channel and event to be taken into account in gain or tzero calibration runs
 		string fsetSpecialChannels;               // set channels with L2 channels to correct for FADC crate time offsets (file name of channel settings)
                 string fthroughputCorrectionFile;         // throughput correction (e.g., mirror reflectivity or gain loss) --> applied after pixel integration
@@ -179,6 +182,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		vector< unsigned int > fTraceIntegrationMethod;   // trace integration method
 		vector< unsigned int > fTraceIntegrationMethod_pass1;   // trace integration method for pass 1 (doublepass only)
 		vector<int> fsumfirst;                    // parameter for window summation start (window 1)
+        vector<unsigned int>   fSearchWindowLast; // last sample searched for trace integration
 		vector<int> fsumwindow_1;                 // parameter for window summation (window 1)
 		vector<int> fsumwindow_2;                 // parameter for window summation (window 2)
 		vector<int> fsumwindow_pass1;             // parameter for window summation (double pass - pass 1)
@@ -188,7 +192,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   fDoublePassErrorWeighting2005;     // use error weighting from 2004 or today
 		bool   fDynamicIntegrationWindow;         // use a dynamic integration window (doublepass only)
 		vector< int >    fTraceWindowShift;       // shift the summation window by value (in doublepass: low gain channels only, default: 0 )
-		vector< bool >   fsumfirst_start_at_T0;   // start the summation window at T0 (+shift; not for doublepass)
+        vector< unsigned int >   fsumfirst_startingMethod;   // start the summation window at T0, TAverage, ... (+shift; not for doublepass)
 		vector< double > fSumWindowMaxTimeDifferenceLGtoHG;   // maximum difference between lg and hg window in doublepass method
 		vector< double > fSumWindowMaxTimedifferenceToDoublePassPosition; // maximum difference between doublepass calculated window start and t0 (in samples, default: 10 )
 		double ftracefit;                         // tracefit mode or getquick mode (-1.=no fitting, 0=fit all PMTs, else: fit only PMTs with maximum ftracefit x tracerms
@@ -229,8 +233,12 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   frecoverImagePixelNearDeadPixel;
 		bool   fFillImageBorderNeighbours;
 		bool   fSmoothDead;                       // smooth dead pixels (default: off )
-		
-		// reconstruction parameter file
+        // NN cleaning
+        bool   ifWriteGraphsToFile;               // flag to write run-time NN image cleaning settings to root file (read from NN image cleaning input card)
+        bool   ifReadIPRfromDatabase;             // flag to read IPR from external IPR database
+        bool   ifCreateIPRdatabase;               // flag to create external IPR database
+        bool   ifReadIPRfromDSTFile;              // flat to read IPR graph from DST file
+        
 		string freconstructionparameterfile;      // reconstruction parameter file
 		// MC parameters
 		string fsimu_pedestalfile;                // use external pedestal file for MC
@@ -307,7 +315,10 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		// trigsim parameters (note: different telescope IDs!)
 		map< unsigned int, int >   fTrigSim_referenceTrigger;         //!
 		map< unsigned int, float > fTrigSim_threshold;                //!
-		TString  fTrigSimInputcard;                      // input card for trigsim and next-neighbour image cleaning
+        TString  fTrigSimInputcard;                      // input card for trigsim and next-neighbour image cleaning
+        TString  fNNGraphsFile;
+        TString  fIPRdatabase;                    // file to read IPRs from external database
+        TString  fIPRdatabaseFile;                // file to write the IPR database
 		TString  fTrigThreshFile;
 		TString  fNSBdatabaseFile;
 		TString  fIPR1File;

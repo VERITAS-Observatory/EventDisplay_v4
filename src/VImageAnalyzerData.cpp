@@ -1,8 +1,6 @@
 /*! \class VImageAnalyzerData
      \brief all data concerning the channel analysis is stored in this class
 
-
-   \author Gernot Maier
 */
 
 #include <VImageAnalyzerData.h>
@@ -81,6 +79,7 @@ void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxCh
 	fPulseTimingUncorrected.resize( ipulsetiminglevel, fSums );
 	fPulseTimingCorrected.resize( ipulsetiminglevel, fSums );
 	fPulseTimingAverageTime.resize( iChannels, 0. );
+    fPulseTimingAverageTimeCorrected.resize( iChannels, 0. );
 	fTCorrectedSumLast.resize( iChannels, 0 );
 	fTCorrectedSumFirst.resize( iChannels, 0 );
 	fCurrentSummationWindow.resize( iChannels, 0 );
@@ -257,6 +256,13 @@ double VImageAnalyzerData::getHIGHQE_gainfactor( unsigned int iChannel )
 	}
 	
 	return -1.;
+}
+
+valarray<double>& VImageAnalyzerData::getTraceAverageTime( bool iCorrected )
+{
+     if( iCorrected ) return fPulseTimingAverageTimeCorrected;
+
+     return fPulseTimingAverageTime;
 }
 
 valarray<double>& VImageAnalyzerData::getTZeros( bool iCorrected )

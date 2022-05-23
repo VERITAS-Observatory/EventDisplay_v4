@@ -79,15 +79,15 @@ bool VImageBaseAnalyzer::setSpecialChannels()
    (to be used for calibration only)
 
 */
-void VImageBaseAnalyzer::calcSums( int iFirst, int iLast, bool iMakingPeds, bool iLowGainOnly )
+void VImageBaseAnalyzer::calcSums( int iFirst, int iLast, bool iMakingPeds, bool iLowGainOnly, unsigned int iTraceIntegrationMethod )
 {
 	if( getDebugFlag() )
 	{
 		cout << "VImageBaseAnalyzer::calcSums() " << iFirst << "\t" << iLast << endl;
 	}
-	int sw_original = iLast - iFirst ;
+	int sw_original = iLast - iFirst;
 	
-	// for DST source file, ignore everything and just get the sums and tzeros
+	// for DST source file, ignore everything and just get the sums
 	if( getRunParameter()->frunmode != 1 && ( fReader->getDataFormatNum() == 4 || fReader->getDataFormatNum() == 6 ) )
 	{
 		setSums( fReader->getSums() );
@@ -133,38 +133,27 @@ void VImageBaseAnalyzer::calcSums( int iFirst, int iLast, bool iMakingPeds, bool
 				continue;
 			}
 			
-			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( i_channelHitID, getHiLo()[i_channelHitID] ) )
+			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size()
+                    && !getDead( i_channelHitID, getHiLo()[i_channelHitID] )
+                    && iLast > iFirst )
 			{
 				fReader->selectHitChan( i );
-				if( iMakingPeds )
-				{
-					fTraceHandler->setTrace( fReader, getNSamples(), getPeds( getHiLo()[i_channelHitID] )[i_channelHitID],
-											 getPedrms( getHiLo()[i_channelHitID] )[i_channelHitID],
-											 i_channelHitID, i, 0. );
-				}
-				else
-				{
-					fTraceHandler->setTrace( fReader, getNSamples(), getPeds( getHiLo()[i_channelHitID] )[i_channelHitID],
-											 getPedrms( getHiLo()[i_channelHitID] )[i_channelHitID],
-											 i_channelHitID, i, getLowGainMultiplier_Trace()*getHiLo()[i_channelHitID] );
-				}
-				// make sure that trace integration is set (important for pedestal calculations in QADC runs)
-				if( getTraceIntegrationMethod() != 0 )
-				{
-					fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );
-				}
-				else
-				{
-					fTraceHandler->setTraceIntegrationmethod( 1 );
-				}
-				setSums( i_channelHitID, fTraceHandler->getTraceSum( iFirst, iLast, iMakingPeds )* getLowGainSumCorrection( sw_original , iLast - iFirst, getHiLo()[i_channelHitID] ) );
+                initializeTrace( iMakingPeds, i_channelHitID, i, iTraceIntegrationMethod );
+                
+                // calculate sums
+				setSums( i_channelHitID,
+                         fTraceHandler->getTraceSum( iFirst, 
+                                                     iLast, 
+                                                     iMakingPeds )
+                        * getLowGainSumCorrection( sw_original , iLast - iFirst, getHiLo()[i_channelHitID] ) );
 			}
 		}
 		catch( ... )
 		{
 			if( getDebugLevel() == 0 )
 			{
-				cout << "VImageBaseAnalyzer::calcSums(), index out of range (fReader->getHitID) " << i << ", i_channelHitID " << i_channelHitID << endl;
+				cout << "VImageBaseAnalyzer::calcSums(), index out of range (fReader->getHitID) ";
+                cout << i << ", i_channelHitID " << i_channelHitID << endl;
 				cout << "\t nhits: " << nhits << endl;
 				cout << "\t (Telescope " << getTelID() + 1 << ", event " << getEventNumber() << ")" << endl;
 				setDebugLevel( 1 );
@@ -181,6 +170,8 @@ void VImageBaseAnalyzer::calcSums( int iFirst, int iLast, bool iMakingPeds, bool
 
    (to be used for calibration)
 
+   TMPTMPTMPTMP
+   XXXXXX is this still needed?
 */
 void VImageBaseAnalyzer::calcTZeros( int fFirst, int fLast )
 {
@@ -1514,5 +1505,46 @@ int VImageBaseAnalyzer::getFADCTraceIntegrationPosition( int iPos )
 	}
 	
 	return iPos;
+}
+
+/*
+ *
+ * set trace and parameters for trace integration methods
+ *
+ */
+void VImageBaseAnalyzer::initializeTrace( bool iMakingPeds, unsigned int i_channelHitID, unsigned int i, unsigned int iTraceIntegrationMethod )
+{
+    double i_LG = getLowGainMultiplier_Trace() * getHiLo()[i_channelHitID];
+    
+    // sum for pedestal analysis
+    // (set all low-gain sums to
+    // zero)
+    if( iMakingPeds )
+    {
+        i_LG = 0.;
+    }
+    
+    // set trace
+    fTraceHandler->setTrace( fReader,
+                             getNSamples(),
+                             getPeds( getHiLo()[i_channelHitID] )[i_channelHitID],
+                             i_channelHitID,
+                             i,
+                             i_LG );
+    // make sure that trace integration is set (important for pedestal calculations in QADC runs)
+    if( iTraceIntegrationMethod < 9999 )
+    {
+        fTraceHandler->setTraceIntegrationmethod( iTraceIntegrationMethod );
+    }
+    else if( iTraceIntegrationMethod == 9999 && getTraceIntegrationMethod() != 0 )
+    {
+        fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );
+    }
+    // default trace integration method
+    else
+    {
+        fTraceHandler->setTraceIntegrationmethod( 1 );
+    }
+    
 }
 

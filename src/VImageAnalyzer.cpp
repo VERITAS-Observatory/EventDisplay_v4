@@ -1,9 +1,7 @@
 /*! \class VImageAnalyzer
   \brief class for analyzing VERITAS data
 
-  \author
-  Jamie Holder
-  Gernot Maier
+    image analysis (per telescope)
 
 */
 
@@ -446,7 +444,7 @@ void VImageAnalyzer::terminate( bool iDebug_IO )
 		// write calibration summaries
 		if( getRunParameter()->fsourcetype != 7 )
 		{
-			getCalibrationData()->terminate( getDead( false ), getDead( true ) );
+            getCalibrationData()->terminate( getDead( false ), getDead( true ), getRunParameter()->fTraceIntegrationMethod[fTelID] );
 		}
 		// write dead channel tree
 		// note: this writes the dead channel list of the last event to this tree

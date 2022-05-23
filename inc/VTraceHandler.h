@@ -39,6 +39,7 @@ class VTraceHandler
 		int fDynamicRange;                        //!< dynamic range
 		int fMaxThreshold;
 		unsigned int fMC_FADCTraceStart;          // start of FADC trace (in case the simulated trace is longer than needed)
+        bool     kIPRmeasure;                     // if signal extractor is in IPR measurements mode
 		
 		// Signal Extractors (Maxim)
 		float SaturLimit;
@@ -173,6 +174,10 @@ class VTraceHandler
 		{
 			fMC_FADCTraceStart = iO;
 		}
+        void    setIPRmeasure( bool iIPRmeasure = true )
+        {
+            kIPRmeasure = iIPRmeasure;
+        }
 		void    setPulseTimingLevels( vector< float > iP );
 		bool    setTraceIntegrationmethod( unsigned int iT = 1 );
 };
