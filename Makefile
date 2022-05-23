@@ -283,7 +283,6 @@ all VTS:	evndisp \
 	VTS.getRunListFromDB \
 	VTS.getLaserRunFromDB \
 	VTS.getRun_TimeElevAzim \
-	printRunParameter \
 	writeParticleRateFilesForTMVA \
 	writelaserinDB \
 	logFile
@@ -1915,8 +1914,6 @@ else
 	@echo "CTA_USER_DATA_DIR set to $(CTA_USER_DATA_DIR)"
 endif
 
-
-
 ###############################################################################################################################
 # source code formating
 ###############################################################################################################################
@@ -1932,7 +1929,10 @@ install:	all
 
 ###############################################################################################################################
 clean:
-	-rm -f ./obj/*.o ./obj/*_Dict.cpp ./obj/*_Dict.h ./lib/*.pcm
+	-rm -f ./obj/*.o ./obj/*_Dict.cpp ./obj/*_Dict.h ./lib/*.pcm ./obj/*.pcm ./bin/*.pcm
+
+rclean:
+	-rm -f ./obj/*.o ./obj/*_Dict.cpp ./obj/*_Dict.h ./bin/* ./lib/libVAnaSum.so ./lib/*.pcm ./obj/*dict.pcm ./bin/*.pcm
 ###############################################################################################################################
 
 .PHONY: all clean install FORCEDISTDIR dist TESTHESSIO TESTFITS configuration
