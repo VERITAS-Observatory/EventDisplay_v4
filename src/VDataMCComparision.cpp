@@ -151,7 +151,7 @@ bool VDataMCComparision::setTelescopeCoordinates( double x, double y, double z )
 	fTel_x.push_back( x );
 	fTel_y.push_back( y );
 	fTel_z.push_back( z );
-	cout << "\t setting telescope coordinates for telescope " << fTel_x.size() + 1 << "\t" << x << "\t" << y << "\t" << z << endl;
+	cout << "\t setting telescope coordinates for telescope " << fTel_x.size() << "\t" << x << "\t" << y << "\t" << z << endl;
 	return true;
 }
 
