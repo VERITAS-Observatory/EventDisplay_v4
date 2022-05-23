@@ -60,21 +60,20 @@ class VEffectiveAreaCalculator
 		
 		// effective areas (reading of effective areas)
 		unsigned int fNBins;                    // bins in the true energy of MC (fEff_E0)
-                unsigned int fBiasBin;                  // bins in the energy bias
+        unsigned int fBiasBin;                  // bins in the energy bias
 		unsigned int fhistoNEbins;              // energy bins for histograms only
-                unsigned int fResponseMatricesEbinning; // fine bins for response matrices. Likelihood analysis.
-                unsigned int fLogAngularBin;            // bins for the log10(angular diff R,MC [deg])
+        unsigned int fResponseMatricesEbinning; // fine bins for response matrices. Likelihood analysis.
+        unsigned int fLogAngularBin;            // bins for the log10(angular diff R,MC [deg])
 
 		vector< double > fEff_E0;
 		map< unsigned int, vector< double > > fEffArea_map;
 		map< unsigned int, vector< double > > fEffAreaMC_map;
 		map< unsigned int, unsigned int > fEntry_map;
 
-                map< unsigned int, TH2F* > fEsysMCRelative2D_map;
+        map< unsigned int, TH2F* > fEsysMCRelative2D_map;
 
 		vector< double >                      fEff_EsysMCRelative_EnergyAxis;
 		map< unsigned int, vector< double > > fEff_EsysMCRelative;
-		map< unsigned int, vector< double > > fEff_EsysMCRelativeE;
 		unsigned int     fNMeanEffectiveArea;
 		unsigned int     fNMeanEffectiveAreaMC;
 		unsigned int     fNMeanResponseMatrix;
@@ -108,8 +107,8 @@ class VEffectiveAreaCalculator
 		double fEnergyAxis_minimum_defaultValue;
 		double fEnergyAxis_maximum_defaultValue;
 
-                double fLogAngular_minimum_defaultValue;
-                double fLogAngular_maximum_defaultValue;
+        double fLogAngular_minimum_defaultValue;
+        double fLogAngular_maximum_defaultValue;
 		
 		VInstrumentResponseFunctionRunParameter* fRunPara;
 		
@@ -134,7 +133,7 @@ class VEffectiveAreaCalculator
 		vector< vector< TH1D* > > hVEcutNoTh2;
 		vector< vector< TH1D* > > hVEcutRec;
 		vector< vector< TH1D* > > hVEcutUW;
-                vector< vector< TH1D* > > hVEcutRecUW;
+        vector< vector< TH1D* > > hVEcutRecUW;
 		vector< vector< TH1D* > > hVEcutRecNoTh2;
 		vector< vector< TProfile* > > hVEmcSWeight;
 		vector< vector< TH1D* > > hVEcut500;
@@ -143,7 +142,7 @@ class VEffectiveAreaCalculator
 		vector< vector< TProfile* > > hVEsysMCRelative;
 		vector< vector< TH2F* > > hVEsysMCRelativeRMS;
 		vector< vector< TH2F* > > hVEsysMCRelative2D;
-                vector< vector< TH2F* > > hVEsysMCRelative2DNoDirectionCut;
+        vector< vector< TH2F* > > hVEsysMCRelative2DNoDirectionCut;
 		vector< vector< TH2F* > > hVEsys2D;
 		vector< vector< TH2F* > > hVResponseMatrix;
 		vector< vector< TH2F* > > hVResponseMatrixFine;
@@ -151,18 +150,18 @@ class VEffectiveAreaCalculator
 		vector< vector< TH2F* > > hVResponseMatrixQC;
 		vector< vector< TH2F* > > hVEmcCutCTA;
 		vector< vector< TH2F* > > hVResponseMatrixFineQC;
-                vector< vector< TH2F* > > hVResponseMatrixNoDirectionCut;
-                vector< vector< TH2F* > > hVResponseMatrixFineNoDirectionCut;
-                vector< vector< TH2F* > > hVAngErec2D;            // direction reconstruction
-                vector< vector< TH2F* > > hVAngMC2D;            // direction reconstruction
+        vector< vector< TH2F* > > hVResponseMatrixNoDirectionCut;
+        vector< vector< TH2F* > > hVResponseMatrixFineNoDirectionCut;
+        vector< vector< TH2F* > > hVAngErec2D;            // direction reconstruction
+        vector< vector< TH2F* > > hVAngMC2D;            // direction reconstruction
 
 		vector< vector< TH1D* > > hVWeightedRate;
 		vector< vector< TH1D* > > hVWeightedRate005;
 		vector< vector< vector < TH1D* > > > hVEcutSub;
 
                 // angular resolution graphs (vector in az)
-                vector< TGraphErrors* > fGraph_AngularResolution68p;
-                vector< TGraphErrors* > fGraph_AngularResolution80p;
+        vector< TGraphErrors* > fGraph_AngularResolution68p;
+        vector< TGraphErrors* > fGraph_AngularResolution80p;
                 /*
                 vector< vector< TH2F* > > hVAngularDiff_2D;
                 vector< vector< TH2F* > > hVAngularDiffEmc_2D;
@@ -237,9 +236,9 @@ class VEffectiveAreaCalculator
 		double e0[1000];
 		double eff[1000];
 		double effNoTh2[1000];
-		int nbins_MC;
-		double e0_MC[1000];
-		double eff_MC[1000];
+		UShort_t nbins_MC;
+		float e0_MC[1000];
+		float eff_MC[1000];
 		double seff_L[1000];
 		double seff_U[1000];
                 
@@ -263,6 +262,9 @@ class VEffectiveAreaCalculator
 
                 float Rec_angRes_p68[1000];
                 float Rec_angRes_p80[1000];
+
+                // H2F effective area tree
+                float fH2F_e0_esys[1000];
 
 		TTree* fAcceptance_AfterCuts_tree;       //Information for all the events after cuts to construct the background map
 		double fXoff_aC;
@@ -308,6 +310,8 @@ class VEffectiveAreaCalculator
                 void   fillAngularResolution( unsigned int i_az, bool iContaintment_80p );
 		double getAzMean( double azmin, double azmax );
 		double getCRWeight( double iEMC_TeV_log10, TH1* h , bool for_back_map = false );
+                template <typename T> vector< T > get_irf_vector( int i_nbins, T* i_e0, T* i_irf );
+                TH2F*  get_irf2D_vector( int nx, float minx, float maxx, int ny, float miny, float maxy, float* value );
 		bool   getEffectiveAreasFromFitFunction( TTree*, double azmin, double azmax, double ispectralindex );
 		void   getEffectiveAreasFromFitFunction( unsigned int, unsigned int, double, double&, double& );
 		double getEffectiveAreasFromHistograms( double erec, double ze, double woff, double iPedVar,
@@ -316,7 +320,7 @@ class VEffectiveAreaCalculator
 		bool   getMonteCarloSpectra( VEffectiveAreaCalculatorMCHistograms* );
 		double getMCSolidAngleNormalization();
 		vector< unsigned int > getUpperLowBins( vector< double > i_values, double d );
-		bool   initializeEffectiveAreasFromHistograms( TTree*, TH1D*, double azmin, double azmax, double ispectralindex, double ipedvar );
+		bool   initializeEffectiveAreasFromHistograms( TTree*, TH1D*, double azmin, double azmax, double ispectralindex, double ipedvar, TTree *iEffAreaH2F = 0 );
 		vector< double > interpolate_effectiveArea( double iV, double iVLower, double iVupper,
 				vector< double > iEL, vector< double > iEU, bool iCos = true );
 		

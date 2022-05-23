@@ -180,18 +180,18 @@ class VFluxCalculation : public TObject
 		~VFluxCalculation();
 		
 		void          calculateIntegralFlux( double iMinEnergy_TeV );
-                TGraphErrors* getFluxvsElevation()
-                {
-                        return gFluxElevation;
-                }
-                TGraphErrors* getFluxvsWobbleOffset()
-                {
-                        return gFluxWobbleOffset;
-                }
-                TGraphErrors* getFluxvsPedvars()
-                {
-                        return gFluxPedvars;
-                }
+        TGraphErrors* getFluxvsElevation()
+        {
+                return gFluxElevation;
+        }
+        TGraphErrors* getFluxvsWobbleOffset()
+        {
+                return gFluxWobbleOffset;
+        }
+        TGraphErrors* getFluxvsPedvars()
+        {
+                return gFluxPedvars;
+        }
 		TCanvas*      getFluxesVSMJDCanvas()
 		{
 			return fCanvasFluxesVSMJD;

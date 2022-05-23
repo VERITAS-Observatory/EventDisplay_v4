@@ -2867,7 +2867,7 @@ unsigned int VFluxCalculation::getIndexOfRun( int iRun )
 		}
 	}
 	
-	return 99999;
+	return 999999;
 }
 
 //######################################################################################

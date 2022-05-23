@@ -110,7 +110,7 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
 	fAnaSumFile = iAnaSumFile;
 	
 	// read full file to get an overview of all available runs
-	fFluxCombined = new VFluxCalculation( fAnaSumFile, 1, 0, 100000, -99., -99., false );
+	fFluxCombined = new VFluxCalculation( fAnaSumFile, 1, 0, 1000000, -99., -99., false );
 	if( fFluxCombined->IsZombie() )
 	{
 		cout << "VLightCurve::initializeLightCurve error reading anasum file" << endl;
@@ -133,11 +133,24 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
 	// get MJD for the case that no time limits are given
 	if( iMJDMin < 0 )
 	{
-		iMJDMin = TMath::Floor( fMJD[0] );
+        iMJDMin = 1000000;
+        for( unsigned int i = 0; i < fMJD.size(); i++ )
+        {
+            if( fMJD[i] > 0 && fMJD[i] < iMJDMin )
+            {
+                iMJDMin = TMath::Floor( fMJD[i] );
+            }
+        }
 	}
 	if( iMJDMax < 0 )
 	{
-		iMJDMax = TMath::Floor( fMJD[fMJD.size() - 2] ) + 1;
+        for( unsigned int i = 0; i < fMJD.size(); i++ )
+        {
+            if( fMJD[i] > 0 && fMJD[i] > iMJDMax )
+            {
+                iMJDMax = TMath::Floor( fMJD[i] ) + 1;
+            }
+        }
 	}
 	
 	// plotting parameters

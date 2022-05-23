@@ -613,7 +613,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			fRunPara->fWobbleNorth = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
 		// wobble offset EAST
-		else if( iTemp.rfind( "wobbleeast" ) < iTemp.size() && !( iTemp.rfind( "overwritedb_wobbleneast" ) < iTemp.size() ) )
+		else if( iTemp.rfind( "wobbleeast" ) < iTemp.size() && !( iTemp.rfind( "overwritedb_wobbleeast" ) < iTemp.size() ) )
 		{
 			fRunPara->fWobbleEast = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}

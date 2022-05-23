@@ -15,7 +15,6 @@
 #include "VStereoMaps.h"
 #include "VSkyCoordinates.h"
 #include "VSkyCoordinatesUtilities.h"
-#include "VTargets.h"
 #include "VPointingDB.h"
 
 #include "TDirectory.h"
@@ -35,6 +34,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 using namespace std;
@@ -199,8 +199,8 @@ class VStereoAnalysis
 		double  fDL3EventTree_El ;
 		double  fDL3EventTree_EmissionHeight ;
 		double  fDL3EventTree_Acceptance ;
-                double  fDL3EventTree_MVA;
-                UInt_t  fDL3EventTree_IsGamma;
+        double  fDL3EventTree_MVA;
+        UInt_t  fDL3EventTree_IsGamma;
 		VRadialAcceptance* fDL3_Acceptance;
 		
 		double  fDeadTimeStorage ;
@@ -219,7 +219,6 @@ class VStereoAnalysis
 		
 		CData* fDataRun;
 		TTree* fDataRunTree;
-		TTree* fDataFrogsTree;
 		TFile* fDataFile;
 		string fInstrumentEpoch;
 		vector< unsigned int > fTelToAnalyze;
@@ -242,6 +241,19 @@ class VStereoAnalysis
 		// directories
 		TDirectory* fDirTot;
 		vector< TDirectory* > fDirTotRun;
+
+        void astro_check_for_valid_coordinates( unsigned int runlist_iter );
+        void astro_set_skymap_center_from_runparameters( unsigned int runlist_iter );
+        void astro_set_skymap_centershift_from_runparameters( unsigned int runlist_iter );
+        pair< double, double > astro_calculate_ra_dec_currentEpoch( unsigned int runlist_iter ); 
+        pair< double, double > astro_get_wobbleoffset_radec( unsigned int runlist_iter, bool bPrint = true );
+        pair< double, double > astro_get_arraypointing( unsigned int runlist_iter, bool bPrint = true );
+        pair< double, double > astro_get_arraypointingJ2000( unsigned int runlist_iter );
+        double astro_get_mjd( unsigned int runlist_iter );
+        void astro_print_pointing( unsigned int runlist_iter );
+        void astro_calculate_modified_wobbleoffset( unsigned int runlist_iter );
+        void astro_set_exclusionsregions( unsigned int runlist_iter );
+        void astro_setup_star_cataloge( unsigned int runlist_iter );
 		
 		double combineHistograms();
 		void   defineAstroSource();

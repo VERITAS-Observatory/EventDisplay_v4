@@ -283,8 +283,8 @@ all VTS:	evndisp \
 	VTS.getRunListFromDB \
 	VTS.getLaserRunFromDB \
 	VTS.getRun_TimeElevAzim \
-	printRunParameter \
-        writeParticleRateFilesForTMVA \
+	writeParticleRateFilesForTMVA \
+	writelaserinDB \
 	logFile
 
 CTA:	evndisp \
@@ -369,7 +369,6 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 	 	./obj/VPointingDB.o \
 		./obj/VSkyCoordinates.o \
 		./obj/VArrayPointing.o \
-		./obj/VTargets.o \
 		./obj/VStarCatalogue.o  ./obj/VStarCatalogue_Dict.o \
 		./obj/VStar.o ./obj/VStar_Dict.o \
 		./obj/VTrackingCorrections.o \
@@ -523,7 +522,6 @@ ACCOBJECT = ./obj/VTS.getRun_TimeElevAzim.o \
 		./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
-		./obj/VTargets.o \
 		./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 		./obj/VStar.o ./obj/VStar_Dict.o \
 		./obj/VDB_Connection.o \
@@ -612,7 +610,7 @@ ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_
 		./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o ./obj/VTableLookupRunParameter.o \
 		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
-		./obj/VTableLookupRunParameter_Dict.o ./obj/VTargets.o ./obj/VASlalib.o \
+		./obj/VTableLookupRunParameter_Dict.o ./obj/VASlalib.o \
 		./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 		./obj/VDB_Connection.o \
 		./obj/VStar.o ./obj/VStar_Dict.o \
@@ -879,8 +877,7 @@ printDISPTables:	$(PRINTDISPTABLESOBJ)
 ########################################################
 # compareDatawithMC
 ########################################################
-COMPAREDATAMCOBJ=	./obj/VTargets.o \
-                        ./obj/VASlalib.o \
+COMPAREDATAMCOBJ=	./obj/VASlalib.o \
 			./obj/CData.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
@@ -1177,6 +1174,19 @@ updateDBlaserRUN:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "Done updateDBlaserRUN"
 
+########################################################
+# updateDBlaserRUN
+# ########################################################
+writelaserinDBOBJ  = ./obj/VDB_CalibrationInfo.o
+writelaserinDBOBJ += ./obj/VDB_Connection.o
+writelaserinDBOBJ += ./obj/writelaserinDB.o
+
+./obj/writelaserinDB.o : ./src/writelaserinDB.cpp
+	$(CXX) $(CXXFLAGS) -Wno-write-strings -Wno-unused-function -c -o $@ $<
+
+writelaserinDB : $(writelaserinDBOBJ)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
 
 ########################################################
 # combineEffectiveAreas
@@ -1395,7 +1405,7 @@ VTS.next_day:	./obj/VFITS.o ./obj/VFITS_Dict.o \
 		./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 		./obj/VFluxCalculation.o ./obj/VFluxCalculation_Dict.o \
 		./obj/VLightCurve.o ./obj/VLightCurve_Dict.o \
-		./obj/VLightCurveData.o \
+		./obj/VLightCurveData.o ./obj/VLightCurveData_Dict.o \
 		./obj/VLightCurveUtilities.o ./obj/VLightCurveUtilities_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 		./obj/VTS.next_day.o
@@ -1525,7 +1535,6 @@ writeFITS_eventlistOBJ	= ./obj/writeFITS_eventlist.o \
 			  ./obj/VStarCatalogue.o  ./obj/VStarCatalogue_Dict.o \
 			  ./obj/VStar.o ./obj/VStar_Dict.o \
 			  ./obj/VASlalib.o \
-			  ./obj/VTargets.o \
 			  ./obj/VUtilities.o  \
 			  ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o
 
@@ -1844,6 +1853,7 @@ ifeq ($(VBFFLAG),-DNOVBF)
 	@echo "evndisp without VBF support"
 else
 	@echo "evndisp with VBF support"
+	@echo "$(VBFSYS)"
 endif
 ifeq ($(DBFLAG),-DRUNWITHDB)
 	@echo "evndisp with database support"
@@ -1904,8 +1914,6 @@ else
 	@echo "CTA_USER_DATA_DIR set to $(CTA_USER_DATA_DIR)"
 endif
 
-
-
 ###############################################################################################################################
 # source code formating
 ###############################################################################################################################
@@ -1921,7 +1929,10 @@ install:	all
 
 ###############################################################################################################################
 clean:
-	-rm -f ./obj/*.o ./obj/*_Dict.cpp ./obj/*_Dict.h ./lib/*.pcm
+	-rm -f ./obj/*.o ./obj/*_Dict.cpp ./obj/*_Dict.h ./lib/*.pcm ./obj/*.pcm ./bin/*.pcm
+
+rclean:
+	-rm -f ./obj/*.o ./obj/*_Dict.cpp ./obj/*_Dict.h ./bin/* ./lib/libVAnaSum.so ./lib/*.pcm ./obj/*dict.pcm ./bin/*.pcm
 ###############################################################################################################################
 
 .PHONY: all clean install FORCEDISTDIR dist TESTHESSIO TESTFITS configuration

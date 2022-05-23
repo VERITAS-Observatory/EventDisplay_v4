@@ -10,21 +10,26 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 	fEventDisplayVersion = "";
 	
 	fRunOn = 0;
-        fRunOnFileName = "";
+    fRunOnFileName = "";
 	fRunOff = 0;
-        fRunOffFileName = "";
+    fRunOffFileName = "";
 	
 	fMJDOn = 0.;
 	fMJDOff = 0.;
 
-        fMJDOnStart = 0.;
-        fMJDOnStop = 0.;
+    fMJDOnStart = 0.;
+    fMJDOnStop = 0.;
 	
 	fTarget = "";
 	fTargetRAJ2000 = 0.;
 	fTargetDecJ2000 = -90.;
 	fTargetRA = 0.;
 	fTargetDec = 0.;
+
+    fArrayPointingRA = 0.;
+    fArrayPointingDec = 0.;
+    fArrayPointingRAJ2000 = 0.;
+    fArrayPointingDecJ2000 = 0.;
 	
 	fPairOffset = 0.;
 	
@@ -44,7 +49,7 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 	fTargetShiftDecJ2000 = 0.;
 	
 	fNTel = 4;
-        fTelToAna = "";
+    fTelToAna = "";
 	fMaxTelID = fNTel;
 	
 	fBackgroundModel = 0;
@@ -324,14 +329,14 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			else if( temp == "SKYMAPSIZEX" )
 			{
 				fSkyMapSizeXmin = atof( temp2.c_str() );
-                                fSkyMapSizeXmin = -1. *TMath::Abs( fSkyMapSizeXmin );
-                                fSkyMapSizeXmax = TMath::Abs( fSkyMapSizeXmin );
+                fSkyMapSizeXmin = -1. *TMath::Abs( fSkyMapSizeXmin );
+                fSkyMapSizeXmax = TMath::Abs( fSkyMapSizeXmin );
 			}
 			else if( temp == "SKYMAPSIZEY" )
 			{
 				fSkyMapSizeYmin = atof( temp2.c_str() );
-                                fSkyMapSizeYmin = -1. *TMath::Abs( fSkyMapSizeYmin );
-                                fSkyMapSizeYmax = TMath::Abs( fSkyMapSizeYmin );
+                fSkyMapSizeYmin = -1. *TMath::Abs( fSkyMapSizeYmin );
+                fSkyMapSizeYmax = TMath::Abs( fSkyMapSizeYmin );
 			}
 			else if( temp == "BRIGHTSTARCATALOGUE" )
 			{
@@ -452,13 +457,13 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				d_tt += atof( temp2.c_str() ) / 3600.;
 				fTargetShiftRAJ2000 = d_tt / 24. * 360.;
 				// dec
-                                string iDec1;
-                                string iDec2;
-                                string iDec3;
+                string iDec1;
+                string iDec2;
+                string iDec3;
 				is_stream >> iDec1;
 				is_stream >> iDec2;
 				is_stream >> iDec3;
-                                fTargetShiftDecJ2000 = getDeclinationFromStrings( iDec1, iDec2, iDec3 );
+                fTargetShiftDecJ2000 = getDeclinationFromStrings( iDec1, iDec2, iDec3 );
 			}
 			
 			else if( temp == "REGIONTOEXCLUDE" || temp == "REGIONTOEXCLUDE_RADECJ2000_DEG" )
@@ -1528,32 +1533,30 @@ unsigned int VAnaSumRunParameter::getMaxNumberofTelescopes()
 }
 
 
-bool VAnaSumRunParameter::setTargetShifts( unsigned int i, double west, double north, double ra, double dec )
+bool VAnaSumRunParameter::setTargetShifts( unsigned int i )
 {
 	if( i < fRunList.size() )
 	{
 		if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
 		{
-			fMapRunList[fRunList[i].fRunOn].fTargetShiftWest = west;
-			fMapRunList[fRunList[i].fRunOn].fTargetShiftNorth = north;
-			fMapRunList[fRunList[i].fRunOn].fTargetShiftRAJ2000 = ra;
-			fMapRunList[fRunList[i].fRunOn].fTargetShiftDecJ2000 = dec;
+			fMapRunList[fRunList[i].fRunOn].fTargetShiftWest = fRunList[i].fTargetShiftWest;
+			fMapRunList[fRunList[i].fRunOn].fTargetShiftNorth = fRunList[i].fTargetShiftNorth;
+			fMapRunList[fRunList[i].fRunOn].fTargetShiftRAJ2000 = fTargetShiftRAJ2000;
+			fMapRunList[fRunList[i].fRunOn].fTargetShiftDecJ2000 = fTargetShiftDecJ2000;
 		}
 		return true;
 	}
 	return false;
 }
 
-bool VAnaSumRunParameter::setSkyMapCentreJ2000( unsigned int i, double ra, double dec )
+bool VAnaSumRunParameter::setSkyMapCentreJ2000( unsigned int i )
 {
 	if( i < fRunList.size() )
 	{
-		fRunList[i].fSkyMapCentreRAJ2000  = ra;
-		fRunList[i].fSkyMapCentreDecJ2000 = dec;
 		if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
 		{
-			fMapRunList[fRunList[i].fRunOn].fSkyMapCentreRAJ2000  = ra;
-			fMapRunList[fRunList[i].fRunOn].fSkyMapCentreDecJ2000 = dec;
+			fMapRunList[fRunList[i].fRunOn].fSkyMapCentreRAJ2000  = fRunList[i].fSkyMapCentreRAJ2000;
+			fMapRunList[fRunList[i].fRunOn].fSkyMapCentreDecJ2000 = fRunList[i].fSkyMapCentreDecJ2000;
 		}
 		return true;
 	}
@@ -1577,18 +1580,15 @@ bool VAnaSumRunParameter::setRunTimes( unsigned int i, double iMJDStart, double 
 }
 
 
-bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i, double ra, double dec, string iTargetName )
+bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i )
 {
 	if( i < fRunList.size() )
 	{
-		fRunList[i].fTargetRAJ2000 = ra;
-		fRunList[i].fTargetDecJ2000 = dec;
-                fRunList[i].fTarget = iTargetName;
 		if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
 		{
-			fMapRunList[fRunList[i].fRunOn].fTargetRAJ2000 = ra;
-			fMapRunList[fRunList[i].fRunOn].fTargetDecJ2000 = dec;
-                        fMapRunList[fRunList[i].fRunOn].fTarget = iTargetName;
+			fMapRunList[fRunList[i].fRunOn].fTargetRAJ2000 = fRunList[i].fTargetRAJ2000;
+			fMapRunList[fRunList[i].fRunOn].fTargetDecJ2000 = fRunList[i].fTargetDecJ2000;
+            fMapRunList[fRunList[i].fRunOn].fTarget = fRunList[i].fTarget;
 		}
 		// set centre of stereo maps (if this parameter is not set in the file runparameter.dat)
 		if( TMath::Abs( fSkyMapCentreNorth ) < 1.e-8 && TMath::Abs( fSkyMapCentreWest ) < 1.e-8
@@ -1596,15 +1596,15 @@ bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i, double ra, double
 		{
 			fRunList[i].fSkyMapCentreNorth    = 0.;
 			fRunList[i].fSkyMapCentreWest     = 0.;
-			fRunList[i].fSkyMapCentreRAJ2000  = ra;
-			fRunList[i].fSkyMapCentreDecJ2000 = dec;
+			fRunList[i].fSkyMapCentreRAJ2000  = fRunList[i].fTargetRAJ2000;
+			fRunList[i].fSkyMapCentreDecJ2000 = fRunList[i].fTargetDecJ2000;
 
 			if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
 			{
 				fMapRunList[fRunList[i].fRunOn].fSkyMapCentreNorth    = 0.;
 				fMapRunList[fRunList[i].fRunOn].fSkyMapCentreWest     = 0.;
-				fMapRunList[fRunList[i].fRunOn].fSkyMapCentreRAJ2000  = ra;
-				fMapRunList[fRunList[i].fRunOn].fSkyMapCentreDecJ2000 = dec;
+				fMapRunList[fRunList[i].fRunOn].fSkyMapCentreRAJ2000  = fRunList[i].fTargetRAJ2000;;
+				fMapRunList[fRunList[i].fRunOn].fSkyMapCentreDecJ2000 = fRunList[i].fTargetDecJ2000;
 			}
 		}
 		return true;
@@ -1612,8 +1612,27 @@ bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i, double ra, double
 	return false;
 }
 
+void VAnaSumRunParameter::setArrayPointing( 
+        unsigned int i,
+        pair< double, double > i_radec,
+        pair< double, double > i_radecJ2000 )
+{
+    if( i >= fRunList.size() ) return;
 
-bool VAnaSumRunParameter::setTargetRADec_currentEpoch( unsigned int i, double ra, double dec )
+    fRunList[i].fArrayPointingRA = i_radec.first;
+    fRunList[i].fArrayPointingDec = i_radec.second;
+    fRunList[i].fArrayPointingRAJ2000 = i_radecJ2000.first;
+    fRunList[i].fArrayPointingDecJ2000 = i_radecJ2000.second;
+    if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
+    {
+       fMapRunList[fRunList[i].fRunOn].fArrayPointingRA = i_radec.first;
+       fMapRunList[fRunList[i].fRunOn].fArrayPointingDec = i_radec.second;
+       fMapRunList[fRunList[i].fRunOn].fArrayPointingRAJ2000 = i_radecJ2000.first;
+       fMapRunList[fRunList[i].fRunOn].fArrayPointingDecJ2000 = i_radecJ2000.second;
+    }
+}
+
+void VAnaSumRunParameter::setTargetRADec_currentEpoch( unsigned int i, double ra, double dec )
 {
 	if( i < fRunList.size() )
 	{
@@ -1624,9 +1643,7 @@ bool VAnaSumRunParameter::setTargetRADec_currentEpoch( unsigned int i, double ra
 			fMapRunList[fRunList[i].fRunOn].fTargetRA = ra;
 			fMapRunList[fRunList[i].fRunOn].fTargetDec = dec;
 		}
-		return true;
 	}
-	return false;
 }
 
 
@@ -1660,6 +1677,10 @@ void VAnaSumRunParameter::getEventdisplayRunParameter( string fDatadir )
 			fRunList[i].fWobbleWest = -1.*iParV2->fWobbleEast;
 			fRunList[i].fWobbleNorthMod = iParV2->fWobbleNorth;
 			fRunList[i].fWobbleWestMod = -1.*iParV2->fWobbleEast;
+            cout << "Run " << fRunList[i].fRunOn << ":";
+            cout << "\t pointing from mscw file is ";
+            cout << " (ra,dec (J2000)) = (" << fRunList[i].fTargetRAJ2000 << ", " << fRunList[i].fTargetDecJ2000;
+            cout << ")" << endl;
 			fRunList[i].fNTel = ( int )iParV2->fTelToAnalyze.size();
 			fRunList[i].fTelToAnalyze = iParV2->fTelToAnalyze;
 		}
@@ -1702,53 +1723,6 @@ void VAnaSumRunParameter::getEventdisplayRunParameter( string fDatadir )
 		}
 	}
 }
-
-
-void VAnaSumRunParameter::getWobbleOffsets( string fDatadir )
-{
-	cout << "\t read wobble offsets from root files (may take a second...)" << endl;
-	char i_temp[200];
-	int i_run;
-	string i_treename = "data";
-	string fPrefix = "";
-	string fSuffix = ".mscw.root";
-	for( unsigned int i = 0; i < fRunList.size(); i++ )
-	{
-		i_run = fRunList[i].fRunOn;
-		
-		sprintf( i_temp, "%s%s%d%s", fDatadir.c_str(), fPrefix.c_str(), i_run, fSuffix.c_str() );
-		TFile* i_f = new TFile( i_temp );
-		if( i_f->IsZombie() )
-		{
-			cout << "VAnaSumRunParameter::getWobbleOffset fatal error: file not found, " << i_temp << endl;
-			exit( -1 );
-		}
-		
-		TTree* i_tree = ( TTree* )i_f->Get( i_treename.c_str() );
-		if( !i_tree )
-		{
-			cout << "VAnaSumRunParameter::getWobbleOffset tree not found " << i_treename << endl;
-		}
-		i_tree->GetEntry( 1 );
-		
-		if( i_tree->GetBranch( "WobbleN" ) && i_tree->GetBranch( "WobbleE" ) )
-		{
-			fRunList[i].fWobbleNorth = i_tree->GetBranch( "WobbleN" )->GetLeaf( "WobbleN" )->GetValue();
-			fRunList[i].fWobbleWest = -1.*i_tree->GetBranch( "WobbleE" )->GetLeaf( "WobbleE" )->GetValue();
-			fRunList[i].fWobbleNorthMod = i_tree->GetBranch( "WobbleN" )->GetLeaf( "WobbleN" )->GetValue();
-			fRunList[i].fWobbleWestMod = -1.*i_tree->GetBranch( "WobbleE" )->GetLeaf( "WobbleE" )->GetValue();
-		}
-		else
-		{
-			cout << endl;
-			cout << "VAnaSumRunParameter::getWobbleOffset error: cannot determine wobble offset for run " << fRunList[i].fRunOn << " from mscw_energy output file" << endl;
-			cout << "\t old file version?" << endl;
-			exit( 0 );
-		}
-		i_f->Close();
-	}
-}
-
 
 /*!
     observe that these are hardwired values according to the VERITAS simulation sets
@@ -1926,7 +1900,10 @@ double VAnaSumRunParameter::getDeclinationFromStrings( string iDec1, string iDec
     return d_tt;
 }
 
-
+void VAnaSumRunParameter::sortRunList()
+{
+    sort( fRunList.begin(), fRunList.end() );
+}
 
 
 //==================================================================================

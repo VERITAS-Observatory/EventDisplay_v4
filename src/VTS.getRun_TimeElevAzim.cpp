@@ -143,7 +143,7 @@ int main( int argc, char* argv[] )
 				}
 				else
 				{
-					cout << "Error, '" << file_line << "' needs to be a valid runnumber (9999-99999)" << endl;
+					cout << "Error, '" << file_line << "' needs to be a valid runnumber (9999-999999)" << endl;
 					return 1 ;
 				}
 			}
