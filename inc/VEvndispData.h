@@ -926,7 +926,6 @@ class VEvndispData
 		{
 			return fRunPar->fTraceWindowShift[fTelID];
 		}
-        // TODO CHECK v570: return integer, not bool
 		bool                getSumWindowStart_at_T0()
 		{
 			return fRunPar->fsumfirst_startingMethod[fTelID];

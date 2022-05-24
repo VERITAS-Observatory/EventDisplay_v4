@@ -506,7 +506,9 @@ void VImageBaseAnalyzer::calcTCorrectedSums( int iFirst, int iLast )
      calculate sums and timing parameters of FADC traces
 
 
-     this function is called from VAnalyzer::doAnalysis()
+     this function is called from VImageAnalyzer::doAnalysis()
+
+     (used for calibration, DP pass1 integration, NN cleaning, and tzero calculation)
 
 */
 void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned int iTraceIntegrationMethod )
@@ -850,6 +852,8 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 	}
 	
 	// reset dead channel vector
+    /*
+    // this is duplicated code, simplify
 	if( fRunPar->fMCNdead && iFirst )
 	{
 		setDead( false, iLowGain );
@@ -858,6 +862,8 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 	{
 		setDead( false, iLowGain );
 	}
+    */
+    setDead(false, iLowGain);
 	
 	// get mean and rms of pedvar
 	double i_meanPedVar = 0.;

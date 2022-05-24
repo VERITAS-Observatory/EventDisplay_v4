@@ -1508,8 +1508,6 @@ void VReadRunParameter::test_and_adjustParams()
 	setDirectories();
 	
 	// for command line case, all parameters are the same for all telescopes
-	// !preli!
-	// this will go with a configuration file or connection to a database
 	if( f_boolCommandline )
 	{
 		// start at 1, parameters for first telescope are filled by default
