@@ -538,7 +538,10 @@ bool VImageCleaning::InitNNImgClnPerTelType( unsigned int teltype )
         {
             iFileN = "RECREATE";
         }
-        TFile* fgraphs = new TFile( fData->getRunParameter()->fNNGraphsFile, iFileN.c_str() );
+        ostringstream i_NNGraphFileName;
+        i_NNGraphFileName << gSystem->DirName( fData->getRunParameter()->foutputfileName.c_str() );
+        i_NNGraphFileName << "/" << fData->getRunParameter()->frunnumber << ".IPR.root";
+        TFile* fgraphs = new TFile( i_NNGraphFileName.str().c_str(), iFileN.c_str() );
         if( fgraphs->IsZombie() )
         {
             printDataError( "VImageCleaning::InitNNImgClnPerTelType( int type ), error opening NNgraphs file" );
@@ -564,7 +567,7 @@ bool VImageCleaning::InitNNImgClnPerTelType( unsigned int teltype )
         
         // close output file
         fgraphs->Close();
-        std::cout << "VImageCleaning::InitNNImgClnPerTelType( type ): writing graph root file to:" << fgraphs->GetName() << std::endl;
+        std::cout << "VImageCleaning::InitNNImgClnPerTelType( type ): writing graph root file to: " << fgraphs->GetName() << std::endl;
     }
     
     return true;
