@@ -814,7 +814,7 @@ valarray<double>& VEvndispData::getPulseTime( bool iCorrected )
     }
     
     // default: return average pulse time
-     // in run parameter file: FADCSUMMATIONSTART set to TAVERAGE
+    // in run parameter file: FADCSUMMATIONSTART set to TAVERAGE
     return fAnaData[fTelID]->getTraceAverageTime( iCorrected );
 }
 
@@ -890,6 +890,11 @@ void VEvndispData::setPulseTimingCorrection( unsigned int iChannel, double iCorr
 			}
 		}
 	}
+    // average trace time corrections
+    if( iChannel < getTraceAverageTime( false ).size() && iChannel < getTraceAverageTime( false ).size() )
+    {
+        getTraceAverageTime( true )[iChannel] = getTraceAverageTime( false )[iChannel] + iCorrection;
+    }
 }
 
 unsigned int VEvndispData::getLargestSumWindow()
