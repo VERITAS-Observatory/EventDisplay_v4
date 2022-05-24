@@ -1424,8 +1424,7 @@ void VReadRunParameter::test_and_adjustParams()
 	}
 	
 	// fRunPara->fImageLL: values between 0-2
-    // TODO CHECK WITH v570
-	if( fRunPara->fImageLL < 0 && fRunPara->fImageLL > 2 )
+	if( fRunPara->fImageLL < 0 || fRunPara->fImageLL > 2 )
 	{
 		cout << "warning: logl parameter out of range, setting it to 1" << endl;
 		fRunPara->fImageLL = 1;

@@ -950,8 +950,6 @@ void VImageAnalyzer::setNTrigger()
  *
  *   - select the correct image cleaning method and pass parameters
  *
- *   - TODO: simplify the interface to the image cleaning class by passing the
- *           pointer to the image cleaning run parameters
  *
  */
 void VImageAnalyzer::imageCleaning()
