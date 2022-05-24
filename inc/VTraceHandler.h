@@ -27,10 +27,8 @@ class VTraceHandler
 		vector< float > fpulsetiming;             //!< pulse timing vector (refilled for each call)
 		bool fFindPulseTiming;                    //!< true if pulse timing finder was successfull
 		int fpTrazeSize;                          //!< length of the FADC trace
-		double fMax;                              //!< Max value for this trace
 		double fPed;                              //!< Ped value for this trace
 		double fPedrms;                           //!< Ped rms for this trace (needed for VFitTraceHandler)
-		double fSum;                              //!< Sum value for this trace
 		double fTraceAverageTime;                 //!< average time for this trace
 		int    fSumWindowFirst;
 		int    fSumWindowLast;
@@ -41,21 +39,9 @@ class VTraceHandler
 		unsigned int fMC_FADCTraceStart;          // start of FADC trace (in case the simulated trace is longer than needed)
         bool     kIPRmeasure;                     // if signal extractor is in IPR measurements mode
 		
-		// Signal Extractors (Maxim)
-		float SaturLimit;
-		float fSliceRMS[10];                      // FIXME: RMS of one time slice for every telescope type
-		unsigned int oversampling;                // oversampling factor 1GHz->oversampling*1GHz
-		unsigned int WinToAverage;                // window for averaging (in overampled slices)
-		unsigned int MaxNumPulses;                // maximum number of pulses per pixel for several pulse signal extractor
-		float PoleZeroFlash;                      // pole zero cancelation after oversampled digital signal differentiation
-		float PoleZeroDragNec;                    // pole zero cancelation after oversampled digital signal differentiation
-		float ProcToAmplFlash;
-		float ProcToAmplDragNec;
 		double   getQuickMaximumSum( unsigned int iSearchStart, unsigned int iSearchEnd, int iIntegrationWindow, bool fRaw = false );
-		double   getMaxSumAutoWindow( float AmplThresh, unsigned int iSearchStart, unsigned int iSearchEnd, int iIntegrationWindow, bool fRaw = false );
-		double   getMaxSumWithOverSampling( unsigned int iSearchStart, unsigned int iSearchEnd, unsigned int ElecConcept, int iIntegrationWindow, bool fRaw = false );
-		double   getMaximumSums( float AmplThresh, int* integwindows, float* charges, float* arrtimes, bool fRaw = false );
 		
+        double   calculateTraceSum_slidingWindow( unsigned int iSearchStart, unsigned int iSearchEnd, int iIntegrationWindow, bool fRaw );
 		
 		void     reset();
 		
@@ -69,7 +55,7 @@ class VTraceHandler
 							   unsigned int iChanID, unsigned int iHitID, double iHilo = -1. );
 		// methods for getting quick trace parameters between specified limits
 		bool   apply_lowgain( double );
-		double getQuickSum( int , int, bool );
+		double calculateTraceSum_fixedWindow( int , int, bool );
 		double getQuickTZero( int , int );
 		double getQuickTZero( int , int, int );
 		void   getQuickMax( int , int, double&, int& );
@@ -78,14 +64,6 @@ class VTraceHandler
 		double getPed()
 		{
 			return fPed;
-		}
-		double getMax()
-		{
-			return fMax;
-		}
-		double getSum()
-		{
-			return fSum;
 		}
 		vector< double >& getTrace()
 		{
@@ -109,7 +87,12 @@ class VTraceHandler
 		{
 			return getQuickPulseWidth( fFirst, fLast, fPed );
 		}
-		virtual double getTraceSum( int fFirst, int fLast, bool fRaw );
+        virtual double getTraceSum( int iSumWindowFirst,
+                                    int iSumWindowLast,
+                                    bool iRaw,
+                                    unsigned int iTraceIntegrationMethod = 9999,
+                                    bool iForceWindowStart = false,
+                                    unsigned int iSlidingWindowLast = 9999 );
 		virtual double getTraceTZero( int fFirst, int fLast )
 		{
 			return getQuickTZero( fFirst, fLast );
@@ -123,6 +106,10 @@ class VTraceHandler
 		{
 			return fFindPulseTiming;
 		}
+        unsigned int   getTraceIntegrationMethod()
+        {
+            return fTraceIntegrationMethod;
+        }
 		virtual double getTraceMax();
 		virtual double getTraceMax( unsigned int& n255, double iHiLo = 6. ); // get maximum value in trace
 		virtual void   getTraceMax( double&, double& );
