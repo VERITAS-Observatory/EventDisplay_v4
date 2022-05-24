@@ -82,7 +82,6 @@ class VTraceHandler
 			return fSumWindowLast;
 		}
 		vector<float> getFADCTiming( int fFirst, int fLast, bool debug = false );
-		// virtual functions
 		virtual double getTraceWidth( int fFirst, int fLast, double fPed )
 		{
 			return getQuickPulseWidth( fFirst, fLast, fPed );
