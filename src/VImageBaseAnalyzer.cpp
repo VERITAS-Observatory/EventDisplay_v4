@@ -1528,6 +1528,7 @@ void VImageBaseAnalyzer::initializeTrace( bool iMakingPeds, unsigned int i_chann
     fTraceHandler->setTrace( fReader,
                              getNSamples(),
                              getPeds( getHiLo()[i_channelHitID] )[i_channelHitID],
+                             getPedrms( getHiLo()[i_channelHitID] )[i_channelHitID],
                              i_channelHitID,
                              i,
                              i_LG );
