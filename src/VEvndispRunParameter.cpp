@@ -287,33 +287,10 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
     fIPRdatabase = "";
     fIPRdatabaseFile = "";
 
-	fNSBscale = 0.;
-	for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
-	{
-		fFADCPedestal[i] = -1.;
-		fFADCPedestalSig[i] = -1.;
-		fFlashCamFADCPedestal[i] = -1.;
-		fFlashCamFADCPedestalSig[i] = -1.;
-	}
 	for( unsigned int i = 0; i < VDST_MAXTELTYPES; i++ )
 	{
-		fFADCsampleRate[i] = -1.;
-		fFlashCamFADCtoPhe[i] = -1.;
-		fFlashCamFADCsampleRate[i] = -1.;
 		fFADCtoPhe[i] = -1.;
-		fPerformFlashCamAnalysis[i] = false;
-		fFWHMdata[i] = -1.;
-		fFWHMtrigger[i] = -1.;
-		fIntegWindow[i] = -1.;
-		ifActiveType[i] = false;
 	}
-	
-	fTrigThreshFile = "";
-	fNSBdatabaseFile = "";
-	fIPR1File = "";
-	fIPR2File = "";
-	fIPR3File = "";
-	fIPR4File = "";
 	
 	// movie
 	fMovieBool = false;
@@ -321,6 +298,19 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fMovieInput = "";
 	fMovieFrameOutput = "";
 	
+}
+
+VEvndispRunParameter::~VEvndispRunParameter()
+{
+    for( unsigned int i = 0; i < fImageCleaningParameters.size(); i++ )
+    {
+        if( fImageCleaningParameters[i] )
+        {
+            delete fImageCleaningParameters[i];
+        }
+    }
+    
+    
 }
 
 
