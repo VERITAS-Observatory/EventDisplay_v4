@@ -155,23 +155,30 @@ bool VTraceHandler::apply_lowgain( double iHiLo )
 	return false;
 }
 
-
-double VTraceHandler::calculateTraceSum_fixedWindow( int fFirst, int fLast, bool fRaw )
+/*
+ * sum up FADC trace from fFirst to fLast
+ *
+ */
+double VTraceHandler::calculateTraceSum_fixedWindow( int fFirst, int fLast, bool iRaw )
 {
 	double sum = 0.;
+    double tcharge = 0.;
+    fTraceAverageTime = 0.;
 	for( int i = fFirst; i < fLast; i++ )
 	{
 		// require that trace is >0.
 		// (CTA MC write trace values above a certain signal only)
 		if( i < fpTrazeSize && fpTrace[i] > 0. )
 		{
-			if( !fRaw )
+			if( !iRaw )
 			{
 				sum += fpTrace[i] - fPed;
+                tcharge += ( i + 0.5 ) * ( fpTrace[i] - fPed );
 			}
-			if( fRaw )
+            else
 			{
 				sum += fpTrace[i];
+                tcharge += ( i + 0.5 ) * fpTrace[i];
 			}
 		}
 	}
@@ -179,13 +186,17 @@ double VTraceHandler::calculateTraceSum_fixedWindow( int fFirst, int fLast, bool
 	{
 		sum = 0.;
 	}
-	if( abs( sum ) < 1.e-10 )
+    if( TMath::Abs( sum ) < 1.e-10 )
 	{
 		sum = 0.;
+        fTraceAverageTime = 0.;
 	}
+    else
+    {
+        fTraceAverageTime = tcharge / sum;
+    }
 	return sum;
 }
-
 
 double VTraceHandler::getQuickTZero( int fFirst, int fLast )
 {
