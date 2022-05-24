@@ -12,9 +12,7 @@
 #include "TTree.h"
 
 #include "TMVA/Config.h"
-#ifdef ROOT6
 #include "TMVA/DataLoader.h"
-#endif
 #include "TMVA/Factory.h"
 #include "TMVA/Reader.h"
 #include "TMVA/Tools.h"
@@ -187,11 +185,7 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 	//////////////////////////////////////////
 	// defining training class
 	TMVA::Factory* factory = new TMVA::Factory( iRun->fOutputFile[iEnergyBin][iZenithBin]->GetTitle(), iRun->fOutputFile[iEnergyBin][iZenithBin], "V" );
-#ifdef ROOT6
-        TMVA::DataLoader *dataloader = new TMVA::DataLoader("dataset");
-#else
-        TMVA::Factory *dataloader = factory;
-#endif
+    TMVA::DataLoader *dataloader = new TMVA::DataLoader("dataset");
 	////////////////////////////
 	// train gamma/hadron separation
 	if( iTrainGammaHadronSeparation )
@@ -334,19 +328,11 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 			}
 			if( i < iRun->fMVAMethod_Options.size() )
 			{
-#ifdef ROOT6
-				factory->BookMethod( dataloader, TMVA::Types::kBDT, htitle, iRun->fMVAMethod_Options[i].c_str() );
-#else
-				factory->BookMethod( TMVA::Types::kBDT, htitle, iRun->fMVAMethod_Options[i].c_str() );
-#endif
+                factory->BookMethod( dataloader, TMVA::Types::kBDT, htitle, iRun->fMVAMethod_Options[i].c_str() );
 			}
 			else
 			{
-#ifdef ROOT6
 				factory->BookMethod( dataloader, TMVA::Types::kBDT, htitle );
-#else
-				factory->BookMethod( TMVA::Types::kBDT, htitle );
-#endif
 			}
 		}
 		//////////////////////////
@@ -363,19 +349,11 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 			}
 			if( i < iRun->fMVAMethod_Options.size() )
 			{
-#ifdef ROOT6
 				factory->BookMethod( dataloader, TMVA::Types::kMLP, htitle, iRun->fMVAMethod_Options[i].c_str() );
-#else
-				factory->BookMethod( TMVA::Types::kMLP, htitle, iRun->fMVAMethod_Options[i].c_str() );
-#endif
 			}
 			else
 			{
-#ifdef ROOT6
 				factory->BookMethod( dataloader, TMVA::Types::kMLP, htitle );
-#else
-				factory->BookMethod( TMVA::Types::kMLP, htitle );
-#endif
 			}
 		}
 		//////////////////////////
@@ -401,11 +379,7 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 				sprintf( hname, "%s:VarProp[%d]=%s", hname, i, iRun->fTrainingVariable_VarProp[i].c_str() );
 			}
 			sprintf( htitle, "BOXCUTS_%d_%d", iEnergyBin, iZenithBin );
-#ifdef ROOT6
 			factory->BookMethod( dataloader, TMVA::Types::kCuts, htitle, hname );
-#else
-			factory->BookMethod( TMVA::Types::kCuts, htitle, hname );
-#endif
 		}
 	}
 	
