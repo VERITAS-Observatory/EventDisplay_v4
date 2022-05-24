@@ -172,10 +172,7 @@ void VImageBaseAnalyzer::calcSums( int iFirst, int iLast, bool iMakingPeds, bool
 
    calculate trace timing parameters
 
-   (to be used for calibration)
-
-   TMPTMPTMPTMP
-   XXXXXX is this still needed?
+   (used for time calibration)
 
 */
 void VImageBaseAnalyzer::calcTZeros( int fFirst, int fLast )
@@ -253,7 +250,13 @@ void VImageBaseAnalyzer::calcTZeros( int fFirst, int fLast )
 	}
 }
 
-
+/*
+ *
+ * calculate correction for crate jitter from L2 channels fed into each crate
+ *
+ * (this is very VERITAS specific)
+ *
+ */
 void VImageBaseAnalyzer::FADCStopCorrect()
 {
 	if( fDebug )
@@ -572,7 +575,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 	int corrlast = 0;
 	
 	//////////////////////////////////////////////////////////////////
-	// loop over all channels
+    // loop over all channels (hits)
 	//////////////////////////////////////////////////////////////////
 	for( unsigned int i = 0; i < nhits; i++ )
 	{
@@ -653,6 +656,8 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 			setTCorrectedSumFirst( i_channelHitID, fTraceHandler->getTraceIntegrationFirst() );
 			setTCorrectedSumLast( i_channelHitID, fTraceHandler->getTraceIntegrationLast() );
 			setTraceAverageTime( i_channelHitID, fTraceHandler->getTraceAverageTime() );
+            cout << "calcztzerosums " << i_channelHitID << "\t" << fTraceHandler->getTraceAverageTime() << endl;
+            cout << "getPulseTime " << getPulseTime( true )[i_channelHitID] << endl;
 			i_tempTraceMax = fTraceHandler->getTraceMax( i_tempN255, getLowGainMultiplier_Trace() );
 			setTraceMax( i_channelHitID, i_tempTraceMax );
 			setTraceRawMax( i_channelHitID, i_tempTraceMax + getPeds( getHiLo()[i_channelHitID] )[i_channelHitID] );
@@ -690,6 +695,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 		}
 		/////////////////////////////////////////////////////////////////
 		// calculate size of FADC stop channel
+        // (used for DQM)
 		// (note that this does not catch FADC stop channels in channel 499)
 		else
 		{
@@ -721,6 +727,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 }
 
 /*!
+ 
     apply relative gain corretion
 
 */
@@ -774,15 +781,13 @@ void VImageBaseAnalyzer::gainCorrect()
   If you add an additional code value, please add the corresponding text
   in void VEvndispData::setDeadChannelText()
 
-  added maximum time offset (GM)
-
   dead channel coding (see also VEvndispData::setDeadChannelText())
   - outside pedestal range (1)
   - small absolute pedvars (2)
   - small relative pedvars (3)
   - large relative pedvars (4)
   - outside gain range (5)
-  - small gain variations (6)
+  - small/large gain variations (6)
   - large gain deviations (7)
   - large time offset (8)
   - FADC stop signal (9)
@@ -1101,9 +1106,13 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 }
 
 
+/*
+ *
+ * apply timing correction determined from flasher/laser runs
+ */
 void VImageBaseAnalyzer::timingCorrect()
 {
-	// apply timing correction
+    // apply timing correction to all pulse timing parameters
 	const unsigned int nc = getTZeros().size();
 	if( nc == getTOffsets().size() )
 	{
@@ -1117,6 +1126,11 @@ void VImageBaseAnalyzer::timingCorrect()
 	}
 }
 
+/*
+ * fill a vector with all zero-suppressed channels
+ *
+ * return number of zero suppressed channels
+ */
 unsigned int VImageBaseAnalyzer::fillZeroSuppressed()
 {
 	setZeroSuppressed( false );
@@ -1227,7 +1241,7 @@ TTree* VImageBaseAnalyzer::makeDeadChannelTree()
 
    FADC integration: second pass for double pass method
 
-   use time gradient of first image to determine window placement here
+   use time gradient of first image to determine window placement
 
 */
 void VImageBaseAnalyzer::calcSecondTZerosSums()
@@ -1236,11 +1250,12 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 	{
 		cout << "VImageBaseAnalyzer::calcSecondTZerosSums()" << endl;
 	}
+    // print lots of output for trace debugging
 	bool fDebugTrace = false;
 	
 	// get number of channels
 	unsigned int nhits = fReader->getNumChannelsHit();
-	// exclude photodiode from number of channels
+    // exclude photodiode from number of channels (would be for VTS channel 500)
 	if( nhits > getDead( false ).size() )
 	{
 		nhits = getDead( false ).size();
@@ -1249,7 +1264,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 	// set integration window
 	unsigned int iSumWindow = getSumWindow();
 	setTCorrectedSumFirst( getSumFirst() );
-	// set dynamic integration window
+	// set integration window
 	// (depending on the measured integrated charge in first pass)
 	// (not implemented yet)
 	for( unsigned int i = 0; i < nhits; i++ )
@@ -1260,6 +1275,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 			i_channelHitID = fReader->getHitID( i );
 			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( i_channelHitID, getHiLo()[i_channelHitID] ) )
 			{
+                // -- dynamic integration window is not implemented - function returns fixed window ---
 				if( getRunParameter()->fDynamicIntegrationWindow )
 				{
 					iSumWindow = getDynamicSummationWindow( i_channelHitID );
@@ -1283,7 +1299,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 		}
 	}
 	
-	// reinitialize arrays
+    // (re)initialize arrays
 	setSums( 0. );
 	setSums2( 0. );
 	setImage( false );
@@ -1343,8 +1359,8 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 					cout << " : fit " << xtime << ", toff " << getTOffsets()[i_channelHitID];
 					cout << ", sumwindowshift " << getSumWindowShift() << " corrfirst " << corrfirst << endl;
 				}
-				// no success in start of integration window
-				// (usually happens when first pass of cleaning returned no image/border pixels)
+                // no success in determining start of integration window
+                // (usually happens when first pass of image cleaning returned no image/border pixels)
 				if( corrfirst < getSumFirst() )
 				{
 					// take average tzero per telescope and pixel
@@ -1359,7 +1375,9 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 					}
 				}
 				///////////////////
-				// low gain channel have different time -> use tzero (do not do this for DST sims)
+                // low gain channel have different timing
+                // (not for CTA-DSTs)
+                //
 				if( getHiLo()[i_channelHitID] && getRunParameter()->fsourcetype != 7 )
 				{
 					// integrate low-gain pulse only if prediction window start is before the end of the readout window
@@ -1557,5 +1575,6 @@ void VImageBaseAnalyzer::initializeTrace( bool iMakingPeds, unsigned int i_chann
     {
         fTraceHandler->setTraceIntegrationmethod( 1 );
     }
+
 }
 

@@ -1070,6 +1070,18 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                 }
                 continue;
             }
+			else if( iTemp == "WRITEGRAPHSTOFILE" && fRunPara )
+            {
+                if( iTemp2 == "TRUE" )
+                {
+                    fRunPara->ifWriteGraphsToFile = true;
+                }
+                else
+                {
+                    fRunPara->ifWriteGraphsToFile = false;
+                }
+                continue;
+            }
 			else if( iTemp == "TIMECLEANINGPARAMETERS" && fRunPara )
 			{
 				for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
