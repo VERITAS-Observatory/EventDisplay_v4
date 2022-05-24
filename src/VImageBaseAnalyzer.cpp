@@ -144,8 +144,12 @@ void VImageBaseAnalyzer::calcSums( int iFirst, int iLast, bool iMakingPeds, bool
 				setSums( i_channelHitID,
                          fTraceHandler->getTraceSum( iFirst, 
                                                      iLast, 
-                                                     iMakingPeds )
+                                                     iMakingPeds,
+                                                     9999,
+                                                     true,
+                                                     getSearchWindowLast() )
                         * getLowGainSumCorrection( sw_original , iLast - iFirst, getHiLo()[i_channelHitID] ) );
+                setTraceAverageTime( i_channelHitID, fTraceHandler->getTraceIntegrationFirst() );
 			}
 		}
 		catch( ... )
@@ -1546,6 +1550,5 @@ void VImageBaseAnalyzer::initializeTrace( bool iMakingPeds, unsigned int i_chann
     {
         fTraceHandler->setTraceIntegrationmethod( 1 );
     }
-    
 }
 
