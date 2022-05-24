@@ -326,12 +326,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		TString  fIPR3File;
 		TString  fIPR4File;
 		
-		// Parallaxwidth
-		int fPWmethod;                            // how to make the trigger-map to calculate the trigger-level image parameters
-		int fPWcleanNeighbors;                    // number of neighbors required for a center pixel to survive the cleaning procedure
-		float fPWcleanThreshold;                  // cleaning threshold to use to determine hit pixels from the summed FADC charge (dc)
-		int fPWlimit;                             // limits the number of pixels transmitted per sector, if =0, then the function is ignored and no cut is applied on the generation of the trigger map
-		
 		// Movie Parameters
 		bool fMovieBool;                           // Are we making a movie?
 		string fMovieInput;                        // The input file with the event numbers

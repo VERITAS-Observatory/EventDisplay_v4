@@ -56,33 +56,19 @@ VImageAnalyzer::VImageAnalyzer()
 	
 	//If -hough is specified on the command line, run the hough transform initialization method in
 	//VImageParameterCalculation
-	if( fRunPar->fhoughmuonmode )
+    if( fRunPar->fhoughmuonmode || fRunPar->fmuonmode )
 	{
-	
 #ifndef NOGSL
 		cout << "Using GSL libraries for muon analysis." << endl;
 #else
 		cout << "Warning! No GSL libraries found. Muon impact parameter corrected Size will not be calculated." << endl;
 #endif
 		cout << "" << endl;
-		
-		fVImageParameterCalculation->houghInitialization();
-		
+        if( fRunPar->fhoughmuonmode )
+        {
+            fVImageParameterCalculation->houghInitialization();
+        }
 	}
-	
-	if( fRunPar->fmuonmode )
-	{
-	
-#ifndef NOGSL
-		cout << "Using GSL libraries for muon analysis." << endl;
-#else
-		cout << "Warning! No GSL libraries found. Muon impact parameter corrected Size will not be calculated." << endl;
-#endif
-		
-		cout << "" << endl;
-		
-	}
-	
 }
 
 
@@ -196,23 +182,9 @@ void VImageAnalyzer::doAnalysis()
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
-	// parallax width cleaning
-	if( fRunPar->fPWmethod > -1 )
-	{
-		fVImageCleaning->cleanTriggerFixed( getImageThresh(), getBorderThresh() );
-	}
-	
-	///////////////////////////////////////////////////////////////////////////////////////////
 	// set parameters for image parameter calculation
 	fVImageParameterCalculation->setDetectorGeometry( getDetectorGeometry() );
 	fVImageParameterCalculation->setParameters( getImageParameters() );
-	
-	///////////////////////////////////////////////////////////////////////////////////////////
-	// parallax width trigger parameter calculation
-	if( fRunPar->fPWmethod > -1 )
-	{
-		fVImageParameterCalculation->calcTriggerParameters( getTrigger() );
-	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// image parameter calculation
@@ -298,13 +270,6 @@ void VImageAnalyzer::doAnalysis()
 				getDead( true )[i] = savedDeadLow[i];
 				getGains( true )[i] = savedGainsLow[i];
 			}
-		}
-		///////////////////////////////////////////////////////////////////////////////////////////
-		// parallax width trigger parameter calculation
-		if( fRunPar->fPWmethod > -1 )
-		{
-			fVImageCleaning->cleanTriggerFixed( getImageThresh(), getBorderThresh() );
-			fVImageParameterCalculation->calcTriggerParameters( getTrigger() );
 		}
 		
 		///////////////////////////////////////////////////////////////////////////////////////////
@@ -1003,18 +968,17 @@ void VImageAnalyzer::imageCleaning()
 		gainCorrect();
 		if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMECLUSTERCLEANING" )
 		{
-			fVImageCleaning->cleanImageFixedWithTiming( getImageThresh(), getBorderThresh(), getBrightNonImageThresh(),
-					getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
+			fVImageCleaning->cleanImageFixedWithTiming( getImageCleaningParameter() );
 		}
 		// time-next-neighbour cleaning
 		else if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMENEXTNEIGHBOUR" )
 		{
-			fVImageCleaning->cleanNNImageFixed();
+			fVImageCleaning->cleanNNImageFixed( getImageCleaningParameter() );
 		}
 		// fixed cleaning levels (classic image/border)
 		else
 		{
-			fVImageCleaning->cleanImageFixed( getImageThresh(), getBorderThresh(), getBrightNonImageThresh() );
+			fVImageCleaning->cleanImageFixed( getImageCleaningParameter() );
 		}
 	}
 	/////////////////////////////
@@ -1023,26 +987,29 @@ void VImageAnalyzer::imageCleaning()
 	{
 		if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMECLUSTERCLEANING" )
 		{
-			fVImageCleaning->cleanImagePedvarsWithTiming( getImageThresh(), getBorderThresh(), getBrightNonImageThresh(),
-					getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
+			fVImageCleaning->cleanImagePedvarsWithTiming( getImageCleaningParameter() );
 		}
 		else if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMENEXTNEIGHBOUR" )
 		{
-			fVImageCleaning->cleanNNImagePedvars();
+			cout << "Error cleaning method ";
+            cout << getImageCleaningParameter()->getImageCleaningMethod();
+            cout << " not defined for signal/noise thresholds" << endl;
+            cout << "exiting..." << endl;
+            exit( EXIT_FAILURE );
 		}
         // simple time two-level cleaning
 		else if( getImageCleaningParameter()->getImageCleaningMethod() == "TWOLEVELANDCORRELATION" )
 		{
-			fVImageCleaning->cleanImageTraceCorrelate( getImageCleaningParameter()->fCorrelationCleanBoardThresh, getImageCleaningParameter()->fCorrelationCleanCorrelThresh, getImageCleaningParameter()->fCorrelationCleanNpixThresh );
+			fVImageCleaning->cleanImageTraceCorrelate( getImageCleaningParameter() );
 		}
 		// simple time two-level cleaning
 		else if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMETWOLEVEL" )
 		{
-			fVImageCleaning->cleanImagePedvarsTimeDiff( getImageThresh(), getBorderThresh(), getBrightNonImageThresh(), getTimeTwoLevelCleaningTimeDiff() );
+			fVImageCleaning->cleanImagePedvarsTimeDiff( getImageCleaningParameter() );
 		}
 		else
 		{
-			fVImageCleaning->cleanImagePedvars( getImageThresh(), getBorderThresh(), getBrightNonImageThresh() );
+			fVImageCleaning->cleanImagePedvars( getImageCleaningParameter() );
 		}
 		gainCorrect();
 	}

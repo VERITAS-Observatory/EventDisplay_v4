@@ -5,32 +5,47 @@
  */
 
 #include "VImageCleaning.h"
-#include "TopoTrigger.h"
-#ifndef VIMAGENNCLEANING_H
-#include "NNImageCleaningServiceFunc.h"
-#define VIMAGENNCLEANING_H
-#endif
 
 VImageCleaning::VImageCleaning( VEvndispData* iData )
 {
 	fData = iData;
 	
-	fNSBscale = fData->getRunParameter()->fNSBscale;
+    fProb4nnCurves = 0;
+    fProb3nnrelCurves = 0;
+    fProb2plus1Curves = 0;
+    fProb2nnCurves = 0;
+    fProbBoundCurves = 0;
+    fIPRgraphs = 0;
+    
+    // initialize NN cleaning (TIMENEXTNEIGHBOUR)
+    kInitNNImageCleaning = false;
+    if( fData && fData->getImageCleaningParameter()->getImageCleaningMethod() == "TIMENEXTNEIGHBOUR" )
+    {
+        kInitNNImageCleaning = InitNNImageCleaning();
+        fIPRgraphs = new TObjArray( VDST_MAXTELTYPES );
+    }
+    
+    fWriteGraphToFileRecreate = true;
+    fFakeImageProb = 0.;
+    vector< bool > i_tempB;
+    for( unsigned int i = 0; i < VDST_MAXTELTYPES; i++ )
+    {
+        kInitNNImgClnPerTelType[i] = false;
+        fMinRate[i] = 0.;
+        fifActiveNN.push_back( i_tempB );
+    }
 	
-	kInitNNImageCleaning = false;
-	if( fData && fData->getImageCleaningParameter()->getImageCleaningMethod() == "TIMENEXTNEIGHBOUR" )
-	{
-		kInitNNImageCleaning = InitNNImageCleaning();
-	}
-	nRings        = 3;
-	CoincWinLimit = 8;   // GMGM what unit is this?
 }
 
+/*
+ * simple error messager
+ *
+*/
 void VImageCleaning::printDataError( string iFunctionName )
 {
 	cout << iFunctionName;
 	cout << " error: no pointer to data class set" << endl;
-	exit( -1 );
+    exit( EXIT_FAILURE );
 }
 
 /*!
@@ -39,8 +54,25 @@ void VImageCleaning::printDataError( string iFunctionName )
    \par lothresh border threshold
    \par brightthresh bright pixel threshold
 */
+
+void VImageCleaning::cleanImageFixed( VImageCleaningRunParameter* iImageCleaningParameters )
+{
+    ///////////////////////////////////////////////
+    // setting of image cleaning run parameters
+    if( !iImageCleaningParameters )
+    {
+        return;
+    }
+    double hithresh     = iImageCleaningParameters->fimagethresh;
+    double lothresh     = iImageCleaningParameters->fborderthresh;
+    double brightthresh = iImageCleaningParameters->fbrightnonimagetresh;
+    
+    cleanImageFixed( hithresh, lothresh, brightthresh );
+}
+
 void VImageCleaning::cleanImageFixed( double hithresh, double lothresh, double brightthresh )
 {
+
 	if( !fData )
 	{
 		printDataError( "VImageCleaning::cleanImageFixed" );
@@ -106,8 +138,23 @@ void VImageCleaning::cleanImageFixed( double hithresh, double lothresh, double b
    \par brightthresh bright pixel threshold
 
 */
-void VImageCleaning::cleanImagePedvars( double hithresh, double lothresh, double brightthresh )
+void VImageCleaning::cleanImagePedvars( VImageCleaningRunParameter* iImageCleaningParameters )
 {
+    ///////////////////////////////////////////////
+    // setting of image cleaning run parameters
+    if( !iImageCleaningParameters )
+    {
+        return;
+    }
+    double hithresh     = iImageCleaningParameters->fimagethresh;
+    double lothresh     = iImageCleaningParameters->fborderthresh;
+    double brightthresh = iImageCleaningParameters->fbrightnonimagetresh;
+    
+    if( !fData )
+    {
+        printDataError( "VImageCleaning::cleanImagePedvars" );
+    }
+    
 	if( fData->getDebugFlag() )
 	{
 		cout << "VImageCleaning::cleanImagePedvars " << fData->getTelID() << endl;
@@ -180,8 +227,19 @@ void VImageCleaning::cleanImagePedvars( double hithresh, double lothresh, double
    \par timediff time constraint between next neighbor pixels
 
 */
-void VImageCleaning::cleanImagePedvarsTimeDiff( double hithresh, double lothresh, double brightthresh, double timediff )
+void VImageCleaning::cleanImagePedvarsTimeDiff( VImageCleaningRunParameter* iImageCleaningParameters )
 {
+    ///////////////////////////////////////////////
+    // setting of image cleaning run parameters
+    if( !iImageCleaningParameters )
+    {
+        return;
+    }
+    double hithresh     = iImageCleaningParameters->fimagethresh;
+    double lothresh     = iImageCleaningParameters->fborderthresh;
+    double brightthresh =  iImageCleaningParameters->fbrightnonimagetresh;
+    double timediff      = iImageCleaningParameters->ftimediff;
+
 	if( fData->getDebugFlag() )
 	{
 		cout << "VImageCleaning::cleanImagePedvarsTimeDiff " << fData->getTelID() << endl;
@@ -279,6 +337,11 @@ void VImageCleaning::cleanImagePedvarsTimeDiff( double hithresh, double lothresh
 //  NOTE: IPR curves, used for cuts,  should be obtained with the SAME signal extraction method
 //        as the image under study
 // preliminary
+
+/*
+ * calculate maximum and position of maximum
+ * in a float array
+ */
 int VImageCleaning::LocMax( int n, float* ptr, float& max )
 {
 	if( n <= 0 )
@@ -297,6 +360,11 @@ int VImageCleaning::LocMax( int n, float* ptr, float& max )
 	}
 	return xmax;
 }
+
+/*
+ * calculate minimum and position of minimum
+ * in a float array
+ */
 int VImageCleaning::LocMin( int n, float* ptr, float& min ) //ptr[i]>0
 {
 	if( n <= 0 )
@@ -316,1651 +384,1835 @@ int VImageCleaning::LocMin( int n, float* ptr, float& min ) //ptr[i]>0
 	return xmin;
 }
 
+//*****************************************************************************************************
+//*****************************************************************************************************
+//*****************************************************************************************************
+//*****************************************************************************************************
+// start NN image cleaning
+
 /*
  *
- * initialize time-next-neighbour cleaning
- *
+ * init TIMENEXTNEIGHBOUR image cleaning method
  *
  */
 bool VImageCleaning::InitNNImageCleaning()
 {
-	TString refIPR, MSTrefIPR, SSTrefIPR;
-	TString prefixProd2 = "";
-#ifdef CTA_PROD2
-	prefixProd2 += "Prod2";
-#endif
-	refIPR = fData->getRunParameter()->fIPR1File + ".root";
-	MSTrefIPR = fData->getRunParameter()->fIPR2File + ".root";
-	//SCSSTrefIPR=fData->getRunParameter()->fIPR3File;
-	SSTrefIPR = fData->getRunParameter()->fIPR4File + ".root";
-	cout << "refIPR = " << refIPR << " ifAnalyseFlash:" << fData->getRunParameter()->fPerformFlashCamAnalysis[1] << endl;
-	cout << "MSTrefIPR = " << MSTrefIPR << " ifAnalyseFlash:" << fData->getRunParameter()->fPerformFlashCamAnalysis[2] << endl;
-	cout << "SSTrefIPR = " << SSTrefIPR << " ifAnalyseFlash:" << fData->getRunParameter()->fPerformFlashCamAnalysis[4] << endl;
-	
-	if( !fData->getRunParameter()->fPerformFlashCamAnalysis[1] )
-	{
-		gIPR = ReadIPRGraph( refIPR,   "IPRcharge" );
-		fFADCtoPhe[1] = ReadConvFactorsHist( refIPR, "hConvFactors", 1 );
-	}
-	if( !fData->getRunParameter()->fPerformFlashCamAnalysis[2] )
-	{
-		gIPR2 = ReadIPRGraph( MSTrefIPR, "IPRcharge" );
-		fFADCtoPhe[2] = ReadConvFactorsHist( MSTrefIPR, "hConvFactors", 1 );
-	}
-	//    if(!fData->getRunParameter()->fPerformFlashCamAnalysis[3]){gIPR3=ReadIPRGraph(SSTrefIPR,"IPRcharge");fFADCtoPhe[3]=ReadConvFactorsHist(SSTrefIPR,"hConvFactors",1);}
-	if( !fData->getRunParameter()->fPerformFlashCamAnalysis[4] )
-	{
-		gIPR4 = ReadIPRGraph( SSTrefIPR, "IPRcharge" );
-		fFADCtoPhe[4] = ReadConvFactorsHist( SSTrefIPR, "hConvFactors", 1 );
-	}
-	
-	if( fData->getRunParameter()->fPerformFlashCamAnalysis[1] )
-	{
-		gIPR = ReadIPRGraph( refIPR,   "IPRchargeFlash" );
-		fFADCtoPhe[1] = ReadConvFactorsHist( refIPR, "hConvFactors", 2 );
-	}
-	if( fData->getRunParameter()->fPerformFlashCamAnalysis[2] )
-	{
-		gIPR2 = ReadIPRGraph( MSTrefIPR, "IPRchargeFlash" );
-		fFADCtoPhe[2] = ReadConvFactorsHist( MSTrefIPR, "hConvFactors", 2 );
-	}
-	//    if(fData->getRunParameter()->fPerformFlashCamAnalysis[3]) {gIPR3=ReadIPRGraph(SSTrefIPR,"IPRchargeFlash");fFADCtoPhe[3]=ReadConvFactorsHist(SSTrefIPR,"hConvFactors",2);}
-	if( fData->getRunParameter()->fPerformFlashCamAnalysis[4] )
-	{
-		gIPR4 = ReadIPRGraph( SSTrefIPR, "IPRchargeFlash" );
-		fFADCtoPhe[4] = ReadConvFactorsHist( SSTrefIPR, "hConvFactors", 2 );
-	}
-	if( gIPR == NULL || gIPR2 == NULL || gIPR4 == NULL )
-	{
-		cout << "VImageCleaning::InitNNImageCleaning() one of IPR graphs is null... return" << endl;
-		return false;
-	}
-	
-	// GMGM what are these values?
-	float fFakeImageProb = 0.5E-3; // 0.2%  for LST ->less for MST, SST
-	float SimTime = 100.; //ns
-	float fMinRate = fFakeImageProb / ( SimTime * 1E-9 * float( 3 ) ); //ns
-	
-	float CombFactor[5] = {60000.*20., 950000., 130000., 12000., 2.}; //for 2400 pixels
-	const int types = 5; // GM hardwired number of telescope types
-	fProb4nnCurves   = new TObjArray( types );
-	fProb3nnrelCurves = new TObjArray( types );
-	fProb2plus1Curves = new TObjArray( types );
-	fProb2nnCurves   = new TObjArray( types );
-	fProbBoundCurves = new TObjArray( types );
-	
-	for( int t = 0; t < types; t++ )
-	{
-		if( t < 1 || t > 4 )
-		{
-			continue;
-		}
-		float ChargeMax = gIPR->GetXaxis()->GetXmax();
-		fProb4nnCurves->AddAt( RateContour( t, "ProbCurve4nn", fMinRate, 4, CombFactor[0], 0, ChargeMax ), t );
-		fProb3nnrelCurves->AddAt( RateContour( t, "ProbCurve3nnrel", fMinRate, 3, CombFactor[2], 0, ChargeMax ), t );
-		fProb2plus1Curves->AddAt( RateContour( t, "ProbCurve2plus1", fMinRate, 3, CombFactor[1], 0, ChargeMax ), t );
-		fProb2nnCurves->AddAt( RateContour( t, "ProbCurve2nn", fMinRate, 2, CombFactor[3], 0, ChargeMax ), t );
-		fProbBoundCurves->AddAt( RateContourBound( t, "ProbCurveBound", fMinRate, 4.0, CombFactor[4], 0, ChargeMax ), t );
-		fFADCsampleRate[t] = fData->getRunParameter()->fFADCsampleRate[t];
-		if( fFADCtoPhe[t] < 0. )
-		{
-			fFADCtoPhe[t] = 1;    // working in FADC counts directly
-		}
-		//fFADCtoPhe[t]=fData->getRunParameter()->fFADCtoPhe[t];
-		std::cout << "fFADCtoPhe[" << t << "]=" << fFADCtoPhe[t] << " ChargeMax:" << gIPR->GetXaxis()->GetXmax() << " ifActiveType:" << fData->getRunParameter()->ifActiveType[t] << std::endl;
-	}
-	// init IPRs
-	fIPRdim = 200;
-	IPR = new float* [VDST_MAXTELTYPES];
-	for( int t = 0; t < VDST_MAXTELTYPES; t++ )
-	{
-		IPR[t] = new float[fIPRdim];
-	}
-	for( int t = 0; t < VDST_MAXTELTYPES; t++ )
-		for( unsigned int th = 0; th < fIPRdim; th++ )
-		{
-			IPR[t][th] = 0.;
-		}
-		
-	return true;
-}
-
-void VImageCleaning::ScaleCombFactors( int type, float scale )
-{
-	float CombFactor[5] = {60000.*20., 950000., 130000., 6000., 2.}; //for 2400 pixels
-	TF1* f4nn   = ( TF1* )fProb4nnCurves->At( type );
-	TF1* f3nnrel = ( TF1* )fProb3nnrelCurves->At( type );
-	TF1* f2plus1 = ( TF1* )fProb2plus1Curves->At( type );
-	TF1* f2nn   = ( TF1* )fProb2nnCurves->At( type );
-	f4nn->SetParameter( 2, CombFactor[0]*scale );
-	f3nnrel->SetParameter( 2, CombFactor[2]*scale );
-	f2plus1->SetParameter( 2, CombFactor[1]*scale );
-	f2nn->SetParameter( 2, CombFactor[3]*scale );
-}
-void VImageCleaning::ResetCombFactors( int type )
-{
-	float CombFactor[5] = {60000.*20., 950000., 130000., 12000., 2.}; //for 2400 pixels
-	ScaleCombFactors( type, fData->getNChannels() / 2400. ); // for this amount of pixels
-	TF1* f4nn   = ( TF1* )fProb4nnCurves->At( type );
-	TF1* f3nnrel = ( TF1* )fProb3nnrelCurves->At( type );
-	TF1* f2plus1 = ( TF1* )fProb2plus1Curves->At( type );
-	TF1* f2nn   = ( TF1* )fProb2nnCurves->At( type );
-	f4nn->SetParameter( 2, CombFactor[0] );
-	f3nnrel->SetParameter( 2, CombFactor[2] );
-	f2plus1->SetParameter( 2, CombFactor[1] );
-	f2nn->SetParameter( 2, CombFactor[3] );
-}
-
-bool VImageCleaning::BoundarySearch( int type, float thresh, TF1* fProbCurve, float refdT, int refvalidity, int idx )
-{
-	//idx - should be next neigbour of core!!!
-	//skip core pix
-	if( ( VALIDITYBUF[idx] > 1.9 && VALIDITYBUF[idx] < 6.1 ) )
-	{
-		return false;
-	}
-	
-	// check for valid pixel number
-	if( idx >= ( int )fData->getDetectorGeo()->getNeighbours().size() )
-	{
-		return false;
-	}
-	
-	float TimeForReSearch = 0.;
-	bool iffound = false;
-	Int_t n = 0;
-	float time = 0.;
-	
-	// reftime from core pixels
-	for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[idx].size(); j++ )
-	{
-		const Int_t idx2 = fData->getDetectorGeo()->getNeighbours()[idx][j];
-		Float_t t = TIMES[idx2];
-		if( t > 0. && VALIDITYBUF[idx2] > 1.9 && VALIDITYBUF[idx2] < 5.1 )
-		{
-			time += t;
-			n++;
-		}
-	}
-	// check THIS pix and ring of neighbours
-	if( n > 0.5 )
-	{
-		TimeForReSearch = time / float( n );
-		float dT = fabs( TIMES[idx] - TimeForReSearch );
-		float times[2] = {refdT, dT};
-		float maxtime = 1E6;
-		LocMax( 2, times, maxtime );
-		float charges[2] = {thresh, INTENSITY[idx]};
-		float mincharge = 0;
-		LocMin( 2, charges, mincharge );
-		if( maxtime < CoincWinLimit && maxtime < fProbCurve->Eval( mincharge ) && VALIDITY[idx] > 0.5 )
-		{
-			if( VALIDITYBOUND[idx] != refvalidity )
-			{
-				VALIDITYBOUND[idx] = refvalidity;
-			}
-			iffound = true;
-		}
-		
-		for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[idx].size(); j++ )
-		{
-			const Int_t idx2 = fData->getDetectorGeo()->getNeighbours()[idx][j];
-			if( ( TIMES[idx2] > 0. && VALIDITYBUF[idx2] > 1.9 && VALIDITYBUF[idx2] < 5.1 ) || VALIDITYBOUND[idx2] == refvalidity )
-			{
-				continue;
-			}
-			
-			float dT2 = fabs( TIMES[idx2] - TimeForReSearch );
-			times[1] = dT2;
-			LocMax( 2, times, maxtime );
-			charges[1] = INTENSITY[idx2];
-			LocMin( 2, charges, mincharge );
-			
-			if( maxtime < CoincWinLimit && maxtime < fProbCurve->Eval( mincharge ) && VALIDITY[idx2] > 0.5 )
-			{
-				VALIDITYBOUND[idx2] = refvalidity;
-				iffound = true;
-			}
-		}
-	}
-	return iffound;
-}
-
-
-int VImageCleaning::NNGroupSearchProbCurve( int type, TF1* fProbCurve, float PreCut ) // if Nfold =3 it will search for 2nn+1, including sparse groups (with the empty pix in between)
-{
-	int NN = ( int )fProbCurve->GetParameter( 1 ); //"Nfold"
-	
-	Float_t nn2;
-	Float_t nn3;
-	Float_t nn4;
-	
-	Int_t NN2 = 0;
-	Int_t NN3 = 0;
-	Int_t NN4 = 0;
-	
-	int NSBpix = 5;
-	int numpix = fData->getDetectorGeo()->getNumChannels();
-	
-	for( int PixNum = 0; PixNum < numpix; PixNum++ )
-	{
-		Double_t q = VALIDITY[PixNum];
-		if( q < 0.5 || INTENSITY[PixNum] < PreCut )
-		{
-			continue;
-		}
-		
-		if( PixNum >= ( int )fData->getDetectorGeo()->getNeighbours().size() )
-		{
-			continue;
-		}
-		
-		for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[PixNum].size(); j++ )
-		{
-			const Int_t PixNum2 = fData->getDetectorGeo()->getNeighbours()[PixNum][j];
-			if( PixNum2 < 0 )
-			{
-				continue;
-			}
-			Double_t q1 = VALIDITY[PixNum2];
-			
-			if( q1 < 0.5 || INTENSITY[PixNum2] < PreCut )
-			{
-				continue;
-			}
-			Double_t dT = fabs( TIMES[PixNum] - TIMES[PixNum2] );
-			float charges[2] = {INTENSITY[PixNum], INTENSITY[PixNum2]};
-			float mincharge = 0;
-			LocMin( 2, charges, mincharge );
-			//if(dT>TrigWin2NN) continue;
-			if( dT > CoincWinLimit || dT > fProbCurve->Eval( mincharge ) )
-			{
-				continue;
-			}
-			
-			if( VALIDITYBUF[PixNum] < 2.9 )
-			{
-				VALIDITYBUF[PixNum] = 2;
-			}
-			if( VALIDITYBUF[PixNum2] < 2.9 )
-			{
-				VALIDITYBUF[PixNum2] = 2;
-			}
-			//if(VALIDITYBUF[PixNum2]<2.9) {VALIDITYBUF[PixNum2]=2;cout<<"charges:"<<charges[0]<<":"<<dT<<":"<<charges[1]<<" mincharge:"<<mincharge<<endl;}
-			if( NN == 2 )
-			{
-				break;
-			}
-			// Boundary search (sparse group 2+1)
-			// *************************
-			if( VALIDITYBUF[PixNum2] == 2 && NN == 3 )
-			{
-				bool iffound = false;
-				for( unsigned int k = 0; k < fData->getDetectorGeo()->getNeighbours()[PixNum].size(); k++ )
-				{
-					if( BoundarySearch( type, mincharge, fProbCurve, dT, 3, fData->getDetectorGeo()->getNeighbours()[PixNum][k] ) )
-					{
-						iffound = true;
-					}
-				}
-				if( PixNum2 >= ( int )fData->getDetectorGeo()->getNeighbours().size() )
-				{
-					continue;
-				}
-				for( unsigned int k = 0; k < fData->getDetectorGeo()->getNeighbours()[PixNum2].size(); k++ )
-				{
-					if( BoundarySearch( type, mincharge, fProbCurve, dT, 3, fData->getDetectorGeo()->getNeighbours()[PixNum2][k] ) )
-					{
-						iffound = true;
-					}
-				}
-				//cout<<"iffound:"<<iffound<<endl;
-				if( iffound )
-				{
-					if( VALIDITYBUF[PixNum] < 3.9 )
-					{
-						VALIDITYBUF[PixNum] = 3;
-					}
-					if( VALIDITYBUF[PixNum2] < 3.9 )
-					{
-						VALIDITYBUF[PixNum2] = 3;
-					}
-				}
-			}
-			if( NN == 3 )
-			{
-				break;
-			}
-			// *************************
-			
-			if( NSBpix > 2 )
-			{
-				//Double_t y=PixelY[type*maxpixels + PixNum2];
-				//Double_t x=PixelX[type*maxpixels + PixNum2];
-				Double_t x = fData->getDetectorGeo()->getX()[PixNum2];
-				Double_t y = fData->getDetectorGeo()->getY()[PixNum2];
-				
-				Int_t idxm = -1;
-				Int_t idxp = -1;
-				//Int_t idxq=-1;
-				Int_t nn = 0;
-				for( unsigned int kk = 0; kk < fData->getDetectorGeo()->getNeighbours()[PixNum].size(); kk++ )
-				{
-					const Int_t k = fData->getDetectorGeo()->getNeighbours()[PixNum][kk];
-					if( k < 0 )
-					{
-						continue;
-					}
-					//Double_t xx=x-PixelX[type*maxpixels + k];
-					//Double_t yy=y-PixelY[type*maxpixels + k];
-					Double_t xx = x - fData->getDetectorGeo()->getX()[k];
-					Double_t yy = y - fData->getDetectorGeo()->getY()[k];
-					
-					Double_t dist = sqrt( xx * xx + yy * yy );
-					//Double_t diam=2.*PixelR[type*maxpixels];
-					Double_t diam = 2.*fData->getDetectorGeo()->getTubeRadius()[1];
-					if( dist > 0.01 * diam && dist < 1.1 * diam )
-					{
-						if( nn )
-						{
-							idxp = k;
-						}
-						else
-						{
-							idxm = k;
-						}
-						nn++;
-					}
-				}
-				if( idxp < 0 )
-				{
-					continue;
-				}
-				
-				Double_t q2 = VALIDITY[idxp];
-				if( q2 < 0.5 || INTENSITY[idxp] < PreCut )
-				{
-					continue;
-				}
-				
-				dT = fabs( TIMES[PixNum] - TIMES[idxp] );
-				double dt2 = fabs( TIMES[PixNum2] - TIMES[idxp] );
-				float charges2[2] = {mincharge, INTENSITY[idxp]};
-				LocMin( 2, charges2, mincharge );
-				float times2[2] = {(float)dT, (float)dt2 };
-				float maxtime = 1E6;
-				LocMax( 2, times2, maxtime );
-				if( maxtime > CoincWinLimit || maxtime > fProbCurve->Eval( mincharge ) )
-				{
-					continue;
-				}
-				
-				if( VALIDITYBUF[PixNum] < 3.9 )
-				{
-					VALIDITYBUF[PixNum] = 3;
-				}
-				if( VALIDITYBUF[PixNum2] < 3.9 )
-				{
-					VALIDITYBUF[PixNum2] = 3;
-				}
-				if( VALIDITYBUF[idxp] < 3.9 )
-				{
-					VALIDITYBUF[idxp] = 3;
-				}
-				//if(VALIDITYBUF[idxp]<3.9)   {VALIDITYBUF[idxp]=3;cout<<"PreThresh:"<<PreCut<<" 3nn charges:"<<charges[0]<<"::::"<<dT<<","<<dt2<<", maxtime="<<maxtime<<"::::"<<charges[1]<<" mincharge:"<<mincharge<<endl;}
-				if( NN == 3 )
-				{
-					break;
-				}
-				if( NSBpix > 3 )
-				{
-					if( idxm < 0 )
-					{
-						continue;
-					}
-					Double_t q3 = VALIDITY[idxm];
-					if( q3 < 0.5 || INTENSITY[idxm] < PreCut )
-					{
-						continue;
-					}
-					dT = fabs( TIMES[PixNum] - TIMES[idxm] );
-					dt2 = fabs( TIMES[PixNum2] - TIMES[idxm] );
-					double dt3 = fabs( TIMES[idxp] - TIMES[idxm] );
-					float charges3[2] = {mincharge, INTENSITY[idxm]};
-					LocMin( 2, charges3, mincharge );
-					float times3[4] = { (float)maxtime, (float)dT, (float)dt2, (float)dt3 };
-					LocMax( 4, times3, maxtime );
-					
-					if( maxtime > CoincWinLimit || maxtime > fProbCurve->Eval( mincharge ) )
-					{
-						continue;
-					}
-					
-					VALIDITYBUF[PixNum] = 4;
-					VALIDITYBUF[PixNum2] = 4;
-					VALIDITYBUF[idxp] = 4;
-					VALIDITYBUF[idxm] = 4;
-					//cout<<"PreThresh:"<<PreCut<<" 4nn charges:"<<charges[0]<<"::::"<<dT<<","<<dt2<<","<<dt3<<", maxtime="<<maxtime<<"::::"<<charges[1]<<" mincharge:"<<mincharge<<endl;
-					
-				}
-			}
-		}
-		
-	}//end of for() loop
-	
-	for( Int_t i = 0; i < numpix; i++ )
-	{
-		float q = VALIDITYBUF[i];
-		if( q > 1.5 && q < 2.1 )
-		{
-			NN2++;
-		}
-		if( q > 2.5 && q < 3.1 )
-		{
-			NN3++;
-		}
-		if( q > 3.5 && q < 4.1 )
-		{
-			NN4++;
-		}
-		if( VALIDITYBUF[i] < 1.9 )
-		{
-			VALIDITYBUF[i] = -1;
-		}
-	}
-	
-	nn2 = float( NN2 ) / 2.;
-	nn3 = float( NN3 ) / 3.;
-	nn4 = float( NN4 ) / 4.;
-	
-	int ngroups = 0;
-	if( NN == 2 )
-	{
-		ngroups = int( nn2 + 0.5 );
-	}
-	if( NN == 3 )
-	{
-		ngroups = int( nn3 + 0.5 );
-	}
-	if( NN == 4 )
-	{
-		ngroups = int( nn4 + 0.5 );
-	}
-	return ngroups; //*/
-}
-
-int VImageCleaning::NNGroupSearchProbCurveRelaxed( int type, TF1* fProbCurve, float PreCut )
-{
-	int NN = ( int )fProbCurve->GetParameter( 1 ); //"Nfold"
-	Int_t NN2 = 0;
-	Int_t NN3 = 0;
-	Int_t NN4 = 0;
-	Double_t dT = 0, dt2 = 0, dt3 = 0;
-	
-	int numpix = fData->getDetectorGeo()->getNumChannels();
-	
-	for( int PixNum = 0; PixNum < numpix; PixNum++ )
-	{
-		int nng3[3];
-		
-		Double_t q = VALIDITY[PixNum];
-		if( q < 0.5 || INTENSITY[PixNum] < PreCut )
-		{
-			continue;
-		}
-		int NNcnt = 1;
-		int pix1 = 0, pix2 = 0, pix3 = 0, pix4 = 0;
-		if( PixNum >= ( int )fData->getDetectorGeo()->getNeighbours().size() )
-		{
-			continue;
-		}
-		for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[PixNum].size(); j++ )
-		{
-			const Int_t PixNum2 = fData->getDetectorGeo()->getNeighbours()[PixNum][j];
-			if( PixNum2 < 0 )
-			{
-				continue;
-			}
-			Double_t q1 = VALIDITY[PixNum2];
-			
-			if( q1 < 0.5 || INTENSITY[PixNum2] < PreCut )
-			{
-				continue;
-			}
-			dT = fabs( TIMES[PixNum] - TIMES[PixNum2] );
-			//if(dT>TrigWin3NNrelax) continue;
-			float charges[2] = {INTENSITY[PixNum], INTENSITY[PixNum2]};
-			float mincharge = 0;
-			LocMin( 2, charges, mincharge );
-			//if(dT>TrigWin2NN) continue;
-			if( dT > CoincWinLimit || dT > fProbCurve->Eval( mincharge ) )
-			{
-				continue;
-			}
-			float maxtime = 1E6;
-			if( dT < fProbCurve->Eval( mincharge ) && q1 > 0.5 && INTENSITY[PixNum2] > PreCut )
-			{
-				pix1 = PixNum;
-				if( PixNum2 != pix2 )
-				{
-					pix3 = PixNum2;
-				}
-				if( pix2 == 0 )
-				{
-					pix2 = PixNum2;
-				}
-				dt2 = fabs( TIMES[pix2] - TIMES[pix3] );
-				dt3 = fabs( TIMES[pix1] - TIMES[pix3] );
-				float charges2[3] = {mincharge, INTENSITY[pix3], INTENSITY[pix2]};
-				LocMin( 3, charges2, mincharge );
-				float times2[3] = {(float)dT, (float)dt2, (float)dt3};
-				LocMax( 3, times2, maxtime );
-				
-				if( maxtime < CoincWinLimit && maxtime < fProbCurve->Eval( mincharge ) )
-				{
-					NNcnt++;
-				}
-			}
-			
-			if( NNcnt > 2 )
-			{
-				if( VALIDITYBUF[pix1] < 4.9 )
-				{
-					VALIDITYBUF[pix1] = 5;
-				}
-				nng3[0] = pix1;
-				if( VALIDITYBUF[pix2] < 4.9 )
-				{
-					VALIDITYBUF[pix2] = 5;
-				}
-				nng3[1] = pix2;
-				if( VALIDITYBUF[pix3] < 4.9 )
-				{
-					VALIDITYBUF[pix3] = 5;
-				}
-				nng3[2] = pix3; //cout<<"PreThresh:"<<PreCut<<" 3nn charges:"<<INTENSITY[pix3]<<","<<INTENSITY[pix2]<<" mincharge:"<<mincharge<<"maxtime:"<<maxtime<<endl; }
-				short VALIDITYLOCAL[numpix];
-				memset( VALIDITYLOCAL, 0, sizeof( VALIDITYLOCAL ) );
-				for( int n = 0; n < 3; n++ )
-				{
-					VALIDITYLOCAL[nng3[n]] = 10;
-				}
-				if( NN == 3 )
-				{
-					break;
-				}
-				//4 connected pixels
-				for( int n = 0; n < 3; n++ )
-				{
-					if( nng3[n] >= ( int )fData->getDetectorGeo()->getNeighbours().size() )
-					{
-						continue;
-					}
-					for( unsigned int jj = 0; jj < fData->getDetectorGeo()->getNeighbours()[nng3[n]].size(); jj++ )
-					{
-						const Int_t testpixnum = fData->getDetectorGeo()->getNeighbours()[nng3[n]][jj];
-						//if(testpixnum<0 || VALIDITY[testpixnum]<0.5 || VALIDITYBUF[testpixnum]==5) continue;
-						if( testpixnum < 0 || VALIDITYLOCAL[testpixnum] == 10 )
-						{
-							continue;
-						}
-						if( INTENSITY[testpixnum] < PreCut )
-						{
-							continue;
-						}
-						
-						float minchargeloc = 0, maxtimeloc = 0;
-						float charges3[2] = {mincharge, INTENSITY[testpixnum]};
-						LocMin( 2, charges3, minchargeloc );
-						float times3[4] = {maxtime, fabs( TIMES[testpixnum] - TIMES[nng3[0]] ), fabs( TIMES[testpixnum] - TIMES[nng3[1]] ), fabs( TIMES[testpixnum] - TIMES[nng3[2]] )};
-						LocMax( 4, times3, maxtimeloc );
-						//cout<<"refpix:"<<nng3[n]<<" pixnum:"<<neighbor1[jj]<<" mincharge:"<<mincharge<<" "<<minchargeloc<<" maxtime:"<<maxtime<<" "<<maxtimeloc<<endl;
-						
-						if( maxtimeloc < CoincWinLimit && maxtimeloc < fProbCurve->Eval( minchargeloc ) )
-						{
-							NNcnt++;// cout<<"4conn group found. added pix:"<<pix4<<" | "<<pix1<<" "<<pix2<<" "<<pix3<<endl;
-							pix4 = testpixnum;
-							float groupsize = INTENSITY[pix1] + INTENSITY[pix2] + INTENSITY[pix3] + INTENSITY[pix4];
-							if( groupsize > PreCut * 4.*1.5 )
-							{
-								if( VALIDITYBUF[pix1] < 5.9 )
-								{
-									VALIDITYBUF[pix1] = 6;
-								}
-								if( VALIDITYBUF[pix2] < 5.9 )
-								{
-									VALIDITYBUF[pix2] = 6;
-								}
-								if( VALIDITYBUF[pix3] < 5.9 )
-								{
-									VALIDITYBUF[pix3] = 6;
-								}
-								if( VALIDITYBUF[pix4] < 5.9 )
-								{
-									VALIDITYBUF[pix4] = 6;
-								}
-							}
-							//cout<<"group size:"<<groupsize<<endl;
-						}
-					}
-				}
-			}// end if NNcnt>2
-		}
-		
-	}//end of for() loop
-	
-	for( Int_t i = 0; i < numpix; i++ )
-	{
-		float q = VALIDITYBUF[i];
-		if( q > 1.5 && q < 2.1 )
-		{
-			NN2++;
-		}
-		if( q > 4.5 && q < 5.1 )
-		{
-			NN3++;
-		}
-		if( q > 5.5 && q < 6.1 )
-		{
-			NN4++;
-		}
-		if( VALIDITYBUF[i] < 1.9 )
-		{
-			VALIDITYBUF[i] = -1;
-		}
-	}
-	if( NN3 > 2 && NN == 3 )
-	{
-		return NN3 / 3;
-	}
-	if( NN4 > 3 && NN == 4 )
-	{
-		return NN4 / 4;
-	}
-	if( NN3 < 3 )
-	{
-		return 0;
-	}
-	return 0;
-}
-void VImageCleaning::DiscardIsolatedPixels( int type )
-{
-	unsigned int numpix = fData->getDetectorGeo()->getNumChannels();
-	
-	for( unsigned int PixNum = 0; PixNum < numpix; PixNum++ )
-	{
-		if( VALIDITY[PixNum] < 1.9 )
-		{
-			continue;
-		}
-		unsigned int NumOfNeighbor = 0;
-		if( PixNum >= fData->getDetectorGeo()->getNeighbours().size() )
-		{
-			continue;
-		}
-		for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[PixNum].size(); j++ )
-		{
-			const Int_t PixNum2 = fData->getDetectorGeo()->getNeighbours()[PixNum][j];
-			if( PixNum2 < 0 )
-			{
-				continue;
-			}
-			if( VALIDITY[PixNum2] > 1.9 )
-			{
-				NumOfNeighbor++;
-			}
-		}
-		if( NumOfNeighbor < 0.5 )
-		{
-			VALIDITY[PixNum] = 0;
-		}
-	}
-}
-void VImageCleaning::DiscardTimeOutlayers( int type )
-{
-	unsigned int numpix = fData->getDetectorGeo()->getNumChannels();
-	unsigned int Tcnt = 0;
-	float meanTw = 0;
-	float sigmaT = 0;
-	float meanT = 0;
-	float sigmaTw = 0;
-	float sumw = 0;
-	for( unsigned int pixnum = 0; pixnum < numpix; pixnum++ )
-	{
-		if( VALIDITY[pixnum] < 1.9 )
-		{
-			continue;
-		}
-		meanT += TIMES[pixnum];
-		sigmaT += TIMES[pixnum] * TIMES[pixnum];
-		meanTw += INTENSITY[pixnum] * TIMES[pixnum];
-		sigmaTw += INTENSITY[pixnum] * TIMES[pixnum] * TIMES[pixnum];
-		sumw += INTENSITY[pixnum];
-		Tcnt++;
-	}
-	if( Tcnt > 1 )
-	{
-		meanT /= Tcnt;
-		meanTw /= sumw;
-		float radicand = ( sigmaT - Tcnt * meanT * meanT ) / ( float( Tcnt ) - 1. );
-		float radicand2 = ( sigmaTw - sumw * meanTw * meanTw ) / ( float( sumw ) - 1. );
-		if( radicand > 0 )
-		{
-			sigmaT = sqrt( radicand );
-		}
-		else
-		{
-			sigmaT = 1E6;
-		}
-		if( radicand2 > 0 )
-		{
-			sigmaTw = sqrt( radicand2 );
-		}
-		else
-		{
-			sigmaTw = 1E6;
-		}
-		for( unsigned int pp = 0; pp < numpix; pp++ )
-		{
-			if( VALIDITY[pp] < 1.9 )
-			{
-				continue;
-			}
-			if( fabs( TIMES[pp] - meanTw ) > 2.4 * sigmaTw )
-			{
-				//cout<<"TelType:"<<type<<"pix:"<<pp<<" "<<TIMES[pp]-meanTw<<" "<<sigmaTw<<endl;
-				VALIDITY[pp] = 0;
-			}
-		}
-	}
-}
-
-void VImageCleaning::DiscardLocalTimeOutlayers( int type, float NNthresh[6] )
-{
-	//   unsigned int numpix=fNumPixels[type];
-	unsigned int numpix = fData->getDetectorGeo()->getNumChannels();
-	unsigned int nimagepix = 0;
-	DiscardIsolatedPixels( type );
-	for( unsigned int pixnum = 0; pixnum < numpix; pixnum++ )
-	{
-		if( VALIDITY[pixnum] < 1.9 )
-		{
-			continue;
-		}
-		nimagepix++;
-	}
-	//******************************************************************
-	// discard groups with no neighbouring group in the vicinity of 6pixels
-	for( unsigned int pixnum = 0; pixnum < numpix; pixnum++ )
-	{
-		if( VALIDITY[pixnum] < 1.9 )
-		{
-			continue;
-		}
-		
-		Double_t diam = 2.*fData->getDetectorGeo()->getTubeRadius()[1];
-		Double_t x = fData->getDetectorGeo()->getX()[pixnum] / diam; // coord in pixels units
-		Double_t y = fData->getDetectorGeo()->getY()[pixnum] / diam; // coord in pixels units
-		
-		unsigned int pixcnt = 0;
-		unsigned int pixzerocnt = 0;
-		// loop over vicinity of 2 rings around pixnum
-		for( unsigned int pp = 0; pp < numpix; pp++ )
-		{
-			if( VALIDITY[pp] < 1.9 || pp == pixnum )
-			{
-				continue;
-			}
-			Double_t xx = x - fData->getDetectorGeo()->getX()[pp] / diam; // coord in pixels units
-			Double_t yy = y - fData->getDetectorGeo()->getY()[pp] / diam; // coord in pixels units
-			Double_t dist = sqrt( xx * xx + yy * yy );
-			if( dist > 6.1 )
-			{
-				continue;
-			}
-			if( dist < 2.1 )
-			{
-				pixcnt++;
-			}
-			if( dist > 2.1 )
-			{
-				pixzerocnt++;
-			}
-			//cout<<"Tel:"<<fData->getTelID()<<" RefPix:"<<pixnum<<"  pix:"<<pp<<endl;
-		}
-		//cout<<"Tel:"<<fData->getTelID()<<"  Nimagepix:"<<nimagepix<<" RefPix:"<<pixnum<<" Vicinity(<2.1) cnt:"<<pixcnt<<" Vicinity(>2.1) cnt:"<<pixzerocnt<<endl;
-		//if(nimagepix>4&&pixcnt<4&&pixzerocnt==0) VALIDITY[pixnum]=0;
-		if( nimagepix > 7 && pixcnt < 7 && pixzerocnt == 0 )
-		{
-			VALIDITY[pixnum] = 0;
-		}
-	}
-	//******************************************************************
-	// loop over accepted pixels
-	for( unsigned int pixnum = 0; pixnum < numpix; pixnum++ )
-	{
-		if( VALIDITY[pixnum] < 1.9 )
-		{
-			continue;
-		}
-		
-		unsigned int Tcnt = 0;
-		float meanTw = 0;
-		float sigmaT = 0;
-		float meanT = 0;
-		float sigmaTw = 0;
-		float sumw = 0;
-		Double_t diam = 2.*fData->getDetectorGeo()->getTubeRadius()[1];
-		Double_t x = fData->getDetectorGeo()->getX()[pixnum] / diam; // coord in pixels units
-		Double_t y = fData->getDetectorGeo()->getY()[pixnum] / diam; // coord in pixels units
-		
-		// loop over vicinity of 2 rings around pixnum
-		for( unsigned int pp = 0; pp < numpix; pp++ )
-		{
-			if( VALIDITY[pp] < 1.9 || pp == pixnum )
-			{
-				continue;
-			}
-			Double_t xx = x - fData->getDetectorGeo()->getX()[pp] / diam; // coord in pixels units
-			Double_t yy = y - fData->getDetectorGeo()->getY()[pp] / diam; // coord in pixels units
-			Double_t dist = sqrt( xx * xx + yy * yy );
-			if( dist > 2.1 )
-			{
-				continue;
-			}
-			//cout<<"Tel:"<<fData->getTelID()<<" RefPix:"<<pixnum<<"  pix:"<<pp<<endl;
-			meanT += TIMES[pp];
-			sigmaT += TIMES[pp] * TIMES[pp];
-			meanTw += INTENSITY[pp] * TIMES[pp];
-			sigmaTw += INTENSITY[pp] * TIMES[pp] * TIMES[pp];
-			sumw += INTENSITY[pp];
-			Tcnt++;
-		}
-		if( Tcnt > 1 && nimagepix > 4 )
-		{
-			meanT /= ( float )Tcnt;
-			meanTw /= sumw;
-			float radicand = ( sigmaT - Tcnt * meanT * meanT ) / ( float( Tcnt ) - 1. );
-			float radicand2 = ( sigmaTw - sumw * meanTw * meanTw ) / ( float( sumw ) - 1. );
-			if( radicand > 0 )
-			{
-				sigmaT = sqrt( radicand );
-			}
-			else
-			{
-				sigmaT = 1E6;
-			}
-			if( radicand2 > 0 )
-			{
-				sigmaTw = sqrt( radicand2 );
-			}
-			else
-			{
-				sigmaTw = 1E6;
-			}
-			
-			//float SNRlimit=5.0; if(Tcnt==2) SNRlimit=8.;
-			float SNRlimit = 5.0;
-			if( Tcnt == 2 )
-			{
-				SNRlimit = 9.;
-			}
-			float sigmalimit = 0.11; // sigmaT>sigmalimit:  time clustering due to finite sampling rate
-			if( fabs( TIMES[pixnum] - meanT ) / sigmaT > SNRlimit && sigmaT > sigmalimit && INTENSITY[pixnum] < 1.5 * NNthresh[3] )
-			{
-				// cout<<"Tel:"<<fData->getTelID()<<" RefPix:"<<pixnum<<" Entrie cnt:"<<Tcnt<<" dTw:"<<TIMES[pixnum]-meanTw<<" SigdTw:"<<sigmaTw<<
-				//     " SNRw:"<<fabs(TIMES[pixnum]-meanTw)/sigmaTw<<" dT:"<<TIMES[pixnum]-meanT<<" SigdT:"<<sigmaT<<" SNRw:"<<fabs(TIMES[pixnum]-meanT)/sigmaT<<endl;
-				VALIDITY[pixnum] = 0;
-			}
-		}
-	}
-	//******************************************************************
-}
-
-
-void  VImageCleaning::SetNeighborRings( int type, unsigned short* VALIDITYBOUNDBUF, float* TIMESReSearch, float* REFTHRESH )
-{
-	unsigned int nfirstringpix = 0;
-	//    unsigned int numpix=fNumPixels[type];
-	unsigned int numpix = fData->getDetectorGeo()->getNumChannels();
-	//Define search region, driven by found core pixels
-	for( unsigned int p = 0; p < numpix; p++ )
-	{
-		TIMESReSearch[p] = 0.;
-		REFTHRESH[p] = 0.;
-		VALIDITYBOUNDBUF[p] = 0;
-		if( VALIDITY[p] > 1.9 )
-		{
-			VALIDITYBOUNDBUF[p] = 2;
-		}
-	}
-	for( unsigned int iRing = 0; iRing < nRings; iRing++ )
-	{
-		for( unsigned int idx = 0; idx < numpix; idx++ )
-		{
-			if( VALIDITYBOUNDBUF[idx] == 2 )
-			{
-				continue;
-			}
-			if( ( iRing > 0 ) && ( VALIDITYBOUNDBUF[idx] < iRing + 7 ) && ( VALIDITYBOUNDBUF[idx] > 1.9 ) )
-			{
-				continue;
-			}
-			float time = 0.;
-			float refthresh = 0.;
-			int n = 0;
-			if( idx >= fData->getDetectorGeo()->getNeighbours().size() )
-			{
-				continue;
-			}
-			for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[idx].size(); j++ )
-			{
-				int idx2 = fData->getDetectorGeo()->getNeighbours()[idx][j];
-				if( idx2 < 0 || VALIDITYBOUNDBUF[idx2] < 1.9 )
-				{
-					continue;
-				}
-				
-				if( iRing == 0 )
-				{
-					if( VALIDITYBOUNDBUF[idx2] < 1.9 || VALIDITYBOUNDBUF[idx2] == iRing + 7 )
-					{
-						continue;
-					}
-					//n++;
-					if( TIMESReSearch[idx2] > 0.01 )
-					{
-						time += TIMESReSearch[idx2];
-						refthresh += INTENSITY[idx2];
-						n++;
-					}
-					else
-					{
-						Float_t t = TIMES[idx2];
-						if( t > 0. )
-						{
-							time += t;
-							refthresh += INTENSITY[idx2];
-							n++;
-						}
-					}
-				}
-				if( iRing > 0 )
-				{
-					if( VALIDITYBOUNDBUF[idx2] == iRing + 6 )
-					{
-						time += TIMESReSearch[idx2];
-						refthresh += REFTHRESH[idx2];
-						n++;
-					}
-				}
-			}
-			if( iRing == 0 && n > 0.5 )
-			{
-				TIMESReSearch[idx] = time / float( n );
-				REFTHRESH[idx] = refthresh / float( n );
-			}
-			if( iRing > 0 && n > 0.5 )
-			{
-				TIMESReSearch[idx] = time / float( n );
-				REFTHRESH[idx] = refthresh / float( n );
-			}
-			if( n > 0.5 )
-			{
-				VALIDITYBOUNDBUF[idx] = iRing + 7;
-				if( iRing == 0 )
-				{
-					nfirstringpix++;
-				}
-				// cout<<"ring:"<<iRing<<" VALIDITY:"<<VALIDITYBOUNDBUF[idx]<<" pix:"<<idx<<" TimeReSearch:"<<TIMESReSearch[idx]<<" RefTh:"<<REFTHRESH[idx]<<endl;
-			}
-		}
-	} // loop over rings
+    const int types = VDST_MAXTELTYPES;
+    // arrays with rate contour curves
+    // (length of number of telescope types)
+    fProb4nnCurves    = new TObjArray( types );
+    fProb3nnrelCurves = new TObjArray( types );
+    fProb2plus1Curves = new TObjArray( types );
+    fProb2nnCurves    = new TObjArray( types );
+    fProbBoundCurves  = new TObjArray( types );
+    
+    // init IPR arrays
+    // IPR[teltypes][IPRdim]
+    IPR = new float* [VDST_MAXTELTYPES];
+    for( int t = 0; t < VDST_MAXTELTYPES; t++ )
+    {
+        IPR[t] = new float[fIPRdim];
+    }
+    for( int t = 0; t < VDST_MAXTELTYPES; t++ )
+    {
+        for( unsigned int th = 0; th < fIPRdim; th++ )
+        {
+            IPR[t][th] = 0.;
+        }
+    }
+    
+    return true;
 }
 
 /*
- * time-next-neighbour cleaning (service function)
- *
- *
- */
-float VImageCleaning::ImageCleaningCharge( int type, int& ngroups )
+    get IPR graphs from different sources (files), calculate probability contours
+
+*/
+bool VImageCleaning::InitNNImgClnPerTelType( unsigned int teltype )
 {
-	unsigned int numpix = fData->getDetectorGeo()->getNumChannels();
-	float corr = 1.;
-	//                 [p.e.]4nn   2+1      3nn       2nn      Bound.   Bound Ref Charge
-	float PreThresh[6] = { (float)(2.0 / corr), (float)(3.0 / corr), (float)(2.8 / corr), (float)(5.2 / corr), (float)(1.8 / corr), (float)(4.0 / corr) };
-	// GMGM hardcoded number of telescope type, why is this not an array?
-	if( type == 1 )
-	{
-		FillPreThresholds( gIPR, PreThresh );
-	}
-	if( type == 2 )
-	{
-		FillPreThresholds( gIPR2, PreThresh );
-	}
-	//if(type==3)FillPreThresholds(gIPR3, PreThresh);
-	if( type == 4 )
-	{
-		FillPreThresholds( gIPR4, PreThresh );
-	}
-	ngroups = 0;
-	memset( VALIDITYBOUND, 0, sizeof( VALIDITYBOUND ) );
-	memset( VALIDITY, 0, sizeof( VALIDITY ) );
-	memset( VALIDITYBUF, 0, sizeof( VALIDITYBUF ) );
-	ResetCombFactors( type );
-	for( unsigned int p = 0; p < numpix; p++ )
-	{
-		if( INTENSITY[p] > PreThresh[4] )
-		{
-			VALIDITY[p] = 1;
-			VALIDITYBUF[p] = 1;
-		}
-		else
-		{
-			VALIDITY[p] = -1;
-			VALIDITYBUF[p] = -1;
-		}
-	}
-	
-	//*************** Image Cleaning ******************************************************************************************
-	ngroups = NNGroupSearchProbCurve( type, ( TF1* )fProb2nnCurves->At( type ), PreThresh[3] );
-	for( unsigned int p = 0; p < numpix; p++ )
-	{
-		if( VALIDITYBUF[p] == 2 )
-		{
-			VALIDITY[p] = 2;
-		}
-	}
-	ngroups += NNGroupSearchProbCurve( type, ( TF1* )fProb2plus1Curves->At( type ), PreThresh[1] );
-	for( unsigned int p = 0; p < numpix; p++ )
-	{
-		if( VALIDITYBUF[p] == 3 || VALIDITYBOUND[p] == 3 )
-		{
-			VALIDITY[p] = 3;
-		}
-	}
-	ngroups += NNGroupSearchProbCurveRelaxed( type, ( TF1* )fProb3nnrelCurves->At( type ), PreThresh[2] );
-	for( unsigned int p = 0; p < numpix; p++ )
-	{
-		if( VALIDITYBUF[p] == 5 )
-		{
-			VALIDITY[p] = 5;
-		}
-	}
-	ngroups += NNGroupSearchProbCurveRelaxed( type, ( TF1* )fProb4nnCurves->At( type ), PreThresh[0] );
-	for( unsigned int p = 0; p < numpix; p++ )
-	{
-		if( VALIDITYBUF[p] == 6 )
-		{
-			VALIDITY[p] = 6;
-		}
-	}
-	//ngroups+=NNGroupSearchProbCurve(type,(TF1*)fProb4nnCurves->At(type), PreThresh[0]);           for(unsigned int p=0;p<numpix;p++){if(VALIDITYBUF[p]==4) VALIDITY[p]=4; }
-	// GMGM don't understund PreThresh[..] index
-	// *********************************************************************
-	//*********************************************************************
-	// Boundary
-	unsigned int ncorepix = 0;
-	unsigned int ncore4nnpix = 0;
-	unsigned int nboundsearchpix = 0;
-	unsigned int nfirstringpix = 0;
-	unsigned int nboundary = 0;
-	float TIMESReSearch[numpix];
-	unsigned short VALIDITYBOUNDBUF[numpix];
-	float REFTHRESH[numpix];
-	
-	//*****************************************************************************************************************
-	//boundary search (same as core search above but reduced search area (vicinity of core pixels) )
-	//Define search region for boundary
-	SetNeighborRings( type, &VALIDITYBOUNDBUF[0], &TIMESReSearch[0], &REFTHRESH[0] );
-	//Reset  validity buffers (Important)
-	for( unsigned int p = 0; p < numpix; p++ )
-	{
-		//if(VALIDITYBOUNDBUF[p]>1.9) {if(VALIDITYBOUNDBUF[p]>6){nboundsearchpix++;} VALIDITYBUF[p]=1;VALIDITYBOUND[p]=0;}//VALIDITY[p];}
-		if( VALIDITYBOUNDBUF[p] > 1.9 )
-		{
-			{
-				nboundsearchpix++;
-			}
-			VALIDITYBUF[p] = 1;
-			VALIDITYBOUND[p] = 0;
-		}//VALIDITY[p];}
-		if( VALIDITYBOUNDBUF[p] < 1.9 )
-		{
-			VALIDITYBUF[p] = 0;
-			VALIDITY[p] = 0;
-		}
-	}
-	
-	// all found pixels are set also to CORE pixels!!!
-	if( ngroups > 0 )
-	{
-		ScaleCombFactors( type, float( nboundsearchpix ) / ( numpix * 1.5 ) );
-		NNGroupSearchProbCurve( type, ( TF1* )fProb2nnCurves->At( type ), 0.8 * PreThresh[3] ); // GMGM why are thresholds scaled by 0.8 or 0.9?
-		for( unsigned int p = 0; p < numpix; p++ )
-		{
-			if( VALIDITY[p] > 1.9 )
-			{
-				continue;
-			}
-			if( VALIDITYBUF[p] == 2 )
-			{
-				VALIDITY[p] = 2;
-			}
-		}
-		
-		NNGroupSearchProbCurve( type, ( TF1* )fProb2plus1Curves->At( type ), 0.8 * PreThresh[1] );
-		for( unsigned int p = 0; p < numpix; p++ )
-		{
-			if( VALIDITY[p] > 1.9 )
-			{
-				continue;
-			}
-			if( VALIDITYBUF[p] == 3 || VALIDITYBOUND[p] == 3 )
-			{
-				VALIDITY[p] = 3;
-			}
-		}
-		
-		NNGroupSearchProbCurveRelaxed( type, ( TF1* )fProb3nnrelCurves->At( type ), 0.8 * PreThresh[2] );
-		for( unsigned int p = 0; p < numpix; p++ )
-		{
-			if( VALIDITY[p] > 1.9 )
-			{
-				continue;
-			}
-			if( VALIDITYBUF[p] == 5 )
-			{
-				VALIDITY[p] = 5;
-			}
-		}
-		
-		NNGroupSearchProbCurveRelaxed( type, ( TF1* )fProb4nnCurves->At( type ), 0.9 * PreThresh[0] );
-		for( unsigned int p = 0; p < numpix; p++ )
-		{
-			if( VALIDITY[p] > 1.9 )
-			{
-				continue;
-			}
-			if( VALIDITYBUF[p] == 6 )
-			{
-				VALIDITY[p] = 6;
-			}
-		}
-		ResetCombFactors( type );
-	}
-	//calc corepix:
-	for( unsigned int p = 0; p < numpix; p++ )
-	{
-		if( VALIDITY[p] > 1.9 && VALIDITY[p] < 6.1 )
-		{
-			ncorepix++;
-		}
-	}
-	
-	//set rings of boundaries for newly found core pixels
-	SetNeighborRings( type, &VALIDITYBOUNDBUF[0], &TIMESReSearch[0], &REFTHRESH[0] );
-	for( unsigned int p = 0; p < numpix; p++ )
-	{
-		if( VALIDITYBOUNDBUF[p] == 7 )
-		{
-			nfirstringpix++;
-			// cout<<"Pix:"<<p<<" secondPulse: "<<fData->getSumsSecond()[p]<<" t:"<<fData->getTimesSecond()[p]<<endl;
-		}
-	}
-	
-	
-	// BOUNDARY pixel search (usually very few pixels are found)
-	//only first ring
-	TF1* fProbCurveBound = ( TF1* )fProbBoundCurves->At( type );
-	for( Int_t iRing = 0; iRing < 1; iRing++ )
-	{
-		for( UInt_t idx = 0; idx < numpix; idx++ )
-		{
-			if( ( VALIDITY[idx] < 5.1 ) && ( VALIDITY[idx] > 1.9 ) )
-			{
-				continue;
-			}
-			if( ( iRing > 0 ) && ( VALIDITY[idx] < iRing + 7 ) && ( VALIDITY[idx] > 1.9 ) )
-			{
-				continue;
-			}
-			int n = 0;
-			float time = 0.;
-			float charge = 0.;
-			
-			if( idx >= fData->getDetectorGeo()->getNeighbours().size() )
-			{
-				continue;
-			}
-			for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[idx].size(); j++ )
-			{
-				const Int_t idx2 = fData->getDetectorGeo()->getNeighbours()[idx][j];
-				if( idx2 < 0 || VALIDITYBOUNDBUF[idx2] < 1.9 )
-				{
-					continue;
-				}
-				
-				if( iRing == 0 )
-				{
-					if( VALIDITY[idx2] < 1.9 || VALIDITY[idx2] == iRing + 7 )
-					{
-						continue;
-					}
-					if( TIMESReSearch[idx2] > 0. )
-					{
-						time += TIMESReSearch[idx2];
-						charge += REFTHRESH[idx2];
-						n++;
-					}
-					else
-					{
-						Float_t t = TIMES[idx2];
-						if( t > 0. )
-						{
-							time += t;
-							charge += INTENSITY[idx2];
-							n++;
-						}
-					}
-					//n++;
-				}
-				if( iRing > 0 )
-				{
-					if( VALIDITYBOUNDBUF[idx2] == iRing + 6 )
-					{
-						if( TIMESReSearch[idx2] > 0. )
-						{
-							time += TIMESReSearch[idx2];
-							charge += REFTHRESH[idx2];
-							n++;
-						}
-						else
-						{
-							Float_t t = TIMES[idx2];
-							if( t > 0. )
-							{
-								time += t;
-								charge += INTENSITY[idx2];
-								n++;
-							}
-						}
-					}
-				}
-			}
-			if( n > 0.5 )
-			{
-				if( INTENSITY[idx] < PreThresh[4] )
-				{
-					continue;
-				}
-				TIMESReSearch[idx] = time / float( n );
-				charge /= float( n );
-				if( charge > 2.*PreThresh[3] )
-				{
-					charge = 2 * PreThresh[3];
-				}
-				float dT = fabs( TIMES[idx] - TIMESReSearch[idx] );
-				//fProbCurveBound->SetParameter( 1, PreThresh[5] );
-				fProbCurveBound->SetParameter( 1, charge );
-				float charges[2] = {INTENSITY[idx], (float)fProbCurveBound->GetParameter( 1 )};
-				float refth = 0.;
-				LocMin( 2, charges, refth );
-				//fProbCurveBound->SetParameter( 2, 2.*( 1. + ncorepix * ( iRing )*pow( double( iRing + 1 ), 2. ) ) );
-				fProbCurveBound->SetParameter( 2, 2.*nfirstringpix );
-				if( dT < 0.6 * CoincWinLimit && dT < fProbCurveBound->Eval( refth ) )
-				{
-					VALIDITY[idx] = iRing + 7;
-					//cout<<"pix:"<<idx<<" dt:"<<dT<<" Intensity:"<<INTENSITY[idx]<<" refth:"<<refth<<" Eval:"<<fProbCurveBound->Eval(refth)<<endl;
-				}
-			}
-		}
-	} // end of loop over rings
-	
-	if( ncorepix > 4 )
-	{
-		// order is important
-		DiscardLocalTimeOutlayers( type, PreThresh );
-		DiscardIsolatedPixels( type );
-	}
-	
-	for( unsigned int p = 0; p < numpix; p++ )
-	{
-		if( VALIDITY[p] > 6.1 )
-		{
-			nboundary++;
-		}
-		if( VALIDITY[p] == 6 )
-		{
-			ncore4nnpix++;
-		}
-	}
-	//Discard small images and 4nn with no boundaries: Important protection from fully fake images which can destroy  shower dir reconstuction
-	// prob of any of fake group is <0.8%
-	// after this discarding prob of fake image <0.05% !!!
-	
-	if( ( ( ncorepix + nboundary ) < 4 ) || ( ncore4nnpix == 4 && nboundary == 0 && ncorepix == 4 ) )
-	{
-		for( unsigned int p = 0; p < numpix; p++ )
-		{
-			if( VALIDITY[p] > 1.9 )
-			{
-				VALIDITY[p] = 1;
-			}
-		}
-		ngroups = 0;
-	}
-	int imageflag = 0;
-	float SIZE = 0.;
-	
-	for( unsigned int p = 0; p < numpix; p++ )
-	{
-		if( VALIDITY[p] > 1.9 )
-		{
-			SIZE += INTENSITY[p];
-			imageflag++;
-		}
-	}
-	// GMGM    if(imageflag==0) SIZE=-1;
-	if( imageflag == 0 )
-	{
-		SIZE = 0.;
-	}
-	return SIZE; //*/
+    // reading IPR graphs
+    TGraphErrors* IPRgraph = NULL;
+    // get ready filled IPR from DST or pedestal file
+    if( fData->getRunParameter()->ifReadIPRfromDSTFile )
+    {
+        cout << "VImageCleaning::InitNNImgClnPerTelType( int type ): getting IPR graph for (simtel) teltype: ";
+        cout << teltype << " (type " << ( int )fData->getTelType( fData->getTelID() );
+        cout << ", summation window " << fData->getSumWindow() << ") from DST file" << endl;
+        IPRgraph = fData->getIPRGraph();
+        if( IPRgraph )
+        {
+            cout << "\t found graph: " << IPRgraph->GetName() << endl;
+        }
+    }
+    else if( !fData->getRunParameter()->ifReadIPRfromDatabase )
+    {
+        cout << "VImageCleaning::InitNNImgClnPerTelType( int type ): getting IPR graph for teltype: ";
+        cout << teltype << " from external file (ped or DST file)" << endl;
+        IPRgraph = fData->getIPRGraph();
+        if( IPRgraph )
+        {
+            IPRgraph->SetName( Form( "IPRchargeTelType%d", teltype ) );
+        }
+    }
+    // get IPR from database
+    else
+    {
+        cout << "VImageCleaning::InitNNImgClnPerTelType( int type ): getting IPR graph for teltype:" << teltype << " from external IPR database" << endl;
+        TFile* fgraphs = new TFile( fData->getRunParameter()->fIPRdatabaseFile, "READ" );
+        TString  gname = Form( "IPRchargeTelType%d_TelID%d", ( int )fData->getTelType( fData->getTelID() ), ( int )fData->getTelID() );
+        IPRgraph = ( TGraphErrors* )fgraphs->Get( gname.Data() );
+        fgraphs->Close();
+        fgraphs->Delete();
+    }
+    if( !IPRgraph )
+    {
+        cout << "VImageCleaning::InitNNImgClnPerTelType( int type ) ERROR: IPR graph is NULL for teltype " << teltype << " !!!" << endl;
+        printDataError( "" );
+    }
+    fIPRgraphs->AddAt( IPRgraph, teltype );
+    
+    cout << "IPR for TelType (TrigSim, TIMENEXTNEIGHBOUR):" << teltype << " read: " << IPRgraph->GetName();
+    cout << endl;
+    
+    //initializing probability curves
+    unsigned int NgroupTypes = 0;
+    if( teltype < fifActiveNN.size() )
+    {
+        for( unsigned int i = 0; i < fifActiveNN[teltype].size(); i++ )
+        {
+            if( fifActiveNN[teltype][i] )
+            {
+                NgroupTypes++;
+            }
+        }
+    }
+    if( NgroupTypes == 0 )
+    {
+        cout << "VImageCleaning::InitNNImgClnPerTelType( int type ) ERROR:";
+        cout << "no NN groups type selected for search (check image cleaning input card) ...exit" << endl;
+        printDataError( "VImageCleaning::InitNNImgClnPerTelType( int type )" );
+    }
+    float SimTime = fData->getDetectorGeo()->getLengthOfSampleTimeSlice( fData->getTelID() );
+    if( fData->getSearchWindowLast() < fData->getNSamples() )
+    {
+        SimTime *= ( fData->getSearchWindowLast() - fData->getSumFirst() );
+    }
+    else
+    {
+        SimTime *= ( fData->getNSamples() - fData->getSumFirst() );
+    }
+    if( setExplicitSampleTimeSlice )
+    {
+        // simple peak sensing: sim_telarray uses the maximum bin only
+        // (searched for in the window given by SimTime)
+        // The values for sampleTimeSlice and nBinsADC are set in the cleaning parameter file
+        // For example, for the currect (Apr 17) ASTRI simulation, it is set in sim_telarray as
+        // fadc_mhz = 500 % MHz ==> sampleTimeSlice = 2 ns
+        // fadc_sum_bins = nBinsADC = 25 % Number of ADC time intervals actually summed up.
+        SimTime = sampleTimeSlice * nBinsADC;
+    }
+    float fMinRate = fFakeImageProb / ( SimTime * 1E-9 * float( NgroupTypes ) ); //ns
+    
+    // number of combinations
+    // (this number is scaled to the size of the camera later)
+    float CombFactor[5] = {60000.*20., 950000., 130000., 12000., 2.}; //for 2400 pixels
+    float ChargeMax = IPRgraph->GetXaxis()->GetXmax();
+    
+    // define rate contour functions
+    fProb4nnCurves->AddAt( defineRateContourFunction( teltype, "ProbCurve4nn", fMinRate, 4, CombFactor[0], 0, ChargeMax ), ( int )teltype );
+    fProb3nnrelCurves->AddAt( defineRateContourFunction( teltype, "ProbCurve3nnrel", fMinRate, 3, CombFactor[2], 0, ChargeMax ), ( int )teltype );
+    fProb2plus1Curves->AddAt( defineRateContourFunction( teltype, "ProbCurve2plus1", fMinRate, 3, CombFactor[1], 0, ChargeMax ), ( int )teltype );
+    fProb2nnCurves->AddAt( defineRateContourFunction( teltype, "ProbCurve2nn", fMinRate, 2, CombFactor[3], 0, ChargeMax ), ( int )teltype );
+    fProbBoundCurves->AddAt( defineRateContourBoundFunction( teltype, "ProbCurveBound", fMinRate, 4.0, CombFactor[4], 0, ChargeMax ), ( int )teltype );
+    
+    cout << "Fake image probability: " << fFakeImageProb << " NgroupTypes: " << NgroupTypes;
+    cout << " teltype " << teltype << " ChargeMax:" << IPRgraph->GetXaxis()->GetXmax() << " Min rate: " << fMinRate;
+    cout << std::endl;
+    
+    /////////////////////////////////////////////////////////////////////////
+    // writing file with graphs and prob curves if required in input card
+    if( fData->getRunParameter()->ifWriteGraphsToFile )
+    {
+        string iFileN = "UPDATE";
+        if( fWriteGraphToFileRecreate )
+        {
+            iFileN = "RECREATE";
+        }
+        TFile* fgraphs = new TFile( fData->getRunParameter()->fNNGraphsFile, iFileN.c_str() );
+        if( fgraphs->IsZombie() )
+        {
+            printDataError( "VImageCleaning::InitNNImgClnPerTelType( int type ), error opening NNgraphs file" );
+        }
+        // IPR graphs
+        IPRgraph->Write();
+        if( fWriteGraphToFileRecreate )
+        {
+            // probability curves (note that the x-axis is not charge!)
+            fProb4nnCurves->Write();
+            fProb3nnrelCurves->Write();
+            fProb2plus1Curves->Write();
+            fProb2nnCurves->Write();
+            fProbBoundCurves->Write();
+        }
+        fWriteGraphToFileRecreate = false;
+        
+        // probablity curves
+        writeProbabilityCurve( ( TGraph* )fIPRgraphs->At( teltype ), ( TF1* )fProb4nnCurves->At( teltype ), fMinRate );
+        writeProbabilityCurve( ( TGraph* )fIPRgraphs->At( teltype ), ( TF1* )fProb3nnrelCurves->At( teltype ), fMinRate );
+        writeProbabilityCurve( ( TGraph* )fIPRgraphs->At( teltype ), ( TF1* )fProb2plus1Curves->At( teltype ), fMinRate );
+        writeProbabilityCurve( ( TGraph* )fIPRgraphs->At( teltype ), ( TF1* )fProb2nnCurves->At( teltype ), fMinRate );
+        
+        // close output file
+        fgraphs->Close();
+        std::cout << "VImageCleaning::InitNNImgClnPerTelType( type ): writing graph root file to:" << fgraphs->GetName() << std::endl;
+    }
+    
+    return true;
 }
 
 /*
- *  time-next-neighbour cleaning
+ * fill and write contour plot of delta T vs minimal charge
+ *
+ * (Equation 2 and Fig 2 in ICRC 2013 proceedings)
  *
  */
-void VImageCleaning::cleanNNImageFixed()
+void VImageCleaning::writeProbabilityCurve( TGraph* iIPR, TF1* iProb, double iRate )
 {
-	if( !fData )
-	{
-		printDataError( "VImageCleaning::cleanNNImageFixed" );
-	}
-	if( !kInitNNImageCleaning )
-	{
-		printDataError( "VImageCleaning::cleanNNImageFixed image cleaning not initialized" );
-	}
-	// calculates the valarray of tubes to be included in the parameterization
-	fData->setImage( false );
-	fData->setBorder( false );
-	fData->setBrightNonImage( false );
-	fData->setImageBorderNeighbour( false );
-	unsigned int i_nchannel = fData->getNChannels();
-	
-	int type = getTrigSimTelType( fData->getTelType( fData->getTelID() ) );
-	
-	int ngroups = 0;
-	
-	//measure IPR
-	float FADCslice = fData->getDetectorGeo()->getLengthOfSampleTimeSlice( fData->getTelID() );
-	unsigned int nsamples = fData->getNSamples( fData->getTelID() );
-	float ScanWindow = float( 0.5 * nsamples ) * FADCslice; //ns    half of long FADC trace is used for signal extraction in VTraceHandler (long trace files should ve used for IPR determination)
-	if( fData->getRunParameter()->fTraceIntegrationMethod[fData->getTelID()] == 4 )
-	{
-		int EventCntLimit = 400000; // statistics needed to get IPRs with good quality up to ~40 phe threshold
-		FillIPR( type );
-		if( IPR[type][0] >= EventCntLimit )
-		{
-			GetIPRGraph( type, ScanWindow );
-		}
-	}
-	//prepare for image cleaning (setting the charge and time for every pixel)
-	for( unsigned int i = 0; i < i_nchannel; i++ )
-	{
-		INTENSITY[i] = 0;
-		TIMES[i] = -1;
-		VALIDITY[i] = 0;
-		if( fData->getDetectorGeo()->getAnaPixel()[i] > 0 && !fData->getDead( fData->getHiLo()[i] )[i] )
-		{
-			INTENSITY[i] = fFADCtoPhe[type] * fData->getSums()[i];
-			TIMES[i] = fData->getTraceAverageTime()[i] * FADCslice;
-			if( TIMES[i] < 1.5 )
-			{
-				INTENSITY[i] = 0;
-			}
-		}
-	}
-	//set pixel's flags
-	unsigned int ncorepix = 0;
-	//    unsigned int nimagepix=0;
-	if( ngroups > 0 )
-	{
-	
-		float maxcharge = 0;
-		for( unsigned int i = 0; i < i_nchannel; i++ )
-		{
-			if( VALIDITY[i] > 1.9 )
-			{
-				if( INTENSITY[i] > maxcharge )
-				{
-					maxcharge = INTENSITY[i];
-				}
-			}
-		}
-		
-		//float BorderEdge=2.*sqrt(fNSBscale)/sqrt(0.6)*pow(maxcharge/7.,0.76);
-		for( unsigned int i = 0; i < i_nchannel; i++ )
-		{
-			fData->setImage( i, false );
-			fData->setBorder( i, false );
-			if( fData->getDetectorGeo()->getAnaPixel()[i] > 0 && !fData->getDead( fData->getHiLo()[i] )[i] )
-			{
-				if( VALIDITY[i] > 1.9 && VALIDITY[i] < 6.1 )
-				{
-					fData->setImage( i, true );
-					ncorepix++;
-				}
-				if( VALIDITY[i] > 6.1 )
-				{
-					fData->setBorder( i, true );
-				}
-				//if(VALIDITY[i]>1.9&&INTENSITY[i]>BorderEdge) {fData->setImage( i, true ); ncorepix++;}
-				//if(VALIDITY[i]>6.1&&INTENSITY[i]>BorderEdge) fData->setBorder( i, true );
-				//if(VALIDITY[i]>1.9) {fData->setImage( i, true ); ncorepix++;}
-				//if(VALIDITY[i]>1.9&&INTENSITY[i]<BorderEdge) fData->setBorder( i, true );
-				//if(VALIDITY[i]>1.9&&INTENSITY[i]>BorderEdge){nimagepix++;}
-			}
-		}
-		/*
-		if(nimagepix<5)
-		{
-		    for ( unsigned int i=0; i < i_nchannel; i++)
-		    {
-		        fData->setImage( i, false); fData->setBorder( i, false);
-		        if( fData->getDetectorGeo()->getAnaPixel()[i] > 0 && !fData->getDead(fData->getHiLo()[i])[i] )
-		        {
-		            if(VALIDITY[i]>1.9) {fData->setImage( i, true );}
-		            if(VALIDITY[i]>6.1) fData->setBorder( i, true );
-		        }
-		    }
-		}*/
-	}
-	recoverImagePixelNearDeadPixel();
-	fillImageBorderNeighbours();
+    if( !iIPR || !iProb )
+    {
+        return;
+    }
+    TSpline* spl = NULL;
+    TGraph* iGPP = new TGraph( iIPR->GetN() );
+    double x = 0.;
+    double y = 0.;
+    for( int i = 0; i < iIPR->GetN(); i++ )
+    {
+        iIPR->GetPoint( i, x, y );
+        float valIPR = iIPR->Eval( x, spl, "" );
+        if( valIPR < 100. )
+        {
+            valIPR = 100.;
+        }
+        iGPP->SetPoint( i, x, iProb->Eval( valIPR ) );
+    }
+    char hname[400];
+    sprintf( hname, "graph%s", iProb->GetName() );
+    iGPP->SetName( hname );
+    sprintf( hname, "Rate contour for %1.2e Hz (fake image prob:%1.2e)", iRate, fFakeImageProb );
+    iGPP->SetTitle( hname );
+    iGPP->GetXaxis()->SetTitle( "Threshold,  [FADC counts]" );
+    iGPP->GetYaxis()->SetTitle( "#Delta t [ns]" );
+    iGPP->Write();
 }
 
-int  VImageCleaning::getTrigSimTelType( unsigned int fTelType )
+/*
+ * scale combinatorial factors by number of channels
+ *
+ *
+*/
+void VImageCleaning::ScaleCombFactors( unsigned int type, float scale )
 {
-	int type = 0;
-	if( fTelType == 138704810 )
-	{
-		type = 1;    //LST
-	}
-	if( fTelType == 10408418 )
-	{
-		type = 2;    //MST
-	}
-	if( fTelType == 201509515 )
-	{
-		type = 3;    //SC-SST
-	}
-	if( fTelType ==  3709425 )
-	{
-		type = 4;    //DC-SST
-	}
-	//Prod1
-	if( fTelType == 141305009 )
-	{
-		type = 1;    //LST
-	}
-	if( fTelType == 10007818 )
-	{
-		type = 2;    //MST
-	}
-	if( fTelType ==  3709725 )
-	{
-		type = 3;    //DC-SST
-	}
-	return type;
+    float CombFactor[5] = {60000.*20., 950000., 130000., 6000., 2.}; //for 2400 pixels
+    TF1* f4nn   = ( TF1* )fProb4nnCurves->At( type );
+    TF1* f3nnrel = ( TF1* )fProb3nnrelCurves->At( type );
+    TF1* f2plus1 = ( TF1* )fProb2plus1Curves->At( type );
+    TF1* f2nn   = ( TF1* )fProb2nnCurves->At( type );
+    f4nn->SetParameter( 2, CombFactor[0]*scale );
+    f3nnrel->SetParameter( 2, CombFactor[2]*scale );
+    f2plus1->SetParameter( 2, CombFactor[1]*scale );
+    f2nn->SetParameter( 2, CombFactor[3]*scale );
 }
 
-void VImageCleaning::cleanNNImagePedvars()
+/*
+ * reset combinatorial factors to default values
+ *
+*/
+void VImageCleaning::ResetCombFactors( unsigned int type )
 {
-
+    ScaleCombFactors( type, fData->getNChannels() / 2400. ); // for this amount of pixels
 }
 
-void VImageCleaning::FillPreThresholds( TGraph* gipr, float NNthresh[5] )
+bool VImageCleaning::BoundarySearch( unsigned int teltype, float thresh, TF1* fProbCurve, float refdT, int refvalidity, int idx )
 {
-	// assuming monotonous ipr curve (as it should be)
-	//                    4nn   2+1   3nn   2nn   bound  ref for bound
-	//float ThreshFreq[6]={8.5E6,2.4E6,4.2E6,1.01E5,1.1E7,8.555E5};
-	float ThreshFreq[6] = {8.5E6, 2.4E6, 4.2E6, 1.5E5, 1.1E7, 4.0E5};
-	float gXres = ( gipr->GetXaxis()->GetXmax() - gipr->GetXaxis()->GetXmin() ) / gipr->GetN();
-	for( int i = 0; i < 6; i++ )
-	{
-		for( int t = 0; t < gipr->GetN(); t++ )
-		{
-			float x = gipr->GetXaxis()->GetXmin() + gXres * ( float( t ) );
-			float val = gipr->Eval( x );
-			if( val <= ThreshFreq[i] )
-			{
-				NNthresh[i] = x;
-				break;
-			}
-		}
-	}
-	if( NNthresh[4] < 0.001 )
-	{
-		NNthresh[4] = NNthresh[3] / 3.4;   //pre-threshold for boundary, if not set by IPR curve scanning due to IPR curve behaviour for small thresholds
-	}
-	if( NNthresh[0] < 0.001 )
-	{
-		NNthresh[0] = NNthresh[3] / 2.75;   //pre-threshold for boundary, if not set by IPR curve scanning
-	}
-	for( int i = 0; i < 6; i++ )
-	{
-		// std::cout<<"thresh:"<<NNthresh[i]<<" phe( approx. valid for Prod2 LST):"<<NNthresh[i]/33.<<std::endl;
-	}
-	
+    //idx - should be next neigbour of core!!!
+    //skip core pix
+    if( ( VALIDITYBUF[idx] > 1.9 && VALIDITYBUF[idx] < 6.1 ) )
+    {
+        return false;
+    }
+    
+    // check for valid pixel number
+    if( idx >= ( int )fData->getDetectorGeo()->getNeighbours().size() )
+    {
+        return false;
+    }
+    
+    // get IPR graph
+    TGraph* iIPR = ( TGraph* )fIPRgraphs->At( teltype );
+    if( !iIPR )
+    {
+        cout << "VImageCleaning::BoundarySearch error, no IPR graph for telescope type " << teltype << endl;
+        return 0;
+    }
+    
+//    float TimeForReSearch = 0.;
+    bool iffound = false;
+    Int_t n = 0;
+    float time = 0.;
+    
+    // reftime from core pixels
+    for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[idx].size(); j++ )
+    {
+        const Int_t idx2 = fData->getDetectorGeo()->getNeighbours()[idx][j];
+        Float_t t = TIMES[idx2];
+        if( t > 0. && VALIDITYBUF[idx2] > 1.9 && VALIDITYBUF[idx2] < 5.1 )
+        {
+            time += t;
+            n++;
+        }
+    }
+    // check THIS pix and ring of neighbours
+    if( n > 0.5 )
+    {
+        float TimeForReSearch = time / float( n );
+        float dT = fabs( TIMES[idx] - TimeForReSearch );
+        float times[2] = {refdT, dT};
+        float maxtime = 1E6;
+        LocMax( 2, times, maxtime );
+        float charges[2] = {thresh, INTENSITY[idx]};
+        float mincharge = 0;
+        LocMin( 2, charges, mincharge );
+        
+        if( NNChargeAndTimeCut( iIPR, fProbCurve, mincharge, maxtime, CoincWinLimit, true )
+                && VALIDITY[idx] > 0.5 )
+        {
+            if( VALIDITYBOUND[idx] != refvalidity )
+            {
+                VALIDITYBOUND[idx] = refvalidity;
+            }
+            iffound = true;
+        }
+        
+        for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[idx].size(); j++ )
+        {
+            const Int_t idx2 = fData->getDetectorGeo()->getNeighbours()[idx][j];
+            if( ( TIMES[idx2] > 0. && VALIDITYBUF[idx2] > 1.9 && VALIDITYBUF[idx2] < 5.1 ) || VALIDITYBOUND[idx2] == refvalidity )
+            {
+                continue;
+            }
+            
+            float dT2 = fabs( TIMES[idx2] - TimeForReSearch );
+            times[1] = dT2;
+            LocMax( 2, times, maxtime );
+            charges[1] = INTENSITY[idx2];
+            LocMin( 2, charges, mincharge );
+            
+            if( NNChargeAndTimeCut( iIPR, fProbCurve, mincharge, maxtime, CoincWinLimit, true )
+                    && VALIDITY[idx2] > 0.5 )
+            {
+                VALIDITYBOUND[idx2] = refvalidity;
+                iffound = true;
+            }
+        }
+    }
+    return iffound;
 }
 
-void VImageCleaning::CalcSliceRMS()  //TEMP
+/*
+ * NN search
+ *
+ * if Nfold = 3 it will search for 2nn+1, including sparse groups (with the empty pix in between)
+ *
+*/
+unsigned int VImageCleaning::NNGroupSearchProbCurve( unsigned int type, TF1* fProbCurve, float PreCut )
 {
-	int type = getTrigSimTelType( fData->getTelType( fData->getTelID() ) );
-	float pedrms = 0.;
-	float pedmean = 0.;
-	unsigned int i_nchannel = fData->getNChannels();
-	for( unsigned int i = 0; i < i_nchannel; i++ )
-	{
-		if( fData->getDetectorGeo()->getAnaPixel()[i] > 0 && !fData->getDead( fData->getHiLo()[i] )[i] )
-		{
-			float val = fData->getSums()[i];
-			pedmean += val;
-			pedrms += val * val;
-		}
-	}
-	pedmean /= float( i_nchannel );
-	pedrms = sqrt( ( pedrms - float( i_nchannel ) * pedmean * pedmean ) / float( i_nchannel - 1 ) );
-	cout << "Type:" << type << " ped:" << pedmean << " rms:" << pedrms << endl;
-}
-void VImageCleaning::FillIPR( unsigned int type ) //tel type
-{
-	float  gIPRUp = 1500.; //charge in FADC counts
-	float  gIPRLo = 0.;
-	float  gIPRStep = ( gIPRUp - gIPRLo ) / float( fIPRdim );
-	float RATE[fIPRdim];
-	for( unsigned int thbin = 0; thbin < fIPRdim; thbin++ )
-	{
-		RATE[thbin] = 0;
-	}
-	
-	//loop over pixels
-	unsigned int i_nchannel = fData->getNChannels();
-	for( unsigned int i = 0; i < i_nchannel; i++ )
-	{
-		if( fData->getDetectorGeo()->getAnaPixel()[i] > 0 && !fData->getDead( fData->getHiLo()[i] )[i] )
-		{
-			// event counter
-			IPR[type][0] += 1;
-			for( unsigned int thbin = 1; thbin < fIPRdim; thbin++ )
-			{
-				float val = gIPRLo + float( thbin ) * gIPRStep;
-				//if(INTENSITY[i]>val) RATE[thbin]+=1.;
-				IPR[0][thbin] = val;
-				if( fData->getSums()[i] > val )
-				{
-					RATE[thbin] += 1.;
-				}
-				if( fData->getSums()[i] > val )
-				{
-					IPR[type][thbin] += 1.;
-				}
-			}
-			
-		}
-	}
-	/*
-	std::cout<<"IPR scan  (TelTypes):  Type1   Type2   Type3   Type4"<<std::endl;
-	for(unsigned int th=0;th<fIPRdim;th++)
-	{
-	    if(th==0) printf("NumOfmeasurements:      %5.0f  %5.0f  %5.0f  %5.0f \n",IPR[1][th],IPR[2][th],IPR[3][th],IPR[4][th]);
-	    if(th>0 ) printf("DT[fadc]:%3.2f counts:  %5.0f  %5.0f  %5.0f  %5.0f \n",IPR[0][th],IPR[1][th],IPR[2][th],IPR[3][th],IPR[4][th]);
-	}
-	*/
+    if( !fProbCurve )
+    {
+        return 0;
+    }
+    
+    // Nfold (e.g. 2 or 3)
+    int NN = ( int )fProbCurve->GetParameter( 1 );
+    
+    TGraph* iIPR = ( TGraph* )fIPRgraphs->At( type );
+    if( !iIPR )
+    {
+        cout << "VImageCleaning::NNGroupSearchProbCurve error, no IPR graph for telescope type " << type << endl;
+        return 0;
+    }
+    
+    // (GM) unclear why this is hardwired here
+    int NSBpix = 5;
+    
+    //////////////////////////////
+    // loop over all pixels
+    int numpix = fData->getDetectorGeo()->getNumChannels();
+    for( int PixNum = 0; PixNum < numpix; PixNum++ )
+    {
+        // check validity of a pixel and apply pre cut on charge
+        // if not: skip
+        if( VALIDITY[PixNum] < 0.5 || INTENSITY[PixNum] < PreCut )
+        {
+            continue;
+        }
+        
+        // access neighbour list and loop over all neighbours
+        if( PixNum >= ( int )fData->getDetectorGeo()->getNeighbours().size() )
+        {
+            continue;
+        }
+        for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[PixNum].size(); j++ )
+        {
+            const Int_t PixNum2 = fData->getDetectorGeo()->getNeighbours()[PixNum][j];
+            if( PixNum2 < 0 )
+            {
+                continue;
+            }
+            // apply validity and pre-cut to neighbour pixel
+            if( VALIDITY[PixNum2] < 0.5 || INTENSITY[PixNum2] < PreCut )
+            {
+                continue;
+            }
+            
+            // time difference between pixel and its neighbour
+            Double_t dT = fabs( TIMES[PixNum] - TIMES[PixNum2] );
+            
+            // get minimum between pixel and neighbour charge
+            float charges[2] = {INTENSITY[PixNum], INTENSITY[PixNum2]};
+            float mincharge = 0;
+            LocMin( 2, charges, mincharge );
+            
+            // apply charge and time cut
+            if( !NNChargeAndTimeCut( iIPR, fProbCurve, mincharge, dT, CoincWinLimit ) )
+            {
+                continue;
+            }
+            
+            // validity of pixel and neighbour to 2
+            if( VALIDITYBUF[PixNum] < 2.9 )
+            {
+                VALIDITYBUF[PixNum] = 2;
+            }
+            if( VALIDITYBUF[PixNum2] < 2.9 )
+            {
+                VALIDITYBUF[PixNum2] = 2;
+            }
+            // for NN 2 multiplicity: this is the end
+            if( NN == 2 )
+            {
+                break;
+            }
+            
+            ///////////////////////////////////////////////////
+            // Boundary search (sparse group 2+1)
+            // *************************
+            if( VALIDITYBUF[PixNum2] == 2 && NN == 3 )
+            {
+                bool iffound = false;
+                for( unsigned int k = 0; k < fData->getDetectorGeo()->getNeighbours()[PixNum].size(); k++ )
+                {
+                    if( BoundarySearch( type, mincharge, fProbCurve, dT, 3, fData->getDetectorGeo()->getNeighbours()[PixNum][k] ) )
+                    {
+                        iffound = true;
+                    }
+                }
+                if( PixNum2 >= ( int )fData->getDetectorGeo()->getNeighbours().size() )
+                {
+                    continue;
+                }
+                for( unsigned int k = 0; k < fData->getDetectorGeo()->getNeighbours()[PixNum2].size(); k++ )
+                {
+                    if( BoundarySearch( type, mincharge, fProbCurve, dT, 3, fData->getDetectorGeo()->getNeighbours()[PixNum2][k] ) )
+                    {
+                        iffound = true;
+                    }
+                }
+                if( iffound )
+                {
+                    if( VALIDITYBUF[PixNum] < 3.9 )
+                    {
+                        VALIDITYBUF[PixNum] = 3;
+                    }
+                    if( VALIDITYBUF[PixNum2] < 3.9 )
+                    {
+                        VALIDITYBUF[PixNum2] = 3;
+                    }
+                }
+            }
+            if( NN == 3 )
+            {
+                break;
+            }
+            
+            ////////////////////////////////////////
+            // *************************
+            // NN = 4 and beyond
+            if( NSBpix > 2 )
+            {
+                Double_t x = fData->getDetectorGeo()->getX()[PixNum2];
+                Double_t y = fData->getDetectorGeo()->getY()[PixNum2];
+                
+                Int_t idxm = -1;
+                Int_t idxp = -1;
+                Int_t nn = 0;
+                for( unsigned int kk = 0; kk < fData->getDetectorGeo()->getNeighbours()[PixNum].size(); kk++ )
+                {
+                    const Int_t k = fData->getDetectorGeo()->getNeighbours()[PixNum][kk];
+                    if( k < 0 )
+                    {
+                        continue;
+                    }
+                    Double_t xx = x - fData->getDetectorGeo()->getX()[k];
+                    Double_t yy = y - fData->getDetectorGeo()->getY()[k];
+                    
+                    Double_t dist = sqrt( xx * xx + yy * yy );
+                    // assume that all pixel have the same tube radius
+                    Double_t diam = 2.*fData->getDetectorGeo()->getTubeRadius()[1];
+                    if( dist > 0.01 * diam && dist < 1.1 * diam )
+                    {
+                        if( nn )
+                        {
+                            idxp = k;
+                        }
+                        else
+                        {
+                            idxm = k;
+                        }
+                        nn++;
+                    }
+                }
+                if( idxp < 0 )
+                {
+                    continue;
+                }
+                if( VALIDITY[idxp] < 0.5 || INTENSITY[idxp] < PreCut )
+                {
+                    continue;
+                }
+                
+                dT = fabs( TIMES[PixNum] - TIMES[idxp] );
+                double dt2 = fabs( TIMES[PixNum2] - TIMES[idxp] );
+                float charges2[2] = {mincharge, INTENSITY[idxp]};
+                LocMin( 2, charges2, mincharge );
+                float times2[2] = {( float )dT, ( float )dt2 };
+                float maxtime = 1E6;
+                LocMax( 2, times2, maxtime );
+                // apply charge and time cut
+                if( !NNChargeAndTimeCut( iIPR, fProbCurve, mincharge, maxtime, CoincWinLimit ) )
+                {
+                    continue;
+                }
+                
+                if( VALIDITYBUF[PixNum] < 3.9 )
+                {
+                    VALIDITYBUF[PixNum] = 3;
+                }
+                if( VALIDITYBUF[PixNum2] < 3.9 )
+                {
+                    VALIDITYBUF[PixNum2] = 3;
+                }
+                if( VALIDITYBUF[idxp] < 3.9 )
+                {
+                    VALIDITYBUF[idxp] = 3;
+                }
+                if( NN == 3 )
+                {
+                    break;
+                }
+                if( NSBpix > 3 )
+                {
+                    if( idxm < 0 )
+                    {
+                        continue;
+                    }
+                    Double_t q3 = VALIDITY[idxm];
+                    if( q3 < 0.5 || INTENSITY[idxm] < PreCut )
+                    {
+                        continue;
+                    }
+                    dT = fabs( TIMES[PixNum] - TIMES[idxm] );
+                    dt2 = fabs( TIMES[PixNum2] - TIMES[idxm] );
+                    double dt3 = fabs( TIMES[idxp] - TIMES[idxm] );
+                    float charges3[2] = {mincharge, INTENSITY[idxm]};
+                    LocMin( 2, charges3, mincharge );
+                    float times3[4] = { ( float )maxtime, ( float )dT, ( float )dt2, ( float )dt3 };
+                    LocMax( 4, times3, maxtime );
+                    
+                    // apply charge and time cut
+                    if( !NNChargeAndTimeCut( iIPR, fProbCurve, mincharge, maxtime, CoincWinLimit ) )
+                    {
+                        continue;
+                    }
+                    
+                    VALIDITYBUF[PixNum] = 4;
+                    VALIDITYBUF[PixNum2] = 4;
+                    VALIDITYBUF[idxp] = 4;
+                    VALIDITYBUF[idxm] = 4;
+                    
+                }
+            }
+        }
+        
+    }//end of for() loop
+    
+    /////////////////////////////////////////////
+    // calculate number of NN groups
+    
+    Float_t nn2 = 0.;
+    Float_t nn3 = 0.;
+    Float_t nn4 = 0.;
+    for( Int_t i = 0; i < numpix; i++ )
+    {
+        float q = VALIDITYBUF[i];
+        if( q > 1.5 && q < 2.1 )
+        {
+            nn2 += 1. / 2.;
+        }
+        if( q > 2.5 && q < 3.1 )
+        {
+            nn3 += 1. / 3.;
+        }
+        if( q > 3.5 && q < 4.1 )
+        {
+            nn4 += 1. / 4.;
+        }
+        if( VALIDITYBUF[i] < 1.9 )
+        {
+            VALIDITYBUF[i] = -1;
+        }
+    }
+    
+    unsigned int ngroups = 0;
+    if( NN == 2 )
+    {
+        ngroups = int( nn2 + 0.5 );
+    }
+    else if( NN == 3 )
+    {
+        ngroups = int( nn3 + 0.5 );
+    }
+    else if( NN == 4 )
+    {
+        ngroups = int( nn4 + 0.5 );
+    }
+    return ngroups;
 }
 
-TGraphErrors* VImageCleaning::GetIPRGraph( unsigned int type, float ScanWindow )
+/*
+ * apply cut in charge and time space
+ *
+ */
+bool VImageCleaning::NNChargeAndTimeCut( TGraph* iIPR, TF1* fProbCurve,
+        float mincharge, float dT,
+        float iCoincWinLimit,
+        bool bInvert )
 {
-	TString title = Form( "IPRtype%dExtractor%d", type, fData->getRunParameter()->fTraceIntegrationMethod[fData->getTelID()] ); //FIXME always wrong extractor ID
-	float RATES[fIPRdim],  RATESERR[fIPRdim];
-	float RATESX[fIPRdim], RATESXERR[fIPRdim];
-	
-	for( unsigned int i = 0; i < fIPRdim; i++ )
-	{
-		RATES[i] = IPR[type][i];
-		float ConvToHz = ( ScanWindow * IPR[type][0] ) / 1E9;
-		if( ConvToHz < 0.9E-9 )
-		{
-			break;
-		}
-		RATES[i] /= ConvToHz;
-		RATESX[i] = IPR[0][i];
-		RATESERR[i] = sqrt( RATES[i] * ConvToHz ) / ConvToHz;
-		//RATESXERR[i]=0.1*float(i)/float(res);
-		RATESXERR[i] = 0.;
-	}
-	TGraphErrors* gRate = new TGraphErrors( fIPRdim, RATESX, RATES, RATESXERR, RATESERR );
-	gRate->SetTitle( "IPRcharge" );
-	gRate->SetName( "IPRcharge" );
-	gRate->GetXaxis()->SetTitle( "Threshold, FADC" );
-	gRate->GetYaxis()->SetTitle( "Rate, Hz" );
-	gRate->SetMinimum( 1 );
-	
-	TFile* fgraph = new TFile( "$CTA_USER_DATA_DIR/" + title + ".root", "RECREATE" );
-	gRate->Write();
-	fgraph->Close();
-	std::cout << "[TriggerAnalogueSummation::GetIPRGraph()]: graph root file written:" << "$CTA_USER_DATA_DIR/" + title + ".root" << std::endl;
-	return gRate;
+    if( !iIPR || !fProbCurve )
+    {
+        return false;
+    }
+    TSpline* spl = NULL;
+    
+    // get expected NSB frequency for this charge
+    float valIPR = iIPR->Eval( mincharge, spl, "" );
+    if( valIPR < 100. || mincharge > iIPR->GetXaxis()->GetXmax() )
+    {
+        valIPR = 100.;   // Hz
+    }
+    
+    // fix dT to the maximum coincidence limit for no-time cleaning
+    if( NNoptNoTimeing )
+    {
+        dT = CoincWinLimit;
+    }
+    
+    // apply cut in deltaT
+    // (note cut on maximum coincidence limit (given in the cleaning parameter file))
+    if( !bInvert )
+    {
+        if( dT > iCoincWinLimit || dT > fProbCurve->Eval( valIPR ) )
+        {
+            return false;
+        }
+    }
+    else
+    {
+        if( dT < iCoincWinLimit && dT < fProbCurve->Eval( valIPR ) )
+        {
+            return true;
+        }
+    }
+    
+    return !bInvert;
 }
 
+/*
+ *
+ * relaxed NN group search
+ *
+ * used for NN 3 and 4
+ */
+unsigned int VImageCleaning::NNGroupSearchProbCurveRelaxed( unsigned int teltype, TF1* fProbCurve, float PreCut )
+{
+    if( !fProbCurve )
+    {
+        return 0;
+    }
+    
+    // Nfold (e.g. 2 or 3)
+    int NN = ( int )fProbCurve->GetParameter( 1 );
+    
+    TGraph* iIPR = ( TGraph* )fIPRgraphs->At( teltype );
+    if( !iIPR )
+    {
+        cout << "VImageCleaning::NNGroupSearchProbCurveRelaxed error, no IPR graph for telescope type " << teltype << endl;
+        return 0;
+    }
+    
+    int NNcnt = 1;
+    float dT = 0.;
+    float dt2 = 0.;
+    float dt3 = 0.;
+    
+    ///////////////////////////////////
+    // loop over all pixels
+    int numpix = fData->getDetectorGeo()->getNumChannels();
+    for( int PixNum = 0; PixNum < numpix; PixNum++ )
+    {
+        int nng3[3];
+        
+        if( VALIDITY[PixNum] < 0.5 || INTENSITY[PixNum] < PreCut )
+        {
+            continue;
+        }
+        NNcnt = 1;
+        int pix1 = 0, pix2 = 0, pix3 = 0, pix4 = 0;
+        if( PixNum >= ( int )fData->getDetectorGeo()->getNeighbours().size() )
+        {
+            continue;
+        }
+        for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[PixNum].size(); j++ )
+        {
+            Int_t PixNum2 = fData->getDetectorGeo()->getNeighbours()[PixNum][j];
+            if( PixNum2 < 0 )
+            {
+                continue;
+            }
+            if( VALIDITY[PixNum2] < 0.5 || INTENSITY[PixNum2] < PreCut )
+            {
+                continue;
+            }
+            dT = fabs( TIMES[PixNum] - TIMES[PixNum2] );
+            float charges[2] = {INTENSITY[PixNum], INTENSITY[PixNum2]};
+            float mincharge = 0;
+            LocMin( 2, charges, mincharge );
+            
+            // apply charge and time cut
+            if( !NNChargeAndTimeCut( iIPR, fProbCurve, mincharge, dT, CoincWinLimit ) )
+            {
+                continue;
+            }
+            
+            //////////////////////////////////////////
+            float maxtime = 1E6;
+            if( NNChargeAndTimeCut( iIPR, fProbCurve, mincharge, dT, 1.e6, true )
+                    && VALIDITY[PixNum2] > 0.5 && INTENSITY[PixNum2] > PreCut )
+            {
+                pix1 = PixNum;
+                if( PixNum2 != pix2 )
+                {
+                    pix3 = PixNum2;
+                }
+                if( pix2 == 0 )
+                {
+                    pix2 = PixNum2;
+                }
+                dt2 = fabs( TIMES[pix2] - TIMES[pix3] );
+                dt3 = fabs( TIMES[pix1] - TIMES[pix3] );
+                float charges2[3] = {mincharge, INTENSITY[pix3], INTENSITY[pix2]};
+                LocMin( 3, charges2, mincharge );
+                float times2[3] = { dT, dt2, dt3};
+                LocMax( 3, times2, maxtime );
+                
+                if( NNChargeAndTimeCut( iIPR, fProbCurve, mincharge, maxtime, 1.e6, true ) )
+                {
+                    NNcnt++;
+                }
+            }
+            
+            if( NNcnt > 2 )
+            {
+                if( VALIDITYBUF[pix1] < 4.9 )
+                {
+                    VALIDITYBUF[pix1] = 5;
+                }
+                nng3[0] = pix1;
+                if( VALIDITYBUF[pix2] < 4.9 )
+                {
+                    VALIDITYBUF[pix2] = 5;
+                }
+                nng3[1] = pix2;
+                if( VALIDITYBUF[pix3] < 4.9 )
+                {
+                    VALIDITYBUF[pix3] = 5;
+                }
+                nng3[2] = pix3;
+                short VALIDITYLOCAL[numpix];
+                memset( VALIDITYLOCAL, 0, sizeof( VALIDITYLOCAL ) );
+                for( int n = 0; n < 3; n++ )
+                {
+                    VALIDITYLOCAL[nng3[n]] = 10;
+                }
+                if( NN == 3 )
+                {
+                    break;
+                }
+                //4 connected pixels
+                for( int n = 0; n < 3; n++ )
+                {
+                    if( nng3[n] >= ( int )fData->getDetectorGeo()->getNeighbours().size() )
+                    {
+                        continue;
+                    }
+                    for( unsigned int jj = 0; jj < fData->getDetectorGeo()->getNeighbours()[nng3[n]].size(); jj++ )
+                    {
+                        const Int_t testpixnum = fData->getDetectorGeo()->getNeighbours()[nng3[n]][jj];
+                        if( testpixnum < 0 || VALIDITYLOCAL[testpixnum] == 10 )
+                        {
+                            continue;
+                        }
+                        if( INTENSITY[testpixnum] < PreCut )
+                        {
+                            continue;
+                        }
+                        
+                        float minchargeloc = 0.;
+                        float maxtimeloc = 0.;
+                        float charges3[2] = {mincharge, INTENSITY[testpixnum]};
+                        LocMin( 2, charges3, minchargeloc );
+                        
+                        float times3[4] = { maxtime, fabs( TIMES[testpixnum] - TIMES[nng3[0]] ),
+                                            fabs( TIMES[testpixnum] - TIMES[nng3[1]] ),
+                                            fabs( TIMES[testpixnum] - TIMES[nng3[2]] )
+                                          };
+                        LocMax( 4, times3, maxtimeloc );
+                        
+                        if( NNChargeAndTimeCut( iIPR, fProbCurve, minchargeloc, maxtimeloc, CoincWinLimit, true ) )
+                        {
+                            NNcnt++;
+                            pix4 = testpixnum;
+                            float groupsize = INTENSITY[pix1] + INTENSITY[pix2] + INTENSITY[pix3] + INTENSITY[pix4];
+                            if( groupsize > PreCut * 4.*1.5 )
+                            {
+                                if( VALIDITYBUF[pix1] < 5.9 )
+                                {
+                                    VALIDITYBUF[pix1] = 6;
+                                }
+                                if( VALIDITYBUF[pix2] < 5.9 )
+                                {
+                                    VALIDITYBUF[pix2] = 6;
+                                }
+                                if( VALIDITYBUF[pix3] < 5.9 )
+                                {
+                                    VALIDITYBUF[pix3] = 6;
+                                }
+                                if( VALIDITYBUF[pix4] < 5.9 )
+                                {
+                                    VALIDITYBUF[pix4] = 6;
+                                }
+                            }
+                        }
+                    }
+                }
+            }// end if NNcnt>2
+        }
+        
+    }//end of for() loop
+    
+    //////////////////////
+    // counting
+    float NN3 = 0.;
+    float NN4 = 0.;
+    for( Int_t i = 0; i < numpix; i++ )
+    {
+        if( VALIDITYBUF[i] > 4.5 && VALIDITYBUF[i] < 5.1 )
+        {
+            NN3 += 1. / 3.;
+        }
+        else if( VALIDITYBUF[i] > 5.5 && VALIDITYBUF[i] < 6.1 )
+        {
+            NN4 += 1. / 4.;
+        }
+        if( VALIDITYBUF[i] < 1.9 )
+        {
+            VALIDITYBUF[i] = -1;
+        }
+    }
+    if( NN3 > 2 && NN == 3 )
+    {
+        return ( unsigned int )( NN3 + 0.5 );
+    }
+    if( NN4 > 3 && NN == 4 )
+    {
+        return ( unsigned int )( NN4 + 0.5 );
+    }
+    return 0;
+}
+
+/*
+ * discard any pixels with no neighbours
+ *
+ */
+void VImageCleaning::DiscardIsolatedPixels()
+{
+    unsigned int numpix = fData->getDetectorGeo()->getNumChannels();
+    unsigned int NumOfNeighbor = 0;
+    int PixNum2 = 0;
+    
+    for( unsigned int PixNum = 0; PixNum < numpix; PixNum++ )
+    {
+        if( VALIDITY[PixNum] < 1.9 )
+        {
+            continue;
+        }
+        NumOfNeighbor = 0;
+        if( PixNum >= fData->getDetectorGeo()->getNeighbours().size() )
+        {
+            continue;
+        }
+        for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[PixNum].size(); j++ )
+        {
+            PixNum2 = fData->getDetectorGeo()->getNeighbours()[PixNum][j];
+            if( PixNum2 >= 0 && VALIDITY[PixNum2] > 1.9 )
+            {
+                NumOfNeighbor++;
+            }
+        }
+        if( NumOfNeighbor < 0.5 )
+        {
+            VALIDITY[PixNum] = 0;
+        }
+    }
+}
+
+void VImageCleaning::DiscardLocalTimeOutlayers( float NNthresh[6] )
+{
+    unsigned int numpix = fData->getDetectorGeo()->getNumChannels();
+    unsigned int nimagepix = 0;
+    DiscardIsolatedPixels();
+    for( unsigned int pixnum = 0; pixnum < numpix; pixnum++ )
+    {
+        if( VALIDITY[pixnum] < 1.9 )
+        {
+            continue;
+        }
+        nimagepix++;
+    }
+    // assume all pixels have same radius!
+    Double_t diam = 2.*fData->getDetectorGeo()->getTubeRadius()[1];
+    if( diam <= 0. )
+    {
+        return;
+    }
+    Double_t x = 0.;
+    Double_t y = 0.;
+    Double_t xx = 0.;
+    Double_t yy = 0.;
+    unsigned int pixcnt = 0;
+    unsigned int pixzerocnt = 0;
+    //******************************************************************
+    // discard groups with no neighbouring group in the vicinity of 6pixels
+    for( unsigned int pixnum = 0; pixnum < numpix; pixnum++ )
+    {
+        if( VALIDITY[pixnum] < 1.9 )
+        {
+            continue;
+        }
+        
+        x = fData->getDetectorGeo()->getX()[pixnum] / diam; // coord in pixels units
+        y = fData->getDetectorGeo()->getY()[pixnum] / diam; // coord in pixels units
+        pixcnt = 0;
+        pixzerocnt = 0;
+        // loop over vicinity of 2 rings around pixnum
+        for( unsigned int pp = 0; pp < numpix; pp++ )
+        {
+            if( VALIDITY[pp] < 1.9 || pp == pixnum )
+            {
+                continue;
+            }
+            xx = x - fData->getDetectorGeo()->getX()[pp] / diam; // coord in pixels units
+            yy = y - fData->getDetectorGeo()->getY()[pp] / diam; // coord in pixels units
+            Double_t dist = sqrt( xx * xx + yy * yy );
+            if( dist > 6.1 )
+            {
+                continue;
+            }
+            if( dist < 2.1 )
+            {
+                pixcnt++;
+            }
+            else
+            {
+                pixzerocnt++;
+            }
+        }
+        if( nimagepix > 7 && pixcnt < 7 && pixzerocnt == 0 )
+        {
+            VALIDITY[pixnum] = 0;
+        }
+    }
+    //******************************************************************
+    // don't do anything for small images
+    if( nimagepix <= 4 )
+    {
+        return;
+    }
+    //******************************************************************
+    // loop over accepted pixels
+    float SNRlimit = 5.0;
+    float radicand = 0.;
+    float sigmalimit = 0.11; // sigmaT>sigmalimit:  time clustering due to finite sampling rate
+    unsigned int Tcnt = 0;
+    float sigmaT = 0.;
+    float meanT = 0.;
+    for( unsigned int pixnum = 0; pixnum < numpix; pixnum++ )
+    {
+        if( VALIDITY[pixnum] < 1.9 )
+        {
+            continue;
+        }
+        
+        Tcnt = 0;
+        sigmaT = 0.;
+        meanT = 0.;
+        x = fData->getDetectorGeo()->getX()[pixnum] / diam; // coord in pixels units
+        y = fData->getDetectorGeo()->getY()[pixnum] / diam; // coord in pixels units
+        
+        // loop over vicinity of 2 rings around pixnum
+        for( unsigned int pp = 0; pp < numpix; pp++ )
+        {
+            if( VALIDITY[pp] < 1.9 || pp == pixnum )
+            {
+                continue;
+            }
+            xx = x - fData->getDetectorGeo()->getX()[pp] / diam; // coord in pixels units
+            yy = y - fData->getDetectorGeo()->getY()[pp] / diam; // coord in pixels units
+            if( xx * xx + yy * yy > 2.1 * 2.1 )
+            {
+                continue;
+            }
+            meanT  += TIMES[pp];
+            sigmaT += TIMES[pp] * TIMES[pp];
+            Tcnt++;
+        }
+        if( Tcnt > 1 && nimagepix > 4 )
+        {
+            meanT /= ( float )Tcnt;
+            radicand = ( sigmaT - Tcnt * meanT * meanT ) / ( float( Tcnt ) - 1. );
+            if( radicand > 0. )
+            {
+                sigmaT = sqrt( radicand );
+            }
+            else
+            {
+                sigmaT = 1E6;
+            }
+            
+            SNRlimit = 5.0;
+            if( Tcnt == 2 )
+            {
+                SNRlimit = 9.;
+            }
+            if( sigmaT > 0.
+                    && fabs( TIMES[pixnum] - meanT ) / sigmaT > SNRlimit && sigmaT > sigmalimit
+                    && INTENSITY[pixnum] < 1.5 * NNthresh[3] )
+            {
+                VALIDITY[pixnum] = 0;
+            }
+        }
+    }
+    //******************************************************************
+}
+
+
+/*
+ * set ring of pixels around core pixels
+ *
+ * this defines the search region for boundary pixels
+ *
+ */
+void  VImageCleaning::SetNeighborRings( unsigned short* VALIDITYBOUNDBUF, float* TIMESReSearch, float* REFTHRESH )
+{
+    unsigned int nfirstringpix = 0;
+    unsigned int numpix = fData->getDetectorGeo()->getNumChannels();
+    
+    //Define search region, driven by found core pixels
+    for( unsigned int p = 0; p < numpix; p++ )
+    {
+        TIMESReSearch[p] = 0.;
+        REFTHRESH[p] = 0.;
+        VALIDITYBOUNDBUF[p] = 0;
+        // set core pixel
+        if( VALIDITY[p] > 1.9 )
+        {
+            VALIDITYBOUNDBUF[p] = 2;
+        }
+    }
+    // nRing is read from the cleaning parameter file
+    for( unsigned int iRing = 0; iRing < nRings; iRing++ )
+    {
+        for( unsigned int idx = 0; idx < numpix; idx++ )
+        {
+            // skip core pixel
+            if( VALIDITYBOUNDBUF[idx] == 2 )
+            {
+                continue;
+            }
+            if( ( iRing > 0 ) && ( VALIDITYBOUNDBUF[idx] < iRing + 7 ) && ( VALIDITYBOUNDBUF[idx] > 1.9 ) )
+            {
+                continue;
+            }
+            float time = 0.;
+            float refthresh = 0.;
+            int n = 0;
+            if( idx >= fData->getDetectorGeo()->getNeighbours().size() )
+            {
+                continue;
+            }
+            for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[idx].size(); j++ )
+            {
+                int idx2 = fData->getDetectorGeo()->getNeighbours()[idx][j];
+                if( idx2 < 0 || VALIDITYBOUNDBUF[idx2] < 1.9 )
+                {
+                    continue;
+                }
+                
+                if( iRing == 0 )
+                {
+                    if( VALIDITYBOUNDBUF[idx2] < 1.9 || VALIDITYBOUNDBUF[idx2] == iRing + 7 )
+                    {
+                        continue;
+                    }
+                    if( TIMESReSearch[idx2] > 0.01 )
+                    {
+                        time += TIMESReSearch[idx2];
+                        refthresh += INTENSITY[idx2];
+                        n++;
+                    }
+                    else
+                    {
+                        if( TIMES[idx2] > -500. )
+                        {
+                            time += TIMES[idx2];
+                            refthresh += INTENSITY[idx2];
+                            n++;
+                        }
+                    }
+                }
+                if( iRing > 0 )
+                {
+                    if( VALIDITYBOUNDBUF[idx2] == iRing + 6 )
+                    {
+                        time += TIMESReSearch[idx2];
+                        refthresh += REFTHRESH[idx2];
+                        n++;
+                    }
+                }
+            }
+            if( iRing > 0 && n > 0.5 )
+            {
+                TIMESReSearch[idx] = time / float( n );
+                REFTHRESH[idx] = refthresh / float( n );
+            }
+            if( n > 0.5 )
+            {
+                VALIDITYBOUNDBUF[idx] = iRing + 7;
+                if( iRing == 0 )
+                {
+                    nfirstringpix++;
+                }
+            }
+        }
+    } // loop over rings
+}
+
+/*
+ * optimized time-next-neighbour cleaning (main function)
+ *
+ *
+ *  return number of groups ngroups
+ */
+int VImageCleaning::ImageCleaningCharge( unsigned int teltype )
+{
+    unsigned int numpix = fData->getDetectorGeo()->getNumChannels();
+    
+    // return value: number of groups
+    int ngroups = 0;
+    
+    //////////////////////////////////////////////////////////////////
+    // fill pre thresholds
+    // (length must match VDST_MAXNNGROUPTYPES)
+    //                 [p.e.]
+    // (NOTE: replaced by FillPreThresholds() in the next line
+    //  (unit then changed to d.c.)
+    float PreThresh[6] = { 2.0,   // 4nn
+                           3.0,   // 2+1
+                           2.8,   // 3nn
+                           5.2,   // 2nn
+                           1.8,   // Bound.
+                           4.0
+                         }; // Bound RefCharge
+                         
+    FillPreThresholds( ( TGraph* )fIPRgraphs->At( teltype ), PreThresh );
+    
+    memset( VALIDITYBOUND, 0, sizeof( VALIDITYBOUND ) );
+    memset( VALIDITY, 0, sizeof( VALIDITY ) );
+    memset( VALIDITYBUF, 0, sizeof( VALIDITYBUF ) );
+    ResetCombFactors( teltype );
+    
+    /////////////////////////////////////////////
+    // apply pre-thresholds
+    for( unsigned int p = 0; p < numpix; p++ )
+    {
+        if( INTENSITY[p] > PreThresh[4] )
+        {
+            VALIDITY[p] = 1;
+            VALIDITYBUF[p] = 1;
+        }
+        else
+        {
+            VALIDITY[p] = -1;
+            VALIDITYBUF[p] = -1;
+        }
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //*************** Image Cleaning ***************************************************************************
+    // first search for NN-groups  (CORE pixels, image cleaning trigger) if NN-group is activated in input card
+    
+    // 2NN
+    if( teltype < fifActiveNN.size() &&  fifActiveNN[teltype][3] )
+    {
+        ngroups = NNGroupSearchProbCurve( teltype, ( TF1* )fProb2nnCurves->At( teltype ), PreThresh[3] );
+        for( unsigned int p = 0; p < numpix; p++ )
+        {
+            if( VALIDITYBUF[p] == 2 )
+            {
+                VALIDITY[p] = 2;
+            }
+        }
+    }
+    
+    // 2NNplus1
+    if( teltype < fifActiveNN.size() &&  fifActiveNN[teltype][1] )
+    {
+        ngroups += NNGroupSearchProbCurve( teltype, ( TF1* )fProb2plus1Curves->At( teltype ), PreThresh[1] );
+        for( unsigned int p = 0; p < numpix; p++ )
+        {
+            if( VALIDITYBUF[p] == 3 || VALIDITYBOUND[p] == 3 )
+            {
+                VALIDITY[p] = 3;
+            }
+        }
+    }
+    
+    // 3NN (note: relaxed search)
+    if( teltype < fifActiveNN.size() &&  fifActiveNN[teltype][2] )
+    {
+        ngroups += NNGroupSearchProbCurveRelaxed( teltype, ( TF1* )fProb3nnrelCurves->At( teltype ), PreThresh[2] );
+        for( unsigned int p = 0; p < numpix; p++ )
+        {
+            if( VALIDITYBUF[p] == 5 )
+            {
+                VALIDITY[p] = 5;
+            }
+        }
+    }
+    
+    // 4NN (note: relaxed search)
+    if( teltype < fifActiveNN.size() &&  fifActiveNN[teltype][0] )
+    {
+        ngroups += NNGroupSearchProbCurveRelaxed( teltype, ( TF1* )fProb4nnCurves->At( teltype ), PreThresh[0] );
+        for( unsigned int p = 0; p < numpix; p++ )
+        {
+            if( VALIDITYBUF[p] == 6 )
+            {
+                VALIDITY[p] = 6;
+            }
+        }
+    }
+    // (end of core pixel determination)
+    
+    ///////////////////////////////////////////////////////////////////////////////
+    //*********************************************************************
+    // Boundary pixels
+    unsigned int ncorepix = 0;
+    unsigned int ncore4nnpix = 0;
+    unsigned int nboundsearchpix = 0;
+    unsigned int nfirstringpix = 0;
+    unsigned int nboundary = 0;
+    float TIMESReSearch[numpix];
+    unsigned short VALIDITYBOUNDBUF[numpix];
+    float REFTHRESH[numpix];
+    
+    //*****************************************************************************************************************
+    // boundary search (same as core search above but reduced search area (vicinity of core pixels) )
+    // Define search region for boundary
+    SetNeighborRings( &VALIDITYBOUNDBUF[0], &TIMESReSearch[0], &REFTHRESH[0] );
+    
+    // Reset validity buffers (Important)
+    for( unsigned int p = 0; p < numpix; p++ )
+    {
+        if( VALIDITYBOUNDBUF[p] > 1.9 )
+        {
+            nboundsearchpix++;
+            VALIDITYBUF[p] = 1;
+            VALIDITYBOUND[p] = 0;
+        }
+        else
+        {
+            VALIDITYBUF[p] = 0;
+            VALIDITY[p] = 0;
+        }
+    }
+    
+    // all found pixels are set also to CORE pixels!!!
+    if( ngroups > 0 )
+    {
+        ScaleCombFactors( teltype, float( nboundsearchpix ) / ( numpix * 1.5 ) );
+        if( teltype < fifActiveNN.size() &&  fifActiveNN[teltype][3] )
+        {
+            NNGroupSearchProbCurve( teltype, ( TF1* )fProb2nnCurves->At( teltype ), 0.8 * PreThresh[3] );
+            for( unsigned int p = 0; p < numpix; p++ )
+            {
+                if( VALIDITY[p] > 1.9 )
+                {
+                    continue;
+                }
+                if( VALIDITYBUF[p] == 2 )
+                {
+                    VALIDITY[p] = 2;
+                }
+            }
+        }
+        
+        if( teltype < fifActiveNN.size() &&  fifActiveNN[teltype][1] )
+        {
+            NNGroupSearchProbCurve( teltype, ( TF1* )fProb2plus1Curves->At( teltype ), 0.8 * PreThresh[1] );
+            for( unsigned int p = 0; p < numpix; p++ )
+            {
+                if( VALIDITY[p] > 1.9 )
+                {
+                    continue;
+                }
+                if( VALIDITYBUF[p] == 3 || VALIDITYBOUND[p] == 3 )
+                {
+                    VALIDITY[p] = 3;
+                }
+            }
+        }
+        
+        if( teltype < fifActiveNN.size() &&  fifActiveNN[teltype][2] )
+        {
+            NNGroupSearchProbCurveRelaxed( teltype, ( TF1* )fProb3nnrelCurves->At( teltype ), 0.8 * PreThresh[2] );
+            for( unsigned int p = 0; p < numpix; p++ )
+            {
+                if( VALIDITY[p] > 1.9 )
+                {
+                    continue;
+                }
+                if( VALIDITYBUF[p] == 5 )
+                {
+                    VALIDITY[p] = 5;
+                }
+            }
+        }
+        
+        if( teltype < fifActiveNN.size() &&  fifActiveNN[teltype][0] )
+        {
+            NNGroupSearchProbCurveRelaxed( teltype, ( TF1* )fProb4nnCurves->At( teltype ), 0.9 * PreThresh[0] );
+            for( unsigned int p = 0; p < numpix; p++ )
+            {
+                if( VALIDITY[p] > 1.9 )
+                {
+                    continue;
+                }
+                if( VALIDITYBUF[p] == 6 )
+                {
+                    VALIDITY[p] = 6;
+                }
+            }
+        }
+        
+        ResetCombFactors( teltype );
+    }
+    // update number of core pixels
+    for( unsigned int p = 0; p < numpix; p++ )
+    {
+        if( VALIDITY[p] > 1.9 && VALIDITY[p] < 6.1 )
+        {
+            ncorepix++;
+        }
+    }
+    
+    // set rings of boundaries for newly found core pixels
+    SetNeighborRings( &VALIDITYBOUNDBUF[0], &TIMESReSearch[0], &REFTHRESH[0] );
+    for( unsigned int p = 0; p < numpix; p++ )
+    {
+        if( VALIDITYBOUNDBUF[p] == 7 )
+        {
+            nfirstringpix++;
+        }
+    }
+    
+    
+    // BOUNDARY pixel search (usually very few pixels are found)
+    // only first ring
+    TF1* fProbCurveBound = ( TF1* )fProbBoundCurves->At( teltype );
+    TGraph* iIPR = ( TGraph* )fIPRgraphs->At( teltype );
+    if( !iIPR )
+    {
+        cout << "VImageCleaning::ImageCleaningCharge error, no IPR graph for telescope type " << teltype << endl;
+        return 0;
+    }
+    TSpline* spl = NULL;
+    
+    for( Int_t iRing = 0; iRing < 1; iRing++ )
+    {
+        for( UInt_t idx = 0; idx < numpix; idx++ )
+        {
+            if( ( VALIDITY[idx] < 5.1 ) && ( VALIDITY[idx] > 1.9 ) )
+            {
+                continue;
+            }
+            if( ( iRing > 0 ) && ( VALIDITY[idx] < iRing + 7 ) && ( VALIDITY[idx] > 1.9 ) )
+            {
+                continue;
+            }
+            int n = 0;
+            float time = 0.;
+            float charge = 0.;
+            
+            if( idx >= fData->getDetectorGeo()->getNeighbours().size() )
+            {
+                continue;
+            }
+            for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[idx].size(); j++ )
+            {
+                const Int_t idx2 = fData->getDetectorGeo()->getNeighbours()[idx][j];
+                if( idx2 < 0 || VALIDITYBOUNDBUF[idx2] < 1.9 )
+                {
+                    continue;
+                }
+                
+                if( iRing == 0 )
+                {
+                    if( VALIDITY[idx2] < 1.9 || VALIDITY[idx2] == iRing + 7 )
+                    {
+                        continue;
+                    }
+                    // allow for negative time differences in image cleaning
+                    // ignore here as it leads to different (sub-optimal)
+                    // cleaning results
+                    // if( TIMESReSearch[idx2] > -500. )
+                    if( TIMESReSearch[idx2] > 0. )
+                    {
+                        time += TIMESReSearch[idx2];
+                        charge += REFTHRESH[idx2];
+                        n++;
+                    }
+                    else
+                    {
+                        Float_t t = TIMES[idx2];
+                        if( t > 0. )
+                        {
+                            time += t;
+                            charge += INTENSITY[idx2];
+                            n++;
+                        }
+                    }
+                }
+                if( iRing > 0 )
+                {
+                    if( VALIDITYBOUNDBUF[idx2] == iRing + 6 )
+                    {
+                        if( TIMESReSearch[idx2] > -500. )
+                        {
+                            time += TIMESReSearch[idx2];
+                            charge += REFTHRESH[idx2];
+                            n++;
+                        }
+                        else
+                        {
+                            Float_t t = TIMES[idx2];
+                            if( t > 0. )
+                            {
+                                time += t;
+                                charge += INTENSITY[idx2];
+                                n++;
+                            }
+                        }
+                    }
+                }
+            }
+            if( n > 0.5 )
+            {
+                if( INTENSITY[idx] < PreThresh[4] )
+                {
+                    continue;
+                }
+                TIMESReSearch[idx] = time / float( n );
+                charge /= float( n );
+                if( charge > 2.*PreThresh[3] )
+                {
+                    charge = 2 * PreThresh[3];
+                }
+                float dT = fabs( TIMES[idx] - TIMESReSearch[idx] );
+                float charges[2] = {INTENSITY[idx], ( float )charge };
+                float refth = 0.;
+                LocMin( 2, charges, refth );
+                fProbCurveBound->SetParameter( 2, 2.*nfirstringpix );
+                
+                Double_t valIPRref = iIPR->Eval( charge, spl, "" );
+                if( valIPRref < 100. || charge >= iIPR->GetXaxis()->GetXmax() )
+                {
+                    valIPRref = 100.;
+                }
+                fProbCurveBound->SetParameter( 1, valIPRref );
+                
+                if( NNChargeAndTimeCut( iIPR, fProbCurveBound, refth, dT, 0.6 * CoincWinLimit, true ) )
+                {
+                    VALIDITY[idx] = iRing + 7;
+                }
+            }
+        }
+    } // end of loop over rings
+    
+    
+    ///////////////////////////////////////
+    // search for outliers
+    if( ncorepix > 4 )
+    {
+        // order is important
+        DiscardLocalTimeOutlayers( PreThresh );
+        DiscardIsolatedPixels();
+    }
+    
+    for( unsigned int p = 0; p < numpix; p++ )
+    {
+        if( VALIDITY[p] > 6.1 )
+        {
+            nboundary++;
+        }
+        if( VALIDITY[p] == 6 )
+        {
+            ncore4nnpix++;
+        }
+    }
+    
+    /////////////////////////////////////////////////////////////////////////
+    // Discard small images and 4nn with no boundaries:
+    // Important protection from fully fake images which can worsen
+    // shower direction reconstuction
+    // prob of any of fake group is <0.8%
+    // after this discarding prob of fake image <0.05% !!!
+    
+    if( ( ( ncorepix + nboundary ) < 4 ) || ( ncore4nnpix == 4 && nboundary == 0 && ncorepix == 4 ) )
+    {
+        for( unsigned int p = 0; p < numpix; p++ )
+        {
+            if( VALIDITY[p] > 1.9 )
+            {
+                VALIDITY[p] = 1;
+            }
+        }
+        ngroups = 0;
+    }
+    
+    return ngroups;
+}
+
+/*********************************************************************************************
+ * time-next-neighbour cleaning
+ * (Maxim Shayduk)
+ *
+ * see http://arxiv.org/pdf/1307.4939v1.pdf for the NN image cleaning methodology
+ */
+void VImageCleaning::cleanNNImageFixed( VImageCleaningRunParameter* iImageCleaningParameters )
+{
+    if( !iImageCleaningParameters )
+    {
+        return;
+    }
+    if( !fData )
+    {
+        printDataError( "VImageCleaning::cleanNNImageFixed" );
+    }
+    if( !kInitNNImageCleaning )
+    {
+        printDataError( "VImageCleaning::cleanNNImageFixed image cleaning not initialized" );
+    }
+    /////////////////////////////////////////////////////////////
+    // reset all valarrays regarding the image cleaning
+    fData->setImage( false );
+    fData->setBorder( false );
+    fData->setBrightNonImage( false );
+    fData->setImageBorderNeighbour( false );
+    
+    /////////////////////////////////////////////////////////////
+    // NN cleaning is working with different telescope types than rest of evndisp
+    
+    // get telescope type
+    unsigned int teltype = fData->getTelType_Counter( fData->getTelType( fData->getTelID() ) );
+    if( teltype >= VDST_MAXTELTYPES )
+    {
+        char hname[200];
+        sprintf( hname, "VImageCleaning::cleanNNImageFixed, invalid telescope type: %u", teltype );
+        printDataError( hname );
+    }
+    
+    /////////////////////////////////////////////////////////////
+    // initialize IPRs and Prob. curves once for every telescope type
+    
+    // fake image probability (a typical value is 0.5%)
+    fFakeImageProb = iImageCleaningParameters->fNNOpt_FakeImageProb;
+    // Init options for NN cleaning
+    nRings = iImageCleaningParameters->fNNOpt_nRings;
+    CoincWinLimit = iImageCleaningParameters->fNNOpt_CoincWinLimit;
+    NNoptNoTimeing = iImageCleaningParameters->fNNOpt_ifNNoptNoTimeing;
+    setExplicitSampleTimeSlice = iImageCleaningParameters->fNNOpt_ifExplicitSampleTimeSlice;
+    sampleTimeSlice = iImageCleaningParameters->fNNOpt_sampleTimeSlice;
+    nBinsADC = iImageCleaningParameters->fNNOpt_nBinsADC;
+    // init IPR graphs and rate countours
+    if( !kInitNNImgClnPerTelType[teltype] )
+    {
+        // active multiplicities;
+        if( teltype < fifActiveNN.size() )
+        {
+            fifActiveNN[teltype] = iImageCleaningParameters->fNNOpt_ActiveNN;
+        }
+        // initiate probability contours
+        kInitNNImgClnPerTelType[teltype] = InitNNImgClnPerTelType( teltype );
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////
+    // timing parameters for image cleaning
+    float FADCslice = fData->getDetectorGeo()->getLengthOfSampleTimeSlice( fData->getTelID() );
+    
+    ///////////////////////////////////////////////////////////////////////////////
+    // fill intensities and times per pixel
+    for( unsigned int i = 0; i < fData->getNChannels(); i++ )
+    {
+        INTENSITY[i] = 0.;
+        TIMES[i]     = -500.;
+        VALIDITY[i]  = 0;
+        if( fData->getDetectorGeo()->getAnaPixel()[i] > 0
+                && !fData->getDead( fData->getHiLo()[i] )[i] )
+        {
+            INTENSITY[i] = fData->getFADCtoPhe()[i] * fData->getSums()[i];
+            //(first option is for tests of impact of timing)
+            if( NNoptNoTimeing )
+            {
+                TIMES[i] = 0.;
+            }
+            else
+            {
+                // trace times are corrected for flasher determined time offsets
+                TIMES[i] = fData->getPulseTime( true )[i] * FADCslice;
+            }
+            // make sure that pixels without timing are ignored
+            if( TIMES[i] <= -500 && !NNoptNoTimeing )
+            {
+                INTENSITY[i] = 0;
+            }
+        }
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////
+    // optimized NN image cleaning
+    int ngroups = ImageCleaningCharge( teltype );
+    
+    ///////////////////////////////////////////////////////////////////////////////////
+    // set image flags for valid pixels
+    // note: no border pixel flags are set
+    if( ngroups > 0 )
+    {
+        // set image/border pixels
+        for( unsigned int i = 0; i < fData->getNChannels(); i++ )
+        {
+            fData->setImage( i, false );
+            fData->setBorder( i, false );
+            if( fData->getDetectorGeo()->getAnaPixel()[i] > 0
+                    && !fData->getDead( fData->getHiLo()[i] )[i] )
+            {
+                if( VALIDITY[i] > 1.9 )
+                {
+                    fData->setImage( i, true );
+                }
+            }
+        }
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////
+    // (end of optimized NN cleaning)
+    
+    // recover image pixels besides dead pixels
+    recoverImagePixelNearDeadPixel();
+    
+    // fill list of pixels which are beside image/border pixels
+    fillImageBorderNeighbours();
+}
+
+/*
+ * define rate contour function
+ *
+ * equation 2 in ICRC 2013 proceedings
+ *
+ * parameter plane formed by minimal charge and maximal coincidence time delta T
+ *
+ */
+TF1* VImageCleaning::defineRateContourFunction( unsigned int teltype, TString funcname, float iRate, float iNfold, float iCombFactor,
+        float xlow, float xup )
+{
+    // (factor 1.e9: work in [ns])
+    TF1* f1 = new TF1( funcname, "1.0E9 * TMath::Exp( 1. / ( [1] - 1 ) * TMath::Log( [0] / ( [2] * pow( x, [1] ) ) ) )", xlow, 3.*xup );
+    f1->SetParameters( iRate, iNfold, iCombFactor );
+    f1->SetParNames( "Rate", "Nfold", "CombFactor" );
+    f1->SetName( ( TString )f1->GetName() + Form( "Type%d", teltype ) );
+    
+    return f1;
+}
+
+TF1* VImageCleaning::defineRateContourBoundFunction( unsigned int teltype, TString funcname, float iRate, float refThresh, float iCombFactor,
+        float xlow, float xup )
+{
+    TF1* f1 = new TF1( funcname, "1.0E9 * TMath::Exp( 1. / ( 2. - 1. ) * TMath::Log( [0] / ( [2] * x * [1] ) ) )", xlow, 3.*xup );
+    f1->SetParameters( iRate, refThresh, iCombFactor, xup );
+    f1->SetParNames( "Rate", "RefThresh", "CombFactor", "ChargeMax" );
+    f1->SetName( ( TString )f1->GetName() + Form( "Type%d", teltype ) );
+    
+    return f1;
+}
+
+/*
+ * fill pre thresholds
+ *
+ * depends on NN configuration
+ *
+*/
+void VImageCleaning::FillPreThresholds( TGraph* gipr, float NNthresh[6] )
+{
+    if( !gipr )
+    {
+        cout << "VImageCleaning::FillPreThresholds() error filling pre-thresholds" << endl;
+        cout << "exiting..." << endl;
+        exit( EXIT_FAILURE );
+    }
+    
+    // assuming monotonous ipr curve (as it should be)
+    //                    4nn   2+1   3nn   2nn   bound  ref for bound
+    float ThreshFreq[6] = {8.5E6, 2.4E6, 4.2E6, 1.5E5, 1.1E7, 4.0E5};
+    float gXres = ( gipr->GetXaxis()->GetXmax() - gipr->GetXaxis()->GetXmin() ) / gipr->GetN();
+    for( int i = 0; i < 6; i++ )
+    {
+        for( int t = 0; t < gipr->GetN(); t++ )
+        {
+            float x = gipr->GetXaxis()->GetXmin() + gXres * ( float( t ) );
+            float val = gipr->Eval( x );
+            if( val <= ThreshFreq[i] )
+            {
+                NNthresh[i] = x;
+                break;
+            }
+        }
+    }
+    if( NNthresh[4] < 0.001 )
+    {
+        NNthresh[4] = NNthresh[3] / 3.4;   //pre-threshold for boundary, if not set by IPR curve scanning due to IPR curve behaviour for small thresholds
+    }
+    if( NNthresh[0] < 0.001 )
+    {
+        NNthresh[0] = NNthresh[3] / 2.75;   //pre-threshold for boundary, if not set by IPR curve scanning
+    }
+}
+
+void VImageCleaning::FillIPR( unsigned int teltype ) //tel type
+{
+    float  gIPRUp = 1500.; //charge in FADC counts
+    float  gIPRLo = 0.;
+    float  gIPRStep = ( gIPRUp - gIPRLo ) / float( fIPRdim );
+    float RATE[fIPRdim];
+    for( unsigned int thbin = 0; thbin < fIPRdim; thbin++ )
+    {
+        RATE[thbin] = 0;
+    }
+    
+    //loop over pixels
+    for( unsigned int i = 0; i < fData->getNChannels(); i++ )
+    {
+        if( fData->getDetectorGeo()->getAnaPixel()[i] > 0 && !fData->getDead( fData->getHiLo()[i] )[i] )
+        {
+            if( VALIDITY[i] < 1.9 )
+            {
+                // event counter
+                IPR[teltype][0] += 1;
+                for( unsigned int thbin = 1; thbin < fIPRdim; thbin++ )
+                {
+                    float val = gIPRLo + float( thbin ) * gIPRStep;
+                    //if(INTENSITY[i]>val) RATE[thbin]+=1.;
+                    IPR[0][thbin] = val;
+                    if( fData->getSums()[i] > val )
+                    {
+                        RATE[thbin] += 1.;
+                    }
+                    if( fData->getSums()[i] > val )
+                    {
+                        IPR[teltype][thbin] += 1.;
+                    }
+                }
+            }
+        }
+    }
+}
+
+TGraphErrors* VImageCleaning::GetIPRGraph( unsigned int teltype, float ScanWindow )
+{
+    float RATES[fIPRdim],  RATESERR[fIPRdim];
+    float RATESX[fIPRdim], RATESXERR[fIPRdim];
+    
+    for( unsigned int i = 0; i < fIPRdim; i++ )
+    {
+        RATES[i] = IPR[teltype][i];
+        float ConvToHz = ( ScanWindow * IPR[teltype][0] ) / 1E9;
+        if( ConvToHz < 0.9E-9 )
+        {
+            break;
+        }
+        RATES[i] /= ConvToHz;
+        RATESX[i] = IPR[0][i];
+        RATESERR[i] = sqrt( RATES[i] * ConvToHz ) / ConvToHz;
+        //RATESXERR[i]=0.1*float(i)/float(res);
+        RATESXERR[i] = 0.;
+    }
+    TGraphErrors* gRate = new TGraphErrors( fIPRdim, RATESX, RATES, RATESXERR, RATESERR );
+    gRate->SetTitle( "IPRcharge" );
+    gRate->SetName( "IPRcharge" );
+    gRate->GetXaxis()->SetTitle( "Threshold, FADC" );
+    gRate->GetYaxis()->SetTitle( "Rate, Hz" );
+    gRate->SetMinimum( 1 );
+    
+    TFile* fgraph = new TFile( "$CTA_USER_DATA_DIR/TestIPRtrunk.root", "RECREATE" );
+    gRate->Write();
+    fgraph->Close();
+    std::cout << "[TriggerAnalogueSummation::GetIPRGraph()]: graph root file written:" << fgraph->GetName() << std::endl;
+    return gRate;
+}
 
 // end of NN image cleaning
 //*****************************************************************************************************
-
-
+//*****************************************************************************************************
+//*****************************************************************************************************
+//*****************************************************************************************************
 
 
 /*!
@@ -1980,24 +2232,39 @@ TGraphErrors* VImageCleaning::GetIPRGraph( unsigned int type, float ScanWindow )
    \par loop_max number of loops
 */
 
-void VImageCleaning::cleanImageFixedWithTiming( double hithresh, double lothresh, double brightthresh, double timeCutPixel, double timeCutCluster, int minNumPixel, int loop_max )
+void VImageCleaning::cleanImageFixedWithTiming( VImageCleaningRunParameter* iImageCleaningParameters )
 {
-	cleanImageWithTiming( hithresh, lothresh, brightthresh, timeCutPixel, timeCutCluster, minNumPixel, loop_max, true );
+	cleanImageWithTiming( iImageCleaningParameters, true );
 }
 
-void VImageCleaning::cleanImagePedvarsWithTiming( double hithresh, double lothresh, double brightthresh, double timeCutPixel, double timeCutCluster, int minNumPixel, int loop_max )
+void VImageCleaning::cleanImagePedvarsWithTiming( VImageCleaningRunParameter* iImageCleaningParameters )
 {
-	cleanImageWithTiming( hithresh, lothresh, brightthresh, timeCutPixel, timeCutCluster, minNumPixel, loop_max, false );
+	cleanImageWithTiming( iImageCleaningParameters, false );
 }
 
 
-void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, double brightthresh, double timeCutPixel, double timeCutCluster, int minNumPixel, int loop_max, bool isFixed )
+void VImageCleaning::cleanImageWithTiming( VImageCleaningRunParameter* iImageCleaningParameters, bool isFixed )
 {
+    ///////////////////////////////////////////////
+    // setting of image cleaning run parameters
+    if( !iImageCleaningParameters )
+    {
+        return;
+    }
+    double hithresh     = iImageCleaningParameters->fimagethresh;
+    double lothresh     = iImageCleaningParameters->fborderthresh;
+    double brightthresh = iImageCleaningParameters->fbrightnonimagetresh;
+    double timeCutPixel = iImageCleaningParameters->ftimecutpixel;
+    double timeCutCluster = iImageCleaningParameters->ftimecutcluster;
+    int minNumPixel     = iImageCleaningParameters->fminpixelcluster;
+    int loop_max        = iImageCleaningParameters->floops;
+    
 	if( fData->getDebugFlag() )
 	{
 		cout << "VImageCleaning::cleanImageWithTiming " << fData->getTelID() << "\t" << brightthresh << endl;
 	}
 	
+    ///////////////////////////////////////////////
 	// check if time gradient was already calculated
 	if( fData->getImageParameters()->tgrad_x == 0 && fData->getImageParameters()->tint_x == 0 )
 	{
@@ -2012,7 +2279,6 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 			timeCutPixel = tpix + 0.1;                     // added some uncertenties adhoc
 		}
 	}
-	//     cout << "TimeImageCleaning: TC = " << timeCutPixel << " / " << timeCutCluster << " L = " << loop_max << endl;
 	
 	fData->setImage( false );
 	fData->setBorder( false );
@@ -2171,9 +2437,6 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 		fData->setClusterCenx( cluster, i_clustercenx );
 		fData->setClusterCeny( cluster, i_clusterceny );
 		
-		//       cout << "### " << cluster << " Npix=" << i_clusterNpix << " size=" << i_clustersize << " time=" << i_clustertime
-		// 	   << " cenx=" << i_clustercenx << " ceny=" << i_clusterceny << endl;
-		
 		if( i_clustersize == -99 )
 		{
 			fData->setMainClusterID( 0 );
@@ -2237,17 +2500,8 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 				
 				if( i_ID == cluster && fData->getImage()[i] )
 				{
-					// 		    cout<< "  " <<i_ID << "  delta_T  = " << fabs(xtime - xtimemain) << endl;
-					// 		    cout<< "  " <<i_ID << "  time diff= " << fabs( getClusterTime()[i_ID] - getClusterTime()[getMainClusterID()]) << endl;
-					// 		    cout<< i_ID << " " << i << ": " << getClusterTime()[i_ID] << "-" << getClusterTime()[getMainClusterID()] << "="
-					// 			<< getClusterTime()[i_ID] - getClusterTime()[getMainClusterID()]
-					// 			<< " fabs(" << i_clusterXtime << "-" << i_mainXtime << "=" << i_clusterXtime - i_mainXtime << ") = "
-					// 			<< fabs( (getClusterTime()[i_ID]-getClusterTime()[getMainClusterID()]) - (i_clusterXtime - i_mainXtime) ) << endl;
-					
 					if( fabs( ( fData->getClusterTime()[i_ID] - fData->getClusterTime()[fData->getMainClusterID()] ) - ( i_clusterXtime - i_mainXtime ) ) > timeCutCluster )
 					{
-						// 			cout << " --> "<< i << " cluster time cleaning : "
-						// 			     << fabs( (getClusterTime()[i_ID]-getClusterTime()[getMainClusterID()]) - (i_clusterXtime - i_mainXtime) ) <<  endl;
 						fData->setImage( i, false );
 						fData->setClusterID( i, -99 );
 					}
@@ -2272,12 +2526,8 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 				
 				if( i_ID != fData->getMainClusterID() && fabs( fData->getClusterTime()[i_ID] - fData->getClusterTime()[fData->getMainClusterID()] ) > timeCutCluster )
 				{
-					// 		    cout << "----> "<< i << " was removed with cluster time cleaning" << endl;
 					fData->setImage( i, false );
 					fData->setClusterID( i, -99 );
-					
-					// 	      if( fData->getSums()[i] > brightthresh  * i_pedvars_i ) setBrightNonImage( i, true );
-					//  	      if( fData->getSums()[i] > hithresh  * i_pedvars_i ) setBrightNonImage( i, true );
 				}
 			}
 		}
@@ -2302,9 +2552,6 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 		double i_pedvars_k = 0.;
 		for( unsigned int i = 0; i < i_nchannel; i++ )
 		{
-			// 	    if (fData->getDetectorGeo()->getAnaPixel()[i] < 1 ||
-			//  		fData->getClusterID()[i] == 0 || fData->getClusterID()[i] == -99 ) continue;
-			
 			i_ID = fData->getClusterID()[i];
 			if( fData->getImage()[i] || fData->getBorder()[i] )
 			{
@@ -2339,14 +2586,11 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 		}
 		if( fData->getMainClusterID() != 0 )
 		{
-			//  	    cout << "setBorder: ";
 			for( int pixel = 0; pixel < counter; pixel++ )
 			{
-				//cout << tmp_border[pixel] << "(" << tmp_cluster[pixel] << ") , ";
 				fData->setBorder( tmp_border[pixel], true );
 				fData->setClusterID( tmp_border[pixel], tmp_cluster[pixel] );
 			}
-			//cout << endl;
 		}
 	}
 	
@@ -2356,7 +2600,6 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 	
 	mergeClusters();
 	
-	//     for( unsigned int i = 0; i < i_nchannel; i++ ) setClusterID( i, 0 );
 	for( int x = 0; x <= i_cluster; x++ )
 	{
 		fData->setClusterNpix( x, 0 );
@@ -2403,9 +2646,6 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 		fData->setClusterNpix( cluster, i_clusterNpix );
 		fData->setClusterSize( cluster, i_clustersize );
 		fData->setClusterTime( cluster, i_clustertime );
-		
-		//       if( i_clusterNpix > 0 )
-		// 	cout << "     CLUSTER " <<cluster<< ": Npix=" <<i_clusterNpix<< " Size=" <<i_clustersize<< " Time=" << i_clustertime << endl;
 		
 		if( i_clustersize == -99 )
 		{
@@ -2459,24 +2699,6 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 		}
 	}
 	fData->setNcluster_cleaned( tmp_counter_cleaned.size() );
-	
-	
-	
-	//       cout << "BRIGHT NON IMAGES : ";
-	//       for( unsigned int i = 0; i < i_nchannel; i++ )
-	//       {
-	//       // check for bright non images
-	//       if( fData->getBrightNonImage()[i] )
-	//       {
-	//       if( fData->getImage()[i] ) setBrightNonImage( i, false );
-	//       else if( fData->getBorder()[i] ) setBrightNonImage( i, false );
-	//       }
-	
-	//       if( fData->getBrightNonImage()[i] )
-	//       cout << i << ", ";
-	//       }
-	//       cout << endl;
-	
 	
 	if( fData->getReader()->getDataFormatNum() == 1 || fData->getReader()->getDataFormatNum() == 4 || fData->getReader()->getDataFormatNum() == 6 )
 	{
@@ -2536,21 +2758,16 @@ void VImageCleaning::removeSmallClusters( int minPix )
 		// remove clusters with less then minPix
 		if( fData->getClusterNpix()[i_cluster] < minPix )
 		{
-			// 	  if( fData->getImage()[i] || fData->getBorder()[i] ) cout << "ELIMINATOR ACTIVE for cluster " << i_cluster << " : ";
-			
 			if( fData->getImage()[i] )
 			{
-				// 	      cout << i << ", ";
 				fData->setImage( i, false );
 				fData->setClusterID( i, -99 );
 			}
 			else if( fData->getBorder()[i] )
 			{
-				// 	      cout << i << ", ";
 				fData->setBorder( i, false );
 				fData->setClusterID( i, -99 );
 			}
-			// 	  cout << endl;
 		}
 		
 		// remove single core pixels with less than two direct border pixels
@@ -2593,7 +2810,6 @@ void VImageCleaning::removeSmallClusters( int minPix )
 		
 		if( c1 + c2 < 2 && fData->getImage()[i] )
 		{
-			// 	  cout << "----> "<< i << " was removed as single core pixel (incl ";
 			fData->setImage( i, false );
 			fData->setBorder( i, false );
 			fData->setBrightNonImage( i, true );
@@ -2607,7 +2823,6 @@ void VImageCleaning::removeSmallClusters( int minPix )
 				if( fData->getBorder()[k] )
 				{
 					fData->setBorder( k, false );
-					// 		  cout << k << " ";
 					
 					for( unsigned l = 0; l < fData->getDetectorGeo()->getNNeighbours()[k]; l++ )
 					{
@@ -2615,12 +2830,10 @@ void VImageCleaning::removeSmallClusters( int minPix )
 						if( fData->getBorder()[m] )
 						{
 							fData->setBorder( m, false );
-							// 			  cout << m << " ";
 						}
 					}
 				}
 			}
-			// 	  cout << ")" << endl;
 		}
 	}
 	
@@ -2659,191 +2872,57 @@ void VImageCleaning::fillImageBorderNeighbours()
  */
 void VImageCleaning::recoverImagePixelNearDeadPixel()
 {
-	bool i_neigh = false;
-	unsigned int i_neighbour_size = 0;
-	unsigned int k = 0;
-	
-	for( unsigned int i = 0; i < fData->getNChannels(); i++ )
-	{
-		if( fData->getImage()[i] )
-		{
-			i_neigh = false;
-			i_neighbour_size = fData->getDetectorGeo()->getNNeighbours()[i];
-			for( unsigned int j = 0; j < i_neighbour_size; j++ )
-			{
-				k = fData->getDetectorGeo()->getNeighbours()[i][j];
-				if( k < fData->getBorder().size() && ( fData->getBorder()[k] || fData->getImage()[k] ) )
-				{
-					fData->setImage( i, true );
-					i_neigh = true;
-					break;
-				}
-				else if( k < fData->getDead().size() && fData->getDead( k, fData->getHiLo()[k] ) )
-				{
-					for( unsigned l = 0; l < i_neighbour_size; l++ )
-					{
-						unsigned int m = fData->getDetectorGeo()->getNeighbours()[i][l];
-						if( m != i && m < fData->getBorder().size() && ( fData->getBorder()[m] || fData->getImage()[m] ) )
-						{
-							fData->setImage( i, true );
-							i_neigh = true;
-							break;
-						}
-					}
-				}
-				if( !i_neigh )
-				{
-					fData->setImage( i, false );
-				}
-			}
-		}
-		if( fData->getBrightNonImage()[i] )
-		{
-			if( fData->getImage()[i] )
-			{
-				fData->setBrightNonImage( i, false );
-			}
-			else if( fData->getBorder()[i] )
-			{
-				fData->setBrightNonImage( i, false );
-			}
-		}
-	}
+    bool i_neigh = false;
+    unsigned int i_neighbour_size = 0;
+    unsigned int k = 0;
+    
+    for( unsigned int i = 0; i < fData->getNChannels(); i++ )
+    {
+        if( fData->getImage()[i] )
+        {
+            i_neigh = false;
+            i_neighbour_size = fData->getDetectorGeo()->getNNeighbours()[i];
+            for( unsigned int j = 0; j < i_neighbour_size; j++ )
+            {
+                k = fData->getDetectorGeo()->getNeighbours()[i][j];
+                if( k < fData->getBorder().size() && ( fData->getBorder()[k] || fData->getImage()[k] ) )
+                {
+                    fData->setImage( i, true );
+                    i_neigh = true;
+                    break;
+                }
+                else if( k < fData->getDead().size() && fData->getDead( k, fData->getHiLo()[k] ) )
+                {
+                    for( unsigned l = 0; l < i_neighbour_size; l++ )
+                    {
+                        unsigned int m = fData->getDetectorGeo()->getNeighbours()[i][l];
+                        if( m != i && m < fData->getBorder().size() && ( fData->getBorder()[m] || fData->getImage()[m] ) )
+                        {
+                            fData->setImage( i, true );
+                            i_neigh = true;
+                            break;
+                        }
+                    }
+                }
+                if( !i_neigh )
+                {
+                    fData->setImage( i, false );
+                }
+            }
+        }
+        if( fData->getBrightNonImage()[i] )
+        {
+            if( fData->getImage()[i] )
+            {
+                fData->setBrightNonImage( i, false );
+            }
+            else if( fData->getBorder()[i] )
+            {
+                fData->setBrightNonImage( i, false );
+            }
+        }
+    }
 }
-
-//
-// MS: produce a trigger map for calculation of  binary-image Hillas parameters and apply some sort of cleaning algorithm to reject noisy pixels
-//
-void VImageCleaning::cleanTriggerFixed( double hithresh, double lothresh )
-{
-	if( fData->getDebugFlag() )
-	{
-		cout << "VImageCleaning::cleanTriggerFixed() " << hithresh << "\t" << lothresh << endl;
-	}
-	// MS: produce a trigger-level cleaned image. The logic here is that one might want to require
-	// only patches of 3 nearest neighbors to constitute a valid center pixel.
-	fData->setTrigger( false );
-	unsigned int i_nchannel = fData->getNChannels();
-	
-	for( unsigned int i = 0; i < i_nchannel; i++ )
-	{
-		if( fData->getDetectorGeo()->getAnaPixel()[i] > 0  && !fData->getDead( fData->getHiLo()[i] )[i] )
-		{
-			// use the CFD hits
-			if( fData->getRunParameter()->fPWmethod == 0 || fData->getRunParameter()->fPWmethod == 1 )
-			{
-				if( fData->getReader()->getFullTrigVec()[i] )
-				{
-					// ensure that at least XX neighbors are above this threshold
-					int local_neighbors = 0;
-					for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[i].size(); j++ )
-					{
-						unsigned int k = fData->getDetectorGeo()->getNeighbours()[i][j];
-						if( k < fData->getTrigger().size()  && fData->getReader()->getFullTrigVec()[k] )
-						{
-							local_neighbors++;
-						}
-					}
-					if( local_neighbors >= fData->getRunParameter()->fPWcleanNeighbors )
-					{
-						fData->setTrigger( i, true );
-					}
-				}
-			}
-			
-			// use a software cleaning algorithm for determining the trigger hits from the FADCs
-			if( fData->getRunParameter()->fPWmethod == 2 || fData->getRunParameter()->fPWmethod == 3 )
-			{
-				if( fData->getSums()[i] > fData->getRunParameter()->fPWcleanThreshold )
-				{
-					// ensure that at least XX neighbors are above this threshold
-					int local_neighbors = 0;
-					for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[i].size(); j++ )
-					{
-						unsigned int k = fData->getDetectorGeo()->getNeighbours()[i][j];
-						if( k < fData->getTrigger().size()  && fData->getSums()[k] > fData->getRunParameter()->fPWcleanThreshold )
-						{
-							local_neighbors++;
-						}
-					}
-					if( local_neighbors >= fData->getRunParameter()->fPWcleanNeighbors )
-					{
-						fData->setTrigger( i, true );
-					}
-				}
-			}
-		}
-	}
-	
-	// then include the next row of pixels that "made" the center pixel alive
-	if( fData->getRunParameter()->fPWmethod == 1 || fData->getRunParameter()->fPWmethod == 3 )
-	{
-		vector< bool > tmp_trigger( i_nchannel, 0 );
-		
-		for( unsigned int i = 0; i < i_nchannel; i++ )
-		{
-			if( fData->getDetectorGeo()->getAnaPixel()[i] > 0  && !fData->getDead( fData->getHiLo()[i] )[i] )
-			{
-			
-				if( fData->getReader()->getFullTrigVec()[i] )
-				{
-					int local_neighbors = 0;
-					for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[i].size(); j++ )
-					{
-						unsigned int k = fData->getDetectorGeo()->getNeighbours()[i][j];
-						if( k < fData->getTrigger().size()  &&  fData->getTrigger()[k] )
-						{
-							local_neighbors++;
-						}
-					}
-					if( local_neighbors >= fData->getRunParameter()->fPWcleanNeighbors - 1 )
-					{
-						tmp_trigger[i] = 1;
-					}
-				}
-			}
-		}
-		
-		for( unsigned int i = 0; i < i_nchannel; i++ )
-		{
-			fData->setTrigger( i, ( tmp_trigger[i] | fData->getTrigger()[i] ) );
-		}
-		
-	}
-	
-	// assume that the image has been cleaned according to spec, then a new parameter will decide
-	// wether  to apply a reduction in the number of pixels transmitted:
-	// This will mask all pixels past the cut-off to be ZERO
-	
-	if( fData->getRunParameter()->fPWlimit > 0 )                   // then we'll transmit up to a fixed number of pixels per sector
-	{
-		const int n_sectors = 3;
-		const int sector_max = 182;               // there are 192 channels per trigger sector, but not all are used
-		int sector_count[n_sectors] = {0};
-		
-		for( int i = 0; i < n_sectors; i++ )
-		{
-			for( int j = 0; j < sector_max; j++ )
-			{
-				int current_pixel = sector_channel_to_pixel[j][i + 1]  - 1 ;
-				
-				if( fData->getTrigger()[ current_pixel  ] )
-				{
-					sector_count[ i  ]++;
-				}
-				
-				if( sector_count[i] > fData->getRunParameter()->fPWlimit )
-				{
-					// then turn the pixel OFF, regardless wether or not it was ON
-					fData->setTrigger( current_pixel, 0 );
-				}
-			}
-			
-		}
-		
-	}
-}
-
 
 void VImageCleaning::addImageChannel( unsigned int i_channel )
 {
@@ -2937,8 +3016,18 @@ double getTraceVar( vector < double > vA, double Am )
    trace correlation cleaning
 
 */
-void VImageCleaning::cleanImageTraceCorrelate( double sigNoiseThresh, double corrThresh, double pixThresh )
+void VImageCleaning::cleanImageTraceCorrelate( VImageCleaningRunParameter* iImageCleaningParameters )
 {
+    ///////////////////////////////////////////////
+    // setting of image cleaning run parameters
+    if( !iImageCleaningParameters )
+    {
+        return;
+    }
+    double sigNoiseThresh = iImageCleaningParameters->fCorrelationCleanBoardThresh;
+    double corrThresh = iImageCleaningParameters->fCorrelationCleanCorrelThresh;
+    double pixThresh = iImageCleaningParameters->fCorrelationCleanNpixThresh;
+    
 	fData->setBorderCorrelationCoefficient( 0. );
 	
 	vector < vector < double > > vImageTraces( fData->getDetectorGeo()->getNChannels( fData->getTelID() ), vector<double>( ( int )fData->getNSamples(), 0 ) );
