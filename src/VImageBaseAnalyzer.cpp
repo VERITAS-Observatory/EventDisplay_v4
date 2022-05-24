@@ -176,6 +176,7 @@ void VImageBaseAnalyzer::calcSums( int iFirst, int iLast, bool iMakingPeds, bool
 
    TMPTMPTMPTMP
    XXXXXX is this still needed?
+
 */
 void VImageBaseAnalyzer::calcTZeros( int fFirst, int fLast )
 {
