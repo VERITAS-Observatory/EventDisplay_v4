@@ -306,7 +306,10 @@ void VCalibrator::calculatePedestals( bool iLowGain )
             getSumFirst() + ( i + 1 ),
             false,
             iLowGain,
-            getTraceIntegrationMethod()
+            // NOTE: this different to v570, which always calculates IPR graphs
+            // with pedestal zero
+            // getTraceIntegrationMethod()
+            2
         );
         // loop over all channels
         for( unsigned int j = 0; j < hped_vec[iTelType][i].size(); j++ )
@@ -877,7 +880,6 @@ void VCalibrator::calculateAverageTZero( bool iLowGain )
         }
     }
 	
-    // TODO CHECKCHECK
 	if( fRunPar->fL2TimeCorrect )
 	{
 		FADCStopCorrect();
@@ -901,9 +903,9 @@ void VCalibrator::calculateAverageTZero( bool iLowGain )
 		}
 		
 		// require a min sum for tzero filling
-		if( getSums()[i] > fRunPar->fCalibrationIntSumMin && !getDead()[i] && !getMasked()[i] && getTZeros()[i] > 0. )
+		if( getSums()[i] > fRunPar->fCalibrationIntSumMin && !getDead()[i] && !getMasked()[i] )
 		{
-			if( i < htzero[fTelID].size() && htzero[fTelID][i] )
+            if( getTZeros()[i] > 0. && i < htzero[fTelID].size() && htzero[fTelID][i] )
 			{
 				htzero[fTelID][i]->Fill( getTZeros()[i] );
 			}
@@ -3542,10 +3544,10 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 						else if( iVariable == "LOWGAINMULTIPLIER_SUM" && atoi( iValueString.c_str() ) > 0. && iTel == ( int )iTelescopeSelect )
 						{
 							int isum = atoi( iValueString.c_str() );
-                                                        if( iVersion5 )
-                                                        {
-                                                            is_stream >> isum;
-                                                        }
+                            if( iVersion5 )
+                            {
+                                is_stream >> isum;
+                            }
 							getLowGainDefaultSumWindows().push_back( isum );
 							int jmin = 0;
 							int jmax = 0;
