@@ -656,8 +656,6 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 			setTCorrectedSumFirst( i_channelHitID, fTraceHandler->getTraceIntegrationFirst() );
 			setTCorrectedSumLast( i_channelHitID, fTraceHandler->getTraceIntegrationLast() );
 			setTraceAverageTime( i_channelHitID, fTraceHandler->getTraceAverageTime() );
-            cout << "calcztzerosums " << i_channelHitID << "\t" << fTraceHandler->getTraceAverageTime() << endl;
-            cout << "getPulseTime " << getPulseTime( true )[i_channelHitID] << endl;
 			i_tempTraceMax = fTraceHandler->getTraceMax( i_tempN255, getLowGainMultiplier_Trace() );
 			setTraceMax( i_channelHitID, i_tempTraceMax );
 			setTraceRawMax( i_channelHitID, i_tempTraceMax + getPeds( getHiLo()[i_channelHitID] )[i_channelHitID] );
