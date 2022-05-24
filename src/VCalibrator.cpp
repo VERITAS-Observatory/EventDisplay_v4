@@ -633,7 +633,7 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
         cout << t << "\t" << hped_vec.size() << endl;
 		return false;
 	}
-    cout << "\t filling pedestal tree for telescope " << t << " (telescope type " << iTelType << ")" << endl;
+    cout << "\t filling pedestal tree for telescope " << t+1 << " (telescope type " << iTelType << ")" << endl;
 	
 	char iname[800];
 	char ititle[800];
@@ -3927,10 +3927,8 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 	unsigned int fnum_sumwindow = 1;
 	unsigned int fsumwindow[VDST_MAXSUMWINDOW];
 	float fPed_high[VDST_MAXCHANNELS];
-	//   float fPedvar_high2D[VDST_MAXCHANNELS][VDST_MAXSUMWINDOW];
 	float* fPedvar_high = new float[VDST_MAXCHANNELS * VDST_MAXSUMWINDOW];
 	float fPed_low[VDST_MAXCHANNELS];
-	//   float fPedvar_low2D[VDST_MAXCHANNELS][VDST_MAXSUMWINDOW];
 	float* fPedvar_low = new float[VDST_MAXCHANNELS * VDST_MAXSUMWINDOW];
 	float fConv_high[VDST_MAXCHANNELS];
 	float fConv_low[VDST_MAXCHANNELS];
