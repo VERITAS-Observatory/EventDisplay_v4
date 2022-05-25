@@ -1934,7 +1934,7 @@ void VEventLoop::setEventTimeFromReader()
 		//! 1st January of this year, then add fGPS.getDays()-1.
 		int  j = 0;
 		double dMJD = 0.;
-		slaCldj( fReader->getATGPSYear() + 2000, 1, 1, &dMJD, &j );
+		VAstronometry::vlaCldj( fReader->getATGPSYear() + 2000, 1, 1, &dMJD, &j );
 		dMJD += fGPS.getDays() - 1.;
 		if( fReader->isGrisuMC() && dMJD == 51543 )
 		{

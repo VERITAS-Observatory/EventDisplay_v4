@@ -6,7 +6,7 @@
 #include "TMath.h"
 #include "TObject.h"
 
-#include "VASlalib.h"
+#include "VAstronometry.h"
 
 #include <iostream>
 #include <string>
@@ -58,7 +58,7 @@ class VStar : public TObject
 		void printStar();
         void printStar_for_anasum( string iBand );
 		
-		ClassDef( VStar, 3 );
+		ClassDef( VStar, 5 );
 };
 
 

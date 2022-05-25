@@ -99,7 +99,12 @@ bool VAtmosphereSoundings::readSoundingsFromRootFile( string iRootFile )
 }
 
 /*
-
+ * read text files with sounding data downloaded from Wyoming server
+ *
+ * - requires list of files as input
+ *
+ *   highly adapted to the file format of these files
+ *
 */
 bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 {
@@ -159,16 +164,15 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 				is_stream >> iTemp;
 				int iYear = atoi( iTemp.c_str() );
 				
-				// get MJD
+                // calculate MJD from date
 				double iMJD = 0;
 				int j = 0;
-				slaCldj( iYear, iMonth, iDay, &iMJD, &j );
+				VAstronometry::vlaCldj( iYear, iMonth, iDay, &iMJD, &j );
 				if( j != 0 )
 				{
 					cout << "VAtmosphereSoundings::readSoundingsFromTextFile: error: invalid data: " << is_line << endl;
 					continue;
 				}
-				// preli!
 				if( iHour == 0 )
 				{
 					iMJD += 0.5;
@@ -475,17 +479,22 @@ void VAtmosphereSoundings::fillAtmosphericThickness( VAtmosphereSoundingData* iD
 
 void VAtmosphereSoundings::fillIndexofRefraction()
 {
+    // Refractive index formula from J.Owens, 'Optical Refractive Index of Air' (1967)
+    
 	for( unsigned int i = 0; i < fData.size(); i++ )
 	{
 		if( fData[i] )
 		{
+
 			for( unsigned int j = 0; j < fData[i]->fPressure_Pa.size(); j++ )
 			{
 				fData[i]->fIndexofRefraction.push_back( -9999. );
 			}
 		}
+
 	}
 }
+
 
 /*
 
@@ -1870,6 +1879,11 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 	}
 }
 
+/*
+ * open root file with sounding data and fill it into
+ * data class structure
+ *
+*/
 bool VAtmosphereSoundings::readRootFile()
 {
 	if( !fDataTree )
@@ -2812,17 +2826,16 @@ bool VAtmosphereSoundings::write_CORSIKA_UserProfile( unsigned int iMODTRANIndex
 }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
+ * average atmosphere over a certain period
+ *
+*/
 int VAtmosphereSoundings::push_average_atmosphere( string name = "", vector<int>* years = 0, vector<int>* months = 0, vector<int>* days = 0, vector<int>* hours = 0, vector<double>* mjds = 0 , unsigned int nMinPoints = 20, int nMinFlights = 1 )
 {
 
 
 	VAtmosphereSoundingData* Average =  new VAtmosphereSoundingData();
 	Average->Name  = name;
-	
 	
 	vector<double> heightbins;
 	
@@ -2908,6 +2921,12 @@ int VAtmosphereSoundings::push_average_atmosphere( string name = "", vector<int>
 	
 }
 
+/*
+ * check if data points are inside a certain
+ * years / months / days / hours / mjds range
+ *
+ * note: e.g. years and months are treated separatedly
+ */
 bool VAtmosphereSoundings::isDateInRange( VAtmosphereSoundingData* Data, vector<int>* years, vector<int>* months, vector<int>* days, vector<int>* hours, vector<double>* mjds , unsigned int nMinPoints = 20 )
 {
 
@@ -3183,8 +3202,8 @@ void VAtmosphereSoundings::plot_season( double mjd_start, double mjd_end, TStrin
 		
 		int y1, y2, m1, m2, d1, d2, j;
 		double f;
-		slaDjcl( start[i] , &y1, &m1, &d1, &f, &j );
-		slaDjcl( end[i] , &y2, &m2, &d2, &f, &j );
+		VAstronometry::vlaDjcl( start[i] , &y1, &m1, &d1, &f, &j );
+		VAstronometry::vlaDjcl( end[i] , &y2, &m2, &d2, &f, &j );
 		TString output = TString::Format( "%d\t%d-%d-%d\t%d-%d-%d", i + 1, y1, m1, d1, y2, m2, d2 );
 		cout << output << endl;
 		
@@ -3221,8 +3240,8 @@ void VAtmosphereSoundings::plot_season( double mjd_start, double mjd_end, TStrin
 	{
 		int y1, y2, m1, m2, d1, d2, j;
 		double f;
-		slaDjcl( start[i] , &y1, &m1, &d1, &f, &j );
-		slaDjcl( end[i] , &y2, &m2, &d2, &f, &j );
+		VAstronometry::vlaDjcl( start[i] , &y1, &m1, &d1, &f, &j );
+		VAstronometry::vlaDjcl( end[i] , &y2, &m2, &d2, &f, &j );
 		TString name = TString::Format( "%d-%d-%d - %d-%d-%d", y1, m1, d1, y2, m2, d2 );
 		VAtmosphereSoundingData* t = makeMeanAtmosphereMJD( start[i], end[i], name.Data(), name.Data() );
 		t->setColor( col[i] );
@@ -3334,8 +3353,8 @@ void VAtmosphereSoundings::plot_season( int year_start, int month_start, int day
 	double mjd_start, mjd_end;
 	int j;
 	TString season_name = TString::Format( "%d-%d", year_start, year_end );
-	slaCldj( year_start, month_start , day_start, &mjd_start, &j );
-	slaCldj( year_end, month_end , day_end, &mjd_end, &j );
+	VAstronometry::vlaCldj( year_start, month_start , day_start, &mjd_start, &j );
+	VAstronometry::vlaCldj( year_end, month_end , day_end, &mjd_end, &j );
 	plot_season( mjd_start, mjd_end, season_name, value );
 	
 }

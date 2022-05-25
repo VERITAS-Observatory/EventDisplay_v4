@@ -6,6 +6,7 @@
 
 #include "VExposure.h"
 
+
 ClassImp( VExposure )
 
 VExposure::VExposure( int nBinsL, int nBinsB )
@@ -109,7 +110,7 @@ bool VExposure::setPlannedObservation( vector<double> ra, vector<double> dec, ve
 		double i_b = 0;
 		double i_l = 0;
 		
-		slaEqgal( ra[i] / 180. * TMath::Pi(), dec[i] / 180. * TMath::Pi(), &i_l, &i_b );
+		VAstronometry::vlaEqgal( ra[i] / 180. * TMath::Pi(), dec[i] / 180. * TMath::Pi(), &i_l, &i_b );
 		fRunGalLong1958.push_back( i_l * 180. / TMath::Pi() );
 		fRunGalLat1958.push_back( i_b * 180. / TMath::Pi() );
 		fRunDuration.push_back( t[i] );
@@ -318,7 +319,7 @@ bool VExposure::readFromDB()
 		iRa  += fRunoffsetRA.back();
 		iDec += fRunoffsetDec.back();
 		
-		slaEqgal( iRa / 180. * TMath::Pi(), iDec / 180. * TMath::Pi(), &i_l, &i_b );
+		VAstronometry::vlaEqgal( iRa / 180. * TMath::Pi(), iDec / 180. * TMath::Pi(), &i_l, &i_b );
 		fRunGalLong1958.push_back( i_l * 180. / TMath::Pi() );
 		fRunGalLat1958.push_back( i_b * 180. / TMath::Pi() );
 		if( fDebug )
@@ -409,13 +410,13 @@ bool VExposure::readFromDB()
 		double iSid = 0.;
 		double az, el;
 		// get Greenwich sideral time
-		iSid = slaGmsta( ( double )iMJD, ( iTime1 + iTime2 ) / 2. / 86400. );
+        iSid = VAstronometry::vlaGmsta( ( double )iMJD, ( iTime1 + iTime2 ) / 2. / 86400. );
 		// calculate local sideral time
 		iSid = iSid - VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad();
 		// calculate hour angle
-		ha = slaDranrm( iSid - iRa / 180. * TMath::Pi() );
+		ha = VAstronometry::vlaDranrm( iSid - iRa / 180. * TMath::Pi() );
 		// get horizontal coordinates
-		slaDe2h( ha, iDec / 180. * TMath::Pi(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &az, &el );
+        VAstronometry::vlaDe2h( ha, iDec / 180. * TMath::Pi(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &az, &el );
 		// fill vectors
 		fRunTelElevation.push_back( el * 180. / TMath::Pi() );
 		fRunTelAzimuth.push_back( az * 180. / TMath::Pi() );
@@ -585,7 +586,7 @@ bool VExposure::readFromDBList()
 		iRa  += fRunoffsetRA.back();
 		iDec += fRunoffsetDec.back();
 		
-		slaEqgal( iRa / 180. * TMath::Pi(), iDec / 180. * TMath::Pi(), &i_l, &i_b );
+		VAstronometry::vlaEqgal( iRa / 180. * TMath::Pi(), iDec / 180. * TMath::Pi(), &i_l, &i_b );
 		fRunGalLong1958.push_back( i_l * 180. / TMath::Pi() );
 		fRunGalLat1958.push_back( i_b * 180. / TMath::Pi() );
 		if( fDebug )
@@ -654,13 +655,13 @@ bool VExposure::readFromDBList()
 		double iSid = 0.;
 		double az, el;
 		// get Greenwich sideral time
-		iSid = slaGmsta( ( double )iMJD, ( iTime1 + iTime2 ) / 2. / 86400. );
+        iSid = VAstronometry::vlaGmsta( ( double )iMJD, ( iTime1 + iTime2 ) / 2. / 86400. );
 		// calculate local sideral time
 		iSid = iSid - VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad();
 		// calculate hour angle
-		ha = slaDranrm( iSid - iRa / 180. * TMath::Pi() );
+		ha = VAstronometry::vlaDranrm( iSid - iRa / 180. * TMath::Pi() );
 		// get horizontal coordinates
-		slaDe2h( ha, iDec / 180. * TMath::Pi(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &az, &el );
+        VAstronometry::vlaDe2h( ha, iDec / 180. * TMath::Pi(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &az, &el );
 		// fill vectors
 		fRunTelElevation.push_back( el * 180. / TMath::Pi() );
 		fRunTelAzimuth.push_back( az * 180. / TMath::Pi() );
@@ -925,7 +926,7 @@ void VExposure::fillElevationPlot( int iYear, int iMonth, int ze_max_deg )
 				for( int a = 0; a < 360; a++ )
 				{
 					VSkyCoordinatesUtilities::getEquatorialCoordinates( imjd, time, ( double )a, ( double )z, dec, ra );
-					slaEqgal( ra * TMath::DegToRad(), dec * TMath::DegToRad(), &l, &b );
+					VAstronometry::vlaEqgal( ra * TMath::DegToRad(), dec * TMath::DegToRad(), &l, &b );
 					
 					l *= TMath::RadToDeg();
 					if( l > 180 )
@@ -1041,7 +1042,7 @@ void VExposure::fillExposureMap()
 			{
 				double l_pos = fMapGal2D->GetXaxis()->GetBinCenter( l );
 				
-				r_dist = slaDsep( l_pos * TMath::Pi() / 180., b_pos * TMath::Pi() / 180., fRunGalLong1958[i] * TMath::Pi() / 180.,
+                r_dist = VAstronometry::vlaDsep( l_pos * TMath::Pi() / 180., b_pos * TMath::Pi() / 180., fRunGalLong1958[i] * TMath::Pi() / 180.,
 								  fRunGalLat1958[i] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
 				if( r_dist < fMaximumIntegrationRadius && fRunDuration[i] > 0. )
 				{
@@ -1303,7 +1304,7 @@ void VExposure::plotVTSObjects( bool bAitoff, double ibmin, double ibmax, double
 			
 			ra  = fRunRA[i];
 			dec = fRunDec[i];
-			slaEqgal( ra / 180. * TMath::Pi(), dec / 180. * TMath::Pi(), &l, &b );
+			VAstronometry::vlaEqgal( ra / 180. * TMath::Pi(), dec / 180. * TMath::Pi(), &l, &b );
 			
 			plotObject( l * TMath::RadToDeg(), b * TMath::RadToDeg(), fRunSourceID[i], 0.,
 						ibmin, ibmax, ilmin, ilmax, h,
@@ -1460,7 +1461,7 @@ void VExposure::getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip 
 		ms = 0;
 	}
 	// calculate MJD
-	slaCldj( y, m, d, &gMJD, &l );
+	VAstronometry::vlaCldj( y, m, d, &gMJD, &l );
 	MJD = ( int )gMJD;
 	Time = h * 60.*60. + min * 60. + s + ms / 1.e3;
 }
@@ -1672,7 +1673,7 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 		// loop over second catalogue
 		for( unsigned int j = 0; j < tev->getNStar(); j++ )
 		{
-			double r = slaDsep( s->getStarRA2000( i ) * TMath::Pi() / 180., s->getStarDec2000( i ) * TMath::Pi() / 180., tev->getStarRA2000( j ) * TMath::Pi() / 180., tev->getStarDec2000( j ) * TMath::Pi() / 180. ) * 180. / TMath::Pi();
+            double r = VAstronometry::vlaDsep( s->getStarRA2000( i ) * TMath::Pi() / 180., s->getStarDec2000( i ) * TMath::Pi() / 180., tev->getStarRA2000( j ) * TMath::Pi() / 180., tev->getStarDec2000( j ) * TMath::Pi() / 180. ) * 180. / TMath::Pi();
 			if( r < r_min )
 			{
 				tev_select = ( int )j;
@@ -1700,7 +1701,7 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 		for( unsigned int j = 0; j < fRunRA.size(); j++ )
 		{
 			// calculate distance of catalogue object to camera center
-			r_centre = slaDsep( s->getStarRA2000( i ) * TMath::Pi() / 180., s->getStarDec2000( i ) * TMath::Pi() / 180.,
+            r_centre = VAstronometry::vlaDsep( s->getStarRA2000( i ) * TMath::Pi() / 180., s->getStarDec2000( i ) * TMath::Pi() / 180.,
 								( fRunRA[j] + fRunoffsetRA[j] ) * TMath::Pi() / 180., ( fRunDec[j] + fRunoffsetDec[j] ) * TMath::Pi() / 180. ) * 180. / TMath::Pi();
 			// do dqm
 			if( !doDQM( j, iMinDuration ) )
@@ -1712,7 +1713,7 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 			if( r_centre < iR )
 			{
 				// calculate distance of catalogue object to VERITAS object
-				r_VA_object = slaDsep( s->getStarRA2000( i ) * TMath::Pi() / 180., s->getStarDec2000( i ) * TMath::Pi() / 180.,
+                r_VA_object = VAstronometry::vlaDsep( s->getStarRA2000( i ) * TMath::Pi() / 180., s->getStarDec2000( i ) * TMath::Pi() / 180.,
 									   fRunRA[j] * TMath::Pi() / 180., fRunDec[j] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
 				// total time on object (all array configurations)
 				r_tot += fRunDuration[j];
@@ -1980,7 +1981,7 @@ void VExposure::printListOfRuns( double il, double ib, double iR, double iMinDur
 	}
 	for( unsigned int i = 0; i < fRunGalLong1958.size(); i++ )
 	{
-		r_dist = slaDsep( il * TMath::Pi() / 180., ib * TMath::Pi() / 180., fRunGalLong1958[i] * TMath::Pi() / 180., fRunGalLat1958[i] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
+        r_dist = VAstronometry::vlaDsep( il * TMath::Pi() / 180., ib * TMath::Pi() / 180., fRunGalLong1958[i] * TMath::Pi() / 180., fRunGalLat1958[i] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
 		
 		if( r_dist < iR && fRunDuration[i] > iMinDuration )
 		{
@@ -2041,6 +2042,8 @@ void VExposure::printListOfRuns( double il, double ib, double iR, double iMinDur
 
 /*
    copied from ROOT forum #6650
+
+   (input in degrees)
 */
 void VExposure::aitoff2xy( Double_t l, Double_t b, Double_t& Al, Double_t& Ab )
 {

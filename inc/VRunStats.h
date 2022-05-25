@@ -3,8 +3,7 @@
 #ifndef VRUNSTATS_H
 #define VRUNSTATS_H
 
-#include "VASlamac.h"
-#include "VASlalib.h"
+#include "VAstronometry.h"
 #include "VGlobalRunParameter.h"
 #include "VDB_Connection.h"
 
