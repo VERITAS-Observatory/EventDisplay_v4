@@ -33,10 +33,6 @@ ARCH = $(shell uname)
 #############################
 package = EVNDISP
 version = 490
-# version of auxiliary files
-auxversion = $(version)-auxv01
-distdir = $(package)-$(version)
-vtspara = $(package)-$(auxversion).VTS.aux
 #############################
 #############################
 # check root version number
@@ -147,10 +143,6 @@ CXXFLAGS     += -I$(shell root-config --incdir) -I$(shell root-config --incdir)/
 ROOTGLIBS     = $(shell root-config --glibs)
 GLIBS         = $(ROOTGLIBS)
 GLIBS        += -lMLP -lTreePlayer -lTMVA -lMinuit -lXMLIO -lSpectrum
-
-#ifeq ($(DCTEST),yes)
-#   GLIBS     += -lDCache
-#endif
 ########################################################
 # VBF
 ########################################################
@@ -158,7 +150,6 @@ ifneq ($(VBFFLAG),-DNOVBF)
 VBFCFLAGS     = -I$(VBFSYS)/include/VBF/
 VBFLIBS       = $(shell $(VBFSYS)/bin/vbfConfig --ldflags --libs)
 CXXFLAGS     += $(VBFCFLAGS)
-#GLIBS        += $(VBFLIBS)
 endif
 ########################################################
 # GSL FLAGS
@@ -1462,4 +1453,4 @@ rclean:
 	-rm -f ./obj/*.o ./obj/*_Dict.cpp ./obj/*_Dict.h ./bin/* ./lib/libVAnaSum.so ./lib/*.pcm ./obj/*dict.pcm ./bin/*.pcm
 ###############################################################################################################################
 
-.PHONY: all clean install FORCEDISTDIR dist TESTFITS configuration
+.PHONY: all clean install TESTFITS configuration
