@@ -35,6 +35,7 @@ class VCalibrator : public VImageBaseAnalyzer
 		
 		TFile* fPedSingleOutFile;
 		map< ULong64_t, TFile* > fPedOutFile;
+        map< ULong64_t, vector< vector<TH1F* > > > hpedPerTelescopeType;  //<! one histogram per teltype/channel/sumwindow
 		map< ULong64_t, vector< vector<TH1F* > > > hped_vec;  //<! one histogram per telescope/channel/sumwindow
 		map< ULong64_t, TClonesArray* > fPedestalsHistoClonesArray;
 		TFile* opfgain;
@@ -44,6 +45,7 @@ class VCalibrator : public VImageBaseAnalyzer
 		vector<TProfile* > htcpulse;
 		vector<TH1F* > htoff;
 		vector<TProfile* > htoff_vs_sum;
+        int fPedPerTelescopeTypeMinCnt;                         // statistical limit for IPR calculation
 		
 		//Extra calib output.
 		TTree* tExtra_ChargeTree;
@@ -63,11 +65,11 @@ class VCalibrator : public VImageBaseAnalyzer
 		int fExtra_nPix;
 		int fExtra_eventNumber;
 		
-		
 		// average Tzero calculation
 		vector< TFile* > fTZeroOutFile;
 		// one histogram per telescope and channel
 		vector< vector< TH1F* > > htzero;
+        vector< vector< TH1F* > > htaverage;
 		
 		vector< string > fPedFileNameC;
 		vector< string > fGainFileNameC;
@@ -84,6 +86,9 @@ class VCalibrator : public VImageBaseAnalyzer
 		
 		TTree* fillCalibrationSummaryTree( unsigned int itel, string iName, vector<TH1F* > h );
 		bool   fillPedestalTree( unsigned int tel, VPedestalCalculator* iP );
+        bool   initializePedestalHistograms( ULong64_t iTelType, bool iLowGain, 
+                                               vector< double > minSumPerSumWindow, 
+                                               vector< double > maxSumPerSumWindow );
 		void getCalibrationRunNumbers();
 		int  getCalibrationRunNumbers_fromCalibFile();
 		unsigned int getNumberOfEventsUsedInCalibration( vector< int > iE, int iTelID );
@@ -95,6 +100,9 @@ class VCalibrator : public VImageBaseAnalyzer
 		bool readCalibrationDatafromDSTFiles( string iSourceFile );
 		void readfromVOFFLINE_DB( int gain_or_toff, string& iFile, vector< unsigned int >& VchannelList, vector< double >& Vmean, vector< double >& Vrms );
 		void readGains( bool iLowGain = false );
+        bool readIPRGraph_from_DSTFile( string iDSTFile, unsigned int iSummationWindow, ULong64_t iTelType );
+        bool calculateIPRGraphs();
+        bool calculateIPRGraphs( string iPedFileName, unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel );
 		bool readLowGainMultiplier( );
 		bool readPeds( string iFile, bool, unsigned int );
 		bool readPeds_from_grisufile( bool, unsigned int );
@@ -107,10 +115,10 @@ class VCalibrator : public VImageBaseAnalyzer
 		void setCalibrationFileNames();
 		
 		void writeGains( bool iLowGain = false );
-		void writePeds( bool iLowGain = false );
-		void writePeds( bool iLowGain, VPedestalCalculator* iP, bool iWriteAsciiFile = true );
+		void writePeds( bool iLowGain, VPedestalCalculator* iP = 0, bool iWriteAsciiFile = true );
 		void writeTOffsets( bool iLowGain = false );
 		void writeAverageTZeros( bool iLowGain = false );
+        bool writeIPRgraphs( string iFile = "" );
 		
 		
 	public:

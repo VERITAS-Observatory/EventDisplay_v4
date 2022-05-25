@@ -799,6 +799,31 @@ bool VEvndispData::isTeltoAna( unsigned int iTel )
 	return false;
 }
 
+/*
+ * return typical (arrival) time of FADC pulse
+ *
+ * a) T0
+ * b) average pulse time
+ */
+valarray<double>& VEvndispData::getPulseTime( bool iCorrected )
+{
+     // in run parameter file: FADCSUMMATIONSTART set to TZERO
+    if( getSumWindowStart_T_method() == 1 )
+    {
+        return fAnaData[fTelID]->getTZeros( iCorrected );
+    }
+    
+    // default: return average pulse time
+    // in run parameter file: FADCSUMMATIONSTART set to TAVERAGE
+    return fAnaData[fTelID]->getTraceAverageTime( iCorrected );
+}
+
+
+/*
+ *  return timing values characterizing a pulse
+ *  time of max, tzero, etc. (0.5, 1., 0.5 values)
+ *
+ */
 vector< valarray<double> >& VEvndispData::getPulseTiming( bool iCorrected )
 {
 	if( iCorrected )
@@ -865,6 +890,11 @@ void VEvndispData::setPulseTimingCorrection( unsigned int iChannel, double iCorr
 			}
 		}
 	}
+    // average trace time corrections
+    if( iChannel < getTraceAverageTime( false ).size() && iChannel < getTraceAverageTime( false ).size() )
+    {
+        getTraceAverageTime( true )[iChannel] = getTraceAverageTime( false )[iChannel] + iCorrection;
+    }
 }
 
 unsigned int VEvndispData::getLargestSumWindow()
@@ -998,6 +1028,16 @@ ULong64_t VEvndispData::getTelType( unsigned int iTelID )
 	}
 	return 99999;
 }
+
+unsigned int VEvndispData::getTelType_Counter( ULong64_t iTelType )
+{
+    if( getDetectorGeometry() )
+    {
+        return getDetectorGeometry()->getTelType_Counter( iTelType );
+    }
+    return 99999;
+}
+
 
 /*
 

@@ -63,6 +63,7 @@ class VImageAnalyzerData
 		vector< valarray<double> > fPulseTimingUncorrected; //!< pulse timing at certain fraction of pulse maxima (uncorrected values)
 		vector< valarray<double> > fPulseTimingCorrected; //!< pulse timing at certain fraction of pulse maxima (corrected values)
 		valarray< double >     fPulseTimingAverageTime; //!< average pulse time
+        valarray< double >     fPulseTimingAverageTimeCorrected; //!< average pulse time (corrected values)
 		valarray<unsigned int> fTCorrectedSumFirst;
 		valarray<unsigned int> fTCorrectedSumLast;
 		valarray<unsigned int> fCurrentSummationWindow;
@@ -119,7 +120,8 @@ class VImageAnalyzerData
 		// dummy vector
 		vector< unsigned int > iDummyVectorUI;
 		
-		VImageAnalyzerData( unsigned int iTelID, unsigned int iShortTree = 0, bool bCalibration = false );
+		VImageAnalyzerData( unsigned int iTelID, unsigned int iShortTree = 0,
+                            bool bCalibration = false );
 		~VImageAnalyzerData() {}
 		
 		void                     fillPulseSum( unsigned int, double, bool );
@@ -141,6 +143,7 @@ class VImageAnalyzerData
 		{
 			return fRandomMakeDeadChannelsSeed;
 		}
+        valarray<double>&        getTraceAverageTime( bool iCorrected );
 		valarray<double>&        getTZeros( bool iCorrected );
 		valarray<double>&        getTraceWidth( bool iCorrected );
 		VSpecialChannel*         getSpecialChannel()

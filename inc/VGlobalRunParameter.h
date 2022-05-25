@@ -14,18 +14,23 @@
 #include <sstream>
 #include <string>
 
+//////////////////////////////////////////////////////////////////
 // HARDWIRED MAXIMUM NUMBER OF TELESCOPES AND CHANNELS, etc.
+// (changing anything here means that you have to rerun all stages
+//  of the analysis again)
 #define VDST_MAXTELESCOPES  100    // maximum number of telescopes
-#define VDST_MAXTELTYPES      6   // maximum number of telescope types
+#define VDST_MAXTELTYPES      7   // maximum number of telescope types
+#define VDST_MAXNNGROUPTYPES  6    // maximum number of NN-group types searched in NN-image cleaning
 #ifndef CTA_SC
 #define VDST_MAXCHANNELS   2900    // maximum number of channels per telescopes
 #else
 #define VDST_MAXCHANNELS  12000    // maximum number of channels per telescopes
 #endif
-#define VDST_MAXSUMWINDOW   500    // maximum number of summation windows (=maximum number of samples per FADC trace)
+#define VDST_MAXSUMWINDOW   130    // maximum number of summation windows (=maximum number of samples per FADC trace)
 #define VDST_PEDTIMESLICES 5000    // maximum number of time slices for pedestal calculation
 #define VDST_MAXRECMETHODS  100    // maximum number of arrayreconstruction method
 #define VDST_MAXTIMINGLEVELS 10    // maximum number of timing levels
+//////////////////////////////////////////////////////////////////
 
 using namespace std;
 
@@ -77,6 +82,10 @@ class VGlobalRunParameter
 		}
 		string       getDirectory_EVNDISPCalibrationData()
 		{
+            return fEVNDISPAnaDataDirectory + "/Calibration/";
+        }
+        string       getDirectory_EVNDISPCalibrationData_perRun()
+        {
 			return fEVNDISPCalibrationDataDirectory + "/Calibration/";
 		}
 		string       getDirectory_EVNDISPDetectorGeometry()
@@ -143,7 +152,7 @@ class VGlobalRunParameter
 		bool         setDirectory_EVNDISPCalibrationData( string iDir );
 		bool         update( TChain* ic );
 		
-		ClassDef( VGlobalRunParameter, 9 );
+		ClassDef( VGlobalRunParameter, 10 );
 };
 
 #endif

@@ -172,18 +172,10 @@ namespace VStatistics
 		double big = 10.*sqrt( b + c ) + fabs( c - b ) + 10.; //! 10 sigma noise
 		TF1 g( "myfuncg", funcg, 0.0, big, 5 );
 		g.SetParameters( par );
-#ifndef ROOT6
-		n1 = g.Integral( 0., big, par, eps );
-#else
-                n1 = g.Integral( 0., big, eps );
-#endif
+        n1 = g.Integral( 0., big, eps );
 		if( n1 > 0. )
 		{
-#ifndef ROOT6
-			p = g.Integral( ul, big, par, eps ) / n1;
-#else
-			p = g.Integral( ul, big, eps ) / n1;
-#endif
+        p = g.Integral( ul, big, eps ) / n1;
 		}
 		else
 		{

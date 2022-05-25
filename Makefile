@@ -50,22 +50,13 @@ vtspara = $(package)-$(auxversion).VTS.aux
 ROOTVERSION=$(shell root-config --version)
 # check if this is root 6 (or later)
 ROOT6=$(shell expr 5.99 \>= `root-config --version | cut -f1 -d \/`)
-ifeq ($(ROOT6),0)
-  ROOT6FLAG=-DROOT6
-endif
-ifeq ($(ROOT6),0)
-  ROOT_CntCln = rootcling
-  ROOT6_message = "Using ROOT6 - make sure to add `pwd`/obj to LD_LIBRARY_PATH"
-else
-  ROOT6_message = ""
-  ROOT_CntCln = rootcint
-endif
+ROOT_CntCln = rootcling
 #############################
 # check for root libraries
 #############################
 ROOT_MLP=$(shell root-config --has-xml)
-ROOT_MINUIT2=$(shell root-config --has-minuit2)
-ROOT_MINUIT2=no
+# mysql support
+# (necessary for VERITAS data analysis)
 ROOT_MYSQL=$(shell root-config --has-mysql)
 ROOT_DCACHE=$(shell root-config --has-dcache)
 #############################
@@ -112,7 +103,6 @@ ifeq ($(origin GSLSYS), undefined)
   endif
 endif
 # GSLFLAG=-DNOGSL
-#FROGSFLAG=-DUSEFROGS
 
 ifneq ($(GSLFLAG),-DNOGSL)
 # check GSL version
@@ -144,7 +134,7 @@ endif
 CXX           = g++
 CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
 CXXFLAGS     += -I. -I./inc/
-CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(ROOT6FLAG) $(GSLFLAG) $(GSL2FLAG) $(FROGSFLAG) $(DCACHEFLAG)
+CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG) $(GSL2FLAG) $(DCACHEFLAG)
 LD            = g++
 OutPutOpt     = -o
 INCLUDEFLAGS  = -I. -I./inc/
@@ -153,11 +143,6 @@ INCLUDEFLAGS  = -I. -I./inc/
 ifeq ($(ARCH),Linux)
 	LDFLAGS       = -O
 	SOFLAGS       = -shared
-	ifeq ($(ROOT6FLAG),-DROOT6)
-		ifeq ($(GCC_GT_4_8),true)
-		  $(error PAY ATTENTION. YOU USE THE WRONG GCC COMPILER $(GCCVERSION) FOR THIS ROOT VERSION $(ROOTVERSION)!)
-		endif
-	endif
 endif
 # Apple OS X flags
 ifeq ($(ARCH),Darwin)
@@ -196,9 +181,6 @@ CXXFLAGS     += -I$(shell root-config --incdir) -I$(shell root-config --incdir)/
 ROOTGLIBS     = $(shell root-config --glibs)
 GLIBS         = $(ROOTGLIBS)
 GLIBS        += -lMLP -lTreePlayer -lTMVA -lMinuit -lXMLIO -lSpectrum
-ifeq ($(ROOT_MINUIT2),yes)
-   GLIBS     += -lMinuit2
-endif
 
 #ifeq ($(DCTEST),yes)
 #   GLIBS     += -lDCache
@@ -316,19 +298,27 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VPETree.o \
 		./obj/VPETree_Dict.o \
 		./obj/VNoiseFileReader.o \
-                ./obj/VCamera.o \
+         ./obj/VCamera.o \
 		./obj/VDisplayBirdsEye.o \
 		./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
 		./obj/VCameraRead.o \
 		./obj/VDetectorGeometry.o \
 		./obj/VDetectorTree.o \
-	        ./obj/VImageParameterCalculation.o \
+	    ./obj/VImageParameterCalculation.o \
 		./obj/VImageBaseAnalyzer.o \
 		./obj/VImageCleaning.o \
 		./obj/VDB_CalibrationInfo.o\
 		./obj/VDB_Connection.o\
+		./obj/VEvndispRunParameter.o  ./obj/VEvndispRunParameter_Dict.o \
+		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+		./obj/VReadRunParameter.o \
+		./obj/VEvndispData.o \
+		./obj/VImageAnalyzerData.o \
+		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
+		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
+		./obj/VCalibrationData.o \
 		./obj/VCalibrator.o \
-                ./obj/VImageAnalyzer.o \
+        ./obj/VImageAnalyzer.o \
 		./obj/VArrayAnalyzer.o \
 		./obj/VMLPAnalyzer.o \
 		./obj/VDispAnalyzer.o \
@@ -343,12 +333,8 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VTraceHandler.o \
 		./obj/VFitTraceHandler.o \
 		./obj/VImageAnalyzerHistograms.o \
-		./obj/VImageAnalyzerData.o \
-		./obj/VCalibrationData.o \
 		./obj/VDST.o \
 		./obj/VDSTTree.o \
-		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
-		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
@@ -356,11 +342,7 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VDeadChannelFinder.o \
 		./obj/VSpecialChannel.o \
 		./obj/VDeadTime.o \
-		./obj/VEvndispRunParameter.o  ./obj/VEvndispRunParameter_Dict.o \
-		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-		./obj/VReadRunParameter.o \
 		./obj/VEventLoop.o \
-		./obj/VEvndispData.o \
 		./obj/VDBRunInfo.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/VUtilities.o \
@@ -381,19 +363,11 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VDisplay.o \
 		./obj/VDeadPixelOrganizer.o
 
-FROGSOBJECTS =	./obj/VFrogs.o \
-                ./obj/frogs.o \
-                ./obj/VFrogsParameters.o
-
 
 ifneq ($(ARCH),Darwin)
 EVNOBJECTS += ./obj/VDisplay_Dict.o
 endif
 
-# # add frogs objects
-# ifneq ($(GSLFLAG),-DNOGSL)
-#    EVNOBJECTS += $(FROGSOBJECTS)
-# endif
 # add VBF objects
 ifneq ($(VBFFLAG),-DNOVBF)
    EVNOBJECTS +=    ./obj/VRawDataReader.o \
@@ -410,9 +384,9 @@ EVNOBJECTS += ./obj/evndisp.o
 
 evndisp:	$(EVNOBJECTS)
 ifeq ($(GSLFLAG),-DNOGSL)
-	@echo "LINKING evndisp without GSL libraries (frogs)"
+	@echo "LINKING evndisp without GSL libraries"
 else
-	@echo "LINKING evndisp with GSL libraries (frogs)"
+	@echo "LINKING evndisp with GSL libraries"
 endif
 ifeq ($(VBFFLAG),-DNOVBF)
 	@echo "LINKING evndisp without VBF support"
@@ -715,11 +689,6 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
 		./obj/VPlotOptimalCut.o ./obj/VPlotOptimalCut_Dict.o
 
-ifeq ($(ROOT_MINUIT2),yes)
-  ifneq ($(ROOT6),0)
-    SHAREDOBJS	+= ./obj/VSourceGeometryFitter.o ./obj/VSourceGeometryFitter_Dict.o
-  endif
-endif
 ifneq ($(GSLFLAG),-DNOGSL)
   SHAREDOBJS	+= ./obj/VLikelihoodFitter.o ./obj/VLikelihoodFitter_Dict.o
 endif
@@ -731,22 +700,9 @@ endif
 slib lsib ./lib/libVAnaSum.so:   $(SHAREDOBJS)
 	mkdir -p ./lib
 	$(LD) $(SOFLAGS) $(SHAREDOBJS) $(GLIBS) $(OutPutOpt) ./lib/libVAnaSum.so
-ifneq ($(ROOT_MINUIT2),yes)
-	@echo "ROOT NOT COMPILED WITH MINUIT2"
-	@echo "THEREFORE: NO SOURCE GEOMETRY FITTER AVAILABLE"
-endif
-ifeq ($(FITS),FALSE)
-	@echo "NO FITS LIBRARIES FOUND, NO FITS SUPPORT"
-else
-	@echo "SHARED LIBRARIES WITH FITS SUPPORT"
-endif
-ifeq ($(ROOT6),0)
 	@echo "COPYING pcm FILES TO lib"
 	cp -f ./obj/*.pcm ./lib/
 	cp -f ./obj/*.pcm ./bin/
-endif
-	@echo "$@ done"
-
 
 ########################################################
 # printAnasumRunParameter
@@ -1464,9 +1420,11 @@ endif
 
 ./obj/%_Dict.o:	./inc/%.h ./inc/%LinkDef.h
 	@echo "Generating dictionary $@.."
-	@echo ${ROOT_CntCln} -f $(basename $@).cpp -c -p $(ROOT6FLAG) $?
-	${ROOT_CntCln} -f $(basename $@).cpp -c -p $(ROOT6FLAG) $?
+	@echo ${ROOT_CntCln} -f $(basename $@).cpp -c -p $?
+	${ROOT_CntCln} -f $(basename $@).cpp -c -p $?
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
+	cp -f -v $(basename $@)_rdict.pcm bin/
+	cp -f -v $(basename $@)_rdict.pcm lib/
 
 $(TARGET):	$(OBJECTS)
 ifeq ($(PLATFORM),macosx)
@@ -1482,27 +1440,35 @@ endif
 ########################################################
 ./obj/VFITS_Dict.o:
 	@echo "A Generating dictionary $@.."
-	@echo ${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I$(FITSSYS)/include inc/VFITS.h inc/VFITSLinkDef.h
-	${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I$(FITSSYS)/include inc/VFITS.h inc/VFITSLinkDef.h
+	@echo ${ROOT_CntCln} -f $(basename $@).cpp  -c -p -I$(FITSSYS)/include inc/VFITS.h inc/VFITSLinkDef.h
+	${ROOT_CntCln} -f $(basename $@).cpp  -c -p -I$(FITSSYS)/include inc/VFITS.h inc/VFITSLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
+	cp -f -v $(basename $@)_rdict.pcm bin/
+	cp -f -v $(basename $@)_rdict.pcm lib/
 
 ./obj/VDisplay_Dict.o:
 	@echo "A Generating dictionary $@.."
-	@echo ${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) $(ROOT6FLAG) ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
-	${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) $(ROOT6FLAG) ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
+	@echo ${ROOT_CntCln} -f $(basename $@).cpp  -c -p -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG)  ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
+	${ROOT_CntCln} -f $(basename $@).cpp  -c -p -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG)  ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
+	cp -f -v $(basename $@)_rdict.pcm bin/
+	cp -f -v $(basename $@)_rdict.pcm lib/
 
 ./obj/VLightCurve_Dict.o:
 	@echo "Generating dictionary $@..."
-	@echo ${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) $(ROOT6FLAG) ./inc/VLightCurve.h ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
-	${ROOT_CntCln} -f $(basename $@).cpp  -c -p $(ROOT6FLAG) -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) $(ROOT6FLAG) ./inc/VLightCurve.h ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
+	@echo ${ROOT_CntCln} -f $(basename $@).cpp  -c -p -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) ./inc/VLightCurve.h ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
+	${ROOT_CntCln} -f $(basename $@).cpp  -c -p -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) ./inc/VLightCurve.h ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
+	cp -f -v $(basename $@)_rdict.pcm bin/
+	cp -f -v $(basename $@)_rdict.pcm lib/
 
 ./obj/VZDCF_Dict.o:
 	@echo "Generating dictionary $@..."
-	@echo ${ROOT_CntCln} -f $(basename $@).cpp -c -p $(ROOT6FLAG) ./inc/VZDCF.h ./inc/VZDCFData.h ./inc/VZDCFLinkDef.h
-	${ROOT_CntCln} -f $(basename $@).cpp -c -p $(ROOT6FLAG) ./inc/VZDCF.h ./inc/VZDCFData.h ./inc/VZDCFLinkDef.h
+	@echo ${ROOT_CntCln} -f $(basename $@).cpp -c -p ./inc/VZDCF.h ./inc/VZDCFData.h ./inc/VZDCFLinkDef.h
+	${ROOT_CntCln} -f $(basename $@).cpp -c -p ./inc/VZDCF.h ./inc/VZDCFData.h ./inc/VZDCFLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
+	cp -f -v $(basename $@)_rdict.pcm bin/
+	cp -f -v $(basename $@)_rdict.pcm lib/
 
 ###############################################################################################################################
 # code which requires the libnova package installed in $LIBNOVASYS
@@ -1546,331 +1512,70 @@ writeFITS_eventlist:	$(writeFITS_eventlistOBJ)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) -L $(EVLIOSYS)/lib -lfitsrecord $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
-
-###############################################################################################################################
-# make a tar package with all the source files / Makefiles / scripts
-# used for distribution, file name is EVNDISP-$VERSION.tar.gz
-###############################################################################################################################
-dist: $(distdir).tar.gz
-
-$(distdir).tar.gz:	$(distdir)
-	tar chof - $(distdir) | gzip -9 -c > $@
-	rm -rf $(distdir)
-
-$(distdir):	FORCEDISTDIR
-	mkdir -p $(distdir)
-	cp Makefile $(distdir)
-	cp setObservatory.sh $(distdir)
-	cp setObservatory.tcsh $(distdir)
-	mkdir -p $(distdir)/obj
-	mkdir -p $(distdir)/bin
-	mkdir -p $(distdir)/lib
-	mkdir -p $(distdir)/README
-	cp README/README* $(distdir)/README
-	cp README/INSTALL $(distdir)/README
-	cp README/AUTHORS $(distdir)/README
-	cp README/CHANGELOG $(distdir)/README
-	mkdir -p $(distdir)/doc
-	cp doc/Manual.tex $(distdir)/doc
-	cp doc/Manual_Title.tex $(distdir)/doc
-	cp doc/Manual.pdf $(distdir)/doc
-	mkdir -p $(distdir)/src
-	cp src/*.cpp src/*.C src/*.c $(distdir)/src
-	mkdir -p $(distdir)/inc
-	cp inc/*.h $(distdir)/inc
-	mkdir -p $(distdir)/macros
-	cp -r macros/*.C $(distdir)/macros
-	mkdir -p $(distdir)/macros/CTA
-	cp -r macros/CTA/*.C $(distdir)/macros/CTA
-	mkdir -p $(distdir)/macros/VTS
-	cp -r macros/VTS/*.C $(distdir)/macros/VTS
-	cp -r macros/VTS/*.pl $(distdir)/macros/VTS
-	cp -r macros/VTS/*.sh $(distdir)/macros/VTS
-	mkdir -p $(distdir)/scripts/VTS
-	mkdir -p $(distdir)/scripts/VTS/helper_scripts
-	mkdir -p $(distdir)/scripts/CTA
-	mkdir -p $(distdir)/scripts/CTA/grid-tools
-	cp -r scripts/CTA/*.sh $(distdir)/scripts/CTA
-	cp -r scripts/CTA/*.list $(distdir)/scripts/CTA
-	cp -r scripts/CTA/CTA.EVNDISP* $(distdir)/scripts/CTA
-	cp -r scripts/CTA/grid-tools/* $(distdir)/scripts/CTA/grid-tools
-	cp -r scripts/VTS/*.sh $(distdir)/scripts/VTS
-	cp -r scripts/VTS/submissionCommands.dat $(distdir)/scripts/VTS
-	cp -r scripts/VTS/ANALYSIS.pipeline $(distdir)/scripts/VTS
-	cp -r scripts/VTS/helper_scripts/* $(distdir)/scripts/VTS/helper_scripts
-	mkdir -p $(distdir)/templates
-	cp -r templates/* $(distdir)/templates
-
-FORCEDISTDIR:
-	rm -rf $(distdir).tar.gz  >/dev/null 2>&1
-	rm -rf $(distdir) >/dev/null 2>&1
-
-###############################################################################################################################
-# make a tar package with all run parameter files
-###############################################################################################################################
-
-#########################################
-# CTA
-
-CTA.runfiles:	$(ctapara).tar.gz
-
-$(ctapara).tar.gz:	$(ctapara)
-	find $(ctapara) \( -type f -o -type d \) -print | cpio -o -H ustar > $(ctapara).tar
-	gzip $(ctapara).tar
-	rm -rf $(ctapara)
-
-$(ctapara):
-	rm -rf $(ctapara).tar.gz  >/dev/null 2>&1
-	rm -rf $(distdir) >/dev/null 2>&1
-	mkdir -p $(ctapara)
-	mkdir -p $(ctapara)/AstroData
-	cp -r $(CTA_EVNDISP_AUX_DIR)/AstroData/TeV_data $(ctapara)/AstroData
-	mkdir -p $(ctapara)/Calibration
-	mkdir -p $(ctapara)/DetectorGeometry
-	cp -r $(CTA_EVNDISP_AUX_DIR)/DetectorGeometry/prod1 $(ctapara)/DetectorGeometry
-	cp -r $(CTA_EVNDISP_AUX_DIR)/DetectorGeometry/CTA.prod2* $(ctapara)/DetectorGeometry
-	mkdir -p $(ctapara)/GammaHadronCutFiles
-	cp -Lr $(CTA_EVNDISP_AUX_DIR)/GammaHadronCutFiles/ANA* $(ctapara)/GammaHadronCutFiles
-	mkdir -p $(ctapara)/ParameterFiles
-	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/EFFECTIVEAREA.runparameter $(ctapara)/ParameterFiles
-	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.global.runparameter $(ctapara)/ParameterFiles
-	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.prod*.runparameter $(ctapara)/ParameterFiles
-	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(ctapara)/ParameterFiles
-	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/TMVA.BDT.runparameter $(ctapara)/ParameterFiles
-	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/scriptsInput.prod*.runparameter $(ctapara)/ParameterFiles
-	mkdir -p $(ctapara)/RadialAcceptances/
-	mkdir -p $(ctapara)/Calibration/
-	mkdir -p $(ctapara)/EffectiveAreas/
-	mkdir -p $(ctapara)/Tables/
-
-#########################################
-# VTS
-#
-# several packages with auxililary files
-#
-# VTS.runfiles (required)
-# VTS.calibration (required)
-# VTS.lookuptables (required)
-# VTS.effectiveareas (required)
-# VTS.radialacceptances (required)
-# VTS.dispBDTs (optional)
-# VTS.Frogs (optional) : Frogs related templates and parameter files
-#
-
-VTS.auxfiles:	$(vtspara).runfiles.tar.gz $(vtspara).calibration.tar.gz $(vtspara).lookuptables.tar.gz $(vtspara).effectiveareas.tar.gz $(vtspara).radialacceptances.tar.gz $(vtspara).VTS.GammaHadron_BDTs $(vtspara).dispBDTs.tar.gz
-
-VTS.runfiles:	$(vtspara).runfiles.tar.gz
-VTS.calibration:	$(vtspara).calibration.tar.gz
-VTS.lookuptables:	$(vtspara).lookuptables.tar.gz
-VTS.effectiveareas:	$(vtspara).effectiveareas.tar.gz
-VTS.radialacceptances:	$(vtspara).radialacceptances.tar.gz
-VTS.GammaHadronBDTs:	$(vtspara).GammaHadron_BDTs.tar.gz
-VTS.dispBDTs:	$(vtspara).dispBDTs.tar.gz
-
-######
-# VTS runparameter files
-
-$(vtspara).runfiles.tar.gz:
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).runfiles.tar.gz  >/dev/null 2>&1
-	rm -rf $(distdir) >/dev/null 2>&1
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
-# astrodata
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/AstroData
-	rsync -av --exclude=".*" $(VERITAS_EVNDISP_AUX_DIR)/AstroData/Catalogues $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/AstroData
-	rsync -av --exclude=".*"  $(VERITAS_EVNDISP_AUX_DIR)/AstroData/TeV_data $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/AstroData
-# detector geometry
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/DetectorGeometry
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V4_Autumn2007_20130110.txt $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/DetectorGeometry
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V6_Upgrade_20121127_v420.txt $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/DetectorGeometry
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/DetectorGeometry
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/DetectorGeometry
-# gamma hadron files
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/GammaHadronCutFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/GammaHadronCutFiles/ANASUM.GammaHadron-Cut* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/GammaHadronCutFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/GammaHadronCutFiles/FROGS* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/GammaHadronCutFiles
-# run parameter files
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.timemask.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.runlist $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EFFECTIVEAREA.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.global.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.Hough.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter.DISP $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter.SumWindow6-DISP $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter.SumWindow6-noDISP $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter.allCutSets $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter.SumWindow6.allCutSets $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.SW18_noDoublePass.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.SWXX_DoublePass.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.LMULT.SWXX.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.LGCalibration.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.specialchannels.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.validchannels.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/TMVA.BoxCuts.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/COMPAREMC.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/SENSITIVITY.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/VISIBILITY.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/VERITAS.*.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/ParameterFiles
-# make package
-	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).runfiles.tar.gz . && cd ..
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
-
-######
-# VTS calibration files
-
-$(vtspara).calibration.tar.gz:
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).calibration.tar.gz  >/dev/null 2>&1
-	rm -rf $(distdir) >/dev/null 2>&1
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_1
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_2
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_3
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_4
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.LowGain.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.LowGainForCare.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.LowGainForCalibration.dat $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Calibration/LowGainPedestals.lped $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/
-	rsync -av --exclude=".*" $(VERITAS_EVNDISP_AUX_DIR)/Calibration/CareSimulations $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/
-#	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_1/36862.lpe* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_1/
-#	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_2/36862.lpe* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_2/
-#	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_3/36862.lpe* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_3/
-#	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_4/36862.lpe* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_4/
-#	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_1/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_1/
-#	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_2/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_2/
-#	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_3/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_3/
-#	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_4/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Calibration/Tel_4/
-# NSB files for pedestal calculation in grisu simulations
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/NOISE
-	cp -L $(VERITAS_EVNDISP_AUX_DIR)/NOISE/*.grisu $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/NOISE
-# make tar file
-	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).calibration.tar.gz . && cd ..
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
-
-######
-# VTS lookup table files
-
-$(vtspara).lookuptables.tar.gz:
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).lookuptables.tar.gz  >/dev/null 2>&1
-	rm -rf $(distdir) >/dev/null 2>&1
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Tables
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Tables/table-v$(auxversion)* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Tables
-#	make tar file
-	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).lookuptables.tar.gz . && cd ..
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
-
-
-######
-# VTS radial acceptances
-
-$(vtspara).radialacceptances.tar.gz:
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).radialacceptances.tar.gz  >/dev/null 2>&1
-	rm -rf $(distdir) >/dev/null 2>&1
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/RadialAcceptances
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/RadialAcceptances/radialAcceptance-v$(auxversion)* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/RadialAcceptances
-#	make tar file
-	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).radialacceptances.tar.gz . && cd ..
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
-
-######
-# VTS effective areas
-
-$(vtspara).effectiveareas.tar.gz:
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).effectiveareas.tar.gz  >/dev/null 2>&1
-	rm -rf $(distdir) >/dev/null 2>&1
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/EffectiveAreas
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/EffectiveAreas/effArea-v$(auxversion)* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/EffectiveAreas
-#	make tar file
-	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).effectiveareas.tar.gz . && cd ..
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
-
-######
-# VTS disp BDTs
-
-$(vtspara).dispBDTs.tar.gz:
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).dispBDTs.tar.gz  >/dev/null 2>&1
-	rm -rf $(distdir) >/dev/null 2>&1
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/DISP_BDTs
-	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/DISP_BDTs/V* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/DISP_BDTs/
-#	make tar file
-	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).dispBDTs.tar.gz . && cd ..
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
-
-######
-# VTS gamma/hadron BDTs
-
-$(vtspara).GammaHadron_BDTs.tar.gz:
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).GammaHadron_BDTs.tar.gz  >/dev/null 2>&1
-	rm -rf $(distdir) >/dev/null 2>&1
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/GammaHadron_BDTs
-	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/GammaHadron_BDTs/V* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/GammaHadron_BDTs/
-#	make tar file
-	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).GammaHadron_BDTs.tar.gz . && cd ..
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
-
-######
-# VTS Frogs template and parameter files
-
-$(vtspara).Frogs.tar.gz:
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara).Frogs.tar.gz  >/dev/null 2>&1
-	rm -rf $(distdir) >/dev/null 2>&1
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs
-	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/Frogs/*.txt $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs/
-	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/Frogs/*.runparameter $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs/
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs/Templates/V6
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs/Templates/V5
-	mkdir -p $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs/Templates/V4
-	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/Frogs/Templates/V6/frogs* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs/Templates/V6/
-	cp -f -r $(VERITAS_EVNDISP_AUX_DIR)/Frogs/Templates/V5/frogs* $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)/Frogs/Templates/V5/
-#	make tar file
-	cd $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara) && tar -zcvf ../$(vtspara).Frogs.tar.gz . && cd ..
-	rm -rf $(VERITAS_USER_DATA_DIR)/tmpIRF/$(vtspara)
-
-######
-# VTS Frogs template and parameter files
-
 ###############################################################################################################################
 # print environment and compilation parameters
 ###############################################################################################################################
 printconfig configuration config:
 	@echo ""
-	@echo "CONFIGURATION TEST FOR $(package) version $(version)"
+	@echo "CONFIGURATION SUMMARY FOR $(package) version $(version)"
 	@echo "======================================================"
 	@echo ""
-	@echo "gcc $(GCCVERSION) on $(GCCMACHINE) $(ARCH)"
+	@echo "$(CXX) $(GCCVERSION) on $(GCCMACHINE) $(ARCH)"
+	@echo "    $(GCC_VER_MAJOR) $(GCC_VER_MINOR) $(GCC_GT_4_8)"
+	@echo "    $(CXXFLAGS)"
+	@echo "    $(GLIBS)"
 	@echo ""
 	@echo "using root version $(ROOTVERSION)"
-	@echo "    compiled with MLP: $(ROOT_MLP), MINUIT2: $(ROOT_MINUIT2), MYSQL: $(ROOT_MYSQL), DCACHE: $(ROOT_DCACHE), MATHMORE: $(ROOT_MATHMORE)"
+	@echo "    compiled with MLP: $(ROOT_MLP), MYSQL: $(ROOT_MYSQL), DCACHE: $(ROOT_DCACHE), MATHMORE: $(ROOT_MATHMORE)"
+	@echo "    $(ROOTSYS)"
 	@echo ""
 ifeq ($(GSLFLAG),-DNOGSL)
 	@echo "evndisp without GSL libraries (no Hough muon calibration, no likelihood fitter)"
 else
 	@echo "evndisp with GSL libraries (used in Hough muon calibration, likelihood fitter)"
+	@echo "   GSL  $(GSLFLAG)" 
+	@echo "   GSL2 $(GSL2FLAG)" 
+	@echo "   $(GSLCFLAGS) $(GSLLIBS)"
 endif
+	@echo ""
 ifeq ($(VBFFLAG),-DNOVBF)
 	@echo "evndisp without VBF support"
 else
 	@echo "evndisp with VBF support"
-	@echo "$(VBFSYS)"
+	@echo "    VBFSYS $(VBFSYS)"
+	@echo "    VBFCFLAGS $(VBFCFLAGS)"
+	@echo "    VBFLIBS $(VBFLIBS)"
 endif
+ifeq ($(VBFFLAG),-DVBF_034)
+	@echo "    VBF support includes additional corsika info (version 0.34)"
+endif
+	@echo ""
 ifeq ($(DBFLAG),-DRUNWITHDB)
-	@echo "evndisp with database support"
+	@echo "evndisp with database (mysql) support"
 else
-	@echo "evndisp without database support"
+	@echo "evndisp without database (mysql) support"
 endif
+	@echo ""
 ifeq ($(HESSIO),FALSE)
 	@echo "no HESSIO support enabled"
 else
 	@echo "HESSIO support enabled"
 endif
+	@echo ""
 ifeq ($(FITS),FALSE)
 	@echo "no FITS support enabled"
 else
-	@echo "FITS support enabled"
+	@echo "FITS support enabled $(FITSSYS)"
 endif
 	@echo ""
+ifeq ($(ASTRONMETRY),-DASTROSOFA)
+	@echo "Astronometry with SOFALIB $(SOFASYS)"
+else
+	@echo "Astronometry with SLALIB"
+endif
+
+	@echo ""
+
 	@echo "Testing EVNDISP environmental variables (for VTS and CTA):"
 	@echo "----------------------------------------------------------"
 ifeq ($(strip $(EVNDISPSYS)),)

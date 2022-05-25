@@ -1,9 +1,7 @@
 /*! \class VImageAnalyzer
   \brief class for analyzing VERITAS data
 
-  \author
-  Jamie Holder
-  Gernot Maier
+    image analysis (per telescope)
 
 */
 
@@ -48,7 +46,7 @@ VImageAnalyzer::VImageAnalyzer()
 	{
 		fAnaDir.push_back( 0 );
 	}
-	// initialize tgraphs
+    // initialize tgraphs (used for double pass method)
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
 		fXGraph.push_back( new TGraphErrors( 1 ) );
@@ -58,34 +56,19 @@ VImageAnalyzer::VImageAnalyzer()
 	
 	//If -hough is specified on the command line, run the hough transform initialization method in
 	//VImageParameterCalculation
-	if( fRunPar->fhoughmuonmode )
+    if( fRunPar->fhoughmuonmode || fRunPar->fmuonmode )
 	{
-	
 #ifndef NOGSL
 		cout << "Using GSL libraries for muon analysis." << endl;
 #else
 		cout << "Warning! No GSL libraries found. Muon impact parameter corrected Size will not be calculated." << endl;
 #endif
-		
 		cout << "" << endl;
-		
-		fVImageParameterCalculation->houghInitialization();
-		
+        if( fRunPar->fhoughmuonmode )
+        {
+            fVImageParameterCalculation->houghInitialization();
+        }
 	}
-	
-	if( fRunPar->fmuonmode )
-	{
-	
-#ifndef NOGSL
-		cout << "Using GSL libraries for muon analysis." << endl;
-#else
-		cout << "Warning! No GSL libraries found. Muon impact parameter corrected Size will not be calculated." << endl;
-#endif
-		
-		cout << "" << endl;
-		
-	}
-	
 }
 
 
@@ -96,7 +79,11 @@ VImageAnalyzer::~VImageAnalyzer()
 }
 
 
-/*!
+/*
+ *  run through different steps of image cleaning and image parameterization
+ *
+ *  this is the main loop
+ *
  */
 void VImageAnalyzer::doAnalysis()
 {
@@ -154,7 +141,7 @@ void VImageAnalyzer::doAnalysis()
 	}
 	if( getDebugFlag() )
 	{
-		cout << "VAnalysis:doAnalysis array trigger: " << getReader()->hasArrayTrigger() << endl;
+		cout << "VImageAnalyzer:doAnalysis array trigger: " << getReader()->hasArrayTrigger() << endl;
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
@@ -163,23 +150,24 @@ void VImageAnalyzer::doAnalysis()
 	{
 		calcTZerosSums( getSumFirst(), getSumFirst() + getSumWindow_Pass1(), getTraceIntegrationMethod_pass1() );
 	}
+    // no double pass (e.g. NN cleaning)
 	else
 	{
 		calcTZerosSums( getSumFirst(), getSumFirst() + getSumWindow(), getTraceIntegrationMethod() );
 	}
 	
-	// fill saturated channels
+	// number of saturated channels
 	getImageParameters()->nsat = fillSaturatedChannels();
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
-	// correct for jitter timing
+    // correct for FADC crate jitter timing
 	if( fRunPar->fL2TimeCorrect )
 	{
 		FADCStopCorrect();
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
-	// apply timing correction from laser calibration
+    // apply timing correction from laser calibration (flatfielding in time)
 	timingCorrect();
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
@@ -194,29 +182,17 @@ void VImageAnalyzer::doAnalysis()
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
-	// parallax width cleaning
-	if( fRunPar->fPWmethod > -1 )
-	{
-		fVImageCleaning->cleanTriggerFixed( getImageThresh(), getBorderThresh() );
-	}
-	
-	///////////////////////////////////////////////////////////////////////////////////////////
 	// set parameters for image parameter calculation
 	fVImageParameterCalculation->setDetectorGeometry( getDetectorGeometry() );
 	fVImageParameterCalculation->setParameters( getImageParameters() );
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
-	// parallax width trigger parameter calculation
-	if( fRunPar->fPWmethod > -1 )
-	{
-		fVImageParameterCalculation->calcTriggerParameters( getTrigger() );
-	}
-	
-	///////////////////////////////////////////////////////////////////////////////////////////
 	// image parameter calculation
 	fVImageParameterCalculation->calcParameters();
 	fVImageParameterCalculation->calcTimingParameters();
+
 	///////////////////////////////////////////////////////////////////////////////////////////
+    // here: no double pass trace integration
 	// do a log likelihood image fitting on events on the camera edge only
 	if( !fRunPar->fDoublePass || !fReader->hasFADCTrace() )
 	{
@@ -295,13 +271,6 @@ void VImageAnalyzer::doAnalysis()
 				getGains( true )[i] = savedGainsLow[i];
 			}
 		}
-		///////////////////////////////////////////////////////////////////////////////////////////
-		// parallax width trigger parameter calculation
-		if( fRunPar->fPWmethod > -1 )
-		{
-			fVImageCleaning->cleanTriggerFixed( getImageThresh(), getBorderThresh() );
-			fVImageParameterCalculation->calcTriggerParameters( getTrigger() );
-		}
 		
 		///////////////////////////////////////////////////////////////////////////////////////////
 		// image parameter calculation
@@ -322,7 +291,7 @@ void VImageAnalyzer::doAnalysis()
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
-	// log likelihood image analysis
+    // log likelihood image analysis (not default)
 	// calculate image parameters (mainly for edge images)
 	if( fRunPar->fImageLL && getImageParameters()->ntubes > 0 )
 	{
@@ -446,7 +415,7 @@ void VImageAnalyzer::terminate( bool iDebug_IO )
 		// write calibration summaries
 		if( getRunParameter()->fsourcetype != 7 )
 		{
-			getCalibrationData()->terminate( getDead( false ), getDead( true ) );
+            getCalibrationData()->terminate( getDead( false ), getDead( true ), getRunParameter()->fTraceIntegrationMethod[fTelID] );
 		}
 		// write dead channel tree
 		// note: this writes the dead channel list of the last event to this tree
@@ -519,13 +488,13 @@ void VImageAnalyzer::initOutput()
 	if( fRunPar->foutputfileName != "-1" )
 	{
 		// tree versioning numbers used in mscw_energy
-		char i_textTitle[200];
-		sprintf( i_textTitle, "VERSION %d", fRunPar->getEVNDISP_TREE_VERSION() );
+        stringstream i_textTitle;
+        i_textTitle << "VERSION " << fRunPar->getEVNDISP_TREE_VERSION();
 		if( getRunParameter()->fShortTree )
 		{
-			sprintf( i_textTitle, "%s (short tree)", i_textTitle );
+            i_textTitle << "(short tree)";
 		}
-		fOutputfile = new TFile( fRunPar->foutputfileName.c_str(), "RECREATE", i_textTitle );
+        fOutputfile = new TFile( fRunPar->foutputfileName.c_str(), "RECREATE", i_textTitle.str().c_str() );
 		if( fOutputfile->IsZombie() )
 		{
 			cout << endl;
@@ -667,6 +636,7 @@ bool VImageAnalyzer::initEvent()
 	// fill high/low gain vector
 	getImageParameters()->nlowgain = fillHiLo();
 	// fill vector with zero suppressed channels
+    // (return number of zero suppressed channels)
 	getImageParameters()->nzerosuppressed = fillZeroSuppressed();
 	
 	if( fRunPar->fImageLL )
@@ -888,7 +858,6 @@ void VImageAnalyzer::printTrace( int iChannel )
 		}
 	}
 	cout << endl;
-	
 }
 
 
@@ -933,20 +902,15 @@ void VImageAnalyzer::setNTrigger()
 	std::vector<bool> triggered = getReader()->getFullTrigVec();
 	unsigned int triggered_size = triggered.size();
 	unsigned short max_num_in_patch = 0;
-	float xj = 0.;
-	float yj = 0.;
-	float xi = 0.;
-	float yi = 0.;
-	unsigned short  num_in_patch = 0;
 	
 	for( unsigned int i = 0; i < triggered_size; i++ )
 	{
 		if( triggered[i] && i < getDetectorGeo()->getNumChannels() )
 		{
 			//! find position of triggered tube
-			xi = getDetectorGeo()->getX()[i];
-			yi = getDetectorGeo()->getY()[i];
-			num_in_patch = 1;
+			float xi = getDetectorGeo()->getX()[i];
+			float yi = getDetectorGeo()->getY()[i];
+			unsigned short num_in_patch = 1;
 			//! see how many other triggered tubes are within 0.3 degrees
 			for( unsigned int j = 0; j < triggered_size; j++ )
 			{
@@ -964,8 +928,8 @@ void VImageAnalyzer::setNTrigger()
 					{
 						continue;
 					}
-					xj = getDetectorGeo()->getX()[j];
-					yj = getDetectorGeo()->getY()[j];
+					float xj = getDetectorGeo()->getX()[j];
+					float yj = getDetectorGeo()->getY()[j];
 					if( ( xj - xi ) * ( xj - xi ) + ( yj - yi ) * ( yj - yi ) < 0.09 )
 					{
 						num_in_patch += 1;
@@ -981,6 +945,13 @@ void VImageAnalyzer::setNTrigger()
 	getImageParameters()->ntrig_per_patch = max_num_in_patch;
 }
 
+/*
+ *   run the image cleaning
+ *
+ *   - select the correct image cleaning method and pass parameters
+ *
+ *
+ */
 void VImageAnalyzer::imageCleaning()
 {
 	if( !getImageCleaningParameter() )
@@ -995,18 +966,17 @@ void VImageAnalyzer::imageCleaning()
 		gainCorrect();
 		if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMECLUSTERCLEANING" )
 		{
-			fVImageCleaning->cleanImageFixedWithTiming( getImageThresh(), getBorderThresh(), getBrightNonImageThresh(),
-					getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
+			fVImageCleaning->cleanImageFixedWithTiming( getImageCleaningParameter() );
 		}
 		// time-next-neighbour cleaning
 		else if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMENEXTNEIGHBOUR" )
 		{
-			fVImageCleaning->cleanNNImageFixed();
+			fVImageCleaning->cleanNNImageFixed( getImageCleaningParameter() );
 		}
 		// fixed cleaning levels (classic image/border)
 		else
 		{
-			fVImageCleaning->cleanImageFixed( getImageThresh(), getBorderThresh(), getBrightNonImageThresh() );
+			fVImageCleaning->cleanImageFixed( getImageCleaningParameter() );
 		}
 	}
 	/////////////////////////////
@@ -1015,25 +985,29 @@ void VImageAnalyzer::imageCleaning()
 	{
 		if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMECLUSTERCLEANING" )
 		{
-			fVImageCleaning->cleanImagePedvarsWithTiming( getImageThresh(), getBorderThresh(), getBrightNonImageThresh(),
-					getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
+			fVImageCleaning->cleanImagePedvarsWithTiming( getImageCleaningParameter() );
 		}
 		else if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMENEXTNEIGHBOUR" )
 		{
-			fVImageCleaning->cleanNNImagePedvars();
+			cout << "Error cleaning method ";
+            cout << getImageCleaningParameter()->getImageCleaningMethod();
+            cout << " not defined for signal/noise thresholds" << endl;
+            cout << "exiting..." << endl;
+            exit( EXIT_FAILURE );
 		}
+        // simple time two-level cleaning
 		else if( getImageCleaningParameter()->getImageCleaningMethod() == "TWOLEVELANDCORRELATION" )
 		{
-			fVImageCleaning->cleanImageTraceCorrelate( getImageCleaningParameter()->fCorrelationCleanBoardThresh, getImageCleaningParameter()->fCorrelationCleanCorrelThresh, getImageCleaningParameter()->fCorrelationCleanNpixThresh );
+			fVImageCleaning->cleanImageTraceCorrelate( getImageCleaningParameter() );
 		}
 		// simple time two-level cleaning
 		else if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMETWOLEVEL" )
 		{
-			fVImageCleaning->cleanImagePedvarsTimeDiff( getImageThresh(), getBorderThresh(), getBrightNonImageThresh(), getTimeTwoLevelCleaningTimeDiff() );
+			fVImageCleaning->cleanImagePedvarsTimeDiff( getImageCleaningParameter() );
 		}
 		else
 		{
-			fVImageCleaning->cleanImagePedvars( getImageThresh(), getBorderThresh(), getBrightNonImageThresh() );
+			fVImageCleaning->cleanImagePedvars( getImageCleaningParameter() );
 		}
 		gainCorrect();
 	}

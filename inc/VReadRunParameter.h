@@ -47,7 +47,6 @@ class VReadRunParameter
 		bool getRunParametersFromDST();
 		bool readEpochsAndAtmospheres();
                 bool readTraceAmplitudeCorrections( string ifile );
-		bool readTrigSimInputCard( TString card );
 		void setDirectories();
 		
 	public:

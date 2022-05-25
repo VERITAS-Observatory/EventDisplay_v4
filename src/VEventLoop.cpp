@@ -481,6 +481,9 @@ bool VEventLoop::initEventLoop( string iFileName )
 			exit( -1 );
 		}
 	}
+    // initialize analyzers (output files are created as well here)
+    initializeAnalyzers();
+    
 	
 	// create calibrators, analyzers, etc. at first event
 	if( fCalibrator )
@@ -488,7 +491,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 		fCalibrator->initialize();
 	}
 	
-	initializeAnalyzers();
+    // initialize pedestal calculator
 	if( fPedestalCalculator && fRunPar->fPedestalsInTimeSlices )
 	{
 		fPedestalCalculator->initialize( ( fRunMode == R_PED ),  getNChannels(), fRunPar->fPedestalsLengthOfTimeSlice,
@@ -613,7 +616,8 @@ void VEventLoop::initializeAnalyzers()
 	}
 	
 	// set analysis data storage classes
-	// (slight inconsistency, produce VImageAnalyzerData for all telescopes, not only for the requested ones
+	// (slight inconsistency, produce VImageAnalyzerData for all telescopes,
+    //  not only for the requested ones (in teltoana))
 	if( fAnaData.size() == 0 )
 	{
 		for( unsigned int i = 0; i < fNTel; i++ )
