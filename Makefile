@@ -283,7 +283,6 @@ all VTS:	evndisp \
 	VTS.getRunListFromDB \
 	VTS.getLaserRunFromDB \
 	VTS.getRun_TimeElevAzim \
-	printRunParameter \
 	writeParticleRateFilesForTMVA \
 	writelaserinDB \
 	logFile
@@ -1406,7 +1405,7 @@ VTS.next_day:	./obj/VFITS.o ./obj/VFITS_Dict.o \
 		./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 		./obj/VFluxCalculation.o ./obj/VFluxCalculation_Dict.o \
 		./obj/VLightCurve.o ./obj/VLightCurve_Dict.o \
-		./obj/VLightCurveData.o \
+		./obj/VLightCurveData.o ./obj/VLightCurveData_Dict.o \
 		./obj/VLightCurveUtilities.o ./obj/VLightCurveUtilities_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 		./obj/VTS.next_day.o
@@ -1915,8 +1914,6 @@ else
 	@echo "CTA_USER_DATA_DIR set to $(CTA_USER_DATA_DIR)"
 endif
 
-
-
 ###############################################################################################################################
 # source code formating
 ###############################################################################################################################
@@ -1932,7 +1929,10 @@ install:	all
 
 ###############################################################################################################################
 clean:
-	-rm -f ./obj/*.o ./obj/*_Dict.cpp ./obj/*_Dict.h ./lib/*.pcm
+	-rm -f ./obj/*.o ./obj/*_Dict.cpp ./obj/*_Dict.h ./lib/*.pcm ./obj/*.pcm ./bin/*.pcm
+
+rclean:
+	-rm -f ./obj/*.o ./obj/*_Dict.cpp ./obj/*_Dict.h ./bin/* ./lib/libVAnaSum.so ./lib/*.pcm ./obj/*dict.pcm ./bin/*.pcm
 ###############################################################################################################################
 
 .PHONY: all clean install FORCEDISTDIR dist TESTHESSIO TESTFITS configuration

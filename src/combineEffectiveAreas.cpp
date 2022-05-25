@@ -491,15 +491,15 @@ int main( int argc, char* argv[] )
 	if( argc < 4 )
 	{
 		cout << endl;
-		cout << "combineEffectiveAreas <effective area files> <combined file> <tree type>" << endl; 
-                cout << endl;
-                cout << "  <tree type>  effective area tree type (defines size of combined tree)" << endl;
-                cout << "                - DL3 (default): entries required for DL3 analyis (large)" << endl;
-                cout << "                - all          : all entries of original trees (largest)" << endl;
-                cout << "                - anasum       : entries required for anasum analysis only (smallest)" << endl;
-                cout << "                - DL3reduced   : histograms are written as regular arrays for DL3 analysis" << endl;
+		cout << "combineEffectiveAreas <effective area file list> <combined file> <tree type>" << endl; 
+        cout << endl;
+        cout << "  <effective area file list>  list of effective files to be merged" << endl;
+        cout << "  <tree type>  effective area tree type (defines size of combined tree)" << endl;
+        cout << "                - DL3 (default): entries required for DL3 analyis (large)" << endl;
+        cout << "                - all          : all entries of original trees (largest)" << endl;
+        cout << "                - anasum       : entries required for anasum analysis only (smallest)" << endl;
+        cout << "                - DL3reduced   : histograms are written as regular arrays for DL3 analysis" << endl;
 		cout << endl;
-		cout << "   <effective area files>    without .root suffix (e.g. effArea*. Note need of \"...\")" << endl;
 		cout << endl;
 		exit( EXIT_FAILURE );
 	}
@@ -508,7 +508,7 @@ int main( int argc, char* argv[] )
 	cout << "------------------------------------" << endl;
 	cout << endl;
 
-        vector< string > file_list = readListOfFiles( argv[1] );
+    vector< string > file_list = readListOfFiles( argv[1] );
 	
 	merge( file_list, argv[2], argv[3] );
     write_reduced_merged_tree( file_list, argv[2], argv[3] );
