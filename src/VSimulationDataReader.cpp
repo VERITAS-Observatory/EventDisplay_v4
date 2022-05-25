@@ -3,9 +3,6 @@
 
     workaround to get simulation data from vbf file format
 
-
-    \author
-      Gernot Maier
 */
 
 #include "VSimulationDataReader.h"

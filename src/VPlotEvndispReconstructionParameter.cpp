@@ -7,7 +7,6 @@
 
     Note: not all cuts are implemented yet
 
-    \Author Gernot Maier
 */
 
 #include "inc/VPlotEvndispReconstructionParameter.h"

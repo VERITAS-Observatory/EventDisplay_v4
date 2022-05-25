@@ -2,7 +2,7 @@
  *  \brief bright star catalogue
 
 
-    \author Gernot Maier
+    
 */
 
 #include "VStarCatalogue.h"

@@ -2,8 +2,6 @@
  *  \brief radial acceptance for a given point on the sky
  *
  *
- *    \author
- *    Gernot Maier
  */
 
 #include "VRadialAcceptance.h"

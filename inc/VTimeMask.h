@@ -4,7 +4,6 @@
  * ---------------------------------------------
  * Created: Mon  2 Mar 00:00:10 2009
  * Author: Michael McCutcheon
- * $Id: VTimeMask.h,v 1.1.2.1.8.1.2.1.2.1 2010/10/30 03:46:19 gmaier Exp $
  */
 #ifndef VTIMEMASK_H
 #  define VTIMEMASK_H

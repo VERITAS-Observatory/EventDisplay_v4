@@ -7,7 +7,7 @@
      * add mean HV values
 
 
-    \author Gernot Maier
+    
 */
 
 #include "VRunStats.h"

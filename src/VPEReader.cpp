@@ -2,9 +2,6 @@
 
      reading class for pe files
 
-
-     \author
-       Gernot Maier
 */
 
 #include <VPEReader.h>

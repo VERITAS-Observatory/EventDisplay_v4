@@ -4,20 +4,15 @@
 #
 #  for VERITAS: make VTS
 #
-#  for CTA:     make CTA
-#
 #  shell variables needed:
 #    ROOTSYS (pointing to your root installation)
 #
-#  Libraries needed either for CTA or VTS:
+#  Libraries needed either for VTS:
 #
 #  for reading of VBF files (optional, VERITAS only)
 #    VBFSYS  (pointing to VBF installation)
 #    or
 #   vbfConfig exists
-#
-#  for reading of sim_telarray (HESSIO) files (optional, CTA only)
-#    HESSIOSYS (pointing to HESSIO installation)
 #
 #  Optional libraries:
 #
@@ -38,11 +33,6 @@ ARCH = $(shell uname)
 #############################
 package = EVNDISP
 version = 490
-# version of auxiliary files
-auxversion = $(version)-auxv01
-distdir = $(package)-$(version)
-ctapara = $(distdir).CTA.runparameter
-vtspara = $(package)-$(auxversion).VTS.aux
 #############################
 #############################
 # check root version number
@@ -54,11 +44,9 @@ ROOT_CntCln = rootcling
 #############################
 # check for root libraries
 #############################
-ROOT_MLP=$(shell root-config --has-xml)
 # mysql support
 # (necessary for VERITAS data analysis)
 ROOT_MYSQL=$(shell root-config --has-mysql)
-ROOT_DCACHE=$(shell root-config --has-dcache)
 #############################
 # VERITAS BANK FORMAT (VBF)
 #############################
@@ -69,15 +57,6 @@ ifeq ($(origin VBFSYS), undefined)
   ifeq ($(strip $(VBFTEST)),)
    VBFFLAG=-DNOVBF
   endif
-endif
-#############################
-# DCACHE
-# (necessary for CTA data analysis)
-#############################
-# check that root is compiled with dcache
-DCTEST=$(shell root-config --has-dcache)
-ifeq ($(DCTEST),yes)
-  DCACHEFLAG=-DRUNWITHDCACHE
 endif
 #############################
 # VERITAS DATABASE
@@ -102,23 +81,6 @@ ifeq ($(origin GSLSYS), undefined)
     GSLFLAG=-DNOGSL
   endif
 endif
-# GSLFLAG=-DNOGSL
-
-ifneq ($(GSLFLAG),-DNOGSL)
-# check GSL version
-  GSLV2=$(shell expr 2.0 \>= `gsl-config --version`)
-  ifeq ($(GSLV2),0)
-    GSL2FLAG=-DGSL2
-  endif
-endif
-#####################
-# CTA HESSIO INPUT
-#####################
-# USE HESSIO LIBRARY
-# (necessary for CTA hessio to VDST converter)
-ifeq ($(strip $(HESSIOSYS)),)
-HESSIO = FALSE
-endif
 #####################
 # FITS ROUTINES
 # (optional, necessary for root to FITS converter)
@@ -134,7 +96,7 @@ endif
 CXX           = g++
 CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
 CXXFLAGS     += -I. -I./inc/
-CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG) $(GSL2FLAG) $(DCACHEFLAG)
+CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG)
 LD            = g++
 OutPutOpt     = -o
 INCLUDEFLAGS  = -I. -I./inc/
@@ -181,10 +143,6 @@ CXXFLAGS     += -I$(shell root-config --incdir) -I$(shell root-config --incdir)/
 ROOTGLIBS     = $(shell root-config --glibs)
 GLIBS         = $(ROOTGLIBS)
 GLIBS        += -lMLP -lTreePlayer -lTMVA -lMinuit -lXMLIO -lSpectrum
-
-#ifeq ($(DCTEST),yes)
-#   GLIBS     += -lDCache
-#endif
 ########################################################
 # VBF
 ########################################################
@@ -192,7 +150,6 @@ ifneq ($(VBFFLAG),-DNOVBF)
 VBFCFLAGS     = -I$(VBFSYS)/include/VBF/
 VBFLIBS       = $(shell $(VBFSYS)/bin/vbfConfig --ldflags --libs)
 CXXFLAGS     += $(VBFCFLAGS)
-#GLIBS        += $(VBFLIBS)
 endif
 ########################################################
 # GSL FLAGS
@@ -202,7 +159,7 @@ ifneq ($(GSLFLAG),-DNOGSL)
 GSLCFLAGS    = $(shell gsl-config --cflags)
 GSLLIBS      = $(shell gsl-config --libs)
 GLIBS        += $(GSLLIBS)
-CXXFLAGS     += $(GSLCFLAGS) $(GSL2FLAG)
+CXXFLAGS     += $(GSLCFLAGS)
 endif
 ########################################################
 # FITS
@@ -211,28 +168,6 @@ ifneq ($(FITS),FALSE)
 GLIBS		+= -L$(FITSSYS)/lib -lcfitsio
 CXXFLAGS	+= -I$(FITSSYS)/include/
 endif
-########################################################
-# HESSIO
-########################################################
-ifneq ($(HESSIO),FALSE)
-HESSIOINCLUDEFLAGS = -I $(HESSIOSYS)/include/
-#CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_MAX
-# 2010 PROD1 production
-# CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
-# 2011 PROD1 production for Leeds
-# CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_ULTRA
-# 2011 PROD1 SC
-# CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_SC=2
-# 2013 PROD2
-CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_PROD2 -DCTA_PROD2_TRGMASK
-# SC MST FLAGS (needs 201312 hessio version)
-# CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_SC=3
-endif
-########################################################
-# profiler (gperftools)
-########################################################
-#GLIBS        += -L/afs/ifh.de/group/cta/scratch/maierg/software/lib/lib/ -ltcmalloc
-#CXXFLAGS     += -fno-omit-frame-pointer
 
 ########################################################
 # paths
@@ -268,19 +203,6 @@ all VTS:	evndisp \
 	writeParticleRateFilesForTMVA \
 	writelaserinDB \
 	logFile
-
-CTA:	evndisp \
-        CTA.convert_hessio_to_VDST \
-        printRunParameter \
-	mscw_energy \
-	combineLookupTables \
-	makeEffectiveArea \
-	trainTMVAforGammaHadronSeparation \
-	slib \
-	writeCTAWPPhysSensitivityFiles \
-	writeCTAWPPhysSensitivityTree \
-	writeParticleRateFilesFromEffectiveAreas \
-	printRunParameter
 
 ###############################################################################################################################
 # core eventdisplay package
@@ -614,7 +536,6 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 		./obj/VFluxCalculation.o ./obj/VFluxCalculation_Dict.o \
 		./obj/VStatistics_Dict.o \
-		./obj/VCTASensitivityRequirements.o ./obj/VCTASensitivityRequirements_Dict.o \
 		./obj/VDifferentialFlux.o ./obj/VDifferentialFlux_Dict.o \
 		./obj/VSpectralFitter.o ./obj/VSpectralFitter_Dict.o \
 		./obj/VEnergyThreshold.o ./obj/VEnergyThreshold_Dict.o \
@@ -679,12 +600,10 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VPlotEvndispReconstructionParameter.o ./obj/VPlotEvndispReconstructionParameter_Dict.o \
 		./obj/VImageParameter.o  \
 		./obj/VPlotWPPhysSensitivity.o ./obj/VPlotWPPhysSensitivity_Dict.o \
-		./obj/VPlotPPUT.o ./obj/VPlotPPUT_Dict.o \
 		./obj/VSiteData.o \
 		./obj/VPlotTMVAParameters.o ./obj/VPlotTMVAParameters_Dict.o \
 		./obj/VWPPhysSensitivityPlotsMaker.o ./obj/VWPPhysSensitivityPlotsMaker_Dict.o \
 		./obj/VPedestalLowGain.o ./obj/VPedestalLowGain_Dict.o \
-		./obj/VCTARequirements.o ./obj/VCTARequirements_Dict.o \
 		./obj/VLowGainCalibrator.o ./obj/VLowGainCalibrator_Dict.o \
 		./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
 		./obj/VPlotOptimalCut.o ./obj/VPlotOptimalCut_Dict.o
@@ -883,61 +802,6 @@ printBinaryOrbitalPhase:	$(PRINTBINARYOBJ)
 	@echo "$@ done"
 
 ########################################################
-# writeCTAWPPhysSensitivityFiles
-########################################################
-WRITECTAPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
-			./obj/writeCTAWPPhysSensitivityFiles.o \
-			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-			./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
-			./obj/VASlalib.o \
-			./obj/VInstrumentResponseFunctionReader.o ./obj/VInstrumentResponseFunctionReader_Dict.o \
-			./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
-			./obj/VSensitivityCalculator.o ./obj/VSensitivityCalculator_Dict.o \
-			./obj/CEffArea.o ./obj/CEffArea_Dict.o \
-			./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
-			./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
-			./obj/VInstrumentResponseFunctionData.o ./obj/VInstrumentResponseFunctionData_Dict.o \
-			./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
-			./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o \
-			./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
-			./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
-			./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
-			./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
-			./obj/VSpectralFitter.o ./obj/VSpectralFitter_Dict.o \
-			./obj/VEnergyThreshold.o ./obj/VEnergyThreshold_Dict.o \
-			./obj/VRunList.o ./obj/VRunList_Dict.o \
-			./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
-			./obj/VEnergySpectrum.o ./obj/VEnergySpectrum_Dict.o \
-			./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o  \
-			./obj/VDifferentialFlux.o ./obj/VDifferentialFlux_Dict.o \
-			./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
-			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
-			./obj/VStatistics_Dict.o \
-			./obj/VUtilities.o \
-			./obj/Ctelconfig.o
-
-./obj/writeCTAWPPhysSensitivityFiles.o: 	./src/writeCTAWPPhysSensitivityFiles.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-writeCTAWPPhysSensitivityFiles:	$(WRITECTAPHYSOBJ)
-	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
-	@echo "$@ done"
-
-########################################################
-#  writeCTAWPPhysSensitivityTree
-########################################################
-
-WRITESENSTREE=	./obj/writeCTAWPPhysSensitivityTree.o
-
-./obj/writeCTAWPPhysSensitivityTree.o: 	./src/writeCTAWPPhysSensitivityTree.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-writeCTAWPPhysSensitivityTree:	$(WRITESENSTREE)
-	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
-	@echo "$@ done"
-
-
-########################################################
 # writeVTSWPPhysSensitivityFiles
 ########################################################
 WRITEVTSPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
@@ -988,7 +852,7 @@ writeVTSWPPhysSensitivityFiles:	$(WRITEVTSPHYSOBJ)
 ########################################################
 # writeParticleRateFilesFromEffectiveAreas
 ########################################################
-WRITECTAPHYSOBJ=	./obj/writeParticleRateFilesFromEffectiveAreas.o \
+WRITEPARTPHYSOBJ=	./obj/writeParticleRateFilesFromEffectiveAreas.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
 			./obj/VASlalib.o \
@@ -1021,14 +885,14 @@ WRITECTAPHYSOBJ=	./obj/writeParticleRateFilesFromEffectiveAreas.o \
 ./obj/writeParticleRateFilesFromEffectiveAreas.o: 	./src/writeParticleRateFilesFromEffectiveAreas.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-writeParticleRateFilesFromEffectiveAreas:	$(WRITECTAPHYSOBJ)
+writeParticleRateFilesFromEffectiveAreas:	$(WRITEPARTPHYSOBJ)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
 ########################################################
 # writeParticleRateFilesForTMVA
 ########################################################
-WRITECTAPHYSOBJ=	./obj/writeParticleRateFilesForTMVA.o \
+WRITEPARTPHYSOBJ=	./obj/writeParticleRateFilesForTMVA.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
 			./obj/VASlalib.o \
@@ -1061,7 +925,7 @@ WRITECTAPHYSOBJ=	./obj/writeParticleRateFilesForTMVA.o \
 ./obj/writeParticleRateFilesForTMVA.o: 	./src/writeParticleRateFilesForTMVA.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-writeParticleRateFilesForTMVA:	$(WRITECTAPHYSOBJ)
+writeParticleRateFilesForTMVA:	$(WRITEPARTPHYSOBJ)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
@@ -1378,35 +1242,6 @@ ifeq ($(FITS),FALSE)
 endif
 
 ########################################################
-# HESSIO converter
-########################################################
-
-./obj/CTA.convert_hessio_to_VDST.o:	./src/CTA.convert_hessio_to_VDST.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-CTA.convert_hessio_to_VDST:	./obj/VDSTTree.o \
-				./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
-				./obj/VASlalib.o \
-				./obj/VSkyCoordinatesUtilities.o \
-				./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
-				./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
-				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-				$(HESSIOSYS)/out/io_trgmask.o \
-				./obj/CTA.convert_hessio_to_VDST.o
-	$(LD) $(LDFLAGS) $^ $(GLIBS) -L$(HESSIOSYS)/lib -lhessio \
-	$(OutPutOpt) ./bin/$@
-	@echo "$@ done"
-
-TESTHESSIO:
-ifeq ($(HESSIO),FALSE)
-	   @echo ""
-	   @echo "----------------------------------------"
-	   @echo "NO HESSIOSYS ENVIRONMENTAL VARIABLE SET"
-	   @echo "----------------------------------------"
-	   @echo "";
-endif
-
-########################################################
 # implicit rules
 ########################################################
 ./obj/%.o:	%.cpp %.h
@@ -1526,7 +1361,7 @@ printconfig configuration config:
 	@echo "    $(GLIBS)"
 	@echo ""
 	@echo "using root version $(ROOTVERSION)"
-	@echo "    compiled with MLP: $(ROOT_MLP), MYSQL: $(ROOT_MYSQL), DCACHE: $(ROOT_DCACHE), MATHMORE: $(ROOT_MATHMORE)"
+	@echo "    $(ROOT_MYSQL)"
 	@echo "    $(ROOTSYS)"
 	@echo ""
 ifeq ($(GSLFLAG),-DNOGSL)
@@ -1534,7 +1369,6 @@ ifeq ($(GSLFLAG),-DNOGSL)
 else
 	@echo "evndisp with GSL libraries (used in Hough muon calibration, likelihood fitter)"
 	@echo "   GSL  $(GSLFLAG)" 
-	@echo "   GSL2 $(GSL2FLAG)" 
 	@echo "   $(GSLCFLAGS) $(GSLLIBS)"
 endif
 	@echo ""
@@ -1556,12 +1390,6 @@ else
 	@echo "evndisp without database (mysql) support"
 endif
 	@echo ""
-ifeq ($(HESSIO),FALSE)
-	@echo "no HESSIO support enabled"
-else
-	@echo "HESSIO support enabled"
-endif
-	@echo ""
 ifeq ($(FITS),FALSE)
 	@echo "no FITS support enabled"
 else
@@ -1576,7 +1404,7 @@ endif
 
 	@echo ""
 
-	@echo "Testing EVNDISP environmental variables (for VTS and CTA):"
+	@echo "Testing EVNDISP environmental variables (for VTS):"
 	@echo "----------------------------------------------------------"
 ifeq ($(strip $(EVNDISPSYS)),)
 	@echo "EVNDISPSYS not set (see README/INSTALL)"
@@ -1603,21 +1431,6 @@ ifeq ($(strip $(VERITAS_IRFPRODUCTION_DIR)),)
 else
 	@echo "VERITAS_IRFPRODUCTION_DIR set to $(VERITAS_IRFPRODUCTION_DIR)"
 endif
-ifeq ($(strip $(CTA_EVNDISP_AUX_DIR)),)
-	@echo "CTA_EVNDISP_AUX_DIR not set (see README/INSTALL)"
-else
-	@echo "CTA_EVNDISP_AUX_DIR set to $(CTA_EVNDISP_AUX_DIR)"
-endif
-ifeq ($(strip $(CTA_DATA_DIR)),)
-	@echo "CTA_DATA_DIR not set (see README/INSTALL)"
-else
-	@echo "CTA_DATA_DIR set to $(CTA_DATA_DIR)"
-endif
-ifeq ($(strip $(CTA_USER_DATA_DIR)),)
-	@echo "CTA_USER_DATA_DIR not set (see README/INSTALL)"
-else
-	@echo "CTA_USER_DATA_DIR set to $(CTA_USER_DATA_DIR)"
-endif
 
 ###############################################################################################################################
 # source code formating
@@ -1626,7 +1439,7 @@ formatSourceCode:
 	@echo ""
 	astyle --options=./.astylerc src/*
 	astyle --options=./.astylerc inc/*
-	astyle --options=./.astylerc macros/*.C macros/VTS/*.C macros/CTA/*.C
+	astyle --options=./.astylerc macros/*.C macros/VTS/*.C
 
 ###############################################################################################################################
 install:	all
@@ -1640,4 +1453,4 @@ rclean:
 	-rm -f ./obj/*.o ./obj/*_Dict.cpp ./obj/*_Dict.h ./bin/* ./lib/libVAnaSum.so ./lib/*.pcm ./obj/*dict.pcm ./bin/*.pcm
 ###############################################################################################################################
 
-.PHONY: all clean install FORCEDISTDIR dist TESTHESSIO TESTFITS configuration
+.PHONY: all clean install TESTFITS configuration

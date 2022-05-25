@@ -1,7 +1,6 @@
 /*! file VTS.getRunListFromDB read exposure from DB
 
     (VERITAS only)
-    \author Gareth Hughes
 
 */
 

@@ -2,10 +2,7 @@
 
     contains common elements for VRawDataReader and VBFDataReader
 
-
-    \author
-      Gernot Maier
-      Filip Pizlo
+    \author Filip Pizlo
 
 */
 

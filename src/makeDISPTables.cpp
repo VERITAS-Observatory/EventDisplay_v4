@@ -8,7 +8,6 @@
 
     tables are then used in VArrayAnalyzer for direction reconstruction
 
-\autor Gernot Maier
 */
 
 #include "VGlobalRunParameter.h"

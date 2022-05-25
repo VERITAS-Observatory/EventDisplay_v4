@@ -23,13 +23,6 @@ Required options for VERITAS [VTS] analysis are:
 	see $EVNDISPSYS/scripts/VTS for scripts for calibration, analysis and
 	efficient submission of a large number of jobs to a computing cluster
 
-Required options for CTA [CTA] analysis are:
-
-        -sourcefile <source file name> [name of the EVNDISP DST file to analyse]
-
-	sim_telarray files can be converted to EVNDISP DST format with 
-	$EVNDISPSYS/bin/CTA.convert_hessio_to_VDST 
-
 Option to display events:
 
 	-display=<0=off/1=on>          [open the display to look at events]
@@ -66,8 +59,6 @@ Calibration data:
    (or no connection to the VERITAS DB could be established):
    $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.dat
 
-   [CTA] No calibration files are needed (data is included in EVNDISP DST files)
-
 ----------------------------------------------
 
 Detector configuration:
@@ -75,8 +66,6 @@ Detector configuration:
    [VTS] Detector configuration files (with telescope positions, pixel positions, etc):
    $VERITAS_EVNDISP_AUX_DIR/DetectorGeometry/*.cfg
 
-   [CTA] Detector configuration is read from EVNDISP DST file (telconfig tree)
-   
 ----------------------------------------------
 
 Please report any problems and bugs to Gernot Maier or Jamie Holder

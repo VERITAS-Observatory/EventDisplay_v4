@@ -1,8 +1,6 @@
 /*! \class VImageAnalyzerHistograms
     \brief  histogramming of run parameter, etc.
 
-    \author
-       Gernot Maier
 */
 
 #include "VImageAnalyzerHistograms.h"

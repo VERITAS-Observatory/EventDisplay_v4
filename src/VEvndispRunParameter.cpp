@@ -226,19 +226,6 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fmuonmode = false;
 	fhoughmuonmode = false;
 	
-	// Frogs parameters
-	ffrogsmscwfile = "";
-	ffrogsmode = false;
-	ffrogsRecID = 0;
-	ffrogstemplatelist = "";
-	
-	// Model3D parameters, JG
-	fUseModel3D = false;
-	fUseDisplayModel3D = false;
-	fCreateLnLTable = false;
-	fLnLTableFile = "";
-	fIDstartDirectionModel3D = 0;
-	
 	// output parameters
 	ffillhistos = false;                          // obsolete
 	foutputfileName = "";

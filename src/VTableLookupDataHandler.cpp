@@ -21,7 +21,6 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	fEventDisplayFileFormat = 2;
 	fTshowerpars = 0;
 	fshowerpars = 0;
-	fTmodel3Dpars = 0;
 	fOTree = 0;
 	fShortTree = fTLRunParameter->bShortTree;
 	bWriteMCPars = fTLRunParameter->bWriteMCPars;
@@ -51,7 +50,6 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	fEventCounter = 0;
 	
 	fEventWeight = 1.;
-	fIsModel3D = false;
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	// weighting of energy spectrum
@@ -565,12 +563,6 @@ bool VTableLookupDataHandler::checkIfFilesInChainAreRecovered( TChain* c )
 			cout << "\t " << chEl->GetTitle() << endl;
 			return true;
 		}
-		// check if input data includes Model3D parameters
-		fKeyModel3D = ifInput->FindKey( "model3Dpars" );
-		if( fKeyModel3D != 0 )
-		{
-			fIsModel3D = true;
-		}
 		
 		ifInput->Close();
 	}
@@ -752,19 +744,10 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 	unsigned int bShort = false;
 	// get shower parameter tree
 	fTshowerpars = new TChain( "showerpars" );
-	// get model3Dpars tree
-	if( fIsModel3D )
-	{
-		fTmodel3Dpars = new TChain( "model3Dpars" );
-	}
 	
 	for( unsigned int i = 0; i < finputfile.size(); i++ )
 	{
 		fTshowerpars->Add( finputfile[i].c_str() );
-		if( fIsModel3D )
-		{
-			fTmodel3Dpars->Add( finputfile[i].c_str() );
-		}
 	}
 	if( !fTshowerpars )
 	{
@@ -1201,25 +1184,6 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 		fOTree->Branch( "Fitstat", fFitstat, iTT );
 	}
 	fOTree->Branch( "DispDiff", &fDispDiff, "DispDiff/D" );
-	// Model3D parameters
-	if( fIsModel3D )
-	{
-		fOTree->Branch( "Smax3D", &fSmax3D, "Smax3D/D" );
-		fOTree->Branch( "sigmaL3D", &fsigmaL3D, "sigmaL3D/D" );
-		fOTree->Branch( "sigmaT3D", &fsigmaT3D, "sigmaT3D/D" );
-		fOTree->Branch( "Nc3D", &fNc3D, "Nc3D/D" );
-		fOTree->Branch( "Xcore3D", &fXcore3D, "Xcore3D/D" );
-		fOTree->Branch( "Ycore3D", &fYcore3D, "Ycore3D/D" );
-		fOTree->Branch( "Xoff3D", &fXoff3D, "Xoff3D/D" );
-		fOTree->Branch( "Yoff3D", &fYoff3D, "Yoff3D/D" );
-		fOTree->Branch( "XoffDeRot3D", &fXoffDeRot3D, "fXoffDeRot3D/D" );
-		fOTree->Branch( "YoffDeRot3D", &fYoffDeRot3D, "fYoffDeRot3D/D" );
-		fOTree->Branch( "Goodness3D", &fGoodness3D, "Goodness3D/D" );
-		fOTree->Branch( "Depth3D", &fDepth3D, "Depth3D/D" );
-		fOTree->Branch( "RWidth3D", &fRWidth3D, "RWidth3D/D" );
-		fOTree->Branch( "ErrRWidth3D", &fErrRWidth3D, "ErrRWidth3D/D" );
-		fOTree->Branch( "Converged3D", &fConverged3D, "Converged3D/b" );
-	}
 	
 	sprintf( iTT, "R[%d]/D", fNTel );
 	fOTree->Branch( "R", fR, iTT );
@@ -2071,22 +2035,6 @@ void VTableLookupDataHandler::resetAll()
 	fMC_distance_to_cameracenter_min = 0.;
 	fMC_distance_to_cameracenter_max = 1.e10;
 	fDispDiff = 0;
-	// Model3D parameters
-	fSmax3D = 0;
-	fsigmaL3D = 0;
-	fsigmaT3D = 0;
-	fNc3D = 0;
-	fXcore3D = 0;
-	fYcore3D = 0;
-	fXoff3D = 0;
-	fYoff3D = 0;
-	fXoffDeRot3D = 0;
-	fYoffDeRot3D = 0;
-	fGoodness3D = 0;
-	fDepth3D = 0;
-	fRWidth3D = 0;
-	fErrRWidth3D = 0;
-	fConverged3D = false;
 	
 	// cut efficiency counter
 	fNStats_All = 0;

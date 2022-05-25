@@ -2,7 +2,7 @@
     \brief merge different DISP tables into one file
 
 
-    \author Gernot Maier
+    
 */
 
 #include "VGlobalRunParameter.h"

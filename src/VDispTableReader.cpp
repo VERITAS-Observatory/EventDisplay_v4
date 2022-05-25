@@ -2,7 +2,7 @@
     \brief read tables for angular reconstruction with disp method
 
 
-    \author Gernot Maier
+    
 
 */
 

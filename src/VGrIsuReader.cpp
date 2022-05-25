@@ -8,7 +8,7 @@
 
        - fillBackgroundfromTraceLibrary should be checked
 
-    \author Gernot Maier
+    
 */
 
 #include <VGrIsuReader.h>

@@ -1,10 +1,6 @@
 /*! \class VTableLookup
     \brief calculation of mean scaled variables and energies using MC filled tables
 
-    \author
-    Gernot Maier
-    Henric Krawczynski
-
 */
 
 #include "VTableLookup.h"

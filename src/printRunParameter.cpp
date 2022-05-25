@@ -2,7 +2,7 @@
     \brief print run parameters from mscw or eventdisplay file to screen
 
 
-    \author Gernot Maier
+    
 */
 
 #include "VEvndispRunParameter.h"

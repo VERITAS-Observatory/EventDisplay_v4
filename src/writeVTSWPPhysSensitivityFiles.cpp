@@ -13,7 +13,7 @@
    - calculate offaxis values
      - need to read in run parameters from a file?
 
-   \author Gernot Maier
+   
 
 */
 

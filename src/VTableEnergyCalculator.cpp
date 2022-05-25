@@ -2,8 +2,6 @@
     \brief fill or lookup energy tables
 
 
-    \author Henrik Krawczynski (WashU), Gernot Maier
-
 */
 
 #include "VTableEnergyCalculator.h"

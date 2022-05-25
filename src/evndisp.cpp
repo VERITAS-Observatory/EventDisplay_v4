@@ -3,8 +3,6 @@
 
     event analysis and display
 
-
-   \author( Gernot Maier, Jamie Holder)
 */
 
 #include <TApplication.h>

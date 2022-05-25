@@ -2,8 +2,6 @@
     \brief print binary orbital phase
 
 
-    \author
-    Gernot Maier
 */
 
 #include <iomanip>

@@ -1,10 +1,6 @@
 /*! \class VPlotRunSummary
     \brief different plot routines (rates vs. elevation etc)
 
-
-    \author
-    Gernot Maier
-
 */
 
 #include "VPlotRunSummary.h"

@@ -39,7 +39,7 @@ class VCamera
 						 C_PEDMEAN, C_PEDVAR, C_PEDMEANLOW, C_PEDVARLOW, C_GAINS, C_GAINVARS, C_GAINSLOW, C_GAINVARSLOW,
 						 C_TOFF, C_TOFFLOW, C_LOWGAIN, C_CALTZERO, C_CALTZEROLOW, C_STATUS, C_STATUSLOW,
 						 C_L1, C_HV, C_CURRENTS,
-						 C_TRIGGER_EVNDISP, C_TEMPLATE, C_MODEL3D
+						 C_TRIGGER_EVNDISP
 						};
 						
 		unsigned int fcameraModus;                //!< camera modus (trigger/charge/hit/timing/etc.)
@@ -61,7 +61,6 @@ class VCamera
 		TMarker* fAnaShowerDir;                   //!< reconstructed shower direction
 		TMarker* fAnaShowerCentroid;              //!< image centroid
 		TMarker* fMCShowerDir;                    //!< MC shower direction
-		TMarker* fModel3DShowerDir;               //!< Model3D shower direction
 		TMarker* fCameraCentreDir;                //!< camera centre
 		TEllipse* fCameraCentreEllipse;
 		double fmaxPlot;                          //!< relative size of camera (0.5 = full canvas)

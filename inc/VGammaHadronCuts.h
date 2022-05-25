@@ -32,7 +32,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // analysis types
 ////////////////////////////////////////////////////////////////////////////////
-enum E_AnalysisType { GEO = 0, MVAAnalysis = 1, FROGS = 2, MODEL3D = 3 };
+enum E_AnalysisType { GEO = 0, MVAAnalysis = 1 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // class for telescope type dependent multiplicity  cut
@@ -169,12 +169,9 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		VGammaHadronCutsStatistics* fStats;                       //!
 		
 		bool   applyProbabilityCut( int i, bool fIsOn );
-		bool   applyFrogsCut( int i, bool fIsOn );
-		bool   applyModel3DCut( int i, bool fIsOn );
 		double getEnergyDependentCut( double energy_TeV, TGraph* iG, bool bUseEvalue = true, bool bMaxCut = true );
 		TGraph* getEnergyDependentCut( string iCutName );
 		bool   getEnergyDependentCutFromFile( string iFileName, string iVariable );
-		double getMeanGoodness( double, double, double, double, int );
 		bool   initAngularResolutionFile();
 		bool   initPhaseCuts( int irun );
 		bool   initPhaseCuts( string iDir );
@@ -247,10 +244,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		bool   fUseOrbitalPhaseCuts;
 		double fOrbitalPhase_min;
 		double fOrbitalPhase_max;
-		double fCut_Depth3D_min;
-		double fCut_Depth3D_max;
-		double fCut_RWidth3D_min;
-		double fCut_RWidth3D_max;
 		
 		VGammaHadronCuts();
 		~VGammaHadronCuts();
@@ -431,14 +424,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			fCut_Theta2_max = it2;
 		}
 		void   terminate();
-		bool   useModel3DCuts()
-		{
-			return ( fAnalysisType == MODEL3D );
-		}
-		bool   useFrogsCuts()
-		{
-			return ( fAnalysisType == FROGS );
-		}
 		bool   useTMVACuts()
 		{
 			return ( fAnalysisType == MVAAnalysis );
@@ -448,6 +433,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			return fUseOrbitalPhaseCuts;
 		}
 		
-		ClassDef( VGammaHadronCuts, 54 );
+		ClassDef( VGammaHadronCuts, 56 );
 };
 #endif

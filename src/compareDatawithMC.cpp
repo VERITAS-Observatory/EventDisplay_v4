@@ -2,7 +2,6 @@
  *  \brief compare MC gamma-ray distributions with on-off distributions from data
  *         (e.g. Crab Nebula or Mrk 421 flare data)
  *
- *  \Author Gernot Maier
  *
 */
 

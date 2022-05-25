@@ -2,7 +2,7 @@
     \brief reader class for the pe trees
 
 
-    \author Gernot Maier
+    
 */
 
 #include "VPETree.h"

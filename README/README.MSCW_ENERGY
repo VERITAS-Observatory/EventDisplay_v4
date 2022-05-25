@@ -17,8 +17,6 @@ general parameters:
 	 -inputfilelist FILELIST list of evndisp root file as input (wildcards possible use, -inputfile "YOUR_DATA_DIRECTORY/*.root")
 	 			 (simple text file)
 
-[CTA]    -pe                     input data is in pe's (not in [dc])
-
 table filling:
 
 	 -filltables=1           flag to indicate that tables should be filled
@@ -26,7 +24,6 @@ table filling:
 	 -ze=FLOAT       	 zenith angle of simulations
 	 -woff=FLOAT      	 wobble offset of simulations [deg]
 	 -noise=NINT     	 mean pedestal variance x 100 (integer value; used to set the right directory structure)
-	 -CTAoffAxisBins         use CTA off-axis bins (note: hardwired in VTableLookupRunParameter::setCTA_MC_offaxisBins() )
 
 table reading:
 

@@ -1,9 +1,6 @@
 /*! \file mscw_energy.cpp
     \brief calculate mean scaled width and length,  energy with lookup tables
 
-    \author
-     Gernot Maier
-     basic routines: Henrik Krawczynski (mscw+energy routine)
 */
 
 #include "VTableCalculator.h"

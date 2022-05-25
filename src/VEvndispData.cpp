@@ -5,10 +5,6 @@
 
      fReader is not static! Call of VEvndispData::initializeDataReader() necessary  in constructors of all inherit classes
 
-
-   \author
-     Gernot Maier
-
 */
 
 #include "VEvndispData.h"
@@ -208,9 +204,6 @@ void VEvndispData::resetAnaData()
 		fAnaData[fTelID]->fTCorrectedSumLast = fRunPar->fsumfirst[fTelID] + fRunPar->fsumwindow_1[fTelID];
 		fAnaData[fTelID]->fCurrentSummationWindow = fRunPar->fsumwindow_1[fTelID];
 		fAnaData[fTelID]->fCurrentSummationWindow_2 = fRunPar->fsumwindow_2[fTelID];
-		
-		fAnaData[fTelID]->fTemplateMu = 0;
-		fAnaData[fTelID]->fModel3DMu = 0;
 		
 		if( getTraceFit() > -1. )
 		{
@@ -1216,7 +1209,6 @@ vector< VImageAnalyzerData* > VEvndispData::fAnaData;
 VShowerParameters* VEvndispData::fShowerParameters = 0;
 VMCParameters* VEvndispData::fMCParameters = 0;
 VEvndispReconstructionParameter* VEvndispData::fEvndispReconstructionParameter = 0;
-VFrogsParameters* VEvndispData::fFrogsParameters = 0;
 //vector< VFrogImageData* > VEvndispData::fFrogData;
 
 // timing graphs

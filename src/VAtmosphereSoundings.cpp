@@ -15,8 +15,6 @@
 //////////////////////////////////
    FIX ATMOSPHERIC THICKNESS
 
-   \author
-   Gernot Maier
 */
 
 #include "VAtmosphereSoundings.h"

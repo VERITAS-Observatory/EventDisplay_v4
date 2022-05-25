@@ -1,9 +1,6 @@
 /*! \class VPointingDB
     \brief read pointing data from the database
 
-
-    \author
-    Gernot Maier
 */
 
 #include "VPointingDB.h"
@@ -486,7 +483,7 @@ bool VPointingDB::readPointingFromVPMTextFile( string iDirectory )
 }
 
 /*
-    read calibrated (default) pointing monitor data from DB  (JG)
+    read calibrated (default) pointing monitor data from DB
 */
 bool VPointingDB::readPointingCalibratedVPMFromDB()
 {
@@ -624,7 +621,7 @@ bool VPointingDB::readPointingCalibratedVPMFromDB()
 }
 
 /*
-    read uncalibrated pointing monitor data from DB  (JG)
+    read uncalibrated pointing monitor data from DB
 */
 bool VPointingDB::readPointingUncalibratedVPMFromDB()
 {

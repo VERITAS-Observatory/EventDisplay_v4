@@ -198,10 +198,6 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		
 		int f2DAcceptanceMode ; // USE2DACCEPTANCE
 		
-		// advanced analysis codes
-		bool fModel3D;
-		bool fDirectionModel3D;
-		
         // add all events to DL3 tree, no gh cuts but add BDT score and IsGamma 
         bool fWriteAllEvents;
 
