@@ -1022,6 +1022,66 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				}
 				continue;
 			}
+            else if( iTemp == "IMAGECLEANING_FAKEPROBABILITY" && fRunPara )
+            {
+				for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
+				{
+					if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+					{
+						if( i < fRunPara->fImageCleaningParameters.size() )
+						{
+							fRunPara->fImageCleaningParameters[i]->fNNOpt_FakeImageProb = atof( iTemp2.c_str() );
+                        }
+                    }
+                }
+                continue;
+            }
+            else if( iTemp == "IMAGECLEANING_ACTIVEMULTIPLICITIES" && fRunPara )
+            {
+                for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
+                {
+                    if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+                    {
+                        if( i < fRunPara->fImageCleaningParameters.size() )
+                        {
+                            for( unsigned int m = 0; m < fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities.size(); m++ )
+                            {
+                                if( iTemp2 == fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities[m] )
+                                {
+                                    fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[m] = true;
+                                }
+                                if( iTemp3.size() > 0 && iTemp3 == fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities[m] )
+                                {
+                                    fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[m] = true;
+                                }
+                                if( iTemp4.size() > 0 && iTemp4 == fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities[m] )
+                                {
+                                    fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[m] = true;
+                                }
+                                if( iTemp5.size() > 0 && iTemp5 == fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities[m] )
+                                {
+                                    fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[m] = true;
+                                }
+                            }
+                            // (not used; always true)
+                            fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[4] = true;
+                        }
+                    }
+                }
+                continue;
+            }
+			else if( iTemp == "WRITEGRAPHSTOFILE" && fRunPara )
+            {
+                if( iTemp2 == "TRUE" )
+                {
+                    fRunPara->ifWriteGraphsToFile = true;
+                }
+                else
+                {
+                    fRunPara->ifWriteGraphsToFile = false;
+                }
+                continue;
+            }
 			else if( iTemp == "TIMECLEANINGPARAMETERS" && fRunPara )
 			{
 				for( unsigned int i = 0; i < fTel_type_V.size(); i++ )

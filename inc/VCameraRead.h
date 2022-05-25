@@ -279,6 +279,7 @@ class VCameraRead : public VGlobalRunParameter
 			return fTelType;
 		}
 		vector<ULong64_t>      getTelType_list();
+        unsigned int         getTelType_Counter( ULong64_t iTelType );
 		vector<float>&       getTelXpos()         //!< return vector with x positions of telescopes
 		{
 			return fTelXpos;

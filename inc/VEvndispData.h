@@ -926,7 +926,6 @@ class VEvndispData
 		{
 			return fRunPar->fTraceWindowShift[fTelID];
 		}
-        // TODO CHECK v570: return integer, not bool
 		bool                getSumWindowStart_at_T0()
 		{
 			return fRunPar->fsumfirst_startingMethod[fTelID];
@@ -973,6 +972,7 @@ class VEvndispData
 		}
 		unsigned int        getTeltoAnaID( unsigned int iTelID );
 		ULong64_t           getTelType( unsigned int iTelID );
+        unsigned int        getTelType_Counter( ULong64_t iTelType );
 		vector< unsigned int>& getTeltoAna()
 		{
 			return fTeltoAna;
@@ -1122,6 +1122,7 @@ class VEvndispData
 			return fFitTraceHandler;
 		}
 		vector< valarray< double > >& getPulseTiming( bool iCorrected = true );
+        valarray<double>&   getPulseTime( bool iCorrected = true );
 		valarray<double>&   getTZeros()
 		{
 			return fAnaData[fTelID]->getTZeros( true );

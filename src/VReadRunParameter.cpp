@@ -1028,22 +1028,6 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fShortTree = 0;
 		}
-		else if( iTemp.find( "pwmethod" ) < iTemp.size() )
-		{
-			fRunPara->fPWmethod = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-		}
-		else if( iTemp.find( "pwcleanneighbors" ) < iTemp.size() )
-		{
-			fRunPara->fPWcleanNeighbors = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-		}
-		else if( iTemp.find( "pwcleanthreshold" ) < iTemp.size() )
-		{
-			fRunPara->fPWcleanThreshold = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-		}
-		else if( iTemp.find( "pwlimit" ) < iTemp.size() )
-		{
-			fRunPara->fPWlimit = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-		}
 		else if( iTemp.rfind( "printgrisuheader" ) < iTemp.size() )
 		{
 			fRunPara->fPrintGrisuHeader = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -1440,8 +1424,7 @@ void VReadRunParameter::test_and_adjustParams()
 	}
 	
 	// fRunPara->fImageLL: values between 0-2
-    // TODO CHECK WITH v570
-	if( fRunPara->fImageLL < 0 && fRunPara->fImageLL > 2 )
+	if( fRunPara->fImageLL < 0 || fRunPara->fImageLL > 2 )
 	{
 		cout << "warning: logl parameter out of range, setting it to 1" << endl;
 		fRunPara->fImageLL = 1;
@@ -1524,8 +1507,6 @@ void VReadRunParameter::test_and_adjustParams()
 	setDirectories();
 	
 	// for command line case, all parameters are the same for all telescopes
-	// !preli!
-	// this will go with a configuration file or connection to a database
 	if( f_boolCommandline )
 	{
 		// start at 1, parameters for first telescope are filled by default
@@ -1670,29 +1651,6 @@ void VReadRunParameter::test_and_adjustParams()
 		{
 			fRunPara->fTraceWindowShift[t] = 0;
 		}
-	}
-	
-	// throws an error if its a simulation file and it was asked to calculate the PW parameters from the CFD hits, since CFDs don't exist in the simulation record
-	if( fRunPara->fIsMC > 0 && ( fRunPara->fPWmethod == 0 || fRunPara->fPWmethod == 1 ) )
-	{
-		cout << " GrISU simulations don't have true CFD hits! PWmethod=" << fRunPara->fPWmethod << " can only be used with data with CFD hits." << endl;
-		cout << " Switching to FADC signals cleaned with PWcleanThreshold!!  " << endl << endl;
-	}
-	
-	if( fRunPara->fPWmethod > 3 )
-	{
-		cout << "Incorrect method for calculating binary-image trigger map: " << fRunPara->fPWmethod << endl;
-		exit( -1 );
-	}
-	if( fRunPara->fPWcleanNeighbors < 0 )
-	{
-		cout << "Incorrect number of nearest neighbors required for cleaning: " << fRunPara->fPWcleanNeighbors << endl;
-		exit( -1 );
-	}
-	if( fRunPara->fPWlimit < 0 )
-	{
-		cout << "Can't send less than zero pixels to moment-generating function: " << fRunPara->fPWlimit << endl;
-		exit( -1 );
 	}
 	
 	//don't start frogs analysis unless it's a 4-Telescope run
