@@ -1,7 +1,7 @@
 /*! \class VExposure
     \brief calculate VERITAS exposure
 
-    \author Gernot Maier
+    
 */
 
 #include "VExposure.h"

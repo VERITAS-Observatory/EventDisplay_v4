@@ -2,7 +2,7 @@
     \brief data and converter class for differential flux values
 
 
-    \author Gernot Maier
+    
 */
 
 #include "VDifferentialFlux.h"

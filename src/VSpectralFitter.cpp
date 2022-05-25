@@ -2,7 +2,7 @@
     \brief  fitter class for energy spectra
 
 
-    \author Gernot Maier
+    
 */
 
 #include "VSpectralFitter.h"

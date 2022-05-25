@@ -23,7 +23,7 @@
 
     (end example code)
 
-    \author Gernot Maier
+    
 */
 
 #include "VSpectralEnergyDistribution.h"

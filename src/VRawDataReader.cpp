@@ -2,10 +2,7 @@
 
     steering class for reading raw data format
 
-
-    \author
-      Gernot Maier
-      Filip Pizlo
+    \author Filip Pizlo
 
 */
 

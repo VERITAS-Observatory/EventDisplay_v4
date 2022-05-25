@@ -11,7 +11,6 @@
  * goes in the .cpp files.
  *
  * Original Author: Stephen Fegan
- * $Author: gmaier $
  * $Date: 2010/03/08 08:01:35 $
  * $Tag$
  *

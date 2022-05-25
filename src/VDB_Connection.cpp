@@ -1,7 +1,6 @@
 /*! \class VDB_Connection
     \brief connect to DB
 
-    \author Lucie
 */
 
 #include "VDB_Connection.h"

@@ -2,7 +2,7 @@
     \brief MLP based disp method
 
 
-    \author Gernot Maier
+    
 */
 
 #include "VMLPAnalyzer.h"

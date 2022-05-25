@@ -3,9 +3,6 @@
  *
  *   input is a file list of mscw_energy output file from gamma-ray simulations
  *
- * \author
- *   Gernot Maier
- *
  */
 
 #include "TChain.h"

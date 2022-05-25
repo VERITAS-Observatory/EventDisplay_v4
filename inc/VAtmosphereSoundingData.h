@@ -1,5 +1,4 @@
 //! VAtmosphereSoundings read and analyse sounding data
-// Revision $Id: VAtmosphereSoundings.h,v 1.1.2.7 2010/09/20 10:49:28 gmaier Exp $
 
 #ifndef VAtmosphereSoundingData_H
 #define VAtmosphereSoundingData_H

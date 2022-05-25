@@ -3,9 +3,6 @@
 
     variables called VARNAME_SC are in shower coordinates
 
-    \author
-      Jamie Holder
-      Gernot Maier
 */
 
 #include "VImageParameter.h"

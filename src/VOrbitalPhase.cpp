@@ -1,11 +1,6 @@
 /*! \class VOrbitalPhase
     \brief calculation of the orbital phase
 
-
-    \author
-     Gernot Maier
-     Ester Aliu
-
 */
 
 #include "VOrbitalPhase.h"

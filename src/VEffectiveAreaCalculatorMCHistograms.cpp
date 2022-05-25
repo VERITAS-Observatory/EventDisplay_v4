@@ -1,9 +1,6 @@
 /*! \CLASS veFFECTIVEaREAcALCULATORmchISTOGRAMS
     \brief filling, reading, writing of MC histograms for effective area calculation
 
-
-    \author
-    Gernot Maier
 */
 
 #include "VEffectiveAreaCalculatorMCHistograms.h"

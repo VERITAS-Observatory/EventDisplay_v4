@@ -1,8 +1,6 @@
 /*! \class VPointing
     \brief get telescope pointing direction
 
-    \author
-       Gernot Maier
 */
 
 #include "VPointing.h"

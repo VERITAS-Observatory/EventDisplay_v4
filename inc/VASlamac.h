@@ -4,7 +4,6 @@
  * \brief Astronomical tools used by the sp24 analysis package
  *
  * Original Author: Pascal Fortin
- * $Author: gmaier $
  * $Date: 2010/03/08 08:01:34 $
  * $Tag$
  *******************************************************************/

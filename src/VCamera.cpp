@@ -1,7 +1,7 @@
 /*! \class VCamera
     \brief camera plotting routines
 
-    \author Gernot Maier
+    
 */
 
 #include "VCamera.h"

@@ -1,7 +1,7 @@
 /*! \class VInstrumentResponseFunctionRunParameter
     \brief run parameters for response function calculator (effective areas)
 
-    \author Gernot Maier
+    
 */
 
 #include "VInstrumentResponseFunctionRunParameter.h"
