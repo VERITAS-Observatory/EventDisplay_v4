@@ -48,11 +48,9 @@ ROOT_CntCln = rootcling
 #############################
 # check for root libraries
 #############################
-ROOT_MLP=$(shell root-config --has-xml)
 # mysql support
 # (necessary for VERITAS data analysis)
 ROOT_MYSQL=$(shell root-config --has-mysql)
-ROOT_DCACHE=$(shell root-config --has-dcache)
 #############################
 # VERITAS BANK FORMAT (VBF)
 #############################
@@ -87,15 +85,6 @@ ifeq ($(origin GSLSYS), undefined)
     GSLFLAG=-DNOGSL
   endif
 endif
-# GSLFLAG=-DNOGSL
-
-ifneq ($(GSLFLAG),-DNOGSL)
-# check GSL version
-  GSLV2=$(shell expr 2.0 \>= `gsl-config --version`)
-  ifeq ($(GSLV2),0)
-    GSL2FLAG=-DGSL2
-  endif
-endif
 #####################
 # FITS ROUTINES
 # (optional, necessary for root to FITS converter)
@@ -111,7 +100,7 @@ endif
 CXX           = g++
 CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
 CXXFLAGS     += -I. -I./inc/
-CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG) $(GSL2FLAG)
+CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG)
 LD            = g++
 OutPutOpt     = -o
 INCLUDEFLAGS  = -I. -I./inc/
@@ -179,7 +168,7 @@ ifneq ($(GSLFLAG),-DNOGSL)
 GSLCFLAGS    = $(shell gsl-config --cflags)
 GSLLIBS      = $(shell gsl-config --libs)
 GLIBS        += $(GSLLIBS)
-CXXFLAGS     += $(GSLCFLAGS) $(GSL2FLAG)
+CXXFLAGS     += $(GSLCFLAGS)
 endif
 ########################################################
 # FITS
@@ -1381,7 +1370,7 @@ printconfig configuration config:
 	@echo "    $(GLIBS)"
 	@echo ""
 	@echo "using root version $(ROOTVERSION)"
-	@echo "    compiled with MLP: $(ROOT_MLP), MYSQL: $(ROOT_MYSQL), DCACHE: $(ROOT_DCACHE), MATHMORE: $(ROOT_MATHMORE)"
+	@echo "    $(ROOT_MYSQL)"
 	@echo "    $(ROOTSYS)"
 	@echo ""
 ifeq ($(GSLFLAG),-DNOGSL)
@@ -1389,7 +1378,6 @@ ifeq ($(GSLFLAG),-DNOGSL)
 else
 	@echo "evndisp with GSL libraries (used in Hough muon calibration, likelihood fitter)"
 	@echo "   GSL  $(GSLFLAG)" 
-	@echo "   GSL2 $(GSL2FLAG)" 
 	@echo "   $(GSLCFLAGS) $(GSLLIBS)"
 endif
 	@echo ""
