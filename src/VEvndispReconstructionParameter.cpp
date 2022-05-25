@@ -1217,12 +1217,6 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				continue;
 			}
 			
-			// Model3D: reconstruction ID for starting values
-			else if( iTemp == "MODEL3DSTARTID" && fRunPara )
-			{
-				fRunPara->fIDstartDirectionModel3D = atoi( iTemp2.c_str() );
-				continue;
-			}
 			
 			/////////////////////////////////////////////////
 			// check for exit statement

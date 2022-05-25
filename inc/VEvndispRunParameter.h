@@ -274,21 +274,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		// Hough transform muon parameters
 		bool fhoughmuonmode;                      // Use hough transform muon analysis
 		
-		// Frogs parameters
-		bool ffrogsmode;                          // for Frogs template Analysis, GH
-		string ffrogsmscwfile;			            // frogs file for getting table energy
-		int ffrogsRecID;			                  // RecID or Cut_ID Frogs Uses - combine with table
-		string ffrogstemplatelist;                // text file containing the elevation and
-		//   elevation-dependant template file names
-		string ffrogsparameterfile;               // parameter file for frogs settings
-		
-		// Model3D
-		bool fUseModel3D;                         // use Model3D analysis, JG
-		bool fUseDisplayModel3D;                  // display Model3D generated images, JG
-		bool fCreateLnLTable;                     // create lookup table for likelihood
-		string fLnLTableFile;                     // read lookup table for likelihood from this file
-		unsigned int fIDstartDirectionModel3D;    // reconstruction ID for starting values
-		
 		// write pulse histograms to gain files
 		int  fwriteLaserPulseN;                    // number of pulse histogram written to gain file
 		bool fwriteAverageLaserPulse;              // write average laser pulse to file
@@ -335,6 +320,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fuseDB;
 		}
 		
-		ClassDef( VEvndispRunParameter, 2000 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 2001 ); //(increase this number)
 };
 #endif

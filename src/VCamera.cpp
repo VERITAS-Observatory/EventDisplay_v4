@@ -476,22 +476,6 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
 			case C_TRIGGER_EVNDISP:
 				setPMTColorOnOff( fData->getTrigger(), fColorTrigger, fColorTrigger, fFillStylePos );
 				break;
-			case C_TEMPLATE:
-				if( fData->getRunParameter()->ffrogsmode == 1 )
-				{
-					setPMTColorScheme( fData->getTemplateMu(), false,  -1.0, 1.1 * fData->getTemplateMuMax(), "photons [p.e.]", false );
-				}
-				break;
-			case C_MODEL3D:
-				if( fData->getRunParameter()->fUseDisplayModel3D )
-				{
-					double minSum = 0;
-					double maxSum = 0;
-					getMinMax( fData->getSums(), minSum, maxSum );
-					setPMTColorScheme( fData->getModel3DMu(), false,  minSum, maxSum, "Model3D signal [d.c.]", false );
-					setPMTColorOff( fData->getModel3DClean() );
-				}
-				break;
 				
 			default:
 				break;
@@ -1684,13 +1668,6 @@ void VCamera::drawAnaResults()
 				fMCShowerDir->SetMarkerColor( 1 );
 				fMCShowerDir->SetMarkerSize( 2. );
 				fMCShowerDir->Draw();
-			}
-			if( fData->getRunParameter()->fUseDisplayModel3D )
-			{
-				fModel3DShowerDir = new TMarker( 0, 0, 29 );
-				fModel3DShowerDir->SetMarkerColor( 3 );
-				fModel3DShowerDir->SetMarkerSize( 2. );
-				fModel3DShowerDir->Draw();
 			}
 			// camera center
 			fCameraCentreDir = new TMarker( convertX( 0. ), convertY( 0. ), 5 );

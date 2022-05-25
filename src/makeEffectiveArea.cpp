@@ -207,19 +207,6 @@ int main( int argc, char* argv[] )
 		exit( EXIT_FAILURE );
 	}
 	
-	//FROGS
-	if( fRunPara->fGammaHadronCutSelector / 10 == 5 )
-	{
-		TChain* fchain = new TChain( "frogspars" );
-		if( !fchain->Add( fRunPara->fdatafile.c_str(), -1 ) )
-		{
-			cout << "Error while trying to add mscw frogs tree from file " << fRunPara->fdatafile  << endl;
-			cout << "exiting..." << endl;
-			exit( EXIT_FAILURE );
-		}
-		c->AddFriend( fchain );
-	}
-	
 	CData d( c, true, 6, true );
 	fCuts->setDataTree( &d );
 	TH1D* hE0mc = ( TH1D* )gDirectory->Get( "hE0mc" );

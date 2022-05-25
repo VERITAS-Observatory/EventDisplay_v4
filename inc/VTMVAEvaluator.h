@@ -145,9 +145,6 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		float    fTheta2;
 		float    fCoreDist;
 		float    fImages_Ttype[VDST_MAXTELESCOPES];
-		float    fRWidth3D;    //model3D
-		float    fErrRWidth3D; //model3D
-		float    fDepth3D;     //model3D
 		float    fDispDiff;
 		float    fDummy;
 		

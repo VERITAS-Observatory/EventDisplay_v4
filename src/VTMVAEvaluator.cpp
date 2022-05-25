@@ -38,9 +38,6 @@ void VTMVAEvaluator::reset()
 	fSizeSecondMax_log10 = 0;
 	fTheta2 = 0.;
 	fCoreDist = 0.;
-	fRWidth3D = 0.;    //model3D
-	fErrRWidth3D = 0.; //model3D
-	fDepth3D = 0.;     //model3D
 	fDispDiff = 0.;
 	fDummy = 0.;
 	for( int i = 0; i < VDST_MAXTELESCOPES; i++ )
@@ -498,18 +495,6 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 			{
 				fTMVAData[b]->fTMVAReader->AddVariable( "sqrt(Xcore*Xcore+Ycore*Ycore)", &fCoreDist );
 			}
-			else if( iTrainingVariables[t] == "RWidth3D" && !iVariableIsASpectator[t] )
-			{
-				fTMVAData[b]->fTMVAReader->AddVariable( "RWidth3D", &fRWidth3D );
-			}
-			else if( iTrainingVariables[t] == "ErrRWidth3D" && !iVariableIsASpectator[t] )
-			{
-				fTMVAData[b]->fTMVAReader->AddVariable( "ErrRWidth3D", &fErrRWidth3D );
-			}
-			else if( iTrainingVariables[t] == "Depth3D" && !iVariableIsASpectator[t] )
-			{
-				fTMVAData[b]->fTMVAReader->AddVariable( "Depth3D", &fDepth3D );
-			}
 			else if( iTrainingVariables[t] == "DispDiff" && !iVariableIsASpectator[t] )
 			{
 				fTMVAData[b]->fTMVAReader->AddVariable( "DispDiff", &fDispDiff );
@@ -794,12 +779,6 @@ bool VTMVAEvaluator::evaluate()
 			fTheta2 = fData->Xoff * fData->Xoff + fData->Yoff * fData->Yoff;
 		}
 		fCoreDist = sqrt( fData->Xcore * fData->Xcore + fData->Ycore * fData->Ycore );
-		if( fData->fModel3D )
-		{
-			fRWidth3D = fData->RWidth3D;
-			fErrRWidth3D = fData->ErrRWidth3D;
-			fDepth3D = fData->Depth3D;
-		}
 		fDispDiff = fData->DispDiff;
 		if( fData->NTtype < VDST_MAXTELESCOPES )
 		{
