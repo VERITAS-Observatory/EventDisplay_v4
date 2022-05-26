@@ -21,7 +21,6 @@
 #include <VBFDataReader.h>
 #endif
 #include <VPedestalCalculator.h>
-#include <VPEReader.h>
 #include <VEvndispRunParameter.h>
 
 #include <VDeadPixelOrganizer.h>

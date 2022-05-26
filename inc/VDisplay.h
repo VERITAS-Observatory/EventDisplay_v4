@@ -47,7 +47,6 @@
 #include <VDisplayBirdsEye.h>
 #include <VEventLoop.h>
 #include <VFitTraceHandler.h>
-#include <VPETree.h>
 
 #include <bitset>
 #include <iostream>

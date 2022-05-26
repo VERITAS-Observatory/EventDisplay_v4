@@ -38,7 +38,6 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 #endif
 	fGrIsuReader = 0;
 	fDSTReader = 0;
-	fPEReader = 0;
 	
 	bMCSetAtmosphericID = false;
 	fBoolPrintSample.assign( fNTel, true );
@@ -427,15 +426,6 @@ bool VEventLoop::initEventLoop( string iFileName )
 		{
 			fDSTReader->setNumSamples( fRunPar->fTelToAnalyze[i], getNSamples( fRunPar->fTelToAnalyze[i] ) );
 		}
-	}
-	// sourcefile has PE format
-	else if( fRunPar->fsourcetype == 6 )
-	{
-		if( fPEReader != 0 )
-		{
-			delete fPEReader;
-		}
-		fPEReader = new VPEReader( fRunPar->fsourcefile, fRunPar->fTelToAnalyze, getDetectorGeo(), fDebug );
 	}
 	// ============================
 	// set the data readers for all inherent classes
