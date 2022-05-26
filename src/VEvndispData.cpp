@@ -129,10 +129,6 @@ bool VEvndispData::initializeDataReader()
 	{
 		fReader = ( VVirtualDataReader* )fMultipleGrIsuReader;
 	}
-	else if( fPEReader != 0 )
-	{
-		fReader = ( VVirtualDataReader* )fPEReader;
-	}
 	
 	if( !fReader )
 	{
@@ -177,10 +173,6 @@ void VEvndispData::testDataReader()
 		else if( fRunPar->fsourcetype == 5  && fMultipleGrIsuReader != 0 )
 		{
 			fReader = ( VVirtualDataReader* )fMultipleGrIsuReader;
-		}
-		else if( fRunPar->fsourcetype == 6 && fPEReader != 0 )
-		{
-			fReader = ( VVirtualDataReader* )fPEReader;
 		}
 		else if( fRunPar->fsourcetype == 7  && fDSTReader != 0 )
 		{
@@ -1167,7 +1159,6 @@ VMultipleGrIsuReader* VEvndispData::fMultipleGrIsuReader = 0;
 VBaseRawDataReader* VEvndispData::fRawDataReader = 0;
 #endif
 VDSTReader* VEvndispData::fDSTReader = 0;
-VPEReader* VEvndispData::fPEReader = 0;
 
 // event data
 unsigned int VEvndispData::fEventNumber = 0;

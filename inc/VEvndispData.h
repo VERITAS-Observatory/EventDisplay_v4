@@ -16,7 +16,6 @@
 #ifndef NOVBF
 #include <VBaseRawDataReader.h>
 #endif
-#include <VPEReader.h>
 #include <VDB_PixelDataReader.h>
 #include <VEvndispRunParameter.h>
 #include <VFitTraceHandler.h>
@@ -73,7 +72,6 @@ class VEvndispData
 		static VBaseRawDataReader* fRawDataReader;
 #endif
 		static VDSTReader* fDSTReader;
-		static VPEReader*  fPEReader;
 		
 		// DB pixel data
 		static VDB_PixelDataReader* fDB_PixelDataReader;

@@ -216,9 +216,6 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VGrIsuReader.o \
 		./obj/VMultipleGrIsuReader.o \
 		./obj/VDSTReader.o \
-		./obj/VPEReader.o \
-		./obj/VPETree.o \
-		./obj/VPETree_Dict.o \
 		./obj/VNoiseFileReader.o \
          ./obj/VCamera.o \
 		./obj/VDisplayBirdsEye.o \
