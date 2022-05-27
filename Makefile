@@ -460,7 +460,6 @@ VTS.getRun_TimeElevAzim: $(ACCOBJECT)
 	$(LD) $(LDFLAGS) $^ $(GLIBS)  $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
-
 ########################################################
 # effective area code (makeEffectiveArea_
 ########################################################
@@ -917,6 +916,7 @@ WRITEVTSPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 ifneq ($(GSLFLAG),-DNOGSL)
   WRITEVTSPHYSOBJ	+= ./obj/VLikelihoodFitter.o ./obj/VLikelihoodFitter_Dict.o
 endif
+
 ifeq ($(ASTRONMETRY),-DASTROSLALIB)
     WRITEVTSPHYSOBJ += ./obj/VASlalib.o
 endif
@@ -1101,7 +1101,7 @@ writelaserinDB : $(writelaserinDBOBJ)
 ./obj/combineEffectiveAreas.o:	./src/combineEffectiveAreas.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-combineEffectiveAreas:	 ./obj/combineEffectiveAreas.o  \
+COMBINEEFFAREAOBJ:	 ./obj/combineEffectiveAreas.o  \
 			 ./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 			 ./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 			 ./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
@@ -1129,6 +1129,7 @@ ifeq ($(ASTRONMETRY),-DASTROSLALIB)
     COMBINEEFFOBJ += ./obj/VASlalib.o
 endif
 
+combineEffectiveAreas:	$(COMBINEEFFAREAOBJ)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
