@@ -1098,10 +1098,8 @@ writelaserinDB : $(writelaserinDBOBJ)
 ########################################################
 # combineEffectiveAreas
 ########################################################
-./obj/combineEffectiveAreas.o:	./src/combineEffectiveAreas.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-COMBINEEFFAREAOBJ:	 ./obj/combineEffectiveAreas.o  \
+COMBINEEFFAREAOBJ=	 ./obj/combineEffectiveAreas.o  \
 			 ./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 			 ./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 			 ./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
@@ -1123,7 +1121,11 @@ COMBINEEFFAREAOBJ:	 ./obj/combineEffectiveAreas.o  \
 			 ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			 ./obj/VSkyCoordinatesUtilities.o ./obj/VUtilities.o \
 			 ./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
-			 ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o
+			 ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o \
+			 ./obj/combineEffectiveAreas.o
+
+./obj/combineEffectiveAreas.o:	./src/combineEffectiveAreas.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 ifeq ($(ASTRONMETRY),-DASTROSLALIB)
     COMBINEEFFOBJ += ./obj/VASlalib.o
