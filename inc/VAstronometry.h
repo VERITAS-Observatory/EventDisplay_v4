@@ -9,6 +9,8 @@
 
 #ifdef ASTROSLALIB
 #include "VAstronometry.h"
+#include "VASlalib.h"
+#include "VASlamac.h"
 #elif ASTROSOFA
 #include <sofa.h>
 #include <sofam.h>
@@ -48,6 +50,7 @@ class VAstronometry
          static double vlaGmst( double ut1 );
          static double vlaGmsta( double date, double ut1 );
 
+         static void vlaClyd(int iy, int im, int id, int* ny, int* nd, int* jstat );
          static double vlaDranrm( double angle );
          static double vlaDsep( double a1, double b1, double a2, double b2 );
          static void vlaDs2tp( double ra, double dec, double raz, double decz,

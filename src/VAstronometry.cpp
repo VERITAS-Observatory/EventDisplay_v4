@@ -21,7 +21,7 @@ VAstronometry::VAstronometry()
 void VAstronometry::vlaDjcl( double djm, int* iy, int* im, int* id, double* fd, int* j )
 {
 #ifdef ASTROSLALIB
-    VAstronometry::vlaDjcl( djm, iy, im, id, fd, j );
+    slaDjcl( djm, iy, im, id, fd, j );
 #elif ASTROSOFA
     *j = iauJd2cal( ASTRODJM0, djm, iy, im, id, fd );
 #endif
@@ -33,7 +33,7 @@ void VAstronometry::vlaDjcl( double djm, int* iy, int* im, int* id, double* fd, 
 void VAstronometry::vlaCldj( int iy, int im, int id, double* djm, int* j )
 {
 #ifdef ASTROSLALIB
-    VAstronometry::vlaCldj( iy, im, id, djm, j );
+    slaCldj( iy, im, id, djm, j );
 #elif ASTROSOFA
     double djm0 = 0.;
     *j = iauCal2jd( iy, im, id, &djm0, djm );
@@ -71,7 +71,7 @@ double VAstronometry::vlaGmst( double ut1 )
 void VAstronometry::vlaEqgal( double dr, double dd, double* dl, double* db )
 {
 #ifdef ASTROSLALIB
-    VAstronometry::vlaEqgal( dr, dd, dl, db );
+    slaEqgal( dr, dd, dl, db );
 #elif ASTROSOFA
     iauIcrs2g( dr, dd, dl, db );
 #endif
@@ -90,6 +90,18 @@ void VAstronometry::vlaDe2h( double ha, double dec, double phi, double* az, doub
 #endif
 }
 
+/*
+ * Gregorian to Julian calendar
+ *
+ */
+void VAstronometry::vlaClyd(int iy, int im, int id, int* ny, int* nd, int* jstat )
+{
+#ifdef ASTROSLALIB
+    slaClyd( iy, im, id, ny, nd, jstat );
+#elif ASTROSOFA
+    cout << "VAstronometry::vlaClyd error: not implemented for sofa" << endl;
+#endif
+}
 
 /*
  *  Precession
@@ -102,14 +114,14 @@ void VAstronometry::vlaPreces( double MJD_ep0, double MJD_ep1, double *ra, doubl
 #ifdef ASTROSLALIB
     int  oy, om, od, j, ny, nd;
     double ofd, ep0, ep1;
-    VAstronometry::vlaDjcl( MJD_ep0, &oy, &om, &od, &ofd, &j );
-    VAstronometry::vlaClyd( oy, om, od, &ny, &nd, &j );
+    slaDjcl( MJD_ep0, &oy, &om, &od, &ofd, &j );
+    slaClyd( oy, om, od, &ny, &nd, &j );
     ep0  = ny + nd / 365.25;
-    VAstronometry::vlaDjcl( MJD_ep1, &oy, &om, &od, &ofd, &j );
-    VAstronometry::vlaClyd( oy, om, od, &ny, &nd, &j );
+    slaDjcl( MJD_ep1, &oy, &om, &od, &ofd, &j );
+    slaClyd( oy, om, od, &ny, &nd, &j );
     ep1  = ny + nd / 365.25;
 
-    VAstronometry::vlaPreces( "FK5", ep0, ep1, ra, dc );
+    slaPreces( "FK5", ep0, ep1, ra, dc );
 
 #elif ASTROSOFA
     
@@ -162,7 +174,7 @@ void VAstronometry::vlaPreces( double MJD_ep0, double MJD_ep1, double *ra, doubl
 double VAstronometry::vlaDranrm( double angle )
 {
 #ifdef ASTROSLALIB
-    return VAstronometry::vlaDranrm( angle );
+    return slaDranrm( angle );
 #elif ASTROSOFA
     return iauAnp( angle );
 #endif
@@ -200,7 +212,7 @@ void VAstronometry::vlaDs2tp( double ra, double dec, double raz, double decz,
         double* xi, double* eta, int* j )
 {
 #ifdef ASTROSLALIB
-    VAstronometry::vlaDs2tp( ra, dec, raz, decz, xi, eta, j );
+    slaDs2tp( ra, dec, raz, decz, xi, eta, j );
 #elif ASTROSOFA
     *j = iauTpxes( ra, dec, raz, decz, xi, eta );
 #endif
