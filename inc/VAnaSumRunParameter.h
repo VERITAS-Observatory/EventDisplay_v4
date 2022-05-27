@@ -139,7 +139,7 @@ class VAnaSumRunParameterDataClass : public TNamed
         {
             return fRunOn < x.fRunOn;
         }
-		ClassDef( VAnaSumRunParameterDataClass, 2 );
+		ClassDef( VAnaSumRunParameterDataClass, 3 );
 };
 
 class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
@@ -270,6 +270,6 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		bool writeListOfExcludedSkyRegions();
 		bool getListOfExcludedSkyRegions( TFile* f );
 		
-		ClassDef( VAnaSumRunParameter, 17 ) ;
+		ClassDef( VAnaSumRunParameter, 18 ) ;
 };
 #endif
