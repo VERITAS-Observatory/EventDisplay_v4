@@ -1,7 +1,42 @@
-Original developers:
-Gernot Maier, DESY
-Jamie Holder, University of Delaware
+Eventdisplay was originally developed for the analysis of gamma-ray data from the VERITAS gamma-ray
+observatory (http://veritas.sao.arizona.edu/), but has been released as open source software to be
+used the analysis from MC events for future observatories.
 
-With contributions from many collaborators 
-among others (sorry for missing names):
-H.Krawczynski, R.Guenette, M.McCutcheon, A.McCann, E.Aliu, J.Grube, M.Beilicke, H.Prokoph, G.Hughes, R.Welsing, C. Skole, M.Schroedter, C.Duke, F.Pizlo, L.Gerard, B.Behera, M.Shayduk, S.Vorobiov, H.Fleischhack, J. Tyler, M.Krause, N.Kelley-Hoskins, E.Pueschel, T.Hassan, S. O'Brian, M.Nievas Rossilo, ...
+Main developers of Eventdisplay are Gernot Maier, DESY and Jamie Holder, University of Delaware.
+
+Many people contributed to the software. If you've been left off, please email to G.Maier.
+
+Contributors are:
+H.Krawczynski 
+R.Guenette 
+M.McCutcheon 
+A.McCann 
+E.Aliu
+J.Grube
+M.Beilicke 
+H.Prokoph 
+G.Hughes 
+R.Welsing 
+C.Skole 
+M.Schroedter 
+C.Duke 
+F.Pizlo 
+L.Gerard 
+B.Behera 
+M.Shayduk 
+S.Vorobiov 
+H.Fleischhack 
+J.Tyler 
+M.Krause 
+N.Kelley-Hoskins 
+K.Berger 
+S.Griffiths 
+S.Griffin
+E.Pueschel
+T.Hassan
+S. O'Brian
+M.Nievas Rossilo
+R.Prado
+O.Gueta
+P.Ivo
+...and many more...
