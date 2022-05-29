@@ -31,7 +31,7 @@ VLightCurve::VLightCurve()
 	fRateAxisTitleUnSet = false;
 	setLightCurveAxis();
 	setPhaseFoldingValues( -99., -99., false );
-        setFluxCalculationMethod();
+	setFluxCalculationMethod();
 }
 
 /*
@@ -133,24 +133,24 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
 	// get MJD for the case that no time limits are given
 	if( iMJDMin < 0 )
 	{
-        iMJDMin = 1000000;
-        for( unsigned int i = 0; i < fMJD.size(); i++ )
-        {
-            if( fMJD[i] > 0 && fMJD[i] < iMJDMin )
-            {
-                iMJDMin = TMath::Floor( fMJD[i] );
-            }
-        }
+		iMJDMin = 1000000;
+		for( unsigned int i = 0; i < fMJD.size(); i++ )
+		{
+			if( fMJD[i] > 0 && fMJD[i] < iMJDMin )
+			{
+				iMJDMin = TMath::Floor( fMJD[i] );
+			}
+		}
 	}
 	if( iMJDMax < 0 )
 	{
-        for( unsigned int i = 0; i < fMJD.size(); i++ )
-        {
-            if( fMJD[i] > 0 && fMJD[i] > iMJDMax )
-            {
-                iMJDMax = TMath::Floor( fMJD[i] ) + 1;
-            }
-        }
+		for( unsigned int i = 0; i < fMJD.size(); i++ )
+		{
+			if( fMJD[i] > 0 && fMJD[i] > iMJDMax )
+			{
+				iMJDMax = TMath::Floor( fMJD[i] ) + 1;
+			}
+		}
 	}
 	
 	// plotting parameters
@@ -266,8 +266,8 @@ bool VLightCurve::fillTeV_anasum( bool iPrint )
 		{
 			fLightCurveData[i]->setFluxCalculationEnergyInterval( fEnergy_min_TeV, fEnergy_max_TeV );
 			fLightCurveData[i]->fillTeVEvndispData( fAnaSumFile, fThresholdSignificance, fMinEvents,
-				   			        fUpperLimit, fUpperLimitMethod, fLiMaEqu, fMinEnergy, fE0, fAlpha,
-                                                                fFluxCalculationUseRolke );
+													fUpperLimit, fUpperLimitMethod, fLiMaEqu, fMinEnergy, fE0, fAlpha,
+													fFluxCalculationUseRolke );
 		}
 	}
 	
@@ -438,7 +438,7 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 					iMJD_error = 0.3;
 				}
 				fLightCurveGraph->SetPointError( z, iMJD_error, iMJD_error,
-	           		           iFMean - fLightCurveData[i]->fRunFluxCI_lo_1sigma, fLightCurveData[i]->fRunFluxCI_up_1sigma - iFMean );
+												 iFMean - fLightCurveData[i]->fRunFluxCI_lo_1sigma, fLightCurveData[i]->fRunFluxCI_up_1sigma - iFMean );
 			}
 			z++;
 		}

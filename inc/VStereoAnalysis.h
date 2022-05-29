@@ -133,7 +133,7 @@ class VStereoAnalysis
 		
 		TGraphAsymmErrors* gMeanEffectiveAreaMC;
 		TH2F*			   hResponseMatrix;
-
+		
 		VStereoMaps* fMap;
 		VStereoMaps* fMapUC;
 		int fHisCounter;
@@ -192,15 +192,15 @@ class VStereoAnalysis
 		double  fDL3EventTree_YGroundCore;
 		int     fDL3EventTree_NImages;
 		ULong64_t fDL3EventTree_ImgSel;
-                double  fDL3EventTree_MeanPedvar;
+		double  fDL3EventTree_MeanPedvar;
 		double  fDL3EventTree_MSCW;
 		double  fDL3EventTree_MSCL;
 		double  fDL3EventTree_Az ;
 		double  fDL3EventTree_El ;
 		double  fDL3EventTree_EmissionHeight ;
 		double  fDL3EventTree_Acceptance ;
-        double  fDL3EventTree_MVA;
-        UInt_t  fDL3EventTree_IsGamma;
+		double  fDL3EventTree_MVA;
+		UInt_t  fDL3EventTree_IsGamma;
 		VRadialAcceptance* fDL3_Acceptance;
 		
 		double  fDeadTimeStorage ;
@@ -241,19 +241,19 @@ class VStereoAnalysis
 		// directories
 		TDirectory* fDirTot;
 		vector< TDirectory* > fDirTotRun;
-
-        void astro_check_for_valid_coordinates( unsigned int runlist_iter );
-        void astro_set_skymap_center_from_runparameters( unsigned int runlist_iter );
-        void astro_set_skymap_centershift_from_runparameters( unsigned int runlist_iter );
-        pair< double, double > astro_calculate_ra_dec_currentEpoch( unsigned int runlist_iter ); 
-        pair< double, double > astro_get_wobbleoffset_radec( unsigned int runlist_iter, bool bPrint = true );
-        pair< double, double > astro_get_arraypointing( unsigned int runlist_iter, bool bPrint = true );
-        pair< double, double > astro_get_arraypointingJ2000( unsigned int runlist_iter );
-        double astro_get_mjd( unsigned int runlist_iter );
-        void astro_print_pointing( unsigned int runlist_iter );
-        void astro_calculate_modified_wobbleoffset( unsigned int runlist_iter );
-        void astro_set_exclusionsregions( unsigned int runlist_iter );
-        void astro_setup_star_cataloge( unsigned int runlist_iter );
+		
+		void astro_check_for_valid_coordinates( unsigned int runlist_iter );
+		void astro_set_skymap_center_from_runparameters( unsigned int runlist_iter );
+		void astro_set_skymap_centershift_from_runparameters( unsigned int runlist_iter );
+		pair< double, double > astro_calculate_ra_dec_currentEpoch( unsigned int runlist_iter );
+		pair< double, double > astro_get_wobbleoffset_radec( unsigned int runlist_iter, bool bPrint = true );
+		pair< double, double > astro_get_arraypointing( unsigned int runlist_iter, bool bPrint = true );
+		pair< double, double > astro_get_arraypointingJ2000( unsigned int runlist_iter );
+		double astro_get_mjd( unsigned int runlist_iter );
+		void astro_print_pointing( unsigned int runlist_iter );
+		void astro_calculate_modified_wobbleoffset( unsigned int runlist_iter );
+		void astro_set_exclusionsregions( unsigned int runlist_iter );
+		void astro_setup_star_cataloge( unsigned int runlist_iter );
 		
 		double combineHistograms();
 		void   defineAstroSource();
@@ -264,9 +264,9 @@ class VStereoAnalysis
 		bool init_TreeWithSelectedEvents( int, bool );
 		void reset_TreeWithSelectedEvents();
 		
-		void fill_DL3Tree( CData* c , 
-                                   double i_xderot, double i_yderot, 
-                                   unsigned int icounter, double i_UTC );
+		void fill_DL3Tree( CData* c ,
+						   double i_xderot, double i_yderot,
+						   unsigned int icounter, double i_UTC );
 		bool init_DL3Tree( int irun, int icounter );
 		void write_DL3Tree();
 		

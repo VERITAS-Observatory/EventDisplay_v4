@@ -44,7 +44,7 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		int fInterpolate;
 		string fInterpolateString;
 		char readwrite;
-                bool fUpdateInstrumentEpoch;
+		bool fUpdateInstrumentEpoch;
 		
 		bool  fLimitEnergyReconstruction;
 		
@@ -58,8 +58,8 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		double fMSCWSizecorrection_mean;
 		double fMSCLSizecorrection_mean;
 		double fEnergySizecorrection_mean;
-                int sizecorr_ntel;
-
+		int sizecorr_ntel;
+		
 		string writeoption;
 		bool bNoNoTrigger;
 		int  bWriteReconstructedEventsOnly;

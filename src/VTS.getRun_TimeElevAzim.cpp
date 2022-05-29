@@ -133,7 +133,7 @@ int main( int argc, char* argv[] )
 					if( runnumber < 9999 or runnumber > 999999 )
 					{
 						cout << "Error, '" << file_line;
-                                                cout << "' needs to be a valid runnumber (9999-999999)" << endl;
+						cout << "' needs to be a valid runnumber (9999-999999)" << endl;
 						return 1 ;
 					}
 					else

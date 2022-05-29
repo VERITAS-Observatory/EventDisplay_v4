@@ -451,7 +451,7 @@ void Ctpars::Init( TTree* tree )
 		index_of_max[1] = 0;
 		index_of_max[2] = 0;
 		tchisq_x = 0.;
-
+		
 		//muon analysis//
 		if( fChain->GetBranchStatus( "muonX0" ) )
 		{
@@ -525,7 +525,7 @@ void Ctpars::Init( TTree* tree )
 		{
 			houghMuonValid = 0;
 		}
-
+		
 	}
 	// bShort == 0: read all branches
 	if( bShort == 0 )

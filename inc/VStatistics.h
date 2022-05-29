@@ -172,10 +172,10 @@ namespace VStatistics
 		double big = 10.*sqrt( b + c ) + fabs( c - b ) + 10.; //! 10 sigma noise
 		TF1 g( "myfuncg", funcg, 0.0, big, 5 );
 		g.SetParameters( par );
-        n1 = g.Integral( 0., big, eps );
+		n1 = g.Integral( 0., big, eps );
 		if( n1 > 0. )
 		{
-        p = g.Integral( ul, big, eps ) / n1;
+			p = g.Integral( ul, big, eps ) / n1;
 		}
 		else
 		{
@@ -258,7 +258,7 @@ namespace VStatistics
 		{
 			TRolke i_Rolke;
 			i_Rolke.SetCL( CL );
-                        i_Rolke.SetBounding( iBoundedLimits );
+			i_Rolke.SetBounding( iBoundedLimits );
 			
 			double sdb = ratio * sqrt( nOff );
 			
@@ -272,7 +272,7 @@ namespace VStatistics
 		{
 			TRolke i_Rolke;
 			i_Rolke.SetCL( CL );
-                        i_Rolke.SetBounding( iBoundedLimits );
+			i_Rolke.SetBounding( iBoundedLimits );
 			i_Rolke.SetPoissonBkgKnownEff( ( int )nOn, ( int )nOff, 1. / ratio, 1. );
 			
 			return i_Rolke.GetUpperLimit();

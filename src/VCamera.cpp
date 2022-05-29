@@ -1,7 +1,7 @@
 /*! \class VCamera
     \brief camera plotting routines
 
-    
+
 */
 
 #include "VCamera.h"

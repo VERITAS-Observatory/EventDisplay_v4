@@ -33,16 +33,16 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
 		VSpectralWeight*           fSpectralWeight;                 //! backwards compatibility
 		vector< VSpectralWeight* > fVSpectralWeight;                //!
 		
-                double   fMCEnergyRange_TeV_min;
+		double   fMCEnergyRange_TeV_min;
 		double   fMCEnergyRange_TeV_max;
 		double   fMCSpectralIndex;
 		
-                // range in log(E) for the EffArea hisotrams
+		// range in log(E) for the EffArea hisotrams
 		int      fEnergyAxisBins_log10;
 		double   fEnergyAxisMin_log10;
 		double   fEnergyAxisMax_log10;
-
-                
+		
+		
 		
 		int      checkParameters( const VEffectiveAreaCalculatorMCHistograms* );
 		

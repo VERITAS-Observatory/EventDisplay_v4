@@ -61,7 +61,7 @@ class VImageAnalyzerData
 		vector< valarray<double> > fPulseTimingUncorrected; //!< pulse timing at certain fraction of pulse maxima (uncorrected values)
 		vector< valarray<double> > fPulseTimingCorrected; //!< pulse timing at certain fraction of pulse maxima (corrected values)
 		valarray< double >     fPulseTimingAverageTime; //!< average pulse time
-        valarray< double >     fPulseTimingAverageTimeCorrected; //!< average pulse time (corrected values)
+		valarray< double >     fPulseTimingAverageTimeCorrected; //!< average pulse time (corrected values)
 		valarray<unsigned int> fTCorrectedSumFirst;
 		valarray<unsigned int> fTCorrectedSumLast;
 		valarray<unsigned int> fCurrentSummationWindow;
@@ -119,7 +119,7 @@ class VImageAnalyzerData
 		vector< unsigned int > iDummyVectorUI;
 		
 		VImageAnalyzerData( unsigned int iTelID, unsigned int iShortTree = 0,
-                            bool bCalibration = false );
+							bool bCalibration = false );
 		~VImageAnalyzerData() {}
 		
 		void                     fillPulseSum( unsigned int, double, bool );
@@ -141,7 +141,7 @@ class VImageAnalyzerData
 		{
 			return fRandomMakeDeadChannelsSeed;
 		}
-        valarray<double>&        getTraceAverageTime( bool iCorrected );
+		valarray<double>&        getTraceAverageTime( bool iCorrected );
 		valarray<double>&        getTZeros( bool iCorrected );
 		valarray<double>&        getTraceWidth( bool iCorrected );
 		VSpecialChannel*         getSpecialChannel()
@@ -152,9 +152,9 @@ class VImageAnalyzerData
 											 unsigned int iSamples, unsigned int ipulsetiminglevel, unsigned int iTzeroIndex, unsigned int iWidthIndex );
 		void                     initializeMeanPulseHistograms();
 		void                     initializeIntegratedChargeHistograms();
-		bool                     readSpecialChannels( int iRunNumber, string iEpoch, 
-                                                              string ispecialchannelfile, 
-                                                              string ithroughputfile, string iDirectory );
+		bool                     readSpecialChannels( int iRunNumber, string iEpoch,
+				string ispecialchannelfile,
+				string ithroughputfile, string iDirectory );
 		void                     setTraceIntegrationMethod( unsigned iN = 1 )
 		{
 			fTraceIntegrationMethod = iN;

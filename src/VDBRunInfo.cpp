@@ -122,7 +122,7 @@ unsigned int VDBRunInfo::readRunDQM( string iDBserver, int run_number , unsigned
 	iTempS << iDBserver << "/VOFFLINE";
 	char c_query[1000];
 	sprintf( c_query, "SELECT run_id , data_category   , status   , status_reason , tel_cut_mask , usable_duration , time_cut_mask , light_level , vpm_config_mask , authors  , comment from tblRun_Analysis_Comments where run_id=%d", run_number );
-
+	
 	//std::cout<<"VDBRunInfo::readRunDQM "<<std::endl;
 	VDB_Connection my_connection( iTempS.str().c_str(), "readonly", "" ) ;
 	if( !my_connection.Get_Connection_Status() )
@@ -382,10 +382,16 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 	{
 		angl = atof( db_row->GetField( 18 ) );
 	}
-    fWobbleNorth = dist * cos( angl * TMath::DegToRad() );
-    fWobbleEast = dist * sin( angl * TMath::DegToRad() );
-    if( TMath::Abs( fWobbleNorth ) < 1.e-15 ) fWobbleNorth = 0.;
-    if( TMath::Abs( fWobbleEast ) < 1.e-15 ) fWobbleEast = 0.;
+	fWobbleNorth = dist * cos( angl * TMath::DegToRad() );
+	fWobbleEast = dist * sin( angl * TMath::DegToRad() );
+	if( TMath::Abs( fWobbleNorth ) < 1.e-15 )
+	{
+		fWobbleNorth = 0.;
+	}
+	if( TMath::Abs( fWobbleEast ) < 1.e-15 )
+	{
+		fWobbleEast = 0.;
+	}
 	
 	// get config mask
 	if( db_row->GetField( 10 ) )

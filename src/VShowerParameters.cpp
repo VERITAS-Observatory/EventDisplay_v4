@@ -6,7 +6,7 @@
     some variables are the same for each event (data format, source file, etc.),
     not really necessary to store them in this tree (but convenient)
 
-    
+
 */
 
 #include "VShowerParameters.h"

@@ -1390,8 +1390,8 @@ void VDisplay::setFADCText()
 	sprintf( cTemp, "telescope %d channel %d%s (NN %d: ", fTelescope + 1, fSelectedChan - 200000, iFADCtext.Data(), fEventLoop->getDetectorGeometry()->getNNeighbours()[iChannel] );
 	for( unsigned int n = 0; n < fEventLoop->getDetectorGeometry()->getNNeighbours()[iChannel]; n++ )
 	{
-	    sprintf( cTemp, "%s %d", cTemp, fEventLoop->getDetectorGeometry()->getNeighbours()[iChannel][n] );
-        }
+		sprintf( cTemp, "%s %d", cTemp, fEventLoop->getDetectorGeometry()->getNeighbours()[iChannel][n] );
+	}
 	sprintf( cTemp, "%s)", cTemp );
 	fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 	// L1/HV/currents (if available)
@@ -3341,8 +3341,9 @@ void VDisplay::dumpImageBorderPixels()
 	}
 }
 
-void VDisplay::makeFullMovie(){
-	if (fEventLoop->getRunParameter()->fMovieBool)
+void VDisplay::makeFullMovie()
+{
+	if( fEventLoop->getRunParameter()->fMovieBool )
 	{
 		//step 1, click the next button
 		fEventLoop->setNextEventStatus( true );
@@ -3351,11 +3352,12 @@ void VDisplay::makeFullMovie(){
 		// Step 2, Process
 		string inFile = fEventLoop->getRunParameter()->fMovieInput;
 		string outDir = fEventLoop->getRunParameter()->fMovieOutputDir;
-		ifstream inputFile(inFile.c_str());
+		ifstream inputFile( inFile.c_str() );
 		int eventNum = 0;
-		while(inputFile >> eventNum){
+		while( inputFile >> eventNum )
+		{
 			char c_ev[200];
-			sprintf( c_ev, "searching for event %d",eventNum );
+			sprintf( c_ev, "searching for event %d", eventNum );
 			fStatusBar->SetText( c_ev, 1 );
 			fEventLoop->gotoEvent( eventNum );
 			if( eventNum != 0 )
@@ -3380,7 +3382,7 @@ void VDisplay::makeFullMovie(){
 			ostringstream os;
 			os << outDir << "/run_" << fEventLoop->getRunNumber() << "_event_" << fEventLoop->getEventNumber() << "." << fEventLoop->getRunParameter()->fMovieFrameOutput;
 			string outFile = os.str();
-			fCanvasCamera->Print(outFile.c_str());
+			fCanvasCamera->Print( outFile.c_str() );
 		}
 		inputFile.close();
 		//Step 3, click quit button

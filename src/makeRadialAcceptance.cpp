@@ -61,12 +61,12 @@ int main( int argc, char* argv[] )
 	parseOptions( argc, argv );
 	
 	//find telescopes to analyse
-	for( unsigned int i = 0; i < teltoanastring.length(); i++ ) 
+	for( unsigned int i = 0; i < teltoanastring.length(); i++ )
 	{
-                string i_tel = teltoanastring.substr( i, 1 );
-		teltoana.push_back(atoi( i_tel.c_str()) - 1 );
-	}	
-
+		string i_tel = teltoanastring.substr( i, 1 );
+		teltoana.push_back( atoi( i_tel.c_str() ) - 1 );
+	}
+	
 	// read file list from run list file
 	if( listfilename.size() > 0 )
 	{
@@ -199,24 +199,24 @@ int main( int argc, char* argv[] )
 		VEvndispRunParameter* iParV2 = ( VEvndispRunParameter* )fTest.Get( "runparameterV2" );
 		if( iParV2 )
 		{
-                        cout << "Testing telescope multiplicity " << teltoanastring << endl;
+			cout << "Testing telescope multiplicity " << teltoanastring << endl;
 			if( teltoana.size() != iParV2->fTelToAnalyze.size() || !equal( teltoana.begin(), teltoana.end(), iParV2->fTelToAnalyze.begin() ) )
 			{
 				cout << endl;
 				cout << "error: Requested telescopes " << teltoanastring << " do not equal telescopes in run " << ifile << endl;
-                                cout << "PAR ";
-                                for( unsigned int i = 0; i < iParV2->fTelToAnalyze.size(); i++ )
-                                {
-                                     cout << iParV2->fTelToAnalyze[i] << "  ";
-                                }
-                                cout << endl;
-                                cout << "USER ";
-                                for( unsigned int i = 0; i < teltoana.size(); i++ )
-                                {
-                                     cout << teltoana[i] << "  ";
-                                }
-                                cout << endl;
-                                cout << "\t" << teltoana.size() << "\t" << iParV2->fTelToAnalyze.size() << endl;
+				cout << "PAR ";
+				for( unsigned int i = 0; i < iParV2->fTelToAnalyze.size(); i++ )
+				{
+					cout << iParV2->fTelToAnalyze[i] << "  ";
+				}
+				cout << endl;
+				cout << "USER ";
+				for( unsigned int i = 0; i < teltoana.size(); i++ )
+				{
+					cout << teltoana[i] << "  ";
+				}
+				cout << endl;
+				cout << "\t" << teltoana.size() << "\t" << iParV2->fTelToAnalyze.size() << endl;
 				exit( EXIT_FAILURE );
 			}
 		}
@@ -276,7 +276,7 @@ int main( int argc, char* argv[] )
 		}
 		cout << "total number of entries after cuts: " << i_entries_after_cuts << endl;
 		cout << endl << endl;
-
+		
 		fTest.Close();
 	}
 	
@@ -393,8 +393,8 @@ int parseOptions( int argc, char* argv[] )
 				break;
 			case 'i':
 				fInstrumentEpoch = optarg;
-                                // make sure that major epoch is used
-                                fInstrumentEpoch = fInstrumentEpoch.substr( 0, fInstrumentEpoch.find( "_" ) );
+				// make sure that major epoch is used
+				fInstrumentEpoch = fInstrumentEpoch.substr( 0, fInstrumentEpoch.find( "_" ) );
 				cout << "(Major) instrument epoch is " << fInstrumentEpoch << endl;
 				break;
 			case 'e':

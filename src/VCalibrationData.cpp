@@ -222,8 +222,8 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
 	fAverageTzero.resize( i_channel, 0. );
 	fAverageTzerovars.resize( i_channel, 0. );
 	
-    fFADCtoPhe.resize( i_channel, 1. );
-
+	fFADCtoPhe.resize( i_channel, 1. );
+	
 	// low gain channels
 	fLowGainPeds.resize( i_channel, 20. );
 	fVLowGainPedvars.resize( nSamples + 1, fLowGainPeds );
@@ -239,7 +239,7 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
 	fLowGainAverageTzero.resize( i_channel, 0. );
 	fLowGainAverageTzerovars.resize( i_channel, 0. );
 	
-    fLowGainFADCtoPhe.resize( i_channel, 1. );
+	fLowGainFADCtoPhe.resize( i_channel, 1. );
 	
 	itemp_ped.resize( i_channel, 1. );
 	// low gain multiplier settings
@@ -414,8 +414,8 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 		double itzerovar = 0.;
 		double ipedlowgain = 0.;
 		double ipedvarlowgain = 0.;
-        double iFADCtoPhe = 0.;
-        double iFADCtoPhelowgain = 0.;
+		double iFADCtoPhe = 0.;
+		double iFADCtoPhelowgain = 0.;
 		double igainlowgain = 0.;
 		double ilowgainmultiplier_trace = 0;
 		double ilowgainmultiplier_sum[iMAXDEFWINDOWS][iMAXSUMWINDOWS];
@@ -428,7 +428,7 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 		double itzerovarlowgain = 0.;
 		unsigned int nsumwindows = 0;
 		unsigned int sumwindow = 0;
-        unsigned int iintegrationMethod = iTraceIntegrationMethod;
+		unsigned int iintegrationMethod = iTraceIntegrationMethod;
 		int istat = 0;
 		int istatLow = 0;
 		double pedvarV[iMAXSUMWINDOWS];
@@ -457,7 +457,7 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 		fCalibrationTree->Branch( "pedvarV", pedvarV, "pedvarV[nsumwindows]/D" );
 		fCalibrationTree->Branch( "gain", &igain, "gain/D" );
 		fCalibrationTree->Branch( "gainvar", &igainvar, "gainvar/D" );
-        fCalibrationTree->Branch( "FADCtoPhe", &iFADCtoPhe, "FADCtoPhe/D" );
+		fCalibrationTree->Branch( "FADCtoPhe", &iFADCtoPhe, "FADCtoPhe/D" );
 		fCalibrationTree->Branch( "toff", &itoff, "toff/D" );
 		fCalibrationTree->Branch( "toffvar", &itoffvar, "toffvar/D" );
 		fCalibrationTree->Branch( "tzero", &itzero, "tzero/D" );
@@ -467,21 +467,21 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 		fCalibrationTree->Branch( "pedvarVLowGain", pedvarLowGainV, "pedvarVLowGain[nsumwindows]/D" );
 		fCalibrationTree->Branch( "gainLowGain", &igainlowgain, "gainLowGain/D" );
 		fCalibrationTree->Branch( "gainvarLowGain", &igainvarlowgain, "gainvarLowGain/D" );
-        fCalibrationTree->Branch( "FADCtoPheLowGain", &iFADCtoPhelowgain, "FADCtoPheLowGain/D" );
+		fCalibrationTree->Branch( "FADCtoPheLowGain", &iFADCtoPhelowgain, "FADCtoPheLowGain/D" );
 		fCalibrationTree->Branch( "toffLowGain", &itofflowgain, "toffLowGain/D" );
 		fCalibrationTree->Branch( "toffvarLowGain", &itoffvarlowgain, "toffvarLowGain/D" );
 		fCalibrationTree->Branch( "tzeroLowGain", &itzerolowgain, "tzeroLowGain/D" );
 		fCalibrationTree->Branch( "tzerovarLowGain", &itzerovarlowgain, "tzerovarLowGain/D" );
 		fCalibrationTree->Branch( "lowgainmultiplier_trace", &ilowgainmultiplier_trace, "lowgainmultiplier_trace/D" );
-        fCalibrationTree->Branch( "integrationMethod", &iintegrationMethod, "integrationMethod/I" );
+		fCalibrationTree->Branch( "integrationMethod", &iintegrationMethod, "integrationMethod/I" );
 		fCalibrationTree->Branch( "lowgainmultiplier_sum", &ilowgainmultiplier_sum, "lowgainmultiplier_sum[10][1000]/D" );
 		fCalibrationTree->Branch( "nlowgaindefaultsumwindows", &inlowgaindefaultsumwindows, "nlowgaindefaultsumwindows/i" );
 		fCalibrationTree->Branch( "lowgaindefaultsumwindows", &ilowgaindefaultsumwindows, "lowgaindefaultsumwindows[nlowgaindefaultsumwindows]/D" );
 		
 		
 		if( fPeds.size() == fPedrms.size() && fPeds.size() == fGains.size() && fPeds.size() == fGainvars.size()
-                && fPeds.size() == fTOffsets.size() && fPeds.size() == fTOffsetvars.size() && fPeds.size() == fLowGainPeds.size()
-                && fPeds.size() == fFADCtoPhe.size() && fPeds.size() == fLowGainFADCtoPhe.size() )
+				&& fPeds.size() == fTOffsets.size() && fPeds.size() == fTOffsetvars.size() && fPeds.size() == fLowGainPeds.size()
+				&& fPeds.size() == fFADCtoPhe.size() && fPeds.size() == fLowGainFADCtoPhe.size() )
 		{
 			for( unsigned int i = 0; i < fPeds.size(); i++ )
 			{
@@ -528,10 +528,10 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 				{
 					igainvar = fGainvars[i];
 				}
-                if( i < fFADCtoPhe.size() )
-                {
-                    iFADCtoPhe = fFADCtoPhe[i];
-                }
+				if( i < fFADCtoPhe.size() )
+				{
+					iFADCtoPhe = fFADCtoPhe[i];
+				}
 				if( i < fTOffsets.size() )
 				{
 					itoff = fTOffsets[i];
@@ -598,10 +598,10 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 				{
 					igainvarlowgain = fLowGainGainvars[i];
 				}
-                if( i < fLowGainFADCtoPhe.size() )
-                {
-                    iFADCtoPhelowgain = fLowGainFADCtoPhe[i];
-                }
+				if( i < fLowGainFADCtoPhe.size() )
+				{
+					iFADCtoPhelowgain = fLowGainFADCtoPhe[i];
+				}
 				if( i < fLowGainTOffsets.size() )
 				{
 					itofflowgain = fLowGainTOffsets[i];
@@ -1027,25 +1027,25 @@ void VCalibrationData::recoverLowGainPedestals()
  */
 TGraphErrors* VCalibrationData::getIPRGraph( unsigned int iSumWindow, bool iMakeNewGraph )
 {
-    if( fGraphIPRGraph.find( iSumWindow ) != fGraphIPRGraph.end() && fGraphIPRGraph[iSumWindow] )
-    {
-        return fGraphIPRGraph[iSumWindow];
-    }
-    else if( iMakeNewGraph )
-    {
-        fGraphIPRGraph[iSumWindow] = new TGraphErrors( 1 );
-        fGraphIPRGraph[iSumWindow]->SetTitle( "" );
-        char hname[200];
-        sprintf( hname, "IRPFGraph_TelID%d_SumWindow%d", fTelID, iSumWindow );
-        fGraphIPRGraph[iSumWindow]->SetName( hname );
-        return fGraphIPRGraph[iSumWindow];
-    }
-    return 0;
+	if( fGraphIPRGraph.find( iSumWindow ) != fGraphIPRGraph.end() && fGraphIPRGraph[iSumWindow] )
+	{
+		return fGraphIPRGraph[iSumWindow];
+	}
+	else if( iMakeNewGraph )
+	{
+		fGraphIPRGraph[iSumWindow] = new TGraphErrors( 1 );
+		fGraphIPRGraph[iSumWindow]->SetTitle( "" );
+		char hname[200];
+		sprintf( hname, "IRPFGraph_TelID%d_SumWindow%d", fTelID, iSumWindow );
+		fGraphIPRGraph[iSumWindow]->SetName( hname );
+		return fGraphIPRGraph[iSumWindow];
+	}
+	return 0;
 }
 
 void VCalibrationData::setIPRGraph( unsigned int iSumWindow, TGraphErrors* g )
 {
-    fGraphIPRGraph[iSumWindow] = g;
+	fGraphIPRGraph[iSumWindow] = g;
 }
 
 /*
@@ -1054,33 +1054,33 @@ void VCalibrationData::setIPRGraph( unsigned int iSumWindow, TGraphErrors* g )
  */
 double VCalibrationData::getTelescopeAverageFADCtoPhe( bool iLowGain )
 {
-    double n = 0.;
-    double i_n = 0.;
-    if( iLowGain )
-    {
-        for( unsigned int i = 0; i < fLowGainFADCtoPhe.size(); i++ )
-        {
-            if( fLowGainFADCtoPhe[i] > 0. )
-            {
-                i_n += fLowGainFADCtoPhe[i];
-                n++;
-            }
-        }
-    }
-    else
-    {
-        for( unsigned int i = 0; i < fFADCtoPhe.size(); i++ )
-        {
-            if( fFADCtoPhe[i] > 0. )
-            {
-                i_n += fFADCtoPhe[i];
-                n++;
-            }
-        }
-    }
-    if( n > 0. )
-    {
-        return i_n / n;
-    }
-    return 0.;
+	double n = 0.;
+	double i_n = 0.;
+	if( iLowGain )
+	{
+		for( unsigned int i = 0; i < fLowGainFADCtoPhe.size(); i++ )
+		{
+			if( fLowGainFADCtoPhe[i] > 0. )
+			{
+				i_n += fLowGainFADCtoPhe[i];
+				n++;
+			}
+		}
+	}
+	else
+	{
+		for( unsigned int i = 0; i < fFADCtoPhe.size(); i++ )
+		{
+			if( fFADCtoPhe[i] > 0. )
+			{
+				i_n += fFADCtoPhe[i];
+				n++;
+			}
+		}
+	}
+	if( n > 0. )
+	{
+		return i_n / n;
+	}
+	return 0.;
 }

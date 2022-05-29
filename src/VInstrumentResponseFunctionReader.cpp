@@ -2,7 +2,7 @@
 
     data class for effective area plotting
 
-    
+
 */
 
 #include "VInstrumentResponseFunctionReader.h"

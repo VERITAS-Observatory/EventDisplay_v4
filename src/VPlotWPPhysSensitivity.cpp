@@ -498,7 +498,7 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( TGraphAsymmErrors* g
 	{
 		return;
 	}
-    return;
+	return;
 	
 	iEmin_TeV = log10( iEmin_TeV );
 	iEmax_TeV = log10( iEmax_TeV );

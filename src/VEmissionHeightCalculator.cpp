@@ -1,7 +1,7 @@
 /*! \class VEmissionHeightCalculator
     \brief  get systematic error in energy reconstruction and calculate mean height of maximum emission
 
-    
+
 */
 
 #include "VEmissionHeightCalculator.h"

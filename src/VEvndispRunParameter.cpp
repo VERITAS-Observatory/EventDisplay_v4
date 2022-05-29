@@ -23,8 +23,8 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fEventDisplayBuildROOTVersion = "";
 	fEventDisplayBuildROOTVersionInt = 0;
 	fEventDisplaySystemInfo = 0;
-
-        fSGE_TASK_ID = 0;
+	
+	fSGE_TASK_ID = 0;
 	
 	// debug parameters
 	fDebug = false;
@@ -39,7 +39,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	frunmode = 0;
 	fRunIsZeroSuppressed = false;
 	frunnumber = -1;
-    fRunTitle  = "";
+	fRunTitle  = "";
 	fsourcetype = 3;           // 0 = rawdata, 1 = GrIsu simulation, 2 = MC in VBF format,
 	// 3 = rawdata in VBF, 4 = DST (data), 5 = multiple GrIsu file,
 	// 6 = PE file, 7 = DST (MC)
@@ -57,7 +57,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fsimu_noiselevel   = 250;
 	fsimu_pedestalfile_DefaultPed = 20.;
 	fsimu_lowgain_pedestal_DefaultPed = -999.;
-    fCombineChannelsForPedestalCalculation = 0;
+	fCombineChannelsForPedestalCalculation = 0;
 	fPedestalSingleRootFile = false;
 	fnevents = -10000;
 	fFirstEvent = -10000;
@@ -68,8 +68,8 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fPrintAnalysisProgress = 25000;
 	fRunDuration = 60. * 3600.;        // default run duration is 1 h (reset by DBRunInfo)
 	fPrintGrisuHeader = 0;
-        finjectGaussianNoise = -1.;
-        finjectGaussianNoiseSeed = 0;
+	finjectGaussianNoise = -1.;
+	finjectGaussianNoiseSeed = 0;
 	
 	fprintdeadpixelinfo = false ; // DEADCHAN if true, print list of dead pixels to evndisp.log
 	
@@ -155,7 +155,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fImageCleaningParameters.push_back( new VImageCleaningRunParameter() );
 	
 	fsumfirst.push_back( 2 );
-    fSearchWindowLast.push_back( 9999 );
+	fSearchWindowLast.push_back( 9999 );
 	fsumwindow_1.push_back( 12 );
 	fsumwindow_2.push_back( 12 );
 	fsumwindow_pass1.push_back( 18 );
@@ -172,7 +172,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	frecoverImagePixelNearDeadPixel = true;
 	fFillImageBorderNeighbours = true;
 	fTraceWindowShift.push_back( -1 );
-    fsumfirst_startingMethod.push_back( 1 );
+	fsumfirst_startingMethod.push_back( 1 );
 	fTraceIntegrationMethod.push_back( 1 );
 	fTraceIntegrationMethod_pass1.push_back( 1 );
 	fSumWindowMaxTimedifferenceToDoublePassPosition.push_back( 10. );
@@ -188,12 +188,12 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fPedestalsLengthOfTimeSlice = 180.;            //!< [s]
 	fCalibrationSumWindow = 16;
 	fCalibrationSumFirst = 0;
-    fCalibrationSumWindowAverageTime = 6;
+	fCalibrationSumWindowAverageTime = 6;
 	fCalibrationIntSumMin = 20.;
 	fL2TimeCorrect = true;
 	fsetSpecialChannels = "EVNDISP.specialchannels.dat";
-        fthroughputCorrectionFile = "";
-        ftraceamplitudecorrectionFile = "";
+	fthroughputCorrectionFile = "";
+	ftraceamplitudecorrectionFile = "";
 	ftracefit = -1.;
 	ftracefitfunction = "ev";
 	freconstructionparameterfile = "EVNDISP.reconstruction.runparameter.v48x";
@@ -264,16 +264,16 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fdstminntubes = -1;
 	fdstwriteallpixel = true;
 	
-    // NN cleaning parameters
-    ifWriteGraphsToFile = false;
-    ifReadIPRfromDatabase = false;
-    ifCreateIPRdatabase = false;
-    ifReadIPRfromDSTFile = false;
-
-    fNNGraphsFile = "IPRgraph.root";
-    fIPRdatabase = "";
-    fIPRdatabaseFile = "";
-
+	// NN cleaning parameters
+	ifWriteGraphsToFile = false;
+	ifReadIPRfromDatabase = false;
+	ifCreateIPRdatabase = false;
+	ifReadIPRfromDSTFile = false;
+	
+	fNNGraphsFile = "IPRgraph.root";
+	fIPRdatabase = "";
+	fIPRdatabaseFile = "";
+	
 	for( unsigned int i = 0; i < VDST_MAXTELTYPES; i++ )
 	{
 		fFADCtoPhe[i] = -1.;
@@ -289,15 +289,15 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 
 VEvndispRunParameter::~VEvndispRunParameter()
 {
-    for( unsigned int i = 0; i < fImageCleaningParameters.size(); i++ )
-    {
-        if( fImageCleaningParameters[i] )
-        {
-            delete fImageCleaningParameters[i];
-        }
-    }
-    
-    
+	for( unsigned int i = 0; i < fImageCleaningParameters.size(); i++ )
+	{
+		if( fImageCleaningParameters[i] )
+		{
+			delete fImageCleaningParameters[i];
+		}
+	}
+	
+	
 }
 
 
@@ -377,12 +377,12 @@ void VEvndispRunParameter::print( int iEv )
 		cout << "============================" << endl << endl;
 	}
 	
-    cout << "RUN " << frunnumber;
-    if( fRunTitle.size() > 0 )
-    {
-        cout << " (" << fRunTitle << ")";
-    }
-    cout << endl;
+	cout << "RUN " << frunnumber;
+	if( fRunTitle.size() > 0 )
+	{
+		cout << " (" << fRunTitle << ")";
+	}
+	cout << endl;
 	cout << "Observatory: " << getObservatory();
 	cout << " (lat " << getObservatory_Latitude_deg() << ", long " << getObservatory_Longitude_deg();
 	cout << ", height " << getObservatory_Height_m() << "m)";
@@ -430,10 +430,10 @@ void VEvndispRunParameter::print( int iEv )
 	{
 		cout << "ROOT version " << fEventDisplayBuildROOTVersion << endl;
 	}
-        if( fSGE_TASK_ID > 0 )
-        {
-                cout << "SGE TASK ID " << fSGE_TASK_ID << endl;
-        }
+	if( fSGE_TASK_ID > 0 )
+	{
+		cout << "SGE TASK ID " << fSGE_TASK_ID << endl;
+	}
 	
 	cout << endl;
 	if( fTargetName.size() > 0 )
@@ -462,11 +462,11 @@ void VEvndispRunParameter::print( int iEv )
 			cout << " use database" << endl;
 		}
 	}
-        if( fDBRunType.size() > 0 )
-        {
-            cout << "Run type: " << fDBRunType << endl;
-        }
-        cout << "Instrument epoch: " << fInstrumentEpoch << "  Atmosphere (corsika ID): " << fAtmosphereID << endl;
+	if( fDBRunType.size() > 0 )
+	{
+		cout << "Run type: " << fDBRunType << endl;
+	}
+	cout << "Instrument epoch: " << fInstrumentEpoch << "  Atmosphere (corsika ID): " << fAtmosphereID << endl;
 	if( fEpochFile.size() > 0 )
 	{
 		cout << "(epochs read from " << fEpochFile << ")" << endl;
@@ -502,10 +502,10 @@ void VEvndispRunParameter::print( int iEv )
 	{
 		cout << "number of events to analyse: " << fnevents << endl;
 	}
-        if( fFirstEvent > 0 )
-        {
-               cout << "starting analysis at event:  " << fFirstEvent << endl;
-        }
+	if( fFirstEvent > 0 )
+	{
+		cout << "starting analysis at event:  " << fFirstEvent << endl;
+	}
 	if( fTimeCutsMin_min > 0 )
 	{
 		cout << "start analysing at minute " << fTimeCutsMin_min << endl;
@@ -565,12 +565,12 @@ void VEvndispRunParameter::print( int iEv )
 			cout << "using pedestal events for pedestal calculation" << endl;
 		}
 	}
-        if( finjectGaussianNoise > 0. )
-        {
-                 cout << "Injecting Gaussian noise with standard deviation " << finjectGaussianNoise;
-                 cout << " (seed " << finjectGaussianNoiseSeed << ")";
-                 cout << endl;
-        }
+	if( finjectGaussianNoise > 0. )
+	{
+		cout << "Injecting Gaussian noise with standard deviation " << finjectGaussianNoise;
+		cout << " (seed " << finjectGaussianNoiseSeed << ")";
+		cout << endl;
+	}
 	if( fsimu_HILO_from_simFile )
 	{
 		cout << "reading hilo multiplier from MC run header" << endl;
@@ -607,15 +607,15 @@ void VEvndispRunParameter::print( int iEv )
 		}
 		cout << endl;
 		cout << "setting special channels (e.g. with L2 signal): " << fsetSpecialChannels << endl;
-                if( fthroughputCorrectionFile.size() > 0 )
-                {
-                    cout << "setting throughput correction from file: " << fthroughputCorrectionFile << endl;
-                }
-                if( ftraceamplitudecorrectionFile.size() )
-                {
-                    cout << "setting throughput correction from file (FADC): ";
-                    cout << ftraceamplitudecorrectionFile << endl;
-                }
+		if( fthroughputCorrectionFile.size() > 0 )
+		{
+			cout << "setting throughput correction from file: " << fthroughputCorrectionFile << endl;
+		}
+		if( ftraceamplitudecorrectionFile.size() )
+		{
+			cout << "setting throughput correction from file (FADC): ";
+			cout << ftraceamplitudecorrectionFile << endl;
+		}
 		cout << "pulse timing levels: ";
 		for( unsigned int i = 0; i < fpulsetiminglevels.size(); i++ )
 		{
@@ -750,12 +750,12 @@ void VEvndispRunParameter::print( int iEv )
 				}
 				cout << endl;
 				cout << "\t start of summation window: \t" << fsumfirst[fTelToAnalyze[i]];
-                cout << "\t (shifted by " << fTraceWindowShift[fTelToAnalyze[i]] << " samples";
-                cout << " [method-" << fsumfirst_startingMethod[fTelToAnalyze[i]] << "]) ";
-                if( fSearchWindowLast[fTelToAnalyze[i]] < 9999 )
-                {
-                    cout << ", last sample for sliding window search: " << fSearchWindowLast[fTelToAnalyze[i]];
-                }
+				cout << "\t (shifted by " << fTraceWindowShift[fTelToAnalyze[i]] << " samples";
+				cout << " [method-" << fsumfirst_startingMethod[fTelToAnalyze[i]] << "]) ";
+				if( fSearchWindowLast[fTelToAnalyze[i]] < 9999 )
+				{
+					cout << ", last sample for sliding window search: " << fSearchWindowLast[fTelToAnalyze[i]];
+				}
 				cout << "\t length of summation window: \t" << fsumwindow_1[fTelToAnalyze[i]];
 				cout << "/" << fsumwindow_2[fTelToAnalyze[i]];
 				if( fDoublePass )
@@ -896,12 +896,12 @@ void VEvndispRunParameter::setSystemParameters()
 	// get root info
 	fEventDisplayBuildROOTVersion = gROOT->GetVersion();
 	fEventDisplayBuildROOTVersionInt = gROOT->GetVersionInt();
-
-        const char* i_sge = gSystem->Getenv( "SGE_TASK_ID" );
-        if( i_sge )
-        {
-              fSGE_TASK_ID = atoi( i_sge );
-        }
+	
+	const char* i_sge = gSystem->Getenv( "SGE_TASK_ID" );
+	if( i_sge )
+	{
+		fSGE_TASK_ID = atoi( i_sge );
+	}
 }
 
 /*
@@ -913,13 +913,16 @@ void VEvndispRunParameter::setSystemParameters()
  */
 string VEvndispRunParameter::getInstrumentEpoch( bool iMajor, bool iUpdateInstrumentEpoch )
 {
-        // re-read instrument epoch 
-        if( iUpdateInstrumentEpoch )  updateInstrumentEpochFromFile();
-        if( iMajor )
-        {
-             return fInstrumentEpoch.substr( 0, fInstrumentEpoch.find( "_" ) );
-        }
-        return fInstrumentEpoch;
+	// re-read instrument epoch
+	if( iUpdateInstrumentEpoch )
+	{
+		updateInstrumentEpochFromFile();
+	}
+	if( iMajor )
+	{
+		return fInstrumentEpoch.substr( 0, fInstrumentEpoch.find( "_" ) );
+	}
+	return fInstrumentEpoch;
 }
 
 
@@ -928,69 +931,111 @@ string VEvndispRunParameter::getInstrumentEpoch( bool iMajor, bool iUpdateInstru
    (typically VERITAS.Epochs.runparameter)
 */
 bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpocheFile,
-                                                          bool iReadInstrumentEpoch )
+		bool iReadInstrumentEpoch )
 {
-       if( iEpocheFile != "usedefault" ) fEpochFile = iEpocheFile;
-       if( fEpochFile.size() == 0 ) return true;
-
-       ifstream is;
-       is.open( fEpochFile.c_str(), ifstream::in );
-       if( !is )
-       {
-            string iTemp = getDirectory_EVNDISPParameterFiles() + fEpochFile;
-            is.open( iTemp.c_str(), ifstream::in );
-            if( !is )
-            {
-                    cout << "error opening epoch parameter file " << fEpochFile << endl;
-                    cout << iTemp << endl;
-                    exit( EXIT_FAILURE );
-            }
-       }
-       string is_line;
-       string temp;
-       string itemp_epoch = "not_found";
-       int itemp_atmo = 0;
-       int run_min = 0;
-       int run_max = 0;
-       while( getline( is, is_line ) )
-       {
-           if( is_line.size() == 0 ) continue;
-           istringstream is_stream( is_line );
-           is_stream >> temp >> temp;
-           if( iReadInstrumentEpoch && temp == "EPOCH" )
-           { 
-               if( !(is_stream>>std::ws).eof() ) is_stream >> itemp_epoch;
-               if( !(is_stream>>std::ws).eof() ) is_stream >> run_min;
-               if( !(is_stream>>std::ws).eof() ) is_stream >> run_max;
-               if( frunnumber >= run_min && frunnumber <= run_max )
-               {
-                   break;
-               }
-           }
-           else if( temp == "ATMOSPHERE" )
-           {
-               if( !(is_stream>>std::ws).eof() ) is_stream >> itemp_atmo;
-               if( !(is_stream>>std::ws).eof() ) is_stream >> temp;
-               if( !(is_stream>>std::ws).eof() ) is_stream >> temp;
-               int mjd_min = 0;
-               if( !(is_stream>>std::ws).eof() ) is_stream >> mjd_min;
-               int mjd_max = 0;
-               if( !(is_stream>>std::ws).eof() ) is_stream >> mjd_max;
-               if( fDBDataStartTimeMJD >= mjd_min && fDBDataStoppTimeMJD <= mjd_max )
-               {
-                   break;
-               }
-           }
-       }
-       if( iReadInstrumentEpoch ) fInstrumentEpoch = itemp_epoch;
-       else                       fAtmosphereID = itemp_atmo;
-       is.close();
-       return true;
+	if( iEpocheFile != "usedefault" )
+	{
+		fEpochFile = iEpocheFile;
+	}
+	if( fEpochFile.size() == 0 )
+	{
+		return true;
+	}
+	
+	ifstream is;
+	is.open( fEpochFile.c_str(), ifstream::in );
+	if( !is )
+	{
+		string iTemp = getDirectory_EVNDISPParameterFiles() + fEpochFile;
+		is.open( iTemp.c_str(), ifstream::in );
+		if( !is )
+		{
+			cout << "error opening epoch parameter file " << fEpochFile << endl;
+			cout << iTemp << endl;
+			exit( EXIT_FAILURE );
+		}
+	}
+	string is_line;
+	string temp;
+	string itemp_epoch = "not_found";
+	int itemp_atmo = 0;
+	int run_min = 0;
+	int run_max = 0;
+	while( getline( is, is_line ) )
+	{
+		if( is_line.size() == 0 )
+		{
+			continue;
+		}
+		istringstream is_stream( is_line );
+		is_stream >> temp >> temp;
+		if( iReadInstrumentEpoch && temp == "EPOCH" )
+		{
+			if( !( is_stream >> std::ws ).eof() )
+			{
+				is_stream >> itemp_epoch;
+			}
+			if( !( is_stream >> std::ws ).eof() )
+			{
+				is_stream >> run_min;
+			}
+			if( !( is_stream >> std::ws ).eof() )
+			{
+				is_stream >> run_max;
+			}
+			if( frunnumber >= run_min && frunnumber <= run_max )
+			{
+				break;
+			}
+		}
+		else if( temp == "ATMOSPHERE" )
+		{
+			if( !( is_stream >> std::ws ).eof() )
+			{
+				is_stream >> itemp_atmo;
+			}
+			if( !( is_stream >> std::ws ).eof() )
+			{
+				is_stream >> temp;
+			}
+			if( !( is_stream >> std::ws ).eof() )
+			{
+				is_stream >> temp;
+			}
+			int mjd_min = 0;
+			if( !( is_stream >> std::ws ).eof() )
+			{
+				is_stream >> mjd_min;
+			}
+			int mjd_max = 0;
+			if( !( is_stream >> std::ws ).eof() )
+			{
+				is_stream >> mjd_max;
+			}
+			if( fDBDataStartTimeMJD >= mjd_min && fDBDataStoppTimeMJD <= mjd_max )
+			{
+				break;
+			}
+		}
+	}
+	if( iReadInstrumentEpoch )
+	{
+		fInstrumentEpoch = itemp_epoch;
+	}
+	else
+	{
+		fAtmosphereID = itemp_atmo;
+	}
+	is.close();
+	return true;
 }
 
 unsigned int VEvndispRunParameter::getAtmosphereID( bool iUpdateInstrumentEpoch )
 {
-       if( iUpdateInstrumentEpoch ) updateInstrumentEpochFromFile( "usedefault", false );
-
-       return fAtmosphereID;
+	if( iUpdateInstrumentEpoch )
+	{
+		updateInstrumentEpochFromFile( "usedefault", false );
+	}
+	
+	return fAtmosphereID;
 }

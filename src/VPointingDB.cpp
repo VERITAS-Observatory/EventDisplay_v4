@@ -386,8 +386,8 @@ bool VPointingDB::getDBRunInfo()
 		
 		float dist = atof( db_row->GetField( 17 ) );
 		float angl = atof( db_row->GetField( 18 ) );
-        fDBWobbleNorth = dist * cos( angl * TMath::DegToRad() );
-        fDBWobbleEast = dist * sin( angl * TMath::DegToRad() );
+		fDBWobbleNorth = dist * cos( angl * TMath::DegToRad() );
+		fDBWobbleEast = dist * sin( angl * TMath::DegToRad() );
 	}
 	else
 	{
@@ -433,7 +433,7 @@ bool VPointingDB::readPointingFromVPMTextFile( string iDirectory )
 		// test line for completeness (expect 11 columns)
 		int nC = 0;
 		istringstream is_streamT( is_line );
-		while( !(is_streamT>>std::ws).eof() )
+		while( !( is_streamT >> std::ws ).eof() )
 		{
 			is_streamT >> iTemp;
 			nC++;
@@ -460,8 +460,8 @@ bool VPointingDB::readPointingFromVPMTextFile( string iDirectory )
 			fDBTime.push_back( iITime * 86400. );
 			fDBTelElevationRaw.push_back( 0. );
 			fDBTelAzimuthRaw.push_back( 0. );
-            fDBTelRA.push_back( iRA * degrad );
-            fDBTelDec.push_back( iDec * degrad );
+			fDBTelRA.push_back( iRA * degrad );
+			fDBTelDec.push_back( iDec * degrad );
 			getHorizonCoordinates( fDBMJD.back(), fDBTime.back(), iDec * degrad, iRA * degrad, az, ze );
 			fDBTelElevation.push_back( 90. - ze );
 			fDBTelAzimuth.push_back( az );
@@ -606,8 +606,8 @@ bool VPointingDB::readPointingCalibratedVPMFromDB()
 		
 		iRA = atof( db_row->GetField( 1 ) );
 		iDec = atof( db_row->GetField( 2 ) );
-        fDBTelRA.push_back( iRA * degrad );
-        fDBTelDec.push_back( iDec * degrad );
+		fDBTelRA.push_back( iRA * degrad );
+		fDBTelDec.push_back( iDec * degrad );
 		getHorizonCoordinates( fDBMJD.back(), fDBTime.back(), iDec * degrad, iRA * degrad, az, ze );
 		fDBTelElevation.push_back( 90. - ze );
 		fDBTelAzimuth.push_back( az );
@@ -847,8 +847,8 @@ bool VPointingDB::readPointingFromDB()
 		fDBTelAzimuthRaw.push_back( atof( db_row->GetField( 2 ) ) * 180. / TMath::Pi() );
 		fDBTelElevation.push_back( el * 180. / TMath::Pi() );
 		fDBTelAzimuth.push_back( az * 180. / TMath::Pi() );
-        fDBTelRA.push_back( 0. );
-        fDBTelDec.push_back( 0. );
+		fDBTelRA.push_back( 0. );
+		fDBTelDec.push_back( 0. );
 		fDBTelExpectedElevation.push_back( atof( db_row->GetField( 5 ) ) * 180. / TMath::Pi() );
 		fDBTelExpectedAzimuth.push_back( atof( db_row->GetField( 6 ) ) * 180. / TMath::Pi() );
 	}
@@ -901,26 +901,26 @@ TTree* VPointingDB::getTreePointingDB()
 	float iTelAz = 0.;
 	float iTelElT = 0.;
 	float iTelAzT = 0.;
-    float iTelRA = 0.;
-    float iTelDec = 0.;
+	float iTelRA = 0.;
+	float iTelDec = 0.;
 	
 	sprintf( hname, "db_pointing_%d", getTelID() + 1 );
 	sprintf( htitle, "pointing from DB (Telescope %d)", getTelID() + 1 );
 	TTree* tD = new TTree( hname, htitle );
 	tD->Branch( "MJD", &MJD, "MJD/i" );
 	tD->Branch( "Time", &Time, "Time/D" );
-        // elevation / azimuth before application of tracking corrections
+	// elevation / azimuth before application of tracking corrections
 	tD->Branch( "ElRaw", &iTelElR, "ElRaw/F" );
 	tD->Branch( "AzRaw", &iTelAzR, "AzRaw/F" );
-        // elevation / azimuth after application of tracking corrections
+	// elevation / azimuth after application of tracking corrections
 	tD->Branch( "El", &iTelEl, "El/F" );
 	tD->Branch( "Az", &iTelAz, "Az/F" );
-        // expected elevation / azimuth (value requested by pointing software)
+	// expected elevation / azimuth (value requested by pointing software)
 	tD->Branch( "ElTelExpected", &iTelElT, "ElTelExpected/F" );
 	tD->Branch( "AzTelExpected", &iTelAzT, "AzTelExpected/F" );
-    // ra/dec as read from DB
-    tD->Branch("RA", &iTelRA, "RA/F" );
-    tD->Branch("Dec", &iTelDec, "Dec/F" );
+	// ra/dec as read from DB
+	tD->Branch( "RA", &iTelRA, "RA/F" );
+	tD->Branch( "Dec", &iTelDec, "Dec/F" );
 	
 	for( unsigned int i = 0; i < fDBMJD.size(); i++ )
 	{
@@ -932,8 +932,8 @@ TTree* VPointingDB::getTreePointingDB()
 		iTelAz = fDBTelAzimuth[i];
 		iTelElT = fDBTelExpectedElevation[i];
 		iTelAzT = fDBTelExpectedAzimuth[i];
-        iTelRA = fDBTelRA[i];
-        iTelDec = fDBTelDec[i];
+		iTelRA = fDBTelRA[i];
+		iTelDec = fDBTelDec[i];
 		
 		tD->Fill();
 	}

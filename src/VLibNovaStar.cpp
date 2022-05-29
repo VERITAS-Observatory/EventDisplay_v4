@@ -1,7 +1,7 @@
 /* \class VLibNovaStar
    \brief get altitude and azimuth for a star
 
-   
+
 
    VERITAS basecamp location hardcoded
 */

@@ -215,7 +215,7 @@ bool VCameraRead::readCameraFile( string iCameraFile )
 			// reading neighbours
 			is_stream >> i_char;
 			unsigned int j = 0;
-			while( !(is_stream>>std::ws).eof() && i_char.substr( 0, 1 ) == "N" )
+			while( !( is_stream >> std::ws ).eof() && i_char.substr( 0, 1 ) == "N" )
 			{
 				if( j < fNeighbour[fTelID][i_ch].size() )
 				{
@@ -225,11 +225,11 @@ bool VCameraRead::readCameraFile( string iCameraFile )
 				j++;
 			}
 			// maybe there is some information about triggers and dead channels
-			if( !(is_stream>>std::ws).eof() && i_char.substr( 0, 4 ) == "TRIG" )
+			if( !( is_stream >> std::ws ).eof() && i_char.substr( 0, 4 ) == "TRIG" )
 			{
 				is_stream >> fTrigTube[fTelID][i_ch];
 			}
-			if( !(is_stream>>std::ws).eof() )
+			if( !( is_stream >> std::ws ).eof() )
 			{
 				is_stream >> i_char;
 				if( i_char.substr( 0, 3 ) == "ANA" )
@@ -238,7 +238,7 @@ bool VCameraRead::readCameraFile( string iCameraFile )
 				}
 			}
 			// get convertion from MC tube numbering to real data tube numbering
-			if( !(is_stream>>std::ws).eof() )
+			if( !( is_stream >> std::ws ).eof() )
 			{
 				is_stream >> i_char;
 				if( i_char.substr( 0, 3 ) == "MIX" )
@@ -842,7 +842,7 @@ void VCameraRead::readPixelFile( string iFile )
 				}
 				for( unsigned int j = 0; j < fMaxNeighbour; j++ )
 				{
-					if( !(is_stream>>std::ws).eof() )
+					if( !( is_stream >> std::ws ).eof() )
 					{
 						if( j < fNeighbour[i_telID][i_chan].size() )
 						{
@@ -1275,7 +1275,7 @@ bool VCameraRead::makeNeighbourList()
 			for( unsigned int k = 0; k < j; k++ )
 			{
 				double itemp = sqrt( ( getX_MM( i )[j] - getX_MM( i )[k] ) * ( getX_MM( i )[j] - getX_MM( i )[k] )
-						   + ( getY_MM( i )[j] - getY_MM( i )[k] ) * ( getY_MM( i )[j] - getY_MM( i )[k] ) );
+									 + ( getY_MM( i )[j] - getY_MM( i )[k] ) * ( getY_MM( i )[j] - getY_MM( i )[k] ) );
 				if( itemp < iTubeDistance_min )
 				{
 					iTubeDistance_min = itemp;
@@ -1291,7 +1291,7 @@ bool VCameraRead::makeNeighbourList()
 			for( unsigned int k = 0; k < j; k++ )
 			{
 				double itemp = sqrt( ( getX_MM( i )[j] - getX_MM( i )[k] ) * ( getX_MM( i )[j] - getX_MM( i )[k] )
-						   + ( getY_MM( i )[j] - getY_MM( i )[k] ) * ( getY_MM( i )[j] - getY_MM( i )[k] ) );
+									 + ( getY_MM( i )[j] - getY_MM( i )[k] ) * ( getY_MM( i )[j] - getY_MM( i )[k] ) );
 				if( itemp < 2.1 * sqrt( 2. )*iTubeDistance_min )
 				{
 					if( getAnaPixel( i )[k] > 0 )
@@ -1316,7 +1316,7 @@ bool VCameraRead::makeNeighbourList()
 			}
 		}
 	}
-
+	
 	return true;
 }
 
@@ -1372,25 +1372,25 @@ bool VCameraRead::setLowGainThreshold( unsigned int iTel, unsigned int ival )
 */
 unsigned int VCameraRead::getTelType_Counter( ULong64_t iTelType )
 {
-    set< ULong64_t > s;
-    
-    for( unsigned int i = 0; i < fTelType.size(); i++ )
-    {
-        s.insert( fTelType[i] );
-    }
-
-    unsigned int z = 0;
-    for( set< ULong64_t >::iterator i_s = s.begin(); i_s != s.end(); i_s++ )
-    {
-        if( *i_s == iTelType )
-        {
-            return z;
-        }
-        z++;
-    }
-
-    // unsuccessfull search
-    return 9999;
+	set< ULong64_t > s;
+	
+	for( unsigned int i = 0; i < fTelType.size(); i++ )
+	{
+		s.insert( fTelType[i] );
+	}
+	
+	unsigned int z = 0;
+	for( set< ULong64_t >::iterator i_s = s.begin(); i_s != s.end(); i_s++ )
+	{
+		if( *i_s == iTelType )
+		{
+			return z;
+		}
+		z++;
+	}
+	
+	// unsuccessfull search
+	return 9999;
 }
 
 

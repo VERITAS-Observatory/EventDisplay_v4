@@ -34,8 +34,8 @@ class VInstrumentResponseFunctionData : public TObject, public VHistogramUtiliti
 		double  fHistogrambinningEnergy_Min_Tev_Log;
 		double  fHistogrambinningEnergy_Max_Tev_Log;
 		
-                // angular binning
-                int     fHistogrambinningAngular_Log;
+		// angular binning
+		int     fHistogrambinningAngular_Log;
 		double  fHistogrambinningAngular_Min_Log;
 		double  fHistogrambinningAngular_Max_Log;
 		
@@ -44,7 +44,7 @@ class VInstrumentResponseFunctionData : public TObject, public VHistogramUtiliti
 		double  fArrayCentre_Y;
 		
 		TList*  calculateResolution( TH2D* iHistogram, TGraphErrors* iResult, string iHistoName,
-					     double iContainmentProbability, double iContainmentProbabilityError );
+									 double iContainmentProbability, double iContainmentProbabilityError );
 		double  getResolutionErrorfromToyMC( double i68, double iN );
 		int     testResponseFunctionType( string iType );
 		
@@ -76,9 +76,10 @@ class VInstrumentResponseFunctionData : public TObject, public VHistogramUtiliti
 		unsigned int fEnergyReconstructionMethod;
 		
 		// list of histograms
-		enum    E_HISTOID { E_DIFF, E_DIFF2, E_LOGDIFF, E_NIMAG, E_DIST, E_ERROR, E_RELA, 
-                                    E_DIFF_MC, E_DIFF2_MC, E_LOGDIFF_MC };
-                TList*                     fHistogramList;
+		enum    E_HISTOID { E_DIFF, E_DIFF2, E_LOGDIFF, E_NIMAG, E_DIST, E_ERROR, E_RELA,
+							E_DIFF_MC, E_DIFF2_MC, E_LOGDIFF_MC
+						  };
+		TList*                     fHistogramList;
 		vector< TH2D* >            f2DHisto;
 		vector< TGraphErrors* >    fResolutionGraph;
 		vector< double >           fContainmentProbability;

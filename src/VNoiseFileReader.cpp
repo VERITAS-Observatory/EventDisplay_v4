@@ -2,7 +2,7 @@
      \brief read noise traces from a file
 
 
-     
+
 
 */
 

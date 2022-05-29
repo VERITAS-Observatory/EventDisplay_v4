@@ -1,7 +1,7 @@
 /*! \class VExposure
     \brief calculate VERITAS exposure
 
-    
+
 */
 
 #include "VExposure.h"
@@ -53,9 +53,9 @@ VExposure::VExposure( int nBinsL, int nBinsB )
 	fRadAccMapGal2D_aitoff->SetYTitle( "Galactic latitude [deg]" );
 	
 	fPlotVTSObjects = false;
-
+	
 	fDoCheckSums = false;
-
+	
 }
 
 
@@ -394,10 +394,16 @@ bool VExposure::readFromDB()
 		{
 			angl = atof( db_row->GetField( 18 ) );
 		}
-        fWobbleNorth = dist * cos( angl * TMath::DegToRad() );
-        fWobbleEast  = dist * sin( angl * TMath::DegToRad() );
-        if( TMath::Abs( fWobbleNorth ) < 1.e-15 ) fWobbleNorth = 0.;
-        if( TMath::Abs( fWobbleEast ) < 1.e-15 ) fWobbleEast = 0.;
+		fWobbleNorth = dist * cos( angl * TMath::DegToRad() );
+		fWobbleEast  = dist * sin( angl * TMath::DegToRad() );
+		if( TMath::Abs( fWobbleNorth ) < 1.e-15 )
+		{
+			fWobbleNorth = 0.;
+		}
+		if( TMath::Abs( fWobbleEast ) < 1.e-15 )
+		{
+			fWobbleEast = 0.;
+		}
 		
 		fWobbleN.push_back( fWobbleNorth );
 		fWobbleE.push_back( fWobbleEast );
@@ -570,10 +576,16 @@ bool VExposure::readFromDBList()
 		{
 			angl = atof( db_row->GetField( 18 ) );
 		}
-        fWobbleNorth = dist * cos( angl * TMath::DegToRad() );
-        fWobbleEast  = dist * sin( angl * TMath::DegToRad() );
-        if( TMath::Abs( fWobbleNorth ) < 1.e-15 ) fWobbleNorth = 0.;
-        if( TMath::Abs( fWobbleEast ) < 1.e-15 ) fWobbleEast = 0.;
+		fWobbleNorth = dist * cos( angl * TMath::DegToRad() );
+		fWobbleEast  = dist * sin( angl * TMath::DegToRad() );
+		if( TMath::Abs( fWobbleNorth ) < 1.e-15 )
+		{
+			fWobbleNorth = 0.;
+		}
+		if( TMath::Abs( fWobbleEast ) < 1.e-15 )
+		{
+			fWobbleEast = 0.;
+		}
 		
 		fWobbleN.push_back( fWobbleNorth );
 		fWobbleE.push_back( fWobbleEast );
@@ -2616,10 +2628,10 @@ void VExposure::downloadRunList()
 					 getRawDataServer().c_str() );
 			cout << dl_string << endl;
 			system( dl_string );
-
+			
 			checkMD5sum( fRunDownloadDate[i], fRunDownload[i] );
 		}
-			
+		
 		
 	}
 	
@@ -2684,169 +2696,205 @@ void VExposure::downloadRunList()
 	
 }
 
-int VExposure::checkMD5sum( int date, int run, bool force_download) {
-	
-	if( !fDoCheckSums) return 0;
+int VExposure::checkMD5sum( int date, int run, bool force_download )
+{
 
-	TString desy_sum = calcMD5sum( date, run);
-	if( desy_sum == "" ) 
+	if( !fDoCheckSums )
+	{
+		return 0;
+	}
+	
+	TString desy_sum = calcMD5sum( date, run );
+	if( desy_sum == "" )
 	{
 		cout << "VExposure::checkMD5sum Warning: Unable to calculate checksum for run " << run << ", date " << date << endl;
 		fRunsNoChecksum.push_back( run );
 		return -1;
 	}
-	TString archive_sum = getArchiveMD5sum( date, run, force_download);
-	if( archive_sum == "" ) 
+	TString archive_sum = getArchiveMD5sum( date, run, force_download );
+	if( archive_sum == "" )
 	{
 		cout << "VExposure::checkMD5sum Warning: Unable to download checksum for run " << run << ", date " << date << endl;
 		fRunsNoChecksum.push_back( run );
 		return -1;
 	}
-
-	if( archive_sum != desy_sum ) 
+	
+	if( archive_sum != desy_sum )
 	{
 		cout << "VExposure::checkMD5sum Warning: Checksum error for run " << run << ", date " << date << endl;
 		cout << "Checksum from archive: " << archive_sum << ", calculated checksum: " << desy_sum << endl;
 		fRunsBadChecksum.push_back( run );
 		return 1;
-	} 
+	}
 	cout << "VExposure::checkMD5sum: Run " << run << " survived the testsum check." << endl;
 	cout << "Checksum from archive: " << archive_sum << ", calculated checksum: " << desy_sum << endl;
 	fRunsGoodChecksum.push_back( run );
 	return 0;
 }
 
-void VExposure::printChecksumSummary() 
+void VExposure::printChecksumSummary()
 {
-	if( !fDoCheckSums ) return;
-
+	if( !fDoCheckSums )
+	{
+		return;
+	}
+	
 	unsigned int ntot = fRunsNoChecksum.size() + fRunsGoodChecksum.size() + fRunsBadChecksum.size() ;
 	cout << "Checksum summary: " << ntot << " run(s); " << fRunsBadChecksum.size() << " bad, " << fRunsGoodChecksum.size() << " good, " << fRunsNoChecksum.size() << " could not be checked." << endl;
 	
-	if( fRunsGoodChecksum.size() == ntot && ntot > 0 ) 
+	if( fRunsGoodChecksum.size() == ntot && ntot > 0 )
 	{
 		cout << "Congratulations, all runs survived the checksum test. " << endl;
-	
+		
 	}
-	else {  
-		if( fRunsGoodChecksum.size() > 0 ) {
+	else
+	{
+		if( fRunsGoodChecksum.size() > 0 )
+		{
 			cout << "Got good checksums for " << fRunsGoodChecksum.size() << " run(s)."  << endl << "Good runs:\t" ;
-			for( unsigned int i=0; i<  fRunsGoodChecksum.size() ; i++ ) 
+			for( unsigned int i = 0; i <  fRunsGoodChecksum.size() ; i++ )
 			{
-				cout << fRunsGoodChecksum.at(i) << "\t" ;
+				cout << fRunsGoodChecksum.at( i ) << "\t" ;
 			}
 			cout << endl << endl;
 		}
-
-		if( fRunsNoChecksum.size() > 0 ) 
+		
+		if( fRunsNoChecksum.size() > 0 )
 		{
 			cout << "Warning, checksums could not be compared for " << fRunsNoChecksum.size();
 			cout << " run(s), see above for details. (Checksums are not available from the archive for old or very new runs.)"  << endl << "Not checked:\t" ;
-			for( unsigned int i=0; i<  fRunsNoChecksum.size() ; i++ ) 
+			for( unsigned int i = 0; i <  fRunsNoChecksum.size() ; i++ )
 			{
-				cout << fRunsNoChecksum.at(i) << "\t" ;
+				cout << fRunsNoChecksum.at( i ) << "\t" ;
 			}
 			cout << endl << endl;
 		}
-		if( fRunsBadChecksum.size() > 0 ) 
+		if( fRunsBadChecksum.size() > 0 )
 		{
 			cout << "Warning, wrong checksums for " << fRunsBadChecksum.size() << " run(s), see above for details. "  << endl << "Bad run(s): " ;
-			for( unsigned int i=0; i<  fRunsBadChecksum.size() ; i++ ) 
+			for( unsigned int i = 0; i <  fRunsBadChecksum.size() ; i++ )
 			{
-				cout << fRunsBadChecksum.at(i) << "\t" ;
+				cout << fRunsBadChecksum.at( i ) << "\t" ;
 			}
 			cout << endl << endl;
 		}
 	}
-
+	
 }
 
-TString VExposure::getArchiveMD5sum( int date, int run, bool force_download  ) {
-	
-	bool attempt_download = true;
+TString VExposure::getArchiveMD5sum( int date, int run, bool force_download )
+{
 
+	bool attempt_download = true;
+	
 	//check if md5sum utility is available
 	if( system( "which bbftp" ) != 0 )
 	{
 		cout << "VExposure::getArchiveMD5sum Error: \"which bbftp\" shows no match; will attempt to DL checksum file" << endl;
 		attempt_download = false;
-		if ( force_download )
+		if( force_download )
 		{
 			return "";
 		}
 	}
-
+	
 	char* ENVIR_VAR;
 	ENVIR_VAR = getenv( "VERITAS_DATA_DIR" );
-
+	
 	TString basecamp_sumfilename = TString::Format( "%s/data/d%d/sumd%d", ENVIR_VAR, date, date );
 	TString UTAH_sumfilename = TString::Format( "%s/data/d%d/CHPC_sumd%d", ENVIR_VAR, date, date );
 	TString UCLA_sumfilename = TString::Format( "%s/data/d%d/UCLA_sumd%d", ENVIR_VAR, date, date );
 	TString UCLA2_sumfilename = TString::Format( "%s/data/d%d/UCLA_sum", ENVIR_VAR, date );
-	TString UCLA_new_sumfilename = TString::Format( "%s/data/d%d/UCLA_new_sum", ENVIR_VAR, date ); 	
+	TString UCLA_new_sumfilename = TString::Format( "%s/data/d%d/UCLA_new_sum", ENVIR_VAR, date );
 	//see elog http://veritash.sao.arizona.edu:8081/VERITAS-Operations/11544 . Some runs were reprocessed on disk at ucla to correct 2 rows of swapped signal cables.
-
-	TString dlcommand = TString::Format("bbftp -V -S -p 12 -u bbftp -e \"mget /veritas/data/d%d/*sum* %s/data/d%d/\" %s", date, ENVIR_VAR, date, getRawDataServer().c_str() );
+	
+	TString dlcommand = TString::Format( "bbftp -V -S -p 12 -u bbftp -e \"mget /veritas/data/d%d/*sum* %s/data/d%d/\" %s", date, ENVIR_VAR, date, getRawDataServer().c_str() );
 	TString chmodcommand = TString::Format( "chmod g+w %s/data/d%d/*sum*", ENVIR_VAR, date );
-
+	
 	bool use_new_ucla_sumfile = ( run >= 69474 && run <= 69641 );
-
+	
 	TString checksum = "";
 	//attempt to find checksum on disk
-	if( !force_download) {
-		if( use_new_ucla_sumfile ) 
+	if( !force_download )
+	{
+		if( use_new_ucla_sumfile )
 		{
-			checksum = readMD5sumFromFile( UCLA_new_sumfilename, run, !attempt_download);
-		} 
-		else 
+			checksum = readMD5sumFromFile( UCLA_new_sumfilename, run, !attempt_download );
+		}
+		else
 		{
 			checksum = readMD5sumFromFile( basecamp_sumfilename, run, !attempt_download );
-			if(checksum == "") checksum = readMD5sumFromFile( UCLA_sumfilename, run, !attempt_download );
-			if(checksum == "") checksum = readMD5sumFromFile( UCLA2_sumfilename, run, !attempt_download );
-			if(checksum == "") checksum = readMD5sumFromFile( UTAH_sumfilename, run, !attempt_download );
+			if( checksum == "" )
+			{
+				checksum = readMD5sumFromFile( UCLA_sumfilename, run, !attempt_download );
+			}
+			if( checksum == "" )
+			{
+				checksum = readMD5sumFromFile( UCLA2_sumfilename, run, !attempt_download );
+			}
+			if( checksum == "" )
+			{
+				checksum = readMD5sumFromFile( UTAH_sumfilename, run, !attempt_download );
+			}
 		}
-		if(checksum != "" ) return checksum;
-
+		if( checksum != "" )
+		{
+			return checksum;
+		}
+		
 	}
-
-	if( attempt_download) 
+	
+	if( attempt_download )
 	{
 		cout << dlcommand << endl;
-		if( system( dlcommand.Data() ) !=0 )  
+		if( system( dlcommand.Data() ) != 0 )
 		{
 			cout << "VExposure::getArchiveMD5sum Error: Problem executing command : " << dlcommand << endl;
 		}
-		system(chmodcommand.Data() );
-		if( use_new_ucla_sumfile ) 
+		system( chmodcommand.Data() );
+		if( use_new_ucla_sumfile )
 		{
-			checksum = readMD5sumFromFile( UCLA_new_sumfilename, run);
-		} 
-		else 
+			checksum = readMD5sumFromFile( UCLA_new_sumfilename, run );
+		}
+		else
 		{
 			checksum = readMD5sumFromFile( basecamp_sumfilename, run );
-			if(checksum == "") checksum = readMD5sumFromFile( UCLA_sumfilename, run );
-			if(checksum == "") checksum = readMD5sumFromFile( UCLA2_sumfilename, run );
-			if(checksum == "") checksum = readMD5sumFromFile( UTAH_sumfilename, run );
-		}	
-		if( checksum != "" ) return checksum;
+			if( checksum == "" )
+			{
+				checksum = readMD5sumFromFile( UCLA_sumfilename, run );
+			}
+			if( checksum == "" )
+			{
+				checksum = readMD5sumFromFile( UCLA2_sumfilename, run );
+			}
+			if( checksum == "" )
+			{
+				checksum = readMD5sumFromFile( UTAH_sumfilename, run );
+			}
+		}
+		if( checksum != "" )
+		{
+			return checksum;
+		}
 	}
 	
 	return "";
-
+	
 }
 
-TString VExposure::readMD5sumFromFile( TString filename, int run, bool warn ) {
-	
-	ifstream intemp(filename.Data() );
+TString VExposure::readMD5sumFromFile( TString filename, int run, bool warn )
+{
+
+	ifstream intemp( filename.Data() );
 	string linestring;
 	TString iChecksum;
 	TString iFile;
-
-	TString search = TString::Format("%d.cvbf", run);
+	
+	TString search = TString::Format( "%d.cvbf", run );
 	TString checksum = "";
-
-	if (! intemp.is_open() )
-	{ 
+	
+	if( ! intemp.is_open() )
+	{
 		if( warn )
 		{
 			cout << "VExposure::readMD5sumFromFile Error: Unable to open file: " << filename << endl;
@@ -2855,26 +2903,27 @@ TString VExposure::readMD5sumFromFile( TString filename, int run, bool warn ) {
 	}
 	else
 	{
-		while( getline( intemp, linestring) )
+		while( getline( intemp, linestring ) )
 		{
-			stringstream line( linestring );			
+			stringstream line( linestring );
 			line >> iChecksum >> iFile;
-			if( iFile.EndsWith(search.Data() )  )
+			if( iFile.EndsWith( search.Data() ) )
 			{
 				checksum = iChecksum;
 			}
 		}
 		intemp.close();
 	}
-	if ( checksum == "" && warn) 
-	{ 
+	if( checksum == "" && warn )
+	{
 		cout <<   "VExposure::readMD5sumFromFile Error: Unable to find checksum for " << search << " in file: " << filename << endl;
-	} 
+	}
 	return checksum;
-
+	
 }
 
-TString VExposure::calcMD5sum( int date, int run ) {
+TString VExposure::calcMD5sum( int date, int run )
+{
 
 	//check if md5sum utility is available
 	if( system( "which md5sum" ) != 0 )
@@ -2882,7 +2931,7 @@ TString VExposure::calcMD5sum( int date, int run ) {
 		cout << "VExposure::calcMD5sum Error: \"which md5sum\" shows no match; will not calculate checksum." << endl;
 		return "";
 	}
-
+	
 	TString datafilename;
 	TString resultfilename;
 	TString tempfilename;
@@ -2890,44 +2939,44 @@ TString VExposure::calcMD5sum( int date, int run ) {
 	char* ENVIR_VAR;
 	
 	ENVIR_VAR = getenv( "VERITAS_DATA_DIR" );
-
+	
 	datafilename.Form( "%s/data/d%d/%d.cvbf", ENVIR_VAR, date, run );
 	resultfilename.Form( "%s/data/d%d/LOCAL_sumd%d", ENVIR_VAR, date, date );
-	tempfilename.Form( "%s/data/d%d/TEMP_sum_%d_%d", ENVIR_VAR, date, run, (int)time(0) );
+	tempfilename.Form( "%s/data/d%d/TEMP_sum_%d_%d", ENVIR_VAR, date, run, ( int )time( 0 ) );
 	filepath.Form( "%s/data/d%d/", ENVIR_VAR, date );
-
+	
 	//check if input file exists
-	ifstream itemp(datafilename.Data());
-	if (! itemp.good())
+	ifstream itemp( datafilename.Data() );
+	if( ! itemp.good() )
 	{
 		itemp.close();
 		cout << "VExposure::calcMD5sum Error: File " << datafilename.Data() << " not available. "  << endl;
 		return "";
-	} 
+	}
 	itemp.close();
-
+	
 	//now do the checksum.
 	TString command = TString::Format( "md5sum %s | tr \"\\n\" \" \" > %s ; date >> %s", datafilename.Data(), tempfilename.Data(), tempfilename.Data() );
 	cout << command << endl;
-	if( system( command.Data() ) != 0 ) 
-	{ 
+	if( system( command.Data() ) != 0 )
+	{
 		cout << "VExposure::calcMD5sum Error: Unable to execute command: " << command << endl;
 		return "";
 	}
-
+	
 	//read in checksum
 	TString checksum = readMD5sumFromFile( tempfilename, run );
-
-	if( checksum != "" ) 
-	{ 
+	
+	if( checksum != "" )
+	{
 		command.Form( "cat %s >> %s", tempfilename.Data(), resultfilename.Data() );
 		if( system( command.Data() ) == 0 )
 		{
-			command.Form("rm %s", tempfilename.Data() );
+			command.Form( "rm %s", tempfilename.Data() );
 			system( command.Data() );
-			command.Form("chmod g+w %s", resultfilename.Data() );
+			command.Form( "chmod g+w %s", resultfilename.Data() );
 			system( command.Data() );
-		} 
+		}
 	}
 	return checksum;
 }
@@ -3068,7 +3117,7 @@ void VExposure::readRunCommentsFromDB()
 	for( unsigned int i = 0; i < fRun.size(); i++ )
 	{
 	
-	    sprintf( c_query, "SELECT run_id , data_category   , status   , status_reason , tel_cut_mask , usable_duration , time_cut_mask , light_level , vpm_config_mask , authors  , comment from tblRun_Analysis_Comments where run_id=%d", fRun[i] );	
+		sprintf( c_query, "SELECT run_id , data_category   , status   , status_reason , tel_cut_mask , usable_duration , time_cut_mask , light_level , vpm_config_mask , authors  , comment from tblRun_Analysis_Comments where run_id=%d", fRun[i] );
 		if( !my_connection.make_query( c_query ) )
 		{
 			return;

@@ -460,7 +460,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			ftpars[i]->GetEntry( fEventCounter );
 			
 			fdist[i] = ftpars[i]->dist;
-                        // MNR: We need to correct here the sizes too.
+			// MNR: We need to correct here the sizes too.
 			fsize[i] = ftpars[i]->size * fTLRunParameter->fEnergySizecorrection[i];
 			fsize2[i] = ftpars[i]->size2 * fTLRunParameter->fEnergySizecorrection[i];
 			floss[i] = ftpars[i]->loss;
@@ -1301,11 +1301,11 @@ bool VTableLookupDataHandler::readRunParameter()
 			}
 			VEvndispRunParameter* iPar = ( VEvndispRunParameter* ) ifInput.Get( "runparameterV2" );
 			VEvndispReconstructionParameter* iA = ( VEvndispReconstructionParameter* )ifInput.Get( "EvndispReconstructionParameter" );
-                        VMonteCarloRunHeader* iMC = ( VMonteCarloRunHeader* )ifInput.Get( "MC_runheader" );
-                        if( iMC )
-                        {
-                             fTLRunParameter->ze = iMC->getMeanZenithAngle_Deg();
-                        }
+			VMonteCarloRunHeader* iMC = ( VMonteCarloRunHeader* )ifInput.Get( "MC_runheader" );
+			if( iMC )
+			{
+				fTLRunParameter->ze = iMC->getMeanZenithAngle_Deg();
+			}
 			vector< unsigned int > iTelToAnalyze;
 			if( iPar )
 			{
@@ -1332,19 +1332,19 @@ bool VTableLookupDataHandler::readRunParameter()
 				}
 				
 				fOutFile->cd();
-                                // update instrument epoch in evendisp run parameters
-                                // (might have been changed since the evndisp analysis)
-                                if( fTLRunParameter->fUpdateInstrumentEpoch )
-                                {
-                                     cout << "Evaluating instrument epoch (";
-                                     cout << "was: " << iPar->getInstrumentEpoch( false );
-                                     cout << ", is: " << iPar->getInstrumentEpoch( false, true );
-                                     cout << ")" << endl;
-                                     cout << "Evaluating atmosphere ID (";
-                                     cout << "was: " << iPar->getAtmosphereID( false );
-                                     cout << ", is: " << iPar->getAtmosphereID( true );
-                                     cout << ")" << endl;
-                                }
+				// update instrument epoch in evendisp run parameters
+				// (might have been changed since the evndisp analysis)
+				if( fTLRunParameter->fUpdateInstrumentEpoch )
+				{
+					cout << "Evaluating instrument epoch (";
+					cout << "was: " << iPar->getInstrumentEpoch( false );
+					cout << ", is: " << iPar->getInstrumentEpoch( false, true );
+					cout << ")" << endl;
+					cout << "Evaluating atmosphere ID (";
+					cout << "was: " << iPar->getAtmosphereID( false );
+					cout << ", is: " << iPar->getAtmosphereID( true );
+					cout << ")" << endl;
+				}
 				iPar->Write();
 			}
 		}
@@ -1470,23 +1470,23 @@ bool VTableLookupDataHandler::terminate( TNamed* iM )
 			TFile* inpMscwFile = new TFile( finputfile[0].c_str(), "READ" ) ;
 			fOutFile->cd();
 			TTree* iTree       = ( TTree* )inpMscwFile->Get( "pointingDataReduced" );
-			if( iTree ) 
+			if( iTree )
 			{
 				TTree* newtree     = iTree->CloneTree();
-				if( newtree ) 
+				if( newtree )
 				{
 					newtree->Write();
 				}
-				else 
+				else
 				{
 					cout << "VTableLookupDataHandler::terminate Warning: Unable to clone tree " << iTree->GetName() << endl;
 				}
 			}
-			else 
+			else
 			{
 				cout << "VTableLookupDataHandler::terminate Warning: Unable to find tree pointingDataReduced in file " << inpMscwFile->GetName() << endl;
-			}	
-
+			}
+			
 			TTree* jTree = ( TTree* )inpMscwFile->Get( "deadPixelRegistry" ) ;
 			// deadPixelRegistry may not exist, only try to copy it if it's there
 			if( jTree )
@@ -1672,10 +1672,10 @@ void VTableLookupDataHandler::copyMCHistograms()
 						{
 							iMC_his_temp->matchDataVectors( i_az_min, i_az_max, i_spectral_index );
 						}
-                                                if( iMC_his_temp )
-                                                {
-                                                        iMC_his->add( iMC_his_temp );
-                                                }
+						if( iMC_his_temp )
+						{
+							iMC_his->add( iMC_his_temp );
+						}
 					}
 					ifInput->Close();
 				}

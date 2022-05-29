@@ -28,7 +28,7 @@ class VDifferentialFlux : public TObject
 		double Energy_Hz;                         // [Hz]
 		double EnergyWeightedMean;                // [TeV]
 		double dE;                                // size of energy bin (in TeV)
-                double EffectiveArea;                     // [m2]
+		double EffectiveArea;                     // [m2]
 		double DifferentialFlux;                  // [1/cm2/s/TeV]
 		double DifferentialFluxError;             // [1/cm2/s/TeV]
 		double DifferentialFluxError_up;             // [1/cm2/s/TeV]

@@ -3,7 +3,7 @@
     (VERITAS only)
 
 
-    
+
 */
 
 #include "VGlobalRunParameter.h"

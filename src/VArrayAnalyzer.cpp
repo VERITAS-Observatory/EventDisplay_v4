@@ -605,7 +605,7 @@ void VArrayAnalyzer::terminate( bool iWriteDebug )
 				{
 					iMC_histos.setMonteCarloEnergyRange( getReader()->getMonteCarloHeader()->E_range[0], getReader()->getMonteCarloHeader()->E_range[1],
 														 TMath::Abs( getReader()->getMonteCarloHeader()->spectral_index ) );
-                                        i_ze = getReader()->getMonteCarloHeader()->getMeanZenithAngle_Deg();
+					i_ze = getReader()->getMonteCarloHeader()->getMeanZenithAngle_Deg();
 				}
 				iMC_histos.setDefaultValues();
 				iMC_histos.initializeHistograms();
@@ -913,8 +913,8 @@ int VArrayAnalyzer::rcs_method_0( unsigned int iMethod )
 	num_images = getShowerParameters()->fShowerNumImages[iMethod];
 	
 	// are there enough images the run an array analysis. Also check for less images in order to do event-type analyses.
-	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] && 
-            num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod])
+	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] &&
+			num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod] )
 	{
 		prepareforDirectionReconstruction( iMethod, 0 );
 	}
@@ -1150,7 +1150,7 @@ double VArrayAnalyzer::getMeanPointingMismatch( unsigned int iTel )
 	{
 		return -2.;
 	}
-        if( TMath::IsNaN( fMeanPointingMismatch[iTel] ) == 0 && TMath::IsNaN( fNMeanPointingMismatch[iTel] ) == 0 )
+	if( TMath::IsNaN( fMeanPointingMismatch[iTel] ) == 0 && TMath::IsNaN( fNMeanPointingMismatch[iTel] ) == 0 )
 	{
 		if( fNMeanPointingMismatch[iTel] > 0. )
 		{
@@ -1230,8 +1230,8 @@ int VArrayAnalyzer::rcs_method_3( unsigned int iMethod )
 	num_images = getShowerParameters()->fShowerNumImages[iMethod];
 	
 	// are there enough images the run an array analysis
-	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] && 
-            num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod])
+	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] &&
+			num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod] )
 	{
 		prepareforDirectionReconstruction( iMethod, 3 );
 	}
@@ -1386,8 +1386,8 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
 	num_images = getShowerParameters()->fShowerNumImages[iMethod];
 	
 	// are there enough images the run an array analysis
-	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] && 
-            num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod])
+	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] &&
+			num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod] )
 	{
 		prepareforDirectionReconstruction( iMethod, 4 );
 	}
@@ -1562,11 +1562,11 @@ bool VArrayAnalyzer::fillShowerDirection( unsigned int iMethod, float xs, float 
 		getArrayPointing()->getRotatedShowerDirection( -1.*getShowerParameters()->fShower_Yoffset[iMethod],
 				-1.*getShowerParameters()->fShower_Xoffset[iMethod], ze, az );
 	}
-        if( TMath::IsNaN( ze ) )
+	if( TMath::IsNaN( ze ) )
 	{
 		ze = -99999.;
 	}
-        if( TMath::IsNaN( az ) )
+	if( TMath::IsNaN( az ) )
 	{
 		az = -99999.;
 	}
@@ -1820,8 +1820,8 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp )
 	
 	
 	// are there enough images the run an array analysis
-	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] && 
-            num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod])
+	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] &&
+			num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod] )
 	{
 		prepareforDirectionReconstruction( iMethod, 5 );
 	}
@@ -2025,8 +2025,8 @@ int VArrayAnalyzer::rcs_method_9( unsigned int iMethod )
 	num_images = getShowerParameters()->fShowerNumImages[iMethod];
 	
 	// cut on minimum number of images
-	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] && 
-            num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod])
+	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] &&
+			num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod] )
 	{
 		prepareforDirectionReconstruction( iMethod, 4 );
 	}
@@ -2287,10 +2287,10 @@ void VArrayAnalyzer::updatePointingToArbitraryTime( int iMJD, double iTime )
 
 	// same conditions as above
 	if( !fReader->isMC() &&
-    	    !( getRunParameter()->felevation > 0.0 ) &&
-   	    !( getRunParameter()->fazimuth > 0.0 ) &&
-     	       getArrayPointing()->isSet() &&
-    	     ( getArrayPointing()->getTargetName() != "laser" ) )
+			!( getRunParameter()->felevation > 0.0 ) &&
+			!( getRunParameter()->fazimuth > 0.0 ) &&
+			getArrayPointing()->isSet() &&
+			( getArrayPointing()->getTargetName() != "laser" ) )
 	{
 	
 		getArrayPointing()->updatePointing( iMJD, iTime );

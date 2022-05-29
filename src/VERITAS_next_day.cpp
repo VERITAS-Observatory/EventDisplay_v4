@@ -1,7 +1,7 @@
 /*! \file run next day analysis and produce text and fits output
 
 
-    
+
 */
 
 #include "VGlobalRunParameter.h"

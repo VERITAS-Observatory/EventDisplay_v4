@@ -1,7 +1,7 @@
 /*! \class VPlotUtilities
 
 
-    
+
 */
 
 #include "VPlotUtilities.h"

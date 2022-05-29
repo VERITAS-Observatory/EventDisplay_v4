@@ -670,14 +670,14 @@ void VTableLookup::fillLookupTable()
 				// get telescope type
 				ULong64_t t = iter_i_list_of_Tel_type->first;
 				
-                                // This should be already the corrected/scaled size value for MC. 
+				// This should be already the corrected/scaled size value for MC.
 				double* i_s2 = fData->getSize2( 1., t, fTLRunParameter->fUseSelectedImagesOnly );
 				double* i_r = fData->getDistanceToCore( t );
 				unsigned int i_type = fData->getNTel_type( t );
-                                // Corrected size values (old, only applies to the MC) ... 
-                                //double* i_s2_fMSCWcorr   = fData->getSize2( fTLRunParameter->fMSCWSizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly ); 
-                                //double* i_s2_fMSCLcorr   = fData->getSize2( fTLRunParameter->fMSCLSizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly ); 
-                                //double* i_s2_fEnergycorr = fData->getSize2( fTLRunParameter->fEnergySizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly ); 
+				// Corrected size values (old, only applies to the MC) ...
+				//double* i_s2_fMSCWcorr   = fData->getSize2( fTLRunParameter->fMSCWSizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly );
+				//double* i_s2_fMSCLcorr   = fData->getSize2( fTLRunParameter->fMSCLSizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly );
+				//double* i_s2_fEnergycorr = fData->getSize2( fTLRunParameter->fEnergySizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly );
 				////////////////////////////////////////////////
 				// for zenith-angle == 0 deg fill all az bins
 				if( fabs( fData->getMCZe() ) < 3. )
@@ -690,8 +690,8 @@ void VTableLookup::fillLookupTable()
 								fData->getWidth( t ), idummy1, iEventWeight, idummy3, idummy1 );
 						fmscl[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2,
 								fData->getLength( t ), idummy1, iEventWeight, idummy3, idummy1 );
-						fenergySizevsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2, 
-                                                                fData->getMCEnergyArray(), idummy1, iEventWeight, idummy3, idummy1 );
+						fenergySizevsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2,
+								fData->getMCEnergyArray(), idummy1, iEventWeight, idummy3, idummy1 );
 						if( !fTLRunParameter->fLimitEnergyReconstruction )
 						{
 							fenergyEnergyvsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, fData->getMCEnergy(),
@@ -709,8 +709,8 @@ void VTableLookup::fillLookupTable()
 							fData->getWidth( t ), idummy1, iEventWeight, idummy3, idummy1 );
 					fmscl[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2,
 							fData->getLength( t ), idummy1, iEventWeight, idummy3, idummy1 );
-					fenergySizevsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2, 
-                                                        fData->getMCEnergyArray(), idummy1, iEventWeight, idummy3, idummy1 );
+					fenergySizevsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2,
+							fData->getMCEnergyArray(), idummy1, iEventWeight, idummy3, idummy1 );
 							
 					if( !fTLRunParameter->fLimitEnergyReconstruction )
 					{
@@ -791,10 +791,10 @@ void VTableLookup::readLookupTable()
 		}
 		
 		// get zenith angle for first valid MC event from MC files
-		if( bFirst && fData->getMCEnergy() > 0.001 
-                && fTLRunParameter->ze < 0. )
+		if( bFirst && fData->getMCEnergy() > 0.001
+				&& fTLRunParameter->ze < 0. )
 		{
-                        cout << "\t\t setting IRF ze from first event" << endl;
+			cout << "\t\t setting IRF ze from first event" << endl;
 			if( fNTel > 0 )
 			{
 				fTLRunParameter->ze = TMath::Floor( ( 90. - fData->getTelElevation() ) + 0.5 );
@@ -1145,10 +1145,10 @@ void VTableLookup::terminate()
 		cout << "closing file..." << endl;
 		fLookupTableFile->Close();
 	}
-        else
-        {
-            gROOT->GetListOfFiles()->Remove( fLookupTableFile );
-        }
+	else
+	{
+		gROOT->GetListOfFiles()->Remove( fLookupTableFile );
+	}
 	
 	cout << "exiting..." << endl;
 }
@@ -1445,13 +1445,13 @@ void VTableLookup::calculateMSFromTables( VTablesToRead* s, double esys )
 		return;
 	}
 	double i_dummy = 0.;
-
-        // MNR Get the size untouched, the size was already scaled if needed when reading the event. 
+	
+	// MNR Get the size untouched, the size was already scaled if needed when reading the event.
 	double* i_s2 = fData->getSize2( 1., fTLRunParameter->fUseSelectedImagesOnly );
-        // Old. APPLY it only for MC, getSize2 gives the pointer to an array. 
-        //double* i_s2_fMSCWcorr   = fData->getSize2( fTLRunParameter->fMSCWSizecorrection, fTLRunParameter->fUseSelectedImagesOnly ); 
-        //double* i_s2_fMSCLcorr   = fData->getSize2( fTLRunParameter->fMSCLSizecorrection, fTLRunParameter->fUseSelectedImagesOnly ); 
-        //double* i_s2_fEnergycorr = fData->getSize2( fTLRunParameter->fEnergySizecorrection, fTLRunParameter->fUseSelectedImagesOnly ); 
+	// Old. APPLY it only for MC, getSize2 gives the pointer to an array.
+	//double* i_s2_fMSCWcorr   = fData->getSize2( fTLRunParameter->fMSCWSizecorrection, fTLRunParameter->fUseSelectedImagesOnly );
+	//double* i_s2_fMSCLcorr   = fData->getSize2( fTLRunParameter->fMSCLSizecorrection, fTLRunParameter->fUseSelectedImagesOnly );
+	//double* i_s2_fEnergycorr = fData->getSize2( fTLRunParameter->fEnergySizecorrection, fTLRunParameter->fUseSelectedImagesOnly );
 	
 	f_calc_msc->setCalculateEnergies( false );
 	// calculate mscw

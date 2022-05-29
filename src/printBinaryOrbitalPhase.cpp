@@ -65,7 +65,7 @@ int main( int argc, char* argv[] )
 	if( argc == 7 )
 	{
 		orbit = atof( argv[6] );
-        }
+	}
 	if( argc == 8 )
 	{
 		t0 = atof( argv[7] );
@@ -84,16 +84,16 @@ int main( int argc, char* argv[] )
 		{
 			// calculate orbital phase
 			cout << "Orbital phase of " << object << " for " << year << "-" << month << "-" << day << ", MJD " << djm << ": ";
-                        cout << endl;
-                        double iP = ( djm - t0 ) / orbit - ( int )( ( djm - t0 ) / orbit );
-                        if( iP < 0. )
-                        {
-                             cout << 1. + iP << endl;
-                        }
-                        else
-                        {
-                             cout << iP << endl;
-                        }
+			cout << endl;
+			double iP = ( djm - t0 ) / orbit - ( int )( ( djm - t0 ) / orbit );
+			if( iP < 0. )
+			{
+				cout << 1. + iP << endl;
+			}
+			else
+			{
+				cout << iP << endl;
+			}
 		}
 		else
 		{
@@ -112,7 +112,7 @@ int main( int argc, char* argv[] )
 				}
 				slaDjcl( djm, &year, &month, &day, &fd, &j );
 				cout << "Orbital phase of " << object << " for ";
-                                cout << year << "-" << month << "-" << day << ", MJD " << djm << ": ";
+				cout << year << "-" << month << "-" << day << ", MJD " << djm << ": ";
 				cout << ( djm - t0 ) / orbit - ( int )( ( djm - t0 ) / orbit ) << endl;
 				p_old = p;
 				djm_old = djm;

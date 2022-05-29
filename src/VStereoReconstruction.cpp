@@ -2,7 +2,7 @@
     \brief calculate and plot array reconstruction quality
 
 
-    
+
 */
 
 #include "VStereoReconstruction.h"
