@@ -204,8 +204,8 @@ void print_event_differences(
 
 void sofa_vs_slalib( 
         int runnumber = 64080, bool bPrintEvents = false, bool bPrintIsGamma = false,
-        string sofafile = "/lustre/fs23/group/veritas/users/maierg/analysis/Results/v490/TS/all_anasum_soft/64080.anasum.root",
-        string slalibfile = "/lustre/fs23/group/veritas/users/maierg/analysis/Results/v490/TSsla/all_anasum_soft/64080.anasum.root" )
+        string sofafile = "$VERITAS_USER_DATA_DIR/analysis/Results/v490/TS/anasum_soft/64080.anasum.root",
+        string slalibfile = "$VERITAS_USER_DATA_DIR/analysis/Results/v490/TSsla/using_TS_Tables/anasum_soft/64080.anasum.root" )
 {
     map< int, dset* > sofa = read_tree( runnumber, sofafile, "sofa" );
     map< int, dset* > slal = read_tree( runnumber, slalibfile, "slalib" );
