@@ -146,8 +146,8 @@ void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x_deg, double y
         // sign error; see http://veritash.sao.arizona.edu:8081/Eventdisplay-WG/1912
 	// x_deg *= -1.;
 	
-	slaDtp2s( x_deg*TMath::DegToRad(), y_deg*TMath::DegToRad(), fSkyMapCentreRAJ2000*TMath::DegToRad(), fSkyMapCentreDecJ2000*TMath::DegToRad(), &ra, &dec );
-	slaDtp2s( (x_deg+xerr_deg)*TMath::DegToRad(), (y_deg+yerr_deg)*TMath::DegToRad(), fSkyMapCentreRAJ2000*TMath::DegToRad(), fSkyMapCentreDecJ2000*TMath::DegToRad(), &ra_err_deg, &dec_err_deg );
+    VAstronometry::vlaDtp2s( x_deg * TMath::DegToRad(), y_deg * TMath::DegToRad(), fSkyMapCentreRAJ2000 * TMath::DegToRad(), fSkyMapCentreDecJ2000 * TMath::DegToRad(), &ra, &dec );
+    VAstronometry::vlaDtp2s( ( x_deg + xerr_deg )*TMath::DegToRad(), ( y_deg + yerr_deg )*TMath::DegToRad(), fSkyMapCentreRAJ2000 * TMath::DegToRad(), fSkyMapCentreDecJ2000 * TMath::DegToRad(), &ra_err_deg, &dec_err_deg );
 	
 	ra          *= TMath::RadToDeg();
 	dec         *= TMath::RadToDeg();
@@ -1260,7 +1260,7 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 			// convert angle to hours/min/seconds
 			char iSign[10];
 			int ihmsf[4];
-			slaDr2tf( 4, -1.*Xmax * TMath::DegToRad(), iSign, ihmsf );
+            VAstronometry::vlaDr2tf( 4, -1.*Xmax * TMath::DegToRad(), iSign, ihmsf );
 			iRA_hrs = ihmsf[0];
 			iRA_min = ihmsf[1];
 			iRA_sec = ihmsf[2];
@@ -1586,7 +1586,7 @@ vector<sSource> VPlotAnasumHistograms::plot_catalogue( TCanvas* c, string iCatal
 				double x = 0.;
 				double y = 0.;
 				int j = 0;
-				slaDs2tp( s.getStarRA2000( i )*TMath::Pi() / 180., s.getStarDec2000( i )*TMath::Pi() / 180., ra * TMath::Pi() / 180., dec * TMath::Pi() / 180., &x, &y, &j );
+                VAstronometry::vlaDs2tp( s.getStarRA2000( i )*TMath::Pi() / 180., s.getStarDec2000( i )*TMath::Pi() / 180., ra * TMath::Pi() / 180., dec * TMath::Pi() / 180., &x, &y, &j );
 				x *= -1. * 180. / TMath::Pi();
 				y *= 180. / TMath::Pi();
 				

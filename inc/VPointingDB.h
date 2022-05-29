@@ -4,7 +4,7 @@
 #define VPOINTINGDB_H
 
 #include "PointingMonitor.h"
-#include "VASlalib.h"
+#include "VAstronometry.h"
 #include "VGlobalRunParameter.h"
 #include "VTrackingCorrections.h"
 #include "VDB_Connection.h"

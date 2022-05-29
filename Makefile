@@ -24,6 +24,9 @@
 #  for using FITS (optional)
 #    FITSSYS (pointing to FITS installation)
 #
+#   for using sofa (default)
+#      SOFASYS
+#
 ##########################################################################
 SHELL = /bin/sh
 ARCH = $(shell uname)
@@ -89,6 +92,13 @@ ifeq ($(strip $(FITSSYS)),)
 FITS = FALSE
 endif
 
+#####################
+# ASTRONMETRY ROUTINES
+#
+ASTRONMETRY = -DASTROSOFA
+ifeq ($(strip $(SOFASYS)),)
+ASTRONMETRY = -DASTROSLALIB
+endif
 ########################################################################################################################
 # compile and linker flags
 ########################################################################################################################
@@ -96,7 +106,7 @@ endif
 CXX           = g++
 CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
 CXXFLAGS     += -I. -I./inc/
-CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG)
+CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG) $(ASTRONMETRY)
 LD            = g++
 OutPutOpt     = -o
 INCLUDEFLAGS  = -I. -I./inc/
@@ -168,6 +178,14 @@ ifneq ($(FITS),FALSE)
 GLIBS		+= -L$(FITSSYS)/lib -lcfitsio
 CXXFLAGS	+= -I$(FITSSYS)/include/
 endif
+########################################################
+# ASTROMETRY
+########################################################
+ifeq ($(ASTRONMETRY),-DASTROSOFA)
+GLIBS		+= -L$(SOFASYS)/lib -lsofa_c
+CXXFLAGS	+= -I$(SOFASYS)/include/
+endif
+########################################################
 
 ########################################################
 # paths
@@ -265,7 +283,7 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VDBRunInfo.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/VUtilities.o \
-		./obj/VASlalib.o \
+		./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 		./obj/VPointing.o \
 	 	./obj/VPointingDB.o \
 		./obj/VSkyCoordinates.o \
@@ -334,14 +352,19 @@ MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 		./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
-                ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
-                ./obj/VStar.o ./obj/VStar_Dict.o \
-                ./obj/VUtilities.o \
-                ./obj/VASlalib.o \
+        ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+        ./obj/VStar.o ./obj/VStar_Dict.o \
+        ./obj/VUtilities.o \
+        ./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 		./obj/VMedianCalculator.o \
-                ./obj/VSkyCoordinatesUtilities.o \
-                ./obj/VDB_Connection.o \
+        ./obj/VSkyCoordinatesUtilities.o \
+        ./obj/VDB_Connection.o \
 		./obj/mscw_energy.o
+
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    MSCOBJECTS += ./obj/VASlalib.o
+endif
+
 ./obj/mscw_energy.o:	./src/mscw_energy.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
@@ -357,7 +380,7 @@ ACCOBJECT = 	./obj/makeRadialAcceptance.o \
 		./obj/VRadialAcceptance.o \
 		./obj/VSkyCoordinatesUtilities.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-		./obj/VASlalib.o \
+		./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
@@ -379,6 +402,9 @@ ACCOBJECT = 	./obj/makeRadialAcceptance.o \
 		 ./obj/VUtilities.o
 
 
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    ACCOBJECT += ./obj/VASlalib.o
+endif
 
 
 ./obj/makeRadialAcceptance.o:	./src/makeRadialAcceptance.cpp
@@ -396,7 +422,7 @@ ACCOBJECT = ./obj/VTS.getRun_TimeElevAzim.o \
 		./obj/VSkyCoordinates.o \
 		./obj/VSkyCoordinatesUtilities.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-		./obj/VASlalib.o \
+		./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
@@ -419,6 +445,10 @@ ACCOBJECT = ./obj/VTS.getRun_TimeElevAzim.o \
 		./obj/VStar.o ./obj/VStar_Dict.o \
 		./obj/VDB_Connection.o \
 		./obj/VUtilities.o
+
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    VTSRUNTIMEOBJ += ./obj/VASlalib.o
+endif
 
 ./obj/VTS.getRun_TimeElevAzim.o: ./src/VTS.getRun_TimeElevAzim.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -451,14 +481,18 @@ EFFOBJECT =	./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 		./obj/VSkyCoordinatesUtilities.o ./obj/VUtilities.o \
 		./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
-		./obj/VASlalib.o \
+		./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 		./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
 		./obj/makeEffectiveArea.o
+
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    EFFOBJECT += ./obj/VASlalib.o
+endif
 
 ./obj/makeEffectiveArea.o:	./src/makeEffectiveArea.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-makeEffectiveArea:	$(EFFOBJECT) ./obj/VASlalib.o ./obj/makeEffectiveArea.o
+makeEffectiveArea:	$(EFFOBJECT) ./obj/makeEffectiveArea.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
@@ -503,7 +537,8 @@ ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_
 		./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o ./obj/VTableLookupRunParameter.o \
 		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
-		./obj/VTableLookupRunParameter_Dict.o ./obj/VASlalib.o \
+		./obj/VTableLookupRunParameter_Dict.o \
+		./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 		./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 		./obj/VDB_Connection.o \
 		./obj/VStar.o ./obj/VStar_Dict.o \
@@ -511,6 +546,10 @@ ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_
 		./obj/VSkyCoordinatesUtilities.o ./obj/VUtilities.o \
 		./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
 		./obj/anasum.o
+
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    ANASUMOBJECTS += ./obj/VASlalib.o
+endif
 
 ./obj/anasum.o:	./src/anasum.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -539,7 +578,6 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VEnergySpectrum.o ./obj/VEnergySpectrum_Dict.o \
 		./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 		./obj/VStar.o ./obj/VStar_Dict.o \
-		./obj/VASlalib.o ./obj/VASlalib_Dict.o \
 		./obj/Ctelconfig.o \
 		./obj/VSkyCoordinatesUtilities.o ./obj/VSkyCoordinatesUtilities_Dict.o \
 		./obj/VSkyCoordinates.o ./obj/VSkyCoordinates_Dict.o \
@@ -603,7 +641,12 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VPedestalLowGain.o ./obj/VPedestalLowGain_Dict.o \
 		./obj/VLowGainCalibrator.o ./obj/VLowGainCalibrator_Dict.o \
 		./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
+		./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 		./obj/VPlotOptimalCut.o ./obj/VPlotOptimalCut_Dict.o
+
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+  SHAREDOBJS += ./obj/VASlalib.o ./obj/VASlalib_Dict.o 
+endif
 
 ifneq ($(GSLFLAG),-DNOGSL)
   SHAREDOBJS	+= ./obj/VLikelihoodFitter.o ./obj/VLikelihoodFitter_Dict.o
@@ -634,7 +677,7 @@ PRINTANAOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 		./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
 		./obj/VUtilities.o \
-		./obj/VASlalib.o \
+		./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 		./obj/VSkyCoordinatesUtilities.o \
 		./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
 		./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
@@ -653,8 +696,6 @@ printAnasumRunParameter:	$(PRINTANAOBJ)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
-
-
 ########################################################
 # printRunParameter
 ########################################################
@@ -667,12 +708,16 @@ PRINTRUNOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-                ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
-                ./obj/VStar.o ./obj/VStar_Dict.o \
-                ./obj/VASlalib.o \
-                ./obj/VSkyCoordinatesUtilities.o \
-                ./obj/VDB_Connection.o \
+        ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+        ./obj/VStar.o ./obj/VStar_Dict.o \
+		./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
+        ./obj/VSkyCoordinatesUtilities.o \
+        ./obj/VDB_Connection.o \
 		./obj/printRunParameter.o
+
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    PRINTRUNOBJ += ./obj/VASlalib.o
+endif
 
 ./obj/printRunParameter.o:	./src/printRunParameter.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -693,11 +738,15 @@ MAKEDISPTABLESOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
                         ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
                         ./obj/VStar.o ./obj/VStar_Dict.o \
-                        ./obj/VASlalib.o \
+			./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
                         ./obj/VSkyCoordinatesUtilities.o \
                         ./obj/VDB_Connection.o \
 			./obj/VUtilities.o \
 			./obj/makeDISPTables.o
+
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    MAKEDISPTABLESOBJ += ./obj/VASlalib.o
+endif
 
 ./obj/makeDISPTables.o:	./src/makeDISPTables.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -730,7 +779,7 @@ PRINTDISPTABLESOBJ= 	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dic
 			./obj/VUtilities.o \
                         ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
                         ./obj/VStar.o ./obj/VStar_Dict.o \
-                        ./obj/VASlalib.o \
+			./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
                         ./obj/VSkyCoordinatesUtilities.o \
                         ./obj/VDB_Connection.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
@@ -738,6 +787,10 @@ PRINTDISPTABLESOBJ= 	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dic
 			./obj/VDispTable.o ./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o \
 			./obj/Cshowerpars.o ./obj/Ctpars.o \
 			./obj/printDISPTables.o
+
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    PRINTDISPTABLESOBJ += ./obj/VASlalib.o
+endif
 
 ./obj/printDISPTables.o:	./src/printDISPTables.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -749,13 +802,13 @@ printDISPTables:	$(PRINTDISPTABLESOBJ)
 ########################################################
 # compareDatawithMC
 ########################################################
-COMPAREDATAMCOBJ=	./obj/VASlalib.o \
-			./obj/CData.o \
+COMPAREDATAMCOBJ=	./obj/CData.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 			./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 			./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 			./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
+			./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 			./obj/VSkyCoordinates.o \
 			./obj/VSkyCoordinatesUtilities.o \
 			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
@@ -779,6 +832,10 @@ COMPAREDATAMCOBJ=	./obj/VASlalib.o \
 			./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
 			./obj/compareDatawithMC.o
 
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    COMPAREDATAMCOBJ += ./obj/VASlalib.o
+endif
+
 ./obj/compareDatawithMC.o:	./src/compareDatawithMC.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
@@ -789,12 +846,30 @@ compareDatawithMC:	$(COMPAREDATAMCOBJ)
 ########################################################
 # printBinaryOrbitalPhase
 ########################################################
-PRINTBINARYOBJ=		./obj/VASlalib.o ./obj/printBinaryOrbitalPhase.o
+PRINTBINARYOBJ=		./obj/VAstronometry.o ./obj/printBinaryOrbitalPhase.o
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    PRINTBINARYOBJ += ./obj/VASlalib.o
+endif
 
 ./obj/printBinaryOrbitalPhase.o:	./src/printBinaryOrbitalPhase.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 printBinaryOrbitalPhase:	$(PRINTBINARYOBJ)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+########################################################
+# testAstronometry
+########################################################
+TESTASTROMETRYOBJ =		./obj/VAstronometry.o ./obj/testAstronometry.o
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    TESTASTROMETRYOBJ += ./obj/VASlalib.o
+endif
+
+./obj/testAstronometry.o:	./src/testAstronometry.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+testAstronometry:	$(TESTASTROMETRYOBJ)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
@@ -805,7 +880,7 @@ WRITEVTSPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 			./obj/writeVTSWPPhysSensitivityFiles.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
-			./obj/VASlalib.o \
+			./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 			./obj/VInstrumentResponseFunctionReader.o ./obj/VInstrumentResponseFunctionReader_Dict.o \
 			./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
 			./obj/VSensitivityCalculator.o ./obj/VSensitivityCalculator_Dict.o \
@@ -837,6 +912,10 @@ WRITEVTSPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 
 ifneq ($(GSLFLAG),-DNOGSL)
   WRITEVTSPHYSOBJ	+= ./obj/VLikelihoodFitter.o ./obj/VLikelihoodFitter_Dict.o
+endif
+
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    WRITEVTSPHYSOBJ += ./obj/VASlalib.o
 endif
 
 ./obj/writeVTSWPPhysSensitivityFiles.o: 	./src/writeVTSWPPhysSensitivityFiles.cpp
@@ -879,6 +958,10 @@ WRITEPARTPHYSOBJ=	./obj/writeParticleRateFilesFromEffectiveAreas.o \
 			./obj/VStatistics_Dict.o \
 			./obj/VUtilities.o
 
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    WRITECTAPHYSOBJ += ./obj/VASlalib.o
+endif
+
 ./obj/writeParticleRateFilesFromEffectiveAreas.o: 	./src/writeParticleRateFilesFromEffectiveAreas.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
@@ -892,7 +975,7 @@ writeParticleRateFilesFromEffectiveAreas:	$(WRITEPARTPHYSOBJ)
 WRITEPARTPHYSOBJ=	./obj/writeParticleRateFilesForTMVA.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
-			./obj/VASlalib.o \
+			./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 			./obj/VInstrumentResponseFunctionReader.o ./obj/VInstrumentResponseFunctionReader_Dict.o \
 			./obj/VSensitivityCalculator.o ./obj/VSensitivityCalculator_Dict.o \
 			./obj/CEffArea.o ./obj/CEffArea_Dict.o \
@@ -918,6 +1001,10 @@ WRITEPARTPHYSOBJ=	./obj/writeParticleRateFilesForTMVA.o \
 			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 			./obj/VStatistics_Dict.o \
 			./obj/VUtilities.o
+
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    WRITECTAPHYSOBJ += ./obj/VASlalib.o
+endif
 
 ./obj/writeParticleRateFilesForTMVA.o: 	./src/writeParticleRateFilesForTMVA.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -961,7 +1048,7 @@ trainTMVAforAngularReconstruction:	./obj/trainTMVAforAngularReconstruction.o \
 					./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 					./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 					./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
-					./obj/VASlalib.o \
+					./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 					./obj/VStar.o ./obj/VStar_Dict.o \
 					./obj/VDB_Connection.o \
 					./obj/VSkyCoordinatesUtilities.o \
@@ -982,7 +1069,7 @@ updateDBlaserRUN:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 			./obj/VStar.o ./obj/VStar_Dict.o \
 			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 			./obj/VDB_Connection.o \
-			./obj/VASlalib.o \
+			./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 			./obj/VSkyCoordinatesUtilities.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VUtilities.o \
@@ -1008,13 +1095,12 @@ writelaserinDB : $(writelaserinDBOBJ)
 ########################################################
 # combineEffectiveAreas
 ########################################################
-./obj/combineEffectiveAreas.o:	./src/combineEffectiveAreas.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-combineEffectiveAreas:	 ./obj/combineEffectiveAreas.o  \
+COMBINEEFFAREAOBJ=	 ./obj/combineEffectiveAreas.o  \
 			 ./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 			 ./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 			 ./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
+			 ./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 			 ./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 			 ./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
 			 ./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
@@ -1032,10 +1118,17 @@ combineEffectiveAreas:	 ./obj/combineEffectiveAreas.o  \
 			 ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			 ./obj/VSkyCoordinatesUtilities.o ./obj/VUtilities.o \
 			 ./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
-			 ./obj/VASlalib.o \
-			 ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o
+			 ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o \
+			 ./obj/combineEffectiveAreas.o
 
+./obj/combineEffectiveAreas.o:	./src/combineEffectiveAreas.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    COMBINEEFFOBJ += ./obj/VASlalib.o
+endif
+
+combineEffectiveAreas:	$(COMBINEEFFAREAOBJ)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
@@ -1045,6 +1138,7 @@ combineEffectiveAreas:	 ./obj/combineEffectiveAreas.o  \
 ########################################################
 MAKEOPTCUTTMVAOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 			./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
+			./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 			./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 			./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
@@ -1055,6 +1149,10 @@ MAKEOPTCUTTMVAOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VUtilities.o \
 			./obj/trainTMVAforGammaHadronSeparation.o
+
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    MAKEOPTCUTTMVAOBJ += ./obj/VASlalib.o
+endif
 
 ./obj/trainTMVAforGammaHadronSeparation.o:	./src/trainTMVAforGammaHadronSeparation.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -1071,7 +1169,12 @@ MAKEOPTCUTTMVATRAININGOBJ= 	./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHea
 				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 				./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 				./obj/VEvndispRunParameter.o obj/VEvndispRunParameter_Dict.o \
+				./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 				./obj/trainTMVAforGammaHadronSeparation_TrainingFile.o
+
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    MAKEOPTCUTTMVATRAININGOBJ += ./obj/VASlalib.o
+endif
 
 ./obj/trainTMVAforGammaHadronSeparation_TrainingFile.o:	./src/trainTMVAforGammaHadronSeparation_TrainingFile.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -1097,7 +1200,7 @@ VTS.calculateCrabRateFromMC:	./obj/CEffArea.o ./obj/CEffArea_Dict.o \
                                 ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
                                 ./obj/VStar.o ./obj/VStar_Dict.o \
                                 ./obj/VUtilities.o \
-                                ./obj/VASlalib.o \
+                                 ./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
                                 ./obj/VSkyCoordinatesUtilities.o \
                                 ./obj/VDB_Connection.o \
 				./obj/VTS.calculateCrabRateFromMC.o
@@ -1130,12 +1233,11 @@ VTS.calculateExposureFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 				./obj/VStar.o ./obj/VStar_Dict.o \
 				./obj/VExposure.o ./obj/VExposure_Dict.o \
 				./obj/VDB_Connection.o \
-				./obj/VASlalib.o \
-                                ./obj/VStar.o ./obj/VStar_Dict.o \
-                                ./obj/VUtilities.o \
-                                ./obj/VSkyCoordinatesUtilities.o \
-				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+				./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
+                ./obj/VUtilities.o \
 				./obj/VUtilities.o \
+				./obj/VSkyCoordinatesUtilities.o \
+				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 				./obj/VTS.calculateExposureFromDB.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
@@ -1146,18 +1248,22 @@ VTS.calculateExposureFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 ./obj/VTS.getLaserRunFromDB.o:   ./src/VTS.getLaserRunFromDB.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-VTS.getLaserRunFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
+VTSLASERUNOBJ=	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 			./obj/VStar.o ./obj/VStar_Dict.o \
                         ./obj/VUtilities.o \
-                        ./obj/VASlalib.o \
+                        ./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
                         ./obj/VSkyCoordinatesUtilities.o \
 			./obj/VDBRunInfo.o \
 			./obj/VDB_Connection.o \
-			./obj/VASlalib.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VTS.getLaserRunFromDB.o
 
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    VTSLASERUNOBJ += ./obj/VASlalib.o
+endif
+
+VTS.getLaserRunFromDB:	$(VTSLASERUNOBJ)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
@@ -1167,20 +1273,25 @@ VTS.getLaserRunFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 ./obj/VTS.getRunListFromDB.o:   ./src/VTS.getRunListFromDB.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-VTS.getRunListFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
+VTSRUNLISTDBOJB=	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 			./obj/VStar.o ./obj/VStar_Dict.o \
 			./obj/VExposure.o ./obj/VExposure_Dict.o \
 			./obj/VDB_Connection.o \
-			./obj/VASlalib.o \
-         ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
-         ./obj/VStar.o ./obj/VStar_Dict.o \
-         ./obj/VUtilities.o \
-         ./obj/VSkyCoordinatesUtilities.o \
+			./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
+			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+			./obj/VStar.o ./obj/VStar_Dict.o \
+			./obj/VUtilities.o \
+			./obj/VSkyCoordinatesUtilities.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VUtilities.o \
 			./obj/VTS.getRunListFromDB.o
 
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    VTSRUNLISTDBOJB += ./obj/VASlalib.o
+endif
+
+VTS.getRunListFromDB:	$(VTSRUNLISTDBOJB)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
@@ -1252,8 +1363,8 @@ endif
 
 ./obj/%_Dict.o:	./inc/%.h ./inc/%LinkDef.h
 	@echo "Generating dictionary $@.."
-	@echo ${ROOT_CntCln} -f $(basename $@).cpp -c -p $?
-	${ROOT_CntCln} -f $(basename $@).cpp -c -p $?
+	@echo ${ROOT_CntCln} -f $(basename $@).cpp  $?
+	${ROOT_CntCln} -f $(basename $@).cpp  $?
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 	cp -f -v $(basename $@)_rdict.pcm bin/
 	cp -f -v $(basename $@)_rdict.pcm lib/
@@ -1272,32 +1383,32 @@ endif
 ########################################################
 ./obj/VFITS_Dict.o:
 	@echo "A Generating dictionary $@.."
-	@echo ${ROOT_CntCln} -f $(basename $@).cpp  -c -p -I$(FITSSYS)/include inc/VFITS.h inc/VFITSLinkDef.h
-	${ROOT_CntCln} -f $(basename $@).cpp  -c -p -I$(FITSSYS)/include inc/VFITS.h inc/VFITSLinkDef.h
+	@echo ${ROOT_CntCln} -f $(basename $@).cpp -I$(FITSSYS)/include inc/VFITS.h inc/VFITSLinkDef.h
+	${ROOT_CntCln} -f $(basename $@).cpp  -I$(FITSSYS)/include inc/VFITS.h inc/VFITSLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 	cp -f -v $(basename $@)_rdict.pcm bin/
 	cp -f -v $(basename $@)_rdict.pcm lib/
 
 ./obj/VDisplay_Dict.o:
 	@echo "A Generating dictionary $@.."
-	@echo ${ROOT_CntCln} -f $(basename $@).cpp  -c -p -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG)  ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
-	${ROOT_CntCln} -f $(basename $@).cpp  -c -p -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG)  ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
+	@echo ${ROOT_CntCln} -f $(basename $@).cpp -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
+	${ROOT_CntCln} -f $(basename $@).cpp -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 	cp -f -v $(basename $@)_rdict.pcm bin/
 	cp -f -v $(basename $@)_rdict.pcm lib/
 
 ./obj/VLightCurve_Dict.o:
 	@echo "Generating dictionary $@..."
-	@echo ${ROOT_CntCln} -f $(basename $@).cpp  -c -p -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) ./inc/VLightCurve.h ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
-	${ROOT_CntCln} -f $(basename $@).cpp  -c -p -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) ./inc/VLightCurve.h ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
+	@echo ${ROOT_CntCln} -f $(basename $@).cpp -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) ./inc/VLightCurve.h ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
+	${ROOT_CntCln} -f $(basename $@).cpp -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) $(GSLFLAG) ./inc/VLightCurve.h ./inc/VLightCurveData.h ./inc/VLightCurveLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 	cp -f -v $(basename $@)_rdict.pcm bin/
 	cp -f -v $(basename $@)_rdict.pcm lib/
 
 ./obj/VZDCF_Dict.o:
 	@echo "Generating dictionary $@..."
-	@echo ${ROOT_CntCln} -f $(basename $@).cpp -c -p ./inc/VZDCF.h ./inc/VZDCFData.h ./inc/VZDCFLinkDef.h
-	${ROOT_CntCln} -f $(basename $@).cpp -c -p ./inc/VZDCF.h ./inc/VZDCFData.h ./inc/VZDCFLinkDef.h
+	@echo ${ROOT_CntCln} -f $(basename $@).cpp ./inc/VZDCF.h ./inc/VZDCFData.h ./inc/VZDCFLinkDef.h
+	${ROOT_CntCln} -f $(basename $@).cpp ./inc/VZDCF.h ./inc/VZDCFData.h ./inc/VZDCFLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 	cp -f -v $(basename $@)_rdict.pcm bin/
 	cp -f -v $(basename $@)_rdict.pcm lib/
@@ -1332,10 +1443,13 @@ writeFITS_eventlistOBJ	= ./obj/writeFITS_eventlist.o \
 			  ./obj/VDB_Connection.o \
 			  ./obj/VStarCatalogue.o  ./obj/VStarCatalogue_Dict.o \
 			  ./obj/VStar.o ./obj/VStar_Dict.o \
-			  ./obj/VASlalib.o \
 			  ./obj/VUtilities.o  \
-			  ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o
+			  ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+			  ./obj/VAstronometry.o ./obj/VAstronometry_Dict.o
 
+ifeq ($(ASTRONMETRY),-DASTROSLALIB)
+    writeEventListTMVAOBJ += ./obj/VASlalib.o
+endif
 
 ./obj/writeFITS_eventlist.o:	./src/writeFITS_eventlist.cpp
 	$(CXX) $(CXXFLAGS) -I $(EVLIOSYS)/records/ -I $(EVLIOSYS)/include/ -c -o $@ $<

@@ -111,7 +111,7 @@ void VPointing::getPointingFromDB( int irun, string iTCorrection, string iVPMDir
 		cout << endl;
 		cout << "FATAL ERROR: cannot connect to VERITAS database" << endl;
 		cout << "exiting..." << endl;
-		exit( 0 );
+        exit( EXIT_FAILURE );
 	}
 #else
 	fPointingDB = 0;
@@ -137,11 +137,11 @@ bool VPointing::updatePointingfromDB( int MJD, double iTime )
 		
 		if( fEventStatus != 3 )
 		{
-			// calculate pointing error in camera coordinates (using slalib)
+            // calculate pointing error in camera coordinates
 			double iPx = 0.;
 			double iPy = 0.;
 			int j = 0;
-			slaDs2tp( fTelAzimuthCalculated / TMath::RadToDeg(), fTelElevationCalculated / TMath::RadToDeg(),
+			VAstronometry::vlaDs2tp( fTelAzimuthCalculated / TMath::RadToDeg(), fTelElevationCalculated / TMath::RadToDeg(),
 					  fTelAzimuthDB / TMath::RadToDeg(), fTelElevationDB / TMath::RadToDeg(),
 					  &iPx, &iPy, &j );
 			if( j == 0 )

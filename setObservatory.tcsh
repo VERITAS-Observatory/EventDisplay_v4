@@ -40,9 +40,12 @@ if( $OBSERVATORY == "CTA" ) then
   setenv LD_LIBRARY_PATH $HESSIOSYS/lib:$LD_LIBRARY_PATH
 endif
 
+# SOFASYS
+setenv SOFASYS $EVNDISPSYS/sofa
+
 ######################################################
 ## EVNDISP libraries 
-setenv LD_LIBRARY_PATH $EVNDISPSYS/lib/:$LD_LIBRARY_PATH
+setenv LD_LIBRARY_PATH $EVNDISPSYS/lib/:$EVNDISPSYS/obj/:$LD_LIBRARY_PATH
 
 ######################################################
 ## environmental variables

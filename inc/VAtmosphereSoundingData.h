@@ -3,7 +3,7 @@
 #ifndef VAtmosphereSoundingData_H
 #define VAtmosphereSoundingData_H
 
-#include "VASlalib.h"
+#include "VAstronometry.h"
 
 #include "TCanvas.h"
 #include "TFile.h"

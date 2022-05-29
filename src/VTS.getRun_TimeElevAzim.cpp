@@ -2,6 +2,7 @@
 //  Take a single runnumber, and print the elevation and azimuth
 //  the telescope is pointing at once per second
 #include "CData.h"
+#include "VAstronometry.h"
 #include "VSkyCoordinates.h"
 #include "VDB_Connection.h"
 #include "VGlobalRunParameter.h"
@@ -338,10 +339,10 @@ int main( int argc, char* argv[] )
 				mjdFrac = mjd[i_row] - floor( mjd[i_row] ) ;
 				ra_rad = ra[i_row] ;
 				de_rad = decl[i_row] ;
-				iSid = slaGmsta( ( double ) mjdInt, mjdFrac ) ;
+				iSid = VAstronometry::vlaGmsta( ( double ) mjdInt, mjdFrac ) ;
 				iSid = iSid - lon_rad ;
-				ha   = slaDranrm( iSid - ra_rad ) ;
-				slaDe2h( ha, de_rad, lat_rad, &Azim, &Elev ) ;
+				ha   = VAstronometry::vlaDranrm( iSid - ra_rad ) ;
+                VAstronometry::vlaDe2h( ha, de_rad, lat_rad, &Azim, &Elev ) ;
 				Azim *= TMath::RadToDeg() ;
 				Elev *= TMath::RadToDeg() ;
 				cout << "i_row:" << i_row << endl;
@@ -415,7 +416,7 @@ void getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip )
 	}
 	
 	// calculate MJD
-	slaCldj( y, m, d, &gMJD, &l );
+	VAstronometry::vlaCldj( y, m, d, &gMJD, &l );
 	MJD = ( int )gMJD;
 	Time = h * 60.*60. + min * 60. + s + ms / 1.e3;
 }

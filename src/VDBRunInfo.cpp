@@ -334,7 +334,7 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 	int id = iStarttime - iy * 10000 - im * 100;
 	if( iStarttime > 0 )
 	{
-		slaCldj( iy, im, id, &imjd, &j );
+		VAstronometry::vlaCldj( iy, im, id, &imjd, &j );
 	}
 	else
 	{
@@ -346,7 +346,7 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 	id = iStopptime - iy * 10000 - im * 100;
 	if( iStopptime > 0 )
 	{
-		slaCldj( iy, im, id, &imjd, &j );
+		VAstronometry::vlaCldj( iy, im, id, &imjd, &j );
 	}
 	else
 	{

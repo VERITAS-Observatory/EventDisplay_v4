@@ -6,7 +6,7 @@
 #include "CData.h"
 #include "VGammaHadronCuts.h"
 #include "VAnaSumRunParameter.h"
-#include "VASlalib.h"
+#include "VAstronometry.h"
 #include "VEffectiveAreaCalculatorMCHistograms.h"
 #include "TEfficiency.h"
 #include "VHistogramUtilities.h"

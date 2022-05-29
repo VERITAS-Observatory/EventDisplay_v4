@@ -964,7 +964,7 @@ void VPlotRunSummary::fillDailyRates( bool iCorrectForDeadTimes )
 		}
 		
 		// get date from mjd
-		slaDjcl( c->MJDOn, &iy, &im, &id, &fd, &j );
+		VAstronometry::vlaDjcl( c->MJDOn, &iy, &im, &id, &fd, &j );
 		iDate.push_back( iy * 10000 + im * 100 + id );
 		if( iDate.size() == 1 )
 		{
@@ -1173,7 +1173,7 @@ void VPlotRunSummary::writeRunTable( string ioutfile, bool iPhases, bool iSignif
 		}
 		
 		// get date from mjd
-		slaDjcl( c->MJDOn, &iy, &im, &id, &fd, &j );
+		VAstronometry::vlaDjcl( c->MJDOn, &iy, &im, &id, &fd, &j );
 		iDate.push_back( iy * 10000 + im * 100 + id );
 		iMJD.push_back( ( int )c->MJDOn );
 		if( iDate.size() == 1 )
