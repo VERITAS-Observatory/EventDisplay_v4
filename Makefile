@@ -201,6 +201,7 @@ VPATH = src:inc
 
 all VTS:	evndisp \
         printRunParameter \
+		printAnasumRunParameter \
 	mscw_energy \
 	anasum makeDISPTables \
 	combineDISPTables \
