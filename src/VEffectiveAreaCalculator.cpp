@@ -1656,7 +1656,10 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms(
             // read 2D histograms
             if( iEffAreaH2F && count_max_az_bins > 0 )
             {
-                iEffAreaH2F->GetEntry( iIndexAz / fH2F_treecounter_offset + iIndexAz % count_max_az_bins );
+                iEffAreaH2F->GetEntry( 
+                        count_max_az_bins 
+                        * (iIndexAz/(fH2F_treecounter_offset*count_max_az_bins))
+                        + iIndexAz % count_max_az_bins );
             }
 
             fEff_EsysMCRelative[i_ID].resize( fH2F_nbins_esys, 0. );
