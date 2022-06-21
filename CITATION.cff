@@ -1,0 +1,18 @@
+# YAML 1.2
+# Metadata for citation of this software according to the CFF format (https://citation-file-format.github.io/)
+cff-version: 1.0.3
+message: If you use this software, please cite it using these metadata.
+title: "Eventdisplay: An Analysis and Reconstruction Package for Ground-based Gamma-ray Astronomy"
+# doi: 10.5281/zenodo.3559075
+authors:
+- given-names: Gernot
+  family-names: Maier
+  affiliation: DESY
+  orcid: https://orcid.org/0000-0001-9868-4700
+- given-names: "Jamie"
+  family-names: "Holder"
+  affiliation: "Department of Physics and Astronomy and the Bartol Research Institute, University of Delaware, Newark, DE 19716, USA"
+version: 4.9.0
+date-released: 2022-06-15
+repository-code: https://github.com/VERITAS-Observatory/EventDisplay_v4
+license: BSD-3-Clause
