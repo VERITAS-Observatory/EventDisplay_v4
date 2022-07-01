@@ -511,6 +511,30 @@ logFile:	$(LOGFILE)
 	@echo "$@ done"
 
 ########################################################
+# merge VBF files
+########################################################
+VBFMERGE=	./obj/mergeVBF.o
+
+./obj/mergeVBF.o:    ./src/mergeVBF.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+mergeVBF: $(VBFMERGE)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(VBFLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+########################################################
+# split VBF files
+########################################################
+VBFSPLIT=	./obj/splitVBF.o
+
+./obj/splitVBF.o:    ./src/splitVBF.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+splitVBF: $(VBFSPLIT)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(VBFLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+########################################################
 # anasum
 ########################################################
 ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \
