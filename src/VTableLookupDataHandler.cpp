@@ -328,6 +328,10 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		}
 		fTotalTime = time - fTotalTime0;
 		
+        pair<float, float > i_array_pointing = getArrayPointing();
+        fArrayPointingElevation = i_array_pointing.first;
+        fArrayPointingAzimuth = i_array_pointing.second;
+
 		for( unsigned int i = 0; i < fNTel; i++ )
 		{
 			fTelElevation[i] = fshowerpars->TelElevation[i];
@@ -1835,7 +1839,7 @@ bool VTableLookupDataHandler::isReconstructed()
 
 void VTableLookupDataHandler::calcEmissionHeights()
 {
-	fEmissionHeightCalculator->getEmissionHeight( fcen_x, fcen_y, fdist, fsize, fR, fTelAzimuth, fTelElevation );
+	fEmissionHeightCalculator->getEmissionHeight( fcen_x, fcen_y, fsize, fArrayPointingAzimuth, fArrayPointingElevation );
 	fNTelPairs = fEmissionHeightCalculator->getNTelPairs();
 	fEmissionHeightMean = ( float )fEmissionHeightCalculator->getMeanEmissionHeight();
 	fEmissionHeightChi2 = ( float )fEmissionHeightCalculator->getMeanEmissionHeightChi2();
@@ -1908,6 +1912,8 @@ void VTableLookupDataHandler::resetAll()
 	eventNumber = 0;
 	MJD = 0;
 	time = 0;
+    fArrayPointingAzimuth = 0.;
+    fArrayPointingElevation = 0.;
 	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
 	{
 		fTelElevation[i] = 0.;
@@ -2407,3 +2413,26 @@ void VTableLookupDataHandler::initializeTelTypeVector()
 	}
 }
 
+pair<float, float > VTableLookupDataHandler::getArrayPointing()
+{
+    pair<float, float > i_array_pointing;
+    i_array_pointing.first = 0.;
+    i_array_pointing.second = 0.;
+    float i_N = 0.;
+
+    for( unsigned int i = 0; i < fNTel; i++ )
+    {
+        if( fshowerpars->ImgSel_list[fMethod][i] )
+        {
+            i_array_pointing.first += fshowerpars->TelElevation[i];
+            i_array_pointing.second = VSkyCoordinatesUtilities::addToMeanAzimuth(i_array_pointing.second, fshowerpars->TelAzimuth[i]);
+            i_N++;
+         }
+    }
+    if( i_N > 0. )
+    {
+        i_array_pointing.first /= i_N;
+        i_array_pointing.second /= i_N;
+    }
+    return i_array_pointing;
+}

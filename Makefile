@@ -1073,10 +1073,13 @@ trainTMVAforAngularReconstruction:	./obj/trainTMVAforAngularReconstruction.o \
 					./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 					./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 					./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+					./obj/VEmissionHeightCalculator.o \
 					./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 					./obj/VStar.o ./obj/VStar_Dict.o \
 					./obj/VDB_Connection.o \
 					./obj/VSkyCoordinatesUtilities.o \
+					./obj/VSimpleStereoReconstructor.o \
+					./obj/VGrIsuAnalyzer.o \
 					./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
 					./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 					./obj/VUtilities.o \
