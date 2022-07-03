@@ -178,7 +178,7 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
     dataloader->AddVariable( "asym"  , 'F' );
     dataloader->AddVariable( "loss"  , 'F' );
     dataloader->AddVariable( "dist"  , 'F' );
-    dataloader->AddVariable( "fui"  , 'F' );
+    // dataloader->AddVariable( "fui"  , 'F' );
     if( iTargetML.find( "DispEnergy" ) != string::npos && !iSingleTelescopeAnalysis )
     {
         dataloader->AddVariable( "EHeight", 'F' );
