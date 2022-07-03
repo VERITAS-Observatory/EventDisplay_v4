@@ -71,7 +71,6 @@ class Cshowerpars
 		Float_t         WobbleN;
 		Float_t         WobbleE;
 		UInt_t          NTrig;
-		UInt_t          LTrigS;
 		ULong64_t       LTrig;
 		//[NTrig]
 		UShort_t        Trig_list[VDST_MAXTELESCOPES];
@@ -81,8 +80,6 @@ class Cshowerpars
 		UShort_t        MethodID[VDST_MAXRECMETHODS];
 		//[NMethods]
 		UShort_t        NImages[VDST_MAXRECMETHODS];
-		//[NMethods]
-		UInt_t          ImgSelS[VDST_MAXRECMETHODS];
 		//[NMethods]
 		ULong64_t       ImgSel[VDST_MAXRECMETHODS];
 		//[NMethods]
@@ -189,7 +186,6 @@ class Cshowerpars
 		
 		Cshowerpars( TTree* tree = 0, bool iMC = false, bool iShort = false );
 		virtual ~Cshowerpars();
-		virtual Int_t    Cut( Long64_t entry );
 		virtual Int_t    GetEntry( Long64_t entry );
 		virtual Long64_t LoadTree( Long64_t entry );
 		virtual void     Init( TTree* tree );
@@ -330,6 +326,7 @@ void Cshowerpars::Init( TTree* tree )
 			TelRA[i] = 0;
 		}
 	}
+
 	if( !bMC && !bShort )
 	{
 		fChain->SetBranchAddress( "TelElevationVBF", TelElevationVBF );
@@ -412,8 +409,11 @@ void Cshowerpars::Init( TTree* tree )
 	if( !bShort )
 	{
 		fChain->SetBranchAddress( "stds", stds );
-		fChain->SetBranchAddress( "dec", dec );
-		fChain->SetBranchAddress( "ra", ra );
+        if( fChain->GetBranchStatus( "dec" ) )
+        {
+            fChain->SetBranchAddress( "dec", dec );
+            fChain->SetBranchAddress( "ra", ra );
+        }
 	}
 	else
 	{
@@ -674,11 +674,4 @@ void Cshowerpars::Show( Long64_t entry )
 }
 
 
-Int_t Cshowerpars::Cut( Long64_t entry )
-{
-	// This function may be called from Loop.
-	// returns  1 if entry is accepted.
-	// returns -1 otherwise.
-	return 1;
-}
 #endif                                            // #ifdef Cshowerpars_cxx

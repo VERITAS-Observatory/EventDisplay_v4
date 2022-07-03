@@ -841,7 +841,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 						fEventDisplayFileFormat = 5;
 					}
 				}
-				ftpars.push_back( new Ctpars( iT, fIsMC, fEventDisplayFileFormat, bShort ) );
+				ftpars.push_back( new Ctpars( iT, fIsMC, bShort ) );
 			}
 		}
 		else
