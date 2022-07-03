@@ -350,6 +350,8 @@ MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o \
 		./obj/VDeadTime.o ./obj/VUtilities.o \
 		./obj/VStatistics_Dict.o \
 		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
+		./obj/VSimpleStereoReconstructor.o \
+		./obj/VGrIsuAnalyzer.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 		./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \

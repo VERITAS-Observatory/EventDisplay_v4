@@ -7,6 +7,8 @@
 #include "VDeadTime.h"
 #include "VEffectiveAreaCalculatorMCHistograms.h"
 #include "VMonteCarloRunHeader.h"
+#include "VDispAnalyzer.h"
+#include "VSimpleStereoReconstructor.h"
 #include "VTableLookupRunParameter.h"
 #include "VUtilities.h"
 
@@ -60,11 +62,16 @@ class VTableLookupDataHandler
 		double fTotalTime0;                       //!< time of first event (in [s])
 		
 		VEmissionHeightCalculator* fEmissionHeightCalculator;
+        VDispAnalyzer*             fDispAnalyzerDirection;
+        VDispAnalyzer*             fDispAnalyzerDirectionError;
 		
 		double fSelectRandom;
 		int fSelectRandomSeed;
 		TRandom3* fRandom;
 		
+        int fSSR_NImages_min;
+        float fSSR_AxesAngles_min;
+        
 		// MC parameter
 		unsigned int fMinImages;
 		double fMC_distance_to_cameracenter_min;
@@ -101,17 +108,13 @@ class VTableLookupDataHandler
 		TH2D* hWE0trig;
 		TList* hisList;
 		
-		TH1D* hTrigPattern;                       //!< trigger pattern
-		TH1D* hImagePattern;                      //!< pattern of telescopes with more than 4 pixels
-		vector< string > sTrigPattern;            //!< label for trigger pattern histogram
-		
 		// telescope positions from fTtelconfig
 		double fTelX[VDST_MAXTELESCOPES];
 		double fTelY[VDST_MAXTELESCOPES];
 		double fTelZ[VDST_MAXTELESCOPES];
 		double fFocalLength[VDST_MAXTELESCOPES];
 		ULong64_t fTel_type[VDST_MAXTELESCOPES];
-		map<ULong64_t, unsigned int > fList_of_Tel_type;
+        map<ULong64_t, unsigned int > fList_of_Tel_type;                      // [teltype][number of telescopes for this type]
 		map<ULong64_t, unsigned int >::iterator fList_of_Tel_type_iterator;
 		vector< unsigned int > fTel_type_counter;
         float fArrayPointingElevation;
@@ -128,6 +131,9 @@ class VTableLookupDataHandler
 		double fTargetRA;
 		double fWobbleN;
 		double fWobbleE;
+        float  fArrayPointing_Elevation;
+        float  fArrayPointing_Azimuth;
+        float  fArrayPointing_RotationAngle;
 		
 		// output trees
 		TTree* fOTree;
@@ -156,9 +162,11 @@ class VTableLookupDataHandler
 		bool   copyMCRunheader();
 		void   copyMCTree();
 		void   copy_telconfig();
+        void   doStereoReconstruction();
 		void   initializeTelTypeVector();
 		int    fillNextEvent( bool bShort );
         pair<float, float > getArrayPointing();
+        float getArrayPointingDeRotationAngle();
 		void   printCutStatistics();
 		bool   randomSelected();
 		void   resetImageParameters();
@@ -194,7 +202,6 @@ class VTableLookupDataHandler
 		ULong64_t LTrig;
 		unsigned int fNTrig;
 		int fNImages;
-		unsigned int fImgSelS;
 		ULong64_t fImgSel;
 		bool fImgSel_list[VDST_MAXTELESCOPES];
 		unsigned int fImgSel_list_short[VDST_MAXTELESCOPES];
@@ -290,7 +297,20 @@ class VTableLookupDataHandler
 		
 		double fSizeSecondMax;
 		double ftheta2_All[25];
-		double fDispDiff; // difference in disp event direction between telescopes
+
+        // disp related variables
+        float fXoff_edisp;
+        float fYoff_edisp;
+        float fXoff_intersect;                  //! keep direction from intersection method
+        float fYoff_intersect;                  //! keep direction from intersection method
+        float fXoff_T[VDST_MAXTELESCOPES];      //! direction reconstructed for each telescope
+        float fYoff_T[VDST_MAXTELESCOPES];      //! direction reconstructed for each telescope
+        float fWoff_T[VDST_MAXTELESCOPES];      //! direction reconstructed for each telescope (weight)
+        float fDoff_T[VDST_MAXTELESCOPES];      //! (disp value)
+        unsigned int fToff_T[VDST_MAXTELESCOPES]; //! list of telescope participating in disp
+        unsigned int fnxyoff;                   //! number of images used for disp direction reconstruction
+        // difference in disp event direction between telescopes
+        double fDispDiff;
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
