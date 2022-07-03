@@ -107,7 +107,7 @@ int main( int argc, char* argv[] )
 		cout << "error finding tree showerpars" << endl;
 		exit( 0 );
 	}
-	Cshowerpars *m = new Cshowerpars( s, false, 6, true );
+	Cshowerpars *m = new Cshowerpars( s, false, true );
 	if( !m )
 	{
 		exit( 0 );		

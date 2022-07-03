@@ -278,7 +278,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
 		cout << "VDispTable::fillTable error finding tree showerpars" << endl;
 		return false;
 	}
-	Cshowerpars* m = new Cshowerpars( s, true, 6, true );
+	Cshowerpars* m = new Cshowerpars( s, true, true );
 	if( !m )
 	{
 		return false;

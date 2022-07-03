@@ -795,7 +795,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		{
 			cout << "input data is of eventdisplay short tree output format (" << bShort << ")" << endl;
 		}
-		fshowerpars = new Cshowerpars( fTshowerpars, fIsMC, fEventDisplayFileFormat, bShort );
+		fshowerpars = new Cshowerpars( fTshowerpars, fIsMC, bShort );
 		fIsMC = fshowerpars->isMC();
 	}
 	else
