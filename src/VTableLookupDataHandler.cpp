@@ -1080,6 +1080,45 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 			fNoiseLevel.push_back( 0. );
 		}
 	}
+    
+    
+    // temporary list of telescopes required for disp analysers
+    vector<ULong64_t> i_TelTypeList;
+    for( fList_of_Tel_type_iterator = fList_of_Tel_type.begin();
+            fList_of_Tel_type_iterator != fList_of_Tel_type.end();
+            fList_of_Tel_type_iterator++ )
+    {
+        if( fList_of_Tel_type_iterator->second > 0 )
+        {
+            i_TelTypeList.push_back( fList_of_Tel_type_iterator->first );
+        }
+    }
+    
+    /////////////////////////////////////////
+    // initialize Disp Analyzer for direction reconstruction
+    // (if required)
+    if( fTLRunParameter->fRerunStereoReconstruction_BDTFileName.size() > 0. )
+    {
+        cout << endl;
+        cout << "Initializing BDT disp analyzer for direction reconstruction" << endl;
+        cout << "===========================================================" << endl << endl;
+        fDispAnalyzerDirection = new VDispAnalyzer();
+        fDispAnalyzerDirection->setTelescopeTypeList( i_TelTypeList );
+        fDispAnalyzerDirection->initialize( fTLRunParameter->fRerunStereoReconstruction_BDTFileName, "TMVABDT" );
+    }
+    /////////////////////////////////////////
+    // initialize Disp Analyzer for error on direction reconstruction
+    // (if required)
+    if( fTLRunParameter->fDispError_BDTFileName.size() > 0. )
+    {
+        cout << endl;
+        cout << "Initializing BDT disp analyzer for estimation of disp error" << endl;
+        cout << "===========================================================" << endl << endl;
+        cout << "\t error weighting parameter: " << fTLRunParameter->fDispError_BDTWeight << endl;
+        fDispAnalyzerDirectionError = new VDispAnalyzer();
+        fDispAnalyzerDirectionError->setTelescopeTypeList( i_TelTypeList );
+        fDispAnalyzerDirectionError->initialize( fTLRunParameter->fDispError_BDTFileName, "TMVABDT", "BDTDispError" );
+    }
 	if( fDebug )
 	{
 		cout << "VTableLookupDataHandler::setInputFile() END" << endl;

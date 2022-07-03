@@ -258,7 +258,6 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VCalibrator.o \
         ./obj/VImageAnalyzer.o \
 		./obj/VArrayAnalyzer.o \
-		./obj/VMLPAnalyzer.o \
 		./obj/VDispAnalyzer.o \
 		./obj/VDispTableReader.o \
 		./obj/VDispTableReader_Dict.o \
@@ -352,6 +351,11 @@ MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o \
 		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
 		./obj/VSimpleStereoReconstructor.o \
 		./obj/VGrIsuAnalyzer.o \
+		./obj/VDispAnalyzer.o \
+		./obj/VDispTableReader.o \
+		./obj/VDispTableReader_Dict.o \
+		./obj/VDispTableAnalyzer.o \
+		./obj/VTMVADispAnalyzer.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 		./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
