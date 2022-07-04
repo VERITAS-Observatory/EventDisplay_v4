@@ -614,7 +614,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
     // store results from line intersection for debugging
     fXoff_intersect = i_SR.fShower_Xoffset;
     fYoff_intersect = i_SR.fShower_Yoffset;
-    /* 
+     
     ////////////////////////////////////////////////////////////////////
     // DISP method for updated disp reconstruction
     ////////////////////////////////////////////////////////////////////
@@ -640,8 +640,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
                 fasym, ftgrad_x,
                 floss, fntubes,
                 getWeight(),
-                i_SR.fShower_Xoffset, i_SR.fShower_Yoffset,
-                ffui );
+                i_SR.fShower_Xoffset, i_SR.fShower_Yoffset);
                 
             // get estimated error on direction reconstruction
             for( unsigned int t = 0; t < getNTel(); t++ )
@@ -655,9 +654,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
                 fTLRunParameter->fDispError_BDTWeight );
         fDispAnalyzerDirection->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
                                                 fTLRunParameter->fmaxdist, 
-                                                fTLRunParameter->fmaxloss,
-                                                fTLRunParameter->fminfui,
-                                                fmaxdist_qc );
+                                                fTLRunParameter->fmaxloss );
         fDispAnalyzerDirection->calculateMeanDirection(
             getNTel(),
             fArrayPointing_Elevation, fArrayPointing_Azimuth,
@@ -670,11 +667,11 @@ void VTableLookupDataHandler::doStereoReconstruction()
             floss, fntubes,
             getWeight(),
             i_SR.fShower_Xoffset, i_SR.fShower_Yoffset,
-            iDispError, ffui );
+            iDispError );
         // reconstructed direction by disp method:
         fXoff = fDispAnalyzerDirection->getXcoordinate_disp();
         fYoff = fDispAnalyzerDirection->getYcoordinate_disp();
-            
+
         // dispersion of disp values
         fDispDiff = fDispAnalyzerDirection->getDispDiff();
         fimg2_ang = fDispAnalyzerDirection->getAngDiff();
@@ -690,11 +687,11 @@ void VTableLookupDataHandler::doStereoReconstruction()
             fDoff_T[t] = fDispAnalyzerDirection->get_disp( t );
             fToff_T[t] = fDispAnalyzerDirection->get_disp_tel_list( t );
         }
-    } */
+    } 
     ////////////////////////////////////////////////////////////////////
     // Standard (intersection) method for all other cases
     ////////////////////////////////////////////////////////////////////
-//    else
+    else
     {
         fXoff  = i_SR.fShower_Xoffset;
         fYoff  = i_SR.fShower_Yoffset;

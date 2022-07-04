@@ -122,7 +122,7 @@ void VDispAnalyzer::terminate()
 float VDispAnalyzer::evaluate( float iWidth, float iLength, float iAsymm, float iDist, float iSize,
                                float iPedvar, float iTGrad, float iLoss, float icen_x, float icen_y,
                                float xoff_4, float yoff_4, ULong64_t iTelType,
-                               float iZe, float iAz, float iRcore, float iFui, float iNtubes, bool b2D )
+                               float iZe, float iAz, float iRcore, float iNtubes, bool b2D )
 {
     f_disp = -99.;
     
@@ -134,7 +134,7 @@ float VDispAnalyzer::evaluate( float iWidth, float iLength, float iAsymm, float 
     {
         f_disp = fTMVADispAnalyzer->evaluate( iWidth, iLength, iSize, iAsymm, iLoss, iTGrad,
                                               icen_x, icen_y, xoff_4, yoff_4, iTelType,
-                                              iZe, iAz, iRcore, -1., iDist, iFui, iNtubes );
+                                              iZe, iAz, iRcore, -1., iDist, iNtubes );
     }
     return f_disp;
     
@@ -605,8 +605,7 @@ void VDispAnalyzer::calculateMeanDirection( unsigned int i_ntel,
         double* img_weight,
         double xoff_4,
         double yoff_4,
-        vector< float > dispErrorT,
-        double* img_fui )
+        vector< float > dispErrorT )
 {
     // reset values from previous event
     f_disp = -99.;
@@ -620,7 +619,7 @@ void VDispAnalyzer::calculateMeanDirection( unsigned int i_ntel,
             || !img_width || !img_length
             || !img_asym || !img_tgrad
             || !img_loss || !img_ntubes
-            || !img_weight || !img_fui )
+            || !img_weight )
     {
         return;
     }
@@ -641,9 +640,7 @@ void VDispAnalyzer::calculateMeanDirection( unsigned int i_ntel,
         // quality cuts
         if( img_size[i] > 0. && img_length[i] > 0.
                 && sqrt( img_cen_x[i]*img_cen_x[i] + img_cen_y[i]*img_cen_y[i] ) < fdistance_max
-                && img_loss[i] < floss_max
-                && img_fui[i] > fFui_min
-                && (fdistanceQC_max == 0 || sqrt( img_cen_x[i]*img_cen_x[i] + img_cen_y[i]*img_cen_y[i] ) < fdistanceQC_max[i] ) )
+                && img_loss[i] < floss_max )
         {
             disp = evaluate( ( float )img_width[i], ( float )img_length[i], ( float )img_asym[i],
                              ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
@@ -651,7 +648,7 @@ void VDispAnalyzer::calculateMeanDirection( unsigned int i_ntel,
                              ( float )img_cen_x[i], ( float )img_cen_y[i],
                              ( float )xoff_4, ( float )yoff_4, iTelType[i],
                              ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
-                             -99., ( float )img_fui[i], ( float )img_ntubes[i] );
+                             -99., ( float )img_ntubes[i] );
             if( disp < -98. )
             {
                 continue;
@@ -682,8 +679,7 @@ void VDispAnalyzer::calculateMeanDirection( unsigned int i_ntel,
             else
             {
                 v_weight.push_back( img_size[i] * img_weight[i] * ( 1. - img_width[i] / img_length[i] )
-                                    * img_size[i] * img_weight[i] * ( 1. - img_width[i] / img_length[i] )
-                                    * img_fui[i] * img_fui[i] * img_fui[i] * img_fui[i] );
+                                    * img_size[i] * img_weight[i] * ( 1. - img_width[i] / img_length[i] ) );
             }
             
             x.push_back( img_cen_x[i] );
@@ -737,8 +733,7 @@ void VDispAnalyzer::calculateExpectedDirectionError( unsigned int i_ntel,
         int* img_ntubes,
         double* img_weight,
         double xoff_4,
-        double yoff_4,
-        double* img_fui )
+        double yoff_4 )
 {
     // make sure that all data arrays exist
     if( !img_size || !img_cen_x || !img_cen_y
@@ -746,7 +741,7 @@ void VDispAnalyzer::calculateExpectedDirectionError( unsigned int i_ntel,
             || !img_width || !img_length
             || !img_asym || !img_tgrad
             || !img_loss || !img_ntubes
-            || !img_weight || !img_fui )
+            || !img_weight )
     {
         return;
     }
@@ -761,9 +756,7 @@ void VDispAnalyzer::calculateExpectedDirectionError( unsigned int i_ntel,
         // quality cuts
         if( img_size[i] > 0. && img_length[i] > 0.
                 && sqrt( img_cen_x[i]*img_cen_x[i] + img_cen_y[i]*img_cen_y[i] ) < fdistance_max
-                && img_loss[i] < floss_max
-                && img_fui[i] > fFui_min
-                && (fdistanceQC_max == 0 || sqrt( img_cen_x[i]*img_cen_x[i] + img_cen_y[i]*img_cen_y[i] ) < fdistanceQC_max[i] ) )
+                && img_loss[i] < floss_max )
         {
             fdisp_error_T[i] = evaluate( ( float )img_width[i], ( float )img_length[i], ( float )img_asym[i],
                                          ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
@@ -771,7 +764,7 @@ void VDispAnalyzer::calculateExpectedDirectionError( unsigned int i_ntel,
                                          ( float )img_cen_x[i], ( float )img_cen_y[i],
                                          ( float )xoff_4, ( float )yoff_4, iTelType[i],
                                          ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
-                                         -99., ( float )img_fui[i], ( float )img_ntubes[i] );
+                                         -99., ( float )img_ntubes[i] );
         }
     }
 }
@@ -846,8 +839,7 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
                                        double yoff_4,
                                        double* iRcore,
                                        double iEHeight,
-                                       double iMCEnergy,
-                                       double* img_fui )
+                                       double iMCEnergy )
 {
     fdisp_energy = -99.;
     fdisp_energy_chi = 1.e-10;
@@ -863,8 +855,7 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
             || !img_width || !img_length
             || !img_asym || !img_tgrad
             || !img_loss || !img_ntubes
-            || !img_weight || !iRcore
-            || !img_fui )
+            || !img_weight || !iRcore )
     {
         return;
     }
@@ -878,9 +869,7 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
     {
         if( img_size[i] > 0. && iRcore[i] > 0. && iArrayElevation > 0.
                 && sqrt( img_cen_x[i]*img_cen_x[i] + img_cen_y[i]*img_cen_y[i] ) < fdistance_max
-                && img_loss[i] < floss_max 
-                && img_fui[i] > fFui_min
-                && (fdistanceQC_max == 0 || sqrt( img_cen_x[i]*img_cen_x[i] + img_cen_y[i]*img_cen_y[i] ) < fdistanceQC_max[i] ) )
+                && img_loss[i] < floss_max )
         {
             fdisp_energy_T[i] = fTMVADispAnalyzer->evaluate(
                                     ( float )img_width[i], ( float )img_length[i],
@@ -891,7 +880,7 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
                                     ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
                                     ( float )iRcore[i], ( float )iEHeight,
                                     ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
-                                    ( float )img_fui[i], ( float )img_ntubes[i] );
+                                    ( float )img_ntubes[i] );
                                     
             // dispEnergy is trained as log10(MCe0) in GeV
             if( fdisp_energy_T[i] > -98. )
@@ -1097,8 +1086,7 @@ void VDispAnalyzer::calculateCore( unsigned int i_ntel,
                                    double xcoreSR,
                                    double ycoreSR,
                                    double xs,
-                                   double ys,
-                                   double* img_fui )
+                                   double ys )
 {
     fdisp_core_T.clear();
     fdisp_core_T.assign( i_ntel, -99. );
@@ -1110,7 +1098,7 @@ void VDispAnalyzer::calculateCore( unsigned int i_ntel,
             || !img_asym || !img_tgrad
             || !img_loss || !img_ntubes
             || !img_weight || !iRcore
-            || !iTelX || !iTelY || !iTelZ || !img_fui )
+            || !iTelX || !iTelY || !iTelZ )
     {
         return;
     }
@@ -1131,7 +1119,7 @@ void VDispAnalyzer::calculateCore( unsigned int i_ntel,
                                   ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
                                   ( float )iRcore[i], -1.,
                                   ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
-                                  ( float )img_fui[i], ( float )img_ntubes[i] );
+                                  ( float )img_ntubes[i] );
         }
         else
         {

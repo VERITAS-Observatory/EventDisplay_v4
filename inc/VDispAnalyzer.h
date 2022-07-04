@@ -34,10 +34,8 @@ class VDispAnalyzer
         unsigned int fNImages_min;
         float fdistance_max;
         float floss_max;
-        float fFui_min;
         bool  fDispErrorWeighting;
         float fDispErrorExponential;
-        double *fdistanceQC_max;
         
         // disp direction reconstruction
         float f_disp;
@@ -89,8 +87,7 @@ class VDispAnalyzer
                             double xoff_4, double yoff_4,
                             double* iR,
                             double xcore, double ycore,
-                            double xs, double ys,
-                            double* img_fui );
+                            double xs, double ys );
                             
         void calculateEnergies( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
                                 ULong64_t* iTelType,
@@ -101,8 +98,7 @@ class VDispAnalyzer
                                 double* img_weight,
                                 double xoff_4, double yoff_4,
                                 double* iR, double iEHeight,
-                                double iMCEnergy = -1.,
-                                double* img_fui = 0 );
+                                double iMCEnergy = -1. );
                                 
         void  calculateMeanDirection( float& xs, float& ys,
                                       vector< float > x, vector< float > y,
@@ -120,8 +116,7 @@ class VDispAnalyzer
                                      double* img_tgrad, double* img_loss, int* img_ntubes,
                                      double* img_weight,
                                      double xoff_4, double yoff_4,
-                                     vector< float > dispErrorT,
-                                     double* img_fui );
+                                     vector< float > dispErrorT);
                                      
         void calculateExpectedDirectionError( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
                                               ULong64_t* iTelType,
@@ -130,13 +125,12 @@ class VDispAnalyzer
                                               double* img_width, double* img_length, double* img_asym,
                                               double* img_tgrad, double* img_loss, int* img_ntubes,
                                               double* img_weight,
-                                              double xoff_4, double yoff_4,
-                                              double* img_fui );
+                                              double xoff_4, double yoff_4);
                                               
         float evaluate( float iWidth, float iLength, float iAsymm, float iDist,
                         float iSize, float iPedvar, float itgrad, float iLoss,
                         float icen_x, float icen_y, float xoff_4, float yoff_4, ULong64_t iTelType,
-                        float iZe, float iAz, float iRcore = -99., float iFui = -1., float iNtubes = -1.,
+                        float iZe, float iAz, float iRcore = -99., float iNtubes = -1.,
                         bool b2D = true );
         float getAngDiff()
         {
@@ -228,15 +222,12 @@ class VDispAnalyzer
             fDispErrorExponential = iWeight;
         }
         void  setQualityCuts( unsigned int iNImages_min = 0, float iAxesAngles_min = 0., 
-                              float imaxdist = 1.e5, float imaxloss = 1.,
-                              float iminfui = 0., double* imaxdist_qc = 0 )
+                              float imaxdist = 1.e5, float imaxloss = 1. )
         {
             fAxesAngles_min = iAxesAngles_min;
             fNImages_min    = iNImages_min;
             fdistance_max   = imaxdist;
             floss_max       = imaxloss;
-            fFui_min        = iminfui;
-            fdistanceQC_max = imaxdist_qc;
         }
         void  setTelescopeTypeList( vector<ULong64_t> iTelescopeTypeList );
         void  setZombie( bool iB = true )
