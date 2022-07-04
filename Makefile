@@ -258,11 +258,6 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VCalibrator.o \
         ./obj/VImageAnalyzer.o \
 		./obj/VArrayAnalyzer.o \
-		./obj/VDispAnalyzer.o \
-		./obj/VDispTableReader.o \
-		./obj/VDispTableReader_Dict.o \
-		./obj/VDispTableAnalyzer.o \
-		./obj/VTMVADispAnalyzer.o \
 		./obj/VShowerParameters.o \
 		./obj/VMCParameters.o \
 		./obj/VGrIsuAnalyzer.o \
