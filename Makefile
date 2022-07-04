@@ -209,6 +209,7 @@ all VTS:	evndisp \
 	combineLookupTables \
 	makeEffectiveArea \
 	trainTMVAforGammaHadronSeparation \
+	trainTMVAforAngularReconstruction \
 	VTS.calculateCrabRateFromMC \
 	VTS.calculateExposureFromDB \
 	slib \

@@ -36,7 +36,6 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	fTableFillingCut_WobbleCut_max = 15.;
 	fminsize = 0.;
 	fmaxdist = 50000.;
-    fmaxdistfraction = -1.;
     fmaxloss = 1.;
 	fSelectRandom = -1.;
 	fSelectRandomSeed = 17;
@@ -260,10 +259,6 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		{
 			fmaxdist = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-        else if( iTemp.find( "-maxdistfraction" ) < iTemp.size() )
-        {
-            fmaxdistfraction = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-        }
         else if( iTemp.find( "-maxloss" ) < iTemp.size() )
         {
             fmaxloss = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -537,11 +532,6 @@ void VTableLookupRunParameter::print( int iP )
             if( fmaxdist < 1.e3 )
             {
                 cout << "\t BDT TMVA stereo reconstruction distance cut < " << fmaxdist << endl;
-            }
-            if( fmaxdistfraction > 0. )
-            {
-                cout << "\t BDT TMVA stereo reconstruction distance cut (fraction of FOV) < ";
-                cout << fmaxdistfraction << endl;
             }
             if( fmaxloss < 1. )
             {

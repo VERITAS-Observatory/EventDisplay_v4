@@ -78,7 +78,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		double fMC_distance_to_cameracenter_min;
 		double fMC_distance_to_cameracenter_max;
         double       fmaxdist;   // note: same for all telescope types
-        double       fmaxdistfraction; // note: same for all telescope types
         double       fmaxloss;   // note: same for all telescope types
         double       fminsize;   // note: same for all telescope times
         // seed for random selection of showers before table filling
