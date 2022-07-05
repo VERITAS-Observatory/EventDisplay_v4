@@ -162,7 +162,7 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	
 	// Write all events to DL3 Tree
 	fWriteAllEvents = false;
-    // Wirte Dataon/dataoff trees
+    // Write Dataon/dataoff trees
     fWriteDataOnOffTrees = false;
 
 	// if 0, use default 1D radial acceptance
