@@ -179,6 +179,7 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
         dataloader->AddVariable( "Rcore", 'F' );
     }
     dataloader->AddVariable( "meanPedvar_Image", 'F' );
+    dataloader->AddVariable( "TelAzimuth", 'F' );
     // spectators
     dataloader->AddSpectator( "cen_x", 'F' );
     dataloader->AddSpectator( "cen_y", 'F' );
