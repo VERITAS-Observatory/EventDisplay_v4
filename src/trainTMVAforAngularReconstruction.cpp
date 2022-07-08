@@ -165,12 +165,7 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
     dataloader->AddVariable( "wol",    'F' );
     dataloader->AddVariable( "size"  , 'F' );
     dataloader->AddVariable( "ntubes", 'F' );
-    // hard coded ASTRI telescope type
-    // (no time gradient is available)
-    if( iTelType != 201511619 )
-    {
-        dataloader->AddVariable( "tgrad_x*tgrad_x", 'F' );
-    }
+    dataloader->AddVariable( "tgrad_x*tgrad_x", 'F' );
     if( !iSingleTelescopeAnalysis )
     {
         dataloader->AddVariable( "cross" , 'F' );
@@ -183,6 +178,7 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
         dataloader->AddVariable( "EHeight", 'F' );
         dataloader->AddVariable( "Rcore", 'F' );
     }
+    dataloader->AddVariable( "meanPedvar_Image", 'F' );
     // spectators
     dataloader->AddSpectator( "cen_x", 'F' );
     dataloader->AddSpectator( "cen_y", 'F' );
@@ -522,6 +518,8 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
     float Xoff = -1.;
     float Yoff = -1.;
     float LTrig = -1.;
+    float TelElevation = -1.;
+    float TelAzimuth = -1.;
     float MCaz = -1.;
     float MCze = -1.;
     float disp = -1.;
@@ -597,6 +595,8 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
             fMapOfTrainingTree[i_tel.TelType]->Branch( "LTrig"      , &LTrig      , "LTrig/F" );
             fMapOfTrainingTree[i_tel.TelType]->Branch( "NImages"    , &NImages    , "NImages/F" );
             fMapOfTrainingTree[i_tel.TelType]->Branch( "EHeight"    , &EmissionHeight, "EHeight/F" );
+            fMapOfTrainingTree[i_tel.TelType]->Branch( "TelElevation", &TelElevation, "TelElevation/F" );
+            fMapOfTrainingTree[i_tel.TelType]->Branch( "TelAzimuth", &TelAzimuth, "TelAzimuth/F" );
             fMapOfTrainingTree[i_tel.TelType]->Branch( "MCaz"       , &MCaz       , "MCaz/F" );
             fMapOfTrainingTree[i_tel.TelType]->Branch( "MCze"       , &MCze       , "MCze/F" );
             fMapOfTrainingTree[i_tel.TelType]->Branch( "Ze"         , &ze         , "Ze/F" );
@@ -862,6 +862,8 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
             NImages     = i_showerpars.NImages[iRecID];
             MCze        = i_showerpars.MCze;
             MCaz        = i_showerpars.MCaz;
+            TelElevation = i_showerpars.TelElevation[i];
+            TelAzimuth = i_showerpars.TelAzimuth[i];
             
             Rcore       = VUtilities::line_point_distance( Ycore,   -1.*Xcore,   0., ze, az, fTelY[i], -1.*fTelX[i], fTelZ[i] );
             MCrcore     = VUtilities::line_point_distance( MCycore, -1.*MCxcore, 0., MCze, MCaz, fTelY[i], -1.*fTelX[i], fTelZ[i] );
