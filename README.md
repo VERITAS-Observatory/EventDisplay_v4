@@ -1,8 +1,9 @@
 # Eventdisplay - An Analysis and Reconstruction Package for VERITAS
 
-**Development version main branch - not to be used for science analysis**
+* Authors and contributors: [CITATION.cff](CITATION.cff)
+* Licence: [LICENSE](LICENSE)
 
-Please check the [release pages](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases) for the most recent versions.
+Please check the [release pages](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases) for the most recent versions to be used for VERITAS publications.
 
 For older versions of Eventdisplay, see the release pages on the VERITAS wiki (private pages):
 https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual#Versions_of_eventdisplay
@@ -12,12 +13,15 @@ https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual#Versions_of_e
 
 Eventdisplay is a reconstruction and analysis pipline for data of
 Imaging Atmospheric Cherenkov Telescopes (IACT).
-It has been primarily developed for VERITAS and CTA analysis.
+It has been primarily developed for VERITAS and CTA analysis and used in
+many VERITAS and CTA publications. 
+This repository contains the Eventdisplay version used for VERITAS analysis.
+For the CTA version, please go to [https://github.com/Eventdisplay/Eventdisplay](https://github.com/Eventdisplay/Eventdisplay).
 
 Original developers: Gernot Maier and Jamie Holder
 
-In case Eventdisplay is used in a research project, please cite the 
-following publication:
+In case Eventdisplay is used in a research project, please cite this repository and
+the following publication:
 
 Maier, G.; Holder, J., Eventdisplay: An Analysis and Reconstruction Package for 
 Ground-based Gamma-ray Astronomy,  35th International Cosmic Ray Conference.
@@ -25,29 +29,24 @@ Ground-based Gamma-ray Astronomy,  35th International Cosmic Ray Conference.
 Online at [https://pos.sissa.it/cgi-bin/reader/conf.cgi?confid=301], id.747
 [https://arxiv.org/abs/1708.04048]
 
-For guidelines on installation, see INSTALL. For further information, 
-see files in README directory
+For guidelines on installation, see [INSTALL.md](INSTALL.md). For further information, 
+see files in [README](./README) directory
 
 ## Documentation
 
-- INSTALL: information on installation the analysis package, dependencies, environmental variables
-- README.VERITAS.quick_summary: description of a typical VERITAS analysis
-- AUTHORS: author description
+- [INSTALL.md](INSTALL.md): information on installation the analysis package, dependencies, environmental variables
+- [README.VERITAS.quick_summary](README/README.VERITAS.quick_summary): description of a typical VERITAS analysis
 
 Description and command line options for the different software parts:
 
-- README.EVNDISP
-- README.EVNDISP.commandline
-- README.MSCW_ENERGY
-- README.ANASUM
-- README.EFFECTIVEAREA
-- README.ANALYSISLIBRARY
-- README.SCRIPTS
-- README.MACROS
+- [README.EVNDISP](README/README.EVNDISP)
+- [README.EVNDISP.commandline](README/README.EVNDISP.commandline)
+- [README.MSCW_ENERGY](README/README.MSCW_ENERGY)
+- [README.ANASUM](README/README.ANASUM)
+- [README.EFFECTIVEAREA](README/README.EFFECTIVEAREA)
+- [README.ANALYSISLIBRARY](README/README.ANALYSISLIBRARY)
+- [README.MACROS](README/README.MACROS)
 
-## Licence
-
-License: BSD-3 (see LICENCE file)
 
 ## The Eventdisplay Ecosystem
 
@@ -58,8 +57,9 @@ Some are internal to VERITAS and not accessible to the general public.
 
 For almost every use case, Eventdisplay consists of at least three major components: 
 - the code (Eventdisplay), 
-- a library of scripts,
-- a set of auxiliary files.
+- a library of scripts (see [Eventdisplay_AnalysisScripts_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisScripts_VTS))
+- a set of auxiliary files (see internal github repository [Eventdisplay_AnalysisFiles_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles_VTS))
+- release test macros and results (see internal github repository [Eventdisplay_ReleaseTests](https://github.com/VERITAS-Observatory/Eventdisplay_ReleaseTests))
 
 Care should be taken in using the correct versions (releases, tags, branches) combining these three types of repositories.
 A blending of different versions of components will lead to incorrect results.
@@ -68,26 +68,23 @@ A blending of different versions of components will lead to incorrect results.
 
 The core library consist of all code, tools, and libraries required to run the analysis.
 
-Private (VERITAS) repository (to be used for VERITAS analysis): <https://github.com/VERITAS-Observatory/EventDisplay_v4>
-
 ### Analysis scripts
 
 Typical use cases for Eventdisplay require the processing of many files.
 A library of scripts for the efficient execution is available and recommended to be used as the main access to the tools described in the section above.
 
-Repository for scripts: <https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisScripts_VTS> 
+Repository for scripts: [https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisScripts_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisScripts_VTS)
 
 ### Auxiliary files for parameters, definitions, calibration values
 
 The reconstruction of analysis requires information on the instrument (e.g., telescope positions), access information to data bases, parameters for the analysis (e.g., image cleaning parameters or instruction for the gamma/hadron separation), or basic calibration values.
 
-Repository for auxiliary files: (private repository): <https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles_VTS>
+Repository for auxiliary files: (private repository): [https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles_VTS)
 
 ### Release tests
 
 Reconstruction and analysis are complex and a series of tests are required before the release of a new version of Eventdisplay.
 
-Release repository: (private repository): <https://github.com/VERITAS-Observatory/EventDisplay_ReleaseTests>
-
+Release repository: (private repository): [https://github.com/VERITAS-Observatory/EventDisplay_ReleaseTests](https://github.com/VERITAS-Observatory/EventDisplay_ReleaseTests)
 
 For any questions, contact Gernot Maier (gernot.maier@desy.de)
