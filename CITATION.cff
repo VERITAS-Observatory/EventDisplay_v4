@@ -2,7 +2,7 @@
 # Metadata for citation of this software according to the CFF format (https://citation-file-format.github.io/)
 cff-version: 1.2.0
 message: If you use this software, please cite it using these metadata.
-title: "An Analysis and Reconstruction Package for VERITAS"
+title: "Eventdisplay: an Analysis and Reconstruction Package for VERITAS"
 # doi: 10.5281/zenodo.3559075
 version: 4.9.0
 date-released: 2022-06-15
