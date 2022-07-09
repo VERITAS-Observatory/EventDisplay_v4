@@ -45,7 +45,6 @@ Description and command line options for the different software parts:
 - [README.ANASUM](README/README.ANASUM)
 - [README.EFFECTIVEAREA](README/README.EFFECTIVEAREA)
 - [README.ANALYSISLIBRARY](README/README.ANALYSISLIBRARY)
-- [README.MACROS](README/README.MACROS)
 
 
 ## The Eventdisplay Ecosystem
@@ -86,5 +85,9 @@ Repository for auxiliary files: (private repository): [https://github.com/VERITA
 Reconstruction and analysis are complex and a series of tests are required before the release of a new version of Eventdisplay.
 
 Release repository: (private repository): [https://github.com/VERITAS-Observatory/EventDisplay_ReleaseTests](https://github.com/VERITAS-Observatory/EventDisplay_ReleaseTests)
+
+### Converter to GADF DL3 Format
+
+see [https://github.com/VERITAS-Observatory/V2DL3](https://github.com/VERITAS-Observatory/V2DL3)
 
 For any questions, contact Gernot Maier (gernot.maier@desy.de)
