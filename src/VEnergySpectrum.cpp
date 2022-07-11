@@ -2104,7 +2104,7 @@ bool VEnergySpectrum::writeSpectralPointsToCSVFile( string iOFileName,
                                                     TGraphAsymmErrors* iDiffFlux )
 {
        ofstream os;
-       os.open( iOFileName.c_str() );
+       os.open( gSystem->ExpandPathName(iOFileName.c_str()) );
        if( !os )
        {
             cout << "VEnergySpectrum::writeSpectralPointsToCSVFile error opening " << iOFileName << endl;

@@ -200,6 +200,8 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		
         // add all events to DL3 tree, no gh cuts but add BDT score and IsGamma 
         bool fWriteAllEvents;
+        // write data_on and data_off trees (subset of DL3 tree)
+        bool fWriteDataOnOffTrees;
 
 		// vector with all run parameters
 		vector< VAnaSumRunParameterDataClass > fRunList;

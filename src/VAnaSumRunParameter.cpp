@@ -158,6 +158,8 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	
 	// Write all events to DL3 Tree
 	fWriteAllEvents = false;
+    // Write Dataon/dataoff trees
+    fWriteDataOnOffTrees = false;
 
 	// if 0, use default 1D radial acceptance
 	// if >0, use alternate 2D-dependent acceptance
@@ -664,7 +666,14 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                 unsigned int tmpWriteAll = ( unsigned int )atoi( temp2.c_str() ) ;
                 if( tmpWriteAll == 1 )
                 {
-                    fWriteAllEvents = true ;
+                    fWriteAllEvents = true;
+                }
+            }
+            else if( temp == "WRITEDATAONOFFEVENTS" )
+            {
+                if( (unsigned int)atoi( temp2.c_str() ) == 1 )
+                {
+                    fWriteDataOnOffTrees = true;
                 }
             }
 			else
