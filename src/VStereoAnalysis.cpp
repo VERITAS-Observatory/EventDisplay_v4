@@ -912,6 +912,10 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 		{
 		     write_DL3Tree() ;
 		}
+        if( fTreeSelectedEvents && fRunPara->fWriteDataOnOffTrees ) 
+        {
+            fTreeSelectedEvents->Write();
+        }
 	}
 }
 

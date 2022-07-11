@@ -99,7 +99,7 @@ void printEntry( string iname, int iEntry, double ze, int az, double Woff, doubl
     cout << " az: " << az;
     cout << " Woff: " << Woff;
     cout << " pedvar: " << pedvar;
-    cout << " index: " << index;
+    if( index > 0. ) cout << " index: " << index;
     cout << endl;
 }
 
@@ -112,6 +112,8 @@ TGraph* get_effAreaGraph( TFile *f,
     TTree *t = (TTree*)f->Get( tree_name.c_str() );
     if( !t ) return 0;
 
+    int fH2F_treecounter_offset = 20;
+    int count_max_az_bins = 17;
 
     TGraph *g = new TGraph( 1 );
     if( tree_name == "fEffArea" )
@@ -131,7 +133,9 @@ TGraph* get_effAreaGraph( TFile *f,
     }
     else
     {
-        int iEntryH2F = iEntry / 340 * 17 + iEntry % 17;
+        int iEntryH2F = count_max_az_bins * (iEntry / (fH2F_treecounter_offset*count_max_az_bins))
+            + iEntry % count_max_az_bins;
+        cout << "Reading entryH2F " << iEntryH2F << endl;
         UShort_t nbins;
         Float_t e0[1000];
         Float_t eff[1000];
@@ -157,14 +161,17 @@ void test_reducedIRFFiles( string iIRFFile,
      {
         return 0;
      }
+    int fH2F_treecounter_offset = 20;
+    int count_max_az_bins = 17;
 
      TH2F* h1 = plot_h2f( f, iHistogramName, iEntry );
 
-     TH2F* h2 = plot_array( f, iHistogramName, iEntry / 20 + iEntry % 17 );
+     TH2F* h2 = plot_array( f, iHistogramName, 
+             count_max_az_bins * (iEntry / (fH2F_treecounter_offset*count_max_az_bins)) + iEntry % count_max_az_bins );
 
      if( h1 && h2 )
      {
-         TCanvas *c = new TCanvas( ("comp"+iHistogramName).c_str(), "", 1380, 10, 600, 600 );
+         TCanvas *c = new TCanvas( ("comp"+iHistogramName).c_str(), "", 80, 10, 600, 600 );
          c->Draw();
          TH2F *h3 = (TH2F*)h1->Clone( ("hc"+iHistogramName).c_str() );
          h3->Divide( h2 );
@@ -190,7 +197,7 @@ void test_effectiveAreas( string iIRFFile,
      TGraph *h2_eff = get_effAreaGraph( f, "fEffAreaH2F", iVariable, iEntry );
      if( h1_eff && h2_eff )
      {
-         TCanvas *d = new TCanvas( "c_effNoTh2", "", 1380, 600, 600, 600 );
+         TCanvas *d = new TCanvas( "c_effNoTh2", "", 80, 600, 600, 600 );
          d->Draw();
          d->cd();
          h1_eff->Draw( "ap" );
@@ -231,6 +238,18 @@ void sync_effectiveAreaTrees( string iIRFFile, int zmax = 100 )
     fEffAreaH2F->SetBranchAddress( "Woff", &Woff2 );
     fEffAreaH2F->SetBranchAddress( "pedvar", &pedvar2 );
 
+    int fH2F_treecounter_offset = fEffArea->GetEntries() / fEffAreaH2F->GetEntries();
+    cout << "Tree counter offset: " << fH2F_treecounter_offset << endl;
+    int count_max_az_bins = 0;
+    for( unsigned int i = 0; i < fEffArea->GetEntries(); i++ )
+    {
+        fEffArea->GetEntry( i );
+        if( az > count_max_az_bins ) count_max_az_bins = az;
+        if( az < count_max_az_bins ) break;
+    }
+    count_max_az_bins++;
+    cout << "Maximum number of az bin: " << count_max_az_bins << endl;
+
     int z = 0;
     for( unsigned int i = 0; i < fEffArea->GetEntries(); i++ )
     {
@@ -246,7 +265,8 @@ void sync_effectiveAreaTrees( string iIRFFile, int zmax = 100 )
             if( TMath::Abs( pedvar - pedvar2 ) > 1.e-2 ) continue;
             if( az != az2 ) continue;
             printEntry( "EffAreaH2", j, ze2, az2, Woff2, pedvar2, 0.);
-            cout << "H2 entry should be: " << i / 20 + i % 17 << endl;
+            cout << "H2 entry should be: ";
+            cout <<  count_max_az_bins * (i / (fH2F_treecounter_offset*count_max_az_bins)) + i % count_max_az_bins << endl;
             cout << "===========================================" << endl;
         }
         z++;
