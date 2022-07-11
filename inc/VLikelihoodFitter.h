@@ -134,6 +134,8 @@ public:
             fFitMax_logTeV = i_max;
         }
 
+        // Recreate the model
+        setModel(fModelID);
     }
 
     // Setting the min and max energy rannge in linear scale
@@ -152,6 +154,8 @@ public:
             fFitMin_logTeV = TMath::Log10(i_min);
             fFitMax_logTeV = TMath::Log10(i_max);
         }
+        // Recreate the model
+        setModel(fModelID);
     }
 
     void setBinWidth( double i_BinWidth);
