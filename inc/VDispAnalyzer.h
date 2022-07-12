@@ -116,7 +116,8 @@ class VDispAnalyzer
                                      double* img_tgrad, double* img_loss, int* img_ntubes,
                                      double* img_weight,
                                      double xoff_4, double yoff_4,
-                                     vector< float > dispErrorT);
+                                     vector< float > dispErrorT,
+                                     float* img_pedvar);
                                      
         void calculateExpectedDirectionError( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
                                               ULong64_t* iTelType,
@@ -125,7 +126,8 @@ class VDispAnalyzer
                                               double* img_width, double* img_length, double* img_asym,
                                               double* img_tgrad, double* img_loss, int* img_ntubes,
                                               double* img_weight,
-                                              double xoff_4, double yoff_4);
+                                              double xoff_4, double yoff_4,
+                                              float* img_pedvar);
                                               
         float evaluate( float iWidth, float iLength, float iAsymm, float iDist,
                         float iSize, float iPedvar, float itgrad, float iLoss,

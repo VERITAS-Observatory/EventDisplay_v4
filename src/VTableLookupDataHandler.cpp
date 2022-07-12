@@ -640,7 +640,8 @@ void VTableLookupDataHandler::doStereoReconstruction()
                 fasym, ftgrad_x,
                 floss, fntubes,
                 getWeight(),
-                i_SR.fShower_Xoffset, i_SR.fShower_Yoffset);
+                i_SR.fShower_Xoffset, i_SR.fShower_Yoffset,
+                fmeanPedvar_ImageT);
                 
             // get estimated error on direction reconstruction
             for( unsigned int t = 0; t < getNTel(); t++ )
@@ -667,7 +668,8 @@ void VTableLookupDataHandler::doStereoReconstruction()
             floss, fntubes,
             getWeight(),
             i_SR.fShower_Xoffset, i_SR.fShower_Yoffset,
-            iDispError );
+            iDispError,
+            fmeanPedvar_ImageT );
         // reconstructed direction by disp method:
         fXoff = fDispAnalyzerDirection->getXcoordinate_disp();
         fYoff = fDispAnalyzerDirection->getYcoordinate_disp();

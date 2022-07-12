@@ -127,12 +127,7 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "wol", &fWoL );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "size", &fSize );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "ntubes", &fNtubes );
-        // ASTRI telescopes are without timing information
-        // tgrad_x is therefore ignored
-        if( fTelescopeTypeList[i] != 201511619 )
-        {
-            fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "tgrad_x*tgrad_x", &fTGrad );
-        }
+        fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "tgrad_x*tgrad_x", &fTGrad );
         // cross variable should be on this spot
         if( !iSingleTelescopeAnalysis )
         {
@@ -146,6 +141,8 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
             fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "EHeight", &fEHeight );
             fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "Rcore", &fRcore );
         }
+        fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "meanPedvar_Image", &fPedvar );
+        fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "TelAzimuth", &fAz );
         // spectators
         fTMVAReader[fTelescopeTypeList[i]]->AddSpectator( "cen_x", &cen_x );
         fTMVAReader[fTelescopeTypeList[i]]->AddSpectator( "cen_y", &cen_y );
@@ -186,7 +183,8 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
 */
 float VTMVADispAnalyzer::evaluate( float iWidth, float iLength, float iSize, float iAsymm, float iLoss, float iTGrad,
                                    float icen_x, float icen_y, float xoff_4, float yoff_4, ULong64_t iTelType,
-                                   float iZe, float iAz, float iRcore, float iEHeight, float iDist, float iNtubes )
+                                   float iZe, float iAz, float iRcore, float iEHeight, float iDist, float iNtubes,
+                                   float iPedVar )
 {
     fWidth = iWidth;
     fLength = iLength;
@@ -217,6 +215,7 @@ float VTMVADispAnalyzer::evaluate( float iWidth, float iLength, float iSize, flo
     fTGrad = iTGrad * iTGrad;
     fZe = iZe;
     fAz = iAz;
+    fPedvar = iPedVar;
     // %%@^#%!@(#
     // fcross = sqrt( ( icen_y - yoff_4 ) * ( icen_y - yoff_4 ) + ( icen_x - xoff_4 ) * ( icen_x - xoff_4 ) );
     if( yoff_4 > -999. && xoff_4 > -999. )

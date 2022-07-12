@@ -134,7 +134,7 @@ float VDispAnalyzer::evaluate( float iWidth, float iLength, float iAsymm, float 
     {
         f_disp = fTMVADispAnalyzer->evaluate( iWidth, iLength, iSize, iAsymm, iLoss, iTGrad,
                                               icen_x, icen_y, xoff_4, yoff_4, iTelType,
-                                              iZe, iAz, iRcore, -1., iDist, iNtubes );
+                                              iZe, iAz, iRcore, -1., iDist, iNtubes, iPedvar );
     }
     return f_disp;
     
@@ -605,7 +605,8 @@ void VDispAnalyzer::calculateMeanDirection( unsigned int i_ntel,
         double* img_weight,
         double xoff_4,
         double yoff_4,
-        vector< float > dispErrorT )
+        vector< float > dispErrorT,
+        float* img_pedvar )
 {
     // reset values from previous event
     f_disp = -99.;
@@ -619,7 +620,7 @@ void VDispAnalyzer::calculateMeanDirection( unsigned int i_ntel,
             || !img_width || !img_length
             || !img_asym || !img_tgrad
             || !img_loss || !img_ntubes
-            || !img_weight )
+            || !img_weight || !img_pedvar )
     {
         return;
     }
@@ -644,7 +645,7 @@ void VDispAnalyzer::calculateMeanDirection( unsigned int i_ntel,
         {
             disp = evaluate( ( float )img_width[i], ( float )img_length[i], ( float )img_asym[i],
                              ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
-                             ( float )img_size[i], 1., ( float )img_tgrad[i], ( float )img_loss[i],
+                             ( float )img_size[i], img_pedvar[i], ( float )img_tgrad[i], ( float )img_loss[i],
                              ( float )img_cen_x[i], ( float )img_cen_y[i],
                              ( float )xoff_4, ( float )yoff_4, iTelType[i],
                              ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
@@ -733,7 +734,8 @@ void VDispAnalyzer::calculateExpectedDirectionError( unsigned int i_ntel,
         int* img_ntubes,
         double* img_weight,
         double xoff_4,
-        double yoff_4 )
+        double yoff_4,
+        float* img_pedvar )
 {
     // make sure that all data arrays exist
     if( !img_size || !img_cen_x || !img_cen_y
@@ -741,7 +743,7 @@ void VDispAnalyzer::calculateExpectedDirectionError( unsigned int i_ntel,
             || !img_width || !img_length
             || !img_asym || !img_tgrad
             || !img_loss || !img_ntubes
-            || !img_weight )
+            || !img_weight || !img_pedvar )
     {
         return;
     }
@@ -760,7 +762,7 @@ void VDispAnalyzer::calculateExpectedDirectionError( unsigned int i_ntel,
         {
             fdisp_error_T[i] = evaluate( ( float )img_width[i], ( float )img_length[i], ( float )img_asym[i],
                                          ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
-                                         ( float )img_size[i], 1., ( float )img_tgrad[i], ( float )img_loss[i],
+                                         ( float )img_size[i], img_pedvar[i], ( float )img_tgrad[i], ( float )img_loss[i],
                                          ( float )img_cen_x[i], ( float )img_cen_y[i],
                                          ( float )xoff_4, ( float )yoff_4, iTelType[i],
                                          ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
