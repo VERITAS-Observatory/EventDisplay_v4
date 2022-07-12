@@ -16,6 +16,11 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
         exit( EXIT_FAILURE );
 	}
 	fDebug = fTLRunParameter->fDebug;
+    if( fDebug > 0 )
+    {
+        cout << "VTableLookupDataHandler::VTableLookupDataHandler" << endl;
+    }
+    
 	fwrite = iwrite;
 	fNEntries = fTLRunParameter->fNentries;
 	fEventDisplayFileFormat = 2;
@@ -256,7 +261,7 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
 		}
 		
 		// calculate distances
-		calcDistances( fNImages );
+		calcDistances();
 		// calculate emission height (not for writing of tables)
 		if( fNImages > 1 && !fwrite )
 		{
@@ -512,10 +517,32 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			fwidth[i] = ftpars[i]->width;
 			flength[i] = ftpars[i]->length;
             ftgrad_x[i] = ftpars[i]->tgrad_x;
-            fcen_x[i] = ftpars[i]->cen_x;
-            fcen_y[i] = ftpars[i]->cen_y;
-            fcosphi[i] = ftpars[i]->cosphi;
-            fsinphi[i] = ftpars[i]->sinphi;
+
+            if( i < fpointingCorrections.size() && fpointingCorrections[i]
+                    && fpointingCorrections[i]->is_initialized() )
+            {
+                fpointingCorrections[i]->getEntry( fEventCounter );
+                fcen_x[i] = fpointingCorrections[i]->getCorrected_cen_x( ftpars[i]->cen_x );
+                fcen_y[i] = fpointingCorrections[i]->getCorrected_cen_y( ftpars[i]->cen_y );
+                if( ftpars[i]->has_sdevxy() )
+                {
+                    float phi = fpointingCorrections[i]->getCorrected_phi(
+                            ftpars[i]->cen_x,
+                            ftpars[i]->cen_y,
+                            ftpars[i]->f_d,
+                            ftpars[i]->f_s,
+                            ftpars[i]->f_sdevxy );
+                    fcosphi[i] = cos( phi );
+                    fsinphi[i] = sin( phi );
+                }
+            }
+            else
+            {
+                fcen_x[i] = ftpars[i]->cen_x;
+                fcen_y[i] = ftpars[i]->cen_y;
+                fcosphi[i] = ftpars[i]->cosphi;
+                fsinphi[i] = ftpars[i]->sinphi;
+            }
         
 			if( fsize[i] > SizeSecondMax_temp )
 			{
@@ -569,9 +596,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		fSizeSecondMax = SizeSecondMax_temp;
 	}
     //////////////////////////////////////////////////////////
-    // !!! SPECIAL AND EXPERT USAGE ONLY !!!
     // redo the stereo (direction and core) reconstruction
-    // Works for MC only!!
     //
     if( fTLRunParameter->fRerunStereoReconstruction )
     {
@@ -947,10 +972,19 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
         TChain *iT = new TChain( "tpars" );
+        sprintf( iName, "pointing_%u", i+1 );
+        // pointing correction chain
+        TChain *iPC = new TChain( iName );
 		for( unsigned int f = 0; f < finputfile.size(); f++ )
 		{
             sprintf( iDir, "%s/Tel_%u/tpars", finputfile[f].c_str(), i + 1 );
 			iT->Add( iDir );
+            // no pointing corrections for MC analysis
+            if( !fIsMC )
+            {
+                sprintf( iDir, "%s/Tel_%u/pointing_%u", finputfile[f].c_str(), i + 1, i + 1 );
+                iPC->Add( iDir );
+            }
 		}
 		if( !iT )
 		{
@@ -981,6 +1015,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		{
 			ftpars.push_back( 0 );
 		}
+        fpointingCorrections.push_back( new VPointingCorrectionsTreeReader( iPC ) );
 		gErrorIgnoreLevel = 0;
 	}
 	cout << "reading eventdisplay file format version " << fEventDisplayFileFormat;
@@ -1491,7 +1526,6 @@ bool VTableLookupDataHandler::readRunParameter()
                         {
                              fTLRunParameter->ze = iMC->getMeanZenithAngle_Deg();
                         }
-			vector< unsigned int > iTelToAnalyze;
 			if( iPar )
 			{
 				if( fTLRunParameter->fTelToAnalyse.size() > 0 )
@@ -1502,9 +1536,11 @@ bool VTableLookupDataHandler::readRunParameter()
 				{
 					//copied from VTableLookupRunParameter.cpp
 					vector< unsigned int > iRunParT = iPar->fTelToAnalyze;
+			vector< unsigned int > iTelToAnalyze;
 					// this works only if number of telescopes = number of telescope types
                     // (e.g. the VERITAS case)
-					if( fTLRunParameter->rec_method < ( int )iERecPar->fLocalUseImage.size() && iPar->fNTelescopes == iERecPar->fLocalUseImage[fTLRunParameter->rec_method].size() )
+					if( fTLRunParameter->rec_method < ( int )iERecPar->fLocalUseImage.size()
+                            && iPar->fNTelescopes == iERecPar->fLocalUseImage[fTLRunParameter->rec_method].size() )
 					{
 						for( unsigned int i = 0; i < iRunParT.size(); i++ )
 						{
@@ -1517,26 +1553,31 @@ bool VTableLookupDataHandler::readRunParameter()
 					}
 					iPar->fTelToAnalyze = iTelToAnalyze;
 				}
-				
-				fOutFile->cd();
-                                // update instrument epoch in evendisp run parameters
-                                // (might have been changed since the evndisp analysis)
-                                if( fTLRunParameter->fUpdateInstrumentEpoch )
-                                {
-                                     cout << "Evaluating instrument epoch (";
-                                     cout << "was: " << iPar->getInstrumentEpoch( false );
-                                     cout << ", is: " << iPar->getInstrumentEpoch( false, true );
-                                     cout << ")" << endl;
-                                     cout << "Evaluating atmosphere ID (";
-                                     cout << "was: " << iPar->getAtmosphereID( false );
-                                     cout << ", is: " << iPar->getAtmosphereID( true );
-                                     cout << ")" << endl;
-                                }
-				iPar->Write();
+                if( fOutFile )
+                {
+                    fOutFile->cd();
+                    // update instrument epoch in evendisp run parameters
+                    // (might have been changed since the evndisp analysis)
+                    if( fTLRunParameter->fUpdateInstrumentEpoch )
+                    {
+                         cout << "Evaluating instrument epoch (";
+                         cout << "was: " << iPar->getInstrumentEpoch( false );
+                         cout << ", is: " << iPar->getInstrumentEpoch( false, true );
+                         cout << ")" << endl;
+                         cout << "Evaluating atmosphere ID (";
+                         cout << "was: " << iPar->getAtmosphereID( false );
+                         cout << ", is: " << iPar->getAtmosphereID( true );
+                         cout << ")" << endl;
+                    }
+                    iPar->Write();
+                }
 			}
 		}
 		ifInput.Close();
-		fOutFile->cd();
+        if( fOutFile )
+        {
+            fOutFile->cd();
+        }
 	}
 	
 	return true;
@@ -1940,7 +1981,7 @@ void VTableLookupDataHandler::reset()
   calculate distances between telescopes and reconstructed shower core
 
 */
-void VTableLookupDataHandler::calcDistances( int nimages )
+void VTableLookupDataHandler::calcDistances()
 {
 	// check for successfull reconstruction
     for( unsigned int tel = 0; tel < fNTel; tel++ )
@@ -2029,6 +2070,13 @@ bool VTableLookupDataHandler::isReconstructed()
 }
 
 
+/*
+ *  calculate emission height
+ *
+ *  - mean value
+ *  - value for each pair
+ *  - chi2 for paris
+ */
 void VTableLookupDataHandler::calcEmissionHeights()
 {
 	fEmissionHeightCalculator->getEmissionHeight( fcen_x, fcen_y, fsize,
@@ -2153,6 +2201,8 @@ void VTableLookupDataHandler::resetAll()
 	fYoff_derot = 0.;
     fXoff_intersect = 0.;
     fYoff_intersect = 0.;
+    fXoff_edisp = 0.;
+    fYoff_edisp = 0.;
 	fstdS = 0.;
 	ftheta2 = 0.;
 	fXcore = 0.;
@@ -2235,6 +2285,10 @@ void VTableLookupDataHandler::resetAll()
 	fMC_distance_to_cameracenter_min = 0.;
 	fMC_distance_to_cameracenter_max = 1.e10;
 	fDispDiff = 0;
+    fXoff_intersect = 0.;
+    fYoff_intersect = 0.;
+    fXoff_edisp = 0.;
+    fYoff_edisp = 0.;
 	
 	// cut efficiency counter
 	fNStats_All = 0;
@@ -2263,7 +2317,7 @@ bool VTableLookupDataHandler::cut( bool bWrite )
 	// number of reconstructed events
 	fNStats_Rec++;
 	
-	if( getWobbleOffset() > fTLRunParameter->fTableFillingCut_WobbleCut_max )
+    if( getWobbleOffset() < 0. || getWobbleOffset() > fTLRunParameter->fTableFillingCut_WobbleCut_max )
 	{
 		fNStats_WobbleCut++;
 		return false;
@@ -2431,6 +2485,10 @@ double VTableLookupDataHandler::getTelElevation()
 	return fTelElevation[i_max];
 }
 
+/*
+ * used for table filling only
+ *
+ */
 double* VTableLookupDataHandler::getDistanceToCore( ULong64_t iTelType )
 {
 	unsigned int z = 0;
@@ -2445,7 +2503,10 @@ double* VTableLookupDataHandler::getDistanceToCore( ULong64_t iTelType )
 	return fR_telType;
 }
 
-// Old classes (global one-for-all-telescope scaling)
+/*
+ * used for table filling only
+ *
+ */
 double* VTableLookupDataHandler::getSize( double iSizeCorrection, bool iSelectedImagesOnly, bool iSize2 )
 {
 	for( unsigned int i = 0; i < getNTel(); i++ )

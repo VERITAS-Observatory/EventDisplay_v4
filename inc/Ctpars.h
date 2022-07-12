@@ -19,6 +19,7 @@ class Ctpars
 {
 	public :
 		bool            bMC;
+        bool            bsdevxy;
 		unsigned int    bShort;
 		TTree*          fChain;                   //!pointer to the analyzed TTree or TChain
 		Int_t           fCurrent;                 //!current Tree number in a TChain
@@ -50,6 +51,9 @@ class Ctpars
 		Float_t         meanPedvar_Image;
 		Float_t         cen_x;
 		Float_t         cen_y;
+        Float_t         f_s;
+        Float_t         f_d;
+        Float_t         f_sdevxy;
 		Float_t         length;
 		Float_t         width;
 		Float_t         size;
@@ -119,6 +123,9 @@ class Ctpars
 		TBranch*        b_meanPedvar_Image;       //!
 		TBranch*        b_cen_x;                  //!
 		TBranch*        b_cen_y;                  //!
+        TBranch*        b_f_s;                    //!
+        TBranch*        b_f_d;                    //!
+        TBranch*        b_f_sdevxy;               //!
 		TBranch*        b_length;                 //!
 		TBranch*        b_width;                  //!
 		TBranch*        b_size;                   //!
@@ -173,6 +180,10 @@ class Ctpars
 		virtual void     Loop();
 		virtual Bool_t   Notify();
 		virtual void     Show( Long64_t entry = -1 );
+        bool             has_sdevxy()
+        {
+            return bsdevxy;
+        }
 		bool             isMC()
 		{
 			return bMC;
@@ -207,6 +218,7 @@ Ctpars::Ctpars( TTree* tree, bool iMC, unsigned int iShort )
 	// is supposed to speed up reading significantly
 	// problem: large memory consumption (>12 GB for certain cta arrays)
 	//    tree->SetCacheSize(10000000);
+    bsdevxy = false;
 	
 	Init( tree );
 }
@@ -315,6 +327,32 @@ void Ctpars::Init( TTree* tree )
 		}
 		fChain->SetBranchAddress( "cen_x", &cen_x );
 		fChain->SetBranchAddress( "cen_y", &cen_y );
+        if( fChain->GetBranchStatus( "f_d" ) )
+        {
+               fChain->SetBranchAddress( "f_d", &f_d );
+               bsdevxy = true;
+        }
+        else
+        {
+               f_d = 0.;
+        }
+        if( fChain->GetBranchStatus( "f_s" ) )
+        {
+               fChain->SetBranchAddress( "f_s", &f_s );
+        }
+        else
+        {
+               f_s = 0.;
+        }
+        if( fChain->GetBranchStatus( "f_sdevxy" ) )
+        {
+               fChain->SetBranchAddress( "f_sdevxy", &f_sdevxy );
+        }
+        else
+        {
+               f_sdevxy = 0.;
+        }
+
 		fChain->SetBranchAddress( "size", &size );
         fChain->SetBranchAddress( "loss", &loss );
 		if( fChain->GetBranchStatus( "fracLow" ) )
@@ -473,6 +511,9 @@ Bool_t Ctpars::Notify()
 	b_size2 = 0;
 	b_cen_x = 0;
 	b_cen_y = 0;
+    b_f_s = 0;
+    b_f_d = 0;
+    b_f_sdevxy = 0;
 	b_loss = 0;
 	b_fracLow = 0;
 	b_alpha = 0;
@@ -504,6 +545,10 @@ Bool_t Ctpars::Notify()
 			b_meanPedvar_Image = fChain->GetBranch( "meanPedvar_Image" );
 			fChain->AddBranchToCache( b_meanPedvar_Image );
 		}
+        else
+        {
+            b_meanPedvar_Image = 0;
+        }
 		b_length = fChain->GetBranch( "length" );
 		fChain->AddBranchToCache( b_length );
 		b_width = fChain->GetBranch( "width" );
@@ -528,10 +573,29 @@ Bool_t Ctpars::Notify()
 		{
 			b_meanPed_Image = fChain->GetBranch( "meanPed_Image" );
 		}
+        else
+        {
+            b_meanPed_Image = 0;
+        }
 		b_cen_x = fChain->GetBranch( "cen_x" );
 		fChain->AddBranchToCache( b_cen_x );
 		b_cen_y = fChain->GetBranch( "cen_y" );
 		fChain->AddBranchToCache( b_cen_y );
+        if( fChain->GetBranchStatus( "f_d" ) )
+        {
+             b_f_d = fChain->GetBranch( "f_d" );
+             fChain->AddBranchToCache( b_f_d );
+        }
+        if( fChain->GetBranchStatus( "f_s" ) )
+        {
+             b_f_s = fChain->GetBranch( "f_s" );
+             fChain->AddBranchToCache( b_f_s );
+        }
+        if( fChain->GetBranchStatus( "f_sdevxy" ) )
+        {
+             b_f_sdevxy = fChain->GetBranch( "f_sdevxy" );
+             fChain->AddBranchToCache( b_f_sdevxy );
+        }
 		b_size = fChain->GetBranch( "size" );
 		fChain->AddBranchToCache( b_size );
         b_loss = fChain->GetBranch( "loss" );

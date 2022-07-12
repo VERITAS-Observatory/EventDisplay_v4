@@ -8,6 +8,7 @@
 #include "VEffectiveAreaCalculatorMCHistograms.h"
 #include "VMonteCarloRunHeader.h"
 #include "VDispAnalyzer.h"
+#include "VPointingCorrectionsTreeReader.h"
 #include "VSimpleStereoReconstructor.h"
 #include "VTableLookupRunParameter.h"
 #include "VUtilities.h"
@@ -93,6 +94,7 @@ class VTableLookupDataHandler
 		Ctelconfig* ftelconfig;
 		vector< TChain* > fTtpars;
 		vector< Ctpars* > ftpars;
+        vector< VPointingCorrectionsTreeReader* > fpointingCorrections;
 		
 		double fEventWeight;
 		
@@ -154,7 +156,7 @@ class VTableLookupDataHandler
 		// dead time handler
 		VDeadTime* fDeadTime;
 		
-		void   calcDistances( int );                //!< calculate distances between telescopes and shower core
+		void   calcDistances();                //!< calculate distances between telescopes and shower core
 		void   calcEmissionHeights();
 		double calculateMeanNoiseLevel( bool bCurrentNoiseLevel = false );
 		bool   checkIfFilesInChainAreRecovered( TChain* c );
