@@ -80,7 +80,6 @@ float VPointingCorrectionsTreeReader::getCorrected_phi( float cen_x, float cen_y
 	
 	const double ac = ( d + s ) * ymean + 2.0 * sdevxy * xmean;
 	const double bc = 2.0 * sdevxy * ymean - ( d - s ) * xmean;
-	const double cc = sqrt( ac * ac + bc * bc );
-	
-	return atan2( ac / cc, bc / cc );
+
+	return atan2( ac, bc );
 }
