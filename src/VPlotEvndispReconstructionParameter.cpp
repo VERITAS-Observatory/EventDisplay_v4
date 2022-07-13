@@ -208,7 +208,7 @@ bool VPlotEvndispReconstructionParameter::fill( unsigned int iMethod, unsigned i
 	sprintf( hname, "%s/Tel_%d/tpars", fDataFileName.c_str(), iTelescope + 1 );
 	TChain* i_tpars = new TChain( "tpars" );
 	i_tpars->Add( hname );
-	fDataTpars = new Ctpars( i_tpars, true, 8, 1 );
+	fDataTpars = new Ctpars( i_tpars, true, 1 );
 	
 	// loop over all entries and fill the histograms
 	cout << "total number of entries : " << fDataShowerPars->fChain->GetEntries() << endl;

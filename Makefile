@@ -209,6 +209,7 @@ all VTS:	evndisp \
 	combineLookupTables \
 	makeEffectiveArea \
 	trainTMVAforGammaHadronSeparation \
+	trainTMVAforAngularReconstruction \
 	VTS.calculateCrabRateFromMC \
 	VTS.calculateExposureFromDB \
 	slib \
@@ -258,12 +259,6 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VCalibrator.o \
         ./obj/VImageAnalyzer.o \
 		./obj/VArrayAnalyzer.o \
-		./obj/VMLPAnalyzer.o \
-		./obj/VDispAnalyzer.o \
-		./obj/VDispTableReader.o \
-		./obj/VDispTableReader_Dict.o \
-		./obj/VDispTableAnalyzer.o \
-		./obj/VTMVADispAnalyzer.o \
 		./obj/VShowerParameters.o \
 		./obj/VMCParameters.o \
 		./obj/VGrIsuAnalyzer.o \
@@ -350,6 +345,13 @@ MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o \
 		./obj/VDeadTime.o ./obj/VUtilities.o \
 		./obj/VStatistics_Dict.o \
 		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
+		./obj/VSimpleStereoReconstructor.o \
+		./obj/VGrIsuAnalyzer.o \
+		./obj/VDispAnalyzer.o \
+		./obj/VDispTableReader.o \
+		./obj/VDispTableReader_Dict.o \
+		./obj/VDispTableAnalyzer.o \
+		./obj/VTMVADispAnalyzer.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 		./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
@@ -360,6 +362,7 @@ MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o \
 		./obj/VMedianCalculator.o \
         ./obj/VSkyCoordinatesUtilities.o \
         ./obj/VDB_Connection.o \
+		./obj/VPointingCorrectionsTreeReader.o \
 		./obj/mscw_energy.o
 
 ifeq ($(ASTRONMETRY),-DASTROSLALIB)
@@ -1073,10 +1076,13 @@ trainTMVAforAngularReconstruction:	./obj/trainTMVAforAngularReconstruction.o \
 					./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 					./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 					./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+					./obj/VEmissionHeightCalculator.o \
 					./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 					./obj/VStar.o ./obj/VStar_Dict.o \
 					./obj/VDB_Connection.o \
 					./obj/VSkyCoordinatesUtilities.o \
+					./obj/VSimpleStereoReconstructor.o \
+					./obj/VGrIsuAnalyzer.o \
 					./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
 					./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 					./obj/VUtilities.o \

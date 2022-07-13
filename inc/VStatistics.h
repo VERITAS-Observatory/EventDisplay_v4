@@ -16,6 +16,7 @@
 #include "TH1F.h"
 #include "TLegend.h"
 
+#include <algorithm>
 #include <iostream>
 #include <cmath>
 #include <vector>
@@ -27,24 +28,18 @@ namespace VStatistics
 
 	inline void liandma( double Non, double Noff, double alpha, double& Nsig, double& Sig5, double& Sig9, double& Sig17 )
 	{
-		double alphasq;
-		double oneplusalpha;
-		double oneplusalphaoveralpha;
-		
-		double Ntot;
-		
 		if( alpha == 0. )
 		{
 			Sig17 = 0.;
 			return;
 		}
 		
-		alphasq = alpha * alpha;
-		oneplusalpha = 1.0 + alpha;
-		oneplusalphaoveralpha = oneplusalpha / alpha;
+		double alphasq = alpha * alpha;
+		double oneplusalpha = 1.0 + alpha;
+		double oneplusalphaoveralpha = oneplusalpha / alpha;
 		
 		Nsig   = Non - alpha * Noff;
-		Ntot   = Non + Noff;
+		double Ntot   = Non + Noff;
 		
 		if( Non + alphasq * Noff > 0. )
 		{
@@ -78,7 +73,7 @@ namespace VStatistics
 		{
 			Sig17 = 2.*( Non * log( oneplusalphaoveralpha * ( Non / Ntot ) ) + Noff * log( oneplusalpha * ( Noff / Ntot ) ) );
 			// value in brackets can be a small negative number
-			if( TMath::Abs( Sig17 ) < 1.e-5 )
+			if( TMath::Abs( Sig17 ) < 1.e-15 )
 			{
 				Sig17 = 0.;
 			}
@@ -458,6 +453,58 @@ namespace VStatistics
 		
 		return 0.;
 	}
+    /*
+     *
+     * median absolute error
+     *
+     */
+    inline double getMedianAbsoluteError( vector< double >& x, double median )
+    {
+        double iAbs = 0.;
+        for( unsigned int i = 0; i < x.size(); i++ )
+        {
+            iAbs += TMath::Abs( x[i] - median );
+        }
+        if( x.size() > 0. )
+        {
+            return iAbs / ( ( double )x.size() );
+        }
+        
+        return 0.;
+    }
+    /*
+    
+       trimmed mean absolute error
+    
+           trimMLow = trim N elements on lower side
+           trimMLow = trim N elements on upper side
+    
+           (Note: this is nowhere used that this point and therefore untested)
+    
+    */
+    inline double getMeanAbsoluteError( vector< double > x, unsigned int trimMLow, unsigned int trimMUp )
+    {
+        // sort vector
+        std::sort( x.begin(), x.end() );
+        
+        // trimmed mean
+        if( x.size() > trimMLow + trimMUp + 1 )
+        {
+            vector< double > y( x.begin() + trimMLow, x.begin() + x.size() - trimMUp );
+            double mean = getMean( y );
+            double iAbs = 0.;
+            for( unsigned int i = 0; i < y.size(); i++ )
+            {
+                iAbs += TMath::Abs( y[i] - mean );
+            }
+            if( y.size() > 0 )
+            {
+                return iAbs / ( ( double )y.size() );
+            }
+        }
+        
+        return 0.;
+    }
 	
 }
 #endif
