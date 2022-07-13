@@ -2,7 +2,7 @@
     \brief  fitter class for energy spectra
 
 
-    \author Gernot Maier
+    
 */
 
 #include "VSpectralFitter.h"
@@ -318,11 +318,7 @@ double VSpectralFitter::getIntegralFlux( double iMinEnergy_TeV, double iMaxEnerg
 	       }
 	    }     */
 	
-#ifdef ROOT6
-        return fFitFunction_lin->Integral( iMinEnergy_TeV, iMaxEnergy_TeV, 1.e-30 );
-#else	
-	return fFitFunction_lin->Integral( iMinEnergy_TeV, iMaxEnergy_TeV, fFitFunction_lin->GetParameters(), 1.e-30 );
-#endif
+    return fFitFunction_lin->Integral( iMinEnergy_TeV, iMaxEnergy_TeV, 1.e-30 );
 }
 
 /*

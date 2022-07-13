@@ -52,7 +52,7 @@ ii)  at a specific maximum systematic error in the energy reconstruction
 iii) at a fraction of the maximum value of the effective area (i.e.10%)
 (output tree variable: E_effFract_05p, E_effFract_10p, E_effFract_20p, E_effFract_50p, E_effFract_90p)
 
-\author Gernot Maier
+
 
 ********************************************************************************************************************
 ********************************************************************************************************************

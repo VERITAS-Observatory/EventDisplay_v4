@@ -2269,25 +2269,29 @@ void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot,
     {
         fDL3EventTree_Acceptance     = 0.;
     }
+    // get event ra and dec
     if( icounter < fRunPara->fRunList.size() )
     {
-        double i_RA  = 0.;
-        double i_DEC = 0.;
-        slaDtp2s( fDL3EventTree_Xderot * TMath::DegToRad(),
+        double i_Spherical_RA  = 0.;
+        double i_Spherical_DEC = 0.;
+        VAstronometry::vlaDtp2s( fDL3EventTree_Xderot * TMath::DegToRad(),
                   fDL3EventTree_Yderot * TMath::DegToRad(),
                   fRunPara->fRunList[icounter].fArrayPointingRAJ2000 * TMath::DegToRad(), 
                   fRunPara->fRunList[icounter].fArrayPointingDecJ2000 * TMath::DegToRad(),
-                  &i_RA, &i_DEC);
-        fDL3EventTree_RA  = i_RA * TMath::RadToDeg();
-        fDL3EventTree_DEC = i_DEC * TMath::RadToDeg();
+                  &i_Spherical_RA, &i_Spherical_DEC);
+        fDL3EventTree_RA  = i_Spherical_RA * TMath::RadToDeg();
+        fDL3EventTree_DEC = i_Spherical_DEC * TMath::RadToDeg();
 
-        // Convert from RA and DEC to Azimuth and Zenith
-        fVsky->setTargetJ2000( i_DEC * TMath::RadToDeg(), i_RA * TMath::RadToDeg() );
+        // Convert from spherical RA and DEC to Azimuth and Zenith
+        // convert to degrees and do calculation
+        fVsky->setTargetJ2000( i_Spherical_DEC * TMath::RadToDeg(), i_Spherical_RA * TMath::RadToDeg() );
         fVsky->precessTarget( fDL3EventTree_MJD, 0 ) ;
 
+        // calculate new param
         fVsky->updatePointing( fDL3EventTree_MJD, fDL3EventTree_Time ) ;
         fDL3EventTree_Az = fVsky->getTargetAzimuth();
         fDL3EventTree_El = fVsky->getTargetElevation();
+
     }
     else
     {
@@ -2308,6 +2312,7 @@ void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot,
             fDL3EventTree_IsGamma = 0;
         }
     }
+
 	if( fDL3EventTree )
 	{
 		fDL3EventTree->Fill();

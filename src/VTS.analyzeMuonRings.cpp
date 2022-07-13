@@ -107,7 +107,7 @@ int main( int argc, char* argv[] )
 		cout << "error finding tree showerpars" << endl;
 		exit( 0 );
 	}
-	Cshowerpars *m = new Cshowerpars( s, false, 6, true );
+	Cshowerpars *m = new Cshowerpars( s, false, true );
 	if( !m )
 	{
 		exit( 0 );		
@@ -132,7 +132,7 @@ int main( int argc, char* argv[] )
 		        cout << "no tree tpars for telescope " << i+1 <<" skipping this telescope"<<endl;
 		        continue;
 		}
-		Ctpars* c = new Ctpars( t, false, 6, 1 );
+		Ctpars* c = new Ctpars( t, false, 1 );
 		if( !c )
 		{
 		        exit( 0 );		

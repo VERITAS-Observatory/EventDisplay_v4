@@ -7,7 +7,6 @@
      * add mean HV values
 
 
-    \author Gernot Maier
 */
 
 #include "VRunStats.h"
@@ -936,7 +935,7 @@ bool VRunStats::readDBRunInfo( TSQLServer* f_db )
 		iRa  += i_RunData->offsetRA;
 		iDec += i_RunData->offsetDec;
 		
-		slaEqgal( iRa / 180. * TMath::Pi(), iDec / 180. * TMath::Pi(), &i_l, &i_b );
+		VAstronometry::vlaEqgal( iRa / 180. * TMath::Pi(), iDec / 180. * TMath::Pi(), &i_l, &i_b );
 		i_RunData->GalLong1958 = i_l * 180. / TMath::Pi();
 		i_RunData->GalLat1958  = i_b * 180. / TMath::Pi();
 		
@@ -1143,7 +1142,7 @@ void VRunStats::getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip 
 		ms = 0;
 	}
 	// calculate MJD
-	slaCldj( y, m, d, &gMJD, &l );
+	VAstronometry::vlaCldj( y, m, d, &gMJD, &l );
 	MJD = ( int )gMJD;
 	Time = h * 60.*60. + min * 60. + s + ms / 1.e3;
 }

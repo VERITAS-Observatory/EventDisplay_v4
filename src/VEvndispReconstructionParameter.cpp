@@ -53,6 +53,8 @@ void VEvndispReconstructionParameter::reset()
 
      apply array analysis cuts for this set of image parameters
 
+     returns true if image is good and selected
+
 */
 bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth, unsigned int iTel, unsigned int iTelType,
 		VImageParameter* iImageParameter, unsigned short int iLocalTriggerType,
@@ -312,6 +314,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 	////////////////////////////////////////////
 	// remove image which is too close to a bright star
 	// (use list of image and border pixels)
+    // __this cut is disabled__
 	if( iStarCatalogue && fRunPara && iImageParameter->ntubes < fRunPara->fMinStarNTubes )
 	{
 		for( unsigned int i = 0; i < iImageParameter->fImageBorderPixelPosition_x.size(); i++ )
@@ -347,7 +350,9 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 }
 
 /*
+
     add a new cut method
+
 */
 void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
 {
@@ -935,16 +940,32 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 						}
 						if( iTemp4.size() > 0 )
 						{
-							if( i < fRunPara->fsumfirst_start_at_T0.size() )
+							if( i < fRunPara->fsumfirst_startingMethod.size() )
 							{
-								if( iTemp4 == "T0" )
+                                // use T0 for timing of pulse integration
+								if( iTemp4 == "T0" || iTemp4 == "TZERO" || atoi(iTemp4.c_str()) == 1 )
 								{
-									fRunPara->fsumfirst_start_at_T0[i] = true;
+									fRunPara->fsumfirst_startingMethod[i] = 1;
 								}
-								else
+                                // use average pulse arrival time for timing of pulse integration
+								else if( iTemp4 == "TAVERAGE" || atoi( iTemp4.c_str() ) == 2 )
 								{
-									fRunPara->fsumfirst_start_at_T0[i] = false;
+                                    fRunPara->fsumfirst_startingMethod[i] = 2;
 								}
+                                // fixed window start
+                                else if( iTemp4 == "FIXED" || atoi( iTemp4.c_str() ) == 0 )
+								{
+                                    fRunPara->fsumfirst_startingMethod[i] = 0;
+								}
+                                else
+                                {
+                                    cout << "VEvndispReconstructionParameter::read_arrayAnalysisCuts error:";
+                                    cout << " unknown timing method used for calculation of window start";
+                                    cout << " (valid parameters are TZERO/TAVERAGE/FIXED/TTRIGGER): ";
+                                    cout << iTemp4 << endl;
+                                    cout << "...exiting" << endl;
+                                    exit( EXIT_FAILURE );
+                                }
 							}
 						}
 					}
@@ -1001,6 +1022,66 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				}
 				continue;
 			}
+            else if( iTemp == "IMAGECLEANING_FAKEPROBABILITY" && fRunPara )
+            {
+				for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
+				{
+					if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+					{
+						if( i < fRunPara->fImageCleaningParameters.size() )
+						{
+							fRunPara->fImageCleaningParameters[i]->fNNOpt_FakeImageProb = atof( iTemp2.c_str() );
+                        }
+                    }
+                }
+                continue;
+            }
+            else if( iTemp == "IMAGECLEANING_ACTIVEMULTIPLICITIES" && fRunPara )
+            {
+                for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
+                {
+                    if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+                    {
+                        if( i < fRunPara->fImageCleaningParameters.size() )
+                        {
+                            for( unsigned int m = 0; m < fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities.size(); m++ )
+                            {
+                                if( iTemp2 == fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities[m] )
+                                {
+                                    fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[m] = true;
+                                }
+                                if( iTemp3.size() > 0 && iTemp3 == fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities[m] )
+                                {
+                                    fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[m] = true;
+                                }
+                                if( iTemp4.size() > 0 && iTemp4 == fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities[m] )
+                                {
+                                    fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[m] = true;
+                                }
+                                if( iTemp5.size() > 0 && iTemp5 == fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities[m] )
+                                {
+                                    fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[m] = true;
+                                }
+                            }
+                            // (not used; always true)
+                            fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[4] = true;
+                        }
+                    }
+                }
+                continue;
+            }
+			else if( iTemp == "WRITEGRAPHSTOFILE" && fRunPara )
+            {
+                if( iTemp2 == "TRUE" )
+                {
+                    fRunPara->ifWriteGraphsToFile = true;
+                }
+                else
+                {
+                    fRunPara->ifWriteGraphsToFile = false;
+                }
+                continue;
+            }
 			else if( iTemp == "TIMECLEANINGPARAMETERS" && fRunPara )
 			{
 				for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
@@ -1136,12 +1217,6 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				continue;
 			}
 			
-			// Model3D: reconstruction ID for starting values
-			else if( iTemp == "MODEL3DSTARTID" && fRunPara )
-			{
-				fRunPara->fIDstartDirectionModel3D = atoi( iTemp2.c_str() );
-				continue;
-			}
 			
 			/////////////////////////////////////////////////
 			// check for exit statement

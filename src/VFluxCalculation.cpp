@@ -1,7 +1,7 @@
 /*! \class VFluxCalculation
     \brief read effective area file from anasum output file, sum them up to mean effective area
 
-    \author Gernot Maier
+    
 */
 
 #include "VFluxCalculation.h"

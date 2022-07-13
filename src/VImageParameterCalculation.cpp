@@ -3,9 +3,6 @@
 
     dead channels for low gains and LL
 
-    \author
-       Jamie Holder
-       Gernot Maier
 */
 
 #include <VImageParameterCalculation.h>
@@ -130,6 +127,7 @@ void VImageParameterCalculation::calcTimingParameters()
 					et.back() = 0.3;
 				}
 			}
+            // used now (note scaling in a later step)
 			else
 			{
 				// use 1./sums as error for fitting (rescale errors later)

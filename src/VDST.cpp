@@ -4,7 +4,7 @@
     output is after pedestal substraction, gain and toffset correction
 
 
-    \author Gernot Maier
+    
 */
 
 #include <VDST.h>
@@ -219,7 +219,7 @@ void VDST::fill()
 			{
 				if( fVImageCleaning )
 				{
-					fVImageCleaning->cleanImagePedvars( getImageThresh(), getBorderThresh(), getBorderThresh() );
+					fVImageCleaning->cleanImagePedvars( getImageCleaningParameter() );
 				}
 				// NOTE: DOUBLE PASS IS NOT WORKING FOR DSTs, this call should not be here!!!!
 				if( getRunParameter()->fDoublePass )
@@ -227,7 +227,7 @@ void VDST::fill()
 					calcSecondTZerosSums();
 					if( fVImageCleaning )
 					{
-						fVImageCleaning->cleanImagePedvars( getImageThresh(), getBorderThresh(), getBorderThresh() );
+						fVImageCleaning->cleanImagePedvars( getImageCleaningParameter() );
 					}
 				}
 			}

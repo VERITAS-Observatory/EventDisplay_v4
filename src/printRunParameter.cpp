@@ -2,7 +2,7 @@
     \brief print run parameters from mscw or eventdisplay file to screen
 
 
-    \author Gernot Maier
+    
 */
 
 #include "VEvndispRunParameter.h"
@@ -150,12 +150,32 @@ bool readMeanElevation( TFile *fIn )
         }
         unsigned int iNTel = (unsigned int)telconfig->GetEntries();
         if( iNTel >= VDST_MAXTELESCOPES ) iNTel = VDST_MAXTELESCOPES;
+        Double_t TelElevation[VDST_MAXTELESCOPES];
+        Float_t TelElevationFloat[VDST_MAXTELESCOPES];
+        bool bData = true;
         TTree *data = (TTree*)fIn->Get( "data" );
         if( data )
         {
-            Double_t TelElevation[VDST_MAXTELESCOPES];
             data->SetBranchAddress( "TelElevation", TelElevation );
+            data->SetBranchAddress( "TelElevation", TelElevation );
+        }
+        else
+        {
+            data = (TTree*)fIn->Get( "showerpars" );
+            data->SetBranchAddress( "TelElevation", TelElevationFloat );
+            bData = false;
+        }
+        if( data )
+        {
             data->GetEntry( 0 );
+            if( !bData )
+            {
+                for( unsigned int i = 0; i < iNTel; i++ )
+                {
+                    TelElevation[i] = TelElevationFloat[i];
+                }
+            }
+
             double iMean_f = 0.;
             double iMeanN = 0.;
             for( unsigned int i = 0; i < iNTel; i++ )
@@ -169,6 +189,13 @@ bool readMeanElevation( TFile *fIn )
             if( data->GetEntries() > 1 )
             {
                 data->GetEntry( data->GetEntries() - 1 );
+                if( !bData )
+                {
+                    for( unsigned int i = 0; i < iNTel; i++ )
+                    {
+                        TelElevation[i] = TelElevationFloat[i];
+                    }
+                }
                 for( unsigned int i = 0; i < iNTel; i++ )
                 {
                     if( TelElevation[i] > 5. )
@@ -294,7 +321,7 @@ int main( int argc, char* argv[] )
 	
 	if( fOption.size() > 0 )
 	{
-                if( fOption == "-elevation" )
+                if( fOption.find( "-elevation" ) != string::npos )
                 {
                         readMeanElevation( fIn );
                 }

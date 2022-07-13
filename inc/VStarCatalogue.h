@@ -12,7 +12,7 @@
 #include <TSystem.h>
 #include "TTree.h"
 
-#include "VASlalib.h"
+#include "VAstronometry.h"
 #include "VGlobalRunParameter.h"
 #include "VSkyCoordinatesUtilities.h"
 #include "VStar.h"

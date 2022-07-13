@@ -62,6 +62,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		
 		// run parameters
 		int    frunnumber;                        // runnumber
+        string fRunTitle;                         // run title (usually empty, useful for debugging)
 		int    frunmode;                          // run mode
 		//    (0=analysis, 1=pedestal calculation, 2=gain/toffset calculation,
 		//    5 = gain/toffset calculation for low gain channels, 6=pedestals for low gain channels)
@@ -139,6 +140,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		string fLowGainCalibrationFile;           // file with file name for low-gain calibration
 		int fNCalibrationEvents;                  // events to be used for calibration
 		float faverageTZeroFiducialRadius;        // fiducial radius for average tzero calculation (DST), in fraction of FOV
+        unsigned int fCombineChannelsForPedestalCalculation; // combine all channels per telescope type for the pedestal calculation
 		vector< int > fGainFileNumber;
 		vector< int > fTOffFileNumber;
 		vector< int > fPedFileNumber;
@@ -165,6 +167,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   fPedestalSingleRootFile;           // write pedestal trees and histograms into a single root file
 		int    fCalibrationSumWindow;             // sumwindow for all calibration calculation
 		int    fCalibrationSumFirst;              // starting point all calibration calculation
+        int    fCalibrationSumWindowAverageTime;  // sumwindow for average arrival time calculation
 		float  fCalibrationIntSumMin;             // minimum integrated charge in a channel and event to be taken into account in gain or tzero calibration runs
 		string fsetSpecialChannels;               // set channels with L2 channels to correct for FADC crate time offsets (file name of channel settings)
                 string fthroughputCorrectionFile;         // throughput correction (e.g., mirror reflectivity or gain loss) --> applied after pixel integration
@@ -174,11 +177,13 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   fL2TimeCorrect;                    // use L2 pulses to correct FADC times (default: on )
 		unsigned fCalibrationDataType;            // for DSTs: kind of calibration data available: 1: full (peds, pedvars, etc). 0: (no calibration data)
 		
+        //////////////////////////////////////////////////
 		// FADC integration
 		string  fFADCChargeUnit;                  // FADC charge unit (DC or PE)
 		vector< unsigned int > fTraceIntegrationMethod;   // trace integration method
 		vector< unsigned int > fTraceIntegrationMethod_pass1;   // trace integration method for pass 1 (doublepass only)
 		vector<int> fsumfirst;                    // parameter for window summation start (window 1)
+        vector<unsigned int>   fSearchWindowLast; // last sample searched for trace integration
 		vector<int> fsumwindow_1;                 // parameter for window summation (window 1)
 		vector<int> fsumwindow_2;                 // parameter for window summation (window 2)
 		vector<int> fsumwindow_pass1;             // parameter for window summation (double pass - pass 1)
@@ -188,29 +193,14 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   fDoublePassErrorWeighting2005;     // use error weighting from 2004 or today
 		bool   fDynamicIntegrationWindow;         // use a dynamic integration window (doublepass only)
 		vector< int >    fTraceWindowShift;       // shift the summation window by value (in doublepass: low gain channels only, default: 0 )
-		vector< bool >   fsumfirst_start_at_T0;   // start the summation window at T0 (+shift; not for doublepass)
+        vector< unsigned int >   fsumfirst_startingMethod;   // start the summation window at T0, TAverage, ... (+shift; not for doublepass)
 		vector< double > fSumWindowMaxTimeDifferenceLGtoHG;   // maximum difference between lg and hg window in doublepass method
 		vector< double > fSumWindowMaxTimedifferenceToDoublePassPosition; // maximum difference between doublepass calculated window start and t0 (in samples, default: 10 )
 		double ftracefit;                         // tracefit mode or getquick mode (-1.=no fitting, 0=fit all PMTs, else: fit only PMTs with maximum ftracefit x tracerms
 		string ftracefitfunction;                 // number of tracefit function (default=ev, others: grisu);
 		bool   fperformFADCAnalysis;              // run FADC analysis (important e.g. for CTA DST files, where sim_tel results are available as well )
 		
-		double fNSBscale;                                     //
-		
-		float  fFADCPedestal[VDST_MAXTELESCOPES];             //! fadc pedestal+baselineshift, taken from external NSB database if fShowerOnly=true
-		float  fFADCPedestalSig[VDST_MAXTELESCOPES];          //! fadc pedestal+baselineshift, taken from external NSB database if fShowerOnly=true
-		float  fFlashCamFADCPedestal[VDST_MAXTELESCOPES];     //! FlashCam fadc pedestal+baselineshift sigma, taken from external NSB database if fShowerOnly=true
-		float  fFlashCamFADCPedestalSig[VDST_MAXTELESCOPES];  //! FlashCam fadc pedestal+baselineshift sigma, taken from external NSB database if fShowerOnly=true
-		
-		float  fFADCsampleRate[VDST_MAXTELTYPES];             //! FADC sample rate in GHz
-		float  fFlashCamFADCtoPhe[VDST_MAXTELTYPES];          //! default conversion factor c[phes/fadc]: [phes]=c*[fadc] for certain integ. window (4slices)
-		float  fFlashCamFADCsampleRate[VDST_MAXTELTYPES];     //! FADC sample rate in GHz
 		float  fFADCtoPhe[VDST_MAXTELTYPES];                  //! default conversion factor c[phes/fadc]: [phes]=c*[fadc] for certain integ. window (4slices)
-		bool   fPerformFlashCamAnalysis[VDST_MAXTELTYPES];    //! flag if FlashCam FADC should be taken for analysis
-		double fFWHMdata[VDST_MAXTELTYPES];                   //! ns FWHM of dataline pulse
-		double fFWHMtrigger[VDST_MAXTELTYPES];                //! ns FWHM of triggerline pulse (except FlashCam)
-		double fIntegWindow[VDST_MAXTELTYPES];                //! ns
-		bool   ifActiveType[VDST_MAXTELTYPES];                //! if telescope of this type is activated for analysis
 		
 		// FADC timing parameters
 		vector< float > fpulsetiminglevels;       // levels at which timing of FADC pulses is calculated
@@ -229,8 +219,12 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   frecoverImagePixelNearDeadPixel;
 		bool   fFillImageBorderNeighbours;
 		bool   fSmoothDead;                       // smooth dead pixels (default: off )
-		
-		// reconstruction parameter file
+        // NN cleaning
+        bool   ifWriteGraphsToFile;               // flag to write run-time NN image cleaning settings to root file (read from NN image cleaning input card)
+        bool   ifReadIPRfromDatabase;             // flag to read IPR from external IPR database
+        bool   ifCreateIPRdatabase;               // flag to create external IPR database
+        bool   ifReadIPRfromDSTFile;              // flat to read IPR graph from DST file
+        
 		string freconstructionparameterfile;      // reconstruction parameter file
 		// MC parameters
 		string fsimu_pedestalfile;                // use external pedestal file for MC
@@ -280,21 +274,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		// Hough transform muon parameters
 		bool fhoughmuonmode;                      // Use hough transform muon analysis
 		
-		// Frogs parameters
-		bool ffrogsmode;                          // for Frogs template Analysis, GH
-		string ffrogsmscwfile;			            // frogs file for getting table energy
-		int ffrogsRecID;			                  // RecID or Cut_ID Frogs Uses - combine with table
-		string ffrogstemplatelist;                // text file containing the elevation and
-		//   elevation-dependant template file names
-		string ffrogsparameterfile;               // parameter file for frogs settings
-		
-		// Model3D
-		bool fUseModel3D;                         // use Model3D analysis, JG
-		bool fUseDisplayModel3D;                  // display Model3D generated images, JG
-		bool fCreateLnLTable;                     // create lookup table for likelihood
-		string fLnLTableFile;                     // read lookup table for likelihood from this file
-		unsigned int fIDstartDirectionModel3D;    // reconstruction ID for starting values
-		
 		// write pulse histograms to gain files
 		int  fwriteLaserPulseN;                    // number of pulse histogram written to gain file
 		bool fwriteAverageLaserPulse;              // write average laser pulse to file
@@ -304,22 +283,9 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		int fdstminntubes;                        // write only events with more than fdstminntubes ntubes into dst file
 		bool fdstwriteallpixel;                   // write all information of all pixel into dst output files
 		
-		// trigsim parameters (note: different telescope IDs!)
-		map< unsigned int, int >   fTrigSim_referenceTrigger;         //!
-		map< unsigned int, float > fTrigSim_threshold;                //!
-		TString  fTrigSimInputcard;                      // input card for trigsim and next-neighbour image cleaning
-		TString  fTrigThreshFile;
-		TString  fNSBdatabaseFile;
-		TString  fIPR1File;
-		TString  fIPR2File;
-		TString  fIPR3File;
-		TString  fIPR4File;
-		
-		// Parallaxwidth
-		int fPWmethod;                            // how to make the trigger-map to calculate the trigger-level image parameters
-		int fPWcleanNeighbors;                    // number of neighbors required for a center pixel to survive the cleaning procedure
-		float fPWcleanThreshold;                  // cleaning threshold to use to determine hit pixels from the summed FADC charge (dc)
-		int fPWlimit;                             // limits the number of pixels transmitted per sector, if =0, then the function is ignored and no cut is applied on the generation of the trigger map
+        TString  fNNGraphsFile;
+        TString  fIPRdatabase;                    // file to read IPRs from external database
+        TString  fIPRdatabaseFile;                // file to write the IPR database
 		
 		// Movie Parameters
 		bool fMovieBool;                           // Are we making a movie?
@@ -333,7 +299,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		void printCTA_DST();
 		
 		VEvndispRunParameter( bool bSetGlobalParameter = true );
-		~VEvndispRunParameter() {}
+		~VEvndispRunParameter();
 		
 		bool         doFADCAnalysis()
 		{
@@ -346,14 +312,14 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		{
 			return fIsMC;
 		}
-                bool         updateInstrumentEpochFromFile( string iEpocheFile = "usedefault", bool iReadInstrumentEpoch = true );
 		void         setPulseZeroIndex();
 		void         setSystemParameters();
+        bool         updateInstrumentEpochFromFile( string iEpocheFile = "usedefault", bool iReadInstrumentEpoch = true );
 		bool         useDB()
 		{
 			return fuseDB;
 		}
 		
-		ClassDef( VEvndispRunParameter, 169 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 2001 ); //(increase this number)
 };
 #endif

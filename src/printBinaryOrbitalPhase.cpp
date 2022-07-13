@@ -2,8 +2,6 @@
     \brief print binary orbital phase
 
 
-    \author
-    Gernot Maier
 */
 
 #include <iomanip>
@@ -39,7 +37,7 @@ int main( int argc, char* argv[] )
 	double fd = 0.;
 	if( year < 0 && month < 0 && day < 0 && djm > 0 )
 	{
-		slaDjcl( djm, &year, &month, &day, &fd, &j );
+		VAstronometry::vlaDjcl( djm, &year, &month, &day, &fd, &j );
 	}
 	bool bPrintWholeYear = false;
 	if( month < 0 && day < 0 && djm < 0 )
@@ -79,7 +77,7 @@ int main( int argc, char* argv[] )
 	cout << endl << endl;
 	
 	// get mjd for given date
-	slaCldj( year, month, day, &djm, &j );
+	VAstronometry::vlaCldj( year, month, day, &djm, &j );
 	if( j == 0 )
 	{
 		if( !bPrintWholeYear )
@@ -108,11 +106,11 @@ int main( int argc, char* argv[] )
 				p = ( djm  - t0 ) / orbit - ( int )( ( djm - t0 ) / orbit );
 				if( p < p_old )
 				{
-					slaDjcl( djm_old, &year, &month, &day, &fd, &j );
+					VAstronometry::vlaDjcl( djm_old, &year, &month, &day, &fd, &j );
 					cout << "new orbit (MJD: " << djm_old << "): \t";
 					cout << year << "/" << month << "/" << day << endl;
 				}
-				slaDjcl( djm, &year, &month, &day, &fd, &j );
+				VAstronometry::vlaDjcl( djm, &year, &month, &day, &fd, &j );
 				cout << "Orbital phase of " << object << " for ";
                                 cout << year << "-" << month << "-" << day << ", MJD " << djm << ": ";
 				cout << ( djm - t0 ) / orbit - ( int )( ( djm - t0 ) / orbit ) << endl;

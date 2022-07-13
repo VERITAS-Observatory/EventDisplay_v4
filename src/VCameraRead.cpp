@@ -6,7 +6,6 @@
     observe that for EVNDISP version > 3 only .cfg are supported
 
 
-\author Gernot Maier
 */
 
 #include "VCameraRead.h"
@@ -1317,6 +1316,7 @@ bool VCameraRead::makeNeighbourList()
 			}
 		}
 	}
+
 	return true;
 }
 
@@ -1362,6 +1362,35 @@ bool VCameraRead::setLowGainThreshold( unsigned int iTel, unsigned int ival )
 		return false;
 	}
 	return true;
+}
+
+/*
+ * get position of telescope type in list of telescope types
+ *
+ * (this is a slow routine, don't call it too often)
+ *
+*/
+unsigned int VCameraRead::getTelType_Counter( ULong64_t iTelType )
+{
+    set< ULong64_t > s;
+    
+    for( unsigned int i = 0; i < fTelType.size(); i++ )
+    {
+        s.insert( fTelType[i] );
+    }
+
+    unsigned int z = 0;
+    for( set< ULong64_t >::iterator i_s = s.begin(); i_s != s.end(); i_s++ )
+    {
+        if( *i_s == iTelType )
+        {
+            return z;
+        }
+        z++;
+    }
+
+    // unsuccessfull search
+    return 9999;
 }
 
 

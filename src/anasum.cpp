@@ -2,7 +2,6 @@
     \brief main program to create an analysis summary (VERITAS data analysis chain)
 
 
-   \author( Jamie Holder, Gernot Maier )
 */
 
 #include "VAnaSum.h"

@@ -33,22 +33,33 @@ class VDataMCComparisionHistogramData
 		unsigned int fTelescopeID;                    // 0 = array variable
 		
 		TH1D*  fHis1D;
-		TH2D*  fHis2D;
+        TH2D*  fHis2D_Erec;
+        TH2D*  fHis2D_ntubes;
+        TH2D*  fHis2D_size;
+        TH2D*  fHis2D_sizeHG;
+        TH2D*  fHis2D_sizeLG;
 		
 		VDataMCComparisionHistogramData( string iVarName = "", string iHistogramType = "", unsigned int iTelescopeID = 0 );
 		~VDataMCComparisionHistogramData() {}
 		bool   initHistogram( string iXTitle, int iNbins, double ix_min, double ix_max );
-		void   fill( double iV, double iWeight = 1., double iLogEnergy_TeV = -99. );
+        TH2D*  newHistogram( string iName, string iYTitle, string iXTitle, int iNbins, double ix_min, double ix_max, double iy_min, double iy_max );
+        void   fill( double iV, double iWeight = 1., double iLogEnergy_TeV = -99., int i_ntubes = -99,
+                     double i_sizeLog10 = -99., double i_sizeHGLog10 = -99. );
 };
 
 class VDataMCComparision
 {
 	private:
 	
-		enum E_varname { ELENGTH, EWIDTH, EDIST, EALPHA, ENTUBES, ENLOWGAIN, ESIZE, ESIZE2, ESIZELG, EFRACLOW, EMAX1, EMAX2, EMAX3, ELOSS, ELOS, EASYM,
-						 ECENX, ECENY, ETGRADX, EMSCWT, EMSCLT, ETELDIST, ETHETA2, ELTHETA2, EMSCW, EMSCL, EMWR, EMLR, EXCORE, EYCORE, EEREC, ENIMAGES,
-						 EIMGSEL, EEMISSIONHEIGHT, EMVA, ESIGMAT3D, ENC3D, EDEPTH3D, ERWIDTH3D, EERRRWIDTH3D
-					   };
+        enum E_varname { ELENGTH, EWIDTH, EDIST, EALPHA, ENTUBES, ENLOWGAIN, ESIZE, ESIZEHG,
+                         ESIZELG, EFRACLOW, EMAX1, EMAX2, EMAX3, ELOSS, ELOS, EASYM,
+                         ECENX, ECENY, ETGRADX, EMSCWT, EMSCLT, EMWRT, EMLTT,
+                         ETELDIST, ETHETA2, ELTHETA2,
+                         EMSCW, EMSCL, EMWR, EMLR, EXCORE, EYCORE, EEREC, ENIMAGES, ERECRAT, EPEDVAR, EPEDVART,
+                         EAEL, EAAZ,
+                         EIMGSEL, EEMISSIONHEIGHT, EMVA,
+                         ESIGMAT3D, ENC3D, ESMAX3D, EERRSIGMAT3D, EOMEGA3D, EDEPTH3D, ERWIDTH3D, EERRRWIDTH3D
+                       };
 					   
 		string fName;
 		int fNTel;
@@ -56,8 +67,6 @@ class VDataMCComparision
 		vector< double > fTel_x;
 		vector< double > fTel_y;
 		vector< double > fTel_z;
-		
-		bool bBckData;
 		
 		// wobble north offset
 		double fWobbleNorth;
@@ -96,8 +105,12 @@ class VDataMCComparision
 		vector<TH2D* > hcen_xy;
 		vector< TH2D* > hdistR;
 		
-                // angle for shower max correction
-                double fShowerMaxZe_deg;
+        // histogram for azimuth weighting
+        TH1D* hAzWeight;
+        
+        // angle for shower max correction
+        double fShowerMaxZe_deg;
+
 		void setEntries( TH1D* );
 		void setEntries( TH2D* );
 		
@@ -106,13 +119,17 @@ class VDataMCComparision
 		
 	public:
 	
-		VDataMCComparision( string, bool, int, bool );
+        VDataMCComparision( string, int, bool );
 		~VDataMCComparision() {}
 		void defineHistograms();
 		bool fillHistograms( string ifile, int iSingleTelescopeCuts );
-		bool fillHistograms( string ifile, int iSingleTelescopeCuts, double iWobbleNorth, double iWobbleEast );
+        TH1D* getAzimuthWeightingHistogram( string ifile );
 		void resetTelescopeCoordinates();
 		void scaleHistograms( string );
+        void setAzimuthWeightingHistogram( TH1D* hAz )
+        {
+            hAzWeight = hAz;
+        }
 		void setAzRange( double iAzMin, double iAzMax );
                 void setZeRange( double iZeMin, double iZeMax );
 		bool setOnOffHistograms( VDataMCComparision*, VDataMCComparision*, double norm );
@@ -125,5 +142,5 @@ class VDataMCComparision
 		{
 			fWobbleFromDataTree = true;
 		}
-		bool writeHistograms( TDirectory* );
+        bool writeHistograms( string iOutFile );
 };

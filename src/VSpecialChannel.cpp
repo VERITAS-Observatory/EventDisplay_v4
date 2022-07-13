@@ -1,9 +1,6 @@
 /*! \class VSpecialChannel
     \brief read and administrate list of special channels (e.g. L2 channels)
 
-
-    \author
-    Gernot Maier
 */
 
 #include <VSpecialChannel.h>

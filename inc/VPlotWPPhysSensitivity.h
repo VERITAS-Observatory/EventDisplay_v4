@@ -21,8 +21,6 @@
 
 #include "VHistogramUtilities.h"
 #include "VMathsandFunctions.h"
-#include "VCTARequirements.h"
-#include "VCTASensitivityRequirements.h"
 #include "VPlotInstrumentResponseFunction.h"
 #include "VPlotUtilities.h"
 #include "VSensitivityCalculator.h"
@@ -44,7 +42,6 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
 		
 		int fPlotCTARequirementsID;
 		bool fPlotCTARequirementGoals;
-		VCTARequirements* fPlotCTARequirements;
 		
 		bool fUseIntegratedSensitivityForOffAxisPlots;
 		

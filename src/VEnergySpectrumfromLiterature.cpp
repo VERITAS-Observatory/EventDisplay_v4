@@ -2,7 +2,7 @@
     \brief provide spectra from literature
 
 
-    \author Gernot Maier
+    
 */
 
 #include "VEnergySpectrumfromLiterature.h"

@@ -3,8 +3,7 @@
 #ifndef VEXPOSURE_H
 #define VEXPOSURE_H
 
-#include "VASlamac.h"
-#include "VASlalib.h"
+#include "VAstronometry.h"
 #include "VDBTools.h"
 #include "VStarCatalogue.h"
 #include "VGlobalRunParameter.h"

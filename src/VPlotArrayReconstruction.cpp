@@ -18,7 +18,7 @@ VPlotArrayReconstruction::cameraPlot( int iEventNumber = 0, double iFOV = 8., do
 A negative event number will start a search for the next event with reconstructed parameters
 
 #########################################################################################################################################
-\author Gernot Maier
+
 #########################################################################################################################################
 */
 

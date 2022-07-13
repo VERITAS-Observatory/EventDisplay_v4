@@ -3,9 +3,6 @@
 
     variables called VARNAME_SC are in shower coordinates
 
-    \author
-      Jamie Holder
-      Gernot Maier
 */
 
 #include "VImageParameter.h"
@@ -72,50 +69,53 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL,
 		tpars->Branch( "MCprim", &MCprimary, "MCprimary/s" );
 		tpars->Branch( "MCe0", &MCenergy, "MCenergy/F" );
 		tpars->Branch( "MCxcore", &MCxcore, "MCxcore/F" );
-		tpars->Branch( "MCycore", &MCycore, "MCycore/F" );
-		tpars->Branch( "MCxcos", &MCxcos, "MCxcos/F" );
-		tpars->Branch( "MCycos", &MCycos, "MCycos/F" );
-		tpars->Branch( "MCLocalTriggerTime", &MCLocalTriggerTime, "MCLocalTriggerTime/F" );
-		tpars->Branch( "MCLocalDelayedTriggerTime", &MCLocalDelayedTriggerTime, "MCLocalDelayedTriggerTime/F" );
-		tpars->Branch( "MCTel_Xoff", &MCTel_Xoff, "MCTel_Xoff/F" );
-		tpars->Branch( "MCTel_Yoff", &MCTel_Yoff, "MCTel_Yoff/F" );
-	}
-	
-	// image parameters
-	if( fShortTree < 1 )
-	{
-		tpars->Branch( "meanPed_Image", &fmeanPed_Image, "meanPed_Image/F" );
-	}
-	tpars->Branch( "meanPedvar_Image", &fmeanPedvar_Image, "meanPedvar_Image/F" );
-	tpars->Branch( "cen_x", &cen_x, "cen_x/F" );
-	tpars->Branch( "cen_y", &cen_y, "cen_y/F" );
-	if( fShortTree < 1 )
-	{
-		tpars->Branch( "cen_x_trig", &cen_x_trig, "cen_x_trig/F" );
-		tpars->Branch( "cen_y_trig", &cen_y_trig, "cen_y_trig/F" );
-		tpars->Branch( "cen_x2_trig", &cen_x2_trig, "cen_x2_trig/F" );
-		tpars->Branch( "cen_y2_trig", &cen_y2_trig, "cen_y2_trig/F" );
-	}
-	tpars->Branch( "length", &length, "length/F" );
-	tpars->Branch( "width", &width, "width/F" );
-	tpars->Branch( "size", &size, "size/F" );
-	tpars->Branch( "size2", &size2, "size2/F" );
-	tpars->Branch( "loss", &loss, "loss/F" );
-	if( fShortTree < 1 )
-	{
-		tpars->Branch( "sizeLL", &sizeLL, "sizeLL/F" );
-		tpars->Branch( "size2LL", &size2LL, "size2LL/F" );
-		tpars->Branch( "lossAndDead", &lossAndDead, "lossAndDead/F" );
-		tpars->Branch( "fui", &fui, "fui/F" );
-	}
-	tpars->Branch( "fracLow", &fracLow, "fracLow/F" );
-	tpars->Branch( "dist", &dist, "dist/F" );
-	if( fShortTree < 1 )
-	{
-		tpars->Branch( "azwidth", &azwidth, "azwidth/F" );
-		tpars->Branch( "alpha", &alpha, "alpha/F" );
-		tpars->Branch( "los", &los, "los/F" );
-		tpars->Branch( "miss", &miss, "miss/F" );
+    tpars->Branch( "MCycore", &MCycore, "MCycore/F" );
+    tpars->Branch( "MCxcos", &MCxcos, "MCxcos/F" );
+    tpars->Branch( "MCycos", &MCycos, "MCycos/F" );
+    tpars->Branch( "MCLocalTriggerTime", &MCLocalTriggerTime, "MCLocalTriggerTime/F" );
+    tpars->Branch( "MCLocalDelayedTriggerTime", &MCLocalDelayedTriggerTime, "MCLocalDelayedTriggerTime/F" );
+    tpars->Branch( "MCTel_Xoff", &MCTel_Xoff, "MCTel_Xoff/F" );
+    tpars->Branch( "MCTel_Yoff", &MCTel_Yoff, "MCTel_Yoff/F" );
+}
+
+// image parameters
+if( fShortTree < 1 )
+{
+    tpars->Branch( "meanPed_Image", &fmeanPed_Image, "meanPed_Image/F" );
+}
+tpars->Branch( "meanPedvar_Image", &fmeanPedvar_Image, "meanPedvar_Image/F" );
+tpars->Branch( "cen_x", &cen_x, "cen_x/F" );
+tpars->Branch( "cen_y", &cen_y, "cen_y/F" );
+tpars->Branch( "f_d", &f_d, "f_d/F" );
+tpars->Branch( "f_s", &f_s, "f_s/F" );
+tpars->Branch( "f_sdevxy", &f_sdevxy, "f_sdevxy/F" );
+if( fShortTree < 1 )
+{
+    tpars->Branch( "cen_x_trig", &cen_x_trig, "cen_x_trig/F" );
+    tpars->Branch( "cen_y_trig", &cen_y_trig, "cen_y_trig/F" );
+    tpars->Branch( "cen_x2_trig", &cen_x2_trig, "cen_x2_trig/F" );
+    tpars->Branch( "cen_y2_trig", &cen_y2_trig, "cen_y2_trig/F" );
+}
+tpars->Branch( "length", &length, "length/F" );
+tpars->Branch( "width", &width, "width/F" );
+tpars->Branch( "size", &size, "size/F" );
+tpars->Branch( "size2", &size2, "size2/F" );
+tpars->Branch( "loss", &loss, "loss/F" );
+if( fShortTree < 1 )
+{
+    tpars->Branch( "sizeLL", &sizeLL, "sizeLL/F" );
+    tpars->Branch( "size2LL", &size2LL, "size2LL/F" );
+    tpars->Branch( "lossAndDead", &lossAndDead, "lossAndDead/F" );
+}
+    tpars->Branch( "fui", &fui, "fui/F" );
+tpars->Branch( "fracLow", &fracLow, "fracLow/F" );
+tpars->Branch( "dist", &dist, "dist/F" );
+if( fShortTree < 1 )
+{
+    tpars->Branch( "azwidth", &azwidth, "azwidth/F" );
+    tpars->Branch( "alpha", &alpha, "alpha/F" );
+    tpars->Branch( "los", &los, "los/F" );
+    tpars->Branch( "miss", &miss, "miss/F" );
 		tpars->Branch( "phi", &phi, "phi/F" );
 	}
 	tpars->Branch( "cosphi", &cosphi, "cosphi/F" );
@@ -163,9 +163,7 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL,
 		tpars->Branch( "muonSize", &muonSize, "muonSize/F" );
 		tpars->Branch( "muonIPCorrectedSize", &muonIPCorrectedSize, "muonIPCorrectedSize/F" );
 		tpars->Branch( "muonValid", &muonValid, "muonValid/I" );
-		
 	}
-	
 	// muon parameters (Hough transform)
 	if( iHough )
 	{
@@ -282,7 +280,6 @@ void VImageParameter::reset( unsigned int resetLevel )
 	sinphi = 0.;
 	cosphi = 0.;
 	asymmetry = 0.;
-	// Heike's image cleaning
 	fncluster_cleaned = 0;
 	fncluster_uncleaned = 0;
 	
@@ -373,7 +370,6 @@ void VImageParameter::printParameters()
 
 bool VImageParameter::hasImage()
 {
-	// (GM) contains now number of bad channels   if( bad != 0 ) return false;
 	if( ntubes > 0 )
 	{
 		return true;

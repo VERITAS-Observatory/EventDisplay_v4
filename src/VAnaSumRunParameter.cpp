@@ -153,10 +153,6 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	// length of time intervalls in seconds for rate plots and short term histograms
 	fTimeIntervall = 4. * 60.;
 	
-	// model3D analysis
-	fModel3D = false; // MODEL3DANALYSIS
-	fDirectionModel3D = false; //USEDIRECTIONMODEL3D
-
     // likelihood analysis
     fLikelihoodAnalysis = false;
 	
@@ -648,24 +644,6 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			else if( temp == "USE2DACCEPTANCE" )
 			{
 				f2DAcceptanceMode = ( unsigned int )atoi( temp2.c_str() ) ;
-			}
-			/// use Model3D analysis ///
-			else if( temp == "MODEL3DANALYSIS" )
-			{
-				unsigned int tmpModel3D = ( unsigned int )atoi( temp2.c_str() ) ;
-				if( tmpModel3D == 1 )
-				{
-					fModel3D = true;
-				}
-			}
-			/// use Model3D direction ///
-			else if( temp == "USEDIRECTIONMODEL3D" )
-			{
-				unsigned int tmpDirectionModel3D = ( unsigned int )atoi( temp2.c_str() ) ;
-				if( tmpDirectionModel3D == 1 )
-				{
-					fDirectionModel3D = true;
-				}
 			}
 			/// enable likelihood analysis ///
 			else if (temp == "ENABLELIKELIHOOD")

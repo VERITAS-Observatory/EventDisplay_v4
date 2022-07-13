@@ -39,11 +39,11 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	frunmode = 0;
 	fRunIsZeroSuppressed = false;
 	frunnumber = -1;
+    fRunTitle  = "";
 	fsourcetype = 3;           // 0 = rawdata, 1 = GrIsu simulation, 2 = MC in VBF format,
 	// 3 = rawdata in VBF, 4 = DST (data), 5 = multiple GrIsu file,
 	// 6 = PE file, 7 = DST (MC)
 	fsourcefile = "";
-	fTrigSimInputcard = "";
 	
 	fDBRunType = "";
 	fDBDataStartTimeMJD = 0.;
@@ -57,6 +57,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fsimu_noiselevel   = 250;
 	fsimu_pedestalfile_DefaultPed = 20.;
 	fsimu_lowgain_pedestal_DefaultPed = -999.;
+    fCombineChannelsForPedestalCalculation = 0;
 	fPedestalSingleRootFile = false;
 	fnevents = -10000;
 	fFirstEvent = -10000;
@@ -154,6 +155,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fImageCleaningParameters.push_back( new VImageCleaningRunParameter() );
 	
 	fsumfirst.push_back( 2 );
+    fSearchWindowLast.push_back( 9999 );
 	fsumwindow_1.push_back( 12 );
 	fsumwindow_2.push_back( 12 );
 	fsumwindow_pass1.push_back( 18 );
@@ -170,7 +172,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	frecoverImagePixelNearDeadPixel = true;
 	fFillImageBorderNeighbours = true;
 	fTraceWindowShift.push_back( -1 );
-	fsumfirst_start_at_T0.push_back( false );
+    fsumfirst_startingMethod.push_back( 1 );
 	fTraceIntegrationMethod.push_back( 1 );
 	fTraceIntegrationMethod_pass1.push_back( 1 );
 	fSumWindowMaxTimedifferenceToDoublePassPosition.push_back( 10. );
@@ -184,9 +186,10 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fUsePedestalsInTimeSlices = true;
 	fPedestalsInTimeSlices = true;
 	fPedestalsLengthOfTimeSlice = 180.;            //!< [s]
-	fCalibrationSumWindow = 20;
+	fCalibrationSumWindow = 16;
 	fCalibrationSumFirst = 0;
-	fCalibrationIntSumMin = 50.;
+    fCalibrationSumWindowAverageTime = 6;
+	fCalibrationIntSumMin = 20.;
 	fL2TimeCorrect = true;
 	fsetSpecialChannels = "EVNDISP.specialchannels.dat";
         fthroughputCorrectionFile = "";
@@ -222,19 +225,6 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	// muon parameters
 	fmuonmode = false;
 	fhoughmuonmode = false;
-	
-	// Frogs parameters
-	ffrogsmscwfile = "";
-	ffrogsmode = false;
-	ffrogsRecID = 0;
-	ffrogstemplatelist = "";
-	
-	// Model3D parameters, JG
-	fUseModel3D = false;
-	fUseDisplayModel3D = false;
-	fCreateLnLTable = false;
-	fLnLTableFile = "";
-	fIDstartDirectionModel3D = 0;
 	
 	// output parameters
 	ffillhistos = false;                          // obsolete
@@ -274,41 +264,20 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fdstminntubes = -1;
 	fdstwriteallpixel = true;
 	
-	// NN parameters
-	fNSBscale = 0.;
-	for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
-	{
-		fFADCPedestal[i] = -1.;
-		fFADCPedestalSig[i] = -1.;
-		fFlashCamFADCPedestal[i] = -1.;
-		fFlashCamFADCPedestalSig[i] = -1.;
-	}
+    // NN cleaning parameters
+    ifWriteGraphsToFile = false;
+    ifReadIPRfromDatabase = false;
+    ifCreateIPRdatabase = false;
+    ifReadIPRfromDSTFile = false;
+
+    fNNGraphsFile = "IPRgraph.root";
+    fIPRdatabase = "";
+    fIPRdatabaseFile = "";
+
 	for( unsigned int i = 0; i < VDST_MAXTELTYPES; i++ )
 	{
-		fFADCsampleRate[i] = -1.;
-		fFlashCamFADCtoPhe[i] = -1.;
-		fFlashCamFADCsampleRate[i] = -1.;
 		fFADCtoPhe[i] = -1.;
-		fPerformFlashCamAnalysis[i] = false;
-		fFWHMdata[i] = -1.;
-		fFWHMtrigger[i] = -1.;
-		fIntegWindow[i] = -1.;
-		ifActiveType[i] = false;
 	}
-	
-	// parallaxwidth  // MS
-	fPWmethod = -1;            // MS default is to use cleaned CFD trigger map
-	fPWcleanNeighbors = 2;     // MS: default number of neighbors required for identifying center pixels in the trigger map
-	fPWcleanThreshold = 26.0;  // MS: default is about 5.3 dc/pe for VERITAS (5 sample integration window), i.e. cleaning of ~5 pe
-	fPWlimit = 0;              // MS: default is no restriction on the number of trigger pixels transmitted to moment-generating function
-	
-	fTrigSimInputcard = "";
-	fTrigThreshFile = "";
-	fNSBdatabaseFile = "";
-	fIPR1File = "";
-	fIPR2File = "";
-	fIPR3File = "";
-	fIPR4File = "";
 	
 	// movie
 	fMovieBool = false;
@@ -316,6 +285,19 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fMovieInput = "";
 	fMovieFrameOutput = "";
 	
+}
+
+VEvndispRunParameter::~VEvndispRunParameter()
+{
+    for( unsigned int i = 0; i < fImageCleaningParameters.size(); i++ )
+    {
+        if( fImageCleaningParameters[i] )
+        {
+            delete fImageCleaningParameters[i];
+        }
+    }
+    
+    
 }
 
 
@@ -395,7 +377,12 @@ void VEvndispRunParameter::print( int iEv )
 		cout << "============================" << endl << endl;
 	}
 	
-	cout << "RUN " << frunnumber << endl;
+    cout << "RUN " << frunnumber;
+    if( fRunTitle.size() > 0 )
+    {
+        cout << " (" << fRunTitle << ")";
+    }
+    cout << endl;
 	cout << "Observatory: " << getObservatory();
 	cout << " (lat " << getObservatory_Latitude_deg() << ", long " << getObservatory_Longitude_deg();
 	cout << ", height " << getObservatory_Height_m() << "m)";
@@ -749,12 +736,6 @@ void VEvndispRunParameter::print( int iEv )
 	if( iEv == 2 )
 	{
 		cout << endl;
-		if( fPWmethod == 3 )
-		{
-			cout << "Parallaxwidth: trigger map input type: " << fPWmethod << endl;
-			cout << "Parallaxwidth: number of neighbors required for cleaning: " << fPWcleanNeighbors << endl;
-			cout << "Parallaxwidth: FADC cleaning threshold for identifying triggered pixels (for method 3): " << fPWcleanThreshold << endl;
-		}
 		for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ )
 		{
 			cout << "Telescope " << fTelToAnalyze[i] + 1 << endl;
@@ -769,8 +750,12 @@ void VEvndispRunParameter::print( int iEv )
 				}
 				cout << endl;
 				cout << "\t start of summation window: \t" << fsumfirst[fTelToAnalyze[i]];
-				cout << "\t (shifted by " << fTraceWindowShift[i] << " samples";
-				cout << " [T0-" << fsumfirst_start_at_T0[i] << "])" << endl;
+                cout << "\t (shifted by " << fTraceWindowShift[fTelToAnalyze[i]] << " samples";
+                cout << " [method-" << fsumfirst_startingMethod[fTelToAnalyze[i]] << "]) ";
+                if( fSearchWindowLast[fTelToAnalyze[i]] < 9999 )
+                {
+                    cout << ", last sample for sliding window search: " << fSearchWindowLast[fTelToAnalyze[i]];
+                }
 				cout << "\t length of summation window: \t" << fsumwindow_1[fTelToAnalyze[i]];
 				cout << "/" << fsumwindow_2[fTelToAnalyze[i]];
 				if( fDoublePass )
@@ -936,6 +921,7 @@ string VEvndispRunParameter::getInstrumentEpoch( bool iMajor, bool iUpdateInstru
         }
         return fInstrumentEpoch;
 }
+
 
 /*
    read instrument epoch from file

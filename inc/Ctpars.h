@@ -1,24 +1,13 @@
 //////////////////////////////////////////////////////////
-// This class has been automatically generated on
-// Thu Feb  8 14:35:45 2007 by ROOT version 5.10/00
-// from TTree tpars/Event Parameters (Telescope 1)
-// found on file: output/32855.root
-//////////////////////////////////////////////////////////
 //
 //   adjusted to mscw_energy
 //
-//
-//
-//
 //   DO NOT OVERWRITE !!!!
 //
-//   (GM)
 ///////////////////////////////////////////
 
 #ifndef Ctpars_h
 #define Ctpars_h
-
-#define TREES_VERSION2
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -30,13 +19,12 @@ class Ctpars
 {
 	public :
 		bool            bMC;
+        bool            bsdevxy;
 		unsigned int    bShort;
-		int             fVersion;
 		TTree*          fChain;                   //!pointer to the analyzed TTree or TChain
 		Int_t           fCurrent;                 //!current Tree number in a TChain
 		
 		// Declaration of leave types
-#ifdef TREES_VERSION2
 		Int_t           telID;
 		Int_t           runNumber;
 		Int_t           MJD;
@@ -63,6 +51,9 @@ class Ctpars
 		Float_t         meanPedvar_Image;
 		Float_t         cen_x;
 		Float_t         cen_y;
+        Float_t         f_s;
+        Float_t         f_d;
+        Float_t         f_sdevxy;
 		Float_t         length;
 		Float_t         width;
 		Float_t         size;
@@ -103,66 +94,6 @@ class Ctpars
 		Int_t           muonValid;
 		Int_t           houghMuonValid;
 		Int_t           Fitstat;
-#else
-		Int_t           telID;
-		Int_t           runNumber;
-		Int_t           MJD;
-		Double_t        Time;
-		Int_t           eventNumber;
-		Double_t        fimagethresh;
-		Double_t        fborderthresh;
-		Int_t           fsumfirst;
-		Int_t           fsumwindow;
-		Int_t           fsumwindow_2;
-		Int_t           fsumwindowsmall;
-		Short_t         LocalTrigger;
-		Int_t           MCprim;
-		Double_t        MCe0;
-		Double_t        MCxcore;
-		Double_t        MCycore;
-		Double_t        MCxcos;
-		Double_t        MCycos;
-		Double_t        MCLocalTriggerTime;
-		Double_t        MCLocalDelayedTriggerTime;
-		Double_t        MCTel_Xoff;
-		Double_t        MCTel_Yoff;
-		Double_t        cen_x;
-		Double_t        cen_y;
-		Double_t        length;
-		Double_t        width;
-		Double_t        size;
-		Double_t        size2;
-		Double_t        loss;
-		Double_t        dist;
-		Double_t        azwidth;
-		Double_t        alpha;
-		Double_t        los;
-		Double_t        miss;
-		Double_t        phi;
-		Double_t        cosphi;
-		Double_t        sinphi;
-		Int_t           ntubes;
-		Int_t           ntrig;
-		Int_t           ntrig_per_patch;
-		Int_t           nsat;
-		Int_t		nlowgain;
-		Int_t           bad;
-		Double_t        max[3];
-		Int_t           index_of_max[3];
-		Double_t        frac[3];
-		Double_t        asymmetry;
-		Double_t        tgrad_x;
-		Double_t        tgrad_y;
-		Double_t        tgrad_r;
-		Double_t        tint_x;
-		Double_t        tgrad_dx;
-		Double_t        tint_dx;
-		Double_t        tchisq_x;
-		Double_t        tmin;
-		Double_t        tmax;
-		Double_t        tmean;
-		Int_t           Fitstat;
-#endif
 		
 		// List of branches
 		TBranch*        b_telID;                  //!
@@ -192,6 +123,9 @@ class Ctpars
 		TBranch*        b_meanPedvar_Image;       //!
 		TBranch*        b_cen_x;                  //!
 		TBranch*        b_cen_y;                  //!
+        TBranch*        b_f_s;                    //!
+        TBranch*        b_f_d;                    //!
+        TBranch*        b_f_sdevxy;               //!
 		TBranch*        b_length;                 //!
 		TBranch*        b_width;                  //!
 		TBranch*        b_size;                   //!
@@ -238,15 +172,18 @@ class Ctpars
 		TBranch*        b_muonValid;
 		TBranch*        b_houghMuonValid;
 		
-		Ctpars( TTree* tree = 0, bool iMC = false, int iVersion = 2, unsigned int iShort = false );
+		Ctpars( TTree* tree = 0, bool iMC = false, unsigned int iShort = false );
 		virtual ~Ctpars();
-		virtual Int_t    Cut( Long64_t entry );
 		virtual Int_t    GetEntry( Long64_t entry );
 		virtual Long64_t LoadTree( Long64_t entry );
 		virtual void     Init( TTree* tree );
 		virtual void     Loop();
 		virtual Bool_t   Notify();
 		virtual void     Show( Long64_t entry = -1 );
+        bool             has_sdevxy()
+        {
+            return bsdevxy;
+        }
 		bool             isMC()
 		{
 			return bMC;
@@ -269,7 +206,7 @@ class Ctpars
     bShort = 2:  read limited number of branched needed for lookup table filling
 
 */
-Ctpars::Ctpars( TTree* tree, bool iMC, int iVersion, unsigned int iShort )
+Ctpars::Ctpars( TTree* tree, bool iMC, unsigned int iShort )
 {
 	if( !tree )
 	{
@@ -277,11 +214,11 @@ Ctpars::Ctpars( TTree* tree, bool iMC, int iVersion, unsigned int iShort )
 	}
 	bMC = iMC;
 	bShort = iShort;
-	fVersion = iVersion;
 	// forward I/O
 	// is supposed to speed up reading significantly
 	// problem: large memory consumption (>12 GB for certain cta arrays)
 	//    tree->SetCacheSize(10000000);
+    bsdevxy = false;
 	
 	Init( tree );
 }
@@ -349,7 +286,7 @@ void Ctpars::Init( TTree* tree )
 	//    bShort = 2:  read limited number of branched needed for lookup table filling
 	if( bShort <= 2 )
 	{
-		if( fVersion > 3 && fChain->GetBranchStatus( "meanPedvar_Image" ) )
+		if( fChain->GetBranchStatus( "meanPedvar_Image" ) )
 		{
 			fChain->SetBranchAddress( "meanPedvar_Image", &meanPedvar_Image );
 		}
@@ -380,7 +317,7 @@ void Ctpars::Init( TTree* tree )
 		{
 			eventNumber = 0;
 		}
-		if( fVersion > 3 && fChain->GetBranchStatus( "meanPed_Image" ) )
+		if( fChain->GetBranchStatus( "meanPed_Image" ) )
 		{
 			fChain->SetBranchAddress( "meanPed_Image", &meanPed_Image );
 		}
@@ -390,15 +327,34 @@ void Ctpars::Init( TTree* tree )
 		}
 		fChain->SetBranchAddress( "cen_x", &cen_x );
 		fChain->SetBranchAddress( "cen_y", &cen_y );
+        if( fChain->GetBranchStatus( "f_d" ) )
+        {
+               fChain->SetBranchAddress( "f_d", &f_d );
+               bsdevxy = true;
+        }
+        else
+        {
+               f_d = 0.;
+        }
+        if( fChain->GetBranchStatus( "f_s" ) )
+        {
+               fChain->SetBranchAddress( "f_s", &f_s );
+        }
+        else
+        {
+               f_s = 0.;
+        }
+        if( fChain->GetBranchStatus( "f_sdevxy" ) )
+        {
+               fChain->SetBranchAddress( "f_sdevxy", &f_sdevxy );
+        }
+        else
+        {
+               f_sdevxy = 0.;
+        }
+
 		fChain->SetBranchAddress( "size", &size );
-		if( fVersion > 2 )
-		{
-			fChain->SetBranchAddress( "loss", &loss );
-		}
-		else
-		{
-			loss = 0.;
-		}
+        fChain->SetBranchAddress( "loss", &loss );
 		if( fChain->GetBranchStatus( "fracLow" ) )
 		{
 		
@@ -406,16 +362,16 @@ void Ctpars::Init( TTree* tree )
 		}
 		else
 		{
-			fui = 0.;
+			fracLow = 0.;
 		}
-		if( fVersion > 6 && fChain->GetBranchStatus( "fui" ) )
-		{
-			fChain->SetBranchAddress( "fui", &fui );
-		}
-		else
-		{
-			fui = 0.;
-		}
+        if( fChain->GetBranchStatus( "fui" ) )
+        {
+            fChain->SetBranchAddress( "fui", &fui );
+        }
+        else
+        {
+            fui = 0.;
+        }
 		fChain->SetBranchAddress( "dist", &dist );
 		fChain->SetBranchAddress( "ntubes", &ntubes );
 		fChain->SetBranchAddress( "cosphi", &cosphi );
@@ -555,6 +511,9 @@ Bool_t Ctpars::Notify()
 	b_size2 = 0;
 	b_cen_x = 0;
 	b_cen_y = 0;
+    b_f_s = 0;
+    b_f_d = 0;
+    b_f_sdevxy = 0;
 	b_loss = 0;
 	b_fracLow = 0;
 	b_alpha = 0;
@@ -581,11 +540,15 @@ Bool_t Ctpars::Notify()
 	// get branch pointers
 	if( bShort <= 2 )
 	{
-		if( fVersion > 3 && fChain->GetBranchStatus( "meanPedvar_Image" ) )
+		if( fChain->GetBranchStatus( "meanPedvar_Image" ) )
 		{
 			b_meanPedvar_Image = fChain->GetBranch( "meanPedvar_Image" );
 			fChain->AddBranchToCache( b_meanPedvar_Image );
 		}
+        else
+        {
+            b_meanPedvar_Image = 0;
+        }
 		b_length = fChain->GetBranch( "length" );
 		fChain->AddBranchToCache( b_length );
 		b_width = fChain->GetBranch( "width" );
@@ -606,27 +569,43 @@ Bool_t Ctpars::Notify()
 		{
 			b_eventNumber = fChain->GetBranch( "eventNumber" );
 		}
-		if( fVersion > 3 && fChain->GetBranchStatus( "meanPed_Image" ) )
+		if( fChain->GetBranchStatus( "meanPed_Image" ) )
 		{
 			b_meanPed_Image = fChain->GetBranch( "meanPed_Image" );
 		}
+        else
+        {
+            b_meanPed_Image = 0;
+        }
 		b_cen_x = fChain->GetBranch( "cen_x" );
 		fChain->AddBranchToCache( b_cen_x );
 		b_cen_y = fChain->GetBranch( "cen_y" );
 		fChain->AddBranchToCache( b_cen_y );
+        if( fChain->GetBranchStatus( "f_d" ) )
+        {
+             b_f_d = fChain->GetBranch( "f_d" );
+             fChain->AddBranchToCache( b_f_d );
+        }
+        if( fChain->GetBranchStatus( "f_s" ) )
+        {
+             b_f_s = fChain->GetBranch( "f_s" );
+             fChain->AddBranchToCache( b_f_s );
+        }
+        if( fChain->GetBranchStatus( "f_sdevxy" ) )
+        {
+             b_f_sdevxy = fChain->GetBranch( "f_sdevxy" );
+             fChain->AddBranchToCache( b_f_sdevxy );
+        }
 		b_size = fChain->GetBranch( "size" );
 		fChain->AddBranchToCache( b_size );
-		if( fVersion > 2 )
-		{
-			b_loss = fChain->GetBranch( "loss" );
-			fChain->AddBranchToCache( b_loss );
-		}
-		if( fVersion > 6 && fChain->GetBranchStatus( "fracLow" ) )
+        b_loss = fChain->GetBranch( "loss" );
+        fChain->AddBranchToCache( b_loss );
+		if( fChain->GetBranchStatus( "fracLow" ) )
 		{
 			b_fracLow = fChain->GetBranch( "fracLow" );
 			fChain->AddBranchToCache( b_fracLow );
 		}
-		if( fVersion > 6 && fChain->GetBranchStatus( "fui" ) )
+		if( fChain->GetBranchStatus( "fui" ) )
 		{
 			b_fui = fChain->GetBranch( "fui" );
 		}
@@ -721,11 +700,4 @@ void Ctpars::Show( Long64_t entry )
 }
 
 
-Int_t Ctpars::Cut( Long64_t entry )
-{
-	// This function may be called from Loop.
-	// returns  1 if entry is accepted.
-	// returns -1 otherwise.
-	return 1;
-}
 #endif                                            // #ifdef Ctpars_cxx

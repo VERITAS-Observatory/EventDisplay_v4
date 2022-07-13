@@ -3,7 +3,7 @@
 #ifndef VDBRUNINFO_H
 #define VDBRUNINFO_H
 
-#include "VASlalib.h"
+#include "VAstronometry.h"
 
 #include <TMath.h>
 #include <TSQLResult.h>

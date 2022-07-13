@@ -74,7 +74,7 @@ class VTableLookup
 		vector< vector< vector< vector< vector< ULong64_t > > > > > fTelType_tables;
 		vector< vector< vector< vector< vector< VTableCalculator* > > > > > fmscw;
 		vector< vector< vector< vector< vector< VTableCalculator* > > > > > fmscl;
-		vector< vector< vector< vector< vector< VTableEnergyCalculator* > > > > > fenergyEnergyvsRadius;;
+		vector< vector< vector< vector< vector< VTableEnergyCalculator* > > > > > fenergyEnergyvsRadius;
 		vector< vector< vector< vector< vector< VTableCalculator* > > > > > fenergySizevsRadius;
 		
 		// used for calculations

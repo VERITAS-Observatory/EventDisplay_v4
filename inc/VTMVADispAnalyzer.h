@@ -3,6 +3,7 @@
 #ifndef VTMVADispAnalyzer_H
 #define VTMVADispAnalyzer_H
 
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -20,40 +21,49 @@ using namespace std;
 
 class VTMVADispAnalyzer
 {
-	private:
-	
-		bool fDebug;
-		bool bZombie;
-		
-		vector<ULong64_t> fTelescopeTypeList;
-		map< ULong64_t, TMVA::Reader* > fTMVAReader;
-		
-		float fWidth;
-		float fLength;
-		float fSize;
-		float fPedvar;
-		float fTGrad;
-		float fZe;
-		float fAz;
-		float fLoss;
-		float fDist;
-		float fAsymm;
-		float fXcore;
-		float fYcore;
-		float fcross;
-		
-	public:
-	
-		VTMVADispAnalyzer( string iFile, vector< ULong64_t > iTelTypeList );
-		~VTMVADispAnalyzer() {}
-		
-		float evaluate( float iWidth, float iLength, float iSize, float iAsymm, float iLoss, float iTGrad, float icen_x, float icen_y, float xoff_4, float yoff_4, ULong64_t iTelType, float iZe, float iAz );
-		bool isZombie()
-		{
-			return bZombie;
-		}
-		void terminate();
-		
+    private:
+    
+        bool fDebug;
+        bool bZombie;
+        string fDispType;
+        
+        vector<ULong64_t> fTelescopeTypeList;
+        map< ULong64_t, TMVA::Reader* > fTMVAReader;
+        
+        float fWidth;
+        float fLength;
+        float fWoL;
+        float fSize;
+        float fNtubes;
+        float fPedvar;
+        float fTGrad;
+        float fZe;
+        float fAz;
+        float fLoss;
+        float fDist;
+        float fAsymm;
+        float fXcore;
+        float fYcore;
+        float fcross;
+        float fRcore;
+        float fEHeight;
+        
+    public:
+    
+        VTMVADispAnalyzer( string iFile, vector< ULong64_t > iTelTypeList, string iDispType = "BDTDisp" );
+        ~VTMVADispAnalyzer() {}
+        
+        float evaluate( float iWidth, float iLength, float iSize, float iAsymm, float iLoss,
+                        float iTGrad, float icen_x, float icen_y, float xoff_4, float yoff_4,
+                        ULong64_t iTelType, float iZe, float iAz, float iRcore,
+                        float iEHeight = -1., float iDist = -1., float iNtubes = -1,
+                        float iPedVar = -1. );
+        bool isZombie()
+        {
+            return bZombie;
+        }
+        void terminate();
+        
 };
 
 #endif

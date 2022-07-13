@@ -3,9 +3,6 @@
  *
  *   input is a file list of mscw_energy output file from gamma-ray simulations
  *
- * \author
- *   Gernot Maier
- *
  */
 
 #include "TChain.h"
@@ -205,19 +202,6 @@ int main( int argc, char* argv[] )
 		cout << "Error while trying to add mscw data tree from file " << fRunPara->fdatafile  << endl;
 		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
-	}
-	
-	//FROGS
-	if( fRunPara->fGammaHadronCutSelector / 10 == 5 )
-	{
-		TChain* fchain = new TChain( "frogspars" );
-		if( !fchain->Add( fRunPara->fdatafile.c_str(), -1 ) )
-		{
-			cout << "Error while trying to add mscw frogs tree from file " << fRunPara->fdatafile  << endl;
-			cout << "exiting..." << endl;
-			exit( EXIT_FAILURE );
-		}
-		c->AddFriend( fchain );
 	}
 	
 	CData d( c, true, 6, true );

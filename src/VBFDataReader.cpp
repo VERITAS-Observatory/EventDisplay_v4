@@ -2,9 +2,7 @@
 
     steering class for reading vbf data format
 
-
-    \author
-      Filip Pizlo
+    \author Filip Pizlo
 */
 
 #include <VBFDataReader.h>

@@ -2,7 +2,7 @@
     \brief calculate gamma ray rate from Crab Nebula with effective areas from MC
 
 
-    \author Gernot Maier
+    
 */
 
 #include "TF1.h"

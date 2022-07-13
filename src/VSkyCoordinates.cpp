@@ -86,11 +86,11 @@ void VSkyCoordinates::precessTarget( int iMJD, int iTelID )
 		}
 		// ENDTEMP
 		// precess target coordinates
-		double ofy = VSkyCoordinatesUtilities::precessTarget( iMJD, fTargetRA, fTargetDec );
+        VSkyCoordinatesUtilities::precessTarget( iMJD, fTargetRA, fTargetDec );
 		
 		if( !fSupressStdoutText )
 		{
-			cout << "\tMJD " << iMJD << " (" << setprecision( 6 ) << ofy << ")";
+            cout << "\tMJD " << iMJD;
 			cout << "\t RA=" << fTargetRA* TMath::RadToDeg() << " dec=" << fTargetDec* TMath::RadToDeg() << endl;
 		}
 		// precess telescope coordinates
@@ -216,51 +216,36 @@ void VSkyCoordinates::getDerotatedShowerDirection( double ze, double az, float& 
 	VSkyCoordinatesUtilities::getDifferenceInCameraCoordinates( ze, az, rze, raz, y, x, z );
 }
 
-
-double VSkyCoordinates::getSidereal( double i_UTC )
+double VSkyCoordinates::derotateCoords( double i_UTC, double i_xin, double i_yin, double& i_xout, double& i_yout )
 {
-	return slaDranrm( slaGmst( i_UTC ) - fObsLongitude );
+    double i_theta = VSkyCoordinatesUtilities::getDerotationAngle( i_UTC, fTelRA, fTelDec, fObsLongitude, fObsLatitude );
+    i_xout = i_xin * cos( i_theta ) + i_yin * sin( i_theta );
+    i_yout = i_yin * cos( i_theta ) - i_xin * sin( i_theta );
+    return i_theta;
 }
 
-
-double VSkyCoordinates::getHourAngle( double i_UTC )
+double VSkyCoordinates::getDerotationAngle( int i_mjd, double i_seconds )
 {
-	return slaDranrm( getSidereal( i_UTC ) - fTelRA );
+    return VSkyCoordinatesUtilities::getDerotationAngle( VSkyCoordinatesUtilities::getUTC( i_mjd, i_seconds ),
+            fTelRA, fTelDec, fObsLongitude, fObsLatitude );
 }
 
-double VSkyCoordinates::getDerotationAngle( int iMJD, double iTime )
-{
-	return getDerotationAngle( VSkyCoordinatesUtilities::getUTC( iMJD, iTime ) );
-}
-
-
-double VSkyCoordinates::getDerotationAngle( double i_UTC )
-{
-	//! Returns the camera derotation angle in radians
-	return -slaPa( getHourAngle( i_UTC ), fTelDec, fObsLatitude );
-}
-
-void VSkyCoordinates::derotateCoords( double i_UTC, double i_xin, double i_yin, double& i_xout, double& i_yout )
-{
-	double i_theta = getDerotationAngle( i_UTC );
-	i_xout = i_xin * cos( i_theta ) + i_yin * sin( i_theta );
-	i_yout = i_yin * cos( i_theta ) - i_xin * sin( i_theta );
-}
-
-void VSkyCoordinates::derotateCoords( int i_mjd, double i_seconds, double i_xin, double i_yin, double& i_xout, double& i_yout )
+double VSkyCoordinates::derotateCoords( int i_mjd, double i_seconds, double i_xin, double i_yin, double& i_xout, double& i_yout )
 {
 	double i_UTC = VSkyCoordinatesUtilities::getUTC( i_mjd, i_seconds );
-	double i_theta = getDerotationAngle( i_UTC );
+    double i_theta = VSkyCoordinatesUtilities::getDerotationAngle( i_UTC, fTelRA, fTelDec, fObsLongitude, fObsLatitude );
 	i_xout = i_xin * cos( i_theta ) + i_yin * sin( i_theta );
 	i_yout = i_yin * cos( i_theta ) - i_xin * sin( i_theta );
+    return i_theta;
 }
 
-void VSkyCoordinates::rotateCoords( int i_mjd, double i_seconds, double i_xin, double i_yin, double& i_xout, double& i_yout )
+double VSkyCoordinates::rotateCoords( int i_mjd, double i_seconds, double i_xin, double i_yin, double& i_xout, double& i_yout )
 {
 	double i_UTC = VSkyCoordinatesUtilities::getUTC( i_mjd, i_seconds );
-	double i_theta = -1. * getDerotationAngle( i_UTC );
+    double i_theta = -1. * VSkyCoordinatesUtilities::getDerotationAngle( i_UTC, fTelRA, fTelDec, fObsLongitude, fObsLatitude );
 	i_xout = i_xin * cos( i_theta ) + i_yin * sin( i_theta );
 	i_yout = i_yin * cos( i_theta ) - i_xin * sin( i_theta );
+    return i_theta;
 }
 
 
@@ -317,10 +302,13 @@ void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast, int iTelID, 
 
    initial star catalogue and set FOV in catalogue
 
+   results in a list of stars in the current FOV
+
    expect J2000 coordinates
 
 */
-bool VSkyCoordinates::initStarCatalogue( string iCatalogueName, double iMJD, double xmin, double xmax, double ymin, double ymax,
+bool VSkyCoordinates::initStarCatalogue( string iCatalogueName, double iMJD,
+        double xmin, double xmax, double ymin, double ymax,
 		double iRASkyMapCentre_J2000, double iDecSkyMapCentre_J2000 )
 {
 	if( !fStarCatalogue )

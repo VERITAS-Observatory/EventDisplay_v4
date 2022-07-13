@@ -1,8 +1,6 @@
 /*! \class VStarCatalogue
  *  \brief bright star catalogue
 
-
-    \author Gernot Maier
 */
 
 #include "VStarCatalogue.h"
@@ -34,13 +32,6 @@ bool VStarCatalogue::init( double iMJD, string iCatalogue )
 	{
 		return false;
 	}
-	
-	// now precess everything
-	int  oy, om, od, j, ny, nd;
-	double ofd, ofy;
-	slaDjcl( iMJD, &oy, &om, &od, &ofd, &j );
-	slaClyd( oy, om, od, &ny, &nd, &j );
-	ofy = ny + nd / 365.25;
 	double dec, ra;
 	double i_b, i_l;
 	for( unsigned int i = 0; i < fStars.size(); i++ )
@@ -48,9 +39,11 @@ bool VStarCatalogue::init( double iMJD, string iCatalogue )
 		dec = fStars[i]->fDec2000 * TMath::Pi() / 180.;
 		ra =  fStars[i]->fRA2000 * TMath::Pi() / 180.;
 		// calculate galac coordinates
-		slaEqgal( ra, dec, &i_l, &i_b );
+		VAstronometry::vlaEqgal( ra, dec, &i_l, &i_b );
 		fStars[i]->fRunGalLong1958 = i_l * 180. / TMath::Pi();
-		slaPreces( "FK5", 2000.0, ofy, &ra, &dec );
+
+        // apply precesssion
+        VAstronometry::vlaPreces( 2451545.0 - 2400000.5, iMJD, &ra, &dec );
 		// calculate ra/dec for current epoch
 		fStars[i]->fDecCurrentEpoch = dec * 180. / TMath::Pi();
 		fStars[i]->fRACurrentEpoch = ra * 180. / TMath::Pi();
@@ -1332,7 +1325,12 @@ unsigned int VStarCatalogue::setFOV( string ra_hour, string dec, double FOV_x, d
 
 
 /*!
-    all values in [deg]
+
+    loop over the current star catalogue and fill a list with stars in a box
+
+    centred around ra/dec with width iFOV_x/iFOV_y
+
+    all angles in [deg]
 */
 unsigned int VStarCatalogue::setFOV( double ra, double dec, double iFOV_x, double iFOV_y, bool bJ2000, double iBrightness, string iBand )
 {
@@ -1369,7 +1367,7 @@ unsigned int VStarCatalogue::setFOV( double ra, double dec, double iFOV_x, doubl
 		double y = 0.;
 		int ierr = 0;
 		
-		slaDs2tp( iRA / degrad, iDec / degrad, ra / degrad, dec / degrad, &x, &y, &ierr );
+		VAstronometry::vlaDs2tp( iRA / degrad, iDec / degrad, ra / degrad, dec / degrad, &x, &y, &ierr );
 		
 		x *= degrad;
 		y *= degrad;

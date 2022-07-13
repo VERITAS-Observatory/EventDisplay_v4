@@ -1,9 +1,6 @@
 /*! \class VPointingDB
     \brief read pointing data from the database
 
-
-    \author
-    Gernot Maier
 */
 
 #include "VPointingDB.h"
@@ -331,7 +328,7 @@ void VPointingDB::getDBMJDTime( string itemp, int& MJD, double& Time, bool bStri
 			ms = 0;
 		}
 		// calculate MJD
-		slaCldj( y, m, d, &gMJD, &l );
+		VAstronometry::vlaCldj( y, m, d, &gMJD, &l );
 		MJD = ( int )gMJD;
 		Time = h * 60.*60. + min * 60. + s + ms / 1.e3;
 	}
@@ -486,7 +483,7 @@ bool VPointingDB::readPointingFromVPMTextFile( string iDirectory )
 }
 
 /*
-    read calibrated (default) pointing monitor data from DB  (JG)
+    read calibrated (default) pointing monitor data from DB
 */
 bool VPointingDB::readPointingCalibratedVPMFromDB()
 {
@@ -606,7 +603,6 @@ bool VPointingDB::readPointingCalibratedVPMFromDB()
 		fDBTime.push_back( iITime * 86400. );
 		fDBTelElevationRaw.push_back( 0. );
 		fDBTelAzimuthRaw.push_back( 0. );
-		
 		iRA = atof( db_row->GetField( 1 ) );
 		iDec = atof( db_row->GetField( 2 ) );
         fDBTelRA.push_back( iRA * degrad );
@@ -624,7 +620,7 @@ bool VPointingDB::readPointingCalibratedVPMFromDB()
 }
 
 /*
-    read uncalibrated pointing monitor data from DB  (JG)
+    read uncalibrated pointing monitor data from DB
 */
 bool VPointingDB::readPointingUncalibratedVPMFromDB()
 {
@@ -638,7 +634,7 @@ bool VPointingDB::readPointingUncalibratedVPMFromDB()
 	// get date in year/month/day
 	int year, month, day, j_status;
 	double fracday;
-	slaDjcl( ( double )fMJDRunStart, &year, &month, &day, &fracday, &j_status );
+	VAstronometry::vlaDjcl( ( double )fMJDRunStart, &year, &month, &day, &fracday, &j_status );
 	year = year * 10000;
 	month = month * 100;
 	
@@ -702,7 +698,6 @@ bool VPointingDB::readPointingUncalibratedVPMFromDB()
 	
 	// hard-wired time bin (in sec) to check for VPM data //
 	int tbinwidth = 10;
-	
 	// hard-wired minimum fraction of run missing VPM data //
 	double vpmrunfrac = 0.10;
 	
@@ -718,11 +713,10 @@ bool VPointingDB::readPointingUncalibratedVPMFromDB()
 	
 	double starttime = startMJD * 86400.;
 	int nbad = 0;
-	bool timegood;
 	
 	for( int k = 0; k < timebin; k++ )
 	{
-		timegood = false;
+		bool timegood = false;
 		
 		for( uint32_t i = 0; i < VPMcalibratedPointing.size(); i++ )
 		{
@@ -787,14 +781,14 @@ bool VPointingDB::readPointingFromDB()
 	// get date in year/month/day
 	int year, month, day, j_status;
 	double fracday;
-	slaDjcl( ( double )fMJDRunStart, &year, &month, &day, &fracday, &j_status );
+	VAstronometry::vlaDjcl( ( double )fMJDRunStart, &year, &month, &day, &fracday, &j_status );
 	
 	int hour = ( int )( fTimeRunStart / 3600. );
 	int minute = ( int )( ( fTimeRunStart - hour * 3600. ) / 60. );
 	int sec = ( int )( fTimeRunStart - hour * 3600. - minute * 60. );
 	sprintf( iDate1, "%d%02d%02d%02d%02d%02d000", ( int )year, ( int )month, ( int )day, hour, minute, sec );
 	
-	slaDjcl( ( double )fMJDRunStopp, &year, &month, &day, &fracday, &j_status );
+	VAstronometry::vlaDjcl( ( double )fMJDRunStopp, &year, &month, &day, &fracday, &j_status );
 	hour = ( int )( fTimeRunStopp / 3600. );
 	minute = ( int )( ( fTimeRunStopp - hour * 3600. ) / 60. );
 	sec = ( int )( fTimeRunStopp - hour * 3600. - minute * 60. );
@@ -944,19 +938,17 @@ TTree* VPointingDB::getTreePointingDB()
 	return tD;
 }
 
-
-void VPointingDB::getHorizonCoordinates( int MJD, double time, double dec, double ra, double& az, double& ze )
+/*
+ *
+ *
+ */
+void VPointingDB::getHorizonCoordinates( int MJD, double time, double decJ2000, double raJ2000, double& az, double& ze )
 {
-	ra /= degrad;
-	dec /= degrad;
+    raJ2000 /= degrad;
+    decJ2000 /= degrad;
 	
 	// first precess target to current epoch
-	int  oy, om, od, j, ny, nd;
-	double ofd, ofy;
-	slaDjcl( MJD, &oy, &om, &od, &ofd, &j );
-	slaClyd( oy, om, od, &ny, &nd, &j );
-	ofy = ny + nd / 365.25;
-	slaPreces( "FK5", 2000.0, ofy, &ra, &dec );
+    VAstronometry::vlaPreces( 2451545.0 - 2400000.5, (double)(MJD+0.5), &raJ2000, &decJ2000 );
 	
 	// convert ra into hour angle
 	double ha = 0.;
@@ -965,14 +957,14 @@ void VPointingDB::getHorizonCoordinates( int MJD, double time, double dec, doubl
 	// convert time to fraction of a day
 	iTime = time / 86400.;
 	// get Greenwich sideral time
-	iSid = slaGmsta( ( double )MJD, iTime );
+    iSid = VAstronometry::vlaGmsta( ( double )MJD, iTime );
 	// calculate local sideral time
 	iSid = iSid - fObsLongitude;
 	// calculate right ascension
-	ha = slaDranrm( iSid - ra );
+    ha = VAstronometry::vlaDranrm( iSid - raJ2000 );
 	// calculate equatorial coordinates
 	double el = 0.;
-	slaDe2h( ha, dec, fObsLatitude, &az, &el );
+    VAstronometry::vlaDe2h( ha, decJ2000, fObsLatitude, &az, &el );
 	el *= degrad;
 	
 	ze = 90. - el;

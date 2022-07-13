@@ -139,7 +139,7 @@ class VAnaSumRunParameterDataClass : public TNamed
         {
             return fRunOn < x.fRunOn;
         }
-		ClassDef( VAnaSumRunParameterDataClass, 2 );
+		ClassDef( VAnaSumRunParameterDataClass, 3 );
 };
 
 class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
@@ -197,10 +197,6 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		int  fDeadTimeCalculationMethod;
 		
 		int f2DAcceptanceMode ; // USE2DACCEPTANCE
-		
-		// advanced analysis codes
-		bool fModel3D;
-		bool fDirectionModel3D;
 		
         // add all events to DL3 tree, no gh cuts but add BDT score and IsGamma 
         bool fWriteAllEvents;

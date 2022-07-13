@@ -21,12 +21,8 @@ Documentation
 -------------
 
 INSTALL   	               information on installation the analysis package, dependencies, environmental variables
-README.CTA                     description of a typical CTA analysis
 README.VERITAS.quick_summary   description of a typical VERITAS analysis
 AUTHORS		               author description
-
-A brief description of the analysis methods can be found on the following webpage:
-https://znwiki3.ifh.de/CTA/Eventdisplay%20Software
 
 Description and command line options for the different software parts:
 

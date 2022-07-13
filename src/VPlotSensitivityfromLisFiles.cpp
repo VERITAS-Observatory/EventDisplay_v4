@@ -1,7 +1,7 @@
 /*! \file VPlotSensitivityfromLisFiles
     \brief plot sensitivity parameters from lis files
 
-    \author Gernot Maier
+    
 */
 
 #include "VPlotSensitivityfromLisFiles.h"
