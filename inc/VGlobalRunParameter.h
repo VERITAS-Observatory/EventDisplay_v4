@@ -78,10 +78,10 @@ class VGlobalRunParameter
 		}
 		string       getDirectory_EVNDISPCalibrationData()
 		{
-            return fEVNDISPAnaDataDirectory + "/Calibration/";
-        }
-        string       getDirectory_EVNDISPCalibrationData_perRun()
-        {
+			return fEVNDISPAnaDataDirectory + "/Calibration/";
+		}
+		string       getDirectory_EVNDISPCalibrationData_perRun()
+		{
 			return fEVNDISPCalibrationDataDirectory + "/Calibration/";
 		}
 		string       getDirectory_EVNDISPDetectorGeometry()

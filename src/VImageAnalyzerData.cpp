@@ -77,7 +77,7 @@ void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxCh
 	fPulseTimingUncorrected.resize( ipulsetiminglevel, fSums );
 	fPulseTimingCorrected.resize( ipulsetiminglevel, fSums );
 	fPulseTimingAverageTime.resize( iChannels, 0. );
-    fPulseTimingAverageTimeCorrected.resize( iChannels, 0. );
+	fPulseTimingAverageTimeCorrected.resize( iChannels, 0. );
 	fTCorrectedSumLast.resize( iChannels, 0 );
 	fTCorrectedSumFirst.resize( iChannels, 0 );
 	fCurrentSummationWindow.resize( iChannels, 0 );
@@ -221,16 +221,16 @@ vector<unsigned int>& VImageAnalyzerData::getFADCstopTrigChannelID()
 }
 
 /*
- * read special channel configuration 
+ * read special channel configuration
  * (e.g. channels occupied by L2)
  *
  * read through put correction from file
  *
  * use special channel for this (although it is per telescope)
  */
-bool VImageAnalyzerData::readSpecialChannels( int iRunNumber, string iEpoch, 
-                                              string ispecialchannelfile, 
-                                              string ithroughputfile, string iDirectory )
+bool VImageAnalyzerData::readSpecialChannels( int iRunNumber, string iEpoch,
+		string ispecialchannelfile,
+		string ithroughputfile, string iDirectory )
 {
 	if( fSpecialChannel )
 	{
@@ -241,7 +241,7 @@ bool VImageAnalyzerData::readSpecialChannels( int iRunNumber, string iEpoch,
 		fSpecialChannel = new VSpecialChannel( fTelID );
 	}
 	fSpecialChannel->readSpecialChannels( iRunNumber, ispecialchannelfile, iDirectory );
-        fSpecialChannel->readThroughput( iEpoch, ithroughputfile, iDirectory, fNChannels );
+	fSpecialChannel->readThroughput( iEpoch, ithroughputfile, iDirectory, fNChannels );
 	
 	return !fSpecialChannel->isZombie();
 }
@@ -258,9 +258,12 @@ double VImageAnalyzerData::getHIGHQE_gainfactor( unsigned int iChannel )
 
 valarray<double>& VImageAnalyzerData::getTraceAverageTime( bool iCorrected )
 {
-     if( iCorrected ) return fPulseTimingAverageTimeCorrected;
-
-     return fPulseTimingAverageTime;
+	if( iCorrected )
+	{
+		return fPulseTimingAverageTimeCorrected;
+	}
+	
+	return fPulseTimingAverageTime;
 }
 
 valarray<double>& VImageAnalyzerData::getTZeros( bool iCorrected )

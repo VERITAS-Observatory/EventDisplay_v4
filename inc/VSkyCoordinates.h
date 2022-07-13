@@ -168,11 +168,11 @@ class VSkyCoordinates
 		{
 			fTelRA  = iTelRA_deg * TMath::DegToRad();
 		}
-        void setTelRADec_deg( pair< double, double > iTelRADec_deg )
-        {
-            fTelRA = iTelRADec_deg.first * TMath::DegToRad();
-            fTelDec = iTelRADec_deg.second * TMath::DegToRad();
-        }
+		void setTelRADec_deg( pair< double, double > iTelRADec_deg )
+		{
+			fTelRA = iTelRADec_deg.first * TMath::DegToRad();
+			fTelDec = iTelRADec_deg.second * TMath::DegToRad();
+		}
 		void   setTelAzimuth( double iTelAz )
 		{
 			fTelAzimuth = iTelAz;    //!< set telescope azimuth (e.g.for MC)

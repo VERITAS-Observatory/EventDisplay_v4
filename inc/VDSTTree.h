@@ -137,7 +137,7 @@ class VDSTTree
 		
 		//////////////////////////////////////////////////////////////////////////////////////
 		VDSTTree();
-	       ~VDSTTree() {}
+		~VDSTTree() {}
 		map< unsigned int, float> getArrayConfig()
 		{
 			return fDST_list_of_telescopes;
@@ -349,7 +349,7 @@ class VDSTTree
 		{
 			return fDSTTel_yoff;
 		}
-                int          getDSTTelescopeNumber( unsigned int iTelHyperArray_ID );
+		int          getDSTTelescopeNumber( unsigned int iTelHyperArray_ID );
 		
 		void         fillDSTMeanPulseTiming( unsigned int iTelID, unsigned int iChannelID, double iTime, int iNSamples = 0 );
 		double       getDSTMeanPulseTimingPerTelescope( unsigned int iTelID );

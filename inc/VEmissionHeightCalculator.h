@@ -38,12 +38,12 @@ class VEmissionHeightCalculator
 		
 		double getTelescopeDistanceSC( unsigned int iTel1, unsigned int iTel2, double az, double z );
 		double imageDistance( double c1x, double c2x, double c1y, double c2y );
-							
+		
 	public:
 	
 		VEmissionHeightCalculator();
 		~VEmissionHeightCalculator();
-        double getEmissionHeight( double* cen_x, double* cen_y, double* size, double az, double el );
+		double getEmissionHeight( double* cen_x, double* cen_y, double* size, double az, double el );
 		double getMeanEmissionHeight()
 		{
 			return fEmissionHeight;
@@ -60,7 +60,7 @@ class VEmissionHeightCalculator
 		{
 			return fNTelPairs;
 		}
-        void setTelescopePositions( vector< float > x, vector< float > y, vector< float > z );
+		void setTelescopePositions( vector< float > x, vector< float > y, vector< float > z );
 		void setTelescopePositions( unsigned int ntel, double* x, double* y, double* z );
 };
 #endif

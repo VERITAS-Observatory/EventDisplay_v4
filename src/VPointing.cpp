@@ -111,7 +111,7 @@ void VPointing::getPointingFromDB( int irun, string iTCorrection, string iVPMDir
 		cout << endl;
 		cout << "FATAL ERROR: cannot connect to VERITAS database" << endl;
 		cout << "exiting..." << endl;
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 #else
 	fPointingDB = 0;
@@ -137,13 +137,13 @@ bool VPointing::updatePointingfromDB( int MJD, double iTime )
 		
 		if( fEventStatus != 3 )
 		{
-            // calculate pointing error in camera coordinates
+			// calculate pointing error in camera coordinates
 			double iPx = 0.;
 			double iPy = 0.;
 			int j = 0;
 			VAstronometry::vlaDs2tp( fTelAzimuthCalculated / TMath::RadToDeg(), fTelElevationCalculated / TMath::RadToDeg(),
-					  fTelAzimuthDB / TMath::RadToDeg(), fTelElevationDB / TMath::RadToDeg(),
-					  &iPx, &iPy, &j );
+									 fTelAzimuthDB / TMath::RadToDeg(), fTelElevationDB / TMath::RadToDeg(),
+									 &iPx, &iPy, &j );
 			if( j == 0 )
 			{
 				// azimuth from North to East
@@ -241,37 +241,37 @@ void VPointing::initializePointingTree()
 	fPointingTree = new TTree( hname, htitle );
 	fPointingTree->Branch( "MJD", &fMJD, "MJD/i" );
 	fPointingTree->Branch( "Time", &fTime, "Time/D" );
-        // elevation / azimuth for target 
-        // (calculated from target coordinates in run parameters)
+	// elevation / azimuth for target
+	// (calculated from target coordinates in run parameters)
 	fPointingTree->Branch( "TargetAzimuth", &fTargetAzimuth, "TargetAzimuth/D" );
 	fPointingTree->Branch( "TargetElevation", &fTargetElevation, "TargetElevation/D" );
-        // ra / dec for target for J2000
-        // (fixed target coordinates from  run parameters)
+	// ra / dec for target for J2000
+	// (fixed target coordinates from  run parameters)
 	fPointingTree->Branch( "TargetRAJ2000", &fTargetRAJ2000, "TargetRAJ2000/D" );
 	fPointingTree->Branch( "TargetDecJ2000", &fTargetDecJ2000, "TargetDecJ2000/D" );
-        // ra / dec for target for current epoch
-        // (calcualted from target coordinates in run parameters)
+	// ra / dec for target for current epoch
+	// (calcualted from target coordinates in run parameters)
 	fPointingTree->Branch( "TargetRA", &fTargetRA, "TargetRA/D" );
 	fPointingTree->Branch( "TargetDec", &fTargetDec, "TargetDec/D" );
-        // elevation / azimuth for telescopes
-        // (default: from DB (pointing monitior); otherwise calculate from target coordinates or vbf values)
-        // (so default means that TelAzimuth = TelAzimuthDB and TelElevation = TelElevationDB)
+	// elevation / azimuth for telescopes
+	// (default: from DB (pointing monitior); otherwise calculate from target coordinates or vbf values)
+	// (so default means that TelAzimuth = TelAzimuthDB and TelElevation = TelElevationDB)
 	fPointingTree->Branch( "TelAzimuth", &fTelAzimuth, "TelAzimuth/D" );
 	fPointingTree->Branch( "TelElevation", &fTelElevation, "TelElevation/D" );
-        // flag indicated pointing type: see beginning of VPointing::getPointingFromDB() for the meaning of these flags
+	// flag indicated pointing type: see beginning of VPointing::getPointingFromDB() for the meaning of these flags
 	fPointingTree->Branch( "PointingType", &fPointingType, "fPointingType/i" );
-        // eleation / azimuth calculated from target coordinates and wobble offset
+	// eleation / azimuth calculated from target coordinates and wobble offset
 	fPointingTree->Branch( "TelAzimuthCalculated", &fTelAzimuthCalculated, "TelAzimuthCalculated/F" );
 	fPointingTree->Branch( "TelElevationCalculated", &fTelElevationCalculated, "TelElevationCalculated/F" );
-        // elevation / azimuth for telescopes from DB (pointing monitor)
+	// elevation / azimuth for telescopes from DB (pointing monitor)
 	fPointingTree->Branch( "TelAzimuthDB", &fTelAzimuthDB, "TelAzimuthDB/F" );
 	fPointingTree->Branch( "TelElevationDB", &fTelElevationDB, "TelElevationDB/F" );
-        // difference between expected az/el from target coordinates and DB el/az
+	// difference between expected az/el from target coordinates and DB el/az
 	fPointingTree->Branch( "PointingErrorX", &fPointingErrorX, "PointingErrorX/F" );
 	fPointingTree->Branch( "PointingErrorY", &fPointingErrorY, "PointingErrorY/F" );
-        // status of pointing results -> never used and need to be checked
+	// status of pointing results -> never used and need to be checked
 	fPointingTree->Branch( "EventStatus", &fEventStatus, "EventStatus/i" );
-        // telescope pointing directions in ra/dec
+	// telescope pointing directions in ra/dec
 	fPointingTree->Branch( "TelRAJ2000", &fTelRAJ2000, "TelRAJ2000/D" );
 	fPointingTree->Branch( "TelDecJ2000", &fTelDecJ2000, "TelDecJ2000/D" );
 	fPointingTree->Branch( "TelRA", &fTelRA, "TelRA/D" );

@@ -46,9 +46,9 @@ class VTMVARunData : public TNamed
 		string            fOutputFileName;
 		string            fOutputDirectoryName;
 		vector< vector< TFile* > >  fOutputFile;
-
-                // training options
-                bool              fCheckValidityOfInputVariables;
+		
+		// training options
+		bool              fCheckValidityOfInputVariables;
 		
 		// training data
 		double            fSignalWeight;

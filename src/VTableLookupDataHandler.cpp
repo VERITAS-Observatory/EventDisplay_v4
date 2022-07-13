@@ -13,14 +13,14 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	if( !fTLRunParameter )
 	{
 		cout << "VTableLookupDataHandler::VTableLookupDataHandler error: to table lookup run parameters" << endl;
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 	fDebug = fTLRunParameter->fDebug;
-    if( fDebug > 0 )
-    {
-        cout << "VTableLookupDataHandler::VTableLookupDataHandler" << endl;
-    }
-    
+	if( fDebug > 0 )
+	{
+		cout << "VTableLookupDataHandler::VTableLookupDataHandler" << endl;
+	}
+	
 	fwrite = iwrite;
 	fNEntries = fTLRunParameter->fNentries;
 	fEventDisplayFileFormat = 2;
@@ -33,7 +33,7 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	fNTelComb = 0;
 	fTtelconfig = 0;
 	foutputfile = "";
-
+	
 	fEmissionHeightCalculator = new VEmissionHeightCalculator();
 	
 	fEventStatus = true;
@@ -56,10 +56,10 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	fEventCounter = 0;
 	
 	fEventWeight = 1.;
-    /////////////////////////////////////////////////////////////////////////////////////
-    // values needed by the optional stereo reconstruction
-    fSSR_AxesAngles_min = 0.;
-    fSSR_NImages_min    = 0;
+	/////////////////////////////////////////////////////////////////////////////////////
+	// values needed by the optional stereo reconstruction
+	fSSR_AxesAngles_min = 0.;
+	fSSR_NImages_min    = 0;
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	// weighting of energy spectrum
@@ -73,13 +73,13 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	
 	// MC spectra histograms
 	hisList = new TList();
-    hE0mc = new TH1D( "hE0mc", "MC energy spectrum", 1175, -2., 2.7 );
+	hE0mc = new TH1D( "hE0mc", "MC energy spectrum", 1175, -2., 2.7 );
 	hE0mc->SetXTitle( "log_{10} energy_{MC} [TeV]" );
 	hE0mc->SetYTitle( "number of events" );
 	hE0mc->Sumw2();
 	hisList->Add( hE0mc );
 	
-    hDE0mc = new TH2D( "hDE0mc", "distance vs. MC primary energy", 1175, -2., 2.7, 1000, 0., 2000. );
+	hDE0mc = new TH2D( "hDE0mc", "distance vs. MC primary energy", 1175, -2., 2.7, 1000, 0., 2000. );
 	hDE0mc->SetXTitle( "log_{10} energy_{MC} [TeV]" );
 	hDE0mc->SetYTitle( "distance to shower core [m]" );
 	hDE0mc->SetZTitle( "number of events" );
@@ -92,7 +92,7 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	hXYmc->SetYTitle( "y [m]" );
 	hisList->Add( hXYmc );
 	
-    hWE0mc = new TH2D( "hWE0mc", "ang. dist. vs. energy", 1175, -2., 2.75, 500, 0., 10. );
+	hWE0mc = new TH2D( "hWE0mc", "ang. dist. vs. energy", 1175, -2., 2.75, 500, 0., 10. );
 	hWE0mc->SetTitle( "ang. distance vs. primary energy" );
 	hWE0mc->SetXTitle( "log_{10} E_{MC} [TeV]" );
 	hWE0mc->SetYTitle( "distance to camera center [deg]" );
@@ -104,13 +104,13 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	hisList->Add( hZe );
 	
 	// same with triggered events
-    hE0trig = new TH1D( "hE0trig", "MC energy spectrum (triggered events)", 1175, -2., 2.7 );
+	hE0trig = new TH1D( "hE0trig", "MC energy spectrum (triggered events)", 1175, -2., 2.7 );
 	hE0trig->SetXTitle( "log_{10} energy_{MC} [TeV]" );
 	hE0trig->SetYTitle( "number of events" );
 	hE0trig->Sumw2();
 	hisList->Add( hE0trig );
 	
-    hDE0trig = new TH2D( "hDE0trig", "distance vs. MC primary energy (triggered events)", 1175, -2., 2.7, 1000, 0., 2000. );
+	hDE0trig = new TH2D( "hDE0trig", "distance vs. MC primary energy (triggered events)", 1175, -2., 2.7, 1000, 0., 2000. );
 	hDE0trig->SetXTitle( "log_{10} energy_{MC} [TeV]" );
 	hDE0trig->SetYTitle( "distance to shower core [m]" );
 	hDE0trig->SetZTitle( "number of events" );
@@ -137,8 +137,8 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	
 	resetAll();
 	
-    fDispAnalyzerDirection = 0;
-    fDispAnalyzerDirectionError = 0;
+	fDispAnalyzerDirection = 0;
+	fDispAnalyzerDirectionError = 0;
 }
 
 /*
@@ -230,7 +230,7 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
 			cout << "unknown eventdisplay file format: " << fEventDisplayFileFormat << endl;
 			cout << "(possible old format? Format version: " << fEventDisplayFileFormat << ")" << endl;
 			cout << "...exiting" << endl;
-            exit( EXIT_FAILURE );
+			exit( EXIT_FAILURE );
 		}
 		if( iNE == -1 )
 		{
@@ -248,16 +248,16 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
 			return true;
 		}
 		
-        // calculate theta2
+		// calculate theta2
 		if( !fIsMC )
 		{
 			ftheta2 = ( fYoff_derot - fWobbleN ) * ( fYoff_derot - fWobbleN )
-                    + ( fXoff_derot - fWobbleE ) * ( fXoff_derot - fWobbleE );
+					  + ( fXoff_derot - fWobbleE ) * ( fXoff_derot - fWobbleE );
 		}
 		else
 		{
 			ftheta2 = ( fXoff - fMCxoff ) * ( fXoff - fMCxoff )
-                    + ( fYoff - fMCyoff ) * ( fYoff - fMCyoff );
+					  + ( fYoff - fMCyoff ) * ( fYoff - fMCyoff );
 		}
 		
 		// calculate distances
@@ -288,13 +288,13 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
  */
 int VTableLookupDataHandler::fillNextEvent( bool bShort )
 {
-    ///////////////////////////////////////////////////////////////////////////////
-    // read partical event for quick reconstruction quality assessment
+	///////////////////////////////////////////////////////////////////////////////
+	// read partical event for quick reconstruction quality assessment
 	if( !fshowerpars->GetEntry( fEventCounter ) )
 	{
 		return -1;
 	}
-
+	
 	// count all events
 	fNStats_All++;
 	////////////////////////////////////////////////////
@@ -305,7 +305,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		cout << "VTableLookupDataHandler::fillNextEvent() error, invalid array reconstruction record" << endl;
 		cout << "\t maximum number of records are " << fNMethods << " (request is " << fMethod << ")" << endl;
 		cout << "exiting..." << endl;
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 	fNImages = fshowerpars->NImages[fMethod];
 	fchi2 = fshowerpars->Chi2[fMethod];
@@ -335,11 +335,11 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			fMCycos = fshowerpars->MCycos;
 		}
 	}
-    pair<float, float > i_array_pointing = getArrayPointing();
-    fArrayPointing_Elevation = i_array_pointing.first;
-    fArrayPointing_Azimuth = i_array_pointing.second;
-    fArrayPointing_RotationAngle = getArrayPointingDeRotationAngle();
-
+	pair<float, float > i_array_pointing = getArrayPointing();
+	fArrayPointing_Elevation = i_array_pointing.first;
+	fArrayPointing_Azimuth = i_array_pointing.second;
+	fArrayPointing_RotationAngle = getArrayPointingDeRotationAngle();
+	
 	
 	// the following variables are not set in table filling mode
 	if( !fwrite )
@@ -382,17 +382,17 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		{
 			LTrig = ( ULong64_t )fshowerpars->LTrig;
 		}
-    } // end (!fwrite)
+	} // end (!fwrite)
 	
 	fZe = fshowerpars->Ze[fMethod];
 	fAz = fshowerpars->Az[fMethod];
 	fXcore = fshowerpars->Xcore[fMethod];
 	fYcore = fshowerpars->Ycore[fMethod];
-    // return if stereo reconstruction was not successful
-    // (don't do this if stereo reconstruction is
-    //  repeated)
-    if( !fTLRunParameter->fRerunStereoReconstruction
-     && ( TMath::IsNaN( fXcore ) || TMath::IsNaN( fYcore ) ) )
+	// return if stereo reconstruction was not successful
+	// (don't do this if stereo reconstruction is
+	//  repeated)
+	if( !fTLRunParameter->fRerunStereoReconstruction
+			&& ( TMath::IsNaN( fXcore ) || TMath::IsNaN( fYcore ) ) )
 	{
 		fXcore =  -999999.;
 		fYcore =  -999999.;
@@ -404,26 +404,26 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		}
 		return 0;
 	}
-    // standard stereo reconstruction
+	// standard stereo reconstruction
 	fXoff = fshowerpars->Xoff[fMethod];
 	fYoff = fshowerpars->Yoff[fMethod];
 	fXoff_derot = fshowerpars->XoffDeRot[fMethod];
 	fYoff_derot = fshowerpars->YoffDeRot[fMethod];
 	fDispDiff = fshowerpars->DispDiff[fMethod];
 	
-    ///////////////////////////////////////////////////////
-    // set telescope selection variables
-    
-    // bit coded image selection
-    // (note limitation in number of telescopes (<64)
+	///////////////////////////////////////////////////////
+	// set telescope selection variables
+	
+	// bit coded image selection
+	// (note limitation in number of telescopes (<64)
 	fImgSel = ( ULong64_t )fshowerpars->ImgSel[fMethod];
 	unsigned int ii = 0;
 	for( unsigned int i = 0; i < getNTelTypes(); i++ )
 	{
 		NImages_Ttype[i] = 0;
 	}
-    // list of selected telescopes
-    // (but loop over all telescopes!)
+	// list of selected telescopes
+	// (but loop over all telescopes!)
 	for( unsigned int i = 0; i < getNTel(); i++ )
 	{
 		fImgSel_list[i] = ( bool )fshowerpars->ImgSel_list[fMethod][i];
@@ -465,11 +465,11 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			fEventStatus = true;
 		}
 	}
-    // (end of accessing showerpars tree)
-    //////////////////////////////////////////
+	// (end of accessing showerpars tree)
+	//////////////////////////////////////////
 	
-    ////////////////////////////////////////////
-    // initialize tpars trees
+	////////////////////////////////////////////
+	// initialize tpars trees
 	// loop over all telescopes
 	bitset<8 * sizeof( unsigned long )> i_nimage; // for imagepattern
 	i_nimage.reset();
@@ -483,8 +483,8 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		{
 			fReadTPars = true;
 		}
-        // check if the tpars for this telescope should be
-        // read
+		// check if the tpars for this telescope should be
+		// read
 		if( ( fTLRunParameter->bWriteReconstructedEventsOnly >= 0 )
 				|| fTLRunParameter->bWriteReconstructedEventsOnly == -2 || fwrite )
 		{
@@ -503,9 +503,9 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			if( !ftpars[i] )
 			{
 				cout << "VTableLookupDataHandler::fillNextEvent error:";
-                cout << "tree tpars not found (telescope " << i + 1 << ")" << endl;
+				cout << "tree tpars not found (telescope " << i + 1 << ")" << endl;
 				cout << "\t(run " << runNumber << ", " << eventNumber << ")" << endl;
-                exit( EXIT_FAILURE );
+				exit( EXIT_FAILURE );
 			}
 			ftpars[i]->GetEntry( fEventCounter );
 			
@@ -516,34 +516,34 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			ffracLow[i] = ftpars[i]->fracLow;
 			fwidth[i] = ftpars[i]->width;
 			flength[i] = ftpars[i]->length;
-            ftgrad_x[i] = ftpars[i]->tgrad_x;
-
-            if( i < fpointingCorrections.size() && fpointingCorrections[i]
-                    && fpointingCorrections[i]->is_initialized() )
-            {
-                fpointingCorrections[i]->getEntry( fEventCounter );
-                fcen_x[i] = fpointingCorrections[i]->getCorrected_cen_x( ftpars[i]->cen_x );
-                fcen_y[i] = fpointingCorrections[i]->getCorrected_cen_y( ftpars[i]->cen_y );
-                if( ftpars[i]->has_sdevxy() )
-                {
-                    float phi = fpointingCorrections[i]->getCorrected_phi(
-                            ftpars[i]->cen_x,
-                            ftpars[i]->cen_y,
-                            ftpars[i]->f_d,
-                            ftpars[i]->f_s,
-                            ftpars[i]->f_sdevxy );
-                    fcosphi[i] = cos( phi );
-                    fsinphi[i] = sin( phi );
-                }
-            }
-            else
-            {
-                fcen_x[i] = ftpars[i]->cen_x;
-                fcen_y[i] = ftpars[i]->cen_y;
-                fcosphi[i] = ftpars[i]->cosphi;
-                fsinphi[i] = ftpars[i]->sinphi;
-            }
-        
+			ftgrad_x[i] = ftpars[i]->tgrad_x;
+			
+			if( i < fpointingCorrections.size() && fpointingCorrections[i]
+					&& fpointingCorrections[i]->is_initialized() )
+			{
+				fpointingCorrections[i]->getEntry( fEventCounter );
+				fcen_x[i] = fpointingCorrections[i]->getCorrected_cen_x( ftpars[i]->cen_x );
+				fcen_y[i] = fpointingCorrections[i]->getCorrected_cen_y( ftpars[i]->cen_y );
+				if( ftpars[i]->has_sdevxy() )
+				{
+					float phi = fpointingCorrections[i]->getCorrected_phi(
+									ftpars[i]->cen_x,
+									ftpars[i]->cen_y,
+									ftpars[i]->f_d,
+									ftpars[i]->f_s,
+									ftpars[i]->f_sdevxy );
+					fcosphi[i] = cos( phi );
+					fsinphi[i] = sin( phi );
+				}
+			}
+			else
+			{
+				fcen_x[i] = ftpars[i]->cen_x;
+				fcen_y[i] = ftpars[i]->cen_y;
+				fcosphi[i] = ftpars[i]->cosphi;
+				fsinphi[i] = ftpars[i]->sinphi;
+			}
+			
 			if( fsize[i] > SizeSecondMax_temp )
 			{
 				if( fsize[i] > SizeFirstMax_temp )
@@ -556,7 +556,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 					SizeSecondMax_temp = fsize[i];
 				}
 			}
-            fCurrentNoiseLevel[i] = ftpars[i]->meanPedvar_Image;
+			fCurrentNoiseLevel[i] = ftpars[i]->meanPedvar_Image;
 			if( !bShort )
 			{
 				fmeanPedvar_ImageT[i] = ftpars[i]->meanPedvar_Image;
@@ -582,8 +582,8 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		}
 		fweight[i] = 1.;
 		
-        // bit coding for telescope used in analysis
-        // (small arrays only)
+		// bit coding for telescope used in analysis
+		// (small arrays only)
 		if( !bShort && fntubes[i] > 4 && i < i_nimage.size() && i < 10 )
 		{
 			i_nimage.set( i, 1 );
@@ -595,13 +595,13 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 	{
 		fSizeSecondMax = SizeSecondMax_temp;
 	}
-    //////////////////////////////////////////////////////////
-    // redo the stereo (direction and core) reconstruction
-    //
-    if( fTLRunParameter->fRerunStereoReconstruction )
-    {
-        doStereoReconstruction();
-    }
+	//////////////////////////////////////////////////////////
+	// redo the stereo (direction and core) reconstruction
+	//
+	if( fTLRunParameter->fRerunStereoReconstruction )
+	{
+		doStereoReconstruction();
+	}
 	
 	fEventCounter++;
 	return 1;
@@ -619,137 +619,137 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 */
 void VTableLookupDataHandler::doStereoReconstruction()
 {
-    // save original values
-    fXoff_edisp = fXoff;
-    fYoff_edisp = fYoff;
-    ///////////////////////////
-    // stereo reconstruction
-    // (rcs_method4)
-    VSimpleStereoReconstructor i_SR;
-    // minimal value; just used to initialize disp method
-    i_SR.initialize( fSSR_NImages_min, fSSR_AxesAngles_min );
-    i_SR.reconstruct_direction_and_core( getNTel(),
-                                         fArrayPointing_Elevation, fArrayPointing_Azimuth,
-                                         fTelX, fTelY, fTelZ,
-                                         getSize( 1., true, false ),
-                                         fcen_x, fcen_y,
-                                         fcosphi, fsinphi,
-                                         fwidth, flength,
-                                         getWeight() );
-    // store results from line intersection for debugging
-    fXoff_intersect = i_SR.fShower_Xoffset;
-    fYoff_intersect = i_SR.fShower_Yoffset;
-     
-    ////////////////////////////////////////////////////////////////////
-    // DISP method for updated disp reconstruction
-    ////////////////////////////////////////////////////////////////////
-    if( fDispAnalyzerDirection
-        && fNImages <= ( int )fTLRunParameter->fRerunStereoReconstruction_BDTNImages_max )
-    {
-    
-        vector< float > iDispError( getNTel(), -9999. );
-        
-        ////////////////////////////////////////////////////////////////////
-        // estimate error on direction reconstruction from DISP method
-        ////////////////////////////////////////////////////////////////////
-        if( fDispAnalyzerDirectionError )
-        {
-            fDispAnalyzerDirectionError->calculateExpectedDirectionError(
-                getNTel(),
-                fArrayPointing_Elevation, fArrayPointing_Azimuth,
-                fTel_type,
-                getSize( 1., true, false ),
-                fcen_x, fcen_y,
-                fcosphi, fsinphi,
-                fwidth, flength,
-                fasym, ftgrad_x,
-                floss, fntubes,
-                getWeight(),
-                i_SR.fShower_Xoffset, i_SR.fShower_Yoffset,
-                fmeanPedvar_ImageT);
-                
-            // get estimated error on direction reconstruction
-            for( unsigned int t = 0; t < getNTel(); t++ )
-            {
-                iDispError[t] = fDispAnalyzerDirectionError->getDispErrorT( t );
-            }
-        }
-        
-        // use weighting calculated from disp error
-        fDispAnalyzerDirection->setDispErrorWeighting( fDispAnalyzerDirectionError != 0,
-                fTLRunParameter->fDispError_BDTWeight );
-        fDispAnalyzerDirection->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
-                                                fTLRunParameter->fmaxdist, 
-                                                fTLRunParameter->fmaxloss );
-        fDispAnalyzerDirection->calculateMeanDirection(
-            getNTel(),
-            fArrayPointing_Elevation, fArrayPointing_Azimuth,
-            fTel_type,
-            getSize( 1., true, false ),
-            fcen_x, fcen_y,
-            fcosphi, fsinphi,
-            fwidth, flength,
-            fasym, ftgrad_x,
-            floss, fntubes,
-            getWeight(),
-            i_SR.fShower_Xoffset, i_SR.fShower_Yoffset,
-            iDispError,
-            fmeanPedvar_ImageT );
-        // reconstructed direction by disp method:
-        fXoff = fDispAnalyzerDirection->getXcoordinate_disp();
-        fYoff = fDispAnalyzerDirection->getYcoordinate_disp();
-
-        // dispersion of disp values
-        fDispDiff = fDispAnalyzerDirection->getDispDiff();
-        fimg2_ang = fDispAnalyzerDirection->getAngDiff();
-        fchi2 = fDispDiff;
-        // for az / ze calculation
-        i_SR.fillShowerDirection( fXoff, fYoff );
-        fnxyoff = fDispAnalyzerDirection->getXYWeight_disp().size();
-        for( unsigned int t = 0; t < fnxyoff; t++ )
-        {
-            fXoff_T[t] = fDispAnalyzerDirection->getXcoordinate_disp( t );
-            fYoff_T[t] = fDispAnalyzerDirection->getYcoordinate_disp( t );
-            fWoff_T[t] = fDispAnalyzerDirection->getXYWeight_disp( t );
-            fDoff_T[t] = fDispAnalyzerDirection->get_disp( t );
-            fToff_T[t] = fDispAnalyzerDirection->get_disp_tel_list( t );
-        }
-    } 
-    ////////////////////////////////////////////////////////////////////
-    // Standard (intersection) method for all other cases
-    ////////////////////////////////////////////////////////////////////
-    else
-    {
-        fXoff  = i_SR.fShower_Xoffset;
-        fYoff  = i_SR.fShower_Yoffset;
-        fstdS  = i_SR.fShower_stdS;
-        fchi2  = i_SR.fShower_Chi2;
-        fDispDiff = i_SR.fShower_DispDiff;
-        fimg2_ang = i_SR.fiangdiff;
-        fXoff_derot = i_SR.fShower_Xoffset;
-        fYoff_derot = i_SR.fShower_Yoffset;
-        fstdS = i_SR.fShower_DispDiff;
-    }
-    
-    // overwrite the values read from the evndisp file with the newly
-    // calculated values
-    if( fIsMC )
-    {
-        fXoff_derot = fXoff; // MC only!
-        fYoff_derot = fYoff; // MC only!
-    }
-    // derotate coordinates
-    else
-    {
-         fXoff_derot = fXoff * cos( fArrayPointing_RotationAngle) 
-                     - fYoff * sin( fArrayPointing_RotationAngle );
-         fYoff_derot = fYoff * cos( fArrayPointing_RotationAngle )
-                     + fXoff * sin( fArrayPointing_RotationAngle );
-    }
-    fZe    = i_SR.fShower_Ze;
-    fAz    = i_SR.fShower_Az;
-    fXcore = i_SR.fShower_Xcore;
-    fYcore = i_SR.fShower_Ycore;
+	// save original values
+	fXoff_edisp = fXoff;
+	fYoff_edisp = fYoff;
+	///////////////////////////
+	// stereo reconstruction
+	// (rcs_method4)
+	VSimpleStereoReconstructor i_SR;
+	// minimal value; just used to initialize disp method
+	i_SR.initialize( fSSR_NImages_min, fSSR_AxesAngles_min );
+	i_SR.reconstruct_direction_and_core( getNTel(),
+										 fArrayPointing_Elevation, fArrayPointing_Azimuth,
+										 fTelX, fTelY, fTelZ,
+										 getSize( 1., true, false ),
+										 fcen_x, fcen_y,
+										 fcosphi, fsinphi,
+										 fwidth, flength,
+										 getWeight() );
+	// store results from line intersection for debugging
+	fXoff_intersect = i_SR.fShower_Xoffset;
+	fYoff_intersect = i_SR.fShower_Yoffset;
+	
+	////////////////////////////////////////////////////////////////////
+	// DISP method for updated disp reconstruction
+	////////////////////////////////////////////////////////////////////
+	if( fDispAnalyzerDirection
+			&& fNImages <= ( int )fTLRunParameter->fRerunStereoReconstruction_BDTNImages_max )
+	{
+	
+		vector< float > iDispError( getNTel(), -9999. );
+		
+		////////////////////////////////////////////////////////////////////
+		// estimate error on direction reconstruction from DISP method
+		////////////////////////////////////////////////////////////////////
+		if( fDispAnalyzerDirectionError )
+		{
+			fDispAnalyzerDirectionError->calculateExpectedDirectionError(
+				getNTel(),
+				fArrayPointing_Elevation, fArrayPointing_Azimuth,
+				fTel_type,
+				getSize( 1., true, false ),
+				fcen_x, fcen_y,
+				fcosphi, fsinphi,
+				fwidth, flength,
+				fasym, ftgrad_x,
+				floss, fntubes,
+				getWeight(),
+				i_SR.fShower_Xoffset, i_SR.fShower_Yoffset,
+				fmeanPedvar_ImageT );
+				
+			// get estimated error on direction reconstruction
+			for( unsigned int t = 0; t < getNTel(); t++ )
+			{
+				iDispError[t] = fDispAnalyzerDirectionError->getDispErrorT( t );
+			}
+		}
+		
+		// use weighting calculated from disp error
+		fDispAnalyzerDirection->setDispErrorWeighting( fDispAnalyzerDirectionError != 0,
+				fTLRunParameter->fDispError_BDTWeight );
+		fDispAnalyzerDirection->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
+												fTLRunParameter->fmaxdist,
+												fTLRunParameter->fmaxloss );
+		fDispAnalyzerDirection->calculateMeanDirection(
+			getNTel(),
+			fArrayPointing_Elevation, fArrayPointing_Azimuth,
+			fTel_type,
+			getSize( 1., true, false ),
+			fcen_x, fcen_y,
+			fcosphi, fsinphi,
+			fwidth, flength,
+			fasym, ftgrad_x,
+			floss, fntubes,
+			getWeight(),
+			i_SR.fShower_Xoffset, i_SR.fShower_Yoffset,
+			iDispError,
+			fmeanPedvar_ImageT );
+		// reconstructed direction by disp method:
+		fXoff = fDispAnalyzerDirection->getXcoordinate_disp();
+		fYoff = fDispAnalyzerDirection->getYcoordinate_disp();
+		
+		// dispersion of disp values
+		fDispDiff = fDispAnalyzerDirection->getDispDiff();
+		fimg2_ang = fDispAnalyzerDirection->getAngDiff();
+		fchi2 = fDispDiff;
+		// for az / ze calculation
+		i_SR.fillShowerDirection( fXoff, fYoff );
+		fnxyoff = fDispAnalyzerDirection->getXYWeight_disp().size();
+		for( unsigned int t = 0; t < fnxyoff; t++ )
+		{
+			fXoff_T[t] = fDispAnalyzerDirection->getXcoordinate_disp( t );
+			fYoff_T[t] = fDispAnalyzerDirection->getYcoordinate_disp( t );
+			fWoff_T[t] = fDispAnalyzerDirection->getXYWeight_disp( t );
+			fDoff_T[t] = fDispAnalyzerDirection->get_disp( t );
+			fToff_T[t] = fDispAnalyzerDirection->get_disp_tel_list( t );
+		}
+	}
+	////////////////////////////////////////////////////////////////////
+	// Standard (intersection) method for all other cases
+	////////////////////////////////////////////////////////////////////
+	else
+	{
+		fXoff  = i_SR.fShower_Xoffset;
+		fYoff  = i_SR.fShower_Yoffset;
+		fstdS  = i_SR.fShower_stdS;
+		fchi2  = i_SR.fShower_Chi2;
+		fDispDiff = i_SR.fShower_DispDiff;
+		fimg2_ang = i_SR.fiangdiff;
+		fXoff_derot = i_SR.fShower_Xoffset;
+		fYoff_derot = i_SR.fShower_Yoffset;
+		fstdS = i_SR.fShower_DispDiff;
+	}
+	
+	// overwrite the values read from the evndisp file with the newly
+	// calculated values
+	if( fIsMC )
+	{
+		fXoff_derot = fXoff; // MC only!
+		fYoff_derot = fYoff; // MC only!
+	}
+	// derotate coordinates
+	else
+	{
+		fXoff_derot = fXoff * cos( fArrayPointing_RotationAngle )
+					  - fYoff * sin( fArrayPointing_RotationAngle );
+		fYoff_derot = fYoff * cos( fArrayPointing_RotationAngle )
+					  + fXoff * sin( fArrayPointing_RotationAngle );
+	}
+	fZe    = i_SR.fShower_Ze;
+	fAz    = i_SR.fShower_Az;
+	fXcore = i_SR.fShower_Xcore;
+	fYcore = i_SR.fShower_Ycore;
 }
 
 /*
@@ -814,7 +814,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 	
 	//////////////////////////////////////////////////////////////////////////////////////
 	// get telescope configuration
-    // get it from the telescope configuration tree (if available), else assume two telescope setup
+	// get it from the telescope configuration tree (if available), else assume two telescope setup
 	fTtelconfig = new TChain( "telconfig" );
 	int iNFil_sum = 0;
 	for( unsigned int i = 0; i < finputfile.size(); i++ )
@@ -823,7 +823,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		if( iNFil == 0 )
 		{
 			cout << "error: no file(s) in chain" << endl;
-            exit( EXIT_FAILURE );
+			exit( EXIT_FAILURE );
 		}
 		iNFil_sum += iNFil;
 	}
@@ -835,12 +835,12 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		{
 			cout << "VTableLookupDataHandler::setInputFile() error: some file are not properly closed" << endl;
 			cout << "exit..." << endl;
-            exit( EXIT_FAILURE );
+			exit( EXIT_FAILURE );
 		}
 	}
 	
-    ////////////////////////////////////
-    // read in telescope configuration
+	////////////////////////////////////
+	// read in telescope configuration
 	fList_of_Tel_type.clear();
 	if( fTtelconfig )
 	{
@@ -850,7 +850,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		if( fNTel > getMaxNbrTel() )
 		{
 			cout << "VTableLookupDataHandler::setInputFile: error too many telescopes " << fNTel << "\t" << getMaxNbrTel() << endl;
-            exit( EXIT_FAILURE );
+			exit( EXIT_FAILURE );
 		}
 		fNTelComb = ( unsigned int )TMath::Nint( TMath::Power( 2., ( double )fNTel ) );
 		for( unsigned int i = 0; i < fNTel; i++ )
@@ -877,7 +877,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 	{
 		cout << "VTableLookupDataHandler::setInputFile error: no telescope configurations found " << endl;
 		cout << "...exiting" << endl;
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 	
 	// print everything to the screen
@@ -919,14 +919,14 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 	{
 		cout << "VTableLookupDataHandler::setInputFile: error while retrieving data trees (2)" << endl;
 		cout << "exiting..." << endl;
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 	// check validity of showerpars tree
 	if( !fTshowerpars->GetBranchStatus( "runNumber" ) )
 	{
 		cout << "VTableLookupDataHandler::setInputFile: error while retrieving data trees (2b)" << endl;
 		cout << "exiting..." << endl;
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 	// check if input data is MC
 	if( fTshowerpars->GetBranchStatus( "MCe0" ) )
@@ -948,7 +948,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		fEventDisplayFileFormat = fTLRunParameter->getEVNDISP_TREE_VERSION();
 		bShort                  = ( unsigned int )fTLRunParameter->getEVNDISP_TREE_isShort( fTshowerpars->GetTree() );
 	}
-    // check file format and initialize trees
+	// check file format and initialize trees
 	if( fEventDisplayFileFormat >= 2 )
 	{
 		if( bShort )
@@ -971,25 +971,25 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 	// get individual image parameter trees
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
-        TChain *iT = new TChain( "tpars" );
-        sprintf( iName, "pointing_%u", i+1 );
-        // pointing correction chain
-        TChain *iPC = new TChain( iName );
+		TChain* iT = new TChain( "tpars" );
+		sprintf( iName, "pointing_%u", i + 1 );
+		// pointing correction chain
+		TChain* iPC = new TChain( iName );
 		for( unsigned int f = 0; f < finputfile.size(); f++ )
 		{
-            sprintf( iDir, "%s/Tel_%u/tpars", finputfile[f].c_str(), i + 1 );
+			sprintf( iDir, "%s/Tel_%u/tpars", finputfile[f].c_str(), i + 1 );
 			iT->Add( iDir );
-            // no pointing corrections for MC analysis
-            if( !fIsMC )
-            {
-                sprintf( iDir, "%s/Tel_%u/pointing_%u", finputfile[f].c_str(), i + 1, i + 1 );
-                iPC->Add( iDir );
-            }
+			// no pointing corrections for MC analysis
+			if( !fIsMC )
+			{
+				sprintf( iDir, "%s/Tel_%u/pointing_%u", finputfile[f].c_str(), i + 1, i + 1 );
+				iPC->Add( iDir );
+			}
 		}
 		if( !iT )
 		{
 			cout << "VTableLookupDataHandler::setInputFile: error while retrieving data trees (3)" << endl;
-            exit( EXIT_FAILURE );
+			exit( EXIT_FAILURE );
 		}
 		// get first entry to check if chain is there
 		gErrorIgnoreLevel = 5000;
@@ -1015,7 +1015,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		{
 			ftpars.push_back( 0 );
 		}
-        fpointingCorrections.push_back( new VPointingCorrectionsTreeReader( iPC ) );
+		fpointingCorrections.push_back( new VPointingCorrectionsTreeReader( iPC ) );
 		gErrorIgnoreLevel = 0;
 	}
 	cout << "reading eventdisplay file format version " << fEventDisplayFileFormat;
@@ -1038,27 +1038,27 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 			{
 				cout << "VTableLookupDataHandler::setInputFile() calculating pedvar for telescope " << i + 1 << endl;
 			}
-            sprintf( iName, "calib_%u", i + 1 );
+			sprintf( iName, "calib_%u", i + 1 );
 			TChain iPedVars( iName );
 			for( unsigned int f = 0; f < finputfile.size(); f++ )
 			{
 				gErrorIgnoreLevel = 5000;
-                sprintf( iDir, "%s/Tel_%u/calib_%u", finputfile[f].c_str(), i + 1, i + 1 );
+				sprintf( iDir, "%s/Tel_%u/calib_%u", finputfile[f].c_str(), i + 1, i + 1 );
 				if( !iPedVars.Add( iDir ) )
 				{
 					cout << "VTableLookupDataHandler::setInputFile: error while retrieving pedvars trees" << endl;
 					cout << "exiting..." << endl;
-                    exit( EXIT_FAILURE );
+					exit( EXIT_FAILURE );
 				}
 				if( iPedVars.GetEntries() == 0 )
 				{
 					// backwards compatibility: read calibration tree from a different directory (note: this produces a root error message)
-                    sprintf( iDir, "%s/Tel_%u/calibration/calib_%u", finputfile[f].c_str(), i + 1, i + 1 );
+					sprintf( iDir, "%s/Tel_%u/calibration/calib_%u", finputfile[f].c_str(), i + 1, i + 1 );
 					if( !iPedVars.Add( iDir ) )
 					{
 						cout << "VTableLookupDataHandler::setInputFile: error while retrieving pedvars trees" << endl;
 						cout << "exiting..." << endl;
-                        exit( EXIT_FAILURE );
+						exit( EXIT_FAILURE );
 					}
 				}
 				gErrorIgnoreLevel = 0;
@@ -1074,7 +1074,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 				iPedVars.SetBranchAddress( "state", &state );
 			}
 			
-            sprintf( iName, "ht_%u", i + 1 );
+			sprintf( iName, "ht_%u", i + 1 );
 			TH1D h( iName, "", 1000, 0., 50. );
 			
 			if( fDebug > 1 )
@@ -1114,45 +1114,45 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 			fNoiseLevel.push_back( 0. );
 		}
 	}
-    
-    
-    // temporary list of telescopes required for disp analysers
-    vector<ULong64_t> i_TelTypeList;
-    for( fList_of_Tel_type_iterator = fList_of_Tel_type.begin();
-            fList_of_Tel_type_iterator != fList_of_Tel_type.end();
-            fList_of_Tel_type_iterator++ )
-    {
-        if( fList_of_Tel_type_iterator->second > 0 )
-        {
-            i_TelTypeList.push_back( fList_of_Tel_type_iterator->first );
-        }
-    }
-    
-    /////////////////////////////////////////
-    // initialize Disp Analyzer for direction reconstruction
-    // (if required)
-    if( fTLRunParameter->fRerunStereoReconstruction_BDTFileName.size() > 0. )
-    {
-        cout << endl;
-        cout << "Initializing BDT disp analyzer for direction reconstruction" << endl;
-        cout << "===========================================================" << endl << endl;
-        fDispAnalyzerDirection = new VDispAnalyzer();
-        fDispAnalyzerDirection->setTelescopeTypeList( i_TelTypeList );
-        fDispAnalyzerDirection->initialize( fTLRunParameter->fRerunStereoReconstruction_BDTFileName, "TMVABDT" );
-    }
-    /////////////////////////////////////////
-    // initialize Disp Analyzer for error on direction reconstruction
-    // (if required)
-    if( fTLRunParameter->fDispError_BDTFileName.size() > 0. )
-    {
-        cout << endl;
-        cout << "Initializing BDT disp analyzer for estimation of disp error" << endl;
-        cout << "===========================================================" << endl << endl;
-        cout << "\t error weighting parameter: " << fTLRunParameter->fDispError_BDTWeight << endl;
-        fDispAnalyzerDirectionError = new VDispAnalyzer();
-        fDispAnalyzerDirectionError->setTelescopeTypeList( i_TelTypeList );
-        fDispAnalyzerDirectionError->initialize( fTLRunParameter->fDispError_BDTFileName, "TMVABDT", "BDTDispError" );
-    }
+	
+	
+	// temporary list of telescopes required for disp analysers
+	vector<ULong64_t> i_TelTypeList;
+	for( fList_of_Tel_type_iterator = fList_of_Tel_type.begin();
+			fList_of_Tel_type_iterator != fList_of_Tel_type.end();
+			fList_of_Tel_type_iterator++ )
+	{
+		if( fList_of_Tel_type_iterator->second > 0 )
+		{
+			i_TelTypeList.push_back( fList_of_Tel_type_iterator->first );
+		}
+	}
+	
+	/////////////////////////////////////////
+	// initialize Disp Analyzer for direction reconstruction
+	// (if required)
+	if( fTLRunParameter->fRerunStereoReconstruction_BDTFileName.size() > 0. )
+	{
+		cout << endl;
+		cout << "Initializing BDT disp analyzer for direction reconstruction" << endl;
+		cout << "===========================================================" << endl << endl;
+		fDispAnalyzerDirection = new VDispAnalyzer();
+		fDispAnalyzerDirection->setTelescopeTypeList( i_TelTypeList );
+		fDispAnalyzerDirection->initialize( fTLRunParameter->fRerunStereoReconstruction_BDTFileName, "TMVABDT" );
+	}
+	/////////////////////////////////////////
+	// initialize Disp Analyzer for error on direction reconstruction
+	// (if required)
+	if( fTLRunParameter->fDispError_BDTFileName.size() > 0. )
+	{
+		cout << endl;
+		cout << "Initializing BDT disp analyzer for estimation of disp error" << endl;
+		cout << "===========================================================" << endl << endl;
+		cout << "\t error weighting parameter: " << fTLRunParameter->fDispError_BDTWeight << endl;
+		fDispAnalyzerDirectionError = new VDispAnalyzer();
+		fDispAnalyzerDirectionError->setTelescopeTypeList( i_TelTypeList );
+		fDispAnalyzerDirectionError->initialize( fTLRunParameter->fDispError_BDTFileName, "TMVABDT", "BDTDispError" );
+	}
 	if( fDebug )
 	{
 		cout << "VTableLookupDataHandler::setInputFile() END" << endl;
@@ -1177,7 +1177,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 	if( fNTel == 0 )
 	{
 		cout << "VTableLookupDataHandler::setOutputFile error: no telescopes" << endl;
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 	
 	for( unsigned int i = 0; i < finputfile.size(); i++ )
@@ -1186,7 +1186,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 		{
 			cout << "VTableLookupDataHandler::setOutputFile error: can't overwrite inputfile" << endl;
 			cout << "\t" << finputfile[i] << endl;
-            exit( EXIT_FAILURE );
+			exit( EXIT_FAILURE );
 		}
 	}
 	
@@ -1195,7 +1195,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 	if( fOutFile->IsZombie() )
 	{
 		cout << "VTableLookupDataHandler::setOutputFile error while opening output file " << foutputfile << "\t" << iOption << endl;
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 	// define output tree
 	char iTT[2000];
@@ -1213,14 +1213,14 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 	
 	fOTree->Branch( "runNumber", &runNumber, "runNumber/I" );
 	fOTree->Branch( "eventNumber", &eventNumber, "eventNumber/I" );
-    fOTree->Branch( "MJD", &MJD, "MJD/I" );
-    fOTree->Branch( "Time",  &time,  "Time/D" );
+	fOTree->Branch( "MJD", &MJD, "MJD/I" );
+	fOTree->Branch( "Time",  &time,  "Time/D" );
 	sprintf( iTT, "TelElevation[%d]/D", fNTel );
 	fOTree->Branch( "TelElevation", fTelElevation, iTT );
 	sprintf( iTT, "TelAzimuth[%d]/D", fNTel );
 	fOTree->Branch( "TelAzimuth", fTelAzimuth, iTT );
-    fOTree->Branch( "ArrayPointing_Elevation", &fArrayPointing_Elevation, "ArrayPointing_Elevation/F" );
-    fOTree->Branch( "ArrayPointing_Azimuth", &fArrayPointing_Azimuth, "ArrayPointing_Azimuth/F" );
+	fOTree->Branch( "ArrayPointing_Elevation", &fArrayPointing_Elevation, "ArrayPointing_Elevation/F" );
+	fOTree->Branch( "ArrayPointing_Azimuth", &fArrayPointing_Azimuth, "ArrayPointing_Azimuth/F" );
 	sprintf( iTT, "TelDec[%d]/D", fNTel );
 	if( !fShortTree )
 	{
@@ -1391,15 +1391,15 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 		sprintf( iTT, "Fitstat[%d]/I", fNTel );
 		fOTree->Branch( "Fitstat", fFitstat, iTT );
 	}
-    fOTree->Branch( "DispNImages", &fnxyoff, "DispNImages/i" );
-    fOTree->Branch( "DispXoff_T", fXoff_T, "DispXoff_T[NImages]/F" );
-    fOTree->Branch( "DispYoff_T", fYoff_T, "DispYoff_T[NImages]/F" );
-    fOTree->Branch( "DispWoff_T", fWoff_T, "DispWoff_T[NImages]/F" );
-    fOTree->Branch( "Disp_T", fDoff_T, "Disp_T[NImages]/F" );
-    fOTree->Branch( "DispTelList_T", fToff_T, "DispTelList_T[NImages]/i" );
+	fOTree->Branch( "DispNImages", &fnxyoff, "DispNImages/i" );
+	fOTree->Branch( "DispXoff_T", fXoff_T, "DispXoff_T[NImages]/F" );
+	fOTree->Branch( "DispYoff_T", fYoff_T, "DispYoff_T[NImages]/F" );
+	fOTree->Branch( "DispWoff_T", fWoff_T, "DispWoff_T[NImages]/F" );
+	fOTree->Branch( "Disp_T", fDoff_T, "Disp_T[NImages]/F" );
+	fOTree->Branch( "DispTelList_T", fToff_T, "DispTelList_T[NImages]/i" );
 	fOTree->Branch( "DispDiff", &fDispDiff, "DispDiff/D" );
-    fOTree->Branch( "Xoff_intersect", &fXoff_intersect, "Xoff_intersect/F" );
-    fOTree->Branch( "Yoff_intersect", &fYoff_intersect, "Yoff_intersect/F" );
+	fOTree->Branch( "Xoff_intersect", &fXoff_intersect, "Xoff_intersect/F" );
+	fOTree->Branch( "Yoff_intersect", &fYoff_intersect, "Yoff_intersect/F" );
 	
 	sprintf( iTT, "R[%d]/D", fNTel );
 	fOTree->Branch( "R", fR, iTT );
@@ -1514,38 +1514,38 @@ bool VTableLookupDataHandler::readRunParameter()
 		{
 			cout << "reading eventdisplay run parameters from " << ifInput.GetName() << endl;
 			TNamed* iR = ( TNamed* )ifInput.Get( "runparameter" );
-            if( iR && fOutFile )
+			if( iR && fOutFile )
 			{
 				fOutFile->cd();
 				iR->Write();
 			}
 			VEvndispRunParameter* iPar = ( VEvndispRunParameter* ) ifInput.Get( "runparameterV2" );
-            VEvndispReconstructionParameter* iERecPar = ( VEvndispReconstructionParameter* )ifInput.Get( "EvndispReconstructionParameter" );
-                        VMonteCarloRunHeader* iMC = ( VMonteCarloRunHeader* )ifInput.Get( "MC_runheader" );
-                        if( iMC )
-                        {
-                             fTLRunParameter->ze = iMC->getMeanZenithAngle_Deg();
-                        }
+			VEvndispReconstructionParameter* iERecPar = ( VEvndispReconstructionParameter* )ifInput.Get( "EvndispReconstructionParameter" );
+			VMonteCarloRunHeader* iMC = ( VMonteCarloRunHeader* )ifInput.Get( "MC_runheader" );
+			if( iMC )
+			{
+				fTLRunParameter->ze = iMC->getMeanZenithAngle_Deg();
+			}
 			if( iPar )
 			{
 				if( fTLRunParameter->fTelToAnalyse.size() > 0 )
 				{
 					iPar->fTelToAnalyze = fTLRunParameter->fTelToAnalyse;
 				}
-                else if( iERecPar )
+				else if( iERecPar )
 				{
 					//copied from VTableLookupRunParameter.cpp
 					vector< unsigned int > iRunParT = iPar->fTelToAnalyze;
-			vector< unsigned int > iTelToAnalyze;
+					vector< unsigned int > iTelToAnalyze;
 					// this works only if number of telescopes = number of telescope types
-                    // (e.g. the VERITAS case)
+					// (e.g. the VERITAS case)
 					if( fTLRunParameter->rec_method < ( int )iERecPar->fLocalUseImage.size()
-                            && iPar->fNTelescopes == iERecPar->fLocalUseImage[fTLRunParameter->rec_method].size() )
+							&& iPar->fNTelescopes == iERecPar->fLocalUseImage[fTLRunParameter->rec_method].size() )
 					{
 						for( unsigned int i = 0; i < iRunParT.size(); i++ )
 						{
-							if( iRunParT[i] < iERecPar->fLocalUseImage[fTLRunParameter->rec_method].size() 
-                                 && iERecPar->fLocalUseImage[fTLRunParameter->rec_method][iRunParT[i]] )
+							if( iRunParT[i] < iERecPar->fLocalUseImage[fTLRunParameter->rec_method].size()
+									&& iERecPar->fLocalUseImage[fTLRunParameter->rec_method][iRunParT[i]] )
 							{
 								iTelToAnalyze.push_back( iRunParT[i] );
 							}
@@ -1553,31 +1553,31 @@ bool VTableLookupDataHandler::readRunParameter()
 					}
 					iPar->fTelToAnalyze = iTelToAnalyze;
 				}
-                if( fOutFile )
-                {
-                    fOutFile->cd();
-                    // update instrument epoch in evendisp run parameters
-                    // (might have been changed since the evndisp analysis)
-                    if( fTLRunParameter->fUpdateInstrumentEpoch )
-                    {
-                         cout << "Evaluating instrument epoch (";
-                         cout << "was: " << iPar->getInstrumentEpoch( false );
-                         cout << ", is: " << iPar->getInstrumentEpoch( false, true );
-                         cout << ")" << endl;
-                         cout << "Evaluating atmosphere ID (";
-                         cout << "was: " << iPar->getAtmosphereID( false );
-                         cout << ", is: " << iPar->getAtmosphereID( true );
-                         cout << ")" << endl;
-                    }
-                    iPar->Write();
-                }
+				if( fOutFile )
+				{
+					fOutFile->cd();
+					// update instrument epoch in evendisp run parameters
+					// (might have been changed since the evndisp analysis)
+					if( fTLRunParameter->fUpdateInstrumentEpoch )
+					{
+						cout << "Evaluating instrument epoch (";
+						cout << "was: " << iPar->getInstrumentEpoch( false );
+						cout << ", is: " << iPar->getInstrumentEpoch( false, true );
+						cout << ")" << endl;
+						cout << "Evaluating atmosphere ID (";
+						cout << "was: " << iPar->getAtmosphereID( false );
+						cout << ", is: " << iPar->getAtmosphereID( true );
+						cout << ")" << endl;
+					}
+					iPar->Write();
+				}
 			}
 		}
 		ifInput.Close();
-        if( fOutFile )
-        {
-            fOutFile->cd();
-        }
+		if( fOutFile )
+		{
+			fOutFile->cd();
+		}
 	}
 	
 	return true;
@@ -1625,7 +1625,7 @@ void VTableLookupDataHandler::printCutStatistics()
 bool VTableLookupDataHandler::terminate( TNamed* iM )
 {
 	printCutStatistics();
-
+	
 	if( fOutFile )
 	{
 		cout << "writing data to " << fOutFile->GetName() << endl;
@@ -1668,9 +1668,9 @@ bool VTableLookupDataHandler::terminate( TNamed* iM )
 			writeDeadTimeHistograms();
 		}
 		
-        // copy MC tree
-        // (not default, as this is a large tree with 
-        // 1 entry per simulated event)
+		// copy MC tree
+		// (not default, as this is a large tree with
+		// 1 entry per simulated event)
 		if( fIsMC )
 		{
 			bool iMCTree_exists = copyMCRunheader();
@@ -1693,23 +1693,23 @@ bool VTableLookupDataHandler::terminate( TNamed* iM )
 			TFile* inpMscwFile = new TFile( finputfile[0].c_str(), "READ" ) ;
 			fOutFile->cd();
 			TTree* iTree       = ( TTree* )inpMscwFile->Get( "pointingDataReduced" );
-			if( iTree ) 
+			if( iTree )
 			{
 				TTree* newtree     = iTree->CloneTree();
-				if( newtree ) 
+				if( newtree )
 				{
 					newtree->Write();
 				}
-				else 
+				else
 				{
 					cout << "VTableLookupDataHandler::terminate Warning: Unable to clone tree " << iTree->GetName() << endl;
 				}
 			}
-			else 
+			else
 			{
 				cout << "VTableLookupDataHandler::terminate Warning: Unable to find tree pointingDataReduced in file " << inpMscwFile->GetName() << endl;
-			}	
-
+			}
+			
 			TTree* jTree = ( TTree* )inpMscwFile->Get( "deadPixelRegistry" ) ;
 			// deadPixelRegistry may not exist, only try to copy it if it's there
 			if( jTree )
@@ -1741,7 +1741,7 @@ void VTableLookupDataHandler::writeDeadTimeHistograms()
 		cout << "VTableLookupDataHandler::writeDeadTimeHistograms() error: ";
 		cout << "analysis of several files at once not allowed " << endl;
 		cout << "(dead times will be wrong)" << endl;
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 	
 	// use chain to get list of files
@@ -1760,9 +1760,9 @@ void VTableLookupDataHandler::writeDeadTimeHistograms()
 			TDirectoryFile* iDeadtimeDirectory = ( TDirectoryFile* )f->Get( "deadTimeHistograms" );
 			if( iDeadtimeDirectory )
 			{
-                fDeadTime->calculateDeadTime();
-                fDeadTime->printDeadTime();
-                fDeadTime->writeHistograms();
+				fDeadTime->calculateDeadTime();
+				fDeadTime->printDeadTime();
+				fDeadTime->writeHistograms();
 				fDeadTime->readHistograms( iDeadtimeDirectory );
 			}
 		}
@@ -1856,7 +1856,7 @@ void VTableLookupDataHandler::copyMCTree()
 	if( iNFil > 0 && iMC.GetEntries() > 0 )
 	{
 		cout << "\t copying MC tree ";
-        cout << " with " << iMC.GetEntries() << " entries..." << flush;
+		cout << " with " << iMC.GetEntries() << " entries..." << flush;
 		iMC.Merge( fOutFile, 0, "keep" );
 		cout << "done " << endl;
 	}
@@ -1875,8 +1875,8 @@ void VTableLookupDataHandler::copyMCHistograms()
 	VEffectiveAreaCalculatorMCHistograms* iMC_his = 0;
 	if( fTshowerpars )
 	{
-        // loop over all files in chain (might be many) and add up MC histograms
-        // (histograms are needed for effective area calculation)
+		// loop over all files in chain (might be many) and add up MC histograms
+		// (histograms are needed for effective area calculation)
 		TObjArray* fileElements = fTshowerpars->GetListOfFiles();
 		if( !fileElements )
 		{
@@ -1909,10 +1909,10 @@ void VTableLookupDataHandler::copyMCHistograms()
 						{
 							iMC_his_temp->matchDataVectors( i_az_min, i_az_max, i_spectral_index );
 						}
-                                                if( iMC_his_temp )
-                                                {
-                                                        iMC_his->add( iMC_his_temp );
-                                                }
+						if( iMC_his_temp )
+						{
+							iMC_his->add( iMC_his_temp );
+						}
 					}
 					ifInput->Close();
 				}
@@ -1960,10 +1960,10 @@ void VTableLookupDataHandler::reset()
 	fYoff = -99.;
 	fXoff_derot = -99.;
 	fYoff_derot = -99.;
-    fXoff_intersect = -99.;
-    fYoff_intersect = -99.;
-    fXoff_edisp = -99.;
-    fYoff_edisp = -99.;
+	fXoff_intersect = -99.;
+	fYoff_intersect = -99.;
+	fXoff_edisp = -99.;
+	fYoff_edisp = -99.;
 	fXcore = -99.;
 	fYcore = -99.;
 	fstdP = -99.;
@@ -1984,17 +1984,17 @@ void VTableLookupDataHandler::reset()
 void VTableLookupDataHandler::calcDistances()
 {
 	// check for successfull reconstruction
-    for( unsigned int tel = 0; tel < fNTel; tel++ )
-    {
-        if( fImgSel_list[tel] && fZe >= 0. && fXcore > -9998. && fYcore > -9998. )
-        {
-            fR[tel] = VUtilities::line_point_distance( fYcore, -1.*fXcore, 0., fZe, fAz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
-        }
-        else
-        {
-            fR[tel] = -99.;
-        }
-    }
+	for( unsigned int tel = 0; tel < fNTel; tel++ )
+	{
+		if( fImgSel_list[tel] && fZe >= 0. && fXcore > -9998. && fYcore > -9998. )
+		{
+			fR[tel] = VUtilities::line_point_distance( fYcore, -1.*fXcore, 0., fZe, fAz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
+		}
+		else
+		{
+			fR[tel] = -99.;
+		}
+	}
 }
 
 
@@ -2080,7 +2080,7 @@ bool VTableLookupDataHandler::isReconstructed()
 void VTableLookupDataHandler::calcEmissionHeights()
 {
 	fEmissionHeightCalculator->getEmissionHeight( fcen_x, fcen_y, fsize,
-            fArrayPointing_Azimuth, fArrayPointing_Elevation );
+			fArrayPointing_Azimuth, fArrayPointing_Elevation );
 	fNTelPairs = fEmissionHeightCalculator->getNTelPairs();
 	fEmissionHeightMean = ( float )fEmissionHeightCalculator->getMeanEmissionHeight();
 	fEmissionHeightChi2 = ( float )fEmissionHeightCalculator->getMeanEmissionHeightChi2();
@@ -2159,8 +2159,8 @@ void VTableLookupDataHandler::resetAll()
 		fTelDec[i] = 0.;
 		fTelRA[i] = 0.;
 	}
-    fArrayPointing_Azimuth = 0.;
-    fArrayPointing_Elevation = 0.;
+	fArrayPointing_Azimuth = 0.;
+	fArrayPointing_Elevation = 0.;
 	fTargetElev = 0.;
 	fTargetAz = 0.;
 	fTargetDec = 0.;
@@ -2199,10 +2199,10 @@ void VTableLookupDataHandler::resetAll()
 	fYoff = 0.;
 	fXoff_derot = 0.;
 	fYoff_derot = 0.;
-    fXoff_intersect = 0.;
-    fYoff_intersect = 0.;
-    fXoff_edisp = 0.;
-    fYoff_edisp = 0.;
+	fXoff_intersect = 0.;
+	fYoff_intersect = 0.;
+	fXoff_edisp = 0.;
+	fYoff_edisp = 0.;
 	fstdS = 0.;
 	ftheta2 = 0.;
 	fXcore = 0.;
@@ -2285,10 +2285,10 @@ void VTableLookupDataHandler::resetAll()
 	fMC_distance_to_cameracenter_min = 0.;
 	fMC_distance_to_cameracenter_max = 1.e10;
 	fDispDiff = 0;
-    fXoff_intersect = 0.;
-    fYoff_intersect = 0.;
-    fXoff_edisp = 0.;
-    fYoff_edisp = 0.;
+	fXoff_intersect = 0.;
+	fYoff_intersect = 0.;
+	fXoff_edisp = 0.;
+	fYoff_edisp = 0.;
 	
 	// cut efficiency counter
 	fNStats_All = 0;
@@ -2317,7 +2317,7 @@ bool VTableLookupDataHandler::cut( bool bWrite )
 	// number of reconstructed events
 	fNStats_Rec++;
 	
-    if( getWobbleOffset() < 0. || getWobbleOffset() > fTLRunParameter->fTableFillingCut_WobbleCut_max )
+	if( getWobbleOffset() < 0. || getWobbleOffset() > fTLRunParameter->fTableFillingCut_WobbleCut_max )
 	{
 		fNStats_WobbleCut++;
 		return false;
@@ -2360,7 +2360,7 @@ void VTableLookupDataHandler::setSelectRandom( double iF, int iS )
 	if( iF > 1. )
 	{
 		cout << "VTableLookupDataHandler::setSelectRandom error: random selector outside intervall [0,1]: " << iF << endl;
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 	
 	fSelectRandom = iF;
@@ -2708,26 +2708,26 @@ void VTableLookupDataHandler::initializeTelTypeVector()
  */
 pair<float, float > VTableLookupDataHandler::getArrayPointing()
 {
-    pair<float, float > i_array_pointing;
-    i_array_pointing.first = 0.;
-    i_array_pointing.second = 0.;
-    float i_N = 0.;
-
-    for( unsigned int i = 0; i < fNTel; i++ )
-    {
-        if( fshowerpars->ImgSel_list[fMethod][i] )
-        {
-            i_array_pointing.first += fshowerpars->TelElevation[i];
-            i_array_pointing.second = VSkyCoordinatesUtilities::addToMeanAzimuth(i_array_pointing.second, fshowerpars->TelAzimuth[i]);
-            i_N++;
-         }
-    }
-    if( i_N > 0. )
-    {
-        i_array_pointing.first /= i_N;
-        i_array_pointing.second /= i_N;
-    }
-    return i_array_pointing;
+	pair<float, float > i_array_pointing;
+	i_array_pointing.first = 0.;
+	i_array_pointing.second = 0.;
+	float i_N = 0.;
+	
+	for( unsigned int i = 0; i < fNTel; i++ )
+	{
+		if( fshowerpars->ImgSel_list[fMethod][i] )
+		{
+			i_array_pointing.first += fshowerpars->TelElevation[i];
+			i_array_pointing.second = VSkyCoordinatesUtilities::addToMeanAzimuth( i_array_pointing.second, fshowerpars->TelAzimuth[i] );
+			i_N++;
+		}
+	}
+	if( i_N > 0. )
+	{
+		i_array_pointing.first /= i_N;
+		i_array_pointing.second /= i_N;
+	}
+	return i_array_pointing;
 }
 
 /*
@@ -2736,20 +2736,20 @@ pair<float, float > VTableLookupDataHandler::getArrayPointing()
  */
 float VTableLookupDataHandler::getArrayPointingDeRotationAngle()
 {
-    double i_array_dec = 0.;
-    double i_array_ra = 0.;
-
-    VSkyCoordinatesUtilities::getEquatorialCoordinates(
-            MJD, time,
-            fArrayPointing_Azimuth,
-            90.-fArrayPointing_Elevation,
-            i_array_dec, i_array_ra );
-
-    float derot = VSkyCoordinatesUtilities::getDerotationAngle( 
-            MJD, time,
-            i_array_ra, i_array_dec,
-            VGlobalRunParameter::getObservatory_Longitude_deg(),
-            VGlobalRunParameter::getObservatory_Latitude_deg() );
-
-    return derot;
+	double i_array_dec = 0.;
+	double i_array_ra = 0.;
+	
+	VSkyCoordinatesUtilities::getEquatorialCoordinates(
+		MJD, time,
+		fArrayPointing_Azimuth,
+		90. - fArrayPointing_Elevation,
+		i_array_dec, i_array_ra );
+		
+	float derot = VSkyCoordinatesUtilities::getDerotationAngle(
+					  MJD, time,
+					  i_array_ra, i_array_dec,
+					  VGlobalRunParameter::getObservatory_Longitude_deg(),
+					  VGlobalRunParameter::getObservatory_Latitude_deg() );
+					  
+	return derot;
 }

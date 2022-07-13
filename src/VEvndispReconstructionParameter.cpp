@@ -314,7 +314,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 	////////////////////////////////////////////
 	// remove image which is too close to a bright star
 	// (use list of image and border pixels)
-    // __this cut is disabled__
+	// __this cut is disabled__
 	if( iStarCatalogue && fRunPara && iImageParameter->ntubes < fRunPara->fMinStarNTubes )
 	{
 		for( unsigned int i = 0; i < iImageParameter->fImageBorderPixelPosition_x.size(); i++ )
@@ -542,10 +542,10 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
 		}
 		cout << endl;
 		cout << "\t\t minimum number of images: " << fNImages_min[m] << endl;
-                if (fNImages_max[m] < VDST_MAXTELESCOPES)
-                {
-		    cout << "\t\t maximum number of images: " << fNImages_max[m] << endl;
-                }
+		if( fNImages_max[m] < VDST_MAXTELESCOPES )
+		{
+			cout << "\t\t maximum number of images: " << fNImages_max[m] << endl;
+		}
 		cout << "\t\t minimum angle between image axes [deg]: " << fAxesAngles_min[m] << endl;
 		if( fMLPFileName[m].size() > 0 )
 		{
@@ -788,7 +788,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 			is_stream >> iTemp;
 			iTemp = VUtilities::upperCase( iTemp );
 			is_stream >> iTemp2;
-			if( !(is_stream>>std::ws).eof() )
+			if( !( is_stream >> std::ws ).eof() )
 			{
 				is_stream >> iTemp3;
 			}
@@ -796,7 +796,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 			{
 				iTemp3 = "";
 			}
-			if( !(is_stream>>std::ws).eof() )
+			if( !( is_stream >> std::ws ).eof() )
 			{
 				is_stream >> iTemp4;
 			}
@@ -804,7 +804,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 			{
 				iTemp4 = "";
 			}
-			if( !(is_stream>>std::ws).eof() )
+			if( !( is_stream >> std::ws ).eof() )
 			{
 				is_stream >> iTemp5;
 			}
@@ -812,7 +812,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 			{
 				iTemp5 = "";
 			}
-			if( !(is_stream>>std::ws).eof() )
+			if( !( is_stream >> std::ws ).eof() )
 			{
 				is_stream >> iTemp6;
 			}
@@ -942,30 +942,30 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 						{
 							if( i < fRunPara->fsumfirst_startingMethod.size() )
 							{
-                                // use T0 for timing of pulse integration
-								if( iTemp4 == "T0" || iTemp4 == "TZERO" || atoi(iTemp4.c_str()) == 1 )
+								// use T0 for timing of pulse integration
+								if( iTemp4 == "T0" || iTemp4 == "TZERO" || atoi( iTemp4.c_str() ) == 1 )
 								{
 									fRunPara->fsumfirst_startingMethod[i] = 1;
 								}
-                                // use average pulse arrival time for timing of pulse integration
+								// use average pulse arrival time for timing of pulse integration
 								else if( iTemp4 == "TAVERAGE" || atoi( iTemp4.c_str() ) == 2 )
 								{
-                                    fRunPara->fsumfirst_startingMethod[i] = 2;
+									fRunPara->fsumfirst_startingMethod[i] = 2;
 								}
-                                // fixed window start
-                                else if( iTemp4 == "FIXED" || atoi( iTemp4.c_str() ) == 0 )
+								// fixed window start
+								else if( iTemp4 == "FIXED" || atoi( iTemp4.c_str() ) == 0 )
 								{
-                                    fRunPara->fsumfirst_startingMethod[i] = 0;
+									fRunPara->fsumfirst_startingMethod[i] = 0;
 								}
-                                else
-                                {
-                                    cout << "VEvndispReconstructionParameter::read_arrayAnalysisCuts error:";
-                                    cout << " unknown timing method used for calculation of window start";
-                                    cout << " (valid parameters are TZERO/TAVERAGE/FIXED/TTRIGGER): ";
-                                    cout << iTemp4 << endl;
-                                    cout << "...exiting" << endl;
-                                    exit( EXIT_FAILURE );
-                                }
+								else
+								{
+									cout << "VEvndispReconstructionParameter::read_arrayAnalysisCuts error:";
+									cout << " unknown timing method used for calculation of window start";
+									cout << " (valid parameters are TZERO/TAVERAGE/FIXED/TTRIGGER): ";
+									cout << iTemp4 << endl;
+									cout << "...exiting" << endl;
+									exit( EXIT_FAILURE );
+								}
 							}
 						}
 					}
@@ -1022,8 +1022,8 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				}
 				continue;
 			}
-            else if( iTemp == "IMAGECLEANING_FAKEPROBABILITY" && fRunPara )
-            {
+			else if( iTemp == "IMAGECLEANING_FAKEPROBABILITY" && fRunPara )
+			{
 				for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
 				{
 					if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
@@ -1031,57 +1031,57 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 						if( i < fRunPara->fImageCleaningParameters.size() )
 						{
 							fRunPara->fImageCleaningParameters[i]->fNNOpt_FakeImageProb = atof( iTemp2.c_str() );
-                        }
-                    }
-                }
-                continue;
-            }
-            else if( iTemp == "IMAGECLEANING_ACTIVEMULTIPLICITIES" && fRunPara )
-            {
-                for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
-                {
-                    if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
-                    {
-                        if( i < fRunPara->fImageCleaningParameters.size() )
-                        {
-                            for( unsigned int m = 0; m < fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities.size(); m++ )
-                            {
-                                if( iTemp2 == fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities[m] )
-                                {
-                                    fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[m] = true;
-                                }
-                                if( iTemp3.size() > 0 && iTemp3 == fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities[m] )
-                                {
-                                    fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[m] = true;
-                                }
-                                if( iTemp4.size() > 0 && iTemp4 == fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities[m] )
-                                {
-                                    fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[m] = true;
-                                }
-                                if( iTemp5.size() > 0 && iTemp5 == fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities[m] )
-                                {
-                                    fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[m] = true;
-                                }
-                            }
-                            // (not used; always true)
-                            fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[4] = true;
-                        }
-                    }
-                }
-                continue;
-            }
+						}
+					}
+				}
+				continue;
+			}
+			else if( iTemp == "IMAGECLEANING_ACTIVEMULTIPLICITIES" && fRunPara )
+			{
+				for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
+				{
+					if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+					{
+						if( i < fRunPara->fImageCleaningParameters.size() )
+						{
+							for( unsigned int m = 0; m < fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities.size(); m++ )
+							{
+								if( iTemp2 == fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities[m] )
+								{
+									fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[m] = true;
+								}
+								if( iTemp3.size() > 0 && iTemp3 == fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities[m] )
+								{
+									fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[m] = true;
+								}
+								if( iTemp4.size() > 0 && iTemp4 == fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities[m] )
+								{
+									fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[m] = true;
+								}
+								if( iTemp5.size() > 0 && iTemp5 == fRunPara->fImageCleaningParameters[i]->fNNOpt_Multiplicities[m] )
+								{
+									fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[m] = true;
+								}
+							}
+							// (not used; always true)
+							fRunPara->fImageCleaningParameters[i]->fNNOpt_ActiveNN[4] = true;
+						}
+					}
+				}
+				continue;
+			}
 			else if( iTemp == "WRITEGRAPHSTOFILE" && fRunPara )
-            {
-                if( iTemp2 == "TRUE" )
-                {
-                    fRunPara->ifWriteGraphsToFile = true;
-                }
-                else
-                {
-                    fRunPara->ifWriteGraphsToFile = false;
-                }
-                continue;
-            }
+			{
+				if( iTemp2 == "TRUE" )
+				{
+					fRunPara->ifWriteGraphsToFile = true;
+				}
+				else
+				{
+					fRunPara->ifWriteGraphsToFile = false;
+				}
+				continue;
+			}
 			else if( iTemp == "TIMECLEANINGPARAMETERS" && fRunPara )
 			{
 				for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
@@ -1279,7 +1279,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 			{
 				fNImages_min[m_temp] = atoi( iTemp2.c_str() );
 			}
-                        // MNR Allow to cut in the maximum number of images (goal: event types)
+			// MNR Allow to cut in the maximum number of images (goal: event types)
 			else if( iTemp == "MXIMAGE" )
 			{
 				fNImages_max[m_temp] = atoi( iTemp2.c_str() );

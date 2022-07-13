@@ -72,19 +72,19 @@ int main( int argc, char* argv[] )
 			a.getLaserList();
 		}
 		a.printListOfRuns();
-
+		
 		if( bCHECKDISK )
 		{
 			a.checkRunList();
 		}
-		else 
+		else
 		{
 			a.downloadRunList();
-		}	
+		}
 		if( bANASUM )
 		{
 			a.outputAnasumRunlist( fAnasumFile );
-		}		
+		}
 		a.printChecksumSummary();
 		return 0;
 		
@@ -179,9 +179,9 @@ int main( int argc, char* argv[] )
 		{
 			a.outputAnasumRunlist( fAnasumFile );
 		}
-
+		
 		a.printChecksumSummary();
-
+		
 		return 0;
 		
 	}

@@ -164,7 +164,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 				is_stream >> iTemp;
 				int iYear = atoi( iTemp.c_str() );
 				
-                // calculate MJD from date
+				// calculate MJD from date
 				double iMJD = 0;
 				int j = 0;
 				VAstronometry::vlaCldj( iYear, iMonth, iDay, &iMJD, &j );
@@ -205,7 +205,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 						double iT = 0.;
 						istringstream is_stream( is_line );
 						iT = -9999.;
-						if( !(is_stream>>std::ws).eof() )
+						if( !( is_stream >> std::ws ).eof() )
 						{
 							is_stream >> iT;
 						}
@@ -218,7 +218,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 							fData.back()->fPressure_Pa.push_back( -9999. );
 						}
 						iT = -9999.;
-						if( !(is_stream>>std::ws).eof() )
+						if( !( is_stream >> std::ws ).eof() )
 						{
 							is_stream >> iT;
 						}
@@ -231,7 +231,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 							fData.back()->fHeight_m.push_back( -9999. );
 						}
 						iT = -9999.;
-						if( !(is_stream>>std::ws).eof() )
+						if( !( is_stream >> std::ws ).eof() )
 						{
 							is_stream >> iT;
 							iT += 273.15;
@@ -246,7 +246,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 						}
 						
 						iT = -9999.;
-						if( !(is_stream>>std::ws).eof() )
+						if( !( is_stream >> std::ws ).eof() )
 						{
 							is_stream >> iT;
 							iT += 273.15;
@@ -261,7 +261,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 						}
 						
 						iT = -9999.;
-						if( !(is_stream>>std::ws).eof() )
+						if( !( is_stream >> std::ws ).eof() )
 						{
 							is_stream >> iT;
 							iT /= 1.e2;                // % to fraction
@@ -276,7 +276,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 						}
 						// mixing ratio
 						iT = -9999.;
-						if( !(is_stream>>std::ws).eof() )
+						if( !( is_stream >> std::ws ).eof() )
 						{
 							is_stream >> iT;
 						}
@@ -290,7 +290,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 						}
 						// wind direction
 						iT = -9999.;
-						if( !(is_stream>>std::ws).eof() )
+						if( !( is_stream >> std::ws ).eof() )
 						{
 							is_stream >> iT;
 						}
@@ -304,7 +304,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 						}
 						// wind speed
 						iT = -9999.;
-						if( !(is_stream>>std::ws).eof() )
+						if( !( is_stream >> std::ws ).eof() )
 						{
 							is_stream >> iT;
 							iT *= 0.514444;  // [knots] to [m/s]
@@ -479,19 +479,19 @@ void VAtmosphereSoundings::fillAtmosphericThickness( VAtmosphereSoundingData* iD
 
 void VAtmosphereSoundings::fillIndexofRefraction()
 {
-    // Refractive index formula from J.Owens, 'Optical Refractive Index of Air' (1967)
-    
+	// Refractive index formula from J.Owens, 'Optical Refractive Index of Air' (1967)
+	
 	for( unsigned int i = 0; i < fData.size(); i++ )
 	{
 		if( fData[i] )
 		{
-
+		
 			for( unsigned int j = 0; j < fData[i]->fPressure_Pa.size(); j++ )
 			{
 				fData[i]->fIndexofRefraction.push_back( -9999. );
 			}
 		}
-
+		
 	}
 }
 

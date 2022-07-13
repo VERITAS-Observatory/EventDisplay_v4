@@ -7,7 +7,7 @@
 
     \date 24/08/04
 
-    
+
 */
 
 #include <VDisplayBirdsEye.h>

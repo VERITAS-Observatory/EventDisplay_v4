@@ -19,8 +19,8 @@ VEffectiveAreaCalculatorMCHistograms::VEffectiveAreaCalculatorMCHistograms()
 	fMCCuts = false;
 	fArrayxyoff_MC_min = -1.e5;
 	fArrayxyoff_MC_max =  1.e5;
-
-        // This should be aligned with all the IRF histograms.	
+	
+	// This should be aligned with all the IRF histograms.
 	fEnergyAxisBins_log10 = 60;
 	fEnergyAxisMin_log10  = -2.;
 	fEnergyAxisMax_log10  =  4.;

@@ -86,7 +86,7 @@ class VFITS : public VAnalysisUtilities, public VPlotUtilities, public VHistogra
 		bool writeFITSFile( bool iPrint = false );
 		bool writeNightlyFlux( bool iPrint = false , string outfile = "" );
 		bool writeMonthlyFlux( bool iPrint = false , string outfile = "" );
-
+		
 		ClassDef( VFITS, 1 ); //(increase this number)
 };
 #endif

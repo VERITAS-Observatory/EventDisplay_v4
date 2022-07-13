@@ -63,16 +63,16 @@ class VTableLookupDataHandler
 		double fTotalTime0;                       //!< time of first event (in [s])
 		
 		VEmissionHeightCalculator* fEmissionHeightCalculator;
-        VDispAnalyzer*             fDispAnalyzerDirection;
-        VDispAnalyzer*             fDispAnalyzerDirectionError;
+		VDispAnalyzer*             fDispAnalyzerDirection;
+		VDispAnalyzer*             fDispAnalyzerDirectionError;
 		
 		double fSelectRandom;
 		int fSelectRandomSeed;
 		TRandom3* fRandom;
 		
-        int fSSR_NImages_min;
-        float fSSR_AxesAngles_min;
-        
+		int fSSR_NImages_min;
+		float fSSR_AxesAngles_min;
+		
 		// MC parameter
 		unsigned int fMinImages;
 		double fMC_distance_to_cameracenter_min;
@@ -94,7 +94,7 @@ class VTableLookupDataHandler
 		Ctelconfig* ftelconfig;
 		vector< TChain* > fTtpars;
 		vector< Ctpars* > ftpars;
-        vector< VPointingCorrectionsTreeReader* > fpointingCorrections;
+		vector< VPointingCorrectionsTreeReader* > fpointingCorrections;
 		
 		double fEventWeight;
 		
@@ -116,11 +116,11 @@ class VTableLookupDataHandler
 		double fTelZ[VDST_MAXTELESCOPES];
 		double fFocalLength[VDST_MAXTELESCOPES];
 		ULong64_t fTel_type[VDST_MAXTELESCOPES];
-        map<ULong64_t, unsigned int > fList_of_Tel_type;                      // [teltype][number of telescopes for this type]
+		map<ULong64_t, unsigned int > fList_of_Tel_type;                      // [teltype][number of telescopes for this type]
 		map<ULong64_t, unsigned int >::iterator fList_of_Tel_type_iterator;
 		vector< unsigned int > fTel_type_counter;
-        float fArrayPointingElevation;
-        float fArrayPointingAzimuth;
+		float fArrayPointingElevation;
+		float fArrayPointingAzimuth;
 		// telescope pointing
 		double fTelElevation[VDST_MAXTELESCOPES];
 		double fTelAzimuth[VDST_MAXTELESCOPES];
@@ -133,9 +133,9 @@ class VTableLookupDataHandler
 		double fTargetRA;
 		double fWobbleN;
 		double fWobbleE;
-        float  fArrayPointing_Elevation;
-        float  fArrayPointing_Azimuth;
-        float  fArrayPointing_RotationAngle;
+		float  fArrayPointing_Elevation;
+		float  fArrayPointing_Azimuth;
+		float  fArrayPointing_RotationAngle;
 		
 		// output trees
 		TTree* fOTree;
@@ -164,11 +164,11 @@ class VTableLookupDataHandler
 		bool   copyMCRunheader();
 		void   copyMCTree();
 		void   copy_telconfig();
-        void   doStereoReconstruction();
+		void   doStereoReconstruction();
 		void   initializeTelTypeVector();
 		int    fillNextEvent( bool bShort );
-        pair<float, float > getArrayPointing();
-        float getArrayPointingDeRotationAngle();
+		pair<float, float > getArrayPointing();
+		float getArrayPointingDeRotationAngle();
 		void   printCutStatistics();
 		bool   randomSelected();
 		void   resetImageParameters();
@@ -299,20 +299,20 @@ class VTableLookupDataHandler
 		
 		double fSizeSecondMax;
 		double ftheta2_All[25];
-
-        // disp related variables
-        float fXoff_edisp;
-        float fYoff_edisp;
-        float fXoff_intersect;                  //! keep direction from intersection method
-        float fYoff_intersect;                  //! keep direction from intersection method
-        float fXoff_T[VDST_MAXTELESCOPES];      //! direction reconstructed for each telescope
-        float fYoff_T[VDST_MAXTELESCOPES];      //! direction reconstructed for each telescope
-        float fWoff_T[VDST_MAXTELESCOPES];      //! direction reconstructed for each telescope (weight)
-        float fDoff_T[VDST_MAXTELESCOPES];      //! (disp value)
-        unsigned int fToff_T[VDST_MAXTELESCOPES]; //! list of telescope participating in disp
-        unsigned int fnxyoff;                   //! number of images used for disp direction reconstruction
-        // difference in disp event direction between telescopes
-        double fDispDiff;
+		
+		// disp related variables
+		float fXoff_edisp;
+		float fYoff_edisp;
+		float fXoff_intersect;                  //! keep direction from intersection method
+		float fYoff_intersect;                  //! keep direction from intersection method
+		float fXoff_T[VDST_MAXTELESCOPES];      //! direction reconstructed for each telescope
+		float fYoff_T[VDST_MAXTELESCOPES];      //! direction reconstructed for each telescope
+		float fWoff_T[VDST_MAXTELESCOPES];      //! direction reconstructed for each telescope (weight)
+		float fDoff_T[VDST_MAXTELESCOPES];      //! (disp value)
+		unsigned int fToff_T[VDST_MAXTELESCOPES]; //! list of telescope participating in disp
+		unsigned int fnxyoff;                   //! number of images used for disp direction reconstruction
+		// difference in disp event direction between telescopes
+		double fDispDiff;
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

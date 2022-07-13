@@ -99,7 +99,7 @@ VGammaHadronCuts::VGammaHadronCuts()
 	// Note: for TMVA is this not the probability threshold but the MVA cut value
 	fTMVAProbabilityThreshold = -99.;
 	fTMVAOptimizeSignalEfficiencyParticleNumberFile = "";
-        fTMVAParticleNumberFile_Conversion_Rate_to_seconds = 60.;
+	fTMVAParticleNumberFile_Conversion_Rate_to_seconds = 60.;
 	fTMVAOptimizeSignalEfficiencySignificance_Min = 5.;
 	fTMVAOptimizeSignalEfficiencySignalEvents_Min = 10.;
 	fTMVAOptimizeSignalEfficiencyObservationTime_h = 50.;
@@ -253,11 +253,11 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// choose gamma/hadron cut selectors and direction cut selector
 			if( iCutVariable == "cutselection" )
 			{
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> fGammaHadronCutSelector;
 				}
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> fDirectionCutSelector;
 				}
@@ -364,7 +364,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			}
 			else if( iCutVariable == "telcoredistance" )
 			{
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> fCut_MinimumCoreDistanceToTelescopes_max;
 				}
@@ -408,7 +408,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				int i_select = atoi( temp.c_str() );
 				// check epoch
 				bool i_useTheseCuts = true;
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
 					if( temp != fInstrumentEpoch )
@@ -417,7 +417,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 					}
 				}
 				// check telescope combinations
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
 					if( fTelToAnalyze.size() > 0 && temp != getTelToAnalyzeString() )
@@ -431,7 +431,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 					if( index < 0 )
 					{
 						for( unsigned int i = 0; i < fCut_ImgSelect.size(); i++ )
-                                                {
+						{
 							fCut_ImgSelect[i] = i_select;
 						}
 					}
@@ -446,7 +446,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			{
 				is_stream >> temp;
 				fProbabilityCut = ( atof( temp.c_str() ) );
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
 					fProbabilityCut_ProbID = atoi( temp.c_str() );
@@ -461,7 +461,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			{
 				is_stream >> temp;
 				fOrbitalPhase_min = atof( temp.c_str() );
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					fOrbitalPhase_max = atof( temp.c_str() );
 				}
@@ -475,7 +475,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// to define the lower bounds in probablity cut ranges  (e.g. random forest)
 			else if( iCutVariable == "RFCutLowerVals" )
 			{
-				while( !(is_stream>>std::ws).eof() )
+				while( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
 					fProbabilityCutRangeLower.push_back( atof( temp.c_str() ) );
@@ -485,7 +485,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// to define the upper bounds in probablity cut ranges  (e.g. random forest)
 			else if( iCutVariable == "RFCutUpperVals" )
 			{
-				while( !(is_stream>>std::ws).eof() )
+				while( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
 					fProbabilityCutRangeUpper.push_back( atof( temp.c_str() ) );
@@ -533,18 +533,18 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			{
 				float isize_min = -1000.;
 				float isize_max = 1.e10;
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
 					isize_min = atof( temp.c_str() );
 				}
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
 					isize_max = atof( temp.c_str() );
 				}
 				// check instrument epoch
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
 					if( temp == fInstrumentEpoch )
@@ -566,7 +566,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				fNTelTypeCut.push_back( new VNTelTypeCut() );
 				is_stream >> temp;
 				fNTelTypeCut.back()->fNTelType_min = atoi( temp.c_str() );
-				while( !(is_stream>>std::ws).eof() )
+				while( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
 					fNTelTypeCut.back()->fTelType_counter.push_back( atoi( temp.c_str() ) );
@@ -576,68 +576,68 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// TMVA values
 			else if( iCutVariable == "TMVAPARAMETER" )
 			{
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
 					if( temp == fInstrumentEpoch )
 					{
-						while( !(is_stream>>std::ws).eof() )
+						while( !( is_stream >> std::ws ).eof() )
 						{
-							if( !(is_stream>>std::ws).eof() )
+							if( !( is_stream >> std::ws ).eof() )
 							{
 								is_stream >> fTMVA_MVAMethod;
 							}
 							// files should have endings _fTMVAWeightFileIndex_min to _fTMVAWeightFileIndex_max
-							if( !(is_stream>>std::ws).eof() )
+							if( !( is_stream >> std::ws ).eof() )
 							{
 								is_stream >> fTMVAWeightFileIndex_Emin;
 							}
-							if( !(is_stream>>std::ws).eof() )
+							if( !( is_stream >> std::ws ).eof() )
 							{
 								is_stream >> fTMVAWeightFileIndex_Emax;
 							}
-							if( !(is_stream>>std::ws).eof() )
+							if( !( is_stream >> std::ws ).eof() )
 							{
 								is_stream >> fTMVAWeightFileIndex_Zmin;
 							}
-							if( !(is_stream>>std::ws).eof() )
+							if( !( is_stream >> std::ws ).eof() )
 							{
 								is_stream >> fTMVAWeightFileIndex_Zmax;
 							}
-							if( !(is_stream>>std::ws).eof() )
+							if( !( is_stream >> std::ws ).eof() )
 							{
-							       if( !(is_stream >> fTMVAEnergyStepSize) )
-							       {
-							              cout << "VGammaHadronCuts::readCuts: missing TMVAPARAMETER energy step size  " << endl;
-							              break;
-							       }
+								if( !( is_stream >> fTMVAEnergyStepSize ) )
+								{
+									cout << "VGammaHadronCuts::readCuts: missing TMVAPARAMETER energy step size  " << endl;
+									break;
+								}
 							}
 							string iWeightFileDirectory;
-							if( !(is_stream>>std::ws).eof() )
+							if( !( is_stream >> std::ws ).eof() )
 							{
 								is_stream >> iWeightFileDirectory;
 							}
 							string iWeightFileName;
-							if( !(is_stream>>std::ws).eof() )
+							if( !( is_stream >> std::ws ).eof() )
 							{
 								is_stream >> iWeightFileName;
 							}
 							fTMVAWeightFile = gSystem->ExpandPathName( iWeightFileDirectory.c_str() );
-                                                        // check of path name is complete
-                                                        if( gSystem->AccessPathName( fTMVAWeightFile.c_str() ) )
-                                                        {
-                                                             fTMVAWeightFile = VGlobalRunParameter::getDirectory_EVNDISPAnaData() + fTMVAWeightFile;
-                                                             if( gSystem->AccessPathName( fTMVAWeightFile.c_str() ) )
-                                                             {
-                                                                 cout << "VGammaHadronCuts::readCuts error,";
-                                                                 cout << " weight file directory not found: ";
-                                                                 cout << fTMVAWeightFile << endl;
-                                                                 cout << "exiting..." << endl;
-                                                                 exit( EXIT_FAILURE );
-                                                             }
-                                                        }
+							// check of path name is complete
+							if( gSystem->AccessPathName( fTMVAWeightFile.c_str() ) )
+							{
+								fTMVAWeightFile = VGlobalRunParameter::getDirectory_EVNDISPAnaData() + fTMVAWeightFile;
+								if( gSystem->AccessPathName( fTMVAWeightFile.c_str() ) )
+								{
+									cout << "VGammaHadronCuts::readCuts error,";
+									cout << " weight file directory not found: ";
+									cout << fTMVAWeightFile << endl;
+									cout << "exiting..." << endl;
+									exit( EXIT_FAILURE );
+								}
+							}
 							fTMVAWeightFile += iWeightFileName;
-                                                        break;
+							break;
 						}
 					}
 					else if( iPrint != 0 )
@@ -649,15 +649,15 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			}
 			else if( iCutVariable == "TMVACUTS" )
 			{
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> fTMVAOptimizeSignalEfficiencySignificance_Min;
 				}
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> fTMVAOptimizeSignalEfficiencySignalEvents_Min;
 				}
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
 					// observing time is given as "50h", or "5m", "5s"
@@ -680,38 +680,38 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						fTMVAOptimizeSignalEfficiencyObservationTime_h = atof( temp.c_str() );
 					}
 				}
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> fTMVAOptimizeSignalEfficiencyParticleNumberFile;
 				}
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> fTMVAFixedSignalEfficiencyMax;
 				}
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> fTMVAMinSourceStrength;
 				}
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> fTMVAFixedThetaCutMin;
 				}
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> fTMVAParticleNumberFile_Conversion_Rate_to_seconds;
-                                }
+				}
 			}
 			else if( iCutVariable == "TMVASignalEfficiency" )
 			{
-				while( !(is_stream>>std::ws).eof() )
+				while( !( is_stream >> std::ws ).eof() )
 				{
 					unsigned int iKey = 0;
 					double iS = 0.;
-					if( !(is_stream>>std::ws).eof() )
+					if( !( is_stream >> std::ws ).eof() )
 					{
 						is_stream >> iKey;
 					}
-					if( !(is_stream>>std::ws).eof() )
+					if( !( is_stream >> std::ws ).eof() )
 					{
 						is_stream >> iS;
 					}
@@ -719,13 +719,13 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				}
 			}
 			else if( iCutVariable == "TMVA_MVACut" )
-			{       
-				if( !(is_stream>>std::ws).eof() )
+			{
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
 					if( temp == fInstrumentEpoch )
 					{
-						while( !(is_stream>>std::ws).eof() )
+						while( !( is_stream >> std::ws ).eof() )
 						{
 							unsigned int iKey = 0;
 							double iS = 0.;
@@ -755,7 +755,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// (note that fF1AngResName == "IRF" means that the graph from the IRF file is extrapolated)
 			else if( iCutVariable == "theta2file" )
 			{
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					string iFileNameAngRes;
 					is_stream >> iFileNameAngRes;
@@ -768,7 +768,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						fFileNameAngRes = iFileNameAngRes;
 					}
 				}
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> fF1AngResName;
 				}
@@ -781,7 +781,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// use angular resolution calculated for example from same data with makeEffectiveArea
 			else if( iCutVariable == "angres" )
 			{
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> fAngResContainmentProbability;    // should be an integer; probability x 100
 				}
@@ -790,17 +790,17 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// * theta2scaling <scale factor> <minimum theta> <maximum theta>
 			else if( iCutVariable == "theta2scaling" )
 			{
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
 					fAngRes_ScalingFactor = atof( temp.c_str() );
 				}
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
 					fAngRes_AbsoluteMinimum = atof( temp.c_str() );
 				}
-				if( !(is_stream>>std::ws).eof() )
+				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
 					fAngRes_AbsoluteMaximum = atof( temp.c_str() );
@@ -810,7 +810,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			////////////////////////////////////////////////////////////////////////////////////////////////////
 		}
 	}
-    cout << "========================================" << endl;
+	cout << "========================================" << endl;
 	if( fGammaHadronCutSelector / 10 == 4 )
 	{
 		fAnalysisType = MVAAnalysis;
@@ -988,17 +988,17 @@ void VGammaHadronCuts::printCutSummary()
 			cout << fTMVAOptimizeSignalEfficiencySignalEvents_Min << " signal events in ";
 			cout << fTMVAOptimizeSignalEfficiencyObservationTime_h << " h observing time" << endl;
 			cout << "reading particle counts from " << fTMVAOptimizeSignalEfficiencyParticleNumberFile;
-                        cout << " (unit of rate graphs: " << fTMVAParticleNumberFile_Conversion_Rate_to_seconds << ")" << endl;
+			cout << " (unit of rate graphs: " << fTMVAParticleNumberFile_Conversion_Rate_to_seconds << ")" << endl;
 			cout << "   (max signal efficiency: " << fTMVAFixedSignalEfficiencyMax << ")" << endl;
 			cout << "   (min source strength: " << fTMVAMinSourceStrength << ")" << endl;
 		}
 		else
 		{
-		  if( fDebug )
-		    {
-		      printSignalEfficiency();
-		      printTMVA_MVACut();
-		    }
+			if( fDebug )
+			{
+				printSignalEfficiency();
+				printTMVA_MVACut();
+			}
 		}
 	}
 	// other cut parameters
@@ -1624,7 +1624,7 @@ void VGammaHadronCuts::initializeCuts( int irun, string iFile )
 	// TMVA cuts
 	else if( useTMVACuts() )
 	{
-	        if( !initTMVAEvaluator( fTMVAWeightFile, fTMVAWeightFileIndex_Emin, fTMVAWeightFileIndex_Emax, fTMVAWeightFileIndex_Zmin, fTMVAWeightFileIndex_Zmax, fTMVAEnergyStepSize ) )
+		if( !initTMVAEvaluator( fTMVAWeightFile, fTMVAWeightFileIndex_Emin, fTMVAWeightFileIndex_Emax, fTMVAWeightFileIndex_Zmin, fTMVAWeightFileIndex_Zmax, fTMVAEnergyStepSize ) )
 		{
 			cout << "VGammaHadronCuts::initializeCuts: failed setting TMVA reader for " << fTMVAWeightFile;
 			cout << "(" << fTMVAWeightFileIndex_Emin << "," << fTMVAWeightFileIndex_Emax << ")" << endl;
@@ -2647,24 +2647,24 @@ TGraph* VGammaHadronCuts::getEnergyDependentCut( string iCutName )
 bool VGammaHadronCuts::getEnergyDependentCutFromFile( string iFileName, string iVariable )
 {
 	string iTemp = "g" + iVariable;
-        if( gSystem->AccessPathName( iFileName.c_str() ) )
-        {
-            string iTempFileL = VGlobalRunParameter::getDirectory_EVNDISPAnaData();
-            iFileName = iTempFileL + "/GammaHadronCutFiles/" + iFileName;
-        }
-        TFile *i_f = new TFile( iFileName.c_str(), "READ" );
-        if( i_f->IsZombie() )
-        {
-            cout << "VGammaHadronCuts::getEnergyDependentCutFromFile error opening file with energy dependent cut: " << iFileName << endl;
-            cout << "exiting..." << endl;
-            exit( EXIT_FAILURE );
-        }
-
+	if( gSystem->AccessPathName( iFileName.c_str() ) )
+	{
+		string iTempFileL = VGlobalRunParameter::getDirectory_EVNDISPAnaData();
+		iFileName = iTempFileL + "/GammaHadronCutFiles/" + iFileName;
+	}
+	TFile* i_f = new TFile( iFileName.c_str(), "READ" );
+	if( i_f->IsZombie() )
+	{
+		cout << "VGammaHadronCuts::getEnergyDependentCutFromFile error opening file with energy dependent cut: " << iFileName << endl;
+		cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
+	}
+	
 	TGraph* g = ( TGraph* )i_f->Get( iTemp.c_str() );
 	if( !g )
 	{
 		cout << "VGammaHadronCuts::getEnergyDependentCutFromFile error while reading energy dependent cut: " << iTemp << endl;
-                cout << "\t tried to read from " << iFileName << endl;
+		cout << "\t tried to read from " << iFileName << endl;
 		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
 	}
@@ -2674,7 +2674,7 @@ bool VGammaHadronCuts::getEnergyDependentCutFromFile( string iFileName, string i
 		iG->SetName( iVariable.c_str() );
 		fEnergyDependentCut[iVariable] = iG;
 	}
-        i_f->Close();
+	i_f->Close();
 	return true;
 }
 

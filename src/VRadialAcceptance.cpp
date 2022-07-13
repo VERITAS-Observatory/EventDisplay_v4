@@ -26,13 +26,13 @@ VRadialAcceptance::VRadialAcceptance()
 VRadialAcceptance::VRadialAcceptance( string ifile )
 {
 	reset();
-
-        // ignore acceptance files (getacceptance will always return 1)
-        if( ifile == "IGNOREACCEPTANCE" || ifile == "simu" )
-        {
-            fAcceptanceFunctionDefined = false;
-            return;
-        }
+	
+	// ignore acceptance files (getacceptance will always return 1)
+	if( ifile == "IGNOREACCEPTANCE" || ifile == "simu" )
+	{
+		fAcceptanceFunctionDefined = false;
+		return;
+	}
 	
 	ifile = VUtilities::testFileLocation( ifile, "RadialAcceptances/", true );
 	if( ifile.size() == 0 )
@@ -517,14 +517,14 @@ bool VRadialAcceptance::isExcludedfromBackground( double x, double y )
 	}
 	
 	//Other regions to exclude from background (read from runparameter)
-        for( unsigned int i = 0; i < fXE.size(); i ++ )
-        {
+	for( unsigned int i = 0; i < fXE.size(); i ++ )
+	{
 		if( TMath::Power( ( ( x - fXE[i] ) * TMath::Cos( fAngE[i] * TMath::DegToRad() ) + ( y - fYE[i] ) * TMath::Sin( fAngE[i] * TMath::DegToRad() ) ) / fR1E[i], 2 ) + TMath::Power( ( ( x - fXE[i] ) * TMath::Sin( fAngE[i] * TMath::DegToRad() ) - ( y - fYE[i] ) * TMath::Cos( fAngE[i] * TMath::DegToRad() ) ) / fR2E[i] , 2 ) < 1 )
-                {
-                        return true;
-                }
-        }
-
+		{
+			return true;
+		}
+	}
+	
 	return false;
 }
 
@@ -556,14 +556,14 @@ void VRadialAcceptance::setRegionToExcludeAcceptance( vector<double> x, vector<d
 	fXE = x;
 	fYE = y;
 	
-        fR1E = r1;
-        fR2E = r2;
+	fR1E = r1;
+	fR2E = r2;
 	fAngE = theta;
 	if( fXE.size() != fYE.size() || fXE.size() != fR1E.size() || fXE.size() != fR2E.size() || fXE.size() != fAngE.size() )
-        {
-                cout << "VRadialAcceptance::setRegionToExcludeAcceptance: error: vectors of exclusion regions have different size: ";
-                cout << fXE.size() << " " << fYE.size() << " " << fR1E.size() << " " << fR2E.size() << " " << fAngE.size() << endl;
-        }
+	{
+		cout << "VRadialAcceptance::setRegionToExcludeAcceptance: error: vectors of exclusion regions have different size: ";
+		cout << fXE.size() << " " << fYE.size() << " " << fR1E.size() << " " << fR2E.size() << " " << fAngE.size() << endl;
+	}
 }
 
 /*

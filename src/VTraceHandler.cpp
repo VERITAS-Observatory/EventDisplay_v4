@@ -25,7 +25,7 @@ VTraceHandler::VTraceHandler()
 	fFindPulseTiming = false;
 	
 	fTraceIntegrationMethod = 1;
-    kIPRmeasure  = false;
+	kIPRmeasure  = false;
 	
 }
 
@@ -56,8 +56,8 @@ void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSample
 		return;
 	}
 	
-    ///////////////////////////////////////
-    // copy trace from raw data reader
+	///////////////////////////////////////
+	// copy trace from raw data reader
 	if( iNSamples != fpTrace.size() )
 	{
 		fpTrace.clear();
@@ -68,13 +68,13 @@ void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSample
 	}
 	else for( unsigned int i = 0; i < iNSamples; i++ )
 		{
-				fpTrace[i] = iReader->getSample_double( iHitID, i + fMC_FADCTraceStart, ( i == 0 ) );
+			fpTrace[i] = iReader->getSample_double( iHitID, i + fMC_FADCTraceStart, ( i == 0 ) );
 		}
 		
 	fpTrazeSize = int( fpTrace.size() );
-
-    ////////////////////////////
-    // apply hi-lo gain ratio
+	
+	////////////////////////////
+	// apply hi-lo gain ratio
 	fHiLo = apply_lowgain( iHiLo );
 }
 
@@ -162,8 +162,8 @@ bool VTraceHandler::apply_lowgain( double iHiLo )
 double VTraceHandler::calculateTraceSum_fixedWindow( int fFirst, int fLast, bool iRaw )
 {
 	double sum = 0.;
-    double tcharge = 0.;
-    fTraceAverageTime = 0.;
+	double tcharge = 0.;
+	fTraceAverageTime = 0.;
 	for( int i = fFirst; i < fLast; i++ )
 	{
 		// require that trace is >0.
@@ -173,12 +173,12 @@ double VTraceHandler::calculateTraceSum_fixedWindow( int fFirst, int fLast, bool
 			if( !iRaw )
 			{
 				sum += fpTrace[i] - fPed;
-                tcharge += ( i + 0.5 ) * ( fpTrace[i] - fPed );
+				tcharge += ( i + 0.5 ) * ( fpTrace[i] - fPed );
 			}
-            else
+			else
 			{
 				sum += fpTrace[i];
-                tcharge += ( i + 0.5 ) * fpTrace[i];
+				tcharge += ( i + 0.5 ) * fpTrace[i];
 			}
 		}
 	}
@@ -186,15 +186,15 @@ double VTraceHandler::calculateTraceSum_fixedWindow( int fFirst, int fLast, bool
 	{
 		sum = 0.;
 	}
-    if( TMath::Abs( sum ) < 1.e-10 )
+	if( TMath::Abs( sum ) < 1.e-10 )
 	{
 		sum = 0.;
-        fTraceAverageTime = 0.;
+		fTraceAverageTime = 0.;
 	}
-    else
-    {
-        fTraceAverageTime = tcharge / sum;
-    }
+	else
+	{
+		fTraceAverageTime = tcharge / sum;
+	}
 	return sum;
 }
 
@@ -289,10 +289,10 @@ vector<float> VTraceHandler::getFADCTiming( int fFirst, int fLast, bool debug )
 	{
 		cout << "VTraceHandler::getFADCTiming()  Warning: coulnd't find bin with signal > 40 dc in range " << fFirst << " - " << fLast << endl;
 	}
-    if( i_start >= 4 )
-    {
-        i_start -= 4;
-     }
+	if( i_start >= 4 )
+	{
+		i_start -= 4;
+	}
 	while( i_start < fFirst )
 	{
 		i_start++;
@@ -300,10 +300,10 @@ vector<float> VTraceHandler::getFADCTiming( int fFirst, int fLast, bool debug )
 	i_stop += 4;
 	while( i_stop > fLast )
 	{
-        if( i_stop > 0 )
-        {
-            i_stop--;
-        }
+		if( i_stop > 0 )
+		{
+			i_stop--;
+		}
 	}
 	return getPulseTiming( i_start, i_stop, i_start, i_stop );
 }
@@ -423,12 +423,12 @@ void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpo
 	double it = 0.;
 	int nMax = ( int )( fDynamicRange * tmax );
 	n255 = 0;
-    // value at maximum
+	// value at maximum
 	tmax = -10000.;
-    // position of maximum (in samples)
+	// position of maximum (in samples)
 	maxpos = -100;
-    /////////////////////////////////////////////////////
-    // determine maximum position in a high gain channel
+	/////////////////////////////////////////////////////
+	// determine maximum position in a high gain channel
 	if( !fHiLo )
 	{
 		if( fFirst >= 0 && fFirst < fLast && fLast <= fpTrazeSize )
@@ -445,15 +445,15 @@ void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpo
 			tmax -= fPed;
 		}
 	}
-    /////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////
 	// low gain channel
-    // (needs special treatment as end of the saturated high gain pulse is
+	// (needs special treatment as end of the saturated high gain pulse is
 	//  occassionally at the beginning of the readout window)
 	else
 	{
 		if( fFirst >= 0 && fFirst < fLast && fLast <= fpTrazeSize )
 		{
-            // start search at end of the integration window
+			// start search at end of the integration window
 			for( int i = fLast - 1; i >= fFirst; i-- )
 			{
 				it = fpTrace[i];
@@ -633,53 +633,53 @@ bool VTraceHandler::setTraceIntegrationmethod( unsigned int iT )
  *
  */
 double VTraceHandler::getTraceSum( int iSumWindowFirst, int iSumWindowLast, bool iRaw,
-                                   unsigned int iTraceIntegrationMethod, bool iForceWindowStart,
-                                   unsigned int iSlidingWindowLast )
+								   unsigned int iTraceIntegrationMethod, bool iForceWindowStart,
+								   unsigned int iSlidingWindowLast )
 {
-    // set trace integration method
-    if( iTraceIntegrationMethod < 9999 )
-    {
-        fTraceIntegrationMethod = iTraceIntegrationMethod;
-    }
-
+	// set trace integration method
+	if( iTraceIntegrationMethod < 9999 )
+	{
+		fTraceIntegrationMethod = iTraceIntegrationMethod;
+	}
+	
 	// integrate from fFirst to fLast
 	if( fTraceIntegrationMethod == 1 )
 	{
-        fSumWindowFirst = iSumWindowFirst;
-        fSumWindowLast  = iSumWindowLast;
+		fSumWindowFirst = iSumWindowFirst;
+		fSumWindowLast  = iSumWindowLast;
 		return calculateTraceSum_fixedWindow( fSumWindowFirst, fSumWindowLast, iRaw );
 	}
 	// find maximum integral
 	else if( fTraceIntegrationMethod == 2 )
 	{
-        if( !kIPRmeasure )
-        {
-            // special case: search over restricted window
-            if( iForceWindowStart )
-            {
-                if( iSlidingWindowLast >= fpTrace.size() )
-                {
-                    iSlidingWindowLast = fpTrace.size();
-                }
-                return calculateTraceSum_slidingWindow( iSumWindowFirst,
-                                                        iSlidingWindowLast,
-                                                        iSumWindowLast - iSumWindowFirst,
-                                                        iRaw );
-            }
-            // default: search over whole summation window
-            else
-            {
-                return calculateTraceSum_slidingWindow( 0, fpTrace.size(), iSumWindowLast - iSumWindowFirst, iRaw );
-            }
-        }
-        // IPR measurements from long trace file
-        else
-        {
-            return calculateTraceSum_slidingWindow( 0.5 * fpTrace.size(),
-                                                    fpTrace.size(),
-                                                    iSumWindowLast - iSumWindowFirst,
-                                                    iRaw );
-       }
+		if( !kIPRmeasure )
+		{
+			// special case: search over restricted window
+			if( iForceWindowStart )
+			{
+				if( iSlidingWindowLast >= fpTrace.size() )
+				{
+					iSlidingWindowLast = fpTrace.size();
+				}
+				return calculateTraceSum_slidingWindow( iSumWindowFirst,
+														iSlidingWindowLast,
+														iSumWindowLast - iSumWindowFirst,
+														iRaw );
+			}
+			// default: search over whole summation window
+			else
+			{
+				return calculateTraceSum_slidingWindow( 0, fpTrace.size(), iSumWindowLast - iSumWindowFirst, iRaw );
+			}
+		}
+		// IPR measurements from long trace file
+		else
+		{
+			return calculateTraceSum_slidingWindow( 0.5 * fpTrace.size(),
+													fpTrace.size(),
+													iSumWindowLast - iSumWindowFirst,
+													iRaw );
+		}
 	}
 	// return simple the trace maximum as trace sum
 	else if( fTraceIntegrationMethod == 5 )
@@ -690,7 +690,7 @@ double VTraceHandler::getTraceSum( int iSumWindowFirst, int iSumWindowLast, bool
 		{
 			result = peakamplitude + fPed;
 		}
-        else
+		else
 		{
 			result = peakamplitude;
 		}
@@ -708,104 +708,104 @@ double VTraceHandler::getTraceSum( int iSumWindowFirst, int iSumWindowLast, bool
  *
 */
 double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart,
-        unsigned int iSearchEnd,
-        int iIntegrationWindow,
-        bool fRaw )
+		unsigned int iSearchEnd,
+		int iIntegrationWindow,
+		bool fRaw )
 {
-    unsigned int n = fpTrace.size();
-    unsigned int window = iIntegrationWindow;
-    unsigned int SearchEnd = iSearchEnd;
-    if( ( n - window ) <= SearchEnd )
-    {
-        SearchEnd = n - window + 1;
-    }
-    int lolimit = 0;
-    int uplimit = 0;
-    float tcharge = 0.;
-    double ampl = 0.;
-    double charge = 0.;
-    float ped = fPed;
-    if( kIPRmeasure )
-    {
-        ped = 0.;
-    }
-    ////////////////////////////////////////
-    // sample time and value (ped subracted)
-    float muxBINS[n], FADC[n];
-    for( unsigned int i = 1; i <= n; i++ )
-    {
-        muxBINS[i - 1] = i - 0.5;
-        FADC[i - 1] = ( float )fpTrace.at( i - 1 ) - ped;
-    }
-    
-    if( n == 0 )
-    {
-        fTraceAverageTime = muxBINS[1];
-        return 0.;
-    }
-    
-    ////////////////////////////////////////
-    // special case for ped calculation
-    if( fRaw )
-    {
-        for( unsigned int i = 0; i < ( unsigned int )iIntegrationWindow; i++ )
-        {
-            charge += ( float )fpTrace.at( n - 1 - i );
-        }
-        fTraceAverageTime = muxBINS[n - 1];
-        fSumWindowFirst = n - iIntegrationWindow;
-        fSumWindowLast  = n;
-        
-        return FADC[1];
-    }
-    
-    ////////////////////////////////////////
-    float xmax = 0.;
-    for( unsigned int i = iSearchStart; i < int( window ) + iSearchStart; i++ )
-    {
-        xmax += FADC[i];
-    }
-    // extract charge
-    for( unsigned int i = iSearchStart; i < SearchEnd; i++ )
-    {
-        if( charge < xmax )
-        {
-            charge = xmax;
-            uplimit = i + int( window );
-            if( uplimit > int( n ) )
-            {
-                uplimit = n;
-            }
-            lolimit = i;
-            if( lolimit < 0 )
-            {
-                lolimit = 0;
-            }
-        }
-        xmax = xmax - FADC[i] + FADC[i + window];
-    }
-    // arrival times *****************************************************
-    for( int k = lolimit; k < uplimit; k++ )
-    {
-        tcharge += muxBINS[k] * FADC[k];
-    }
-    
-    if( charge != 0. )
-    {
-        fTraceAverageTime = tcharge / charge;
-    }
-    if( fTraceAverageTime < iSearchStart )
-    {
-        fTraceAverageTime = 0.;
-    }
-    if( fTraceAverageTime > ( ( int )SearchEnd + ( int )window - 1 ) )
-    {
-        fTraceAverageTime = ( ( int )SearchEnd + ( int )window - 1 );
-    }
-    ampl -= fPed;
-    
-    fSumWindowFirst = lolimit;
-    fSumWindowLast  = uplimit;
-    
-    return charge;
+	unsigned int n = fpTrace.size();
+	unsigned int window = iIntegrationWindow;
+	unsigned int SearchEnd = iSearchEnd;
+	if( ( n - window ) <= SearchEnd )
+	{
+		SearchEnd = n - window + 1;
+	}
+	int lolimit = 0;
+	int uplimit = 0;
+	float tcharge = 0.;
+	double ampl = 0.;
+	double charge = 0.;
+	float ped = fPed;
+	if( kIPRmeasure )
+	{
+		ped = 0.;
+	}
+	////////////////////////////////////////
+	// sample time and value (ped subracted)
+	float muxBINS[n], FADC[n];
+	for( unsigned int i = 1; i <= n; i++ )
+	{
+		muxBINS[i - 1] = i - 0.5;
+		FADC[i - 1] = ( float )fpTrace.at( i - 1 ) - ped;
+	}
+	
+	if( n == 0 )
+	{
+		fTraceAverageTime = muxBINS[1];
+		return 0.;
+	}
+	
+	////////////////////////////////////////
+	// special case for ped calculation
+	if( fRaw )
+	{
+		for( unsigned int i = 0; i < ( unsigned int )iIntegrationWindow; i++ )
+		{
+			charge += ( float )fpTrace.at( n - 1 - i );
+		}
+		fTraceAverageTime = muxBINS[n - 1];
+		fSumWindowFirst = n - iIntegrationWindow;
+		fSumWindowLast  = n;
+		
+		return FADC[1];
+	}
+	
+	////////////////////////////////////////
+	float xmax = 0.;
+	for( unsigned int i = iSearchStart; i < int( window ) + iSearchStart; i++ )
+	{
+		xmax += FADC[i];
+	}
+	// extract charge
+	for( unsigned int i = iSearchStart; i < SearchEnd; i++ )
+	{
+		if( charge < xmax )
+		{
+			charge = xmax;
+			uplimit = i + int( window );
+			if( uplimit > int( n ) )
+			{
+				uplimit = n;
+			}
+			lolimit = i;
+			if( lolimit < 0 )
+			{
+				lolimit = 0;
+			}
+		}
+		xmax = xmax - FADC[i] + FADC[i + window];
+	}
+	// arrival times *****************************************************
+	for( int k = lolimit; k < uplimit; k++ )
+	{
+		tcharge += muxBINS[k] * FADC[k];
+	}
+	
+	if( charge != 0. )
+	{
+		fTraceAverageTime = tcharge / charge;
+	}
+	if( fTraceAverageTime < iSearchStart )
+	{
+		fTraceAverageTime = 0.;
+	}
+	if( fTraceAverageTime > ( ( int )SearchEnd + ( int )window - 1 ) )
+	{
+		fTraceAverageTime = ( ( int )SearchEnd + ( int )window - 1 );
+	}
+	ampl -= fPed;
+	
+	fSumWindowFirst = lolimit;
+	fSumWindowLast  = uplimit;
+	
+	return charge;
 }

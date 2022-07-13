@@ -2,7 +2,7 @@
     \brief effective area fitting
 
 
-    
+
 */
 
 #include "VFitEffectiveArea.h"

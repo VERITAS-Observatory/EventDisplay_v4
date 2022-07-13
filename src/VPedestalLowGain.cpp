@@ -8,7 +8,7 @@
     In general, only combineLowGainPedestalFileForAllTelescopes(...) has to be called
     (as long as channel 0-249 are in one file and 250-499 in the other)
 
-    
+
 
 */
 

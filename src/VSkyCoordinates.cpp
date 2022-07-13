@@ -86,11 +86,11 @@ void VSkyCoordinates::precessTarget( int iMJD, int iTelID )
 		}
 		// ENDTEMP
 		// precess target coordinates
-        VSkyCoordinatesUtilities::precessTarget( iMJD, fTargetRA, fTargetDec );
+		VSkyCoordinatesUtilities::precessTarget( iMJD, fTargetRA, fTargetDec );
 		
 		if( !fSupressStdoutText )
 		{
-            cout << "\tMJD " << iMJD;
+			cout << "\tMJD " << iMJD;
 			cout << "\t RA=" << fTargetRA* TMath::RadToDeg() << " dec=" << fTargetDec* TMath::RadToDeg() << endl;
 		}
 		// precess telescope coordinates
@@ -218,34 +218,34 @@ void VSkyCoordinates::getDerotatedShowerDirection( double ze, double az, float& 
 
 double VSkyCoordinates::derotateCoords( double i_UTC, double i_xin, double i_yin, double& i_xout, double& i_yout )
 {
-    double i_theta = VSkyCoordinatesUtilities::getDerotationAngle( i_UTC, fTelRA, fTelDec, fObsLongitude, fObsLatitude );
-    i_xout = i_xin * cos( i_theta ) + i_yin * sin( i_theta );
-    i_yout = i_yin * cos( i_theta ) - i_xin * sin( i_theta );
-    return i_theta;
+	double i_theta = VSkyCoordinatesUtilities::getDerotationAngle( i_UTC, fTelRA, fTelDec, fObsLongitude, fObsLatitude );
+	i_xout = i_xin * cos( i_theta ) + i_yin * sin( i_theta );
+	i_yout = i_yin * cos( i_theta ) - i_xin * sin( i_theta );
+	return i_theta;
 }
 
 double VSkyCoordinates::getDerotationAngle( int i_mjd, double i_seconds )
 {
-    return VSkyCoordinatesUtilities::getDerotationAngle( VSkyCoordinatesUtilities::getUTC( i_mjd, i_seconds ),
-            fTelRA, fTelDec, fObsLongitude, fObsLatitude );
+	return VSkyCoordinatesUtilities::getDerotationAngle( VSkyCoordinatesUtilities::getUTC( i_mjd, i_seconds ),
+			fTelRA, fTelDec, fObsLongitude, fObsLatitude );
 }
 
 double VSkyCoordinates::derotateCoords( int i_mjd, double i_seconds, double i_xin, double i_yin, double& i_xout, double& i_yout )
 {
 	double i_UTC = VSkyCoordinatesUtilities::getUTC( i_mjd, i_seconds );
-    double i_theta = VSkyCoordinatesUtilities::getDerotationAngle( i_UTC, fTelRA, fTelDec, fObsLongitude, fObsLatitude );
+	double i_theta = VSkyCoordinatesUtilities::getDerotationAngle( i_UTC, fTelRA, fTelDec, fObsLongitude, fObsLatitude );
 	i_xout = i_xin * cos( i_theta ) + i_yin * sin( i_theta );
 	i_yout = i_yin * cos( i_theta ) - i_xin * sin( i_theta );
-    return i_theta;
+	return i_theta;
 }
 
 double VSkyCoordinates::rotateCoords( int i_mjd, double i_seconds, double i_xin, double i_yin, double& i_xout, double& i_yout )
 {
 	double i_UTC = VSkyCoordinatesUtilities::getUTC( i_mjd, i_seconds );
-    double i_theta = -1. * VSkyCoordinatesUtilities::getDerotationAngle( i_UTC, fTelRA, fTelDec, fObsLongitude, fObsLatitude );
+	double i_theta = -1. * VSkyCoordinatesUtilities::getDerotationAngle( i_UTC, fTelRA, fTelDec, fObsLongitude, fObsLatitude );
 	i_xout = i_xin * cos( i_theta ) + i_yin * sin( i_theta );
 	i_yout = i_yin * cos( i_theta ) - i_xin * sin( i_theta );
-    return i_theta;
+	return i_theta;
 }
 
 
@@ -308,7 +308,7 @@ void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast, int iTelID, 
 
 */
 bool VSkyCoordinates::initStarCatalogue( string iCatalogueName, double iMJD,
-        double xmin, double xmax, double ymin, double ymax,
+		double xmin, double xmax, double ymin, double ymax,
 		double iRASkyMapCentre_J2000, double iDecSkyMapCentre_J2000 )
 {
 	if( !fStarCatalogue )

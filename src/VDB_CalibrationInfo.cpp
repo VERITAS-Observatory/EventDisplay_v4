@@ -188,11 +188,11 @@ void VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file( string pass_word )
 	
 	std::cout << "You are in the process of WRITING in VOFFLINE Data Base " << std::endl;
 	std::cout << "in order to complete the process: " << std::endl;
-    string the_password = pass_word;
-    if( the_password == "" )
-    {
-        please_give_the_password();
-    }
+	string the_password = pass_word;
+	if( the_password == "" )
+	{
+		please_give_the_password();
+	}
 	
 	//std::cout<<"VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file "<<std::endl;
 	VDB_Connection my_connection( iTempS.c_str(), "readwrite", the_password.c_str() ) ;
@@ -295,7 +295,7 @@ string VDB_CalibrationInfo::please_give_the_password()
 	
 	
 	printf( "Please enter the password: " );
-    int result_scan = scanf( "%79s", str );
+	int result_scan = scanf( "%79s", str );
 	
 	if( result_scan > 0 )
 	{

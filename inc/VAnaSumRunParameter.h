@@ -61,9 +61,9 @@ class VAnaSumRunParameterDataClass : public TNamed
 		
 		double fMJDOn;
 		double fMJDOff;
-
-        double fMJDOnStart;
-        double fMJDOnStop;
+		
+		double fMJDOnStart;
+		double fMJDOnStop;
 		
 		string fTarget;
 		double fTargetRAJ2000;
@@ -71,12 +71,12 @@ class VAnaSumRunParameterDataClass : public TNamed
 		double fTargetRA;                         // [deg], precessed
 		double fTargetDec;                        // [deg], precessed
 		double fPairOffset;
-
-        // centre of camera fov
-        double fArrayPointingRA;
-        double fArrayPointingDec;
-        double fArrayPointingRAJ2000;
-        double fArrayPointingDecJ2000;
+		
+		// centre of camera fov
+		double fArrayPointingRA;
+		double fArrayPointingDec;
+		double fArrayPointingRAJ2000;
+		double fArrayPointingDecJ2000;
 		
 		double fWobbleNorth;                      // [deg]
 		double fWobbleWest;                       // [deg]
@@ -135,10 +135,10 @@ class VAnaSumRunParameterDataClass : public TNamed
 		
 		VAnaSumRunParameterDataClass();
 		~VAnaSumRunParameterDataClass() {}
-        bool operator<(const VAnaSumRunParameterDataClass& x) const
-        {
-            return fRunOn < x.fRunOn;
-        }
+		bool operator<( const VAnaSumRunParameterDataClass& x ) const
+		{
+			return fRunOn < x.fRunOn;
+		}
 		ClassDef( VAnaSumRunParameterDataClass, 3 );
 };
 
@@ -150,7 +150,7 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		
 		int checkNumberOfArguments( string is );
 		void checkNumberOfArguments( int im, int narg, string isf, string isl, int iversion, bool ishortlist );
-                double getDeclinationFromStrings( string iDec1, string iDec2, string iDec3 );
+		double getDeclinationFromStrings( string iDec1, string iDec2, string iDec3 );
 		double getRingWidth( double sr, double rr, double rat );
 		bool   readCutParameter( string ifile, double& iSourceRadius, double& iMaximumDistance );
 		bool   checkAnasumParameter( string ifile );
@@ -159,7 +159,7 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		int  returnWithError( string iL, string iM, string iC = "" );
 		void reset( VAnaSumRunParameterDataClass );
 		void setMCZenith();
-        bool sortAnaSumRunParameterDataClass( VAnaSumRunParameterDataClass l1, VAnaSumRunParameterDataClass l2 );
+		bool sortAnaSumRunParameterDataClass( VAnaSumRunParameterDataClass l1, VAnaSumRunParameterDataClass l2 );
 		
 	public:
 	
@@ -198,11 +198,11 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		
 		int f2DAcceptanceMode ; // USE2DACCEPTANCE
 		
-        // add all events to DL3 tree, no gh cuts but add BDT score and IsGamma 
-        bool fWriteAllEvents;
-        // write data_on and data_off trees (subset of DL3 tree)
-        bool fWriteDataOnOffTrees;
-
+		// add all events to DL3 tree, no gh cuts but add BDT score and IsGamma
+		bool fWriteAllEvents;
+		// write data_on and data_off trees (subset of DL3 tree)
+		bool fWriteDataOnOffTrees;
+		
 		// vector with all run parameters
 		vector< VAnaSumRunParameterDataClass > fRunList;
 		// map with all run parameters (sorted after onrun)
@@ -227,7 +227,7 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		double fTMPL_maxradius;
 		string fTMPL_AcceptanceFile;
 		string fTMPL_EffectiveAreaFile;
-
+		
 		// Likelihood Spectral Analysis
 		bool fLikelihoodAnalysis;
 		
@@ -262,13 +262,13 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 		void printStereoParameter( unsigned int icounter );
 		void printStereoParameter( int irun );
 		int  readRunParameter( string i_filename );
-        void setArrayPointing(unsigned int, std::pair<double, double>, std::pair<double, double>);
-        bool setRunTimes( unsigned int irun, double iMJDStart, double iMJDStopp );
+		void setArrayPointing( unsigned int, std::pair<double, double>, std::pair<double, double> );
+		bool setRunTimes( unsigned int irun, double iMJDStart, double iMJDStopp );
 		bool setSkyMapCentreJ2000( unsigned int i );
 		bool setTargetRADecJ2000( unsigned int i );
 		void setTargetRADec_currentEpoch( unsigned int i, double ra, double dec );
 		bool setTargetShifts( unsigned int i );
-        void sortRunList();
+		void sortRunList();
 		bool writeListOfExcludedSkyRegions();
 		bool getListOfExcludedSkyRegions( TFile* f );
 		

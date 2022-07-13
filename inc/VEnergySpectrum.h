@@ -74,7 +74,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		double fSpectralFitEnergy_min;
 		double fSpectralFitEnergy_max;
 		double fCL;								// Confidence Level
-
+		
 		double fOffsetDistance;                  // offset distance to get correct counting histograms
 		
 		// plotting variables
@@ -164,8 +164,8 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 			return hErecCountsOff;
 		}
 		TGraphAsymmErrors* getEnergySpectrumGraph();
-                double  getUpperEdgeofLastFilledEnergyBin( double iMinNon  = 1., double iSignificance = 0. );
-                double getLowerEdgeofFirstFilledEnergyBin( double iMinNon  = 1., double iSignificance = 0. );
+		double  getUpperEdgeofLastFilledEnergyBin( double iMinNon  = 1., double iSignificance = 0. );
+		double getLowerEdgeofFirstFilledEnergyBin( double iMinNon  = 1., double iSignificance = 0. );
 		TH1D* getTotalTimeHistogram( bool iDeadtimeCorrected = false )
 		{
 			if( iDeadtimeCorrected )
@@ -200,8 +200,8 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		void      printDifferentialFluxes( bool bSED = false );
 		TCanvas*  plot( TCanvas* c = 0 );
 		TCanvas*  plotCrabNebulaSpectrum( double iPlottingMultiplierIndex = 0., double i_FitStart_TevLin = 0.3,
-				                  double i_FitStop_TeVLin = 20., double i_EnergyBinningLog10 = 0.1,
-                                                  int iFitFunctionID = 0 );
+										  double i_FitStop_TeVLin = 20., double i_EnergyBinningLog10 = 0.1,
+										  int iFitFunctionID = 0 );
 		TCanvas*  plotCountingHistograms( TCanvas* c = 0 );
 		void      plotEventNumbers( Double_t ts = 0.02 );
 		void      plotFitValues();
@@ -242,8 +242,8 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 										int iLiAndMa = 17, int iULAlgo = 5 );
 										
 		TF1* fitEnergySpectrum( string iname = "fit", bool bDraw = true );
-
-		void setConfidenceLevel( double i_CL = 0.68)
+		
+		void setConfidenceLevel( double i_CL = 0.68 )
 		{
 			fCL = i_CL;
 		}
@@ -310,7 +310,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 			fPlottingYaxisMin = iMin;
 			fPlottingYaxisMax = iMax;
 		}
-                bool writeSpectralPointsToCSVFile( string iOFileName, TGraphAsymmErrors* iDiffFlux = 0 );
+		bool writeSpectralPointsToCSVFile( string iOFileName, TGraphAsymmErrors* iDiffFlux = 0 );
 		
 		
 		ClassDef( VEnergySpectrum, 17 );

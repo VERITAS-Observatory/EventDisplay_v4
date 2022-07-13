@@ -37,11 +37,11 @@ class VTraceHandler
 		int fDynamicRange;                        //!< dynamic range
 		int fMaxThreshold;
 		unsigned int fMC_FADCTraceStart;          // start of FADC trace (in case the simulated trace is longer than needed)
-        bool     kIPRmeasure;                     // if signal extractor is in IPR measurements mode
+		bool     kIPRmeasure;                     // if signal extractor is in IPR measurements mode
 		
 		double   getQuickMaximumSum( unsigned int iSearchStart, unsigned int iSearchEnd, int iIntegrationWindow, bool fRaw = false );
 		
-        double   calculateTraceSum_slidingWindow( unsigned int iSearchStart, unsigned int iSearchEnd, int iIntegrationWindow, bool fRaw );
+		double   calculateTraceSum_slidingWindow( unsigned int iSearchStart, unsigned int iSearchEnd, int iIntegrationWindow, bool fRaw );
 		
 		void     reset();
 		
@@ -86,12 +86,12 @@ class VTraceHandler
 		{
 			return getQuickPulseWidth( fFirst, fLast, fPed );
 		}
-        virtual double getTraceSum( int iSumWindowFirst,
-                                    int iSumWindowLast,
-                                    bool iRaw,
-                                    unsigned int iTraceIntegrationMethod = 9999,
-                                    bool iForceWindowStart = false,
-                                    unsigned int iSlidingWindowLast = 9999 );
+		virtual double getTraceSum( int iSumWindowFirst,
+									int iSumWindowLast,
+									bool iRaw,
+									unsigned int iTraceIntegrationMethod = 9999,
+									bool iForceWindowStart = false,
+									unsigned int iSlidingWindowLast = 9999 );
 		virtual double getTraceTZero( int fFirst, int fLast )
 		{
 			return getQuickTZero( fFirst, fLast );
@@ -105,10 +105,10 @@ class VTraceHandler
 		{
 			return fFindPulseTiming;
 		}
-        unsigned int   getTraceIntegrationMethod()
-        {
-            return fTraceIntegrationMethod;
-        }
+		unsigned int   getTraceIntegrationMethod()
+		{
+			return fTraceIntegrationMethod;
+		}
 		virtual double getTraceMax();
 		virtual double getTraceMax( unsigned int& n255, double iHiLo = 6. ); // get maximum value in trace
 		virtual void   getTraceMax( double&, double& );
@@ -160,10 +160,10 @@ class VTraceHandler
 		{
 			fMC_FADCTraceStart = iO;
 		}
-        void    setIPRmeasure( bool iIPRmeasure = true )
-        {
-            kIPRmeasure = iIPRmeasure;
-        }
+		void    setIPRmeasure( bool iIPRmeasure = true )
+		{
+			kIPRmeasure = iIPRmeasure;
+		}
 		void    setPulseTimingLevels( vector< float > iP );
 		bool    setTraceIntegrationmethod( unsigned int iT = 1 );
 };

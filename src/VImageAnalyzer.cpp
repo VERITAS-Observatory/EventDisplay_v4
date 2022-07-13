@@ -46,7 +46,7 @@ VImageAnalyzer::VImageAnalyzer()
 	{
 		fAnaDir.push_back( 0 );
 	}
-    // initialize tgraphs (used for double pass method)
+	// initialize tgraphs (used for double pass method)
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
 		fXGraph.push_back( new TGraphErrors( 1 ) );
@@ -56,7 +56,7 @@ VImageAnalyzer::VImageAnalyzer()
 	
 	//If -hough is specified on the command line, run the hough transform initialization method in
 	//VImageParameterCalculation
-    if( fRunPar->fhoughmuonmode || fRunPar->fmuonmode )
+	if( fRunPar->fhoughmuonmode || fRunPar->fmuonmode )
 	{
 #ifndef NOGSL
 		cout << "Using GSL libraries for muon analysis." << endl;
@@ -64,10 +64,10 @@ VImageAnalyzer::VImageAnalyzer()
 		cout << "Warning! No GSL libraries found. Muon impact parameter corrected Size will not be calculated." << endl;
 #endif
 		cout << "" << endl;
-        if( fRunPar->fhoughmuonmode )
-        {
-            fVImageParameterCalculation->houghInitialization();
-        }
+		if( fRunPar->fhoughmuonmode )
+		{
+			fVImageParameterCalculation->houghInitialization();
+		}
 	}
 }
 
@@ -150,7 +150,7 @@ void VImageAnalyzer::doAnalysis()
 	{
 		calcTZerosSums( getSumFirst(), getSumFirst() + getSumWindow_Pass1(), getTraceIntegrationMethod_pass1() );
 	}
-    // no double pass (e.g. NN cleaning)
+	// no double pass (e.g. NN cleaning)
 	else
 	{
 		calcTZerosSums( getSumFirst(), getSumFirst() + getSumWindow(), getTraceIntegrationMethod() );
@@ -160,14 +160,14 @@ void VImageAnalyzer::doAnalysis()
 	getImageParameters()->nsat = fillSaturatedChannels();
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
-    // correct for FADC crate jitter timing
+	// correct for FADC crate jitter timing
 	if( fRunPar->fL2TimeCorrect )
 	{
 		FADCStopCorrect();
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
-    // apply timing correction from laser calibration (flatfielding in time)
+	// apply timing correction from laser calibration (flatfielding in time)
 	timingCorrect();
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
@@ -190,9 +190,9 @@ void VImageAnalyzer::doAnalysis()
 	// image parameter calculation
 	fVImageParameterCalculation->calcParameters();
 	fVImageParameterCalculation->calcTimingParameters();
-
+	
 	///////////////////////////////////////////////////////////////////////////////////////////
-    // here: no double pass trace integration
+	// here: no double pass trace integration
 	// do a log likelihood image fitting on events on the camera edge only
 	if( !fRunPar->fDoublePass || !fReader->hasFADCTrace() )
 	{
@@ -291,7 +291,7 @@ void VImageAnalyzer::doAnalysis()
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
-    // log likelihood image analysis (not default)
+	// log likelihood image analysis (not default)
 	// calculate image parameters (mainly for edge images)
 	if( fRunPar->fImageLL && getImageParameters()->ntubes > 0 )
 	{
@@ -415,7 +415,7 @@ void VImageAnalyzer::terminate( bool iDebug_IO )
 		// write calibration summaries
 		if( getRunParameter()->fsourcetype != 7 )
 		{
-            getCalibrationData()->terminate( getDead( false ), getDead( true ), getRunParameter()->fTraceIntegrationMethod[fTelID] );
+			getCalibrationData()->terminate( getDead( false ), getDead( true ), getRunParameter()->fTraceIntegrationMethod[fTelID] );
 		}
 		// write dead channel tree
 		// note: this writes the dead channel list of the last event to this tree
@@ -488,13 +488,13 @@ void VImageAnalyzer::initOutput()
 	if( fRunPar->foutputfileName != "-1" )
 	{
 		// tree versioning numbers used in mscw_energy
-        stringstream i_textTitle;
-        i_textTitle << "VERSION " << fRunPar->getEVNDISP_TREE_VERSION();
+		stringstream i_textTitle;
+		i_textTitle << "VERSION " << fRunPar->getEVNDISP_TREE_VERSION();
 		if( getRunParameter()->fShortTree )
 		{
-            i_textTitle << "(short tree)";
+			i_textTitle << "(short tree)";
 		}
-        fOutputfile = new TFile( fRunPar->foutputfileName.c_str(), "RECREATE", i_textTitle.str().c_str() );
+		fOutputfile = new TFile( fRunPar->foutputfileName.c_str(), "RECREATE", i_textTitle.str().c_str() );
 		if( fOutputfile->IsZombie() )
 		{
 			cout << endl;
@@ -636,7 +636,7 @@ bool VImageAnalyzer::initEvent()
 	// fill high/low gain vector
 	getImageParameters()->nlowgain = fillHiLo();
 	// fill vector with zero suppressed channels
-    // (return number of zero suppressed channels)
+	// (return number of zero suppressed channels)
 	getImageParameters()->nzerosuppressed = fillZeroSuppressed();
 	
 	if( fRunPar->fImageLL )
@@ -990,12 +990,12 @@ void VImageAnalyzer::imageCleaning()
 		else if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMENEXTNEIGHBOUR" )
 		{
 			cout << "Error cleaning method ";
-            cout << getImageCleaningParameter()->getImageCleaningMethod();
-            cout << " not defined for signal/noise thresholds" << endl;
-            cout << "exiting..." << endl;
-            exit( EXIT_FAILURE );
+			cout << getImageCleaningParameter()->getImageCleaningMethod();
+			cout << " not defined for signal/noise thresholds" << endl;
+			cout << "exiting..." << endl;
+			exit( EXIT_FAILURE );
 		}
-        // simple time two-level cleaning
+		// simple time two-level cleaning
 		else if( getImageCleaningParameter()->getImageCleaningMethod() == "TWOLEVELANDCORRELATION" )
 		{
 			fVImageCleaning->cleanImageTraceCorrelate( getImageCleaningParameter() );

@@ -54,9 +54,9 @@ class VStar : public TObject
 		~VStar() {};
 		
 		double getDistance( VStar* iStar1, VStar* iStar2 = 0 );
-        double getBrightness( string iBand );
+		double getBrightness( string iBand );
 		void printStar();
-        void printStar_for_anasum( string iBand );
+		void printStar_for_anasum( string iBand );
 		
 		ClassDef( VStar, 5 );
 };
