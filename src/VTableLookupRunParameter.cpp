@@ -15,7 +15,7 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	tablefile = "";
 	ze = -1.;
 	isMC = false;
-    fUpdateInstrumentEpoch = true;
+	fUpdateInstrumentEpoch = true;
 	fUseMedianEnergy = 1;
 	fPE = false;
 	fInterpolateString = "";
@@ -36,23 +36,23 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	fTableFillingCut_WobbleCut_max = 15.;
 	fminsize = 0.;
 	fmaxdist = 50000.;
-    fmaxloss = 1.;
+	fmaxloss = 1.;
 	fSelectRandom = -1.;
 	fSelectRandomSeed = 17;
-    fRerunStereoReconstruction = false;
-    fRerunStereoReconstruction_minAngle = -1.;
-    fRerunStereoReconstruction_BDTNImages_max = 4;
-    fRerunStereoReconstruction_BDTFileName = "";
-    fDispError_BDTFileName = "";
-    fDispError_BDTWeight = 5.;
-    fQualityCutLevel = 0;
+	fRerunStereoReconstruction = false;
+	fRerunStereoReconstruction_minAngle = -1.;
+	fRerunStereoReconstruction_BDTNImages_max = 4;
+	fRerunStereoReconstruction_BDTFileName = "";
+	fDispError_BDTFileName = "";
+	fDispError_BDTWeight = 5.;
+	fQualityCutLevel = 0;
 	
 	fLimitEnergyReconstruction = false;
 	
 	fMC_distance_to_cameracenter_min =  0.;
 	fMC_distance_to_cameracenter_max =  1.e10;
 	
-    fNentries = 1234567890;
+	fNentries = 1234567890;
 	fMaxRunTime = 1.e9;
 	
 	printpara = "";
@@ -125,10 +125,10 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		{
 			fUseMedianEnergy = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-        else if( iTemp.find( "updateEpoch" ) < iTemp.size() )
-        {
-                fUpdateInstrumentEpoch = (bool)atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-        }
+		else if( iTemp.find( "updateEpoch" ) < iTemp.size() )
+		{
+			fUpdateInstrumentEpoch = ( bool )atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
 		else if( iTemp.find( "noise" ) < iTemp.size() )
 		{
 			fNoiseLevel = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -169,63 +169,63 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 			{
 				cout << "unknown parameter, choose 1=fill or 2=read lookup tables" << endl;
 				return false;
-            }
-        }
-        // rerun the stero reconstruction
-        else if( iTemp.find( "-redo_stereo_reconstruction" ) < iTemp.size() )
-        {
-            fRerunStereoReconstruction = true;
-        }
-        // new minimum angle between image axes for simple stereo reconstruction
-        else if( iTemp.find( "-minangle_stereo_reconstruction" ) < iTemp.size() )
-        {
-            fRerunStereoReconstruction_minAngle = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-        }
-        // BDT directory and file name for disp stereo reconstruction (direction)
-        else if( iTemp.find( "-tmva_filename_stereo_reconstruction" ) < iTemp.size() )
-        {
-            if( iTemp2.size() > 0 )
-            {
-                fRerunStereoReconstruction_BDTFileName = iTemp2;
-                i++;
-            }
+			}
 		}
-        // DISP BDT reconstruction is applied for images with up to this multiplicity
-        else if( iTemp.find( "-tmva_nimages_max_stereo_reconstruction" ) < iTemp.size() )
-        {
-            fRerunStereoReconstruction_BDTNImages_max = ( unsigned int )( atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() ) );
-            if( fRerunStereoReconstruction_BDTNImages_max > 40000 )
-            {
-                cout << "VTableLookupRunParameter::fillParameters() error:";
-                cout << " maximum number of images for TMVA disp reconstruction is 4";
-                cout << " (selection was " << fRerunStereoReconstruction_BDTNImages_max << ")" << endl;
-                cout << "exiting..." << endl;
-                exit( EXIT_FAILURE );
-            }
-        }
-        // BDT directory and file name for disp stereo reconstruction (disperror)
-        else if( iTemp.find( "-tmva_filename_disperror_reconstruction" ) < iTemp.size() )
-        {
-            if( iTemp2.size() > 0 )
-            {
-                fDispError_BDTFileName = iTemp2;
-                i++;
-            }
-        }
-        else if( iTemp.find( "-tmva_disperror_weight" ) < iTemp.size() )
-        {
-            if( iTemp2.size() > 0 )
-            {
-                fDispError_BDTWeight = atof( iTemp2.c_str() );
-                i++;
-            }
-        }
-        else if( iTemp.find( "-qualitycutlevel" ) < iTemp.size() )
-        {
-            if( iTemp2.size() > 0 )
-            {
-                fQualityCutLevel = ( unsigned int )( atoi( iTemp2.c_str() ) );
-                i++;
+		// rerun the stero reconstruction
+		else if( iTemp.find( "-redo_stereo_reconstruction" ) < iTemp.size() )
+		{
+			fRerunStereoReconstruction = true;
+		}
+		// new minimum angle between image axes for simple stereo reconstruction
+		else if( iTemp.find( "-minangle_stereo_reconstruction" ) < iTemp.size() )
+		{
+			fRerunStereoReconstruction_minAngle = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
+		// BDT directory and file name for disp stereo reconstruction (direction)
+		else if( iTemp.find( "-tmva_filename_stereo_reconstruction" ) < iTemp.size() )
+		{
+			if( iTemp2.size() > 0 )
+			{
+				fRerunStereoReconstruction_BDTFileName = iTemp2;
+				i++;
+			}
+		}
+		// DISP BDT reconstruction is applied for images with up to this multiplicity
+		else if( iTemp.find( "-tmva_nimages_max_stereo_reconstruction" ) < iTemp.size() )
+		{
+			fRerunStereoReconstruction_BDTNImages_max = ( unsigned int )( atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() ) );
+			if( fRerunStereoReconstruction_BDTNImages_max > 40000 )
+			{
+				cout << "VTableLookupRunParameter::fillParameters() error:";
+				cout << " maximum number of images for TMVA disp reconstruction is 4";
+				cout << " (selection was " << fRerunStereoReconstruction_BDTNImages_max << ")" << endl;
+				cout << "exiting..." << endl;
+				exit( EXIT_FAILURE );
+			}
+		}
+		// BDT directory and file name for disp stereo reconstruction (disperror)
+		else if( iTemp.find( "-tmva_filename_disperror_reconstruction" ) < iTemp.size() )
+		{
+			if( iTemp2.size() > 0 )
+			{
+				fDispError_BDTFileName = iTemp2;
+				i++;
+			}
+		}
+		else if( iTemp.find( "-tmva_disperror_weight" ) < iTemp.size() )
+		{
+			if( iTemp2.size() > 0 )
+			{
+				fDispError_BDTWeight = atof( iTemp2.c_str() );
+				i++;
+			}
+		}
+		else if( iTemp.find( "-qualitycutlevel" ) < iTemp.size() )
+		{
+			if( iTemp2.size() > 0 )
+			{
+				fQualityCutLevel = ( unsigned int )( atoi( iTemp2.c_str() ) );
+				i++;
 			}
 		}
 		else if( iTemp.find( "-ze" ) < iTemp.size() )
@@ -253,16 +253,16 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		{
 			fSpectralIndex = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-		else if( iTemp.find( "-maxdist" ) < iTemp.size() 
-          && !( iTemp.find( "-maxdistancetocameracenter" ) < iTemp.size() )
-          && !( iTemp.find( "-maxdistfraction" ) < iTemp.size() ) )
+		else if( iTemp.find( "-maxdist" ) < iTemp.size()
+				 && !( iTemp.find( "-maxdistancetocameracenter" ) < iTemp.size() )
+				 && !( iTemp.find( "-maxdistfraction" ) < iTemp.size() ) )
 		{
 			fmaxdist = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-        else if( iTemp.find( "-maxloss" ) < iTemp.size() )
-        {
-            fmaxloss = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-        }
+		else if( iTemp.find( "-maxloss" ) < iTemp.size() )
+		{
+			fmaxloss = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
 		else if( iTemp.find( "-maxdistancetocameracenter" ) < iTemp.size() )
 		{
 			fMC_distance_to_cameracenter_max  = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -461,11 +461,11 @@ void VTableLookupRunParameter::printHelp()
 {
 	if( gSystem->Getenv( "EVNDISPSYS" ) )
 	{
-        int syst_ret = system( "cat $EVNDISPSYS/README/README.MSCW_ENERGY" );
-        if( syst_ret == -1 )
-        {
-            cout << "VTableLookupRunParameter::printHelp() error: could not find helper file in README directory" << endl;
-        }
+		int syst_ret = system( "cat $EVNDISPSYS/README/README.MSCW_ENERGY" );
+		if( syst_ret == -1 )
+		{
+			cout << "VTableLookupRunParameter::printHelp() error: could not find helper file in README directory" << endl;
+		}
 	}
 	else
 	{
@@ -508,7 +508,7 @@ void VTableLookupRunParameter::print( int iP )
 			cout << "writing reconstructed events only (" << bWriteReconstructedEventsOnly << ")" << endl;
 		}
 	}
-    else
+	else
 	{
 		cout << "filling lookup tables for: ";
 		cout << " zenith " << ze << ", direction offset " << fWobbleOffset << "(x0.01) [deg], ";
@@ -521,24 +521,24 @@ void VTableLookupRunParameter::print( int iP )
 		cout << "\t distance to camera: > " << fMC_distance_to_cameracenter_min << " [deg], <";
 		cout << fMC_distance_to_cameracenter_max << " [deg]" << endl;
 	}
-    if( fRerunStereoReconstruction )
-    {
-        cout << "\t rerunning stereo reconstruction" << endl;
-        if( fRerunStereoReconstruction_BDTFileName.size() > 0 )
-        {
-            cout << "\t reading BDT TMVA files from " << fRerunStereoReconstruction_BDTFileName << endl;
-            cout << "\t BDT TMVA stereo reconstruction is applied for events with <= ";
-            cout << fRerunStereoReconstruction_BDTNImages_max << " images" << endl;
-            if( fmaxdist < 1.e3 )
-            {
-                cout << "\t BDT TMVA stereo reconstruction distance cut < " << fmaxdist << endl;
-            }
-            if( fmaxloss < 1. )
-            {
-                cout << "\t BDT TMVA stereo reconstruction loss cut < " << fmaxloss << endl;
-            }
-        }
-    }
+	if( fRerunStereoReconstruction )
+	{
+		cout << "\t rerunning stereo reconstruction" << endl;
+		if( fRerunStereoReconstruction_BDTFileName.size() > 0 )
+		{
+			cout << "\t reading BDT TMVA files from " << fRerunStereoReconstruction_BDTFileName << endl;
+			cout << "\t BDT TMVA stereo reconstruction is applied for events with <= ";
+			cout << fRerunStereoReconstruction_BDTNImages_max << " images" << endl;
+			if( fmaxdist < 1.e3 )
+			{
+				cout << "\t BDT TMVA stereo reconstruction distance cut < " << fmaxdist << endl;
+			}
+			if( fmaxloss < 1. )
+			{
+				cout << "\t BDT TMVA stereo reconstruction loss cut < " << fmaxloss << endl;
+			}
+		}
+	}
 	if( iP == 2 && isMC )
 	{
 		cout << "zenith angle " << ze << " [deg], wobble offset " << fWobbleOffset / 100. << " [deg], noise level " << fNoiseLevel << endl;
@@ -555,7 +555,7 @@ void VTableLookupRunParameter::print( int iP )
 	{
 		cout << "\t use all images" << endl;
 	}
-    if( readwrite == 'W' )
+	if( readwrite == 'W' )
 	{
 		cout << "minimum number of showers required per lookup table bin: " << fMinRequiredShowerPerBin << endl;
 	}
@@ -571,10 +571,10 @@ void VTableLookupRunParameter::print( int iP )
 	{
 		cout << "use mean of energy distributions" << endl;
 	}
-    if( fUpdateInstrumentEpoch )
-    {
-            cout << "updating instrument epoch from default epoch file" << endl;
-    }
+	if( fUpdateInstrumentEpoch )
+	{
+		cout << "updating instrument epoch from default epoch file" << endl;
+	}
 	
 	if( iP >= 1 )
 	{

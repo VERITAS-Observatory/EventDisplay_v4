@@ -2,7 +2,7 @@
     \brief tree with basic telescope parameters (positions, ...)
 
 
-    
+
 */
 
 #include "VDetectorTree.h"

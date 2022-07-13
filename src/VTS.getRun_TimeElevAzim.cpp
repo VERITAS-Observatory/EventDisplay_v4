@@ -134,7 +134,7 @@ int main( int argc, char* argv[] )
 					if( runnumber < 9999 or runnumber > 999999 )
 					{
 						cout << "Error, '" << file_line;
-                                                cout << "' needs to be a valid runnumber (9999-999999)" << endl;
+						cout << "' needs to be a valid runnumber (9999-999999)" << endl;
 						return 1 ;
 					}
 					else
@@ -342,7 +342,7 @@ int main( int argc, char* argv[] )
 				iSid = VAstronometry::vlaGmsta( ( double ) mjdInt, mjdFrac ) ;
 				iSid = iSid - lon_rad ;
 				ha   = VAstronometry::vlaDranrm( iSid - ra_rad ) ;
-                VAstronometry::vlaDe2h( ha, de_rad, lat_rad, &Azim, &Elev ) ;
+				VAstronometry::vlaDe2h( ha, de_rad, lat_rad, &Azim, &Elev ) ;
 				Azim *= TMath::RadToDeg() ;
 				Elev *= TMath::RadToDeg() ;
 				cout << "i_row:" << i_row << endl;

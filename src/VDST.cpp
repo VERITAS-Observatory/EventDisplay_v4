@@ -4,7 +4,7 @@
     output is after pedestal substraction, gain and toffset correction
 
 
-    
+
 */
 
 #include <VDST.h>

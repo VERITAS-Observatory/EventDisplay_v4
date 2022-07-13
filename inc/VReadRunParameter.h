@@ -46,7 +46,7 @@ class VReadRunParameter
 		void isCompiledWithDB();
 		bool getRunParametersFromDST();
 		bool readEpochsAndAtmospheres();
-                bool readTraceAmplitudeCorrections( string ifile );
+		bool readTraceAmplitudeCorrections( string ifile );
 		void setDirectories();
 		
 	public:

@@ -112,46 +112,46 @@ int main( int argc, char* argv[] )
 	{
 		cout << "combine several tables from different files into one single table file" << endl << endl;
 		cout << "combineLookupTables <file with list of tables> <output file name> [histogram types to copy]" << endl;
-                cout << endl;
-                cout << "[histogram types]:    all, mpv, median (default)" << endl;
+		cout << endl;
+		cout << "[histogram types]:    all, mpv, median (default)" << endl;
 		cout << endl;
 		exit( EXIT_FAILURE );
 	}
 	string fListOfFiles = argv[1];
 	string fOFile       = argv[2];
-        string histogram_types = "median";
-        if( argc == 4 )
-        {
-            histogram_types = argv[3];
-        }
-        vector< string > hist_to_copy;
-        if( histogram_types == "all" )
-        {
-            hist_to_copy.push_back( "median" );
-            hist_to_copy.push_back( "Median" );
-            hist_to_copy.push_back( "mpv" );
-        }
-        else if( histogram_types == "median" )
-        {
-            hist_to_copy.push_back( "median" );
-            hist_to_copy.push_back( "Median" );
-        }
-        else if( histogram_types == "mpv" )
-        {
-            hist_to_copy.push_back( "mpv" );
-        }
-        else
-        {
-            cout << "unknown histogram type (use all/median/mpv)" << endl;
-            cout << "exiting..." << endl;
-            exit( EXIT_FAILURE );
-        }
-        cout << "Copying histograms of type: ";
-        for( unsigned int i = 0; i < hist_to_copy.size(); i++ )
-        {
-            cout << hist_to_copy[i] << "  ";
-        }
-        cout << endl;
+	string histogram_types = "median";
+	if( argc == 4 )
+	{
+		histogram_types = argv[3];
+	}
+	vector< string > hist_to_copy;
+	if( histogram_types == "all" )
+	{
+		hist_to_copy.push_back( "median" );
+		hist_to_copy.push_back( "Median" );
+		hist_to_copy.push_back( "mpv" );
+	}
+	else if( histogram_types == "median" )
+	{
+		hist_to_copy.push_back( "median" );
+		hist_to_copy.push_back( "Median" );
+	}
+	else if( histogram_types == "mpv" )
+	{
+		hist_to_copy.push_back( "mpv" );
+	}
+	else
+	{
+		cout << "unknown histogram type (use all/median/mpv)" << endl;
+		cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
+	}
+	cout << "Copying histograms of type: ";
+	for( unsigned int i = 0; i < hist_to_copy.size(); i++ )
+	{
+		cout << hist_to_copy[i] << "  ";
+	}
+	cout << endl;
 	
 	vector< string > fInFiles = readListOfFiles( fListOfFiles );
 	unsigned int nFiles = fInFiles.size();
@@ -219,9 +219,9 @@ int main( int argc, char* argv[] )
  *
  *   Author: Rene Brun
  */
-void copyDirectory( TDirectory* source, 
-                    const char* hx,
-                    vector< string > hist_to_copy )
+void copyDirectory( TDirectory* source,
+					const char* hx,
+					vector< string > hist_to_copy )
 {
 	//copy all objects and subdirs of directory source as a subdir of the current directory
 	TDirectory* savdir = gDirectory;
@@ -292,15 +292,15 @@ void copyDirectory( TDirectory* source,
 				cout << gDirectory->GetPath() << endl;
 			}
 			// copy only median and mpv histogram
-                        for( unsigned int i = 0; i < hist_to_copy.size(); i++ )
-                        {
-                            if( iName.find( hist_to_copy[i].c_str() ) != string::npos )
-                            {
-				adir->cd();
-				obj->Write( iName.c_str() );
-                                break;
-                            }
-                        }
+			for( unsigned int i = 0; i < hist_to_copy.size(); i++ )
+			{
+				if( iName.find( hist_to_copy[i].c_str() ) != string::npos )
+				{
+					adir->cd();
+					obj->Write( iName.c_str() );
+					break;
+				}
+			}
 			delete obj;
 		}
 	}

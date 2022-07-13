@@ -41,9 +41,9 @@ bool VStarCatalogue::init( double iMJD, string iCatalogue )
 		// calculate galac coordinates
 		VAstronometry::vlaEqgal( ra, dec, &i_l, &i_b );
 		fStars[i]->fRunGalLong1958 = i_l * 180. / TMath::Pi();
-
-        // apply precesssion
-        VAstronometry::vlaPreces( 2451545.0 - 2400000.5, iMJD, &ra, &dec );
+		
+		// apply precesssion
+		VAstronometry::vlaPreces( 2451545.0 - 2400000.5, iMJD, &ra, &dec );
 		// calculate ra/dec for current epoch
 		fStars[i]->fDecCurrentEpoch = dec * 180. / TMath::Pi();
 		fStars[i]->fRACurrentEpoch = ra * 180. / TMath::Pi();
@@ -325,13 +325,13 @@ bool VStarCatalogue::readCatalogue()
 				// RA2000
 				is_stream >> iT1;
 				// make sure that entry exists
-				if( (is_stream>>std::ws).eof() )
+				if( ( is_stream >> std::ws ).eof() )
 				{
 					zid++;
 					continue;
 				}
 				is_stream >> iT2;
-				if( (is_stream>>std::ws).eof() )
+				if( ( is_stream >> std::ws ).eof() )
 				{
 					zid++;
 					continue;
@@ -1289,12 +1289,12 @@ unsigned int VStarCatalogue::setFOV( string ra_hour, string dec, double FOV_x, d
 	double d_tt = 0.;
 	is_stream >> temp2;
 	d_tt += atof( temp2.c_str() );
-	if( !(is_stream>>std::ws).eof() )
+	if( !( is_stream >> std::ws ).eof() )
 	{
 		is_stream >> temp2;
 		d_tt += atof( temp2.c_str() ) / 60.;
 	}
-	if( !(is_stream>>std::ws).eof() )
+	if( !( is_stream >> std::ws ).eof() )
 	{
 		is_stream >> temp2;
 		d_tt += atof( temp2.c_str() ) / 3600.;
@@ -1306,12 +1306,12 @@ unsigned int VStarCatalogue::setFOV( string ra_hour, string dec, double FOV_x, d
 	d_tt = 0.;
 	is_dec >> temp2;
 	d_tt += atof( temp2.c_str() );
-	if( !(is_dec>>std::ws).eof() )
+	if( !( is_dec >> std::ws ).eof() )
 	{
 		is_dec >> temp2;
 		d_tt += atof( temp2.c_str() ) / 60.;
 	}
-	if( !(is_dec>>std::ws).eof() )
+	if( !( is_dec >> std::ws ).eof() )
 	{
 		is_dec >> temp2;
 		d_tt += atof( temp2.c_str() ) / 3600.;

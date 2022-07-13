@@ -30,15 +30,15 @@ class VImageBaseAnalyzer : public VEvndispData
 		void timingCorrect();
 		TTree* makeDeadChannelTree();
 		
-        void initializeTrace( bool iMakingPeds, unsigned int i_channelHitID,
-                              unsigned int i, unsigned int iTraceIntegrationMethod );
-                              
+		void initializeTrace( bool iMakingPeds, unsigned int i_channelHitID,
+							  unsigned int i, unsigned int iTraceIntegrationMethod );
+							  
 	public:
 		VImageBaseAnalyzer() {}
 		~VImageBaseAnalyzer() {}
 		
 		void           calcTCorrectedSums( int , int );
-        void           calcSums( int iFirst , int iLast, bool iMakingPeds, bool iLowGainOnly = false, unsigned int iTraceIntegrationMethod = 9999 );
+		void           calcSums( int iFirst , int iLast, bool iMakingPeds, bool iLowGainOnly = false, unsigned int iTraceIntegrationMethod = 9999 );
 		unsigned int   fillHiLo();                          //!< fill hi/low gain vector
 		int            fillSaturatedChannels();
 		unsigned int   fillZeroSuppressed();

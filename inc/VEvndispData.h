@@ -391,18 +391,18 @@ class VEvndispData
 		{
 			return fAnaData[fTelID]->fFADCstopTZero;
 		}
-        double getTelescopeAverageFADCtoPhe( bool iLowGain = false )
-        {
-            return fCalData[fTelID]->getTelescopeAverageFADCtoPhe( iLowGain );
-        }
-        valarray<double>& getFADCtoPhe( bool iLowGain = false )
-        {
-            if( iLowGain )
-            {
-                return fCalData[fTelID]->fLowGainFADCtoPhe;
-            }
-            return fCalData[fTelID]->fFADCtoPhe;
-        }
+		double getTelescopeAverageFADCtoPhe( bool iLowGain = false )
+		{
+			return fCalData[fTelID]->getTelescopeAverageFADCtoPhe( iLowGain );
+		}
+		valarray<double>& getFADCtoPhe( bool iLowGain = false )
+		{
+			if( iLowGain )
+			{
+				return fCalData[fTelID]->fLowGainFADCtoPhe;
+			}
+			return fCalData[fTelID]->fFADCtoPhe;
+		}
 		bool                getFillMeanTraces()
 		{
 			return fAnaData[fTelID]->fFillMeanTraces;
@@ -515,14 +515,14 @@ class VEvndispData
 		{
 			return fAnaData[fTelID]->getIntegratedChargeHistograms();
 		}
-        TGraphErrors*  getIPRGraph()
-        {
-            return fCalData[fTelID]->getIPRGraph( getSumWindow(), false );
-        }
-        TGraphErrors*  getIPRGraph( unsigned int iSumWindow, bool iMakeNewGraph = false )
-        {
-            return fCalData[fTelID]->getIPRGraph( iSumWindow, iMakeNewGraph );
-        }
+		TGraphErrors*  getIPRGraph()
+		{
+			return fCalData[fTelID]->getIPRGraph( getSumWindow(), false );
+		}
+		TGraphErrors*  getIPRGraph( unsigned int iSumWindow, bool iMakeNewGraph = false )
+		{
+			return fCalData[fTelID]->getIPRGraph( iSumWindow, iMakeNewGraph );
+		}
 		float               getL1Rate( unsigned int iChannel )
 		{
 			if( fDB_PixelDataReader )
@@ -821,10 +821,10 @@ class VEvndispData
 		{
 			return fRunPar->fsumfirst[fTelID];
 		}
-        unsigned int getSearchWindowLast()
-        {
-            return fRunPar->fSearchWindowLast[fTelID];
-        }
+		unsigned int getSearchWindowLast()
+		{
+			return fRunPar->fSearchWindowLast[fTelID];
+		}
 		valarray<double>&   getSums()
 		{
 			return fAnaData[fTelID]->fSums;
@@ -912,10 +912,10 @@ class VEvndispData
 		{
 			return fRunPar->fsumfirst_startingMethod[fTelID];
 		}
-        unsigned int  getSumWindowStart_T_method()
-        {
-            return fRunPar->fsumfirst_startingMethod[fTelID];
-        }
+		unsigned int  getSumWindowStart_T_method()
+		{
+			return fRunPar->fsumfirst_startingMethod[fTelID];
+		}
 		double              getSumWindowMaxTimedifferenceToDoublePassPosition()
 		{
 			return fRunPar->fSumWindowMaxTimedifferenceToDoublePassPosition[fTelID];
@@ -954,7 +954,7 @@ class VEvndispData
 		}
 		unsigned int        getTeltoAnaID( unsigned int iTelID );
 		ULong64_t           getTelType( unsigned int iTelID );
-        unsigned int        getTelType_Counter( ULong64_t iTelType );
+		unsigned int        getTelType_Counter( ULong64_t iTelType );
 		vector< unsigned int>& getTeltoAna()
 		{
 			return fTeltoAna;
@@ -1023,12 +1023,12 @@ class VEvndispData
 				return fCalData[fTelID]->fLowGainTOffsetvars;
 			}
 		}
-        valarray<double>&   getTraceAverageTime( bool iCorrected = true )
+		valarray<double>&   getTraceAverageTime( bool iCorrected = true )
 		{
-            if( iCorrected )
-            {
-                return fAnaData[fTelID]->fPulseTimingAverageTimeCorrected;
-            }
+			if( iCorrected )
+			{
+				return fAnaData[fTelID]->fPulseTimingAverageTimeCorrected;
+			}
 			return fAnaData[fTelID]->fPulseTimingAverageTime;
 		}
 		unsigned int        getTraceIntegrationMethod()
@@ -1104,7 +1104,7 @@ class VEvndispData
 			return fFitTraceHandler;
 		}
 		vector< valarray< double > >& getPulseTiming( bool iCorrected = true );
-        valarray<double>&   getPulseTime( bool iCorrected = true );
+		valarray<double>&   getPulseTime( bool iCorrected = true );
 		valarray<double>&   getTZeros()
 		{
 			return fAnaData[fTelID]->getTZeros( true );
@@ -1551,10 +1551,10 @@ class VEvndispData
 		{
 			return fAnaData[fTelID]->fncluster_uncleaned;
 		};
-        void  setIPRGraph( unsigned int iSumWindow, TGraphErrors* g )
-        {
-            return fCalData[fTelID]->setIPRGraph( iSumWindow, g );
-        }
+		void  setIPRGraph( unsigned int iSumWindow, TGraphErrors* g )
+		{
+			return fCalData[fTelID]->setIPRGraph( iSumWindow, g );
+		}
 		/////////////// pedestals /////////////////////
 		void                setPeds( unsigned int iChannel, double iPed, bool iLowGain = false )
 		{

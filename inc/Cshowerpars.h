@@ -326,7 +326,7 @@ void Cshowerpars::Init( TTree* tree )
 			TelRA[i] = 0;
 		}
 	}
-
+	
 	if( !bMC && !bShort )
 	{
 		fChain->SetBranchAddress( "TelElevationVBF", TelElevationVBF );
@@ -359,8 +359,8 @@ void Cshowerpars::Init( TTree* tree )
 	fChain->SetBranchAddress( "WobbleN", &WobbleN );
 	fChain->SetBranchAddress( "WobbleE", &WobbleE );
 	fChain->SetBranchAddress( "NTrig", &NTrig );
-    fChain->SetBranchAddress( "LTrig", &LTrig );
-    fChain->SetBranchAddress( "Trig_list", Trig_list, &b_Trig_list );
+	fChain->SetBranchAddress( "LTrig", &LTrig );
+	fChain->SetBranchAddress( "Trig_list", Trig_list, &b_Trig_list );
 	if( fChain->GetBranchStatus( "Trig_type" ) )
 	{
 		fChain->SetBranchAddress( "Trig_type", Trig_type, &b_Trig_type );
@@ -387,8 +387,8 @@ void Cshowerpars::Init( TTree* tree )
 	
 	fChain->SetBranchAddress( "NImages", NImages );
 	fChain->SetBranchAddress( "img2_ang", img2_ang );
-    fChain->SetBranchAddress( "ImgSel", ImgSel );
-    fChain->SetBranchAddress( "ImgSel_list", ImgSel_list, &b_ImgSel_list );
+	fChain->SetBranchAddress( "ImgSel", ImgSel );
+	fChain->SetBranchAddress( "ImgSel_list", ImgSel_list, &b_ImgSel_list );
 	fChain->SetBranchAddress( "Ze", Ze );
 	fChain->SetBranchAddress( "Az", Az );
 	fChain->SetBranchAddress( "Xoff", Xoff );
@@ -409,11 +409,11 @@ void Cshowerpars::Init( TTree* tree )
 	if( !bShort )
 	{
 		fChain->SetBranchAddress( "stds", stds );
-        if( fChain->GetBranchStatus( "dec" ) )
-        {
-            fChain->SetBranchAddress( "dec", dec );
-            fChain->SetBranchAddress( "ra", ra );
-        }
+		if( fChain->GetBranchStatus( "dec" ) )
+		{
+			fChain->SetBranchAddress( "dec", dec );
+			fChain->SetBranchAddress( "ra", ra );
+		}
 	}
 	else
 	{
@@ -455,7 +455,7 @@ void Cshowerpars::Init( TTree* tree )
 	}
 	if( bMC )
 	{
-        fChain->SetBranchAddress( "MCprim", &MCprim );
+		fChain->SetBranchAddress( "MCprim", &MCprim );
 		fChain->SetBranchAddress( "MCe0", &MCe0 );
 		fChain->SetBranchAddress( "MCxcore", &MCxcore );
 		fChain->SetBranchAddress( "MCycore", &MCycore );

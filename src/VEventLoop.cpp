@@ -349,20 +349,20 @@ bool VEventLoop::initEventLoop( string iFileName )
 				fRawDataReader->initTraceNoiseGenerator( 0, fRunPar->fsimu_pedestalfile, getDetectorGeo(), fRunPar->fsumwindow_1,
 						fDebug, fRunPar->fgrisuseed, fRunPar->fsimu_pedestalfile_DefaultPed, fRunPar->fGainCorrection );
 			}
-                        if( fRawDataReader && fRunPar->finjectGaussianNoise > 0. )
-                        {
-                             fRawDataReader->injectGaussianNoise( fRunPar->finjectGaussianNoise, fRunPar->finjectGaussianNoiseSeed );
-                        }
-                        // allow for FADC trace amplitude correction
-                        if( fRawDataReader && fRunPar->fthroughoutCorrectionSFactor.size() > 0 )
-                        {
-                                if( !fRawDataReader->initThroughputCorrection( fRunPar->fsimu_pedestalfile_DefaultPed,
-                                                                          fRunPar->fthroughoutCorrectionSFactor,
-                                                                          fRunPar->fthroughoutCorrectionGFactor ) )
-                                {
-                                      exit( EXIT_FAILURE );
-                                }
-                        }
+			if( fRawDataReader && fRunPar->finjectGaussianNoise > 0. )
+			{
+				fRawDataReader->injectGaussianNoise( fRunPar->finjectGaussianNoise, fRunPar->finjectGaussianNoiseSeed );
+			}
+			// allow for FADC trace amplitude correction
+			if( fRawDataReader && fRunPar->fthroughoutCorrectionSFactor.size() > 0 )
+			{
+				if( !fRawDataReader->initThroughputCorrection( fRunPar->fsimu_pedestalfile_DefaultPed,
+						fRunPar->fthroughoutCorrectionSFactor,
+						fRunPar->fthroughoutCorrectionGFactor ) )
+				{
+					exit( EXIT_FAILURE );
+				}
+			}
 		}
 	}
 	// something went wrong, probably wrong filename
@@ -464,9 +464,9 @@ bool VEventLoop::initEventLoop( string iFileName )
 			exit( -1 );
 		}
 	}
-    // initialize analyzers (output files are created as well here)
-    initializeAnalyzers();
-    
+	// initialize analyzers (output files are created as well here)
+	initializeAnalyzers();
+	
 	
 	// create calibrators, analyzers, etc. at first event
 	if( fCalibrator )
@@ -474,7 +474,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 		fCalibrator->initialize();
 	}
 	
-    // initialize pedestal calculator
+	// initialize pedestal calculator
 	if( fPedestalCalculator && fRunPar->fPedestalsInTimeSlices )
 	{
 		fPedestalCalculator->initialize( ( fRunMode == R_PED ),  getNChannels(), fRunPar->fPedestalsLengthOfTimeSlice,
@@ -600,7 +600,7 @@ void VEventLoop::initializeAnalyzers()
 	
 	// set analysis data storage classes
 	// (slight inconsistency, produce VImageAnalyzerData for all telescopes,
-    //  not only for the requested ones (in teltoana))
+	//  not only for the requested ones (in teltoana))
 	if( fAnaData.size() == 0 )
 	{
 		for( unsigned int i = 0; i < fNTel; i++ )
@@ -630,15 +630,15 @@ void VEventLoop::initializeAnalyzers()
 			fAnaData.back()->setTraceIntegrationMethod( getRunParameter()->fTraceIntegrationMethod[i] );
 		}
 		// reading special channels for all requested telescopes
-                // reading throughput correction for all requested telescopes
+		// reading throughput correction for all requested telescopes
 		for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
 		{
 			if( getTeltoAna()[i] < fAnaData.size() && fAnaData[getTeltoAna()[i]] )
 			{
 				fAnaData[getTeltoAna()[i]]->readSpecialChannels( getRunNumber(), fRunPar->getInstrumentEpoch(),
-                                                        fRunPar->fsetSpecialChannels,
-                                                        fRunPar->fthroughputCorrectionFile,
-                                                        getRunParameter()->getDirectory_EVNDISPParameterFiles() );
+						fRunPar->fsetSpecialChannels,
+						fRunPar->fthroughputCorrectionFile,
+						getRunParameter()->getDirectory_EVNDISPParameterFiles() );
 			}
 		}
 		// initialize cleaning

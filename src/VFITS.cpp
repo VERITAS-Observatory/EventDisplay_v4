@@ -764,11 +764,11 @@ int VFITS::createTableFitsFile( vector< vector<double> > Table , char* ttype[] ,
 {
 	int hdunum = -99;
 	int nRows = int( Table.size() );
-        int nCol = 0;
-        if( nRows > 0 )
-        {
-            nCol = int( Table[0].size() );
-        }
+	int nCol = 0;
+	if( nRows > 0 )
+	{
+		nCol = int( Table[0].size() );
+	}
 	//    cout<<"NCol: "<<nCol<<endl;
 	int status = 0;
 	string fFileName = fFile_FITS;
@@ -976,8 +976,8 @@ bool VFITS::writeFITSimageInfo( long naxis, long* naxes, TH2D* hSkyMap , string 
 	{
 		return printerror( status );
 	}
-
-    float pix1_origin = hSkyMap->GetNbinsX() - hSkyMap->GetXaxis()->FindFixBin(0.) + 1;
+	
+	float pix1_origin = hSkyMap->GetNbinsX() - hSkyMap->GetXaxis()->FindFixBin( 0. ) + 1;
 	if( fits_update_key( fptr, TFLOAT, "CRPIX1", &pix1_origin, ( char* )"Reference point of pixel location axis 1", &status ) )
 	{
 		return printerror( status );
@@ -1001,7 +1001,7 @@ bool VFITS::writeFITSimageInfo( long naxis, long* naxes, TH2D* hSkyMap , string 
 		return printerror( status );
 	}
 	
-    float pix2_origin = hSkyMap->GetYaxis()->FindFixBin(0.);	
+	float pix2_origin = hSkyMap->GetYaxis()->FindFixBin( 0. );
 	if( fits_update_key( fptr, TFLOAT, "CRPIX2", &pix2_origin, ( char* )"Reference point of pixel location axis 2", &status ) )
 	{
 		return printerror( status );

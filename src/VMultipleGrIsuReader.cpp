@@ -2,7 +2,7 @@
     \brief read grisu simulation data from several files (one per telescope)
 
 
-    
+
 */
 
 #include "VMultipleGrIsuReader.h"

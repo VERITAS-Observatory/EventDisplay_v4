@@ -124,7 +124,7 @@ Bool_t          VTimeMask::setMask()
 		}
 		else
 		{
-			cout <<"\t setting time-mask from file "<< mask_file << endl;
+			cout << "\t setting time-mask from file " << mask_file << endl;
 			// Retrieve each line and parse
 			string settings_str = "";
 			while( getline( settings_file, settings_str ) )

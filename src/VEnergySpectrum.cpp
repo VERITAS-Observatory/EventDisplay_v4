@@ -35,8 +35,8 @@ bool VEnergySpectrum::openDataFile( string iFile, int irun, bool iSourceTypeIsAs
 {
 	fTotalRun = irun;
 	bAsciiDataFile = iSourceTypeIsAscii;
-	setConfidenceLevel(0.68);
-
+	setConfidenceLevel( 0.68 );
+	
 	// open anasum file
 	if( !bAsciiDataFile )
 	{
@@ -115,8 +115,8 @@ void VEnergySpectrum::initializeRunVariables()
 	
 	gEnergySpectrum = 0;
 	fEnergySpectrumFit = 0;
-	setConfidenceLevel(0.68);
-
+	setConfidenceLevel( 0.68 );
+	
 }
 
 
@@ -1009,14 +1009,14 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 		if( bEnergyAxisLinear )
 		{
 			i_flux.dE = hErecCountsOn->GetXaxis()->GetBinUpEdge( i ) - hErecCountsOn->GetXaxis()->GetBinLowEdge( i );
-                        i_flux.Energy_lowEdge = hErecCountsOn->GetXaxis()->GetBinLowEdge( i );
-                        i_flux.Energy_upEdge = hErecCountsOn->GetXaxis()->GetBinUpEdge( i );
+			i_flux.Energy_lowEdge = hErecCountsOn->GetXaxis()->GetBinLowEdge( i );
+			i_flux.Energy_upEdge = hErecCountsOn->GetXaxis()->GetBinUpEdge( i );
 		}
 		else
 		{
 			i_flux.dE = TMath::Power( 10., hErecCountsOn->GetXaxis()->GetBinUpEdge( i ) ) - TMath::Power( 10., hErecCountsOn->GetXaxis()->GetBinLowEdge( i ) );
-                        i_flux.Energy_lowEdge =  TMath::Power( 10., hErecCountsOn->GetXaxis()->GetBinLowEdge( i ) );
-                        i_flux.Energy_upEdge =  TMath::Power( 10., hErecCountsOn->GetXaxis()->GetBinUpEdge( i ) );
+			i_flux.Energy_lowEdge =  TMath::Power( 10., hErecCountsOn->GetXaxis()->GetBinLowEdge( i ) );
+			i_flux.Energy_upEdge =  TMath::Power( 10., hErecCountsOn->GetXaxis()->GetBinUpEdge( i ) );
 		}
 		
 		// get on and off numbers for this bin
@@ -1081,7 +1081,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			if( hEffArea && hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) ) > 0. )
 			{
 				i_flux.DifferentialFlux /= ( hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) ) * 1.e4 );
-                                i_flux.EffectiveArea = hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) );
+				i_flux.EffectiveArea = hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) );
 			}
 			else
 			{
@@ -1118,7 +1118,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 					i_flux.DifferentialFlux /= i_flux.dE;
 					i_flux.DifferentialFlux /= i_flux.ObsTime;
 					i_flux.DifferentialFlux /= ( hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) ) * 1.e4 );
-                                        i_flux.EffectiveArea = hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) );
+					i_flux.EffectiveArea = hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) );
 				}
 			}
 			else
@@ -1229,13 +1229,16 @@ TCanvas* VEnergySpectrum::plot( TCanvas* c )
 		plot_nullHistogram( c, hNull, fPlottingLogEnergyAxis, true, hNull->GetYaxis()->GetTitleOffset(), fPlottingMinEnergy, fPlottingMaxEnergy );
 		c->SetLogy( 1 );
 	}
-	if( c ) c->cd();
+	if( c )
+	{
+		c->cd();
+	}
 	
 	// plot the spectral energy points
 	plot_energySpectrum();
 	
 	fPlottingCanvas = c;
-
+	
 	return c;
 }
 
@@ -1333,7 +1336,7 @@ TGraphAsymmErrors* VEnergySpectrum::getEnergySpectrumGraph()
 	// return graph
 	if( z > 0 && gEnergySpectrum )
 	{
-                gEnergySpectrum->Print();
+		gEnergySpectrum->Print();
 		return gEnergySpectrum;
 	}
 	
@@ -1366,7 +1369,7 @@ TF1* VEnergySpectrum::fitEnergySpectrum( string iname, bool bDraw )
 	
 	// get energy spectrum
 	gEnergySpectrum = getEnergySpectrumGraph();
-	fSpectralFitter->setCL(fCL);
+	fSpectralFitter->setCL( fCL );
 	if( gEnergySpectrum )
 	{
 		// perform the fit
@@ -1379,7 +1382,7 @@ TF1* VEnergySpectrum::fitEnergySpectrum( string iname, bool bDraw )
 				f->Draw( "same" );
 			}
 			// print results
-                        cout << "Fit Results" << endl;
+			cout << "Fit Results" << endl;
 			fSpectralFitter->print();
 			// return pointer to fit function
 			return f;
@@ -1505,7 +1508,7 @@ void VEnergySpectrum::plotFitValues()
 		
 		// 4) curved power law
 		sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f + (%.2f#pm%.2f)lg E/%.2f} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE, i_curvatureV, i_curvatureE, fSpectralFitter->getSpectralFitNormalisationEnergy() );
-        }
+	}
 	
 	
 	tL2->SetNDC( 1 );
@@ -1883,50 +1886,50 @@ bool VEnergySpectrum::setEnergyInBinDefinition( unsigned int iEF )
 }
 
 /*
- *  get energy of upper edge of the last filled bin 
+ *  get energy of upper edge of the last filled bin
  *
  *  require at least two bins filled
  *
  */
 double VEnergySpectrum::getUpperEdgeofLastFilledEnergyBin( double iMinNdiff, double iSignificance )
 {
-      if( fDifferentialFlux.size() > 1 )
-      {
-          for( unsigned int i = fDifferentialFlux.size()-1; i > 1; i-- )
-          {
-              double n_diff1 = fDifferentialFlux[i].NOn - fDifferentialFlux[i].NOff_alpha * fDifferentialFlux[i].NOff;
-              double n_diff2 = fDifferentialFlux[i-1].NOn - fDifferentialFlux[i-1].NOff_alpha * fDifferentialFlux[i-1].NOff;
-              if( n_diff1 > iMinNdiff && n_diff2 > iMinNdiff
-              && fDifferentialFlux[i].Significance > iSignificance 
-              && fDifferentialFlux[i-1].Significance > iSignificance )
-              {
-                   return fDifferentialFlux[i].Energy_upEdge;
-              }
-           }
-      }
-
-      return 9999.;
-} 
+	if( fDifferentialFlux.size() > 1 )
+	{
+		for( unsigned int i = fDifferentialFlux.size() - 1; i > 1; i-- )
+		{
+			double n_diff1 = fDifferentialFlux[i].NOn - fDifferentialFlux[i].NOff_alpha * fDifferentialFlux[i].NOff;
+			double n_diff2 = fDifferentialFlux[i - 1].NOn - fDifferentialFlux[i - 1].NOff_alpha * fDifferentialFlux[i - 1].NOff;
+			if( n_diff1 > iMinNdiff && n_diff2 > iMinNdiff
+					&& fDifferentialFlux[i].Significance > iSignificance
+					&& fDifferentialFlux[i - 1].Significance > iSignificance )
+			{
+				return fDifferentialFlux[i].Energy_upEdge;
+			}
+		}
+	}
+	
+	return 9999.;
+}
 
 /*
- *  get energy of lower edge of the first filled bin 
+ *  get energy of lower edge of the first filled bin
  *
  */
 double VEnergySpectrum::getLowerEdgeofFirstFilledEnergyBin( double iMinNdiff, double iSignificance )
 {
-      if( fDifferentialFlux.size() > 0 )
-      {
-          for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ )
-          {
-              double n_diff = fDifferentialFlux[i].NOn - fDifferentialFlux[i].NOff_alpha * fDifferentialFlux[i].NOff;
-              if( n_diff > iMinNdiff && fDifferentialFlux[i].Significance > iSignificance )
-              {
-                   return fDifferentialFlux[i].Energy_lowEdge;
-              }
-           }
-      }
-
-      return 9999.;
+	if( fDifferentialFlux.size() > 0 )
+	{
+		for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ )
+		{
+			double n_diff = fDifferentialFlux[i].NOn - fDifferentialFlux[i].NOff_alpha * fDifferentialFlux[i].NOff;
+			if( n_diff > iMinNdiff && fDifferentialFlux[i].Significance > iSignificance )
+			{
+				return fDifferentialFlux[i].Energy_lowEdge;
+			}
+		}
+	}
+	
+	return 9999.;
 }
 
 
@@ -2016,41 +2019,47 @@ TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierInde
 	// plot & fit
 	TCanvas* c = plot();
 	
-        if( iFitFunctionID >= 0 )
-        {
-            setSpectralFitFunction( iFitFunctionID );
-            setSpectralFitFluxNormalisationEnergy( 1. );
-            // set fit range
-            if( i_FitStart_TevLin > 0. && i_FitStop_TeVLin > 0. )
-            {
-                setSpectralFitRangeLin( i_FitStart_TevLin, i_FitStop_TeVLin );
-            }
-            // set fit range from first to last point
-            else
-            {
-                if( gEnergySpectrum )
-                {
-                    double x, y;
-                    double i_xmin = 1.e9;
-                    double i_xmax = -1.e9;
-                    for( int p = 0; p < gEnergySpectrum->GetN(); p++ )
-                    {
-                         gEnergySpectrum->GetPoint( p, x , y );
-                         x = TMath::Power( 10., x );
-                         if( x > i_xmax ) i_xmax = x;
-                         if( x < i_xmin ) i_xmin = x;
-                    }
-                    setSpectralFitRangeLin( i_xmin, i_xmax );
-                }
-            }
-            fitEnergySpectrum();
-            if( iPlottingMultiplierIndex < 2. )
-            {
-                    plotFitValues();
-                    plotEventNumbers();
-            }
-            plotResiduals();
-        }
+	if( iFitFunctionID >= 0 )
+	{
+		setSpectralFitFunction( iFitFunctionID );
+		setSpectralFitFluxNormalisationEnergy( 1. );
+		// set fit range
+		if( i_FitStart_TevLin > 0. && i_FitStop_TeVLin > 0. )
+		{
+			setSpectralFitRangeLin( i_FitStart_TevLin, i_FitStop_TeVLin );
+		}
+		// set fit range from first to last point
+		else
+		{
+			if( gEnergySpectrum )
+			{
+				double x, y;
+				double i_xmin = 1.e9;
+				double i_xmax = -1.e9;
+				for( int p = 0; p < gEnergySpectrum->GetN(); p++ )
+				{
+					gEnergySpectrum->GetPoint( p, x , y );
+					x = TMath::Power( 10., x );
+					if( x > i_xmax )
+					{
+						i_xmax = x;
+					}
+					if( x < i_xmin )
+					{
+						i_xmin = x;
+					}
+				}
+				setSpectralFitRangeLin( i_xmin, i_xmax );
+			}
+		}
+		fitEnergySpectrum();
+		if( iPlottingMultiplierIndex < 2. )
+		{
+			plotFitValues();
+			plotEventNumbers();
+		}
+		plotResiduals();
+	}
 	plotLifeTimevsEnergy();
 	plotCountingHistograms();
 	plotMeanEffectiveArea();
@@ -2085,9 +2094,9 @@ TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierInde
 		l.listValues( 10 );
 		l.plot( 10, c );
 	}
-        l.setPlottingStyle( 800, 4, 4, 25 );
-        l.listValues( 11 );
-        l.plot( 11, c );
+	l.setPlottingStyle( 800, 4, 4, 25 );
+	l.listValues( 11 );
+	l.plot( 11, c );
 	
 	plot( c );
 	
@@ -2101,69 +2110,69 @@ TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierInde
  *
  */
 bool VEnergySpectrum::writeSpectralPointsToCSVFile( string iOFileName,
-                                                    TGraphAsymmErrors* iDiffFlux )
+		TGraphAsymmErrors* iDiffFlux )
 {
-       ofstream os;
-       os.open( gSystem->ExpandPathName(iOFileName.c_str()) );
-       if( !os )
-       {
-            cout << "VEnergySpectrum::writeSpectralPointsToCSVFile error opening " << iOFileName << endl;
-            return false;
-       }
-       cout << "writing ecsv file " << iOFileName << endl;
-
-       os << "# \%ECSV 0.9" << endl;
-       os << "# ---" << endl;
-       os << "# datatype:" << endl;
-       os << "# - {name: e_ref, unit: TeV, datatype: float32}" << endl;
-       os << "# - {name: e_min, unit: TeV, datatype: float32}" << endl;
-       os << "# - {name: e_max, unit: TeV, datatype: float32}" << endl;
-       os << "# - {name: dnde, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
-       os << "# - {name: dnde_errn, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
-       os << "# - {name: dnde_errp, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
-       os << "# - {name: dnde_ul, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
-       os << "# - {name: signi, datatype: float32}" << endl;
-       os << "# - UL_CONF: 0.95" << endl;
-       os << "# meta: !!omap" << endl;
-       os << "e_ref e_min e_max dnde dnde_errn dnde_errp dnde_ul signi" << endl;
-       if( iDiffFlux == 0 )
-       {
-           for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ )
-           {
-                os << fDifferentialFlux[i].Energy << "    ";
-                os << fDifferentialFlux[i].Energy_lowEdge << "    ";
-                os << fDifferentialFlux[i].Energy_upEdge << "    ";
-                if( fDifferentialFlux[i].DifferentialFluxError_low > 0. )
-                {
-                    os << fDifferentialFlux[i].DifferentialFlux << "    ";
-                    os << fDifferentialFlux[i].DifferentialFluxError_low << "    ";
-                    os << fDifferentialFlux[i].DifferentialFluxError_up << "    ";
-                    os << "nan     ";
-                }
-                else
-                {
-                    os << "nan     nan nan    ";
-                    os << fDifferentialFlux[i].DifferentialFlux << "    ";
-                }
-                os << fDifferentialFlux[i].Significance;
-                os << endl;
-           }
-       }
-       else
-       {
-           for (int i = 0 ; i < iDiffFlux->GetN(); i++)
-           {
-               os << iDiffFlux->GetX()[i] << "    ";
-               os << iDiffFlux->GetX()[i] - iDiffFlux->GetErrorXlow(i) << "    ";
-               os << iDiffFlux->GetX()[i] + iDiffFlux->GetErrorXhigh(i) << "    ";
-               os << iDiffFlux->GetY()[i] << "    ";
-               os << iDiffFlux->GetErrorYlow(i) << "    ";
-               os << iDiffFlux->GetErrorYhigh(i) << "    ";
-               os << 999.;
-               os << endl;
-           }
-       }
-       os.close();
-
-       return true;
+	ofstream os;
+	os.open( gSystem->ExpandPathName( iOFileName.c_str() ) );
+	if( !os )
+	{
+		cout << "VEnergySpectrum::writeSpectralPointsToCSVFile error opening " << iOFileName << endl;
+		return false;
+	}
+	cout << "writing ecsv file " << iOFileName << endl;
+	
+	os << "# \%ECSV 0.9" << endl;
+	os << "# ---" << endl;
+	os << "# datatype:" << endl;
+	os << "# - {name: e_ref, unit: TeV, datatype: float32}" << endl;
+	os << "# - {name: e_min, unit: TeV, datatype: float32}" << endl;
+	os << "# - {name: e_max, unit: TeV, datatype: float32}" << endl;
+	os << "# - {name: dnde, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
+	os << "# - {name: dnde_errn, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
+	os << "# - {name: dnde_errp, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
+	os << "# - {name: dnde_ul, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
+	os << "# - {name: signi, datatype: float32}" << endl;
+	os << "# - UL_CONF: 0.95" << endl;
+	os << "# meta: !!omap" << endl;
+	os << "e_ref e_min e_max dnde dnde_errn dnde_errp dnde_ul signi" << endl;
+	if( iDiffFlux == 0 )
+	{
+		for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ )
+		{
+			os << fDifferentialFlux[i].Energy << "    ";
+			os << fDifferentialFlux[i].Energy_lowEdge << "    ";
+			os << fDifferentialFlux[i].Energy_upEdge << "    ";
+			if( fDifferentialFlux[i].DifferentialFluxError_low > 0. )
+			{
+				os << fDifferentialFlux[i].DifferentialFlux << "    ";
+				os << fDifferentialFlux[i].DifferentialFluxError_low << "    ";
+				os << fDifferentialFlux[i].DifferentialFluxError_up << "    ";
+				os << "nan     ";
+			}
+			else
+			{
+				os << "nan     nan nan    ";
+				os << fDifferentialFlux[i].DifferentialFlux << "    ";
+			}
+			os << fDifferentialFlux[i].Significance;
+			os << endl;
+		}
+	}
+	else
+	{
+		for( int i = 0 ; i < iDiffFlux->GetN(); i++ )
+		{
+			os << iDiffFlux->GetX()[i] << "    ";
+			os << iDiffFlux->GetX()[i] - iDiffFlux->GetErrorXlow( i ) << "    ";
+			os << iDiffFlux->GetX()[i] + iDiffFlux->GetErrorXhigh( i ) << "    ";
+			os << iDiffFlux->GetY()[i] << "    ";
+			os << iDiffFlux->GetErrorYlow( i ) << "    ";
+			os << iDiffFlux->GetErrorYhigh( i ) << "    ";
+			os << 999.;
+			os << endl;
+		}
+	}
+	os.close();
+	
+	return true;
 }

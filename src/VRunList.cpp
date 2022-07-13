@@ -2,7 +2,7 @@
     \brief data class
 
 
-    
+
 */
 
 #include "VRunList.h"

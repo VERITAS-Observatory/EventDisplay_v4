@@ -2,7 +2,7 @@
     \brief wrapper classe for data reading
 
 
-    
+
 */
 
 #include <VVirtualDataReader.h>

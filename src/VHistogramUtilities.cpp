@@ -310,7 +310,7 @@ bool VHistogramUtilities::normalizeTH2D_x( TH2* h )
 		{
 			for( int j = 1; j <= h->GetNbinsY(); j++ )
 			{
-			  h->SetBinContent( i, j, h->GetBinContent( i, j ) / i_sum );
+				h->SetBinContent( i, j, h->GetBinContent( i, j ) / i_sum );
 			}
 		}
 	}

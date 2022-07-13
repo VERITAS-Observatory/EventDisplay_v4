@@ -36,8 +36,8 @@ class VHistogramUtilities
 		static bool      divide( TGraphAsymmErrors* g, TGraphAsymmErrors* g1, TGraphAsymmErrors* g2, double epsilon = 1.e-3 );
 		int              findBinInGraph( TGraph* g, double x );
 		// TH1D*            get_Bin_Distribution( TH2D* h, int ion, double rmax, double rSource, bool iDiff, TH2D* hTest, int iN = 0, float* x = 0, float* y = 0, float* r = 0, string regioncode = "" );
-		TH1D*            get_Bin_Distribution( TH2D* h, int ion, double rmax, double rSource, bool iDiff, TH2D* hTest, 
-							int iN = 0, float* x = 0, float* y = 0, float* r1 = 0, float* r2 = 0, float* theta = 0, string regioncode = "" );
+		TH1D*            get_Bin_Distribution( TH2D* h, int ion, double rmax, double rSource, bool iDiff, TH2D* hTest,
+											   int iN = 0, float* x = 0, float* y = 0, float* r1 = 0, float* r2 = 0, float* theta = 0, string regioncode = "" );
 		TH1D*            get_Cumulative_Histogram( TH1D* iH_in, bool iNormalize, bool iLeft_to_right, double i_binvalue = 1.e30 );
 		bool             get_Graph_from_Histogram( TH1* h, TGraphErrors* g, bool bIgnoreErrors = false, double iMinBinContent = 0.,
 				double iXmin = -1.e50, double iXmax = 1.e50 );

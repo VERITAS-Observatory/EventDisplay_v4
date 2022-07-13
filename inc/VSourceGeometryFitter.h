@@ -147,7 +147,7 @@ class VFun_PSFDescription_2DGauss_Chi2 : public ROOT::Minuit2::FCNBase
 			double sum = 0.;
 			double fT = 0.;
 			double fH = 0.;
-                        double fHErr = 0.;
+			double fHErr = 0.;
 			
 			double t2 = 0.;
 			double sigmaSource2 = par[2] * par[2];
@@ -200,7 +200,7 @@ class VFun_PSFDescription_2DGauss_Chi2 : public ROOT::Minuit2::FCNBase
 						
 						// get value and error in histogram
 						fH = hSkyMap->GetBinContent( i, j );
-                                                fHErr = hSkyMap->GetBinError( i, j );
+						fHErr = hSkyMap->GetBinError( i, j );
 						
 						// calculate chi2
 						if( fHErr > 0. && fH > -90. )
@@ -485,7 +485,7 @@ class VFun_SourceDescription_RadialSymmetricSource_Chi2 : public ROOT::Minuit2::
 			double sum = 0.;
 			double fT = 0.;
 			double fH = 0.;
-                        double fHErr = 0;
+			double fHErr = 0;
 			
 			double t2 = 0.;
 			double sigmaSRC = par[2];
@@ -521,10 +521,10 @@ class VFun_SourceDescription_RadialSymmetricSource_Chi2 : public ROOT::Minuit2::
 						}
 						
 						// skip empty bins
-					//	if( hSkyMap->GetBinContent( i, j ) <= 0. )
-					//	{
-					//		continue;
-					//	}
+						//	if( hSkyMap->GetBinContent( i, j ) <= 0. )
+						//	{
+						//		continue;
+						//	}
 						
 						// calculate theta2
 						t2 = ( x - par[0] ) * ( x - par[0] ) + ( y - par[1] ) * ( y - par[1] );
@@ -538,7 +538,7 @@ class VFun_SourceDescription_RadialSymmetricSource_Chi2 : public ROOT::Minuit2::
 						
 						// get value and error in histogram
 						fH = hSkyMap->GetBinContent( i, j );
-                                                fHErr = hSkyMap->GetBinError( i, j );
+						fHErr = hSkyMap->GetBinError( i, j );
 						
 						// calculate chi2
 						if( fHErr > 0. && fH > -90. )

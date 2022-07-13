@@ -2,7 +2,7 @@
     \brief fill and read tables for angular reconstruction with disp method
 
 
-    
+
 
 */
 
