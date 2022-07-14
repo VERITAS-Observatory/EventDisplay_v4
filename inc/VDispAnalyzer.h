@@ -104,21 +104,23 @@ class VDispAnalyzer
 									  vector< float > x, vector< float > y,
 									  vector< float > cosphi, vector< float > sinphi,
 									  vector< float > v_disp, vector< float > v_weight,
+									  vector< float > tel_pointing_dx,
+									  vector< float > tel_pointing_dy,
 									  float& dispdiff,
 									  float x_off4 = -999., float yoff_4 = -999. );
 									  
-									  
-		void calculateMeanDirection( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
-									 ULong64_t* iTelType,
-									 double* img_size, double* img_cen_x, double* img_cen_y,
-									 double* img_cosphi, double* img_sinphi,
-									 double* img_width, double* img_length, double* img_asym,
-									 double* img_tgrad, double* img_loss, int* img_ntubes,
-									 double* img_weight,
-									 double xoff_4, double yoff_4,
-									 vector< float > dispErrorT,
-									 float* img_pedvar );
-									 
+		void calculateMeanDispDirection( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
+										 ULong64_t* iTelType,
+										 double* img_size, double* img_cen_x, double* img_cen_y,
+										 double* img_cosphi, double* img_sinphi,
+										 double* img_width, double* img_length, double* img_asym,
+										 double* img_tgrad, double* img_loss, int* img_ntubes,
+										 double* img_weight,
+										 double xoff_4, double yoff_4,
+										 vector< float > dispErrorT,
+										 float* img_pedvar,
+										 double* pointing_dx, double* pointing_dy );
+										 
 		void calculateExpectedDirectionError( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
 											  ULong64_t* iTelType,
 											  double* img_size, double* img_cen_x, double* img_cen_y,

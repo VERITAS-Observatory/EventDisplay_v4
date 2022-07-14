@@ -163,6 +163,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 		vector< float > x, vector< float > y,
 		vector< float > cosphi, vector< float > sinphi,
 		vector< float > v_disp, vector< float > v_weight,
+		vector< float > tel_pointing_dx, vector< float > tel_pointing_dy,
 		float& dispdiff,
 		float x_off4, float yoff_4 )
 {
@@ -281,11 +282,11 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 			// image #1
 			if( ii == 0 )
 			{
-				x1 = x[ii] - v_disp[ii] * cosphi[ii];
-				x2 = x[ii] + v_disp[ii] * cosphi[ii];
+				x1 = x[ii] - v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
+				x2 = x[ii] + v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
 				
-				y1 = y[ii] - v_disp[ii] * sinphi[ii];
-				y2 = y[ii] + v_disp[ii] * sinphi[ii];
+				y1 = y[ii] - v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
+				y2 = y[ii] + v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
 				
 				fdisp_xs_T[0] = x1;
 				fdisp_ys_T[0] = y1;
@@ -295,11 +296,11 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 			// image #2
 			else if( ii == 1 )
 			{
-				x3 = x[ii] - v_disp[ii] * cosphi[ii];
-				x4 = x[ii] + v_disp[ii] * cosphi[ii];
+				x3 = x[ii] - v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
+				x4 = x[ii] + v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
 				
-				y3 = y[ii] - v_disp[ii] * sinphi[ii];
-				y4 = y[ii] + v_disp[ii] * sinphi[ii];
+				y3 = y[ii] - v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
+				y4 = y[ii] + v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
 				
 				if( ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 )
 						&& ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 )
@@ -348,11 +349,11 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 			// image #3
 			else if( ii == 2 )
 			{
-				x5 = x[ii] - v_disp[ii] * cosphi[ii];
-				x6 = x[ii] + v_disp[ii] * cosphi[ii];
+				x5 = x[ii] - v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
+				x6 = x[ii] + v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
 				
-				y5 = y[ii] - v_disp[ii] * sinphi[ii];
-				y6 = y[ii] + v_disp[ii] * sinphi[ii];
+				y5 = y[ii] - v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
+				y6 = y[ii] + v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
 				
 				if( ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) )
 				{
@@ -445,11 +446,11 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 			if( ii == 3 )
 			{
 			
-				x3 = x[ii] - v_disp[ii] * cosphi[ii];
-				x4 = x[ii] + v_disp[ii] * cosphi[ii];
+				x3 = x[ii] - v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
+				x4 = x[ii] + v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
 				
-				y3 = y[ii] - v_disp[ii] * sinphi[ii];
-				y4 = y[ii] + v_disp[ii] * sinphi[ii];
+				y3 = y[ii] - v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
+				y4 = y[ii] + v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
 				
 				
 				if( ( xs - x3 ) * ( xs - x3 ) + ( ys - y3 ) * ( ys - y3 ) < ( xs - x4 ) * ( xs - x4 ) + ( ys - y4 ) * ( ys - y4 ) )
@@ -487,11 +488,11 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 		
 		for( unsigned int ii = 0; ii < v_weight.size(); ii++ )
 		{
-			x1 = x[ii] - v_disp[ii] * cosphi[ii];
-			x2 = x[ii] + v_disp[ii] * cosphi[ii];
+			x1 = x[ii] - v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
+			x2 = x[ii] + v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
 			
-			y1 = y[ii] - v_disp[ii] * sinphi[ii];
-			y2 = y[ii] + v_disp[ii] * sinphi[ii];
+			y1 = y[ii] - v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
+			y2 = y[ii] + v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
 			
 			// check solution closest to starting value
 			// (should work properly here, as these are
@@ -584,13 +585,13 @@ void VDispAnalyzer::calculateMeanShowerDirection( vector< float > v_x, vector< f
 }
 
 /*
- * calculate mean direction using as input C arrays
+ * calculate mean disp direction using as input C arrays
  * (used primarily from lookup table code)
  *
  * called from VTableLookupDataHandler::doStereoReconstruction()
  *
  */
-void VDispAnalyzer::calculateMeanDirection( unsigned int i_ntel,
+void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 		float iArrayElevation,
 		float iArrayAzimuth,
 		ULong64_t* iTelType,
@@ -609,7 +610,9 @@ void VDispAnalyzer::calculateMeanDirection( unsigned int i_ntel,
 		double xoff_4,
 		double yoff_4,
 		vector< float > dispErrorT,
-		float* img_pedvar )
+		float* img_pedvar,
+		double* pointing_dx,
+		double* pointing_dy )
 {
 	// reset values from previous event
 	f_disp = -99.;
@@ -636,6 +639,8 @@ void VDispAnalyzer::calculateMeanDirection( unsigned int i_ntel,
 	vector< float > y;
 	vector< float > cosphi;
 	vector< float > sinphi;
+	vector< float > tel_pointing_dx;
+	vector< float > tel_pointing_dy;
 	
 	//////////////////////////////
 	// loop over all telescopes and calculate disp per telescope
@@ -690,11 +695,16 @@ void VDispAnalyzer::calculateMeanDirection( unsigned int i_ntel,
 			y.push_back( img_cen_y[i] );
 			cosphi.push_back( img_cosphi[i] );
 			sinphi.push_back( img_sinphi[i] );
+			tel_pointing_dx.push_back( pointing_dx[i] );
+			tel_pointing_dy.push_back( pointing_dy[i] );
 		}
 	}
 	
 	// calculate expected direction
-	calculateMeanDirection( f_xs, f_ys, x, y, cosphi, sinphi, v_disp, v_weight, f_dispDiff, xoff_4, yoff_4 );
+	calculateMeanDirection( f_xs, f_ys,
+							x, y, cosphi, sinphi, v_disp, v_weight,
+							tel_pointing_dx, tel_pointing_dy,
+							f_dispDiff, xoff_4, yoff_4 );
 	fdisp_xy_weight_T = v_weight;
 	fdisp_T = v_disp;
 	fdisplist_T = v_displist;
