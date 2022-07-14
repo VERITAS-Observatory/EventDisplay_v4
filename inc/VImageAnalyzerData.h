@@ -119,7 +119,7 @@ class VImageAnalyzerData
 		vector< unsigned int > iDummyVectorUI;
 		
 		VImageAnalyzerData( unsigned int iTelID, unsigned int iShortTree = 0,
-                            bool bCalibration = false, bool bWriteImagePixelList = false );
+							bool bCalibration = false, bool bWriteImagePixelList = false );
 		~VImageAnalyzerData() {}
 		
 		void                     fillPulseSum( unsigned int, double, bool );

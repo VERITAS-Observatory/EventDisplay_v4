@@ -6,7 +6,7 @@
 #include <VImageAnalyzerData.h>
 
 VImageAnalyzerData::VImageAnalyzerData( unsigned int iTelID, unsigned int iShortTree,
-                                        bool bCalibration, bool bWriteImagePixelList )
+										bool bCalibration, bool bWriteImagePixelList )
 {
 	fTelID = iTelID;
 	if( !bCalibration )
@@ -20,8 +20,8 @@ VImageAnalyzerData::VImageAnalyzerData( unsigned int iTelID, unsigned int iShort
 	
 	if( !bCalibration )
 	{
-        fImageParameter = new VImageParameter( iShortTree, bWriteImagePixelList );
-        fImageParameterLogL = new VImageParameter( iShortTree, bWriteImagePixelList );
+		fImageParameter = new VImageParameter( iShortTree, bWriteImagePixelList );
+		fImageParameterLogL = new VImageParameter( iShortTree, bWriteImagePixelList );
 	}
 	
 	// initialize time since run start
@@ -289,7 +289,7 @@ valarray<double>& VImageAnalyzerData::getTZeros( bool iCorrected )
 	// this is a serious problem and should never happen
 	cout << "VImageAnalyzerData::getTZeros error: tzero index out of range" << endl;
 	cout << "\t" << fpulsetiming_tzero_index << "\t" << fPulseTimingCorrected.size() << "\t" << fPulseTimingUncorrected.size() << endl;
-    exit( EXIT_FAILURE );
+	exit( EXIT_FAILURE );
 	
 	return fPulseTimingUncorrected[0]; // should never happen
 }
