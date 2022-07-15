@@ -76,8 +76,6 @@ class VImageParameterCalculation : public TObject
 		
 		//Hough transform
 		void houghInitialization(); 				//Initialize the Hough transform class
-		void houghMuonRingFinder();                 //!< fit a single ring to the image to look for muons
-		void houghSizeInMuonRing();                 //! calculate the brightness of the muon ring
 		void houghMuonPixelDistribution();          //!< determine the distribution of pixels in the image
 		
 		void calcTriggerParameters( vector<bool> fTrigger );                                   //!< MS: calculate trigger-level image parameters
@@ -124,6 +122,8 @@ class VImageParameterCalculation : public TObject
 		{
 			return fDetectorGeometry;
 		}
+		//!< fill image/border list (optional)
+		void fillImageBorderPixelTree();
 		//!< return value of 2d-gaus at channel iChannel
 		double getFitValue( unsigned int iChannel, double, double, double, double, double, double );
 		//!< set the detector geometry

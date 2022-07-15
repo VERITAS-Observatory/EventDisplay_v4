@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+#include "VGlobalRunParameter.h"
+
 using namespace std;
 
 class VImageParameter
@@ -15,6 +17,7 @@ class VImageParameter
 		TTree* tpars;
 		bool fMC;
 		unsigned int fShortTree;                 // if set, only a subset of the parameters are written to the tree of parameters
+		bool fWriteNImagePixels;
 		
 	public:
 		// global parameters
@@ -159,10 +162,17 @@ class VImageParameter
 		float signal;
 		float dsignal;                            //!< error in signal (normalisation parameter for fit)
 		
+		// image / border list
+		unsigned int PixelListN;
+		unsigned int PixelID[VDST_MAXCHANNELS];
+		unsigned int PixelType[VDST_MAXCHANNELS];
+		float PixelIntensity[VDST_MAXCHANNELS];
+		float PixelTimingT0[VDST_MAXCHANNELS];
+		
 		vector< float > fImageBorderPixelPosition_x;              //! list of image+border pixel
 		vector< float > fImageBorderPixelPosition_y;              //! list of image+border pixel
 		
-		VImageParameter( unsigned int iShortTree = 0 );
+		VImageParameter( unsigned int iShortTree = 0, bool iWriteNImagePixels = false );
 		~VImageParameter();
 		void fill();
 		TTree* getTree()
@@ -174,6 +184,10 @@ class VImageParameter
 		bool isMC()
 		{
 			return fMC;
+		}
+		bool isWriteNImagePixels()
+		{
+			return fWriteNImagePixels;
 		}
 		void printParameters();
 		void reset( unsigned int resetLevel = 0 );
