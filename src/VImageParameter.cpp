@@ -218,7 +218,6 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL,
 		tpars->Branch( "PixelType", PixelType, "PixelType[PixelListN]/i" );
 		tpars->Branch( "PixelIntensity", PixelIntensity, "PixelIntensity[PixelListN]/F" );
 		tpars->Branch( "PixelTimingT0", PixelTimingT0, "PixelTimingT0[PixelListN]/F" );
-		tpars->Branch( "PixelPE", PixelPE, "PixelPE[PixelListN]/F" );
 	}
 }
 
@@ -379,7 +378,6 @@ void VImageParameter::reset( unsigned int resetLevel )
 		memset( PixelType, 0, VDST_MAXCHANNELS * sizeof( unsigned int ) );
 		memset( PixelIntensity, 0, VDST_MAXCHANNELS * sizeof( float ) );
 		memset( PixelTimingT0, 0, VDST_MAXCHANNELS * sizeof( float ) );
-		memset( PixelPE, 0, VDST_MAXCHANNELS * sizeof( float ) );
 	}
 }
 

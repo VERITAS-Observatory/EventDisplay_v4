@@ -168,7 +168,6 @@ class VImageParameter
 		unsigned int PixelType[VDST_MAXCHANNELS];
 		float PixelIntensity[VDST_MAXCHANNELS];
 		float PixelTimingT0[VDST_MAXCHANNELS];
-		float PixelPE[VDST_MAXCHANNELS];
 		
 		vector< float > fImageBorderPixelPosition_x;              //! list of image+border pixel
 		vector< float > fImageBorderPixelPosition_y;              //! list of image+border pixel
