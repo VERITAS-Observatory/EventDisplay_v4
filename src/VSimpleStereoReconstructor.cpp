@@ -369,10 +369,10 @@ bool VSimpleStereoReconstructor::fillShowerDirection( float xoff, float yoff )
 	{
 		fShower_Ze = -99999.;
 	}
-    else
-    {
-        fShower_Ze = 90. - el * TMath::RadToDeg();
-    }
+	else
+	{
+		fShower_Ze = 90. - el * TMath::RadToDeg();
+	}
 	fShower_Az = VAstronometry::vlaDranrm( az ) * TMath::RadToDeg();
 	
 	return true;

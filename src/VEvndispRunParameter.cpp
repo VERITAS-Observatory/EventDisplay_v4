@@ -732,10 +732,10 @@ void VEvndispRunParameter::print( int iEv )
 	{
 		cout << endl << "shortened tree output " << endl;
 	}
-    if( fWriteImagePixelList )
-    {
-        cout << "(add image/border pixel list to output tree)" << endl;
-    }
+	if( fWriteImagePixelList )
+	{
+		cout << "(add image/border pixel list to output tree)" << endl;
+	}
 	
 	// print analysis parameters
 	if( iEv == 2 )

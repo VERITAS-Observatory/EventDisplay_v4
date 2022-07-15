@@ -122,8 +122,8 @@ class VImageParameterCalculation : public TObject
 		{
 			return fDetectorGeometry;
 		}
-        //!< fill image/border list (optional)
-        void fillImageBorderPixelTree();
+		//!< fill image/border list (optional)
+		void fillImageBorderPixelTree();
 		//!< return value of 2d-gaus at channel iChannel
 		double getFitValue( unsigned int iChannel, double, double, double, double, double, double );
 		//!< set the detector geometry

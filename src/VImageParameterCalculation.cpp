@@ -288,7 +288,7 @@ void VImageParameterCalculation::muonRingFinder()
 	if( !getDetectorGeo() )
 	{
 		cout << "VImageParameterCalculation::muonRingFinder error: detector geometry not defined" << endl;
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 	
 	int counter = 0, safty = 0, noChangeX = 0, noChangeY = 0;
@@ -411,7 +411,7 @@ void VImageParameterCalculation::muonRingFinder()
 		x0[0] = x0[1];
 		
 		///*********************************************
-        // TAKE A STEP IN THE Y-DIRECTION ?
+		// TAKE A STEP IN THE Y-DIRECTION ?
 		///*********************************************
 		//try a different x0[1], see if sigma of r decreases
 		x0[1] = x0[0];
@@ -914,7 +914,7 @@ void VImageParameterCalculation::calcParameters()
 	if( !getDetectorGeo() )
 	{
 		cout << "VImageParameterCalculation::calcParameters error: detector geometry not defined" << endl;
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 	
 	double sumsig = 0;
@@ -940,7 +940,7 @@ void VImageParameterCalculation::calcParameters()
 	
 	if( fData->getRunParameter()->doFADCAnalysis() && fData->getReader()->hasFADCTrace() )
 	{
-        double nPixPed = 0.;
+		double nPixPed = 0.;
 		for( unsigned int j = 0; j < fData->getImageBorderNeighbour().size(); j++ )
 		{
 			if( fData->getImageBorderNeighbour()[j] )
@@ -990,7 +990,7 @@ void VImageParameterCalculation::calcParameters()
 			pntubesBrightNoImage++;
 		}
 		
-        // loop over image tubes
+		// loop over image tubes
 		// select image or border pixel
 		if( fData->getImage()[j] || fData->getBorder()[j] )
 		{
@@ -1131,10 +1131,10 @@ void VImageParameterCalculation::calcParameters()
 		double xymean = 0.;
 		if( sumsig > 0. )
 		{
-            xmean = sumxsig / sumsig;
-            ymean = sumysig / sumsig;
-            x2mean = sumx2sig / sumsig;
-            y2mean = sumy2sig / sumsig;
+			xmean = sumxsig / sumsig;
+			ymean = sumysig / sumsig;
+			x2mean = sumx2sig / sumsig;
+			y2mean = sumy2sig / sumsig;
 			xymean = sumxysig / sumsig;
 		}
 		
@@ -2155,42 +2155,42 @@ void VImageParameterCalculation::setImageBorderPixelPosition( VImageParameter* i
 */
 void VImageParameterCalculation::fillImageBorderPixelTree()
 {
-    if( !fParGeo )
-    {
-        return;
-    }
-    if( !fParGeo->isWriteNImagePixels() )
-    {
-        return;
-    }
-    fParGeo->PixelListN = 0;
-    for( unsigned int i = 0; i < fData->getSums().size(); i++ )
-    {
-        // decide of pixel should be added to list written to tree
-        fParGeo->PixelID[fParGeo->PixelListN] = i;
-        fParGeo->PixelType[fParGeo->PixelListN] = 99;
-        if( fData->getImage()[i] )
-        {
-            fParGeo->PixelType[fParGeo->PixelListN] = 1;
-        }
-        else if( fData->getBorder()[i] )
-        {
-            fParGeo->PixelType[fParGeo->PixelListN] = 2;
-        }
-        else if( fData->getImageBorderNeighbour()[i] )
-        {
-            fParGeo->PixelType[fParGeo->PixelListN] = 3;
-        }
-        if( fParGeo->PixelType[fParGeo->PixelListN] < 99 )
-        {
-            fParGeo->PixelIntensity[fParGeo->PixelListN] = fData->getSums()[i];
-            fParGeo->PixelTimingT0[fParGeo->PixelListN] = fData->getPulseTime()[i];
-            // low-gain channel: add '10' to pixel type
-            if( fData->getHiLo()[i] )
-            {
-                fParGeo->PixelType[fParGeo->PixelListN] += 10;
-            } 
-            fParGeo->PixelListN++;
-        }
-    }
+	if( !fParGeo )
+	{
+		return;
+	}
+	if( !fParGeo->isWriteNImagePixels() )
+	{
+		return;
+	}
+	fParGeo->PixelListN = 0;
+	for( unsigned int i = 0; i < fData->getSums().size(); i++ )
+	{
+		// decide of pixel should be added to list written to tree
+		fParGeo->PixelID[fParGeo->PixelListN] = i;
+		fParGeo->PixelType[fParGeo->PixelListN] = 99;
+		if( fData->getImage()[i] )
+		{
+			fParGeo->PixelType[fParGeo->PixelListN] = 1;
+		}
+		else if( fData->getBorder()[i] )
+		{
+			fParGeo->PixelType[fParGeo->PixelListN] = 2;
+		}
+		else if( fData->getImageBorderNeighbour()[i] )
+		{
+			fParGeo->PixelType[fParGeo->PixelListN] = 3;
+		}
+		if( fParGeo->PixelType[fParGeo->PixelListN] < 99 )
+		{
+			fParGeo->PixelIntensity[fParGeo->PixelListN] = fData->getSums()[i];
+			fParGeo->PixelTimingT0[fParGeo->PixelListN] = fData->getPulseTime()[i];
+			// low-gain channel: add '10' to pixel type
+			if( fData->getHiLo()[i] )
+			{
+				fParGeo->PixelType[fParGeo->PixelListN] += 10;
+			}
+			fParGeo->PixelListN++;
+		}
+	}
 }

@@ -613,7 +613,7 @@ void VEventLoop::initializeAnalyzers()
 			fAnaData.push_back( new VImageAnalyzerData( i, fRunPar->fShortTree, ( fRunMode == R_PED || fRunMode == R_PEDLOW ||
 								fRunMode == R_GTO || fRunMode == R_GTOLOW ||
 								fRunMode == R_TZERO || fRunMode == R_TZEROLOW ),
-                                getRunParameter()->fWriteImagePixelList ) );
+								getRunParameter()->fWriteImagePixelList ) );
 			int iseed = fRunPar->fMCNdeadSeed;
 			if( iseed != 0 )
 			{
