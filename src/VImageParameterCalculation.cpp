@@ -16,8 +16,8 @@ VImageParameterCalculation::VImageParameterCalculation( unsigned int iShortTree,
 		cout << "VImageParameterCalculation::VImageParameterCalculation()" << endl;
 	}
 	fData = iData;
-	fParGeo = new VImageParameter( iShortTree );
-	fParLL =  new VImageParameter( iShortTree );
+	fParGeo = new VImageParameter( iShortTree, fData->getRunParameter()->fWriteImagePixelList );
+	fParLL =  new VImageParameter( iShortTree, fData->getRunParameter()->fWriteImagePixelList );
 	fboolCalcGeo = false;
 	fboolCalcTiming = false;
 	fDetectorGeometry = 0;
@@ -288,7 +288,7 @@ void VImageParameterCalculation::muonRingFinder()
 	if( !getDetectorGeo() )
 	{
 		cout << "VImageParameterCalculation::muonRingFinder error: detector geometry not defined" << endl;
-		exit( 0 );
+        exit( EXIT_FAILURE );
 	}
 	
 	int counter = 0, safty = 0, noChangeX = 0, noChangeY = 0;
@@ -411,7 +411,7 @@ void VImageParameterCalculation::muonRingFinder()
 		x0[0] = x0[1];
 		
 		///*********************************************
-		// TAKE A STEP IN THE Y-DRIRECTION ?
+        // TAKE A STEP IN THE Y-DIRECTION ?
 		///*********************************************
 		//try a different x0[1], see if sigma of r decreases
 		x0[1] = x0[0];
@@ -529,7 +529,7 @@ void VImageParameterCalculation::sizeInMuonRing()
 	}
 	
 	unsigned int i;
-	double xi, yi, rp, size = 0.0, x0, y0, radius, si;
+	double xi, yi, size = 0.0, x0, y0, radius, si;
 	int totalPixels = 0;
 	int offPixels = 0;
 	double xc = 0.; //Centroid x coordinate
@@ -542,7 +542,7 @@ void VImageParameterCalculation::sizeInMuonRing()
 	{
 		xi = getDetectorGeo()->getX()[i];
 		yi = getDetectorGeo()->getY()[i];
-		rp = sqrt( pow( xi - x0 , 2 ) + pow( yi - y0, 2 ) );
+		double rp = sqrt( pow( xi - x0 , 2 ) + pow( yi - y0, 2 ) );
 		
 		if( rp > radius - 0.15 && rp < radius + 0.15 )
 		{
@@ -762,27 +762,6 @@ void VImageParameterCalculation::houghInitialization()
 }
 
 
-//Placeholder for Hough transform based parametrization algorithm
-void VImageParameterCalculation::houghMuonRingFinder()
-{
-
-
-}
-
-
-//Placeholder for Hough transform based size calculator
-void VImageParameterCalculation::houghSizeInMuonRing()
-{
-
-
-
-
-
-
-
-
-
-}
 
 
 //Hough transform muon identification algorithm.
@@ -860,15 +839,14 @@ void VImageParameterCalculation::houghMuonPixelDistribution()
 
 void VImageParameterCalculation::calcTriggerParameters( vector<bool> fTrigger )
 {
-	// MS: This function does:
 	// Calculate the trigger-level centroids
-	double sumx_trig = 0.;                        // MS
-	double sumy_trig = 0.;                        // MS
-	double sumx2_trig = 0.;                       // MS
-	double sumy2_trig = 0.;                       // MS
+	double sumx_trig = 0.;
+	double sumy_trig = 0.;
+	double sumx2_trig = 0.;
+	double sumy2_trig = 0.;
 	int trig_tubes = 0;
 	
-	// MS: calculated trigger-level parameters
+	// calculate trigger-level parameters
 	// loop over all pixels
 	for( unsigned int j = 0; j < fTrigger.size(); j++ )
 	{
@@ -880,30 +858,25 @@ void VImageParameterCalculation::calcTriggerParameters( vector<bool> fTrigger )
 			double xi = getDetectorGeo()->getX()[j];
 			double yi = getDetectorGeo()->getY()[j];
 			
-			sumx_trig += xi;                      // MS
-			sumy_trig += yi;                      // MS
-			sumx2_trig += xi * xi;                // MS
-			sumy2_trig += yi * yi;                // MS
+			sumx_trig += xi;
+			sumy_trig += yi;
+			sumx2_trig += xi * xi;
+			sumy2_trig += yi * yi;
 		}
 	}
 	fParGeo->trig_tubes = trig_tubes;
 	
-	//  MS: store the trigger-level information
 	if( fParGeo->trig_tubes != 0 )
 	{
-		// MS
 		const double xmean_trig = sumx_trig / trig_tubes;
-		// MS
 		const double ymean_trig = sumy_trig / trig_tubes;
-		// MS
 		const double x2mean_trig = sumx2_trig / trig_tubes;
-		// MS
 		const double y2mean_trig = sumy2_trig / trig_tubes;
 		
-		fParGeo->cen_x_trig = xmean_trig;         // MS
-		fParGeo->cen_y_trig = ymean_trig;         // MS
-		fParGeo->cen_x2_trig = x2mean_trig;       // MS
-		fParGeo->cen_y2_trig = y2mean_trig;       // MS
+		fParGeo->cen_x_trig = xmean_trig;
+		fParGeo->cen_y_trig = ymean_trig;
+		fParGeo->cen_x2_trig = x2mean_trig;
+		fParGeo->cen_y2_trig = y2mean_trig;
 	}
 	
 }
@@ -941,7 +914,7 @@ void VImageParameterCalculation::calcParameters()
 	if( !getDetectorGeo() )
 	{
 		cout << "VImageParameterCalculation::calcParameters error: detector geometry not defined" << endl;
-		exit( 0 );
+        exit( EXIT_FAILURE );
 	}
 	
 	double sumsig = 0;
@@ -962,12 +935,12 @@ void VImageParameterCalculation::calcParameters()
 	double sumLowGain = 0.;
 	
 	// calculate mean ped and pedvar
-	double nPixPed = 0.;
 	fParGeo->fmeanPed_Image = 0.;
 	fParGeo->fmeanPedvar_Image = 0.;
 	
 	if( fData->getRunParameter()->doFADCAnalysis() && fData->getReader()->hasFADCTrace() )
 	{
+        double nPixPed = 0.;
 		for( unsigned int j = 0; j < fData->getImageBorderNeighbour().size(); j++ )
 		{
 			if( fData->getImageBorderNeighbour()[j] )
@@ -1017,19 +990,18 @@ void VImageParameterCalculation::calcParameters()
 			pntubesBrightNoImage++;
 		}
 		
+        // loop over image tubes
 		// select image or border pixel
 		if( fData->getImage()[j] || fData->getBorder()[j] )
 		{
 			pntubes += 1;
 			
-			// loop over image tubes
-			
 			double xi = getDetectorGeo()->getX()[j];
 			double yi = getDetectorGeo()->getY()[j];
 			
-			const double si = ( double )fData->getSums()[j]; // charge (dc)
+			double si = ( double )fData->getSums()[j]; // charge (dc)
 			sumsig += si;
-			const double si2 = ( double )fData->getSums2()[j];
+			double si2 = ( double )fData->getSums2()[j];
 			sumsig_2 += si2;
 			// sum in outer ring
 			if( getDetectorGeo()->getNNeighbours()[j] < getDetectorGeo()->getMaxNeighbour() )
@@ -1153,29 +1125,16 @@ void VImageParameterCalculation::calcParameters()
 	else
 	{
 		double xmean = 0.;
-		if( sumsig > 0. )
-		{
-			xmean = sumxsig / sumsig;
-		}
 		double ymean = 0.;
-		if( sumsig > 0. )
-		{
-			ymean = sumysig / sumsig;
-		}
-		
 		double x2mean = 0.;
-		if( sumsig > 0. )
-		{
-			x2mean = sumx2sig / sumsig;
-		}
 		double y2mean = 0.;
-		if( sumsig > 0. )
-		{
-			y2mean = sumy2sig / sumsig;
-		}
 		double xymean = 0.;
 		if( sumsig > 0. )
 		{
+            xmean = sumxsig / sumsig;
+            ymean = sumysig / sumsig;
+            x2mean = sumx2sig / sumsig;
+            y2mean = sumy2sig / sumsig;
 			xymean = sumxysig / sumsig;
 		}
 		
@@ -1260,18 +1219,12 @@ void VImageParameterCalculation::calcParameters()
 		double length2 = ( sdevx2 + sdevy2 + z ) / 2.0;
 		if( length2 < ZeroTolerence )
 		{
-			//if ( length2 < -(ZeroTolerence) )
-			//	throw Error("Length squared is less than -ZeroTolerence");
-			
 			length2 = 0;
 		}
 		
 		double width2  = ( sdevx2 + sdevy2 - z ) / 2.0;
 		if( width2 < ZeroTolerence )
 		{
-			//if ( width2 < -(ZeroTolerence) )
-			//throw Error("Width squared is less than -ZeroTolerence");
-			
 			width2 = 0;
 		}
 		
@@ -1324,7 +1277,6 @@ void VImageParameterCalculation::calcParameters()
 		////////////////////////////////////////////////////////////////////////////
 		
 		const double sinalpha = ( dist > ZeroTolerence ) ? miss / dist : 0;
-		//  if(sinalpha>1.0)sinalpha=1.0; // Floating point sanity check
 		
 		const double alpha = fabs( TMath::RadToDeg() * asin( sinalpha ) );
 		
@@ -1354,8 +1306,6 @@ void VImageParameterCalculation::calcParameters()
 		////////////////////////////////////////////////////////////////////////////
 		
 		double asymmetry = 0;
-		double minorasymmetry = 0;
-		
 		if( length2 > ZeroTolerence )
 		{
 			const double x3mean = sumx3sig / sumsig;
@@ -1383,23 +1333,6 @@ void VImageParameterCalculation::calcParameters()
 				if( asymmetry3length3 < 0 )
 				{
 					asymmetry = -asymmetry;
-				}
-			}
-			
-			if( width2 > ZeroTolerence )
-			{
-				const double minorasymmetry3width3 =
-					-sdevx3 * sinphi * sinphi2 + 3.0 * sdevx2y * cosphi * sinphi2 -
-					3.0 * sdevxy2 * sinphi * cosphi2 + sdevy3 * cosphi * cosphi2;
-					
-				if( fabs( minorasymmetry3width3 ) > ZeroTolerence )
-				{
-					minorasymmetry = pow( fabs( minorasymmetry3width3 ),
-										  0.333333333333 ) / width;
-					if( minorasymmetry3width3 < 0 )
-					{
-						minorasymmetry = -minorasymmetry;
-					}
 				}
 			}
 		}
@@ -2207,4 +2140,57 @@ void VImageParameterCalculation::setImageBorderPixelPosition( VImageParameter* i
 		}
 		iPar->setImageBorderPixelPosition( i_x, i_y );
 	}
+}
+
+
+/*
+    fill image/border pixel to image parameter tree
+    (optional)
+
+    PixelType == 0: Pe > 0 and not image and not border pixel
+    PixelType == 1: image pixel
+    PixelType == 2: border pixel
+    PixelType == 3: neighbour pixel to image/border
+
+*/
+void VImageParameterCalculation::fillImageBorderPixelTree()
+{
+    if( !fParGeo )
+    {
+        return;
+    }
+    if( !fParGeo->isWriteNImagePixels() )
+    {
+        return;
+    }
+    fParGeo->PixelListN = 0;
+    for( unsigned int i = 0; i < fData->getSums().size(); i++ )
+    {
+        // decide of pixel should be added to list written to tree
+        fParGeo->PixelID[fParGeo->PixelListN] = i;
+        fParGeo->PixelType[fParGeo->PixelListN] = 99;
+        if( fData->getImage()[i] )
+        {
+            fParGeo->PixelType[fParGeo->PixelListN] = 1;
+        }
+        else if( fData->getBorder()[i] )
+        {
+            fParGeo->PixelType[fParGeo->PixelListN] = 2;
+        }
+        else if( fData->getImageBorderNeighbour()[i] )
+        {
+            fParGeo->PixelType[fParGeo->PixelListN] = 3;
+        }
+        if( fParGeo->PixelType[fParGeo->PixelListN] < 99 )
+        {
+            fParGeo->PixelIntensity[fParGeo->PixelListN] = fData->getSums()[i];
+            fParGeo->PixelTimingT0[fParGeo->PixelListN] = fData->getPulseTime()[i];
+            // low-gain channel: add '10' to pixel type
+            if( fData->getHiLo()[i] )
+            {
+                fParGeo->PixelType[fParGeo->PixelListN] += 10;
+            } 
+            fParGeo->PixelListN++;
+        }
+    }
 }
