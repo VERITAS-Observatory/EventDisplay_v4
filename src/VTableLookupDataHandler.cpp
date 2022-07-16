@@ -518,44 +518,18 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			flength[i] = ftpars[i]->length;
 			ftgrad_x[i] = ftpars[i]->tgrad_x;
 			
+			fcen_x[i] = ftpars[i]->cen_x;
+			fcen_y[i] = ftpars[i]->cen_y;
+			fcosphi[i] = ftpars[i]->cosphi;
+			fsinphi[i] = ftpars[i]->sinphi;
+			fpointing_dx[i] = 0.;
+			fpointing_dy[i] = 0.;
 			if( i < fpointingCorrections.size() && fpointingCorrections[i]
 					&& fpointingCorrections[i]->is_initialized() )
 			{
 				fpointingCorrections[i]->getEntry( fEventCounter );
-				// fpointing_dx[i] = fpointingCorrections[i]->getPointErrorX();
-				// fpointing_dy[i] = fpointingCorrections[i]->getPointErrorY();
-				fpointing_dx[i] = 0.;
-				fpointing_dy[i] = 0.;
-				
-				// TEMP TODO understand better pointing corrections
-				bool fApplyPointCorrectionToImageParameters = false;
-				if( fApplyPointCorrectionToImageParameters )
-				{
-					fcen_x[i] = fpointingCorrections[i]->getCorrected_cen_x( ftpars[i]->cen_x );
-					fcen_y[i] = fpointingCorrections[i]->getCorrected_cen_y( ftpars[i]->cen_y );
-					fcen_x[i] = fpointingCorrections[i]->getCorrected_cen_x( ftpars[i]->cen_x );
-					fcen_y[i] = fpointingCorrections[i]->getCorrected_cen_y( ftpars[i]->cen_y );
-					if( ftpars[i]->has_sdevxy() )
-					{
-						float phi = fpointingCorrections[i]->getCorrected_phi(
-										ftpars[i]->cen_x,
-										ftpars[i]->cen_y,
-										ftpars[i]->f_d,
-										ftpars[i]->f_s,
-										ftpars[i]->f_sdevxy );
-						fcosphi[i] = cos( phi );
-						fsinphi[i] = sin( phi );
-					}
-				}
-			}
-			else
-			{
-				fcen_x[i] = ftpars[i]->cen_x;
-				fcen_y[i] = ftpars[i]->cen_y;
-				fcosphi[i] = ftpars[i]->cosphi;
-				fsinphi[i] = ftpars[i]->sinphi;
-				fpointing_dx[i] = 0.;
-				fpointing_dy[i] = 0.;
+				fpointing_dx[i] = fpointingCorrections[i]->getPointErrorX();
+				fpointing_dy[i] = fpointingCorrections[i]->getPointErrorY();
 			}
 			
 			if( fsize[i] > SizeSecondMax_temp )
