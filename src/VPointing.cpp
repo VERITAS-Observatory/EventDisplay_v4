@@ -17,7 +17,6 @@ VPointing::VPointing( unsigned int iTelID )
 	fTelAzimuthDB = 0.;
 	fTelElevationDB = 0.;
 	fNEventsWithNoDBPointing = 0;
-	fPointingDB = 0;
 	fEventStatus = 0;
 	
 	fPointingErrorX = 0.;
