@@ -1446,7 +1446,6 @@ bool VCameraRead::readDetectorGeometryFromDB( string iDBStartTime, bool iReadRot
 		char c_query[800];
 		sprintf( c_query, "select telescope_id, version, pmt_rotation from tblPointing_Monitor_Camera_Parameters where start_date <= \"%s\" AND end_date > \"%s\" ", iDBStartTime.substr( 0, 10 ).c_str(), iDBStartTime.substr( 0, 10 ).c_str() );
 		
-		//std::cout<<"VCameraRead::readDetectorGeometryFromDB "<<std::endl;
 		VDB_Connection my_connection( iTempS.str().c_str() , "readonly", "" ) ;
 		if( !my_connection.Get_Connection_Status() )
 		{
@@ -1459,7 +1458,6 @@ bool VCameraRead::readDetectorGeometryFromDB( string iDBStartTime, bool iReadRot
 			return false;
 		}
 		TSQLResult* db_res = my_connection.Get_QueryResult();
-		
 		
 		int iNRows = db_res->GetRowCount();
 		vector< int > iVersion( fCameraRotation.size(), -99 );
@@ -1494,7 +1492,6 @@ bool VCameraRead::readDetectorGeometryFromDB( string iDBStartTime, bool iReadRot
 				}
 			}
 		}
-		//       i_DB->Close();
 	}
 	
 	cout << "\t (rotations from DB [deg]: ";
