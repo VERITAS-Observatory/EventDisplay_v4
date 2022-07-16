@@ -53,6 +53,17 @@ class VDBRunInfo
 		string fRunStatus;
 		string fWeather;
 		vector< unsigned int > fLaserRunID;
+
+        int get_time_ymd( string iTemp );
+        double get_time_MJD( string iTemp );
+        int get_time_HMS( string iTemp );
+        int get_time_seconds_of_date( string iTemp );
+        int get_duration( string iTemp );
+        int get_duration_from_sql_string();
+        string get_time_sql( string iTemp );
+        double get_wobble_north( string dist, string angle );
+        double get_wobble_east( string dist, string angle );
+        void set_telescope_to_analyse();
 		
 		vector< unsigned int > getLaserRun( string iDBserver, unsigned int iRunNumber, unsigned int iNTel );
 		void                   readRunInfoFromDB( string iDBserver );

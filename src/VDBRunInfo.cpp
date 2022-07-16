@@ -20,8 +20,6 @@ VDBRunInfo::VDBRunInfo( int irun, string iDBserver, unsigned int iNTel )
 	fWobbleNorth = 0.;
 	fWobbleEast = 0.;
 	fConfigMask = 0;
-	//fConfigMaskDQM = 0;
-	//fConfigMaskNew = 0;
 	fTelToAna = 1234;
 	fRunType = "";
 	fObservingMode = "";
@@ -47,74 +45,11 @@ void VDBRunInfo::readRunDQM( string iDBserver )
 
 	int config_mask_new = readRunDQM( iDBserver, fRunNumber, getConfigMask() );
 	fConfigMask = config_mask_new;
-	if( fConfigMask == 1 )
-	{
-		fTelToAna = 1;
-	}
-	else if( fConfigMask == 2 )
-	{
-		fTelToAna = 2;
-	}
-	else if( fConfigMask == 3 )
-	{
-		fTelToAna = 12;
-	}
-	else if( fConfigMask == 4 )
-	{
-		fTelToAna = 3;
-	}
-	else if( fConfigMask == 5 )
-	{
-		fTelToAna = 13;
-	}
-	else if( fConfigMask == 6 )
-	{
-		fTelToAna = 23;
-	}
-	else if( fConfigMask == 7 )
-	{
-		fTelToAna = 123;
-	}
-	else if( fConfigMask == 8 )
-	{
-		fTelToAna = 4;
-	}
-	else if( fConfigMask == 9 )
-	{
-		fTelToAna = 14;
-	}
-	else if( fConfigMask == 10 )
-	{
-		fTelToAna = 24;
-	}
-	else if( fConfigMask == 11 )
-	{
-		fTelToAna = 124;
-	}
-	else if( fConfigMask == 12 )
-	{
-		fTelToAna = 34;
-	}
-	else if( fConfigMask == 13 )
-	{
-		fTelToAna = 134;
-	}
-	else if( fConfigMask == 14 )
-	{
-		fTelToAna = 234;
-	}
-	else if( fConfigMask == 15 )
-	{
-		fTelToAna = 1234;
-	}
-	
-	return;
-	
+    set_telescope_to_analyse();
 }
 
-unsigned int VDBRunInfo::readRunDQM( string iDBserver, int run_number , unsigned int config_mask )
+unsigned int VDBRunInfo::readRunDQM( string iDBserver, int run_number, unsigned int config_mask )
 {
-
 	unsigned int ConfigMaskDQM = 0;
 	unsigned int ConfigMaskNew = 0;
 	
@@ -134,7 +69,6 @@ unsigned int VDBRunInfo::readRunDQM( string iDBserver, int run_number , unsigned
 		return config_mask;
 	}
 	TSQLResult* db_res = my_connection.Get_QueryResult();
-	
 	
 	TSQLRow* db_row = db_res->Next();
 	if( !db_row )
@@ -159,8 +93,6 @@ unsigned int VDBRunInfo::readRunDQM( string iDBserver, int run_number , unsigned
 			return config_mask;
 		}
 		
-		
-		
 		bitset<4> bitConfig( config_mask );
 		bitset<4> bitDQM( ConfigMaskDQM );
 		bitset<4> bitNDQM;
@@ -181,15 +113,10 @@ unsigned int VDBRunInfo::readRunDQM( string iDBserver, int run_number , unsigned
 			}
 		}
 		
-		
 		config_mask = ConfigMaskNew;
-		
 	}
 	
-	
-	
 	return config_mask;
-	
 }
 
 void VDBRunInfo::readRunInfoFromDB( string iDBserver )
@@ -199,7 +126,6 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 	char c_query[1000];
 	sprintf( c_query, "select * from tblRun_Info where run_id=%d", fRunNumber );
 	
-	//std::cout<<"VDBRunInfo::readRunInfoFromDB "<<std::endl;
 	VDB_Connection my_connection( iTempS.str(), "readonly", "" ) ;
 	if( !my_connection.Get_Connection_Status() )
 	{
@@ -213,7 +139,6 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 	}
 	TSQLResult* db_res = my_connection.Get_QueryResult();
 	
-	
 	TSQLRow* db_row = db_res->Next();
 	if( !db_row )
 	{
@@ -221,16 +146,13 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 		fDBStatus = false;
 		return;
 	}
-	double iStarttime = 0.;
-	double iStopptime = 0.;
-	
 	// get date
 	if( db_row->GetField( 4 ) )
 	{
 		string iTemp = db_row->GetField( 4 );
 		if( iTemp.size() > 8 )
 		{
-			fDBDate = atoi( iTemp.substr( 0, 4 ).c_str() ) * 10000 + atoi( iTemp.substr( 5, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 8, 2 ).c_str() );
+			fDBDate = get_time_ymd( iTemp );
 		}
 		else
 		{
@@ -243,50 +165,26 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 	}
 	if( db_row->GetField( 6 ) )
 	{
-		string iTemp = db_row->GetField( 6 );
-		if( iTemp.size() > 8 )
-		{
-			fDataStartTimeSQL = iTemp;
-			iStarttime = atoi( iTemp.substr( 0, 4 ).c_str() ) * 10000 + atoi( iTemp.substr( 5, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 8, 2 ).c_str() );
-			fDataStartTimeHMS = atoi( iTemp.substr( 11, 2 ).c_str() ) * 10000 + atoi( iTemp.substr( 14, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 17, 2 ).c_str() );
-			fDataStartTime = atoi( iTemp.substr( 11, 2 ).c_str() ) * 60 * 60 + atoi( iTemp.substr( 14, 2 ).c_str() ) * 60 + atoi( iTemp.substr( 17, 2 ).c_str() );
-		}
-		else
-		{
-			iStarttime = 0;
-			fDataStartTime = 0;
-			fDataStartTimeHMS = 0;
-			fDataStartTimeSQL = "";
-		}
+        fDataStartTimeSQL = get_time_sql( db_row->GetField( 6 ) );
+        fDataStartTimeMJD = get_time_MJD( db_row->GetField( 6 ) );
+        fDataStartTimeHMS = get_time_HMS( db_row->GetField( 6 ) );
+        fDataStartTime = get_time_seconds_of_date( db_row->GetField( 6 ) );
 	}
 	else
 	{
-		iStarttime = 0;
 		fDataStartTime = 0;
 		fDataStartTimeHMS = 0;
 		fDataStartTimeSQL = "";
 	}
 	if( db_row->GetField( 7 ) )
 	{
-		string iTemp = db_row->GetField( 7 );
-		if( iTemp.size() > 8 )
-		{
-			fDataStoppTimeSQL = iTemp;
-			iStopptime = atoi( iTemp.substr( 0, 4 ).c_str() ) * 10000 + atoi( iTemp.substr( 5, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 8, 2 ).c_str() );
-			fDataStoppTimeHMS = atoi( iTemp.substr( 11, 2 ).c_str() ) * 10000 + atoi( iTemp.substr( 14, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 17, 2 ).c_str() );
-			fDataStoppTime = atoi( iTemp.substr( 11, 2 ).c_str() ) * 60 * 60 + atoi( iTemp.substr( 14, 2 ).c_str() ) * 60 + atoi( iTemp.substr( 17, 2 ).c_str() );
-		}
-		else
-		{
-			iStopptime = 0;
-			fDataStoppTime = 0.;
-			fDataStoppTimeHMS = 0;
-			fDataStoppTimeSQL = "";
-		}
+        fDataStoppTimeSQL = get_time_sql( db_row->GetField( 7 ) );
+        fDataStoppTimeHMS = get_time_HMS( db_row->GetField( 7 ) );
+        fDataStoppTimeMJD = get_time_MJD( db_row->GetField( 7 ) );
+        fDataStoppTime = get_time_seconds_of_date( db_row->GetField( 7 ) );
 	}
 	else
 	{
-		iStopptime = 0;
 		fDataStoppTime = 0;
 		fDataStoppTimeHMS = 0;
 		fDataStoppTimeSQL = "";
@@ -294,28 +192,15 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 	
 	if( db_row->GetField( 8 ) )
 	{
-		string iTemp = db_row->GetField( 8 );
-		if( iTemp.size() > 7 )
-		{
-			fDuration = atoi( iTemp.substr( 0, 1 ).c_str() ) * 3600 + atoi( iTemp.substr( 3, 4 ).c_str() ) * 60 + atoi( iTemp.substr( 6, 7 ).c_str() );
-		}
-		else
-		{
-			fDuration = 0;
-		}
+        fDuration = get_duration( db_row->GetField( 8 ) );
 	}
 	else
 	{
-		fDuration = 0;
+		fDuration = 0.;
 	}
 	if( TMath::Abs( fDuration < 1.e-4 ) )
 	{
-		double mjd = 0.;
-		double isec_start = 0.;
-		double isec_stopp = 0.;
-		VSkyCoordinatesUtilities::getMJD_from_SQLstring( fDataStartTimeSQL, mjd, isec_start );
-		VSkyCoordinatesUtilities::getMJD_from_SQLstring( fDataStoppTimeSQL, mjd, isec_stopp );
-		fDuration = isec_stopp - isec_start;
+		fDuration = get_duration_from_sql_string();
 	}
 	
 	if( db_row->GetField( 19 ) )
@@ -326,35 +211,6 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 	{
 		fTargetName = "";
 	}
-	
-	double imjd = 0.;
-	int j = 0;
-	int iy = iStarttime / 10000;
-	int im = ( iStarttime - iy * 10000 ) / 100;
-	int id = iStarttime - iy * 10000 - im * 100;
-	if( iStarttime > 0 )
-	{
-		VAstronometry::vlaCldj( iy, im, id, &imjd, &j );
-	}
-	else
-	{
-		imjd = 0.;
-	}
-	fDataStartTimeMJD = imjd;
-	iy = iStopptime / 10000;
-	im = ( iStopptime - iy * 10000 ) / 100;
-	id = iStopptime - iy * 10000 - im * 100;
-	if( iStopptime > 0 )
-	{
-		VAstronometry::vlaCldj( iy, im, id, &imjd, &j );
-	}
-	else
-	{
-		imjd = 0.;
-	}
-	fDataStoppTimeMJD  = imjd;
-	// calculate start and stop time
-	
 	if( db_row->GetField( 1 ) )
 	{
 		fRunType = db_row->GetField( 1 );
@@ -371,26 +227,10 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 	{
 		fWeather = db_row->GetField( 9 );
 	}
-	
-	float dist = 0.;
-	if( db_row->GetField( 17 ) )
+	if( db_row->GetField( 17 ) && db_row->GetField( 18 ) )
 	{
-		dist = atof( db_row->GetField( 17 ) );
-	}
-	float angl = 0.;
-	if( db_row->GetField( 18 ) )
-	{
-		angl = atof( db_row->GetField( 18 ) );
-	}
-	fWobbleNorth = dist * cos( angl * TMath::DegToRad() );
-	fWobbleEast = dist * sin( angl * TMath::DegToRad() );
-	if( TMath::Abs( fWobbleNorth ) < 1.e-15 )
-	{
-		fWobbleNorth = 0.;
-	}
-	if( TMath::Abs( fWobbleEast ) < 1.e-15 )
-	{
-		fWobbleEast = 0.;
+        fWobbleNorth = get_wobble_north( db_row->GetField( 17 ), db_row->GetField( 18 ) );
+        fWobbleEast = get_wobble_east( db_row->GetField( 17 ), db_row->GetField( 18 ) );
 	}
 	
 	// get config mask
@@ -402,66 +242,7 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 	{
 		fConfigMask = 0;
 	}
-	if( fConfigMask == 1 )
-	{
-		fTelToAna = 1;
-	}
-	else if( fConfigMask == 2 )
-	{
-		fTelToAna = 2;
-	}
-	else if( fConfigMask == 3 )
-	{
-		fTelToAna = 12;
-	}
-	else if( fConfigMask == 4 )
-	{
-		fTelToAna = 3;
-	}
-	else if( fConfigMask == 5 )
-	{
-		fTelToAna = 13;
-	}
-	else if( fConfigMask == 6 )
-	{
-		fTelToAna = 23;
-	}
-	else if( fConfigMask == 7 )
-	{
-		fTelToAna = 123;
-	}
-	else if( fConfigMask == 8 )
-	{
-		fTelToAna = 4;
-	}
-	else if( fConfigMask == 9 )
-	{
-		fTelToAna = 14;
-	}
-	else if( fConfigMask == 10 )
-	{
-		fTelToAna = 24;
-	}
-	else if( fConfigMask == 11 )
-	{
-		fTelToAna = 124;
-	}
-	else if( fConfigMask == 12 )
-	{
-		fTelToAna = 34;
-	}
-	else if( fConfigMask == 13 )
-	{
-		fTelToAna = 134;
-	}
-	else if( fConfigMask == 14 )
-	{
-		fTelToAna = 234;
-	}
-	else if( fConfigMask == 15 )
-	{
-		fTelToAna = 1234;
-	}
+    set_telescope_to_analyse();
 	
 	// get source coordinates
 	sprintf( c_query, "select * from tblObserving_Sources where source_id like convert( _utf8 \'%s\' using latin1)", fTargetName.c_str() );
@@ -484,7 +265,6 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 		fTargetRA = atof( db_row->GetField( 1 ) ) * 180. / TMath::Pi();
 	}
 	
-	
 	fDBStatus = true;
 	return;
 }
@@ -506,6 +286,7 @@ void VDBRunInfo::print()
 		cout << "T" << i + 1 << ": " << getLaserRun()[i] << "   ";
 	}
 	cout << endl;
+    exit(0);
 }
 
 
@@ -549,7 +330,6 @@ vector< unsigned int > VDBRunInfo::getLaserRun( string iDBserver, unsigned int i
 			iLaserExclude.push_back( atoi( db_row->GetField( 1 ) ) );
 			iLaserConfigMask.push_back( atoi( db_row->GetField( 2 ) ) );
 		}
-		
 	}
 	else
 	{
@@ -570,9 +350,169 @@ vector< unsigned int > VDBRunInfo::getLaserRun( string iDBserver, unsigned int i
 			{
 				fLaserRunID[t] = iLaserList[i];
 			}
-			
 		}
 	}
 	
 	return fLaserRunID;
+}
+
+int VDBRunInfo::get_time_ymd( string iTemp )
+{
+    return atoi( iTemp.substr( 0, 4 ).c_str() ) * 10000 
+        + atoi( iTemp.substr( 5, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 8, 2 ).c_str() );
+}
+
+double VDBRunInfo::get_time_MJD( string iTemp ) 
+{
+    if( iTemp.size() < 9 )
+    {
+        return 0.;
+    }
+    int iTime = get_time_ymd( iTemp );
+    if( iTime <= 0 )
+    {
+        return 0.;
+    }
+	double imjd = 0.;
+	int j = 0;
+	int iy = iTime / 10000;
+	int im = ( iTime - iy * 10000 ) / 100;
+	int id = iTime - iy * 10000 - im * 100;
+	if( iTime > 0 )
+	{
+		VAstronometry::vlaCldj( iy, im, id, &imjd, &j );
+	}
+    return imjd;
+}
+
+int VDBRunInfo::get_time_HMS( string iTemp )
+{
+    if( iTemp.size() < 9 )
+    {
+        return 0.;
+    }
+    return atoi( iTemp.substr( 11, 2 ).c_str() ) * 10000
+        + atoi( iTemp.substr( 14, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 17,  2 ).c_str() );
+}
+
+int VDBRunInfo::get_time_seconds_of_date( string iTemp )
+{
+    if( iTemp.size() < 9 )
+    {
+        return 0.;
+    }
+    return atoi( iTemp.substr( 11, 2 ).c_str() ) * 60 * 60
+        + atoi( iTemp.substr( 14, 2 ).c_str() ) * 60 + atoi( iTemp.substr( 17, 2).c_str() );
+}
+
+int VDBRunInfo::get_duration( string iTemp )
+{
+    if( iTemp.size() < 8 )
+    {
+        return 0.;
+    }
+    return atoi( iTemp.substr( 0, 1 ).c_str() ) * 3600 + atoi( iTemp.substr( 3, 4 ).c_str() ) * 60 + atoi( iTemp.substr( 6, 7 ).c_str() );
+}
+
+int VDBRunInfo::get_duration_from_sql_string()
+{
+    double mjd = 0.;
+    double isec_start = 0.;
+    double isec_stopp = 0.;
+    VSkyCoordinatesUtilities::getMJD_from_SQLstring( fDataStartTimeSQL, mjd, isec_start );
+    VSkyCoordinatesUtilities::getMJD_from_SQLstring( fDataStoppTimeSQL, mjd, isec_stopp );
+    return (int)(isec_stopp - isec_start);
+}
+
+string VDBRunInfo::get_time_sql( string iTemp )
+{
+    if( iTemp.size() < 9 )
+    {
+        return "";
+    }
+    return iTemp;
+}
+
+double VDBRunInfo::get_wobble_north( string dist, string angle )
+{
+    double w = atof(dist.c_str()) * cos( atof(angle.c_str()) * TMath::DegToRad() );
+    if( TMath::Abs( w ) < 1.e-15 )
+    {
+        return 0.;
+    }
+    return w;
+}
+
+double VDBRunInfo::get_wobble_east( string dist, string angle )
+{
+    double w = atof(dist.c_str()) * sin( atof(angle.c_str()) * TMath::DegToRad() );
+    if( TMath::Abs( w ) < 1.e-15 )
+    {
+        return 0.;
+    }
+    return w;
+}
+
+void VDBRunInfo::set_telescope_to_analyse()
+{
+	if( fConfigMask == 1 )
+	{
+		fTelToAna = 1;
+	}
+	else if( fConfigMask == 2 )
+	{
+		fTelToAna = 2;
+	}
+	else if( fConfigMask == 3 )
+	{
+		fTelToAna = 12;
+	}
+	else if( fConfigMask == 4 )
+	{
+		fTelToAna = 3;
+	}
+	else if( fConfigMask == 5 )
+	{
+		fTelToAna = 13;
+	}
+	else if( fConfigMask == 6 )
+	{
+		fTelToAna = 23;
+	}
+	else if( fConfigMask == 7 )
+	{
+		fTelToAna = 123;
+	}
+	else if( fConfigMask == 8 )
+	{
+		fTelToAna = 4;
+	}
+	else if( fConfigMask == 9 )
+	{
+		fTelToAna = 14;
+	}
+	else if( fConfigMask == 10 )
+	{
+		fTelToAna = 24;
+	}
+	else if( fConfigMask == 11 )
+	{
+		fTelToAna = 124;
+	}
+	else if( fConfigMask == 12 )
+	{
+		fTelToAna = 34;
+	}
+	else if( fConfigMask == 13 )
+	{
+		fTelToAna = 134;
+	}
+	else if( fConfigMask == 14 )
+	{
+		fTelToAna = 234;
+	}
+	else if( fConfigMask == 15 )
+	{
+		fTelToAna = 1234;
+	}
 }
