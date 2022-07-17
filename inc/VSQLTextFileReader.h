@@ -29,6 +29,7 @@ class VSQLTextFileReader
         vector< unsigned int > getValueVector_from_key_as_integer(string iKey);
         string getValue_from_key(string iKey, string iSearchKey, string iValue );
 
+        bool checkDataVectorsForSameLength();
         bool isGood()
         {
             return fisGood;

@@ -308,6 +308,10 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fperformFADCAnalysis;
 		}
 		unsigned int getAtmosphereID( bool iUpdateInstrumentEpoch = false );
+        string       getDBTextDirectory()
+        {
+            return fDBTextDirectory;
+        }
 		string       getInstrumentEpoch( bool iMajor = false,
 										 bool iUpdateInstrumentEpoch = false );
 		bool         isMC()
@@ -323,8 +327,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		}
         bool         useDBTextFiles()
         {
-            return "abc";
-            // return (fDBTextDirectory.size() > 0);
+            return (fDBTextDirectory.size() > 0);
         }
 		
 		ClassDef( VEvndispRunParameter, 2003 ); //(increase this number)

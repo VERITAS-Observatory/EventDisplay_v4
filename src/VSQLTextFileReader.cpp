@@ -110,6 +110,27 @@ string VSQLTextFileReader::getValue_from_key(string iKey, string iSearchKey, str
     return "";
 }
 
+bool VSQLTextFileReader::checkDataVectorsForSameLength()
+{
+    unsigned int iLength = 0;
+    for( map<string, vector< string > >::iterator it = fData.begin(); it != fData.end(); ++it )
+    {
+        if( iLength == 0 )
+        {
+            iLength = it->second.size();
+        }
+        else
+        {
+            if( iLength != it->second.size() )
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+
 void VSQLTextFileReader::printData()
 {
     for( map<string, vector< string > >::iterator it = fData.begin(); it != fData.end(); ++it )

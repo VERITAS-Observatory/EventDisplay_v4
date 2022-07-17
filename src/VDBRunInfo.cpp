@@ -619,8 +619,8 @@ bool VDBRunInfo::readTargetFromDBTextFile()
     string i_ra = a.getValue_from_key("ra", "source_id", fTargetName);
     if( i_dec.size() > 0 && i_ra.size() > 0 )
     {
-        fTargetDec = atoi( i_dec.c_str() ) * TMath::RadToDeg() ;
-        fTargetRA =  atoi( i_ra.c_str() ) * TMath::RadToDeg() ;
+        fTargetDec = atof( i_dec.c_str() ) * TMath::RadToDeg();
+        fTargetRA =  atof( i_ra.c_str() ) * TMath::RadToDeg();
     }
     else 
     {

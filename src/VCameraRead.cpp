@@ -1414,12 +1414,94 @@ vector<ULong64_t> VCameraRead::getTelType_list()
 	return t;
 }
 
+bool VCameraRead::read_camerarotation_fromDB( string iDBStartTime )
+{
+    stringstream iTempS;
+    iTempS << getDBServer() << "/VOFFLINE";
+    char c_query[800];
+    sprintf( c_query, "select telescope_id, version, pmt_rotation from tblPointing_Monitor_Camera_Parameters where start_date <= \"%s\" AND end_date > \"%s\" ", iDBStartTime.substr( 0, 10 ).c_str(), iDBStartTime.substr( 0, 10 ).c_str() );
+    
+    VDB_Connection my_connection( iTempS.str().c_str() , "readonly", "" ) ;
+    if( !my_connection.Get_Connection_Status() )
+    {
+        cout << "VCameraRead: failed to connect to database server" << endl;
+        cout << "\t server: " <<  iTempS.str() << endl;
+        return false;
+    }
+    if( !my_connection.make_query( c_query ) )
+    {
+        return false;
+    }
+    TSQLResult* db_res = my_connection.Get_QueryResult();
+    
+    int iNRows = db_res->GetRowCount();
+    vector< int > iVersion( fCameraRotation.size(), -99 );
+    for( int j = 0; j < iNRows; j++ )
+    {
+        TSQLRow* db_row = db_res->Next();
+        if( !db_row )
+        {
+            continue;
+        }
+        
+        int itelID = -99;
+        double iRot = -99.;
+        if( db_row->GetField( 0 ) )
+        {
+            itelID = atoi( db_row->GetField( 0 ) );
+        }
+        // check entry version
+        if( itelID >= 0 && itelID < ( int )iVersion.size() )
+        {
+            if( db_row->GetField( 1 ) && atoi( db_row->GetField( 1 ) ) > iVersion[itelID] )
+            {
+                if( db_row->GetField( 2 ) )
+                {
+                    iRot = atof( db_row->GetField( 2 ) ) * TMath::RadToDeg();
+                    if( itelID >= 0 && itelID < ( int )fCameraRotation.size() )
+                    {
+                        fCameraRotation[itelID] = -1.* iRot;
+                    }
+                }
+                iVersion[itelID] = atoi( db_row->GetField( 1 ) );
+            }
+        }
+    }
+    return true;
+}
+
+/*
+ * read camera rotation values from text files
+ *
+ */
+bool VCameraRead::read_camerarotation_fromDBTextFile( unsigned int run_number, string iDBTextDirectory )
+{
+    VSQLTextFileReader a( string(iDBTextDirectory +"/"+run_number+".camerarotation") );
+    if( !a.isGood() )
+    {
+        return false;
+    }
+    for( unsigned int telID = 0; telID < fNTel; telID++ )
+    {
+        if( telID < fCameraRotation.size() )
+        {
+            fCameraRotation[telID] = -1. * atof( 
+                    a.getValue_from_key( "pmt_rotation", "telescope_id", to_string( telID ) ).c_str() ) * TMath::RadToDeg();
+        }
+    }
+    return true;
+}
+
 /*!
 
      read varios detector parameters from the DB
 
 */
-bool VCameraRead::readDetectorGeometryFromDB( string iDBStartTime, bool iReadRotationsFromDB )
+bool VCameraRead::readDetectorGeometryFromDB( 
+        string iDBStartTime, 
+        string iDBTextDirectory,
+        unsigned int iRunNumber,
+        bool iReadRotationsFromDB )
 {
 	if( fDebug )
 	{
@@ -1441,57 +1523,20 @@ bool VCameraRead::readDetectorGeometryFromDB( string iDBStartTime, bool iReadRot
 	// read camera rotations from DB
 	if( iReadRotationsFromDB )
 	{
-		stringstream iTempS;
-		iTempS << getDBServer() << "/VOFFLINE";
-		char c_query[800];
-		sprintf( c_query, "select telescope_id, version, pmt_rotation from tblPointing_Monitor_Camera_Parameters where start_date <= \"%s\" AND end_date > \"%s\" ", iDBStartTime.substr( 0, 10 ).c_str(), iDBStartTime.substr( 0, 10 ).c_str() );
-		
-		VDB_Connection my_connection( iTempS.str().c_str() , "readonly", "" ) ;
-		if( !my_connection.Get_Connection_Status() )
-		{
-			cout << "VCameraRead: failed to connect to database server" << endl;
-			cout << "\t server: " <<  iTempS.str() << endl;
-			return false;
-		}
-		if( !my_connection.make_query( c_query ) )
-		{
-			return false;
-		}
-		TSQLResult* db_res = my_connection.Get_QueryResult();
-		
-		int iNRows = db_res->GetRowCount();
-		vector< int > iVersion( fCameraRotation.size(), -99 );
-		for( int j = 0; j < iNRows; j++ )
-		{
-			TSQLRow* db_row = db_res->Next();
-			if( !db_row )
-			{
-				continue;
-			}
-			
-			int itelID = -99;
-			double iRot = -99.;
-			if( db_row->GetField( 0 ) )
-			{
-				itelID = atoi( db_row->GetField( 0 ) );
-			}
-			// check entry version
-			if( itelID >= 0 && itelID < ( int )iVersion.size() )
-			{
-				if( db_row->GetField( 1 ) && atoi( db_row->GetField( 1 ) ) > iVersion[itelID] )
-				{
-					if( db_row->GetField( 2 ) )
-					{
-						iRot = atof( db_row->GetField( 2 ) ) * TMath::RadToDeg();
-						if( itelID >= 0 && itelID < ( int )fCameraRotation.size() )
-						{
-							fCameraRotation[itelID] = -1.* iRot;
-						}
-					}
-					iVersion[itelID] = atoi( db_row->GetField( 1 ) );
-				}
-			}
-		}
+        if( iDBTextDirectory.size() == 0 )
+        {
+            if( !read_camerarotation_fromDB(iDBStartTime) )
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if( !read_camerarotation_fromDBTextFile(iRunNumber, iDBTextDirectory) )
+            {
+                return false;
+            }
+        }
 	}
 	
 	cout << "\t (rotations from DB [deg]: ";

@@ -20,6 +20,7 @@
 
 #include "VGlobalRunParameter.h"
 #include "VDB_Connection.h"
+#include "VSQLTextFileReader.h"
 
 using namespace std;
 
@@ -93,6 +94,8 @@ class VCameraRead : public VGlobalRunParameter
 		void                 cleanNeighbourList();
 		void                 convertMMtoDeg();    //!< convert camera vectors from mm to deg
 		void                 fillTelescopeVectors();
+        bool                 read_camerarotation_fromDB( string iDBStartTime );
+        bool                 read_camerarotation_fromDBTextFile( unsigned int iRunNumber, string iDBTextDirectory );
 		void                 readPixelFile( string );
 		void                 resetCamVectors( bool bMaxN = true );
 		void                 resetNeighbourLists( bool bMaxN = true );
@@ -353,7 +356,11 @@ class VCameraRead : public VGlobalRunParameter
 		//!< read in camera geometry
 		bool                 readCameraFile( string, unsigned int );
 		//!< read telescope geometry from grisu cfg file
-		bool                 readDetectorGeometryFromDB( string iDBStartTime, bool iReadRotationsFromDB = true );
+		bool                 readDetectorGeometryFromDB( 
+                string iDBStartTime, 
+                string iDBTextDirectory,
+                unsigned int iRunNumber,
+                bool iReadRotationsFromDB = true );
 		bool                 readGrisucfg( string iFile, unsigned int fNTel );
 		void                 setCameraCentreTubeIndex();
 		void                 setConfigDir( string iDir )
