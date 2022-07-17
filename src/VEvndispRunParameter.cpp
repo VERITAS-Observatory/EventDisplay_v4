@@ -33,8 +33,10 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	// run parameters
 #ifdef RUNWITHDB
 	fuseDB = true;
+    fDBTextDirectory = "";
 #else
 	fuseDB = false;
+    fDBTextDirectory = "";
 #endif
 	frunmode = 0;
 	fRunIsZeroSuppressed = false;
@@ -390,6 +392,14 @@ void VEvndispRunParameter::print( int iEv )
 	cout << endl;
 	cout << "File: " << fsourcefile << " (sourcetype " << fsourcetype;
 	cout << ")" << endl;
+    if( useDBTextFiles() )
+    {
+        cout << "Using database files for slow control data from " << fDBTextDirectory << endl;
+    }
+    else if( useDB() )
+    {
+        cout << "Using database for slow control data" << endl;
+    }
 	cout << "===========" << endl;
 	cout << fEventDisplayDate;
 	if( fIsMC )

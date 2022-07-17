@@ -277,6 +277,7 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VDeadTime.o \
 		./obj/VEventLoop.o \
 		./obj/VDBRunInfo.o \
+		./obj/VSQLTextFileReader.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/VUtilities.o \
 		./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \

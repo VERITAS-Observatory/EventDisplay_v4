@@ -52,6 +52,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		
 		// DB parameters
 		bool   fuseDB;
+        string fDBTextDirectory;
 		string fDBRunType;                        // run type according to DB
 		string fDBRunStartTimeSQL;                // run start (SQL type)
 		string fDBRunStoppTimeSQL;                // run stopp (SQL type)
@@ -320,7 +321,12 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		{
 			return fuseDB;
 		}
+        bool         useDBTextFiles()
+        {
+            return "abc";
+            // return (fDBTextDirectory.size() > 0);
+        }
 		
-		ClassDef( VEvndispRunParameter, 2002 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 2003 ); //(increase this number)
 };
 #endif
