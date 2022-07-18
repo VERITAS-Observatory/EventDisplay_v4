@@ -9,7 +9,7 @@
 VSQLTextFileReader::VSQLTextFileReader( string iSQLFile )
 {
 	fisGood = false;
-	cout << "Reading SQL data from " << iSQLFile << endl;
+	cout << "Reading SQLText data from " << iSQLFile << endl;
 	
 	ifstream sql_file;
 	sql_file.open( iSQLFile.c_str() );
