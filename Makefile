@@ -873,6 +873,21 @@ compareDatawithMC:	$(COMPAREDATAMCOBJ)
 	@echo "$@ done"
 
 ########################################################
+# printMJD 
+########################################################
+PRINTMJDOBJ=		./obj/VSkyCoordinatesUtilities.o \
+					./obj/VAstronometry.o \
+					./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+					./obj/printMJD.o
+
+./obj/printMJD.o:	./src/printMJD.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+printMJD:	$(PRINTMJDOBJ)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+########################################################
 # printBinaryOrbitalPhase
 ########################################################
 PRINTBINARYOBJ=		./obj/VAstronometry.o ./obj/printBinaryOrbitalPhase.o
