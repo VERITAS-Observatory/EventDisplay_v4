@@ -68,16 +68,16 @@ void VPointingDB::readTrackingCorrections( string iTPointCorrection )
 
 void VPointingDB::setup_DB_connection()
 {
-    string iTempS  = getDBServer();
-    iTempS        += "/VERITAS";
-    fmy_connection = new VDB_Connection( iTempS.c_str(), "readonly", "" ) ;
-    
-    if( !fmy_connection->Get_Connection_Status() )
-    {
-        cout << "VPointingDB: failed to connect to database server: " << iTempS << endl;
-        fStatus = false;
-        exit( EXIT_FAILURE );
-    }
+	string iTempS  = getDBServer();
+	iTempS        += "/VERITAS";
+	fmy_connection = new VDB_Connection( iTempS.c_str(), "readonly", "" ) ;
+	
+	if( !fmy_connection->Get_Connection_Status() )
+	{
+		cout << "VPointingDB: failed to connect to database server: " << iTempS << endl;
+		fStatus = false;
+		exit( EXIT_FAILURE );
+	}
 }
 
 
@@ -91,11 +91,11 @@ bool VPointingDB::initialize(
 	if( iDBTextDirectory.size() > 0 )
 	{
 		fmy_connection = 0;
-		fStatus = getDBTextRunInfo(iDBTextDirectory);
+		fStatus = getDBTextRunInfo( iDBTextDirectory );
 	}
 	else
 	{
-        setup_DB_connection();
+		setup_DB_connection();
 		fStatus = getDBRunInfo();
 	}
 	// read pointing from calibrated pointing monitor (VPM) entries in DB
@@ -372,28 +372,28 @@ void VPointingDB::getDBMJDTime( string itemp, int& MJD, double& Time, bool bStri
 
 bool VPointingDB::getDBTextRunInfo( string iDBTextDirectory )
 {
-    VSQLTextFileReader a( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".runinfo") );
-    if( !a.isGood() )
-    {
-        return false;
-    }
-    getDBMJDTime( a.getValue_from_key( "data_start_time"), fMJDRunStart, fTimeRunStart, true );
-    getDBMJDTime( a.getValue_from_key( "data_end_time"), fMJDRunStart, fTimeRunStopp, true );
-    // add 1 min to be save
-    fTimeRunStopp += 60.;
-    fDBSourceName = a.getValue_from_key( "source_id" );
-    float dist = atof( a.getValue_from_key( "offset_distance" ).c_str() );
-    float angl = atof( a.getValue_from_key( "offset_angle" ).c_str() );
-    fDBWobbleNorth = dist * cos( angl * TMath::DegToRad() );
-    fDBWobbleEast = dist * sin( angl * TMath::DegToRad() );
-    VSQLTextFileReader t( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".target") );
-    if( !t.isGood() )
-    {
-        return false;
-    }
-    fDBTargetDec = atof( t.getValue_from_key( "decl" ).c_str() ) * TMath::RadToDeg();
-    fDBTargetRA = atof( t.getValue_from_key( "ra" ).c_str() ) * TMath::RadToDeg();
-    return true;
+	VSQLTextFileReader a( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".runinfo" ) );
+	if( !a.isGood() )
+	{
+		return false;
+	}
+	getDBMJDTime( a.getValue_from_key( "data_start_time" ), fMJDRunStart, fTimeRunStart, true );
+	getDBMJDTime( a.getValue_from_key( "data_end_time" ), fMJDRunStart, fTimeRunStopp, true );
+	// add 1 min to be save
+	fTimeRunStopp += 60.;
+	fDBSourceName = a.getValue_from_key( "source_id" );
+	float dist = atof( a.getValue_from_key( "offset_distance" ).c_str() );
+	float angl = atof( a.getValue_from_key( "offset_angle" ).c_str() );
+	fDBWobbleNorth = dist * cos( angl * TMath::DegToRad() );
+	fDBWobbleEast = dist * sin( angl * TMath::DegToRad() );
+	VSQLTextFileReader t( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".target" ) );
+	if( !t.isGood() )
+	{
+		return false;
+	}
+	fDBTargetDec = atof( t.getValue_from_key( "decl" ).c_str() ) * TMath::RadToDeg();
+	fDBTargetRA = atof( t.getValue_from_key( "ra" ).c_str() ) * TMath::RadToDeg();
+	return true;
 }
 
 
@@ -807,24 +807,24 @@ bool VPointingDB::readPointingUncalibratedVPMFromDB()
 
 bool VPointingDB::readPointingFromDBText( string iDBTextDirectory )
 {
-    VSQLTextFileReader a( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".rawpointing_TEL" + getTelID() ) );
-    if( !a.isGood() || !a.checkDataVectorsForSameLength() )
-    {
+	VSQLTextFileReader a( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".rawpointing_TEL" + getTelID() ) );
+	if( !a.isGood() || !a.checkDataVectorsForSameLength() )
+	{
 		cout << "Error reading Raw pointing data from DBText for telescope " << getTelID() + 1 << endl;
 		return false;
 	}
-    vector< string > i_timestamp = a.getValueVector_from_key( "timestamp" );
-    vector< double > i_el_raw = a.getValueVector_from_key_as_double( "elevation_raw" );
-    vector< double > i_az_raw = a.getValueVector_from_key_as_double( "azimuth_raw" );
-    vector< double > i_el_meas = a.getValueVector_from_key_as_double( "elevation_meas" );
-    vector< double > i_az_meas = a.getValueVector_from_key_as_double( "azimuth_meas" );
-    vector< double > i_el_target = a.getValueVector_from_key_as_double( "elevation_target" );
-    vector< double > i_az_target = a.getValueVector_from_key_as_double( "azimuth_target" );
-
+	vector< string > i_timestamp = a.getValueVector_from_key( "timestamp" );
+	vector< double > i_el_raw = a.getValueVector_from_key_as_double( "elevation_raw" );
+	vector< double > i_az_raw = a.getValueVector_from_key_as_double( "azimuth_raw" );
+	vector< double > i_el_meas = a.getValueVector_from_key_as_double( "elevation_meas" );
+	vector< double > i_az_meas = a.getValueVector_from_key_as_double( "azimuth_meas" );
+	vector< double > i_el_target = a.getValueVector_from_key_as_double( "elevation_target" );
+	vector< double > i_az_target = a.getValueVector_from_key_as_double( "azimuth_target" );
+	
 	int iMJD = 0;
 	double iTime = 0.;
-    for( unsigned int i = 0; i < i_timestamp.size(); i++ )
-    {
+	for( unsigned int i = 0; i < i_timestamp.size(); i++ )
+	{
 		getDBMJDTime( i_timestamp[i], iMJD, iTime, false );
 		fDBMJD.push_back( ( unsigned int )iMJD );
 		fDBTime.push_back( iTime );
@@ -836,7 +836,7 @@ bool VPointingDB::readPointingFromDBText( string iDBTextDirectory )
 		fDBTelDec.push_back( 0. );
 		fDBTelExpectedElevation.push_back( i_el_target[i] * TMath::DegToRad() );
 		fDBTelExpectedAzimuth.push_back( i_az_target[i] * TMath::DegToRad() );
-    }
+	}
 	return true;
 }
 
@@ -846,7 +846,7 @@ bool VPointingDB::readPointingFromDB()
 	if( !fmy_connection || !fmy_connection->Get_Connection_Status() )
 	{
 		return false;
-	} 
+	}
 	
 	char iDate1[200];
 	char iDate2[200];
