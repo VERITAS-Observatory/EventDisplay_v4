@@ -504,7 +504,7 @@ bool VPointingDB::readPointingCalibratedVPMFromDBTextFile( string iDBTextDirecto
 	}
 	fDBNrows = fDBMJD.size();
 	
-	return true;
+	return (fDBNrows != 0);
 }
 
 /*
@@ -837,7 +837,8 @@ bool VPointingDB::readPointingFromDBText( string iDBTextDirectory )
 		fDBTelExpectedElevation.push_back( i_el_target[i] * TMath::DegToRad() );
 		fDBTelExpectedAzimuth.push_back( i_az_target[i] * TMath::DegToRad() );
 	}
-	return true;
+    fDBNrows = fDBMJD.size();
+	return (fDBNrows != 0);
 }
 
 bool VPointingDB::readPointingFromDB()
@@ -922,8 +923,7 @@ bool VPointingDB::readPointingFromDB()
 		fDBTelExpectedAzimuth.push_back( atof( db_row->GetField( 6 ) ) * 180. / TMath::Pi() );
 	}
 	fDBNrows = fDBMJD.size();
-	
-	return true;
+	return (fDBNrows != 0);
 }
 
 

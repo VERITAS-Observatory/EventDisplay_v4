@@ -115,6 +115,11 @@ void VDB_PixelDataReader::fillDataRow( unsigned int iDataType, string iTimeStamp
 				cout << iTimeStamp << ", T" << iTel + 1 << ", pixel " << iPixel << ": " << iData << endl;
 			}
 		}
+        else
+        {
+            cout << "VDB_PixelDataReader::fillDataRow(): invalid pixel ID for data type " << iDataType << ": ";
+            cout << iPixel << "\t" << fPixelData[iDataType][iTel].size() << endl;
+        }
 	}
 	else
 	{
@@ -136,40 +141,45 @@ bool VDB_PixelDataReader::readFromDBTextFiles( string iDBTextDirectory, unsigned
 	vector< string > i_timestamp = a.getValueVector_from_key( "timestamp" );
 	vector< unsigned int > i_telID = a.getValueVector_from_key_as_integer( "telescope_id" );
 	vector< unsigned int > i_pixelID = a.getValueVector_from_key_as_integer( "pixel_id" );
-	vector< string > i_rate = a.getValueVector_from_key( "rate" );
+	vector< double > i_rate = a.getValueVector_from_key_as_double( "rate" );
 	for( unsigned int i = 0; i < i_timestamp.size(); i++ )
 	{
-		fillDataRow( 0, i_timestamp[i], i_telID[i], i_pixelID[i], atof( i_rate[i].c_str() ) );
+        if( i_telID[i] < fNPixel.size() && i_pixelID[i] < fNPixel[i_telID[i]] )
+        {
+            fillDataRow( 0, i_timestamp[i], i_telID[i], i_pixelID[i], i_rate[i] );
+        }
 	}
 	// read HV
-	for( unsigned int i = 0; i < getNTel(); i++ )
+	for( unsigned int t = 0; t < getNTel(); t++ )
 	{
-		VSQLTextFileReader h( string( iDBTextDirectory + "/" + runNumber + "/" + runNumber + ".HVsettings_TEL" + i ) );
+        // HVsettings
+		VSQLTextFileReader h( string( iDBTextDirectory + "/" + runNumber + "/" + runNumber + ".HVsettings_TEL" + t ) );
 		if( !h.isGood() || !h.checkDataVectorsForSameLength() )
 		{
 			return false;
 		}
 		vector< string > i_timestamp = h.getValueVector_from_key( "db_end_time" );
 		vector< unsigned int > i_channelid = h.getValueVector_from_key_as_integer( "channel" );
-		vector< string > i_hv = h.getValueVector_from_key( "voltage_meas" );
-		vector< string > i_currents = h.getValueVector_from_key( "current_meas" );
+		vector< double > i_hv = h.getValueVector_from_key_as_double( "voltage_meas" );
+		vector< double > i_currents = h.getValueVector_from_key_as_double( "current_meas" );
 		for( unsigned int i = 0; i < i_timestamp.size(); i++ )
 		{
-			fillDataRow( 1, i_timestamp[i], i, i_channelid[i] - 1, atof( i_hv[i].c_str() ) );
-			fillDataRow( 2, i_timestamp[i], i, i_channelid[i] - 1, atof( i_currents[i].c_str() ) );
+			fillDataRow( 1, i_timestamp[i], t, i_channelid[i] - 1, i_hv[i] );
+			fillDataRow( 2, i_timestamp[i], t, i_channelid[i] - 1, i_currents[i] );
 		}
-		VSQLTextFileReader f( string( iDBTextDirectory + "/" + runNumber + "/" + runNumber + ".FADCsettings_TEL" + i ) );
+        // FADCsettings
+		VSQLTextFileReader f( string( iDBTextDirectory + "/" + runNumber + "/" + runNumber + ".FADCsettings_TEL" + t ) );
 		if( !f.isGood() || !f.checkDataVectorsForSameLength() )
 		{
 			return false;
 		}
-		vector< unsigned int > i_pixel_id = h.getValueVector_from_key_as_integer( "pixel_id" );
-		vector< unsigned int > i_fadc_id = h.getValueVector_from_key_as_integer( "fadc_id" );
-		vector< unsigned int > i_fadc_channel = h.getValueVector_from_key_as_integer( "fadc_channel" );
+		vector< unsigned int > i_pixel_id = f.getValueVector_from_key_as_integer( "pixel_id" );
+		vector< unsigned int > i_fadc_id = f.getValueVector_from_key_as_integer( "fadc_id" );
+		vector< unsigned int > i_fadc_channel = f.getValueVector_from_key_as_integer( "fadc_channel" );
 		for( unsigned int i = 0; i < i_pixel_id.size(); i++ )
 		{
-			fillDataRow( 3, iDBStartTimeSQL, i, i_pixel_id[i], i_fadc_id[i] );
-			fillDataRow( 4, iDBStartTimeSQL, i, i_pixel_id[i], i_fadc_channel[i] );
+			fillDataRow( 3, iDBStartTimeSQL, t, i_pixel_id[i], i_fadc_id[i] );
+			fillDataRow( 4, iDBStartTimeSQL, t, i_pixel_id[i], i_fadc_channel[i] );
 		}
 	}
 	
