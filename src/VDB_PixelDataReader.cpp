@@ -128,7 +128,7 @@ void VDB_PixelDataReader::fillDataRow( unsigned int iDataType, string iTimeStamp
  */
 bool VDB_PixelDataReader::readFromDBTextFiles( string iDBTextDirectory, unsigned int runNumber, string iDBStartTimeSQL )
 {
-    VSQLTextFileReader a( string(iDBTextDirectory+"/"+runNumber+".L1_TriggerInfo") );
+    VSQLTextFileReader a( string(iDBTextDirectory+"/"+runNumber+"/"+runNumber+".L1_TriggerInfo") );
     if( !a.isGood() || !a.checkDataVectorsForSameLength() )
     {
         return false;
@@ -144,7 +144,7 @@ bool VDB_PixelDataReader::readFromDBTextFiles( string iDBTextDirectory, unsigned
     // read HV
     for( unsigned int i = 0; i < getNTel(); i++ )
     {
-        VSQLTextFileReader h( string(iDBTextDirectory+"/"+runNumber+".HVsettings_TEL"+i) );
+        VSQLTextFileReader h( string(iDBTextDirectory+"/"+runNumber+"/"+runNumber+".HVsettings_TEL"+i) );
         if( !h.isGood() || !h.checkDataVectorsForSameLength() )
         {
             return false;
@@ -158,7 +158,7 @@ bool VDB_PixelDataReader::readFromDBTextFiles( string iDBTextDirectory, unsigned
             fillDataRow( 1, i_timestamp[i], i, i_channelid[i] - 1, atof(i_hv[i].c_str() ) );
             fillDataRow( 2, i_timestamp[i], i, i_channelid[i] - 1, atof(i_currents[i].c_str() ) );
         }
-        VSQLTextFileReader f( string(iDBTextDirectory+"/"+runNumber+".FADCsettings_TEL"+i) );
+        VSQLTextFileReader f( string(iDBTextDirectory+"/"+runNumber+"/"+runNumber+".FADCsettings_TEL"+i) );
         if( !f.isGood() || !f.checkDataVectorsForSameLength() )
         {
             return false;

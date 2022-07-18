@@ -543,7 +543,7 @@ void VDBRunInfo::set_telescope_to_analyse()
 
 bool VDBRunInfo::readRunInfoFromDBTextFile()
 {
-    VSQLTextFileReader a( string(fDBTextDirectory+"/"+fRunNumber+".runinfo") );
+    VSQLTextFileReader a( string(fDBTextDirectory+"/"+fRunNumber+"/"+fRunNumber+".runinfo") );
     if( !a.isGood() )
     {
         return false;
@@ -610,7 +610,7 @@ bool VDBRunInfo::readRunInfoFromDBTextFile()
 
 bool VDBRunInfo::readTargetFromDBTextFile()
 {
-    VSQLTextFileReader a( string(fDBTextDirectory+"/"+fRunNumber+".target") );
+    VSQLTextFileReader a( string(fDBTextDirectory+"/"+fRunNumber+"/"+fRunNumber+".target") );
     if( !a.isGood() )
     {
         return false;
@@ -634,7 +634,7 @@ bool VDBRunInfo::readTargetFromDBTextFile()
 vector< unsigned int > VDBRunInfo::readLaserFromDBTextFile()
 {
     vector< unsigned int > iTemp;
-    VSQLTextFileReader a( string(fDBTextDirectory+"/"+fRunNumber+".laserrun") );
+    VSQLTextFileReader a( string(fDBTextDirectory+"/"+fRunNumber+"/"+fRunNumber+".laserrun") );
     if( !a.isGood() )
     {
         return iTemp;
@@ -659,7 +659,7 @@ unsigned int VDBRunInfo::readRunDQMFromDBTextFile( int run_number, unsigned int 
 {
 	unsigned int ConfigMaskDQM = 0;
 
-    VSQLTextFileReader a( string(fDBTextDirectory+"/"+run_number+".rundqm") );
+    VSQLTextFileReader a( string(fDBTextDirectory+"/"+run_number+"/"+run_number+".rundqm") );
     if( !a.isGood() )
     {
         return config_mask;

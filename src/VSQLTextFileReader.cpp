@@ -95,6 +95,26 @@ vector< unsigned int > VSQLTextFileReader::getValueVector_from_key_as_integer(st
     return itemp;
 }
 
+vector< double > VSQLTextFileReader::getValueVector_from_key_as_double(string iKey)
+{
+    vector< double > itemp;
+    if( fData.find(iKey) != fData.end() )
+    {
+        for( unsigned int i = 0; i < fData[iKey].size(); i++ )
+        {
+            if( fData[iKey][i].size() > 0 )
+            {
+                itemp.push_back( atof( fData[iKey][i].c_str() ) );
+            }
+            else
+            {
+                itemp.push_back( 0. );
+            }
+         }
+    }
+    return itemp;
+}
+
 string VSQLTextFileReader::getValue_from_key(string iKey, string iSearchKey, string iValue )
 {
     if( fData.find( iSearchKey ) != fData.end() && fData.find( iKey ) != fData.end() )
