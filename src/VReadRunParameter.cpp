@@ -416,19 +416,19 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			fRunPara->fuseDB = true;
 			isCompiledWithDB();
 		}
-        else if( iTemp.find( "dbtextdirectory" ) < iTemp.size() )
-        {
+		else if( iTemp.find( "dbtextdirectory" ) < iTemp.size() )
+		{
 			if( iTemp2.size() > 0 )
 			{
-                fRunPara->fDBTextDirectory = iTemp2;
-                i++;
-            }
-            else
-            {
-                cout << "error setting DB text directory" << endl;
-                return false;
-            }
-        }
+				fRunPara->fDBTextDirectory = iTemp2;
+				i++;
+			}
+			else
+			{
+				cout << "error setting DB text directory" << endl;
+				return false;
+			}
+		}
 		else if( iTemp.find( "donotusedbinfo" ) < iTemp.size() )
 		{
 			fRunPara->fuseDB = false;
@@ -1204,7 +1204,7 @@ void VReadRunParameter::test_and_adjustParams()
 	// (some values can be overwritten by the command line)
 	if( fRunPara->fuseDB )
 	{
-        read_db_runinfo();
+		read_db_runinfo();
 	}
 	if( !readEpochsAndAtmospheres() )
 	{
@@ -1871,98 +1871,98 @@ bool VReadRunParameter::readEpochsAndAtmospheres()
 
 void VReadRunParameter::read_db_runinfo()
 {
-    VDBRunInfo i_DBinfo( fRunPara->frunnumber, 
-            fRunPara->getDBServer(), 
-            fRunPara->fNTelescopes,
-            fRunPara->fDBTextDirectory );
-    if( i_DBinfo.isGood() )
-    {
-        fRunPara->fTargetName = i_DBinfo.getTargetName();
-        // DB coordinates are in J2000
-        fRunPara->fTargetDec = i_DBinfo.getTargetDec();
-        fRunPara->fTargetRA = i_DBinfo.getTargetRA();
-        if( fWobbleNorth_overwriteDB < -9998. )
-        {
-            fRunPara->fWobbleNorth = i_DBinfo.getWobbleNorth();
-        }
-        else
-        {
-            fRunPara->fWobbleNorth = fWobbleNorth_overwriteDB;
-            cout << "VReadRunParameter::test_and_adjustParams() info: overwriting DB wobble north (";
-            cout << i_DBinfo.getWobbleNorth() << " deg)";
-            cout << "with command line value: " << fWobbleNorth_overwriteDB << " deg" << endl;
-        }
-        if( fWobbleEast_overwriteDB < -9998. )
-        {
-            fRunPara->fWobbleEast = i_DBinfo.getWobbleEast();
-        }
-        else
-        {
-            fRunPara->fWobbleEast = fWobbleEast_overwriteDB;
-            cout << "VReadRunParameter::test_and_adjustParams() info: overwriting DB wobble east (";
-            cout << i_DBinfo.getWobbleEast() << " deg)";
-            cout << "with command line value: " << fWobbleEast_overwriteDB << " deg" << endl;
-        }
-        fRunPara->fDBRunType = i_DBinfo.getRunType();
-        fRunPara->fDBRunStartTimeSQL = i_DBinfo.getDataStartTimeSQL();
-        fRunPara->fDBRunStoppTimeSQL = i_DBinfo.getDataStoppTimeSQL();
-        fRunPara->fDBDataStartTimeMJD = i_DBinfo.getDataStartTimeMJD();
-        fRunPara->fDBDataStoppTimeMJD = i_DBinfo.getDataStoppTimeMJD();
-        fRunPara->fDBDataStartTimeSecOfDay = i_DBinfo.getDataStartTime();
-        fRunPara->fDBDataStoppTimeSecOfDay = i_DBinfo.getDataStoppTime();
-        fRunPara->fRunDuration = ( float )i_DBinfo.getDuration();
-        if( fTelToAna == 0 )
-        {
-            fTelToAna = i_DBinfo.getTelToAna();
-        }
-        // get source file from run number (if run number is given and no sourcefile)
-        if( fRunPara->fsourcefile.size() < 1 )
-        {
-            char iname[5000];
-            // set raw data directories
-            if( fRunPara->getDirectory_VBFRawData().size() > 0 )
-            {
-                sprintf( iname, "%s/d%d/%d.cvbf", fRunPara->getDirectory_VBFRawData().c_str(), i_DBinfo.getRunDate(), fRunPara->frunnumber );
-                if( gSystem->AccessPathName( iname ) )
-                {
-                    sprintf( iname, "%s/data/d%d/%d.cvbf", fRunPara->getDirectory_VBFRawData().c_str(), i_DBinfo.getRunDate(), fRunPara->frunnumber );
-                }
-            }
-            else
-            {
-                sprintf( iname, "data/d%d/%d.cvbf", i_DBinfo.getRunDate(), fRunPara->frunnumber );
-                cout << iname << endl;
-            }
-            fRunPara->fsourcefile = iname;
-        }
-        
-        // get laser runs
-        if( fRunPara->frunmode != 2 && fRunPara->frunmode != 5 )
-        {
-            vector< unsigned int > iL = i_DBinfo.getLaserRun();
-            if( iL.size() != fRunPara->fNTelescopes )
-            {
-                cout << "VReadRunParameter::test_and_adjustParams() error: list of laser file has wrong length ";
-                cout << iL.size() << "\t" << fRunPara->fNTelescopes << endl;
-                exit( EXIT_FAILURE );
-            }
-            else
-            {
-                for( unsigned int i = 0; i < iL.size(); i++ )
-                {
-                    fRunPara->fGainFileNumber[i] = ( int )iL[i];
-                    fRunPara->fTOffFileNumber[i] = ( int )iL[i];
-                }
-            }
-        }
-        
-        i_DBinfo.print();
-    }
-    else
-    {
-        cout << endl;
-        cout << "FATAL ERROR: cannot connect to VERITAS database" << endl;
-        cout << "exiting..." << endl;
-        exit( EXIT_FAILURE );
-    }
+	VDBRunInfo i_DBinfo( fRunPara->frunnumber,
+						 fRunPara->getDBServer(),
+						 fRunPara->fNTelescopes,
+						 fRunPara->fDBTextDirectory );
+	if( i_DBinfo.isGood() )
+	{
+		fRunPara->fTargetName = i_DBinfo.getTargetName();
+		// DB coordinates are in J2000
+		fRunPara->fTargetDec = i_DBinfo.getTargetDec();
+		fRunPara->fTargetRA = i_DBinfo.getTargetRA();
+		if( fWobbleNorth_overwriteDB < -9998. )
+		{
+			fRunPara->fWobbleNorth = i_DBinfo.getWobbleNorth();
+		}
+		else
+		{
+			fRunPara->fWobbleNorth = fWobbleNorth_overwriteDB;
+			cout << "VReadRunParameter::test_and_adjustParams() info: overwriting DB wobble north (";
+			cout << i_DBinfo.getWobbleNorth() << " deg)";
+			cout << "with command line value: " << fWobbleNorth_overwriteDB << " deg" << endl;
+		}
+		if( fWobbleEast_overwriteDB < -9998. )
+		{
+			fRunPara->fWobbleEast = i_DBinfo.getWobbleEast();
+		}
+		else
+		{
+			fRunPara->fWobbleEast = fWobbleEast_overwriteDB;
+			cout << "VReadRunParameter::test_and_adjustParams() info: overwriting DB wobble east (";
+			cout << i_DBinfo.getWobbleEast() << " deg)";
+			cout << "with command line value: " << fWobbleEast_overwriteDB << " deg" << endl;
+		}
+		fRunPara->fDBRunType = i_DBinfo.getRunType();
+		fRunPara->fDBRunStartTimeSQL = i_DBinfo.getDataStartTimeSQL();
+		fRunPara->fDBRunStoppTimeSQL = i_DBinfo.getDataStoppTimeSQL();
+		fRunPara->fDBDataStartTimeMJD = i_DBinfo.getDataStartTimeMJD();
+		fRunPara->fDBDataStoppTimeMJD = i_DBinfo.getDataStoppTimeMJD();
+		fRunPara->fDBDataStartTimeSecOfDay = i_DBinfo.getDataStartTime();
+		fRunPara->fDBDataStoppTimeSecOfDay = i_DBinfo.getDataStoppTime();
+		fRunPara->fRunDuration = ( float )i_DBinfo.getDuration();
+		if( fTelToAna == 0 )
+		{
+			fTelToAna = i_DBinfo.getTelToAna();
+		}
+		// get source file from run number (if run number is given and no sourcefile)
+		if( fRunPara->fsourcefile.size() < 1 )
+		{
+			char iname[5000];
+			// set raw data directories
+			if( fRunPara->getDirectory_VBFRawData().size() > 0 )
+			{
+				sprintf( iname, "%s/d%d/%d.cvbf", fRunPara->getDirectory_VBFRawData().c_str(), i_DBinfo.getRunDate(), fRunPara->frunnumber );
+				if( gSystem->AccessPathName( iname ) )
+				{
+					sprintf( iname, "%s/data/d%d/%d.cvbf", fRunPara->getDirectory_VBFRawData().c_str(), i_DBinfo.getRunDate(), fRunPara->frunnumber );
+				}
+			}
+			else
+			{
+				sprintf( iname, "data/d%d/%d.cvbf", i_DBinfo.getRunDate(), fRunPara->frunnumber );
+				cout << iname << endl;
+			}
+			fRunPara->fsourcefile = iname;
+		}
+		
+		// get laser runs
+		if( fRunPara->frunmode != 2 && fRunPara->frunmode != 5 )
+		{
+			vector< unsigned int > iL = i_DBinfo.getLaserRun();
+			if( iL.size() != fRunPara->fNTelescopes )
+			{
+				cout << "VReadRunParameter::test_and_adjustParams() error: list of laser file has wrong length ";
+				cout << iL.size() << "\t" << fRunPara->fNTelescopes << endl;
+				exit( EXIT_FAILURE );
+			}
+			else
+			{
+				for( unsigned int i = 0; i < iL.size(); i++ )
+				{
+					fRunPara->fGainFileNumber[i] = ( int )iL[i];
+					fRunPara->fTOffFileNumber[i] = ( int )iL[i];
+				}
+			}
+		}
+		
+		i_DBinfo.print();
+	}
+	else
+	{
+		cout << endl;
+		cout << "FATAL ERROR: cannot connect to VERITAS database" << endl;
+		cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
+	}
 }

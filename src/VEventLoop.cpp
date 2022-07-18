@@ -438,16 +438,16 @@ bool VEventLoop::initEventLoop( string iFileName )
 	{
 		fDB_PixelDataReader = new VDB_PixelDataReader( getDetectorGeo()->getNumChannelVector() );
 		fDB_PixelDataReader->setDebug( fRunPar->fDebug );
-        if( fRunPar->useDBTextFiles() )
-        {
-            fDB_PixelDataReader->readFromDBTextFiles(
-                    fRunPar->getDBTextDirectory(), fRunPar->frunnumber, fRunPar->fDBRunStartTimeSQL );
-        }
-        else
-        {
-            fDB_PixelDataReader->readFromDB( fRunPar->getDBServer(), fRunPar->frunnumber,
-                                             fRunPar->fDBRunStartTimeSQL, fRunPar->fDBRunStoppTimeSQL );
-        }
+		if( fRunPar->useDBTextFiles() )
+		{
+			fDB_PixelDataReader->readFromDBTextFiles(
+				fRunPar->getDBTextDirectory(), fRunPar->frunnumber, fRunPar->fDBRunStartTimeSQL );
+		}
+		else
+		{
+			fDB_PixelDataReader->readFromDB( fRunPar->getDBServer(), fRunPar->frunnumber,
+											 fRunPar->fDBRunStartTimeSQL, fRunPar->fDBRunStoppTimeSQL );
+		}
 	}
 	
 	// set event number vector
@@ -556,7 +556,8 @@ bool VEventLoop::initEventLoop( string iFileName )
 			if( fRunPar->fDBTracking )
 			{
 				fPointing.back()->getPointingFromDB( fRunPar->frunnumber, fRunPar->fDBTrackingCorrections, fRunPar->fPMTextFileDirectory,
-													 fRunPar->fDBVPM, fRunPar->fDBUncalibratedVPM );
+													 fRunPar->fDBVPM, fRunPar->fDBUncalibratedVPM,
+                                                     fRunPar->getDBTextDirectory() );
 			}
 			else
 			{

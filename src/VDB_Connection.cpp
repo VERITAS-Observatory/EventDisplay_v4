@@ -49,8 +49,8 @@ bool VDB_Connection::Connect()
 	
 	if( !f_db )
 	{
-        cout << "TMP TMP TMP exit when not able to connect" << endl;
-        exit( EXIT_FAILURE );
+		cout << "TMP TMP TMP exit when not able to connect" << endl;
+		exit( EXIT_FAILURE );
 		// connection failed
 		cout << "VDB_Connection: info: failed to connect to database server, sleep for 10 and try again..." << endl;
 		gSystem->Sleep( 10000 );

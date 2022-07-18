@@ -143,7 +143,7 @@ class VDB_PixelDataReader
 		void   print();
 		void   print( string iDatatype, unsigned int iTelID, unsigned int iPixel );
 		bool   readFromDB( string DBServer, unsigned int runNumber, string iDBStartTimeSQL, string fDBRunStoppTimeSQL );
-        bool   readFromDBTextFiles( string iDBTextDirectory, unsigned int runNumber, string iDBStartTimeSQL );
+		bool   readFromDBTextFiles( string iDBTextDirectory, unsigned int runNumber, string iDBStartTimeSQL );
 		void   setDebug( bool iB = false )
 		{
 			fDebug = iB;

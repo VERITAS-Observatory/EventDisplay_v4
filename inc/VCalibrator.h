@@ -99,7 +99,7 @@ class VCalibrator : public VImageBaseAnalyzer
 		string getCalibrationFileName( int iTel, int irun, string iSuffix, string name = "" );
 		void readCalibrationData();
 		bool readCalibrationDatafromDSTFiles( string iSourceFile );
-        void readfromVOFFLINE_DBText( int gain_or_toff, vector< unsigned int >& VchannelList, vector< double >& Vmean, vector< double >& Vrms );
+		void readfromVOFFLINE_DBText( int gain_or_toff, vector< unsigned int >& VchannelList, vector< double >& Vmean, vector< double >& Vrms );
 		void readfromVOFFLINE_DB( int gain_or_toff, string& iFile, vector< unsigned int >& VchannelList, vector< double >& Vmean, vector< double >& Vrms );
 		void readGains( bool iLowGain = false );
 		bool readIPRGraph_from_DSTFile( string iDSTFile, unsigned int iSummationWindow, ULong64_t iTelType );

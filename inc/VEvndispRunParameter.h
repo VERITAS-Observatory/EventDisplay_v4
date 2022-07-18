@@ -52,7 +52,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		
 		// DB parameters
 		bool   fuseDB;
-        string fDBTextDirectory;
+		string fDBTextDirectory;
 		string fDBRunType;                        // run type according to DB
 		string fDBRunStartTimeSQL;                // run start (SQL type)
 		string fDBRunStoppTimeSQL;                // run stopp (SQL type)
@@ -308,10 +308,10 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fperformFADCAnalysis;
 		}
 		unsigned int getAtmosphereID( bool iUpdateInstrumentEpoch = false );
-        string       getDBTextDirectory()
-        {
-            return fDBTextDirectory;
-        }
+		string       getDBTextDirectory()
+		{
+			return fDBTextDirectory;
+		}
 		string       getInstrumentEpoch( bool iMajor = false,
 										 bool iUpdateInstrumentEpoch = false );
 		bool         isMC()
@@ -325,10 +325,10 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		{
 			return fuseDB;
 		}
-        bool         useDBTextFiles()
-        {
-            return (fDBTextDirectory.size() > 0);
-        }
+		bool         useDBTextFiles()
+		{
+			return ( fDBTextDirectory.size() > 0 );
+		}
 		
 		ClassDef( VEvndispRunParameter, 2003 ); //(increase this number)
 };
