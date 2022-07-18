@@ -557,7 +557,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 			{
 				fPointing.back()->getPointingFromDB( fRunPar->frunnumber, fRunPar->fDBTrackingCorrections, fRunPar->fPMTextFileDirectory,
 													 fRunPar->fDBVPM, fRunPar->fDBUncalibratedVPM,
-                                                     fRunPar->getDBTextDirectory() );
+													 fRunPar->getDBTextDirectory() );
 			}
 			else
 			{

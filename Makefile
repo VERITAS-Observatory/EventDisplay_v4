@@ -1298,6 +1298,7 @@ VTS.calculateExposureFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 VTSLASERUNOBJ=	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 			./obj/VStar.o ./obj/VStar_Dict.o \
+			./obj/VSQLTextFileReader.o \
                         ./obj/VUtilities.o \
                         ./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
                         ./obj/VSkyCoordinatesUtilities.o \

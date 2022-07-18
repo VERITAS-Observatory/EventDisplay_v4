@@ -67,34 +67,34 @@ void VPointingDB::readTrackingCorrections( string iTPointCorrection )
 }
 
 
-bool VPointingDB::initialize( 
-        string iTPointCorrection, string iVPMDirectory, 
-        bool iVPMDB, bool iUncalibratedVPM, string iDBTextDirectory )
+bool VPointingDB::initialize(
+	string iTPointCorrection, string iVPMDirectory,
+	bool iVPMDB, bool iUncalibratedVPM, string iDBTextDirectory )
 {
-    readTrackingCorrections( iTPointCorrection );
+	readTrackingCorrections( iTPointCorrection );
 	
 	string iTempS  = getDBServer();
 	iTempS        += "/VERITAS";
-
-    if( iDBTextDirectory.size() > 0 )
-    {
-        fmy_connection = 0;
-    }
-    else
-    {
-        fmy_connection = new VDB_Connection( iTempS.c_str(), "readonly", "" ) ;
-        
-        if( !fmy_connection->Get_Connection_Status() )
-        {
-            cout << "VPointingDB: failed to connect to database server: " << iTempS << endl;
-            fStatus = false;
-            exit( EXIT_FAILURE );
-        }
-        
-        fStatus = getDBRunInfo();
-    }
+	
+	if( iDBTextDirectory.size() > 0 )
+	{
+		fmy_connection = 0;
+	}
+	else
+	{
+		fmy_connection = new VDB_Connection( iTempS.c_str(), "readonly", "" ) ;
+		
+		if( !fmy_connection->Get_Connection_Status() )
+		{
+			cout << "VPointingDB: failed to connect to database server: " << iTempS << endl;
+			fStatus = false;
+			exit( EXIT_FAILURE );
+		}
+		
+		fStatus = getDBRunInfo();
+	}
 	// read pointing from VPM text file
-    // (old and outdated format)
+	// (old and outdated format)
 	if( iVPMDirectory.size() > 0 )
 	{
 		fStatus = readPointingFromVPMTextFile( iVPMDirectory );
@@ -102,27 +102,27 @@ bool VPointingDB::initialize(
 	// read pointing from calibrated pointing monitor (VPM) entries in DB
 	else if( iVPMDB )
 	{
-        if( iDBTextDirectory.size() > 0 )
-        {
-            fGoodVPM = readPointingCalibratedVPMFromDBTextFile(iDBTextDirectory);
-        }
-        else
-        {
-            fGoodVPM = readPointingCalibratedVPMFromDB();
-        }
+		if( iDBTextDirectory.size() > 0 )
+		{
+			fGoodVPM = readPointingCalibratedVPMFromDBTextFile( iDBTextDirectory );
+		}
+		else
+		{
+			fGoodVPM = readPointingCalibratedVPMFromDB();
+		}
 		// fall back to DB pointing if reading pointing monitor data failed
 		if( !fGoodVPM )
 		{
 			cout << "VPointingDB warning: quality-selected VPM data not available, reverting to encoder data for telescope ";
-            cout << getTelID() + 1 << " for full duration of run " << fRunNumber << endl;
-            if( iDBTextDirectory.size() > 0 )
-            {
-                fStatus = readPointingFromDBText(iDBTextDirectory);
-            }
-            else
-            {
-                fStatus = readPointingFromDB();
-            }
+			cout << getTelID() + 1 << " for full duration of run " << fRunNumber << endl;
+			if( iDBTextDirectory.size() > 0 )
+			{
+				fStatus = readPointingFromDBText( iDBTextDirectory );
+			}
+			else
+			{
+				fStatus = readPointingFromDB();
+			}
 		}
 		else
 		{
@@ -516,40 +516,40 @@ bool VPointingDB::readPointingFromVPMTextFile( string iDirectory )
 /*
     read calibrated (default) pointing monitor data from DBTextfile
 */
-bool VPointingDB::readPointingCalibratedVPMFromDBTextFile(string iDBTextDirectory)
+bool VPointingDB::readPointingCalibratedVPMFromDBTextFile( string iDBTextDirectory )
 {
-    // VPM quality flag
-    VSQLTextFileReader a( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".pointingflag" ) );
-    if( !a.isGood() )
-    {
-        cout << "Error reading VPM status flags" << endl;
-        return false;
-    }
-    int maskVPM = atoi(a.getValue_from_key("vpm_config_mask").c_str());
-    cout << "MASK " << maskVPM << endl;
-    if( !check_maskVPM( maskVPM ) )
-    {
-        return false;
-    }
-
-    // VPM data
-    VSQLTextFileReader vpm( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".VPM_TEL" + getTelID()) );
-    if( !vpm.isGood() || !vpm.checkDataVectorsForSameLength() )
-    {
-        cout << "Error reading VPM data from DBText for telescope " << getTelID() + 1 << endl;
-        return false;
-    }
+	// VPM quality flag
+	VSQLTextFileReader a( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".pointingflag" ) );
+	if( !a.isGood() )
+	{
+		cout << "Error reading VPM status flags" << endl;
+		return false;
+	}
+	int maskVPM = atoi( a.getValue_from_key( "vpm_config_mask" ).c_str() );
+	cout << "MASK " << maskVPM << endl;
+	if( !check_maskVPM( maskVPM ) )
+	{
+		return false;
+	}
+	
+	// VPM data
+	VSQLTextFileReader vpm( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".VPM_TEL" + getTelID() ) );
+	if( !vpm.isGood() || !vpm.checkDataVectorsForSameLength() )
+	{
+		cout << "Error reading VPM data from DBText for telescope " << getTelID() + 1 << endl;
+		return false;
+	}
 	string itemp;
 	double iMJD = 0.;
 	double iITime = 0.;
 	double az = 0.;
 	double ze = 0.;
-    vector< double > iMJD_v = vpm.getValueVector_from_key_as_double("mjd");
-    vector< double > iRA = vpm.getValueVector_from_key_as_double("ra" );
-    vector< double > iDec = vpm.getValueVector_from_key_as_double("decl" );
-    for( unsigned int i = 0; i < iMJD_v.size(); i++ )
-    {
-        iMJD = iMJD_v[i];
+	vector< double > iMJD_v = vpm.getValueVector_from_key_as_double( "mjd" );
+	vector< double > iRA = vpm.getValueVector_from_key_as_double( "ra" );
+	vector< double > iDec = vpm.getValueVector_from_key_as_double( "decl" );
+	for( unsigned int i = 0; i < iMJD_v.size(); i++ )
+	{
+		iMJD = iMJD_v[i];
 		iITime = modf( iMJD, &iMJD );
 		fDBMJD.push_back( ( unsigned int )( iMJD ) );
 		fDBTime.push_back( iITime * 86400. );
@@ -564,7 +564,7 @@ bool VPointingDB::readPointingCalibratedVPMFromDBTextFile(string iDBTextDirector
 		fDBTelExpectedAzimuth.push_back( 0. );
 	}
 	fDBNrows = fDBMJD.size();
-
+	
 	return true;
 }
 
@@ -620,10 +620,10 @@ bool VPointingDB::readPointingCalibratedVPMFromDB()
 		return false;
 	}
 	int maskVPM = atoi( flag_row->GetField( 0 ) );
-    if( !check_maskVPM( maskVPM ) )
-    {
-        return false;
-    }
+	if( !check_maskVPM( maskVPM ) )
+	{
+		return false;
+	}
 	
 	// loop over all db entries
 	string itemp;
@@ -715,7 +715,7 @@ bool VPointingDB::check_maskVPM( int maskVPM )
 			return false;
 		}
 	}
-    return true;
+	return true;
 }
 
 /*
@@ -866,9 +866,9 @@ bool VPointingDB::readPointingUncalibratedVPMFromDB()
 	return true;
 }
 
-bool VPointDB::readPointingFromDBText(string iDBTextDirectory)
+bool VPointingDB::readPointingFromDBText( string iDBTextDirectory )
 {
-    return true;
+	return true;
 }
 
 bool VPointingDB::readPointingFromDB()

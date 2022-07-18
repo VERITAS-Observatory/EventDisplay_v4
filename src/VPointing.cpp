@@ -77,10 +77,10 @@ void VPointing::setTelPointing( int MJD, double time, bool iUseDB, bool iFillPoi
 	
 }
 
-void VPointing::getPointingFromDB( 
-        int irun, string iTCorrection, string iVPMDirectory, 
-        bool iVPMDB, bool iUncalibratedVPM,
-        string iDBTextDirectory )
+void VPointing::getPointingFromDB(
+	int irun, string iTCorrection, string iVPMDirectory,
+	bool iVPMDB, bool iUncalibratedVPM,
+	string iDBTextDirectory )
 {
 	fPointingType = 2;
 	if( iVPMDB == true )
