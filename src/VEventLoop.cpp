@@ -555,7 +555,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 			// set pointing error
 			if( fRunPar->fDBTracking )
 			{
-				fPointing.back()->getPointingFromDB( fRunPar->frunnumber, fRunPar->fDBTrackingCorrections, fRunPar->fPMTextFileDirectory,
+				fPointing.back()->getPointingFromDB( fRunPar->frunnumber, fRunPar->fDBTrackingCorrections,
 													 fRunPar->fDBVPM, fRunPar->fDBUncalibratedVPM,
 													 fRunPar->getDBTextDirectory() );
 			}

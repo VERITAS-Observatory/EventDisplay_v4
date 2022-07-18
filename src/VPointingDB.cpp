@@ -66,41 +66,40 @@ void VPointingDB::readTrackingCorrections( string iTPointCorrection )
 	}
 }
 
+void VPointingDB::setup_DB_connection()
+{
+    string iTempS  = getDBServer();
+    iTempS        += "/VERITAS";
+    fmy_connection = new VDB_Connection( iTempS.c_str(), "readonly", "" ) ;
+    
+    if( !fmy_connection->Get_Connection_Status() )
+    {
+        cout << "VPointingDB: failed to connect to database server: " << iTempS << endl;
+        fStatus = false;
+        exit( EXIT_FAILURE );
+    }
+}
+
 
 bool VPointingDB::initialize(
-	string iTPointCorrection, string iVPMDirectory,
+	string iTPointCorrection,
 	bool iVPMDB, bool iUncalibratedVPM, string iDBTextDirectory )
 {
+
 	readTrackingCorrections( iTPointCorrection );
-	
-	string iTempS  = getDBServer();
-	iTempS        += "/VERITAS";
 	
 	if( iDBTextDirectory.size() > 0 )
 	{
 		fmy_connection = 0;
+		fStatus = getDBTextRunInfo(iDBTextDirectory);
 	}
 	else
 	{
-		fmy_connection = new VDB_Connection( iTempS.c_str(), "readonly", "" ) ;
-		
-		if( !fmy_connection->Get_Connection_Status() )
-		{
-			cout << "VPointingDB: failed to connect to database server: " << iTempS << endl;
-			fStatus = false;
-			exit( EXIT_FAILURE );
-		}
-		
+        setup_DB_connection();
 		fStatus = getDBRunInfo();
 	}
-	// read pointing from VPM text file
-	// (old and outdated format)
-	if( iVPMDirectory.size() > 0 )
-	{
-		fStatus = readPointingFromVPMTextFile( iVPMDirectory );
-	}
 	// read pointing from calibrated pointing monitor (VPM) entries in DB
-	else if( iVPMDB )
+	if( iVPMDB )
 	{
 		if( iDBTextDirectory.size() > 0 )
 		{
@@ -371,10 +370,35 @@ void VPointingDB::getDBMJDTime( string itemp, int& MJD, double& Time, bool bStri
 	}
 }
 
+bool VPointingDB::getDBTextRunInfo( string iDBTextDirectory )
+{
+    VSQLTextFileReader a( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".runinfo") );
+    if( !a.isGood() )
+    {
+        return false;
+    }
+    getDBMJDTime( a.getValue_from_key( "data_start_time"), fMJDRunStart, fTimeRunStart, true );
+    getDBMJDTime( a.getValue_from_key( "data_end_time"), fMJDRunStart, fTimeRunStopp, true );
+    // add 1 min to be save
+    fTimeRunStopp += 60.;
+    fDBSourceName = a.getValue_from_key( "source_id" );
+    float dist = atof( a.getValue_from_key( "offset_distance" ).c_str() );
+    float angl = atof( a.getValue_from_key( "offset_angle" ).c_str() );
+    fDBWobbleNorth = dist * cos( angl * TMath::DegToRad() );
+    fDBWobbleEast = dist * sin( angl * TMath::DegToRad() );
+    VSQLTextFileReader t( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".target") );
+    if( !t.isGood() )
+    {
+        return false;
+    }
+    fDBTargetDec = atof( t.getValue_from_key( "decl" ).c_str() ) * TMath::RadToDeg();
+    fDBTargetRA = atof( t.getValue_from_key( "ra" ).c_str() ) * TMath::RadToDeg();
+    return true;
+}
+
 
 bool VPointingDB::getDBRunInfo()
 {
-
 	if( !fmy_connection->Get_Connection_Status() )
 	{
 		return false;
@@ -429,90 +453,6 @@ bool VPointingDB::getDBRunInfo()
 }
 
 
-bool VPointingDB::readPointingFromVPMTextFile( string iDirectory )
-{
-	if( iDirectory.size() < 1 )
-	{
-		return false;
-	}
-	
-	char fname[1200];
-	sprintf( fname, "%s/pointing_VPM.%d.t%d.dat", iDirectory.c_str(), fRunNumber, getTelID() + 1 );
-	
-	ifstream is;
-	is.open( fname );
-	if( !is )
-	{
-		cout << "VPointingDB: error opening pointing monitor data file: " << fname << endl;
-		cout << "exiting...." << endl;
-		exit( 0 );
-	}
-	string is_line;
-	int nLines = 0;
-	double iMJD = 0.;
-	double iTemp = 0.;
-	double iRA = 0.;
-	double iDec = 0.;
-	double iITime = 0.;
-	double az = 0.;
-	double ze = 0.;
-	
-	while( getline( is, is_line ) )
-	{
-		// This is the expected format (vpm v.0.9):
-		// MJD REQ_AZ REQ_EL REQ_RA2000 REQ_DEC2000 POSITIONER_RA2000 POSITIONER_DEC2000 VPM_AZ VPM_EL VPM_RA2000 VPM_DEC2000
-		// test line for completeness (expect 11 columns)
-		int nC = 0;
-		istringstream is_streamT( is_line );
-		while( !( is_streamT >> std::ws ).eof() )
-		{
-			is_streamT >> iTemp;
-			nC++;
-		};
-		if( nC != 11 )
-		{
-			cout << "\t warning: incomplete line in pointing monitor file" << endl;
-			continue;
-		}
-		// read a new line
-		istringstream is_stream( is_line );
-		is_stream >> iMJD;
-		iITime = modf( iMJD, &iMJD );
-		// ignore the following 8 columns
-		for( int i = 0; i < 8; i++ )
-		{
-			is_stream >> iTemp;
-		}
-		is_stream >> iRA;
-		is_stream >> iDec;
-		if( iRA > 0. && iDec > 0. )
-		{
-			fDBMJD.push_back( ( unsigned int )( iMJD ) );
-			fDBTime.push_back( iITime * 86400. );
-			fDBTelElevationRaw.push_back( 0. );
-			fDBTelAzimuthRaw.push_back( 0. );
-			fDBTelRA.push_back( iRA * degrad );
-			fDBTelDec.push_back( iDec * degrad );
-			getHorizonCoordinates( fDBMJD.back(), fDBTime.back(), iDec * degrad, iRA * degrad, az, ze );
-			fDBTelElevation.push_back( 90. - ze );
-			fDBTelAzimuth.push_back( az );
-			fDBTelExpectedElevation.push_back( 0. );
-			fDBTelExpectedAzimuth.push_back( 0. );
-		}
-		nLines++;
-	};
-	cout << "Reading pointing data from VERITAS pointing monitor file for telescope " << getTelID() + 1;
-	cout << ": found " << nLines << " rows in file " << fname << endl;
-	if( nLines == 0 )
-	{
-		return false;
-	}
-	
-	fDBNrows = fDBMJD.size();
-	
-	return true;
-}
-
 /*
     read calibrated (default) pointing monitor data from DBTextfile
 */
@@ -526,7 +466,6 @@ bool VPointingDB::readPointingCalibratedVPMFromDBTextFile( string iDBTextDirecto
 		return false;
 	}
 	int maskVPM = atoi( a.getValue_from_key( "vpm_config_mask" ).c_str() );
-	cout << "MASK " << maskVPM << endl;
 	if( !check_maskVPM( maskVPM ) )
 	{
 		return false;
@@ -868,16 +807,46 @@ bool VPointingDB::readPointingUncalibratedVPMFromDB()
 
 bool VPointingDB::readPointingFromDBText( string iDBTextDirectory )
 {
+    VSQLTextFileReader a( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".rawpointing_TEL" + getTelID() ) );
+    if( !a.isGood() || !a.checkDataVectorsForSameLength() )
+    {
+		cout << "Error reading Raw pointing data from DBText for telescope " << getTelID() + 1 << endl;
+		return false;
+	}
+    vector< string > i_timestamp = a.getValueVector_from_key( "timestamp" );
+    vector< double > i_el_raw = a.getValueVector_from_key_as_double( "elevation_raw" );
+    vector< double > i_az_raw = a.getValueVector_from_key_as_double( "azimuth_raw" );
+    vector< double > i_el_meas = a.getValueVector_from_key_as_double( "elevation_meas" );
+    vector< double > i_az_meas = a.getValueVector_from_key_as_double( "azimuth_meas" );
+    vector< double > i_el_target = a.getValueVector_from_key_as_double( "elevation_target" );
+    vector< double > i_az_target = a.getValueVector_from_key_as_double( "azimuth_target" );
+
+	int iMJD = 0;
+	double iTime = 0.;
+    for( unsigned int i = 0; i < i_timestamp.size(); i++ )
+    {
+		getDBMJDTime( i_timestamp[i], iMJD, iTime, false );
+		fDBMJD.push_back( ( unsigned int )iMJD );
+		fDBTime.push_back( iTime );
+		fDBTelElevationRaw.push_back( i_el_raw[i] * TMath::DegToRad() );
+		fDBTelAzimuthRaw.push_back( i_az_raw[i] * TMath::DegToRad() );
+		fDBTelElevation.push_back( i_el_meas[i] * TMath::DegToRad() );
+		fDBTelAzimuth.push_back( i_az_meas[i] * TMath::DegToRad() );
+		fDBTelRA.push_back( 0. );
+		fDBTelDec.push_back( 0. );
+		fDBTelExpectedElevation.push_back( i_el_target[i] * TMath::DegToRad() );
+		fDBTelExpectedAzimuth.push_back( i_az_target[i] * TMath::DegToRad() );
+    }
 	return true;
 }
 
 bool VPointingDB::readPointingFromDB()
 {
 
-	if( !fmy_connection->Get_Connection_Status() )
+	if( !fmy_connection || !fmy_connection->Get_Connection_Status() )
 	{
 		return false;
-	}
+	} 
 	
 	char iDate1[200];
 	char iDate2[200];
@@ -907,7 +876,6 @@ bool VPointingDB::readPointingFromDB()
 		return false;
 	}
 	TSQLResult* db_res = fmy_connection->Get_QueryResult();
-	
 	
 	int fNRows = db_res->GetRowCount();
 	
@@ -975,8 +943,6 @@ void VPointingDB::getDBSourceCoordinates( string iSource, float& iEVNTargetDec, 
 		return;
 	}
 	TSQLResult* db_res = fmy_connection->Get_QueryResult();
-	
-	
 	
 	TSQLRow* db_row = db_res->Next();
 	

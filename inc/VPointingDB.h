@@ -86,6 +86,7 @@ class VPointingDB : public VGlobalRunParameter
 		
 		bool check_maskVPM( int maskVPM );
 		bool getDBRunInfo();
+        bool getDBTextRunInfo( string iDBTextDirectory );
 		void getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip );
 		void getDBSourceCoordinates( string iSource, float& iEVNTargetDec, float& iEVNTargetRA );
 		bool readPointingFromDB();
@@ -93,8 +94,8 @@ class VPointingDB : public VGlobalRunParameter
 		bool readPointingCalibratedVPMFromDB();
 		bool readPointingCalibratedVPMFromDBTextFile( string iDBTextDirectory );
 		bool readPointingUncalibratedVPMFromDB();
-		bool readPointingFromVPMTextFile( string );
 		void readTrackingCorrections( string iTPointCorrection );
+        void setup_DB_connection();
 		
 		void delete_myconnection()
 		{
@@ -163,7 +164,6 @@ class VPointingDB : public VGlobalRunParameter
 		}
 		bool   initialize(
 			string iTPointCorrection,
-			string iVPMDirectory,
 			bool iVPMDB,
 			bool iUncalibratedVPM,
 			string iDBTextDirectory );

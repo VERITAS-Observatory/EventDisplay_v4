@@ -629,21 +629,6 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				return false;
 			}
 		}
-		else if( iTemp.rfind( "-pointingmonitortxt" ) < iTemp.size() )
-		{
-			if( iTemp2.size() > 0 )
-			{
-				fRunPara->fPMTextFileDirectory = iTemp2;
-				fRunPara->fDBTracking = true;
-				i++;
-			}
-			else
-			{
-				fRunPara->fPMTextFileDirectory = "";
-				cout << "no pointing monitor text file directory give" << endl;
-				return false;
-			}
-		}
 		// min laser charge
 		else if( iTemp.rfind( "lasermin" ) < iTemp.size() )
 		{
@@ -1237,15 +1222,6 @@ void VReadRunParameter::test_and_adjustParams()
 			cout << "error: cannot read gzipped or bzipped files" << endl;
 			exit( EXIT_FAILURE );
 		}
-	}
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// can't apply T-point corrections to pointing monitor data
-	if( fRunPara->fDBTrackingCorrections.size() > 0 && fRunPara->fPMTextFileDirectory.size() > 0 )
-	{
-		cout << "error: can't apply T-point corrections to pointing monitor data" << endl;
-		cout << "exiting..." << endl;
-		exit( -1 );
 	}
 	
 	// switch of display in calibration and dst mode

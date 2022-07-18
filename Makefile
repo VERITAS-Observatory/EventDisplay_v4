@@ -222,7 +222,8 @@ all VTS:	evndisp \
 	VTS.getRun_TimeElevAzim \
 	writeParticleRateFilesForTMVA \
 	writelaserinDB \
-	logFile
+	logFile \
+	printMJD
 
 ###############################################################################################################################
 # core eventdisplay package
