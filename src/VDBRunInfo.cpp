@@ -665,7 +665,7 @@ unsigned int VDBRunInfo::readRunDQMFromDBTextFile( int run_number, unsigned int 
 		return config_mask;
 	}
 	string i_config_mask = a.getValue_from_key( "tel_cut_mask", "run_id", to_string( run_number ) );
-	if( i_config_mask.size() > 0 )
+	if( i_config_mask.size() > 0 && i_config_mask != "NULL" )
 	{
 		ConfigMaskDQM = atoi( i_config_mask.c_str() );
 	}

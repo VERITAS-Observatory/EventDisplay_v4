@@ -459,7 +459,7 @@ bool VPointingDB::getDBRunInfo()
 bool VPointingDB::readPointingCalibratedVPMFromDBTextFile( string iDBTextDirectory )
 {
 	// VPM quality flag
-	VSQLTextFileReader a( iDBTextDirectory, fRunNumber, "pointingflag" );
+	VSQLTextFileReader a( iDBTextDirectory, fRunNumber, "rundqm" );
 	if( !a.isGood() )
 	{
 		cout << "Error reading VPM status flags" << endl;
