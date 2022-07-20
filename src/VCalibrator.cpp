@@ -2468,13 +2468,13 @@ void VCalibrator::readfromVOFFLINE_DBText( int gain_or_toff, vector< unsigned in
 	string i_suffix;
 	if( gain_or_toff == 1 )
 	{
-		i_suffix = ".gain_TEL" + to_string( getTelID() + 1 );
+		i_suffix = "gain";
 	}
 	else
 	{
-		i_suffix = ".toffset_TEL" + to_string( getTelID() + 1 );
+		i_suffix = "toffset";
 	}
-	VSQLTextFileReader a( string( getRunParameter()->getDBTextDirectory() + "/" + run_number + "/" + run_number + i_suffix ) );
+    VSQLTextFileReader a( getRunParameter()->getDBTextDirectory(), run_number, i_suffix, getTelID() + 1 );
 	if( !a.isGood() || !a.checkDataVectorsForSameLength() )
 	{
 		cout << "Error reading calibration values from file" << endl;

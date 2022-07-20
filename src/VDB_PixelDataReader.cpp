@@ -133,7 +133,7 @@ void VDB_PixelDataReader::fillDataRow( unsigned int iDataType, string iTimeStamp
  */
 bool VDB_PixelDataReader::readFromDBTextFiles( string iDBTextDirectory, unsigned int runNumber, string iDBStartTimeSQL )
 {
-	VSQLTextFileReader a( string( iDBTextDirectory + "/" + runNumber + "/" + runNumber + ".L1_TriggerInfo" ) );
+    VSQLTextFileReader a(iDBTextDirectory, runNumber, "L1_TriggerInfo" );
 	if( !a.isGood() || !a.checkDataVectorsForSameLength() )
 	{
 		return false;
@@ -153,7 +153,7 @@ bool VDB_PixelDataReader::readFromDBTextFiles( string iDBTextDirectory, unsigned
 	for( unsigned int t = 0; t < getNTel(); t++ )
 	{
         // HVsettings
-		VSQLTextFileReader h( string( iDBTextDirectory + "/" + runNumber + "/" + runNumber + ".HVsettings_TEL" + t ) );
+        VSQLTextFileReader h(iDBTextDirectory, runNumber, "HVsettings", t );
 		if( !h.isGood() || !h.checkDataVectorsForSameLength() )
 		{
 			return false;
@@ -168,7 +168,7 @@ bool VDB_PixelDataReader::readFromDBTextFiles( string iDBTextDirectory, unsigned
 			fillDataRow( 2, i_timestamp[i], t, i_channelid[i] - 1, i_currents[i] );
 		}
         // FADCsettings
-		VSQLTextFileReader f( string( iDBTextDirectory + "/" + runNumber + "/" + runNumber + ".FADCsettings_TEL" + t ) );
+        VSQLTextFileReader f(iDBTextDirectory, runNumber, "FADCsettings", t );
 		if( !f.isGood() || !f.checkDataVectorsForSameLength() )
 		{
 			return false;

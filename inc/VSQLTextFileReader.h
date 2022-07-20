@@ -16,12 +16,19 @@ class VSQLTextFileReader
 {
 	private:
 	
-		bool fisGood;
+		bool fIsGood;
 		map<string, vector< string >> fData;
+
+        void readSQLFile( string iSQLFile );
 		
 	public:
 	
 		VSQLTextFileReader( string iSQLFile );
+        VSQLTextFileReader( 
+                string iSQLFileDirectory,
+                unsigned irunnumber,
+                string iSQLFileType,
+                unsigned int iTelID = 9999 );
 		~VSQLTextFileReader() {}
 		
 		string getValue_from_key( string iKey );
@@ -33,7 +40,7 @@ class VSQLTextFileReader
 		bool checkDataVectorsForSameLength();
 		bool isGood()
 		{
-			return fisGood;
+			return fIsGood;
 		}
 		void printData();
 };

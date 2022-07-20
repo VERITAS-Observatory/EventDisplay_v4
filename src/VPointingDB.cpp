@@ -372,7 +372,7 @@ void VPointingDB::getDBMJDTime( string itemp, int& MJD, double& Time, bool bStri
 
 bool VPointingDB::getDBTextRunInfo( string iDBTextDirectory )
 {
-	VSQLTextFileReader a( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".runinfo" ) );
+    VSQLTextFileReader a(iDBTextDirectory, fRunNumber, "runinfo" );
 	if( !a.isGood() )
 	{
 		return false;
@@ -386,7 +386,7 @@ bool VPointingDB::getDBTextRunInfo( string iDBTextDirectory )
 	float angl = atof( a.getValue_from_key( "offset_angle" ).c_str() );
 	fDBWobbleNorth = dist * cos( angl * TMath::DegToRad() );
 	fDBWobbleEast = dist * sin( angl * TMath::DegToRad() );
-	VSQLTextFileReader t( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".target" ) );
+    VSQLTextFileReader t(iDBTextDirectory, fRunNumber, "target" );
 	if( !t.isGood() )
 	{
 		return false;
@@ -459,7 +459,7 @@ bool VPointingDB::getDBRunInfo()
 bool VPointingDB::readPointingCalibratedVPMFromDBTextFile( string iDBTextDirectory )
 {
 	// VPM quality flag
-	VSQLTextFileReader a( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".pointingflag" ) );
+    VSQLTextFileReader a(iDBTextDirectory, fRunNumber, "pointingflag" );
 	if( !a.isGood() )
 	{
 		cout << "Error reading VPM status flags" << endl;
@@ -472,7 +472,7 @@ bool VPointingDB::readPointingCalibratedVPMFromDBTextFile( string iDBTextDirecto
 	}
 	
 	// VPM data
-	VSQLTextFileReader vpm( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".VPM_TEL" + getTelID() ) );
+    VSQLTextFileReader vpm(iDBTextDirectory, fRunNumber, "VPM", getTelID() );
 	if( !vpm.isGood() || !vpm.checkDataVectorsForSameLength() )
 	{
 		cout << "Error reading VPM data from DBText for telescope " << getTelID() + 1 << endl;
@@ -807,7 +807,7 @@ bool VPointingDB::readPointingUncalibratedVPMFromDB()
 
 bool VPointingDB::readPointingFromDBText( string iDBTextDirectory )
 {
-	VSQLTextFileReader a( string( iDBTextDirectory + "/" + fRunNumber + "/" + fRunNumber + ".rawpointing_TEL" + getTelID() ) );
+    VSQLTextFileReader a(iDBTextDirectory, fRunNumber, "rawpointing", getTelID() );
 	if( !a.isGood() || !a.checkDataVectorsForSameLength() )
 	{
 		cout << "Error reading Raw pointing data from DBText for telescope " << getTelID() + 1 << endl;
