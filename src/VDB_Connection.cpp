@@ -43,14 +43,11 @@ bool VDB_Connection::Connect()
 
 	// Connect
 	f_db = TSQLServer::Connect( fDBserver.c_str(), fconnection_mode.c_str() , fconnection_option.c_str() );
-	//std::cout<<"VDB_Connection::Connect  server "<<fDBserver<<" mode "<<fconnection_mode<<" option "<<fconnection_option <<std::endl;
 	
 	// Test the connection
 	
 	if( !f_db )
 	{
-		cout << "TMP TMP TMP exit when not able to connect" << endl;
-		exit( EXIT_FAILURE );
 		// connection failed
 		cout << "VDB_Connection: info: failed to connect to database server, sleep for 10 and try again..." << endl;
 		gSystem->Sleep( 10000 );
