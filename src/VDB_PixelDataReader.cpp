@@ -115,11 +115,11 @@ void VDB_PixelDataReader::fillDataRow( unsigned int iDataType, string iTimeStamp
 				cout << iTimeStamp << ", T" << iTel + 1 << ", pixel " << iPixel << ": " << iData << endl;
 			}
 		}
-        else
-        {
-            cout << "VDB_PixelDataReader::fillDataRow(): invalid pixel ID for data type " << iDataType << ": ";
-            cout << iPixel << "\t" << fPixelData[iDataType][iTel].size() << endl;
-        }
+		else
+		{
+			cout << "VDB_PixelDataReader::fillDataRow(): invalid pixel ID for data type " << iDataType << ": ";
+			cout << iPixel << "\t" << fPixelData[iDataType][iTel].size() << endl;
+		}
 	}
 	else
 	{
@@ -133,7 +133,7 @@ void VDB_PixelDataReader::fillDataRow( unsigned int iDataType, string iTimeStamp
  */
 bool VDB_PixelDataReader::readFromDBTextFiles( string iDBTextDirectory, unsigned int runNumber, string iDBStartTimeSQL )
 {
-    VSQLTextFileReader a(iDBTextDirectory, runNumber, "L1_TriggerInfo" );
+	VSQLTextFileReader a( iDBTextDirectory, runNumber, "L1_TriggerInfo" );
 	if( !a.isGood() || !a.checkDataVectorsForSameLength() )
 	{
 		return false;
@@ -144,16 +144,16 @@ bool VDB_PixelDataReader::readFromDBTextFiles( string iDBTextDirectory, unsigned
 	vector< double > i_rate = a.getValueVector_from_key_as_double( "rate" );
 	for( unsigned int i = 0; i < i_timestamp.size(); i++ )
 	{
-        if( i_telID[i] < fNPixel.size() && i_pixelID[i] < fNPixel[i_telID[i]] )
-        {
-            fillDataRow( 0, i_timestamp[i], i_telID[i], i_pixelID[i], i_rate[i] );
-        }
+		if( i_telID[i] < fNPixel.size() && i_pixelID[i] < fNPixel[i_telID[i]] )
+		{
+			fillDataRow( 0, i_timestamp[i], i_telID[i], i_pixelID[i], i_rate[i] );
+		}
 	}
 	// read HV
 	for( unsigned int t = 0; t < getNTel(); t++ )
 	{
-        // HVsettings
-        VSQLTextFileReader h(iDBTextDirectory, runNumber, "HVsettings", t );
+		// HVsettings
+		VSQLTextFileReader h( iDBTextDirectory, runNumber, "HVsettings", t );
 		if( !h.isGood() || !h.checkDataVectorsForSameLength() )
 		{
 			return false;
@@ -167,8 +167,8 @@ bool VDB_PixelDataReader::readFromDBTextFiles( string iDBTextDirectory, unsigned
 			fillDataRow( 1, i_timestamp[i], t, i_channelid[i] - 1, i_hv[i] );
 			fillDataRow( 2, i_timestamp[i], t, i_channelid[i] - 1, i_currents[i] );
 		}
-        // FADCsettings
-        VSQLTextFileReader f(iDBTextDirectory, runNumber, "FADCsettings", t );
+		// FADCsettings
+		VSQLTextFileReader f( iDBTextDirectory, runNumber, "FADCsettings", t );
 		if( !f.isGood() || !f.checkDataVectorsForSameLength() )
 		{
 			return false;

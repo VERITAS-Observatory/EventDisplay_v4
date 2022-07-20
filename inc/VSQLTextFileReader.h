@@ -18,17 +18,17 @@ class VSQLTextFileReader
 	
 		bool fIsGood;
 		map<string, vector< string >> fData;
-
-        void readSQLFile( string iSQLFile );
+		
+		void readSQLFile( string iSQLFile );
 		
 	public:
 	
 		VSQLTextFileReader( string iSQLFile );
-        VSQLTextFileReader( 
-                string iSQLFileDirectory,
-                unsigned irunnumber,
-                string iSQLFileType,
-                unsigned int iTelID = 9999 );
+		VSQLTextFileReader(
+			string iSQLFileDirectory,
+			unsigned irunnumber,
+			string iSQLFileType,
+			unsigned int iTelID = 9999 );
 		~VSQLTextFileReader() {}
 		
 		string getValue_from_key( string iKey );

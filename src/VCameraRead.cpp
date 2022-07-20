@@ -1476,7 +1476,7 @@ bool VCameraRead::read_camerarotation_fromDB( string iDBStartTime )
  */
 bool VCameraRead::read_camerarotation_fromDBTextFile( unsigned int run_number, string iDBTextDirectory )
 {
-    VSQLTextFileReader a(iDBTextDirectory, run_number, "camerarotation" );
+	VSQLTextFileReader a( iDBTextDirectory, run_number, "camerarotation" );
 	if( !a.isGood() )
 	{
 		return false;

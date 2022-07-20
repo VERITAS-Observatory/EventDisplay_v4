@@ -9,28 +9,28 @@
 VSQLTextFileReader::VSQLTextFileReader( string iSQLFile )
 {
 	fIsGood = false;
-    readSQLFile( iSQLFile );
+	readSQLFile( iSQLFile );
 }
 
 VSQLTextFileReader::VSQLTextFileReader(
-        string iSQLFileDirectory,
-        unsigned irunnumber,
-        string iSQLFileType,
-        unsigned int iTelID )
+	string iSQLFileDirectory,
+	unsigned irunnumber,
+	string iSQLFileType,
+	unsigned int iTelID )
 {
 	fIsGood = false;
-
-    string iSQLFile = 
-        iSQLFileDirectory + "/" +
-        to_string(irunnumber/10000) + "/" +
-        to_string(irunnumber) + "/" +
-        to_string(irunnumber) + "." +
-        iSQLFileType;
-    if( iTelID < 9999 )
-    {
-        iSQLFile += "_TEL" + to_string( iTelID );
-    }
-    readSQLFile( iSQLFile );
+	
+	string iSQLFile =
+		iSQLFileDirectory + "/" +
+		to_string( irunnumber / 10000 ) + "/" +
+		to_string( irunnumber ) + "/" +
+		to_string( irunnumber ) + "." +
+		iSQLFileType;
+	if( iTelID < 9999 )
+	{
+		iSQLFile += "_TEL" + to_string( iTelID );
+	}
+	readSQLFile( iSQLFile );
 }
 
 
@@ -40,11 +40,11 @@ void VSQLTextFileReader::readSQLFile( string iSQLFile )
 	
 	ifstream sql_file;
 	sql_file.open( iSQLFile.c_str() );
-    if( sql_file.fail() )
-    {
-        cout << "Error openening SQLText data from " << iSQLFile << endl;
-        exit( EXIT_FAILURE );
-    }
+	if( sql_file.fail() )
+	{
+		cout << "Error openening SQLText data from " << iSQLFile << endl;
+		exit( EXIT_FAILURE );
+	}
 	
 	string line;
 	unsigned int z = 0;

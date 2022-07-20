@@ -2198,7 +2198,7 @@ bool VCalibrator::readPeds_from_combinedfile( string iFile, bool iLowGain, unsig
 	{
 		int iFADCModule = getDBPixelDataReader()->getFADC_module( getTelID(), iChan );
 		int iFADCChannel = getDBPixelDataReader()->getFADC_channel( getTelID(), iChan );
-
+		
 		//special catch for swapped channels at start of season 2013/14. This should be fixed in the data base.
 		//see elog http://veritash.sao.arizona.edu:8081/VERITAS-Operations/11544
 		if( getRunParameter()->frunnumber >= 69474 && getRunParameter()->frunnumber <= 69641 )
@@ -2474,7 +2474,7 @@ void VCalibrator::readfromVOFFLINE_DBText( int gain_or_toff, vector< unsigned in
 	{
 		i_suffix = "toffset";
 	}
-    VSQLTextFileReader a( getRunParameter()->getDBTextDirectory(), run_number, i_suffix, getTelID() + 1 );
+	VSQLTextFileReader a( getRunParameter()->getDBTextDirectory(), run_number, i_suffix, getTelID() + 1 );
 	if( !a.isGood() || !a.checkDataVectorsForSameLength() )
 	{
 		cout << "Error reading calibration values from file" << endl;

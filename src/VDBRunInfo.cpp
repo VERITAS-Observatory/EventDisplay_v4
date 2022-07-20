@@ -543,7 +543,7 @@ void VDBRunInfo::set_telescope_to_analyse()
 
 bool VDBRunInfo::readRunInfoFromDBTextFile()
 {
-    VSQLTextFileReader a( fDBTextDirectory, fRunNumber, "runinfo" );
+	VSQLTextFileReader a( fDBTextDirectory, fRunNumber, "runinfo" );
 	if( !a.isGood() )
 	{
 		return false;
@@ -610,7 +610,7 @@ bool VDBRunInfo::readRunInfoFromDBTextFile()
 
 bool VDBRunInfo::readTargetFromDBTextFile()
 {
-    VSQLTextFileReader a( fDBTextDirectory, fRunNumber, "target" );
+	VSQLTextFileReader a( fDBTextDirectory, fRunNumber, "target" );
 	if( !a.isGood() )
 	{
 		return false;
@@ -634,7 +634,7 @@ bool VDBRunInfo::readTargetFromDBTextFile()
 vector< unsigned int > VDBRunInfo::readLaserFromDBTextFile()
 {
 	vector< unsigned int > iTemp;
-    VSQLTextFileReader a( fDBTextDirectory, fRunNumber, "laserrun" );
+	VSQLTextFileReader a( fDBTextDirectory, fRunNumber, "laserrun" );
 	if( !a.isGood() )
 	{
 		return iTemp;
@@ -659,7 +659,7 @@ unsigned int VDBRunInfo::readRunDQMFromDBTextFile( int run_number, unsigned int 
 {
 	unsigned int ConfigMaskDQM = 0;
 	
-    VSQLTextFileReader a( fDBTextDirectory, fRunNumber, "rundqm" );
+	VSQLTextFileReader a( fDBTextDirectory, fRunNumber, "rundqm" );
 	if( !a.isGood() )
 	{
 		return config_mask;
