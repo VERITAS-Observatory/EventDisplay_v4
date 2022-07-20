@@ -42,7 +42,7 @@ void VSQLTextFileReader::readSQLFile( string iSQLFile )
 	sql_file.open( iSQLFile.c_str() );
 	if( sql_file.fail() )
 	{
-		cout << "Error openening SQLText data from " << iSQLFile << endl;
+		cout << "Error opening SQLText data from " << iSQLFile << endl;
 		exit( EXIT_FAILURE );
 	}
 	
