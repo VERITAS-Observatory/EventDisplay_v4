@@ -31,6 +31,15 @@ class VPointingCorrectionsTreeReader
 		float getCorrected_cen_x( float cen_x );
 		float getCorrected_cen_y( float cen_y );
 		float getCorrected_phi( float cen_x, float cen_y, float d, float s, float sdevxy );
+		float getPointErrorX()
+		{
+			return fPointingErrorX;
+		}
+		float getPointErrorY()
+		{
+			return fPointingErrorY;
+		}
+		
 		
 };
 

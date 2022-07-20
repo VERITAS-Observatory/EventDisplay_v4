@@ -518,30 +518,18 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			flength[i] = ftpars[i]->length;
 			ftgrad_x[i] = ftpars[i]->tgrad_x;
 			
+			fcen_x[i] = ftpars[i]->cen_x;
+			fcen_y[i] = ftpars[i]->cen_y;
+			fcosphi[i] = ftpars[i]->cosphi;
+			fsinphi[i] = ftpars[i]->sinphi;
+			fpointing_dx[i] = 0.;
+			fpointing_dy[i] = 0.;
 			if( i < fpointingCorrections.size() && fpointingCorrections[i]
 					&& fpointingCorrections[i]->is_initialized() )
 			{
 				fpointingCorrections[i]->getEntry( fEventCounter );
-				fcen_x[i] = fpointingCorrections[i]->getCorrected_cen_x( ftpars[i]->cen_x );
-				fcen_y[i] = fpointingCorrections[i]->getCorrected_cen_y( ftpars[i]->cen_y );
-				if( ftpars[i]->has_sdevxy() )
-				{
-					float phi = fpointingCorrections[i]->getCorrected_phi(
-									ftpars[i]->cen_x,
-									ftpars[i]->cen_y,
-									ftpars[i]->f_d,
-									ftpars[i]->f_s,
-									ftpars[i]->f_sdevxy );
-					fcosphi[i] = cos( phi );
-					fsinphi[i] = sin( phi );
-				}
-			}
-			else
-			{
-				fcen_x[i] = ftpars[i]->cen_x;
-				fcen_y[i] = ftpars[i]->cen_y;
-				fcosphi[i] = ftpars[i]->cosphi;
-				fsinphi[i] = ftpars[i]->sinphi;
+				fpointing_dx[i] = fpointingCorrections[i]->getPointErrorX();
+				fpointing_dy[i] = fpointingCorrections[i]->getPointErrorY();
 			}
 			
 			if( fsize[i] > SizeSecondMax_temp )
@@ -681,7 +669,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 		fDispAnalyzerDirection->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
 												fTLRunParameter->fmaxdist,
 												fTLRunParameter->fmaxloss );
-		fDispAnalyzerDirection->calculateMeanDirection(
+		fDispAnalyzerDirection->calculateMeanDispDirection(
 			getNTel(),
 			fArrayPointing_Elevation, fArrayPointing_Azimuth,
 			fTel_type,
@@ -694,7 +682,8 @@ void VTableLookupDataHandler::doStereoReconstruction()
 			getWeight(),
 			i_SR.fShower_Xoffset, i_SR.fShower_Yoffset,
 			iDispError,
-			fmeanPedvar_ImageT );
+			fmeanPedvar_ImageT,
+			fpointing_dx, fpointing_dy );
 		// reconstructed direction by disp method:
 		fXoff = fDispAnalyzerDirection->getXcoordinate_disp();
 		fYoff = fDispAnalyzerDirection->getYcoordinate_disp();
@@ -1685,7 +1674,9 @@ bool VTableLookupDataHandler::terminate( TNamed* iM )
 		// copy TTree 'pointingDataReduced' and 'deadPixelRegistry' from evndisp.<>.root to mscw.<>.root
 		if( finputfile.size() > 1 && !fIsMC )
 		{
-			cout << "Warning, VTableLookupDataHandler->finputfile.size() isn't 1, not sure which input file to copy TTree 'pointingDataReduced' from, copying from file finputfile[0]:" << finputfile[0] << endl;
+			cout << "Warning, VTableLookupDataHandler->finputfile.size() isn't 1,";
+			cout << " not sure which input file to copy TTree 'pointingDataReduced'";
+			cout << " from, copying from file finputfile[0]:" << finputfile[0] << endl;
 		}
 		// not sure why we don't want to do this for MC
 		if( finputfile.size() > 0 && !fIsMC )
@@ -2036,6 +2027,8 @@ void VTableLookupDataHandler::resetImageParameters( unsigned int i )
 	fasym[i] = 0.;
 	fcen_x[i] = 0.;
 	fcen_y[i] = 0.;
+	fpointing_dx[i] = 0.;
+	fpointing_dy[i] = 0.;
 	fcosphi[i] = 0.;
 	fsinphi[i] = 0.;
 	fmax1[i] = 0.;
@@ -2238,6 +2231,8 @@ void VTableLookupDataHandler::resetAll()
 		fasym[i] = 0.;
 		fcen_x[i] = 0.;
 		fcen_y[i] = 0.;
+		fpointing_dx[i] = 0.;
+		fpointing_dy[i] = 0.;
 		fcosphi[i] = 0.;
 		fsinphi[i] = 0.;
 		ftgrad_x[i] = 0.;
