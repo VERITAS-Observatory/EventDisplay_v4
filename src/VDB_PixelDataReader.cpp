@@ -115,7 +115,7 @@ void VDB_PixelDataReader::fillDataRow( unsigned int iDataType, string iTimeStamp
 				cout << iTimeStamp << ", T" << iTel + 1 << ", pixel " << iPixel << ": " << iData << endl;
 			}
 		}
-		else
+        else if( iPixel != 499 )
 		{
 			cout << "VDB_PixelDataReader::fillDataRow(): invalid pixel ID for data type " << iDataType << ": ";
 			cout << iPixel << "\t" << fPixelData[iDataType][iTel].size() << endl;

@@ -2597,7 +2597,7 @@ void VCalibrator::readGains( bool iLowGain )
 		// read gain from DB
 		if( !iLowGain && getRunParameter()->freadCalibfromDB && getRunParameter()->fcalibrationfile.size() == 0 )
 		{
-			if( getRunParameter()->useDB() )
+			if( getRunParameter()->useDBTextFiles() )
 			{
 				cout << "VOFFLINE DBTEXT" << endl;
 				readfromVOFFLINE_DBText( 1, VchannelList, Vmean, Vvar );
@@ -2914,7 +2914,7 @@ void VCalibrator::readTOffsets( bool iLowGain )
 		// read toffs from DB
 		if( !iLowGain && getRunParameter()->freadCalibfromDB )
 		{
-			if( getRunParameter()->useDB() )
+			if( getRunParameter()->useDBTextFiles() )
 			{
 				cout << "VOFFLINE DBTEXT" << endl;
 				readfromVOFFLINE_DBText( 2, VchannelList, Vmean, Vvar );
