@@ -33,8 +33,10 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	// run parameters
 #ifdef RUNWITHDB
 	fuseDB = true;
+	fDBTextDirectory = "";
 #else
 	fuseDB = false;
+	fDBTextDirectory = "";
 #endif
 	frunmode = 0;
 	fRunIsZeroSuppressed = false;
@@ -138,7 +140,6 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fDBUncalibratedVPM = false;
 #endif
 	fDBTrackingCorrections = "";
-	fPMTextFileDirectory = "";
 	fPointingErrorX.push_back( 0. );
 	fPointingErrorY.push_back( 0. );
 	// star catalogue
@@ -230,6 +231,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	ffillhistos = false;                          // obsolete
 	foutputfileName = "";
 	fWriteExtraCalibTree = false;
+	fWriteImagePixelList = false;
 	// MC parameters
 	// offset in telescope numbering (0 for old grisudet version (<3.0.0))
 	ftelescopeNOffset = 1;
@@ -389,6 +391,14 @@ void VEvndispRunParameter::print( int iEv )
 	cout << endl;
 	cout << "File: " << fsourcefile << " (sourcetype " << fsourcetype;
 	cout << ")" << endl;
+	if( useDBTextFiles() )
+	{
+		cout << "Using database files for slow control data from " << fDBTextDirectory << endl;
+	}
+	else if( useDB() )
+	{
+		cout << "Using database for slow control data" << endl;
+	}
 	cout << "===========" << endl;
 	cout << fEventDisplayDate;
 	if( fIsMC )
@@ -730,6 +740,10 @@ void VEvndispRunParameter::print( int iEv )
 	if( fShortTree )
 	{
 		cout << endl << "shortened tree output " << endl;
+	}
+	if( fWriteImagePixelList )
+	{
+		cout << "(add image/border pixel list to output tree)" << endl;
 	}
 	
 	// print analysis parameters

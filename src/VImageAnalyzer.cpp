@@ -182,7 +182,7 @@ void VImageAnalyzer::doAnalysis()
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
-	// set parameters for image parameter calculation
+	// set parameters required for image parameter calculation
 	fVImageParameterCalculation->setDetectorGeometry( getDetectorGeometry() );
 	fVImageParameterCalculation->setParameters( getImageParameters() );
 	
@@ -328,12 +328,14 @@ void VImageAnalyzer::fillOutputTree()
 		getAnaHistos()->fillL2DiagnosticTree( getRunNumber(), getTelescopeEventNumber( getTelID() ),
 											  0, 0, getFADCstopTZero(), getFADCstopSums() );
 	}
+	// fill (optionally) image/border tree lists
+	fVImageParameterCalculation->fillImageBorderPixelTree();
 	
 	// fill some basic run parameters
 	getImageParameters()->fimagethresh = getImageThresh();
 	getImageParameters()->fborderthresh = getBorderThresh();
-	getImageParameters()->fncluster_cleaned = getNcluster_cleaned(); // HP
-	getImageParameters()->fncluster_uncleaned = getNcluster_uncleaned(); // HP
+	getImageParameters()->fncluster_cleaned = getNcluster_cleaned();
+	getImageParameters()->fncluster_uncleaned = getNcluster_uncleaned();
 	getImageParameters()->fsumfirst = getSumFirst();
 	getImageParameters()->fsumwindow = getSumWindow();
 	getImageParameters()->fsumwindow_2 = getSumWindow_2();
@@ -501,7 +503,7 @@ void VImageAnalyzer::initOutput()
 			cout << "ERROR: unable to create eventdisplay output file: " << fRunPar->foutputfileName.c_str() << endl;
 			cout << "exiting..." << endl;
 			cout << endl;
-			exit( 0 );
+			exit( EXIT_FAILURE );
 		}
 	}
 	
@@ -554,19 +556,21 @@ void VImageAnalyzer::initTrees()
 	// now book the trees (for MC with additional MC block)
 	// tree versioning numbers used in mscw_energy
 	char i_text[300];
-	char i_textTitle[300];
 	sprintf( i_text, "tpars" );
-	sprintf( i_textTitle, "Event Parameters (Telescope %d, VERSION %d)", getTelID() + 1, fRunPar->getEVNDISP_TREE_VERSION() );
+	ostringstream iSTRText;
+	iSTRText << "Event Parameters (Telescope " << getTelID() + 1;
+	iSTRText << ", VERSION " << fRunPar->getEVNDISP_TREE_VERSION() << ")";
 	if( getRunParameter()->fShortTree )
 	{
-		sprintf( i_textTitle, "%s (short tree)", i_textTitle );
+		iSTRText << " (short tree)";
 	}
-	fVImageParameterCalculation->getParameters()->initTree( i_text, i_textTitle, fReader->isMC(), false, fRunPar->fmuonmode, fRunPar->fhoughmuonmode );
+	fVImageParameterCalculation->getParameters()->initTree( i_text, iSTRText.str().c_str(), fReader->isMC(), false, fRunPar->fmuonmode, fRunPar->fhoughmuonmode );
 	
 	// for log likelihood method, book a second image parameter tree
 	if( fRunPar->fImageLL )
 	{
 		sprintf( i_text, "lpars" );
+		char i_textTitle[300];
 		sprintf( i_textTitle, "Event Parameters, loglikelihood (Telescope %d)", getTelID() + 1 );
 		fVImageParameterCalculation->getLLParameters()->initTree( i_text, i_textTitle, fReader->isMC(), true, fRunPar->fmuonmode, fRunPar->fhoughmuonmode );
 	}

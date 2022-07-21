@@ -231,7 +231,11 @@ void VEvndispData::setDetectorGeometry( unsigned int iNTel, vector< string > iCa
 		// get camera rotations from the DB
 		if( getRunParameter()->fDBCameraRotationMeasurements )
 		{
-			fDetectorGeo->readDetectorGeometryFromDB( getRunParameter()->fDBRunStartTimeSQL, getRunParameter()->fDBCameraRotationMeasurements );
+			fDetectorGeo->readDetectorGeometryFromDB(
+				getRunParameter()->fDBRunStartTimeSQL,
+				getRunParameter()->getDBTextDirectory(),
+				getRunNumber(),
+				getRunParameter()->fDBCameraRotationMeasurements );
 		}
 	}
 	// for DST files: read detector geometry from DST file

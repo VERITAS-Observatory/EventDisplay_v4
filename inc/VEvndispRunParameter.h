@@ -52,6 +52,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		
 		// DB parameters
 		bool   fuseDB;
+		string fDBTextDirectory;
 		string fDBRunType;                        // run type according to DB
 		string fDBRunStartTimeSQL;                // run start (SQL type)
 		string fDBRunStoppTimeSQL;                // run stopp (SQL type)
@@ -120,7 +121,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		double fazimuth;                          // azimuth in [deg] (preli)
 		bool fDBTracking;                         // use tracking from DB
 		string fDBTrackingCorrections;            // apply tracking corrections from this period (SQL time string), empty for use of measured values in db
-		string fPMTextFileDirectory;              // pointing monitor text file directory
 		bool fDBVPM;                              // use calibrated VPM tracking from database
 		bool fDBUncalibratedVPM;                  // use uncalibrated VPM tracking from database
 		vector<double> fPointingErrorX;           // pointing error, in camera coordinates [deg]
@@ -137,6 +137,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool fNoCalibNoPb;                        // if true, when no information for gain and toff can be found, the analysis is done filling thenm with 1 and 0 respectively (in VCalibrator)
 		bool fNextDayGainHack;			  //if true, and > 100 channels in one telescope have gain=0, all gains in that tel will be set to 1; gains won't be tested in the dead channel finder.
 		bool fWriteExtraCalibTree;		  // write additional tree into .gain.root file with channel charges/monitor charge/nHiLo for each event
+		bool fWriteImagePixelList;        // write image pixel list to tpars tree
 		string fLowGainCalibrationFile;           // file with file name for low-gain calibration
 		int fNCalibrationEvents;                  // events to be used for calibration
 		float faverageTZeroFiducialRadius;        // fiducial radius for average tzero calculation (DST), in fraction of FOV
@@ -306,6 +307,10 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fperformFADCAnalysis;
 		}
 		unsigned int getAtmosphereID( bool iUpdateInstrumentEpoch = false );
+		string       getDBTextDirectory()
+		{
+			return fDBTextDirectory;
+		}
 		string       getInstrumentEpoch( bool iMajor = false,
 										 bool iUpdateInstrumentEpoch = false );
 		bool         isMC()
@@ -319,7 +324,11 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		{
 			return fuseDB;
 		}
+		bool         useDBTextFiles()
+		{
+			return ( fDBTextDirectory.size() > 0 );
+		}
 		
-		ClassDef( VEvndispRunParameter, 2001 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 2003 ); //(increase this number)
 };
 #endif

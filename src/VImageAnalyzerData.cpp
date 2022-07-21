@@ -5,7 +5,8 @@
 
 #include <VImageAnalyzerData.h>
 
-VImageAnalyzerData::VImageAnalyzerData( unsigned int iTelID, unsigned int iShortTree, bool bCalibration )
+VImageAnalyzerData::VImageAnalyzerData( unsigned int iTelID, unsigned int iShortTree,
+										bool bCalibration, bool bWriteImagePixelList )
 {
 	fTelID = iTelID;
 	if( !bCalibration )
@@ -19,8 +20,8 @@ VImageAnalyzerData::VImageAnalyzerData( unsigned int iTelID, unsigned int iShort
 	
 	if( !bCalibration )
 	{
-		fImageParameter = new VImageParameter( iShortTree );
-		fImageParameterLogL = new VImageParameter( iShortTree );
+		fImageParameter = new VImageParameter( iShortTree, bWriteImagePixelList );
+		fImageParameterLogL = new VImageParameter( iShortTree, bWriteImagePixelList );
 	}
 	
 	// initialize time since run start
@@ -84,7 +85,7 @@ void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxCh
 	fCurrentSummationWindow_2.resize( iChannels, 0 );
 	fImage.resize( iChannels, false );
 	fBorder.resize( iChannels, false );
-	fTrigger.resize( iChannels, false );          // MS
+	fTrigger.resize( iChannels, false );
 	fBrightNonImage.resize( iChannels, false );
 	fImageBorderNeighbour.resize( iChannels, false );
 	fTraceWidth.resize( iChannels, 0. );
@@ -93,14 +94,14 @@ void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxCh
 	fRawTraceMax.resize( iChannels, 0. );
 	fImageUser.resize( iChannels, 0 );
 	
-	fClusterID.resize( iChannels, 0 ); //HP
-	fClusterNpix.resize( iChannels, 0 ); //HP
-	fClusterSize.resize( iChannels, 0. ); //HP
-	fClusterTime.resize( iChannels, 0. ); //HP
-	fClusterCenx.resize( iChannels, 0. ); //HP
-	fClusterCeny.resize( iChannels, 0. ); //HP
-	fncluster_cleaned = 0; //HP
-	fncluster_uncleaned = 0; //HP
+	fClusterID.resize( iChannels, 0 );
+	fClusterNpix.resize( iChannels, 0 );
+	fClusterSize.resize( iChannels, 0. );
+	fClusterTime.resize( iChannels, 0. );
+	fClusterCenx.resize( iChannels, 0. );
+	fClusterCeny.resize( iChannels, 0. );
+	fncluster_cleaned = 0;
+	fncluster_uncleaned = 0;
 	
 	fCorrelationCoefficient.resize( iChannels, false );
 	
@@ -132,14 +133,14 @@ void VImageAnalyzerData::initializeMeanPulseHistograms()
 	char htitle[200];
 	for( unsigned int j = 0; j < fNChannels; j++ )
 	{
-		sprintf( hname, "hPulseHigh_%d_%d", fTelID + 1, j );
-		sprintf( htitle, "mean pulse, high gain (tel %d, channel %d)", fTelID + 1, j );
+		sprintf( hname, "hPulseHigh_%d_%u", fTelID + 1, j );
+		sprintf( htitle, "mean pulse, high gain (tel %d, channel %u)", fTelID + 1, j );
 		hMeanPulseHigh.push_back( new TProfile2D( hname, htitle, 50, 0., 5., 2 * fNSamples, -( double )fNSamples, ( double )fNSamples ) );
 		hMeanPulseHigh.back()->SetXTitle( "log_{10} integrated charge" );
 		hMeanPulseHigh.back()->SetYTitle( "sample (time corrected)" );
 		hMeanPulses->Add( hMeanPulseHigh.back() );
-		sprintf( hname, "hPulseLow_%d_%d", fTelID + 1, j );
-		sprintf( htitle, "mean pulse, low gain (tel %d, channel %d)", fTelID + 1, j );
+		sprintf( hname, "hPulseLow_%d_%u", fTelID + 1, j );
+		sprintf( htitle, "mean pulse, low gain (tel %d, channel %u)", fTelID + 1, j );
 		hMeanPulseLow.push_back( new TProfile2D( hname, htitle, 50, 0., 5., 2 * fNSamples, -( double )fNSamples, ( double )fNSamples ) );
 		hMeanPulseLow.back()->SetXTitle( "log_{10} integrated charge" );
 		hMeanPulseLow.back()->SetYTitle( "sample (time corrected)" );
@@ -157,14 +158,14 @@ void VImageAnalyzerData::initializeIntegratedChargeHistograms()
 	char htitle[200];
 	for( unsigned int j = 0; j < fNChannels; j++ )
 	{
-		sprintf( hname, "hSumHigh_%d_%d", fTelID + 1, j );
-		sprintf( htitle, "integrated charge, high gain (tel %d, channel %d)", fTelID + 1, j );
+		sprintf( hname, "hSumHigh_%d_%u", fTelID + 1, j );
+		sprintf( htitle, "integrated charge, high gain (tel %d, channel %u)", fTelID + 1, j );
 		hPulseSumHigh.push_back( new TH1F( hname, htitle, 200, 0., 6. ) );
 		hPulseSumHigh.back()->SetXTitle( "log_{10} integrated charge" );
 		hPulseSum->Add( hPulseSumHigh.back() );
 		
-		sprintf( hname, "hSumLow_%d_%d", fTelID + 1, j );
-		sprintf( htitle, "integrated charge, low gain (tel %d, channel %d)", fTelID + 1, j );
+		sprintf( hname, "hSumLow_%d_%u", fTelID + 1, j );
+		sprintf( htitle, "integrated charge, low gain (tel %d, channel %u)", fTelID + 1, j );
 		hPulseSumLow.push_back( new TH1F( hname, htitle, 200, 0., 6. ) );
 		hPulseSumLow.back()->SetXTitle( "log_{10} integrated charge" );
 		hPulseSum->Add( hPulseSumLow.back() );
@@ -288,7 +289,7 @@ valarray<double>& VImageAnalyzerData::getTZeros( bool iCorrected )
 	// this is a serious problem and should never happen
 	cout << "VImageAnalyzerData::getTZeros error: tzero index out of range" << endl;
 	cout << "\t" << fpulsetiming_tzero_index << "\t" << fPulseTimingCorrected.size() << "\t" << fPulseTimingUncorrected.size() << endl;
-	exit( -1 );
+	exit( EXIT_FAILURE );
 	
 	return fPulseTimingUncorrected[0]; // should never happen
 }

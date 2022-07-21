@@ -222,7 +222,8 @@ all VTS:	evndisp \
 	VTS.getRun_TimeElevAzim \
 	writeParticleRateFilesForTMVA \
 	writelaserinDB \
-	logFile
+	logFile \
+	printMJD
 
 ###############################################################################################################################
 # core eventdisplay package
@@ -277,6 +278,7 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VDeadTime.o \
 		./obj/VEventLoop.o \
 		./obj/VDBRunInfo.o \
+		./obj/VSQLTextFileReader.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/VUtilities.o \
 		./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
@@ -872,6 +874,21 @@ compareDatawithMC:	$(COMPAREDATAMCOBJ)
 	@echo "$@ done"
 
 ########################################################
+# printMJD 
+########################################################
+PRINTMJDOBJ=		./obj/VSkyCoordinatesUtilities.o \
+					./obj/VAstronometry.o \
+					./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+					./obj/printMJD.o
+
+./obj/printMJD.o:	./src/printMJD.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+printMJD:	$(PRINTMJDOBJ)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+########################################################
 # printBinaryOrbitalPhase
 ########################################################
 PRINTBINARYOBJ=		./obj/VAstronometry.o ./obj/printBinaryOrbitalPhase.o
@@ -1282,6 +1299,7 @@ VTS.calculateExposureFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 VTSLASERUNOBJ=	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 			./obj/VStar.o ./obj/VStar_Dict.o \
+			./obj/VSQLTextFileReader.o \
                         ./obj/VUtilities.o \
                         ./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
                         ./obj/VSkyCoordinatesUtilities.o \

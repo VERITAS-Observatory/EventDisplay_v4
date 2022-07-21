@@ -438,8 +438,16 @@ bool VEventLoop::initEventLoop( string iFileName )
 	{
 		fDB_PixelDataReader = new VDB_PixelDataReader( getDetectorGeo()->getNumChannelVector() );
 		fDB_PixelDataReader->setDebug( fRunPar->fDebug );
-		fDB_PixelDataReader->readFromDB( fRunPar->getDBServer(), fRunPar->frunnumber,
-										 fRunPar->fDBRunStartTimeSQL, fRunPar->fDBRunStoppTimeSQL );
+		if( fRunPar->useDBTextFiles() )
+		{
+			fDB_PixelDataReader->readFromDBTextFiles(
+				fRunPar->getDBTextDirectory(), fRunPar->frunnumber, fRunPar->fDBRunStartTimeSQL );
+		}
+		else
+		{
+			fDB_PixelDataReader->readFromDB( fRunPar->getDBServer(), fRunPar->frunnumber,
+											 fRunPar->fDBRunStartTimeSQL, fRunPar->fDBRunStoppTimeSQL );
+		}
 	}
 	
 	// set event number vector
@@ -547,8 +555,9 @@ bool VEventLoop::initEventLoop( string iFileName )
 			// set pointing error
 			if( fRunPar->fDBTracking )
 			{
-				fPointing.back()->getPointingFromDB( fRunPar->frunnumber, fRunPar->fDBTrackingCorrections, fRunPar->fPMTextFileDirectory,
-													 fRunPar->fDBVPM, fRunPar->fDBUncalibratedVPM );
+				fPointing.back()->getPointingFromDB( fRunPar->frunnumber, fRunPar->fDBTrackingCorrections,
+													 fRunPar->fDBVPM, fRunPar->fDBUncalibratedVPM,
+													 fRunPar->getDBTextDirectory() );
 			}
 			else
 			{
@@ -612,7 +621,8 @@ void VEventLoop::initializeAnalyzers()
 			setTelID( i );
 			fAnaData.push_back( new VImageAnalyzerData( i, fRunPar->fShortTree, ( fRunMode == R_PED || fRunMode == R_PEDLOW ||
 								fRunMode == R_GTO || fRunMode == R_GTOLOW ||
-								fRunMode == R_TZERO || fRunMode == R_TZEROLOW ) ) );
+								fRunMode == R_TZERO || fRunMode == R_TZEROLOW ),
+								getRunParameter()->fWriteImagePixelList ) );
 			int iseed = fRunPar->fMCNdeadSeed;
 			if( iseed != 0 )
 			{

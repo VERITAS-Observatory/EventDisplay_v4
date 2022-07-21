@@ -66,7 +66,10 @@ class VPointing : public VSkyCoordinates
 		{
 			return fPointingType;
 		}
-		void         getPointingFromDB( int irun, string iTCorrections, string iVPMDirectory, bool iVPMDB, bool iUncalibratedVPM );
+		void         getPointingFromDB(
+			int irun, string iTCorrections,
+			bool iVPMDB, bool iUncalibratedVPM,
+			string iDBTextDirectory );
 		unsigned int getTelID()
 		{
 			return fTelID;
