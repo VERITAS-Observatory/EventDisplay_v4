@@ -523,7 +523,6 @@ bool VPointingDB::readPointingCalibratedVPMFromDB()
 	string iTempS  = getDBServer();
 	iTempS += "/VOFFLINE";
 	
-	//std::cout<<"VPointingDB::readPointingCalibratedVPMFromDB "<<std::endl;
 	VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ;
 	if( !my_connection.Get_Connection_Status() )
 	{
@@ -828,14 +827,14 @@ bool VPointingDB::readPointingFromDBText( string iDBTextDirectory )
 		getDBMJDTime( i_timestamp[i], iMJD, iTime, false );
 		fDBMJD.push_back( ( unsigned int )iMJD );
 		fDBTime.push_back( iTime );
-		fDBTelElevationRaw.push_back( i_el_raw[i] * TMath::DegToRad() );
-		fDBTelAzimuthRaw.push_back( i_az_raw[i] * TMath::DegToRad() );
-		fDBTelElevation.push_back( i_el_meas[i] * TMath::DegToRad() );
-		fDBTelAzimuth.push_back( i_az_meas[i] * TMath::DegToRad() );
+		fDBTelElevationRaw.push_back( i_el_raw[i] * TMath::RadToDeg() );
+		fDBTelAzimuthRaw.push_back( i_az_raw[i] * TMath::RadToDeg() );
+		fDBTelElevation.push_back( i_el_meas[i] * TMath::RadToDeg() );
+		fDBTelAzimuth.push_back( i_az_meas[i] * TMath::RadToDeg() );
 		fDBTelRA.push_back( 0. );
 		fDBTelDec.push_back( 0. );
-		fDBTelExpectedElevation.push_back( i_el_target[i] * TMath::DegToRad() );
-		fDBTelExpectedAzimuth.push_back( i_az_target[i] * TMath::DegToRad() );
+		fDBTelExpectedElevation.push_back( i_el_target[i] * TMath::RadToDeg() );
+		fDBTelExpectedAzimuth.push_back( i_az_target[i] * TMath::RadToDeg() );
 	}
 	fDBNrows = fDBMJD.size();
 	return ( fDBNrows != 0 );
