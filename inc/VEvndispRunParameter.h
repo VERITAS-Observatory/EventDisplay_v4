@@ -52,6 +52,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		
 		// DB parameters
 		bool   fuseDB;
+		string fDBTextDirectory;
 		string fDBRunType;                        // run type according to DB
 		string fDBRunStartTimeSQL;                // run start (SQL type)
 		string fDBRunStoppTimeSQL;                // run stopp (SQL type)
@@ -120,7 +121,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		double fazimuth;                          // azimuth in [deg] (preli)
 		bool fDBTracking;                         // use tracking from DB
 		string fDBTrackingCorrections;            // apply tracking corrections from this period (SQL time string), empty for use of measured values in db
-		string fPMTextFileDirectory;              // pointing monitor text file directory
 		bool fDBVPM;                              // use calibrated VPM tracking from database
 		bool fDBUncalibratedVPM;                  // use uncalibrated VPM tracking from database
 		vector<double> fPointingErrorX;           // pointing error, in camera coordinates [deg]
@@ -307,6 +307,10 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fperformFADCAnalysis;
 		}
 		unsigned int getAtmosphereID( bool iUpdateInstrumentEpoch = false );
+		string       getDBTextDirectory()
+		{
+			return fDBTextDirectory;
+		}
 		string       getInstrumentEpoch( bool iMajor = false,
 										 bool iUpdateInstrumentEpoch = false );
 		bool         isMC()
@@ -320,7 +324,11 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		{
 			return fuseDB;
 		}
+		bool         useDBTextFiles()
+		{
+			return ( fDBTextDirectory.size() > 0 );
+		}
 		
-		ClassDef( VEvndispRunParameter, 2002 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 2003 ); //(increase this number)
 };
 #endif

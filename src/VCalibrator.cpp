@@ -2196,10 +2196,8 @@ bool VCalibrator::readPeds_from_combinedfile( string iFile, bool iLowGain, unsig
 	
 	for( unsigned int iChan = 0; iChan < getPedvars( iLowGain, i_SumWindow, -99. ).size(); iChan++ )
 	{
-		int iFADCModule;
-		int iFADCChannel;
-		iFADCModule = getDBPixelDataReader()->getFADC_module( getTelID(), iChan );
-		iFADCChannel = getDBPixelDataReader()->getFADC_channel( getTelID(), iChan );
+		int iFADCModule = getDBPixelDataReader()->getFADC_module( getTelID(), iChan );
+		int iFADCChannel = getDBPixelDataReader()->getFADC_channel( getTelID(), iChan );
 		
 		//special catch for swapped channels at start of season 2013/14. This should be fixed in the data base.
 		//see elog http://veritash.sao.arizona.edu:8081/VERITAS-Operations/11544
@@ -2220,11 +2218,9 @@ bool VCalibrator::readPeds_from_combinedfile( string iFile, bool iLowGain, unsig
 		vector<double> i_peds = peds[temp];
 		vector< vector<double> > i_pedvars = pedvars[temp];
 		
-		
 		mean = 0;
 		rms = 0;
 		vars = std::vector<double>( getPedvarsAllSumWindows( iLowGain ).size() , 0 );
-		
 		
 		if( i_runs.size() == 0 )
 		{
@@ -2246,8 +2242,6 @@ bool VCalibrator::readPeds_from_combinedfile( string iFile, bool iLowGain, unsig
 				}
 			}
 			
-			//int theIndex = iLower;
-			//if( TMath::Abs( i_runs.at( iUpper )/100 - getRunNumber() ) < TMath::Abs( i_runs.at( iLower )/100 ) - getRunNumber() )  theIndex = iUpper ;
 			int theIndex = iUpper;
 			mean = i_peds.at( theIndex );
 			vars = std::vector<double>( getPedvarsAllSumWindows( iLowGain ).size() , 0.0 );
@@ -2463,6 +2457,42 @@ string VCalibrator::getCalibrationFileName( int iTel, int irun, string iSuffix, 
 	return iFileStr.str();
 }
 
+/*
+ * read gain or toffsets from DBText File
+ *
+ */
+void VCalibrator::readfromVOFFLINE_DBText( int gain_or_toff, vector< unsigned int >& Vchannel, vector< double >& Vmean, vector< double >& Vrms )
+{
+	unsigned int run_number = getRunParameter()->fGainFileNumber[getTelID()];
+	
+	string i_suffix;
+	if( gain_or_toff == 1 )
+	{
+		i_suffix = "gain";
+	}
+	else
+	{
+		i_suffix = "toffset";
+	}
+	VSQLTextFileReader a( getRunParameter()->getDBTextDirectory(), run_number, i_suffix, getTelID() + 1 );
+	if( !a.isGood() || !a.checkDataVectorsForSameLength() )
+	{
+		cout << "Error reading calibration values from file" << endl;
+		return;
+	}
+	Vchannel = a.getValueVector_from_key_as_integer( "channel_id" );
+	if( gain_or_toff == 1 )
+	{
+		Vmean = a.getValueVector_from_key_as_double( "gain_mean" );
+		Vrms = a.getValueVector_from_key_as_double( "gain_var" );
+	}
+	else
+	{
+		Vmean = a.getValueVector_from_key_as_double( "toffset_mean" );
+		Vrms = a.getValueVector_from_key_as_double( "toffset_var" );
+	}
+}
+
 
 void VCalibrator::readfromVOFFLINE_DB( int gain_or_toff, string& iFile, vector< unsigned int >& Vchannel, vector< double >& Vmean, vector< double >& Vrms )
 {
@@ -2567,8 +2597,16 @@ void VCalibrator::readGains( bool iLowGain )
 		// read gain from DB
 		if( !iLowGain && getRunParameter()->freadCalibfromDB && getRunParameter()->fcalibrationfile.size() == 0 )
 		{
-			cout << "VOFFLINE DB" << endl;
-			readfromVOFFLINE_DB( 1, iFile, VchannelList, Vmean, Vvar );
+			if( getRunParameter()->useDBTextFiles() )
+			{
+				cout << "VOFFLINE DBTEXT" << endl;
+				readfromVOFFLINE_DBText( 1, VchannelList, Vmean, Vvar );
+			}
+			else
+			{
+				cout << "VOFFLINE DB" << endl;
+				readfromVOFFLINE_DB( 1, iFile, VchannelList, Vmean, Vvar );
+			}
 		}
 		// read gains from external file
 		else
@@ -2876,8 +2914,16 @@ void VCalibrator::readTOffsets( bool iLowGain )
 		// read toffs from DB
 		if( !iLowGain && getRunParameter()->freadCalibfromDB )
 		{
-			cout << "VOFFLINE DB" << endl;
-			readfromVOFFLINE_DB( 2, iFile, VchannelList, Vmean, Vvar );
+			if( getRunParameter()->useDBTextFiles() )
+			{
+				cout << "VOFFLINE DBTEXT" << endl;
+				readfromVOFFLINE_DBText( 2, VchannelList, Vmean, Vvar );
+			}
+			else
+			{
+				cout << "VOFFLINE DB" << endl;
+				readfromVOFFLINE_DB( 2, iFile, VchannelList, Vmean, Vvar );
+			}
 		}
 		// read toffs from external file
 		else
@@ -3386,7 +3432,6 @@ void VCalibrator::getCalibrationRunNumbers()
 			fPixFileNameC[i] += ".pix";
 		}
 	}
-	cout << endl;
 	
 	return;
 }
