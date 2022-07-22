@@ -1242,7 +1242,9 @@ vector< string > VTableLookup::getSortedListOfDirectories( TDirectory* iDir )
 		while( TNamed* iK = ( TNamed* )next() )
 		{
 			string i_dir_name = iK->GetName();
-			if( i_dir_name.find( "log" ) != string::npos || i_dir_name.find( "Log" ) != string::npos )
+			if( i_dir_name.find( "log" ) != string::npos
+					|| i_dir_name.find( "Log" ) != string::npos
+					|| i_dir_name.find( "List" ) != string::npos )
 			{
 				continue;
 			}
