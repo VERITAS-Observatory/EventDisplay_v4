@@ -2592,7 +2592,8 @@ void VCalibrator::readGains( bool iLowGain )
 		{
 			cout << " for high gain channels ";
 		}
-		cout << "from: " << endl;
+		cout << " for run " << getRunParameter()->fGainFileNumber[getTelID()];
+		cout << " from: " << endl;
 		cout << "Telescope " << getTelID() + 1 << ": ";
 		// read gain from DB
 		if( !iLowGain && getRunParameter()->freadCalibfromDB && getRunParameter()->fcalibrationfile.size() == 0 )
