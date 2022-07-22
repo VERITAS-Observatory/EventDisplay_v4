@@ -221,8 +221,6 @@ void VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file( string pass_word )
 //---------------------------------------------
 bool VDB_CalibrationInfo::readVOFFLINE()
 {
-	std::cout << "Reading calibration information from VOFFLINE DB" << std::endl;
-	
 	if( !fread_flag )
 	{
 		std::cout << "ERROR: wrong constructor" << std::endl;
