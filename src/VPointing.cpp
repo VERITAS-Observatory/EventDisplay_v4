@@ -248,7 +248,7 @@ void VPointing::initializePointingTree()
 	fPointingTree->Branch( "TargetRAJ2000", &fTargetRAJ2000, "TargetRAJ2000/D" );
 	fPointingTree->Branch( "TargetDecJ2000", &fTargetDecJ2000, "TargetDecJ2000/D" );
 	// ra / dec for target for current epoch
-	// (calcualted from target coordinates in run parameters)
+	// (calculated from target coordinates in run parameters)
 	fPointingTree->Branch( "TargetRA", &fTargetRA, "TargetRA/D" );
 	fPointingTree->Branch( "TargetDec", &fTargetDec, "TargetDec/D" );
 	// elevation / azimuth for telescopes
