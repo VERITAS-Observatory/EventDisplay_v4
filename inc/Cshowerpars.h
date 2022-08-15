@@ -123,6 +123,7 @@ class Cshowerpars
 		// List of branches
 		TBranch*        b_runNumber;              //!
 		TBranch*        b_eventNumber;            //!
+		TBranch*        b_eventStatus;            //!
 		TBranch*        b_MJD;                    //!
 		TBranch*        b_Time;                   //!
 		TBranch*        b_dataFormat;             //!
@@ -291,6 +292,14 @@ void Cshowerpars::Init( TTree* tree )
 	
 	fChain->SetBranchAddress( "runNumber", &runNumber );
 	fChain->SetBranchAddress( "eventNumber", &eventNumber );
+	if( fChain->GetBranchStatus( "eventStatus" ) )
+	{
+		fChain->SetBranchAddress( "eventStatus", &eventStatus );
+	}
+	else
+	{
+		eventStatus = 0;
+	}
 	fChain->SetBranchAddress( "MJD", &MJD );
 	fChain->SetBranchAddress( "Time", &Time );
 	if( !bShort )

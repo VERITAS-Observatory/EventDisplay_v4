@@ -1024,6 +1024,7 @@ void VArrayAnalyzer::checkPointing()
 	{
 		return;
 	}
+	bitset<4> bitPointingStatus;
 	
 	// calculate difference between calculated pointing direction and vbf pointing direction
 	if( getReader()->getArrayTrigger() )
@@ -1066,7 +1067,7 @@ void VArrayAnalyzer::checkPointing()
 				}
 				else
 				{
-					setAnalysisArrayEventStatus( 4 );
+					bitPointingStatus.set( i, 1 );
 				}
 				
 				// check pointing difference, abort if too large
@@ -1088,6 +1089,7 @@ void VArrayAnalyzer::checkPointing()
 				getShowerParameters()->fTelPointingErrorY[i] = 0.;
 			}
 		}
+		setAnalysisArrayEventStatus( ( unsigned int )bitPointingStatus.to_ulong() );
 	}
 }
 

@@ -1053,7 +1053,17 @@ void VGammaHadronCuts::printCutSummary()
 */
 bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructionMethod, bool bCount, int iEntry, bool fIsOn )
 {
-
+	// require good pointing
+	if( fData->Array_PointingStatus != 0 )
+	{
+		if( bCount && fStats )
+		{
+			fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+			fStats->updateCutCounter( VGammaHadronCutsStatistics::ePointing );
+		}
+		return false;
+	}
+	
 	/////////////////////////////////////////////////////////////////////////////////
 	// require certain quality in stereo reconstruction
 	if( fData->Chi2 < fCut_Chi2_min || fData->Chi2 > fCut_Chi2_max )

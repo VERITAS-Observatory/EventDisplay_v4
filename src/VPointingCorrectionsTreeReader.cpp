@@ -10,6 +10,7 @@
 
 VPointingCorrectionsTreeReader::VPointingCorrectionsTreeReader( TChain* t )
 {
+	fEventStatus = 0;
 	fPointingErrorX = 0.;
 	fPointingErrorY = 0.;
 	fPointingCorrectionTreeSetting = false;
@@ -17,6 +18,7 @@ VPointingCorrectionsTreeReader::VPointingCorrectionsTreeReader( TChain* t )
 	fTree = t;
 	if( fTree )
 	{
+		fTree->SetBranchAddress( "EventStatus", &fEventStatus );
 		if( fTree->GetBranchStatus( "PointingErrorX" ) &&
 				fTree->GetBranchStatus( "PointingErrorY" ) )
 		{
@@ -33,6 +35,7 @@ int VPointingCorrectionsTreeReader::getEntry( Long64_t iEntry )
 {
 	if( !fTree )
 	{
+		fEventStatus = 0;
 		fPointingErrorX = 0.;
 		fPointingErrorY = 0.;
 		return 0;
@@ -45,6 +48,7 @@ Long64_t VPointingCorrectionsTreeReader::getEntries()
 {
 	if( !fTree )
 	{
+		fEventStatus = 0;
 		fPointingErrorX = 0.;
 		fPointingErrorY = 0.;
 		return 0;

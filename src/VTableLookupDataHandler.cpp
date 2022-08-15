@@ -339,7 +339,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 	fArrayPointing_Elevation = i_array_pointing.first;
 	fArrayPointing_Azimuth = i_array_pointing.second;
 	fArrayPointing_RotationAngle = getArrayPointingDeRotationAngle();
-	
+	fArray_PointingStatus = fshowerpars->eventStatus;
 	
 	// the following variables are not set in table filling mode
 	if( !fwrite )
@@ -364,6 +364,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			fTelElevation[i] = fshowerpars->TelElevation[i];
 			fTelAzimuth[i] = fshowerpars->TelAzimuth[i];
 		}
+		fArray_PointingStatus = fshowerpars->eventStatus;
 		if( !fIsMC )
 		{
 			for( unsigned int i = 0; i < fNTel; i++ )
@@ -528,8 +529,16 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 					&& fpointingCorrections[i]->is_initialized() )
 			{
 				fpointingCorrections[i]->getEntry( fEventCounter );
-				fpointing_dx[i] = fpointingCorrections[i]->getPointErrorX();
-				fpointing_dy[i] = fpointingCorrections[i]->getPointErrorY();
+				if( fpointingCorrections[i]->getPointingEventStatus() == 0 )
+				{
+					fpointing_dx[i] = fpointingCorrections[i]->getPointErrorX();
+					fpointing_dy[i] = fpointingCorrections[i]->getPointErrorY();
+				}
+				else
+				{
+					fpointing_dx[i] = 0.;
+					fpointing_dy[i] = 0.;
+				}
 			}
 			
 			if( fsize[i] > SizeSecondMax_temp )
@@ -1210,6 +1219,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 	fOTree->Branch( "TelAzimuth", fTelAzimuth, iTT );
 	fOTree->Branch( "ArrayPointing_Elevation", &fArrayPointing_Elevation, "ArrayPointing_Elevation/F" );
 	fOTree->Branch( "ArrayPointing_Azimuth", &fArrayPointing_Azimuth, "ArrayPointing_Azimuth/F" );
+	fOTree->Branch( "ArrayPointing_Status", &fArray_PointingStatus, "Array_PointingStatus/i" );
 	sprintf( iTT, "TelDec[%d]/D", fNTel );
 	if( !fShortTree )
 	{
@@ -2154,6 +2164,7 @@ void VTableLookupDataHandler::resetAll()
 	}
 	fArrayPointing_Azimuth = 0.;
 	fArrayPointing_Elevation = 0.;
+	fArray_PointingStatus = 0;
 	fTargetElev = 0.;
 	fTargetAz = 0.;
 	fTargetDec = 0.;
