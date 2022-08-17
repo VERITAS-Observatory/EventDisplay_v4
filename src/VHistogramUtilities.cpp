@@ -317,7 +317,7 @@ bool VHistogramUtilities::normalizeTH2D_x( TH2* h )
 	return true;
 }
 
-TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormalize, bool iLeft_to_right, double i_bin_value )
+TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormalize, bool iLeft_to_right, double i_bin_value, double i_min_value )
 {
 	if( !iH_in )
 	{
@@ -330,7 +330,7 @@ TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormaliz
 	TH1D* iH_out = ( TH1D* )iH_in->Clone( hname );
 	iH_out->Reset();
 	
-	float z = 0.;
+    float z = iH_out->GetNbinsX();
 	
 	if( iLeft_to_right )
 	{
@@ -343,21 +343,37 @@ TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormaliz
 				z = i - 1;
 				break;
 			}
-			iH_out->SetBinContent( i, iH_in->GetBinContent( i ) + iH_out->GetBinContent( i - 1 ) );
+            // avoid overshooting of from e.g. negative excesses
+            if( iH_in->GetBinContent( i ) > i_min_value )
+            {
+                iH_out->SetBinContent( i, iH_in->GetBinContent( i ) + iH_out->GetBinContent( i - 1 ) );
+            }
+            else
+            {
+                iH_out->SetBinContent( i, iH_out->GetBinContent( i - 1 ) );
+            }
 		}
 	}
 	else
 	{
 		iH_out->SetBinContent( iH_in->GetNbinsX(), iH_in->GetBinContent( iH_in->GetNbinsX() ) );
 		// loop over all bins
-		for( int i = iH_in->GetNbinsX() - 1.; i >= 1; i-- )
+		for( int i = iH_in->GetNbinsX() - 1; i >= 1; i-- )
 		{
 			if( iH_in->GetBinCenter( i ) < i_bin_value )
 			{
 				z = i + 1;
 				break;
 			}
-			iH_out->SetBinContent( i, iH_in->GetBinContent( i ) + iH_out->GetBinContent( i + 1 ) );
+            // avoid overshooting of from e.g. negative excesses
+            if( iH_in->GetBinContent( i ) > i_min_value )
+            {
+                iH_out->SetBinContent( i, iH_in->GetBinContent( i ) + iH_out->GetBinContent( i + 1 ) );
+            }
+            else
+            {
+                iH_out->SetBinContent( i, iH_out->GetBinContent( i + 1 ) );
+            }
 		}
 	}
 	if( iNormalize && iH_out->GetBinContent( z ) > 0. )
@@ -429,7 +445,6 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 	}
 	
 	
-	
 	char hname[200];
 	if( iDiff )
 	{
@@ -440,7 +455,7 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 		sprintf( hname, "hsig1D_%d_%f_%d%s", ion, rSource, iExcN, regioncode_histname );
 	}
 	
-	TH1D* h1D;
+	TH1D* h1D = 0;
 	if( gDirectory->Get( hname ) )
 	{
 		h1D = ( TH1D* )gDirectory->Get( hname );
