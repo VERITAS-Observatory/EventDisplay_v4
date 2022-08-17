@@ -119,7 +119,7 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
 	char hname[2000];
 	////////////////////////////
 	// effective areas
-	TCanvas* c = fIRF->plotEffectiveArea( 2.e7, iEffAreaPad );
+	TCanvas* c = fIRF->plotEffectiveArea( -1., 2.e7, iEffAreaPad );
 	plotLegend( c, true );
 	if( iPrint.size() > 0 )
 	{
