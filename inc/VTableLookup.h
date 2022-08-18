@@ -111,7 +111,6 @@ class VTableLookup
 		void getIndexBoundary( unsigned int* ib, unsigned int* il, vector< double >& iV, double x );
 		vector< string > getSortedListOfDirectories( TDirectory* );
 		void getTables( unsigned int inoise, unsigned int ize, unsigned int iwoff, unsigned int iaz, unsigned int tel, VTablesToRead* s );
-		unsigned int getWobbleBin( double w );
 		void interpolate( VTablesToRead* s1, double w1, VTablesToRead* s2, double w2, VTablesToRead* s, double w, bool iCos = false );
 		void readLookupTable();
 		void   readNoiseLevel( bool bWriteToRunPara = true ); // read noise level from pedvar histograms of data files
