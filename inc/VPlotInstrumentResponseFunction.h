@@ -46,11 +46,11 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
 		int    fCanvasSize_Y;
 		
 		// general resolution plotter
-        TCanvas* plotPSF( vector< double > i_Energy_TeV_lin, double iTheta2AxisMax = 0.05,
-                          bool iCumulative = false, bool iPlotTheta2 = false );
+		TCanvas* plotPSF( vector< double > i_Energy_TeV_lin, double iTheta2AxisMax = 0.05,
+						  bool iCumulative = false, bool iPlotTheta2 = false );
 		TCanvas* plotResolution( string iName, string iCanvasTitle, string iYTitle,
 								 double iYmin, double iYmax, string iResolutionTreeName,
-                                 string iXaxis, TPad* iResolutionPad = 0 );
+								 string iXaxis, TPad* iResolutionPad = 0 );
 		TCanvas* plotResolution2D( unsigned int iDataSetID, string iName, string iCanvasTitle, string iYTitle,
 								   double iYmin, double iYmax, string iResolutionTreeName, string iXaxis, double iEnergySlice_GeV = -1. );
 								   
@@ -78,7 +78,7 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
 			return fData.size();
 		}
 		unsigned int getNumberOfGoodDataSets();
-        TH1D*        getTheta2orThetaHistogram( unsigned int iDataSetID = 0, double i_Energy_TeV_lin = 1., bool iTheta2 = true );
+		TH1D*        getTheta2orThetaHistogram( unsigned int iDataSetID = 0, double i_Energy_TeV_lin = 1., bool iTheta2 = true );
 		void         listDataSets();
 		TCanvas*     plotAngularResolution( string iXaxis = "energy", string iProbabilityString = "68", double iMax = -1.e99, TPad* iResolutionPad = 0 );
 		TCanvas*     plotAngularResolution2D( unsigned int iDataSetID = 0, string iXaxis = "energy", string iProbabilityString = "68", double iEnergySlice_GeV = -1. );
@@ -98,8 +98,8 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
 		TCanvas*     plotEnergyResolution( string iXaxis );                                                // from IRF
 		TCanvas*     plotEnergyResolution2D( unsigned int iDataSetID = 0, string iXaxis = "energy" );
 		void         plotEnergySpectra( bool iWeighted = true, double iYMax = -1., int iRebin = 1 );
-        TCanvas*     plotTheta( double iTheta2AxisMax = 0.05, bool iCumulative = false );
-        TCanvas*     plotTheta( vector< double > i_Energy_TeV_lin, double iTheta2AxisMax = 0.05, bool iCumulative = false );
+		TCanvas*     plotTheta( double iTheta2AxisMax = 0.05, bool iCumulative = false );
+		TCanvas*     plotTheta( vector< double > i_Energy_TeV_lin, double iTheta2AxisMax = 0.05, bool iCumulative = false );
 		TCanvas*     plotTheta2( double iTheta2AxisMax = 0.05, bool iCumulative = false );
 		TCanvas*     plotTheta2( vector< double > i_Energy_TeV_lin, double iTheta2AxisMax = 0.05, bool iCumulative = false );
 		TCanvas*     plotWeightedRate();

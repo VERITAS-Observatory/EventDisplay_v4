@@ -192,7 +192,7 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
 	//////////////////
 	// DIRECTION OFFSET
 	vector< int > i_woff_vector;
-    i_woff_vector.push_back( woff );
+	i_woff_vector.push_back( woff );
 	TDirectory* i_curDir_w = gDirectory;
 	for( unsigned int w = 0; w < i_woff_vector.size(); w++ )
 	{
