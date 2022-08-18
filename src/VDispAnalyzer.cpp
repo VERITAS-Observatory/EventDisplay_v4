@@ -647,7 +647,7 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 	for( unsigned int i = 0; i < i_ntel; i++ )
 	{
 		// quality cuts
-		if( img_size[i] > 0. && img_length[i] > 0.
+		if( img_size[i] > 0. && img_length[i] > 0. && img_ntubes[i] > 0
 				&& sqrt( img_cen_x[i]*img_cen_x[i] + img_cen_y[i]*img_cen_y[i] ) < fdistance_max
 				&& img_loss[i] < floss_max )
 		{
