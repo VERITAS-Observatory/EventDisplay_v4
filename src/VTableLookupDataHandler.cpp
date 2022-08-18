@@ -1571,6 +1571,36 @@ bool VTableLookupDataHandler::readRunParameter()
 					iPar->Write();
 				}
 			}
+			///////////////////////////
+			// read parameters needed for (simple) stereo reconstruction
+			// minimum angle set as command line parameter
+			if( fTLRunParameter && fTLRunParameter->fRerunStereoReconstruction_minAngle > 0. )
+			{
+				fSSR_AxesAngles_min = fTLRunParameter->fRerunStereoReconstruction_minAngle;
+			}
+			// use minimum angle from evndisp analysis
+			else if( fTLRunParameter->rec_method < ( int )iERecPar->fAxesAngles_min.size() )
+			{
+				fSSR_AxesAngles_min = iERecPar->fAxesAngles_min[fTLRunParameter->rec_method];
+			}
+			else
+			{
+				fSSR_AxesAngles_min = 0.;
+			}
+			if( fTLRunParameter->rec_method < ( int )iERecPar->fNImages_min.size() )
+			{
+				fSSR_NImages_min = iERecPar->fNImages_min[fTLRunParameter->rec_method];
+			}
+			else
+			{
+				fSSR_NImages_min = 0.;
+			}
+			if( fTLRunParameter->fRerunStereoReconstruction )
+			{
+				cout << "\t quality cuts in stereo reconstruction: ";
+				cout << "number of images >= " << fSSR_NImages_min;
+				cout << ", angdiff > " << fSSR_AxesAngles_min << " deg" << endl;
+			}
 		}
 		ifInput.Close();
 		if( fOutFile )
