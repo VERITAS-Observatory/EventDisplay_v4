@@ -5,8 +5,6 @@
   \bug nextEvent with selection: bad expression in selection -> this event is skipped
   \bug reading of gain filename, seg fault if directory = calibration/gain
 
-
-  \author Gernot Maier
 */
 
 //     fCanvasCharge->Connect( "ProcessedEvent(Int_t , Int_t , Int_t , TObject* )", "LCamera", this, "Print( Int_t, Int_t, Int_t, TObject* )" );
@@ -1392,8 +1390,8 @@ void VDisplay::setFADCText()
 	sprintf( cTemp, "telescope %d channel %d%s (NN %d: ", fTelescope + 1, fSelectedChan - 200000, iFADCtext.Data(), fEventLoop->getDetectorGeometry()->getNNeighbours()[iChannel] );
 	for( unsigned int n = 0; n < fEventLoop->getDetectorGeometry()->getNNeighbours()[iChannel]; n++ )
 	{
-	    sprintf( cTemp, "%s %d", cTemp, fEventLoop->getDetectorGeometry()->getNeighbours()[iChannel][n] );
-        }
+		sprintf( cTemp, "%s %d", cTemp, fEventLoop->getDetectorGeometry()->getNeighbours()[iChannel][n] );
+	}
 	sprintf( cTemp, "%s)", cTemp );
 	fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 	// L1/HV/currents (if available)
@@ -1534,22 +1532,6 @@ void VDisplay::setFADCText()
 	else
 	{
 		fTextFADC.back()->SetTextColor( 1 );
-	}
-	
-	// Template Expectation Value
-	
-	if( fEventLoop->getRunParameter()->ffrogsmode == 1 )
-	{
-		sprintf( cTemp, "Mu %.2f (%.2f) ImgGood %.2f BkgGood %.2f  (%.2f) Frogs Energy %.2f", fEventLoop->getData()->getTemplateMu()[iChannel], 5.3 * fEventLoop->getData()->getTemplateMu()[iChannel], fEventLoop->getData()->getFrogsParameters()->frogsGoodnessImg, fEventLoop->getData()->getFrogsParameters()->frogsGoodnessBkg, pow( fEventLoop->getAnalyzer()->getSums()[iChannel] / fEventLoop->getAnalyzer()->getPedvars( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] )[iChannel], 2.0 ) - 1.0, fEventLoop->getData()->getFrogsParameters()->frogsEnergy );
-		fTextFADC.push_back( new TText( xL, yT, cTemp ) );
-	}
-	
-	// Model3D Value
-	
-	if( fEventLoop->getRunParameter()->fUseDisplayModel3D )
-	{
-		sprintf( cTemp, "Model3D: %.2f", fEventLoop->getData()->getModel3DMu()[iChannel] );
-		fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 	}
 	
 	// dead channel text
@@ -2312,8 +2294,6 @@ void VDisplay::defineGui()
 	fComboCameraView->AddEntry( "HV", 24 );
 	fComboCameraView->AddEntry( "currents", 25 );
 	fComboCameraView->AddEntry( "trigger-evndisp", 26 );
-	fComboCameraView->AddEntry( "template (frogs)", 27 );
-	fComboCameraView->AddEntry( "model3D", 28 );
 	fComboCameraView->Select( 0 );
 	fComboCameraView->Associate( this );
 	fComboCameraView->Resize( 110, 20 );
@@ -3361,8 +3341,9 @@ void VDisplay::dumpImageBorderPixels()
 	}
 }
 
-void VDisplay::makeFullMovie(){
-	if (fEventLoop->getRunParameter()->fMovieBool)
+void VDisplay::makeFullMovie()
+{
+	if( fEventLoop->getRunParameter()->fMovieBool )
 	{
 		//step 1, click the next button
 		fEventLoop->setNextEventStatus( true );
@@ -3371,11 +3352,12 @@ void VDisplay::makeFullMovie(){
 		// Step 2, Process
 		string inFile = fEventLoop->getRunParameter()->fMovieInput;
 		string outDir = fEventLoop->getRunParameter()->fMovieOutputDir;
-		ifstream inputFile(inFile.c_str());
+		ifstream inputFile( inFile.c_str() );
 		int eventNum = 0;
-		while(inputFile >> eventNum){
+		while( inputFile >> eventNum )
+		{
 			char c_ev[200];
-			sprintf( c_ev, "searching for event %d",eventNum );
+			sprintf( c_ev, "searching for event %d", eventNum );
 			fStatusBar->SetText( c_ev, 1 );
 			fEventLoop->gotoEvent( eventNum );
 			if( eventNum != 0 )
@@ -3400,7 +3382,7 @@ void VDisplay::makeFullMovie(){
 			ostringstream os;
 			os << outDir << "/run_" << fEventLoop->getRunNumber() << "_event_" << fEventLoop->getEventNumber() << "." << fEventLoop->getRunParameter()->fMovieFrameOutput;
 			string outFile = os.str();
-			fCanvasCamera->Print(outFile.c_str());
+			fCanvasCamera->Print( outFile.c_str() );
 		}
 		inputFile.close();
 		//Step 3, click quit button

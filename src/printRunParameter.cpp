@@ -2,7 +2,7 @@
     \brief print run parameters from mscw or eventdisplay file to screen
 
 
-    \author Gernot Maier
+
 */
 
 #include "VEvndispRunParameter.h"
@@ -29,26 +29,26 @@ bool readRunParameter( TFile* fIn, string iPara )
 	VEvndispRunParameter* fPar = 0;
 	
 	fPar = ( VEvndispRunParameter* )fIn->Get( "runparameterV2" );
-        // possibly a DST file
+	// possibly a DST file
 	if( !fPar )
 	{
 		fPar = ( VEvndispRunParameter* )fIn->Get( "runparameterDST" );
 	}
-        // possibly a anasum file -> check first (!) run directory
-        if( !fPar )
-        {
-           TIter next( fIn->GetListOfKeys() );
-           TKey *key = 0;
-           while( ( key = ( TKey * )next() ) )
-           {
-               string key_name = key->GetName();
-               if( key_name.find( "run_" ) != string::npos )
-               {
-                   fPar = ( VEvndispRunParameter* )fIn->Get( (key_name+"/stereo/runparameterV2").c_str() );
-                   break;
-               }
-           }
-        }
+	// possibly a anasum file -> check first (!) run directory
+	if( !fPar )
+	{
+		TIter next( fIn->GetListOfKeys() );
+		TKey* key = 0;
+		while( ( key = ( TKey* )next() ) )
+		{
+			string key_name = key->GetName();
+			if( key_name.find( "run_" ) != string::npos )
+			{
+				fPar = ( VEvndispRunParameter* )fIn->Get( ( key_name + "/stereo/runparameterV2" ).c_str() );
+				break;
+			}
+		}
+	}
 	if( !fPar )
 	{
 		return false;
@@ -97,7 +97,7 @@ bool readRunParameter( TFile* fIn, string iPara )
 	else if( iPara.find( "runinfo" ) != string::npos )
 	{
 		cout << fPar->getInstrumentEpoch( false,
-                                   iPara.find( "updated-runinfo" ) != string::npos ) << "\t";
+										  iPara.find( "updated-runinfo" ) != string::npos ) << "\t";
 		cout << fPar->getInstrumentEpoch( true ) << "\t";
 		cout << fPar->getAtmosphereID( iPara.find( "updated-runinfo" ) != string::npos ) << "\t";
 		cout << fPar->fDBRunType << "\t";
@@ -111,87 +111,117 @@ bool readRunParameter( TFile* fIn, string iPara )
 	return true;
 }
 
-bool readWobbleOffset( TFile *fIn, bool printInteger )
+bool readWobbleOffset( TFile* fIn, bool printInteger )
 {
 	if( !fIn )
 	{
 		return false;
 	}
-	VEvndispRunParameter *fPar = ( VEvndispRunParameter* )fIn->Get( "runparameterV2" );
-        if( fPar )
-        {
-             cout << "Wobble offset: ";
-             if( printInteger )
-             {
-                 cout << TMath::Nint( sqrt( fPar->fWobbleNorth*fPar->fWobbleNorth + fPar->fWobbleEast*fPar->fWobbleEast ) * 100. );
-             }
-             else
-             {
-                 cout << sqrt( fPar->fWobbleNorth*fPar->fWobbleNorth + fPar->fWobbleEast*fPar->fWobbleEast );
-             }
-             cout << endl;
-             return true;
-        }
-        return false;
+	VEvndispRunParameter* fPar = ( VEvndispRunParameter* )fIn->Get( "runparameterV2" );
+	if( fPar )
+	{
+		cout << "Wobble offset: ";
+		if( printInteger )
+		{
+			cout << TMath::Nint( sqrt( fPar->fWobbleNorth * fPar->fWobbleNorth + fPar->fWobbleEast * fPar->fWobbleEast ) * 100. );
+		}
+		else
+		{
+			cout << sqrt( fPar->fWobbleNorth * fPar->fWobbleNorth + fPar->fWobbleEast * fPar->fWobbleEast );
+		}
+		cout << endl;
+		return true;
+	}
+	return false;
 }
 
 
-bool readMeanElevation( TFile *fIn )
+bool readMeanElevation( TFile* fIn )
 {
 	if( !fIn )
 	{
 		return false;
 	}
-        // get total number of telescopes available
-        TTree *telconfig = (TTree*)fIn->Get( "telconfig" );
-        if( !telconfig )
-        {
-            return false;
-        }
-        unsigned int iNTel = (unsigned int)telconfig->GetEntries();
-        if( iNTel >= VDST_MAXTELESCOPES ) iNTel = VDST_MAXTELESCOPES;
-        TTree *data = (TTree*)fIn->Get( "data" );
-        if( data )
-        {
-            Double_t TelElevation[VDST_MAXTELESCOPES];
-            data->SetBranchAddress( "TelElevation", TelElevation );
-            data->GetEntry( 0 );
-            double iMean_f = 0.;
-            double iMeanN = 0.;
-            for( unsigned int i = 0; i < iNTel; i++ )
-            {
-                if( TelElevation[i] > 5. )
-                {
-                    iMean_f += TelElevation[i];
-                    iMeanN++;
-                }
-            }
-            if( data->GetEntries() > 1 )
-            {
-                data->GetEntry( data->GetEntries() - 1 );
-                for( unsigned int i = 0; i < iNTel; i++ )
-                {
-                    if( TelElevation[i] > 5. )
-                    {
-                        iMean_f += TelElevation[i];
-                        iMeanN++;
-                    }
-                }
-            }
-            if( iMeanN > 0. )
-            {
-                iMean_f /= iMeanN;
-                cout << "Average elevation: " << iMean_f << endl;
-            }
-        }
-        else
-        {
-            cout << "not implemented" << endl;
-        }
-
-        return true;
-}
+	// get total number of telescopes available
+	TTree* telconfig = ( TTree* )fIn->Get( "telconfig" );
+	if( !telconfig )
+	{
+		return false;
+	}
+	unsigned int iNTel = ( unsigned int )telconfig->GetEntries();
+	if( iNTel >= VDST_MAXTELESCOPES )
+	{
+		iNTel = VDST_MAXTELESCOPES;
+	}
+	Double_t TelElevation[VDST_MAXTELESCOPES];
+	Float_t TelElevationFloat[VDST_MAXTELESCOPES];
+	bool bData = true;
+	TTree* data = ( TTree* )fIn->Get( "data" );
+	if( data )
+	{
+		data->SetBranchAddress( "TelElevation", TelElevation );
+		data->SetBranchAddress( "TelElevation", TelElevation );
+	}
+	else
+	{
+		data = ( TTree* )fIn->Get( "showerpars" );
+		data->SetBranchAddress( "TelElevation", TelElevationFloat );
+		bData = false;
+	}
+	if( data )
+	{
+		data->GetEntry( 0 );
+		if( !bData )
+		{
+			for( unsigned int i = 0; i < iNTel; i++ )
+			{
+				TelElevation[i] = TelElevationFloat[i];
+			}
+		}
+		
+		double iMean_f = 0.;
+		double iMeanN = 0.;
+		for( unsigned int i = 0; i < iNTel; i++ )
+		{
+			if( TelElevation[i] > 5. )
+			{
+				iMean_f += TelElevation[i];
+				iMeanN++;
+			}
+		}
+		if( data->GetEntries() > 1 )
+		{
+			data->GetEntry( data->GetEntries() - 1 );
+			if( !bData )
+			{
+				for( unsigned int i = 0; i < iNTel; i++ )
+				{
+					TelElevation[i] = TelElevationFloat[i];
+				}
+			}
+			for( unsigned int i = 0; i < iNTel; i++ )
+			{
+				if( TelElevation[i] > 5. )
+				{
+					iMean_f += TelElevation[i];
+					iMeanN++;
+				}
+			}
+		}
+		if( iMeanN > 0. )
+		{
+			iMean_f /= iMeanN;
+			cout << "Average elevation: " << iMean_f << endl;
+		}
+	}
+	else
+	{
+		cout << "not implemented" << endl;
+	}
 	
+	return true;
+}
+
 
 
 bool readMCParameter( TFile* fIn, string iPara )
@@ -262,10 +292,10 @@ int main( int argc, char* argv[] )
 		cout << "      -teltoana     print telescope combination used in analysis" << endl;
 		cout << "      -evndispreconstructionparameterfile print evndisp reconstruction parameter file" << endl;
 		cout << "      -runinfo      print relevant run info in one line" << endl;
-                cout << "      -updated-runinfo print relevant run info in one line (update epoch from VERITAS.Epochs.runparameter)" << endl;
-                cout << "      -elevation    print (rough) average elevation" << endl;
-                cout << "      -wobble       print wobble offset" << endl;
-                cout << "      -wobbleInt    print wobble offset (as integer, x100)" << endl;
+		cout << "      -updated-runinfo print relevant run info in one line (update epoch from VERITAS.Epochs.runparameter)" << endl;
+		cout << "      -elevation    print (rough) average elevation" << endl;
+		cout << "      -wobble       print wobble offset" << endl;
+		cout << "      -wobbleInt    print wobble offset (as integer, x100)" << endl;
 		cout << endl;
 		exit( 0 );
 	}
@@ -283,7 +313,7 @@ int main( int argc, char* argv[] )
 	}
 	
 	// open file
-        gErrorIgnoreLevel = kError;
+	gErrorIgnoreLevel = kError;
 	TFile* fIn = new TFile( argv[1] );
 	if( fIn->IsZombie() )
 	{
@@ -294,14 +324,14 @@ int main( int argc, char* argv[] )
 	
 	if( fOption.size() > 0 )
 	{
-                if( fOption == "-elevation" )
-                {
-                        readMeanElevation( fIn );
-                }
-                else if( fOption.find( "-wobble" ) != string::npos )
-                {
-                       readWobbleOffset( fIn, (fOption.find( "-wobbleInt" ) != string::npos) );
-                }
+		if( fOption.find( "-elevation" ) != string::npos )
+		{
+			readMeanElevation( fIn );
+		}
+		else if( fOption.find( "-wobble" ) != string::npos )
+		{
+			readWobbleOffset( fIn, ( fOption.find( "-wobbleInt" ) != string::npos ) );
+		}
 		else if( fOption == "-mcaz" || fOption == "-runnumber" )
 		{
 			readMCParameter( fIn, fOption );
@@ -320,22 +350,22 @@ int main( int argc, char* argv[] )
 	{
 		fPar = ( VEvndispRunParameter* )fIn->Get( "runparameterDST" );
 	}
-        // possibly a anasum file -> check first (!) run directory
-        if( !fPar )
-        {
-           TIter next( fIn->GetListOfKeys() );
-           TKey *key = 0;
-           while( ( key = ( TKey * )next() ) )
-           {
-               string key_name = key->GetName();
-               if( key_name.find( "run_" ) != string::npos )
-               {
-                   fPar = ( VEvndispRunParameter* )fIn->Get( (key_name+"/stereo/runparameterV2").c_str() );
-                   cout << "Reading run parameters from key_name" << endl;
-                   break;
-               }
-           }
-        }
+	// possibly a anasum file -> check first (!) run directory
+	if( !fPar )
+	{
+		TIter next( fIn->GetListOfKeys() );
+		TKey* key = 0;
+		while( ( key = ( TKey* )next() ) )
+		{
+			string key_name = key->GetName();
+			if( key_name.find( "run_" ) != string::npos )
+			{
+				fPar = ( VEvndispRunParameter* )fIn->Get( ( key_name + "/stereo/runparameterV2" ).c_str() );
+				cout << "Reading run parameters from key_name" << endl;
+				break;
+			}
+		}
+	}
 	
 	if( fPar )
 	{

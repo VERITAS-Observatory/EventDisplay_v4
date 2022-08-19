@@ -16,14 +16,11 @@
 #ifndef NOVBF
 #include <VBaseRawDataReader.h>
 #endif
-#include <VPEReader.h>
 #include <VDB_PixelDataReader.h>
 #include <VEvndispRunParameter.h>
 #include <VFitTraceHandler.h>
 #include <VStarCatalogue.h>
 #include <VShowerParameters.h>
-#include <VFrogsParameters.h>
-//#include <VFrogsImageData.h>
 #include <VPointing.h>
 #include <VArrayPointing.h>
 #include <VTraceHandler.h>
@@ -75,7 +72,6 @@ class VEvndispData
 		static VBaseRawDataReader* fRawDataReader;
 #endif
 		static VDSTReader* fDSTReader;
-		static VPEReader*  fPEReader;
 		
 		// DB pixel data
 		static VDB_PixelDataReader* fDB_PixelDataReader;
@@ -126,8 +122,6 @@ class VEvndispData
 		static vector< VImageAnalyzerData* > fAnaData; //!< data class with analysis results for each telescope
 		//!< data class with analysis results from all telescopes
 		static VShowerParameters* fShowerParameters;
-		static VFrogsParameters* fFrogsParameters;
-		//	static vector< VFrogImageData* > fFrogsData;    //!< frogs Template tube information
 		static VMCParameters* fMCParameters;      //!< data class with MC parameters
 		
 		// timing results
@@ -397,6 +391,18 @@ class VEvndispData
 		{
 			return fAnaData[fTelID]->fFADCstopTZero;
 		}
+		double getTelescopeAverageFADCtoPhe( bool iLowGain = false )
+		{
+			return fCalData[fTelID]->getTelescopeAverageFADCtoPhe( iLowGain );
+		}
+		valarray<double>& getFADCtoPhe( bool iLowGain = false )
+		{
+			if( iLowGain )
+			{
+				return fCalData[fTelID]->fLowGainFADCtoPhe;
+			}
+			return fCalData[fTelID]->fFADCtoPhe;
+		}
 		bool                getFillMeanTraces()
 		{
 			return fAnaData[fTelID]->fFillMeanTraces;
@@ -508,6 +514,14 @@ class VEvndispData
 		TList*              getIntegratedChargeHistograms()
 		{
 			return fAnaData[fTelID]->getIntegratedChargeHistograms();
+		}
+		TGraphErrors*  getIPRGraph()
+		{
+			return fCalData[fTelID]->getIPRGraph( getSumWindow(), false );
+		}
+		TGraphErrors*  getIPRGraph( unsigned int iSumWindow, bool iMakeNewGraph = false )
+		{
+			return fCalData[fTelID]->getIPRGraph( iSumWindow, iMakeNewGraph );
 		}
 		float               getL1Rate( unsigned int iChannel )
 		{
@@ -803,13 +817,13 @@ class VEvndispData
 		{
 			return fShowerParameters;
 		}
-		VFrogsParameters*    getFrogsParameters()
-		{
-			return fFrogsParameters;
-		}
 		int                 getSumFirst()
 		{
 			return fRunPar->fsumfirst[fTelID];
+		}
+		unsigned int getSearchWindowLast()
+		{
+			return fRunPar->fSearchWindowLast[fTelID];
 		}
 		valarray<double>&   getSums()
 		{
@@ -830,14 +844,6 @@ class VEvndispData
 		double              getTemplateMuMax()
 		{
 			return fAnaData[fTelID]->fTemplateMu.max();
-		}
-		valarray<double>&   getModel3DMu()
-		{
-			return fAnaData[fTelID]->fModel3DMu;
-		}
-		vector<bool>&       getModel3DClean()
-		{
-			return fAnaData[fTelID]->fModel3DClean;
 		}
 		unsigned int        getLargestSumWindow();
 		unsigned int        getLargestSumWindow( unsigned int iTelID );
@@ -904,7 +910,11 @@ class VEvndispData
 		}
 		bool                getSumWindowStart_at_T0()
 		{
-			return fRunPar->fsumfirst_start_at_T0[fTelID];
+			return fRunPar->fsumfirst_startingMethod[fTelID];
+		}
+		unsigned int  getSumWindowStart_T_method()
+		{
+			return fRunPar->fsumfirst_startingMethod[fTelID];
 		}
 		double              getSumWindowMaxTimedifferenceToDoublePassPosition()
 		{
@@ -944,6 +954,7 @@ class VEvndispData
 		}
 		unsigned int        getTeltoAnaID( unsigned int iTelID );
 		ULong64_t           getTelType( unsigned int iTelID );
+		unsigned int        getTelType_Counter( ULong64_t iTelType );
 		vector< unsigned int>& getTeltoAna()
 		{
 			return fTeltoAna;
@@ -1012,8 +1023,12 @@ class VEvndispData
 				return fCalData[fTelID]->fLowGainTOffsetvars;
 			}
 		}
-		valarray<double>&   getTraceAverageTime()
+		valarray<double>&   getTraceAverageTime( bool iCorrected = true )
 		{
+			if( iCorrected )
+			{
+				return fAnaData[fTelID]->fPulseTimingAverageTimeCorrected;
+			}
 			return fAnaData[fTelID]->fPulseTimingAverageTime;
 		}
 		unsigned int        getTraceIntegrationMethod()
@@ -1089,6 +1104,7 @@ class VEvndispData
 			return fFitTraceHandler;
 		}
 		vector< valarray< double > >& getPulseTiming( bool iCorrected = true );
+		valarray<double>&   getPulseTime( bool iCorrected = true );
 		valarray<double>&   getTZeros()
 		{
 			return fAnaData[fTelID]->getTZeros( true );
@@ -1462,79 +1478,83 @@ class VEvndispData
 		
 		void             setClusterNpix( int iID, int clusterNpix )
 		{
-			fAnaData[fTelID]->fClusterNpix[iID] = clusterNpix;    //HP
+			fAnaData[fTelID]->fClusterNpix[iID] = clusterNpix;
 		}
 		vector<int>&     getClusterNpix()
 		{
-			return fAnaData[fTelID]->fClusterNpix;     //HP
+			return fAnaData[fTelID]->fClusterNpix;
 		}
 		void             setClusterID( unsigned int iChannel, int iID )
 		{
-			fAnaData[fTelID]->fClusterID[iChannel] = iID;    //HP
+			fAnaData[fTelID]->fClusterID[iChannel] = iID;
 		}
 		vector<int>&     getClusterID()
 		{
-			return fAnaData[fTelID]->fClusterID;     //HP
+			return fAnaData[fTelID]->fClusterID;
 		}
 		void             setMainClusterID( int iID )
 		{
-			fAnaData[fTelID]->fMainClusterID = iID;    //HP
+			fAnaData[fTelID]->fMainClusterID = iID;
 		}
 		int              getMainClusterID()
 		{
-			return fAnaData[fTelID]->fMainClusterID;    //HP
+			return fAnaData[fTelID]->fMainClusterID;
 		}
 		
 		void             setClusterSize( int iID, double clustersize )
 		{
-			fAnaData[fTelID]->fClusterSize[iID] = clustersize;    //HP
+			fAnaData[fTelID]->fClusterSize[iID] = clustersize;
 		}
 		vector<double>&  getClusterSize()
 		{
-			return fAnaData[fTelID]->fClusterSize;     //HP
+			return fAnaData[fTelID]->fClusterSize;
 		}
 		void             setClusterTime( int iID, double clustertime )
 		{
-			fAnaData[fTelID]->fClusterTime[iID] = clustertime;    //HP
+			fAnaData[fTelID]->fClusterTime[iID] = clustertime;
 		}
 		vector<double>&  getClusterTime()
 		{
-			return fAnaData[fTelID]->fClusterTime;     //HP
+			return fAnaData[fTelID]->fClusterTime;
 		}
 		
 		void             setClusterCenx( int iID, double clustercenx )
 		{
-			fAnaData[fTelID]->fClusterCenx[iID] = clustercenx;    //HP
+			fAnaData[fTelID]->fClusterCenx[iID] = clustercenx;
 		}
 		vector<double>&  getClusterCenx()
 		{
-			return fAnaData[fTelID]->fClusterCenx;     //HP
+			return fAnaData[fTelID]->fClusterCenx;
 		}
 		void             setClusterCeny( int iID, double clusterceny )
 		{
-			fAnaData[fTelID]->fClusterCeny[iID] = clusterceny;    //HP
+			fAnaData[fTelID]->fClusterCeny[iID] = clusterceny;
 		}
 		vector<double>&  getClusterCeny()
 		{
-			return fAnaData[fTelID]->fClusterCeny;     //HP
+			return fAnaData[fTelID]->fClusterCeny;
 		}
 		
 		void             setNcluster_cleaned( int i_Ncluster )
 		{
 			fAnaData[fTelID]->fncluster_cleaned = i_Ncluster;
-		}; //HP
+		};
 		int              getNcluster_cleaned()
 		{
 			return fAnaData[fTelID]->fncluster_cleaned;
-		}; //HP
+		};
 		void             setNcluster_uncleaned( int i_Ncluster )
 		{
 			fAnaData[fTelID]->fncluster_uncleaned = i_Ncluster;
-		}; //HP
+		};
 		int              getNcluster_uncleaned()
 		{
 			return fAnaData[fTelID]->fncluster_uncleaned;
-		}; //HP
+		};
+		void  setIPRGraph( unsigned int iSumWindow, TGraphErrors* g )
+		{
+			return fCalData[fTelID]->setIPRGraph( iSumWindow, g );
+		}
 		/////////////// pedestals /////////////////////
 		void                setPeds( unsigned int iChannel, double iPed, bool iLowGain = false )
 		{
@@ -1581,14 +1601,6 @@ class VEvndispData
 		void                setTemplateMu( valarray< double > iVTemplateMu )
 		{
 			fAnaData[fTelID]->fTemplateMu = iVTemplateMu;
-		}
-		void                setModel3DMu( valarray< double > iVModel3DMu )
-		{
-			fAnaData[fTelID]->fModel3DMu = iVModel3DMu;
-		}
-		void                setModel3DClean( vector<bool> iVModel3DClean )
-		{
-			fAnaData[fTelID]->fModel3DClean = iVModel3DClean;
 		}
 		void                setTCorrectedSumFirst( unsigned int iT )
 		{

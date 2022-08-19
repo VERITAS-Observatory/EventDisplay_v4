@@ -12,9 +12,7 @@
 #include "TTree.h"
 
 #include "TMVA/Config.h"
-#ifdef ROOT6
 #include "TMVA/DataLoader.h"
-#endif
 #include "TMVA/Factory.h"
 #include "TMVA/Reader.h"
 #include "TMVA/Tools.h"
@@ -187,11 +185,7 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 	//////////////////////////////////////////
 	// defining training class
 	TMVA::Factory* factory = new TMVA::Factory( iRun->fOutputFile[iEnergyBin][iZenithBin]->GetTitle(), iRun->fOutputFile[iEnergyBin][iZenithBin], "V" );
-#ifdef ROOT6
-        TMVA::DataLoader *dataloader = new TMVA::DataLoader("dataset");
-#else
-        TMVA::Factory *dataloader = factory;
-#endif
+	TMVA::DataLoader* dataloader = new TMVA::DataLoader( "dataset" );
 	////////////////////////////
 	// train gamma/hadron separation
 	if( iTrainGammaHadronSeparation )
@@ -258,12 +252,12 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 				
 				double iSignalMean = 1.;
 				double iBckMean    = -1.;
-                                if( iRun->fCheckValidityOfInputVariables )
-                                {
-                                    iSignalMean = checkIfVariableIsConstant( iRun, iCutSignal && iCutCC, iTemp.str(), true, iSplitBlock );
-                                    iBckMean    = checkIfVariableIsConstant( iRun, iCutBck && iCutCC, iTemp.str(), false, iSplitBlock );
-                                    cout << "\t mean values " << iSignalMean << "\t" << iBckMean << endl;
-                                }
+				if( iRun->fCheckValidityOfInputVariables )
+				{
+					iSignalMean = checkIfVariableIsConstant( iRun, iCutSignal && iCutCC, iTemp.str(), true, iSplitBlock );
+					iBckMean    = checkIfVariableIsConstant( iRun, iCutBck && iCutCC, iTemp.str(), false, iSplitBlock );
+					cout << "\t mean values " << iSignalMean << "\t" << iBckMean << endl;
+				}
 				if( ( TMath::Abs( iSignalMean - iBckMean ) > 1.e-6
 						|| TMath::Abs( iSignalMean + 9999. ) < 1.e-2 || TMath::Abs( iBckMean + 9999. ) < 1.e-2 )
 						&& iSignalMean != 0 && iBckMean != 0 )
@@ -282,12 +276,12 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 			// check if the training variable is constant
 			double iSignalMean = 1.;
 			double iBckMean    = -1.;
-                        if( iRun->fCheckValidityOfInputVariables )
-                        {
-                            checkIfVariableIsConstant( iRun, iCutSignal, iRun->fTrainingVariable[i].c_str(), true, iSplitBlock );
-                            checkIfVariableIsConstant( iRun, iCutBck, iRun->fTrainingVariable[i].c_str(), false, iSplitBlock );
-                            cout << "\t mean values " << iSignalMean << "\t" << iBckMean << endl;
-                        }
+			if( iRun->fCheckValidityOfInputVariables )
+			{
+				checkIfVariableIsConstant( iRun, iCutSignal, iRun->fTrainingVariable[i].c_str(), true, iSplitBlock );
+				checkIfVariableIsConstant( iRun, iCutBck, iRun->fTrainingVariable[i].c_str(), false, iSplitBlock );
+				cout << "\t mean values " << iSignalMean << "\t" << iBckMean << endl;
+			}
 			
 			if( TMath::Abs( iSignalMean - iBckMean ) > 1.e-6
 					|| TMath::Abs( iSignalMean + 9999. ) < 1.e-2 || TMath::Abs( iBckMean + 9999. ) < 1.e-2 )
@@ -311,7 +305,7 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 	// prepare training events
 	// nTrain Signal=5000:nTrain Background=5000: nTest Signal=4000:nTest Background=5000
 	
-        dataloader->PrepareTrainingAndTestTree( iCutSignal, iCutBck, iRun->fPrepareTrainingOptions );
+	dataloader->PrepareTrainingAndTestTree( iCutSignal, iCutBck, iRun->fPrepareTrainingOptions );
 	
 	//////////////////////////////////////////
 	// book all methods
@@ -334,19 +328,11 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 			}
 			if( i < iRun->fMVAMethod_Options.size() )
 			{
-#ifdef ROOT6
 				factory->BookMethod( dataloader, TMVA::Types::kBDT, htitle, iRun->fMVAMethod_Options[i].c_str() );
-#else
-				factory->BookMethod( TMVA::Types::kBDT, htitle, iRun->fMVAMethod_Options[i].c_str() );
-#endif
 			}
 			else
 			{
-#ifdef ROOT6
 				factory->BookMethod( dataloader, TMVA::Types::kBDT, htitle );
-#else
-				factory->BookMethod( TMVA::Types::kBDT, htitle );
-#endif
 			}
 		}
 		//////////////////////////
@@ -363,19 +349,11 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 			}
 			if( i < iRun->fMVAMethod_Options.size() )
 			{
-#ifdef ROOT6
 				factory->BookMethod( dataloader, TMVA::Types::kMLP, htitle, iRun->fMVAMethod_Options[i].c_str() );
-#else
-				factory->BookMethod( TMVA::Types::kMLP, htitle, iRun->fMVAMethod_Options[i].c_str() );
-#endif
 			}
 			else
 			{
-#ifdef ROOT6
 				factory->BookMethod( dataloader, TMVA::Types::kMLP, htitle );
-#else
-				factory->BookMethod( TMVA::Types::kMLP, htitle );
-#endif
 			}
 		}
 		//////////////////////////
@@ -401,11 +379,7 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 				sprintf( hname, "%s:VarProp[%d]=%s", hname, i, iRun->fTrainingVariable_VarProp[i].c_str() );
 			}
 			sprintf( htitle, "BOXCUTS_%d_%d", iEnergyBin, iZenithBin );
-#ifdef ROOT6
 			factory->BookMethod( dataloader, TMVA::Types::kCuts, htitle, hname );
-#else
-			factory->BookMethod( TMVA::Types::kCuts, htitle, hname );
-#endif
 		}
 	}
 	
@@ -505,57 +479,57 @@ int main( int argc, char* argv[] )
 			{
 				trainReconstructionQuality( fData, i, j );
 			}
-                        stringstream iTempS;
+			stringstream iTempS;
 			stringstream iTempS2;
-                        if( fData->fEnergyCutData.size() > 1 && fData->fZenithCutData.size() > 1 )
-                        {
-                                iTempS << fData->fOutputDirectoryName << "/" << fData->fOutputFileName << "_" << i << "_" << j << ".bin.root";
-                        	iTempS2 << "/" << fData->fOutputFileName << "_" << i << "_" << j << ".root";
+			if( fData->fEnergyCutData.size() > 1 && fData->fZenithCutData.size() > 1 )
+			{
+				iTempS << fData->fOutputDirectoryName << "/" << fData->fOutputFileName << "_" << i << "_" << j << ".bin.root";
+				iTempS2 << "/" << fData->fOutputFileName << "_" << i << "_" << j << ".root";
 			}
-                        else if( fData->fEnergyCutData.size() > 1 && fData->fZenithCutData.size() <= 1 )
-                        {
-                                iTempS << fData->fOutputDirectoryName << "/" << fData->fOutputFileName << "_" << i << ".bin.root";
-                        	iTempS2 << "/" << fData->fOutputFileName << "_" << i << ".root";
+			else if( fData->fEnergyCutData.size() > 1 && fData->fZenithCutData.size() <= 1 )
+			{
+				iTempS << fData->fOutputDirectoryName << "/" << fData->fOutputFileName << "_" << i << ".bin.root";
+				iTempS2 << "/" << fData->fOutputFileName << "_" << i << ".root";
 			}
-                        else if( fData->fZenithCutData.size() > 1 &&  fData->fEnergyCutData.size() <= 1 )
-                        {
-                                iTempS << fData->fOutputDirectoryName << "/" << fData->fOutputFileName << "_0_" << j << ".bin.root";
-                        	iTempS2 << "/" << fData->fOutputFileName << "_0_" << j << ".root";
+			else if( fData->fZenithCutData.size() > 1 &&  fData->fEnergyCutData.size() <= 1 )
+			{
+				iTempS << fData->fOutputDirectoryName << "/" << fData->fOutputFileName << "_0_" << j << ".bin.root";
+				iTempS2 << "/" << fData->fOutputFileName << "_0_" << j << ".root";
 			}
-                        else
-                        {
-                                iTempS << fData->fOutputDirectoryName << "/" << fData->fOutputFileName << ".bin.root";
+			else
+			{
+				iTempS << fData->fOutputDirectoryName << "/" << fData->fOutputFileName << ".bin.root";
 				iTempS2 << fData->fOutputFileName << ".root";
-                        }
+			}
 			
 			// create small root file with necessary information for user
-			TFile *root_file = fData->fOutputFile[i][j];			
-                        TFile* short_root_file = TFile::Open( iTempS.str().c_str() , "RECREATE");
-                        VTMVARunDataEnergyCut* fDataEnergyCut = (VTMVARunDataEnergyCut*)root_file->Get("fDataEnergyCut");
-                        VTMVARunDataZenithCut* fDataZenithCut = (VTMVARunDataZenithCut*)root_file->Get("fDataZenithCut");
-			TH1D* MVA_BDT_0_effS = (TH1D*)root_file->Get("Method_BDT/BDT_0/MVA_BDT_0_effS");
-			TH1D* MVA_BDT_0_effB = (TH1D*)root_file->Get("Method_BDT/BDT_0/MVA_BDT_0_effB");
+			TFile* root_file = fData->fOutputFile[i][j];
+			TFile* short_root_file = TFile::Open( iTempS.str().c_str() , "RECREATE" );
+			VTMVARunDataEnergyCut* fDataEnergyCut = ( VTMVARunDataEnergyCut* )root_file->Get( "fDataEnergyCut" );
+			VTMVARunDataZenithCut* fDataZenithCut = ( VTMVARunDataZenithCut* )root_file->Get( "fDataZenithCut" );
+			TH1D* MVA_BDT_0_effS = ( TH1D* )root_file->Get( "Method_BDT/BDT_0/MVA_BDT_0_effS" );
+			TH1D* MVA_BDT_0_effB = ( TH1D* )root_file->Get( "Method_BDT/BDT_0/MVA_BDT_0_effB" );
 			fDataEnergyCut->Write();
-                        fDataZenithCut->Write();
-			TDirectory *Method_BDT = short_root_file->mkdir("Method_BDT");
+			fDataZenithCut->Write();
+			TDirectory* Method_BDT = short_root_file->mkdir( "Method_BDT" );
 			Method_BDT->cd();
-			TDirectory *BDT_0 = Method_BDT->mkdir("BDT_0");
+			TDirectory* BDT_0 = Method_BDT->mkdir( "BDT_0" );
 			BDT_0->cd();
-                        MVA_BDT_0_effS->Write();
+			MVA_BDT_0_effS->Write();
 			MVA_BDT_0_effB->Write();
 			short_root_file->GetList();
-                        short_root_file->Write();
-                        short_root_file->Close();
-		
-			// copy complete TMVA output root-file to another directory	
-			string iOutputFileName( fData->fOutputDirectoryName + "/"+iTempS2.str() );
+			short_root_file->Write();
+			short_root_file->Close();
+			
+			// copy complete TMVA output root-file to another directory
+			string iOutputFileName( fData->fOutputDirectoryName + "/" + iTempS2.str() );
 			string iOutputFileNameCompleteSubDir( "complete_BDTroot" );
 			string iOutputFileNameCompleteDir( fData->fOutputDirectoryName + "/" + iOutputFileNameCompleteSubDir + "/" );
 			gSystem->mkdir( iOutputFileNameCompleteDir.c_str() );
 			string iOutputFileNameComplete( iOutputFileNameCompleteDir + iTempS2.str() );
 			rename( iOutputFileName.c_str(), iOutputFileNameComplete.c_str() );
 			cout << "Complete TMVA output root-file: " << iOutputFileNameComplete << endl;
-
+			
 			// rename .bin.root file to .root-file
 			string iFinalRootFileName( iTempS.str() );
 			string iBinRootString( ".bin.root" );

@@ -2,7 +2,7 @@
     \brief  fitter class for energy spectra
 
 
-    \author Gernot Maier
+
 */
 
 #include "VSpectralFitter.h"
@@ -48,7 +48,7 @@ TF1* VSpectralFitter::fit( TGraph* g, string fitname )
 	}
 	
 	cout << "VSpectralFitter::fit Applying Fit\n";
-
+	
 	// define fit function
 	defineFitFunction();
 	
@@ -73,24 +73,24 @@ TF1* VSpectralFitter::fit( TGraph* g, string fitname )
 		g->Fit( fFitFunction, "0MNER" );
 	}
 	
-
-	// Getting Fit Confidince interval.
-	fConfidenceInterval = new TGraphErrors(g->GetX()[g->GetN()-1]/0.001);
-	int i_tmp = 0;
-	double i_energy = log10(fSpectralFitEnergy_min);
-	while  (i_energy  <= log10(fSpectralFitEnergy_max))
-	{
-    	fConfidenceInterval->SetPoint(i_tmp,i_energy , 0);
-    	i_tmp++;
-    	i_energy += 0.001;
-    }
 	
-	cout << "VSpectralFitter::fit Getting Confidence Interval (cl = "<< fCL << ")\n";
-	(TVirtualFitter::GetFitter())->GetConfidenceIntervals(fConfidenceInterval,fCL);
-
-//	fConfidenceInterval->SetFillColorAlpha(kRed,0.5);
-        fConfidenceInterval->SetFillStyle(1001);
-
+	// Getting Fit Confidince interval.
+	fConfidenceInterval = new TGraphErrors( g->GetX()[g->GetN() - 1] / 0.001 );
+	int i_tmp = 0;
+	double i_energy = log10( fSpectralFitEnergy_min );
+	while( i_energy  <= log10( fSpectralFitEnergy_max ) )
+	{
+		fConfidenceInterval->SetPoint( i_tmp, i_energy , 0 );
+		i_tmp++;
+		i_energy += 0.001;
+	}
+	
+	cout << "VSpectralFitter::fit Getting Confidence Interval (cl = " << fCL << ")\n";
+	( TVirtualFitter::GetFitter() )->GetConfidenceIntervals( fConfidenceInterval, fCL );
+	
+	//	fConfidenceInterval->SetFillColorAlpha(kRed,0.5);
+	fConfidenceInterval->SetFillStyle( 1001 );
+	
 	// covariance matrix
 	if( fitter )
 	{
@@ -190,7 +190,7 @@ bool VSpectralFitter::defineFitFunction()
 		sprintf( hname, "((x<[3]) * [0] * TMath::Power( x/ [3], [1] )) + ((x>=[3]) * [0] * TMath::Power( x/ [3], [2] ))" );
 		fFitFunction_lin = new TF1( iFitName_lin.c_str(), hname, fSpectralFitEnergy_min, fSpectralFitEnergy_max );
 	}
-	// curved power law fit 
+	// curved power law fit
 	else if( fSpectralFitFunction == 3 )
 	{
 		cout << "Fitfunction: curved power law fit" << endl;
@@ -209,8 +209,8 @@ bool VSpectralFitter::defineFitFunction()
 		fFitFunction->SetParameter( 0, 1.e-7 );
 		fFitFunction->SetParameter( 1, -2. );
 		fFitFunction->SetParameter( 2, -0.01 );
-                fFitFunction->SetParLimits( 2, -0.3, 0. );
-        }
+		fFitFunction->SetParLimits( 2, -0.3, 0. );
+	}
 	else
 	{
 		cout << "VSpectralFitter::defineFitFunction: unknown spectral fit function: " << fSpectralFitFunction << endl;
@@ -271,7 +271,7 @@ void VSpectralFitter::print()
 		}
 		cout << endl;
 	}
-        else if( fSpectralFitFunction == 1 )
+	else if( fSpectralFitFunction == 1 )
 	{
 		cout << "Results for power law fit with exponential cutoff: " << endl;
 		cout << "--------------------------" << endl;
@@ -280,8 +280,8 @@ void VSpectralFitter::print()
 		cout << " +- " << fFitFunction->GetParError( 0 ) << " cm^-2s^-1TeV^-1" << endl;
 		cout << "Gamma = " << fixed << setprecision( 2 ) << fFitFunction->GetParameter( 1 );
 		cout << " +- " << fFitFunction->GetParError( 1 ) << endl;
-                cout << "Ecut = " << fixed << setprecision( 2 ) << fFitFunction->GetParameter( 2 );
-                cout << " +- " << fFitFunction->GetParError( 2 ) << " TeV" << endl;
+		cout << "Ecut = " << fixed << setprecision( 2 ) << fFitFunction->GetParameter( 2 );
+		cout << " +- " << fFitFunction->GetParError( 2 ) << " TeV" << endl;
 		cout << "Chi2 " << setprecision( 2 ) << fFitFunction->GetChisquare();
 		cout << ", N = " << fFitFunction->GetNDF();
 		if( fFitFunction->GetNDF() > 0. )
@@ -289,7 +289,7 @@ void VSpectralFitter::print()
 			cout << " (Chi2/N=" << fFitFunction->GetChisquare() / fFitFunction->GetNDF() << ")" << endl;
 		}
 		cout << endl;
-        }
+	}
 }
 
 /*
@@ -318,11 +318,7 @@ double VSpectralFitter::getIntegralFlux( double iMinEnergy_TeV, double iMaxEnerg
 	       }
 	    }     */
 	
-#ifdef ROOT6
-        return fFitFunction_lin->Integral( iMinEnergy_TeV, iMaxEnergy_TeV, 1.e-30 );
-#else	
-	return fFitFunction_lin->Integral( iMinEnergy_TeV, iMaxEnergy_TeV, fFitFunction_lin->GetParameters(), 1.e-30 );
-#endif
+	return fFitFunction_lin->Integral( iMinEnergy_TeV, iMaxEnergy_TeV, 1.e-30 );
 }
 
 /*

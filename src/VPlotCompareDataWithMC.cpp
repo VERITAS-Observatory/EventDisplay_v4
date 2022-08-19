@@ -42,6 +42,7 @@ void VPlotCompareDataWithMC::help()
 	cout << "centroid plots:                  centroids()" << endl << endl;
 	cout << "image parameter distributions:   single_telescope()" << endl << endl;
 	cout << "width/length energy dependent:   widthlength_vs_energy_plots()" << endl << endl;
+	cout << "erecratio energy dependent:      erecRatio_vs_energy_plots()" << endl << endl;
 	cout << "mva energy dependent:            mva_vs_energy_plots()" << endl << endl;
 	cout << "mva parameter distribution:      mva_parameter()" << endl << endl;
 	cout << endl;
@@ -131,7 +132,7 @@ void VPlotCompareDataWithMC::plotLegend( TH1D* hsims, TH1D* hdiff, double x0 )
 
   bContents = 1:   scale to same contents
   bContents = 2:   scale to same maximum value
-  bContents = 3:   scale to same maximum value
+  bContents = 3:   scale to same maximum value (three bins around maximum)
 */
 void VPlotCompareDataWithMC::getScaling( TH1D* h_sims, TH1D* h_diff, double& s_sims, double& s_diff,
 		int bContents, double xmin, double xmax )
@@ -229,6 +230,7 @@ void VPlotCompareDataWithMC::getScaling( TH1D* h_sims, TH1D* h_diff, double& s_s
 			s_sims = z / s_sims;
 		}
 		s_diff = 1.;
+		cout << h_sims->GetName() << " scale to 3 bins around maximum " << endl;
 	}
 	
 	// make sure that results are positiv
@@ -346,7 +348,7 @@ TF1* VPlotCompareDataWithMC::do_theta2Fit( TH1D* h, int icolor, int istyle )
 	return fTheta2;
 }
 
-void VPlotCompareDataWithMC::plotCummulativePlot( TH1D* h1, TH1D* h2, double xmin, double xmax, bool iLeftToRight, double iBinValue )
+void VPlotCompareDataWithMC::plotCummulativePlot( TH1D* h1, TH1D* h2, double xmin, double xmax, double iSystematicCutCheck, int iTelescope, bool iLeftToRight, double iBinValue )
 {
 	if( !h1 || !h2 )
 	{
@@ -361,7 +363,6 @@ void VPlotCompareDataWithMC::plotCummulativePlot( TH1D* h1, TH1D* h2, double xmi
 	{
 		xmax = h1->GetXaxis()->GetXmax();
 	}
-	
 	TH1D* hCumu_1 = VHistogramUtilities::get_Cumulative_Histogram( h1, true, iLeftToRight, iBinValue );
 	TH1D* hCumu_2 = VHistogramUtilities::get_Cumulative_Histogram( h2, true, iLeftToRight, iBinValue );
 	if( !hCumu_1 || !hCumu_2 )
@@ -376,6 +377,13 @@ void VPlotCompareDataWithMC::plotCummulativePlot( TH1D* h1, TH1D* h2, double xmi
 	hCumu_1->SetLineWidth( 2 );
 	hCumu_2->SetLineWidth( 2 );
 	
+	if( iTelescope > 0 )
+	{
+		char hname[500];
+		sprintf( hname, "%s (T%d)", hCumu_1->GetXaxis()->GetTitle(), iTelescope );
+		hCumu_1->SetXTitle( hname );
+	}
+	
 	hCumu_1->Draw();
 	hCumu_2->Draw( "sames" );
 	
@@ -383,10 +391,21 @@ void VPlotCompareDataWithMC::plotCummulativePlot( TH1D* h1, TH1D* h2, double xmi
 	iL->SetLineStyle( 2 );
 	iL->Draw();
 	
-	
+	// calculate systematics a certain value
+	if( iSystematicCutCheck > xmin && iSystematicCutCheck < xmax )
+	{
+		TLine* iLS = new TLine( iSystematicCutCheck, 0., iSystematicCutCheck, 1.15 );
+		iLS->Draw();
+		double iSys = TMath::Abs( hCumu_1->GetBinContent( hCumu_1->FindBin( iSystematicCutCheck ) )
+								  - hCumu_2->GetBinContent( hCumu_2->FindBin( iSystematicCutCheck ) ) );
+		char hname[200];
+		sprintf( hname, "Sys.in flux estimates: %.1f%%", iSys * 100. );
+		TLatex* iM = new TLatex( xmin + 0.1 * ( xmax - xmin ), 0.88 * hCumu_1->GetMaximum(), hname );
+		iM->Draw();
+	}
 }
 
-void VPlotCompareDataWithMC::plotRelativePlot( TH1D* h1, TH1D* h2, double xmin, double xmax )
+void VPlotCompareDataWithMC::plotRelativePlot( TH1D* h1, TH1D* h2, double xmin, double xmax, int iTelescope )
 {
 	if( !h1 || !h2 )
 	{
@@ -412,6 +431,13 @@ void VPlotCompareDataWithMC::plotRelativePlot( TH1D* h1, TH1D* h2, double xmin, 
 	hRel->SetYTitle( "sims/data" );
 	hRel->SetMinimum( fRelatePlotRange_min );
 	hRel->SetMaximum( fRelatePlotRange_max );
+	
+	if( iTelescope > 0 )
+	{
+		char hname[500];
+		sprintf( hname, "%s (T%d)", hRel->GetXaxis()->GetTitle(), iTelescope );
+		hRel->SetXTitle( hname );
+	}
 	
 	hRel->Draw();
 	
@@ -571,11 +597,11 @@ void VPlotCompareDataWithMC::multiplicity_plots()
   plot three single canvases for a certain histogram
 
 */
-void VPlotCompareDataWithMC::plot_singleCanvas( string iHistoName, string iCanvasTitle, double iHistoXAxisMax, string iScalingVariable )
+TCanvas* VPlotCompareDataWithMC::plot_singleCanvas( string iHistoName, string iCanvasTitle, double iHistoXAxisMax, string iScalingVariable )
 {
 	if( !fDataFile )
 	{
-		return;
+		return 0;
 	}
 	
 	char hname[600];
@@ -588,7 +614,7 @@ void VPlotCompareDataWithMC::plot_singleCanvas( string iHistoName, string iCanva
 	
 	sprintf( hname, "c%s_%s", iHistoName.c_str(), fDataFileName.c_str() );
 	sprintf( htitle, "%s (%s)", iCanvasTitle.c_str(), fDataFileName.c_str() );
-	TCanvas* cEMH = new TCanvas( hname, htitle, 610, 410, 400, 400 );
+	TCanvas* cEMH = new TCanvas( hname, htitle, 610, 410, 900, 600 );
 	cEMH->SetGridx( 0 );
 	cEMH->SetGridy( 0 );
 	
@@ -599,7 +625,7 @@ void VPlotCompareDataWithMC::plot_singleCanvas( string iHistoName, string iCanva
 	
 	if( !hHistogram_SIMS || !hHistogram_DIFF )
 	{
-		return;
+		return 0;
 	}
 	
 	setHistogramAtt( hHistogram_SIMS, 2, 3, 1, 20, 1 );
@@ -632,12 +658,12 @@ void VPlotCompareDataWithMC::plot_singleCanvas( string iHistoName, string iCanva
 		sprintf( hname, "%s-%sRel.pdf", fPrintName.c_str(), iHistoName.c_str() );
 		c->Print( hname );
 	}
-	
+	return cEMH;
 }
 
-void VPlotCompareDataWithMC::emission_height( double iEmissionHeightMax )
+TCanvas* VPlotCompareDataWithMC::emission_height( double iEmissionHeightMax )
 {
-	plot_singleCanvas( "hEmissionHeight", "emission height", iEmissionHeightMax, "EmissionHeight" );
+	return plot_singleCanvas( "hEmissionHeight", "emission height", iEmissionHeightMax, "EmissionHeight" );
 }
 
 void VPlotCompareDataWithMC::widthlength_vs_energy_plots( int iTelescope, int iRebin, double xmin, double xmax )
@@ -660,19 +686,19 @@ void VPlotCompareDataWithMC::widthlength_vs_energy_plots( int iTelescope, int iR
     plot mscw and mscl energy dependent
 
 */
-void VPlotCompareDataWithMC::msc_vs_energy_plots( int iRebin, double xmin, double xmax )
+void VPlotCompareDataWithMC::msc_vs_energy_plots( int iRebin, double xmin, double xmax, double iSystematicCutCheck )
 {
 	if( !fDataFile )
 	{
 		return;
 	}
 	
-	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax , "CUMU" );
-	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax , "CUMU" );
-	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax , "REL" );
+	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax , "CUMU", 0, iSystematicCutCheck );
+	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax , "CUMU", 0, iSystematicCutCheck );
 	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax , "REL" );
-	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax );
+	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax , "REL" );
 	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax );
+	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax );
 }
 
 /*
@@ -680,29 +706,46 @@ void VPlotCompareDataWithMC::msc_vs_energy_plots( int iRebin, double xmin, doubl
     plot mva energy dependent
 
 */
-void VPlotCompareDataWithMC::mva_vs_energy_plots( int iRebin, double xmin, double xmax )
+void VPlotCompareDataWithMC::mva_vs_energy_plots( int iRebin, double xmin, double xmax, double iSystematicCutCheck )
 {
-        if( !fDataFile )
-        {
-                return;
-        }
+	if( !fDataFile )
+	{
+		return;
+	}
+	
+	plot_energyDependentDistributions( "MVA", iRebin, xmin, xmax , "CUMU", 0, iSystematicCutCheck );
+	plot_energyDependentDistributions( "MVA", iRebin, xmin, xmax , "REL" );
+	plot_energyDependentDistributions( "MVA", iRebin, xmin, xmax );
+}
 
-        plot_energyDependentDistributions( "MVA", iRebin, xmin, xmax , "CUMU" );
-        plot_energyDependentDistributions( "MVA", iRebin, xmin, xmax , "REL" );
-        plot_energyDependentDistributions( "MVA", iRebin, xmin, xmax );
+/*
+ *
+ * plot erecratio vs energy
+ *
+ */
+void VPlotCompareDataWithMC::erecRatio_vs_energy_plots( int iTelescope, int iRebin, double xmin, double xmax )
+{
+	if( !fDataFile )
+	{
+		return;
+	}
+	
+	plot_energyDependentDistributions( "erecratio", iRebin, xmin, xmax, "REL", iTelescope );
+	plot_energyDependentDistributions( "erecratio", iRebin, xmin, xmax, "SIMSDIFF", iTelescope );
 }
 
 /*
  * energy dependent plots
  *
  */
-void VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVariable, int iRebin, double x_min, double x_max, string iPlot, int iTelescope )
+TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVariable, int iRebin, double x_min, double x_max,
+		string iPlot, int iTelescope, double iSystematicCutCheck,
+		string iXVariable, double y_min, bool iPlotLogY )
 {
 	if( !fDataFile )
 	{
-		return;
+		return 0;
 	}
-        cout << "Plotting " << iVariable << "\t" << iPlot << "\t"<< iTelescope << endl;
 	
 	double KSProb = 0;
 	double KSSig = 0;
@@ -713,17 +756,20 @@ void VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVariable
 	double s_sims = 1.;
 	double s_diff = 1.;
 	
+	double error_sims = 0.;
+	double error_diff = 0.;
+	
 	char hname[600];
 	char htitle[600];
 	if( iTelescope > 0 )
 	{
-		sprintf( hname, "c_%s_%s_%s_%d", iVariable.c_str(), fDataFile->GetName(), iPlot.c_str(), iTelescope );
-		sprintf( htitle, "%s T%d (%s) %s", iVariable.c_str(), iTelescope, fDataFile->GetName(), iPlot.c_str() );
+		sprintf( hname, "c_%s_%s_%s_%s_%d", iVariable.c_str(), iXVariable.c_str(), fDataFile->GetName(), iPlot.c_str(), iTelescope );
+		sprintf( htitle, "%s vs %s T%d (%s) %s", iVariable.c_str(), iXVariable.c_str(), iTelescope, fDataFile->GetName(), iPlot.c_str() );
 	}
 	else
 	{
-		sprintf( hname, "c_%s_%s_%s", iVariable.c_str(), fDataFile->GetName(), iPlot.c_str() );
-		sprintf( htitle, "%s (%s) %s", iVariable.c_str(), fDataFile->GetName(), iPlot.c_str() );
+		sprintf( hname, "c_%s_%s_%s_%s", iVariable.c_str(), iXVariable.c_str(), fDataFile->GetName(), iPlot.c_str() );
+		sprintf( htitle, "%s vs %s (%s) %s", iVariable.c_str(), iXVariable.c_str(), fDataFile->GetName(), iPlot.c_str() );
 	}
 	TCanvas* c_MS = new TCanvas( hname, htitle, 100, 10, 900, 600 );
 	c_MS->SetGridx( 0 );
@@ -732,26 +778,26 @@ void VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVariable
 	
 	if( iTelescope > 0 )
 	{
-		sprintf( hname, "h%sErec_%d_SIMS", iVariable.c_str(), iTelescope );
+		sprintf( hname, "h%s%s_%d_SIMS", iVariable.c_str(), iXVariable.c_str(), iTelescope );
 	}
 	else
 	{
-		sprintf( hname, "h%sErec_SIMS", iVariable.c_str() );
+		sprintf( hname, "h%s%s_SIMS", iVariable.c_str(), iXVariable.c_str() );
 	}
 	TH2D* h_sims = ( TH2D* )fDataFile->Get( hname );
 	if( iTelescope > 0 )
 	{
-		sprintf( hname, "h%sErec_%d_DIFF", iVariable.c_str(), iTelescope );
+		sprintf( hname, "h%s%s_%d_DIFF", iVariable.c_str(), iXVariable.c_str(), iTelescope );
 	}
 	else
 	{
-		sprintf( hname, "h%sErec_DIFF", iVariable.c_str() );
+		sprintf( hname, "h%s%s_DIFF", iVariable.c_str(), iXVariable.c_str() );
 	}
 	TH2D* h_diff = ( TH2D* )fDataFile->Get( hname );
 	
 	if( !h_sims || !h_diff )
 	{
-		return;
+		return 0;
 	}
 	
 	// loop over all bins in energy
@@ -759,21 +805,21 @@ void VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVariable
 	{
 		if( iTelescope > 0 )
 		{
-			sprintf( hname, "h%sErec_%d_SIMS_%d", iVariable.c_str(), iTelescope, i );
+			sprintf( hname, "h%s%s_%d_SIMS_%d", iVariable.c_str(), iXVariable.c_str(), iTelescope, i );
 		}
 		else
 		{
-			sprintf( hname, "h%sErec_SIMS_%d", iVariable.c_str(), i );
+			sprintf( hname, "h%s%s_SIMS_%d", iVariable.c_str(), iXVariable.c_str(), i );
 		}
 		TH1D* hSims = h_sims->ProjectionY( hname, i, i );
 		setHistogramAtt( hSims, 2, 1, 1, 20, iRebin );
 		if( iTelescope > 0 )
 		{
-			sprintf( hname, "h_%sErec_%d_diff_%d", iVariable.c_str(), iTelescope, i );
+			sprintf( hname, "h_%s%s_%d_diff_%d", iVariable.c_str(), iXVariable.c_str(), iTelescope, i );
 		}
 		else
 		{
-			sprintf( hname, "h_%sErec_diff_%d", iVariable.c_str(), i );
+			sprintf( hname, "h_%s%s_diff_%d", iVariable.c_str(), iXVariable.c_str(), i );
 		}
 		TH1D* hDiff = h_diff->ProjectionY( hname, i, i );
 		setHistogramAtt( hDiff, 1, 1, 1, 21, iRebin );
@@ -788,10 +834,32 @@ void VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVariable
 			hDiff->Scale( s_diff );
 		}
 		
+		for( int j = 0; j < hSims->GetNbinsX(); j++ )
+		{
+			error_sims = hSims->GetBinError( j ) * s_sims;
+			hSims->SetBinError( j, error_sims );
+			error_diff = hDiff->GetBinError( j ) * s_diff;
+			hDiff->SetBinError( j, error_diff );
+		}
+		
 		hSims->SetAxisRange( x_min, x_max );
 		hDiff->SetAxisRange( x_min, x_max );
-		hSims->SetMaximum( hSims->GetMaximum() * 1.8 );
-		hSims->SetMinimum( 0. );
+		if( !iPlotLogY )
+		{
+			hSims->SetMaximum( hSims->GetMaximum() * 1.8 );
+		}
+		else
+		{
+			hSims->SetMaximum( TMath::Exp( TMath::Log( hSims->GetMaximum() ) * 1.8 ) );
+		}
+		if( y_min > 0. )
+		{
+			hSims->SetMinimum( y_min );
+		}
+		else
+		{
+			hSims->SetMinimum( 0. );
+		}
 		
 		// calculate matching of distributions
 		KSProb = hSims->KolmogorovTest( hDiff );
@@ -806,9 +874,18 @@ void VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVariable
 			g->SetRightMargin( 0.01 );
 			g->SetLeftMargin( 0.13 );
 			g->SetBottomMargin( 0.13 );
+			if( iPlotLogY )
+			{
+				g->SetLogy( true );
+			}
 		}
 		if( iPlot == "SIMSDIFF" )
 		{
+			if( iTelescope > 0 )
+			{
+				sprintf( hname, "%s (T%d)", hSims->GetXaxis()->GetTitle(), iTelescope );
+				hSims->SetXTitle( hname );
+			}
 			hSims->Draw();
 			hDiff->Draw( "same" );
 			
@@ -823,53 +900,75 @@ void VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVariable
 		}
 		else if( iPlot == "REL" )
 		{
-			plotRelativePlot( hSims, hDiff, x_min, x_max );
+			plotRelativePlot( hSims, hDiff, x_min, x_max, iTelescope );
 		}
 		else if( iPlot == "CUMU" )
 		{
-			if( iVariable == "MSCW" || iVariable == "MSCL"  )
+			if( iVariable == "MVA" )
 			{
-				plotCummulativePlot( hSims, hDiff, x_min, x_max, true, 1.5 );
+				plotCummulativePlot( hSims, hDiff, x_min, x_max, iSystematicCutCheck, iTelescope, false, -0.95 );
 			}
-			else if( iVariable == "MVA" )
+			else
 			{
-				plotCummulativePlot( hSims, hDiff, x_min, x_max, false, -0.95 );
+				plotCummulativePlot( hSims, hDiff, x_min, x_max, iSystematicCutCheck, iTelescope );
 			}
 		}
 		
 		
-		sprintf( hname, "%.1f < log_{10} E_{rec} < %.1f", h_sims->GetXaxis()->GetBinLowEdge( i ),  h_sims->GetXaxis()->GetBinUpEdge( i ) );
-		TLatex* iT = new TLatex( x_min + 0.1 * ( x_max - x_min ), 0.9 * hSims->GetMaximum(), hname );
+		if( iXVariable == "Erec" )
+		{
+			sprintf( hname, "%.1f < log_{10} E_{rec} < %.1f", h_sims->GetXaxis()->GetBinLowEdge( i ),  h_sims->GetXaxis()->GetBinUpEdge( i ) );
+		}
+		else if( iXVariable == "ntubes" )
+		{
+			sprintf( hname, "%.1f < ntubes < %.1f", h_sims->GetXaxis()->GetBinLowEdge( i ),  h_sims->GetXaxis()->GetBinUpEdge( i ) );
+		}
+		else if( iXVariable == "size" )
+		{
+			sprintf( hname, "%.1f < log_{10} size < %.1f", h_sims->GetXaxis()->GetBinLowEdge( i ),  h_sims->GetXaxis()->GetBinUpEdge( i ) );
+		}
+		else if( iXVariable == "sizeHG" )
+		{
+			sprintf( hname, "%.1f < log_{10} sizeHG < %.1f", h_sims->GetXaxis()->GetBinLowEdge( i ),  h_sims->GetXaxis()->GetBinUpEdge( i ) );
+		}
+		else if( iXVariable == "sizeLG" )
+		{
+			sprintf( hname, "%.1f < log_{10} sizeLG < %.1f", h_sims->GetXaxis()->GetBinLowEdge( i ),  h_sims->GetXaxis()->GetBinUpEdge( i ) );
+		}
+		
+		
+		TLatex* iT = new TLatex;
 		iT->SetTextSize( iT->GetTextSize() * 0.6 );
-		iT->Draw();
-		sprintf( hname, "mean (MC): %.2f#pm %.2f, mean (data): %.2f#pm %.2f", hSims->GetMean(), hSims->GetRMS(), hDiff->GetMean(), hDiff->GetRMS() );
-		TLatex* iM = new TLatex( x_min + 0.1 * ( x_max - x_min ), 0.84 * hSims->GetMaximum(), hname );
-		iM->SetTextSize( iM->GetTextSize() * 0.6 );
-		iM->Draw();
-		sprintf( hname, "KS-test | P = %1.2e (%1.1f #sigma)", KSProb, KSSig );
-		TLatex* iK = new TLatex( x_min + 0.1 * ( x_max - x_min ), 0.78 * hSims->GetMaximum(), hname );
-		iK->SetTextSize( iK->GetTextSize() * 0.6 );
-		iK->Draw();
-		sprintf( hname, "Chi2 | P = %1.2e (%1.1f #sigma)", Chi2Prob, Chi2Sig );
-		TLatex* iC = new TLatex( x_min + 0.1 * ( x_max - x_min ), 0.72 * hSims->GetMaximum(), hname );
-		iC->SetTextSize( iC->GetTextSize() * 0.6 );
-		iC->Draw();
+		iT->DrawLatexNDC( 0.22, 0.84, hname );
+		
+		
+		//don't print the rest of the stuff if we are plotting relative or cumulative distributions.
+		if( iPlot == "SIMSDIFF" )
+		{
+			sprintf( hname, "mean (MC): %.2f#pm %.2f, mean (data): %.2f#pm %.2f", hSims->GetMean(), hSims->GetRMS(), hDiff->GetMean(), hDiff->GetRMS() );
+			iT->DrawLatexNDC( 0.22, 0.80, hname );
+			sprintf( hname, "KS-test | P = %1.2e (%1.1f #sigma)", KSProb, KSSig );
+			iT->DrawLatexNDC( 0.22, 0.76, hname );
+			sprintf( hname, "Chi2 | P = %1.2e (%1.1f #sigma)", Chi2Prob, Chi2Sig );
+			iT->DrawLatexNDC( 0.22, 0.72, hname );
+		}
+		
 	}
 	// print the canvas
 	if( fPrintName.size() > 0 )
 	{
-                c_MS->Update();
 		if( iTelescope > 0 )
 		{
-			sprintf( hname, "%s-%s-T%d-%s.pdf", fPrintName.c_str(), iVariable.c_str(), iTelescope, iPlot.c_str() );
+			sprintf( hname, "%s-%s-%s-T%d-%s.pdf", fPrintName.c_str(), iXVariable.c_str(), iVariable.c_str(), iTelescope, iPlot.c_str() );
 		}
 		else
 		{
-			sprintf( hname, "%s-%s-%s.pdf", fPrintName.c_str(), iVariable.c_str(), iPlot.c_str() );
+			sprintf( hname, "%s-%s-%s-%s.pdf", fPrintName.c_str(), iXVariable.c_str(), iVariable.c_str(), iPlot.c_str() );
 		}
 		c_MS->Print( hname );
 	}
 	
+	return c_MS;
 }
 
 /*
@@ -877,25 +976,25 @@ void VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVariable
  * plot stereo parameter
  *
  */
-void VPlotCompareDataWithMC::stereo_parameter( int msc_rebin )
+TCanvas* VPlotCompareDataWithMC::stereo_parameter()
 {
 	if( !fDataFile )
 	{
-		return;
+		return 0;
 	}
 	
 	// two canvases, one with sims and diff, one with on/off histograms
 	
 	char hname[600];
 	char htitle[600];
-	TCanvas* cOO = new TCanvas( "cOO", "relative plots (stereo parameter)", 100, 10, 600, 600 );
+	TCanvas* cOO = new TCanvas( "cOO", "relative plots (stereo parameter)", 100, 10, 900, 600 );
 	cOO->SetGridx( 0 );
 	cOO->SetGridy( 0 );
 	cOO->Divide( 2, 2 );
 	
 	sprintf( hname, "cSD_%s", fDataFileName.c_str() );
 	sprintf( htitle, "sims/diff (stereo parameter, %s)", fDataFileName.c_str() );
-	TCanvas* cSD = new TCanvas( hname, htitle, 10, 10, 600, 600 );
+	TCanvas* cSD = new TCanvas( hname, htitle, 10, 10, 900, 600 );
 	cSD->SetGridx( 0 );
 	cSD->SetGridy( 0 );
 	cSD->Divide( 2, 2 );
@@ -1055,105 +1154,124 @@ void VPlotCompareDataWithMC::stereo_parameter( int msc_rebin )
 		sprintf( hn, "%s-StereoRel.pdf", fPrintName.c_str() );
 		cOO->Print( hn );
 	}
+	return cSD;
 }
 
 /*
-* 
+*
 * plot mva parameter
 *
 */
 
-void VPlotCompareDataWithMC::mva_parameter( int mva_rebin )
-{
-        if( !fDataFile )
-        {
-                return;
-        }
-	        
-	char hname[600];
-        char htitle[600];
-        TCanvas* cOO = new TCanvas( "cOO", "relative plots (mva parameter)", 100, 10, 600, 600 );
-        cOO->SetGridx( 0 );
-        cOO->SetGridy( 0 );
-
-        sprintf( hname, "cSD_%s", fDataFileName.c_str() );
-        sprintf( htitle, "sims/diff (mva parameter, %s)", fDataFileName.c_str() );
-        TCanvas* cSD = new TCanvas( hname, htitle, 10, 10, 600, 600 );
-        cSD->SetGridx( 0 );
-        cSD->SetGridy( 0 );
-
-	TH1D* hmva_sims = ( TH1D* )fDataFile->Get( "hMVA_SIMS" );
-        setHistogramAtt( hmva_sims, 2, 3, 1, 20, 2 );
-        hmva_sims->SetYTitle( "number of events per bin" );
-
-        TH1D* hmva_diff = ( TH1D* )fDataFile->Get( "hMVA_DIFF" );
-        setHistogramAtt( hmva_diff, 1, 3, 1, 21, 2 );
-        hmva_diff->SetLineWidth( 3 );
-        hmva_diff->SetStats( 0 );
-
-	// scaling of the histograms
-	double s_sims = 1.;
-        double s_diff = 1.;
-
-        hmva_sims->SetAxisRange( -1., 1. );
-        getScaling( s_sims, s_diff, "MVA", 1, -0.75, 0.75 );
-        if( hmva_sims->GetEntries() > 0 )
-        {
-                hmva_sims->Scale( s_sims );
-        }
-        if( hmva_diff->GetEntries() > 0 )
-        {
-                hmva_diff->Scale( s_diff );
-        }
-
-        cSD->cd();
-        gPad->SetLeftMargin( 0.14 );
-        gPad->SetBottomMargin( 0.12 );
-        hmva_sims->GetYaxis()->SetTitleOffset( 1.3 );
-        hmva_sims->SetMaximum( hmva_sims->GetMaximum() * 1.5 );
-        hmva_sims->Draw();
-        hmva_diff->Draw( "same" );
-        TLine* lmva = new TLine( 0., hmva_sims->GetMinimum(), 0., hmva_sims->GetMaximum() );
-        lmva->SetLineStyle( 2 );
-        lmva->Draw();
-        drawMatchingTests( hmva_sims, hmva_diff, -1., 1. );
-
-        cOO->cd();
-        gPad->SetLeftMargin( 0.14 );
-        gPad->SetBottomMargin( 0.12 );
-        plotRelativePlot( hmva_sims, hmva_diff, -1., 1. );
-
-	if( fPrintName.size() > 0 )
-        {
-                char hn[200];
-                sprintf( hn, "%s-Stereo.pdf", fPrintName.c_str() );
-                cSD->Print( hn );
-                sprintf( hn, "%s-StereoRel.pdf", fPrintName.c_str() );
-                cOO->Print( hn );
-        }
-}
-
-void VPlotCompareDataWithMC::core_plots( int iRebin, int iScaling )
+void VPlotCompareDataWithMC::mva_parameter()
 {
 	if( !fDataFile )
 	{
 		return;
 	}
 	
-	TCanvas* cOCore = new TCanvas( "cOCore", "on/off (core positions)", 100, 10, 600, 600 );
+	char hname[600];
+	char htitle[600];
+	TCanvas* cOO = new TCanvas( "cOO", "relative plots (mva parameter)", 100, 10, 600, 600 );
+	cOO->SetGridx( 0 );
+	cOO->SetGridy( 0 );
+	
+	sprintf( hname, "cSD_%s", fDataFileName.c_str() );
+	sprintf( htitle, "sims/diff (mva parameter, %s)", fDataFileName.c_str() );
+	TCanvas* cSD = new TCanvas( hname, htitle, 10, 10, 600, 600 );
+	cSD->SetGridx( 0 );
+	cSD->SetGridy( 0 );
+	
+	TH1D* hmva_sims = ( TH1D* )fDataFile->Get( "hMVA_SIMS" );
+	setHistogramAtt( hmva_sims, 2, 3, 1, 20, 2 );
+	hmva_sims->SetYTitle( "number of events per bin" );
+	
+	TH1D* hmva_diff = ( TH1D* )fDataFile->Get( "hMVA_DIFF" );
+	setHistogramAtt( hmva_diff, 1, 3, 1, 21, 2 );
+	hmva_diff->SetLineWidth( 3 );
+	hmva_diff->SetStats( 0 );
+	
+	// scaling of the histograms
+	double s_sims = 1.;
+	double s_diff = 1.;
+	
+	double error_sims = 0.;
+	double error_diff = 0.;
+	
+	hmva_sims->SetAxisRange( -1., 1. );
+	getScaling( s_sims, s_diff, "MVA", 1, -0.75, 0.75 );
+	if( hmva_sims->GetEntries() > 0 )
+	{
+		hmva_sims->Scale( s_sims );
+	}
+	if( hmva_diff->GetEntries() > 0 )
+	{
+		hmva_diff->Scale( s_diff );
+	}
+	
+	for( int j = 0; j < hmva_sims->GetNbinsX(); j++ )
+	{
+		error_sims = hmva_sims->GetBinError( j ) * s_sims;
+		hmva_sims->SetBinError( j, error_sims );
+		error_diff = hmva_diff->GetBinError( j ) * s_diff;
+		hmva_diff->SetBinError( j, error_diff );
+	}
+	
+	cSD->cd();
+	gPad->SetLeftMargin( 0.14 );
+	gPad->SetBottomMargin( 0.12 );
+	hmva_sims->GetYaxis()->SetTitleOffset( 1.3 );
+	hmva_sims->SetMaximum( hmva_sims->GetMaximum() * 1.5 );
+	hmva_sims->Draw();
+	hmva_diff->Draw( "same" );
+	TLine* lmva = new TLine( 0., hmva_sims->GetMinimum(), 0., hmva_sims->GetMaximum() );
+	lmva->SetLineStyle( 2 );
+	lmva->Draw();
+	drawMatchingTests( hmva_sims, hmva_diff, -1., 1. );
+	
+	cOO->cd();
+	gPad->SetLeftMargin( 0.14 );
+	gPad->SetBottomMargin( 0.12 );
+	plotRelativePlot( hmva_sims, hmva_diff, -1., 1. );
+	
+	if( fPrintName.size() > 0 )
+	{
+		char hn[200];
+		sprintf( hn, "%s-Stereo.pdf", fPrintName.c_str() );
+		cSD->Print( hn );
+		sprintf( hn, "%s-StereoRel.pdf", fPrintName.c_str() );
+		cOO->Print( hn );
+	}
+}
+
+/*
+ *
+ * core parameter plots
+ *
+ * horrible code...programmer doesn't know what a loop is
+*/
+
+TCanvas* VPlotCompareDataWithMC::core_plots( int iRebin, int iScaling )
+{
+	if( !fDataFile )
+	{
+		return 0;
+	}
+	
+	TCanvas* cOCore = new TCanvas( "cOCore", "on/off (core positions)", 100, 10, 1200, 600 );
 	cOCore->SetGridx( 0 );
 	cOCore->SetGridy( 0 );
-	cOCore->Divide( 2, 2 );
+	cOCore->Divide( 3, 2 );
 	
-	TCanvas* cSCore = new TCanvas( "cSCore", "sims & diff (core positions)", 10, 10, 600, 600 );
+	TCanvas* cSCore = new TCanvas( "cSCore", "sims & diff (core positions)", 10, 10, 1200, 600 );
 	cSCore->SetGridx( 0 );
 	cSCore->SetGridy( 0 );
-	cSCore->Divide( 2, 2 );
+	cSCore->Divide( 3, 2 );
 	
-	TCanvas* cSCoreRel = new TCanvas( "cSCoreRel", "sims/diff (core positions)", 10, 110, 600, 330 );
+	TCanvas* cSCoreRel = new TCanvas( "cSCoreRel", "sims/diff (core positions)", 10, 110, 600, 630 );
 	cSCoreRel->SetGridx( 0 );
 	cSCoreRel->SetGridy( 0 );
-	cSCoreRel->Divide( 2, 1 );
+	cSCoreRel->Divide( 2, 2 );
 	
 	// xcore
 	//
@@ -1231,9 +1349,69 @@ void VPlotCompareDataWithMC::core_plots( int iRebin, int iScaling )
 	hYcore_on->Draw();
 	hYcore_off->Draw( "same" );
 	
+	// az & elevation
+	cSCore->cd( 3 );
+	TH1D* hArrayEl_sims = ( TH1D* )fDataFile->Get( "hArrayEl_SIMS" );
+	TH1D* hArrayEl_on = ( TH1D* )fDataFile->Get( "hArrayEl_ON" );
+	TH1D* hArrayEl_off = ( TH1D* )fDataFile->Get( "hArrayEl_OFF" );
+	TH1D* hArrayEl_diff = ( TH1D* )fDataFile->Get( "hArrayEl_DIFF" );
+	if( hArrayEl_sims && hArrayEl_on && hArrayEl_off && hArrayEl_diff )
+	{
+		setHistogramAtt( hArrayEl_sims, 2, 1, 1, 20, iRebin );
+		setHistogramAtt( hArrayEl_on, 3, 1, 1, 20, iRebin );
+		setHistogramAtt( hArrayEl_off, 4, 1, 1, 20, iRebin );
+		setHistogramAtt( hArrayEl_diff, 1, 1, 1, 21, iRebin );
+		hArrayEl_sims->SetAxisRange( 40., 90. );
+		hArrayEl_on->SetAxisRange( 40., 90. );
+		getScaling( nSims, nDiff, "ArrayEl", iScaling );
+		hArrayEl_diff->Scale( nDiff );
+		hArrayEl_sims->Scale( nSims );
+		
+		cSCore->cd( 3 );
+		hArrayEl_sims->Draw();
+		hArrayEl_diff->Draw( "same" );
+		plotLegend( hArrayEl_sims, hArrayEl_diff, 0.13 );
+		
+		cSCoreRel->cd( 3 );
+		plotRelativePlot( hArrayEl_sims, hArrayEl_diff, 40., 90. );
+		
+		cOCore->cd( 3 );
+		hArrayEl_off->Draw();
+		hArrayEl_on->Draw( "same" );
+	}
+	cSCore->cd( 6 );
+	TH1D* hArrayAz_sims = ( TH1D* )fDataFile->Get( "hArrayAz_SIMS" );
+	TH1D* hArrayAz_on = ( TH1D* )fDataFile->Get( "hArrayAz_ON" );
+	TH1D* hArrayAz_off = ( TH1D* )fDataFile->Get( "hArrayAz_OFF" );
+	TH1D* hArrayAz_diff = ( TH1D* )fDataFile->Get( "hArrayAz_DIFF" );
+	if( hArrayAz_sims && hArrayAz_on && hArrayAz_off && hArrayAz_diff )
+	{
+		setHistogramAtt( hArrayAz_sims, 2, 1, 1, 20, 1 );
+		setHistogramAtt( hArrayAz_on, 3, 1, 1, 20, 1 );
+		setHistogramAtt( hArrayAz_off, 4, 1, 1, 20, 1 );
+		setHistogramAtt( hArrayAz_diff, 1, 1, 1, 21, 1 );
+		getScaling( nSims, nDiff, "ArrayAz", iScaling );
+		hArrayAz_diff->Scale( nDiff );
+		hArrayAz_sims->Scale( nSims );
+		
+		cSCore->cd( 6 );
+		hArrayAz_sims->SetMaximum( hArrayAz_sims->GetMaximum() * 1.8 );
+		hArrayAz_sims->Draw();
+		hArrayAz_diff->Draw( "same" );
+		plotLegend( hArrayAz_sims, hArrayAz_diff, 0.13 );
+		
+		cSCoreRel->cd( 4 );
+		plotRelativePlot( hArrayAz_sims, hArrayAz_diff, 0., 360. );
+		
+		cOCore->cd( 6 );
+		hArrayAz_off->Draw();
+		hArrayAz_on->Draw( "same" );
+	}
+	
+	// //////////////////////
 	// XY plot
 	
-	cOCore->cd( 3 );
+	cOCore->cd( 4 );
 	TH2D* hXYcore_on = ( TH2D* )fDataFile->Get( "hXYcore_ON" );
 	setHistogramAtt( hXYcore_on, 1. );
 	hXYcore_on->SetXTitle( "core position X (ON) [m]" );
@@ -1241,7 +1419,7 @@ void VPlotCompareDataWithMC::core_plots( int iRebin, int iScaling )
 	
 	hXYcore_on->Draw( "colz" );
 	
-	cOCore->cd( 4 );
+	cOCore->cd( 5 );
 	TH2D* hXYcore_off = ( TH2D* )fDataFile->Get( "hXYcore_OFF" );
 	setHistogramAtt( hXYcore_off, 1. );
 	hXYcore_off->SetXTitle( "core position X (OFF) [m]" );
@@ -1249,7 +1427,7 @@ void VPlotCompareDataWithMC::core_plots( int iRebin, int iScaling )
 	
 	hXYcore_off->Draw( "colz" );
 	
-	cSCore->cd( 3 );
+	cSCore->cd( 4 );
 	TH2D* hXYcore_diff = ( TH2D* )fDataFile->Get( "hXYcore_DIFF" );
 	setHistogramAtt( hXYcore_diff, 1. );
 	hXYcore_diff->SetXTitle( "core position X (ON-OFF) [m]" );
@@ -1257,13 +1435,14 @@ void VPlotCompareDataWithMC::core_plots( int iRebin, int iScaling )
 	
 	hXYcore_diff->Draw( "colz" );
 	
-	cSCore->cd( 4 );
+	cSCore->cd( 5 );
 	TH2D* hXYcore_sims = ( TH2D* )fDataFile->Get( "hXYcore_SIMS" );
 	setHistogramAtt( hXYcore_sims, 1. );
 	
 	hXYcore_sims->SetXTitle( "core position X (SIMS) [m]" );
 	hXYcore_sims->SetYTitle( "core position Y (SIMS) [m]" );
 	hXYcore_sims->Draw( "colz" );
+	
 	
 	// print the canvas
 	if( fPrintName.size() > 0 )
@@ -1276,6 +1455,7 @@ void VPlotCompareDataWithMC::core_plots( int iRebin, int iScaling )
 		sprintf( hn, "%s-CoreRel.pdf", fPrintName.c_str() );
 		cSCoreRel->Print( hn );
 	}
+	return cSCore;
 }
 
 void VPlotCompareDataWithMC::centroids()
@@ -1307,22 +1487,22 @@ void VPlotCompareDataWithMC::centroids()
 	char hname[200];
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
-		sprintf( hname, "hcen_xy%d_SIMS", i + 1 );
+		sprintf( hname, "hcen_xy%u_SIMS", i + 1 );
 		hCenXY_sims[i] = ( TH2D* )fDataFile->Get( hname );
 		setHistogramAtt( hCenXY_sims[i], -999. );
 		setAxisTitles( hCenXY_sims[i], "sims", i + 1 );
 		
-		sprintf( hname, "hcen_xy%d_DIFF", i + 1 );
+		sprintf( hname, "hcen_xy%u_DIFF", i + 1 );
 		hCenXY_diff[i] = ( TH2D* )fDataFile->Get( hname );
 		setHistogramAtt( hCenXY_diff[i], 0.01 );
 		setAxisTitles( hCenXY_diff[i], "on-off", i + 1 );
 		
-		sprintf( hname, "hcen_xy%d_ON", i + 1 );
+		sprintf( hname, "hcen_xy%u_ON", i + 1 );
 		hCenXY_on[i] = ( TH2D* )fDataFile->Get( hname );
 		setHistogramAtt( hCenXY_on[i], -999. );
 		setAxisTitles( hCenXY_on[i], "on", i + 1 );
 		
-		sprintf( hname, "hcen_xy%d_OFF", i + 1 );
+		sprintf( hname, "hcen_xy%u_OFF", i + 1 );
 		hCenXY_off[i] = ( TH2D* )fDataFile->Get( hname );
 		setHistogramAtt( hCenXY_off[i], -999. );
 		setAxisTitles( hCenXY_off[i], "off", i + 1 );
@@ -1349,11 +1529,11 @@ void VPlotCompareDataWithMC::centroids()
   plot distance from telescope to shower core
 
 */
-void VPlotCompareDataWithMC::distance_plots()
+TCanvas* VPlotCompareDataWithMC::distance_plots()
 {
 	if( !fDataFile )
 	{
-		return;
+		return 0;
 	}
 	
 	TCanvas* cODist = new TCanvas( "cODist", "on/off (distance plots)", 100, 10, 900, fNTel * 150 );
@@ -1377,7 +1557,7 @@ void VPlotCompareDataWithMC::distance_plots()
 	if( fNTel > 100 )
 	{
 		cout << "too many telescopes ..." << endl;
-		return;
+		return 0;
 	}
 	if( fPlotPoster )
 	{
@@ -1412,26 +1592,26 @@ void VPlotCompareDataWithMC::distance_plots()
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
 		// R
-		sprintf( hname, "hr_%d_SIMS", i + 1 );
+		sprintf( hname, "hr_%u_SIMS", i + 1 );
 		hR_sims[i] = ( TH1D* )fDataFile->Get( hname );
 		setHistogramAtt( hR_sims[i], 2, 1, 0.5, 20, 1 );
 		hR_sims[i]->SetMaximum( hR_sims[i]->GetMaximum() * 1.3 );
 		hR_sims[i]->SetYTitle( "number of shower [a.u.]" );
 		
-		sprintf( hname, "hr_%d_DIFF", i + 1 );
+		sprintf( hname, "hr_%u_DIFF", i + 1 );
 		hR_diff[i] = ( TH1D* )fDataFile->Get( hname );
 		setHistogramAtt( hR_diff[i], 1, 1, 0.5, 21, 1 );
 		
-		sprintf( hname, "hr_%d_ON", i + 1 );
+		sprintf( hname, "hr_%u_ON", i + 1 );
 		hR_on[i] = ( TH1D* )fDataFile->Get( hname );
 		setHistogramAtt( hR_on[i], 3, 1, 0.5, 20, 1 );
 		
-		sprintf( hname, "hr_%d_OFF", i + 1 );
+		sprintf( hname, "hr_%u_OFF", i + 1 );
 		hR_off[i] = ( TH1D* )fDataFile->Get( hname );
 		setHistogramAtt( hR_off[i], 4, 1, 0.5, 21, 1 );
 		
 		
-		sprintf( hname, "r_%d", i + 1 );
+		sprintf( hname, "r_%u", i + 1 );
 		getScaling( s_sims, s_diff, hname, 1 );
 		if( hR_sims[i]->GetEntries() > 0 )
 		{
@@ -1458,7 +1638,7 @@ void VPlotCompareDataWithMC::distance_plots()
 		// relative plots
 		if( hR_sims[i] && hR_diff[i] )
 		{
-			sprintf( hname, "hR_RE_%d", i );
+			sprintf( hname, "hR_RE_%u", i );
 			hrel = ( TH1D* )hR_sims[i]->Clone( hname );
 			hrel->Divide( hR_diff[i] );
 			hrel->SetYTitle( "sims/data" );
@@ -1476,25 +1656,25 @@ void VPlotCompareDataWithMC::distance_plots()
 		
 		// distR
 		//
-		sprintf( hname, "hdistR%d_SIMS", i + 1 );
+		sprintf( hname, "hdistR%u_SIMS", i + 1 );
 		hdistR_sims[i] = ( TH2D* )fDataFile->Get( hname );
 		setHistogramAtt( hdistR_sims[i], -999. );
 		setAxisTitles( hdistR_sims[i], "sims", i + 1 );
 		hdistR_sims[i]->SetAxisRange( 0., 1.5, "Y" );
 		
-		sprintf( hname, "hdistR%d_DIFF", i + 1 );
+		sprintf( hname, "hdistR%u_DIFF", i + 1 );
 		hdistR_diff[i] = ( TH2D* )fDataFile->Get( hname );
 		setHistogramAtt( hdistR_diff[i], 0.001 );
 		setAxisTitles( hdistR_diff[i], "on-off", i + 1 );
 		hdistR_diff[i]->SetAxisRange( 0., 1.5, "Y" );
 		
-		sprintf( hname, "hdistR%d_ON", i + 1 );
+		sprintf( hname, "hdistR%u_ON", i + 1 );
 		hdistR_on[i] = ( TH2D* )fDataFile->Get( hname );
 		setHistogramAtt( hdistR_on[i], -999. );
 		setAxisTitles( hdistR_on[i], "on", i + 1 );
 		hdistR_on[i]->SetAxisRange( 0., 1.5, "Y" );
 		
-		sprintf( hname, "hdistR%d_OFF", i + 1 );
+		sprintf( hname, "hdistR%u_OFF", i + 1 );
 		hdistR_off[i] = ( TH2D* )fDataFile->Get( hname );
 		setHistogramAtt( hdistR_off[i], -999. );
 		setAxisTitles( hdistR_off[i], "off", i + 1 );
@@ -1528,6 +1708,7 @@ void VPlotCompareDataWithMC::distance_plots()
 		sprintf( hn, "%s-DistRel.pdf", fPrintName.c_str() );
 		cODist->Print( hn );
 	}
+	return cSDist;
 }
 
 /*
@@ -1539,11 +1720,12 @@ void VPlotCompareDataWithMC::distance_plots()
  *
  */
 
-void VPlotCompareDataWithMC::single_telescope( int telid )
+TCanvas* VPlotCompareDataWithMC::single_telescope( int telid )
 {
+	TCanvas* c = 0;
 	if( telid > 0 )
 	{
-		single_telescope( telid, "REL" );
+		c = single_telescope( telid, "REL" );
 		single_telescope( telid, "SIMSDIFF" );
 	}
 	else
@@ -1554,20 +1736,21 @@ void VPlotCompareDataWithMC::single_telescope( int telid )
 			single_telescope( i + 1, "SIMSDIFF" );
 		}
 	}
+	return c;
 }
 
-void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOneCanvas,
+TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOneCanvas,
 		int iScalingMethod, int i_rebin )
 {
 
 	if( iPlot != "SIMSDIFF" && iPlot != "ONOFF" && iPlot != "REL" )
 	{
 		cout << "error: unknown plotting mode (allowed are SIMSDIFF, ONOFF, REL)" << endl;
-		return;
+		return 0;
 	}
 	if( !fDataFile )
 	{
-		return;
+		return 0;
 	}
 	
 	double KSProb = 0;
@@ -1606,19 +1789,19 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 	f_rebin.push_back( i_rebin );
 	f_logy.push_back( 1 );
 	f_x_min.push_back( 1.5 );
-	f_x_max.push_back( 6.00 );
-	hname.push_back( "size2" );
+	f_x_max.push_back( 6.50 );
+	hname.push_back( "sizeHG" );
 	f_rebin.push_back( i_rebin );
 	f_logy.push_back( 1 );
 	f_x_min.push_back( 1.5 );
 	f_x_max.push_back( 6.50 );
 	hname.push_back( "sizeLG" );
-	f_rebin.push_back( 2 );
+	f_rebin.push_back( i_rebin );
 	f_logy.push_back( 1 );
-	f_x_min.push_back( 2.5 );
-	f_x_max.push_back( 6. );
+	f_x_min.push_back( 1.5 );
+	f_x_max.push_back( 6.5 );
 	hname.push_back( "fraclow" );
-	f_rebin.push_back( 2 );
+	f_rebin.push_back( 1 );
 	f_logy.push_back( 1 );
 	f_x_min.push_back( 0.0 );
 	f_x_max.push_back( 1. );
@@ -1652,12 +1835,12 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 	f_logy.push_back( 1 );
 	f_x_min.push_back( 0. );
 	f_x_max.push_back( 90. );
-	hname.push_back( "mscwt" );
+	hname.push_back( "mwrt" );
 	f_rebin.push_back( i_rebin );
 	f_logy.push_back( 0 );
 	f_x_min.push_back( 0.5 );
 	f_x_max.push_back( 1.5 );
-	hname.push_back( "msclt" );
+	hname.push_back( "mltt" );
 	f_rebin.push_back( i_rebin );
 	f_logy.push_back( 0 );
 	f_x_min.push_back( 0.5 );
@@ -1672,6 +1855,11 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 	f_logy.push_back( 0 );
 	f_x_min.push_back( -7.5 );
 	f_x_max.push_back( 7.5 );
+	hname.push_back( "pedvarT" );
+	f_rebin.push_back( i_rebin );
+	f_logy.push_back( 0 );
+	f_x_min.push_back( 5. );
+	f_x_max.push_back( 10. );
 	
 	// loop over all histograms and plot them
 	char hn[600];
@@ -1743,12 +1931,9 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 			hdiff->Scale( s_diff );
 		}
 		// relative histograms
-		if( hsims && hdiff )
-		{
-			sprintf( hn, "h%s_%d_RE", hname[j].c_str(), telid );
-			hrel = ( TH1D* )hsims->Clone( hn );
-			hrel->Divide( hdiff );
-		}
+		sprintf( hn, "h%s_%d_RE", hname[j].c_str(), telid );
+		hrel = ( TH1D* )hsims->Clone( hn );
+		hrel->Divide( hdiff );
 		
 		if( iOneCanvas )
 		{
@@ -1819,11 +2004,11 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 		}
 		if( f_logy[j] )
 		{
-			hdiff->SetMaximum( hdiff->GetMaximum() * 1.5 );
+			hdiff->SetMaximum( hdiff->GetBinContent( hdiff->GetMaximumBin() ) * 1.5 );
 		}
 		else
 		{
-			hdiff->SetMaximum( hdiff->GetMaximum() * 1.1 );
+			hdiff->SetMaximum( hdiff->GetBinContent( hdiff->GetMaximumBin() ) * 1.1 );
 		}
 		hrel->SetYTitle( "sims/data" );
 		hrel->SetMinimum( fRelatePlotRange_min );
@@ -1895,7 +2080,7 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 		// line for mscwt and msclt histograms
 		if( iPlot != "REL" )
 		{
-			if( hname[j] == "mscwt" || hname[j] == "msclt" )
+			if( hname[j] == "hmwrt" || hname[j] == "mltt" )
 			{
 				TLine* iLine = new TLine( 1., hdiff->GetMinimum(), 1., hdiff->GetMaximum() );
 				iLine->SetLineStyle( 2 );
@@ -1916,11 +2101,11 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 			KSSig = TMath::ErfInverse( 1 - KSProb ) * TMath::Sqrt( 2 );
 			if( KSProb != 0 )
 			{
-				sprintf( text, "%s | KS P = %1.2e (%1.1f #sigma)", hname[j].c_str(), KSProb, KSSig );
+				sprintf( text, "%s (TEL%d) | KS P = %1.2e (%1.1f #sigma)", hname[j].c_str(), telid, KSProb, KSSig );
 			}
 			else
 			{
-				sprintf( text, "%s | KS P = %1.2e (#infty #sigma)", hname[j].c_str(), KSProb );
+				sprintf( text, "%s (TEL%d) | KS P = %1.2e (#infty #sigma)", hname[j].c_str(), telid, KSProb );
 			}
 			cout << text << endl;
 			
@@ -1936,6 +2121,7 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 		sprintf( hn, "%s-SINGLET-%s-T%d.pdf", fPrintName.c_str(), iPlot.c_str(), telid );
 		hc->Print( hn );
 	}
+	return hc;
 }
 
 void VPlotCompareDataWithMC::msc_plots( char* offFile, char* helium, char* proton, double xmin, double xmax, string ivar )
@@ -2094,52 +2280,20 @@ void VPlotCompareDataWithMC::msc_plots( char* offFile, char* helium, char* proto
 
     plot mean width plots (energy dependent)
 */
-void VPlotCompareDataWithMC::mwr_vs_energy_plots( int iRebin, double xmin, double xmax )
+void VPlotCompareDataWithMC::mwr_vs_energy_plots( int iRebin, double xmin, double xmax, double iSystematicCutCheck )
 {
 	if( !fDataFile )
 	{
 		return;
 	}
 	
+	plot_energyDependentDistributions( "MLR", iRebin, xmin, xmax, "CUMU", 0, iSystematicCutCheck );
+	plot_energyDependentDistributions( "MWR", iRebin, xmin, xmax, "CUMU", 0, iSystematicCutCheck );
 	plot_energyDependentDistributions( "MLR", iRebin, xmin, xmax, "REL" );
 	plot_energyDependentDistributions( "MWR", iRebin, xmin, xmax, "REL" );
 	plot_energyDependentDistributions( "MLR", iRebin, xmin, xmax );
 	plot_energyDependentDistributions( "MWR", iRebin, xmin, xmax );
 	
-	return;
-}
-
-/*
-    model3D plots (energy dependent)
-*/
-void VPlotCompareDataWithMC::model3D_vs_energy_plots()
-{
-	if( !fDataFile )
-	{
-		return;
-	}
-	int iRebin = 4;
-	double xmin, xmax;
-	xmin = 5.;
-	xmax = 25.;
-	plot_energyDependentDistributions( "sigmaT3D", iRebin, xmin, xmax );
-	plot_energyDependentDistributions( "sigmaT3D", iRebin, xmin, xmax, "REL" );
-	xmin = 11.;
-	xmax = 20.;
-	plot_energyDependentDistributions( "Nc3D", iRebin, xmin, xmax );
-	plot_energyDependentDistributions( "Nc3D", iRebin, xmin, xmax, "REL" );
-	xmin = 10.;
-	xmax = 700.;
-	plot_energyDependentDistributions( "Depth3D", iRebin, xmin, xmax );
-	plot_energyDependentDistributions( "Depth3D", iRebin, xmin, xmax, "REL" );
-	xmin = 0.1;
-	xmax = 5.;
-	plot_energyDependentDistributions( "RWidth3D", iRebin, xmin, xmax );
-	plot_energyDependentDistributions( "RWidth3D", iRebin, xmin, xmax, "REL" );
-	xmin = 0.001;
-	xmax = 0.08;
-	plot_energyDependentDistributions( "ErrRWidth3D", iRebin, xmin, xmax );
-	plot_energyDependentDistributions( "ErrRWidth3D", iRebin, xmin, xmax, "REL" );
 	return;
 }
 
@@ -2150,15 +2304,375 @@ void VPlotCompareDataWithMC::model3D_vs_energy_plots()
 
 void VPlotCompareDataWithMC::plot( string iPrintName )
 {
-	setPrintName( iPrintName );
+
+	TCanvas* c = new TCanvas( "cP", "empty page", 10, 10, 600, 400 );
+	c->Draw();
+	char hname[400];
+	sprintf( hname, "%s.pdf(", iPrintName.c_str() );
+	c->Print( hname );
+	sprintf( hname, "%s.pdf", iPrintName.c_str() );
+	TCanvas* cP = 0;
+	cP = plot_energyDependentDistributions( "MSCW", 2, -1.5, 1.5, "SIMSDIFF" );
+	if( cP )
+	{
+		cP->Print( hname );
+	}
+	cP = plot_energyDependentDistributions( "MSCW", 1, -1.5, 1.5, "CUMU" );
+	if( cP )
+	{
+		cP->Print( hname );
+	}
+	cP = plot_energyDependentDistributions( "MSCL", 2, -1.5, 1.5, "SIMSDIFF" );
+	if( cP )
+	{
+		cP->Print( hname );
+	}
+	cP = plot_energyDependentDistributions( "MSCL", 1, -1.5, 1.5, "CUMU" );
+	if( cP )
+	{
+		cP->Print( hname );
+	}
+	cP = plot_energyDependentDistributions( "MWR", 2, 0.7, 1.3, "SIMSDIFF" );
+	if( cP )
+	{
+		cP->Print( hname );
+	}
+	cP = plot_energyDependentDistributions( "MWR", 1, 0.7, 1.3, "CUMU" );
+	if( cP )
+	{
+		cP->Print( hname );
+	}
+	cP = plot_energyDependentDistributions( "MWL", 1, 0.7, 1.3, "SIMSDIFF" );
+	if( cP )
+	{
+		cP->Print( hname );
+	}
+	cP = plot_energyDependentDistributions( "MWL", 1, 0.7, 1.3, "CUMU" );
+	if( cP )
+	{
+		cP->Print( hname );
+	}
+	// telescope dependent plots
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = single_telescope( i, "SIMSDIFF" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = single_telescope( i, "REL" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "width", 1, 0.03, 0.16, "SIMSDIFF", i, -99., "Erec" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "width", 1, 0.03, 0.16, "SIMSDIFF", i, -99., "size" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "width", 1, 0.03, 0.16, "SIMSDIFF", i, -99., "sizeHG" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "width", 1, 0.03, 0.16, "SIMSDIFF", i, -99., "sizeLG" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "width", 1, 0.03, 0.16, "SIMSDIFF", i, -99., "ntubes" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "length", 2, 0.05, 0.75, "SIMSDIFF", i, -99., "Erec" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "length", 2, 0.05, 0.75, "SIMSDIFF", i, -99., "size" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "length", 2, 0.05, 0.75, "SIMSDIFF", i, -99., "sizeHG" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "length", 2, 0.05, 0.75, "SIMSDIFF", i, -99., "sizeLG" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "length", 2, 0.05, 0.75, "SIMSDIFF", i, -99., "ntubes" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "mwrt", 1, 0.7, 1.4, "SIMSDIFF", i, -99., "Erec" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "mwrt", 1, 0.7, 1.4, "SIMSDIFF", i, -99., "size" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "mwrt", 1, 0.7, 1.4, "SIMSDIFF", i, -99., "sizeHG" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "mwrt", 1, 0.7, 1.4, "SIMSDIFF", i, -99., "sizeLG" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "mwrt", 1, 0.7, 1.4, "SIMSDIFF", i, -99., "ntubes" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "erecratio", 1, 0.5, 1.5, "SIMSDIFF", i );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "erecratio", 1, 0.5, 1.5, "REL", i );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "erecratio", 1, 0.5, 1.5, "SIMSDIFF", i, -99., "size" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "erecratio", 1, 0.5, 1.5, "SIMSDIFF", i, -99., "sizeHG" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "erecratio", 1, 0.5, 1.5, "SIMSDIFF", i, -99., "sizeLG" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "erecratio", 1, 0.5, 1.5, "SIMSDIFF", i, -99., "ntubes" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "size", 1, 2., 5., "SIMSDIFF", i, -99., "Erec" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "size", 1, 2., 5., "REL", i, -99., "Erec" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "sizeHG", 1, 2., 5., "SIMSDIFF", i, -99., "Erec", 1, true );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "sizeHG", 1, 2., 5., "REL", i, -99., "Erec" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "sizeLG", 2, 3., 5., "SIMSDIFF", i, -99., "Erec", 1, true );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "sizeLG", 2, 3., 5., "REL", i, -99., "Erec" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "ntubes", 2, 0.0, 90., "SIMSDIFF", i, -99., "Erec", 1, true );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "ntubes", 2, 0.0, 90., "REL", i, -99., "Erec" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "nlowgain", 2, 0.0, 40., "SIMSDIFF", i, -99., "Erec", 1, true );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "nlowgain", 2, 0.0, 40., "REL", i, -99., "Erec" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "fraclow", 4, 0.0, 1.0, "SIMSDIFF", i, -99., "Erec", 0.2, true );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "fraclow", 4, 0.0, 1.0, "REL", i, -99., "Erec" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	for( unsigned int i = 1; i <= 4; i++ )
+	{
+		cP = plot_energyDependentDistributions( "r", 4, 0., 400., "SIMSDIFF", i, -99., "core distance" );
+		if( cP )
+		{
+			cP->Print( hname );
+		}
+	}
+	cP = plot_energyDependentDistributions( "ltheta2", 1, -5., -1., "SIMSDIFF", 0 );
+	if( cP )
+	{
+		cP->Print( hname );
+	}
+	cP = plot_energyDependentDistributions( "theta2", 1, 0., 0.04, "SIMSDIFF", 0 );
+	if( cP )
+	{
+		cP->Print( hname );
+	}
+	cP = stereo_parameter();
+	if( cP )
+	{
+		cP->Print( hname );
+	}
+	cP = core_plots();
+	if( cP )
+	{
+		cP->Print( hname );
+	}
+	cP = distance_plots();
+	if( cP )
+	{
+		cP->Print( hname );
+	}
+	cP = emission_height();
+	if( cP )
+	{
+		cP->Print( hname );
+	}
 	
-	single_telescope();
-	msc_vs_energy_plots();
-	mwr_vs_energy_plots();
-	multiplicity_plots();
-	stereo_parameter();
-	centroids();
-	core_plots();
-	distance_plots();
-	emission_height();
+	sprintf( hname, "%s.pdf)", iPrintName.c_str() );
+	c->Print( hname );
+	
 }

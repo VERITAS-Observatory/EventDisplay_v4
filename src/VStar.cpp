@@ -7,7 +7,7 @@
 
 VStar::VStar()
 {
-        fStarID = 0;
+	fStarID = 0;
 	fStarName = "";
 	fDec2000 = 0.;
 	fRA2000 = 0.;
@@ -48,15 +48,37 @@ double VStar::getDistance( VStar* iStar1, VStar* iStar2 )
 	
 	if( iStar2 == 0 )
 	{
-		return TMath::RadToDeg() * slaDsep( iStar1->fRA2000 * TMath::DegToRad(), iStar1->fDec2000 * TMath::DegToRad(),
-											fRA2000 * TMath::DegToRad(), fDec2000 * TMath::DegToRad() );
+		return TMath::RadToDeg() * VAstronometry::vlaDsep( iStar1->fRA2000 * TMath::DegToRad(), iStar1->fDec2000 * TMath::DegToRad(),
+				fRA2000 * TMath::DegToRad(), fDec2000 * TMath::DegToRad() );
 	}
 	
-	return TMath::RadToDeg() * slaDsep( iStar1->fRA2000 * TMath::DegToRad(), iStar1->fDec2000 * TMath::DegToRad(),
-										iStar2->fRA2000 * TMath::DegToRad(), iStar2->fDec2000 * TMath::DegToRad() );
+	return TMath::RadToDeg() * VAstronometry::vlaDsep( iStar1->fRA2000 * TMath::DegToRad(), iStar1->fDec2000 * TMath::DegToRad(),
+			iStar2->fRA2000 * TMath::DegToRad(), iStar2->fDec2000 * TMath::DegToRad() );
 }
 
 void VStar::printStar()
 {
 	cout << fStarName << "\t" << fRA2000 << "\t" << fDec2000 << " B: " << fBrightness_B << " V: " << fBrightness_V << endl;
+}
+
+void VStar::printStar_for_anasum( string iBand )
+{
+	cout << "\t\t" << fStarID << "\t";
+	cout << fRA2000 << "\t";
+	cout << fDec2000 << "\t";
+	cout << getBrightness( iBand ) << " (" << iBand << " band)";
+	cout << "    " << fStarName << endl;
+}
+
+double VStar::getBrightness( string iBand )
+{
+	if( iBand == "B" )
+	{
+		return  fBrightness_B;
+	}
+	else if( iBand == "V" )
+	{
+		return fBrightness_V;
+	}
+	return 0.;
 }

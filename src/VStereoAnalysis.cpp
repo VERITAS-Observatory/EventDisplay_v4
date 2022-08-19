@@ -9,64 +9,64 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 								  TDirectory* iDirTot, string iDataDir, int iRandomSeed, bool iTotalAnalysisOnly )
 {
 	fDebug = false;
-
+	
 	fDataFile = 0;
 	fInstrumentEpoch = "NOT_SET";
 	fDirTot = iDirTot;
 	fDirTotRun = iDirRun;
 	bTotalAnalysisOnly = iTotalAnalysisOnly;
-
+	
 	// set default values
 	fIsOn = ion;
 	// do full sky plots
 	fNoSkyPlots = false;
-
+	
 	gMeanEffectiveArea = 0;
 	gTimeBinnedMeanEffectiveArea = 0;
 	gMeanEsys_MC = 0;
-
+	
 	gMeanEffectiveAreaMC = 0;
 	hResponseMatrix = 0;
-
+	
 	fHisCounter = 0;
 	fTotCount = 0.;
-
+	
 	fMeanAzimuth = 0.;
 	fMeanElevation = 0.;
 	fNMeanElevation = 0.;
-
+	
 	fTreeSelectedEvents = 0;
-
+	
 	fRunPara = irunpara;
 	fDL3EventTree = 0;
 	fDeadTimeStorage = 0.;
-
+	
 	fVsky = new VSkyCoordinates() ;
 	fVsky->supressStdoutText( true ) ;
 	fVsky->setObservatory( VGlobalRunParameter::getObservatory_Longitude_deg(),
 						   VGlobalRunParameter::getObservatory_Latitude_deg() );
-
+						   
 	// calculating run start, end and duration (verifies data trees)
 	if( !bTotalAnalysisOnly )
 	{
 		setRunTimes();
 	}
-
+	
 	// targets and exclusion regions
 	if( !bTotalAnalysisOnly )
 	{
 		defineAstroSource();
 	}
-
+	
 	///////////////////////////////
 	// define histograms
-
+	
 	// combined results
 	iDirTot->cd();
 	fHistoTot = new VStereoHistograms( i_hsuffix, fRunPara->fSkyMapBinSize, fRunPara->fSkyMapBinSizeUC,
 									   fRunPara->fEnergySpectrumBinSize, fRunPara->fTimeIntervall, -1, -1, fIsOn );
 	fHistoTot->setSkyMapSize( fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax, fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax );
-
+	
 	// one set of histograms for each run
 	if( iDirRun.size() != fRunPara->fRunList.size() )
 	{
@@ -93,20 +93,20 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 		{
 			fHisto.back()->setRunNumber( fRunPara->fRunList[i].fRunOff );
 		}
-
+		
 		// define dead time calculators
 		fDeadTime.push_back( new VDeadTime( fIsOn ) );
-
+		
 		// rate plots
 		fRateCounts.push_back( i_v );
 		fRateTime.push_back( i_v );
 		fRateTimeIntervall.push_back( i_v );
-
+		
 	}
-
+	
 	// define the time mask
 	fTimeMask = new VTimeMask();
-
+	
 	// define the cuts
 	fCuts = new VGammaHadronCuts();
 	char hname[200];
@@ -122,7 +122,7 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 	fCuts->resetCutValues();
 	fCuts->setDataTree( 0 );
 	fCuts->setDataDirectory( iDataDir );
-
+	
 	// define the background model
 	fMap   = new VStereoMaps( false, iRandomSeed, fRunPara->fTMPL_RE_RemoveOffRegionsRandomly );
 	fMapUC = new VStereoMaps( true,  iRandomSeed, fRunPara->fTMPL_RE_RemoveOffRegionsRandomly );
@@ -139,13 +139,13 @@ void VStereoAnalysis::setRunTimes()
 	cout << endl << "-----------------------------------------------------------------------" << endl;
 	cout << "Checking data trees " << ( fIsOn ? "(ON runs)" : "(OFF runs)" ) << endl;
 	cout << "\t Run \t| Start (MJD : secs)\t| End (MJD : secs)\t| Duration (secs [mins])" << endl;
-
+	
 	for( unsigned int i = 0; i < fRunPara->fRunList.size(); i++ )
 	{
 		int i_run = fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff;
-
+		
 		CData* c = getDataFromFile( i_run );
-
+		
 		cout << setRunTimes( c ) << endl;
 		if( fIsOn )
 		{
@@ -155,7 +155,7 @@ void VStereoAnalysis::setRunTimes()
 		{
 			fRunPara->fRunList[i].fMJDOff = getMJD( i_run );
 		}
-
+		
 		closeDataFile();
 	}
 }
@@ -170,48 +170,48 @@ string  VStereoAnalysis::setRunTimes( CData* iData )
 {
 	ostringstream ires( "" );
 	ires.setf( ios_base::fixed, ios_base::floatfield );
-
+	
 	double i_min, i_minMJD, i_minUTC = 0.;
 	double i_max, i_maxMJD, i_maxUTC = 0.;
 	double i_dur = 0.;
-
+	
 	fDataRun = iData;
 	int i_run = getDataRunNumber();
-
+	
 	fDataRun->GetEntry( 1 );
 	i_min = fDataRun->Time;
 	f_t_in_s_min[i_run] = i_min;
 	i_minMJD = fDataRun->MJD;
 	i_minUTC = VSkyCoordinatesUtilities::getUTC( ( int )i_minMJD, i_min );
-
+	
 	int i_nentries = ( int )fDataRun->fChain->GetEntries() - 2;
 	fDataRun->GetEntry( i_nentries );
 	i_max = fDataRun->Time;
 	f_t_in_s_max[i_run] = i_max;
 	i_maxMJD = fDataRun->MJD;
 	i_maxUTC = VSkyCoordinatesUtilities::getUTC( ( int )i_maxMJD, i_max );
-
+	
 	i_dur = ( i_maxUTC - i_minUTC ) * 24 * 60 * 60;
-
+	
 	fRunMJDStart[i_run] = i_minUTC;
 	fRunMJDStopp[i_run] = i_maxUTC;
 	fRunMJD[i_run] = ( i_maxUTC + i_minUTC ) / 2.;
 	fRunDuration[i_run] = i_dur;
-
+	
 	ires.precision( 0 );
 	ires << "\t " << i_run << "\t| ";
-
+	
 	ires <<  i_minMJD;
 	ires.precision( 2 );
 	ires << " : " << i_min;
-
+	
 	ires.precision( 0 );
 	ires << "\t| " << i_maxMJD;
 	ires.precision( 2 );
 	ires << " : " << i_max;
-
+	
 	ires << "\t| " << i_dur  << " [" << i_dur / 60. << "]";
-
+	
 	return ires.str();
 }
 
@@ -243,7 +243,7 @@ int VStereoAnalysis::getDataRunNumber() const
 			return fDataRun->runNumber;
 		}
 	}
-
+	
 	exit( EXIT_FAILURE );
 	return 0;
 }
@@ -265,9 +265,9 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	{
 		cout << "DEBUG double VStereoAnalysis::fillHistograms() "  << icounter << "\t" << irun << endl;
 	}
-
+	
 	fHisCounter = icounter;
-
+	
 	////////////////////////////////////////////////
 	// combine all histograms from all runs
 	if( irun < 0 )
@@ -275,8 +275,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 		fHisCounter = -1;
 		return combineHistograms();
 	}
-	////////////////////////////////////////////////
-
+	
 	////////////////////////////////////////////////
 	// analyze individual run
 	if( fIsOn )
@@ -289,7 +288,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 		cout << endl << "------------------------------------------------------------------------" << endl;
 		cout << "Filling OFF histograms for run " << irun << " -----------------------------" << endl;
 	}
-
+	
 	// set pointer to data tree (run wise)
 	fDataRun = getDataFromFile( irun );
 	if( fDataRun == 0 || fDataRunTree == 0 )
@@ -304,13 +303,13 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 		cout << "VStereoAnalysis::fillHistograms invalid run number " << irun << "\t" << fHisCounter << "\t" << fHisto.size() << endl;
 		exit( EXIT_FAILURE );
 	}
-
+	
 	double iMJDStart = 0.;
 	double iMJDStopp = 0.;
 	if( getDataRunNumber() != irun )
 	{
 		cout << "VStereoAnalysis::fillHistograms warning: given run (" << irun;
-        cout << ") does not match run of given tree (" << getDataRunNumber() << ")" << endl;
+		cout << ") does not match run of given tree (" << getDataRunNumber() << ")" << endl;
 	}
 	else
 	{
@@ -327,31 +326,31 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	}
 	//////////////////////////////////////////
 	// boolean for gamma/hadron cuts
-
+	
 	// event is gamma-ray like according to VGammaHadronCuts
 	bIsGamma = false;
 	// event direction is inside search region (e.g. reflected region)
 	bool bDirectionCuts = false;
 	// successfull energy reconstruction
 	bool bEnergyQualityCuts = false;
-
+	
 	// rate vectors
 	vector< double > iRateCounts;
 	vector< double > iRateTime;
 	vector< double > iRateTimeIntervall;
-
+	
 	// initialize time mask
 	fTimeMask->setMask( irun, iMJDStart, iMJDStopp, fRunPara->fTimeMaskFile );
-    fRunPara->setRunTimes( icounter, iMJDStart, iMJDStopp );
-
+	fRunPara->setRunTimes( icounter, iMJDStart, iMJDStopp );
+	
 	// initialize cuts
 	setCuts( fRunPara->fRunList[fHisCounter], irun );
-
+	
 	// define histograms
 	fDirTotRun[fHisCounter]->cd();
 	fHisto[fHisCounter]->setRunNumber( irun );
 	fHisto[fHisCounter]->defineHistograms();
-
+	
 	// adjust dead time calculator
 	TDirectoryFile* iDeadtimeDirectory = 0;
 	if( fDataFile )
@@ -366,47 +365,47 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	{
 		fDeadTime[fHisCounter]->defineHistograms();
 	}
-
+	
 	// adjust axis in rate histograms
 	fHisto[fHisCounter]->makeRateHistograms( iMJDStart, iMJDStopp );
-
+	
 	// set map properties
 	fMap->setData( fDataRun );
 	fMap->setTargetShift( fRunPara->fRunList[fHisCounter].fTargetShiftWest, fRunPara->fRunList[fHisCounter].fTargetShiftNorth );
 	fMap->setRegionToExclude( fRunPara->fExclusionRegions );
 	fMap->setNoSkyPlots( fNoSkyPlots );
 	fMap->setRunList( fRunPara->fRunList[fHisCounter] );
-	fMap->setHistograms( fHisto[fHisCounter]->hmap_stereo, 
-                         fHisto[fHisCounter]->hmap_alpha, 
-                         fHisto[fHisCounter]->hmap_MeanSignalBackgroundAreaRatio );
-
+	fMap->setHistograms( fHisto[fHisCounter]->hmap_stereo,
+						 fHisto[fHisCounter]->hmap_alpha,
+						 fHisto[fHisCounter]->hmap_MeanSignalBackgroundAreaRatio );
+						 
 	fMapUC->setData( fDataRun );
 	fMapUC->setTargetShift( fRunPara->fRunList[fHisCounter].fTargetShiftWest, fRunPara->fRunList[fHisCounter].fTargetShiftNorth );
 	fMapUC->setRegionToExclude( fRunPara->fExclusionRegions );
 	fMapUC->setNoSkyPlots( fNoSkyPlots );
 	fMapUC->setRunList( fRunPara->fRunList[fHisCounter] );
 	fMapUC->setHistograms( fHisto[fHisCounter]->hmap_stereoUC, fHisto[fHisCounter]->hmap_alphaUC, 0 );
-
+	
 	// initialize gamma/hadron cuts
 	fCuts->setDataTree( fDataRun );
-
+	
 	// tree with selected events
 	init_TreeWithSelectedEvents( irun, fIsOn );
-
+	
 	if( fIsOn )
 	{
 		init_DL3Tree( irun, fHisCounter );
 	}
-
+	
 	// spectral energy reconstruction (effective areas, etc.)
 	// effective area class
 	VEffectiveAreaCalculator fEnergy( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, iAzMin, iAzMax, iPedVar,
-				  fRunPara->fEnergyReconstructionSpectralIndex, fRunPara->fMCZe,
-				  fRunPara->fEnergyEffectiveAreaSmoothingIterations,
-				  fRunPara->fEnergyEffectiveAreaSmoothingThreshold, 
-                  fRunPara->fEffectiveAreaVsEnergyMC,
-				  fRunPara->fLikelihoodAnalysis);
-
+									  fRunPara->fEnergyReconstructionSpectralIndex, fRunPara->fMCZe,
+									  fRunPara->fEnergyEffectiveAreaSmoothingIterations,
+									  fRunPara->fEnergyEffectiveAreaSmoothingThreshold,
+									  fRunPara->fEffectiveAreaVsEnergyMC,
+									  fRunPara->fLikelihoodAnalysis );
+									  
 	double iEnergyWeighting = 1.;
 	double iErec = 0.;
 	double iErecChi2 = 0.;
@@ -417,18 +416,18 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	// variable to set the real duration of each time bin
 	double time_of_EVENT = 0;
 	int index_time_bin_NOW  = 1;
-
+	
 	double i_UTC = 0.;
 	double i_xderot = -99.;
 	double i_yderot = -99.;
 	double i_theta2 = -99.;
-
+	
 	// mean direction values
 	fMeanAzimuth = 0.;
 	fMeanElevation = 0.;
 	fNMeanElevation = 0.;
 	double iDirectionOffset = 0.;
-
+	
 	// get number of entries from data tree
 	Int_t nentries = Int_t( fDataRun->fChain->GetEntries() );
 	if( fDebug )
@@ -436,24 +435,24 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 		cout << "DEBUG double VStereoAnalysis::fillHistograms() reading chain " << fDataRun->fChain->GetName() << "\t" << nentries << endl;
 	}
 	cout << "\t number of entries for this run: " << nentries << endl;
-
+	
 	double i_count = 0.;
 	int nentries_run = 0;
-
+	
 	/////////////////////////////////////////////////////////////////////
 	// loop over all entries/events in the data tree
 	for( int i = 0; i < nentries; i++ )
 	{
 		fDataRun->GetEntry( i );
-
+		
 		if( fDataRun->runNumber == irun )
 		{
 			// count how many entries are in this run
 			nentries_run++;
-
+			
 			// UTC time
 			i_UTC = VSkyCoordinatesUtilities::getUTC( fDataRun->MJD, fDataRun->Time );
-
+			
 			// phase cuts - this is also a time cut that adds to the previously initialized mask
 			if( !fCuts->applyPhaseCut( i ) )
 			{
@@ -465,25 +464,25 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			{
 				continue;
 			}
-
+			
 			// fill rate histograms
 			fHisto[fHisCounter]->hrate_1sec->Fill( i_UTC );
 			fHisto[fHisCounter]->hrate_10sec->Fill( i_UTC );
 			fHisto[fHisCounter]->hrate_1min->Fill( i_UTC );
-
+			
 			// dead time calculation
 			if( !iDeadtimeDirectory )
 			{
 				fDeadTime[fHisCounter]->fillDeadTime( fDataRun->Time );
 			}
-
+			
 			// get energy (depending on energy reconstruction method)
 			iErec = fCuts->getReconstructedEnergy( fRunPara->fEnergyReconstructionMethod );
 			iErecChi2 = fCuts->getReconstructedEnergyChi2( fRunPara->fEnergyReconstructionMethod );
 			// get shower direction (depending on shower reconstruction method)
 			iXoff = fCuts->getReconstructedXoff();
 			iYoff = fCuts->getReconstructedYoff();
-
+			
 			////////////////////////////////////////////////
 			// apply all quality cuts
 			//
@@ -492,40 +491,36 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			{
 				continue;
 			}
-
+			
 			// stereo quality cuts (e.g. successful direction, mscw, mscl reconstruction)
 			if( !fCuts->applyStereoQualityCuts( fRunPara->fEnergyReconstructionMethod, false, i , fIsOn ) )
 			{
 				continue;
 			}
-
+			
 			// fill image and trigger pattern histograms
 			fHisto[fHisCounter]->hTriggerPatternBeforeCuts->Fill( fDataRun->LTrig );
 			fHisto[fHisCounter]->hImagePatternBeforeCuts->Fill( fDataRun->ImgSel );
-
-			// direction offset
+			
 			iDirectionOffset = sqrt( iXoff * iXoff + iYoff * iYoff );
-
-			// derotate coordinates
-            // (sign change in Y important - GrISU inspired coordinate system)
-			getDerotatedCoordinates( icounter, i_UTC, iXoff, -1.* iYoff,  i_xderot, i_yderot );
-
+			getDerotatedCoordinates( icounter, i_UTC, iXoff, iYoff,  i_xderot, i_yderot );
+			
 			// gamma/hadron cuts
 			bIsGamma = fCuts->isGamma( i, false, fIsOn );
-
+			
 			// fill on/offstereo maps and direction cut
 			i_theta2 = -99;
 			bDirectionCuts = fMap->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max( iErec ),
 										 fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma, i_theta2 );
 			bDirectionCuts = fMapUC->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max( iErec ),
 										   fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma, i_theta2 );
-
+										   
 			// energy reconstruction cut
 			bEnergyQualityCuts = fCuts->applyEnergyReconstructionQualityCuts( fRunPara->fEnergyReconstructionMethod );
-
+			
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
 			// following histograms (theta2, mscw, mscl, core position, etc.)  assume source at given target position
-
+			
 			// theta2 ---
 			fMap->calculateTheta2( fIsOn, i_xderot, i_yderot );
 			// theta2 values for debugging
@@ -533,7 +528,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			{
 				fDataRun->theta2_All[dex] = fMap->getTheta2_All()[dex];
 			}
-
+			
 			for( unsigned int t = 0; t < fMap->getTheta2_length(); t++ )
 			{
 				fHisto[fHisCounter]->htheta2->Fill( fMap->getTheta2()[t], fMap->getTheta2_weigth()[t] );
@@ -547,14 +542,14 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			{
 				fDataRun->theta2 = -1;
 			}
-
+			
 			/////////////////////////////////////////////////////////
 			// histograms after shape (or other gamma/hadron separation cuts) cuts only
 			if( bIsGamma )
 			{
 				fHisto[fHisCounter]->hxyoff_stereo->Fill( iXoff, iYoff );
 			}
-
+			
 			/////////////////////////////////////////////////////////
 			// histograms after direction cuts only
 			//
@@ -595,9 +590,9 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 				// fill a tree with the selected events (after direction cut only)
 				fill_TreeWithSelectedEvents( fDataRun, i_xderot, i_yderot, i_theta2 );
 			}
-
+			
 			// fill a tree with current event for DL3 converter
-			if( fIsOn && ( bIsGamma || fRunPara->fWriteAllEvents ))
+			if( fIsOn && ( bIsGamma || fRunPara->fWriteAllEvents ) )
 			{
 				fill_DL3Tree( fDataRun, i_xderot, i_yderot, icounter, i_UTC );
 			}
@@ -622,7 +617,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 					fHisto[fHisCounter]->herecCounts2D_vs_distance->Fill( log10( iErec ), iDirectionOffset, iWeight );
 				}
 			}
-
+			
 			/////////////////////////////////////////////////////////
 			// histograms after all cuts ( shape and direction cuts )
 			//
@@ -653,7 +648,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 									   iDirectionOffset, iPedVar_temp,
 									   fRunPara->fEnergyReconstructionSpectralIndex, true,
 									   fRunPara->fEffectiveAreaVsEnergyMC );
-
+									   
 					// fill energy histograms: require a valid effective area value
 					if( iEnergyWeighting > 0. )
 					{
@@ -668,18 +663,22 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 						fHisto[fHisCounter]->hLinerecEffectiveArea->Fill( iErec, 1. / iEnergyWeighting );
 						// filling the effective area for each time bin
 						double time_of_previous_EVENT = time_of_EVENT;
-						time_of_EVENT = ( ( double )fDataRun->Time - f_t_in_s_min[irun]);
+						time_of_EVENT = ( ( double )fDataRun->Time - f_t_in_s_min[irun] );
 						double index_time_bin_PREVIOUS_EVENT = index_time_bin_NOW;
-						index_time_bin_NOW = fHisto[fHisCounter]->hRealDuration1DtimeBinned->FindFixBin(time_of_EVENT);
-
-						if(time_of_previous_EVENT>time_of_EVENT) std::cout<<"ERROR events are not ordered chronolically "<<std::endl;
-
-						if(index_time_bin_PREVIOUS_EVENT != index_time_bin_NOW){
-						 //--- we just got into a new time bin
-						 // getting the effective area for the time bin we just left
-						 fEnergy.setTimeBin( fHisto[fHisCounter]->hRealDuration1DtimeBinned->GetBinCenter(index_time_bin_PREVIOUS_EVENT) );
-						 fEnergy.setTimeBinnedMeanEffectiveArea();
-						 fEnergy.resetTimeBin();
+						index_time_bin_NOW = fHisto[fHisCounter]->hRealDuration1DtimeBinned->FindFixBin( time_of_EVENT );
+						
+						if( time_of_previous_EVENT > time_of_EVENT )
+						{
+							std::cout << "ERROR events are not ordered chronolically " << std::endl;
+						}
+						
+						if( index_time_bin_PREVIOUS_EVENT != index_time_bin_NOW )
+						{
+							//--- we just got into a new time bin
+							// getting the effective area for the time bin we just left
+							fEnergy.setTimeBin( fHisto[fHisCounter]->hRealDuration1DtimeBinned->GetBinCenter( index_time_bin_PREVIOUS_EVENT ) );
+							fEnergy.setTimeBinnedMeanEffectiveArea();
+							fEnergy.resetTimeBin();
 						}
 					}
 				}
@@ -707,40 +706,40 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	}
 	// END: loop over all entries/events in the data tree
 	/////////////////////////////////////////////////////////////////////
-
+	
 	// filling the effective area for last time bin
 	// fill energy histograms: require a valid effective area value
-    if( iEnergyWeighting > 0. )
-    {
-         fEnergy.setTimeBin( fHisto[fHisCounter]->hRealDuration1DtimeBinned->GetBinCenter(index_time_bin_NOW) );
-         fEnergy.setTimeBinnedMeanEffectiveArea();
-         fEnergy.resetTimeBin();
-    }
-    // filling the histo with the duration of the time bin
-    // looping over the mask seconds
-    for(unsigned int i_s = 0 ; i_s < fTimeMask->getMaskSize() ; i_s++)
-    {
-         if(fTimeMask->getMask()[i_s])
-         {
-              // dead time is taken into account for each second
-              double dead_time_fraction = fDeadTime[fHisCounter]->getDeadTimeFraction( ( double )i_s + 0.5,fRunPara->fDeadTimeCalculationMethod );
-              fHisto[fHisCounter]->hRealDuration1DtimeBinned->Fill(i_s,1-dead_time_fraction);
-         }
-
-    }
-
+	if( iEnergyWeighting > 0. )
+	{
+		fEnergy.setTimeBin( fHisto[fHisCounter]->hRealDuration1DtimeBinned->GetBinCenter( index_time_bin_NOW ) );
+		fEnergy.setTimeBinnedMeanEffectiveArea();
+		fEnergy.resetTimeBin();
+	}
+	// filling the histo with the duration of the time bin
+	// looping over the mask seconds
+	for( unsigned int i_s = 0 ; i_s < fTimeMask->getMaskSize() ; i_s++ )
+	{
+		if( fTimeMask->getMask()[i_s] )
+		{
+			// dead time is taken into account for each second
+			double dead_time_fraction = fDeadTime[fHisCounter]->getDeadTimeFraction( ( double )i_s + 0.5, fRunPara->fDeadTimeCalculationMethod );
+			fHisto[fHisCounter]->hRealDuration1DtimeBinned->Fill( i_s, 1 - dead_time_fraction );
+		}
+		
+	}
+	
 	// fill rate vectors
 	fTimeMask->getIntervalRates( iRateCounts, iRateTime, iRateTimeIntervall, fRunPara->fTimeIntervall );
 	fRateCounts[fHisCounter] = iRateCounts;
 	fRateTime[fHisCounter] = iRateTime;
 	fRateTimeIntervall[fHisCounter] = iRateTimeIntervall;
-
+	
 	// finalize sky maps
 	fMap->finalize( fIsOn, fCuts->getProbabilityCutAlpha( fIsOn ) );
 	fMapUC->finalize( fIsOn, fCuts->getProbabilityCutAlpha( fIsOn ) );
-
+	
 	fTotCount += i_count;
-
+	
 	// calculate mean elevation
 	if( fNMeanElevation > 0. )
 	{
@@ -759,38 +758,38 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	{
 		gMeanEsys_MC = ( TGraphErrors* )gMeanEsys_MC->Clone();
 	}
-
+	
 	// Likelihood analysis
-	if ( fRunPara->fLikelihoodAnalysis )
+	if( fRunPara->fLikelihoodAnalysis )
 	{
-
+	
 		gMeanEffectiveAreaMC = ( TGraphAsymmErrors* )fEnergy.getMeanEffectiveAreaMC();
 		if( gMeanEffectiveAreaMC )
 		{
 			gMeanEffectiveAreaMC = ( TGraphAsymmErrors* )gMeanEffectiveAreaMC->Clone();
 		}
-
+		
 		hResponseMatrix = ( TH2F* ) fEnergy.getMeanResponseMatrix();
-		if ( hResponseMatrix )
+		if( hResponseMatrix )
 		{
 			hResponseMatrix = ( TH2F* )hResponseMatrix->Clone();
-        }
-        else
-        {
-            cout << "\t error: no response matrix found" << endl;
+		}
+		else
+		{
+			cout << "\t error: no response matrix found" << endl;
 			cout << "\t Creating empty TH2D" << endl;
-			hResponseMatrix = new TH2F("hResponseMatrix", "hResponseMatrix", 10, -1, 1, 10 , -1 , 1 );
-        }
-        if( fIsOn )
-        {
-             hResponseMatrix->SetName( "hResponseMatrix_on" );
-        }
-        else
-        {
-             hResponseMatrix->SetName( "hResponseMatrix_off" );
-        }
+			hResponseMatrix = new TH2F( "hResponseMatrix", "hResponseMatrix", 10, -1, 1, 10 , -1 , 1 );
+		}
+		if( fIsOn )
+		{
+			hResponseMatrix->SetName( "hResponseMatrix_on" );
+		}
+		else
+		{
+			hResponseMatrix->SetName( "hResponseMatrix_off" );
+		}
 	}
-
+	
 	// get mean effective area for TIME BINs
 	gTimeBinnedMeanEffectiveArea = ( TGraph2DErrors* )fEnergy.getTimeBinnedMeanEffectiveArea()->Clone();
 	// get dead time
@@ -803,7 +802,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 		fDeadTime[fHisCounter]->calculateDeadTime();
 	}
 	fDeadTime[fHisCounter]->printDeadTime();
-
+	
 	// get mean run times after time cuts
 	fRunExposure[irun] = fTimeMask->getEffectiveDuration();
 	fRunMJD[irun] = fTimeMask->getMeanUTC_Mask();
@@ -841,10 +840,10 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 			iTimeMask->Write( "vtimemask" );
 		}
 		fHisto[fHisCounter]->writeHistograms();
-
+		
 		// need to grab fScalarDeadTimeFrac while fDeadTime histograms are intact,
 		fRunPara->fScalarDeadTimeFrac = fDeadTime[fHisCounter]->getDeadTimeFraction( fTimeMask->getMask(), fRunPara->fDeadTimeCalculationMethod );
-
+		
 		fDeadTime[fHisCounter]->writeHistograms();
 		// copy effective areas and radial acceptance to anasum output file
 		if( bOn )
@@ -852,28 +851,28 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveArea );
 			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveArea );
 			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEsys_MC );
-
+			
 			// Both MC and REC  effective areas are required for Binned Likelihood analysis
-			if ( fRunPara->fLikelihoodAnalysis )
+			if( fRunPara->fLikelihoodAnalysis )
 			{
-                                if( gMeanEffectiveAreaMC )
-                                {
-                                    // (SOB) When nOn = 0 gMeanEffectiveAreaMC_on(E) = 0
-                                    // VLikelihoodFitter will check gMeanEffectiveAreaMC_on::integral > 1
-                                    gMeanEffectiveAreaMC->SetTitle("gMeanEffectiveAreaMC_on");
-                                    gMeanEffectiveAreaMC->SetName("gMeanEffectiveAreaMC_on");
-
-                                    fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveAreaMC );
-                                }
-                                if( hResponseMatrix )
-                                {
-                                    hResponseMatrix->SetTitle("hResponseMatrix_on");
-                                    hResponseMatrix->SetName("hResponseMatrix_on");
-                                    fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", hResponseMatrix );
-                                }
+				if( gMeanEffectiveAreaMC )
+				{
+					// (SOB) When nOn = 0 gMeanEffectiveAreaMC_on(E) = 0
+					// VLikelihoodFitter will check gMeanEffectiveAreaMC_on::integral > 1
+					gMeanEffectiveAreaMC->SetTitle( "gMeanEffectiveAreaMC_on" );
+					gMeanEffectiveAreaMC->SetName( "gMeanEffectiveAreaMC_on" );
+					
+					fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveAreaMC );
+				}
+				if( hResponseMatrix )
+				{
+					hResponseMatrix->SetTitle( "hResponseMatrix_on" );
+					hResponseMatrix->SetName( "hResponseMatrix_on" );
+					fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", hResponseMatrix );
+				}
 			}
-			if( fRunPara->fRunList[fHisCounter].fAcceptanceFile.size() > 0 
-                        && fRunPara->fRunList[fHisCounter].fAcceptanceFile != "IGNOREACCEPTANCE" )
+			if( fRunPara->fRunList[fHisCounter].fAcceptanceFile.size() > 0
+					&& fRunPara->fRunList[fHisCounter].fAcceptanceFile != "IGNOREACCEPTANCE" )
 			{
 				fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fAcceptanceFile, "RadialAcceptances", 0 );
 			}
@@ -893,29 +892,33 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 			}
 			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveArea );
 			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveArea );
-
+			
 			// Both MC and REC  effective areas are required for Binned Likelihood analysis
-                        // (SOB) A set of Off MC effective areas and response matrix are used as a back up
-                        // If zero On counts the Off set will be used
-			if ( fRunPara->fLikelihoodAnalysis )
+			// (SOB) A set of Off MC effective areas and response matrix are used as a back up
+			// If zero On counts the Off set will be used
+			if( fRunPara->fLikelihoodAnalysis )
 			{
 				if( gMeanEffectiveAreaMC )
 				{
-					gMeanEffectiveAreaMC->SetTitle("gMeanEffectiveAreaMC_off");
-					gMeanEffectiveAreaMC->SetName("gMeanEffectiveAreaMC_off");
+					gMeanEffectiveAreaMC->SetTitle( "gMeanEffectiveAreaMC_off" );
+					gMeanEffectiveAreaMC->SetName( "gMeanEffectiveAreaMC_off" );
 					fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveAreaMC );
 				}
 				if( hResponseMatrix )
 				{
-					hResponseMatrix->SetTitle("hResponseMatrix_off");
-					hResponseMatrix->SetName("hResponseMatrix_off");
+					hResponseMatrix->SetTitle( "hResponseMatrix_off" );
+					hResponseMatrix->SetName( "hResponseMatrix_off" );
 					fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", hResponseMatrix );
 				}
 			}
 		}
 		if( fDL3EventTree && fIsOn )
 		{
-		     write_DL3Tree() ;
+			write_DL3Tree() ;
+		}
+		if( fTreeSelectedEvents && fRunPara->fWriteDataOnOffTrees )
+		{
+			fTreeSelectedEvents->Write();
 		}
 	}
 }
@@ -927,9 +930,9 @@ void VStereoAnalysis::writeDebugHistograms()
 	{
 		cout << "DEBUG void VStereoAnalysis::writeDebugHistograms()" << endl;
 	}
-
+	
 	TDirectory* iDir = gDirectory;
-
+	
 	if( iDir->mkdir( "debug" )->cd() )
 	{
 		if( fMap && fMap->getAux_hisList() )
@@ -938,7 +941,7 @@ void VStereoAnalysis::writeDebugHistograms()
 			fMap->getAux_hisList()->Delete();
 		}
 	}
-
+	
 	iDir->cd();
 }
 
@@ -993,7 +996,7 @@ void VStereoAnalysis::scaleAlpha( TH2D* halpha_on, bool bUC )
 		cout << halpha_off << "\t" << hmap_alphaNorm << endl;
 		exit( EXIT_FAILURE );
 	}
-
+	
 	// halpha_on: on alpha histogram
 	// halpha_off: off alpha histogram
 	// hmap_alphaNorm: alpha histogram used in significance calculations (alphaNorm)
@@ -1024,14 +1027,14 @@ void VStereoAnalysis::scaleAlpha( TH2D* halpha_on, bool bUC )
 double VStereoAnalysis::combineHistograms()
 {
 	unsigned int n_histo = fHisto.size();
-
+	
 	TDirectory* iDir = gDirectory;
 	fDirTot->cd();
 	fHistoTot->defineHistograms();
-
+	
 	// list of trees with selected events
 	iDir->cd();
-
+	
 	///////////////////////////////////////////////////
 	// loop over all runs (= all available histograms = n_histo)
 	for( unsigned h = 0; h < n_histo; h++ )
@@ -1039,7 +1042,7 @@ double VStereoAnalysis::combineHistograms()
 		fDirTotRun[h]->cd();
 		// read in sky plots from disk
 		fHisto[h]->readSkyPlots();
-
+		
 		/////////////////////////////
 		// UNCORRELATED PLOTS
 		int nxbin = fHistoTot->hmap_stereoUC->GetNbinsX();
@@ -1105,7 +1108,7 @@ double VStereoAnalysis::combineHistograms()
 		fHisto[h]->deleteSkyPlots();
 		iDir->cd();
 	}  // (end loop over all histograms)
-
+	
 	//////////////////////////////////////
 	// errors in sky maps (counting error)
 	for( int i = 1; i <= fHistoTot->hmap_stereoUC->GetNbinsX(); i++ )
@@ -1128,7 +1131,7 @@ double VStereoAnalysis::combineHistograms()
 			}
 		}
 	}
-
+	
 	//////////////////////////////////////
 	// combine parameter (1D) histograms
 	for( unsigned int h = 0; h < n_histo; h++ )
@@ -1145,7 +1148,7 @@ double VStereoAnalysis::combineHistograms()
 			{
 				continue;
 			}
-
+			
 			string iTemp = h1->GetName();
 			if( iTemp.find( "2D" ) != string::npos )
 			{
@@ -1160,7 +1163,7 @@ double VStereoAnalysis::combineHistograms()
 		fHisto[h]->deleteParameterHistograms();
 	}
 	iDir->cd();
-
+	
 	// combine rate vectors (in time intervalls)
 	for( unsigned int h = 0; h < n_histo; h++ )
 	{
@@ -1177,7 +1180,7 @@ double VStereoAnalysis::combineHistograms()
 			fRateTimeIntervallTot.push_back( fRateTimeIntervall[h][i] );
 		}
 	}
-
+	
 	iDir->cd();
 	return fTotCount;
 }
@@ -1188,7 +1191,7 @@ TH1D* VStereoAnalysis::getMeanSignalBackgroundAreaRatio()
 	{
 		return fHistoTot->hmap_MeanSignalBackgroundAreaRatio;
 	}
-
+	
 	return fHisto[fHisCounter]->hmap_MeanSignalBackgroundAreaRatio;
 }
 
@@ -1198,7 +1201,7 @@ TH1D* VStereoAnalysis::getMeanSignalBackgroundAreaRatioUC()
 	{
 		return fHistoTot->hmap_MeanSignalBackgroundAreaRatioUC;
 	}
-
+	
 	return fHisto[fHisCounter]->hmap_MeanSignalBackgroundAreaRatioUC;
 }
 
@@ -1209,12 +1212,12 @@ TH2D* VStereoAnalysis::getAlpha()
 	{
 		cout << "VStereoAnalysis::getAlpha() " << fHisCounter << endl;
 	}
-
+	
 	if( fHisCounter < 0 )
 	{
 		return fHistoTot->hmap_alpha;
 	}
-
+	
 	return fHisto[fHisCounter]->hmap_alpha;
 }
 
@@ -1225,12 +1228,12 @@ TH2D* VStereoAnalysis::getAlphaUC()
 	{
 		cout << "VStereoAnalysis::getAlphaUC() " << fHisCounter << endl;
 	}
-
+	
 	if( fHisCounter < 0 )
 	{
 		return fHistoTot->hmap_alphaUC;
 	}
-
+	
 	return fHisto[fHisCounter]->hmap_alphaUC;
 }
 
@@ -1241,12 +1244,12 @@ TH2D* VStereoAnalysis::getAlphaNorm()
 	{
 		cout << "VStereoAnalysis::getAlphaNorm() " << fHisCounter << endl;
 	}
-
+	
 	if( fHisCounter < 0 )
 	{
 		return fHistoTot->hmap_alphaNorm;
 	}
-
+	
 	return fHisto[fHisCounter]->hmap_alphaNorm;
 }
 
@@ -1257,12 +1260,12 @@ TH2D* VStereoAnalysis::getAlphaNormUC()
 	{
 		cout << "VStereoAnalysis::getAlphaNormUC() " << fHisCounter << endl;
 	}
-
+	
 	if( fHisCounter < 0 )
 	{
 		return fHistoTot->hmap_alphaNormUC;
 	}
-
+	
 	return fHisto[fHisCounter]->hmap_alphaNormUC;
 }
 
@@ -1273,7 +1276,7 @@ TList* VStereoAnalysis::getHisList()
 	{
 		return fHistoTot->hisList;
 	}
-
+	
 	return fHisto[fHisCounter]->hisList;
 }
 
@@ -1284,7 +1287,7 @@ TList* VStereoAnalysis::getSkyHistograms( bool bUC )
 	{
 		cout << "VStereoAnalysis::getSkyHistograms() " << fHisCounter << "\t" << bUC << endl;
 	}
-
+	
 	// uncorrelated plot
 	if( bUC )
 	{
@@ -1309,7 +1312,7 @@ TList* VStereoAnalysis::getParameterHistograms()
 	{
 		return fHistoTot->hListParameterHistograms;
 	}
-
+	
 	return fHisto[fHisCounter]->hListParameterHistograms;
 }
 
@@ -1320,12 +1323,12 @@ TH2D* VStereoAnalysis::getStereoSkyMapUC()
 	{
 		cout << "VStereoAnalysis::getStereoSkyMapUC()" << "\t" << fHisCounter << endl;
 	}
-
+	
 	if( fHisCounter < 0 )
 	{
 		return fHistoTot->hmap_stereoUC;
 	}
-
+	
 	return fHisto[fHisCounter]->hmap_stereoUC;
 }
 
@@ -1336,12 +1339,12 @@ TH2D* VStereoAnalysis::getStereoSkyMap()
 	{
 		cout << "VStereoAnalysis::getStereoSkyMap()" << "\t" << fHisCounter << endl;
 	}
-
+	
 	if( fHisCounter < 0 )
 	{
 		return fHistoTot->hmap_stereo;
 	}
-
+	
 	return fHisto[fHisCounter]->hmap_stereo;
 }
 
@@ -1352,12 +1355,12 @@ double VStereoAnalysis::getDeadTimeFraction()
 	{
 		cout << "VStereoAnalysis::getDeadTimeFraction()" << endl;
 	}
-
+	
 	if( fHisCounter < 0 )
 	{
 		return 0.;
 	}
-
+	
 	if( fHisCounter < ( int )fDeadTime.size() )
 	{
 		// dead time depending on time mask
@@ -1367,13 +1370,367 @@ double VStereoAnalysis::getDeadTimeFraction()
 		}
 		return fDeadTime[fHisCounter]->getDeadTimeFraction( -1, fRunPara->fDeadTimeCalculationMethod );
 	}
-
+	
 	return 0.;
 }
 
+void VStereoAnalysis::astro_check_for_valid_coordinates( unsigned int runlist_iter )
+{
+	// (this is the target of observation)
+	/////////////////////////////////////////////////////////
+	if( fRunPara->fRunList[runlist_iter].fTargetDecJ2000 < -89.99 )
+	{
+		cout << "ERROR in VStereoAnalysis::astro_check_for_valid_coordinates: invalid target ";
+		cout << fRunPara->fRunList[runlist_iter].fTarget << endl;
+		cout << "\t run " << fRunPara->fRunList[runlist_iter].fRunOn << "\t" << fRunPara->fRunList[runlist_iter].fTarget;
+		cout << fRunPara->fRunList[runlist_iter].fTargetDecJ2000 << "\t" << fRunPara->fRunList[runlist_iter].fTargetShiftDecJ2000 << endl;
+		exit( EXIT_FAILURE );
+	}
+}
+
+void VStereoAnalysis::astro_set_skymap_center_from_runparameters( unsigned int runlist_iter )
+{
+	/////////////////////////////////////////////////////////
+	// Case 1: sky map centre is given as xy offset [deg] in runparameter file
+	if( TMath::Abs( fRunPara->fSkyMapCentreNorth ) > 1.e-8 || TMath::Abs( fRunPara->fSkyMapCentreWest ) > 1.e-8 )
+	{
+		fRunPara->fRunList[runlist_iter].fSkyMapCentreWest  = fRunPara->fSkyMapCentreWest;
+		fRunPara->fRunList[runlist_iter].fSkyMapCentreNorth = fRunPara->fSkyMapCentreNorth;
+		double i_decDiff =  0.;   // offset in dec
+		double i_raDiff = 0.;     // offset in ra
+		VSkyCoordinatesUtilities::getWobbleOffset_in_RADec(
+			fRunPara->fRunList[runlist_iter].fSkyMapCentreNorth,
+			fRunPara->fRunList[runlist_iter].fSkyMapCentreWest,
+			fRunPara->fRunList[runlist_iter].fTargetRAJ2000, fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
+			i_decDiff, i_raDiff );
+		fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000  = fRunPara->fRunList[runlist_iter].fTargetRAJ2000 + i_raDiff;
+		fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000 = fRunPara->fRunList[runlist_iter].fTargetDecJ2000 + i_decDiff;
+	}
+	// Case 2: sky map centre is given in J200 in runparameter file
+	// (this is in almost all analysis the usual/default case)
+	else if( TMath::Abs( fRunPara->fSkyMapCentreRAJ2000 ) > 1.e-8 )
+	{
+		fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000  = fRunPara->fSkyMapCentreRAJ2000;
+		fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000 = fRunPara->fSkyMapCentreDecJ2000;
+		fRunPara->fRunList[runlist_iter].fSkyMapCentreWest =
+			VSkyCoordinatesUtilities::getTargetShiftWest(
+				fRunPara->fRunList[runlist_iter].fTargetRAJ2000, fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
+				fRunPara->fSkyMapCentreRAJ2000, fRunPara->fSkyMapCentreDecJ2000 ) * -1.;
+		fRunPara->fRunList[runlist_iter].fSkyMapCentreNorth =
+			VSkyCoordinatesUtilities::getTargetShiftNorth(
+				fRunPara->fRunList[runlist_iter].fTargetRAJ2000, fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
+				fRunPara->fSkyMapCentreRAJ2000, fRunPara->fSkyMapCentreDecJ2000 );
+	}
+	// if not set in runparameter file: set to target direction
+	else
+	{
+		fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000 = fRunPara->fRunList[runlist_iter].fTargetRAJ2000;
+		fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000 = fRunPara->fRunList[runlist_iter].fTargetDecJ2000;
+		fRunPara->fSkyMapCentreRAJ2000 = fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000;
+		fRunPara->fSkyMapCentreDecJ2000 = fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000;
+	}
+}
+
+void VStereoAnalysis::astro_set_skymap_centershift_from_runparameters( unsigned int runlist_iter )
+{
+	/////////////////////////////////////////////////////////
+	// from runparameter file: set and get target shifts
+	// (calculated relative to sky map centre)
+	// (this is the position where all 1D histograms (theta2, energy spectra, etc) are calculated)
+	if( fIsOn )
+	{
+		if( TMath::Abs( fRunPara->fTargetShiftDecJ2000 ) > 1.e-8 || TMath::Abs( fRunPara->fTargetShiftRAJ2000 ) > 1.e-8 )
+		{
+			fRunPara->fRunList[runlist_iter].fTargetShiftWest = VSkyCoordinatesUtilities::getTargetShiftWest(
+						fRunPara->fRunList[runlist_iter].fTargetRAJ2000, fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
+						fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
+			fRunPara->fRunList[runlist_iter].fTargetShiftNorth = -1.*VSkyCoordinatesUtilities::getTargetShiftNorth(
+						fRunPara->fRunList[runlist_iter].fTargetRAJ2000, fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
+						fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
+						
+			fRunPara->fRunList[runlist_iter].fTargetShiftWest  += fRunPara->fRunList[runlist_iter].fSkyMapCentreWest;
+			fRunPara->fRunList[runlist_iter].fTargetShiftNorth += fRunPara->fRunList[runlist_iter].fSkyMapCentreNorth;
+		}
+		else
+		{
+			fRunPara->fRunList[runlist_iter].fTargetShiftWest  = fRunPara->fTargetShiftWest;
+			fRunPara->fRunList[runlist_iter].fTargetShiftNorth = fRunPara->fTargetShiftNorth;
+		}
+		fRunPara->fRunList[runlist_iter].fTargetShiftWest *= -1.;
+		fRunPara->fTargetShiftWest = fRunPara->fRunList[runlist_iter].fTargetShiftWest;
+		fRunPara->fTargetShiftNorth = fRunPara->fRunList[runlist_iter].fTargetShiftNorth;
+		fRunPara->setTargetShifts( runlist_iter );
+	}
+}
+
+double VStereoAnalysis::astro_get_mjd( unsigned int runlist_iter )
+{
+	double iMJD = ( double )fRunPara->fRunList[runlist_iter].fMJDOn;
+	if( !fIsOn )
+	{
+		iMJD = ( double )fRunPara->fRunList[runlist_iter].fMJDOff;
+	}
+	return iMJD;
+}
 
 /*
-  (this is called for each run)
+ * convert wobble offsets from angle in the sky
+ * to offsets in RA/Dec
+ */
+pair< double, double > VStereoAnalysis::astro_get_wobbleoffset_radec( unsigned int runlist_iter, bool bPrint )
+{
+	// calculate wobble offset in ra/dec for current epoch
+	pair< double, double > i_radec_diff;
+	
+	VSkyCoordinatesUtilities::getWobbleOffset_in_RADec(
+		fRunPara->fRunList[runlist_iter].fWobbleNorth,
+		-1.*fRunPara->fRunList[runlist_iter].fWobbleWest,
+		fRunPara->fRunList[runlist_iter].fTargetDec,
+		fRunPara->fRunList[runlist_iter].fTargetRA,
+		i_radec_diff.second,
+		i_radec_diff.first );
+	if( i_radec_diff.first < -180. )
+	{
+		i_radec_diff.first += 360.;
+	}
+	if( fIsOn && bPrint )
+	{
+		cout << "\tWobble offsets (currE): N: ";
+		cout << fRunPara->fRunList[runlist_iter].fWobbleNorth;
+		cout << " W: " << fRunPara->fRunList[runlist_iter].fWobbleWest;
+		cout << ",  RA " << i_radec_diff.first << ", Dec " << i_radec_diff.second << endl;
+	}
+	return i_radec_diff;
+}
+
+/*
+ * array pointing (center of pointing FOV)
+ * in current epoch
+ */
+pair< double, double > VStereoAnalysis::astro_get_arraypointing( unsigned int runlist_iter, bool bPrint )
+{
+	pair< double, double > ra_dec_wobbleoffset = astro_get_wobbleoffset_radec( runlist_iter, bPrint );
+	
+	pair< double, double > i_radec_arraypointing;
+	i_radec_arraypointing.first = fRunPara->fRunList[runlist_iter].fTargetRA   + ra_dec_wobbleoffset.first;
+	i_radec_arraypointing.second = fRunPara->fRunList[runlist_iter].fTargetDec + ra_dec_wobbleoffset.second;
+	
+	return i_radec_arraypointing;
+}
+
+/*
+ * array pointing (center of pointing FOV)
+ * in J2000
+ */
+pair< double, double > VStereoAnalysis::astro_get_arraypointingJ2000( unsigned int runlist_iter )
+{
+	pair< double, double > i_radec_arraypointing = astro_get_arraypointing( runlist_iter );
+	// correct for precession (from current epoch to J2000=MJD51544)
+	VSkyCoordinatesUtilities::precessTarget(
+		51544.,
+		i_radec_arraypointing.first, i_radec_arraypointing.second,
+		astro_get_mjd( runlist_iter ), true );
+	return i_radec_arraypointing;
+}
+
+void VStereoAnalysis::astro_calculate_modified_wobbleoffset( unsigned int runlist_iter )
+{
+	pair< double, double > ra_dec_arraypointing = astro_get_arraypointingJ2000( runlist_iter );
+	
+	double i_WobbleJ2000_West = VSkyCoordinatesUtilities::getTargetShiftWest(
+									fRunPara->fRunList[runlist_iter].fTargetRAJ2000,
+									fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
+									ra_dec_arraypointing.first,
+									ra_dec_arraypointing.second ) * -1.;
+	double i_WobbleJ2000_North = VSkyCoordinatesUtilities::getTargetShiftNorth(
+									 fRunPara->fRunList[runlist_iter].fTargetRAJ2000,
+									 fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
+									 ra_dec_arraypointing.first,
+									 ra_dec_arraypointing.second );
+									 
+	// modify wobble offsets for centering of sky maps
+	fRunPara->fRunList[runlist_iter].fWobbleNorthMod = i_WobbleJ2000_North - fRunPara->fRunList[runlist_iter].fSkyMapCentreNorth;
+	fRunPara->fRunList[runlist_iter].fWobbleWestMod  = i_WobbleJ2000_West  - fRunPara->fRunList[runlist_iter].fSkyMapCentreWest;
+	
+	if( fIsOn )
+	{
+		cout << "\tWobble offsets (J2000): N: " << i_WobbleJ2000_North << " W: " << i_WobbleJ2000_West << endl;
+		cout << "\tSky maps centred at (ra,dec (J2000)) (";
+		cout << fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000 << ", ";
+		cout << fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000 << ")";
+		cout << endl;
+		cout << "\tTelescopes pointing to: (ra,dec (J2000)) (";
+		cout << ra_dec_arraypointing.first << ", ";
+		cout << ra_dec_arraypointing.second << ")";
+		cout << ", N: " << fRunPara->fRunList[runlist_iter].fWobbleNorthMod;
+		cout << " W: " << fRunPara->fRunList[runlist_iter].fWobbleWestMod << endl;
+		cout << "\t1D-histograms calculated at (x,y): ";
+		cout << fRunPara->fRunList[runlist_iter].fTargetShiftNorth << ", " << fRunPara->fRunList[runlist_iter].fTargetShiftWest;
+		if( TMath::Abs( fRunPara->fTargetShiftDecJ2000 ) > 1.e-8 &&  TMath::Abs( fRunPara->fTargetShiftRAJ2000 ) > 1.e-8 )
+		{
+			cout << " (ra,dec (J2000)) " << fRunPara->fTargetShiftRAJ2000 << ", " << fRunPara->fTargetShiftDecJ2000;
+		}
+		cout << endl;
+	}
+}
+
+/*
+ * precess telescope pointing from J2000 to current epoch
+ * and return current epoch coordinates
+ */
+pair< double, double > VStereoAnalysis::astro_calculate_ra_dec_currentEpoch( unsigned int runlist_iter )
+{
+	pair< double, double > i_radec;
+	i_radec.first = fRunPara->fRunList[runlist_iter].fTargetRAJ2000 * TMath::DegToRad();
+	i_radec.second = fRunPara->fRunList[runlist_iter].fTargetDecJ2000 * TMath::DegToRad();
+	
+	VSkyCoordinatesUtilities::precessTarget( astro_get_mjd( runlist_iter ), i_radec.first, i_radec.second );
+	// set target coordinates into run parameter list
+	fRunPara->setTargetRADec_currentEpoch(
+		runlist_iter,
+		i_radec.first * TMath::RadToDeg(),
+		i_radec.second * TMath::RadToDeg() );
+		
+	return i_radec;
+}
+
+void VStereoAnalysis::astro_print_pointing( unsigned int runlist_iter )
+{
+	if( !fIsOn )
+	{
+		return;
+	}
+	// print some information on targeting/pointing to screen
+	cout << "Run " << fRunPara->fRunList[runlist_iter].fRunOn << " ---------------------------" << endl;
+	// print target info to screen
+	cout << "\tTarget: " << fRunPara->fRunList[runlist_iter].fTarget << " (ra,dec)=(";
+	cout << fRunPara->fRunList[runlist_iter].fTargetRA << ", " << fRunPara->fRunList[runlist_iter].fTargetDec << ")";
+	cout << " (precessed, MJD=" << astro_get_mjd( runlist_iter ) << "), ";
+	cout << "(ra,dec (J2000)) = (";
+	cout << fRunPara->fRunList[runlist_iter].fTargetRAJ2000 << ", ";
+	cout << fRunPara->fRunList[runlist_iter].fTargetDecJ2000 << ")";
+	if( TMath::Abs( fRunPara->fRunList[runlist_iter].fPairOffset ) > 1.e-2 )
+	{
+		cout << ", pair offset [min]: " << fRunPara->fRunList[runlist_iter].fPairOffset;
+	}
+	cout << endl;
+}
+
+/*
+ * set and get the regions to exclude
+ * (these are calculated relative to the sky map centre)
+*/
+void VStereoAnalysis::astro_set_exclusionsregions( unsigned int runlist_iter )
+{
+	astro_setup_star_cataloge( runlist_iter );
+	
+	for( unsigned int k = 0 ; k < fRunPara->fExclusionRegions.size(); k++ )
+	{
+		if( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 < -90. )
+		{
+			continue;
+		}
+		fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  =
+			VSkyCoordinatesUtilities::getTargetShiftWest(
+				fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000,
+				fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000,
+				fRunPara->fExclusionRegions[k]->fExcludeFromBackground_RAJ2000,
+				fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 );
+				
+		fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North =
+			VSkyCoordinatesUtilities::getTargetShiftNorth(
+				fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000,
+				fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000,
+				fRunPara->fExclusionRegions[k]->fExcludeFromBackground_RAJ2000,
+				fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 );
+				
+		if( TMath::Abs( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North ) < 1.e-8 )
+		{
+			fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North = 0.;
+		}
+		if( TMath::Abs( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West ) < 1.e-8 )
+		{
+			fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  = 0.;
+		}
+	}
+}
+
+/*
+ * set up star catalogue and exclusion regions
+ * (all in J2000)
+ */
+void VStereoAnalysis::astro_setup_star_cataloge( unsigned int runlist_iter )
+{
+	if( !fIsOn )
+	{
+		return;
+	}
+	
+	fAstro.back()->initStarCatalogue(
+		fRunPara->fStarCatalogue,
+		astro_get_mjd( runlist_iter ),
+		fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax,
+		fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax,
+		fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000, fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000 );
+	VStarCatalogue* iStarCatalogue = fAstro.back()->getStarCatalogue();
+	if( !iStarCatalogue )
+	{
+		cout << "VStereoAnalysis::astro_setup_star_cataloge() error: star catalogue not found: " << fRunPara->fStarCatalogue << endl;
+		cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
+	}
+	// remove double entries
+	iStarCatalogue->purge();
+	if( iStarCatalogue->getListOfStarsinFOV().size() == 0 )
+	{
+		return;
+	}
+	
+	cout << "\tbright stars (magnitude brighter than " << fRunPara->fStarMinBrightness << ", exclusion radius ";
+	cout << fRunPara->fStarExlusionRadius << " deg, " << fRunPara->fStarBand << "-band) in field of view (J2000): " << endl;
+	cout << "\t\t ID \t RA \t Dec \t magnitude " << endl;
+	for( unsigned int i = 0; i < iStarCatalogue->getListOfStarsinFOV().size(); i++ )
+	{
+		if( !iStarCatalogue->getListOfStarsinFOV()[i]
+				|| iStarCatalogue->getListOfStarsinFOV()[i]->getBrightness( fRunPara->fStarBand )
+				>= fRunPara->fStarMinBrightness
+				|| fRunPara->fStarExlusionRadius <= 0. )
+		{
+			continue;
+		}
+		iStarCatalogue->getListOfStarsinFOV()[i]->printStar_for_anasum( fRunPara->fStarBand );
+		
+		// check if this region is already excluded (avoid dublications)
+		bool b_isExcluded = false;
+		for( unsigned int e = 0; e < fRunPara->fExclusionRegions.size(); e++ )
+		{
+			if( fRunPara->fExclusionRegions[e]->fExcludeFromBackground_StarID >= 0
+					&& fRunPara->fExclusionRegions[e]->fExcludeFromBackground_StarID == ( int )iStarCatalogue->getListOfStarsinFOV()[i]->fStarID )
+			{
+				b_isExcluded = true;
+			}
+		}
+		if( b_isExcluded )
+		{
+			continue;
+		}
+		fRunPara->fExclusionRegions.push_back( new VAnaSumRunParameterListOfExclusionRegions() );
+		fRunPara->fExclusionRegions.back()->fExcludeFromBackground_RAJ2000 = iStarCatalogue->getListOfStarsinFOV()[i]->fRA2000;
+		fRunPara->fExclusionRegions.back()->fExcludeFromBackground_DecJ2000 = iStarCatalogue->getListOfStarsinFOV()[i]->fDec2000;
+		fRunPara->fExclusionRegions.back()->fExcludeFromBackground_Radius1 = fRunPara->fStarExlusionRadius;
+		fRunPara->fExclusionRegions.back()->fExcludeFromBackground_Radius2 = fRunPara->fStarExlusionRadius;
+		fRunPara->fExclusionRegions.back()->fExcludeFromBackground_North = 0.;
+		fRunPara->fExclusionRegions.back()->fExcludeFromBackground_West = 0.;
+		fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarID = ( int )iStarCatalogue->getListOfStarsinFOV()[i]->fStarID;
+		fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarName = iStarCatalogue->getListOfStarsinFOV()[i]->fStarName;
+		fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarBrightness_V = iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_V;
+		fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarBrightness_B = iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_B;
+	}
+	iStarCatalogue->purge();
+}
+
+/*
+  setup all coordinate systems
 
   - set targets
   - set sky map centres
@@ -1389,316 +1746,43 @@ void VStereoAnalysis::defineAstroSource()
 	{
 		cout << "VStereoAnalysis::defineAstroSource()" << endl;
 	}
-
+	
 	if( fIsOn )
 	{
 		cout << endl << "-----------------------------------------------------------------------" << endl;
 		cout << "Defining targets and exclusion regions" << endl;
 	}
-
-	/////////////////////////////////////////////////////////
-	// loop over all runs in runlist
+	
 	for( unsigned int i = 0; i < fRunPara->fRunList.size(); i++ )
 	{
-		/////////////////////////////////////////////////////////
-		// check source coordinates
-		// (this is the target of observation)
-		/////////////////////////////////////////////////////////
-		if( fRunPara->fRunList[i].fTargetDecJ2000 < -89.99 )
-		{
-			cout << "ERROR in VStereoAnalysis::defineAstroSource: invalid target " << fRunPara->fRunList[i].fTarget << endl;
-			cout << "\t run " << fRunPara->fRunList[i].fRunOn << "\t" << fRunPara->fRunList[i].fTarget;
-			cout << fRunPara->fRunList[i].fTargetDecJ2000 << "\t" << fRunPara->fRunList[i].fTargetShiftDecJ2000 << endl;
-			exit( EXIT_FAILURE );
-		}
-
-		/////////////////////////////////////////////////////////
-		// Case 1: sky map centre is given as xy offset [deg] in runparameter file
-		if( TMath::Abs( fRunPara->fSkyMapCentreNorth ) > 1.e-8 || TMath::Abs( fRunPara->fSkyMapCentreWest ) > 1.e-8 )
-		{
-			fRunPara->fRunList[i].fSkyMapCentreWest  = fRunPara->fSkyMapCentreWest;
-			fRunPara->fRunList[i].fSkyMapCentreNorth = fRunPara->fSkyMapCentreNorth;
-			double i_decDiff =  0.;   // offset in dec
-			double i_raDiff = 0.;     // offset in ra
-			VSkyCoordinatesUtilities::getWobbleOffset_in_RADec(
-                    fRunPara->fRunList[i].fSkyMapCentreNorth,
-					fRunPara->fRunList[i].fSkyMapCentreWest,
-					fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
-					i_decDiff, i_raDiff );
-			fRunPara->fRunList[i].fSkyMapCentreRAJ2000  = fRunPara->fRunList[i].fTargetRAJ2000 + i_raDiff;
-			fRunPara->fRunList[i].fSkyMapCentreDecJ2000 = fRunPara->fRunList[i].fTargetDecJ2000 + i_decDiff;
-		}
-        // Case 2: sky map centre is given in J200 in runparameter file
-		// (this is in almost all analysis the usual/default case)
-		else if( TMath::Abs( fRunPara->fSkyMapCentreRAJ2000 ) > 1.e-8 )
-		{
-			fRunPara->fRunList[i].fSkyMapCentreRAJ2000  = fRunPara->fSkyMapCentreRAJ2000;
-			fRunPara->fRunList[i].fSkyMapCentreDecJ2000 = fRunPara->fSkyMapCentreDecJ2000;
-			fRunPara->fRunList[i].fSkyMapCentreWest =
-				VSkyCoordinatesUtilities::getTargetShiftWest( 
-                        fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
-						fRunPara->fSkyMapCentreRAJ2000, fRunPara->fSkyMapCentreDecJ2000 ) * -1.;
-			fRunPara->fRunList[i].fSkyMapCentreNorth =
-				VSkyCoordinatesUtilities::getTargetShiftNorth( 
-                        fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
-						fRunPara->fSkyMapCentreRAJ2000, fRunPara->fSkyMapCentreDecJ2000 );
-		}
-		// if not set in runparameter file: set to target direction
-		else
-		{
-			fRunPara->fRunList[i].fSkyMapCentreRAJ2000 = fRunPara->fRunList[i].fTargetRAJ2000;
-			fRunPara->fRunList[i].fSkyMapCentreDecJ2000 = fRunPara->fRunList[i].fTargetDecJ2000;
-			fRunPara->fSkyMapCentreRAJ2000 = fRunPara->fRunList[i].fSkyMapCentreRAJ2000;
-			fRunPara->fSkyMapCentreDecJ2000 = fRunPara->fRunList[i].fSkyMapCentreDecJ2000;
-		}
-
-		/////////////////////////////////////////////////////////
-		// from runparameter file: set and get target shifts
-		// (calculated relative to sky map centre)
-		// (this is the position where all 1D histograms (theta2, energy spectra, etc) are calculated)
-		if( fIsOn )
-		{
-			if( TMath::Abs( fRunPara->fTargetShiftDecJ2000 ) > 1.e-8 || TMath::Abs( fRunPara->fTargetShiftRAJ2000 ) > 1.e-8 )
-			{
-				fRunPara->fRunList[i].fTargetShiftWest = VSkyCoordinatesUtilities::getTargetShiftWest( 
-                        fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
-						fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
-				fRunPara->fRunList[i].fTargetShiftNorth = -1.*VSkyCoordinatesUtilities::getTargetShiftNorth( 
-                        fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
-						fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
-
-				fRunPara->fRunList[i].fTargetShiftWest  += fRunPara->fRunList[i].fSkyMapCentreWest;
-				fRunPara->fRunList[i].fTargetShiftNorth += fRunPara->fRunList[i].fSkyMapCentreNorth;
-			}
-			else
-			{
-				fRunPara->fRunList[i].fTargetShiftWest  = fRunPara->fTargetShiftWest;
-				fRunPara->fRunList[i].fTargetShiftNorth = fRunPara->fTargetShiftNorth;
-			}
-			fRunPara->fRunList[i].fTargetShiftWest *= -1.;
-			fRunPara->fTargetShiftWest = fRunPara->fRunList[i].fTargetShiftWest;
-			fRunPara->fTargetShiftNorth = fRunPara->fRunList[i].fTargetShiftNorth;
-			fRunPara->setTargetShifts( i, fRunPara->fRunList[i].fTargetShiftWest, fRunPara->fRunList[i].fTargetShiftNorth,
-									   fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
-		}
-		/////////////////////////////////////////////////////////
-		// precess target coordinates from J2000 to current epoch
-		// (direction of telescope pointing)
-		double i_dec = fRunPara->fRunList[i].fTargetDecJ2000 * TMath::DegToRad();
-		double i_ra  = fRunPara->fRunList[i].fTargetRAJ2000 * TMath::DegToRad();
-		double iMJD = ( double )fRunPara->fRunList[i].fMJDOn;
-		if( !fIsOn )
-		{
-			iMJD = ( double )fRunPara->fRunList[i].fMJDOff;
-		}
-		// (i_dec and i_ra are in current epoch coordinates in the following, not J2000)
-		VSkyCoordinatesUtilities::precessTarget( iMJD, i_ra, i_dec );
-
-		// print some information on targeting/pointing to screen
-		if( fIsOn )
-		{
-			cout << "Run " << fRunPara->fRunList[i].fRunOn << " ---------------------------" << endl;
-			// set target coordinates into run parameter list
-			fRunPara->setTargetRADec_currentEpoch( i, i_ra * TMath::RadToDeg(), i_dec * TMath::RadToDeg() );
-			// print target info to screen
-			cout << "\tTarget: " << fRunPara->fRunList[i].fTarget << " (ra,dec)=(";
-			cout << fRunPara->fRunList[i].fTargetRA << ", " << fRunPara->fRunList[i].fTargetDec << ")";
-			cout << " (precessed, MJD=" << iMJD << "), ";
-			cout << "(ra,dec (J2000)) = (" << fRunPara->fRunList[i].fTargetRAJ2000 << ", " << fRunPara->fRunList[i].fTargetDecJ2000 << ")";
-			if( TMath::Abs( fRunPara->fRunList[i].fPairOffset ) > 1.e-2 )
-			{
-				cout << ", pair offset [min]: " << fRunPara->fRunList[i].fPairOffset;
-			}
-			cout << endl;
-		}
-		/////////////////////////////////////
-		// calculate wobble offsets in J2000
-		// (this might be overcomplicated)
-		/////////////////////////////////////
-		// calculate wobble offset in ra/dec for current epoch
-		double i_decDiff = 0.;
-		double i_raDiff = 0.;
-		VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( 
-                fRunPara->fRunList[i].fWobbleNorth, -1.*fRunPara->fRunList[i].fWobbleWest,
-				i_dec * TMath::RadToDeg(), i_ra * TMath::RadToDeg(), i_decDiff, i_raDiff );
-		if( i_raDiff < -180. )
-		{
-			i_raDiff += 360.;
-		}
-		double i_decWobble = i_dec * TMath::RadToDeg() + i_decDiff;
-		double i_raWobble  = i_ra * TMath::RadToDeg()  + i_raDiff;
-		// correct for precession (from current epoch to J2000=MJD51544)
-		VSkyCoordinatesUtilities::precessTarget( 51544., i_raWobble, i_decWobble, iMJD, true );
-		double i_WobbleJ2000_West = VSkyCoordinatesUtilities::getTargetShiftWest( 
-                                    fRunPara->fRunList[i].fTargetRAJ2000, 
-                                    fRunPara->fRunList[i].fTargetDecJ2000,
-									i_raWobble, i_decWobble ) * -1.;
-		double i_WobbleJ2000_North = VSkyCoordinatesUtilities::getTargetShiftNorth( 
-                                     fRunPara->fRunList[i].fTargetRAJ2000, 
-                                     fRunPara->fRunList[i].fTargetDecJ2000,
-									 i_raWobble, i_decWobble );
-		// modify wobble offsets for centering of sky maps
-		fRunPara->fRunList[i].fWobbleNorthMod = i_WobbleJ2000_North - fRunPara->fRunList[i].fSkyMapCentreNorth;
-		fRunPara->fRunList[i].fWobbleWestMod  = i_WobbleJ2000_West  - fRunPara->fRunList[i].fSkyMapCentreWest;
-
+		astro_check_for_valid_coordinates( i );
+		astro_set_skymap_center_from_runparameters( i );
+		astro_set_skymap_centershift_from_runparameters( i );
+		
+		astro_calculate_ra_dec_currentEpoch( i );
+		astro_print_pointing( i );
+		astro_calculate_modified_wobbleoffset( i );
+		fRunPara->setArrayPointing(
+			i,
+			astro_get_arraypointing( i, false ),
+			astro_get_arraypointingJ2000( i ) );
+			
 		// fill run parameter values
-		fRunPara->setTargetRADecJ2000( i, fRunPara->fRunList[i].fTargetRAJ2000, 
-                                          fRunPara->fRunList[i].fTargetDecJ2000,
-                                          fRunPara->fRunList[i].fTarget );
-		fRunPara->setTargetShifts( i, fRunPara->fRunList[i].fTargetShiftWest, fRunPara->fRunList[i].fTargetShiftNorth,
-								   fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
-		fRunPara->setSkyMapCentreJ2000( i, fRunPara->fRunList[i].fSkyMapCentreRAJ2000, fRunPara->fRunList[i].fSkyMapCentreDecJ2000 );
-
-		///////////////////////////////////////////////////////////////////
-		// some printout
-		if( fIsOn )
-		{
-			cout << "\tWobble offsets (currE): N: " << fRunPara->fRunList[i].fWobbleNorth << " W: " << fRunPara->fRunList[i].fWobbleWest;
-			cout << ",  RA " << i_raDiff << ", Dec " << i_decDiff << endl;
-			cout << "\tWobble offsets (J2000): N: " << i_WobbleJ2000_North << " W: " << i_WobbleJ2000_West << endl;
-			cout << "\tSky maps centred at (ra,dec (J2000)) (";
-			cout << fRunPara->fRunList[i].fSkyMapCentreRAJ2000 << ", " << fRunPara->fRunList[i].fSkyMapCentreDecJ2000 << ")";
-			cout << "\tTelescopes pointing to: (ra,dec (J2000)) (" << i_raWobble << ", " << i_decWobble << ")";
-			cout << ", N: " << fRunPara->fRunList[i].fWobbleNorthMod << " W: " << fRunPara->fRunList[i].fWobbleWestMod << endl;
-			cout << "\t1D-histograms calculated at (x,y): ";
-            cout << fRunPara->fRunList[i].fTargetShiftNorth << ", " << fRunPara->fRunList[i].fTargetShiftWest;
-			if( TMath::Abs( fRunPara->fTargetShiftDecJ2000 ) > 1.e-8 &&  TMath::Abs( fRunPara->fTargetShiftRAJ2000 ) > 1.e-8 )
-			{
-				cout << " (ra,dec (J2000)) " << fRunPara->fTargetShiftRAJ2000 << ", " << fRunPara->fTargetShiftDecJ2000;
-			}
-			cout << endl;
-		}
-
-		//////////////////////////////////
-
-		// =============================================================
+		fRunPara->setTargetRADecJ2000( i );
+		fRunPara->setTargetShifts( i );
+		fRunPara->setSkyMapCentreJ2000( i );
+		
 		// define source and tracking class
 		fAstro.push_back( new VSkyCoordinates() );
-		// get wobble offsets in ra,dec
-		i_dec = fRunPara->fRunList[i].fTargetDecJ2000 * TMath::DegToRad();
-		i_ra  = fRunPara->fRunList[i].fTargetRAJ2000 * TMath::DegToRad();
-		// precess target to current epoch
-		VSkyCoordinatesUtilities::precessTarget( iMJD, i_ra, i_dec );
-		double idec_T = 0.;
-		double ira_T = 0.;
-		VSkyCoordinatesUtilities::getWobbledDirection( fRunPara->fRunList[i].fWobbleNorth, fRunPara->fRunList[i].fWobbleWest,
-				i_dec * TMath::RadToDeg(), i_ra * TMath::RadToDeg(), idec_T, ira_T );
-		// setting telescope coordinates (in current epoch)
-		// (ignore pointing errors here (very small impact))
-		fAstro.back()->setTelDec_deg( idec_T );
-		fAstro.back()->setTelRA_deg( ira_T );
-		// set observatory position
-		fAstro.back()->setObservatory( fRunPara->getObservatory_Longitude_deg(), fRunPara->getObservatory_Latitude_deg() );
-		// =============================================================
-		// set up star catalogue and exclusion regions
-		// (all in J2000)
-		if( fIsOn )
-		{
-			fAstro.back()->initStarCatalogue( fRunPara->fStarCatalogue, iMJD, fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax,
-											  fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax,
-											  fRunPara->fRunList[i].fSkyMapCentreRAJ2000, fRunPara->fRunList[i].fSkyMapCentreDecJ2000 );
-			VStarCatalogue* iStarCatalogue = fAstro.back()->getStarCatalogue();
-			if( !iStarCatalogue )
-			{
-				cout << "VStereoAnalysis::defineAstroSource() error: star catalogue not found: " << fRunPara->fStarCatalogue << endl;
-				cout << "exiting..." << endl;
-				exit( EXIT_FAILURE );
-			}
-			// remove double entries
-			iStarCatalogue->purge();
-			if( iStarCatalogue->getListOfStarsinFOV().size() > 0 )
-			{
-				cout << "\tbright stars (magnitude brighter than " << fRunPara->fStarMinBrightness << ", exclusion radius ";
-				cout << fRunPara->fStarExlusionRadius << " deg, " << fRunPara->fStarBand << "-band) in field of view (J2000): " << endl;
-				cout << "\t\t ID \t RA \t Dec \t magnitude " << endl;
-				double i_brightness = 100.;
-				for( unsigned int i = 0; i < iStarCatalogue->getListOfStarsinFOV().size(); i++ )
-				{
-					if( !iStarCatalogue->getListOfStarsinFOV()[i] )
-					{
-						continue;
-					}
-
-					if( fRunPara->fStarBand == "V" )
-					{
-						i_brightness = iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_V;
-					}
-					else if( fRunPara->fStarBand == "B" )
-					{
-						i_brightness = iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_B;
-					}
-
-					if( i_brightness < fRunPara->fStarMinBrightness )
-					{
-						cout << "\t\t" << iStarCatalogue->getListOfStarsinFOV()[i]->fStarID << "\t";
-						cout << iStarCatalogue->getListOfStarsinFOV()[i]->fRA2000 << "\t";
-						cout << iStarCatalogue->getListOfStarsinFOV()[i]->fDec2000 << "\t";
-						cout << i_brightness << " (" << fRunPara->fStarBand << " band)";
-						cout << "    " << iStarCatalogue->getListOfStarsinFOV()[i]->fStarName;
-						cout << endl;
-						// add this to set of exclusion regions
-						if( fRunPara->fStarExlusionRadius > 0. )
-						{
-							// check if this region is already excluded (avoid dublications)
-							bool b_isExcluded = false;
-							for( unsigned int e = 0; e < fRunPara->fExclusionRegions.size(); e++ )
-							{
-								if( fRunPara->fExclusionRegions[e]->fExcludeFromBackground_StarID >= 0
-							     && fRunPara->fExclusionRegions[e]->fExcludeFromBackground_StarID == ( int )iStarCatalogue->getListOfStarsinFOV()[i]->fStarID )
-								{
-									b_isExcluded = true;
-								}
-							}
-							if( !b_isExcluded )
-							{
-								fRunPara->fExclusionRegions.push_back( new VAnaSumRunParameterListOfExclusionRegions() );
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_RAJ2000 = iStarCatalogue->getListOfStarsinFOV()[i]->fRA2000;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_DecJ2000 = iStarCatalogue->getListOfStarsinFOV()[i]->fDec2000;
-								//fRunPara->fExclusionRegions.back()->fExcludeFromBackground_Radius = fRunPara->fStarExlusionRadius;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_Radius1 = fRunPara->fStarExlusionRadius;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_Radius2 = fRunPara->fStarExlusionRadius;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_North = 0.;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_West = 0.;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarID = ( int )iStarCatalogue->getListOfStarsinFOV()[i]->fStarID;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarName = iStarCatalogue->getListOfStarsinFOV()[i]->fStarName;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarBrightness_V = iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_V;
-								fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarBrightness_B = iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_B;
-							}
-						}
-					}
-				}
-			}
-			iStarCatalogue->purge();
-		}
-		// doesn't work if different sources are analyzed with RA <> 360 deg
-		/////////////////////////////////////////////////////////
-		// set and get the regions to exclude
-		// (these are calculated relative to the sky map centre)
-		for( unsigned int k = 0 ; k < fRunPara->fExclusionRegions.size(); k++ )
-		{
-			if( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 > -90. )
-			{
-				fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  = VSkyCoordinatesUtilities::getTargetShiftWest( fRunPara->fRunList[i].fSkyMapCentreRAJ2000,
-						fRunPara->fRunList[i].fSkyMapCentreDecJ2000,
-						fRunPara->fExclusionRegions[k]->fExcludeFromBackground_RAJ2000,
-						fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 );
-				fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North = VSkyCoordinatesUtilities::getTargetShiftNorth( fRunPara->fRunList[i].fSkyMapCentreRAJ2000,
-						fRunPara->fRunList[i].fSkyMapCentreDecJ2000,
-						fRunPara->fExclusionRegions[k]->fExcludeFromBackground_RAJ2000,
-						fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 );
-				if( TMath::Abs( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North ) < 1.e-4 )
-				{
-					fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North = 0.;
-				}
-				if( TMath::Abs( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West ) < 1.e-4 )
-				{
-					fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  = 0.;
-				}
-			}
-		}
+		fAstro.back()->setTelRADec_deg( astro_get_arraypointing( i, false ) );
+		
+		fAstro.back()->setObservatory(
+			fRunPara->getObservatory_Longitude_deg(),
+			fRunPara->getObservatory_Latitude_deg() );
+			
+		astro_set_exclusionsregions( i );
 	}
 }
-/////////////////////////////////////////////////////////
 
 
 void VStereoAnalysis::setCuts( VAnaSumRunParameterDataClass iL, int irun )
@@ -1709,7 +1793,7 @@ void VStereoAnalysis::setCuts( VAnaSumRunParameterDataClass iL, int irun )
 		if( iL.fCutFile.find( ".root" ) != string::npos )
 		{
 			string iEffFile = VUtilities::testFileLocation( iL.fCutFile, "EffectiveAreas", true );
-
+			
 			TFile* iF  = new TFile( iEffFile.c_str() );
 			if( iF->IsZombie() )
 			{
@@ -1754,12 +1838,12 @@ vector< double > VStereoAnalysis::getRateCounts()
 	{
 		return fRateCountsTot;
 	}
-
+	
 	if( fHisCounter < ( int )fRateCounts.size() )
 	{
 		return fRateCounts[fHisCounter];
 	}
-
+	
 	// this shouldn't happen
 	vector< double > f;
 	return f;
@@ -1772,12 +1856,12 @@ vector< double > VStereoAnalysis::getRateTime()
 	{
 		return fRateTimeTot;
 	}
-
+	
 	if( fHisCounter < ( int )fRateTime.size() )
 	{
 		return fRateTime[fHisCounter];
 	}
-
+	
 	// this shouldn't happen
 	vector< double > f;
 	return f;
@@ -1790,12 +1874,12 @@ vector< double > VStereoAnalysis::getRateTimeIntervall()
 	{
 		return fRateTimeIntervallTot;
 	}
-
+	
 	if( fHisCounter < ( int )fRateTimeIntervall.size() )
 	{
 		return fRateTimeIntervall[fHisCounter];
 	}
-
+	
 	// this shouldn't happen
 	vector< double > f;
 	return f;
@@ -1812,7 +1896,7 @@ TList* VStereoAnalysis::getEnergyHistograms()
 	{
 		return fHisto[fHisCounter]->hListEnergyHistograms;
 	}
-
+	
 	return 0;
 }
 
@@ -1827,7 +1911,7 @@ TH1D* VStereoAnalysis::getTheta2()
 	{
 		return fHisto[fHisCounter]->htheta2;
 	}
-
+	
 	return 0;
 }
 
@@ -1842,7 +1926,7 @@ double VStereoAnalysis::getRawRate()
 	{
 		return fHisto[fHisCounter]->hrate_1sec->GetEntries();
 	}
-
+	
 	return 0.;
 }
 
@@ -1853,14 +1937,14 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
 	for( unsigned int i = 0; i < fRunPara->fRunList.size(); i++ )
 	{
 		int i_run = fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff;
-
+		
 		if( i_runNumber > 0 && i_runNumber != i_run )
 		{
 			continue;
 		}
-
+		
 		string iFileName = fIsOn ? fRunPara->fRunList[i].fRunOnFileName : fRunPara->fRunList[i].fRunOffFileName;
-
+		
 		fDataFile = new TFile( iFileName.c_str() );
 		if( fDataFile->IsZombie() )
 		{
@@ -1901,7 +1985,7 @@ bool VStereoAnalysis::closeDataFile()
 	{
 		fDataFile->Close();
 	}
-
+	
 	return true;
 }
 
@@ -1909,7 +1993,7 @@ bool VStereoAnalysis::closeDataFile()
 bool VStereoAnalysis::terminate()
 {
 	closeDataFile();
-
+	
 	return true;
 }
 
@@ -1923,7 +2007,7 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
 	{
 		return false;
 	}
-
+	
 	char hname[200];
 	char htitle[200];
 	if( isOn )
@@ -1941,7 +2025,7 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
 	{
 		fTreeSelectedEvents->SetLineColor( 2 );
 	}
-
+	
 	fTreeSelectedEvents->Branch( "runNumber", &fTreeSelected_runNumber, "runNumber/I" );
 	fTreeSelectedEvents->Branch( "eventNumber", &fTreeSelected_eventNumber, "eventNumber/I" );
 	fTreeSelectedEvents->Branch( "MJD", &fTreeSelected_MJD, "MJD/I" );
@@ -1968,7 +2052,7 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
 	fTreeSelectedEvents->Branch( "SizeSecondMax", &fTreeSelected_SizeSecondMax, "SizeSecondMax/D" );
 	fTreeSelectedEvents->Branch( "MVA", &fTreeSelected_MVA, "MVA/D" );
 	fTreeSelectedEvents->Branch( "IsGamma", &fTreeSelected_IsGamma, "IsGamma/i" );
-
+	
 	return true;
 }
 
@@ -2008,7 +2092,7 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c, double i_xderot, do
 	{
 		return;
 	}
-
+	
 	fTreeSelected_runNumber = c->runNumber;
 	fTreeSelected_eventNumber = c->eventNumber;
 	fTreeSelected_MJD = c->MJD;
@@ -2041,7 +2125,7 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c, double i_xderot, do
 	{
 		fTreeSelected_MVA = -99.;
 	}
-
+	
 	if( bIsGamma )
 	{
 		fTreeSelected_IsGamma = 1;
@@ -2050,12 +2134,12 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c, double i_xderot, do
 	{
 		fTreeSelected_IsGamma = 0;
 	}
-
+	
 	if( fTreeSelectedEvents )
 	{
 		fTreeSelectedEvents->Fill();
 	}
-
+	
 }
 
 void VStereoAnalysis::getDerotatedCoordinates( unsigned int icounter,  double i_UTC, double x, double y, double& x_derot, double& y_derot )
@@ -2064,14 +2148,14 @@ void VStereoAnalysis::getDerotatedCoordinates( unsigned int icounter,  double i_
 	{
 		return;
 	}
-
+	
 	// (!!!! Y coordinate reflected in eventdisplay for version < v.3.43 !!!!)
 	// ( don't change signs if you don't know why! )
-	fAstro[icounter]->derotateCoords( i_UTC, x, y, x_derot, y_derot );
+	fAstro[icounter]->derotateCoords( i_UTC, x, -1.*y, x_derot, y_derot );
 	y_derot *= -1.;
-
-	VSkyCoordinatesUtilities::convert_derotatedCoordinates_to_J2000( i_UTC, 
-            fRunPara->fRunList[icounter].fTargetRAJ2000,
+	
+	VSkyCoordinatesUtilities::convert_derotatedCoordinates_to_J2000( i_UTC,
+			fRunPara->fRunList[icounter].fTargetRAJ2000,
 			fRunPara->fRunList[icounter].fTargetDecJ2000,
 			x_derot, y_derot );
 }
@@ -2082,7 +2166,7 @@ double VStereoAnalysis::getWobbleNorth()
 	{
 		return fRunPara->fRunList[fHisCounter].fWobbleNorthMod;
 	}
-
+	
 	return 0.;
 }
 
@@ -2092,7 +2176,7 @@ double VStereoAnalysis::getWobbleWest()
 	{
 		return fRunPara->fRunList[fHisCounter].fWobbleWestMod;
 	}
-
+	
 	return 0.;
 }
 
@@ -2109,11 +2193,11 @@ bool VStereoAnalysis::init_DL3Tree( int irun, int icounter )
 	{
 		return false;
 	}
-
+	
 	char htitle[200];
 	sprintf( htitle, "DL3 event list for run %d", irun );
 	fDL3EventTree = new TTree( "DL3EventTree", htitle );
-
+	
 	fDL3EventTree->Branch( "runNumber",      &fDL3EventTree_runNumber,      "runNumber/I" );
 	fDL3EventTree->Branch( "eventNumber",    &fDL3EventTree_eventNumber,    "eventNumber/I" );
 	fDL3EventTree->Branch( "timeOfDay",      &fDL3EventTree_Time,           "timeOfDay/D" );
@@ -2126,7 +2210,7 @@ bool VStereoAnalysis::init_DL3Tree( int irun, int icounter )
 	fDL3EventTree->Branch( "Yderot",         &fDL3EventTree_Yderot,         "Yderot/D" );
 	fDL3EventTree->Branch( "NImages",        &fDL3EventTree_NImages,        "NImages/I" );
 	fDL3EventTree->Branch( "ImgSel",         &fDL3EventTree_ImgSel,         "ImgSel/l" );
-    fDL3EventTree->Branch( "MeanPedvar",     &fDL3EventTree_MeanPedvar,     "MeanPedvar/D" );
+	fDL3EventTree->Branch( "MeanPedvar",     &fDL3EventTree_MeanPedvar,     "MeanPedvar/D" );
 	fDL3EventTree->Branch( "MSCW",           &fDL3EventTree_MSCW,           "MSCW/D" );
 	fDL3EventTree->Branch( "MSCL",           &fDL3EventTree_MSCL,           "MSCL/D" );
 	fDL3EventTree->Branch( "RA"            , &fDL3EventTree_RA,             "RA/D" );
@@ -2137,23 +2221,23 @@ bool VStereoAnalysis::init_DL3Tree( int irun, int icounter )
 	fDL3EventTree->Branch( "Xoff"          , &fDL3EventTree_Xoff          , "Xoff/D" );
 	fDL3EventTree->Branch( "Yoff"          , &fDL3EventTree_Yoff          , "Yoff/D" );
 	fDL3EventTree->Branch( "Acceptance"    , &fDL3EventTree_Acceptance    , "Acceptance/D" );
-    if ( fRunPara->fWriteAllEvents )
-    {
-        fDL3EventTree->Branch( "MVA"       , &fDL3EventTree_MVA,            "MVA/D" );
-        fDL3EventTree->Branch( "IsGamma"   , &fDL3EventTree_IsGamma,        "IsGamma/I" );
-    }
+	if( fRunPara->fWriteAllEvents )
+	{
+		fDL3EventTree->Branch( "MVA"       , &fDL3EventTree_MVA,            "MVA/D" );
+		fDL3EventTree->Branch( "IsGamma"   , &fDL3EventTree_IsGamma,        "IsGamma/I" );
+	}
 	cout << endl;
-
+	
 	// init radial acceptance class
-    if( icounter < (int)fRunPara->fRunList.size() )
-    {
-        fDL3_Acceptance = new VRadialAcceptance( fRunPara->fRunList[icounter].fAcceptanceFile ) ;
-        fDL3_Acceptance->Set2DAcceptanceMode( fRunPara->fRunList[icounter].f2DAcceptanceMode ) ;
-    }
-    else
-    {
-        fDL3_Acceptance = 0;
-    }
+	if( icounter < ( int )fRunPara->fRunList.size() )
+	{
+		fDL3_Acceptance = new VRadialAcceptance( fRunPara->fRunList[icounter].fAcceptanceFile ) ;
+		fDL3_Acceptance->Set2DAcceptanceMode( fRunPara->fRunList[icounter].f2DAcceptanceMode ) ;
+	}
+	else
+	{
+		fDL3_Acceptance = 0;
+	}
 	return true;
 }
 
@@ -2166,83 +2250,85 @@ void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot,
 	{
 		return;
 	}
-
-	fDL3EventTree_runNumber      = c->runNumber;    // Run Number
-	fDL3EventTree_eventNumber    = c->eventNumber;  // Event Number
+	
+	fDL3EventTree_runNumber      = c->runNumber;
+	fDL3EventTree_eventNumber    = c->eventNumber;
 	fDL3EventTree_Time           = c->Time;         // Time of day (seconds) of gamma ray event
-	fDL3EventTree_MJD            = c->MJD;          // Day of epoch (days)
+	fDL3EventTree_MJD            = c->MJD;
 	fDL3EventTree_Xoff           = c->Xoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
 	fDL3EventTree_Yoff           = c->Yoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
 	fDL3EventTree_Xderot         = i_xderot;        // Derotated Gamma Point-Of-Origin (deg, RA)
 	fDL3EventTree_Yderot         = i_yderot;        // Derotated Gamma Point-Of-Origin (deg, DEC)
-    if( fCuts )
-    {
-       fDL3EventTree_Erec       = fCuts->getReconstructedEnergy( fRunPara->fEnergyReconstructionMethod );        // Reconstructed Gamma Energy (TeV)
-       fDL3EventTree_Erec_Err   = fCuts->getReconstructedEnergydE( fRunPara->fEnergyReconstructionMethod );          // Reconstructed Gamma Energy (TeV) Error
-    }
-    else
-    {
-       fDL3EventTree_Erec       = 0.;
-       fDL3EventTree_Erec_Err   = 0.;
-    }
+	if( fCuts )
+	{
+		fDL3EventTree_Erec = fCuts->getReconstructedEnergy( fRunPara->fEnergyReconstructionMethod );
+		fDL3EventTree_Erec_Err = fCuts->getReconstructedEnergydE( fRunPara->fEnergyReconstructionMethod ); // Reconstructed Gamma Energy (TeV) Error
+	}
+	else
+	{
+		fDL3EventTree_Erec       = 0.;
+		fDL3EventTree_Erec_Err   = 0.;
+	}
 	fDL3EventTree_XGroundCore    = c->Xcore;        // Gamma Ray Core-Ground intersection location (north)
 	fDL3EventTree_YGroundCore    = c->Ycore;        // Gamma Ray Core-Ground intersection location (east)
-	fDL3EventTree_NImages        = c->NImages;      // Number of images used in reconstruction?
+	fDL3EventTree_NImages        = c->NImages;      // Number of images used in reconstruction
 	fDL3EventTree_ImgSel         = c->ImgSel;       // binary code describing which telescopes had images
-    fDL3EventTree_MeanPedvar     = c->meanPedvar_Image; // average pedvar
+	fDL3EventTree_MeanPedvar     = c->meanPedvar_Image; // average pedvar
 	fDL3EventTree_MSCW           = c->MSCW;        // mean scaled width
 	fDL3EventTree_MSCL           = c->MSCL;        // mean scaled length
 	fDL3EventTree_EmissionHeight = c->EmissionHeight ; // height of shower maximum (in km) above telescope z-plane
-    if( fDL3_Acceptance )
-    {
-        fDL3EventTree_Acceptance     = fDL3_Acceptance->getAcceptance( c->Xoff, c->Yoff );
-    }
-    else
-    {
-        fDL3EventTree_Acceptance     = 0.;
-    }
-    // get event ra and dec
-    if( icounter < fRunPara->fRunList.size() )
-    {
-        double i_centerpoint_RA = ( fRunPara->fRunList[icounter].fTargetRAJ2000 + -1.0 * getWobbleWest() );
-        double i_centerpoint_dec = ( fRunPara->fRunList[icounter].fTargetDecJ2000 + getWobbleNorth() );
-        double i_Spherical_RA  = 0.;
-        double i_Spherical_DEC = 0.;
-        slaDtp2s( fDL3EventTree_Xderot * TMath::DegToRad(),
-                  fDL3EventTree_Yderot * TMath::DegToRad(),
-                  i_centerpoint_RA * TMath::DegToRad(), 
-                  i_centerpoint_dec * TMath::DegToRad(),
-                  &i_Spherical_RA, &i_Spherical_DEC);
-        fDL3EventTree_RA  = i_Spherical_RA * TMath::RadToDeg();
-        fDL3EventTree_DEC = i_Spherical_DEC * TMath::RadToDeg();
-
-        // Convert from spherical RA and DEC to Azimuth and Zenith
-        // convert to degrees and do calculation
-        fVsky->setTargetJ2000( i_Spherical_DEC * TMath::RadToDeg(), i_Spherical_RA * TMath::RadToDeg() );
-        fVsky->precessTarget( fDL3EventTree_MJD, 0 ) ;
-
-        // calculate new param
-        fVsky->updatePointing( fDL3EventTree_MJD, fDL3EventTree_Time ) ;
-        fDL3EventTree_Az = fVsky->getTargetAzimuth();
-        fDL3EventTree_El = fVsky->getTargetElevation();
-    }
-    else
-    {
-        fDL3EventTree_RA = 0.;
-        fDL3EventTree_DEC = 0.;
-    }
-    if ( fCuts && fRunPara->fWriteAllEvents )
-    {
-        fDL3EventTree_MVA = fCuts->getTMVA_EvaluationResult();
-        if ( bIsGamma )
-        {
-            fDL3EventTree_IsGamma = 1;
-        }
-        else
-        {
-            fDL3EventTree_IsGamma = 0;
-        }
-    }
+	if( fDL3_Acceptance )
+	{
+		fDL3EventTree_Acceptance     = fDL3_Acceptance->getAcceptance( c->Xoff, c->Yoff );
+	}
+	else
+	{
+		fDL3EventTree_Acceptance     = 0.;
+	}
+	// get event ra and dec
+	if( icounter < fRunPara->fRunList.size() )
+	{
+		double i_Spherical_RA  = 0.;
+		double i_Spherical_DEC = 0.;
+		VAstronometry::vlaDtp2s( fDL3EventTree_Xderot * TMath::DegToRad(),
+								 fDL3EventTree_Yderot * TMath::DegToRad(),
+								 fRunPara->fRunList[icounter].fArrayPointingRAJ2000 * TMath::DegToRad(),
+								 fRunPara->fRunList[icounter].fArrayPointingDecJ2000 * TMath::DegToRad(),
+								 &i_Spherical_RA, &i_Spherical_DEC );
+		fDL3EventTree_RA  = i_Spherical_RA * TMath::RadToDeg();
+		fDL3EventTree_DEC = i_Spherical_DEC * TMath::RadToDeg();
+		
+		// Convert from spherical RA and DEC to Azimuth and Zenith
+		// convert to degrees and do calculation
+		fVsky->setTargetJ2000( i_Spherical_DEC * TMath::RadToDeg(), i_Spherical_RA * TMath::RadToDeg() );
+		fVsky->precessTarget( fDL3EventTree_MJD, 0 ) ;
+		
+		// calculate new param
+		fVsky->updatePointing( fDL3EventTree_MJD, fDL3EventTree_Time ) ;
+		fDL3EventTree_Az = fVsky->getTargetAzimuth();
+		fDL3EventTree_El = fVsky->getTargetElevation();
+		
+	}
+	else
+	{
+		fDL3EventTree_RA = 0.;
+		fDL3EventTree_DEC = 0.;
+		fDL3EventTree_Az = 0.;
+		fDL3EventTree_El = 0.;
+	}
+	if( fCuts && fRunPara->fWriteAllEvents )
+	{
+		fDL3EventTree_MVA = fCuts->getTMVA_EvaluationResult();
+		if( bIsGamma )
+		{
+			fDL3EventTree_IsGamma = 1;
+		}
+		else
+		{
+			fDL3EventTree_IsGamma = 0;
+		}
+	}
+	
 	if( fDL3EventTree )
 	{
 		fDL3EventTree->Fill();
@@ -2256,13 +2342,13 @@ void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot,
 void VStereoAnalysis::write_DL3Tree()
 {
 	fDL3EventTree->Write();
-
+	
 	fRunPara->SetName( "VAnaSumRunParameter" );
 	fRunPara->Write() ;
-
-    // cleanup
-    if( fDL3_Acceptance )
-    {
-        delete fDL3_Acceptance;
-    }
+	
+	// cleanup
+	if( fDL3_Acceptance )
+	{
+		delete fDL3_Acceptance;
+	}
 }

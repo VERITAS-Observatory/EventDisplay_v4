@@ -2,7 +2,7 @@
 
     data class for effective area plotting
 
-    \author Gernot Maier
+
 */
 
 #include "VInstrumentResponseFunctionReader.h"
@@ -488,7 +488,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 		hEsysMCRelative2D = ( TH2D* )c->hEsysMCRelative2D;
 		// get energy resolution (!!)
 		//       getEnergyResolutionPlot( (TProfile*)c->hEsysMCRelative );
-		// energy resolution caluclation as 68% value
+		// energy resolution calculation as 68% value
 		//       getEnergyResolutionPlot68( (TH2D*)c->hEsysMCRelative2D );
 		// energy resolution is RMS
 		getEnergyResolutionPlot( ( TH2D* )c->hEsysMCRelativeRMS );

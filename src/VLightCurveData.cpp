@@ -93,14 +93,14 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
 {
 	fDataFileName = iAnaSumFile;
 	
-	VFluxCalculation fFluxCalculation( fDataFileName, 1, 0, 100000, fMJD_min, fMJD_max, false );
+	VFluxCalculation fFluxCalculation( fDataFileName, 1, 0, 1000000, fMJD_min, fMJD_max, false );
 	if( fFluxCalculation.IsZombie() )
 	{
 		cout << "VLightCurveData::fill error reading anasum file: " << fDataFileName << endl;
 		bIsZombie = true;
 		return false;
 	}
-        fFluxCalculation.setFluxCalculationMethod( i_bRolke );
+	fFluxCalculation.setFluxCalculationMethod( i_bRolke );
 	fFluxCalculation.setTimeBinnedAnalysis( false );
 	fFluxCalculation.setDebug( false );
 	fFluxCalculation.setSignificanceParameters( -999., -999. );
@@ -145,20 +145,20 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
 	fRunTime  = fFluxCalculation.getRunTime( -1 );
 	fRunElevation = fFluxCalculation.getRunElevation( -1 );
 	fSignificance = fFluxCalculation.getSignificance( -1 );
-
-        //////////////////////////////////////
-        // get fluxes and errors
+	
+	//////////////////////////////////////
+	// get fluxes and errors
 	double iFluxError = 0;
-        // 'traditional' method allowing for negative flux
-        if( !i_bRolke )
-        {
-            fFluxCalculation.getFlux( -1, fFlux, iFluxError, fUpperFluxLimit );
-            setFluxError( iFluxError );
-        }
-        else
-        {
-            fFluxCalculation.getBoundedFlux( -1, fFlux, fFluxErrorDown, fFluxErrorUp, fUpperFluxLimit );
-        }
+	// 'traditional' method allowing for negative flux
+	if( !i_bRolke )
+	{
+		fFluxCalculation.getFlux( -1, fFlux, iFluxError, fUpperFluxLimit );
+		setFluxError( iFluxError );
+	}
+	else
+	{
+		fFluxCalculation.getBoundedFlux( -1, fFlux, fFluxErrorDown, fFluxErrorUp, fUpperFluxLimit );
+	}
 	fFluxCalculation.getFluxConfidenceInterval( -1, fRunFluxCI_lo_1sigma, fRunFluxCI_up_1sigma, true );
 	fFluxCalculation.getFluxConfidenceInterval( -1, fRunFluxCI_lo_3sigma, fRunFluxCI_up_3sigma, false );
 	

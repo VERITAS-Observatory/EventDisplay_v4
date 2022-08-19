@@ -1,10 +1,6 @@
 /*! \class VTableLookup
     \brief calculation of mean scaled variables and energies using MC filled tables
 
-    \author
-    Gernot Maier
-    Henric Krawczynski
-
 */
 
 #include "VTableLookup.h"
@@ -674,14 +670,14 @@ void VTableLookup::fillLookupTable()
 				// get telescope type
 				ULong64_t t = iter_i_list_of_Tel_type->first;
 				
-                                // This should be already the corrected/scaled size value for MC. 
+				// This should be already the corrected/scaled size value for MC.
 				double* i_s2 = fData->getSize2( 1., t, fTLRunParameter->fUseSelectedImagesOnly );
 				double* i_r = fData->getDistanceToCore( t );
 				unsigned int i_type = fData->getNTel_type( t );
-                                // Corrected size values (old, only applies to the MC) ... 
-                                //double* i_s2_fMSCWcorr   = fData->getSize2( fTLRunParameter->fMSCWSizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly ); 
-                                //double* i_s2_fMSCLcorr   = fData->getSize2( fTLRunParameter->fMSCLSizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly ); 
-                                //double* i_s2_fEnergycorr = fData->getSize2( fTLRunParameter->fEnergySizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly ); 
+				// Corrected size values (old, only applies to the MC) ...
+				//double* i_s2_fMSCWcorr   = fData->getSize2( fTLRunParameter->fMSCWSizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly );
+				//double* i_s2_fMSCLcorr   = fData->getSize2( fTLRunParameter->fMSCLSizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly );
+				//double* i_s2_fEnergycorr = fData->getSize2( fTLRunParameter->fEnergySizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly );
 				////////////////////////////////////////////////
 				// for zenith-angle == 0 deg fill all az bins
 				if( fabs( fData->getMCZe() ) < 3. )
@@ -694,8 +690,8 @@ void VTableLookup::fillLookupTable()
 								fData->getWidth( t ), idummy1, iEventWeight, idummy3, idummy1 );
 						fmscl[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2,
 								fData->getLength( t ), idummy1, iEventWeight, idummy3, idummy1 );
-						fenergySizevsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2, 
-                                                                fData->getMCEnergyArray(), idummy1, iEventWeight, idummy3, idummy1 );
+						fenergySizevsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2,
+								fData->getMCEnergyArray(), idummy1, iEventWeight, idummy3, idummy1 );
 						if( !fTLRunParameter->fLimitEnergyReconstruction )
 						{
 							fenergyEnergyvsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, fData->getMCEnergy(),
@@ -713,8 +709,8 @@ void VTableLookup::fillLookupTable()
 							fData->getWidth( t ), idummy1, iEventWeight, idummy3, idummy1 );
 					fmscl[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2,
 							fData->getLength( t ), idummy1, iEventWeight, idummy3, idummy1 );
-					fenergySizevsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2, 
-                                                        fData->getMCEnergyArray(), idummy1, iEventWeight, idummy3, idummy1 );
+					fenergySizevsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2,
+							fData->getMCEnergyArray(), idummy1, iEventWeight, idummy3, idummy1 );
 							
 					if( !fTLRunParameter->fLimitEnergyReconstruction )
 					{
@@ -795,10 +791,10 @@ void VTableLookup::readLookupTable()
 		}
 		
 		// get zenith angle for first valid MC event from MC files
-		if( bFirst && fData->getMCEnergy() > 0.001 
-                && fTLRunParameter->ze < 0. )
+		if( bFirst && fData->getMCEnergy() > 0.001
+				&& fTLRunParameter->ze < 0. )
 		{
-                        cout << "\t\t setting IRF ze from first event" << endl;
+			cout << "\t\t setting IRF ze from first event" << endl;
 			if( fNTel > 0 )
 			{
 				fTLRunParameter->ze = TMath::Floor( ( 90. - fData->getTelElevation() ) + 0.5 );
@@ -1149,10 +1145,10 @@ void VTableLookup::terminate()
 		cout << "closing file..." << endl;
 		fLookupTableFile->Close();
 	}
-        else
-        {
-            gROOT->GetListOfFiles()->Remove( fLookupTableFile );
-        }
+	else
+	{
+		gROOT->GetListOfFiles()->Remove( fLookupTableFile );
+	}
 	
 	cout << "exiting..." << endl;
 }
@@ -1245,7 +1241,12 @@ vector< string > VTableLookup::getSortedListOfDirectories( TDirectory* iDir )
 		TIter next( iKeyList );
 		while( TNamed* iK = ( TNamed* )next() )
 		{
-			iDName.push_back( iK->GetName() );
+			string i_dir_name = iK->GetName();
+			if( i_dir_name.find( "log" ) != string::npos || i_dir_name.find( "Log" ) != string::npos )
+			{
+				continue;
+			}
+			iDName.push_back( i_dir_name );
 			if( iDName.back().substr( 0, 4 ) == "woff" && iDName.back().size() == 8 )
 			{
 				iDName.back() = "woff_0" + iDName.back().substr( 5, iDName.back().size() );
@@ -1403,7 +1404,8 @@ void VTableLookup::getTables( unsigned int inoise, unsigned int ize, unsigned in
 	if( telX == 999999 )
 	{
 		cout << "VTableLookup::getTables invalid telescope type: " << tel << "\t" << telX << endl;
-		exit( -1 );
+		cout << "(this means that there is no table in the table file given for the requested telescope type)" << endl;
+		exit( EXIT_FAILURE );
 	}
 	if( fDebug == 2 )
 	{
@@ -1437,37 +1439,41 @@ void VTableLookup::getTables( unsigned int inoise, unsigned int ize, unsigned in
 }
 
 
+/*
+
+        calculate mean scaled values and energies with help of lookup tables
+
+*/
 void VTableLookup::calculateMSFromTables( VTablesToRead* s, double esys )
 {
 	if( !s )
 	{
 		return;
 	}
+	// make sure that list of pointers to tables exists
 	if( !f_calc_msc || !f_calc_energy || !f_calc_energySR )
 	{
 		s->reset();
 		return;
 	}
 	double i_dummy = 0.;
-
-        // MNR Get the size untouched, the size was already scaled if needed when reading the event. 
+	
 	double* i_s2 = fData->getSize2( 1., fTLRunParameter->fUseSelectedImagesOnly );
-        // Old. APPLY it only for MC, getSize2 gives the pointer to an array. 
-        //double* i_s2_fMSCWcorr   = fData->getSize2( fTLRunParameter->fMSCWSizecorrection, fTLRunParameter->fUseSelectedImagesOnly ); 
-        //double* i_s2_fMSCLcorr   = fData->getSize2( fTLRunParameter->fMSCLSizecorrection, fTLRunParameter->fUseSelectedImagesOnly ); 
-        //double* i_s2_fEnergycorr = fData->getSize2( fTLRunParameter->fEnergySizecorrection, fTLRunParameter->fUseSelectedImagesOnly ); 
 	
 	f_calc_msc->setCalculateEnergies( false );
+	///////////////////
 	// calculate mscw
 	f_calc_msc->setVHistograms( s->hmscwMedian );
 	s->mscw = f_calc_msc->calc( ( int )fData->getNTel(), fData->getDistanceToCore(),
 								i_s2, fData->getWidth(),
 								s->mscw_T, i_dummy, i_dummy, s->mscw_Tsigma );
+	///////////////////
 	// calculate mscl
 	f_calc_msc->setVHistograms( s->hmsclMedian );
 	s->mscl = f_calc_msc->calc( ( int )fData->getNTel(), fData->getDistanceToCore(),
 								i_s2, fData->getLength(),
 								s->mscl_T, i_dummy, i_dummy, s->mscl_Tsigma );
+	///////////////////
 	// calculate energy (method 1)
 	f_calc_energySR->setCalculateEnergies( true );
 	f_calc_energySR->setVHistograms( s->henergySRMedian );
@@ -1507,6 +1513,7 @@ bool VTableLookup::initialize( VTableLookupRunParameter* iTLRunParameter )
 		setSpectralIndex( fTLRunParameter->fSpectralIndex );
 	}
 	
+	///////////////////////////////////////
 	// write mscw,mscl, and energy tables
 	if( fTLRunParameter->readwrite == 'W' )
 	{
@@ -1538,6 +1545,7 @@ bool VTableLookup::initialize( VTableLookupRunParameter* iTLRunParameter )
 			fData->setMCDistanceToCameraCenter( fTLRunParameter->fMC_distance_to_cameracenter_min, fTLRunParameter->fMC_distance_to_cameracenter_max );
 		}
 	}
+	///////////////////////////////////////
 	// read MC tables
 	else
 	{

@@ -4,7 +4,7 @@
     use code from Steve Fegan to apply tracking corrections (thanks!)
 
 
-    \author Gernot Maier
+
 */
 
 #include "VTrackingCorrections.h"

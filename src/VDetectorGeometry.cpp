@@ -2,7 +2,6 @@
     \brief description of telescopes, camera and FADC system
 
 
-    \author  Gernot Maier
 */
 
 #include "VDetectorGeometry.h"

@@ -38,7 +38,6 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 #endif
 	fGrIsuReader = 0;
 	fDSTReader = 0;
-	fPEReader = 0;
 	
 	bMCSetAtmosphericID = false;
 	fBoolPrintSample.assign( fNTel, true );
@@ -133,13 +132,6 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 		fDeadPixelOrganizer = 0 ;
 	}
 	
-#ifdef USEFROGS
-	// FROGS
-	if( fRunPar->ffrogsmode )
-	{
-		fFrogs = new VFrogs();
-	} 
-#endif
 	// reset cut strings and variables
 	resetRunOptions();
 }
@@ -357,20 +349,20 @@ bool VEventLoop::initEventLoop( string iFileName )
 				fRawDataReader->initTraceNoiseGenerator( 0, fRunPar->fsimu_pedestalfile, getDetectorGeo(), fRunPar->fsumwindow_1,
 						fDebug, fRunPar->fgrisuseed, fRunPar->fsimu_pedestalfile_DefaultPed, fRunPar->fGainCorrection );
 			}
-                        if( fRawDataReader && fRunPar->finjectGaussianNoise > 0. )
-                        {
-                             fRawDataReader->injectGaussianNoise( fRunPar->finjectGaussianNoise, fRunPar->finjectGaussianNoiseSeed );
-                        }
-                        // allow for FADC trace amplitude correction
-                        if( fRawDataReader && fRunPar->fthroughoutCorrectionSFactor.size() > 0 )
-                        {
-                                if( !fRawDataReader->initThroughputCorrection( fRunPar->fsimu_pedestalfile_DefaultPed,
-                                                                          fRunPar->fthroughoutCorrectionSFactor,
-                                                                          fRunPar->fthroughoutCorrectionGFactor ) )
-                                {
-                                      exit( EXIT_FAILURE );
-                                }
-                        }
+			if( fRawDataReader && fRunPar->finjectGaussianNoise > 0. )
+			{
+				fRawDataReader->injectGaussianNoise( fRunPar->finjectGaussianNoise, fRunPar->finjectGaussianNoiseSeed );
+			}
+			// allow for FADC trace amplitude correction
+			if( fRawDataReader && fRunPar->fthroughoutCorrectionSFactor.size() > 0 )
+			{
+				if( !fRawDataReader->initThroughputCorrection( fRunPar->fsimu_pedestalfile_DefaultPed,
+						fRunPar->fthroughoutCorrectionSFactor,
+						fRunPar->fthroughoutCorrectionGFactor ) )
+				{
+					exit( EXIT_FAILURE );
+				}
+			}
 		}
 	}
 	// something went wrong, probably wrong filename
@@ -435,15 +427,6 @@ bool VEventLoop::initEventLoop( string iFileName )
 			fDSTReader->setNumSamples( fRunPar->fTelToAnalyze[i], getNSamples( fRunPar->fTelToAnalyze[i] ) );
 		}
 	}
-	// sourcefile has PE format
-	else if( fRunPar->fsourcetype == 6 )
-	{
-		if( fPEReader != 0 )
-		{
-			delete fPEReader;
-		}
-		fPEReader = new VPEReader( fRunPar->fsourcefile, fRunPar->fTelToAnalyze, getDetectorGeo(), fDebug );
-	}
 	// ============================
 	// set the data readers for all inherent classes
 	initializeDataReader();
@@ -455,8 +438,16 @@ bool VEventLoop::initEventLoop( string iFileName )
 	{
 		fDB_PixelDataReader = new VDB_PixelDataReader( getDetectorGeo()->getNumChannelVector() );
 		fDB_PixelDataReader->setDebug( fRunPar->fDebug );
-		fDB_PixelDataReader->readFromDB( fRunPar->getDBServer(), fRunPar->frunnumber,
-										 fRunPar->fDBRunStartTimeSQL, fRunPar->fDBRunStoppTimeSQL );
+		if( fRunPar->useDBTextFiles() )
+		{
+			fDB_PixelDataReader->readFromDBTextFiles(
+				fRunPar->getDBTextDirectory(), fRunPar->frunnumber, fRunPar->fDBRunStartTimeSQL );
+		}
+		else
+		{
+			fDB_PixelDataReader->readFromDB( fRunPar->getDBServer(), fRunPar->frunnumber,
+											 fRunPar->fDBRunStartTimeSQL, fRunPar->fDBRunStoppTimeSQL );
+		}
 	}
 	
 	// set event number vector
@@ -481,6 +472,9 @@ bool VEventLoop::initEventLoop( string iFileName )
 			exit( -1 );
 		}
 	}
+	// initialize analyzers (output files are created as well here)
+	initializeAnalyzers();
+	
 	
 	// create calibrators, analyzers, etc. at first event
 	if( fCalibrator )
@@ -488,7 +482,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 		fCalibrator->initialize();
 	}
 	
-	initializeAnalyzers();
+	// initialize pedestal calculator
 	if( fPedestalCalculator && fRunPar->fPedestalsInTimeSlices )
 	{
 		fPedestalCalculator->initialize( ( fRunMode == R_PED ),  getNChannels(), fRunPar->fPedestalsLengthOfTimeSlice,
@@ -561,8 +555,9 @@ bool VEventLoop::initEventLoop( string iFileName )
 			// set pointing error
 			if( fRunPar->fDBTracking )
 			{
-				fPointing.back()->getPointingFromDB( fRunPar->frunnumber, fRunPar->fDBTrackingCorrections, fRunPar->fPMTextFileDirectory,
-													 fRunPar->fDBVPM, fRunPar->fDBUncalibratedVPM );
+				fPointing.back()->getPointingFromDB( fRunPar->frunnumber, fRunPar->fDBTrackingCorrections,
+													 fRunPar->fDBVPM, fRunPar->fDBUncalibratedVPM,
+													 fRunPar->getDBTextDirectory() );
 			}
 			else
 			{
@@ -613,7 +608,8 @@ void VEventLoop::initializeAnalyzers()
 	}
 	
 	// set analysis data storage classes
-	// (slight inconsistency, produce VImageAnalyzerData for all telescopes, not only for the requested ones
+	// (slight inconsistency, produce VImageAnalyzerData for all telescopes,
+	//  not only for the requested ones (in teltoana))
 	if( fAnaData.size() == 0 )
 	{
 		for( unsigned int i = 0; i < fNTel; i++ )
@@ -625,7 +621,8 @@ void VEventLoop::initializeAnalyzers()
 			setTelID( i );
 			fAnaData.push_back( new VImageAnalyzerData( i, fRunPar->fShortTree, ( fRunMode == R_PED || fRunMode == R_PEDLOW ||
 								fRunMode == R_GTO || fRunMode == R_GTOLOW ||
-								fRunMode == R_TZERO || fRunMode == R_TZEROLOW ) ) );
+								fRunMode == R_TZERO || fRunMode == R_TZEROLOW ),
+								getRunParameter()->fWriteImagePixelList ) );
 			int iseed = fRunPar->fMCNdeadSeed;
 			if( iseed != 0 )
 			{
@@ -643,15 +640,15 @@ void VEventLoop::initializeAnalyzers()
 			fAnaData.back()->setTraceIntegrationMethod( getRunParameter()->fTraceIntegrationMethod[i] );
 		}
 		// reading special channels for all requested telescopes
-                // reading throughput correction for all requested telescopes
+		// reading throughput correction for all requested telescopes
 		for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
 		{
 			if( getTeltoAna()[i] < fAnaData.size() && fAnaData[getTeltoAna()[i]] )
 			{
 				fAnaData[getTeltoAna()[i]]->readSpecialChannels( getRunNumber(), fRunPar->getInstrumentEpoch(),
-                                                        fRunPar->fsetSpecialChannels,
-                                                        fRunPar->fthroughputCorrectionFile,
-                                                        getRunParameter()->getDirectory_EVNDISPParameterFiles() );
+						fRunPar->fsetSpecialChannels,
+						fRunPar->fthroughputCorrectionFile,
+						getRunParameter()->getDirectory_EVNDISPParameterFiles() );
 			}
 		}
 		// initialize cleaning
@@ -805,12 +802,6 @@ void VEventLoop::shutdown()
 		{
 			fArrayAnalyzer->terminate( fDebug_writing );
 		}
-#ifdef USEFROGS 
-		if( fRunPar->ffrogsmode )
-		{
-			fFrogs->terminate();
-		}
-#endif
 		// write analysis results for each telescope to output file
 		if( fAnalyzer )
 		{
@@ -873,14 +864,6 @@ void VEventLoop::shutdown()
 		{
 			cout << endl << "Final checks on result file (seems to be OK): " << fRunPar->foutputfileName << endl;
 		}
-		// FROGS finishing here
-		// (GM) not clear why this has to happen at this point in the program
-#ifdef USEFROGS
-		if( fRunPar->ffrogsmode )
-		{
-			fFrogs->finishFrogs( &f );
-		}
-#endif
 		f.Close();
 	}
 	// end of analysis
@@ -1437,14 +1420,6 @@ int VEventLoop::analyzeEvent()
 #endif
 		{
 			fArrayAnalyzer->doAnalysis();
-			// Frogs Analysis
-#ifdef USEFROGS
-			if( fRunPar->ffrogsmode )
-			{
-				string fArrayEpoch = getRunParameter()->getInstrumentEpoch( true );
-				fFrogs->doFrogsStuff( fEventNumber, fArrayEpoch );
-			}
-#endif
 		}
 	}
 	
@@ -1959,7 +1934,7 @@ void VEventLoop::setEventTimeFromReader()
 		//! 1st January of this year, then add fGPS.getDays()-1.
 		int  j = 0;
 		double dMJD = 0.;
-		slaCldj( fReader->getATGPSYear() + 2000, 1, 1, &dMJD, &j );
+		VAstronometry::vlaCldj( fReader->getATGPSYear() + 2000, 1, 1, &dMJD, &j );
 		dMJD += fGPS.getDays() - 1.;
 		if( fReader->isGrisuMC() && dMJD == 51543 )
 		{

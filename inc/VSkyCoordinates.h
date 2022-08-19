@@ -7,8 +7,9 @@
 
 #include <iomanip>
 #include <iostream>
+#include <utility>
 
-#include "VASlalib.h"
+#include "VAstronometry.h"
 #include "VSkyCoordinatesUtilities.h"
 #include "VStarCatalogue.h"
 
@@ -58,13 +59,10 @@ class VSkyCoordinates
 		VSkyCoordinates();
 		~VSkyCoordinates();
 		
-		void   derotateCoords( int MJD, double time, double i_xin, double i_yin, double& i_xout, double& i_yout );
-		void   derotateCoords( double i_UTC, double i_xin, double i_yin, double& i_xout, double& i_yout );
-		double getDerotationAngle( double i_UTC );
+		double derotateCoords( int MJD, double time, double i_xin, double i_yin, double& i_xout, double& i_yout );
+		double derotateCoords( double i_UTC, double i_xin, double i_yin, double& i_xout, double& i_yout );
 		double getDerotationAngle( int MJD, double time );
 		void   getEquatorialCoordinates( int MJD, double time, double az, double ze, double& dec, double& ra );
-		double getHourAngle( double i_UTC );
-		double getSidereal( double i_UTC );
 		string getTargetName()
 		{
 			return fTargetName;
@@ -150,7 +148,7 @@ class VSkyCoordinates
 			return fSet;
 		}
 		void   precessTarget( int iMJD, int iTelID = -1 );
-		void   rotateCoords( int i_mjd, double i_seconds, double i_xin, double i_yin, double& i_xout, double& i_yout );
+		double rotateCoords( int i_mjd, double i_seconds, double i_xin, double i_yin, double& i_xout, double& i_yout );
 		void   setMC()
 		{
 			fMC = true;
@@ -169,6 +167,11 @@ class VSkyCoordinates
 		void   setTelRA_deg( double iTelRA_deg )
 		{
 			fTelRA  = iTelRA_deg * TMath::DegToRad();
+		}
+		void setTelRADec_deg( pair< double, double > iTelRADec_deg )
+		{
+			fTelRA = iTelRADec_deg.first * TMath::DegToRad();
+			fTelDec = iTelRADec_deg.second * TMath::DegToRad();
 		}
 		void   setTelAzimuth( double iTelAz )
 		{

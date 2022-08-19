@@ -6,6 +6,8 @@
 #include "TDirectory.h"
 #include "TError.h"
 #include "TFile.h"
+#include "TGraph.h"
+#include "TGraphErrors.h"
 #include "TH1F.h"
 #include "TList.h"
 #include "TTree.h"
@@ -134,6 +136,14 @@ class VCalibrationData
 		bool fBoolLowGainGains;
 		valarray<double> fLowGainGainvars;        //!< gain variance
 		
+		///////////////////////////////////////////////////////
+		valarray<double>  fFADCtoPhe;             //!< dc to pe value
+		valarray<double>  fLowGainFADCtoPhe;
+		
+		
+		// IPR graphs
+		map< unsigned int, TGraphErrors* >      fGraphIPRGraph;         // one IPR graph per summation window
+		
 		VCalibrationData( unsigned int iTel, string iDir, string iPedfile, string iGainfile, string iTofffile,
 						  string iPedLowGainfile, string iGainLowGainFile = "",
 						  string iToffLowGainFile = "", string iLowGainMultFile = "",
@@ -157,6 +167,7 @@ class VCalibrationData
 				return getHistoDist( C_PEDLOW, true );
 			}
 		}
+		double getTelescopeAverageFADCtoPhe( bool iHiLo = false );
 		TH1F* getPedvarsDist( bool iHiLo = false )
 		{
 			if( iHiLo )
@@ -225,6 +236,7 @@ class VCalibrationData
 				return getHistoDist( C_GAINLOW, false );
 			}
 		}
+		TGraphErrors* getIPRGraph( unsigned int iSumWindow, bool iMakeNewGraph = false );
 		TH1F* getLowGainMultiplierDistribution()
 		{
 			return getHistoDist( C_LOWGAIN, true );
@@ -321,6 +333,7 @@ class VCalibrationData
 		unsigned int getTSTimeIndex( double iTime, unsigned int& i1, unsigned int& i2, double& ifrac1, double& ifrac2 );
 		
 		void     recoverLowGainPedestals();
+		void    setIPRGraph( unsigned int iSumWindow, TGraphErrors* g );
 		bool 	setLowGainPedestalFile( string file )
 		{
 			fLowGainPedestalFile = file;
@@ -343,7 +356,7 @@ class VCalibrationData
 		{
 			fSumWindow = isw;
 		}
-		bool     terminate( vector< unsigned int > a, vector< unsigned int > b, bool iDST = false );
+		bool     terminate( vector< unsigned int > a, vector< unsigned int > b, unsigned int iTraceIntegrationMethod, bool iDST = false );
 		bool     usePedestalsInTimeSlices( bool iB )
 		{
 			if( !iB )

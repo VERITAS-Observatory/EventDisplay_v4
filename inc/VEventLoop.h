@@ -21,12 +21,7 @@
 #include <VBFDataReader.h>
 #endif
 #include <VPedestalCalculator.h>
-#include <VPEReader.h>
 #include <VEvndispRunParameter.h>
-
-#ifndef NOGSL
-#include <VFrogs.h>
-#endif
 
 #include <VDeadPixelOrganizer.h>
 
@@ -49,9 +44,6 @@ class VEventLoop : public VEvndispData
 		VImageAnalyzer* fAnalyzer;                     //!< default analyzer class
 		VArrayAnalyzer* fArrayAnalyzer;           //!< default array analyzer
 		VDST* fDST;                               //!< data summarizer
-#ifdef USEFROGS
-		VFrogs* fFrogs;                           //!< Frogs Analyzer
-#endif
 		
 		VDeadPixelOrganizer* fDeadPixelOrganizer ;
 		

@@ -4,10 +4,11 @@
 #define VPOINTINGDB_H
 
 #include "PointingMonitor.h"
-#include "VASlalib.h"
+#include "VAstronometry.h"
 #include "VGlobalRunParameter.h"
 #include "VTrackingCorrections.h"
 #include "VDB_Connection.h"
+#include "VSQLTextFileReader.h"
 
 #include <TMath.h>
 #include <TSQLResult.h>
@@ -68,6 +69,8 @@ class VPointingDB : public VGlobalRunParameter
 		vector< double > fDBTime;
 		vector< float > fDBTelElevationRaw;
 		vector< float > fDBTelAzimuthRaw;
+		vector< float > fDBTelRA;
+		vector< float > fDBTelDec;
 		vector< float > fDBTelElevation;
 		vector< float > fDBTelAzimuth;
 		vector< float > fDBTelExpectedElevation;
@@ -81,13 +84,18 @@ class VPointingDB : public VGlobalRunParameter
 		VTrackingCorrections* fTrackingCorrections;
 		string fTPointCorrectionDate;
 		
+		bool check_maskVPM( int maskVPM );
 		bool getDBRunInfo();
+		bool getDBTextRunInfo( string iDBTextDirectory );
 		void getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip );
 		void getDBSourceCoordinates( string iSource, float& iEVNTargetDec, float& iEVNTargetRA );
 		bool readPointingFromDB();
+		bool readPointingFromDBText( string iDBTextDirectory );
 		bool readPointingCalibratedVPMFromDB();
+		bool readPointingCalibratedVPMFromDBTextFile( string iDBTextDirectory );
 		bool readPointingUncalibratedVPMFromDB();
-		bool readPointingFromVPMTextFile( string );
+		void readTrackingCorrections( string iTPointCorrection );
+		void setup_DB_connection();
 		
 		void delete_myconnection()
 		{
@@ -105,8 +113,6 @@ class VPointingDB : public VGlobalRunParameter
 		{
 			delete_myconnection();
 		}
-		
-		
 		bool   isGood()
 		{
 			return fStatus;
@@ -156,7 +162,11 @@ class VPointingDB : public VGlobalRunParameter
 		{
 			return fTelID;
 		}
-		bool   initialize( string iTPointCorrection, string iVPMDirectory, bool iVPMDB, bool iUncalibratedVPM );
+		bool   initialize(
+			string iTPointCorrection,
+			bool iVPMDB,
+			bool iUncalibratedVPM,
+			string iDBTextDirectory );
 		void   setObservatory( double iLongitude_deg = 0., double iLatitude_deg = 0. );
 		bool   terminate();
 		bool   updatePointing( int MJD, double iTime );

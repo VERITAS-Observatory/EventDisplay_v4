@@ -5,10 +5,6 @@
 
      fReader is not static! Call of VEvndispData::initializeDataReader() necessary  in constructors of all inherit classes
 
-
-   \author
-     Gernot Maier
-
 */
 
 #include "VEvndispData.h"
@@ -133,10 +129,6 @@ bool VEvndispData::initializeDataReader()
 	{
 		fReader = ( VVirtualDataReader* )fMultipleGrIsuReader;
 	}
-	else if( fPEReader != 0 )
-	{
-		fReader = ( VVirtualDataReader* )fPEReader;
-	}
 	
 	if( !fReader )
 	{
@@ -182,10 +174,6 @@ void VEvndispData::testDataReader()
 		{
 			fReader = ( VVirtualDataReader* )fMultipleGrIsuReader;
 		}
-		else if( fRunPar->fsourcetype == 6 && fPEReader != 0 )
-		{
-			fReader = ( VVirtualDataReader* )fPEReader;
-		}
 		else if( fRunPar->fsourcetype == 7  && fDSTReader != 0 )
 		{
 			fReader = ( VVirtualDataReader* )fDSTReader;
@@ -208,9 +196,6 @@ void VEvndispData::resetAnaData()
 		fAnaData[fTelID]->fTCorrectedSumLast = fRunPar->fsumfirst[fTelID] + fRunPar->fsumwindow_1[fTelID];
 		fAnaData[fTelID]->fCurrentSummationWindow = fRunPar->fsumwindow_1[fTelID];
 		fAnaData[fTelID]->fCurrentSummationWindow_2 = fRunPar->fsumwindow_2[fTelID];
-		
-		fAnaData[fTelID]->fTemplateMu = 0;
-		fAnaData[fTelID]->fModel3DMu = 0;
 		
 		if( getTraceFit() > -1. )
 		{
@@ -246,7 +231,11 @@ void VEvndispData::setDetectorGeometry( unsigned int iNTel, vector< string > iCa
 		// get camera rotations from the DB
 		if( getRunParameter()->fDBCameraRotationMeasurements )
 		{
-			fDetectorGeo->readDetectorGeometryFromDB( getRunParameter()->fDBRunStartTimeSQL, getRunParameter()->fDBCameraRotationMeasurements );
+			fDetectorGeo->readDetectorGeometryFromDB(
+				getRunParameter()->fDBRunStartTimeSQL,
+				getRunParameter()->getDBTextDirectory(),
+				getRunNumber(),
+				getRunParameter()->fDBCameraRotationMeasurements );
 		}
 	}
 	// for DST files: read detector geometry from DST file
@@ -799,6 +788,31 @@ bool VEvndispData::isTeltoAna( unsigned int iTel )
 	return false;
 }
 
+/*
+ * return typical (arrival) time of FADC pulse
+ *
+ * a) T0
+ * b) average pulse time
+ */
+valarray<double>& VEvndispData::getPulseTime( bool iCorrected )
+{
+	// in run parameter file: FADCSUMMATIONSTART set to TZERO
+	if( getSumWindowStart_T_method() == 1 )
+	{
+		return fAnaData[fTelID]->getTZeros( iCorrected );
+	}
+	
+	// default: return average pulse time
+	// in run parameter file: FADCSUMMATIONSTART set to TAVERAGE
+	return fAnaData[fTelID]->getTraceAverageTime( iCorrected );
+}
+
+
+/*
+ *  return timing values characterizing a pulse
+ *  time of max, tzero, etc. (0.5, 1., 0.5 values)
+ *
+ */
 vector< valarray<double> >& VEvndispData::getPulseTiming( bool iCorrected )
 {
 	if( iCorrected )
@@ -864,6 +878,11 @@ void VEvndispData::setPulseTimingCorrection( unsigned int iChannel, double iCorr
 				getPulseTiming( true )[i][iChannel] += iCorrection;
 			}
 		}
+	}
+	// average trace time corrections
+	if( iChannel < getTraceAverageTime( false ).size() && iChannel < getTraceAverageTime( false ).size() )
+	{
+		getTraceAverageTime( true )[iChannel] = getTraceAverageTime( false )[iChannel] + iCorrection;
 	}
 }
 
@@ -998,6 +1017,16 @@ ULong64_t VEvndispData::getTelType( unsigned int iTelID )
 	}
 	return 99999;
 }
+
+unsigned int VEvndispData::getTelType_Counter( ULong64_t iTelType )
+{
+	if( getDetectorGeometry() )
+	{
+		return getDetectorGeometry()->getTelType_Counter( iTelType );
+	}
+	return 99999;
+}
+
 
 /*
 
@@ -1134,7 +1163,6 @@ VMultipleGrIsuReader* VEvndispData::fMultipleGrIsuReader = 0;
 VBaseRawDataReader* VEvndispData::fRawDataReader = 0;
 #endif
 VDSTReader* VEvndispData::fDSTReader = 0;
-VPEReader* VEvndispData::fPEReader = 0;
 
 // event data
 unsigned int VEvndispData::fEventNumber = 0;
@@ -1176,7 +1204,6 @@ vector< VImageAnalyzerData* > VEvndispData::fAnaData;
 VShowerParameters* VEvndispData::fShowerParameters = 0;
 VMCParameters* VEvndispData::fMCParameters = 0;
 VEvndispReconstructionParameter* VEvndispData::fEvndispReconstructionParameter = 0;
-VFrogsParameters* VEvndispData::fFrogsParameters = 0;
 //vector< VFrogImageData* > VEvndispData::fFrogData;
 
 // timing graphs

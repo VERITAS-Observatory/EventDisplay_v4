@@ -31,7 +31,6 @@ class Cshowerpars
 		bool            bMC;
 		bool            bDeRot;
 		bool            bShort;
-		int             fVersion;
 		
 		TTree*          fChain;                   //!pointer to the analyzed TTree or TChain
 		Int_t           fCurrent;                 //!current Tree number in a TChain
@@ -72,7 +71,6 @@ class Cshowerpars
 		Float_t         WobbleN;
 		Float_t         WobbleE;
 		UInt_t          NTrig;
-		UInt_t          LTrigS;
 		ULong64_t       LTrig;
 		//[NTrig]
 		UShort_t        Trig_list[VDST_MAXTELESCOPES];
@@ -82,8 +80,6 @@ class Cshowerpars
 		UShort_t        MethodID[VDST_MAXRECMETHODS];
 		//[NMethods]
 		UShort_t        NImages[VDST_MAXRECMETHODS];
-		//[NMethods]
-		UInt_t          ImgSelS[VDST_MAXRECMETHODS];
 		//[NMethods]
 		ULong64_t       ImgSel[VDST_MAXRECMETHODS];
 		//[NMethods]
@@ -188,14 +184,9 @@ class Cshowerpars
 		TBranch*        b_MCycore_SC;             //!
 		TBranch*        b_MCzcore_SC;             //!
 		
-		Cshowerpars( TTree* tree = 0, bool iMC = false, int iVersion = 2, bool iShort = false );
+		Cshowerpars( TTree* tree = 0, bool iMC = false, bool iShort = false );
 		virtual ~Cshowerpars();
-		virtual Int_t    Cut( Long64_t entry );
 		virtual Int_t    GetEntry( Long64_t entry );
-		int              getTreeVersion()
-		{
-			return fVersion;
-		}
 		virtual Long64_t LoadTree( Long64_t entry );
 		virtual void     Init( TTree* tree );
 		virtual void     Loop();
@@ -214,7 +205,7 @@ class Cshowerpars
 
 #ifdef Cshowerpars_cxx
 
-Cshowerpars::Cshowerpars( TTree* tree, bool iMC, int iVersion, bool iShort )
+Cshowerpars::Cshowerpars( TTree* tree, bool iMC, bool iShort )
 {
 	if( !tree )
 	{
@@ -224,7 +215,6 @@ Cshowerpars::Cshowerpars( TTree* tree, bool iMC, int iVersion, bool iShort )
 	bMC = iMC;
 	bDeRot = false;
 	bShort = iShort;
-	fVersion = iVersion;
 	
 	Init( tree );
 }
@@ -248,17 +238,7 @@ Int_t Cshowerpars::GetEntry( Long64_t entry )
 		return 0;
 	}
 	
-	int a = fChain->GetEntry( entry );
-	
-	if( a > 0 && fVersion < 6 )
-	{
-		LTrig = ( ULong64_t )LTrigS;
-		for( unsigned int i = 0; i < VDST_MAXRECMETHODS; i++ )
-		{
-			ImgSel[i] = ( ULong64_t )ImgSelS[i];
-		}
-	}
-	return a;
+	return fChain->GetEntry( entry );
 }
 
 
@@ -346,6 +326,7 @@ void Cshowerpars::Init( TTree* tree )
 			TelRA[i] = 0;
 		}
 	}
+	
 	if( !bMC && !bShort )
 	{
 		fChain->SetBranchAddress( "TelElevationVBF", TelElevationVBF );
@@ -378,25 +359,8 @@ void Cshowerpars::Init( TTree* tree )
 	fChain->SetBranchAddress( "WobbleN", &WobbleN );
 	fChain->SetBranchAddress( "WobbleE", &WobbleE );
 	fChain->SetBranchAddress( "NTrig", &NTrig );
-	if( fVersion < 6 )
-	{
-		fChain->SetBranchAddress( "LTrig", &LTrigS );
-	}
-	else
-	{
-		fChain->SetBranchAddress( "LTrig", &LTrig );
-	}
-	if( fVersion > 6 )
-	{
-		fChain->SetBranchAddress( "Trig_list", Trig_list, &b_Trig_list );
-	}
-	else
-	{
-		for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
-		{
-			Trig_list[i] = 0;
-		}
-	}
+	fChain->SetBranchAddress( "LTrig", &LTrig );
+	fChain->SetBranchAddress( "Trig_list", Trig_list, &b_Trig_list );
 	if( fChain->GetBranchStatus( "Trig_type" ) )
 	{
 		fChain->SetBranchAddress( "Trig_type", Trig_type, &b_Trig_type );
@@ -423,28 +387,8 @@ void Cshowerpars::Init( TTree* tree )
 	
 	fChain->SetBranchAddress( "NImages", NImages );
 	fChain->SetBranchAddress( "img2_ang", img2_ang );
-	if( fVersion < 6 )
-	{
-		fChain->SetBranchAddress( "ImgSel", ImgSelS );
-	}
-	else
-	{
-		fChain->SetBranchAddress( "ImgSel", ImgSel );
-	}
-	if( fVersion > 6 )
-	{
-		fChain->SetBranchAddress( "ImgSel_list", ImgSel_list, &b_ImgSel_list );
-	}
-	else
-	{
-		for( unsigned int i = 0; i < VDST_MAXRECMETHODS; i++ )
-		{
-			for( unsigned int j = 0; j < VDST_MAXTELESCOPES; j++ )
-			{
-				ImgSel_list[i][j] = 0;
-			}
-		}
-	}
+	fChain->SetBranchAddress( "ImgSel", ImgSel );
+	fChain->SetBranchAddress( "ImgSel_list", ImgSel_list, &b_ImgSel_list );
 	fChain->SetBranchAddress( "Ze", Ze );
 	fChain->SetBranchAddress( "Az", Az );
 	fChain->SetBranchAddress( "Xoff", Xoff );
@@ -465,8 +409,11 @@ void Cshowerpars::Init( TTree* tree )
 	if( !bShort )
 	{
 		fChain->SetBranchAddress( "stds", stds );
-		fChain->SetBranchAddress( "dec", dec );
-		fChain->SetBranchAddress( "ra", ra );
+		if( fChain->GetBranchStatus( "dec" ) )
+		{
+			fChain->SetBranchAddress( "dec", dec );
+			fChain->SetBranchAddress( "ra", ra );
+		}
 	}
 	else
 	{
@@ -508,14 +455,7 @@ void Cshowerpars::Init( TTree* tree )
 	}
 	if( bMC )
 	{
-		if( fVersion > 7 )
-		{
-			fChain->SetBranchAddress( "MCprim", &MCprim );
-		}
-		else
-		{
-			MCprim = 0;
-		}
+		fChain->SetBranchAddress( "MCprim", &MCprim );
 		fChain->SetBranchAddress( "MCe0", &MCe0 );
 		fChain->SetBranchAddress( "MCxcore", &MCxcore );
 		fChain->SetBranchAddress( "MCycore", &MCycore );
@@ -734,11 +674,4 @@ void Cshowerpars::Show( Long64_t entry )
 }
 
 
-Int_t Cshowerpars::Cut( Long64_t entry )
-{
-	// This function may be called from Loop.
-	// returns  1 if entry is accepted.
-	// returns -1 otherwise.
-	return 1;
-}
 #endif                                            // #ifdef Cshowerpars_cxx

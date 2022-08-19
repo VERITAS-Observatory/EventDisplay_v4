@@ -401,7 +401,7 @@ double VFitTraceHandler::getTraceSum( int iFirst, int iLast, bool iRaw )
 	}
 	else
 	{
-		isum = getQuickSum( iFirst, iLast, iRaw );
+		isum = calculateTraceSum_fixedWindow( iFirst, iLast, iRaw );
 	}
 	
 	return isum;

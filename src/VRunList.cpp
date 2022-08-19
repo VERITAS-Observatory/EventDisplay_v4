@@ -2,7 +2,7 @@
     \brief data class
 
 
-    \author Gernot Maier
+
 */
 
 #include "VRunList.h"

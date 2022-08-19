@@ -1,9 +1,6 @@
 /*! \file mscw_energy.cpp
     \brief calculate mean scaled width and length,  energy with lookup tables
 
-    \author
-     Gernot Maier
-     basic routines: Henrik Krawczynski (mscw+energy routine)
 */
 
 #include "VTableCalculator.h"
@@ -96,10 +93,10 @@ int main( int argc, char* argv[] )
 	}
 	
 	cout << endl << "loop over all events ";
-        if( fTLook->getNEntries() != 1234567890 )
-        {
-            cout << "(in total " << fTLook->getNEntries() << ")";
-        }
+	if( fTLook->getNEntries() != 1234567890 )
+	{
+		cout << "(in total " << fTLook->getNEntries() << ")";
+	}
 	cout << endl;
 	if( fTLook->getMaxTotalTime() < 1.e8 )
 	{

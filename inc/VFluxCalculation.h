@@ -73,8 +73,8 @@ class VFluxCalculation : public TObject
 		bool fDebug;
 		
 		bool fTimebinned;
-                double fMJD_min;
-                double fMJD_max;
+		double fMJD_min;
+		double fMJD_max;
 		
 		// input parameters read from anasum file (from run summary tree)
 		vector< double > fRunList;                //!< run number
@@ -84,7 +84,7 @@ class VFluxCalculation : public TObject
 		vector< vector< double > > fIntraRunTOn;  //!< life time [s] of each time bin (time mask and deadtime already taken into account)
 		vector< double > fRunDeadTime;            //!< dead time fraction
 		vector< double > fRunZe;                  //!< mean zenith angle [deg]
-                vector< double > fRunAz;                  //!< mean azumith angle[deg] (not not always well defined)
+		vector< double > fRunAz;                  //!< mean azumith angle[deg] (not not always well defined)
 		vector< double > fRunWobbleOffset;        //!< wobble offset [deg]
 		vector< double > fRunPedvars;             //!< pedvars
 		vector< double > fRunNdiff;               //!< N_on - alpha * N_off
@@ -144,16 +144,16 @@ class VFluxCalculation : public TObject
 		double fMinEvents;
 		double fUpperLimit;
 		int    fUpperLimitMethod;
-                bool   fFluxCalculationUseRolke;
+		bool   fFluxCalculationUseRolke;
 		
 		// X-ray data
 		VXRayData* fRXTE;
 		
 		// graphs
 		TGraphErrors* gFluxElevation;
-                TGraphErrors* gFluxAzimuth;
-                TGraphErrors* gFluxWobbleOffset;
-                TGraphErrors* gFluxPedvars;
+		TGraphErrors* gFluxAzimuth;
+		TGraphErrors* gFluxWobbleOffset;
+		TGraphErrors* gFluxPedvars;
 		TCanvas* fCanvasFluxesVSMJD;
 		TCanvas* fCanvasFluxesInBINs;
 		
@@ -180,18 +180,18 @@ class VFluxCalculation : public TObject
 		~VFluxCalculation();
 		
 		void          calculateIntegralFlux( double iMinEnergy_TeV );
-                TGraphErrors* getFluxvsElevation()
-                {
-                        return gFluxElevation;
-                }
-                TGraphErrors* getFluxvsWobbleOffset()
-                {
-                        return gFluxWobbleOffset;
-                }
-                TGraphErrors* getFluxvsPedvars()
-                {
-                        return gFluxPedvars;
-                }
+		TGraphErrors* getFluxvsElevation()
+		{
+			return gFluxElevation;
+		}
+		TGraphErrors* getFluxvsWobbleOffset()
+		{
+			return gFluxWobbleOffset;
+		}
+		TGraphErrors* getFluxvsPedvars()
+		{
+			return gFluxPedvars;
+		}
 		TCanvas*      getFluxesVSMJDCanvas()
 		{
 			return fCanvasFluxesVSMJD;
@@ -279,17 +279,17 @@ class VFluxCalculation : public TObject
 		void          printResults();
 		void          printResultsJSON();
 		void          printRunList();
-                void          printECSVLine();
+		void          printECSVLine();
 		void          printDebugSummary();
 		bool          readRXTE( string ifile );
 		void          setDebug( bool iB )
 		{
 			fDebug = iB;
 		}
-                void          setFluxCalculationMethod( bool i_bRolke = false )
-                {
-                        fFluxCalculationUseRolke = i_bRolke;
-                }
+		void          setFluxCalculationMethod( bool i_bRolke = false )
+		{
+			fFluxCalculationUseRolke = i_bRolke;
+		}
 		void          setSpectralParameters( double iMinEnergy_TeV = 0., double E0 = 1., double alpha = -2.5, double iMaxEnergy_TeV = MAX_SAFE_MC_ENERGY );
 		void          setSignificanceParameters( double iThresholdSignificance = 3., double iMinEvents = 5,
 				double iUpperLimit = 0.99, int iUpperlimitMethod = 5, int iLiMaEqu = 17 );

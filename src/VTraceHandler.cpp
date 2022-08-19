@@ -1,7 +1,6 @@
 /*! \class VTraceHandler
     \brief calculation of trace specific stuff like charge sums, getting the maximum, etc.
 
-    base class for all varitations of trace handlers, see VFitTraceHandler for an example
 
 */
 
@@ -13,8 +12,6 @@ VTraceHandler::VTraceHandler()
 	fpTrace.assign( 64, 0. );
 	fPed = 0.;
 	fPedrms = 0.;
-	fMax = 0.;
-	fSum = 0.;
 	fTraceAverageTime = 0.;
 	fChanID = 0;
 	fpTrazeSize = 0;
@@ -28,26 +25,12 @@ VTraceHandler::VTraceHandler()
 	fFindPulseTiming = false;
 	
 	fTraceIntegrationMethod = 1;
-	
-	// Signal Extractors (Maxim)
-	SaturLimit = 10000; //FIXME discuss with Gernot
-	fSliceRMS[1] = 9.;
-	fSliceRMS[2] = 11.;
-	fSliceRMS[3] = 5.;
-	fSliceRMS[4] = 4.7; // FIXME: TEMP: should be extracted from traces automatically
-	oversampling = 4;
-	WinToAverage = 2 * oversampling;
-	MaxNumPulses = 15;
-	PoleZeroFlash = 0.96; // for FlashCam ~10% undershoot  pole zero cancelation after oversampled digital signal differentiation
-	PoleZeroDragNec = 0.84; // for fwhm=3.16ns
-	ProcToAmplFlash = 3.;
-	ProcToAmplDragNec = 5.;
+	kIPRmeasure  = false;
 	
 }
 
 void VTraceHandler::reset()
 {
-	fSum = 0.;
 	fTraceAverageTime = 0.;
 	fSumWindowFirst = 0;
 	fSumWindowLast  = 0;
@@ -56,6 +39,8 @@ void VTraceHandler::reset()
 
 /*
     analysis routines call this function
+
+    (generally, this function is called)
 */
 void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSamples, double ped, double pedrms, unsigned int iChanID, unsigned int iHitID, double iHiLo )
 {
@@ -71,7 +56,8 @@ void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSample
 		return;
 	}
 	
-	// copy trace
+	///////////////////////////////////////
+	// copy trace from raw data reader
 	if( iNSamples != fpTrace.size() )
 	{
 		fpTrace.clear();
@@ -82,15 +68,20 @@ void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSample
 	}
 	else for( unsigned int i = 0; i < iNSamples; i++ )
 		{
-			{
-				fpTrace[i] = iReader->getSample_double( iHitID, i + fMC_FADCTraceStart, ( i == 0 ) );
-			}
+			fpTrace[i] = iReader->getSample_double( iHitID, i + fMC_FADCTraceStart, ( i == 0 ) );
 		}
 		
 	fpTrazeSize = int( fpTrace.size() );
+	
+	////////////////////////////
+	// apply hi-lo gain ratio
 	fHiLo = apply_lowgain( iHiLo );
 }
 
+/*
+ *  used only for time jitter calibration
+ *
+ */
 void VTraceHandler::setTrace( vector<uint16_t> pTrace, double ped, double pedrms, unsigned int iChanID, double iHiLo )
 {
 	fPed = ped;
@@ -116,6 +107,10 @@ void VTraceHandler::setTrace( vector<uint16_t> pTrace, double ped, double pedrms
 	fHiLo = apply_lowgain( iHiLo );
 }
 
+/*
+ *  used only for time jitter calibration
+ *
+ */
 void VTraceHandler::setTrace( vector<uint8_t> pTrace, double ped, double pedrms, unsigned int iChanID, double iHiLo )
 {
 	fPed = ped;
@@ -160,23 +155,30 @@ bool VTraceHandler::apply_lowgain( double iHiLo )
 	return false;
 }
 
-
-double VTraceHandler::getQuickSum( int fFirst, int fLast, bool fRaw )
+/*
+ * sum up FADC trace from fFirst to fLast
+ *
+ */
+double VTraceHandler::calculateTraceSum_fixedWindow( int fFirst, int fLast, bool iRaw )
 {
 	double sum = 0.;
+	double tcharge = 0.;
+	fTraceAverageTime = 0.;
 	for( int i = fFirst; i < fLast; i++ )
 	{
 		// require that trace is >0.
 		// (CTA MC write trace values above a certain signal only)
 		if( i < fpTrazeSize && fpTrace[i] > 0. )
 		{
-			if( !fRaw )
+			if( !iRaw )
 			{
 				sum += fpTrace[i] - fPed;
+				tcharge += ( i + 0.5 ) * ( fpTrace[i] - fPed );
 			}
-			if( fRaw )
+			else
 			{
 				sum += fpTrace[i];
+				tcharge += ( i + 0.5 ) * fpTrace[i];
 			}
 		}
 	}
@@ -184,14 +186,17 @@ double VTraceHandler::getQuickSum( int fFirst, int fLast, bool fRaw )
 	{
 		sum = 0.;
 	}
-	if( abs( sum ) < 1.e-10 )
+	if( TMath::Abs( sum ) < 1.e-10 )
 	{
 		sum = 0.;
+		fTraceAverageTime = 0.;
 	}
-	fSum = sum;
+	else
+	{
+		fTraceAverageTime = tcharge / sum;
+	}
 	return sum;
 }
-
 
 double VTraceHandler::getQuickTZero( int fFirst, int fLast )
 {
@@ -238,6 +243,11 @@ double VTraceHandler::getQuickTZero( int fFirst, int fLast, int fTFirst )
 	return tzero;
 }
 
+/*
+ *  determines timing if L2 pulse to calculate crate timing jitter
+ *
+ *
+*/
 vector<float> VTraceHandler::getFADCTiming( int fFirst, int fLast, bool debug )
 {
 
@@ -266,23 +276,23 @@ vector<float> VTraceHandler::getFADCTiming( int fFirst, int fLast, bool debug )
 		{
 			i_start = i;
 			have_first = true;
-			//cout << "VTraceHandler::getFADCTiming(): First " << i_start << endl;
 		}
 		if( have_first && ( fpTrace[i] - fPed ) < temp )
 		{
 			i_stop = i;
 			have_second = true;
-			//cout << "VTraceHandler::getFADCTiming(): Stop  " << i_stop << endl;
 		}
 		temp = fpTrace[i] - fPed;
-		//cout << "VTraceHandler::getFADCTiming(): i " << i << ", Temp  " << temp << endl;
 	}
 	
 	if( !have_first && debug )
 	{
 		cout << "VTraceHandler::getFADCTiming()  Warning: coulnd't find bin with signal > 40 dc in range " << fFirst << " - " << fLast << endl;
 	}
-	i_start -= 4;
+	if( i_start >= 4 )
+	{
+		i_start -= 4;
+	}
 	while( i_start < fFirst )
 	{
 		i_start++;
@@ -290,7 +300,10 @@ vector<float> VTraceHandler::getFADCTiming( int fFirst, int fLast, bool debug )
 	i_stop += 4;
 	while( i_stop > fLast )
 	{
-		i_stop--;
+		if( i_stop > 0 )
+		{
+			i_stop--;
+		}
 	}
 	return getPulseTiming( i_start, i_stop, i_start, i_stop );
 }
@@ -391,6 +404,13 @@ vector< float >& VTraceHandler::getPulseTiming( int fFirst, int fLast, int fTFir
 }
 
 
+/*
+ *
+ *   return trace value and position of trace maximum
+ *
+ *   trace value is pedestal subtracted
+ *
+ */
 void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpos )
 {
 	unsigned int n255 = 0;
@@ -403,9 +423,12 @@ void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpo
 	double it = 0.;
 	int nMax = ( int )( fDynamicRange * tmax );
 	n255 = 0;
+	// value at maximum
 	tmax = -10000.;
+	// position of maximum (in samples)
 	maxpos = -100;
-	// high gain channel
+	/////////////////////////////////////////////////////
+	// determine maximum position in a high gain channel
 	if( !fHiLo )
 	{
 		if( fFirst >= 0 && fFirst < fLast && fLast <= fpTrazeSize )
@@ -420,16 +443,17 @@ void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpo
 				}
 			}
 			tmax -= fPed;
-			fMax = tmax;
 		}
 	}
+	/////////////////////////////////////////////////////
 	// low gain channel
-	// (needs special treatment as end of the high gain pulse is
+	// (needs special treatment as end of the saturated high gain pulse is
 	//  occassionally at the beginning of the readout window)
 	else
 	{
 		if( fFirst >= 0 && fFirst < fLast && fLast <= fpTrazeSize )
 		{
+			// start search at end of the integration window
 			for( int i = fLast - 1; i >= fFirst; i-- )
 			{
 				it = fpTrace[i];
@@ -453,7 +477,6 @@ void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpo
 				}
 			}
 			tmax -= fPed;
-			fMax = tmax;
 		}
 	}
 }
@@ -585,10 +608,9 @@ void VTraceHandler::setPulseTimingLevels( vector< float > iP )
 
     select trace integration method
 
-    0: get trace sum between given integration range
+    1: get trace sum between given integration range
 
-
-    1: get maximum sum from sliding window method (use integration range to calculate integration window only)
+    2: get maximum sum from sliding window method (use integration range to calculate integration window only)
 
 */
 bool VTraceHandler::setTraceIntegrationmethod( unsigned int iT )
@@ -604,43 +626,71 @@ bool VTraceHandler::setTraceIntegrationmethod( unsigned int iT )
 	return true;
 }
 
-double VTraceHandler::getTraceSum( int fFirst, int fLast, bool fRaw )
+/*
+ *   trace integration
+ *
+ *   note that there are a number of different trace integration methods
+ *
+ */
+double VTraceHandler::getTraceSum( int iSumWindowFirst, int iSumWindowLast, bool iRaw,
+								   unsigned int iTraceIntegrationMethod, bool iForceWindowStart,
+								   unsigned int iSlidingWindowLast )
 {
+	// set trace integration method
+	if( iTraceIntegrationMethod < 9999 )
+	{
+		fTraceIntegrationMethod = iTraceIntegrationMethod;
+	}
+	
 	// integrate from fFirst to fLast
 	if( fTraceIntegrationMethod == 1 )
 	{
-		fSumWindowFirst = fFirst;
-		fSumWindowLast  = fLast;
-		return getQuickSum( fFirst, fLast, fRaw );
+		fSumWindowFirst = iSumWindowFirst;
+		fSumWindowLast  = iSumWindowLast;
+		return calculateTraceSum_fixedWindow( fSumWindowFirst, fSumWindowLast, iRaw );
 	}
 	// find maximum integral
 	else if( fTraceIntegrationMethod == 2 )
 	{
-		//return getQuickMaximumSum( 0, 0.5*fpTrace.size(),fLast - fFirst, fRaw );
-		return getQuickMaximumSum( 0, fpTrace.size(), fLast - fFirst, fRaw );
+		if( !kIPRmeasure )
+		{
+			// special case: search over restricted window
+			if( iForceWindowStart )
+			{
+				if( iSlidingWindowLast >= fpTrace.size() )
+				{
+					iSlidingWindowLast = fpTrace.size();
+				}
+				return calculateTraceSum_slidingWindow( iSumWindowFirst,
+														iSlidingWindowLast,
+														iSumWindowLast - iSumWindowFirst,
+														iRaw );
+			}
+			// default: search over whole summation window
+			else
+			{
+				return calculateTraceSum_slidingWindow( 0, fpTrace.size(), iSumWindowLast - iSumWindowFirst, iRaw );
+			}
+		}
+		// IPR measurements from long trace file
+		else
+		{
+			return calculateTraceSum_slidingWindow( 0.5 * fpTrace.size(),
+													fpTrace.size(),
+													iSumWindowLast - iSumWindowFirst,
+													iRaw );
+		}
 	}
-	// extraction with oversampling (less time clustering (due to limited sampling) even for short window
-	else if( fTraceIntegrationMethod == 3 )
-	{
-		//return getMaxSumWithOverSampling(0,0.5*fpTrace.size(),0, fLast-fFirst, fRaw);
-		return getMaxSumWithOverSampling( 0, fpTrace.size(), 0, fLast - fFirst, fRaw );
-	}
-	// TEMP: IPR calculation from long traces for extractors 2/3
-	else if( fTraceIntegrationMethod == 4 )
-	{
-		return getQuickMaximumSum( 0.5 * fpTrace.size(), fpTrace.size(), fLast - fFirst, fRaw );         // extractor 2
-		//return getMaxSumWithOverSampling( 0.5*fpTrace.size(), fpTrace.size(),0,fLast - fFirst, fRaw );   //extractor 3
-	}
-	// return simle the trace maximum as trace sum
+	// return simple the trace maximum as trace sum
 	else if( fTraceIntegrationMethod == 5 )
 	{
 		double peakamplitude = getTraceMax();
 		double result = 0;
-		if( fRaw )
+		if( iRaw )
 		{
 			result = peakamplitude + fPed;
 		}
-		if( !fRaw )
+		else
 		{
 			result = peakamplitude;
 		}
@@ -651,80 +701,82 @@ double VTraceHandler::getTraceSum( int fFirst, int fLast, bool fRaw )
 }
 
 
-//****************************************************************************************
-// Various signal extractors (Maxim)
-//****************************************************************************************
-double VTraceHandler::getQuickMaximumSum( unsigned int iSearchStart, unsigned int iSearchEnd, int iIntegrationWindow, bool fRaw )
+/*
+ *
+ * get maximum trace sum
+ * (sliding window, search along trace for maximum sum)
+ *
+*/
+double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart,
+		unsigned int iSearchEnd,
+		int iIntegrationWindow,
+		bool fRaw )
 {
-	fRaw = false;
 	unsigned int n = fpTrace.size();
-	int saturflag = 0;
-	int max = 0;
 	unsigned int window = iIntegrationWindow;
-	unsigned int windowcalib = 2 * iIntegrationWindow;
 	unsigned int SearchEnd = iSearchEnd;
 	if( ( n - window ) <= SearchEnd )
 	{
-		SearchEnd = n - window;
+		SearchEnd = n - window + 1;
 	}
 	int lolimit = 0;
-	int lolimitcal = 0;
 	int uplimit = 0;
-	int uplimitcal = 0;
-	//float SaturLimit=fDynamicRange*10.;//FIXME (need to be discussed with Gernot)
-	float tcharge = 0, tcharge2 = 0;
-	float arrtime = 0, arrtime2 = 0;
-	double charge = 0, charge2 = 0, ampl = 0.;
-	
+	float tcharge = 0.;
+	double ampl = 0.;
+	double charge = 0.;
+	float ped = fPed;
+	if( kIPRmeasure )
+	{
+		ped = 0.;
+	}
+	////////////////////////////////////////
+	// sample time and value (ped subracted)
 	float muxBINS[n], FADC[n];
 	for( unsigned int i = 1; i <= n; i++ )
 	{
 		muxBINS[i - 1] = i - 0.5;
-		FADC[i - 1] = ( float )fpTrace.at( i - 1 ) - fPed;
+		FADC[i - 1] = ( float )fpTrace.at( i - 1 ) - ped;
 	}
 	
-	charge = 0, charge2 = 0;
-	tcharge = 0, tcharge2 = 0;
-	//maxbin   = LocMax(ampl);
-	//if(ampl>=SaturLimit) saturflag=1;
-	if( iIntegrationWindow == 1 && iSearchStart == 1 ) // special case for slice RMS calculation
+	if( n == 0 )
 	{
-		charge = FADC[1];
-		arrtime = muxBINS[1];
-		fSum = charge;
-		fTraceAverageTime = arrtime;
-		fSumWindowFirst = lolimit;
-		fSumWindowLast  = uplimit;
-		
-		return charge;
-	}
-	
-	if( n <= 0 )
-	{
+		fTraceAverageTime = muxBINS[1];
 		return 0.;
 	}
-	float xmax = 0, xmax2 = 0;
+	
+	////////////////////////////////////////
+	// special case for ped calculation
+	if( fRaw )
+	{
+		for( unsigned int i = 0; i < ( unsigned int )iIntegrationWindow; i++ )
+		{
+			charge += ( float )fpTrace.at( n - 1 - i );
+		}
+		fTraceAverageTime = muxBINS[n - 1];
+		fSumWindowFirst = n - iIntegrationWindow;
+		fSumWindowLast  = n;
+		
+		return FADC[1];
+	}
+	
+	////////////////////////////////////////
+	float xmax = 0.;
 	for( unsigned int i = iSearchStart; i < int( window ) + iSearchStart; i++ )
 	{
 		xmax += FADC[i];
 	}
-	for( unsigned int i = iSearchStart; i < int( windowcalib ) + iSearchStart; i++ )
-	{
-		xmax2 += FADC[i];
-	}
-	// extract charge for small window **********************************
+	// extract charge
 	for( unsigned int i = iSearchStart; i < SearchEnd; i++ )
 	{
 		if( charge < xmax )
 		{
 			charge = xmax;
-			max = i;
-			uplimit = max + int( window );
+			uplimit = i + int( window );
 			if( uplimit > int( n ) )
 			{
 				uplimit = n;
 			}
-			lolimit = max;
+			lolimit = i;
 			if( lolimit < 0 )
 			{
 				lolimit = 0;
@@ -732,664 +784,28 @@ double VTraceHandler::getQuickMaximumSum( unsigned int iSearchStart, unsigned in
 		}
 		xmax = xmax - FADC[i] + FADC[i + window];
 	}
-	// extract charge for big window ************************************
-	uplimitcal = int( uplimit ) + ( int( windowcalib ) - int( window ) ) / 2;
-	if( uplimitcal > int( SearchEnd ) + ( int )window - 2 )
-	{
-		uplimitcal = ( int )SearchEnd + ( int )window - 1;
-	}
-	lolimitcal = int( lolimit ) - ( int( windowcalib ) - int( window ) ) / 2;
-	if( lolimitcal < int( iSearchStart ) )
-	{
-		lolimitcal = ( int )iSearchStart;
-	}
 	// arrival times *****************************************************
 	for( int k = lolimit; k < uplimit; k++ )
 	{
 		tcharge += muxBINS[k] * FADC[k];
 	}
-	for( int k = lolimitcal; k < uplimitcal; k++ )
-	{
-		tcharge2 += muxBINS[k] * FADC[k];
-		charge2 += FADC[k];
-	}
-	// extract saturated charge (integrate everything to the end) ************************************
-	if( saturflag )
-	{
-		tcharge = 0;
-		charge = 0;
-		charge2 = 0;
-		uplimitcal = ( int )SearchEnd + ( int )window - 1;
-		lolimitcal = lolimit - ( int( windowcalib ) - int( window ) ) / 2;
-		if( lolimitcal < int( iSearchStart ) )
-		{
-			lolimitcal = iSearchStart;
-		}
-		for( int k = lolimitcal; k < uplimitcal; k++ )
-		{
-			tcharge += muxBINS[k] * FADC[k];
-			charge2 += FADC[k];
-		}
-	}
 	
-	if( charge != 0 )
+	if( charge != 0. )
 	{
-		arrtime = tcharge / charge;
+		fTraceAverageTime = tcharge / charge;
 	}
-	if( charge2 != 0 )
+	if( fTraceAverageTime < iSearchStart )
 	{
-		arrtime2 = tcharge2 / charge2;
+		fTraceAverageTime = 0.;
 	}
-	if( arrtime < iSearchStart )
+	if( fTraceAverageTime > ( ( int )SearchEnd + ( int )window - 1 ) )
 	{
-		arrtime = 0;
-	}
-	if( arrtime > ( ( int )SearchEnd + ( int )window - 1 ) )
-	{
-		arrtime = ( ( int )SearchEnd + ( int )window - 1 );
-	}
-	if( arrtime2 < iSearchStart )
-	{
-		arrtime2 = 0;
-	}
-	if( arrtime2 > ( ( int )SearchEnd + ( int )window - 1 ) )
-	{
-		arrtime2 = ( ( int )SearchEnd + ( int )window - 1 );
+		fTraceAverageTime = ( ( int )SearchEnd + ( int )window - 1 );
 	}
 	ampl -= fPed;
 	
-	fSum = charge;
-	fTraceAverageTime = arrtime;
 	fSumWindowFirst = lolimit;
 	fSumWindowLast  = uplimit;
 	
 	return charge;
 }
-
-double VTraceHandler::getMaxSumAutoWindow( float AmplThresh, unsigned int iSearchStart, unsigned int iSearchEnd, int iIntegrationWindow, bool fRaw )
-{
-	fRaw = false;
-	unsigned int n = fpTrace.size();
-	int saturflag = 0;
-	int max = 0;
-	unsigned int window = iIntegrationWindow;
-	unsigned int windowcalib = 2 * iIntegrationWindow;
-	unsigned int SearchEnd = iSearchEnd;
-	if( ( n - window ) <= SearchEnd )
-	{
-		SearchEnd = n - window;
-	}
-	int lolimit = 0;
-	int lolimitcal = 0;
-	int uplimit = 0;
-	int uplimitcal = 0;
-	//float SaturLimit=fDynamicRange*10.;//FIXME (need to be discussed with Gernot)
-	float tcharge = 0, tcharge2 = 0;
-	float arrtime = 0, arrtime2 = 0;
-	double charge = 0, charge2 = 0, ampl = 0.;
-	
-	float muxBINS[n], FADC[n];
-	for( unsigned int i = 1; i <= n; i++ )
-	{
-		muxBINS[i - 1] = i - 0.5;
-		FADC[i - 1] = ( float )fpTrace.at( i - 1 ) - fPed;
-	}
-	
-	charge = 0, charge2 = 0;
-	tcharge = 0, tcharge2 = 0;
-	//maxbin   = LocMax(ampl);
-	//if(ampl>=SaturLimit) saturflag=1;
-	
-	if( n <= 0 )
-	{
-		return -1;
-	}
-	float xmax = 0, xmax2 = 0;
-	for( unsigned int i = iSearchStart; i < int( window ) + iSearchStart; i++ )
-	{
-		xmax += FADC[i];
-	}
-	for( unsigned int i = iSearchStart; i < int( windowcalib ) + iSearchStart; i++ )
-	{
-		xmax2 += FADC[i];
-	}
-	// extract charge for small window **********************************
-	for( unsigned int i = iSearchStart; i < SearchEnd; i++ )
-	{
-		if( charge < xmax )
-		{
-			charge = xmax;
-			max = i;
-			uplimit = max + int( window );
-			if( uplimit > int( n ) )
-			{
-				uplimit = n - 1;
-			}
-			lolimit = max;
-			if( lolimit < 0 )
-			{
-				lolimit = 1;
-			}
-		}
-		xmax = xmax - FADC[i] + FADC[i + window];
-	}
-	// extract charge for big window ************************************
-	uplimitcal = int( uplimit ) + ( int( windowcalib ) - int( window ) ) / 2;
-	if( uplimitcal > int( SearchEnd ) + ( int )window - 2 )
-	{
-		uplimitcal = ( int )SearchEnd + ( int )window - 1;
-	}
-	lolimitcal = int( lolimit ) - ( int( windowcalib ) - int( window ) ) / 2;
-	if( lolimitcal < int( iSearchStart ) )
-	{
-		lolimitcal = ( int )iSearchStart;
-	}
-	// arrival times *****************************************************
-	for( int k = lolimit; k < uplimit; k++ )
-	{
-		tcharge += muxBINS[k] * FADC[k];
-	}
-	for( int k = lolimitcal; k < uplimitcal; k++ )
-	{
-		tcharge2 += muxBINS[k] * FADC[k];
-		charge2 += FADC[k];
-	}
-	// extract saturated charge (integrate everything to the end) ************************************
-	if( saturflag )
-	{
-		tcharge = 0;
-		charge = 0;
-		charge2 = 0;
-		uplimitcal = ( int )SearchEnd + ( int )window - 1;
-		lolimitcal = lolimit - ( int( windowcalib ) - int( window ) ) / 2;
-		if( lolimitcal < int( iSearchStart ) )
-		{
-			lolimitcal = iSearchStart;
-		}
-		for( int k = lolimitcal; k < uplimitcal; k++ )
-		{
-			tcharge += muxBINS[k] * FADC[k];
-			charge2 += FADC[k];
-		}
-	}
-	
-	if( charge != 0 )
-	{
-		arrtime = tcharge / charge;
-	}
-	if( charge2 != 0 )
-	{
-		arrtime2 = tcharge2 / charge2;
-	}
-	if( arrtime < iSearchStart )
-	{
-		arrtime = 0;
-	}
-	if( arrtime > ( ( int )SearchEnd + ( int )window - 1 ) )
-	{
-		arrtime = ( ( int )SearchEnd + ( int )window - 1 );
-	}
-	if( arrtime2 < iSearchStart )
-	{
-		arrtime2 = 0;
-	}
-	if( arrtime2 > ( ( int )SearchEnd + ( int )window - 1 ) )
-	{
-		arrtime2 = ( ( int )SearchEnd + ( int )window - 1 );
-	}
-	ampl -= fPed;
-	
-	// extract charge for automatic integration window (extends window )
-	int intwin = 0;
-	int Start = lolimit;
-	int Stop = uplimit;
-	
-	float chargeAutoWin = 0.;
-	
-	for( int i = lolimit; i > int( iSearchStart ); i-- )
-	{
-		if( FADC[i] >= AmplThresh )
-		{
-			intwin++;
-			//chargeAutoWin+=FADC[i];
-			Start = i;
-		}
-		else
-		{
-			break;
-		}
-	}
-	for( int i = uplimit; i < int( SearchEnd ); i++ )
-	{
-		if( FADC[i] >= AmplThresh )
-		{
-			intwin++;
-			//chargeAutoWin+=FADC[i];
-			Stop = i;
-		}
-		else
-		{
-			break;
-		}
-	}
-	//*/
-	
-	for( int k = Start; k < Stop; k++ )
-	{
-		chargeAutoWin += FADC[k];
-	}
-	
-	fSum = charge;
-	//fSum = chargeAutoWin;
-	fTraceAverageTime = arrtime;
-	//fSumWindowFirst = lolimit;
-	//fSumWindowLast  = uplimit;
-	fSumWindowFirst = Start;
-	fSumWindowLast  = Stop;
-	
-	std::cout << " Charge:" << charge << " arrtime:" << arrtime << " ChargeAuto:" << chargeAutoWin << " autowin:" << intwin << " start/stop:" << Start << "/" << Stop << endl;
-	return charge;
-	//return chargeAutoWin;
-}
-
-double VTraceHandler::getMaxSumWithOverSampling( unsigned int iSearchStart, unsigned int iSearchEnd, unsigned int ElecConcept, int iIntegrationWindow, bool fRaw )
-{
-	fRaw = false;
-	unsigned int n = fpTrace.size();
-	int saturflag = 0;
-	int max = 0;
-	float ProcToAmpl = 1.;
-	unsigned int integwin = iIntegrationWindow * oversampling;
-	unsigned int bigintegwin = 2 * iIntegrationWindow * oversampling;
-	
-	int lolimit = 0;
-	int lolimitcal = 0;
-	int uplimit = 0;
-	int uplimitcal = 0;
-	//float SaturLimit=fDynamicRange*10.;//FIXME (need to be discussed with Gernot)
-	float tcharge = 0., tcharge2 = 0.;
-	float arrtime = 0., arrtime2 = 0.;
-	double charge = 0., charge2 = 0., ampl = 0.;
-	
-	//float muxBINS[n], FADC[n];
-	int ElecResBoost = 1;
-	float polezero = PoleZeroFlash;
-	if( ElecConcept == 0 )
-	{
-		ElecResBoost = 5;
-		polezero = PoleZeroDragNec;
-		ProcToAmpl = ProcToAmplDragNec;
-	}
-	if( ElecConcept == 1 )
-	{
-		ProcToAmpl = ProcToAmplFlash;
-	}
-	//for(int i=1;i<=n;i++) {muxBINS[i-1]=i-0.5; FADC[i-1]=(float)ptr[i-1]-ped;}
-	
-	//overampled array
-	unsigned int nfine = n * oversampling;
-	unsigned int SearchStart = iSearchStart * oversampling;
-	unsigned int SearchEnd = iSearchEnd * oversampling;
-	if( ( nfine - integwin ) <= SearchEnd )
-	{
-		SearchEnd = ( nfine - integwin );
-	}
-	float muxBINSfine[nfine], FADCfine[nfine]; // ovesampled fadc slices;
-	float FADCfineBuf[nfine]; // ovesampled fadc slices;
-	
-	// filling oversampled array
-	for( unsigned int i = 1; i <= n; i++ )
-	{
-		unsigned int start = oversampling * i - oversampling;
-		for( unsigned int j = start; j < start + oversampling; j++ )
-		{
-			muxBINSfine[j] = j + 0.5;
-			FADCfine[j] = float( ElecResBoost ) * ProcToAmpl * ( ( float )fpTrace.at( i - 1 ) - fPed );
-		}
-	}
-	for( unsigned int j = 0; j < nfine; j++ )
-	{
-		float val = 0;
-		int cnt = 0;
-		for( unsigned int m = 0; m < WinToAverage; m++ )
-		{
-			val += FADCfine[j + m];
-			unsigned int end = j + m;
-			if( end >= nfine )
-			{
-				break;
-			}
-			cnt++;
-		}
-		val /= float( cnt );
-		FADCfineBuf[j] = val;
-	}
-	
-	// process oversampled array ************************
-	//short* ProcessedFADC=new short[nfine];
-	float* ProcessedFADC = new float[nfine];
-	//differentiate with pole-zero cancellation
-	for( unsigned int j = 0; j < nfine; j++ )
-	{
-		ProcessedFADC[j] = float( int( -polezero * FADCfineBuf[j] + FADCfineBuf[j + 1] ) );
-	}
-	ProcessedFADC[nfine - 1] = ProcessedFADC[nfine - 2];
-	//rolling average
-	for( unsigned int j = 0; j < nfine; j++ )
-	{
-		ProcessedFADC[j] = ( ProcessedFADC[j] + ProcessedFADC[j + 1] ) / 2;
-		//std::cout<<"roll. ave j:"<<" val:"<<ProcessedFADC[j]<<std::endl;
-	}
-	ProcessedFADC[nfine - 1] = ProcessedFADC[nfine - 2];
-	//again rolling average
-	for( unsigned int j = 0; j < nfine; j++ )
-	{
-		ProcessedFADC[j] = ( ProcessedFADC[j] + ProcessedFADC[j + 1] ) / 2;
-		//std::cout<<"roll. ave j:"<<j<<" val:"<<ProcessedFADC[j]<<" ptr:"<<ptr[j]<<std::endl;
-	}
-	ProcessedFADC[nfine - 1] = ProcessedFADC[nfine - 2];
-	
-	//******************************************************************************************************************
-	if( fPed <= 0.00001 ) //if input value for pedestal is around zero, but positive - this function extracts pedestal charge
-	{
-		charge = 0., charge2 = 0.;
-		for( unsigned int k = 0; k < integwin; k++ )
-		{
-			charge += ProcessedFADC[nfine - 1 - k];
-		}
-		for( unsigned int k = 0; k < bigintegwin; k++ )
-		{
-			charge2 += ProcessedFADC[nfine - 1 - k];
-		}
-		//for(int k=0; k<integwin;k++)    {charge+=FADC[k];}
-		//for(int k=0; k<bigintegwin;k++) {charge2+=FADC[k];}
-		arrtime = -1;
-		ampl = -100;
-	}
-	if( fPed > 0.00001 )
-	{
-		charge = 0, charge2 = 0;
-		tcharge = 0, tcharge2 = 0;
-		//maxbin   = LocMax(n,ptr,ampl);
-		//ampl=LocMaxf(nfine,FADCfine);
-		//if(ampl>=SaturLimit) saturflag=1;
-		
-		//if  (n <= 0) return -1;
-		float xmax = 0, xmax2 = 0;
-		//for (Int_t i = 0; i < int(integwin); i++)   {xmax+=ProcessedFADC[i]; }
-		//for (Int_t i = 0; i < int(bigintegwin); i++){xmax2+=ProcessedFADC[i];}
-		for( unsigned int i = SearchStart; i < int( integwin ) + SearchStart; i++ )
-		{
-			xmax += ProcessedFADC[i];
-		}
-		for( unsigned int i = SearchStart; i < int( bigintegwin ) + SearchStart; i++ )
-		{
-			xmax2 += ProcessedFADC[i];
-		}
-		// extract charge for small window **********************************
-		//        for (unsigned int i = 0; i < nfine - int(integwin); i++){
-		for( unsigned int i = SearchStart; i < SearchEnd; i++ )
-		{
-			if( charge < xmax )
-			{
-				charge = xmax;
-				max = i;
-				uplimit = max + int( integwin );
-				if( uplimit > int( nfine ) )
-				{
-					uplimit = nfine;
-				}
-				lolimit = max;
-				if( lolimit < 0 )
-				{
-					lolimit = 0;
-				}
-			}
-			xmax = xmax - ProcessedFADC[i] + ProcessedFADC[i + integwin];
-			//tcharge=tcharge-muxBINS[i]*FADC[i] + muxBINS[i+integwin]*FADC[i+integwin];
-		}
-		// extract charge for big window ************************************
-		uplimitcal = uplimit + ( ( int( bigintegwin ) - int( integwin ) ) / 2 );
-		if( uplimitcal > int( SearchEnd ) + ( int )integwin - 2 )
-		{
-			uplimitcal = int( SearchEnd ) + ( int )integwin - 1;
-		}
-		lolimitcal = lolimit - ( ( int( bigintegwin ) - int( integwin ) ) / 2 );
-		if( lolimitcal < int( SearchStart ) )
-		{
-			lolimitcal = int( SearchStart );
-		}
-		// arrival times *****************************************************
-		for( int k = lolimit; k < uplimit; k++ )
-		{
-			tcharge += muxBINSfine[k] * ProcessedFADC[k];
-		}
-		for( int k = lolimitcal; k < uplimitcal; k++ )
-		{
-			tcharge2 += muxBINSfine[k] * ProcessedFADC[k];
-			charge2 += ProcessedFADC[k];
-		}
-		// extract saturated charge (integrate everything to the end) ************************************
-		if( saturflag )
-		{
-			tcharge = 0;
-			charge = 0;
-			charge2 = 0;
-			uplimitcal = ( int )SearchEnd + ( int )integwin - 1;
-			lolimitcal = lolimit - ( ( bigintegwin - integwin ) / 2 );
-			if( lolimitcal < int( SearchStart ) )
-			{
-				lolimitcal = int( SearchStart );
-			}
-			for( int k = lolimitcal; k < uplimitcal; k++ )
-			{
-				tcharge += muxBINSfine[k] * ProcessedFADC[k];
-				charge2 += ProcessedFADC[k];
-			}
-		}
-		
-		if( charge != 0. )
-		{
-			arrtime = tcharge / charge / float( oversampling );
-		}
-		if( charge2 != 0. )
-		{
-			arrtime2 = tcharge2 / charge2 / float( oversampling );
-		}
-		//arrtime2= FindPulseWidth(0.5*(ampl-fPed),FADC);
-		if( arrtime < 0 )
-		{
-			arrtime = 0;
-		}
-		if( arrtime > ( int( SearchEnd ) + ( int )integwin - 2 ) / float( oversampling ) )
-		{
-			arrtime = ( int( SearchEnd ) + ( int )integwin - 1 ) / float( oversampling );
-		}
-		if( arrtime2 < 0 )
-		{
-			arrtime2 = 0;
-		}
-		if( arrtime2 > ( int( SearchEnd ) + ( int )integwin - 2 ) / float( oversampling ) )
-		{
-			arrtime2 = ( int( SearchEnd ) + ( int )integwin - 1 ) / float( oversampling );
-		}
-		ampl -= fPed;
-	}
-	// alternative: time of maximum amplitude (should be better for small signals, distorted by NSB)
-	/*
-	float tmaxampl=0.;
-	float chargeampl=0.;
-	int tmaxindex=0;
-	ampl=ProcessedFADC[lolimit];
-	for(int i = lolimit; i <uplimit; i++){
-	    if (ampl <=ProcessedFADC[i]){
-	        ampl = ProcessedFADC[i];
-	        tmaxindex=i;
-	    }
-	}
-	if(tmaxindex<=lolimit) tmaxindex=lolimit+0.5*oversampling;
-	if(tmaxindex>=uplimit) tmaxindex=uplimit-0.5*oversampling;
-	for(int i = tmaxindex-0.5*oversampling; i <=tmaxindex+0.5*oversampling; i++)
-	{
-	     chargeampl+=ProcessedFADC[i];
-	     tmaxampl+=muxBINSfine[i]*ProcessedFADC[i];
-	}
-	if(charge!=0.) {tmaxampl=tmaxampl/chargeampl/float(oversampling);}
-	else  tmaxampl=-1.;
-	*/
-	//normalization (for convenient calibration):***************
-	//if(ElecConcept==0)
-	{
-		//charge/=((float)ElecResBoost*ProcToAmpl*(float)oversampling);
-		//charge2/=((float)ElecResBoost*ProcToAmpl*(float)oversampling);
-		charge /= ( ( float )ElecResBoost * ( float )oversampling );
-		charge2 /= ( ( float )ElecResBoost * ( float )oversampling );
-	}
-	
-	delete[] ProcessedFADC;
-	//return ProcessedFADC;
-	//return saturflag;
-	fSum = charge;
-	fTraceAverageTime = arrtime;
-	//fTraceAverageTime = tmaxampl;
-	fSumWindowFirst = lolimit / oversampling;
-	fSumWindowLast  = uplimit / oversampling;
-	//std::cout<<" Charge:"<<charge<<" arrtime:"<<arrtime<<"[slices]"<<" intwin:"<<" f/l bin:"<<fSumWindowFirst<<"/"<<fSumWindowLast<<std::endl;
-	
-	return charge;
-}
-
-double VTraceHandler::getMaximumSums( float AmplThresh, int* integwindows, float* charges, float* arrtimes, bool fRaw )
-{
-	fRaw = false;
-	unsigned int n = fpTrace.size();
-	float muxBINS[n], FADC[n];
-	int   Start[n], Stop[n];
-	int IntWindows[n];
-	float Charges[n], Times[n];
-	for( unsigned int i = 1; i <= n; i++ )
-	{
-		muxBINS[i - 1] = float( i ) - 0.5;
-		FADC[i - 1] = ( float )fpTrace.at( i - 1 ) - fPed;
-	}
-	//for(int i=0;i<n;i++)  {IntWindows[i]=0; Charges[i]=0;Times[i]=0;}
-	// Define integration windows ******************************************
-	//std::cout<<"Thresh:"<<AmplThresh<<" FADC/slice"<<std::endl;
-	unsigned int pulsecnt = 0;
-	int intwin = 0;
-	for( unsigned int i = 1; i < n - 1; i++ )
-	{
-		if( FADC[i] >= AmplThresh )
-		{
-			intwin++;
-		}
-		if( intwin > 0 && FADC[i] < AmplThresh )
-		{
-			pulsecnt++;
-			Stop[pulsecnt] = i;
-			Start[pulsecnt] = i - intwin;
-			Charges[pulsecnt] = 0.;
-			Times[pulsecnt] = 0.;
-			if( intwin >= 3 )
-			{
-				for( int m = Start[pulsecnt]; m < Stop[pulsecnt]; m++ )
-				{
-					Charges[pulsecnt] += FADC[m];
-				}
-				for( int m = Start[pulsecnt]; m < Stop[pulsecnt]; m++ )
-				{
-					Times[pulsecnt] += muxBINS[m] * FADC[m];
-				}
-				//for(int m=Start[pulsecnt];m<Start[pulsecnt]+4;m++){ Charges[pulsecnt]+=FADC[m];}
-				//for(int m=Start[pulsecnt];m<Start[pulsecnt]+4;m++){ Times[pulsecnt]+=muxBINS[m]*FADC[m];}
-			}
-			if( intwin < 3 )
-			{
-				for( int m = Start[pulsecnt] - 1; m <= Start[pulsecnt] + 1; m++ )
-				{
-					Charges[pulsecnt] += FADC[m];
-				}
-				for( int m = Start[pulsecnt] - 1; m <= Start[pulsecnt] + 1; m++ )
-				{
-					Times[pulsecnt] += muxBINS[m] * FADC[m];
-				}
-				intwin = 3;
-				Start[pulsecnt] = Start[pulsecnt] - 1;
-				Stop[pulsecnt] = Stop[pulsecnt] + 1;
-			}
-			
-			if( Charges[pulsecnt] > 0. )
-			{
-				Times[pulsecnt] /= Charges[pulsecnt];
-			}
-			
-			//std::cout<<pulsecnt<<" win:"<<intwin<<" Start:"<<Start[pulsecnt]<<" Stop:"<<Stop[pulsecnt]<<" charge:"<<Charges[pulsecnt]<<" "<<Times[pulsecnt]<<std::endl;
-			IntWindows[pulsecnt] = intwin;
-			intwin = 0;
-			if( pulsecnt >= MaxNumPulses )
-			{
-				break;
-			}
-		}
-	}
-	IntWindows[0] = pulsecnt;
-	Charges[0] = pulsecnt;
-	Times[0] = pulsecnt;
-	integwindows[0] = pulsecnt;
-	charges[0] = pulsecnt;
-	arrtimes[0] = pulsecnt;
-	for( unsigned int i = 0; i <= pulsecnt; i++ )
-	{
-		integwindows[i + 1] = IntWindows[i + 1];
-		charges[i + 1] = Charges[i + 1];
-		arrtimes[i + 1] = Times[i + 1];
-	}
-	
-	// TEMP: getMaximum pulse:
-	float MaxCharge = charges[1];
-	float MaxChargeTime = arrtimes[1];
-	int MaxChargeIndex = 1;
-	if( pulsecnt >= 1 )
-	{
-		for( unsigned int i = 1; i <= pulsecnt; i++ )
-		{
-			if( MaxCharge <= charges[i] )
-			{
-				MaxCharge = charges[i];
-				MaxChargeTime = arrtimes[i];
-				MaxChargeIndex = i;
-			}
-		}
-		std::cout << pulsecnt << " maxcharge:" << MaxCharge << " arrtime:" << MaxChargeTime << " index:" << MaxChargeIndex << "  start/stop: "
-				  << Start[MaxChargeIndex] << "/" << Stop[MaxChargeIndex] << std::endl;
-	}
-	if( pulsecnt < 1 )
-	{
-		MaxCharge = 0;
-		MaxChargeTime = -1;
-		MaxChargeIndex = 1;
-		charges[MaxChargeIndex] = 0;
-	}
-	// sorting pulses *******************************************************
-	/*
-	float signal[pulsecnt];
-	int  index[pulsecnt];
-	for(int i=0;i<pulsecnt;i++) {signal[i]=Charges[i+1];}
-	SortArray(pulsecnt,signal,index,true);
-	for(int i=0;i<pulsecnt;i++)
-	{
-	    integwindows[i+1]=IntWindows[index[i]+1];
-	    charges[i+1]=Charges[index[i]+1];
-	    arrtimes[i+1]=Times[index[i]+1];
-	    std::cout<<"  win:"<<integwindows[i+1]<<" charge:"<<charges[i+1]<<" arrtime:"<<arrtimes[i+1]<<std::endl;
-	}
-	*/
-	
-	fSum = charges[MaxChargeIndex];
-	fTraceAverageTime = arrtimes[MaxChargeIndex];
-	fSumWindowFirst = Start[MaxChargeIndex];
-	fSumWindowLast  = Stop[MaxChargeIndex];
-	
-	return charges[MaxChargeIndex];
-}
-

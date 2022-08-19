@@ -1,10 +1,6 @@
 /*! \class VPlotRunSummary
     \brief different plot routines (rates vs. elevation etc)
 
-
-    \author
-    Gernot Maier
-
 */
 
 #include "VPlotRunSummary.h"
@@ -968,7 +964,7 @@ void VPlotRunSummary::fillDailyRates( bool iCorrectForDeadTimes )
 		}
 		
 		// get date from mjd
-		slaDjcl( c->MJDOn, &iy, &im, &id, &fd, &j );
+		VAstronometry::vlaDjcl( c->MJDOn, &iy, &im, &id, &fd, &j );
 		iDate.push_back( iy * 10000 + im * 100 + id );
 		if( iDate.size() == 1 )
 		{
@@ -1177,7 +1173,7 @@ void VPlotRunSummary::writeRunTable( string ioutfile, bool iPhases, bool iSignif
 		}
 		
 		// get date from mjd
-		slaDjcl( c->MJDOn, &iy, &im, &id, &fd, &j );
+		VAstronometry::vlaDjcl( c->MJDOn, &iy, &im, &id, &fd, &j );
 		iDate.push_back( iy * 10000 + im * 100 + id );
 		iMJD.push_back( ( int )c->MJDOn );
 		if( iDate.size() == 1 )
@@ -1302,33 +1298,33 @@ void VPlotRunSummary::writeRunTable( string ioutfile, bool iPhases, bool iSignif
 				{
 					is << fDayRate[t] << "$\\pm$" << fDayRateE[t] << " & ";
 					// mean Crab rates for September 2006 (2-tel)
-/*					if( c->runOn < 31600 )
-					{
-						ig = 3.9;
-					}
-					// mean Crab rates for October 2006 (2-tel)
-					else if( c->runOn < 32100 )
-					{
-						ig = 4.4;
-					}
-					// mean Crab rates for November 2006 (2-tel)
-					else if( c->runOn < 32600 )
-					{
-						ig = 4.1;
-					}
-					// mean Crab rates for January 2007 (3-tel)
-					else if( c->runOn < 33500 )
-					{
-						ig = 7.4;
-					}
-					// mean Crab rates for February 2007 (3-tel)
-					else
-					{
-						ig = 7.7;
-					}
-					//		  is << fDayRate[t]/ig << "$\\pm$";
-					// don't print daily rate in Crab units
-					//		  is << fDayRateE[t]/ig << " & "; */
+					/*					if( c->runOn < 31600 )
+										{
+											ig = 3.9;
+										}
+										// mean Crab rates for October 2006 (2-tel)
+										else if( c->runOn < 32100 )
+										{
+											ig = 4.4;
+										}
+										// mean Crab rates for November 2006 (2-tel)
+										else if( c->runOn < 32600 )
+										{
+											ig = 4.1;
+										}
+										// mean Crab rates for January 2007 (3-tel)
+										else if( c->runOn < 33500 )
+										{
+											ig = 7.4;
+										}
+										// mean Crab rates for February 2007 (3-tel)
+										else
+										{
+											ig = 7.7;
+										}
+										//		  is << fDayRate[t]/ig << "$\\pm$";
+										// don't print daily rate in Crab units
+										//		  is << fDayRateE[t]/ig << " & "; */
 					if( !iSignificancePerHour )
 					{
 						is << fDaySigni[t];
@@ -1630,7 +1626,7 @@ void VPlotRunSummary::setListofExcludedRuns( string iList )
 	
 	string itemp;
 	istringstream is_stream( iList );
-	while( !(is_stream>>std::ws).eof() )
+	while( !( is_stream >> std::ws ).eof() )
 	{
 		is_stream >> itemp;
 		fListofExcludedRuns.push_back( ( int )atoi( itemp.c_str() ) );

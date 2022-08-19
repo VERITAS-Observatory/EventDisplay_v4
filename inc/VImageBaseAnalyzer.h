@@ -21,7 +21,6 @@ class VImageBaseAnalyzer : public VEvndispData
 		bool fRaw;
 		
 		void calcSecondTZerosSums();
-		void calcSums( int iFirst , int iLast, bool iMakingPeds, bool iLowGainOnly = false );
 		void calcTZeros( int , int );
 		void calcTZerosSums( int, int, unsigned int );
 		unsigned int getDynamicSummationWindow( unsigned int chanID );
@@ -31,11 +30,15 @@ class VImageBaseAnalyzer : public VEvndispData
 		void timingCorrect();
 		TTree* makeDeadChannelTree();
 		
+		void initializeTrace( bool iMakingPeds, unsigned int i_channelHitID,
+							  unsigned int i, unsigned int iTraceIntegrationMethod );
+							  
 	public:
 		VImageBaseAnalyzer() {}
 		~VImageBaseAnalyzer() {}
 		
 		void           calcTCorrectedSums( int , int );
+		void           calcSums( int iFirst , int iLast, bool iMakingPeds, bool iLowGainOnly = false, unsigned int iTraceIntegrationMethod = 9999 );
 		unsigned int   fillHiLo();                          //!< fill hi/low gain vector
 		int            fillSaturatedChannels();
 		unsigned int   fillZeroSuppressed();

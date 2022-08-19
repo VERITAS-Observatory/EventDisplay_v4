@@ -2,7 +2,7 @@
     \brief fill and plot quality factors for MC
 
 
-    Author:  Gernot Maier
+    Author:
 */
 
 #include "VPlotMonteCarloQualityFactor.h"

@@ -3,7 +3,7 @@
 # set the environmental variables to CTA/VERITAS/etc
 #
 
-if [ ! -n "$1" ] || [ $1 = "-h" ] || [ $1 = "-help" ]
+if [ ! -n "$1" ] || [ "$1" = "-h" ] || [ "$1" = "-help" ]
 then
    echo 
    echo "set the environmental variables for EVNDISP"
@@ -20,6 +20,12 @@ then
    fi
 fi
 OBSERVATORY=$1
+
+if [ -z "${EVNDISPSYS}" ]; then
+    echo "Error: required environmental variable EVNDISPSYS not set"
+    echo "exiting..."
+    return
+fi
 
 ######################################################
 ## dependencies
@@ -46,15 +52,18 @@ then
    LD_LIBRARY_PATH=$HESSIOSYS/lib:$LD_LIBRARY_PATH; export LD_LIBRARY_PATH 
 fi
 
+# SOFASYS
+export SOFASYS=$EVNDISPSYS/sofa
+
 ######################################################
 ## EVNDISP libraries 
-LD_LIBRARY_PATH=$EVNDISPSYS/lib/:$LD_LIBRARY_PATH; export LD_LIBRARY_PATH
+LD_LIBRARY_PATH=$EVNDISPSYS/lib/:$EVNDISPSYS/obj/:$LD_LIBRARY_PATH; export LD_LIBRARY_PATH
 ######################################################
 
 ######################################################
 ## environmental variables
 ######################################################
-if [ $OBSERVATORY = "VERITAS" ] || [ $OBSERVATORY = "VTS" ]
+if [ "$OBSERVATORY" = "VERITAS" ] || [ "$OBSERVATORY" = "VTS" ]
 then
   if [[ $2 != "-q" ]]; then
 	echo "setting observatory to VERITAS"
@@ -65,7 +74,7 @@ then
   export OBS_USER_LOG_DIR=$VERITAS_USER_LOG_DIR
 fi
 
-if [ $OBSERVATORY = "CTA" ]
+if [ "$OBSERVATORY" = "CTA" ]
 then
   if [[ $2 != "-q" ]]; then
   	echo "setting observatory to CTA"

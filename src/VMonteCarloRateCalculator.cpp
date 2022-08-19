@@ -1,7 +1,7 @@
 /*! \class VMonteCarloRateCalculator
     \brief calculate rates from Monte Carlo
 
-    \author Gernot Maier
+
 */
 
 #include "VMonteCarloRateCalculator.h"

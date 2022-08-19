@@ -2,7 +2,7 @@
     \brief tree with basic telescope parameters (positions, ...)
 
 
-    \author Gernot Maier
+
 */
 
 #include "VDetectorTree.h"

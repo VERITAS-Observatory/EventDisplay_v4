@@ -1,7 +1,6 @@
 /*! \class VDB_Connection
     \brief connect to DB
 
-    \author Lucie
 */
 
 #include "VDB_Connection.h"
@@ -44,7 +43,6 @@ bool VDB_Connection::Connect()
 
 	// Connect
 	f_db = TSQLServer::Connect( fDBserver.c_str(), fconnection_mode.c_str() , fconnection_option.c_str() );
-	//std::cout<<"VDB_Connection::Connect  server "<<fDBserver<<" mode "<<fconnection_mode<<" option "<<fconnection_option <<std::endl;
 	
 	// Test the connection
 	
