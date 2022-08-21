@@ -8,7 +8,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-#include "VASlalib.h"
+#include "VAstronometry.h"
 
 using namespace std;
 
