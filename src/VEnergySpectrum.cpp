@@ -2122,10 +2122,13 @@ bool VEnergySpectrum::writeSpectralPointsToCSVFile( string iOFileName,
        os << "# - {name: dnde_errn, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
        os << "# - {name: dnde_errp, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
        os << "# - {name: dnde_ul, unit: cm-2 s-1 TeV-1, datatype: float32}" << endl;
+	os << "# - {name: n_on, datatype: float32}" << endl;
+	os << "# - {name: n_off, datatype: float32}" << endl;
+	os << "# - {name: norm, datatype: float32}" << endl;
        os << "# - {name: signi, datatype: float32}" << endl;
        os << "# - UL_CONF: 0.95" << endl;
        os << "# meta: !!omap" << endl;
-       os << "e_ref e_min e_max dnde dnde_errn dnde_errp dnde_ul signi" << endl;
+	   os << "e_ref e_min e_max dnde dnde_errn dnde_errp dnde_ul n_on n_off norm signi" << endl;
        if( iDiffFlux == 0 )
        {
            for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ )
@@ -2145,6 +2148,9 @@ bool VEnergySpectrum::writeSpectralPointsToCSVFile( string iOFileName,
                     os << "nan     nan nan    ";
                     os << fDifferentialFlux[i].DifferentialFlux << "    ";
                 }
+			os << fDifferentialFlux[i].NOn << "    ";
+			os << fDifferentialFlux[i].NOff << "    ";
+			os << fTotalNormalisationFactor << "    ";
                 os << fDifferentialFlux[i].Significance;
                 os << endl;
            }
