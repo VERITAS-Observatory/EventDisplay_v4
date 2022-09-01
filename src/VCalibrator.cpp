@@ -4565,8 +4565,8 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
 	TDirectory* iG_CurrentDirectory = gDirectory;
 	
 	// get an IPR graph
-	TGraphErrors* g = getIPRGraph( iSummationWindow, true );
-	if( !g )
+	TGraphErrors* i_IPRGraph = getIPRGraph( iSummationWindow, true );
+	if( !i_IPRGraph )
 	{
 		cout << "VCalibrator::calculateIPRGraphs info: no IPR graph found for telescope type " << iTelType << endl;
 		return false;
@@ -4731,25 +4731,25 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
 			double charge_pe = hIPR->GetXaxis()->GetBinCenter( i ) * getTelescopeAverageFADCtoPhe();
 			double charge_pe_bin_width = 0.5 * hIPR->GetXaxis()->GetBinWidth( i ) * getTelescopeAverageFADCtoPhe();
 			
-			g->SetPoint( z, charge_pe, val );
-			g->SetPointError( z, charge_pe_bin_width, valerr );
+			i_IPRGraph->SetPoint( z, charge_pe, val );
+			i_IPRGraph->SetPointError( z, charge_pe_bin_width, valerr );
 			z++;
 		}
 	}
 	
-	g->SetMinimum( 1 );
-	g->SetTitle( Form( "Rate vs Threshold. W_{RO}=%2.1f ns, W_{int}=%2.1f ns", Tsearch,
+	i_IPRGraph->SetMinimum( 1 );
+	i_IPRGraph->SetTitle( Form( "Rate vs Threshold. W_{RO}=%2.1f ns, W_{int}=%2.1f ns", Tsearch,
 					   getDetectorGeometry()->getLengthOfSampleTimeSlice( getTelID() ) * iSummationWindow ) );
 	if( getRunParameter()->fIgnoreDSTGains )
 	{
-		g->GetXaxis()->SetTitle( "Threshold [FADC counts]" );
+		i_IPRGraph->GetXaxis()->SetTitle( "Threshold [FADC counts]" );
 	}
 	else
 	{
-		g->GetXaxis()->SetTitle( "Threshold [p.e.]" );
+		i_IPRGraph->GetXaxis()->SetTitle( "Threshold [p.e.]" );
 	}
-	g->GetYaxis()->SetTitle( "Rate above Threshold [Hz]" );
-	g->SetName( Form( "IPRcharge_TelType%d_SW%d", ( int )iTelType, iSummationWindow ) );
+	i_IPRGraph->GetYaxis()->SetTitle( "Rate above Threshold [Hz]" );
+	i_IPRGraph->SetName( Form( "IPRcharge_TelType%d_SW%d", ( int )iTelType, iSummationWindow ) );
 	hIPR->Delete();
 	
 	iPedFile.Close();

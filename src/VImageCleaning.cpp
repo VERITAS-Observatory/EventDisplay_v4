@@ -471,7 +471,7 @@ bool VImageCleaning::InitNNImgClnPerTelType( unsigned int teltype )
 	}
 	fIPRgraphs->AddAt( IPRgraph, teltype );
 	
-	cout << "IPR for TelType (TrigSim, TIMENEXTNEIGHBOUR):" << teltype << " read: " << IPRgraph->GetName();
+	cout << "IPR for TelType (TrigSim, TIMENEXTNEIGHBOUR): " << teltype << " read: " << IPRgraph->GetName();
 	cout << endl;
 	
 	//initializing probability curves
