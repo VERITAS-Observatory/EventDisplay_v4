@@ -4739,7 +4739,7 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
 	
 	i_IPRGraph->SetMinimum( 1 );
 	i_IPRGraph->SetTitle( Form( "Rate vs Threshold. W_{RO}=%2.1f ns, W_{int}=%2.1f ns", Tsearch,
-					   getDetectorGeometry()->getLengthOfSampleTimeSlice( getTelID() ) * iSummationWindow ) );
+								getDetectorGeometry()->getLengthOfSampleTimeSlice( getTelID() ) * iSummationWindow ) );
 	if( getRunParameter()->fIgnoreDSTGains )
 	{
 		i_IPRGraph->GetXaxis()->SetTitle( "Threshold [FADC counts]" );
