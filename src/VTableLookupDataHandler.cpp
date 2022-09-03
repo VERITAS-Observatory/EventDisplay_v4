@@ -634,8 +634,18 @@ void VTableLookupDataHandler::doStereoReconstruction()
 										 fwidth, flength,
 										 getWeight() );
 	// store results from line intersection for debugging
+	// (used also as seed values for DispAnalyzers)
 	fXoff_intersect = i_SR.fShower_Xoffset;
 	fYoff_intersect = i_SR.fShower_Yoffset;
+	
+	// fall back to original eventdisplay results in case
+	// simple reconstructor fails
+	if( ( fXoff_intersect < -999. || fYoff_intersect < -999. )
+			&& fchi2 >= 0 && isReconstructed() )
+	{
+		fXoff_intersect = fXoff_edisp;
+		fYoff_intersect = fYoff_edisp;
+	}
 	
 	////////////////////////////////////////////////////////////////////
 	// DISP method for updated disp reconstruction
@@ -662,7 +672,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 				fasym, ftgrad_x,
 				floss, fntubes,
 				getWeight(),
-				i_SR.fShower_Xoffset, i_SR.fShower_Yoffset,
+				fXoff_intersect, fYoff_intersect,
 				fmeanPedvar_ImageT );
 				
 			// get estimated error on direction reconstruction
@@ -689,7 +699,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 			fasym, ftgrad_x,
 			floss, fntubes,
 			getWeight(),
-			i_SR.fShower_Xoffset, i_SR.fShower_Yoffset,
+			fXoff_intersect, fYoff_intersect,
 			iDispError,
 			fmeanPedvar_ImageT,
 			fpointing_dx, fpointing_dy );
@@ -2094,6 +2104,11 @@ bool VTableLookupDataHandler::isReconstructed()
 	{
 		return false;
 	}
+	if( fXoff < -99998 || TMath::Abs( fYoff ) > 99998 )
+	{
+		fchi2 = -1.;
+		return false;
+	}
 	if( fNImages < 2 )
 	{
 		return false;
@@ -2352,6 +2367,12 @@ bool VTableLookupDataHandler::cut( bool bWrite )
 	
 	// number of reconstructed events
 	fNStats_Rec++;
+	
+	if( !isReconstructed() )
+	{
+		fNStats_Chi2Cut++;
+		return false;
+	}
 	
 	if( getWobbleOffset() < 0. || getWobbleOffset() > fTLRunParameter->fTableFillingCut_WobbleCut_max )
 	{
