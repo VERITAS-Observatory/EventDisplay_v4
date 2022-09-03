@@ -165,7 +165,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 		vector< float > v_disp, vector< float > v_weight,
 		vector< float > tel_pointing_dx, vector< float > tel_pointing_dy,
 		float& dispdiff,
-		float x_off4, float yoff_4 )
+		float x_off4, float y_off4 )
 {
 	xs = -99999.;
 	ys = -99999.;
@@ -176,7 +176,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 	// works only for a maximum of 4 images
 	// for more than 4 images: seed value from different reconstruction method
 	// should be given.
-	if( x.size() > 4 && x_off4 < -998. && yoff_4 < -998. )
+	if( x.size() > 4 && x_off4 < -998. && y_off4 < -998. )
 	{
 		return;
 	}
@@ -184,12 +184,11 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 	//////////////////////////////////////////////////////////
 	// calculate (average) angle between the image lines for
 	f_angdiff = 0.;
+	float fmean_iangdiffN = 0.;
 	
 	if( cosphi.size() > 1 )
 	{
 		// calculate average angle between image lines
-		f_angdiff = 0.;
-		float fmean_iangdiffN = 0.;
 		for( unsigned int ii = 0; ii < sinphi.size(); ii++ )
 		{
 			for( unsigned int jj = 1; jj < sinphi.size(); jj++ )
@@ -225,13 +224,14 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 	// multiplicity 1 (fix to artifically large value)
 	else
 	{
+		fmean_iangdiffN = 1.;
 		f_angdiff = 180.;
 	}
 	// check for close to parallel lines
 	// (not so important for disp direction,
 	//  but note that core reconstruction
 	//  is still done the convential way)
-	if( f_angdiff < fAxesAngles_min )
+	if( f_angdiff < fAxesAngles_min && fmean_iangdiffN <= 2.01 )
 	{
 		return;
 	}
@@ -246,234 +246,9 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 	///////////////////////////////////////////////////////////////////////
 	// method: BDTs
 	///////////////////////////////////////////////////////////////////////
-	// first: 4 image and less
-	//
-	// why is this so complicated?
-	// disp solution is ambigous, don't
-	// know on which side of the image is the
-	// source location: search for
-	// smallest dispersion
-	else if( x.size() < 5 )
-	{
-		float x1 = 0.;
-		float x2 = 0.;
-		float x3 = 0.;
-		float x4 = 0.;
-		float x5 = 0.;
-		float x6 = 0.;
-		float y1 = 0.;
-		float y2 = 0.;
-		float y3 = 0.;
-		float y4 = 0.;
-		float y5 = 0.;
-		float y6 = 0.;
-		
-		// vector with disp directions per image
-		fdisp_xs_T.clear();
-		fdisp_ys_T.clear();
-		fdisp_xs_T.assign( v_weight.size(), 0. );
-		fdisp_ys_T.assign( v_weight.size(), 0. );
-		
-		// loop over all images and calculate x,y from disp
-		// select always cluster of points with smallest
-		// distance to each other
-		for( unsigned int ii = 0; ii < v_weight.size() ; ii++ )
-		{
-			// image #1
-			if( ii == 0 )
-			{
-				x1 = x[ii] - v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
-				x2 = x[ii] + v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
-				
-				y1 = y[ii] - v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
-				y2 = y[ii] + v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
-				
-				fdisp_xs_T[0] = x1;
-				fdisp_ys_T[0] = y1;
-				
-				calculateMeanShowerDirection( fdisp_xs_T, fdisp_ys_T, v_weight, xs, ys, dispdiff, 1 );
-			}
-			// image #2
-			else if( ii == 1 )
-			{
-				x3 = x[ii] - v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
-				x4 = x[ii] + v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
-				
-				y3 = y[ii] - v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
-				y4 = y[ii] + v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
-				
-				if( ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 )
-						&& ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 )
-						&& ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) )
-				{
-					fdisp_xs_T[0] = x1;
-					fdisp_xs_T[1] = x3;
-					fdisp_ys_T[0] = y1;
-					fdisp_ys_T[1] = y3;
-				}
-				else if( ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 )
-						 && ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 )
-						 && ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) )
-				{
-					fdisp_xs_T[0] = x1;
-					fdisp_xs_T[1] = x4;
-					fdisp_ys_T[0] = y1;
-					fdisp_ys_T[1] = y4;
-					v_disp[1] = -1.*TMath::Abs( v_disp[1] );
-				}
-				else if( ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 )
-						 && ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 )
-						 && ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) )
-				{
-					fdisp_xs_T[0] = x2;
-					fdisp_xs_T[1] = x3;
-					fdisp_ys_T[0] = y2;
-					fdisp_ys_T[1] = y3;
-					v_disp[0] = -1.*TMath::Abs( v_disp[0] );
-				}
-				else if( ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 )
-						 && ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 )
-						 && ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) )
-				{
-					fdisp_xs_T[0] = x2;
-					fdisp_xs_T[1] = x4;
-					fdisp_ys_T[0] = y2;
-					fdisp_ys_T[1] = y4;
-					v_disp[0] = -1.*TMath::Abs( v_disp[0] );
-					v_disp[1] = -1.*TMath::Abs( v_disp[1] );
-				}
-				
-				// average shower direction from first two images
-				calculateMeanShowerDirection( fdisp_xs_T, fdisp_ys_T, v_weight, xs, ys, dispdiff, 2 );
-			}
-			// image #3
-			else if( ii == 2 )
-			{
-				x5 = x[ii] - v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
-				x6 = x[ii] + v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
-				
-				y5 = y[ii] - v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
-				y6 = y[ii] + v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
-				
-				if( ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) )
-				{
-					fdisp_xs_T[0] = x1;
-					fdisp_xs_T[1] = x3;
-					fdisp_xs_T[2] = x5;
-					fdisp_ys_T[0] = y1;
-					fdisp_ys_T[1] = y3;
-					fdisp_ys_T[2] = y5;
-				}
-				else if( ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) && ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) && ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) && ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) && ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) && ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) && ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) )
-				{
-					fdisp_xs_T[0] = x2;
-					fdisp_xs_T[1] = x3;
-					fdisp_xs_T[2] = x5;
-					fdisp_ys_T[0] = y2;
-					fdisp_ys_T[1] = y3;
-					fdisp_ys_T[2] = y5;
-					v_disp[0] = -1.*TMath::Abs( v_disp[0] );
-				}
-				else if( ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) && ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) && ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) && ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) && ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) && ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) && ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) )
-				{
-					fdisp_xs_T[0] = x1;
-					fdisp_xs_T[1] = x4;
-					fdisp_xs_T[2] = x5;
-					fdisp_ys_T[0] = y1;
-					fdisp_ys_T[1] = y4;
-					fdisp_ys_T[2] = y5;
-					v_disp[1] = -1.*TMath::Abs( v_disp[1] );
-				}
-				else if( ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) && ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) && ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) && ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) && ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) && ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) && ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) )
-				{
-					fdisp_xs_T[0] = x2;
-					fdisp_xs_T[1] = x4;
-					fdisp_xs_T[2] = x5;
-					fdisp_ys_T[0] = y2;
-					fdisp_ys_T[1] = y4;
-					fdisp_ys_T[2] = y5;
-					v_disp[0] = -1.*TMath::Abs( v_disp[0] );
-					v_disp[1] = -1.*TMath::Abs( v_disp[1] );
-				}
-				else if( ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) && ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) )
-				{
-					fdisp_xs_T[0] = x1;
-					fdisp_xs_T[1] = x3;
-					fdisp_xs_T[2] = x6;
-					fdisp_ys_T[0] = y1;
-					fdisp_ys_T[1] = y3;
-					fdisp_ys_T[2] = y6;
-					v_disp[2] = -1.*TMath::Abs( v_disp[2] );
-				}
-				else if( ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) && ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) && ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) && ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) && ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) && ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) && ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) )
-				{
-					fdisp_xs_T[0] = x2;
-					fdisp_xs_T[1] = x3;
-					fdisp_xs_T[2] = x6;
-					fdisp_ys_T[0] = y2;
-					fdisp_ys_T[1] = y3;
-					fdisp_ys_T[2] = y6;
-					v_disp[0] = -1.*TMath::Abs( v_disp[0] );
-					v_disp[2] = -1.*TMath::Abs( v_disp[2] );
-				}
-				else if( ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) && ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) && ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) && ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) && ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) && ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) && ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) )
-				{
-					fdisp_xs_T[0] = x1;
-					fdisp_xs_T[1] = x4;
-					fdisp_xs_T[2] = x6;
-					fdisp_ys_T[0] = y1;
-					fdisp_ys_T[1] = y4;
-					fdisp_ys_T[2] = y6;
-					v_disp[1] = -1.*TMath::Abs( v_disp[1] );
-					v_disp[2] = -1.*TMath::Abs( v_disp[2] );
-				}
-				else if( ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) && ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) && ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) < ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x5 ) * ( x2 - x5 ) + ( y2 - y5 ) * ( y2 - y5 ) + ( x4 - x5 ) * ( x4 - x5 ) + ( y4 - y5 ) * ( y4 - y5 ) && ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) && ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) < ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x3 - x6 ) * ( x3 - x6 ) + ( y3 - y6 ) * ( y3 - y6 ) && ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) < ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( x1 - x6 ) * ( x1 - x6 ) + ( y1 - y6 ) * ( y1 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) && ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( x2 - x6 ) * ( x2 - x6 ) + ( y2 - y6 ) * ( y2 - y6 ) + ( x4 - x6 ) * ( x4 - x6 ) + ( y4 - y6 ) * ( y4 - y6 ) < ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( x1 - x5 ) * ( x1 - x5 ) + ( y1 - y5 ) * ( y1 - y5 ) + ( x3 - x5 ) * ( x3 - x5 ) + ( y3 - y5 ) * ( y3 - y5 ) )
-				{
-					fdisp_xs_T[0] = x2;
-					fdisp_xs_T[1] = x4;
-					fdisp_xs_T[2] = x6;
-					fdisp_ys_T[0] = y2;
-					fdisp_ys_T[1] = y4;
-					fdisp_ys_T[2] = y6;
-					v_disp[0] = -1.*TMath::Abs( v_disp[0] );
-					v_disp[1] = -1.*TMath::Abs( v_disp[1] );
-					v_disp[2] = -1.*TMath::Abs( v_disp[2] );
-				}
-				// average shower direction from first three images
-				calculateMeanShowerDirection( fdisp_xs_T, fdisp_ys_T, v_weight, xs, ys, dispdiff, 3 );
-			}
-			// image #4
-			if( ii == 3 )
-			{
-			
-				x3 = x[ii] - v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
-				x4 = x[ii] + v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
-				
-				y3 = y[ii] - v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
-				y4 = y[ii] + v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
-				
-				
-				if( ( xs - x3 ) * ( xs - x3 ) + ( ys - y3 ) * ( ys - y3 ) < ( xs - x4 ) * ( xs - x4 ) + ( ys - y4 ) * ( ys - y4 ) )
-				{
-					fdisp_xs_T[3] = x3;
-					fdisp_ys_T[3] = y3;
-				}
-				else
-				{
-					fdisp_xs_T[3] = x4;
-					fdisp_ys_T[3] = y4;
-					v_disp[3] = -1.*TMath::Abs( v_disp[3] );
-				}
-				// average shower direction from all four images
-				calculateMeanShowerDirection( fdisp_xs_T, fdisp_ys_T, v_weight, xs, ys, dispdiff, fdisp_xs_T.size() );
-			}
-		}
-	}
-	// more than 4 images
 	// (MVA disp analyzer using
-	// stereo reconstruction as starting
-	// value
-	else if( x_off4 > -998. && yoff_4 > -998. )
+	// stereo reconstruction as starting value
+	if( x_off4 > -998. && y_off4 > -998. )
 	{
 		// vector with disp directions per image
 		fdisp_xs_T.clear();
@@ -497,8 +272,8 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 			// check solution closest to starting value
 			// (should work properly here, as these are
 			// all events with multiplicity > 4)
-			if( sqrt( ( x1 - x_off4 ) * ( x1 - x_off4 ) + ( y1 + yoff_4 ) * ( y1 + yoff_4 ) )
-					< sqrt( ( x2 - x_off4 ) * ( x2 - x_off4 ) + ( y2 + yoff_4 ) * ( y2 + yoff_4 ) ) )
+			if( sqrt( ( x1 - x_off4 ) * ( x1 - x_off4 ) + ( y1 + y_off4 ) * ( y1 + y_off4 ) )
+					< sqrt( ( x2 - x_off4 ) * ( x2 - x_off4 ) + ( y2 + y_off4 ) * ( y2 + y_off4 ) ) )
 			{
 				fdisp_xs_T[ii] = x1;
 				fdisp_ys_T[ii] = y1;
