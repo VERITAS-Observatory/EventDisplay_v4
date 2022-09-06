@@ -149,25 +149,25 @@ float VDispAnalyzer::evaluate( float iWidth, float iLength, float iAsymm, float 
  */
 vector< vector< float > > VDispAnalyzer::get_sign_permuation_vector( unsigned int x_size )
 {
-    unsigned int ncombinations = (1 << x_size) - 1;
-    vector< vector< float > > i_sign;
-    for( unsigned int i = 0; i <= ncombinations; i++ )
-    {
-        int y = i;
-        int i_counter = 0;
-        vector< float > i_temp_v(x_size, 1. );
-        while ( y > 0 )
-        {
-            if ((y & 1) == 1)
-            {
-                i_temp_v[i_counter] = -1.;
-            }
-            y = y >> 1;
-            i_counter++;
-        }
-        i_sign.push_back( i_temp_v );
-    }
-    return i_sign;
+	unsigned int ncombinations = ( 1 << x_size ) - 1;
+	vector< vector< float > > i_sign;
+	for( unsigned int i = 0; i <= ncombinations; i++ )
+	{
+		int y = i;
+		int i_counter = 0;
+		vector< float > i_temp_v( x_size, 1. );
+		while( y > 0 )
+		{
+			if( ( y & 1 ) == 1 )
+			{
+				i_temp_v[i_counter] = -1.;
+			}
+			y = y >> 1;
+			i_counter++;
+		}
+		i_sign.push_back( i_temp_v );
+	}
+	return i_sign;
 }
 
 /*
@@ -176,43 +176,43 @@ vector< vector< float > > VDispAnalyzer::get_sign_permuation_vector( unsigned in
  *
  */
 unsigned int VDispAnalyzer::find_smallest_diff_element(
-        vector< vector< float > > i_sign,
-        vector< float > x, vector< float > y,
-        vector< float > cosphi, vector< float > sinphi,
-        vector< float > v_disp, vector< float > v_weight )
+	vector< vector< float > > i_sign,
+	vector< float > x, vector< float > y,
+	vector< float > cosphi, vector< float > sinphi,
+	vector< float > v_disp, vector< float > v_weight )
 {
-    vector< float > v_disp_diff(i_sign.size(), 0. );
-    vector< float > v_dist(i_sign.size(), 0. );
-    for( unsigned int s = 0; s < i_sign.size(); s++ )
-    {
-        vector< float > v_xs;
-        vector< float > v_ys;
-        float xs = 0.;
-        float ys = 0.;
-        float disp_diff = 0.;
-        cout << "\t SIGN " << s << "\t event multiplicity: " << x.size() << endl;
-        for( unsigned int i = 0; i < x.size(); i++ )
-        {
-            v_xs.push_back( x[i] - i_sign[s][i] * v_disp[i] * cosphi[i] );
-            v_ys.push_back( y[i] - i_sign[s][i] * v_disp[i] * sinphi[i] );
-        }
-        calculateMeanShowerDirection( v_xs, v_ys, v_weight, xs, ys, disp_diff, v_xs.size() );
-        v_disp_diff[s] = disp_diff;
-        v_dist[s] = sqrt(xs*xs + ys*ys);
-        cout << "\t\t DIR " << xs << ", " << ys << ", " << disp_diff << ", dist: " << v_dist[s] << endl;
-    }
-    unsigned int i_mean_element = 0;
-    float i_smallest_dist = 1.e20;
-    for( unsigned int s = 0; s < v_disp_diff.size(); s++ )
-    {
-        if( v_disp_diff[s] < i_smallest_dist
-                && v_dist[s] < 3.5/2.*1.1 )
-        {
-            i_mean_element = s;
-            i_smallest_dist = v_disp_diff[s];
-        }
-    }
-    return i_mean_element;
+	vector< float > v_disp_diff( i_sign.size(), 0. );
+	vector< float > v_dist( i_sign.size(), 0. );
+	for( unsigned int s = 0; s < i_sign.size(); s++ )
+	{
+		vector< float > v_xs;
+		vector< float > v_ys;
+		float xs = 0.;
+		float ys = 0.;
+		float disp_diff = 0.;
+		for( unsigned int i = 0; i < x.size(); i++ )
+		{
+			v_xs.push_back( x[i] - i_sign[s][i] * v_disp[i] * cosphi[i] );
+			v_ys.push_back( y[i] - i_sign[s][i] * v_disp[i] * sinphi[i] );
+		}
+		calculateMeanShowerDirection( v_xs, v_ys, v_weight, xs, ys, disp_diff, v_xs.size() );
+		v_disp_diff[s] = disp_diff;
+		v_dist[s] = sqrt( xs * xs + ys * ys );
+	}
+	unsigned int i_mean_element = 0;
+	float i_smallest_dist = 1.e20;
+	for( unsigned int s = 0; s < v_disp_diff.size(); s++ )
+	{
+		// TMPTMP hard-wired FOV cut:
+		// FOV radius * 10%
+		if( v_disp_diff[s] < i_smallest_dist
+				&& v_dist[s] < 3.5 / 2.*1.1 )
+		{
+			i_mean_element = s;
+			i_smallest_dist = v_disp_diff[s];
+		}
+	}
+	return i_mean_element;
 }
 
 
@@ -319,25 +319,25 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 	///////////////////////////////////////////////////////////////////////
 	// method: BDTs
 	///////////////////////////////////////////////////////////////////////
-    // head/tail uncertainty
-    // search for combination of images with smallest differences
-    // in reconstructed images
-    fdisp_xs_T.clear();
-    fdisp_ys_T.clear();
-    fdisp_xs_T.assign( v_weight.size(), 0. );
-    fdisp_ys_T.assign( v_weight.size(), 0. );
-
-    vector< vector< float > > i_sign = get_sign_permuation_vector( x.size() );
-    unsigned int i_smallest_diff_element = find_smallest_diff_element(
-            i_sign, x, y, cosphi, sinphi, v_disp, v_weight );
-
-    for( unsigned int ii = 0; ii < x.size(); ii++ )
-    {
-        fdisp_xs_T[ii] = x[ii] - i_sign[i_smallest_diff_element][ii] * v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
-        fdisp_ys_T[ii] = y[ii] - i_sign[i_smallest_diff_element][ii] * v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
-    }
-    calculateMeanShowerDirection( fdisp_xs_T, fdisp_ys_T, v_weight, xs, ys, dispdiff, fdisp_xs_T.size() );
-
+	// head/tail uncertainty
+	// search for combination of images with smallest differences
+	// in reconstructed images
+	fdisp_xs_T.clear();
+	fdisp_ys_T.clear();
+	fdisp_xs_T.assign( v_weight.size(), 0. );
+	fdisp_ys_T.assign( v_weight.size(), 0. );
+	
+	vector< vector< float > > i_sign = get_sign_permuation_vector( x.size() );
+	unsigned int i_smallest_diff_element = find_smallest_diff_element(
+			i_sign, x, y, cosphi, sinphi, v_disp, v_weight );
+			
+	for( unsigned int ii = 0; ii < x.size(); ii++ )
+	{
+		fdisp_xs_T[ii] = x[ii] - i_sign[i_smallest_diff_element][ii] * v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
+		fdisp_ys_T[ii] = y[ii] - i_sign[i_smallest_diff_element][ii] * v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
+	}
+	calculateMeanShowerDirection( fdisp_xs_T, fdisp_ys_T, v_weight, xs, ys, dispdiff, fdisp_xs_T.size() );
+	
 	// apply a completely unnecessary sign flip
 	if( ys > -9998. )
 	{
@@ -383,10 +383,10 @@ void VDispAnalyzer::calculateMeanShowerDirection( vector< float > v_x, vector< f
 	{
 		for( unsigned int m = n; m < iMaxN; m++ )
 		{
-			dispdiff += ( ( v_x[n] - v_x[m] ) * ( v_x[n] - v_x[m] ) 
-                    + ( v_y[n] - v_y[m] ) * ( v_y[n] - v_y[m] ) )
-                * v_weight[n] * v_weight[m];
-            z += v_weight[n] * v_weight[m];
+			dispdiff += sqrt( ( v_x[n] - v_x[m] ) * ( v_x[n] - v_x[m] )
+							  + ( v_y[n] - v_y[m] ) * ( v_y[n] - v_y[m] ) )
+						* v_weight[n] * v_weight[m];
+			z += v_weight[n] * v_weight[m];
 		}
 		xs += v_x[n] * v_weight[n];
 		ys += v_y[n] * v_weight[n];

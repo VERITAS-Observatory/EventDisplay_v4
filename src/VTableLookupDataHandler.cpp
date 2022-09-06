@@ -688,9 +688,6 @@ void VTableLookupDataHandler::doStereoReconstruction()
 		fDispAnalyzerDirection->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
 												fTLRunParameter->fmaxdist,
 												fTLRunParameter->fmaxloss );
-        if( fMCEnergy > 20. )
-        {
-            cout << "EVENT " << fMCEnergy << "\t" << fMCxoff << "\t" << fMCyoff << endl;
 		fDispAnalyzerDirection->calculateMeanDispDirection(
 			getNTel(),
 			fArrayPointing_Elevation, fArrayPointing_Azimuth,
@@ -714,13 +711,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 		fDispDiff = fDispAnalyzerDirection->getDispDiff();
 		fimg2_ang = fDispAnalyzerDirection->getAngDiff();
 		fchi2 = fDispDiff;
-        cout << "\t reco: " << fXoff << ", " << fYoff << ", " << fDispDiff << endl;
-        cout << "\t stereo: " << fXoff_edisp << ", " << fYoff_edisp << endl;
-        if( sqrt( (fMCxoff-fXoff)*(fMCxoff-fXoff) + (fMCyoff-fYoff)*(fMCyoff-fYoff))>1.5 && fYoff > -90. && fXoff > -90. )
-        {
-            cout << "LARGE " << sqrt( (fMCxoff-fXoff)*(fMCxoff-fXoff) + (fMCyoff-fYoff)*(fMCyoff-fYoff)) << endl;
-        }
-        }
+		
 		// for az / ze calculation
 		i_SR.fillShowerDirection( fXoff, fYoff );
 		fnxyoff = fDispAnalyzerDirection->getXYWeight_disp().size();
