@@ -688,6 +688,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 		fDispAnalyzerDirection->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
 												fTLRunParameter->fmaxdist,
 												fTLRunParameter->fmaxloss );
+		fDispAnalyzerDirection->setTelescopeFOV( fTelFOV );
 		fDispAnalyzerDirection->calculateMeanDispDirection(
 			getNTel(),
 			fArrayPointing_Elevation, fArrayPointing_Azimuth,
@@ -853,6 +854,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 	fList_of_Tel_type.clear();
 	if( fTtelconfig )
 	{
+		fTelFOV.clear();
 		ftelconfig = new Ctelconfig( fTtelconfig );
 		ftelconfig->GetEntry( 0 );
 		fNTel = ftelconfig->NTel;
@@ -869,6 +871,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 			fTelY[i] = ftelconfig->TelY;
 			fTelZ[i] = ftelconfig->TelZ;
 			fFocalLength[i] = ftelconfig->FocalLength;
+			fTelFOV.push_back( ftelconfig->FOV );
 			fTel_type[i] = ftelconfig->TelType;
 			if( fList_of_Tel_type.find( ftelconfig->TelType ) != fList_of_Tel_type.end() )
 			{

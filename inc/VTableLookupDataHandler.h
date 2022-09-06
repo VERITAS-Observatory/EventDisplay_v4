@@ -115,6 +115,7 @@ class VTableLookupDataHandler
 		double fTelY[VDST_MAXTELESCOPES];
 		double fTelZ[VDST_MAXTELESCOPES];
 		double fFocalLength[VDST_MAXTELESCOPES];
+		vector< float > fTelFOV;
 		ULong64_t fTel_type[VDST_MAXTELESCOPES];
 		map<ULong64_t, unsigned int > fList_of_Tel_type;                      // [teltype][number of telescopes for this type]
 		map<ULong64_t, unsigned int >::iterator fList_of_Tel_type_iterator;

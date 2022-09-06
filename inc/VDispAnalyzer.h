@@ -67,6 +67,7 @@ class VDispAnalyzer
 		vector< float > fdisp_core_T;
 		
 		vector<ULong64_t> fTelescopeTypeList;
+		vector<float> fTelescopeFOV;
 		
 		void calculateMeanShowerDirection( vector< float > v_x, vector< float > v_y, vector< float > v_weight,
 										   float& xs, float& ys, float& dispdiff, unsigned int iMaxN );
@@ -241,6 +242,10 @@ class VDispAnalyzer
 			floss_max       = imaxloss;
 		}
 		void  setTelescopeTypeList( vector<ULong64_t> iTelescopeTypeList );
+		void  setTelescopeFOV( vector< float > iTelFOV )
+		{
+			fTelescopeFOV = iTelFOV;
+		}
 		void  setZombie( bool iB = true )
 		{
 			bZombie = iB;

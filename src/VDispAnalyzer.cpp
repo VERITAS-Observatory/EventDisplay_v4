@@ -201,12 +201,31 @@ unsigned int VDispAnalyzer::find_smallest_diff_element(
 	}
 	unsigned int i_mean_element = 0;
 	float i_smallest_dist = 1.e20;
+	// calculate average FOV
+	float i_average_FOV = 0.;
+	float z = 0.;
+	for( unsigned int i = 0; i < fTelescopeFOV.size(); i++ )
+	{
+		if( fTelescopeFOV[i] > 0. )
+		{
+			i_average_FOV += fTelescopeFOV[i];
+			z++;
+		}
+	}
+	if( z > 0. )
+	{
+		i_average_FOV /= z;
+	}
+	else
+	{
+		i_average_FOV = 3.5;
+	}
+	
 	for( unsigned int s = 0; s < v_disp_diff.size(); s++ )
 	{
-		// TMPTMP hard-wired FOV cut:
 		// FOV radius * 10%
 		if( v_disp_diff[s] < i_smallest_dist
-				&& v_dist[s] < 3.5 / 2.*1.1 )
+				&& v_dist[s] < i_average_FOV / 2.*1.1 )
 		{
 			i_mean_element = s;
 			i_smallest_dist = v_disp_diff[s];
