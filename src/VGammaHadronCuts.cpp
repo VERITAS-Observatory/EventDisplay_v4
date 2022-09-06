@@ -12,7 +12,7 @@
      1: apply gamma/hadron cuts on probabilities given by a friend to the data tree (e.g. random forest analysis)
      2: same as 2
      3: apply cuts on probabilities given by a friend to the data tree already at the level of
-        the event quality level (e.g. of use for analysis of certain binary phases only)
+        the event quality level
      4: TMVA gamma/hadron separation
 
   ID1:
@@ -1148,9 +1148,10 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 	
 	/////////////////////////////////////////////////////////////////////////////////
 	// check core positions
-	// (average distance to telescopes with images)
-	double iR = 0.;
+	// closest distance between telescope and core
 	double iR_min = 1.e10;
+	// average distance to telescopes with images
+	double iR = 0.;
 	double iNTR = 0.;
 	for( int i = 0; i < fData->NImages; i++ )
 	{
@@ -1174,6 +1175,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 		iR /= iNTR;
 	}
 	
+	// apply cut on distance
 	if( iR < fCut_AverageCoreDistanceToTelescopes_min || iR > fCut_AverageCoreDistanceToTelescopes_max )
 	{
 		if( bCount && fStats )
@@ -1936,6 +1938,8 @@ bool VGammaHadronCuts::applyMCXYoffCut( double xoff, double yoff, bool bCount )
 
    check telescope type (e.g. remove all LSTs)
 
+   returns true if current event fails the fulfil the conditions
+
 */
 bool VGammaHadronCuts::applyTelTypeTest( bool bCount )
 {
@@ -1948,6 +1952,7 @@ bool VGammaHadronCuts::applyTelTypeTest( bool bCount )
 	
 	for( unsigned int i = 0; i < fNTelTypeCut.size(); i++ )
 	{
+		// test: true means this event has enough telescopes
 		icut = ( icut || fNTelTypeCut[i]->test( fData ) );
 	}
 	
