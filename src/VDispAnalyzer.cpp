@@ -323,7 +323,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 	// (not so important for disp direction,
 	//  but note that core reconstruction
 	//  is still done the convential way)
-	if( f_angdiff < fAxesAngles_min && fmean_iangdiffN <= 2.01 )
+	if( f_angdiff < fAxesAngles_min && fmean_iangdiffN < 2.01 )
 	{
 		return;
 	}
