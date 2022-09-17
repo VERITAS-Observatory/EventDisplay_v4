@@ -12,19 +12,18 @@ VTableLookup::VTableLookup( char ireadwrite, unsigned int iDebug )
 {
 	fDebug = iDebug;
 	
+    // total number of telescopes
 	fNTel = 0;
-	
 	// look up table file
 	fLookupTableFile = 0;
 	fDirMSCW = 0;
 	fDirMSCL = 0;
-	fDirEnergyER = 0;
 	fDirEnergySR = 0;
 	
 	// run parameters
 	fTLRunParameter = 0;
 	
-	fNumberOfIgnoredeEvents = 0;
+	fNumberOfIgnoredEvents = 0;
 	fNNoiseLevelWarnings = 0;
 	
 	
@@ -49,7 +48,7 @@ VTableLookup::VTableLookup( char ireadwrite, unsigned int iDebug )
 	cout << "-------------------------------------------------------" << endl;
 	if( fwrite )
 	{
-		cout << "making lookup tables" << endl;
+        cout << "filling lookup tables" << endl;
 	}
 	else
 	{
@@ -129,34 +128,30 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
 	{
 		cout << "VTableLookup::setMCTableFiles error while opening table file: " << itablefile << endl;
 		cout << "exiting..." << endl;
-		exit( 0 );
+        exit( EXIT_FAILURE );
 	}
 	if( fLookupTableFile->TestBit( TFile::kRecovered ) )
 	{
 		cout << "VTableLookup::setMCTableFiles problems with file (TFile::kRecovered, " << fLookupTableFile->TestBit( TFile::kRecovered ) << "): " << endl;
 		cout << itablefile << endl;
 		cout << "exiting..." << endl;
-		exit( 0 );
+		exit( EXIT_FAILURE );
 	}
 	// telescope type
 	vector< VTableCalculator* > i_mscw;
 	vector< VTableCalculator* > i_mscl;
 	vector< VTableCalculator* > i_energySR;
-	vector< VTableEnergyCalculator* > i_energy;
 	// azimuth
 	vector< vector< VTableCalculator* > > ii_mscw;
 	vector< vector< VTableCalculator* > > ii_mscl;
 	vector< vector< VTableCalculator* > > ii_energySR;
-	vector< vector< VTableEnergyCalculator* > > ii_energy;
 	
 	vector< vector< vector< VTableCalculator* > > > iii_mscw;
 	vector< vector< vector< VTableCalculator* > > > iii_mscl;
 	vector< vector< vector< VTableCalculator* > > > iii_energySR;
-	vector< vector< vector< VTableEnergyCalculator* > > > iii_energy;
 	vector< vector< vector< vector< VTableCalculator* > > > > iiii_mscw;
 	vector< vector< vector< vector< VTableCalculator* > > > > iiii_mscl;
 	vector< vector< vector< vector< VTableCalculator* > > > > iiii_energySR;
-	vector< vector< vector< vector< VTableEnergyCalculator* > > > > iiii_energy;
 	
 	map<ULong64_t, unsigned int > i_list_of_Tel_type = fData->getList_of_Tel_type();
 	map<ULong64_t, unsigned int >::iterator iter_i_list_of_Tel_type;
@@ -210,7 +205,6 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
 		
 		ii_mscw.clear();
 		ii_mscl.clear();
-		ii_energy.clear();
 		ii_energySR.clear();
 		
 		//////////////////
@@ -233,7 +227,6 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
 			
 			i_mscw.clear();
 			i_mscl.clear();
-			i_energy.clear();
 			i_energySR.clear();
 			
 			//////////////////
@@ -260,7 +253,6 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
 				// DIRECTORIES FOR DIFFERENT TABLES
 				fDirMSCW = gDirectory->mkdir( "mscw" );
 				fDirMSCL = gDirectory->mkdir( "mscl" );
-				fDirEnergyER = gDirectory->mkdir( "energyER" );
 				fDirEnergySR = gDirectory->mkdir( "energySR" );
 				
 				// mean scaled width and length
@@ -271,10 +263,6 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
 				i_mscl.back()->setWrite1DHistograms( fWrite1DHistograms );
 				i_mscl.back()->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
 				// energy reconstruction
-				i_energy.push_back( new VTableEnergyCalculator( isuff.c_str(), freadwrite, fDirEnergyER, fUseMedianSizeforEnergyDetermination ) );
-				i_energy.back()->setCutValues( fTLRunParameter->fminsize, fTLRunParameter->fmaxdist );
-				i_energy.back()->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
-				i_energy.back()->setWrite1DHistograms( fWrite1DHistograms );
 				i_energySR.push_back( new VTableCalculator( "energySR", isuff.c_str(), freadwrite, fDirEnergySR, true, fTLRunParameter->fPE,
 									  fTLRunParameter->fUseMedianEnergy ) );
 				i_energySR.back()->setWrite1DHistograms( fWrite1DHistograms );
@@ -282,21 +270,17 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
 			}   // telescope types
 			ii_mscw.push_back( i_mscw );
 			ii_mscl.push_back( i_mscl );
-			ii_energy.push_back( i_energy );
 			ii_energySR.push_back( i_energySR );
 		} // azimuth
 		iii_mscw.push_back( ii_mscw );
 		iii_mscl.push_back( ii_mscl );
-		iii_energy.push_back( ii_energy );
 		iii_energySR.push_back( ii_energySR );
 	} // wobble offsets
 	iiii_mscw.push_back( iii_mscw );
 	iiii_mscl.push_back( iii_mscl );
-	iiii_energy.push_back( iii_energy );
 	iiii_energySR.push_back( iii_energySR );
 	fmscw.push_back( iiii_mscw );
 	fmscl.push_back( iiii_mscl );
-	fenergyEnergyvsRadius.push_back( iiii_energy );
 	fenergySizevsRadius.push_back( iiii_energySR );
 }
 
@@ -318,6 +302,7 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 		cout << "void VTableLookup::setMCTableFiles( string itablefile, string isuff )" << endl;
 	}
 	
+    // open table file
 	gErrorIgnoreLevel = 20001;
 	fLookupTableFile = new TFile( itablefile.c_str() );
 	if( fLookupTableFile->IsZombie() )
@@ -351,26 +336,25 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 	vector< VTableCalculator* > i_mscl;
 	vector< VTableCalculator* > i_energySR;
 	vector< ULong64_t > i_telType;
-	vector< VTableEnergyCalculator* > i_energy;
 	vector< vector< VTableCalculator* > > ii_mscw;
 	vector< vector< VTableCalculator* > > ii_mscl;
 	vector< vector< VTableCalculator* > > ii_energySR;
-	vector< vector< VTableEnergyCalculator* > > ii_energy;
 	vector< vector< ULong64_t > > ii_telType;
 	vector< vector< vector< VTableCalculator* > > > iii_mscw;
 	vector< vector< vector< VTableCalculator* > > > iii_mscl;
 	vector< vector< vector< VTableCalculator* > > > iii_energySR;
-	vector< vector< vector< VTableEnergyCalculator* > > > iii_energy;
 	vector< vector< vector< ULong64_t > > > iii_telType;
 	vector< vector< vector< vector< VTableCalculator* > > > > iiii_mscw;
 	vector< vector< vector< vector< VTableCalculator* > > > > iiii_mscl;
 	vector< vector< vector< vector< VTableCalculator* > > > > iiii_energySR;
-	vector< vector< vector< vector< VTableEnergyCalculator* > > > > iiii_energy;
 	vector< vector< vector< vector< ULong64_t > > > > iiii_telType;
 	
+    // vector with available NSB levels [tel_type][NSB]
 	fTableNoiseLevel.clear();
+    // vector with available zenith angles [tel_type][NSB][ze]
 	fTableZe.clear();
 	vector< double > i_ze;
+    // vector with available wobble offsets [tel_type][NSB][ze][woff]
 	fTableDirectionOffset.clear();
 	vector< double > i_DirectionOffset;
 	vector< vector< double > > ii_DirectionOffset;
@@ -393,7 +377,6 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 		ii_DirectionOffset.clear();
 		iiii_mscw.clear();
 		iiii_mscl.clear();
-		iiii_energy.clear();
 		iiii_energySR.clear();
 		iiii_telType.clear();
 		for( unsigned z = 0; z < iDNameZE.size(); z++ )
@@ -401,7 +384,6 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 			i_ze.push_back( atof( iDNameZE[z].substr( 3, 3 ).c_str() ) / 10. );
 			iii_mscw.clear();
 			iii_mscl.clear();
-			iii_energy.clear();
 			iii_energySR.clear();
 			iii_telType.clear();
 			
@@ -415,7 +397,6 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 				i_DirectionOffset.push_back( atof( iDNameWoff[w].substr( 5, 4 ).c_str() ) / 1000. );
 				ii_mscw.clear();
 				ii_mscl.clear();
-				ii_energy.clear();
 				ii_energySR.clear();
 				ii_telType.clear();
 				
@@ -427,7 +408,6 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 				{
 					i_mscw.clear();
 					i_mscl.clear();
-					i_energy.clear();
 					i_energySR.clear();
 					i_telType.clear();
 					
@@ -448,12 +428,6 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 						iDirTel->cd( iDNameTel[t].c_str() );
 						iDir = ( TDirectory* )gDirectory->Get( "mscl" );
 						i_mscl.push_back( new VTableCalculator( "length", isuff.c_str(), freadwrite, iDir, false ) );
-						// get energy directory (inverted tabled)
-						iDirTel->cd( iDNameTel[t].c_str() );
-						iDir = ( TDirectory* )gDirectory->Get( "energyER" );
-						i_energy.push_back( new VTableEnergyCalculator( isuff.c_str(), freadwrite, iDir, true, iInterpolString ) );
-						i_energy.back()->setCutValues( fTLRunParameter->fminsize, fTLRunParameter->fmaxdist );
-						i_energy.back()->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
 						// get energy directory (size vs radius method)
 						iDirTel->cd( iDNameTel[t].c_str() );
 						iDir = ( TDirectory* )gDirectory->Get( "energySR" );
@@ -461,26 +435,22 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 					}                             // telescopes
 					ii_mscw.push_back( i_mscw );
 					ii_mscl.push_back( i_mscl );
-					ii_energy.push_back( i_energy );
 					ii_energySR.push_back( i_energySR );
 					ii_telType.push_back( i_telType );
 				}                                 // az
 				iii_mscw.push_back( ii_mscw );
 				iii_mscl.push_back( ii_mscl );
-				iii_energy.push_back( ii_energy );
 				iii_energySR.push_back( ii_energySR );
 				iii_telType.push_back( ii_telType );
 			}                                     // woff
 			iiii_mscw.push_back( iii_mscw );
 			iiii_mscl.push_back( iii_mscl );
-			iiii_energy.push_back( iii_energy );
 			iiii_energySR.push_back( iii_energySR );
 			iiii_telType.push_back( iii_telType );
 			ii_DirectionOffset.push_back( i_DirectionOffset );
 		}                                         // ze
 		fmscw.push_back( iiii_mscw );
 		fmscl.push_back( iiii_mscl );
-		fenergyEnergyvsRadius.push_back( iiii_energy );
 		fenergySizevsRadius.push_back( iiii_energySR );
 		fTelType_tables.push_back( iiii_telType );
 		
@@ -498,7 +468,7 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 		cout << "     ...did not survive test of table file ! There are missing tables in your table file: " << itablefile << endl;
 		cout << "     You need to redo your table, or contact Gernot if this is the standard table supplied " << endl ;
 		sanityCheckLookupTableFile( true ); // this will print which tables are missing
-		exit( -1 );
+        exit( EXIT_FAILURE );
 	}
 	
 	if( fDebug )
@@ -507,7 +477,13 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 	}
 }
 
+/*
 
+     sanity checks for lookup tables
+
+     - make sure that the same number of zenith, az, NSB tables are given for each telescope type
+
+*/
 bool VTableLookup::sanityCheckLookupTableFile( bool iPrint )
 {
 	if( iPrint == false )
@@ -519,10 +495,8 @@ bool VTableLookup::sanityCheckLookupTableFile( bool iPrint )
 		cout << "this screen printing will help you to locate the missing LTs..." << endl;
 	}
 	
-	
 	for( unsigned int i = 0; i < fTableNoiseLevel.size(); i++ )
 	{
-	
 		if( iPrint == true )
 		{
 			cout << " Noise level index  " << i << " has " << fTableZe[i].size() << " zenith angles" << endl;
@@ -579,11 +553,11 @@ bool VTableLookup::sanityCheckLookupTableFile( bool iPrint )
 		}
 	}
 	
+    // print a summary of the number of tables found
 	if( iPrint == false )
 	{
 		cout << "Found " << fTableNoiseLevel.size() << " noise levels, " << fTableZe[0].size() << " zenith angles, " << fTableDirectionOffset[0][0].size() << " wobble offsets, " << fTableAzBins << " azimuth bins and " << fTelType_tables[0][0][0][0].size() << " telescope types" << endl;
 	}
-	
 	return true;
 }
 
@@ -608,7 +582,7 @@ void VTableLookup::loop()
 /*
     fill the tables
 
-    (fmscw,fmscl,fenergyEnergyvsRadius are vectors of size 1)
+    (fmscw,fmscl,fenerrgySR are vectors of size 1)
 */
 void VTableLookup::fillLookupTable()
 {
@@ -675,11 +649,6 @@ void VTableLookup::fillLookupTable()
 								fData->getLength( t ), idummy1, iEventWeight, idummy3, idummy1 );
 						fenergySizevsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2,
 								fData->getMCEnergyArray(), idummy1, iEventWeight, idummy3, idummy1 );
-						if( !fTLRunParameter->fLimitEnergyReconstruction )
-						{
-							fenergyEnergyvsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, fData->getMCEnergy(),
-									i_r, i_s2, idummy1, iEventWeight, idummy3, 0. );
-						}
 					}
 				}
 				////////////////////////////////////////////////
@@ -694,12 +663,6 @@ void VTableLookup::fillLookupTable()
 							fData->getLength( t ), idummy1, iEventWeight, idummy3, idummy1 );
 					fenergySizevsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s2,
 							fData->getMCEnergyArray(), idummy1, iEventWeight, idummy3, idummy1 );
-							
-					if( !fTLRunParameter->fLimitEnergyReconstruction )
-					{
-						fenergyEnergyvsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, fData->getMCEnergy(),
-								i_r, i_s2, idummy1, iEventWeight, idummy3, 0. );
-					}
 				}
 				i_Tel_type_counter++;
 			}
@@ -714,7 +677,6 @@ void VTableLookup::fillLookupTable()
 */
 void VTableLookup::readLookupTable()
 {
-	// zenith angle lower and upper limit
 	int i_az = 0;
 	
 	double esys = 0.;
@@ -769,7 +731,7 @@ void VTableLookup::readLookupTable()
 		// eventdisplay is saying that his event should be ignored
 		if( fData->getEventNumber() == 99999999 )
 		{
-			fNumberOfIgnoredeEvents++;
+			fNumberOfIgnoredEvents++;
 			continue;
 		}
 		
@@ -811,12 +773,14 @@ void VTableLookup::readLookupTable()
 		{
 			//////////////////////////////////////
 			// here we should have good data only
+            // (ze, az, and wobble offset have been
+            //  tested)
 			//////////////////////////////////////
+            
+            // get direction angles for this event
 			ze = fData->getZe();
 			woff = fData->getWobbleOffset();
-			// get azimuth angle bin (no interpolation)
 			i_az = getAzBin( fData->getAz() );
-			
 			// get noise level for this event
 			readNoiseLevel( false );
 			
@@ -1032,15 +996,15 @@ void VTableLookup::readLookupTable()
 			}
 			
 			// set energy values
-			fData->setEnergy( s_N->energyER, s_N->energySR );
-			fData->setChi2( s_N->energyER_Chi2, s_N->energySR_Chi2 );
-			fData->setdE( s_N->energyER_dE, s_N->energySR_dE );
+			fData->setEnergy( 0., s_N->energySR );
+			fData->setChi2( 0., s_N->energySR_Chi2 );
+			fData->setdE( 0., s_N->energySR_dE );
 			// set mean reduced scaled widths and energies per telescope
 			for( unsigned int j = 0; j < s_N->fNTel; j++ )
 			{
 				fData->setMSCWT( j, s_N->mscw_T[j], s_N->mscw_Tsigma[j] );
 				fData->setMSCLT( j, s_N->mscl_T[j], s_N->mscl_Tsigma[j] );
-				fData->setEnergyT( j, s_N->energyER_T[j], s_N->energySR_T[j] );
+				fData->setEnergyT( j, 0., s_N->energySR_T[j] );
 			}
 			
 			fData->fill();
@@ -1054,9 +1018,6 @@ void VTableLookup::interpolate( VTablesToRead* s1, double w1, VTablesToRead* s2,
 {
 	s->mscw =          VStatistics::interpolate( s1->mscw, w1, s2->mscw, w2, w, iCos, 0.1 );
 	s->mscl =          VStatistics::interpolate( s1->mscl, w1, s2->mscl, w2, w, iCos, 0.1 );
-	s->energyER =      VStatistics::interpolate( s1->energyER, w1, s2->energyER, w2, w, iCos, 0.1 );
-	s->energyER_Chi2 = VStatistics::interpolate( s1->energyER_Chi2, w1, s2->energyER_Chi2, w2, w, iCos, 0.1 );
-	s->energyER_dE =   VStatistics::interpolate( s1->energyER_dE, w1, s2->energyER_dE, w2, w, iCos, 0.1 );
 	s->energySR =      VStatistics::interpolate( s1->energySR, w1, s2->energySR, w2, w, iCos, 0.1 );
 	s->energySR_Chi2 = VStatistics::interpolate( s1->energySR_Chi2, w1, s2->energySR_Chi2, w2, w, iCos, 0.1 );
 	s->energySR_dE =   VStatistics::interpolate( s1->energySR_dE, w1, s2->energySR_dE, w2, w, iCos, 0.1 );
@@ -1065,7 +1026,6 @@ void VTableLookup::interpolate( VTablesToRead* s1, double w1, VTablesToRead* s2,
 	{
 		s->mscw_T[i] =      VStatistics::interpolate( s1->mscw_T[i], w1, s2->mscw_T[i], w2, w, iCos, 1.e-2 );
 		s->mscl_T[i] =      VStatistics::interpolate( s1->mscl_T[i], w1, s2->mscl_T[i], w2, w, iCos, 1.e-2 );
-		s->energyER_T[i] =  VStatistics::interpolate( s1->energyER_T[i], w1, s2->energyER_T[i], w2, w, iCos, 1.e-2 );
 		s->energySR_T[i] =  VStatistics::interpolate( s1->energySR_T[i], w1, s2->energySR_T[i], w2, w, iCos, 1.e-2 );
 		s->mscw_Tsigma[i] = VStatistics::interpolate( s1->mscw_Tsigma[i], w1, s2->mscw_Tsigma[i], w2, w, iCos, 1.e-2 );
 		s->mscl_Tsigma[i] = VStatistics::interpolate( s1->mscl_Tsigma[i], w1, s2->mscl_Tsigma[i], w2, w, iCos, 1.e-2 );
@@ -1098,10 +1058,6 @@ void VTableLookup::terminate()
 							sprintf( hname, "NOISE %d ZE %d WOFF %d AZ %d TEL %d", i, t, u, v, w );
 							fmscw[i][t][u][v][w]->terminate( fmscw[i][t][u][v][w]->getOutputDirectory(), hname );
 							fmscl[i][t][u][v][w]->terminate( fmscl[i][t][u][v][w]->getOutputDirectory(), hname );
-							if( !fTLRunParameter->fLimitEnergyReconstruction )
-							{
-								fenergyEnergyvsRadius[i][t][u][v][w]->terminate( fenergyEnergyvsRadius[i][t][u][v][w]->getOutputDirectory(), hname );
-							}
 							fenergySizevsRadius[i][t][u][v][w]->terminate( fenergySizevsRadius[i][t][u][v][w]->getOutputDirectory(), hname );
 							fLookupTableFile->Flush();
 						}
@@ -1113,9 +1069,9 @@ void VTableLookup::terminate()
 	}
 	else
 	{
-		if( fNumberOfIgnoredeEvents > 0 )
+		if( fNumberOfIgnoredEvents > 0 )
 		{
-			cout << endl << "\t total number of ignored events: " << fNumberOfIgnoredeEvents << endl;
+			cout << endl << "\t total number of ignored events: " << fNumberOfIgnoredEvents << endl;
 		}
 	}
 	
@@ -1136,10 +1092,15 @@ void VTableLookup::terminate()
 	cout << "exiting..." << endl;
 }
 
+/*
 
+     get the corresponding bin number for an azimuth angle
+     (no interpolation)
+
+*/
 int VTableLookup::getAzBin( double az )
 {
-	// be sure that az is bin intervall [-180., 180.]
+	// be sure that az is bin interval [-180., 180.]
 	if( az > 180. )
 	{
 		az -= 360.;
@@ -1199,14 +1160,16 @@ bool VTableLookup::setInputFiles( vector< string > iInputFiles )
 	f_calc_msc->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
 	f_calc_energySR = new VTableCalculator( fNTel, true );
 	f_calc_energySR->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
-	f_calc_energy = new VTableEnergyCalculator( fNTel );
-	f_calc_energy->setCutValues( fTLRunParameter->fminsize, fTLRunParameter->fmaxdist );
-	f_calc_energy->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
 	
 	return bMC;
 }
 
+/*
+      read list of directories from table file
 
+      sort them to make sure that they are always in the same sequence
+
+*/
 vector< string > VTableLookup::getSortedListOfDirectories( TDirectory* iDir )
 {
 	vector< string > iDName;
@@ -1257,6 +1220,11 @@ vector< string > VTableLookup::getSortedListOfDirectories( TDirectory* iDir )
 }
 
 
+/*
+
+     read pedvar values for this event
+
+*/
 void VTableLookup::readNoiseLevel( bool bWriteToRunPara )
 {
 	if( !fData )
@@ -1329,7 +1297,7 @@ void VTableLookup::readNoiseLevel( bool bWriteToRunPara )
 	{
 		cout << " VTableLookup::readNoiseLevel ERROR: could not find mean pedestal variation for each telescope" << endl;
 		cout << "exiting...." << endl;
-		exit( 0 );
+        exit( EXIT_FAILURE );
 	}
 }
 
@@ -1368,8 +1336,14 @@ void VTableLookup::getIndexBoundary( unsigned int* iup, unsigned int* ilow, vect
 	}
 }
 
+/*
 
-void VTableLookup::getTables( unsigned int inoise, unsigned int ize, unsigned int iwoff, unsigned int iaz, unsigned int tel, VTablesToRead* s )
+    get pointers to a certain set of tables
+
+*/
+void VTableLookup::getTables( unsigned int inoise, unsigned int ize, 
+                              unsigned int iwoff, unsigned int iaz, unsigned int tel, 
+                              VTablesToRead* s )
 {
 	if( !s )
 	{
@@ -1417,10 +1391,6 @@ void VTableLookup::getTables( unsigned int inoise, unsigned int ize, unsigned in
 	s->hmscwMedian[tel] = fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian();
 	s->hmsclMedian[tel] = fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian();
 	s->henergySRMedian[tel] = fenergySizevsRadius[inoise][ize][iwoff][iaz][telX]->getHistoMedian();
-	if( !fTLRunParameter->fLimitEnergyReconstruction )
-	{
-		s->henergyERMedian[tel] = fenergyEnergyvsRadius[inoise][ize][iwoff][iaz][telX]->getHistoMedian();
-	}
 }
 
 
@@ -1436,7 +1406,7 @@ void VTableLookup::calculateMSFromTables( VTablesToRead* s, double esys )
 		return;
 	}
 	// make sure that list of pointers to tables exists
-	if( !f_calc_msc || !f_calc_energy || !f_calc_energySR )
+	if( !f_calc_msc || !f_calc_energySR )
 	{
 		s->reset();
 		return;
@@ -1465,10 +1435,6 @@ void VTableLookup::calculateMSFromTables( VTablesToRead* s, double esys )
 	s->energySR = f_calc_energySR->calc( ( int )fData->getNTel(), fData->getDistanceToCore(),
 										 i_s2, 0,
 										 s->energySR_T, s->energySR_Chi2, s->energySR_dE, s->energySR_Tsigma );
-	// calculate energy (method 0)
-	f_calc_energy->setVHistograms( s->henergyERMedian );
-	s->energyER = f_calc_energy->calc( ( int )fData->getNTel(), fData->getMCEnergy(), fData->getDistanceToCore(),
-									   i_s2, s->energyER_T, s->energyER_Chi2, s->energyER_dE, esys );
 }
 
 

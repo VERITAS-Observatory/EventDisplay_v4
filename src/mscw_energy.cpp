@@ -4,7 +4,6 @@
 */
 
 #include "VTableCalculator.h"
-#include "VTableEnergyCalculator.h"
 #include "VTableLookupDataHandler.h"
 #include "VGlobalRunParameter.h"
 #include "VTableLookupRunParameter.h"

@@ -14,7 +14,6 @@
 #include "VTableLookupRunParameter.h"
 #include "VTablesToRead.h"
 #include "VTableCalculator.h"
-#include "VTableEnergyCalculator.h"
 
 #include <fstream>
 #include <iostream>
@@ -34,7 +33,7 @@ class VTableLookup
 		char freadwrite;                    // 'w' for table filling, 'r' for table reading
 		VTableLookupDataHandler* fData;
 		
-		int fNumberOfIgnoredeEvents;
+		int fNumberOfIgnoredEvents;
 		
 		VTableLookupRunParameter* fTLRunParameter;
 		
@@ -49,7 +48,6 @@ class VTableLookup
 		TFile* fLookupTableFile;                  // root files with lookup tables
 		TDirectory* fDirMSCW;
 		TDirectory* fDirMSCL;
-		TDirectory* fDirEnergyER;
 		TDirectory* fDirEnergySR;
 		
 		bool fWriteNoTriggerEvent;                // fill events with no triggers into the output tree
@@ -74,13 +72,11 @@ class VTableLookup
 		vector< vector< vector< vector< vector< ULong64_t > > > > > fTelType_tables;
 		vector< vector< vector< vector< vector< VTableCalculator* > > > > > fmscw;
 		vector< vector< vector< vector< vector< VTableCalculator* > > > > > fmscl;
-		vector< vector< vector< vector< vector< VTableEnergyCalculator* > > > > > fenergyEnergyvsRadius;
 		vector< vector< vector< vector< vector< VTableCalculator* > > > > > fenergySizevsRadius;
 		
 		// used for calculations
 		VTableCalculator* f_calc_msc;
 		VTableCalculator* f_calc_energySR;
-		VTableEnergyCalculator* f_calc_energy;
 		
 		
 		double fMeanNoiseLevel;
