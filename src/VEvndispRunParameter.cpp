@@ -951,6 +951,7 @@ bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpocheFile,
        is.open( fEpochFile.c_str(), ifstream::in );
        if( !is )
        {
+            setDirectories();
             string iTemp = getDirectory_EVNDISPParameterFiles() + fEpochFile;
             is.open( iTemp.c_str(), ifstream::in );
             if( !is )
