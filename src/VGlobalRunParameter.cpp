@@ -168,16 +168,7 @@ bool VGlobalRunParameter::setDirectories()
 {
 	//////////////////////////////////////////////////////////////////////
 	// get directories with all analysis data
-	string data_dir = "";
-	if( gSystem->Getenv( "OBS_EVNDISP_AUX_DIR" ) )
-	{
-		data_dir = gSystem->Getenv( "OBS_EVNDISP_AUX_DIR" );
-	}
-	// assume that by default a VERITAS analysis is requested
-	else if( gSystem->Getenv( "VERITAS_EVNDISP_AUX_DIR" ) )
-	{
-		data_dir = gSystem->Getenv( "VERITAS_EVNDISP_AUX_DIR" );
-	}
+	string data_dir = gSystem->Getenv( "VERITAS_EVNDISP_AUX_DIR" );
 	if( data_dir.size() != 0 )
 	{
 		fEVNDISPAnaDataDirectory = data_dir;
@@ -188,7 +179,7 @@ bool VGlobalRunParameter::setDirectories()
 	{
 		cout << "VGlobalRunParameter::setDirectories(): cannot find directory with EVNDISP aux data" << endl;
 		cout << "\t looking for " << fEVNDISPAnaDataDirectory << endl;
-		cout << "\t is environmental variable $OBS_EVNDISP_AUX_DIR (or $VERITAS_EVNDISP_AUX_DIR or $CTA_EVNDISP_AUX_DIR) set?" << endl;
+		cout << "\t is environmental variable $VERITAS_EVNDISP_AUX_DIR set?" << endl;
 		cout << "\t (see README/INSTALL)" << endl;
 		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
@@ -212,29 +203,20 @@ bool VGlobalRunParameter::setDirectories()
 	
 	//////////////////////////////////////////////////////////////////////
 	// output is written to this directory (unless stated otherwise on command line)
-	const char* cal_out = gSystem->Getenv( "OBS_USER_DATA_DIR" );
-	if( cal_out )
-	{
-		fEVNDISPOutputDirectory = cal_out;
-		fEVNDISPOutputDirectory += "/";
-	}
-	else
-	{
-		const char* vcal_out = gSystem->Getenv( "VERITAS_USER_DATA_DIR" );
-		if( vcal_out )
-		{
-			fEVNDISPOutputDirectory = vcal_out;
-			fEVNDISPOutputDirectory += "/";
-		}
-	}
+    const char* vcal_out = gSystem->Getenv( "VERITAS_USER_DATA_DIR" );
+    if( vcal_out )
+    {
+        fEVNDISPOutputDirectory = vcal_out;
+        fEVNDISPOutputDirectory += "/";
+    }
 	if( gSystem->AccessPathName( fEVNDISPOutputDirectory.c_str() ) )
 	{
 		cout << "VGlobalRunParameter::setDirectories(): cannot find directory for EVNDISP output data" << endl;
 		cout << "\t looking for " << fEVNDISPOutputDirectory << endl;
-		cout << "\t is environmental variable $OBS_USER_DATA_DIR set?" << endl;
+		cout << "\t is environmental variable $VERITAS_USER_DATA_DIR set?" << endl;
 		cout << "\t (see README/INSTALL)" << endl;
 		cout << "exiting..." << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	
 	return true;

@@ -59,29 +59,3 @@ export SOFASYS=$EVNDISPSYS/sofa
 ## EVNDISP libraries 
 LD_LIBRARY_PATH=$EVNDISPSYS/lib/:$EVNDISPSYS/obj/:$LD_LIBRARY_PATH; export LD_LIBRARY_PATH
 ######################################################
-
-######################################################
-## environmental variables
-######################################################
-if [ "$OBSERVATORY" = "VERITAS" ] || [ "$OBSERVATORY" = "VTS" ]
-then
-  if [[ $2 != "-q" ]]; then
-	echo "setting observatory to VERITAS"
-  fi
-  export OBS_EVNDISP_AUX_DIR=$VERITAS_EVNDISP_AUX_DIR
-  export OBS_DATA_DIR=$VERITAS_DATA_DIR
-  export OBS_USER_DATA_DIR=$VERITAS_USER_DATA_DIR
-  export OBS_USER_LOG_DIR=$VERITAS_USER_LOG_DIR
-fi
-
-if [ "$OBSERVATORY" = "CTA" ]
-then
-  if [[ $2 != "-q" ]]; then
-  	echo "setting observatory to CTA"
-  fi	
-  export OBS_EVNDISP_AUX_DIR=$CTA_EVNDISP_AUX_DIR
-  export OBS_DATA_DIR=$CTA_DATA_DIR
-  export OBS_USER_DATA_DIR=$CTA_USER_DATA_DIR
-  export OBS_USER_LOG_DIR=$CTA_USER_LOG_DIR
-fi
-
