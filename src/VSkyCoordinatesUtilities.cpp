@@ -36,6 +36,20 @@ int VSkyCoordinatesUtilities::getMJD_from_SQLstring( string iSQLData, double& i_
 	return i_stat;
 }
 
+string VSkyCoordinatesUtilities::getSQLstring_fromMJD( double MJD )
+{
+    stringstream iSQL;
+    int year = 0;
+    int month = 0;
+    int day = 0;
+    int j = 0;
+    double fd = 0.;
+    VAstronometry::vlaDjcl( MJD, &year, &month, &day, &fd, &j );
+    iSQL << year << "-" << month << "-" << day;
+
+    return iSQL.str();
+}
+
 double VSkyCoordinatesUtilities::getMJD( int i_year, int i_month, int i_day )
 {
 	double i_mjd = 0.;

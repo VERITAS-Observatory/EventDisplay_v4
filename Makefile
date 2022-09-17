@@ -223,7 +223,8 @@ all VTS:	evndisp \
 	writeParticleRateFilesForTMVA \
 	writelaserinDB \
 	logFile \
-	printMJD
+	printMJD \
+	printSQLDate
 
 ###############################################################################################################################
 # core eventdisplay package
@@ -885,6 +886,21 @@ PRINTMJDOBJ=		./obj/VSkyCoordinatesUtilities.o \
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 printMJD:	$(PRINTMJDOBJ)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+########################################################
+# printSQLDate 
+########################################################
+printSQLDateOBJ=		./obj/VSkyCoordinatesUtilities.o \
+					./obj/VAstronometry.o \
+					./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+					./obj/printSQLDate.o
+
+./obj/printSQLDate.o:	./src/printSQLDate.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+printSQLDate:	$(printSQLDateOBJ)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
