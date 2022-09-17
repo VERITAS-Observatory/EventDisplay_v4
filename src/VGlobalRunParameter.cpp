@@ -203,12 +203,12 @@ bool VGlobalRunParameter::setDirectories()
 	
 	//////////////////////////////////////////////////////////////////////
 	// output is written to this directory (unless stated otherwise on command line)
-    const char* vcal_out = gSystem->Getenv( "VERITAS_USER_DATA_DIR" );
-    if( vcal_out )
-    {
-        fEVNDISPOutputDirectory = vcal_out;
-        fEVNDISPOutputDirectory += "/";
-    }
+	const char* vcal_out = gSystem->Getenv( "VERITAS_USER_DATA_DIR" );
+	if( vcal_out )
+	{
+		fEVNDISPOutputDirectory = vcal_out;
+		fEVNDISPOutputDirectory += "/";
+	}
 	if( gSystem->AccessPathName( fEVNDISPOutputDirectory.c_str() ) )
 	{
 		cout << "VGlobalRunParameter::setDirectories(): cannot find directory for EVNDISP output data" << endl;

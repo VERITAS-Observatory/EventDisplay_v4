@@ -23,6 +23,7 @@
 
 #include "VGlobalRunParameter.h"
 #include "VImageCleaningRunParameter.h"
+#include "VSkyCoordinatesUtilities.h"
 
 using namespace std;
 
@@ -329,6 +330,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return ( fDBTextDirectory.size() > 0 );
 		}
 		
-		ClassDef( VEvndispRunParameter, 2003 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 2004 ); //(increase this number)
 };
 #endif

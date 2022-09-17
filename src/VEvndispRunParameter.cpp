@@ -1005,27 +1005,39 @@ bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpocheFile,
 		}
 		else if( temp == "ATMOSPHERE" )
 		{
+			string i_sql_min;
+			string i_sql_max;
 			if( !( is_stream >> std::ws ).eof() )
 			{
 				is_stream >> itemp_atmo;
 			}
 			if( !( is_stream >> std::ws ).eof() )
 			{
-				is_stream >> temp;
+				is_stream >> i_sql_min;
 			}
 			if( !( is_stream >> std::ws ).eof() )
 			{
-				is_stream >> temp;
+				is_stream >> i_sql_max;
 			}
-			int mjd_min = 0;
+			double mjd_min = 0;
 			if( !( is_stream >> std::ws ).eof() )
 			{
 				is_stream >> mjd_min;
 			}
-			int mjd_max = 0;
+			else
+			{
+				double i_s;
+				VSkyCoordinatesUtilities::getMJD_from_SQLstring( i_sql_min, mjd_min, i_s );
+			}
+			double mjd_max = 0;
 			if( !( is_stream >> std::ws ).eof() )
 			{
 				is_stream >> mjd_max;
+			}
+			else
+			{
+				double i_s;
+				VSkyCoordinatesUtilities::getMJD_from_SQLstring( i_sql_max, mjd_max, i_s );
 			}
 			if( fDBDataStartTimeMJD >= mjd_min && fDBDataStoppTimeMJD <= mjd_max )
 			{

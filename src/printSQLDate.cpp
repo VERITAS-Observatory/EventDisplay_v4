@@ -20,7 +20,7 @@ int main( int argc, char* argv[] )
 		cout << "print SQL-formated date string from MJD (ignoring hours and seconds)" << endl;
 		exit( EXIT_SUCCESS );
 	}
-	double iMJD = atof(argv[1]);
+	double iMJD = atof( argv[1] );
 	
-	cout << VSkyCoordinatesUtilities::getSQLstring_fromMJD(iMJD) << endl;
+	cout << VSkyCoordinatesUtilities::getSQLstring_fromMJD( iMJD ) << endl;
 }
