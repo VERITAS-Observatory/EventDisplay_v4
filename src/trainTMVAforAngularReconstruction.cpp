@@ -778,7 +778,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 						 
 		if( !iSingleTelescopeAnalysis )
 		{
-			i_SR.reconstruct_direction_and_core(
+			i_SR.reconstruct_direction(
 				fEM_TelX.size(),
 				i_mean_array_pointing.first,
 				i_mean_array_pointing.second,
