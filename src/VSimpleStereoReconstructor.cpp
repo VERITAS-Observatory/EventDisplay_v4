@@ -53,6 +53,8 @@ void VSimpleStereoReconstructor::reset()
       Hofmann et al 1999, Method 1 (HEGRA method)
 
       shower direction by intersection of image axes
+      shower core by intersection of lines connecting reconstruced shower
+      direction and image centroids
 
       corresponds to rcs_method4 in VArrayAnalyzer
 
@@ -391,7 +393,7 @@ bool VSimpleStereoReconstructor::reconstruct_core( unsigned int i_ntel,
 bool VSimpleStereoReconstructor::fillShowerDirection( float xoff, float yoff )
 {
 	if( TMath::IsNaN( yoff ) || TMath::IsNaN( yoff )
-			|| xoff < -99998. || yoff < -99998. || yoff > 99999.5 )
+			|| xoff < -998. || yoff < -998. || yoff > 998. )
 	{
 		reset();
 		return false;
@@ -465,4 +467,3 @@ bool VSimpleStereoReconstructor::fillShowerCore( float ximp, float yimp )
 	}
 	return true;
 }
-

@@ -12,7 +12,7 @@ VTableLookup::VTableLookup( char ireadwrite, unsigned int iDebug )
 {
 	fDebug = iDebug;
 	
-    // total number of telescopes
+	// total number of telescopes
 	fNTel = 0;
 	// look up table file
 	fLookupTableFile = 0;
@@ -48,7 +48,7 @@ VTableLookup::VTableLookup( char ireadwrite, unsigned int iDebug )
 	cout << "-------------------------------------------------------" << endl;
 	if( fwrite )
 	{
-        cout << "filling lookup tables" << endl;
+		cout << "filling lookup tables" << endl;
 	}
 	else
 	{
@@ -128,7 +128,7 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
 	{
 		cout << "VTableLookup::setMCTableFiles error while opening table file: " << itablefile << endl;
 		cout << "exiting..." << endl;
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 	if( fLookupTableFile->TestBit( TFile::kRecovered ) )
 	{
@@ -302,7 +302,7 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 		cout << "void VTableLookup::setMCTableFiles( string itablefile, string isuff )" << endl;
 	}
 	
-    // open table file
+	// open table file
 	gErrorIgnoreLevel = 20001;
 	fLookupTableFile = new TFile( itablefile.c_str() );
 	if( fLookupTableFile->IsZombie() )
@@ -349,12 +349,12 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 	vector< vector< vector< vector< VTableCalculator* > > > > iiii_energySR;
 	vector< vector< vector< vector< ULong64_t > > > > iiii_telType;
 	
-    // vector with available NSB levels [tel_type][NSB]
+	// vector with available NSB levels [tel_type][NSB]
 	fTableNoiseLevel.clear();
-    // vector with available zenith angles [tel_type][NSB][ze]
+	// vector with available zenith angles [tel_type][NSB][ze]
 	fTableZe.clear();
 	vector< double > i_ze;
-    // vector with available wobble offsets [tel_type][NSB][ze][woff]
+	// vector with available wobble offsets [tel_type][NSB][ze][woff]
 	fTableDirectionOffset.clear();
 	vector< double > i_DirectionOffset;
 	vector< vector< double > > ii_DirectionOffset;
@@ -468,7 +468,7 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 		cout << "     ...did not survive test of table file ! There are missing tables in your table file: " << itablefile << endl;
 		cout << "     You need to redo your table, or contact Gernot if this is the standard table supplied " << endl ;
 		sanityCheckLookupTableFile( true ); // this will print which tables are missing
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 	
 	if( fDebug )
@@ -553,7 +553,7 @@ bool VTableLookup::sanityCheckLookupTableFile( bool iPrint )
 		}
 	}
 	
-    // print a summary of the number of tables found
+	// print a summary of the number of tables found
 	if( iPrint == false )
 	{
 		cout << "Found " << fTableNoiseLevel.size() << " noise levels, " << fTableZe[0].size() << " zenith angles, " << fTableDirectionOffset[0][0].size() << " wobble offsets, " << fTableAzBins << " azimuth bins and " << fTelType_tables[0][0][0][0].size() << " telescope types" << endl;
@@ -773,11 +773,11 @@ void VTableLookup::readLookupTable()
 		{
 			//////////////////////////////////////
 			// here we should have good data only
-            // (ze, az, and wobble offset have been
-            //  tested)
+			// (ze, az, and wobble offset have been
+			//  tested)
 			//////////////////////////////////////
-            
-            // get direction angles for this event
+			
+			// get direction angles for this event
 			ze = fData->getZe();
 			woff = fData->getWobbleOffset();
 			i_az = getAzBin( fData->getAz() );
@@ -1297,7 +1297,7 @@ void VTableLookup::readNoiseLevel( bool bWriteToRunPara )
 	{
 		cout << " VTableLookup::readNoiseLevel ERROR: could not find mean pedestal variation for each telescope" << endl;
 		cout << "exiting...." << endl;
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 }
 
@@ -1341,9 +1341,9 @@ void VTableLookup::getIndexBoundary( unsigned int* iup, unsigned int* ilow, vect
     get pointers to a certain set of tables
 
 */
-void VTableLookup::getTables( unsigned int inoise, unsigned int ize, 
-                              unsigned int iwoff, unsigned int iaz, unsigned int tel, 
-                              VTablesToRead* s )
+void VTableLookup::getTables( unsigned int inoise, unsigned int ize,
+							  unsigned int iwoff, unsigned int iaz, unsigned int tel,
+							  VTablesToRead* s )
 {
 	if( !s )
 	{
