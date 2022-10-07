@@ -113,7 +113,7 @@ INCLUDEFLAGS  = -I. -I./inc/
 
 # linux depending flags
 ifeq ($(ARCH),Linux)
-	LDFLAGS       = -O -pg
+	LDFLAGS       = -O
 	SOFLAGS       = -shared
 endif
 # Apple OS X flags
@@ -146,7 +146,6 @@ else
    ROOTCFLAGS   = $(shell root-config --auxcflags)
 endif
 CXXFLAGS     += $(ROOTCFLAGS)
-CXXFLAGS     += -pg
 CXXFLAGS     += -I$(shell root-config --incdir) -I$(shell root-config --incdir)/TMVA
 ########################################################
 # root libs
