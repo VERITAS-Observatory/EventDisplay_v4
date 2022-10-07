@@ -26,6 +26,9 @@ VReadRunParameter::VReadRunParameter()
 	
 	fPrintOutputFile = false;
 	
+    fTargetName_overwriteDB = "";
+    fTargetDec_overwriteDB = -9999.;
+    fTargetRA_overwriteDB = -9999.;
 	fWobbleNorth_overwriteDB = -9999.;
 	fWobbleEast_overwriteDB  = -9999.;
 }
@@ -574,15 +577,25 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			fRunPara->fazimuth = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
 		// target declination
-		else if( iTemp.rfind( "declination" ) < iTemp.size() )
+		else if( iTemp.rfind( "declination" ) < iTemp.size() && !( iTemp.rfind( "overwritedb_declination" ) < iTemp.size() ) )
 		{
 			fRunPara->fTargetDec = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
+        // target ra [J2000] overwrite DB
+        else if( iTemp.rfind( "overwritedb_declination" ) < iTemp.size() )
+        {
+            fTargetDec_overwriteDB = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+        }
 		// target ra [J2000]
-		else if( iTemp.rfind( "rightascension" ) < iTemp.size() )
+		else if( iTemp.rfind( "rightascension" ) < iTemp.size() && !( iTemp.rfind( "overwritedb_rightascension" ) < iTemp.size() ) )
 		{
 			fRunPara->fTargetRA = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
+        // target ra [J2000] overwrite DB
+        else if( iTemp.rfind( "overwritedb_rightascension" ) < iTemp.size() )
+        {
+            fTargetRA_overwriteDB = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+        }
 		// target declination offset [J2000]
 		else if( iTemp.rfind( "decoffset" ) < iTemp.size() )
 		{
@@ -594,18 +607,24 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			fRunPara->fTargetRAOffset = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
 		// target name
-		else if( iTemp.rfind( "target" ) < iTemp.size() )
+		else if( iTemp.rfind( "target" ) < iTemp.size() && !( iTemp.rfind( "overwritedb_target" ) < iTemp.size() ) )
 		{
+            fRunPara->fTargetName = "";
 			if( iTemp2.size() > 0 )
 			{
 				fRunPara->fTargetName = iTemp2;
 				i++;
 			}
-			else
-			{
-				fRunPara->fTargetName = "";
-			}
 		}
+        // target name (overwrite DB
+        else if( iTemp.rfind( "overwritedb_target" ) < iTemp.size() )
+        {
+            if( iTemp2.size() > 0 )
+            {
+                fTargetName_overwriteDB = iTemp2;
+                i++;
+            }
+        }
 		// these two command line settings might be overwritten by values read from the data base
 		// wobble offset NORTH
 		else if( iTemp.rfind( "wobblenorth" ) < iTemp.size() && !( iTemp.rfind( "overwritedb_wobblenorth" ) < iTemp.size() ) )
@@ -1286,31 +1305,18 @@ void VReadRunParameter::test_and_adjustParams()
 		if( i_DBinfo.isGood() )
 		{
 			fRunPara->fTargetName = i_DBinfo.getTargetName();
+            if( fTargetName_overwriteDB.size() > 0 )
+            {
+                fRunPara->fTargetName = fTargetName_overwriteDB;
+                cout << "VReadRunParameter::setParameterOverwrite() info: overwriting DB target name";
+                cout << " (" << i_DBinfo.getTargetName() << ")  by " << fRunPara->fTargetName << endl;
+            }
 			// DB coordinates are in J2000
-			fRunPara->fTargetDec = i_DBinfo.getTargetDec();
-			fRunPara->fTargetRA = i_DBinfo.getTargetRA();
-			if( fWobbleNorth_overwriteDB < -9998. )
-			{
-				fRunPara->fWobbleNorth = i_DBinfo.getWobbleNorth();
-			}
-			else
-			{
-				fRunPara->fWobbleNorth = fWobbleNorth_overwriteDB;
-				cout << "VReadRunParameter::test_and_adjustParams() info: overwriting DB wobble north (";
-				cout << i_DBinfo.getWobbleNorth() << " deg)";
-				cout << "with command line value: " << fWobbleNorth_overwriteDB << " deg" << endl;
-			}
-			if( fWobbleEast_overwriteDB < -9998. )
-			{
-				fRunPara->fWobbleEast = i_DBinfo.getWobbleEast();
-			}
-			else
-			{
-				fRunPara->fWobbleEast = fWobbleEast_overwriteDB;
-				cout << "VReadRunParameter::test_and_adjustParams() info: overwriting DB wobble east (";
-				cout << i_DBinfo.getWobbleEast() << " deg)";
-				cout << "with command line value: " << fWobbleEast_overwriteDB << " deg" << endl;
-			}
+			fRunPara->fTargetDec =  setParameterOverwrite("fTargetDec", i_DBinfo.getTargetDec(), fTargetDec_overwriteDB);
+			fRunPara->fTargetRA =  setParameterOverwrite("fTargetRA", i_DBinfo.getTargetRA(), fTargetRA_overwriteDB);
+            fRunPara->fWobbleNorth = setParameterOverwrite("fWobbleNorth", i_DBinfo.getWobbleNorth(), fWobbleNorth_overwriteDB);
+            fRunPara->fWobbleEast = setParameterOverwrite("fWobbleEast", i_DBinfo.getWobbleEast(), fWobbleEast_overwriteDB);
+
 			fRunPara->fDBRunType = i_DBinfo.getRunType();
 			fRunPara->fDBRunStartTimeSQL = i_DBinfo.getDataStartTimeSQL();
 			fRunPara->fDBRunStoppTimeSQL = i_DBinfo.getDataStoppTimeSQL();
@@ -1698,6 +1704,22 @@ void VReadRunParameter::test_and_adjustParams()
 	}
 	
 	printStartMessage();
+}
+
+/*
+ * Check if overwrite parameter is given - return value dependent on this result
+ *
+ */
+double VReadRunParameter::setParameterOverwrite( string ipar_name, double ipar_db, double ipar_db_overwrite )
+{
+    if( ipar_db_overwrite > -9998. )
+    {
+        cout << "VReadRunParameter::setParameterOverwrite() info: overwriting DB parameter ";
+        cout << ipar_name << " (was " << ipar_db << ")";
+        cout << " with new value: " << ipar_db_overwrite << endl;
+        return ipar_db_overwrite;
+    }
+    return ipar_db;
 }
 
 void VReadRunParameter::printShortHelp()
