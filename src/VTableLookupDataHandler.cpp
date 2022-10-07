@@ -625,14 +625,14 @@ void VTableLookupDataHandler::doStereoReconstruction()
 	VSimpleStereoReconstructor i_SR;
 	// minimal value; just used to initialize disp method
 	i_SR.initialize( fSSR_NImages_min, fSSR_AxesAngles_min );
-	i_SR.reconstruct_direction_and_core( getNTel(),
-										 fArrayPointing_Elevation, fArrayPointing_Azimuth,
-										 fTelX, fTelY, fTelZ,
-										 getSize( 1., true, false ),
-										 fcen_x, fcen_y,
-										 fcosphi, fsinphi,
-										 fwidth, flength,
-										 getWeight() );
+	i_SR.reconstruct_direction( getNTel(),
+								fArrayPointing_Elevation, fArrayPointing_Azimuth,
+								fTelX, fTelY, fTelZ,
+								getSize( 1., true, false ),
+								fcen_x, fcen_y,
+								fcosphi, fsinphi,
+								fwidth, flength,
+								getWeight() );
 	// store results from line intersection for debugging
 	// (used also as seed values for DispAnalyzers)
 	fXoff_intersect = i_SR.fShower_Xoffset;
@@ -758,6 +758,19 @@ void VTableLookupDataHandler::doStereoReconstruction()
 	}
 	fZe    = i_SR.fShower_Ze;
 	fAz    = i_SR.fShower_Az;
+	
+	////////////////////////////////////////////////////////////
+	// shower core reconstruction
+	i_SR.reconstruct_core( getNTel(),
+						   fArrayPointing_Elevation, fArrayPointing_Azimuth,
+						   fXoff, fYoff,
+						   fTelX, fTelY, fTelZ,
+						   getSize( 1., true, false ),
+						   fcen_x, fcen_y,
+						   fcosphi, fsinphi,
+						   fwidth, flength,
+						   getWeight() );
+	// store results from line intersection for debugging
 	fXcore = i_SR.fShower_Xcore;
 	fYcore = i_SR.fShower_Ycore;
 }

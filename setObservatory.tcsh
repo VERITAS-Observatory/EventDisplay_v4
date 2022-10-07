@@ -2,8 +2,6 @@
 #
 # set the environmental variables to CTA/VERITAS/etc
 #
-# Autor: Gernot Maier
-#
 
 if ($#argv != 1) then
    echo 
@@ -46,25 +44,4 @@ setenv SOFASYS $EVNDISPSYS/sofa
 ######################################################
 ## EVNDISP libraries 
 setenv LD_LIBRARY_PATH $EVNDISPSYS/lib/:$EVNDISPSYS/obj/:$LD_LIBRARY_PATH
-
 ######################################################
-## environmental variables
-######################################################
-if( $OBSERVATORY == "VERITAS" || $OBSERVATORY == "VTS" ) then
-  echo "setting observatory to VERITAS"
-
-  setenv OBS_EVNDISP_AUX_DIR $VERITAS_EVNDISP_AUX_DIR
-  setenv OBS_DATA_DIR $VERITAS_DATA_DIR
-  setenv OBS_USER_DATA_DIR $VERITAS_USER_DATA_DIR
-  setenv OBS_USER_LOG_DIR $VERITAS_USER_LOG_DIR
-endif 
-
-if( $OBSERVATORY == "CTA" ) then
-  echo "setting observatory to CTA"
-
-  setenv OBS_EVNDISP_AUX_DIR $CTA_EVNDISP_AUX_DIR
-  setenv OBS_DATA_DIR $CTA_DATA_DIR
-  setenv OBS_USER_DATA_DIR $CTA_USER_DATA_DIR
-  setenv OBS_USER_LOG_DIR $CTA_USER_LOG_DIR
-endif
-

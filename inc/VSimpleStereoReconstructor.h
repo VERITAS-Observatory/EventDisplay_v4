@@ -52,20 +52,34 @@ class VSimpleStereoReconstructor : public VGrIsuAnalyzer
 		
 		bool fillShowerDirection( float xoff, float yoff );
 		void initialize( unsigned int iNImages_min = 0, float iAxesAngles_min = 0. );
-		bool reconstruct_direction_and_core( unsigned int i_ntel,
-											 double iTelElevation, double iTelAzimuth,
-											 double* iTelX,
-											 double* iTelY,
-											 double* iTelZ,
-											 double* img_size,
-											 double* img_cen_x,
-											 double* img_cen_y,
-											 double* img_cosphi,
-											 double* img_sinphi,
-											 double* img_width,
-											 double* img_length,
-											 double* img_weight );
-											 
+		bool reconstruct_direction( unsigned int i_ntel,
+									double iTelElevation, double iTelAzimuth,
+									double* iTelX,
+									double* iTelY,
+									double* iTelZ,
+									double* img_size,
+									double* img_cen_x,
+									double* img_cen_y,
+									double* img_cosphi,
+									double* img_sinphi,
+									double* img_width,
+									double* img_length,
+									double* img_weight );
+		bool reconstruct_core( unsigned int i_ntel,
+							   double iTelElevation, double iTelAzimuth,
+							   double iShowerDir_xs, double iShowerDir_ys,
+							   double* iTelX,
+							   double* iTelY,
+							   double* iTelZ,
+							   double* img_size,
+							   double* img_cen_x,
+							   double* img_cen_y,
+							   double* img_cosphi,
+							   double* img_sinphi,
+							   double* img_width,
+							   double* img_length,
+							   double* img_weight );
+							   
 };
 
 #endif

@@ -223,7 +223,8 @@ all VTS:	evndisp \
 	writeParticleRateFilesForTMVA \
 	writelaserinDB \
 	logFile \
-	printMJD
+	printMJD \
+	printSQLDate
 
 ###############################################################################################################################
 # core eventdisplay package
@@ -337,7 +338,7 @@ endif
 ########################################################
 MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o \
                 ./obj/Ctelconfig.o ./obj/VTableLookupDataHandler.o ./obj/VTableCalculator.o \
-		./obj/VTableEnergyCalculator.o ./obj/VTableLookup.o ./obj/VTablesToRead.o \
+		./obj/VTableLookup.o ./obj/VTablesToRead.o \
 		./obj/VEmissionHeightCalculator.o \
 		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
@@ -740,6 +741,7 @@ PRINTRUNOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
         ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
         ./obj/VStar.o ./obj/VStar_Dict.o \
+		./obj/VSkyCoordinatesUtilities.o \
 		./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
         ./obj/VSkyCoordinatesUtilities.o \
         ./obj/VDB_Connection.o \
@@ -885,6 +887,21 @@ PRINTMJDOBJ=		./obj/VSkyCoordinatesUtilities.o \
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 printMJD:	$(PRINTMJDOBJ)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+########################################################
+# printSQLDate 
+########################################################
+printSQLDateOBJ=		./obj/VSkyCoordinatesUtilities.o \
+					./obj/VAstronometry.o \
+					./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+					./obj/printSQLDate.o
+
+./obj/printSQLDate.o:	./src/printSQLDate.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+printSQLDate:	$(printSQLDateOBJ)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
@@ -1187,6 +1204,7 @@ combineEffectiveAreas:	$(COMBINEEFFAREAOBJ)
 MAKEOPTCUTTMVAOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 			./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 			./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
+			./obj/VSkyCoordinatesUtilities.o \
 			./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 			./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
@@ -1356,6 +1374,8 @@ calculateBinaryPhases:	./obj/CData.o \
 			./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VOrbitalPhase.o ./obj/VOrbitalPhase_Dict.o \
+			./obj/VSkyCoordinatesUtilities.o \
+			./obj/VAstronometry.o \
 			./obj/calculateBinaryPhases.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"

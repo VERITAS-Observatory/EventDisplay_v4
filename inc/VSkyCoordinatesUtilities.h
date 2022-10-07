@@ -6,6 +6,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include "TF1.h"
@@ -31,6 +32,7 @@ namespace VSkyCoordinatesUtilities
 	void   getHorizontalCoordinates( int MJD, double time, double dec_deg, double ra_deg, double& az_deg, double& ze_deg );
 	double getMJD( int i_year, int i_month, int i_day );
 	int    getMJD_from_SQLstring( string iSQLData, double& mjd, double& sec_of_day );
+	string getSQLstring_fromMJD( double MJD );
 	void   getRotatedShowerDirection( double ze, double az, double y, double x, double& rze, double& raz );
 	double getTargetShiftWest( double iTargetRA_deg, double iTargetDec_deg, double ira_deg, double idec_deg );
 	double getTargetShiftNorth( double iTargetRA_deg, double iTargetDec_deg, double ira_deg, double idec_deg );

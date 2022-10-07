@@ -720,7 +720,7 @@ expected file format:
 
 additional data needed:
 
-i.  file with wavelengths and zero-points for photometric bands (e.g. $OBS_EVNDISP_AUX_DIR/AstroData/Multiwavelengthdata/photometricBands.dat)
+i.  file with wavelengths and zero-points for photometric bands (e.g. $VERITAS_EVNDISP_AUX_DIR/AstroData/Multiwavelengthdata/photometricBands.dat)
 
 ii. file with galactic extinction correction (for dereddening)
 

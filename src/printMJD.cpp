@@ -1,6 +1,6 @@
 /*! \file printMJD
  *
- *  print MJD from SQL string
+ *  print MJD from SQL-formated date string
  *
  */
 
@@ -17,7 +17,7 @@ int main( int argc, char* argv[] )
 	{
 		cout << "printMJD <SQL date>" << endl;
 		cout << endl;
-		cout << "print MJD from sql string" << endl;
+		cout << "print MJD from SQL-formated date string" << endl;
 		exit( EXIT_SUCCESS );
 	}
 	string iSQLData = argv[1];

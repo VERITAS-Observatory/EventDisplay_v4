@@ -32,36 +32,32 @@ void VSimpleStereoReconstructor::reset()
 {
 
 	fiangdiff = 0.;
-	fShower_Xoffset = -9999.;
-	fShower_Yoffset = -9999.;
-	fShower_stdS = -9999.;
-	fShower_Chi2 = -9999.;
-	fShower_Ze = -9999.;
-	fShower_Az = -9999.;
-	fShower_DispDiff = -9999.;
+	fShower_Xoffset = -99999.;
+	fShower_Yoffset = -99999.;
+	fShower_stdS = -99999.;
+	fShower_Chi2 = -99999.;
+	fShower_Ze = -99999.;
+	fShower_Az = -99999.;
+	fShower_DispDiff = -99999.;
 	
-	fShower_Xcore = -9999.;
-	fShower_Ycore = -9999.;
-	fShower_stdP = -9999.;
+	fShower_Xcore = -99999.;
+	fShower_Ycore = -99999.;
+	fShower_stdP = -99999.;
 	fmean_iangdiff = 0.;
 }
 
 
 /*!
-      reconstruction of shower direction and core
+      reconstruction of shower direction
 
       Hofmann et al 1999, Method 1 (HEGRA method)
 
       shower direction by intersection of image axes
-      shower core by intersection of lines connecting reconstruced shower
-      direction and image centroids
 
       corresponds to rcs_method4 in VArrayAnalyzer
 
-      should be used for MC only
-
 */
-bool VSimpleStereoReconstructor::reconstruct_direction_and_core( unsigned int i_ntel,
+bool VSimpleStereoReconstructor::reconstruct_direction( unsigned int i_ntel,
 		double iArrayElevation,
 		double iArrayAzimuth,
 		double* iTelX,
@@ -94,7 +90,6 @@ bool VSimpleStereoReconstructor::reconstruct_direction_and_core( unsigned int i_
 	float ys = 0.;
 	
 	// fill data vectors for direction reconstruction
-	// (vectors are refilled for core reconstruction)
 	vector< float > m;
 	vector< float > x;
 	vector< float > y;
@@ -278,6 +273,54 @@ bool VSimpleStereoReconstructor::reconstruct_direction_and_core( unsigned int i_
 	{
 		return false;
 	}
+	return true;
+}
+
+/*!
+      reconstruction of shower core
+
+      Hofmann et al 1999, Method 1 (HEGRA method)
+
+      shower core by intersection of lines connecting reconstruced shower
+      direction and image centroids
+
+      expected to be run after direction reconstruction
+
+      corresponds to rcs_method4 in VArrayAnalyzer
+
+*/
+bool VSimpleStereoReconstructor::reconstruct_core( unsigned int i_ntel,
+		double iArrayElevation,
+		double iArrayAzimuth,
+		double iShowerDir_xs,
+		double iShowerDir_ys,
+		double* iTelX,
+		double* iTelY,
+		double* iTelZ,
+		double* img_size,
+		double* img_cen_x,
+		double* img_cen_y,
+		double* img_cosphi,
+		double* img_sinphi,
+		double* img_width,
+		double* img_length,
+		double* img_weight )
+{
+	// telescope pointings
+	fTelElevation = iArrayElevation;
+	fTelAzimuth   = iArrayAzimuth;
+	// sign flip in reconstruction
+	iShowerDir_ys *= -1.;
+	
+	// make sure that all data arrays exist
+	if( !img_size || !img_cen_x || !img_cen_y
+			|| !img_cosphi || !img_sinphi
+			|| !img_width || !img_length
+			|| !img_weight )
+	{
+		reset();
+		return false;
+	}
 	
 	////////////////////////////////////////////////
 	// core reconstruction
@@ -295,10 +338,11 @@ bool VSimpleStereoReconstructor::reconstruct_direction_and_core( unsigned int i_
 	float i_cenx = 0.;
 	float i_ceny = 0.;
 	
-	x.clear();
-	y.clear();
-	m.clear();
-	w.clear();
+	vector< float > m;
+	vector< float > x;
+	vector< float > y;
+	vector< float > w;
+	float iweight = 1.;
 	
 	for( unsigned int i = 0; i < i_ntel; i++ )
 	{
@@ -307,15 +351,12 @@ bool VSimpleStereoReconstructor::reconstruct_direction_and_core( unsigned int i_
 			// telescope coordinates
 			// shower coordinates (telecope pointing)
 			tel_impact( i_xcos, i_ycos, iTelX[i], iTelY[i], iTelZ[i], &i_xrot, &i_yrot, &i_zrot, false );
-			// shower coordinates (shower direction)
-			// x.push_back( iTelX[i] - ixs / TMath::RadToDeg() * iTelZ[i] );
-			// y.push_back( iTelY[i] - iys / TMath::RadToDeg() * iTelZ[i] );
-			x.push_back( i_xrot - ixs / TMath::RadToDeg() * i_zrot );
-			y.push_back( i_yrot - iys / TMath::RadToDeg() * i_zrot );
+			x.push_back( i_xrot - iShowerDir_xs / TMath::RadToDeg() * i_zrot );
+			y.push_back( i_yrot - iShowerDir_ys / TMath::RadToDeg() * i_zrot );
 			
 			// gradient of image
-			i_cenx = img_cen_x[i] - ixs;
-			i_ceny = img_cen_y[i] - iys;
+			i_cenx = img_cen_x[i] - iShowerDir_xs;
+			i_ceny = img_cen_y[i] - iShowerDir_ys;
 			if( i_cenx != 0. )
 			{
 				m.push_back( -1. * i_ceny / i_cenx );
@@ -350,7 +391,7 @@ bool VSimpleStereoReconstructor::reconstruct_direction_and_core( unsigned int i_
 bool VSimpleStereoReconstructor::fillShowerDirection( float xoff, float yoff )
 {
 	if( TMath::IsNaN( yoff ) || TMath::IsNaN( yoff )
-			|| xoff < -9998. || yoff < -9998. || yoff > 9999.5 )
+			|| xoff < -99998. || yoff < -99998. || yoff > 99999.5 )
 	{
 		reset();
 		return false;
@@ -424,3 +465,4 @@ bool VSimpleStereoReconstructor::fillShowerCore( float ximp, float yimp )
 	}
 	return true;
 }
+

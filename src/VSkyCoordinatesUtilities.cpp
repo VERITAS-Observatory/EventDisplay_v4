@@ -7,7 +7,7 @@
 
 int VSkyCoordinatesUtilities::getMJD_from_SQLstring( string iSQLData, double& i_mjd, double& sec_of_day )
 {
-	if( iSQLData.size() < 19 )
+	if( iSQLData.size() < 19 && iSQLData.size() != 10 )
 	{
 		i_mjd = 0;
 		sec_of_day = 0;
@@ -16,6 +16,7 @@ int VSkyCoordinatesUtilities::getMJD_from_SQLstring( string iSQLData, double& i_
 	int i_year  = atoi( iSQLData.substr( 0, 4 ).c_str() );
 	int i_month = atoi( iSQLData.substr( 5, 2 ).c_str() );
 	int i_day   = atoi( iSQLData.substr( 8, 2 ).c_str() );
+	
 	
 	// MJD
 	int i_stat = 0;
@@ -27,13 +28,31 @@ int VSkyCoordinatesUtilities::getMJD_from_SQLstring( string iSQLData, double& i_
 	{
 		i_mjd = 0;
 	}
-	
-	// fraction of day
-	sec_of_day  = atof( iSQLData.substr( 11, 2 ).c_str() ) * 60.*60.;
-	sec_of_day += atof( iSQLData.substr( 14, 2 ).c_str() ) * 60.;
-	sec_of_day += atof( iSQLData.substr( 17, 2 ).c_str() );
+	if( iSQLData.size() != 10 )
+	{
+		// fraction of day
+		sec_of_day  = atof( iSQLData.substr( 11, 2 ).c_str() ) * 60.*60.;
+		sec_of_day += atof( iSQLData.substr( 14, 2 ).c_str() ) * 60.;
+		sec_of_day += atof( iSQLData.substr( 17, 2 ).c_str() );
+	}
 	
 	return i_stat;
+}
+
+string VSkyCoordinatesUtilities::getSQLstring_fromMJD( double MJD )
+{
+	stringstream iSQL;
+	int year = 0;
+	int month = 0;
+	int day = 0;
+	int j = 0;
+	double fd = 0.;
+	VAstronometry::vlaDjcl( MJD, &year, &month, &day, &fd, &j );
+	iSQL << year << "-";
+	iSQL << setfill( '0' ) << setw( 2 ) << month << "-";
+	iSQL << setfill( '0' ) << setw( 2 ) << day;
+	
+	return iSQL.str();
 }
 
 double VSkyCoordinatesUtilities::getMJD( int i_year, int i_month, int i_day )
