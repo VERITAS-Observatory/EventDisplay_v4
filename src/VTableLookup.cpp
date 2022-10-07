@@ -192,20 +192,7 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
 	//////////////////
 	// DIRECTION OFFSET
 	vector< int > i_woff_vector;
-	if( fTLRunParameter->fCTA_MC_offaxisBin_min.size() == 0 )
-	{
-		i_woff_vector.push_back( woff );
-	}
-	else
-	{
-		for( unsigned int i = 0; i < fTLRunParameter->fCTA_MC_offaxisBin_min.size(); i++ )
-		{
-			if( i < fTLRunParameter->fCTA_MC_offaxisBin_max.size() )
-			{
-				i_woff_vector.push_back( ( int )( 0.5 * ( fTLRunParameter->fCTA_MC_offaxisBin_min[i] + fTLRunParameter->fCTA_MC_offaxisBin_max[i] ) * 1000. + 0.5 ) );
-			}
-		}
-	}
+	i_woff_vector.push_back( woff );
 	TDirectory* i_curDir_w = gDirectory;
 	for( unsigned int w = 0; w < i_woff_vector.size(); w++ )
 	{
@@ -655,7 +642,7 @@ void VTableLookup::fillLookupTable()
 		// apply cuts
 		if( fData->getEventStatus() && iEventWeight > 0. )
 		{
-			unsigned int w = getWobbleBin( fData->getMCWobbleOffset() );
+			unsigned int w = 0;
 			if( w >= fmscw[0][0].size() )
 			{
 				continue;
@@ -674,10 +661,6 @@ void VTableLookup::fillLookupTable()
 				double* i_s2 = fData->getSize2( 1., t, fTLRunParameter->fUseSelectedImagesOnly );
 				double* i_r = fData->getDistanceToCore( t );
 				unsigned int i_type = fData->getNTel_type( t );
-				// Corrected size values (old, only applies to the MC) ...
-				//double* i_s2_fMSCWcorr   = fData->getSize2( fTLRunParameter->fMSCWSizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly );
-				//double* i_s2_fMSCLcorr   = fData->getSize2( fTLRunParameter->fMSCLSizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly );
-				//double* i_s2_fEnergycorr = fData->getSize2( fTLRunParameter->fEnergySizecorrection, t, fTLRunParameter->fUseSelectedImagesOnly );
 				////////////////////////////////////////////////
 				// for zenith-angle == 0 deg fill all az bins
 				if( fabs( fData->getMCZe() ) < 3. )
@@ -1242,7 +1225,9 @@ vector< string > VTableLookup::getSortedListOfDirectories( TDirectory* iDir )
 		while( TNamed* iK = ( TNamed* )next() )
 		{
 			string i_dir_name = iK->GetName();
-			if( i_dir_name.find( "log" ) != string::npos || i_dir_name.find( "Log" ) != string::npos )
+			if( i_dir_name.find( "log" ) != string::npos
+					|| i_dir_name.find( "Log" ) != string::npos
+					|| i_dir_name.find( "List" ) != string::npos )
 			{
 				continue;
 			}
@@ -1559,23 +1544,3 @@ bool VTableLookup::initialize( VTableLookupRunParameter* iTLRunParameter )
 	
 	return true;
 }
-
-unsigned int VTableLookup::getWobbleBin( double w )
-{
-	// no wobble bins defined - return 0 (first vector element)
-	if( fTLRunParameter->fCTA_MC_offaxisBin_min.size() == 0 )
-	{
-		return 0;
-	}
-	
-	for( unsigned int i = 0; i < fTLRunParameter->fCTA_MC_offaxisBin_min.size(); i++ )
-	{
-		if( w >= fTLRunParameter->fCTA_MC_offaxisBin_min[i] && w < fTLRunParameter->fCTA_MC_offaxisBin_max[i] )
-		{
-			return i;
-		}
-	}
-	
-	return 9999;
-}
-

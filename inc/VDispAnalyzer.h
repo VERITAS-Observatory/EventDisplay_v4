@@ -67,10 +67,18 @@ class VDispAnalyzer
 		vector< float > fdisp_core_T;
 		
 		vector<ULong64_t> fTelescopeTypeList;
+		vector<float> fTelescopeFOV;
 		
 		void calculateMeanShowerDirection( vector< float > v_x, vector< float > v_y, vector< float > v_weight,
 										   float& xs, float& ys, float& dispdiff, unsigned int iMaxN );
 										   
+		unsigned int find_smallest_diff_element(
+			vector< vector< float > > i_sign,
+			vector< float > x, vector< float > y,
+			vector< float > cosphi, vector< float > sinphi,
+			vector< float > v_disp, vector< float > v_weight );
+		vector< vector< float > > get_sign_permuation_vector( unsigned int x_size );
+		
 	public:
 	
 		VDispAnalyzer();
@@ -234,6 +242,10 @@ class VDispAnalyzer
 			floss_max       = imaxloss;
 		}
 		void  setTelescopeTypeList( vector<ULong64_t> iTelescopeTypeList );
+		void  setTelescopeFOV( vector< float > iTelFOV )
+		{
+			fTelescopeFOV = iTelFOV;
+		}
 		void  setZombie( bool iB = true )
 		{
 			bZombie = iB;

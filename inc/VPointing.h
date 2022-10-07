@@ -54,6 +54,10 @@ class VPointing : public VSkyCoordinates
 		~VPointing() {}
 		
 		void         fillPointingTree();
+		unsigned int getPointingEventStatus()
+		{
+			return fEventStatus;
+		}
 		float        getPointingErrorX()
 		{
 			return fPointingErrorX;

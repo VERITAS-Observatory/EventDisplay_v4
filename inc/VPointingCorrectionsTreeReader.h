@@ -13,6 +13,7 @@ using namespace std;
 class VPointingCorrectionsTreeReader
 {
 	private:
+		unsigned int fEventStatus;
 		float fPointingErrorX;
 		float fPointingErrorY;
 		bool  fPointingCorrectionTreeSetting;
@@ -31,6 +32,10 @@ class VPointingCorrectionsTreeReader
 		float getCorrected_cen_x( float cen_x );
 		float getCorrected_cen_y( float cen_y );
 		float getCorrected_phi( float cen_x, float cen_y, float d, float s, float sdevxy );
+		unsigned int getPointingEventStatus()
+		{
+			return fEventStatus;
+		}
 		float getPointErrorX()
 		{
 			return fPointingErrorX;

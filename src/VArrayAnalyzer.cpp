@@ -130,9 +130,9 @@ void VArrayAnalyzer::doAnalysis()
 			getShowerParameters()->fTelDec[i]       = 0.;
 			getShowerParameters()->fTelRA[i]        = 0.;
 		}
-		// compare calculated pointing with vbf pointing
-		checkPointing();
 	}
+	// compare calculated pointing with vbf pointing
+	checkPointing();
 	
 	////////////////////////////////////////////////////////
 	// do array analysis only if there is an array trigger
@@ -375,7 +375,6 @@ void VArrayAnalyzer::generateReducedPointingTreeData()
 		getShowerParameters()->fNTelescopes = 4 ;
 		getShowerParameters()->time = iTime ;
 		getShowerParameters()->MJD  = iMJD  ;
-		//calcTelescopePointing() ;
 		updatePointingToArbitraryTime( iMJD, iTime ) ;
 		
 		// fill pointing to tree in VArrayPointing
@@ -1025,6 +1024,7 @@ void VArrayAnalyzer::checkPointing()
 	{
 		return;
 	}
+	bitset<4> bitPointingStatus;
 	
 	// calculate difference between calculated pointing direction and vbf pointing direction
 	if( getReader()->getArrayTrigger() )
@@ -1060,8 +1060,15 @@ void VArrayAnalyzer::checkPointing()
 				getShowerParameters()->fTelPointingErrorX[i] = getPointing()[i]->getPointingErrorX();
 				getShowerParameters()->fTelPointingErrorY[i] = getPointing()[i]->getPointingErrorY();
 				
-				fMeanPointingMismatch[i] += iPointingDiff;
-				fNMeanPointingMismatch[i]++;
+				if( getPointing()[i]->getPointingEventStatus() == 0 )
+				{
+					fMeanPointingMismatch[i] += iPointingDiff;
+					fNMeanPointingMismatch[i]++;
+				}
+				else
+				{
+					bitPointingStatus.set( i, 1 );
+				}
 				
 				// check pointing difference, abort if too large
 				if( getRunParameter()->fCheckPointing < 900. && iPointingDiff > getRunParameter()->fCheckPointing )
@@ -1082,6 +1089,7 @@ void VArrayAnalyzer::checkPointing()
 				getShowerParameters()->fTelPointingErrorY[i] = 0.;
 			}
 		}
+		setAnalysisArrayEventStatus( ( unsigned int )bitPointingStatus.to_ulong() );
 	}
 }
 

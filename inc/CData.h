@@ -42,6 +42,7 @@ class CData
 		Double_t        TelAzimuth[VDST_MAXTELESCOPES];
 		Double_t        TelDec[VDST_MAXTELESCOPES];
 		Double_t        TelRA[VDST_MAXTELESCOPES];
+		UInt_t          Array_PointingStatus;
 		// MC parameters
 		Int_t           MCprimary;
 		Double_t        MCe0;
@@ -145,6 +146,7 @@ class CData
 		TBranch*        b_TelAzimuth;             //!
 		TBranch*        b_TelDec;                 //!
 		TBranch*        b_TelRA;                  //!
+		TBranch*        b_Array_PointingStatus;   //!
 		// MC parameter
 		TBranch*        b_MCprimary;
 		TBranch*        b_MCe0;                   //!
@@ -401,6 +403,14 @@ void CData::Init( TTree* tree )
 			TelDec[i] = 0.;
 			TelRA[i] = 0.;
 		}
+	}
+	if( fChain->GetBranchStatus( "Array_PointingStatus" ) )
+	{
+		fChain->SetBranchAddress( "Array_PointingStatus", &Array_PointingStatus );
+	}
+	else
+	{
+		Array_PointingStatus = 0;
 	}
 	
 	// MC tree

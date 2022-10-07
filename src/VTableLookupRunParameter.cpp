@@ -276,10 +276,6 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 				fMC_distance_to_cameracenter_min = 0.;
 			}
 		}
-		else if( iTemp.find( "-CTAoffAxisBins" ) < iTemp.size() )
-		{
-			setCTA_MC_offaxisBins();
-		}
 		else if( iTemp.find( "-add_mc_spectral_index" ) < iTemp.size() )
 		{
 			fAddMC_spectral_index.push_back( atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() ) );
@@ -484,8 +480,6 @@ void VTableLookupRunParameter::print( int iP )
 	cout << endl;
 	cout << "evndisp reconstruction parameter ID: " << rec_method << endl;
 	cout << endl;
-	printCTA_MC_offaxisBins();
-	cout << endl;
 	cout << "input file(s): ";
 	for( unsigned int i = 0; i < inputfile.size(); i++ )
 	{
@@ -622,51 +616,4 @@ bool VTableLookupRunParameter::fillInputFile_fromList( string iList )
 	cout << "total number of input files " << inputfile.size() << endl;
 	
 	return true;
-}
-
-void VTableLookupRunParameter::setCTA_MC_offaxisBins()
-{
-	fCTA_MC_offaxisBin_min.clear();
-	fCTA_MC_offaxisBin_max.clear();
-	
-	fCTA_MC_offaxisBin_min.push_back( 0.0 );
-	fCTA_MC_offaxisBin_max.push_back( 1.0 );
-	
-	fCTA_MC_offaxisBin_min.push_back( 1.0 );
-	fCTA_MC_offaxisBin_max.push_back( 2.0 );
-	
-	fCTA_MC_offaxisBin_min.push_back( 2.0 );
-	fCTA_MC_offaxisBin_max.push_back( 3.0 );
-	
-	fCTA_MC_offaxisBin_min.push_back( 3.0 );
-	fCTA_MC_offaxisBin_max.push_back( 3.5 );
-	
-	fCTA_MC_offaxisBin_min.push_back( 3.5 );
-	fCTA_MC_offaxisBin_max.push_back( 4.0 );
-	
-	fCTA_MC_offaxisBin_min.push_back( 4.0 );
-	fCTA_MC_offaxisBin_max.push_back( 4.5 );
-	
-	fCTA_MC_offaxisBin_min.push_back( 4.5 );
-	fCTA_MC_offaxisBin_max.push_back( 5.0 );
-	
-	fCTA_MC_offaxisBin_min.push_back( 5.0 );
-	fCTA_MC_offaxisBin_max.push_back( 5.5 );
-	
-	fCTA_MC_offaxisBin_min.push_back( 5.5 );
-	fCTA_MC_offaxisBin_max.push_back( 6.0 );
-}
-
-void VTableLookupRunParameter::printCTA_MC_offaxisBins()
-{
-	if( fCTA_MC_offaxisBin_min.size() == 0 )
-	{
-		return;
-	}
-	
-	cout << "setting the following off-axis bins for CTA analysis: " << endl;
-	for( unsigned int i = 0; i < fCTA_MC_offaxisBin_min.size(); i++ )
-	{
-		cout << "   bin " << i << "\t min " << fCTA_MC_offaxisBin_min[i] << " deg, max " << fCTA_MC_offaxisBin_max[i] << " deg" << endl;
-	}
 }

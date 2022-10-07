@@ -28,9 +28,7 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 	private:
 	
 		bool fillInputFile_fromList( string iList );
-		void printCTA_MC_offaxisBins();
 		bool readTelescopeToAnalyze( string iFile );
-		void setCTA_MC_offaxisBins();
 		
 	public:
 	
@@ -83,9 +81,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		// seed for random selection of showers before table filling
 		double fSelectRandom;
 		int fSelectRandomSeed;
-		// definition of offaxis bins (CTA only)
-		vector< double > fCTA_MC_offaxisBin_min;
-		vector< double > fCTA_MC_offaxisBin_max;
 		vector< double > fAddMC_spectral_index;
 		
 		Long64_t fNentries;
@@ -111,6 +106,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		void print( int iB = 0 );
 		void printHelp();
 		
-		ClassDef( VTableLookupRunParameter, 27 );
+		ClassDef( VTableLookupRunParameter, 28 );
 };
 #endif

@@ -339,7 +339,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 	fArrayPointing_Elevation = i_array_pointing.first;
 	fArrayPointing_Azimuth = i_array_pointing.second;
 	fArrayPointing_RotationAngle = getArrayPointingDeRotationAngle();
-	
+	fArray_PointingStatus = fshowerpars->eventStatus;
 	
 	// the following variables are not set in table filling mode
 	if( !fwrite )
@@ -364,6 +364,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			fTelElevation[i] = fshowerpars->TelElevation[i];
 			fTelAzimuth[i] = fshowerpars->TelAzimuth[i];
 		}
+		fArray_PointingStatus = fshowerpars->eventStatus;
 		if( !fIsMC )
 		{
 			for( unsigned int i = 0; i < fNTel; i++ )
@@ -528,8 +529,16 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 					&& fpointingCorrections[i]->is_initialized() )
 			{
 				fpointingCorrections[i]->getEntry( fEventCounter );
-				fpointing_dx[i] = fpointingCorrections[i]->getPointErrorX();
-				fpointing_dy[i] = fpointingCorrections[i]->getPointErrorY();
+				if( fpointingCorrections[i]->getPointingEventStatus() == 0 )
+				{
+					fpointing_dx[i] = fpointingCorrections[i]->getPointErrorX();
+					fpointing_dy[i] = fpointingCorrections[i]->getPointErrorY();
+				}
+				else
+				{
+					fpointing_dx[i] = 0.;
+					fpointing_dy[i] = 0.;
+				}
 			}
 			
 			if( fsize[i] > SizeSecondMax_temp )
@@ -625,8 +634,18 @@ void VTableLookupDataHandler::doStereoReconstruction()
 										 fwidth, flength,
 										 getWeight() );
 	// store results from line intersection for debugging
+	// (used also as seed values for DispAnalyzers)
 	fXoff_intersect = i_SR.fShower_Xoffset;
 	fYoff_intersect = i_SR.fShower_Yoffset;
+	
+	// fall back to original eventdisplay results in case
+	// simple reconstructor fails
+	if( ( fXoff_intersect < -999. || fYoff_intersect < -999. )
+			&& fchi2 >= 0 && isReconstructed() )
+	{
+		fXoff_intersect = fXoff_edisp;
+		fYoff_intersect = fYoff_edisp;
+	}
 	
 	////////////////////////////////////////////////////////////////////
 	// DISP method for updated disp reconstruction
@@ -653,7 +672,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 				fasym, ftgrad_x,
 				floss, fntubes,
 				getWeight(),
-				i_SR.fShower_Xoffset, i_SR.fShower_Yoffset,
+				fXoff_intersect, fYoff_intersect,
 				fmeanPedvar_ImageT );
 				
 			// get estimated error on direction reconstruction
@@ -669,6 +688,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 		fDispAnalyzerDirection->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
 												fTLRunParameter->fmaxdist,
 												fTLRunParameter->fmaxloss );
+		fDispAnalyzerDirection->setTelescopeFOV( fTelFOV );
 		fDispAnalyzerDirection->calculateMeanDispDirection(
 			getNTel(),
 			fArrayPointing_Elevation, fArrayPointing_Azimuth,
@@ -680,7 +700,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 			fasym, ftgrad_x,
 			floss, fntubes,
 			getWeight(),
-			i_SR.fShower_Xoffset, i_SR.fShower_Yoffset,
+			fXoff_intersect, fYoff_intersect,
 			iDispError,
 			fmeanPedvar_ImageT,
 			fpointing_dx, fpointing_dy );
@@ -692,6 +712,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 		fDispDiff = fDispAnalyzerDirection->getDispDiff();
 		fimg2_ang = fDispAnalyzerDirection->getAngDiff();
 		fchi2 = fDispDiff;
+		
 		// for az / ze calculation
 		i_SR.fillShowerDirection( fXoff, fYoff );
 		fnxyoff = fDispAnalyzerDirection->getXYWeight_disp().size();
@@ -833,6 +854,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 	fList_of_Tel_type.clear();
 	if( fTtelconfig )
 	{
+		fTelFOV.clear();
 		ftelconfig = new Ctelconfig( fTtelconfig );
 		ftelconfig->GetEntry( 0 );
 		fNTel = ftelconfig->NTel;
@@ -849,6 +871,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 			fTelY[i] = ftelconfig->TelY;
 			fTelZ[i] = ftelconfig->TelZ;
 			fFocalLength[i] = ftelconfig->FocalLength;
+			fTelFOV.push_back( ftelconfig->FOV );
 			fTel_type[i] = ftelconfig->TelType;
 			if( fList_of_Tel_type.find( ftelconfig->TelType ) != fList_of_Tel_type.end() )
 			{
@@ -1210,6 +1233,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 	fOTree->Branch( "TelAzimuth", fTelAzimuth, iTT );
 	fOTree->Branch( "ArrayPointing_Elevation", &fArrayPointing_Elevation, "ArrayPointing_Elevation/F" );
 	fOTree->Branch( "ArrayPointing_Azimuth", &fArrayPointing_Azimuth, "ArrayPointing_Azimuth/F" );
+	fOTree->Branch( "ArrayPointing_Status", &fArray_PointingStatus, "Array_PointingStatus/i" );
 	sprintf( iTT, "TelDec[%d]/D", fNTel );
 	if( !fShortTree )
 	{
@@ -1560,6 +1584,36 @@ bool VTableLookupDataHandler::readRunParameter()
 					}
 					iPar->Write();
 				}
+			}
+			///////////////////////////
+			// read parameters needed for (simple) stereo reconstruction
+			// minimum angle set as command line parameter
+			if( fTLRunParameter && fTLRunParameter->fRerunStereoReconstruction_minAngle > 0. )
+			{
+				fSSR_AxesAngles_min = fTLRunParameter->fRerunStereoReconstruction_minAngle;
+			}
+			// use minimum angle from evndisp analysis
+			else if( fTLRunParameter->rec_method < ( int )iERecPar->fAxesAngles_min.size() )
+			{
+				fSSR_AxesAngles_min = iERecPar->fAxesAngles_min[fTLRunParameter->rec_method];
+			}
+			else
+			{
+				fSSR_AxesAngles_min = 0.;
+			}
+			if( fTLRunParameter->rec_method < ( int )iERecPar->fNImages_min.size() )
+			{
+				fSSR_NImages_min = iERecPar->fNImages_min[fTLRunParameter->rec_method];
+			}
+			else
+			{
+				fSSR_NImages_min = 0.;
+			}
+			if( fTLRunParameter->fRerunStereoReconstruction )
+			{
+				cout << "\t quality cuts in stereo reconstruction: ";
+				cout << "number of images >= " << fSSR_NImages_min;
+				cout << ", angdiff > " << fSSR_AxesAngles_min << " deg" << endl;
 			}
 		}
 		ifInput.Close();
@@ -2054,6 +2108,11 @@ bool VTableLookupDataHandler::isReconstructed()
 	{
 		return false;
 	}
+	if( fXoff < -99998 || TMath::Abs( fYoff ) > 99998 )
+	{
+		fchi2 = -1.;
+		return false;
+	}
 	if( fNImages < 2 )
 	{
 		return false;
@@ -2154,6 +2213,7 @@ void VTableLookupDataHandler::resetAll()
 	}
 	fArrayPointing_Azimuth = 0.;
 	fArrayPointing_Elevation = 0.;
+	fArray_PointingStatus = 0;
 	fTargetElev = 0.;
 	fTargetAz = 0.;
 	fTargetDec = 0.;
@@ -2311,6 +2371,12 @@ bool VTableLookupDataHandler::cut( bool bWrite )
 	
 	// number of reconstructed events
 	fNStats_Rec++;
+	
+	if( !isReconstructed() )
+	{
+		fNStats_Chi2Cut++;
+		return false;
+	}
 	
 	if( getWobbleOffset() < 0. || getWobbleOffset() > fTLRunParameter->fTableFillingCut_WobbleCut_max )
 	{

@@ -115,12 +115,11 @@ class VTableLookupDataHandler
 		double fTelY[VDST_MAXTELESCOPES];
 		double fTelZ[VDST_MAXTELESCOPES];
 		double fFocalLength[VDST_MAXTELESCOPES];
+		vector< float > fTelFOV;
 		ULong64_t fTel_type[VDST_MAXTELESCOPES];
 		map<ULong64_t, unsigned int > fList_of_Tel_type;                      // [teltype][number of telescopes for this type]
 		map<ULong64_t, unsigned int >::iterator fList_of_Tel_type_iterator;
 		vector< unsigned int > fTel_type_counter;
-		float fArrayPointingElevation;
-		float fArrayPointingAzimuth;
 		// telescope pointing
 		double fTelElevation[VDST_MAXTELESCOPES];
 		double fTelAzimuth[VDST_MAXTELESCOPES];
@@ -136,6 +135,7 @@ class VTableLookupDataHandler
 		float  fArrayPointing_Elevation;
 		float  fArrayPointing_Azimuth;
 		float  fArrayPointing_RotationAngle;
+		unsigned int fArray_PointingStatus;
 		
 		// output trees
 		TTree* fOTree;
