@@ -59,7 +59,7 @@ int main( int argc, char* argv[] )
 	// calculate total fluxes and upper limits
 	double fMinEnergy = 0.2;
 	double fGamma = 2.5;
-	double iFlux , iFluxE, iFluxUL, iFluxInCU, iFluxULinCU , var1, var2;
+	double iFlux, iFluxE, iFluxUL, iFluxInCU, iFluxULinCU, var1, var2;
 	char ifile[100];
 	sprintf( ifile, "%s", fDataFile.c_str() );
 	//calculate fluxes for all runs even when significance < 3
@@ -147,7 +147,7 @@ int main( int argc, char* argv[] )
 				if( c->runOn > 0 )
 				{
 					flux->getFlux( c->runOn, iFlux, iFluxE, var1 );
-					iFluxInCU = flux->getFluxVsCrab( iFlux, fMinEnergy , fGamma );
+					iFluxInCU = flux->getFluxVsCrab( iFlux, fMinEnergy, fGamma );
 					fluxUL->getFlux( c->runOn, var1, var2, iFluxUL );
 					iFluxULinCU = fluxUL->getFluxVsCrab( iFluxUL, fMinEnergy, fGamma );
 					
@@ -207,7 +207,7 @@ int main( int argc, char* argv[] )
 		// convert to fits
 		
 		cout << "---------Start production of FITS ouput file ------" << endl;
-		VFITS f( fDataFile, fOUTFile + ".fits" , fTargetName, fMergeFITSFiles, fDebug );
+		VFITS f( fDataFile, fOUTFile + ".fits", fTargetName, fMergeFITSFiles, fDebug );
 		f.writeCumSignificance( fDebug );
 		f.writeSignificanceDistribution( fDebug );
 		f.writeLightCurve( fDebug );

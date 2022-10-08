@@ -701,8 +701,8 @@ void VEventLoop::shutdown()
 		{
 			cout << endl;
 			setTelID( getTeltoAna()[i] );
-			printDeadChannels( false , true );
-			printDeadChannels( true , true );
+			printDeadChannels( false, true );
+			printDeadChannels( true, true );
 		}
 	}
 	

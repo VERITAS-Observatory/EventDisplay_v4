@@ -248,7 +248,7 @@ TGraphAsymmErrors* VEnergySpectrumfromLiterature::getEnergySpectrumWithErrors( u
 	}
 	
 	TF1* f = getEnergySpectrum( iID, bLogEnergy );
-
+	
 	if( !f )
 	{
 		return 0;
@@ -387,7 +387,7 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
 	}
 	
 	// define functions
-    char hname[6000];
+	char hname[6000];
 	char h_exponent[600];
 	char h_energy[60];
 	// define energy variable (log or lin)
@@ -458,7 +458,7 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
 	}
 	
 	// plotting multiplier
-    char hisnmae[10000];
+	char hisnmae[10000];
 	sprintf( hisnmae, "%s * TMath::Power( %s, %f )", hname, h_energy, fPlottingMultiplierIndex );
 	
 	// create function
@@ -742,8 +742,8 @@ sData VEnergySpectrumfromLiterature::getEnergySpectrumDataField( unsigned int iI
 	if( !checkIDRange( iID ) )
 	{
 		sData a;
-        a.Type = 0.;
-        a.EnergyRange_min = a.EnergyRange_max = 0.;
+		a.Type = 0.;
+		a.EnergyRange_min = a.EnergyRange_max = 0.;
 		return a;
 	}
 	return fData[iID];

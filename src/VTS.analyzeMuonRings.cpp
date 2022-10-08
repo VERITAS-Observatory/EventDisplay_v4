@@ -169,7 +169,7 @@ int main( int argc, char* argv[] )
 			{
 				continue;
 			}
-			if( ( c->muonValid == CUTmuonValid && c->muonRadius > CUTLOmuonRadius && c->muonRSigma < CUTUPmuonRSigma && ( sqrt( pow( c->muonX0 , 2 ) + pow( c->muonY0 , 2 ) ) + c->muonRadius < CUTUPmuonRadius ) && c->muonSize < CUTUPmuonSize ) || c->houghMuonValid == CUThoughMuonValid )
+			if( ( c->muonValid == CUTmuonValid && c->muonRadius > CUTLOmuonRadius && c->muonRSigma < CUTUPmuonRSigma && ( sqrt( pow( c->muonX0, 2 ) + pow( c->muonY0, 2 ) ) + c->muonRadius < CUTUPmuonRadius ) && c->muonSize < CUTUPmuonSize ) || c->houghMuonValid == CUThoughMuonValid )
 			{
 				if( j > 10000 )
 				{

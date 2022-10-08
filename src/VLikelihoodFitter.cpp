@@ -2167,7 +2167,7 @@ TGraphAsymmErrors* VLikelihoodFitter::calculateConfidenceInterval( double* i_cov
 			// log^2(E/E0) * errGamma^2
 			i_flux_err += TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * i_covmat[ 4 ];
 			// (E/EC^2)^2 * errEC^2
-			i_flux_err += TMath::Power( TMath::Power( 10., i_energy ) / i_fitfunction->GetParameter( 2 ) / i_fitfunction->GetParameter( 2 ) , 2 ) * i_covmat[ 8 ];
+			i_flux_err += TMath::Power( TMath::Power( 10., i_energy ) / i_fitfunction->GetParameter( 2 ) / i_fitfunction->GetParameter( 2 ), 2 ) * i_covmat[ 8 ];
 			// 2 * log(E/E0) * cov_N_Gamma / N
 			i_flux_err += -2. * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * i_covmat[ 1 ] /  i_fitfunction->GetParameter( 0 );
 			// 2 * (E/E_C^2) * cov_N_EC / N
@@ -2188,7 +2188,7 @@ TGraphAsymmErrors* VLikelihoodFitter::calculateConfidenceInterval( double* i_cov
 			// log^2(E/E0) * errAlpha^2
 			i_flux_err += TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * i_covmat[ 4 ];
 			// (E/E0) * log^2(E/E0) * errBeta
-			i_flux_err += TMath::Power( TMath::Power( 10., i_energy ) / fENorm * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) , 2 ) * i_covmat[ 8 ];
+			i_flux_err += TMath::Power( TMath::Power( 10., i_energy ) / fENorm * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ), 2 ) * i_covmat[ 8 ];
 			// 2 * log(E/E0) * cov_N_Alpha / N
 			i_flux_err += -2. * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * i_covmat[ 1 ] /  i_fitfunction->GetParameter( 0 );
 			// 2 * (E/E0) log(E/E0) * cov_N_Beta / N
@@ -3735,8 +3735,8 @@ TGraphErrors* VLikelihoodFitter::getLightCurve()
 	cout << "# MJD\tMJD-err\tFlux\tFlux-err\tFlux-UL\tTS" << endl;
 	for( unsigned int i = 0; i < fLCFlux.size() ; i++ )
 	{
-		i_lightCurve->SetPoint( i, fLCMJD[i] , fLCFlux[i] );
-		i_lightCurve->SetPointError( i, fLCMJDErr[i] , fLCFluxErr[i] );
+		i_lightCurve->SetPoint( i, fLCMJD[i], fLCFlux[i] );
+		i_lightCurve->SetPointError( i, fLCMJDErr[i], fLCFluxErr[i] );
 		
 		cout << fLCMJD[i] << "\t"
 			 << fLCMJDErr[i] << "\t"

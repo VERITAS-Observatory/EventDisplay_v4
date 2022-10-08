@@ -55,11 +55,11 @@ class VTraceHandler
 							   unsigned int iChanID, unsigned int iHitID, double iHilo = -1. );
 		// methods for getting quick trace parameters between specified limits
 		bool   apply_lowgain( double );
-		double calculateTraceSum_fixedWindow( int , int, bool );
-		double getQuickTZero( int , int );
-		double getQuickTZero( int , int, int );
-		void   getQuickMax( int , int, double&, int& );
-		void   getQuickMax( int , int, double&, int&, unsigned int& );
+		double calculateTraceSum_fixedWindow( int, int, bool );
+		double getQuickTZero( int, int );
+		double getQuickTZero( int, int, int );
+		void   getQuickMax( int, int, double&, int& );
+		void   getQuickMax( int, int, double&, int&, unsigned int& );
 		double getQuickPulseWidth( int fFirst, int fLast, double fPed );
 		double getPed()
 		{

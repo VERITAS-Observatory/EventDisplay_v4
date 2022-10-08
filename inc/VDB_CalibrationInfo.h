@@ -72,7 +72,7 @@ class VDB_CalibrationInfo
 		void write_inVOFFLINE_DB_from_file( string pass_word = "" );
 		
 		//-- constructor to then call read
-		VDB_CalibrationInfo( int laserrun , int tel , string name_out_file, int gain_or_toff, int VOFFLINE_version_query, int LOW_GAIN, TString DBserver );
+		VDB_CalibrationInfo( int laserrun, int tel, string name_out_file, int gain_or_toff, int VOFFLINE_version_query, int LOW_GAIN, TString DBserver );
 		bool readVOFFLINE();
 		vector< unsigned int > getVectorChannelList()
 		{

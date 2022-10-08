@@ -246,11 +246,11 @@ void VCamera::setUpCamera()
 	fTextEventPlotPaper->SetTextFont( 42 );
 	fTextEventPlotPaper->SetTextSize( i_TextSize * 2 );
 	// camera scale axis (left+top)
-	fCameraXaxis = new TGaxis( convertX( -1.* fdist_edgeX ) , 0.97, convertX( fdist_edgeX ), 0.97, -1.*fdist_edgeX, fdist_edgeX, 510, "+L" );
+	fCameraXaxis = new TGaxis( convertX( -1.* fdist_edgeX ), 0.97, convertX( fdist_edgeX ), 0.97, -1.*fdist_edgeX, fdist_edgeX, 510, "+L" );
 	fCameraXaxis->SetLabelSize( 0.02 );
 	fCameraXaxis->SetLineColor( 42 );
 	fCameraXaxis->SetLabelColor( 42 );
-	fCameraYaxis = new TGaxis( 0.96, convertY( -1. * fdist_edgeY ) , 0.96, convertY( fdist_edgeY ), -1. * fdist_edgeY, fdist_edgeY, 510, "+L" );
+	fCameraYaxis = new TGaxis( 0.96, convertY( -1. * fdist_edgeY ), 0.96, convertY( fdist_edgeY ), -1. * fdist_edgeY, fdist_edgeY, 510, "+L" );
 	fCameraYaxis->SetLabelSize( 0.02 );
 	fCameraYaxis->SetLineColor( 43 );
 	fCameraYaxis->SetLabelColor( 43 );
@@ -642,7 +642,7 @@ void VCamera::setPMTColorForChargeTiming()
 		fPMTData[i] = fData->getSums()[i];
 	}
 	// rescale data to maximum values of 1
-	fPMTData = rescaleSums( fPMTData , false );
+	fPMTData = rescaleSums( fPMTData, false );
 	
 	// all colors > 10 are greyish/brown. Start at 1 again
 	int iTelescopeColor = ( fTelescope % 10 ) + 1;
@@ -821,12 +821,12 @@ void VCamera::drawEventText()
 	// big letters for plotpaper options
 	if( fPlotPaper && fTelescope == fData->getTeltoAna()[0] )
 	{
-        stringstream i_stext;
-        i_stext <<  "Run: " << fData->getRunNumber();
-        i_stext << "Event: " << int( fData->getReader()->getEventNumber() );
+		stringstream i_stext;
+		i_stext <<  "Run: " << fData->getRunNumber();
+		i_stext << "Event: " << int( fData->getReader()->getEventNumber() );
 		if( fCurrentTimeSlice >= 0 )
 		{
-            i_stext << "FADC " << fCurrentTimeSlice;
+			i_stext << "FADC " << fCurrentTimeSlice;
 		}
 		fTextEventPlotPaper->SetNDC( true );
 		fTextEventPlotPaper->SetTitle( i_stext.str().c_str() );
@@ -853,21 +853,21 @@ void VCamera::drawEventText()
 #endif
 	fTextEvent[0]->SetTitle( iText );
 	// get local trigger list
-  stringstream i_stext;
+	stringstream i_stext;
 	if( fBoolAllinOne )
 	{
-        i_stext << "local trigger: ";
+		i_stext << "local trigger: ";
 		for( unsigned int t = 0; t < fData->getNTel(); t++ )
 		{
 			if( fData->getReader()->hasLocalTrigger( t ) )
 			{
-                i_stext << " " << t+1;
+				i_stext << " " << t + 1;
 			}
 		}
 	}
 	else
 	{
-        i_stext << "Max channel " << int( fData->getReader()->getMaxChannels() ) << endl;
+		i_stext << "Max channel " << int( fData->getReader()->getMaxChannels() ) << endl;
 	}
 	fTextEvent[1]->SetTitle( i_stext.str().c_str() );
 	sprintf( iText, "Num Samples %d", int( fData->getNSamples() ) );

@@ -225,7 +225,7 @@ void VDataMCComparision::defineHistograms()
 	fHistoArray[EMSCW]->initHistogram( "mean reduced scaled width", 500, -5., 10. );
 	
 	fHistoArray[EMSCL] = new VDataMCComparisionHistogramData( "MSCL", fName, 0 );
-	fHistoArray[EMSCL]->initHistogram( "mean reduced scaled length" , 500, -5., 10. );
+	fHistoArray[EMSCL]->initHistogram( "mean reduced scaled length", 500, -5., 10. );
 	
 	fHistoArray[EMWR] = new VDataMCComparisionHistogramData( "MWR", fName, 0 );
 	fHistoArray[EMWR]->initHistogram( "mean scaled width", 500, -2., 2. );
@@ -987,7 +987,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 					fHistoArray[EYCORE]->fill( -1.*fData->Ycore, weight, log10( fData->ErecS ) );
 				}
 				hXYcore->Fill( fData->Xcore, -1.*fData->Ycore, weight );
-				hAzYcore->Fill( fData->Az, -1.*fData->Ycore , weight );
+				hAzYcore->Fill( fData->Az, -1.*fData->Ycore, weight );
 			}
 			else
 			{
@@ -996,7 +996,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 					fHistoArray[EYCORE]->fill( fData->Ycore, weight, log10( fData->ErecS ) );
 				}
 				hXYcore->Fill( fData->Xcore, fData->Ycore, weight );
-				hAzYcore->Fill( fData->Az, fData->Ycore , weight );
+				hAzYcore->Fill( fData->Az, fData->Ycore, weight );
 			}
 			if( fHistoArray[EAEL] )
 			{

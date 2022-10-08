@@ -21,7 +21,7 @@ class VImageBaseAnalyzer : public VEvndispData
 		bool fRaw;
 		
 		void calcSecondTZerosSums();
-		void calcTZeros( int , int );
+		void calcTZeros( int, int );
 		void calcTZerosSums( int, int, unsigned int );
 		unsigned int getDynamicSummationWindow( unsigned int chanID );
 		int  getFADCTraceIntegrationPosition( int iPos );
@@ -37,8 +37,8 @@ class VImageBaseAnalyzer : public VEvndispData
 		VImageBaseAnalyzer() {}
 		~VImageBaseAnalyzer() {}
 		
-		void           calcTCorrectedSums( int , int );
-		void           calcSums( int iFirst , int iLast, bool iMakingPeds, bool iLowGainOnly = false, unsigned int iTraceIntegrationMethod = 9999 );
+		void           calcTCorrectedSums( int, int );
+		void           calcSums( int iFirst, int iLast, bool iMakingPeds, bool iLowGainOnly = false, unsigned int iTraceIntegrationMethod = 9999 );
 		unsigned int   fillHiLo();                          //!< fill hi/low gain vector
 		int            fillSaturatedChannels();
 		unsigned int   fillZeroSuppressed();

@@ -895,7 +895,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	
 	///////////////////////////
 	// Top half of skymap ONLY
-	TH1D* hsig_1DTopOnly = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on, iN, v_x, v_y, v_r1, v_r2, v_theta , "a" );
+	TH1D* hsig_1DTopOnly = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on, iN, v_x, v_y, v_r1, v_r2, v_theta, "a" );
 	if( regioncodeflag )
 	{
 		setHistogramPlottingStyle( hsig_1DTopOnly, kMagenta, 2, 2, 1, 1, 0 );
@@ -909,7 +909,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	
 	///////////////////////////
 	// Bottom half of skymap ONLY
-	TH1D* hsig_1DBottomOnly = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on, iN, v_x, v_y, v_r1, v_r2, v_theta , "b" );
+	TH1D* hsig_1DBottomOnly = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on, iN, v_x, v_y, v_r1, v_r2, v_theta, "b" );
 	if( regioncodeflag )
 	{
 		setHistogramPlottingStyle( hsig_1DBottomOnly, kGreen + 3, 2, 2, 1, 1, 0 );
@@ -2991,7 +2991,7 @@ TCanvas* VPlotAnasumHistograms::plot_skyPlots_significance( bool iCorrelated, do
 		if( bZetaTau )
 		{
 			TGraph* gZetaTau = new TGraph( 1 );
-			gZetaTau->SetPoint( 0, 0.7263087 , 0.8719 );
+			gZetaTau->SetPoint( 0, 0.7263087, 0.8719 );
 			gZetaTau->SetMarkerSize( 2 );
 			gZetaTau->SetMarkerStyle( 24 );
 			gZetaTau->SetMarkerColor( 5 );

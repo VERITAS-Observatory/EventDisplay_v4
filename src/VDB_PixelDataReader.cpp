@@ -211,13 +211,13 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
 	/////////////////////////////////////////////////////
 	// read L1 rates
 	
-    ostringstream c_queryS;
-    c_queryS << "select timestamp, telescope_id, pixel_id, rate from tblL1_TriggerInfo, tblRun_Info where timestamp";
-    c_queryS << " >= tblRun_Info.data_start_time - INTERVAL 1 MINUTE AND timestamp ";
-    c_queryS << " <=  tblRun_Info.data_end_time + INTERVAL 1 MINUTE AND tblRun_Info.run_id=";
-    c_queryS << runNumber;
+	ostringstream c_queryS;
+	c_queryS << "select timestamp, telescope_id, pixel_id, rate from tblL1_TriggerInfo, tblRun_Info where timestamp";
+	c_queryS << " >= tblRun_Info.data_start_time - INTERVAL 1 MINUTE AND timestamp ";
+	c_queryS << " <=  tblRun_Info.data_end_time + INTERVAL 1 MINUTE AND tblRun_Info.run_id=";
+	c_queryS << runNumber;
 	
-    if( !my_connection.make_query( c_queryS.str().c_str() ) )
+	if( !my_connection.make_query( c_queryS.str().c_str() ) )
 	{
 		fDBStatus = false;
 		return false;
@@ -256,12 +256,12 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
 	
 	for( unsigned int i = 0; i < getNTel(); i++ )
 	{
-        ostringstream c_queryS;
-        c_queryS << "select * FROM tblHV_Telescope" << i << "_Status WHERE channel > 0 AND";
-        c_queryS << " (db_start_time >= \"" << iDBStartTimeSQL << "\"";
-        c_queryS << "- INTERVAL 1 MINUTE) AND (db_start_time <= \" " << fDBRunStoppTimeSQL << "\" )";
+		ostringstream c_queryS;
+		c_queryS << "select * FROM tblHV_Telescope" << i << "_Status WHERE channel > 0 AND";
+		c_queryS << " (db_start_time >= \"" << iDBStartTimeSQL << "\"";
+		c_queryS << "- INTERVAL 1 MINUTE) AND (db_start_time <= \" " << fDBRunStoppTimeSQL << "\" )";
 		
-        if( !my_connection.make_query( c_queryS.str().c_str() ) )
+		if( !my_connection.make_query( c_queryS.str().c_str() ) )
 		{
 			fDBStatus = false;
 			cout << "FAILED" << endl;
@@ -333,8 +333,8 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
 				
 				if( db_row->GetField( 0 ) && db_row->GetField( 1 ) && db_row->GetField( 2 ) )
 				{
-					fillDataRow( 3, iDBStartTimeSQL, i, atoi( db_row->GetField( 0 ) ) , atof( db_row->GetField( 1 ) ) );
-					fillDataRow( 4, iDBStartTimeSQL, i, atoi( db_row->GetField( 0 ) ) , atof( db_row->GetField( 2 ) ) );
+					fillDataRow( 3, iDBStartTimeSQL, i, atoi( db_row->GetField( 0 ) ), atof( db_row->GetField( 1 ) ) );
+					fillDataRow( 4, iDBStartTimeSQL, i, atoi( db_row->GetField( 0 ) ), atof( db_row->GetField( 2 ) ) );
 				}
 			}
 		}

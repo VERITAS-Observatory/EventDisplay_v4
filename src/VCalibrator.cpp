@@ -2213,14 +2213,14 @@ bool VCalibrator::readPeds_from_combinedfile( string iFile, bool iLowGain, unsig
 			}
 		}
 		
-		std::pair<int, int> temp( iFADCModule , iFADCChannel );
+		std::pair<int, int> temp( iFADCModule, iFADCChannel );
 		vector<int> i_runs = runs[temp];
 		vector<double> i_peds = peds[temp];
 		vector< vector<double> > i_pedvars = pedvars[temp];
 		
 		mean = 0;
 		rms = 0;
-		vars = std::vector<double>( getPedvarsAllSumWindows( iLowGain ).size() , 0 );
+		vars = std::vector<double>( getPedvarsAllSumWindows( iLowGain ).size(), 0 );
 		
 		if( i_runs.size() == 0 )
 		{
@@ -2244,7 +2244,7 @@ bool VCalibrator::readPeds_from_combinedfile( string iFile, bool iLowGain, unsig
 			
 			int theIndex = iUpper;
 			mean = i_peds.at( theIndex );
-			vars = std::vector<double>( getPedvarsAllSumWindows( iLowGain ).size() , 0.0 );
+			vars = std::vector<double>( getPedvarsAllSumWindows( iLowGain ).size(), 0.0 );
 			
 			for( unsigned int iS = 1; iS < getPedvarsAllSumWindows( iLowGain ).size() && iS < i_pedvars.at( theIndex ).size(); iS++ )
 			{
@@ -3270,7 +3270,7 @@ void VCalibrator::setCalibrationFileNames()
 		
 		if( i < fNewLowGainPedFileNameC.size() )
 		{
-			fNewLowGainPedFileNameC[i] = getCalibrationFileName( i, 10, "newlped" , getRunParameter()->fPedLowGainFile );
+			fNewLowGainPedFileNameC[i] = getCalibrationFileName( i, 10, "newlped", getRunParameter()->fPedLowGainFile );
 		}
 		else
 		{

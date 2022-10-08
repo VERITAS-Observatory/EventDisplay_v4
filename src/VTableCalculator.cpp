@@ -220,7 +220,7 @@ bool VTableCalculator::create1DHistogram( int i, int j, double w_first_event )
 		char histitle[200];
 		int id = i * 1000 + j;
 		
-		sprintf( hisname , "h%d", id );
+		sprintf( hisname, "h%d", id );
 		double is1 = hMedian->GetXaxis()->GetBinLowEdge( i + 1 );
 		double is2 = hMedian->GetXaxis()->GetBinLowEdge( i + 1 ) + hMedian->GetXaxis()->GetBinWidth( i + 1 );
 		double id1 = hMedian->GetYaxis()->GetBinLowEdge( j + 1 );

@@ -603,7 +603,7 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	// fill rate graphs by run
 	if( onrun != -1 && hStSig )
 	{
-		fRatePlots->fill( onrun, fStereoOn->getMJD( onrun ), i_sig, hStSig->GetMaximum(), i_nevts_on, i_nevts_off * 1. , i_rate );
+		fRatePlots->fill( onrun, fStereoOn->getMJD( onrun ), i_sig, hStSig->GetMaximum(), i_nevts_on, i_nevts_off * 1., i_rate );
 	}
 	
 	// rate graphs by interval

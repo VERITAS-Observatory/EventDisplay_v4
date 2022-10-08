@@ -405,7 +405,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	fEffArea->Branch( hisTreeList, 64000, 1 );
 	fEffArea->SetMarkerStyle( 20 );
 	
-	fAcceptance_AfterCuts_tree = new TTree( "Acceptance_AfterCuts" , "Info to conctruct background map" );
+	fAcceptance_AfterCuts_tree = new TTree( "Acceptance_AfterCuts", "Info to conctruct background map" );
 	fAcceptance_AfterCuts_tree->Branch( "Xoff_aC", &fXoff_aC, "Xoff_aC/D" );
 	fAcceptance_AfterCuts_tree->Branch( "Yoff_aC", &fYoff_aC, "Yoff_aC/D" );
 	fAcceptance_AfterCuts_tree->Branch( "Xoff_derot_aC", &fXoff_derot_aC, "Xoff_derot_aC/D" );
@@ -2197,7 +2197,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 		hEcutSub[1]->Fill( eMC, 1. );
 		
 		// apply reconstruction quality cuts
-		if( !fCuts->applyStereoQualityCuts( iMethod, true, i , true ) )
+		if( !fCuts->applyStereoQualityCuts( iMethod, true, i, true ) )
 		{
 			continue;
 		}
@@ -2418,7 +2418,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				fYoff_derot_aC = d->Yoff_derot;
 				fErec = eRecLin;
 				fEMC  = d->MCe0;
-				fCRweight = getCRWeight( d->MCe0, hVEmc[0][az_bin_index] , true ); //So that the acceptance can be normalised to the CR spectrum.
+				fCRweight = getCRWeight( d->MCe0, hVEmc[0][az_bin_index], true );  //So that the acceptance can be normalised to the CR spectrum.
 				// when running on gamma, this should return 1.
 				fAcceptance_AfterCuts_tree->Fill();
 			}
@@ -3774,8 +3774,8 @@ TGraph2DErrors* VEffectiveAreaCalculator::getTimeBinnedMeanEffectiveArea()
 			{
 				if( fEffArea_time[i][j] > 0. )
 				{
-					gTimeBinnedMeanEffectiveArea->SetPoint( z , fEff_E0[j], fEffArea_time[i][j] , timebins[i] );
-					gTimeBinnedMeanEffectiveArea->SetPointError( z , 0 , 0 , 0 );
+					gTimeBinnedMeanEffectiveArea->SetPoint( z, fEff_E0[j], fEffArea_time[i][j], timebins[i] );
+					gTimeBinnedMeanEffectiveArea->SetPointError( z, 0, 0, 0 );
 					z++;
 				}
 			}

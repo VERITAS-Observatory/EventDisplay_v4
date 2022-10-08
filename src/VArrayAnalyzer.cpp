@@ -420,7 +420,7 @@ void VArrayAnalyzer::initOutput()
 	{
 		// tree versioning numbers used in mscw_energy
 		char i_textTitle[300];
-		sprintf( i_textTitle, "VERSION %d (short tree: %d)", getRunParameter()->getEVNDISP_TREE_VERSION(), (int)getRunParameter()->fShortTree );
+		sprintf( i_textTitle, "VERSION %d (short tree: %d)", getRunParameter()->getEVNDISP_TREE_VERSION(), ( int )getRunParameter()->fShortTree );
 		fOutputfile = new TFile( fRunPar->foutputfileName.c_str(), "RECREATE", i_textTitle );
 	}
 }

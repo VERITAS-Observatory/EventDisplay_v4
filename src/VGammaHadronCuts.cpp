@@ -1239,7 +1239,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 	// apply cut selector from probability tree
 	if( fGammaHadronCutSelector / 10 == 3 )
 	{
-		if( !applyProbabilityCut( iEntry , fIsOn ) )
+		if( !applyProbabilityCut( iEntry, fIsOn ) )
 		{
 			if( bCount && fStats )
 			{
@@ -2289,10 +2289,10 @@ bool VGammaHadronCuts::initAngularResolutionFile()
 		if( getAngularResolutionContainmentRadius() - 68 != 0 )
 		{
 			sprintf( iTreeName, "t_angular_resolution_%03dp", getAngularResolutionContainmentRadius() );
-        }
-        else
-        {
-           sprintf( iTreeName, "t_angular_resolution" );
+		}
+		else
+		{
+			sprintf( iTreeName, "t_angular_resolution" );
 		}
 		
 		cout << "VGammaHadronCuts::initAngularResolutionFile: reading angular resolution graph from file (" << iTreeName << "):" << endl;

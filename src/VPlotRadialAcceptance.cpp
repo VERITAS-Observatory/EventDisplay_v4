@@ -127,7 +127,7 @@ bool VPlotRadialAcceptance::openAcceptanceFile( string iFile, unsigned int iZeBi
     plot acceptance curves
 
 */
-TCanvas* VPlotRadialAcceptance::plotRadialAcceptance( TCanvas* cX , int iColor )
+TCanvas* VPlotRadialAcceptance::plotRadialAcceptance( TCanvas* cX, int iColor )
 {
 	if( !fAcceptanceFile || fAcceptanceFile->IsZombie() )
 	{

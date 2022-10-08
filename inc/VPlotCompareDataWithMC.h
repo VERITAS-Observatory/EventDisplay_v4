@@ -49,7 +49,7 @@ class VPlotCompareDataWithMC : public VHistogramUtilities
 		TCanvas* plotRelativePlots( char* i_CanvasName, char* i_CanvasTitle, TH1D* h1, TH1D* h2, double xmin, double xmax );
 		void   plotRelativePlot( TH1D* h1, TH1D* h2, double xmin = -999., double xmax = -999., int iTelescope = 0 );
 		void   plotCummulativePlot( TH1D* h1, TH1D* h2, double xmin = -999., double xmax = -999., double iSystematicCutCheck = -99.,
-									int iTelescope = 0, bool iLeftToRight = true , double iBinValue = 1.5 );
+									int iTelescope = 0, bool iLeftToRight = true, double iBinValue = 1.5 );
 		TCanvas* plot_singleCanvas( string iHistoName, string iCanvasTitle, double iHistoXAxisMax, string iScalingVariable = "MSCW" );
 		void   setAxisTitles( TH2D* h, string iS, int iTel );
 		void   setHistogramAtt( TH1D* his, int icolor, double iwidth, double isize, int imarker = 1, int irebin = 1, double iTitleOffset = 1.3 );

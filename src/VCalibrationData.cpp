@@ -949,7 +949,7 @@ double VCalibrationData::getLowGainSumCorrection( int iSumWindow, int jSumWindow
 	return getLowGainMultiplier_Sum( iSumWindow, jSumWindow ) / fLowGainMultiplier_Trace ;
 }
 
-bool VCalibrationData::setLowGainMultiplier_Sum( int iSumWindow, int jSumWindow , double lmult )
+bool VCalibrationData::setLowGainMultiplier_Sum( int iSumWindow, int jSumWindow, double lmult )
 {
 	std::pair<int, int> temp( iSumWindow, jSumWindow );
 	fLowGainMultiplier_Sum[temp] = lmult;

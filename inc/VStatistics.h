@@ -220,7 +220,7 @@ namespace VStatistics
 			TF1 f( "myfuncf", funcf, 0.0, 100000, 5 );
 			f.SetParameters( mypars );
 			f.SetNpx( 10000 );
-			return f.GetX( 0.0 , 0.0, 100000, 1.e-10, 1000 );
+			return f.GetX( 0.0, 0.0, 100000, 1.e-10, 1000 );
 		}
 		// Feldman & Cousins
 		else if( iMethod == 3 )

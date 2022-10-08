@@ -575,7 +575,7 @@ void VFluxCalculation::getIntegralEffectiveArea()
 				// get energies and effective areas
 				g->GetPoint( b - 1, x0, ieff_mean );
 				g->GetPoint( b + 1, x2, ieff_mean );
-				g->GetPoint( b  , x1, ieff_mean );
+				g->GetPoint( b, x1, ieff_mean );
 				
 				ieff_int = integrateEffectiveAreaInterval( x0, x1, x2, ieff_mean );
 				if( ieff_int > 0. )
@@ -820,7 +820,7 @@ void VFluxCalculation::printResults()
 		printf( "t_obs [min]: %.1f", fRunTOn[i] / 60. );
 		printf( ", dead time fraction: %.2f", fRunDeadTime[i] );
 		cout << endl;
-		printf( "\t NOn: %d, NOff: %d, Norm: %.2f, NDiff: %.1f +- %.1f", ( int )fRunNon[i], ( int )fRunNoff[i], fRunNorm[i] , fRunNdiff[i], fRunNdiffE[i] );
+		printf( "\t NOn: %d, NOff: %d, Norm: %.2f, NDiff: %.1f +- %.1f", ( int )fRunNon[i], ( int )fRunNoff[i], fRunNorm[i], fRunNdiff[i], fRunNdiffE[i] );
 		printf( ", Rate: %.2f +- %.2f gammas/min", fRunRate[i], fRunRateE[i] );
 		cout << endl;
 		printf( "\t Effective area %.1f m^2", fRunEffArea[i] );
@@ -1307,7 +1307,7 @@ void VFluxCalculation::calculateFluxes()
     these values are used to calculate a spectral weighted effective area (good values are important!)
 
 */
-void VFluxCalculation::setSpectralParameters( double iMinEnergy_TeV, double  E0, double alpha , double iMaxEnergy_TeV )
+void VFluxCalculation::setSpectralParameters( double iMinEnergy_TeV, double  E0, double alpha, double iMaxEnergy_TeV )
 {
 	fMinEnergy = iMinEnergy_TeV;
 	if( iMaxEnergy_TeV <  MAX_SAFE_MC_ENERGY && iMaxEnergy_TeV > 0. )
@@ -2378,7 +2378,7 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char* iTex, double iMJDOffset, 
 	if( iTex )
 	{
 		sprintf( hname, "   &[$%s$ cm$^{-2}$s$^{-1}$]", sFluxMult.c_str() );
-		writeTexFileForFluxValues( iTex, iV_Run, iV_Flux, iV_FluxE, fluxMult , "run & flux",  "   &[$10^9$ cm$^{-2}$s$^{-1}$]" );
+		writeTexFileForFluxValues( iTex, iV_Run, iV_Flux, iV_FluxE, fluxMult, "run & flux",  "   &[$10^9$ cm$^{-2}$s$^{-1}$]" );
 	}
 	
 	return gFluxMJD;
@@ -2588,7 +2588,7 @@ TGraphErrors* VFluxCalculation::plotFluxesInBINs( int run, char* iTex, double iM
 	if( iTex )
 	{
 		sprintf( hname, "   &[$%s$ cm$^{-2}$s$^{-1}$]", sFluxMult.c_str() );
-		writeTexFileForFluxValues( iTex, iV_Run, iV_Flux, iV_FluxE, fluxMult , "run & flux",  "   &[$10^9$ cm$^{-2}$s$^{-1}$]" );
+		writeTexFileForFluxValues( iTex, iV_Run, iV_Flux, iV_FluxE, fluxMult, "run & flux",  "   &[$10^9$ cm$^{-2}$s$^{-1}$]" );
 	}
 	
 	return gFluxInBINs;

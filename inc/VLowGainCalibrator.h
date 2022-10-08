@@ -126,8 +126,8 @@ class VLowGainCalibrator
 		Short_t RawMax[4][2900];
 		
 		double calcMonitorCharge( int tel, int ientry = -1 );
-		double calcMeanMonitorCharge( int tel , int ientry = -1 );
-		double calcMedianMonitorCharge( int tel , int ientry = -1 );
+		double calcMeanMonitorCharge( int tel, int ientry = -1 );
+		double calcMedianMonitorCharge( int tel, int ientry = -1 );
 		
 		bool fIsOk;
 		
@@ -155,7 +155,7 @@ class VLowGainCalibrator
 		bool doTheFit( ) ;
 		
 		bool terminate( );
-		void findLightLevels( int tel, int iPeakSignificance = 2 , bool iDraw = false );
+		void findLightLevels( int tel, int iPeakSignificance = 2, bool iDraw = false );
 		bool findLightLevels( bool iDraw = false );
 		void setLowGainMultiplierUsedInDST( double lmult = 6.0 )
 		{

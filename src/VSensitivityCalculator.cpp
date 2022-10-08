@@ -61,7 +61,6 @@ VSensitivityCalculator a;
 a.setMonteCarloParametersCTA_MC( "data/DESY/DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-Aar-lowE-NS.S.2a.180000s.root", 0., "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat", 5 );
 a.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( 0, "CTA-MC", 1, "ENERGY" );
 
-
 */
 
 #include "VSensitivityCalculator.h"
@@ -529,7 +528,7 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
 		{
 			sprintf( hname, "%f", 1. );
 		}
-		i_fFunCrabFlux = new TF1( "i_fFunCrabFlux" , hname, TMath::Power( 10., fEnergy_min_Log ), 10000. );
+		i_fFunCrabFlux = new TF1( "i_fFunCrabFlux", hname, TMath::Power( 10., fEnergy_min_Log ), 10000. );
 	}
 	// use spectrum from text file
 	else
@@ -541,7 +540,7 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
 		}
 		else if( bUnit == "CU" )
 		{
-			i_fFunCrabFlux = new TF1( "i_fFunCrabFlux" , "1.", TMath::Power( 10., fEnergy_min_Log ), 10000. );
+			i_fFunCrabFlux = new TF1( "i_fFunCrabFlux", "1.", TMath::Power( 10., fEnergy_min_Log ), 10000. );
 		}
 	}
 	if( !i_fFunCrabFlux )
@@ -856,7 +855,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 			double iN_on  = gRandom->Gaus( non, non_error );
 			double iN_off = gRandom->Gaus( noff, noff_error );
 			double i_s = getSensitivity( iN_on  / fDifferentialFlux[i].ObsTime * 60.,
-										 iN_off / fDifferentialFlux[i].ObsTime * 60., alpha , -100., 0 );
+										 iN_off / fDifferentialFlux[i].ObsTime * 60., alpha, -100., 0 );
 			if( i_s > 0 )
 			{
 				i_s_v[i_s_z] = i_s;

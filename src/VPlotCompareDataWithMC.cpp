@@ -673,8 +673,8 @@ void VPlotCompareDataWithMC::widthlength_vs_energy_plots( int iTelescope, int iR
 		return;
 	}
 	
-	plot_energyDependentDistributions( "length", iRebin, xmin, xmax , "REL", iTelescope );
-	plot_energyDependentDistributions( "width", iRebin, xmin, xmax , "REL", iTelescope );
+	plot_energyDependentDistributions( "length", iRebin, xmin, xmax, "REL", iTelescope );
+	plot_energyDependentDistributions( "width", iRebin, xmin, xmax, "REL", iTelescope );
 	plot_energyDependentDistributions( "length", iRebin, xmin, xmax, "SIMSDIFF", iTelescope );
 	plot_energyDependentDistributions( "width", iRebin, xmin, xmax, "SIMSDIFF", iTelescope );
 	
@@ -693,10 +693,10 @@ void VPlotCompareDataWithMC::msc_vs_energy_plots( int iRebin, double xmin, doubl
 		return;
 	}
 	
-	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax , "CUMU", 0, iSystematicCutCheck );
-	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax , "CUMU", 0, iSystematicCutCheck );
-	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax , "REL" );
-	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax , "REL" );
+	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax, "CUMU", 0, iSystematicCutCheck );
+	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax, "CUMU", 0, iSystematicCutCheck );
+	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax, "REL" );
+	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax, "REL" );
 	plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax );
 	plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax );
 }
@@ -713,8 +713,8 @@ void VPlotCompareDataWithMC::mva_vs_energy_plots( int iRebin, double xmin, doubl
 		return;
 	}
 	
-	plot_energyDependentDistributions( "MVA", iRebin, xmin, xmax , "CUMU", 0, iSystematicCutCheck );
-	plot_energyDependentDistributions( "MVA", iRebin, xmin, xmax , "REL" );
+	plot_energyDependentDistributions( "MVA", iRebin, xmin, xmax, "CUMU", 0, iSystematicCutCheck );
+	plot_energyDependentDistributions( "MVA", iRebin, xmin, xmax, "REL" );
 	plot_energyDependentDistributions( "MVA", iRebin, xmin, xmax );
 }
 

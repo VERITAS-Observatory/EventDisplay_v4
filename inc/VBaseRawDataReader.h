@@ -311,7 +311,7 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
 		valarray<double>&          getPedRMS();
 		bool                       initTraceNoiseGenerator( unsigned int, string, VDetectorGeometry*, vector<int>, bool, int, double, vector<double> );
 		void                       injectGaussianNoise( double injectGaussianNoise, UInt_t seed = 0 );
-		bool                       initThroughputCorrection( double , vector< float >, vector< float > );
+		bool                       initThroughputCorrection( double, vector< float >, vector< float > );
 		void                       setSumWindow( unsigned int iTelID, int isw );
 		
 		//      vector< bool >&             getLocalTrigger() { return getSLocalTrigger(); }

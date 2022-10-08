@@ -81,7 +81,7 @@ int main( int argc, char* argv[] )
 		{
 			VGlobalRunParameter fRunPara;
 			cout << fRunPara.getEVNDISP_VERSION() << endl;
-            exit( EXIT_SUCCESS );
+			exit( EXIT_SUCCESS );
 		}
 	}
 	
@@ -94,7 +94,7 @@ int main( int argc, char* argv[] )
 	
 	if( !testCommandlineArguments() )
 	{
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 	
 	// initialize analysis
@@ -175,16 +175,16 @@ int parseOptions( int argc, char* argv[] )
 			case 'h':
 				if( gSystem->Getenv( "EVNDISPSYS" ) )
 				{
-                    if( system( "cat $EVNDISPSYS/README/README.ANASUM" ) != 0 )
-		                {
-		                   cout << "error reading README" << endl;
-                    }
+					if( system( "cat $EVNDISPSYS/README/README.ANASUM" ) != 0 )
+					{
+						cout << "error reading README" << endl;
+					}
 				}
 				else
 				{
 					cout << " no help find (environmental variable EVNDISPSYS not set)" << endl;
 				}
-                exit( EXIT_FAILURE );
+				exit( EXIT_FAILURE );
 				break;
 			case 'd':
 				datadir = optarg;

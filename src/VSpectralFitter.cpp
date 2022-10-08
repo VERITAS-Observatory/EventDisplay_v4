@@ -80,7 +80,7 @@ TF1* VSpectralFitter::fit( TGraph* g, string fitname )
 	double i_energy = log10( fSpectralFitEnergy_min );
 	while( i_energy  <= log10( fSpectralFitEnergy_max ) )
 	{
-		fConfidenceInterval->SetPoint( i_tmp, i_energy , 0 );
+		fConfidenceInterval->SetPoint( i_tmp, i_energy, 0 );
 		i_tmp++;
 		i_energy += 0.001;
 	}

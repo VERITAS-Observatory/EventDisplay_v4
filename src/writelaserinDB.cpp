@@ -97,7 +97,7 @@ void write_calib_DB( TString new_laser_run_list_name );
 //-- Active function
 //------------------------------- used in get_new_laser_run_list():
 unsigned long Check_telmissing_from_VOFFDB_for_one_run( unsigned int VERITAS_DB_LaserRunNumber_i_run, unsigned int VERITAS_DB_LaserConfigMask_i_run, unsigned int VERITAS_DB_LaserExclTel_i_run, vector < unsigned int > VOFFLINE_DB_LaserRunNumber_Tel );
-void check_run_calib( vector< int >  ListTel , vector< int >& list_of_valid_tel );
+void check_run_calib( vector< int >  ListTel, vector< int >& list_of_valid_tel );
 bool test_gain_toff( TString file_root_name_gain, TString file_root_name_toff );
 bool construct_VOFFLINE_calibration_writing_file( FILE*& wDB_file );
 //-------------------------------------------------------------------
@@ -1118,7 +1118,7 @@ bool read_calib_file( TString file_root_name, vector < double >& Vchannel, vecto
 // for one run, on a list of good telescope ListTel (mask and not excluded), check the gain and toff root file
 // create the list of telescope with correct calib output
 //---------------------------------------------------------------------------
-void check_run_calib( vector< int >  ListTel , vector< int >& list_of_valid_tel )
+void check_run_calib( vector< int >  ListTel, vector< int >& list_of_valid_tel )
 {
 
 	// write introduction for the run
