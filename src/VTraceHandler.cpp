@@ -740,7 +740,8 @@ double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart
 	
 	if( n == 0 )
 	{
-		fTraceAverageTime = muxBINS[1];
+	 	// fTraceAverageTime = muxBINS[1];
+        fTraceAverageTime = 0.;
 		return 0.;
 	}
 	

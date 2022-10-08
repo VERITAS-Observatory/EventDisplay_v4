@@ -5,13 +5,10 @@
   \bug nextEvent with selection: bad expression in selection -> this event is skipped
   \bug reading of gain filename, seg fault if directory = calibration/gain
 
+
 */
 
-//     fCanvasCharge->Connect( "ProcessedEvent(Int_t , Int_t , Int_t , TObject* )", "LCamera", this, "Print( Int_t, Int_t, Int_t, TObject* )" );
-
 #include "VDisplay.h"
-
-// ClassImp(VDisplay);
 
 VDisplay::VDisplay() : TGMainFrame( 0, 0, 0 )
 {
@@ -66,12 +63,6 @@ VDisplay::VDisplay( const TGWindow* p, unsigned int h, unsigned int w, VEventLoo
 	fMoviePictNumber = 0;
 	fAutoRunStatus = false;
 	
-	// fit tracehandler for fit button
-	if( fEventLoop->getRunParameter()->ftracefit < 0. )
-	{
-		fFitTraceHandler = new VFitTraceHandler( fEventLoop->getRunParameter()->ftracefitfunction );
-	}
-	
 	fCanvasesNx = 1;
 	fCanvasesNy = 1;
 	fBWNum = 50;
@@ -111,9 +102,10 @@ VDisplay::VDisplay( const TGWindow* p, unsigned int h, unsigned int w, VEventLoo
 	fCanvasCamera->SetEditable( false );
 	
 	char i_wname[300];
-	sprintf( i_wname, "%s event analysis and display %s",
+    sprintf( i_wname, "%s event analysis and display %s (%s)",
 			 fEventLoop->getRunParameter()->getObservatory().c_str(),
-			 fEventLoop->getEventDisplayVersion().c_str() );
+             fEventLoop->getEventDisplayVersion().c_str(),
+             fEventLoop->getRunParameter()->fRunTitle.c_str() );
 	SetWindowName( i_wname );
 	MapSubwindows();
 	Layout();
@@ -181,6 +173,7 @@ void VDisplay::printCanvas( TPad* priCanvas )
 
 	const Char_t* filetypes[] =
 	{
+        "PDF files",    "*.pdf",
 		"EPS files",    "*.eps",
 		"PS files",    "*.ps",
 		"GIF files",    "*.gif",
@@ -654,8 +647,12 @@ void VDisplay::searchChannel( int i_channel )
 
 
 /*!
+ *
+ * fill a histogram with the FADCS trace for the given channel
+
    \param i_channel channel number
    \param i_his pointer to FADC histogram
+
 */
 TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 {
@@ -875,49 +872,6 @@ void VDisplay::drawFADC( bool iFit )
 				fHisFADC->SetLineColor( 9 );
 			}
 			
-			///////////////////////////////////////////////////////////
-			// TRACE FITTING
-			// fill fit values into histogram
-			if( ( fEventLoop->getRunParameter()->ftracefit > -1. && fEventLoop->getFitTraceHandler() != 0 ) || iFit )
-			{
-				unsigned int chanID = fSelectedChan - 200000;
-				if( fEventLoop->getRunParameter()->ftracefit > -1. && fEventLoop->getFitTraceHandler() != 0 )
-				{
-					fFitTraceHandler = fEventLoop->getFitTraceHandler();
-				}
-				fFitTraceHandler->setMinuitPrint( true );
-				pair< bool, uint32_t > i_hitIndexPair = fEventLoop->getReader()->getChannelHitIndex( chanID );
-				fEventLoop->getReader()->selectHitChan( i_hitIndexPair.second );
-				if( fEventLoop->getReader()->has16Bit() )
-				{
-					fFitTraceHandler->setTrace( fEventLoop->getReader()->getSamplesVec16Bit(),
-												fEventLoop->getPeds( fEventLoop->getHiLo()[chanID] )[chanID],
-												fEventLoop->getPedrms( fEventLoop->getHiLo()[chanID] )[chanID],
-												chanID,
-												fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier_Trace() );
-				}
-				else
-				{
-					fFitTraceHandler->setTrace( fEventLoop->getReader()->getSamplesVec(),
-												fEventLoop->getPeds( fEventLoop->getHiLo()[chanID] )[chanID],
-												fEventLoop->getPedrms( fEventLoop->getHiLo()[chanID] )[chanID],
-												chanID,
-												fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier_Trace() );
-				}
-				fFitTraceHandler->setMinuitPrint( false );
-				if( fFitTraceHandler->getFitted() )
-				{
-					iTraceFits = ( TH1D* )fFitTraceHandler->getFitHis()->Clone();
-					cout << "\t Pulse width (samples): " << fFitTraceHandler->getTraceWidth( 0, 0, fEventLoop->getPeds( fEventLoop->getHiLo()[chanID] )[chanID] ) << endl;
-					cout << "\t Risetime (samples): " << fFitTraceHandler->getTraceRiseTime( fEventLoop->getPeds( fEventLoop->getHiLo()[chanID] )[chanID], 0.1, 0.9 ) << endl;
-					cout << "\t Falltime (samples): " << fFitTraceHandler->getTraceFallTime( fEventLoop->getPeds( fEventLoop->getHiLo()[chanID] )[chanID], 0.9, 0.1 ) << endl;
-					cout << "\t Pulse max (dc): " << fFitTraceHandler->getTraceMax() << endl;
-				}
-				else
-				{
-					iTraceFits = 0;
-				}
-			}
 			fF1Ped->SetParameter( 0, -1.* fEventLoop->getAnalyzer()->getPeds( fEventLoop->getHiLo()[fSelectedChan - 200000] )[fSelectedChan - 200000] );
 		}
 		///////////////////////////////////////////////////////////
@@ -1015,7 +969,7 @@ void VDisplay::drawFADC( bool iFit )
 	// plot sum signal (sum of all image pixels), click beside camera for that
 	else if( !( fSelectedChan >= 200000 ) )
 	{
-		sprintf( histitle, "sum signal (Telescope %d)", fTelescope + 1 );
+		sprintf( histitle, "average signal (Telescope %d)", fTelescope + 1 );
 		int i_image = 0;
 		for( unsigned int i = 0; i < fEventLoop->getAnalyzer()->getImage().size(); i++ )
 		{
@@ -1076,7 +1030,7 @@ void VDisplay::drawFADC( bool iFit )
 			fGraphFADC->Draw( "f" );
 			fGraphFADC_2->Draw( "f" );
 		}
-		// Draw the line to indicate TZero
+		// draw a line to indicate TZero
 		if( fEventLoop->getAnalyzer()->getRawTZeros()[fSelectedChan - 200000] > 0. )
 		{
 			fLineFADC->SetX1( fEventLoop->getAnalyzer()->getRawTZeros()[fSelectedChan - 200000] );
@@ -1386,14 +1340,16 @@ void VDisplay::setFADCText()
 		int iFADCchannel = fEventLoop->getDBPixelDataReader()->getFADC_channel( fTelescope, fSelectedChan - 200000 );
 		iFADCtext.Form( ", FADC %d/%d", iFADCmodule, iFADCchannel );
 	}
-	
-	sprintf( cTemp, "telescope %d channel %d%s (NN %d: ", fTelescope + 1, fSelectedChan - 200000, iFADCtext.Data(), fEventLoop->getDetectorGeometry()->getNNeighbours()[iChannel] );
+    ostringstream iSTRText;
+    iSTRText << "telescope " << fTelescope + 1;
+    iSTRText << " channel " << fSelectedChan - 200000 << iFADCtext.Data();
+    iSTRText << " (NN " << fEventLoop->getDetectorGeometry()->getNNeighbours()[iChannel] << ": ";
 	for( unsigned int n = 0; n < fEventLoop->getDetectorGeometry()->getNNeighbours()[iChannel]; n++ )
 	{
-		sprintf( cTemp, "%s %d", cTemp, fEventLoop->getDetectorGeometry()->getNeighbours()[iChannel][n] );
+        iSTRText << " " << fEventLoop->getDetectorGeometry()->getNeighbours()[iChannel][n];
 	}
-	sprintf( cTemp, "%s)", cTemp );
-	fTextFADC.push_back( new TText( xL, yT, cTemp ) );
+    iSTRText << ")";
+    fTextFADC.push_back( new TText( xL, yT, iSTRText.str().c_str() ) );
 	// L1/HV/currents (if available)
 	if( fEventLoop->getDBPixelDataReader() && fEventLoop->getDBPixelDataReader()->getDBStatus() )
 	{
@@ -1445,7 +1401,7 @@ void VDisplay::setFADCText()
 		sprintf( cTemp, "ped var %.2f (low gain: %.2f), DP1 window %d, LG mult %.2f",
 				 fEventLoop->getAnalyzer()->getPedvars( false, iSW )[iChannel],
 				 fEventLoop->getAnalyzer()->getPedvars( true, iSW )[iChannel],
-				 iSW  ,
+				 iSW,
 				 fEventLoop->getLowGainMultiplier_Sum( fEventLoop->getRunParameter()->fsumwindow_pass1[ fEventLoop->getAnalyzer()->getTelID() ] , iSW ) );
 	}
 	else if( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] == 0 )
@@ -1453,7 +1409,6 @@ void VDisplay::setFADCText()
 		sprintf( cTemp, "no pedestal variance for 0 summation window" );
 	}
 	fTextFADC.push_back( new TText( xL, yT, cTemp ) );
-	// gain
 	// gain
 	sprintf( cTemp, "gain %.2f (low gain channel: %.2f)", fEventLoop->getAnalyzer()->getGains()[iChannel], fEventLoop->getAnalyzer()->getGains( true )[iChannel] );
 	fTextFADC.push_back( new TText( xL, yT, cTemp ) );
@@ -1494,12 +1449,16 @@ void VDisplay::setFADCText()
 			 fEventLoop->getAnalyzer()->getFADCStopOffsets()[iChannel] );
 	fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 	// pulse timing
-	sprintf( cTemp, "pulse timing (raw): " );
+    ostringstream iSTRTextTemp;
+    iSTRTextTemp << "pulse timing (raw): ";
 	for( unsigned int p = 0; p < fEventLoop->getRunParameter()->fpulsetiminglevels.size(); p++ )
 	{
-		sprintf( cTemp, "%s %d%% : %.1f ", cTemp, ( int )( fEventLoop->getRunParameter()->fpulsetiminglevels[p] * 100. ), fEventLoop->getPulseTiming( false )[p][iChannel] );
+	    iSTRTextTemp << ( int )( fEventLoop->getRunParameter()->fpulsetiminglevels[p] * 100. );
+        iSTRTextTemp << " : ";
+        iSTRTextTemp << setprecision( 2 ) << fEventLoop->getPulseTiming( false )[p][iChannel];
+        iSTRTextTemp << "  ";
 	}
-	fTextFADC.push_back( new TText( xL, yT, cTemp ) );
+    fTextFADC.push_back( new TText( xL, yT, iSTRTextTemp.str().c_str() ) );
 	// sum / pedvar
 	double i_var = 0.;
 	if( fEventLoop->getRunParameter()->fsourcetype != 6 &&
@@ -1882,6 +1841,10 @@ void VDisplay::drawPixelHistos()
 }
 
 
+/*
+     draw a histogram with the timing for each pixel
+
+*/
 bool VDisplay::drawImageBorderTZero()
 {
 	fEventLoop->getData()->setTelID( fTelescope );
@@ -2839,8 +2802,6 @@ void VDisplay::subprocessButton( Long_t parm1 )
 				fEventLoop->setCutNTrigger( ( int )fNEntryOTri->GetNumber() );
 				fEventLoop->setCutNArrayTrigger( ( int )fNEntryOATri->GetNumber() );
 				fEventLoop->setCutNArrayImages( ( int )fNEntryOAIma->GetNumber() );
-				// (GM)               fEventLoop->getAnalyzer()->setSumFirst( (int)fNEntryOSum->GetNumber() );
-				// (GM)                fEventLoop->getAnalyzer()->setSumWindow( (int)fNEntryOWin->GetNumber() );
 				fEventLoop->getAnalyzer()->setImageThresh( fNEntryOIma->GetNumber() );
 				fEventLoop->getAnalyzer()->setBorderThresh( fNEntryOBor->GetNumber() );
 			}
@@ -3283,6 +3244,10 @@ void VDisplay::dumpDeadChannels()
 	}
 }
 
+/*
+ * dump all image/border channels to the screen
+ *
+ */
 void VDisplay::dumpImageBorderPixels()
 {
 	if( fDebug )

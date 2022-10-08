@@ -46,7 +46,6 @@
 #include <VCamera.h>
 #include <VDisplayBirdsEye.h>
 #include <VEventLoop.h>
-#include <VFitTraceHandler.h>
 
 #include <bitset>
 #include <iostream>
@@ -242,8 +241,6 @@ class VDisplay : public TGMainFrame
 		bool fAutoRunStatus;                      //!< true = autorunmodus is on
 		unsigned int fTimingSleep;                //!< pause between each event in autorunmodus (microseconds)
 		bool fCameraTiming;                       //!< last tab was timing tab (read again data)
-		
-		VFitTraceHandler* fFitTraceHandler;       //!< trace handler for trace fitting
 		
 		void     bookHistos();                    //!< book histograms
 		//!< not all plots make sense
