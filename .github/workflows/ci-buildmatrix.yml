@@ -3,8 +3,6 @@ name: buildmatrix
 
 # Controls when the workflow will run
 on:
-  push:
-    branches: [main, master, v490-dev-v0.7]
   pull_request:
     branches: [main, master, v490-dev-v0.7]
   # run this workflow manually from the Actions tab
@@ -32,8 +30,8 @@ jobs:
         run: |
           wget --no-verbose https://syncandshare.desy.de/index.php/s/${{ secrets.VBFcpp17 }}/download
           mv download VBF.tar.gz
-          tar -xzf VBF.tar.gz
-          ./configure --prefix=$(echo $GITHUB_WORKSPACE)/VBF
+          tar -xzf VBF.tar.gz -C VBF --strip-components=1
+          cd VBF && ./configure --prefix=$(echo $GITHUB_WORKSPACE)/VBF 
           make
           make install
 
