@@ -168,7 +168,11 @@ bool VGlobalRunParameter::setDirectories()
 {
 	//////////////////////////////////////////////////////////////////////
 	// get directories with all analysis data
-	string data_dir = gSystem->Getenv( "VERITAS_EVNDISP_AUX_DIR" );
+	string data_dir;
+	if( gSystem->Getenv( "VERITAS_EVNDISP_AUX_DIR" ) )
+	{
+		data_dir = gSystem->Getenv( "VERITAS_EVNDISP_AUX_DIR" );
+	}
 	if( data_dir.size() != 0 )
 	{
 		fEVNDISPAnaDataDirectory = data_dir;
