@@ -32,7 +32,7 @@ void calib_combine_lowgainpedestalfiles( TString file = "", TString calibdir = "
 		TString name = run1;
 		name.Append( run2( 3, 4 ).Data() );
 		cout << name << endl;
-		a.combineLowGainPedestalFileForAllTelescopes( ntel , calibdir.Data(), run1.Data() , run2.Data() , name.Data() ) ;
+		a.combineLowGainPedestalFileForAllTelescopes( ntel, calibdir.Data(), run1.Data(), run2.Data(), name.Data() ) ;
 	}
 }
 

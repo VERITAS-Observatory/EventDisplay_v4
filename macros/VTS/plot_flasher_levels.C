@@ -20,7 +20,7 @@ void plot_flasher_levels( int run, TString calibdir, TString outdir )
 	{
 		c->cd( iTel + 1 );
 		TString filename = TString::Format( "%s/Tel_%d/%d.gain.root", calibdir.Data(), iTel + 1, run );
-		TFile* file = new TFile( filename.Data() , "read" );
+		TFile* file = new TFile( filename.Data(), "read" );
 		if( !file )
 		{
 			continue;
