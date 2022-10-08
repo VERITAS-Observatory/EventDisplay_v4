@@ -152,7 +152,8 @@ CXXFLAGS     += -I$(shell root-config --incdir) -I$(shell root-config --incdir)/
 ########################################################
 ROOTGLIBS     = $(shell root-config --glibs)
 GLIBS         = $(ROOTGLIBS)
-GLIBS        += -lMLP -lTreePlayer -lTMVA -lMinuit -lXMLIO -lSpectrum
+# GLIBS        += -lMLP -lTreePlayer -lTMVA -lMinuit -lXMLIO -lSpectrum
+GLIBS        += -lMLP -lTMVA -lMinuit -lXMLIO
 ########################################################
 # VBF
 ########################################################
