@@ -104,7 +104,7 @@ endif
 ########################################################################################################################
 # compiler and linker general values
 CXX           = g++
-CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
+CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
 CXXFLAGS     += -I. -I./inc/
 CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG) $(ASTRONMETRY)
 LD            = g++
