@@ -30,8 +30,8 @@ jobs:
         run: |
           wget --no-verbose https://syncandshare.desy.de/index.php/s/${{ secrets.VBFcpp17 }}/download
           mv download VBF.tar.gz
-          tar -xzf VBF.tar.gz -C VBF --strip-components=1
-          cd VBF && ./configure --prefix=$(echo $GITHUB_WORKSPACE)/VBF 
+          mkdir VBF && tar -xzf VBF.tar.gz -C VBF --strip-components=1
+          cd VBF && ./configure --prefix=$(echo $GITHUB_WORKSPACE)/VBF
           make
           make install
 
