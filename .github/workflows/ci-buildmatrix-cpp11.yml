@@ -43,5 +43,5 @@ jobs:
           export VBFSYS=$(echo $GITHUB_WORKSPACE)/VBF
           export LD_LIBRARY_PATH="${EVNDISPSYS}/obj:${EVNDISPSYS}/lib:${LD_LIBRARY_PATH}"
           export LD_LIBRARY_PATH="${VBFSYS}/lib:${LD_LIBRARY_PATH}"
-          export SOFASYS=${EVNDISPSYS}/sofa
+          export SOFASYS=/sofa
           make VTS
