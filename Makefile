@@ -95,6 +95,10 @@ endif
 # TSpectrum
 # (not available in newer root version)
 TSPECTRUMFLAG=-DNOSPECTRUM
+TSPECTRUMTEST=$(shell if [ -f `root-config --libdir`/libSpectrum.so ]; then echo "TRUE"; else echo "FALSE"; fi)
+ifeq ($(TSPECTRUMTEST),TRUE)
+  TSPECTRUMFLAG=""
+endif
 
 #####################
 # ASTRONMETRY ROUTINES
@@ -1592,6 +1596,11 @@ ifeq ($(ASTRONMETRY),-DASTROSOFA)
 	@echo "Astronometry with SOFALIB $(SOFASYS)"
 else
 	@echo "Astronometry with SLALIB"
+endif
+ifeq ($(TSPECTRUMFLAG),-DNOSPECTRUM)
+	@echo "TSpectrum not available; affects ability to run low-gain calibration"
+else
+	@echo "TSpectrum available for low-gain calibration"
 endif
 
 	@echo ""
