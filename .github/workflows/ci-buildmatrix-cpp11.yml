@@ -31,8 +31,12 @@ jobs:
           make
           make install
 
-      # Runs a set of commands using the runners shell
-      - name: build
+      - name: sofa
+        run: |
+          curl https://syncandshare.desy.de/index.php/s/${{ secrets.SOFA }}/download > sofa/sofa.tar.gz
+          ./install_sofa.sh
+
+      - name: eventdisplay
         run: |
           root-config --version
           export EVNDISPSYS=$(echo $GITHUB_WORKSPACE)
@@ -40,5 +44,4 @@ jobs:
           export LD_LIBRARY_PATH="${EVNDISPSYS}/obj:${EVNDISPSYS}/lib:${LD_LIBRARY_PATH}"
           export LD_LIBRARY_PATH="${VBFSYS}/lib:${LD_LIBRARY_PATH}"
           export SOFASYS=${EVNDISPSYS}/sofa
-          ./install_sofa.sh CI
           make VTS
