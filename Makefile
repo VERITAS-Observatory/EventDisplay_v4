@@ -94,10 +94,9 @@ endif
 #####################
 # TSpectrum
 # (not available in newer root version)
-TSPECTRUMFLAG=-DNOSPECTRUM
 TSPECTRUMTEST=$(shell if [ -f `root-config --libdir`/libSpectrum.so ]; then echo "TRUE"; else echo "FALSE"; fi)
-ifeq ($(TSPECTRUMTEST),TRUE)
-  TSPECTRUMFLAG=""
+ifeq ($(TSPECTRUMTEST),FALSE)
+  TSPECTRUMFLAG=-DNOSPECTRUM
 endif
 
 #####################
