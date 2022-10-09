@@ -91,6 +91,10 @@ endif
 ifeq ($(strip $(FITSSYS)),)
 FITS = FALSE
 endif
+#####################
+# TSpectrum
+# (not available in newer root version)
+TSPECTRUMFLAG=-DNOSPECTRUM
 
 #####################
 # ASTRONMETRY ROUTINES
@@ -106,7 +110,7 @@ endif
 CXX           = g++
 CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
 CXXFLAGS     += -I. -I./inc/
-CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG) $(ASTRONMETRY)
+CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG) $(ASTRONMETRY) $(TSPECTRUMFLAG)
 LD            = g++
 OutPutOpt     = -o
 INCLUDEFLAGS  = -I. -I./inc/
@@ -153,7 +157,11 @@ CXXFLAGS     += -I$(shell root-config --incdir) -I$(shell root-config --incdir)/
 ROOTGLIBS     = $(shell root-config --glibs)
 GLIBS         = $(ROOTGLIBS)
 # GLIBS        += -lMLP -lTreePlayer -lTMVA -lMinuit -lXMLIO -lSpectrum
+ifeq ($(TSPECTRUMFLAG),-DNOSPECTRUM)
 GLIBS        += -lMLP -lTMVA -lMinuit -lXMLIO
+else
+GLIBS        += -lMLP -lTMVA -lMinuit -lXMLIO -lSpectrum
+endif
 ########################################################
 # VBF
 ########################################################
@@ -671,10 +679,13 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VPlotTMVAParameters.o ./obj/VPlotTMVAParameters_Dict.o \
 		./obj/VWPPhysSensitivityPlotsMaker.o ./obj/VWPPhysSensitivityPlotsMaker_Dict.o \
 		./obj/VPedestalLowGain.o ./obj/VPedestalLowGain_Dict.o \
-		./obj/VLowGainCalibrator.o ./obj/VLowGainCalibrator_Dict.o \
 		./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
 		./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 		./obj/VPlotOptimalCut.o ./obj/VPlotOptimalCut_Dict.o
+
+ifneq ($(TSPECTRUMFLAG),-DNOSPECTRUM)
+  SHAREDOBJS +=./obj/VLowGainCalibrator.o ./obj/VLowGainCalibrator_Dict.o
+endif
 
 ifeq ($(ASTRONMETRY),-DASTROSLALIB)
   SHAREDOBJS += ./obj/VASlalib.o ./obj/VASlalib_Dict.o 
@@ -690,7 +701,7 @@ endif
 
 slib lsib ./lib/libVAnaSum.so:   $(SHAREDOBJS)
 	mkdir -p ./lib
-	$(LD) $(SOFLAGS) $(SHAREDOBJS) $(GLIBS) $(OutPutOpt) ./lib/libVAnaSum.so
+	$(LD) $(SOFLAGS) $(SHAREDOBJS) $(TSPECTRUMFLAG) $(GLIBS) $(OutPutOpt) ./lib/libVAnaSum.so
 	@echo "COPYING pcm FILES TO lib"
 	cp -f ./obj/*.pcm ./lib/
 	cp -f ./obj/*.pcm ./bin/
@@ -1434,7 +1445,7 @@ endif
 ./obj/%_Dict.o:	./inc/%.h ./inc/%LinkDef.h
 	@echo "Generating dictionary $@.."
 	@echo ${ROOT_CntCln} -f $(basename $@).cpp  $?
-	${ROOT_CntCln} -f $(basename $@).cpp  $?
+	${ROOT_CntCln} $(TSPECTRUMFLAG) -f $(basename $@).cpp  $?
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 	cp -f -v $(basename $@)_rdict.pcm bin/
 	cp -f -v $(basename $@)_rdict.pcm lib/
