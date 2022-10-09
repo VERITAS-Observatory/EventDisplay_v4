@@ -495,6 +495,7 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
 	if( fEnergySpectrumfromLiterature == 0 )
 	{
 		char hname[800];
+		char hname2[800];
 		unsigned int i_CrabSpectrum_ID = 1;              // NOTE: hardwired to 1!
 		
 		// Whipple Crab spectrum (1989)
@@ -518,17 +519,17 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
 		}
 		if( bUnit == "PFLUX" )
 		{
-			sprintf( hname, "%s", hname );
+			sprintf( hname2, "%s", hname );
 		}
 		else if( bUnit == "ENERGY" )
 		{
-			sprintf( hname, "%s * 1.e12 * x * x * %e", hname, fConstant_Flux_To_Ergs );
+			sprintf( hname2, "%s * 1.e12 * x * x * %e", hname, fConstant_Flux_To_Ergs );
 		}
 		else
 		{
-			sprintf( hname, "%f", 1. );
+			sprintf( hname2, "%f", 1. );
 		}
-		i_fFunCrabFlux = new TF1( "i_fFunCrabFlux", hname, TMath::Power( 10., fEnergy_min_Log ), 10000. );
+		i_fFunCrabFlux = new TF1( "i_fFunCrabFlux", hname2, TMath::Power( 10., fEnergy_min_Log ), 10000. );
 	}
 	// use spectrum from text file
 	else
