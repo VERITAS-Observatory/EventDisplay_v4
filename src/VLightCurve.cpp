@@ -329,7 +329,8 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 		double i_xmin = fPlottingMJDMin;
 		double i_xmax = fPlottingMJDMax;
 		sprintf( hname, "MJD" );
-		sprintf( htitle, "hLightCurve" );
+		stringstream i_title;
+		i_title << "hLightCurve";
 		if( fPhase_Period_days > 0. )
 		{
 			if( fPhasePlotting )
@@ -344,10 +345,10 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 				i_xmax = fPhase_Period_days;
 				sprintf( hname, "phase folded days" );
 			}
-			sprintf( htitle, "%s_%d_%d_%d", htitle, ( int )fPhase_MJD0, ( int )fPhase_Period_days, ( int )fPhasePlotting );
+			i_title << "_" << ( int )fPhase_MJD0 << "_" << ( int )fPhase_Period_days << "_" << ( int )fPhasePlotting;
 		}
 		
-		hLightCurve = new TH1D( htitle, "", 100, i_xmin, i_xmax );
+		hLightCurve = new TH1D( i_title.str().c_str(), "", 100, i_xmin, i_xmax );
 		hLightCurve->SetStats( 0 );
 		hLightCurve->SetXTitle( hname );
 		hLightCurve->GetXaxis()->CenterTitle( true );
@@ -368,19 +369,20 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 	{
 		fCanvasLightCurve = iCanvasLightCurve;
 		fCanvasLightCurve->cd();
-		sprintf( htitle, "hLightCurve" );
+		stringstream i_title;
+		i_title << "hLightCurve";
 		if( fPhase_Period_days > 0. )
 		{
-			sprintf( htitle, "%s_%d_%d_%d", htitle, ( int )fPhase_MJD0, ( int )fPhase_Period_days, ( int )fPhasePlotting );
+			i_title << "_" << ( int )fPhase_MJD0 << "_" << ( int )fPhase_Period_days << "_" << ( int )fPhasePlotting;
 		}
-		hLightCurve = ( TH1D* )fCanvasLightCurve->GetListOfPrimitives()->FindObject( htitle );
+		hLightCurve = ( TH1D* )fCanvasLightCurve->GetListOfPrimitives()->FindObject( i_title.str().c_str() );
 		if( !hLightCurve )
 		{
 			hLightCurve = ( TH1D* )fCanvasLightCurve->GetListOfPrimitives()->FindObject( "hLightCurve" );
 		}
 		if( !hLightCurve )
 		{
-			cout << "VLightCurve::plot: no light curve histogram found with name " << htitle << endl;
+			cout << "VLightCurve::plot: no light curve histogram found with name " << i_title.str() << endl;
 			return fCanvasLightCurve;
 		}
 	}
