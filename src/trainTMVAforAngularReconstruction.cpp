@@ -160,19 +160,19 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	TMVA::DataLoader* dataloader = new TMVA::DataLoader( "" );
 	
 	// list of variables used by MVA method
-	dataloader->AddVariable( "width" , 'F' );
+	dataloader->AddVariable( "width", 'F' );
 	dataloader->AddVariable( "length", 'F' );
 	dataloader->AddVariable( "wol",    'F' );
-	dataloader->AddVariable( "size"  , 'F' );
+	dataloader->AddVariable( "size", 'F' );
 	dataloader->AddVariable( "ntubes", 'F' );
 	dataloader->AddVariable( "tgrad_x*tgrad_x", 'F' );
 	if( !iSingleTelescopeAnalysis )
 	{
-		dataloader->AddVariable( "cross" , 'F' );
+		dataloader->AddVariable( "cross", 'F' );
 	}
-	dataloader->AddVariable( "asym"  , 'F' );
-	dataloader->AddVariable( "loss"  , 'F' );
-	dataloader->AddVariable( "dist"  , 'F' );
+	dataloader->AddVariable( "asym", 'F' );
+	dataloader->AddVariable( "loss", 'F' );
+	dataloader->AddVariable( "dist", 'F' );
 	if( iTargetML.find( "DispEnergy" ) != string::npos && !iSingleTelescopeAnalysis )
 	{
 		dataloader->AddVariable( "EHeight", 'F' );
@@ -203,7 +203,7 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	{
 		dataloader->AddSpectator( "disp", 'F' );
 		dataloader->AddSpectator( "dispError", 'F' );
-		dataloader->AddTarget( "dispPhi"  , 'F' );
+		dataloader->AddTarget( "dispPhi", 'F' );
 	}
 	// train for error on disp reconstruction
 	else if( iTargetML.find( "DispError" ) != string::npos )
@@ -215,14 +215,14 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	// train for core reconstruction
 	else if( iTargetML.find( "DispCore" ) != string::npos )
 	{
-		dataloader->AddTarget( "dispCore"  , 'F', "m", 0., 1.e5 );
+		dataloader->AddTarget( "dispCore", 'F', "m", 0., 1.e5 );
 	}
 	// train for direction reconstruction
 	else
 	{
 		dataloader->AddSpectator( "dispError", 'F' );
 		dataloader->AddSpectator( "dispPhi", 'F' );
-		dataloader->AddTarget( "disp"  , 'F' );
+		dataloader->AddTarget( "disp", 'F' );
 	}
 	// add weights (optional)
 	//    dataloader->SetWeightExpression( "MCe0*MCe0", "Regression" );
@@ -564,50 +564,50 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			iTreeTitle << "training tree for modified disp method (telescope type " << i_tel.TelType << ")";
 			fMapOfTrainingTree[i_tel.TelType] = new TTree( iTreeName.str().c_str(), iTreeTitle.str().c_str() );
 			
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "runNumber"  , &runNumber  , "runNumber/I" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "runNumber", &runNumber, "runNumber/I" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "eventNumber", &eventNumber, "eventNumber/I" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "tel",         &tel        , "tel/i" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "cen_x"      , &cen_x      , "cen_x/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "cen_y"      , &cen_y      , "cen_y/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "sinphi"     , &sinphi     , "sinphi/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "cosphi"     , &cosphi     , "cosphi/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "size"       , &size       , "size/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "ntubes"     , &ntubes     , "ntubes/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "loss"       , &loss       , "loss/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "asym"       , &asym       , "asym/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "width"      , &width      , "width/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "length"     , &length     , "length/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "wol"        , &wol        , "wol/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "dist"       , &dist       , "dist/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "tgrad_x"    , &tgrad_x    , "tgrad_x/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "meanPedvar_Image"         , &meanPedvar_Image, "meanPedvar_Image/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "Fitstat"    , &Fitstat    , "Fitstat/I" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCe0"       , &MCe0       , "MCe0/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCxoff"     , &MCxoff     , "MCxoff/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCyoff"     , &MCyoff     , "MCyoff/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCxcore"    , &MCxcore    , "MCxcore/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCycore"    , &MCycore    , "MCycore/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCrcore"    , &MCrcore    , "MCrcore/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "Xcore"      , &Xcore      , "Xcore/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "Ycore"      , &Ycore      , "Ycore/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "Rcore"      , &Rcore      , "Rcore/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "Xoff"       , &Xoff       , "Xoff/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "Yoff"       , &Yoff       , "Yoff/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "LTrig"      , &LTrig      , "LTrig/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "NImages"    , &NImages    , "NImages/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "EHeight"    , &EmissionHeight, "EHeight/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "tel",         &tel, "tel/i" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "cen_x", &cen_x, "cen_x/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "cen_y", &cen_y, "cen_y/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "sinphi", &sinphi, "sinphi/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "cosphi", &cosphi, "cosphi/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "size", &size, "size/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "ntubes", &ntubes, "ntubes/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "loss", &loss, "loss/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "asym", &asym, "asym/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "width", &width, "width/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "length", &length, "length/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "wol", &wol, "wol/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "dist", &dist, "dist/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "tgrad_x", &tgrad_x, "tgrad_x/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "meanPedvar_Image", &meanPedvar_Image, "meanPedvar_Image/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "Fitstat", &Fitstat, "Fitstat/I" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCe0", &MCe0, "MCe0/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCxoff", &MCxoff, "MCxoff/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCyoff", &MCyoff, "MCyoff/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCxcore", &MCxcore, "MCxcore/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCycore", &MCycore, "MCycore/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCrcore", &MCrcore, "MCrcore/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "Xcore", &Xcore, "Xcore/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "Ycore", &Ycore, "Ycore/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "Rcore", &Rcore, "Rcore/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "Xoff", &Xoff, "Xoff/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "Yoff", &Yoff, "Yoff/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "LTrig", &LTrig, "LTrig/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "NImages", &NImages, "NImages/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "EHeight", &EmissionHeight, "EHeight/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "TelElevation", &TelElevation, "TelElevation/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "TelAzimuth", &TelAzimuth, "TelAzimuth/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCaz"       , &MCaz       , "MCaz/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCze"       , &MCze       , "MCze/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "Ze"         , &ze         , "Ze/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "Az"         , &az         , "Az/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "disp"       , &disp       , "disp/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispError"  , &dispError  , "dispError/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "cross"      , &cross      , "cross/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispPhi"    , &dispPhi    , "dispPhi/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispEnergy" , &dispEnergy , "dispEnergy/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispCore"   , &dispCore   , "dispCore/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCaz", &MCaz, "MCaz/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCze", &MCze, "MCze/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "Ze", &ze, "Ze/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "Az", &az, "Az/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "disp", &disp, "disp/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispError", &dispError, "dispError/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "cross", &cross, "cross/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispPhi", &dispPhi, "dispPhi/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispEnergy", &dispEnergy, "dispEnergy/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispCore", &dispCore, "dispCore/F" );
 			
 		}
 	}

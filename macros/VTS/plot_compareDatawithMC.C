@@ -1639,7 +1639,7 @@ void single_telescope( int telid = 1, char* ifile = "stereo_compare.root", strin
 			hc->SetLogy( f_logy[j] );
 			hc->cd();
 		}
-		iL = new TLegend( 0.58 , 0.68, 0.85, 0.85 );
+		iL = new TLegend( 0.58, 0.68, 0.85, 0.85 );
 		
 		setHistogramAtt( hsims, 2, 0.5, 1, 20, 1 );
 		if( bPoster )

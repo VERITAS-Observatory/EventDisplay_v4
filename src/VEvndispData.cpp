@@ -523,7 +523,7 @@ void VEvndispData::printDeadChannels( bool iLowGain, bool iGrepAble )
 			}
 			else //set dead by eventdisplay
 			{
-				extrainfo.Form( "(pedestal %5.1f, pedvar %5.1f, rel. gain %3.2f, gainvar %3.2f, L1 rate %.2e Hz, HV %4d V, I %4.1f muA)", getPeds( iLowGain )[i] , getPedvars( ( bool )iLowGain, getSumWindow() )[ i ], getGains( iLowGain )[i] , getGainvars( iLowGain )[i] , getL1Rate( i ), ( int )getHV( i ), getCurrent( i ) );
+				extrainfo.Form( "(pedestal %5.1f, pedvar %5.1f, rel. gain %3.2f, gainvar %3.2f, L1 rate %.2e Hz, HV %4d V, I %4.1f muA)", getPeds( iLowGain )[i], getPedvars( ( bool )iLowGain, getSumWindow() )[ i ], getGains( iLowGain )[i], getGainvars( iLowGain )[i], getL1Rate( i ), ( int )getHV( i ), getCurrent( i ) );
 				
 				cout << linestart << extrainfo ;
 				for( unsigned j = 0; j < i_dead.size(); j++ )

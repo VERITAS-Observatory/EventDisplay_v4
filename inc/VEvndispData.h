@@ -134,7 +134,7 @@ class VEvndispData
 		
 		// set detector geometry
 		unsigned int        checkSummationWindow( unsigned int iTelID, unsigned int iSumWindow );
-		void                setDetectorGeometry( unsigned int iNTel, vector< string > icamera , string idir );
+		void                setDetectorGeometry( unsigned int iNTel, vector< string > icamera, string idir );
 		
 		// names of dead channels
 		static vector< string > fDeadChannelText;
@@ -605,9 +605,9 @@ class VEvndispData
 		{
 			return fCalData[fTelID]->getLowGainMultiplier_Sum( iWindow, jWindow );
 		}
-		double              getLowGainSumCorrection( int iSumWindow, int jSumWindow , bool HiLo = true )
+		double              getLowGainSumCorrection( int iSumWindow, int jSumWindow, bool HiLo = true )
 		{
-			return fCalData[fTelID]->getLowGainSumCorrection( iSumWindow, jSumWindow , HiLo ) ;
+			return fCalData[fTelID]->getLowGainSumCorrection( iSumWindow, jSumWindow, HiLo ) ;
 		}
 		bool                getLowGainPedestals()
 		{

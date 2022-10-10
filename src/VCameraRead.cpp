@@ -1421,7 +1421,7 @@ bool VCameraRead::read_camerarotation_fromDB( string iDBStartTime )
 	char c_query[800];
 	sprintf( c_query, "select telescope_id, version, pmt_rotation from tblPointing_Monitor_Camera_Parameters where start_date <= \"%s\" AND end_date > \"%s\" ", iDBStartTime.substr( 0, 10 ).c_str(), iDBStartTime.substr( 0, 10 ).c_str() );
 	
-	VDB_Connection my_connection( iTempS.str().c_str() , "readonly", "" ) ;
+	VDB_Connection my_connection( iTempS.str().c_str(), "readonly", "" ) ;
 	if( !my_connection.Get_Connection_Status() )
 	{
 		cout << "VCameraRead: failed to connect to database server" << endl;

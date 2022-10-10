@@ -309,7 +309,7 @@ class VEffectiveAreaCalculator
 		void   copyHistograms( TH1*,  TH1*, bool );
 		void   fillAngularResolution( unsigned int i_az, bool iContaintment_80p );
 		double getAzMean( double azmin, double azmax );
-		double getCRWeight( double iEMC_TeV_log10, TH1* h , bool for_back_map = false );
+		double getCRWeight( double iEMC_TeV_log10, TH1* h, bool for_back_map = false );
 		template <typename T> vector< T > get_irf_vector( int i_nbins, T* i_e0, T* i_irf );
 		TH2F*  get_irf2D_vector( int nx, float minx, float maxx, int ny, float miny, float maxy, float* value );
 		bool   getEffectiveAreasFromFitFunction( TTree*, double azmin, double azmax, double ispectralindex );

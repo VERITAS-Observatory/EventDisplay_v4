@@ -366,14 +366,14 @@ bool VEventLoop::initEventLoop( string iFileName )
 		}
 	}
 	// something went wrong, probably wrong filename
-	catch( VFileException ex )
+	catch( VFileException* ex )
 	{
-		cout << ex.what() << endl;
+		cout << ex->what() << endl;
 		//      cout << "data file not found, exiting: " << fRunPar->fsourcefile << endl;
 		// !!! no solution, should be something else
 		if( !fRunPar->fdisplaymode )
 		{
-			exit( -1 );
+			exit( EXIT_FAILURE );
 		}
 		else
 		{
@@ -701,8 +701,8 @@ void VEventLoop::shutdown()
 		{
 			cout << endl;
 			setTelID( getTeltoAna()[i] );
-			printDeadChannels( false , true );
-			printDeadChannels( true , true );
+			printDeadChannels( false, true );
+			printDeadChannels( true, true );
 		}
 	}
 	

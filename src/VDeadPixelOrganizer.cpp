@@ -196,7 +196,7 @@ void VDeadPixelOrganizer::UpdatePixelState( int tel, int pix, bool lowGain, int 
 
 	char buff[200] ;
 	sprintf( buff, "VDeadPixelOrganizer::UpdatePixelState( tel=%d, pix=%3d, gain=%s, mjd=%d, time=%f, state=%d)",
-			 tel, pix, lowGain ? "low" : "high" , mjd, time, state ) ;
+			 tel, pix, lowGain ? "low" : "high", mjd, time, state ) ;
 	/*
 	if ( tel <= tellimit && pix <= pixUlimit && pix >= pixLlimit ) {
 		cout << coutprefix << buff << endl;
@@ -454,17 +454,17 @@ void VDeadPixelOrganizer::organize()
 	}
 	
 	// branches
-	fRegTree->Branch( "runnumber" , &runnum     , "runnumber/I" ) ;
-	fRegTree->Branch( "telid"     , &telid      , "telid/I" ) ;
-	fRegTree->Branch( "pixid"     , &pixid      , "pixid/I" ) ;
-	fRegTree->Branch( "gain"      , &gainChar   , "gainChar/B" ) ;
-	fRegTree->Branch( "pixXcam"   , &pixXcam    , "pixXcam/D" ) ;
-	fRegTree->Branch( "pixYcam"   , &pixYcam    , "pixYcam/D" ) ;
-	fRegTree->Branch( "begTimeMJD", &begtimeMJD , "begTimeMJD/I" ) ;
-	fRegTree->Branch( "begTimeSec", &begtimeSec , "begTimeSec/D" ) ;
-	fRegTree->Branch( "endTimeMJD", &begtimeMJD , "endTimeMJD/I" ) ;
-	fRegTree->Branch( "endTimeSec", &begtimeSec , "endTimeSec/D" ) ;
-	fRegTree->Branch( "state"     , &state      , "state/s" ) ;
+	fRegTree->Branch( "runnumber", &runnum, "runnumber/I" ) ;
+	fRegTree->Branch( "telid", &telid, "telid/I" ) ;
+	fRegTree->Branch( "pixid", &pixid, "pixid/I" ) ;
+	fRegTree->Branch( "gain", &gainChar, "gainChar/B" ) ;
+	fRegTree->Branch( "pixXcam", &pixXcam, "pixXcam/D" ) ;
+	fRegTree->Branch( "pixYcam", &pixYcam, "pixYcam/D" ) ;
+	fRegTree->Branch( "begTimeMJD", &begtimeMJD, "begTimeMJD/I" ) ;
+	fRegTree->Branch( "begTimeSec", &begtimeSec, "begTimeSec/D" ) ;
+	fRegTree->Branch( "endTimeMJD", &begtimeMJD, "endTimeMJD/I" ) ;
+	fRegTree->Branch( "endTimeSec", &begtimeSec, "endTimeSec/D" ) ;
+	fRegTree->Branch( "state", &state, "state/s" ) ;
 	
 	// loop over all telescopes, pixels, and gains
 	VNTelescope* vnt ;

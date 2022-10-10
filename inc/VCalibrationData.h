@@ -345,7 +345,7 @@ class VCalibrationData
 			fLowGainMultiplier_Camera = lmult ;
 			return true;
 		}
-		bool 	setLowGainMultiplier_Sum( int iSumWindow, int jSumWindow , double lmult ) ;
+		bool 	setLowGainMultiplier_Sum( int iSumWindow, int jSumWindow, double lmult ) ;
 		
 		void     setPeds( unsigned int iChannel, double iPed, bool iLowGain = false );
 		void     setReader( VVirtualDataReader* f )

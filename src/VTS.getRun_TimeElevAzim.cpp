@@ -324,7 +324,7 @@ int main( int argc, char* argv[] )
 			if( mode == 1 ) // this is the better way, don't use mode=2
 			{
 				// target's ra and decl in degrees
-				vsky->setTargetJ2000( decl[i_row] * TMath::RadToDeg() , ra[i_row] * TMath::RadToDeg() ) ;
+				vsky->setTargetJ2000( decl[i_row] * TMath::RadToDeg(), ra[i_row] * TMath::RadToDeg() ) ;
 				// day that you're looking for elev and azimuth on
 				vsky->precessTarget( mjdDay[i_row], telescope ) ;
 				// calculate new param

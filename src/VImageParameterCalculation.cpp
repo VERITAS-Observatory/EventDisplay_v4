@@ -320,7 +320,7 @@ void VImageParameterCalculation::muonRingFinder()
 			counter++;
 			xi = getDetectorGeo()->getX()[i];
 			yi = getDetectorGeo()->getY()[i];
-			tmp = sqrt( pow( ( xi - x0[0] ), 2 ) + pow( ( yi - y0[0] ) , 2 ) );
+			tmp = sqrt( pow( ( xi - x0[0] ), 2 ) + pow( ( yi - y0[0] ), 2 ) );
 			rTotal += tmp;
 			rSquaredTotal += tmp * tmp;
 		}
@@ -366,7 +366,7 @@ void VImageParameterCalculation::muonRingFinder()
 			{
 				xi = getDetectorGeo()->getX()[i];
 				yi = getDetectorGeo()->getY()[i];
-				tmp = sqrt( pow( ( xi - x0[1] ), 2 ) + pow( ( yi - y0[1] ) , 2 ) );
+				tmp = sqrt( pow( ( xi - x0[1] ), 2 ) + pow( ( yi - y0[1] ), 2 ) );
 				rTotal += tmp;
 				rSquaredTotal += tmp * tmp;
 			}
@@ -388,7 +388,7 @@ void VImageParameterCalculation::muonRingFinder()
 				{
 					xi = getDetectorGeo()->getX()[i];
 					yi = getDetectorGeo()->getY()[i];
-					tmp = sqrt( pow( ( xi - x0[1] ), 2 ) + pow( ( yi - y0[1] ) , 2 ) );
+					tmp = sqrt( pow( ( xi - x0[1] ), 2 ) + pow( ( yi - y0[1] ), 2 ) );
 					rTotal += tmp;
 					rSquaredTotal += tmp * tmp;
 				}
@@ -428,7 +428,7 @@ void VImageParameterCalculation::muonRingFinder()
 			{
 				xi = getDetectorGeo()->getX()[i];
 				yi = getDetectorGeo()->getY()[i];
-				tmp = sqrt( pow( ( xi - x0[1] ), 2 ) + pow( ( yi - y0[1] ) , 2 ) );
+				tmp = sqrt( pow( ( xi - x0[1] ), 2 ) + pow( ( yi - y0[1] ), 2 ) );
 				rTotal += tmp;
 				rSquaredTotal += tmp * tmp;
 			}
@@ -450,7 +450,7 @@ void VImageParameterCalculation::muonRingFinder()
 				{
 					xi = getDetectorGeo()->getX()[i];
 					yi = getDetectorGeo()->getY()[i];
-					tmp = sqrt( pow( ( xi - x0[1] ), 2 ) + pow( ( yi - y0[1] ) , 2 ) );
+					tmp = sqrt( pow( ( xi - x0[1] ), 2 ) + pow( ( yi - y0[1] ), 2 ) );
 					rTotal += tmp;
 					rSquaredTotal += tmp * tmp;
 				}
@@ -542,7 +542,7 @@ void VImageParameterCalculation::sizeInMuonRing()
 	{
 		xi = getDetectorGeo()->getX()[i];
 		yi = getDetectorGeo()->getY()[i];
-		double rp = sqrt( pow( xi - x0 , 2 ) + pow( yi - y0, 2 ) );
+		double rp = sqrt( pow( xi - x0, 2 ) + pow( yi - y0, 2 ) );
 		
 		if( rp > radius - 0.15 && rp < radius + 0.15 )
 		{
@@ -634,8 +634,8 @@ void VImageParameterCalculation::muonPixelDistribution()
 			totalPixels++;
 			xi = getDetectorGeo()->getX()[i];
 			yi = getDetectorGeo()->getY()[i];
-			rp = sqrt( pow( xi - x0 , 2 ) + pow( yi - y0, 2 ) );
-			phi = 180.0 / TMath::Pi() * atan2( yi - y0 , xi - x0 ) + 180.;
+			rp = sqrt( pow( xi - x0, 2 ) + pow( yi - y0, 2 ) );
+			phi = 180.0 / TMath::Pi() * atan2( yi - y0, xi - x0 ) + 180.;
 			
 			if( rp > radius - 1.5 * rsigma  && rp < radius + 1.5 * rsigma )
 			{
@@ -729,7 +729,7 @@ float VImageParameterCalculation::correctSizeInMuonRing()
 		//Calculate the elliptic integral. This requires GSL.
 #ifndef NOGSL
 		float xi_tmp = ( float )i / ( float )numSteps;
-		ngExi[i] = ( 2.0 / TMath::Pi() ) * ( gsl_sf_ellint_E( TMath::Pi() / 2.0 , xi_tmp , 0 ) ); //Calculate elliptic integral
+		ngExi[i] = ( 2.0 / TMath::Pi() ) * ( gsl_sf_ellint_E( TMath::Pi() / 2.0, xi_tmp, 0 ) );   //Calculate elliptic integral
 #endif
 		
 	}//End of elliptical integral for loop

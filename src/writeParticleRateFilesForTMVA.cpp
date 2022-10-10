@@ -213,7 +213,7 @@ int main( int argc, char* argv[] )
 	
 	char iOutputFile[800];
 	sprintf( iOutputFile, "%s", iOutFil.c_str() );
-	TFile* SignalRateFile = new TFile( iOutputFile , "RECREATE" );
+	TFile* SignalRateFile = new TFile( iOutputFile, "RECREATE" );
 	
 	SignalRateFile->cd();
 	SignalRateFile->Write();

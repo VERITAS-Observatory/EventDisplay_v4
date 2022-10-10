@@ -1,5 +1,7 @@
 /*! \class VExposure
-    \brief calculate VERITAS exposure
+    retrieve a list of runs, fill and plot VERITAS exposure plots, fill elevation plots
+
+    Note: some of the usage of this class is counter-intuitive
 
 
 */
@@ -133,7 +135,6 @@ unsigned int VExposure::getLaserDate( unsigned int iRunNumber )
 	string iTempS;
 	iTempS = getDBServer() + "/VERITAS";
 	
-	//std::cout<<"VExposure::getLaserDate "<<std::endl;
 	VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ;
 	if( !my_connection.Get_Connection_Status() )
 	{
@@ -449,7 +450,6 @@ bool VExposure::readFromDBList()
 	string iTempS;
 	iTempS = getDBServer() + "/VERITAS";
 	
-	//std::cout<<"VExposure::readFromDBList "<<std::endl;
 	VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ;
 	if( !my_connection.Get_Connection_Status() )
 	{
@@ -467,6 +467,7 @@ bool VExposure::readFromDBList()
 		
 		if( !my_connection.make_query( c_query ) )
 		{
+			cout << "VExposure::readFromDBList() error: could not connect to DB." << endl;
 			return false;
 		}
 		TSQLResult* db_res =  my_connection.Get_QueryResult();
@@ -1121,7 +1122,12 @@ TCanvas* VExposure::plot( double ilmin, double ilmax, double ibmin, double ibmax
 	return 0;
 }
 
-
+/*
+ * plots extension of HESS survey
+ *
+ * (note: this is the original HESS survey, not the extended one )
+ *
+ */
 void VExposure::plot_HESSSkySurvey( TCanvas* c )
 {
 	if( !c )
@@ -1205,7 +1211,7 @@ TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy,
 	decAxis->Draw();
 	
 	//   TGaxis *raLowerAxis = new TGaxis( cGal->GetUxmin()-ilmax - h->GetYaxis()->GetBinWidth( 1 )/2., cGal->GetUymin()+ibmin-h->GetYaxis()->GetBinWidth(1)/2. , cGal->GetUxmin()-ilmin+h->GetYaxis()->GetBinWidth( 1 )/2., cGal->GetUymin()+ibmin -h->GetYaxis()->GetBinWidth(1)/2. , "IncValues", 4 );
-	TGaxis* raLowerAxis = new TGaxis( cGal->GetUxmin() - ilmax - h->GetYaxis()->GetBinWidth( 1 ) / 2., cGal->GetUymin() + ibmin - h->GetYaxis()->GetBinWidth( 1 ) / 2. , cGal->GetUxmin() - ilmin + h->GetYaxis()->GetBinWidth( 1 ) / 2., cGal->GetUymin() + ibmin - h->GetYaxis()->GetBinWidth( 1 ) / 2. , "IncValues", 4 );
+	TGaxis* raLowerAxis = new TGaxis( cGal->GetUxmin() - ilmax - h->GetYaxis()->GetBinWidth( 1 ) / 2., cGal->GetUymin() + ibmin - h->GetYaxis()->GetBinWidth( 1 ) / 2., cGal->GetUxmin() - ilmin + h->GetYaxis()->GetBinWidth( 1 ) / 2., cGal->GetUymin() + ibmin - h->GetYaxis()->GetBinWidth( 1 ) / 2., "IncValues", 4 );
 	raLowerAxis->SetTitleFont( h->GetXaxis()->GetTitleFont() );
 	raLowerAxis->SetTitleSize( h->GetXaxis()->GetTitleSize() );
 	raLowerAxis->SetTitleOffset( h->GetXaxis()->GetTitleOffset() );

@@ -64,7 +64,7 @@ class VPlotRadialAcceptance : public VPlotUtilities
 		}
 		
 		//TCanvas* plotRadialAcceptance( TCanvas* cX = 0 );
-		TCanvas* plotRadialAcceptance( TCanvas* cX = 0 , int iColor = 1 );
+		TCanvas* plotRadialAcceptance( TCanvas* cX = 0, int iColor = 1 );
 		TCanvas* plotPhiDependentRadialAcceptances( TCanvas* cX = 0, int iIterator = 4, bool iDeRot = false );
 		TCanvas* plotPhiDistributions( TCanvas* cX = 0, int iColor = 1 );
 		TCanvas* plotResiduals( TCanvas* cX = 0, double i_res_min = -0.5, double i_res_max = 0.5, bool iDrawChi2 = true );

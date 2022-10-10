@@ -397,7 +397,7 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
 	hNull->Draw( "" );
 	hNull->Draw( "AH" );
 	
-	plot_nullHistogram( cSensRatio, hNull, true , false, 1.2, fMinEnergy_TeV, fMaxEnergy_TeV );
+	plot_nullHistogram( cSensRatio, hNull, true, false, 1.2, fMinEnergy_TeV, fMaxEnergy_TeV );
 	
 	TLine* iL = new TLine( log10( fMinEnergy_TeV ), 1., log10( fMaxEnergy_TeV ), 1. );
 	iL->SetLineStyle( 2 );

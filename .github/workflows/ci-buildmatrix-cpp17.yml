@@ -1,0 +1,48 @@
+---
+name: cpp17-buildmatrix
+
+# Controls when the workflow will run
+on:
+  pull_request:
+    branches: [main, master, v490-dev-v0.7]
+  # run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        root:
+          - "rootproject/root:latest"
+          - "rootproject/root:6.26.06-ubuntu22.04"
+          - "rootproject/root:6.26.06-fedora35"
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.root }}
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+
+      - name: vbf
+        run: |
+          curl https://syncandshare.desy.de/index.php/s/${{ secrets.VBFcpp17 }}/download > VBF.tar.gz
+          mkdir VBF && tar -xzf VBF.tar.gz -C VBF --strip-components=1
+          cd VBF && ./configure --prefix=$(echo $GITHUB_WORKSPACE)/VBF
+          make
+          make install
+
+      - name: sofa
+        run: |
+          curl https://syncandshare.desy.de/index.php/s/${{ secrets.SOFA }}/download > sofa/sofa.tar.gz
+          ./install_sofa.sh
+
+      - name: eventdisplay
+        run: |
+          root-config --version
+          export EVNDISPSYS=$(echo $GITHUB_WORKSPACE)
+          export VBFSYS=$(echo $GITHUB_WORKSPACE)/VBF
+          export LD_LIBRARY_PATH="${EVNDISPSYS}/obj:${EVNDISPSYS}/lib:${LD_LIBRARY_PATH}"
+          export LD_LIBRARY_PATH="${VBFSYS}/lib:${LD_LIBRARY_PATH}"
+          export SOFASYS=/sofa
+          make VTS

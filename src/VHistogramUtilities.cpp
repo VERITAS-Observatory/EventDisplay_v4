@@ -521,7 +521,7 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 			bool iBBreak = false;
 			for( int e = 0; e < iExcN; e++ )
 			{
-				if( TMath::Power( ( ( x_r - iExcX[e] ) * TMath::Cos( iExcTheta[e] * TMath::DegToRad() ) + ( y_r - iExcY[e] ) * TMath::Sin( iExcTheta[e] * TMath::DegToRad() ) ) / iExcR1[e], 2 ) + TMath::Power( ( ( x_r - iExcX[e] ) * TMath::Sin( iExcTheta[e] * TMath::DegToRad() ) - ( y_r - iExcY[e] ) * TMath::Cos( iExcTheta[e] * TMath::DegToRad() ) ) / iExcR2[e] , 2 ) < 1. )
+				if( TMath::Power( ( ( x_r - iExcX[e] ) * TMath::Cos( iExcTheta[e] * TMath::DegToRad() ) + ( y_r - iExcY[e] ) * TMath::Sin( iExcTheta[e] * TMath::DegToRad() ) ) / iExcR1[e], 2 ) + TMath::Power( ( ( x_r - iExcX[e] ) * TMath::Sin( iExcTheta[e] * TMath::DegToRad() ) - ( y_r - iExcY[e] ) * TMath::Cos( iExcTheta[e] * TMath::DegToRad() ) ) / iExcR2[e], 2 ) < 1. )
 				{
 					iBBreak = true;
 					break;

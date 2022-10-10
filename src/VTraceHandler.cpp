@@ -559,7 +559,7 @@ double VTraceHandler::getQuickPulseWidth( int fFirst, int fLast, double fPed )
 			it = fpTrace[i] - fPed;
 			if( it < 0.5 * imax )
 			{
-				p50_max = getLinInterpol( 0.5 * imax + fPed, i - 1, fpTrace[i - 1] , i, fpTrace[i] );
+				p50_max = getLinInterpol( 0.5 * imax + fPed, i - 1, fpTrace[i - 1], i, fpTrace[i] );
 				break;
 			}
 		}
@@ -740,7 +740,8 @@ double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart
 	
 	if( n == 0 )
 	{
-		fTraceAverageTime = muxBINS[1];
+		// fTraceAverageTime = muxBINS[1];
+		fTraceAverageTime = 0.;
 		return 0.;
 	}
 	

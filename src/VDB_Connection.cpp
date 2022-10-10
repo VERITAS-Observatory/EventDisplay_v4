@@ -42,7 +42,7 @@ bool VDB_Connection::Connect()
 {
 
 	// Connect
-	f_db = TSQLServer::Connect( fDBserver.c_str(), fconnection_mode.c_str() , fconnection_option.c_str() );
+	f_db = TSQLServer::Connect( fDBserver.c_str(), fconnection_mode.c_str(), fconnection_option.c_str() );
 	
 	// Test the connection
 	
@@ -52,7 +52,7 @@ bool VDB_Connection::Connect()
 		cout << "VDB_Connection: info: failed to connect to database server, sleep for 10 and try again..." << endl;
 		gSystem->Sleep( 10000 );
 		// try again
-		f_db = TSQLServer::Connect( fDBserver.c_str(), fconnection_mode.c_str() , fconnection_option.c_str() );
+		f_db = TSQLServer::Connect( fDBserver.c_str(), fconnection_mode.c_str(), fconnection_option.c_str() );
 		// give up
 		if( !f_db )
 		{

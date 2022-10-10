@@ -519,7 +519,7 @@ bool VRadialAcceptance::isExcludedfromBackground( double x, double y )
 	//Other regions to exclude from background (read from runparameter)
 	for( unsigned int i = 0; i < fXE.size(); i ++ )
 	{
-		if( TMath::Power( ( ( x - fXE[i] ) * TMath::Cos( fAngE[i] * TMath::DegToRad() ) + ( y - fYE[i] ) * TMath::Sin( fAngE[i] * TMath::DegToRad() ) ) / fR1E[i], 2 ) + TMath::Power( ( ( x - fXE[i] ) * TMath::Sin( fAngE[i] * TMath::DegToRad() ) - ( y - fYE[i] ) * TMath::Cos( fAngE[i] * TMath::DegToRad() ) ) / fR2E[i] , 2 ) < 1 )
+		if( TMath::Power( ( ( x - fXE[i] ) * TMath::Cos( fAngE[i] * TMath::DegToRad() ) + ( y - fYE[i] ) * TMath::Sin( fAngE[i] * TMath::DegToRad() ) ) / fR1E[i], 2 ) + TMath::Power( ( ( x - fXE[i] ) * TMath::Sin( fAngE[i] * TMath::DegToRad() ) - ( y - fYE[i] ) * TMath::Cos( fAngE[i] * TMath::DegToRad() ) ) / fR2E[i], 2 ) < 1 )
 		{
 			return true;
 		}
@@ -1050,7 +1050,7 @@ double VRadialAcceptance::calculate2DBinNormalizationConstant( double radius ) /
 			{
 				sprintf( buff, "%s/ImgSel%d.PhiDependentSlice", fExtraHistogramDir.c_str(), i ) ;
 				string buff2 = buff ;
-				Write1DHistToTextFile( hXYAccImgSelPhiDependentSlice[i], buff2 , 2 ) ;
+				Write1DHistToTextFile( hXYAccImgSelPhiDependentSlice[i], buff2, 2 ) ;
 			}
 		}
 		if( hXYAccNImagesPhiDependentSlice.empty() == 0 )
@@ -1060,7 +1060,7 @@ double VRadialAcceptance::calculate2DBinNormalizationConstant( double radius ) /
 			{
 				sprintf( buff, "%s/NImages%d.PhiDependentSlice", fExtraHistogramDir.c_str(), i ) ;
 				string buff2 = buff ;
-				Write1DHistToTextFile( hXYAccNImagesPhiDependentSlice[i], buff2 , 2 ) ;
+				Write1DHistToTextFile( hXYAccNImagesPhiDependentSlice[i], buff2, 2 ) ;
 			}
 		}
 		

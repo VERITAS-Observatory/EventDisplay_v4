@@ -137,7 +137,7 @@ class VStereoMaps
 		void              calculateTheta2( bool, double, double );
 		bool              fill( bool is_on, double x_sky, double y_sky, double theta2CutMax, double ze,
 								double erec, int irun, bool ishapecuts, double& i_theta2 );
-		void              finalize( bool iIsOn , double OnOff_Alpha = 1.0 );
+		void              finalize( bool iIsOn, double OnOff_Alpha = 1.0 );
 		VRadialAcceptance*      getAcceptance()
 		{
 			return fAcceptance;

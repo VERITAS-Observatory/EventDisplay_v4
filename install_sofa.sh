@@ -29,7 +29,9 @@ cd sofa
 # get sofa package from the web page and install
 SOFAD="20210512"
 SOFA="sofa_c-${SOFAD}.tar.gz"
-if [[ $DOWNL == "CI" ]]; then
+if [[ -e sofa.tar.gz ]]; then
+    mv -f sofa.tar.gz ${SOFA}
+elif [[ $DOWNL == "CI" ]]; then
     wget https://syncandshare.desy.de/index.php/s/jr9NrbWFR5MLaDf/download
     mv -f download ${SOFA}
 else

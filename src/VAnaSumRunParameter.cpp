@@ -203,7 +203,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 		if( !is )
 		{
 			cout << "no file found to read run parameters: " << itemp << endl;
-			exit( 0 );
+			exit( EXIT_FAILURE );
 		}
 		i_filename = itemp;
 	}
@@ -213,6 +213,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 	string temp;
 	string temp2;
 	
+	// loop over all lines in the run parameter file
 	while( getline( is, is_line ) )
 	{
 		if( is_line.size() > 0 )
@@ -250,7 +251,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 					{
 						cout << "Error opening time mask file: " << fTimeMaskFile << endl;
 						cout << "exiting..." << endl;
-						exit( 0 );
+						exit( EXIT_FAILURE );
 					}
 					else
 					{
@@ -690,7 +691,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 		{
 			cout << "error in reading run parameters: ";
 			cout << "invalid source radius " << fTMPL_SourceRadius << endl;
-			exit( -1 );
+			exit( EXIT_FAILURE );
 		}
 		fTMPL_RM_RingWidth = getRingWidth( TMath::Pi() * fTMPL_SourceRadius, fTMPL_RM_RingRadius, fTMPL_RM_RingWidth );
 		fTMPL_maxradius = readMaximumDistance( fTMPL_CutFile );
@@ -698,7 +699,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 		{
 			cout << "error in reading run parameters: ";
 			cout << "invalid maximum distance " << fTMPL_maxradius << endl;
-			exit( -1 );
+			exit( EXIT_FAILURE );
 		}
 	}
 	else
@@ -772,7 +773,8 @@ int VAnaSumRunParameter::loadShortFileList( string i_listfilename, string iDataD
 				}
 				else
 				{
-					sprintf( hTelToAna, "%s%d", hTelToAna, iPar->fTelToAnalyze[i] + 1 );
+					string tmp_str = hTelToAna;
+					sprintf( hTelToAna, "%s%d", tmp_str.c_str(), iPar->fTelToAnalyze[i] + 1 );
 				}
 			}
 			iF.Close();

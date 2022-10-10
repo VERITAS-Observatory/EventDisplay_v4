@@ -264,7 +264,7 @@ class VStereoAnalysis
 		bool init_TreeWithSelectedEvents( int, bool );
 		void reset_TreeWithSelectedEvents();
 		
-		void fill_DL3Tree( CData* c ,
+		void fill_DL3Tree( CData* c,
 						   double i_xderot, double i_yderot,
 						   unsigned int icounter, double i_UTC );
 		bool init_DL3Tree( int irun, int icounter );

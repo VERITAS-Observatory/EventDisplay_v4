@@ -2,7 +2,6 @@
     \brief provide spectra from literature
 
 
-
 */
 
 #include "VEnergySpectrumfromLiterature.h"
@@ -249,6 +248,7 @@ TGraphAsymmErrors* VEnergySpectrumfromLiterature::getEnergySpectrumWithErrors( u
 	}
 	
 	TF1* f = getEnergySpectrum( iID, bLogEnergy );
+	
 	if( !f )
 	{
 		return 0;
@@ -387,10 +387,10 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
 	}
 	
 	// define functions
-	char hname[600];
+	char hname[6000];
 	char h_exponent[600];
-	char h_energy[600];
-	// define energy variabile (log or lin)
+	char h_energy[60];
+	// define energy variable (log or lin)
 	if( bLogEnergy )
 	{
 		sprintf( h_energy, "TMath::Power( 10, x )" );
@@ -424,14 +424,14 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
 			// broken power law (e.g. A&A 457, 899 (2006))
 			else if( fData[iID].Type == 3 )
 			{
-				sprintf( hname, "[1]*TMath::Power( %s / [0], [2] ) ", h_energy );
-				sprintf( hname, "%s * TMath::Power( 1. + TMath::Power( %s / [0], 1./[4] ), [4]*([3]-[2]) )", hname, h_energy );
+				sprintf( h_exponent, "[1]*TMath::Power( %s / [0], [2] ) ", h_energy );
+				sprintf( hname, "%s * TMath::Power( 1. + TMath::Power( %s / [0], 1./[4] ), [4]*([3]-[2]) )", h_exponent, h_energy );
 			}
 			// broken power law (2)
 			else if( fData[iID].Type == 4 )
 			{
-				sprintf( hname, "[1]*TMath::Power( %s / %f, -1. ) ", h_energy, fData[iID].Parameter[0] );
-				sprintf( hname, "%s * TMath::Power( 1. + TMath::Power( %s / [0], [2] ), -1. )", hname, h_energy );
+				sprintf( h_exponent, "[1]*TMath::Power( %s / %f, -1. ) ", h_energy, fData[iID].Parameter[0] );
+				sprintf( hname, "%s * TMath::Power( 1. + TMath::Power( %s / [0], [2] ), -1. )", h_exponent, h_energy );
 			}
 			// power law with exponential cut off (with beta factor for cut-off strength)
 			else if( fData[iID].Type == 5 )
@@ -442,8 +442,8 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
 			// power law with exponential cut off (Gaussian factor)
 			else if( fData[iID].Type == 6 )
 			{
-				sprintf( hname, "[0]*TMath::Power( %s / %f, [4] ) ", h_energy, fData[iID].Parameter[0] );
-				sprintf( hname, "%s * (1.+[1]*(exp(TMath::Gaus(log10(%s),[2], [3] ))-1.))", hname, h_energy );
+				sprintf( h_exponent, "[0]*TMath::Power( %s / %f, [4] ) ", h_energy, fData[iID].Parameter[0] );
+				sprintf( hname, "%s * (1.+[1]*(exp(TMath::Gaus(log10(%s),[2], [3] ))-1.))", h_exponent, h_energy );
 			}
 			
 		}
@@ -458,10 +458,11 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
 	}
 	
 	// plotting multiplier
-	sprintf( hname, "%s * TMath::Power( %s, %f )", hname, h_energy, fPlottingMultiplierIndex );
+	char hisnmae[10000];
+	sprintf( hisnmae, "%s * TMath::Power( %s, %f )", hname, h_energy, fPlottingMultiplierIndex );
 	
 	// create function
-	f = new TF1( fData[iID].Name.c_str(), hname, xmin, xmax );
+	f = new TF1( fData[iID].Name.c_str(), hisnmae, xmin, xmax );
 	
 	// set parameters
 	for( unsigned int i = 1; i < fData[iID].Parameter.size(); i++ )
@@ -741,6 +742,8 @@ sData VEnergySpectrumfromLiterature::getEnergySpectrumDataField( unsigned int iI
 	if( !checkIDRange( iID ) )
 	{
 		sData a;
+		a.Type = 0.;
+		a.EnergyRange_min = a.EnergyRange_max = 0.;
 		return a;
 	}
 	return fData[iID];

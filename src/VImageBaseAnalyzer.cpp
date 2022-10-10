@@ -148,7 +148,7 @@ void VImageBaseAnalyzer::calcSums( int iFirst, int iLast, bool iMakingPeds, bool
 													 9999,
 													 true,
 													 getSearchWindowLast() )
-						 * getLowGainSumCorrection( sw_original , iLast - iFirst, getHiLo()[i_channelHitID] ) );
+						 * getLowGainSumCorrection( sw_original, iLast - iFirst, getHiLo()[i_channelHitID] ) );
 				setTraceAverageTime( i_channelHitID, fTraceHandler->getTraceIntegrationFirst() );
 			}
 		}
@@ -490,7 +490,7 @@ void VImageBaseAnalyzer::calcTCorrectedSums( int iFirst, int iLast )
 				setTCorrectedSumFirst( i_channelHitID, corrfirst );
 				setTCorrectedSumLast( i_channelHitID, corrlast );
 				setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast, false );
-				setSums( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw )* getLowGainSumCorrection( sw_original , iLast - iFirst, getHiLo()[i_channelHitID] ) ); // nb sw_original is small->most likely correction will be 1
+				setSums( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw )* getLowGainSumCorrection( sw_original, iLast - iFirst, getHiLo()[i_channelHitID] ) );  // nb sw_original is small->most likely correction will be 1
 				
 			}
 		}
@@ -650,7 +650,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 			
 			///////////////////////////////////////////
 			// integrate trace
-			setSums( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) * getLowGainSumCorrection( iLastSum - iFirstSum , corrlast - corrfirst, getHiLo()[i_channelHitID] ) );
+			setSums( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) * getLowGainSumCorrection( iLastSum - iFirstSum, corrlast - corrfirst, getHiLo()[i_channelHitID] ) );
 			
 			// fill parameters characterizing the trace
 			setTCorrectedSumFirst( i_channelHitID, fTraceHandler->getTraceIntegrationFirst() );
@@ -674,7 +674,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 					getAnaData()->fillPulseSum( i_channelHitID, getSums()[i_channelHitID], getHiLo()[i_channelHitID] );
 				}
 				corrlast = getFADCTraceIntegrationPosition( corrfirst + ( int )getSumWindow_2() );
-				setSums2( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw )* getLowGainSumCorrection( fRunPar->fsumwindow_2[fTelID] , corrlast - corrfirst, getHiLo()[i_channelHitID] ) );
+				setSums2( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw )* getLowGainSumCorrection( fRunPar->fsumwindow_2[fTelID], corrlast - corrfirst, getHiLo()[i_channelHitID] ) );
 				setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast, true );
 			}
 			//////////////////////////////////////////////////
@@ -927,7 +927,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 			setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )
 					 ->testGainVariations( i, getGainvars( iLowGain && getLowGainGains() )[i] ), iLowGain );
 			setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )
-					 ->testGainDev( i, getGains( iLowGain )[i], getGainvars( iLowGain && getLowGainGains() )[i] , getGains_DefaultValue( iLowGain )[i] ), iLowGain );
+					 ->testGainDev( i, getGains( iLowGain )[i], getGainvars( iLowGain && getLowGainGains() )[i], getGains_DefaultValue( iLowGain )[i] ), iLowGain );
 		}
 		if( ( !getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fTOffFileNumber[getTelID()] > 0 )
 				|| ( iLowGain && getRunParameter()->fTOffLowGainFileNumber[getTelID()] > 0 ) )
@@ -1057,7 +1057,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 		//dump list of dead channels
 		if( fRunPar->fprintdeadpixelinfo )
 		{
-			printDeadChannels( iLowGain , true );
+			printDeadChannels( iLowGain, true );
 		}
 		// do not allow to run eventdisplay with all channels dead in the low channels one of the telescopes
 		// (GM) why low-gain channels?? Why not all?
@@ -1456,7 +1456,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 				// calculate pulse sums
 				///////////////////////////////////
 				// sum for first summation window
-				setSums( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) * getLowGainSumCorrection( fRunPar->fsumwindow_1[fTelID] , corrlast - corrfirst, getHiLo()[i_channelHitID] ) );
+				setSums( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) * getLowGainSumCorrection( fRunPar->fsumwindow_1[fTelID], corrlast - corrfirst, getHiLo()[i_channelHitID] ) );
 				if( getFillPulseSum() )
 				{
 					getAnaData()->fillPulseSum( i_channelHitID, getSums()[i_channelHitID], getHiLo()[i_channelHitID] );
@@ -1466,10 +1466,10 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 				{
 					corrfirst = getFADCTraceIntegrationPosition( getSumFirst() + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID] );
 					corrlast  = getFADCTraceIntegrationPosition( getSumFirst() + ( int )getSumWindow_2() );
-					setSums2( i_channelHitID, fTraceHandler->getTraceSum( getSumFirst(), corrlast, fRaw ) * getLowGainSumCorrection( fRunPar->fsumwindow_2[fTelID] , corrlast - getSumFirst(), getHiLo()[i_channelHitID] ) );
+					setSums2( i_channelHitID, fTraceHandler->getTraceSum( getSumFirst(), corrlast, fRaw ) * getLowGainSumCorrection( fRunPar->fsumwindow_2[fTelID], corrlast - getSumFirst(), getHiLo()[i_channelHitID] ) );
 				}
 				corrlast = getFADCTraceIntegrationPosition( corrfirst + ( int )getSumWindow_2() );
-				setSums2( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) * getLowGainSumCorrection( fRunPar->fsumwindow_2[fTelID] , corrlast - corrfirst, getHiLo()[i_channelHitID] ) );
+				setSums2( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) * getLowGainSumCorrection( fRunPar->fsumwindow_2[fTelID], corrlast - corrfirst, getHiLo()[i_channelHitID] ) );
 				setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast, true );
 				
 			}

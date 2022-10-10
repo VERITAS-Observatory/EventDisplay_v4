@@ -493,7 +493,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			}
 			
 			// stereo quality cuts (e.g. successful direction, mscw, mscl reconstruction)
-			if( !fCuts->applyStereoQualityCuts( fRunPara->fEnergyReconstructionMethod, false, i , fIsOn ) )
+			if( !fCuts->applyStereoQualityCuts( fRunPara->fEnergyReconstructionMethod, false, i, fIsOn ) )
 			{
 				continue;
 			}
@@ -656,7 +656,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 						fHisto[fHisCounter]->herecCounts->Fill( log10( iErec ) );
 						fHisto[fHisCounter]->herecCounts2DtimeBinned->Fill( log10( iErec ), ( ( double )fDataRun->Time - f_t_in_s_min[irun] ) );
 						fHisto[fHisCounter]->hLinerecCounts->Fill( iErec );
-						fHisto[fHisCounter]->hLinerecCounts2DtimeBinned->Fill( iErec , ( ( double )fDataRun->Time - f_t_in_s_min[irun] ) );
+						fHisto[fHisCounter]->hLinerecCounts2DtimeBinned->Fill( iErec, ( ( double )fDataRun->Time - f_t_in_s_min[irun] ) );
 						fHisto[fHisCounter]->herecWeights->Fill( log10( iErec ), log10( 1. / iEnergyWeighting ) );
 						fHisto[fHisCounter]->hLinerecWeights->Fill( iErec, log10( 1. / iEnergyWeighting ) );
 						fHisto[fHisCounter]->herecEffectiveArea->Fill( log10( iErec ), 1. / iEnergyWeighting );
@@ -778,7 +778,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 		{
 			cout << "\t error: no response matrix found" << endl;
 			cout << "\t Creating empty TH2D" << endl;
-			hResponseMatrix = new TH2F( "hResponseMatrix", "hResponseMatrix", 10, -1, 1, 10 , -1 , 1 );
+			hResponseMatrix = new TH2F( "hResponseMatrix", "hResponseMatrix", 10, -1, 1, 10, -1, 1 );
 		}
 		if( fIsOn )
 		{
@@ -2213,18 +2213,18 @@ bool VStereoAnalysis::init_DL3Tree( int irun, int icounter )
 	fDL3EventTree->Branch( "MeanPedvar",     &fDL3EventTree_MeanPedvar,     "MeanPedvar/D" );
 	fDL3EventTree->Branch( "MSCW",           &fDL3EventTree_MSCW,           "MSCW/D" );
 	fDL3EventTree->Branch( "MSCL",           &fDL3EventTree_MSCL,           "MSCL/D" );
-	fDL3EventTree->Branch( "RA"            , &fDL3EventTree_RA,             "RA/D" );
-	fDL3EventTree->Branch( "DEC"           , &fDL3EventTree_DEC,            "DEC/D" );
-	fDL3EventTree->Branch( "Az"            , &fDL3EventTree_Az,             "Az/D" );
-	fDL3EventTree->Branch( "El"            , &fDL3EventTree_El,             "El/D" );
+	fDL3EventTree->Branch( "RA", &fDL3EventTree_RA,             "RA/D" );
+	fDL3EventTree->Branch( "DEC", &fDL3EventTree_DEC,            "DEC/D" );
+	fDL3EventTree->Branch( "Az", &fDL3EventTree_Az,             "Az/D" );
+	fDL3EventTree->Branch( "El", &fDL3EventTree_El,             "El/D" );
 	fDL3EventTree->Branch( "EmissionHeight", &fDL3EventTree_EmissionHeight, "EmissionHeight/D" );
-	fDL3EventTree->Branch( "Xoff"          , &fDL3EventTree_Xoff          , "Xoff/D" );
-	fDL3EventTree->Branch( "Yoff"          , &fDL3EventTree_Yoff          , "Yoff/D" );
-	fDL3EventTree->Branch( "Acceptance"    , &fDL3EventTree_Acceptance    , "Acceptance/D" );
+	fDL3EventTree->Branch( "Xoff", &fDL3EventTree_Xoff, "Xoff/D" );
+	fDL3EventTree->Branch( "Yoff", &fDL3EventTree_Yoff, "Yoff/D" );
+	fDL3EventTree->Branch( "Acceptance", &fDL3EventTree_Acceptance, "Acceptance/D" );
 	if( fRunPara->fWriteAllEvents )
 	{
-		fDL3EventTree->Branch( "MVA"       , &fDL3EventTree_MVA,            "MVA/D" );
-		fDL3EventTree->Branch( "IsGamma"   , &fDL3EventTree_IsGamma,        "IsGamma/I" );
+		fDL3EventTree->Branch( "MVA", &fDL3EventTree_MVA,            "MVA/D" );
+		fDL3EventTree->Branch( "IsGamma", &fDL3EventTree_IsGamma,        "IsGamma/I" );
 	}
 	cout << endl;
 	
@@ -2244,7 +2244,7 @@ bool VStereoAnalysis::init_DL3Tree( int irun, int icounter )
 /*
  *  fill a new event into the DL3 tree
  */
-void VStereoAnalysis::fill_DL3Tree( CData* c , double i_xderot, double i_yderot, unsigned int icounter, double i_UTC )
+void VStereoAnalysis::fill_DL3Tree( CData* c, double i_xderot, double i_yderot, unsigned int icounter, double i_UTC )
 {
 	if( !c )
 	{

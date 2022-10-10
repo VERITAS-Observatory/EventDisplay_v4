@@ -68,12 +68,13 @@ double checkIfVariableIsConstant( VTMVARunData* iRun, TCut iCut, string iVariabl
 	// add cut on number of telescope (per type) for
 	if( iVariable.find( "NImages_Ttype" ) != string::npos || iVariable.find( "EmissionHeightChi2" ) != string::npos )
 	{
-		sprintf( hname, "%s >=2 ", iVariable.c_str() );
+		ostringstream iTemp;
 		if( iVariable.find( "NImages_Ttype" ) != string::npos )
 		{
-			sprintf( hname, "NTtype>0 && %s", hname );
+			iTemp << "NTtype>0 && ";
 		}
-		TCut ntCut( hname );
+		iTemp << iVariable << " >=2";
+		TCut ntCut( iTemp.str().c_str() );
 		iCut = iCut && ntCut;
 	}
 	
@@ -309,7 +310,6 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 	
 	//////////////////////////////////////////
 	// book all methods
-	char hname[6000];
 	char htitle[6000];
 	
 	for( unsigned int i = 0; i < iRun->fMVAMethod.size(); i++ )
@@ -361,25 +361,26 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, unsigned int iZenithBin
 		// (note: box cuts needs additional checking, as the code might be outdated)
 		else if( iRun->fMVAMethod[i] == "BOXCUTS" )
 		{
+			stringstream i_opt;
 			if( i < iRun->fMVAMethod_Options.size() )
 			{
-				sprintf( hname, "%s", iRun->fMVAMethod_Options[i].c_str() );
+				i_opt << iRun->fMVAMethod_Options[i].c_str();
 			}
 			
 			for( unsigned int i = 0; i < iRun->fTrainingVariable_CutRangeMin.size(); i++ )
 			{
-				sprintf( hname, "%s:CutRangeMin[%d]=%f", hname, i, iRun->fTrainingVariable_CutRangeMin[i] );
+				i_opt << ":CutRangeMin[" << i << "]=" << iRun->fTrainingVariable_CutRangeMin[i];
 			}
 			for( unsigned int i = 0; i < iRun->fTrainingVariable_CutRangeMax.size(); i++ )
 			{
-				sprintf( hname, "%s:CutRangeMax[%d]=%f", hname, i, iRun->fTrainingVariable_CutRangeMax[i] );
+				i_opt << ":CutRangeMax[" << i << "]=" << iRun->fTrainingVariable_CutRangeMax[i];
 			}
 			for( unsigned int i = 0; i < iRun->fTrainingVariable_VarProp.size(); i++ )
 			{
-				sprintf( hname, "%s:VarProp[%d]=%s", hname, i, iRun->fTrainingVariable_VarProp[i].c_str() );
+				i_opt << ":VarProp[" << i << "]=" << iRun->fTrainingVariable_VarProp[i];
 			}
-			sprintf( htitle, "BOXCUTS_%d_%d", iEnergyBin, iZenithBin );
-			factory->BookMethod( dataloader, TMVA::Types::kCuts, htitle, hname );
+			sprintf( htitle, "BOXCUTS_%u_%u", iEnergyBin, iZenithBin );
+			factory->BookMethod( dataloader, TMVA::Types::kCuts, htitle, i_opt.str().c_str() );
 		}
 	}
 	
@@ -504,7 +505,7 @@ int main( int argc, char* argv[] )
 			
 			// create small root file with necessary information for user
 			TFile* root_file = fData->fOutputFile[i][j];
-			TFile* short_root_file = TFile::Open( iTempS.str().c_str() , "RECREATE" );
+			TFile* short_root_file = TFile::Open( iTempS.str().c_str(), "RECREATE" );
 			VTMVARunDataEnergyCut* fDataEnergyCut = ( VTMVARunDataEnergyCut* )root_file->Get( "fDataEnergyCut" );
 			VTMVARunDataZenithCut* fDataZenithCut = ( VTMVARunDataZenithCut* )root_file->Get( "fDataZenithCut" );
 			TH1D* MVA_BDT_0_effS = ( TH1D* )root_file->Get( "Method_BDT/BDT_0/MVA_BDT_0_effS" );
@@ -534,7 +535,7 @@ int main( int argc, char* argv[] )
 			string iFinalRootFileName( iTempS.str() );
 			string iBinRootString( ".bin.root" );
 			iFinalRootFileName.replace( iFinalRootFileName.find( iBinRootString ), iBinRootString.length(), ".root" );
-			rename( iTempS.str().c_str() , iFinalRootFileName.c_str() );
+			rename( iTempS.str().c_str(), iFinalRootFileName.c_str() );
 		}
 	}
 	return 0;

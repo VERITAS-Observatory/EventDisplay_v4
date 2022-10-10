@@ -242,7 +242,7 @@ class VFluxCalculation : public TObject
 		}
 		double        getFluxVsCrab( double iF, double iE, double iGamma = 2.49 )
 		{
-			return getFluxInCrabUnits( iF, iE , iGamma ) * 100.;
+			return getFluxInCrabUnits( iF, iE, iGamma ) * 100.;
 		}
 		unsigned int  getIndexOfRun( int iRun );
 		double        getRate( int iRun );

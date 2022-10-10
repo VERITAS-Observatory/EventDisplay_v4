@@ -673,7 +673,7 @@ TTree* VHoughTransform::initLookupTable( int fRMinDpmt, int fRMaxDpmt, int fStep
 	sprintf( fLookupTableName, "Templates Tel%d", iTelescopeIndex );
 	
 	//Instantiate Hough transform lookup table tree.
-	TTree* iHTLookupTableTree = new TTree( fLookupTableName , fLookupTableName );
+	TTree* iHTLookupTableTree = new TTree( fLookupTableName, fLookupTableName );
 	
 	
 	//Set up the branches in the tree. One brach for each pixel. Each brach will have circle parametrizations that hit that pixel.
@@ -681,13 +681,13 @@ TTree* VHoughTransform::initLookupTable( int fRMinDpmt, int fRMaxDpmt, int fStep
 	{
 	
 		//Sets the branch name
-		sprintf( fHTBranchName , "Pixel %d" , iChannelIndex );
+		sprintf( fHTBranchName, "Pixel %d", iChannelIndex );
 		
 		//Sets the leaf name
-		sprintf( fHTLeafName , "Pixel %d Circle Coordinates[3]/D" , iChannelIndex );
+		sprintf( fHTLeafName, "Pixel %d Circle Coordinates[3]/D", iChannelIndex );
 		
 		//Setup the branch for that pixel
-		iHTLookupTableTree->Branch( fHTBranchName , &fTemplateCircleCoordinates , fHTLeafName );
+		iHTLookupTableTree->Branch( fHTBranchName, &fTemplateCircleCoordinates, fHTLeafName );
 		
 	}// End of setting up the pixel branches in the HT lookup table tree
 	
@@ -733,8 +733,8 @@ TTree* VHoughTransform::initLookupTable( int fRMinDpmt, int fRMaxDpmt, int fStep
 				
 				//Check if the test pixel is hit by the circle parametrization
 				if( fabs( ( sqrt(
-								( pow( ( fTestPixel[0] - fTemplateCircleCoordinates[0] ) , 2.0 ) ) +
-								( pow( ( fTestPixel[1] - fTemplateCircleCoordinates[1] ) , 2.0 ) ) ) ) - fTemplateCircleCoordinates[2] ) 	<=
+								( pow( ( fTestPixel[0] - fTemplateCircleCoordinates[0] ), 2.0 ) ) +
+								( pow( ( fTestPixel[1] - fTemplateCircleCoordinates[1] ), 2.0 ) ) ) ) - fTemplateCircleCoordinates[2] ) 	<=
 						( fPMTDiameter[ iTelescopeIndex ] / 2.0 ) )
 						
 				{
@@ -857,7 +857,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	
 	//Convert the telescope number (+1) into a string
 	char iCharTelIDPlusOne[3];
-	sprintf( iCharTelIDPlusOne , "%d" , ( fTelID + 1 ) );
+	sprintf( iCharTelIDPlusOne, "%d", ( fTelID + 1 ) );
 	string iTelIDPlusOne = ( string )iCharTelIDPlusOne;
 	
 	

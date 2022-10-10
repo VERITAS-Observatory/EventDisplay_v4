@@ -2038,7 +2038,7 @@ TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierInde
 				double i_xmax = -1.e9;
 				for( int p = 0; p < gEnergySpectrum->GetN(); p++ )
 				{
-					gEnergySpectrum->GetPoint( p, x , y );
+					gEnergySpectrum->GetPoint( p, x, y );
 					x = TMath::Power( 10., x );
 					if( x > i_xmax )
 					{

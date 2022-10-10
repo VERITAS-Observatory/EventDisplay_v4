@@ -176,7 +176,7 @@ bool VInstrumentResponseFunction::fillEventData()
 		}
 		
 		// apply reconstruction quality cuts
-		if( !fAnaCuts->applyStereoQualityCuts( fEnergyReconstructionMethod, true, i , true ) )
+		if( !fAnaCuts->applyStereoQualityCuts( fEnergyReconstructionMethod, true, i, true ) )
 		{
 			continue;
 		}

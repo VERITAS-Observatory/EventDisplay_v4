@@ -71,7 +71,7 @@ VDB_CalibrationInfo::VDB_CalibrationInfo( int current_run, int current_tel, TStr
 	flong_char_query = 100000;
 	fseparation = "|";
 }
-VDB_CalibrationInfo::VDB_CalibrationInfo( int laserrun , int tel , string name_out_file, int gain_or_toff, int VOFFLINE_version_query, int LOW_GAIN, TString DBserver )
+VDB_CalibrationInfo::VDB_CalibrationInfo( int laserrun, int tel, string name_out_file, int gain_or_toff, int VOFFLINE_version_query, int LOW_GAIN, TString DBserver )
 {
 	fread_flag = true;
 	fcurrent_run = laserrun;
