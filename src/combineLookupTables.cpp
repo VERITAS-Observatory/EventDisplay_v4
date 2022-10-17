@@ -26,7 +26,7 @@ using namespace std;
 // list with noise levels
 vector< int > fNoiseLevel;
 
-void copyDirectory( TDirectory* source, const char* hx, vector< string > hist_to_copy );
+void copyDirectory( TDirectory* source, const char* hx, vector< string > hist_to_copy, float noise_tolerance );
 
 /*
  * noise directory names are determined in the lookup table code using the
@@ -34,7 +34,7 @@ void copyDirectory( TDirectory* source, const char* hx, vector< string > hist_to
  * simulation file. We search here therefore for very similar noise levels,
  * and return those directory names if available
  */
-string check_for_similar_noise_values( const char* hx )
+string check_for_similar_noise_values( const char* hx, float noise_tolerance )
 {
 	string iTemp = hx;
 	
@@ -43,7 +43,7 @@ string check_for_similar_noise_values( const char* hx )
 		int i_noise = atoi( iTemp.substr( iTemp.find( "_" ) + 1, iTemp.size() ).c_str() );
 		for( unsigned int i = 0; i < fNoiseLevel.size(); i++ )
 		{
-			if( TMath::Abs( fNoiseLevel[i] - i_noise ) < 10 )
+			if( TMath::Abs( fNoiseLevel[i] - i_noise ) < noise_tolerance )
 			{
 				char hname[200];
 				sprintf( hname, "NOISE_%05d", fNoiseLevel[i] );
@@ -58,8 +58,6 @@ string check_for_similar_noise_values( const char* hx )
 	}
 	
 	return iTemp;
-	
-	
 }
 
 vector< string > readListOfFiles( string iFile )
@@ -111,19 +109,26 @@ int main( int argc, char* argv[] )
 	if( argc < 2 )
 	{
 		cout << "combine several tables from different files into one single table file" << endl << endl;
-		cout << "combineLookupTables <file with list of tables> <output file name> [histogram types to copy]" << endl;
+		cout << "combineLookupTables <file with list of tables> <output file name> [histogram types to copy] [noise tolerance]" << endl;
 		cout << endl;
 		cout << "[histogram types]:    all, mpv, median (default)" << endl;
+        cout << "[noise tolerance]:    tolerance for combining NSB bins (default==20)" << endl;
 		cout << endl;
 		exit( EXIT_FAILURE );
 	}
 	string fListOfFiles = argv[1];
 	string fOFile       = argv[2];
 	string histogram_types = "median";
-	if( argc == 4 )
+	if( argc >= 4 )
 	{
 		histogram_types = argv[3];
 	}
+    float noise_tolerance = 20.;
+    if( argc == 5 )
+    {
+        noise_tolerance = atof(argv[4]);
+    }
+
 	vector< string > hist_to_copy;
 	if( histogram_types == "all" )
 	{
@@ -201,7 +206,7 @@ int main( int argc, char* argv[] )
 				fROFile->cd();
 				const char* hname = iSource->GetName();
 				cout << "\t copying " << hname << endl;
-				copyDirectory( iSource, hname, hist_to_copy );
+				copyDirectory( iSource, hname, hist_to_copy, noise_tolerance );
 			}
 		}
 		fIn->Close();
@@ -221,7 +226,8 @@ int main( int argc, char* argv[] )
  */
 void copyDirectory( TDirectory* source,
 					const char* hx,
-					vector< string > hist_to_copy )
+					vector< string > hist_to_copy,
+                    float noise_tolerance )
 {
 	//copy all objects and subdirs of directory source as a subdir of the current directory
 	TDirectory* savdir = gDirectory;
@@ -230,7 +236,7 @@ void copyDirectory( TDirectory* source,
 	// 1. case: top directory exists (NOISE_...)
 	if( hx )
 	{
-		string noise_dir = check_for_similar_noise_values( hx );
+		string noise_dir = check_for_similar_noise_values( hx, noise_tolerance );
 		adir = ( TDirectory* )savdir->Get( noise_dir.c_str() );
 	}
 	else
@@ -278,7 +284,7 @@ void copyDirectory( TDirectory* source,
 			source->cd( key->GetName() );
 			TDirectory* subdir = gDirectory;
 			adir->cd();
-			copyDirectory( subdir, 0, hist_to_copy );
+			copyDirectory( subdir, 0, hist_to_copy, noise_tolerance );
 			adir->cd();
 		}
 		else
