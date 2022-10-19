@@ -4,7 +4,6 @@
 
 - ROOT must be installed 
   version >= 6.20
-  To compile root, use '-Dbuiltin_cfitsio=ON -Dbuiltin_gsl=ON'
 
 - SOFA library (http://www.iausofa.org/current_C.html) must be installed. Use the script in the $EVNDISPSYS directory:
 ```
@@ -13,6 +12,12 @@
 Set the following environmental variable:  SOFASYS=$EVNDISPSYS/sofa
 
 ### VERITAS analysis
+
+Requires installation of the VBF library (VERITAS bank format).
+Note that for newer unix system, adapations to C++17 standards are reqired.
+Use e.g.
+- https://github.com/VERITAS-Observatory/VBF/releases/tag/0.3.4-1-c%2B%2B17 for newer systems C++17 support
+- https://github.com/VERITAS-Observatory/VBF/releases/tag/0.3.4-1 for all other systems
 
 (see VERITAS internal wiki for all details)
 
