@@ -2247,6 +2247,8 @@ void VImageCleaning::cleanImageWithClusters( VImageCleaningRunParameter* iImageC
 	fData->setBrightNonImage( false );
 	fData->setImageBorderNeighbour( false );
 	double i_pedvars_i = 0.;
+	double i_pedvars_k = 0.;
+	unsigned int k = 0;
 	
 	for( unsigned int i = 0; i < fData->getNChannels(); i++ )
 	{
@@ -2260,6 +2262,20 @@ void VImageCleaning::cleanImageWithClusters( VImageCleaningRunParameter* iImageC
 		{
 			fData->setImage( i, true );
 			fData->setBorder( i, false );
+			for( unsigned int j = 0; j < fData->getDetectorGeo()->getNNeighbours()[i]; j++ )
+			{
+				k = fData->getDetectorGeo()->getNeighbours()[i][j];
+				if( k < i )
+				{
+					i_pedvars_k = fData->getPedvars( fData->getCurrentSumWindow()[k], fData->getHiLo()[k] )[k];
+					if( !fData->getImage()[k] &&
+							( ( isFixed && fData->getSums()[i] > lothresh ) ||
+							  ( !isFixed && fData->getSums()[k] > lothresh * i_pedvars_k ) ) )
+					{
+						fData->setBorder( k, true );
+					}
+				}
+			}
 		}
 		if( ( isFixed && fData->getSums()[i] > brightthresh ) || ( !isFixed && fData->getSums()[i] > brightthresh * i_pedvars_i ) )
 		{
@@ -2286,7 +2302,7 @@ void VImageCleaning::cleanImageWithClusters( VImageCleaningRunParameter* iImageC
 	
 	for( unsigned int i = 0; i < fData->getNChannels(); i++ )
 	{
-		if( fData->getImage()[i] && fData->getClusterID()[i] == 0 ) //new cluster
+		if( ( fData->getImage()[i] || fData->getBorder()[i] ) && fData->getClusterID()[i] == 0 ) //new cluster
 		{
 			fNCluster++;
 			fSizeCluster.push_back( 0 );
@@ -2296,7 +2312,7 @@ void VImageCleaning::cleanImageWithClusters( VImageCleaningRunParameter* iImageC
 		}
 	}
 	
-	//find clusters passing the size cuts
+	// find clusters passing the size cuts
 	vector<int> good_clusters;
 	for( unsigned int i = 1; i <= fNCluster; i++ )
 	{

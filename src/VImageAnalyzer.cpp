@@ -977,6 +977,11 @@ void VImageAnalyzer::imageCleaning()
 		{
 			fVImageCleaning->cleanNNImageFixed( getImageCleaningParameter() );
 		}
+		//cluster cleaning
+		else if( getImageCleaningParameter()->getImageCleaningMethod() == "CLUSTERCLEANING" )
+		{
+			fVImageCleaning->cleanImageWithClusters( getImageCleaningParameter(), true );
+		}
 		// fixed cleaning levels (classic image/border)
 		else
 		{
@@ -1008,6 +1013,11 @@ void VImageAnalyzer::imageCleaning()
 		else if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMETWOLEVEL" )
 		{
 			fVImageCleaning->cleanImagePedvarsTimeDiff( getImageCleaningParameter() );
+		}
+		//cluster cleaning
+		else if( getImageCleaningParameter()->getImageCleaningMethod() == "CLUSTERCLEANING" )
+		{
+			fVImageCleaning->cleanImageWithClusters( getImageCleaningParameter(), false );
 		}
 		else
 		{
