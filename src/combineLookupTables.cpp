@@ -112,7 +112,7 @@ int main( int argc, char* argv[] )
 		cout << "combineLookupTables <file with list of tables> <output file name> [histogram types to copy] [noise tolerance]" << endl;
 		cout << endl;
 		cout << "[histogram types]:    all, mpv, median (default)" << endl;
-        cout << "[noise tolerance]:    tolerance for combining NSB bins (default==20)" << endl;
+		cout << "[noise tolerance]:    tolerance for combining NSB bins (default==20)" << endl;
 		cout << endl;
 		exit( EXIT_FAILURE );
 	}
@@ -123,12 +123,12 @@ int main( int argc, char* argv[] )
 	{
 		histogram_types = argv[3];
 	}
-    float noise_tolerance = 20.;
-    if( argc == 5 )
-    {
-        noise_tolerance = atof(argv[4]);
-    }
-
+	float noise_tolerance = 20.;
+	if( argc == 5 )
+	{
+		noise_tolerance = atof( argv[4] );
+	}
+	
 	vector< string > hist_to_copy;
 	if( histogram_types == "all" )
 	{
@@ -227,7 +227,7 @@ int main( int argc, char* argv[] )
 void copyDirectory( TDirectory* source,
 					const char* hx,
 					vector< string > hist_to_copy,
-                    float noise_tolerance )
+					float noise_tolerance )
 {
 	//copy all objects and subdirs of directory source as a subdir of the current directory
 	TDirectory* savdir = gDirectory;

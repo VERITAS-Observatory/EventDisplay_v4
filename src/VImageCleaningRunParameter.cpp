@@ -25,10 +25,10 @@ VImageCleaningRunParameter::VImageCleaningRunParameter( string iName )
 	fminpixelcluster = 3;
 	floops = 2;
 	
-    //cluster cleaning
-    fnmaxcluster = 1;
-    fminsizecluster = 0;
-    
+	//cluster cleaning
+	fnmaxcluster = 1;
+	fminsizecluster = 0;
+	
 	// Trace Correlation Cleaning
 	fCorrelationCleanBoardThresh = 1.0; // S/N ratio of 1
 	fCorrelationCleanCorrelThresh = 0.75; // Sample correlation coefficient of 0.75
@@ -122,23 +122,23 @@ void VImageCleaningRunParameter::print()
 	{
 		cout << "\t\t time constraint between next neighbor pixels (samples): " << ftimediff << endl;
 	}
-    if( getImageCleaningMethodIndex() == 5 )
-    {
-        cout << "\t\t cluster cleaning; " ;
-        if( fnmaxcluster > 0 )
-        {
-            cout << "keep at most " << fnmaxcluster << " clusters; " ;
-        }
-        if( fminsizecluster > 0 )
-        {
-            cout << " min cluster size: " << fminsizecluster;
-        }
-        if( fminpixelcluster > 0 )
-        {
-            cout << " min no. pixels: " << fminpixelcluster;
-        }
-        cout << endl;
-    }
+	if( getImageCleaningMethodIndex() == 5 )
+	{
+		cout << "\t\t cluster cleaning; " ;
+		if( fnmaxcluster > 0 )
+		{
+			cout << "keep at most " << fnmaxcluster << " clusters; " ;
+		}
+		if( fminsizecluster > 0 )
+		{
+			cout << " min cluster size: " << fminsizecluster;
+		}
+		if( fminpixelcluster > 0 )
+		{
+			cout << " min no. pixels: " << fminpixelcluster;
+		}
+		cout << endl;
+	}
 }
 
 
@@ -160,10 +160,10 @@ string VImageCleaningRunParameter::getImageCleaningMethod()
 	{
 		return "TIMETWOLEVEL";
 	}
-    else if( fImageCleaningMethod == 5 )
-    {
-        return "CLUSTERCLEANING";
-    }
+	else if( fImageCleaningMethod == 5 )
+	{
+		return "CLUSTERCLEANING";
+	}
 	return "TWOLEVELCLEANING";
 }
 
@@ -189,10 +189,10 @@ bool VImageCleaningRunParameter::setImageCleaningMethod( string iMethod )
 	{
 		fImageCleaningMethod = 4;
 	}
-    else if( iMethod == "CLUSTERCLEANING" )
-    {
-        fImageCleaningMethod = 5;
-    }
+	else if( iMethod == "CLUSTERCLEANING" )
+	{
+		fImageCleaningMethod = 5;
+	}
 	else
 	{
 		return false;

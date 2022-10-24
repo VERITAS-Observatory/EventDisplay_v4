@@ -24,6 +24,11 @@ class VImageCleaning
 		void printDataError( string iFunctionName );
 		void removeSmallClusters( int );
 		
+		// cluster cleaning
+		void addToCluster( unsigned int cID, unsigned int iChan );
+		void removeCluster( unsigned int cID ) ;
+		vector<int> fNpixCluster;
+		vector<double> fSizeCluster;
 		
 		// NN image cleaning
 		bool  kInitNNImageCleaning;
@@ -99,6 +104,8 @@ class VImageCleaning
 		void cleanImageFixedWithTiming( VImageCleaningRunParameter* iImageCleaningParameters );
 		void cleanImagePedvarsWithTiming( VImageCleaningRunParameter* iImageCleaningParameters );
 		
+		// cluster cleaning
+		void cleanImageWithClusters( VImageCleaningRunParameter* iImageCleaningParameters, bool isFixed );
 		
 		// trace correlation cleaning
 		void cleanImageTraceCorrelate( VImageCleaningRunParameter* iImageCleaningParameters );
