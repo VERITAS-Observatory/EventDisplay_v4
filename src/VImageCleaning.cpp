@@ -385,9 +385,6 @@ int VImageCleaning::LocMin( int n, float* ptr, float& min ) //ptr[i]>0
 }
 
 //*****************************************************************************************************
-//*****************************************************************************************************
-//*****************************************************************************************************
-//*****************************************************************************************************
 // start NN image cleaning
 
 /*
@@ -2213,9 +2210,280 @@ TGraphErrors* VImageCleaning::GetIPRGraph( unsigned int teltype, float ScanWindo
 
 // end of NN image cleaning
 //*****************************************************************************************************
-//*****************************************************************************************************
-//*****************************************************************************************************
-//*****************************************************************************************************
+
+/*
+   simple cluster cleaning.
+   get image pixels (above threshold)
+   find clusters of touching pixels
+   keep N biggest clusters; cut on cluster size and number of pixels
+   add border pixels
+   in part derived from time cluster cleaning
+*/
+void VImageCleaning::cleanImageWithClusters( VImageCleaningRunParameter* iImageCleaningParameters, bool isFixed )
+{
+
+    ///////////////////////////////////////////////
+    // setting of image cleaning run parameters
+    if( !iImageCleaningParameters )
+    {
+        return;
+    }
+    double hithresh = iImageCleaningParameters->fimagethresh;
+    double lothresh = iImageCleaningParameters->fborderthresh;
+    double brightthresh = iImageCleaningParameters->fbrightnonimagetresh;
+    int minNumPixel = iImageCleaningParameters->fminpixelcluster;
+    int maxNumCluster = iImageCleaningParameters->fnmaxcluster;
+    double minSizeCluster = iImageCleaningParameters->fminsizecluster;
+    
+    
+    if( fData->getDebugFlag() )
+    {
+        cout << "VImageCleaning::cleanImageWithClusters " << fData->getTelID() << "\t" << brightthresh << endl;
+    }
+    
+    // STEP 1: Select all pixels with a signal > hithresh
+    fData->setImage( false );
+    fData->setBorder( false );
+    fData->setBrightNonImage( false );
+    fData->setImageBorderNeighbour( false );
+    double i_pedvars_i = 0.;
+    
+    for( unsigned int i = 0; i < fData->getNChannels(); i++ )
+    {
+        if( fData->getDetectorGeo()->getAnaPixel()[i] < 1 || fData->getDead( i, fData->getHiLo()[i] ) )
+        {
+            continue;
+        }
+        i_pedvars_i = fData->getPedvars( fData->getCurrentSumWindow()[i], fData->getHiLo()[i] )[i];
+        
+        if( ( isFixed && fData->getSums()[i] > hithresh ) || ( !isFixed && fData->getSums()[i] > hithresh * i_pedvars_i ) )
+        {
+            fData->setImage( i, true );
+            fData->setBorder( i, false );
+        }
+        if( ( isFixed && fData->getSums()[i] > brightthresh ) || ( !isFixed && fData->getSums()[i] > brightthresh * i_pedvars_i ) )
+        {
+            fData->setBrightNonImage( i, true );
+        }
+    }
+    
+    // STEP 2: Make clusters
+    // - group touching core pixels to clusters
+    
+    //in case there is still something in the memory, reset all channels to cluster id 0
+    for( unsigned int i = 0; i < fData->getNChannels(); i++ )
+    {
+        fData->setClusterID( i, 0 );
+    }
+    
+    unsigned int fNCluster = 0;
+    fSizeCluster.clear();
+    fNpixCluster.clear();
+    
+    //cluster 0 is for non-image pixels & non-analyzed pixels.
+    fSizeCluster.push_back( 0 );
+    fNpixCluster.push_back( 0 );
+    
+    for( unsigned int i = 0; i < fData->getNChannels(); i++ )
+    {
+        if( fData->getImage()[i] && fData->getClusterID()[i] == 0 ) //new cluster
+        {
+            fNCluster++;
+            fSizeCluster.push_back( 0 );
+            fNpixCluster.push_back( 0 );
+            //recursively add channel & its neighbors to the cluster.
+            addToCluster( fNCluster, i );
+        }
+    }
+    
+    //find clusters passing the size cuts
+    vector<int> good_clusters;
+    for( unsigned int i = 1; i <= fNCluster; i++ )
+    {
+        if( fSizeCluster.at( i ) >= minSizeCluster && fNpixCluster.at( i ) >= minNumPixel )
+        {
+            good_clusters.push_back( i );
+        }
+        else
+        {
+            removeCluster( i );
+        }
+    }
+    
+    //sort clusters by size. Bubblesort algorithm from wikipedia.
+    unsigned int n = good_clusters.size();
+    do
+    {
+        int newn = 0;
+        for( unsigned int i = 1; i < n; i++ )
+        {
+            if( fSizeCluster.at( good_clusters.at( i - 1 ) ) < fSizeCluster.at( good_clusters.at( i ) ) )
+            {
+                unsigned int temp = good_clusters.at( i );
+                good_clusters.at( i ) = good_clusters.at( i - 1 );
+                good_clusters.at( i - 1 ) = temp;
+                newn = i;
+            }
+        }
+        n = newn;
+    }
+    while( n > 0 );
+    
+    //only keep the nmax largest clusters
+    if( maxNumCluster > 0 )
+    {
+        for( unsigned int i = maxNumCluster; i < good_clusters.size() ; i++ )
+        {
+            removeCluster( good_clusters.at( i ) );
+            good_clusters.erase( good_clusters.begin() + i );
+            i--;
+        }
+    }
+    
+    //add border pixels
+    for( unsigned int i = 0; i < fData->getNChannels(); i++ )
+    {
+        int i_ID = fData->getClusterID()[i];
+        if( fData->getImage()[i] && fData->getClusterID()[i] > 0 )
+        {
+            for( unsigned int j = 0; j < fData->getDetectorGeo()->getNNeighbours()[i]; j++ )
+            {
+                unsigned int k = fData->getDetectorGeo()->getNeighbours()[i][j];
+                if( fData->getImage()[k] || fData->getBorder()[k] )
+                {
+                    continue;
+                }
+                if( ( isFixed && fData->getSums()[k] > lothresh ) || ( !isFixed && fData->getSums()[k] > lothresh * fData->getPedvars( fData->getCurrentSumWindow()[k], fData->getHiLo()[k] )[k] ) )
+                {
+                    fData->setBorder( k, true );
+                    fData->setClusterID( k, i_ID );
+                }
+            }
+        }
+    }
+    
+    // (preli) set the trigger vector in MC case (preli)
+    // trigger vector are image/border tubes
+    if( fData->getReader() )
+    {
+        if( fData->getReader()->getDataFormatNum() == 1 || fData->getReader()->getDataFormatNum() == 4	|| fData->getReader()->getDataFormatNum() == 6 )
+        {
+            fData->getReader()->setTrigger( fData->getImage(), fData->getBorder() );
+        }
+    }
+    // (end of preli)
+    
+    recoverImagePixelNearDeadPixel();
+    fillImageBorderNeighbours();
+    
+    return;
+    
+}
+
+//recursively add a pixel and its neigboring image pixels to a cluster.
+void VImageCleaning::addToCluster( unsigned int cID, unsigned int iChan )
+{
+    fData->setClusterID( iChan, cID );
+    if( fSizeCluster.size() > ( unsigned int ) cID )
+    {
+        fSizeCluster.at( cID ) += fData->getSums()[iChan];
+    }
+    else
+    {
+        cout << "VImageCleaning::addToCluster warning: ClusterID " << cID << " not available in fSizeCluster vector (size " <<  fSizeCluster.size() << ")" << endl;
+    }
+    if( fNpixCluster.size() > ( unsigned int ) cID )
+    {
+        fNpixCluster.at( cID )++;
+    }
+    else
+    {
+        cout << "VImageCleaning::addToCluster warning: ClusterID " << cID << " not available in fNpixCluster vector (size " <<  fNpixCluster.size() << ")" << endl;
+    }
+    
+    for( unsigned int j = 0; j < fData->getDetectorGeo()->getNNeighbours()[iChan]; j++ )
+    {
+        unsigned int k = fData->getDetectorGeo()->getNeighbours()[iChan][j];
+        if( fData->getImage()[k] && fData->getClusterID()[k] == 0 )
+        {
+            addToCluster( cID, k ) ;
+        }
+    }
+    return;
+}
+
+//remove a cluster (ie. set all its pixels to non-image status)
+void VImageCleaning::removeCluster( unsigned int cID )
+{
+    for( unsigned int i = 0; i < fData->getNChannels(); i++ )
+    {
+        if( fData->getClusterID()[i] == cID )
+        {
+            fData->setImage( i, false );
+        }
+    }
+    return;
+}
+
+
+
+/*!
+  Image cleaning routine using pixel timing information
+  based on Nepomuk's PhD thesis time-cluster cleaning algorithm
+   - uses fixed time differences for discrimination of pixels/clusters
+   - adjusts time difference according to the time gradient
+   - handles single core pixel
+   - BrightNonImages not completely implemented yet (needs checks - but who is really using them?)
+
+   \par hithresh image threshold
+   \par lothresh border threshold
+   \par brightthresh bright pixel threshold
+   \par timeCutPixel time difference between pixels
+   \par timeCutCluster time difference between clusters
+   \par minNumPixel minimum number of pixels in a cluster
+   \par loop_max number of loops
+*/
+
+void VImageCleaning::cleanImageFixedWithTiming( VImageCleaningRunParameter* iImageCleaningParameters )
+{
+    cleanImageWithTiming( iImageCleaningParameters, true );
+}
+
+void VImageCleaning::cleanImagePedvarsWithTiming( VImageCleaningRunParameter* iImageCleaningParameters )
+{
+    cleanImageWithTiming( iImageCleaningParameters, false );
+}
+
+
+void VImageCleaning::cleanImageWithTiming( VImageCleaningRunParameter* iImageCleaningParameters, bool isFixed )
+{
+    ///////////////////////////////////////////////
+    // setting of image cleaning run parameters
+    if( !iImageCleaningParameters )
+    {
+        return;
+    }
+    double hithresh     = iImageCleaningParameters->fimagethresh;
+    double lothresh     = iImageCleaningParameters->fborderthresh;
+    double brightthresh = iImageCleaningParameters->fbrightnonimagetresh;
+    double timeCutPixel = iImageCleaningParameters->ftimecutpixel;
+    double timeCutCluster = iImageCleaningParameters->ftimecutcluster;
+    int minNumPixel     = iImageCleaningParameters->fminpixelcluster;
+    int loop_max        = iImageCleaningParameters->floops;
+    
+    if( fData->getDebugFlag() )
+    {
+        cout << "VImageCleaning::cleanImageWithTiming " << fData->getTelID() << "\t" << brightthresh << endl;
+    }
+    
+    ///////////////////////////////////////////////
+    // check if time gradient was already calculated
+    if( fData->getImageParameters()->tgrad_x == 0 && fData->getImageParameters()->tint_x == 0 )
+    {
+        timeCutPixel = 5.0;
+        timeCutCluster = fData->getNSamples();         // = number of readout samples
+    }
+    else
 
 
 /*!
@@ -2279,7 +2547,7 @@ void VImageCleaning::cleanImageWithTiming( VImageCleaningRunParameter* iImageCle
 		float tpix = fData->getImageParameters()->tgrad_x * 0.15; // VERITAS pixel size (HARDCODED)
 		if( tpix > timeCutPixel )
 		{
-			timeCutPixel = tpix + 0.1;                     // added some uncertenties adhoc
+			timeCutPixel = tpix + 0.1;                     // added some uncertainties adhoc
 		}
 	}
 	
@@ -2307,7 +2575,6 @@ void VImageCleaning::cleanImageWithTiming( VImageCleaningRunParameter* iImageCle
 			{
 				fData->setImage( i, true );
 			}
-			//	    if( fData->getSums()[i] > brightthresh ) fData->setBrightNonImage( i, true );
 		}
 		else
 		{
@@ -2316,7 +2583,6 @@ void VImageCleaning::cleanImageWithTiming( VImageCleaningRunParameter* iImageCle
 			{
 				fData->setImage( i, true );
 			}
-			//	    if( fData->getSums()[i] > brightthresh  * i_pedvars_i ) fData->setBrightNonImage( i, true );
 		}
 	}
 	
@@ -2451,10 +2717,6 @@ void VImageCleaning::cleanImageWithTiming( VImageCleaningRunParameter* iImageCle
 		}
 		cluster++;
 	}
-	//     cout << "MAIN CLUSTER " << getMainClusterID()
-	// 	 << ": Npix=" << getClusterNpix()[ getMainClusterID() ]
-	// 	 << " Size=" << getClusterSize()[ getMainClusterID() ]
-	// 	 << " Time=" << getClusterTime()[ getMainClusterID() ] << endl;
 	
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// STEP 4: eliminate all clusters with time differences > Tcluster to the main cluster

@@ -1082,6 +1082,34 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				}
 				continue;
 			}
+            else if( iTemp.find( "CLUSTERCLEANINGPARAMETERS" ) != string::npos && fRunPara )
+            {
+                for( unsigned int i = 0; i < fTel_type_perTelescope.size(); i++ )
+                {
+                    if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+                    {
+                        if( i < fRunPara->fImageCleaningParameters.size() && iTemp2.size() > 0 )
+                        {
+                            fRunPara->fImageCleaningParameters[i]->fnmaxcluster = atof( iTemp2.c_str() );
+                        }
+                        if( iTemp3.size() > 0 )
+                        {
+                            if( i < fRunPara->fImageCleaningParameters.size() )
+                            {
+                                fRunPara->fImageCleaningParameters[i]->fminsizecluster = atof( iTemp3.c_str() );
+                            }
+                        }
+                        if( iTemp4.size() > 0 )
+                        {
+                            if( i < fRunPara->fImageCleaningParameters.size() )
+                            {
+                                fRunPara->fImageCleaningParameters[i]->fminpixelcluster = atoi( iTemp4.c_str() );
+                            }
+                        }
+                    }
+                }
+                continue;
+            }
 			else if( iTemp == "TIMECLEANINGPARAMETERS" && fRunPara )
 			{
 				for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
@@ -1706,4 +1734,3 @@ vector< int > VEvndispReconstructionParameter::getTelescopeType_counter_from_Mir
 	}
 	return x;
 }
-

@@ -40,6 +40,10 @@ class VImageCleaningRunParameter
 		double fCorrelationCleanCorrelThresh; //  parameter for trace correlation level (0.6-1.0)
 		int    fCorrelationCleanNpixThresh;   //  Maximum Number of pixels to apply correlation cleaning to (eg 10-15)
 		
+        /////////////////////////////////////////////////
+        // cluster cleaning
+        int fnmaxcluster;
+        double fminsizecluster;
 		
 		/////////////////////////////////////////////////
 		// time two-level
