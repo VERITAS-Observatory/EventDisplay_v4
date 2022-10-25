@@ -4688,7 +4688,7 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
 		cout << "(total counts available: " << norm << ", ";
 		cout << "current limit " << fPedPerTelescopeTypeMinCnt << ")" << endl;
 		cout << "IPR graphs will be provided as sum of 4 telescopes statistics." << endl;
-	        cout << "VCalibrator::calculateIPRGraphs(): fIPRAverageTel = " << fRunPar->fIPRAverageTel << endl;
+		cout << "VCalibrator::calculateIPRGraphs(): fIPRAverageTel = " << fRunPar->fIPRAverageTel << endl;
 	}
 	if( norm == 0 )
 	{

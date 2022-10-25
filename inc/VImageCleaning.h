@@ -65,7 +65,7 @@ class VImageCleaning
 		void  ScaleCombFactors( unsigned int TrigSimTelType, float scale );
 		void  ResetCombFactors( unsigned int TrigSimTelType );
 		int   ImageCleaningCharge( unsigned int TrigSimTelType );
-		TGraphErrors* calculateIPRGraphsAveragedAllTelescopes(unsigned int iSummationWindow );
+		TGraphErrors* calculateIPRGraphsAveragedAllTelescopes( unsigned int iSummationWindow );
 		bool  InitNNImageCleaning();
 		bool  InitNNImgClnPerTelType( unsigned int TrigSimTelType );
 		void  DiscardTimeOutlayers( unsigned int TrigSimTelType );

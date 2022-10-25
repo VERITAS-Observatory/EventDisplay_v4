@@ -134,7 +134,7 @@ class CData
 		Float_t         EmissionHeightChi2;
 		UInt_t          NTelPairs;
 		//[NTelPairs]
-		Float_t         EmissionHeightT[VDST_MAXTELESCOPES * VDST_MAXTELESCOPES];
+		Float_t         EmissionHeightT[VDST_MAXTELESCOPES* VDST_MAXTELESCOPES];
 		Double_t        DispDiff;  // from disp method
 		
 		// List of branches
