@@ -1,7 +1,7 @@
 /*! \class VPlotUtilities
 
 
-
+    \author Gernot Maier
 */
 
 #include "VPlotUtilities.h"

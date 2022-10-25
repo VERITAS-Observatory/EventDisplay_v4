@@ -7,6 +7,7 @@
      * add mean HV values
 
 
+    \author Gernot Maier
 */
 
 #include "VRunStats.h"
@@ -209,7 +210,7 @@ bool VRunStats::readDBAnalysisComments()
 	
 	char c_query[1000];
 	sprintf( c_query, "select run_id , data_category   , status   , status_reason , tel_cut_mask , usable_duration , time_cut_mask , light_level , vpm_config_mask , authors  , comment from tblRun_Analysis_Comments where run_id >= %d and run_id <= %d", fMin_run_id, fMax_run_id );
-	cout << c_query << endl;
+    cout << c_query << endl;
 	
 	if( !my_connection.make_query( c_query ) )
 	{
@@ -935,7 +936,7 @@ bool VRunStats::readDBRunInfo( TSQLServer* f_db )
 		iRa  += i_RunData->offsetRA;
 		iDec += i_RunData->offsetDec;
 		
-		VAstronometry::vlaEqgal( iRa / 180. * TMath::Pi(), iDec / 180. * TMath::Pi(), &i_l, &i_b );
+		slaEqgal( iRa / 180. * TMath::Pi(), iDec / 180. * TMath::Pi(), &i_l, &i_b );
 		i_RunData->GalLong1958 = i_l * 180. / TMath::Pi();
 		i_RunData->GalLat1958  = i_b * 180. / TMath::Pi();
 		
@@ -1142,7 +1143,7 @@ void VRunStats::getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip 
 		ms = 0;
 	}
 	// calculate MJD
-	VAstronometry::vlaCldj( y, m, d, &gMJD, &l );
+	slaCldj( y, m, d, &gMJD, &l );
 	MJD = ( int )gMJD;
 	Time = h * 60.*60. + min * 60. + s + ms / 1.e3;
 }

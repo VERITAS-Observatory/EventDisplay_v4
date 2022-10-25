@@ -2,7 +2,7 @@
     \brief effective area fitting
 
 
-
+    \author Gernot Maier
 */
 
 #include "VFitEffectiveArea.h"

@@ -2,7 +2,7 @@
     \brief fill and read tables for angular reconstruction with disp method
 
 
-
+    \author Gernot Maier
 
 */
 
@@ -278,7 +278,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
 		cout << "VDispTable::fillTable error finding tree showerpars" << endl;
 		return false;
 	}
-	Cshowerpars* m = new Cshowerpars( s, true, true );
+	Cshowerpars* m = new Cshowerpars( s, true, 6, true );
 	if( !m )
 	{
 		return false;
@@ -294,7 +294,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
 			cout << "VDispTable::fillTable error finding tree tpars for telescope " << i + 1 << endl;
 			continue;
 		}
-		Ctpars* c = new Ctpars( t, true, 1 );
+		Ctpars* c = new Ctpars( t, true, 6, 1 );
 		if( !c )
 		{
 			continue;
@@ -386,7 +386,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
 			cout << "VDispTable::fillTable error finding tree tpars for telescope " << i + 1 << endl;
 			continue;
 		}
-		Ctpars* c = new Ctpars( t, true, 1 );
+		Ctpars* c = new Ctpars( t, true, 6, 1 );
 		if( !c )
 		{
 			continue;

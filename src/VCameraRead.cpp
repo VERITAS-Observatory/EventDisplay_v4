@@ -215,7 +215,7 @@ bool VCameraRead::readCameraFile( string iCameraFile )
 			// reading neighbours
 			is_stream >> i_char;
 			unsigned int j = 0;
-			while( !( is_stream >> std::ws ).eof() && i_char.substr( 0, 1 ) == "N" )
+			while( !(is_stream>>std::ws).eof() && i_char.substr( 0, 1 ) == "N" )
 			{
 				if( j < fNeighbour[fTelID][i_ch].size() )
 				{
@@ -225,11 +225,11 @@ bool VCameraRead::readCameraFile( string iCameraFile )
 				j++;
 			}
 			// maybe there is some information about triggers and dead channels
-			if( !( is_stream >> std::ws ).eof() && i_char.substr( 0, 4 ) == "TRIG" )
+			if( !(is_stream>>std::ws).eof() && i_char.substr( 0, 4 ) == "TRIG" )
 			{
 				is_stream >> fTrigTube[fTelID][i_ch];
 			}
-			if( !( is_stream >> std::ws ).eof() )
+			if( !(is_stream>>std::ws).eof() )
 			{
 				is_stream >> i_char;
 				if( i_char.substr( 0, 3 ) == "ANA" )
@@ -238,7 +238,7 @@ bool VCameraRead::readCameraFile( string iCameraFile )
 				}
 			}
 			// get convertion from MC tube numbering to real data tube numbering
-			if( !( is_stream >> std::ws ).eof() )
+			if( !(is_stream>>std::ws).eof() )
 			{
 				is_stream >> i_char;
 				if( i_char.substr( 0, 3 ) == "MIX" )
@@ -842,7 +842,7 @@ void VCameraRead::readPixelFile( string iFile )
 				}
 				for( unsigned int j = 0; j < fMaxNeighbour; j++ )
 				{
-					if( !( is_stream >> std::ws ).eof() )
+					if( !(is_stream>>std::ws).eof() )
 					{
 						if( j < fNeighbour[i_telID][i_chan].size() )
 						{
@@ -1275,7 +1275,7 @@ bool VCameraRead::makeNeighbourList()
 			for( unsigned int k = 0; k < j; k++ )
 			{
 				double itemp = sqrt( ( getX_MM( i )[j] - getX_MM( i )[k] ) * ( getX_MM( i )[j] - getX_MM( i )[k] )
-									 + ( getY_MM( i )[j] - getY_MM( i )[k] ) * ( getY_MM( i )[j] - getY_MM( i )[k] ) );
+						   + ( getY_MM( i )[j] - getY_MM( i )[k] ) * ( getY_MM( i )[j] - getY_MM( i )[k] ) );
 				if( itemp < iTubeDistance_min )
 				{
 					iTubeDistance_min = itemp;
@@ -1291,7 +1291,7 @@ bool VCameraRead::makeNeighbourList()
 			for( unsigned int k = 0; k < j; k++ )
 			{
 				double itemp = sqrt( ( getX_MM( i )[j] - getX_MM( i )[k] ) * ( getX_MM( i )[j] - getX_MM( i )[k] )
-									 + ( getY_MM( i )[j] - getY_MM( i )[k] ) * ( getY_MM( i )[j] - getY_MM( i )[k] ) );
+						   + ( getY_MM( i )[j] - getY_MM( i )[k] ) * ( getY_MM( i )[j] - getY_MM( i )[k] ) );
 				if( itemp < 2.1 * sqrt( 2. )*iTubeDistance_min )
 				{
 					if( getAnaPixel( i )[k] > 0 )
@@ -1316,7 +1316,7 @@ bool VCameraRead::makeNeighbourList()
 			}
 		}
 	}
-	
+
 	return true;
 }
 
@@ -1372,25 +1372,25 @@ bool VCameraRead::setLowGainThreshold( unsigned int iTel, unsigned int ival )
 */
 unsigned int VCameraRead::getTelType_Counter( ULong64_t iTelType )
 {
-	set< ULong64_t > s;
-	
-	for( unsigned int i = 0; i < fTelType.size(); i++ )
-	{
-		s.insert( fTelType[i] );
-	}
-	
-	unsigned int z = 0;
-	for( set< ULong64_t >::iterator i_s = s.begin(); i_s != s.end(); i_s++ )
-	{
-		if( *i_s == iTelType )
-		{
-			return z;
-		}
-		z++;
-	}
-	
-	// unsuccessfull search
-	return 9999;
+    set< ULong64_t > s;
+    
+    for( unsigned int i = 0; i < fTelType.size(); i++ )
+    {
+        s.insert( fTelType[i] );
+    }
+
+    unsigned int z = 0;
+    for( set< ULong64_t >::iterator i_s = s.begin(); i_s != s.end(); i_s++ )
+    {
+        if( *i_s == iTelType )
+        {
+            return z;
+        }
+        z++;
+    }
+
+    // unsuccessfull search
+    return 9999;
 }
 
 
@@ -1414,94 +1414,12 @@ vector<ULong64_t> VCameraRead::getTelType_list()
 	return t;
 }
 
-bool VCameraRead::read_camerarotation_fromDB( string iDBStartTime )
-{
-	stringstream iTempS;
-	iTempS << getDBServer() << "/VOFFLINE";
-	char c_query[800];
-	sprintf( c_query, "select telescope_id, version, pmt_rotation from tblPointing_Monitor_Camera_Parameters where start_date <= \"%s\" AND end_date > \"%s\" ", iDBStartTime.substr( 0, 10 ).c_str(), iDBStartTime.substr( 0, 10 ).c_str() );
-	
-	VDB_Connection my_connection( iTempS.str().c_str(), "readonly", "" ) ;
-	if( !my_connection.Get_Connection_Status() )
-	{
-		cout << "VCameraRead: failed to connect to database server" << endl;
-		cout << "\t server: " <<  iTempS.str() << endl;
-		return false;
-	}
-	if( !my_connection.make_query( c_query ) )
-	{
-		return false;
-	}
-	TSQLResult* db_res = my_connection.Get_QueryResult();
-	
-	int iNRows = db_res->GetRowCount();
-	vector< int > iVersion( fCameraRotation.size(), -99 );
-	for( int j = 0; j < iNRows; j++ )
-	{
-		TSQLRow* db_row = db_res->Next();
-		if( !db_row )
-		{
-			continue;
-		}
-		
-		int itelID = -99;
-		double iRot = -99.;
-		if( db_row->GetField( 0 ) )
-		{
-			itelID = atoi( db_row->GetField( 0 ) );
-		}
-		// check entry version
-		if( itelID >= 0 && itelID < ( int )iVersion.size() )
-		{
-			if( db_row->GetField( 1 ) && atoi( db_row->GetField( 1 ) ) > iVersion[itelID] )
-			{
-				if( db_row->GetField( 2 ) )
-				{
-					iRot = atof( db_row->GetField( 2 ) ) * TMath::RadToDeg();
-					if( itelID >= 0 && itelID < ( int )fCameraRotation.size() )
-					{
-						fCameraRotation[itelID] = -1.* iRot;
-					}
-				}
-				iVersion[itelID] = atoi( db_row->GetField( 1 ) );
-			}
-		}
-	}
-	return true;
-}
-
-/*
- * read camera rotation values from text files
- *
- */
-bool VCameraRead::read_camerarotation_fromDBTextFile( unsigned int run_number, string iDBTextDirectory )
-{
-	VSQLTextFileReader a( iDBTextDirectory, run_number, "camerarotation" );
-	if( !a.isGood() )
-	{
-		return false;
-	}
-	for( unsigned int telID = 0; telID < fNTel; telID++ )
-	{
-		if( telID < fCameraRotation.size() )
-		{
-			fCameraRotation[telID] = -1. * atof(
-										 a.getValue_from_key( "pmt_rotation", "telescope_id", to_string( telID ) ).c_str() ) * TMath::RadToDeg();
-		}
-	}
-	return true;
-}
-
 /*!
 
      read varios detector parameters from the DB
 
 */
-bool VCameraRead::readDetectorGeometryFromDB(
-	string iDBStartTime,
-	string iDBTextDirectory,
-	unsigned int iRunNumber,
-	bool iReadRotationsFromDB )
+bool VCameraRead::readDetectorGeometryFromDB( string iDBStartTime, bool iReadRotationsFromDB )
 {
 	if( fDebug )
 	{
@@ -1523,20 +1441,60 @@ bool VCameraRead::readDetectorGeometryFromDB(
 	// read camera rotations from DB
 	if( iReadRotationsFromDB )
 	{
-		if( iDBTextDirectory.size() == 0 )
+		stringstream iTempS;
+		iTempS << getDBServer() << "/VOFFLINE";
+		char c_query[800];
+		sprintf( c_query, "select telescope_id, version, pmt_rotation from tblPointing_Monitor_Camera_Parameters where start_date <= \"%s\" AND end_date > \"%s\" ", iDBStartTime.substr( 0, 10 ).c_str(), iDBStartTime.substr( 0, 10 ).c_str() );
+		
+		//std::cout<<"VCameraRead::readDetectorGeometryFromDB "<<std::endl;
+		VDB_Connection my_connection( iTempS.str().c_str() , "readonly", "" ) ;
+		if( !my_connection.Get_Connection_Status() )
 		{
-			if( !read_camerarotation_fromDB( iDBStartTime ) )
+			cout << "VCameraRead: failed to connect to database server" << endl;
+			cout << "\t server: " <<  iTempS.str() << endl;
+			return false;
+		}
+		if( !my_connection.make_query( c_query ) )
+		{
+			return false;
+		}
+		TSQLResult* db_res = my_connection.Get_QueryResult();
+		
+		
+		int iNRows = db_res->GetRowCount();
+		vector< int > iVersion( fCameraRotation.size(), -99 );
+		for( int j = 0; j < iNRows; j++ )
+		{
+			TSQLRow* db_row = db_res->Next();
+			if( !db_row )
 			{
-				return false;
+				continue;
+			}
+			
+			int itelID = -99;
+			double iRot = -99.;
+			if( db_row->GetField( 0 ) )
+			{
+				itelID = atoi( db_row->GetField( 0 ) );
+			}
+			// check entry version
+			if( itelID >= 0 && itelID < ( int )iVersion.size() )
+			{
+				if( db_row->GetField( 1 ) && atoi( db_row->GetField( 1 ) ) > iVersion[itelID] )
+				{
+					if( db_row->GetField( 2 ) )
+					{
+						iRot = atof( db_row->GetField( 2 ) ) * TMath::RadToDeg();
+						if( itelID >= 0 && itelID < ( int )fCameraRotation.size() )
+						{
+							fCameraRotation[itelID] = -1.* iRot;
+						}
+					}
+					iVersion[itelID] = atoi( db_row->GetField( 1 ) );
+				}
 			}
 		}
-		else
-		{
-			if( !read_camerarotation_fromDBTextFile( iRunNumber, iDBTextDirectory ) )
-			{
-				return false;
-			}
-		}
+		//       i_DB->Close();
 	}
 	
 	cout << "\t (rotations from DB [deg]: ";

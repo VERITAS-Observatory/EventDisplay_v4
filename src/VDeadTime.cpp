@@ -518,34 +518,34 @@ TList* VDeadTime::getDeadTimeHistograms()
 */
 double VDeadTime::getDeadTimeFraction( double iT_run_s, bool iTimeDiff, bool iCheckForConsistentDeadTime )
 {
-	double iDeadTime = 0.;
+        double iDeadTime = 0.;
 	// method of time difference: no time dependence
 	if( iTimeDiff )
 	{
-		iDeadTime = fDeadTimeFrac;
+	        iDeadTime = fDeadTimeFrac;
 	}
 	// dead time fraction from scalars
-	else
-	{
-		if( hScalarDeadTimeFraction )
-		{
-			int nbin = hScalarDeadTimeFraction->FindBin( iT_run_s );
-			if( nbin > 0 && nbin <= hScalarDeadTimeFraction->GetNbinsX() )
-			{
-				iDeadTime = hScalarDeadTimeFraction->GetBinContent( nbin );
-			}
-		}
-		else
-		{
-			iDeadTime = fScalarDeadTimeFrac;
-		}
+    else
+    {
+       if( hScalarDeadTimeFraction )
+       {
+            int nbin = hScalarDeadTimeFraction->FindBin( iT_run_s );
+            if( nbin > 0 && nbin <= hScalarDeadTimeFraction->GetNbinsX() )
+            {
+                iDeadTime = hScalarDeadTimeFraction->GetBinContent( nbin );
+            }
+       }
+            else
+            {
+                 iDeadTime = fScalarDeadTimeFrac;
+            }
 	}
-	// scalar dead time does not provide consistent values for a very small
-	// number of runs
-	if( iCheckForConsistentDeadTime && iDeadTime > 0.98 )
-	{
-		return fDeadTimeFrac;
-	}
+        // scalar dead time does not provide consistent values for a very small
+        // number of runs
+        if( iCheckForConsistentDeadTime && iDeadTime > 0.98 )
+        {
+            return fDeadTimeFrac;
+        }
 	return iDeadTime;
 }
 

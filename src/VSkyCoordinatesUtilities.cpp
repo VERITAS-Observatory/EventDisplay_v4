@@ -7,7 +7,7 @@
 
 int VSkyCoordinatesUtilities::getMJD_from_SQLstring( string iSQLData, double& i_mjd, double& sec_of_day )
 {
-	if( iSQLData.size() < 19 && iSQLData.size() != 10 )
+	if( iSQLData.size() < 19 )
 	{
 		i_mjd = 0;
 		sec_of_day = 0;
@@ -17,49 +17,30 @@ int VSkyCoordinatesUtilities::getMJD_from_SQLstring( string iSQLData, double& i_
 	int i_month = atoi( iSQLData.substr( 5, 2 ).c_str() );
 	int i_day   = atoi( iSQLData.substr( 8, 2 ).c_str() );
 	
-	
 	// MJD
 	int i_stat = 0;
 	if( i_year > 0 )
 	{
-		VAstronometry::vlaCldj( i_year, i_month, i_day, &i_mjd, &i_stat );
+		slaCldj( i_year, i_month, i_day, &i_mjd, &i_stat );
 	}
 	else
 	{
 		i_mjd = 0;
 	}
-	if( iSQLData.size() != 10 )
-	{
-		// fraction of day
-		sec_of_day  = atof( iSQLData.substr( 11, 2 ).c_str() ) * 60.*60.;
-		sec_of_day += atof( iSQLData.substr( 14, 2 ).c_str() ) * 60.;
-		sec_of_day += atof( iSQLData.substr( 17, 2 ).c_str() );
-	}
+	
+	// fraction of day
+	sec_of_day  = atof( iSQLData.substr( 11, 2 ).c_str() ) * 60.*60.;
+	sec_of_day += atof( iSQLData.substr( 14, 2 ).c_str() ) * 60.;
+	sec_of_day += atof( iSQLData.substr( 17, 2 ).c_str() );
 	
 	return i_stat;
-}
-
-string VSkyCoordinatesUtilities::getSQLstring_fromMJD( double MJD )
-{
-	stringstream iSQL;
-	int year = 0;
-	int month = 0;
-	int day = 0;
-	int j = 0;
-	double fd = 0.;
-	VAstronometry::vlaDjcl( MJD, &year, &month, &day, &fd, &j );
-	iSQL << year << "-";
-	iSQL << setfill( '0' ) << setw( 2 ) << month << "-";
-	iSQL << setfill( '0' ) << setw( 2 ) << day;
-	
-	return iSQL.str();
 }
 
 double VSkyCoordinatesUtilities::getMJD( int i_year, int i_month, int i_day )
 {
 	double i_mjd = 0.;
 	int i_stat = 0;
-	VAstronometry::vlaCldj( i_year, i_month, i_day, &i_mjd, &i_stat );
+	slaCldj( i_year, i_month, i_day, &i_mjd, &i_stat );
 	
 	return i_mjd;
 }
@@ -174,7 +155,7 @@ void VSkyCoordinatesUtilities::getWobbledDirection( double iNorth, double iEast,
    [rad] or [deg] (depending on iUnitIsDeg)
 
 */
-void VSkyCoordinatesUtilities::precessTarget( double iMJD_end, double& ra_rad, double& dec_rad, double iMJD_start, bool iUnitIsDeg )
+double VSkyCoordinatesUtilities::precessTarget( double iMJD_end, double& ra_rad, double& dec_rad, double iMJD_start, bool iUnitIsDeg )
 {
 	if( iUnitIsDeg )
 	{
@@ -182,13 +163,24 @@ void VSkyCoordinatesUtilities::precessTarget( double iMJD_end, double& ra_rad, d
 		dec_rad *= TMath::DegToRad();
 	}
 	
-	VAstronometry::vlaPreces( iMJD_start, iMJD_end, &ra_rad, &dec_rad );
+	int  oy, om, od, j, ny, nd;
+	double ofd, ofy_start, ofy_end;
+	slaDjcl( iMJD_end, &oy, &om, &od, &ofd, &j );
+	slaClyd( oy, om, od, &ny, &nd, &j );
+	ofy_end = ny + nd / 365.25;
+	slaDjcl( iMJD_start, &oy, &om, &od, &ofd, &j );
+	slaClyd( oy, om, od, &ny, &nd, &j );
+	ofy_start = ny + nd / 365.25;
+	
+	slaPreces( "FK5", ofy_start, ofy_end, &ra_rad, &dec_rad );
 	
 	if( iUnitIsDeg )
 	{
 		ra_rad *= TMath::RadToDeg();
 		dec_rad *= TMath::RadToDeg();
 	}
+	
+	return ofy_end;
 }
 
 
@@ -330,7 +322,7 @@ void VSkyCoordinatesUtilities::getRotatedShowerDirection( double ze, double az, 
 
 double VSkyCoordinatesUtilities::adjustAzimuthToRange( double az_deg )
 {
-	return VAstronometry::vlaDranrm( az_deg * TMath::DegToRad() ) * TMath::RadToDeg();
+	return slaDranrm( az_deg * TMath::DegToRad() ) * TMath::RadToDeg();
 }
 
 /*
@@ -340,11 +332,15 @@ double VSkyCoordinatesUtilities::adjustAzimuthToRange( double az_deg )
 */
 double VSkyCoordinatesUtilities::getTargetShiftWest( double iTargetRA_deg, double iTargetDec_deg, double ira_deg, double idec_deg )
 {
-	double sep  = VAstronometry::vlaDsep( iTargetRA_deg * TMath::DegToRad(), iTargetDec_deg * TMath::DegToRad(),
-										  ira_deg * TMath::DegToRad(), idec_deg * TMath::DegToRad() );
-	double bear = VAstronometry::vlaDbear( iTargetRA_deg * TMath::DegToRad(), iTargetDec_deg * TMath::DegToRad(),
-										   ira_deg * TMath::DegToRad(), idec_deg * TMath::DegToRad() );
-										   
+	double sep  = slaDsep( iTargetRA_deg * TMath::DegToRad(), 
+                           iTargetDec_deg * TMath::DegToRad(), 
+                           ira_deg * TMath::DegToRad(), 
+                           idec_deg * TMath::DegToRad() );
+	double bear = slaDbear( iTargetRA_deg * TMath::DegToRad(), 
+                            iTargetDec_deg * TMath::DegToRad(), 
+                            ira_deg * TMath::DegToRad(), 
+                            idec_deg * TMath::DegToRad() );
+	
 	double iShift = sep * sin( bear ) * TMath::RadToDeg();
 	
 	if( TMath::Abs( iShift ) < 1.e-8 )
@@ -358,11 +354,15 @@ double VSkyCoordinatesUtilities::getTargetShiftWest( double iTargetRA_deg, doubl
 
 double VSkyCoordinatesUtilities::getTargetShiftNorth( double iTargetRA_deg, double iTargetDec_deg, double ira_deg, double idec_deg )
 {
-	double sep  = VAstronometry::vlaDsep( iTargetRA_deg * TMath::DegToRad(), iTargetDec_deg * TMath::DegToRad(),
-										  ira_deg * TMath::DegToRad(), idec_deg * TMath::DegToRad() );
-	double bear = VAstronometry::vlaDbear( iTargetRA_deg * TMath::DegToRad(), iTargetDec_deg * TMath::DegToRad(),
-										   ira_deg * TMath::DegToRad(), idec_deg * TMath::DegToRad() );
-										   
+	double sep  = slaDsep( iTargetRA_deg * TMath::DegToRad(), 
+                           iTargetDec_deg * TMath::DegToRad(), 
+                           ira_deg * TMath::DegToRad(), 
+                           idec_deg * TMath::DegToRad() );
+	double bear = slaDbear( iTargetRA_deg * TMath::DegToRad(), 
+                            iTargetDec_deg * TMath::DegToRad(), 
+                            ira_deg * TMath::DegToRad(), 
+                            idec_deg * TMath::DegToRad() );
+	
 	double iShift = sep * cos( bear ) * TMath::RadToDeg();
 	
 	if( TMath::Abs( iShift ) < 1.e-8 )
@@ -376,8 +376,6 @@ double VSkyCoordinatesUtilities::getTargetShiftNorth( double iTargetRA_deg, doub
 /*
 
    convert x,y in derotated coordinates of current epoch (iMJD) into x,y in J2000
-
-   use RA/DEC in J2000 for pointing
 
 */
 void VSkyCoordinatesUtilities::convert_derotatedCoordinates_to_J2000( double iMJD, double i_RA_J2000_deg, double i_DEC_J2000_deg, double& x, double& y )
@@ -428,27 +426,20 @@ double VSkyCoordinatesUtilities::angularDistance( double Az, double Ze, double T
 	return value;
 }
 
-
-/*
- *
- *  get equatorial from horizontal coordinates
- *
- *  all input/output angles in [deg]
- */
 void VSkyCoordinatesUtilities::getEquatorialCoordinates( int MJD, double time, double az_deg, double ze_deg, double& dec_deg, double& ra_deg )
 {
 	// convert time to fraction of a day
 	double iTime = time / 86400.;
 	// transform coordinates
 	double ha = 0.;
-	VAstronometry::vlaDh2e( az_deg * TMath::DegToRad(), ( 90. - ze_deg ) * TMath::DegToRad(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &ha, &dec_deg );
+	slaDh2e( az_deg * TMath::DegToRad(), ( 90. - ze_deg ) * TMath::DegToRad(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &ha, &dec_deg );
 	// convert hour angle into ra
 	// get Greenwich sideral time
-	double iSid = VAstronometry::vlaGmsta( ( double )MJD, iTime );
+	double iSid = slaGmsta( ( double )MJD, iTime );
 	// calculate local sideral time
 	iSid = iSid - VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad();
 	// calculate right ascension
-	ra_deg = VAstronometry::vlaDranrm( iSid - ha );
+	ra_deg = slaDranrm( iSid - ha );
 	// from [rad] to [deg]
 	dec_deg *= TMath::RadToDeg();
 	ra_deg  *= TMath::RadToDeg();
@@ -459,43 +450,14 @@ void VSkyCoordinatesUtilities::getHorizontalCoordinates( int MJD, double time, d
 	// convert time to fraction of a day
 	double iTime = time / 86400.;
 	// get Greenwich sideral time
-	double iSid = VAstronometry::vlaGmsta( ( double )MJD, iTime );
+	double iSid = slaGmsta( ( double )MJD, iTime );
 	// calculate local sideral time
 	iSid = iSid - VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad();
 	// calculate hour angle
-	double ha = VAstronometry::vlaDranrm( iSid - ra_deg * TMath::DegToRad() );
+	double ha = slaDranrm( iSid - ra_deg * TMath::DegToRad() );
 	// get horizontal coordinates
-	VAstronometry::vlaDe2h( ha, dec_deg * TMath::DegToRad(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &az_deg, &ze_deg );
+	slaDe2h( ha, dec_deg * TMath::DegToRad(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &az_deg, &ze_deg );
 	// from [rad] to [deg]
 	ze_deg = 90 - ze_deg * TMath::RadToDeg();
 	az_deg *= TMath::RadToDeg();
 }
-
-/*
- * returns the camera derotation angle in radians
-*/
-double VSkyCoordinatesUtilities::getDerotationAngle( double i_UTC, double iTelRA, double iTelDec,
-		double iObservatoryLongitude, double iObservatoryLatitude )
-{
-	return  -1.*VAstronometry::vlaPa( getHourAngle( i_UTC, iTelRA, iObservatoryLongitude ),
-									  iTelDec, iObservatoryLatitude );
-}
-
-double VSkyCoordinatesUtilities::getDerotationAngle( double iMJD, double iTime, double iTelRA, double iTelDec,
-		double iObservatoryLongitude, double iObservatoryLatitude )
-{
-	return getDerotationAngle( getUTC( iMJD, iTime ), iTelRA, iTelDec, iObservatoryLongitude, iObservatoryLatitude );
-}
-
-
-double VSkyCoordinatesUtilities::getSidereal( double i_UTC, double iObservatoryLongitude )
-{
-	return VAstronometry::vlaDranrm( VAstronometry::vlaGmst( i_UTC ) - iObservatoryLongitude );
-}
-
-
-double VSkyCoordinatesUtilities::getHourAngle( double i_UTC, double iTelRA, double iObservatoryLongitude )
-{
-	return VAstronometry::vlaDranrm( getSidereal( i_UTC, iObservatoryLongitude ) - iTelRA );
-}
-

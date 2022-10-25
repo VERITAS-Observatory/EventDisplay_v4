@@ -2,7 +2,7 @@
     \brief calculate and plot array reconstruction quality
 
 
-
+    \author Gernot Maier
 */
 
 #include "VStereoReconstruction.h"

@@ -1,6 +1,7 @@
 /*! file VTS.getRunListFromDB read exposure from DB
 
     (VERITAS only)
+    \author Gareth Hughes
 
 */
 
@@ -72,19 +73,19 @@ int main( int argc, char* argv[] )
 			a.getLaserList();
 		}
 		a.printListOfRuns();
-		
+
 		if( bCHECKDISK )
 		{
 			a.checkRunList();
 		}
-		else
+		else 
 		{
 			a.downloadRunList();
-		}
+		}	
 		if( bANASUM )
 		{
 			a.outputAnasumRunlist( fAnasumFile );
-		}
+		}		
 		a.printChecksumSummary();
 		return 0;
 		
@@ -179,9 +180,9 @@ int main( int argc, char* argv[] )
 		{
 			a.outputAnasumRunlist( fAnasumFile );
 		}
-		
+
 		a.printChecksumSummary();
-		
+
 		return 0;
 		
 	}

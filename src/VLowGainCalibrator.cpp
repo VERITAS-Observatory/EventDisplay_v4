@@ -324,7 +324,7 @@ bool VLowGainCalibrator::findLightLevels( bool iDraw )
 {
 	for( int tel = 0; tel < fNTel; tel++ )
 	{
-		findLightLevels( tel, 2, iDraw );
+		findLightLevels( tel, 2 , iDraw );
 		
 		int test = checkLightLevels( tel );
 		if( test == 0 )
@@ -354,7 +354,7 @@ bool VLowGainCalibrator::findLightLevels( bool iDraw )
      fill the different light levels from the monitoring charge histograms
 
 */
-void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance, bool iDraw )
+void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance , bool iDraw )
 {
 	resetLightLevels( tel );
 	// check first that monitoring charge histogram exists
@@ -764,7 +764,7 @@ bool VLowGainCalibrator::calculateMeanCharges()
 					fN   [tel][iChan][ HiLo[tel][iChan] ][level]++;
 					fNSat[tel][iChan][ HiLo[tel][iChan] ][level] += ( RawMax[tel][iChan] == 255 ? 1 : 0 );
 					fY   [tel][iChan][ HiLo[tel][iChan] ][level] += sum2[tel][iChan] / ( HiLo[tel][iChan] ? fLMult[tel] : 1.0 );
-					fY2  [tel][iChan][ HiLo[tel][iChan] ][level] += TMath::Power( sum2[tel][iChan] / ( HiLo[tel][iChan] ? fLMult[tel] : 1.0 ), 2 ) ;
+					fY2  [tel][iChan][ HiLo[tel][iChan] ][level] += TMath::Power( sum2[tel][iChan] / ( HiLo[tel][iChan] ? fLMult[tel] : 1.0 ) , 2 ) ;
 				}
 				if( isDebugChannel( iChan ) )
 				{
@@ -942,7 +942,7 @@ bool VLowGainCalibrator::doTheFit()
 			fOuttree[tel]->Fill();
 		}//chan
 		
-		TString out = TString::Format( "RUN %d T%d good/bad: %3d/%3d high,  %3d/%3d low,  %3d/%3d total.", fRun, tel + 1, nGood[0], nBad[0],  nGood[1], nBad[1],  nGood[2], nBad[2] );
+		TString out = TString::Format( "RUN %d T%d good/bad: %3d/%3d high,  %3d/%3d low,  %3d/%3d total." , fRun, tel + 1, nGood[0], nBad[0],  nGood[1], nBad[1],  nGood[2], nBad[2] );
 		cout << out << endl;
 		
 	}//tel

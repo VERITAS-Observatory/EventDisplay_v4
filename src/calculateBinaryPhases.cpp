@@ -5,6 +5,9 @@
  *
  *   requires runlist version 4 or later
  *
+ * \author
+ *   Ester Aliu
+ *
  */
 
 #include "VOrbitalPhase.h"
@@ -36,6 +39,12 @@ int main( int argc, char* argv[] )
 	fOrb->printBinaryPars();
 	fOrb->fill();
 	fOrb->terminate();
+	
+	
+	/////// pulsar analysis : need to be implemented, maybe in some functions call VPulsarPhase, file extension will be "psr"
+	
+	
+	
 	
 	return 1;
 }

@@ -1,13 +1,10 @@
 /*! \class VExposure
-    retrieve a list of runs, fill and plot VERITAS exposure plots, fill elevation plots
+    \brief calculate VERITAS exposure
 
-    Note: some of the usage of this class is counter-intuitive
-
-
+    \author Gernot Maier
 */
 
 #include "VExposure.h"
-
 
 ClassImp( VExposure )
 
@@ -56,9 +53,9 @@ VExposure::VExposure( int nBinsL, int nBinsB )
 	fRadAccMapGal2D_aitoff->SetYTitle( "Galactic latitude [deg]" );
 	
 	fPlotVTSObjects = false;
-	
+
 	fDoCheckSums = false;
-	
+
 }
 
 
@@ -112,7 +109,7 @@ bool VExposure::setPlannedObservation( vector<double> ra, vector<double> dec, ve
 		double i_b = 0;
 		double i_l = 0;
 		
-		VAstronometry::vlaEqgal( ra[i] / 180. * TMath::Pi(), dec[i] / 180. * TMath::Pi(), &i_l, &i_b );
+		slaEqgal( ra[i] / 180. * TMath::Pi(), dec[i] / 180. * TMath::Pi(), &i_l, &i_b );
 		fRunGalLong1958.push_back( i_l * 180. / TMath::Pi() );
 		fRunGalLat1958.push_back( i_b * 180. / TMath::Pi() );
 		fRunDuration.push_back( t[i] );
@@ -135,6 +132,7 @@ unsigned int VExposure::getLaserDate( unsigned int iRunNumber )
 	string iTempS;
 	iTempS = getDBServer() + "/VERITAS";
 	
+	//std::cout<<"VExposure::getLaserDate "<<std::endl;
 	VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ;
 	if( !my_connection.Get_Connection_Status() )
 	{
@@ -320,7 +318,7 @@ bool VExposure::readFromDB()
 		iRa  += fRunoffsetRA.back();
 		iDec += fRunoffsetDec.back();
 		
-		VAstronometry::vlaEqgal( iRa / 180. * TMath::Pi(), iDec / 180. * TMath::Pi(), &i_l, &i_b );
+		slaEqgal( iRa / 180. * TMath::Pi(), iDec / 180. * TMath::Pi(), &i_l, &i_b );
 		fRunGalLong1958.push_back( i_l * 180. / TMath::Pi() );
 		fRunGalLat1958.push_back( i_b * 180. / TMath::Pi() );
 		if( fDebug )
@@ -396,16 +394,10 @@ bool VExposure::readFromDB()
 		{
 			angl = atof( db_row->GetField( 18 ) );
 		}
-		fWobbleNorth = dist * cos( angl * TMath::DegToRad() );
-		fWobbleEast  = dist * sin( angl * TMath::DegToRad() );
-		if( TMath::Abs( fWobbleNorth ) < 1.e-15 )
-		{
-			fWobbleNorth = 0.;
-		}
-		if( TMath::Abs( fWobbleEast ) < 1.e-15 )
-		{
-			fWobbleEast = 0.;
-		}
+        fWobbleNorth = dist * cos( angl * TMath::DegToRad() );
+        fWobbleEast  = dist * sin( angl * TMath::DegToRad() );
+        if( TMath::Abs( fWobbleNorth ) < 1.e-15 ) fWobbleNorth = 0.;
+        if( TMath::Abs( fWobbleEast ) < 1.e-15 ) fWobbleEast = 0.;
 		
 		fWobbleN.push_back( fWobbleNorth );
 		fWobbleE.push_back( fWobbleEast );
@@ -417,13 +409,13 @@ bool VExposure::readFromDB()
 		double iSid = 0.;
 		double az, el;
 		// get Greenwich sideral time
-		iSid = VAstronometry::vlaGmsta( ( double )iMJD, ( iTime1 + iTime2 ) / 2. / 86400. );
+		iSid = slaGmsta( ( double )iMJD, ( iTime1 + iTime2 ) / 2. / 86400. );
 		// calculate local sideral time
 		iSid = iSid - VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad();
 		// calculate hour angle
-		ha = VAstronometry::vlaDranrm( iSid - iRa / 180. * TMath::Pi() );
+		ha = slaDranrm( iSid - iRa / 180. * TMath::Pi() );
 		// get horizontal coordinates
-		VAstronometry::vlaDe2h( ha, iDec / 180. * TMath::Pi(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &az, &el );
+		slaDe2h( ha, iDec / 180. * TMath::Pi(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &az, &el );
 		// fill vectors
 		fRunTelElevation.push_back( el * 180. / TMath::Pi() );
 		fRunTelAzimuth.push_back( az * 180. / TMath::Pi() );
@@ -450,6 +442,7 @@ bool VExposure::readFromDBList()
 	string iTempS;
 	iTempS = getDBServer() + "/VERITAS";
 	
+	//std::cout<<"VExposure::readFromDBList "<<std::endl;
 	VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ;
 	if( !my_connection.Get_Connection_Status() )
 	{
@@ -467,7 +460,6 @@ bool VExposure::readFromDBList()
 		
 		if( !my_connection.make_query( c_query ) )
 		{
-			cout << "VExposure::readFromDBList() error: could not connect to DB." << endl;
 			return false;
 		}
 		TSQLResult* db_res =  my_connection.Get_QueryResult();
@@ -578,16 +570,10 @@ bool VExposure::readFromDBList()
 		{
 			angl = atof( db_row->GetField( 18 ) );
 		}
-		fWobbleNorth = dist * cos( angl * TMath::DegToRad() );
-		fWobbleEast  = dist * sin( angl * TMath::DegToRad() );
-		if( TMath::Abs( fWobbleNorth ) < 1.e-15 )
-		{
-			fWobbleNorth = 0.;
-		}
-		if( TMath::Abs( fWobbleEast ) < 1.e-15 )
-		{
-			fWobbleEast = 0.;
-		}
+        fWobbleNorth = dist * cos( angl * TMath::DegToRad() );
+        fWobbleEast  = dist * sin( angl * TMath::DegToRad() );
+        if( TMath::Abs( fWobbleNorth ) < 1.e-15 ) fWobbleNorth = 0.;
+        if( TMath::Abs( fWobbleEast ) < 1.e-15 ) fWobbleEast = 0.;
 		
 		fWobbleN.push_back( fWobbleNorth );
 		fWobbleE.push_back( fWobbleEast );
@@ -599,7 +585,7 @@ bool VExposure::readFromDBList()
 		iRa  += fRunoffsetRA.back();
 		iDec += fRunoffsetDec.back();
 		
-		VAstronometry::vlaEqgal( iRa / 180. * TMath::Pi(), iDec / 180. * TMath::Pi(), &i_l, &i_b );
+		slaEqgal( iRa / 180. * TMath::Pi(), iDec / 180. * TMath::Pi(), &i_l, &i_b );
 		fRunGalLong1958.push_back( i_l * 180. / TMath::Pi() );
 		fRunGalLat1958.push_back( i_b * 180. / TMath::Pi() );
 		if( fDebug )
@@ -668,13 +654,13 @@ bool VExposure::readFromDBList()
 		double iSid = 0.;
 		double az, el;
 		// get Greenwich sideral time
-		iSid = VAstronometry::vlaGmsta( ( double )iMJD, ( iTime1 + iTime2 ) / 2. / 86400. );
+		iSid = slaGmsta( ( double )iMJD, ( iTime1 + iTime2 ) / 2. / 86400. );
 		// calculate local sideral time
 		iSid = iSid - VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad();
 		// calculate hour angle
-		ha = VAstronometry::vlaDranrm( iSid - iRa / 180. * TMath::Pi() );
+		ha = slaDranrm( iSid - iRa / 180. * TMath::Pi() );
 		// get horizontal coordinates
-		VAstronometry::vlaDe2h( ha, iDec / 180. * TMath::Pi(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &az, &el );
+		slaDe2h( ha, iDec / 180. * TMath::Pi(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &az, &el );
 		// fill vectors
 		fRunTelElevation.push_back( el * 180. / TMath::Pi() );
 		fRunTelAzimuth.push_back( az * 180. / TMath::Pi() );
@@ -939,7 +925,7 @@ void VExposure::fillElevationPlot( int iYear, int iMonth, int ze_max_deg )
 				for( int a = 0; a < 360; a++ )
 				{
 					VSkyCoordinatesUtilities::getEquatorialCoordinates( imjd, time, ( double )a, ( double )z, dec, ra );
-					VAstronometry::vlaEqgal( ra * TMath::DegToRad(), dec * TMath::DegToRad(), &l, &b );
+					slaEqgal( ra * TMath::DegToRad(), dec * TMath::DegToRad(), &l, &b );
 					
 					l *= TMath::RadToDeg();
 					if( l > 180 )
@@ -1055,8 +1041,8 @@ void VExposure::fillExposureMap()
 			{
 				double l_pos = fMapGal2D->GetXaxis()->GetBinCenter( l );
 				
-				r_dist = VAstronometry::vlaDsep( l_pos * TMath::Pi() / 180., b_pos * TMath::Pi() / 180., fRunGalLong1958[i] * TMath::Pi() / 180.,
-												 fRunGalLat1958[i] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
+				r_dist = slaDsep( l_pos * TMath::Pi() / 180., b_pos * TMath::Pi() / 180., fRunGalLong1958[i] * TMath::Pi() / 180.,
+								  fRunGalLat1958[i] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
 				if( r_dist < fMaximumIntegrationRadius && fRunDuration[i] > 0. )
 				{
 					// galactic longitudes are from 180. to -180.
@@ -1122,12 +1108,7 @@ TCanvas* VExposure::plot( double ilmin, double ilmax, double ibmin, double ibmax
 	return 0;
 }
 
-/*
- * plots extension of HESS survey
- *
- * (note: this is the original HESS survey, not the extended one )
- *
- */
+
 void VExposure::plot_HESSSkySurvey( TCanvas* c )
 {
 	if( !c )
@@ -1211,7 +1192,7 @@ TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy,
 	decAxis->Draw();
 	
 	//   TGaxis *raLowerAxis = new TGaxis( cGal->GetUxmin()-ilmax - h->GetYaxis()->GetBinWidth( 1 )/2., cGal->GetUymin()+ibmin-h->GetYaxis()->GetBinWidth(1)/2. , cGal->GetUxmin()-ilmin+h->GetYaxis()->GetBinWidth( 1 )/2., cGal->GetUymin()+ibmin -h->GetYaxis()->GetBinWidth(1)/2. , "IncValues", 4 );
-	TGaxis* raLowerAxis = new TGaxis( cGal->GetUxmin() - ilmax - h->GetYaxis()->GetBinWidth( 1 ) / 2., cGal->GetUymin() + ibmin - h->GetYaxis()->GetBinWidth( 1 ) / 2., cGal->GetUxmin() - ilmin + h->GetYaxis()->GetBinWidth( 1 ) / 2., cGal->GetUymin() + ibmin - h->GetYaxis()->GetBinWidth( 1 ) / 2., "IncValues", 4 );
+	TGaxis* raLowerAxis = new TGaxis( cGal->GetUxmin() - ilmax - h->GetYaxis()->GetBinWidth( 1 ) / 2., cGal->GetUymin() + ibmin - h->GetYaxis()->GetBinWidth( 1 ) / 2. , cGal->GetUxmin() - ilmin + h->GetYaxis()->GetBinWidth( 1 ) / 2., cGal->GetUymin() + ibmin - h->GetYaxis()->GetBinWidth( 1 ) / 2. , "IncValues", 4 );
 	raLowerAxis->SetTitleFont( h->GetXaxis()->GetTitleFont() );
 	raLowerAxis->SetTitleSize( h->GetXaxis()->GetTitleSize() );
 	raLowerAxis->SetTitleOffset( h->GetXaxis()->GetTitleOffset() );
@@ -1322,7 +1303,7 @@ void VExposure::plotVTSObjects( bool bAitoff, double ibmin, double ibmax, double
 			
 			ra  = fRunRA[i];
 			dec = fRunDec[i];
-			VAstronometry::vlaEqgal( ra / 180. * TMath::Pi(), dec / 180. * TMath::Pi(), &l, &b );
+			slaEqgal( ra / 180. * TMath::Pi(), dec / 180. * TMath::Pi(), &l, &b );
 			
 			plotObject( l * TMath::RadToDeg(), b * TMath::RadToDeg(), fRunSourceID[i], 0.,
 						ibmin, ibmax, ilmin, ilmax, h,
@@ -1479,7 +1460,7 @@ void VExposure::getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip 
 		ms = 0;
 	}
 	// calculate MJD
-	VAstronometry::vlaCldj( y, m, d, &gMJD, &l );
+	slaCldj( y, m, d, &gMJD, &l );
 	MJD = ( int )gMJD;
 	Time = h * 60.*60. + min * 60. + s + ms / 1.e3;
 }
@@ -1691,7 +1672,7 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 		// loop over second catalogue
 		for( unsigned int j = 0; j < tev->getNStar(); j++ )
 		{
-			double r = VAstronometry::vlaDsep( s->getStarRA2000( i ) * TMath::Pi() / 180., s->getStarDec2000( i ) * TMath::Pi() / 180., tev->getStarRA2000( j ) * TMath::Pi() / 180., tev->getStarDec2000( j ) * TMath::Pi() / 180. ) * 180. / TMath::Pi();
+			double r = slaDsep( s->getStarRA2000( i ) * TMath::Pi() / 180., s->getStarDec2000( i ) * TMath::Pi() / 180., tev->getStarRA2000( j ) * TMath::Pi() / 180., tev->getStarDec2000( j ) * TMath::Pi() / 180. ) * 180. / TMath::Pi();
 			if( r < r_min )
 			{
 				tev_select = ( int )j;
@@ -1719,8 +1700,8 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 		for( unsigned int j = 0; j < fRunRA.size(); j++ )
 		{
 			// calculate distance of catalogue object to camera center
-			r_centre = VAstronometry::vlaDsep( s->getStarRA2000( i ) * TMath::Pi() / 180., s->getStarDec2000( i ) * TMath::Pi() / 180.,
-											   ( fRunRA[j] + fRunoffsetRA[j] ) * TMath::Pi() / 180., ( fRunDec[j] + fRunoffsetDec[j] ) * TMath::Pi() / 180. ) * 180. / TMath::Pi();
+			r_centre = slaDsep( s->getStarRA2000( i ) * TMath::Pi() / 180., s->getStarDec2000( i ) * TMath::Pi() / 180.,
+								( fRunRA[j] + fRunoffsetRA[j] ) * TMath::Pi() / 180., ( fRunDec[j] + fRunoffsetDec[j] ) * TMath::Pi() / 180. ) * 180. / TMath::Pi();
 			// do dqm
 			if( !doDQM( j, iMinDuration ) )
 			{
@@ -1731,8 +1712,8 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 			if( r_centre < iR )
 			{
 				// calculate distance of catalogue object to VERITAS object
-				r_VA_object = VAstronometry::vlaDsep( s->getStarRA2000( i ) * TMath::Pi() / 180., s->getStarDec2000( i ) * TMath::Pi() / 180.,
-													  fRunRA[j] * TMath::Pi() / 180., fRunDec[j] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
+				r_VA_object = slaDsep( s->getStarRA2000( i ) * TMath::Pi() / 180., s->getStarDec2000( i ) * TMath::Pi() / 180.,
+									   fRunRA[j] * TMath::Pi() / 180., fRunDec[j] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
 				// total time on object (all array configurations)
 				r_tot += fRunDuration[j];
 				// total time on object (new array configuration only)
@@ -1999,7 +1980,7 @@ void VExposure::printListOfRuns( double il, double ib, double iR, double iMinDur
 	}
 	for( unsigned int i = 0; i < fRunGalLong1958.size(); i++ )
 	{
-		r_dist = VAstronometry::vlaDsep( il * TMath::Pi() / 180., ib * TMath::Pi() / 180., fRunGalLong1958[i] * TMath::Pi() / 180., fRunGalLat1958[i] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
+		r_dist = slaDsep( il * TMath::Pi() / 180., ib * TMath::Pi() / 180., fRunGalLong1958[i] * TMath::Pi() / 180., fRunGalLat1958[i] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
 		
 		if( r_dist < iR && fRunDuration[i] > iMinDuration )
 		{
@@ -2060,8 +2041,6 @@ void VExposure::printListOfRuns( double il, double ib, double iR, double iMinDur
 
 /*
    copied from ROOT forum #6650
-
-   (input in degrees)
 */
 void VExposure::aitoff2xy( Double_t l, Double_t b, Double_t& Al, Double_t& Ab )
 {
@@ -2637,10 +2616,10 @@ void VExposure::downloadRunList()
 					 getRawDataServer().c_str() );
 			cout << dl_string << endl;
 			system( dl_string );
-			
+
 			checkMD5sum( fRunDownloadDate[i], fRunDownload[i] );
 		}
-		
+			
 		
 	}
 	
@@ -2705,205 +2684,169 @@ void VExposure::downloadRunList()
 	
 }
 
-int VExposure::checkMD5sum( int date, int run, bool force_download )
-{
-
-	if( !fDoCheckSums )
-	{
-		return 0;
-	}
+int VExposure::checkMD5sum( int date, int run, bool force_download) {
 	
-	TString desy_sum = calcMD5sum( date, run );
-	if( desy_sum == "" )
+	if( !fDoCheckSums) return 0;
+
+	TString desy_sum = calcMD5sum( date, run);
+	if( desy_sum == "" ) 
 	{
 		cout << "VExposure::checkMD5sum Warning: Unable to calculate checksum for run " << run << ", date " << date << endl;
 		fRunsNoChecksum.push_back( run );
 		return -1;
 	}
-	TString archive_sum = getArchiveMD5sum( date, run, force_download );
-	if( archive_sum == "" )
+	TString archive_sum = getArchiveMD5sum( date, run, force_download);
+	if( archive_sum == "" ) 
 	{
 		cout << "VExposure::checkMD5sum Warning: Unable to download checksum for run " << run << ", date " << date << endl;
 		fRunsNoChecksum.push_back( run );
 		return -1;
 	}
-	
-	if( archive_sum != desy_sum )
+
+	if( archive_sum != desy_sum ) 
 	{
 		cout << "VExposure::checkMD5sum Warning: Checksum error for run " << run << ", date " << date << endl;
 		cout << "Checksum from archive: " << archive_sum << ", calculated checksum: " << desy_sum << endl;
 		fRunsBadChecksum.push_back( run );
 		return 1;
-	}
+	} 
 	cout << "VExposure::checkMD5sum: Run " << run << " survived the testsum check." << endl;
 	cout << "Checksum from archive: " << archive_sum << ", calculated checksum: " << desy_sum << endl;
 	fRunsGoodChecksum.push_back( run );
 	return 0;
 }
 
-void VExposure::printChecksumSummary()
+void VExposure::printChecksumSummary() 
 {
-	if( !fDoCheckSums )
-	{
-		return;
-	}
-	
+	if( !fDoCheckSums ) return;
+
 	unsigned int ntot = fRunsNoChecksum.size() + fRunsGoodChecksum.size() + fRunsBadChecksum.size() ;
 	cout << "Checksum summary: " << ntot << " run(s); " << fRunsBadChecksum.size() << " bad, " << fRunsGoodChecksum.size() << " good, " << fRunsNoChecksum.size() << " could not be checked." << endl;
 	
-	if( fRunsGoodChecksum.size() == ntot && ntot > 0 )
+	if( fRunsGoodChecksum.size() == ntot && ntot > 0 ) 
 	{
 		cout << "Congratulations, all runs survived the checksum test. " << endl;
-		
+	
 	}
-	else
-	{
-		if( fRunsGoodChecksum.size() > 0 )
-		{
+	else {  
+		if( fRunsGoodChecksum.size() > 0 ) {
 			cout << "Got good checksums for " << fRunsGoodChecksum.size() << " run(s)."  << endl << "Good runs:\t" ;
-			for( unsigned int i = 0; i <  fRunsGoodChecksum.size() ; i++ )
+			for( unsigned int i=0; i<  fRunsGoodChecksum.size() ; i++ ) 
 			{
-				cout << fRunsGoodChecksum.at( i ) << "\t" ;
+				cout << fRunsGoodChecksum.at(i) << "\t" ;
 			}
 			cout << endl << endl;
 		}
-		
-		if( fRunsNoChecksum.size() > 0 )
+
+		if( fRunsNoChecksum.size() > 0 ) 
 		{
 			cout << "Warning, checksums could not be compared for " << fRunsNoChecksum.size();
 			cout << " run(s), see above for details. (Checksums are not available from the archive for old or very new runs.)"  << endl << "Not checked:\t" ;
-			for( unsigned int i = 0; i <  fRunsNoChecksum.size() ; i++ )
+			for( unsigned int i=0; i<  fRunsNoChecksum.size() ; i++ ) 
 			{
-				cout << fRunsNoChecksum.at( i ) << "\t" ;
+				cout << fRunsNoChecksum.at(i) << "\t" ;
 			}
 			cout << endl << endl;
 		}
-		if( fRunsBadChecksum.size() > 0 )
+		if( fRunsBadChecksum.size() > 0 ) 
 		{
 			cout << "Warning, wrong checksums for " << fRunsBadChecksum.size() << " run(s), see above for details. "  << endl << "Bad run(s): " ;
-			for( unsigned int i = 0; i <  fRunsBadChecksum.size() ; i++ )
+			for( unsigned int i=0; i<  fRunsBadChecksum.size() ; i++ ) 
 			{
-				cout << fRunsBadChecksum.at( i ) << "\t" ;
+				cout << fRunsBadChecksum.at(i) << "\t" ;
 			}
 			cout << endl << endl;
 		}
 	}
-	
+
 }
 
-TString VExposure::getArchiveMD5sum( int date, int run, bool force_download )
-{
-
-	bool attempt_download = true;
+TString VExposure::getArchiveMD5sum( int date, int run, bool force_download  ) {
 	
+	bool attempt_download = true;
+
 	//check if md5sum utility is available
 	if( system( "which bbftp" ) != 0 )
 	{
 		cout << "VExposure::getArchiveMD5sum Error: \"which bbftp\" shows no match; will attempt to DL checksum file" << endl;
 		attempt_download = false;
-		if( force_download )
+		if ( force_download )
 		{
 			return "";
 		}
 	}
-	
+
 	char* ENVIR_VAR;
 	ENVIR_VAR = getenv( "VERITAS_DATA_DIR" );
-	
+
 	TString basecamp_sumfilename = TString::Format( "%s/data/d%d/sumd%d", ENVIR_VAR, date, date );
 	TString UTAH_sumfilename = TString::Format( "%s/data/d%d/CHPC_sumd%d", ENVIR_VAR, date, date );
 	TString UCLA_sumfilename = TString::Format( "%s/data/d%d/UCLA_sumd%d", ENVIR_VAR, date, date );
 	TString UCLA2_sumfilename = TString::Format( "%s/data/d%d/UCLA_sum", ENVIR_VAR, date );
-	TString UCLA_new_sumfilename = TString::Format( "%s/data/d%d/UCLA_new_sum", ENVIR_VAR, date );
+	TString UCLA_new_sumfilename = TString::Format( "%s/data/d%d/UCLA_new_sum", ENVIR_VAR, date ); 	
 	//see elog http://veritash.sao.arizona.edu:8081/VERITAS-Operations/11544 . Some runs were reprocessed on disk at ucla to correct 2 rows of swapped signal cables.
-	
-	TString dlcommand = TString::Format( "bbftp -V -S -p 12 -u bbftp -e \"mget /veritas/data/d%d/*sum* %s/data/d%d/\" %s", date, ENVIR_VAR, date, getRawDataServer().c_str() );
+
+	TString dlcommand = TString::Format("bbftp -V -S -p 12 -u bbftp -e \"mget /veritas/data/d%d/*sum* %s/data/d%d/\" %s", date, ENVIR_VAR, date, getRawDataServer().c_str() );
 	TString chmodcommand = TString::Format( "chmod g+w %s/data/d%d/*sum*", ENVIR_VAR, date );
-	
+
 	bool use_new_ucla_sumfile = ( run >= 69474 && run <= 69641 );
-	
+
 	TString checksum = "";
 	//attempt to find checksum on disk
-	if( !force_download )
-	{
-		if( use_new_ucla_sumfile )
+	if( !force_download) {
+		if( use_new_ucla_sumfile ) 
 		{
-			checksum = readMD5sumFromFile( UCLA_new_sumfilename, run, !attempt_download );
-		}
-		else
+			checksum = readMD5sumFromFile( UCLA_new_sumfilename, run, !attempt_download);
+		} 
+		else 
 		{
 			checksum = readMD5sumFromFile( basecamp_sumfilename, run, !attempt_download );
-			if( checksum == "" )
-			{
-				checksum = readMD5sumFromFile( UCLA_sumfilename, run, !attempt_download );
-			}
-			if( checksum == "" )
-			{
-				checksum = readMD5sumFromFile( UCLA2_sumfilename, run, !attempt_download );
-			}
-			if( checksum == "" )
-			{
-				checksum = readMD5sumFromFile( UTAH_sumfilename, run, !attempt_download );
-			}
+			if(checksum == "") checksum = readMD5sumFromFile( UCLA_sumfilename, run, !attempt_download );
+			if(checksum == "") checksum = readMD5sumFromFile( UCLA2_sumfilename, run, !attempt_download );
+			if(checksum == "") checksum = readMD5sumFromFile( UTAH_sumfilename, run, !attempt_download );
 		}
-		if( checksum != "" )
-		{
-			return checksum;
-		}
-		
+		if(checksum != "" ) return checksum;
+
 	}
-	
-	if( attempt_download )
+
+	if( attempt_download) 
 	{
 		cout << dlcommand << endl;
-		if( system( dlcommand.Data() ) != 0 )
+		if( system( dlcommand.Data() ) !=0 )  
 		{
 			cout << "VExposure::getArchiveMD5sum Error: Problem executing command : " << dlcommand << endl;
 		}
-		system( chmodcommand.Data() );
-		if( use_new_ucla_sumfile )
+		system(chmodcommand.Data() );
+		if( use_new_ucla_sumfile ) 
 		{
-			checksum = readMD5sumFromFile( UCLA_new_sumfilename, run );
-		}
-		else
+			checksum = readMD5sumFromFile( UCLA_new_sumfilename, run);
+		} 
+		else 
 		{
 			checksum = readMD5sumFromFile( basecamp_sumfilename, run );
-			if( checksum == "" )
-			{
-				checksum = readMD5sumFromFile( UCLA_sumfilename, run );
-			}
-			if( checksum == "" )
-			{
-				checksum = readMD5sumFromFile( UCLA2_sumfilename, run );
-			}
-			if( checksum == "" )
-			{
-				checksum = readMD5sumFromFile( UTAH_sumfilename, run );
-			}
-		}
-		if( checksum != "" )
-		{
-			return checksum;
-		}
+			if(checksum == "") checksum = readMD5sumFromFile( UCLA_sumfilename, run );
+			if(checksum == "") checksum = readMD5sumFromFile( UCLA2_sumfilename, run );
+			if(checksum == "") checksum = readMD5sumFromFile( UTAH_sumfilename, run );
+		}	
+		if( checksum != "" ) return checksum;
 	}
 	
 	return "";
-	
+
 }
 
-TString VExposure::readMD5sumFromFile( TString filename, int run, bool warn )
-{
-
-	ifstream intemp( filename.Data() );
+TString VExposure::readMD5sumFromFile( TString filename, int run, bool warn ) {
+	
+	ifstream intemp(filename.Data() );
 	string linestring;
 	TString iChecksum;
 	TString iFile;
-	
-	TString search = TString::Format( "%d.cvbf", run );
+
+	TString search = TString::Format("%d.cvbf", run);
 	TString checksum = "";
-	
-	if( ! intemp.is_open() )
-	{
+
+	if (! intemp.is_open() )
+	{ 
 		if( warn )
 		{
 			cout << "VExposure::readMD5sumFromFile Error: Unable to open file: " << filename << endl;
@@ -2912,27 +2855,26 @@ TString VExposure::readMD5sumFromFile( TString filename, int run, bool warn )
 	}
 	else
 	{
-		while( getline( intemp, linestring ) )
+		while( getline( intemp, linestring) )
 		{
-			stringstream line( linestring );
+			stringstream line( linestring );			
 			line >> iChecksum >> iFile;
-			if( iFile.EndsWith( search.Data() ) )
+			if( iFile.EndsWith(search.Data() )  )
 			{
 				checksum = iChecksum;
 			}
 		}
 		intemp.close();
 	}
-	if( checksum == "" && warn )
-	{
+	if ( checksum == "" && warn) 
+	{ 
 		cout <<   "VExposure::readMD5sumFromFile Error: Unable to find checksum for " << search << " in file: " << filename << endl;
-	}
+	} 
 	return checksum;
-	
+
 }
 
-TString VExposure::calcMD5sum( int date, int run )
-{
+TString VExposure::calcMD5sum( int date, int run ) {
 
 	//check if md5sum utility is available
 	if( system( "which md5sum" ) != 0 )
@@ -2940,7 +2882,7 @@ TString VExposure::calcMD5sum( int date, int run )
 		cout << "VExposure::calcMD5sum Error: \"which md5sum\" shows no match; will not calculate checksum." << endl;
 		return "";
 	}
-	
+
 	TString datafilename;
 	TString resultfilename;
 	TString tempfilename;
@@ -2948,44 +2890,44 @@ TString VExposure::calcMD5sum( int date, int run )
 	char* ENVIR_VAR;
 	
 	ENVIR_VAR = getenv( "VERITAS_DATA_DIR" );
-	
+
 	datafilename.Form( "%s/data/d%d/%d.cvbf", ENVIR_VAR, date, run );
 	resultfilename.Form( "%s/data/d%d/LOCAL_sumd%d", ENVIR_VAR, date, date );
-	tempfilename.Form( "%s/data/d%d/TEMP_sum_%d_%d", ENVIR_VAR, date, run, ( int )time( 0 ) );
+	tempfilename.Form( "%s/data/d%d/TEMP_sum_%d_%d", ENVIR_VAR, date, run, (int)time(0) );
 	filepath.Form( "%s/data/d%d/", ENVIR_VAR, date );
-	
+
 	//check if input file exists
-	ifstream itemp( datafilename.Data() );
-	if( ! itemp.good() )
+	ifstream itemp(datafilename.Data());
+	if (! itemp.good())
 	{
 		itemp.close();
 		cout << "VExposure::calcMD5sum Error: File " << datafilename.Data() << " not available. "  << endl;
 		return "";
-	}
+	} 
 	itemp.close();
-	
+
 	//now do the checksum.
 	TString command = TString::Format( "md5sum %s | tr \"\\n\" \" \" > %s ; date >> %s", datafilename.Data(), tempfilename.Data(), tempfilename.Data() );
 	cout << command << endl;
-	if( system( command.Data() ) != 0 )
-	{
+	if( system( command.Data() ) != 0 ) 
+	{ 
 		cout << "VExposure::calcMD5sum Error: Unable to execute command: " << command << endl;
 		return "";
 	}
-	
+
 	//read in checksum
 	TString checksum = readMD5sumFromFile( tempfilename, run );
-	
-	if( checksum != "" )
-	{
+
+	if( checksum != "" ) 
+	{ 
 		command.Form( "cat %s >> %s", tempfilename.Data(), resultfilename.Data() );
 		if( system( command.Data() ) == 0 )
 		{
-			command.Form( "rm %s", tempfilename.Data() );
+			command.Form("rm %s", tempfilename.Data() );
 			system( command.Data() );
-			command.Form( "chmod g+w %s", resultfilename.Data() );
+			command.Form("chmod g+w %s", resultfilename.Data() );
 			system( command.Data() );
-		}
+		} 
 	}
 	return checksum;
 }
@@ -3126,7 +3068,7 @@ void VExposure::readRunCommentsFromDB()
 	for( unsigned int i = 0; i < fRun.size(); i++ )
 	{
 	
-		sprintf( c_query, "SELECT run_id , data_category   , status   , status_reason , tel_cut_mask , usable_duration , time_cut_mask , light_level , vpm_config_mask , authors  , comment from tblRun_Analysis_Comments where run_id=%d", fRun[i] );
+	    sprintf( c_query, "SELECT run_id , data_category   , status   , status_reason , tel_cut_mask , usable_duration , time_cut_mask , light_level , vpm_config_mask , authors  , comment from tblRun_Analysis_Comments where run_id=%d", fRun[i] );	
 		if( !my_connection.make_query( c_query ) )
 		{
 			return;

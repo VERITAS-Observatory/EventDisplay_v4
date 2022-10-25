@@ -52,7 +52,7 @@ FITSRecord::FITSRecord( std::string fits_filename,
 						std::string template_filename,
 						std::string extension_name, int extension_version )
 	: 	 _fptr( NULL ), _own_fptr( true ), _rowcount( 0 ), _verbose( 0 ),
-		_extension_version( 0 ), _is_writable( true ), _is_finished( true )
+		 _extension_version( 0 ), _is_writable( true ), _is_finished( true )
 {
 
 
@@ -171,7 +171,7 @@ lookupColInfo( string column )
 	char name[100];
 	strncpy( name, column.c_str(), 100 ) ;
 	
-	fits_get_colnum( _fptr, CASEINSEN, name, &colnum, &status );
+	fits_get_colnum( _fptr, CASEINSEN, name , &colnum, &status );
 	
 	if( status )
 	{
@@ -482,7 +482,7 @@ write() throw( FITSRecordError )
 						_rowcount + 1,
 						1,	// first element
 						colval->getSize(), // n elements
-						colval->getVoidPointerToValue(),
+						colval->getVoidPointerToValue() ,
 						&status );
 		if( status )
 			throw FITSRecordError( "write failed for column "

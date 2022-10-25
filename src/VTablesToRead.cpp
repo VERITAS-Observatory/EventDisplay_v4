@@ -1,6 +1,9 @@
 /* \class VTablesToRead
    \brief service class for lookup tables
 
+
+   \author
+   Gernot Maier
 */
 
 #include "VTablesToRead.h"

@@ -70,7 +70,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 	{
 		cout << "VPedestalCalculator::initialize, error: cannot initialize data readers" << endl;
 		cout << "exiting..." << endl;
-		exit( EXIT_FAILURE );
+        exit( EXIT_FAILURE );
 	}
 	// reset all variables
 	reset();
@@ -151,7 +151,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		// get run number
 		runNumber = getRunNumber();
 		
-		// initialise the pedvars variables
+        // initialise the pedvars variables
 		iped_cal2.clear();
 		for( unsigned int p = 0; p < fNPixel; p++ )
 		{
@@ -201,8 +201,8 @@ void VPedestalCalculator::fillTimeSlice( unsigned int telID )
 				// root use 1/n and not 1./(n-1) in rms calculation: for consistency use the same here (shouldn't matter)
 				//	      v_temp_pedvar[p][w]     = sqrt( 1./(fpedcal_n[telID][p][w]-1.) * ( fpedcal_mean2[telID][p][w] - fpedcal_mean[telID][p][w]*fpedcal_mean[telID][p][w]/fpedcal_n[telID][p][w] ) );
 				v_temp_pedvar[p][w]     = sqrt( 1. / ( fpedcal_n[telID][p][w] )
-												* TMath::Abs( fpedcal_mean2[telID][p][w]
-														- fpedcal_mean[telID][p][w] * fpedcal_mean[telID][p][w] / fpedcal_n[telID][p][w] ) );
+                                                * TMath::Abs( fpedcal_mean2[telID][p][w]
+                                                           - fpedcal_mean[telID][p][w] * fpedcal_mean[telID][p][w] / fpedcal_n[telID][p][w] ) );
 			}
 			else
 			{
@@ -291,18 +291,18 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
 						fReader->selectHitChan( i );
 						fTraceHandler->setTrace( fReader, getNSamples(), getPeds()[chanID], getPedrms()[chanID], chanID, i,
 												 getLowGainMultiplier_Trace()*getHiLo()[chanID] );
-												 
-						//////////////////////////
+                                                 
+                        //////////////////////////
 						// loop over all summation windows
 						unsigned int iTempSW = fpedcal_mean[telID][chanID].size();
 						if( getRunParameter()->fCalibrationSumWindow < ( int )iTempSW )
 						{
 							iTempSW = getRunParameter()->fCalibrationSumWindow;
 						}
-						// w = 0 --> summation window 1
+                        // w = 0 --> summation window 1
 						for( unsigned int w = 0; w < iTempSW; w++ )
 						{
-							// calculate trace sum
+                            // calculate trace sum
 							i_tr_sum = fTraceHandler->getTraceSum( fSumFirst, fSumFirst + ( w + 1 ), true, 1 );
 							if( i_tr_sum > 0. && i_tr_sum < 50.*( w + 1 ) )
 							{
@@ -314,8 +314,8 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
 								}
 								else
 								{
-									cout << "ERROR (VPedestalCalculator): ";
-									cout << telID << " " << fpedcal_n.size() << endl;
+                                    cout << "ERROR (VPedestalCalculator): ";
+                                    cout << telID << " " << fpedcal_n.size() << endl;
 									cout << "\t" << chanID << " " << fpedcal_n[telID].size() << endl;
 									cout << "\t" << w << " " << fpedcal_n[telID][chanID].size() << endl;
 								}
@@ -328,7 +328,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
 					if( getDebugLevel() == 0 )
 					{
 						cout << "VPedestalCalculator::doAnalysis(), index out of range (fReader->getHitID) ";
-						cout << i << "(Telescope " << getTelID() + 1 << ", event " << getEventNumber() << ")" << endl;
+                        cout << i << "(Telescope " << getTelID() + 1 << ", event " << getEventNumber() << ")" << endl;
 						setDebugLevel( 1 );
 					}
 					continue;

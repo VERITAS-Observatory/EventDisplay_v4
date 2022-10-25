@@ -6,9 +6,14 @@
   \bug reading of gain filename, seg fault if directory = calibration/gain
 
 
+  \author Gernot Maier
 */
 
+//     fCanvasCharge->Connect( "ProcessedEvent(Int_t , Int_t , Int_t , TObject* )", "LCamera", this, "Print( Int_t, Int_t, Int_t, TObject* )" );
+
 #include "VDisplay.h"
+
+// ClassImp(VDisplay);
 
 VDisplay::VDisplay() : TGMainFrame( 0, 0, 0 )
 {
@@ -63,6 +68,12 @@ VDisplay::VDisplay( const TGWindow* p, unsigned int h, unsigned int w, VEventLoo
 	fMoviePictNumber = 0;
 	fAutoRunStatus = false;
 	
+	// fit tracehandler for fit button
+	if( fEventLoop->getRunParameter()->ftracefit < 0. )
+	{
+		fFitTraceHandler = new VFitTraceHandler( fEventLoop->getRunParameter()->ftracefitfunction );
+	}
+	
 	fCanvasesNx = 1;
 	fCanvasesNy = 1;
 	fBWNum = 50;
@@ -102,10 +113,9 @@ VDisplay::VDisplay( const TGWindow* p, unsigned int h, unsigned int w, VEventLoo
 	fCanvasCamera->SetEditable( false );
 	
 	char i_wname[300];
-	sprintf( i_wname, "%s event analysis and display %s (%s)",
+	sprintf( i_wname, "%s event analysis and display %s",
 			 fEventLoop->getRunParameter()->getObservatory().c_str(),
-			 fEventLoop->getEventDisplayVersion().c_str(),
-			 fEventLoop->getRunParameter()->fRunTitle.c_str() );
+			 fEventLoop->getEventDisplayVersion().c_str() );
 	SetWindowName( i_wname );
 	MapSubwindows();
 	Layout();
@@ -173,7 +183,6 @@ void VDisplay::printCanvas( TPad* priCanvas )
 
 	const Char_t* filetypes[] =
 	{
-		"PDF files",    "*.pdf",
 		"EPS files",    "*.eps",
 		"PS files",    "*.ps",
 		"GIF files",    "*.gif",
@@ -517,7 +526,7 @@ void VDisplay::selectAnaTab( Int_t it )
   \param objSel pointer to selected object
 
 */
-void VDisplay::selectChannel( Int_t bt, Int_t x, Int_t y, TObject* objSel )
+void VDisplay::selectChannel( Int_t bt, Int_t x, Int_t y , TObject* objSel )
 {
 	if( fEventLoop->getEventNumber() < 1 )
 	{
@@ -647,12 +656,8 @@ void VDisplay::searchChannel( int i_channel )
 
 
 /*!
- *
- * fill a histogram with the FADCS trace for the given channel
-
    \param i_channel channel number
    \param i_his pointer to FADC histogram
-
 */
 TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 {
@@ -872,6 +877,49 @@ void VDisplay::drawFADC( bool iFit )
 				fHisFADC->SetLineColor( 9 );
 			}
 			
+			///////////////////////////////////////////////////////////
+			// TRACE FITTING
+			// fill fit values into histogram
+			if( ( fEventLoop->getRunParameter()->ftracefit > -1. && fEventLoop->getFitTraceHandler() != 0 ) || iFit )
+			{
+				unsigned int chanID = fSelectedChan - 200000;
+				if( fEventLoop->getRunParameter()->ftracefit > -1. && fEventLoop->getFitTraceHandler() != 0 )
+				{
+					fFitTraceHandler = fEventLoop->getFitTraceHandler();
+				}
+				fFitTraceHandler->setMinuitPrint( true );
+				pair< bool, uint32_t > i_hitIndexPair = fEventLoop->getReader()->getChannelHitIndex( chanID );
+				fEventLoop->getReader()->selectHitChan( i_hitIndexPair.second );
+				if( fEventLoop->getReader()->has16Bit() )
+				{
+					fFitTraceHandler->setTrace( fEventLoop->getReader()->getSamplesVec16Bit(),
+												fEventLoop->getPeds( fEventLoop->getHiLo()[chanID] )[chanID],
+												fEventLoop->getPedrms( fEventLoop->getHiLo()[chanID] )[chanID],
+												chanID,
+												fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier_Trace() );
+				}
+				else
+				{
+					fFitTraceHandler->setTrace( fEventLoop->getReader()->getSamplesVec(),
+												fEventLoop->getPeds( fEventLoop->getHiLo()[chanID] )[chanID],
+												fEventLoop->getPedrms( fEventLoop->getHiLo()[chanID] )[chanID],
+												chanID,
+												fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier_Trace() );
+				}
+				fFitTraceHandler->setMinuitPrint( false );
+				if( fFitTraceHandler->getFitted() )
+				{
+					iTraceFits = ( TH1D* )fFitTraceHandler->getFitHis()->Clone();
+					cout << "\t Pulse width (samples): " << fFitTraceHandler->getTraceWidth( 0, 0, fEventLoop->getPeds( fEventLoop->getHiLo()[chanID] )[chanID] ) << endl;
+					cout << "\t Risetime (samples): " << fFitTraceHandler->getTraceRiseTime( fEventLoop->getPeds( fEventLoop->getHiLo()[chanID] )[chanID], 0.1, 0.9 ) << endl;
+					cout << "\t Falltime (samples): " << fFitTraceHandler->getTraceFallTime( fEventLoop->getPeds( fEventLoop->getHiLo()[chanID] )[chanID], 0.9, 0.1 ) << endl;
+					cout << "\t Pulse max (dc): " << fFitTraceHandler->getTraceMax() << endl;
+				}
+				else
+				{
+					iTraceFits = 0;
+				}
+			}
 			fF1Ped->SetParameter( 0, -1.* fEventLoop->getAnalyzer()->getPeds( fEventLoop->getHiLo()[fSelectedChan - 200000] )[fSelectedChan - 200000] );
 		}
 		///////////////////////////////////////////////////////////
@@ -969,7 +1017,7 @@ void VDisplay::drawFADC( bool iFit )
 	// plot sum signal (sum of all image pixels), click beside camera for that
 	else if( !( fSelectedChan >= 200000 ) )
 	{
-		sprintf( histitle, "average signal (Telescope %d)", fTelescope + 1 );
+		sprintf( histitle, "sum signal (Telescope %d)", fTelescope + 1 );
 		int i_image = 0;
 		for( unsigned int i = 0; i < fEventLoop->getAnalyzer()->getImage().size(); i++ )
 		{
@@ -1030,7 +1078,7 @@ void VDisplay::drawFADC( bool iFit )
 			fGraphFADC->Draw( "f" );
 			fGraphFADC_2->Draw( "f" );
 		}
-		// draw a line to indicate TZero
+		// Draw the line to indicate TZero
 		if( fEventLoop->getAnalyzer()->getRawTZeros()[fSelectedChan - 200000] > 0. )
 		{
 			fLineFADC->SetX1( fEventLoop->getAnalyzer()->getRawTZeros()[fSelectedChan - 200000] );
@@ -1340,16 +1388,14 @@ void VDisplay::setFADCText()
 		int iFADCchannel = fEventLoop->getDBPixelDataReader()->getFADC_channel( fTelescope, fSelectedChan - 200000 );
 		iFADCtext.Form( ", FADC %d/%d", iFADCmodule, iFADCchannel );
 	}
-	ostringstream iSTRText;
-	iSTRText << "telescope " << fTelescope + 1;
-	iSTRText << " channel " << fSelectedChan - 200000 << iFADCtext.Data();
-	iSTRText << " (NN " << fEventLoop->getDetectorGeometry()->getNNeighbours()[iChannel] << ": ";
+	
+	sprintf( cTemp, "telescope %d channel %d%s (NN %d: ", fTelescope + 1, fSelectedChan - 200000, iFADCtext.Data(), fEventLoop->getDetectorGeometry()->getNNeighbours()[iChannel] );
 	for( unsigned int n = 0; n < fEventLoop->getDetectorGeometry()->getNNeighbours()[iChannel]; n++ )
 	{
-		iSTRText << " " << fEventLoop->getDetectorGeometry()->getNeighbours()[iChannel][n];
-	}
-	iSTRText << ")";
-	fTextFADC.push_back( new TText( xL, yT, iSTRText.str().c_str() ) );
+	    sprintf( cTemp, "%s %d", cTemp, fEventLoop->getDetectorGeometry()->getNeighbours()[iChannel][n] );
+        }
+	sprintf( cTemp, "%s)", cTemp );
+	fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 	// L1/HV/currents (if available)
 	if( fEventLoop->getDBPixelDataReader() && fEventLoop->getDBPixelDataReader()->getDBStatus() )
 	{
@@ -1374,8 +1420,8 @@ void VDisplay::setFADCText()
 		sprintf( cTemp, "ped var %.2f (low gain: %.2f), 1st window %d, LG mult %.2f",
 				 fEventLoop->getAnalyzer()->getPedvars( false, fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] )[iChannel],
 				 fEventLoop->getAnalyzer()->getPedvars( true, fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] )[iChannel],
-				 fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel],
-				 fEventLoop->getLowGainMultiplier_Sum( fEventLoop->getRunParameter()->fsumwindow_1[ fEventLoop->getAnalyzer()->getTelID() ], fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] ) );
+				 fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] ,
+				 fEventLoop->getLowGainMultiplier_Sum( fEventLoop->getRunParameter()->fsumwindow_1[ fEventLoop->getAnalyzer()->getTelID() ] , fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] ) );
 	}
 	else if( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] == 0 )
 	{
@@ -1387,8 +1433,8 @@ void VDisplay::setFADCText()
 		sprintf( cTemp, "ped var %.2f (low gain: %.2f), 2nd window %d, LG mult %.2f",
 				 fEventLoop->getAnalyzer()->getPedvars( false, fEventLoop->getAnalyzer()->getCurrentSumWindow_2()[iChannel] )[iChannel],
 				 fEventLoop->getAnalyzer()->getPedvars( true, fEventLoop->getAnalyzer()->getCurrentSumWindow_2()[iChannel] )[iChannel],
-				 fEventLoop->getAnalyzer()->getCurrentSumWindow_2()[iChannel],
-				 fEventLoop->getLowGainMultiplier_Sum( fEventLoop->getRunParameter()->fsumwindow_2[ fEventLoop->getAnalyzer()->getTelID() ], fEventLoop->getAnalyzer()->getCurrentSumWindow_2()[iChannel] ) );
+				 fEventLoop->getAnalyzer()->getCurrentSumWindow_2()[iChannel] ,
+				 fEventLoop->getLowGainMultiplier_Sum( fEventLoop->getRunParameter()->fsumwindow_2[ fEventLoop->getAnalyzer()->getTelID() ]  , fEventLoop->getAnalyzer()->getCurrentSumWindow_2()[iChannel] ) );
 	}
 	else if( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] == 0 )
 	{
@@ -1401,14 +1447,15 @@ void VDisplay::setFADCText()
 		sprintf( cTemp, "ped var %.2f (low gain: %.2f), DP1 window %d, LG mult %.2f",
 				 fEventLoop->getAnalyzer()->getPedvars( false, iSW )[iChannel],
 				 fEventLoop->getAnalyzer()->getPedvars( true, iSW )[iChannel],
-				 iSW,
-				 fEventLoop->getLowGainMultiplier_Sum( fEventLoop->getRunParameter()->fsumwindow_pass1[ fEventLoop->getAnalyzer()->getTelID() ], iSW ) );
+				 iSW  ,
+				 fEventLoop->getLowGainMultiplier_Sum( fEventLoop->getRunParameter()->fsumwindow_pass1[ fEventLoop->getAnalyzer()->getTelID() ] , iSW ) );
 	}
 	else if( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] == 0 )
 	{
 		sprintf( cTemp, "no pedestal variance for 0 summation window" );
 	}
 	fTextFADC.push_back( new TText( xL, yT, cTemp ) );
+	// gain
 	// gain
 	sprintf( cTemp, "gain %.2f (low gain channel: %.2f)", fEventLoop->getAnalyzer()->getGains()[iChannel], fEventLoop->getAnalyzer()->getGains( true )[iChannel] );
 	fTextFADC.push_back( new TText( xL, yT, cTemp ) );
@@ -1449,16 +1496,12 @@ void VDisplay::setFADCText()
 			 fEventLoop->getAnalyzer()->getFADCStopOffsets()[iChannel] );
 	fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 	// pulse timing
-	ostringstream iSTRTextTemp;
-	iSTRTextTemp << "pulse timing (raw): ";
+	sprintf( cTemp, "pulse timing (raw): " );
 	for( unsigned int p = 0; p < fEventLoop->getRunParameter()->fpulsetiminglevels.size(); p++ )
 	{
-		iSTRTextTemp << ( int )( fEventLoop->getRunParameter()->fpulsetiminglevels[p] * 100. );
-		iSTRTextTemp << " : ";
-		iSTRTextTemp << setprecision( 2 ) << fEventLoop->getPulseTiming( false )[p][iChannel];
-		iSTRTextTemp << "  ";
+		sprintf( cTemp, "%s %d%% : %.1f ", cTemp, ( int )( fEventLoop->getRunParameter()->fpulsetiminglevels[p] * 100. ), fEventLoop->getPulseTiming( false )[p][iChannel] );
 	}
-	fTextFADC.push_back( new TText( xL, yT, iSTRTextTemp.str().c_str() ) );
+	fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 	// sum / pedvar
 	double i_var = 0.;
 	if( fEventLoop->getRunParameter()->fsourcetype != 6 &&
@@ -1491,6 +1534,22 @@ void VDisplay::setFADCText()
 	else
 	{
 		fTextFADC.back()->SetTextColor( 1 );
+	}
+	
+	// Template Expectation Value
+	
+	if( fEventLoop->getRunParameter()->ffrogsmode == 1 )
+	{
+		sprintf( cTemp, "Mu %.2f (%.2f) ImgGood %.2f BkgGood %.2f  (%.2f) Frogs Energy %.2f", fEventLoop->getData()->getTemplateMu()[iChannel], 5.3 * fEventLoop->getData()->getTemplateMu()[iChannel], fEventLoop->getData()->getFrogsParameters()->frogsGoodnessImg, fEventLoop->getData()->getFrogsParameters()->frogsGoodnessBkg, pow( fEventLoop->getAnalyzer()->getSums()[iChannel] / fEventLoop->getAnalyzer()->getPedvars( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] )[iChannel], 2.0 ) - 1.0, fEventLoop->getData()->getFrogsParameters()->frogsEnergy );
+		fTextFADC.push_back( new TText( xL, yT, cTemp ) );
+	}
+	
+	// Model3D Value
+	
+	if( fEventLoop->getRunParameter()->fUseDisplayModel3D )
+	{
+		sprintf( cTemp, "Model3D: %.2f", fEventLoop->getData()->getModel3DMu()[iChannel] );
+		fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 	}
 	
 	// dead channel text
@@ -1841,10 +1900,6 @@ void VDisplay::drawPixelHistos()
 }
 
 
-/*
-     draw a histogram with the timing for each pixel
-
-*/
 bool VDisplay::drawImageBorderTZero()
 {
 	fEventLoop->getData()->setTelID( fTelescope );
@@ -2143,14 +2198,14 @@ void VDisplay::defineGui()
 	char i_text[200];
 	// layout hints
 	fL1 = new TGLayoutHints( kLHintsTop | kLHintsLeft | kLHintsExpandX | kLHintsExpandY, 2, 2, 2, 2 );
-	fL2 = new TGLayoutHints( kLHintsLeft | kLHintsBottom, 0, 0, 0, 0 );
+	fL2 = new TGLayoutHints( kLHintsLeft | kLHintsBottom , 0, 0, 0, 0 );
 	fL4 = new TGLayoutHints( kLHintsTop | kLHintsLeft | kLHintsExpandX, 0, 0, 0, 0 );
 	//  fL5 = new TGLayoutHints(kLHintsTop | kLHintsLeft | kFixedWidth, 2, 2, 2, 2);
 	fL5 = new TGLayoutHints( kLHintsTop );
 	fL6 = new TGLayoutHints( kLHintsTop | kLHintsLeft, 2, 2, 2, 2 );
 	fL8 = new TGLayoutHints( kLHintsTop | kLHintsRight, 2, 2, 2, 2 );
 	
-	fL3 = new TGLayoutHints( kLHintsTop | kLHintsRight, 0, 0, 0, 0 );
+	fL3 = new TGLayoutHints( kLHintsTop | kLHintsRight , 0, 0, 0, 0 );
 	fL7 = new TGLayoutHints( kLHintsBottom | kLHintsRight, 0, 0, 0, 0 );
 	
 	// main menu bar
@@ -2257,6 +2312,8 @@ void VDisplay::defineGui()
 	fComboCameraView->AddEntry( "HV", 24 );
 	fComboCameraView->AddEntry( "currents", 25 );
 	fComboCameraView->AddEntry( "trigger-evndisp", 26 );
+	fComboCameraView->AddEntry( "template (frogs)", 27 );
+	fComboCameraView->AddEntry( "model3D", 28 );
 	fComboCameraView->Select( 0 );
 	fComboCameraView->Associate( this );
 	fComboCameraView->Resize( 110, 20 );
@@ -2407,7 +2464,7 @@ void VDisplay::defineGui()
 	fCompOpt->AddFrame( fGroupOptDis, fL4 );
 	//  fChButtonColor = new TGCheckButton( fGroupOptDis, "&color scheme" , B_DCOLOR  );
 	//  fChButtonColor->Associate( this );
-	fRadioB1 = new TGRadioButton( fGroupOptDis, "&no IDs", B_DNONE );
+	fRadioB1 = new TGRadioButton( fGroupOptDis, "&no IDs" , B_DNONE );
 	fRadioB2 = new TGRadioButton( fGroupOptDis, "&channel IDs ", B_DCHANNEL );
 	fRadioB3 = new TGRadioButton( fGroupOptDis, "&tubes IDs", B_DTUBE );
 	fRadioB4 = new TGRadioButton( fGroupOptDis, "c&oordinate system", B_DCOOR );
@@ -2802,6 +2859,8 @@ void VDisplay::subprocessButton( Long_t parm1 )
 				fEventLoop->setCutNTrigger( ( int )fNEntryOTri->GetNumber() );
 				fEventLoop->setCutNArrayTrigger( ( int )fNEntryOATri->GetNumber() );
 				fEventLoop->setCutNArrayImages( ( int )fNEntryOAIma->GetNumber() );
+				// (GM)               fEventLoop->getAnalyzer()->setSumFirst( (int)fNEntryOSum->GetNumber() );
+				// (GM)                fEventLoop->getAnalyzer()->setSumWindow( (int)fNEntryOWin->GetNumber() );
 				fEventLoop->getAnalyzer()->setImageThresh( fNEntryOIma->GetNumber() );
 				fEventLoop->getAnalyzer()->setBorderThresh( fNEntryOBor->GetNumber() );
 			}
@@ -3244,10 +3303,6 @@ void VDisplay::dumpDeadChannels()
 	}
 }
 
-/*
- * dump all image/border channels to the screen
- *
- */
 void VDisplay::dumpImageBorderPixels()
 {
 	if( fDebug )
@@ -3306,9 +3361,8 @@ void VDisplay::dumpImageBorderPixels()
 	}
 }
 
-void VDisplay::makeFullMovie()
-{
-	if( fEventLoop->getRunParameter()->fMovieBool )
+void VDisplay::makeFullMovie(){
+	if (fEventLoop->getRunParameter()->fMovieBool)
 	{
 		//step 1, click the next button
 		fEventLoop->setNextEventStatus( true );
@@ -3317,12 +3371,11 @@ void VDisplay::makeFullMovie()
 		// Step 2, Process
 		string inFile = fEventLoop->getRunParameter()->fMovieInput;
 		string outDir = fEventLoop->getRunParameter()->fMovieOutputDir;
-		ifstream inputFile( inFile.c_str() );
+		ifstream inputFile(inFile.c_str());
 		int eventNum = 0;
-		while( inputFile >> eventNum )
-		{
+		while(inputFile >> eventNum){
 			char c_ev[200];
-			sprintf( c_ev, "searching for event %d", eventNum );
+			sprintf( c_ev, "searching for event %d",eventNum );
 			fStatusBar->SetText( c_ev, 1 );
 			fEventLoop->gotoEvent( eventNum );
 			if( eventNum != 0 )
@@ -3347,7 +3400,7 @@ void VDisplay::makeFullMovie()
 			ostringstream os;
 			os << outDir << "/run_" << fEventLoop->getRunNumber() << "_event_" << fEventLoop->getEventNumber() << "." << fEventLoop->getRunParameter()->fMovieFrameOutput;
 			string outFile = os.str();
-			fCanvasCamera->Print( outFile.c_str() );
+			fCanvasCamera->Print(outFile.c_str());
 		}
 		inputFile.close();
 		//Step 3, click quit button

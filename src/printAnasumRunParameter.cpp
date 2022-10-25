@@ -45,8 +45,8 @@ int main( int argc, char* argv[] )
 		cout << endl;
 		cout << "   options: " << endl;
 		cout << "      -effareafile  print effective area file" << endl;
-		cout << "      -acceptancefile print radical acceptance file" << endl;
-		cout << "      -cutfile      print cut file" << endl;
+                cout << "      -acceptancefile print radical acceptance file" << endl;
+                cout << "      -cutfile      print cut file" << endl;
 		cout << endl;
 		exit( 0 );
 	}
@@ -64,39 +64,39 @@ int main( int argc, char* argv[] )
 		cout << "exiting..." << endl;
 		exit( 0 );
 	}
-	ostringstream oss;
-	oss << "run_" << fRunNumber << "/stereo/";
-	if( fIn->cd( oss.str().c_str() ) )
-	{
-		if( argc == 4 )
-		{
-			string fOption = argv[3];
-			VAnaSumRunParameter* a = ( VAnaSumRunParameter* )gDirectory->Get( "VAnaSumRunParameter" );
-			if( a && a->fMapRunList.find( fRunNumber ) != a->fMapRunList.end() )
-			{
-				if( fOption == "-effareafile" )
-				{
-					cout << a->fMapRunList[fRunNumber].fEffectiveAreaFile << endl;
-				}
-				else if( fOption == "-acceptancefile" )
-				{
-					cout << a->fMapRunList[fRunNumber].fAcceptanceFile << endl;
-				}
-				else if( fOption == "-cutfile" )
-				{
-					cout << a->fMapRunList[fRunNumber].fCutFile << endl;
-				}
-				else if( fOption == "-teltoana" )
-				{
-					cout << a->fMapRunList[fRunNumber].fTelToAna << endl;
-				}
-				else if( fOption == "-ntel" )
-				{
-					cout << a->fMapRunList[fRunNumber].fNTel << endl;
-				}
-			}
-		}
-	}
+        ostringstream oss;
+        oss << "run_" << fRunNumber << "/stereo/";
+        if( fIn->cd( oss.str().c_str() ) )
+        {
+            if( argc == 4 )
+            {
+                string fOption = argv[3];
+                VAnaSumRunParameter *a = (VAnaSumRunParameter*)gDirectory->Get( "VAnaSumRunParameter" );
+                if( a && a->fMapRunList.find( fRunNumber ) != a->fMapRunList.end() )
+                {
+                    if( fOption == "-effareafile" )
+                    {
+                        cout << a->fMapRunList[fRunNumber].fEffectiveAreaFile << endl;
+                    }
+                    else if( fOption == "-acceptancefile" )
+                    {
+                        cout << a->fMapRunList[fRunNumber].fAcceptanceFile << endl;
+                    }
+                    else if( fOption == "-cutfile" )
+                    {
+                        cout << a->fMapRunList[fRunNumber].fCutFile << endl;
+                    }
+                    else if( fOption == "-teltoana" )
+                    {
+                        cout << a->fMapRunList[fRunNumber].fTelToAna << endl;
+                    }
+                    else if( fOption == "-ntel" )
+                    {
+                        cout << a->fMapRunList[fRunNumber].fNTel << endl;
+                    }
+                }
+            }
+        }
 	
 	fIn->Close();
 	

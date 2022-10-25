@@ -3,6 +3,9 @@
  *
  *   input is a file list of mscw_energy output file from gamma-ray simulations
  *
+ * \author
+ *   Gernot Maier
+ *
  */
 
 #include "TChain.h"
@@ -48,9 +51,9 @@ int main( int argc, char* argv[] )
 		string fCommandLine = argv[1];
 		if( fCommandLine == "-v" || fCommandLine == "--version" )
 		{
-			VGlobalRunParameter iRunPara;
-			cout << iRunPara.getEVNDISP_VERSION() << endl;
-			exit( EXIT_SUCCESS );
+			VGlobalRunParameter fRunPara;
+			cout << fRunPara.getEVNDISP_VERSION() << endl;
+			exit( 0 );
 		}
 	}
 	
@@ -66,18 +69,14 @@ int main( int argc, char* argv[] )
 		cout << endl;
 		if( gSystem->Getenv( "EVNDISPSYS" ) )
 		{
-			int i_s = system( "cat $EVNDISPSYS/README/README.EFFECTIVEAREA" );
-			if( i_s == -1 )
-			{
-				cout << "error: README/README.EFFECTIVEAREA not found" << endl;
-			}
+			system( "cat $EVNDISPSYS/README/README.EFFECTIVEAREA" );
 		}
 		else
 		{
 			cout << "no help files found (environmental variable EVNDISPSYS not set)" << endl;
 		}
 		cout << endl;
-		exit( EXIT_SUCCESS );
+		exit( 0 );
 	}
 	string fOutputfileName = argv[2];
 	
@@ -190,11 +189,11 @@ int main( int argc, char* argv[] )
 		}
 		else
 		{
-			f_IRF.back()->setContainmentProbability( f_IRF_ContainmentProbability[i] );
+		 	f_IRF.back()->setContainmentProbability( f_IRF_ContainmentProbability[i] );
 		}
 		f_IRF.back()->initialize( f_IRF_Name[i], f_IRF_Type[i],
-								  fRunPara->telconfig_ntel, fRunPara->fCoreScatterRadius,
-								  fRunPara->fze, fRunPara->fnoise, fRunPara->fpedvar, fRunPara->fXoff, fRunPara->fYoff );
+                                          fRunPara->telconfig_ntel, fRunPara->fCoreScatterRadius,
+                                          fRunPara->fze, fRunPara->fnoise, fRunPara->fpedvar, fRunPara->fXoff, fRunPara->fYoff );
 	}
 	
 	
@@ -206,6 +205,19 @@ int main( int argc, char* argv[] )
 		cout << "Error while trying to add mscw data tree from file " << fRunPara->fdatafile  << endl;
 		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
+	}
+	
+	//FROGS
+	if( fRunPara->fGammaHadronCutSelector / 10 == 5 )
+	{
+		TChain* fchain = new TChain( "frogspars" );
+		if( !fchain->Add( fRunPara->fdatafile.c_str(), -1 ) )
+		{
+			cout << "Error while trying to add mscw frogs tree from file " << fRunPara->fdatafile  << endl;
+			cout << "exiting..." << endl;
+			exit( EXIT_FAILURE );
+		}
+		c->AddFriend( fchain );
 	}
 	
 	CData d( c, true, 6, true );
@@ -220,16 +232,16 @@ int main( int argc, char* argv[] )
 		{
 			f_IRF[i]->setDataTree( &d );
 			f_IRF[i]->setCuts( fCuts );
-			if( f_IRF[i]->doNotDuplicateIRFs() )
-			{
-				f_IRF[i]->fill();
-			}
-			else if( f_IRF[i]->getDuplicationID() < f_IRF.size() && f_IRF[f_IRF[i]->getDuplicationID()] )
-			{
-				f_IRF[i]->fillResolutionGraphs( f_IRF[f_IRF[i]->getDuplicationID()]->getIRFData() );
-			}
-			
-			if( fCuts_AngularResolutionName.size() > 0 && f_IRF_Name[i] == fCuts_AngularResolutionName )
+                        if( f_IRF[i]->doNotDuplicateIRFs() )
+                        {
+			    f_IRF[i]->fill();
+                        }
+                        else if ( f_IRF[i]->getDuplicationID() < f_IRF.size() && f_IRF[f_IRF[i]->getDuplicationID()] )
+                        {
+                            f_IRF[i]->fillResolutionGraphs( f_IRF[f_IRF[i]->getDuplicationID()]->getIRFData() );
+                        }
+                        
+                        if( fCuts_AngularResolutionName.size() > 0 && f_IRF_Name[i] == fCuts_AngularResolutionName )
 			{
 				if( fCuts->getDirectionCutSelector() == 2 )
 				{
@@ -315,38 +327,38 @@ int main( int argc, char* argv[] )
 	if( !fRunPara->fFillMCHistograms && fRunPara->fFillingMode != 1 && fRunPara->fFillingMode != 2 )
 	{
 		fOutputfile->cd();
-		
-		// copy angular resolution graphs to effective areas
-		// assume same az bins in resolution and effective area calculation
-		// use first spectral index bin
-		for( unsigned int f = 0; f < f_IRF.size(); f++ )
-		{
-			if( f_IRF[f] && f_IRF[f]->getResolutionType() == "angular_resolution" )
-			{
-				if( TMath::Abs( f_IRF[f]->getContainmentProbability() - 0.68 ) < 1.e-4 )
-				{
-					for( unsigned int i = 0; i < fRunPara->fAzMin.size(); i++ )
-					{
-						//cout << "copy/setAngularResolution (" << f << " " << i << ")" << endl;
-						fEffectiveAreaCalculator.setAngularResolutionGraph( i,
-								f_IRF[f]->getAngularResolutionGraph( i, 0 ),
-								false );
-						fEffectiveAreaCalculator.setAngularResolution2D( i,
-								f_IRF[f]->getAngularResolution2D( i, 0 ) );
-					}
-				}
-				else if( TMath::Abs( f_IRF[f]->getContainmentProbability() - 0.80 ) < 1.e-4 )
-				{
-					for( unsigned int i = 0; i < fRunPara->fAzMin.size(); i++ )
-					{
-						fEffectiveAreaCalculator.setAngularResolutionGraph( i,
-								f_IRF[f]->getAngularResolutionGraph( i, 0 ),
-								true );
-					}
-				}
-			}
-		}
-		
+
+                // copy angular resolution graphs to effective areas
+                // assume same az bins in resolution and effective area calculation
+                // use first spectral index bin
+                for( unsigned int f = 0; f < f_IRF.size(); f++ )
+                {
+                    if( f_IRF[f] && f_IRF[f]->getResolutionType() == "angular_resolution" )
+                    {
+                        if( TMath::Abs( f_IRF[f]->getContainmentProbability() - 0.68 ) < 1.e-4 )
+                        {
+                            for( unsigned int i = 0; i < fRunPara->fAzMin.size(); i++ )
+                            {
+			        //cout << "copy/setAngularResolution (" << f << " " << i << ")" << endl;
+                                fEffectiveAreaCalculator.setAngularResolutionGraph( i,
+                                        f_IRF[f]->getAngularResolutionGraph( i, 0 ),
+                                        false );
+                                fEffectiveAreaCalculator.setAngularResolution2D( i,
+                                        f_IRF[f]->getAngularResolution2D( i, 0 ) );
+                            }
+                        }
+                        else if( TMath::Abs( f_IRF[f]->getContainmentProbability() - 0.80 ) < 1.e-4 )
+                        {
+                            for( unsigned int i = 0; i < fRunPara->fAzMin.size(); i++ )
+                            {
+                                fEffectiveAreaCalculator.setAngularResolutionGraph( i,
+                                        f_IRF[f]->getAngularResolutionGraph( i, 0 ),
+                                        true );
+                            }
+                        }
+                    }
+                }
+
 		fEffectiveAreaCalculator.fill( hE0mc, &d, fMC_histo, fRunPara->fEnergyReconstructionMethod );
 		fStopWatch.Print();
 	}

@@ -3,7 +3,7 @@
     (VERITAS only)
 
 
-
+    \author Gernot Maier
 */
 
 #include "VGlobalRunParameter.h"

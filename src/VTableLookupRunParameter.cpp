@@ -15,8 +15,9 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	tablefile = "";
 	ze = -1.;
 	isMC = false;
-	fUpdateInstrumentEpoch = true;
+	fInterpolate = 0;
 	fUseMedianEnergy = 1;
+        fUpdateInstrumentEpoch = true;
 	fPE = false;
 	fInterpolateString = "";
 	readwrite = 'R';
@@ -28,6 +29,8 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	bShortTree = false;
 	bWriteMCPars = true;
 	rec_method = 0;
+	point_source = false;
+	esysfile = "";
 	fWrite1DHistograms = false;
 	fSpectralIndex = 2.0;
 	fWobbleOffset = 500;     // integer of wobble offset * 100
@@ -36,22 +39,27 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	fTableFillingCut_WobbleCut_max = 15.;
 	fminsize = 0.;
 	fmaxdist = 50000.;
-	fmaxloss = 1.;
 	fSelectRandom = -1.;
 	fSelectRandomSeed = 17;
-	fRerunStereoReconstruction = false;
-	fRerunStereoReconstruction_minAngle = -1.;
-	fRerunStereoReconstruction_BDTNImages_max = 4;
-	fRerunStereoReconstruction_BDTFileName = "";
-	fDispError_BDTFileName = "";
-	fDispError_BDTWeight = 5.;
-	fQualityCutLevel = 0;
+        fMSCWSizecorrection_mean=0;
+        fMSCLSizecorrection_mean=0;
+        fEnergySizecorrection_mean=0;
 	
+        for (Int_t k=0; k<VDST_MAXTELESCOPES; k++){
+            // Default scalings set to 1. Will be replaced later with data from a runparameter file
+	    fMSCWSizecorrection.push_back(1.);
+            fMSCLSizecorrection.push_back(1.);
+            fEnergySizecorrection.push_back(1.);
+        }
+
+
 	fLimitEnergyReconstruction = false;
 	
 	fMC_distance_to_cameracenter_min =  0.;
 	fMC_distance_to_cameracenter_max =  1.e10;
 	
+	//	fNentries = TChain::kBigNumber;
+	// Setting to ROOT 5 value to prevent ROOT 6 Errors
 	fNentries = 1234567890;
 	fMaxRunTime = 1.e9;
 	
@@ -121,13 +129,13 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 			}
 			return true;
 		}
+                else if( iTemp.find( "updateEpoch" ) < iTemp.size() )
+                {
+                        fUpdateInstrumentEpoch = (bool)atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+                }
 		else if( iTemp.find( "useMedian" ) < iTemp.size() )
 		{
 			fUseMedianEnergy = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-		}
-		else if( iTemp.find( "updateEpoch" ) < iTemp.size() )
-		{
-			fUpdateInstrumentEpoch = ( bool )atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
 		else if( iTemp.find( "noise" ) < iTemp.size() )
 		{
@@ -154,6 +162,22 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 				i++;
 			}
 		}
+		else if( iTemp.find( "-esysfi" ) < iTemp.size() )
+		{
+			if( iTemp2.size() > 0 )
+			{
+				esysfile = iTemp2;
+				i++;
+			}
+		}
+		else if( iTemp.find( "-limitEnergyReconstruction" ) < iTemp.size() )
+		{
+			fLimitEnergyReconstruction = true;
+		}
+		else if( iTemp.find( "-interpolate" ) < iTemp.size() )
+		{
+			fInterpolate = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
 		else if( iTemp.find( "-fill" ) < iTemp.size() )
 		{
 			int iT = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -169,63 +193,6 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 			{
 				cout << "unknown parameter, choose 1=fill or 2=read lookup tables" << endl;
 				return false;
-			}
-		}
-		// rerun the stero reconstruction
-		else if( iTemp.find( "-redo_stereo_reconstruction" ) < iTemp.size() )
-		{
-			fRerunStereoReconstruction = true;
-		}
-		// new minimum angle between image axes for simple stereo reconstruction
-		else if( iTemp.find( "-minangle_stereo_reconstruction" ) < iTemp.size() )
-		{
-			fRerunStereoReconstruction_minAngle = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-		}
-		// BDT directory and file name for disp stereo reconstruction (direction)
-		else if( iTemp.find( "-tmva_filename_stereo_reconstruction" ) < iTemp.size() )
-		{
-			if( iTemp2.size() > 0 )
-			{
-				fRerunStereoReconstruction_BDTFileName = iTemp2;
-				i++;
-			}
-		}
-		// DISP BDT reconstruction is applied for images with up to this multiplicity
-		else if( iTemp.find( "-tmva_nimages_max_stereo_reconstruction" ) < iTemp.size() )
-		{
-			fRerunStereoReconstruction_BDTNImages_max = ( unsigned int )( atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() ) );
-			if( fRerunStereoReconstruction_BDTNImages_max > 40000 )
-			{
-				cout << "VTableLookupRunParameter::fillParameters() error:";
-				cout << " maximum number of images for TMVA disp reconstruction is 4";
-				cout << " (selection was " << fRerunStereoReconstruction_BDTNImages_max << ")" << endl;
-				cout << "exiting..." << endl;
-				exit( EXIT_FAILURE );
-			}
-		}
-		// BDT directory and file name for disp stereo reconstruction (disperror)
-		else if( iTemp.find( "-tmva_filename_disperror_reconstruction" ) < iTemp.size() )
-		{
-			if( iTemp2.size() > 0 )
-			{
-				fDispError_BDTFileName = iTemp2;
-				i++;
-			}
-		}
-		else if( iTemp.find( "-tmva_disperror_weight" ) < iTemp.size() )
-		{
-			if( iTemp2.size() > 0 )
-			{
-				fDispError_BDTWeight = atof( iTemp2.c_str() );
-				i++;
-			}
-		}
-		else if( iTemp.find( "-qualitycutlevel" ) < iTemp.size() )
-		{
-			if( iTemp2.size() > 0 )
-			{
-				fQualityCutLevel = ( unsigned int )( atoi( iTemp2.c_str() ) );
-				i++;
 			}
 		}
 		else if( iTemp.find( "-ze" ) < iTemp.size() )
@@ -253,15 +220,9 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		{
 			fSpectralIndex = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-		else if( iTemp.find( "-maxdist" ) < iTemp.size()
-				 && !( iTemp.find( "-maxdistancetocameracenter" ) < iTemp.size() )
-				 && !( iTemp.find( "-maxdistfraction" ) < iTemp.size() ) )
+		else if( iTemp.find( "-maxdist" ) < iTemp.size() && !( iTemp.find( "-maxdistancetocameracenter" ) < iTemp.size() ) )
 		{
 			fmaxdist = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-		}
-		else if( iTemp.find( "-maxloss" ) < iTemp.size() )
-		{
-			fmaxloss = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
 		else if( iTemp.find( "-maxdistancetocameracenter" ) < iTemp.size() )
 		{
@@ -275,6 +236,10 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 			{
 				fMC_distance_to_cameracenter_min = 0.;
 			}
+		}
+		else if( iTemp.find( "-CTAoffAxisBins" ) < iTemp.size() )
+		{
+			setCTA_MC_offaxisBins();
 		}
 		else if( iTemp.find( "-add_mc_spectral_index" ) < iTemp.size() )
 		{
@@ -303,6 +268,146 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 			{
 				writeoption = "recreate";
 			}
+		}
+		else if( iTemp.find( "-sizecorrect" ) < iTemp.size() )
+		{
+                        float _scale;
+                        int   sizecorr_ntel=0;
+                        iTemp = iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() );
+                        if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size() ) 
+                        {
+                            // special case, user set only 1 value, assuming it is the same for all telescopes
+                            _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+                            for (unsigned long int k=0; k<VDST_MAXTELESCOPES; k++){
+                                fMSCWSizecorrection[k] = _scale;
+                                fMSCLSizecorrection[k] = _scale;
+                                fEnergySizecorrection[k] = _scale;
+                            
+                            }
+                            fMSCWSizecorrection_mean = _scale;
+                            fMSCLSizecorrection_mean = _scale;
+                            fEnergySizecorrection_mean = _scale;
+                        }                
+                        else 
+                        {                                                            
+                            // read comma separated corrections
+                            for (unsigned long int k=0; k<VDST_MAXTELESCOPES; k++)
+                            {
+                                _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+                                fMSCWSizecorrection[k] = _scale;
+                                fMSCLSizecorrection[k] = _scale;
+                                fEnergySizecorrection[k] = _scale;
+                                fMSCWSizecorrection_mean += _scale;
+                                fMSCLSizecorrection_mean += _scale;
+                                fEnergySizecorrection_mean += _scale;
+                                sizecorr_ntel++;
+                                if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
+                                {
+                                    break;
+                                }
+                                iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+                            }
+                            fMSCWSizecorrection_mean = fMSCWSizecorrection_mean/sizecorr_ntel;
+                            fMSCLSizecorrection_mean = fMSCLSizecorrection_mean/sizecorr_ntel;
+                            fEnergySizecorrection_mean = fEnergySizecorrection_mean/sizecorr_ntel;
+                        }
+		}
+		else if( iTemp.find( "-sizemscwcorrect" ) < iTemp.size() )
+		{
+                        float _scale;
+                        int   sizecorr_ntel=0;
+                        iTemp = iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() );
+
+                        if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size() ) 
+                        {
+                            // special case, user set only 1 value, assuming it is the same for all telescopes
+                            _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+                            for (unsigned long int k=0; k<VDST_MAXTELESCOPES; k++){
+                                fMSCWSizecorrection[k] = _scale;
+                            
+                            }
+                            fMSCWSizecorrection_mean = _scale;
+                        }                
+                        else 
+                        {                                                           
+                            // read comma separated corrections
+                            for (unsigned long int k=0; k<VDST_MAXTELESCOPES; k++)
+                            {
+                                _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+                                fMSCWSizecorrection[k] = _scale;
+                                fMSCWSizecorrection_mean += _scale;
+                                sizecorr_ntel++;
+                                if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size() )
+                                {
+                                    break;
+                                }
+                                iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+                            }
+                            fMSCWSizecorrection_mean = fMSCWSizecorrection_mean/sizecorr_ntel;
+                        }
+		}
+		else if( iTemp.find( "-sizemsclcorrect" ) < iTemp.size() )
+		{
+                        float _scale;
+                        iTemp = iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() );
+                        if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size() ) 
+                        {
+                            // special case, user set only 1 value, assuming it is the same for all telescopes
+                            _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+                            for (unsigned long int k=0; k<VDST_MAXTELESCOPES; k++){
+                                fMSCLSizecorrection[k] = _scale;
+                            
+                            }
+                            fMSCLSizecorrection_mean = _scale;
+                        }                
+                        else
+                        {
+                            // read comma separated corrections
+                            for (unsigned long int k=0; k<VDST_MAXTELESCOPES; k++)
+                            {
+                                _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+                                fMSCLSizecorrection[k] = _scale;
+                                fMSCLSizecorrection_mean += _scale;
+                                sizecorr_ntel++;
+                                if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
+                                {
+                                    break;
+                                }
+                                iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+                            }
+                            fMSCLSizecorrection_mean = fMSCLSizecorrection_mean/sizecorr_ntel;
+                        }
+		}
+		else if( iTemp.find( "-sizeenergycorrect" ) < iTemp.size() )
+		{
+                        float _scale;
+                        iTemp = iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() );
+                        if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size() ) 
+                        {
+                            // special case, user set only 1 value, assuming it is the same for all telescopes
+                            _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+                            for (unsigned long int k=0; k<VDST_MAXTELESCOPES; k++){
+                                fEnergySizecorrection[k] = _scale;
+                            
+                            }
+                            fEnergySizecorrection_mean = _scale;
+                        }                
+                        else
+                        {
+                            // read comma separated corrections
+                            for (unsigned long int k=0; k<VDST_MAXTELESCOPES; k++)
+                            {
+                                _scale = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+                                fEnergySizecorrection[k] = _scale;
+                                fEnergySizecorrection_mean += _scale;
+                                if ( iTemp.size() == (iTemp.substr( iTemp.find( "," ) + 1, iTemp.size())).size())
+                                {
+                                    break;
+                                }
+                                iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+                            }
+                            fEnergySizecorrection_mean = fEnergySizecorrection_mean/sizecorr_ntel;
+                        }
 		}
 		else if( iTemp.find( "-noNo" ) < iTemp.size() )
 		{
@@ -457,11 +562,7 @@ void VTableLookupRunParameter::printHelp()
 {
 	if( gSystem->Getenv( "EVNDISPSYS" ) )
 	{
-		int syst_ret = system( "cat $EVNDISPSYS/README/README.MSCW_ENERGY" );
-		if( syst_ret == -1 )
-		{
-			cout << "VTableLookupRunParameter::printHelp() error: could not find helper file in README directory" << endl;
-		}
+		system( "cat $EVNDISPSYS/README/README.MSCW_ENERGY" );
 	}
 	else
 	{
@@ -479,6 +580,8 @@ void VTableLookupRunParameter::print( int iP )
 	cout << "lookuptable: " << tablefile << endl;
 	cout << endl;
 	cout << "evndisp reconstruction parameter ID: " << rec_method << endl;
+	cout << endl;
+	printCTA_MC_offaxisBins();
 	cout << endl;
 	cout << "input file(s): ";
 	for( unsigned int i = 0; i < inputfile.size(); i++ )
@@ -502,7 +605,7 @@ void VTableLookupRunParameter::print( int iP )
 			cout << "writing reconstructed events only (" << bWriteReconstructedEventsOnly << ")" << endl;
 		}
 	}
-	else
+	if( readwrite == 'W' || readwrite == 'w' )
 	{
 		cout << "filling lookup tables for: ";
 		cout << " zenith " << ze << ", direction offset " << fWobbleOffset << "(x0.01) [deg], ";
@@ -514,24 +617,6 @@ void VTableLookupRunParameter::print( int iP )
 		cout << "\t minimum telescope multiplicity: " << fTableFillingCut_NImages_min << endl;
 		cout << "\t distance to camera: > " << fMC_distance_to_cameracenter_min << " [deg], <";
 		cout << fMC_distance_to_cameracenter_max << " [deg]" << endl;
-	}
-	if( fRerunStereoReconstruction )
-	{
-		cout << "\t rerunning stereo reconstruction" << endl;
-		if( fRerunStereoReconstruction_BDTFileName.size() > 0 )
-		{
-			cout << "\t reading BDT TMVA files from " << fRerunStereoReconstruction_BDTFileName << endl;
-			cout << "\t BDT TMVA stereo reconstruction is applied for events with <= ";
-			cout << fRerunStereoReconstruction_BDTNImages_max << " images" << endl;
-			if( fmaxdist < 1.e3 )
-			{
-				cout << "\t BDT TMVA stereo reconstruction distance cut < " << fmaxdist << endl;
-			}
-			if( fmaxloss < 1. )
-			{
-				cout << "\t BDT TMVA stereo reconstruction loss cut < " << fmaxloss << endl;
-			}
-		}
 	}
 	if( iP == 2 && isMC )
 	{
@@ -549,7 +634,18 @@ void VTableLookupRunParameter::print( int iP )
 	{
 		cout << "\t use all images" << endl;
 	}
-	if( readwrite == 'W' )
+	if( fLimitEnergyReconstruction )
+	{
+		cout << "limited energy tables" << endl;
+	}
+	if( !( readwrite == 'W' || readwrite == 'w' ) || iP == 2 )
+	{
+		if( esysfile.size() > 0 )
+		{
+			cout << "correct for systematic errors with " << esysfile << endl;
+		}
+	}
+	else
 	{
 		cout << "minimum number of showers required per lookup table bin: " << fMinRequiredShowerPerBin << endl;
 	}
@@ -565,10 +661,62 @@ void VTableLookupRunParameter::print( int iP )
 	{
 		cout << "use mean of energy distributions" << endl;
 	}
-	if( fUpdateInstrumentEpoch )
+	if( fInterpolate > 0 )
 	{
-		cout << "updating instrument epoch from default epoch file" << endl;
+		cout << "WARNING: interpolation switched off for efficiency reasons" << endl;
 	}
+       
+        // Check the average scaling factors among all telescopes. If it deviates from 1, print it 
+        if( fMSCWSizecorrection_mean!=0 && TMath::Abs( fMSCWSizecorrection_mean - 1. ) > 1.e-2 )
+        {
+                cout << "Mean size correction for mscw tables: " << fMSCWSizecorrection_mean;
+                // print (for good reasons) first four corrections
+                if( 4 < fMSCWSizecorrection.size() )
+                {
+                    cout << " (";
+                    for( unsigned int t = 0; t < 4; t++ )
+                    {
+                        cout << "T" << t+1 << ": ";
+                        cout << fMSCWSizecorrection[t] << "  ";
+                    }
+                    cout << ")";
+                }
+                cout << endl;
+        }
+        if( fMSCLSizecorrection_mean!=0 && TMath::Abs( fMSCLSizecorrection_mean - 1. ) > 1.e-2 )
+        {
+                cout << "Mean size correction for mscl tables: " << fMSCLSizecorrection_mean;
+                if( 4 < fMSCLSizecorrection.size() )
+                {
+                    cout << " (";
+                    for( unsigned int t = 0; t < 4; t++ )
+                    {
+                        cout << "T" << t+1 << ": ";
+                        cout << fMSCLSizecorrection[t] << "  ";
+                    }
+                    cout << ")";
+                }
+                cout << endl;
+        }
+        if( fEnergySizecorrection_mean!=0 && TMath::Abs( fEnergySizecorrection_mean - 1. ) > 1.e-2 )
+        {
+                cout << "Mean size correction for energy tables: " << fEnergySizecorrection_mean;
+                if( 4 < fEnergySizecorrection.size() )
+                {
+                    cout << " (";
+                    for( unsigned int t = 0; t < 4; t++ )
+                    {
+                        cout << "T" << t+1 << ": ";
+                        cout << fEnergySizecorrection[t] << "  ";
+                    }
+                    cout << ")";
+                }
+                cout << endl;
+        }
+        if( fUpdateInstrumentEpoch )
+        {
+                cout << "updating instrument epoch from default epoch file" << endl;
+        }
 	
 	if( iP >= 1 )
 	{
@@ -616,4 +764,51 @@ bool VTableLookupRunParameter::fillInputFile_fromList( string iList )
 	cout << "total number of input files " << inputfile.size() << endl;
 	
 	return true;
+}
+
+void VTableLookupRunParameter::setCTA_MC_offaxisBins()
+{
+	fCTA_MC_offaxisBin_min.clear();
+	fCTA_MC_offaxisBin_max.clear();
+	
+	fCTA_MC_offaxisBin_min.push_back( 0.0 );
+	fCTA_MC_offaxisBin_max.push_back( 1.0 );
+	
+	fCTA_MC_offaxisBin_min.push_back( 1.0 );
+	fCTA_MC_offaxisBin_max.push_back( 2.0 );
+	
+	fCTA_MC_offaxisBin_min.push_back( 2.0 );
+	fCTA_MC_offaxisBin_max.push_back( 3.0 );
+	
+	fCTA_MC_offaxisBin_min.push_back( 3.0 );
+	fCTA_MC_offaxisBin_max.push_back( 3.5 );
+	
+	fCTA_MC_offaxisBin_min.push_back( 3.5 );
+	fCTA_MC_offaxisBin_max.push_back( 4.0 );
+	
+	fCTA_MC_offaxisBin_min.push_back( 4.0 );
+	fCTA_MC_offaxisBin_max.push_back( 4.5 );
+	
+	fCTA_MC_offaxisBin_min.push_back( 4.5 );
+	fCTA_MC_offaxisBin_max.push_back( 5.0 );
+	
+	fCTA_MC_offaxisBin_min.push_back( 5.0 );
+	fCTA_MC_offaxisBin_max.push_back( 5.5 );
+	
+	fCTA_MC_offaxisBin_min.push_back( 5.5 );
+	fCTA_MC_offaxisBin_max.push_back( 6.0 );
+}
+
+void VTableLookupRunParameter::printCTA_MC_offaxisBins()
+{
+	if( fCTA_MC_offaxisBin_min.size() == 0 )
+	{
+		return;
+	}
+	
+	cout << "setting the following off-axis bins for CTA analysis: " << endl;
+	for( unsigned int i = 0; i < fCTA_MC_offaxisBin_min.size(); i++ )
+	{
+		cout << "   bin " << i << "\t min " << fCTA_MC_offaxisBin_min[i] << " deg, max " << fCTA_MC_offaxisBin_max[i] << " deg" << endl;
+	}
 }

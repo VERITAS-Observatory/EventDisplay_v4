@@ -2,7 +2,7 @@
  *  \brief interpolate empty bins in 2D histograms
  *
  *
- *
+ *  \author Gernot Maier
  *
  */
 

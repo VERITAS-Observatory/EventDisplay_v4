@@ -2,7 +2,7 @@
     \brief get DISP values from tables
 
 
-
+    \author Gernot Maier
 */
 
 #include "VDispTableAnalyzer.h"

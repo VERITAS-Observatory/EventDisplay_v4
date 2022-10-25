@@ -59,7 +59,7 @@ bool VLightCurveUtilities::writeASCIIFile( string iFile, vector< VLightCurveData
 	return true;
 }
 
-/*
+/* 
 
     read light curve data from ASCII file for the given period in MJD
 
@@ -79,8 +79,8 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 	cout << "VLightCurveUtilities::readASCIIFile(): reading " << iFile << endl;
 	if( fXRTTimeSettings )
 	{
-		cout << "\t XRT Time settings: time offset is " << fXRTMissionTimeStart << " [s]" << endl;
-	}
+	    cout << "\t XRT Time settings: time offset is " << fXRTMissionTimeStart << " [s]" << endl;
+        }
 	
 	double iTemp1 = 0.;
 	double iTemp2 = 0.;
@@ -102,13 +102,13 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 		istringstream is_stream( is_line );
 		
 		// little errors catching here...
-		
+
 		// a '!' in the first column is a comment
 		is_stream >> iTemp4;     // second since fXRTMissionTimeStart or MJD (depends on fXRTTimeSettings)
-		if( iTemp4.size() == 0 || iTemp4.substr( 0, 1 ) == "!" )
+		if( iTemp4.size() == 0 || iTemp4.substr( 0, 1 ) == "!" ) 
 		{
-			continue;
-		}
+		    continue;
+                }
 		iTemp1 = atof( iTemp4.c_str() );
 		is_stream >> iTemp2;     // error [s]
 		
@@ -167,10 +167,10 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 		
 		//////////////////////////////////
 		// read in rates or fluxes + errors
-		
+
 		is_stream >> iTemp1;     // rate or flux
 		is_stream >> iTemp2;     // rate or flux error
-		
+
 		// upper error (if available)
 		if( !is_stream )
 		{
@@ -186,7 +186,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 		iTemp3 *= iFluxMultiplier;
 		
 		// flux state (if available)
-		if( !( is_stream >> std::ws ).eof() )
+		if( !(is_stream>>std::ws).eof() )
 		{
 			is_stream >> iTemp4;
 		}
@@ -369,7 +369,7 @@ void VLightCurveUtilities::printLightCurve( int bFullDetail )
 			if( fLightCurveData[i]->fNon >= 0. )
 			{
 				cout << "\tNon " << fLightCurveData[i]->fNon << "\tNoff " << fLightCurveData[i]->fNoff;
-				cout << "\tAlpha " << fLightCurveData[i]->fNoffAlpha;
+                                cout << "\tAlpha " << fLightCurveData[i]->fNoffAlpha;
 			}
 			cout << "\t Significance: " << fLightCurveData[i]->fSignificance;
 			cout << "\t Tot Time [h]: " << fLightCurveData[i]->fRunTime / 3600.;

@@ -437,7 +437,7 @@ int main( int argc, char* argv[] )
 	if( argc < 2 )
 	{
 		cout << endl;
-		cout << "./writeFITS_EVENTLIST <input file> <output name>" << endl;
+		cout << "./writeCTA_EVENTLIST <input file> <output name>" << endl;
 		cout << endl;
 		exit( -1 );
 	}

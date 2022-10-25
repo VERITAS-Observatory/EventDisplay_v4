@@ -3,6 +3,8 @@
 
     event analysis and display
 
+
+   \author( Gernot Maier, Jamie Holder)
 */
 
 #include <TApplication.h>
@@ -74,12 +76,9 @@ int main( int argc, char* argv[] )
 		VDisplay display( gClient->GetRoot(), fReadRunParameter->getRunParameter()->fw, fReadRunParameter->getRunParameter()->fh, &mainEventLoop );
 		display.Draw();
 		
-		if( fReadRunParameter->getRunParameter()->fMovieBool )
-		{
+		if(fReadRunParameter->getRunParameter()->fMovieBool){			
 			display.makeFullMovie();
-		}
-		else
-		{
+		}else{
 			app.Run();
 		}
 		

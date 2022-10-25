@@ -527,16 +527,16 @@ void VStereoMaps::RM_getAlpha( bool iIsOn )
 	
 	double i_rS = sqrt( fRunList.fSourceRadius );
 	
-	// check if background region does not overlap with source region
-	if( i_rL < i_rS )
-	{
-		cout << "VStereoMaps::RM_getAlpha error: background region overlaps with source region ";
-		cout << "inner ring radius " << i_rL << " < source radius " << i_rS << endl;
-		cout << "Check your RBM parameters! " << endl;
-		return;
-	}
+    // check if background region does not overlap with source region
+    if( i_rL < i_rS )
+    {
+        cout << "VStereoMaps::RM_getAlpha error: background region overlaps with source region ";
+        cout << "inner ring radius " << i_rL << " < source radius " << i_rS << endl;
+        cout << "Check your RBM parameters! " << endl;
+        return;
+    }
 	
-	double x = 0.;
+    double x = 0.;
 	double x_w = hmap_stereo->GetXaxis()->GetBinWidth( 2 );
 	int ix_start = 0;
 	int ix_stopp = 0;
@@ -828,8 +828,8 @@ bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool 
 		
 		for( int i = f_RE_xstart; i <= f_RE_xstopp; i++ )
 		{
-			i_cx =  hmap_stereo->GetXaxis()->GetBinCenter( i );
-			
+		        i_cx =  hmap_stereo->GetXaxis()->GetBinCenter( i );
+
 			for( int j = f_RE_ystart; j <= f_RE_ystopp; j++ )
 			{
 				i_cy =  hmap_stereo->GetYaxis()->GetBinCenter( j );
@@ -857,8 +857,8 @@ bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool 
 				{
 					// apply theta2 cut in background region
 					double theta2 = ( x - fRE_off[i][j].xoff[p] ) * ( x - fRE_off[i][j].xoff[p] )
-									+ ( y - fRE_off[i][j].yoff[p] ) * ( y - fRE_off[i][j].yoff[p] );
-									
+                                                      + ( y - fRE_off[i][j].yoff[p] ) * ( y - fRE_off[i][j].yoff[p] );
+
 					if( theta2 < fRE_off[i][j].roff[p]*fRE_off[i][j].roff[p] )
 					{
 						i_theta2 = theta2;
@@ -879,17 +879,17 @@ bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool 
 			if( p < 25 )
 			{
 				fTheta2_All[p] = ( x - fRE_off[f_RE_WW][f_RE_WN].xoff[p] ) * ( x - fRE_off[f_RE_WW][f_RE_WN].xoff[p] ) +
-								 ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] ) * ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] );
+						 ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] ) * ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] );
 			}
 			
 			if( ( x - fRE_off[f_RE_WW][f_RE_WN].xoff[p] ) * ( x - fRE_off[f_RE_WW][f_RE_WN].xoff[p] ) +
-					( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] ) * ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] ) <
+   			    ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] ) * ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] ) <
 					fRE_off[f_RE_WW][f_RE_WN].roff[p]*fRE_off[f_RE_WW][f_RE_WN].roff[p] )
 			{
 				double t2temp = fTheta2_All[0];
 				fTheta2_All[0] = ( x - fRE_off[f_RE_WW][f_RE_WN].xoff[p] ) * ( x - fRE_off[f_RE_WW][f_RE_WN].xoff[p] ) +
-								 ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] ) * ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] );
-				i_theta2 = fTheta2_All[0];
+						 ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] ) * ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] );
+                                i_theta2 = fTheta2_All[0];
 				fTheta2_All[p] = t2temp;
 				is_inside = true;
 			}
@@ -1169,7 +1169,7 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
 								for( unsigned int ex = 0; ex < vXTOEXCLUDE.size(); ex++ )
 								{
 									// vXTOEXCLUDE and vYTOEXCLUDE are relative to sky map centre in rotated camera coordinates
-									if( TMath::Power( ( ( x_t - vXTOEXCLUDE[ex] - fRunList.fWobbleWestMod ) * TMath::Cos( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) + ( y_t - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod ) * TMath::Sin( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) ) / ( vR1TOEXCLUDE[ex] + fRE_roffTemp ), 2 ) + TMath::Power( ( ( x_t - vXTOEXCLUDE[ex] - fRunList.fWobbleWestMod ) * TMath::Sin( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) - ( y_t - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod ) * TMath::Cos( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) ) / ( vR2TOEXCLUDE[ex] + fRE_roffTemp ), 2 ) < 1. )
+									if( TMath::Power( ( ( x_t - vXTOEXCLUDE[ex] - fRunList.fWobbleWestMod ) * TMath::Cos( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) + ( y_t - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod  ) * TMath::Sin( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) ) / ( vR1TOEXCLUDE[ex] + fRE_roffTemp ), 2 ) + TMath::Power( ( ( x_t - vXTOEXCLUDE[ex] - fRunList.fWobbleWestMod ) * TMath::Sin( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) - ( y_t - vYTOEXCLUDE[ex] - fRunList.fWobbleNorthMod ) * TMath::Cos( vAngTOEXCLUDE[ex] * TMath::DegToRad() ) ) / ( vR2TOEXCLUDE[ex] + fRE_roffTemp  ), 2 ) < 1. )
 									{
 										bExclude = true;
 									}
@@ -1480,11 +1480,11 @@ bool VStereoMaps::fill_RingBackgroundModel( double x, double y, double ze, doubl
 		{
 			for( int j = iy_start; j <= iy_stopp; j++ )
 			{
-				i_cx = hmap_stereo->GetXaxis()->GetBinCenter( i );
-				i_cy = hmap_stereo->GetYaxis()->GetBinCenter( j );
+                                i_cx = hmap_stereo->GetXaxis()->GetBinCenter( i );
+                                i_cy = hmap_stereo->GetYaxis()->GetBinCenter( j );
 				// get bin coordinates (source test position) (source test position)
-				//				i_cx = fRandom->Uniform( hmap_stereo->GetXaxis()->GetBinLowEdge( i ), hmap_stereo->GetXaxis()->GetBinUpEdge( i ) );
-				//				i_cy = fRandom->Uniform( hmap_stereo->GetYaxis()->GetBinLowEdge( j ), hmap_stereo->GetYaxis()->GetBinUpEdge( j ) );
+//				i_cx = fRandom->Uniform( hmap_stereo->GetXaxis()->GetBinLowEdge( i ), hmap_stereo->GetXaxis()->GetBinUpEdge( i ) );
+//				i_cy = fRandom->Uniform( hmap_stereo->GetYaxis()->GetBinLowEdge( j ), hmap_stereo->GetYaxis()->GetBinUpEdge( j ) );
 				
 				// check if bin is inside fiducial area
 				if( sqrt( i_cx * i_cx + i_cy * i_cy ) > fRunList.fmaxradius )

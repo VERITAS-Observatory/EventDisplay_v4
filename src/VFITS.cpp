@@ -38,7 +38,7 @@ bool VFITS::printerror( int status )
 bool VFITS::readAnasumFile( bool iPrint )
 {
 
-	if( !openFile( fFile_anasum, -1, false, iPrint ) )
+	if( !openFile( fFile_anasum , -1, false, iPrint ) )
 	{
 		cout << "VFITS::readAnasumFile() Error reading anasum file: " << fFile_anasum << endl;
 		return false;
@@ -416,7 +416,7 @@ bool VFITS::writeSignificanceSkyMap( bool iPrint )
 	}
 	
 	//Transform to Fits
-	createImageFitsFile( hSkyMap, "SignificanceMap", iPrint );
+	createImageFitsFile( hSkyMap , "SignificanceMap", iPrint );
 	if( iPrint )
 	{
 		cout << " transformed SkyMap image into FITS-table" << endl;
@@ -439,7 +439,7 @@ bool VFITS::writeExcessSkyMap( bool iPrint )
 	}
 	
 	//Transform to Fits
-	createImageFitsFile( hSkyMap, "ExcessSkyMap", iPrint );
+	createImageFitsFile( hSkyMap , "ExcessSkyMap", iPrint );
 	if( iPrint )
 	{
 		cout << " transformed SkyMap image into FITS-table" << endl;
@@ -483,7 +483,7 @@ double VFITS::getFluxIntegral( TGraphErrors* gEspec, double minE, bool iPrint )
 /**************************************************************/
 
 
-int VFITS::writeVecTH1DFits( vector<pair<TH1D*, string> > vhist, string DiagName,  char* tType[], char* tUnit[], char* tForm[],  bool iPrint )
+int VFITS::writeVecTH1DFits( vector<pair<TH1D*, string> > vhist, string DiagName,  char* tType[], char* tUnit[], char* tForm[] ,  bool iPrint )
 {
 	/*To use WriteVecTH1DFits() you have to specify which histograms
 	 and which columns of that histograms should be used. The strings
@@ -646,8 +646,8 @@ int VFITS::writeTGraphFits( TGraph* g, string DiagName, string x_name, string y_
 	
 	// define Names, Units and DataForms for new FITS BinTable
 	string DeltaX( "Delta_" + x_name );
-	char* tType[3] = {const_cast<char*>( x_name.c_str() ), const_cast<char*>( DeltaX.c_str() ), const_cast<char*>( y_name.c_str() )};
-	char* tUnit[3] = {const_cast<char*>( x_unit.c_str() ), const_cast<char*>( x_unit.c_str() ), const_cast<char*>( y_unit.c_str() )};
+	char* tType[3] = {const_cast<char*>( x_name.c_str() ), const_cast<char*>( DeltaX.c_str() ) , const_cast<char*>( y_name.c_str() )};
+	char* tUnit[3] = {const_cast<char*>( x_unit.c_str() ), const_cast<char*>( x_unit.c_str() ) , const_cast<char*>( y_unit.c_str() )};
 	char* tForm[3] = {( char* )"1D", ( char* )"1D", ( char* )"1D"};
 	if( iPrint )
 	{
@@ -693,7 +693,7 @@ int VFITS::writeTGraphErrorsFits( TGraphErrors* g, string DiagName, string x_nam
 	// define Names, Units and DataForms for new FITS BinTable
 	string DeltaX( "Delta_" + x_name );
 	string ErrorY( y_name + "_Error" );
-	char* tType[4] = {const_cast<char*>( x_name.c_str() ), const_cast<char*>( DeltaX.c_str() ), const_cast<char*>( y_name.c_str() ), const_cast<char*>( ErrorY.c_str() )};
+	char* tType[4] = {const_cast<char*>( x_name.c_str() ), const_cast<char*>( DeltaX.c_str() ) , const_cast<char*>( y_name.c_str() ), const_cast<char*>( ErrorY.c_str() )};
 	char* tUnit[4] = {const_cast<char*>( x_unit.c_str() ), const_cast<char*>( x_unit.c_str() ), const_cast<char*>( y_unit.c_str() ), const_cast<char*>( y_unit.c_str() ),};
 	char* tForm[4] = {( char* )"1D", ( char* )"1D", ( char* )"1D", ( char* )"1D"};
 	if( iPrint )
@@ -738,7 +738,7 @@ int VFITS::writeTGraphAsymmErrorsFits( TGraphAsymmErrors* g, string DiagName, st
 	// define Names, Units and DataForms for new FITS BinTable
 	string DeltaX( "Delta_" + x_name );
 	string ErrorY( y_name + "_Error" );
-	char* tType[4] = {const_cast<char*>( x_name.c_str() ), const_cast<char*>( DeltaX.c_str() ), const_cast<char*>( y_name.c_str() ), const_cast<char*>( ErrorY.c_str() )};
+	char* tType[4] = {const_cast<char*>( x_name.c_str() ), const_cast<char*>( DeltaX.c_str() ) , const_cast<char*>( y_name.c_str() ), const_cast<char*>( ErrorY.c_str() )};
 	char* tUnit[4] = {const_cast<char*>( x_unit.c_str() ), const_cast<char*>( x_unit.c_str() ), const_cast<char*>( y_unit.c_str() ), const_cast<char*>( y_unit.c_str() ),};
 	char* tForm[4] = {( char* )"1D", ( char* )"1D", ( char* )"1D", ( char* )"1D"};
 	if( iPrint )
@@ -760,15 +760,15 @@ int VFITS::writeTGraphAsymmErrorsFits( TGraphAsymmErrors* g, string DiagName, st
 /* Create FITS file with BinTable extension      */
 /*************************************************/
 
-int VFITS::createTableFitsFile( vector< vector<double> > Table, char* ttype[], char* tunit[], char* tform[], string DiagName, bool iPrint )
+int VFITS::createTableFitsFile( vector< vector<double> > Table , char* ttype[] , char* tunit[], char* tform[], string DiagName, bool iPrint )
 {
 	int hdunum = -99;
 	int nRows = int( Table.size() );
-	int nCol = 0;
-	if( nRows > 0 )
-	{
-		nCol = int( Table[0].size() );
-	}
+        int nCol = 0;
+        if( nRows > 0 )
+        {
+            nCol = int( Table[0].size() );
+        }
 	//    cout<<"NCol: "<<nCol<<endl;
 	int status = 0;
 	string fFileName = fFile_FITS;
@@ -796,7 +796,7 @@ int VFITS::createTableFitsFile( vector< vector<double> > Table, char* ttype[], c
 		//for (int j = 0; j<nCol; j++) { cout<<"tForm["<<j<<"] = "<<tform[j]<<endl;}
 	}
 	
-	if( fits_create_tbl( fptr, BINARY_TBL, nRows, nCol, ttype, tform, tunit, DiagName.c_str(), &status ) )
+	if( fits_create_tbl( fptr, BINARY_TBL, nRows, nCol, ttype, tform, tunit, DiagName.c_str() , &status ) )
 	{
 		return printerror( status );
 	}
@@ -810,7 +810,7 @@ int VFITS::createTableFitsFile( vector< vector<double> > Table, char* ttype[], c
 	{
 		for( int i = 0; i < nRows; i++ )
 		{
-			if( fits_write_col( fptr, TDOUBLE, k + 1, i + 1, 1, 1, &Table[i][k], &status ) )
+			if( fits_write_col( fptr, TDOUBLE, k + 1, i + 1, 1, 1, &Table[i][k] , &status ) )
 			{
 				return printerror( status );
 			}
@@ -843,7 +843,7 @@ int VFITS::createTableFitsFile( vector< vector<double> > Table, char* ttype[], c
 /* Create FITS file with IMAGE extension    */
 /********************************************/
 
-int VFITS::createImageFitsFile( TH2D* hSkyMap, string DiagName, bool iPrint )
+int VFITS::createImageFitsFile( TH2D* hSkyMap , string DiagName, bool iPrint )
 {
 
 	int hdunum = -99;
@@ -920,7 +920,7 @@ int VFITS::createImageFitsFile( TH2D* hSkyMap, string DiagName, bool iPrint )
 	{
 		return printerror( status );
 	}
-	writeFITSimageInfo( naxis, naxes, hSkyMap, DiagName, iPrint );
+	writeFITSimageInfo( naxis, naxes, hSkyMap , DiagName, iPrint );
 	
 	free( array[0] );                             /* free previously allocated memory */
 	
@@ -942,13 +942,13 @@ int VFITS::createImageFitsFile( TH2D* hSkyMap, string DiagName, bool iPrint )
 /* Write useful IMAGE infos into FITS file */
 /*******************************************/
 
-bool VFITS::writeFITSimageInfo( long naxis, long* naxes, TH2D* hSkyMap, string DiagName, bool iPrint )
+bool VFITS::writeFITSimageInfo( long naxis, long* naxes, TH2D* hSkyMap , string DiagName, bool iPrint )
 {
 	int status = 0;
 	
 	char extname[100];
 	sprintf( extname, "%s", DiagName.c_str() );
-	if( fits_write_key_str( fptr, "EXTNAME", extname, "Extension Name", &status ) )
+	if( fits_write_key_str( fptr, "EXTNAME", extname , "Extension Name" , &status ) )
 	{
 		return printerror( status );
 	}
@@ -960,7 +960,7 @@ bool VFITS::writeFITSimageInfo( long naxis, long* naxes, TH2D* hSkyMap, string D
 	}
 	
 	float equinoxsys = 2000.;
-	if( fits_update_key( fptr, TFLOAT, "EQUINOX", &equinoxsys, ( char* )"Epoch of coordinate system", &status ) )
+	if( fits_update_key( fptr, TFLOAT, "EQUINOX", &equinoxsys , ( char* )"Epoch of coordinate system", &status ) )
 	{
 		return printerror( status );
 	}
@@ -976,8 +976,8 @@ bool VFITS::writeFITSimageInfo( long naxis, long* naxes, TH2D* hSkyMap, string D
 	{
 		return printerror( status );
 	}
-	
-	float pix1_origin = hSkyMap->GetNbinsX() - hSkyMap->GetXaxis()->FindFixBin( 0. ) + 1;
+
+    float pix1_origin = hSkyMap->GetNbinsX() - hSkyMap->GetXaxis()->FindFixBin(0.) + 1;
 	if( fits_update_key( fptr, TFLOAT, "CRPIX1", &pix1_origin, ( char* )"Reference point of pixel location axis 1", &status ) )
 	{
 		return printerror( status );
@@ -1001,7 +1001,7 @@ bool VFITS::writeFITSimageInfo( long naxis, long* naxes, TH2D* hSkyMap, string D
 		return printerror( status );
 	}
 	
-	float pix2_origin = hSkyMap->GetYaxis()->FindFixBin( 0. );
+    float pix2_origin = hSkyMap->GetYaxis()->FindFixBin(0.);	
 	if( fits_update_key( fptr, TFLOAT, "CRPIX2", &pix2_origin, ( char* )"Reference point of pixel location axis 2", &status ) )
 	{
 		return printerror( status );
@@ -1076,7 +1076,7 @@ bool VFITS::writeFITSInfo( bool iPrint )
 	}
 	
 	float equinoxsys = 2000.;
-	if( fits_update_key( fptr, TFLOAT, ( char* )"EQUINOX", &equinoxsys, ( char* )"Epoch of coordinate system", &status ) )
+	if( fits_update_key( fptr, TFLOAT, ( char* )"EQUINOX", &equinoxsys , ( char* )"Epoch of coordinate system", &status ) )
 	{
 		return printerror( status );
 	}
@@ -1231,7 +1231,7 @@ bool VFITS::mergeColumns( fitsfile* fPtr, vector<int> hdunums, vector<vector <in
 			for( int k = 0; k < nRows; k++ )
 			{
 				double test = 0.;
-				if( fits_read_col( fPtr, TDOUBLE, columns[i][j], k + 1, 1, 1, 0, &test, &anynul, &status ) )
+				if( fits_read_col( fPtr, TDOUBLE, columns[i][j] , k + 1, 1, 1, 0, &test, &anynul, &status ) )
 				{
 					return printerror( status );
 				}

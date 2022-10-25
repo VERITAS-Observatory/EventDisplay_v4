@@ -2,6 +2,8 @@
  * \file
  * \brief Function definitions for Pointing Monitor interactions with the database [ VDB v4.1.0 (Jan 2010), adapted for TSQLServer Jeff Grube (Oct 2010) ]
  *
+ * some adaption for eventdisplay by G.Maier
+ *
  * \author Dirk Pandel
  */
 
@@ -96,7 +98,7 @@ vector<pointingmonitor::CameraParameters> PointingMonitor::getCameraParametersLi
 	if( !my_connection.Get_Connection_Status() )
 	{
 		cout << "PointingMonitor: failed to connect to database server" << endl;
-		return parametersVec;
+		return parametersVec; // JG
 	}
 	if( !my_connection.make_query( strbuf.str().c_str() ) )
 	{
@@ -175,7 +177,7 @@ vector<pointingmonitor::CalibrationParameters> PointingMonitor::getCalibrationPa
 	if( !my_connection.Get_Connection_Status() )
 	{
 		cout << "PointingMonitor: failed to connect to database server" << endl;
-		return parametersVec;
+		return parametersVec; // JG
 	}
 	if( !my_connection.make_query( strbuf.str().c_str() ) )
 	{
@@ -255,11 +257,11 @@ vector<pointingmonitor::UncalibratedPointing> PointingMonitor::getUncalibratedPo
 	if( !my_connection.Get_Connection_Status() )
 	{
 		cout << "PointingMonitor: failed to connect to database server" << endl;
-		return pointingVec;
+		return pointingVec; // JG
 	}
 	if( !my_connection.make_query( strbuf.str().c_str() ) )
 	{
-		return  pointingVec;
+		return  pointingVec; // JG
 	}
 	TSQLResult* db_res = my_connection.Get_QueryResult();
 	

@@ -1,7 +1,7 @@
 /*! \class VLibNovaSunAndMoon
     \brief get moon data (elevation, rise time, etc.)
 
-
+    \author Gernot Maier
 
     VERITAS basecamp location hardcoded
 */

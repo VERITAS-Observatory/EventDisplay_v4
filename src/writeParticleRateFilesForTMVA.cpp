@@ -130,7 +130,7 @@ int main( int argc, char* argv[] )
 		RunSum->GetEntry( i );
 		alphaNorm = OffNorm;
 		//iZenithperrun = 90.0 - elevationOn;
-		iZenithperrun = 90.0 - elevationOff;
+                iZenithperrun = 90.0 - elevationOff; 	        
 		sprintf( histnameOn, "run_%d/stereo/energyHistograms/herecCounts_on", runOn );
 		sprintf( histnameOff, "run_%d/stereo/energyHistograms/herecCounts_off", runOn );
 		TH1D* t1 = ( TH1D* )f1->Get( histnameOn );
@@ -213,7 +213,7 @@ int main( int argc, char* argv[] )
 	
 	char iOutputFile[800];
 	sprintf( iOutputFile, "%s", iOutFil.c_str() );
-	TFile* SignalRateFile = new TFile( iOutputFile, "RECREATE" );
+	TFile* SignalRateFile = new TFile( iOutputFile , "RECREATE" );
 	
 	SignalRateFile->cd();
 	SignalRateFile->Write();

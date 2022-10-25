@@ -11,6 +11,7 @@ VPlotWPPhysSensitivity::VPlotWPPhysSensitivity()
 	fIRF = 0;
 	setEnergyRange_Lin_TeV();
 	setCrabSpectraFile();
+	fPlotCTARequirements = 0;
 	setPlotCTARequirements();
 	
 	fSensitivityFOM = -1.;
@@ -119,7 +120,7 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
 	char hname[2000];
 	////////////////////////////
 	// effective areas
-	TCanvas* c = fIRF->plotEffectiveArea( -1., 2.e7, iEffAreaPad );
+	TCanvas* c = fIRF->plotEffectiveArea( 2.e7, iEffAreaPad );
 	plotLegend( c, true );
 	if( iPrint.size() > 0 )
 	{
@@ -128,6 +129,11 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
 		{
 			c->Print( hname );
 		}
+	}
+	if( fPlotCTARequirementsID >= 0 && fPlotCTARequirements )
+	{
+		// effective area requirements are all goals
+		fPlotCTARequirements->plotRequirement_EffectiveArea( c, true );
 	}
 	////////////////////////////
 	// angular resolution (68%)
@@ -140,6 +146,10 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
 		{
 			c->Print( hname );
 		}
+	}
+	if( fPlotCTARequirementsID >= 0 && fPlotCTARequirements )
+	{
+		fPlotCTARequirements->plotRequirement_AngularResolution( c, fPlotCTARequirementGoals );
 	}
 	// angular resolution (80%)
 	c = fIRF->plotAngularResolution( "energy", "80", -1.e99, iAngResPad );
@@ -155,6 +165,10 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
 		{
 			c->Print( hname );
 		}
+	}
+	if( fPlotCTARequirementsID >= 0 && fPlotCTARequirements )
+	{
+		fPlotCTARequirements->plotRequirement_EnergyResolution( c, fPlotCTARequirementGoals );
 	}
 	// energy bias
 	c = fIRF->plotEnergyReconstructionBias( "mean", -0.5, 0.5 );
@@ -397,7 +411,7 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
 	hNull->Draw( "" );
 	hNull->Draw( "AH" );
 	
-	plot_nullHistogram( cSensRatio, hNull, true, false, 1.2, fMinEnergy_TeV, fMaxEnergy_TeV );
+	plot_nullHistogram( cSensRatio, hNull, true , false, 1.2, fMinEnergy_TeV, fMaxEnergy_TeV );
 	
 	TLine* iL = new TLine( log10( fMinEnergy_TeV ), 1., log10( fMaxEnergy_TeV ), 1. );
 	iL->SetLineStyle( 2 );
@@ -405,6 +419,27 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
 	iL->Draw();
 	
 	TGraph* gRelG = 0;
+	if( fPlotCTARequirements )
+	{
+		if( !iRatoToGoal )
+		{
+			gRelG = fPlotCTARequirements->getRequiredDifferentalSensitivity();
+		}
+		else
+		{
+			gRelG = fPlotCTARequirements->getGoalDifferentialSensitivity();
+		}
+		if( !gRelG )
+		{
+			return false;
+		}
+		iL->SetLineColor( gRelG->GetLineColor() );
+	}
+	else
+	{
+		cout << "Error: CTA requirements not found" << endl;
+		return false;
+	}
 	
 	// loop over all data sets and divide it by the first
 	for( unsigned int i = 0; i < fData.size(); i++ )
@@ -435,6 +470,14 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
 	if( fPlotCTARequirementGoals )
 	{
 		TGraphAsymmErrors* gRelGoal = 0;
+		if( !iRatoToGoal )
+		{
+			gRelGoal = ( TGraphAsymmErrors* )fPlotCTARequirements->getGoalDifferentialSensitivity();
+		}
+		else
+		{
+			gRelGoal = ( TGraphAsymmErrors* )fPlotCTARequirements->getRequiredDifferentalSensitivity();
+		}
 		if( gRelGoal )
 		{
 			TGraphAsymmErrors* g = new TGraphAsymmErrors();
@@ -498,7 +541,10 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( TGraphAsymmErrors* g
 	{
 		return;
 	}
-	return;
+	if( fPlotCTARequirementsID < 0 )
+	{
+		return;
+	}
 	
 	iEmin_TeV = log10( iEmin_TeV );
 	iEmax_TeV = log10( iEmax_TeV );
@@ -519,6 +565,43 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( TGraphAsymmErrors* g
 		if( iEmin_TeV < x - gSensitivity->GetErrorX( p )
 				&& iEmax_TeV > x )
 		{
+			// south 50h
+			if( fPlotCTARequirementsID == 0 )
+			{
+				if( !fPlotCTARequirementGoals )
+				{
+					req = VCTASensitivityRequirements::Flux_req50_E2erg_south( TMath::Power( 10., x ) );
+				}
+				else
+				{
+					req = VCTASensitivityRequirements::Flux_goal50_E2erg_south( TMath::Power( 10., x ) );
+				}
+			}
+			// south 5 h
+			else if( fPlotCTARequirementsID == 1 )
+			{
+				req = VCTASensitivityRequirements::Flux_req5_E2erg_south( TMath::Power( 10., x ) );
+			}
+			// south 0.5h
+			else if( fPlotCTARequirementsID == 2 )
+			{
+				req = VCTASensitivityRequirements::Flux_req05_E2erg_south( TMath::Power( 10., x ) );
+			}
+			// north 50h
+			else if( fPlotCTARequirementsID == 3 )
+			{
+				req = VCTASensitivityRequirements::Flux_req50_E2erg_north( TMath::Power( 10., x ) );
+			}
+			// north 5h
+			else if( fPlotCTARequirementsID == 4 )
+			{
+				req = VCTASensitivityRequirements::Flux_req5_E2erg_north( TMath::Power( 10., x ) );
+			}
+			// north 0.5h
+			else if( fPlotCTARequirementsID == 5 )
+			{
+				req = VCTASensitivityRequirements::Flux_req05_E2erg_north( TMath::Power( 10., x ) );
+			}
 			if( y > 0 )
 			{
 				m  *= req / y;
@@ -601,6 +684,10 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
 				cBck = c_temp;
 			}
 			fData[i]->fGraphSensitivity[j] = ( TGraphAsymmErrors* )a->getSensitivityGraph();
+			if( z == 0 && fPlotCTARequirementsID >= 0 && fPlotCTARequirements )
+			{
+				fPlotCTARequirements->plotRequirement_DifferentialSensitivity( cSens, fPlotCTARequirementGoals, iUnit );
+			}
 			z++;
 		}
 		////////////////////////////////////////////////////////
@@ -619,6 +706,10 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
 				b->setPlottingStyle( fData[i]->fPlottingColor[0], fData[i]->fPlottingLineStyle[0], 2., 1, 2., fData[i]->fPlottingFillStyle[0] );
 			}
 			cSensInter = b->plotSensitivityvsEnergyFromCrabSpectrum( cSensInter, i + 1, iUnit, 0.2, ( i == 0 ) );
+			if( fPlotCTARequirementsID >= 0 && fPlotCTARequirements )
+			{
+				fPlotCTARequirements->plotRequirement_DifferentialSensitivity( cSensInter, fPlotCTARequirementGoals, iUnit );
+			}
 			if( fUseIntegratedSensitivityForOffAxisPlots )
 			{
 				TGraphAsymmErrors* iGraphIntegratedSensitivity = fData[i]->getCombinedSensitivityGraph( true, "", true );
@@ -741,6 +832,11 @@ bool VPlotWPPhysSensitivity::setPlotCTARequirements( int iRequirementID, bool iP
 {
 	fPlotCTARequirementGoals = iPlotRequirementGoals;
 	fPlotCTARequirementsID = iRequirementID;
+	if( fPlotCTARequirementsID >= 0 )
+	{
+		fPlotCTARequirements = new VCTARequirements();
+		return fPlotCTARequirements->setRequirement( fPlotCTARequirementsID );
+	}
 	
 	return false;
 }

@@ -2,6 +2,7 @@
     \brief read tables for angular reconstruction with disp method
 
 
+    \author Gernot Maier
 
 */
 
@@ -580,7 +581,7 @@ void VDispTableReader::print( bool bDetailed )
 
 unsigned int VDispTableReader::getAzBin( float az )
 {
-	// be sure that az is bin interval [-180., 180.]
+	// be sure that az is bin intervall [-180., 180.]
 	if( az > 180. )
 	{
 		az -= 360.;
@@ -610,7 +611,7 @@ int VDispTableReader::getTreeEntryFinder( unsigned int iID )
 	
 	cout << "VDispTableReader::getTreeEntryFinder: warning: no entry found for ID " << iID << endl;
 	
-	for( map<unsigned int, int>::iterator i_iter = fTreeEntry_Map.begin(); i_iter != fTreeEntry_Map.end(); ++i_iter )
+	for( map<unsigned int, int>::iterator i_iter = fTreeEntry_Map.begin(); i_iter != fTreeEntry_Map.end(); i_iter++ )
 	{
 		cout << ( *i_iter ).first << "\t" << ( *i_iter ).second << endl;
 	}

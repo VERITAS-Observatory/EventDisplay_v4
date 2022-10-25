@@ -4,6 +4,10 @@
 
     all telescope positions, images, etc. are in shower coordinates
 
+
+    \date 24/08/04
+
+    \author Gernot Maier
 */
 
 #include <VDisplayBirdsEye.h>
@@ -120,7 +124,7 @@ void VDisplayBirdsEye::draw( TPad* iPad )
 
 void VDisplayBirdsEye::drawEventText()
 {
-	char iText [2000];
+	char iText [200];
 	
 	if( fPlotPaper )
 	{
@@ -133,33 +137,30 @@ void VDisplayBirdsEye::drawEventText()
 	// run and event number:
 	sprintf( iText, "Run/Event: %d/%d", fData->getRunNumber(), fData->getEventNumber() );
 	fTextRec.push_back( new TText( 0.02, 0.96, iText ) );
-	// MC text
+	// mc text
 	if( fData->getReader()->isMC() )
 	{
 		sprintf( iText, "MC: E=%.2f, Ze=%.0f, Az=%.0f, Xoff=%.2f, Yoff=%.2f, Xcore=%.0f, Ycore=%.0f", fData->getShowerParameters()->MCenergy, fData->getShowerParameters()->MCze, fData->getShowerParameters()->MCaz, fData->getShowerParameters()->MCTel_Xoff, fData->getShowerParameters()->MCTel_Yoff, fData->getShowerParameters()->MCxcore, fData->getShowerParameters()->MCycore );
 		fTextRec.push_back( new TText( 0.02, 0.12, iText ) );
 	}
 	// shower reconstruction text
-	stringstream i_stext;
-	i_stext << fData->getShowerParameters()->fShowerNumImages[iM];
-	i_stext << " tel in reco (ID" << iM << "):";
+	sprintf( iText, "%u tel in stereo analysis (ID%d):", fData->getShowerParameters()->fShowerNumImages[iM], iM );
 	for( unsigned int i = 0; i < fData->getNTel(); i++ )
 	{
 		if( fData->getShowerParameters()->fTelIDImageSelected_list[iM][i] )
 		{
-			i_stext << " " << ( int )( i + 1 );
+			sprintf( iText, "%s %d", iText, ( int )( i + 1 ) );
 		}
 	}
-	fTextRec.push_back( new TText( 0.02, 0.09, i_stext.str().c_str() ) );
+	fTextRec.push_back( new TText( 0.02, 0.09, iText ) );
 	// triggered events
 	// (any trigger condition)
-	i_stext.str( "" );
-	i_stext << fData->getShowerParameters()->fNTrig << " tel triggered: ";
+	sprintf( iText, "%u tel triggered: ", fData->getShowerParameters()->fNTrig );
 	for( unsigned int i = 0; i < fData->getShowerParameters()->fNTrig; i++ )
 	{
-		i_stext << " " << fData->getShowerParameters()->fTrig_list[i] + 1;
+		sprintf( iText, "%s %d", iText, fData->getShowerParameters()->fTrig_list[i] + 1 );
 	}
-	fTextRec.push_back( new TText( 0.02, 0.06, i_stext.str().c_str() ) );
+	fTextRec.push_back( new TText( 0.02, 0.06, iText ) );
 	
 	sprintf( iText, "Ze=%.1f, Az=%.1f, Xoff=%.2f, Yoff=%.2f, Xcore=%.0f, Ycore=%.0f", fData->getShowerParameters()->fShowerZe[iM], fData->getShowerParameters()->fShowerAz[iM], fData->getShowerParameters()->fShower_Xoffset[iM], fData->getShowerParameters()->fShower_Yoffset[iM], fData->getShowerParameters()->fShowerXcore[iM], fData->getShowerParameters()->fShowerYcore[iM] );
 	fTextRec.push_back( new TText( 0.02, 0.03, iText ) );

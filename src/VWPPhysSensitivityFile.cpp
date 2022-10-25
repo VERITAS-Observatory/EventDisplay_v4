@@ -756,9 +756,9 @@ bool VWPPhysSensitivityFile::fillSensitivityHistograms( string iDataDirectory, b
 	i_SensCU.setMonteCarloParameters( 1, fCrabSpectrumFile, fCrabSpectrumID, iMC_Gamma, 20.,
 									  i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma, -10., 10., "CU" );
 	// protons
-	i_Sens.setMonteCarloParameters( 14, fCosmicRaySpectrumFile, fProtonSpectrumID, iMC_Proton, 20.,
+	i_Sens.setMonteCarloParameters( 14, fCosmicRaySpectrumFile, fProtonSpectrumID , iMC_Proton, 20.,
 									i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton, -10., 10., "ENERGY" );
-	i_SensCU.setMonteCarloParameters( 14, fCosmicRaySpectrumFile, fProtonSpectrumID, iMC_Proton, 20.,
+	i_SensCU.setMonteCarloParameters( 14, fCosmicRaySpectrumFile, fProtonSpectrumID , iMC_Proton, 20.,
 									  i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton, -10., 10., "CU" );
 	// electrons (spectral index)
 	if( iMC_Electron.size() > 0 && iMC_Electron != "NOFILE" )

@@ -12,8 +12,9 @@
      1: apply gamma/hadron cuts on probabilities given by a friend to the data tree (e.g. random forest analysis)
      2: same as 2
      3: apply cuts on probabilities given by a friend to the data tree already at the level of
-        the event quality level
+        the event quality level (e.g. of use for analysis of certain binary phases only)
      4: TMVA gamma/hadron separation
+     5: apply frogs cut
 
   ID1:
 
@@ -85,6 +86,12 @@ VGammaHadronCuts::VGammaHadronCuts()
 	fOrbitalPhase_max = 1.e10;
 	fUseOrbitalPhaseCuts = false;
 	
+	// model3D parameters
+	fCut_Depth3D_min = -1.;
+	fCut_Depth3D_max = 9999.;
+	fCut_RWidth3D_min = -1.;
+	fCut_RWidth3D_max = 9999.;
+	
 	// TMVA evaluator
 	fTMVAEvaluator = 0;
 	fTMVA_MVAMethod = "";
@@ -99,7 +106,7 @@ VGammaHadronCuts::VGammaHadronCuts()
 	// Note: for TMVA is this not the probability threshold but the MVA cut value
 	fTMVAProbabilityThreshold = -99.;
 	fTMVAOptimizeSignalEfficiencyParticleNumberFile = "";
-	fTMVAParticleNumberFile_Conversion_Rate_to_seconds = 60.;
+        fTMVAParticleNumberFile_Conversion_Rate_to_seconds = 60.;
 	fTMVAOptimizeSignalEfficiencySignificance_Min = 5.;
 	fTMVAOptimizeSignalEfficiencySignalEvents_Min = 10.;
 	fTMVAOptimizeSignalEfficiencyObservationTime_h = 50.;
@@ -196,6 +203,11 @@ void VGammaHadronCuts::resetCutValues()
 	fOrbitalPhase_min = -1.;
 	fOrbitalPhase_max = 1.e10;
 	
+	fCut_Depth3D_min = -1.;
+	fCut_Depth3D_max = 9999.;
+	fCut_RWidth3D_min = -1.;
+	fCut_RWidth3D_max = 9999.;
+	
 	fCut_CoreDistanceToArrayCentreX_min = -1.e10;
 	fCut_CoreDistanceToArrayCentreX_max =  1.e10;
 	fCut_CoreDistanceToArrayCentreY_min = -1.e10;
@@ -216,6 +228,9 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 	// reset trigger vector
 	fNLTrigs = 0;
 	fCut_ImgSelect.clear();
+        // frogs cuts
+        string iFileNameFrogsCut;
+        vector< string > iVariableNameFrogsCut;
 	
 	// open text file
 	ifstream is;
@@ -253,11 +268,11 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// choose gamma/hadron cut selectors and direction cut selector
 			if( iCutVariable == "cutselection" )
 			{
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fGammaHadronCutSelector;
 				}
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fDirectionCutSelector;
 				}
@@ -364,7 +379,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			}
 			else if( iCutVariable == "telcoredistance" )
 			{
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fCut_MinimumCoreDistanceToTelescopes_max;
 				}
@@ -408,7 +423,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				int i_select = atoi( temp.c_str() );
 				// check epoch
 				bool i_useTheseCuts = true;
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					if( temp != fInstrumentEpoch )
@@ -417,7 +432,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 					}
 				}
 				// check telescope combinations
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					if( fTelToAnalyze.size() > 0 && temp != getTelToAnalyzeString() )
@@ -431,7 +446,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 					if( index < 0 )
 					{
 						for( unsigned int i = 0; i < fCut_ImgSelect.size(); i++ )
-						{
+                                                {
 							fCut_ImgSelect[i] = i_select;
 						}
 					}
@@ -446,7 +461,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			{
 				is_stream >> temp;
 				fProbabilityCut = ( atof( temp.c_str() ) );
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					fProbabilityCut_ProbID = atoi( temp.c_str() );
@@ -461,7 +476,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			{
 				is_stream >> temp;
 				fOrbitalPhase_min = atof( temp.c_str() );
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					fOrbitalPhase_max = atof( temp.c_str() );
 				}
@@ -471,11 +486,26 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				}
 				fUseOrbitalPhaseCuts = true;
 			}
+			// model3D parameters
+			else if( iCutVariable == "depth3D" )
+			{
+				is_stream >> temp;
+				fCut_Depth3D_min = ( atof( temp.c_str() ) );
+				is_stream >> temp;
+				fCut_Depth3D_max = ( atof( temp.c_str() ) );
+			}
+			else if( iCutVariable == "rwidth3D" )
+			{
+				is_stream >> temp;
+				fCut_RWidth3D_min = ( atof( temp.c_str() ) );
+				is_stream >> temp;
+				fCut_RWidth3D_max = ( atof( temp.c_str() ) );
+			}
 			
 			// to define the lower bounds in probablity cut ranges  (e.g. random forest)
 			else if( iCutVariable == "RFCutLowerVals" )
 			{
-				while( !( is_stream >> std::ws ).eof() )
+				while( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					fProbabilityCutRangeLower.push_back( atof( temp.c_str() ) );
@@ -485,7 +515,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// to define the upper bounds in probablity cut ranges  (e.g. random forest)
 			else if( iCutVariable == "RFCutUpperVals" )
 			{
-				while( !( is_stream >> std::ws ).eof() )
+				while( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					fProbabilityCutRangeUpper.push_back( atof( temp.c_str() ) );
@@ -533,18 +563,18 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			{
 				float isize_min = -1000.;
 				float isize_max = 1.e10;
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					isize_min = atof( temp.c_str() );
 				}
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					isize_max = atof( temp.c_str() );
 				}
 				// check instrument epoch
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					if( temp == fInstrumentEpoch )
@@ -566,78 +596,96 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				fNTelTypeCut.push_back( new VNTelTypeCut() );
 				is_stream >> temp;
 				fNTelTypeCut.back()->fNTelType_min = atoi( temp.c_str() );
-				while( !( is_stream >> std::ws ).eof() )
+				while( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					fNTelTypeCut.back()->fTelType_counter.push_back( atoi( temp.c_str() ) );
 				}
 			}
 			////////////////////////////////////////////////////////////////////////////////////////////////////
+			// FROGS values
+			else if( iCutVariable == "frogscutsfile" )
+			{
+				if( !(is_stream>>std::ws).eof() )
+				{
+					is_stream >> iFileNameFrogsCut;
+				}
+			}
+			else if( iCutVariable == "energydependentcuts" )
+			{
+				while( !(is_stream>>std::ws).eof() )
+				{
+                                        string iT;
+					is_stream >> iT;
+                                        iVariableNameFrogsCut.push_back( iT );
+				}
+			}
+			////////////////////////////////////////////////////////////////////////////////////////////////////
 			// TMVA values
 			else if( iCutVariable == "TMVAPARAMETER" )
 			{
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					if( temp == fInstrumentEpoch )
 					{
-						while( !( is_stream >> std::ws ).eof() )
+						while( !(is_stream>>std::ws).eof() )
 						{
-							if( !( is_stream >> std::ws ).eof() )
+							if( !(is_stream>>std::ws).eof() )
 							{
 								is_stream >> fTMVA_MVAMethod;
 							}
 							// files should have endings _fTMVAWeightFileIndex_min to _fTMVAWeightFileIndex_max
-							if( !( is_stream >> std::ws ).eof() )
+							if( !(is_stream>>std::ws).eof() )
 							{
 								is_stream >> fTMVAWeightFileIndex_Emin;
 							}
-							if( !( is_stream >> std::ws ).eof() )
+							if( !(is_stream>>std::ws).eof() )
 							{
 								is_stream >> fTMVAWeightFileIndex_Emax;
 							}
-							if( !( is_stream >> std::ws ).eof() )
+							if( !(is_stream>>std::ws).eof() )
 							{
 								is_stream >> fTMVAWeightFileIndex_Zmin;
 							}
-							if( !( is_stream >> std::ws ).eof() )
+							if( !(is_stream>>std::ws).eof() )
 							{
 								is_stream >> fTMVAWeightFileIndex_Zmax;
 							}
-							if( !( is_stream >> std::ws ).eof() )
+							if( !(is_stream>>std::ws).eof() )
 							{
-								if( !( is_stream >> fTMVAEnergyStepSize ) )
-								{
-									cout << "VGammaHadronCuts::readCuts: missing TMVAPARAMETER energy step size  " << endl;
-									break;
-								}
+							       if( !(is_stream >> fTMVAEnergyStepSize) )
+							       {
+							              cout << "VGammaHadronCuts::readCuts: missing TMVAPARAMETER energy step size  " << endl;
+							              break;
+							       }
 							}
 							string iWeightFileDirectory;
-							if( !( is_stream >> std::ws ).eof() )
+							if( !(is_stream>>std::ws).eof() )
 							{
 								is_stream >> iWeightFileDirectory;
 							}
 							string iWeightFileName;
-							if( !( is_stream >> std::ws ).eof() )
+							if( !(is_stream>>std::ws).eof() )
 							{
 								is_stream >> iWeightFileName;
 							}
 							fTMVAWeightFile = gSystem->ExpandPathName( iWeightFileDirectory.c_str() );
-							// check of path name is complete
-							if( gSystem->AccessPathName( fTMVAWeightFile.c_str() ) )
-							{
-								fTMVAWeightFile = VGlobalRunParameter::getDirectory_EVNDISPAnaData() + fTMVAWeightFile;
-								if( gSystem->AccessPathName( fTMVAWeightFile.c_str() ) )
-								{
-									cout << "VGammaHadronCuts::readCuts error,";
-									cout << " weight file directory not found: ";
-									cout << fTMVAWeightFile << endl;
-									cout << "exiting..." << endl;
-									exit( EXIT_FAILURE );
-								}
-							}
+                                                        // check of path name is complete
+                                                        if( gSystem->AccessPathName( fTMVAWeightFile.c_str() ) )
+                                                        {
+                                                             fTMVAWeightFile = VGlobalRunParameter::getDirectory_EVNDISPAnaData() + fTMVAWeightFile;
+                                                             if( gSystem->AccessPathName( fTMVAWeightFile.c_str() ) )
+                                                             {
+                                                                 cout << "VGammaHadronCuts::readCuts error,";
+                                                                 cout << " weight file directory not found: ";
+                                                                 cout << fTMVAWeightFile << endl;
+                                                                 cout << "exiting..." << endl;
+                                                                 exit( EXIT_FAILURE );
+                                                             }
+                                                        }
 							fTMVAWeightFile += iWeightFileName;
-							break;
+                                                        break;
 						}
 					}
 					else if( iPrint != 0 )
@@ -649,15 +697,15 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			}
 			else if( iCutVariable == "TMVACUTS" )
 			{
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fTMVAOptimizeSignalEfficiencySignificance_Min;
 				}
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fTMVAOptimizeSignalEfficiencySignalEvents_Min;
 				}
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					// observing time is given as "50h", or "5m", "5s"
@@ -680,38 +728,38 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						fTMVAOptimizeSignalEfficiencyObservationTime_h = atof( temp.c_str() );
 					}
 				}
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fTMVAOptimizeSignalEfficiencyParticleNumberFile;
 				}
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fTMVAFixedSignalEfficiencyMax;
 				}
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fTMVAMinSourceStrength;
 				}
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fTMVAFixedThetaCutMin;
 				}
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fTMVAParticleNumberFile_Conversion_Rate_to_seconds;
-				}
+                                }
 			}
 			else if( iCutVariable == "TMVASignalEfficiency" )
 			{
-				while( !( is_stream >> std::ws ).eof() )
+				while( !(is_stream>>std::ws).eof() )
 				{
 					unsigned int iKey = 0;
 					double iS = 0.;
-					if( !( is_stream >> std::ws ).eof() )
+					if( !(is_stream>>std::ws).eof() )
 					{
 						is_stream >> iKey;
 					}
-					if( !( is_stream >> std::ws ).eof() )
+					if( !(is_stream>>std::ws).eof() )
 					{
 						is_stream >> iS;
 					}
@@ -719,13 +767,13 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				}
 			}
 			else if( iCutVariable == "TMVA_MVACut" )
-			{
-				if( !( is_stream >> std::ws ).eof() )
+			{       
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					if( temp == fInstrumentEpoch )
 					{
-						while( !( is_stream >> std::ws ).eof() )
+						while( !(is_stream>>std::ws).eof() )
 						{
 							unsigned int iKey = 0;
 							double iS = 0.;
@@ -755,7 +803,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// (note that fF1AngResName == "IRF" means that the graph from the IRF file is extrapolated)
 			else if( iCutVariable == "theta2file" )
 			{
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					string iFileNameAngRes;
 					is_stream >> iFileNameAngRes;
@@ -768,7 +816,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						fFileNameAngRes = iFileNameAngRes;
 					}
 				}
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fF1AngResName;
 				}
@@ -781,7 +829,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// use angular resolution calculated for example from same data with makeEffectiveArea
 			else if( iCutVariable == "angres" )
 			{
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> fAngResContainmentProbability;    // should be an integer; probability x 100
 				}
@@ -790,17 +838,17 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			// * theta2scaling <scale factor> <minimum theta> <maximum theta>
 			else if( iCutVariable == "theta2scaling" )
 			{
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					fAngRes_ScalingFactor = atof( temp.c_str() );
 				}
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					fAngRes_AbsoluteMinimum = atof( temp.c_str() );
 				}
-				if( !( is_stream >> std::ws ).eof() )
+				if( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> temp;
 					fAngRes_AbsoluteMaximum = atof( temp.c_str() );
@@ -810,8 +858,24 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 			////////////////////////////////////////////////////////////////////////////////////////////////////
 		}
 	}
-	cout << "========================================" << endl;
-	if( fGammaHadronCutSelector / 10 == 4 )
+        // read energy dependent gamma/hadron cuts
+        for( unsigned int i = 0; i < iVariableNameFrogsCut.size(); i++ )
+        {
+            getEnergyDependentCutFromFile( iFileNameFrogsCut, iVariableNameFrogsCut[i] );
+        }
+
+        // printouts
+        cout << "========================================" << endl;
+	// check cut selection
+	if( fGammaHadronCutSelector / 10 == 5 )
+	{
+		fAnalysisType = FROGS;
+	}
+	else if( fGammaHadronCutSelector / 10 == 6 )
+	{
+		fAnalysisType = MODEL3D;
+	}
+	else if( fGammaHadronCutSelector / 10 == 4 )
 	{
 		fAnalysisType = MVAAnalysis;
 	}
@@ -972,6 +1036,13 @@ void VGammaHadronCuts::printCutSummary()
 		cout << endl;
 		cout << "Orbital Phase bin ( " << fOrbitalPhase_min << ", " << fOrbitalPhase_max << " )";
 	}
+	// model3D cuts
+	if( useModel3DCuts() )
+	{
+		cout << " Model3D cuts ( ";
+		cout << fCut_Depth3D_min << " < Depth3D < " << fCut_Depth3D_max;
+		cout << ", " << fCut_RWidth3D_min << " < RWidth3D < " << fCut_RWidth3D_max << " )";
+	}
 	// TMVA cuts
 	if( useTMVACuts() )
 	{
@@ -988,17 +1059,17 @@ void VGammaHadronCuts::printCutSummary()
 			cout << fTMVAOptimizeSignalEfficiencySignalEvents_Min << " signal events in ";
 			cout << fTMVAOptimizeSignalEfficiencyObservationTime_h << " h observing time" << endl;
 			cout << "reading particle counts from " << fTMVAOptimizeSignalEfficiencyParticleNumberFile;
-			cout << " (unit of rate graphs: " << fTMVAParticleNumberFile_Conversion_Rate_to_seconds << ")" << endl;
+                        cout << " (unit of rate graphs: " << fTMVAParticleNumberFile_Conversion_Rate_to_seconds << ")" << endl;
 			cout << "   (max signal efficiency: " << fTMVAFixedSignalEfficiencyMax << ")" << endl;
 			cout << "   (min source strength: " << fTMVAMinSourceStrength << ")" << endl;
 		}
 		else
 		{
-			if( fDebug )
-			{
-				printSignalEfficiency();
-				printTMVA_MVACut();
-			}
+		  if( fDebug )
+		    {
+		      printSignalEfficiency();
+		      printTMVA_MVACut();
+		    }
 		}
 	}
 	// other cut parameters
@@ -1053,17 +1124,7 @@ void VGammaHadronCuts::printCutSummary()
 */
 bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructionMethod, bool bCount, int iEntry, bool fIsOn )
 {
-	// require good pointing
-	if( fData->Array_PointingStatus != 0 )
-	{
-		if( bCount && fStats )
-		{
-			fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
-			fStats->updateCutCounter( VGammaHadronCutsStatistics::ePointing );
-		}
-		return false;
-	}
-	
+
 	/////////////////////////////////////////////////////////////////////////////////
 	// require certain quality in stereo reconstruction
 	if( fData->Chi2 < fCut_Chi2_min || fData->Chi2 > fCut_Chi2_max )
@@ -1148,10 +1209,9 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 	
 	/////////////////////////////////////////////////////////////////////////////////
 	// check core positions
-	// closest distance between telescope and core
-	double iR_min = 1.e10;
-	// average distance to telescopes with images
+	// (average distance to telescopes with images)
 	double iR = 0.;
+	double iR_min = 1.e10;
 	double iNTR = 0.;
 	for( int i = 0; i < fData->NImages; i++ )
 	{
@@ -1175,7 +1235,6 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 		iR /= iNTR;
 	}
 	
-	// apply cut on distance
 	if( iR < fCut_AverageCoreDistanceToTelescopes_min || iR > fCut_AverageCoreDistanceToTelescopes_max )
 	{
 		if( bCount && fStats )
@@ -1239,7 +1298,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 	// apply cut selector from probability tree
 	if( fGammaHadronCutSelector / 10 == 3 )
 	{
-		if( !applyProbabilityCut( iEntry, fIsOn ) )
+		if( !applyProbabilityCut( iEntry , fIsOn ) )
 		{
 			if( bCount && fStats )
 			{
@@ -1362,6 +1421,31 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
 			return false;
 		}
 	}
+	/////////////////////////////////////////////////////////////////////////////
+	// apply Frogs Cuts
+	else if( useFrogsCuts() )
+	{
+		if( !applyFrogsCut( i, fIsOn ) )
+		{
+			if( bCount && fStats )
+			{
+				fStats->updateCutCounter( VGammaHadronCutsStatistics::eIsGamma );
+			}
+			return false;
+		}
+	}
+	// apply Model3D Cuts
+	else if( useModel3DCuts() )
+	{
+		if( !applyModel3DCut( i, fIsOn ) )
+		{
+			if( bCount && fStats )
+			{
+				fStats->updateCutCounter( VGammaHadronCutsStatistics::eIsGamma );
+			}
+			return false;
+		}
+	}
 	
 	return true;
 }
@@ -1392,6 +1476,90 @@ bool VGammaHadronCuts::applyTMVACut( int i )
 	return false;
 }
 
+/*
+   apply Cuts to frogs data.
+*/
+
+bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
+{
+	if( fData->frogsEnergy < -99. || fabs( fData->frogsEnergy ) < 1E-18 || fData->frogsNImages < 1 )
+	{
+		return false;
+	}
+	
+	double ShowerGoodnessCut_max = -99.;
+	if( getEnergyDependentCut( "ShowerGoodness" ) && getEnergyDependentCut( "ShowerGoodness" )->GetN() > 0 )
+	{
+		ShowerGoodnessCut_max = getEnergyDependentCut( fData->frogsEnergy, getEnergyDependentCut( "ShowerGoodness" ), false, true );
+		
+		double fMeanShowerGoodness =
+			getMeanGoodness( fData->frogsTelGoodnessImg0, fData->frogsTelGoodnessImg1, fData->frogsTelGoodnessImg2, fData->frogsTelGoodnessImg3, fData->frogsEventID );
+		if( fMeanShowerGoodness > ShowerGoodnessCut_max )
+		{
+			return false;
+		}
+	}
+	
+	double BackgroundGoodnessCut_max = -99.;
+	if( getEnergyDependentCut( "BackgroundGoodness" ) && getEnergyDependentCut( "BackgroundGoodness" )->GetN() > 0 )
+	{
+		BackgroundGoodnessCut_max = getEnergyDependentCut( fData->frogsEnergy, getEnergyDependentCut( "BackgroundGoodness" ), false, true );
+		double fMeanBackgroundGoodness =
+			getMeanGoodness( fData->frogsTelGoodnessBkg0, fData->frogsTelGoodnessBkg1, fData->frogsTelGoodnessBkg2, fData->frogsTelGoodnessBkg3, fData->frogsEventID );
+		if( fMeanBackgroundGoodness > BackgroundGoodnessCut_max )
+		{
+			return false;
+		}
+	}
+	
+	double MSCWCut_max = -99.;
+	if( getEnergyDependentCut( "MSCW" ) && getEnergyDependentCut( "MSCW" )->GetN() > 0 )
+	{
+		MSCWCut_max = getEnergyDependentCut( fData->frogsEnergy, getEnergyDependentCut( "MSCW" ), false, true );
+		if( fData->MSCW > MSCWCut_max )
+		{
+			return false;
+		}
+	}
+	
+	double MSCLCut_max = -99.;
+	if( getEnergyDependentCut( "MSCL" ) && getEnergyDependentCut( "MSCL" )->GetN() > 0 )
+	{
+		MSCLCut_max = getEnergyDependentCut( fData->frogsEnergy, getEnergyDependentCut( "MSCL" ), false, true );
+		if( fData->MSCL > MSCLCut_max )
+		{
+			return false;
+		}
+	}
+	
+	return true;
+	
+}
+
+/*
+   appy Model3D Cuts
+*/
+
+bool VGammaHadronCuts::applyModel3DCut( int i, bool fIsOn )
+{
+	if( !fData->isModel3D() )
+	{
+		cout << "VGammaHadronCuts::applyModel3DCut error: input data (mscw file) does not contain Model3D parameters" << endl;
+		cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
+	}
+	
+	if( fData->Depth3D > fCut_Depth3D_max )
+	{
+		return false;
+	}
+	if( fData->RWidth3D > fCut_RWidth3D_max )
+	{
+		return false;
+	}
+	
+	return true;
+}
 
 /*
 
@@ -1636,7 +1804,7 @@ void VGammaHadronCuts::initializeCuts( int irun, string iFile )
 	// TMVA cuts
 	else if( useTMVACuts() )
 	{
-		if( !initTMVAEvaluator( fTMVAWeightFile, fTMVAWeightFileIndex_Emin, fTMVAWeightFileIndex_Emax, fTMVAWeightFileIndex_Zmin, fTMVAWeightFileIndex_Zmax, fTMVAEnergyStepSize ) )
+	        if( !initTMVAEvaluator( fTMVAWeightFile, fTMVAWeightFileIndex_Emin, fTMVAWeightFileIndex_Emax, fTMVAWeightFileIndex_Zmin, fTMVAWeightFileIndex_Zmax, fTMVAEnergyStepSize ) )
 		{
 			cout << "VGammaHadronCuts::initializeCuts: failed setting TMVA reader for " << fTMVAWeightFile;
 			cout << "(" << fTMVAWeightFileIndex_Emin << "," << fTMVAWeightFileIndex_Emax << ")" << endl;
@@ -1938,8 +2106,6 @@ bool VGammaHadronCuts::applyMCXYoffCut( double xoff, double yoff, bool bCount )
 
    check telescope type (e.g. remove all LSTs)
 
-   returns true if current event fails the fulfil the conditions
-
 */
 bool VGammaHadronCuts::applyTelTypeTest( bool bCount )
 {
@@ -1952,7 +2118,6 @@ bool VGammaHadronCuts::applyTelTypeTest( bool bCount )
 	
 	for( unsigned int i = 0; i < fNTelTypeCut.size(); i++ )
 	{
-		// test: true means this event has enough telescopes
 		icut = ( icut || fNTelTypeCut[i]->test( fData ) );
 	}
 	
@@ -2186,7 +2351,7 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
 		{
 			// get theta2 cut
 			
-			theta_cut_max  = getEnergyDependentCut( e, getTheta2Cut_IRF_Max(), true );
+			theta_cut_max  = getEnergyDependentCut( e, getTheta2Cut_IRF_Max(), !useFrogsCuts() );
 		}
 		/////////////////////////////////////////////
 		// use TMVA determined cut
@@ -2286,13 +2451,10 @@ bool VGammaHadronCuts::initAngularResolutionFile()
 	else if( fF1AngResName == "IRF" )
 	{
 		char iTreeName[200];
+		sprintf( iTreeName, "t_angular_resolution" );
 		if( getAngularResolutionContainmentRadius() - 68 != 0 )
 		{
-			sprintf( iTreeName, "t_angular_resolution_%03dp", getAngularResolutionContainmentRadius() );
-		}
-		else
-		{
-			sprintf( iTreeName, "t_angular_resolution" );
+			sprintf( iTreeName, "%s_%03dp", iTreeName, getAngularResolutionContainmentRadius() );
 		}
 		
 		cout << "VGammaHadronCuts::initAngularResolutionFile: reading angular resolution graph from file (" << iTreeName << "):" << endl;
@@ -2549,6 +2711,41 @@ void VGammaHadronCuts::printEnergyDependentCuts()
 	}
 }
 
+double VGammaHadronCuts::getMeanGoodness( double G0, double G1, double G2, double G3, int iFrogsEventID )
+{
+	int N = 0;
+	double sum = 0.;
+	double goodFrogsNumber = -99.;
+	if( G0 > goodFrogsNumber )
+	{
+		sum += G0;
+		N++;
+	}
+	if( G1 > goodFrogsNumber )
+	{
+		sum += G1;
+		N++;
+	}
+	if( G2 > goodFrogsNumber )
+	{
+		sum += G2;
+		N++;
+	}
+	if( G3 > goodFrogsNumber )
+	{
+		sum += G3;
+		N++;
+	}
+	if( N == 0 )
+	{
+		cout << "VGammaHadronCuts::getMeanGoodness error: none of the goodness-of-fit values have a good number (good number means > -99) " << endl;
+		cout << "\t failure at frogs event ID " << iFrogsEventID << endl;
+		cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
+	}
+	return sum / N;
+}
+
 string VGammaHadronCuts::getTelToAnalyzeString()
 {
 	stringstream iTemp;
@@ -2567,7 +2764,18 @@ double VGammaHadronCuts::getReconstructedEnergy( unsigned int iEnergyReconstruct
 	{
 		return -99.;
 	}
-	if( iEnergyReconstructionMethod == 0 )
+	if( useFrogsCuts() )
+	{
+		if( fData->frogsEnergy > -99. )
+		{
+			return TMath::Power( 10., fData->frogsEnergy );
+		}
+		else
+		{
+			return -99.;
+		}
+	}
+	else if( iEnergyReconstructionMethod == 0 )
 	{
 		return fData->Erec;
 	}
@@ -2584,7 +2792,18 @@ double VGammaHadronCuts::getReconstructedEnergyChi2( unsigned int iEnergyReconst
 	{
 		return -99.;
 	}
-	if( iEnergyReconstructionMethod == 0 )
+	if( useFrogsCuts() )
+	{
+		if( fData->frogsEnergy > -99. )
+		{
+			return 1.;
+		}
+		else
+		{
+			return -99.;
+		}
+	}
+	else if( iEnergyReconstructionMethod == 0 )
 	{
 		return fData->EChi2;
 	}
@@ -2601,7 +2820,18 @@ double VGammaHadronCuts::getReconstructedEnergydE( unsigned int iEnergyReconstru
 	{
 		return -99.;
 	}
-	if( iEnergyReconstructionMethod == 0 )
+	if( useFrogsCuts() )
+	{
+		if( fData->frogsEnergy > -99. )
+		{
+			return 1.;
+		}
+		else
+		{
+			return -99.;
+		}
+	}
+	else if( iEnergyReconstructionMethod == 0 )
 	{
 		return fData->dE;
 	}
@@ -2619,6 +2849,15 @@ double VGammaHadronCuts::getReconstructedXoff()
 		return -9999.;
 	}
 	
+	if( useFrogsCuts() )
+	{
+		return fData->frogsXS;
+	}
+	else if( useModel3DCuts() )
+	{
+		return fData->Xoff3D;
+	}
+	
 	return fData->Xoff;
 }
 
@@ -2627,6 +2866,16 @@ double VGammaHadronCuts::getReconstructedYoff()
 	if( !fData )
 	{
 		return -9999.;
+	}
+	
+	if( useFrogsCuts() )
+	{
+		// -1 sign difference for frogs ED
+		return -1.*fData->frogsYS;
+	}
+	else if( useModel3DCuts() )
+	{
+		return fData->Yoff3D;
 	}
 	
 	return fData->Yoff;
@@ -2639,6 +2888,15 @@ double VGammaHadronCuts::getReconstructedXcore()
 		return -9999.;
 	}
 	
+	if( useFrogsCuts() )
+	{
+		return fData->frogsXP;
+	}
+	else if( useModel3DCuts() )
+	{
+		return fData->Xcore3D;
+	}
+	
 	return fData->Xcore;
 }
 
@@ -2647,6 +2905,15 @@ double VGammaHadronCuts::getReconstructedYcore()
 	if( !fData )
 	{
 		return -9999.;
+	}
+	
+	if( useFrogsCuts() )
+	{
+		return fData->frogsYP;
+	}
+	else if( useModel3DCuts() )
+	{
+		return fData->Ycore3D;
 	}
 	
 	return fData->Ycore;
@@ -2665,24 +2932,24 @@ TGraph* VGammaHadronCuts::getEnergyDependentCut( string iCutName )
 bool VGammaHadronCuts::getEnergyDependentCutFromFile( string iFileName, string iVariable )
 {
 	string iTemp = "g" + iVariable;
-	if( gSystem->AccessPathName( iFileName.c_str() ) )
-	{
-		string iTempFileL = VGlobalRunParameter::getDirectory_EVNDISPAnaData();
-		iFileName = iTempFileL + "/GammaHadronCutFiles/" + iFileName;
-	}
-	TFile* i_f = new TFile( iFileName.c_str(), "READ" );
-	if( i_f->IsZombie() )
-	{
-		cout << "VGammaHadronCuts::getEnergyDependentCutFromFile error opening file with energy dependent cut: " << iFileName << endl;
-		cout << "exiting..." << endl;
-		exit( EXIT_FAILURE );
-	}
-	
+        if( gSystem->AccessPathName( iFileName.c_str() ) )
+        {
+            string iTempFileL = VGlobalRunParameter::getDirectory_EVNDISPAnaData();
+            iFileName = iTempFileL + "/GammaHadronCutFiles/" + iFileName;
+        }
+        TFile *i_f = new TFile( iFileName.c_str(), "READ" );
+        if( i_f->IsZombie() )
+        {
+            cout << "VGammaHadronCuts::getEnergyDependentCutFromFile error opening file with energy dependent cut: " << iFileName << endl;
+            cout << "exiting..." << endl;
+            exit( EXIT_FAILURE );
+        }
+
 	TGraph* g = ( TGraph* )i_f->Get( iTemp.c_str() );
 	if( !g )
 	{
 		cout << "VGammaHadronCuts::getEnergyDependentCutFromFile error while reading energy dependent cut: " << iTemp << endl;
-		cout << "\t tried to read from " << iFileName << endl;
+                cout << "\t tried to read from " << iFileName << endl;
 		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
 	}
@@ -2692,7 +2959,7 @@ bool VGammaHadronCuts::getEnergyDependentCutFromFile( string iFileName, string i
 		iG->SetName( iVariable.c_str() );
 		fEnergyDependentCut[iVariable] = iG;
 	}
-	i_f->Close();
+        i_f->Close();
 	return true;
 }
 

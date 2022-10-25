@@ -27,7 +27,7 @@ bool VRunSummary::setBranches()
 	fRunSummaryTree->Branch( "MJDOff", &MJDOff, "MJDOff/D" );
 	fRunSummaryTree->Branch( "MJDrunstart", &MJDrunstart, "MJDrunstart/D" );
 	fRunSummaryTree->Branch( "MJDrunstop", &MJDrunstop, "MJDrunstop/D" );
-	fRunSummaryTree->Branch( "TargetName", &fTargetName, "TargetName/C" );
+        fRunSummaryTree->Branch( "TargetName", &fTargetName, "TargetName/C"  );
 	fRunSummaryTree->Branch( "TargetRA", &fTargetRA, "TargetRA/D" );
 	fRunSummaryTree->Branch( "TargetDec", &fTargetDec, "TargetDec/D" );
 	fRunSummaryTree->Branch( "TargetRAJ2000", &fTargetRAJ2000, "TargetRAJ2000/D" );
@@ -41,7 +41,7 @@ bool VRunSummary::setBranches()
 	fRunSummaryTree->Branch( "WobbleNorth", &fWobbleNorth, "WobbleNorth/D" );
 	fRunSummaryTree->Branch( "WobbleWest", &fWobbleWest, "WobbleWest/D" );
 	fRunSummaryTree->Branch( "NTel", &fNTel, "NTel/i" );
-	fRunSummaryTree->Branch( "TelList", &fTelList, "TelList/C" );
+        fRunSummaryTree->Branch( "TelList", &fTelList, "TelList/C"  );
 	fRunSummaryTree->Branch( "tOn", &tOn, "tOn/D" );
 	fRunSummaryTree->Branch( "tOff", &tOff, "tOff/D" );
 	fRunSummaryTree->Branch( "elevationOn", &elevationOn, "elevationOn/D" );
@@ -80,10 +80,10 @@ void VRunSummary::init()
 	runOff = 0;
 	MJDOn = 0.;
 	MJDOff = 0.;
-	MJDrunstart = 0.;
-	MJDrunstop = 0.;
-	sprintf( fTargetName, "NOTSET" );
-	sprintf( fTelList, "NOTSET" );
+        MJDrunstart = 0.;
+        MJDrunstop = 0.;
+        sprintf( fTargetName, "NOTSET" );
+        sprintf( fTelList, "NOTSET" );
 	fTargetDec = 0.;
 	fTargetRA = 0.;
 	fTargetDecJ2000 = 0.;
@@ -103,7 +103,7 @@ void VRunSummary::init()
 	elevationOff = 0.;
 	azimuthOn  = 0.;
 	azimuthOff = 0.;
-	fTheta2Max = 0.;
+        fTheta2Max = 0.;
 	RawRateOn = 0.;
 	RawRateOff = 0.;
 	pedvarsOn = 0.;
@@ -232,25 +232,25 @@ void VRunSummary::print()
    called for summary runs only
 
 */
-bool VRunSummary::fill( string iDataDirectory,
-						string i_inputfile_total_directory,
-						vector< VAnaSumRunParameterDataClass > iRunList )
+bool VRunSummary::fill( string iDataDirectory, 
+                        string i_inputfile_total_directory, 
+                        vector< VAnaSumRunParameterDataClass > iRunList )
 {
 	char i_temp[2000];
-	
+
 	// current directory
 	TDirectory* iCurrentDirectory = gDirectory;
-	// copy relevant entries
-	TChain* i_runSumChain = new TChain( "total_1/stereo/tRunSummary" );
-	for( unsigned int i = 0; i < iRunList.size(); i++ )
-	{
-		sprintf( i_temp, "%s/%d.anasum.root", iDataDirectory.c_str(), iRunList[i].fRunOn );
-		i_runSumChain->Add( i_temp );
-	}
-	fRunSummaryTree = i_runSumChain->CopyTree( "runOn>0" );
-	fRunSummaryTree->SetDirectory( iCurrentDirectory );
-	fRunSummaryTree->AutoSave();
-	
+        // copy relevant entries
+        TChain *i_runSumChain = new TChain( "total_1/stereo/tRunSummary");
+        for( unsigned int i = 0; i < iRunList.size(); i++ )
+        {
+            sprintf( i_temp, "%s/%d.anasum.root", iDataDirectory.c_str(), iRunList[i].fRunOn );
+            i_runSumChain->Add( i_temp );
+        }
+        fRunSummaryTree = i_runSumChain->CopyTree( "runOn>0");
+        fRunSummaryTree->SetDirectory( iCurrentDirectory );
+        fRunSummaryTree->AutoSave();
+
 	// reset variables
 	fRunMJD.clear();
 	
@@ -269,67 +269,67 @@ bool VRunSummary::fill( string iDataDirectory,
 	fMeanRawRateOff = 0.;
 	fMeanPedVarsOn = 0.;
 	fMeanPedVarsOff = 0.;
-	
-	CRunSummary i_runSum( i_runSumChain );
-	double iTargetRA = 0.;
-	double iTargetDec = 0.;
-	double iTargetRAJ2000 = 0.;
-	double iTargetDecJ2000 = 0.;
-	
-	for( int n = 0; n < i_runSum.fChain->GetEntries(); n++ )
-	{
-		i_runSum.GetEntry( n );
-		for( unsigned int i = 0; i < iRunList.size(); i++ )
-		{
-			if( i_runSum.runOn == iRunList[i].fRunOn )
-			{
-				runOn = iRunList[i].fRunOn;
-				runOff = iRunList[i].fRunOff;
-				
-				// add values to run list
-				fRunMJD[runOn] = i_runSum.MJDOn;
-				fRunMJD[runOff] = i_runSum.MJDOff;
-				fTotalExposureOn += i_runSum.tOn;
-				fTotalExposureOff += i_runSum.tOff;
-				f_exposureOn[runOn] = i_runSum.tOn;
-				f_exposureOff[runOff] = i_runSum.tOff;
-				fMeanElevationOn += i_runSum.elevationOn;
-				fMeanElevationOff += i_runSum.elevationOff;
-				fMeanAzimuthOn  = VSkyCoordinatesUtilities::addToMeanAzimuth( fMeanAzimuthOn,  i_runSum.azimuthOn );
-				fMeanAzimuthOff = VSkyCoordinatesUtilities::addToMeanAzimuth( fMeanAzimuthOff, i_runSum.azimuthOff );
-				fMeanDeadTimeOn += i_runSum.DeadTimeFracOn * tOn;
-				fMeanDeadTimeOff += i_runSum.DeadTimeFracOff * tOff;
-				fMeanRawRateOn += i_runSum.RawRateOn;
-				fMeanRawRateOff += i_runSum.RawRateOff;
-				fMeanPedVarsOn += i_runSum.pedvarsOn;
-				fMeanPedVarsOff += i_runSum.pedvarsOff;
-				fNMeanElevation++;
-				
-				if( fNMeanElevation == 0. )
-				{
-					iTargetRA = i_runSum.TargetRA;
-					iTargetDec = i_runSum.TargetDec;
-					iTargetRAJ2000 = i_runSum.TargetRAJ2000;
-					iTargetDecJ2000 = i_runSum.TargetDecJ2000;
-				}
-				else if( iTargetRA != fTargetRA || iTargetDec != fTargetDec )
-				{
-					iTargetRA = 0.;
-					iTargetDec = 0.;
-					iTargetRAJ2000 = 0.;
-					iTargetDecJ2000 = 0.;
-				}
-				break;
-			}
-		}
-	}
-	
-	// set target coordinates
-	fTotTargetRA = iTargetRA;
-	fTotTargetDec = iTargetDec;
-	fTotTargetRAJ2000 = iTargetRAJ2000;
-	fTotTargetDecJ2000 = iTargetDecJ2000;
-	
+
+        CRunSummary i_runSum( i_runSumChain );
+        double iTargetRA = 0.;
+        double iTargetDec = 0.;
+        double iTargetRAJ2000 = 0.;
+        double iTargetDecJ2000 = 0.;
+        
+        for( int n = 0; n < i_runSum.fChain->GetEntries(); n++ )
+        {
+             i_runSum.GetEntry( n );
+             for( unsigned int i = 0; i < iRunList.size(); i++ )
+             {
+                if( i_runSum.runOn == iRunList[i].fRunOn )
+                {
+                    runOn = iRunList[i].fRunOn;
+                    runOff = iRunList[i].fRunOff;
+                        
+                    // add values to run list
+                    fRunMJD[runOn] = i_runSum.MJDOn;
+                    fRunMJD[runOff] = i_runSum.MJDOff;
+                    fTotalExposureOn += i_runSum.tOn;
+                    fTotalExposureOff += i_runSum.tOff;
+                    f_exposureOn[runOn] = i_runSum.tOn;
+                    f_exposureOff[runOff] = i_runSum.tOff;
+                    fMeanElevationOn += i_runSum.elevationOn;
+                    fMeanElevationOff += i_runSum.elevationOff;
+                    fMeanAzimuthOn  = VSkyCoordinatesUtilities::addToMeanAzimuth( fMeanAzimuthOn,  i_runSum.azimuthOn );
+                    fMeanAzimuthOff = VSkyCoordinatesUtilities::addToMeanAzimuth( fMeanAzimuthOff, i_runSum.azimuthOff );
+                    fMeanDeadTimeOn += i_runSum.DeadTimeFracOn * tOn;
+                    fMeanDeadTimeOff += i_runSum.DeadTimeFracOff * tOff;
+                    fMeanRawRateOn += i_runSum.RawRateOn;
+                    fMeanRawRateOff += i_runSum.RawRateOff;
+                    fMeanPedVarsOn += i_runSum.pedvarsOn;
+                    fMeanPedVarsOff += i_runSum.pedvarsOff;
+                    fNMeanElevation++;
+
+                    if( fNMeanElevation == 0. )
+                    {
+                            iTargetRA = i_runSum.TargetRA;
+                            iTargetDec = i_runSum.TargetDec;
+                            iTargetRAJ2000 = i_runSum.TargetRAJ2000;
+                            iTargetDecJ2000 = i_runSum.TargetDecJ2000;
+                    }
+                    else if( iTargetRA != fTargetRA || iTargetDec != fTargetDec )
+                    {
+                            iTargetRA = 0.;
+                            iTargetDec = 0.;
+                            iTargetRAJ2000 = 0.;
+                            iTargetDecJ2000 = 0.;
+                    }
+                    break;
+                }
+            }
+        }
+        
+        // set target coordinates
+        fTotTargetRA = iTargetRA;
+        fTotTargetDec = iTargetDec;
+        fTotTargetRAJ2000 = iTargetRAJ2000;
+        fTotTargetDecJ2000 = iTargetDecJ2000;
+
 	iCurrentDirectory->cd();
 	
 	return true;

@@ -1,6 +1,9 @@
 /*! \class VRatePlots
  *  \brief fill some graphs with rates, significances, etc.
  *
+ *  \author
+ *    Gernot Maier
+ *
  */
 
 #include "VRatePlots.h"

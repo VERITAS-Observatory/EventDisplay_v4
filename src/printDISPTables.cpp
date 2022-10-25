@@ -4,7 +4,7 @@
      ** PRELIMINARY **
 
 
-
+     \author Gernot Maier
 */
 
 #include "VGlobalRunParameter.h"

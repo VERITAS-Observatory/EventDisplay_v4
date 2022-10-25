@@ -8,7 +8,7 @@
 
        - fillBackgroundfromTraceLibrary should be checked
 
-
+    \author Gernot Maier
 */
 
 #include <VGrIsuReader.h>
@@ -538,7 +538,7 @@ void VGrIsuReader::readPedsfromPlines()
 				}
 				fhPeds[i_telID][i_channel]->Reset();
 				is_stream >> is_Temp;
-				while( !( is_stream >> std::ws ).eof() )
+				while( !(is_stream>>std::ws).eof() )
 				{
 					is_stream >> is_Temp;
 					i_val.push_back( atof( is_Temp.c_str() ) );
@@ -733,7 +733,7 @@ bool VGrIsuReader::getNextShowerEvent()
 	// set eventtype IGNORE
 	fEventType = 1;
 	// is there anything left in the file?
-	if( !( is >> std::ws ).eof() )
+	if( !(is>>std::ws).eof() )
 	{
 		return false;
 	}
@@ -754,7 +754,7 @@ bool VGrIsuReader::getNextShowerEvent()
 	// read triggered pixels from GrIsu file
 	sp = is.tellg();
 	char iSRecord;
-	while( !( is >> std::ws ).eof() )
+	while( !(is>>std::ws).eof() )
 	{
 		is >> iSRecord;
 		is_line = iSRecord;
