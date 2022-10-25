@@ -23,6 +23,7 @@
 
 #include "VGlobalRunParameter.h"
 #include "VImageCleaningRunParameter.h"
+#include "VSkyCoordinatesUtilities.h"
 
 using namespace std;
 
@@ -46,12 +47,13 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		// root parameters
 		string fEventDisplayBuildROOTVersion;
 		int    fEventDisplayBuildROOTVersionInt;
-
-                // JOB ids
-                int    fSGE_TASK_ID;
+		
+		// JOB ids
+		int    fSGE_TASK_ID;
 		
 		// DB parameters
 		bool   fuseDB;
+		string fDBTextDirectory;
 		string fDBRunType;                        // run type according to DB
 		string fDBRunStartTimeSQL;                // run start (SQL type)
 		string fDBRunStoppTimeSQL;                // run stopp (SQL type)
@@ -62,7 +64,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		
 		// run parameters
 		int    frunnumber;                        // runnumber
-        string fRunTitle;                         // run title (usually empty, useful for debugging)
+		string fRunTitle;                         // run title (usually empty, useful for debugging)
 		int    frunmode;                          // run mode
 		//    (0=analysis, 1=pedestal calculation, 2=gain/toffset calculation,
 		//    5 = gain/toffset calculation for low gain channels, 6=pedestals for low gain channels)
@@ -120,7 +122,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		double fazimuth;                          // azimuth in [deg] (preli)
 		bool fDBTracking;                         // use tracking from DB
 		string fDBTrackingCorrections;            // apply tracking corrections from this period (SQL time string), empty for use of measured values in db
-		string fPMTextFileDirectory;              // pointing monitor text file directory
 		bool fDBVPM;                              // use calibrated VPM tracking from database
 		bool fDBUncalibratedVPM;                  // use uncalibrated VPM tracking from database
 		vector<double> fPointingErrorX;           // pointing error, in camera coordinates [deg]
@@ -137,11 +138,12 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool fNoCalibNoPb;                        // if true, when no information for gain and toff can be found, the analysis is done filling thenm with 1 and 0 respectively (in VCalibrator)
 		bool fNextDayGainHack;			  //if true, and > 100 channels in one telescope have gain=0, all gains in that tel will be set to 1; gains won't be tested in the dead channel finder.
 		bool fWriteExtraCalibTree;		  // write additional tree into .gain.root file with channel charges/monitor charge/nHiLo for each event
+		bool fWriteImagePixelList;        // write image pixel list to tpars tree
 		string fLowGainCalibrationFile;           // file with file name for low-gain calibration
 		int fNCalibrationEvents;                  // events to be used for calibration
-                bool fIPRAverageTel;                    // flag to make average of all telescopes IPR in case there is not enough statistics to produce IPR graphs 
+		bool fIPRAverageTel;                    // flag to make average of all telescopes IPR in case there is not enough statistics to produce IPR graphs 
 		float faverageTZeroFiducialRadius;        // fiducial radius for average tzero calculation (DST), in fraction of FOV
-        unsigned int fCombineChannelsForPedestalCalculation; // combine all channels per telescope type for the pedestal calculation
+		unsigned int fCombineChannelsForPedestalCalculation; // combine all channels per telescope type for the pedestal calculation
 		vector< int > fGainFileNumber;
 		vector< int > fTOffFileNumber;
 		vector< int > fPedFileNumber;
@@ -168,23 +170,23 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   fPedestalSingleRootFile;           // write pedestal trees and histograms into a single root file
 		int    fCalibrationSumWindow;             // sumwindow for all calibration calculation
 		int    fCalibrationSumFirst;              // starting point all calibration calculation
-        int    fCalibrationSumWindowAverageTime;  // sumwindow for average arrival time calculation
+		int    fCalibrationSumWindowAverageTime;  // sumwindow for average arrival time calculation
 		float  fCalibrationIntSumMin;             // minimum integrated charge in a channel and event to be taken into account in gain or tzero calibration runs
 		string fsetSpecialChannels;               // set channels with L2 channels to correct for FADC crate time offsets (file name of channel settings)
-                string fthroughputCorrectionFile;         // throughput correction (e.g., mirror reflectivity or gain loss) --> applied after pixel integration
-                string ftraceamplitudecorrectionFile;     // throughput correction file (e.g., mirror reflectivity or gain loss) --> applied to FADC values
-                vector< float > fthroughoutCorrectionSFactor; // throughput correction (e.g., mirror reflectivity and gain loss) --> applied to FADC values
-                vector< float > fthroughoutCorrectionGFactor; // throughput correction (e.g., gain loss) --> applied to FADC values
+		string fthroughputCorrectionFile;         // throughput correction (e.g., mirror reflectivity or gain loss) --> applied after pixel integration
+		string ftraceamplitudecorrectionFile;     // throughput correction file (e.g., mirror reflectivity or gain loss) --> applied to FADC values
+		vector< float > fthroughoutCorrectionSFactor; // throughput correction (e.g., mirror reflectivity and gain loss) --> applied to FADC values
+		vector< float > fthroughoutCorrectionGFactor; // throughput correction (e.g., gain loss) --> applied to FADC values
 		bool   fL2TimeCorrect;                    // use L2 pulses to correct FADC times (default: on )
 		unsigned fCalibrationDataType;            // for DSTs: kind of calibration data available: 1: full (peds, pedvars, etc). 0: (no calibration data)
 		
-        //////////////////////////////////////////////////
+		//////////////////////////////////////////////////
 		// FADC integration
 		string  fFADCChargeUnit;                  // FADC charge unit (DC or PE)
 		vector< unsigned int > fTraceIntegrationMethod;   // trace integration method
 		vector< unsigned int > fTraceIntegrationMethod_pass1;   // trace integration method for pass 1 (doublepass only)
 		vector<int> fsumfirst;                    // parameter for window summation start (window 1)
-        vector<unsigned int>   fSearchWindowLast; // last sample searched for trace integration
+		vector<unsigned int>   fSearchWindowLast; // last sample searched for trace integration
 		vector<int> fsumwindow_1;                 // parameter for window summation (window 1)
 		vector<int> fsumwindow_2;                 // parameter for window summation (window 2)
 		vector<int> fsumwindow_pass1;             // parameter for window summation (double pass - pass 1)
@@ -194,7 +196,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   fDoublePassErrorWeighting2005;     // use error weighting from 2004 or today
 		bool   fDynamicIntegrationWindow;         // use a dynamic integration window (doublepass only)
 		vector< int >    fTraceWindowShift;       // shift the summation window by value (in doublepass: low gain channels only, default: 0 )
-        vector< unsigned int >   fsumfirst_startingMethod;   // start the summation window at T0, TAverage, ... (+shift; not for doublepass)
+		vector< unsigned int >   fsumfirst_startingMethod;   // start the summation window at T0, TAverage, ... (+shift; not for doublepass)
 		vector< double > fSumWindowMaxTimeDifferenceLGtoHG;   // maximum difference between lg and hg window in doublepass method
 		vector< double > fSumWindowMaxTimedifferenceToDoublePassPosition; // maximum difference between doublepass calculated window start and t0 (in samples, default: 10 )
 		double ftracefit;                         // tracefit mode or getquick mode (-1.=no fitting, 0=fit all PMTs, else: fit only PMTs with maximum ftracefit x tracerms
@@ -220,12 +222,12 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   frecoverImagePixelNearDeadPixel;
 		bool   fFillImageBorderNeighbours;
 		bool   fSmoothDead;                       // smooth dead pixels (default: off )
-        // NN cleaning
-        bool   ifWriteGraphsToFile;               // flag to write run-time NN image cleaning settings to root file (read from NN image cleaning input card)
-        bool   ifReadIPRfromDatabase;             // flag to read IPR from external IPR database
-        bool   ifCreateIPRdatabase;               // flag to create external IPR database
-        bool   ifReadIPRfromDSTFile;              // flat to read IPR graph from DST file
-        
+		// NN cleaning
+		bool   ifWriteGraphsToFile;               // flag to write run-time NN image cleaning settings to root file (read from NN image cleaning input card)
+		bool   ifReadIPRfromDatabase;             // flag to read IPR from external IPR database
+		bool   ifCreateIPRdatabase;               // flag to create external IPR database
+		bool   ifReadIPRfromDSTFile;              // flat to read IPR graph from DST file
+		
 		string freconstructionparameterfile;      // reconstruction parameter file
 		// MC parameters
 		string fsimu_pedestalfile;                // use external pedestal file for MC
@@ -235,8 +237,8 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   fsimu_HILO_from_simFile;           // read hilo multiplier from MC header in vbf file
 		int    fIsMC;                             // source data is Monte Carlo (==1 write all MC events, ==2 write only triggered events)
 		bool   fIgnoreCFGversions;                // ignore configuration file versions
-                double finjectGaussianNoise;              // add Gaussian noise to trace (standard deviation in units of DC)
-                UInt_t finjectGaussianNoiseSeed;          // seed for random Gaussian noise to trace adding
+		double finjectGaussianNoise;              // add Gaussian noise to trace (standard deviation in units of DC)
+		UInt_t finjectGaussianNoiseSeed;          // seed for random Gaussian noise to trace adding
 		
 		int fgrisuseed;
 		int ftelescopeNOffset;                    // offset in telescope numbering (default: first tele = 0 ), for GrIsu Reader
@@ -275,21 +277,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		// Hough transform muon parameters
 		bool fhoughmuonmode;                      // Use hough transform muon analysis
 		
-		// Frogs parameters
-		bool ffrogsmode;                          // for Frogs template Analysis, GH
-		string ffrogsmscwfile;			            // frogs file for getting table energy
-		int ffrogsRecID;			                  // RecID or Cut_ID Frogs Uses - combine with table
-		string ffrogstemplatelist;                // text file containing the elevation and
-		//   elevation-dependant template file names
-		string ffrogsparameterfile;               // parameter file for frogs settings
-		
-		// Model3D
-		bool fUseModel3D;                         // use Model3D analysis, JG
-		bool fUseDisplayModel3D;                  // display Model3D generated images, JG
-		bool fCreateLnLTable;                     // create lookup table for likelihood
-		string fLnLTableFile;                     // read lookup table for likelihood from this file
-		unsigned int fIDstartDirectionModel3D;    // reconstruction ID for starting values
-		
 		// write pulse histograms to gain files
 		int  fwriteLaserPulseN;                    // number of pulse histogram written to gain file
 		bool fwriteAverageLaserPulse;              // write average laser pulse to file
@@ -299,14 +286,14 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		int fdstminntubes;                        // write only events with more than fdstminntubes ntubes into dst file
 		bool fdstwriteallpixel;                   // write all information of all pixel into dst output files
 		
-        TString  fNNGraphsFile;
-        TString  fIPRdatabase;                    // file to read IPRs from external database
-        TString  fIPRdatabaseFile;                // file to write the IPR database
+		TString  fNNGraphsFile;
+		TString  fIPRdatabase;                    // file to read IPRs from external database
+		TString  fIPRdatabaseFile;                // file to write the IPR database
 		
 		// Movie Parameters
 		bool fMovieBool;                           // Are we making a movie?
 		string fMovieInput;                        // The input file with the event numbers
-		string fMovieOutputDir;                    // Where are we outputting the movie? 
+		string fMovieOutputDir;                    // Where are we outputting the movie?
 		string fMovieFrameOutput;                  // What format should we output the images in?
 		
 		// functions
@@ -321,21 +308,29 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		{
 			return fperformFADCAnalysis;
 		}
-                unsigned int getAtmosphereID( bool iUpdateInstrumentEpoch = false );
-                string       getInstrumentEpoch(  bool iMajor = false,
-                                                  bool iUpdateInstrumentEpoch = false );
+		unsigned int getAtmosphereID( bool iUpdateInstrumentEpoch = false );
+		string       getDBTextDirectory()
+		{
+			return fDBTextDirectory;
+		}
+		string       getInstrumentEpoch( bool iMajor = false,
+										 bool iUpdateInstrumentEpoch = false );
 		bool         isMC()
 		{
 			return fIsMC;
 		}
 		void         setPulseZeroIndex();
 		void         setSystemParameters();
-        bool         updateInstrumentEpochFromFile( string iEpocheFile = "usedefault", bool iReadInstrumentEpoch = true );
+		bool         updateInstrumentEpochFromFile( string iEpocheFile = "usedefault", bool iReadInstrumentEpoch = true );
 		bool         useDB()
 		{
 			return fuseDB;
 		}
+		bool         useDBTextFiles()
+		{
+			return ( fDBTextDirectory.size() > 0 );
+		}
 		
-		ClassDef( VEvndispRunParameter, 2000 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 2004 ); //(increase this number)
 };
 #endif
