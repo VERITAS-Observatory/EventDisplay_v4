@@ -36,6 +36,18 @@ void VPlotInstrumentResponseFunction::setPlottingDefaults()
 	
 }
 
+/*
+
+   read instrument response list of files and load them for e.g. plotting
+
+   this replaces several VPlotInstrumentResponseFunction::addInstrumentResponseData( filename, ...)
+
+   the format of the file list is:
+
+    * 1 myEffectiveArea1.root 20. 16. 0.5 2.4 200 A_MC p 1 1 20 Number 1
+    * 1 myEffectiveArea2.root  20. 16. 0.5 2.4 200 A_MC p 2 1 21 Number 2
+    * ID FILENAME (zenith) (azimuth bin) (wobble offset) (spectral index) (noise level) (A_MC/A_REC) (plotting style) (color) (line style) (marker style) (name)
+*/
 bool VPlotInstrumentResponseFunction::addInstrumentResponseData( int iDataID, string iFileList )
 {
 	ifstream is;
@@ -137,14 +149,18 @@ void VPlotInstrumentResponseFunction::resetInstrumentResponseData()
 	fData.clear();   // this is not a clean way to get rid of the data -> fix
 }
 
-TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMax_m2, TPad* iEffAreaPad )
+TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMin_m2, double iEffAreaMax_m2, TPad* iEffAreaPad )
 {
 	if( fData.size() == 0 )
 	{
 		return 0;
 	}
 	
-	// set maximum value in effective area axis
+	// set min/maximum value in effective area axis
+	if( iEffAreaMin_m2 > 0. )
+	{
+		getPlottingAxis( "effarea_Lin" )->fMinValue = iEffAreaMin_m2;
+	}
 	if( iEffAreaMax_m2 > 0. )
 	{
 		getPlottingAxis( "effarea_Lin" )->fMaxValue = iEffAreaMax_m2;
@@ -672,7 +688,6 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveAreaRatio( unsigned int i
 	iL->SetLineWidth( 2 );
 	iL->SetLineStyle( 1 );
 	iL->Draw();
-	
 	for( unsigned int i = 0; i < fData.size(); i++ )
 	{
 		if( i == iDataSetID )
@@ -1452,7 +1467,8 @@ bool VPlotInstrumentResponseFunction::write_fitResolutionFunction( string iOutNa
 	return true;
 }
 
-TH1D* VPlotInstrumentResponseFunction::getTheta2Histogram( unsigned int iDataSetID, double i_Energy_TeV_lin )
+TH1D* VPlotInstrumentResponseFunction::getTheta2orThetaHistogram( unsigned int iDataSetID, double i_Energy_TeV_lin,
+		bool iTheta2 )
 {
 	if( !checkDataSetID( iDataSetID ) )
 	{
@@ -1466,7 +1482,12 @@ TH1D* VPlotInstrumentResponseFunction::getTheta2Histogram( unsigned int iDataSet
 	
 	string iResolutionTreeName = "t_angular_resolution";
 	
+	// check if theta or theta2 histograms should be used
 	unsigned int i_Plotting_Selector = VInstrumentResponseFunctionData::E_DIFF2;
+	if( !iTheta2 )
+	{
+		i_Plotting_Selector = VInstrumentResponseFunctionData::E_DIFF;
+	}
 	
 	
 	// get 2D histo
@@ -1479,15 +1500,22 @@ TH1D* VPlotInstrumentResponseFunction::getTheta2Histogram( unsigned int iDataSet
 			if( j < fData[iDataSetID]->fIRF_Data.size() && fData[iDataSetID]->fIRF_Data[j] && i_Plotting_Selector < fData[iDataSetID]->fIRF_Data[j]->f2DHisto.size() )
 			{
 				h2D = fData[iDataSetID]->fIRF_Data[j]->f2DHisto[i_Plotting_Selector];
-				// plot everything
 				if( h2D )
 				{
 					if( i_Energy_TeV_lin > 0. )
 					{
 						char iname[600];
 						sprintf( iname, "%s_%d_%f", h2D->GetName(), iDataSetID, i_Energy_TeV_lin );
-						h1D = h2D->ProjectionY( iname, h2D->GetXaxis()->FindBin( log10( i_Energy_TeV_lin ) ) - 2, h2D->GetXaxis()->FindBin( log10( i_Energy_TeV_lin ) ) + 2 );
-						setHistogramPlottingStyle( h1D, iDataSetID + 1, 3. );
+						h1D = h2D->ProjectionY( iname, h2D->GetXaxis()->FindBin( log10( i_Energy_TeV_lin ) ),
+												h2D->GetXaxis()->FindBin( log10( i_Energy_TeV_lin ) ) );
+						if( iTheta2 )
+						{
+							setHistogramPlottingStyle( h1D, iDataSetID + 1, 3. );
+						}
+						else
+						{
+							setHistogramPlottingStyle( h1D, iDataSetID + 1, 1. );
+						}
 					}
 					else
 					{
@@ -1501,14 +1529,33 @@ TH1D* VPlotInstrumentResponseFunction::getTheta2Histogram( unsigned int iDataSet
 	return h1D;
 }
 
-void VPlotInstrumentResponseFunction::plotTheta2( double iTheta2AxisMax, bool iCumulative )
+TCanvas* VPlotInstrumentResponseFunction::plotTheta2( double iTheta2AxisMax, bool iCumulative )
 {
 	vector< double > i_temp_vector;
-	plotTheta2( i_temp_vector, iTheta2AxisMax, iCumulative );
+	return plotPSF( i_temp_vector, iTheta2AxisMax, iCumulative, true );
 }
 
-void VPlotInstrumentResponseFunction::plotTheta2( vector< double > i_Energy_TeV_lin, double iTheta2AxisMax, bool iCumulative )
+TCanvas* VPlotInstrumentResponseFunction::plotTheta2( vector< double > i_Energy_TeV_lin, double iTheta2AxisMax, bool iCumulative )
 {
+	return plotPSF( i_Energy_TeV_lin, iTheta2AxisMax, iCumulative, true );
+}
+
+TCanvas* VPlotInstrumentResponseFunction::plotTheta( double iTheta2AxisMax, bool iCumulative )
+{
+	vector< double > i_temp_vector;
+	return plotPSF( i_temp_vector, iTheta2AxisMax, iCumulative, false );
+}
+
+TCanvas* VPlotInstrumentResponseFunction::plotTheta( vector< double > i_Energy_TeV_lin, double iTheta2AxisMax, bool iCumulative )
+{
+	return plotPSF( i_Energy_TeV_lin, iTheta2AxisMax, iCumulative, false );
+}
+
+
+TCanvas* VPlotInstrumentResponseFunction::plotPSF( vector< double > i_Energy_TeV_lin, double iTheta2AxisMax,
+		bool iCumulative, bool iPlotTheta2 )
+{
+
 	if( i_Energy_TeV_lin.size() == 0 )
 	{
 		i_Energy_TeV_lin.push_back( 0.3 );
@@ -1518,7 +1565,14 @@ void VPlotInstrumentResponseFunction::plotTheta2( vector< double > i_Energy_TeV_
 	}
 	
 	char hname[600];
-	sprintf( hname, "Theta2_ID_%d", iCumulative );
+	if( iPlotTheta2 )
+	{
+		sprintf( hname, "Theta2_ID_%d", iCumulative );
+	}
+	else
+	{
+		sprintf( hname, "Theta_ID_%d", iCumulative );
+	}
 	TCanvas* c = new TCanvas( hname, hname, 10, 10, 600, 600 );
 	c->Divide( TMath::Nint( sqrt( i_Energy_TeV_lin.size() ) ), TMath::Nint( sqrt( i_Energy_TeV_lin.size() ) ) );
 	for( unsigned int j = 0; j < i_Energy_TeV_lin.size(); j++ )
@@ -1527,17 +1581,38 @@ void VPlotInstrumentResponseFunction::plotTheta2( vector< double > i_Energy_TeV_
 		gPad->SetGridx( 0 );
 		gPad->SetGridy( 0 );
 		// histogram frame
-		sprintf( hname, "hTheta2_ID_%d_%d", iCumulative, j );
+		if( iPlotTheta2 )
+		{
+			sprintf( hname, "hTheta2_ID_%d_%d", iCumulative, j );
+		}
+		else
+		{
+			sprintf( hname, "hTheta_ID_%d_%d", iCumulative, j );
+		}
 		TH1D* hnull = new TH1D( hname, "", 100, 0., iTheta2AxisMax );
-		hnull->SetXTitle( "#Theta^{2}" );
+		if( iPlotTheta2 )
+		{
+			hnull->SetXTitle( "#Theta^{2}" );
+		}
+		else
+		{
+			hnull->SetXTitle( "#Theta" );
+		}
 		hnull->SetMaximum( 1.1 );
 		hnull->SetStats( 0 );
 		plot_nullHistogram( ( TPad* )gPad, hnull, false, false, 1.3, 0., iTheta2AxisMax );
 		hnull->GetXaxis()->SetNdivisions( 505 );
 		hnull->Draw();
 		
-		sprintf( hname, "%.1f TeV", i_Energy_TeV_lin[j] );
-		TText* iT = new TText( iTheta2AxisMax * 0.6, hnull->GetMaximum() * 0.7, hname );
+		if( i_Energy_TeV_lin[j] < 0.1 )
+		{
+			sprintf( hname, "%.2f TeV", i_Energy_TeV_lin[j] );
+		}
+		else
+		{
+			sprintf( hname, "%.1f TeV", i_Energy_TeV_lin[j] );
+		}
+		TText* iT = new TText( iTheta2AxisMax * 0.6, hnull->GetMaximum() * 0.5, hname );
 		iT->Draw();
 		
 	}
@@ -1551,24 +1626,55 @@ void VPlotInstrumentResponseFunction::plotTheta2( vector< double > i_Energy_TeV_
 			gPad->SetGridx( 0 );
 			gPad->SetGridy( 0 );
 			
-			TH1D* h = getTheta2Histogram( i, i_Energy_TeV_lin[j] );
+			TH1D* h = getTheta2orThetaHistogram( i, i_Energy_TeV_lin[j], iPlotTheta2 );
 			if( h )
 			{
+				TH1D* hCumu = get_Cumulative_Histogram( h, true, true );
 				if( iCumulative )
 				{
-					h = get_Cumulative_Histogram( h, true, true );
+					hCumu->Draw( "same" );
 				}
 				else
 				{
 					// rebin
-					h->Rebin( 2 );
+					if( iPlotTheta2 )
+					{
+						h->Rebin( 2 );
+					}
+					else
+					{
+						if( h->GetNbinsX() % 2  == 0 )
+						{
+							h->Rebin( 2 );
+						}
+						else
+						{
+							h->Rebin( 5 );
+						}
+					}
 					// normalize
 					if( h->GetMaximum() > 0. )
 					{
 						h->Scale( 1. / h->GetMaximum() );
 					}
+					h->Draw( "same" );
 				}
-				h->Draw( "same" );
+				// get 68% per value
+				double x68 = hCumu->GetXaxis()->GetBinCenter( hCumu->FindFirstBinAbove( 0.68 ) );
+				TLine* iL68 = new TLine( x68, 0., x68, 1.1 );
+				iL68->SetLineStyle( 2 );
+				iL68->SetLineColor( hCumu->GetLineColor() );
+				iL68->Draw();
+				cout << "68% value at " << i_Energy_TeV_lin[j] << " TeV: ";
+				if( iPlotTheta2 )
+				{
+					cout << sqrt( x68 ) << " deg" << endl;
+				}
+				else
+				{
+					cout << x68 << " deg" << endl;
+				}
+				// set line at '1' for cumulative histograms
 				if( iCumulative )
 				{
 					TLine* iL = new TLine( h->GetXaxis()->GetXmin(), 1.,
@@ -1579,5 +1685,6 @@ void VPlotInstrumentResponseFunction::plotTheta2( vector< double > i_Energy_TeV_
 			}
 		}
 	}
+	return c;
 }
 

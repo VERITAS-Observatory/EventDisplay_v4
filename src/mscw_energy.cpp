@@ -1,13 +1,8 @@
 /*! \file mscw_energy.cpp
     \brief calculate mean scaled width and length,  energy with lookup tables
 
-    \author
-     Gernot Maier
-     basic routines: Henrik Krawczynski (mscw+energy routine)
 */
 
-#include "VTableCalculator.h"
-#include "VTableEnergyCalculator.h"
 #include "VTableLookupDataHandler.h"
 #include "VGlobalRunParameter.h"
 #include "VTableLookupRunParameter.h"
@@ -22,13 +17,17 @@
 
 using namespace std;
 
+/*
+ * print table lookup run parameter for an existing file
+ * exit after printing
+ */
 void printParametersFromFile( string ff )
 {
 	TFile iF( ff.c_str() );
 	if( iF.IsZombie() )
 	{
 		cout << "couldn't read mscw file: " << ff << endl;
-		exit( 0 );
+		exit( EXIT_FAILURE );
 	}
 	VTableLookupRunParameter* fX = ( VTableLookupRunParameter* )iF.Get( "TLRunParameter" );
 	if( fX )
@@ -41,11 +40,13 @@ void printParametersFromFile( string ff )
 	}
 	iF.Close();
 	
-	exit( 0 );
+	exit( EXIT_SUCCESS );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
+//
+//  main function to write and read lookup tables
+//
 int main( int argc, char* argv[] )
 {
 	// print version only
@@ -56,7 +57,7 @@ int main( int argc, char* argv[] )
 		{
 			VGlobalRunParameter fRunPara;
 			cout << fRunPara.getEVNDISP_VERSION() << endl;
-			exit( 0 );
+			exit( EXIT_SUCCESS );
 		}
 	}
 	// timing
@@ -76,44 +77,47 @@ int main( int argc, char* argv[] )
 	
 	if( !fTLRunParameter->fillParameters( argc, argv ) )
 	{
-		exit( 0 );
+		exit( EXIT_SUCCESS );
 	}
 	
 	if( fTLRunParameter->printpara.size() > 0 )
 	{
 		printParametersFromFile( fTLRunParameter->printpara );
-		exit( 0 );
+		exit( EXIT_SUCCESS );
 	}
 	fTLRunParameter->print();
 	
-	// create lookup tables
+	// initialize lookup tables
 	VTableLookup* fTLook = new VTableLookup( fTLRunParameter->readwrite, fTLRunParameter->fDebug );
 	if( !fTLook->initialize( fTLRunParameter ) )
 	{
 		cout << "error creating lookup tables: no run parameters";
 		cout << "exiting..." << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	
 	cout << endl << "loop over all events ";
-        if( fTLook->getNEntries() != 1234567890 )
-        {
-            cout << "(in total " << fTLook->getNEntries() << ")";
-        }
+	if( fTLook->getNEntries() != TChain::kBigNumber )
+	{
+		cout << "(in total " << fTLook->getNEntries() << ")";
+	}
 	cout << endl;
 	if( fTLook->getMaxTotalTime() < 1.e8 )
 	{
 		cout << "\t maximum run time [s]: " << fTLook->getMaxTotalTime() << endl;
 	}
 	
+	//////////////////////////
 	// loop over all events
 	fTLook->loop();
 	
 	cout << "... end of loop" << endl;
 	
+	// stopwatch results
 	fStopWatch.Stop();
 	fStopWatch.Print();
 	
+	//////////////////////////
 	// write tables to disk
 	fTLook->terminate();
 }

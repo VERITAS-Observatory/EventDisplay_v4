@@ -46,7 +46,7 @@ VImageAnalyzer::VImageAnalyzer()
 	{
 		fAnaDir.push_back( 0 );
 	}
-    // initialize tgraphs (used for double pass method)
+	// initialize tgraphs (used for double pass method)
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
 		fXGraph.push_back( new TGraphErrors( 1 ) );
@@ -56,7 +56,7 @@ VImageAnalyzer::VImageAnalyzer()
 	
 	//If -hough is specified on the command line, run the hough transform initialization method in
 	//VImageParameterCalculation
-    if( fRunPar->fhoughmuonmode || fRunPar->fmuonmode )
+	if( fRunPar->fhoughmuonmode || fRunPar->fmuonmode )
 	{
 #ifndef NOGSL
 		cout << "Using GSL libraries for muon analysis." << endl;
@@ -64,10 +64,10 @@ VImageAnalyzer::VImageAnalyzer()
 		cout << "Warning! No GSL libraries found. Muon impact parameter corrected Size will not be calculated." << endl;
 #endif
 		cout << "" << endl;
-        if( fRunPar->fhoughmuonmode )
-        {
-            fVImageParameterCalculation->houghInitialization();
-        }
+		if( fRunPar->fhoughmuonmode )
+		{
+			fVImageParameterCalculation->houghInitialization();
+		}
 	}
 }
 
@@ -150,7 +150,7 @@ void VImageAnalyzer::doAnalysis()
 	{
 		calcTZerosSums( getSumFirst(), getSumFirst() + getSumWindow_Pass1(), getTraceIntegrationMethod_pass1() );
 	}
-    // no double pass (e.g. NN cleaning)
+	// no double pass (e.g. NN cleaning)
 	else
 	{
 		calcTZerosSums( getSumFirst(), getSumFirst() + getSumWindow(), getTraceIntegrationMethod() );
@@ -160,14 +160,14 @@ void VImageAnalyzer::doAnalysis()
 	getImageParameters()->nsat = fillSaturatedChannels();
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
-    // correct for FADC crate jitter timing
+	// correct for FADC crate jitter timing
 	if( fRunPar->fL2TimeCorrect )
 	{
 		FADCStopCorrect();
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
-    // apply timing correction from laser calibration (flatfielding in time)
+	// apply timing correction from laser calibration (flatfielding in time)
 	timingCorrect();
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
@@ -182,7 +182,7 @@ void VImageAnalyzer::doAnalysis()
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
-	// set parameters for image parameter calculation
+	// set parameters required for image parameter calculation
 	fVImageParameterCalculation->setDetectorGeometry( getDetectorGeometry() );
 	fVImageParameterCalculation->setParameters( getImageParameters() );
 	
@@ -190,9 +190,9 @@ void VImageAnalyzer::doAnalysis()
 	// image parameter calculation
 	fVImageParameterCalculation->calcParameters();
 	fVImageParameterCalculation->calcTimingParameters();
-
+	
 	///////////////////////////////////////////////////////////////////////////////////////////
-    // here: no double pass trace integration
+	// here: no double pass trace integration
 	// do a log likelihood image fitting on events on the camera edge only
 	if( !fRunPar->fDoublePass || !fReader->hasFADCTrace() )
 	{
@@ -291,7 +291,7 @@ void VImageAnalyzer::doAnalysis()
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////
-    // log likelihood image analysis (not default)
+	// log likelihood image analysis (not default)
 	// calculate image parameters (mainly for edge images)
 	if( fRunPar->fImageLL && getImageParameters()->ntubes > 0 )
 	{
@@ -328,12 +328,14 @@ void VImageAnalyzer::fillOutputTree()
 		getAnaHistos()->fillL2DiagnosticTree( getRunNumber(), getTelescopeEventNumber( getTelID() ),
 											  0, 0, getFADCstopTZero(), getFADCstopSums() );
 	}
+	// fill (optionally) image/border tree lists
+	fVImageParameterCalculation->fillImageBorderPixelTree();
 	
 	// fill some basic run parameters
 	getImageParameters()->fimagethresh = getImageThresh();
 	getImageParameters()->fborderthresh = getBorderThresh();
-	getImageParameters()->fncluster_cleaned = getNcluster_cleaned(); // HP
-	getImageParameters()->fncluster_uncleaned = getNcluster_uncleaned(); // HP
+	getImageParameters()->fncluster_cleaned = getNcluster_cleaned();
+	getImageParameters()->fncluster_uncleaned = getNcluster_uncleaned();
 	getImageParameters()->fsumfirst = getSumFirst();
 	getImageParameters()->fsumwindow = getSumWindow();
 	getImageParameters()->fsumwindow_2 = getSumWindow_2();
@@ -415,7 +417,7 @@ void VImageAnalyzer::terminate( bool iDebug_IO )
 		// write calibration summaries
 		if( getRunParameter()->fsourcetype != 7 )
 		{
-            getCalibrationData()->terminate( getDead( false ), getDead( true ), getRunParameter()->fTraceIntegrationMethod[fTelID] );
+			getCalibrationData()->terminate( getDead( false ), getDead( true ), getRunParameter()->fTraceIntegrationMethod[fTelID] );
 		}
 		// write dead channel tree
 		// note: this writes the dead channel list of the last event to this tree
@@ -488,20 +490,20 @@ void VImageAnalyzer::initOutput()
 	if( fRunPar->foutputfileName != "-1" )
 	{
 		// tree versioning numbers used in mscw_energy
-        stringstream i_textTitle;
-        i_textTitle << "VERSION " << fRunPar->getEVNDISP_TREE_VERSION();
+		stringstream i_textTitle;
+		i_textTitle << "VERSION " << fRunPar->getEVNDISP_TREE_VERSION();
 		if( getRunParameter()->fShortTree )
 		{
-            i_textTitle << "(short tree)";
+			i_textTitle << "(short tree)";
 		}
-        fOutputfile = new TFile( fRunPar->foutputfileName.c_str(), "RECREATE", i_textTitle.str().c_str() );
+		fOutputfile = new TFile( fRunPar->foutputfileName.c_str(), "RECREATE", i_textTitle.str().c_str() );
 		if( fOutputfile->IsZombie() )
 		{
 			cout << endl;
 			cout << "ERROR: unable to create eventdisplay output file: " << fRunPar->foutputfileName.c_str() << endl;
 			cout << "exiting..." << endl;
 			cout << endl;
-			exit( 0 );
+			exit( EXIT_FAILURE );
 		}
 	}
 	
@@ -554,19 +556,21 @@ void VImageAnalyzer::initTrees()
 	// now book the trees (for MC with additional MC block)
 	// tree versioning numbers used in mscw_energy
 	char i_text[300];
-	char i_textTitle[300];
 	sprintf( i_text, "tpars" );
-	sprintf( i_textTitle, "Event Parameters (Telescope %d, VERSION %d)", getTelID() + 1, fRunPar->getEVNDISP_TREE_VERSION() );
+	ostringstream iSTRText;
+	iSTRText << "Event Parameters (Telescope " << getTelID() + 1;
+	iSTRText << ", VERSION " << fRunPar->getEVNDISP_TREE_VERSION() << ")";
 	if( getRunParameter()->fShortTree )
 	{
-		sprintf( i_textTitle, "%s (short tree)", i_textTitle );
+		iSTRText << " (short tree)";
 	}
-	fVImageParameterCalculation->getParameters()->initTree( i_text, i_textTitle, fReader->isMC(), false, fRunPar->fmuonmode, fRunPar->fhoughmuonmode );
+	fVImageParameterCalculation->getParameters()->initTree( i_text, iSTRText.str().c_str(), fReader->isMC(), false, fRunPar->fmuonmode, fRunPar->fhoughmuonmode );
 	
 	// for log likelihood method, book a second image parameter tree
 	if( fRunPar->fImageLL )
 	{
 		sprintf( i_text, "lpars" );
+		char i_textTitle[300];
 		sprintf( i_textTitle, "Event Parameters, loglikelihood (Telescope %d)", getTelID() + 1 );
 		fVImageParameterCalculation->getLLParameters()->initTree( i_text, i_textTitle, fReader->isMC(), true, fRunPar->fmuonmode, fRunPar->fhoughmuonmode );
 	}
@@ -636,7 +640,7 @@ bool VImageAnalyzer::initEvent()
 	// fill high/low gain vector
 	getImageParameters()->nlowgain = fillHiLo();
 	// fill vector with zero suppressed channels
-    // (return number of zero suppressed channels)
+	// (return number of zero suppressed channels)
 	getImageParameters()->nzerosuppressed = fillZeroSuppressed();
 	
 	if( fRunPar->fImageLL )
@@ -990,12 +994,12 @@ void VImageAnalyzer::imageCleaning()
 		else if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMENEXTNEIGHBOUR" )
 		{
 			cout << "Error cleaning method ";
-            cout << getImageCleaningParameter()->getImageCleaningMethod();
-            cout << " not defined for signal/noise thresholds" << endl;
-            cout << "exiting..." << endl;
-            exit( EXIT_FAILURE );
+			cout << getImageCleaningParameter()->getImageCleaningMethod();
+			cout << " not defined for signal/noise thresholds" << endl;
+			cout << "exiting..." << endl;
+			exit( EXIT_FAILURE );
 		}
-        // simple time two-level cleaning
+		// simple time two-level cleaning
 		else if( getImageCleaningParameter()->getImageCleaningMethod() == "TWOLEVELANDCORRELATION" )
 		{
 			fVImageCleaning->cleanImageTraceCorrelate( getImageCleaningParameter() );

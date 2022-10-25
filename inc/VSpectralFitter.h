@@ -27,7 +27,7 @@ class VSpectralFitter : public TObject
 		double* fFitFunction_CovarianceMatrix;         // covariance matrix from fit
 		TFitResult* fFitResult;
 		string fFitName;
-		TGraphErrors* fConfidenceInterval;				// Fit Confidence Interval 
+		TGraphErrors* fConfidenceInterval;				// Fit Confidence Interval
 		Double_t fCL; 									// Confidince Level
 		
 		int    fSpectralFitFunction;
@@ -80,9 +80,9 @@ class VSpectralFitter : public TObject
 			fPlottingEnergySpectrumLineStyle = iStyle;
 			fPlottingEnergySpectrumLineWidth = iWidth;
 		}
-
+		
 		// Setting fit CL (default 68%)
-		void setCL(double i_CL = 0.68)
+		void setCL( double i_CL = 0.68 )
 		{
 			fCL = i_CL;
 		}

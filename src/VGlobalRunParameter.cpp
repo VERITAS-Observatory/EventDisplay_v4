@@ -24,7 +24,7 @@ VGlobalRunParameter::VGlobalRunParameter( bool bSetGlobalParameter )
 				cout << endl;
 				cout << "Parameter files are expected to be in the following directory: " << endl;
 				cout << getDirectory_EVNDISPParameterFiles() << endl;
-                exit( EXIT_FAILURE );
+				exit( EXIT_FAILURE );
 			}
 			else
 			{
@@ -73,7 +73,7 @@ bool VGlobalRunParameter::readRunparameterFile( string i_filename )
 				continue;
 			}
 			// print runparameter to stdout
-			if( !(is_stream>>std::ws).eof() )
+			if( !( is_stream >> std::ws ).eof() )
 			{
 				is_stream >> temp;
 				if( temp == "OBSERVATORY" )
@@ -82,15 +82,15 @@ bool VGlobalRunParameter::readRunparameterFile( string i_filename )
 				}
 				else if( temp == "OBSERVATORY_COORDINATES" )
 				{
-					if( !(is_stream>>std::ws).eof() )
+					if( !( is_stream >> std::ws ).eof() )
 					{
 						is_stream >> fObservatory_Latitude_deg;
 					}
-					if( !(is_stream>>std::ws).eof() )
+					if( !( is_stream >> std::ws ).eof() )
 					{
 						is_stream >> fObservatory_Longitude_deg;
 					}
-					if( !(is_stream>>std::ws).eof() )
+					if( !( is_stream >> std::ws ).eof() )
 					{
 						is_stream >> fObservatory_Height_m;
 					}
@@ -168,13 +168,8 @@ bool VGlobalRunParameter::setDirectories()
 {
 	//////////////////////////////////////////////////////////////////////
 	// get directories with all analysis data
-	string data_dir = "";
-	if( gSystem->Getenv( "OBS_EVNDISP_AUX_DIR" ) )
-	{
-		data_dir = gSystem->Getenv( "OBS_EVNDISP_AUX_DIR" );
-	}
-	// assume that by default a VERITAS analysis is requested
-	else if( gSystem->Getenv( "VERITAS_EVNDISP_AUX_DIR" ) )
+	string data_dir;
+	if( gSystem->Getenv( "VERITAS_EVNDISP_AUX_DIR" ) )
 	{
 		data_dir = gSystem->Getenv( "VERITAS_EVNDISP_AUX_DIR" );
 	}
@@ -186,12 +181,12 @@ bool VGlobalRunParameter::setDirectories()
 	// test if directory exists
 	if( gSystem->AccessPathName( fEVNDISPAnaDataDirectory.c_str() ) )
 	{
-        cout << "VGlobalRunParameter::setDirectories(): cannot find directory with EVNDISP aux data" << endl;
+		cout << "VGlobalRunParameter::setDirectories(): cannot find directory with EVNDISP aux data" << endl;
 		cout << "\t looking for " << fEVNDISPAnaDataDirectory << endl;
-		cout << "\t is environmental variable $OBS_EVNDISP_AUX_DIR (or $VERITAS_EVNDISP_AUX_DIR or $CTA_EVNDISP_AUX_DIR) set?" << endl;
+		cout << "\t is environmental variable $VERITAS_EVNDISP_AUX_DIR set?" << endl;
 		cout << "\t (see README/INSTALL)" << endl;
 		cout << "exiting..." << endl;
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 	// by default: calibration directory = fEVNDISPAnaDataDirectory
 	if( fEVNDISPCalibrationDataDirectory.size() == 0 )
@@ -212,29 +207,20 @@ bool VGlobalRunParameter::setDirectories()
 	
 	//////////////////////////////////////////////////////////////////////
 	// output is written to this directory (unless stated otherwise on command line)
-	const char* cal_out = gSystem->Getenv( "OBS_USER_DATA_DIR" );
-	if( cal_out )
+	const char* vcal_out = gSystem->Getenv( "VERITAS_USER_DATA_DIR" );
+	if( vcal_out )
 	{
-		fEVNDISPOutputDirectory = cal_out;
+		fEVNDISPOutputDirectory = vcal_out;
 		fEVNDISPOutputDirectory += "/";
-	}
-	else
-	{
-		const char* vcal_out = gSystem->Getenv( "VERITAS_USER_DATA_DIR" );
-		if( vcal_out )
-		{
-			fEVNDISPOutputDirectory = vcal_out;
-			fEVNDISPOutputDirectory += "/";
-		}
 	}
 	if( gSystem->AccessPathName( fEVNDISPOutputDirectory.c_str() ) )
 	{
 		cout << "VGlobalRunParameter::setDirectories(): cannot find directory for EVNDISP output data" << endl;
 		cout << "\t looking for " << fEVNDISPOutputDirectory << endl;
-		cout << "\t is environmental variable $OBS_USER_DATA_DIR set?" << endl;
+		cout << "\t is environmental variable $VERITAS_USER_DATA_DIR set?" << endl;
 		cout << "\t (see README/INSTALL)" << endl;
 		cout << "exiting..." << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	
 	return true;
@@ -271,10 +257,10 @@ bool VGlobalRunParameter::getEVNDISP_TREE_isShort( TTree* t )
 	{
 		return true;
 	}
-        else if( !t->GetBranchStatus( "dataFormat" ) )
-        {
-                return true;
-        }
+	else if( !t->GetBranchStatus( "dataFormat" ) )
+	{
+		return true;
+	}
 	
 	return false;
 }
@@ -306,7 +292,7 @@ void VGlobalRunParameter::printGlobalRunParameter()
 	cout << "EVNDISP.global.runparameter" << endl;
 	cout << endl;
 	cout << "VERSION " << fEVNDISP_VERSION << " (tree version " << fEVNDISP_TREE_VERSION << ")";
-    cout << endl;
+	cout << endl;
 	cout << "Observatory: " << fObservatory;
 	if( TMath::Abs( fObservatory_Longitude_deg ) > 1.e-5
 			&& TMath::Abs( fObservatory_Latitude_deg ) > 1.e-5
@@ -327,23 +313,23 @@ void VGlobalRunParameter::printGlobalRunParameter()
 	cout << "Directories: " << endl;
 	if( fEVNDISPAnaDataDirectory.size() > 0 )
 	{
-        cout << "    for EVNDISP aux data: \t\t" << fEVNDISPAnaDataDirectory << endl;
+		cout << "    for EVNDISP aux data: \t\t" << fEVNDISPAnaDataDirectory << endl;
 	}
 	if( fVBFRawDataDirectory.size() > 0 )
 	{
 		cout << "    for VBF raw: \t\t\t" << fVBFRawDataDirectory << endl;
 	}
-    if( getDirectory_EVNDISPCalibrationData().size() > 0 )
+	if( getDirectory_EVNDISPCalibrationData().size() > 0 )
 	{
-        cout << "    for Calibration data: \t\t" << getDirectory_EVNDISPCalibrationData() << endl;
+		cout << "    for Calibration data: \t\t" << getDirectory_EVNDISPCalibrationData() << endl;
 	}
-    if( getDirectory_EVNDISPCalibrationData_perRun().size() > 0 )
-    {
-        cout << "    for Calibration data (per run): \t" << getDirectory_EVNDISPCalibrationData_perRun() << endl;
-    }
+	if( getDirectory_EVNDISPCalibrationData_perRun().size() > 0 )
+	{
+		cout << "    for Calibration data (per run): \t" << getDirectory_EVNDISPCalibrationData_perRun() << endl;
+	}
 	if( fEVNDISPOutputDirectory.size() > 0 )
 	{
-        cout << "    for EVNDISP output: \t\t" << fEVNDISPOutputDirectory << endl;
+		cout << "    for EVNDISP output: \t\t" << fEVNDISPOutputDirectory << endl;
 	}
 	cout << endl;
 }

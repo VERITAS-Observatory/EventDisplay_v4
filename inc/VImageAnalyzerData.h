@@ -39,8 +39,6 @@ class VImageAnalyzerData
 		VImageAnalyzerHistograms* fAnaHistos;               //!< analysis test histograms
 		
 		valarray<double> fTemplateMu;
-		valarray<double> fModel3DMu;              //!< Model3D pixel signal (JG)
-		vector<bool>     fModel3DClean;           //!< Model3D selected pixels (JG)
 		valarray<double> fSums;
 		valarray<double> fSums2;
 		vector<bool> fLLEst;                      //!< true for dead channels with estimated sum from loglikelihood fit
@@ -63,7 +61,7 @@ class VImageAnalyzerData
 		vector< valarray<double> > fPulseTimingUncorrected; //!< pulse timing at certain fraction of pulse maxima (uncorrected values)
 		vector< valarray<double> > fPulseTimingCorrected; //!< pulse timing at certain fraction of pulse maxima (corrected values)
 		valarray< double >     fPulseTimingAverageTime; //!< average pulse time
-        valarray< double >     fPulseTimingAverageTimeCorrected; //!< average pulse time (corrected values)
+		valarray< double >     fPulseTimingAverageTimeCorrected; //!< average pulse time (corrected values)
 		valarray<unsigned int> fTCorrectedSumFirst;
 		valarray<unsigned int> fTCorrectedSumLast;
 		valarray<unsigned int> fCurrentSummationWindow;
@@ -83,19 +81,19 @@ class VImageAnalyzerData
 		vector<bool> fImage;
 		vector<int> fImageUser;                   //!< channels which are enabled/disables by the user
 		vector<bool> fBorder;
-		vector<bool> fTrigger;                    //!< MS: pixels selected by trigger algorithm
+		vector<bool> fTrigger;                    //!< pixels selected by trigger algorithm
 		vector<bool> fBrightNonImage;             //!< pixel above non image threshold
 		vector<bool> fImageBorderNeighbour;       //!< image and border pixel plus their neighbours
 		// time cleaning
-		vector<int> fClusterNpix;                 //!< HP: numer of pixels in cluster
-		vector<int> fClusterID;                   //!< HP: cluster ID
-		int fMainClusterID;                       //!< HP: main cluster ID
-		vector<double> fClusterSize;              //!< HP: size of the cluster
-		vector<double> fClusterTime;              //!< HP: weighted mean time of the cluster
-		vector<double> fClusterCenx;              //!< HP: cenX of the cluster
-		vector<double> fClusterCeny;              //!< HP: cenY of the cluster
-		int fncluster_cleaned;                    //!< HP: number of clusters
-		int fncluster_uncleaned;                  //!< HP: number of clusters before cluster rejection
+		vector<int> fClusterNpix;                 //!< number of pixels in cluster
+		vector<int> fClusterID;                   //!< cluster ID
+		int fMainClusterID;                       //!< main cluster ID
+		vector<double> fClusterSize;              //!< size of the cluster
+		vector<double> fClusterTime;              //!< weighted mean time of the cluster
+		vector<double> fClusterCenx;              //!< cenX of the cluster
+		vector<double> fClusterCeny;              //!< cenY of the cluster
+		int fncluster_cleaned;                    //!< number of clusters
+		int fncluster_uncleaned;                  //!< number of clusters before cluster rejection
 		// correlation cleaning
 		vector<double> fCorrelationCoefficient;  // correlation coefficient
 		// time since run start
@@ -121,7 +119,7 @@ class VImageAnalyzerData
 		vector< unsigned int > iDummyVectorUI;
 		
 		VImageAnalyzerData( unsigned int iTelID, unsigned int iShortTree = 0,
-                            bool bCalibration = false );
+							bool bCalibration = false, bool bWriteImagePixelList = false );
 		~VImageAnalyzerData() {}
 		
 		void                     fillPulseSum( unsigned int, double, bool );
@@ -143,7 +141,7 @@ class VImageAnalyzerData
 		{
 			return fRandomMakeDeadChannelsSeed;
 		}
-        valarray<double>&        getTraceAverageTime( bool iCorrected );
+		valarray<double>&        getTraceAverageTime( bool iCorrected );
 		valarray<double>&        getTZeros( bool iCorrected );
 		valarray<double>&        getTraceWidth( bool iCorrected );
 		VSpecialChannel*         getSpecialChannel()
@@ -154,9 +152,9 @@ class VImageAnalyzerData
 											 unsigned int iSamples, unsigned int ipulsetiminglevel, unsigned int iTzeroIndex, unsigned int iWidthIndex );
 		void                     initializeMeanPulseHistograms();
 		void                     initializeIntegratedChargeHistograms();
-		bool                     readSpecialChannels( int iRunNumber, string iEpoch, 
-                                                              string ispecialchannelfile, 
-                                                              string ithroughputfile, string iDirectory );
+		bool                     readSpecialChannels( int iRunNumber, string iEpoch,
+				string ispecialchannelfile,
+				string ithroughputfile, string iDirectory );
 		void                     setTraceIntegrationMethod( unsigned iN = 1 )
 		{
 			fTraceIntegrationMethod = iN;

@@ -3,7 +3,6 @@
 #ifndef VPlotAnasumHistograms_h
 #define VPlotAnasumHistograms_h
 
-#include "VASlalib.h"
 #include "VAnalysisUtilities.h"
 #include "VEnergyThreshold.h"
 #include "VHistogramUtilities.h"
@@ -13,8 +12,7 @@
 #include "VStatistics.h"
 #include "CRunSummary.h"
 
-#include "VASlalib.h"
-#include "VASlamac.h"
+#include "VAstronometry.h"
 #include "VStarCatalogue.h"
 
 #include "TArrow.h"

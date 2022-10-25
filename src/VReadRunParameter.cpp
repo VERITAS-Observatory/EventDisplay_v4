@@ -26,6 +26,9 @@ VReadRunParameter::VReadRunParameter()
 	
 	fPrintOutputFile = false;
 	
+	fTargetName_overwriteDB = "";
+	fTargetDec_overwriteDB = -9999.;
+	fTargetRA_overwriteDB = -9999.;
 	fWobbleNorth_overwriteDB = -9999.;
 	fWobbleEast_overwriteDB  = -9999.;
 }
@@ -105,7 +108,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		}
 		// movie mode
 		// movie <input file>,<output dir>,<image format>
-		else if( iTemp.find( "movie" ) < iTemp.size())
+		else if( iTemp.find( "movie" ) < iTemp.size() )
 		{
 			fRunPara->fdisplaymode = 1;
 			fRunPara->fMovieBool = true;
@@ -125,98 +128,6 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		else if( iTemp.find( "hough" ) < iTemp.size() )
 		{
 			fRunPara->fhoughmuonmode = 1;
-		}
-		/////////////////////////////////////////////////////////
-		// Frogs mode
-		else if( iTemp1 == "-frogs" )
-		{
-			fRunPara->ffrogsmode = 1;
-			if( iTemp2.size() > 0 )
-			{
-				fRunPara->ffrogsmscwfile = iTemp2;
-				i++;
-                                // setting default parameters for frogs
-                                // (might be overwritten by the following command lines)
-                                if( fRunPara->ffrogsparameterfile.size() == 0 )
-                                {
-                                    fRunPara->ffrogsparameterfile = "FROGS.runparameter";
-                                }
-                                if( fRunPara->ffrogsRecID < 0 )
-                                {
-                                    fRunPara->ffrogsRecID = 0;
-                                }
-			}
-			else
-			{
-				fRunPara->ffrogsmscwfile = "";
-			}
-		}
-		else if( iTemp1 == "-frogsid" )
-		{
-			if( iTemp2.size() > 0 )
-			{
-				fRunPara->ffrogsRecID = atoi( iTemp2.c_str() );
-				i++;
-			}
-			else
-			{
-				fRunPara->ffrogsRecID = 0;
-			}
-		}
-		else if( iTemp1 == "-templatelistforfrogs" )
-		{
-			if( iTemp2.size() > 0 )
-			{
-				fRunPara->ffrogstemplatelist = iTemp2 ;
-				i++;
-			}
-			else
-			{
-				fRunPara->ffrogstemplatelist = "" ;
-			}
-		}
-		else if( iTemp1 == "-frogsparameterfile" )
-		{
-			if( iTemp2.size() > 0 )
-			{
-				fRunPara->ffrogsparameterfile = iTemp2 ;
-				i++;
-			}
-			else
-			{
-				fRunPara->ffrogsparameterfile = "" ;
-			}
-		}
-		/////////////////////////////////////////////////////////
-		// Model3D
-		else if( iTemp.find( "model3d" ) < iTemp.size() )
-		{
-			fRunPara->fUseModel3D = true;
-			fRunPara->fLnLTableFile = "table_LnL.root";
-		}
-		else if( iTemp.find( "plot3d" ) < iTemp.size() )
-		{
-			fRunPara->fUseModel3D = true;
-			fRunPara->fUseDisplayModel3D = true;
-			fRunPara->fLnLTableFile = "table_LnL.root";
-			fRunPara->fdisplaymode = 1;
-		}
-		else if( iTemp.find( "lnlfile" ) < iTemp.size() )
-		{
-			if( iTemp2.size() > 0 )
-			{
-				fRunPara->fLnLTableFile = iTemp2;
-				i++;
-			}
-			else
-			{
-				fRunPara->fLnLTableFile = "table_LnL.root";
-			}
-		}
-		else if( iTemp.find( "createlnltablefile" ) < iTemp.size() )
-		{
-			fRunPara->fUseModel3D = true;
-			fRunPara->fCreateLnLTable = true;
 		}
 		// source file
 		else if( iTemp.find( "sourcefi" ) < iTemp.size() )
@@ -242,17 +153,17 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				i++;
 			}
 		}
-        else if( iTemp.find( "combine_pedestal_channels" ) < iTemp.size() )
-        {
-            if( iTemp.find( "=" ) != string::npos )
-            {
-                fRunPara->fCombineChannelsForPedestalCalculation = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-            }
-            else
-            {
-                fRunPara->fCombineChannelsForPedestalCalculation = 1;
-            }
-        }
+		else if( iTemp.find( "combine_pedestal_channels" ) < iTemp.size() )
+		{
+			if( iTemp.find( "=" ) != string::npos )
+			{
+				fRunPara->fCombineChannelsForPedestalCalculation = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+			}
+			else
+			{
+				fRunPara->fCombineChannelsForPedestalCalculation = 1;
+			}
+		}
 		// for pedestal calculation: write results into a single root file
 		else if( iTemp.find( "singlepedestalrootfile" ) < iTemp.size() )
 		{
@@ -433,15 +344,15 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			fRunPara->fUsePedestalsInTimeSlices = true;
 			fRunPara->fLowGainUsePedestalsInTimeSlices = true;
 		}
-                // inject Gaussian noise
-                else if( iTemp.find( "injectgaussiannoise" ) < iTemp.size() && !( iTemp.find( "injectgaussiannoiseseed" ) < iTemp.size() ) )
-                {
-                        fRunPara->finjectGaussianNoise = double( atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() ) );
-                }
-                else if( iTemp.find( "injectgaussiannoiseseed" ) < iTemp.size() )
-                {
-                        fRunPara->finjectGaussianNoiseSeed = UInt_t( atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() ) );
-                }
+		// inject Gaussian noise
+		else if( iTemp.find( "injectgaussiannoise" ) < iTemp.size() && !( iTemp.find( "injectgaussiannoiseseed" ) < iTemp.size() ) )
+		{
+			fRunPara->finjectGaussianNoise = double( atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() ) );
+		}
+		else if( iTemp.find( "injectgaussiannoiseseed" ) < iTemp.size() )
+		{
+			fRunPara->finjectGaussianNoiseSeed = UInt_t( atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() ) );
+		}
 		else if( iTemp.find( "nopedestalsintimeslices" ) < iTemp.size() )
 		{
 			fRunPara->fPedestalsInTimeSlices = false;
@@ -461,10 +372,10 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			fRunPara->fUsePedestalsInTimeSlices = true;
 			fRunPara->fLowGainUsePedestalsInTimeSlices = true;
 		}
-        else if( iTemp.find( "sumwindowaveragetime" ) < iTemp.size() )
-        {
-            fRunPara->fCalibrationSumWindowAverageTime = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-        }
+		else if( iTemp.find( "sumwindowaveragetime" ) < iTemp.size() )
+		{
+			fRunPara->fCalibrationSumWindowAverageTime = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
 		else if( iTemp.find( "calibrationsumwindow" ) < iTemp.size() && iTemp != "pedestalsintimeslices" )
 		{
 			fRunPara->fCalibrationSumWindow = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -482,6 +393,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fPlotRaw = true;
 			fRunPara->fuseDB = false;
+			fRunPara->fDBTextDirectory = "";
 			fRunPara->fDBTracking = false;
 			fRunPara->fTargetName = "laser";
 			fRunPara->fdisplaymode = 1;
@@ -508,6 +420,19 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			fRunPara->fuseDB = true;
 			isCompiledWithDB();
 		}
+		else if( iTemp.find( "dbtextdirectory" ) < iTemp.size() )
+		{
+			if( iTemp2.size() > 0 )
+			{
+				fRunPara->fDBTextDirectory = iTemp2;
+				i++;
+			}
+			else
+			{
+				cout << "error setting DB text directory" << endl;
+				return false;
+			}
+		}
 		else if( iTemp.find( "donotusedbinfo" ) < iTemp.size() )
 		{
 			fRunPara->fuseDB = false;
@@ -531,10 +456,10 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->frunnumber = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-        else if( iTemp.find( "runtitle" ) < iTemp.size() )
-        {
-            fRunPara->fRunTitle = iTemp.substr( iTemp.find( "=" ) + 1, iTemp.size() );
-        }
+		else if( iTemp.find( "runtitle" ) < iTemp.size() )
+		{
+			fRunPara->fRunTitle = iTemp.substr( iTemp.find( "=" ) + 1, iTemp.size() );
+		}
 		else if( iTemp.rfind( "epochfile" ) < iTemp.size() )
 		{
 			if( iTemp2.size() > 0 )
@@ -584,14 +509,24 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			fRunPara->fazimuth = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
 		// target declination
-		else if( iTemp.rfind( "declination" ) < iTemp.size() )
+		else if( iTemp.rfind( "declination" ) < iTemp.size() && !( iTemp.rfind( "overwritedb_declination" ) < iTemp.size() ) )
 		{
 			fRunPara->fTargetDec = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
+		// target ra [J2000] overwrite DB
+		else if( iTemp.rfind( "overwritedb_declination" ) < iTemp.size() )
+		{
+			fTargetDec_overwriteDB = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
 		// target ra [J2000]
-		else if( iTemp.rfind( "rightascension" ) < iTemp.size() )
+		else if( iTemp.rfind( "rightascension" ) < iTemp.size() && !( iTemp.rfind( "overwritedb_rightascension" ) < iTemp.size() ) )
 		{
 			fRunPara->fTargetRA = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
+		// target ra [J2000] overwrite DB
+		else if( iTemp.rfind( "overwritedb_rightascension" ) < iTemp.size() )
+		{
+			fTargetRA_overwriteDB = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
 		// target declination offset [J2000]
 		else if( iTemp.rfind( "decoffset" ) < iTemp.size() )
@@ -604,17 +539,20 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			fRunPara->fTargetRAOffset = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
 		// target name
-		else if( iTemp.rfind( "target" ) < iTemp.size() )
+		else if( iTemp.rfind( "target" ) < iTemp.size() && !( iTemp.rfind( "overwritedb_target" ) < iTemp.size() ) )
 		{
+			fRunPara->fTargetName = "";
 			if( iTemp2.size() > 0 )
 			{
 				fRunPara->fTargetName = iTemp2;
 				i++;
 			}
-			else
-			{
-				fRunPara->fTargetName = "";
-			}
+		}
+		// target name (overwrite DB)
+		else if( iTemp.rfind( "overwritedb_target" ) < iTemp.size() && iTemp2.size() > 0 )
+		{
+			fTargetName_overwriteDB = iTemp2;
+			i++;
 		}
 		// these two command line settings might be overwritten by values read from the data base
 		// wobble offset NORTH
@@ -705,21 +643,6 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			{
 				fRunPara->fDBTrackingCorrections = "";
 				cout << "no date for T-Point correction given" << endl;
-				return false;
-			}
-		}
-		else if( iTemp.rfind( "-pointingmonitortxt" ) < iTemp.size() )
-		{
-			if( iTemp2.size() > 0 )
-			{
-				fRunPara->fPMTextFileDirectory = iTemp2;
-				fRunPara->fDBTracking = true;
-				i++;
-			}
-			else
-			{
-				fRunPara->fPMTextFileDirectory = "";
-				cout << "no pointing monitor text file directory give" << endl;
 				return false;
 			}
 		}
@@ -839,7 +762,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				if( !fRunPara->setDirectory_EVNDISPCalibrationData( iTemp2 ) )
 				{
 					cout << "exiting..." << endl;
-                    exit( EXIT_FAILURE );
+					exit( EXIT_FAILURE );
 				}
 				i++;
 			}
@@ -857,16 +780,16 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->foutputfileName = "";
 			}
 		}
-        else if( iTemp.find( "highres" ) < iTemp.size() )
+		else if( iTemp.find( "highres" ) < iTemp.size() )
 		{
 			fRunPara->fh = ( unsigned int )( 833 );
 			fRunPara->fw = ( unsigned int )( 1250 );
 		}
-        else if( iTemp.find( "hdhres" ) < iTemp.size() )
-        {
-            fRunPara->fh = ( unsigned int )( 833 * 1.5 );
-            fRunPara->fw = ( unsigned int )( 1250 * 1.5 );
-        }
+		else if( iTemp.find( "hdhres" ) < iTemp.size() )
+		{
+			fRunPara->fh = ( unsigned int )( 833 * 1.5 );
+			fRunPara->fw = ( unsigned int )( 1250 * 1.5 );
+		}
 		else if( iTemp.find( "telenoff" ) < iTemp.size() )
 		{
 			fRunPara->ftelescopeNOffset = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -963,7 +886,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				}
 				i++;
 			}
-                }
+		}
 		else if( iTemp.find( "tracelib" ) < iTemp.size() )
 		{
 			if( iTemp2.size() > 0 )
@@ -1036,22 +959,26 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fWriteExtraCalibTree = true;
 		}
+		else if( iTemp.rfind( "writeimagepixellist" ) < iTemp.size() )
+		{
+			fRunPara->fWriteImagePixelList = true;
+		}
 		else if( i > 1 )
 		{
 			cout << "unknown command line parameter: " << iTemp << endl;
 			cout << "exiting..." << endl;
-            exit( EXIT_FAILURE );
+			exit( EXIT_FAILURE );
 		}
 	}
 	
 	// test and adjust some parameters
 	test_and_adjustParams();
-
-        // read trace amplitude corrections
-        if( fRunPara->ftraceamplitudecorrectionFile.size() > 0 )
-        {
-                readTraceAmplitudeCorrections( fRunPara->ftraceamplitudecorrectionFile );
-        }
+	
+	// read trace amplitude corrections
+	if( fRunPara->ftraceamplitudecorrectionFile.size() > 0 )
+	{
+		readTraceAmplitudeCorrections( fRunPara->ftraceamplitudecorrectionFile );
+	}
 	
 	
 	return true;
@@ -1110,6 +1037,7 @@ void VReadRunParameter::test_and_adjustParams()
 	{
 		fRunPara->fDBTracking = false;
 		fRunPara->fuseDB = false;
+		fRunPara->fDBTextDirectory = "";
 		fRunPara->fL2TimeCorrect = false;
 		fRunPara->fDBCameraRotationMeasurements = false;
 		// this is for example required for Grisudet sims, when low gains are read from
@@ -1125,10 +1053,10 @@ void VReadRunParameter::test_and_adjustParams()
 	if( fRunPara->getObservatory().find( "cta" ) != string::npos || fRunPara->getObservatory().find( "CTA" ) != string::npos
 			|| fRunPara->getObservatory().find( "agis" ) != string::npos || fRunPara->getObservatory().find( "AGIS" ) != string::npos )
 	{
-        // no special channels allowed (e.g. L2 timing channels)
+		// no special channels allowed (e.g. L2 timing channels)
 		fRunPara->fsetSpecialChannels = "";
-        fRunPara->fthroughputCorrectionFile = "";
-        // no dead channels allowed
+		fRunPara->fthroughputCorrectionFile = "";
+		// no dead channels allowed
 		fRunPara->fDeadChannelFile = "";
 	}
 	
@@ -1176,7 +1104,6 @@ void VReadRunParameter::test_and_adjustParams()
 			fRunPara->fcalibrationfile = "";
 		}
 		fRunPara->fDBTracking = false;
-		//        fRunPara->fuseDB = false;
 		fRunPara->fcalibrationrun = true;
 	}
 	if( fRunPara->frunmode != 1 && fRunPara->frunmode != 6 )
@@ -1276,100 +1203,10 @@ void VReadRunParameter::test_and_adjustParams()
 	/////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////
 	// read run info from database
-    // (some values can be overwritten by the command line)
+	// (some values can be overwritten by the command line)
 	if( fRunPara->fuseDB )
 	{
-		VDBRunInfo i_DBinfo( fRunPara->frunnumber, fRunPara->getDBServer(), fRunPara->fNTelescopes );
-		if( i_DBinfo.isGood() )
-		{
-			fRunPara->fTargetName = i_DBinfo.getTargetName();
-			// DB coordinates are in J2000
-			fRunPara->fTargetDec = i_DBinfo.getTargetDec();
-			fRunPara->fTargetRA = i_DBinfo.getTargetRA();
-			if( fWobbleNorth_overwriteDB < -9998. )
-			{
-				fRunPara->fWobbleNorth = i_DBinfo.getWobbleNorth();
-			}
-			else
-			{
-				fRunPara->fWobbleNorth = fWobbleNorth_overwriteDB;
-				cout << "VReadRunParameter::test_and_adjustParams() info: overwriting DB wobble north (";
-				cout << i_DBinfo.getWobbleNorth() << " deg)";
-				cout << "with command line value: " << fWobbleNorth_overwriteDB << " deg" << endl;
-			}
-			if( fWobbleEast_overwriteDB < -9998. )
-			{
-				fRunPara->fWobbleEast = i_DBinfo.getWobbleEast();
-			}
-			else
-			{
-				fRunPara->fWobbleEast = fWobbleEast_overwriteDB;
-				cout << "VReadRunParameter::test_and_adjustParams() info: overwriting DB wobble east (";
-				cout << i_DBinfo.getWobbleEast() << " deg)";
-				cout << "with command line value: " << fWobbleEast_overwriteDB << " deg" << endl;
-			}
-			fRunPara->fDBRunType = i_DBinfo.getRunType();
-			fRunPara->fDBRunStartTimeSQL = i_DBinfo.getDataStartTimeSQL();
-			fRunPara->fDBRunStoppTimeSQL = i_DBinfo.getDataStoppTimeSQL();
-			fRunPara->fDBDataStartTimeMJD = i_DBinfo.getDataStartTimeMJD();
-			fRunPara->fDBDataStoppTimeMJD = i_DBinfo.getDataStoppTimeMJD();
-			fRunPara->fDBDataStartTimeSecOfDay = i_DBinfo.getDataStartTime();
-			fRunPara->fDBDataStoppTimeSecOfDay = i_DBinfo.getDataStoppTime();
-			fRunPara->fRunDuration = ( float )i_DBinfo.getDuration();
-			if( fTelToAna == 0 )
-			{
-				fTelToAna = i_DBinfo.getTelToAna();
-			}
-			// get source file from run number (if run number is given and no sourcefile)
-			if( fRunPara->fsourcefile.size() < 1 )
-			{
-				char iname[5000];
-				// set raw data directories
-				if( fRunPara->getDirectory_VBFRawData().size() > 0 )
-				{
-					sprintf( iname, "%s/d%d/%d.cvbf", fRunPara->getDirectory_VBFRawData().c_str(), i_DBinfo.getRunDate(), fRunPara->frunnumber );
-					if( gSystem->AccessPathName( iname ) )
-					{
-						sprintf( iname, "%s/data/d%d/%d.cvbf", fRunPara->getDirectory_VBFRawData().c_str(), i_DBinfo.getRunDate(), fRunPara->frunnumber );
-					}
-				}
-				else
-				{
-					sprintf( iname, "data/d%d/%d.cvbf", i_DBinfo.getRunDate(), fRunPara->frunnumber );
-					cout << iname << endl;
-				}
-				fRunPara->fsourcefile = iname;
-			}
-			
-			// get laser runs
-			if( fRunPara->frunmode != 2 && fRunPara->frunmode != 5 )
-			{
-				vector< unsigned int > iL = i_DBinfo.getLaserRun();
-				if( iL.size() != fRunPara->fNTelescopes )
-				{
-                    cout << "VReadRunParameter::test_and_adjustParams() error: list of laser file has wrong length ";
-                    cout << iL.size() << "\t" << fRunPara->fNTelescopes << endl;
-                    exit( EXIT_FAILURE );
-				}
-				else
-				{
-					for( unsigned int i = 0; i < iL.size(); i++ )
-					{
-						fRunPara->fGainFileNumber[i] = ( int )iL[i];
-						fRunPara->fTOffFileNumber[i] = ( int )iL[i];
-					}
-				}
-			}
-			
-			i_DBinfo.print();
-		}
-		else
-		{
-			cout << endl;
-			cout << "FATAL ERROR: cannot connect to VERITAS database" << endl;
-			cout << "exiting..." << endl;
-			exit( EXIT_FAILURE );
-		}
+		read_db_runinfo();
 	}
 	if( !readEpochsAndAtmospheres() )
 	{
@@ -1386,7 +1223,7 @@ void VReadRunParameter::test_and_adjustParams()
 		cout << "\t - source file does not exist" << endl;
 		cout << "\t - eventdisplay was compiled without database support and couldn't find corresponding data directory" << endl;
 		cout << "exit...." << endl;
-        exit( EXIT_FAILURE );
+		exit( EXIT_FAILURE );
 	}
 	
 	if( fRunPara->fsourcefile.find( "vbf" ) < fRunPara->fsourcefile.size() && fRunPara->fsourcetype == 0 )
@@ -1400,17 +1237,8 @@ void VReadRunParameter::test_and_adjustParams()
 		if( fRunPara->fsourcefile.find( ".gz" ) < fRunPara->fsourcefile.size() || fRunPara->fsourcefile.find( ".bz2" ) < fRunPara->fsourcefile.size() )
 		{
 			cout << "error: cannot read gzipped or bzipped files" << endl;
-            exit( EXIT_FAILURE );
+			exit( EXIT_FAILURE );
 		}
-	}
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// can't apply T-point corrections to pointing monitor data
-	if( fRunPara->fDBTrackingCorrections.size() > 0 && fRunPara->fPMTextFileDirectory.size() > 0 )
-	{
-		cout << "error: can't apply T-point corrections to pointing monitor data" << endl;
-		cout << "exiting..." << endl;
-		exit( -1 );
 	}
 	
 	// switch of display in calibration and dst mode
@@ -1525,9 +1353,9 @@ void VReadRunParameter::test_and_adjustParams()
 			fRunPara->fsumwindow_2.push_back( fRunPara->fsumwindow_2[0] );
 			fRunPara->fsumwindow_pass1.push_back( fRunPara->fsumwindow_pass1[0] );
 			fRunPara->fsumfirst.push_back( fRunPara->fsumfirst[0] );
-            fRunPara->fSearchWindowLast.push_back( fRunPara->fSearchWindowLast[0] );
+			fRunPara->fSearchWindowLast.push_back( fRunPara->fSearchWindowLast[0] );
 			fRunPara->fTraceWindowShift.push_back( fRunPara->fTraceWindowShift[0] );
-            fRunPara->fsumfirst_startingMethod.push_back( fRunPara->fsumfirst_startingMethod[0] );
+			fRunPara->fsumfirst_startingMethod.push_back( fRunPara->fsumfirst_startingMethod[0] );
 			fRunPara->fTraceIntegrationMethod.push_back( fRunPara->fTraceIntegrationMethod[0] );
 			fRunPara->fTraceIntegrationMethod_pass1.push_back( fRunPara->fTraceIntegrationMethod_pass1[0] );
 			fRunPara->fLogLikelihoodLoss_min.push_back( fRunPara->fLogLikelihoodLoss_min[0] );
@@ -1645,22 +1473,14 @@ void VReadRunParameter::test_and_adjustParams()
 		exit( -1 );
 	}
 	// set trace window shift to zero for fixed window start
-    for( unsigned int t = 0; t < fRunPara->fsumfirst_startingMethod.size(); t++ )
-    {
-        if( fRunPara->fsumfirst_startingMethod[t] == 0 )
+	for( unsigned int t = 0; t < fRunPara->fsumfirst_startingMethod.size(); t++ )
+	{
+		if( fRunPara->fsumfirst_startingMethod[t] == 0 )
 		{
 			fRunPara->fTraceWindowShift[t] = 0;
 		}
 	}
 	
-	//don't start frogs analysis unless it's a 4-Telescope run
-	if( fRunPara->ffrogsmode && fRunPara->fTelToAnalyze.size() != 4 )
-	{
-		cout << "Error: You requested a frogs analysis for " << fRunPara->fTelToAnalyze.size() << " telescopes; will only do frogs analysis for exactly 4 telescopes!" << endl;
-		exit( EXIT_FAILURE );  
-	}
-
-
 	if( fPrintOutputFile )
 	{
 		cout << fRunPara->foutputfileName << endl;
@@ -1668,6 +1488,22 @@ void VReadRunParameter::test_and_adjustParams()
 	}
 	
 	printStartMessage();
+}
+
+/*
+ * Check if overwrite parameter is given - return value dependent on this result
+ *
+ */
+double VReadRunParameter::setParameterOverwrite( string ipar_name, double ipar_db, double ipar_db_overwrite )
+{
+	if( ipar_db_overwrite > -9998. )
+	{
+		cout << "VReadRunParameter::setParameterOverwrite() info: overwriting DB parameter ";
+		cout << ipar_name << " (was " << ipar_db << ")";
+		cout << " with new value: " << ipar_db_overwrite << endl;
+		return ipar_db_overwrite;
+	}
+	return ipar_db;
 }
 
 void VReadRunParameter::printShortHelp()
@@ -1699,11 +1535,11 @@ void VReadRunParameter::printHelp()
 	cout << endl;
 	if( gSystem->Getenv( "EVNDISPSYS" ) )
 	{
-        int syst_ret = system( "cat $EVNDISPSYS/README/README.EVNDISP" );
-        if( syst_ret == -1 )
-        {
-            cout << "VReadRunParameter::printHelp() error: could not find helper file in README directory" << endl;
-        }
+		int syst_ret = system( "cat $EVNDISPSYS/README/README.EVNDISP" );
+		if( syst_ret == -1 )
+		{
+			cout << "VReadRunParameter::printHelp() error: could not find helper file in README directory" << endl;
+		}
 	}
 	else
 	{
@@ -1733,14 +1569,14 @@ void VReadRunParameter::setDirectories()
 		{
 			if( gSystem->mkdir( fRunPara->getDirectory_EVNDISPOutput().c_str() ) != 0 )
 			{
-                // check again if the directory exists - might have been created
-                // by another job in the meanwhile
-                if( !gSystem->cd( fRunPara->getDirectory_EVNDISPOutput().c_str() ) )
-                {
-                    cout << "VReadRunParameter::test_and_adjustParams() warning: unable to create output directory: " << endl;
-                    cout <<  fRunPara->getDirectory_EVNDISPOutput() << endl;
-                    exit( EXIT_FAILURE );
-                }
+				// check again if the directory exists - might have been created
+				// by another job in the meanwhile
+				if( !gSystem->cd( fRunPara->getDirectory_EVNDISPOutput().c_str() ) )
+				{
+					cout << "VReadRunParameter::test_and_adjustParams() warning: unable to create output directory: " << endl;
+					cout <<  fRunPara->getDirectory_EVNDISPOutput() << endl;
+					exit( EXIT_FAILURE );
+				}
 			}
 			else
 			{
@@ -1755,21 +1591,21 @@ void VReadRunParameter::setDirectories()
 	{
 		for( unsigned int i = 0; i < fRunPara->fNTelescopes; i++ )
 		{
-            sprintf( i_text, "%s/Tel_%d/", fRunPara->getDirectory_EVNDISPCalibrationData_perRun().c_str(), i + 1 );
+			sprintf( i_text, "%s/Tel_%d/", fRunPara->getDirectory_EVNDISPCalibrationData_perRun().c_str(), i + 1 );
 			if( gSystem->AccessPathName( i_text ) )
 			{
 				cout << "\t creating calibration directory for Telescope " << i + 1 << " : " << i_text << endl;
 				if( gSystem->mkdir( i_text, kTRUE ) != 0 )
 				{
-                    // possibilitiy that many jobs try to do the same thing; repeat after sleep
-                    gSystem->Sleep( gRandom->Uniform( 10., 60 ) );
-                    if( gSystem->mkdir( i_text, kTRUE ) != 0 )
-                    {
-                        cout << "VReadRunParameter::test_and_adjustParams() error: unable to create calibration directory for Telescope ";
-                        cout << i + 1 << ": " << endl;
-                        cout << i_text << endl;
-                        exit( EXIT_FAILURE );
-                    }
+					// possibilitiy that many jobs try to do the same thing; repeat after sleep
+					gSystem->Sleep( gRandom->Uniform( 10., 60 ) );
+					if( gSystem->mkdir( i_text, kTRUE ) != 0 )
+					{
+						cout << "VReadRunParameter::test_and_adjustParams() error: unable to create calibration directory for Telescope ";
+						cout << i + 1 << ": " << endl;
+						cout << i_text << endl;
+						exit( EXIT_FAILURE );
+					}
 				}
 			}
 		}
@@ -1788,7 +1624,7 @@ void VReadRunParameter::isCompiledWithDB()
 	cout << endl;
 	cout << "       uncomment line 'DBFLAG=-DRUNWITHDB' in Makefile to compile eventdisplay with mysql support" << endl;
 	cout << "#########################################################################################" << endl;
-	exit( 0 );
+	exit( EXIT_FAILURE );
 #endif
 }
 
@@ -1830,6 +1666,7 @@ bool VReadRunParameter::getRunParametersFromDST()
 		fRunPara->fIsMC = 0;
 	}
 	fRunPara->fuseDB = false;
+	fRunPara->fDBTextDirectory = "";
 	fRunPara->fDBTracking = false;
 	VEvndispRunParameter* iV = ( VEvndispRunParameter* )iF.Get( "runparameterDST" );
 	if( !iV )
@@ -1922,82 +1759,82 @@ bool VReadRunParameter::checkSecondArgument( string iPara1, string iPara2, bool 
 
 bool VReadRunParameter::readTraceAmplitudeCorrections( string ifile )
 {
-       if( ifile.size() == 0 )
-       {
-            return true;
-       }
-       string iEpoch = fRunPara->getInstrumentEpoch();
-       string iDirectory = fRunPara->getDirectory_EVNDISPParameterFiles();
-       ifile = iDirectory + "/" + ifile;
-       ifstream is;
-       is.open( ifile.c_str(), ifstream::in );
-       if( !is )
-       {
-            cout << "error reading amplitude correction for telescope from " << ifile << endl;
-            return false;
-       }
-       cout << "reading amplitude correction from: ";
-       cout << ifile << endl;
-
-       fRunPara->fthroughoutCorrectionSFactor.clear();
-
-       string is_line;
-       string is_temp;
-       while( getline( is, is_line ) )
-       {
-            if( is_line.size() <= 0 )
-            {
-                    continue;
-            }
-            if( is_line.substr( 0, 1 ) != "*" )
-            {
-                    continue;
-            }
-            
-            istringstream is_stream( is_line );
-            is_stream >> is_temp;
-
-            // check epoch
-            is_stream >> is_temp;
-            if( is_temp == "s" )
-            {
-                is_stream >> is_temp;
-                if( is_temp == iEpoch )
-                {
-                    double iSFactor = 1.;
-                    while( !is_stream.eof() )
-                    {
-                        is_stream >> iSFactor;
-                        fRunPara->fthroughoutCorrectionSFactor.push_back( iSFactor );
-                    };
-                }
-            }
-            else if( is_temp == "G" )
-            {
-                is_stream >> is_temp;
-                if( is_temp == iEpoch )
-                {
-                    double iGFactor = 1.;
-                    while( !is_stream.eof() )
-                    {
-                        is_stream >> iGFactor;
-                        fRunPara->fthroughoutCorrectionGFactor.push_back( iGFactor );
-                    };
-                }
-            }
-       }
-       cout << "\t amplitude scaling s-factors: ";
-       for( unsigned int i = 0; i < fRunPara->fthroughoutCorrectionSFactor.size(); i++ )
-       {
-           cout << "T" << i+1 << ": " << fRunPara->fthroughoutCorrectionSFactor[i] << " ";
-       }
-       cout << endl;
-       cout << "\t amplitude scaling G-factors: ";
-       for( unsigned int i = 0; i < fRunPara->fthroughoutCorrectionGFactor.size(); i++ )
-       {
-           cout << "T" << i+1 << ": " << fRunPara->fthroughoutCorrectionGFactor[i] << " ";
-       }
-       return true;
+	if( ifile.size() == 0 )
+	{
+		return true;
+	}
+	string iEpoch = fRunPara->getInstrumentEpoch();
+	string iDirectory = fRunPara->getDirectory_EVNDISPParameterFiles();
+	ifile = iDirectory + "/" + ifile;
+	ifstream is;
+	is.open( ifile.c_str(), ifstream::in );
+	if( !is )
+	{
+		cout << "error reading amplitude correction for telescope from " << ifile << endl;
+		return false;
+	}
+	cout << "reading amplitude correction from: ";
+	cout << ifile << endl;
+	
+	fRunPara->fthroughoutCorrectionSFactor.clear();
+	
+	string is_line;
+	string is_temp;
+	while( getline( is, is_line ) )
+	{
+		if( is_line.size() <= 0 )
+		{
+			continue;
+		}
+		if( is_line.substr( 0, 1 ) != "*" )
+		{
+			continue;
+		}
+		
+		istringstream is_stream( is_line );
+		is_stream >> is_temp;
+		
+		// check epoch
+		is_stream >> is_temp;
+		if( is_temp == "s" )
+		{
+			is_stream >> is_temp;
+			if( is_temp == iEpoch )
+			{
+				double iSFactor = 1.;
+				while( !is_stream.eof() )
+				{
+					is_stream >> iSFactor;
+					fRunPara->fthroughoutCorrectionSFactor.push_back( iSFactor );
+				};
+			}
+		}
+		else if( is_temp == "G" )
+		{
+			is_stream >> is_temp;
+			if( is_temp == iEpoch )
+			{
+				double iGFactor = 1.;
+				while( !is_stream.eof() )
+				{
+					is_stream >> iGFactor;
+					fRunPara->fthroughoutCorrectionGFactor.push_back( iGFactor );
+				};
+			}
+		}
+	}
+	cout << "\t amplitude scaling s-factors: ";
+	for( unsigned int i = 0; i < fRunPara->fthroughoutCorrectionSFactor.size(); i++ )
+	{
+		cout << "T" << i + 1 << ": " << fRunPara->fthroughoutCorrectionSFactor[i] << " ";
+	}
+	cout << endl;
+	cout << "\t amplitude scaling G-factors: ";
+	for( unsigned int i = 0; i < fRunPara->fthroughoutCorrectionGFactor.size(); i++ )
+	{
+		cout << "T" << i + 1 << ": " << fRunPara->fthroughoutCorrectionGFactor[i] << " ";
+	}
+	return true;
 }
 
 
@@ -2021,22 +1858,107 @@ bool VReadRunParameter::readEpochsAndAtmospheres()
 	cout << endl;
 	cout << "========================================" << endl;
 	cout << "reading epoch for given run and date from " << fRunPara->fEpochFile << endl;
-        if( fRunPara->fInstrumentEpoch == "noepoch" )
-        {
-            fRunPara->updateInstrumentEpochFromFile( fRunPara->fEpochFile, true );
-        }
-        else
-        {
-	    cout << "   (epoch is set from command line - ignoring values in epoch parameter file" << endl;
-        }
-	if( fRunPara->fAtmosphereID == 0 )
-        {
-           fRunPara->updateInstrumentEpochFromFile( fRunPara->fEpochFile, false );
-        }
-        else
+	if( fRunPara->fInstrumentEpoch == "noepoch" )
 	{
-	    cout << "   (atmosphere ID is set from command line - ignoring values in epoch parameter file" << endl;
+		fRunPara->updateInstrumentEpochFromFile( fRunPara->fEpochFile, true );
+	}
+	else
+	{
+		cout << "   (epoch is set from command line - ignoring values in epoch parameter file" << endl;
+	}
+	if( fRunPara->fAtmosphereID == 0 )
+	{
+		fRunPara->updateInstrumentEpochFromFile( fRunPara->fEpochFile, false );
+	}
+	else
+	{
+		cout << "   (atmosphere ID is set from command line - ignoring values in epoch parameter file" << endl;
 	}
 	
 	return true;
+}
+
+void VReadRunParameter::read_db_runinfo()
+{
+	VDBRunInfo i_DBinfo( fRunPara->frunnumber,
+						 fRunPara->getDBServer(),
+						 fRunPara->fNTelescopes,
+						 fRunPara->fDBTextDirectory );
+	if( i_DBinfo.isGood() )
+	{
+		fRunPara->fTargetName = i_DBinfo.getTargetName();
+		if( fTargetName_overwriteDB.size() > 0 )
+		{
+			fRunPara->fTargetName = fTargetName_overwriteDB;
+			cout << "VReadRunParameter::setParameterOverwrite() info: overwriting DB target name";
+			cout << " (" << i_DBinfo.getTargetName() << ")  by " << fRunPara->fTargetName << endl;
+		}
+		// DB coordinates are in J2000
+		fRunPara->fTargetDec =  setParameterOverwrite( "fTargetDec", i_DBinfo.getTargetDec(), fTargetDec_overwriteDB );
+		fRunPara->fTargetRA =  setParameterOverwrite( "fTargetRA", i_DBinfo.getTargetRA(), fTargetRA_overwriteDB );
+		fRunPara->fWobbleNorth = setParameterOverwrite( "fWobbleNorth", i_DBinfo.getWobbleNorth(), fWobbleNorth_overwriteDB );
+		fRunPara->fWobbleEast = setParameterOverwrite( "fWobbleEast", i_DBinfo.getWobbleEast(), fWobbleEast_overwriteDB );
+		
+		fRunPara->fDBRunType = i_DBinfo.getRunType();
+		fRunPara->fDBRunStartTimeSQL = i_DBinfo.getDataStartTimeSQL();
+		fRunPara->fDBRunStoppTimeSQL = i_DBinfo.getDataStoppTimeSQL();
+		fRunPara->fDBDataStartTimeMJD = i_DBinfo.getDataStartTimeMJD();
+		fRunPara->fDBDataStoppTimeMJD = i_DBinfo.getDataStoppTimeMJD();
+		fRunPara->fDBDataStartTimeSecOfDay = i_DBinfo.getDataStartTime();
+		fRunPara->fDBDataStoppTimeSecOfDay = i_DBinfo.getDataStoppTime();
+		fRunPara->fRunDuration = ( float )i_DBinfo.getDuration();
+		if( fTelToAna == 0 )
+		{
+			fTelToAna = i_DBinfo.getTelToAna();
+		}
+		// get source file from run number (if run number is given and no sourcefile)
+		if( fRunPara->fsourcefile.size() < 1 )
+		{
+			char iname[5000];
+			// set raw data directories
+			if( fRunPara->getDirectory_VBFRawData().size() > 0 )
+			{
+				sprintf( iname, "%s/d%d/%d.cvbf", fRunPara->getDirectory_VBFRawData().c_str(), i_DBinfo.getRunDate(), fRunPara->frunnumber );
+				if( gSystem->AccessPathName( iname ) )
+				{
+					sprintf( iname, "%s/data/d%d/%d.cvbf", fRunPara->getDirectory_VBFRawData().c_str(), i_DBinfo.getRunDate(), fRunPara->frunnumber );
+				}
+			}
+			else
+			{
+				sprintf( iname, "data/d%d/%d.cvbf", i_DBinfo.getRunDate(), fRunPara->frunnumber );
+				cout << iname << endl;
+			}
+			fRunPara->fsourcefile = iname;
+		}
+		
+		// get laser runs
+		if( fRunPara->frunmode != 2 && fRunPara->frunmode != 5 )
+		{
+			vector< unsigned int > iL = i_DBinfo.getLaserRun();
+			if( iL.size() != fRunPara->fNTelescopes )
+			{
+				cout << "VReadRunParameter::test_and_adjustParams() error: list of laser file has wrong length ";
+				cout << iL.size() << "\t" << fRunPara->fNTelescopes << endl;
+				exit( EXIT_FAILURE );
+			}
+			else
+			{
+				for( unsigned int i = 0; i < iL.size(); i++ )
+				{
+					fRunPara->fGainFileNumber[i] = ( int )iL[i];
+					fRunPara->fTOffFileNumber[i] = ( int )iL[i];
+				}
+			}
+		}
+		
+		i_DBinfo.print();
+	}
+	else
+	{
+		cout << endl;
+		cout << "FATAL ERROR: cannot connect to VERITAS database" << endl;
+		cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
+	}
 }

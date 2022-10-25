@@ -1,7 +1,7 @@
 /*! \class VCamera
     \brief camera plotting routines
 
-    \author Gernot Maier
+
 */
 
 #include "VCamera.h"
@@ -36,7 +36,6 @@ VCamera::VCamera( unsigned int iTel, VEvndispData* iData )
 	fData->initializeDataReader();
 	
 	// get a nicer color palette and get some informations about colors/contours
-	
 	gStyle->SetPalette( 1 );
 	gStyle->SetNumberContours( 100 );
 	fncolors = gStyle->GetNumberOfColors();
@@ -247,11 +246,11 @@ void VCamera::setUpCamera()
 	fTextEventPlotPaper->SetTextFont( 42 );
 	fTextEventPlotPaper->SetTextSize( i_TextSize * 2 );
 	// camera scale axis (left+top)
-	fCameraXaxis = new TGaxis( convertX( -1.* fdist_edgeX ) , 0.97, convertX( fdist_edgeX ), 0.97, -1.*fdist_edgeX, fdist_edgeX, 510, "+L" );
+	fCameraXaxis = new TGaxis( convertX( -1.* fdist_edgeX ), 0.97, convertX( fdist_edgeX ), 0.97, -1.*fdist_edgeX, fdist_edgeX, 510, "+L" );
 	fCameraXaxis->SetLabelSize( 0.02 );
 	fCameraXaxis->SetLineColor( 42 );
 	fCameraXaxis->SetLabelColor( 42 );
-	fCameraYaxis = new TGaxis( 0.96, convertY( -1. * fdist_edgeY ) , 0.96, convertY( fdist_edgeY ), -1. * fdist_edgeY, fdist_edgeY, 510, "+L" );
+	fCameraYaxis = new TGaxis( 0.96, convertY( -1. * fdist_edgeY ), 0.96, convertY( fdist_edgeY ), -1. * fdist_edgeY, fdist_edgeY, 510, "+L" );
 	fCameraYaxis->SetLabelSize( 0.02 );
 	fCameraYaxis->SetLineColor( 43 );
 	fCameraYaxis->SetLabelColor( 43 );
@@ -476,22 +475,6 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
 			case C_TRIGGER_EVNDISP:
 				setPMTColorOnOff( fData->getTrigger(), fColorTrigger, fColorTrigger, fFillStylePos );
 				break;
-			case C_TEMPLATE:
-				if( fData->getRunParameter()->ffrogsmode == 1 )
-				{
-					setPMTColorScheme( fData->getTemplateMu(), false,  -1.0, 1.1 * fData->getTemplateMuMax(), "photons [p.e.]", false );
-				}
-				break;
-			case C_MODEL3D:
-				if( fData->getRunParameter()->fUseDisplayModel3D )
-				{
-					double minSum = 0;
-					double maxSum = 0;
-					getMinMax( fData->getSums(), minSum, maxSum );
-					setPMTColorScheme( fData->getModel3DMu(), false,  minSum, maxSum, "Model3D signal [d.c.]", false );
-					setPMTColorOff( fData->getModel3DClean() );
-				}
-				break;
 				
 			default:
 				break;
@@ -659,7 +642,7 @@ void VCamera::setPMTColorForChargeTiming()
 		fPMTData[i] = fData->getSums()[i];
 	}
 	// rescale data to maximum values of 1
-	fPMTData = rescaleSums( fPMTData , false );
+	fPMTData = rescaleSums( fPMTData, false );
 	
 	// all colors > 10 are greyish/brown. Start at 1 again
 	int iTelescopeColor = ( fTelescope % 10 ) + 1;
@@ -838,13 +821,15 @@ void VCamera::drawEventText()
 	// big letters for plotpaper options
 	if( fPlotPaper && fTelescope == fData->getTeltoAna()[0] )
 	{
-		sprintf( iText, "Run: %d Event: %d", fData->getRunNumber(), int( fData->getReader()->getEventNumber() ) );
+		stringstream i_stext;
+		i_stext <<  "Run: " << fData->getRunNumber();
+		i_stext << "Event: " << int( fData->getReader()->getEventNumber() );
 		if( fCurrentTimeSlice >= 0 )
 		{
-			sprintf( iText, "%s FADC %d", iText, fCurrentTimeSlice );
+			i_stext << "FADC " << fCurrentTimeSlice;
 		}
 		fTextEventPlotPaper->SetNDC( true );
-		fTextEventPlotPaper->SetTitle( iText );
+		fTextEventPlotPaper->SetTitle( i_stext.str().c_str() );
 		fTextEventPlotPaper->DrawLatex( 0.02, 0.95, fTextEventPlotPaper->GetTitle() );
 	}
 	
@@ -868,22 +853,23 @@ void VCamera::drawEventText()
 #endif
 	fTextEvent[0]->SetTitle( iText );
 	// get local trigger list
+	stringstream i_stext;
 	if( fBoolAllinOne )
 	{
-		sprintf( iText, "local trigger: " );
+		i_stext << "local trigger: ";
 		for( unsigned int t = 0; t < fData->getNTel(); t++ )
 		{
 			if( fData->getReader()->hasLocalTrigger( t ) )
 			{
-				sprintf( iText, "%s %d", iText, t + 1 );
+				i_stext << " " << t + 1;
 			}
 		}
 	}
 	else
 	{
-		sprintf( iText, "Max channel %d", int( fData->getReader()->getMaxChannels() ) );
+		i_stext << "Max channel " << int( fData->getReader()->getMaxChannels() ) << endl;
 	}
-	fTextEvent[1]->SetTitle( iText );
+	fTextEvent[1]->SetTitle( i_stext.str().c_str() );
 	sprintf( iText, "Num Samples %d", int( fData->getNSamples() ) );
 	fTextEvent[2]->SetTitle( iText );
 	sprintf( iText, "Num Trigger %d", fData->getReader()->getNumberofFullTrigger() );
@@ -1045,7 +1031,7 @@ void VCamera::setPMTColorScheme( valarray<unsigned int> v_value, bool i_select, 
    \par zmin     minimum value of color scheme axis
    \par zmax     maximum value of color scheme axis (if zmin=100.&&zmax=0. then min/max values are taken from v_value)
    \par i_axisTitle title of color axis
-   \par i_scale
+   \par i_scale  scale size of circle draw according to type (image, border, etc)
    \par i_DrawDead  draw contents of dead channels
 
 */
@@ -1684,13 +1670,6 @@ void VCamera::drawAnaResults()
 				fMCShowerDir->SetMarkerColor( 1 );
 				fMCShowerDir->SetMarkerSize( 2. );
 				fMCShowerDir->Draw();
-			}
-			if( fData->getRunParameter()->fUseDisplayModel3D )
-			{
-				fModel3DShowerDir = new TMarker( 0, 0, 29 );
-				fModel3DShowerDir->SetMarkerColor( 3 );
-				fModel3DShowerDir->SetMarkerSize( 2. );
-				fModel3DShowerDir->Draw();
 			}
 			// camera center
 			fCameraCentreDir = new TMarker( convertX( 0. ), convertY( 0. ), 5 );

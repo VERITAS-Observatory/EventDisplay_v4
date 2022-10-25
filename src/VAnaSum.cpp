@@ -92,7 +92,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 	
 	if( fAnalysisRunMode != 1 )
 	{
-        fRunPara->getEventdisplayRunParameter( fDatadir );
+		fRunPara->getEventdisplayRunParameter( fDatadir );
 	}
 	fNumTels = fRunPara->getMaxNumberofTelescopes();
 	fTelOffset = 0;
@@ -142,7 +142,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 	///////////////////////////////////////////////////////////////////////////////////////////
 	if( fAnalysisRunMode == 1 )
 	{
-        fRunPara->sortRunList();
+		fRunPara->sortRunList();
 		// loop over all files in run list and copy histograms
 		for( unsigned int j = 0; j < fRunPara->fRunList.size(); j++ )
 		{
@@ -303,20 +303,20 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 						TTree* newtreek = kTree->CloneTree();
 						newtreek->Write();
 					}
-                                        // log information
-                                        TMacro* evndispLog = (TMacro*)oldfile->Get( "evndispLog" );
-                                        if( evndispLog )
-                                        {
-                                            fStereoRunDir[j]->cd();
-                                            evndispLog->Write( "evndispLog" );
-                                        }
-                                        TMacro* mscwTableLog = (TMacro*)oldfile->Get( "mscwTableLog" );
-                                        if( mscwTableLog )
-                                        {
-                                            fStereoRunDir[j]->cd();
-                                            mscwTableLog->Write( "mscwTableLog" );
-                                        }
-
+					// log information
+					TMacro* evndispLog = ( TMacro* )oldfile->Get( "evndispLog" );
+					if( evndispLog )
+					{
+						fStereoRunDir[j]->cd();
+						evndispLog->Write( "evndispLog" );
+					}
+					TMacro* mscwTableLog = ( TMacro* )oldfile->Get( "mscwTableLog" );
+					if( mscwTableLog )
+					{
+						fStereoRunDir[j]->cd();
+						mscwTableLog->Write( "mscwTableLog" );
+					}
+					
 				}
 				// copy VEvndispRunParameter 'runparameterV2' to anasum.root file
 				fStereoRunDir[j]->cd();
@@ -603,7 +603,7 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	// fill rate graphs by run
 	if( onrun != -1 && hStSig )
 	{
-		fRatePlots->fill( onrun, fStereoOn->getMJD( onrun ), i_sig, hStSig->GetMaximum(), i_nevts_on, i_nevts_off * 1. , i_rate );
+		fRatePlots->fill( onrun, fStereoOn->getMJD( onrun ), i_sig, hStSig->GetMaximum(), i_nevts_on, i_nevts_off * 1., i_rate );
 	}
 	
 	// rate graphs by interval
@@ -733,11 +733,11 @@ void VAnaSum::copyDirectory( TDirectory* source )
 			source->cd();
 			TObject* obj = key->ReadObj();
 			adir->cd();
-                        if( obj )
-                        {
-                            obj->Write();
-                            delete obj;
-                        }
+			if( obj )
+			{
+				obj->Write();
+				delete obj;
+			}
 		}
 	}
 	adir->SaveSelf( kTRUE );
@@ -753,8 +753,8 @@ void VAnaSum::copyDirectory( TDirectory* source )
 
 */
 void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp_off,
-		              double i_nevts_on, double i_nevts_off, double i_norm_alpha,
-			      double i_sig, double i_rate, double i_rateOFF, VOnOff* fstereo_onoff )
+							  double i_nevts_on, double i_nevts_off, double i_norm_alpha,
+							  double i_sig, double i_rate, double i_rateOFF, VOnOff* fstereo_onoff )
 {
 	if( !fRunSummary )
 	{
@@ -767,14 +767,14 @@ void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp
 	if( onrun != -1 )
 	{
 		fRunSummary->MJDOn = fStereoOn->getMJD( onrun );
-                fRunSummary->MJDrunstart = fRunPara->fMapRunList[onrun].fMJDOnStart;
-                fRunSummary->MJDrunstop = fRunPara->fMapRunList[onrun].fMJDOnStop ;
+		fRunSummary->MJDrunstart = fRunPara->fMapRunList[onrun].fMJDOnStart;
+		fRunSummary->MJDrunstop = fRunPara->fMapRunList[onrun].fMJDOnStop ;
 	}
 	else
 	{
 		fRunSummary->MJDOn = 0.;
-                fRunSummary->MJDrunstart = 0.;
-                fRunSummary->MJDrunstop = 0.;
+		fRunSummary->MJDrunstart = 0.;
+		fRunSummary->MJDrunstop = 0.;
 	}
 	if( offrun != -1 )
 	{
@@ -784,17 +784,17 @@ void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp
 	{
 		fRunSummary->MJDOff = 0.;
 	}
-        if( onrun != -1 )
-        {
-               if( fRunPara->fMapRunList[onrun].fTarget.size() < 300 )
-               {
-                    sprintf( fRunSummary->fTargetName, "%s", fRunPara->fMapRunList[onrun].fTarget.c_str() );
-               }
-               else
-               {
-                    sprintf( fRunSummary->fTargetName, "%s", fRunPara->fMapRunList[onrun].fTarget.substr( 0, 299 ).c_str() );
-               }
-        }
+	if( onrun != -1 )
+	{
+		if( fRunPara->fMapRunList[onrun].fTarget.size() < 300 )
+		{
+			sprintf( fRunSummary->fTargetName, "%s", fRunPara->fMapRunList[onrun].fTarget.c_str() );
+		}
+		else
+		{
+			sprintf( fRunSummary->fTargetName, "%s", fRunPara->fMapRunList[onrun].fTarget.substr( 0, 299 ).c_str() );
+		}
+	}
 	if( onrun != -1 && fRunPara->fMapRunList.find( onrun ) != fRunPara->fMapRunList.end() )
 	{
 		fRunSummary->fTargetRA = fRunPara->fMapRunList[onrun].fTargetRA;
@@ -866,31 +866,31 @@ void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp
 	if( onrun != -1 )
 	{
 		fRunSummary->fNTel = fRunPara->fMapRunList[onrun].fNTel;
-                for( unsigned int p = 0; p < fRunPara->fRunList.size(); p++ )
-                {
-                    stringstream iTelCombination;
-                    if( fRunPara->fRunList[p].fRunOn == onrun )
-                    {
-                        for( unsigned int t = 0; t < fRunPara->fRunList[p].fTelToAnalyze.size(); t++ )
-                        {
-                            iTelCombination << "T";
-                            iTelCombination << fRunPara->fRunList[p].fTelToAnalyze[t]+1;
-                        }
-                        if( iTelCombination.str().size() < 300 )
-                        {
-                            sprintf( fRunSummary->fTelList, "%s", iTelCombination.str().c_str() );
-                        }
-                        else
-                        {
-                            sprintf( fRunSummary->fTelList, "%s", iTelCombination.str().substr(0,299).c_str() );
-                        }
-                    }    
-                }
+		for( unsigned int p = 0; p < fRunPara->fRunList.size(); p++ )
+		{
+			stringstream iTelCombination;
+			if( fRunPara->fRunList[p].fRunOn == onrun )
+			{
+				for( unsigned int t = 0; t < fRunPara->fRunList[p].fTelToAnalyze.size(); t++ )
+				{
+					iTelCombination << "T";
+					iTelCombination << fRunPara->fRunList[p].fTelToAnalyze[t] + 1;
+				}
+				if( iTelCombination.str().size() < 300 )
+				{
+					sprintf( fRunSummary->fTelList, "%s", iTelCombination.str().c_str() );
+				}
+				else
+				{
+					sprintf( fRunSummary->fTelList, "%s", iTelCombination.str().substr( 0, 299 ).c_str() );
+				}
+			}
+		}
 	}
 	else
 	{
 		fRunSummary->fNTel = 0;
-                sprintf( fRunSummary->fTelList, "NOTSET" );
+		sprintf( fRunSummary->fTelList, "NOTSET" );
 	}
 	fRunSummary->tOn = iexp_on;
 	fRunSummary->tOff = iexp_off;
@@ -926,10 +926,10 @@ void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp
 	{
 		fRunSummary->azimuthOff = fMeanAzimuthOff;
 	}
-        if( onrun != -1 )
-        {
-            fRunSummary->fTheta2Max = fRunPara->fMapRunList[onrun].fSourceRadius;
-        }
+	if( onrun != -1 )
+	{
+		fRunSummary->fTheta2Max = fRunPara->fMapRunList[onrun].fSourceRadius;
+	}
 	if( onrun != -1 )
 	{
 		if( iexp_on > 0. )

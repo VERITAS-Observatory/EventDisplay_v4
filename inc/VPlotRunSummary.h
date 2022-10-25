@@ -6,7 +6,7 @@
 #include "CEffArea.h"
 #include "CRunSummary.h"
 
-#include "VASlalib.h"
+#include "VAstronometry.h"
 #include "VPlotUtilities.h"
 #include "VStatistics.h"
 

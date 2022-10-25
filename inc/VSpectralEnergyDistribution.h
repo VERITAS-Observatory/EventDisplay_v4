@@ -110,7 +110,7 @@ class VSpectralEnergyDistribution
 							   bool bPlotButterfly = false, double iNormError = 0., double iGammaError = 0.,
 							   int iLineColor = 1, int iLineStyle = 1 );
 		void printASCII();
-		bool readPhotoMetricBands( string ifile = "$OBS_EVNDISP_AUX_DIR/AstroData/Multiwavelengthdata/photometricBands.dat", bool iPrint = true );
+		bool readPhotoMetricBands( string ifile = "$VERITAS_EVNDISP_AUX_DIR/AstroData/Multiwavelengthdata/photometricBands.dat", bool iPrint = true );
 		bool readGalacticExtinction( string ifile, bool iPrint = true );
 		bool readDataFile( string name, string txtfile, double MJD_min, double MJD_max, bool bPrint = false, int imarker = 20, int icolor = 1 );
 		TGraphErrors* readOpticalData( string name, string txtfile, string band, bool bPrint = false, int imarker = 20, int icolor = 1, bool bAverage = false, double iPlotMagnitudeMultiplier = 1., bool bCorrection = false, string icorfile = "" );

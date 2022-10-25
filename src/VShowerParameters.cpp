@@ -6,7 +6,7 @@
     some variables are the same for each event (data format, source file, etc.),
     not really necessary to store them in this tree (but convenient)
 
-    \author Gernot Maier
+
 */
 
 #include "VShowerParameters.h"
@@ -120,7 +120,7 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 	
 	// C. Duke 19Oct06  added bitmapped unsigned int array for images selected
 	sprintf( i_des, "ImgSel[NMethods]/l" );
-	fTreeSC->Branch( "ImgSel", fTelIDImageSelected_bitcode , i_des );
+	fTreeSC->Branch( "ImgSel", fTelIDImageSelected_bitcode, i_des );
 	sprintf( i_des, "ImgSel_list[NMethods][%d]/b", VDST_MAXTELESCOPES );
 	fTreeSC->Branch( "ImgSel_list", fTelIDImageSelected_list, i_des );
 	

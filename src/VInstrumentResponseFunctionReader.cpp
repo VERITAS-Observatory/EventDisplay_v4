@@ -2,7 +2,7 @@
 
     data class for effective area plotting
 
-    \author Gernot Maier
+
 */
 
 #include "VInstrumentResponseFunctionReader.h"
@@ -295,53 +295,148 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
 	return true;
 }
 
-/*!
-
-    read IRF from a root file
-
-    might be a
-
-    - evndisp IRF file (produced with makeEffectiveArea)
-    - CTA WP MC response file
-
-*/
-bool VInstrumentResponseFunctionReader::getDataFromFile()
+/*
+ * read IRF from a effective area file
+ * (MC case only - from combined files)
+ *
+ */
+bool VInstrumentResponseFunctionReader::fill_from_effectiveAreaFromH2( TTree* t )
 {
-	if( fDebug )
-	{
-		cout << "VInstrumentResponseFunctionReader::getDataFromFile" << endl;
-	}
-	
-	TFile* iFile = new TFile( fFile.c_str() );
-	if( iFile->IsZombie() )
+	if( !t )
 	{
 		return false;
 	}
+	bool bFound = false;
 	
+	Float_t ze;
+	UShort_t az;
+	Float_t Woff;
+	UShort_t noise;
+	UShort_t nbins;
+	Float_t  e0[600];
+	Float_t eff[600];
+	UShort_t nbins_esys;
+	Float_t e0_esys[600];
+	Float_t esys_rel[600];
+	Int_t binsx;
+	Float_t minx;
+	Float_t maxx;
+	Int_t binsy;
+	Float_t miny;
+	Float_t maxy;
+	Int_t binsxy;
+	Float_t value[10000];
 	
-	///////////////////////////////////////////////////////////////////////////////////////////////////////
-	// read effective areas
-	//
-	TTree* t = ( TTree* )iFile->Get( "fEffArea" );
-	// not effective area tree - is this a CTA file?
-	if( !t )
+	t->SetBranchAddress( "ze", &ze );
+	t->SetBranchAddress( "az", &az );
+	t->SetBranchAddress( "Woff", &Woff );
+	t->SetBranchAddress( "noise", &noise );
+	t->SetBranchAddress( "nbins", &nbins );
+	t->SetBranchAddress( "e0", e0 );
+	t->SetBranchAddress( "eff", eff );
+	t->SetBranchAddress( "nbins_esys", &nbins_esys );
+	t->SetBranchAddress( "e0_esys", e0_esys );
+	t->SetBranchAddress( "esys_rel", esys_rel );
+	t->SetBranchAddress( "hEsysMCRelative2D_binsx", &binsx );
+	t->SetBranchAddress( "hEsysMCRelative2D_minx", &minx );
+	t->SetBranchAddress( "hEsysMCRelative2D_maxx", &maxx );
+	t->SetBranchAddress( "hEsysMCRelative2D_binsy", &binsy );
+	t->SetBranchAddress( "hEsysMCRelative2D_miny", &miny );
+	t->SetBranchAddress( "hEsysMCRelative2D_maxy", &maxy );
+	t->SetBranchAddress( "hEsysMCRelative2D_binsxy", &binsxy );
+	t->SetBranchAddress( "hEsysMCRelative2D_value", value );
+	
+	for( int j = 0; j < t->GetEntries(); j++ )
 	{
-		// try to read CTA file
-		if( !getDataFromCTAFile() )
+		t->GetEntry( j );
+		if( fDebug )
 		{
-			cout << "Error: effective area histogram not found in CTA-style file" << endl;
-			return false;
+			cout << "VInstrumentResponseFunctionReader::getDataFromFile: reading event " << j << endl;
 		}
-		else
+		
+		// ignore all checks if there is only one entry in this tree
+		if( t->GetEntries() > 1 )
 		{
-			return true;
+			// azimuth
+			if( fDebug )
+			{
+				cout << "\t AZ: tree entry " << j << "\t az " << az << "\t az bin " << fAzbin << endl;
+			}
+			if( az != fAzbin )
+			{
+				continue;
+			}
+			// wobble offset
+			if( fDebug )
+			{
+				cout << "\t Woff: " << j << "\t" << Woff << "\t" << fWoff << endl;
+			}
+			if( TMath::Abs( Woff - fWoff ) > 0.05 )
+			{
+				continue;
+			}
+			// noise level
+			if( fDebug )
+			{
+				cout << "\t Noise: " << j << "\t" << noise << "\t" << fNoise << endl;
+			}
+			if( noise != fNoise )
+			{
+				continue;
+			}
+			// zenith angle
+			if( fDebug )
+			{
+				cout << "\t Ze: " << j << "\t" << ze << "\t" << fZe << endl;
+			}
+			if( TMath::Abs( ze - fZe ) > 3. )
+			{
+				continue;
+			}
 		}
+		cout << "\t FOUND EFFECTIVE AREA (entry " << j << ")" << endl;
+		bFound = true;
+		gEffArea_MC = new TGraphAsymmErrors( nbins );
+		for( int k = 0; k < nbins; k++ )
+		{
+			gEffArea_MC->SetPoint( k, e0[k], eff[k] );
+		}
+		setGraphPlottingStyle( gEffArea_MC );
+		gEnergyBias_Mean = new TGraphErrors( nbins_esys );
+		for( int k = 0; k < nbins_esys; k++ )
+		{
+			gEnergyBias_Mean->SetPoint( k, e0_esys[k], esys_rel[k] );
+		}
+		setGraphPlottingStyle( gEnergyBias_Mean );
+		hEsysMCRelative2D = new TH2D( "hEsysMCRelative2D", "",
+									  binsx, minx, maxx,
+									  binsy, miny, maxy );
+		hEsysMCRelative2D->SetXTitle( "energy_{MC} [TeV]" );
+		hEsysMCRelative2D->SetYTitle( "energy bias E_{rec}/E_{MC}" );
+		for( int i = 0; i < binsxy; i++ )
+		{
+			int nx = i % binsx;
+			int ny = ( i - nx ) / binsx;
+			hEsysMCRelative2D->SetBinContent( nx + 1, ny + 1, value[i] );
+		}
+		
+		break;
 	}
 	
 	
-	////////////////////////////////////////////////////////////////////
-	// read IRF from a EVNDISP response file
-	////////////////////////////////////////////////////////////////////
+	return bFound;
+}
+
+/*
+ * read IRF from a effective area file
+ *
+ */
+bool VInstrumentResponseFunctionReader::fill_from_effectiveArea( TTree* t )
+{
+	if( !t )
+	{
+		return false;
+	}
 	CEffArea* c = new CEffArea( t );
 	
 	bool bFound = false;
@@ -488,7 +583,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 		hEsysMCRelative2D = ( TH2D* )c->hEsysMCRelative2D;
 		// get energy resolution (!!)
 		//       getEnergyResolutionPlot( (TProfile*)c->hEsysMCRelative );
-		// energy resolution caluclation as 68% value
+		// energy resolution calculation as 68% value
 		//       getEnergyResolutionPlot68( (TH2D*)c->hEsysMCRelative2D );
 		// energy resolution is RMS
 		getEnergyResolutionPlot( ( TH2D* )c->hEsysMCRelativeRMS );
@@ -569,6 +664,62 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 		
 		break;
 	}
+	return bFound;
+}
+
+/*!
+
+    read IRF from a root file
+
+    might be a
+
+    - evndisp IRF file (produced with makeEffectiveArea)
+    - CTA WP MC response file
+
+*/
+bool VInstrumentResponseFunctionReader::getDataFromFile()
+{
+	if( fDebug )
+	{
+		cout << "VInstrumentResponseFunctionReader::getDataFromFile" << endl;
+	}
+	
+	TFile* iFile = new TFile( fFile.c_str() );
+	if( iFile->IsZombie() )
+	{
+		return false;
+	}
+	bool bFound = false;
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
+	// read effective areas
+	// (take into account that in combined file effective areas are in a separate file)
+	TTree* t = 0;
+	if( fA_MC == "A_REC" || iFile->Get( "fEffAreaH2F" ) == 0 )
+	{
+		t = ( TTree* )iFile->Get( "fEffArea" );
+		bFound = fill_from_effectiveArea( t );
+	}
+	else
+	{
+		t = ( TTree* )iFile->Get( "fEffAreaH2F" );
+		bFound = fill_from_effectiveAreaFromH2( t );
+	}
+	// not effective area tree - is this a CTA file?
+	if( !t )
+	{
+		// try to read CTA file
+		if( !getDataFromCTAFile() )
+		{
+			cout << "Error: effective area histogram not found in CTA-style file" << endl;
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+	
 	//////////////////////////////////////////////////////////////
 	// read resolution files
 	

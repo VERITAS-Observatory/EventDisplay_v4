@@ -3,7 +3,7 @@
 #ifndef VAtmosphereSoundings_H
 #define VAtmosphereSoundings_H
 
-#include "VASlalib.h"
+#include "VAstronometry.h"
 #include "VAtmosphereSoundingData.h"
 
 #include "TCanvas.h"
@@ -228,10 +228,10 @@ class VAtmosphereSoundings
 		bool     write_MODTRAN_UserProfile( unsigned int iIndexUserData, unsigned int defaultModel = 6, bool iWriteDewPoint = false );
 		bool     writeRootFile( string iFile );
 		
-		int push_average_atmosphere( string name, vector<int>* years, vector<int>* months, vector<int>* days , vector<int>* hours  , vector<double>* mjds, unsigned int nMinPoints, int nMinFlights );
-		bool isDateInRange( VAtmosphereSoundingData* Data, vector<int>* years, vector<int>* months, vector<int>* days, vector<int>* hours, vector<double>* mjds , unsigned int nMinPoints );
+		int push_average_atmosphere( string name, vector<int>* years, vector<int>* months, vector<int>* days, vector<int>* hours, vector<double>* mjds, unsigned int nMinPoints, int nMinFlights );
+		bool isDateInRange( VAtmosphereSoundingData* Data, vector<int>* years, vector<int>* months, vector<int>* days, vector<int>* hours, vector<double>* mjds, unsigned int nMinPoints );
 		bool isDateInRange( VAtmosphereSoundingData* Data, vector<double>* mjds, unsigned int nMinPoints );
-		bool isDateInRange( VAtmosphereSoundingData* Data, double minMJD, double max_MJD , unsigned int nMinPoints );
+		bool isDateInRange( VAtmosphereSoundingData* Data, double minMJD, double max_MJD, unsigned int nMinPoints );
 		VAtmosphereSoundingData* makeDefaultWinterAtmosphere( string name = "winter", string opt = "" ) ;
 		VAtmosphereSoundingData* makeDefaultSummerAtmosphere( string name = "summer", string opt = "" ) ;
 		VAtmosphereSoundingData* makeMeanMonthlyAtmosphere( int month, string name, string opt, int yearMin, int yearMax );
@@ -288,9 +288,9 @@ class VAtmosphereSoundings
 		
 		bool write_2C1( unsigned int iIndexAverageData, string filename, double max_height );
 		
-		TGraph* getResidualGraph( TGraph* data, TGraph* model , int color = 2 ) ;
+		TGraph* getResidualGraph( TGraph* data, TGraph* model, int color = 2 ) ;
 		void plot_season( double mjd_start, double mjd_end, TString season_name, char* value, TString outfileprefix ) ;
-		void plot_season( int year_start, int month_start, int day_start, int year_end, int month_end , int day_end, char* value, TString outfileprefix = "" ) ;
+		void plot_season( int year_start, int month_start, int day_start, int year_end, int month_end, int day_end, char* value, TString outfileprefix = "" ) ;
 		
 		
 };

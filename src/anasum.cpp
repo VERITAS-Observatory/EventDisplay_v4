@@ -1,8 +1,6 @@
 /*! \file anasum.cpp
     \brief main program to create an analysis summary (VERITAS data analysis chain)
 
-
-   \author( Jamie Holder, Gernot Maier )
 */
 
 #include "VAnaSum.h"
@@ -83,7 +81,7 @@ int main( int argc, char* argv[] )
 		{
 			VGlobalRunParameter fRunPara;
 			cout << fRunPara.getEVNDISP_VERSION() << endl;
-			exit( 0 );
+			exit( EXIT_SUCCESS );
 		}
 	}
 	
@@ -96,7 +94,7 @@ int main( int argc, char* argv[] )
 	
 	if( !testCommandlineArguments() )
 	{
-		exit( 0 );
+		exit( EXIT_FAILURE );
 	}
 	
 	// initialize analysis
@@ -123,6 +121,9 @@ int main( int argc, char* argv[] )
 }
 
 
+/*
+ * read command line options
+ */
 int parseOptions( int argc, char* argv[] )
 {
 	while( 1 )
@@ -174,13 +175,16 @@ int parseOptions( int argc, char* argv[] )
 			case 'h':
 				if( gSystem->Getenv( "EVNDISPSYS" ) )
 				{
-					system( "cat $EVNDISPSYS/README/README.ANASUM" );
+					if( system( "cat $EVNDISPSYS/README/README.ANASUM" ) != 0 )
+					{
+						cout << "error reading README" << endl;
+					}
 				}
 				else
 				{
 					cout << " no help find (environmental variable EVNDISPSYS not set)" << endl;
 				}
-				exit( 0 );
+				exit( EXIT_FAILURE );
 				break;
 			case 'd':
 				datadir = optarg;

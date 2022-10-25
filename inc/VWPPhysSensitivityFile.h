@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-#include "VASlalib.h"
+#include "VAstronometry.h"
 #include "VInstrumentResponseFunctionReader.h"
 #include "VSensitivityCalculator.h"
 

@@ -39,6 +39,8 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 		
 		bool                             calculateCutEfficiencies();
 		TGraphAsymmErrors*               calculateEffectiveAreaRatios( TGraphAsymmErrors* g0, TGraphAsymmErrors* g1 );
+		bool                             fill_from_effectiveArea( TTree* t );
+		bool                             fill_from_effectiveAreaFromH2( TTree* t );
 		VInstrumentResponseFunctionData* getIRFFromFile( TTree*, unsigned int );
 		bool                             getDataFromFile();
 		bool                             getDataFromCTAFile();

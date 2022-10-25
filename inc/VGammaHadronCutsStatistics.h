@@ -28,7 +28,7 @@ class VGammaHadronCutsStatistics : public TNamed
 		// enum for efficiency counting of the different types of cuts
 		enum EN_AnaCutsStats { eTot, eMC_XYoff, eXYoff, eStereoQuality, eArrayChi2, eNImages, eMSC_Quality,
 							   eErec, eCorePos, eLTrig, eSizeSecondMax, eTelType, eDirection, eIsGamma, eEnergyRec,
-							   eError
+							   ePointing, eError
 							 };
 							 
 							 
@@ -48,7 +48,7 @@ class VGammaHadronCutsStatistics : public TNamed
 		void         terminate();
 		void         updateCutCounter( unsigned int iCut );
 		
-		ClassDef( VGammaHadronCutsStatistics, 2 );
+		ClassDef( VGammaHadronCutsStatistics, 3 );
 };
 
 

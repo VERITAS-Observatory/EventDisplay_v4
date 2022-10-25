@@ -2,8 +2,6 @@
 
      reading class for DST sources files
 
-     \author
-       Gernot Maier
 */
 
 #include <VDSTReader.h>

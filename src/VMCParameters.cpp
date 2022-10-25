@@ -1,8 +1,6 @@
 /*! \class VMCParameters
     \brief MC data storage class
 
-    \author
-    Gernot Maier
 */
 
 #include "VMCParameters.h"

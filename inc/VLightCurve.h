@@ -46,7 +46,7 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
 		double fMaxEnergy;   //!< maximum energy to be taken into account [TeV]
 		double fE0;          //!< calculate flux at this energy [TeV]
 		double fAlpha;       //!< assumed spectral index
-                bool   fFluxCalculationUseRolke;   //!< use Rolke for flux calculation
+		bool   fFluxCalculationUseRolke;   //!< use Rolke for flux calculation
 		
 		// significance and upper flux limit parameters
 		int    fLiMaEqu;
@@ -118,16 +118,16 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
 		TCanvas* plotPhaseDistribution( TCanvas* iCanvasPhaseDist = 0, string iCanvasName = "cPD", string iFluxState = "", int iColor = 1 );
 		void     setPlottingParameter( double iPlottingMJDMin, double iPlottingMJDMax );
 		void     setSignificanceParameters( double iThresholdSignificance = -9999., double iMinEvents = -9999.,
-						    double iUpperLimit = 0.99, int iUpperlimitMethod = 5, int iLiMaEqu = 17 );
+											double iUpperLimit = 0.99, int iUpperlimitMethod = 5, int iLiMaEqu = 17 );
 		void     setLightCurveAxis( double iYmin = -9.e10, double iYmax = -9.e10, string iAxisTitle = "tevRate" );
 		void     setName( string iName )
 		{
 			fName = iName;
 		}
-                void     setFluxCalculationMethod( bool i_bRolke = false )
-                {
-                      fFluxCalculationUseRolke = i_bRolke;
-                }
+		void     setFluxCalculationMethod( bool i_bRolke = false )
+		{
+			fFluxCalculationUseRolke = i_bRolke;
+		}
 		void     setSpectralParameters( double iMinEnergy = 0., double E0 = 1., double alpha = -2.5, double iMaxEnergy = MAX_SAFE_MC_ENERGY );
 		
 		ClassDef( VLightCurve, 9 );

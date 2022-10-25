@@ -52,12 +52,12 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
 		double          fMCEnergy_index;
 		bool            fFillMCHistograms;
 		bool            fgetXoff_Yoff_afterCut;
-
-                // IRF histogram bin definition
-                unsigned int fBiasBin;                       // Energy bias (bias bins)
-                unsigned int fLogAngularBin;                 // Angular resolution Log10 (bins)
-                unsigned int fResponseMatricesEbinning;      // bins in the ResponseMatrices 
-                unsigned int fhistoNEbins;                   // E binning (affects 2D histograms only)
+		
+		// IRF histogram bin definition
+		unsigned int fBiasBin;                       // Energy bias (bias bins)
+		unsigned int fLogAngularBin;                 // Angular resolution Log10 (bins)
+		unsigned int fResponseMatricesEbinning;      // bins in the ResponseMatrices
+		unsigned int fhistoNEbins;                   // E binning (affects 2D histograms only)
 		
 		string          fCoreScatterMode;
 		double          fCoreScatterRadius;
@@ -98,8 +98,8 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
 		
 		VInstrumentResponseFunctionRunParameter();
 		~VInstrumentResponseFunctionRunParameter() {}
-
-	        string                getInstrumentEpoch( bool iMajor = false );	
+		
+		string                getInstrumentEpoch( bool iMajor = false );
 		void                  print();
 		VMonteCarloRunHeader* readMCRunHeader();
 		bool                  readRunParameterFromTextFile( string iFile );

@@ -16,6 +16,7 @@
 #include "TH1F.h"
 #include "TLegend.h"
 
+#include <algorithm>
 #include <iostream>
 #include <cmath>
 #include <vector>
@@ -27,24 +28,18 @@ namespace VStatistics
 
 	inline void liandma( double Non, double Noff, double alpha, double& Nsig, double& Sig5, double& Sig9, double& Sig17 )
 	{
-		double alphasq;
-		double oneplusalpha;
-		double oneplusalphaoveralpha;
-		
-		double Ntot;
-		
 		if( alpha == 0. )
 		{
 			Sig17 = 0.;
 			return;
 		}
 		
-		alphasq = alpha * alpha;
-		oneplusalpha = 1.0 + alpha;
-		oneplusalphaoveralpha = oneplusalpha / alpha;
+		double alphasq = alpha * alpha;
+		double oneplusalpha = 1.0 + alpha;
+		double oneplusalphaoveralpha = oneplusalpha / alpha;
 		
 		Nsig   = Non - alpha * Noff;
-		Ntot   = Non + Noff;
+		double Ntot   = Non + Noff;
 		
 		if( Non + alphasq * Noff > 0. )
 		{
@@ -78,7 +73,7 @@ namespace VStatistics
 		{
 			Sig17 = 2.*( Non * log( oneplusalphaoveralpha * ( Non / Ntot ) ) + Noff * log( oneplusalpha * ( Noff / Ntot ) ) );
 			// value in brackets can be a small negative number
-			if( TMath::Abs( Sig17 ) < 1.e-5 )
+			if( TMath::Abs( Sig17 ) < 1.e-15 )
 			{
 				Sig17 = 0.;
 			}
@@ -172,10 +167,10 @@ namespace VStatistics
 		double big = 10.*sqrt( b + c ) + fabs( c - b ) + 10.; //! 10 sigma noise
 		TF1 g( "myfuncg", funcg, 0.0, big, 5 );
 		g.SetParameters( par );
-        n1 = g.Integral( 0., big, eps );
+		n1 = g.Integral( 0., big, eps );
 		if( n1 > 0. )
 		{
-        p = g.Integral( ul, big, eps ) / n1;
+			p = g.Integral( ul, big, eps ) / n1;
 		}
 		else
 		{
@@ -225,7 +220,7 @@ namespace VStatistics
 			TF1 f( "myfuncf", funcf, 0.0, 100000, 5 );
 			f.SetParameters( mypars );
 			f.SetNpx( 10000 );
-			return f.GetX( 0.0 , 0.0, 100000, 1.e-10, 1000 );
+			return f.GetX( 0.0, 0.0, 100000, 1.e-10, 1000 );
 		}
 		// Feldman & Cousins
 		else if( iMethod == 3 )
@@ -258,7 +253,7 @@ namespace VStatistics
 		{
 			TRolke i_Rolke;
 			i_Rolke.SetCL( CL );
-                        i_Rolke.SetBounding( iBoundedLimits );
+			i_Rolke.SetBounding( iBoundedLimits );
 			
 			double sdb = ratio * sqrt( nOff );
 			
@@ -272,7 +267,7 @@ namespace VStatistics
 		{
 			TRolke i_Rolke;
 			i_Rolke.SetCL( CL );
-                        i_Rolke.SetBounding( iBoundedLimits );
+			i_Rolke.SetBounding( iBoundedLimits );
 			i_Rolke.SetPoissonBkgKnownEff( ( int )nOn, ( int )nOff, 1. / ratio, 1. );
 			
 			return i_Rolke.GetUpperLimit();
@@ -454,6 +449,58 @@ namespace VStatistics
 		if( x.size() > 0. )
 		{
 			return iAbs / ( ( double )x.size() );
+		}
+		
+		return 0.;
+	}
+	/*
+	 *
+	 * median absolute error
+	 *
+	 */
+	inline double getMedianAbsoluteError( vector< double >& x, double median )
+	{
+		double iAbs = 0.;
+		for( unsigned int i = 0; i < x.size(); i++ )
+		{
+			iAbs += TMath::Abs( x[i] - median );
+		}
+		if( x.size() > 0. )
+		{
+			return iAbs / ( ( double )x.size() );
+		}
+		
+		return 0.;
+	}
+	/*
+	
+	   trimmed mean absolute error
+	
+	       trimMLow = trim N elements on lower side
+	       trimMLow = trim N elements on upper side
+	
+	       (Note: this is nowhere used that this point and therefore untested)
+	
+	*/
+	inline double getMeanAbsoluteError( vector< double > x, unsigned int trimMLow, unsigned int trimMUp )
+	{
+		// sort vector
+		std::sort( x.begin(), x.end() );
+		
+		// trimmed mean
+		if( x.size() > trimMLow + trimMUp + 1 )
+		{
+			vector< double > y( x.begin() + trimMLow, x.begin() + x.size() - trimMUp );
+			double mean = getMean( y );
+			double iAbs = 0.;
+			for( unsigned int i = 0; i < y.size(); i++ )
+			{
+				iAbs += TMath::Abs( y[i] - mean );
+			}
+			if( y.size() > 0 )
+			{
+				return iAbs / ( ( double )y.size() );
+			}
 		}
 		
 		return 0.;

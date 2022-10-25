@@ -261,8 +261,16 @@ void CEffArea::Init( TTree* tree )
 	fChain->SetBranchAddress( "az", &az, &b_az );
 	fChain->SetBranchAddress( "azMin", &azMin, &b_azMin );
 	fChain->SetBranchAddress( "azMax", &azMax, &b_azMax );
-	fChain->SetBranchAddress( "Xoff", &Xoff, &b_Xoff );
-	fChain->SetBranchAddress( "Yoff", &Yoff, &b_Yoff );
+	if( fChain->GetBranchStatus( "Xoff" ) )
+	{
+		fChain->SetBranchAddress( "Xoff", &Xoff, &b_Xoff );
+		fChain->SetBranchAddress( "Yoff", &Yoff, &b_Yoff );
+	}
+	else
+	{
+		Xoff = 0.;
+		Yoff = 0.;
+	}
 	fChain->SetBranchAddress( "Woff", &Woff, &b_Woff );
 	fChain->SetBranchAddress( "noise", &noise, &b_noise );
 	if( fChain->GetBranchStatus( "noisePE" ) )
@@ -274,39 +282,70 @@ void CEffArea::Init( TTree* tree )
 		noisePE = 0.;
 	}
 	fChain->SetBranchAddress( "pedvar", &pedvar, &b_pedvar );
-	fChain->SetBranchAddress( "index", &index, &b_index );
-	fChain->SetBranchAddress( "nbins", &nbins, &b_nbins );
-	fChain->SetBranchAddress( "e0", e0, &b_e0 );
-	fChain->SetBranchAddress( "eff", eff, &b_eff );
+	if( fChain->GetBranchStatus( "index" ) )
+	{
+		fChain->SetBranchAddress( "index", &index, &b_index );
+	}
+	else
+	{
+		index = 0.;
+	}
+	if( fChain->GetBranchStatus( "nbins" ) )
+	{
+		fChain->SetBranchAddress( "nbins", &nbins, &b_nbins );
+		fChain->SetBranchAddress( "e0", e0, &b_e0 );
+		fChain->SetBranchAddress( "eff", eff, &b_eff );
+	}
+	else
+	{
+		nbins = 0;
+		for( int i = 0; i < 1000; i++ )
+		{
+			e0[i] = 0.;
+			eff[i] = 0.;
+		}
+	}
 	if( fChain->GetBranchStatus( "seff_L" ) )
-        {
-                fChain->SetBranchAddress( "seff_L", seff_L, &b_seff_L );
-                fChain->SetBranchAddress( "seff_U", seff_U, &b_seff_U );
-        }
-        else
-        {
-                for( int i = 0; i < 1000; i++ )
-                {
-                        seff_L[i] = 0.;
-                        seff_U[i] = 0.;
-                }
-        }
-        if( fChain->GetBranchStatus( "Rec_seff_L" ) )
-        {
-                fChain->SetBranchAddress( "Rec_seff_L", Rec_seff_L, &b_Rec_seff_L );
-                fChain->SetBranchAddress( "Rec_seff_U", Rec_seff_U, &b_Rec_seff_U );
-        }
-        else
-        {
-                for( int i = 0; i < 1000; i++ )
-                {
-                        Rec_seff_L[i] = 0.;
-                        Rec_seff_U[i] = 0.;
-                }
-        }
-	fChain->SetBranchAddress( "Rec_nbins", &Rec_nbins, &b_Rec_nbins );
-	fChain->SetBranchAddress( "Rec_e0", Rec_e0, &b_Rec_e0 );
-	fChain->SetBranchAddress( "Rec_eff", Rec_eff, &b_Rec_eff );
+	{
+		fChain->SetBranchAddress( "seff_L", seff_L, &b_seff_L );
+		fChain->SetBranchAddress( "seff_U", seff_U, &b_seff_U );
+	}
+	else
+	{
+		for( int i = 0; i < 1000; i++ )
+		{
+			seff_L[i] = 0.;
+			seff_U[i] = 0.;
+		}
+	}
+	if( fChain->GetBranchStatus( "Rec_seff_L" ) )
+	{
+		fChain->SetBranchAddress( "Rec_seff_L", Rec_seff_L, &b_Rec_seff_L );
+		fChain->SetBranchAddress( "Rec_seff_U", Rec_seff_U, &b_Rec_seff_U );
+	}
+	else
+	{
+		for( int i = 0; i < 1000; i++ )
+		{
+			Rec_seff_L[i] = 0.;
+			Rec_seff_U[i] = 0.;
+		}
+	}
+	if( fChain->GetBranchStatus( "Rec_nbins" ) )
+	{
+		fChain->SetBranchAddress( "Rec_nbins", &Rec_nbins, &b_Rec_nbins );
+		fChain->SetBranchAddress( "Rec_e0", Rec_e0, &b_Rec_e0 );
+		fChain->SetBranchAddress( "Rec_eff", Rec_eff, &b_Rec_eff );
+	}
+	else
+	{
+		Rec_nbins = 0;
+		for( int i = 0; i < 1000; i++ )
+		{
+			Rec_e0[i] = 0.;
+			Rec_eff[i] = 0.;
+		}
+	}
 	if( fChain->GetBranchStatus( "hEmc" ) )
 	{
 		fChain->SetBranchAddress( "hEmc", &hEmc, &b_hEmc );

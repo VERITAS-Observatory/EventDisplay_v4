@@ -4,7 +4,7 @@
     output is after pedestal substraction, gain and toffset correction
 
 
-    \author Gernot Maier
+
 */
 
 #include <VDSTTree.h>
@@ -497,14 +497,14 @@ int VDSTTree::hasData( int iTelID )
 
 int VDSTTree::getDSTTelescopeNumber( unsigned int iTelHyperArray_ID )
 {
-    for( unsigned int i = 0; i < fDST_vlist_of_telescopes.size(); i++ )
-    {
-        if( fDST_vlist_of_telescopes[i] == iTelHyperArray_ID )
-        {
-            return (int)i;
-        }
-    }
-    return -1;
+	for( unsigned int i = 0; i < fDST_vlist_of_telescopes.size(); i++ )
+	{
+		if( fDST_vlist_of_telescopes[i] == iTelHyperArray_ID )
+		{
+			return ( int )i;
+		}
+	}
+	return -1;
 }
 
 
@@ -827,7 +827,7 @@ float VDSTTree::getDSTLocalDelayedTriggerTime( int iTelID )
 map< unsigned int, float> VDSTTree::readArrayConfig( string iFile )
 {
 	fDST_list_of_telescopes.clear();
-        fDST_vlist_of_telescopes.clear();
+	fDST_vlist_of_telescopes.clear();
 	if( iFile.size() == 0 )
 	{
 		return fDST_list_of_telescopes;
@@ -851,7 +851,7 @@ map< unsigned int, float> VDSTTree::readArrayConfig( string iFile )
 		{
 			istringstream is_stream( iLine );
 			is_stream >> iT1;
-			if( !(is_stream>>std::ws).eof() )
+			if( !( is_stream >> std::ws ).eof() )
 			{
 				is_stream >> iT2;
 			}
@@ -861,8 +861,8 @@ map< unsigned int, float> VDSTTree::readArrayConfig( string iFile )
 				iT2 = "12.5";
 			}
 			fDST_list_of_telescopes[atoi( iT1.c_str() )] = atof( iT2.c_str() );
-                        fDST_vlist_of_telescopes.push_back( atoi( iT1.c_str() ) );
-                        cout << "PPP " << fDST_vlist_of_telescopes.back() << endl;
+			fDST_vlist_of_telescopes.push_back( atoi( iT1.c_str() ) );
+			cout << "PPP " << fDST_vlist_of_telescopes.back() << endl;
 		}
 	}
 	is.close();
@@ -898,12 +898,12 @@ int VDSTTree::setTelCounter( int iTelID )
 
 void VDSTTree::fillDSTMeanPulseTiming( unsigned int iTelID, unsigned int iChannelID, double iTime, int iNSamples )
 {
-        int iTel = getDSTTelescopeNumber( iTelID+1 );
-        if( iTel < 0 ) 
-        {
-            return;
-        }
-
+	int iTel = getDSTTelescopeNumber( iTelID + 1 );
+	if( iTel < 0 )
+	{
+		return;
+	}
+	
 	if( iTel < VDST_MAXTELESCOPES && iChannelID < VDST_MAXCHANNELS )
 	{
 		fDSTMeanPulseTiming[iTel][iChannelID] += iTime;
@@ -920,12 +920,12 @@ void VDSTTree::fillDSTMeanPulseTiming( unsigned int iTelID, unsigned int iChanne
 
 double VDSTTree::getDSTMeanPulseTiming( unsigned int iTelID, unsigned int iChannelID )
 {
-        int iTel = getDSTTelescopeNumber( iTelID+1 );
-        if( iTel < 0. )
-        {
-           return -9999.;
-        }
-
+	int iTel = getDSTTelescopeNumber( iTelID + 1 );
+	if( iTel < 0. )
+	{
+		return -9999.;
+	}
+	
 	if( iTel < VDST_MAXTELESCOPES && iChannelID < VDST_MAXCHANNELS )
 	{
 		if( fDSTMeanPulseTiming_N[iTel][iChannelID] > 0. )
@@ -944,12 +944,12 @@ double VDSTTree::getDSTMeanPulseTiming( unsigned int iTelID, unsigned int iChann
 
 double VDSTTree::getDSTMedianPulseTimingPerTelescope( unsigned int iTelID )
 {
-        int iTel = getDSTTelescopeNumber( iTelID+1 );
-        if( iTel < 0. )
-        {
-           return -9999.;
-        }
-
+	int iTel = getDSTTelescopeNumber( iTelID + 1 );
+	if( iTel < 0. )
+	{
+		return -9999.;
+	}
+	
 	if( iTel < VDST_MAXTELESCOPES )
 	{
 		if( fDSTMeanPulseTimingHistogram[iTel] )
@@ -971,12 +971,12 @@ double VDSTTree::getDSTMedianPulseTimingPerTelescope( unsigned int iTelID )
 
 double VDSTTree::getDSTMeanPulseTimingPerTelescope( unsigned int iTelID )
 {
-        int iTel = getDSTTelescopeNumber( iTelID+1 );
-        if( iTel < 0. )
-        {
-           return -9999.;
-        }
-
+	int iTel = getDSTTelescopeNumber( iTelID + 1 );
+	if( iTel < 0. )
+	{
+		return -9999.;
+	}
+	
 	if( iTel < VDST_MAXTELESCOPES )
 	{
 		if( fDSTMeanPulseTimingHistogram[iTel] )
@@ -993,12 +993,12 @@ double VDSTTree::getDSTMeanPulseTimingPerTelescope( unsigned int iTelID )
 
 double VDSTTree::getDSTRMSPulseTimingPerTelescope( unsigned int iTelID )
 {
-        int iTel = getDSTTelescopeNumber( iTelID+1 );
-        if( iTel < 0. )
-        {
-           return -9999.;
-        }
-
+	int iTel = getDSTTelescopeNumber( iTelID + 1 );
+	if( iTel < 0. )
+	{
+		return -9999.;
+	}
+	
 	if( iTel < VDST_MAXTELESCOPES )
 	{
 		if( fDSTMeanPulseTimingHistogram[iTel] )
@@ -1015,12 +1015,12 @@ double VDSTTree::getDSTRMSPulseTimingPerTelescope( unsigned int iTelID )
 
 double VDSTTree::getDSTNEventsPulseTimingPerTelescope( unsigned int iTelID )
 {
-        int iTel = getDSTTelescopeNumber( iTelID+1 );
-        if( iTel < 0. )
-        {
-           return -9999.;
-        }
-
+	int iTel = getDSTTelescopeNumber( iTelID + 1 );
+	if( iTel < 0. )
+	{
+		return -9999.;
+	}
+	
 	if( iTel < VDST_MAXTELESCOPES )
 	{
 		if( fDSTMeanPulseTimingHistogram[iTel] )

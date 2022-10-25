@@ -31,7 +31,7 @@ VLightCurve::VLightCurve()
 	fRateAxisTitleUnSet = false;
 	setLightCurveAxis();
 	setPhaseFoldingValues( -99., -99., false );
-        setFluxCalculationMethod();
+	setFluxCalculationMethod();
 }
 
 /*
@@ -133,24 +133,24 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
 	// get MJD for the case that no time limits are given
 	if( iMJDMin < 0 )
 	{
-        iMJDMin = 1000000;
-        for( unsigned int i = 0; i < fMJD.size(); i++ )
-        {
-            if( fMJD[i] > 0 && fMJD[i] < iMJDMin )
-            {
-                iMJDMin = TMath::Floor( fMJD[i] );
-            }
-        }
+		iMJDMin = 1000000;
+		for( unsigned int i = 0; i < fMJD.size(); i++ )
+		{
+			if( fMJD[i] > 0 && fMJD[i] < iMJDMin )
+			{
+				iMJDMin = TMath::Floor( fMJD[i] );
+			}
+		}
 	}
 	if( iMJDMax < 0 )
 	{
-        for( unsigned int i = 0; i < fMJD.size(); i++ )
-        {
-            if( fMJD[i] > 0 && fMJD[i] > iMJDMax )
-            {
-                iMJDMax = TMath::Floor( fMJD[i] ) + 1;
-            }
-        }
+		for( unsigned int i = 0; i < fMJD.size(); i++ )
+		{
+			if( fMJD[i] > 0 && fMJD[i] > iMJDMax )
+			{
+				iMJDMax = TMath::Floor( fMJD[i] ) + 1;
+			}
+		}
 	}
 	
 	// plotting parameters
@@ -266,8 +266,8 @@ bool VLightCurve::fillTeV_anasum( bool iPrint )
 		{
 			fLightCurveData[i]->setFluxCalculationEnergyInterval( fEnergy_min_TeV, fEnergy_max_TeV );
 			fLightCurveData[i]->fillTeVEvndispData( fAnaSumFile, fThresholdSignificance, fMinEvents,
-				   			        fUpperLimit, fUpperLimitMethod, fLiMaEqu, fMinEnergy, fE0, fAlpha,
-                                                                fFluxCalculationUseRolke );
+													fUpperLimit, fUpperLimitMethod, fLiMaEqu, fMinEnergy, fE0, fAlpha,
+													fFluxCalculationUseRolke );
 		}
 	}
 	
@@ -329,7 +329,8 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 		double i_xmin = fPlottingMJDMin;
 		double i_xmax = fPlottingMJDMax;
 		sprintf( hname, "MJD" );
-		sprintf( htitle, "hLightCurve" );
+		stringstream i_title;
+		i_title << "hLightCurve";
 		if( fPhase_Period_days > 0. )
 		{
 			if( fPhasePlotting )
@@ -344,10 +345,10 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 				i_xmax = fPhase_Period_days;
 				sprintf( hname, "phase folded days" );
 			}
-			sprintf( htitle, "%s_%d_%d_%d", htitle, ( int )fPhase_MJD0, ( int )fPhase_Period_days, ( int )fPhasePlotting );
+			i_title << "_" << ( int )fPhase_MJD0 << "_" << ( int )fPhase_Period_days << "_" << ( int )fPhasePlotting;
 		}
 		
-		hLightCurve = new TH1D( htitle, "", 100, i_xmin, i_xmax );
+		hLightCurve = new TH1D( i_title.str().c_str(), "", 100, i_xmin, i_xmax );
 		hLightCurve->SetStats( 0 );
 		hLightCurve->SetXTitle( hname );
 		hLightCurve->GetXaxis()->CenterTitle( true );
@@ -368,19 +369,20 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 	{
 		fCanvasLightCurve = iCanvasLightCurve;
 		fCanvasLightCurve->cd();
-		sprintf( htitle, "hLightCurve" );
+		stringstream i_title;
+		i_title << "hLightCurve";
 		if( fPhase_Period_days > 0. )
 		{
-			sprintf( htitle, "%s_%d_%d_%d", htitle, ( int )fPhase_MJD0, ( int )fPhase_Period_days, ( int )fPhasePlotting );
+			i_title << "_" << ( int )fPhase_MJD0 << "_" << ( int )fPhase_Period_days << "_" << ( int )fPhasePlotting;
 		}
-		hLightCurve = ( TH1D* )fCanvasLightCurve->GetListOfPrimitives()->FindObject( htitle );
+		hLightCurve = ( TH1D* )fCanvasLightCurve->GetListOfPrimitives()->FindObject( i_title.str().c_str() );
 		if( !hLightCurve )
 		{
 			hLightCurve = ( TH1D* )fCanvasLightCurve->GetListOfPrimitives()->FindObject( "hLightCurve" );
 		}
 		if( !hLightCurve )
 		{
-			cout << "VLightCurve::plot: no light curve histogram found with name " << htitle << endl;
+			cout << "VLightCurve::plot: no light curve histogram found with name " << i_title.str() << endl;
 			return fCanvasLightCurve;
 		}
 	}
@@ -438,7 +440,7 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 					iMJD_error = 0.3;
 				}
 				fLightCurveGraph->SetPointError( z, iMJD_error, iMJD_error,
-	           		           iFMean - fLightCurveData[i]->fRunFluxCI_lo_1sigma, fLightCurveData[i]->fRunFluxCI_up_1sigma - iFMean );
+												 iFMean - fLightCurveData[i]->fRunFluxCI_lo_1sigma, fLightCurveData[i]->fRunFluxCI_up_1sigma - iFMean );
 			}
 			z++;
 		}

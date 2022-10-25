@@ -6,7 +6,7 @@
 #include "CData.h"
 #include "VGammaHadronCuts.h"
 #include "VAnaSumRunParameter.h"
-#include "VASlalib.h"
+#include "VAstronometry.h"
 #include "VEffectiveAreaCalculatorMCHistograms.h"
 #include "TEfficiency.h"
 #include "VHistogramUtilities.h"
@@ -45,13 +45,13 @@ class VEffectiveAreaCalculator
 		vector< vector< double > > fEffArea_time;
 		vector< vector< double > > fEffAreaMC_time;
 		vector< double > timebins;
-
+		
 		float fMC_ScatterArea;
 		
 		bool bNOFILE;
 		TDirectory* fGDirectory;
 		
-		TFile *fCloneTreeFile;
+		TFile* fCloneTreeFile;
 		vector< double > fZe;
 		vector< double > fMCZe;
 		vector< vector< double > > fEff_WobbleOffsets;
@@ -60,33 +60,33 @@ class VEffectiveAreaCalculator
 		
 		// effective areas (reading of effective areas)
 		unsigned int fNBins;                    // bins in the true energy of MC (fEff_E0)
-        unsigned int fBiasBin;                  // bins in the energy bias
+		unsigned int fBiasBin;                  // bins in the energy bias
 		unsigned int fhistoNEbins;              // energy bins for histograms only
-        unsigned int fResponseMatricesEbinning; // fine bins for response matrices. Likelihood analysis.
-        unsigned int fLogAngularBin;            // bins for the log10(angular diff R,MC [deg])
-
+		unsigned int fResponseMatricesEbinning; // fine bins for response matrices. Likelihood analysis.
+		unsigned int fLogAngularBin;            // bins for the log10(angular diff R,MC [deg])
+		
 		vector< double > fEff_E0;
 		map< unsigned int, vector< double > > fEffArea_map;
 		map< unsigned int, vector< double > > fEffAreaMC_map;
 		map< unsigned int, unsigned int > fEntry_map;
-
-        map< unsigned int, TH2F* > fEsysMCRelative2D_map;
-
+		
+		map< unsigned int, TH2F* > fEsysMCRelative2D_map;
+		
 		vector< double >                      fEff_EsysMCRelative_EnergyAxis;
 		map< unsigned int, vector< double > > fEff_EsysMCRelative;
 		unsigned int     fNMeanEffectiveArea;
 		unsigned int     fNMeanEffectiveAreaMC;
 		unsigned int     fNMeanResponseMatrix;
-
+		
 		unsigned int     fNTimeBinnedMeanEffectiveArea;
 		unsigned int     fNTimeBinnedMeanEffectiveAreaMC;
-
+		
 		vector< double > fVMeanEffectiveArea;
 		vector< double > fVMeanEffectiveAreaMC;
-
+		
 		vector< double > fVTimeBinnedMeanEffectiveArea;
 		vector< double > fVTimeBinnedMeanEffectiveAreaMC;
-
+		
 		TGraphAsymmErrors* gMeanEffectiveArea;
 		TGraph2DErrors*    gTimeBinnedMeanEffectiveArea;
 		
@@ -103,12 +103,12 @@ class VEffectiveAreaCalculator
 		vector< double > fYWobble;                //!< wobble offset in camera coordinates (grisudet)
 		vector< int >    fNoise;
 		vector< double > fPedVar;
-                
+		
 		double fEnergyAxis_minimum_defaultValue;
 		double fEnergyAxis_maximum_defaultValue;
-
-        double fLogAngular_minimum_defaultValue;
-        double fLogAngular_maximum_defaultValue;
+		
+		double fLogAngular_minimum_defaultValue;
+		double fLogAngular_maximum_defaultValue;
 		
 		VInstrumentResponseFunctionRunParameter* fRunPara;
 		
@@ -133,7 +133,7 @@ class VEffectiveAreaCalculator
 		vector< vector< TH1D* > > hVEcutNoTh2;
 		vector< vector< TH1D* > > hVEcutRec;
 		vector< vector< TH1D* > > hVEcutUW;
-        vector< vector< TH1D* > > hVEcutRecUW;
+		vector< vector< TH1D* > > hVEcutRecUW;
 		vector< vector< TH1D* > > hVEcutRecNoTh2;
 		vector< vector< TProfile* > > hVEmcSWeight;
 		vector< vector< TH1D* > > hVEcut500;
@@ -142,7 +142,7 @@ class VEffectiveAreaCalculator
 		vector< vector< TProfile* > > hVEsysMCRelative;
 		vector< vector< TH2F* > > hVEsysMCRelativeRMS;
 		vector< vector< TH2F* > > hVEsysMCRelative2D;
-        vector< vector< TH2F* > > hVEsysMCRelative2DNoDirectionCut;
+		vector< vector< TH2F* > > hVEsysMCRelative2DNoDirectionCut;
 		vector< vector< TH2F* > > hVEsys2D;
 		vector< vector< TH2F* > > hVResponseMatrix;
 		vector< vector< TH2F* > > hVResponseMatrixFine;
@@ -150,30 +150,30 @@ class VEffectiveAreaCalculator
 		vector< vector< TH2F* > > hVResponseMatrixQC;
 		vector< vector< TH2F* > > hVEmcCutCTA;
 		vector< vector< TH2F* > > hVResponseMatrixFineQC;
-        vector< vector< TH2F* > > hVResponseMatrixNoDirectionCut;
-        vector< vector< TH2F* > > hVResponseMatrixFineNoDirectionCut;
-        vector< vector< TH2F* > > hVAngErec2D;            // direction reconstruction
-        vector< vector< TH2F* > > hVAngMC2D;            // direction reconstruction
-
+		vector< vector< TH2F* > > hVResponseMatrixNoDirectionCut;
+		vector< vector< TH2F* > > hVResponseMatrixFineNoDirectionCut;
+		vector< vector< TH2F* > > hVAngErec2D;            // direction reconstruction
+		vector< vector< TH2F* > > hVAngMC2D;            // direction reconstruction
+		
 		vector< vector< TH1D* > > hVWeightedRate;
 		vector< vector< TH1D* > > hVWeightedRate005;
 		vector< vector< vector < TH1D* > > > hVEcutSub;
-
-                // angular resolution graphs (vector in az)
-        vector< TGraphErrors* > fGraph_AngularResolution68p;
-        vector< TGraphErrors* > fGraph_AngularResolution80p;
-                /*
-                vector< vector< TH2F* > > hVAngularDiff_2D;
-                vector< vector< TH2F* > > hVAngularDiffEmc_2D;
-                vector< vector< TH2F* > > hVAngularLogDiff_2D;
-                vector< vector< TH2F* > > hVAngularLogDiffEmc_2D;
-                */
-                vector< TH2F* > hVAngularDiff_2D;
-                vector< TH2F* > hVAngularDiffEmc_2D;
-                vector< TH2F* > hVAngularLogDiff_2D;
-                vector< TH2F* > hVAngularLogDiffEmc_2D;
-
-                // written to the EffArea tree
+		
+		// angular resolution graphs (vector in az)
+		vector< TGraphErrors* > fGraph_AngularResolution68p;
+		vector< TGraphErrors* > fGraph_AngularResolution80p;
+		/*
+		vector< vector< TH2F* > > hVAngularDiff_2D;
+		vector< vector< TH2F* > > hVAngularDiffEmc_2D;
+		vector< vector< TH2F* > > hVAngularLogDiff_2D;
+		vector< vector< TH2F* > > hVAngularLogDiffEmc_2D;
+		*/
+		vector< TH2F* > hVAngularDiff_2D;
+		vector< TH2F* > hVAngularDiffEmc_2D;
+		vector< TH2F* > hVAngularLogDiff_2D;
+		vector< TH2F* > hVAngularLogDiffEmc_2D;
+		
+		// written to the EffArea tree
 		TList* hisTreeList;
 		TH1D* hEmc;
 		TH1D* hEcut;
@@ -186,8 +186,8 @@ class VEffectiveAreaCalculator
 		TH1D* hEcutRecNoTh2;
 		TGraphAsymmErrors* gEffAreaMC;
 		TGraphAsymmErrors* gEffAreaRec;
-                TGraphAsymmErrors* gEffAreaNoTh2MC;
-                TGraphAsymmErrors* gEffAreaNoTh2Rec;
+		TGraphAsymmErrors* gEffAreaNoTh2MC;
+		TGraphAsymmErrors* gEffAreaNoTh2Rec;
 		TProfile* hEmcSWeight;
 		TProfile* hEsysRec;
 		TProfile* hEsysMC;
@@ -201,26 +201,26 @@ class VEffectiveAreaCalculator
 		TH2F* hResponseMatrix;
 		TProfile* hResponseMatrixProfile;
 		TH2F* hResponseMatrixQC;
-
-                TH2F* hEsysMCRelative2DNoDirectionCut;
-                TH2F* hResponseMatrixNoDirectionCut;
-                TH2F* hResponseMatrixFineNoDirectionCut;
-
+		
+		TH2F* hEsysMCRelative2DNoDirectionCut;
+		TH2F* hResponseMatrixNoDirectionCut;
+		TH2F* hResponseMatrixFineNoDirectionCut;
+		
 		TH1D* hWeightedRate;
 		TH1D* hWeightedRate005;
 		vector< TH1D* > hEcutSub;                //! events after individual cuts
-    
-                TH2F *hAngularDiff_2D;
-                TH2F *hAngularDiffEmc_2D;
-                TH2F *hAngularLogDiff_2D;
-                TH2F *hAngularLogDiffEmc_2D;
+		
+		TH2F* hAngularDiff_2D;
+		TH2F* hAngularDiffEmc_2D;
+		TH2F* hAngularLogDiff_2D;
+		TH2F* hAngularLogDiffEmc_2D;
 		
 		int fEffectiveAreaVsEnergyMC;            // 0 = vs MC energy, 1 = vs rec energy (approx. method), 2 = vs rec energy (default)
 		bool bLikelihoodAnalysis;
-
+		
 		TTree* fEffArea;
 		TTree* fEffTree;
-
+		
 		double ze;
 		int fAzBin;                               //!< az bin: definitions see getEffectiveArea
 		double fMinAz;
@@ -241,11 +241,11 @@ class VEffectiveAreaCalculator
 		float eff_MC[1000];
 		double seff_L[1000];
 		double seff_U[1000];
-                
-                float eff_error[1000];
-                float effNoTh2_error[1000];
-                float esys_rel[1000];
-
+		
+		float eff_error[1000];
+		float effNoTh2_error[1000];
+		float esys_rel[1000];
+		
 		int Rec_nbins;
 		double Rec_e0[1000];
 		double Rec_eff[1000];
@@ -256,16 +256,16 @@ class VEffectiveAreaCalculator
 		double ResMat_MC[1000];
 		double ResMat_Rec[1000];
 		double ResMat_Rec_Err[1000];
-                
-                float Rec_eff_error[1000];
-                float Rec_effNoTh2_error[1000];
-
-                float Rec_angRes_p68[1000];
-                float Rec_angRes_p80[1000];
-
-                // H2F effective area tree
-                float fH2F_e0_esys[1000];
-
+		
+		float Rec_eff_error[1000];
+		float Rec_effNoTh2_error[1000];
+		
+		float Rec_angRes_p68[1000];
+		float Rec_angRes_p80[1000];
+		
+		// H2F effective area tree
+		float fH2F_e0_esys[1000];
+		
 		TTree* fAcceptance_AfterCuts_tree;       //Information for all the events after cuts to construct the background map
 		double fXoff_aC;
 		double fYoff_aC;
@@ -298,34 +298,34 @@ class VEffectiveAreaCalculator
 		// effective areas fit functions
 		vector< TF1* > fEffAreaFitFunction;
 		
-		TF1 *fGauss;
+		TF1* fGauss;
 		double hres_binw;
-        	double* hres_bins;
-        	vector <double> hres_binc;
-           	int hres_nbins;
+		double* hres_bins;
+		vector <double> hres_binc;
+		int hres_nbins;
 		TGraphAsymmErrors* applyResponseMatrix( TH2* h, TGraphAsymmErrors* g );
 		bool   binomialDivide( TGraphAsymmErrors* g, TH1D* hrec, TH1D* hmc );
 		void   copyProfileHistograms( TProfile*,  TProfile* );
 		void   copyHistograms( TH1*,  TH1*, bool );
-                void   fillAngularResolution( unsigned int i_az, bool iContaintment_80p );
+		void   fillAngularResolution( unsigned int i_az, bool iContaintment_80p );
 		double getAzMean( double azmin, double azmax );
-		double getCRWeight( double iEMC_TeV_log10, TH1* h , bool for_back_map = false );
-                template <typename T> vector< T > get_irf_vector( int i_nbins, T* i_e0, T* i_irf );
-                TH2F*  get_irf2D_vector( int nx, float minx, float maxx, int ny, float miny, float maxy, float* value );
+		double getCRWeight( double iEMC_TeV_log10, TH1* h, bool for_back_map = false );
+		template <typename T> vector< T > get_irf_vector( int i_nbins, T* i_e0, T* i_irf );
+		TH2F*  get_irf2D_vector( int nx, float minx, float maxx, int ny, float miny, float maxy, float* value );
 		bool   getEffectiveAreasFromFitFunction( TTree*, double azmin, double azmax, double ispectralindex );
 		void   getEffectiveAreasFromFitFunction( unsigned int, unsigned int, double, double&, double& );
 		double getEffectiveAreasFromHistograms( double erec, double ze, double woff, double iPedVar,
-							double iSpectralIndex, bool bAddtoMeanEffectiveArea = true,
-							int iEffectiveAreaVsEnergyMC = 2 );
+												double iSpectralIndex, bool bAddtoMeanEffectiveArea = true,
+												int iEffectiveAreaVsEnergyMC = 2 );
 		bool   getMonteCarloSpectra( VEffectiveAreaCalculatorMCHistograms* );
 		double getMCSolidAngleNormalization();
 		vector< unsigned int > getUpperLowBins( vector< double > i_values, double d );
-		bool   initializeEffectiveAreasFromHistograms( TTree*, TH1D*, double azmin, double azmax, double ispectralindex, double ipedvar, TTree *iEffAreaH2F = 0 );
+		bool   initializeEffectiveAreasFromHistograms( TTree*, TH1D*, double azmin, double azmax, double ispectralindex, double ipedvar, TTree* iEffAreaH2F = 0 );
 		vector< double > interpolate_effectiveArea( double iV, double iVLower, double iVupper,
 				vector< double > iEL, vector< double > iEU, bool iCos = true );
-		
-                TH2F*  interpolate_responseMatrix( double iV, double iVLower, double iVupper, TH2F *iElower, TH2F *iEupper, bool iCos = true );
-                void   multiplyByScatterArea( TGraphAsymmErrors* g );
+				
+		TH2F*  interpolate_responseMatrix( double iV, double iVLower, double iVupper, TH2F* iElower, TH2F* iEupper, bool iCos = true );
+		void   multiplyByScatterArea( TGraphAsymmErrors* g );
 		void   reset();
 		void   smoothEffectiveAreas( map< unsigned int, vector< double > > );
 		
@@ -366,24 +366,24 @@ class VEffectiveAreaCalculator
 		TGraphAsymmErrors* getMeanEffectiveArea();
 		TGraph2DErrors*    getTimeBinnedMeanEffectiveArea();
 		TGraphAsymmErrors* getMeanEffectiveAreaMC();
-
-
-
-                void addMeanResponseMatrix( TH2F *i_hTmp ) ;
+		
+		
+		
+		void addMeanResponseMatrix( TH2F* i_hTmp ) ;
 		TH2F* getMeanResponseMatrix()
 		{
-		  return hMeanResponseMatrix;
+			return hMeanResponseMatrix;
 		}
-
+		
 		void setTimeBinnedMeanEffectiveArea();
 		void setTimeBinnedMeanEffectiveAreaMC( double i_time );
-
+		
 		void initializeHistograms( vector< double > iAzMin, vector< double > iAzMax, vector< double > iSpectralIndex );
 		void resetHistograms( unsigned int iZe );
 		void resetHistogramsVectors( unsigned int iZe );
-                void setAngularResolution2D( unsigned int i_az, vector< TH2D* > );
-                void setAngularResolutionGraph( unsigned int i_az, TGraphErrors* g, bool iAngContainment_80p );
-
+		void setAngularResolution2D( unsigned int i_az, vector< TH2D* > );
+		void setAngularResolutionGraph( unsigned int i_az, TGraphErrors* g, bool iAngContainment_80p );
+		
 		void setAzimuthCut( int iAzBin, double iAzMin, double iAzMax );
 		void setEffectiveArea( int iMC )
 		{

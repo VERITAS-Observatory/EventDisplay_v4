@@ -1,9 +1,7 @@
-/*! \CLASS veFFECTIVEaREAcALCULATORmchISTOGRAMS
+/*! \class VEffectiveAreaCalculatorMCHistograms
     \brief filling, reading, writing of MC histograms for effective area calculation
 
 
-    \author
-    Gernot Maier
 */
 
 #include "VEffectiveAreaCalculatorMCHistograms.h"
@@ -22,8 +20,7 @@ VEffectiveAreaCalculatorMCHistograms::VEffectiveAreaCalculatorMCHistograms()
 	fMCCuts = false;
 	fArrayxyoff_MC_min = -1.e5;
 	fArrayxyoff_MC_max =  1.e5;
-
-        // This should be aligned with all the IRF histograms.	
+	
 	fEnergyAxisBins_log10 = 60;
 	fEnergyAxisMin_log10  = -2.;
 	fEnergyAxisMax_log10  =  4.;
@@ -92,10 +89,25 @@ void VEffectiveAreaCalculatorMCHistograms::print()
 					cout << "\tEntries (MCweights): ";
 					cout << getHistogram_EmcWeight( j, i )->GetEntries();
 				}
+				if( getHistogram_EmcUnweighted( j ) && getHistogram_EmcUnweighted( j )->GetEntries() > 0 )
+				{
+					cout << "\t Entries (Unweighted): ";
+					cout << getHistogram_EmcUnweighted( j )->GetEntries();
+				}
 				cout << endl;
 			}
 		}
 	}
+}
+
+TH1D* VEffectiveAreaCalculatorMCHistograms::getHistogram_EmcUnweighted( unsigned int iAz )
+{
+	if( iAz < hVEmcUnWeighted.size() )
+	{
+		return hVEmcUnWeighted[iAz];
+	}
+	
+	return 0;
 }
 
 
@@ -254,6 +266,8 @@ bool VEffectiveAreaCalculatorMCHistograms::fill( double i_ze, TTree* i_MCData, b
 					hVEmcSWeight[s][i_az]->Fill( eMC, i_weight );
 				}
 			}
+			// fill unweighted histogram
+			hVEmcUnWeighted[i_az]->Fill( eMC );
 		}
 	} // end of loop over all MC entries
 	
@@ -287,23 +301,34 @@ void VEffectiveAreaCalculatorMCHistograms::initializeHistograms( vector< double 
 		iT_TH1D.clear();
 		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
 		{
-			sprintf( hname, "hVVEmc_%d_%d", i, j );
+			sprintf( hname, "hVVEmc_%u_%u", i, j );
 			iT_TH1D.push_back( new TH1D( hname, "", nbins, xmin, xmax ) );
 			iT_TH1D.back()->SetXTitle( "energy_{MC} [TeV]" );
-			iT_TH1D.back()->SetYTitle( "entries" );
+			iT_TH1D.back()->SetYTitle( "entries (weighted)" );
 			iT_TH1D.back()->Sumw2();
 		}
 		hVEmc.push_back( iT_TH1D );
 		
 		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
 		{
-			sprintf( hname, "hVVEmcSWeight_%d_%d", i, j );
+			sprintf( hname, "hVVEmcSWeight_%u_%u", i, j );
 			iT_TProfile.push_back( new TProfile( hname, "", nbins, xmin, xmax, 0., 1.e12 ) );
 			iT_TProfile.back()->SetXTitle( "energy_{MC} [TeV]" );
 			iT_TProfile.back()->SetYTitle( "spectral weight" );
 		}
 		hVEmcSWeight.push_back( iT_TProfile );
+		
 	}
+	// unweighted histogram (for debugging purposes)
+	for( unsigned int j = 0; j < fVMinAz.size(); j++ )
+	{
+		sprintf( hname, "hVVEmc_%u", j );
+		hVEmcUnWeighted.push_back( new TH1D( hname, "", nbins, xmin, xmax ) );
+		hVEmcUnWeighted.back()->SetXTitle( "energy_{MC} [TeV]" );
+		hVEmcUnWeighted.back()->SetYTitle( "entries (not weighted)" );
+		hVEmcUnWeighted.back()->Sumw2();
+	}
+	
 	
 	// set spectral weight vector
 	for( unsigned int s = 0; s < fVSpectralIndex.size(); s++ )
@@ -399,9 +424,22 @@ bool VEffectiveAreaCalculatorMCHistograms::add( const VEffectiveAreaCalculatorMC
 		}
 	}
 	
+	for( unsigned int j = 0; j < hVEmcUnWeighted.size(); j++ )
+	{
+		if( hVEmcUnWeighted[j] && iMChis->hVEmcUnWeighted[j] )
+		{
+			hVEmcUnWeighted[j]->Add( iMChis->hVEmcUnWeighted[j] );
+		}
+	}
+	
 	return true;
 }
 
+/*
+
+     note the interesting error coding...
+
+*/
 int VEffectiveAreaCalculatorMCHistograms::checkParameters( const VEffectiveAreaCalculatorMCHistograms* iMChis )
 {
 	if( fDebug )
@@ -537,6 +575,13 @@ bool VEffectiveAreaCalculatorMCHistograms::matchDataVectors( vector< double > iA
 	vector< TProfile* > iP;
 	
 	// match spectral index
+	if( fDebug )
+	{
+		cout << "VEffectiveAreaCalculatorMCHistograms::matchDataVectors: ";
+		cout << "matching spectral index;";
+		cout << " found: " << fVSpectralIndex.size();
+		cout << " requested: " << iSpectralIndex.size() << endl;
+	}
 	for( unsigned int i = 0; i < fVSpectralIndex.size(); i++ )
 	{
 		for( unsigned int j = 0; j < iSpectralIndex.size(); j++ )
@@ -571,6 +616,7 @@ bool VEffectiveAreaCalculatorMCHistograms::matchDataVectors( vector< double > iA
 	// match azimuth vector
 	vector< double > iVMinAz_new;
 	vector< double > iVMaxAz_new;
+	vector< unsigned int > iVAz_match;
 	for( unsigned int s = 0; s < fVSpectralIndex.size(); s++ )
 	{
 		iVMinAz_new.clear();
@@ -590,6 +636,7 @@ bool VEffectiveAreaCalculatorMCHistograms::matchDataVectors( vector< double > iA
 					iVMaxAz_new.push_back( iAzMax[i] );
 					ihVEmc_new.push_back( hVEmc[s][j] );
 					iVEmcSWeight_new.push_back( hVEmcSWeight[s][j] );
+					iVAz_match.push_back( j );
 				}
 			}
 		}
@@ -598,6 +645,17 @@ bool VEffectiveAreaCalculatorMCHistograms::matchDataVectors( vector< double > iA
 	}
 	fVMinAz = iVMinAz_new;
 	fVMaxAz = iVMaxAz_new;
+	
+	// unweighted histogram
+	vector< TH1D* > ihVEmcUnWeighted_new;
+	for( unsigned int i = 0; i < iVAz_match.size(); i++ )
+	{
+		if( iVAz_match[i] < hVEmcUnWeighted.size() )
+		{
+			ihVEmcUnWeighted_new.push_back( hVEmcUnWeighted[iVAz_match[i]] );
+		}
+	}
+	hVEmcUnWeighted = ihVEmcUnWeighted_new;
 	
 	return true;
 }

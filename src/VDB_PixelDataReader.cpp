@@ -115,11 +115,75 @@ void VDB_PixelDataReader::fillDataRow( unsigned int iDataType, string iTimeStamp
 				cout << iTimeStamp << ", T" << iTel + 1 << ", pixel " << iPixel << ": " << iData << endl;
 			}
 		}
+		else if( iPixel != 499 )
+		{
+			cout << "VDB_PixelDataReader::fillDataRow(): invalid pixel ID for data type " << iDataType << ": ";
+			cout << iPixel << "\t" << fPixelData[iDataType][iTel].size() << endl;
+		}
 	}
 	else
 	{
 		cout << "VDB_PixelDataReader::fillDataRow(): invalid data type: " << iDataType << endl;
 	}
+}
+
+/*
+ * read from DB text files
+ *
+ */
+bool VDB_PixelDataReader::readFromDBTextFiles( string iDBTextDirectory, unsigned int runNumber, string iDBStartTimeSQL )
+{
+	VSQLTextFileReader a( iDBTextDirectory, runNumber, "L1_TriggerInfo" );
+	if( !a.isGood() || !a.checkDataVectorsForSameLength() )
+	{
+		return false;
+	}
+	vector< string > i_timestamp = a.getValueVector_from_key( "timestamp" );
+	vector< unsigned int > i_telID = a.getValueVector_from_key_as_integer( "telescope_id" );
+	vector< unsigned int > i_pixelID = a.getValueVector_from_key_as_integer( "pixel_id" );
+	vector< double > i_rate = a.getValueVector_from_key_as_double( "rate" );
+	for( unsigned int i = 0; i < i_timestamp.size(); i++ )
+	{
+		if( i_telID[i] < fNPixel.size() && i_pixelID[i] < fNPixel[i_telID[i]] )
+		{
+			fillDataRow( 0, i_timestamp[i], i_telID[i], i_pixelID[i], i_rate[i] );
+		}
+	}
+	// read HV
+	for( unsigned int t = 0; t < getNTel(); t++ )
+	{
+		// HVsettings
+		VSQLTextFileReader h( iDBTextDirectory, runNumber, "HVsettings", t );
+		if( !h.isGood() || !h.checkDataVectorsForSameLength() )
+		{
+			return false;
+		}
+		vector< string > i_timestamp = h.getValueVector_from_key( "db_end_time" );
+		vector< unsigned int > i_channelid = h.getValueVector_from_key_as_integer( "channel" );
+		vector< double > i_hv = h.getValueVector_from_key_as_double( "voltage_meas" );
+		vector< double > i_currents = h.getValueVector_from_key_as_double( "current_meas" );
+		for( unsigned int i = 0; i < i_timestamp.size(); i++ )
+		{
+			fillDataRow( 1, i_timestamp[i], t, i_channelid[i] - 1, i_hv[i] );
+			fillDataRow( 2, i_timestamp[i], t, i_channelid[i] - 1, i_currents[i] );
+		}
+		// FADCsettings
+		VSQLTextFileReader f( iDBTextDirectory, runNumber, "FADCsettings", t );
+		if( !f.isGood() || !f.checkDataVectorsForSameLength() )
+		{
+			return false;
+		}
+		vector< unsigned int > i_pixel_id = f.getValueVector_from_key_as_integer( "pixel_id" );
+		vector< unsigned int > i_fadc_id = f.getValueVector_from_key_as_integer( "fadc_id" );
+		vector< unsigned int > i_fadc_channel = f.getValueVector_from_key_as_integer( "fadc_channel" );
+		for( unsigned int i = 0; i < i_pixel_id.size(); i++ )
+		{
+			fillDataRow( 3, iDBStartTimeSQL, t, i_pixel_id[i], i_fadc_id[i] );
+			fillDataRow( 4, iDBStartTimeSQL, t, i_pixel_id[i], i_fadc_channel[i] );
+		}
+	}
+	
+	return true;
 }
 
 /*
@@ -147,10 +211,13 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
 	/////////////////////////////////////////////////////
 	// read L1 rates
 	
-	sprintf( c_query, "select timestamp, telescope_id, pixel_id, rate from tblL1_TriggerInfo, tblRun_Info where timestamp" );
-	sprintf( c_query, "%s >= tblRun_Info.data_start_time - INTERVAL 1 MINUTE AND timestamp <=  tblRun_Info.data_end_time + INTERVAL 1 MINUTE AND tblRun_Info.run_id=%d", c_query, runNumber );
+	ostringstream c_queryS;
+	c_queryS << "select timestamp, telescope_id, pixel_id, rate from tblL1_TriggerInfo, tblRun_Info where timestamp";
+	c_queryS << " >= tblRun_Info.data_start_time - INTERVAL 1 MINUTE AND timestamp ";
+	c_queryS << " <=  tblRun_Info.data_end_time + INTERVAL 1 MINUTE AND tblRun_Info.run_id=";
+	c_queryS << runNumber;
 	
-	if( !my_connection.make_query( c_query ) )
+	if( !my_connection.make_query( c_queryS.str().c_str() ) )
 	{
 		fDBStatus = false;
 		return false;
@@ -189,10 +256,12 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
 	
 	for( unsigned int i = 0; i < getNTel(); i++ )
 	{
-		sprintf( c_query, "select * FROM tblHV_Telescope%d_Status WHERE channel > 0 AND", i );
-		sprintf( c_query, "%s (db_start_time >= \"%s\" - INTERVAL 1 MINUTE) AND (db_start_time <= \"%s\" )", c_query, iDBStartTimeSQL.c_str(), fDBRunStoppTimeSQL.c_str() );
+		ostringstream c_queryS;
+		c_queryS << "select * FROM tblHV_Telescope" << i << "_Status WHERE channel > 0 AND";
+		c_queryS << " (db_start_time >= \"" << iDBStartTimeSQL << "\"";
+		c_queryS << "- INTERVAL 1 MINUTE) AND (db_start_time <= \" " << fDBRunStoppTimeSQL << "\" )";
 		
-		if( !my_connection.make_query( c_query ) )
+		if( !my_connection.make_query( c_queryS.str().c_str() ) )
 		{
 			fDBStatus = false;
 			cout << "FAILED" << endl;
@@ -264,8 +333,8 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
 				
 				if( db_row->GetField( 0 ) && db_row->GetField( 1 ) && db_row->GetField( 2 ) )
 				{
-					fillDataRow( 3, iDBStartTimeSQL, i, atoi( db_row->GetField( 0 ) ) , atof( db_row->GetField( 1 ) ) );
-					fillDataRow( 4, iDBStartTimeSQL, i, atoi( db_row->GetField( 0 ) ) , atof( db_row->GetField( 2 ) ) );
+					fillDataRow( 3, iDBStartTimeSQL, i, atoi( db_row->GetField( 0 ) ), atof( db_row->GetField( 1 ) ) );
+					fillDataRow( 4, iDBStartTimeSQL, i, atoi( db_row->GetField( 0 ) ), atof( db_row->GetField( 2 ) ) );
 				}
 			}
 		}
@@ -443,8 +512,8 @@ vector< float > VDB_PixelDataReader::getDataVector( unsigned int iDataType, unsi
 							{
 								if( t == 0 || t == 1 )
 								{
-									if( fPixelData[iDataType][iTel][i]->fData.size() > t + 1 ) 
-									{ 
+									if( fPixelData[iDataType][iTel][i]->fData.size() > t + 1 )
+									{
 										fDummyReturnVector[i] = fPixelData[iDataType][iTel][i]->fData[t + 1];
 									}
 									if( fDummyReturnVector[i] < 1.e-2 && fPixelData[iDataType][iTel][i]->fData.size() > 3 )

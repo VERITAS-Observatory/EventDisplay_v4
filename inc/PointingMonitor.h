@@ -2,8 +2,6 @@
  * \file
  * \brief Function declarations for Pointing Monitor interactions with the database
  *
- * some adaption for eventdisplay by G.Maier and J.Grube
- *
  * \author Dirk Pandel
  */
 
@@ -41,7 +39,6 @@ namespace pointingmonitor
 		uint32_t startDate;                  ///< Start date from which the parameters are valid (yyyymmdd)
 		uint32_t endDate;                    ///< End date until which the parameters are valid (yyyymmdd)
 		uint32_t version;                    ///< Version number of the parameters
-		//JG/////std::vector<LEDPos> ledPositions;    ///< Vector of LED positions in the PMT coordinate system
 		float pmtRotation;                   ///< Clockwise PMT rotation angle vs. the horizon (radians)
 		float pmtScale;                      ///< Plate scale of the PMTs (radians/PMT)
 		float skyCameraRotation;             ///< Clockwise rotation angle of the sky camera (radians)

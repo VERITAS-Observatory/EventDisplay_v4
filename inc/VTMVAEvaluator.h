@@ -106,7 +106,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		double                      fTMVACutValueNoVec;
 		
 		string                  fParticleNumberFileName;          // particle numbers are read from this file
-                double                  fParticleNumberFile_Conversion_Rate_to_seconds;
+		double                  fParticleNumberFile_Conversion_Rate_to_seconds;
 		double                  fOptimizationSourceSignificance;
 		double                  fOptimizationFixedSignalEfficiency;
 		double                  fOptimizationMinSourceStrength;
@@ -145,9 +145,6 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		float    fTheta2;
 		float    fCoreDist;
 		float    fImages_Ttype[VDST_MAXTELESCOPES];
-		float    fRWidth3D;    //model3D
-		float    fErrRWidth3D; //model3D
-		float    fDepth3D;     //model3D
 		float    fDispDiff;
 		float    fDummy;
 		
@@ -204,7 +201,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 			return fTMVA_EvaluationResult;
 		}
 		bool   initializeWeightFiles( string iWeightFileName, unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
-									  unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax, double iEnergyStepSize=0.2, string iInstrumentEpoch = "noepoch" );
+									  unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax, double iEnergyStepSize = 0.2, string iInstrumentEpoch = "noepoch" );
 		bool   initializeDataStrutures( CData* iC );
 		bool   IsZombie()
 		{
@@ -242,7 +239,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		void   setParticleNumberFile( string iParticleNumberFile = "", double iConversionFactor_to_seconds = 60. )
 		{
 			fParticleNumberFileName = iParticleNumberFile;
-                        fParticleNumberFile_Conversion_Rate_to_seconds = iConversionFactor_to_seconds;
+			fParticleNumberFile_Conversion_Rate_to_seconds = iConversionFactor_to_seconds;
 		}
 		void   setPlotEfficiencyPlotsPerBin( bool iB = false )
 		{

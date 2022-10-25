@@ -71,7 +71,7 @@ VDB_CalibrationInfo::VDB_CalibrationInfo( int current_run, int current_tel, TStr
 	flong_char_query = 100000;
 	fseparation = "|";
 }
-VDB_CalibrationInfo::VDB_CalibrationInfo( int laserrun , int tel , string name_out_file, int gain_or_toff, int VOFFLINE_version_query, int LOW_GAIN, TString DBserver )
+VDB_CalibrationInfo::VDB_CalibrationInfo( int laserrun, int tel, string name_out_file, int gain_or_toff, int VOFFLINE_version_query, int LOW_GAIN, TString DBserver )
 {
 	fread_flag = true;
 	fcurrent_run = laserrun;
@@ -188,11 +188,11 @@ void VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file( string pass_word )
 	
 	std::cout << "You are in the process of WRITING in VOFFLINE Data Base " << std::endl;
 	std::cout << "in order to complete the process: " << std::endl;
-    string the_password = pass_word;
-    if( the_password == "" )
-    {
-        please_give_the_password();
-    }
+	string the_password = pass_word;
+	if( the_password == "" )
+	{
+		please_give_the_password();
+	}
 	
 	//std::cout<<"VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file "<<std::endl;
 	VDB_Connection my_connection( iTempS.c_str(), "readwrite", the_password.c_str() ) ;
@@ -221,8 +221,6 @@ void VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file( string pass_word )
 //---------------------------------------------
 bool VDB_CalibrationInfo::readVOFFLINE()
 {
-	std::cout << "Reading calibration information from VOFFLINE DB" << std::endl;
-	
 	if( !fread_flag )
 	{
 		std::cout << "ERROR: wrong constructor" << std::endl;
@@ -295,7 +293,7 @@ string VDB_CalibrationInfo::please_give_the_password()
 	
 	
 	printf( "Please enter the password: " );
-    int result_scan = scanf( "%79s", str );
+	int result_scan = scanf( "%79s", str );
 	
 	if( result_scan > 0 )
 	{

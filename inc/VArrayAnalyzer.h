@@ -5,10 +5,8 @@
 #include "TMath.h"
 
 #include "VEvndispData.h"
-#include "VDispAnalyzer.h"
 #include "VGrIsuAnalyzer.h"
 #include "VEffectiveAreaCalculatorMCHistograms.h"
-#include "VMLPAnalyzer.h"
 #include "VShowerParameters.h"
 #include "VSkyCoordinatesUtilities.h"
 #include "VStarCatalogue.h"
@@ -25,8 +23,6 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
 	
 		bool fDebug;
 		bool fInitialized;                        //!< true after initialization
-		
-		vector< VDispAnalyzer* > fDispAnalyzer;
 		
 		vector< double > fMeanPointingMismatch;   //!< mean pointing mismatch between eventdisplay and vbf (per telescope)
 		vector< double > fNMeanPointingMismatch;
@@ -67,22 +63,16 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
 		
 		void calcShowerDirection_and_Core();      //!< calculate shower core and direction
 		void checkPointing();                     //!< check for mismatching between different pointing values
-		void initializeDispAnalyzer( unsigned int iStereoMethodID );
 		void prepareforCoreReconstruction( unsigned int iMeth, float xs, float ys );
 		void prepareforDirectionReconstruction( unsigned int iMethIndex, unsigned int iReconstructionMethod );
 		bool fillSimulationEvent();
 		bool fillShowerDirection( unsigned int iMeth, float xoff, float yoff, float stds );
 		bool fillShowerCore( unsigned int iMeth, float ximp, float yimp ); //!< fill shower core results into VEvndispData
 		double getMeanPointingMismatch( unsigned int iTel );
-		string getTMVAFileNameForAngularReconstruction( unsigned int iStereoMethodID, string iBDTFileName = "BDTDisp_BDT_" );
 		void initEvent();                         //!< reset vectors, etc. (called for each event)
 		int  rcs_method_0( unsigned int );        //!< GrIsu reconstruction method 1(!)
 		int  rcs_method_3( unsigned int );
 		int  rcs_method_4( unsigned int );
-		int  rcs_method_5( unsigned int, unsigned int );
-		int  rcs_method_7( unsigned int );
-		int  rcs_method_8( unsigned int );
-		int  rcs_method_9( unsigned int );
 		float recalculateImagePhi( double, double );
 		void selectShowerImages( unsigned int );  //!< select shower images to be used in determinate of shower coordinates
 		//!< transform telescope positions into shower coordinates

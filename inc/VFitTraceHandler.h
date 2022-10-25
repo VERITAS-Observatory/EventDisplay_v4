@@ -113,14 +113,14 @@ class VFitTraceHandler : public VTraceHandler
 			return -1.*fTraceMax - fPed;
 		}
 		//!< get maximum value in trace
-		void   getTraceMax( int , int, double&, int& );
+		void   getTraceMax( int, int, double&, int& );
 		void   getTraceMax( double&, double& );   //!< get maximum value in trace
 		double getTraceNorm()                     //!< return trace normalisation
 		{
 			return fTraceNorm;
 		}
-		double getTraceSum( int , int, bool );    //!< get sum from integration of fit function
-		double getTraceTZero( int , int );        //!< get pulse start (at half maximum of the rising edge of the pulse)
+		double getTraceSum( int, int, bool );     //!< get sum from integration of fit function
+		double getTraceTZero( int, int );         //!< get pulse start (at half maximum of the rising edge of the pulse)
 		bool   setFitFunction( string );          //!< set fit function to use
 		void   setFitThresh( double ithres )      //!< threshold above PMT is fitted (don't fit traces with no signal)
 		{

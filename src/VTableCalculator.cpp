@@ -190,8 +190,8 @@ void VTableCalculator::setBinning()
 	if( fEnergy )
 	{
 		fBinning1DXlow =  0.01;
-		fBinning1DXhigh = 250.;
-		HistBins = int( fBinning1DXhigh / 0.005 );
+		fBinning1DXhigh = 100.;
+		HistBins = int( ( fBinning1DXhigh - fBinning1DXlow ) / 0.005 );
 	}
 }
 
@@ -220,40 +220,14 @@ bool VTableCalculator::create1DHistogram( int i, int j, double w_first_event )
 		char histitle[200];
 		int id = i * 1000 + j;
 		
-		sprintf( hisname , "h%d", id );
+		sprintf( hisname, "h%d", id );
 		double is1 = hMedian->GetXaxis()->GetBinLowEdge( i + 1 );
 		double is2 = hMedian->GetXaxis()->GetBinLowEdge( i + 1 ) + hMedian->GetXaxis()->GetBinWidth( i + 1 );
 		double id1 = hMedian->GetYaxis()->GetBinLowEdge( j + 1 );
 		double id2 = hMedian->GetYaxis()->GetBinLowEdge( j + 1 ) + hMedian->GetYaxis()->GetBinWidth( j + 1 );
 		sprintf( histitle, "%.2f < log10 size < %.2f, %.1f < r < %.1f (%s)", is1, is2, id1, id2, fHName_Add.c_str() );
 		
-		int n_bins   = HistBins;
-		float x_low  = fBinning1DXlow;
-		float x_high = fBinning1DXhigh;
-		//////////////////////////////////////////////////
-		// set adaptive binning for filling of energies
-		// note: reason is memory problems (mainly for CTA)
-		// this is a crude fix to the problem
-		// something better should be found
-		if( fEnergy )
-		{
-			x_low = w_first_event / 100.;
-			if( x_low < fBinning1DXlow )
-			{
-				x_low = fBinning1DXlow;
-			}
-			x_high = w_first_event * 100.;
-			// <1 TeV: 5 GeV binning
-			n_bins = int( ( x_high - x_low ) / 0.005 );
-			// >1 TeV: 25 GeV binning
-			if( w_first_event > 1. )
-			{
-				x_low  = fBinning1DXlow;
-				x_high = fBinning1DXhigh;
-				n_bins = int( ( x_high - x_low ) / 0.025 );
-			}
-		}
-		Oh[i][j] = new TH1F( hisname, histitle, n_bins, x_low, x_high );
+		Oh[i][j] = new TH1F( hisname, histitle, HistBins, fBinning1DXlow, fBinning1DXhigh );
 		Oh[i][j]->SetXTitle( fName.c_str() );
 	}
 	else

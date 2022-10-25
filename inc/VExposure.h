@@ -3,8 +3,7 @@
 #ifndef VEXPOSURE_H
 #define VEXPOSURE_H
 
-#include "VASlamac.h"
-#include "VASlalib.h"
+#include "VAstronometry.h"
 #include "VDBTools.h"
 #include "VStarCatalogue.h"
 #include "VGlobalRunParameter.h"
@@ -79,7 +78,7 @@ class VExposure : public TObject, public VGlobalRunParameter
 		
 		bool fPlotExtendedSources;
 		bool fPlotSourceNames;
-	
+		
 		bool fDoCheckSums;
 		vector<int> fRunsNoChecksum;
 		vector<int> fRunsGoodChecksum;
@@ -242,13 +241,13 @@ class VExposure : public TObject, public VGlobalRunParameter
 		void addCatalogue( string, int iMarker = 5, int iColor = 50, double iAngle = 45. );
 		void listCatalogues();
 		bool removeCataloge( unsigned int iB );
-
-		TString getArchiveMD5sum( int date, int run, bool force_download = false);
+		
+		TString getArchiveMD5sum( int date, int run, bool force_download = false );
 		TString calcMD5sum( int date, int run );
-		TString readMD5sumFromFile( TString filename, int run, bool warn = true);
-		int checkMD5sum( int date, int run, bool force_download = false) ;
+		TString readMD5sumFromFile( TString filename, int run, bool warn = true );
+		int checkMD5sum( int date, int run, bool force_download = false ) ;
 		void printChecksumSummary();
-
+		
 		ClassDef( VExposure, 8 );
 };
 #endif

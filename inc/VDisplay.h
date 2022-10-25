@@ -46,8 +46,6 @@
 #include <VCamera.h>
 #include <VDisplayBirdsEye.h>
 #include <VEventLoop.h>
-#include <VFitTraceHandler.h>
-#include <VPETree.h>
 
 #include <bitset>
 #include <iostream>
@@ -86,7 +84,7 @@ class VDisplay : public TGMainFrame
 							C_PEDMEAN, C_PEDVAR, C_PEDMEANLOW, C_PEDVARLOW, C_GAINS, C_GAINVARS, C_GAINSLOW, C_GAINVARSLOW,
 							C_TOFF, C_TOFFLOW, C_LOWGAIN, C_CALTZERO, C_CALTZEROLOW, C_STATUS, C_STATUSLOW,
 							C_L1, C_HV, C_CURRENTS,
-							C_TRIGGER_EVNDISP, C_TEMPLATE, C_MODEL3D
+							C_TRIGGER_EVNDISP
 						   };
 		//! FADC/ana tab identifier
 		enum E_fadcIDENT {F_FADC, F_ANA};
@@ -243,8 +241,6 @@ class VDisplay : public TGMainFrame
 		bool fAutoRunStatus;                      //!< true = autorunmodus is on
 		unsigned int fTimingSleep;                //!< pause between each event in autorunmodus (microseconds)
 		bool fCameraTiming;                       //!< last tab was timing tab (read again data)
-		
-		VFitTraceHandler* fFitTraceHandler;       //!< trace handler for trace fitting
 		
 		void     bookHistos();                    //!< book histograms
 		//!< not all plots make sense

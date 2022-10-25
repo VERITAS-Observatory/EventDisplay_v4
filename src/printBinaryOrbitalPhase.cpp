@@ -2,21 +2,19 @@
     \brief print binary orbital phase
 
 
-    \author
-    Gernot Maier
 */
 
 #include <iomanip>
 #include <iostream>
 #include <stdlib.h>
 
-#include "VASlalib.h"
+#include "VAstronometry.h"
 
 using namespace std;
 
 int main( int argc, char* argv[] )
 {
-	if( argc != 6 && argc != 8 && argc != 7 )
+	if( argc != 6 && argc != 7 && argc != 8 )
 	{
 		cout << "printBinaryOrbitalPhase <year> <month> <day> <MJD> <Object> [orbit] [T0]" << endl;
 		cout << endl;
@@ -24,9 +22,9 @@ int main( int argc, char* argv[] )
 		cout << endl;
 		cout << "   print orbit for a whole year: set month and day to -1 each" << endl;
 		cout << endl;
-		cout << "   <Object=\"LS I +61 303\" or \"HESS J0632+057\" " << endl;
+		cout << "   <Object=\"LS I +61 303\", \"HESS J0632+057\", \"LS 5039\", \"PSR B1259–63\", \"HESS J1832-093\">" << endl;
 		cout << endl;
-		cout << "   [orbit]   orbital period in days (optional" << endl;
+		cout << "   [orbit]   orbital period in days (optional)" << endl;
 		cout << "   [T0]      MJD 0" << endl;
 		cout << endl;
 		exit( 0 ) ;
@@ -39,7 +37,7 @@ int main( int argc, char* argv[] )
 	double fd = 0.;
 	if( year < 0 && month < 0 && day < 0 && djm > 0 )
 	{
-		slaDjcl( djm, &year, &month, &day, &fd, &j );
+		VAstronometry::vlaDjcl( djm, &year, &month, &day, &fd, &j );
 	}
 	bool bPrintWholeYear = false;
 	if( month < 0 && day < 0 && djm < 0 )
@@ -52,22 +50,50 @@ int main( int argc, char* argv[] )
 	string object = argv[5];
 	double orbit = 0.;
 	double t0 = 0.;
-	// LS I+61 303 timing
+	// LS I+61 303
 	if( object == "LS I +61 303" )
 	{
 		orbit = 26.4960;
 		t0 = 2443366.775 - 2400000.5;
 	}
+	// HESS J0632+057
 	else if( object == "HESS J0632+057" )
 	{
 		orbit = 315.;
 		t0 = 54857.;
 	}
+	// LS 5039
+	else if( object == "LS 5039" )
+	{
+		orbit = 3.90603;
+		t0    = 51942.59;
+	}
+	// PSR B1259–63 (needs to be verified)
+	else if( object == "PSR B1259–63" )
+	{
+		orbit = 1237.;
+		t0    = 53040.22;
+	}
+	else if( object == "IGR J00370+6122" )
+	{
+		orbit = 15.6627;
+		t0    = 2450000 + 3000.04 - 2400000.5;
+	}
+	else if( object == "V662 Cas" )
+	{
+		orbit = 11.5983;
+		t0    = 2400000 + 51825.3 - 2400000.5;
+	}
+	else if( object == "HESS J1832-093" )
+	{
+		orbit = 86.28;
+		t0 = 54524.9979255;
+	}
 	// user given timing parameters
-	if( argc == 7 )
+	if( argc > 6 )
 	{
 		orbit = atof( argv[6] );
-        }
+	}
 	if( argc == 8 )
 	{
 		t0 = atof( argv[7] );
@@ -79,42 +105,42 @@ int main( int argc, char* argv[] )
 	cout << endl << endl;
 	
 	// get mjd for given date
-	slaCldj( year, month, day, &djm, &j );
+	VAstronometry::vlaCldj( year, month, day, &djm, &j );
 	if( j == 0 )
 	{
 		if( !bPrintWholeYear )
 		{
 			// calculate orbital phase
 			cout << "Orbital phase of " << object << " for " << year << "-" << month << "-" << day << ", MJD " << djm << ": ";
-                        cout << endl;
-                        double iP = ( djm - t0 ) / orbit - ( int )( ( djm - t0 ) / orbit );
-                        if( iP < 0. )
-                        {
-                             cout << 1. + iP << endl;
-                        }
-                        else
-                        {
-                             cout << iP << endl;
-                        }
+			cout << endl;
+			double iP = ( djm - t0 ) / orbit - ( int )( ( djm - t0 ) / orbit );
+			if( iP < 0. )
+			{
+				cout << 1. + iP << endl;
+			}
+			else
+			{
+				cout << iP << endl;
+			}
 		}
 		else
 		{
 			float p = 0.;
 			float p_old = p;
 			double djm_old = djm;
-			// 10 day intervall
+			// 10 day interval
 			for( int i = 0; i < 366; i++ )
 			{
 				p = ( djm  - t0 ) / orbit - ( int )( ( djm - t0 ) / orbit );
 				if( p < p_old )
 				{
-					slaDjcl( djm_old, &year, &month, &day, &fd, &j );
+					VAstronometry::vlaDjcl( djm_old, &year, &month, &day, &fd, &j );
 					cout << "new orbit (MJD: " << djm_old << "): \t";
 					cout << year << "/" << month << "/" << day << endl;
 				}
-				slaDjcl( djm, &year, &month, &day, &fd, &j );
+				VAstronometry::vlaDjcl( djm, &year, &month, &day, &fd, &j );
 				cout << "Orbital phase of " << object << " for ";
-                                cout << year << "-" << month << "-" << day << ", MJD " << djm << ": ";
+				cout << year << "-" << month << "-" << day << ", MJD " << djm << ": ";
 				cout << ( djm - t0 ) / orbit - ( int )( ( djm - t0 ) / orbit ) << endl;
 				p_old = p;
 				djm_old = djm;
@@ -127,4 +153,5 @@ int main( int argc, char* argv[] )
 		cout << "failed calculation of MJD" << endl;
 		exit( -1 );
 	}
+	cout << endl;
 }
