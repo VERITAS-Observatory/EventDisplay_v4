@@ -1,0 +1,107 @@
+//! VTableLookupRunParameter parameter storage class
+
+#ifndef VTABLELOOKUPRUNPARAMTER_H
+#define VTABLELOOKUPRUNPARAMTER_H
+
+#include <TChain.h>
+#include <TFile.h>
+#include <TMath.h>
+#include <TNamed.h>
+#include <TSystem.h>
+
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
+
+#include "VEvndispRunParameter.h"
+#include "VEvndispReconstructionParameter.h"
+#include "VGlobalRunParameter.h"
+
+using namespace std;
+
+class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
+{
+	private:
+	
+		bool fillInputFile_fromList( string iList );
+		void printCTA_MC_offaxisBins();
+		bool readTelescopeToAnalyze( string iFile );
+		void setCTA_MC_offaxisBins();
+		
+	public:
+	
+		unsigned int fDebug;              // 0 = off, 1 = default debug level, 2 = detailed
+		
+		vector< string > inputfile;
+		string outputfile;
+		string tablefile;
+		double ze;
+		bool isMC;
+		int fUseMedianEnergy;
+		bool fPE;                          // input size type is 'pe' (not [dc])
+		int fInterpolate;
+		string fInterpolateString;
+		char readwrite;
+                bool fUpdateInstrumentEpoch;
+		
+		bool  fLimitEnergyReconstruction;
+		
+		float fMinRequiredShowerPerBin;    // minimum number of showers required per table bin
+		
+		bool  fUseSelectedImagesOnly;
+		
+		vector<double> fMSCWSizecorrection;
+		vector<double> fMSCLSizecorrection;
+		vector<double> fEnergySizecorrection;
+		double fMSCWSizecorrection_mean;
+		double fMSCLSizecorrection_mean;
+		double fEnergySizecorrection_mean;
+                int sizecorr_ntel;
+
+		string writeoption;
+		bool bNoNoTrigger;
+		int  bWriteReconstructedEventsOnly;
+		bool bShortTree;
+		bool bWriteMCPars;
+		int  rec_method;
+		bool point_source;
+		string esysfile;
+		bool fWrite1DHistograms;
+		double fSpectralIndex;
+		int fWobbleOffset;
+		int fNoiseLevel;
+		
+		vector< unsigned int > fTelToAnalyse;             // telescopes used in analysis
+		
+		unsigned int fTableFillingCut_NImages_min;
+		double       fTableFillingCut_WobbleCut_max;
+		double fmaxdist;
+		double fminsize;
+		double fSelectRandom;
+		int fSelectRandomSeed;
+		double fMC_distance_to_cameracenter_min;
+		double fMC_distance_to_cameracenter_max;
+		vector< double > fCTA_MC_offaxisBin_min;
+		vector< double > fCTA_MC_offaxisBin_max;
+		vector< double > fAddMC_spectral_index;
+		
+		Long64_t fNentries;
+		double fMaxRunTime;
+		
+		// parameters to be used in anasum
+		double meanpedvars;                       // mean pedvar
+		vector< double > pedvars;                 // mean pedvar per telescope
+		
+		string printpara;
+		
+		VTableLookupRunParameter();
+		~VTableLookupRunParameter() {}
+		bool fillParameters( int argc, char* argv[] );
+		void print( int iB = 0 );
+		void printHelp();
+		
+		ClassDef( VTableLookupRunParameter, 26 );
+};
+#endif

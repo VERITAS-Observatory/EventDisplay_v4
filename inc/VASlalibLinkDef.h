@@ -1,0 +1,41 @@
+#ifdef __CINT__
+
+#pragma link C++ all;
+#pragma link C++ function slaAltaz;
+#pragma link C++ function slaCalyd;
+#pragma link C++ function slaCldj;
+#pragma link C++ function slaClyd;
+#pragma link C++ function slaDbear;
+#pragma link C++ function slaDcc2s;
+#pragma link C++ function slaDcs2c;
+#pragma link C++ function slaDd2tf;
+#pragma link C++ function slaDe2h;
+#pragma link C++ function slaDeuler;
+#pragma link C++ function slaDh2e;
+#pragma link C++ function slaDimxv;
+#pragma link C++ function slaDjcl;
+#pragma link C++ function slaDmxv;
+#pragma link C++ function slaDr2af;
+#pragma link C++ function slaDr2tf;
+#pragma link C++ function slaDrange;
+#pragma link C++ function slaDranrm;
+#pragma link C++ function slaDs2tp;
+#pragma link C++ function slaDsep;
+#pragma link C++ function slaDsepv;
+#pragma link C++ function slaDtp2s;
+#pragma link C++ function slaDvdv;
+#pragma link C++ function slaDvn;
+#pragma link C++ function slaDvxv;
+#pragma link C++ function slaEqgal;
+#pragma link C++ function slaGaleq;
+#pragma link C++ function slaGmst;
+#pragma link C++ function slaGmsta;
+#pragma link C++ function slaPa;
+#pragma link C++ function slaPda2h;
+#pragma link C++ function slaPrebn;
+#pragma link C++ function slaPrec;
+#pragma link C++ function slaPreces;
+#pragma link C++ function slaSep;
+#pragma link C++ function slaSepv;
+#pragma link C++ function slaVdv;
+#endif
