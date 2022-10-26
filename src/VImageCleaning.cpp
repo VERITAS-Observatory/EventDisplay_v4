@@ -435,8 +435,9 @@ TGraphErrors* VImageCleaning::calculateIPRGraphsAveragedAllTelescopes( unsigned 
 	TGraphErrors* IPRGraphAverageTel = new TGraphErrors();
 	
 	char InitTelID = fData->getTelID();
-	
-	for( unsigned int fTelescope = 0; fTelescope < fData->getRunParameter()->fNTelescopes; fTelescope++ )
+        int NTelAverage = fData->getNTel();
+	cout << "VImageCleaning::calculateIPRGraphsAveragedAllTelescopes: number of telescopes to average: " << NTelAverage << endl;	
+	for( unsigned int fTelescope = 0; fTelescope < NTelAverage; fTelescope++ )
 	{
 		//change it back to original tel ID
 		fData->setTelID( fTelescope );
@@ -501,7 +502,7 @@ TGraphErrors* VImageCleaning::calculateIPRGraphsAveragedAllTelescopes( unsigned 
 	// take average for all telescopes
 	for( int i = 0; i < IPRGraphAverageTel->GetN(); i++ )
 	{
-		IPRGraphAverageTel->SetPointY( i, IPRGraphAverageTel->GetPointY( i ) / 4. );
+		IPRGraphAverageTel->SetPointY( i, IPRGraphAverageTel->GetPointY( i ) / NTelAverage );
 	}
 	
 	IPRGraphAverageTel->SetName( Form( "IPRcharge_AverageTel_SW%d", ( iSummationWindow ) ) );

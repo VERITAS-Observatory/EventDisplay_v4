@@ -4680,6 +4680,10 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
 	
 	int z = 0;
 	float norm = hIPR->Integral( 1, hIPR->GetNbinsX() );
+
+        double norma_all = fRunPar->fNormAllIPR;
+        fRunPar->fNormAllIPR = norma_all + norm;
+
 	if( norm < fPedPerTelescopeTypeMinCnt )  //statistical limit for number of counts
 	{
 		fRunPar->fIPRAverageTel = true;
