@@ -4551,6 +4551,10 @@ bool VCalibrator::calculateIPRGraphs()
 		// calculate IPR graphs
 		calculateIPRGraphs( fPedFileNameC[getTeltoAna()[i]], getSumWindow(), getTelType( getTeltoAna()[i] ), i );
 	}
+
+	if ( fRunPar->fNormAllIPR < fPedPerTelescopeTypeMinCnt){
+                cout << "VCalibrator::calculateIPRGraphs WARNING: too few statistics to measure IPR curves even averaging all telescopes: " << fRunPar->fNormAllIPR << endl;
+        }
 	return true;
 }
 
