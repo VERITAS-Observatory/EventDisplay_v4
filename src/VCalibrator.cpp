@@ -4691,7 +4691,7 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
 		cout << "VCalibrator::calculateIPRGraphs WARNING: too few statistics to measure IPR curves ";
 		cout << "(total counts available: " << norm << ", ";
 		cout << "current limit " << fPedPerTelescopeTypeMinCnt << ")" << endl;
-		cout << "IPR graphs will be provided as sum of 4 telescopes statistics." << endl;
+		cout << "IPR graphs will be provided as sum of " << getNTel() << "telescopes statistics." << endl;
 		cout << "VCalibrator::calculateIPRGraphs(): fIPRAverageTel = " << fRunPar->fIPRAverageTel << endl;
 	}
 	if( norm == 0 )
