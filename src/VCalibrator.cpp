@@ -17,6 +17,8 @@ VCalibrator::VCalibrator()
 	
 	fPedSingleOutFile = 0;
 	fPedPerTelescopeTypeMinCnt = 1.E5;  // minimal counter for IPR measurements
+
+	fNormAllIPR = 0.;
 }
 
 /*
@@ -4541,6 +4543,7 @@ unsigned int VCalibrator::getNumberOfEventsUsedInCalibration( map< ULong64_t, in
 */
 bool VCalibrator::calculateIPRGraphs()
 {
+
 	for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
 	{
 		setTelID( getTeltoAna()[i] );
@@ -4552,8 +4555,8 @@ bool VCalibrator::calculateIPRGraphs()
 		calculateIPRGraphs( fPedFileNameC[getTeltoAna()[i]], getSumWindow(), getTelType( getTeltoAna()[i] ), i );
 	}
 
-	if ( fRunPar->fNormAllIPR < fPedPerTelescopeTypeMinCnt){
-                cout << "VCalibrator::calculateIPRGraphs WARNING: too few statistics to measure IPR curves even averaging all telescopes: " << fRunPar->fNormAllIPR << endl;
+	if ( fNormAllIPR < fPedPerTelescopeTypeMinCnt){
+                cout << "VCalibrator::calculateIPRGraphs WARNING: too few statistics to measure IPR curves even averaging all telescopes: " << fNormAllIPR << endl;
         }
 	return true;
 }
@@ -4685,8 +4688,8 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
 	int z = 0;
 	float norm = hIPR->Integral( 1, hIPR->GetNbinsX() );
 
-        double norma_all = fRunPar->fNormAllIPR;
-        fRunPar->fNormAllIPR = norma_all + norm;
+        double norma_all = fNormAllIPR;
+        fNormAllIPR = norma_all + norm;
 
 	if( norm < fPedPerTelescopeTypeMinCnt )  //statistical limit for number of counts
 	{
@@ -4695,7 +4698,7 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
 		cout << "VCalibrator::calculateIPRGraphs WARNING: too few statistics to measure IPR curves ";
 		cout << "(total counts available: " << norm << ", ";
 		cout << "current limit " << fPedPerTelescopeTypeMinCnt << ")" << endl;
-		cout << "IPR graphs will be provided as sum of " << getNTel() << "telescopes statistics." << endl;
+		cout << "IPR graphs will be provided as sum of " << getTeltoAna().size() << " telescopes statistics." << endl;
 		cout << "VCalibrator::calculateIPRGraphs(): fIPRAverageTel = " << fRunPar->fIPRAverageTel << endl;
 	}
 	if( norm == 0 )

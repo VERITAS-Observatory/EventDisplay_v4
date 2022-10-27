@@ -86,7 +86,6 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fcalibrationrun = false;
 	fNCalibrationEvents = -1;
 	fIPRAverageTel = false;
-	fNormAllIPR = 0.;
 	fLaserSumMin = 50000.;
 	fGainFileNumber.push_back( 0 );
 	fTOffFileNumber.push_back( 0 );
