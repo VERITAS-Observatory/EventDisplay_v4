@@ -439,7 +439,7 @@ TGraphErrors* VImageCleaning::calculateIPRGraphsAveragedAllTelescopes( unsigned 
 	for( unsigned int fTelescope = 0; fTelescope < fData->getTeltoAna().size(); fTelescope++ )
 	{
 		//change it back to original tel ID
-		fData->setTelID( fTelescope );
+		fData->setTelID( fData->getTeltoAna()[fTelescope] );
 		cout << "VImageCleaning::calculateIPRGraphsAveragedAllTelescopes: getting IPR for telescope: ";
         cout << fTelescope << " " << fData->getDetectorGeometry()->getTelID() << endl;
 		TGraphErrors* g = fData->getIPRGraph( iSummationWindow, false );
