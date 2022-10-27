@@ -4543,7 +4543,6 @@ unsigned int VCalibrator::getNumberOfEventsUsedInCalibration( map< ULong64_t, in
 */
 bool VCalibrator::calculateIPRGraphs()
 {
-
 	for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
 	{
 		setTelID( getTeltoAna()[i] );
@@ -4688,8 +4687,7 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
 	int z = 0;
 	float norm = hIPR->Integral( 1, hIPR->GetNbinsX() );
 
-        double norma_all = fNormAllIPR;
-        fNormAllIPR = norma_all + norm;
+        fNormAllIPR += norm;
 
 	if( norm < fPedPerTelescopeTypeMinCnt )  //statistical limit for number of counts
 	{
