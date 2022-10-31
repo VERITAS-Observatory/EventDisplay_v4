@@ -24,6 +24,7 @@ class VImageCleaningRunParameter
 		double fimagethresh;              // parameter for image threshold
 		double fborderthresh;             // parameter for border threshold
 		double fbrightnonimagetresh;      // parameter for bright pixels threshold
+        bool fremoveIslandOfImageBorderPair; // remove single image with single border pixels
 		
 		bool fUseFixedThresholds;         // use fixed image/border thresholds instead of multiples of pedestal variances
 		
