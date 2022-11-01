@@ -52,7 +52,7 @@ FITSRecord::FITSRecord( std::string fits_filename,
 						std::string template_filename,
 						std::string extension_name, int extension_version )
 	: 	 _fptr( NULL ), _own_fptr( true ), _rowcount( 0 ), _verbose( 0 ),
-		 _extension_version( 0 ), _is_writable( true ), _is_finished( true )
+		_extension_version( 0 ), _is_writable( true ), _is_finished( true )
 {
 
 

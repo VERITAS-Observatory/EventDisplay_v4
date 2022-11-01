@@ -17,7 +17,6 @@ VCalibrator::VCalibrator()
 	
 	fPedSingleOutFile = 0;
 	fPedPerTelescopeTypeMinCnt = 1.E5;  // minimal counter for IPR measurements
-
 	fIPRAverageTel = false;
 }
 
@@ -4558,7 +4557,6 @@ bool VCalibrator::calculateIPRGraphs()
                         copyIPRTelAveraged( getSumWindow(), getTeltoAna()[i], i);
                 }
 	}
-
 	return true;
 }
 
@@ -4688,8 +4686,6 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
 	
 	int z = 0;
 	float norm = hIPR->Integral( 1, hIPR->GetNbinsX() );
-
-
 	if( norm < fPedPerTelescopeTypeMinCnt )  //statistical limit for number of counts
 	{
 		fIPRAverageTel = true;
@@ -4948,7 +4944,7 @@ TH1F* VCalibrator::calculateIPRGraphAveraged(unsigned int iSummationWindow){
 
         }
         hIPR->Scale(1./getTeltoAna().size());
-        float norm = hIPR->Integral( 1, getTeltoAna().size()*hIPR->GetNbinsX() )
+        float norm = getTeltoAna().size()*hIPR->Integral( 1, hIPR->GetNbinsX() )
         cout << "VCalibrator::initializeIPRAveraged normalization of IPR histogram " << norm;
         cout << ". Returning IPR histogram." << endl;
         if( norm < fPedPerTelescopeTypeMinCnt )  //statistical limit for number of counts
