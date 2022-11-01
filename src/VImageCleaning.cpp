@@ -424,97 +424,6 @@ bool VImageCleaning::InitNNImageCleaning()
 	return true;
 }
 
-/*
- * Calculate averaged IPR graph over all telescopes when there is not enough statistics
- * Call it if flag fIPRAverageTel > 0.
- */
-TGraphErrors* VImageCleaning::calculateIPRGraphsAveragedAllTelescopes( unsigned int iSummationWindow )
-{
-
-	cout << "VImageCleaning::calculateIPRGraphsAveragedAllTelescopes: doing average of IPR graphs." << endl;
-	TGraphErrors* IPRGraphAverageTel = new TGraphErrors();
-	
-	char InitTelID = fData->getTelID();
-	cout << "VImageCleaning::calculateIPRGraphsAveragedAllTelescopes: number of telescopes to average: " << fData->getTeltoAna().size() << endl;	
-	for( unsigned int fTelescope = 0; fTelescope < fData->getTeltoAna().size(); fTelescope++ )
-	{
-		//change it back to original tel ID
-		fData->setTelID( fData->getTeltoAna()[fTelescope] );
-		cout << "VImageCleaning::calculateIPRGraphsAveragedAllTelescopes: getting IPR for telescope: ";
-        cout << fTelescope << " " << fData->getDetectorGeometry()->getTelID() << endl;
-		TGraphErrors* g = fData->getIPRGraph( iSummationWindow, false );
-		if( !g )
-		{
-			continue;
-		}
-        cout << "IPR graph: " << g->GetName() << endl;
-		g->Sort();
-		
-		int NPointsAverageTel = IPRGraphAverageTel->GetN();
-		float eps = 1e-3;
-		for( int k = 0; k < g->GetN(); k++ )
-		{
-			double XIndivTel =  g->GetPointX( k );
-			double YIndivTel =  g->GetPointY( k );
-			
-			double XEIndivTel = g->GetErrorX( k );
-			double YEIndivTel = g->GetErrorY( k );
-			int i_ocurrence = 0;
-			if( fTelescope == 0 )
-			{
-				IPRGraphAverageTel->SetPoint( k, XIndivTel, YIndivTel );
-				IPRGraphAverageTel->SetPointError( k, XEIndivTel, YEIndivTel );
-			}
-            else
-			{
-				int p = 0;
-				bool exists = false;
-				do   //check if that PE point already exists in all telescopes graph
-				{
-					if( abs( XIndivTel - IPRGraphAverageTel->GetPointX( p ) ) < eps )
-					{
-						exists = true;    //add break here?
-						i_ocurrence = p;
-					}
-					p++;
-				}
-				while( !exists && p < NPointsAverageTel );
-				if( exists )
-				{
-					double YAverageTel = IPRGraphAverageTel->GetPointY( i_ocurrence );
-					IPRGraphAverageTel->SetPoint( i_ocurrence, XIndivTel, YIndivTel + YAverageTel );
-					
-					double YEAverageTel = IPRGraphAverageTel->GetErrorY( i_ocurrence );
-					IPRGraphAverageTel->SetPointError( i_ocurrence, XEIndivTel, TMath::Sqrt( YEAverageTel * YEAverageTel  + YEIndivTel * YEIndivTel ) );
-					
-				}
-				else
-				{
-					IPRGraphAverageTel->SetPoint( NPointsAverageTel, XIndivTel, YIndivTel );
-					IPRGraphAverageTel->SetPointError( NPointsAverageTel, XEIndivTel, YEIndivTel );
-					
-				}
-			}
-		}
-	}
-	
-	// take average for all telescopes
-	for( int i = 0; i < IPRGraphAverageTel->GetN(); i++ )
-	{
-		IPRGraphAverageTel->SetPointY( i, IPRGraphAverageTel->GetPointY( i ) / fData->getTeltoAna().size() );
-	}
-	
-	IPRGraphAverageTel->SetName( Form( "IPRcharge_AverageTel_SW%d", ( iSummationWindow ) ) );
-	IPRGraphAverageTel->SetTitle( Form( "Rate vs Threshold. W_{RO}=%2.1f ns, W_{int}=%2.1f ns",
-										fData->getDetectorGeometry()->getLengthOfSampleTimeSlice( fData->getTelID() ),
-										fData->getDetectorGeometry()->getLengthOfSampleTimeSlice( fData->getTelID() ) * iSummationWindow ) );
-										
-	IPRGraphAverageTel->GetYaxis()->SetTitle( "Rate above Threshold [Hz]" );
-	cout << "VImageCleaning::calculateIPRGraphsAveragedAllTelescopes: # of points for avg. telescope " << IPRGraphAverageTel->GetN() << endl;
-	fData->setTelID( InitTelID );
-	
-	return IPRGraphAverageTel;
-}
 
 /*
     get IPR graphs from different sources (files), calculate probability contours
@@ -532,16 +441,7 @@ bool VImageCleaning::InitNNImgClnPerTelType( unsigned int teltype )
 		cout << ", summation window " << fData->getSumWindow() << ") from DST file" << endl;
 		
 		
-		if( fData->getRunParameter()->fIPRAverageTel == false )
-		{
-			cout << "VImageCleaning::InitNNImgClnPerTelType( int type ): getting individual IPR graph per teltype (fIPRAverageTel = false)." << endl;
-			IPRgraph = fData->getIPRGraph();
-		}
-		else
-		{
-			cout << "VImageCleaning::InitNNImgClnPerTelType( int type ): getting individual IPR graph per teltype (fIPRAverageTel = true)." << endl;
-			IPRgraph = calculateIPRGraphsAveragedAllTelescopes( fData->getSumWindow() );
-		}
+		IPRgraph = fData->getIPRGraph();
 		
 		if( IPRgraph )
 		{
@@ -553,16 +453,7 @@ bool VImageCleaning::InitNNImgClnPerTelType( unsigned int teltype )
 		cout << "VImageCleaning::InitNNImgClnPerTelType( int type ): getting IPR graph for teltype: ";
 		cout << teltype << " from external file (ped or DST file)" << endl;
 		
-		if( fData->getRunParameter()->fIPRAverageTel == false )
-		{
-			cout << "VImageCleaning::InitNNImgClnPerTelType( int type ): getting individual IPR graph per teltype (fIPRAverageTel = false)." << endl;
-			IPRgraph = fData->getIPRGraph();
-		}
-		else
-		{
-			cout << "VImageCleaning::InitNNImgClnPerTelType( int type ): getting averaged IPR graph per teltype. (fIPRAverageTel = true)" << endl;
-			IPRgraph = calculateIPRGraphsAveragedAllTelescopes( fData->getSumWindow() );
-		}
+		IPRgraph = fData->getIPRGraph();
 		
 		if( IPRgraph )
 		{

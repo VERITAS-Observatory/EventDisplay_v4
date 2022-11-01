@@ -141,7 +141,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool fWriteImagePixelList;        // write image pixel list to tpars tree
 		string fLowGainCalibrationFile;           // file with file name for low-gain calibration
 		int fNCalibrationEvents;                  // events to be used for calibration
-		bool fIPRAverageTel;                    // flag to make average of all telescopes IPR in case there is not enough statistics to produce IPR graphs
 		float faverageTZeroFiducialRadius;        // fiducial radius for average tzero calculation (DST), in fraction of FOV
 		unsigned int fCombineChannelsForPedestalCalculation; // combine all channels per telescope type for the pedestal calculation
 		vector< int > fGainFileNumber;

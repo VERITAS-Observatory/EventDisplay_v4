@@ -85,7 +85,6 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fLowGainCalibrationFile = "calibrationlist.LowGain.dat";
 	fcalibrationrun = false;
 	fNCalibrationEvents = -1;
-	fIPRAverageTel = false;
 	fLaserSumMin = 50000.;
 	fGainFileNumber.push_back( 0 );
 	fTOffFileNumber.push_back( 0 );
