@@ -4791,7 +4791,7 @@ TH1F* VCalibrator::initializeIPRAveraged(unsigned int iSummationWindow, unsigned
         {
                 cout << "VCalibrator::calculateIPRGraphsStatistics: error reading IPR graphs from ";
                 cout << PedFile_name << endl;
-                return false;
+                return hIPR;
         }
 
         // histograms with IPR distributions are either
