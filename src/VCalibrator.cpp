@@ -4944,7 +4944,7 @@ TH1F* VCalibrator::calculateIPRGraphAveraged(unsigned int iSummationWindow){
 
         }
         hIPR->Scale(1./getTeltoAna().size());
-        float norm = getTeltoAna().size()*hIPR->Integral( 1, hIPR->GetNbinsX() )
+        float norm = getTeltoAna().size()*hIPR->Integral( 1, hIPR->GetNbinsX() );
         cout << "VCalibrator::initializeIPRAveraged normalization of IPR histogram " << norm;
         cout << ". Returning IPR histogram." << endl;
         if( norm < fPedPerTelescopeTypeMinCnt )  //statistical limit for number of counts
