@@ -106,7 +106,7 @@ class VCalibrator : public VImageBaseAnalyzer
 		bool readIPRGraph_from_DSTFile( string iDSTFile, unsigned int iSummationWindow, ULong64_t iTelType );
 		bool calculateIPRGraphs();
 		bool calculateIPRGraphs( string iPedFileName, unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel );
-		bool copyIPRTelAveraged(unsigned int iSummationWindow, unsigned int iTelType, unsigned int i_tel);
+		bool copyIPRTelAveraged(unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel);
                 TH1F* initializeIPRAveraged(unsigned int iSummationWindow, unsigned int iTelType);
                 TH1F* calculateIPRGraphAveraged(unsigned int iSummationWindow);
 		bool readLowGainMultiplier( );

@@ -4567,28 +4567,42 @@ bool VCalibrator::calculateIPRGraphs()
  *
  */
 
-bool VCalibrator::copyIPRTelAveraged(unsigned int iSummationWindow, unsigned int iTelType, unsigned int i_tel){
+bool VCalibrator::copyIPRTelAveraged( unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel){
 
         TGraphErrors* i_IPRGraph = getIPRGraph( iSummationWindow, true );
+
+        setTelID( getTeltoAna()[0] );
+        TGraphErrors* i_IPRGraph_Tel0 = getIPRGraph( iSummationWindow, true );
+
+        setTelID( getTeltoAna()[i_tel] );
+
         if( !i_IPRGraph )
-        {       
+        {
                 cout << "VCalibrator::calculateIPRGraphsFunction info: no IPR graph found for telescope type " << iTelType << endl;
                 return false;
         }
-        setTelID( getTeltoAna()[0] );
-        TGraphErrors* i_IPRGraph_Init = getIPRGraph( iSummationWindow, true );
-        if( !i_IPRGraph_Init )
-        {       
+        if( !i_IPRGraph_Tel0 )
+        {
                 cout << "VCalibrator::calculateIPRGraphsFunction info: no IPR graph found for telescope type " << getTeltoAna()[0] << endl;
                 return false;
         }
 
-        i_IPRGraph = (TGraphErrors*)i_IPRGraph_Init->Clone();
-        setTelID( iTelType );
+        cout << "test clone of histogram for teltype: " << iTelType << i_IPRGraph->GetN() << "  " << i_IPRGraph->GetX()[1] << "  " << i_IPRGraph->GetName() << endl;
+
+
+        for(Int_t i = 0; i < i_IPRGraph_Tel0->GetN() ; i++){
+                i_IPRGraph->SetPoint(i, i_IPRGraph_Tel0->GetPointX(i), i_IPRGraph_Tel0->GetPointY(i) );
+        }
+
+        i_IPRGraph->SetMinimum( 1 );
+        i_IPRGraph->SetTitle( i_IPRGraph_Tel0->GetTitle());
+        i_IPRGraph->GetXaxis()->SetTitle( i_IPRGraph_Tel0->GetXaxis()->GetTitle() );
+        i_IPRGraph->GetYaxis()->SetTitle( i_IPRGraph_Tel0->GetYaxis()->GetTitle() );
+        i_IPRGraph->SetName( Form( "IPRcharge_TelType%d_SW%d", ( int )iTelType, iSummationWindow ) );
 
         return true;
-
-}
+         
+}         
 
 bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel )
 {
