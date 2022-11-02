@@ -4550,12 +4550,14 @@ bool VCalibrator::calculateIPRGraphs()
 		// (ignore low gains here)
 		findDeadChans( false );
 		// calculate IPR graphs
-                if (fIPRAverageTel == false){
-                        calculateIPRGraphs( fPedFileNameC[getTeltoAna()[i]], getSumWindow(), getTelType( getTeltoAna()[i] ), i );
-                }
-                else{
-                        copyIPRTelAveraged( getSumWindow(), getTeltoAna()[i], i);
-                }
+		if( fIPRAverageTel == false )
+		{
+			calculateIPRGraphs( fPedFileNameC[getTeltoAna()[i]], getSumWindow(), getTelType( getTeltoAna()[i] ), i );
+		}
+		else
+		{
+			copyIPRTelAveraged( getSumWindow(), getTeltoAna()[i], i );
+		}
 	}
 	return true;
 }
@@ -4567,43 +4569,45 @@ bool VCalibrator::calculateIPRGraphs()
  *
  */
 
-bool VCalibrator::copyIPRTelAveraged( unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel){
+bool VCalibrator::copyIPRTelAveraged( unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel )
+{
 
-        TGraphErrors* i_IPRGraph = getIPRGraph( iSummationWindow, true );
-
-        setTelID( getTeltoAna()[0] );
-        TGraphErrors* i_IPRGraph_Tel0 = getIPRGraph( iSummationWindow, true );
-
-        setTelID( getTeltoAna()[i_tel] );
-
-        if( !i_IPRGraph )
-        {
-                cout << "VCalibrator::copyIPRTelAveraged: no IPR graph found for telescope type " << iTelType << endl;
-                return false;
-        }
-        if( !i_IPRGraph_Tel0 )
-        {
-                cout << "VCalibrator::copyIPRTelAveraged: no IPR graph found for telescope type " << getTeltoAna()[0] << endl;
-                return false;
-        }
-
-        for(Int_t i = 0; i < i_IPRGraph_Tel0->GetN() ; i++){
-                i_IPRGraph->SetPoint(i, i_IPRGraph_Tel0->GetPointX(i), i_IPRGraph_Tel0->GetPointY(i) );
-        }
-
-        i_IPRGraph->SetMinimum( 1 );
-        i_IPRGraph->SetTitle( i_IPRGraph_Tel0->GetTitle());
-        i_IPRGraph->GetXaxis()->SetTitle( i_IPRGraph_Tel0->GetXaxis()->GetTitle() );
-        i_IPRGraph->GetYaxis()->SetTitle( i_IPRGraph_Tel0->GetYaxis()->GetTitle() );
-        i_IPRGraph->SetName( Form( "IPRcharge_TelType%d_SW%d", ( int )iTelType, iSummationWindow ) );
-
-        return true;
-         
-}         
+	TGraphErrors* i_IPRGraph = getIPRGraph( iSummationWindow, true );
+	
+	setTelID( getTeltoAna()[0] );
+	TGraphErrors* i_IPRGraph_Tel0 = getIPRGraph( iSummationWindow, true );
+	
+	setTelID( getTeltoAna()[i_tel] );
+	
+	if( !i_IPRGraph )
+	{
+		cout << "VCalibrator::copyIPRTelAveraged: no IPR graph found for telescope type " << iTelType << endl;
+		return false;
+	}
+	if( !i_IPRGraph_Tel0 )
+	{
+		cout << "VCalibrator::copyIPRTelAveraged: no IPR graph found for telescope type " << getTeltoAna()[0] << endl;
+		return false;
+	}
+	
+	for( Int_t i = 0; i < i_IPRGraph_Tel0->GetN() ; i++ )
+	{
+		i_IPRGraph->SetPoint( i, i_IPRGraph_Tel0->GetPointX( i ), i_IPRGraph_Tel0->GetPointY( i ) );
+	}
+	
+	i_IPRGraph->SetMinimum( 1 );
+	i_IPRGraph->SetTitle( i_IPRGraph_Tel0->GetTitle() );
+	i_IPRGraph->GetXaxis()->SetTitle( i_IPRGraph_Tel0->GetXaxis()->GetTitle() );
+	i_IPRGraph->GetYaxis()->SetTitle( i_IPRGraph_Tel0->GetYaxis()->GetTitle() );
+	i_IPRGraph->SetName( Form( "IPRcharge_TelType%d_SW%d", ( int )iTelType, iSummationWindow ) );
+	
+	return true;
+	
+}
 
 bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel )
 {
-	TH1F *hIPR = (TH1F*)initializeIPRAveraged(iSummationWindow, getTeltoAna()[i_tel]);
+	TH1F* hIPR = ( TH1F* )initializeIPRAveraged( iSummationWindow, getTeltoAna()[i_tel] );
 	TDirectory* iG_CurrentDirectory = gDirectory;
 	
 	// get an IPR graph
@@ -4706,7 +4710,7 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
 		cout << "current limit " << fPedPerTelescopeTypeMinCnt << ")" << endl;
 		cout << "IPR graphs will be provided as sum of " << getTeltoAna().size() << " telescopes statistics." << endl;
 		cout << "VCalibrator::calculateIPRGraphs(): fIPRAverageTel = " << fIPRAverageTel << endl;
-		hIPR = calculateIPRGraphAveraged(iSummationWindow);
+		hIPR = calculateIPRGraphAveraged( iSummationWindow );
 		cout << "VCalibrator::calculateIPRGraphs norm IPR combined: " << hIPR->Integral( 1, hIPR->GetNbinsX() ) << endl;
 	}
 	if( norm == 0 )
@@ -4781,194 +4785,198 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
 	return true;
 }
 
-TH1F* VCalibrator::initializeIPRAveraged(unsigned int iSummationWindow, unsigned int iTelType){
-        //get reference hpedPerTelescopeType for channel 1
-        cout << "VCalibrator::initializeIPRAveraged initializing IPR graph for calculation of average of telescopes." << endl;
-        TH1F* hIPR = 0;
+TH1F* VCalibrator::initializeIPRAveraged( unsigned int iSummationWindow, unsigned int iTelType )
+{
+	//get reference hpedPerTelescopeType for channel 1
+	cout << "VCalibrator::initializeIPRAveraged initializing IPR graph for calculation of average of telescopes." << endl;
+	TH1F* hIPR = 0;
+	
+	
+	int TelType = getTelType( iTelType );
+	string PedFile_name = fPedFileNameC[iTelType];
+	
+	// check suffix of ped file
+	if( PedFile_name.find( ".root" ) == string::npos )
+	{
+		PedFile_name += ".root";
+	}
+	// open pedestal files
+	TFile PedFile( PedFile_name.c_str() );
+	
+	if( PedFile.IsZombie() )
+	{
+		cout << "VCalibrator::calculateIPRGraphsStatistics: error reading IPR graphs from ";
+		cout << PedFile_name << endl;
+		return hIPR;
+	}
+	
+	// histograms with IPR distributions are either
+	// i) in a directory called distributions_TelType
+	// ii) in the current directory
+	cout << "Telescope type " << TelType << ": ";
+	cout << "reading IPR histograms for summation window " << iSummationWindow;
+	cout << " from ";
+	cout << PedFile_name << endl;
+	
+	stringstream Directory( stringstream::in | stringstream::out );
+	Directory << "distributions_" << TelType;
+	if( !PedFile.Get( Directory.str().c_str() ) )
+	{
+		return hIPR;
+	}
+	
+	// get charge distribution for first channel as reference histogram
+	stringstream hIPRname( stringstream::in | stringstream::out );
+	hIPRname << "distributions_" << TelType << "/hpedPerTelescopeType_" << TelType << "_" << iSummationWindow << "_" << 1;
+	
+	//?
+	TH1F* href = ( TH1F* )gDirectory->Get( hIPRname.str().c_str() );
+	PedFile.Close();
+	
+	if( !href )
+	{
+		cout << " Error: cannot find IPR histogram " << hIPRname.str().c_str();
+		cout << " in file:" << PedFile_name << " ... exiting " << endl;
+		return hIPR;
+	}
+	
+	
+	//summary histogram
+	if( getRunParameter()->fIgnoreDSTGains )
+	{
+		// work in dc
+		hIPR = new TH1F( "", "", int( 1.5 * href->GetNbinsX() + 0.5 ), href->GetXaxis()->GetXmin(), href->GetXaxis()->GetXmax() );
+		cout << "Error: " <<  href->GetNbinsX() << "  " << href->GetXaxis()->GetXmin() << "  " << href->GetXaxis()->GetXmax() << endl;
+		return hIPR;
+	}
+	else
+	{
+		// work in pe
+		hIPR = new TH1F( "", "", 1000, 0., 100. );
+		return hIPR;
+	}
+}
 
+TH1F* VCalibrator::calculateIPRGraphAveraged( unsigned int iSummationWindow )
+{
 
-        int TelType = getTelType( iTelType );
-        string PedFile_name = fPedFileNameC[iTelType];
-
-       // check suffix of ped file
-        if( PedFile_name.find( ".root" ) == string::npos )
-        {
-                PedFile_name += ".root";
-        }
-        // open pedestal files
-        TFile PedFile( PedFile_name.c_str() );
-
-        if( PedFile.IsZombie() )
-        {
-                cout << "VCalibrator::calculateIPRGraphsStatistics: error reading IPR graphs from ";
-                cout << PedFile_name << endl;
-                return hIPR;
-        }
-
-        // histograms with IPR distributions are either
-        // i) in a directory called distributions_TelType
-        // ii) in the current directory
-        cout << "Telescope type " << TelType << ": ";
-        cout << "reading IPR histograms for summation window " << iSummationWindow;
-        cout << " from ";
-        cout << PedFile_name << endl;
-
-        stringstream Directory( stringstream::in | stringstream::out );
-        Directory << "distributions_" << TelType;
-        if( !PedFile.Get( Directory.str().c_str() ) )
-        {
-                return hIPR;
-        }
-
-        // get charge distribution for first channel as reference histogram
-        stringstream hIPRname( stringstream::in | stringstream::out );
-        hIPRname << "distributions_" << TelType << "/hpedPerTelescopeType_" << TelType << "_" << iSummationWindow << "_" << 1;
-
-        //?     
-        TH1F* href = ( TH1F* )gDirectory->Get( hIPRname.str().c_str() );
-        PedFile.Close();
-
-        if( !href )
-        {
-                cout << " Error: cannot find IPR histogram " << hIPRname.str().c_str();
-                cout << " in file:" << PedFile_name << " ... exiting " << endl;
-                return hIPR;
-        }
-
-
-        //summary histogram
-        if( getRunParameter()->fIgnoreDSTGains )
-        {
-                // work in dc
-                hIPR = new TH1F( "", "", int( 1.5 * href->GetNbinsX() + 0.5 ), href->GetXaxis()->GetXmin(), href->GetXaxis()->GetXmax() );
-                cout << "Error: " <<  href->GetNbinsX() << "  " << href->GetXaxis()->GetXmin() << "  " << href->GetXaxis()->GetXmax() << endl;
-                return hIPR;
-        }
-        else
-        {
-                // work in pe  
-                hIPR = new TH1F( "", "", 1000, 0., 100. );
-                return hIPR;
-        }
-}       
-
-TH1F* VCalibrator::calculateIPRGraphAveraged(unsigned int iSummationWindow){
-    
-        TH1F *hIPR = (TH1F*)initializeIPRAveraged(iSummationWindow, getTeltoAna()[0]);
-    
-        for( unsigned int teltype = 0; teltype < getTeltoAna().size(); teltype++ )
-        {
-                setTelID( getTeltoAna()[teltype] );
-
-                // first find dead channels
-                // (ignore low gains here)
-                findDeadChans( false );
-                // calculate IPR graphs
-                string PedFile_name = fPedFileNameC[getTeltoAna()[teltype]];
-                int TelType = getTelType( getTeltoAna()[teltype] );
-
-                if( PedFile_name.find( ".root" ) == string::npos )
-                {
-                        PedFile_name += ".root";
-                }
-                // open pedestal files
-                TFile PedFile( PedFile_name.c_str() );
-                if( PedFile.IsZombie() )
-                {
-                        cout << "VCalibrator::calculateIPRGraphAveraged error reading IPR graphs from ";
-                        cout << PedFile_name << endl;
-                        TH1F *hNull = 0;
-                        return hNull;
-                }
-                // histograms with IPR distributions are either
-                // i) in a directory called distributions_TelType
-                // ii) in the current directory
-                cout << "VCalibrator::calculateIPRGraphAveraged Telescope type " << TelType << ": ";
-                cout << "reading IPR histograms for summation window " << iSummationWindow;
-                cout << " from ";
-                cout << PedFile_name << endl;
-                stringstream Directory( stringstream::in | stringstream::out );
-                Directory.str(std::string());
-                Directory << "distributions_" << TelType;
-                cout << Directory.str().c_str() << endl;
-                if( PedFile.Get( Directory.str().c_str() ) )
-                {
-                        PedFile.cd( Directory.str().c_str() );
-                }
-                else{
-                        cout << "VCalibrator::calculateIPRGraphAveraged no directory: " << Directory.str().c_str() << endl;
-                }
-
-                ///////////////////////////
-                // average over all channels in one telescope
-                float i_gainCorrect = 1.;
-                for( unsigned int i = 0; i < getNChannels(); i++ )
-                {
-                        if( getDetectorGeometry()->getAnaPixel()[i] > 0
-                                && i < getDead().size() && !getDead()[i] )
-                        {
-                                stringstream HistName( stringstream::in | stringstream::out );
-                                HistName << "hpedPerTelescopeType_" << TelType << "_" << iSummationWindow << "_" << i;
-                                TH1F* h = ( TH1F* )gDirectory->Get( HistName.str().c_str() );
-
-
-                                if( h )
-                                {
-                                        float ped = 0;
-                                        // default: pedestals are subtracted here
-                                        // (for combined channel analysis: charges are filled already pedestal subtracted)
-                                        // apply relative gain correction to integrated charges
-                                        if( getRunParameter()->fCombineChannelsForPedestalCalculation == 0 )
-                                        {
-                                                ped = getPeds()[i];
-                                        }
-                                        // special treatment for ASTRI telescopes
-                                        else if( getRunParameter()->fCombineChannelsForPedestalCalculation == 2 )
-                                        {
-                                                stringstream Pname( stringstream::in | stringstream::out );
-                                                Pname << "hped_" << TelType << "_" << iSummationWindow << "_" << i;
-                                                TH1F* hP = ( TH1F* )gDirectory->Get( Pname.str().c_str() );
-                                                if( hP )
-                                                { 
-                                                        ped = hP->GetMean();
-                                                }
-                                        }
-                                        for( int j = 1; j <= h->GetNbinsX(); j++ )
-                                        {
-                                                if( h->GetBinContent( j ) > 0. && getGains()[i] > 0 )
-                                                {
-                                                        i_gainCorrect = getGains()[i];
-                                                        if( getHIGHQE_gainfactor( i ) > 0. )
-                                                        {
-                                                                i_gainCorrect *= getHIGHQE_gainfactor( i );
-                                                        }
-                                                        if( i_gainCorrect > 0. )
-                                                        {
-                                                                hIPR->Fill( ( h->GetBinCenter( j ) - ped * iSummationWindow ) / i_gainCorrect, h->GetBinContent( j ) );
-                                                        }
-                                                }
-                                        }
-                                }
-                        }
-                }
-                PedFile.Close();
-
-        }
-        hIPR->Scale(1./getTeltoAna().size());
-        float norm = getTeltoAna().size()*hIPR->Integral( 1, hIPR->GetNbinsX() );
-        cout << "VCalibrator::calculateIPRGraphAveraged normalization of average IPR histogram " << norm;
-        cout << ". Returning IPR histogram." << endl;
-        if( norm < fPedPerTelescopeTypeMinCnt )  //statistical limit for number of counts
-        {
-                cout << "VCalibrator::calculateIPRGraphAveraged WARNING: there is NOT enough statistics ";
-                cout << " ( < " << fPedPerTelescopeTypeMinCnt << ") even when averaging over all telescopes." << endl;
-                return hIPR;
-        }
-        else{
-                cout << "VCalibrator::calculateIPRGraphsStatistics: there is enough statistics to average over telescopes. " << endl;
-                return hIPR;
-        }             
-}     
+	TH1F* hIPR = ( TH1F* )initializeIPRAveraged( iSummationWindow, getTeltoAna()[0] );
+	
+	for( unsigned int teltype = 0; teltype < getTeltoAna().size(); teltype++ )
+	{
+		setTelID( getTeltoAna()[teltype] );
+		
+		// first find dead channels
+		// (ignore low gains here)
+		findDeadChans( false );
+		// calculate IPR graphs
+		string PedFile_name = fPedFileNameC[getTeltoAna()[teltype]];
+		int TelType = getTelType( getTeltoAna()[teltype] );
+		
+		if( PedFile_name.find( ".root" ) == string::npos )
+		{
+			PedFile_name += ".root";
+		}
+		// open pedestal files
+		TFile PedFile( PedFile_name.c_str() );
+		if( PedFile.IsZombie() )
+		{
+			cout << "VCalibrator::calculateIPRGraphAveraged error reading IPR graphs from ";
+			cout << PedFile_name << endl;
+			TH1F* hNull = 0;
+			return hNull;
+		}
+		// histograms with IPR distributions are either
+		// i) in a directory called distributions_TelType
+		// ii) in the current directory
+		cout << "VCalibrator::calculateIPRGraphAveraged Telescope type " << TelType << ": ";
+		cout << "reading IPR histograms for summation window " << iSummationWindow;
+		cout << " from ";
+		cout << PedFile_name << endl;
+		stringstream Directory( stringstream::in | stringstream::out );
+		Directory.str( std::string() );
+		Directory << "distributions_" << TelType;
+		cout << Directory.str().c_str() << endl;
+		if( PedFile.Get( Directory.str().c_str() ) )
+		{
+			PedFile.cd( Directory.str().c_str() );
+		}
+		else
+		{
+			cout << "VCalibrator::calculateIPRGraphAveraged no directory: " << Directory.str().c_str() << endl;
+		}
+		
+		///////////////////////////
+		// average over all channels in one telescope
+		float i_gainCorrect = 1.;
+		for( unsigned int i = 0; i < getNChannels(); i++ )
+		{
+			if( getDetectorGeometry()->getAnaPixel()[i] > 0
+					&& i < getDead().size() && !getDead()[i] )
+			{
+				stringstream HistName( stringstream::in | stringstream::out );
+				HistName << "hpedPerTelescopeType_" << TelType << "_" << iSummationWindow << "_" << i;
+				TH1F* h = ( TH1F* )gDirectory->Get( HistName.str().c_str() );
+				
+				
+				if( h )
+				{
+					float ped = 0;
+					// default: pedestals are subtracted here
+					// (for combined channel analysis: charges are filled already pedestal subtracted)
+					// apply relative gain correction to integrated charges
+					if( getRunParameter()->fCombineChannelsForPedestalCalculation == 0 )
+					{
+						ped = getPeds()[i];
+					}
+					// special treatment for ASTRI telescopes
+					else if( getRunParameter()->fCombineChannelsForPedestalCalculation == 2 )
+					{
+						stringstream Pname( stringstream::in | stringstream::out );
+						Pname << "hped_" << TelType << "_" << iSummationWindow << "_" << i;
+						TH1F* hP = ( TH1F* )gDirectory->Get( Pname.str().c_str() );
+						if( hP )
+						{
+							ped = hP->GetMean();
+						}
+					}
+					for( int j = 1; j <= h->GetNbinsX(); j++ )
+					{
+						if( h->GetBinContent( j ) > 0. && getGains()[i] > 0 )
+						{
+							i_gainCorrect = getGains()[i];
+							if( getHIGHQE_gainfactor( i ) > 0. )
+							{
+								i_gainCorrect *= getHIGHQE_gainfactor( i );
+							}
+							if( i_gainCorrect > 0. )
+							{
+								hIPR->Fill( ( h->GetBinCenter( j ) - ped * iSummationWindow ) / i_gainCorrect, h->GetBinContent( j ) );
+							}
+						}
+					}
+				}
+			}
+		}
+		PedFile.Close();
+		
+	}
+	hIPR->Scale( 1. / getTeltoAna().size() );
+	float norm = getTeltoAna().size() * hIPR->Integral( 1, hIPR->GetNbinsX() );
+	cout << "VCalibrator::calculateIPRGraphAveraged normalization of average IPR histogram " << norm;
+	cout << ". Returning IPR histogram." << endl;
+	if( norm < fPedPerTelescopeTypeMinCnt )  //statistical limit for number of counts
+	{
+		cout << "VCalibrator::calculateIPRGraphAveraged WARNING: there is NOT enough statistics ";
+		cout << " ( < " << fPedPerTelescopeTypeMinCnt << ") even when averaging over all telescopes." << endl;
+		return hIPR;
+	}
+	else
+	{
+		cout << "VCalibrator::calculateIPRGraphsStatistics: there is enough statistics to average over telescopes. " << endl;
+		return hIPR;
+	}
+}
 
 
 bool VCalibrator::readIPRGraph_from_DSTFile( string iDSTFile, unsigned int iSummationWindow, ULong64_t iTelType )
