@@ -213,10 +213,10 @@ void VImageCleaning::cleanImagePedvars( VImageCleaningRunParameter* iImageCleani
 	// (end of preli)
 	
 	recoverImagePixelNearDeadPixel();
-    if( iImageCleaningParameters->fremoveIslandOfImageBorderPair )
-    {
-        removeIslandOfImageBorderPair(false);
-    }    
+	if( iImageCleaningParameters->fremoveIslandOfImageBorderPair )
+	{
+		removeIslandOfImageBorderPair();
+	}
 	fillImageBorderNeighbours();
 }
 
@@ -3079,53 +3079,53 @@ void VImageCleaning::fillImageBorderNeighbours()
  * (introduced in discussions about NN cleaning)
  *
 */
-void VImageCleaning::removeIslandOfImageBorderPair(bool reset_pixels_with_no_neighbours_only)
+void VImageCleaning::removeIslandOfImageBorderPair()
 {
-    vector< int > num_neigh_image(fData->getNChannels(), 0 );
-    vector< int > num_neigh_border(fData->getNChannels(), 0 );
+	unsigned int num_neigh_image = 0;
+	unsigned int num_neigh_border = 0;
 	unsigned int i_neighbour_size = 0;
 	unsigned int k = 0;
-    // count number of neighbour pixels which are image or border
+	unsigned int single_neighbour = 0;
+	// count number of neighbour pixels to an image pixel which are image or border
 	for( unsigned int i = 0; i < fData->getNChannels(); i++ )
 	{
-        i_neighbour_size = fData->getDetectorGeo()->getNNeighbours()[i];
-        for( unsigned int j = 0; j < i_neighbour_size; j++ )
-        {
-             k = fData->getDetectorGeo()->getNeighbours()[i][j];
-             if( fData->getImage()[k] )
-             {
-                 num_neigh_image[i]++;
-             }
-             else if( fData->getBorder()[k] )
-             {
-                 num_neigh_border[i]++;
-             }
-         }
-    }
-    // remove pixels without neighbours
-    // remove image pixels with single border neighbour only
-    for( unsigned int i = 0; i < fData->getNChannels(); i++ )
-    {
-        if( num_neigh_image[i] == 0 && num_neigh_border[i] == 0 )
-        {
-            fData->setImage(i, false);
-            fData->setBorder(i, false);
-        }
-        if( !reset_pixels_with_no_neighbours_only )
-        {
-            if( num_neigh_border[i]==1 && num_neigh_image[i]==0 )
-            {
-                fData->setImage(i,false);
-            }
-        }
-    }
-    if( reset_pixels_with_no_neighbours_only )
-    {
-        return;
-    }
-    // remove single image pixels in a final step
-    removeIslandOfImageBorderPair(true);
+		if( !fData->getImage()[i] )
+		{
+			continue;
+		}
+		num_neigh_image = 0;
+		num_neigh_border = 0;
+		i_neighbour_size = fData->getDetectorGeo()->getNNeighbours()[i];
+		for( unsigned int j = 0; j < i_neighbour_size; j++ )
+		{
+			k = fData->getDetectorGeo()->getNeighbours()[i][j];
+			if( fData->getImage()[k] )
+			{
+				num_neigh_image++;
+			}
+			else if( fData->getBorder()[k] )
+			{
+				num_neigh_border++;
+				single_neighbour = k;
+			}
+			if( num_neigh_image > 1 || num_neigh_border > 1 )
+			{
+				break;
+			}
+		}
+		if( num_neigh_image == 0 && num_neigh_border == 0 )
+		{
+			fData->setImage( i, false );
+		}
+		// remove image pixels with single neighbour
+		if( num_neigh_image == 0 && num_neigh_border == 1 )
+		{
+			fData->setImage( i, false );
+			fData->setBorder( single_neighbour, false );
+		}
+	}
 }
+
 
 /*
  * loop again to remove isolated image pixels

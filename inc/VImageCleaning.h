@@ -22,7 +22,7 @@ class VImageCleaning
 		void mergeClusters();
 		void recoverImagePixelNearDeadPixel();
 		void printDataError( string iFunctionName );
-        void removeIslandOfImageBorderPair( bool = false );
+		void removeIslandOfImageBorderPair();
 		void removeSmallClusters( int );
 		
 		// cluster cleaning

@@ -18,7 +18,7 @@ VImageCleaningRunParameter::VImageCleaningRunParameter( string iName )
 	fimagethresh = 5.0;
 	fborderthresh = 2.5;
 	fbrightnonimagetresh = 2.5;
-    fremoveIslandOfImageBorderPair = false;
+	fremoveIslandOfImageBorderPair = false;
 	
 	// time cluster cleaning
 	ftimecutpixel = 0.5;
@@ -107,10 +107,10 @@ void VImageCleaningRunParameter::print()
 	else if( getImageCleaningMethod() != "TIMENEXTNEIGHBOUR" )
 	{
 		cout << "\t\t (signal-to-noise cleaning thresholds)" << endl;
-        if( fremoveIslandOfImageBorderPair )
-        {
-            cout << "\t\t remove islands of one image plus one border pixel" << endl;
-        }
+		if( fremoveIslandOfImageBorderPair )
+		{
+			cout << "\t\t remove islands of one image plus one border pixel" << endl;
+		}
 	}
 	if( getImageCleaningMethodIndex() == 1 )
 	{

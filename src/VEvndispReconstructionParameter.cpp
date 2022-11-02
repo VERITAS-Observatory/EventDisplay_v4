@@ -1018,13 +1018,13 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 								fRunPara->fImageCleaningParameters[i]->fborderthresh = atof( iTemp3.c_str() );
 							}
 						}
-                        if( iTemp4.size() > 0 )
-                        {
-                            if( i < fRunPara->fImageCleaningParameters.size() )
-                            {
-                                fRunPara->fImageCleaningParameters[i]->fremoveIslandOfImageBorderPair = (bool)(atoi(iTemp4.c_str()));
-                            }
-                        }
+						if( iTemp4.size() > 0 )
+						{
+							if( i < fRunPara->fImageCleaningParameters.size() )
+							{
+								fRunPara->fImageCleaningParameters[i]->fremoveIslandOfImageBorderPair = ( bool )( atoi( iTemp4.c_str() ) );
+							}
+						}
 					}
 				}
 				continue;
