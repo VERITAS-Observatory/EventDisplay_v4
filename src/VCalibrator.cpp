@@ -4578,17 +4578,14 @@ bool VCalibrator::copyIPRTelAveraged( unsigned int iSummationWindow, ULong64_t i
 
         if( !i_IPRGraph )
         {
-                cout << "VCalibrator::calculateIPRGraphsFunction info: no IPR graph found for telescope type " << iTelType << endl;
+                cout << "VCalibrator::copyIPRTelAveraged: no IPR graph found for telescope type " << iTelType << endl;
                 return false;
         }
         if( !i_IPRGraph_Tel0 )
         {
-                cout << "VCalibrator::calculateIPRGraphsFunction info: no IPR graph found for telescope type " << getTeltoAna()[0] << endl;
+                cout << "VCalibrator::copyIPRTelAveraged: no IPR graph found for telescope type " << getTeltoAna()[0] << endl;
                 return false;
         }
-
-        cout << "test clone of histogram for teltype: " << iTelType << i_IPRGraph->GetN() << "  " << i_IPRGraph->GetX()[1] << "  " << i_IPRGraph->GetName() << endl;
-
 
         for(Int_t i = 0; i < i_IPRGraph_Tel0->GetN() ; i++){
                 i_IPRGraph->SetPoint(i, i_IPRGraph_Tel0->GetPointX(i), i_IPRGraph_Tel0->GetPointY(i) );
@@ -4959,11 +4956,11 @@ TH1F* VCalibrator::calculateIPRGraphAveraged(unsigned int iSummationWindow){
         }
         hIPR->Scale(1./getTeltoAna().size());
         float norm = getTeltoAna().size()*hIPR->Integral( 1, hIPR->GetNbinsX() );
-        cout << "VCalibrator::initializeIPRAveraged normalization of IPR histogram " << norm;
+        cout << "VCalibrator::calculateIPRGraphAveraged normalization of average IPR histogram " << norm;
         cout << ". Returning IPR histogram." << endl;
         if( norm < fPedPerTelescopeTypeMinCnt )  //statistical limit for number of counts
         {
-                cout << "VCalibrator::initializeIPRAveraged WARNING: there is NOT enough statistics ";
+                cout << "VCalibrator::calculateIPRGraphAveraged WARNING: there is NOT enough statistics ";
                 cout << " ( < " << fPedPerTelescopeTypeMinCnt << ") even when averaging over all telescopes." << endl;
                 return hIPR;
         }
