@@ -30,6 +30,7 @@ class VCalibrator : public VImageBaseAnalyzer
 	private:
 		int fCalibrationfileVersion;
 		
+		bool fIPRAverageTel;                    // flag to make average of all telescopes IPR in case there is not enough statistics to produce IPR graphs
 		map< ULong64_t, int > fNumberPedestalEvents;        //!< number of events used in pedestal analysis
 		vector<int> fNumberGainEvents;            //!< number of events used in gain and toffset analysis
 		vector<int> fNumberTZeroEvents;
@@ -105,6 +106,9 @@ class VCalibrator : public VImageBaseAnalyzer
 		bool readIPRGraph_from_DSTFile( string iDSTFile, unsigned int iSummationWindow, ULong64_t iTelType );
 		bool calculateIPRGraphs();
 		bool calculateIPRGraphs( string iPedFileName, unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel );
+		bool copyIPRTelAveraged( unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel );
+		TH1F* initializeIPRAveraged( unsigned int iSummationWindow, unsigned int iTelType );
+		TH1F* calculateIPRGraphAveraged( unsigned int iSummationWindow );
 		bool readLowGainMultiplier( );
 		bool readPeds( string iFile, bool, unsigned int );
 		bool readPeds_from_grisufile( bool, unsigned int );
