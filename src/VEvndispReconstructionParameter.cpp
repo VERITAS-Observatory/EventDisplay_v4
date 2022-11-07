@@ -1018,6 +1018,13 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 								fRunPara->fImageCleaningParameters[i]->fborderthresh = atof( iTemp3.c_str() );
 							}
 						}
+						if( iTemp4.size() > 0 )
+						{
+							if( i < fRunPara->fImageCleaningParameters.size() )
+							{
+								fRunPara->fImageCleaningParameters[i]->fremoveIslandOfImageBorderPair = ( bool )( atoi( iTemp4.c_str() ) );
+							}
+						}
 					}
 				}
 				continue;
@@ -1079,6 +1086,34 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				else
 				{
 					fRunPara->ifWriteGraphsToFile = false;
+				}
+				continue;
+			}
+			else if( iTemp.find( "CLUSTERCLEANINGPARAMETERS" ) != string::npos && fRunPara )
+			{
+				for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
+				{
+					if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+					{
+						if( i < fRunPara->fImageCleaningParameters.size() && iTemp2.size() > 0 )
+						{
+							fRunPara->fImageCleaningParameters[i]->fnmaxcluster = atof( iTemp2.c_str() );
+						}
+						if( iTemp3.size() > 0 )
+						{
+							if( i < fRunPara->fImageCleaningParameters.size() )
+							{
+								fRunPara->fImageCleaningParameters[i]->fminsizecluster = atof( iTemp3.c_str() );
+							}
+						}
+						if( iTemp4.size() > 0 )
+						{
+							if( i < fRunPara->fImageCleaningParameters.size() )
+							{
+								fRunPara->fImageCleaningParameters[i]->fminpixelcluster = atoi( iTemp4.c_str() );
+							}
+						}
+					}
 				}
 				continue;
 			}
@@ -1706,4 +1741,3 @@ vector< int > VEvndispReconstructionParameter::getTelescopeType_counter_from_Mir
 	}
 	return x;
 }
-

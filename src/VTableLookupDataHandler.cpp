@@ -309,6 +309,8 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 	}
 	fNImages = fshowerpars->NImages[fMethod];
 	fchi2 = fshowerpars->Chi2[fMethod];
+	fXoff = fshowerpars->Xoff[fMethod];
+	fYoff = fshowerpars->Yoff[fMethod];
 	// for table filling: check as soon as possible if the event is useful
 	if( fwrite && !isReconstructed() )
 	{

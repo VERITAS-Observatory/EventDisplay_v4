@@ -44,7 +44,7 @@ VRadialAcceptance::VRadialAcceptance( string ifile )
 	if( fAccFile->IsZombie() )
 	{
 		cout << "VRadialAcceptance::VRadialAcceptance error reading acceptance file " << ifile << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	
 	char hname[200];

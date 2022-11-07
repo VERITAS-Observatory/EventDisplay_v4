@@ -24,6 +24,7 @@ class VImageCleaningRunParameter
 		double fimagethresh;              // parameter for image threshold
 		double fborderthresh;             // parameter for border threshold
 		double fbrightnonimagetresh;      // parameter for bright pixels threshold
+		bool fremoveIslandOfImageBorderPair; // remove single image with single border pixels
 		
 		bool fUseFixedThresholds;         // use fixed image/border thresholds instead of multiples of pedestal variances
 		
@@ -40,6 +41,10 @@ class VImageCleaningRunParameter
 		double fCorrelationCleanCorrelThresh; //  parameter for trace correlation level (0.6-1.0)
 		int    fCorrelationCleanNpixThresh;   //  Maximum Number of pixels to apply correlation cleaning to (eg 10-15)
 		
+		/////////////////////////////////////////////////
+		// cluster cleaning
+		int fnmaxcluster;
+		double fminsizecluster;
 		
 		/////////////////////////////////////////////////
 		// time two-level

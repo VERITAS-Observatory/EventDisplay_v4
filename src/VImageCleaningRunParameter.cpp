@@ -18,12 +18,17 @@ VImageCleaningRunParameter::VImageCleaningRunParameter( string iName )
 	fimagethresh = 5.0;
 	fborderthresh = 2.5;
 	fbrightnonimagetresh = 2.5;
+	fremoveIslandOfImageBorderPair = false;
 	
 	// time cluster cleaning
 	ftimecutpixel = 0.5;
 	ftimecutcluster = 2.0;
 	fminpixelcluster = 3;
 	floops = 2;
+	
+	//cluster cleaning
+	fnmaxcluster = 1;
+	fminsizecluster = 0;
 	
 	// Trace Correlation Cleaning
 	fCorrelationCleanBoardThresh = 1.0; // S/N ratio of 1
@@ -102,6 +107,10 @@ void VImageCleaningRunParameter::print()
 	else if( getImageCleaningMethod() != "TIMENEXTNEIGHBOUR" )
 	{
 		cout << "\t\t (signal-to-noise cleaning thresholds)" << endl;
+		if( fremoveIslandOfImageBorderPair )
+		{
+			cout << "\t\t remove islands of one image plus one border pixel" << endl;
+		}
 	}
 	if( getImageCleaningMethodIndex() == 1 )
 	{
@@ -117,6 +126,23 @@ void VImageCleaningRunParameter::print()
 	if( getImageCleaningMethodIndex() == 4 )
 	{
 		cout << "\t\t time constraint between next neighbor pixels (samples): " << ftimediff << endl;
+	}
+	if( getImageCleaningMethodIndex() == 5 )
+	{
+		cout << "\t\t cluster cleaning; " ;
+		if( fnmaxcluster > 0 )
+		{
+			cout << "keep at most " << fnmaxcluster << " clusters; " ;
+		}
+		if( fminsizecluster > 0 )
+		{
+			cout << " min cluster size: " << fminsizecluster;
+		}
+		if( fminpixelcluster > 0 )
+		{
+			cout << " min no. pixels: " << fminpixelcluster;
+		}
+		cout << endl;
 	}
 }
 
@@ -139,7 +165,10 @@ string VImageCleaningRunParameter::getImageCleaningMethod()
 	{
 		return "TIMETWOLEVEL";
 	}
-	
+	else if( fImageCleaningMethod == 5 )
+	{
+		return "CLUSTERCLEANING";
+	}
 	return "TWOLEVELCLEANING";
 }
 
@@ -164,6 +193,10 @@ bool VImageCleaningRunParameter::setImageCleaningMethod( string iMethod )
 	else if( iMethod == "TIMETWOLEVEL" )
 	{
 		fImageCleaningMethod = 4;
+	}
+	else if( iMethod == "CLUSTERCLEANING" )
+	{
+		fImageCleaningMethod = 5;
 	}
 	else
 	{
