@@ -425,6 +425,7 @@ bool VImageCleaning::InitNNImageCleaning()
 	return true;
 }
 
+
 /*
     get IPR graphs from different sources (files), calculate probability contours
 
@@ -439,7 +440,10 @@ bool VImageCleaning::InitNNImgClnPerTelType( unsigned int teltype )
 		cout << "VImageCleaning::InitNNImgClnPerTelType( int type ): getting IPR graph for (simtel) teltype: ";
 		cout << teltype << " (type " << ( int )fData->getTelType( fData->getTelID() );
 		cout << ", summation window " << fData->getSumWindow() << ") from DST file" << endl;
+		
+		
 		IPRgraph = fData->getIPRGraph();
+		
 		if( IPRgraph )
 		{
 			cout << "\t found graph: " << IPRgraph->GetName() << endl;
@@ -449,7 +453,9 @@ bool VImageCleaning::InitNNImgClnPerTelType( unsigned int teltype )
 	{
 		cout << "VImageCleaning::InitNNImgClnPerTelType( int type ): getting IPR graph for teltype: ";
 		cout << teltype << " from external file (ped or DST file)" << endl;
+		
 		IPRgraph = fData->getIPRGraph();
+		
 		if( IPRgraph )
 		{
 			IPRgraph->SetName( Form( "IPRchargeTelType%d", teltype ) );
