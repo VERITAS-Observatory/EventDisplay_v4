@@ -56,6 +56,6 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
-          file: ./Eventdisplay/dockerfiles/Dockerfile
+          file: ./EventDisplay_v4/dockerfiles/Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
