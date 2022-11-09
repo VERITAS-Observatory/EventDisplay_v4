@@ -43,10 +43,12 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}.{{patch}},suffix=-vts
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: tar_packages
+      - name: vbf
         run: |
           curl https://syncandshare.desy.de/index.php/s/${{ secrets.VBFcpp17 }}/download > VBF.tar.gz
-          curl https://syncandshare.desy.de/index.php/s/${{ secrets.SOFA }}/download > sofa.tar.gz
+      - name: sofa
+        run: |
+          curl https://syncandshare.desy.de/index.php/s/${{ secrets.SOFA }}/download > sofa/sofa.tar.gz
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
