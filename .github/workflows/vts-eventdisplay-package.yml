@@ -1,0 +1,61 @@
+# https://docs.github.com/en/actions/publishing-packages/publishing-docker-images
+name: VTS Eventdisplay Docker Image
+
+on:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    branches: ["main"]
+  release:
+    types: [published]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-vts-eventdisplay-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          path: 'EventDisplay_v4'
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          tags: |
+            type=ref,event=pr,suffix=-vts
+            type=semver,pattern={{major}}.{{minor}}.{{patch}},suffix=-vts
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: vbf
+        run: |
+          curl https://syncandshare.desy.de/index.php/s/${{ secrets.VBFcpp17 }}/download > VBF.tar.gz
+
+      - name: sofa
+        run: |
+          curl https://syncandshare.desy.de/index.php/s/${{ secrets.SOFA }}/download > sofa.tar.gz
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          file: ./EventDisplay_v4/dockerfiles/Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
