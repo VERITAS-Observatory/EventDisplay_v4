@@ -3,8 +3,8 @@ name: VTS Eventdisplay Docker Image
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
   pull_request:
     branches: ["main"]
   release:
