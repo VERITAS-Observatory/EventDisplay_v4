@@ -41,6 +41,7 @@ class VPedestalCalculator : public VImageBaseAnalyzer
 		
 		vector< TTree* > fTree;
 		
+		// [telID][pixelID][summation window]
 		vector< vector< vector< float > > > fpedcal_n;
 		vector< vector< vector< float > > > fpedcal_mean;
 		vector< vector< vector< float > > > fpedcal_mean2;
