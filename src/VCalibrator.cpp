@@ -649,11 +649,14 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 	UInt_t insumw = 0;
 	Float_t isumw[VDST_MAXSUMWINDOW];
 	Float_t iped = 0.;
+	Float_t ipedmedian = 0.;
 	Float_t ipedv[VDST_MAXSUMWINDOW];
+	Float_t ipedv68[VDST_MAXSUMWINDOW];
 	for( int i = 0; i < VDST_MAXSUMWINDOW; i++ )
 	{
 		isumw[i] = 0.;
 		ipedv[i] = 0.;
+		ipedv68[i] = 0.;
 	}
 	UInt_t inevents = 0;
 	// pedestals in time slices
@@ -669,15 +672,18 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 	Double_t TStime[VDST_PEDTIMESLICES];
 	UInt_t TSnevents[VDST_PEDTIMESLICES];
 	Float_t TSpedmean[VDST_PEDTIMESLICES];
+	Float_t TSpedmedian[VDST_PEDTIMESLICES];
 	for( int i = 0; i < VDST_PEDTIMESLICES; i++ )
 	{
 		TSMJD[i] = 0;
 		TStime[i] = 0.;
 		TSnevents[i] = 0;
 		TSpedmean[i] = 0.;
+		TSpedmedian[i] = 0.;
 	}
 	// TSpedvar[Summationwindow-1][Time slice]
 	vector< Float_t* > TSpedvar;
+	vector< Float_t* > TSpedvar68;
 	
 	std::ostringstream iSname;
 	iSname << "tPeds_" << iTelType;
@@ -689,6 +695,8 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 	iPedTree->Branch( "sumwindow", isumw, "sumwindow[nsumwindow]/F" );
 	iPedTree->Branch( "pedmean", &iped, "pedmean/F" );
 	iPedTree->Branch( "pedvars", ipedv, "pedvars[nsumwindow]/F" );
+	iPedTree->Branch( "pedmedian", &ipedmedian, "pedmedian/F" );
+	iPedTree->Branch( "pedvars68", ipedv68, "pedvars68[nsumwindow]/F" );
 	iPedTree->Branch( "nevents", &inevents, "nevents/i" );
 	// fill this part only if time dependent pedestals are calculated
 	if( iPedestalInTimeSlices )
@@ -698,17 +706,29 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 		iPedTree->Branch( "TStime", TStime, "TStime[TSnSlices]/D" );
 		iPedTree->Branch( "TSnevents", TSnevents, "TSnevents[TSnSlices]/i" );
 		iPedTree->Branch( "TSpedmean", TSpedmean, "TSpedmean[TSnSlices]/F" );
+		iPedTree->Branch( "TSpedmedian", TSpedmedian, "TSpedmedian[TSnSlices]/F" );
 		for( unsigned int i = 0; i < hped_vec[iTelType].size(); i++ )
 		{
 			TSpedvar.push_back( new Float_t[VDST_PEDTIMESLICES] );
 			sprintf( iname, "TSpedvar_sw%d[TSnSlices]/F", i + 1 );
 			sprintf( ititle, "TSpedvar_sw%d", i + 1 );
 			iPedTree->Branch( ititle, TSpedvar[i], iname );
+			TSpedvar68.push_back( new Float_t[VDST_PEDTIMESLICES] );
+			sprintf( iname, "TSpedvar68_sw%d[TSnSlices]/F", i + 1 );
+			sprintf( ititle, "TSpedvar68_sw%d", i + 1 );
+			iPedTree->Branch( ititle, TSpedvar68[i], iname );
 		}
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////
 	// tree filling
+	
+	// median pedestal and 68% containment
+	Double_t xq[3];
+	Double_t yq[3];
+	xq[0] = 0.16;
+	xq[1] = 0.5;
+	xq[2] = 0.84;
 	
 	// loop over all channels
 	for( unsigned int i = 0; i < hped_vec[iTelType][0].size(); i++ )
@@ -716,13 +736,16 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 		ichannel = ( Int_t )i;
 		
 		// get pedestal and pedestal variances from pedestal histograms
-		if( fRunPar->fCalibrationSumWindow > 0 )
+		if( fRunPar->fCalibrationSumWindow > 0 && hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetEntries() > 0 )
 		{
 			iped = hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetMean() / ( double )fRunPar->fCalibrationSumWindow;
+			hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetQuantiles( 3, yq, xq );
+			ipedmedian = yq[1] / ( double )fRunPar->fCalibrationSumWindow;
 		}
 		else
 		{
 			iped = 0.;
+			ipedmedian = 0.;
 		}
 		inevents = ( Int_t )hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetEntries();
 		
@@ -731,7 +754,17 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 		for( unsigned int j = 0; j < hped_vec[iTelType].size(); j++ )
 		{
 			isumw[j] = ( Float_t )j + 1;
-			ipedv[j] = hped_vec[iTelType][j][i]->GetRMS();
+			if( hped_vec[iTelType][j][i]->GetEntries() > 0 )
+			{
+				ipedv[j] = hped_vec[iTelType][j][i]->GetRMS();
+				hped_vec[iTelType][j][i]->GetQuantiles( 3, yq, xq );
+				ipedv68[j] = ( yq[2] - yq[0] ) / 2.;
+			}
+			else
+			{
+				ipedv[j] = 0.;
+				ipedv68[j] = 0.;
+			}
 		}
 		
 		/////////////////////////////////////////////////
@@ -753,6 +786,7 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 					}
 					TSnevents[ts] = ( UInt_t )iPedestalInTimeSlices->v_pedEntries[tel][ts][i][iSW_mean];
 					TSpedmean[ts] = iPedestalInTimeSlices->v_ped[tel][ts][i][iSW_mean];
+					TSpedmedian[ts] = iPedestalInTimeSlices->v_ped_median[tel][ts][i][iSW_mean];
 					// check summation windows
 					unsigned int iSW_temp = iPedestalInTimeSlices->v_pedvar[tel][ts][i].size();
 					if( iSW_temp > TSpedvar.size() )
@@ -762,6 +796,7 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 					for( unsigned int w = 0; w < iSW_temp; w++ )
 					{
 						TSpedvar[w][ts] = iPedestalInTimeSlices->v_pedvar[tel][ts][i][w];
+						TSpedvar68[w][ts] = iPedestalInTimeSlices->v_pedvar68[tel][ts][i][w];
 					}
 				}
 			}

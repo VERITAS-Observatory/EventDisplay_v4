@@ -9,6 +9,7 @@
 
 #include "TDirectory.h"
 #include "TFile.h"
+#include "TH1.h"
 #include "TMath.h"
 #include "TTree.h"
 
@@ -45,10 +46,13 @@ class VPedestalCalculator : public VImageBaseAnalyzer
 		vector< vector< vector< float > > > fpedcal_n;
 		vector< vector< vector< float > > > fpedcal_mean;
 		vector< vector< vector< float > > > fpedcal_mean2;
+		vector< vector< vector< TH1F* > > > fpedcal_histo;
 		
 		vector< vector< float > > v_temp_pedEntries;
 		vector< vector< float > > v_temp_ped;
 		vector< vector< float > > v_temp_pedvar;
+		vector< vector< float > > v_temp_ped_median;
+		vector< vector< float > > v_temp_pedvar68;
 		
 		// timing vector
 		vector< double > fTimeVec;
@@ -67,6 +71,8 @@ class VPedestalCalculator : public VImageBaseAnalyzer
 		vector< vector< vector< vector< float > > > > v_ped;
 		//! [telid][time slice][npixel][summation window]
 		vector< vector< vector< vector< float > > > > v_pedvar;
+		vector< vector< vector< vector< float > > > > v_ped_median;
+		vector< vector< vector< vector< float > > > > v_pedvar68;
 		
 		VPedestalCalculator();
 		~VPedestalCalculator() {}
