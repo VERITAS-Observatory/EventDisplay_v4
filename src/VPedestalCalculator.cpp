@@ -76,7 +76,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 	reset();
 	
 	// pedestal histogram binning
-	int i_hist_nbin = 750;
+	int i_hist_nbin = 1500.;
 	float i_hist_xmin = 0.;
 	float i_hist_xmax = 750.;
 	
@@ -228,9 +228,17 @@ void VPedestalCalculator::fillTimeSlice( unsigned int telID )
 				v_temp_pedvar[p][w]     = sqrt( 1. / ( fpedcal_n[telID][p][w] )
 												* TMath::Abs( fpedcal_mean2[telID][p][w]
 														- fpedcal_mean[telID][p][w] * fpedcal_mean[telID][p][w] / fpedcal_n[telID][p][w] ) );
-				fpedcal_histo[telID][p][w]->GetQuantiles( 3, yq, xq );
-				v_temp_ped_median[p][w] = yq[1] / ( double )( w + 1 );
-				v_temp_pedvar68[p][w] = 0.5 * ( yq[2] - yq[0] );
+				if( fpedcal_histo[telID][p][w]->GetEntries() > 0 )
+				{
+					fpedcal_histo[telID][p][w]->GetQuantiles( 3, yq, xq );
+					v_temp_ped_median[p][w] = yq[1] / ( double )( w + 1 );
+					v_temp_pedvar68[p][w] = 0.5 * ( yq[2] - yq[0] );
+				}
+				else
+				{
+					v_temp_ped_median[p][w] = 0.;
+					v_temp_pedvar68[p][w] = 0.;
+				}
 			}
 			else
 			{

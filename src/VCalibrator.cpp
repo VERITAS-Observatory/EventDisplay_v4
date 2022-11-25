@@ -736,7 +736,7 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 		ichannel = ( Int_t )i;
 		
 		// get pedestal and pedestal variances from pedestal histograms
-		if( fRunPar->fCalibrationSumWindow > 0 && hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetEntries() > 0 )
+		if( fRunPar->fCalibrationSumWindow > 0 && hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetEntries() > 10 )
 		{
 			iped = hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetMean() / ( double )fRunPar->fCalibrationSumWindow;
 			hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetQuantiles( 3, yq, xq );
