@@ -573,6 +573,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 	unsigned int i_tempN255 = 0;
 	int corrfirst = 0;
 	int corrlast = 0;
+	int corrlast_sw2 = 0;
 	
 	//////////////////////////////////////////////////////////////////
 	// loop over all channels (hits)
@@ -673,8 +674,15 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 				{
 					getAnaData()->fillPulseSum( i_channelHitID, getSums()[i_channelHitID], getHiLo()[i_channelHitID] );
 				}
-				corrlast = getFADCTraceIntegrationPosition( corrfirst + ( int )getSumWindow_2() );
-				setSums2( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw )* getLowGainSumCorrection( fRunPar->fsumwindow_2[fTelID], corrlast - corrfirst, getHiLo()[i_channelHitID] ) );
+				corrlast_sw2 = getFADCTraceIntegrationPosition( corrfirst + ( int )getSumWindow_2() );
+				if( corrlast_sw2 != corrlast )
+				{
+					setSums2( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast_sw2, fRaw )* getLowGainSumCorrection( fRunPar->fsumwindow_2[fTelID], corrlast - corrfirst, getHiLo()[i_channelHitID] ) );
+				}
+				else
+				{
+					setSums2( i_channelHitID, getSums()[i_channelHitID] );
+				}
 				setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast, true );
 			}
 			//////////////////////////////////////////////////
