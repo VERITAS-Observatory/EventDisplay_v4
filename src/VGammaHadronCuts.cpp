@@ -2303,8 +2303,6 @@ bool VGammaHadronCuts::initAngularResolutionFile()
 			cout << "VGammaHadronCuts::initAngularResolutionFile: error finding tree with instrument response function for angular resolution " << endl;
 			return false;
 		}
-		// TODO: this should go in the future
-		// (currently there should be only one entry in the angular resolution tree, which is the case in the CTA analysis)
 		if( t->GetEntries() != 1 )
 		{
 			cout << "VGammaHadronCuts::initAngularResolutionFile error: invalid number of entries in instrument response function tree ";
