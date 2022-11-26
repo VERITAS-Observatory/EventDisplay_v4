@@ -645,8 +645,8 @@ double VTraceHandler::getTraceSum( int iSumWindowFirst, int iSumWindowLast, bool
 	// integrate from fFirst to fLast
 	if( fTraceIntegrationMethod == 1 )
 	{
-		fSumWindowFirst = iSumWindowFirst;
-		fSumWindowLast  = iSumWindowLast;
+		fSumWindowFirst = ( unsigned int )iSumWindowFirst;
+		fSumWindowLast  = ( unsigned int )iSumWindowLast;
 		return calculateTraceSum_fixedWindow( fSumWindowFirst, fSumWindowLast, iRaw );
 	}
 	// find maximum integral
@@ -706,6 +706,8 @@ double VTraceHandler::getTraceSum( int iSumWindowFirst, int iSumWindowLast, bool
  * get maximum trace sum
  * (sliding window, search along trace for maximum sum)
  *
+ * iSearchEnd is the last FADC bin where the integration is starting from (!)
+ *
 */
 double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart,
 		unsigned int iSearchEnd,
@@ -713,16 +715,18 @@ double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart
 		bool fRaw )
 {
 	unsigned int n = fpTrace.size();
-	unsigned int window = iIntegrationWindow;
-	unsigned int SearchEnd = iSearchEnd;
-	if( ( n - window ) <= SearchEnd )
+	
+	// zero length trace
+	if( n == 0 )
 	{
-		SearchEnd = n - window + 1;
+		fTraceAverageTime = 0.;
+		return 0.;
 	}
-	int lolimit = 0;
-	int uplimit = 0;
-	float tcharge = 0.;
-	double ampl = 0.;
+	// last bin to start search from
+	if( ( n - iIntegrationWindow ) <= iSearchEnd )
+	{
+		iSearchEnd = n - iIntegrationWindow + 1;
+	}
 	double charge = 0.;
 	float ped = fPed;
 	if( kIPRmeasure )
@@ -732,17 +736,10 @@ double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart
 	////////////////////////////////////////
 	// sample time and value (ped subracted)
 	float muxBINS[n], FADC[n];
-	for( unsigned int i = 1; i <= n; i++ )
+	for( unsigned int i = 0; i < n; i++ )
 	{
-		muxBINS[i - 1] = i - 0.5;
-		FADC[i - 1] = ( float )fpTrace.at( i - 1 ) - ped;
-	}
-	
-	if( n == 0 )
-	{
-		// fTraceAverageTime = muxBINS[1];
-		fTraceAverageTime = 0.;
-		return 0.;
+		muxBINS[i] = i + 0.5;
+		FADC[i] = ( float )fpTrace.at( i ) - ped;
 	}
 	
 	////////////////////////////////////////
@@ -761,36 +758,37 @@ double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart
 	}
 	
 	////////////////////////////////////////
+	// sliding window
+	fSumWindowFirst = 0;
+	fSumWindowLast = 0;
+	
+	// first window
 	float xmax = 0.;
-	for( unsigned int i = iSearchStart; i < int( window ) + iSearchStart; i++ )
+	for( unsigned int i = iSearchStart; i < iIntegrationWindow + iSearchStart; i++ )
 	{
 		xmax += FADC[i];
 	}
-	// extract charge
-	for( unsigned int i = iSearchStart; i < SearchEnd; i++ )
+	// extract charge and slide to the right
+	for( unsigned int i = iSearchStart; i < iSearchEnd; i++ )
 	{
 		if( charge < xmax )
 		{
 			charge = xmax;
-			uplimit = i + int( window );
-			if( uplimit > int( n ) )
+			fSumWindowFirst = i;
+			fSumWindowLast = i + iIntegrationWindow;
+			if( fSumWindowLast > n )
 			{
-				uplimit = n;
-			}
-			lolimit = i;
-			if( lolimit < 0 )
-			{
-				lolimit = 0;
+				fSumWindowLast = n;
 			}
 		}
-		xmax = xmax - FADC[i] + FADC[i + window];
+		xmax = xmax - FADC[i] + FADC[i + iIntegrationWindow];
 	}
-	// arrival times *****************************************************
-	for( int k = lolimit; k < uplimit; k++ )
+	// arrival times (weighted average)
+	float tcharge = 0.;
+	for( unsigned int k = fSumWindowFirst; k < fSumWindowLast; k++ )
 	{
 		tcharge += muxBINS[k] * FADC[k];
 	}
-	
 	if( charge != 0. )
 	{
 		fTraceAverageTime = tcharge / charge;
@@ -799,14 +797,10 @@ double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart
 	{
 		fTraceAverageTime = 0.;
 	}
-	if( fTraceAverageTime > ( ( int )SearchEnd + ( int )window - 1 ) )
+	if( fTraceAverageTime > ( ( int )iSearchEnd + ( int )iIntegrationWindow - 1 ) )
 	{
-		fTraceAverageTime = ( ( int )SearchEnd + ( int )window - 1 );
+		fTraceAverageTime = ( ( int )iSearchEnd + ( int )iIntegrationWindow - 1 );
 	}
-	ampl -= fPed;
-	
-	fSumWindowFirst = lolimit;
-	fSumWindowLast  = uplimit;
 	
 	return charge;
 }
