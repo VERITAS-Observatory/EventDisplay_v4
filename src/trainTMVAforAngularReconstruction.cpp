@@ -39,7 +39,8 @@ using namespace std;
 
 /*
  * return average pointing elevation
- * TODODISPBDT
+ *
+ * NOT IMPLEMENTED - this is used for the dispEnergy reconstruction
  */
 pair<float, float> getArrayPointing( Cshowerpars* i_showerpars )
 {
@@ -152,7 +153,6 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	gSystem->ExpandPathName( iOutputDirectory );
 	( TMVA::gConfig().GetIONames() ).fWeightFileDir = iOutputDirectory;
 	
-	
 	// tmva regression
 	TMVA::Factory* factory = new TMVA::Factory( iTargetML.c_str(), i_tmva,
 			"V:!DrawProgressBar:!Color:!Silent:AnalysisType=Regression:VerboseLevel=Debug:Correlations=True" );
@@ -175,6 +175,7 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	dataloader->AddVariable( "dist", 'F' );
 	if( iTargetML.find( "DispEnergy" ) != string::npos && !iSingleTelescopeAnalysis )
 	{
+		// TODO: correct EHeight calculation
 		dataloader->AddVariable( "EHeight", 'F' );
 		dataloader->AddVariable( "Rcore", 'F' );
 	}
@@ -974,6 +975,7 @@ int main( int argc, char* argv[] )
 		cout << "                       (for VTS - these are telescope numbers)" << endl;
 		cout << "     optional: train for energy/core reconstruction = \"BDTDispEnergy\"/\"BDTDispCore\"";
 		cout << "(default = \"BDTDisp\": train for angular reconstrution)" << endl;
+		cout << "     NOTE! dispEnergy not fully implemented. Do not use." << endl;
 		cout << endl;
 		exit( EXIT_SUCCESS );
 	}
