@@ -2147,7 +2147,6 @@ void VImageParameterCalculation::setImageBorderPixelPosition( VImageParameter* i
     fill image/border pixel to image parameter tree
     (optional)
 
-    PixelType == 0: Pe > 0 and not image and not border pixel
     PixelType == 1: image pixel
     PixelType == 2: border pixel
     PixelType == 3: neighbour pixel to image/border
