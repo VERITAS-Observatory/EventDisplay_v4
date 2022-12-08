@@ -30,8 +30,8 @@ class VTraceHandler
 		double fPed;                              //!< Ped value for this trace
 		double fPedrms;                           //!< Ped rms for this trace (needed for VFitTraceHandler)
 		double fTraceAverageTime;                 //!< average time for this trace
-		int    fSumWindowFirst;
-		int    fSumWindowLast;
+		unsigned int    fSumWindowFirst;
+		unsigned int    fSumWindowLast;
 		unsigned int fChanID;                     //!< channel ID
 		bool fHiLo;                               //!< hilo bit
 		int fDynamicRange;                        //!< dynamic range
@@ -73,11 +73,11 @@ class VTraceHandler
 		{
 			return fTraceAverageTime;
 		}
-		int    getTraceIntegrationFirst()
+		unsigned int    getTraceIntegrationFirst()
 		{
 			return fSumWindowFirst;
 		}
-		int    getTraceIntegrationLast()
+		unsigned int    getTraceIntegrationLast()
 		{
 			return fSumWindowLast;
 		}

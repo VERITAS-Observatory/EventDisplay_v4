@@ -11,7 +11,7 @@ VPedestalCalculator::VPedestalCalculator()
 {
 	fDebug = getDebugFlag();
 	
-	// default parameters (can be adjusted later in initialize()
+	// default parameters (can be adjusted later in initialize())
 	fLengthofTimeSlice = 180.;                     // in [s]
 	fSumWindow = 24;
 	fNPixel = 500;
@@ -75,6 +75,11 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 	// reset all variables
 	reset();
 	
+	// pedestal histogram binning
+	int i_hist_nbin = 1500.;
+	float i_hist_xmin = 0.;
+	float i_hist_xmax = 750.;
+	
 	// set up the trees
 	TDirectory* iDir = gDirectory;
 	
@@ -83,6 +88,8 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 	
 	vector< float > iped_cal;
 	vector< vector< float > > iped_cal2;
+	vector< TH1F* > iped_histo;
+	vector< vector< TH1F* > > iped_histo2;
 	
 	for( unsigned int p = 0; p < fNPixel; p++ )
 	{
@@ -94,6 +101,8 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		v_temp_pedEntries.push_back( iped_cal );
 		v_temp_ped.push_back( iped_cal );
 		v_temp_pedvar.push_back( iped_cal );
+		v_temp_ped_median.push_back( iped_cal );
+		v_temp_pedvar68.push_back( iped_cal );
 	}
 	
 	// vectors
@@ -111,6 +120,8 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		v_pedEntries.push_back( iv_vvdouble );
 		v_ped.push_back( iv_vvdouble );
 		v_pedvar.push_back( iv_vvdouble );
+		v_ped_median.push_back( iv_vvdouble );
+		v_pedvar68.push_back( iv_vvdouble );
 		
 		setTelID( i );
 		unsigned int t = getTeltoAna()[i];
@@ -153,18 +164,26 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		
 		// initialise the pedvars variables
 		iped_cal2.clear();
+		iped_histo.clear();
 		for( unsigned int p = 0; p < fNPixel; p++ )
 		{
 			iped_cal.clear();
+			iped_histo.clear();
 			for( int w = 0; w < fSumWindow; w++ )
 			{
 				iped_cal.push_back( 0. );
+				sprintf( hname, "hped_cal_%d_%d_%d", i, p, w );
+				iped_histo.push_back( new TH1F(
+										  hname, "",
+										  i_hist_nbin, i_hist_xmin, i_hist_xmax ) );
 			}
 			iped_cal2.push_back( iped_cal );
+			iped_histo2.push_back( iped_histo );
 		}
 		fpedcal_n.push_back( iped_cal2 );
 		fpedcal_mean.push_back( iped_cal2 );
 		fpedcal_mean2.push_back( iped_cal2 );
+		fpedcal_histo.push_back( iped_histo2 );
 		
 		// define the time vector
 		fTimeVec.push_back( 0 );
@@ -182,6 +201,12 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 
 void VPedestalCalculator::fillTimeSlice( unsigned int telID )
 {
+	// values for median and 84% containment
+	Double_t xq[3];
+	Double_t yq[3];
+	xq[0] = 0.16;
+	xq[1] = 0.5;
+	xq[2] = 0.84;
 	// loop over all channels
 	for( unsigned int p = 0; p < fpedcal_mean[telID].size(); p++ )
 	{
@@ -194,7 +219,7 @@ void VPedestalCalculator::fillTimeSlice( unsigned int telID )
 		for( unsigned int w = 0; w < iTempSW; w++ )
 		{
 			// get pedestal values
-			if( fpedcal_n[telID][p][w] > 0. )
+			if( fpedcal_n[telID][p][w] > 10. )
 			{
 				v_temp_pedEntries[p][w] = fpedcal_n[telID][p][w];
 				v_temp_ped[p][w]        = fpedcal_mean[telID][p][w] / fpedcal_n[telID][p][w] / ( double )( w + 1 );
@@ -203,16 +228,30 @@ void VPedestalCalculator::fillTimeSlice( unsigned int telID )
 				v_temp_pedvar[p][w]     = sqrt( 1. / ( fpedcal_n[telID][p][w] )
 												* TMath::Abs( fpedcal_mean2[telID][p][w]
 														- fpedcal_mean[telID][p][w] * fpedcal_mean[telID][p][w] / fpedcal_n[telID][p][w] ) );
+				if( fpedcal_histo[telID][p][w]->GetEntries() > 0 )
+				{
+					fpedcal_histo[telID][p][w]->GetQuantiles( 3, yq, xq );
+					v_temp_ped_median[p][w] = yq[1] / ( double )( w + 1 );
+					v_temp_pedvar68[p][w] = 0.5 * ( yq[2] - yq[0] );
+				}
+				else
+				{
+					v_temp_ped_median[p][w] = 0.;
+					v_temp_pedvar68[p][w] = 0.;
+				}
 			}
 			else
 			{
 				v_temp_pedEntries[p][w] = 0.;
 				v_temp_ped[p][w]        = 0.;
 				v_temp_pedvar[p][w]     = 0.;
+				v_temp_ped_median[p][w] = 0.;
+				v_temp_pedvar68[p][w]   = 0.;
 			}
 			fpedcal_n[telID][p][w] = 0.;
 			fpedcal_mean[telID][p][w] = 0.;
 			fpedcal_mean2[telID][p][w] = 0.;
+			fpedcal_histo[telID][p][w]->Reset();
 		}
 		// deroate the pixel coordinates
 		if( getTelID() < getPointing().size() && getPointing()[getTelID()] )
@@ -233,6 +272,8 @@ void VPedestalCalculator::fillTimeSlice( unsigned int telID )
 	v_pedEntries[telID].push_back( v_temp_pedEntries );
 	v_ped[telID].push_back( v_temp_ped );
 	v_pedvar[telID].push_back( v_temp_pedvar );
+	v_ped_median[telID].push_back( v_temp_ped_median );
+	v_pedvar68[telID].push_back( v_temp_pedvar68 );
 }
 
 
@@ -311,6 +352,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
 									fpedcal_n[telID][chanID][w]++;
 									fpedcal_mean[telID][chanID][w] += i_tr_sum;
 									fpedcal_mean2[telID][chanID][w] += i_tr_sum * i_tr_sum;
+									fpedcal_histo[telID][chanID][w]->Fill( i_tr_sum );
 								}
 								else
 								{
@@ -336,7 +378,6 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
 			}
 		}                                         // for (unsigned int i = 0; i < nhits; i++)
 	}                                             // if( telID < fTree.size() && fTree[telID] && telID < fTimeVec.size() )
-	
 }
 
 

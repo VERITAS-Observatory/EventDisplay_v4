@@ -679,12 +679,8 @@ void VEventLoop::initializeAnalyzers()
 */
 void VEventLoop::shutdown()
 {
-	// additional output for writing to disk (MC only)
+	// additional output for writing to disk
 	bool fDebug_writing = false;
-	if( isMC() )
-	{
-		fDebug_writing = true;
-	}
 	if( fDebug )
 	{
 		cout << "VEventLoop::shutdown()" << endl;
@@ -789,7 +785,6 @@ void VEventLoop::shutdown()
 		// orgainze and write out tree
 		if( fRunPar->frunmode == R_ANA && fDeadPixelOrganizer )
 		{
-			cout << "NKH Finish Up VDeadPixelOrganizer" << endl;
 			fDeadPixelOrganizer->printSummary() ;
 			
 			// copy tree to output root file
