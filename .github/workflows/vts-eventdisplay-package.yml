@@ -3,8 +3,7 @@ name: VTS Eventdisplay Docker Image
 
 on:
   push:
-    branches:
-      - main
+    branches: ["main"]
   pull_request:
     branches: ["main"]
   release:
@@ -38,9 +37,6 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          tags: |
-            type=ref,event=pr,suffix=-vts
-            type=semver,pattern={{major}}.{{minor}}.{{patch}},suffix=-vts
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: vbf
