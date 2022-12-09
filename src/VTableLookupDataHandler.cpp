@@ -1224,7 +1224,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		fDispAnalyzerDirectionError->initialize( fTLRunParameter->fDispError_BDTFileName, "TMVABDT", "BDTDispError" );
 	}
 	/////////////////////////////////////////
-	// initialize Disp Analyzer for error on direction reconstruction
+	// initialize Disp Analyzer for sign (head/tail) prediction
 	// (if required)
 	if( fTLRunParameter->fDispSign_BDTFileName.size() > 0. )
 	{
