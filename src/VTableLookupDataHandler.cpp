@@ -139,6 +139,7 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	
 	fDispAnalyzerDirection = 0;
 	fDispAnalyzerDirectionError = 0;
+	fDispAnalyzerDirectionSign = 0;
 }
 
 /*
@@ -683,14 +684,55 @@ void VTableLookupDataHandler::doStereoReconstruction()
 				iDispError[t] = fDispAnalyzerDirectionError->getDispErrorT( t );
 			}
 		}
+		////////////////////////////////////////////////////////////////////
+		// estimate disp head/tail sign
+		////////////////////////////////////////////////////////////////////
+		vector< float > iDispSign( getNTel(), 1. );
+		if( fDispAnalyzerDirectionSign )
+		{
+			fDispAnalyzerDirectionSign->calculateExpectedDirectionSign(
+				getNTel(),
+				fArrayPointing_Elevation, fArrayPointing_Azimuth,
+				fTel_type,
+				getSize( 1., true, false ),
+				fcen_x, fcen_y,
+				fcosphi, fsinphi,
+				fwidth, flength,
+				fasym, ftgrad_x,
+				floss, fntubes,
+				getWeight(),
+				fXoff_intersect, fYoff_intersect,
+				fmeanPedvar_ImageT );
+				
+			// get estimated sign (head/tail) on direction reconstruction
+			for( unsigned int t = 0; t < getNTel(); t++ )
+			{
+				iDispSign[t] = fDispAnalyzerDirectionSign->getDispSignT( t );
+				if( iDispSign[t] > -90. )
+				{
+					iDispError[t] *= TMath::Abs( iDispSign[t] );
+					if( iDispSign[t] > 0 )
+					{
+						iDispSign[t] = 1.;
+					}
+					else
+					{
+						iDispSign[t] = -1.;
+					}
+				}
+			}
+		}
 		
 		// use weighting calculated from disp error
 		fDispAnalyzerDirection->setDispErrorWeighting( fDispAnalyzerDirectionError != 0,
 				fTLRunParameter->fDispError_BDTWeight );
+		fDispAnalyzerDirection->setDispSign( fDispAnalyzerDirectionSign != 0 );
 		fDispAnalyzerDirection->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
 												fTLRunParameter->fmaxdist,
 												fTLRunParameter->fmaxloss );
 		fDispAnalyzerDirection->setTelescopeFOV( fTelFOV );
+		float mx = fMCxoff;
+		float my = fMCyoff;
 		fDispAnalyzerDirection->calculateMeanDispDirection(
 			getNTel(),
 			fArrayPointing_Elevation, fArrayPointing_Azimuth,
@@ -702,8 +744,9 @@ void VTableLookupDataHandler::doStereoReconstruction()
 			fasym, ftgrad_x,
 			floss, fntubes,
 			getWeight(),
-			fXoff_intersect, fYoff_intersect,
-			iDispError,
+			// TMP TMP			fXoff_intersect, fYoff_intersect,
+			mx, my,
+			iDispError, iDispSign,
 			fmeanPedvar_ImageT,
 			fpointing_dx, fpointing_dy );
 		// reconstructed direction by disp method:
@@ -1179,6 +1222,18 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		fDispAnalyzerDirectionError = new VDispAnalyzer();
 		fDispAnalyzerDirectionError->setTelescopeTypeList( i_TelTypeList );
 		fDispAnalyzerDirectionError->initialize( fTLRunParameter->fDispError_BDTFileName, "TMVABDT", "BDTDispError" );
+	}
+	/////////////////////////////////////////
+	// initialize Disp Analyzer for error on direction reconstruction
+	// (if required)
+	if( fTLRunParameter->fDispSign_BDTFileName.size() > 0. )
+	{
+		cout << endl;
+		cout << "Initializing BDT disp analyzer for estimation of disp sign " << endl;
+		cout << "===========================================================" << endl << endl;
+		fDispAnalyzerDirectionSign = new VDispAnalyzer();
+		fDispAnalyzerDirectionSign->setTelescopeTypeList( i_TelTypeList );
+		fDispAnalyzerDirectionSign->initialize( fTLRunParameter->fDispSign_BDTFileName, "TMVABDT", "BDTDispSign" );
 	}
 	if( fDebug )
 	{

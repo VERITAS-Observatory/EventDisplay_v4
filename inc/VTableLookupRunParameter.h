@@ -97,6 +97,7 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		unsigned int fRerunStereoReconstruction_BDTNImages_max;
 		string fDispError_BDTFileName;
 		float  fDispError_BDTWeight;
+		string fDispSign_BDTFileName;
 		
 		// functions...
 		VTableLookupRunParameter();
@@ -106,6 +107,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		void print( int iB = 0 );
 		void printHelp();
 		
-		ClassDef( VTableLookupRunParameter, 28 );
+		ClassDef( VTableLookupRunParameter, 29 );
 };
 #endif

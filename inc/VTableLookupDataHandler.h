@@ -65,6 +65,7 @@ class VTableLookupDataHandler
 		VEmissionHeightCalculator* fEmissionHeightCalculator;
 		VDispAnalyzer*             fDispAnalyzerDirection;
 		VDispAnalyzer*             fDispAnalyzerDirectionError;
+		VDispAnalyzer*             fDispAnalyzerDirectionSign;
 		
 		double fSelectRandom;
 		int fSelectRandomSeed;

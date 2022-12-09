@@ -36,6 +36,7 @@ class VDispAnalyzer
 		float floss_max;
 		bool  fDispErrorWeighting;
 		float fDispErrorExponential;
+		bool  fDispSignUse;
 		
 		// disp direction reconstruction
 		float f_disp;
@@ -52,6 +53,8 @@ class VDispAnalyzer
 		
 		// disp direction error
 		vector< float > fdisp_error_T;
+		// disp direction sign
+		vector< float > fdisp_sign_T;
 		
 		// disp energy reconstruction
 		float fdisp_energy;
@@ -112,6 +115,7 @@ class VDispAnalyzer
 									  vector< float > x, vector< float > y,
 									  vector< float > cosphi, vector< float > sinphi,
 									  vector< float > v_disp, vector< float > v_weight,
+									  vector< float > v_sign,
 									  vector< float > tel_pointing_dx,
 									  vector< float > tel_pointing_dy,
 									  float& dispdiff,
@@ -125,7 +129,7 @@ class VDispAnalyzer
 										 double* img_tgrad, double* img_loss, int* img_ntubes,
 										 double* img_weight,
 										 double xoff_4, double yoff_4,
-										 vector< float > dispErrorT,
+										 vector< float > dispErrorT, vector< float > dispSignT,
 										 float* img_pedvar,
 										 double* pointing_dx, double* pointing_dy );
 										 
@@ -139,6 +143,17 @@ class VDispAnalyzer
 											  double xoff_4, double yoff_4,
 											  float* img_pedvar );
 											  
+		void calculateExpectedDirectionSign( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
+											 ULong64_t* iTelType,
+											 double* img_size, double* img_cen_x, double* img_cen_y,
+											 double* img_cosphi, double* img_sinphi,
+											 double* img_width, double* img_length, double* img_asym,
+											 double* img_tgrad, double* img_loss, int* img_ntubes,
+											 double* img_weight,
+											 double xoff_4, double yoff_4,
+											 float* img_pedvar );
+											 
+											 
 		float evaluate( float iWidth, float iLength, float iAsymm, float iDist,
 						float iSize, float iPedvar, float itgrad, float iLoss,
 						float icen_x, float icen_y, float xoff_4, float yoff_4, ULong64_t iTelType,
@@ -161,6 +176,7 @@ class VDispAnalyzer
 			return f_dispE;
 		}
 		float getDispErrorT( unsigned int iTelescopeNumber );
+		float getDispSignT( unsigned int iTelescopeNumber );
 		float getCoreDistance( unsigned int iTelescopeNumber );
 		float getEnergy();
 		float getEnergyChi2();
@@ -232,6 +248,10 @@ class VDispAnalyzer
 		{
 			fDispErrorWeighting = iW;
 			fDispErrorExponential = iWeight;
+		}
+		void setDispSign( bool iW = false )
+		{
+			fDispSignUse = iW;
 		}
 		void  setQualityCuts( unsigned int iNImages_min = 0, float iAxesAngles_min = 0.,
 							  float imaxdist = 1.e5, float imaxloss = 1. )
