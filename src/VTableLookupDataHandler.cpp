@@ -731,8 +731,6 @@ void VTableLookupDataHandler::doStereoReconstruction()
 												fTLRunParameter->fmaxdist,
 												fTLRunParameter->fmaxloss );
 		fDispAnalyzerDirection->setTelescopeFOV( fTelFOV );
-		float mx = fMCxoff;
-		float my = fMCyoff;
 		fDispAnalyzerDirection->calculateMeanDispDirection(
 			getNTel(),
 			fArrayPointing_Elevation, fArrayPointing_Azimuth,
@@ -744,8 +742,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 			fasym, ftgrad_x,
 			floss, fntubes,
 			getWeight(),
-			// TMP TMP			fXoff_intersect, fYoff_intersect,
-			mx, my,
+			fXoff_intersect, fYoff_intersect,
 			iDispError, iDispSign,
 			fmeanPedvar_ImageT,
 			fpointing_dx, fpointing_dy );
