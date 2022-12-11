@@ -180,6 +180,7 @@ unsigned int VDispAnalyzer::find_smallest_diff_element(
 	vector< vector< float > > i_sign,
 	vector< float > x, vector< float > y,
 	vector< float > cosphi, vector< float > sinphi,
+	vector< float > tel_pointing_dx, vector< float > tel_pointing_dy,
 	vector< float > v_disp, vector< float > v_weight )
 {
 	vector< float > v_disp_diff( i_sign.size(), 0. );
@@ -193,15 +194,13 @@ unsigned int VDispAnalyzer::find_smallest_diff_element(
 		float disp_diff = 0.;
 		for( unsigned int i = 0; i < x.size(); i++ )
 		{
-			v_xs.push_back( x[i] - i_sign[s][i] * v_disp[i] * cosphi[i] );
-			v_ys.push_back( y[i] - i_sign[s][i] * v_disp[i] * sinphi[i] );
+			v_xs.push_back( x[i] - i_sign[s][i] * v_disp[i] * cosphi[i] + tel_pointing_dx[i] );
+			v_ys.push_back( y[i] - i_sign[s][i] * v_disp[i] * sinphi[i] + tel_pointing_dy[i] );
 		}
 		calculateMeanShowerDirection( v_xs, v_ys, v_weight, xs, ys, disp_diff, v_xs.size() );
 		v_disp_diff[s] = disp_diff;
 		v_dist[s] = sqrt( xs * xs + ys * ys );
 	}
-	unsigned int i_mean_element = 0;
-	float i_smallest_dist = 1.e20;
 	// calculate average FOV
 	float i_average_FOV = 0.;
 	float z = 0.;
@@ -221,7 +220,11 @@ unsigned int VDispAnalyzer::find_smallest_diff_element(
 	{
 		i_average_FOV = 3.5;
 	}
+	// TMP ignore FOV cut
+	i_average_FOV = 1.e10;
 	
+	unsigned int i_mean_element = 0;
+	float i_smallest_dist = 1.e20;
 	for( unsigned int s = 0; s < v_disp_diff.size(); s++ )
 	{
 		// FOV radius * 10%
@@ -340,7 +343,9 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 	
 	vector< vector< float > > i_sign = get_sign_permuation_vector( x.size() );
 	unsigned int i_smallest_diff_element = find_smallest_diff_element(
-			i_sign, x, y, cosphi, sinphi, v_disp, v_weight );
+			i_sign, x, y, cosphi, sinphi,
+			tel_pointing_dx, tel_pointing_dy,
+			v_disp, v_weight );
 	for( unsigned int ii = 0; ii < x.size(); ii++ )
 	{
 		fdisp_xs_T[ii] = x[ii] - i_sign[i_smallest_diff_element][ii] * v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
@@ -352,24 +357,24 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 	// TMP TMP TMP TMP
 	// TMP use true direction
 	// same sign for x and y
-	/*    for( unsigned int ii = 0; ii < x.size(); ii++ )
-	    {
-	        float x1 = x[ii] - v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
-	        float x2 = x[ii] + v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
-	        float y1 = y[ii] - v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
-	        float y2 = y[ii] + v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
-	        if( sqrt( (x1-x_off4)*(x1-x_off4) + (y1+y_off4)*(y1+y_off4) ) < sqrt( (x2-x_off4)*(x2-x_off4) + (y2+y_off4)*(y2+y_off4) ) )
-	        {
-	            fdisp_xs_T[ii] = x1;
-	            fdisp_ys_T[ii] = y1;
-	        }
-	        else
-	        {
-	            fdisp_xs_T[ii] = x2;
-	            fdisp_ys_T[ii] = y2;
-	        }
-	    }*/
-	//	calculateMeanShowerDirection( fdisp_xs_T, fdisp_ys_T, v_weight, xs, ys, dispdiff, fdisp_xs_T.size() );
+	/*	    for( unsigned int ii = 0; ii < x.size(); ii++ )
+		    {
+		        float x1 = x[ii] - v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
+		        float x2 = x[ii] + v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
+		        float y1 = y[ii] - v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
+		        float y2 = y[ii] + v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
+		        if( sqrt( (x1-x_off4)*(x1-x_off4) + (y1+y_off4)*(y1+y_off4) ) < sqrt( (x2-x_off4)*(x2-x_off4) + (y2+y_off4)*(y2+y_off4) ) )
+		        {
+		            fdisp_xs_T[ii] = x1;
+		            fdisp_ys_T[ii] = y1;
+		        }
+		        else
+		        {
+		            fdisp_xs_T[ii] = x2;
+		            fdisp_ys_T[ii] = y2;
+		        }
+		    }
+		calculateMeanShowerDirection( fdisp_xs_T, fdisp_ys_T, v_weight, xs, ys, dispdiff, fdisp_xs_T.size() ); */
 	// END END TMP TMP TMP TMP
 	////////////////////////////////////
 	

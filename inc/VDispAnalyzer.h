@@ -79,6 +79,7 @@ class VDispAnalyzer
 			vector< vector< float > > i_sign,
 			vector< float > x, vector< float > y,
 			vector< float > cosphi, vector< float > sinphi,
+			vector< float > tel_pointing_dx, vector< float > tel_pointing_dy,
 			vector< float > v_disp, vector< float > v_weight );
 		vector< vector< float > > get_sign_permuation_vector( unsigned int x_size );
 		
