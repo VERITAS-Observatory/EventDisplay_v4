@@ -46,6 +46,7 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	fDispError_BDTFileName = "";
 	fDispError_BDTWeight = 5.;
 	fDispSign_BDTFileName = "";
+	fDisp_UseIntersectForHeadTail = false;
 	fQualityCutLevel = 0;
 	
 	fLimitEnergyReconstruction = false;
@@ -229,6 +230,11 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 				fDispSign_BDTFileName = iTemp2;
 				i++;
 			}
+		}
+		// BDTdisp use intersection for head tail uncertainty
+		else if( iTemp.find( "-disp_use_intersect" ) < iTemp.size() )
+		{
+			fDisp_UseIntersectForHeadTail = true;
 		}
 		else if( iTemp.find( "-qualitycutlevel" ) < iTemp.size() )
 		{
@@ -540,6 +546,15 @@ void VTableLookupRunParameter::print( int iP )
 			if( fmaxloss < 1. )
 			{
 				cout << "\t BDT TMVA stereo reconstruction loss cut < " << fmaxloss << endl;
+			}
+			cout << "\t Head/tail uncertainty: ";
+			if( fDisp_UseIntersectForHeadTail )
+			{
+				cout << " use intersetion method to resolve" << endl;
+			}
+			else
+			{
+				cout << " use smallest diff" << endl;
 			}
 		}
 	}

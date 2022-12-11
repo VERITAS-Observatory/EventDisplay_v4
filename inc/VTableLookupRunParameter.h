@@ -98,6 +98,7 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		string fDispError_BDTFileName;
 		float  fDispError_BDTWeight;
 		string fDispSign_BDTFileName;
+		bool fDisp_UseIntersectForHeadTail;
 		
 		// functions...
 		VTableLookupRunParameter();
@@ -107,6 +108,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		void print( int iB = 0 );
 		void printHelp();
 		
-		ClassDef( VTableLookupRunParameter, 29 );
+		ClassDef( VTableLookupRunParameter, 30 );
 };
 #endif

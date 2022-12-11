@@ -745,7 +745,8 @@ void VTableLookupDataHandler::doStereoReconstruction()
 			fXoff_intersect, fYoff_intersect,
 			iDispError, iDispSign,
 			fmeanPedvar_ImageT,
-			fpointing_dx, fpointing_dy );
+			fpointing_dx, fpointing_dy,
+			fTLRunParameter->fDisp_UseIntersectForHeadTail );
 		// reconstructed direction by disp method:
 		fXoff = fDispAnalyzerDirection->getXcoordinate_disp();
 		fYoff = fDispAnalyzerDirection->getYcoordinate_disp();

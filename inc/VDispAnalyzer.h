@@ -120,7 +120,8 @@ class VDispAnalyzer
 									  vector< float > tel_pointing_dx,
 									  vector< float > tel_pointing_dy,
 									  float& dispdiff,
-									  float x_off4 = -999., float yoff_4 = -999. );
+									  float x_off4 = -999., float yoff_4 = -999.,
+									  bool UseIntersectForHeadTail = false );
 									  
 		void calculateMeanDispDirection( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
 										 ULong64_t* iTelType,
@@ -132,7 +133,8 @@ class VDispAnalyzer
 										 double xoff_4, double yoff_4,
 										 vector< float > dispErrorT, vector< float > dispSignT,
 										 float* img_pedvar,
-										 double* pointing_dx, double* pointing_dy );
+										 double* pointing_dx, double* pointing_dy,
+										 bool UseIntersectForHeadTail );
 										 
 		void calculateExpectedDirectionError( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
 											  ULong64_t* iTelType,
