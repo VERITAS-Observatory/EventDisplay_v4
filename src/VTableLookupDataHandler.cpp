@@ -791,12 +791,17 @@ void VTableLookupDataHandler::doStereoReconstruction()
 		fYoff_derot = fYoff; // MC only!
 	}
 	// derotate coordinates
-	else
+	else if( fXoff > -999. && fYoff > -999. )
 	{
 		fXoff_derot = fXoff * cos( fArrayPointing_RotationAngle )
 					  - fYoff * sin( fArrayPointing_RotationAngle );
 		fYoff_derot = fYoff * cos( fArrayPointing_RotationAngle )
 					  + fXoff * sin( fArrayPointing_RotationAngle );
+	}
+	else
+	{
+		fXoff_derot = fXoff;
+		fYoff_derot = fYoff;
 	}
 	fZe    = i_SR.fShower_Ze;
 	fAz    = i_SR.fShower_Az;
@@ -2875,9 +2880,9 @@ float VTableLookupDataHandler::getArrayPointingDeRotationAngle()
 		
 	float derot = VSkyCoordinatesUtilities::getDerotationAngle(
 					  MJD, time,
-					  i_array_ra, i_array_dec,
-					  VGlobalRunParameter::getObservatory_Longitude_deg(),
-					  VGlobalRunParameter::getObservatory_Latitude_deg() );
+					  i_array_ra * TMath::DegToRad(), i_array_dec * TMath::DegToRad(),
+					  VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad(),
+					  VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad() );
 					  
 	return derot;
 }
