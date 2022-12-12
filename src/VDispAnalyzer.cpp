@@ -346,7 +346,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 	{
 		// search for combination of images with smallest differences
 		// in reconstructed images
-		vector< vector< float > > i_sign = get_sign_permuation_vector( x.size() );
+		vector< vector< float > > i_sign = get_sign_permutation_vector( x.size() );
 		unsigned int i_smallest_diff_element = find_smallest_diff_element(
 				i_sign, x, y, cosphi, sinphi,
 				tel_pointing_dx, tel_pointing_dy,
