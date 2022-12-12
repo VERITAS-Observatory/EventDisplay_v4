@@ -123,7 +123,7 @@ void VDispAnalyzer::terminate()
 float VDispAnalyzer::evaluate( float iWidth, float iLength, float iAsymm, float iDist, float iSize,
 							   float iPedvar, float iTGrad, float iLoss, float icen_x, float icen_y,
 							   float xoff_4, float yoff_4, ULong64_t iTelType,
-							   float iZe, float iAz, float iRcore, float iNtubes, bool b2D )
+							   float iZe, float iAz, float iRcore, float iFui, float iNtubes, bool b2D )
 {
 	f_disp = -99.;
 	
@@ -135,7 +135,7 @@ float VDispAnalyzer::evaluate( float iWidth, float iLength, float iAsymm, float 
 	{
 		f_disp = fTMVADispAnalyzer->evaluate( iWidth, iLength, iSize, iAsymm, iLoss, iTGrad,
 											  icen_x, icen_y, xoff_4, yoff_4, iTelType,
-											  iZe, iAz, iRcore, -1., iDist, iNtubes, iPedvar );
+											  iZe, iAz, iRcore, -1., iDist, iFui, iNtubes, iPedvar );
 	}
 	return f_disp;
 	
@@ -143,12 +143,11 @@ float VDispAnalyzer::evaluate( float iWidth, float iLength, float iAsymm, float 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
-///
 /*
- * return permuation vector with all possible pairs of signs
+ * return permutation vector with all possible pairs of signs
  *
  */
-vector< vector< float > > VDispAnalyzer::get_sign_permuation_vector( unsigned int x_size )
+vector< vector< float > > VDispAnalyzer::get_sign_permutation_vector( unsigned int x_size )
 {
 	unsigned int ncombinations = ( 1 << x_size ) - 1;
 	vector< vector< float > > i_sign;
@@ -311,7 +310,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 		fmean_iangdiffN = 1.;
 		f_angdiff = 180.;
 	}
-	// check for close to parallel lines
+	// check for close to parallel lines for image multiplicity 2
 	// (not so important for disp direction,
 	//  but note that core reconstruction
 	//  is still done the convential way)
@@ -338,7 +337,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 	fdisp_xs_T.assign( v_weight.size(), 0. );
 	fdisp_ys_T.assign( v_weight.size(), 0. );
 	
-	vector< vector< float > > i_sign = get_sign_permuation_vector( x.size() );
+	vector< vector< float > > i_sign = get_sign_permutation_vector( x.size() );
 	unsigned int i_smallest_diff_element = find_smallest_diff_element(
 			i_sign, x, y, cosphi, sinphi, v_disp, v_weight );
 	for( unsigned int ii = 0; ii < x.size(); ii++ )
@@ -471,6 +470,7 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 		double yoff_4,
 		vector< float > dispErrorT,
 		vector< float > dispSignT,
+		double* img_fui,
 		float* img_pedvar,
 		double* pointing_dx,
 		double* pointing_dy )
@@ -487,7 +487,8 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 			|| !img_width || !img_length
 			|| !img_asym || !img_tgrad
 			|| !img_loss || !img_ntubes
-			|| !img_weight || !img_pedvar )
+			|| !img_weight || !img_fui
+			|| !img_pedvar )
 	{
 		return;
 	}
@@ -511,7 +512,8 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 		// quality cuts
 		if( img_size[i] > 0. && img_length[i] > 0. && img_ntubes[i] > 0
 				&& sqrt( img_cen_x[i]*img_cen_x[i] + img_cen_y[i]*img_cen_y[i] ) < fdistance_max
-				&& img_loss[i] < floss_max )
+				&& img_loss[i] < floss_max
+				&& img_fui[i] > fFui_min )
 		{
 			disp = evaluate( ( float )img_width[i], ( float )img_length[i], ( float )img_asym[i],
 							 ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
@@ -519,7 +521,7 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 							 ( float )img_cen_x[i], ( float )img_cen_y[i],
 							 ( float )xoff_4, ( float )yoff_4, iTelType[i],
 							 ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
-							 -99., ( float )img_ntubes[i] );
+							 -99., ( float )img_fui[i], ( float )img_ntubes[i] );
 			if( disp < -98. )
 			{
 				continue;
@@ -550,7 +552,8 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 			else
 			{
 				v_weight.push_back( img_size[i] * img_weight[i] * ( 1. - img_width[i] / img_length[i] )
-									* img_size[i] * img_weight[i] * ( 1. - img_width[i] / img_length[i] ) );
+									* img_size[i] * img_weight[i] * ( 1. - img_width[i] / img_length[i] )
+									* img_fui[i] * img_fui[i] * img_fui[i] * img_fui[i] );
 			}
 			if( fDispSignUse )
 			{
@@ -608,8 +611,6 @@ float VDispAnalyzer::getDispSignT( unsigned int iTelescopeNumber )
 	return -9999.;
 }
 
-
-
 /*
  * calculate expected error for angular reconstruction
  * using the disp method
@@ -637,6 +638,7 @@ void VDispAnalyzer::calculateExpectedDirectionError( unsigned int i_ntel,
 		double* img_weight,
 		double xoff_4,
 		double yoff_4,
+		double* img_fui,
 		float* img_pedvar )
 {
 	// make sure that all data arrays exist
@@ -645,7 +647,8 @@ void VDispAnalyzer::calculateExpectedDirectionError( unsigned int i_ntel,
 			|| !img_width || !img_length
 			|| !img_asym || !img_tgrad
 			|| !img_loss || !img_ntubes
-			|| !img_weight || !img_pedvar )
+			|| !img_weight || !img_fui
+			|| !img_pedvar )
 	{
 		return;
 	}
@@ -660,7 +663,8 @@ void VDispAnalyzer::calculateExpectedDirectionError( unsigned int i_ntel,
 		// quality cuts
 		if( img_size[i] > 0. && img_length[i] > 0.
 				&& sqrt( img_cen_x[i]*img_cen_x[i] + img_cen_y[i]*img_cen_y[i] ) < fdistance_max
-				&& img_loss[i] < floss_max )
+				&& img_loss[i] < floss_max
+				&& img_fui[i] > fFui_min )
 		{
 			fdisp_error_T[i] = evaluate( ( float )img_width[i], ( float )img_length[i], ( float )img_asym[i],
 										 ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
@@ -668,7 +672,7 @@ void VDispAnalyzer::calculateExpectedDirectionError( unsigned int i_ntel,
 										 ( float )img_cen_x[i], ( float )img_cen_y[i],
 										 ( float )xoff_4, ( float )yoff_4, iTelType[i],
 										 ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
-										 -99., ( float )img_ntubes[i] );
+										 -99., ( float )img_fui[i], ( float )img_ntubes[i] );
 		}
 	}
 }
@@ -699,6 +703,7 @@ void VDispAnalyzer::calculateExpectedDirectionSign( unsigned int i_ntel,
 		double* img_weight,
 		double xoff_4,
 		double yoff_4,
+		double* img_fui,
 		float* img_pedvar )
 {
 	// make sure that all data arrays exist
@@ -707,7 +712,8 @@ void VDispAnalyzer::calculateExpectedDirectionSign( unsigned int i_ntel,
 			|| !img_width || !img_length
 			|| !img_asym || !img_tgrad
 			|| !img_loss || !img_ntubes
-			|| !img_weight || !img_pedvar )
+			|| !img_weight || !img_fui
+			|| !img_pedvar )
 	{
 		return;
 	}
@@ -721,7 +727,8 @@ void VDispAnalyzer::calculateExpectedDirectionSign( unsigned int i_ntel,
 		// quality cuts
 		if( img_size[i] > 0. && img_length[i] > 0.
 				&& sqrt( img_cen_x[i]*img_cen_x[i] + img_cen_y[i]*img_cen_y[i] ) < fdistance_max
-				&& img_loss[i] < floss_max )
+				&& img_loss[i] < floss_max
+				&& img_fui[i] > fFui_min )
 		{
 			fdisp_sign_T[i] = evaluate( ( float )img_width[i], ( float )img_length[i], ( float )img_asym[i],
 										( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
@@ -729,7 +736,7 @@ void VDispAnalyzer::calculateExpectedDirectionSign( unsigned int i_ntel,
 										( float )img_cen_x[i], ( float )img_cen_y[i],
 										( float )xoff_4, ( float )yoff_4, iTelType[i],
 										( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
-										-99., ( float )img_ntubes[i] );
+										-99., ( float )img_fui[i], ( float )img_ntubes[i] );
 		}
 	}
 }
@@ -803,7 +810,9 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
 									   double yoff_4,
 									   double* iRcore,
 									   double iEHeight,
-									   double iMCEnergy )
+									   double iMCEnergy,
+									   double* img_fui,
+									   float* img_pedvar )
 {
 	fdisp_energy = -99.;
 	fdisp_energy_chi = 1.e-10;
@@ -819,7 +828,8 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
 			|| !img_width || !img_length
 			|| !img_asym || !img_tgrad
 			|| !img_loss || !img_ntubes
-			|| !img_weight || !iRcore )
+			|| !img_weight || !iRcore
+			|| !img_fui )
 	{
 		return;
 	}
@@ -833,7 +843,8 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
 	{
 		if( img_size[i] > 0. && iRcore[i] > 0. && iArrayElevation > 0.
 				&& sqrt( img_cen_x[i]*img_cen_x[i] + img_cen_y[i]*img_cen_y[i] ) < fdistance_max
-				&& img_loss[i] < floss_max )
+				&& img_loss[i] < floss_max
+				&& img_fui[i] > fFui_min )
 		{
 			fdisp_energy_T[i] = fTMVADispAnalyzer->evaluate(
 									( float )img_width[i], ( float )img_length[i],
@@ -844,7 +855,7 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
 									( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
 									( float )iRcore[i], ( float )iEHeight,
 									( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
-									( float )img_ntubes[i] );
+									( float )img_fui[i], ( float )img_ntubes[i] );
 									
 			// dispEnergy is trained as log10(MCe0) in GeV
 			if( fdisp_energy_T[i] > -98. )
@@ -1050,7 +1061,8 @@ void VDispAnalyzer::calculateCore( unsigned int i_ntel,
 								   double xcoreSR,
 								   double ycoreSR,
 								   double xs,
-								   double ys )
+								   double ys,
+								   double* img_fui )
 {
 	fdisp_core_T.clear();
 	fdisp_core_T.assign( i_ntel, -99. );
@@ -1062,7 +1074,7 @@ void VDispAnalyzer::calculateCore( unsigned int i_ntel,
 			|| !img_asym || !img_tgrad
 			|| !img_loss || !img_ntubes
 			|| !img_weight || !iRcore
-			|| !iTelX || !iTelY || !iTelZ )
+			|| !iTelX || !iTelY || !iTelZ || !img_fui )
 	{
 		return;
 	}
@@ -1083,7 +1095,7 @@ void VDispAnalyzer::calculateCore( unsigned int i_ntel,
 								  ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
 								  ( float )iRcore[i], -1.,
 								  ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
-								  ( float )img_ntubes[i] );
+								  ( float )img_fui[i], ( float )img_ntubes[i] );
 		}
 		else
 		{
