@@ -200,29 +200,12 @@ unsigned int VDispAnalyzer::find_smallest_diff_element(
 		v_disp_diff[s] = disp_diff;
 		v_dist[s] = sqrt( xs * xs + ys * ys );
 	}
-	// calculate average FOV
-	float i_average_FOV = 0.;
-	float z = 0.;
-	for( unsigned int i = 0; i < fTelescopeFOV.size(); i++ )
-	{
-		if( fTelescopeFOV[i] > 0. )
-		{
-			i_average_FOV += fTelescopeFOV[i];
-			z++;
-		}
-	}
-	if( z > 0. )
-	{
-		i_average_FOV /= z;
-	}
-	else
-	{
-		i_average_FOV = 3.5;
-	}
+	// fixed average FOV
+	float i_average_FOV = 3.5;
 	// TMP ignore FOV cut
-	i_average_FOV = 1.e10;
+	// i_average_FOV = 1.e10;
 	
-	unsigned int i_mean_element = 0;
+	unsigned int i_mean_element = 9999;
 	float i_smallest_dist = 1.e20;
 	for( unsigned int s = 0; s < v_disp_diff.size(); s++ )
 	{
@@ -369,11 +352,14 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 				i_sign, x, y, cosphi, sinphi,
 				tel_pointing_dx, tel_pointing_dy,
 				v_disp, v_weight );
-		for( unsigned int ii = 0; ii < x.size(); ii++ )
-		{
-			fdisp_xs_T[ii] = x[ii] - i_sign[i_smallest_diff_element][ii] * v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
-			fdisp_ys_T[ii] = y[ii] - i_sign[i_smallest_diff_element][ii] * v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
-		}
+        if( i_smallest_diff_element < i_sign.size() )
+        {
+            for( unsigned int ii = 0; ii < x.size(); ii++ )
+            {
+                fdisp_xs_T[ii] = x[ii] - i_sign[i_smallest_diff_element][ii] * v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
+                fdisp_ys_T[ii] = y[ii] - i_sign[i_smallest_diff_element][ii] * v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
+            }
+        }
 	}
 	calculateMeanShowerDirection( fdisp_xs_T, fdisp_ys_T, v_weight, xs, ys, dispdiff, fdisp_xs_T.size() );
 	
