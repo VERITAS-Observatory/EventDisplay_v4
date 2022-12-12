@@ -112,6 +112,10 @@ class CData
 		Double_t        tgrad_x[VDST_MAXTELESCOPES];
 		Double_t        tchisq_x[VDST_MAXTELESCOPES];
 		Int_t           Fitstat[VDST_MAXTELESCOPES];
+		Float_t         DispXoff_T[VDST_MAXTELESCOPES];
+		Float_t         DispYoff_T[VDST_MAXTELESCOPES];
+		Float_t         DispWoff_T[VDST_MAXTELESCOPES];
+		Float_t         Disp_T[VDST_MAXTELESCOPES];
 		Double_t        R[VDST_MAXTELESCOPES];
 		Double_t        MSCWT[VDST_MAXTELESCOPES];
 		Double_t        MSCLT[VDST_MAXTELESCOPES];
@@ -667,6 +671,10 @@ void CData::Init( TTree* tree )
 		fChain->SetBranchAddress( "sinphi", sinphi );
 		fChain->SetBranchAddress( "tgrad_x", tgrad_x );
 		fChain->SetBranchAddress( "Fitstat", Fitstat );
+		fChain->SetBranchAddress( "DispXoff_T", DispXoff_T );
+		fChain->SetBranchAddress( "DispYoff_T", DispYoff_T );
+		fChain->SetBranchAddress( "DispWoff_T", DispWoff_T );
+		fChain->SetBranchAddress( "Disp_T", Disp_T );
 		fChain->SetBranchAddress( "tchisq_x", tchisq_x );
 	}
 	else
@@ -699,6 +707,10 @@ void CData::Init( TTree* tree )
 			sinphi[i] = 0.;
 			tgrad_x[i] = 0.;
 			Fitstat[i] = 0;
+			DispXoff_T[i] = 0.;
+			DispYoff_T[i] = 0.;
+			DispWoff_T[i] = 0.;
+			Disp_T[i] = 0.;
 			tchisq_x[i] = 0.;
 		}
 	}
