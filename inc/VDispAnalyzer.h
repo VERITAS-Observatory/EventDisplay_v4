@@ -37,7 +37,6 @@ class VDispAnalyzer
 		float fFui_min;
 		bool  fDispErrorWeighting;
 		float fDispErrorExponential;
-		bool  fDispSignUse;
 		
 		// disp direction reconstruction
 		float f_disp;
@@ -80,6 +79,7 @@ class VDispAnalyzer
 			vector< vector< float > > i_sign,
 			vector< float > x, vector< float > y,
 			vector< float > cosphi, vector< float > sinphi,
+			vector< float > tel_pointing_dx, vector< float > tel_pointing_dy,
 			vector< float > v_disp, vector< float > v_weight );
 		vector< vector< float > > get_sign_permutation_vector( unsigned int x_size );
 		
@@ -119,11 +119,11 @@ class VDispAnalyzer
 									  vector< float > x, vector< float > y,
 									  vector< float > cosphi, vector< float > sinphi,
 									  vector< float > v_disp, vector< float > v_weight,
-									  vector< float > v_sign,
 									  vector< float > tel_pointing_dx,
 									  vector< float > tel_pointing_dy,
 									  float& dispdiff,
-									  float x_off4 = -999., float yoff_4 = -999. );
+									  float x_off4 = -999., float yoff_4 = -999.,
+									  bool UseIntersectForHeadTail = false );
 									  
 		void calculateMeanDispDirection( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
 										 ULong64_t* iTelType,
@@ -133,10 +133,11 @@ class VDispAnalyzer
 										 double* img_tgrad, double* img_loss, int* img_ntubes,
 										 double* img_weight,
 										 double xoff_4, double yoff_4,
-										 vector< float > dispErrorT, vector< float > dispSignT,
+										 vector< float > dispErrorT,
 										 double* img_fui,
 										 float* img_pedvar,
-										 double* pointing_dx, double* pointing_dy );
+										 double* pointing_dx, double* pointing_dy,
+										 bool UseIntersectForHeadTail );
 										 
 		void calculateExpectedDirectionError( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
 											  ULong64_t* iTelType,
@@ -255,10 +256,6 @@ class VDispAnalyzer
 		{
 			fDispErrorWeighting = iW;
 			fDispErrorExponential = iWeight;
-		}
-		void setDispSign( bool iW = false )
-		{
-			fDispSignUse = iW;
 		}
 		void  setQualityCuts( unsigned int iNImages_min = 0, float iAxesAngles_min = 0.,
 							  float imaxdist = 1.e5, float imaxloss = 1.,

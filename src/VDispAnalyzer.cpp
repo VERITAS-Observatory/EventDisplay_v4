@@ -35,7 +35,6 @@ VDispAnalyzer::VDispAnalyzer()
 	
 	setQualityCuts();
 	setDispErrorWeighting();
-	setDispSign();
 	setDebug( false );
 }
 void VDispAnalyzer::setTelescopeTypeList( vector<ULong64_t> iTelescopeTypeList )
@@ -179,6 +178,7 @@ unsigned int VDispAnalyzer::find_smallest_diff_element(
 	vector< vector< float > > i_sign,
 	vector< float > x, vector< float > y,
 	vector< float > cosphi, vector< float > sinphi,
+	vector< float > tel_pointing_dx, vector< float > tel_pointing_dy,
 	vector< float > v_disp, vector< float > v_weight )
 {
 	vector< float > v_disp_diff( i_sign.size(), 0. );
@@ -192,35 +192,20 @@ unsigned int VDispAnalyzer::find_smallest_diff_element(
 		float disp_diff = 0.;
 		for( unsigned int i = 0; i < x.size(); i++ )
 		{
-			v_xs.push_back( x[i] - i_sign[s][i] * v_disp[i] * cosphi[i] );
-			v_ys.push_back( y[i] - i_sign[s][i] * v_disp[i] * sinphi[i] );
+			v_xs.push_back( x[i] - i_sign[s][i] * v_disp[i] * cosphi[i] + tel_pointing_dx[i] );
+			v_ys.push_back( y[i] - i_sign[s][i] * v_disp[i] * sinphi[i] + tel_pointing_dy[i] );
 		}
 		calculateMeanShowerDirection( v_xs, v_ys, v_weight, xs, ys, disp_diff, v_xs.size() );
 		v_disp_diff[s] = disp_diff;
 		v_dist[s] = sqrt( xs * xs + ys * ys );
 	}
-	unsigned int i_mean_element = 0;
-	float i_smallest_dist = 1.e20;
-	// calculate average FOV
-	float i_average_FOV = 0.;
-	float z = 0.;
-	for( unsigned int i = 0; i < fTelescopeFOV.size(); i++ )
-	{
-		if( fTelescopeFOV[i] > 0. )
-		{
-			i_average_FOV += fTelescopeFOV[i];
-			z++;
-		}
-	}
-	if( z > 0. )
-	{
-		i_average_FOV /= z;
-	}
-	else
-	{
-		i_average_FOV = 3.5;
-	}
+	// fixed average FOV
+	float i_average_FOV = 3.5;
+	// TMP ignore FOV cut
+	// i_average_FOV = 1.e10;
 	
+	unsigned int i_mean_element = 9999;
+	float i_smallest_dist = 1.e20;
 	for( unsigned int s = 0; s < v_disp_diff.size(); s++ )
 	{
 		// FOV radius * 10%
@@ -248,17 +233,17 @@ unsigned int VDispAnalyzer::find_smallest_diff_element(
  * cosphi, shinphi:  orientation of image axes
  * v_disp:           displacement [deg]
  * v_weigth:         weight using in calculation of average direction
- * v_sign:           sign (head / tail)
  *
  *
  */
 void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 		vector< float > x, vector< float > y,
 		vector< float > cosphi, vector< float > sinphi,
-		vector< float > v_disp, vector< float > v_weight, vector< float > v_sign,
+		vector< float > v_disp, vector< float > v_weight,
 		vector< float > tel_pointing_dx, vector< float > tel_pointing_dy,
 		float& dispdiff,
-		float x_off4, float y_off4 )
+		float x_off4, float y_off4,
+		bool UseIntersectForHeadTail )
 {
 	xs = -99999.;
 	ys = -99999.;
@@ -330,49 +315,54 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 	// method: BDTs
 	///////////////////////////////////////////////////////////////////////
 	// head/tail uncertainty
-	// search for combination of images with smallest differences
-	// in reconstructed images
 	fdisp_xs_T.clear();
 	fdisp_ys_T.clear();
 	fdisp_xs_T.assign( v_weight.size(), 0. );
 	fdisp_ys_T.assign( v_weight.size(), 0. );
 	
-	vector< vector< float > > i_sign = get_sign_permutation_vector( x.size() );
-	unsigned int i_smallest_diff_element = find_smallest_diff_element(
-			i_sign, x, y, cosphi, sinphi, v_disp, v_weight );
-	for( unsigned int ii = 0; ii < x.size(); ii++ )
+	if( UseIntersectForHeadTail )
 	{
-		fdisp_xs_T[ii] = x[ii] - i_sign[i_smallest_diff_element][ii] * v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
-		fdisp_ys_T[ii] = y[ii] - i_sign[i_smallest_diff_element][ii] * v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
+		// use closest value to intersection results
+		for( unsigned int ii = 0; ii < x.size(); ii++ )
+		{
+			float x1 = x[ii] - v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
+			float x2 = x[ii] + v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
+			float y1 = y[ii] - v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
+			float y2 = y[ii] + v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
+			if( sqrt( ( x1 - x_off4 ) * ( x1 - x_off4 ) + ( y1 + y_off4 ) * ( y1 + y_off4 ) )
+					< sqrt( ( x2 - x_off4 ) * ( x2 - x_off4 ) + ( y2 + y_off4 ) * ( y2 + y_off4 ) ) )
+			{
+				fdisp_xs_T[ii] = x1;
+				fdisp_ys_T[ii] = y1;
+			}
+			else
+			{
+				fdisp_xs_T[ii] = x2;
+				fdisp_ys_T[ii] = y2;
+			}
+		}
+	}
+	else
+	{
+		// search for combination of images with smallest differences
+		// in reconstructed images
+		vector< vector< float > > i_sign = get_sign_permuation_vector( x.size() );
+		unsigned int i_smallest_diff_element = find_smallest_diff_element(
+				i_sign, x, y, cosphi, sinphi,
+				tel_pointing_dx, tel_pointing_dy,
+				v_disp, v_weight );
+		if( i_smallest_diff_element < i_sign.size() )
+		{
+			for( unsigned int ii = 0; ii < x.size(); ii++ )
+			{
+				fdisp_xs_T[ii] = x[ii] - i_sign[i_smallest_diff_element][ii] * v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
+				fdisp_ys_T[ii] = y[ii] - i_sign[i_smallest_diff_element][ii] * v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
+			}
+		}
 	}
 	calculateMeanShowerDirection( fdisp_xs_T, fdisp_ys_T, v_weight, xs, ys, dispdiff, fdisp_xs_T.size() );
 	
-	////////////////////////////////////
-	// TMP TMP TMP TMP
-	// TMP use true direction
-	// same sign for x and y
-	/*    for( unsigned int ii = 0; ii < x.size(); ii++ )
-	    {
-	        float x1 = x[ii] - v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
-	        float x2 = x[ii] + v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
-	        float y1 = y[ii] - v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
-	        float y2 = y[ii] + v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
-	        if( sqrt( (x1-x_off4)*(x1-x_off4) + (y1+y_off4)*(y1+y_off4) ) < sqrt( (x2-x_off4)*(x2-x_off4) + (y2+y_off4)*(y2+y_off4) ) )
-	        {
-	            fdisp_xs_T[ii] = x1;
-	            fdisp_ys_T[ii] = y1;
-	        }
-	        else
-	        {
-	            fdisp_xs_T[ii] = x2;
-	            fdisp_ys_T[ii] = y2;
-	        }
-	    }*/
-	//	calculateMeanShowerDirection( fdisp_xs_T, fdisp_ys_T, v_weight, xs, ys, dispdiff, fdisp_xs_T.size() );
-	// END END TMP TMP TMP TMP
-	////////////////////////////////////
-	
-	// apply a completely unnecessary sign flip
+	// apply a completely necessary sign flip
 	if( ys > -9998. )
 	{
 		ys *= -1.;
@@ -469,11 +459,11 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 		double xoff_4,
 		double yoff_4,
 		vector< float > dispErrorT,
-		vector< float > dispSignT,
 		double* img_fui,
 		float* img_pedvar,
 		double* pointing_dx,
-		double* pointing_dy )
+		double* pointing_dy,
+		bool UseIntersectForHeadTail )
 {
 	// reset values from previous event
 	f_disp = -99.;
@@ -497,7 +487,6 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 	vector< float > v_disp;
 	vector< unsigned int > v_displist;
 	vector< float > v_weight;
-	vector< float > v_sign;
 	vector< float > x;
 	vector< float > y;
 	vector< float > cosphi;
@@ -555,21 +544,6 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 									* img_size[i] * img_weight[i] * ( 1. - img_width[i] / img_length[i] )
 									* img_fui[i] * img_fui[i] * img_fui[i] * img_fui[i] );
 			}
-			if( fDispSignUse )
-			{
-				if( i < dispSignT.size() )
-				{
-					v_sign.push_back( dispSignT[i] );
-				}
-				else
-				{
-					v_sign.push_back( -999. );
-				}
-			}
-			else
-			{
-				v_sign.push_back( -999. );
-			}
 			
 			x.push_back( img_cen_x[i] );
 			y.push_back( img_cen_y[i] );
@@ -583,9 +557,9 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 	// calculate expected direction
 	calculateMeanDirection( f_xs, f_ys,
 							x, y, cosphi, sinphi,
-							v_disp, v_weight, v_sign,
+							v_disp, v_weight,
 							tel_pointing_dx, tel_pointing_dy,
-							f_dispDiff, xoff_4, yoff_4 );
+							f_dispDiff, xoff_4, yoff_4, UseIntersectForHeadTail );
 	fdisp_xy_weight_T = v_weight;
 	fdisp_T = v_disp;
 	fdisplist_T = v_displist;

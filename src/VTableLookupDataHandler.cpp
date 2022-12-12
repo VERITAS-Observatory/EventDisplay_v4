@@ -730,7 +730,6 @@ void VTableLookupDataHandler::doStereoReconstruction()
 		////////////////////////////////////////////////////////////////////
 		// estimate disp head/tail sign
 		////////////////////////////////////////////////////////////////////
-		vector< float > iDispSign( getNTel(), 1. );
 		if( fDispAnalyzerDirectionSign )
 		{
 			fDispAnalyzerDirectionSign->calculateExpectedDirectionSign(
@@ -750,18 +749,9 @@ void VTableLookupDataHandler::doStereoReconstruction()
 			// get estimated sign (head/tail) on direction reconstruction
 			for( unsigned int t = 0; t < getNTel(); t++ )
 			{
-				iDispSign[t] = fDispAnalyzerDirectionSign->getDispSignT( t );
-				if( iDispSign[t] > -90. )
+				if( fDispAnalyzerDirectionSign->getDispSignT( t ) > -90. )
 				{
-					iDispError[t] *= TMath::Abs( iDispSign[t] );
-					if( iDispSign[t] > 0 )
-					{
-						iDispSign[t] = 1.;
-					}
-					else
-					{
-						iDispSign[t] = -1.;
-					}
+					iDispError[t] *= TMath::Abs( fDispAnalyzerDirectionSign->getDispSignT( t ) );
 				}
 			}
 		}
@@ -769,7 +759,6 @@ void VTableLookupDataHandler::doStereoReconstruction()
 		// use weighting calculated from disp error
 		fDispAnalyzerDirection->setDispErrorWeighting( fDispAnalyzerDirectionError != 0,
 				fTLRunParameter->fDispError_BDTWeight );
-		fDispAnalyzerDirection->setDispSign( fDispAnalyzerDirectionSign != 0 );
 		fDispAnalyzerDirection->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
 												fTLRunParameter->fmaxdist,
 												fTLRunParameter->fmaxloss,
@@ -787,9 +776,10 @@ void VTableLookupDataHandler::doStereoReconstruction()
 			floss, fntubes,
 			getWeight(),
 			fXoff_intersect, fYoff_intersect,
-			iDispError, iDispSign,
+			iDispError,
 			ffui, fmeanPedvar_ImageT,
-			fpointing_dx, fpointing_dy );
+			fpointing_dx, fpointing_dy,
+			fTLRunParameter->fDisp_UseIntersectForHeadTail );
 		// reconstructed direction by disp method:
 		fXoff = fDispAnalyzerDirection->getXcoordinate_disp();
 		fYoff = fDispAnalyzerDirection->getYcoordinate_disp();
@@ -835,12 +825,17 @@ void VTableLookupDataHandler::doStereoReconstruction()
 		fYoff_derot = fYoff; // MC only!
 	}
 	// derotate coordinates
-	else
+	else if( fXoff > -999. && fYoff > -999. )
 	{
 		fXoff_derot = fXoff * cos( fArrayPointing_RotationAngle )
 					  - fYoff * sin( fArrayPointing_RotationAngle );
 		fYoff_derot = fYoff * cos( fArrayPointing_RotationAngle )
 					  + fXoff * sin( fArrayPointing_RotationAngle );
+	}
+	else
+	{
+		fXoff_derot = fXoff;
+		fYoff_derot = fYoff;
 	}
 	fZe    = i_SR.fShower_Ze;
 	fAz    = i_SR.fShower_Az;
@@ -2943,9 +2938,9 @@ float VTableLookupDataHandler::getArrayPointingDeRotationAngle()
 		
 	float derot = VSkyCoordinatesUtilities::getDerotationAngle(
 					  MJD, time,
-					  i_array_ra, i_array_dec,
-					  VGlobalRunParameter::getObservatory_Longitude_deg(),
-					  VGlobalRunParameter::getObservatory_Latitude_deg() );
+					  i_array_ra * TMath::DegToRad(), i_array_dec * TMath::DegToRad(),
+					  VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad(),
+					  VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad() );
 					  
 	return derot;
 }
