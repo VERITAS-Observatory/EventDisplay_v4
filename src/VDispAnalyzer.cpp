@@ -352,14 +352,14 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 				i_sign, x, y, cosphi, sinphi,
 				tel_pointing_dx, tel_pointing_dy,
 				v_disp, v_weight );
-        if( i_smallest_diff_element < i_sign.size() )
-        {
-            for( unsigned int ii = 0; ii < x.size(); ii++ )
-            {
-                fdisp_xs_T[ii] = x[ii] - i_sign[i_smallest_diff_element][ii] * v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
-                fdisp_ys_T[ii] = y[ii] - i_sign[i_smallest_diff_element][ii] * v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
-            }
-        }
+		if( i_smallest_diff_element < i_sign.size() )
+		{
+			for( unsigned int ii = 0; ii < x.size(); ii++ )
+			{
+				fdisp_xs_T[ii] = x[ii] - i_sign[i_smallest_diff_element][ii] * v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
+				fdisp_ys_T[ii] = y[ii] - i_sign[i_smallest_diff_element][ii] * v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
+			}
+		}
 	}
 	calculateMeanShowerDirection( fdisp_xs_T, fdisp_ys_T, v_weight, xs, ys, dispdiff, fdisp_xs_T.size() );
 	
