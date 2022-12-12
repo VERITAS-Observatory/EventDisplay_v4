@@ -36,7 +36,6 @@ class VDispAnalyzer
 		float floss_max;
 		bool  fDispErrorWeighting;
 		float fDispErrorExponential;
-		bool  fDispSignUse;
 		
 		// disp direction reconstruction
 		float f_disp;
@@ -116,7 +115,6 @@ class VDispAnalyzer
 									  vector< float > x, vector< float > y,
 									  vector< float > cosphi, vector< float > sinphi,
 									  vector< float > v_disp, vector< float > v_weight,
-									  vector< float > v_sign,
 									  vector< float > tel_pointing_dx,
 									  vector< float > tel_pointing_dy,
 									  float& dispdiff,
@@ -131,7 +129,7 @@ class VDispAnalyzer
 										 double* img_tgrad, double* img_loss, int* img_ntubes,
 										 double* img_weight,
 										 double xoff_4, double yoff_4,
-										 vector< float > dispErrorT, vector< float > dispSignT,
+										 vector< float > dispErrorT,
 										 float* img_pedvar,
 										 double* pointing_dx, double* pointing_dy,
 										 bool UseIntersectForHeadTail );
@@ -251,10 +249,6 @@ class VDispAnalyzer
 		{
 			fDispErrorWeighting = iW;
 			fDispErrorExponential = iWeight;
-		}
-		void setDispSign( bool iW = false )
-		{
-			fDispSignUse = iW;
 		}
 		void  setQualityCuts( unsigned int iNImages_min = 0, float iAxesAngles_min = 0.,
 							  float imaxdist = 1.e5, float imaxloss = 1. )

@@ -687,7 +687,6 @@ void VTableLookupDataHandler::doStereoReconstruction()
 		////////////////////////////////////////////////////////////////////
 		// estimate disp head/tail sign
 		////////////////////////////////////////////////////////////////////
-		vector< float > iDispSign( getNTel(), 1. );
 		if( fDispAnalyzerDirectionSign )
 		{
 			fDispAnalyzerDirectionSign->calculateExpectedDirectionSign(
@@ -707,18 +706,9 @@ void VTableLookupDataHandler::doStereoReconstruction()
 			// get estimated sign (head/tail) on direction reconstruction
 			for( unsigned int t = 0; t < getNTel(); t++ )
 			{
-				iDispSign[t] = fDispAnalyzerDirectionSign->getDispSignT( t );
-				if( iDispSign[t] > -90. )
+				if( fDispAnalyzerDirectionSign->getDispSignT( t ) > -90. )
 				{
-					iDispError[t] *= TMath::Abs( iDispSign[t] );
-					if( iDispSign[t] > 0 )
-					{
-						iDispSign[t] = 1.;
-					}
-					else
-					{
-						iDispSign[t] = -1.;
-					}
+					iDispError[t] *= TMath::Abs( fDispAnalyzerDirectionSign->getDispSignT( t ) );
 				}
 			}
 		}
@@ -726,7 +716,6 @@ void VTableLookupDataHandler::doStereoReconstruction()
 		// use weighting calculated from disp error
 		fDispAnalyzerDirection->setDispErrorWeighting( fDispAnalyzerDirectionError != 0,
 				fTLRunParameter->fDispError_BDTWeight );
-		fDispAnalyzerDirection->setDispSign( fDispAnalyzerDirectionSign != 0 );
 		fDispAnalyzerDirection->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
 												fTLRunParameter->fmaxdist,
 												fTLRunParameter->fmaxloss );
@@ -743,7 +732,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 			floss, fntubes,
 			getWeight(),
 			fXoff_intersect, fYoff_intersect,
-			iDispError, iDispSign,
+			iDispError,
 			fmeanPedvar_ImageT,
 			fpointing_dx, fpointing_dy,
 			fTLRunParameter->fDisp_UseIntersectForHeadTail );

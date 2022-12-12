@@ -35,7 +35,6 @@ VDispAnalyzer::VDispAnalyzer()
 	
 	setQualityCuts();
 	setDispErrorWeighting();
-	setDispSign();
 	setDebug( false );
 }
 void VDispAnalyzer::setTelescopeTypeList( vector<ULong64_t> iTelescopeTypeList )
@@ -252,14 +251,13 @@ unsigned int VDispAnalyzer::find_smallest_diff_element(
  * cosphi, shinphi:  orientation of image axes
  * v_disp:           displacement [deg]
  * v_weigth:         weight using in calculation of average direction
- * v_sign:           sign (head / tail)
  *
  *
  */
 void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 		vector< float > x, vector< float > y,
 		vector< float > cosphi, vector< float > sinphi,
-		vector< float > v_disp, vector< float > v_weight, vector< float > v_sign,
+		vector< float > v_disp, vector< float > v_weight,
 		vector< float > tel_pointing_dx, vector< float > tel_pointing_dy,
 		float& dispdiff,
 		float x_off4, float y_off4,
@@ -349,7 +347,8 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 			float x2 = x[ii] + v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
 			float y1 = y[ii] - v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
 			float y2 = y[ii] + v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
-			if( sqrt( ( x1 - x_off4 ) * ( x1 - x_off4 ) + ( y1 + y_off4 ) * ( y1 + y_off4 ) ) < sqrt( ( x2 - x_off4 ) * ( x2 - x_off4 ) + ( y2 + y_off4 ) * ( y2 + y_off4 ) ) )
+			if( sqrt( ( x1 - x_off4 ) * ( x1 - x_off4 ) + ( y1 + y_off4 ) * ( y1 + y_off4 ) )
+					< sqrt( ( x2 - x_off4 ) * ( x2 - x_off4 ) + ( y2 + y_off4 ) * ( y2 + y_off4 ) ) )
 			{
 				fdisp_xs_T[ii] = x1;
 				fdisp_ys_T[ii] = y1;
@@ -378,7 +377,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 	}
 	calculateMeanShowerDirection( fdisp_xs_T, fdisp_ys_T, v_weight, xs, ys, dispdiff, fdisp_xs_T.size() );
 	
-	// apply a completely unnecessary sign flip
+	// apply a completely necessary sign flip
 	if( ys > -9998. )
 	{
 		ys *= -1.;
@@ -475,7 +474,6 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 		double xoff_4,
 		double yoff_4,
 		vector< float > dispErrorT,
-		vector< float > dispSignT,
 		float* img_pedvar,
 		double* pointing_dx,
 		double* pointing_dy,
@@ -502,7 +500,6 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 	vector< float > v_disp;
 	vector< unsigned int > v_displist;
 	vector< float > v_weight;
-	vector< float > v_sign;
 	vector< float > x;
 	vector< float > y;
 	vector< float > cosphi;
@@ -558,21 +555,6 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 				v_weight.push_back( img_size[i] * img_weight[i] * ( 1. - img_width[i] / img_length[i] )
 									* img_size[i] * img_weight[i] * ( 1. - img_width[i] / img_length[i] ) );
 			}
-			if( fDispSignUse )
-			{
-				if( i < dispSignT.size() )
-				{
-					v_sign.push_back( dispSignT[i] );
-				}
-				else
-				{
-					v_sign.push_back( -999. );
-				}
-			}
-			else
-			{
-				v_sign.push_back( -999. );
-			}
 			
 			x.push_back( img_cen_x[i] );
 			y.push_back( img_cen_y[i] );
@@ -586,7 +568,7 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 	// calculate expected direction
 	calculateMeanDirection( f_xs, f_ys,
 							x, y, cosphi, sinphi,
-							v_disp, v_weight, v_sign,
+							v_disp, v_weight,
 							tel_pointing_dx, tel_pointing_dy,
 							f_dispDiff, xoff_4, yoff_4, UseIntersectForHeadTail );
 	fdisp_xy_weight_T = v_weight;
@@ -613,8 +595,6 @@ float VDispAnalyzer::getDispSignT( unsigned int iTelescopeNumber )
 	
 	return -9999.;
 }
-
-
 
 /*
  * calculate expected error for angular reconstruction
