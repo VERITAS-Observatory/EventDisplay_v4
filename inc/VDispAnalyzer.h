@@ -143,7 +143,7 @@ class VDispAnalyzer
 				double* img_tgrad, double* img_loss, int* img_ntubes,
 				double* img_weight,
 				double xoff_4, double yoff_4,
-				float* img_pedvar );
+				double* img_fui, float* img_pedvar );
 				
 		float evaluate( float iWidth, float iLength, float iAsymm, float iDist,
 						float iSize, float iPedvar, float itgrad, float iLoss,
