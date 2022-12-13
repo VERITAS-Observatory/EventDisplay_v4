@@ -697,12 +697,10 @@ void VTableLookupDataHandler::doStereoReconstruction()
 	if( fDispAnalyzerDirection
 			&& fNImages <= ( int )fTLRunParameter->fRerunStereoReconstruction_BDTNImages_max )
 	{
-	
-		vector< float > iDispError( getNTel(), -9999. );
-		
 		////////////////////////////////////////////////////////////////////
 		// estimate error on direction reconstruction from DISP method
 		////////////////////////////////////////////////////////////////////
+		vector< float > iDispError( getNTel(), -9999. );
 		if( fDispAnalyzerDirectionError )
 		{
 			iDispError = fDispAnalyzerDirectionError->calculateExpectedDirectionError_or_Sign(
