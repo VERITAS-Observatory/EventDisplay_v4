@@ -200,9 +200,9 @@ unsigned int VDispAnalyzer::find_smallest_diff_element(
 		v_dist[s] = sqrt( xs * xs + ys * ys );
 	}
 	// fixed average FOV
-	float i_average_FOV = 3.5;
+	//    float i_average_FOV = 3.5;
 	// TMP ignore FOV cut
-	// i_average_FOV = 1.e10;
+	float i_average_FOV = 1.e10;
 	
 	unsigned int i_mean_element = 9999;
 	float i_smallest_dist = 1.e20;
@@ -459,6 +459,7 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 		double xoff_4,
 		double yoff_4,
 		vector< float > dispErrorT,
+		vector< float > dispSignT,
 		double* img_fui,
 		float* img_pedvar,
 		double* pointing_dx,
@@ -526,11 +527,16 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 			// use estimated uncertainty on disp direction reconstruction as
 			// weight: exponential coefficent ad-hoc, not a result of
 			// optimisation
+			// if available; weight by dispsign
 			if( fDispErrorWeighting )
 			{
 				if( i < dispErrorT.size() )
 				{
 					v_weight.push_back( exp( -1. * fDispErrorExponential * TMath::Abs( dispErrorT[i] ) ) );
+					if( !UseIntersectForHeadTail && i < dispSignT.size() && dispSignT[i] > -99. )
+					{
+						v_weight.back() *= dispSignT[i];
+					}
 				}
 				else
 				{
@@ -565,26 +571,6 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 	fdisplist_T = v_displist;
 }
 
-float VDispAnalyzer::getDispErrorT( unsigned int iTelescopeNumber )
-{
-	if( iTelescopeNumber < fdisp_error_T.size() && fdisp_error_T[iTelescopeNumber] > 0. )
-	{
-		return fdisp_error_T[iTelescopeNumber];
-	}
-	
-	return -9999.;
-}
-
-float VDispAnalyzer::getDispSignT( unsigned int iTelescopeNumber )
-{
-	if( iTelescopeNumber < fdisp_sign_T.size() && fdisp_sign_T[iTelescopeNumber] > -90. )
-	{
-		return fdisp_sign_T[iTelescopeNumber];
-	}
-	
-	return -9999.;
-}
-
 /*
  * calculate expected error for angular reconstruction
  * using the disp method
@@ -594,7 +580,7 @@ float VDispAnalyzer::getDispSignT( unsigned int iTelescopeNumber )
  * called from VTableLookupDataHandler::doStereoReconstruction()
  *
  */
-void VDispAnalyzer::calculateExpectedDirectionError( unsigned int i_ntel,
+vector< float > VDispAnalyzer::calculateExpectedDirectionError_or_Sign( unsigned int i_ntel,
 		float iArrayElevation,
 		float iArrayAzimuth,
 		ULong64_t* iTelType,
@@ -615,6 +601,7 @@ void VDispAnalyzer::calculateExpectedDirectionError( unsigned int i_ntel,
 		double* img_fui,
 		float* img_pedvar )
 {
+	vector< float > i_disp( i_ntel, -9999. );
 	// make sure that all data arrays exist
 	if( !img_size || !img_cen_x || !img_cen_y
 			|| !img_cosphi || !img_sinphi
@@ -624,10 +611,8 @@ void VDispAnalyzer::calculateExpectedDirectionError( unsigned int i_ntel,
 			|| !img_weight || !img_fui
 			|| !img_pedvar )
 	{
-		return;
+		return i_disp;
 	}
-	fdisp_error_T.clear();
-	fdisp_error_T.assign( i_ntel, -99. );
 	
 	//////////////////////////////
 	// loop over all telescopes and calculate disp per telescope
@@ -640,79 +625,16 @@ void VDispAnalyzer::calculateExpectedDirectionError( unsigned int i_ntel,
 				&& img_loss[i] < floss_max
 				&& img_fui[i] > fFui_min )
 		{
-			fdisp_error_T[i] = evaluate( ( float )img_width[i], ( float )img_length[i], ( float )img_asym[i],
-										 ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
-										 ( float )img_size[i], img_pedvar[i], ( float )img_tgrad[i], ( float )img_loss[i],
-										 ( float )img_cen_x[i], ( float )img_cen_y[i],
-										 ( float )xoff_4, ( float )yoff_4, iTelType[i],
-										 ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
-										 -99., ( float )img_fui[i], ( float )img_ntubes[i] );
+			i_disp[i] = evaluate( ( float )img_width[i], ( float )img_length[i], ( float )img_asym[i],
+								  ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
+								  ( float )img_size[i], img_pedvar[i], ( float )img_tgrad[i], ( float )img_loss[i],
+								  ( float )img_cen_x[i], ( float )img_cen_y[i],
+								  ( float )xoff_4, ( float )yoff_4, iTelType[i],
+								  ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
+								  -99., ( float )img_fui[i], ( float )img_ntubes[i] );
 		}
 	}
-}
-
-/*
- * calculate expected disp sign (head/tail)
- *
- * one value per telescope
- *
- * called from VTableLookupDataHandler::doStereoReconstruction()
- *
- */
-void VDispAnalyzer::calculateExpectedDirectionSign( unsigned int i_ntel,
-		float iArrayElevation,
-		float iArrayAzimuth,
-		ULong64_t* iTelType,
-		double* img_size,
-		double* img_cen_x,
-		double* img_cen_y,
-		double* img_cosphi,
-		double* img_sinphi,
-		double* img_width,
-		double* img_length,
-		double* img_asym,
-		double* img_tgrad,
-		double* img_loss,
-		int* img_ntubes,
-		double* img_weight,
-		double xoff_4,
-		double yoff_4,
-		double* img_fui,
-		float* img_pedvar )
-{
-	// make sure that all data arrays exist
-	if( !img_size || !img_cen_x || !img_cen_y
-			|| !img_cosphi || !img_sinphi
-			|| !img_width || !img_length
-			|| !img_asym || !img_tgrad
-			|| !img_loss || !img_ntubes
-			|| !img_weight || !img_fui
-			|| !img_pedvar )
-	{
-		return;
-	}
-	fdisp_sign_T.clear();
-	fdisp_sign_T.assign( i_ntel, -99. );
-	
-	//////////////////////////////
-	// loop over all telescopes and calculate disp per telescope
-	for( unsigned int i = 0; i < i_ntel; i++ )
-	{
-		// quality cuts
-		if( img_size[i] > 0. && img_length[i] > 0.
-				&& sqrt( img_cen_x[i]*img_cen_x[i] + img_cen_y[i]*img_cen_y[i] ) < fdistance_max
-				&& img_loss[i] < floss_max
-				&& img_fui[i] > fFui_min )
-		{
-			fdisp_sign_T[i] = evaluate( ( float )img_width[i], ( float )img_length[i], ( float )img_asym[i],
-										( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
-										( float )img_size[i], img_pedvar[i], ( float )img_tgrad[i], ( float )img_loss[i],
-										( float )img_cen_x[i], ( float )img_cen_y[i],
-										( float )xoff_4, ( float )yoff_4, iTelType[i],
-										( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
-										-99., ( float )img_fui[i], ( float )img_ntubes[i] );
-		}
-	}
+	return i_disp;
 }
 
 /*

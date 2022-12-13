@@ -707,53 +707,39 @@ void VTableLookupDataHandler::doStereoReconstruction()
 		////////////////////////////////////////////////////////////////////
 		if( fDispAnalyzerDirectionError )
 		{
-			fDispAnalyzerDirectionError->calculateExpectedDirectionError(
-				getNTel(),
-				fArrayPointing_Elevation, fArrayPointing_Azimuth,
-				fTel_type,
-				getSize( 1., true, false ),
-				fcen_x, fcen_y,
-				fcosphi, fsinphi,
-				fwidth, flength,
-				fasym, ftgrad_x,
-				floss, fntubes,
-				getWeight(),
-				fXoff_intersect, fYoff_intersect,
-				ffui, fmeanPedvar_ImageT );
-				
-			// get estimated error on direction reconstruction
-			for( unsigned int t = 0; t < getNTel(); t++ )
-			{
-				iDispError[t] = fDispAnalyzerDirectionError->getDispErrorT( t );
-			}
+			iDispError = fDispAnalyzerDirectionError->calculateExpectedDirectionError_or_Sign(
+							 getNTel(),
+							 fArrayPointing_Elevation, fArrayPointing_Azimuth,
+							 fTel_type,
+							 getSize( 1., true, false ),
+							 fcen_x, fcen_y,
+							 fcosphi, fsinphi,
+							 fwidth, flength,
+							 fasym, ftgrad_x,
+							 floss, fntubes,
+							 getWeight(),
+							 fXoff_intersect, fYoff_intersect,
+							 ffui, fmeanPedvar_ImageT );
 		}
 		////////////////////////////////////////////////////////////////////
 		// estimate disp head/tail sign
 		////////////////////////////////////////////////////////////////////
+		vector< float > iDispSign( getNTel(), -9999. );
 		if( fDispAnalyzerDirectionSign )
 		{
-			fDispAnalyzerDirectionSign->calculateExpectedDirectionSign(
-				getNTel(),
-				fArrayPointing_Elevation, fArrayPointing_Azimuth,
-				fTel_type,
-				getSize( 1., true, false ),
-				fcen_x, fcen_y,
-				fcosphi, fsinphi,
-				fwidth, flength,
-				fasym, ftgrad_x,
-				floss, fntubes,
-				getWeight(),
-				fXoff_intersect, fYoff_intersect,
-				ffui, fmeanPedvar_ImageT );
-				
-			// get estimated sign (head/tail) on direction reconstruction
-			for( unsigned int t = 0; t < getNTel(); t++ )
-			{
-				if( fDispAnalyzerDirectionSign->getDispSignT( t ) > -90. )
-				{
-					iDispError[t] *= TMath::Abs( fDispAnalyzerDirectionSign->getDispSignT( t ) );
-				}
-			}
+			iDispSign = fDispAnalyzerDirectionSign->calculateExpectedDirectionError_or_Sign(
+							getNTel(),
+							fArrayPointing_Elevation, fArrayPointing_Azimuth,
+							fTel_type,
+							getSize( 1., true, false ),
+							fcen_x, fcen_y,
+							fcosphi, fsinphi,
+							fwidth, flength,
+							fasym, ftgrad_x,
+							floss, fntubes,
+							getWeight(),
+							fXoff_intersect, fYoff_intersect,
+							ffui, fmeanPedvar_ImageT );
 		}
 		
 		// use weighting calculated from disp error
@@ -776,7 +762,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 			floss, fntubes,
 			getWeight(),
 			fXoff_intersect, fYoff_intersect,
-			iDispError,
+			iDispError, iDispSign,
 			ffui, fmeanPedvar_ImageT,
 			fpointing_dx, fpointing_dy,
 			fTLRunParameter->fDisp_UseIntersectForHeadTail );
