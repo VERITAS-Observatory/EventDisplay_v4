@@ -557,30 +557,54 @@ class VTableLookupDataHandler
 		bool readRunParameter();
 		void reset();                             //!< reset a few output variables
 		void resetAll();
-		void setChi2( double iChi2, double iChi2S )
+		void setChi2( double iChi2, bool iTableErecS = true )
 		{
-			fechi2 = iChi2;
-			fechi2S = iChi2S;
+			if( iTableErecS )
+			{
+				fechi2S = iChi2;
+			}
+			else
+			{
+				fechi2 = iChi2;
+			}
 		}
-		void setdE( double idE, double idES )
+		void setdE( double idE, bool iTableErecS = true )
 		{
-			fdE = idE ;
-			fdES = idES;
+			if( iTableErecS )
+			{
+				fdES = idE ;
+			}
+			else
+			{
+				fdE = idE;
+			}
 		}
 		//!< no check of boundaries!!
 		void setDistanceToCore( int itel, double iR )
 		{
 			fR[itel] = iR;
 		}
-		void setEnergy( double iE, double iES )
+		void setEnergy( double iE, bool iTableErecS = true )
 		{
-			fenergy = iE;
-			fenergyS = iES;
+			if( iTableErecS )
+			{
+				fenergyS = iE;
+			}
+			else
+			{
+				fenergy = iE;
+			}
 		}
-		void setEnergyT( int i, double iET, double iETS )
+		void setEnergyT( int i, double iET, bool iTableErecS = true )
 		{
-			fE[i] = iET;
-			fES[i] = iETS;
+			if( iTableErecS )
+			{
+				fES[i] = iET;
+			}
+			else
+			{
+				fE[i] = iET;
+			}
 		}
 		bool setInputFile( vector< string > );              //!< set input file
 		void setMCMinEnergy( double iB )

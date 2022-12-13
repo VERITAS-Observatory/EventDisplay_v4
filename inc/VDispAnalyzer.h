@@ -95,7 +95,8 @@ class VDispAnalyzer
 							double* iR,
 							double xcore, double ycore,
 							double xs, double ys,
-							double* img_fui );
+							double* img_fui,
+							float* img_pedvar );
 							
 		void calculateEnergies( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
 								ULong64_t* iTelType,
@@ -106,9 +107,9 @@ class VDispAnalyzer
 								double* img_weight,
 								double xoff_4, double yoff_4,
 								double* iR, double iEHeight,
-								double iMCEnergy = -1.,
-								double* img_fui = 0,
-								float* img_pedvar = 0 );
+								double iMCEnergy,
+								double* img_fui,
+								float* img_pedvar );
 								
 		void  calculateMeanDirection( float& xs, float& ys,
 									  vector< float > x, vector< float > y,
@@ -117,7 +118,7 @@ class VDispAnalyzer
 									  vector< float > tel_pointing_dx,
 									  vector< float > tel_pointing_dy,
 									  float& dispdiff,
-									  float x_off4 = -999., float yoff_4 = -999.,
+									  float x_off4, float yoff_4,
 									  bool UseIntersectForHeadTail = false );
 									  
 		void calculateMeanDispDirection( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
@@ -148,7 +149,7 @@ class VDispAnalyzer
 		float evaluate( float iWidth, float iLength, float iAsymm, float iDist,
 						float iSize, float iPedvar, float itgrad, float iLoss,
 						float icen_x, float icen_y, float xoff_4, float yoff_4, ULong64_t iTelType,
-						float iZe, float iAz, float iRcore = -99., float iFui = -1., float iNtubes = -1.,
+						float iZe, float iAz, float iRcore, float iFui, float iNtubes,
 						bool b2D = true );
 		float getAngDiff()
 		{

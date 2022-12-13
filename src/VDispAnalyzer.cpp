@@ -511,7 +511,7 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 							 ( float )img_cen_x[i], ( float )img_cen_y[i],
 							 ( float )xoff_4, ( float )yoff_4, iTelType[i],
 							 ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
-							 -99., ( float )img_fui[i], ( float )img_ntubes[i] );
+							 -99., ( float )img_fui[i], ( float )img_ntubes[i], ( float )img_pedvar[i] );
 			if( disp < -98. )
 			{
 				continue;
@@ -751,13 +751,14 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
 									( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
 									( float )iRcore[i], ( float )iEHeight,
 									( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
-									( float )img_fui[i], ( float )img_ntubes[i] );
+									( float )img_fui[i], ( float )img_ntubes[i], ( float )img_pedvar[i] );
 									
 			// dispEnergy is trained as log10(MCe0) in GeV
 			if( fdisp_energy_T[i] > -98. )
 			{
 				fdisp_energy_T[i] = TMath::Power( 10., fdisp_energy_T[i] * log10( img_size[i] ) );
 			}
+			
 			if( fDebug )
 			{
 				cout << "VDispAnalyzer::calculateEnergies: tel " << i << " (teltype " << ( ULong64_t )iTelType[i] << ") ";
@@ -958,7 +959,8 @@ void VDispAnalyzer::calculateCore( unsigned int i_ntel,
 								   double ycoreSR,
 								   double xs,
 								   double ys,
-								   double* img_fui )
+								   double* img_fui,
+								   float* img_pedvar )
 {
 	fdisp_core_T.clear();
 	fdisp_core_T.assign( i_ntel, -99. );
@@ -991,7 +993,7 @@ void VDispAnalyzer::calculateCore( unsigned int i_ntel,
 								  ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
 								  ( float )iRcore[i], -1.,
 								  ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
-								  ( float )img_fui[i], ( float )img_ntubes[i] );
+								  ( float )img_fui[i], ( float )img_ntubes[i], ( float )img_pedvar[i] );
 		}
 		else
 		{

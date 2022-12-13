@@ -632,15 +632,13 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			ffui, fmeanPedvar_ImageT );
 			
 		// fill results
-		setEnergy( fDispAnalyzerEnergy->getEnergy(), fDispAnalyzerEnergy->getEnergy() );
-		setChi2( fDispAnalyzerEnergy->getEnergyChi2(), fDispAnalyzerEnergy->getEnergyChi2() );
-		setdE( fDispAnalyzerEnergy->getEnergydES(), fDispAnalyzerEnergy->getEnergydES() );
-		//                   fDispAnalyzerEnergy->getEnergydES(),
-		//                   fDispAnalyzerEnergy->getEnergyMedianAbsoluteError() );
+		setEnergy( fDispAnalyzerEnergy->getEnergy(), false );
+		setChi2( fDispAnalyzerEnergy->getEnergyChi2(), false );
+		setdE( fDispAnalyzerEnergy->getEnergydES(), false );
 		
 		for( unsigned int i = 0; i < getNTel(); i++ )
 		{
-			setEnergyT( i, -1., fDispAnalyzerEnergy->getEnergyT( i ) );
+			setEnergyT( i, fDispAnalyzerEnergy->getEnergyT( i ), false );
 		}
 		setNEnergyT( fDispAnalyzerEnergy->getEnergyNT() );
 		setNEnergyQuality( fDispAnalyzerEnergy->getEnergyQualityLabel() );
@@ -1263,6 +1261,9 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 	if( fTLRunParameter->fEnergyReconstruction_BDTFileName.size() > 0. )
 	{
 		cout << endl;
+		cout << "*******************************************************" << endl;
+		cout << "WARNING: dispBDT energy reconstruction not fully tested" << endl;
+		cout << "*******************************************************" << endl;
 		cout << "Initializing BDT disp analyzer for energy reconstruction" << endl;
 		cout << "===========================================================" << endl << endl;
 		fDispAnalyzerEnergy = new VDispAnalyzer();

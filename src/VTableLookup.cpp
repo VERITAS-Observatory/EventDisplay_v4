@@ -996,15 +996,15 @@ void VTableLookup::readLookupTable()
 			}
 			
 			// set energy values
-			fData->setEnergy( 0., s_N->energySR );
-			fData->setChi2( 0., s_N->energySR_Chi2 );
-			fData->setdE( 0., s_N->energySR_dE );
+			fData->setEnergy( s_N->energySR, true );
+			fData->setChi2( s_N->energySR_Chi2, true );
+			fData->setdE( s_N->energySR_dE, true );
 			// set mean reduced scaled widths and energies per telescope
 			for( unsigned int j = 0; j < s_N->fNTel; j++ )
 			{
 				fData->setMSCWT( j, s_N->mscw_T[j], s_N->mscw_Tsigma[j] );
 				fData->setMSCLT( j, s_N->mscl_T[j], s_N->mscl_Tsigma[j] );
-				fData->setEnergyT( j, 0., s_N->energySR_T[j] );
+				fData->setEnergyT( j, s_N->energySR_T[j], true );
 			}
 			
 			fData->fill();
