@@ -410,8 +410,8 @@ void VDispAnalyzer::calculateMeanShowerDirection(
 		{
 			dispdiff += sqrt( ( v_x[n] - v_x[m] ) * ( v_x[n] - v_x[m] )
 							  + ( v_y[n] - v_y[m] ) * ( v_y[n] - v_y[m] ) )
-						* v_weight[n] * v_weight[m];
-			z += v_weight[n] * v_weight[m];
+						* TMath::Abs( v_weight[n] ) * TMath::Abs( v_weight[m] );
+			z += TMath::Abs( v_weight[n] ) * TMath::Abs( v_weight[m] );
 		}
 		xs += v_x[n] * TMath::Abs( v_weight[n] );
 		ys += v_y[n] * TMath::Abs( v_weight[n] );
