@@ -51,6 +51,7 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
 	float temp1 = 0.;
 	float temp2 = 0.;
 	float temp3 = 0.;
+	float temp4 = 0.;
 	
 	// list of telescope types: required to selected correct BDT weight file
 	fTelescopeTypeList = iTelTypeList;
@@ -164,6 +165,7 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
 		if( fDispType == "BDTDisp" )
 		{
 			fTMVAReader[fTelescopeTypeList[i]]->AddSpectator( "dispError", &temp2 );
+			fTMVAReader[fTelescopeTypeList[i]]->AddSpectator( "dispCrossError", &temp4 );
 			fTMVAReader[fTelescopeTypeList[i]]->AddSpectator( "dispPhi", &temp1 );
 			fTMVAReader[fTelescopeTypeList[i]]->AddSpectator( "dispSign", &temp3 );
 		}
