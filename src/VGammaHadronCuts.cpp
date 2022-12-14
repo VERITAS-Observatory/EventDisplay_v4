@@ -525,7 +525,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				is_stream >> temp;
 				fCut_Erec_max = atof( temp.c_str() );
 			}
-			else if( iCutVariable = "arraydispdiff" )
+			else if( iCutVariable == "arraydispdiff" )
 			{
 				is_stream >> temp;
 				fCut_DispIntersectDiff_min = atof( temp.c_str() );
