@@ -378,9 +378,9 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
  *
 */
 void VDispAnalyzer::calculateMeanShowerDirection(
-        vector< float > v_x, vector< float > v_y, vector< float > v_weight,
-		float& xs, float& ys, float& dispdiff,
-		unsigned int iMaxN )
+	vector< float > v_x, vector< float > v_y, vector< float > v_weight,
+	float& xs, float& ys, float& dispdiff,
+	unsigned int iMaxN )
 {
 	xs = 0.;
 	ys = 0.;
@@ -413,9 +413,9 @@ void VDispAnalyzer::calculateMeanShowerDirection(
 						* v_weight[n] * v_weight[m];
 			z += v_weight[n] * v_weight[m];
 		}
-		xs += v_x[n] * TMath::Abs(v_weight[n]);
-		ys += v_y[n] * TMath::Abs(v_weight[n]);
-		d_w_sum += TMath::Abs(v_weight[n]);
+		xs += v_x[n] * TMath::Abs( v_weight[n] );
+		ys += v_y[n] * TMath::Abs( v_weight[n] );
+		d_w_sum += TMath::Abs( v_weight[n] );
 	}
 	if( d_w_sum > 0. )
 	{
