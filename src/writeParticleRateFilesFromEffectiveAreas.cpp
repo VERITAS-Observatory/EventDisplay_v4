@@ -39,7 +39,7 @@ void writeAngResHistogram( char* iMC_Gamma = 0, string iParticleNumberFile = "pa
 	iR.fillData( iMC_Gamma );
 	for( unsigned int i = 0; i < iR.fIRF_TreeNames.size(); i++ )
 	{
-		if( iR.fIRF_TreeNames[i] == "t_angular_resolution_080p" )
+		if( iR.fIRF_TreeNames[i] == "t_angular_resolution_095p" )
 		{
 			TH2D* h = 0;
 			if( i < iR.fIRF_Data.size() && iR.fIRF_Data[i] )
