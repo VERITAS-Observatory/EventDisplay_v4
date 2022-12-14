@@ -140,6 +140,7 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	fDispAnalyzerDirection = 0;
 	fDispAnalyzerDirectionError = 0;
 	fDispAnalyzerDirectionSign = 0;
+	fDispAnalyzerEnergy = 0;
 }
 
 /*
