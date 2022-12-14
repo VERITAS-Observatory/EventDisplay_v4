@@ -412,6 +412,8 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 	// standard stereo reconstruction
 	fXoff = fshowerpars->Xoff[fMethod];
 	fYoff = fshowerpars->Yoff[fMethod];
+	fXoff_intersect = fshowerpars->Xoff[fMethod];
+	fYoff_intersect = fshowerpars->Yoff[fMethod];
 	fXoff_derot = fshowerpars->XoffDeRot[fMethod];
 	fYoff_derot = fshowerpars->YoffDeRot[fMethod];
 	fDispDiff = fshowerpars->DispDiff[fMethod];

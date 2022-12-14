@@ -140,6 +140,8 @@ class CData
 		//[NTelPairs]
 		Float_t         EmissionHeightT[VDST_MAXTELESCOPES* VDST_MAXTELESCOPES];
 		Double_t        DispDiff;  // from disp method
+		Float_t         Xoff_intersect;
+		Float_t         Yoff_intersect;
 		
 		// List of branches
 		TBranch*        b_runNumber;              //!
@@ -236,6 +238,8 @@ class CData
 		TBranch*        b_NTelPairs;              //!
 		TBranch*        b_EmissionHeightT;        //!
 		TBranch*        b_DispDiff; //disp
+		TBranch*        b_Xoff_intersect;
+		TBranch*        b_Yoff_intersect;
 		
 		CData( TTree* tree = 0, bool bMC = false, int iVersion = 5, bool bShort = false );
 		virtual ~CData();
@@ -811,6 +815,22 @@ void CData::Init( TTree* tree )
 	{
 		DispDiff = 0.;
 	}
+	if( fChain->GetBranchStatus( "Xoff_intersect" ) )
+	{
+		fChain->SetBranchAddress( "Xoff_intersect", &Xoff_intersect );
+	}
+	else
+	{
+		Xoff_intersect = 0.;
+	}
+	if( fChain->GetBranchStatus( "Yoff_intersect" ) )
+	{
+		fChain->SetBranchAddress( "Yoff_intersect", &Yoff_intersect );
+	}
+	else
+	{
+		Yoff_intersect = 0.;
+	}
 	
 	Notify();
 }
@@ -961,6 +981,22 @@ Bool_t CData::Notify()
 	else
 	{
 		b_DispDiff = 0;
+	}
+	if( fChain->GetBranchStatus( "Xoff_intersect" ) )
+	{
+		b_Xoff_intersect = fChain->GetBranch( "Xoff_intersect" );
+	}
+	else
+	{
+		b_Xoff_intersect = 0;
+	}
+	if( fChain->GetBranchStatus( "Yoff_intersect" ) )
+	{
+		b_Yoff_intersect = fChain->GetBranch( "Yoff_intersect" );
+	}
+	else
+	{
+		b_Yoff_intersect = 0;
 	}
 	
 	return kTRUE;
