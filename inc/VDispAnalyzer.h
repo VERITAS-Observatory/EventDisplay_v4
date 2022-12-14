@@ -67,15 +67,15 @@ class VDispAnalyzer
 		vector<ULong64_t> fTelescopeTypeList;
 		vector<float> fTelescopeFOV;
 		
-		void calculateMeanShowerDirection( vector< float > v_x, vector< float > v_y, vector< float > v_weight,
+		void calculateMeanShowerDirection( vector< float >& v_x, vector< float >& v_y, vector< float >& v_weight,
 										   float& xs, float& ys, float& dispdiff, unsigned int iMaxN );
 										   
 		unsigned int find_smallest_diff_element(
-			vector< vector< float > > i_sign,
-			vector< float > x, vector< float > y,
-			vector< float > cosphi, vector< float > sinphi,
-			vector< float > tel_pointing_dx, vector< float > tel_pointing_dy,
-			vector< float > v_disp, vector< float > v_weight );
+			vector< vector< float > >& i_sign,
+			vector< float >& x, vector< float >& y,
+			vector< float >& cosphi, vector< float >& sinphi,
+			vector< float >& tel_pointing_dx, vector< float >& tel_pointing_dy,
+			vector< float >& v_disp, vector< float >& v_weight );
 		vector< vector< float > > get_sign_permutation_vector( unsigned int x_size );
 		
 	public:
@@ -112,11 +112,11 @@ class VDispAnalyzer
 								float* img_pedvar );
 								
 		void  calculateMeanDirection( float& xs, float& ys,
-									  vector< float > x, vector< float > y,
-									  vector< float > cosphi, vector< float > sinphi,
-									  vector< float > v_disp, vector< float > v_weight,
-									  vector< float > tel_pointing_dx,
-									  vector< float > tel_pointing_dy,
+									  vector< float >& x, vector< float >& y,
+									  vector< float >& cosphi, vector< float >& sinphi,
+									  vector< float >& v_disp, vector< float >& v_weight,
+									  vector< float >& tel_pointing_dx,
+									  vector< float >& tel_pointing_dy,
 									  float& dispdiff,
 									  float x_off4, float yoff_4,
 									  bool UseIntersectForHeadTail = false );
@@ -129,8 +129,8 @@ class VDispAnalyzer
 										 double* img_tgrad, double* img_loss, int* img_ntubes,
 										 double* img_weight,
 										 double xoff_4, double yoff_4,
-										 vector< float > dispErrorT,
-										 vector< float > dispSignT,
+										 vector< float >& dispErrorT,
+										 vector< float >& dispSignT,
 										 double* img_fui,
 										 float* img_pedvar,
 										 double* pointing_dx, double* pointing_dy,

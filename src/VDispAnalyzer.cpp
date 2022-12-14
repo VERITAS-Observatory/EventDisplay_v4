@@ -175,25 +175,25 @@ vector< vector< float > > VDispAnalyzer::get_sign_permutation_vector( unsigned i
  *
  */
 unsigned int VDispAnalyzer::find_smallest_diff_element(
-	vector< vector< float > > i_sign,
-	vector< float > x, vector< float > y,
-	vector< float > cosphi, vector< float > sinphi,
-	vector< float > tel_pointing_dx, vector< float > tel_pointing_dy,
-	vector< float > v_disp, vector< float > v_weight )
+	vector< vector< float > >& i_sign,
+	vector< float >& x, vector< float >& y,
+	vector< float >& cosphi, vector< float >& sinphi,
+	vector< float >& tel_pointing_dx, vector< float >& tel_pointing_dy,
+	vector< float >& v_disp, vector< float >& v_weight )
 {
 	vector< float > v_disp_diff( i_sign.size(), 0. );
 	vector< float > v_dist( i_sign.size(), 0. );
+	vector< float > v_xs( x.size(), 0. );
+	vector< float > v_ys( x.size(), 0. );
+	float xs = 0.;
+	float ys = 0.;
+	float disp_diff = 0.;
 	for( unsigned int s = 0; s < i_sign.size(); s++ )
 	{
-		vector< float > v_xs;
-		vector< float > v_ys;
-		float xs = 0.;
-		float ys = 0.;
-		float disp_diff = 0.;
 		for( unsigned int i = 0; i < x.size(); i++ )
 		{
-			v_xs.push_back( x[i] - i_sign[s][i] * v_disp[i] * cosphi[i] + tel_pointing_dx[i] );
-			v_ys.push_back( y[i] - i_sign[s][i] * v_disp[i] * sinphi[i] + tel_pointing_dy[i] );
+			v_xs[i] = x[i] - i_sign[s][i] * v_disp[i] * cosphi[i] + tel_pointing_dx[i];
+			v_ys[i] = y[i] - i_sign[s][i] * v_disp[i] * sinphi[i] + tel_pointing_dy[i];
 		}
 		calculateMeanShowerDirection( v_xs, v_ys, v_weight, xs, ys, disp_diff, v_xs.size() );
 		v_disp_diff[s] = disp_diff;
@@ -237,10 +237,10 @@ unsigned int VDispAnalyzer::find_smallest_diff_element(
  *
  */
 void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
-		vector< float > x, vector< float > y,
-		vector< float > cosphi, vector< float > sinphi,
-		vector< float > v_disp, vector< float > v_weight,
-		vector< float > tel_pointing_dx, vector< float > tel_pointing_dy,
+		vector< float >& x, vector< float >& y,
+		vector< float >& cosphi, vector< float >& sinphi,
+		vector< float >& v_disp, vector< float >& v_weight,
+		vector< float >& tel_pointing_dx, vector< float >& tel_pointing_dy,
 		float& dispdiff,
 		float x_off4, float y_off4,
 		bool UseIntersectForHeadTail )
@@ -378,7 +378,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
  *
 */
 void VDispAnalyzer::calculateMeanShowerDirection(
-	vector< float > v_x, vector< float > v_y, vector< float > v_weight,
+	vector< float >& v_x, vector< float >& v_y, vector< float >& v_weight,
 	float& xs, float& ys, float& dispdiff,
 	unsigned int iMaxN )
 {
@@ -395,7 +395,7 @@ void VDispAnalyzer::calculateMeanShowerDirection(
 	}
 	
 	// single image
-	if( iMaxN == 1 && v_x.size() == 1 && v_y.size() == 1 && v_weight.size() == 1 )
+	if( iMaxN == 1 )
 	{
 		dispdiff = 0.;
 		xs = v_x[0];
@@ -417,16 +417,13 @@ void VDispAnalyzer::calculateMeanShowerDirection(
 		ys += v_y[n] * TMath::Abs( v_weight[n] );
 		d_w_sum += TMath::Abs( v_weight[n] );
 	}
-	if( d_w_sum > 0. )
+	if( d_w_sum > 0. && z > 0. )
 	{
 		xs /= d_w_sum;
 		ys /= d_w_sum;
-	}
-	if( z > 0. )
-	{
 		dispdiff /= z;
 	}
-	if( v_x.size() < 2 && iMaxN >= 2 )
+	else
 	{
 		dispdiff = -9999.;
 		xs = -99999.;
@@ -459,8 +456,8 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 		double* img_weight,
 		double xoff_4,
 		double yoff_4,
-		vector< float > dispErrorT,
-		vector< float > dispSignT,
+		vector< float >& dispErrorT,
+		vector< float >& dispSignT,
 		double* img_fui,
 		float* img_pedvar,
 		double* pointing_dx,
