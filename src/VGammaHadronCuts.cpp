@@ -914,7 +914,12 @@ void VGammaHadronCuts::printDirectionCuts()
 	cout << "Direction cut scale factor " << fAngRes_ScalingFactor;
 	cout << ", minimum : " << fAngRes_AbsoluteMinimum << " [deg] ";
 	cout << ", maximum : " << fAngRes_AbsoluteMaximum << " [deg]" << endl;
-	
+    if( fCut_DispIntersectDiff_max < 1.e9 )
+    {
+        cout << "Direction cut on difference between disp and intersection method: ";
+        cout << ", minimum : " << fCut_DispIntersectDiff_min << " [deg] ";
+        cout << ", maximum : " << fCut_DispIntersectDiff_max << " [deg] " << endl;
+    }
 }
 
 void VGammaHadronCuts::printCutSummary()
