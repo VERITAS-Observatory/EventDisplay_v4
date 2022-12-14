@@ -1587,7 +1587,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 	fOTree->Branch( "EChi2S", &fechi2S, iTT );
 	sprintf( iTT, "dES/D" );
 	fOTree->Branch( "dES", &fdES, iTT );
-	fOTree->Branch( "NErecST", &fnenergyT, iTT );
+	fOTree->Branch( "NErecST", &fnenergyT, "NErecST" );
 	fOTree->Branch( "ErecQL", &fenergyQL, "ErecQL/I" );
 	
 	sprintf( iTT, "EmissionHeight/F" );
