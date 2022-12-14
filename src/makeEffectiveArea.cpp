@@ -151,22 +151,9 @@ int main( int argc, char* argv[] )
 		f_IRF_Type.push_back( "angular_resolution" );
 		f_IRF_ContainmentProbability.push_back( 0.68 );
 		// 80% angular resolution file
-		f_IRF_Name.push_back( "angular_resolution_080p" );
+		f_IRF_Name.push_back( "angular_resolution_095p" );
 		f_IRF_Type.push_back( "angular_resolution" );
-		f_IRF_ContainmentProbability.push_back( 0.80 );
-		// use same containment radius as in gamma/hadron cuts
-		if( fCuts->getAngularResolutionContainmentRadius()
-				&& TMath::Abs( ( float )fCuts->getAngularResolutionContainmentRadius() - 68. ) > 1.e-5
-				&& TMath::Abs( ( float )fCuts->getAngularResolutionContainmentRadius() - 80. ) > 1.e-5 )
-		{
-			exit( 0 );
-			char hname[200];
-			sprintf( hname, "angular_resolution_0%dp", fCuts->getAngularResolutionContainmentRadius() );
-			fCuts_AngularResolutionName = hname;
-			f_IRF_ContainmentProbability.push_back( fCuts->getAngularResolutionContainmentRadius() );
-			f_IRF_Name.push_back( fCuts_AngularResolutionName );
-			f_IRF_Type.push_back( "angular_resolution" );
-		}
+		f_IRF_ContainmentProbability.push_back( 0.95 );
 		if( fRunPara->fFillingMode != 2 )
 		{
 			// core resolution
@@ -335,7 +322,7 @@ int main( int argc, char* argv[] )
 								f_IRF[f]->getAngularResolution2D( i, 0 ) );
 					}
 				}
-				else if( TMath::Abs( f_IRF[f]->getContainmentProbability() - 0.80 ) < 1.e-4 )
+				else if( TMath::Abs( f_IRF[f]->getContainmentProbability() - 0.95 ) < 1.e-4 )
 				{
 					for( unsigned int i = 0; i < fRunPara->fAzMin.size(); i++ )
 					{

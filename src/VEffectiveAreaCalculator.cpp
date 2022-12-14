@@ -335,7 +335,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	for( unsigned int i = 0; i < fRunPara->fAzMin.size(); i++ )
 	{
 		fGraph_AngularResolution68p.push_back( 0 );
-		fGraph_AngularResolution80p.push_back( 0 );
+		fGraph_AngularResolution95p.push_back( 0 );
 		hVAngularDiff_2D.push_back( 0 );
 		hVAngularDiffEmc_2D.push_back( 0 );
 		hVAngularLogDiff_2D.push_back( 0 );
@@ -1133,18 +1133,18 @@ void VEffectiveAreaCalculator::multiplyByScatterArea( TGraphAsymmErrors* g )
    copy angular resolution values to tree variable
 
 */
-void VEffectiveAreaCalculator::fillAngularResolution( unsigned int i_az, bool iContainment_80p )
+void VEffectiveAreaCalculator::fillAngularResolution( unsigned int i_az, bool iContainment_95p )
 {
-	if( iContainment_80p && i_az < fGraph_AngularResolution68p.size() && fGraph_AngularResolution68p[i_az] )
+	if( iContainment_95p && i_az < fGraph_AngularResolution68p.size() && fGraph_AngularResolution68p[i_az] )
 	{
 		// get first and last energy bin
 		double i_emin = 1.e5;
 		double i_emax = 1.e-5;
 		double x = 0.;
 		double y = 0.;
-		for( int i = 0; i < fGraph_AngularResolution80p[i_az]->GetN(); i++ )
+		for( int i = 0; i < fGraph_AngularResolution95p[i_az]->GetN(); i++ )
 		{
-			fGraph_AngularResolution80p[i_az]->GetPoint( i, x, y );
+			fGraph_AngularResolution95p[i_az]->GetPoint( i, x, y );
 			if( x < i_emin )
 			{
 				i_emin = x;
@@ -1158,11 +1158,11 @@ void VEffectiveAreaCalculator::fillAngularResolution( unsigned int i_az, bool iC
 		{
 			if( Rec_e0[i] > i_emin && Rec_e0[i] < i_emax )
 			{
-				Rec_angRes_p80[i]  = fGraph_AngularResolution80p[i_az]->Eval( Rec_e0[i] );
+				Rec_angRes_p80[i]  = fGraph_AngularResolution95p[i_az]->Eval( Rec_e0[i] );
 			}
 		}
 	}
-	else if( !iContainment_80p && i_az < fGraph_AngularResolution68p.size() && fGraph_AngularResolution68p[i_az] )
+	else if( !iContainment_95p && i_az < fGraph_AngularResolution68p.size() && fGraph_AngularResolution68p[i_az] )
 	{
 		double i_emin = 0.;
 		double i_emax = 0.;
@@ -1203,13 +1203,13 @@ void VEffectiveAreaCalculator::setAngularResolution2D( unsigned int i_az, vector
 	}
 }
 
-void VEffectiveAreaCalculator::setAngularResolutionGraph( unsigned int i_az, TGraphErrors* g, bool iAngContainment_80p )
+void VEffectiveAreaCalculator::setAngularResolutionGraph( unsigned int i_az, TGraphErrors* g, bool iAngContainment_95p )
 {
 	if( i_az < fGraph_AngularResolution68p.size() && g )
 	{
-		if( iAngContainment_80p )
+		if( iAngContainment_95p )
 		{
-			fGraph_AngularResolution80p[i_az] = g;
+			fGraph_AngularResolution95p[i_az] = g;
 		}
 		else
 		{

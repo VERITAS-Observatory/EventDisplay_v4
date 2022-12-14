@@ -60,7 +60,7 @@ bool VInstrumentResponseFunctionReader::initializeIRFData()
 {
 	// read angular and core resolution
 	fIRF_TreeNames.push_back( "t_angular_resolution" );
-	fIRF_TreeNames.push_back( "t_angular_resolution_080p" );
+	fIRF_TreeNames.push_back( "t_angular_resolution_095p" );
 	fIRF_TreeNames.push_back( "t_core_resolution" );
 	fIRF_TreeNames.push_back( "t_energy_resolution" );
 	
@@ -769,14 +769,14 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 						gEffArea_Recp80 = new TGraphAsymmErrors( 1 );
 						setGraphPlottingStyle( gEffArea_Recp80, 2 );
 						// loop over all energies (x-axis of hRes) and get containment level for given theta2 cut
-						float i_ffactor_80p = 1.;
+						float i_ffactor_95p = 1.;
 						for( int p = 0; p < gEffArea_Rec->GetN(); p++ )
 						{
 							gEffArea_Rec->GetPoint( p, i_x, i_y );
-							i_ffactor_80p = i_cuts->getTheta2Cut_max( TMath::Power( 10., i_x ) );
-							if( i_ffactor_80p > 0. )
+							i_ffactor_95p = i_cuts->getTheta2Cut_max( TMath::Power( 10., i_x ) );
+							if( i_ffactor_95p > 0. )
 							{
-								i_ffactor_80p = sqrt( i_ffactor_80p );
+								i_ffactor_95p = sqrt( i_ffactor_95p );
 							}
 							// integrate and calculate contaiment level for this bin in log10 energy
 							int i_bin = hRes->GetXaxis()->FindBin( i_x );
@@ -793,7 +793,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 							for( int j = 1; j <= hRes->GetNbinsY(); j++ )
 							{
 								iSum += hRes->GetBinContent( i_bin, j );
-								if( hRes->GetYaxis()->GetBinCenter( j ) > i_ffactor_80p )
+								if( hRes->GetYaxis()->GetBinCenter( j ) > i_ffactor_95p )
 								{
 									if( iSum / iTot > 0. )
 									{

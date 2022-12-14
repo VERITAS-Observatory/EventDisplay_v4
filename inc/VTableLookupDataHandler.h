@@ -66,6 +66,7 @@ class VTableLookupDataHandler
 		VDispAnalyzer*             fDispAnalyzerDirection;
 		VDispAnalyzer*             fDispAnalyzerDirectionError;
 		VDispAnalyzer*             fDispAnalyzerDirectionSign;
+		VDispAnalyzer*             fDispAnalyzerEnergy;
 		
 		double fSelectRandom;
 		int fSelectRandomSeed;
@@ -233,6 +234,7 @@ class VTableLookupDataHandler
 		float  fmeanPedvar_ImageT[VDST_MAXTELESCOPES];
 		float  fmeanPedvar_Image;
 		double fdist     [VDST_MAXTELESCOPES];
+		double ffui       [VDST_MAXTELESCOPES];
 		double fdist_telType[VDST_MAXTELESCOPES];
 		double fsize     [VDST_MAXTELESCOPES];
 		double fsize2    [VDST_MAXTELESCOPES];
@@ -268,11 +270,14 @@ class VTableLookupDataHandler
 		int    fFitstat  [VDST_MAXTELESCOPES];
 		// {-1}
 		double fR        [VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core
+		double fRTel        [VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core
 		double fR_telType[VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core (depending on tel type)
 		//        double fMCR        [VDST_MAXTELESCOPES];  //!< distance from each telescope to reconstructed shower core
 		//        double fMCR_telType[VDST_MAXTELESCOPES];  //!< distance from each telescope to reconstructed shower core
 		double fE        [VDST_MAXTELESCOPES];    //!< energy assigned to each telescope (method 0)
 		double fES       [VDST_MAXTELESCOPES];    //!< energy assigned to each telescope (method 1)
+		int    fnenergyT;                         //!< number of images used for the energy calculation
+		int    fenergyQL;                         //!< quality label for energy calculation
 		double ftmscw    [VDST_MAXTELESCOPES];    //!< mscw assigned to each telescope
 		double ftmscl    [VDST_MAXTELESCOPES];    //!< mscl assigned to each telescope
 		float  ftmscw_sigma[VDST_MAXTELESCOPES];  //!< mscw  sigma  assigned to each telescope
@@ -345,6 +350,10 @@ class VTableLookupDataHandler
 		double* getDistanceToCore()
 		{
 			return fR;
+		}
+		double* getDistanceToCoreTel()
+		{
+			return fRTel;
 		}
 		double* getDistanceToCore( ULong64_t iTelType );
 		int    getEventNumber()
@@ -548,30 +557,54 @@ class VTableLookupDataHandler
 		bool readRunParameter();
 		void reset();                             //!< reset a few output variables
 		void resetAll();
-		void setChi2( double iChi2, double iChi2S )
+		void setChi2( double iChi2, bool iTableErecS = true )
 		{
-			fechi2 = iChi2;
-			fechi2S = iChi2S;
+			if( iTableErecS )
+			{
+				fechi2S = iChi2;
+			}
+			else
+			{
+				fechi2 = iChi2;
+			}
 		}
-		void setdE( double idE, double idES )
+		void setdE( double idE, bool iTableErecS = true )
 		{
-			fdE = idE ;
-			fdES = idES;
+			if( iTableErecS )
+			{
+				fdES = idE ;
+			}
+			else
+			{
+				fdE = idE;
+			}
 		}
 		//!< no check of boundaries!!
 		void setDistanceToCore( int itel, double iR )
 		{
 			fR[itel] = iR;
 		}
-		void setEnergy( double iE, double iES )
+		void setEnergy( double iE, bool iTableErecS = true )
 		{
-			fenergy = iE;
-			fenergyS = iES;
+			if( iTableErecS )
+			{
+				fenergyS = iE;
+			}
+			else
+			{
+				fenergy = iE;
+			}
 		}
-		void setEnergyT( int i, double iET, double iETS )
+		void setEnergyT( int i, double iET, bool iTableErecS = true )
 		{
-			fE[i] = iET;
-			fES[i] = iETS;
+			if( iTableErecS )
+			{
+				fES[i] = iET;
+			}
+			else
+			{
+				fE[i] = iET;
+			}
 		}
 		bool setInputFile( vector< string > );              //!< set input file
 		void setMCMinEnergy( double iB )
@@ -599,6 +632,14 @@ class VTableLookupDataHandler
 		{
 			ftmscl[i] = iMSLC;
 			ftmscl_sigma[i] = iMSLC_T;
+		}
+		void setNEnergyT( int in )
+		{
+			fnenergyT = in;
+		}
+		void setNEnergyQuality( int in )
+		{
+			fenergyQL = in;
 		}
 		void setNMSCW( int in )
 		{

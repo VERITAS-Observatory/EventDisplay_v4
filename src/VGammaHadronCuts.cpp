@@ -191,6 +191,9 @@ void VGammaHadronCuts::resetCutValues()
 	fCut_SizeSecondMax_min = -1000;
 	fCut_SizeSecondMax_max = 1.e10;
 	
+	fCut_DispIntersectDiff_min = -1000.;
+	fCut_DispIntersectDiff_max = 1.e10;
+	
 	fProbabilityCut = 0.5;
 	
 	fOrbitalPhase_min = -1.;
@@ -521,6 +524,13 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				fCut_Erec_min = atof( temp.c_str() );
 				is_stream >> temp;
 				fCut_Erec_max = atof( temp.c_str() );
+			}
+			else if( iCutVariable == "arraydispdiff" )
+			{
+				is_stream >> temp;
+				fCut_DispIntersectDiff_min = atof( temp.c_str() );
+				is_stream >> temp;
+				fCut_DispIntersectDiff_max = atof( temp.c_str() );
 			}
 			else if( iCutVariable == "arrayemission" || iCutVariable == "emissionheight" )
 			{
@@ -1247,6 +1257,22 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 			}
 			return false;
 		}
+	}
+	
+	/////////////////////////////////////////////////////////////////////////
+	// apply cut on difference between stereo intersection and disp method
+	// (for stereo method only: this should always pass)
+	float i_disp_diff = sqrt(
+							( fData->Xoff - fData->Xoff_intersect ) * ( fData->Xoff - fData->Xoff_intersect ) +
+							( fData->Yoff - fData->Yoff_intersect ) * ( fData->Yoff - fData->Yoff_intersect ) );
+	if( i_disp_diff < fCut_DispIntersectDiff_min || i_disp_diff > fCut_DispIntersectDiff_max )
+	{
+		if( bCount && fStats )
+		{
+			fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+			fStats->updateCutCounter( VGammaHadronCutsStatistics::eArrayDispDiff );
+		}
+		return false;
 	}
 	
 	return true;

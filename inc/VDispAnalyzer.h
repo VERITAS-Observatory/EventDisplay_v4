@@ -34,6 +34,7 @@ class VDispAnalyzer
 		unsigned int fNImages_min;
 		float fdistance_max;
 		float floss_max;
+		float fFui_min;
 		bool  fDispErrorWeighting;
 		float fDispErrorExponential;
 		
@@ -66,16 +67,16 @@ class VDispAnalyzer
 		vector<ULong64_t> fTelescopeTypeList;
 		vector<float> fTelescopeFOV;
 		
-		void calculateMeanShowerDirection( vector< float > v_x, vector< float > v_y, vector< float > v_weight,
+		void calculateMeanShowerDirection( vector< float >& v_x, vector< float >& v_y, vector< float >& v_weight,
 										   float& xs, float& ys, float& dispdiff, unsigned int iMaxN );
 										   
 		unsigned int find_smallest_diff_element(
-			vector< vector< float > > i_sign,
-			vector< float > x, vector< float > y,
-			vector< float > cosphi, vector< float > sinphi,
-			vector< float > tel_pointing_dx, vector< float > tel_pointing_dy,
-			vector< float > v_disp, vector< float > v_weight );
-		vector< vector< float > > get_sign_permuation_vector( unsigned int x_size );
+			vector< vector< float > >& i_sign,
+			vector< float >& x, vector< float >& y,
+			vector< float >& cosphi, vector< float >& sinphi,
+			vector< float >& tel_pointing_dx, vector< float >& tel_pointing_dy,
+			vector< float >& v_disp, vector< float >& v_weight );
+		vector< vector< float > > get_sign_permutation_vector( unsigned int x_size );
 		
 	public:
 	
@@ -93,7 +94,9 @@ class VDispAnalyzer
 							double xoff_4, double yoff_4,
 							double* iR,
 							double xcore, double ycore,
-							double xs, double ys );
+							double xs, double ys,
+							double* img_fui,
+							float* img_pedvar );
 							
 		void calculateEnergies( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
 								ULong64_t* iTelType,
@@ -104,16 +107,18 @@ class VDispAnalyzer
 								double* img_weight,
 								double xoff_4, double yoff_4,
 								double* iR, double iEHeight,
-								double iMCEnergy = -1. );
+								double iMCEnergy,
+								double* img_fui,
+								float* img_pedvar );
 								
 		void  calculateMeanDirection( float& xs, float& ys,
-									  vector< float > x, vector< float > y,
-									  vector< float > cosphi, vector< float > sinphi,
-									  vector< float > v_disp, vector< float > v_weight,
-									  vector< float > tel_pointing_dx,
-									  vector< float > tel_pointing_dy,
+									  vector< float >& x, vector< float >& y,
+									  vector< float >& cosphi, vector< float >& sinphi,
+									  vector< float >& v_disp, vector< float >& v_weight,
+									  vector< float >& tel_pointing_dx,
+									  vector< float >& tel_pointing_dy,
 									  float& dispdiff,
-									  float x_off4 = -999., float yoff_4 = -999.,
+									  float x_off4, float yoff_4,
 									  bool UseIntersectForHeadTail = false );
 									  
 		void calculateMeanDispDirection( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
@@ -124,8 +129,9 @@ class VDispAnalyzer
 										 double* img_tgrad, double* img_loss, int* img_ntubes,
 										 double* img_weight,
 										 double xoff_4, double yoff_4,
-										 vector< float > dispErrorT,
-										 vector< float > dispSignT,
+										 vector< float >& dispErrorT,
+										 vector< float >& dispSignT,
+										 double* img_fui,
 										 float* img_pedvar,
 										 double* pointing_dx, double* pointing_dy,
 										 bool UseIntersectForHeadTail );
@@ -138,12 +144,12 @@ class VDispAnalyzer
 				double* img_tgrad, double* img_loss, int* img_ntubes,
 				double* img_weight,
 				double xoff_4, double yoff_4,
-				float* img_pedvar );
+				double* img_fui, float* img_pedvar );
 				
 		float evaluate( float iWidth, float iLength, float iAsymm, float iDist,
 						float iSize, float iPedvar, float itgrad, float iLoss,
 						float icen_x, float icen_y, float xoff_4, float yoff_4, ULong64_t iTelType,
-						float iZe, float iAz, float iRcore = -99., float iNtubes = -1.,
+						float iZe, float iAz, float iRcore, float iFui, float iNtubes,
 						bool b2D = true );
 		float getAngDiff()
 		{
@@ -234,12 +240,14 @@ class VDispAnalyzer
 			fDispErrorExponential = iWeight;
 		}
 		void  setQualityCuts( unsigned int iNImages_min = 0, float iAxesAngles_min = 0.,
-							  float imaxdist = 1.e5, float imaxloss = 1. )
+							  float imaxdist = 1.e5, float imaxloss = 1.,
+							  float iminfui = 0. )
 		{
 			fAxesAngles_min = iAxesAngles_min;
 			fNImages_min    = iNImages_min;
 			fdistance_max   = imaxdist;
 			floss_max       = imaxloss;
+			fFui_min        = iminfui;
 		}
 		void  setTelescopeTypeList( vector<ULong64_t> iTelescopeTypeList );
 		void  setTelescopeFOV( vector< float > iTelFOV )

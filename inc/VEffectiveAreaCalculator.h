@@ -161,7 +161,7 @@ class VEffectiveAreaCalculator
 		
 		// angular resolution graphs (vector in az)
 		vector< TGraphErrors* > fGraph_AngularResolution68p;
-		vector< TGraphErrors* > fGraph_AngularResolution80p;
+		vector< TGraphErrors* > fGraph_AngularResolution95p;
 		/*
 		vector< vector< TH2F* > > hVAngularDiff_2D;
 		vector< vector< TH2F* > > hVAngularDiffEmc_2D;
@@ -307,7 +307,7 @@ class VEffectiveAreaCalculator
 		bool   binomialDivide( TGraphAsymmErrors* g, TH1D* hrec, TH1D* hmc );
 		void   copyProfileHistograms( TProfile*,  TProfile* );
 		void   copyHistograms( TH1*,  TH1*, bool );
-		void   fillAngularResolution( unsigned int i_az, bool iContaintment_80p );
+		void   fillAngularResolution( unsigned int i_az, bool iContaintment_95p );
 		double getAzMean( double azmin, double azmax );
 		double getCRWeight( double iEMC_TeV_log10, TH1* h, bool for_back_map = false );
 		template <typename T> vector< T > get_irf_vector( int i_nbins, T* i_e0, T* i_irf );
@@ -382,7 +382,7 @@ class VEffectiveAreaCalculator
 		void resetHistograms( unsigned int iZe );
 		void resetHistogramsVectors( unsigned int iZe );
 		void setAngularResolution2D( unsigned int i_az, vector< TH2D* > );
-		void setAngularResolutionGraph( unsigned int i_az, TGraphErrors* g, bool iAngContainment_80p );
+		void setAngularResolutionGraph( unsigned int i_az, TGraphErrors* g, bool iAngContainment_95p );
 		
 		void setAzimuthCut( int iAzBin, double iAzMin, double iAzMax );
 		void setEffectiveArea( int iMC )

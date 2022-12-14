@@ -140,6 +140,7 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	fDispAnalyzerDirection = 0;
 	fDispAnalyzerDirectionError = 0;
 	fDispAnalyzerDirectionSign = 0;
+	fDispAnalyzerEnergy = 0;
 }
 
 /*
@@ -411,6 +412,8 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 	// standard stereo reconstruction
 	fXoff = fshowerpars->Xoff[fMethod];
 	fYoff = fshowerpars->Yoff[fMethod];
+	fXoff_intersect = fshowerpars->Xoff[fMethod];
+	fYoff_intersect = fshowerpars->Yoff[fMethod];
 	fXoff_derot = fshowerpars->XoffDeRot[fMethod];
 	fYoff_derot = fshowerpars->YoffDeRot[fMethod];
 	fDispDiff = fshowerpars->DispDiff[fMethod];
@@ -514,6 +517,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			ftpars[i]->GetEntry( fEventCounter );
 			
 			fdist[i] = ftpars[i]->dist;
+			ffui[i] = ftpars[i]->fui;
 			fsize[i] = ftpars[i]->size;
 			fsize2[i] = ftpars[i]->size2;
 			floss[i] = ftpars[i]->loss;
@@ -603,6 +607,46 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		doStereoReconstruction();
 	}
 	
+	// dispEnergy
+	// energy reconstruction using the disp MVA
+	// This is preliminary and works for MC events only!
+	//
+	if( fDispAnalyzerEnergy )
+	{
+		fDispAnalyzerEnergy->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
+											 fTLRunParameter->fmaxdist,
+											 fTLRunParameter->fmaxloss,
+											 fTLRunParameter->fminfui );
+		fDispAnalyzerEnergy->calculateEnergies(
+			getNTel(),
+			fArrayPointing_Elevation, fArrayPointing_Azimuth,
+			fTel_type,
+			getSize( 1., true, false ),
+			fcen_x, fcen_y,
+			fcosphi, fsinphi,
+			fwidth, flength,
+			fasym, ftgrad_x,
+			floss, fntubes,
+			getWeight(),
+			fXoff, fYoff,
+			getDistanceToCoreTel(),
+			fEmissionHeightMean,
+			fMCEnergy,
+			ffui, fmeanPedvar_ImageT );
+			
+		// fill results
+		setEnergy( fDispAnalyzerEnergy->getEnergy(), false );
+		setChi2( fDispAnalyzerEnergy->getEnergyChi2(), false );
+		setdE( fDispAnalyzerEnergy->getEnergydES(), false );
+		
+		for( unsigned int i = 0; i < getNTel(); i++ )
+		{
+			setEnergyT( i, fDispAnalyzerEnergy->getEnergyT( i ), false );
+		}
+		setNEnergyT( fDispAnalyzerEnergy->getEnergyNT() );
+		setNEnergyQuality( fDispAnalyzerEnergy->getEnergyQualityLabel() );
+	}
+	
 	fEventCounter++;
 	return 1;
 }
@@ -656,12 +700,10 @@ void VTableLookupDataHandler::doStereoReconstruction()
 	if( fDispAnalyzerDirection
 			&& fNImages <= ( int )fTLRunParameter->fRerunStereoReconstruction_BDTNImages_max )
 	{
-	
-		vector< float > iDispError( getNTel(), -9999. );
-		
 		////////////////////////////////////////////////////////////////////
 		// estimate error on direction reconstruction from DISP method
 		////////////////////////////////////////////////////////////////////
+		vector< float > iDispError( getNTel(), -9999. );
 		if( fDispAnalyzerDirectionError )
 		{
 			iDispError = fDispAnalyzerDirectionError->calculateExpectedDirectionError_or_Sign(
@@ -676,7 +718,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 							 floss, fntubes,
 							 getWeight(),
 							 fXoff_intersect, fYoff_intersect,
-							 fmeanPedvar_ImageT );
+							 ffui, fmeanPedvar_ImageT );
 		}
 		////////////////////////////////////////////////////////////////////
 		// estimate disp head/tail sign
@@ -696,7 +738,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 							floss, fntubes,
 							getWeight(),
 							fXoff_intersect, fYoff_intersect,
-							fmeanPedvar_ImageT );
+							ffui, fmeanPedvar_ImageT );
 		}
 		
 		// use weighting calculated from disp error
@@ -704,6 +746,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 				fTLRunParameter->fDispError_BDTWeight );
 		fDispAnalyzerDirection->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
 												fTLRunParameter->fmaxdist,
+												fTLRunParameter->fmaxloss,
 												fTLRunParameter->fmaxloss );
 		fDispAnalyzerDirection->setTelescopeFOV( fTelFOV );
 		fDispAnalyzerDirection->calculateMeanDispDirection(
@@ -719,7 +762,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 			getWeight(),
 			fXoff_intersect, fYoff_intersect,
 			iDispError, iDispSign,
-			fmeanPedvar_ImageT,
+			ffui, fmeanPedvar_ImageT,
 			fpointing_dx, fpointing_dy,
 			fTLRunParameter->fDisp_UseIntersectForHeadTail );
 		// reconstructed direction by disp method:
@@ -1213,6 +1256,21 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		fDispAnalyzerDirectionSign->setTelescopeTypeList( i_TelTypeList );
 		fDispAnalyzerDirectionSign->initialize( fTLRunParameter->fDispSign_BDTFileName, "TMVABDT", "BDTDispSign" );
 	}
+	/////////////////////////////////////////
+	// initialize Disp Analyzer for energy reconstruction
+	// (if required)
+	if( fTLRunParameter->fEnergyReconstruction_BDTFileName.size() > 0. )
+	{
+		cout << endl;
+		cout << "*******************************************************" << endl;
+		cout << "WARNING: dispBDT energy reconstruction not fully tested" << endl;
+		cout << "*******************************************************" << endl;
+		cout << "Initializing BDT disp analyzer for energy reconstruction" << endl;
+		cout << "===========================================================" << endl << endl;
+		fDispAnalyzerEnergy = new VDispAnalyzer();
+		fDispAnalyzerEnergy->setTelescopeTypeList( i_TelTypeList );
+		fDispAnalyzerEnergy->initialize( fTLRunParameter->fEnergyReconstruction_BDTFileName, "TMVABDT", "BDTDispEnergy" );
+	}
 	if( fDebug )
 	{
 		cout << "VTableLookupDataHandler::setInputFile() END" << endl;
@@ -1529,6 +1587,8 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 	fOTree->Branch( "EChi2S", &fechi2S, iTT );
 	sprintf( iTT, "dES/D" );
 	fOTree->Branch( "dES", &fdES, iTT );
+	fOTree->Branch( "NErecST", &fnenergyT, iTT );
+	fOTree->Branch( "ErecQL", &fenergyQL, "ErecQL/I" );
 	
 	sprintf( iTT, "EmissionHeight/F" );
 	fOTree->Branch( "EmissionHeight", &fEmissionHeightMean, iTT );
@@ -2029,6 +2089,7 @@ void VTableLookupDataHandler::reset()
 	{
 		fR[i] = -99.;
 		fE[i] = -99.;
+		fRTel[i] = -99.;
 		fES[i] = -99.;
 		ftmscl[i] = -99.;
 		ftmscw[i] = -99.;
@@ -2036,6 +2097,8 @@ void VTableLookupDataHandler::reset()
 		ftmscl_sigma[i] = -99.;
 	}
 	fnmscw = 0;
+	fnenergyT = 0;
+	fenergyQL = -1;
 	fmscl = -99.;
 	fmscw = -99.;
 	fmwr  = -99.;
@@ -2082,10 +2145,12 @@ void VTableLookupDataHandler::calcDistances()
 		if( fImgSel_list[tel] && fZe >= 0. && fXcore > -9998. && fYcore > -9998. )
 		{
 			fR[tel] = VUtilities::line_point_distance( fYcore, -1.*fXcore, 0., fZe, fAz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
+			fRTel[tel] = VUtilities::line_point_distance( fYcore, -1.*fXcore, 0., 90. - fArrayPointing_Elevation, fArrayPointing_Azimuth, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
 		}
 		else
 		{
 			fR[tel] = -99.;
+			fRTel[tel] = -99.;
 		}
 	}
 }
@@ -2109,6 +2174,7 @@ void VTableLookupDataHandler::resetImageParameters( unsigned int i )
 	}
 	
 	fdist[i] = 0.;
+	ffui[i] = 0.;
 	fsize[i] = 0.;
 	fsize2[i] = 0.;
 	floss[i] = 0.;
@@ -2316,6 +2382,7 @@ void VTableLookupDataHandler::resetAll()
 	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
 	{
 		fdist[i] = 0.;
+		ffui[i] = 0.;
 		fsize[i] = 0.;
 		fsize2[i] = 0.;
 		fsizeCorr[i] = 0.;
@@ -2347,6 +2414,7 @@ void VTableLookupDataHandler::resetAll()
 		fFitstat[i] = 0;
 		ftchisq_x[i] = 0.;
 		fR[i] = 0.;
+		fRTel[i] = 0.;
 		fR_telType[i] = 0.;
 		ftmscw[i] = 0.;
 		ftmscl[i] = 0.;
@@ -2360,6 +2428,8 @@ void VTableLookupDataHandler::resetAll()
 		ftheta2_All[i] = 99.;
 	}
 	fnmscw = 0;
+	fnenergyT = 0;
+	fenergyQL = -1;
 	fmscw = 0.;
 	fmscl = 0.;
 	fmwr  = 0.;

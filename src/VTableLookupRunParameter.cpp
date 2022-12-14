@@ -37,12 +37,14 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	fminsize = 0.;
 	fmaxdist = 50000.;
 	fmaxloss = 1.;
+	fminfui = 0.;
 	fSelectRandom = -1.;
 	fSelectRandomSeed = 17;
 	fRerunStereoReconstruction = false;
 	fRerunStereoReconstruction_minAngle = -1.;
 	fRerunStereoReconstruction_BDTNImages_max = 4;
 	fRerunStereoReconstruction_BDTFileName = "";
+	fEnergyReconstruction_BDTFileName = "";
 	fDispError_BDTFileName = "";
 	fDispError_BDTWeight = 5.;
 	fDispSign_BDTFileName = "";
@@ -205,6 +207,15 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 				exit( EXIT_FAILURE );
 			}
 		}
+		// BDT directory and file name for disp stereo reconstruction (energy)
+		else if( iTemp.find( "-tmva_filename_energy_reconstruction" ) < iTemp.size() )
+		{
+			if( iTemp2.size() > 0 )
+			{
+				fEnergyReconstruction_BDTFileName = iTemp2;
+				i++;
+			}
+		}
 		// BDT directory and file name for disp stereo reconstruction (disperror)
 		else if( iTemp.find( "-tmva_filename_disperror_reconstruction" ) < iTemp.size() )
 		{
@@ -278,6 +289,10 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		else if( iTemp.find( "-maxloss" ) < iTemp.size() )
 		{
 			fmaxloss = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
+		else if( iTemp.find( "-minfui" ) < iTemp.size() )
+		{
+			fminfui = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
 		else if( iTemp.find( "-maxdistancetocameracenter" ) < iTemp.size() )
 		{
@@ -546,6 +561,10 @@ void VTableLookupRunParameter::print( int iP )
 			if( fmaxloss < 1. )
 			{
 				cout << "\t BDT TMVA stereo reconstruction loss cut < " << fmaxloss << endl;
+			}
+			if( fminfui > 0. )
+			{
+				cout << "\t BDT TMVA stereo reconstruction fui cut < " << fminfui << endl;
 			}
 			cout << "\t Head/tail uncertainty: ";
 			if( fDisp_UseIntersectForHeadTail )
