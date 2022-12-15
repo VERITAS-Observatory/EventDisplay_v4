@@ -193,6 +193,7 @@ void VGammaHadronCuts::resetCutValues()
 	
 	fCut_DispIntersectDiff_min = -1000.;
 	fCut_DispIntersectDiff_max = 1.e10;
+    fCut_DispIntersectSuccess = 1;
 	
 	fProbabilityCut = 0.5;
 	
@@ -531,6 +532,11 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				fCut_DispIntersectDiff_min = atof( temp.c_str() );
 				is_stream >> temp;
 				fCut_DispIntersectDiff_max = atof( temp.c_str() );
+                if( !( is_stream >> std::ws ).eof() )
+                {
+                    is_stream >> temp;
+                    fCut_DispIntersectSuccess = atoi( temp.c_str() );
+                }
 			}
 			else if( iCutVariable == "arrayemission" || iCutVariable == "emissionheight" )
 			{
@@ -918,7 +924,12 @@ void VGammaHadronCuts::printDirectionCuts()
     {
         cout << "Direction cut on difference between disp and intersection method: ";
         cout << ", minimum : " << fCut_DispIntersectDiff_min << " [deg] ";
-        cout << ", maximum : " << fCut_DispIntersectDiff_max << " [deg] " << endl;
+        cout << ", maximum : " << fCut_DispIntersectDiff_max << " [deg] ";
+        if( fCut_DispIntersectSuccess > 0 )
+        {
+            cout << " (require success of both reconstruction methods)";
+        }
+        cout << endl;
     }
 }
 
@@ -1270,6 +1281,15 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 	float i_disp_diff = sqrt(
 							( fData->Xoff - fData->Xoff_intersect ) * ( fData->Xoff - fData->Xoff_intersect ) +
 							( fData->Yoff - fData->Yoff_intersect ) * ( fData->Yoff - fData->Yoff_intersect ) );
+    if( fCut_DispIntersectSuccess && (fData->Xoff_intersect < -90. || fData->Yoff_intersect < -90. ) )
+	{
+		if( bCount && fStats )
+		{
+			fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+			fStats->updateCutCounter( VGammaHadronCutsStatistics::eArrayDispDiff );
+		}
+		return false;
+	}
 	if( i_disp_diff < fCut_DispIntersectDiff_min || i_disp_diff > fCut_DispIntersectDiff_max )
 	{
 		if( bCount && fStats )
