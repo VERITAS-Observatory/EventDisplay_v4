@@ -68,6 +68,8 @@ map< ULong64_t, unsigned int > fMapOfNTelescopeType;
 
     BDTDisp
     BDTDispError
+    BDTDispCrossError
+    BDTDispSign
     BDTDispEnergy
     BDTDispCore
 
@@ -173,9 +175,9 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	dataloader->AddVariable( "asym", 'F' );
 	dataloader->AddVariable( "loss", 'F' );
 	dataloader->AddVariable( "dist", 'F' );
+	dataloader->AddVariable( "fui"  , 'F' );
 	if( iTargetML.find( "DispEnergy" ) != string::npos && !iSingleTelescopeAnalysis )
 	{
-		// TODO: correct EHeight calculation
 		dataloader->AddVariable( "EHeight", 'F' );
 		dataloader->AddVariable( "Rcore", 'F' );
 	}
@@ -204,14 +206,33 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	{
 		dataloader->AddSpectator( "disp", 'F' );
 		dataloader->AddSpectator( "dispError", 'F' );
+		dataloader->AddSpectator( "dispSign", 'F' );
 		dataloader->AddTarget( "dispPhi", 'F' );
 	}
-	// train for error on disp reconstruction
+	// train for error on disp reconstruction (method error)
 	else if( iTargetML.find( "DispError" ) != string::npos )
 	{
 		dataloader->AddSpectator( "disp", 'F' );
 		dataloader->AddSpectator( "dispPhi", 'F' );
+		dataloader->AddSpectator( "dispSign", 'F' );
 		dataloader->AddTarget( "dispError", 'F', "dispError", 0., 10. );
+	}
+	// train on cross error
+	else if( iTargetML.find( "DispCrossError" ) != string::npos )
+	{
+		dataloader->AddSpectator( "disp", 'F' );
+		dataloader->AddSpectator( "dispPhi", 'F' );
+		dataloader->AddSpectator( "dispSign", 'F' );
+		dataloader->AddSpectator( "dispError", 'F' );
+		dataloader->AddTarget( "dispCrossError", 'F', "dispCrossError", 0., 10. );
+	}
+	// train for disp sign (head/tail)
+	else if( iTargetML.find( "DispSign" ) != string::npos )
+	{
+		dataloader->AddSpectator( "disp", 'F' );
+		dataloader->AddSpectator( "dispPhi", 'F' );
+		dataloader->AddSpectator( "dispError", 'F' );
+		dataloader->AddTarget( "dispSign", 'F', "dispSign", -2., 2. );
 	}
 	// train for core reconstruction
 	else if( iTargetML.find( "DispCore" ) != string::npos )
@@ -222,7 +243,9 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	else
 	{
 		dataloader->AddSpectator( "dispError", 'F' );
+		dataloader->AddSpectator( "dispCrossError", 'F' );
 		dataloader->AddSpectator( "dispPhi", 'F' );
+		dataloader->AddSpectator( "dispSign", 'F' );
 		dataloader->AddTarget( "disp", 'F' );
 	}
 	// add weights (optional)
@@ -349,56 +372,6 @@ bool readTrainingFile( string iTargetML, ULong64_t iTelType, string iDataDirecto
 	return true;
 }
 
-/*
- * read list of valid telescopes from a typical telescope (array) list
- *
- */
-vector< bool > readArrayList( unsigned int i_ntel, string iArrayList, vector< unsigned int > iHyperArrayID )
-{
-	vector< bool > iTelList( i_ntel, true );
-	
-	if( iArrayList.size() > 0 )
-	{
-		// switch all telescopes off
-		iTelList.assign( iTelList.size(), false );
-		
-		// open telescope list file
-		ifstream is;
-		is.open( iArrayList.c_str(), ifstream::in );
-		if( !is )
-		{
-			cout << "readArrayList() error reading list of arrays from " << endl;
-			cout << iArrayList << endl;
-			cout << "exiting..." << endl;
-			exit( EXIT_FAILURE );
-		}
-		cout << "reading list of telescope from " << iArrayList << endl;
-		string iLine;
-		while( getline( is, iLine ) )
-		{
-			if( iLine.size() > 0 )
-			{
-				istringstream is_stream( iLine );
-				unsigned int T = ( unsigned int )atoi( is_stream.str().c_str() );
-				// find position of telescope in hyper array list
-				for( unsigned int i = 0; i < iHyperArrayID.size(); i++ )
-				{
-					if( T == iHyperArrayID[i] )
-					{
-						if( i < iTelList.size() )
-						{
-							iTelList[i] = true;
-						}
-					}
-				}
-			}
-		}
-	}
-	return iTelList;
-}
-
-
-
 /******************************************************************************************
 
    write the training file used for the TMVA training
@@ -445,16 +418,9 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 		cout << "\t FOV for telescope " << iHyperArrayID.back() << ": " << iFOV_tel.back() << endl;
 	}
 	
-	// read list of telescope from usual array lists
-	vector< bool > fUseTelescope = readArrayList( i_ntel, iArrayList, iHyperArrayID );
-	if( fUseTelescope.size() != i_ntel )
-	{
-		cout << "Error in telescope list size: " << fUseTelescope.size() << ", " << i_ntel << endl;
-		cout << "Exiting..." << endl;
-		exit( EXIT_FAILURE );
-	}
+	// use all telescope for reconstruction
+	vector< bool > fUseTelescope( i_ntel, true );
 	
-	//
 	// vector with telescope position
 	// (includes all telescopes, even those
 	// of other types)
@@ -526,12 +492,15 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 	float MCze = -1.;
 	float disp = -1.;
 	float dispError = -1.;
+	float dispSign = 1.;
 	float NImages = -1.;
 	float cross = -1.;
+	float dispCrossError = -1.;
 	float dispPhi = -1.;
 	float dispEnergy = -1.;
 	float dispCore = -1.;
 	float dist = -1.;
+	float fui = -1.;
 	float tgrad_x = -1.;
 	float meanPedvar_Image = -1.;
 	float ze = -1.;
@@ -580,6 +549,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "length", &length, "length/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "wol", &wol, "wol/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "dist", &dist, "dist/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "fui"        , &fui        , "fui/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "tgrad_x", &tgrad_x, "tgrad_x/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "meanPedvar_Image", &meanPedvar_Image, "meanPedvar_Image/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "Fitstat", &Fitstat, "Fitstat/I" );
@@ -605,11 +575,12 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "Az", &az, "Az/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "disp", &disp, "disp/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispError", &dispError, "dispError/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispSign", &dispSign, "dispSign/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "cross", &cross, "cross/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispPhi", &dispPhi, "dispPhi/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispCrossError", &dispCrossError, "dispCrossError/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispEnergy", &dispEnergy, "dispEnergy/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispCore", &dispCore, "dispCore/F" );
-			
 		}
 	}
 	
@@ -811,7 +782,8 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			// check if event is not completely out of the FOV
 			// (use 20% x size of the camera)
 			if( i < iFOV_tel.size()
-					&& sqrt( i_showerpars.MCxoff * i_showerpars.MCxoff + i_showerpars.MCyoff * i_showerpars.MCyoff ) > iFOV_tel[i] * 0.5 * 1.2 )
+					&& sqrt( i_showerpars.MCxoff * i_showerpars.MCxoff
+							 + i_showerpars.MCyoff * i_showerpars.MCyoff ) > iFOV_tel[i] * 0.5 * 1.2 )
 			{
 				continue;
 			}
@@ -846,6 +818,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 				wol = 0.;
 			}
 			dist        = i_tpars[i]->dist;
+			fui         = i_tpars[i]->fui;
 			tgrad_x     = i_tpars[i]->tgrad_x;
 			meanPedvar_Image = i_tpars[i]->meanPedvar_Image;
 			Fitstat     = i_tpars[i]->Fitstat;
@@ -892,6 +865,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 				cross = sqrt( ( cen_y + Yoff ) * ( cen_y + Yoff )
 							  + ( cen_x - Xoff ) * ( cen_x - Xoff ) );
 			}
+			dispCrossError = disp - cross;
 			dispPhi = TMath::ATan2( sinphi, cosphi ) - TMath::ATan2( cen_y + MCyoff, cen_x - MCxoff );
 			
 			// disp error: the expected difference between true and
@@ -900,6 +874,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			// of the image length axis with the true direction, not the error
 			// due to a wrong prediction of disp by the BDT
 			dispError = 0;
+			dispSign = 1.;
 			float x1 = cen_x - disp * cosphi;
 			float x2 = cen_x + disp * cosphi;
 			float y1 = cen_y - disp * sinphi;
@@ -908,10 +883,12 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 					< sqrt( ( x2 - MCxoff ) * ( x2 - MCxoff ) + ( y2 + MCyoff ) * ( y2 + MCyoff ) ) )
 			{
 				dispError = sqrt( ( x1 - MCxoff ) * ( x1 - MCxoff ) + ( y1 + MCyoff ) * ( y1 + MCyoff ) );
+				dispSign = 1.;
 			}
 			else
 			{
 				dispError = sqrt( ( x2 - MCxoff ) * ( x2 - MCxoff ) + ( y2 + MCyoff ) * ( y2 + MCyoff ) );
+				dispSign = -1.;
 			}
 			
 			// training target in ratio to size
@@ -975,7 +952,6 @@ int main( int argc, char* argv[] )
 		cout << "                       (for VTS - these are telescope numbers)" << endl;
 		cout << "     optional: train for energy/core reconstruction = \"BDTDispEnergy\"/\"BDTDispCore\"";
 		cout << "(default = \"BDTDisp\": train for angular reconstrution)" << endl;
-		cout << "     NOTE! dispEnergy not fully implemented. Do not use." << endl;
 		cout << endl;
 		exit( EXIT_SUCCESS );
 	}
@@ -1038,7 +1014,8 @@ int main( int argc, char* argv[] )
 	if( fTrainTest <= 0.0 || fTrainTest >= 1.0 )
 	{
 		cout << endl;
-		cout << "Error, 4th argument <train vs test fraction> = '" << fTrainTest << "' must fall in the range 0.0 < x < 1.0" << endl;
+		cout << "Error, 4th argument <train vs test fraction> = '";
+		cout << fTrainTest << "' must fall in the range 0.0 < x < 1.0" << endl;
 		cout << endl;
 		exit( EXIT_FAILURE );
 	}
@@ -1061,13 +1038,15 @@ int main( int argc, char* argv[] )
 	}
 	//////////////////////
 	// fill training file
-	if( iDataDirectory.size() == 0 && !writeTrainingFile( fInputFile, iTelType, iRecID, iLayoutFile, redo_stereo_reconstruction ) )
+	if( iDataDirectory.size() == 0
+			&& !writeTrainingFile( fInputFile, iTelType, iRecID, iLayoutFile, redo_stereo_reconstruction ) )
 	{
 		cout << "error writing training file " << endl;
 		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
 	}
-	else if( iDataDirectory.size() != 0 && !readTrainingFile( iTargetML, iTelType, iDataDirectory ) )
+	else if( iDataDirectory.size() != 0
+			 && !readTrainingFile( iTargetML, iTelType, iDataDirectory ) )
 	{
 		cout << "error reading training file " << endl;
 		cout << "exiting..." << endl;
@@ -1077,7 +1056,9 @@ int main( int argc, char* argv[] )
 	// write training tree to output file
 	iO.cd();
 	map< ULong64_t, TTree* >::iterator fMapOfTrainingTree_iter;
-	for( fMapOfTrainingTree_iter = fMapOfTrainingTree.begin(); fMapOfTrainingTree_iter != fMapOfTrainingTree.end(); ++fMapOfTrainingTree_iter )
+	for( fMapOfTrainingTree_iter = fMapOfTrainingTree.begin();
+			fMapOfTrainingTree_iter != fMapOfTrainingTree.end();
+			++fMapOfTrainingTree_iter )
 	{
 		if( fMapOfTrainingTree_iter->second )
 		{
@@ -1089,7 +1070,9 @@ int main( int argc, char* argv[] )
 	//////////////////////
 	// train TMVA
 	cout << "Number of telescope types: " << fMapOfTrainingTree.size() << endl;
-	for( fMapOfTrainingTree_iter = fMapOfTrainingTree.begin(); fMapOfTrainingTree_iter != fMapOfTrainingTree.end(); ++fMapOfTrainingTree_iter )
+	for( fMapOfTrainingTree_iter = fMapOfTrainingTree.begin();
+			fMapOfTrainingTree_iter != fMapOfTrainingTree.end();
+			++fMapOfTrainingTree_iter )
 	{
 		bool iSingleTel = false;
 		if( fMapOfNTelescopeType.find( fMapOfTrainingTree_iter->first ) != fMapOfNTelescopeType.end() )

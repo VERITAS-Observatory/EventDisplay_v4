@@ -363,6 +363,9 @@ void VDataMCComparision::defineHistograms()
 		fHistoSingleTel[EPEDVART].push_back( new VDataMCComparisionHistogramData( "pedvarT", fName, i ) );
 		fHistoSingleTel[EPEDVART].back()->initHistogram( "pedvar (T)",  100, 5., 10. );
 		
+		fHistoSingleTel[EDISPT].push_back( new VDataMCComparisionHistogramData( "disp", fName, i ) );
+		fHistoSingleTel[EDISPT].back()->initHistogram( "disp (T)",  100, 0., 2.5 );
+		
 		sprintf( hname, "hcen_xy%d_%s", i, fName.c_str() );
 		hcen_xy.push_back( new TH2D( hname, "", 100, -2., 2., 100, -2., 2. ) );
 		hcen_xy.back()->SetXTitle( "image centroid (x) [deg]" );
@@ -803,17 +806,9 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 		if( fSingleTelescopeCuts > 0 )
 		{
 			// get telescope and check if telescope is available
-			int iTelIndex = -99;
-			for( int i = 0; i < fData->NImages; i++ )
-			{
-				if( fSingleTelescopeCuts - 1 == ( int )fData->ImgSel_list[i] )
-				{
-					iTelIndex = i;
-					break;
-				}
-			}
+			int iTelIndex = fSingleTelescopeCuts - 1;
 			// required telescope did not participate
-			if( iTelIndex < 0 )
+			if( iTelIndex < 0 || iTelIndex > 3 )
 			{
 				continue;
 			}
@@ -888,9 +883,9 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 				if( fData->MSCWT[iTelImage] > 0. && fHistoSingleTel[EMWRT].size() > 0
 						&& iTelImage < fHistoSingleTel[EMWRT].size() && fHistoSingleTel[EMWRT][iTelImage] )
 				{
-					fHistoSingleTel[EMWRT][iTelImage]->fill( fData->width[j] / fData->MSCWT[iTelImage],
+					fHistoSingleTel[EMWRT][iTelImage]->fill( fData->width[iTelImage] / fData->MSCWT[iTelImage],
 							weight, log10( fData->ErecS ),
-							fData->ntubes[j], fData->size[j],
+							fData->ntubes[iTelImage], fData->size[iTelImage],
 							fData->fraclow[iTelImage] );
 				}
 				if( fHistoSingleTel[EMSCWT].size() > 0 && iTelImage < fHistoSingleTel[EMWRT].size()
@@ -898,7 +893,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 				{
 					fHistoSingleTel[EMSCWT][iTelImage]->fill( fData->MSCWT[iTelImage],
 							weight, log10( fData->ErecS ),
-							fData->ntubes[j], fData->size[j],
+							fData->ntubes[iTelImage], fData->size[iTelImage],
 							fData->fraclow[iTelImage] );
 				}
 			}
@@ -921,20 +916,20 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 				// telescope ID
 				UInt_t iTelImage = fData->ImgSel_list[j];
 				
-				if( fData->MSCLT[j] > 0. && fHistoSingleTel[EMLTT].size() > 0
+				if( fData->MSCLT[iTelImage] > 0. && fHistoSingleTel[EMLTT].size() > 0
 						&& iTelImage < fHistoSingleTel[EMLTT].size() && fHistoSingleTel[EMLTT][iTelImage] )
 				{
-					fHistoSingleTel[EMLTT][iTelImage]->fill( fData->length[j] / fData->MSCLT[iTelImage],
+					fHistoSingleTel[EMLTT][iTelImage]->fill( fData->length[iTelImage] / fData->MSCLT[iTelImage],
 							weight, log10( fData->ErecS ),
-							fData->ntubes[j], fData->size[j],
+							fData->ntubes[iTelImage], fData->size[iTelImage],
 							fData->fraclow[iTelImage] );
 				}
 				if( fHistoSingleTel[EMSCLT].size() > 0 && iTelImage < fHistoSingleTel[EMSCLT].size()
 						&& fHistoSingleTel[EMSCLT][iTelImage] )
 				{
-					fHistoSingleTel[EMSCLT][j]->fill( fData->MSCLT[iTelImage], weight, log10( fData->ErecS ),
-													  fData->ntubes[j], fData->size[j],
-													  fData->fraclow[iTelImage] );
+					fHistoSingleTel[EMSCLT][iTelImage]->fill( fData->MSCLT[iTelImage], weight, log10( fData->ErecS ),
+							fData->ntubes[iTelImage], fData->size[iTelImage],
+							fData->fraclow[iTelImage] );
 				}
 			}
 			if( fHistoArray[EMLR] )
@@ -1007,7 +1002,6 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 				fHistoArray[EAAZ]->fill( 90. - fData->Ze, weight );
 			}
 			
-			
 			///////////////////////////////////////////////////////////////
 			// core position relative to each telescope
 			for( int j = 0; j < fData->NImages; j++ )
@@ -1015,13 +1009,13 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 				// telescope ID
 				UInt_t iTelImage = fData->ImgSel_list[j];
 				
-				if( fData->ntubes[j] > ntubes_min )
+				if( fData->ntubes[iTelImage] > ntubes_min )
 				{
 					rdist1 = VUtilities::line_point_distance( fData->Ycore, -1.*fData->Xcore, 0., fData->Ze, fData->Az,
 							 fTel_y[iTelImage], -1.*fTel_x[iTelImage], fTel_z[iTelImage] );
 					// camera distance is calculated relative to centre of camera (should be: wobble offset position)
-					hdistR[j]->Fill( rdist1, sqrt( fData->cen_x[iTelImage]*fData->cen_x[iTelImage]
-												   + fData->cen_y[iTelImage]*fData->cen_y[iTelImage] ), weight );
+					hdistR[iTelImage]->Fill( rdist1, sqrt( fData->cen_x[iTelImage]*fData->cen_x[iTelImage]
+														   + fData->cen_y[iTelImage]*fData->cen_y[iTelImage] ), weight );
 				}
 			}
 			
@@ -1030,135 +1024,140 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 			//  (loop over all images -> use selected images only)
 			for( int t = 0; t < fData->NImages; t++ )
 			{
-				// get telescope number (0...3)
-				int j = fData->ImgSel_list[t];
+				// telescope ID (0...3)
+				UInt_t iTelImage = fData->ImgSel_list[t];
 				
 				// telescope wise quality cuts
-				if( fData->ntubes[t] > ntubes_min && fData->size[t] > 0. && fData->ErecS > 0. )
+				if( fData->ntubes[iTelImage] > ntubes_min && fData->size[t] > 0. && fData->ErecS > 0. )
 				{
-					if( fHistoSingleTel[ELENGTH][j] )
+					if( fHistoSingleTel[ELENGTH][iTelImage] )
 					{
-						fHistoSingleTel[ELENGTH][j]->fill( fData->length[t], weight, log10( fData->ErecS ),
-														   fData->ntubes[t], fData->size[t],
-														   fData->fraclow[j] );
+						fHistoSingleTel[ELENGTH][iTelImage]->fill( fData->length[iTelImage], weight, log10( fData->ErecS ),
+								fData->ntubes[iTelImage], fData->size[iTelImage],
+								fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[EWIDTH][j] )
+					if( fHistoSingleTel[EWIDTH][iTelImage] )
 					{
-						fHistoSingleTel[EWIDTH][j]->fill( fData->width[t], weight, log10( fData->ErecS ),
-														  fData->ntubes[t], fData->size[t],
-														  fData->fraclow[j] );
+						fHistoSingleTel[EWIDTH][iTelImage]->fill( fData->width[iTelImage], weight, log10( fData->ErecS ),
+								fData->ntubes[iTelImage], fData->size[iTelImage],
+								fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[ENTUBES][j] )
+					if( fHistoSingleTel[ENTUBES][iTelImage] )
 					{
-						fHistoSingleTel[ENTUBES][j]->fill( fData->ntubes[t], weight, log10( fData->ErecS ), fData->ntubes[t],
-														   fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[ENTUBES][iTelImage]->fill( fData->ntubes[iTelImage], weight, log10( fData->ErecS ), fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[ENLOWGAIN][j] && fData->nlowgain[j] )
+					if( fHistoSingleTel[ENLOWGAIN][iTelImage] && fData->nlowgain[iTelImage] )
 					{
-						fHistoSingleTel[ENLOWGAIN][j]->fill( fData->nlowgain[j], weight, log10( fData->ErecS ), fData->ntubes[t],
-															 fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[ENLOWGAIN][iTelImage]->fill( fData->nlowgain[iTelImage], weight, log10( fData->ErecS ), fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[EDIST][j] )
+					if( fHistoSingleTel[EDIST][iTelImage] )
 					{
-						fHistoSingleTel[EDIST][j]->fill( fData->dist[t], weight, log10( fData->ErecS ), fData->ntubes[t],
-														 fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[EDIST][iTelImage]->fill( fData->dist[iTelImage], weight, log10( fData->ErecS ), fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[ESIZE][j] )
+					if( fHistoSingleTel[ESIZE][iTelImage] )
 					{
-						fHistoSingleTel[ESIZE][j]->fill( log10( fData->size[t] ), weight, log10( fData->ErecS ),
-														 fData->ntubes[t],
-														 fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[ESIZE][iTelImage]->fill( log10( fData->size[iTelImage] ), weight, log10( fData->ErecS ),
+								fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[ESIZEHG][j] )
+					if( fHistoSingleTel[ESIZEHG][iTelImage] )
 					{
-						fHistoSingleTel[ESIZEHG][j]->fill( log10( fData->size[t] - fData->size[t]*fData->fraclow[j] ),
-														   weight, log10( fData->ErecS ), fData->ntubes[t],
-														   fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[ESIZEHG][iTelImage]->fill( log10( fData->size[iTelImage] - fData->size[iTelImage]*fData->fraclow[iTelImage] ),
+								weight, log10( fData->ErecS ), fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[ESIZELG][j] && fData->fraclow[j] > 0. )
+					if( fHistoSingleTel[ESIZELG][iTelImage] && fData->fraclow[iTelImage] > 0. )
 					{
-						fHistoSingleTel[ESIZELG][j]->fill( log10( fData->size[t]*fData->fraclow[j] ), weight,
-														   log10( fData->ErecS ), fData->ntubes[t],
-														   fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[ESIZELG][iTelImage]->fill( log10( fData->size[iTelImage]*fData->fraclow[iTelImage] ), weight,
+								log10( fData->ErecS ), fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[EFRACLOW][j] )
+					if( fHistoSingleTel[EFRACLOW][iTelImage] )
 					{
-						fHistoSingleTel[EFRACLOW][j]->fill( fData->fraclow[j], weight, log10( fData->ErecS ),
-															fData->ntubes[t],
-															fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[EFRACLOW][iTelImage]->fill( fData->fraclow[iTelImage], weight, log10( fData->ErecS ),
+								fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[EMAX1][j] && fData->max1[j] > 0. )
+					if( fHistoSingleTel[EMAX1][iTelImage] && fData->max1[iTelImage] > 0. )
 					{
-						fHistoSingleTel[EMAX1][j]->fill( log10( fData->max1[j] ), weight, log10( fData->ErecS ),
-														 fData->ntubes[t],
-														 fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[EMAX1][iTelImage]->fill( log10( fData->max1[iTelImage] ), weight, log10( fData->ErecS ),
+								fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[EMAX2][j] && fData->max2[j] > 0. )
+					if( fHistoSingleTel[EMAX2][iTelImage] && fData->max2[iTelImage] > 0. )
 					{
-						fHistoSingleTel[EMAX2][j]->fill( log10( fData->max2[j] ), weight, log10( fData->ErecS ),
-														 fData->ntubes[t],
-														 fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[EMAX2][iTelImage]->fill( log10( fData->max2[iTelImage] ), weight, log10( fData->ErecS ),
+								fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[EMAX3][j] && fData->max3[j] > 0. )
+					if( fHistoSingleTel[EMAX3][iTelImage] && fData->max3[iTelImage] > 0. )
 					{
-						fHistoSingleTel[EMAX3][j]->fill( log10( fData->max3[j] ), weight, log10( fData->ErecS ),
-														 fData->ntubes[t], fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[EMAX3][iTelImage]->fill( log10( fData->max3[iTelImage] ), weight, log10( fData->ErecS ),
+								fData->ntubes[iTelImage], fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[EALPHA][j] )
+					if( fHistoSingleTel[EALPHA][iTelImage] )
 					{
-						fHistoSingleTel[EALPHA][j]->fill( fData->alpha[j], weight, log10( fData->ErecS ),
-														  fData->ntubes[t], fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[EALPHA][iTelImage]->fill( fData->alpha[iTelImage], weight, log10( fData->ErecS ),
+								fData->ntubes[iTelImage], fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[ELOS][j] && fData->size[t] > 0. )
+					if( fHistoSingleTel[ELOS][iTelImage] && fData->size[iTelImage] > 0. )
 					{
-						fHistoSingleTel[ELOS][j]->fill( fData->length[t] / fData->size[t] * 1000., weight,
-														log10( fData->ErecS ), fData->ntubes[t],
-														fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[ELOS][iTelImage]->fill( fData->length[iTelImage] / fData->size[iTelImage] * 1000., weight,
+																log10( fData->ErecS ), fData->ntubes[iTelImage],
+																fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[ELOSS][j] )
+					if( fHistoSingleTel[ELOSS][iTelImage] )
 					{
-						fHistoSingleTel[ELOSS][j]->fill( fData->loss[t], weight, log10( fData->ErecS ), fData->ntubes[t],
-														 fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[ELOSS][iTelImage]->fill( fData->loss[iTelImage], weight, log10( fData->ErecS ), fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[EASYM][j] )
+					if( fHistoSingleTel[EASYM][iTelImage] )
 					{
-						fHistoSingleTel[EASYM][j]->fill( fData->asym[j], weight, log10( fData->ErecS ), fData->ntubes[t],
-														 fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[EASYM][iTelImage]->fill( fData->asym[iTelImage], weight, log10( fData->ErecS ), fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[ECENX][j] )
+					if( fHistoSingleTel[ECENX][iTelImage] )
 					{
-						fHistoSingleTel[ECENX][j]->fill( fData->cen_x[j], weight, log10( fData->ErecS ), fData->ntubes[t],
-														 fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[ECENX][iTelImage]->fill( fData->cen_x[iTelImage], weight, log10( fData->ErecS ), fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[ECENY][j] )
+					if( fHistoSingleTel[ECENY][iTelImage] )
 					{
-						fHistoSingleTel[ECENY][j]->fill( fData->cen_y[j], weight, log10( fData->ErecS ), fData->ntubes[t],
-														 fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[ECENY][iTelImage]->fill( fData->cen_y[iTelImage], weight, log10( fData->ErecS ), fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[ETGRADX][j] )
+					if( fHistoSingleTel[ETGRADX][iTelImage] )
 					{
-						fHistoSingleTel[ETGRADX][j]->fill( fData->tgrad_x[t], weight, log10( fData->ErecS ), fData->ntubes[t],
-														   fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[ETGRADX][iTelImage]->fill( fData->tgrad_x[iTelImage], weight, log10( fData->ErecS ), fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[ETELDIST][j] )
+					if( fHistoSingleTel[ETELDIST][iTelImage] )
 					{
-						fHistoSingleTel[ETELDIST][j]->fill( fData->R[t], weight, log10( fData->ErecS ), fData->ntubes[t],
-															fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[ETELDIST][iTelImage]->fill( fData->R[iTelImage], weight, log10( fData->ErecS ), fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[ERECRAT][j] && fData->ErecS > 0. && fData->ES[t] > 0. )
+					if( fHistoSingleTel[ERECRAT][iTelImage] && fData->ErecS > 0. && fData->ES[iTelImage] > 0. )
 					{
-						fHistoSingleTel[ERECRAT][j]->fill( fData->ES[t] / fData->ErecS, weight, log10( fData->ErecS ), fData->ntubes[t],
-														   fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[ERECRAT][iTelImage]->fill( fData->ES[iTelImage] / fData->ErecS, weight, log10( fData->ErecS ), fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[EPEDVART][j] )
+					if( fHistoSingleTel[EPEDVART][iTelImage] )
 					{
-						fHistoSingleTel[EPEDVART][j]->fill( fData->meanPedvar_ImageT[j], weight, log10( fData->ErecS ), fData->ntubes[t],
-															fData->size[t], fData->fraclow[j] );
+						fHistoSingleTel[EPEDVART][iTelImage]->fill( fData->meanPedvar_ImageT[iTelImage], weight, log10( fData->ErecS ), fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
 					}
-					if( fHistoSingleTel[ERECRAT][j] && fData->ErecS > 0. )
-						if( hcen_xy[j] )
+					if( fHistoSingleTel[EDISPT][iTelImage] )
+					{
+						fHistoSingleTel[EDISPT][iTelImage]->fill( fData->Disp_T[t], weight, log10( fData->ErecS ), fData->ntubes[iTelImage],
+								fData->size[iTelImage], fData->fraclow[iTelImage] );
+					}
+					if( fHistoSingleTel[ERECRAT][iTelImage] && fData->ErecS > 0. )
+						if( hcen_xy[iTelImage] )
 						{
-							hcen_xy[j]->Fill( fData->cen_x[j], fData->cen_y[j], weight );
+							hcen_xy[iTelImage]->Fill( fData->cen_x[iTelImage], fData->cen_y[iTelImage], weight );
 						}
 				}
 			}
@@ -1304,7 +1303,6 @@ TH1D*  VDataMCComparision::getAzimuthWeightingHistogram( string ifile )
 	delete iC;
 	
 	return hAzWeight;
-	
 }
 
 /*

@@ -77,6 +77,7 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		double fMC_distance_to_cameracenter_max;
 		double       fmaxdist;   // note: same for all telescope types
 		double       fmaxloss;   // note: same for all telescope types
+		double       fminfui ;   // note: same for all telescope types
 		double       fminsize;   // note: same for all telescope times
 		// seed for random selection of showers before table filling
 		double fSelectRandom;
@@ -95,8 +96,11 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		double fRerunStereoReconstruction_minAngle;
 		string fRerunStereoReconstruction_BDTFileName;
 		unsigned int fRerunStereoReconstruction_BDTNImages_max;
+		string fEnergyReconstruction_BDTFileName;
 		string fDispError_BDTFileName;
 		float  fDispError_BDTWeight;
+		string fDispSign_BDTFileName;
+		bool fDisp_UseIntersectForHeadTail;
 		
 		// functions...
 		VTableLookupRunParameter();
@@ -106,6 +110,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		void print( int iB = 0 );
 		void printHelp();
 		
-		ClassDef( VTableLookupRunParameter, 28 );
+		ClassDef( VTableLookupRunParameter, 30 );
 };
 #endif

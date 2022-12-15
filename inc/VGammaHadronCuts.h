@@ -235,6 +235,9 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		double fCut_CoreDistanceEdgeSize;
 		double fCut_SizeSecondMax_min;
 		double fCut_SizeSecondMax_max;
+		double fCut_DispIntersectDiff_min;
+		double fCut_DispIntersectDiff_max;
+		int    fCut_DispIntersectSuccess;
 		double fProbabilityCut;
 		vector <double> fProbabilityCutRangeLower;
 		vector <double> fProbabilityCutRangeUpper;
@@ -433,6 +436,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			return fUseOrbitalPhaseCuts;
 		}
 		
-		ClassDef( VGammaHadronCuts, 56 );
+		ClassDef( VGammaHadronCuts, 58 );
 };
 #endif

@@ -41,6 +41,7 @@ class VTMVADispAnalyzer
 		float fAz;
 		float fLoss;
 		float fDist;
+		float fFui;
 		float fAsymm;
 		float fXcore;
 		float fYcore;
@@ -56,8 +57,8 @@ class VTMVADispAnalyzer
 		float evaluate( float iWidth, float iLength, float iSize, float iAsymm, float iLoss,
 						float iTGrad, float icen_x, float icen_y, float xoff_4, float yoff_4,
 						ULong64_t iTelType, float iZe, float iAz, float iRcore,
-						float iEHeight = -1., float iDist = -1., float iNtubes = -1,
-						float iPedVar = -1. );
+						float iEHeight, float iDist, float iFui, float iNtubes,
+						float iPedVar );
 		bool isZombie()
 		{
 			return bZombie;

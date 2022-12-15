@@ -32,6 +32,7 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
 	fYcore = 0.;
 	fcross = 0.;
 	fDist = 0.;
+	fFui = 0.;
 	fRcore = 0.;
 	fEHeight = 0.;
 	
@@ -49,6 +50,8 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
 	float sinphi = 0.;
 	float temp1 = 0.;
 	float temp2 = 0.;
+	float temp3 = 0.;
+	float temp4 = 0.;
 	
 	// list of telescope types: required to selected correct BDT weight file
 	fTelescopeTypeList = iTelTypeList;
@@ -73,6 +76,10 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
 	else if( fDispType == "BDTDispError" )
 	{
 		cout << "disp angular uncertainty estimation";
+	}
+	else if( fDispType == "BDTDispSign" )
+	{
+		cout << "disp angular sign estimation";
 	}
 	else
 	{
@@ -135,6 +142,7 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
 		fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "asym", &fAsymm );
 		fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "loss", &fLoss );
 		fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "dist", &fDist );
+		fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "fui", &fFui );
 		if( fDispType == "BDTDispEnergy" && !iSingleTelescopeAnalysis )
 		{
 			fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "EHeight", &fEHeight );
@@ -157,12 +165,21 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
 		if( fDispType == "BDTDisp" )
 		{
 			fTMVAReader[fTelescopeTypeList[i]]->AddSpectator( "dispError", &temp2 );
+			fTMVAReader[fTelescopeTypeList[i]]->AddSpectator( "dispCrossError", &temp4 );
 			fTMVAReader[fTelescopeTypeList[i]]->AddSpectator( "dispPhi", &temp1 );
+			fTMVAReader[fTelescopeTypeList[i]]->AddSpectator( "dispSign", &temp3 );
 		}
 		else if( fDispType == "BDTDispError" )
 		{
 			fTMVAReader[fTelescopeTypeList[i]]->AddSpectator( "disp", &temp2 );
 			fTMVAReader[fTelescopeTypeList[i]]->AddSpectator( "dispPhi", &temp1 );
+			fTMVAReader[fTelescopeTypeList[i]]->AddSpectator( "dispSign", &temp3 );
+		}
+		else if( fDispType == "BDTDispSign" )
+		{
+			fTMVAReader[fTelescopeTypeList[i]]->AddSpectator( "disp", &temp2 );
+			fTMVAReader[fTelescopeTypeList[i]]->AddSpectator( "dispPhi", &temp1 );
+			fTMVAReader[fTelescopeTypeList[i]]->AddSpectator( "dispError", &temp3 );
 		}
 		
 		if( !fTMVAReader[fTelescopeTypeList[i]]->BookMVA( "BDTDisp", iFileName.str().c_str() ) )
@@ -182,7 +199,7 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
 */
 float VTMVADispAnalyzer::evaluate( float iWidth, float iLength, float iSize, float iAsymm, float iLoss, float iTGrad,
 								   float icen_x, float icen_y, float xoff_4, float yoff_4, ULong64_t iTelType,
-								   float iZe, float iAz, float iRcore, float iEHeight, float iDist, float iNtubes,
+								   float iZe, float iAz, float iRcore, float iEHeight, float iDist, float iFui, float iNtubes,
 								   float iPedVar )
 {
 	fWidth = iWidth;
@@ -231,6 +248,7 @@ float VTMVADispAnalyzer::evaluate( float iWidth, float iLength, float iSize, flo
 	fRcore = iRcore;
 	fEHeight = iEHeight;
 	fDist = iDist;
+	fFui  = iFui;
 	
 	if( fTMVAReader.find( iTelType ) != fTMVAReader.end() && fTMVAReader[iTelType] )
 	{

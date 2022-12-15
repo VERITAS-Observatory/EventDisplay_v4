@@ -112,6 +112,10 @@ class CData
 		Double_t        tgrad_x[VDST_MAXTELESCOPES];
 		Double_t        tchisq_x[VDST_MAXTELESCOPES];
 		Int_t           Fitstat[VDST_MAXTELESCOPES];
+		Float_t         DispXoff_T[VDST_MAXTELESCOPES];
+		Float_t         DispYoff_T[VDST_MAXTELESCOPES];
+		Float_t         DispWoff_T[VDST_MAXTELESCOPES];
+		Float_t         Disp_T[VDST_MAXTELESCOPES];
 		Double_t        R[VDST_MAXTELESCOPES];
 		Double_t        MSCWT[VDST_MAXTELESCOPES];
 		Double_t        MSCLT[VDST_MAXTELESCOPES];
@@ -136,6 +140,8 @@ class CData
 		//[NTelPairs]
 		Float_t         EmissionHeightT[VDST_MAXTELESCOPES* VDST_MAXTELESCOPES];
 		Double_t        DispDiff;  // from disp method
+		Float_t         Xoff_intersect;
+		Float_t         Yoff_intersect;
 		
 		// List of branches
 		TBranch*        b_runNumber;              //!
@@ -232,6 +238,8 @@ class CData
 		TBranch*        b_NTelPairs;              //!
 		TBranch*        b_EmissionHeightT;        //!
 		TBranch*        b_DispDiff; //disp
+		TBranch*        b_Xoff_intersect;
+		TBranch*        b_Yoff_intersect;
 		
 		CData( TTree* tree = 0, bool bMC = false, int iVersion = 5, bool bShort = false );
 		virtual ~CData();
@@ -667,6 +675,10 @@ void CData::Init( TTree* tree )
 		fChain->SetBranchAddress( "sinphi", sinphi );
 		fChain->SetBranchAddress( "tgrad_x", tgrad_x );
 		fChain->SetBranchAddress( "Fitstat", Fitstat );
+		fChain->SetBranchAddress( "DispXoff_T", DispXoff_T );
+		fChain->SetBranchAddress( "DispYoff_T", DispYoff_T );
+		fChain->SetBranchAddress( "DispWoff_T", DispWoff_T );
+		fChain->SetBranchAddress( "Disp_T", Disp_T );
 		fChain->SetBranchAddress( "tchisq_x", tchisq_x );
 	}
 	else
@@ -699,6 +711,10 @@ void CData::Init( TTree* tree )
 			sinphi[i] = 0.;
 			tgrad_x[i] = 0.;
 			Fitstat[i] = 0;
+			DispXoff_T[i] = 0.;
+			DispYoff_T[i] = 0.;
+			DispWoff_T[i] = 0.;
+			Disp_T[i] = 0.;
 			tchisq_x[i] = 0.;
 		}
 	}
@@ -798,6 +814,22 @@ void CData::Init( TTree* tree )
 	else
 	{
 		DispDiff = 0.;
+	}
+	if( fChain->GetBranchStatus( "Xoff_intersect" ) )
+	{
+		fChain->SetBranchAddress( "Xoff_intersect", &Xoff_intersect );
+	}
+	else
+	{
+		Xoff_intersect = 0.;
+	}
+	if( fChain->GetBranchStatus( "Yoff_intersect" ) )
+	{
+		fChain->SetBranchAddress( "Yoff_intersect", &Yoff_intersect );
+	}
+	else
+	{
+		Yoff_intersect = 0.;
 	}
 	
 	Notify();
@@ -949,6 +981,22 @@ Bool_t CData::Notify()
 	else
 	{
 		b_DispDiff = 0;
+	}
+	if( fChain->GetBranchStatus( "Xoff_intersect" ) )
+	{
+		b_Xoff_intersect = fChain->GetBranch( "Xoff_intersect" );
+	}
+	else
+	{
+		b_Xoff_intersect = 0;
+	}
+	if( fChain->GetBranchStatus( "Yoff_intersect" ) )
+	{
+		b_Yoff_intersect = fChain->GetBranch( "Yoff_intersect" );
+	}
+	else
+	{
+		b_Yoff_intersect = 0;
 	}
 	
 	return kTRUE;

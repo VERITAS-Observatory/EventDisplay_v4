@@ -31,6 +31,7 @@ void VGammaHadronCutsStatistics::initialize()
 	fCutName.push_back( "  QC Erec         " );
 	fCutName.push_back( "  QC CorePos      " );
 	fCutName.push_back( "  QC LTrig        " );
+	fCutName.push_back( "  QC DispDiff     " );
 	fCutName.push_back( "SizeSecondMax     " );
 	fCutName.push_back( "TelType           " );
 	fCutName.push_back( "Direction         " );
