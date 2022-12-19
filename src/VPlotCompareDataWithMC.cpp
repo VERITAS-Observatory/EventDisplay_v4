@@ -2539,7 +2539,7 @@ void VPlotCompareDataWithMC::plot( string iPrintName )
 	}
 	for( unsigned int i = 1; i <= 4; i++ )
 	{
-		cP = plot_energyDependentDistributions( "disp", 2, 0., 2.5, "SIMSDIFF", i, -99., "Erec" );
+		cP = plot_energyDependentDistributions( "disp", 2, -2.5, 2.5, "SIMSDIFF", i, -99., "Erec" );
 		if( cP )
 		{
 			cP->Print( hname );
@@ -2547,7 +2547,7 @@ void VPlotCompareDataWithMC::plot( string iPrintName )
 	}
 	for( unsigned int i = 1; i <= 4; i++ )
 	{
-		cP = plot_energyDependentDistributions( "disp", 2, 0., 2.5, "SIMSDIFF", i, -99., "size" );
+		cP = plot_energyDependentDistributions( "disp", 2, -2.5, 2.5, "SIMSDIFF", i, -99., "size" );
 		if( cP )
 		{
 			cP->Print( hname );
@@ -2555,7 +2555,7 @@ void VPlotCompareDataWithMC::plot( string iPrintName )
 	}
 	for( unsigned int i = 1; i <= 4; i++ )
 	{
-		cP = plot_energyDependentDistributions( "disp", 2, 0., 2.5, "SIMSDIFF", i, -99., "ntubes" );
+		cP = plot_energyDependentDistributions( "disp", 2, -2.5, 2.5, "SIMSDIFF", i, -99., "ntubes" );
 		if( cP )
 		{
 			cP->Print( hname );
