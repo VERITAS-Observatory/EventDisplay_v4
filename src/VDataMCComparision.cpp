@@ -364,7 +364,7 @@ void VDataMCComparision::defineHistograms()
 		fHistoSingleTel[EPEDVART].back()->initHistogram( "pedvar (T)",  100, 5., 10. );
 		
 		fHistoSingleTel[EDISPT].push_back( new VDataMCComparisionHistogramData( "disp", fName, i ) );
-		fHistoSingleTel[EDISPT].back()->initHistogram( "disp (T)",  100, 0., 2.5 );
+		fHistoSingleTel[EDISPT].back()->initHistogram( "disp (T)",  100, -2.5, 2.5 );
 		
 		sprintf( hname, "hcen_xy%d_%s", i, fName.c_str() );
 		hcen_xy.push_back( new TH2D( hname, "", 100, -2., 2., 100, -2., 2. ) );
