@@ -3,7 +3,6 @@
 
    *** might need some attention ***
 
-   \author Gernot Maier
 */
 
 /*
