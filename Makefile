@@ -636,7 +636,6 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 		./obj/VInterpolate2DHistos.o ./obj/VInterpolate2DHistos_Dict.o \
 		./obj/VSpectralEnergyDistribution.o ./obj/VSpectralEnergyDistribution_Dict.o \
-		./obj/VPlotArrayReconstruction.o ./obj/VPlotArrayReconstruction_Dict.o \
 		./obj/VSensitivityCalculator.o ./obj/VSensitivityCalculator_Dict.o \
 		./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o \
 		./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o \
