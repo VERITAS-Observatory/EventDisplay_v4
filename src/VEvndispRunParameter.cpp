@@ -944,16 +944,20 @@ string VEvndispRunParameter::getInstrumentEpoch( bool iMajor, bool iUpdateInstru
    read instrument epoch from file
    (typically VERITAS.Epochs.runparameter)
 */
-bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpocheFile,
-		bool iReadInstrumentEpoch )
+bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpochFile, string iKeyWord )
 {
-	if( iEpocheFile != "usedefault" )
+	if( iEpochFile != "usedefault" )
 	{
-		fEpochFile = iEpocheFile;
+		fEpochFile = iEpochFile;
 	}
 	if( fEpochFile.size() == 0 )
 	{
 		return true;
+	}
+	if( iKeyWord != "EPOCH" && iKeyWord != "ATMOSPHERE" )
+	{
+		cout << "Error reading instrument epochs; invalid keyword: " << iKeyWord << endl;
+		exit( EXIT_FAILURE );
 	}
 	
 	ifstream is;
@@ -973,9 +977,6 @@ bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpocheFile,
 	string is_line;
 	string temp;
 	string itemp_epoch = "not_found";
-	int itemp_atmo = 0;
-	int run_min = 0;
-	int run_max = 0;
 	while( getline( is, is_line ) )
 	{
 		if( is_line.size() == 0 )
@@ -984,32 +985,13 @@ bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpocheFile,
 		}
 		istringstream is_stream( is_line );
 		is_stream >> temp >> temp;
-		if( iReadInstrumentEpoch && temp == "EPOCH" )
-		{
-			if( !( is_stream >> std::ws ).eof() )
-			{
-				is_stream >> itemp_epoch;
-			}
-			if( !( is_stream >> std::ws ).eof() )
-			{
-				is_stream >> run_min;
-			}
-			if( !( is_stream >> std::ws ).eof() )
-			{
-				is_stream >> run_max;
-			}
-			if( frunnumber >= run_min && frunnumber <= run_max )
-			{
-				break;
-			}
-		}
-		else if( temp == "ATMOSPHERE" )
+		if( temp == iKeyWord )
 		{
 			string i_sql_min;
 			string i_sql_max;
 			if( !( is_stream >> std::ws ).eof() )
 			{
-				is_stream >> itemp_atmo;
+				is_stream >> itemp_epoch;
 			}
 			if( !( is_stream >> std::ws ).eof() )
 			{
@@ -1045,13 +1027,13 @@ bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpocheFile,
 			}
 		}
 	}
-	if( iReadInstrumentEpoch )
+	if( iKeyWord == "EPOCH" )
 	{
 		fInstrumentEpoch = itemp_epoch;
 	}
 	else
 	{
-		fAtmosphereID = itemp_atmo;
+		fAtmosphereID = atoi( itemp_epoch.c_str() );
 	}
 	is.close();
 	return true;
@@ -1061,7 +1043,7 @@ unsigned int VEvndispRunParameter::getAtmosphereID( bool iUpdateInstrumentEpoch 
 {
 	if( iUpdateInstrumentEpoch )
 	{
-		updateInstrumentEpochFromFile( "usedefault", false );
+		updateInstrumentEpochFromFile( "usedefault", "ATMOSPHERE" );
 	}
 	
 	return fAtmosphereID;
