@@ -19,9 +19,9 @@ VTMVARunData::VTMVARunData()
 	fOutputDirectoryName = "";
 	fOutputFileName = "";
 	
-	fQualityCuts = "";
-	fQualityCutsBkg = "";
-	fMCxyoffCut = "";
+	fQualityCuts = "1";
+	fQualityCutsBkg = "1";
+	fMCxyoffCut = "1";
 	fMCxyoffCutSignalOnly = false;
 	fPrepareTrainingOptions = "SplitMode=random:!V";
 	
@@ -112,7 +112,12 @@ bool VTMVARunData::openDataFiles()
 					{
 						if( fSignalTree[k] )
 						{
-							fSignalTree[k]->Draw( ">>+signalList", fQualityCuts && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut && fZenithCutData[j]->fZenithCut, "entrylist" );
+							fSignalTree[k]->Draw( ">>+signalList", 
+                                    fQualityCuts
+                                    && fMCxyoffCut &&
+                                    fEnergyCutData[i]->fEnergyCut &&
+                                    fZenithCutData[j]->fZenithCut,
+                                    "entrylist" );
 							i_j_SignalList = ( TEntryList* )gDirectory->Get( "signalList" );
 						}
 					}
@@ -122,7 +127,8 @@ bool VTMVARunData::openDataFiles()
 						cout << "number of signal events in energy bin " << i << " zenith bin " << j << ": ";
 						cout << i_j_SignalList->GetN() << "\t required > " << fMinSignalEvents << endl;
 						cout << "  (cuts are " << fQualityCuts << "&&" << fMCxyoffCut;
-						cout << "&&" << fEnergyCutData[i]->fEnergyCut  << "&&" << fZenithCutData[j]->fZenithCut << ")" << endl;
+						cout << "&&" << fEnergyCutData[i]->fEnergyCut  << "&&" << fZenithCutData[j]->fZenithCut;
+                        cout << ")" << endl;
 						if( i_j_SignalList->GetN() < fMinSignalEvents )
 						{
 							iEnoughEvents = false;
@@ -137,12 +143,16 @@ bool VTMVARunData::openDataFiles()
 					{
 						if( fMCxyoffCutSignalOnly ) // Do we need this?
 						{
-							fBackgroundTree[k]->Draw( ">>+BackgroundList", fQualityCuts && fQualityCutsBkg && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut && fZenithCutData[j]->fZenithCut, "entrylist" );
+							fBackgroundTree[k]->Draw( ">>+BackgroundList", fQualityCuts && fQualityCutsBkg
+                                    && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut 
+                                    && fZenithCutData[j]->fZenithCut, "entrylist" );
 							i_j_BackgroundList = ( TEntryList* )gDirectory->Get( "BackgroundList" );
 						}
 						else if( fBackgroundTree[k] )
 						{
-							fBackgroundTree[k]->Draw( ">>+BackgroundList", fQualityCuts && fQualityCutsBkg && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut && fZenithCutData[j]->fZenithCut, "entrylist" );
+							fBackgroundTree[k]->Draw( ">>+BackgroundList", fQualityCuts && fQualityCutsBkg
+                                    && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut
+                                    && fZenithCutData[j]->fZenithCut, "entrylist" );
 							i_j_BackgroundList = ( TEntryList* )gDirectory->Get( "BackgroundList" );
 						}
 					}
@@ -152,11 +162,8 @@ bool VTMVARunData::openDataFiles()
 						cout << i_j_BackgroundList->GetN();
 						cout << "\t required > " << fMinBackgroundEvents << endl;
 						cout << "  (cuts are " << fQualityCuts << "&&" << fQualityCutsBkg << "&&" << fMCxyoffCut;
-						if( fMCxyoffCutSignalOnly ) // Do we need this?
-						{
-							cout << " (signal only) " ;
-						}
-						cout << "&&" << fEnergyCutData[i]->fEnergyCut  << "&&" << fZenithCutData[j]->fZenithCut << ")" << endl;
+						cout << "&&" << fEnergyCutData[i]->fEnergyCut  << "&&" << fZenithCutData[j]->fZenithCut;
+                        cout << ")" << endl;
 						if( i_j_BackgroundList->GetN() < fMinBackgroundEvents )
 						{
 							iEnoughEvents = false;
@@ -178,7 +185,6 @@ bool VTMVARunData::openDataFiles()
 	
 	///////////////////////////////////////////////////////////////////
 	// open output file
-	cout << "output file name size " << fOutputFileName.size() << endl;
 	if( fOutputFileName.size() > 0 && fOutputDirectoryName.size() > 0 )
 	{
 		for( unsigned int i = 0; i < fEnergyCutData.size(); i++ )
@@ -191,17 +197,20 @@ bool VTMVARunData::openDataFiles()
 				gSystem->mkdir( fOutputDirectoryName.c_str() );
 				if( fEnergyCutData.size() > 1 && fZenithCutData.size() > 1 )
 				{
-					iTempS << fOutputDirectoryName << "/" << fOutputFileName << "_" << i << "_" << j << ".root";    // append a _# at the file name
+					iTempS << fOutputDirectoryName << "/" << fOutputFileName;
+                    iTempS << "_" << i << "_" << j << ".root";    // append a _# at the file name
 					iTempS2 << fOutputFileName << "_" << i << "_" << j;
 				}
 				else if( fEnergyCutData.size() > 1 && fZenithCutData.size() <= 1 )
 				{
-					iTempS << fOutputDirectoryName << "/" << fOutputFileName << "_" << i << ".root";    // append a _# at the file name
+					iTempS << fOutputDirectoryName << "/" << fOutputFileName;
+                    iTempS << "_" << i << ".root";    // append a _# at the file name
 					iTempS2 << fOutputFileName << "_" << i;
 				}
 				else if( fZenithCutData.size() > 1 &&  fEnergyCutData.size() <= 1 )
 				{
-					iTempS << fOutputDirectoryName << "/" << fOutputFileName << "_0_" << j << ".root";    // append a _# at the file name
+					iTempS << fOutputDirectoryName << "/" << fOutputFileName;
+                    iTempS << "_0_" << j << ".root";    // append a _# at the file name
 					iTempS2 << fOutputFileName << "_0_" << i;
 				}
 				else
@@ -212,24 +221,25 @@ bool VTMVARunData::openDataFiles()
 				output_zenith.push_back( new TFile( iTempS.str().c_str(), "RECREATE" ) );
 				if( output_zenith.back()->IsZombie() )
 				{
-					cout << "VTMVARunData::openDataFiles() error creating output file " << output_zenith.back()->GetName() << endl;
+					cout << "VTMVARunData::openDataFiles() error creating output file ";
+                    cout << output_zenith.back()->GetName() << endl;
 					cout << "aborting..." << endl;
 					return false;
 				}
 				output_zenith.back()->SetTitle( iTempS2.str().c_str() );
-				if( fEnergyCutData[i] )
+				if(  i < fEnergyCutData.size() && fEnergyCutData[i] )
 				{
 					fEnergyCutData[i]->Write();
 				}
-				if( fZenithCutData[j] )
+				if( j < fZenithCutData.size() && fZenithCutData[j] )
 				{
 					fZenithCutData[j]->Write();
 				}
+                output_zenith.back()->Write();
 			}
 			fOutputFile.push_back( output_zenith );
 		}
 	}
-	cout << "output file size " << fOutputFile.size()*fOutputFile[0].size() << endl;
 	
 	if( fDebug )
 	{
