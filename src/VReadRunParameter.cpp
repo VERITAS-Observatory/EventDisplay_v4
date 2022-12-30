@@ -1860,7 +1860,7 @@ bool VReadRunParameter::readEpochsAndAtmospheres()
 	cout << "reading epoch for given run and date from " << fRunPara->fEpochFile << endl;
 	if( fRunPara->fInstrumentEpoch == "noepoch" )
 	{
-		fRunPara->updateInstrumentEpochFromFile( fRunPara->fEpochFile, true );
+		fRunPara->updateInstrumentEpochFromFile( fRunPara->fEpochFile, "EPOCH" );
 	}
 	else
 	{
@@ -1868,7 +1868,7 @@ bool VReadRunParameter::readEpochsAndAtmospheres()
 	}
 	if( fRunPara->fAtmosphereID == 0 )
 	{
-		fRunPara->updateInstrumentEpochFromFile( fRunPara->fEpochFile, false );
+		fRunPara->updateInstrumentEpochFromFile( fRunPara->fEpochFile, "ATMOSPHERE" );
 	}
 	else
 	{

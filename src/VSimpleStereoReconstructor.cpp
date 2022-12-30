@@ -275,6 +275,7 @@ bool VSimpleStereoReconstructor::reconstruct_direction( unsigned int i_ntel,
 	{
 		return false;
 	}
+	fShower_Chi2 = 0.;
 	return true;
 }
 

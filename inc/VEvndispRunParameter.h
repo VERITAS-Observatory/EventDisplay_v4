@@ -320,7 +320,9 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		}
 		void         setPulseZeroIndex();
 		void         setSystemParameters();
-		bool         updateInstrumentEpochFromFile( string iEpocheFile = "usedefault", bool iReadInstrumentEpoch = true );
+		bool         updateInstrumentEpochFromFile(
+			string iEpochFile = "usedefault",
+			string iKeyWord = "ATMOSPHERE" );
 		bool         useDB()
 		{
 			return fuseDB;
@@ -330,6 +332,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return ( fDBTextDirectory.size() > 0 );
 		}
 		
-		ClassDef( VEvndispRunParameter, 2004 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 2005 ); //(increase this number)
 };
 #endif

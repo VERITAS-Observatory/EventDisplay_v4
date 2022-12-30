@@ -5,8 +5,6 @@
 
    plot sensitivities from Crab Nebula data or simulations(CTA or VERITAS)
 
-   Author: Gernot Maier, Heike Prokoph
-
 */
 
 #include "TCanvas.h"
