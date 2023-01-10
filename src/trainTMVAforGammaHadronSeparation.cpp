@@ -433,7 +433,7 @@ int main( int argc, char* argv[] )
 		cout << "./trainTMVAforGammaHadronSeparation <configuration file>" << endl;
 		cout << endl;
 		cout << "  (an example for a configuration file can be found in " << endl;
-		cout << "   $CTA_EVNDISP_AUX_DIR/ParameterFiles/TMVA.BDT.runparameter )" << endl;
+		cout << "   $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/TMVA.BDT.runparameter )" << endl;
 		cout << endl;
 		exit( EXIT_SUCCESS );
 	}
