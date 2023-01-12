@@ -190,7 +190,7 @@ bool train( VTMVARunData* iRun,
 	//////////////////////////////////////////
 	// defining training class
 	TMVA::Factory* factory = new TMVA::Factory( iRun->fOutputFile[iEnergyBin][iZenithBin]->GetTitle(), iRun->fOutputFile[iEnergyBin][iZenithBin], "V" );
-	TMVA::DataLoader* dataloader = new TMVA::DataLoader( "dataset" );
+	TMVA::DataLoader* dataloader = new TMVA::DataLoader( "" );
 	////////////////////////////
 	// train gamma/hadron separation
 	if( iTrainGammaHadronSeparation )
