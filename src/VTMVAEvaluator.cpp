@@ -1,10 +1,6 @@
 /*! \class VTMVAEvaluator
     \brief use a TMVA weight file for energy dependent gamma/hadron separation
 
-    TODO list
-
-    - test theta2(E) optimization
-
 */
 
 #include "VTMVAEvaluator.h"
@@ -134,7 +130,8 @@ vector< string > VTMVAEvaluator::getTrainingVariables( string iXMLFile, vector< 
     initialize TMVA readers
 
 */
-bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
+bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
+		unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
 		unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax,
 		double iEnergyStepSize, string iInstrumentEpoch )
 {
@@ -355,7 +352,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 						 fTMVAData.back()->fZenithCut_min, fTMVAData.back()->fZenithCut_max );
 				fTMVAData.back()->SetTitle( hname );
 				
-				sprintf( hname, "MVA%d%d", i, j );
+				sprintf( hname, "%d%d", i, j );
 				fTMVAData.back()->fTMVAMethodTag = hname;
 				if( iNbinZ > 1 )
 				{
@@ -1231,6 +1228,24 @@ void VTMVAEvaluator::printSignalEfficiency()
 		cout << endl;
 	}
 	cout << noshowpoint << endl;
+}
+
+/*
+ * print MVA cut values after optimization to be used
+ * in gamma/hadron cuts files
+ */
+void VTMVAEvaluator::printOptimizedMVACutValues( string iEpoch )
+{
+	cout << "Printing Optimised cuts for gamma/hadron cut values" << endl;
+	cout << "\t this is only correct for an energyStepSize of -1" << endl;
+	cout << "* TMVA_MVACut " << iEpoch;
+	for( unsigned int i = 0; i < fTMVAData.size(); i++ )
+	{
+		cout << " " << fTMVAData[i]->fTMVAMethodTag;
+		cout << " " << fTMVAData[i]->fTMVACutValue;
+	}
+	cout << endl;
+	cout << "(first digit: energy bin, second digit: zenith bin)" << endl;
 }
 
 /*
@@ -2520,6 +2535,7 @@ VTMVAEvaluatorData::VTMVAEvaluatorData()
 	fTMVAFileName = "";
 	fTMVAFileNameXML = "";
 	fTMVAMethodTag = "";
+	fTMVAMethodTag_2 = "";
 	fEnergyCut_Log10TeV_min = -99.;
 	fEnergyCut_Log10TeV_max = -99.;
 	fSpectralWeightedMeanEnergy_Log10TeV = -99.;

@@ -209,6 +209,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		}
 		TGraphAsymmErrors* plotSignalAndBackgroundEfficiencies( bool iLogY = true, double iYmin = 1.e-4, double iMVA_min = -1., double iMVA_max = 1. );
 		void   printAngularContainmentRadius();
+		void   printOptimizedMVACutValues( string iEpoch = "V6" );
 		void   printSensitivityOptimizationParameters();
 		void   printSignalEfficiency();
 		void   printSourceStrength_CU();
@@ -275,7 +276,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		}
 		void   setTMVAMethod( string iMethodName = "BDT" );
 		
-		ClassDef( VTMVAEvaluator, 31 );
+		ClassDef( VTMVAEvaluator, 32 );
 };
 
 #endif
