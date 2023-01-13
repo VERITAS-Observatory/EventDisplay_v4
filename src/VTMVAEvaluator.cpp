@@ -182,10 +182,10 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 			ostringstream iFullFileName;
 			ostringstream iFullFileNameXML;
 			iFullFileName << fTMVAMethodName << "_" << iWeightFileIndex_Emin + i;
-            iFullFileName << "_" << iWeightFileIndex_Zmin + j;
+			iFullFileName << "_" << iWeightFileIndex_Zmin + j;
 			iFullFileName << ".root";
 			iFullFileNameXML << fTMVAMethodName <<  "_" << iWeightFileIndex_Emin + i;
-            iFullFileNameXML << "_" << iWeightFileIndex_Zmin + j;
+			iFullFileNameXML << "_" << iWeightFileIndex_Zmin + j;
 			iFullFileNameXML << "_" << fTMVAMethodName << "_0.weights.xml";
 			TFile iF( iFullFileName.str().c_str() );
 			bool bGoodRun = true;
