@@ -149,6 +149,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		float    fDummy;
 		
 		bool     bPlotEfficiencyPlotsPerBin;
+		bool     fPrintPlotting;
 		
 		TH1F*            getEfficiencyHistogram( string iName, TFile* iF, string iMethodTag_2 );
 		double           getMeanEnergyAfterCut( TFile* f, double iCut, unsigned int iDataBin );
@@ -245,6 +246,10 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		void   setPlotEfficiencyPlotsPerBin( bool iB = false )
 		{
 			bPlotEfficiencyPlotsPerBin = iB;
+		}
+		void   setPrintPlotting( bool iPrintPlotting = false )
+		{
+			fPrintPlotting = iPrintPlotting;
 		}
 		void   setSignalEfficiency( double iSignalEfficiency = -99. );
 		void   setSignalEfficiency( map< unsigned int, double > iMSignalEfficiency );
