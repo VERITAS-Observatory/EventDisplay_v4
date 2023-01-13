@@ -678,7 +678,6 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VImageParameter.o  \
 		./obj/VPlotWPPhysSensitivity.o ./obj/VPlotWPPhysSensitivity_Dict.o \
 		./obj/VSiteData.o \
-		./obj/VPlotTMVAParameters.o ./obj/VPlotTMVAParameters_Dict.o \
 		./obj/VWPPhysSensitivityPlotsMaker.o ./obj/VWPPhysSensitivityPlotsMaker_Dict.o \
 		./obj/VPedestalLowGain.o ./obj/VPedestalLowGain_Dict.o \
 		./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
