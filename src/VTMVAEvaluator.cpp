@@ -181,18 +181,11 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 		{
 			ostringstream iFullFileName;
 			ostringstream iFullFileNameXML;
-			iFullFileName << iWeightFileName << "_" << iWeightFileIndex_Emin + i;
-			// backwards compatibility with CTA
-			if( iInstrumentEpoch != "noepoch" && iInstrumentEpoch != "CTA" )
-			{
-				iFullFileName << "_" << iWeightFileIndex_Zmin + j;
-			}
+			iFullFileName << fTMVAMethodName << "_" << iWeightFileIndex_Emin + i;
+            iFullFileName << "_" << iWeightFileIndex_Zmin + j;
 			iFullFileName << ".root";
-			iFullFileNameXML << iWeightFileName << "_" << iWeightFileIndex_Emin + i;
-			if( iInstrumentEpoch != "noepoch" && iInstrumentEpoch != "CTA" )
-			{
-				iFullFileNameXML << "_" << iWeightFileIndex_Zmin + j;
-			}
+			iFullFileNameXML << fTMVAMethodName <<  "_" << iWeightFileIndex_Emin + i;
+            iFullFileNameXML << "_" << iWeightFileIndex_Zmin + j;
 			iFullFileNameXML << "_" << fTMVAMethodName << "_0.weights.xml";
 			TFile iF( iFullFileName.str().c_str() );
 			bool bGoodRun = true;
@@ -212,7 +205,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 					bGoodRun = false;
 				}
 				// backwards compatibility
-				if( !iZenithData && iInstrumentEpoch != "noepoch" && iInstrumentEpoch != "CTA" )
+				if( !iZenithData )
 				{
 					cout << "No zenith cut data: ";
 					cout << " setting goodrun to false" << endl;
