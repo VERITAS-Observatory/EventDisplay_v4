@@ -645,10 +645,9 @@ void VPlotAnasumHistograms::plot_CorrelatedSkyPlots()
  *
  *
  */
-TCanvas* VPlotAnasumHistograms::plot_theta2( double t2min, double t2max, int irbin )
+TCanvas* VPlotAnasumHistograms::plot_theta2( double t2min, double t2max, int irbin, double setYMax, double setYMin )
 {
 	// int iPlotPSF = 0;
-	double setYMax = -1.;
 	
 	char hname[200];
 	char htitle[200];
@@ -664,28 +663,23 @@ TCanvas* VPlotAnasumHistograms::plot_theta2( double t2min, double t2max, int irb
 	
 	// canvas that will contain the theta2 and the theta2_diff plots
 	TCanvas* c_t2 = 0;
+	TCanvas* c_t2_diff = 0;
 	
 	if( htheta2_diff && htheta2_on && htheta2_off )
 	{
 		sprintf( hname, "c_t2_%d", fRunNumber );
 		sprintf( htitle, "theta2 (run %d)", fRunNumber );
-		c_t2 = new TCanvas( hname, htitle, 10, 10, 900, 400 );
-		c_t2->Divide( 2, 1 );
-		//c_t2->SetLeftMargin( 0.12 );
+		c_t2 = new TCanvas( hname, htitle, 10, 10, 400, 400 );
+		sprintf( hname, "c_t2_diff_%d", fRunNumber );
+		c_t2_diff = new TCanvas( hname, htitle, 410, 10, 400, 400 );
+		c_t2_diff->SetLeftMargin( 0.12 );
 		
-		c_t2->cd( 1 );
+		c_t2->cd();
 		htheta2_on->SetXTitle( "#Theta^{2} [deg^{2}]" );
 		htheta2_on->SetTitle( "" );
 		htheta2_off->SetTitle( "#Theta^{2} Histogram" );
 		htheta2_off->SetTitle( "" );
-		if( setYMax < 0. )
-		{
-			htheta2_off->SetMaximum( htheta2_on->GetMaximum() * 1.1 );
-		}
-		else
-		{
-			htheta2_off->SetMaximum( setYMax );
-		}
+		htheta2_off->SetMaximum( htheta2_on->GetMaximum() * 1.1 );
 		sprintf( hname, "Number of events / %.3f deg^{2}", htheta2_off->GetXaxis()->GetBinWidth( 2 ) );
 		htheta2_on->SetYTitle( hname );
 		htheta2_off->SetYTitle( hname );
@@ -716,15 +710,24 @@ TCanvas* VPlotAnasumHistograms::plot_theta2( double t2min, double t2max, int irb
 			}
 		}
 		
-		c_t2->cd( 2 );
-		htheta2_diff->SetFillColor( 8 );
+		c_t2_diff->cd();
+		htheta2_diff->SetFillColor( 418 );
 		htheta2_diff->SetXTitle( "#Theta^{2} [deg^{2}]" );
 		htheta2_diff->SetTitle( "" );
 		sprintf( hname, "Number of events / %.3f deg^{2}", htheta2_diff->GetXaxis()->GetBinWidth( 2 ) );
 		htheta2_diff->SetYTitle( hname );
-		htheta2_diff->GetYaxis()->SetTitleOffset( 1.4 );
-		setHistogramPlottingStyle( htheta2_diff, 1, 2, 1, 1, irbin, 1001 );
+		htheta2_diff->GetYaxis()->SetTitleOffset( 1.6 );
+		setHistogramPlottingStyle( htheta2_diff, 418, 2, 1, 1, irbin, 1001 );
 		htheta2_diff->SetAxisRange( t2min, t2max );
+		if( setYMax > -999. )
+		{
+			htheta2_diff->SetMaximum( setYMax );
+		}
+		if( setYMin > -999. )
+		{
+			htheta2_diff->SetMinimum( setYMin );
+		}
+		
 		htheta2_diff->Draw( "hist e" );
 		
 		
@@ -757,7 +760,7 @@ TCanvas* VPlotAnasumHistograms::plot_theta2( double t2min, double t2max, int irb
 		cout << "histograms not found" << endl;
 	}
 	
-	return c_t2;
+	return c_t2_diff;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
