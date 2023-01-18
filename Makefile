@@ -678,7 +678,6 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VImageParameter.o  \
 		./obj/VPlotWPPhysSensitivity.o ./obj/VPlotWPPhysSensitivity_Dict.o \
 		./obj/VSiteData.o \
-		./obj/VPlotTMVAParameters.o ./obj/VPlotTMVAParameters_Dict.o \
 		./obj/VWPPhysSensitivityPlotsMaker.o ./obj/VWPPhysSensitivityPlotsMaker_Dict.o \
 		./obj/VPedestalLowGain.o ./obj/VPedestalLowGain_Dict.o \
 		./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
@@ -1076,6 +1075,11 @@ WRITEPARTPHYSOBJ=	./obj/writeParticleRateFilesForTMVA.o \
 			./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
 			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 			./obj/VStatistics_Dict.o \
+			./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+			./obj/VSkyCoordinatesUtilities.o \
+			./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
+			./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
+			./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 			./obj/VUtilities.o
 
 ifeq ($(ASTRONMETRY),-DASTROSLALIB)
@@ -1638,7 +1642,7 @@ formatSourceCode:
 	@echo ""
 	astyle --options=./.astylerc src/*
 	astyle --options=./.astylerc inc/*
-	astyle --options=./.astylerc macros/*.C macros/VTS/*.C
+#	astyle --options=./.astylerc macros/*.C macros/VTS/*.C
 
 ###############################################################################################################################
 install:	all

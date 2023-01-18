@@ -14,7 +14,7 @@ Set the following environmental variable:  SOFASYS=$EVNDISPSYS/sofa
 ### VERITAS analysis
 
 Requires installation of the VBF library (VERITAS bank format).
-Note that for newer unix system, adapations to C++17 standards are reqired.
+Note that for newer UNIX system, adaptations to C++17 standards are required.
 Use e.g.
 - https://github.com/VERITAS-Observatory/VBF/releases/tag/0.3.4-1-c%2B%2B17 for newer systems C++17 support
 - https://github.com/VERITAS-Observatory/VBF/releases/tag/0.3.4-1 for all other systems
@@ -33,7 +33,7 @@ Use e.g.
 ### Compiling and linking
 
 ROOTSYS :   (required) ROOT installation; add $ROOTSYS/lib to $LD_LIBRARY_PATH and $ROOTSYS/bin to $PATH 
-            (root should be compiled with minuit2, mysql, xml)
+            (root should be compiled with minuit2, mysql, XML)
 
 SOFASYS:    (required) Astronomy library from Sofa (use ./install_sofa.sh) for installation)
 
@@ -88,7 +88,7 @@ make VTS
 
 ## Makefile targets
 
-- all	make all executables and libraries
+- all	make all executable and libraries
 - clean
 - install
 - VTS	make all VERITAS relevant binaries/libraries

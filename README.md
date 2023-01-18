@@ -4,7 +4,7 @@
 [![CI](https://github.com/VERITAS-Observatory/EventDisplay_v4/actions/workflows/ci.yml/badge.svg)](https://github.com/VERITAS-Observatory/EventDisplay_v4/actions/workflows/ci.yml)
 
 * Authors and contributors: [CITATION.cff](CITATION.cff)
-* Licence: [LICENSE](LICENSE)
+* License: [LICENSE](LICENSE)
 
 Please check the [release pages](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases) for the most recent versions to be used for VERITAS publications.
 
@@ -14,7 +14,7 @@ https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual#Versions_of_e
 
 ## Overview
 
-Eventdisplay is a reconstruction and analysis pipline for data of
+Eventdisplay is a reconstruction and analysis pipeline for data of
 Imaging Atmospheric Cherenkov Telescopes (IACT).
 It has been primarily developed for VERITAS and CTA analysis and used in
 many VERITAS and CTA publications. 
@@ -52,16 +52,16 @@ Description and command line options for the different software parts:
 
 ## The Eventdisplay Ecosystem
 
-Reconstruction and analysis can be complex; it requires inputs from different sources and execution of several indedependent stages.
-Eventdisplay is in use since roughly 2004 and an ecosystem of libaries and repositories grew around the core code base. 
+Reconstruction and analysis can be complex; it requires inputs from different sources and execution of several interdependent stages.
+Eventdisplay is in use since roughly 2004 and an ecosystem of libraries and repositories grew around the core code base. 
 Below an overview of those repositories. 
 Some are internal to VERITAS and not accessible to the general public.
 
 For almost every use case, Eventdisplay consists of at least three major components: 
 - the code (Eventdisplay), 
 - a library of scripts (see [Eventdisplay_AnalysisScripts_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisScripts_VTS))
-- a set of auxiliary files (see internal github repository [Eventdisplay_AnalysisFiles_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles_VTS))
-- release test macros and results (see internal github repository [Eventdisplay_ReleaseTests](https://github.com/VERITAS-Observatory/Eventdisplay_ReleaseTests))
+- a set of auxiliary files (see internal GitHub repository [Eventdisplay_AnalysisFiles_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles_VTS))
+- release test macros and results (see internal GitHub repository [Eventdisplay_ReleaseTests](https://github.com/VERITAS-Observatory/Eventdisplay_ReleaseTests))
 
 Care should be taken in using the correct versions (releases, tags, branches) combining these three types of repositories.
 A blending of different versions of components will lead to incorrect results.

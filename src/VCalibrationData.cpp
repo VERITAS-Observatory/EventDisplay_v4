@@ -802,7 +802,7 @@ valarray<double>& VCalibrationData::getPedvars( bool iLowGain, unsigned int iSW,
 				cout << getPedvarsVTS_vector( iLowGain )[0].size();
 			}
 			cout << endl;
-			exit( 0 );
+			exit( EXIT_FAILURE );
 		}
 	}
 	//////////////////////////////////////////////////////////

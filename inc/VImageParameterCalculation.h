@@ -8,10 +8,10 @@
 #include <valarray>
 #include <vector>
 
-#include <VDetectorGeometry.h>
-#include <VEvndispData.h>
-#include <VHoughTransform.h>
-#include <VImageParameter.h>
+#include "VDetectorGeometry.h"
+#include "VEvndispData.h"
+#include "VHoughTransform.h"
+#include "VImageParameter.h"
 
 #include "TError.h"
 #include "TMath.h"

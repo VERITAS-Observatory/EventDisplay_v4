@@ -9,8 +9,8 @@ eventdisplay is a complete package for VERITAS and CTA analysis.
 
 The package consists of several analysis steps and tools:
 
-(1) evndisp (calibrate and parametrize images, event reconstruction, stereo analysis)
-(2) mscw_energy (use lookup tables to produce msw, msl, and energies)
+(1) evndisp (calibrate and parameterize images, event reconstruction, stereo analysis)
+(2) mscw_energy (use lookup tables to produce mscw, mscl, and energies)
 (3) anasum (produce maps and calculate analysis results)
 (4) shared library tools and macros (see EVNDISP/lib/libVAnaSum.so and EVNDISP/macros/)  (produce the energy spectrum and integral fluxes, plot maps, etc.) 
 (5) makeEffectiveArea (calculate effective areas)
