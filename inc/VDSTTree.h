@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-#include <VGlobalRunParameter.h>
+#include "VGlobalRunParameter.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // MAXIMUM NUMBERS OF TELESCOPES AND CHANNELS ARE DEFINED IN inc/VGlobalRunParameter.h

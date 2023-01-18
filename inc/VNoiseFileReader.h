@@ -3,7 +3,7 @@
 #ifndef VNoiseFileReader_H
 #define VNoiseFileReader_H
 
-#include <VGrIsuReader.h>
+#include "VGrIsuReader.h"
 
 #include <iostream>
 #include <string>

@@ -455,7 +455,11 @@ void write_log_files( vector< string > file_list, string outputfile )
 	
 	i_sys << outputfile << ".combine.log";
 	cout << "merge log files into " << i_sys.str() << endl;
-	system( i_sys.str().c_str() );
+	int sys_ret = system( i_sys.str().c_str() );
+    if( sys_ret == -1 )
+    {
+        cout << "Error executing system command " << i_sys.str() << endl;
+    }
 	cout << "done.." << endl;
 }
 
