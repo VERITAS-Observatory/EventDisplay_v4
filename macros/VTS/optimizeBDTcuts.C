@@ -1,49 +1,53 @@
-/* \file optimizeBDTcuts.C
+/* optimize TMVA cuts and print optimized cuts to screen
  *
- * \brief optimize BDT cuts
+ * requires as input gamma/hadron rates files prepared with
+ * pre-cuts (e.g., ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-Preselection.dat)
  *
- * \author Maria Krause
- *
- */
+*/
 
-#include <iostream>
-#include <string>
-#include <vector>
+R__LOAD_LIBRARY( $EVNDISPSYS/lib/libVAnaSum.so );
 
-#include "TCanvas.h"
-#include "TF1.h"
-#include "TFile.h"
-#include "TH1D.h"
-#include "TH2D.h"
-#include "TLatex.h"
-#include "TLegend.h"
-#include "TLine.h"
-#include "TMath.h"
-#include "TStyle.h"
-#include "TTree.h"
-
-using namespace std;
 
 void help()
 {
 	cout << endl;
-	cout << "optimize the BDT cuts" << endl;
+	cout << "optimize BDT cuts" << endl;
 	cout << "------------------------------------------------------------------------------" << endl;
-	cout << " indicate particle rate file (.root) and the directory of weight files"
-		 cout << endl;
+	cout << " indicate particle rate file (.root) and weight file directory" << endl;
 }
 
-void optimizeBDTcuts( char* particleraterootfile, char* weightFileDir, double observing_time = 20., double min_sourcestrength = 0.00001, int weightFileIndex_Emin = 0, int weightFileIndex_Emax = 3, int weightFileIndex_Zmin = 0., int weightFileIndex_Zmax = 3., double timeparticlerate = 3600., double significance = 5., int min_events = 10, double min_backgroundrateratio = 1. / 5., double min_backgroundevents = 0., double signalefficiency = 0.90, double energyStepSize = -1 )
-{
 
+void optimizeBDTcuts(
+	string rateFile = "rates.root",
+	string weightFileDir = "./",
+	int weightFileIndex_Emin = 0, int weightFileIndex_Emax = 3,
+	int weightFileIndex_Zmin = 0., int weightFileIndex_Zmax = 3.,
+	double observing_time_h = 20.,
+	double significance = 5. )
+{
 	VTMVAEvaluator a;
-	a.setPlotEfficiencyPlotsPerBin( false );
-	a.setParticleNumberFile( particleraterootfile, timeparticlerate );
-	a.setSensitivityOptimizationParameters( significance, min_events, observing_time, min_backgroundrateratio, min_backgroundevents );
-	a.setSensitivityOptimizationFixedSignalEfficiency( signalefficiency );
-	a.setSensitivityOptimizationMinSourceStrength( min_sourcestrength );
+	
+	// parameter setting
+	a.setPrintPlotting( true );
+	a.setPlotEfficiencyPlotsPerBin( true );
+	a.setParticleNumberFile( rateFile.c_str(), 3600. );
+	a.setSensitivityOptimizationParameters( significance, 10., observing_time_h, 1. / 5. );
+	a.setSensitivityOptimizationFixedSignalEfficiency( 0.90 );
+	a.setSensitivityOptimizationMinSourceStrength( 0.00001 );
+	
+	// reading of weight files and optimisation
 	ostringstream iFullWeightFileName;
 	iFullWeightFileName << weightFileDir << "/BDT";
-	a.initializeWeightFiles( iFullWeightFileName.str().c_str(), weightFileIndex_Emin, weightFileIndex_Emax, weightFileIndex_Zmin, weightFileIndex_Zmax, energyStepSize, "VTS" );
+	a.initializeWeightFiles(
+		iFullWeightFileName.str(),
+		weightFileIndex_Emin, weightFileIndex_Emax,
+		weightFileIndex_Zmin, weightFileIndex_Zmax,
+		-1, "VTS" );
+		
+	// plotting
+	a.plotSignalAndBackgroundEfficiencies();
 	
+	// print results to screen
+	a.printSignalEfficiency();
+	a.printOptimizedMVACutValues( "V6" );
 }

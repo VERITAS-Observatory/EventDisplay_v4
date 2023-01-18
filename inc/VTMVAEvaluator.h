@@ -147,7 +147,8 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		bool             optimizeSensitivity( unsigned int iDataBin );
 		TGraph*          fillfromGraph2D( TObject* i_G, double i_ze_min, double i_ze_max );
 		void             fillTMVAEvaluatorResults();
-		string           getBDTFileName( unsigned int i_E_index, unsigned int i_Z_index, string iSuffix = "" );
+		string           getBDTFileName( string iWeightFileName,
+										 unsigned int i_E_index, unsigned int i_Z_index, string iSuffix = "" );
 		unsigned int     getDataBin();
 		unsigned int     getDataBin( double iErec_log10TeV, double iZe );
 		double           getSignalEfficiency( unsigned int iEbin, double iE_min, double iE_max, unsigned int iZbin, double iZ_min, double iZ_max );
