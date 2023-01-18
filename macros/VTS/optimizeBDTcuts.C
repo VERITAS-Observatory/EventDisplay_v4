@@ -3,6 +3,9 @@
  * requires as input gamma/hadron rates files prepared with
  * pre-cuts (e.g., ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-Preselection.dat)
  *
+ * usage: e.g.
+ * root -l -q -b 'optimizeBDTcuts.C("../../tmva/rates.root", "../../tmva", 0, 3, 0, 1)'
+ *
 */
 
 R__LOAD_LIBRARY( $EVNDISPSYS/lib/libVAnaSum.so );
