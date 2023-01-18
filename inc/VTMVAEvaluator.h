@@ -198,7 +198,6 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		void   printOptimizedMVACutValues( string iEpoch = "V6" );
 		void   printSensitivityOptimizationParameters();
 		void   printSignalEfficiency();
-		void   printSourceStrength_CU();
 		void   setDebug( bool iB = false )
 		{
 			fDebug = iB;

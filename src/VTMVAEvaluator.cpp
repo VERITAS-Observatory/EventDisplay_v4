@@ -280,13 +280,6 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 				fIsZombie = true;
 				return false;
 			}
-			/*			if( !iZenithData )
-						{
-							cout << "VTMVAEvaluator::initializeWeightFiles: warning: problem while reading zeniths from TMVA root file ";
-							cout << iFullFileName << endl;
-							fIsZombie = true;
-							return false;
-						} */
 			// form here on: expect a good TMVA file
 			// initialize one value per energy/zenith bin
 			
@@ -1079,20 +1072,6 @@ void VTMVAEvaluator::setTMVACutValue( double iE )
 {
 	fTMVACutValueNoVec = iE;
 }
-
-void VTMVAEvaluator::printSourceStrength_CU()
-{
-	for( unsigned int i = 0; i < fTMVAData.size(); i++ )
-	{
-		if( fTMVAData[i] )
-		{
-			cout << "E [" << showpoint << setprecision( 3 ) << fTMVAData[i]->fEnergyCut_Log10TeV_min << "," << fTMVAData[i]->fEnergyCut_Log10TeV_max << "] TeV";
-			cout << " (bin " << i << "):\t ";
-			cout << fTMVAData[i]->fSourceStrengthAtOptimum_CU << " CU " << endl;
-		}
-	}
-}
-
 
 void VTMVAEvaluator::printSignalEfficiency()
 {
