@@ -51,7 +51,6 @@ void VTMVAEvaluator::reset()
 	setSensitivityOptimizationMinSourceStrength();
 	setTMVAMethod();
 	setTMVAErrorFraction();
-	setTMVAAngularContainmentRadiusMax();
 	fTMVA_EvaluationResult = -99.;
 	fTMVACutValueNoVec = -99.;
 	
@@ -127,15 +126,15 @@ vector< string > VTMVAEvaluator::getTrainingVariables( string iXMLFile, vector< 
 */
 string VTMVAEvaluator::getBDTFileName( unsigned int i_E_index, unsigned int i_Z_index, string iSuffix )
 {
-    ostringstream iFullFileName;
-    iFullFileName << fTMVAMethodName << "_" << i_E_index;
-    iFullFileName << "_" << i_Z_index;
-    if( iSuffix.find( "xml" ) != string::npos )
-    {
-        iFullFileName << "_" << fTMVAMethodName;
-    }
-    iFullFileName << iSuffix;
-    return iFullFileName.str();
+	ostringstream iFullFileName;
+	iFullFileName << fTMVAMethodName << "_" << i_E_index;
+	iFullFileName << "_" << i_Z_index;
+	if( iSuffix.find( "xml" ) != string::npos )
+	{
+		iFullFileName << "_" << fTMVAMethodName;
+	}
+	iFullFileName << iSuffix;
+	return iFullFileName.str();
 }
 
 /*
@@ -192,10 +191,10 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 		unsigned int jMinMissingBin = 0;
 		for( unsigned int j = 0; j < iNbinZ; j++ )
 		{
-            string iTMVAName = getBDTFileName( iWeightFileIndex_Emin + i, iWeightFileIndex_Zmin + j );
-            string iFullFileName = getBDTFileName( iWeightFileIndex_Emin + i, iWeightFileIndex_Zmin + j, ".root" );
-            string iFullFileNameXML = getBDTFileName( iWeightFileIndex_Emin + i, iWeightFileIndex_Zmin + j, "_0.weights.xml" );
-
+			string iTMVAName = getBDTFileName( iWeightFileIndex_Emin + i, iWeightFileIndex_Zmin + j );
+			string iFullFileName = getBDTFileName( iWeightFileIndex_Emin + i, iWeightFileIndex_Zmin + j, ".root" );
+			string iFullFileNameXML = getBDTFileName( iWeightFileIndex_Emin + i, iWeightFileIndex_Zmin + j, "_0.weights.xml" );
+			
 			TFile iF( iFullFileName.c_str() );
 			bool bGoodRun = true;
 			VTMVARunDataEnergyCut* iEnergyData = 0;
@@ -346,8 +345,6 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 				fTMVAData.back()->fBackgroundEfficiency = -99.;
 				fTMVAData.back()->fTMVAOptimumCutValueFound = false;
 				fTMVAData.back()->fSourceStrengthAtOptimum_CU = 0.;
-				fTMVAData.back()->fAngularContainmentRadius = -99.;
-				fTMVAData.back()->fAngularContainmentFraction = -99.;
 				
 				sprintf( hname, "bin %d, %.2f < log10(E) < %.2f, %.2f < Ze < %.2f)",
 						 ( int )( fTMVAData.size() - 1 ), fTMVAData.back()->fEnergyCut_Log10TeV_min, fTMVAData.back()->fEnergyCut_Log10TeV_max,
@@ -366,7 +363,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 				}
 				
 				fTMVAData.back()->fTMVAMethodTag_2 = hname;
-                fTMVAData.back()->fTMVAName = iTMVAName;
+				fTMVAData.back()->fTMVAName = iTMVAName;
 				fTMVAData.back()->fTMVAFileName = iFullFileName;
 				fTMVAData.back()->fTMVAFileNameXML = iFullFileNameXML;
 				
@@ -891,65 +888,6 @@ bool VTMVAEvaluator::initializeDataStrutures( CData* iC )
 }
 
 /*
-
-   get energy dependent theta2 cut
-
-*/
-double VTMVAEvaluator::getOptimalTheta2Cut( double iEnergy_log10TeV, double iZe )
-{
-	if( fTMVAData.size() == 0 )
-	{
-		cout << "VTMVAEvaluator::getOptimalTheta2Cut error: empty data vector" << endl;
-		return -99.;
-	}
-	
-	unsigned int iDataBin = getDataBin( iEnergy_log10TeV, iZe );
-	
-	if( iDataBin < fTMVAData.size() )
-	{
-		return ( fTMVAData[iDataBin]->fAngularContainmentRadius * fTMVAData[iDataBin]->fAngularContainmentRadius );
-	}
-	
-	return 0.;
-}
-
-/*
-   return a graph with all the theta2 cuts
-
-   (is a memory leak...)
-
-*/
-TGraph* VTMVAEvaluator::getOptimalTheta2Cut_Graph()
-{
-	if( fTMVAData.size() == 0 )
-	{
-		cout << "VTMVAEvaluator::getOptimalTheta2Cut_Graph error: empty data vector" << endl;
-		return 0;
-	}
-	
-	// sort
-	map< double, double > i_AngContaint;
-	for( unsigned int i = 0; i < fTMVAData.size(); i++ )
-	{
-		if( fTMVAData[i] && fTMVAData[i]->fAngularContainmentRadius > 1.e-10 )
-		{
-			i_AngContaint[0.5 * ( fTMVAData[i]->fEnergyCut_Log10TeV_min + fTMVAData[i]->fEnergyCut_Log10TeV_max )] = fTMVAData[i]->fAngularContainmentRadius;
-		}
-	}
-	
-	// fill the graph - energy is at the spectral weighted energy
-	TGraph* g = new TGraph( 1 );
-	unsigned int z = 0;
-	for( map<double, double>::iterator it = i_AngContaint.begin(); it != i_AngContaint.end(); ++it )
-	{
-		g->SetPoint( z, it->first, it->second );
-		z++;
-	}
-	
-	return g;
-}
-
-/*
  * plot signal and background efficiencies
  *
  */
@@ -1260,19 +1198,6 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 		cout << i_on << "\t" << i_of << endl;
 		return false;
 	}
-	// angular containment histogram
-	// (optional, only needed when containment radius is also optimized)
-	TH2D* iHAngContainment = ( TH2D* )iPN.Get( "AngResCumulative" );
-	if( iHAngContainment )
-	{
-		cout << "TVMAEvaluator::optimizeSensitivity: found angular containment histogram (";
-		cout << fTMVAngularContainmentRadiusMax << "%)";
-		cout << endl;
-	}
-	else
-	{
-		cout << "TVMAEvaluator::optimizeSensitivity no angular containment histogram found" << endl;
-	}
 	
 	//////////////////////////////////////////////////////
 	// get mean energy of the considered bins
@@ -1415,23 +1340,17 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 	// optimization starts here
 	//////////////////////////////////////////////////////////////////////////
 	double i_Signal_to_sqrtNoise = 0.;
-	double i_AngularContainmentRadius = 0.;
-	double i_AngularContainmentFraction = 0.;
 	
 	double i_TMVACutValue_AtMaximum = -99.;
 	double i_SourceStrength_atMaximum = 0.;
 	double i_SignalEfficiency_AtMaximum = -99.;
 	double i_BackgroundEfficiency_AtMaximum = -99.;
 	double i_Signal_to_sqrtNoise_atMaximum = 0.;
-	double i_AngularContainmentRadiusAtMaximum = 0.;
-	double i_AngularContainmentFractionAtMaximum = 0.;
 	
 	TGraph* iGSignal_to_sqrtNoise = 0;
 	TGraph* iGSignalEvents        = 0;
 	TGraph* iGBackgroundEvents    = 0;
 	TGraph* iGSignal_to_sqrtNoise_Smooth = 0;
-	TGraph* iGOpt_AngularContainmentRadius = 0;
-	TGraph* iGOpt_AngularContainmentFraction = 0;
 	
 	//////////////////////////////////////////////////////
 	// loop over different source strengths (in Crab Units)
@@ -1481,22 +1400,16 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 		//////////////////////////////////////////////////////
 		// now loop over signal and background efficiency levels
 		i_Signal_to_sqrtNoise = 0.;
-		i_AngularContainmentRadius = 0.;
-		i_AngularContainmentFraction = 0.;
 		
 		i_TMVACutValue_AtMaximum = -99.;
 		i_SourceStrength_atMaximum = 0.;
 		i_SignalEfficiency_AtMaximum = -99.;
 		i_BackgroundEfficiency_AtMaximum = -99.;
 		i_Signal_to_sqrtNoise_atMaximum = 0.;
-		i_AngularContainmentRadiusAtMaximum = 0.;
-		i_AngularContainmentFractionAtMaximum = 0.;
 		
 		iGSignal_to_sqrtNoise = new TGraph( 1 );
 		iGSignalEvents        = new TGraph( 1 );
 		iGBackgroundEvents    = new TGraph( 1 );
-		iGOpt_AngularContainmentRadius = new TGraph( 1 );
-		iGOpt_AngularContainmentFraction = new TGraph( 1 );
 		
 		int z = 0;
 		int z_SB = 0;
@@ -1508,19 +1421,13 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 				if( fOptimizationBackgroundAlpha > 0. )
 				{
 					// optimize signal/sqrt(noise)
-                    i_Signal_to_sqrtNoise = VStatistics::calcSignificance( effS->GetBinContent( i ) * Ndif + effB->GetBinContent( i ) * Nof,
-                                            effB->GetBinContent( i ) * Nof / fOptimizationBackgroundAlpha,
-                                            fOptimizationBackgroundAlpha );
-                    i_AngularContainmentRadius = VHistogramUtilities::interpolateTH2D( iHAngContainment,
-                                                 fTMVAData[iDataBin]->fSpectralWeightedMeanEnergy_Log10TeV,
-                                                 fTMVAngularContainmentRadiusMax );
-                    i_AngularContainmentFraction = fTMVAngularContainmentRadiusMax;
-            }
+					i_Signal_to_sqrtNoise = VStatistics::calcSignificance( effS->GetBinContent( i ) * Ndif + effB->GetBinContent( i ) * Nof,
+											effB->GetBinContent( i ) * Nof / fOptimizationBackgroundAlpha,
+											fOptimizationBackgroundAlpha );
+				}
 				else
 				{
 					i_Signal_to_sqrtNoise = 0.;
-					i_AngularContainmentRadius = 0.;
-					i_AngularContainmentFraction = fTMVAngularContainmentRadiusMax;
 				}
 				if( fDebug )
 				{
@@ -1553,12 +1460,9 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 				if( iGSignal_to_sqrtNoise && i_Signal_to_sqrtNoise > 1.e-2 )
 				{
 					iGSignal_to_sqrtNoise->SetPoint( z, effS->GetBinCenter( i ), i_Signal_to_sqrtNoise );
-					iGOpt_AngularContainmentRadius->SetPoint( z, effS->GetBinCenter( i ), i_AngularContainmentRadius );
-					iGOpt_AngularContainmentFraction->SetPoint( z, effS->GetBinCenter( i ), i_AngularContainmentFraction );
 					if( fDebug )
 					{
-						cout << "\t SET " << z << "\t" << effS->GetBinCenter( i ) << "\t" << i_Signal_to_sqrtNoise << "\t";
-						cout << i_AngularContainmentRadius << "\t" << i_AngularContainmentFraction << endl;
+						cout << "\t SET " << z << "\t" << effS->GetBinCenter( i ) << "\t" << i_Signal_to_sqrtNoise << endl;
 					}
 					z++;
 				}
@@ -1601,8 +1505,6 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 			i_TMVACutValue_AtMaximum         = i_xmax;
 			i_Signal_to_sqrtNoise_atMaximum  = i_ymax;
 			i_SourceStrength_atMaximum       = iSourceStrength;
-			i_AngularContainmentRadiusAtMaximum = iGOpt_AngularContainmentRadius->Eval( i_xmax );
-			i_AngularContainmentFractionAtMaximum = iGOpt_AngularContainmentFraction->Eval( i_xmax );
 		}
 		///////////////////////////////////////////////////////
 		// check if value if really at the optimum or if information is missing from background efficiency curve
@@ -1673,14 +1575,6 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 			{
 				delete iGSignal_to_sqrtNoise_Smooth;
 			}
-			if( iGOpt_AngularContainmentRadius )
-			{
-				delete iGOpt_AngularContainmentRadius;
-			}
-			if( iGOpt_AngularContainmentFraction )
-			{
-				delete iGOpt_AngularContainmentFraction;
-			}
 		}
 	} // end of loop over source strength
 	///////////////////////////////////////////////////////////////////////
@@ -1703,8 +1597,6 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 				{
 					i_TMVACutValue_AtMaximum         = effS->GetBinCenter( i );
 					i_BackgroundEfficiency_AtMaximum = effB->GetBinContent( i );
-					i_AngularContainmentRadiusAtMaximum = iGOpt_AngularContainmentRadius->Eval( i_TMVACutValue_AtMaximum );
-					i_AngularContainmentFractionAtMaximum = iGOpt_AngularContainmentFraction->Eval( i_TMVACutValue_AtMaximum );
 					break;
 				}
 			}
@@ -1722,15 +1614,6 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 	}
 	cout << "\t MVA parameter: " << i_TMVACutValue_AtMaximum;
 	cout << ", background efficiency: " << i_BackgroundEfficiency_AtMaximum << endl;
-	cout << "\t angular containment is " << i_AngularContainmentFractionAtMaximum * 100. << "%, radius ";
-	cout << i_AngularContainmentRadiusAtMaximum << " [deg]";
-	if( iHAngContainment )
-	{
-		cout << " (scaled from " << iHAngContainment->GetBinContent( iHAngContainment->GetXaxis()->FindBin( fTMVAData[iDataBin]->fSpectralWeightedMeanEnergy_Log10TeV ),
-				iHAngContainment->GetYaxis()->FindBin( fTMVAngularContainmentRadiusMax ) );
-		cout << " [deg], " << fTMVAngularContainmentRadiusMax * 100. << "%)";
-	}
-	cout << endl;
 	////////////////////////////////////////////////////////////////
 	
 	// get mean energy for this bin
@@ -1746,15 +1629,12 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 	{
 		fTMVAData[iDataBin]->fSpectralWeightedMeanEnergy_Log10TeV = log10( iMeanEnergyAfterCuts );
 	}
-	fTMVAData[iDataBin]->fAngularContainmentRadius = i_AngularContainmentRadiusAtMaximum;
-	fTMVAData[iDataBin]->fAngularContainmentFraction = i_AngularContainmentFractionAtMaximum;
 	
 	// plot optimziation procedure and event numbers
 	if( bPlotEfficiencyPlotsPerBin )
 	{
 		plotEfficiencyPlotsPerBin( iDataBin, iGSignal_to_sqrtNoise, iGSignal_to_sqrtNoise_Smooth,
-								   effS, effB, iGSignalEvents, iGBackgroundEvents,
-								   iGOpt_AngularContainmentRadius, iGOpt_AngularContainmentFraction );
+								   effS, effB, iGSignalEvents, iGBackgroundEvents );
 	}
 	
 	return true;
@@ -1768,74 +1648,74 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 */
 
 void VTMVAEvaluator::smoothAndInterPolateMVAValue_EnergyOnly(
-        TH1F* effS, TH1F* effB )
+	TH1F* effS, TH1F* effB )
 {
-    int z = 0;
-    // fill graph to be smoothed
-    TGraph* iG = new TGraph( 1 );
-    for( unsigned int i = 0; i < fTMVAData.size(); i++ )
-    {
-        if( fTMVAData[i] )
-        {
-            if( fTMVAData[i]->fTMVAOptimumCutValueFound )
-            {
-                iG->SetPoint( z, fTMVAData[i]->fSpectralWeightedMeanEnergy_Log10TeV, fTMVAData[i]->fTMVACutValue );
-                z++;
-            }
-        }
-    }
-    // smooth graph
-    TGraph* iGout = new TGraph( 1 );
-    TGraphSmooth* iGSmooth = new TGraphSmooth( "t" );
-    iGout = ( TGraph* )iGSmooth->SmoothKern( iG, "normal", 0.5, 100 );
-    
-    // fill smoothed and interpolated values into MVA vector
-    // set all points to 'optimized'
-    for( unsigned int i = 0; i < fTMVAData.size(); i++ )
-    {
-        if( fTMVAData[i] )
-        {
-            cout << "\t TMVA values: unsmoothed at ";
-            cout << TMath::Power( 10., fTMVAData[i]->fSpectralWeightedMeanEnergy_Log10TeV );
-            cout << " TeV, \t" << fTMVAData[i]->fTMVACutValue;
-            fTMVAData[i]->fTMVACutValue = iGout->Eval( fTMVAData[i]->fSpectralWeightedMeanEnergy_Log10TeV );
-            cout << ", smoothed " << fTMVAData[i]->fTMVACutValue;
-            if( !fTMVAData[i]->fTMVAOptimumCutValueFound )
-            {
-                cout << " (interpolated non-optimal value)";
-            }
-            cout << " (" << i << ")" << endl;
-            fTMVAData[i]->fTMVAOptimumCutValueFound = true;
-            
-            // get efficiency histograms
-            TFile iTMVAFile( fTMVAData[i]->fTMVAFileName.c_str() );
-            TH1F* effS = getEfficiencyHistogram( "effS", &iTMVAFile, fTMVAData[i]->fTMVAMethodTag_2 );
-            TH1F* effB = getEfficiencyHistogram( "effB", &iTMVAFile, fTMVAData[i]->fTMVAMethodTag_2 );
-            
-            if( effS )
-            {
-                fTMVAData[i]->fSignalEfficiency = effS->GetBinContent( effS->FindBin( fTMVAData[i]->fTMVACutValue ) );
-                cout << "eff S " << fTMVAData[i]->fSignalEfficiency << endl;
-            }
-            if( effB )
-            {
-                fTMVAData[i]->fBackgroundEfficiency = effB->GetBinContent( effB->FindBin( fTMVAData[i]->fTMVACutValue ) );
-                // background efficiency might be zero -> fill it with first non-zero value
-                if( fTMVAData[i]->fBackgroundEfficiency < 1.e-8 )
-                {
-                    int iS = effB->FindBin( fTMVAData[i]->fTMVACutValue );
-                    for( int j = iS; j > 0; j-- )
-                    {
-                        if( effB->GetBinContent( j ) > 0. )
-                        {
-                            fTMVAData[i]->fBackgroundEfficiency = effB->GetBinContent( j );
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
+	int z = 0;
+	// fill graph to be smoothed
+	TGraph* iG = new TGraph( 1 );
+	for( unsigned int i = 0; i < fTMVAData.size(); i++ )
+	{
+		if( fTMVAData[i] )
+		{
+			if( fTMVAData[i]->fTMVAOptimumCutValueFound )
+			{
+				iG->SetPoint( z, fTMVAData[i]->fSpectralWeightedMeanEnergy_Log10TeV, fTMVAData[i]->fTMVACutValue );
+				z++;
+			}
+		}
+	}
+	// smooth graph
+	TGraph* iGout = new TGraph( 1 );
+	TGraphSmooth* iGSmooth = new TGraphSmooth( "t" );
+	iGout = ( TGraph* )iGSmooth->SmoothKern( iG, "normal", 0.5, 100 );
+	
+	// fill smoothed and interpolated values into MVA vector
+	// set all points to 'optimized'
+	for( unsigned int i = 0; i < fTMVAData.size(); i++ )
+	{
+		if( fTMVAData[i] )
+		{
+			cout << "\t TMVA values: unsmoothed at ";
+			cout << TMath::Power( 10., fTMVAData[i]->fSpectralWeightedMeanEnergy_Log10TeV );
+			cout << " TeV, \t" << fTMVAData[i]->fTMVACutValue;
+			fTMVAData[i]->fTMVACutValue = iGout->Eval( fTMVAData[i]->fSpectralWeightedMeanEnergy_Log10TeV );
+			cout << ", smoothed " << fTMVAData[i]->fTMVACutValue;
+			if( !fTMVAData[i]->fTMVAOptimumCutValueFound )
+			{
+				cout << " (interpolated non-optimal value)";
+			}
+			cout << " (" << i << ")" << endl;
+			fTMVAData[i]->fTMVAOptimumCutValueFound = true;
+			
+			// get efficiency histograms
+			TFile iTMVAFile( fTMVAData[i]->fTMVAFileName.c_str() );
+			TH1F* effS = getEfficiencyHistogram( "effS", &iTMVAFile, fTMVAData[i]->fTMVAMethodTag_2 );
+			TH1F* effB = getEfficiencyHistogram( "effB", &iTMVAFile, fTMVAData[i]->fTMVAMethodTag_2 );
+			
+			if( effS )
+			{
+				fTMVAData[i]->fSignalEfficiency = effS->GetBinContent( effS->FindBin( fTMVAData[i]->fTMVACutValue ) );
+				cout << "eff S " << fTMVAData[i]->fSignalEfficiency << endl;
+			}
+			if( effB )
+			{
+				fTMVAData[i]->fBackgroundEfficiency = effB->GetBinContent( effB->FindBin( fTMVAData[i]->fTMVACutValue ) );
+				// background efficiency might be zero -> fill it with first non-zero value
+				if( fTMVAData[i]->fBackgroundEfficiency < 1.e-8 )
+				{
+					int iS = effB->FindBin( fTMVAData[i]->fTMVACutValue );
+					for( int j = iS; j > 0; j-- )
+					{
+						if( effB->GetBinContent( j ) > 0. )
+						{
+							fTMVAData[i]->fBackgroundEfficiency = effB->GetBinContent( j );
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 /*
@@ -1846,105 +1726,108 @@ void VTMVAEvaluator::smoothAndInterPolateMVAValue_EnergyOnly(
 
 */
 void VTMVAEvaluator::smoothAndInterPolateMVAValue_Energy_and_Zenith(
-        TH1F* effS, TH1F* effB, 
-        unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
-        unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax )
+	TH1F* effS, TH1F* effB,
+	unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
+	unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax )
 {
 	unsigned int z = 0;
 	
 	unsigned int Ebins = iWeightFileIndex_Emax - iWeightFileIndex_Emin + 1;
 	unsigned int ZEbins = iWeightFileIndex_Zmax - iWeightFileIndex_Zmin + 1;
-
-    // 2D histogram to be smoothed (energy and zenith angle dependence)
-    TH2D* iH2 = new TH2D( "h1", "Smooth cut values", 
-            Ebins, iWeightFileIndex_Emin, iWeightFileIndex_Emax, 
-            ZEbins, iWeightFileIndex_Zmin, iWeightFileIndex_Zmax );
-    Double_t effS_value[Ebins * ZEbins];
-    for( unsigned int l = 0; l < fTMVAData.size(); l++ )
-    {
-        if( fTMVAData[l] )
-        {
-            TFile iTMVAFile( fTMVAData[l]->fTMVAFileName.c_str() );
-            if( iTMVAFile.IsZombie() )
-            {
-                cout << "VTMVAEvaluator: error reading file with cut efficiencies: ";
-                cout << fTMVAData[l]->fTMVAFileName << endl;
-                cout << "Exiting..." << endl;
-                exit( EXIT_FAILURE );
-            }
-            TH1F* effS = getEfficiencyHistogram( "effS", &iTMVAFile, fTMVAData[l]->fTMVAMethodTag_2 );
-            effS_value[l] = effS->GetBinContent( effS->FindBin( fTMVAData[l]->fTMVACutValue ) );
-        }
-    }
-    for( unsigned int i = 0; i < Ebins; i++ )
-    {
-        for( unsigned int j = 0; j < ZEbins; j++ )
-        {
-            if( z >= fTMVAData.size() || !fTMVAData[z] )
-            {
-                cout << "VTMVAEvaluator: error reading file with cut efficiencies for bins: ";
-                cout << " energy bin " << i << ", zenith bin " << j;
-                cout << ", entry z (size " << fTMVAData.size() << ")";
-                cout << endl;
-                cout << "Exiting..." << endl;
-                exit( EXIT_FAILURE );
-            }
-            // get signal efficiency histograms and cut values
-            TFile iTMVAFile( fTMVAData[z]->fTMVAFileName.c_str() );
-            TH1F* effS = getEfficiencyHistogram( "effS", &iTMVAFile, fTMVAData[z]->fTMVAMethodTag_2 );
-            if( fTMVAData[z]->fTMVAOptimumCutValueFound )
-            {
-                iH2->SetBinContent( i, j, fTMVAData[z]->fTMVACutValue );
-            }
-            // bins without optimal cut value and not in highest energy bin
-            else if( !fTMVAData[z]->fTMVAOptimumCutValueFound && ( j < ZEbins ) && ( i != Ebins - 1 ) )
-            {
-                for( int k = 0; k < effS->GetNbinsX(); k++ )
-                {
-                    // search for similar cut efficiency in neighbouring bin
-                    unsigned int i_alt_index = z + 1;
-                    if( z > 0 ) i_alt_index = z - 1;
-                    if( i_alt_index < fTMVAData.size() 
-                            && TMath::Abs( effS->GetBinContent( k ) - effS_value[i_alt_index] ) < 0.001 )
-                    {
-                        fTMVAData[z]->fTMVACutValue = effS->GetBinCenter( k );
-                        effS_value[z] = effS->GetBinContent( k );
-                    }
-                }
-            }
-            // bins without optimal cut value and in highest energy bin
-            else if( !fTMVAData[z]->fTMVAOptimumCutValueFound && ( j < ZEbins ) && ( i == Ebins - 1 ) )
-            {
-                for( unsigned int l = 0; l < ZEbins; l++ )
-                {
-                    if( effS_value[fTMVAData.size() - l] > 1.e-10 )
-                    {
-                        for( int k = 0; k < effS->GetNbinsX(); k++ )
-                        {
-                            if( TMath::Abs( effS->GetBinContent( k ) - effS_value[fTMVAData.size() - l] ) < 0.0001 )
-                            {
-                                fTMVAData[z]->fTMVACutValue = effS->GetBinCenter( k );
-                                effS_value[z] = effS->GetBinContent( k );
-                            }
-                        }
-                    }
-                }
-                if( fTMVAData[z]->fTMVACutValue == -99 )
-                {
-                    cout << "Error: no optimal cut value found for this bin" << endl;
-                }
-                cout << "\t TMVA values: at " << TMath::Power( 10., fTMVAData[z]->fSpectralWeightedMeanEnergy_Log10TeV );
-                cout << " TeV, \t" << fTMVAData[z]->fTMVACutValue;
-                if( !fTMVAData[z]->fTMVAOptimumCutValueFound )
-                {
-                    cout << " (interpolated non-optimal value)";
-                }
-                cout << ", signal efficiency: " << effS_value[z];
-                cout << " (" << z << ")" << endl;
-            }
-            z++;
-        }
-    }
+	
+	// 2D histogram to be smoothed (energy and zenith angle dependence)
+	TH2D* iH2 = new TH2D( "h1", "Smooth cut values",
+						  Ebins, iWeightFileIndex_Emin, iWeightFileIndex_Emax,
+						  ZEbins, iWeightFileIndex_Zmin, iWeightFileIndex_Zmax );
+	Double_t effS_value[Ebins * ZEbins];
+	for( unsigned int l = 0; l < fTMVAData.size(); l++ )
+	{
+		if( fTMVAData[l] )
+		{
+			TFile iTMVAFile( fTMVAData[l]->fTMVAFileName.c_str() );
+			if( iTMVAFile.IsZombie() )
+			{
+				cout << "VTMVAEvaluator: error reading file with cut efficiencies: ";
+				cout << fTMVAData[l]->fTMVAFileName << endl;
+				cout << "Exiting..." << endl;
+				exit( EXIT_FAILURE );
+			}
+			TH1F* effS = getEfficiencyHistogram( "effS", &iTMVAFile, fTMVAData[l]->fTMVAMethodTag_2 );
+			effS_value[l] = effS->GetBinContent( effS->FindBin( fTMVAData[l]->fTMVACutValue ) );
+		}
+	}
+	for( unsigned int i = 0; i < Ebins; i++ )
+	{
+		for( unsigned int j = 0; j < ZEbins; j++ )
+		{
+			if( z >= fTMVAData.size() || !fTMVAData[z] )
+			{
+				cout << "VTMVAEvaluator: error reading file with cut efficiencies for bins: ";
+				cout << " energy bin " << i << ", zenith bin " << j;
+				cout << ", entry z (size " << fTMVAData.size() << ")";
+				cout << endl;
+				cout << "Exiting..." << endl;
+				exit( EXIT_FAILURE );
+			}
+			// get signal efficiency histograms and cut values
+			TFile iTMVAFile( fTMVAData[z]->fTMVAFileName.c_str() );
+			TH1F* effS = getEfficiencyHistogram( "effS", &iTMVAFile, fTMVAData[z]->fTMVAMethodTag_2 );
+			if( fTMVAData[z]->fTMVAOptimumCutValueFound )
+			{
+				iH2->SetBinContent( i, j, fTMVAData[z]->fTMVACutValue );
+			}
+			// bins without optimal cut value and not in highest energy bin
+			else if( !fTMVAData[z]->fTMVAOptimumCutValueFound && ( j < ZEbins ) && ( i != Ebins - 1 ) )
+			{
+				for( int k = 0; k < effS->GetNbinsX(); k++ )
+				{
+					// search for similar cut efficiency in neighbouring bin
+					unsigned int i_alt_index = z + 1;
+					if( z > 0 )
+					{
+						i_alt_index = z - 1;
+					}
+					if( i_alt_index < fTMVAData.size()
+							&& TMath::Abs( effS->GetBinContent( k ) - effS_value[i_alt_index] ) < 0.001 )
+					{
+						fTMVAData[z]->fTMVACutValue = effS->GetBinCenter( k );
+						effS_value[z] = effS->GetBinContent( k );
+					}
+				}
+			}
+			// bins without optimal cut value and in highest energy bin
+			else if( !fTMVAData[z]->fTMVAOptimumCutValueFound && ( j < ZEbins ) && ( i == Ebins - 1 ) )
+			{
+				for( unsigned int l = 0; l < ZEbins; l++ )
+				{
+					if( effS_value[fTMVAData.size() - l] > 1.e-10 )
+					{
+						for( int k = 0; k < effS->GetNbinsX(); k++ )
+						{
+							if( TMath::Abs( effS->GetBinContent( k ) - effS_value[fTMVAData.size() - l] ) < 0.0001 )
+							{
+								fTMVAData[z]->fTMVACutValue = effS->GetBinCenter( k );
+								effS_value[z] = effS->GetBinContent( k );
+							}
+						}
+					}
+				}
+				if( fTMVAData[z]->fTMVACutValue == -99 )
+				{
+					cout << "Error: no optimal cut value found for this bin" << endl;
+				}
+				cout << "\t TMVA values: at " << TMath::Power( 10., fTMVAData[z]->fSpectralWeightedMeanEnergy_Log10TeV );
+				cout << " TeV, \t" << fTMVAData[z]->fTMVACutValue;
+				if( !fTMVAData[z]->fTMVAOptimumCutValueFound )
+				{
+					cout << " (interpolated non-optimal value)";
+				}
+				cout << ", signal efficiency: " << effS_value[z];
+				cout << " (" << z << ")" << endl;
+			}
+			z++;
+		}
+	}
 }
 
 /*
@@ -1956,10 +1839,10 @@ void VTMVAEvaluator::smoothAndInterPolateMVAValue_Energy_and_Zenith(
  note: signal and background efficiencies are not updated
 
 */
-void VTMVAEvaluator::smoothAndInterPolateMVAValue( 
-        TH1F* effS, TH1F* effB, 
-        unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax, 
-        unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax )
+void VTMVAEvaluator::smoothAndInterPolateMVAValue(
+	TH1F* effS, TH1F* effB,
+	unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
+	unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax )
 {
 	if( fTMVAData.size() == 0 )
 	{
@@ -1972,22 +1855,21 @@ void VTMVAEvaluator::smoothAndInterPolateMVAValue(
 	// energy dependent TMVA cut optimization only
 	if( iWeightFileIndex_Zmax == iWeightFileIndex_Zmin )
 	{
-        smoothAndInterPolateMVAValue_EnergyOnly(effS, effB);
+		smoothAndInterPolateMVAValue_EnergyOnly( effS, effB );
 	}
 	// energy and zenith angle dependent
 	else
 	{
-        smoothAndInterPolateMVAValue_Energy_and_Zenith(
-                effS, effB,
-                iWeightFileIndex_Emin, iWeightFileIndex_Emax,
-                iWeightFileIndex_Zmin, iWeightFileIndex_Zmax );
-    }
+		smoothAndInterPolateMVAValue_Energy_and_Zenith(
+			effS, effB,
+			iWeightFileIndex_Emin, iWeightFileIndex_Emax,
+			iWeightFileIndex_Zmin, iWeightFileIndex_Zmax );
+	}
 }
 
 void VTMVAEvaluator::plotEfficiencyPlotsPerBin( unsigned int iBin, TGraph* iGSignal_to_sqrtNoise,
 		TGraph* iGSignal_to_sqrtNoise_Smooth, TH1F* hEffS, TH1F* hEffB,
-		TGraph* iGSignalEvents, TGraph* iGBackgroundEvents,
-		TGraph* iGOpt_AngularContainmentRadius, TGraph* iGOpt_AngularContainmentFraction )
+		TGraph* iGSignalEvents, TGraph* iGBackgroundEvents )
 {
 	char hname[800];
 	char htitle[800];
@@ -2050,16 +1932,16 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerBin( unsigned int iBin, TGraph* iGSig
 		iCanvas->SetLeftMargin( 0.12 );
 		iCanvas->SetGridx( 0 );
 		iCanvas->SetGridy( 0 );
-
+		
 		sprintf( hname, "hSignalToSqrtNoise_%d", iBin );
-        TH1F *iSignal_to_sqrtNoise = new TH1F( hname, "", 100, -1., 1. );
-        iSignal_to_sqrtNoise->SetMinimum( 0. );
-        iSignal_to_sqrtNoise->SetMaximum( 6. );
-        iSignal_to_sqrtNoise->SetXTitle( "MVA value #Tau" );
-        iSignal_to_sqrtNoise->SetYTitle( "significance" );
-        iSignal_to_sqrtNoise->GetYaxis()->SetTitleOffset( 1.3 );
-        iSignal_to_sqrtNoise->SetStats( 0 );
-        iSignal_to_sqrtNoise->Draw();
+		TH1F* iSignal_to_sqrtNoise = new TH1F( hname, "", 100, -1., 1. );
+		iSignal_to_sqrtNoise->SetMinimum( 0. );
+		iSignal_to_sqrtNoise->SetMaximum( 6. );
+		iSignal_to_sqrtNoise->SetXTitle( "MVA value #Tau" );
+		iSignal_to_sqrtNoise->SetYTitle( "significance" );
+		iSignal_to_sqrtNoise->GetYaxis()->SetTitleOffset( 1.3 );
+		iSignal_to_sqrtNoise->SetStats( 0 );
+		iSignal_to_sqrtNoise->Draw();
 		
 		iGSignal_to_sqrtNoise->SetTitle( "" );
 		setGraphPlottingStyle( iGSignal_to_sqrtNoise, 4, 1., 20, 0.5, 0, 1 );
@@ -2144,93 +2026,6 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerBin( unsigned int iBin, TGraph* iGSig
 										  hnull->GetXaxis()->GetXmax(), fOptimizationMinBackGroundEvents );
 			iLMinBack->SetLineStyle( 2 );
 			iLMinBack->Draw();
-		}
-	}
-	
-	// angular containment radius
-	if( iGOpt_AngularContainmentRadius )
-	{
-		sprintf( hname, "cCR_%d", iBin );
-		sprintf( htitle, "containment radius (%s)", fTMVAData[iBin]->GetTitle() );
-		TCanvas* iCanvas = new TCanvas( hname, htitle, 750, 10 + iBin * 30, 400, 400 );
-		iCanvas->SetLeftMargin( 0.13 );
-		iCanvas->SetGridx( 0 );
-		iCanvas->SetGridy( 0 );
-		
-		sprintf( hname, "hBC_%d", iBin );
-		TH1D* hnull = new TH1D( hname, "", 100, -1., 1. );
-		hnull->SetXTitle( "cut value" );
-		hnull->SetYTitle( "containment radius [deg]" );
-		hnull->SetMinimum( 1.e-3 );
-		double x = 0.;
-		double y = 0.;
-		double y_max = 0.;
-		for( int i = 0; i < iGOpt_AngularContainmentRadius->GetN(); i++ )
-		{
-			iGOpt_AngularContainmentRadius->GetPoint( i, x, y );
-			if( y > y_max )
-			{
-				y_max = y;
-			}
-		}
-		if( y_max < 1.e-3 )
-		{
-			y_max = 1.;
-		}
-		hnull->SetMaximum( y_max * 1.5 );
-		hnull->SetStats( 0 );
-		hnull->GetYaxis()->SetTitleOffset( 1.5 );
-		hnull->DrawCopy();
-		
-		setGraphPlottingStyle( iGOpt_AngularContainmentRadius, 1, 1., 20 );
-		iGOpt_AngularContainmentRadius->Draw( "pl" );
-		if( iBin < fTMVAData.size() && fTMVAData[iBin] )
-		{
-			TLine* iL = new TLine( fTMVAData[iBin]->fTMVACutValue, hnull->GetMinimum(), fTMVAData[iBin]->fTMVACutValue, y_max * 1.5 );
-			iL->SetLineStyle( 2 );
-			iL->SetLineWidth( 3 );
-			iL->Draw();
-		}
-	}
-	// angular containment fraction
-	if( iGOpt_AngularContainmentFraction )
-	{
-		sprintf( hname, "cCF_%d", iBin );
-		sprintf( htitle, "containment fraction (%s)", fTMVAData[iBin]->GetTitle() );
-		TCanvas* iCanvas = new TCanvas( hname, htitle, 750, 10 + iBin * 30, 400, 400 );
-		iCanvas->SetLeftMargin( 0.13 );
-		iCanvas->SetGridx( 0 );
-		iCanvas->SetGridy( 0 );
-		
-		sprintf( hname, "hBF_%d", iBin );
-		TH1D* hnull = new TH1D( hname, "", 100, -1., 1. );
-		hnull->SetXTitle( "cut value" );
-		hnull->SetYTitle( "containment fraction" );
-		hnull->SetMinimum( 1.e-3 );
-		double x = 0.;
-		double y = 0.;
-		double y_max = 0.;
-		for( int i = 0; i < iGOpt_AngularContainmentFraction->GetN(); i++ )
-		{
-			iGOpt_AngularContainmentFraction->GetPoint( i, x, y );
-			if( y > y_max )
-			{
-				y_max = y;
-			}
-		}
-		hnull->SetMaximum( y_max * 1.5 );
-		hnull->SetStats( 0 );
-		hnull->GetYaxis()->SetTitleOffset( 1.5 );
-		hnull->DrawCopy();
-		
-		setGraphPlottingStyle( iGOpt_AngularContainmentFraction, 1, 1., 20 );
-		iGOpt_AngularContainmentFraction->Draw( "pl" );
-		if( iBin < fTMVAData.size() && fTMVAData[iBin] )
-		{
-			TLine* iL = new TLine( fTMVAData[iBin]->fTMVACutValue, hnull->GetMinimum(), fTMVAData[iBin]->fTMVACutValue, y_max * 1.5 );
-			iL->SetLineStyle( 2 );
-			iL->SetLineWidth( 3 );
-			iL->Draw();
 		}
 	}
 	
@@ -2494,7 +2289,7 @@ TGraph* VTMVAEvaluator::fillfromGraph2D( TObject* i_G, double i_ze_min, double i
 
 VTMVAEvaluatorData::VTMVAEvaluatorData()
 {
-    fTMVAName = "";
+	fTMVAName = "";
 	fTMVAFileName = "";
 	fTMVAFileNameXML = "";
 	fTMVAMethodTag = "";
@@ -2510,8 +2305,6 @@ VTMVAEvaluatorData::VTMVAEvaluatorData()
 	fTMVACutValue = -99.;
 	fTMVAOptimumCutValueFound = false;
 	fSourceStrengthAtOptimum_CU = -99.;
-	fAngularContainmentRadius = -99.;
-	fAngularContainmentFraction = -99.;
 	
 	// transients
 	fTMVAReader = 0;

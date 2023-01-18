@@ -41,7 +41,7 @@ class VTMVAEvaluatorData : public TNamed
 {
 	public:
 	
-        string            fTMVAName;
+		string            fTMVAName;
 		string            fTMVAFileName;
 		string            fTMVAFileNameXML;
 		string            fTMVAMethodTag;
@@ -58,8 +58,6 @@ class VTMVAEvaluatorData : public TNamed
 		double            fTMVACutValue;
 		bool              fTMVAOptimumCutValueFound;
 		double            fSourceStrengthAtOptimum_CU;
-		double            fAngularContainmentRadius;
-		double            fAngularContainmentFraction;
 		
 		TMVA::Reader*     fTMVAReader;                       //!
 		
@@ -119,7 +117,6 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		bool     fSmoothAndInterpolateMVAValues;
 		
 		string   fTMVAMethodName;
-		double   fTMVAngularContainmentRadiusMax;     // maximum angular containment radius (optimization scales relative to this value)
 		double   fTMVAErrorFraction_min;             // remove bins from background efficiency curves with large errors
 		
 		double   fSpectralIndexForEnergyWeighting;        // used to calculate the spectral weighted mean of an energy bin
@@ -150,7 +147,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		bool             optimizeSensitivity( unsigned int iDataBin );
 		TGraph*          fillfromGraph2D( TObject* i_G, double i_ze_min, double i_ze_max );
 		void             fillTMVAEvaluatorResults();
-        string           getBDTFileName( unsigned int i_E_index, unsigned int i_Z_index, string iSuffix = "" );
+		string           getBDTFileName( unsigned int i_E_index, unsigned int i_Z_index, string iSuffix = "" );
 		unsigned int     getDataBin();
 		unsigned int     getDataBin( double iErec_log10TeV, double iZe );
 		double           getSignalEfficiency( unsigned int iEbin, double iE_min, double iE_max, unsigned int iZbin, double iZ_min, double iZ_max );
@@ -162,23 +159,21 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		void             plotEfficiencyPlotsPerBin( unsigned int iBin,
 				TGraph* iGSignal_to_sqrtNoise, TGraph* iGSignal_to_sqrtNoise_Smooth,
 				TH1F* hEffS, TH1F* hEffB,
-				TGraph* iGSignalEvents, TGraph* iGBackgroundEvents,
-				TGraph* iGOpt_AngularContainmentRadius, TGraph* iGOpt_AngularContainmentFraction );
+				TGraph* iGSignalEvents, TGraph* iGBackgroundEvents );
 		TGraph*          readNonNoffGraphsFromFile( TFile* iF, double i_ze_min, double i_ze_max, bool bIsOn = true );
 		void             reset();
-		void             smoothAndInterPolateMVAValue( TH1F*, TH1F*, 
-                unsigned int iE_min, unsigned int iE_max, unsigned int iZ_min, unsigned int iZ_max );
-        void             smoothAndInterPolateMVAValue_EnergyOnly( TH1F*, TH1F* );
-		void             smoothAndInterPolateMVAValue_Energy_and_Zenith( TH1F*, TH1F*, 
-                unsigned int iE_min, unsigned int iE_max, unsigned int iZ_min, unsigned int iZ_max );
-		
+		void             smoothAndInterPolateMVAValue( TH1F*, TH1F*,
+				unsigned int iE_min, unsigned int iE_max, unsigned int iZ_min, unsigned int iZ_max );
+		void             smoothAndInterPolateMVAValue_EnergyOnly( TH1F*, TH1F* );
+		void             smoothAndInterPolateMVAValue_Energy_and_Zenith( TH1F*, TH1F*,
+				unsigned int iE_min, unsigned int iE_max, unsigned int iZ_min, unsigned int iZ_max );
+				
 	public:
 	
 		VTMVAEvaluator();
 		~VTMVAEvaluator() {};
 		
 		bool    evaluate();
-		TGraph* getOptimalTheta2Cut_Graph();
 		vector< double > getBackgroundEfficiency();
 		vector< bool >   getOptimumCutValueFound();
 		vector< double > getSignalEfficiency();
@@ -242,10 +237,6 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		void   setSpectralIndexForEnergyWeighting( double iS = -2. )
 		{
 			fSpectralIndexForEnergyWeighting = iS;
-		}
-		void   setTMVAAngularContainmentRadiusMax( double iC = 0.68 )
-		{
-			fTMVAngularContainmentRadiusMax = iC;
 		}
 		void   setTMVACutValue( double iE = -99. );
 		void   setTMVACutValue( map< unsigned int, double > iMVA );

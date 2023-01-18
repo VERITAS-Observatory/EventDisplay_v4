@@ -1749,13 +1749,6 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
 	fTMVAEvaluatorResults = fTMVAEvaluator->getTMVAEvaluatorResults();
 	fTMVAEvaluator->printSignalEfficiency();
 	
-	fEnergyDependentCut[ "TMVABoxCut_Theta2_max" ] = fTMVAEvaluator->getOptimalTheta2Cut_Graph();
-	if( getTheta2Cut_TMVA_max() )
-	{
-		cout << "VGammaHadronCuts::initTMVAEvaluator: found theta2_max graph from TMVA" << endl;
-		getTheta2Cut_TMVA_max()->SetName( "TMVAtheta2" );
-	}
-	
 	if( cDir )
 	{
 		cDir->cd();

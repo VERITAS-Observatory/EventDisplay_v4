@@ -349,10 +349,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			return fCut_Theta2_max;
 		}
 		double getTheta2Cut_max( double e );                           // get theta2 max cut (might be energy dependent)    [TeV] energy (linear)
-		TGraph* getTheta2Cut_TMVA_max()
-		{
-			return getEnergyDependentCut( "TMVABoxCut_Theta2_max" );
-		}
 		TGraph* getTheta2Cut_IRF_Max()
 		{
 			return getEnergyDependentCut( "IRFAngRes" );
