@@ -8,7 +8,7 @@
 #include <VRawDataExceptions.h>
 #include <VRawEventData.h>
 #else
-#include <VDummyArrayTrigger.h>
+#include "VDummyArrayTrigger.h"
 #endif
 
 #include <iostream>

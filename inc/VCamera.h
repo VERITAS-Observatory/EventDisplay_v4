@@ -15,7 +15,7 @@
 #include <TText.h>
 #include <TColor.h>
 
-#include <VEvndispData.h>
+#include "VEvndispData.h"
 #ifndef NOVBF
 #include <VGPSDecoder.h>
 #endif
