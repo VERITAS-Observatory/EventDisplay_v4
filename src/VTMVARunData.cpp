@@ -7,15 +7,19 @@
 
 VTMVARunData::VTMVARunData()
 {
-	setDebug();
+	setDebug( false );
 	
 	fName = "noname";
+	fRunOption = "TRAIN";
 	
 	fTrainGammaHadronSeparation = true;
 	fTrainReconstructionQuality = false;  // in development: please ignore
 	
 	fOutputDirectoryName = "";
 	fOutputFileName = "";
+	
+	fnTrain_Signal = 0;
+	fnTrain_Background = 0;
 	
 	fQualityCuts = "1";
 	fQualityCutsBkg = "1";
@@ -27,6 +31,7 @@ VTMVARunData::VTMVARunData()
 	fBackgroundWeight = 1.;
 	fMinSignalEvents = 50;
 	fMinBackgroundEvents = 0;
+	fSelectedEventFileName = "";
 	
 	fNTtype = -1;
 	
@@ -213,7 +218,13 @@ bool VTMVARunData::openDataFiles()
 				}
 				else
 				{
-					iTempS << fOutputDirectoryName << "/" << fOutputFileName << ".root";
+					iTempS << fOutputDirectoryName << "/" << fOutputFileName;
+					fSelectedEventFileName =  iTempS.str() + "_preselect.root";
+					if( fRunOption == "WRITETRAININGEVENTS" )
+					{
+						iTempS << "_preselect";
+					}
+					iTempS << ".root";
 					iTempS2 << fOutputFileName;
 				}
 				output_zenith.push_back( new TFile( iTempS.str().c_str(), "RECREATE" ) );
@@ -245,6 +256,42 @@ bool VTMVARunData::openDataFiles()
 	}
 	
 	return true;
+}
+
+/*
+ * read a unsigned int from the TMVA option string
+ *
+ */
+unsigned int VTMVARunData::getTrainOptionValue( string iVarName, unsigned int i_default )
+{
+	if( fPrepareTrainingOptions.find( iVarName ) == string::npos )
+	{
+		return i_default;
+	}
+	size_t s_0 = fPrepareTrainingOptions.find( iVarName ) + iVarName.size() + 1;
+	size_t s_1 = fPrepareTrainingOptions.find( ":", s_0 );
+	
+	return ( unsigned int )atoi( fPrepareTrainingOptions.substr( s_0, s_1 - s_0 ).c_str() );
+}
+
+
+/*
+ * update number of training events, if lower than requested
+ *
+ */
+void VTMVARunData::updateTrainingEvents( string iVarName, unsigned int iNEvents )
+{
+	unsigned int i_requested_nevents = getTrainOptionValue( iVarName, 0 );
+	
+	size_t s_0 = fPrepareTrainingOptions.find( iVarName ) + iVarName.size() + 1;
+	size_t s_1 = fPrepareTrainingOptions.find( ":", s_0 );
+	
+	if( iNEvents < i_requested_nevents )
+	{
+		cout << "WARNING: changing " << iVarName << " from ";
+		cout << i_requested_nevents << " to " << iNEvents << endl;
+		fPrepareTrainingOptions.replace( s_0, s_1 - s_0, std::to_string( iNEvents ) );
+	}
 }
 
 /*!
@@ -525,7 +572,8 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				{
 					fPrepareTrainingOptions = is_stream.str().substr( is_stream.tellg(), is_stream.str().size() ).c_str();
 					fPrepareTrainingOptions = VUtilities::removeSpaces( fPrepareTrainingOptions );
-					// remove all spaces
+					fnTrain_Signal = getTrainOptionValue( "nTrain_Signal", 0 );
+					fnTrain_Background = getTrainOptionValue( "nTrain_Background", 0 );
 				}
 				else
 				{
@@ -734,3 +782,29 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 	return true;
 }
 
+void VTMVARunData::shuffleFileVectors()
+{
+	std::random_device rd;
+	std::mt19937 g( rd() );
+	std::shuffle( fSignalFileName.begin(), fSignalFileName.end(), g );
+	std::shuffle( fBackgroundFileName.begin(), fBackgroundFileName.end(), g );
+}
+
+VTableLookupRunParameter* VTMVARunData::getTLRunParameter()
+{
+	TDirectory* iG_CurrentDirectory = gDirectory;
+	if( fSignalFileName.size() > 0 )
+	{
+		TFile* iF = new TFile( fSignalFileName[0].c_str() );
+		if( iF->IsZombie() )
+		{
+			cout << "Error reading run parameters from ";
+			cout << fSignalFileName[0] << endl;
+			return 0;
+		}
+		VTableLookupRunParameter* iP = ( VTableLookupRunParameter* )iF->Get( "TLRunParameter" );
+		iG_CurrentDirectory->cd();
+		return iP;
+	}
+	return 0;
+}
