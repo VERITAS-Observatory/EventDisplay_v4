@@ -466,7 +466,7 @@ int main( int argc, char* argv[] )
 	
 	//////////////////////////////////////
 	// train MVA
-	// (one training per energy bin)
+	// (one training per energy and zenith bin)
 	cout << "Number of energy bins: " << fData->fEnergyCutData.size();
 	cout << ", number of zenith bins: " << fData->fZenithCutData.size();
 	cout << endl;
