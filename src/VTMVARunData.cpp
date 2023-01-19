@@ -14,8 +14,6 @@ VTMVARunData::VTMVARunData()
 	fTrainGammaHadronSeparation = true;
 	fTrainReconstructionQuality = false;  // in development: please ignore
 	
-	fCheckValidityOfInputVariables = true;
-	
 	fOutputDirectoryName = "";
 	fOutputFileName = "";
 	
@@ -533,16 +531,6 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				{
 					cout << "VTMVARunData::readConfigurationFile error while reading input for variable PREPARE_TRAINING_OPTIONS" << endl;
 					return false;
-				}
-			}
-			// check event validity
-			if( temp == "CHECKEVENTVALIDITY" )
-			{
-				if( !( is_stream >> std::ws ).eof() )
-				{
-					int iT = 0;
-					is_stream >> iT;
-					fCheckValidityOfInputVariables = ( bool )iT;
 				}
 			}
 			// signal weight

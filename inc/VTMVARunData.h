@@ -47,9 +47,6 @@ class VTMVARunData : public TNamed
 		string            fOutputDirectoryName;
 		vector< vector< TFile* > >  fOutputFile;
 		
-		// training options
-		bool              fCheckValidityOfInputVariables;
-		
 		// training data
 		double            fSignalWeight;
 		vector< string >  fSignalFileName;
@@ -104,7 +101,7 @@ class VTMVARunData : public TNamed
 			fName = iN;
 		}
 		
-		ClassDef( VTMVARunData, 9 );
+		ClassDef( VTMVARunData, 10 );
 };
 
 #endif
