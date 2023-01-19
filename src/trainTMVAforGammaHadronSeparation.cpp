@@ -403,6 +403,7 @@ bool train( VTMVARunData* iRun,
 	
 	factory->EvaluateAllMethods();
 	
+	dataloader->Delete();
 	factory->Delete();
 	
 	return true;
@@ -561,6 +562,7 @@ int main( int argc, char* argv[] )
 			rename( iTempS.str().c_str(), iFinalRootFileName.c_str() );
 		}
 	}
+	fData->Delete();
 	return 0;
 }
 
