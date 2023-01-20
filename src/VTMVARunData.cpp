@@ -377,17 +377,20 @@ void VTMVARunData::print()
 	{
 		cout << "energy reconstruction method " << fEnergyCutData[0]->fEnergyReconstructionMethod << endl;
 	}
-	cout << "signal data file(s): " << endl;
-	for( unsigned int i = 0; i < fSignalFileName.size(); i++ )
+	if( fRunOption == "WRITETRAININGEVENTS" )
 	{
-		cout << "\t" << fSignalFileName[i] << endl;
-	}
-	if( !fTrainReconstructionQuality )
-	{
-		cout << "background data file(s): " << endl;
-		for( unsigned int i = 0; i < fBackgroundFileName.size(); i++ )
+		cout << "signal data file(s): " << endl;
+		for( unsigned int i = 0; i < fSignalFileName.size(); i++ )
 		{
-			cout << "\t" << fBackgroundFileName[i] << endl;
+			cout << "\t" << fSignalFileName[i] << endl;
+		}
+		if( !fTrainReconstructionQuality )
+		{
+			cout << "background data file(s): " << endl;
+			for( unsigned int i = 0; i < fBackgroundFileName.size(); i++ )
+			{
+				cout << "\t" << fBackgroundFileName[i] << endl;
+			}
 		}
 	}
 	cout << "output file: " << fOutputFileName << " (" << fOutputDirectoryName << ")" << endl;
