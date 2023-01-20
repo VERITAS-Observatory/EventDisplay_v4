@@ -133,8 +133,7 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
 			if( !iDataTree_reduced )
 			{
 				cout << "Error preparing reduced tree" << endl;
-				cout << "exiting..." << endl;
-				exit( EXIT_FAILURE );
+				return 0;
 			}
 			iTreeVector[i]->Draw( ">>elist", iCut, "entrylist" );
 			TEntryList* elist = ( TEntryList* )gDirectory->Get( "elist" );
@@ -191,8 +190,7 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
 	else
 	{
 		cout << "Error in reducing data trees (missing tree)" << endl;
-		cout << "exiting..." << endl;
-		exit( EXIT_FAILURE );
+		return 0;
 	}
 	// cleanup all remaining trees
 	for( unsigned int i = 0; i < iTreeVector.size(); i++ )
@@ -208,7 +206,6 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
 			iRun->fBackgroundTree[i] = 0;
 		}
 	}
-	
 	return iDataTree_reduced;
 }
 
@@ -283,15 +280,13 @@ bool train( VTMVARunData* iRun,
 							  iCutSignal, true );
 		iBackgroundTree_reduced = prepareSelectedEventsTree( iRun,
 								  iCutBck, false );
-								  
-		if( iSignalTree_reduced )
+		if( !iSignalTree_reduced || !iBackgroundTree_reduced )
 		{
-			iSignalTree_reduced->Write();
+			cout << "Error: failed preparing traing / testing trees" << endl;
+			return false;
 		}
-		if( iBackgroundTree_reduced )
-		{
-			iBackgroundTree_reduced->Write();
-		}
+		iSignalTree_reduced->Write();
+		iBackgroundTree_reduced->Write();
 		if( iRun->getTLRunParameter() )
 		{
 			iRun->getTLRunParameter()->Write();
@@ -309,7 +304,7 @@ bool train( VTMVARunData* iRun,
 		{
 			cout << "Error open file with pre-selected events: ";
 			cout << iRun->fSelectedEventFileName << endl;
-			exit( EXIT_FAILURE );
+			return false;
 		}
 		iSignalTree_reduced = ( TTree* )iF->Get( "data_signal" );
 		iBackgroundTree_reduced = ( TTree* )iF->Get( "data_background" );
@@ -317,6 +312,14 @@ bool train( VTMVARunData* iRun,
 	if( !iSignalTree_reduced || !iBackgroundTree_reduced )
 	{
 		cout << "Error: failed preparing traing / testing trees" << endl;
+		return false;
+	}
+	if( iSignalTree_reduced->GetEntries()  == 0 || iBackgroundTree_reduced->GetEntries() == 0 )
+	{
+		cout << "Error: no events available for training: ";
+		cout << " signal (" << iSignalTree_reduced->GetEntries() << "), ";
+		cout << " background (" << iBackgroundTree_reduced->GetEntries() << ")" << endl;
+		return false;
 	}
 	iRun->updateTrainingEvents( "nTrain_Signal", ( unsigned int )iSignalTree_reduced->GetEntries() * 0.7 );
 	iRun->updateTrainingEvents( "nTrain_Background", ( unsigned int )iBackgroundTree_reduced->GetEntries() * 0.7 );
@@ -534,6 +537,7 @@ int main( int argc, char* argv[] )
 				cout << "===================================================================================" << endl;
 				cout << endl;
 			}
+			///////////////////////////////////////////////
 			// training
 			if( fData->fTrainGammaHadronSeparation && !trainGammaHadronSeparation( fData, i, j ) )
 			{
