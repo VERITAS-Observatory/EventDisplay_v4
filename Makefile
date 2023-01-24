@@ -1246,28 +1246,6 @@ trainTMVAforGammaHadronSeparation:	$(MAKEOPTCUTTMVAOBJ)
 	@echo "Done"
 
 ########################################################
-# trainTMVAforGammaHadronSeparation_TrainingFile
-########################################################
-MAKEOPTCUTTMVATRAININGOBJ= 	./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
-				./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
-				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-				./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
-				./obj/VEvndispRunParameter.o obj/VEvndispRunParameter_Dict.o \
-				./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
-				./obj/trainTMVAforGammaHadronSeparation_TrainingFile.o
-
-ifeq ($(ASTRONMETRY),-DASTROSLALIB)
-    MAKEOPTCUTTMVATRAININGOBJ += ./obj/VASlalib.o
-endif
-
-./obj/trainTMVAforGammaHadronSeparation_TrainingFile.o:	./src/trainTMVAforGammaHadronSeparation_TrainingFile.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-trainTMVAforGammaHadronSeparation_TrainingFile:	$(MAKEOPTCUTTMVATRAININGOBJ)
-	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
-	@echo "Done"
-
-########################################################
 # VTS.calculateCrabRateFromMC
 ########################################################
 ./obj/VTS.calculateCrabRateFromMC.o:	./src/VTS.calculateCrabRateFromMC.cpp

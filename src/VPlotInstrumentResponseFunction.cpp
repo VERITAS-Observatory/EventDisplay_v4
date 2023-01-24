@@ -441,15 +441,15 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
 	char hname[200];
 	
 	sprintf( hname, "cEA_Ematrix_%d_%d_%d_%d", iDataSetID, bFineBinning, bQualityCuts, bInterPol );
-    ostringstream htitle;
-    htitle << "energy reconstruction matrix (" << iDataSetID << "," << bInterPol << ")";
+	ostringstream htitle;
+	htitle << "energy reconstruction matrix (" << iDataSetID << "," << bInterPol << ")";
 	if( bFineBinning )
 	{
-        htitle << " (fine binning)";
+		htitle << " (fine binning)";
 	}
 	if( bQualityCuts )
 	{
-        htitle << " , QC";
+		htitle << " , QC";
 	}
 	TCanvas* iEnergyReconstructionMatrixCanvas = new TCanvas( hname, htitle.str().c_str(), 610, 10, fCanvasSize_X, fCanvasSize_Y );
 	iEnergyReconstructionMatrixCanvas->SetGridx( 0 );
