@@ -154,6 +154,18 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
 				{
 					i_fraction_of_events_to_keep /= ( double )iTreeVector.size();
 				}
+				cout << "\t keeping " << i_fraction_of_events_to_keep * 100. << "\% of events of ";
+				if( iSignal )
+				{
+					cout << iRun->fSignalFileName[i];
+				}
+				else
+				{
+					cout << iRun->fBackgroundFileName[i];
+				}
+				cout << " (training events: " << i_event_selected;
+				cout << ", events after pre-cuts: " << elist->GetN() << " number of runs: " << iTreeVector.size() << ")";
+				cout << endl;
 				for( Long64_t el = 0; el < elist->GetN(); el++ )
 				{
 					if( gRandom->Uniform() > i_fraction_of_events_to_keep )
