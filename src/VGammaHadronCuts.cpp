@@ -642,7 +642,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 							// check of path name is complete
 							if( gSystem->AccessPathName( fTMVAWeightFile.c_str() ) )
 							{
-								fTMVAWeightFile = VGlobalRunParameter::getDirectory_EVNDISPAnaData() + fTMVAWeightFile;
+								fTMVAWeightFile = VGlobalRunParameter::getDirectory_EVNDISPAnaDataTMP() + fTMVAWeightFile;
 								if( gSystem->AccessPathName( fTMVAWeightFile.c_str() ) )
 								{
 									cout << "VGammaHadronCuts::readCuts error,";
@@ -1667,7 +1667,9 @@ void VGammaHadronCuts::initializeCuts( int irun, string iFile )
 	// TMVA cuts
 	else if( useTMVACuts() )
 	{
-		if( !initTMVAEvaluator( fTMVAWeightFile, fTMVAWeightFileIndex_Emin, fTMVAWeightFileIndex_Emax, fTMVAWeightFileIndex_Zmin, fTMVAWeightFileIndex_Zmax, fTMVAEnergyStepSize ) )
+		if( !initTMVAEvaluator( fTMVAWeightFile,
+								fTMVAWeightFileIndex_Emin, fTMVAWeightFileIndex_Emax,
+								fTMVAWeightFileIndex_Zmin, fTMVAWeightFileIndex_Zmax, fTMVAEnergyStepSize ) )
 		{
 			cout << "VGammaHadronCuts::initializeCuts: failed setting TMVA reader for " << fTMVAWeightFile;
 			cout << "(" << fTMVAWeightFileIndex_Emin << "," << fTMVAWeightFileIndex_Emax << ")" << endl;
@@ -1696,7 +1698,12 @@ void VGammaHadronCuts::initializeCuts( int irun, string iFile )
 	}
 }
 
-bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_Emin, unsigned int iTMVAWeightFileIndex_Emax,
+/*
+ * initialize TMVA evaluator
+ *
+ */
+bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile,
+		unsigned int iTMVAWeightFileIndex_Emin, unsigned int iTMVAWeightFileIndex_Emax,
 		unsigned int iTMVAWeightFileIndex_Zmin, unsigned int iTMVAWeightFileIndex_Zmax,  double iTMVAEnergy_StepSize )
 {
 	TDirectory* cDir = gDirectory;
@@ -1715,7 +1722,8 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
 				fTMVAOptimizeSignalEfficiencyObservationTime_h,
 				1. / 5. );
 		fTMVAEvaluator->setSensitivityOptimizationFixedSignalEfficiency( fTMVAFixedSignalEfficiencyMax );
-		fTMVAEvaluator->setParticleNumberFile( fTMVAOptimizeSignalEfficiencyParticleNumberFile, fTMVAParticleNumberFile_Conversion_Rate_to_seconds );
+		fTMVAEvaluator->setParticleNumberFile(
+			fTMVAOptimizeSignalEfficiencyParticleNumberFile, fTMVAParticleNumberFile_Conversion_Rate_to_seconds );
 		fTMVAEvaluator->setSensitivityOptimizationMinSourceStrength( fTMVAMinSourceStrength );
 	}
 	// set a constant signal efficiency
