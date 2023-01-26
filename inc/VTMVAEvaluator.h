@@ -47,9 +47,11 @@ class VTMVAEvaluatorData : public TNamed
 		string            fTMVAMethodTag;
 		string            fTMVAMethodTag_2;
 		
+		unsigned int      fEnergyBin;
 		double            fEnergyCut_Log10TeV_min;
 		double            fEnergyCut_Log10TeV_max;
 		double            fSpectralWeightedMeanEnergy_Log10TeV;
+		unsigned int      fZenithBin;
 		double            fZenithCut_min;
 		double            fZenithCut_max;
 		
@@ -65,7 +67,7 @@ class VTMVAEvaluatorData : public TNamed
 		~VTMVAEvaluatorData() {}
 		void print();
 		
-		ClassDef( VTMVAEvaluatorData, 2 );
+		ClassDef( VTMVAEvaluatorData, 3 );
 };
 
 ///////////////////////////////////////////////////////////////////////////////
