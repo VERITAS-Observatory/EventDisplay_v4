@@ -1015,7 +1015,7 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
 					cout << "VAnaSumRunParameter::loadLongFileList: error in run list: " << endl;
 					cout << is_line << endl;
 					cout << "invalid maximum distance " << i_sT.fmaxradius << endl;
-					exit( -1 );
+					exit( EXIT_FAILURE );
 				}
 			}
 			// file for effective areas
@@ -1024,27 +1024,35 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
 			// cuts are in the effective area files
 			if( fVersion >= 7 )
 			{
-				// check if IRF runparameters are consistent with ANASUM.runparameter file
-				checkAnasumParameter( i_sT.fEffectiveAreaFile );
-				
-				i_sT.fCutFile = temp;
-				// source radius (actually (source radius)^2 )
-				// (read theta2 cut from cut file)
-				if( !bTotalAnalysisOnly )
+				if( i_sT.fEffectiveAreaFile.find( "IGNOREEFFECTIVEAREA" ) != string::npos )
 				{
-					readCutParameter( i_sT.fCutFile, i_sT.fSourceRadius, i_sT.fmaxradius );
+					cout << "VAnaSumRunParameter::loadLongFileList warning: ";
+					cout << "ignore effective areas - cannot read cuts from effective area files" << endl;
 				}
 				else
 				{
-					i_sT.fSourceRadius = 0.1;
-					i_sT.fmaxradius = 2.0;
-				}
-				if( i_sT.fSourceRadius <= 0. )
-				{
-					cout << "VAnaSumRunParameter::loadLongFileList: error in run list: " << endl;
-					cout << is_line << endl;
-					cout << "invalid source radius " << i_sT.fSourceRadius << endl;
-					exit( -1 );
+					// check if IRF runparameters are consistent with ANASUM.runparameter file
+					checkAnasumParameter( i_sT.fEffectiveAreaFile );
+					
+					i_sT.fCutFile = temp;
+					// source radius (actually (source radius)^2 )
+					// (read theta2 cut from cut file)
+					if( !bTotalAnalysisOnly )
+					{
+						readCutParameter( i_sT.fCutFile, i_sT.fSourceRadius, i_sT.fmaxradius );
+					}
+					else
+					{
+						i_sT.fSourceRadius = 0.1;
+						i_sT.fmaxradius = 2.0;
+					}
+					if( i_sT.fSourceRadius <= 0. )
+					{
+						cout << "VAnaSumRunParameter::loadLongFileList: error in run list: " << endl;
+						cout << is_line << endl;
+						cout << "invalid source radius " << i_sT.fSourceRadius << endl;
+						exit( EXIT_FAILURE );
+					}
 				}
 			}
 			// background model dependend parameters
@@ -1088,7 +1096,7 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
 				is_stream >> temp;
 				i_sT.fTE_mscl_max = atof( temp.c_str() );
 				cout << "DO NOT USE " << endl;
-				exit( 0 );
+				exit( EXIT_SUCCESS );
 			}
 			else if( i_sT.fBackgroundModel == eONOFF )
 			{
