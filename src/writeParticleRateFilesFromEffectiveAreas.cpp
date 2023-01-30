@@ -1,6 +1,6 @@
 /* writeParticleRateFilesFromEffectiveAreas
 
-   write files with particle number spectra for on (gamma) and off (protons+electrons) counts
+   write files with events rates for on (gamma) and off (protons+electrons) simulations
 
    files are needed e.g. for setting the optimal cut value for TMVA cuts
 
@@ -25,43 +25,12 @@
 using namespace std;
 
 /*
-
- calculate angular angular resolution vs containment radius vs energy
-*/
-void writeAngResHistogram( char* iMC_Gamma = 0, string iParticleNumberFile = "particleNumbers.tmp.root" )
-{
-	if( !iMC_Gamma )
-	{
-		return;
-	}
-	
-	VInstrumentResponseFunctionReader iR;
-	iR.fillData( iMC_Gamma );
-	for( unsigned int i = 0; i < iR.fIRF_TreeNames.size(); i++ )
-	{
-		if( iR.fIRF_TreeNames[i] == "t_angular_resolution_095p" )
-		{
-			TH2D* h = 0;
-			if( i < iR.fIRF_Data.size() && iR.fIRF_Data[i] )
-			{
-				h = iR.fIRF_Data[i]->f2DHisto[VInstrumentResponseFunctionData::E_DIFF];
-			}
-			TH2D* hRes = VHistogramUtilities::calculateContainmentDistance( h, "AngResCumulative" );
-			if( hRes )
-			{
-				TFile hh( iParticleNumberFile.c_str(), "update" );
-				cout << "writing angular resolution histogram to " << hh.GetName() << endl;
-				hRes->Write();
-				hh.Close();
-			}
-			break;
-		}
-	}
-}
-
-
-
-
+ *
+ * calculate and write events rates for different particle types
+ *
+ * one should use the same CR spectra as in the other analysis
+ *
+ */
 void writeParticleNumberFile( char* iMC_Gamma = 0, char* iMC_Proton = 0, char* iMC_Electron = 0,
 							  unsigned int iCrabSpec_ID = 5, string iParticleNumberFile = "particleNumbers.tmp.root",
 							  string iObservatory = "CTA" )
@@ -109,7 +78,7 @@ void writeParticleNumberFile( char* iMC_Gamma = 0, char* iMC_Proton = 0, char* i
 	}
 }
 
-/*
+/*******************************************************************************************************
 
     write files with particle number spectra for on (gamma) and off (protons+electrons) counts
 
@@ -120,14 +89,16 @@ void writeParticleNumberFile( char* iMC_Gamma = 0, char* iMC_Proton = 0, char* i
 */
 int main( int argc, char* argv[] )
 {
-	if( argc != 5 && argc != 6 )
+	if( argc != 6 && argc != 7 )
 	{
 		cout << endl;
-		cout << "writeParticleRateFilesFromEffectiveAreas <sub array> <onSource/cone>";
-		cout <<  "<reconstruction ID> <directory with effective areas> [directory with angular resolution files]" << endl;
+		cout << "writeParticleRateFilesFromEffectiveAreas <sub array> <onSource/cone> ";
+		cout <<  "<reconstruction ID> <directory with effective areas> ";
+		cout << "<output directory> ";
+		cout << "[directory with angular resolution files]" << endl;
 		cout << argc << endl;
 		cout << endl;
-		exit( 0 );
+		exit( EXIT_SUCCESS );
 	}
 	
 	cout << endl;
@@ -139,10 +110,11 @@ int main( int argc, char* argv[] )
 	string iOnSource = argv[2];
 	int    iRecID = atoi( argv[3] );
 	string iDataDir = argv[4];
+	string iODataDir = argv[5];
 	string iAngResDir = "";
-	if( argc == 6 )
+	if( argc == 7 )
 	{
-		iAngResDir = argv[5];
+		iAngResDir = argv[6];
 	}
 	
 	// hardwired total number of off source bins
@@ -153,20 +125,17 @@ int main( int argc, char* argv[] )
 	}
 	else if( iOnSource == "cone" )
 	{
-		iOffSetCounter = 8;
+		iOffSetCounter = 6;
 	}
-	else if( iOnSource == "offset_7_bin_Norm_Pointing" )
+	// fine binning in off axis
+	else if( iOnSource == "coneFB" )
 	{
-		iOffSetCounter = 7;
-	}
-	else if( iOnSource == "offset_9_bin_WARSAW" )
-	{
-		iOffSetCounter = 9;
+		iOffSetCounter = 17;
 	}
 	else
 	{
 		cout << iOnSource << " invalid off source descriptor; should be: onSource or cone" << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	
 	// effective area file names
@@ -176,22 +145,6 @@ int main( int argc, char* argv[] )
 	string iMC_Proton_onSource = "proton_onSource";
 	string iMC_Electron = "electron";
 	string iMC_Electron_onSource = "electron_onSource";
-	
-	if( iOnSource == "offset_9_bin_WARSAW" )
-	{
-		iMC_Gamma_cone = "gamma_0-20_WARSAW";
-		iMC_Proton = "proton_0-20_rER_WARSAW";
-		iMC_Electron = "";
-		iMC_Gamma_onSource = "";
-	}
-	if( iOnSource == "offset_7_bin_Norm_Pointing" )
-	{
-		iMC_Gamma_cone = "gamma_0-20_Norm_Pointing";
-		iMC_Proton = "proton_0-20_rER_Norm_Pointing";
-		iMC_Electron = "";
-		iMC_Gamma_onSource = "";
-	}
-	
 	
 	char iGamma[800];
 	char iProton[800];
@@ -203,49 +156,9 @@ int main( int argc, char* argv[] )
 	// on-axis rates
 	if( iMC_Gamma_onSource.size() > 0 )
 	{
-		sprintf( iParticleNumberFile, "%s/ParticleNumbers.%s.00.root", iDataDir.c_str(), SubArray.c_str() );
+		sprintf( iParticleNumberFile, "%s/ParticleNumbers.%s.00.root", iODataDir.c_str(), SubArray.c_str() );
 		sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Gamma_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
 		sprintf( iProton, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Proton_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
-		if( iMC_Electron_onSource.size() > 0 )
-		{
-			sprintf( iElectron, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Electron_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
-			writeParticleNumberFile( iGamma, iProton, iElectron, 5, iParticleNumberFile );
-		}
-		else
-		{
-			writeParticleNumberFile( iGamma, iProton, 0, 5, iParticleNumberFile );
-		}
-		// angular resolution histogram
-		if( iAngResDir.size() > 0 )
-		{
-			sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iAngResDir.c_str(), iMC_Gamma_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
-			writeAngResHistogram( iGamma, iParticleNumberFile );
-		}
-	}
-	
-	// off-axis rates
-	for( int j = 0; j < iOffSetCounter; j++ ) // use first bin on source particle file
-	{
-	
-		sprintf( iParticleNumberFile, "%s/ParticleNumbers.%s.%d.root", iDataDir.c_str(), SubArray.c_str(), j );
-		sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Gamma_cone.c_str(), SubArray.c_str(), iRecID, j );
-		sprintf( iProton, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Proton.c_str(), SubArray.c_str(), iRecID, j );
-		
-		if( iMC_Electron.size() > 0 )
-		{
-			sprintf( iElectron, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Electron.c_str(), SubArray.c_str(), iRecID, j );
-			writeParticleNumberFile( iGamma, iProton, iElectron, 5, iParticleNumberFile );
-		}
-		else
-		{
-			writeParticleNumberFile( iGamma, iProton, 0, 5, iParticleNumberFile );
-		}
-		// angular resolution histogram
-		if( iAngResDir.size() > 0 )
-		{
-			sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iAngResDir.c_str(), iMC_Gamma_cone.c_str(), SubArray.c_str(), iRecID, j );
-			writeAngResHistogram( iGamma, iParticleNumberFile );
-		}
+		writeParticleNumberFile( iGamma, iProton, 0, 5, iParticleNumberFile );
 	}
 }
-

@@ -222,7 +222,7 @@ all VTS:	evndisp \
 	makeEffectiveArea \
 	trainTMVAforGammaHadronSeparation \
 	trainTMVAforAngularReconstruction \
-	VTS.calculateCrabRateFromMC \
+	calculateCrabRateFromMC \
 	VTS.calculateExposureFromDB \
 	slib \
 	combineEffectiveAreas \
@@ -1246,17 +1246,26 @@ trainTMVAforGammaHadronSeparation:	$(MAKEOPTCUTTMVAOBJ)
 	@echo "Done"
 
 ########################################################
-# VTS.calculateCrabRateFromMC
+# calculateCrabRateFromMC
 ########################################################
-./obj/VTS.calculateCrabRateFromMC.o:	./src/VTS.calculateCrabRateFromMC.cpp
+./obj/calculateCrabRateFromMC.o:	./src/calculateCrabRateFromMC.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-VTS.calculateCrabRateFromMC:	./obj/CEffArea.o ./obj/CEffArea_Dict.o \
+calculateCrabRateFromMC:	./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 				./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
 				./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
 				./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
 				./obj/VRunList_Dict.o ./obj/VRunList.o \
 				./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
+				./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
+				./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \
+				./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
+				./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+				./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
+				./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
+				./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
+				./obj/Ctelconfig.o \
+				./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 				./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
 				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
                                 ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
@@ -1265,7 +1274,7 @@ VTS.calculateCrabRateFromMC:	./obj/CEffArea.o ./obj/CEffArea_Dict.o \
                                  ./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
                                 ./obj/VSkyCoordinatesUtilities.o \
                                 ./obj/VDB_Connection.o \
-				./obj/VTS.calculateCrabRateFromMC.o
+				./obj/calculateCrabRateFromMC.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
