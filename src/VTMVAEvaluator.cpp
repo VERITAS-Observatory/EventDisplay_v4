@@ -2236,7 +2236,8 @@ vector< bool > VTMVAEvaluator::getOptimumCutValueFound()
  * interpolates between zenith range and return a TGraph
  *
  */
-TGraph* VTMVAEvaluator::readNonNoffGraphsFromFile( TFile* iF, double i_ze_min, double i_ze_max, bool bIsOn )
+TGraph* VTMVAEvaluator::readNonNoffGraphsFromFile(
+	TFile* iF, double i_ze_min, double i_ze_max, bool bIsOn )
 {
 	if( !iF && iF->IsZombie() )
 	{
@@ -2246,10 +2247,6 @@ TGraph* VTMVAEvaluator::readNonNoffGraphsFromFile( TFile* iF, double i_ze_min, d
 	if( bIsOn )
 	{
 		i_N = iF->Get( "gONRate" );
-		if( !i_N )
-		{
-			i_N = iF->Get( "gSignalRate" );
-		}
 	}
 	else
 	{
