@@ -1199,8 +1199,14 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 	}
 	cout << "TVMAEvaluator::optimizeSensitivity reading: " << fParticleNumberFileName << endl;
 	// get the NOn (signal + background) and NOff (background) graphs
-	TGraph* i_on = readNonNoffGraphsFromFile( &iPN, fTMVAData[iDataBin]->fZenithCut_min, fTMVAData[iDataBin]->fZenithCut_max, true );
-	TGraph* i_of = readNonNoffGraphsFromFile( &iPN, fTMVAData[iDataBin]->fZenithCut_min, fTMVAData[iDataBin]->fZenithCut_max, false );
+	TGraph* i_on = readNonNoffGraphsFromFile(
+					   &iPN,
+					   fTMVAData[iDataBin]->fZenithCut_min, fTMVAData[iDataBin]->fZenithCut_max,
+					   true );
+	TGraph* i_of = readNonNoffGraphsFromFile(
+					   &iPN,
+					   fTMVAData[iDataBin]->fZenithCut_min, fTMVAData[iDataBin]->fZenithCut_max,
+					   false );
 	if( !i_on || !i_of )
 	{
 		cout << "VTVMAEvaluator::optimizeSensitivity error:" << endl;
