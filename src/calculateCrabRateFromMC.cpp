@@ -28,7 +28,7 @@ void fill_profilehistogram_for_TMVA(
 	TProfile2D* fMCRates_TMVA,
 	double i_E, double i_Ze, double iRate )
 {
-	if( fMCRates_TMVA )
+	if( fMCRates_TMVA && iRate > 0. )
 	{
 		fMCRates_TMVA->Fill( i_E, i_Ze, iRate );
 	}
