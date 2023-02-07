@@ -7,18 +7,82 @@
 
 #include "TF1.h"
 #include "TFile.h"
+#include "TProfile2D.h"
 #include "TTree.h"
 
 #include "CEffArea.h"
 #include "VGlobalRunParameter.h"
 #include "VMonteCarloRateCalculator.h"
-#include "VEnergySpectrumfromLiterature.h"
 
 #include <iostream>
 #include <vector>
 
 
 using namespace std;
+
+/*
+ * fill profile histogram with a new rate entry
+ *
+ */
+void fill_profilehistogram_for_TMVA(
+	TProfile2D* fMCRates_TMVA,
+	double i_E, double i_Ze, double iRate )
+{
+	if( fMCRates_TMVA )
+	{
+		fMCRates_TMVA->Fill( i_E, i_Ze, iRate );
+	}
+}
+
+/*
+ * read energy bin vector from TMVA run parameter file
+ *
+ */
+vector< double > read_energy_bins( string iTMVAParameterFile )
+{
+	vector< double > tmp_e;
+	ifstream is( iTMVAParameterFile.c_str(), ifstream::in );
+	if( !is )
+	{
+		cout << "Error reading energy bins from TMVA run parameter file" << endl;
+		cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
+	}
+	string is_line;
+	string temp;
+	while( getline( is, is_line ) )
+	{
+		if( is_line.size() == 0 )
+		{
+			continue;
+		}
+		istringstream is_stream( is_line );
+		if( ( is_stream >> std::ws ).eof() )
+		{
+			continue;
+		}
+		is_stream >> temp;
+		if( temp != "*" )
+		{
+			continue;
+		}
+		is_stream >> temp;
+		if( temp == "ENERGYBINS" )
+		{
+			is_stream >> temp;
+			while( !( is_stream >> std::ws ).eof() )
+			{
+				double iT = 0.;
+				is_stream >> iT;
+				tmp_e.push_back( iT );
+			}
+		}
+	}
+	is.close();
+	
+	return tmp_e;
+}
+
 
 int main( int argc, char* argv[] )
 {
@@ -27,10 +91,11 @@ int main( int argc, char* argv[] )
 	cout << endl;
 	cout << "VTS.calculateCrabRateFromMC (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
 	cout << "--------------------------------" << endl;
-	if( argc != 5 )
+	if( argc != 6 )
 	{
 		cout << "VTS.calculateCrabRateFromMC <effective area file> <outputfile> ";
-		cout << "<energy threshold [TeV]> <dead time (0=no dead time)" << endl;
+		cout << "<energy threshold [TeV]> <dead time (0=no dead time) ";
+		cout << "<TMVA parameter file>" << endl;
 		cout << endl;
 		exit( EXIT_SUCCESS );
 	}
@@ -47,19 +112,15 @@ int main( int argc, char* argv[] )
 	}
 	double fDeadTime = atof( argv[4] );
 	cout << "dead time: " << fDeadTime << endl;
-	bool bUsePowerLawOnly = true;
-	if( bUsePowerLawOnly )
-	{
-		cout << "Note! Hardwired Whipple spectrum (power law)" << endl;
-	}
+	
+	cout << "Note! Hardwired Whipple spectrum (power law)" << endl;
 	
 	float ze = 0.;
 	int az = 0;
 	float Woff = 0.;
 	int noise = 0;
 	float pedvar = 0.;
-	unsigned int nrates = 0;
-	float MCrate[1000];
+	float MCrate;
 	
 	TFile* f1 = new TFile( ioffile.c_str(), "RECREATE" );
 	if( f1->IsZombie() )
@@ -73,8 +134,7 @@ int main( int argc, char* argv[] )
 	fMC->Branch( "Woff", &Woff, "Woff/F" );
 	fMC->Branch( "noise", &noise, "noise/I" );
 	fMC->Branch( "pedvar", &pedvar, "pedvar/F" );
-	fMC->Branch( "nrates", &nrates, "nrates/i" );
-	fMC->Branch( "MCrate", MCrate, "MCrate[nrates]/F" );
+	fMC->Branch( "MCrate", &MCrate, "MCrate/F" );
 	
 	TFile* f = new TFile( ieff.c_str() );
 	if( f->IsZombie() )
@@ -102,57 +162,64 @@ int main( int argc, char* argv[] )
 	t->SetBranchAddress( "e0", t_e0 );
 	t->SetBranchAddress( "eff", t_eff );
 	
-	char hname[2000];
-	vector< unsigned int > fID;
-	vector< VEnergySpectrumfromLiterature* > fESpecFun;
-	// Crab Nebula Spectra
-	if( !bUsePowerLawOnly )
+	unsigned int iN = t->GetEntries();
+	// profile histogram of MC rates as function of energy and zenith angle
+	vector< double > tmp_ebins = read_energy_bins( argv[5] );
+	cout << "Energy bins: ";
+	for( unsigned int e = 0; e < tmp_ebins.size(); e++ )
 	{
-		fID.push_back( 1 );                           // Whipple
-		fID.push_back( 5 );                           // HEGRA
-		fID.push_back( 2 );                           // H.E.S.S.
-		fID.push_back( 5 );                           // HEGRA
-		fID.push_back( 6 );                           // MAGIC
-		VGlobalRunParameter* fRunParameter = new VGlobalRunParameter();
-		sprintf( hname,
-				 "%s/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat",
-				 fRunParameter->getDirectory_EVNDISPAnaData().c_str() );
-		VEnergySpectrumfromLiterature* fESpec = new VEnergySpectrumfromLiterature( hname );
-		if( fESpec->isZombie() )
+		cout << tmp_ebins[e] << ", ";
+	}
+	cout << endl;
+	// - read unique vector of zenith angles
+	vector< double > tmp_zebins;
+	for( unsigned int i = 0; i < iN; i++ )
+	{
+		t->GetEntry( i );
+		bool bFound = false;
+		for( unsigned int z = 0; z < tmp_zebins.size(); z++ )
 		{
-			cout << "Error: file with energy spectra from literature not found: " << hname << endl;
-			exit( EXIT_FAILURE );
-		}
-		for( unsigned int i = 0; i < fID.size(); i++ )
-		{
-			fESpecFun.push_back( fESpec );
-		}
-		
-		// error checks
-		if( fESpecFun.size() != fID.size() )
-		{
-			cout << "Error: vector mismatch - check code" << endl;
-			exit( EXIT_FAILURE );
-		}
-		
-		// print everything
-		for( unsigned int i = 0; i < fESpecFun.size(); i++ )
-		{
-			if( fESpecFun[i] )
+			if( TMath::Abs( ze - tmp_zebins[z] ) < 1.e-1 )
 			{
-				fESpecFun[i]->listValues( fID[i] );
+				bFound = true;
+				break;
 			}
 		}
+		if( !bFound )
+		{
+			tmp_zebins.push_back( ze );
+		}
 	}
+	tmp_zebins.push_back( tmp_zebins.back() + 10. );
+	vector< double > tmp_zebin_edges;
+	tmp_zebin_edges.push_back( 0. );
+	for( unsigned int z = 1; z < tmp_zebins.size(); z++ )
+	{
+		tmp_zebin_edges.push_back( 0.5 * ( tmp_zebins[z] + tmp_zebins[z - 1] ) );
+	}
+	cout << "Zenith bins: ";
+	for( unsigned int z = 0; z < tmp_zebin_edges.size(); z++ )
+	{
+		cout << tmp_zebin_edges[z] << ", ";
+	}
+	cout << endl;
+	double* ie = &tmp_ebins[0];
+	double* iz = &tmp_zebin_edges[0];
+	TProfile2D* fMCRates_TMVA = new TProfile2D(
+		"MCRatesTMVA", "",
+		( int )tmp_ebins.size() - 1, ie,
+		( int )tmp_zebin_edges.size() - 1, iz );
+	fMCRates_TMVA->SetXTitle( "log_{10} Energy/TeV" );
+	fMCRates_TMVA->SetYTitle( "zenith angle (deg)" );
+	fMCRates_TMVA->SetZTitle( "rate from Crab Nebula (1/min)" );
 	
 	// rate calculator
 	VMonteCarloRateCalculator* fMCR = new VMonteCarloRateCalculator();
 	
 	// loop over all effective areas and calculate expected rates
-	unsigned int iN = t->GetEntries();
 	cout << endl;
 	cout << "reading " << iN << " effective areas from ";
-	cout << hname << endl;
+	cout << ieff << endl;
 	for( unsigned int i = 0; i < iN; i++ )
 	{
 		t->GetEntry( i );
@@ -168,32 +235,30 @@ int main( int argc, char* argv[] )
 			feffectivearea.push_back( t_eff[e] );
 		}
 		
-		
-		if( bUsePowerLawOnly )
-		{
-			// hardwired Whipple spectrum (much faster than outer function call)
-			nrates = 1;
-			MCrate[0] = fMCR->getMonteCarloRate( fenergy, feffectivearea, -2.440, 3.250e-11, 1., fEnergyThreshold, 1.e7, bDebug );
-		}
-		else
-		{
-			nrates = fESpecFun.size();
-			for( unsigned int t = 0; t < fESpecFun.size(); t++ )
-			{
-				// TODO fix call
-				//                        MCrate[t] = fMCR->getMonteCarloRate(
-				//                                fenergy, feffectivearea, fESpecFun[t], fID[t], fEnergyThreshold, 1.e7, bDebug );
-				if( bDebug )
-				{
-					cout << "MC Rate " << ze << "\t" << MCrate[t] << endl;
-				}
-			}
-		}
+		// hardwired Whipple spectrum
+		MCrate = fMCR->getMonteCarloRate(
+					 fenergy, feffectivearea,
+					 -2.440, 3.250e-11, 1., fEnergyThreshold, 1.e7, bDebug );
 		fMC->Fill();
+		
+		// fill profile histogram for TMVA
+		for( unsigned int e = 0; e < tmp_ebins.size() - 1; e++ )
+		{
+			fill_profilehistogram_for_TMVA(
+				fMCRates_TMVA,
+				0.5 * ( tmp_ebins[e + 1] + tmp_ebins[e] ), ze,
+				fMCR->getMonteCarloRate(
+					fenergy, feffectivearea,
+					-2.440, 3.250e-11, 1.,
+					TMath::Power( 10., tmp_ebins[e] ),
+					TMath::Power( 10., tmp_ebins[e + 1] ),
+					bDebug ) );
+		}
 	}
 	cout << endl;
 	cout << "writing results to " << f1->GetName() << endl;
 	f1->cd();
 	fMC->Write();
+	fMCRates_TMVA->Write();
 	f1->Close();
 }
