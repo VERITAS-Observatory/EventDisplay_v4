@@ -558,9 +558,9 @@ splitVBF: $(VBFSPLIT)
 ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \
                 ./obj/VStereoHistograms.o \
 		./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
-                ./obj/VStereoAnalysis.o \
-                ./obj/VSkyCoordinates.o \
-                ./obj/VOnOff.o ./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
+		./obj/VStereoAnalysis.o \
+		./obj/VSkyCoordinates.o \
+		./obj/VOnOff.o ./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
 		./obj/VStereoMaps.o ./obj/VRatePlots.o \
 		./obj/VRadialAcceptance.o ./obj/VEffectiveAreaCalculator.o ./obj/VRunSummary.o \
 		./obj/VDeadTime.o \
@@ -1224,12 +1224,16 @@ calculateCrabRateFromMC:	./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 				./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 				./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
 				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-                                ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
-                                ./obj/VStar.o ./obj/VStar_Dict.o \
-                                ./obj/VUtilities.o \
-                                 ./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
-                                ./obj/VSkyCoordinatesUtilities.o \
-                                ./obj/VDB_Connection.o \
+				./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+				./obj/VStar.o ./obj/VStar_Dict.o \
+				./obj/VUtilities.o \
+				./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
+				./obj/VSkyCoordinatesUtilities.o \
+				./obj/VDB_Connection.o \
+				./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+				./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
+				./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
+				./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
 				./obj/calculateCrabRateFromMC.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
@@ -1243,7 +1247,7 @@ calculateCrabRateFromMC:	./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 VTS.analyzeMuonRings:		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 				./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 				./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
-		                ./obj/VDB_Connection.o \
+				./obj/VDB_Connection.o \
 				./obj/Ctelconfig.o ./obj/Cshowerpars.o ./obj/Ctpars.o \
 				./obj/VTS.analyzeMuonRings.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
