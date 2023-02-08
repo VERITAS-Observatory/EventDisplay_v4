@@ -325,12 +325,22 @@ void fillBackgroundRates_perRun( string i_runFileName, TProfile2D* h )
 	int runOn = 0;
 	double elevationOff = 0.;
 	double OffNorm = 0.;
+	double NOff = 0.;
 	double tOff = 0.;
 	t->SetBranchAddress( "runOn", &runOn );
 	t->SetBranchAddress( "elevationOff", &elevationOff );
 	t->SetBranchAddress( "OffNorm", &OffNorm );
 	t->SetBranchAddress( "tOff", &tOff );
+	t->SetBranchAddress( "NOff", &NOff );
 	t->GetEntry( 0 );
+	// skip runs shorter than 10 min
+	if( tOff < 600. || NOff < 0.01 )
+	{
+		cout << "\t skipping short run " << runOn << " (run length " << tOff << "s)" << endl;
+		f->Close();
+		return;
+	}
+	cout << "RUN " << elevationOff << ", " << tOff << ", " << OffNorm << ", " << elevationOff << ", " << NOff << ", " << runOn << endl;
 	stringstream iTemp;
 	iTemp << "run_" << runOn << "/stereo/energyHistograms/herecCounts_off";
 	TH1D* hOff = ( TH1D* )f->Get( iTemp.str().c_str() );

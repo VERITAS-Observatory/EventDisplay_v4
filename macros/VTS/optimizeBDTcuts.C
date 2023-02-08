@@ -25,7 +25,7 @@ void optimizeBDTcuts(
 	string weightFileDir = "./",
 	int weightFileIndex_Emin = 0, int weightFileIndex_Emax = 3,
 	int weightFileIndex_Zmin = 0., int weightFileIndex_Zmax = 3.,
-	double observing_time_h = 20.,
+	double observing_time_h = 10.,
 	double significance = 5. )
 {
 	VTMVAEvaluator a;

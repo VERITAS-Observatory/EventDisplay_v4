@@ -959,7 +959,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( string iInputFile, double az
 			exit( EXIT_FAILURE );
 		}
 	}
-	else if( iInputFile.find( "IGNOREEFFECTIVEAREA" ) != string::npos )
+	if( iInputFile.find( "IGNOREEFFECTIVEAREA" ) != string::npos )
 	{
 		cout << "ignoring effective areas: ";
 		cout << "all energy spectra will be invalid" << endl;
