@@ -105,6 +105,7 @@ bool readRunParameter( TFile* fIn, string iPara )
 		{
 			cout << fPar->fTelToAnalyze[i] + 1;
 		}
+		cout << "\t" << fPar->fRunDuration;
 		cout << "\t" << fPar->fTargetName;
 		cout << endl;
 	}
