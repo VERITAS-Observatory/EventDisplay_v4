@@ -428,7 +428,7 @@ TGraph2DErrors* getTGraph2D( vector< TProfile2D* > h, string iGraphName )
 int main( int argc, char* argv[] )
 {
 	cout << endl;
-	cout << "VTS.calculateCrabRateFromMC (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
+	cout << "calculateCrabRateFromMC (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
 	cout << "--------------------------------" << endl;
 	if( argc != 6 )
 	{
