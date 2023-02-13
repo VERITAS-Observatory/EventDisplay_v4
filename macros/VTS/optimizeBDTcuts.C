@@ -4,7 +4,7 @@
  * pre-cuts (e.g., ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-Preselection.dat)
  *
  * usage: e.g.
- * root -l -q -b 'optimizeBDTcuts.C("../../tmva/rates.root", "../../tmva", 0, 3, 0, 1)'
+ * root -l -q -b 'optimizeBDTcuts.C("../../tmva/rates.root", "../../tmva", 0, 3, 0, 2)'
  *
 */
 
