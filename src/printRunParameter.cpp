@@ -105,6 +105,8 @@ bool readRunParameter( TFile* fIn, string iPara )
 		{
 			cout << fPar->fTelToAnalyze[i] + 1;
 		}
+		cout << "\t" << fPar->fRunDuration;
+		cout << "\t" << fPar->fTargetName;
 		cout << endl;
 	}
 	
@@ -135,8 +137,11 @@ bool readWobbleOffset( TFile* fIn, bool printInteger )
 	return false;
 }
 
-
-bool readMeanElevation( TFile* fIn )
+/*
+ * read mean elevation or zenith
+ *
+ */
+bool readMeanElevation( TFile* fIn, bool print_zenith = false )
 {
 	if( !fIn )
 	{
@@ -211,7 +216,14 @@ bool readMeanElevation( TFile* fIn )
 		if( iMeanN > 0. )
 		{
 			iMean_f /= iMeanN;
-			cout << "Average elevation: " << iMean_f << endl;
+			if( print_zenith )
+			{
+				cout << "Average zenith angle: " << 90. - iMean_f << endl;
+			}
+			else
+			{
+				cout << "Average elevation: " << iMean_f << endl;
+			}
 		}
 	}
 	else
@@ -294,6 +306,7 @@ int main( int argc, char* argv[] )
 		cout << "      -runinfo      print relevant run info in one line" << endl;
 		cout << "      -updated-runinfo print relevant run info in one line (update epoch from VERITAS.Epochs.runparameter)" << endl;
 		cout << "      -elevation    print (rough) average elevation" << endl;
+		cout << "      -zenith       print (rough) average zenith angle" << endl;
 		cout << "      -wobble       print wobble offset" << endl;
 		cout << "      -wobbleInt    print wobble offset (as integer, x100)" << endl;
 		cout << endl;
@@ -327,6 +340,10 @@ int main( int argc, char* argv[] )
 		if( fOption.find( "-elevation" ) != string::npos )
 		{
 			readMeanElevation( fIn );
+		}
+		else if( fOption.find( "-zenith" ) != string::npos )
+		{
+			readMeanElevation( fIn, true );
 		}
 		else if( fOption.find( "-wobble" ) != string::npos )
 		{

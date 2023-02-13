@@ -848,33 +848,36 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 		// copy effective areas and radial acceptance to anasum output file
 		if( bOn )
 		{
-			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveArea );
-			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveArea );
-			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEsys_MC );
-			
-			// Both MC and REC  effective areas are required for Binned Likelihood analysis
-			if( fRunPara->fLikelihoodAnalysis )
+			if( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile != "IGNOREEFFECTIVEAREA" )
 			{
-				if( gMeanEffectiveAreaMC )
+				fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveArea );
+				fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveArea );
+				fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEsys_MC );
+				
+				// Both MC and REC  effective areas are required for Binned Likelihood analysis
+				if( fRunPara->fLikelihoodAnalysis )
 				{
-					// (SOB) When nOn = 0 gMeanEffectiveAreaMC_on(E) = 0
-					// VLikelihoodFitter will check gMeanEffectiveAreaMC_on::integral > 1
-					gMeanEffectiveAreaMC->SetTitle( "gMeanEffectiveAreaMC_on" );
-					gMeanEffectiveAreaMC->SetName( "gMeanEffectiveAreaMC_on" );
-					
-					fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveAreaMC );
+					if( gMeanEffectiveAreaMC )
+					{
+						// (SOB) When nOn = 0 gMeanEffectiveAreaMC_on(E) = 0
+						// VLikelihoodFitter will check gMeanEffectiveAreaMC_on::integral > 1
+						gMeanEffectiveAreaMC->SetTitle( "gMeanEffectiveAreaMC_on" );
+						gMeanEffectiveAreaMC->SetName( "gMeanEffectiveAreaMC_on" );
+						
+						fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveAreaMC );
+					}
+					if( hResponseMatrix )
+					{
+						hResponseMatrix->SetTitle( "hResponseMatrix_on" );
+						hResponseMatrix->SetName( "hResponseMatrix_on" );
+						fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", hResponseMatrix );
+					}
 				}
-				if( hResponseMatrix )
+				if( fRunPara->fRunList[fHisCounter].fAcceptanceFile.size() > 0
+						&& fRunPara->fRunList[fHisCounter].fAcceptanceFile != "IGNOREACCEPTANCE" )
 				{
-					hResponseMatrix->SetTitle( "hResponseMatrix_on" );
-					hResponseMatrix->SetName( "hResponseMatrix_on" );
-					fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", hResponseMatrix );
+					fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fAcceptanceFile, "RadialAcceptances", 0 );
 				}
-			}
-			if( fRunPara->fRunList[fHisCounter].fAcceptanceFile.size() > 0
-					&& fRunPara->fRunList[fHisCounter].fAcceptanceFile != "IGNOREACCEPTANCE" )
-			{
-				fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fAcceptanceFile, "RadialAcceptances", 0 );
 			}
 		}
 		else
@@ -1789,8 +1792,9 @@ void VStereoAnalysis::setCuts( VAnaSumRunParameterDataClass iL, int irun )
 {
 	if( iL.fCutFile != "" )
 	{
-		// read cuts from root file
-		if( iL.fCutFile.find( ".root" ) != string::npos )
+		// read cuts from effective area root file
+		if( iL.fCutFile.find( ".root" ) != string::npos
+				&& iL.fCutFile.find( "IGNOREEFFECTIVEAREA" ) == string::npos )
 		{
 			string iEffFile = VUtilities::testFileLocation( iL.fCutFile, "EffectiveAreas", true );
 			
@@ -1811,6 +1815,7 @@ void VStereoAnalysis::setCuts( VAnaSumRunParameterDataClass iL, int irun )
 				exit( EXIT_FAILURE );
 			}
 			fCuts = iC;
+			cout << "Reading gamma/hadron cuts from effective area file " << iEffFile << endl;
 			iF->Close();
 		}
 		// read cuts from text file

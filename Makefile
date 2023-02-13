@@ -222,7 +222,7 @@ all VTS:	evndisp \
 	makeEffectiveArea \
 	trainTMVAforGammaHadronSeparation \
 	trainTMVAforAngularReconstruction \
-	VTS.calculateCrabRateFromMC \
+	calculateCrabRateFromMC \
 	VTS.calculateExposureFromDB \
 	slib \
 	combineEffectiveAreas \
@@ -558,9 +558,9 @@ splitVBF: $(VBFSPLIT)
 ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \
                 ./obj/VStereoHistograms.o \
 		./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
-                ./obj/VStereoAnalysis.o \
-                ./obj/VSkyCoordinates.o \
-                ./obj/VOnOff.o ./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
+		./obj/VStereoAnalysis.o \
+		./obj/VSkyCoordinates.o \
+		./obj/VOnOff.o ./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
 		./obj/VStereoMaps.o ./obj/VRatePlots.o \
 		./obj/VRadialAcceptance.o ./obj/VEffectiveAreaCalculator.o ./obj/VRunSummary.o \
 		./obj/VDeadTime.o \
@@ -1001,50 +1001,6 @@ writeVTSWPPhysSensitivityFiles:	$(WRITEVTSPHYSOBJ)
 	@echo "$@ done"
 
 ########################################################
-# writeParticleRateFilesFromEffectiveAreas
-########################################################
-WRITEPARTPHYSOBJ=	./obj/writeParticleRateFilesFromEffectiveAreas.o \
-			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-			./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
-			./obj/VASlalib.o \
-			./obj/VInstrumentResponseFunctionReader.o ./obj/VInstrumentResponseFunctionReader_Dict.o \
-			./obj/VSensitivityCalculator.o ./obj/VSensitivityCalculator_Dict.o \
-			./obj/CEffArea.o ./obj/CEffArea_Dict.o \
-			./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
-			./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
-			./obj/VInstrumentResponseFunctionData.o ./obj/VInstrumentResponseFunctionData_Dict.o \
-			./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
-			./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o \
-			./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
-			./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
-			./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
-			./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
-			./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
-			./obj/Ctelconfig.o  \
-			./obj/VSpectralFitter.o ./obj/VSpectralFitter_Dict.o \
-			./obj/VEnergyThreshold.o ./obj/VEnergyThreshold_Dict.o \
-			./obj/VRunList.o ./obj/VRunList_Dict.o \
-			./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
-			./obj/VEnergySpectrum.o ./obj/VEnergySpectrum_Dict.o \
-			./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o  \
-			./obj/VDifferentialFlux.o ./obj/VDifferentialFlux_Dict.o \
-			./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
-			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
-			./obj/VStatistics_Dict.o \
-			./obj/VUtilities.o
-
-ifeq ($(ASTRONMETRY),-DASTROSLALIB)
-    WRITECTAPHYSOBJ += ./obj/VASlalib.o
-endif
-
-./obj/writeParticleRateFilesFromEffectiveAreas.o: 	./src/writeParticleRateFilesFromEffectiveAreas.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-writeParticleRateFilesFromEffectiveAreas:	$(WRITEPARTPHYSOBJ)
-	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
-	@echo "$@ done"
-
-########################################################
 # writeParticleRateFilesForTMVA
 ########################################################
 WRITEPARTPHYSOBJ=	./obj/writeParticleRateFilesForTMVA.o \
@@ -1246,26 +1202,39 @@ trainTMVAforGammaHadronSeparation:	$(MAKEOPTCUTTMVAOBJ)
 	@echo "Done"
 
 ########################################################
-# VTS.calculateCrabRateFromMC
+# calculateCrabRateFromMC
 ########################################################
-./obj/VTS.calculateCrabRateFromMC.o:	./src/VTS.calculateCrabRateFromMC.cpp
+./obj/calculateCrabRateFromMC.o:	./src/calculateCrabRateFromMC.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-VTS.calculateCrabRateFromMC:	./obj/CEffArea.o ./obj/CEffArea_Dict.o \
+calculateCrabRateFromMC:	./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 				./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
 				./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
 				./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
 				./obj/VRunList_Dict.o ./obj/VRunList.o \
 				./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
+				./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
+				./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \
+				./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
+				./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+				./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
+				./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
+				./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
+				./obj/Ctelconfig.o \
+				./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 				./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
 				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-                                ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
-                                ./obj/VStar.o ./obj/VStar_Dict.o \
-                                ./obj/VUtilities.o \
-                                 ./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
-                                ./obj/VSkyCoordinatesUtilities.o \
-                                ./obj/VDB_Connection.o \
-				./obj/VTS.calculateCrabRateFromMC.o
+				./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+				./obj/VStar.o ./obj/VStar_Dict.o \
+				./obj/VUtilities.o \
+				./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
+				./obj/VSkyCoordinatesUtilities.o \
+				./obj/VDB_Connection.o \
+				./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+				./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
+				./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
+				./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
+				./obj/calculateCrabRateFromMC.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
@@ -1278,7 +1247,7 @@ VTS.calculateCrabRateFromMC:	./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 VTS.analyzeMuonRings:		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 				./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 				./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
-		                ./obj/VDB_Connection.o \
+				./obj/VDB_Connection.o \
 				./obj/Ctelconfig.o ./obj/Cshowerpars.o ./obj/Ctpars.o \
 				./obj/VTS.analyzeMuonRings.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@

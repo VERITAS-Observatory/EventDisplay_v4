@@ -206,179 +206,189 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 			string iFullFileNameXML = getBDTFileName( iWeightFileName,
 									  iWeightFileIndex_Emin + i, iWeightFileIndex_Zmin + j, "_0.weights.xml" );
 									  
-			TFile iF( iFullFileName.c_str() );
 			bool bGoodRun = true;
 			VTMVARunDataEnergyCut* iEnergyData = 0;
 			VTMVARunDataZenithCut* iZenithData = 0;
-			if( iF.IsZombie() )
+			if( gSystem->AccessPathName( iFullFileName.c_str() ) )
 			{
 				bGoodRun = false;
 			}
 			else
 			{
-				iEnergyData = ( VTMVARunDataEnergyCut* )iF.Get( "fDataEnergyCut" );
-				iZenithData = ( VTMVARunDataZenithCut* )iF.Get( "fDataZenithCut" );
+				TFile iF( iFullFileName.c_str() );
+				if( iF.IsZombie() )
+				{
+					bGoodRun = false;
+				}
+				else
+				{
+					iEnergyData = ( VTMVARunDataEnergyCut* )iF.Get( "fDataEnergyCut" );
+					iZenithData = ( VTMVARunDataZenithCut* )iF.Get( "fDataZenithCut" );
+					if( !iEnergyData )
+					{
+						cout << "No energy cut data: setting goodrun to false" << endl;
+						bGoodRun = false;
+					}
+					// backwards compatibility
+					if( !iZenithData )
+					{
+						cout << "No zenith cut data: ";
+						cout << " setting goodrun to false" << endl;
+						bGoodRun = false;
+					}
+					// signal efficiency
+					sprintf( hname, "Method_%s/%s_0/MVA_%s_0_effS", fTMVAMethodName.c_str(), fTMVAMethodName.c_str(), fTMVAMethodName.c_str() );
+					
+					if( !iF.Get( hname ) )
+					{
+						cout << "No signal efficiency histogram found (" << hname << ")" << endl;
+						bGoodRun = false;
+					}
+				}
+				// allow that first files are missing (this happens when there are no training events in the first energy bins)
+				if( !bGoodRun )
+				{
+					if( i == iMinMissingBin || j == jMinMissingBin )
+					{
+						cout << "VTMVAEvaluator::initializeWeightFiles() warning: ";
+						cout << "TMVA root file not found or incomplete file (" << i << ") " << endl;
+						cout << iFullFileName << endl;
+						if( i == iMinMissingBin )
+						{
+							cout << "  assume this is a low-energy empty bin (bin number " << i << ";";
+							cout << " number of missing bins: " << iMinMissingBin + 1 << ")" << endl;
+							iMinMissingBin++;
+						}
+						if( j == jMinMissingBin )
+						{
+							cout << "  assume this is a zenith empty bin (bin number " << j << ";";
+							cout << " number of missing bins: " << jMinMissingBin + 1 << ")" << endl;
+						}
+						continue;
+					}
+					else if( i == ( iWeightFileIndex_Emax ) || j == ( iWeightFileIndex_Zmax ) )
+					{
+						cout << "VTMVAEvaluator::initializeWeightFiles() warning: TMVA root file not found " << iFullFileName << endl;
+						if( i == ( iWeightFileIndex_Emax ) )
+						{
+							cout << "  assume this is a high-energy empty bin (bin number " << i << ")" << endl;
+							iNbinE--;
+							iWeightFileIndex_Emax--;
+						}
+						if( j == ( iWeightFileIndex_Zmax ) )
+						{
+							cout << "  assume this is a high-zenith empty bin (bin number " << j << ")" << endl;
+							iNbinZ--;
+							iWeightFileIndex_Zmax--;
+						}
+						continue;
+					}
+					else
+					{
+						cout << "VTMVAEvaluator::initializeWeightFiles: warning: problem while initializing energies from TMVA root file ";
+						cout << iFullFileName << endl;
+						cout << "(this might be not a problem if the sensitive energy range of the given array is relatively small)" << endl;
+						continue;
+					}
+				}
 				if( !iEnergyData )
 				{
-					cout << "No energy cut data: setting goodrun to false" << endl;
-					bGoodRun = false;
-				}
-				// backwards compatibility
-				if( !iZenithData )
-				{
-					cout << "No zenith cut data: ";
-					cout << " setting goodrun to false" << endl;
-					bGoodRun = false;
-				}
-				// signal efficiency
-				sprintf( hname, "Method_%s/%s_0/MVA_%s_0_effS", fTMVAMethodName.c_str(), fTMVAMethodName.c_str(), fTMVAMethodName.c_str() );
-				
-				if( !iF.Get( hname ) )
-				{
-					cout << "No signal efficiency histogram found (" << hname << ")" << endl;
-					bGoodRun = false;
-				}
-			}
-			// allow that first files are missing (this happens when there are no training events in the first energy bins)
-			if( !bGoodRun )
-			{
-				if( i == iMinMissingBin || j == jMinMissingBin )
-				{
-					cout << "VTMVAEvaluator::initializeWeightFiles() warning: TMVA root file not found or incomplete file (" << i << ") " << endl;
+					cout << "VTMVAEvaluator::initializeWeightFiles: warning: problem while reading energies from TMVA root file ";
 					cout << iFullFileName << endl;
-					if( i == iMinMissingBin )
-					{
-						cout << "  assume this is a low-energy empty bin (bin number " << i << ";";
-						cout << " number of missing bins: " << iMinMissingBin + 1 << ")" << endl;
-						iMinMissingBin++;
-					}
-					if( j == jMinMissingBin )
-					{
-						cout << "  assume this is a zenith empty bin (bin number " << j << ";";
-						cout << " number of missing bins: " << jMinMissingBin + 1 << ")" << endl;
-					}
-					continue;
+					fIsZombie = true;
+					return false;
 				}
-				else if( i == ( iWeightFileIndex_Emax ) || j == ( iWeightFileIndex_Zmax ) )
-				{
-					cout << "VTMVAEvaluator::initializeWeightFiles() warning: TMVA root file not found " << iFullFileName << endl;
-					if( i == ( iWeightFileIndex_Emax ) )
-					{
-						cout << "  assume this is a high-energy empty bin (bin number " << i << ")" << endl;
-						iNbinE--;
-						iWeightFileIndex_Emax--;
-					}
-					if( j == ( iWeightFileIndex_Zmax ) )
-					{
-						cout << "  assume this is a high-zenith empty bin (bin number " << j << ")" << endl;
-						iNbinZ--;
-						iWeightFileIndex_Zmax--;
-					}
-					continue;
-				}
-				else
-				{
-					cout << "VTMVAEvaluator::initializeWeightFiles: warning: problem while initializing energies from TMVA root file ";
-					cout << iFullFileName << endl;
-					cout << "(this might be not a problem if the sensitive energy range of the given array is relatively small)" << endl;
-					continue;
-				}
-			}
-			if( !iEnergyData )
-			{
-				cout << "VTMVAEvaluator::initializeWeightFiles: warning: problem while reading energies from TMVA root file ";
-				cout << iFullFileName << endl;
-				fIsZombie = true;
-				return false;
-			}
-			// form here on: expect a good TMVA file
-			// initialize one value per energy/zenith bin
-			
-			// set energy binning:
-			//    - one VTMVAEvaluatorData per energy bin
-			//    - bins are set for the energy interval read from the root file:
-			//      [iEnergyData->fEnergyCut_Log10TeV_min, iEnergyData->fEnergyCut_Log10TeV_max]
-			//    - sub-bins given by iEnergyStepSize;
-			double e = iEnergyData->fEnergyCut_Log10TeV_min;
-			do
-			{
-				// central data element for this energy bin
-				fTMVAData.push_back( new VTMVAEvaluatorData() );
-				// find e_min and e_max
-				fTMVAData.back()->fEnergyCut_Log10TeV_min = e;
-				if( iEnergyStepSize > 0. )
-				{
-					fTMVAData.back()->fEnergyCut_Log10TeV_max = e + iEnergyStepSize;
-				}
-				else
-				{
-					fTMVAData.back()->fEnergyCut_Log10TeV_max = iEnergyData->fEnergyCut_Log10TeV_max;
-				}
-				e = fTMVAData.back()->fEnergyCut_Log10TeV_max;
+				// form here on: expect a good TMVA file
+				// initialize one value per energy/zenith bin
 				
-				// calculate spectral weighted mean energy
-				fTMVAData.back()->fSpectralWeightedMeanEnergy_Log10TeV =
-					VMathsandFunctions::getSpectralWeightedMeanEnergy( fTMVAData.back()->fEnergyCut_Log10TeV_min,
-							fTMVAData.back()->fEnergyCut_Log10TeV_max,
-							fSpectralIndexForEnergyWeighting );
-				// zenith angle range
-				if( iZenithData )
+				// set energy binning:
+				//    - one VTMVAEvaluatorData per energy bin
+				//    - bins are set for the energy interval read from the root file:
+				//      [iEnergyData->fEnergyCut_Log10TeV_min, iEnergyData->fEnergyCut_Log10TeV_max]
+				//    - sub-bins given by iEnergyStepSize;
+				double e = iEnergyData->fEnergyCut_Log10TeV_min;
+				do
 				{
-					fTMVAData.back()->fZenithCut_min = iZenithData->fZenithCut_min;
-					fTMVAData.back()->fZenithCut_max = iZenithData->fZenithCut_max;
-				}
-				else
-				{
-					fTMVAData.back()->fZenithCut_min = 0.;
-					fTMVAData.back()->fZenithCut_max = 90.;
-				}
-				
-				
-				fTMVAData.back()->fSignalEfficiency = getSignalEfficiency( iWeightFileIndex_Emin + i,
+					// central data element for this energy bin
+					fTMVAData.push_back( new VTMVAEvaluatorData() );
+					fTMVAData.back()->fEnergyBin = i;
+					fTMVAData.back()->fZenithBin = j;
+					// find e_min and e_max
+					fTMVAData.back()->fEnergyCut_Log10TeV_min = e;
+					if( iEnergyStepSize > 0. )
+					{
+						fTMVAData.back()->fEnergyCut_Log10TeV_max = e + iEnergyStepSize;
+					}
+					else
+					{
+						fTMVAData.back()->fEnergyCut_Log10TeV_max = iEnergyData->fEnergyCut_Log10TeV_max;
+					}
+					e = fTMVAData.back()->fEnergyCut_Log10TeV_max;
+					
+					// calculate spectral weighted mean energy
+					fTMVAData.back()->fSpectralWeightedMeanEnergy_Log10TeV =
+						VMathsandFunctions::getSpectralWeightedMeanEnergy( fTMVAData.back()->fEnergyCut_Log10TeV_min,
+								fTMVAData.back()->fEnergyCut_Log10TeV_max,
+								fSpectralIndexForEnergyWeighting );
+					// zenith angle range
+					if( iZenithData )
+					{
+						fTMVAData.back()->fZenithCut_min = iZenithData->fZenithCut_min;
+						fTMVAData.back()->fZenithCut_max = iZenithData->fZenithCut_max;
+					}
+					else
+					{
+						fTMVAData.back()->fZenithCut_min = 0.;
+						fTMVAData.back()->fZenithCut_max = 90.;
+					}
+					
+					
+					fTMVAData.back()->fSignalEfficiency = getSignalEfficiency( iWeightFileIndex_Emin + i,
+														  iEnergyData->fEnergyCut_Log10TeV_min,
+														  iEnergyData->fEnergyCut_Log10TeV_max,
+														  iWeightFileIndex_Zmin + j,
+														  fTMVAData.back()->fZenithCut_min,
+														  fTMVAData.back()->fZenithCut_max );
+					fTMVAData.back()->fTMVACutValue = getTMVACutValue( iWeightFileIndex_Emin + i,
 													  iEnergyData->fEnergyCut_Log10TeV_min,
 													  iEnergyData->fEnergyCut_Log10TeV_max,
 													  iWeightFileIndex_Zmin + j,
 													  fTMVAData.back()->fZenithCut_min,
 													  fTMVAData.back()->fZenithCut_max );
-				fTMVAData.back()->fTMVACutValue = getTMVACutValue( iWeightFileIndex_Emin + i,
-												  iEnergyData->fEnergyCut_Log10TeV_min,
-												  iEnergyData->fEnergyCut_Log10TeV_max,
-												  iWeightFileIndex_Zmin + j,
-												  fTMVAData.back()->fZenithCut_min,
-												  fTMVAData.back()->fZenithCut_max );
-				fTMVAData.back()->fBackgroundEfficiency = -99.;
-				fTMVAData.back()->fTMVAOptimumCutValueFound = false;
-				fTMVAData.back()->fSourceStrengthAtOptimum_CU = 0.;
-				
-				sprintf( hname, "bin %d, %.2f < log10(E) < %.2f, %.2f < Ze < %.2f)",
-						 ( int )( fTMVAData.size() - 1 ), fTMVAData.back()->fEnergyCut_Log10TeV_min, fTMVAData.back()->fEnergyCut_Log10TeV_max,
-						 fTMVAData.back()->fZenithCut_min, fTMVAData.back()->fZenithCut_max );
-				fTMVAData.back()->SetTitle( hname );
-				
-				sprintf( hname, "%d%d", i, j );
-				fTMVAData.back()->fTMVAMethodTag = hname;
-				if( iNbinZ > 1 )
-				{
-					sprintf( hname, "%d_%d", i, j );
+					fTMVAData.back()->fBackgroundEfficiency = -99.;
+					fTMVAData.back()->fTMVAOptimumCutValueFound = false;
+					fTMVAData.back()->fSourceStrengthAtOptimum_CU = 0.;
+					
+					sprintf( hname, "bin %d, %.2f < log10(E) < %.2f, %.2f < Ze < %.2f)",
+							 ( int )( fTMVAData.size() - 1 ), fTMVAData.back()->fEnergyCut_Log10TeV_min, fTMVAData.back()->fEnergyCut_Log10TeV_max,
+							 fTMVAData.back()->fZenithCut_min, fTMVAData.back()->fZenithCut_max );
+					fTMVAData.back()->SetTitle( hname );
+					
+					sprintf( hname, "%d%d", i, j );
+					fTMVAData.back()->fTMVAMethodTag = hname;
+					if( iNbinZ > 1 )
+					{
+						sprintf( hname, "%d_%d", i, j );
+					}
+					else
+					{
+						sprintf( hname, "%d", i );
+					}
+					
+					fTMVAData.back()->fTMVAMethodTag_2 = hname;
+					fTMVAData.back()->fTMVAName = iTMVAName;
+					fTMVAData.back()->fTMVAFileName = iFullFileName;
+					fTMVAData.back()->fTMVAFileNameXML = iFullFileNameXML;
+					
+					if( iEnergyStepSize < 0. )
+					{
+						break;
+					}
 				}
-				else
-				{
-					sprintf( hname, "%d", i );
-				}
+				while( e < ( iEnergyData->fEnergyCut_Log10TeV_max - 0.0001 ) );
 				
-				fTMVAData.back()->fTMVAMethodTag_2 = hname;
-				fTMVAData.back()->fTMVAName = iTMVAName;
-				fTMVAData.back()->fTMVAFileName = iFullFileName;
-				fTMVAData.back()->fTMVAFileNameXML = iFullFileNameXML;
-				
-				if( iEnergyStepSize < 0. )
-				{
-					break;
-				}
+				iF.Close();
 			}
-			while( e < ( iEnergyData->fEnergyCut_Log10TeV_max - 0.0001 ) );
-			
-			iF.Close();
 		}//end loop on zenith bins
 	}//end loop on energy bins
 	
@@ -1106,7 +1116,8 @@ void VTMVAEvaluator::printSignalEfficiency()
 	{
 		if( fTMVAData[i] )
 		{
-			cout << "E [" << showpoint << setprecision( 3 ) << fTMVAData[i]->fEnergyCut_Log10TeV_min << "," << fTMVAData[i]->fEnergyCut_Log10TeV_max << "] TeV";
+			cout << "E [" << showpoint << setprecision( 3 );
+			cout << fTMVAData[i]->fEnergyCut_Log10TeV_min << "," << fTMVAData[i]->fEnergyCut_Log10TeV_max << "] TeV";
 			cout << ", Ze [" << fTMVAData[i]->fZenithCut_min << "," << fTMVAData[i]->fZenithCut_max << "] deg";
 			cout << " (bin " << i << "):\t ";
 			cout << fTMVAData[i]->fSignalEfficiency;
@@ -1188,8 +1199,14 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 	}
 	cout << "TVMAEvaluator::optimizeSensitivity reading: " << fParticleNumberFileName << endl;
 	// get the NOn (signal + background) and NOff (background) graphs
-	TGraph* i_on = readNonNoffGraphsFromFile( &iPN, fTMVAData[iDataBin]->fZenithCut_min, fTMVAData[iDataBin]->fZenithCut_max, true );
-	TGraph* i_of = readNonNoffGraphsFromFile( &iPN, fTMVAData[iDataBin]->fZenithCut_min, fTMVAData[iDataBin]->fZenithCut_max, false );
+	TGraph* i_on = readNonNoffGraphsFromFile(
+					   &iPN,
+					   fTMVAData[iDataBin]->fZenithCut_min, fTMVAData[iDataBin]->fZenithCut_max,
+					   true );
+	TGraph* i_of = readNonNoffGraphsFromFile(
+					   &iPN,
+					   fTMVAData[iDataBin]->fZenithCut_min, fTMVAData[iDataBin]->fZenithCut_max,
+					   false );
 	if( !i_on || !i_of )
 	{
 		cout << "VTVMAEvaluator::optimizeSensitivity error:" << endl;
@@ -1729,8 +1746,7 @@ void VTMVAEvaluator::smoothAndInterPolateMVAValue_Energy_and_Zenith(
 	unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
 	unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax )
 {
-	unsigned int z = 0;
-	
+
 	unsigned int Ebins = iWeightFileIndex_Emax - iWeightFileIndex_Emin + 1;
 	unsigned int ZEbins = iWeightFileIndex_Zmax - iWeightFileIndex_Zmin + 1;
 	
@@ -1755,76 +1771,74 @@ void VTMVAEvaluator::smoothAndInterPolateMVAValue_Energy_and_Zenith(
 			effS_value[l] = effS->GetBinContent( effS->FindBin( fTMVAData[l]->fTMVACutValue ) );
 		}
 	}
-	for( unsigned int i = 0; i < Ebins; i++ )
+	for( unsigned int z = 0; z < fTMVAData.size(); z++ )
 	{
-		for( unsigned int j = 0; j < ZEbins; j++ )
+		if( !fTMVAData[z] )
 		{
-			if( z >= fTMVAData.size() || !fTMVAData[z] )
+			continue;
+			cout << "VTMVAEvaluator: error reading file with cut efficiencies for bins: ";
+			cout << ", entry " << z << endl;
+			cout << "Exiting..." << endl;
+			exit( EXIT_FAILURE );
+		}
+		// get signal efficiency histograms and cut values
+		TFile iTMVAFile( fTMVAData[z]->fTMVAFileName.c_str() );
+		TH1F* effS = getEfficiencyHistogram( "effS", &iTMVAFile, fTMVAData[z]->fTMVAMethodTag_2 );
+		if( fTMVAData[z]->fTMVAOptimumCutValueFound )
+		{
+			iH2->SetBinContent( fTMVAData[z]->fEnergyBin, fTMVAData[z]->fZenithBin, fTMVAData[z]->fTMVACutValue );
+		}
+		// bins without optimal cut value and not in highest energy bin
+		else if( !fTMVAData[z]->fTMVAOptimumCutValueFound
+				 && ( fTMVAData[z]->fZenithBin < ZEbins )
+				 && ( fTMVAData[z]->fEnergyBin != Ebins - 1 ) )
+		{
+			for( int k = 0; k < effS->GetNbinsX(); k++ )
 			{
-				cout << "VTMVAEvaluator: error reading file with cut efficiencies for bins: ";
-				cout << " energy bin " << i << ", zenith bin " << j;
-				cout << ", entry z (size " << fTMVAData.size() << ")";
-				cout << endl;
-				cout << "Exiting..." << endl;
-				exit( EXIT_FAILURE );
-			}
-			// get signal efficiency histograms and cut values
-			TFile iTMVAFile( fTMVAData[z]->fTMVAFileName.c_str() );
-			TH1F* effS = getEfficiencyHistogram( "effS", &iTMVAFile, fTMVAData[z]->fTMVAMethodTag_2 );
-			if( fTMVAData[z]->fTMVAOptimumCutValueFound )
-			{
-				iH2->SetBinContent( i, j, fTMVAData[z]->fTMVACutValue );
-			}
-			// bins without optimal cut value and not in highest energy bin
-			else if( !fTMVAData[z]->fTMVAOptimumCutValueFound && ( j < ZEbins ) && ( i != Ebins - 1 ) )
-			{
-				for( int k = 0; k < effS->GetNbinsX(); k++ )
+				// search for similar cut efficiency in neighbouring bin
+				unsigned int i_alt_index = z + 1;
+				if( z > 0 )
 				{
-					// search for similar cut efficiency in neighbouring bin
-					unsigned int i_alt_index = z + 1;
-					if( z > 0 )
-					{
-						i_alt_index = z - 1;
-					}
-					if( i_alt_index < fTMVAData.size()
-							&& TMath::Abs( effS->GetBinContent( k ) - effS_value[i_alt_index] ) < 0.001 )
-					{
-						fTMVAData[z]->fTMVACutValue = effS->GetBinCenter( k );
-						effS_value[z] = effS->GetBinContent( k );
-					}
+					i_alt_index = z - 1;
+				}
+				if( i_alt_index < fTMVAData.size()
+						&& TMath::Abs( effS->GetBinContent( k ) - effS_value[i_alt_index] ) < 0.001 )
+				{
+					fTMVAData[z]->fTMVACutValue = effS->GetBinCenter( k );
+					effS_value[z] = effS->GetBinContent( k );
 				}
 			}
-			// bins without optimal cut value and in highest energy bin
-			else if( !fTMVAData[z]->fTMVAOptimumCutValueFound && ( j < ZEbins ) && ( i == Ebins - 1 ) )
+		}
+		// bins without optimal cut value and in highest energy bin
+		else if( !fTMVAData[z]->fTMVAOptimumCutValueFound
+				 && ( fTMVAData[z]->fZenithBin < ZEbins ) && ( fTMVAData[z]->fEnergyBin == Ebins - 1 ) )
+		{
+			for( unsigned int l = 0; l < ZEbins; l++ )
 			{
-				for( unsigned int l = 0; l < ZEbins; l++ )
+				if( effS_value[fTMVAData.size() - l] > 1.e-10 )
 				{
-					if( effS_value[fTMVAData.size() - l] > 1.e-10 )
+					for( int k = 0; k < effS->GetNbinsX(); k++ )
 					{
-						for( int k = 0; k < effS->GetNbinsX(); k++ )
+						if( TMath::Abs( effS->GetBinContent( k ) - effS_value[fTMVAData.size() - l] ) < 0.0001 )
 						{
-							if( TMath::Abs( effS->GetBinContent( k ) - effS_value[fTMVAData.size() - l] ) < 0.0001 )
-							{
-								fTMVAData[z]->fTMVACutValue = effS->GetBinCenter( k );
-								effS_value[z] = effS->GetBinContent( k );
-							}
+							fTMVAData[z]->fTMVACutValue = effS->GetBinCenter( k );
+							effS_value[z] = effS->GetBinContent( k );
 						}
 					}
 				}
-				if( fTMVAData[z]->fTMVACutValue == -99 )
-				{
-					cout << "Error: no optimal cut value found for this bin" << endl;
-				}
-				cout << "\t TMVA values: at " << TMath::Power( 10., fTMVAData[z]->fSpectralWeightedMeanEnergy_Log10TeV );
-				cout << " TeV, \t" << fTMVAData[z]->fTMVACutValue;
-				if( !fTMVAData[z]->fTMVAOptimumCutValueFound )
-				{
-					cout << " (interpolated non-optimal value)";
-				}
-				cout << ", signal efficiency: " << effS_value[z];
-				cout << " (" << z << ")" << endl;
 			}
-			z++;
+			if( fTMVAData[z]->fTMVACutValue == -99 )
+			{
+				cout << "Error: no optimal cut value found for this bin" << endl;
+			}
+			cout << "\t TMVA values: at " << TMath::Power( 10., fTMVAData[z]->fSpectralWeightedMeanEnergy_Log10TeV );
+			cout << " TeV, \t" << fTMVAData[z]->fTMVACutValue;
+			if( !fTMVAData[z]->fTMVAOptimumCutValueFound )
+			{
+				cout << " (interpolated non-optimal value)";
+			}
+			cout << ", signal efficiency: " << effS_value[z];
+			cout << " (" << z << ")" << endl;
 		}
 	}
 }
@@ -2228,7 +2242,8 @@ vector< bool > VTMVAEvaluator::getOptimumCutValueFound()
  * interpolates between zenith range and return a TGraph
  *
  */
-TGraph* VTMVAEvaluator::readNonNoffGraphsFromFile( TFile* iF, double i_ze_min, double i_ze_max, bool bIsOn )
+TGraph* VTMVAEvaluator::readNonNoffGraphsFromFile(
+	TFile* iF, double i_ze_min, double i_ze_max, bool bIsOn )
 {
 	if( !iF && iF->IsZombie() )
 	{
@@ -2238,10 +2253,6 @@ TGraph* VTMVAEvaluator::readNonNoffGraphsFromFile( TFile* iF, double i_ze_min, d
 	if( bIsOn )
 	{
 		i_N = iF->Get( "gONRate" );
-		if( !i_N )
-		{
-			i_N = iF->Get( "gSignalRate" );
-		}
 	}
 	else
 	{
@@ -2293,9 +2304,11 @@ VTMVAEvaluatorData::VTMVAEvaluatorData()
 	fTMVAFileNameXML = "";
 	fTMVAMethodTag = "";
 	fTMVAMethodTag_2 = "";
+	fEnergyBin = 0;
 	fEnergyCut_Log10TeV_min = -99.;
 	fEnergyCut_Log10TeV_max = -99.;
 	fSpectralWeightedMeanEnergy_Log10TeV = -99.;
+	fZenithBin = 0;
 	fZenithCut_min = -99.;
 	fZenithCut_max = -99.;
 	

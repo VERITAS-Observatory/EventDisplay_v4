@@ -897,7 +897,10 @@ void VStereoHistograms::writeObjects( string iFile, string iDirectory, TObject* 
 	}
 	wDir = gDirectory;
 	
-	iFile = VUtilities::testFileLocation( iFile, iDirectory, true );
+	if( iFile.find( "IGNOREEFFECTIVEAREA" ) == string::npos )
+	{
+		iFile = VUtilities::testFileLocation( iFile, iDirectory, true );
+	}
 	if( iFile.size() == 0 )
 	{
 		iDir->cd();

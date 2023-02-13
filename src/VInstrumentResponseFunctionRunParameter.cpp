@@ -16,7 +16,7 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
 	fSpectralIndexMin = 2.0;
 	fSpectralIndexStep = 0.1;
 	
-	fEnergyReconstructionMethod = 0;
+	fEnergyReconstructionMethod = 1;
 	fEnergyAxisBins_log10 = 60;
 	fIgnoreEnergyReconstructionQuality = false;
 	

@@ -19,7 +19,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	{
 		cout << "VEffectiveAreaCalculator: no run parameters given" << endl;
 		cout << "...exiting..." << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	reset();
 	
@@ -951,50 +951,61 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( string iInputFile, double az
 	fGDirectory = gDirectory;
 	
 	// test if input file with effective areas exists
-	iInputFile = VUtilities::testFileLocation( iInputFile, "EffectiveAreas", true );
-	if( iInputFile.size() == 0 )
+	if( iInputFile.find( "IGNOREEFFECTIVEAREA" ) == string::npos )
 	{
-		exit( 0 );
+		iInputFile = VUtilities::testFileLocation( iInputFile, "EffectiveAreas", true );
+		if( iInputFile.size() == 0 )
+		{
+			exit( EXIT_FAILURE );
+		}
 	}
-	
-	TFile fIn( iInputFile.c_str() );
-	if( fIn.IsZombie() )
+	if( iInputFile.find( "IGNOREEFFECTIVEAREA" ) != string::npos )
 	{
-		cout << "Error opening file with effective areas: " << iInputFile << endl;
-		exit( -1 );
-	}
-	cout << "\t reading effective areas from " << fIn.GetName() << endl;
-	
-	// test which kind of file is available
-	//    i) effective areas values for each energy bin (bEffectiveAreasareHistograms = true)
-	//   ii) fit functions to effective area histograms (bEffectiveAreasareFunctions = true)
-	//       (favorable, to avoid binning effects)
-	//
-	//  prefer fit function over histograms
-	//
-	bEffectiveAreasareFunctions = false;
-	bEffectiveAreasareHistograms = false;
-	if( getEffectiveAreasFromFitFunction( ( TTree* )gDirectory->Get( "EffFit" ), azmin, azmax, iSpectralIndex ) )
-	{
-		bEffectiveAreasareFunctions = true;
-	}
-	else if( initializeEffectiveAreasFromHistograms( ( TTree* )gDirectory->Get( "fEffArea" ),
-			 ( TH1D* )gDirectory->Get( "hEmc" ),
-			 azmin, azmax, iSpectralIndex, ipedvar,
-			 ( TTree* )gDirectory->Get( "fEffAreaH2F" ) ) )
-	{
-		bEffectiveAreasareHistograms = true;
-	}
-	if( !bEffectiveAreasareHistograms && !bEffectiveAreasareFunctions )
-	{
-		cout << "VEffectiveAreaCalculator ERROR: no effective areas found" << endl;
+		cout << "ignoring effective areas: ";
 		cout << "all energy spectra will be invalid" << endl;
 		bNOFILE = true;
 	}
-	fIn.Close();
-	if( fGDirectory )
+	else
 	{
-		fGDirectory->cd();
+		TFile fIn( iInputFile.c_str() );
+		if( fIn.IsZombie() )
+		{
+			cout << "Error opening file with effective areas: " << iInputFile << endl;
+			exit( -1 );
+		}
+		cout << "\t reading effective areas from " << fIn.GetName() << endl;
+		
+		// test which kind of file is available
+		//    i) effective areas values for each energy bin (bEffectiveAreasareHistograms = true)
+		//   ii) fit functions to effective area histograms (bEffectiveAreasareFunctions = true)
+		//       (favorable, to avoid binning effects)
+		//
+		//  prefer fit function over histograms
+		//
+		bEffectiveAreasareFunctions = false;
+		bEffectiveAreasareHistograms = false;
+		if( getEffectiveAreasFromFitFunction( ( TTree* )gDirectory->Get( "EffFit" ), azmin, azmax, iSpectralIndex ) )
+		{
+			bEffectiveAreasareFunctions = true;
+		}
+		else if( initializeEffectiveAreasFromHistograms( ( TTree* )gDirectory->Get( "fEffArea" ),
+				 ( TH1D* )gDirectory->Get( "hEmc" ),
+				 azmin, azmax, iSpectralIndex, ipedvar,
+				 ( TTree* )gDirectory->Get( "fEffAreaH2F" ) ) )
+		{
+			bEffectiveAreasareHistograms = true;
+		}
+		if( !bEffectiveAreasareHistograms && !bEffectiveAreasareFunctions )
+		{
+			cout << "VEffectiveAreaCalculator ERROR: no effective areas found" << endl;
+			cout << "all energy spectra will be invalid" << endl;
+			bNOFILE = true;
+		}
+		fIn.Close();
+		if( fGDirectory )
+		{
+			fGDirectory->cd();
+		}
 	}
 }
 
