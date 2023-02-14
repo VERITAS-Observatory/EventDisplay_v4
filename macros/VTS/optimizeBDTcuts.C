@@ -46,7 +46,7 @@ void optimizeBDTcuts(
 		iFullWeightFileName.str(),
 		weightFileIndex_Emin, weightFileIndex_Emax,
 		weightFileIndex_Zmin, weightFileIndex_Zmax,
-		-1, "VTS" );
+		-1 );
 		
 	// plotting
 	a.plotSignalAndBackgroundEfficiencies();

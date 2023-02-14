@@ -415,7 +415,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
-					if( temp != fInstrumentEpoch )
+					if( fInstrumentEpoch.size() > 1 && temp != fInstrumentEpoch.substr( 0, 2 ) )
 					{
 						i_useTheseCuts = false;
 					}
@@ -563,7 +563,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
-					if( temp == fInstrumentEpoch )
+					if( fInstrumentEpoch.size() > 1 && temp != fInstrumentEpoch.substr( 0, 2 ) )
 					{
 						fCut_SizeSecondMax_min = isize_min;
 						fCut_SizeSecondMax_max = isize_max;
@@ -595,7 +595,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
-					if( temp == fInstrumentEpoch )
+					if( fInstrumentEpoch.size() > 0 && temp == fInstrumentEpoch.substr( 0, 2 ) )
 					{
 						while( !( is_stream >> std::ws ).eof() )
 						{
@@ -633,6 +633,12 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 							{
 								is_stream >> iWeightFileDirectory;
 							}
+							if( fInstrumentEpoch.size() > 1 )
+							{
+								iWeightFileDirectory.replace(
+									iWeightFileDirectory.find( fInstrumentEpoch.substr( 0, 1 ) ),
+									2, fInstrumentEpoch );
+							}
 							string iWeightFileName;
 							if( !( is_stream >> std::ws ).eof() )
 							{
@@ -655,11 +661,6 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 							fTMVAWeightFile += iWeightFileName;
 							break;
 						}
-					}
-					else if( iPrint != 0 )
-					{
-						cout << "VGammaHadronCuts::readCuts: skipping TMVAPARAMETER due to epoch mismatch:";
-						cout << " required: " << fInstrumentEpoch << ", is: " << temp << endl;
 					}
 				}
 			}
@@ -752,7 +753,6 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 						}
 					}
 				}
-				////////////////////////////////////////////////////////////////////////////////////////////////////
 			}
 			////////////////////////////////////////////////////////////////////////////////////////////////////
 			// direction cut values
@@ -1747,7 +1747,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile,
 	fTMVAEvaluator->setTMVAMethod( fTMVA_MVAMethod );
 	// read MVA weight files; set MVA cut values (e.g. find optimal values)
 	if( !fTMVAEvaluator->initializeWeightFiles( iTMVAFile, iTMVAWeightFileIndex_Emin, iTMVAWeightFileIndex_Emax,
-			iTMVAWeightFileIndex_Zmin, iTMVAWeightFileIndex_Zmax, iTMVAEnergy_StepSize, fInstrumentEpoch ) )
+			iTMVAWeightFileIndex_Zmin, iTMVAWeightFileIndex_Zmax, iTMVAEnergy_StepSize ) )
 	{
 		cout << "VGammaHadronCuts::initTMVAEvaluator: error while initializing TMVA weight files" << endl;
 		cout << "exiting... " << endl;
