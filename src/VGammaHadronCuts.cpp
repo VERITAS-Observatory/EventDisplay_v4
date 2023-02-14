@@ -940,23 +940,23 @@ void VGammaHadronCuts::printCutSummary()
 	{
 		cout << "Shape cuts: ";
 		cout << fCut_MSCW_min << " < MSCW < " << fCut_MSCW_max;
-		cout << ", " << fCut_MSCL_min << " < MSCL < " << fCut_MSCL_max << ", ";
+		cout << ", " << fCut_MSCL_min << " < MSCL < " << fCut_MSCL_max << endl;
 	}
 	// mean cuts
 	else if( fGammaHadronCutSelector % 10 == 1 )
 	{
 		cout << "Shape cuts: ";
 		cout << fCut_MeanImageWidth_min  << " < mean width < " << fCut_MeanImageWidth_max;
-		cout << ", " << fCut_MeanImageLength_min << " < mean length < " << fCut_MeanImageLength_max << ", ";
+		cout << ", " << fCut_MeanImageLength_min << " < mean length < " << fCut_MeanImageLength_max << endl;
 	}
 	// mean scaled cuts
 	else if( fGammaHadronCutSelector % 10 == 3 )
 	{
 		cout << "Shape cuts: ";
 		cout << fCut_MSW_min << " < MWR < " << fCut_MSW_max;
-		cout << ", " << fCut_MSL_min << " < MLR < " << fCut_MSL_max << ", ";
+		cout << ", " << fCut_MSL_min << " < MLR < " << fCut_MSL_max << endl;
 	}
-	cout << "average core distance < " << fCut_AverageCoreDistanceToTelescopes_max << " m";
+	cout << "Average core distance < " << fCut_AverageCoreDistanceToTelescopes_max << " m";
 	cout << " (max distance to telescopes (mintel) " << fCut_MinimumCoreDistanceToTelescopes_max << " m)";
 	// probability cuts
 	if( fGammaHadronCutSelector / 10 >= 1 && fGammaHadronCutSelector / 10 <= 3 )
