@@ -139,6 +139,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		float    fCoreDist;
 		float    fImages_Ttype[VDST_MAXTELESCOPES];
 		float    fDispDiff;
+		float    fDispDiff_log10;
 		float    fDummy;
 		
 		bool     bPlotEfficiencyPlotsPerBin;

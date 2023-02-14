@@ -34,6 +34,7 @@ void VTMVAEvaluator::reset()
 	fSizeSecondMax_log10 = 0;
 	fCoreDist = 0.;
 	fDispDiff = 0.;
+	fDispDiff_log10 = 0.;
 	fDummy = 0.;
 	for( int i = 0; i < VDST_MAXTELESCOPES; i++ )
 	{
@@ -505,6 +506,10 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 			{
 				fTMVAData[b]->fTMVAReader->AddVariable( "DispDiff", &fDispDiff );
 			}
+			else if( iTrainingVariables[t] == "log10(DispDiff)" && !iVariableIsASpectator[t] )
+			{
+				fTMVAData[b]->fTMVAReader->AddVariable( "log10(DispDiff)", &fDispDiff_log10 );
+			}
 			// Note: assume not more then 3 different telescope types
 			else if( iTrainingVariables[t] == "NImages_Ttype[0]" && !iVariableIsASpectator[t] )
 			{
@@ -777,6 +782,14 @@ bool VTMVAEvaluator::evaluate()
 		}
 		fCoreDist = sqrt( fData->Xcore * fData->Xcore + fData->Ycore * fData->Ycore );
 		fDispDiff = fData->DispDiff;
+		if( fDispDiff > 0. )
+		{
+			fDispDiff_log10 = log10( fDispDiff );
+		}
+		else
+		{
+			fDispDiff_log10 = 0.;    // !!! not clear what the best value is
+		}
 		if( fData->NTtype < VDST_MAXTELESCOPES )
 		{
 			for( int i = 0; i < fData->NTtype; i++ )
