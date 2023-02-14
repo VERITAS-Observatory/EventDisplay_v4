@@ -471,6 +471,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
 	{
 		fObservatory = i_runPara->getObservatory();
 		fInstrumentEpoch = i_runPara->fInstrumentEpoch;
+		fInstrumentEpochATM = i_runPara->getInstrumentATMString();
 		fTelToAnalyse = i_runPara->fTelToAnalyze;
 	}
 	else
@@ -478,6 +479,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
 		cout << "VInstrumentResponseFunctionRunParameter::readRunParameters() warning: cannot read instrument epoch and active telecopes from MC event file" << endl;
 		cout << "this might lead to a wrong choice in the gamma/hadron cuts - please check" << endl;
 		fInstrumentEpoch = "NOT_FOUND";
+		fInstrumentEpochATM = "NOT_FOUND";
 	}
 	// get NSB (pedvar) level
 	VTableLookupRunParameter* fR = ( VTableLookupRunParameter* )iFile->Get( "TLRunParameter" );
@@ -606,7 +608,9 @@ void VInstrumentResponseFunctionRunParameter::print()
 	}
 	if( fInstrumentEpoch != "NOT_SET" )
 	{
-		cout << "Instrument epoch: " << fInstrumentEpoch << endl;
+		cout << "Instrument epoch: " << fInstrumentEpoch;
+		cout << " (" << fInstrumentEpochATM << ")";
+		cout << endl;
 	}
 	else
 	{

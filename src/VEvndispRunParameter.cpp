@@ -1048,3 +1048,12 @@ unsigned int VEvndispRunParameter::getAtmosphereID( bool iUpdateInstrumentEpoch 
 	
 	return fAtmosphereID;
 }
+
+string VEvndispRunParameter::getInstrumentATMString()
+{
+	ostringstream i_temp;
+	i_temp << getInstrumentEpoch( false );
+	i_temp << "_ATM" << getAtmosphereID();
+	
+	return i_temp.str();
+}
