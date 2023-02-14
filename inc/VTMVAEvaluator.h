@@ -192,7 +192,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 			return fTMVA_EvaluationResult;
 		}
 		bool   initializeWeightFiles( string iWeightFileName, unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
-									  unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax, double iEnergyStepSize = 0.2, string iInstrumentEpoch = "noepoch" );
+									  unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax, double iEnergyStepSize = 0.2 );
 		bool   initializeDataStrutures( CData* iC );
 		bool   IsZombie()
 		{

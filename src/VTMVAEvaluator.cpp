@@ -154,7 +154,7 @@ string VTMVAEvaluator::getBDTFileName( string iWeightFileName, unsigned int i_E_
 bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 		unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
 		unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax,
-		double iEnergyStepSize, string iInstrumentEpoch )
+		double iEnergyStepSize )
 {
 	//////////////////////////////
 	// sanity checks
