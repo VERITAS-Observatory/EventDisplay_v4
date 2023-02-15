@@ -255,12 +255,12 @@ bool train( VTMVARunData* iRun,
 	}
 	if( iRun->fEnergyCutData.size() <= iEnergyBin || iRun->fOutputFile.size() <= iEnergyBin )
 	{
-		cout << "error in train: energy bin out of range " << iEnergyBin;
+		cout << "error during training: energy bin out of range " << iEnergyBin << endl;
 		return false;
 	}
 	if( iRun->fZenithCutData.size() < iZenithBin || iRun->fOutputFile[0].size() < iZenithBin )
 	{
-		cout << "error in train: zenith bin out of range " << iZenithBin;
+		cout << "error during training: zenith bin out of range " << iZenithBin << endl;
 		return false;
 	}
 	// quality cuts before training
