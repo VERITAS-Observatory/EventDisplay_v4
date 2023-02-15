@@ -801,7 +801,7 @@ bool VTMVARunData::fillEnergyCutData(
 	vector< double > iEnergyCut_Log10TeV_max )
 {
 	// check sanity
-	if( iEnergyCut_Log10TeV_min.size() < 2 )
+	if( iEnergyCut_Log10TeV_min.size() < 1 )
 	{
 		cout << "VTMVARunData::readConfigurationFile error: need at least two energy bins ";
 		cout << iEnergyCut_Log10TeV_min.size() << endl;
