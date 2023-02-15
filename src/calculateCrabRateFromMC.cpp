@@ -148,8 +148,9 @@ vector< double > read_energy_bins( string iTMVAParameterFile )
 	
 	return tmp_e;
 }
+
 /*
-  initialzie profile histograms rates as function of energy and zenith angle
+  initialize profile histograms rates as function of energy and zenith angle
    - entry 0: MC rates from the Crab nebula
 
 */
@@ -157,6 +158,13 @@ vector< TProfile2D* > initializeRateProfileHistos( string fEffAreaFile, string f
 {
 	vector< TProfile2D* > h;
 	
+    /* TODO
+     * - allow to take overlapping energy bins into account
+     * - two types of bins:
+     *   - for histogram (non overlapping)
+     *   - for integration (possibly overlapping)
+     *
+     */
 	vector< double > tmp_ebins = read_energy_bins( fTMVAParameterFile );
 	
 	vector< double > tmp_zebin_edges = read_zenith_bins( fEffAreaFile );
