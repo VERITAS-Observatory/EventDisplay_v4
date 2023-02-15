@@ -569,7 +569,9 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 	// smooth and interpolate
 	if( fParticleNumberFileName.size() > 0 && fSmoothAndInterpolateMVAValues )
 	{
-		smoothAndInterPolateMVAValue( 0, 0, iWeightFileIndex_Emin, iWeightFileIndex_Emax, iWeightFileIndex_Zmin, iWeightFileIndex_Zmax );
+		smoothAndInterPolateMVAValue( 0, 0,
+									  iWeightFileIndex_Emin, iWeightFileIndex_Emax,
+									  iWeightFileIndex_Zmin, iWeightFileIndex_Zmax );
 	}
 	
 	// print some info to screen
@@ -1294,8 +1296,11 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 	cout << " ndif = " << Ndif << " (1 CU)" << endl;
 	cout << "VTVMAEvaluator::optimizeSensitivity event numbers: ";
 	cout << " (data bin " << iDataBin;
-	cout << ",  weighted mean energy " << TMath::Power( 10., fTMVAData[iDataBin]->fSpectralWeightedMeanEnergy_Log10TeV ) << " [TeV], ";
-	cout << fTMVAData[iDataBin]->fSpectralWeightedMeanEnergy_Log10TeV << ")";
+	cout << ",  weighted mean energy ";
+	cout << TMath::Power( 10., fTMVAData[iDataBin]->fSpectralWeightedMeanEnergy_Log10TeV ) << " [TeV], ";
+	cout << fTMVAData[iDataBin]->fSpectralWeightedMeanEnergy_Log10TeV << "), ";
+	cout << " Ebin [" << fTMVAData[iDataBin]->fEnergyCut_Log10TeV_min;
+	cout << ", " << fTMVAData[iDataBin]->fEnergyCut_Log10TeV_max << "]";
 	cout << endl;
 	
 	///////////////////////////////////////////////////////////////////
