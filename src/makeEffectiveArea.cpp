@@ -246,7 +246,7 @@ int main( int argc, char* argv[] )
 			if( fMC_histo )
 			{
 				fMC_histo->matchDataVectors( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex );
-				fMC_histo->print();
+				// fMC_histo->print();
 			}
 			else
 			{
