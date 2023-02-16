@@ -131,7 +131,6 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		float    fMLR;
 		float    fEmissionHeight;
 		float    fEmissionHeightChi2_log10;
-		unsigned int fEnergyReconstructionMethod;
 		float    fEChi2S;
 		float    fEChi2S_log10;
 		float    fdES;
@@ -146,7 +145,6 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		bool     fPrintPlotting;
 		
 		TH1F*            getEfficiencyHistogram( string iName, TFile* iF, string iMethodTag_2 );
-		double           getMeanEnergyAfterCut( TFile* f, double iCut, unsigned int iDataBin );
 		bool             optimizeSensitivity( unsigned int iDataBin );
 		TGraph*          fillfromGraph2D( TObject* i_G, double i_ze_min, double i_ze_max );
 		void             fillTMVAEvaluatorResults();
