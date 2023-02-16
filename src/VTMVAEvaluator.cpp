@@ -840,7 +840,7 @@ unsigned int VTMVAEvaluator::getDataBin( double iErec, double iZe )
 			}
 		}
 	}
-	//	if( fDebug && iBin < fTMVAData.size() )
+	if( fDebug && iBin < fTMVAData.size() )
 	{
 		cout << "VTMVAEvaluator::getDataBin: " << iBin << endl;
 		fTMVAData[iBin]->print();
