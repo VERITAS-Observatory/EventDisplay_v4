@@ -45,8 +45,7 @@ void optimizeBDTcuts(
 	a.initializeWeightFiles(
 		iFullWeightFileName.str(),
 		weightFileIndex_Emin, weightFileIndex_Emax,
-		weightFileIndex_Zmin, weightFileIndex_Zmax,
-		-1 );
+		weightFileIndex_Zmin, weightFileIndex_Zmax );
 		
 	// plotting
 	a.plotSignalAndBackgroundEfficiencies();

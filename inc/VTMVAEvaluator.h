@@ -192,7 +192,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 			return fTMVA_EvaluationResult;
 		}
 		bool   initializeWeightFiles( string iWeightFileName, unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
-									  unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax, double iEnergyStepSize = 0.2 );
+									  unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax );
 		bool   initializeDataStrutures( CData* iC );
 		bool   IsZombie()
 		{
@@ -249,7 +249,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		}
 		void   setTMVAMethod( string iMethodName = "BDT" );
 		
-		ClassDef( VTMVAEvaluator, 32 );
+		ClassDef( VTMVAEvaluator, 33 );
 };
 
 #endif

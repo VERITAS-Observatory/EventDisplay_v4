@@ -153,8 +153,7 @@ string VTMVAEvaluator::getBDTFileName( string iWeightFileName, unsigned int i_E_
 */
 bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 		unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
-		unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax,
-		double iEnergyStepSize )
+		unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax )
 {
 	//////////////////////////////
 	// sanity checks
@@ -306,87 +305,67 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 				//    - one VTMVAEvaluatorData per energy bin
 				//    - bins are set for the energy interval read from the root file:
 				//      [iEnergyData->fEnergyCut_Log10TeV_min, iEnergyData->fEnergyCut_Log10TeV_max]
-				//    - sub-bins given by iEnergyStepSize;
-				double e = iEnergyData->fEnergyCut_Log10TeV_min;
-				do
+				// central data element for this energy bin
+				fTMVAData.push_back( new VTMVAEvaluatorData() );
+				fTMVAData.back()->fEnergyBin = i;
+				fTMVAData.back()->fZenithBin = j;
+				fTMVAData.back()->fEnergyCut_Log10TeV_min = iEnergyData->fEnergyCut_Log10TeV_min;
+				fTMVAData.back()->fEnergyCut_Log10TeV_max = iEnergyData->fEnergyCut_Log10TeV_max;
+				
+				// calculate spectral weighted mean energy
+				fTMVAData.back()->fSpectralWeightedMeanEnergy_Log10TeV =
+					VMathsandFunctions::getSpectralWeightedMeanEnergy( fTMVAData.back()->fEnergyCut_Log10TeV_min,
+							fTMVAData.back()->fEnergyCut_Log10TeV_max,
+							fSpectralIndexForEnergyWeighting );
+				// zenith angle range
+				if( iZenithData )
 				{
-					// central data element for this energy bin
-					fTMVAData.push_back( new VTMVAEvaluatorData() );
-					fTMVAData.back()->fEnergyBin = i;
-					fTMVAData.back()->fZenithBin = j;
-					// find e_min and e_max
-					fTMVAData.back()->fEnergyCut_Log10TeV_min = e;
-					if( iEnergyStepSize > 0. )
-					{
-						fTMVAData.back()->fEnergyCut_Log10TeV_max = e + iEnergyStepSize;
-					}
-					else
-					{
-						fTMVAData.back()->fEnergyCut_Log10TeV_max = iEnergyData->fEnergyCut_Log10TeV_max;
-					}
-					e = fTMVAData.back()->fEnergyCut_Log10TeV_max;
-					
-					// calculate spectral weighted mean energy
-					fTMVAData.back()->fSpectralWeightedMeanEnergy_Log10TeV =
-						VMathsandFunctions::getSpectralWeightedMeanEnergy( fTMVAData.back()->fEnergyCut_Log10TeV_min,
-								fTMVAData.back()->fEnergyCut_Log10TeV_max,
-								fSpectralIndexForEnergyWeighting );
-					// zenith angle range
-					if( iZenithData )
-					{
-						fTMVAData.back()->fZenithCut_min = iZenithData->fZenithCut_min;
-						fTMVAData.back()->fZenithCut_max = iZenithData->fZenithCut_max;
-					}
-					else
-					{
-						fTMVAData.back()->fZenithCut_min = 0.;
-						fTMVAData.back()->fZenithCut_max = 90.;
-					}
-					
-					
-					fTMVAData.back()->fSignalEfficiency = getSignalEfficiency( iWeightFileIndex_Emin + i,
-														  iEnergyData->fEnergyCut_Log10TeV_min,
-														  iEnergyData->fEnergyCut_Log10TeV_max,
-														  iWeightFileIndex_Zmin + j,
-														  fTMVAData.back()->fZenithCut_min,
-														  fTMVAData.back()->fZenithCut_max );
-					fTMVAData.back()->fTMVACutValue = getTMVACutValue( iWeightFileIndex_Emin + i,
+					fTMVAData.back()->fZenithCut_min = iZenithData->fZenithCut_min;
+					fTMVAData.back()->fZenithCut_max = iZenithData->fZenithCut_max;
+				}
+				else
+				{
+					fTMVAData.back()->fZenithCut_min = 0.;
+					fTMVAData.back()->fZenithCut_max = 90.;
+				}
+				
+				
+				fTMVAData.back()->fSignalEfficiency = getSignalEfficiency( iWeightFileIndex_Emin + i,
 													  iEnergyData->fEnergyCut_Log10TeV_min,
 													  iEnergyData->fEnergyCut_Log10TeV_max,
 													  iWeightFileIndex_Zmin + j,
 													  fTMVAData.back()->fZenithCut_min,
 													  fTMVAData.back()->fZenithCut_max );
-					fTMVAData.back()->fBackgroundEfficiency = -99.;
-					fTMVAData.back()->fTMVAOptimumCutValueFound = false;
-					fTMVAData.back()->fSourceStrengthAtOptimum_CU = 0.;
-					
-					sprintf( hname, "bin %d, %.2f < log10(E) < %.2f, %.2f < Ze < %.2f)",
-							 ( int )( fTMVAData.size() - 1 ), fTMVAData.back()->fEnergyCut_Log10TeV_min, fTMVAData.back()->fEnergyCut_Log10TeV_max,
-							 fTMVAData.back()->fZenithCut_min, fTMVAData.back()->fZenithCut_max );
-					fTMVAData.back()->SetTitle( hname );
-					
-					sprintf( hname, "%d%d", i, j );
-					fTMVAData.back()->fTMVAMethodTag = hname;
-					if( iNbinZ > 1 )
-					{
-						sprintf( hname, "%d_%d", i, j );
-					}
-					else
-					{
-						sprintf( hname, "%d", i );
-					}
-					
-					fTMVAData.back()->fTMVAMethodTag_2 = hname;
-					fTMVAData.back()->fTMVAName = iTMVAName;
-					fTMVAData.back()->fTMVAFileName = iFullFileName;
-					fTMVAData.back()->fTMVAFileNameXML = iFullFileNameXML;
-					
-					if( iEnergyStepSize < 0. )
-					{
-						break;
-					}
+				fTMVAData.back()->fTMVACutValue = getTMVACutValue( iWeightFileIndex_Emin + i,
+												  iEnergyData->fEnergyCut_Log10TeV_min,
+												  iEnergyData->fEnergyCut_Log10TeV_max,
+												  iWeightFileIndex_Zmin + j,
+												  fTMVAData.back()->fZenithCut_min,
+												  fTMVAData.back()->fZenithCut_max );
+				fTMVAData.back()->fBackgroundEfficiency = -99.;
+				fTMVAData.back()->fTMVAOptimumCutValueFound = false;
+				fTMVAData.back()->fSourceStrengthAtOptimum_CU = 0.;
+				
+				sprintf( hname, "bin %d, %.2f < log10(E) < %.2f, %.2f < Ze < %.2f)",
+						 ( int )( fTMVAData.size() - 1 ), fTMVAData.back()->fEnergyCut_Log10TeV_min, fTMVAData.back()->fEnergyCut_Log10TeV_max,
+						 fTMVAData.back()->fZenithCut_min, fTMVAData.back()->fZenithCut_max );
+				fTMVAData.back()->SetTitle( hname );
+				
+				sprintf( hname, "%d%d", i, j );
+				fTMVAData.back()->fTMVAMethodTag = hname;
+				if( iNbinZ > 1 )
+				{
+					sprintf( hname, "%d_%d", i, j );
 				}
-				while( e < ( iEnergyData->fEnergyCut_Log10TeV_max - 0.0001 ) );
+				else
+				{
+					sprintf( hname, "%d", i );
+				}
+				
+				fTMVAData.back()->fTMVAMethodTag_2 = hname;
+				fTMVAData.back()->fTMVAName = iTMVAName;
+				fTMVAData.back()->fTMVAFileName = iFullFileName;
+				fTMVAData.back()->fTMVAFileNameXML = iFullFileNameXML;
 				
 				iF.Close();
 			}
