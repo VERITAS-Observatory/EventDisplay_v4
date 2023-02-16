@@ -848,7 +848,8 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 		// copy effective areas and radial acceptance to anasum output file
 		if( bOn )
 		{
-			if( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile != "IGNOREEFFECTIVEAREA" )
+			if( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile != "IGNOREEFFECTIVEAREA"
+					&& fRunPara->fRunList[fHisCounter].fEffectiveAreaFile != "IGNOREIRF" )
 			{
 				fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveArea );
 				fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveArea );
@@ -859,7 +860,7 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 				{
 					if( gMeanEffectiveAreaMC )
 					{
-						// (SOB) When nOn = 0 gMeanEffectiveAreaMC_on(E) = 0
+						// When nOn = 0 gMeanEffectiveAreaMC_on(E) = 0
 						// VLikelihoodFitter will check gMeanEffectiveAreaMC_on::integral > 1
 						gMeanEffectiveAreaMC->SetTitle( "gMeanEffectiveAreaMC_on" );
 						gMeanEffectiveAreaMC->SetName( "gMeanEffectiveAreaMC_on" );
@@ -893,11 +894,15 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 				sprintf( hname, "%s_off", gTimeBinnedMeanEffectiveArea->GetName() );
 				gTimeBinnedMeanEffectiveArea->SetName( hname );
 			}
-			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveArea );
-			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveArea );
+			if( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile != "IGNOREEFFECTIVEAREA"
+					&& fRunPara->fRunList[fHisCounter].fEffectiveAreaFile != "IGNOREIRF" )
+			{
+				fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveArea );
+				fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveArea );
+			}
 			
 			// Both MC and REC  effective areas are required for Binned Likelihood analysis
-			// (SOB) A set of Off MC effective areas and response matrix are used as a back up
+			// A set of Off MC effective areas and response matrix are used as a back up
 			// If zero On counts the Off set will be used
 			if( fRunPara->fLikelihoodAnalysis )
 			{
@@ -1794,7 +1799,8 @@ void VStereoAnalysis::setCuts( VAnaSumRunParameterDataClass iL, int irun )
 	{
 		// read cuts from effective area root file
 		if( iL.fCutFile.find( ".root" ) != string::npos
-				&& iL.fCutFile.find( "IGNOREEFFECTIVEAREA" ) == string::npos )
+				&& iL.fCutFile.find( "IGNOREEFFECTIVEAREA" ) == string::npos
+				&& iL.fCutFile.find( "IGNOREIRF" ) == string::npos )
 		{
 			string iEffFile = VUtilities::testFileLocation( iL.fCutFile, "EffectiveAreas", true );
 			
