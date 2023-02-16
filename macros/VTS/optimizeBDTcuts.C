@@ -4,7 +4,7 @@
  * pre-cuts (e.g., ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-Preselection.dat)
  *
  * usage: e.g.
- * root -l -q -b 'optimizeBDTcuts.C("../../tmva/rates.root", "../../tmva", 0, 3, 0, 1)'
+ * root -l -q -b 'optimizeBDTcuts.C("../../tmva/rates.root", "../../tmva", "V6", 0, 3, 0, 2)'
  *
 */
 
@@ -23,6 +23,7 @@ void help()
 void optimizeBDTcuts(
 	string rateFile = "rates.root",
 	string weightFileDir = "./",
+    string epoch = "V6",
 	int weightFileIndex_Emin = 0, int weightFileIndex_Emax = 3,
 	int weightFileIndex_Zmin = 0., int weightFileIndex_Zmax = 3.,
 	double observing_time_h = 10.,
@@ -44,13 +45,12 @@ void optimizeBDTcuts(
 	a.initializeWeightFiles(
 		iFullWeightFileName.str(),
 		weightFileIndex_Emin, weightFileIndex_Emax,
-		weightFileIndex_Zmin, weightFileIndex_Zmax,
-		-1, "VTS" );
+		weightFileIndex_Zmin, weightFileIndex_Zmax );
 		
 	// plotting
 	a.plotSignalAndBackgroundEfficiencies();
 	
 	// print results to screen
 	a.printSignalEfficiency();
-	a.printOptimizedMVACutValues( "V6" );
+	a.printOptimizedMVACutValues( epoch );
 }

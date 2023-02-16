@@ -656,18 +656,29 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				}
 			}
 			// energy bins
+			if( temp == "ENERGYBINEDGES" )
+			{
+				vector< double > iEnergyCut_Log10TeV_min;
+				vector< double > iEnergyCut_Log10TeV_max;
+				
+				// read in energy bin
+				while( !( is_stream >> std::ws ).eof() )
+				{
+					double iT = 0.;
+					is_stream >> iT;
+					iEnergyCut_Log10TeV_min.push_back( iT );
+					is_stream >> iT;
+					iEnergyCut_Log10TeV_max.push_back( iT );
+				}
+				if( !fillEnergyCutData( iEnergyCut_Log10TeV_min, iEnergyCut_Log10TeV_max ) )
+				{
+					return false;
+				}
+			}
 			if( temp == "ENERGYBINS" )
 			{
 				vector< double > iEnergyCut_Log10TeV_min;
 				vector< double > iEnergyCut_Log10TeV_max;
-				vector< TCut > iEnergyCut;
-				
-				// energy reconstruction method (should be 1, unless you know it better)
-				unsigned int iEMethod;
-				if( !( is_stream >> std::ws ).eof() )
-				{
-					is_stream >> iEMethod;
-				}
 				
 				// read in energy bin
 				while( !( is_stream >> std::ws ).eof() )
@@ -678,12 +689,6 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				}
 				// sort
 				sort( iEnergyCut_Log10TeV_min.begin(), iEnergyCut_Log10TeV_min.end() );
-				// check sanity
-				if( iEnergyCut_Log10TeV_min.size() < 2 )
-				{
-					cout << "VTMVARunData::readConfigurationFile error: need at least two energy bins " << iEnergyCut_Log10TeV_min.size() << endl;
-					return false;
-				}
 				// fill maximum bins
 				for( unsigned int i = 1; i < iEnergyCut_Log10TeV_min.size(); i++ )
 				{
@@ -691,31 +696,9 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				}
 				// remove last minimum
 				iEnergyCut_Log10TeV_min.pop_back();
-				// fill cuts
-				for( unsigned int i = 0; i < iEnergyCut_Log10TeV_min.size(); i++ )
+				if( !fillEnergyCutData( iEnergyCut_Log10TeV_min, iEnergyCut_Log10TeV_max ) )
 				{
-					ostringstream iCut;
-					if( iEMethod == 0 )
-					{
-						iCut << "Erec>0.&&"  << iEnergyCut_Log10TeV_min[i]  <<  "<log10(Erec)&&log10(Erec)<" << iEnergyCut_Log10TeV_max[i];
-					}
-					else
-					{
-						iCut << "ErecS>0.&&" <<  iEnergyCut_Log10TeV_min[i] <<  "<log10(ErecS)&&log10(ErecS)<" << iEnergyCut_Log10TeV_max[i];
-					}
-					iEnergyCut.push_back( iCut.str().c_str() );
-				}
-				// filling everything into the energy data structure
-				fEnergyCutData.clear();
-				for( unsigned int i = 0; i < iEnergyCut_Log10TeV_min.size(); i++ )
-				{
-					fEnergyCutData.push_back( new VTMVARunDataEnergyCut() );
-					fEnergyCutData.back()->SetName( "fDataEnergyCut" );
-					fEnergyCutData.back()->fEnergyCutBin = 0;
-					fEnergyCutData.back()->fEnergyCut_Log10TeV_min = iEnergyCut_Log10TeV_min[i];
-					fEnergyCutData.back()->fEnergyCut_Log10TeV_max = iEnergyCut_Log10TeV_max[i];
-					fEnergyCutData.back()->fEnergyCut = iEnergyCut[i];
-					fEnergyCutData.back()->fEnergyReconstructionMethod = iEMethod;
+					return false;
 				}
 			}
 			// zenith angle bins (in [deg])
@@ -737,7 +720,8 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				// check sanity
 				if( iZenithCut_min.size() < 2 )
 				{
-					cout << "VTMVARunData::readConfigurationFile error: need at least one zenith bin " << iZenithCut_min.size() << endl;
+					cout << "VTMVARunData::readConfigurationFile error: need at least one zenith bin ";
+					cout << iZenithCut_min.size() << endl;
 					return false;
 				}
 				// fill maximum bins
@@ -810,4 +794,38 @@ VTableLookupRunParameter* VTMVARunData::getTLRunParameter()
 		return iP;
 	}
 	return 0;
+}
+
+bool VTMVARunData::fillEnergyCutData(
+	vector< double > iEnergyCut_Log10TeV_min,
+	vector< double > iEnergyCut_Log10TeV_max )
+{
+	// check sanity
+	if( iEnergyCut_Log10TeV_min.size() < 1 )
+	{
+		cout << "VTMVARunData::readConfigurationFile error: need at least two energy bins ";
+		cout << iEnergyCut_Log10TeV_min.size() << endl;
+		return false;
+	}
+	vector< TCut > iEnergyCut;
+	// fill cuts
+	for( unsigned int i = 0; i < iEnergyCut_Log10TeV_min.size(); i++ )
+	{
+		ostringstream iCut;
+		iCut << "ErecS>0.&&" <<  iEnergyCut_Log10TeV_min[i];
+		iCut <<  "<log10(ErecS)&&log10(ErecS)<" << iEnergyCut_Log10TeV_max[i];
+		iEnergyCut.push_back( iCut.str().c_str() );
+	}
+	// filling everything into the energy data structure
+	fEnergyCutData.clear();
+	for( unsigned int i = 0; i < iEnergyCut_Log10TeV_min.size(); i++ )
+	{
+		fEnergyCutData.push_back( new VTMVARunDataEnergyCut() );
+		fEnergyCutData.back()->SetName( "fDataEnergyCut" );
+		fEnergyCutData.back()->fEnergyCutBin = 0;
+		fEnergyCutData.back()->fEnergyCut_Log10TeV_min = iEnergyCut_Log10TeV_min[i];
+		fEnergyCutData.back()->fEnergyCut_Log10TeV_max = iEnergyCut_Log10TeV_max[i];
+		fEnergyCutData.back()->fEnergyCut = iEnergyCut[i];
+	}
+	return true;
 }

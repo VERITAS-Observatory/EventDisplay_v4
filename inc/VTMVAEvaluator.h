@@ -131,7 +131,6 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		float    fMLR;
 		float    fEmissionHeight;
 		float    fEmissionHeightChi2_log10;
-		unsigned int fEnergyReconstructionMethod;
 		float    fEChi2S;
 		float    fEChi2S_log10;
 		float    fdES;
@@ -139,13 +138,13 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		float    fCoreDist;
 		float    fImages_Ttype[VDST_MAXTELESCOPES];
 		float    fDispDiff;
+		float    fDispDiff_log10;
 		float    fDummy;
 		
 		bool     bPlotEfficiencyPlotsPerBin;
 		bool     fPrintPlotting;
 		
 		TH1F*            getEfficiencyHistogram( string iName, TFile* iF, string iMethodTag_2 );
-		double           getMeanEnergyAfterCut( TFile* f, double iCut, unsigned int iDataBin );
 		bool             optimizeSensitivity( unsigned int iDataBin );
 		TGraph*          fillfromGraph2D( TObject* i_G, double i_ze_min, double i_ze_max );
 		void             fillTMVAEvaluatorResults();
@@ -191,7 +190,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 			return fTMVA_EvaluationResult;
 		}
 		bool   initializeWeightFiles( string iWeightFileName, unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
-									  unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax, double iEnergyStepSize = 0.2, string iInstrumentEpoch = "noepoch" );
+									  unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax );
 		bool   initializeDataStrutures( CData* iC );
 		bool   IsZombie()
 		{
@@ -248,7 +247,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		}
 		void   setTMVAMethod( string iMethodName = "BDT" );
 		
-		ClassDef( VTMVAEvaluator, 32 );
+		ClassDef( VTMVAEvaluator, 33 );
 };
 
 #endif

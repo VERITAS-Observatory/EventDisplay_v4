@@ -154,6 +154,10 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
 				{
 					i_fraction_of_events_to_keep /= ( double )iTreeVector.size();
 				}
+				if( i_fraction_of_events_to_keep > 1. )
+				{
+					i_fraction_of_events_to_keep = 1.;
+				}
 				cout << "\t keeping " << i_fraction_of_events_to_keep * 100. << "\% of events of ";
 				if( iSignal )
 				{
@@ -251,12 +255,12 @@ bool train( VTMVARunData* iRun,
 	}
 	if( iRun->fEnergyCutData.size() <= iEnergyBin || iRun->fOutputFile.size() <= iEnergyBin )
 	{
-		cout << "error in train: energy bin out of range " << iEnergyBin;
+		cout << "error during training: energy bin out of range " << iEnergyBin << endl;
 		return false;
 	}
 	if( iRun->fZenithCutData.size() < iZenithBin || iRun->fOutputFile[0].size() < iZenithBin )
 	{
-		cout << "error in train: zenith bin out of range " << iZenithBin;
+		cout << "error during training: zenith bin out of range " << iZenithBin << endl;
 		return false;
 	}
 	// quality cuts before training
@@ -326,9 +330,9 @@ bool train( VTMVARunData* iRun,
 		cout << "Error: failed preparing traing / testing trees" << endl;
 		return false;
 	}
-	if( iSignalTree_reduced->GetEntries()  == 0 || iBackgroundTree_reduced->GetEntries() == 0 )
+	if( iSignalTree_reduced->GetEntries() < 1000 || iBackgroundTree_reduced->GetEntries() < 1000 )
 	{
-		cout << "Error: no events available for training: ";
+		cout << "Error: less than 1000 events available for training: ";
 		cout << " signal (" << iSignalTree_reduced->GetEntries() << "), ";
 		cout << " background (" << iBackgroundTree_reduced->GetEntries() << ")" << endl;
 		return false;

@@ -11,7 +11,7 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 	fDebug = false;
 	
 	fDataFile = 0;
-	fInstrumentEpoch = "NOT_SET";
+	fInstrumentEpochMinor = "NOT_SET";
 	fDirTot = iDirTot;
 	fDirTotRun = iDirRun;
 	bTotalAnalysisOnly = iTotalAnalysisOnly;
@@ -1822,7 +1822,7 @@ void VStereoAnalysis::setCuts( VAnaSumRunParameterDataClass iL, int irun )
 		else
 		{
 			fCuts->setNTel( iL.fMaxTelID );
-			fCuts->setInstrumentEpoch( fInstrumentEpoch );
+			fCuts->setInstrumentEpoch( fInstrumentEpochMinor );
 			fCuts->setTelToAnalyze( fTelToAnalyze );
 			fCuts->readCuts( iL.fCutFile );
 			fCuts->setTheta2Cut( iL.fSourceRadius );
@@ -1969,7 +1969,7 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
 		VEvndispRunParameter* i_runPara = ( VEvndispRunParameter* )fDataFile->Get( "runparameterV2" );
 		if( i_runPara )
 		{
-			fInstrumentEpoch = i_runPara->getInstrumentEpoch( true );
+			fInstrumentEpochMinor = i_runPara->getInstrumentATMString();
 			fTelToAnalyze = i_runPara->fTelToAnalyze;
 		}
 		else
@@ -1977,7 +1977,7 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
 			cout << "VStereoAnalysis::getDataFromFile() warning: epoch of current file " << endl;
 			cout << "and active telescope combination cannot be determined; " << endl;
 			cout << "this might lead to a wrong choice in the gamma/hadron cuts - please check" << endl;
-			fInstrumentEpoch = "NOT_FOUND";
+			fInstrumentEpochMinor = "NOT_FOUND";
 		}
 	}
 	return c;

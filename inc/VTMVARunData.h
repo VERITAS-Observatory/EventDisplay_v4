@@ -36,6 +36,8 @@ class VTMVARunData : public TNamed
 	
 		bool              fDebug;
 		
+		bool         fillEnergyCutData(
+			vector< double > iEnergyCut_Log10TeV_min, vector< double > iEnergyCut_Log10TeV_max );
 		unsigned int getTrainOptionValue( string iVarName, unsigned int i_default );
 		
 	public:
@@ -112,7 +114,7 @@ class VTMVARunData : public TNamed
 		void shuffleFileVectors();
 		void updateTrainingEvents( string iVarName, unsigned int iNEvents );
 		
-		ClassDef( VTMVARunData, 10 );
+		ClassDef( VTMVARunData, 11 );
 };
 
 #endif
