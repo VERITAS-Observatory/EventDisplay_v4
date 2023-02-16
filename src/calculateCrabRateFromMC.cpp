@@ -308,7 +308,7 @@ TTree* fillMCRates(
 		MCrate = fMCR->getMonteCarloRate(
 					 fenergy, feffectivearea,
 					 fWhippleIndex, fWhippleNorm, 1., fEnergyThreshold, 1.e7, false );
-		MCrate *= ( 1. - fDeadTime );
+		MCrate *= ( 1. - fDeadTime / 100. );
 		fMC->Fill();
 		
 		for( unsigned int e = 0; e < ebins.size(); e++ )
@@ -322,7 +322,7 @@ TTree* fillMCRates(
 					fWhippleIndex, fWhippleNorm, 1.,
 					TMath::Power( 10., ebins[e].first ),
 					TMath::Power( 10., ebins[e].second ),
-					false ) * ( 1. - fDeadTime ) );
+					false ) * ( 1. - fDeadTime / 100. ) );
 		}
 	}
 	f->Close();
