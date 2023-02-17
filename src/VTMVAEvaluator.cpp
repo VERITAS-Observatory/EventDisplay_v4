@@ -1670,7 +1670,6 @@ void VTMVAEvaluator::smoothAndInterPolateMVAValue_EnergyOnly(
 			if( effS )
 			{
 				fTMVAData[i]->fSignalEfficiency = effS->GetBinContent( effS->FindBin( fTMVAData[i]->fTMVACutValue ) );
-				cout << "eff S " << fTMVAData[i]->fSignalEfficiency << endl;
 			}
 			if( effB )
 			{
