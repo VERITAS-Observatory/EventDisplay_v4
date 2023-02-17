@@ -208,7 +208,8 @@ int main( int argc, char* argv[] )
 		cout << "(e.g. from Crab Nebula or Mrk 421 observations)" << endl;
 		cout << endl;
 		cout << endl;
-		cout << "compareDatawithMC <input file list> <cut> <outputfile> [BDT gamma/hadron cuts] [shower max zenith angle (default=20deg)]" << endl;
+		cout << "compareDatawithMC <input file list> <cut> <outputfile> ";
+		cout << "[BDT gamma/hadron cuts] [epoch_ATM] [shower max zenith angle (default=20deg)]" << endl;
 		cout << endl;
 		cout << "\t input file list: see example file COMPAREMC.runparameter in the parameter files directory" << endl;
 		cout << "\t cuts: " << endl;
@@ -234,14 +235,17 @@ int main( int argc, char* argv[] )
 	readInputfile( fInputFile );
 	
 	int fSingleTelescopeCuts = atoi( argv[2] );
-	
 	string fOutputfile = argv[3];
 	
 	bool fCalculateMVACut = false;
-	
 	if( argc > 4 && atoi( argv[4] ) == 1 )
 	{
 		fCalculateMVACut = true;
+	}
+	string fEpochATM = "";
+	if( argc > 5 )
+	{
+		fEpochATM = argv[5];
 	}
 	double fShowerMaxZe_deg = 20.;
 	if( argc > 5 )
@@ -280,7 +284,7 @@ int main( int argc, char* argv[] )
 	{
 		if( fInputData[i].fType == "ON" )
 		{
-			VDataMCComparision iTemp( fInputData[i].fType, fInputData[i].fNTelescopes, fCalculateMVACut );
+			VDataMCComparision iTemp( fInputData[i].fType, fInputData[i].fNTelescopes );
 			iTemp.setAzRange( fInputData[i].fAz_deg_min, fInputData[i].fAz_deg_max );
 			iTemp.setZeRange( fInputData[i].fZe_deg_min, fInputData[i].fZe_deg_max );
 			iTemp.setShowerMaximZe_deg( fShowerMaxZe_deg );
@@ -311,7 +315,11 @@ int main( int argc, char* argv[] )
 	{
 		cout << fInputData[i].fType << endl;
 		cout << "----" << endl;
-		fStereoCompare.push_back( new VDataMCComparision( fInputData[i].fType, fInputData[i].fNTelescopes, fCalculateMVACut ) );
+		fStereoCompare.push_back( new VDataMCComparision( fInputData[i].fType, fInputData[i].fNTelescopes ) );
+		if( fCalculateMVACut )
+		{
+			fStereoCompare.back()->setTMVABDTComparision( fEpochATM );
+		}
 		fStereoCompare.back()->setAzRange( fInputData[i].fAz_deg_min, fInputData[i].fAz_deg_max );
 		fStereoCompare.back()->setZeRange( fInputData[i].fZe_deg_min, fInputData[i].fZe_deg_max );
 		// get telescope coordinates
@@ -351,7 +359,7 @@ int main( int argc, char* argv[] )
 	// calculate difference histograms
 	cout << "DIFF" << endl;
 	cout << "----" << endl;
-	VDataMCComparision* fDiff = new VDataMCComparision( "DIFF", iNT, fCalculateMVACut );
+	VDataMCComparision* fDiff = new VDataMCComparision( "DIFF", iNT );
 	// assume 5 background regions
 	fDiff->setOnOffHistograms( fStereoCompareOn, fStereoCompareOff, 1. / 5. );
 	fDiff->writeHistograms( fOutputfile );
