@@ -27,8 +27,12 @@ void print_sensitivity( string anasum_file, string latex_table_title = "", doubl
     }
     double Rate = 0;
     double RateOff = 0.;
+    double RateE = 0;
+    double RateOffE = 0.;
     t->SetBranchAddress( "Rate", &Rate );
     t->SetBranchAddress( "RateOff", &RateOff );
+    t->SetBranchAddress( "RateE", &RateE );
+    t->SetBranchAddress( "RateOffE", &RateOffE );
 
     t->GetEntry( t->GetEntries()-1 );
 
@@ -37,5 +41,5 @@ void print_sensitivity( string anasum_file, string latex_table_title = "", doubl
     VSensitivityCalculator a;
     a.addDataSet( Rate, RateOff, alpha, "" );
     a.list_sensitivity();
-    a.list_sensitivity( 0, true, latex_table_title);
+    a.list_sensitivity_latex_table( 0, latex_table_title, RateE);
 }
