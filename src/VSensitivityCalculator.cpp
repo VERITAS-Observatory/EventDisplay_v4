@@ -1394,10 +1394,28 @@ void VSensitivityCalculator::list_sensitivity_table( unsigned int iD )
 	cout << " events, and using Li & Ma formula " << fLiAndMaEqu << ")" << endl;
 }
 
-void VSensitivityCalculator::list_sensitivity_latex_table( unsigned int iD, string iTitle )
+void VSensitivityCalculator::list_sensitivity_latex_table(
+	unsigned int iD, string iTitle,
+	double iSignalE, double iBackgroundE )
 {
 	cout << "LATEXLINE  ";
-	cout <<  iTitle << "  &  ";
+	cout << iTitle << "  &  ";
+	if( iSignalE > 0. )
+	{
+		cout << fData[iD].fSignal << " \\pm " << iSignalE << " & ";
+	}
+	else
+	{
+		cout << fData[iD].fSignal << " & ";
+	}
+	if( iBackgroundE > 0. )
+	{
+		cout << fData[iD].fBackground << " \\pm " << iBackgroundE << " & ";
+	}
+	else
+	{
+		cout << fData[iD].fBackground << " & ";
+	}
 	// assume that 10 and 1% values are in source strength vectors
 	for( unsigned int i = 0; i < fSourceStrength.size(); i++ )
 	{
@@ -1407,7 +1425,7 @@ void VSensitivityCalculator::list_sensitivity_latex_table( unsigned int iD, stri
 		}
 		if( TMath::Abs( fSourceStrength[i] - 0.01 ) < 1.e-7 )
 		{
-			cout << setprecision( 3 ) << fGraphObsvsTime[iD]->Eval( fSourceStrength[i] ) << "  &  ";
+			cout << setprecision( 3 ) << fGraphObsvsTime[iD]->Eval( fSourceStrength[i] ) << " ";
 		}
 	}
 	cout <<  "\\\\" << endl;

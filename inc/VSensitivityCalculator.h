@@ -227,7 +227,6 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 		
 		
 		TGraphAsymmErrors* getSensitivityGraphFromWPPhysFile( string bUnit, double iEnergyMin_TeV_lin, double iEnergyMax_TeV_lin, double dE_Log10 );
-		void     list_sensitivity_latex_table( unsigned int iD, string iTitle );
 		void     list_sensitivity_table( unsigned int iD );
 		void       plot_guidingLines( double x, TGraph* g, bool iHours );
 		void       plotEffectiveArea();
@@ -264,6 +263,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 		unsigned int  listDataSets();
 		void     listUnits();
 		void     list_sensitivity( unsigned int iD = 0, bool latex_table_line = false, string iTitle = "" );
+		void     list_sensitivity_latex_table( unsigned int iD, string iTitle, double iSignalE = -1., double iBackgroundE = -1. );
 		TCanvas* plotCanvas_SensitivityvsEnergy( string bUnit, bool bIntegralSensitivity, bool bNewCanvas = false );
 		TCanvas* plotObservationTimevsFlux( unsigned int iD = 0, TCanvas* c = 0, int iLineColor = 1, double iLineWidth = 4., bool bGuidingLines = true );
 		void     plotObservationTimevsFluxFromTextFile( TCanvas* c, string iTextFile, int iLineColor = 4, double iLineWidth = 1., int iLineStyle = 2 );
