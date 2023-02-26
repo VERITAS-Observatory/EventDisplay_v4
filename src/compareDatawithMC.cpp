@@ -247,11 +247,6 @@ int main( int argc, char* argv[] )
 	{
 		fEpochATM = argv[5];
 	}
-	double fShowerMaxZe_deg = 20.;
-	if( argc > 5 )
-	{
-		fShowerMaxZe_deg = atof( argv[5] );
-	}
 	
 	// test number of telescopes
 	int iNT = 0;
@@ -271,7 +266,6 @@ int main( int argc, char* argv[] )
 			}
 		}
 	}
-	
 	// -------- end of reading input parameters
 	
 	TH1D* hAzOn = 0;
@@ -287,7 +281,6 @@ int main( int argc, char* argv[] )
 			VDataMCComparision iTemp( fInputData[i].fType, fInputData[i].fNTelescopes );
 			iTemp.setAzRange( fInputData[i].fAz_deg_min, fInputData[i].fAz_deg_max );
 			iTemp.setZeRange( fInputData[i].fZe_deg_min, fInputData[i].fZe_deg_max );
-			iTemp.setShowerMaximZe_deg( fShowerMaxZe_deg );
 			hAzOn = iTemp.getAzimuthWeightingHistogram( fInputData[i].fFileName );
 			if( hAzOn )
 			{
@@ -326,7 +319,8 @@ int main( int argc, char* argv[] )
 		fStereoCompare.back()->resetTelescopeCoordinates();
 		for( int t = 0; t < fInputData[i].fNTelescopes; t++ )
 		{
-			if( !fStereoCompare.back()->setTelescopeCoordinates( fInputData[i].fTelX[t], fInputData[i].fTelY[t], fInputData[i].fTelZ[t] ) )
+			if( !fStereoCompare.back()->setTelescopeCoordinates(
+						fInputData[i].fTelX[t], fInputData[i].fTelY[t], fInputData[i].fTelZ[t] ) )
 			{
 				exit( EXIT_FAILURE );
 			}
