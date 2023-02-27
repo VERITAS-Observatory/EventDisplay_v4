@@ -2352,7 +2352,7 @@ void VPlotCompareDataWithMC::plot( string iPrintName )
 	{
 		cP->Print( hname );
 	}
-	cP = plot_energyDependentDistributions( "MVA", 1, -75, 0.75, "SIMSDIFF" );
+	cP = plot_energyDependentDistributions( "MVA", 1, -0.75, 0.75, "SIMSDIFF" );
 	if( cP )
 	{
 		cP->Print( hname );
