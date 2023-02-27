@@ -38,6 +38,7 @@ class VPlotCompareDataWithMC : public VHistogramUtilities
 		
 		double fRelatePlotRange_min;
 		double fRelatePlotRange_max;
+		int    fScalingMethod;
 		
 		void   drawMatchingTests( TH1D* h1, TH1D* h2, double xmin = -9999., double xmax = 9999. );
 		TF1*   do_theta2Fit( TH1D* h, int icolor = 1, int istyle = 1 );
@@ -62,7 +63,7 @@ class VPlotCompareDataWithMC : public VHistogramUtilities
 		
 		void help();
 		void centroids();
-		TCanvas* core_plots( int iRebin = 1, int iScaling = 1 );
+		TCanvas* core_plots( int iRebin = 1 );
 		TCanvas* distance_plots();
 		TCanvas* emission_height( double iEmissionHeightMax = 20. );
 		void erecRatio_vs_energy_plots( int iTelescope = 1, int iRebin = 1, double xmin =  0., double xmax = 2. );
@@ -88,7 +89,7 @@ class VPlotCompareDataWithMC : public VHistogramUtilities
 				double iSystematicCutCheck = -99., string iXVariable = "Erec",
 				double y_min = -99., bool iPlotLogY = false );
 		TCanvas* single_telescope( int telid = -1 );
-		TCanvas* single_telescope( int telid, string iPlot, bool iOneCanvas = true, int iScalingMethod = 1, int i_rebin = 1 );
+		TCanvas* single_telescope( int telid, string iPlot, bool iOneCanvas = true, int i_rebin = 1 );
 		TCanvas* stereo_parameter();
 		void mva_parameter();
 		
@@ -113,6 +114,7 @@ class VPlotCompareDataWithMC : public VHistogramUtilities
 			fRelatePlotRange_min = iMin;
 			fRelatePlotRange_max = iMax;
 		}
+		void setScalingMethod( int iScalingMethod = 1 );
 };
 
 #endif
