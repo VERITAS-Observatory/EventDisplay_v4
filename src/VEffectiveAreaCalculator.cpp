@@ -2078,7 +2078,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 	}
 	// reset unique event counter
 	fUniqueEventCounter.clear();
-	int iSuccessfullEventStatistics = 0;
+	Long64_t iSuccessfullEventStatistics = 0;
 	
 	//////////////////////////////////////////////////////////////////
 	// print some run information
@@ -2361,34 +2361,10 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			hEcutSub[6]->Fill( eMC, 1. );
 		}
 		
-		
 		// unique event counter
-		// (make sure that map doesn't get too big)
-		if( !bDirectionCut && iSuccessfullEventStatistics >= 0 )
+		if( !bDirectionCut )
 		{
 			iSuccessfullEventStatistics++;
-			/* This was removed in v502, is it necessary?
-			if( fUniqueEventCounter.size() < 100000 )
-			{
-				unsigned int iUIEnergy = ( unsigned int )( d->MCe0 * 1.e5 );
-				if( fUniqueEventCounter.find( iUIEnergy ) != fUniqueEventCounter.end() )
-				{
-					fUniqueEventCounter[iUIEnergy]++;
-				}
-				else
-				{
-					fUniqueEventCounter[iUIEnergy] = 1;
-				}
-			}
-			else
-			{
-				iSuccessfullEventStatistics *= -1;
-			}
-			*/
-		}
-		else
-		{
-			iSuccessfullEventStatistics--;
 		}
 		
 		// loop over all az bins
@@ -2815,25 +2791,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 	}
 	
 	fCuts->printCutStatistics();
-	
-	// print out uniqueness of events
-	/*    cout << "event statistics: " << endl;
-	    if( iSuccessfullEventStatistics > 0 )
-	    {
-	       map< unsigned int, unsigned short int>::iterator it;
-	       for( it = fUniqueEventCounter.begin(); it != fUniqueEventCounter.end(); it++ )
-	       {
-		  if( (*it).second > 1 )
-		  {
-		     cout << "\t multiple event after cuts at " << (double)((*it).first)/1.e5 << " TeV, used " << (*it).second << " times" << endl;
-		  }
-	       }
-	    }
-	    else iSuccessfullEventStatistics *= -1; */
-	if( iSuccessfullEventStatistics < 0 )
-	{
-		iSuccessfullEventStatistics *= -1;
-	}
 	cout << "\t total number of events after cuts: " << iSuccessfullEventStatistics << endl;
 	
 	return true;
