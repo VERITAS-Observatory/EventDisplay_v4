@@ -92,7 +92,9 @@ bool VDataMCComparisionHistogramData::initHistogram( string iXTitle, int iNbins,
  * fill comparison histograms as function of energy, ntubes, size, sizeHG, sizeLG
  *
  */
-void VDataMCComparisionHistogramData::fill( double iV, double iWeight, double iLogEnergy_TeV, int i_ntubes, double i_size, double i_fracLow )
+void VDataMCComparisionHistogramData::fill(
+	double iV, double iWeight, double iLogEnergy_TeV,
+	int i_ntubes, double i_size, double i_fracLow )
 {
 	if( fHis1D )
 	{
