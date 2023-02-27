@@ -956,10 +956,16 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 			if( fCuts )
 			{
 				fCuts->newEvent();
-				fCuts->applyTMVACut( i );
-				if( fCuts->getTMVA_EvaluationResult() > -90. && fHistoArray[EMVA] )
+				// apply stereo quality cuts to ensure good response of TMV
+				if( fCuts->applyInsideFiducialAreaCut( true )
+						&& fCuts->applyStereoQualityCuts( 1, true, i, true ) )
 				{
-					fHistoArray[EMVA]->fill( fCuts->getTMVA_EvaluationResult(), weight, log10( fData->ErecS ) );
+					fCuts->applyTMVACut( i );
+					if( fCuts->getTMVA_EvaluationResult() > -90. && fHistoArray[EMVA] )
+					{
+						fHistoArray[EMVA]->fill(
+							fCuts->getTMVA_EvaluationResult(), weight, log10( fData->ErecS ) );
+					}
 				}
 			}
 		}
