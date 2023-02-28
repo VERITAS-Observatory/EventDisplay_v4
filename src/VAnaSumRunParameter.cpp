@@ -730,7 +730,7 @@ int VAnaSumRunParameter::loadShortFileList( string i_listfilename, string iDataD
 	{
 		cout << " VAnaSumRunParameter::loadShortFileList error: file with list of runs not found : " << i_listfilename << endl;
 		cout << "exiting..." << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	string is_line;
 	string temp;
@@ -745,84 +745,87 @@ int VAnaSumRunParameter::loadShortFileList( string i_listfilename, string iDataD
 		{
 			istringstream is_stream( is_line );
 			is_stream >> temp;
-			cout << "RUN NUMBER " << temp << endl;
 			i_sT.fRunOn = atoi( temp.c_str() );
 			i_sT.fRunOff = atoi( temp.c_str() );
-			// open mscw file and read out telescope participating in analysis
-			temp = iDataDir + "/" + temp + ".mscw.root";
-			TFile iF( temp.c_str(), "READ" );
-			if( iF.IsZombie() )
+			if( !bTotalAnalysisOnly )
 			{
-				cout << "VAnaSumRunParameter::loadShortFileList: error, data file not found: ";
-				cout << temp << endl;
-				exit( -1 );
-			}
-			VEvndispRunParameter* iPar = ( VEvndispRunParameter* )iF.Get( "runparameterV2" );
-			if( !iPar )
-			{
-				cout << "VAnaSumRunParameter::loadShortFileList: error, no run parameters found in: ";
-				cout << temp << endl;
-				exit( -1 );
-			}
-			char hTelToAna[200];
-			for( unsigned int i = 0; i < iPar->fTelToAnalyze.size(); i++ )
-			{
-				if( i == 0 )
+				// open mscw file and read out telescope participating in analysis
+				temp = iDataDir + "/" + temp + ".mscw.root";
+				TFile iF( temp.c_str(), "READ" );
+				if( iF.IsZombie() )
 				{
-					sprintf( hTelToAna, "%d", iPar->fTelToAnalyze[i] + 1 );
+					cout << "VAnaSumRunParameter::loadShortFileList: error, data file not found: ";
+					cout << temp << endl;
+					exit( EXIT_FAILURE );
+				}
+				VEvndispRunParameter* iPar = ( VEvndispRunParameter* )iF.Get( "runparameterV2" );
+				if( !iPar )
+				{
+					cout << "VAnaSumRunParameter::loadShortFileList: error, no run parameters found in: ";
+					cout << temp << endl;
+					exit( EXIT_FAILURE );
+				}
+				char hTelToAna[200];
+				for( unsigned int i = 0; i < iPar->fTelToAnalyze.size(); i++ )
+				{
+					if( i == 0 )
+					{
+						sprintf( hTelToAna, "%d", iPar->fTelToAnalyze[i] + 1 );
+					}
+					else
+					{
+						string tmp_str = hTelToAna;
+						sprintf( hTelToAna, "%s%d", tmp_str.c_str(), iPar->fTelToAnalyze[i] + 1 );
+					}
+				}
+				iF.Close();
+				i_sT.fTelToAna = hTelToAna;
+				i_sT.fCutFile = fTMPL_CutFile;
+				i_sT.fSourceRadius = fTMPL_SourceRadius;
+				i_sT.fBackgroundModel = fTMPL_fBackgroundModel;
+				i_sT.fmaxradius = fTMPL_maxradius;
+				i_sT.fEffectiveAreaFile = fTMPL_EffectiveAreaFile;
+				if( i_sT.fTelToAna == "1234" )
+				{
+					i_sT.fEffectiveAreaFile += ".root";
 				}
 				else
 				{
-					string tmp_str = hTelToAna;
-					sprintf( hTelToAna, "%s%d", tmp_str.c_str(), iPar->fTelToAnalyze[i] + 1 );
+					i_sT.fEffectiveAreaFile += "_T" + i_sT.fTelToAna + ".root";
 				}
-			}
-			iF.Close();
-			i_sT.fTelToAna = hTelToAna;
-			i_sT.fCutFile = fTMPL_CutFile;
-			i_sT.fSourceRadius = fTMPL_SourceRadius;
-			i_sT.fBackgroundModel = fTMPL_fBackgroundModel;
-			i_sT.fmaxradius = fTMPL_maxradius;
-			i_sT.fEffectiveAreaFile = fTMPL_EffectiveAreaFile;
-			if( i_sT.fTelToAna == "1234" )
-			{
-				i_sT.fEffectiveAreaFile += ".root";
-			}
-			else
-			{
-				i_sT.fEffectiveAreaFile += "_T" + i_sT.fTelToAna + ".root";
-			}
-			i_sT.fAcceptanceFile = fTMPL_AcceptanceFile;
-			if( i_sT.fTelToAna == "1234" )
-			{
-				i_sT.fAcceptanceFile += ".root";
-			}
-			else
-			{
-				i_sT.fAcceptanceFile += "_T" + i_sT.fTelToAna + ".root";
-			}
-			if( i_sT.fBackgroundModel == eRINGMODEL )
-			{
-				i_sT.fRM_RingRadius = fTMPL_RM_RingRadius;
-				i_sT.fRM_RingWidth  = fTMPL_RM_RingWidth;
-			}
-			else if( i_sT.fBackgroundModel == eREFLECTEDREGION )
-			{
-				i_sT.fRE_distanceSourceOff = fTMPL_RE_distanceSourceOff;
-				i_sT.fRE_nMinoffsource = fTMPL_RE_nMinoffsource;
-				i_sT.fRE_nMaxoffsource = fTMPL_RE_nMaxoffsource;
-			}
-			else
-			{
-				cout << "VAnaSumRunParameter error: ";
-				cout << " unknown background model " << i_sT.fBackgroundModel << endl;
-				cout << "\t or" << endl;
-				cout << "VAnaSumRunParameter warning: ";
-				cout << " short runlist not implemented yet for this background model " << i_sT.fBackgroundModel << endl;
+				i_sT.fAcceptanceFile = fTMPL_AcceptanceFile;
+				if( i_sT.fTelToAna == "1234" )
+				{
+					i_sT.fAcceptanceFile += ".root";
+				}
+				else
+				{
+					i_sT.fAcceptanceFile += "_T" + i_sT.fTelToAna + ".root";
+				}
+				if( i_sT.fBackgroundModel == eRINGMODEL )
+				{
+					i_sT.fRM_RingRadius = fTMPL_RM_RingRadius;
+					i_sT.fRM_RingWidth  = fTMPL_RM_RingWidth;
+				}
+				else if( i_sT.fBackgroundModel == eREFLECTEDREGION )
+				{
+					i_sT.fRE_distanceSourceOff = fTMPL_RE_distanceSourceOff;
+					i_sT.fRE_nMinoffsource = fTMPL_RE_nMinoffsource;
+					i_sT.fRE_nMaxoffsource = fTMPL_RE_nMaxoffsource;
+				}
+				else
+				{
+					cout << "VAnaSumRunParameter error: ";
+					cout << " unknown background model " << i_sT.fBackgroundModel << endl;
+					cout << "\t or" << endl;
+					cout << "VAnaSumRunParameter warning: ";
+					cout << " short runlist not implemented yet for this background model " << i_sT.fBackgroundModel << endl;
+				}
+				
+				i_sT.f2DAcceptanceMode = f2DAcceptanceMode ; // USE2DACCEPTANCE
 			}
 			
 			// fill the runlist vector
-			i_sT.f2DAcceptanceMode = f2DAcceptanceMode ; // USE2DACCEPTANCE
 			fRunList.push_back( i_sT );
 			// fill the runlist map
 			fMapRunList[i_sT.fRunOn] = fRunList.back();

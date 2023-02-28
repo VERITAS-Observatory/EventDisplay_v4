@@ -26,16 +26,23 @@ void optimizeBDTcuts(
     string epoch = "V6",
 	int weightFileIndex_Emin = 0, int weightFileIndex_Emax = 3,
 	int weightFileIndex_Zmin = 0., int weightFileIndex_Zmax = 3.,
-	double observing_time_h = 10.,
+	double observing_time_h = 5.,
 	double significance = 5. )
 {
 	VTMVAEvaluator a;
 	
-	// parameter setting
-	a.setPrintPlotting( true );
-	a.setPlotEfficiencyPlotsPerBin( true );
+	// a.setPrintPlotting( true );
+	// a.setPlotEfficiencyPlotsPerBin( true );
+    // conversion factor 3600.:
+    // - particle number graphs are in 1/s
+    // - observing time is in hours
 	a.setParticleNumberFile( rateFile.c_str(), 3600. );
+    // optimisation metric for the given observation time
+    // - significance
+    // - >= 10 signal events
+    // - alpha = 1./5.
 	a.setSensitivityOptimizationParameters( significance, 10., observing_time_h, 1. / 5. );
+    // maximum signal efficiency allowed
 	a.setSensitivityOptimizationFixedSignalEfficiency( 0.90 );
 	a.setSensitivityOptimizationMinSourceStrength( 0.00001 );
 	

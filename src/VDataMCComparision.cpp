@@ -121,7 +121,7 @@ void VDataMCComparisionHistogramData::fill( double iV, double iWeight, double iL
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
-VDataMCComparision::VDataMCComparision( string iname, int intel, bool iMVAValues )
+VDataMCComparision::VDataMCComparision( string iname, int intel )
 {
 	fNTel = intel;
 	fName = iname;
@@ -135,7 +135,8 @@ VDataMCComparision::VDataMCComparision( string iname, int intel, bool iMVAValues
 	
 	fData = 0;
 	fCuts = 0;
-	fCalculateMVAValues = iMVAValues;
+	fCalculateMVAValues = false;
+	fEpochATM = "";
 	
 	// spectral weighting (will be set later correctly, as it is run from MC run header)
 	fSpectralWeight = new VSpectralWeight();
@@ -177,9 +178,12 @@ VDataMCComparision::VDataMCComparision( string iname, int intel, bool iMVAValues
 */
 void VDataMCComparision::initialGammaHadronCuts()
 {
+	VGlobalRunParameter( true );
 	fCuts = new VGammaHadronCuts();
 	fCuts->initialize();
 	fCuts->resetCutValues();
+	fCuts->setNTel( 4 );
+	fCuts->setInstrumentEpoch( fEpochATM );
 	// HARDWIRED CUT FILE
 	if( !fCuts->readCuts( "$VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles/ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-BDT.dat" ) )
 	{

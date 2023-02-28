@@ -2352,6 +2352,16 @@ void VPlotCompareDataWithMC::plot( string iPrintName )
 	{
 		cP->Print( hname );
 	}
+	cP = plot_energyDependentDistributions( "MVA", 1, -1., 1., "SIMSDIFF" );
+	if( cP )
+	{
+		cP->Print( hname );
+	}
+	cP = plot_energyDependentDistributions( "MVA", 1, -1., 1., "CUMU" );
+	if( cP )
+	{
+		cP->Print( hname );
+	}
 	// telescope dependent plots
 	for( unsigned int i = 1; i <= 4; i++ )
 	{
