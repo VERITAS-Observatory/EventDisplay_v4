@@ -9,7 +9,8 @@
 
 #include "VDataMCComparision.h"
 
-VDataMCComparisionHistogramData::VDataMCComparisionHistogramData( string iName, string iHistogramType, unsigned int iTelescopeID )
+VDataMCComparisionHistogramData::VDataMCComparisionHistogramData(
+	string iName, string iHistogramType, unsigned int iTelescopeID )
 {
 	fVarName = iName;
 	fHistogramType = iHistogramType;
@@ -91,7 +92,9 @@ bool VDataMCComparisionHistogramData::initHistogram( string iXTitle, int iNbins,
  * fill comparison histograms as function of energy, ntubes, size, sizeHG, sizeLG
  *
  */
-void VDataMCComparisionHistogramData::fill( double iV, double iWeight, double iLogEnergy_TeV, int i_ntubes, double i_size, double i_fracLow )
+void VDataMCComparisionHistogramData::fill(
+	double iV, double iWeight, double iLogEnergy_TeV,
+	int i_ntubes, double i_size, double i_fracLow )
 {
 	if( fHis1D )
 	{
@@ -185,6 +188,7 @@ void VDataMCComparision::initialGammaHadronCuts()
 	fCuts->setNTel( 4 );
 	fCuts->setInstrumentEpoch( fEpochATM );
 	// HARDWIRED CUT FILE
+	// used for BDT comparision
 	if( !fCuts->readCuts( "$VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles/ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-BDT.dat" ) )
 	{
 		cout << "exiting..." << endl;
@@ -451,7 +455,6 @@ bool VDataMCComparision::setOnOffHistograms( VDataMCComparision* on, VDataMCComp
 		hTel2D[j]->Add( on->hTel2D[j], off->hTel2D[j], 1., norm );
 	}
 	
-	
 	return true;
 }
 
@@ -497,7 +500,7 @@ void VDataMCComparision::setEntries( TH2D* iH )
 bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts )
 {
 	// quality cuts
-	double fCoreMax_QC = 350; //350.;       // cut on core distance
+	double fCoreMax_QC = 350;        // cut on core distance
 	int    fNImages_min = 2;         // minimum number of images per event
 	// stereo cuts
 	double theta2_cut = 0.035; // 0.35;
@@ -515,13 +518,6 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 	double msw_min = -1.2;
 	double msl_max = 0.5;
 	double msl_min = -1.2;
-	
-	/*
-	double msw_max = 1.15;
-	double msw_min = 0.05;
-	double msl_max = 0.40;
-	double msl_min = 0.05;
-	*/
 	
 	double size_min = 200.;
 	double size2ndmax_min = 0.;
@@ -790,7 +786,6 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 			}
 		}
 		
-		
 		/////////////////////////////////////////////////////////
 		//   ---    apply theta2 cuts ---
 		/////////////////////////////////////////////////////////
@@ -961,10 +956,16 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 			if( fCuts )
 			{
 				fCuts->newEvent();
-				fCuts->applyTMVACut( i );
-				if( fCuts->getTMVA_EvaluationResult() > -90. && fHistoArray[EMVA] )
+				// apply stereo quality cuts to ensure good response of TMV
+				if( fCuts->applyInsideFiducialAreaCut( true )
+						&& fCuts->applyStereoQualityCuts( 1, true, i, true ) )
 				{
-					fHistoArray[EMVA]->fill( fCuts->getTMVA_EvaluationResult(), weight, log10( fData->ErecS ) );
+					fCuts->applyTMVACut( i );
+					if( fCuts->getTMVA_EvaluationResult() > -90. && fHistoArray[EMVA] )
+					{
+						fHistoArray[EMVA]->fill(
+							fCuts->getTMVA_EvaluationResult(), weight, log10( fData->ErecS ) );
+					}
 				}
 			}
 		}

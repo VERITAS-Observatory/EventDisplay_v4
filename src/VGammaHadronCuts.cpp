@@ -562,7 +562,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				if( !( is_stream >> std::ws ).eof() )
 				{
 					is_stream >> temp;
-					if( fInstrumentEpoch.size() > 1 && temp != fInstrumentEpoch.substr( 0, 2 ) )
+					if( fInstrumentEpoch.size() > 1 && temp == fInstrumentEpoch.substr( 0, 2 ) )
 					{
 						fCut_SizeSecondMax_min = isize_min;
 						fCut_SizeSecondMax_max = isize_max;
