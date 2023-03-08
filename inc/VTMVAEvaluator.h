@@ -204,8 +204,9 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		{
 			fDebug = iB;
 		}
-		void   setSensitivityOptimizationParameters( double iSignificance = 5., double iMinEvents = 10., double iObservationTime_h = 50.,
-				double iMinBackgroundRateRatio = 1. / 5, double iMinBackgroundEvents = 0. )
+		void   setSensitivityOptimizationParameters(
+			double iSignificance = 5., double iMinEvents = 10., double iObservationTime_h = 50.,
+			double iMinBackgroundRateRatio = 1. / 5, double iMinBackgroundEvents = 0. )
 		{
 			fOptimizationSourceSignificance = iSignificance;
 			fOptimizationMinSignalEvents = iMinEvents;
