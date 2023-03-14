@@ -223,28 +223,23 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 				{
 					iEnergyData = ( VTMVARunDataEnergyCut* )iF.Get( "fDataEnergyCut" );
 					iZenithData = ( VTMVARunDataZenithCut* )iF.Get( "fDataZenithCut" );
-					if( !iEnergyData )
+					if( !iEnergyData || !iZenithData )
 					{
-						cout << "No energy cut data: setting goodrun to false" << endl;
-						bGoodRun = false;
-					}
-					// backwards compatibility
-					if( !iZenithData )
-					{
-						cout << "No zenith cut data: ";
-						cout << " setting goodrun to false" << endl;
+						cout << "  No energy or zenith cut data" << endl;
 						bGoodRun = false;
 					}
 					// signal efficiency
-					sprintf( hname, "Method_%s/%s_0/MVA_%s_0_effS", fTMVAMethodName.c_str(), fTMVAMethodName.c_str(), fTMVAMethodName.c_str() );
-					
+					sprintf( hname, "Method_%s/%s_0/MVA_%s_0_effS",
+							 fTMVAMethodName.c_str(), fTMVAMethodName.c_str(), fTMVAMethodName.c_str() );
+							 
 					if( !iF.Get( hname ) )
 					{
-						cout << "No signal efficiency histogram found (" << hname << ")" << endl;
+						cout << "  No signal efficiency histogram found (" << hname << ")" << endl;
 						bGoodRun = false;
 					}
 				}
-				// allow that first files are missing (this happens when there are no training events in the first energy bins)
+				// allow that first files are missing
+				// (this happens when there are no training events in the first energy or zenith bins)
 				if( !bGoodRun )
 				{
 					if( i == iMinMissingBin || j == jMinMissingBin )
@@ -255,30 +250,27 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 						if( i == iMinMissingBin )
 						{
 							cout << "  assume this is a low-energy empty bin (bin number " << i << ";";
-							cout << " number of missing bins: " << iMinMissingBin + 1 << ")" << endl;
+							cout << " number of missing energy bins: " << iMinMissingBin + 1 << ")" << endl;
 							iMinMissingBin++;
 						}
 						if( j == jMinMissingBin )
 						{
 							cout << "  assume this is a zenith empty bin (bin number " << j << ";";
-							cout << " number of missing bins: " << jMinMissingBin + 1 << ")" << endl;
+							cout << " number of missing zenith bins: " << jMinMissingBin + 1 << ")" << endl;
+							jMinMissingBin++;
 						}
 						continue;
 					}
 					else if( i == ( iWeightFileIndex_Emax ) || j == ( iWeightFileIndex_Zmax ) )
 					{
-						cout << "VTMVAEvaluator::initializeWeightFiles() warning: TMVA root file not found " << iFullFileName << endl;
+						cout << "VTMVAEvaluator::initializeWeightFiles(): TMVA root file not found " << iFullFileName << endl;
 						if( i == ( iWeightFileIndex_Emax ) )
 						{
 							cout << "  assume this is a high-energy empty bin (bin number " << i << ")" << endl;
-							iNbinE--;
-							iWeightFileIndex_Emax--;
 						}
 						if( j == ( iWeightFileIndex_Zmax ) )
 						{
 							cout << "  assume this is a high-zenith empty bin (bin number " << j << ")" << endl;
-							iNbinZ--;
-							iWeightFileIndex_Zmax--;
 						}
 						continue;
 					}
@@ -352,15 +344,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 				
 				sprintf( hname, "%d%d", i, j );
 				fTMVAData.back()->fTMVAMethodTag = hname;
-				if( iNbinZ > 1 )
-				{
-					sprintf( hname, "%d_%d", i, j );
-				}
-				else
-				{
-					sprintf( hname, "%d", i );
-				}
-				
+				sprintf( hname, "%d_%d", i, j );
 				fTMVAData.back()->fTMVAMethodTag_2 = hname;
 				fTMVAData.back()->fTMVAName = iTMVAName;
 				fTMVAData.back()->fTMVAFileName = iFullFileName;
