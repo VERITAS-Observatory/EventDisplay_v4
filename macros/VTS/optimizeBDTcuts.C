@@ -27,7 +27,8 @@ void optimizeBDTcuts(
 	int weightFileIndex_Emin = 0, int weightFileIndex_Emax = 3,
 	int weightFileIndex_Zmin = 0., int weightFileIndex_Zmax = 3.,
 	double observing_time_h = 5.,
-	double significance = 5. )
+	double significance = 5.,
+    double min_source_events = 10. )
 {
 	VTMVAEvaluator a;
 	
@@ -41,7 +42,8 @@ void optimizeBDTcuts(
     // - significance
     // - >= 10 signal events
     // - alpha = 1./5.
-	a.setSensitivityOptimizationParameters( significance, 10., observing_time_h, 1. / 5. );
+	a.setSensitivityOptimizationParameters( 
+            significance, min_source_events, observing_time_h, 1. / 5. );
     // maximum signal efficiency allowed
 	a.setSensitivityOptimizationFixedSignalEfficiency( 0.90 );
 	a.setSensitivityOptimizationMinSourceStrength( 0.00001 );

@@ -274,12 +274,16 @@ bool VEventLoop::initEventLoop( string iFileName )
 				unsigned int i_counter = 0;
 				for( ;; )
 				{
-					i_tempReader.getNextEvent();
+					if( !i_tempReader.getNextEvent() )
+					{
+						break;
+					}
 					for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
 					{
 						i_tempReader.setTelescopeID( fRunPar->fTelToAnalyze[i] );
 						// set number of samples
-						if( i_tempReader.getNumSamples() > 4 )
+						// (require at least 10 samples for any reasonable analysis)
+						if( i_tempReader.getNumSamples() > 9 )
 						{
 							setNSamples( fRunPar->fTelToAnalyze[i], i_tempReader.getNumSamples() );
 							i_nSampleSet[i] = true;
@@ -318,22 +322,18 @@ bool VEventLoop::initEventLoop( string iFileName )
 						}
 					}
 					i_counter++;
-					if( i_counter == 1000 )
+					if( i_counter == 10000 )
 					{
-						cout << "VEventLoop warning: could not find number of samples in the first 1000 events";
+						cout << "VEventLoop warning: could not find number of samples in the first 10000 events";
 						cout << " (this is normal for runs with event losses at the beginning)" << endl;
 					}
-					if( i_counter > 999999 )
-					{
-						cout << "VEventLoop warning: could not find number of samples in the first 999999 events" << endl;
-						break;
-					}
 				}
-				if( getNSamples() == 0 || i_counter > 99999 )
+				// if( getNSamples() == 0 || i_counter > 9999998 )
+				if( getNSamples() == 0 )
 				{
 					cout << "VEventLoop::initEventLoop error: could not find any telescope events to determine sample length" << endl;
 					cout << "exiting..." << endl;
-					exit( -1 );
+					exit( EXIT_FAILURE );
 				}
 				cout << "Found consistent number of samples in vbf file after " << i_counter + 1 << " event(s): ";
 				for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )

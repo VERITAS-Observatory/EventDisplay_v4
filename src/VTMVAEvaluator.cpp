@@ -223,28 +223,23 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 				{
 					iEnergyData = ( VTMVARunDataEnergyCut* )iF.Get( "fDataEnergyCut" );
 					iZenithData = ( VTMVARunDataZenithCut* )iF.Get( "fDataZenithCut" );
-					if( !iEnergyData )
+					if( !iEnergyData || !iZenithData )
 					{
-						cout << "No energy cut data: setting goodrun to false" << endl;
-						bGoodRun = false;
-					}
-					// backwards compatibility
-					if( !iZenithData )
-					{
-						cout << "No zenith cut data: ";
-						cout << " setting goodrun to false" << endl;
+						cout << "  No energy or zenith cut data" << endl;
 						bGoodRun = false;
 					}
 					// signal efficiency
-					sprintf( hname, "Method_%s/%s_0/MVA_%s_0_effS", fTMVAMethodName.c_str(), fTMVAMethodName.c_str(), fTMVAMethodName.c_str() );
-					
+					sprintf( hname, "Method_%s/%s_0/MVA_%s_0_effS",
+							 fTMVAMethodName.c_str(), fTMVAMethodName.c_str(), fTMVAMethodName.c_str() );
+							 
 					if( !iF.Get( hname ) )
 					{
-						cout << "No signal efficiency histogram found (" << hname << ")" << endl;
+						cout << "  No signal efficiency histogram found (" << hname << ")" << endl;
 						bGoodRun = false;
 					}
 				}
-				// allow that first files are missing (this happens when there are no training events in the first energy bins)
+				// allow that first files are missing
+				// (this happens when there are no training events in the first energy or zenith bins)
 				if( !bGoodRun )
 				{
 					if( i == iMinMissingBin || j == jMinMissingBin )
@@ -255,30 +250,27 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 						if( i == iMinMissingBin )
 						{
 							cout << "  assume this is a low-energy empty bin (bin number " << i << ";";
-							cout << " number of missing bins: " << iMinMissingBin + 1 << ")" << endl;
+							cout << " number of missing energy bins: " << iMinMissingBin + 1 << ")" << endl;
 							iMinMissingBin++;
 						}
 						if( j == jMinMissingBin )
 						{
 							cout << "  assume this is a zenith empty bin (bin number " << j << ";";
-							cout << " number of missing bins: " << jMinMissingBin + 1 << ")" << endl;
+							cout << " number of missing zenith bins: " << jMinMissingBin + 1 << ")" << endl;
+							jMinMissingBin++;
 						}
 						continue;
 					}
 					else if( i == ( iWeightFileIndex_Emax ) || j == ( iWeightFileIndex_Zmax ) )
 					{
-						cout << "VTMVAEvaluator::initializeWeightFiles() warning: TMVA root file not found " << iFullFileName << endl;
+						cout << "VTMVAEvaluator::initializeWeightFiles(): TMVA root file not found " << iFullFileName << endl;
 						if( i == ( iWeightFileIndex_Emax ) )
 						{
 							cout << "  assume this is a high-energy empty bin (bin number " << i << ")" << endl;
-							iNbinE--;
-							iWeightFileIndex_Emax--;
 						}
 						if( j == ( iWeightFileIndex_Zmax ) )
 						{
 							cout << "  assume this is a high-zenith empty bin (bin number " << j << ")" << endl;
-							iNbinZ--;
-							iWeightFileIndex_Zmax--;
 						}
 						continue;
 					}
@@ -352,15 +344,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 				
 				sprintf( hname, "%d%d", i, j );
 				fTMVAData.back()->fTMVAMethodTag = hname;
-				if( iNbinZ > 1 )
-				{
-					sprintf( hname, "%d_%d", i, j );
-				}
-				else
-				{
-					sprintf( hname, "%d", i );
-				}
-				
+				sprintf( hname, "%d_%d", i, j );
 				fTMVAData.back()->fTMVAMethodTag_2 = hname;
 				fTMVAData.back()->fTMVAName = iTMVAName;
 				fTMVAData.back()->fTMVAFileName = iFullFileName;
@@ -509,7 +493,9 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 				cout << endl;
 			}
 		}
-		if( !fTMVAData[b]->fTMVAReader->BookMVA( fTMVAData[b]->fTMVAMethodTag_2.c_str(), fTMVAData[b]->fTMVAFileNameXML.c_str() ) )
+		if( !fTMVAData[b]->fTMVAReader->BookMVA(
+					fTMVAData[b]->fTMVAMethodTag_2.c_str(),
+					fTMVAData[b]->fTMVAFileNameXML.c_str() ) )
 		{
 			cout << "VTMVAEvaluator::initializeWeightFiles: error while initializing TMVA reader from weight file ";
 			cout << fTMVAData[b]->fTMVAFileNameXML << endl;
@@ -1230,9 +1216,11 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 	//
 	// Convert the observing time in seconds as the particle rate is given in 1/seconds
 	// Get the value of the middle of the energy and zenith angle bin
-	Non = i_on->Eval( fTMVAData[iDataBin]->fSpectralWeightedMeanEnergy_Log10TeV ) * fOptimizationObservingTime_h * fParticleNumberFile_Conversion_Rate_to_seconds;
-	Nof = i_of->Eval( fTMVAData[iDataBin]->fSpectralWeightedMeanEnergy_Log10TeV ) * fOptimizationObservingTime_h * fParticleNumberFile_Conversion_Rate_to_seconds;
-	
+	Non = i_on->Eval( fTMVAData[iDataBin]->fSpectralWeightedMeanEnergy_Log10TeV )
+		  * fOptimizationObservingTime_h * fParticleNumberFile_Conversion_Rate_to_seconds;
+	Nof = i_of->Eval( fTMVAData[iDataBin]->fSpectralWeightedMeanEnergy_Log10TeV )
+		  * fOptimizationObservingTime_h * fParticleNumberFile_Conversion_Rate_to_seconds;
+		  
 	if( Nof < 0. )
 	{
 		Nof = 0.;
@@ -1242,7 +1230,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 	cout << "VTVMAEvaluator::optimizeSensitivity event numbers: ";
 	cout << " non = " << Non;
 	cout << " noff = " << Nof;
-	cout << " ndif = " << Ndif << " (1 CU)" << endl;
+	cout << " ndiff = " << Ndif << " (1 CU)" << endl;
 	cout << "VTVMAEvaluator::optimizeSensitivity event numbers: ";
 	cout << " (data bin " << iDataBin;
 	cout << ",  weighted mean energy ";
@@ -1273,52 +1261,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 		cout << effS << "\t" << effB << endl;
 		return false;
 	}
-	// evaluate errors on determination of background cut efficiency and remove bins with large errors
-	char hname[800];
-	sprintf( hname, "Method_%s/%s_0/MVA_%s_0_B", fTMVAMethodName.c_str(),
-			 fTMVAMethodName.c_str(), fTMVAMethodName.c_str() );
-	TH1F* effB_counts = ( TH1F* )iTMVAFile.Get( hname );
-	if( effB_counts )
-	{
-		double iMaxMVACutValue = -1.;
-		for( int i = effB_counts->GetNbinsX() - 1; i > 0; i-- )
-		{
-			if( effB_counts->GetBinContent( i ) > 0. )
-			{
-				if( effB_counts->GetBinError( i ) / effB_counts->GetBinContent( i ) > fTMVAErrorFraction_min )
-				{
-					iMaxMVACutValue = effB_counts->GetBinCenter( i );
-				}
-				else
-				{
-					break;
-				}
-			}
-		}
-		if( iMaxMVACutValue > 0. )
-		{
-			cout << "VTVMAEvaluator::optimizeSensitivity() removing low significance bins from background efficiency curve (";
-			cout << fTMVAErrorFraction_min << ", " << iMaxMVACutValue << ")" << endl;
-			for( int i = 1; i <= effB->GetNbinsX(); i++ )
-			{
-				if( effB->GetBinCenter( i ) > iMaxMVACutValue )
-				{
-					effB->SetBinContent( i, 0. );
-				}
-			}
-		}
-	}
-	else
-	{
-		cout << "VTVMAEvaluator::optimizeSensitivity() no background efficiency histogram found" << endl;
-	}
 	
-	cout << "VTVMAEvaluator::optimizeSensitivity: optimization parameters: ";
-	cout << "maximum signal efficiency is " << fOptimizationFixedSignalEfficiency;
-	cout << " minimum source strength is " << fOptimizationMinSourceStrength;
-	cout << " (alpha: " << fOptimizationBackgroundAlpha << ")" << endl;
-	
-	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 	// optimization starts here
 	//////////////////////////////////////////////////////////////////////////
@@ -1338,14 +1281,15 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 	//////////////////////////////////////////////////////
 	// loop over different source strengths (in Crab Units)
 	// (hardwired: start at 0.001 CU to 30 CU)
-	unsigned int iSourceStrengthStepSizeN = ( unsigned int )( ( log10( 30. ) - log10( fOptimizationMinSourceStrength ) ) / 0.005 );
+	unsigned int iSourceStrengthStepSizeN =
+		( unsigned int )( ( log10( 30. ) - log10( fOptimizationMinSourceStrength ) ) / 0.005 );
 	cout << "VTVMAEvaluator::optimizeSensitivity(), source strength steps: " << iSourceStrengthStepSizeN << endl;
 	for( unsigned int s = 0; s < iSourceStrengthStepSizeN; s++ )
 	{
 		double iSourceStrength = log10( fOptimizationMinSourceStrength ) + s * 0.005;
 		iSourceStrength = TMath::Power( 10., iSourceStrength );
 		
-		// source events
+		// source (excess) events
 		Ndif = ( Non - Nof ) * iSourceStrength;
 		
 		// first quick pass to see if there is a change of reaching the required fOptimizationSourceSignificance
@@ -1358,9 +1302,10 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 			{
 				if( fOptimizationBackgroundAlpha > 0. )
 				{
-					i_Signal_to_sqrtNoise = VStatistics::calcSignificance( effS->GetBinContent( i ) * Ndif + effB->GetBinContent( i ) * Nof,
-											effB->GetBinContent( i ) * Nof / fOptimizationBackgroundAlpha,
-											fOptimizationBackgroundAlpha );
+					i_Signal_to_sqrtNoise = VStatistics::calcSignificance(
+												effS->GetBinContent( i ) * Ndif + effB->GetBinContent( i ) * Nof,
+												effB->GetBinContent( i ) * Nof / fOptimizationBackgroundAlpha,
+												fOptimizationBackgroundAlpha );
 					// check significance criteria
 					if( i_Signal_to_sqrtNoise > fOptimizationSourceSignificance )
 					{
@@ -1383,7 +1328,6 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 		//////////////////////////////////////////////////////
 		// now loop over signal and background efficiency levels
 		i_Signal_to_sqrtNoise = 0.;
-		
 		i_TMVACutValue_AtMaximum = -99.;
 		i_SourceStrength_atMaximum = 0.;
 		i_SignalEfficiency_AtMaximum = -99.;
@@ -1404,9 +1348,10 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 				if( fOptimizationBackgroundAlpha > 0. )
 				{
 					// optimize signal/sqrt(noise)
-					i_Signal_to_sqrtNoise = VStatistics::calcSignificance( effS->GetBinContent( i ) * Ndif + effB->GetBinContent( i ) * Nof,
-											effB->GetBinContent( i ) * Nof / fOptimizationBackgroundAlpha,
-											fOptimizationBackgroundAlpha );
+					i_Signal_to_sqrtNoise = VStatistics::calcSignificance(
+												effS->GetBinContent( i ) * Ndif + effB->GetBinContent( i ) * Nof,
+												effB->GetBinContent( i ) * Nof / fOptimizationBackgroundAlpha,
+												fOptimizationBackgroundAlpha );
 				}
 				else
 				{
@@ -1476,8 +1421,8 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 					i_ymax = y;
 					i_xmax = x;
 				}
-				// stop after first maximim (makes maximum research more robust to fluctuations of the
-				// background efficiency
+				// stop after first maximum (makes maximum research more robust to fluctuations of the
+				// background efficiency)
 				else if( y < i_ymax )
 				{
 					break;
@@ -1584,9 +1529,10 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 				}
 			}
 		}
-		i_SignalEfficiency_AtMaximum = fOptimizationFixedSignalEfficiency;
 		cout << "VTMVAEvaluator::optimizeSensitivity: setting signal efficiency to ";
-		cout << fOptimizationFixedSignalEfficiency << endl;
+		cout << fOptimizationFixedSignalEfficiency;
+		cout << " (from " << i_SignalEfficiency_AtMaximum << ")" << endl;
+		i_SignalEfficiency_AtMaximum = fOptimizationFixedSignalEfficiency;
 	}
 	else
 	{
@@ -1618,10 +1564,9 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 /*
  smoothing of optimal cut value vs energy curves
 
- (energy only)
+ (energy axis only)
 
 */
-
 void VTMVAEvaluator::smoothAndInterPolateMVAValue_EnergyOnly(
 	TH1F* effS, TH1F* effB )
 {
@@ -2079,6 +2024,8 @@ void VTMVAEvaluator::printSensitivityOptimizationParameters()
 	cout << "\t" << fOptimizationSourceSignificance << " minimum significance" << endl;
 	cout << "\t" << fOptimizationMinSignalEvents << " minimum number of on events" << endl;
 	cout << "\t" << fOptimizationBackgroundAlpha << " signal to background area ratio" << endl;
+	cout << "\t" << fOptimizationFixedSignalEfficiency << " maximum signal efficiency" << endl;
+	cout << "\t" << fOptimizationMinSourceStrength << " minimum source strength" << endl;
 }
 
 vector< double > VTMVAEvaluator::getBackgroundEfficiency()
@@ -2221,7 +2168,8 @@ VTMVAEvaluatorData::VTMVAEvaluatorData()
 void VTMVAEvaluatorData::print()
 {
 	cout << "\t file " << fTMVAFileName << endl;
-	cout << "\t energy bin [" << fEnergyCut_Log10TeV_min << "," << fEnergyCut_Log10TeV_max << "] (mean energy " << fSpectralWeightedMeanEnergy_Log10TeV << ")";
+	cout << "\t energy bin [" << fEnergyCut_Log10TeV_min << "," << fEnergyCut_Log10TeV_max << "] ";
+	cout << "(mean energy " << fSpectralWeightedMeanEnergy_Log10TeV << ")";
 	cout << ", zenith bin [" << fZenithCut_min << "," << fZenithCut_max << "]";
 	cout << endl;
 }
