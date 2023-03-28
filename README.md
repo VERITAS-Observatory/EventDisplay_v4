@@ -48,10 +48,10 @@ Reconstruction and analysis are complex and require inputs from different source
 
 Eventdisplay consists of the following main components:
 
-- [Eventdisplay](https://github.com/VERITAS-Observatory/EventDisplay_v4): the core library with code, tools, and libraries required to run the analysis
-- a library of scripts to use Eventdisplay efficiently on a computing cluster (see [Eventdisplay_AnalysisScripts_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisScripts_VTS))
-- a set of auxiliary files (see internal GitHub repository [Eventdisplay_AnalysisFiles_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles_VTS)) with information on the instrument (e.g., telescope positions), access information to data bases, parameters for the analysis (e.g., image cleaning parameters or instruction for the gamma/hadron separation), or basic calibration values.
-- a converter to GADF DL3 Format, see [https://github.com/VERITAS-Observatory/V2DL3](https://github.com/VERITAS-Observatory/V2DL3) to use science tools like [gammapy](https://github.com/gammapy/gammapy).
+- [Eventdisplay](https://github.com/VERITAS-Observatory/EventDisplay_v4): the core library with code, tools, and analysis libraries required to run the analysis
+- [Eventdisplay_AnalysisScripts_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisScripts_VTS): a library of scripts to use Eventdisplay efficiently on a computing cluster
+- [Eventdisplay_AnalysisFiles_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles_VTS): a set of auxiliary files with information on the instrument (e.g., telescope positions), access information to data bases, parameters for the analysis (e.g., image cleaning parameters or instruction for the gamma/hadron separation), or basic calibration values (note that this is a VERITAS private repository)
+- [V2DL3](https://github.com/VERITAS-Observatory/V2DL3): a converter of Eventdisplay data products to GADF DL3 Format to be used in science tools like [gammapy](https://github.com/gammapy/gammapy).
 
 Additional components:
 
