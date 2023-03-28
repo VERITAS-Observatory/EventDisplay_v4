@@ -2,17 +2,15 @@
 
 Eventdisplay is a C++ based library and designed to run in typical Linux environments. It has not been tested on MacOS (use Docker containers in this instance).
 
-## Prerequisites
-
-Software required:
+## Software required
 
 ### ROOT
 
 CERN's [ROOT](https://root.cern.ch/) library for I/O, histogramming, and statistical applications:
 
 - ROOT versions >= 6.20
-- the first-stage tool `evndisp` requires ROOT compiled with mysql for access to the VERITAS database. Pre-compiled version of ROOT (downloaded from [here](https://root.cern/install/) have mysql installed. If building from source, ensure the mysql dependencies are installed and compiler flags are added (see [root installation page](https://root.cern/install/build_from_source/)). All other stages of Eventdisplay do not required mysql - meaning e.g., the conda-based installation of Eventdisplay is fine.
-- paths for ROOT should be set trough e.g.,
+- the first-stage tool `evndisp` requires ROOT compiled with mysql for access to the VERITAS database. Pre-compiled version of ROOT (downloaded from [here](https://root.cern/install/)) have mysql installed. If building from source, ensure the mysql dependencies are installed and compiler flags are added (see [root installation page](https://root.cern/install/build_from_source/)). All other stages of Eventdisplay do not required mysql - meaning e.g., the conda-based installation of Eventdisplay is fine.
+- paths for ROOT should be set through e.g.,
 
 ```
 export ROOTSYS=<Path to ROOT installation>/root/
@@ -41,7 +39,7 @@ Set the following environmental variable: `SOFASYS=$EVNDISPSYS/sofa`
 
 ### VBF (evndisp stage only)
 
-The first-stage tool `evndisp` requires the [VBF](https://github.com/VERITAS-Observatory/VBF) ((VERITAS bank format) library to read VERITAS raw data files.
+The first-stage tool `evndisp` requires the [VBF](https://github.com/VERITAS-Observatory/VBF) (VERITAS bank format) library to read VERITAS raw data files.
 
 - use VBF version VBF >= 0.3.4
 - https://github.com/VERITAS-Observatory/VBF/releases/tag/0.3.4-1-c%2B%2B17 for newer Linux systems C++17 support
@@ -53,15 +51,15 @@ Set the following environmental variable: `VBFSYS=<directory with VBF installati
 
 ### GSL (optional)
 
-GSL libraries are used for very specific tasks (used in Hough muon calibration, likelihood fitter) and are not required for most users. GSL is included in all pre-compiled ROOT versions; for building from source, see the [gsl web page](http://www.gnu.org/software/gsl/).
+GSL libraries are used for very specific tasks (Hough muon calibration, likelihood fitter) and are not required for most users. GSL is included in all pre-compiled ROOT versions; for building from source, see the [gsl web page](http://www.gnu.org/software/gsl/).
 
 ### cfitsio (optional)
 
-FITS related output as used for the next-day analysis and requires installation of cfitsio (see (http://heasarc.gsfc.nasa.gov/fitsio/)).
+FITS related output as used for the next-day analysis and requires installation of cfitsio (see http://heasarc.gsfc.nasa.gov/fitsio/).
 
 ## Environmental Variables
 
-Eventdisplay can be used very efficiently with the correct environmental variables set.
+Eventdisplay can be used efficiently with the correct environmental variables set.
 
 ### Compiling and Linking
 
