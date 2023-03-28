@@ -1,6 +1,4 @@
-# Eventdisplay
-
-> *An Analysis and Reconstruction Package for VERITAS*
+# Eventdisplay: An Analysis and Reconstruction Package for VERITAS
 
 [![DOI](https://zenodo.org/badge/221041866.svg)](https://zenodo.org/badge/latestdoi/221041866)
 [![CI](https://github.com/VERITAS-Observatory/EventDisplay_v4/actions/workflows/ci.yml/badge.svg)](https://github.com/VERITAS-Observatory/EventDisplay_v4/actions/workflows/ci.yml)
