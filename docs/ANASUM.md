@@ -71,7 +71,3 @@ use the plotting tools in the shared library to plot the results:
 
 	 VEnergySpectrum b("crab_analysis.root");
 	 b.plot();
-
---------------------------------------------------------
-
-Please report any problems and bugs to Gernot Maier or Jamie Holder

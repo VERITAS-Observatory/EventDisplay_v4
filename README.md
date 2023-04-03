@@ -7,8 +7,7 @@
 
 Eventdisplay is a reconstruction and analysis pipeline for data of
 Imaging Atmospheric Cherenkov Telescopes.
-It has been primarily developed for VERITAS and CTA analysis and used for
-many publications. 
+It has been primarily developed for VERITAS and CTA analysis and publications. 
 This repository contains the Eventdisplay version used for VERITAS analysis (see [here](https://github.com/Eventdisplay/Eventdisplay) for the CTA version).
 
 * Original developers: Gernot Maier and Jamie Holder
@@ -26,6 +25,17 @@ Ground-based Gamma-ray Astronomy,  35th International Cosmic Ray Conference.
 Online at [https://pos.sissa.it/cgi-bin/reader/conf.cgi?confid=301], id.747
 [https://arxiv.org/abs/1708.04048]
 ```
+
+The package consists of several analysis steps and tools:
+
+1. `evndisp`: calibrate and parametrize images, event reconstruction, stereo analysis
+2. `trainTMVAforAngularReconstruction`: train boosted decision trees for direction and energy reconstruction
+3. `mscw_energy`: fill and use lookup tables for mean scaled with and lenght calculation, energy reconstruction, stereo reconstruction
+4. `trainTMVAforGammaHadronSeparation`: train boosted decision trees for gamma/hadron separation
+5. `makeEffectiveArea`: calculation of the instrument response functions (effective areas, angular point-spread function, energy resolution)
+6. `makeRadialAcceptance`: calculation of radial camera acceptance from data files
+7. `anasum`: analysis to calculate sky maps and spectral energy distribution
+8. `libVAnaSum`: shared library tools (e.g., plot instrument response function, spectral energy distributions, light curves, sky maps
 
 ## Releases
 
@@ -62,19 +72,29 @@ Additional components:
 
 Extensive documentation on how to use Eventdisplay are available through the [VERITAS internal wiki pages](https://veritas.sao.arizona.edu/wiki/Eventdisplay_Manual).
 
-Short description and command line options for the different software parts can be found in:
-
-- [README.EVNDISP](README/README.EVNDISP)
-- [README.EVNDISP.commandline](README/README.EVNDISP.commandline)
-- [README.MSCW_ENERGY](README/README.MSCW_ENERGY)
-- [README.ANASUM](README/README.ANASUM)
-- [README.EFFECTIVEAREA](README/README.EFFECTIVEAREA)
-- [README.ANALYSISLIBRARY](README/README.ANALYSISLIBRARY)
-
 ## Support
 
 - VERITAS internal [ELOG](http://veritas.sao.arizona.edu/private/elog/Eventdisplay-WG/) used for announcements, discussions, questions
 - Bugs and issues should be reported through the [GitHub issue tracker](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues)
 
-
 For any questions, contact Gernot Maier (gernot.maier@desy.de)
+
+## Development
+
+astyle is used for source code formatting since 03/2014
+http://astyle.sourceforge.net/
+
+Usage:
+
+do either
+```
+make formatSourceCode
+```
+
+ or
+
+```
+astyle  --options=./.astylerc <.cpp, .h or .C file>
+```
+
+All options are saved in the .astylerc file.

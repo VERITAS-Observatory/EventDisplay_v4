@@ -66,10 +66,10 @@ int main( int argc, char* argv[] )
 		cout << endl;
 		if( gSystem->Getenv( "EVNDISPSYS" ) )
 		{
-			int i_s = system( "cat $EVNDISPSYS/README/README.EFFECTIVEAREA" );
+			int i_s = system( "cat $EVNDISPSYS/docs/EFFECTIVEAREA.md" );
 			if( i_s == -1 )
 			{
-				cout << "error: README/README.EFFECTIVEAREA not found" << endl;
+				cout << "error: docs/EFFECTIVEAREA.md not found" << endl;
 			}
 		}
 		else

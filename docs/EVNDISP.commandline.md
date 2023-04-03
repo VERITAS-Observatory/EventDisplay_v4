@@ -13,8 +13,6 @@ Plot VTS data:
 Quick plotting of VTS data, ignoring all calibration data:
 ./bin/evndisp -plotraw -nocalibnoproblem -display=1 -sourcefile <your vbf data file>
 
-Please take also note of the useful scripts in ./scripts/VTS/
-
 General:
 --------
 	 -runmode=0-7 				 0=analysis (default)
@@ -203,7 +201,4 @@ Others:
 	 -user USERNAME 			 username
 
 
-For installation see file INSTALL
-
-Please report any problems and bugs to Gernot Maier or Jamie Holder
-
+For installation see file INSTALL.md

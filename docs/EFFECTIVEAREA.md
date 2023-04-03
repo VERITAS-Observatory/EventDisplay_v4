@@ -25,6 +25,3 @@ for effiecent usage, see scripts for typical usage:
 
 [VTS] $EVNDISPSYS/scripts/VTS/VTS.EFFAREA.sub_analyse.sh and $EVNDISPSYS/scripts/VTS/VTS.EFFAREA.qsub_analyse.sh
 
---------------------------------------------------------
-
-Please report any problems and bugs to Gernot Maier or Jamie Holder

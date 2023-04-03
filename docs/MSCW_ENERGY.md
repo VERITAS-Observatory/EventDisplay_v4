@@ -94,7 +94,3 @@ Additional options for table reading:
 print run parameters for an existing mscw file
 
 	 -printrunparameters FILE 	 
-
-----------------------------------------------
-
-Please report any problems and bugs to Gernot Maier or Jamie Holder

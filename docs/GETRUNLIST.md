@@ -1,4 +1,4 @@
-VTS.getRunListFromDB (v.4.00)
+VTS.getRunListFromDB
 
 ./VTS.getRunListFromDB 
 
