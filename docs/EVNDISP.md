@@ -7,7 +7,7 @@ calibrate and parametrize images, event reconstruction, stereo analysis
 For installation see INSTALLmd
 
 For a detailed description of the command line parameters see
-[docs/EVNDISP.commandline.md]
+[docs/EVNDISP.commandline.md](docs/EVNDISP.commandline.md)
 
 ----------------------------------------------
 
