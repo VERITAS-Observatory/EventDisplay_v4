@@ -1,10 +1,10 @@
 # EVENTDISPLAY - IACT event analysis and display
 
-calibrate and parametrize images, event reconstruction, stereo analysis
+calibrate and parameterize images, event reconstruction, stereo analysis
 
 ----------------------------------------------
 
-For installation see INSTALLmd
+For installation see INSTALL.md
 
 For a detailed description of the command line parameters see
 [docs/EVNDISP.commandline.md](docs/EVNDISP.commandline.md)
@@ -26,7 +26,7 @@ Option to display events:
 
 ----------------------------------------------
 
-Required auxilliary files:
+Required auxiliary files:
 
    global run parameters (e.g. observatory location and links to database)
    $VERITAS_EVNDISP_AUX_DIR/Parameterfiles/EVNDISP.global.runparameter

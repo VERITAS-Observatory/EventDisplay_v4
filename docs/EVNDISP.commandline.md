@@ -8,7 +8,7 @@ Typical use cases:
 ------------------
 
 Plot VTS data:
-./bin/evdisp -display=1 -runnumber=<run number>
+./bin/evndisp -display=1 -runnumber=<run number>
 
 Quick plotting of VTS data, ignoring all calibration data:
 ./bin/evndisp -plotraw -nocalibnoproblem -display=1 -sourcefile <your vbf data file>
@@ -123,7 +123,7 @@ Pointing:
 Image calculation:
 ------------------
      -smoothdead                 smooth over dead pixels
-     -logl=0/1/2                 perform loglikelihood image parameterisation 0=off,1=on,2=on with minuit output (default=off)
+     -logl=0/1/2                 perform loglikelihood image parametrization 0=off,1=on,2=on with minuit output (default=off)
      -fuifactor=FLOAT            fraction of image/border pixel under image ellipse fact (default=2)
 
 Display options:
@@ -135,7 +135,7 @@ Display options:
      -photodiode                 show photodiode
      -plotraw                    fast plotting without pedestals/gains/toffsets
      -plotpaper                  clean plots for talks/papers (no dead channels, no small text, ..., default=false)
-     -plotmethod=INT             results of this array reconstrutions are shown in 'all in one' display (default=0)
+     -plotmethod=INT             results of this array reconstruction are shown in 'all in one' display (default=0)
      -starcatalogue Hipparcos_MAG8_1997.dat  plot stars into the display
      -starbrightness=float       plot stars brighter than the given B magnitude
 

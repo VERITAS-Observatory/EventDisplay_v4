@@ -11,7 +11,7 @@ Command line syntax:
 
 ---------------------------------------------------
 
-Required auxilliary files:
+Required auxiliary files:
 
    file with analysis run parameters
        see example $VERITAS_EVNDISP_AUX_DIR/Parameterfiles/EFFECTIVEAREA.runparameter
@@ -21,7 +21,7 @@ Required auxilliary files:
 
 ---------------------------------------------------
 
-for effiecent usage, see scripts for typical usage:
+for efficient usage, see scripts for typical usage:
 
 [VTS] $EVNDISPSYS/scripts/VTS/VTS.EFFAREA.sub_analyse.sh and $EVNDISPSYS/scripts/VTS/VTS.EFFAREA.qsub_analyse.sh
 

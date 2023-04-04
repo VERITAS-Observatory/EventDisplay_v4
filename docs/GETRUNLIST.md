@@ -14,15 +14,15 @@ Options:
 
 Parameters Required:
 	-l	<List of Runs>
-		Download Runs from a runlist (asci file one column of run numbers)
+		Download Runs from a runlist (ASCII file one column of run numbers)
 	-m	<List of Laser Runs>
-		Download LASER Runs from a runlist (asci file one column of run numbers)
+		Download LASER Runs from a runlist (ASCII file one column of run numbers)
 		DO NOT use with -l: Use -l <runlist> followed by -x
 	-r	<Run Number>
 		Download this run number
 	-s	<Source String>
 		Download Runs for given source name e.g. Crab
-		Wild Cards are allowed using % eg: 'TeVJ2032%'
+		Wild Cards are allowed using % e.g.: 'TeVJ2032%'
 	-b	<YYYY-MM-DD>
 		Beginning Date
 	-e	<YYY-MM-DD>
