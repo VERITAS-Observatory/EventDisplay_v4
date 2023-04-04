@@ -2,7 +2,7 @@
     \brief read command line parameters and do some tests for consistency
 
      evndisp -help gives an overview of the most important parameters
-     all parameters are listed in README/README.EVNDISP.commandline
+     all parameters are listed in docs/EVNDISP.commandline.md
 
 */
 
@@ -1535,10 +1535,10 @@ void VReadRunParameter::printHelp()
 	cout << endl;
 	if( gSystem->Getenv( "EVNDISPSYS" ) )
 	{
-		int syst_ret = system( "cat $EVNDISPSYS/README/README.EVNDISP" );
+		int syst_ret = system( "cat $EVNDISPSYS/docs/EVNDISP.commandline.md" );
 		if( syst_ret == -1 )
 		{
-			cout << "VReadRunParameter::printHelp() error: could not find helper file in README directory" << endl;
+			cout << "VReadRunParameter::printHelp() error: could not find helper file in docs directory" << endl;
 		}
 	}
 	else

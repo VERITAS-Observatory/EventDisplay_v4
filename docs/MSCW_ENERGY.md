@@ -5,14 +5,14 @@ mscw_energy: calculation of mean scaled width and length, and energy with lookup
 Input data must be in form of evndisp result files (ROOT files produced by evndisp)
 Output is 
    i)  for filling table mode: a lookup table
-   ii) for analysing mode:     a ROOT file with MSCW/MSCL/Energy, etc per event ( .mscw.root )
+   ii) for analyzing mode:     a ROOT file with MSCW/MSCL/Energy, etc per event ( .mscw.root )
 
 --------------------------------------------
 
 command line parameters:
 
 general parameters: 
-	 -arrayrecid=0/1/... 	 choose evendisplay array reconstruction record (default 0)
+	 -arrayrecid=0/1/... 	 choose eventdisplay array reconstruction record (default 0)
 	 -inputfile FILE 	 evndisp root file as input (wildcards possible use, -inputfile "YOUR_DATA_DIRECTORY/*.root")
 	 -inputfilelist FILELIST list of evndisp root file as input (wildcards possible use, -inputfile "YOUR_DATA_DIRECTORY/*.root")
 	 			 (simple text file)
@@ -94,7 +94,3 @@ Additional options for table reading:
 print run parameters for an existing mscw file
 
 	 -printrunparameters FILE 	 
-
-----------------------------------------------
-
-Please report any problems and bugs to Gernot Maier or Jamie Holder

@@ -488,10 +488,10 @@ void VTableLookupRunParameter::printHelp()
 {
 	if( gSystem->Getenv( "EVNDISPSYS" ) )
 	{
-		int syst_ret = system( "cat $EVNDISPSYS/README/README.MSCW_ENERGY" );
+		int syst_ret = system( "cat $EVNDISPSYS/docs/MSCW_ENERGY.md" );
 		if( syst_ret == -1 )
 		{
-			cout << "VTableLookupRunParameter::printHelp() error: could not find helper file in README directory" << endl;
+			cout << "VTableLookupRunParameter::printHelp() error: could not find helper file in docs directory" << endl;
 		}
 	}
 	else
