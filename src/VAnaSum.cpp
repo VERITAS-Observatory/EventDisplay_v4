@@ -32,14 +32,7 @@ VAnaSum::VAnaSum( string i_datadir, unsigned int iAnalysisType )
    check run mode
 
 */
-void VAnaSum::initialize(
-	string i_LongListFilename,
-	string i_ShortListFilename,
-	int i_singletel,
-	unsigned int iRunType,
-	string i_outfile,
-	int iRandomSeed,
-	string iRunParameterfile )
+void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename, int i_singletel, unsigned int iRunType, string i_outfile, int iRandomSeed, string iRunParameterfile )
 {
 	char i_temp[2000];
 	char i_title[200];

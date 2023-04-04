@@ -100,8 +100,7 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
 		void            plot_deadTimes();
 		void            plot_mscPlots( int irebin = 2, double xmin = -2., double xmax = 4., string mscwfile = "" );
 		void            plot_qualityHistograms( double iSourceStrength = 1., bool bUpper = true, int iMethod = 0 );
-		TCanvas*        plot_theta2( double t2min = 0., double t2max = 0.3, int irbin = 5,
-									 double setYMax = -9999., double setYMin = -9999. );
+		TCanvas*        plot_theta2( double t2min = 0., double t2max = 0.3, int irbin = 5 );
 		void            plot_theta2Correction();
 		void            plot_UncorrelatedSkyPlots();
 		void            plot_CorrelatedSkyPlots();
@@ -144,7 +143,7 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
 		}
 		bool            setRunNumber( int iRun );                                      // select run for plotting
 		
-		ClassDef( VPlotAnasumHistograms, 16 );
+		ClassDef( VPlotAnasumHistograms, 15 );
 };
 
 #endif

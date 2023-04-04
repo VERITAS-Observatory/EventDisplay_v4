@@ -802,7 +802,7 @@ valarray<double>& VCalibrationData::getPedvars( bool iLowGain, unsigned int iSW,
 				cout << getPedvarsVTS_vector( iLowGain )[0].size();
 			}
 			cout << endl;
-			exit( EXIT_FAILURE );
+			exit( 0 );
 		}
 	}
 	//////////////////////////////////////////////////////////
@@ -1041,6 +1041,24 @@ TGraphErrors* VCalibrationData::getIPRGraph( unsigned int iSumWindow, bool iMake
 		return fGraphIPRGraph[iSumWindow];
 	}
 	return 0;
+}
+
+TGraphErrors* VCalibrationData::getIPRGraphTimeSlice(  bool iMakeNewGraph, unsigned int TimeSlice ){
+
+        if( fGraphTSIPRGraph.find( TimeSlice) != fGraphTSIPRGraph.end() && fGraphTSIPRGraph[TimeSlice] )
+        {
+                return fGraphTSIPRGraph[TimeSlice];
+        }
+        else if( iMakeNewGraph )
+        {
+                fGraphTSIPRGraph[TimeSlice] = new TGraphErrors( 1 );
+                fGraphTSIPRGraph[TimeSlice]->SetTitle( "" );
+                char hname[200];
+                sprintf( hname, "IRPFGraph_TelID%d_TimeSlice%d", fTelID, TimeSlice );
+                fGraphTSIPRGraph[TimeSlice]->SetName( hname );
+                return fGraphTSIPRGraph[TimeSlice];
+        }
+        return 0;
 }
 
 void VCalibrationData::setIPRGraph( unsigned int iSumWindow, TGraphErrors* g )

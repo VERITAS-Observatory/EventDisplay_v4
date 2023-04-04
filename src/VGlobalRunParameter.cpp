@@ -223,21 +223,6 @@ bool VGlobalRunParameter::setDirectories()
 		exit( EXIT_FAILURE );
 	}
 	
-	//////////////////////////////////////////////////////////////////////
-	// some scripts require a temporary directory for auxiliary files
-	// if note set: use fEVNDISPAnaDataDirectory
-	// important: no access control here
-	const char* vtmp_aux = gSystem->Getenv( "VERITAS_EVNDISP_TMP_AUX_DIR" );
-	if( vtmp_aux )
-	{
-		fEVNDISPAnaDataDirectory_tmp = vtmp_aux;
-		fEVNDISPAnaDataDirectory_tmp += "/";
-	}
-	else
-	{
-		fEVNDISPAnaDataDirectory_tmp = fEVNDISPAnaDataDirectory;
-	}
-	
 	return true;
 }
 
@@ -329,10 +314,6 @@ void VGlobalRunParameter::printGlobalRunParameter()
 	if( fEVNDISPAnaDataDirectory.size() > 0 )
 	{
 		cout << "    for EVNDISP aux data: \t\t" << fEVNDISPAnaDataDirectory << endl;
-		if( fEVNDISPAnaDataDirectory_tmp != fEVNDISPAnaDataDirectory )
-		{
-			cout << "    for temporary EVNDISP aux data: \t\t" << fEVNDISPAnaDataDirectory_tmp << endl;
-		}
 	}
 	if( fVBFRawDataDirectory.size() > 0 )
 	{
@@ -365,7 +346,6 @@ string VGlobalRunParameter::fEVNDISP_VERSION = "v.4.90";
 string VGlobalRunParameter::fDBServer = "";
 string VGlobalRunParameter::fRawDataServer = "";
 string VGlobalRunParameter::fEVNDISPAnaDataDirectory = "";
-string VGlobalRunParameter::fEVNDISPAnaDataDirectory_tmp = "";
 string VGlobalRunParameter::fEVNDISPCalibrationDataDirectory = "";
 string VGlobalRunParameter::fVBFRawDataDirectory = "";
 string VGlobalRunParameter::fEVNDISPOutputDirectory = "";

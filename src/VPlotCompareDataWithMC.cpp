@@ -13,7 +13,6 @@ VPlotCompareDataWithMC::VPlotCompareDataWithMC( string iFile )
 	setNTel();
 	setPrintName();
 	setRelativePlotRange();
-	setScalingMethod();
 	
 	fDataFileName = iFile;
 	fDataFile = 0;
@@ -128,28 +127,15 @@ void VPlotCompareDataWithMC::plotLegend( TH1D* hsims, TH1D* hdiff, double x0 )
 	iLegend->Draw();
 }
 
-void VPlotCompareDataWithMC::setScalingMethod( int iScalingMethod )
-{
-	if( iScalingMethod > 0 && iScalingMethod < 4 )
-	{
-		fScalingMethod = iScalingMethod;
-		return;
-	}
-	cout << "Error setting scaling method; should be in [1,3]" << endl;
-	cout << "Exiting..." << endl;
-	exit( EXIT_FAILURE );
-}
-
-
 /*!
   get scale factor between simulations and data
 
-  iScalingMethod = 1:   scale to same contents
-  iScalingMethod = 2:   scale to same maximum value
-  iScalingMethod = 3:   scale to same maximum value (three bins around maximum)
+  bContents = 1:   scale to same contents
+  bContents = 2:   scale to same maximum value
+  bContents = 3:   scale to same maximum value (three bins around maximum)
 */
 void VPlotCompareDataWithMC::getScaling( TH1D* h_sims, TH1D* h_diff, double& s_sims, double& s_diff,
-		int iScalingMethod, double xmin, double xmax )
+		int bContents, double xmin, double xmax )
 {
 	if( !h_sims || !h_diff )
 	{
@@ -158,7 +144,7 @@ void VPlotCompareDataWithMC::getScaling( TH1D* h_sims, TH1D* h_diff, double& s_s
 	double z = 0.;
 	////////////////////////////////////
 	// scale to same contents (integral)
-	if( iScalingMethod == 1 )
+	if( bContents == 1 )
 	{
 		int i_min = 1;
 		int i_max = h_sims->GetNbinsX();
@@ -188,7 +174,7 @@ void VPlotCompareDataWithMC::getScaling( TH1D* h_sims, TH1D* h_diff, double& s_s
 		}
 		for( int i = i_min; i <= i_max; i++ )
 		{
-			// 		if( h_diff->GetBinContent( i ) > 0 )
+			if( h_diff->GetBinContent( i ) > 0 )
 			{
 				z += h_diff->GetBinContent( i );
 			}
@@ -203,7 +189,7 @@ void VPlotCompareDataWithMC::getScaling( TH1D* h_sims, TH1D* h_diff, double& s_s
 	}
 	//////////////////////////////////
 	// scale to same maximum
-	else if( iScalingMethod == 2 )
+	else if( bContents == 2 )
 	{
 		s_sims = h_sims->GetMaximum();
 		z      = h_diff->GetMaximum();
@@ -216,7 +202,7 @@ void VPlotCompareDataWithMC::getScaling( TH1D* h_sims, TH1D* h_diff, double& s_s
 	}
 	//////////////////////////////////
 	// scale to peak (three bins around maximum)
-	else if( iScalingMethod == 3 )
+	else if( bContents == 3 )
 	{
 		int imaxbin = h_sims->GetMaximumBin();
 		s_sims = h_sims->GetBinContent( imaxbin );
@@ -257,7 +243,7 @@ void VPlotCompareDataWithMC::getScaling( TH1D* h_sims, TH1D* h_diff, double& s_s
 }
 
 void VPlotCompareDataWithMC::getScaling( double& s_sims, double& s_diff, string his,
-		int iScalingMethod, double xmin, double xmax )
+		int bContents, double xmin, double xmax )
 {
 	if( fDataFile == 0 )
 	{
@@ -267,15 +253,15 @@ void VPlotCompareDataWithMC::getScaling( double& s_sims, double& s_diff, string 
 		return;
 	}
 	cout << "scale on histograms " << his << ", scale to";
-	if( iScalingMethod == 1 )
+	if( bContents == 1 )
 	{
 		cout << " histogram contents" << endl;
 	}
-	else if( iScalingMethod == 2 )
+	else if( bContents == 2 )
 	{
 		cout << " histogram maximum" << endl;
 	}
-	else if( iScalingMethod == 3 )
+	else if( bContents == 3 )
 	{
 		cout << " histogram maximum (peak)" << endl;
 	}
@@ -293,7 +279,7 @@ void VPlotCompareDataWithMC::getScaling( double& s_sims, double& s_diff, string 
 		return;
 	}
 	
-	getScaling( h_sims, h_diff, s_sims, s_diff, fScalingMethod, xmin, xmax );
+	getScaling( h_sims, h_diff, s_sims, s_diff, bContents, xmin, xmax );
 }
 
 
@@ -508,7 +494,7 @@ void VPlotCompareDataWithMC::multiplicity_plots()
 	// get the scaling between simulations and data
 	double s_sims = 1.;
 	double s_diff = 1.;
-	getScaling( s_sims, s_diff, "NImages", fScalingMethod );
+	getScaling( s_sims, s_diff, "NImages", 1 );
 	
 	char hname[600];
 	char htitle[600];
@@ -624,7 +610,7 @@ TCanvas* VPlotCompareDataWithMC::plot_singleCanvas( string iHistoName, string iC
 	// get the scaling between simulations and data
 	double s_sims = 1.;
 	double s_diff = 1.;
-	getScaling( s_sims, s_diff, iScalingVariable, fScalingMethod, -9999., iHistoXAxisMax );
+	getScaling( s_sims, s_diff, iScalingVariable, 1, -9999., iHistoXAxisMax );
 	
 	sprintf( hname, "c%s_%s", iHistoName.c_str(), fDataFileName.c_str() );
 	sprintf( htitle, "%s (%s)", iCanvasTitle.c_str(), fDataFileName.c_str() );
@@ -838,8 +824,7 @@ TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVari
 		TH1D* hDiff = h_diff->ProjectionY( hname, i, i );
 		setHistogramAtt( hDiff, 1, 1, 1, 21, iRebin );
 		
-		// getScaling( hSims, hDiff, s_sims, s_diff, 3 );
-		getScaling( hSims, hDiff, s_sims, s_diff, fScalingMethod );
+		getScaling( hSims, hDiff, s_sims, s_diff, 3 );
 		if( hSims->GetEntries() > 0 )
 		{
 			hSims->Scale( s_sims );
@@ -1028,7 +1013,7 @@ TCanvas* VPlotCompareDataWithMC::stereo_parameter()
 	// get the scaling between simulations and data
 	double s_sims = 1.;
 	double s_diff = 1.;
-	getScaling( s_sims, s_diff, "theta2", fScalingMethod );
+	getScaling( s_sims, s_diff, "theta2", 1 );
 	
 	ht2_sims->Scale( s_sims );
 	ht2_diff->Scale( s_diff );
@@ -1060,7 +1045,7 @@ TCanvas* VPlotCompareDataWithMC::stereo_parameter()
 	TH1D* hlt2_diff = ( TH1D* )fDataFile->Get( "hltheta2_DIFF" );
 	setHistogramAtt( hlt2_diff, 1, 3, 1, 25, 1 );
 	
-	getScaling( s_sims, s_diff, "ltheta2", fScalingMethod );
+	getScaling( s_sims, s_diff, "ltheta2", 2 );
 	hlt2_sims->Scale( s_sims );
 	hlt2_diff->Scale( s_diff );
 	
@@ -1092,7 +1077,7 @@ TCanvas* VPlotCompareDataWithMC::stereo_parameter()
 	setHistogramAtt( hmscw_diff, 1, 1, 1, 25, 2 );
 	
 	hmscw_sims->SetAxisRange( -1., 1. );
-	getScaling( s_sims, s_diff, "MSCW", fScalingMethod, -0.5, 0.5 );
+	getScaling( s_sims, s_diff, "MSCW", 2, -0.5, 0.5 );
 	if( hmscw_sims->GetEntries() > 0 )
 	{
 		hmscw_sims->Scale( s_sims );
@@ -1133,7 +1118,7 @@ TCanvas* VPlotCompareDataWithMC::stereo_parameter()
 	hmscl_diff->SetStats( 0 );
 	
 	hmscl_sims->SetAxisRange( -1., 1. );
-	getScaling( s_sims, s_diff, "MSCL", fScalingMethod, -0.75, 0.75 );
+	getScaling( s_sims, s_diff, "MSCL", 1, -0.75, 0.75 );
 	if( hmscl_sims->GetEntries() > 0 )
 	{
 		hmscl_sims->Scale( s_sims );
@@ -1214,7 +1199,7 @@ void VPlotCompareDataWithMC::mva_parameter()
 	double error_diff = 0.;
 	
 	hmva_sims->SetAxisRange( -1., 1. );
-	getScaling( s_sims, s_diff, "MVA", fScalingMethod, -0.75, 0.75 );
+	getScaling( s_sims, s_diff, "MVA", 1, -0.75, 0.75 );
 	if( hmva_sims->GetEntries() > 0 )
 	{
 		hmva_sims->Scale( s_sims );
@@ -1266,7 +1251,7 @@ void VPlotCompareDataWithMC::mva_parameter()
  * horrible code...programmer doesn't know what a loop is
 */
 
-TCanvas* VPlotCompareDataWithMC::core_plots( int iRebin )
+TCanvas* VPlotCompareDataWithMC::core_plots( int iRebin, int iScaling )
 {
 	if( !fDataFile )
 	{
@@ -1308,7 +1293,7 @@ TCanvas* VPlotCompareDataWithMC::core_plots( int iRebin )
 	double nSims = 0.;
 	double nDiff = 0.;
 	
-	getScaling( nSims, nDiff, "Xcore", fScalingMethod );
+	getScaling( nSims, nDiff, "Xcore", iScaling );
 	hXcore_diff->Scale( nDiff );
 	hXcore_sims->Scale( nSims );
 	
@@ -1347,7 +1332,7 @@ TCanvas* VPlotCompareDataWithMC::core_plots( int iRebin )
 	hYcore_sims->SetAxisRange( -250., 250. );
 	hYcore_on->SetAxisRange( -250., 250. );
 	
-	getScaling( nSims, nDiff, "Ycore", fScalingMethod );
+	getScaling( nSims, nDiff, "Ycore", iScaling );
 	hYcore_diff->Scale( nDiff );
 	hYcore_sims->Scale( nSims );
 	
@@ -1378,7 +1363,7 @@ TCanvas* VPlotCompareDataWithMC::core_plots( int iRebin )
 		setHistogramAtt( hArrayEl_diff, 1, 1, 1, 21, iRebin );
 		hArrayEl_sims->SetAxisRange( 40., 90. );
 		hArrayEl_on->SetAxisRange( 40., 90. );
-		getScaling( nSims, nDiff, "ArrayEl", fScalingMethod );
+		getScaling( nSims, nDiff, "ArrayEl", iScaling );
 		hArrayEl_diff->Scale( nDiff );
 		hArrayEl_sims->Scale( nSims );
 		
@@ -1405,7 +1390,7 @@ TCanvas* VPlotCompareDataWithMC::core_plots( int iRebin )
 		setHistogramAtt( hArrayAz_on, 3, 1, 1, 20, 1 );
 		setHistogramAtt( hArrayAz_off, 4, 1, 1, 20, 1 );
 		setHistogramAtt( hArrayAz_diff, 1, 1, 1, 21, 1 );
-		getScaling( nSims, nDiff, "ArrayAz", fScalingMethod );
+		getScaling( nSims, nDiff, "ArrayAz", iScaling );
 		hArrayAz_diff->Scale( nDiff );
 		hArrayAz_sims->Scale( nSims );
 		
@@ -1627,7 +1612,7 @@ TCanvas* VPlotCompareDataWithMC::distance_plots()
 		
 		
 		sprintf( hname, "r_%u", i + 1 );
-		getScaling( s_sims, s_diff, hname, fScalingMethod );
+		getScaling( s_sims, s_diff, hname, 1 );
 		if( hR_sims[i]->GetEntries() > 0 )
 		{
 			hR_sims[i]->Scale( s_sims );
@@ -1754,7 +1739,8 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid )
 	return c;
 }
 
-TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOneCanvas, int i_rebin )
+TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOneCanvas,
+		int iScalingMethod, int i_rebin )
 {
 
 	if( iPlot != "SIMSDIFF" && iPlot != "ONOFF" && iPlot != "REL" )
@@ -1775,7 +1761,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
 	double s_diff = 1.;
 	char htitle[600];
 	sprintf( htitle, "width_%d", telid );
-	getScaling( s_sims, s_diff, htitle, fScalingMethod );
+	getScaling( s_sims, s_diff, htitle, iScalingMethod );
 	
 	//////////////////////////////////////
 	// histogram names to be plotted
@@ -1937,7 +1923,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
 		hon->Rebin( f_rebin[j] );
 		hoff->Rebin( f_rebin[j] );
 		sprintf( htitle, "%s_%d", hname[j].c_str(), telid );
-		getScaling( s_sims, s_diff, htitle, fScalingMethod );
+		getScaling( s_sims, s_diff, htitle, iScalingMethod );
 		// normalize sims histograms to data histograms
 		hsims->Scale( s_sims );
 		if( TMath::Abs( s_diff - 1. ) > 1.e-2 )
@@ -2170,7 +2156,7 @@ void VPlotCompareDataWithMC::msc_plots( char* offFile, char* helium, char* proto
 	// get the scaling between simulations and data
 	double s_sims = 1.;
 	double s_diff = 1.;
-	getScaling( s_sims, s_diff, ivar.c_str(), fScalingMethod );
+	getScaling( s_sims, s_diff, ivar.c_str(), true );
 	hMSC_sims->SetAxisRange( xmin, xmax );
 	if( hMSC_sims->GetEntries() > 0 )
 	{
@@ -2366,16 +2352,6 @@ void VPlotCompareDataWithMC::plot( string iPrintName )
 	{
 		cP->Print( hname );
 	}
-	cP = plot_energyDependentDistributions( "MVA", 1, -0.75, 0.75, "SIMSDIFF" );
-	if( cP )
-	{
-		cP->Print( hname );
-	}
-	cP = plot_energyDependentDistributions( "MVA", 1, -0.75, 0.75, "CUMU" );
-	if( cP )
-	{
-		cP->Print( hname );
-	}
 	// telescope dependent plots
 	for( unsigned int i = 1; i <= 4; i++ )
 	{
@@ -2563,7 +2539,7 @@ void VPlotCompareDataWithMC::plot( string iPrintName )
 	}
 	for( unsigned int i = 1; i <= 4; i++ )
 	{
-		cP = plot_energyDependentDistributions( "disp", 2, -2., 2., "SIMSDIFF", i, -99., "Erec" );
+		cP = plot_energyDependentDistributions( "disp", 2, -2.5, 2.5, "SIMSDIFF", i, -99., "Erec" );
 		if( cP )
 		{
 			cP->Print( hname );
@@ -2571,7 +2547,7 @@ void VPlotCompareDataWithMC::plot( string iPrintName )
 	}
 	for( unsigned int i = 1; i <= 4; i++ )
 	{
-		cP = plot_energyDependentDistributions( "disp", 2, -2., 2., "SIMSDIFF", i, -99., "size" );
+		cP = plot_energyDependentDistributions( "disp", 2, -2.5, 2.5, "SIMSDIFF", i, -99., "size" );
 		if( cP )
 		{
 			cP->Print( hname );
@@ -2579,7 +2555,7 @@ void VPlotCompareDataWithMC::plot( string iPrintName )
 	}
 	for( unsigned int i = 1; i <= 4; i++ )
 	{
-		cP = plot_energyDependentDistributions( "disp", 2, -2., 2., "SIMSDIFF", i, -99., "ntubes" );
+		cP = plot_energyDependentDistributions( "disp", 2, -2.5, 2.5, "SIMSDIFF", i, -99., "ntubes" );
 		if( cP )
 		{
 			cP->Print( hname );

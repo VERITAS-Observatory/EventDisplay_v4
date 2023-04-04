@@ -8,9 +8,9 @@
 #include "TProfile2D.h"
 #include "TRandom3.h"
 
-#include "VImageAnalyzerHistograms.h"
-#include "VSpecialChannel.h"
-#include "VImageParameter.h"
+#include <VImageAnalyzerHistograms.h>
+#include <VSpecialChannel.h>
+#include <VImageParameter.h>
 
 #include <valarray>
 #include <vector>

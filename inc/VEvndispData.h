@@ -3,27 +3,27 @@
 #ifndef VDATA_H
 #define VDATA_H
 
-#include "VImageAnalyzerData.h"
-#include "VEvndispReconstructionParameter.h"
-#include "VCalibrationData.h"
-#include "VDeadChannelFinder.h"
-#include "VDetectorGeometry.h"
-#include "VDetectorTree.h"
-#include "VDSTReader.h"
-#include "VGrIsuReader.h"
-#include "VMCParameters.h"
-#include "VMultipleGrIsuReader.h"
+#include <VImageAnalyzerData.h>
+#include <VEvndispReconstructionParameter.h>
+#include <VCalibrationData.h>
+#include <VDeadChannelFinder.h>
+#include <VDetectorGeometry.h>
+#include <VDetectorTree.h>
+#include <VDSTReader.h>
+#include <VGrIsuReader.h>
+#include <VMCParameters.h>
+#include <VMultipleGrIsuReader.h>
 #ifndef NOVBF
-#include "VBaseRawDataReader.h"
+#include <VBaseRawDataReader.h>
 #endif
-#include "VDB_PixelDataReader.h"
-#include "VEvndispRunParameter.h"
-#include "VFitTraceHandler.h"
-#include "VStarCatalogue.h"
-#include "VShowerParameters.h"
-#include "VPointing.h"
-#include "VArrayPointing.h"
-#include "VTraceHandler.h"
+#include <VDB_PixelDataReader.h>
+#include <VEvndispRunParameter.h>
+#include <VFitTraceHandler.h>
+#include <VStarCatalogue.h>
+#include <VShowerParameters.h>
+#include <VPointing.h>
+#include <VArrayPointing.h>
+#include <VTraceHandler.h>
 
 #include "TDirectory.h"
 #include "TFile.h"
@@ -523,6 +523,14 @@ class VEvndispData
 		{
 			return fCalData[fTelID]->getIPRGraph( iSumWindow, iMakeNewGraph );
 		}
+		TGraphErrors*  getIPRGraphTimeSlice( unsigned int TimeSlice = 0 )
+		{
+			return fCalData[fTelID]->getIPRGraphTimeSlice( false, TimeSlice  );
+		}
+		TGraphErrors*  getIPRGraphTimeSlice( bool iMakeNewGraph = false, unsigned int TimeSlice = 0 )
+                {
+                        return fCalData[fTelID]->getIPRGraphTimeSlice( iMakeNewGraph, TimeSlice );
+                }
 		float               getL1Rate( unsigned int iChannel )
 		{
 			if( fDB_PixelDataReader )

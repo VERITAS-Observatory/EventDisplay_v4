@@ -312,7 +312,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		{
 			return fDBTextDirectory;
 		}
-		string       getInstrumentATMString();
 		string       getInstrumentEpoch( bool iMajor = false,
 										 bool iUpdateInstrumentEpoch = false );
 		bool         isMC()
@@ -333,6 +332,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return ( fDBTextDirectory.size() > 0 );
 		}
 		
-		ClassDef( VEvndispRunParameter, 2006 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 2005 ); //(increase this number)
 };
 #endif

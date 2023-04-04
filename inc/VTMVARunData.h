@@ -15,12 +15,10 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <random>
 #include <sstream>
 #include <string>
 #include <vector>
 
-#include "VTableLookupRunParameter.h"
 #include "VTMVARunDataEnergyCut.h"
 #include "VTMVARunDataZenithCut.h"
 #include "VUtilities.h"
@@ -36,14 +34,9 @@ class VTMVARunData : public TNamed
 	
 		bool              fDebug;
 		
-		bool         fillEnergyCutData(
-			vector< double > iEnergyCut_Log10TeV_min, vector< double > iEnergyCut_Log10TeV_max );
-		unsigned int getTrainOptionValue( string iVarName, unsigned int i_default );
-		
 	public:
 	
 		string            fName;
-		string            fRunOption;
 		
 		// run type
 		bool fTrainGammaHadronSeparation;
@@ -53,7 +46,9 @@ class VTMVARunData : public TNamed
 		string            fOutputFileName;
 		string            fOutputDirectoryName;
 		vector< vector< TFile* > >  fOutputFile;
-		string            fSelectedEventFileName;
+		
+		// training options
+		bool              fCheckValidityOfInputVariables;
 		
 		// training data
 		double            fSignalWeight;
@@ -62,8 +57,6 @@ class VTMVARunData : public TNamed
 		double            fBackgroundWeight;
 		vector< string >  fBackgroundFileName;
 		vector< TChain* > fBackgroundTree;
-		unsigned int      fnTrain_Signal;
-		unsigned int      fnTrain_Background;
 		
 		// list of training variables
 		vector< string >  fTrainingVariable;
@@ -100,7 +93,6 @@ class VTMVARunData : public TNamed
 		VTMVARunData();
 		~VTMVARunData() {}
 		void print();
-		VTableLookupRunParameter* getTLRunParameter();
 		bool readConfigurationFile( char* );
 		bool openDataFiles();
 		void setDebug( bool iB = true )
@@ -111,10 +103,8 @@ class VTMVARunData : public TNamed
 		{
 			fName = iN;
 		}
-		void shuffleFileVectors();
-		void updateTrainingEvents( string iVarName, unsigned int iNEvents );
 		
-		ClassDef( VTMVARunData, 11 );
+		ClassDef( VTMVARunData, 9 );
 };
 
 #endif

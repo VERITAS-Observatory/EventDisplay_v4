@@ -7,8 +7,8 @@
 #include <VRawDataFileRead.h>
 #include <VRawEventParser.h>
 #include <VRawDataExceptions.h>
-#include "VVirtualDataReader.h"
-#include "VSimulationDataReader.h"
+#include <VVirtualDataReader.h>
+#include <VSimulationDataReader.h>
 
 #include <iostream>
 #include <string>

@@ -863,6 +863,17 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 	}
 	
 	// reset dead channel vector
+	/*
+	// this is duplicated code, simplify
+	if( fRunPar->fMCNdead && iFirst )
+	{
+		setDead( false, iLowGain );
+	}
+	else
+	{
+		setDead( false, iLowGain );
+	}
+	*/
 	setDead( false, iLowGain );
 	
 	// get mean and rms of pedvar

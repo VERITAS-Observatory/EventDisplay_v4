@@ -3,7 +3,7 @@
 #ifndef VIMAGECLEANING_H
 #define VIMAGECLEANING_H
 
-#include "VEvndispData.h"
+#include <VEvndispData.h>
 #include <TGraphErrors.h>
 
 #include "VImageCleaningRunParameter.h"
@@ -42,6 +42,9 @@ class VImageCleaning
 		TObjArray* fProb2nnCurves;
 		TObjArray* fProbBoundCurves;
 		TObjArray* fIPRgraphs;
+		//vector< vector< TObjArray* > > fIPRTSgraphs;
+		vector< TObjArray* > fIPRTSgraphs;
+		//TObjArray*** fIPRTSgraphs;
 		vector< vector< bool > > fifActiveNN;                      // [nteltypes][nngroups]
 		bool ifActiveNN[VDST_MAXNNGROUPTYPES][VDST_MAXTELTYPES];   // if  NN groups is searched in NN-image cleaning procedure
 		int   VALIDITY[VDST_MAXCHANNELS];      //   Flags for pixels, accepted by nn-image cleaning. VALIDITY[i]=2-6 : core pixels, VALIDITY[i]>6 :boundary pixels
@@ -73,6 +76,7 @@ class VImageCleaning
 		int   ImageCleaningCharge( unsigned int TrigSimTelType );
 		bool  InitNNImageCleaning();
 		bool  InitNNImgClnPerTelType( unsigned int TrigSimTelType );
+		bool InitNNImgClnPerTelTypeTimeSlice( unsigned int teltype, unsigned int ts );
 		void  DiscardTimeOutlayers( unsigned int TrigSimTelType );
 		void  DiscardLocalTimeOutlayers( float NNthresh[6] ); // use this function
 		void  DiscardIsolatedPixels();

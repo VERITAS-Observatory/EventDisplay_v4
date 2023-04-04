@@ -291,7 +291,7 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
 int VTableLookupDataHandler::fillNextEvent( bool bShort )
 {
 	///////////////////////////////////////////////////////////////////////////////
-	// read partial event for quick reconstruction quality assessment
+	// read partical event for quick reconstruction quality assessment
 	if( !fshowerpars->GetEntry( fEventCounter ) )
 	{
 		return -1;
@@ -1913,10 +1913,10 @@ void VTableLookupDataHandler::writeDeadTimeHistograms()
 			TDirectoryFile* iDeadtimeDirectory = ( TDirectoryFile* )f->Get( "deadTimeHistograms" );
 			if( iDeadtimeDirectory )
 			{
-				fDeadTime->readHistograms( iDeadtimeDirectory );
 				fDeadTime->calculateDeadTime();
 				fDeadTime->printDeadTime();
 				fDeadTime->writeHistograms();
+				fDeadTime->readHistograms( iDeadtimeDirectory );
 			}
 		}
 	}

@@ -779,6 +779,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			{
 				fRunPara->foutputfileName = "";
 			}
+			cout << fRunPara->foutputfileName.c_str() << endl;
 		}
 		else if( iTemp.find( "highres" ) < iTemp.size() )
 		{
@@ -1554,7 +1555,9 @@ void VReadRunParameter::setDirectories()
 	
 	// outputfilename
 	//suppress output file for peds			gain/toffset		low gain/toffset		lpeds			DSTs
-	if( fRunPara->frunmode == 1 || fRunPara->frunmode == 2 || fRunPara->frunmode == 5 || fRunPara->frunmode == 6 || fRunPara->frunmode == 4 )
+	cout << fRunPara->foutputfileName << endl;
+	//if( fRunPara->frunmode == 1 || fRunPara->frunmode == 2 || fRunPara->frunmode == 5 || fRunPara->frunmode == 6 || fRunPara->frunmode == 4 )
+	if( fRunPara->frunmode == 2 || fRunPara->frunmode == 5 || fRunPara->frunmode == 6 || fRunPara->frunmode == 4 )
 	{
 		fRunPara->foutputfileName = "-1";
 	}

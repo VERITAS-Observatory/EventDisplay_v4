@@ -19,7 +19,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	{
 		cout << "VEffectiveAreaCalculator: no run parameters given" << endl;
 		cout << "...exiting..." << endl;
-		exit( EXIT_FAILURE );
+		exit( -1 );
 	}
 	reset();
 	
@@ -951,61 +951,50 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( string iInputFile, double az
 	fGDirectory = gDirectory;
 	
 	// test if input file with effective areas exists
-	if( iInputFile.find( "IGNOREEFFECTIVEAREA" ) == string::npos )
+	iInputFile = VUtilities::testFileLocation( iInputFile, "EffectiveAreas", true );
+	if( iInputFile.size() == 0 )
 	{
-		iInputFile = VUtilities::testFileLocation( iInputFile, "EffectiveAreas", true );
-		if( iInputFile.size() == 0 )
-		{
-			exit( EXIT_FAILURE );
-		}
+		exit( 0 );
 	}
-	if( iInputFile.find( "IGNOREEFFECTIVEAREA" ) != string::npos )
+	
+	TFile fIn( iInputFile.c_str() );
+	if( fIn.IsZombie() )
 	{
-		cout << "ignoring effective areas: ";
+		cout << "Error opening file with effective areas: " << iInputFile << endl;
+		exit( -1 );
+	}
+	cout << "\t reading effective areas from " << fIn.GetName() << endl;
+	
+	// test which kind of file is available
+	//    i) effective areas values for each energy bin (bEffectiveAreasareHistograms = true)
+	//   ii) fit functions to effective area histograms (bEffectiveAreasareFunctions = true)
+	//       (favorable, to avoid binning effects)
+	//
+	//  prefer fit function over histograms
+	//
+	bEffectiveAreasareFunctions = false;
+	bEffectiveAreasareHistograms = false;
+	if( getEffectiveAreasFromFitFunction( ( TTree* )gDirectory->Get( "EffFit" ), azmin, azmax, iSpectralIndex ) )
+	{
+		bEffectiveAreasareFunctions = true;
+	}
+	else if( initializeEffectiveAreasFromHistograms( ( TTree* )gDirectory->Get( "fEffArea" ),
+			 ( TH1D* )gDirectory->Get( "hEmc" ),
+			 azmin, azmax, iSpectralIndex, ipedvar,
+			 ( TTree* )gDirectory->Get( "fEffAreaH2F" ) ) )
+	{
+		bEffectiveAreasareHistograms = true;
+	}
+	if( !bEffectiveAreasareHistograms && !bEffectiveAreasareFunctions )
+	{
+		cout << "VEffectiveAreaCalculator ERROR: no effective areas found" << endl;
 		cout << "all energy spectra will be invalid" << endl;
 		bNOFILE = true;
 	}
-	else
+	fIn.Close();
+	if( fGDirectory )
 	{
-		TFile fIn( iInputFile.c_str() );
-		if( fIn.IsZombie() )
-		{
-			cout << "Error opening file with effective areas: " << iInputFile << endl;
-			exit( -1 );
-		}
-		cout << "\t reading effective areas from " << fIn.GetName() << endl;
-		
-		// test which kind of file is available
-		//    i) effective areas values for each energy bin (bEffectiveAreasareHistograms = true)
-		//   ii) fit functions to effective area histograms (bEffectiveAreasareFunctions = true)
-		//       (favorable, to avoid binning effects)
-		//
-		//  prefer fit function over histograms
-		//
-		bEffectiveAreasareFunctions = false;
-		bEffectiveAreasareHistograms = false;
-		if( getEffectiveAreasFromFitFunction( ( TTree* )gDirectory->Get( "EffFit" ), azmin, azmax, iSpectralIndex ) )
-		{
-			bEffectiveAreasareFunctions = true;
-		}
-		else if( initializeEffectiveAreasFromHistograms( ( TTree* )gDirectory->Get( "fEffArea" ),
-				 ( TH1D* )gDirectory->Get( "hEmc" ),
-				 azmin, azmax, iSpectralIndex, ipedvar,
-				 ( TTree* )gDirectory->Get( "fEffAreaH2F" ) ) )
-		{
-			bEffectiveAreasareHistograms = true;
-		}
-		if( !bEffectiveAreasareHistograms && !bEffectiveAreasareFunctions )
-		{
-			cout << "VEffectiveAreaCalculator ERROR: no effective areas found" << endl;
-			cout << "all energy spectra will be invalid" << endl;
-			bNOFILE = true;
-		}
-		fIn.Close();
-		if( fGDirectory )
-		{
-			fGDirectory->cd();
-		}
+		fGDirectory->cd();
 	}
 }
 
@@ -2078,7 +2067,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 	}
 	// reset unique event counter
 	fUniqueEventCounter.clear();
-	Long64_t iSuccessfullEventStatistics = 0;
+	int iSuccessfullEventStatistics = 0;
 	
 	//////////////////////////////////////////////////////////////////
 	// print some run information
@@ -2361,10 +2350,34 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			hEcutSub[6]->Fill( eMC, 1. );
 		}
 		
+		
 		// unique event counter
-		if( !bDirectionCut )
+		// (make sure that map doesn't get too big)
+		if( !bDirectionCut && iSuccessfullEventStatistics >= 0 )
 		{
 			iSuccessfullEventStatistics++;
+			/* This was removed in v502, is it necessary?
+			if( fUniqueEventCounter.size() < 100000 )
+			{
+				unsigned int iUIEnergy = ( unsigned int )( d->MCe0 * 1.e5 );
+				if( fUniqueEventCounter.find( iUIEnergy ) != fUniqueEventCounter.end() )
+				{
+					fUniqueEventCounter[iUIEnergy]++;
+				}
+				else
+				{
+					fUniqueEventCounter[iUIEnergy] = 1;
+				}
+			}
+			else
+			{
+				iSuccessfullEventStatistics *= -1;
+			}
+			*/
+		}
+		else
+		{
+			iSuccessfullEventStatistics--;
 		}
 		
 		// loop over all az bins
@@ -2791,6 +2804,25 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 	}
 	
 	fCuts->printCutStatistics();
+	
+	// print out uniqueness of events
+	/*    cout << "event statistics: " << endl;
+	    if( iSuccessfullEventStatistics > 0 )
+	    {
+	       map< unsigned int, unsigned short int>::iterator it;
+	       for( it = fUniqueEventCounter.begin(); it != fUniqueEventCounter.end(); it++ )
+	       {
+		  if( (*it).second > 1 )
+		  {
+		     cout << "\t multiple event after cuts at " << (double)((*it).first)/1.e5 << " TeV, used " << (*it).second << " times" << endl;
+		  }
+	       }
+	    }
+	    else iSuccessfullEventStatistics *= -1; */
+	if( iSuccessfullEventStatistics < 0 )
+	{
+		iSuccessfullEventStatistics *= -1;
+	}
 	cout << "\t total number of events after cuts: " << iSuccessfullEventStatistics << endl;
 	
 	return true;

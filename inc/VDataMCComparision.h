@@ -87,7 +87,6 @@ class VDataMCComparision
 		// cuts
 		VGammaHadronCuts* fCuts;
 		bool fCalculateMVAValues;
-		string fEpochATM;
 		
 		// lists with all histograms
 		TList* hisList;
@@ -119,7 +118,7 @@ class VDataMCComparision
 		
 	public:
 	
-		VDataMCComparision( string, int );
+		VDataMCComparision( string, int, bool );
 		~VDataMCComparision() {}
 		void defineHistograms();
 		bool fillHistograms( string ifile, int iSingleTelescopeCuts );
@@ -131,11 +130,6 @@ class VDataMCComparision
 			hAzWeight = hAz;
 		}
 		void setAzRange( double iAzMin, double iAzMax );
-		void setTMVABDTComparision( string iEpochATM )
-		{
-			fCalculateMVAValues = true;
-			fEpochATM = iEpochATM;
-		}
 		void setZeRange( double iZeMin, double iZeMax );
 		bool setOnOffHistograms( VDataMCComparision*, VDataMCComparision*, double norm );
 		void setShowerMaximZe_deg( double iZe = 20. )

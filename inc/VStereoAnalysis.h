@@ -220,7 +220,7 @@ class VStereoAnalysis
 		CData* fDataRun;
 		TTree* fDataRunTree;
 		TFile* fDataFile;
-		string fInstrumentEpochMinor;
+		string fInstrumentEpoch;
 		vector< unsigned int > fTelToAnalyze;
 		
 		vector< VSkyCoordinates* > fAstro;        //!< Astronomical source parameters for this analysis

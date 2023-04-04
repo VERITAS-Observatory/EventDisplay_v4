@@ -57,7 +57,6 @@ class VGlobalRunParameter
 		
 		// DIRECTORIES
 		static string fEVNDISPAnaDataDirectory;          // directory where all data (detectorgeometry, ...) is expected and written to (output file)
-		static string fEVNDISPAnaDataDirectory_tmp;      // tmp directories for aux data (rarely used)
 		static string fVBFRawDataDirectory;              // directory with VERITAS vbf data (vbf files)
 		static string fEVNDISPCalibrationDataDirectory;  // directory where calibration data is expected and written to
 		static string fEVNDISPOutputDirectory;           // output- and result files are written into this directory
@@ -76,10 +75,6 @@ class VGlobalRunParameter
 		static string getDirectory_EVNDISPAnaData()
 		{
 			return fEVNDISPAnaDataDirectory;
-		}
-		static string getDirectory_EVNDISPAnaDataTMP()
-		{
-			return fEVNDISPAnaDataDirectory_tmp;
 		}
 		string       getDirectory_EVNDISPCalibrationData()
 		{
@@ -153,7 +148,7 @@ class VGlobalRunParameter
 		bool         setDirectory_EVNDISPCalibrationData( string iDir );
 		bool         update( TChain* ic );
 		
-		ClassDef( VGlobalRunParameter, 11 );
+		ClassDef( VGlobalRunParameter, 10 );
 };
 
 #endif

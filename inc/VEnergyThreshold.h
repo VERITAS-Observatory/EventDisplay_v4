@@ -4,17 +4,14 @@
 #define VEnergyThreshold_H
 
 #include "TCanvas.h"
-#include "TChain.h"
 #include "TF1.h"
 #include "TFile.h"
-#include "TGraph.h"
 #include "TGraphErrors.h"
 #include "TH1D.h"
-#include "TH2F.h"
 #include "TList.h"
 #include "TMath.h"
 #include "TObject.h"
-#include "TROOT.h"
+#include "TProfile.h"
 #include "TStyle.h"
 #include "TText.h"
 #include "TTree.h"
@@ -26,6 +23,7 @@
 #include <vector>
 
 #include "VRunList.h"
+#include "CEffArea.h"
 
 using namespace std;
 
@@ -36,7 +34,7 @@ class VEnergyThreshold : public TObject
 		bool fDebug;
 		
 		TFile* fEffAreaFile;
-		TChain* fEffArea;
+		CEffArea* fEffArea;
 		
 		TFile* fEnergyThresholdFile;
 		
@@ -46,32 +44,30 @@ class VEnergyThreshold : public TObject
 		TFile* fOutFile;
 		TTree* fTreeEth;
 		
-		float fze;
-		UShort_t fAzBin;
-		float fAzMin;
-		float fAzMax;
-		float fWoff;
-		UShort_t fTNoise;
-		float fTPedvar;
-		float feth;
-		float fesys_10p;
-		float fesys_15p;
-		float fesys_20p;
-		float feffFract_05p;
-		float feffFract_10p;
-		float feffFract_20p;
-		float feffFract_50p;
-		float feffFract_90p;
-		float feff_300GeV;
-		float feff_500GeV;
-		float feff_1TeV;
-		
-		UShort_t nbins;
-		float e0[1000];
-		float eff[1000];
-		UShort_t nbins_esys;
-		float e0_esys[1000];
-		float esys_rel[1000];
+		double fze;
+		int fAzBin;
+		double fAzMin;
+		double fAzMax;
+		double fXoff;
+		double fYoff;
+		double fWoff;
+		int fTNoise;
+		double fTNoisePE;
+		double fTPedvar;
+		double fSpectralIndex;
+		double feth;
+		double fesys_10p;
+		double fesys_15p;
+		double fesys_20p;
+		double feffFract_05p;
+		double feffFract_10p;
+		double feffFract_20p;
+		double feffFract_50p;
+		double feffFract_90p;
+		// effective areas
+		double feff_300GeV;
+		double feff_500GeV;
+		double feff_1TeV;
 		
 		int fPlottingMarkerStyle;
 		int fPlottingMarkerColor;
@@ -83,6 +79,7 @@ class VEnergyThreshold : public TObject
 		double getEnergyThreshold( TH1D* h = 0, bool bLogEnergyAxis = true, bool bFit = true );
 		bool openEnergyThresholdFile();
 		bool setUpThresholdTree();
+		void copyEntry();
 		
 		double interpolateEnergyThreshold( VRunList* );
 		
@@ -95,14 +92,13 @@ class VEnergyThreshold : public TObject
 		bool closeOutputFile();
 		bool openEffectiveAreaFile( string ifile );
 		bool calculateEnergyThreshold( bool bFit = true, int nentries = -1 );
-		double getEnergy_maxSystematic( vector< double > x, vector< double > y, double iSys = 0.1 );
-		double getEnergy_maxSystematic( TGraphErrors* g, double iSys = 0.1 );
+		double getEnergy_maxSystematic( TObject* h = 0, double iSys = 0.1 );
 		double getEnergy_MaxEffectiveAreaFraction( TObject* h = 0, double iFrac = 0.1 );
 		double getEnergy_fixedValue()
 		{
 			return fEnergyThresholdFixedValue;
 		}
-		void plot_energyThresholds( string var = "E_diffmax", double ze = 20., double woff = 0.5, int noise = 150, int az = 16, bool bPlot = true, string plot_option = "p" );
+		void plot_energyThresholds( string var = "E_diffmax", double ze = 20., double woff = 0.5, int noise = 150, double index = 2.4, int az = 16, bool bPlot = true, string plot_option = "p" );
 		void setPlottingStyle( int iC = 1, int iS = 21, float iW = 2., float iL = 2. )
 		{
 			fPlottingMarkerStyle = iS;

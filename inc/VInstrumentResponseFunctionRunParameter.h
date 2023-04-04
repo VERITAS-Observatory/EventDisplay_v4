@@ -36,7 +36,6 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
 		
 		string          fCutFileName;
 		string          fInstrumentEpoch;
-		string          fInstrumentEpochATM;
 		vector< unsigned int > fTelToAnalyse;             // telescopes used in analysis (optional, not always filled)
 		int             fGammaHadronCutSelector;
 		int             fDirectionCutSelector;
@@ -101,16 +100,12 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
 		~VInstrumentResponseFunctionRunParameter() {}
 		
 		string                getInstrumentEpoch( bool iMajor = false );
-		string                getInstrumentATMString()
-		{
-			return fInstrumentEpochATM;
-		}
 		void                  print();
 		VMonteCarloRunHeader* readMCRunHeader();
 		bool                  readRunParameterFromTextFile( string iFile );
 		bool                  testRunparameters();
 		
-		ClassDef( VInstrumentResponseFunctionRunParameter, 17 );
+		ClassDef( VInstrumentResponseFunctionRunParameter, 16 );
 };
 
 #endif

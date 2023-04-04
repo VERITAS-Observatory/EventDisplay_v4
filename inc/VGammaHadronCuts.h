@@ -129,6 +129,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		unsigned int    fTMVAWeightFileIndex_Emax;
 		unsigned int    fTMVAWeightFileIndex_Zmin;
 		unsigned int    fTMVAWeightFileIndex_Zmax;
+		double          fTMVAEnergyStepSize;
 		map< unsigned int, double > fTMVASignalEfficiency;
 		map< unsigned int, double > fTMVA_MVACut;
 		double          fTMVAProbabilityThreshold;
@@ -176,7 +177,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		bool   initPhaseCuts( string iDir );
 		bool   initProbabilityCuts( int irun );
 		bool   initProbabilityCuts( string iDir );
-		bool   initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_Emin, unsigned int iTMVAWeightFileIndex_Emax, unsigned int iTMVAWeightFileIndex_Zmin, unsigned int iTMVAWeightFileIndex_Zmax );
+		bool   initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_Emin, unsigned int iTMVAWeightFileIndex_Emax, unsigned int iTMVAWeightFileIndex_Zmin, unsigned int iTMVAWeightFileIndex_Zmax, double iTMVAEnergy_StepSize );
 		string getTelToAnalyzeString();
 		
 		
@@ -348,6 +349,10 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			return fCut_Theta2_max;
 		}
 		double getTheta2Cut_max( double e );                           // get theta2 max cut (might be energy dependent)    [TeV] energy (linear)
+		TGraph* getTheta2Cut_TMVA_max()
+		{
+			return getEnergyDependentCut( "TMVABoxCut_Theta2_max" );
+		}
 		TGraph* getTheta2Cut_IRF_Max()
 		{
 			return getEnergyDependentCut( "IRFAngRes" );
@@ -431,6 +436,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			return fUseOrbitalPhaseCuts;
 		}
 		
-		ClassDef( VGammaHadronCuts, 59 );
+		ClassDef( VGammaHadronCuts, 58 );
 };
 #endif

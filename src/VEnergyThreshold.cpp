@@ -37,7 +37,7 @@ iii)  plot energy thresholds
 // create a new instance, open the data file
 VEnergyThreshold a( 0.0, "myOutputFile.root" );
 
-// plot everything (for ze=20, wobble offset=0.5 deg, noise = 150, az bin = 16)
+// plot everything (for ze=20, wobble offset=0.5 deg, noise = 150, index = 2.4, az bin = 16)
 a.plot_energyThresholds( "E_diffmax", 20., 0.5, 150, 2.4, 16 );
 
 Energy thresholds are defined (currently) in 3 ways:
@@ -141,32 +141,17 @@ bool VEnergyThreshold::openEffectiveAreaFile( string iname )
 		cout << "VEnergyThreshold::openEffectiveAreaFile " << iname << endl;
 	}
 	
-	fEffArea = new TChain( "fEffAreaH2F" );
-	fEffArea->Add( iname.c_str() );
-	if( fEffArea->GetListOfFiles()->GetEntries() == 0 )
+	TChain* f = new TChain( "fEffArea" );
+	f->Add( iname.c_str() );
+	if( f->GetListOfFiles()->GetEntries() == 0 )
 	{
-		cout << "error opening " << iname << "(" << fEffArea->GetListOfFiles()->GetEntries() << ")" << endl;
+		cout << "error opening " << iname << "(" << f->GetListOfFiles()->GetEntries() << ")" << endl;
 		return false;
 	}
 	
+	fEffArea = new CEffArea( f );
 	cout << "reading effective areas from " << iname << endl;
-	cout << "total number of effective areas: " << fEffArea->GetEntries() << endl;
-	
-	fEffArea->SetBranchAddress( "ze", &fze );
-	fEffArea->SetBranchAddress( "az", &fAzBin );
-	fEffArea->SetBranchAddress( "azMin", &fAzMin );
-	fEffArea->SetBranchAddress( "azMax", &fAzMax );
-	fEffArea->SetBranchAddress( "Woff", &fWoff );
-	fEffArea->SetBranchAddress( "noise", &fTNoise );
-	fEffArea->SetBranchAddress( "pedvar", &fTPedvar );
-	nbins = 0;
-	fEffArea->SetBranchAddress( "nbins", &nbins );
-	fEffArea->SetBranchAddress( "e0", e0 );
-	fEffArea->SetBranchAddress( "eff", eff );
-	nbins_esys = 0;
-	fEffArea->SetBranchAddress( "nbins_esys", &nbins_esys );
-	fEffArea->SetBranchAddress( "e0_esys", e0_esys );
-	fEffArea->SetBranchAddress( "esys_rel", esys_rel );
+	cout << "total number of effective areas: " << f->GetEntries() << endl;
 	
 	return true;
 }
@@ -211,9 +196,13 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 		}
 	}
 	
-	if( nentries < 0 ||  nentries > fEffArea->GetEntries() )
+	if( nentries < 0 )
 	{
-		nentries = fEffArea->GetEntries();
+		nentries = fEffArea->fChain->GetEntries();
+	}
+	if( nentries > fEffArea->fChain->GetEntries() )
+	{
+		nentries = fEffArea->fChain->GetEntries();
 	}
 	for( int i = 0; i < nentries; i++ )
 	{
@@ -239,56 +228,63 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 		feff_500GeV = 0.;
 		feff_1TeV = 0.;
 		
-		if( nbins > 1 )
-		{
-			double idE = e0[1] - e0[0];
-			TH1D hLin( "hLin", "", nbins,
-					   e0[0] - idE,
-					   e0[nbins - 1] + idE );
-			for( int b = 0; b < nbins; b++ )
-			{
-				hLin.SetBinContent( b + 1, e0[b],
-									eff[b] *
-									TMath::Power( TMath::Power( 10., e0[b] ),
-												  -1.*2.4 ) );
-			}
-			feth = getEnergyThreshold( &hLin, true, bFit );
-		}
+		copyEntry();
 		
-		if( nbins_esys > 1 )
+		TH1D* hLin = fEffArea->hEcut500;
+		if( hLin )
 		{
-			vector< double > x;
-			vector< double > y;
-			for( int b = 0; b < nbins_esys; b++ )
+			feth = getEnergyThreshold( hLin, true, bFit );
+		}
+		else
+		{
+			if( fEffArea->nbins > 1 )
 			{
-				if( TMath::Abs( esys_rel[b] ) > 1.e-3 )
+				double idE = fEffArea->e0[1] - fEffArea->e0[0];
+				TH1D hLin( "hLin", "", fEffArea->nbins,
+						   fEffArea->e0[0] - idE,
+						   fEffArea->e0[fEffArea->nbins - 1] + idE );
+				for( int b = 0; b < fEffArea->nbins; b++ )
 				{
-					x.push_back( e0_esys[b] );
-					y.push_back( esys_rel[b] );
+					hLin.SetBinContent( b + 1, fEffArea->e0[b],
+										fEffArea->eff[b] *
+										TMath::Power( TMath::Power( 10., fEffArea->e0[b] ),
+													  -1.*fEffArea->index ) );
 				}
+				feth = getEnergyThreshold( &hLin, true, bFit );
 			}
-			fesys_10p = getEnergy_maxSystematic( x, y, 0.10 );
-			fesys_15p = getEnergy_maxSystematic( x, y, 0.15 );
-			fesys_20p = getEnergy_maxSystematic( x, y, 0.20 );
 		}
-		TGraph* gEffAreaRec = new TGraph( 1 );
-		for( int b = 0; b < nbins; b++ )
-		{
-			gEffAreaRec->SetPoint( b, e0[b], eff[b] );
-		}
-		feff_300GeV = gEffAreaRec->Eval( log10( 0.3 ) );
-		feff_500GeV = gEffAreaRec->Eval( log10( 0.5 ) );
-		feff_1TeV = gEffAreaRec->Eval( log10( 1. ) );
-		feffFract_05p = getEnergy_MaxEffectiveAreaFraction( gEffAreaRec, 0.05 );
-		feffFract_10p = getEnergy_MaxEffectiveAreaFraction( gEffAreaRec, 0.10 );
-		feffFract_20p = getEnergy_MaxEffectiveAreaFraction( gEffAreaRec, 0.20 );
-		feffFract_50p = getEnergy_MaxEffectiveAreaFraction( gEffAreaRec, 0.50 );
-		feffFract_90p = getEnergy_MaxEffectiveAreaFraction( gEffAreaRec, 0.90 );
-		delete gEffAreaRec;
 		
-		if( TMath::Abs( fAzMax - 1000. ) < 1.e-3 )
+		TProfile* hSys = fEffArea->hEsysMCRelative;
+		if( hSys )
 		{
-			cout << "Threshold : ";
+			fesys_10p = getEnergy_maxSystematic( hSys, 0.10 );
+			fesys_15p = getEnergy_maxSystematic( hSys, 0.15 );
+			fesys_20p = getEnergy_maxSystematic( hSys, 0.20 );
+		}
+		TGraph* hG = fEffArea->gEffAreaRec;
+		if( !hG )
+		{
+			hG = new TGraph( 1 );
+			for( int b = 0; b < fEffArea->nbins; b++ )
+			{
+				hG->SetPoint( b, fEffArea->e0[b], fEffArea->eff[b] );
+			}
+			feff_300GeV = hG->Eval( log10( 0.3 ) );
+			feff_500GeV = hG->Eval( log10( 0.5 ) );
+			feff_1TeV = hG->Eval( log10( 1. ) );
+		}
+		if( hG )
+		{
+			feffFract_05p = getEnergy_MaxEffectiveAreaFraction( hG, 0.05 );
+			feffFract_10p = getEnergy_MaxEffectiveAreaFraction( hG, 0.10 );
+			feffFract_20p = getEnergy_MaxEffectiveAreaFraction( hG, 0.20 );
+			feffFract_50p = getEnergy_MaxEffectiveAreaFraction( hG, 0.50 );
+			feffFract_90p = getEnergy_MaxEffectiveAreaFraction( hG, 0.90 );
+			delete hG;
+		}
+		if( TMath::Abs( fEffArea->index - 2.4 ) < 1.e-3 && TMath::Abs( fEffArea->azMax - 1000. ) < 1.e-3 )
+		{
+			cout << "Threshold for index " << fEffArea->index << ": ";
 			cout << feth << " TeV, 10\% sys: " << fesys_10p << endl;
 		}
 		fTreeEth->Fill();
@@ -296,34 +292,45 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 	return true;
 }
 
-double VEnergyThreshold::getEnergy_maxSystematic( TGraphErrors* g, double iSys )
-{
-	if( !g )
-	{
-		return 0.;
-	}
-	vector< double > x;
-	vector< double > y;
-	double e = 0.;
-	double s = 0.;
-	for( int b = 0; b < g->GetN(); b++ )
-	{
-		g->GetPoint( b, e, s );
-		if( TMath::Abs( s ) > 1.e-3 )
-		{
-			x.push_back( e );
-			y.push_back( s );
-		}
-	}
-	return getEnergy_maxSystematic( x, y, iSys );
-}
 
 /*!
     calculate lower energy threshold from systematics:
     (interpolate between two closest values)
 */
-double VEnergyThreshold::getEnergy_maxSystematic( vector< double > x, vector< double > y, double iSys )
+double VEnergyThreshold::getEnergy_maxSystematic( TObject* h, double iSys )
 {
+	if( !h )
+	{
+		return 0.;
+	}
+	vector< double > x;
+	vector< double > y;
+	
+	if( strcmp( "TProfile", h->ClassName() ) == 0 )
+	{
+		TProfile* p = ( TProfile* )h;
+		for( int i = 1; i < p->GetNbinsX(); i++ )
+		{
+			if( p->GetBinError( i ) < 0.001 )
+			{
+				continue;
+			}
+			x.push_back( p->GetBinCenter( i ) );
+			y.push_back( p->GetBinContent( i ) );
+		}
+	}
+	else if( strcmp( "TGraphErrors", h->ClassName() ) == 0 )
+	{
+		double a, b;
+		TGraphErrors* g = ( TGraphErrors* )h;
+		for( int i = 0; i < g->GetN(); i++ )
+		{
+			g->GetPoint( i, a, b );
+			x.push_back( a );
+			y.push_back( b );
+		}
+	}
+	
 	double x1, x2, y1, y2, a, b;
 	
 	for( unsigned int i = 0; i < x.size(); i++ )
@@ -418,6 +425,22 @@ double VEnergyThreshold::getEnergyThreshold( TH1D* h, bool bLogEnergyAxis, bool 
 }
 
 
+void VEnergyThreshold::copyEntry()
+{
+	fze = fEffArea->ze;
+	fAzBin = fEffArea->az;
+	fAzMin  = fEffArea->azMin;
+	fAzMax = fEffArea->azMax;
+	fXoff = fEffArea->Xoff;
+	fYoff = fEffArea->Yoff;
+	fWoff = fEffArea->Woff;
+	fTNoise = fEffArea->noise;
+	fTNoisePE = fEffArea->noisePE;
+	fTPedvar = fEffArea->pedvar;
+	fSpectralIndex = fEffArea->index;
+}
+
+
 bool VEnergyThreshold::setUpThresholdTree()
 {
 	if( fDebug )
@@ -443,25 +466,29 @@ bool VEnergyThreshold::setUpThresholdTree()
 	fOutFile->cd();
 	
 	fTreeEth = new TTree( "fTreeEth", "thresholds in energy reconstruction" );
-	fTreeEth->Branch( "ze", &fze, "ze/F" );
-	fTreeEth->Branch( "az", &fAzBin, "az/s" );
-	fTreeEth->Branch( "azMin", &fAzMin, "azMin/F" );
-	fTreeEth->Branch( "azMax", &fAzMax, "azMax/F" );
-	fTreeEth->Branch( "Woff", &fWoff, "Woff/F" );
-	fTreeEth->Branch( "noise", &fTNoise, "noise/s" );
-	fTreeEth->Branch( "pedvar", &fTPedvar, "pedvar/F" );
-	fTreeEth->Branch( "E_diffmax", &feth, "E_diffmax/F" );
-	fTreeEth->Branch( "E_sys10p", &fesys_10p, "E_sys10p/F" );
-	fTreeEth->Branch( "E_sys15p", &fesys_15p, "E_sys15p/F" );
-	fTreeEth->Branch( "E_sys20p", &fesys_20p, "E_sys20p/F" );
-	fTreeEth->Branch( "E_effFract_05p", &feffFract_05p, "E_effFract_05p/F" );
-	fTreeEth->Branch( "E_effFract_10p", &feffFract_10p, "E_effFract_10p/F" );
-	fTreeEth->Branch( "E_effFract_20p", &feffFract_20p, "E_effFract_20p/F" );
-	fTreeEth->Branch( "E_effFract_50p", &feffFract_50p, "E_effFract_50p/F" );
-	fTreeEth->Branch( "E_effFract_90p", &feffFract_90p, "E_effFract_90p/F" );
-	fTreeEth->Branch( "EffArea_300GeV", &feff_300GeV, "EffArea_300GeV/F" );
-	fTreeEth->Branch( "EffArea_500GeV", &feff_500GeV, "EffArea_500GeV/F" );
-	fTreeEth->Branch( "EffArea_1TeV", &feff_1TeV, "EffArea_1TeV/F" );
+	fTreeEth->Branch( "ze", &fze, "ze/D" );
+	fTreeEth->Branch( "az", &fAzBin, "az/I" );
+	fTreeEth->Branch( "azMin", &fAzMin, "azMin/D" );
+	fTreeEth->Branch( "azMax", &fAzMax, "azMax/D" );
+	fTreeEth->Branch( "Xoff", &fXoff, "Xoff/D" );
+	fTreeEth->Branch( "Yoff", &fYoff, "Yoff/D" );
+	fTreeEth->Branch( "Woff", &fWoff, "Woff/D" );
+	fTreeEth->Branch( "noise", &fTNoise, "noise/I" );
+	fTreeEth->Branch( "noisePE", &fTNoisePE, "noisePE/D" );
+	fTreeEth->Branch( "pedvar", &fTPedvar, "pedvar/D" );
+	fTreeEth->Branch( "index", &fSpectralIndex, "index/D" );
+	fTreeEth->Branch( "E_diffmax", &feth, "E_diffmax/D" );
+	fTreeEth->Branch( "E_sys10p", &fesys_10p, "E_sys10p/D" );
+	fTreeEth->Branch( "E_sys15p", &fesys_15p, "E_sys15p/D" );
+	fTreeEth->Branch( "E_sys20p", &fesys_20p, "E_sys20p/D" );
+	fTreeEth->Branch( "E_effFract_05p", &feffFract_05p, "E_effFract_05p/D" );
+	fTreeEth->Branch( "E_effFract_10p", &feffFract_10p, "E_effFract_10p/D" );
+	fTreeEth->Branch( "E_effFract_20p", &feffFract_20p, "E_effFract_20p/D" );
+	fTreeEth->Branch( "E_effFract_50p", &feffFract_50p, "E_effFract_50p/D" );
+	fTreeEth->Branch( "E_effFract_90p", &feffFract_90p, "E_effFract_90p/D" );
+	fTreeEth->Branch( "EffArea_300GeV", &feff_300GeV, "EffArea_300GeV/D" );
+	fTreeEth->Branch( "EffArea_500GeV", &feff_500GeV, "EffArea_500GeV/D" );
+	fTreeEth->Branch( "EffArea_1TeV", &feff_1TeV, "EffArea_1TeV/D" );
 	
 	return true;
 }
@@ -562,7 +589,7 @@ double VEnergyThreshold::interpolateEnergyThreshold( VRunList* iRunData )
 }
 
 
-void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff, int noise, int az, bool bPlot, string plot_option )
+void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff, int noise, double index, int az, bool bPlot, string plot_option )
 {
 	if( !fTreeEth )
 	{
@@ -585,36 +612,44 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
 	vector< string > iName;
 	vector< string > iTitle;
 	
+	// energy threshold vs spectral index
+	iName.push_back( "spectral index" );
+	iDraw.push_back( var + "*1.e3:index" );
+	sprintf( hname, "az == %d && noise == %d && TMath::Abs( ze - %f ) < 0.1 && TMath::Abs( Woff - %f ) < 0.05", az, noise, ze, woff );
+	iCut.push_back( hname );
+	sprintf( hname, "ze=%d deg, woff = %.2f deg, noise level = %d", ( int )ze, woff, noise );
+	iTitle.push_back( hname );
+	
 	// energy threshold vs zenith angle
 	iName.push_back( "zenith angle [deg]" );
 	iDraw.push_back( var + "*1.e3:ze" );
-	sprintf( hname, "az == %d && noise == %d && TMath::Abs( Woff - %f ) < 0.05", az, noise, woff );
+	sprintf( hname, "az == %d && noise == %d && TMath::Abs( index - %f ) < 0.1 && TMath::Abs( Woff - %f ) < 0.05", az, noise, index, woff );
 	iCut.push_back( hname );
-	sprintf( hname, "woff = %.2f deg, noise level = %d", woff, noise );
+	sprintf( hname, "woff = %.2f deg, noise level = %d, spectral index = %.1f", woff, noise, index );
 	iTitle.push_back( hname );
 	
 	// energy threshold vs wobble offsets
 	iName.push_back( "wobble offset [deg]" );
 	iDraw.push_back( var + "*1.e3:Woff" );
-	sprintf( hname, "az == %d && noise == %d && TMath::Abs( ze - %f ) < 0.05", az, noise, ze );
+	sprintf( hname, "az == %d && noise == %d && TMath::Abs( index - %f ) < 0.1 && TMath::Abs( ze - %f ) < 0.05", az, noise, index, ze );
 	iCut.push_back( hname );
-	sprintf( hname, "ze=%d deg, noise level = %d", ( int )ze, noise );
+	sprintf( hname, "ze=%d deg, noise level = %d, spectral index = %.1f", ( int )ze, noise, index );
 	iTitle.push_back( hname );
 	
 	// energy threshold vs pedestal variations
 	iName.push_back( "pedestal variation" );
 	iDraw.push_back( var + "*1.e3:pedvar" );
-	sprintf( hname, "az == %d && TMath::Abs( Woff - %f ) < 0.05 && TMath::Abs( ze - %f ) < 0.05", az, woff, ze );
+	sprintf( hname, "az == %d && TMath::Abs( Woff - %f ) < 0.05 && TMath::Abs( index - %f ) < 0.1 && TMath::Abs( ze - %f ) < 0.05", az, woff, index, ze );
 	iCut.push_back( hname );
-	sprintf( hname, "ze=%d deg, woff = %.2f deg", ( int )ze, woff );
+	sprintf( hname, "ze=%d deg, woff = %.2f deg, spectral index = %.1f", ( int )ze, woff, index );
 	iTitle.push_back( hname );
 	
 	// energy threshold vs azimuth angle
 	iName.push_back( "azimuth angle [deg]" );
 	iDraw.push_back( var + "*1.e3:azMin+30." );
-	sprintf( hname, "az != 16 && noise == %d && TMath::Abs( Woff - %f ) < 0.05 && TMath::Abs( ze - %f ) < 0.05", noise, woff, ze );
+	sprintf( hname, "az != 16 && noise == %d && TMath::Abs( Woff - %f ) < 0.05 && TMath::Abs( index - %f ) < 0.1 && TMath::Abs( ze - %f ) < 0.05", noise, woff, index, ze );
 	iCut.push_back( hname );
-	sprintf( hname, "ze=%d deg, woff = %.2f deg, noise level = %d", ( int )ze, woff, noise );
+	sprintf( hname, "ze=%d deg, woff = %.2f deg, noise level = %d, spectral index = %.1f", ( int )ze, woff, noise, index );
 	iTitle.push_back( hname );
 	
 	TCanvas* c = 0;

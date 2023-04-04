@@ -175,7 +175,7 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	dataloader->AddVariable( "asym", 'F' );
 	dataloader->AddVariable( "loss", 'F' );
 	dataloader->AddVariable( "dist", 'F' );
-	dataloader->AddVariable( "fui", 'F' );
+	dataloader->AddVariable( "fui"  , 'F' );
 	if( iTargetML.find( "DispEnergy" ) != string::npos && !iSingleTelescopeAnalysis )
 	{
 		dataloader->AddVariable( "EHeight", 'F' );
@@ -549,7 +549,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "length", &length, "length/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "wol", &wol, "wol/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "dist", &dist, "dist/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "fui", &fui, "fui/F" );
+			fMapOfTrainingTree[i_tel.TelType]->Branch( "fui"        , &fui        , "fui/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "tgrad_x", &tgrad_x, "tgrad_x/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "meanPedvar_Image", &meanPedvar_Image, "meanPedvar_Image/F" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "Fitstat", &Fitstat, "Fitstat/I" );

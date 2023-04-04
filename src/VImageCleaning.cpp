@@ -22,7 +22,21 @@ VImageCleaning::VImageCleaning( VEvndispData* iData )
 	if( fData && fData->getImageCleaningParameter()->getImageCleaningMethod() == "TIMENEXTNEIGHBOUR" )
 	{
 		kInitNNImageCleaning = InitNNImageCleaning();
+		cout << "1" << endl;
+		//if ( fIPRTimeSlices )
+		if ( true )
+		{
+			fIPRTSgraphs.resize(VDST_PEDTIMESLICES);
+			for (unsigned int i = 0; i < fIPRTSgraphs.size(); ++i) {
+				//fIPRTSgraphs[i].push_back(new TObjArray( VDST_MAXTELTYPES ));
+				fIPRTSgraphs[i] = new TObjArray( VDST_MAXTELTYPES );
+			}
+			cout << typeid(fIPRTSgraphs[0]).name() << endl;
+			cout << "finished resizing" << endl;
+		}
+		
 		fIPRgraphs = new TObjArray( VDST_MAXTELTYPES );
+	
 	}
 	
 	fWriteGraphToFileRecreate = true;
@@ -427,6 +441,36 @@ bool VImageCleaning::InitNNImageCleaning()
 
 
 /*
+ * Initialize IPR graph per telescope and time slice
+ */
+
+bool VImageCleaning::InitNNImgClnPerTelTypeTimeSlice( unsigned int teltype, unsigned int ts )
+{
+
+	TGraphErrors* IPRgraph = NULL;
+	IPRgraph = fData->getIPRGraphTimeSlice( false, ts );
+	if( IPRgraph )
+        {
+        	cout << "\t found graph: " << IPRgraph->GetName() << endl;
+		IPRgraph->SetName( Form( "IPRchargeTelType%dTS%d", teltype, ts ) );
+        }
+	else
+        {
+                cout << "VImageCleaning::InitNNImgClnPerTelTypeTimeSlice( int type ) ERROR: IPR graph is NULL for teltype " << teltype << " and time slice " << ts << " !!!" << endl;
+                ////printDataError( "" );
+        }
+	//***
+	if(fIPRTSgraphs[ts]){
+		fIPRTSgraphs[ts]->AddAt(IPRgraph, teltype);
+	}
+        //cout << "IPR for TelType (TrigSim, TIMENEXTNEIGHBOUR): " << teltype << " read: " << IPRgraph->GetName();
+        cout << endl;
+	return true;
+
+}
+
+
+/*
     get IPR graphs from different sources (files), calculate probability contours
 
 */
@@ -546,6 +590,7 @@ bool VImageCleaning::InitNNImgClnPerTelType( unsigned int teltype )
 			iFileN = "RECREATE";
 		}
 		ostringstream i_NNGraphFileName;
+		cout << "MK name " << gSystem->DirName( fData->getRunParameter()->foutputfileName.c_str() ) << endl;
 		i_NNGraphFileName << gSystem->DirName( fData->getRunParameter()->foutputfileName.c_str() );
 		i_NNGraphFileName << "/" << fData->getRunParameter()->frunnumber << ".IPR.root";
 		TFile* fgraphs = new TFile( i_NNGraphFileName.str().c_str(), iFileN.c_str() );
@@ -2000,6 +2045,7 @@ void VImageCleaning::cleanNNImageFixed( VImageCleaningRunParameter* iImageCleani
 			fifActiveNN[teltype] = iImageCleaningParameters->fNNOpt_ActiveNN;
 		}
 		// initiate probability contours
+		InitNNImgClnPerTelTypeTimeSlice( 0, 0 );
 		kInitNNImgClnPerTelType[teltype] = InitNNImgClnPerTelType( teltype );
 	}
 	

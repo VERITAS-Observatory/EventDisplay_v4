@@ -92,7 +92,7 @@ int main( int argc, char* argv[] )
 	
 	// read gamma/hadron cuts from cut file
 	VGammaHadronCuts* fCuts = new VGammaHadronCuts();
-	//	fCuts->setInstrumentEpoch( fInstrumentEpoch );
+	fCuts->setInstrumentEpoch( fInstrumentEpoch );
 	fCuts->setTelToAnalyze( teltoana );
 	fCuts->setNTel( ntel );
 	if( cutfilename.size() > 0 )
@@ -180,12 +180,10 @@ int main( int argc, char* argv[] )
 		}
 	}
 	
-	// loop over all files and fill acceptances
 	for( unsigned int i = 0; i < fRunPara->fRunList.size(); i++ )
 	{
 		sprintf( ifile, "%s/%d.mscw.root", datadir.c_str(), fRunPara->fRunList[i].fRunOff );
-		cout << "now chaining " << ifile;
-		cout << " (wobble offset " << -1.*fRunPara->fRunList[i].fWobbleNorth << ", " << fRunPara->fRunList[i].fWobbleWest << ")" << endl;
+		cout << "now chaining " << ifile << " (wobble offset " << -1.*fRunPara->fRunList[i].fWobbleNorth << ", " << fRunPara->fRunList[i].fWobbleWest << ")" << endl;
 		// test if file exists
 		TFile fTest( ifile );
 		if( fTest.IsZombie() )
@@ -199,34 +197,31 @@ int main( int argc, char* argv[] )
 		
 		// Check number of telescopes in run
 		VEvndispRunParameter* iParV2 = ( VEvndispRunParameter* )fTest.Get( "runparameterV2" );
-		if( !iParV2 )
+		if( iParV2 )
 		{
-			cout << "Error reading run parameters " << endl;
-			continue;
-		}
-		cout << "Testing telescope multiplicity " << teltoanastring << endl;
-		if( teltoana.size() != iParV2->fTelToAnalyze.size() || !equal( teltoana.begin(), teltoana.end(), iParV2->fTelToAnalyze.begin() ) )
-		{
-			cout << endl;
-			cout << "error: Requested telescopes " << teltoanastring << " do not equal telescopes in run " << ifile << endl;
-			cout << "PAR ";
-			for( unsigned int i = 0; i < iParV2->fTelToAnalyze.size(); i++ )
+			cout << "Testing telescope multiplicity " << teltoanastring << endl;
+			if( teltoana.size() != iParV2->fTelToAnalyze.size() || !equal( teltoana.begin(), teltoana.end(), iParV2->fTelToAnalyze.begin() ) )
 			{
-				cout << iParV2->fTelToAnalyze[i] << "  ";
+				cout << endl;
+				cout << "error: Requested telescopes " << teltoanastring << " do not equal telescopes in run " << ifile << endl;
+				cout << "PAR ";
+				for( unsigned int i = 0; i < iParV2->fTelToAnalyze.size(); i++ )
+				{
+					cout << iParV2->fTelToAnalyze[i] << "  ";
+				}
+				cout << endl;
+				cout << "USER ";
+				for( unsigned int i = 0; i < teltoana.size(); i++ )
+				{
+					cout << teltoana[i] << "  ";
+				}
+				cout << endl;
+				cout << "\t" << teltoana.size() << "\t" << iParV2->fTelToAnalyze.size() << endl;
+				exit( EXIT_FAILURE );
 			}
-			cout << endl;
-			cout << "USER ";
-			for( unsigned int i = 0; i < teltoana.size(); i++ )
-			{
-				cout << teltoana[i] << "  ";
-			}
-			cout << endl;
-			cout << "\t" << teltoana.size() << "\t" << iParV2->fTelToAnalyze.size() << endl;
-			exit( EXIT_FAILURE );
 		}
 		
 		// set gamma/hadron cuts
-		fCuts->setInstrumentEpoch( iParV2->getInstrumentATMString() );
 		fCuts->initializeCuts( fRunPara->fRunList[i].fRunOff, datadir );
 		// pointer to data tree
 		fCuts->setDataTree( d );

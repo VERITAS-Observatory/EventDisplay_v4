@@ -17,8 +17,8 @@
 #include "TMath.h"
 #include "TMinuit.h"
 
-#include "VTraceHandler.h"
-#include "VVirtualDataReader.h"
+#include <VTraceHandler.h>
+#include <VVirtualDataReader.h>
 
 using namespace std;
 
