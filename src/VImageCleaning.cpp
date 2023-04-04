@@ -2182,39 +2182,6 @@ void VImageCleaning::FillIPR( unsigned int teltype ) //tel type
 	}
 }
 
-TGraphErrors* VImageCleaning::GetIPRGraph( unsigned int teltype, float ScanWindow )
-{
-	float RATES[fIPRdim],  RATESERR[fIPRdim];
-	float RATESX[fIPRdim], RATESXERR[fIPRdim];
-	
-	for( unsigned int i = 0; i < fIPRdim; i++ )
-	{
-		RATES[i] = IPR[teltype][i];
-		float ConvToHz = ( ScanWindow * IPR[teltype][0] ) / 1E9;
-		if( ConvToHz < 0.9E-9 )
-		{
-			break;
-		}
-		RATES[i] /= ConvToHz;
-		RATESX[i] = IPR[0][i];
-		RATESERR[i] = sqrt( RATES[i] * ConvToHz ) / ConvToHz;
-		//RATESXERR[i]=0.1*float(i)/float(res);
-		RATESXERR[i] = 0.;
-	}
-	TGraphErrors* gRate = new TGraphErrors( fIPRdim, RATESX, RATES, RATESXERR, RATESERR );
-	gRate->SetTitle( "IPRcharge" );
-	gRate->SetName( "IPRcharge" );
-	gRate->GetXaxis()->SetTitle( "Threshold, FADC" );
-	gRate->GetYaxis()->SetTitle( "Rate, Hz" );
-	gRate->SetMinimum( 1 );
-	
-	TFile* fgraph = new TFile( "$CTA_USER_DATA_DIR/TestIPRtrunk.root", "RECREATE" );
-	gRate->Write();
-	fgraph->Close();
-	std::cout << "[TriggerAnalogueSummation::GetIPRGraph()]: graph root file written:" << fgraph->GetName() << std::endl;
-	return gRate;
-}
-
 // end of NN image cleaning
 //*****************************************************************************************************
 

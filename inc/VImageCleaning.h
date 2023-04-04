@@ -78,7 +78,6 @@ class VImageCleaning
 		void  DiscardIsolatedPixels();
 		void  FillIPR( unsigned int TrigSimTelType );
 		void  FillPreThresholds( TGraph* gipr, float NNthresh[6] ); // defines pre-search thresholds for nn-groups (below this threshold group is not searched)
-		TGraphErrors* GetIPRGraph( unsigned int TrigSimTelType, float ScanWidow );
 		void  SetNeighborRings( unsigned short* VALIDITYBOUNDBUF, float* TIMESReSearch, float* REFTHRESH );
 		
 		
