@@ -4376,16 +4376,7 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 	
 	////////////////////////////////////////////////////////////////////////////
 	// read IPR graph from dst root file (for direct usage or creation of database )
-	if( getRunParameter()->ifReadIPRfromDSTFile == true )
-	{
-		cout << "\t reading IPR graphs for NN image cleaning from DST file" << endl;
-		for( int i = 0; i < t->GetEntries(); i++ )
-		{
-			setTelID( i );
-			readIPRGraph_from_DSTFile( iDSTfile, getSumWindow(), getTelType( i ) );
-		}
-	}
-	else if( getRunParameter()->ifReadIPRfromDatabase == true || getRunParameter()->ifCreateIPRdatabase == true )
+	if( getRunParameter()->ifReadIPRfromDatabase == true || getRunParameter()->ifCreateIPRdatabase == true )
 	{
 		cout << "\t reading IPR graphs for NN image cleaning" << endl;
 		for( int i = 0; i < t->GetEntries(); i++ )
