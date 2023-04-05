@@ -23,6 +23,7 @@ VImageCleaning::VImageCleaning( VEvndispData* iData )
 	{
 		kInitNNImageCleaning = InitNNImageCleaning();
 		fIPRgraphs = new TObjArray( VDST_MAXTELTYPES );
+		fIPRgraphs_xmax.assign( VDST_MAXTELTYPES, 0. );
 	}
 	
 	fWriteGraphToFileRecreate = true;
@@ -34,6 +35,8 @@ VImageCleaning::VImageCleaning( VEvndispData* iData )
 		fMinRate[i] = 0.;
 		fifActiveNN.push_back( i_tempB );
 	}
+	fIPR_save_mincharge = -99.;
+	fIPR_save_dT_from_probCurve = -99.;
 	
 }
 
@@ -343,49 +346,41 @@ void VImageCleaning::cleanImagePedvarsTimeDiff( VImageCleaningRunParameter* iIma
 // preliminary
 
 /*
- * calculate maximum and position of maximum
- * in a float array
+ * calculate maximum in a float array
  */
-int VImageCleaning::LocMax( int n, float* ptr, float& max )
+void VImageCleaning::LocMax( int n, float* ptr, float& max )
 {
 	if( n <= 0 )
 	{
-		return -1;
+		return;
 	}
 	max = ptr[0];
-	Int_t xmax = 0;
 	for( Int_t i = 1; i < n; i++ )
 	{
 		if( max < ptr[i] )
 		{
 			max = ptr[i];
-			xmax = i;
 		}
 	}
-	return xmax;
 }
 
 /*
- * calculate minimum and position of minimum
- * in a float array
+ * calculate minimum of a float array
  */
-int VImageCleaning::LocMin( int n, float* ptr, float& min ) //ptr[i]>0
+void VImageCleaning::LocMin( int n, float* ptr, float& min ) //ptr[i]>0
 {
 	if( n <= 0 )
 	{
-		return -1;
+		return;
 	}
 	min = ptr[0];
-	Int_t xmin = 0;
 	for( Int_t i = 1; i < n; i++ )
 	{
 		if( min > ptr[i] )
 		{
 			min = ptr[i];
-			xmin = i;
 		}
 	}
-	return xmin;
 }
 
 //*****************************************************************************************************
@@ -434,28 +429,12 @@ bool VImageCleaning::InitNNImgClnPerTelType( unsigned int teltype )
 {
 	// reading IPR graphs
 	TGraphErrors* IPRgraph = NULL;
-	// get ready filled IPR from DST or pedestal file
-	if( fData->getRunParameter()->ifReadIPRfromDSTFile )
-	{
-		cout << "VImageCleaning::InitNNImgClnPerTelType( int type ): getting IPR graph for (simtel) teltype: ";
-		cout << teltype << " (type " << ( int )fData->getTelType( fData->getTelID() );
-		cout << ", summation window " << fData->getSumWindow() << ") from DST file" << endl;
-		
-		
-		IPRgraph = fData->getIPRGraph();
-		
-		if( IPRgraph )
-		{
-			cout << "\t found graph: " << IPRgraph->GetName() << endl;
-		}
-	}
-	else if( !fData->getRunParameter()->ifReadIPRfromDatabase )
+	if( !fData->getRunParameter()->ifReadIPRfromDatabase )
 	{
 		cout << "VImageCleaning::InitNNImgClnPerTelType( int type ): getting IPR graph for teltype: ";
 		cout << teltype << " from external file (ped or DST file)" << endl;
 		
 		IPRgraph = fData->getIPRGraph();
-		
 		if( IPRgraph )
 		{
 			IPRgraph->SetName( Form( "IPRchargeTelType%d", teltype ) );
@@ -477,6 +456,17 @@ bool VImageCleaning::InitNNImgClnPerTelType( unsigned int teltype )
 		printDataError( "" );
 	}
 	fIPRgraphs->AddAt( IPRgraph, teltype );
+	if( teltype < fIPRgraphs_xmax.size() )
+	{
+		fIPRgraphs_xmax[teltype] = IPRgraph->GetXaxis()->GetXmax();
+	}
+	else
+	{
+		cout << "Error filling IPR graphs required for NN cleaning ";
+		cout << "(" << teltype << ")" << endl;
+		cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
+	}
 	
 	cout << "IPR for TelType (TrigSim, TIMENEXTNEIGHBOUR): " << teltype << " read: " << IPRgraph->GetName();
 	cout << endl;
@@ -523,7 +513,7 @@ bool VImageCleaning::InitNNImgClnPerTelType( unsigned int teltype )
 	// number of combinations
 	// (this number is scaled to the size of the camera later)
 	float CombFactor[5] = {60000.*20., 950000., 130000., 12000., 2.}; //for 2400 pixels
-	float ChargeMax = IPRgraph->GetXaxis()->GetXmax();
+	float ChargeMax = fIPRgraphs_xmax[teltype];
 	
 	// define rate contour functions
 	fProb4nnCurves->AddAt( defineRateContourFunction( teltype, "ProbCurve4nn", fMinRate, 4, CombFactor[0], 0, ChargeMax ), ( int )teltype );
@@ -533,7 +523,7 @@ bool VImageCleaning::InitNNImgClnPerTelType( unsigned int teltype )
 	fProbBoundCurves->AddAt( defineRateContourBoundFunction( teltype, "ProbCurveBound", fMinRate, 4.0, CombFactor[4], 0, ChargeMax ), ( int )teltype );
 	
 	cout << "Fake image probability: " << fFakeImageProb << " NgroupTypes: " << NgroupTypes;
-	cout << " teltype " << teltype << " ChargeMax:" << IPRgraph->GetXaxis()->GetXmax() << " Min rate: " << fMinRate;
+	cout << " teltype " << teltype << " ChargeMax:" << ChargeMax << " Min rate: " << fMinRate;
 	cout << std::endl;
 	
 	/////////////////////////////////////////////////////////////////////////
@@ -592,14 +582,13 @@ void VImageCleaning::writeProbabilityCurve( TGraph* iIPR, TF1* iProb, double iRa
 	{
 		return;
 	}
-	TSpline* spl = NULL;
 	TGraph* iGPP = new TGraph( iIPR->GetN() );
 	double x = 0.;
 	double y = 0.;
 	for( int i = 0; i < iIPR->GetN(); i++ )
 	{
 		iIPR->GetPoint( i, x, y );
-		float valIPR = iIPR->Eval( x, spl, "" );
+		float valIPR = iIPR->Eval( x, 0, "" );
 		if( valIPR < 100. )
 		{
 			valIPR = 100.;
@@ -665,6 +654,7 @@ bool VImageCleaning::BoundarySearch( unsigned int teltype, float thresh, TF1* fP
 		cout << "VImageCleaning::BoundarySearch error, no IPR graph for telescope type " << teltype << endl;
 		return 0;
 	}
+	float iIPR_max = fIPRgraphs_xmax[teltype];
 	
 	//    float TimeForReSearch = 0.;
 	bool iffound = false;
@@ -694,7 +684,7 @@ bool VImageCleaning::BoundarySearch( unsigned int teltype, float thresh, TF1* fP
 		float mincharge = 0;
 		LocMin( 2, charges, mincharge );
 		
-		if( NNChargeAndTimeCut( iIPR, fProbCurve, mincharge, maxtime, CoincWinLimit, true )
+		if( NNChargeAndTimeCut( iIPR, iIPR_max, fProbCurve, mincharge, maxtime, CoincWinLimit, true )
 				&& VALIDITY[idx] > 0.5 )
 		{
 			if( VALIDITYBOUND[idx] != refvalidity )
@@ -718,7 +708,7 @@ bool VImageCleaning::BoundarySearch( unsigned int teltype, float thresh, TF1* fP
 			charges[1] = INTENSITY[idx2];
 			LocMin( 2, charges, mincharge );
 			
-			if( NNChargeAndTimeCut( iIPR, fProbCurve, mincharge, maxtime, CoincWinLimit, true )
+			if( NNChargeAndTimeCut( iIPR, iIPR_max, fProbCurve, mincharge, maxtime, CoincWinLimit, true )
 					&& VALIDITY[idx2] > 0.5 )
 			{
 				VALIDITYBOUND[idx2] = refvalidity;
@@ -751,6 +741,7 @@ unsigned int VImageCleaning::NNGroupSearchProbCurve( unsigned int type, TF1* fPr
 		cout << "VImageCleaning::NNGroupSearchProbCurve error, no IPR graph for telescope type " << type << endl;
 		return 0;
 	}
+	float iIPR_max = fIPRgraphs_xmax[type];
 	
 	// (GM) unclear why this is hardwired here
 	int NSBpix = 5;
@@ -794,7 +785,7 @@ unsigned int VImageCleaning::NNGroupSearchProbCurve( unsigned int type, TF1* fPr
 			LocMin( 2, charges, mincharge );
 			
 			// apply charge and time cut
-			if( !NNChargeAndTimeCut( iIPR, fProbCurve, mincharge, dT, CoincWinLimit ) )
+			if( !NNChargeAndTimeCut( iIPR, iIPR_max, fProbCurve, mincharge, dT, CoincWinLimit ) )
 			{
 				continue;
 			}
@@ -909,7 +900,7 @@ unsigned int VImageCleaning::NNGroupSearchProbCurve( unsigned int type, TF1* fPr
 				float maxtime = 1E6;
 				LocMax( 2, times2, maxtime );
 				// apply charge and time cut
-				if( !NNChargeAndTimeCut( iIPR, fProbCurve, mincharge, maxtime, CoincWinLimit ) )
+				if( !NNChargeAndTimeCut( iIPR, iIPR_max, fProbCurve, mincharge, maxtime, CoincWinLimit ) )
 				{
 					continue;
 				}
@@ -950,7 +941,7 @@ unsigned int VImageCleaning::NNGroupSearchProbCurve( unsigned int type, TF1* fPr
 					LocMax( 4, times3, maxtime );
 					
 					// apply charge and time cut
-					if( !NNChargeAndTimeCut( iIPR, fProbCurve, mincharge, maxtime, CoincWinLimit ) )
+					if( !NNChargeAndTimeCut( iIPR, iIPR_max, fProbCurve, mincharge, maxtime, CoincWinLimit ) )
 					{
 						continue;
 					}
@@ -1013,42 +1004,48 @@ unsigned int VImageCleaning::NNGroupSearchProbCurve( unsigned int type, TF1* fPr
  * apply cut in charge and time space
  *
  */
-bool VImageCleaning::NNChargeAndTimeCut( TGraph* iIPR, TF1* fProbCurve,
-		float mincharge, float dT,
-		float iCoincWinLimit,
-		bool bInvert )
+bool VImageCleaning::NNChargeAndTimeCut(
+	TGraph* iIPR, float iIPR_max, TF1* fProbCurve,
+	float mincharge, float dT,
+	float iCoincWinLimit,
+	bool bInvert )
 {
 	if( !iIPR || !fProbCurve )
 	{
 		return false;
 	}
-	TSpline* spl = NULL;
 	
-	// get expected NSB frequency for this charge
-	float valIPR = iIPR->Eval( mincharge, spl, "" );
-	if( valIPR < 100. || mincharge > iIPR->GetXaxis()->GetXmax() )
+	float valDT = 0.;
+	// use previous result if charge is the same
+	if( fIPR_save_mincharge > -90. && TMath::Abs( fIPR_save_mincharge - mincharge ) < 1.e-3 )
 	{
-		valIPR = 100.;   // Hz
+		valDT = fIPR_save_dT_from_probCurve;
 	}
-	
-	// fix dT to the maximum coincidence limit for no-time cleaning
-	if( NNoptNoTimeing )
+	else
 	{
-		dT = CoincWinLimit;
+		// get expected NSB frequency for this charge
+		float valIPR = iIPR->Eval( mincharge, 0, "" );
+		if( valIPR < 100. || mincharge > iIPR_max )
+		{
+			valIPR = 100.;   // Hz
+		}
+		valDT = fProbCurve->Eval( valIPR );
+		fIPR_save_dT_from_probCurve = valDT;
+		fIPR_save_mincharge = mincharge;
 	}
 	
 	// apply cut in deltaT
 	// (note cut on maximum coincidence limit (given in the cleaning parameter file))
 	if( !bInvert )
 	{
-		if( dT > iCoincWinLimit || dT > fProbCurve->Eval( valIPR ) )
+		if( dT > iCoincWinLimit || dT > valDT )
 		{
 			return false;
 		}
 	}
 	else
 	{
-		if( dT < iCoincWinLimit && dT < fProbCurve->Eval( valIPR ) )
+		if( dT < iCoincWinLimit && dT < valDT )
 		{
 			return true;
 		}
@@ -1079,6 +1076,7 @@ unsigned int VImageCleaning::NNGroupSearchProbCurveRelaxed( unsigned int teltype
 		cout << "VImageCleaning::NNGroupSearchProbCurveRelaxed error, no IPR graph for telescope type " << teltype << endl;
 		return 0;
 	}
+	float iIPR_max = fIPRgraphs_xmax[teltype];
 	
 	int NNcnt = 1;
 	float dT = 0.;
@@ -1119,14 +1117,14 @@ unsigned int VImageCleaning::NNGroupSearchProbCurveRelaxed( unsigned int teltype
 			LocMin( 2, charges, mincharge );
 			
 			// apply charge and time cut
-			if( !NNChargeAndTimeCut( iIPR, fProbCurve, mincharge, dT, CoincWinLimit ) )
+			if( !NNChargeAndTimeCut( iIPR, iIPR_max, fProbCurve, mincharge, dT, CoincWinLimit ) )
 			{
 				continue;
 			}
 			
 			//////////////////////////////////////////
 			float maxtime = 1E6;
-			if( NNChargeAndTimeCut( iIPR, fProbCurve, mincharge, dT, 1.e6, true )
+			if( NNChargeAndTimeCut( iIPR, iIPR_max, fProbCurve, mincharge, dT, 1.e6, true )
 					&& VALIDITY[PixNum2] > 0.5 && INTENSITY[PixNum2] > PreCut )
 			{
 				pix1 = PixNum;
@@ -1145,7 +1143,7 @@ unsigned int VImageCleaning::NNGroupSearchProbCurveRelaxed( unsigned int teltype
 				float times2[3] = { dT, dt2, dt3};
 				LocMax( 3, times2, maxtime );
 				
-				if( NNChargeAndTimeCut( iIPR, fProbCurve, mincharge, maxtime, 1.e6, true ) )
+				if( NNChargeAndTimeCut( iIPR, iIPR_max, fProbCurve, mincharge, maxtime, 1.e6, true ) )
 				{
 					NNcnt++;
 				}
@@ -1208,7 +1206,7 @@ unsigned int VImageCleaning::NNGroupSearchProbCurveRelaxed( unsigned int teltype
 										  };
 						LocMax( 4, times3, maxtimeloc );
 						
-						if( NNChargeAndTimeCut( iIPR, fProbCurve, minchargeloc, maxtimeloc, CoincWinLimit, true ) )
+						if( NNChargeAndTimeCut( iIPR, iIPR_max, fProbCurve, minchargeloc, maxtimeloc, CoincWinLimit, true ) )
 						{
 							NNcnt++;
 							pix4 = testpixnum;
@@ -1319,6 +1317,11 @@ void VImageCleaning::DiscardLocalTimeOutlayers( float NNthresh[6] )
 		}
 		nimagepix++;
 	}
+	// don't do anything for small images
+	if( nimagepix <= 4 )
+	{
+		return;
+	}
 	// assume all pixels have same radius!
 	Double_t diam = 2.*fData->getDetectorGeo()->getTubeRadius()[1];
 	if( diam <= 0. )
@@ -1371,12 +1374,6 @@ void VImageCleaning::DiscardLocalTimeOutlayers( float NNthresh[6] )
 		{
 			VALIDITY[pixnum] = 0;
 		}
-	}
-	//******************************************************************
-	// don't do anything for small images
-	if( nimagepix <= 4 )
-	{
-		return;
 	}
 	//******************************************************************
 	// loop over accepted pixels
@@ -1783,6 +1780,7 @@ int VImageCleaning::ImageCleaningCharge( unsigned int teltype )
 		cout << "VImageCleaning::ImageCleaningCharge error, no IPR graph for telescope type " << teltype << endl;
 		return 0;
 	}
+	float iIPR_max = fIPRgraphs_xmax[teltype];
 	TSpline* spl = NULL;
 	
 	for( Int_t iRing = 0; iRing < 1; iRing++ )
@@ -1882,13 +1880,13 @@ int VImageCleaning::ImageCleaningCharge( unsigned int teltype )
 				fProbCurveBound->SetParameter( 2, 2.*nfirstringpix );
 				
 				Double_t valIPRref = iIPR->Eval( charge, spl, "" );
-				if( valIPRref < 100. || charge >= iIPR->GetXaxis()->GetXmax() )
+				if( valIPRref < 100. || charge >= iIPR_max )
 				{
 					valIPRref = 100.;
 				}
 				fProbCurveBound->SetParameter( 1, valIPRref );
 				
-				if( NNChargeAndTimeCut( iIPR, fProbCurveBound, refth, dT, 0.6 * CoincWinLimit, true ) )
+				if( NNChargeAndTimeCut( iIPR, iIPR_max, fProbCurveBound, refth, dT, 0.6 * CoincWinLimit, true ) )
 				{
 					VALIDITY[idx] = iRing + 7;
 				}
@@ -1987,7 +1985,6 @@ void VImageCleaning::cleanNNImageFixed( VImageCleaningRunParameter* iImageCleani
 	// Init options for NN cleaning
 	nRings = iImageCleaningParameters->fNNOpt_nRings;
 	CoincWinLimit = iImageCleaningParameters->fNNOpt_CoincWinLimit;
-	NNoptNoTimeing = iImageCleaningParameters->fNNOpt_ifNNoptNoTimeing;
 	setExplicitSampleTimeSlice = iImageCleaningParameters->fNNOpt_ifExplicitSampleTimeSlice;
 	sampleTimeSlice = iImageCleaningParameters->fNNOpt_sampleTimeSlice;
 	nBinsADC = iImageCleaningParameters->fNNOpt_nBinsADC;
@@ -2018,18 +2015,10 @@ void VImageCleaning::cleanNNImageFixed( VImageCleaningRunParameter* iImageCleani
 				&& !fData->getDead( fData->getHiLo()[i] )[i] )
 		{
 			INTENSITY[i] = fData->getFADCtoPhe()[i] * fData->getSums()[i];
-			//(first option is for tests of impact of timing)
-			if( NNoptNoTimeing )
-			{
-				TIMES[i] = 0.;
-			}
-			else
-			{
-				// trace times are corrected for flasher determined time offsets
-				TIMES[i] = fData->getPulseTime( true )[i] * FADCslice;
-			}
+			// trace times are corrected for flasher determined time offsets
+			TIMES[i] = fData->getPulseTime( true )[i] * FADCslice;
 			// make sure that pixels without timing are ignored
-			if( TIMES[i] <= -500 && !NNoptNoTimeing )
+			if( TIMES[i] <= -500 )
 			{
 				INTENSITY[i] = 0;
 			}
