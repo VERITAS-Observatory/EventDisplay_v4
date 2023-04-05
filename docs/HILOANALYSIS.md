@@ -13,11 +13,11 @@ Example:
 
 1. To make the DST files use:
 
-VTS.EVNDISP.sub_make_DST.sh <runlist> [pedestal calculation (default=1=on)] [Sumation Window]
+VTS.EVNDISP.sub_make_DST.sh <runlist> [pedestal calculation (default=1=on)] [Summation Window]
 
 2. Then use the above hiloAnalysis to create a root file with the HiLo Multipliers.
 
-3. To Look inside the root files produced open the sharedlibrary and use:
+3. To Look inside the root files produced open the shared library and use:
 
 	VHiLoTools::getMeanRMS( string ifile, int tel, int sumwindow, bool bPlot )
 

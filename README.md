@@ -1,96 +1,100 @@
-# Eventdisplay - An Analysis and Reconstruction Package for VERITAS
+# Eventdisplay: An Analysis and Reconstruction Package for VERITAS
 
 [![DOI](https://zenodo.org/badge/221041866.svg)](https://zenodo.org/badge/latestdoi/221041866)
 [![CI](https://github.com/VERITAS-Observatory/EventDisplay_v4/actions/workflows/ci.yml/badge.svg)](https://github.com/VERITAS-Observatory/EventDisplay_v4/actions/workflows/ci.yml)
 
-* Authors and contributors: [CITATION.cff](CITATION.cff)
-* License: [LICENSE](LICENSE)
-
-Please check the [release pages](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases) for the most recent versions to be used for VERITAS publications.
-
-For older versions of Eventdisplay, see the release pages on the VERITAS wiki (private pages):
-https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual#Versions_of_eventdisplay
-
-
 ## Overview
 
 Eventdisplay is a reconstruction and analysis pipeline for data of
-Imaging Atmospheric Cherenkov Telescopes (IACT).
-It has been primarily developed for VERITAS and CTA analysis and used in
-many VERITAS and CTA publications. 
-This repository contains the Eventdisplay version used for VERITAS analysis.
-For the CTA version, please go to [https://github.com/Eventdisplay/Eventdisplay](https://github.com/Eventdisplay/Eventdisplay).
+Imaging Atmospheric Cherenkov Telescopes.
+It has been primarily developed for VERITAS and CTA analysis and publications. 
+This repository contains the Eventdisplay version used for VERITAS analysis (see [here](https://github.com/Eventdisplay/Eventdisplay) for the CTA version).
 
-Original developers: Gernot Maier and Jamie Holder
+* Original developers: Gernot Maier and Jamie Holder
+* Authors and contributors: [CITATION.cff](CITATION.cff)
+* License: [LICENSE](LICENSE)
+* Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
 
-In case Eventdisplay is used in a research project, please cite this repository and
+In case Eventdisplay is used in a research project, please cite this repository using the [Zenodo entry](https://zenodo.org/badge/latestdoi/221041866) and
 the following publication:
 
+```
 Maier, G.; Holder, J., Eventdisplay: An Analysis and Reconstruction Package for 
 Ground-based Gamma-ray Astronomy,  35th International Cosmic Ray Conference.
 10-20 July, 2017. Bexco, Busan, Korea, Proceedings of Science, Vol. 301.
 Online at [https://pos.sissa.it/cgi-bin/reader/conf.cgi?confid=301], id.747
 [https://arxiv.org/abs/1708.04048]
+```
 
-For guidelines on installation, see [INSTALL.md](INSTALL.md). For further information, 
-see files in [README](./README) directory
+The package consists of several analysis steps and tools:
 
-## Documentation
+1. `evndisp`: calibrate and parametrize images, event reconstruction, stereo analysis
+2. `trainTMVAforAngularReconstruction`: train boosted decision trees for direction and energy reconstruction
+3. `mscw_energy`: fill and use lookup tables for mean scaled with and lenght calculation, energy reconstruction, stereo reconstruction
+4. `trainTMVAforGammaHadronSeparation`: train boosted decision trees for gamma/hadron separation
+5. `makeEffectiveArea`: calculation of the instrument response functions (effective areas, angular point-spread function, energy resolution)
+6. `makeRadialAcceptance`: calculation of radial camera acceptance from data files
+7. `anasum`: analysis to calculate sky maps and spectral energy distribution
+8. `libVAnaSum`: shared library tools (e.g., plot instrument response function, spectral energy distributions, light curves, sky maps
 
-- [INSTALL.md](INSTALL.md): information on installation the analysis package, dependencies, environmental variables
-- [README.VERITAS.quick_summary](README/README.VERITAS.quick_summary): description of a typical VERITAS analysis
+## Releases
 
-Description and command line options for the different software parts:
+Official versions to be used for VERITAS publications:
 
-- [README.EVNDISP](README/README.EVNDISP)
-- [README.EVNDISP.commandline](README/README.EVNDISP.commandline)
-- [README.MSCW_ENERGY](README/README.MSCW_ENERGY)
-- [README.ANASUM](README/README.ANASUM)
-- [README.EFFECTIVEAREA](README/README.EFFECTIVEAREA)
-- [README.ANALYSISLIBRARY](README/README.ANALYSISLIBRARY)
+- [v487](https://veritas.sao.arizona.edu/wiki/Eventdisplay_v487)
 
+Versions in preparation:
+
+- [v490](https://veritas.sao.arizona.edu/wiki/Eventdisplay_v490)
+
+Check the [release pages](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases) for the most recent versions to be used for VERITAS publications.
+For older versions of Eventdisplay, see the release pages on the [VERITAS wiki (internal pages)](https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual#Versions_of_eventdisplay).
 
 ## The Eventdisplay Ecosystem
 
-Reconstruction and analysis can be complex; it requires inputs from different sources and execution of several interdependent stages.
-Eventdisplay is in use since roughly 2004 and an ecosystem of libraries and repositories grew around the core code base. 
-Below an overview of those repositories. 
-Some are internal to VERITAS and not accessible to the general public.
+Reconstruction and analysis are complex and require inputs from different sources and execution of several interdependent stages.
 
-For almost every use case, Eventdisplay consists of at least three major components: 
-- the code (Eventdisplay), 
-- a library of scripts (see [Eventdisplay_AnalysisScripts_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisScripts_VTS))
-- a set of auxiliary files (see internal GitHub repository [Eventdisplay_AnalysisFiles_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles_VTS))
-- release test macros and results (see internal GitHub repository [Eventdisplay_ReleaseTests](https://github.com/VERITAS-Observatory/Eventdisplay_ReleaseTests))
+Eventdisplay consists of the following main components:
 
-Care should be taken in using the correct versions (releases, tags, branches) combining these three types of repositories.
-A blending of different versions of components will lead to incorrect results.
+- [Eventdisplay](https://github.com/VERITAS-Observatory/EventDisplay_v4): the core library with code, tools, and analysis libraries required to run the analysis
+- [Eventdisplay_AnalysisScripts_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisScripts_VTS): a library of scripts to use Eventdisplay efficiently on a computing cluster
+- [Eventdisplay_AnalysisFiles_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles_VTS): a set of auxiliary files with information on the instrument (e.g., telescope positions), access information to data bases, parameters for the analysis (e.g., image cleaning parameters or instruction for the gamma/hadron separation), or basic calibration values (note that this is a VERITAS private repository)
+- [V2DL3](https://github.com/VERITAS-Observatory/V2DL3): a converter of Eventdisplay data products to GADF DL3 Format to be used in science tools like [gammapy](https://github.com/gammapy/gammapy).
 
-### Code, tools, library
+Additional components:
 
-The core library consist of all code, tools, and libraries required to run the analysis.
+- release test macros and results (see internal GitHub repository [Eventdisplay_ReleaseTests](https://github.com/VERITAS-Observatory/EventDisplay_v4))
 
-### Analysis scripts
+## Documentation
 
-Typical use cases for Eventdisplay require the processing of many files.
-A library of scripts for the efficient execution is available and recommended to be used as the main access to the tools described in the section above.
+- [INSTALL.md](INSTALL.md): installation, dependencies, environmental variables
+- [README.VERITAS.quick_summary](README/README.VERITAS.quick_summary): description of a typical VERITAS analysis
 
-Repository for scripts: [https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisScripts_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisScripts_VTS)
+Extensive documentation on how to use Eventdisplay are available through the [VERITAS internal wiki pages](https://veritas.sao.arizona.edu/wiki/Eventdisplay_Manual).
 
-### Auxiliary files for parameters, definitions, calibration values
+## Support
 
-The reconstruction of analysis requires information on the instrument (e.g., telescope positions), access information to data bases, parameters for the analysis (e.g., image cleaning parameters or instruction for the gamma/hadron separation), or basic calibration values.
-
-Repository for auxiliary files: (private repository): [https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles_VTS)
-
-### Release tests
-
-Reconstruction and analysis are complex and a series of tests are required before the release of a new version of Eventdisplay.
-
-Release repository: (private repository): [https://github.com/VERITAS-Observatory/EventDisplay_ReleaseTests](https://github.com/VERITAS-Observatory/EventDisplay_ReleaseTests)
-
-### Converter to GADF DL3 Format
-
-see [https://github.com/VERITAS-Observatory/V2DL3](https://github.com/VERITAS-Observatory/V2DL3)
+- VERITAS internal [ELOG](http://veritas.sao.arizona.edu/private/elog/Eventdisplay-WG/) used for announcements, discussions, questions
+- Bugs and issues should be reported through the [GitHub issue tracker](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues)
 
 For any questions, contact Gernot Maier (gernot.maier@desy.de)
+
+## Development
+
+astyle is used for source code formatting since 03/2014
+http://astyle.sourceforge.net/
+
+Usage:
+
+do either
+```
+make formatSourceCode
+```
+
+ or
+
+```
+astyle  --options=./.astylerc <.cpp, .h or .C file>
+```
+
+All options are saved in the .astylerc file.

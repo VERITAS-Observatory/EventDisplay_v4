@@ -184,7 +184,7 @@ bool VGlobalRunParameter::setDirectories()
 		cout << "VGlobalRunParameter::setDirectories(): cannot find directory with EVNDISP aux data" << endl;
 		cout << "\t looking for " << fEVNDISPAnaDataDirectory << endl;
 		cout << "\t is environmental variable $VERITAS_EVNDISP_AUX_DIR set?" << endl;
-		cout << "\t (see README/INSTALL)" << endl;
+		cout << "\t (see INSTALL.md)" << endl;
 		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
 	}
@@ -218,7 +218,7 @@ bool VGlobalRunParameter::setDirectories()
 		cout << "VGlobalRunParameter::setDirectories(): cannot find directory for EVNDISP output data" << endl;
 		cout << "\t looking for " << fEVNDISPOutputDirectory << endl;
 		cout << "\t is environmental variable $VERITAS_USER_DATA_DIR set?" << endl;
-		cout << "\t (see README/INSTALL)" << endl;
+		cout << "\t (see INSTALL.md)" << endl;
 		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
 	}
