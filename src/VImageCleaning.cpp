@@ -346,7 +346,7 @@ void VImageCleaning::cleanImagePedvarsTimeDiff( VImageCleaningRunParameter* iIma
 // preliminary
 
 /*
- * calculate maximum in a float array
+ * calculate maximum of a float array
  */
 void VImageCleaning::LocMax( int n, float* ptr, float& max )
 {
@@ -1017,7 +1017,7 @@ bool VImageCleaning::NNChargeAndTimeCut(
 	
 	float valDT = 0.;
 	// use previous result if charge is the same
-	if( fIPR_save_mincharge > -90. && TMath::Abs( fIPR_save_mincharge - mincharge ) < 1.e-5 )
+	if( fIPR_save_mincharge > -90. && TMath::Abs( fIPR_save_mincharge - mincharge ) < 1.e-3 )
 	{
 		valDT = fIPR_save_dT_from_probCurve;
 	}
@@ -1783,7 +1783,6 @@ int VImageCleaning::ImageCleaningCharge( unsigned int teltype )
 		return 0;
 	}
 	float iIPR_max = fIPRgraphs_xmax[teltype];
-	TSpline* spl = NULL;
 	
 	for( Int_t iRing = 0; iRing < 1; iRing++ )
 	{
@@ -1881,7 +1880,7 @@ int VImageCleaning::ImageCleaningCharge( unsigned int teltype )
 				LocMin( 2, charges, refth );
 				fProbCurveBound->SetParameter( 2, 2.*nfirstringpix );
 				
-				Double_t valIPRref = iIPR->Eval( charge, spl, "" );
+				Double_t valIPRref = iIPR->Eval( charge, 0, "" );
 				if( valIPRref < 100. || charge >= iIPR_max )
 				{
 					valIPRref = 100.;
