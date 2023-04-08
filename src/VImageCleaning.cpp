@@ -1017,7 +1017,7 @@ bool VImageCleaning::NNChargeAndTimeCut(
 	
 	float valDT = 0.;
 	// use previous result if charge is the same
-	if( fIPR_save_mincharge > -90. && TMath::Abs( fIPR_save_mincharge - mincharge ) < 1.e-3 )
+	if( fIPR_save_mincharge > -90. && TMath::Abs( fIPR_save_mincharge - mincharge ) < 1.e-5 )
 	{
 		valDT = fIPR_save_dT_from_probCurve;
 	}
@@ -1077,6 +1077,8 @@ unsigned int VImageCleaning::NNGroupSearchProbCurveRelaxed( unsigned int teltype
 		return 0;
 	}
 	float iIPR_max = fIPRgraphs_xmax[teltype];
+	fIPR_save_mincharge = -99.;
+	fIPR_save_dT_from_probCurve = -99.;
 	
 	int NNcnt = 1;
 	float dT = 0.;
