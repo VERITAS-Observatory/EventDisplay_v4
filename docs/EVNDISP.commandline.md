@@ -8,10 +8,15 @@ Typical use cases:
 ------------------
 
 Plot VTS data:
-./bin/evndisp -display=1 -runnumber=<run number>
+./bin/evndisp -display=1 -runnumber=<run number> \
+              -calibrationdirectory <point to directory with calibration values>
+              (for larger display, add the option -highres)
 
 Quick plotting of VTS data, ignoring all calibration data:
 ./bin/evndisp -plotraw -nocalibnoproblem -display=1 -sourcefile <your vbf data file>
+
+For analysis, use the ANALYSIS.evndisp.sh script. 
+To run the calibration steps only, use the ANALYSIS.evndisp.sh with calibration option set to 5.
 
 General:
 --------

@@ -6,7 +6,7 @@
 #include "VImageBaseAnalyzer.h"
 #include "VPedestalCalculator.h"
 #include "VDB_CalibrationInfo.h"
-#include <VSQLTextFileReader.h>
+#include "VSQLTextFileReader.h"
 
 #include "TClonesArray.h"
 #include "TFile.h"
