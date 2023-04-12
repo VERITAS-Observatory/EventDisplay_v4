@@ -56,6 +56,9 @@ class VImageCleaning
 		unsigned int  nBinsADC;                // Number of ADC bins summed up, each bin the size of sampleTimeSlice
 		float fIPR_save_mincharge;
 		float fIPR_save_dT_from_probCurve;
+		unsigned int fIPR_save_telid;
+		double fIPR_save_ProbCurve_par1;
+		double fIPR_save_ProbCurve_par2;
 		
 		float INTENSITY[VDST_MAXCHANNELS];     //
 		float TIMES[VDST_MAXCHANNELS];         //

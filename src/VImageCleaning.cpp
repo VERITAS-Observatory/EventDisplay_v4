@@ -37,6 +37,9 @@ VImageCleaning::VImageCleaning( VEvndispData* iData )
 	}
 	fIPR_save_mincharge = -99.;
 	fIPR_save_dT_from_probCurve = -99.;
+	fIPR_save_telid = 99;
+	fIPR_save_ProbCurve_par1 = -99.;
+	fIPR_save_ProbCurve_par2 = -99.;
 	
 }
 
@@ -1014,10 +1017,14 @@ bool VImageCleaning::NNChargeAndTimeCut(
 	{
 		return false;
 	}
-	
 	float valDT = 0.;
-	// use previous result if charge is the same
-	if( fIPR_save_mincharge > -90. && TMath::Abs( fIPR_save_mincharge - mincharge ) < 1.e-3 )
+	// use previous result if charge and all other
+	// parameter are the same
+	if( fIPR_save_mincharge > -90.
+			&& fIPR_save_telid == fData->getTelID()
+			&& TMath::Abs( fIPR_save_ProbCurve_par1 - fProbCurve->GetParameter( 1 ) ) < 1.e-3
+			&& TMath::Abs( fIPR_save_ProbCurve_par2 - fProbCurve->GetParameter( 2 ) ) < 1.e-3
+			&& TMath::Abs( fIPR_save_mincharge - mincharge ) < 1.e-3 )
 	{
 		valDT = fIPR_save_dT_from_probCurve;
 	}
@@ -1032,6 +1039,9 @@ bool VImageCleaning::NNChargeAndTimeCut(
 		valDT = fProbCurve->Eval( valIPR );
 		fIPR_save_dT_from_probCurve = valDT;
 		fIPR_save_mincharge = mincharge;
+		fIPR_save_telid = fData->getTelID();
+		fIPR_save_ProbCurve_par1 = fProbCurve->GetParameter( 1 );
+		fIPR_save_ProbCurve_par2 = fProbCurve->GetParameter( 2 );
 	}
 	
 	// apply cut in deltaT
