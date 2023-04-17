@@ -270,7 +270,6 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	ifWriteGraphsToFile = false;
 	ifReadIPRfromDatabase = false;
 	ifCreateIPRdatabase = false;
-	ifReadIPRfromDSTFile = false;
 	
 	fNNGraphsFile = "IPRgraph.root";
 	fIPRdatabase = "";

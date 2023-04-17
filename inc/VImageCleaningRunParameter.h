@@ -58,7 +58,6 @@ class VImageCleaningRunParameter
 		vector< string > fNNOpt_Multiplicities;
 		unsigned int fNNOpt_nRings;
 		float fNNOpt_CoincWinLimit;
-		bool fNNOpt_ifNNoptNoTimeing;
 		bool fNNOpt_ifExplicitSampleTimeSlice;
 		float fNNOpt_sampleTimeSlice;
 		unsigned int fNNOpt_nBinsADC;
