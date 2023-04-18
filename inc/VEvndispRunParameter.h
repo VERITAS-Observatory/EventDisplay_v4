@@ -331,10 +331,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return ( fDBTextDirectory.size() > 0 );
 		}
 		
-		<<< <<< < HEAD
-		ClassDef( VEvndispRunParameter, 2005 ); //(increase this number)
-		== == == =
-			ClassDef( VEvndispRunParameter, 2007 ); //(increase this number)
-		>>> >>> > main
+        ClassDef( VEvndispRunParameter, 2007 ); //(increase this number)
 };
 #endif
