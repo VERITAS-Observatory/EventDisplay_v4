@@ -1,9 +1,9 @@
 #ifndef VIPRCALCULATOR_H
 #define VIPRCALCULATOR_H
 
-#include <VImageBaseAnalyzer.h>
-#include <VDB_CalibrationInfo.h>
-#include <VSQLTextFileReader.h>
+#include "VImageBaseAnalyzer.h"
+#include "VDB_CalibrationInfo.h"
+#include "VSQLTextFileReader.h"
 
 #include "TClonesArray.h"
 #include "TFile.h"
