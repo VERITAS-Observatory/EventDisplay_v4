@@ -49,7 +49,6 @@ VImageCleaningRunParameter::VImageCleaningRunParameter( string iName )
 	
 	fNNOpt_nRings = 3;
 	fNNOpt_CoincWinLimit = 8;
-	fNNOpt_ifNNoptNoTimeing = false;
 	fNNOpt_ifExplicitSampleTimeSlice = false;
 	fNNOpt_sampleTimeSlice = 1;
 	fNNOpt_nBinsADC = 25;
@@ -84,14 +83,7 @@ void VImageCleaningRunParameter::print()
 		cout << endl;
 		cout << "\t\t Maximum number of rings to be searched for boundary pixels - " << fNNOpt_nRings << endl;
 		cout << "\t\t Maximal coincidence window allowed between neighbouring pixels for any NN group - " << fNNOpt_CoincWinLimit << " [ns]" << endl;
-		if( fNNOpt_ifNNoptNoTimeing )
-		{
-			cout << "\t\t Ignore timing information in NN image cleaning" << endl;
-		}
-		else
-		{
-			cout << "\t\t Use timing information in NN image cleaning" << endl;
-		}
+		cout << "\t\t Use timing information in NN image cleaning" << endl;
 		if( fNNOpt_ifExplicitSampleTimeSlice )
 		{
 			cout << "\t\t set sample time slice and number of ADC bins explicitly:" << endl;
