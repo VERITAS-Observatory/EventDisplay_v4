@@ -135,12 +135,6 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	
 	// reset cut strings and variables
 	resetRunOptions();
-<<<<<<< HEAD
-=======
-	
-	//add if statement: if ipr should be in time slices
-	fIPRTimeSlices = true;
->>>>>>> d875f786fff9a004b915438d724c168de7974e22
 }
 
 
@@ -482,7 +476,6 @@ bool VEventLoop::initEventLoop( string iFileName )
 	// initialize analyzers (output files are created as well here)
 	initializeAnalyzers();
 	
-<<<<<<< HEAD
 	if( fIPRCalculator  ){
                   cout << "initializing IPR calculator" << endl;
                   fIPRCalculator->initialize();
@@ -491,19 +484,6 @@ bool VEventLoop::initEventLoop( string iFileName )
 	if( fCalibrator )
 	{
 		fCalibrator->initialize(fIPRCalculator );
-=======
-	
-	if( fIPRCalculator )
-	{
-		cout << "initializing IPR calculator" << endl;
-		fIPRCalculator->initialize();
-	}
-	
-	// create calibrators, analyzers, etc. at first event
-	if( fCalibrator )
-	{
-		fCalibrator->initialize( fIPRCalculator );
->>>>>>> d875f786fff9a004b915438d724c168de7974e22
 	}
 	
 	// initialize pedestal calculator
@@ -845,11 +825,7 @@ void VEventLoop::shutdown()
 		}
 		if( fCalibrator )
 		{
-<<<<<<< HEAD
 			fCalibrator->terminate( iP );
-=======
-			fCalibrator->terminate( iP , fIPRCalculator );
->>>>>>> d875f786fff9a004b915438d724c168de7974e22
 		}
 	}
 	// write data summary
@@ -1042,24 +1018,6 @@ bool VEventLoop::nextEvent()
 			else
 			{
 				cout << "!!! void VEventLoop::nextEvent(): no next event (end of file)" << endl;
-<<<<<<< HEAD
-=======
-				for( unsigned int tel = 0; tel < fIPRCalculator->getStorageHist().size(); tel++ )
-				{
-					for( unsigned int ts = 0; ts < fIPRCalculator->getStorageHist()[tel].size(); ts++ )
-					{
-						for( unsigned int p = 0; p < fIPRCalculator->getStorageHist()[tel][ts].size(); p++ )
-						{
-							for( unsigned int sw = 0; sw < fIPRCalculator->getStorageHist()[tel][ts][p].size(); sw++ )
-							{
-								fIPRCalculator->checkHistEmpty( tel, ts, p, sw );
-							}
-						}
-					}
-				}
-				
-				
->>>>>>> d875f786fff9a004b915438d724c168de7974e22
 				// if the display is run in the loop mode, goto event 0 and start again
 				if( fRunPar->floopmode )
 				{
@@ -1168,10 +1126,6 @@ int VEventLoop::analyzeEvent()
 		cout << "\t now at event " << getEventNumber() << endl;
 		cout << "----------------------------------------" << endl;
 	}
-<<<<<<< HEAD
-=======
-	
->>>>>>> d875f786fff9a004b915438d724c168de7974e22
 	// analysis is running
 	fAnalyzeMode = true;
 	int i_cut = 0;
