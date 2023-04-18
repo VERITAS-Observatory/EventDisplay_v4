@@ -100,10 +100,12 @@ class VCalibrator : public VImageBaseAnalyzer
 		int  readLowGainCalibrationValues_fromCalibFile( string iVariable = "LOWGAINPED", unsigned int iTel = 9999, int iSumWindow = 9999 );
 		string getCalibrationFileName( int iTel, int irun, string iSuffix, string name = "" );
 		void readCalibrationData();
+		bool readCalibrationDatafromDSTFiles( string iSourceFile );
 		void readfromVOFFLINE_DBText( int gain_or_toff, vector< unsigned int >& VchannelList, vector< double >& Vmean, vector< double >& Vrms );
 		void readfromVOFFLINE_DB( int gain_or_toff, string& iFile, vector< unsigned int >& VchannelList, vector< double >& Vmean, vector< double >& Vrms );
 		void readGains( bool iLowGain = false );
 		bool readIPRGraph_from_DSTFile( string iDSTFile, unsigned int iSummationWindow, ULong64_t iTelType );
+		bool calculateIPRGraphs( string iPedFileName, unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel );
 		bool readLowGainMultiplier( );
 		bool readPeds( string iFile, bool, unsigned int );
 		bool readPeds_from_grisufile( bool, unsigned int );
@@ -119,6 +121,7 @@ class VCalibrator : public VImageBaseAnalyzer
 		void writePeds( bool iLowGain, VPedestalCalculator* iP = 0, bool iWriteAsciiFile = true, VIPRCalculator* fIPRCalculator = 0 );
 		void writeTOffsets( bool iLowGain = false );
 		void writeAverageTZeros( bool iLowGain = false );
+		bool writeIPRgraphs( string iFile = "" );
 		
 		
 	public:

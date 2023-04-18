@@ -1023,13 +1023,13 @@ bool VEventLoop::nextEvent()
 			else
 			{
 				cout << "!!! void VEventLoop::nextEvent(): no next event (end of file)" << endl;
-				for( int tel = 0; tel < fIPRCalculator->getStorageHist().size(); tel++ )
+				for( unsigned int tel = 0; tel < fIPRCalculator->getStorageHist().size(); tel++ )
 				{
-					for( int ts = 0; ts < fIPRCalculator->getStorageHist()[tel].size(); ts++ )
+					for( unsigned int ts = 0; ts < fIPRCalculator->getStorageHist()[tel].size(); ts++ )
 					{
-						for( int p = 0; p < fIPRCalculator->getStorageHist()[tel][ts].size(); p++ )
+						for( unsigned int p = 0; p < fIPRCalculator->getStorageHist()[tel][ts].size(); p++ )
 						{
-							for( int sw = 0; sw < fIPRCalculator->getStorageHist()[tel][ts][p].size(); sw++ )
+							for( unsigned int sw = 0; sw < fIPRCalculator->getStorageHist()[tel][ts][p].size(); sw++ )
 							{
 								fIPRCalculator->checkHistEmpty( tel, ts, p, sw );
 							}
