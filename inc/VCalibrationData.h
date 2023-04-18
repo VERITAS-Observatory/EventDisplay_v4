@@ -143,7 +143,7 @@ class VCalibrationData
 		
 		// IPR graphs
 		map< unsigned int, TGraphErrors* >      fGraphIPRGraph;         // one IPR graph per summation window
-		map< unsigned int, TGraphErrors* >      fGraphTSIPRGraph;         // one IPR graph per time slice	
+		map< unsigned int, TGraphErrors* >      fGraphTSIPRGraph;         // one IPR graph per time slice
 		VCalibrationData( unsigned int iTel, string iDir, string iPedfile, string iGainfile, string iTofffile,
 						  string iPedLowGainfile, string iGainLowGainFile = "",
 						  string iToffLowGainFile = "", string iLowGainMultFile = "",

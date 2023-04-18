@@ -359,9 +359,13 @@ void VCalibrator::calculatePedestals( bool iLowGain )
    this might be an ascii file and/or a root file
 
 */
+<<<<<<< HEAD
 //MK test
 void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalculator, bool iWriteAsciiFile )
 //void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalculator, bool iWriteAsciiFile, VIPRCalculator *fIPRCalculator )
+=======
+void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalculator, bool iWriteAsciiFile, VIPRCalculator* fIPRCalculator )
+>>>>>>> d875f786fff9a004b915438d724c168de7974e22
 {
 	if( getDebugFlag() )
 	{
@@ -509,6 +513,24 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 						}
 					}
 				}
+<<<<<<< HEAD
+=======
+				for( unsigned int ts = 0; ts < ( fIPRCalculator->getStorageHist() )[tel].size(); ts++ )
+				{
+					for( unsigned int p = 0; p <  getNChannels(); p++ )
+					{
+						for( unsigned int sw = 0; sw < ( fIPRCalculator->getStorageHist() )[tel][ts][p].size(); sw++ )
+						{
+							if( fIPRCalculator->getIPRPedestalHisto( tel, ts, p, sw ) )
+							{
+								fIPRCalculator->getIPRPedestalHisto( tel, ts, p, sw )->SetName( Form( "hped_Tel%d_TS%d_Pix%d_SW%d", ( int )telType, ts, p, sw ) );
+								fIPRCalculator->getIPRPedestalHisto( tel, ts, p, sw )->SetTitle( Form( "hped_Tel%d_TS%d_Pix%d_SW%d", ( int )telType, ts, p, sw ) );
+								fIPRCalculator->getIPRPedestalHisto( tel, ts, p, sw )->Write();
+							}
+						}
+					}
+				}
+>>>>>>> d875f786fff9a004b915438d724c168de7974e22
 			}
 			iFileWritten[telType] = true;
 		}
@@ -552,9 +574,9 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 			&& getRunParameter()->fPedestalSingleRootFile )
 	{
 		// write one IPR graph per telescope type and summation window
-		
+	
 		cout << "Calculating IPR graphs " << endl;
-		
+	
 		// keep track of telescope type
 		map< ULong64_t, bool > iTelDone;
 		for( unsigned int i = 0; i < getDetectorGeometry()->getTelType_list().size(); i++ )
@@ -564,9 +586,9 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 		for( unsigned int i = 0; i < fNTel; i++ )
 		{
 			setTelID( i );
-			
+	
 			ULong64_t iTelType = getTelType( i );
-			
+	
 			if( !iTelDone[iTelType] )
 			{
 				if( iTelType >= hped_vec.size() )
@@ -1590,9 +1612,14 @@ void VCalibrator::writeTOffsets( bool iLowGain )
 	}
 }
 
+<<<<<<< HEAD
 //MK test
 //void VCalibrator::terminate( VPedestalCalculator* iP, VIPRCalculator *fIPRCalculator )
 void VCalibrator::terminate( VPedestalCalculator* iP )
+=======
+
+void VCalibrator::terminate( VPedestalCalculator* iP, VIPRCalculator* fIPRCalculator )
+>>>>>>> d875f786fff9a004b915438d724c168de7974e22
 {
 	if( fRunPar->frunmode == 1 || fRunPar->frunmode == 6 )
 	{
@@ -1643,6 +1670,13 @@ void VCalibrator::readCalibrationData()
 				getGains( true ) = getGains( false );
 			}
 		}
+<<<<<<< HEAD
+=======
+		else
+		{
+		
+		}
+>>>>>>> d875f786fff9a004b915438d724c168de7974e22
 		
 		// read average tzeros
 		if( getRunParameter()->frunmode != 2 && getRunParameter()->frunmode != 5
@@ -3094,8 +3128,13 @@ void VCalibrator::readTOffsets( bool iLowGain )
 	
 }
 
+<<<<<<< HEAD
 //MK test
 void VCalibrator::initialize(VIPRCalculator *fIPRCalculator )
+=======
+
+void VCalibrator::initialize( VIPRCalculator* fIPRCalculator )
+>>>>>>> d875f786fff9a004b915438d724c168de7974e22
 {
 	if( fDebug )
 	{
@@ -3205,6 +3244,12 @@ void VCalibrator::initialize(VIPRCalculator *fIPRCalculator )
 		{
 			readCalibrationData();
 		}
+<<<<<<< HEAD
+=======
+		else
+		{
+		}
+>>>>>>> d875f786fff9a004b915438d724c168de7974e22
 	}
 	// PE mode: set gains to 1
 	else
@@ -3225,9 +3270,13 @@ void VCalibrator::initialize(VIPRCalculator *fIPRCalculator )
 	// if needed: write IPR graphs to disk
 	if( getRunParameter()->ifCreateIPRdatabase == true && getRunParameter()->ifReadIPRfromDatabase == false )
 	{
+<<<<<<< HEAD
 		//MK test
 		//fIPRCalculator->writeIPRgraphs( hped_vec, "");
 		writeIPRgraphs();
+=======
+		fIPRCalculator->writeIPRgraphs( hped_vec, "" );
+>>>>>>> d875f786fff9a004b915438d724c168de7974e22
 	}
 	
 	// initialize dead  channel finder
@@ -3243,10 +3292,15 @@ void VCalibrator::initialize(VIPRCalculator *fIPRCalculator )
 				&& fRunPar->frunmode != 1
 				&& fRunPar->frunmode != 6 )
 		{
+<<<<<<< HEAD
 			cout << "MK calculating IPR graphs"<< endl;
 			//calculateIPRGraphs();
 			fIPRCalculator->calculateIPRGraphs(fPedFileNameC);
 			//calculateIPRGraphs();
+=======
+			cout << "MK calculating IPR graphs" << endl;
+			fIPRCalculator->calculateIPRGraphs( fPedFileNameC );
+>>>>>>> d875f786fff9a004b915438d724c168de7974e22
 		}
 	}
 }
@@ -4385,6 +4439,7 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 	
 	////////////////////////////////////////////////////////////////////////////
 	// read IPR graph from dst root file (for direct usage or creation of database )
+<<<<<<< HEAD
 	if( getRunParameter()->ifReadIPRfromDSTFile == true )
 	{
 		cout << "\t reading IPR graphs for NN image cleaning from DST file" << endl;
@@ -4395,6 +4450,9 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 		}
 	}
 	else if( getRunParameter()->ifReadIPRfromDatabase == true || getRunParameter()->ifCreateIPRdatabase == true )
+=======
+	if( getRunParameter()->ifReadIPRfromDatabase == true || getRunParameter()->ifCreateIPRdatabase == true )
+>>>>>>> d875f786fff9a004b915438d724c168de7974e22
 	{
 		cout << "\t reading IPR graphs for NN image cleaning" << endl;
 		for( int i = 0; i < t->GetEntries(); i++ )

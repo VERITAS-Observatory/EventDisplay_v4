@@ -1,16 +1,13 @@
-EVENTDISPLAY - IACT event analysis and display
-==============================================
-calibrate and parametrize images, event reconstruction, stereo analysis
+# EVENTDISPLAY - IACT event analysis and display
+
+calibrate and parameterize images, event reconstruction, stereo analysis
 
 ----------------------------------------------
 
-For installation see README file README/INSTALL
+For installation see INSTALL.md
 
 For a detailed description of the command line parameters see
-README/README.EVNDISP.commandline
-
-For a more detailed (but very incomplete) documentation, see
-./doc/Manual.pdf
+[docs/EVNDISP.commandline.md](docs/EVNDISP.commandline.md)
 
 ----------------------------------------------
 
@@ -29,7 +26,7 @@ Option to display events:
 
 ----------------------------------------------
 
-Required auxilliary files:
+Required auxiliary files:
 
    global run parameters (e.g. observatory location and links to database)
    $VERITAS_EVNDISP_AUX_DIR/Parameterfiles/EVNDISP.global.runparameter
@@ -65,8 +62,3 @@ Detector configuration:
 
    [VTS] Detector configuration files (with telescope positions, pixel positions, etc):
    $VERITAS_EVNDISP_AUX_DIR/DetectorGeometry/*.cfg
-
-----------------------------------------------
-
-Please report any problems and bugs to Gernot Maier or Jamie Holder
-

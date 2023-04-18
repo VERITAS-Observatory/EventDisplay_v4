@@ -48,6 +48,10 @@ class VPedestalCalculator : public VImageBaseAnalyzer
 		vector< vector< vector< float > > > fpedcal_mean;
 		vector< vector< vector< float > > > fpedcal_mean2;
 		vector< vector< vector< TH1F* > > > fpedcal_histo;
+<<<<<<< HEAD
+=======
+		std::vector<std::vector<TH1F*> > copy_fpedcal_histo;
+>>>>>>> d875f786fff9a004b915438d724c168de7974e22
 		
 		vector< vector< float > > v_temp_pedEntries;
 		vector< vector< float > > v_temp_ped;
@@ -63,7 +67,7 @@ class VPedestalCalculator : public VImageBaseAnalyzer
 		void reset();
 		
 	public:
-		vector< int > NTimeSlices;	
+		vector< int > NTimeSlices;
 		vector< vector< int > > v_MJD;            //! [telid][time slice]
 		vector< vector< double > > v_time;        //! [telid][time slice]
 		//! [telid][time slice][npixel][summation window]
@@ -75,10 +79,19 @@ class VPedestalCalculator : public VImageBaseAnalyzer
 		vector< vector< vector< vector< float > > > > v_ped_median;
 		vector< vector< vector< vector< float > > > > v_pedvar68;
 		
+<<<<<<< HEAD
 		VPedestalCalculator();
 		~VPedestalCalculator() {}
 		
 		void doAnalysis( bool iLowGain = false );
+=======
+		vector< vector< vector< TH1F* > > > fpedcal_histo_sw;
+		
+		VPedestalCalculator();
+		~VPedestalCalculator() {}
+		
+		void doAnalysis( bool iLowGain = false , VIPRCalculator* fIPRCalculator = 0 );
+>>>>>>> d875f786fff9a004b915438d724c168de7974e22
 		vector< TTree* > getPedestalTree()
 		{
 			return fTree;

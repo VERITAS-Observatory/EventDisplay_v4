@@ -184,6 +184,10 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		fpedcal_mean.push_back( iped_cal2 );
 		fpedcal_mean2.push_back( iped_cal2 );
 		fpedcal_histo.push_back( iped_histo2 );
+<<<<<<< HEAD
+=======
+		fpedcal_histo_sw.push_back( iped_histo2 );
+>>>>>>> d875f786fff9a004b915438d724c168de7974e22
 		
 		// define the time vector
 		fTimeVec.push_back( 0 );
@@ -278,7 +282,11 @@ void VPedestalCalculator::fillTimeSlice( unsigned int telID )
 }
 
 
+<<<<<<< HEAD
 void VPedestalCalculator::doAnalysis( bool iLowGain )
+=======
+void VPedestalCalculator::doAnalysis( bool iLowGain, VIPRCalculator* fIPRCalculator )
+>>>>>>> d875f786fff9a004b915438d724c168de7974e22
 {
 	double t = getEventTime();
 	// get right index for tel id
@@ -305,7 +313,20 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
 		else if( t - fTimeVec[telID] > fLengthofTimeSlice )
 		{
 			time = t;
+<<<<<<< HEAD
 			fillTimeSlice( telID );
+=======
+			if( NTimeSlices[telID] == 0 and telID == 0 )
+			{
+				fIPRCalculator->fillIPRPedestalHisto();
+			}
+			
+			NTimeSlices[telID] += 1;
+			
+			fIPRCalculator->fillIPRPedestalHisto( telID, fpedcal_histo );
+			fillTimeSlice( telID );
+			
+>>>>>>> d875f786fff9a004b915438d724c168de7974e22
 			fTimeVec[telID] = t;
 		}  // if( t - fTimeVec[telID] > fLengthofTimeSlice )
 		///////////////////////////////////////////////////////
