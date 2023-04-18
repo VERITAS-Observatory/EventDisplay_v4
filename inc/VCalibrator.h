@@ -7,7 +7,6 @@
 #include "VPedestalCalculator.h"
 #include "VIPRCalculator.h"
 #include "VDB_CalibrationInfo.h"
-#include <VSQLTextFileReader.h>
 #include "VIPRCalculator.h"
 #include "VPedestalCalculator.h"
 #include "VDB_CalibrationInfo.h"
