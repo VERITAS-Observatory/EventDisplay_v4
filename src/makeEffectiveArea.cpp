@@ -66,10 +66,10 @@ int main( int argc, char* argv[] )
 		cout << endl;
 		if( gSystem->Getenv( "EVNDISPSYS" ) )
 		{
-			int i_s = system( "cat $EVNDISPSYS/README/README.EFFECTIVEAREA" );
+			int i_s = system( "cat $EVNDISPSYS/docs/EFFECTIVEAREA.md" );
 			if( i_s == -1 )
 			{
-				cout << "error: README/README.EFFECTIVEAREA not found" << endl;
+				cout << "error: docs/EFFECTIVEAREA.md not found" << endl;
 			}
 		}
 		else
@@ -94,7 +94,7 @@ int main( int argc, char* argv[] )
 	fRunPara->print();
 	
 	/////////////////////////////////////////////////////////////////
-	// open output file and write results to dist
+	// open output file and write results to disk
 	TFile* fOutputfile = new TFile( fOutputfileName.c_str(), "RECREATE" );
 	if( fOutputfile->IsZombie() )
 	{
@@ -108,7 +108,7 @@ int main( int argc, char* argv[] )
 	VGammaHadronCuts* fCuts = new VGammaHadronCuts();
 	fCuts->initialize();
 	fCuts->setNTel( fRunPara->telconfig_ntel, fRunPara->telconfig_arraycentre_X, fRunPara->telconfig_arraycentre_Y );
-	fCuts->setInstrumentEpoch( fRunPara->getInstrumentEpoch( true ) );
+	fCuts->setInstrumentEpoch( fRunPara->getInstrumentATMString() );
 	fCuts->setTelToAnalyze( fRunPara->fTelToAnalyse );
 	if( !fCuts->readCuts( fRunPara->fCutFileName, 2 ) )
 	{
@@ -246,7 +246,7 @@ int main( int argc, char* argv[] )
 			if( fMC_histo )
 			{
 				fMC_histo->matchDataVectors( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex );
-				fMC_histo->print();
+				// fMC_histo->print();
 			}
 			else
 			{

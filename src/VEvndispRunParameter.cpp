@@ -197,7 +197,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	ftraceamplitudecorrectionFile = "";
 	ftracefit = -1.;
 	ftracefitfunction = "ev";
-	freconstructionparameterfile = "EVNDISP.reconstruction.runparameter.v4x";
+	freconstructionparameterfile = "EVNDISP.reconstruction.runparameter.AP.v4x";
 	
 	////////////////////////////////////////////////////////////////////////////////
 	// pulse timing (fraction of maximum where times are determined)
@@ -1047,4 +1047,13 @@ unsigned int VEvndispRunParameter::getAtmosphereID( bool iUpdateInstrumentEpoch 
 	}
 	
 	return fAtmosphereID;
+}
+
+string VEvndispRunParameter::getInstrumentATMString()
+{
+	ostringstream i_temp;
+	i_temp << getInstrumentEpoch( false );
+	i_temp << "_ATM" << getAtmosphereID();
+	
+	return i_temp.str();
 }

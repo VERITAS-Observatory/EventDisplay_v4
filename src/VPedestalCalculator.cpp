@@ -16,6 +16,7 @@ VPedestalCalculator::VPedestalCalculator()
 	fSumWindow = 24;
 	fNPixel = 500;
 	fSumFirst = 0;
+	
 	bCalibrationRun = false;
 }
 
@@ -75,9 +76,9 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 	reset();
 	
 	// pedestal histogram binning
-	int i_hist_nbin = 1500.;
+	int i_hist_nbin = 2000.;
 	float i_hist_xmin = 0.;
-	float i_hist_xmax = 750.;
+	float i_hist_xmax = 2000.;
 	
 	// set up the trees
 	TDirectory* iDir = gDirectory;
@@ -163,7 +164,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		
 		// initialise the pedvars variables
 		iped_cal2.clear();
-		iped_histo.clear();
+		iped_histo2.clear();
 		for( unsigned int p = 0; p < fNPixel; p++ )
 		{
 			iped_cal.clear();
@@ -171,7 +172,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 			for( int w = 0; w < fSumWindow; w++ )
 			{
 				iped_cal.push_back( 0. );
-				sprintf( hname, "hped_cal_%d_%d_%d", i, p, w );
+				sprintf( hname, "hped_cal_%d_%d_%d", t + 1, p, w );
 				iped_histo.push_back( new TH1F(
 										  hname, "",
 										  i_hist_nbin, i_hist_xmin, i_hist_xmax ) );
@@ -183,8 +184,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		fpedcal_mean.push_back( iped_cal2 );
 		fpedcal_mean2.push_back( iped_cal2 );
 		fpedcal_histo.push_back( iped_histo2 );
-		fpedcal_histo_sw.push_back( iped_histo2 );
-	
+		
 		// define the time vector
 		fTimeVec.push_back( 0 );
 		NTimeSlices.push_back( 0 );
@@ -195,6 +195,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 	{
 		cout << "END: VPedestalCalculator::initialize " << endl;
 	}
+	
 	return true;
 }
 
@@ -251,7 +252,6 @@ void VPedestalCalculator::fillTimeSlice( unsigned int telID )
 			fpedcal_n[telID][p][w] = 0.;
 			fpedcal_mean[telID][p][w] = 0.;
 			fpedcal_mean2[telID][p][w] = 0.;
-			fpedcal_histo_sw[telID][p][w]->Reset();
 			fpedcal_histo[telID][p][w]->Reset();
 		}
 		// deroate the pixel coordinates
@@ -278,7 +278,7 @@ void VPedestalCalculator::fillTimeSlice( unsigned int telID )
 }
 
 
-void VPedestalCalculator::doAnalysis( bool iLowGain, VIPRCalculator *fIPRCalculator )
+void VPedestalCalculator::doAnalysis( bool iLowGain )
 {
 	double t = getEventTime();
 	// get right index for tel id
@@ -291,6 +291,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain, VIPRCalculator *fIPRCalcula
 			break;
 		}
 	}
+	
 	// temporary vectors
 	if( telID < fTimeVec.size() )
 	{
@@ -304,21 +305,12 @@ void VPedestalCalculator::doAnalysis( bool iLowGain, VIPRCalculator *fIPRCalcula
 		else if( t - fTimeVec[telID] > fLengthofTimeSlice )
 		{
 			time = t;
-			if (NTimeSlices[telID] == 0 and telID == 0){
-				fIPRCalculator->fillIPRPedestalHisto();
-			}
-
-			NTimeSlices[telID]+=1;
-			
-			fIPRCalculator->fillIPRPedestalHisto(telID, fpedcal_histo);
 			fillTimeSlice( telID );
-
 			fTimeVec[telID] = t;
 		}  // if( t - fTimeVec[telID] > fLengthofTimeSlice )
 		///////////////////////////////////////////////////////
 		
 		double i_tr_sum = 0.;
-		double i_tr_sum_sw = 0.;
 		// calculate the sums (don't use calcsums because it overwrites getSums() )
 		// and fill the histograms
 		for( unsigned int i = 0; i < getNChannels(); i++ )
@@ -354,15 +346,10 @@ void VPedestalCalculator::doAnalysis( bool iLowGain, VIPRCalculator *fIPRCalcula
 						{
 							// calculate trace sum
 							i_tr_sum = fTraceHandler->getTraceSum( fSumFirst, fSumFirst + ( w + 1 ), true, 1 );
-							i_tr_sum_sw = fTraceHandler->getTraceSum( fSumFirst, fSumFirst + ( w + 1 ), false, 1 );
 							if( i_tr_sum > 0. && i_tr_sum < 50.*( w + 1 ) )
 							{
 								if( chanID < fpedcal_n[telID].size() && w < fpedcal_n[telID][chanID].size() )
 								{
-									if( i_tr_sum_sw > 0. && i_tr_sum_sw < 50.*( w + 1 ) )
-									{
-										fpedcal_histo_sw[telID][chanID][w]->Fill( i_tr_sum_sw );
-									}
 									fpedcal_n[telID][chanID][w]++;
 									fpedcal_mean[telID][chanID][w] += i_tr_sum;
 									fpedcal_mean2[telID][chanID][w] += i_tr_sum * i_tr_sum;
@@ -393,6 +380,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain, VIPRCalculator *fIPRCalcula
 		}                                         // for (unsigned int i = 0; i < nhits; i++)
 	}                                             // if( telID < fTree.size() && fTree[telID] && telID < fTimeVec.size() )
 }
+
 
 void VPedestalCalculator::terminate( bool iWrite, bool iDebug_IO )
 {

@@ -7,17 +7,19 @@
 
 VTMVARunData::VTMVARunData()
 {
-	setDebug();
+	setDebug( false );
 	
 	fName = "noname";
+	fRunOption = "TRAIN";
 	
 	fTrainGammaHadronSeparation = true;
 	fTrainReconstructionQuality = false;  // in development: please ignore
 	
-	fCheckValidityOfInputVariables = true;
-	
 	fOutputDirectoryName = "";
 	fOutputFileName = "";
+	
+	fnTrain_Signal = 0;
+	fnTrain_Background = 0;
 	
 	fQualityCuts = "1";
 	fQualityCutsBkg = "1";
@@ -29,6 +31,7 @@ VTMVARunData::VTMVARunData()
 	fBackgroundWeight = 1.;
 	fMinSignalEvents = 50;
 	fMinBackgroundEvents = 0;
+	fSelectedEventFileName = "";
 	
 	fNTtype = -1;
 	
@@ -112,12 +115,12 @@ bool VTMVARunData::openDataFiles()
 					{
 						if( fSignalTree[k] )
 						{
-							fSignalTree[k]->Draw( ">>+signalList", 
-                                    fQualityCuts
-                                    && fMCxyoffCut &&
-                                    fEnergyCutData[i]->fEnergyCut &&
-                                    fZenithCutData[j]->fZenithCut,
-                                    "entrylist" );
+							fSignalTree[k]->Draw( ">>+signalList",
+												  fQualityCuts
+												  && fMCxyoffCut &&
+												  fEnergyCutData[i]->fEnergyCut &&
+												  fZenithCutData[j]->fZenithCut,
+												  "entrylist" );
 							i_j_SignalList = ( TEntryList* )gDirectory->Get( "signalList" );
 						}
 					}
@@ -128,7 +131,7 @@ bool VTMVARunData::openDataFiles()
 						cout << i_j_SignalList->GetN() << "\t required > " << fMinSignalEvents << endl;
 						cout << "  (cuts are " << fQualityCuts << "&&" << fMCxyoffCut;
 						cout << "&&" << fEnergyCutData[i]->fEnergyCut  << "&&" << fZenithCutData[j]->fZenithCut;
-                        cout << ")" << endl;
+						cout << ")" << endl;
 						if( i_j_SignalList->GetN() < fMinSignalEvents )
 						{
 							iEnoughEvents = false;
@@ -144,15 +147,15 @@ bool VTMVARunData::openDataFiles()
 						if( fMCxyoffCutSignalOnly ) // Do we need this?
 						{
 							fBackgroundTree[k]->Draw( ">>+BackgroundList", fQualityCuts && fQualityCutsBkg
-                                    && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut 
-                                    && fZenithCutData[j]->fZenithCut, "entrylist" );
+													  && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut
+													  && fZenithCutData[j]->fZenithCut, "entrylist" );
 							i_j_BackgroundList = ( TEntryList* )gDirectory->Get( "BackgroundList" );
 						}
 						else if( fBackgroundTree[k] )
 						{
 							fBackgroundTree[k]->Draw( ">>+BackgroundList", fQualityCuts && fQualityCutsBkg
-                                    && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut
-                                    && fZenithCutData[j]->fZenithCut, "entrylist" );
+													  && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut
+													  && fZenithCutData[j]->fZenithCut, "entrylist" );
 							i_j_BackgroundList = ( TEntryList* )gDirectory->Get( "BackgroundList" );
 						}
 					}
@@ -163,7 +166,7 @@ bool VTMVARunData::openDataFiles()
 						cout << "\t required > " << fMinBackgroundEvents << endl;
 						cout << "  (cuts are " << fQualityCuts << "&&" << fQualityCutsBkg << "&&" << fMCxyoffCut;
 						cout << "&&" << fEnergyCutData[i]->fEnergyCut  << "&&" << fZenithCutData[j]->fZenithCut;
-                        cout << ")" << endl;
+						cout << ")" << endl;
 						if( i_j_BackgroundList->GetN() < fMinBackgroundEvents )
 						{
 							iEnoughEvents = false;
@@ -198,36 +201,42 @@ bool VTMVARunData::openDataFiles()
 				if( fEnergyCutData.size() > 1 && fZenithCutData.size() > 1 )
 				{
 					iTempS << fOutputDirectoryName << "/" << fOutputFileName;
-                    iTempS << "_" << i << "_" << j << ".root";    // append a _# at the file name
+					iTempS << "_" << i << "_" << j << ".root";    // append a _# at the file name
 					iTempS2 << fOutputFileName << "_" << i << "_" << j;
 				}
 				else if( fEnergyCutData.size() > 1 && fZenithCutData.size() <= 1 )
 				{
 					iTempS << fOutputDirectoryName << "/" << fOutputFileName;
-                    iTempS << "_" << i << ".root";    // append a _# at the file name
+					iTempS << "_" << i << ".root";    // append a _# at the file name
 					iTempS2 << fOutputFileName << "_" << i;
 				}
 				else if( fZenithCutData.size() > 1 &&  fEnergyCutData.size() <= 1 )
 				{
 					iTempS << fOutputDirectoryName << "/" << fOutputFileName;
-                    iTempS << "_0_" << j << ".root";    // append a _# at the file name
+					iTempS << "_0_" << j << ".root";    // append a _# at the file name
 					iTempS2 << fOutputFileName << "_0_" << i;
 				}
 				else
 				{
-					iTempS << fOutputDirectoryName << "/" << fOutputFileName << ".root";
+					iTempS << fOutputDirectoryName << "/" << fOutputFileName;
+					fSelectedEventFileName =  iTempS.str() + "_preselect.root";
+					if( fRunOption == "WRITETRAININGEVENTS" )
+					{
+						iTempS << "_preselect";
+					}
+					iTempS << ".root";
 					iTempS2 << fOutputFileName;
 				}
 				output_zenith.push_back( new TFile( iTempS.str().c_str(), "RECREATE" ) );
 				if( output_zenith.back()->IsZombie() )
 				{
 					cout << "VTMVARunData::openDataFiles() error creating output file ";
-                    cout << output_zenith.back()->GetName() << endl;
+					cout << output_zenith.back()->GetName() << endl;
 					cout << "aborting..." << endl;
 					return false;
 				}
 				output_zenith.back()->SetTitle( iTempS2.str().c_str() );
-				if(  i < fEnergyCutData.size() && fEnergyCutData[i] )
+				if( i < fEnergyCutData.size() && fEnergyCutData[i] )
 				{
 					fEnergyCutData[i]->Write();
 				}
@@ -235,7 +244,7 @@ bool VTMVARunData::openDataFiles()
 				{
 					fZenithCutData[j]->Write();
 				}
-                output_zenith.back()->Write();
+				output_zenith.back()->Write();
 			}
 			fOutputFile.push_back( output_zenith );
 		}
@@ -247,6 +256,42 @@ bool VTMVARunData::openDataFiles()
 	}
 	
 	return true;
+}
+
+/*
+ * read a unsigned int from the TMVA option string
+ *
+ */
+unsigned int VTMVARunData::getTrainOptionValue( string iVarName, unsigned int i_default )
+{
+	if( fPrepareTrainingOptions.find( iVarName ) == string::npos )
+	{
+		return i_default;
+	}
+	size_t s_0 = fPrepareTrainingOptions.find( iVarName ) + iVarName.size() + 1;
+	size_t s_1 = fPrepareTrainingOptions.find( ":", s_0 );
+	
+	return ( unsigned int )atoi( fPrepareTrainingOptions.substr( s_0, s_1 - s_0 ).c_str() );
+}
+
+
+/*
+ * update number of training events, if lower than requested
+ *
+ */
+void VTMVARunData::updateTrainingEvents( string iVarName, unsigned int iNEvents )
+{
+	unsigned int i_requested_nevents = getTrainOptionValue( iVarName, 0 );
+	
+	size_t s_0 = fPrepareTrainingOptions.find( iVarName ) + iVarName.size() + 1;
+	size_t s_1 = fPrepareTrainingOptions.find( ":", s_0 );
+	
+	if( iNEvents < i_requested_nevents )
+	{
+		cout << "WARNING: changing " << iVarName << " from ";
+		cout << i_requested_nevents << " to " << iNEvents << endl;
+		fPrepareTrainingOptions.replace( s_0, s_1 - s_0, std::to_string( iNEvents ) );
+	}
 }
 
 /*!
@@ -332,17 +377,20 @@ void VTMVARunData::print()
 	{
 		cout << "energy reconstruction method " << fEnergyCutData[0]->fEnergyReconstructionMethod << endl;
 	}
-	cout << "signal data file(s): " << endl;
-	for( unsigned int i = 0; i < fSignalFileName.size(); i++ )
+	if( fRunOption == "WRITETRAININGEVENTS" )
 	{
-		cout << "\t" << fSignalFileName[i] << endl;
-	}
-	if( !fTrainReconstructionQuality )
-	{
-		cout << "background data file(s): " << endl;
-		for( unsigned int i = 0; i < fBackgroundFileName.size(); i++ )
+		cout << "signal data file(s): " << endl;
+		for( unsigned int i = 0; i < fSignalFileName.size(); i++ )
 		{
-			cout << "\t" << fBackgroundFileName[i] << endl;
+			cout << "\t" << fSignalFileName[i] << endl;
+		}
+		if( !fTrainReconstructionQuality )
+		{
+			cout << "background data file(s): " << endl;
+			for( unsigned int i = 0; i < fBackgroundFileName.size(); i++ )
+			{
+				cout << "\t" << fBackgroundFileName[i] << endl;
+			}
 		}
 	}
 	cout << "output file: " << fOutputFileName << " (" << fOutputDirectoryName << ")" << endl;
@@ -527,22 +575,13 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				{
 					fPrepareTrainingOptions = is_stream.str().substr( is_stream.tellg(), is_stream.str().size() ).c_str();
 					fPrepareTrainingOptions = VUtilities::removeSpaces( fPrepareTrainingOptions );
-					// remove all spaces
+					fnTrain_Signal = getTrainOptionValue( "nTrain_Signal", 0 );
+					fnTrain_Background = getTrainOptionValue( "nTrain_Background", 0 );
 				}
 				else
 				{
 					cout << "VTMVARunData::readConfigurationFile error while reading input for variable PREPARE_TRAINING_OPTIONS" << endl;
 					return false;
-				}
-			}
-			// check event validity
-			if( temp == "CHECKEVENTVALIDITY" )
-			{
-				if( !( is_stream >> std::ws ).eof() )
-				{
-					int iT = 0;
-					is_stream >> iT;
-					fCheckValidityOfInputVariables = ( bool )iT;
 				}
 			}
 			// signal weight
@@ -617,18 +656,29 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				}
 			}
 			// energy bins
+			if( temp == "ENERGYBINEDGES" )
+			{
+				vector< double > iEnergyCut_Log10TeV_min;
+				vector< double > iEnergyCut_Log10TeV_max;
+				
+				// read in energy bin
+				while( !( is_stream >> std::ws ).eof() )
+				{
+					double iT = 0.;
+					is_stream >> iT;
+					iEnergyCut_Log10TeV_min.push_back( iT );
+					is_stream >> iT;
+					iEnergyCut_Log10TeV_max.push_back( iT );
+				}
+				if( !fillEnergyCutData( iEnergyCut_Log10TeV_min, iEnergyCut_Log10TeV_max ) )
+				{
+					return false;
+				}
+			}
 			if( temp == "ENERGYBINS" )
 			{
 				vector< double > iEnergyCut_Log10TeV_min;
 				vector< double > iEnergyCut_Log10TeV_max;
-				vector< TCut > iEnergyCut;
-				
-				// energy reconstruction method (should be 1, unless you know it better)
-				unsigned int iEMethod;
-				if( !( is_stream >> std::ws ).eof() )
-				{
-					is_stream >> iEMethod;
-				}
 				
 				// read in energy bin
 				while( !( is_stream >> std::ws ).eof() )
@@ -639,12 +689,6 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				}
 				// sort
 				sort( iEnergyCut_Log10TeV_min.begin(), iEnergyCut_Log10TeV_min.end() );
-				// check sanity
-				if( iEnergyCut_Log10TeV_min.size() < 2 )
-				{
-					cout << "VTMVARunData::readConfigurationFile error: need at least two energy bins " << iEnergyCut_Log10TeV_min.size() << endl;
-					return false;
-				}
 				// fill maximum bins
 				for( unsigned int i = 1; i < iEnergyCut_Log10TeV_min.size(); i++ )
 				{
@@ -652,31 +696,9 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				}
 				// remove last minimum
 				iEnergyCut_Log10TeV_min.pop_back();
-				// fill cuts
-				for( unsigned int i = 0; i < iEnergyCut_Log10TeV_min.size(); i++ )
+				if( !fillEnergyCutData( iEnergyCut_Log10TeV_min, iEnergyCut_Log10TeV_max ) )
 				{
-					ostringstream iCut;
-					if( iEMethod == 0 )
-					{
-						iCut << "Erec>0.&&"  << iEnergyCut_Log10TeV_min[i]  <<  "<log10(Erec)&&log10(Erec)<" << iEnergyCut_Log10TeV_max[i];
-					}
-					else
-					{
-						iCut << "ErecS>0.&&" <<  iEnergyCut_Log10TeV_min[i] <<  "<log10(ErecS)&&log10(ErecS)<" << iEnergyCut_Log10TeV_max[i];
-					}
-					iEnergyCut.push_back( iCut.str().c_str() );
-				}
-				// filling everything into the energy data structure
-				fEnergyCutData.clear();
-				for( unsigned int i = 0; i < iEnergyCut_Log10TeV_min.size(); i++ )
-				{
-					fEnergyCutData.push_back( new VTMVARunDataEnergyCut() );
-					fEnergyCutData.back()->SetName( "fDataEnergyCut" );
-					fEnergyCutData.back()->fEnergyCutBin = 0;
-					fEnergyCutData.back()->fEnergyCut_Log10TeV_min = iEnergyCut_Log10TeV_min[i];
-					fEnergyCutData.back()->fEnergyCut_Log10TeV_max = iEnergyCut_Log10TeV_max[i];
-					fEnergyCutData.back()->fEnergyCut = iEnergyCut[i];
-					fEnergyCutData.back()->fEnergyReconstructionMethod = iEMethod;
+					return false;
 				}
 			}
 			// zenith angle bins (in [deg])
@@ -698,7 +720,8 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				// check sanity
 				if( iZenithCut_min.size() < 2 )
 				{
-					cout << "VTMVARunData::readConfigurationFile error: need at least one zenith bin " << iZenithCut_min.size() << endl;
+					cout << "VTMVARunData::readConfigurationFile error: need at least one zenith bin ";
+					cout << iZenithCut_min.size() << endl;
 					return false;
 				}
 				// fill maximum bins
@@ -746,3 +769,63 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 	return true;
 }
 
+void VTMVARunData::shuffleFileVectors()
+{
+	std::random_device rd;
+	std::mt19937 g( rd() );
+	std::shuffle( fSignalFileName.begin(), fSignalFileName.end(), g );
+	std::shuffle( fBackgroundFileName.begin(), fBackgroundFileName.end(), g );
+}
+
+VTableLookupRunParameter* VTMVARunData::getTLRunParameter()
+{
+	TDirectory* iG_CurrentDirectory = gDirectory;
+	if( fSignalFileName.size() > 0 )
+	{
+		TFile* iF = new TFile( fSignalFileName[0].c_str() );
+		if( iF->IsZombie() )
+		{
+			cout << "Error reading run parameters from ";
+			cout << fSignalFileName[0] << endl;
+			return 0;
+		}
+		VTableLookupRunParameter* iP = ( VTableLookupRunParameter* )iF->Get( "TLRunParameter" );
+		iG_CurrentDirectory->cd();
+		return iP;
+	}
+	return 0;
+}
+
+bool VTMVARunData::fillEnergyCutData(
+	vector< double > iEnergyCut_Log10TeV_min,
+	vector< double > iEnergyCut_Log10TeV_max )
+{
+	// check sanity
+	if( iEnergyCut_Log10TeV_min.size() < 1 )
+	{
+		cout << "VTMVARunData::readConfigurationFile error: need at least two energy bins ";
+		cout << iEnergyCut_Log10TeV_min.size() << endl;
+		return false;
+	}
+	vector< TCut > iEnergyCut;
+	// fill cuts
+	for( unsigned int i = 0; i < iEnergyCut_Log10TeV_min.size(); i++ )
+	{
+		ostringstream iCut;
+		iCut << "ErecS>0.&&" <<  iEnergyCut_Log10TeV_min[i];
+		iCut <<  "<log10(ErecS)&&log10(ErecS)<" << iEnergyCut_Log10TeV_max[i];
+		iEnergyCut.push_back( iCut.str().c_str() );
+	}
+	// filling everything into the energy data structure
+	fEnergyCutData.clear();
+	for( unsigned int i = 0; i < iEnergyCut_Log10TeV_min.size(); i++ )
+	{
+		fEnergyCutData.push_back( new VTMVARunDataEnergyCut() );
+		fEnergyCutData.back()->SetName( "fDataEnergyCut" );
+		fEnergyCutData.back()->fEnergyCutBin = 0;
+		fEnergyCutData.back()->fEnergyCut_Log10TeV_min = iEnergyCut_Log10TeV_min[i];
+		fEnergyCutData.back()->fEnergyCut_Log10TeV_max = iEnergyCut_Log10TeV_max[i];
+		fEnergyCutData.back()->fEnergyCut = iEnergyCut[i];
+	}
+	return true;
+}

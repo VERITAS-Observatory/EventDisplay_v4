@@ -1,7 +1,6 @@
 /*! \class VTMVARunDataEnergyCut
     \brief  VTMVARunDataEnergyCut data class for TMVA energy cuts
 
-
 */
 
 #include "VTMVARunDataEnergyCut.h"
@@ -23,5 +22,3 @@ void VTMVARunDataEnergyCut::print()
 	cout << " method " << fEnergyReconstructionMethod << endl;
 	cout << "\t cuts: " << fEnergyCut.GetTitle() << endl;
 }
-
-

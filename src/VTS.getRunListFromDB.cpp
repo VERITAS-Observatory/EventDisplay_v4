@@ -254,8 +254,12 @@ void parseOptions( int argc, char* argv[] )
 				if( gSystem->Getenv( "EVNDISPSYS" ) )
 				{
 					char readme[500];
-					sprintf( readme, "cat %s/README/README.GETRUNLIST", ENV );
-					system( readme );
+					sprintf( readme, "cat %s/docs/GETRUNLIST.md", ENV );
+					int sys_ret = system( readme );
+					if( sys_ret == -1 )
+					{
+						cout << "error reading " << readme << endl;
+					}
 				}
 				else
 				{

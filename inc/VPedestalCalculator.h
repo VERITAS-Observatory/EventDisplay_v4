@@ -3,10 +3,10 @@
 #ifndef VPEDESTALCALCULATOR_H
 #define VPEDESTALCALCULATOR_H
 
-#include <VImageBaseAnalyzer.h>
-#include <VGlobalRunParameter.h>
-#include <VSkyCoordinatesUtilities.h>
-#include <VIPRCalculator.h>
+#include "VImageBaseAnalyzer.h"
+#include "VGlobalRunParameter.h"
+#include "VSkyCoordinatesUtilities.h"
+#include "VIPRCalculator.h"
 
 #include "TDirectory.h"
 #include "TFile.h"
@@ -48,8 +48,7 @@ class VPedestalCalculator : public VImageBaseAnalyzer
 		vector< vector< vector< float > > > fpedcal_mean;
 		vector< vector< vector< float > > > fpedcal_mean2;
 		vector< vector< vector< TH1F* > > > fpedcal_histo;
-		std::vector<std::vector<TH1F*> > copy_fpedcal_histo;
-
+		
 		vector< vector< float > > v_temp_pedEntries;
 		vector< vector< float > > v_temp_ped;
 		vector< vector< float > > v_temp_pedvar;
@@ -75,13 +74,11 @@ class VPedestalCalculator : public VImageBaseAnalyzer
 		vector< vector< vector< vector< float > > > > v_pedvar;
 		vector< vector< vector< vector< float > > > > v_ped_median;
 		vector< vector< vector< vector< float > > > > v_pedvar68;
-	
-		vector< vector< vector< TH1F* > > > fpedcal_histo_sw;
-	
+		
 		VPedestalCalculator();
 		~VPedestalCalculator() {}
 		
-		void doAnalysis( bool iLowGain = false , VIPRCalculator *fIPRCalculator = 0 );
+		void doAnalysis( bool iLowGain = false );
 		vector< TTree* > getPedestalTree()
 		{
 			return fTree;

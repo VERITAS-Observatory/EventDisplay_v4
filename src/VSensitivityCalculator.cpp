@@ -495,7 +495,7 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
 	if( fEnergySpectrumfromLiterature == 0 )
 	{
 		char hname[800];
-		char hname2[800];
+		ostringstream hname2;
 		unsigned int i_CrabSpectrum_ID = 1;              // NOTE: hardwired to 1!
 		
 		// Whipple Crab spectrum (1989)
@@ -519,17 +519,19 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
 		}
 		if( bUnit == "PFLUX" )
 		{
-			sprintf( hname2, "%s", hname );
+			hname2 << hname;
 		}
 		else if( bUnit == "ENERGY" )
 		{
-			sprintf( hname2, "%s * 1.e12 * x * x * %e", hname, fConstant_Flux_To_Ergs );
+			hname2 << hname << " * 1.e12 * x * x * " << scientific << fConstant_Flux_To_Ergs;
 		}
 		else
 		{
-			sprintf( hname2, "%f", 1. );
+			hname2.clear();
+			hname2.str( std::string() );
+			hname2 << "1.";
 		}
-		i_fFunCrabFlux = new TF1( "i_fFunCrabFlux", hname2, TMath::Power( 10., fEnergy_min_Log ), 10000. );
+		i_fFunCrabFlux = new TF1( "i_fFunCrabFlux", hname2.str().c_str(), TMath::Power( 10., fEnergy_min_Log ), 10000. );
 	}
 	// use spectrum from text file
 	else
@@ -1355,7 +1357,7 @@ TCanvas* VSensitivityCalculator::plotObservationTimevsFlux( unsigned int iD, TCa
 }
 
 
-void VSensitivityCalculator::list_sensitivity( unsigned int iD )
+void VSensitivityCalculator::list_sensitivity( unsigned int iD, bool print_latex_table_line, string iTitle )
 {
 	if( !checkDataSet( iD, "plotObservationTimevsFlux" ) )
 	{
@@ -1364,6 +1366,18 @@ void VSensitivityCalculator::list_sensitivity( unsigned int iD )
 	
 	calculateObservationTimevsFlux( iD );
 	
+	if( print_latex_table_line )
+	{
+		list_sensitivity_latex_table( iD, iTitle );
+	}
+	else
+	{
+		list_sensitivity_table( iD );
+	}
+}
+
+void VSensitivityCalculator::list_sensitivity_table( unsigned int iD )
+{
 	cout << " Flux               time           time" << endl;
 	cout << " [Crab Units]       [min]           [h]" << endl;
 	cout << " ========================================" << endl;
@@ -1380,6 +1394,42 @@ void VSensitivityCalculator::list_sensitivity( unsigned int iD )
 	cout << " events, and using Li & Ma formula " << fLiAndMaEqu << ")" << endl;
 }
 
+void VSensitivityCalculator::list_sensitivity_latex_table(
+	unsigned int iD, string iTitle,
+	double iSignalE, double iBackgroundE )
+{
+	cout << "LATEXLINE  ";
+	cout << iTitle << "  &  ";
+	if( iSignalE > 0. )
+	{
+		cout << fData[iD].fSignal << " \\pm " << iSignalE << " & ";
+	}
+	else
+	{
+		cout << fData[iD].fSignal << " & ";
+	}
+	if( iBackgroundE > 0. )
+	{
+		cout << fData[iD].fBackground << " \\pm " << iBackgroundE << " & ";
+	}
+	else
+	{
+		cout << fData[iD].fBackground << " & ";
+	}
+	// assume that 10 and 1% values are in source strength vectors
+	for( unsigned int i = 0; i < fSourceStrength.size(); i++ )
+	{
+		if( TMath::Abs( fSourceStrength[i] - 0.1 ) < 1.e-7 )
+		{
+			cout << setprecision( 3 ) << fGraphObsvsTime[iD]->Eval( fSourceStrength[i] ) * 60. << "  &  ";
+		}
+		if( TMath::Abs( fSourceStrength[i] - 0.01 ) < 1.e-7 )
+		{
+			cout << setprecision( 3 ) << fGraphObsvsTime[iD]->Eval( fSourceStrength[i] ) << " ";
+		}
+	}
+	cout <<  "\\\\" << endl;
+}
 
 double VSensitivityCalculator::calculateObservationTimevsFlux( unsigned int iD )
 {

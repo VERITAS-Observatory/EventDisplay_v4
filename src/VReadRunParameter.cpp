@@ -2,7 +2,7 @@
     \brief read command line parameters and do some tests for consistency
 
      evndisp -help gives an overview of the most important parameters
-     all parameters are listed in README/README.EVNDISP.commandline
+     all parameters are listed in docs/EVNDISP.commandline.md
 
 */
 
@@ -779,7 +779,6 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			{
 				fRunPara->foutputfileName = "";
 			}
-			cout << fRunPara->foutputfileName.c_str() << endl;
 		}
 		else if( iTemp.find( "highres" ) < iTemp.size() )
 		{
@@ -1536,10 +1535,10 @@ void VReadRunParameter::printHelp()
 	cout << endl;
 	if( gSystem->Getenv( "EVNDISPSYS" ) )
 	{
-		int syst_ret = system( "cat $EVNDISPSYS/README/README.EVNDISP" );
+		int syst_ret = system( "cat $EVNDISPSYS/docs/EVNDISP.commandline.md" );
 		if( syst_ret == -1 )
 		{
-			cout << "VReadRunParameter::printHelp() error: could not find helper file in README directory" << endl;
+			cout << "VReadRunParameter::printHelp() error: could not find helper file in docs directory" << endl;
 		}
 	}
 	else
@@ -1555,9 +1554,7 @@ void VReadRunParameter::setDirectories()
 	
 	// outputfilename
 	//suppress output file for peds			gain/toffset		low gain/toffset		lpeds			DSTs
-	cout << fRunPara->foutputfileName << endl;
-	//if( fRunPara->frunmode == 1 || fRunPara->frunmode == 2 || fRunPara->frunmode == 5 || fRunPara->frunmode == 6 || fRunPara->frunmode == 4 )
-	if( fRunPara->frunmode == 2 || fRunPara->frunmode == 5 || fRunPara->frunmode == 6 || fRunPara->frunmode == 4 )
+	if( fRunPara->frunmode == 1 || fRunPara->frunmode == 2 || fRunPara->frunmode == 5 || fRunPara->frunmode == 6 || fRunPara->frunmode == 4 )
 	{
 		fRunPara->foutputfileName = "-1";
 	}

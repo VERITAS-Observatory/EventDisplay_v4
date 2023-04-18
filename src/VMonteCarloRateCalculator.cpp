@@ -38,7 +38,6 @@ VMonteCarloRateCalculator::VMonteCarloRateCalculator( string ifile )
 	fMCTree->SetBranchAddress( "noise", &fnoise );
 	fMCTree->SetBranchAddress( "nrates", &fnrates );
 	fMCTree->SetBranchAddress( "MCrate", fMCrate );
-	
 }
 
 
@@ -129,9 +128,10 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double >& e, vector
 	if( bDebug )
 	{
 		cout << "VMonteCarloRateCalculator::getMonteCarloRate " << e.size() << "\t" << eff.size() << endl;
-		cout << "\t Gamma " << i_gamma << " phi: " << i_phi << " E0: " << iE0;
+		cout << "\t Gamma " << i_gamma;
+		cout << scientific << " phi: " << i_phi << fixed << " E0: " << iE0;
 		cout << " EMin: " << iEMin << " EMax: " << iEMax;
-		cout << "Rate [1/s]: " << iTot << " Rate [1/min]: " << iTot * 60. << endl;
+		cout << " Rate [1/s]: " << iTot << " Rate [1/min]: " << iTot * 60. << endl;
 	}
 	if( e.size() != eff.size() || e.size() <= 2 )
 	{

@@ -135,9 +135,6 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	
 	// reset cut strings and variables
 	resetRunOptions();
-
-	//add if statement: if ipr should be in time slices
-	fIPRTimeSlices = true;
 }
 
 
@@ -278,12 +275,16 @@ bool VEventLoop::initEventLoop( string iFileName )
 				unsigned int i_counter = 0;
 				for( ;; )
 				{
-					i_tempReader.getNextEvent();
+					if( !i_tempReader.getNextEvent() )
+					{
+						break;
+					}
 					for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
 					{
 						i_tempReader.setTelescopeID( fRunPar->fTelToAnalyze[i] );
 						// set number of samples
-						if( i_tempReader.getNumSamples() > 4 )
+						// (require at least 10 samples for any reasonable analysis)
+						if( i_tempReader.getNumSamples() > 9 )
 						{
 							setNSamples( fRunPar->fTelToAnalyze[i], i_tempReader.getNumSamples() );
 							i_nSampleSet[i] = true;
@@ -322,22 +323,18 @@ bool VEventLoop::initEventLoop( string iFileName )
 						}
 					}
 					i_counter++;
-					if( i_counter == 1000 )
+					if( i_counter == 10000 )
 					{
-						cout << "VEventLoop warning: could not find number of samples in the first 1000 events";
+						cout << "VEventLoop warning: could not find number of samples in the first 10000 events";
 						cout << " (this is normal for runs with event losses at the beginning)" << endl;
 					}
-					if( i_counter > 999999 )
-					{
-						cout << "VEventLoop warning: could not find number of samples in the first 999999 events" << endl;
-						break;
-					}
 				}
-				if( getNSamples() == 0 || i_counter > 99999 )
+				// if( getNSamples() == 0 || i_counter > 9999998 )
+				if( getNSamples() == 0 )
 				{
 					cout << "VEventLoop::initEventLoop error: could not find any telescope events to determine sample length" << endl;
 					cout << "exiting..." << endl;
-					exit( -1 );
+					exit( EXIT_FAILURE );
 				}
 				cout << "Found consistent number of samples in vbf file after " << i_counter + 1 << " event(s): ";
 				for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
@@ -479,17 +476,16 @@ bool VEventLoop::initEventLoop( string iFileName )
 	// initialize analyzers (output files are created as well here)
 	initializeAnalyzers();
 	
-
 	if( fIPRCalculator  ){
                   cout << "initializing IPR calculator" << endl;
                   fIPRCalculator->initialize();
-        }
-		
+        }		
 	// create calibrators, analyzers, etc. at first event
 	if( fCalibrator )
 	{
-		fCalibrator->initialize(fIPRCalculator);
+		fCalibrator->initialize(fIPRCalculator );
 	}
+	
 	// initialize pedestal calculator
 	if( fPedestalCalculator && fRunPar->fPedestalsInTimeSlices )
 	{
@@ -829,7 +825,7 @@ void VEventLoop::shutdown()
 		}
 		if( fCalibrator )
 		{
-			fCalibrator->terminate( iP , fIPRCalculator);
+			fCalibrator->terminate( iP );
 		}
 	}
 	// write data summary
@@ -1022,14 +1018,6 @@ bool VEventLoop::nextEvent()
 			else
 			{
 				cout << "!!! void VEventLoop::nextEvent(): no next event (end of file)" << endl;
-				for (int tel =0; tel < fIPRCalculator->getStorageHist().size(); tel++){
-					for (int ts =0; ts < fIPRCalculator->getStorageHist()[tel].size(); ts++){
-						for (int p =0; p < fIPRCalculator->getStorageHist()[tel][ts].size(); p++){
-							for (int sw =0; sw < fIPRCalculator->getStorageHist()[tel][ts][p].size(); sw++){
-								fIPRCalculator->checkHistEmpty(tel, ts, p, sw);
-							}}}}
-
-
 				// if the display is run in the loop mode, goto event 0 and start again
 				if( fRunPar->floopmode )
 				{
@@ -1138,7 +1126,6 @@ int VEventLoop::analyzeEvent()
 		cout << "\t now at event " << getEventNumber() << endl;
 		cout << "----------------------------------------" << endl;
 	}
-
 	// analysis is running
 	fAnalyzeMode = true;
 	int i_cut = 0;
@@ -1309,6 +1296,7 @@ int VEventLoop::analyzeEvent()
 			// analysis
 			case R_ANA:                           // analysis mode
 				// ignore pedestal events (important for VBF only)
+				cout << getEventNumber() << endl;
 #ifndef NOVBF
 				if( fReader->getATEventType() != VEventType::PED_TRIGGER )
 #endif
@@ -1469,7 +1457,7 @@ int VEventLoop::analyzeEvent()
 			setTelID( fRunPar->fTelToAnalyze[i] );
 			if( fRunPar->fPedestalsInTimeSlices && !fReader->wasLossyCompressed() )
 			{
-				fPedestalCalculator->doAnalysis( fRunMode == R_PEDLOW, fIPRCalculator );
+				fPedestalCalculator->doAnalysis( fRunMode == R_PEDLOW );
 			}
 		}
 	}

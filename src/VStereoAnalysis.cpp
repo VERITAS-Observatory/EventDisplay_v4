@@ -11,7 +11,7 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 	fDebug = false;
 	
 	fDataFile = 0;
-	fInstrumentEpoch = "NOT_SET";
+	fInstrumentEpochMinor = "NOT_SET";
 	fDirTot = iDirTot;
 	fDirTotRun = iDirRun;
 	bTotalAnalysisOnly = iTotalAnalysisOnly;
@@ -848,33 +848,37 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 		// copy effective areas and radial acceptance to anasum output file
 		if( bOn )
 		{
-			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveArea );
-			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveArea );
-			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEsys_MC );
-			
-			// Both MC and REC  effective areas are required for Binned Likelihood analysis
-			if( fRunPara->fLikelihoodAnalysis )
+			if( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile != "IGNOREEFFECTIVEAREA"
+					&& fRunPara->fRunList[fHisCounter].fEffectiveAreaFile != "IGNOREIRF" )
 			{
-				if( gMeanEffectiveAreaMC )
+				fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveArea );
+				fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveArea );
+				fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEsys_MC );
+				
+				// Both MC and REC  effective areas are required for Binned Likelihood analysis
+				if( fRunPara->fLikelihoodAnalysis )
 				{
-					// (SOB) When nOn = 0 gMeanEffectiveAreaMC_on(E) = 0
-					// VLikelihoodFitter will check gMeanEffectiveAreaMC_on::integral > 1
-					gMeanEffectiveAreaMC->SetTitle( "gMeanEffectiveAreaMC_on" );
-					gMeanEffectiveAreaMC->SetName( "gMeanEffectiveAreaMC_on" );
-					
-					fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveAreaMC );
+					if( gMeanEffectiveAreaMC )
+					{
+						// When nOn = 0 gMeanEffectiveAreaMC_on(E) = 0
+						// VLikelihoodFitter will check gMeanEffectiveAreaMC_on::integral > 1
+						gMeanEffectiveAreaMC->SetTitle( "gMeanEffectiveAreaMC_on" );
+						gMeanEffectiveAreaMC->SetName( "gMeanEffectiveAreaMC_on" );
+						
+						fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveAreaMC );
+					}
+					if( hResponseMatrix )
+					{
+						hResponseMatrix->SetTitle( "hResponseMatrix_on" );
+						hResponseMatrix->SetName( "hResponseMatrix_on" );
+						fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", hResponseMatrix );
+					}
 				}
-				if( hResponseMatrix )
+				if( fRunPara->fRunList[fHisCounter].fAcceptanceFile.size() > 0
+						&& fRunPara->fRunList[fHisCounter].fAcceptanceFile != "IGNOREACCEPTANCE" )
 				{
-					hResponseMatrix->SetTitle( "hResponseMatrix_on" );
-					hResponseMatrix->SetName( "hResponseMatrix_on" );
-					fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", hResponseMatrix );
+					fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fAcceptanceFile, "RadialAcceptances", 0 );
 				}
-			}
-			if( fRunPara->fRunList[fHisCounter].fAcceptanceFile.size() > 0
-					&& fRunPara->fRunList[fHisCounter].fAcceptanceFile != "IGNOREACCEPTANCE" )
-			{
-				fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fAcceptanceFile, "RadialAcceptances", 0 );
 			}
 		}
 		else
@@ -890,11 +894,15 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 				sprintf( hname, "%s_off", gTimeBinnedMeanEffectiveArea->GetName() );
 				gTimeBinnedMeanEffectiveArea->SetName( hname );
 			}
-			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveArea );
-			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveArea );
+			if( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile != "IGNOREEFFECTIVEAREA"
+					&& fRunPara->fRunList[fHisCounter].fEffectiveAreaFile != "IGNOREIRF" )
+			{
+				fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveArea );
+				fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveArea );
+			}
 			
 			// Both MC and REC  effective areas are required for Binned Likelihood analysis
-			// (SOB) A set of Off MC effective areas and response matrix are used as a back up
+			// A set of Off MC effective areas and response matrix are used as a back up
 			// If zero On counts the Off set will be used
 			if( fRunPara->fLikelihoodAnalysis )
 			{
@@ -1789,8 +1797,10 @@ void VStereoAnalysis::setCuts( VAnaSumRunParameterDataClass iL, int irun )
 {
 	if( iL.fCutFile != "" )
 	{
-		// read cuts from root file
-		if( iL.fCutFile.find( ".root" ) != string::npos )
+		// read cuts from effective area root file
+		if( iL.fCutFile.find( ".root" ) != string::npos
+				&& iL.fCutFile.find( "IGNOREEFFECTIVEAREA" ) == string::npos
+				&& iL.fCutFile.find( "IGNOREIRF" ) == string::npos )
 		{
 			string iEffFile = VUtilities::testFileLocation( iL.fCutFile, "EffectiveAreas", true );
 			
@@ -1811,13 +1821,14 @@ void VStereoAnalysis::setCuts( VAnaSumRunParameterDataClass iL, int irun )
 				exit( EXIT_FAILURE );
 			}
 			fCuts = iC;
+			cout << "Reading gamma/hadron cuts from effective area file " << iEffFile << endl;
 			iF->Close();
 		}
 		// read cuts from text file
 		else
 		{
 			fCuts->setNTel( iL.fMaxTelID );
-			fCuts->setInstrumentEpoch( fInstrumentEpoch );
+			fCuts->setInstrumentEpoch( fInstrumentEpochMinor );
 			fCuts->setTelToAnalyze( fTelToAnalyze );
 			fCuts->readCuts( iL.fCutFile );
 			fCuts->setTheta2Cut( iL.fSourceRadius );
@@ -1964,7 +1975,7 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
 		VEvndispRunParameter* i_runPara = ( VEvndispRunParameter* )fDataFile->Get( "runparameterV2" );
 		if( i_runPara )
 		{
-			fInstrumentEpoch = i_runPara->getInstrumentEpoch( true );
+			fInstrumentEpochMinor = i_runPara->getInstrumentATMString();
 			fTelToAnalyze = i_runPara->fTelToAnalyze;
 		}
 		else
@@ -1972,7 +1983,7 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
 			cout << "VStereoAnalysis::getDataFromFile() warning: epoch of current file " << endl;
 			cout << "and active telescope combination cannot be determined; " << endl;
 			cout << "this might lead to a wrong choice in the gamma/hadron cuts - please check" << endl;
-			fInstrumentEpoch = "NOT_FOUND";
+			fInstrumentEpochMinor = "NOT_FOUND";
 		}
 	}
 	return c;

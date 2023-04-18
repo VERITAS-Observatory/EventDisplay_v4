@@ -8,10 +8,10 @@
 #include <bitset>
 #include <iostream>
 
-#include <VGlobalRunParameter.h>
-#include <VImageBaseAnalyzer.h>
-#include <VImageCleaning.h>
-#include <VDSTTree.h>
+#include "VGlobalRunParameter.h"
+#include "VImageBaseAnalyzer.h"
+#include "VImageCleaning.h"
+#include "VDSTTree.h"
 
 ///////////////////////////////////////////////////////////////////////////////////
 // MAXIMUM NUMBER OF TELESCOPES AND CHANNELS IS DEFINED IN EVNDISP_definition.h
