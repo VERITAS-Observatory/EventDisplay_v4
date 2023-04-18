@@ -147,21 +147,21 @@ double checkIfVariableIsConstant( VTMVARunData* iRun, TCut iCut, string iVariabl
 */
 
 bool trainGammaHadronSeparation( VTMVARunData* iRun,
-        unsigned int iEnergyBin, unsigned int iZenithBin )
+								 unsigned int iEnergyBin, unsigned int iZenithBin )
 {
 	return train( iRun, iEnergyBin, iZenithBin, true );
 }
 
 bool trainReconstructionQuality( VTMVARunData* iRun,
-        unsigned int iEnergyBin, unsigned int iZenithBin )
+								 unsigned int iEnergyBin, unsigned int iZenithBin )
 {
 	return train( iRun, iEnergyBin, iZenithBin, false );
 }
 
 
 bool train( VTMVARunData* iRun,
-        unsigned int iEnergyBin, unsigned int iZenithBin,
-        bool iTrainGammaHadronSeparation )
+			unsigned int iEnergyBin, unsigned int iZenithBin,
+			bool iTrainGammaHadronSeparation )
 {
 	// sanity checks
 	if( !iRun )
@@ -217,15 +217,15 @@ bool train( VTMVARunData* iRun,
 	}
 	
 	// quality cuts before training
-	TCut iCutSignal = iRun->fQualityCuts 
-        && iRun->fMCxyoffCut && 
-        iRun->fEnergyCutData[iEnergyBin]->fEnergyCut 
-        && iRun->fZenithCutData[iZenithBin]->fZenithCut;
-
-	TCut iCutBck = iRun->fQualityCuts && iRun->fQualityCutsBkg 
-        && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut 
-        && iRun->fZenithCutData[iZenithBin]->fZenithCut;
-
+	TCut iCutSignal = iRun->fQualityCuts
+					  && iRun->fMCxyoffCut &&
+					  iRun->fEnergyCutData[iEnergyBin]->fEnergyCut
+					  && iRun->fZenithCutData[iZenithBin]->fZenithCut;
+					  
+	TCut iCutBck = iRun->fQualityCuts && iRun->fQualityCutsBkg
+				   && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut
+				   && iRun->fZenithCutData[iZenithBin]->fZenithCut;
+				   
 	if( !iRun->fMCxyoffCutSignalOnly )
 	{
 		iCutBck = iCutBck && iRun->fMCxyoffCut;
@@ -318,52 +318,52 @@ bool train( VTMVARunData* iRun,
 	// nTrain Signal=5000:nTrain Background=5000: nTest Signal=4000:nTest Background=5000
 	
 	dataloader->PrepareTrainingAndTestTree( iCutSignal,
-            iCutBck, 
-            iRun->fPrepareTrainingOptions );
-	
+											iCutBck,
+											iRun->fPrepareTrainingOptions );
+											
 	//////////////////////////////////////////
 	// book all methods
 	char htitle[6000];
 	
 	for( unsigned int i = 0; i < iRun->fMVAMethod.size(); i++ )
 	{
-        TMVA::Types::EMVA i_tmva_type = TMVA::Types::kBDT;
+		TMVA::Types::EMVA i_tmva_type = TMVA::Types::kBDT;
 		if( iRun->fMVAMethod[i] == "BDT" )
 		{
 			if( iTrainGammaHadronSeparation )
 			{
 				sprintf( htitle, "BDT_0" );
-                i_tmva_type = TMVA::Types::kBDT;
+				i_tmva_type = TMVA::Types::kBDT;
 			}
 			else
 			{
 				sprintf( htitle, "BDT_RecQuality_0" );
 			}
-        }
-        else if( iRun->fMVAMethod[i] == "MLP" ) 
-        {
-            i_tmva_type = TMVA::Types::kMLP;
-        }
-
+		}
+		else if( iRun->fMVAMethod[i] == "MLP" )
+		{
+			i_tmva_type = TMVA::Types::kMLP;
+		}
+		
 		//////////////////////////
-        if( iRun->fMVAMethod[i] != "BOXCUTS" )
+		if( iRun->fMVAMethod[i] != "BOXCUTS" )
 		{
 			if( iTrainGammaHadronSeparation )
 			{
-                sprintf( htitle, "%s_%u", iRun->fMVAMethod[i].c_str(), i );
+				sprintf( htitle, "%s_%u", iRun->fMVAMethod[i].c_str(), i );
 			}
 			else
 			{
-                sprintf( htitle, "%s_RecQuality_%u", iRun->fMVAMethod[i].c_str(), i );
+				sprintf( htitle, "%s_RecQuality_%u", iRun->fMVAMethod[i].c_str(), i );
 			}
 			if( i < iRun->fMVAMethod_Options.size() )
 			{
-                cout << "Booking method " << htitle << endl;
-                factory->BookMethod( dataloader, i_tmva_type, htitle, iRun->fMVAMethod_Options[i].c_str() );
+				cout << "Booking method " << htitle << endl;
+				factory->BookMethod( dataloader, i_tmva_type, htitle, iRun->fMVAMethod_Options[i].c_str() );
 			}
 			else
 			{
-                factory->BookMethod( dataloader, i_tmva_type, htitle );
+				factory->BookMethod( dataloader, i_tmva_type, htitle );
 			}
 		}
 		//////////////////////////
@@ -372,7 +372,7 @@ bool train( VTMVARunData* iRun,
 		else if( iRun->fMVAMethod[i] == "BOXCUTS" )
 		{
 			stringstream i_opt;
-				i_opt << iRun->fMVAMethod_Options[i].c_str();
+			i_opt << iRun->fMVAMethod_Options[i].c_str();
 			for( unsigned int i = 0; i < iRun->fTrainingVariable_CutRangeMin.size(); i++ )
 			{
 				i_opt << ":CutRangeMin[" << i << "]=" << iRun->fTrainingVariable_CutRangeMin[i];
@@ -466,9 +466,9 @@ int main( int argc, char* argv[] )
 	//////////////////////////////////////
 	// train MVA
 	// (one training per energy bin)
-    cout << "Number of energy bins: " << fData->fEnergyCutData.size();
-    cout << ", number of zenith bins: " << fData->fZenithCutData.size();
-    cout << endl;
+	cout << "Number of energy bins: " << fData->fEnergyCutData.size();
+	cout << ", number of zenith bins: " << fData->fZenithCutData.size();
+	cout << endl;
 	cout << "================================" << endl << endl;
 	for( unsigned int i = 0; i < fData->fEnergyCutData.size(); i++ )
 	{
@@ -477,15 +477,15 @@ int main( int argc, char* argv[] )
 			if( fData->fEnergyCutData[i]->fEnergyCut && fData->fZenithCutData[j]->fZenithCut )
 			{
 				cout << "Training energy bin " << fData->fEnergyCutData[i]->fEnergyCut;
-                cout << " zenith bin " << fData->fZenithCutData[j]->fZenithCut << endl;
+				cout << " zenith bin " << fData->fZenithCutData[j]->fZenithCut << endl;
 				cout << "===================================================================================" << endl;
 				cout << endl;
 			}
-            // training
+			// training
 			if( fData->fTrainGammaHadronSeparation && !trainGammaHadronSeparation( fData, i, j ) )
 			{
-                cout << "Error during training...exiting" << endl;
-                exit( EXIT_FAILURE );
+				cout << "Error during training...exiting" << endl;
+				exit( EXIT_FAILURE );
 			}
 			if( fData->fTrainReconstructionQuality )
 			{
@@ -514,37 +514,37 @@ int main( int argc, char* argv[] )
 				iTempS2 << fData->fOutputFileName << ".root";
 			}
 			
-            // prepare a short root file with the necessary values only
-            // write energy & zenith cuts, plus signal and background efficiencies
+			// prepare a short root file with the necessary values only
+			// write energy & zenith cuts, plus signal and background efficiencies
 			TFile* root_file = fData->fOutputFile[i][j];
-            if( !root_file )
-            {
-                cout << "Error finding tvma root file " << endl;
-                continue;
-            }
+			if( !root_file )
+			{
+				cout << "Error finding tvma root file " << endl;
+				continue;
+			}
 			TFile* short_root_file = TFile::Open( iTempS.str().c_str(), "RECREATE" );
-            if( !short_root_file->IsZombie() )
-            {
-                VTMVARunDataEnergyCut* fDataEnergyCut = ( VTMVARunDataEnergyCut* )root_file->Get( "fDataEnergyCut" );
-                VTMVARunDataZenithCut* fDataZenithCut = ( VTMVARunDataZenithCut* )root_file->Get( "fDataZenithCut" );
-                TH1D* MVA_BDT_0_effS = ( TH1D* )root_file->Get( "Method_BDT/BDT_0/MVA_BDT_0_effS" );
-                TH1D* MVA_BDT_0_effB = ( TH1D* )root_file->Get( "Method_BDT/BDT_0/MVA_BDT_0_effB" );
-                fDataEnergyCut->Write();
-                fDataZenithCut->Write();
-                TDirectory* Method_BDT = short_root_file->mkdir( "Method_BDT" );
-                Method_BDT->cd();
-                TDirectory* BDT_0 = Method_BDT->mkdir( "BDT_0" );
-                BDT_0->cd();
-                MVA_BDT_0_effS->Write();
-                MVA_BDT_0_effB->Write();
-                short_root_file->GetList();
-                short_root_file->Write();
-                short_root_file->Close();
-            }
-            else
-            {
-                cout << "Error: could not create file with energy cuts " << iTempS.str().c_str() << endl;
-            }
+			if( !short_root_file->IsZombie() )
+			{
+				VTMVARunDataEnergyCut* fDataEnergyCut = ( VTMVARunDataEnergyCut* )root_file->Get( "fDataEnergyCut" );
+				VTMVARunDataZenithCut* fDataZenithCut = ( VTMVARunDataZenithCut* )root_file->Get( "fDataZenithCut" );
+				TH1D* MVA_BDT_0_effS = ( TH1D* )root_file->Get( "Method_BDT/BDT_0/MVA_BDT_0_effS" );
+				TH1D* MVA_BDT_0_effB = ( TH1D* )root_file->Get( "Method_BDT/BDT_0/MVA_BDT_0_effB" );
+				fDataEnergyCut->Write();
+				fDataZenithCut->Write();
+				TDirectory* Method_BDT = short_root_file->mkdir( "Method_BDT" );
+				Method_BDT->cd();
+				TDirectory* BDT_0 = Method_BDT->mkdir( "BDT_0" );
+				BDT_0->cd();
+				MVA_BDT_0_effS->Write();
+				MVA_BDT_0_effB->Write();
+				short_root_file->GetList();
+				short_root_file->Write();
+				short_root_file->Close();
+			}
+			else
+			{
+				cout << "Error: could not create file with energy cuts " << iTempS.str().c_str() << endl;
+			}
 			// copy complete TMVA output root-file to another directory
 			string iOutputFileName( fData->fOutputDirectoryName + "/" + iTempS2.str() );
 			string iOutputFileNameCompleteSubDir( "complete_BDTroot" );

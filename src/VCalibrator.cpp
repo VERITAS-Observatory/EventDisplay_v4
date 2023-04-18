@@ -358,7 +358,7 @@ void VCalibrator::calculatePedestals( bool iLowGain )
    this might be an ascii file and/or a root file
 
 */
-void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalculator, bool iWriteAsciiFile, VIPRCalculator *fIPRCalculator )
+void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalculator, bool iWriteAsciiFile, VIPRCalculator* fIPRCalculator )
 {
 	if( getDebugFlag() )
 	{
@@ -506,18 +506,21 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 						}
 					}
 				}
-				for (unsigned int ts = 0; ts < (fIPRCalculator->getStorageHist())[tel].size(); ts++){
-		                        for (unsigned int p = 0; p <  getNChannels(); p++){
-						for(unsigned int sw = 0; sw <  (fIPRCalculator->getStorageHist())[tel][ts][p].size(); sw++)
+				for( unsigned int ts = 0; ts < ( fIPRCalculator->getStorageHist() )[tel].size(); ts++ )
+				{
+					for( unsigned int p = 0; p <  getNChannels(); p++ )
+					{
+						for( unsigned int sw = 0; sw < ( fIPRCalculator->getStorageHist() )[tel][ts][p].size(); sw++ )
 						{
-                               				if (fIPRCalculator->getIPRPedestalHisto(tel, ts, p, sw) ){
-                                                		fIPRCalculator->getIPRPedestalHisto(tel, ts, p, sw)->SetName(Form( "hped_Tel%d_TS%d_Pix%d_SW%d", (int)telType, ts, p, sw ) );
-				                                fIPRCalculator->getIPRPedestalHisto(tel, ts, p, sw)->SetTitle( Form("hped_Tel%d_TS%d_Pix%d_SW%d", (int)telType, ts, p, sw ) );
-        		        		                fIPRCalculator->getIPRPedestalHisto(tel, ts, p, sw)->Write();
-                	                       		}
+							if( fIPRCalculator->getIPRPedestalHisto( tel, ts, p, sw ) )
+							{
+								fIPRCalculator->getIPRPedestalHisto( tel, ts, p, sw )->SetName( Form( "hped_Tel%d_TS%d_Pix%d_SW%d", ( int )telType, ts, p, sw ) );
+								fIPRCalculator->getIPRPedestalHisto( tel, ts, p, sw )->SetTitle( Form( "hped_Tel%d_TS%d_Pix%d_SW%d", ( int )telType, ts, p, sw ) );
+								fIPRCalculator->getIPRPedestalHisto( tel, ts, p, sw )->Write();
+							}
 						}
-                        		}
-                		}
+					}
+				}
 			}
 			iFileWritten[telType] = true;
 		}
@@ -563,9 +566,9 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 			&& getRunParameter()->fPedestalSingleRootFile )
 	{
 		// write one IPR graph per telescope type and summation window
-		
+	
 		cout << "Calculating IPR graphs " << endl;
-		
+	
 		// keep track of telescope type
 		map< ULong64_t, bool > iTelDone;
 		for( unsigned int i = 0; i < getDetectorGeometry()->getTelType_list().size(); i++ )
@@ -575,9 +578,9 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 		for( unsigned int i = 0; i < fNTel; i++ )
 		{
 			setTelID( i );
-			
+	
 			ULong64_t iTelType = getTelType( i );
-			
+	
 			if( !iTelDone[iTelType] )
 			{
 				if( iTelType >= hped_vec.size() )
@@ -1602,7 +1605,7 @@ void VCalibrator::writeTOffsets( bool iLowGain )
 }
 
 
-void VCalibrator::terminate( VPedestalCalculator* iP, VIPRCalculator *fIPRCalculator )
+void VCalibrator::terminate( VPedestalCalculator* iP, VIPRCalculator* fIPRCalculator )
 {
 
 	if( fRunPar->frunmode == 1 || fRunPar->frunmode == 6 )
@@ -1654,8 +1657,9 @@ void VCalibrator::readCalibrationData()
 				getGains( true ) = getGains( false );
 			}
 		}
-		else{
-
+		else
+		{
+		
 		}
 		
 		// read average tzeros
@@ -3109,7 +3113,7 @@ void VCalibrator::readTOffsets( bool iLowGain )
 }
 
 
-void VCalibrator::initialize(VIPRCalculator *fIPRCalculator )
+void VCalibrator::initialize( VIPRCalculator* fIPRCalculator )
 {
 	if( fDebug )
 	{
@@ -3219,7 +3223,8 @@ void VCalibrator::initialize(VIPRCalculator *fIPRCalculator )
 		{
 			readCalibrationData();
 		}
-		else{
+		else
+		{
 		}
 	}
 	// PE mode: set gains to 1
@@ -3242,7 +3247,7 @@ void VCalibrator::initialize(VIPRCalculator *fIPRCalculator )
 	// if needed: write IPR graphs to disk
 	if( getRunParameter()->ifCreateIPRdatabase == true && getRunParameter()->ifReadIPRfromDatabase == false )
 	{
-		fIPRCalculator->writeIPRgraphs( hped_vec, "");
+		fIPRCalculator->writeIPRgraphs( hped_vec, "" );
 	}
 	
 	// initialize dead  channel finder
@@ -3258,19 +3263,11 @@ void VCalibrator::initialize(VIPRCalculator *fIPRCalculator )
 				&& fRunPar->frunmode != 1
 				&& fRunPar->frunmode != 6 )
 		{
-			cout << "MK calculating IPR graphs"<< endl;
-			fIPRCalculator->calculateIPRGraphs(fPedFileNameC);
+			cout << "MK calculating IPR graphs" << endl;
+			fIPRCalculator->calculateIPRGraphs( fPedFileNameC );
 		}
 	}
 }
-
-
-//void VCalibrator::calculateIPRGraphs(VIPRCalculator *fIPRCalculator, VPedestalCalculator *iP )
-//{
-//	cout << "MK calculating IPR" << endl;
-//	fIPRCalculator->calculateIPRGraphs(fPedFileNameC, iP->getPedestalIPRHist());
-//}
-
 
 void VCalibrator::setCalibrationFileNames()
 {
@@ -4009,49 +4006,550 @@ bool VCalibrator::readLowGainMultiplier( )
 	return true;
 }
 
-unsigned int VCalibrator::getNumberOfEventsUsedInCalibration( int iTelID, int iType )
+
+/*
+
+    read calibration data from DST file
+
+*/
+bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 {
-        if( iType == 1 || iType == 6 )
-        {
-                return getNumberOfEventsUsedInCalibration( fNumberPedestalEvents, iTelID );
-        }
-        else if( iType == 2 || iType == 5 )
-        {
-                return getNumberOfEventsUsedInCalibration( fNumberGainEvents, iTelID );
-        }
-        else if( iType == 7 || iType == 8 )
-        {
-                return getNumberOfEventsUsedInCalibration( fNumberTZeroEvents, iTelID );
-        }
-        return 0;
+	if( iDSTfile.size() == 0 )
+	{
+		cout << "VCalibrator::readCalibrationDatafromDSTFiles: no DST file given" << endl;
+		cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
+	}
+	
+	TFile iF( iDSTfile.c_str() );
+	if( iF.IsZombie() )
+	{
+		cout << "VCalibrator::readCalibrationDatafromDSTFiles error while opening DST tree in " << iDSTfile << endl;
+		cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
+	}
+	TTree* t = ( TTree* )iF.Get( "calibration" );
+	if( !t )
+	{
+		cout << "VCalibrator::readCalibrationDatafromDSTFiles warning: failed reading calibration tree from file " << iDSTfile << endl;
+		return false;
+	}
+	cout << "reading calibration data from dst file" << endl;
+	
+	int fTelID = 0;
+	unsigned int nPixel = 0;
+	unsigned int fnum_sumwindow = 1;
+	unsigned int fsumwindow[VDST_MAXSUMWINDOW];
+	float fPed_high[VDST_MAXCHANNELS];
+	float* fPedvar_high = new float[VDST_MAXCHANNELS * VDST_MAXSUMWINDOW];
+	float fPed_low[VDST_MAXCHANNELS];
+	float* fPedvar_low = new float[VDST_MAXCHANNELS * VDST_MAXSUMWINDOW];
+	float fConv_high[VDST_MAXCHANNELS];
+	float fConv_low[VDST_MAXCHANNELS];
+	float ftzero[VDST_MAXCHANNELS];
+	
+	for( unsigned int i = 0; i < VDST_MAXCHANNELS; i++ )
+	{
+		ftzero[i] = -99.;
+	}
+	
+	t->SetBranchAddress( "TelID", &fTelID );
+	t->SetBranchAddress( "NPixel", &nPixel );
+	t->SetBranchAddress( "num_sumwindow", &fnum_sumwindow );
+	t->SetBranchAddress( "sumwindow", fsumwindow );
+	t->SetBranchAddress( "ped_high", fPed_high );
+	// check if this is a old or new style pedvar tree
+	bool iPedVarTreeTypeNew = true;
+	if( t->GetLeaf( "pedvar_high" ) )
+	{
+		string i_temp = ( string )t->GetLeaf( "pedvar_high" )->GetTitle();
+		if( i_temp.find_first_of( "[" ) == i_temp.find_last_of( "[" ) )
+		{
+			iPedVarTreeTypeNew = true;
+		}
+		else
+		{
+			iPedVarTreeTypeNew = false;
+		}
+	}
+	if( !iPedVarTreeTypeNew )
+	{
+		cout << "VCalibrator::readCalibrationDatafromDSTFiles: old style DST file: warning: pedvars will not be set correctly" << endl;
+		cout << "   (you might be able to proceed if you don't do FADC trace analysis and use the pedvars for the image cleaning" << endl;
+	}
+	t->SetBranchAddress( "pedvar_high", fPedvar_high );
+	t->SetBranchAddress( "ped_low", fPed_low );
+	t->SetBranchAddress( "pedvar_low", fPedvar_low );
+	t->SetBranchAddress( "conv_high", fConv_high );
+	t->SetBranchAddress( "conv_low", fConv_low );
+	if( t->GetBranch( "tzero" ) )
+	{
+		t->SetBranchAddress( "tzero", ftzero );
+	}
+	
+	// reset histograms with pedestal distributions
+	if( getPedvarsDist() )
+	{
+		getPedvarsDist()->Reset();
+	}
+	if( getPedDist() )
+	{
+		getPedDist()->Reset();
+	}
+	if( getPedvarsLowGainDist() )
+	{
+		getPedvarsLowGainDist()->Reset();
+	}
+	if( getPedLowGainDist() )
+	{
+		getPedLowGainDist()->Reset();
+	}
+	
+	// histogram for average tzero calculation (per telescope type)
+	vector<ULong64_t> iTelType = getDetectorGeometry()->getTelType_list();
+	vector< TH1D* > iH_averageTZero;
+	char hname[200];
+	for( unsigned int i = 0; i < iTelType.size(); i++ )
+	{
+		sprintf( hname, "iH_averageTZero_%d", i );
+		iH_averageTZero.push_back( new TH1D( hname, "", 3 * ( int )getNSamples(), 0., ( float )getNSamples() ) );
+	}
+	
+	if( getNTel() != ( unsigned int )t->GetEntries() )
+	{
+		cout << "VCalibrator::readCalibrationDatafromDSTFiles error: mismatch in number of telescopes: " << endl;
+		cout << "\t expected: " << getNTel() << endl;
+		cout << "\t found: " << t->GetEntries() << endl;
+		exit( EXIT_FAILURE );
+	}
+	// loop over all telescopes
+	for( int i = 0; i < t->GetEntries(); i++ )
+	{
+		t->GetEntry( i );
+		
+		setTelID( i );
+		
+		// no calibration data available for this telescope
+		if( nPixel == 0 )
+		{
+			continue;
+		}
+		
+		// pedestals
+		if( nPixel == getPeds( false ).size() )
+		{
+			for( unsigned int p = 0; p < nPixel; p++ )
+			{
+				getPeds( false )[p] = fPed_high[p];
+				if( getPedDist() )
+				{
+					getPedDist()->Fill( fPed_high[p] );
+				}
+			}
+		}
+		else
+		{
+			cout << "bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )";
+			cout << " error: index out of range (peds, high gain): ";
+			cout << nPixel << "\t" << getPeds( false ).size();
+			cout << " (telescope " << getTelID() + 1 << ")" << endl;
+		}
+		if( nPixel == getPeds( true ).size() )
+		{
+			for( unsigned int p = 0; p < nPixel; p++ )
+			{
+				getPeds( true )[p] = fPed_low[p];
+				if( getPedLowGainDist() )
+				{
+					getPedLowGainDist()->Fill( fPed_low[p] );
+				}
+			}
+		}
+		else
+		{
+			cout << "bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )";
+			cout << "error: index out of range (peds, low gain): ";
+			cout << nPixel << "\t" << getPeds( true ).size();
+			cout << " (telescope " << getTelID() + 1 << ")" << endl;
+		}
+		// pedvars
+		if( nPixel == getPedvars( false ).size() )
+		{
+			for( unsigned int p = 0; p < nPixel; p++ )
+			{
+				if( p < getPedvars( false ).size() )
+				{
+					for( unsigned int s = 0; s < fnum_sumwindow; s++ )
+					{
+						if( iPedVarTreeTypeNew )
+						{
+							getPedvars( false, fsumwindow[s] )[p] = fPedvar_high[p * VDST_MAXSUMWINDOW + s];
+							if( fsumwindow[s] == 1 )
+							{
+								getPedrms( false ) = fPedvar_high[p * VDST_MAXSUMWINDOW + s];
+							}
+						}
+						if( fsumwindow[s] == getSumWindow() && getPedvarsDist() )
+						{
+							if( iPedVarTreeTypeNew )
+							{
+								getPedvarsDist()->Fill( fPedvar_high[p * VDST_MAXSUMWINDOW + s] );
+							}
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			cout << "bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile ) error: ";
+			cout << "index out of range (pedvars, high gain): ";
+			cout << nPixel << "\t" << getPedvars( false ).size();
+			cout << " (telescope " << getTelID() + 1 << ")" << endl;
+		}
+		if( nPixel == getPedvars( true ).size() )
+		{
+			for( unsigned int p = 0; p < nPixel; p++ )
+			{
+				if( p < getPedvars( true ).size() )
+				{
+					for( unsigned int s = 0; s < fnum_sumwindow; s++ )
+					{
+						if( iPedVarTreeTypeNew )
+						{
+							getPedvars( true, fsumwindow[s] )[p] = fPedvar_low[p * VDST_MAXSUMWINDOW + s];
+							if( fsumwindow[s] == 1 )
+							{
+								getPedrms( true ) = fPedvar_low[p * VDST_MAXSUMWINDOW + s];
+							}
+						}
+						if( fsumwindow[s] == getSumWindow() && getPedvarsDist( true ) )
+						{
+							if( iPedVarTreeTypeNew )
+							{
+								getPedvarsDist( true )->Fill( fPedvar_low[p * VDST_MAXSUMWINDOW + s] );
+							}
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			cout << "bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile ) error: ";
+			cout << "index out of range (pedvars, low gain): ";
+			cout << nPixel << "\t" << getPedvars( true ).size();
+			cout << " (telescope " << getTelID() + 1 << ")" << endl;
+		}
+		////////////////
+		// relative gains
+		if( nPixel == getGains( false ).size() )
+		{
+			// mean conversion factor
+			float i_z = 0;
+			float i_meanC = 0;
+			for( unsigned int p = 0; p < nPixel; p++ )
+			{
+				if( fConv_high[p] > 0. )
+				{
+					i_z++;
+					i_meanC += fConv_high[p];
+				}
+			}
+			if( i_z > 0. && i_meanC > 0. )
+			{
+				i_meanC /= i_z;
+			}
+			else
+			{
+				i_meanC  = 1.;
+			}
+			// calculate relative gain
+			for( unsigned int p = 0; p < nPixel; p++ )
+			{
+				if( fConv_high[p] > 0. && !getRunParameter()->fIgnoreDSTGains )
+				{
+					getGains( false )[p] = 1. / fConv_high[p];
+					if( getGainDist( false ) )
+					{
+						getGainDist( false )->Fill( i_meanC / fConv_high[p] );
+					}
+				}
+				else
+				{
+					getGains( false )[p] = 1.;
+				}
+			}
+		}
+		else
+		{
+			cout << "bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile ) error: ";
+			cout << "index out of range (gains, high gain): ";
+			cout << nPixel << "\t" << getGains( false ).size();
+			cout << " (telescope " << getTelID() + 1 << ")" << endl;
+		}
+		if( nPixel == getGains( true ).size() )
+		{
+			// use high-gain conversion and understand differences between low and high gain as multiplication factor
+			for( unsigned int p = 0; p < nPixel; p++ )
+			{
+				if( getGains( false )[p] > 0. && !getRunParameter()->fIgnoreDSTGains )
+				{
+					getGains( true )[p] = getGains( false )[p];
+					if( getGainDist( true ) )
+					{
+						getGainDist( true )->Fill( getGains( true )[p] );
+					}
+					setLowGainMultiplier_Trace( fConv_low[p] / fConv_high[p] ); //assumes fConv_low / fConv_high is the same for all pixels. Ok as long as we don't have low gain in cta.
+				}
+				else
+				{
+					getGains( true )[p] = 1.;
+				}
+			}
+		}
+		else
+		{
+			cout << "bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile ) error: ";
+			cout << "index out of range (gains, low gain): ";
+			cout << nPixel << "\t" << getGains( true ).size();
+			cout << " (telescope " << getTelID() + 1 << ")" << endl;
+		}
+		////////////////
+		// tzeros
+		if( nPixel == getAverageTZeros( false ).size() )
+		{
+			double i_mean = 0.;
+			double i_nn = 0.;
+			// get teltype counter
+			unsigned int iTelTypeC = 0;
+			for( unsigned int t = 0; t < iTelType.size(); t++ )
+			{
+				if( iTelType[t] == getDetectorGeometry()->getTelType()[i] )
+				{
+					iTelTypeC = t;
+					break;
+				}
+			}
+			for( unsigned int p = 0; p < nPixel; p++ )
+			{
+				getAverageTZeros( false )[p] = ftzero[p];
+				// check if this pixel is inside the averateTZeroFiducialRadius
+				if( getRunParameter()->faverageTZeroFiducialRadius < 1. )
+				{
+					double d = getDetectorGeometry()->getOuterEdgeDistance( p );
+					if( d > 0.5 * getDetectorGeometry()->getFieldofView()[i] * getRunParameter()->faverageTZeroFiducialRadius )
+					{
+						continue;
+					}
+				}
+				if( getAverageTZeros( false )[p] > -98. )
+				{
+					i_mean += ftzero[p];
+					i_nn++;
+					setAverageTZero( p, ftzero[p], false );
+					if( iTelTypeC < iH_averageTZero.size() && iH_averageTZero[iTelTypeC] )
+					{
+						iH_averageTZero[iTelTypeC]->Fill( ftzero[p] );
+					}
+				}
+			}
+		}
+		else
+		{
+			cout << "bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile ) error: ";
+			cout << " index out of range (tzero, high gain): ";
+			cout << nPixel << "\t" << getAverageTZeros( false ).size();
+			cout << " (telescope " << getTelID() + 1 << ")" << endl;
+		}
+	}
+	
+	////////////////////////////////////////////////////////////////////////////
+	// get average tzero per telescope type
+	// use median, as outliers are expected
+	cout << "\t calculate average tzeros" << endl;
+	for( int i = 0; i < t->GetEntries(); i++ )
+	{
+		t->GetEntry( i );
+		
+		setTelID( i );
+		
+		// no calibration data available for this telescope
+		if( nPixel == 0 )
+		{
+			continue;
+		}
+		// get teltype counter
+		unsigned int iTelTypeC = 0;
+		for( unsigned int t = 0; t < iTelType.size(); t++ )
+		{
+			if( iTelType[t] == getDetectorGeometry()->getTelType()[i] )
+			{
+				iTelTypeC = t;
+				break;
+			}
+		}
+		if( iTelTypeC < iH_averageTZero.size() && iH_averageTZero[iTelTypeC] )
+		{
+			if( iH_averageTZero[iTelTypeC]->GetEntries() > 0. )
+			{
+				double i_a[] = { 0.5 };
+				double i_b[] = { 0.0 };
+				iH_averageTZero[iTelTypeC]->GetQuantiles( 1, i_b, i_a );
+				setMeanAverageTZero( i_b[0], false );
+			}
+		}
+	}
+	
+	////////////////////////////////////////////////////////////////////////////
+	// read IPR graph from dst root file (for direct usage or creation of database )
+	if( getRunParameter()->ifReadIPRfromDatabase == true || getRunParameter()->ifCreateIPRdatabase == true )
+	{
+		cout << "\t reading IPR graphs for NN image cleaning" << endl;
+		for( int i = 0; i < t->GetEntries(); i++ )
+		{
+			setTelID( i );
+			calculateIPRGraphs( iDSTfile, getSumWindow(), getTelType( i ), i );
+		}
+	}
+	else if( getRunParameter()->fIPRdatabase.Length() > 0 )
+	{
+		cout << "\t IPR graphs for NN cleaning will be read from external database: ";
+		cout << getRunParameter()->fIPRdatabase << endl;
+	}
+	
+	iF.Close();
+	return true;
 }
 
+/*
+ *
+ * write IPR graphs to disk (one per telescope type)
+ *
+ */
+bool VCalibrator::writeIPRgraphs( string iFile )
+{
+	TFile* fgraphs = 0;
+	if( iFile.size() == 0 )
+	{
+		fgraphs = new TFile( getRunParameter()->fIPRdatabaseFile, "RECREATE" );
+	}
+	else
+	{
+		fgraphs = new TFile( iFile.c_str(), "UPDATE" );
+	}
+	if( fgraphs->IsZombie() )
+	{
+		cout << "VCalibrator::writeIPRgraphs error opening IPR output file: " << endl;
+		cout << "\t" << fgraphs->GetName() << endl;
+		return false;
+	}
+	
+	// tree with conditions for these IRPs
+	TTree* header = new TTree( "IPRheader", "IPR parameters" );
+	unsigned int sumwin = 0;            // [FADC slices]
+	unsigned int Nsamples = 0;          // [FADC slices]
+	float ROwin = 0.;                   // [ns]
+	float FADCslice = 0.;               // [ns]
+	unsigned int SignalExtractor = 0;   // [ Selected Extractor ]
+	header->Branch( "SignalExtractor", &SignalExtractor, "SignalExtractor/i" );
+	header->Branch( "SummationWindow", &sumwin, "SummationWindow/i" );
+	header->Branch( "Nsamples", &Nsamples, "Nsamples/i" );
+	header->Branch( "FADCtimeSlice", &FADCslice, "FADCtimeSlice/F" );
+	header->Branch( "ReadoutWindow", &ROwin, "ReadoutWindow/F" );
+	
+	// one graph per telescope ID
+	map< ULong64_t, bool > iTelDone;
+	for( unsigned int i = 0; i < getDetectorGeometry()->getTelType_list().size(); i++ )
+	{
+		iTelDone[getDetectorGeometry()->getTelType_list()[i]] = false;
+	}
+	
+	for( unsigned int i = 0; i < getNTel(); i++ )
+	{
+		setTelID( i );
+		if( iTelDone[getTelType( i )] )
+		{
+			continue;
+		}
+		
+		if( hped_vec.find( getTelType( i ) ) == hped_vec.end() )
+		{
+			continue;
+		}
+		
+		// loop over all summation windows
+		for( unsigned int j = 0; j < hped_vec[getTelType( i )].size(); j++ )
+		{
+			// summation window
+			int i_sw = j + 1;
+			
+			TGraphErrors* g = getIPRGraph( i_sw, false );
+			if( !g )
+			{
+				continue;
+			}
+			SignalExtractor = getRunParameter()->fTraceIntegrationMethod.at( getTelID() );
+			sumwin          = i_sw;
+			Nsamples        = getNSamples();
+			FADCslice       = getDetectorGeometry()->getLengthOfSampleTimeSlice( getTelID() ); //[ns]
+			ROwin           = getDetectorGeometry()->getLengthOfSampleTimeSlice( getTelID() ) * ( float )getNSamples(); // [ns]
+			
+			header->Fill();
+			g->Write();
+		}
+		
+		iTelDone[getTelType( i )] = true;
+	}
+	header->Write();
+	fgraphs->Close();
+	fgraphs->Delete();
+	
+	return true;
+}
+
+unsigned int VCalibrator::getNumberOfEventsUsedInCalibration( int iTelID, int iType )
+{
+	if( iType == 1 || iType == 6 )
+	{
+		return getNumberOfEventsUsedInCalibration( fNumberPedestalEvents, iTelID );
+	}
+	else if( iType == 2 || iType == 5 )
+	{
+		return getNumberOfEventsUsedInCalibration( fNumberGainEvents, iTelID );
+	}
+	else if( iType == 7 || iType == 8 )
+	{
+		return getNumberOfEventsUsedInCalibration( fNumberTZeroEvents, iTelID );
+	}
+	return 0;
+}
 
 unsigned int VCalibrator::getNumberOfEventsUsedInCalibration( vector< int > iE, int iTelID )
-{       
-        if( iTelID > 0 && iTelID < ( int )iE.size() )
-        {       
-                return iE[iTelID];
-        }
-        else
-        {       
-                int iTot = 0;
-                int iN = 0;
-                for( unsigned int tel = 0; tel < getTeltoAna().size(); tel++ )
-                {       
-                        if( tel < iE.size() )
-                        {       
-                                iTot += iE[tel];
-                                iN++;
-                        }
-                }
-                if( iN > 0 )
-                {
-                        return iTot / iN;
-                }
-        }
-
-        return 0;
+{
+	if( iTelID > 0 && iTelID < ( int )iE.size() )
+	{
+		return iE[iTelID];
+	}
+	else
+	{
+		int iTot = 0;
+		int iN = 0;
+		for( unsigned int tel = 0; tel < getTeltoAna().size(); tel++ )
+		{
+			if( tel < iE.size() )
+			{
+				iTot += iE[tel];
+				iN++;
+			}
+		}
+		if( iN > 0 )
+		{
+			return iTot / iN;
+		}
+	}
+	
+	return 0;
 }
 
 unsigned int VCalibrator::getNumberOfEventsUsedInCalibration( map< ULong64_t, int > iE, int iTelID )

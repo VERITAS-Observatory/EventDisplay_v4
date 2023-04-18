@@ -135,7 +135,7 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	
 	// reset cut strings and variables
 	resetRunOptions();
-
+	
 	//add if statement: if ipr should be in time slices
 	fIPRTimeSlices = true;
 }
@@ -479,16 +479,17 @@ bool VEventLoop::initEventLoop( string iFileName )
 	// initialize analyzers (output files are created as well here)
 	initializeAnalyzers();
 	
-
-	if( fIPRCalculator  ){
-                  cout << "initializing IPR calculator" << endl;
-                  fIPRCalculator->initialize();
-        }
-		
+	
+	if( fIPRCalculator )
+	{
+		cout << "initializing IPR calculator" << endl;
+		fIPRCalculator->initialize();
+	}
+	
 	// create calibrators, analyzers, etc. at first event
 	if( fCalibrator )
 	{
-		fCalibrator->initialize(fIPRCalculator);
+		fCalibrator->initialize( fIPRCalculator );
 	}
 	// initialize pedestal calculator
 	if( fPedestalCalculator && fRunPar->fPedestalsInTimeSlices )
@@ -829,7 +830,7 @@ void VEventLoop::shutdown()
 		}
 		if( fCalibrator )
 		{
-			fCalibrator->terminate( iP , fIPRCalculator);
+			fCalibrator->terminate( iP , fIPRCalculator );
 		}
 	}
 	// write data summary
@@ -1022,14 +1023,21 @@ bool VEventLoop::nextEvent()
 			else
 			{
 				cout << "!!! void VEventLoop::nextEvent(): no next event (end of file)" << endl;
-				for (int tel =0; tel < fIPRCalculator->getStorageHist().size(); tel++){
-					for (int ts =0; ts < fIPRCalculator->getStorageHist()[tel].size(); ts++){
-						for (int p =0; p < fIPRCalculator->getStorageHist()[tel][ts].size(); p++){
-							for (int sw =0; sw < fIPRCalculator->getStorageHist()[tel][ts][p].size(); sw++){
-								fIPRCalculator->checkHistEmpty(tel, ts, p, sw);
-							}}}}
-
-
+				for( int tel = 0; tel < fIPRCalculator->getStorageHist().size(); tel++ )
+				{
+					for( int ts = 0; ts < fIPRCalculator->getStorageHist()[tel].size(); ts++ )
+					{
+						for( int p = 0; p < fIPRCalculator->getStorageHist()[tel][ts].size(); p++ )
+						{
+							for( int sw = 0; sw < fIPRCalculator->getStorageHist()[tel][ts][p].size(); sw++ )
+							{
+								fIPRCalculator->checkHistEmpty( tel, ts, p, sw );
+							}
+						}
+					}
+				}
+				
+				
 				// if the display is run in the loop mode, goto event 0 and start again
 				if( fRunPar->floopmode )
 				{
@@ -1138,7 +1146,7 @@ int VEventLoop::analyzeEvent()
 		cout << "\t now at event " << getEventNumber() << endl;
 		cout << "----------------------------------------" << endl;
 	}
-
+	
 	// analysis is running
 	fAnalyzeMode = true;
 	int i_cut = 0;

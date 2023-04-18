@@ -225,7 +225,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   ifWriteGraphsToFile;               // flag to write run-time NN image cleaning settings to root file (read from NN image cleaning input card)
 		bool   ifReadIPRfromDatabase;             // flag to read IPR from external IPR database
 		bool   ifCreateIPRdatabase;               // flag to create external IPR database
-		bool   ifReadIPRfromDSTFile;              // flat to read IPR graph from DST file
 		
 		string freconstructionparameterfile;      // reconstruction parameter file
 		// MC parameters
@@ -332,6 +331,10 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return ( fDBTextDirectory.size() > 0 );
 		}
 		
+		<<< <<< < HEAD
 		ClassDef( VEvndispRunParameter, 2005 ); //(increase this number)
+		== == == =
+			ClassDef( VEvndispRunParameter, 2007 ); //(increase this number)
+		>>> >>> > main
 };
 #endif

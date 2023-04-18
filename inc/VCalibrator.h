@@ -3,11 +3,11 @@
 #ifndef VCALIBRATOR_H
 #define VCALIBRATOR_H
 
-#include <VImageBaseAnalyzer.h>
-#include <VPedestalCalculator.h>
-#include <VIPRCalculator.h>
-#include <VDB_CalibrationInfo.h>
-#include <VSQLTextFileReader.h>
+#include "VImageBaseAnalyzer.h"
+#include "VIPRCalculator.h"
+#include "VPedestalCalculator.h"
+#include "VDB_CalibrationInfo.h"
+#include "VSQLTextFileReader.h"
 
 #include "TClonesArray.h"
 #include "TFile.h"
@@ -116,7 +116,7 @@ class VCalibrator : public VImageBaseAnalyzer
 		void setCalibrationFileNames();
 		
 		void writeGains( bool iLowGain = false );
-		void writePeds( bool iLowGain, VPedestalCalculator* iP = 0, bool iWriteAsciiFile = true, VIPRCalculator *fIPRCalculator = 0 );
+		void writePeds( bool iLowGain, VPedestalCalculator* iP = 0, bool iWriteAsciiFile = true, VIPRCalculator* fIPRCalculator = 0 );
 		void writeTOffsets( bool iLowGain = false );
 		void writeAverageTZeros( bool iLowGain = false );
 		
@@ -130,7 +130,7 @@ class VCalibrator : public VImageBaseAnalyzer
 		void calculateGainsAndTOffsets( bool iLowGain = false );
 		unsigned int getNumberOfEventsUsedInCalibration( int iTelID, int iType );
 		//void calculateIPRGraphs(VIPRCalculator *fIPRCalculator = 0, VPedestalCalculator *iP = 0);
-		void initialize( VIPRCalculator *fIPRCalculator );
-		void terminate( VPedestalCalculator* iP, VIPRCalculator *fIPRCalculator );
+		void initialize( VIPRCalculator* fIPRCalculator );
+		void terminate( VPedestalCalculator* iP, VIPRCalculator* fIPRCalculator );
 };
 #endif
