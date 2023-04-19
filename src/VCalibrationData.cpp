@@ -1043,6 +1043,25 @@ TGraphErrors* VCalibrationData::getIPRGraph( unsigned int iSumWindow, bool iMake
 	return 0;
 }
 
+TGraphErrors* VCalibrationData::getIPRGraphTimeSlice( bool iMakeNewGraph, unsigned int TimeSlice )
+{
+
+	if( fGraphTSIPRGraph.find( TimeSlice ) != fGraphTSIPRGraph.end() && fGraphTSIPRGraph[TimeSlice] )
+	{
+		return fGraphTSIPRGraph[TimeSlice];
+	}
+	else if( iMakeNewGraph )
+	{
+		fGraphTSIPRGraph[TimeSlice] = new TGraphErrors( 1 );
+		fGraphTSIPRGraph[TimeSlice]->SetTitle( "" );
+		char hname[200];
+		sprintf( hname, "IRPFGraph_TelID%d_TimeSlice%d", fTelID, TimeSlice );
+		fGraphTSIPRGraph[TimeSlice]->SetName( hname );
+		return fGraphTSIPRGraph[TimeSlice];
+	}
+	return 0;
+}
+
 void VCalibrationData::setIPRGraph( unsigned int iSumWindow, TGraphErrors* g )
 {
 	fGraphIPRGraph[iSumWindow] = g;

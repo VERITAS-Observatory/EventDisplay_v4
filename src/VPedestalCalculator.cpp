@@ -187,6 +187,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		
 		// define the time vector
 		fTimeVec.push_back( 0 );
+		NTimeSlices.push_back( 0 );
 	}
 	iDir->cd();
 	

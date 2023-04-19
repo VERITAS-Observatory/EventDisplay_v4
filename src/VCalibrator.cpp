@@ -359,7 +359,9 @@ void VCalibrator::calculatePedestals( bool iLowGain )
    this might be an ascii file and/or a root file
 
 */
+//MK test
 void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalculator, bool iWriteAsciiFile )
+//void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalculator, bool iWriteAsciiFile, VIPRCalculator *fIPRCalculator )
 {
 	if( getDebugFlag() )
 	{
@@ -1588,12 +1590,14 @@ void VCalibrator::writeTOffsets( bool iLowGain )
 	}
 }
 
-
+//MK test
+//void VCalibrator::terminate( VPedestalCalculator* iP, VIPRCalculator *fIPRCalculator )
 void VCalibrator::terminate( VPedestalCalculator* iP )
 {
 	if( fRunPar->frunmode == 1 || fRunPar->frunmode == 6 )
 	{
 		writePeds( fRunPar->frunmode == 6, iP, !fRunPar->fPedestalSingleRootFile );
+		//writePeds( fRunPar->frunmode == 6, iP, !fRunPar->fPedestalSingleRootFile, fIPRCalculator );
 	}
 	else if( fRunPar->frunmode == 2 || fRunPar->frunmode == 5 )
 	{
@@ -3090,8 +3094,8 @@ void VCalibrator::readTOffsets( bool iLowGain )
 	
 }
 
-
-void VCalibrator::initialize()
+//MK test
+void VCalibrator::initialize(VIPRCalculator *fIPRCalculator )
 {
 	if( fDebug )
 	{
@@ -3221,6 +3225,8 @@ void VCalibrator::initialize()
 	// if needed: write IPR graphs to disk
 	if( getRunParameter()->ifCreateIPRdatabase == true && getRunParameter()->ifReadIPRfromDatabase == false )
 	{
+		//MK test
+		//fIPRCalculator->writeIPRgraphs( hped_vec, "");
 		writeIPRgraphs();
 	}
 	
@@ -3237,7 +3243,10 @@ void VCalibrator::initialize()
 				&& fRunPar->frunmode != 1
 				&& fRunPar->frunmode != 6 )
 		{
-			calculateIPRGraphs();
+			cout << "MK calculating IPR graphs"<< endl;
+			//calculateIPRGraphs();
+			fIPRCalculator->calculateIPRGraphs(fPedFileNameC);
+			//calculateIPRGraphs();
 		}
 	}
 }
@@ -4376,7 +4385,16 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 	
 	////////////////////////////////////////////////////////////////////////////
 	// read IPR graph from dst root file (for direct usage or creation of database )
-	if( getRunParameter()->ifReadIPRfromDatabase == true || getRunParameter()->ifCreateIPRdatabase == true )
+	if( getRunParameter()->ifReadIPRfromDSTFile == true )
+	{
+		cout << "\t reading IPR graphs for NN image cleaning from DST file" << endl;
+		for( int i = 0; i < t->GetEntries(); i++ )
+		{
+			setTelID( i );
+			readIPRGraph_from_DSTFile( iDSTfile, getSumWindow(), getTelType( i ) );
+		}
+	}
+	else if( getRunParameter()->ifReadIPRfromDatabase == true || getRunParameter()->ifCreateIPRdatabase == true )
 	{
 		cout << "\t reading IPR graphs for NN image cleaning" << endl;
 		for( int i = 0; i < t->GetEntries(); i++ )

@@ -5,6 +5,11 @@
 
 #include "VImageBaseAnalyzer.h"
 #include "VPedestalCalculator.h"
+#include "VIPRCalculator.h"
+#include "VDB_CalibrationInfo.h"
+#include <VSQLTextFileReader.h>
+#include "VIPRCalculator.h"
+#include "VPedestalCalculator.h"
 #include "VDB_CalibrationInfo.h"
 #include "VSQLTextFileReader.h"
 
@@ -109,6 +114,7 @@ class VCalibrator : public VImageBaseAnalyzer
 		bool copyIPRTelAveraged( unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel );
 		TH1F* initializeIPRAveraged( unsigned int iSummationWindow, unsigned int iTelType );
 		TH1F* calculateIPRGraphAveraged( unsigned int iSummationWindow );
+		bool calculateIPRGraphs( string iPedFileName, unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel );
 		bool readLowGainMultiplier( );
 		bool readPeds( string iFile, bool, unsigned int );
 		bool readPeds_from_grisufile( bool, unsigned int );
@@ -122,6 +128,7 @@ class VCalibrator : public VImageBaseAnalyzer
 		
 		void writeGains( bool iLowGain = false );
 		void writePeds( bool iLowGain, VPedestalCalculator* iP = 0, bool iWriteAsciiFile = true );
+		void writePeds( bool iLowGain, VPedestalCalculator* iP = 0, bool iWriteAsciiFile = true, VIPRCalculator* fIPRCalculator = 0 );
 		void writeTOffsets( bool iLowGain = false );
 		void writeAverageTZeros( bool iLowGain = false );
 		bool writeIPRgraphs( string iFile = "" );
@@ -135,7 +142,10 @@ class VCalibrator : public VImageBaseAnalyzer
 		void calculatePedestals( bool iLowGain = false );
 		void calculateGainsAndTOffsets( bool iLowGain = false );
 		unsigned int getNumberOfEventsUsedInCalibration( int iTelID, int iType );
-		void initialize();
+		void initialize(VIPRCalculator *fIPRCalculator );
 		void terminate( VPedestalCalculator* );
+		//void calculateIPRGraphs(VIPRCalculator *fIPRCalculator = 0, VPedestalCalculator *iP = 0);
+		void initialize( VIPRCalculator* fIPRCalculator );
+		void terminate( VPedestalCalculator* iP, VIPRCalculator* fIPRCalculator );
 };
 #endif
