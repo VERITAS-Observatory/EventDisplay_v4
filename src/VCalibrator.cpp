@@ -360,8 +360,7 @@ void VCalibrator::calculatePedestals( bool iLowGain )
 
 */
 //MK test
-void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalculator, bool iWriteAsciiFile )
-//void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalculator, bool iWriteAsciiFile, VIPRCalculator *fIPRCalculator )
+void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalculator, bool iWriteAsciiFile, VIPRCalculator* fIPRCalculator )
 {
 	if( getDebugFlag() )
 	{
@@ -478,14 +477,15 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 				cout << "...exiting" << endl;
 				exit( EXIT_FAILURE );
 			}
-			
+			cout << "MKa" << endl;
 			// fill and write pedestal tree
 			fillPedestalTree( tel, iPedestalCalculator );
-			
+			cout << "MKb" << endl;	
 			// write 1D histograms to directory calibration_TEL
 			std::ostringstream iSname;
 			iSname << "distributions_" << telType;
 			TDirectory* i_dist = getPedestalRootFile( telType )->mkdir( iSname.str().c_str() );
+			cout << "MKc" << endl;
 			if( i_dist->cd() )
 			{
 				i_dist->cd();
@@ -499,6 +499,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 						}
 					}
 				}
+				cout << "MKd" << endl;
 				for( unsigned int i = 0; i < hpedPerTelescopeType[telType].size(); i++ )
 				{
 					for( unsigned int j = 0; j < hpedPerTelescopeType[telType][i].size(); j++ )
@@ -514,6 +515,8 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 		}
 	}                                             // end loop over all telescopes
 	// delete all histograms
+	cout << "MK clearing histos" << endl;
+	fIPRCalculator->clearHistos();
 	map< ULong64_t, TClonesArray* >::iterator i_PedestalsHistoClonesArray_iter;
 	for( i_PedestalsHistoClonesArray_iter = fPedestalsHistoClonesArray.begin();
 			i_PedestalsHistoClonesArray_iter != fPedestalsHistoClonesArray.end(); i_PedestalsHistoClonesArray_iter++ )
@@ -1592,11 +1595,11 @@ void VCalibrator::writeTOffsets( bool iLowGain )
 
 //MK test
 //void VCalibrator::terminate( VPedestalCalculator* iP, VIPRCalculator *fIPRCalculator )
-void VCalibrator::terminate( VPedestalCalculator* iP )
+void VCalibrator::terminate( VPedestalCalculator* iP, VIPRCalculator* fIPRCalculator )
 {
 	if( fRunPar->frunmode == 1 || fRunPar->frunmode == 6 )
 	{
-		writePeds( fRunPar->frunmode == 6, iP, !fRunPar->fPedestalSingleRootFile );
+		writePeds( fRunPar->frunmode == 6, iP, !fRunPar->fPedestalSingleRootFile, fIPRCalculator );
 		//writePeds( fRunPar->frunmode == 6, iP, !fRunPar->fPedestalSingleRootFile, fIPRCalculator );
 	}
 	else if( fRunPar->frunmode == 2 || fRunPar->frunmode == 5 )

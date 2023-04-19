@@ -48,7 +48,6 @@ class VPedestalCalculator : public VImageBaseAnalyzer
 		vector< vector< vector< float > > > fpedcal_mean;
 		vector< vector< vector< float > > > fpedcal_mean2;
 		vector< vector< vector< TH1F* > > > fpedcal_histo;
-		std::vector<std::vector<TH1F*> > copy_fpedcal_histo;
 		
 		vector< vector< float > > v_temp_pedEntries;
 		vector< vector< float > > v_temp_ped;
@@ -64,7 +63,7 @@ class VPedestalCalculator : public VImageBaseAnalyzer
 		void reset();
 		
 	public:
-		vector< int > NTimeSlices;
+		vector< int > NTimeSlices;	
 		vector< vector< int > > v_MJD;            //! [telid][time slice]
 		vector< vector< double > > v_time;        //! [telid][time slice]
 		//! [telid][time slice][npixel][summation window]
@@ -79,13 +78,7 @@ class VPedestalCalculator : public VImageBaseAnalyzer
 		VPedestalCalculator();
 		~VPedestalCalculator() {}
 		
-		void doAnalysis( bool iLowGain = false );
-		vector< vector< vector< TH1F* > > > fpedcal_histo_sw;
-		
-		VPedestalCalculator();
-		~VPedestalCalculator() {}
-		
-		void doAnalysis( bool iLowGain = false , VIPRCalculator* fIPRCalculator = 0 );
+		void doAnalysis( bool iLowGain = false, VIPRCalculator *fIPRCalculator = 0);
 		vector< TTree* > getPedestalTree()
 		{
 			return fTree;
@@ -93,6 +86,6 @@ class VPedestalCalculator : public VImageBaseAnalyzer
 		bool initialize();
 		bool initialize( bool ibCalibrationRun, unsigned int iNPixel, double iLengthofTimeSlice, int iSumFirst, int iSumWindow,
 						 double iRunStartTime = -99., double iRunStoppTime = -99. );
-		void terminate( bool iWrite = true, bool bDebug_IO = false );
+		void terminate( bool iWrite = true, bool bDebug_IO = false, VIPRCalculator* fIPRCalculator = 0);
 };
 #endif

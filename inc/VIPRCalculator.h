@@ -32,42 +32,26 @@ class VIPRCalculator : public VImageBaseAnalyzer
 		bool fIPRAverageTel;   // flag to make average of all telescopes IPR in case there is not enough statistics to produce IPR graphs
 		bool fIPRInTimeSlices;
 		int fPedPerTelescopeTypeMinCnt;
-<<<<<<< HEAD
 		TH1F* FillIPRHistogram( unsigned int iSummationWindow,  unsigned int i_tel);
 		void definePedestalFile( std::vector<std::string> fPedFileNameCalibrator );
 		TH1F* initializeIPRHistogram( unsigned int iSummationWindow, unsigned int i_tel);
 		bool copyIPRTelAveraged( unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel );
 		TH1F* calculateIPRGraphAveraged( unsigned int iSummationWindow );
 	public:
+		vector<vector<vector<vector<TH1F*>>>> fpedcal_histo_storage;
 		bool calculateIPRGraphs( std::vector<std::string>  fPedFileNameCalibrator );
 		bool calculateIPRGraphs( string iPedFileName, unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel );
+		bool calculateIPRGraphsTimeSlices( string iPedFileName, int TS,  unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel );
 		bool writeIPRgraphs( map<ULong64_t, vector<vector<TH1F*>>> &hped_vec, string iFile = "" );
-	
-=======
-		TH1F* FillIPRHistogram( unsigned int iSummationWindow,  unsigned int i_tel );
-		TGraphErrors* updateIPRGraph( TH1F* hIPR, unsigned int i_tel, int iSummationWindow );
-		float convertRate( unsigned int i_tel );
-		float getTsearch();
-		void definePedestalFile( std::vector<std::string> fPedFileNameC );
-		TFile* initializePedestalFile( int i_tel );
-		TH1F* initializeIPRHistogram( unsigned int iSummationWindow, unsigned int i_tel );
-		bool calculateIPRGraphsTimeSlices( const  int TimeSlice, int iSummationWindow, const int itel );
-		bool calculateIPRGraphsNoTimeSlices( unsigned int iSummationWindow, unsigned int i_tel );
-		bool copyIPRInitialized( unsigned int iSummationWindow, unsigned int i_tel );
-		TH1F* calculateIPRGraphAveragedNoTimeSlices( unsigned int iSummationWindow, unsigned int i_tel );
-	public:
-	
-		vector<vector<vector<vector<TH1F*>>>> fpedcal_histo_storage;
-		TH1F* getIPRPedestalHisto( const int telID, const int ts, const int pixel, const int sw );
-		vector<vector<vector<vector<TH1F*>>>> getStorageHist();
+		void fillIPRPedestalHisto(const int telID, const int NTimeSlices,const vector<vector<vector<TH1F*>>>& fpedcal_histo );
 		void fillIPRPedestalHisto();
-		void fillIPRPedestalHisto( const int telID, const vector<vector<vector<TH1F*>>>& fpedcal_histo );
-		bool calculateIPRGraphs( std::vector<std::string>  fPedFileNameC );
-		bool writeIPRgraphs( map<ULong64_t, vector<vector<TH1F*>>>& hped_vec, string iFile = "" );
-		void checkHistEmpty( const int telID, const int ts, const int pixel, const int sw );
+		TH1F* getIPRPedestalHisto(const int telID, const int ts, const int pixel, const int sw);
+		bool clearHistos();
+		vector<vector<vector<vector<TH1F*>>>> getStorageHist();
+
 		VIPRCalculator();
-		~VIPRCalculator() {}
-		
+                ~VIPRCalculator() {}
+
 		void initialize();
 };
-#endif
+#endif 
