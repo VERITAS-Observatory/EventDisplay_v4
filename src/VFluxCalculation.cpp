@@ -29,7 +29,7 @@ VFluxCalculation::VFluxCalculation( string ifile, unsigned int iTot, int iRunMin
 	fDebug = iDebug;
 	
 	bZombie = openDataFile( ifile.c_str() );
-	bZombie = !( bool )loadRunList( iRunMin, iRunMax, iTot, iMJDMin, iMJDMax );
+	loadRunList( iRunMin, iRunMax, iTot, iMJDMin, iMJDMax );
 }
 
 
@@ -41,7 +41,7 @@ VFluxCalculation::VFluxCalculation( vector< string > ifile, unsigned int iTot, i
 	reset();
 	
 	bZombie = openDataFile( ifile );
-	bZombie = !( bool )loadRunList( iRunMin, iRunMax, iTot, iMJDMin, iMJDMax );
+	loadRunList( iRunMin, iRunMax, iTot, iMJDMin, iMJDMax );
 }
 
 
@@ -2207,10 +2207,6 @@ TCanvas* VFluxCalculation::plotFluxesVSAzimuth( bool iDraw,
 
 TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char* iTex, double iMJDOffset, TCanvas* cFMJD, int iMarkerColor, int iMarkerStyle, bool bDrawAxis, double iMinMJD, double iMaxMJD )
 {
-	if( fFile.size() < 2 )
-	{
-		return 0;
-	}
 	char hname[500];
 	
 	string sFluxMult = "10^{-7}";
@@ -2279,7 +2275,10 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char* iTex, double iMJDOffset, 
 		}
 	}
 	
-	printf( "mean_flux from run by run %.3e \n Total time = %.3e \n total time including dead time %.3e \n", mean_flux / total_time, total_time, fRunTOn[fRunNorm.size() - 1] );
+	if( fRunNorm.size() > 0 )
+	{
+		printf( "mean_flux from run by run %.3e \n Total time = %.3e \n total time including dead time %.3e \n", mean_flux / total_time, total_time, fRunTOn[fRunNorm.size() - 1] );
+	}
 	
 	if( bDrawAxis )
 	{
