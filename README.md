@@ -39,13 +39,6 @@ The package consists of several analysis steps and tools:
 
 ## Releases
 
-Official versions to be used for VERITAS publications:
-
-- [v487](https://veritas.sao.arizona.edu/wiki/Eventdisplay_v487)
-
-Versions in preparation:
-
-- [v490](https://veritas.sao.arizona.edu/wiki/Eventdisplay_v490)
 
 Check the [release pages](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases) for the most recent versions to be used for VERITAS publications.
 For older versions of Eventdisplay, see the release pages on the [VERITAS wiki (internal pages)](https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual#Versions_of_eventdisplay).
@@ -63,7 +56,7 @@ Eventdisplay consists of the following main components:
 
 Additional components:
 
-- release test macros and results (see internal GitHub repository [Eventdisplay_ReleaseTests](https://github.com/VERITAS-Observatory/EventDisplay_v4))
+- release test macros and results (see internal GitHub repository [Eventdisplay_ReleaseTests](https://github.com/VERITAS-Observatory/EventDisplay_ReleaseTests_code).
 
 ## Documentation
 
