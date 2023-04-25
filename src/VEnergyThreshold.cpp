@@ -235,9 +235,11 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 		feffFract_50p = 0;
 		feffFract_90p = 0;
 		
+        feff_150GeV = 0.;
 		feff_300GeV = 0.;
 		feff_500GeV = 0.;
 		feff_1TeV = 0.;
+		feff_10TeV = 0.;
 		
 		if( nbins > 1 )
 		{
@@ -276,9 +278,11 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 		{
 			gEffAreaRec->SetPoint( b, e0[b], eff[b] );
 		}
+		feff_150GeV = gEffAreaRec->Eval( log10( 0.15 ) );
 		feff_300GeV = gEffAreaRec->Eval( log10( 0.3 ) );
 		feff_500GeV = gEffAreaRec->Eval( log10( 0.5 ) );
 		feff_1TeV = gEffAreaRec->Eval( log10( 1. ) );
+		feff_10TeV = gEffAreaRec->Eval( log10( 10. ) );
 		feffFract_05p = getEnergy_MaxEffectiveAreaFraction( gEffAreaRec, 0.05 );
 		feffFract_10p = getEnergy_MaxEffectiveAreaFraction( gEffAreaRec, 0.10 );
 		feffFract_20p = getEnergy_MaxEffectiveAreaFraction( gEffAreaRec, 0.20 );
@@ -459,9 +463,11 @@ bool VEnergyThreshold::setUpThresholdTree()
 	fTreeEth->Branch( "E_effFract_20p", &feffFract_20p, "E_effFract_20p/F" );
 	fTreeEth->Branch( "E_effFract_50p", &feffFract_50p, "E_effFract_50p/F" );
 	fTreeEth->Branch( "E_effFract_90p", &feffFract_90p, "E_effFract_90p/F" );
+	fTreeEth->Branch( "EffArea_150GeV", &feff_150GeV, "EffArea_150GeV/F" );
 	fTreeEth->Branch( "EffArea_300GeV", &feff_300GeV, "EffArea_300GeV/F" );
 	fTreeEth->Branch( "EffArea_500GeV", &feff_500GeV, "EffArea_500GeV/F" );
 	fTreeEth->Branch( "EffArea_1TeV", &feff_1TeV, "EffArea_1TeV/F" );
+	fTreeEth->Branch( "EffArea_10TeV", &feff_10TeV, "EffArea_10TeV/F" );
 	
 	return true;
 }
