@@ -278,7 +278,7 @@ void VPedestalCalculator::fillTimeSlice( unsigned int telID )
 }
 
 
-void VPedestalCalculator::doAnalysis( bool iLowGain, VIPRCalculator *fIPRCalculator )
+void VPedestalCalculator::doAnalysis( bool iLowGain, VIPRCalculator* fIPRCalculator )
 {
 	double t = getEventTime();
 	// get right index for tel id
@@ -305,13 +305,14 @@ void VPedestalCalculator::doAnalysis( bool iLowGain, VIPRCalculator *fIPRCalcula
 		else if( t - fTimeVec[telID] > fLengthofTimeSlice )
 		{
 			time = t;
-
-			if (NTimeSlices[telID] == 0 and telID == 0){
+			
+			if( NTimeSlices[telID] == 0 and telID == 0 )
+			{
 				fIPRCalculator->fillIPRPedestalHisto();
 			}
-			NTimeSlices[telID]+=1;
-			fIPRCalculator->fillIPRPedestalHisto(telID, NTimeSlices[telID], fpedcal_histo);
-
+			NTimeSlices[telID] += 1;
+			fIPRCalculator->fillIPRPedestalHisto( telID, NTimeSlices[telID], fpedcal_histo );
+			
 			fillTimeSlice( telID );
 			fTimeVec[telID] = t;
 		}  // if( t - fTimeVec[telID] > fLengthofTimeSlice )
@@ -389,7 +390,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain, VIPRCalculator *fIPRCalcula
 }
 
 
-void VPedestalCalculator::terminate( bool iWrite, bool iDebug_IO, VIPRCalculator* fIPRCalculator)
+void VPedestalCalculator::terminate( bool iWrite, bool iDebug_IO, VIPRCalculator* fIPRCalculator )
 {
 	if( iWrite )
 	{

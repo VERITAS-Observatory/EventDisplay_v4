@@ -476,14 +476,15 @@ bool VEventLoop::initEventLoop( string iFileName )
 	// initialize analyzers (output files are created as well here)
 	initializeAnalyzers();
 	
-	if( fIPRCalculator  ){
-                  cout << "initializing IPR calculator" << endl;
-                  fIPRCalculator->initialize();
-        }		
+	if( fIPRCalculator )
+	{
+		cout << "initializing IPR calculator" << endl;
+		fIPRCalculator->initialize();
+	}
 	// create calibrators, analyzers, etc. at first event
 	if( fCalibrator )
 	{
-		fCalibrator->initialize(fIPRCalculator);
+		fCalibrator->initialize( fIPRCalculator );
 	}
 	
 	// initialize pedestal calculator

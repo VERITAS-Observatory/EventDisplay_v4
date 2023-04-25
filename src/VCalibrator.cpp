@@ -480,7 +480,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 			cout << "MKa" << endl;
 			// fill and write pedestal tree
 			fillPedestalTree( tel, iPedestalCalculator );
-			cout << "MKb" << endl;	
+			cout << "MKb" << endl;
 			// write 1D histograms to directory calibration_TEL
 			std::ostringstream iSname;
 			iSname << "distributions_" << telType;
@@ -3098,7 +3098,7 @@ void VCalibrator::readTOffsets( bool iLowGain )
 }
 
 //MK test
-void VCalibrator::initialize(VIPRCalculator *fIPRCalculator )
+void VCalibrator::initialize( VIPRCalculator* fIPRCalculator )
 {
 	if( fDebug )
 	{
@@ -3246,9 +3246,9 @@ void VCalibrator::initialize(VIPRCalculator *fIPRCalculator )
 				&& fRunPar->frunmode != 1
 				&& fRunPar->frunmode != 6 )
 		{
-			cout << "MK calculating IPR graphs"<< endl;
+			cout << "MK calculating IPR graphs" << endl;
 			//calculateIPRGraphs();
-			fIPRCalculator->calculateIPRGraphs(fPedFileNameC);
+			fIPRCalculator->calculateIPRGraphs( fPedFileNameC );
 			//calculateIPRGraphs();
 		}
 	}

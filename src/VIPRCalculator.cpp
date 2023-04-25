@@ -7,41 +7,41 @@
 
 VIPRCalculator::VIPRCalculator()
 {
-        fIPRTimeSlices = true;
-        fIPRAverageTel = false;
-        fPedPerTelescopeTypeMinCnt = 1.E5;  // minimal counter for IPR measurements
+	fIPRTimeSlices = true;
+	fIPRAverageTel = false;
+	fPedPerTelescopeTypeMinCnt = 1.E5;  // minimal counter for IPR measurements
 }
 
 void VIPRCalculator::initialize()
 {
-        if( fDebug )
-        {
-                cout << "VIPRCalculator::initialize()" << endl;
-        }
-
-        // set the data readers
-        initializeDataReader();
-        if( !initializeDataReader() )
-        {
-                cout << "VIPRCalculator::initialize, error: cannot initialize data readers" << endl;
-                cout << "exiting..." << endl;
-                exit( EXIT_FAILURE );
-        }
+	if( fDebug )
+	{
+		cout << "VIPRCalculator::initialize()" << endl;
+	}
+	
+	// set the data readers
+	initializeDataReader();
+	if( !initializeDataReader() )
+	{
+		cout << "VIPRCalculator::initialize, error: cannot initialize data readers" << endl;
+		cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
+	}
 	
 }
 
 void VIPRCalculator::definePedestalFile( std::vector<std::string> fPedFileNameCalibrator )
 {
-	for( unsigned int i = 0; i < fPedFileNameCalibrator.size() ; i++)
+	for( unsigned int i = 0; i < fPedFileNameCalibrator.size() ; i++ )
 	{
-	        fPedFileNameC.push_back(fPedFileNameCalibrator[i]);
+		fPedFileNameC.push_back( fPedFileNameCalibrator[i] );
 	}
 }
 
-bool VIPRCalculator::calculateIPRGraphs(std::vector<std::string> fPedFileNameCalibrator )
+bool VIPRCalculator::calculateIPRGraphs( std::vector<std::string> fPedFileNameCalibrator )
 {
 
-        definePedestalFile(fPedFileNameCalibrator);
+	definePedestalFile( fPedFileNameCalibrator );
 	for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
 	{
 		setTelID( getTeltoAna()[i] );
@@ -58,14 +58,14 @@ bool VIPRCalculator::calculateIPRGraphs(std::vector<std::string> fPedFileNameCal
 		{
 			copyIPRTelAveraged( getSumWindow(), getTeltoAna()[i], i );
 		}
-		if(false)
+		if( false )
 		{
 			cout << "MK ts: " << getCalData()->getPedsTS_vector( false ).size() << endl;
-                        for (unsigned int ts = 0 ; ts < getCalData()->getPedsTS_vector( false ).size() ; ts++ )
-                        {
-                                        calculateIPRGraphsTimeSlices( fPedFileNameC[getTeltoAna()[i]], ts, getSumWindow(), getTelType( getTeltoAna()[i] ), i);
-                        }
-                }
+			for( unsigned int ts = 0 ; ts < getCalData()->getPedsTS_vector( false ).size() ; ts++ )
+			{
+				calculateIPRGraphsTimeSlices( fPedFileNameC[getTeltoAna()[i]], ts, getSumWindow(), getTelType( getTeltoAna()[i] ), i );
+			}
+		}
 	}
 	return true;
 }
@@ -491,27 +491,32 @@ TH1F* VIPRCalculator::calculateIPRGraphAveraged( unsigned int iSummationWindow )
  *
  *  TIME SLICES CASE:
  *
- */	
+ */
 
 bool VIPRCalculator::clearHistos()
 {
-        fpedcal_histo_storage.clear();
-	if (fpedcal_histo_storage.empty() ){ 
+	fpedcal_histo_storage.clear();
+	if( fpedcal_histo_storage.empty() )
+	{
 		cout << "MK empty 1" << endl;
 		return false;
 	}
-	for (int telID = 0; telID < fpedcal_histo_storage.size(); telID++) {
-    		for (int i = 0; i < fpedcal_histo_storage[telID].size(); i++) {
-    		    for (int j = 0; j < fpedcal_histo_storage[telID][i].size(); j++) {
-		            for (int k = 0; k < fpedcal_histo_storage[telID][i][j].size(); k++) {
-                		delete fpedcal_histo_storage[telID][i][j][k];
-		            }
-		            fpedcal_histo_storage[telID][i][j].clear();
-		        }
-		        fpedcal_histo_storage[telID][i].clear();
-		    }
-		    fpedcal_histo_storage[telID].clear();
-	}	
+	for( int telID = 0; telID < fpedcal_histo_storage.size(); telID++ )
+	{
+		for( int i = 0; i < fpedcal_histo_storage[telID].size(); i++ )
+		{
+			for( int j = 0; j < fpedcal_histo_storage[telID][i].size(); j++ )
+			{
+				for( int k = 0; k < fpedcal_histo_storage[telID][i][j].size(); k++ )
+				{
+					delete fpedcal_histo_storage[telID][i][j][k];
+				}
+				fpedcal_histo_storage[telID][i][j].clear();
+			}
+			fpedcal_histo_storage[telID][i].clear();
+		}
+		fpedcal_histo_storage[telID].clear();
+	}
 	return true;
 }
 
@@ -520,49 +525,51 @@ vector<vector<vector<vector<TH1F*>>>> VIPRCalculator::getStorageHist()
 	return fpedcal_histo_storage;
 }
 
-TH1F* VIPRCalculator::getIPRPedestalHisto(const int telID, const int ts, const int pixel, const int sw)
+TH1F* VIPRCalculator::getIPRPedestalHisto( const int telID, const int ts, const int pixel, const int sw )
 {
-        if (fpedcal_histo_storage.empty()){
+	if( fpedcal_histo_storage.empty() )
+	{
 		cout << "*** MK empty" << endl;
 		return nullptr;
 	}
-        if(fpedcal_histo_storage[telID][ts][pixel][sw])
-        {
-                return fpedcal_histo_storage[telID][ts][pixel][sw];
-        }
-        else
-        {
-                return nullptr;
-        }
+	if( fpedcal_histo_storage[telID][ts][pixel][sw] )
+	{
+		return fpedcal_histo_storage[telID][ts][pixel][sw];
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 
-void VIPRCalculator::fillIPRPedestalHisto(){
-        fpedcal_histo_storage.resize(getTeltoAna().size());
+void VIPRCalculator::fillIPRPedestalHisto()
+{
+	fpedcal_histo_storage.resize( getTeltoAna().size() );
 }
 
-void VIPRCalculator::fillIPRPedestalHisto(const int telID, const int NTimeSlices,const vector<vector<vector<TH1F*>>>& fpedcal_histo )
-{       
-        //fpedcal_histo_storage[telID].push_back(fpedcal_histo[telID]);
-        if(true)
-        {       
-                vector< vector< TH1F* > > v1;
-                for (int p = 0 ; p < getNChannels(); p++)
-                {       
-                        vector< TH1F* > v2;
-                        for (int sw = 0 ; sw < 3; sw++)
-                        {       
-                                if( fpedcal_histo[telID][p][sw] )
-                                {       
-                                        v2.push_back( (TH1F*)fpedcal_histo[telID][p][sw]->Clone() ) ;
-                                }
-                        }
-                        v1.push_back(v2);
-                        v2.clear();
-                }
-                fpedcal_histo_storage[telID].push_back(v1);
-                v1.clear();
-        }
+void VIPRCalculator::fillIPRPedestalHisto( const int telID, const int NTimeSlices, const vector<vector<vector<TH1F*>>>& fpedcal_histo )
+{
+	//fpedcal_histo_storage[telID].push_back(fpedcal_histo[telID]);
+	if( true )
+	{
+		vector< vector< TH1F* > > v1;
+		for( int p = 0 ; p < getNChannels(); p++ )
+		{
+			vector< TH1F* > v2;
+			for( int sw = 0 ; sw < 3; sw++ )
+			{
+				if( fpedcal_histo[telID][p][sw] )
+				{
+					v2.push_back( ( TH1F* )fpedcal_histo[telID][p][sw]->Clone() ) ;
+				}
+			}
+			v1.push_back( v2 );
+			v2.clear();
+		}
+		fpedcal_histo_storage[telID].push_back( v1 );
+		v1.clear();
+	}
 }
 
 bool VIPRCalculator::calculateIPRGraphsTimeSlices( string iPedFileName, int TS,  unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel )
@@ -571,7 +578,7 @@ bool VIPRCalculator::calculateIPRGraphsTimeSlices( string iPedFileName, int TS, 
 	TDirectory* iG_CurrentDirectory = gDirectory;
 	
 	// get an IPR graph
-	TGraphErrors* i_IPRGraph = getIPRGraphTimeSlice(true, TS );
+	TGraphErrors* i_IPRGraph = getIPRGraphTimeSlice( true, TS );
 	if( !i_IPRGraph )
 	{
 		cout << "VIPRCalculator::calculateIPRGraphsTimeSlices info: no IPR graph found for telescope type " << iTelType << endl;
