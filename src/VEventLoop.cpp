@@ -818,42 +818,34 @@ void VEventLoop::shutdown()
 	else if( fRunPar->frunmode == R_PED || fRunPar->frunmode == R_GTO || fRunPar->frunmode == R_GTOLOW || fRunPar->frunmode == R_PEDLOW
 			 || fRunPar->frunmode == R_TZERO || fRunPar->frunmode == R_TZEROLOW )
 	{
-		//cout << "MKA " << fIPRCalculator->getIPRPedestalHisto(0, 0, 0, 0)->GetEntries() << endl;
 		VPedestalCalculator* iP = 0;
 		if( fRunPar->frunmode == R_PED && fRunPar->fPedestalsInTimeSlices && fPedestalCalculator )
 		{
 			iP = fPedestalCalculator;
 			fPedestalCalculator->terminate( false, false, fIPRCalculator );
 		}
-		//cout << "MKB " << fIPRCalculator->getIPRPedestalHisto(0, 0, 0, 0)->GetEntries() << endl;
 		if( fCalibrator )
 		{
 			fCalibrator->terminate( iP , fIPRCalculator );
 		}
-		//cout << "MKC " << fIPRCalculator->getIPRPedestalHisto(0, 0, 0, 0)->GetEntries() << endl;
-		cout << "MK here" << endl;
 	}
 	// write data summary
 	else if( fDST && fRunPar->frunmode == R_DST )
 	{
-		cout << "MK here2" << endl;
 		fDST->terminate();
 	}
 	// delete readers
 	if( fRunPar->fsourcetype != 0 && fGrIsuReader )
 	{
-		cout << "MK here3" << endl;
 		delete fGrIsuReader;
 	}
 	if( fDebug )
 	{
-		cout << "MK here4" << endl;
 		cout << "VEventLoop::shutdown() ... finished" << endl;
 	}
 	// final check of output file; just open and close it again
 	if( fRunMode == R_ANA )
 	{
-		cout << "MK here5" << endl;
 		if( fDebug )
 		{
 			cout << "VEventLoop::shutdown: final check of output file" << endl;

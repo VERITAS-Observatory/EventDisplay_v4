@@ -136,7 +136,7 @@ class VCalibrator : public VImageBaseAnalyzer
 		void calculatePedestals( bool iLowGain = false );
 		void calculateGainsAndTOffsets( bool iLowGain = false );
 		unsigned int getNumberOfEventsUsedInCalibration( int iTelID, int iType );
-		void initialize( VIPRCalculator* fIPRCalculator );
+		void initialize(VIPRCalculator *fIPRCalculator );
 		void terminate( VPedestalCalculator*, VIPRCalculator* );
 };
 #endif

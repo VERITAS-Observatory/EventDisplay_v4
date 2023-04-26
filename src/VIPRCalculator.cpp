@@ -58,7 +58,7 @@ bool VIPRCalculator::calculateIPRGraphs( std::vector<std::string> fPedFileNameCa
 		{
 			copyIPRTelAveraged( getSumWindow(), getTeltoAna()[i], i );
 		}
-		if( false )
+		if( true )
 		{
 			cout << "MK ts: " << getCalData()->getPedsTS_vector( false ).size() << endl;
 			for( unsigned int ts = 0 ; ts < getCalData()->getPedsTS_vector( false ).size() ; ts++ )
@@ -739,4 +739,109 @@ bool VIPRCalculator::calculateIPRGraphsTimeSlices( string iPedFileName, int TS, 
 	iG_CurrentDirectory->cd();
 	
 	return true;
+}
+
+/*
+ *
+ * write IPR graphs to disk (one per telescope type)
+ *
+ */
+bool VIPRCalculator::writeIPRgraphs( map<ULong64_t, vector<vector<TH1F*>>> &hped_vec, string iFile  )
+{
+        TFile* fgraphs = 0;
+        if( iFile.size() == 0 )
+        {
+                fgraphs = new TFile( getRunParameter()->fIPRdatabaseFile, "RECREATE" );
+        }
+        else
+        {
+                fgraphs = new TFile( iFile.c_str(), "UPDATE" );
+        }
+        if( fgraphs->IsZombie() )
+        {
+                cout << "VCalibrator::writeIPRgraphs error opening IPR output file: " << endl;
+                cout << "\t" << fgraphs->GetName() << endl;
+                return false;
+        }
+
+        // tree with conditions for these IRPs
+        TTree* header = new TTree( "IPRheader", "IPR parameters" );
+        unsigned int sumwin = 0;            // [FADC slices]
+        unsigned int Nsamples = 0;          // [FADC slices]
+        float ROwin = 0.;                   // [ns]
+        float FADCslice = 0.;               // [ns]
+        unsigned int SignalExtractor = 0;   // [ Selected Extractor ]
+        header->Branch( "SignalExtractor", &SignalExtractor, "SignalExtractor/i" );
+        header->Branch( "SummationWindow", &sumwin, "SummationWindow/i" );
+        header->Branch( "Nsamples", &Nsamples, "Nsamples/i" );
+        header->Branch( "FADCtimeSlice", &FADCslice, "FADCtimeSlice/F" );
+        header->Branch( "ReadoutWindow", &ROwin, "ReadoutWindow/F" );
+
+        // one graph per telescope ID
+        map< ULong64_t, bool > iTelDone;
+        for( unsigned int i = 0; i < getDetectorGeometry()->getTelType_list().size(); i++ )
+        {
+                iTelDone[getDetectorGeometry()->getTelType_list()[i]] = false;
+        }
+
+        for( unsigned int i = 0; i < getNTel(); i++ )
+        {
+                setTelID( i );
+                if( iTelDone[getTelType( i )] )
+                {
+                        continue;
+                }
+
+                if( hped_vec.find( getTelType( i ) ) == hped_vec.end() )
+                {
+                        continue;
+                }
+
+                // loop over all summation windows
+                for( unsigned int j = 0; j < hped_vec[getTelType( i )].size(); j++ )
+                {
+                        // summation window
+                        int i_sw = j + 1;
+
+                        TGraphErrors* g = getIPRGraph( i_sw, false );
+                        if( !g )
+                        {
+                                continue;
+                        }
+                        SignalExtractor = getRunParameter()->fTraceIntegrationMethod.at( getTelID() );
+                        sumwin          = i_sw;
+                        Nsamples        = getNSamples();
+                        FADCslice       = getDetectorGeometry()->getLengthOfSampleTimeSlice( getTelID() ); //[ns]
+                        ROwin           = getDetectorGeometry()->getLengthOfSampleTimeSlice( getTelID() ) * ( float )getNSamples(); // [ns]
+
+                        header->Fill();
+                        g->Write();
+                }
+
+		//loop over all time slices
+		for (unsigned int ts = 0 ; ts < getCalData()->getPedsTS_vector( false ).size() ; ts++ )
+		{
+			TGraphErrors* gTS = getIPRGraphTimeSlice(false, ts );
+			if( !gTS )
+                        {
+                                continue;
+                        }
+                        SignalExtractor = getRunParameter()->fTraceIntegrationMethod.at( getTelID() );
+                        sumwin          = 1;
+                        Nsamples        = getNSamples();
+                        FADCslice       = getDetectorGeometry()->getLengthOfSampleTimeSlice( getTelID() ); //[ns]
+                        ROwin           = getDetectorGeometry()->getLengthOfSampleTimeSlice( getTelID() ) * ( float )getNSamples(); // [ns]
+
+                        header->Fill();
+                        gTS->Write();
+
+		}		
+
+                iTelDone[getTelType( i )] = true;
+        }
+        header->Write();
+        fgraphs->Close();
+        fgraphs->Delete();
+
+        return true;
 }

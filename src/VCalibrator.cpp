@@ -477,15 +477,15 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 				cout << "...exiting" << endl;
 				exit( EXIT_FAILURE );
 			}
-			cout << "MKa" << endl;
+			
 			// fill and write pedestal tree
 			fillPedestalTree( tel, iPedestalCalculator );
-			cout << "MKb" << endl;
+			
 			// write 1D histograms to directory calibration_TEL
 			std::ostringstream iSname;
 			iSname << "distributions_" << telType;
 			TDirectory* i_dist = getPedestalRootFile( telType )->mkdir( iSname.str().c_str() );
-			cout << "MKc" << endl;
+			
 			if( i_dist->cd() )
 			{
 				i_dist->cd();
@@ -499,7 +499,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 						}
 					}
 				}
-				cout << "MKd" << endl;
+
 				for( unsigned int i = 0; i < hpedPerTelescopeType[telType].size(); i++ )
 				{
 					for( unsigned int j = 0; j < hpedPerTelescopeType[telType][i].size(); j++ )
@@ -510,6 +510,20 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 						}
 					}
 				}
+				//cout << "MK sum window: " << getSumWindow() << "  " << getRunParameter()->fCalibrationSumWindow << endl;
+				for (unsigned int ts = 0; ts < (fIPRCalculator->getStorageHist())[tel].size(); ts++)
+				{
+		                        for (unsigned int p = 0; p <  getNChannels(); p++)
+					{
+							int sw = getSumWindow() - 6;
+                               				if ( fIPRCalculator->getIPRPedestalHisto(tel, ts, p, sw) )
+							{
+                                                		fIPRCalculator->getIPRPedestalHisto(tel, ts, p, sw)->SetName(Form( "hpedTimeSlices_Tel%d_TS%d_Pix%d_SW%d", (int)telType, ts, p, sw + 6 ) );
+				                                fIPRCalculator->getIPRPedestalHisto(tel, ts, p, sw)->SetTitle( Form("hpedTimeSlices_Tel%d_TS%d_Pix%d_SW%d", (int)telType, ts, p, sw + 6 ) );
+        		        		                fIPRCalculator->getIPRPedestalHisto(tel, ts, p, sw)->Write();
+                	                       		}
+                        		}
+                		}
 			}
 			iFileWritten[telType] = true;
 		}
@@ -589,7 +603,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 				}
 			}
 		}
-		writeIPRgraphs( fPedSingleOutFile->GetName() );
+		fIPRCalculator->writeIPRgraphs( hped_vec, fPedSingleOutFile->GetName() );
 	}
 	
 }
@@ -1593,14 +1607,13 @@ void VCalibrator::writeTOffsets( bool iLowGain )
 	}
 }
 
-//MK test
-//void VCalibrator::terminate( VPedestalCalculator* iP, VIPRCalculator *fIPRCalculator )
+
 void VCalibrator::terminate( VPedestalCalculator* iP, VIPRCalculator* fIPRCalculator )
 {
 	if( fRunPar->frunmode == 1 || fRunPar->frunmode == 6 )
 	{
 		writePeds( fRunPar->frunmode == 6, iP, !fRunPar->fPedestalSingleRootFile, fIPRCalculator );
-		//writePeds( fRunPar->frunmode == 6, iP, !fRunPar->fPedestalSingleRootFile, fIPRCalculator );
+
 	}
 	else if( fRunPar->frunmode == 2 || fRunPar->frunmode == 5 )
 	{
@@ -3097,7 +3110,6 @@ void VCalibrator::readTOffsets( bool iLowGain )
 	
 }
 
-//MK test
 void VCalibrator::initialize( VIPRCalculator* fIPRCalculator )
 {
 	if( fDebug )
@@ -3228,9 +3240,7 @@ void VCalibrator::initialize( VIPRCalculator* fIPRCalculator )
 	// if needed: write IPR graphs to disk
 	if( getRunParameter()->ifCreateIPRdatabase == true && getRunParameter()->ifReadIPRfromDatabase == false )
 	{
-		//MK test
-		//fIPRCalculator->writeIPRgraphs( hped_vec, "");
-		writeIPRgraphs();
+		fIPRCalculator->writeIPRgraphs(hped_vec, "");
 	}
 	
 	// initialize dead  channel finder
@@ -3246,10 +3256,7 @@ void VCalibrator::initialize( VIPRCalculator* fIPRCalculator )
 				&& fRunPar->frunmode != 1
 				&& fRunPar->frunmode != 6 )
 		{
-			cout << "MK calculating IPR graphs" << endl;
-			//calculateIPRGraphs();
 			fIPRCalculator->calculateIPRGraphs( fPedFileNameC );
-			//calculateIPRGraphs();
 		}
 	}
 }
