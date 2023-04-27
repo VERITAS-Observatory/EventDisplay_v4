@@ -43,8 +43,7 @@ class VIPRCalculator : public VImageBaseAnalyzer
 		bool calculateIPRGraphs( string iPedFileName, unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel );
 		bool calculateIPRGraphsTimeSlices( string iPedFileName, int TS,  unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel );
 		bool writeIPRgraphs( map<ULong64_t, vector<vector<TH1F*>>> &hped_vec, string iFile = "" );
-		void fillIPRPedestalHisto(const int telID, const int NTimeSlices,const vector<vector<vector<TH1F*>>>& fpedcal_histo );
-		void fillIPRPedestalHisto();
+		void initializeIPRStorageVector(const int telID, const int NTimeSlices,const vector<vector<vector<TH1F*>>>& fpedcal_histo );
 		TH1F* getIPRPedestalHisto(const int telID, const int ts, const int pixel, const int sw);
 		bool clearHistos();
 		vector<vector<vector<vector<TH1F*>>>> getStorageHist();

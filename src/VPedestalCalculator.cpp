@@ -12,7 +12,7 @@ VPedestalCalculator::VPedestalCalculator()
 	fDebug = getDebugFlag();
 	
 	// default parameters (can be adjusted later in initialize())
-	fLengthofTimeSlice = 180.;                     // in [s]
+	fLengthofTimeSlice = 2000.;                     // in [s]
 	fSumWindow = 24;
 	fNPixel = 500;
 	fSumFirst = 0;
@@ -306,12 +306,9 @@ void VPedestalCalculator::doAnalysis( bool iLowGain, VIPRCalculator *fIPRCalcula
 		{
 			time = t;
 
-			if (NTimeSlices[telID] == 0 and telID == 0){
-				fIPRCalculator->fillIPRPedestalHisto();
-			}
 			NTimeSlices[telID]+=1;
 			cout << "MK filling pedestal for IPR" << endl;
-			fIPRCalculator->fillIPRPedestalHisto(telID, NTimeSlices[telID], fpedcal_histo);
+			fIPRCalculator->initializeIPRStorageVector(telID, NTimeSlices[telID], fpedcal_histo);
 
 			fillTimeSlice( telID );
 			fTimeVec[telID] = t;

@@ -10,6 +10,7 @@ VIPRCalculator::VIPRCalculator()
 	fIPRTimeSlices = true;
 	fIPRAverageTel = false;
 	fPedPerTelescopeTypeMinCnt = 1.E5;  // minimal counter for IPR measurements
+	fpedcal_histo_storage.resize( getTeltoAna().size() );
 }
 
 void VIPRCalculator::initialize()
@@ -542,13 +543,7 @@ TH1F* VIPRCalculator::getIPRPedestalHisto( const int telID, const int ts, const 
 	}
 }
 
-
-void VIPRCalculator::fillIPRPedestalHisto()
-{
-	fpedcal_histo_storage.resize( getTeltoAna().size() );
-}
-
-void VIPRCalculator::fillIPRPedestalHisto( const int telID, const int NTimeSlices, const vector<vector<vector<TH1F*>>>& fpedcal_histo )
+void VIPRCalculator::initializeIPRStorageVector( const int telID, const int NTimeSlices, const vector<vector<vector<TH1F*>>>& fpedcal_histo )
 {
 	//fpedcal_histo_storage[telID].push_back(fpedcal_histo[telID]);
 	if( true )
@@ -623,7 +618,7 @@ bool VIPRCalculator::calculateIPRGraphsTimeSlices( string iPedFileName, int TS, 
 				&& i < getDead().size() && !getDead()[i] )
 		{
 			stringstream i_Hname( stringstream::in | stringstream::out );
-			i_Hname << "hpedTimeSlices_" << iTelType << "_" << iSummationWindow << "_" << i;
+			i_Hname << "hpedTimeSlices_Tel" << iTelType << "_TS" << TS << "_Pix" << i << "_SW" << iSummationWindow;
 			TH1F* h = ( TH1F* )gDirectory->Get( i_Hname.str().c_str() );
 			
 			if( h )
@@ -647,7 +642,7 @@ bool VIPRCalculator::calculateIPRGraphsTimeSlices( string iPedFileName, int TS, 
 						}
 						if( i_gainCorrect > 0. )
 						{
-							hIPR->Fill( ( h->GetBinCenter( j ) - ped * iSummationWindow ) / i_gainCorrect, h->GetBinContent( j ) );
+							hIPR->Fill( ( h->GetBinCenter( j ) - ped ) / i_gainCorrect, h->GetBinContent( j ) );
 						}
 					}
 				}
