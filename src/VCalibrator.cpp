@@ -515,12 +515,11 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 				{
 		                        for (unsigned int p = 0; p <  getNChannels(); p++)
 					{
-							//MK: get the correct index (SW-1) for summation window SW. Same thing done in line 141 for hpedPerTelescopeType
-							int sw = getSumWindow() - 1;
+							int sw = getSumWindow() - 6;
                                				if ( fIPRCalculator->getIPRPedestalHisto(tel, ts, p, sw) )
 							{
-                                                		fIPRCalculator->getIPRPedestalHisto(tel, ts, p, sw)->SetName(Form( "hpedTimeSlices_Tel%d_TS%d_Pix%d_SW%d", (int)telType, ts, p, sw + 1 ) );
-				                                fIPRCalculator->getIPRPedestalHisto(tel, ts, p, sw)->SetTitle( Form("hpedTimeSlices_Tel%d_TS%d_Pix%d_SW%d", (int)telType, ts, p, sw + 1 ) );
+                                                		fIPRCalculator->getIPRPedestalHisto(tel, ts, p, sw)->SetName(Form( "hpedTimeSlices_Tel%d_TS%d_Pix%d_SW%d", (int)telType, ts, p, sw + 6 ) );
+				                                fIPRCalculator->getIPRPedestalHisto(tel, ts, p, sw)->SetTitle( Form("hpedTimeSlices_Tel%d_TS%d_Pix%d_SW%d", (int)telType, ts, p, sw + 6 ) );
         		        		                fIPRCalculator->getIPRPedestalHisto(tel, ts, p, sw)->Write();
                 	                       		}
                         		}

@@ -9,7 +9,7 @@ VIPRCalculator::VIPRCalculator()
 {
 	fIPRTimeSlices = true;
 	fIPRAverageTel = false;
-	fPedPerTelescopeTypeMinCnt = 1.E5;  // minimal counter for IPR measurements
+	fPedPerTelescopeTypeMinCnt = 1.e3; //1.E5;  // minimal counter for IPR measurements
 	fpedcal_histo_storage.resize( getTeltoAna().size() );
 }
 
@@ -59,6 +59,10 @@ bool VIPRCalculator::calculateIPRGraphs( std::vector<std::string> fPedFileNameCa
 		{
 			copyIPRTelAveraged( getSumWindow(), getTeltoAna()[i], i );
 		}
+
+		cout << "*******************************" << endl;
+		cout << "* Starting IPR in Time Slices *" << endl;
+		cout << "*******************************" << endl;
 		if( true )
 		{
 			cout << "MK ts: " << getCalData()->getPedsTS_vector( false ).size() << endl;
@@ -116,6 +120,7 @@ bool VIPRCalculator::copyIPRTelAveraged( unsigned int iSummationWindow, ULong64_
 
 bool VIPRCalculator::calculateIPRGraphs( string iPedFileName, unsigned int iSummationWindow, ULong64_t iTelType, unsigned int i_tel )
 {
+	cout << "MK sum window: " << iSummationWindow << endl;
 	TH1F* hIPR = ( TH1F* )initializeIPRHistogram( iSummationWindow, getTeltoAna()[i_tel] );
 	TDirectory* iG_CurrentDirectory = gDirectory;
 	
@@ -177,17 +182,7 @@ bool VIPRCalculator::calculateIPRGraphs( string iPedFileName, unsigned int iSumm
 				if( getRunParameter()->fCombineChannelsForPedestalCalculation == 0 )
 				{
 					ped = getPeds()[i];
-				}
-				// special treatment for ASTRI telescopes
-				else if( getRunParameter()->fCombineChannelsForPedestalCalculation == 2 )
-				{
-					stringstream i_Pname( stringstream::in | stringstream::out );
-					i_Pname << "hped_" << iTelType << "_" << iSummationWindow << "_" << i;
-					TH1F* hP = ( TH1F* )gDirectory->Get( i_Pname.str().c_str() );
-					if( hP )
-					{
-						ped = hP->GetMean();
-					}
+					if(i<5){ cout << "MK ped: " << ped  << endl;	}
 				}
 				for( int j = 1; j <= h->GetNbinsX(); j++ )
 				{
@@ -543,7 +538,7 @@ TH1F* VIPRCalculator::getIPRPedestalHisto( const int telID, const int ts, const 
 	}
 }
 
-void VIPRCalculator::initializeIPRStorageVector( const int telID, const int NTimeSlices, const vector<vector<vector<TH1F*>>>& fpedcal_histo )
+void VIPRCalculator::fillIPRPedestalHisto( const int telID, const int NTimeSlices, const vector<vector<vector<TH1F*>>>& fpedcal_histo )
 {
 	//fpedcal_histo_storage[telID].push_back(fpedcal_histo[telID]);
 	if( true )
@@ -630,6 +625,7 @@ bool VIPRCalculator::calculateIPRGraphsTimeSlices( string iPedFileName, int TS, 
 				if( getRunParameter()->fCombineChannelsForPedestalCalculation == 0 )
 				{
 					ped = getCalData()->getPedsTS_vector( false )[TS][i];
+					if(i<5){ cout << "MK ped ts: " << ped << endl;     }
 				}
 				for( int j = 1; j <= h->GetNbinsX(); j++ )
 				{
@@ -642,7 +638,7 @@ bool VIPRCalculator::calculateIPRGraphsTimeSlices( string iPedFileName, int TS, 
 						}
 						if( i_gainCorrect > 0. )
 						{
-							hIPR->Fill( ( h->GetBinCenter( j ) - ped ) / i_gainCorrect, h->GetBinContent( j ) );
+							hIPR->Fill( ( h->GetBinCenter( j ) - ped*iSummationWindow ) / i_gainCorrect, h->GetBinContent( j ) );
 						}
 					}
 				}
@@ -652,6 +648,7 @@ bool VIPRCalculator::calculateIPRGraphsTimeSlices( string iPedFileName, int TS, 
 	
 	int z = 0;
 	float norm = hIPR->Integral( 1, hIPR->GetNbinsX() );
+	cout << "MK norm of IPR: " << norm << endl;
 	if( norm < fPedPerTelescopeTypeMinCnt )  //statistical limit for number of counts
 	{
 		fIPRAverageTel = true;
@@ -661,7 +658,7 @@ bool VIPRCalculator::calculateIPRGraphsTimeSlices( string iPedFileName, int TS, 
 		cout << "current limit " << fPedPerTelescopeTypeMinCnt << ")" << endl;
 		cout << "IPR graphs will be provided as sum of " << getTeltoAna().size() << " telescopes statistics." << endl;
 		cout << "VIPRCalculator::calculateIPRGraphsTimeSlices(): fIPRAverageTel = " << fIPRAverageTel << endl;
-		hIPR = calculateIPRGraphAveraged( iSummationWindow );
+		//hIPR = calculateIPRGraphAveraged( iSummationWindow );
 		cout << "VIPRCalculator::calculateIPRGraphsTimeSlices norm IPR combined: " << hIPR->Integral( 1, hIPR->GetNbinsX() ) << endl;
 	}
 	if( norm == 0 )

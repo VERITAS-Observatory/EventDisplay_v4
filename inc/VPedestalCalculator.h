@@ -48,6 +48,7 @@ class VPedestalCalculator : public VImageBaseAnalyzer
 		vector< vector< vector< float > > > fpedcal_mean;
 		vector< vector< vector< float > > > fpedcal_mean2;
 		vector< vector< vector< TH1F* > > > fpedcal_histo;
+		vector< vector< vector< TH1F* > > > fpedcal_histo_slidingw;
 		
 		vector< vector< float > > v_temp_pedEntries;
 		vector< vector< float > > v_temp_ped;

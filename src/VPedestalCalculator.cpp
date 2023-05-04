@@ -184,6 +184,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		fpedcal_mean.push_back( iped_cal2 );
 		fpedcal_mean2.push_back( iped_cal2 );
 		fpedcal_histo.push_back( iped_histo2 );
+		fpedcal_histo_slidingw.push_back( iped_histo2 );
 		
 		// define the time vector
 		fTimeVec.push_back( 0 );
@@ -253,6 +254,7 @@ void VPedestalCalculator::fillTimeSlice( unsigned int telID )
 			fpedcal_mean[telID][p][w] = 0.;
 			fpedcal_mean2[telID][p][w] = 0.;
 			fpedcal_histo[telID][p][w]->Reset();
+			fpedcal_histo_slidingw[telID][p][w]->Reset();
 		}
 		// deroate the pixel coordinates
 		if( getTelID() < getPointing().size() && getPointing()[getTelID()] )
@@ -308,7 +310,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain, VIPRCalculator *fIPRCalcula
 
 			NTimeSlices[telID]+=1;
 			cout << "MK filling pedestal for IPR" << endl;
-			fIPRCalculator->initializeIPRStorageVector(telID, NTimeSlices[telID], fpedcal_histo);
+			fIPRCalculator->fillIPRPedestalHisto(telID, NTimeSlices[telID], fpedcal_histo_slidingw );
 
 			fillTimeSlice( telID );
 			fTimeVec[telID] = t;
@@ -316,6 +318,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain, VIPRCalculator *fIPRCalcula
 		///////////////////////////////////////////////////////
 		
 		double i_tr_sum = 0.;
+		double i_tr_sum_slidingw = 0.;
 		// calculate the sums (don't use calcsums because it overwrites getSums() )
 		// and fill the histograms
 		for( unsigned int i = 0; i < getNChannels(); i++ )
@@ -351,6 +354,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain, VIPRCalculator *fIPRCalcula
 						{
 							// calculate trace sum
 							i_tr_sum = fTraceHandler->getTraceSum( fSumFirst, fSumFirst + ( w + 1 ), true, 1 );
+							i_tr_sum_slidingw = fTraceHandler->getTraceSum( fSumFirst, fSumFirst + ( w + 1 ), false, 2 );
 							if( i_tr_sum > 0. && i_tr_sum < 50.*( w + 1 ) )
 							{
 								if( chanID < fpedcal_n[telID].size() && w < fpedcal_n[telID][chanID].size() )
@@ -359,6 +363,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain, VIPRCalculator *fIPRCalcula
 									fpedcal_mean[telID][chanID][w] += i_tr_sum;
 									fpedcal_mean2[telID][chanID][w] += i_tr_sum * i_tr_sum;
 									fpedcal_histo[telID][chanID][w]->Fill( i_tr_sum );
+									fpedcal_histo_slidingw[telID][chanID][w]->Fill( i_tr_sum_slidingw );
 								}
 								else
 								{
