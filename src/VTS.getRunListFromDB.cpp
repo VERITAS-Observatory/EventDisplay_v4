@@ -1,7 +1,9 @@
-/*! file VTS.getRunListFromDB read exposure from DB
-
-    (VERITAS only)
-
+/*! VTS.getRunListFromDB read from VERITAS database
+ *  and download data from VERITAS archive
+ *
+ *  Note the bizare usage of VExposure for these
+ *  purposes
+ *
 */
 
 #include "VGlobalRunParameter.h"
@@ -35,29 +37,19 @@ bool bCheckSums = false;
 
 int main( int argc, char* argv[] )
 {
-
 	parseOptions( argc, argv );
-	VExposure a;
-	
 	if( runlist != "" && laserlist != "" )
 	{
 		cout << "Error: Cannot use -m and -l at the same time." << endl;
 		return 0;
 	}
 	
+	VExposure a;
 	a.setObservingMode( bOBSMODE );
 	a.setDoCheckSums( bCheckSums );
 	
-	
-	if( runnumber != 0 )
+	if( runnumber > 0 )
 	{
-	
-		if( runnumber <= 0 )
-		{
-			cout << "Error: Run Number less than 0." << endl;
-			return 0;
-		}
-		
 		a.setTelMinElevation( -99999.0 );
 		a.setMinDuration( -99999.0 );
 		a.setRunNumber( runnumber );
@@ -87,13 +79,10 @@ int main( int argc, char* argv[] )
 		}
 		a.printChecksumSummary();
 		return 0;
-		
 	}
 	
 	if( runlist != "" )
 	{
-	
-	
 		a.readRunListFromFile( runlist );
 		a.readFromDBList();
 		a.setSelectLaser( laserruns );
@@ -123,7 +112,6 @@ int main( int argc, char* argv[] )
 		a.printChecksumSummary();
 		
 		return 0;
-		
 	}
 	else if( laserlist != "" )
 	{
@@ -145,11 +133,9 @@ int main( int argc, char* argv[] )
 		a.printChecksumSummary();
 		
 		return 0;
-		
 	}
 	else
 	{
-	
 		a.setMakeRunList( true );
 		a.setTimeRange( startdate, enddate );
 		a.setSourceName( sourcename );
@@ -183,9 +169,7 @@ int main( int argc, char* argv[] )
 		a.printChecksumSummary();
 		
 		return 0;
-		
 	}
-	
 	
 	return 0;
 	

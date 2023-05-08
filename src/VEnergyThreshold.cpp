@@ -235,7 +235,7 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 		feffFract_50p = 0;
 		feffFract_90p = 0;
 		
-        feff_150GeV = 0.;
+		feff_150GeV = 0.;
 		feff_300GeV = 0.;
 		feff_500GeV = 0.;
 		feff_1TeV = 0.;
