@@ -736,7 +736,10 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 		ichannel = ( Int_t )i;
 		
 		// get pedestal and pedestal variances from pedestal histograms
-		if( fRunPar->fCalibrationSumWindow > 0 && hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetEntries() > 10 )
+		if( fRunPar->fCalibrationSumWindow > 0
+				&& hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetEntries() > 10
+				&& hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->Integral(
+					1, hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetNbinsX() ) )
 		{
 			iped = hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetMean() / ( double )fRunPar->fCalibrationSumWindow;
 			hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetQuantiles( 3, yq, xq );
@@ -754,7 +757,8 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 		for( unsigned int j = 0; j < hped_vec[iTelType].size(); j++ )
 		{
 			isumw[j] = ( Float_t )j + 1;
-			if( hped_vec[iTelType][j][i]->GetEntries() > 0 )
+			if( hped_vec[iTelType][j][i]->GetEntries() > 10
+					&& hped_vec[iTelType][j][i]->Integral( 1, hped_vec[iTelType][j][i]->GetNbinsX() > 0. ) )
 			{
 				ipedv[j] = hped_vec[iTelType][j][i]->GetRMS();
 				hped_vec[iTelType][j][i]->GetQuantiles( 3, yq, xq );
@@ -1514,7 +1518,7 @@ TTree* VCalibrator::fillCalibrationSummaryTree( unsigned int itel, string iName,
 	for( unsigned int i = 0; i < getNChannels(); i++ )
 	{
 		ichannel = ( int )i;
-		if( i < h.size() && h[i] && h[i]->GetEntries() > 0 )
+		if( i < h.size() && h[i] && h[i]->GetEntries() > 0 && h[i]->Integral( 1, h[i]->GetNbinsX() > 0. ) )
 		{
 			i_mean = h[i]->GetMean();
 			i_rms  = h[i]->GetRMS();
@@ -4364,7 +4368,8 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 		}
 		if( iTelTypeC < iH_averageTZero.size() && iH_averageTZero[iTelTypeC] )
 		{
-			if( iH_averageTZero[iTelTypeC]->GetEntries() > 0. )
+			if( iH_averageTZero[iTelTypeC]->GetEntries() > 0.
+					&& iH_averageTZero[iTelTypeC]->Integral( 1, iH_averageTZero[iTelTypeC]->GetNbinsX() > 0. ) )
 			{
 				double i_a[] = { 0.5 };
 				double i_b[] = { 0.0 };
@@ -4726,7 +4731,11 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
 	}
 	
 	int z = 0;
-	float norm = hIPR->Integral( 1, hIPR->GetNbinsX() );
+	float norm = 1.;
+	if( hIPR->GetEntries() > 0. )
+	{
+		norm = hIPR->Integral( 1, hIPR->GetNbinsX() );
+	}
 	if( norm < fPedPerTelescopeTypeMinCnt )  //statistical limit for number of counts
 	{
 		fIPRAverageTel = true;
@@ -4737,7 +4746,7 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
 		cout << "IPR graphs will be provided as sum of " << getTeltoAna().size() << " telescopes statistics." << endl;
 		cout << "VCalibrator::calculateIPRGraphs(): fIPRAverageTel = " << fIPRAverageTel << endl;
 		hIPR = calculateIPRGraphAveraged( iSummationWindow );
-		cout << "VCalibrator::calculateIPRGraphs norm IPR combined: " << hIPR->Integral( 1, hIPR->GetNbinsX() ) << endl;
+		cout << "VCalibrator::calculateIPRGraphs norm IPR combined: " << norm << endl;
 	}
 	if( norm == 0 )
 	{
@@ -4988,7 +4997,11 @@ TH1F* VCalibrator::calculateIPRGraphAveraged( unsigned int iSummationWindow )
 		
 	}
 	hIPR->Scale( 1. / getTeltoAna().size() );
-	float norm = getTeltoAna().size() * hIPR->Integral( 1, hIPR->GetNbinsX() );
+	float norm = 1.;
+	if( hIPR->GetEntries() > 0. )
+	{
+		norm = getTeltoAna().size() * hIPR->Integral( 1, hIPR->GetNbinsX() );
+	}
 	cout << "VCalibrator::calculateIPRGraphAveraged normalization of average IPR histogram " << norm;
 	cout << ". Returning IPR histogram." << endl;
 	if( norm < fPedPerTelescopeTypeMinCnt )  //statistical limit for number of counts
