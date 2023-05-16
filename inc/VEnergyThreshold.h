@@ -62,9 +62,11 @@ class VEnergyThreshold : public TObject
 		float feffFract_20p;
 		float feffFract_50p;
 		float feffFract_90p;
+		float feff_150GeV;
 		float feff_300GeV;
 		float feff_500GeV;
 		float feff_1TeV;
+		float feff_10TeV;
 		
 		UShort_t nbins;
 		float e0[1000];
@@ -119,6 +121,6 @@ class VEnergyThreshold : public TObject
 		
 		double getEnergyThreshold( VRunList* );
 		
-		ClassDef( VEnergyThreshold, 1 );
+		ClassDef( VEnergyThreshold, 2 );
 };
 #endif

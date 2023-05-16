@@ -385,7 +385,7 @@ bool VRunStats::readDBHVEvndispData( TSQLServer* f_db )
 		int fNRows = db_res->GetRowCount();
 		
 		cout << "reading HVs for telescope " << i + 1 << " from DB" << endl;
-		cout << "\t number of rows for HV read form DB: " << fNRows << endl;
+		cout << "\t number of rows for HV read from DB: " << fNRows << endl;
 		
 		string itemp;
 		for( int j = 0; j < fNRows; j++ )
@@ -472,7 +472,7 @@ bool VRunStats::readDB_default_HVEvndispData( TSQLServer* f_db )
 		//      for( unsigned int f = 0; f < db_res->GetFieldCount(); f++ ) cout << f << "\t" << db_res->GetFieldName( f ) << endl;
 		
 		cout << "reading HV default settings for telescope " << i + 1 << " from DB" << endl;
-		cout << "\t number of rows for defaultHV read form DB: " << fNRows << endl;
+		cout << "\t number of rows for defaultHV read from DB: " << fNRows << endl;
 		
 		
 		string itemp;
@@ -681,7 +681,7 @@ bool VRunStats::readDBWeatherInfo( TSQLServer* f_db )
 	int fNRows = db_res->GetRowCount();
 	
 	cout << "reading weather info from DB" << endl;
-	cout << "\t number of rows for weather info read form DB: " << fNRows << endl;
+	cout << "\t number of rows for weather info read from DB: " << fNRows << endl;
 	
 	string itemp;
 	for( int j = 0; j < fNRows; j++ )
@@ -739,8 +739,8 @@ bool VRunStats::readDBSourceInfo( TSQLServer* f_db )
 		cout << i << "\t" << db_res->GetFieldName( i ) << endl;
 	}
 	
-	cout << "reading source info from DB" << endl;
-	cout << "\t number of sources read form DB: " << fNRows << endl;
+	cout << "reading target info from DB" << endl;
+	cout << "\t number of targets read from DB: " << fNRows << endl;
 	
 	string itemp;
 	for( int j = 0; j < fNRows; j++ )
@@ -778,7 +778,7 @@ bool VRunStats::readDBRun_IDs( TSQLServer* f_db )
 	
 	int fNRows = db_res->GetRowCount();
 	
-	cout << "\t number of runs read form DB: " << fNRows << endl;
+	cout << "\t number of runs read from DB: " << fNRows << endl;
 	
 	string itemp;
 	
@@ -833,7 +833,7 @@ bool VRunStats::readDBRunInfo( TSQLServer* f_db )
 		cout << i << "\t" << db_res->GetFieldName( i ) << endl;
 	}
 	
-	cout << "\t number of runs read form DB: " << fNRows << endl;
+	cout << "\t number of runs read from DB: " << fNRows << endl;
 	
 	string itemp;
 	unsigned int j_start = 0;

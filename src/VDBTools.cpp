@@ -45,8 +45,8 @@ bool VDB_ObservingSources::fill( TSQLServer* i_db )
 	
 	int fNRows = db_res->GetRowCount();
 	
-	cout << "reading source info from DB" << endl;
-	cout << "\t number of sources read form DB: " << fNRows << endl;
+	cout << "reading targets info from DB" << endl;
+	cout << "\t number of targets read from DB: " << fNRows << endl;
 	
 	string itemp;
 	for( int j = 0; j < fNRows; j++ )

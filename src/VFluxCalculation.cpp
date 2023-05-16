@@ -674,34 +674,9 @@ void VFluxCalculation::getIntegralEffectiveArea()
 				}
 				
 				fIntraRunEffArea.push_back( i_IntraEffArea );
-				
-				/*
-								double mean_run_eff_area = 0;
-								double total_on = 0;
-								double total_off = 0;
-								double total_diff = 0;
-								for(unsigned int ii = 0 ; ii < i_IntraEffArea.size(); ii++){
-									 std::cout<<"i_IntraEffArea["<<ii<<"] "<<i_IntraEffArea[ii]<<" NOn "<< fIntraRunNon[i][ii] <<" Noff "<<fIntraRunNoff[i][ii] <<std::endl;;
-									 mean_run_eff_area +=i_IntraEffArea[ii]*fIntraRunNon[i][ii];
-									 total_on += fIntraRunNon[i][ii];
-									 total_off += fIntraRunNoff[i][ii];
-									 total_diff += fIntraRunNdiff[i][ii];
-								}
-								std::cout<<"RUN "<<fRunList[i] <<std::endl;
-								std::cout<<"mean_run_eff_area "<<mean_run_eff_area/total_on <<std::endl;
-								std::cout<<"run eff area      "<<fRunEffArea[i] <<std::endl;
-								std::cout<<"total Non from time binned "<<total_on <<" from run "<< fRunNon[i]<<std::endl;
-								std::cout<<"total Noff from time binned "<<total_off <<" from run "<< fRunNoff[i]<<std::endl;
-								std::cout<<"total Ndiff from time binned "<<total_diff <<" from run "<< fRunNdiff[i]<<std::endl;
-				*/
 			}
-			
-			
-			
 		}
 	}
-	
-	
 	
 	//////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////
@@ -939,7 +914,6 @@ void VFluxCalculation::printResultsJSON()
 		
 	}
 	cout << "]" << endl;
-	
 }
 
 /*
@@ -1277,36 +1251,6 @@ void VFluxCalculation::calculateFluxes()
 	}
 }
 
-/*
-
-    set spectral parameters);
-	      IntraFluxE.push_back( -1./( fAlpha + 1. ) * fIntraFluxConstantE[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
-	      IntraFluxCI_lo_1sigma.push_back( -1./( fAlpha + 1. ) * fIntraFluxCI_lo_1sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
-	      IntraFluxCI_up_1sigma.push_back( -1./( fAlpha + 1. ) * fIntraFluxCI_up_1sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
-	      IntraFluxCI_lo_3sigma.push_back( -1./( fAlpha + 1. ) * fIntraFluxCI_lo_3sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
-	      IntraFluxCI_up_3sigma.push_back( -1./( fAlpha + 1. ) * fIntraFluxCI_up_3sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
-	    }
-	  else if( fIntraRunFluxConstantE[i][t] > 0. )
-	    {
-            IntraFlux.push_back( -1./( fAlpha + 1. ) * fIntraFluxConstant[t];
-            IntraFluxE.push_back( -1./( fAlpha + 1. ) * fIntraFluxConstantE[t];
-	    IntraFluxCI_lo_1sigma.push_back( -1./( fAlpha + 1. ) * fIntraFluxCI_lo_1sigma[t];
-	    IntraFluxCI_up_1sigma.push_back( -1./( fAlpha + 1. ) * fIntraFluxCI_up_1sigma[t];
-	    IntraFluxCI_lo_3sigma.push_back( -1./( fAlpha + 1. ) * fIntraFluxCI_lo_3sigma[t];
-	    IntraFluxCI_up_3sigma.push_back( -1./( fAlpha + 1. ) * fIntraFluxCI_up_3sigma[t];
-	    }
-	  else
-	    {
-            IntraFlux.push_back([t] = -99.;
-            IntraFluxE.push_back([t] = -99.;
-	    IntraFluxCI_lo_1sigma.push_back([t] = -99.;
-	    IntraFluxCI_up_1sigma.push_back([t] = -99.;
-	    IntraFluxCI_lo_3sigma.push_back([t] = -99.;
-	    IntraFluxCI_up_3sigma
-
-    these values are used to calculate a spectral weighted effective area (good values are important!)
-
-*/
 void VFluxCalculation::setSpectralParameters( double iMinEnergy_TeV, double  E0, double alpha, double iMaxEnergy_TeV )
 {
 	fMinEnergy = iMinEnergy_TeV;
@@ -2331,10 +2275,10 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char* iTex, double iMJDOffset, 
 		}
 	}
 	
-	
-	printf( "mean_flux from run by run %.3e \n Total time = %.3e \n total time including dead time %.3e \n", mean_flux / total_time, total_time, fRunTOn[fRunNorm.size() - 1] );
-	
-	
+	if( fRunNorm.size() > 0 )
+	{
+		printf( "mean_flux from run by run %.3e \n Total time = %.3e \n total time including dead time %.3e \n", mean_flux / total_time, total_time, fRunTOn[fRunNorm.size() - 1] );
+	}
 	
 	if( bDrawAxis )
 	{
@@ -2486,10 +2430,6 @@ TGraphErrors* VFluxCalculation::plotFluxesInBINs( int run, char* iTex, double iM
 		double full_run_duration = nb_bin * fTimeBinDuration[i] ; // duration between the first and the last bin filled
 		double MJD_start = fRunMJD[i] - ( full_run_duration / 2. ) / 86400.;
 		
-		
-		//printf("%d %.2f | %.2f / %d = %.2f | %.2f | MJD-d/2 = %.4f MJD %.4f MJD+d/2 = %.4f \n",( int )fRunList[i],fTimeBinDuration[i], fRunTOn[i],fIntraRunFlux[i].size() , fRunTOn[i]/fIntraRunFlux[i].size(),full_run_duration,fRunMJD[i]-(full_run_duration/2.)/86400. ,fRunMJD[i],fRunMJD[i]+(full_run_duration/2.)/86400.);
-		
-		
 		if( i < fIntraRunFluxE.size() )
 		{
 			unsigned int t_c = 0 ; // counting the time bin from first filled
@@ -2509,28 +2449,14 @@ TGraphErrors* VFluxCalculation::plotFluxesInBINs( int run, char* iTex, double iM
 						iV_Run.push_back( ( int )fRunList[i] );
 						iV_Flux.push_back( fIntraRunFlux[i][t] );
 						iV_FluxE.push_back( fIntraRunFluxE[i][t] );
-						
-						
-						/*
-						printf("*****************             RUN %d %.3f tps %.4f t %d %.3f %.3e \n",( int )fRunList[i],( (t + 0.5)*fTimeBinDuration[i] ),temps,t,fIntraRunTOn[i][t],fIntraRunFlux[i][t]);
-						
-						if(fIntraRunFlux[i][t] < 1.e-11){
-							printf("***************************** RUN %d %.3f tps %.4f t %d %.3f %.3e \n",( int )fRunList[i],(t + 0.5)*fTimeBinDuration[i],temps,t,fIntraRunTOn[i][t],fIntraRunFlux[i][t]);
-						}
-						*/
-						
 					}
 					total_time += fIntraRunTOn[i][t];
-					
-					
 				}
 			}
 		}
 	}
 	
-	
 	printf( "mean_flux from time binned %.3e \n  Total time = %.3e \n", mean_flux / total_time, total_time );
-	
 	
 	if( bDrawAxis )
 	{
@@ -2614,7 +2540,6 @@ void VFluxCalculation::cleanRunList()
 		{
 			iRemovePos.push_back( i );
 			fRunTOn[fRunTOn.size() - 1] += fRunTOn[i];
-			// fRunZe[fRunTOff.size()-1]
 			fRunNon[fRunNon.size() - 1] += fRunNon[i];
 			fRunNoff[fRunNoff.size() - 1] += fRunNoff[i];
 		}

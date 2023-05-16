@@ -1,9 +1,9 @@
 /*! \class VExposure
     retrieve a list of runs, fill and plot VERITAS exposure plots, fill elevation plots
 
-    Note: some of the usage of this class is counter-intuitive
+    Note: some of the usage (a lot?) of this class is counter-intuitive
 
-
+    Used also do download runs from the VERITAS archive
 */
 
 #include "VExposure.h"
@@ -2602,7 +2602,9 @@ void VExposure::downloadRunList()
 	
 	for( unsigned int i = 0 ; i < fRunDownload.size(); i++ )
 	{
-	
+		cout << "Checking / Downloading " << fRunDownload[i];
+		cout << " (run " << i + 1 << " of " << fRunDownload.size() << ")" << endl;
+		
 		sprintf( filename, "%s/data/d%d/%d.cvbf", ENVIR_VAR, fRunDownloadDate[i], fRunDownload[i] );
 		sprintf( filepath, "%s/data/d%d/", ENVIR_VAR, fRunDownloadDate[i] );
 		
@@ -2629,7 +2631,7 @@ void VExposure::downloadRunList()
 			{
 				cout << "ERROR: \"which bbftp\" shows no match. Install bbftp and add to you $PATH." << endl;
 				cout << "exiting ...." << endl;
-				exit( -1 );
+				exit( EXIT_FAILURE );
 			}
 			// Then Download
 			sprintf( dl_string, "bbftp -V -S -p 12 -u bbftp -e \"get /veritas/data/d%d/%d.cvbf %s/data/d%d/%d.cvbf\" %s", fRunDownloadDate[i], fRunDownload[i],

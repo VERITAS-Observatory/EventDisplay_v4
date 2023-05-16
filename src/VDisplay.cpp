@@ -969,23 +969,20 @@ void VDisplay::drawFADC( bool iFit )
 	// plot sum signal (sum of all image pixels), click beside camera for that
 	else if( !( fSelectedChan >= 200000 ) )
 	{
-		sprintf( histitle, "average signal (Telescope %d)", fTelescope + 1 );
-		int i_image = 0;
+		sprintf( histitle, "summed signal (Telescope %d)", fTelescope + 1 );
 		for( unsigned int i = 0; i < fEventLoop->getAnalyzer()->getImage().size(); i++ )
 		{
-			if( fEventLoop->getAnalyzer()->getImage()[i] )
+			if( fEventLoop->getAnalyzer()->getImage()[i] || fEventLoop->getAnalyzer()->getBorder()[i] )
 			{
 				if( !fEventLoop->getZeroSuppressed()[i] )
 				{
-					fHisFADC = fillFADC( i, fHisFADC );
+					TH1D* thisFADC = new TH1D( *fHisFADC );
+					thisFADC = fillFADC( i, fHisFADC );
+					fHisFADC->Add( thisFADC );
 				}
-				i_image++;
 			}
 		}
-		if( i_image > 0 )
-		{
-			fHisFADC->Scale( 1. / double( i_image ) );
-		}
+		/////////////////////////////////////////////
 		fCanvasFADCText->SetEditable( 1 );
 		fCanvasFADCText->Clear();
 		fCanvasFADCText->Update();
