@@ -15,6 +15,7 @@
 
 #include <getopt.h>
 #include <iostream>
+#include<sstream>
 #include <string>
 #include <vector>
 #include <sys/stat.h>
@@ -24,17 +25,26 @@ using namespace std;
 int parseOptions( int argc, char* argv[] );
 string listfilename = "";
 string cutfilename = "";
-string simpleListFileName = "";
 string outfile = "acceptance.root";
 unsigned int ntel = 4;                   // this shouldn't be changed unless you really unterstand why
 string datadir = "../eventdisplay/output";
 int entries = -1;
 string histdir = "" ;
 struct stat sb ;
-string fInstrumentEpoch = "NOT_SET";
 double fMaxDistanceAllowed = 2.0;
 string teltoanastring = "1234";
 vector<unsigned int> teltoana;
+
+
+bool check_if_file_exists( const std::string& name )
+{
+	if( FILE* file = fopen( name.c_str(), "r" ) )
+	{
+		fclose( file );
+		return true;
+	}
+	return false;
+}
 
 int main( int argc, char* argv[] )
 {
@@ -70,18 +80,7 @@ int main( int argc, char* argv[] )
 	// read file list from run list file
 	if( listfilename.size() > 0 )
 	{
-		fRunPara->loadLongFileList( listfilename, true );
-		if( fRunPara->getRunListVersion() < 4 )
-		{
-			cout << "require run list >= 4" << endl;
-			cout << "...exiting" << endl;
-			exit( EXIT_FAILURE );
-		}
-		fRunPara->getEventdisplayRunParameter( datadir );
-	}
-	else if( simpleListFileName.size() > 0 )
-	{
-		fRunPara->loadSimpleFileList( simpleListFileName );
+		fRunPara->loadSimpleFileList( listfilename );
 	}
 	else
 	{
@@ -92,7 +91,6 @@ int main( int argc, char* argv[] )
 	
 	// read gamma/hadron cuts from cut file
 	VGammaHadronCuts* fCuts = new VGammaHadronCuts();
-	//	fCuts->setInstrumentEpoch( fInstrumentEpoch );
 	fCuts->setTelToAnalyze( teltoana );
 	fCuts->setNTel( ntel );
 	if( cutfilename.size() > 0 )
@@ -113,8 +111,6 @@ int main( int argc, char* argv[] )
 	}
 	
 	cout << "total number of files to read: " << fRunPara->fRunList.size() << endl;
-	
-	char ifile[1800];
 	
 	// create output file
 	TFile* fo = new TFile( outfile.c_str(), "RECREATE" );
@@ -159,16 +155,17 @@ int main( int argc, char* argv[] )
 		iAz_min.push_back( -22.5 + 45. * ( double )i );
 		iAz_max.push_back( 22.5 + 45. * ( double )i );
 	}
+	char htemp[200];
 	for( unsigned int i = 0; i < iAz_min.size(); i++ )
 	{
 		if( facc_dir )
 		{
 			facc_dir->cd();
 		}
-		sprintf( ifile, "az_%d", i );
-		fDirName.push_back( ifile );
-		sprintf( ifile, "AZ dependend radial acceptance, %.2f < az < %.2f", iAz_min[i], iAz_max[i] );
-		fDirTitle.push_back( ifile );
+		sprintf( htemp, "az_%d", i );
+		fDirName.push_back( htemp );
+		sprintf( htemp, "AZ dependend radial acceptance, %.2f < az < %.2f", iAz_min[i], iAz_max[i] );
+		fDirTitle.push_back( htemp );
 		facc_az_dir.push_back( fo->mkdir( fDirName.back().c_str(), fDirTitle.back().c_str() ) );
 		if( facc_az_dir.back() )
 		{
@@ -183,17 +180,29 @@ int main( int argc, char* argv[] )
 	// loop over all files and fill acceptances
 	for( unsigned int i = 0; i < fRunPara->fRunList.size(); i++ )
 	{
-		sprintf( ifile, "%s/%d.mscw.root", datadir.c_str(), fRunPara->fRunList[i].fRunOff );
-		cout << "now chaining " << ifile;
-		cout << " (wobble offset " << -1.*fRunPara->fRunList[i].fWobbleNorth << ", " << fRunPara->fRunList[i].fWobbleWest << ")" << endl;
-		// test if file exists
-		TFile fTest( ifile );
+		ostringstream ifile;
+		ifile <<  datadir << "/" << fRunPara->fRunList[i].fRunOff << ".mscw.root";
+		if( ! check_if_file_exists( ifile.str() ) )
+		{
+			ifile.str( "" );
+			ifile <<  datadir << "/" << fRunPara->fRunList[i].fRunOff / 10000;
+			ifile << "/" << fRunPara->fRunList[i].fRunOff << ".mscw.root";
+			if( ! check_if_file_exists( ifile.str() ) )
+			{
+				cout << "Error reading " << ifile.str() << endl;
+				exit( EXIT_FAILURE );
+			}
+		}
+		cout << "now chaining " << ifile.str();
+		cout << " (wobble offset " << -1.*fRunPara->fRunList[i].fWobbleNorth;
+		cout << ", " << fRunPara->fRunList[i].fWobbleWest << ")" << endl;
+		// get data tree
+		TFile fTest( ifile.str().c_str() );
 		if( fTest.IsZombie() )
 		{
-			cout << "error: file not found, " << ifile << endl;
+			cout << "Error reading " << ifile.str() << endl;
 			exit( EXIT_FAILURE );
 		}
-		// get data tree
 		TTree* c = ( TTree* )fTest.Get( "data" );
 		CData* d = new CData( c, false, 5, true );
 		
@@ -205,10 +214,12 @@ int main( int argc, char* argv[] )
 			continue;
 		}
 		cout << "Testing telescope multiplicity " << teltoanastring << endl;
-		if( teltoana.size() != iParV2->fTelToAnalyze.size() || !equal( teltoana.begin(), teltoana.end(), iParV2->fTelToAnalyze.begin() ) )
+		if( teltoana.size() != iParV2->fTelToAnalyze.size()
+				|| !equal( teltoana.begin(), teltoana.end(), iParV2->fTelToAnalyze.begin() ) )
 		{
 			cout << endl;
-			cout << "error: Requested telescopes " << teltoanastring << " do not equal telescopes in run " << ifile << endl;
+			cout << "error: Requested telescopes " << teltoanastring;
+			cout << " do not equal telescopes in run " << ifile.str() << endl;
 			cout << "PAR ";
 			for( unsigned int i = 0; i < iParV2->fTelToAnalyze.size(); i++ )
 			{
@@ -315,9 +326,7 @@ int parseOptions( int argc, char* argv[] )
 		{
 			{"help", no_argument, 0, 'h'},
 			{"runlist", required_argument, 0, 'l'},
-			{"srunlist", required_argument, 0, 's'},
 			{"cutfile", required_argument, 0, 'c'},
-			{"instrumentepoch", required_argument, 0, 'i'},
 			{"maxdistance", required_argument, 0, 'm'},
 			{"outfile", required_argument, 0, 'o'},
 			{"entries", required_argument, 0, 'n'},
@@ -327,7 +336,7 @@ int parseOptions( int argc, char* argv[] )
 			{0, 0, 0, 0}
 		};
 		int option_index = 0;
-		int c = getopt_long( argc, argv, "ht:s:l:e:m:o:i:d:n:c:w:t:", long_options, &option_index );
+		int c = getopt_long( argc, argv, "ht:l:e:m:o:d:n:c:w:t:", long_options, &option_index );
 		if( optopt != 0 )
 		{
 			cout << "error: unknown option" << endl;
@@ -359,10 +368,8 @@ int parseOptions( int argc, char* argv[] )
 			case 'h':
 				cout << endl;
 				cout << "Options are:" << endl;
-				cout << "-l --runlist [anasum-style run list file name, runlist on/off like]" << endl;
-				cout << "-s --srunlist [simple run list file name]" << endl;
+				cout << "-l --runlist [simple run list file name]" << endl;
 				cout << "-c --cutfile [cut file name]" << endl;
-				cout << "-i --instrumentepoch [major instrument epoch (e.g. V6)" << endl;
 				cout << "-d --datadir [directory for input mscw root files]" << endl;
 				cout << "-o --outfile [output ROOT file name]" << endl;
 				cout << "-e --entries [number of entries]" << endl;
@@ -384,10 +391,6 @@ int parseOptions( int argc, char* argv[] )
 				cout << "Run List File Name is " << optarg << endl;
 				listfilename = optarg;
 				break;
-			case 's':
-				cout << "Simple List File Name is " << optarg << endl;
-				simpleListFileName = optarg;
-				break;
 			case 'c':
 				cutfilename = optarg;
 				cout << "Cut File Name is " << cutfilename << endl;
@@ -395,12 +398,6 @@ int parseOptions( int argc, char* argv[] )
 			case 'm':
 				fMaxDistanceAllowed = atof( optarg );
 				cout << "Maximum allowed distance from camera centre: " << fMaxDistanceAllowed << endl;
-				break;
-			case 'i':
-				fInstrumentEpoch = optarg;
-				// make sure that major epoch is used
-				fInstrumentEpoch = fInstrumentEpoch.substr( 0, fInstrumentEpoch.find( "_" ) );
-				cout << "(Major) instrument epoch is " << fInstrumentEpoch << endl;
 				break;
 			case 'e':
 				entries = ( int )atoi( optarg );
