@@ -739,7 +739,7 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 		if( fRunPar->fCalibrationSumWindow > 0
 				&& hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetEntries() > 10
 				&& hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->Integral(
-					1, hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetNbinsX() ) )
+					1, hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetNbinsX() ) > 0. )
 		{
 			iped = hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetMean() / ( double )fRunPar->fCalibrationSumWindow;
 			hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetQuantiles( 3, yq, xq );
@@ -758,7 +758,7 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 		{
 			isumw[j] = ( Float_t )j + 1;
 			if( hped_vec[iTelType][j][i]->GetEntries() > 10
-					&& hped_vec[iTelType][j][i]->Integral( 1, hped_vec[iTelType][j][i]->GetNbinsX() > 0. ) )
+					&& hped_vec[iTelType][j][i]->Integral( 1, hped_vec[iTelType][j][i]->GetNbinsX() ) > 0. )
 			{
 				ipedv[j] = hped_vec[iTelType][j][i]->GetRMS();
 				hped_vec[iTelType][j][i]->GetQuantiles( 3, yq, xq );
@@ -4369,7 +4369,7 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 		if( iTelTypeC < iH_averageTZero.size() && iH_averageTZero[iTelTypeC] )
 		{
 			if( iH_averageTZero[iTelTypeC]->GetEntries() > 0.
-					&& iH_averageTZero[iTelTypeC]->Integral( 1, iH_averageTZero[iTelTypeC]->GetNbinsX() > 0. ) )
+					&& iH_averageTZero[iTelTypeC]->Integral( 1, iH_averageTZero[iTelTypeC]->GetNbinsX() ) > 0. )
 			{
 				double i_a[] = { 0.5 };
 				double i_b[] = { 0.0 };
