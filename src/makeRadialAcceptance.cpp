@@ -15,7 +15,7 @@
 
 #include <getopt.h>
 #include <iostream>
-#include<sstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <sys/stat.h>
@@ -46,6 +46,7 @@ bool check_if_file_exists( const std::string& name )
 	return false;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 int main( int argc, char* argv[] )
 {
 	// print version only
@@ -54,8 +55,8 @@ int main( int argc, char* argv[] )
 		string fCommandLine = argv[1];
 		if( fCommandLine == "-v" || fCommandLine == "--version" )
 		{
-			VGlobalRunParameter fRunPara;
-			cout << fRunPara.getEVNDISP_VERSION() << endl;
+			VGlobalRunParameter iRunPara;
+			cout << iRunPara.getEVNDISP_VERSION() << endl;
 			exit( EXIT_SUCCESS );
 		}
 	}
@@ -91,21 +92,12 @@ int main( int argc, char* argv[] )
 	
 	// read gamma/hadron cuts from cut file
 	VGammaHadronCuts* fCuts = new VGammaHadronCuts();
-	fCuts->setTelToAnalyze( teltoana );
+	fCuts->initialize();
 	fCuts->setNTel( ntel );
-	if( cutfilename.size() > 0 )
+	fCuts->setTelToAnalyze( teltoana );
+	if( !fCuts->readCuts( cutfilename, 2 ) )
 	{
-		if( !fCuts->readCuts( cutfilename ) )
-		{
-			cout << "error reading cut file: " << cutfilename << endl;
-			cout << "exiting..." << endl;
-			exit( EXIT_FAILURE );
-		}
-	}
-	else
-	{
-		cout << "error: no gamma/hadron cut file given" << endl;
-		cout << "(command line option -c)" << endl;
+		cout << "error reading cut file: " << cutfilename << endl;
 		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
 	}
@@ -238,6 +230,12 @@ int main( int argc, char* argv[] )
 		
 		// set gamma/hadron cuts
 		fCuts->setInstrumentEpoch( iParV2->getInstrumentATMString() );
+		if( !fCuts->readCuts( cutfilename, 2 ) )
+		{
+			cout << "run " << fRunPara->fRunList[i].fRunOff << ": ";
+			cout << "error reading cut file: " << cutfilename << endl;
+			continue;
+		}
 		fCuts->initializeCuts( fRunPara->fRunList[i].fRunOff, datadir );
 		// pointer to data tree
 		fCuts->setDataTree( d );
