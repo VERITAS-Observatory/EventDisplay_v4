@@ -465,8 +465,8 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 	}
 	else
 	{
-		cout << "     ...did not survive test of table file ! There are missing tables in your table file: " << itablefile << endl;
-		cout << "     You need to redo your table, or contact Gernot if this is the standard table supplied " << endl ;
+		cout << "     ...Error: did not survive test of table file !";
+		cout << " There are missing tables in your table file: " << itablefile << endl;
 		sanityCheckLookupTableFile( true ); // this will print which tables are missing
 		exit( EXIT_FAILURE );
 	}
