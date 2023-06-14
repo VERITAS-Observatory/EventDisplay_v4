@@ -193,7 +193,7 @@ int main( int argc, char* argv[] )
 			ifile << "/" << fRunPara->fRunList[i].fRunOff << ".mscw.root";
 			if( ! check_if_file_exists( ifile.str() ) )
 			{
-				cout << "error: file not found, " << ifile << endl;
+				cout << "error: file not found, " << ifile.str() << endl;
 				exit( EXIT_FAILURE );
 			}
 		}
