@@ -929,7 +929,7 @@ string VEvndispRunParameter::getInstrumentEpoch( bool iMajor, bool iUpdateInstru
 	// re-read instrument epoch
 	if( iUpdateInstrumentEpoch )
 	{
-		updateInstrumentEpochFromFile();
+		updateInstrumentEpochFromFile( "usedefault", "EPOCH" );
 	}
 	if( iMajor )
 	{
