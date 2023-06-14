@@ -55,22 +55,29 @@ int main( int argc, char* argv[] )
 		string fCommandLine = argv[1];
 		if( fCommandLine == "-v" || fCommandLine == "--version" )
 		{
-			VGlobalRunParameter iRunPara;
-			cout << iRunPara.getEVNDISP_VERSION() << endl;
+			VGlobalRunParameter fRunPara;
+			cout << fRunPara.getEVNDISP_VERSION() << endl;
 			exit( EXIT_SUCCESS );
 		}
 	}
 	
+	///////////////////////////////////////////
+	// use VAnaSumRunParameter to read run lists and list of
+	// exclusion regions
 	VAnaSumRunParameter* fRunPara = new VAnaSumRunParameter();
 	
+	///////////////////////////////////////////
+	// print general stuff and version numbers
 	cout << endl;
-	cout << "makeRadialAcceptance " << fRunPara->getEVNDISP_VERSION() << endl << endl;
+	cout << "makeRadialAcceptance (" << fRunPara->getEVNDISP_VERSION() << ")" << endl << endl;
 	cout << "determine radial acceptance from off events (after cuts)" << endl;
 	cout << endl;
 	
+	///////////////////////////////////////////
 	// read options from command line
 	parseOptions( argc, argv );
 	
+	///////////////////////////////////////////
 	//find telescopes to analyse
 	for( unsigned int i = 0; i < teltoanastring.length(); i++ )
 	{
@@ -78,6 +85,7 @@ int main( int argc, char* argv[] )
 		teltoana.push_back( atoi( i_tel.c_str() ) - 1 );
 	}
 	
+	///////////////////////////////////////////
 	// read file list from run list file
 	if( listfilename.size() > 0 )
 	{
@@ -109,9 +117,9 @@ int main( int argc, char* argv[] )
 	if( fo->IsZombie() )
 	{
 		cout << "makeRadialAcceptances: error opening output file " << outfile << endl;
-		return 0;
+		exit( EXIT_FAILURE );
 	}
-	cout << endl << "writing acceptance curves to " << fo->GetName() << endl;
+	cout << endl << "open output file for acceptance curves: " << fo->GetName() << endl;
 	TDirectory* facc_dir = ( TDirectory* )fo;
 	
 	// create acceptance object
@@ -127,12 +135,13 @@ int main( int argc, char* argv[] )
 		}
 		else
 		{
-			cout << "Error, directory specified by makeRadialAcceptance -w option '" << histdir << "' does not exist, exiting..." << endl;
-			return 0;
+			cout << "Error, directory specified by makeRadialAcceptance -w option '";
+			cout << histdir << "' does not exist, exiting..." << endl;
+			exit( EXIT_FAILURE );
 		}
 	}
 	
-	// az dependent measurement
+	// az dependent radial acceptance curves
 	vector< VRadialAcceptance* > facc_az;
 	vector< string > fDirName;
 	vector< string > fDirTitle;
@@ -164,12 +173,15 @@ int main( int argc, char* argv[] )
 			facc_az_dir.back()->cd();
 			facc_az.push_back( new VRadialAcceptance( fCuts, fRunPara ) );
 			facc_az.back()->setAzCut( iAz_min[i], iAz_max[i] );
-			cout << "initializing AZ dependend radial acceptance class for ";
+			cout << "initializing azimuth dependend radial acceptance class for ";
 			cout << iAz_min[i] << " < az <= " <<   iAz_max[i] << endl;
 		}
 	}
 	
-	// loop over all files and fill acceptances
+	//////////////////////////////////////////////////////////////
+	// main loop over all runs
+	//   - fill radial acceptances per run
+	//   - fill average radial acceptance
 	for( unsigned int i = 0; i < fRunPara->fRunList.size(); i++ )
 	{
 		ostringstream ifile;
@@ -181,7 +193,7 @@ int main( int argc, char* argv[] )
 			ifile << "/" << fRunPara->fRunList[i].fRunOff << ".mscw.root";
 			if( ! check_if_file_exists( ifile.str() ) )
 			{
-				cout << "Error reading " << ifile.str() << endl;
+				cout << "error: file not found, " << ifile << endl;
 				exit( EXIT_FAILURE );
 			}
 		}
@@ -267,6 +279,7 @@ int main( int argc, char* argv[] )
 		{
 			d->GetEntry( n );
 			
+			// printout for MC
 			if( n == 0 and d->isMC() )
 			{
 				cout << "\t (analysing MC data)" << endl;
@@ -294,6 +307,7 @@ int main( int argc, char* argv[] )
 		fTest.Close();
 	}
 	
+	/////////////////////////////////////////
 	// write acceptance files to disk
 	
 	facc->calculate2DBinNormalizationConstant() ;
@@ -314,7 +328,9 @@ int main( int argc, char* argv[] )
 
 
 /*!
+
     read in command line parameters
+
 */
 int parseOptions( int argc, char* argv[] )
 {
