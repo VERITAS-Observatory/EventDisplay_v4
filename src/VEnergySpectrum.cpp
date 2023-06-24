@@ -315,14 +315,16 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 		TH1D* i_hErecCountOff = ( TH1D* )getHistogram( hname, fRunList[i].runnumber, "energyHistograms", fOffsetDistance );
 		// histogram with systematic errors (same for on and off)
 		hname = "gMeanEnergySystematicError";
-		TGraphErrors* i_hEsys = ( TGraphErrors* )getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas", fOffsetDistance );
+		TGraphErrors* i_hEsys = ( TGraphErrors* )getHistogram(
+									hname, fRunList[i].runnumber, "EffectiveAreas", fOffsetDistance );
 		if( fAnalysisEnergyThresholdDefinition == 1 && !i_hEsys )
 		{
 			cout << "WARNING: histogram with systematic error in energy reconstruction not found";
 			cout << " (run " << fRunList[i].runnumber << ")" << endl;
 		}
 		// get effective area
-		TH1* i_hEffAreaP = ( TH1* )getHistogram( "herecEffectiveArea_on", fRunList[i].runnumber, "energyHistograms", fOffsetDistance );
+		TH1* i_hEffAreaP = ( TH1* )getHistogram(
+							   "herecEffectiveArea_on", fRunList[i].runnumber, "energyHistograms", fOffsetDistance );
 		TGraphErrors* i_gEff = new TGraphErrors( 0 );
 		VHistogramUtilities i_hisUtl;
 		i_hisUtl.get_Graph_from_Histogram( i_hEffAreaP, i_gEff );
@@ -334,23 +336,9 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 			i_gEff = ( TGraphErrors* )getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas", fOffsetDistance );
 			if( !i_gEff )
 			{
-				// third choice for backwards compatibility to v35x version
-				hname = "gMeanEffectiveAreaErec";
-				i_gEff = ( TGraphErrors* )getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas", fOffsetDistance );
-				// fourth choice for backwards compatibility to v35x version
-				if( !i_gEff )
-				{
-					hname = "gMeanEffectiveAreaErec_off";
-					i_gEff = ( TGraphErrors* )getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas", fOffsetDistance );
-					if( !i_gEff )
-					{
-						cout << "WARNING: no mean effective area graph found, ignoring run ";
-						cout << " (run " << fRunList[i].runnumber << ")" << endl;
-						continue;
-					}
-				}
-				cout << "WARNING: effective areas not found as expected; reading apparently v35X file" << endl;
-				cout << "\t --- this version is not completely backwards compatible to v35X --- " << endl;
+				cout << "WARNING: no mean effective area graph found, ignoring run ";
+				cout << " (run " << fRunList[i].runnumber << ")" << endl;
+				continue;
 			}
 		}
 		
@@ -367,19 +355,25 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 		// get energy threshold (may depend on ze, az, ...)
 		// (for energy threshold definitions see VEnergyThreshold )
 		/////////////////////////////////////////////////////
-		if( fAnalysisEnergyThresholdDefinition == 0 )            // no energy threshold
+		// no energy threshold
+		if( fAnalysisEnergyThresholdDefinition == 0 )
 		{
 			fRunList[i].energyThreshold = 0.;
 		}
-		else if( fAnalysisEnergyThresholdDefinition == 1 )       // energy threshold: systematic smaller then given value
+		// energy threshold: systematic smaller then given value
+		else if( fAnalysisEnergyThresholdDefinition == 1 )
 		{
-			fRunList[i].energyThreshold = iEnergyThresholdCalculator.getEnergy_maxSystematic( i_hEsys, fAnalysisMaxEnergySystematic );
+			fRunList[i].energyThreshold = iEnergyThresholdCalculator.getEnergy_maxSystematic(
+											  i_hEsys, fAnalysisMaxEnergySystematic );
 		}
-		else if( fAnalysisEnergyThresholdDefinition == 2 )       // energy threshold: effective area > given fraction of maximum effective area (typical value is 10%)
+		// energy threshold: effective area > given fraction of maximum effective area (typical value is 10%)
+		else if( fAnalysisEnergyThresholdDefinition == 2 )
 		{
-			fRunList[i].energyThreshold = iEnergyThresholdCalculator.getEnergy_MaxEffectiveAreaFraction( i_gEff, fAnalysisMaxEffectiveAreaFraction );
+			fRunList[i].energyThreshold = iEnergyThresholdCalculator.getEnergy_MaxEffectiveAreaFraction(
+											  i_gEff, fAnalysisMaxEffectiveAreaFraction );
 		}
-		else if( fAnalysisEnergyThresholdDefinition == 3 )       // energy threshold given by fixed value (e.g. 0.5 TeV)
+		// energy threshold given by fixed value (e.g. 0.5 TeV)
+		else if( fAnalysisEnergyThresholdDefinition == 3 )
 		{
 			fRunList[i].energyThreshold = iEnergyThresholdCalculator.getEnergy_fixedValue();
 		}
