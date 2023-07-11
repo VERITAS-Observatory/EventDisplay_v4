@@ -546,19 +546,10 @@ void VFluxCalculation::getIntegralEffectiveArea()
 				g = ( TGraphAsymmErrors* )gDirectory->Get( "gMeanEffectiveArea_off" );
 				if( !g )
 				{
-					// backwards compatibility to files prodcued with v35x
-					g = ( TGraphAsymmErrors* )gDirectory->Get( "gMeanEffectiveAreaEMC" );
-					if( !g )
-					{
-						g = ( TGraphAsymmErrors* )gDirectory->Get( "gMeanEffectiveAreaEMC_off" );
-					}
-					if( !g )
-					{
-						cout << "error: effective area graph not found" << endl;
-						cout << "continue..." << endl;
-						fRunEffArea[i] = 0.;
-						continue;
-					}
+					cout << "error: effective area graph not found" << endl;
+					cout << "continue..." << endl;
+					fRunEffArea[i] = 0.;
+					continue;
 				}
 			}
 			
