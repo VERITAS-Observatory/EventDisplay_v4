@@ -1853,9 +1853,6 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
 		iSign *= -1.;
 	}
 	
-	
-	
-	
 	bool bFound = false;
 	for( int n = 0; n < iT->GetEntries(); n++ )
 	{
@@ -1894,7 +1891,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
 	cout << "\t x_r \t y_r \t r_r" << endl;
 	for( int n = 0; n < n_r; n++ )
 	{
-		cout << "\t" << n << "\t" << x_r[n] << "\t" << y_r[n] << "\t" << r_r[n] << endl;
+		cout << "\t background region " << n << "\t" << x_r[n] << "\t" << y_r[n] << "\t" << r_r[n] << endl;
 		TEllipse* iL = new TEllipse( iSign * x_r[n], y_r[n], r_r[n], r_r[n] );
 		iL->SetFillStyle( 0 );
 		iL->SetLineWidth( 2 );
