@@ -1200,7 +1200,9 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 		
 		double dec = fSkyMapCentreDecJ2000;
 		double ra  = fSkyMapCentreRAJ2000;
-		cout << "(ra,dec)_J2000 = (" << ra << ", " << dec << ")" << endl;
+		cout << "Sky map center at (ra,dec)_J2000 = (" << ra << ", " << dec << ")" << endl;
+		cout << "   center bins (x_bin, y_bin) = (" << hmap->GetXaxis()->FindBin( 0. ) << ", ";
+		cout << hmap->GetYaxis()->FindBin( 0. ) << ")" << endl;
 		
 		// dec axis
 		xmin = hmap->GetXaxis()->GetBinLowEdge( hmap->GetXaxis()->FindBin( x1 ) );
@@ -1210,8 +1212,6 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 		iYRange = ymax - ymin;
 		wmin = dec + ymin;
 		wmax = dec + ymax;
-		
-		cout << "DECAXIS " << xmin << " " << xmax << " " << ymin << " " << ymax << " " << wmin << " " << wmax << " " << iYRange << endl;
 		
 		TGaxis* decAxis = new TGaxis( xmin, ymin, xmax, ymax, wmin, wmax, 505 );
 		decAxis->SetTitleFont( hmap->GetYaxis()->GetTitleFont() );
@@ -1242,8 +1242,6 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 			Xmin += xmin / cos( ( dec + ymin ) * TMath::Pi() / 180. );
 			Xmax += xmax / cos( ( dec + ymin ) * TMath::Pi() / 180. );
 		}
-		cout << "RAXIS " << xmin << " " << xmax << " " << ymin << " " << ymax << " " << Xmin << " " << Xmax << endl;
-		
 		char TmpTimeFormat[200];
 		if( fabs( rmax ) < 0.3 )
 		{
