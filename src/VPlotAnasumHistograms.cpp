@@ -1200,7 +1200,9 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 		
 		double dec = fSkyMapCentreDecJ2000;
 		double ra  = fSkyMapCentreRAJ2000;
-		cout << "(ra,dec)_J2000 = (" << ra << ", " << dec << ")" << endl;
+		cout << "Sky map center at (ra,dec)_J2000 = (" << ra << ", " << dec << ")" << endl;
+		cout << "   center bins (x_bin, y_bin) = (" << hmap->GetXaxis()->FindBin( 0. ) << ", ";
+		cout << hmap->GetYaxis()->FindBin( 0. ) << ")" << endl;
 		
 		// dec axis
 		xmin = hmap->GetXaxis()->GetBinLowEdge( hmap->GetXaxis()->FindBin( x1 ) );
@@ -1210,8 +1212,6 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 		iYRange = ymax - ymin;
 		wmin = dec + ymin;
 		wmax = dec + ymax;
-		
-		cout << "DECAXIS " << xmin << " " << xmax << " " << ymin << " " << ymax << " " << wmin << " " << wmax << " " << iYRange << endl;
 		
 		TGaxis* decAxis = new TGaxis( xmin, ymin, xmax, ymax, wmin, wmax, 505 );
 		decAxis->SetTitleFont( hmap->GetYaxis()->GetTitleFont() );
@@ -1242,8 +1242,6 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 			Xmin += xmin / cos( ( dec + ymin ) * TMath::Pi() / 180. );
 			Xmax += xmax / cos( ( dec + ymin ) * TMath::Pi() / 180. );
 		}
-		cout << "RAXIS " << xmin << " " << xmax << " " << ymin << " " << ymax << " " << Xmin << " " << Xmax << endl;
-		
 		char TmpTimeFormat[200];
 		if( fabs( rmax ) < 0.3 )
 		{
@@ -1853,9 +1851,6 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
 		iSign *= -1.;
 	}
 	
-	
-	
-	
 	bool bFound = false;
 	for( int n = 0; n < iT->GetEntries(); n++ )
 	{
@@ -1894,7 +1889,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
 	cout << "\t x_r \t y_r \t r_r" << endl;
 	for( int n = 0; n < n_r; n++ )
 	{
-		cout << "\t" << n << "\t" << x_r[n] << "\t" << y_r[n] << "\t" << r_r[n] << endl;
+		cout << "\t background region " << n << "\t" << x_r[n] << "\t" << y_r[n] << "\t" << r_r[n] << endl;
 		TEllipse* iL = new TEllipse( iSign * x_r[n], y_r[n], r_r[n], r_r[n] );
 		iL->SetFillStyle( 0 );
 		iL->SetLineWidth( 2 );
