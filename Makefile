@@ -229,6 +229,7 @@ all VTS:	evndisp \
 	makeRadialAcceptance \
 	calculateBinaryPhases \
 	compareDatawithMC \
+    VTS.analyzeMuonRings \
 	VTS.getRunListFromDB \
 	VTS.getLaserRunFromDB \
 	VTS.getRun_TimeElevAzim \
