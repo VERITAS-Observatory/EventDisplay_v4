@@ -1097,28 +1097,9 @@ trainTMVAforAngularReconstruction:	./obj/trainTMVAforAngularReconstruction.o \
 					./obj/Ctelconfig.o ./obj/Cshowerpars.o ./obj/Ctpars.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
-########################################################
-# updateDBlaserRUN
-########################################################
-./obj/updateDBlaserRUN.o: ./src/updateDBlaserRUN.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-updateDBlaserRUN:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
-			./obj/VExposure.o ./obj/VExposure_Dict.o \
-			./obj/VStar.o ./obj/VStar_Dict.o \
-			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
-			./obj/VDB_Connection.o \
-			./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
-			./obj/VSkyCoordinatesUtilities.o \
-			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-			./obj/VUtilities.o \
-			./obj/VDB_CalibrationInfo.o \
-			./obj/updateDBlaserRUN.o
-	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
-	@echo "Done updateDBlaserRUN"
 
 ########################################################
-# updateDBlaserRUN
+# writelaserinDB
 # ########################################################
 writelaserinDBOBJ  = ./obj/VDB_CalibrationInfo.o
 writelaserinDBOBJ += ./obj/VDB_Connection.o
@@ -1248,6 +1229,8 @@ VTS.analyzeMuonRings:		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dic
 				./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 				./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 				./obj/VDB_Connection.o \
+				./obj/VSkyCoordinatesUtilities.o \
+				./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 				./obj/Ctelconfig.o ./obj/Cshowerpars.o ./obj/Ctpars.o \
 				./obj/VTS.analyzeMuonRings.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
