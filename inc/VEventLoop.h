@@ -21,6 +21,7 @@
 #include "VBFDataReader.h"
 #endif
 #include "VPedestalCalculator.h"
+#include "VIPRCalculator.h"
 #include "VEvndispRunParameter.h"
 
 #include "VDeadPixelOrganizer.h"
@@ -40,6 +41,7 @@ class VEventLoop : public VEvndispData
 		enum E_runmode {R_ANA, R_PED, R_GTO, R_BCK, R_DST, R_GTOLOW, R_PEDLOW, R_TZERO, R_TZEROLOW };
 		
 		VCalibrator* fCalibrator;                 //!< default calibration class
+		VIPRCalculator* fIPRCalculator;
 		VPedestalCalculator* fPedestalCalculator; //!< default pedestal calculator
 		VImageAnalyzer* fAnalyzer;                     //!< default analyzer class
 		VArrayAnalyzer* fArrayAnalyzer;           //!< default array analyzer
@@ -55,6 +57,7 @@ class VEventLoop : public VEvndispData
 		bool fAnalyzeMode;                        //!< used for gotoEvent (go through file without analyse events)
 		bool bMCSetAtmosphericID;
 		vector< bool > fBoolPrintSample;
+		bool fIPRTimeSlices;
 		
 		bool fCutTelescope;                       //!< cuts apply only to one telescope
 		int fNCutNArrayTrigger;                   //!< show only events with more than  fNCutNArrayTrigger triggered telescopes

@@ -101,6 +101,7 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 			fCalibrated.push_back( false );
 		}
 	fCalibrator = new VCalibrator();
+	fIPRCalculator = new VIPRCalculator();
 	
 	// create data summarizer
 	fDST = new VDST( ( fRunMode == R_DST ), ( fRunPar->fsourcetype == 1 || fRunPar->fsourcetype == 2 || fRunPar->fsourcetype == 6 ) );
@@ -475,11 +476,15 @@ bool VEventLoop::initEventLoop( string iFileName )
 	// initialize analyzers (output files are created as well here)
 	initializeAnalyzers();
 	
-	
+	if( fIPRCalculator )
+	{
+		cout << "initializing IPR calculator" << endl;
+		fIPRCalculator->initialize();
+	}
 	// create calibrators, analyzers, etc. at first event
 	if( fCalibrator )
 	{
-		fCalibrator->initialize();
+		fCalibrator->initialize( fIPRCalculator );
 	}
 	
 	// initialize pedestal calculator
@@ -756,7 +761,7 @@ void VEventLoop::shutdown()
 		// write pedestal variation calculations to output file
 		if( ( fRunPar->frunmode == R_ANA ) && fRunPar->fPedestalsInTimeSlices && fPedestalCalculator )
 		{
-			fPedestalCalculator->terminate( true, fDebug_writing );
+			fPedestalCalculator->terminate( true, fDebug_writing, fIPRCalculator );
 		}
 		// calculate and write deadtime calculation to disk
 		if( fDeadTime && !isMC() )
@@ -817,11 +822,11 @@ void VEventLoop::shutdown()
 		if( fRunPar->frunmode == R_PED && fRunPar->fPedestalsInTimeSlices && fPedestalCalculator )
 		{
 			iP = fPedestalCalculator;
-			fPedestalCalculator->terminate( false );
+			fPedestalCalculator->terminate( false, false, fIPRCalculator );
 		}
 		if( fCalibrator )
 		{
-			fCalibrator->terminate( iP );
+			fCalibrator->terminate( iP , fIPRCalculator );
 		}
 	}
 	// write data summary
@@ -1292,6 +1297,7 @@ int VEventLoop::analyzeEvent()
 			// analysis
 			case R_ANA:                           // analysis mode
 				// ignore pedestal events (important for VBF only)
+				cout << getEventNumber() << endl;
 #ifndef NOVBF
 				if( fReader->getATEventType() != VEventType::PED_TRIGGER )
 #endif
@@ -1452,7 +1458,7 @@ int VEventLoop::analyzeEvent()
 			setTelID( fRunPar->fTelToAnalyze[i] );
 			if( fRunPar->fPedestalsInTimeSlices && !fReader->wasLossyCompressed() )
 			{
-				fPedestalCalculator->doAnalysis( fRunMode == R_PEDLOW );
+				fPedestalCalculator->doAnalysis( fRunMode == R_PEDLOW, fIPRCalculator );
 			}
 		}
 	}

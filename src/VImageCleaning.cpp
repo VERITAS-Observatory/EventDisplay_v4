@@ -548,6 +548,19 @@ bool VImageCleaning::InitNNImgClnPerTelType( unsigned int teltype )
 		}
 		// IPR graphs
 		IPRgraph->Write();
+
+		for (unsigned int ts = 0 ; ts < 4 ; ts++ )
+                {
+                        TGraphErrors* gTS = fData->getIPRGraphTimeSlice(false, ts );
+                        if( !gTS )
+                        {
+                                continue;
+                        }
+			cout << "MK writing IPR" << endl;
+			gTS->Write();
+
+		}
+
 		if( fWriteGraphToFileRecreate )
 		{
 			// probability curves (note that the x-axis is not charge!)

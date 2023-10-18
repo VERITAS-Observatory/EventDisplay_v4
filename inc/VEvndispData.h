@@ -523,6 +523,14 @@ class VEvndispData
 		{
 			return fCalData[fTelID]->getIPRGraph( iSumWindow, iMakeNewGraph );
 		}
+		TGraphErrors*  getIPRGraphTimeSlice( unsigned int TimeSlice = 0 )
+		{
+			return fCalData[fTelID]->getIPRGraphTimeSlice( false, TimeSlice  );
+		}
+		TGraphErrors*  getIPRGraphTimeSlice( bool iMakeNewGraph = false, unsigned int TimeSlice = 0 )
+                {
+                        return fCalData[fTelID]->getIPRGraphTimeSlice( iMakeNewGraph, TimeSlice );
+                }
 		float               getL1Rate( unsigned int iChannel )
 		{
 			if( fDB_PixelDataReader )
