@@ -434,13 +434,13 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 					// (require at least 100 entries in pedestal events)
 					os << t << " " << i << " ";
 					if( hped_vec[telType][fRunPar->fCalibrationSumWindow - 1][i]
-							&& hped_vec[telType][fRunPar->fCalibrationSumWindow - 1][i]->GetEntries() > 100 )
+							&& hped_vec[telType][fRunPar->fCalibrationSumWindow - 1][i]->GetEntries() > 50 )
 					{
 						os << hped_vec[telType][fRunPar->fCalibrationSumWindow - 1][i]->GetMean() / ( double )fRunPar->fCalibrationSumWindow << " ";
 					}
 					else
 					{
-						cout << "VCalibrator::writePeds(): WARNING, less than 100 events ";
+						cout << "VCalibrator::writePeds(): WARNING, less than 50 events ";
 						if( hped_vec[telType][fRunPar->fCalibrationSumWindow - 1][i] )
 						{
 							cout << "(";
@@ -454,7 +454,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 					// loop over all window sizes
 					for( unsigned int j = 0; j < hped_vec[telType].size(); j++ )
 					{
-						if( hped_vec[telType][j][i] && hped_vec[telType][j][i]->GetEntries() > 100 )
+						if( hped_vec[telType][j][i] && hped_vec[telType][j][i]->GetEntries() > 50 )
 						{
 							os << hped_vec[telType][j][i]->GetRMS() << " ";
 						}
@@ -1518,7 +1518,7 @@ TTree* VCalibrator::fillCalibrationSummaryTree( unsigned int itel, string iName,
 	for( unsigned int i = 0; i < getNChannels(); i++ )
 	{
 		ichannel = ( int )i;
-		if( i < h.size() && h[i] && h[i]->GetEntries() > 0 && h[i]->Integral( 1, h[i]->GetNbinsX() > 0. ) )
+		if( i < h.size() && h[i] && h[i]->GetEntries() > 0 )
 		{
 			i_mean = h[i]->GetMean();
 			i_rms  = h[i]->GetRMS();
