@@ -1999,7 +1999,6 @@ TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierInde
 	// binning and statistics
 	setEnergyBinning( i_EnergyBinningLog10 );
 	setEnergyRangeLinear( 0.10, 500. );
-	setSignificanceParameters( 3., 5. );
 	setPlottingMultiplierIndex( iPlottingMultiplierIndex );
 	
 	// plotting
