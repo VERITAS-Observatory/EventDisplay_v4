@@ -16,10 +16,7 @@
 #
 #  Optional libraries:
 #
-#  for using GSL libraries (optional)
-#    GSLSYS  (pointing to GSL installation)
-#    or
-#    gsl-config exists
+#  for using GSL libraries (as part of ROO  mathmore)
 #
 #  for using FITS (optional)
 #    FITSSYS (pointing to FITS installation)
@@ -74,15 +71,10 @@ endif
 #####################
 # GSL libraries
 #####################
-ifeq ($(origin GSLSYS), undefined)
-# test if gsl-config exists
-  GSLTEST=$(shell which gsl-config)
-  ifeq ($(strip $(GSLTEST)),)
-    GSLFLAG=-DNOGSL
-  endif
-  ifeq ($(strip $(GSLTEST)),"")
-    GSLFLAG=-DNOGSL
-  endif
+# check that root is compiled with mathmore
+GSLTEST=$(shell root-config --has-mathmore)
+ifeq ($(GSLTEST),no)
+  GSLFLAG=-DNOGSL
 endif
 #####################
 # FITS ROUTINES

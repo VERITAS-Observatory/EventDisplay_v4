@@ -36,4 +36,5 @@ jobs:
           export EVNDISPSYS=$(echo $GITHUB_WORKSPACE)
           export SOFASYS=${EVNDISPSYS}/sofa
           ./install_sofa.sh CI
+          make config
           make VTS
