@@ -48,7 +48,7 @@ jobs:
           curl https://syncandshare.desy.de/index.php/s/${{ secrets.SOFA }}/download > sofa.tar.gz
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
