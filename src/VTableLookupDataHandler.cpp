@@ -747,7 +747,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 		fDispAnalyzerDirection->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
 												fTLRunParameter->fmaxdist,
 												fTLRunParameter->fmaxloss,
-												fTLRunParameter->fmaxloss );
+												fTLRunParameter->fminfui);
 		fDispAnalyzerDirection->setTelescopeFOV( fTelFOV );
 		fDispAnalyzerDirection->calculateMeanDispDirection(
 			getNTel(),
