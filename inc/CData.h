@@ -140,6 +140,7 @@ class CData
 		//[NTelPairs]
 		Float_t         EmissionHeightT[VDST_MAXTELESCOPES* VDST_MAXTELESCOPES];
 		Double_t        DispDiff;  // from disp method
+        UInt_t          DispNImages; // from disp method
 		Float_t         Xoff_intersect;
 		Float_t         Yoff_intersect;
 		
@@ -238,6 +239,7 @@ class CData
 		TBranch*        b_NTelPairs;              //!
 		TBranch*        b_EmissionHeightT;        //!
 		TBranch*        b_DispDiff; //disp
+		TBranch*        b_DispNImages; //disp
 		TBranch*        b_Xoff_intersect;
 		TBranch*        b_Yoff_intersect;
 		
@@ -477,7 +479,15 @@ void CData::Init( TTree* tree )
 		fChain->SetBranchAddress( "LTrig", &LTrig );
 	}
 	fChain->SetBranchAddress( "NTrig", &NTrig );
-	fChain->SetBranchAddress( "NImages", &NImages );
+	if( fChain->GetBranchStatus( "DispNImages" ) )
+    {
+        fChain->SetBranchAddress( "DispNImages", &DispNImages );
+        NImages = (int)DispNImages
+    }
+    else
+    {
+        fChain->SetBranchAddress( "NImages", &NImages );
+    }
 	if( fVersion < 6 )
 	{
 		fChain->SetBranchAddress( "ImgSel", &ImgSelS );
@@ -974,6 +984,14 @@ Bool_t CData::Notify()
 		b_NTelPairs = 0;
 		b_EmissionHeightT = 0;
 	}
+	if( fChain->GetBranchStatus( "DispNImages" ) )
+	{
+		b_DispNImages = fChain->GetBranch( "DispNImages" );
+	}
+	else
+	{
+		b_DispNImages = 0;
+    }
 	if( fChain->GetBranchStatus( "DispDiff" ) )
 	{
 		b_DispDiff = fChain->GetBranch( "DispDiff" );
