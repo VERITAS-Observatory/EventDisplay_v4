@@ -350,12 +350,12 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 	{
 		runNumber = fshowerpars->runNumber;
 		eventNumber = fshowerpars->eventNumber;
-  		if( fDebug > 1 )
+		if( fDebug > 1 )
 		{
 			cout << "===============================================================================" << endl;
 			cout << "SHOWERPARS EVENT " << fshowerpars->eventNumber << "\t" << fEventCounter << "\t";
 			cout << fshowerpars->NImages[fMethod] << "\t" << fshowerpars->Chi2[fMethod];
-            cout << "\t XOFF: " << fshowerpars->Xoff[fMethod] << "\t YOFF: " << fshowerpars->Yoff[fMethod] <<  endl;
+			cout << "\t XOFF: " << fshowerpars->Xoff[fMethod] << "\t YOFF: " << fshowerpars->Yoff[fMethod] <<  endl;
 		}
 		time = fshowerpars->Time;
 		if( fEventCounter == 0 )
@@ -493,12 +493,12 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		}
 		// check if the tpars for this telescope should be
 		// read
-        if( !fTLRunParameter->fUseEvndispSelectedImagesOnly )
-        {
-            fReadTPars = true;
-        }
-        else if( ( fTLRunParameter->bWriteReconstructedEventsOnly >= 0 )
-				|| fTLRunParameter->bWriteReconstructedEventsOnly == -2 || fwrite )
+		if( !fTLRunParameter->fUseEvndispSelectedImagesOnly )
+		{
+			fReadTPars = true;
+		}
+		else if( ( fTLRunParameter->bWriteReconstructedEventsOnly >= 0 )
+				 || fTLRunParameter->bWriteReconstructedEventsOnly == -2 || fwrite )
 		{
 			if( fImgSel_list[i] )
 			{
@@ -651,12 +651,12 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		setNEnergyT( fDispAnalyzerEnergy->getEnergyNT() );
 		setNEnergyQuality( fDispAnalyzerEnergy->getEnergyQualityLabel() );
 	}
-   if( fDebug > 1 )
-    {
-        cout << "Stereo results: " << fshowerpars->eventNumber << "\t" << fEventCounter << "\t";
-        cout << fshowerpars->NImages[fMethod] << "\t" << fshowerpars->Chi2[fMethod];
-        cout << "\t XOFF: " << fXoff << "\t YOFF: " << fYoff << "\t ENERGY: " << fenergy << "  " << fenergyS << endl;
-    }
+	if( fDebug > 1 )
+	{
+		cout << "Stereo results: " << fshowerpars->eventNumber << "\t" << fEventCounter << "\t";
+		cout << fshowerpars->NImages[fMethod] << "\t" << fshowerpars->Chi2[fMethod];
+		cout << "\t XOFF: " << fXoff << "\t YOFF: " << fYoff << "\t ENERGY: " << fenergy << "  " << fenergyS << endl;
+	}
 	
 	fEventCounter++;
 	return 1;
@@ -758,7 +758,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 		fDispAnalyzerDirection->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
 												fTLRunParameter->fmaxdist,
 												fTLRunParameter->fmaxloss,
-												fTLRunParameter->fminfui);
+												fTLRunParameter->fminfui );
 		fDispAnalyzerDirection->setTelescopeFOV( fTelFOV );
 		fDispAnalyzerDirection->calculateMeanDispDirection(
 			getNTel(),

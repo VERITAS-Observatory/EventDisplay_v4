@@ -307,10 +307,10 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 				fMC_distance_to_cameracenter_min = 0.;
 			}
 		}
-        else if( iTemp.find( "-use_evndisp_selected_images" ) < iTemp.size() )
-        {
-            fUseEvndispSelectedImagesOnly = (bool)atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-        }
+		else if( iTemp.find( "-use_evndisp_selected_images" ) < iTemp.size() )
+		{
+			fUseEvndispSelectedImagesOnly = ( bool )atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
 		else if( iTemp.find( "-add_mc_spectral_index" ) < iTemp.size() )
 		{
 			fAddMC_spectral_index.push_back( atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() ) );
