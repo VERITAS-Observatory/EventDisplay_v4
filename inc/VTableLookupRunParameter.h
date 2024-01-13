@@ -52,7 +52,7 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		
 		float fMinRequiredShowerPerBin;    // minimum number of showers required per table bin
 		
-		bool  fUseSelectedImagesOnly;
+		bool  fUseEvndispSelectedImagesOnly;
 		
 		string writeoption;
 		bool bNoNoTrigger;
