@@ -78,6 +78,7 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		double       fmaxloss;   // note: same for all telescope types
 		double       fminfui ;   // note: same for all telescope types
 		double       fminsize;   // note: same for all telescope times
+		int          fminntubes; // note: same for all telescope times
 		// seed for random selection of showers before table filling
 		double fSelectRandom;
 		int fSelectRandomSeed;

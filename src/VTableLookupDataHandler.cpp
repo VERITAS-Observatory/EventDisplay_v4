@@ -155,7 +155,7 @@ void VTableLookupDataHandler::fill()
 
 	if( fTLRunParameter->bWriteReconstructedEventsOnly >= 0 || fTLRunParameter->bWriteReconstructedEventsOnly == -2 )
 	{
-		if( isReconstructed() || fTLRunParameter->fUseEvndispSelectedImagesOnly )
+		if( isReconstructed() )
 		{
 			fOTree->Fill();
 		}
@@ -615,7 +615,8 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		fDispAnalyzerEnergy->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
 											 fTLRunParameter->fmaxdist,
 											 fTLRunParameter->fmaxloss,
-											 fTLRunParameter->fminfui );
+											 fTLRunParameter->fminfui,
+											 fTLRunParameter->fminntubes );
 		fDispAnalyzerEnergy->calculateEnergies(
 			getNTel(),
 			fArrayPointing_Elevation, fArrayPointing_Azimuth,
@@ -742,7 +743,8 @@ void VTableLookupDataHandler::doStereoReconstruction()
 		fDispAnalyzerDirection->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
 												fTLRunParameter->fmaxdist,
 												fTLRunParameter->fmaxloss,
-												fTLRunParameter->fminfui );
+												fTLRunParameter->fminfui,
+												fTLRunParameter->fminntubes );
 		fDispAnalyzerDirection->setTelescopeFOV( fTelFOV );
 		fDispAnalyzerDirection->calculateMeanDispDirection(
 			getNTel(),
@@ -2851,7 +2853,7 @@ void VTableLookupDataHandler::fill_selected_images_after_redo_stereo_reconstruct
 	bitset<8 * sizeof( unsigned long )> i_nimage;
 	for( unsigned int i = 0; i < getNTel(); i++ )
 	{
-		if( tmp_size[i] > 0. && flength[i] > 0. && fntubes[i] > 0 && fArrayPointing_Elevation > 0.
+		if( tmp_size[i] > 0. && flength[i] > 0. && fntubes[i] > fTLRunParameter->fminntubes && fArrayPointing_Elevation > 0.
 				&& sqrt( fcen_x[i]*fcen_x[i] + fcen_y[i]*fcen_y[i] ) < fTLRunParameter->fmaxdist
 				&& floss[i] < fTLRunParameter->fmaxloss
 				&& ffui[i] > fTLRunParameter->fminfui )

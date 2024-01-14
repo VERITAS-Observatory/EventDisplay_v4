@@ -37,6 +37,7 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	fmaxdist = 50000.;
 	fmaxloss = 1.;
 	fminfui = 0.;
+	fminntubes = 5;
 	fSelectRandom = -1.;
 	fSelectRandomSeed = 17;
 	fRerunStereoReconstruction = false;
@@ -292,6 +293,10 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		else if( iTemp.find( "-minfui" ) < iTemp.size() )
 		{
 			fminfui = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
+		else if( iTemp.find( "-minntubes" ) < iTemp.size() )
+		{
+			fminntubes = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
 		else if( iTemp.find( "-maxdistancetocameracenter" ) < iTemp.size() )
 		{
@@ -565,6 +570,7 @@ void VTableLookupRunParameter::print( int iP )
 			{
 				cout << "\t BDT TMVA stereo reconstruction fui cut < " << fminfui << endl;
 			}
+			cout << "\t BDT TMVA stereo reconstruction ntubes cut >= " << fminntubes << endl;
 			cout << "\t Head/tail uncertainty: ";
 			if( fDisp_UseIntersectForHeadTail )
 			{
