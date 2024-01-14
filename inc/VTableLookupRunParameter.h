@@ -26,15 +26,15 @@ using namespace std;
 class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 {
 	private:
-	
+
 		bool fillInputFile_fromList( string iList );
 		bool readTelescopeToAnalyze( string iFile );
-		
+
 	public:
-	
+
 		// debug levels 0 = off, 1 = default debug level, 2 = detailed
 		unsigned int fDebug;
-		
+
 		// list of evndisp input files
 		vector< string > inputfile;
 		string outputfile;
@@ -47,17 +47,16 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		string fInterpolateString;
 		char readwrite;
 		bool fUpdateInstrumentEpoch;
-		
+
 		bool  fLimitEnergyReconstruction;
-		
+
 		float fMinRequiredShowerPerBin;    // minimum number of showers required per table bin
-		
+
 		bool  fUseEvndispSelectedImagesOnly;
-		
+
 		string writeoption;
 		bool bNoNoTrigger;
 		int  bWriteReconstructedEventsOnly;
-		bool bShortTree;
 		bool bWriteMCPars;
 		int  rec_method;
 		// quality cut level
@@ -68,9 +67,9 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		int fWobbleOffset;
 		// NSB (pedvars) level
 		int fNoiseLevel;
-		
+
 		vector< unsigned int > fTelToAnalyse;             // telescopes used in analysis
-		
+
 		unsigned int fTableFillingCut_NImages_min;
 		double       fTableFillingCut_WobbleCut_max;
 		double fMC_distance_to_cameracenter_min;
@@ -83,13 +82,13 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		double fSelectRandom;
 		int fSelectRandomSeed;
 		vector< double > fAddMC_spectral_index;
-		
+
 		Long64_t fNentries;
 		double fMaxRunTime;
 		// parameters to be used in anasum
 		double meanpedvars;                       // mean pedvar
 		vector< double > pedvars;                 // mean pedvar per telescope
-		
+
 		string printpara;
 		// rerun stereo reconstruction
 		bool  fRerunStereoReconstruction;
@@ -101,15 +100,15 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		float  fDispError_BDTWeight;
 		string fDispSign_BDTFileName;
 		bool fDisp_UseIntersectForHeadTail;
-		
+
 		// functions...
 		VTableLookupRunParameter();
 		~VTableLookupRunParameter() {}
-		
+
 		bool fillParameters( int argc, char* argv[] );
 		void print( int iB = 0 );
 		void printHelp();
-		
-		ClassDef( VTableLookupRunParameter, 30 );
+
+		ClassDef( VTableLookupRunParameter, 31 );
 };
 #endif

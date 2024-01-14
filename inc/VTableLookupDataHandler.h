@@ -141,7 +141,6 @@ class VTableLookupDataHandler
 
 		// output trees
 		TTree* fOTree;
-		bool fShortTree;                          //!< use short version of output tree
 		bool bWriteMCPars;
 
 		// cut statistics

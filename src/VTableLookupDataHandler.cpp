@@ -27,7 +27,6 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	fTshowerpars = 0;
 	fshowerpars = 0;
 	fOTree = 0;
-	fShortTree = fTLRunParameter->bShortTree;
 	bWriteMCPars = fTLRunParameter->bWriteMCPars;
 	fNTel = 0;
 	fNTelComb = 0;
@@ -331,7 +330,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		fMCycore = fshowerpars->MCycore;
 		fMCxoff = fshowerpars->MCxoff;
 		fMCyoff = fshowerpars->MCyoff;
-		if( !bShort && !fShortTree && !fwrite )
+		if( !bShort && !fwrite )
 		{
 			fMCxcore_SC = fshowerpars->MCxcore_SC;
 			fMCycore_SC = fshowerpars->MCycore_SC;
@@ -377,17 +376,10 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 				fTelDec[i] = fshowerpars->TelDec[i];
 				fTelRA[i] = fshowerpars->TelRA[i];
 			}
-			if( !fShortTree )
-			{
-				MJD = fshowerpars->MJD;
-			}
+			MJD = fshowerpars->MJD;
 		}
 		fNTrig = fshowerpars->NTrig;
-
-		if( !bShort )
-		{
-			LTrig = ( ULong64_t )fshowerpars->LTrig;
-		}
+		LTrig = ( ULong64_t )fshowerpars->LTrig;
 	} // end (!fwrite)
 
 	fZe = fshowerpars->Ze[fMethod];
@@ -447,7 +439,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 	}
 
 	fimg2_ang = fshowerpars->img2_ang[fMethod];
-	if( !bShort && !fShortTree )
+	if( !bShort )
 	{
 		fRA = fshowerpars->ra[fMethod];
 		fDec = fshowerpars->dec[fMethod];
@@ -1345,31 +1337,13 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 	fOTree->Branch( "ArrayPointing_Azimuth", &fArrayPointing_Azimuth, "ArrayPointing_Azimuth/F" );
 	fOTree->Branch( "ArrayPointing_Status", &fArray_PointingStatus, "Array_PointingStatus/i" );
 	sprintf( iTT, "TelDec[%d]/D", fNTel );
-	if( !fShortTree )
-	{
-		fOTree->Branch( "TelDec", fTelDec, iTT );
-	}
+	fOTree->Branch( "TelDec", fTelDec, iTT );
 	sprintf( iTT, "TelRA[%d]/D", fNTel );
-	if( !fShortTree )
-	{
-		fOTree->Branch( "TelRA", fTelRA, iTT );
-	}
-	if( !fShortTree )
-	{
-		fOTree->Branch( "TargetElev", &fTargetElev, "TargetElev/D" );
-	}
-	if( !fShortTree )
-	{
-		fOTree->Branch( "TargetAz", &fTargetAz, "TargetAz/D" );
-	}
-	if( !fShortTree )
-	{
-		fOTree->Branch( "TargetDec", &fTargetDec, "TargetDec/D" );
-	}
-	if( !fShortTree )
-	{
-		fOTree->Branch( "TargetRA", &fTargetRA, "TargetRA/D" );
-	}
+	fOTree->Branch( "TelRA", fTelRA, iTT );
+	fOTree->Branch( "TargetElev", &fTargetElev, "TargetElev/D" );
+	fOTree->Branch( "TargetAz", &fTargetAz, "TargetAz/D" );
+	fOTree->Branch( "TargetDec", &fTargetDec, "TargetDec/D" );
+	fOTree->Branch( "TargetRA", &fTargetRA, "TargetRA/D" );
 	fOTree->Branch( "WobbleN", &fWobbleN, "WobbleN/D" );
 	fOTree->Branch( "WobbleE", &fWobbleE, "WobbleE/D" );
 
@@ -1382,22 +1356,10 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 		fOTree->Branch( "MCycore", &fMCycore, "MCycore/D" );
 		sprintf( iTT, "MCR[%d]/D", fNTel );
 		// (nowhere needed)        fOTree->Branch( "MCR", fMCR, iTT );
-		if( !fShortTree )
-		{
-			fOTree->Branch( "MCxcore_SC", &fMCxcore_SC, "MCxcore_SC/D" );
-		}
-		if( !fShortTree )
-		{
-			fOTree->Branch( "MCycore_SC", &fMCycore_SC, "MCycore_SC/D" );
-		}
-		if( !fShortTree )
-		{
-			fOTree->Branch( "MCxcos", &fMCxcos, "MCxcos/D" );
-		}
-		if( !fShortTree )
-		{
-			fOTree->Branch( "MCycos", &fMCycos, "MCycos/D" );
-		}
+		fOTree->Branch( "MCxcore_SC", &fMCxcore_SC, "MCxcore_SC/D" );
+		fOTree->Branch( "MCycore_SC", &fMCycore_SC, "MCycore_SC/D" );
+		fOTree->Branch( "MCxcos", &fMCxcos, "MCxcos/D" );
+		fOTree->Branch( "MCycos", &fMCycos, "MCycos/D" );
 		fOTree->Branch( "MCaz", &fMCaz, "MCaz/D" );
 		fOTree->Branch( "MCze", &fMCze, "MCze/D" );
 		fOTree->Branch( "MCxoff", &fMCxoff, "MCxoff/D" );
@@ -1418,102 +1380,78 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 	fOTree->Branch( "RecID", &fMethod, "RecID/I" );
 	fOTree->Branch( "Ze", &fZe, "Ze/D" );
 	fOTree->Branch( "Az", &fAz, "Az/D" );
-	if( !fShortTree )
-	{
-		fOTree->Branch( "ra", &fRA, "ra/D" );
-	}
-	if( !fShortTree )
-	{
-		fOTree->Branch( "dec", &fDec, "dec/D" );
-	}
+	fOTree->Branch( "ra", &fRA, "ra/D" );
+	fOTree->Branch( "dec", &fDec, "dec/D" );
 	fOTree->Branch( "Xoff", &fXoff, "Xoff/D" );
 	fOTree->Branch( "Yoff", &fYoff, "Yoff/D" );
 	fOTree->Branch( "Xoff_derot", &fXoff_derot, "Xoff_derot/D" );
 	fOTree->Branch( "Yoff_derot", &fYoff_derot, "Yoff_derot/D" );
-	if( !fShortTree )
-	{
-		fOTree->Branch( "stdS", &fstdS, "stdS/D" );
-	}
-	if( !fShortTree )
-	{
-		fOTree->Branch( "theta2", &ftheta2, "theta2/D" );
-	}
-	if( !fShortTree )
-	{
-		fOTree->Branch( "theta2_All", &ftheta2_All, "theta2_All[25]/D" );
-	}
+	fOTree->Branch( "stdS", &fstdS, "stdS/D" );
+	fOTree->Branch( "theta2", &ftheta2, "theta2/D" );
+	fOTree->Branch( "theta2_All", &ftheta2_All, "theta2_All[25]/D" );
 	fOTree->Branch( "Xcore", &fXcore, "Xcore/D" );
 	fOTree->Branch( "Ycore", &fYcore, "Ycore/D" );
-	if( !fShortTree )
-	{
-		fOTree->Branch( "Xcore_SC", &fXcore_SC, "Xcore_SC/D" );
-	}
-	if( !fShortTree )
-	{
-		fOTree->Branch( "Ycore_SC", &fYcore_SC, "Ycore_SC/D" );
-	}
+	fOTree->Branch( "Xcore_SC", &fXcore_SC, "Xcore_SC/D" );
+	fOTree->Branch( "Ycore_SC", &fYcore_SC, "Ycore_SC/D" );
 	fOTree->Branch( "stdP", &fstdP, "stdP/D" );
 	fOTree->Branch( "Chi2", &fchi2, "Chi2/D" );
 
 	fOTree->Branch( "meanPedvar_Image", &fmeanPedvar_Image, "meanPedvar_Image/F" );
 
-	if( !fShortTree )
-	{
-		sprintf( iTT, "meanPedvar_ImageT[%d]/F", fNTel );
-		fOTree->Branch( "meanPedvar_ImageT", fmeanPedvar_ImageT, iTT );
-		sprintf( iTT, "dist[%d]/D", fNTel );
-		fOTree->Branch( "dist", fdist, iTT );
-		sprintf( iTT, "size[%d]/D", fNTel );
-		fOTree->Branch( "size", fsize, iTT );
-		sprintf( iTT, "size2[%d]/D", fNTel );
-		fOTree->Branch( "size2", fsize2, iTT );
-		sprintf( iTT, "loss[%d]/D", fNTel );
-		fOTree->Branch( "loss", floss, iTT );
-		sprintf( iTT, "fracLow[%d]/D", fNTel );
-		fOTree->Branch( "fracLow", ffracLow, iTT );
-		sprintf( iTT, "max1[%d]/D", fNTel );
-		fOTree->Branch( "max1", fmax1, iTT );
-		sprintf( iTT, "max2[%d]/D", fNTel );
-		fOTree->Branch( "max2", fmax2, iTT );
-		sprintf( iTT, "max3[%d]/D", fNTel );
-		fOTree->Branch( "max3", fmax3, iTT );
-		sprintf( iTT, "maxindex1[%d]/I", fNTel );
-		fOTree->Branch( "maxindex1", fmaxindex1, iTT );
-		sprintf( iTT, "maxindex2[%d]/I", fNTel );
-		fOTree->Branch( "maxindex2", fmaxindex2, iTT );
-		sprintf( iTT, "maxindex3[%d]/I", fNTel );
-		fOTree->Branch( "maxindex3", fmaxindex3, iTT );
-		sprintf( iTT, "width[%d]/D", fNTel );
-		fOTree->Branch( "width", fwidth, iTT );
-		sprintf( iTT, "length[%d]/D", fNTel );
-		fOTree->Branch( "length", flength, iTT );
-		sprintf( iTT, "ntubes[%d]/I", fNTel );
-		fOTree->Branch( "ntubes", fntubes, iTT );
-		sprintf( iTT, "nsat[%d]/s", fNTel );
-		fOTree->Branch( "nsat", fnsat, iTT );
-		sprintf( iTT, "nlowgain[%d]/s", fNTel );
-		fOTree->Branch( "nlowgain", fnlowgain, iTT );
-		sprintf( iTT, "alpha[%d]/D", fNTel );
-		fOTree->Branch( "alpha", falpha, iTT );
-		sprintf( iTT, "los[%d]/D", fNTel );
-		fOTree->Branch( "los", flos, iTT );
-		sprintf( iTT, "asym[%d]/D", fNTel );
-		fOTree->Branch( "asym", fasym, iTT );
-		sprintf( iTT, "cen_x[%d]/D", fNTel );
-		fOTree->Branch( "cen_x", fcen_x, iTT );
-		sprintf( iTT, "cen_y[%d]/D", fNTel );
-		fOTree->Branch( "cen_y", fcen_y, iTT );
-		sprintf( iTT, "cosphi[%d]/D", fNTel );
-		fOTree->Branch( "cosphi", fcosphi, iTT );
-		sprintf( iTT, "sinphi[%d]/D", fNTel );
-		fOTree->Branch( "sinphi", fsinphi, iTT );
-		sprintf( iTT, "tgrad_x[%d]/D", fNTel );
-		fOTree->Branch( "tgrad_x", ftgrad_x, iTT );
-		sprintf( iTT, "tchisq_x[%d]/D", fNTel );
-		fOTree->Branch( "tchisq_x", ftchisq_x, iTT );
-		sprintf( iTT, "Fitstat[%d]/I", fNTel );
-		fOTree->Branch( "Fitstat", fFitstat, iTT );
-	}
+	sprintf( iTT, "meanPedvar_ImageT[%d]/F", fNTel );
+	fOTree->Branch( "meanPedvar_ImageT", fmeanPedvar_ImageT, iTT );
+	sprintf( iTT, "dist[%d]/D", fNTel );
+	fOTree->Branch( "dist", fdist, iTT );
+	sprintf( iTT, "size[%d]/D", fNTel );
+	fOTree->Branch( "size", fsize, iTT );
+	sprintf( iTT, "size2[%d]/D", fNTel );
+	fOTree->Branch( "size2", fsize2, iTT );
+	sprintf( iTT, "loss[%d]/D", fNTel );
+	fOTree->Branch( "loss", floss, iTT );
+	sprintf( iTT, "fracLow[%d]/D", fNTel );
+	fOTree->Branch( "fracLow", ffracLow, iTT );
+	sprintf( iTT, "max1[%d]/D", fNTel );
+	fOTree->Branch( "max1", fmax1, iTT );
+	sprintf( iTT, "max2[%d]/D", fNTel );
+	fOTree->Branch( "max2", fmax2, iTT );
+	sprintf( iTT, "max3[%d]/D", fNTel );
+	fOTree->Branch( "max3", fmax3, iTT );
+	sprintf( iTT, "maxindex1[%d]/I", fNTel );
+	fOTree->Branch( "maxindex1", fmaxindex1, iTT );
+	sprintf( iTT, "maxindex2[%d]/I", fNTel );
+	fOTree->Branch( "maxindex2", fmaxindex2, iTT );
+	sprintf( iTT, "maxindex3[%d]/I", fNTel );
+	fOTree->Branch( "maxindex3", fmaxindex3, iTT );
+	sprintf( iTT, "width[%d]/D", fNTel );
+	fOTree->Branch( "width", fwidth, iTT );
+	sprintf( iTT, "length[%d]/D", fNTel );
+	fOTree->Branch( "length", flength, iTT );
+	sprintf( iTT, "ntubes[%d]/I", fNTel );
+	fOTree->Branch( "ntubes", fntubes, iTT );
+	sprintf( iTT, "nsat[%d]/s", fNTel );
+	fOTree->Branch( "nsat", fnsat, iTT );
+	sprintf( iTT, "nlowgain[%d]/s", fNTel );
+	fOTree->Branch( "nlowgain", fnlowgain, iTT );
+	sprintf( iTT, "alpha[%d]/D", fNTel );
+	fOTree->Branch( "alpha", falpha, iTT );
+	sprintf( iTT, "los[%d]/D", fNTel );
+	fOTree->Branch( "los", flos, iTT );
+	sprintf( iTT, "asym[%d]/D", fNTel );
+	fOTree->Branch( "asym", fasym, iTT );
+	sprintf( iTT, "cen_x[%d]/D", fNTel );
+	fOTree->Branch( "cen_x", fcen_x, iTT );
+	sprintf( iTT, "cen_y[%d]/D", fNTel );
+	fOTree->Branch( "cen_y", fcen_y, iTT );
+	sprintf( iTT, "cosphi[%d]/D", fNTel );
+	fOTree->Branch( "cosphi", fcosphi, iTT );
+	sprintf( iTT, "sinphi[%d]/D", fNTel );
+	fOTree->Branch( "sinphi", fsinphi, iTT );
+	sprintf( iTT, "tgrad_x[%d]/D", fNTel );
+	fOTree->Branch( "tgrad_x", ftgrad_x, iTT );
+	sprintf( iTT, "tchisq_x[%d]/D", fNTel );
+	fOTree->Branch( "tchisq_x", ftchisq_x, iTT );
+	sprintf( iTT, "Fitstat[%d]/I", fNTel );
+	fOTree->Branch( "Fitstat", fFitstat, iTT );
 	fOTree->Branch( "DispNImages", &fnxyoff, "DispNImages/i" );
 	fOTree->Branch( "DispXoff_T", fXoff_T, "DispXoff_T[NImages]/F" );
 	fOTree->Branch( "DispYoff_T", fYoff_T, "DispYoff_T[NImages]/F" );
@@ -1528,35 +1466,20 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 	sprintf( iTT, "R[%d]/D", fNTel );
 	fOTree->Branch( "R", fR, iTT );
 	sprintf( iTT, "MSCWT[%d]/D", fNTel );
-	if( !fShortTree )
-	{
-		fOTree->Branch( "MSCWT", ftmscw, iTT );
-	}
+	fOTree->Branch( "MSCWT", ftmscw, iTT );
 	sprintf( iTT, "MSCLT[%d]/D", fNTel );
-	if( !fShortTree )
-	{
-		fOTree->Branch( "MSCLT", ftmscl, iTT );
-	}
+	fOTree->Branch( "MSCLT", ftmscl, iTT );
 	sprintf( iTT, "MSCWTSigma[%d]/F", fNTel );
-	if( !fShortTree )
-	{
-		fOTree->Branch( "MSCWTSigma", ftmscw_sigma, iTT );
-	}
+	fOTree->Branch( "MSCWTSigma", ftmscw_sigma, iTT );
 	sprintf( iTT, "MSCLTSigma[%d]/F", fNTel );
-	if( !fShortTree )
-	{
-		fOTree->Branch( "MSCLTSigma", ftmscl_sigma, iTT );
-	}
+	fOTree->Branch( "MSCLTSigma", ftmscl_sigma, iTT );
 	sprintf( iTT, "E[%d]/D", fNTel );
 	fOTree->Branch( "E", fE, iTT );
 	sprintf( iTT, "ES[%d]/D", fNTel );
 	fOTree->Branch( "ES", fES, iTT );
 
 	sprintf( iTT, "NMSCW/I" );
-	if( !fShortTree )
-	{
-		fOTree->Branch( "NMSCW", &fnmscw, iTT );
-	}
+	fOTree->Branch( "NMSCW", &fnmscw, iTT );
 	sprintf( iTT, "MSCW/D" );
 	fOTree->Branch( "MSCW", &fmscw, iTT );
 	sprintf( iTT, "MSCL/D" );
@@ -1572,20 +1495,11 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 	sprintf( iTT, "dE/D" );
 	fOTree->Branch( "dE", &fdE, iTT );
 	sprintf( iTT, "Esys/F" );
-	if( !fShortTree )
-	{
-		fOTree->Branch( "Esys", &fesys, iTT );
-	}
+	fOTree->Branch( "Esys", &fesys, iTT );
 	sprintf( iTT, "EsysVar/F" );
-	if( !fShortTree )
-	{
-		fOTree->Branch( "EsysVar", &fesysVar, iTT );
-	}
+	fOTree->Branch( "EsysVar", &fesysVar, iTT );
 	sprintf( iTT, "EsysDist/F" );
-	if( !fShortTree )
-	{
-		fOTree->Branch( "EsysDist", &fesysDist, iTT );
-	}
+	fOTree->Branch( "EsysDist", &fesysDist, iTT );
 	sprintf( iTT, "ErecS/D" );
 	fOTree->Branch( "ErecS", &fenergyS, iTT );
 	sprintf( iTT, "EChi2S/D" );
@@ -1604,10 +1518,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 	fOTree->Branch( "SizeSecondMax", &fSizeSecondMax, "SizeSecondMax/D" );
 
 	sprintf( iTT, "fEmissionHeightT[NTelPairs]/F" );
-	if( !fShortTree )
-	{
-		fOTree->Branch( "EmissionHeightT", fEmissionHeightT, iTT );
-	}
+	fOTree->Branch( "EmissionHeightT", fEmissionHeightT, iTT );
 	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
 	{
 		fEmissionHeightT[i] = -99.;
