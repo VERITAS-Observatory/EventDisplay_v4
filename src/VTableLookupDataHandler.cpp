@@ -611,6 +611,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 	{
 		doStereoReconstruction();
 		fill_selected_images_after_redo_stereo_reconstruction();
+		fmeanPedvar_Image = calculateMeanNoiseLevel( true );
 	}
 
 	// dispEnergy
@@ -2555,11 +2556,8 @@ void VTableLookupDataHandler::setSelectRandom( double iF, int iS )
 
 
 /*
-
    calculates mean noise level over all telescopes with a valid image
-
-   can use current noise level from time dependent pedestal variations
-
+   allow to use current noise level from time dependent pedestal variations
 */
 double VTableLookupDataHandler::calculateMeanNoiseLevel( bool bCurrentNoiseLevel )
 {
@@ -2569,35 +2567,19 @@ double VTableLookupDataHandler::calculateMeanNoiseLevel( bool bCurrentNoiseLevel
 	// time dependent pedestal variations
 	if( bCurrentNoiseLevel )
 	{
-		// use bit coded image list for older showerpars tree format or for small total numbers of telescopes
-		if( fEventDisplayFileFormat < 7 || getNTel() < 5 )
+		bitset<8 * sizeof( unsigned long )> i_nimage( fImgSel );
+		for( unsigned int i = 0; i < fCurrentNoiseLevel.size(); i++ )
 		{
-			bitset<8 * sizeof( unsigned long )> i_nimage( fImgSel );
-			for( unsigned int i = 0; i < fCurrentNoiseLevel.size(); i++ )
+			if( i >= i_nimage.size() )
 			{
-				if( i >= i_nimage.size() )
-				{
-					cout << "ERROR: too many telescope for calculateMeanNoiseLevel: " << i << "\t" << i_nimage.size() << endl;
-					cout << "\t " << fImgSel << endl;
-					continue;
-				}
-				if( fCurrentNoiseLevel[i] > 0. && i_nimage.test( i ) )
-				{
-					m += fCurrentNoiseLevel[i];
-					z++;
-				}
+				cout << "ERROR: too many telescope for calculateMeanNoiseLevel: " << i << "\t" << i_nimage.size() << endl;
+				cout << "\t " << fImgSel << endl;
+				continue;
 			}
-		}
-		// this should work even for very large telescopes
-		else
-		{
-			for( unsigned int i = 0; i < fCurrentNoiseLevel.size(); i++ )
+			if( fCurrentNoiseLevel[i] > 0. && i_nimage.test( i ) )
 			{
-				if( fCurrentNoiseLevel[i] > 0. && fImgSel_list[i] )
-				{
-					m += fCurrentNoiseLevel[i];
-					z++;
-				}
+				m += fCurrentNoiseLevel[i];
+				z++;
 			}
 		}
 	}
@@ -2954,6 +2936,8 @@ void VTableLookupDataHandler::fill_selected_images_after_redo_stereo_reconstruct
 {
 	double* tmp_size = getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly, false );
 	unsigned int ii = 0;
+	fImgSel = 0;
+	bitset<8 * sizeof( unsigned long )> i_nimage;
 	for( unsigned int i = 0; i < getNTel(); i++ )
 	{
 		if( tmp_size[i] > 0. && flength[i] > 0. && fntubes[i] > 0 && fArrayPointing_Elevation > 0.
@@ -2964,11 +2948,14 @@ void VTableLookupDataHandler::fill_selected_images_after_redo_stereo_reconstruct
 			fImgSel_list[i] = true;
 			fImgSel_list_short[ii] = i;
 			NImages_Ttype[getTelType_arraycounter( i )]++;
+			i_nimage.set( i, 1 );
 			ii++;
 		}
 		else
 		{
 			fImgSel_list[i] = false;
+			i_nimage.set( i, 0 );
 		}
 	}
+	fImgSel = i_nimage.to_ulong();
 }
