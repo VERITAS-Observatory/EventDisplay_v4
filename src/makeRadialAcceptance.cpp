@@ -236,8 +236,8 @@ int main( int argc, char* argv[] )
 				cout << teltoana[i] << "  ";
 			}
 			cout << endl;
-			cout << "\t" << teltoana.size() << "\t" << iParV2->fTelToAnalyze.size() << endl;
-			exit( EXIT_FAILURE );
+			cout << "Ignoring this file" << endl;
+			continue;
 		}
 		
 		// set gamma/hadron cuts
