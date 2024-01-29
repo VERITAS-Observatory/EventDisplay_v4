@@ -38,6 +38,8 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	fmaxdist = 50000.;
 	fmaxloss = 1.;
 	fminfui = 0.;
+	fminwidth = -1.;
+	fminfitstat = -10.;
 	fSelectRandom = -1.;
 	fSelectRandomSeed = 17;
 	fRerunStereoReconstruction = false;
@@ -293,6 +295,14 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		else if( iTemp.find( "-minfui" ) < iTemp.size() )
 		{
 			fminfui = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
+		else if( iTemp.find( "-minwidth" ) < iTemp.size() )
+		{
+			fminwidth = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
+		else if( iTemp.find( "-minfitstat" ) < iTemp.size() )
+		{
+			fminfitstat = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
 		else if( iTemp.find( "-maxdistancetocameracenter" ) < iTemp.size() )
 		{

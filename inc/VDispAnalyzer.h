@@ -35,6 +35,8 @@ class VDispAnalyzer
 		float fdistance_max;
 		float floss_max;
 		float fFui_min;
+		float fWidth_min;
+		float fFitstat_min;
 		bool  fDispErrorWeighting;
 		float fDispErrorExponential;
 		
@@ -109,7 +111,8 @@ class VDispAnalyzer
 								double* iR, double iEHeight,
 								double iMCEnergy,
 								double* img_fui,
-								float* img_pedvar );
+								float* img_pedvar,
+								int* img_fitstat );
 								
 		void  calculateMeanDirection( float& xs, float& ys,
 									  vector< float >& x, vector< float >& y,
@@ -134,7 +137,8 @@ class VDispAnalyzer
 										 double* img_fui,
 										 float* img_pedvar,
 										 double* pointing_dx, double* pointing_dy,
-										 bool UseIntersectForHeadTail );
+										 bool UseIntersectForHeadTail,
+										 int* img_fitstat );
 										 
 		vector< float > calculateExpectedDirectionError_or_Sign( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
 				ULong64_t* iTelType,
@@ -144,7 +148,7 @@ class VDispAnalyzer
 				double* img_tgrad, double* img_loss, int* img_ntubes,
 				double* img_weight,
 				double xoff_4, double yoff_4,
-				double* img_fui, float* img_pedvar );
+				double* img_fui, float* img_pedvar, int* img_fitstat );
 				
 		float evaluate( float iWidth, float iLength, float iAsymm, float iDist,
 						float iSize, float iPedvar, float itgrad, float iLoss,
@@ -241,13 +245,15 @@ class VDispAnalyzer
 		}
 		void  setQualityCuts( unsigned int iNImages_min = 0, float iAxesAngles_min = 0.,
 							  float imaxdist = 1.e5, float imaxloss = 1.,
-							  float iminfui = 0. )
+							  float iminfui = 0., float iminwidth = -1., float iminfitstat = -10. )
 		{
 			fAxesAngles_min = iAxesAngles_min;
 			fNImages_min    = iNImages_min;
 			fdistance_max   = imaxdist;
 			floss_max       = imaxloss;
 			fFui_min        = iminfui;
+			fWidth_min      = iminwidth;
+			fFitstat_min    = iminfitstat;
 		}
 		void  setTelescopeTypeList( vector<ULong64_t> iTelescopeTypeList );
 		void  setTelescopeFOV( vector< float > iTelFOV )
