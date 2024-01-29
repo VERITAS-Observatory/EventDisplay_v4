@@ -576,6 +576,14 @@ void VTableLookupRunParameter::print( int iP )
 			{
 				cout << "\t BDT TMVA stereo reconstruction fui cut < " << fminfui << endl;
 			}
+			if( fminwidth > 0. )
+			{
+				cout << "\t BDT TMVA stereo reconstruction min width cut < " << fminwidth << endl;
+			}
+			if( fminfitstat > 0. )
+			{
+				cout << "\t BDT TMVA stereo reconstruction min fitstat cut < " << fminfitstat << endl;
+			}
 			cout << "\t Head/tail uncertainty: ";
 			if( fDisp_UseIntersectForHeadTail )
 			{
