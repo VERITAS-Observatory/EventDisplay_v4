@@ -574,7 +574,7 @@ void VTableLookupRunParameter::print( int iP )
 			}
 			if( fminfui > 0. )
 			{
-				cout << "\t BDT TMVA stereo reconstruction fui cut < " << fminfui << endl;
+				cout << "\t BDT TMVA stereo reconstruction fui cut > " << fminfui << endl;
 			}
 			if( fminwidth > 0. )
 			{
