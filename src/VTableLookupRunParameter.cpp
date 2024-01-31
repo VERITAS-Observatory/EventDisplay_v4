@@ -38,6 +38,8 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	fmaxloss = 1.;
 	fminfui = 0.;
 	fminntubes = 5;
+	fminwidth = -1.;
+	fminfitstat = -10.;
 	fSelectRandom = -1.;
 	fSelectRandomSeed = 17;
 	fRerunStereoReconstruction = false;
@@ -297,6 +299,14 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		else if( iTemp.find( "-minntubes" ) < iTemp.size() )
 		{
 			fminntubes = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+        }
+		else if( iTemp.find( "-minwidth" ) < iTemp.size() )
+		{
+			fminwidth = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
+		else if( iTemp.find( "-minfitstat" ) < iTemp.size() )
+		{
+			fminfitstat = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
 		else if( iTemp.find( "-maxdistancetocameracenter" ) < iTemp.size() )
 		{
@@ -568,7 +578,15 @@ void VTableLookupRunParameter::print( int iP )
 			}
 			if( fminfui > 0. )
 			{
-				cout << "\t BDT TMVA stereo reconstruction fui cut < " << fminfui << endl;
+				cout << "\t BDT TMVA stereo reconstruction fui cut > " << fminfui << endl;
+			}
+			if( fminwidth > 0. )
+			{
+				cout << "\t BDT TMVA stereo reconstruction min width cut < " << fminwidth << endl;
+			}
+			if( fminfitstat > 0. )
+			{
+				cout << "\t BDT TMVA stereo reconstruction min fitstat cut < " << fminfitstat << endl;
 			}
 			cout << "\t BDT TMVA stereo reconstruction ntubes cut >= " << fminntubes << endl;
 			cout << "\t Head/tail uncertainty: ";

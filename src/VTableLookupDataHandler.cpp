@@ -559,6 +559,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 				}
 			}
 			fCurrentNoiseLevel[i] = ftpars[i]->meanPedvar_Image;
+			fFitstat[i] = ftpars[i]->Fitstat;
 			if( !bShort )
 			{
 				fmeanPedvar_ImageT[i] = ftpars[i]->meanPedvar_Image;
@@ -575,7 +576,6 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 				fmaxindex2[i] = ftpars[i]->index_of_max[1];
 				fmaxindex3[i] = ftpars[i]->index_of_max[2];
 				ftchisq_x[i] = ftpars[i]->tchisq_x;
-				fFitstat[i] = ftpars[i]->Fitstat;
 			}
 		}
 		else
@@ -616,6 +616,8 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 											 fTLRunParameter->fmaxdist,
 											 fTLRunParameter->fmaxloss,
 											 fTLRunParameter->fminfui,
+											 fTLRunParameter->fminwidth,
+											 fTLRunParameter->fminfitstat,
 											 fTLRunParameter->fminntubes );
 		fDispAnalyzerEnergy->calculateEnergies(
 			getNTel(),
@@ -632,8 +634,8 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			getDistanceToCoreTel(),
 			fEmissionHeightMean,
 			fMCEnergy,
-			ffui, fmeanPedvar_ImageT );
-
+			ffui, fmeanPedvar_ImageT, fFitstat );
+			
 		// fill results
 		setEnergy( fDispAnalyzerEnergy->getEnergy(), false );
 		setChi2( fDispAnalyzerEnergy->getEnergyChi2(), false );
@@ -714,7 +716,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 							 floss, fntubes,
 							 getWeight(),
 							 fXoff_intersect, fYoff_intersect,
-							 ffui, fmeanPedvar_ImageT );
+							 ffui, fmeanPedvar_ImageT, fFitstat );
 		}
 		////////////////////////////////////////////////////////////////////
 		// estimate disp head/tail sign
@@ -734,7 +736,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 							floss, fntubes,
 							getWeight(),
 							fXoff_intersect, fYoff_intersect,
-							ffui, fmeanPedvar_ImageT );
+							ffui, fmeanPedvar_ImageT, fFitstat );
 		}
 
 		// use weighting calculated from disp error
@@ -744,6 +746,8 @@ void VTableLookupDataHandler::doStereoReconstruction()
 												fTLRunParameter->fmaxdist,
 												fTLRunParameter->fmaxloss,
 												fTLRunParameter->fminfui,
+												fTLRunParameter->fminwidth,
+												fTLRunParameter->fminfitstat,
 												fTLRunParameter->fminntubes );
 		fDispAnalyzerDirection->setTelescopeFOV( fTelFOV );
 		fDispAnalyzerDirection->calculateMeanDispDirection(
@@ -761,7 +765,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 			iDispError, iDispSign,
 			ffui, fmeanPedvar_ImageT,
 			fpointing_dx, fpointing_dy,
-			fTLRunParameter->fDisp_UseIntersectForHeadTail );
+			fTLRunParameter->fDisp_UseIntersectForHeadTail, fFitstat );
 		// reconstructed direction by disp method:
 		fXoff = fDispAnalyzerDirection->getXcoordinate_disp();
 		fYoff = fDispAnalyzerDirection->getYcoordinate_disp();
@@ -1399,6 +1403,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 	fOTree->Branch( "Chi2", &fchi2, "Chi2/D" );
 
 	fOTree->Branch( "meanPedvar_Image", &fmeanPedvar_Image, "meanPedvar_Image/F" );
+<<<<<<< HEAD
 
 	sprintf( iTT, "meanPedvar_ImageT[%d]/F", fNTel );
 	fOTree->Branch( "meanPedvar_ImageT", fmeanPedvar_ImageT, iTT );
