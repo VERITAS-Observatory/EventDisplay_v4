@@ -1,42 +1,51 @@
-ARG ROOT_VERSION=latest
-FROM rootproject/root:${ROOT_VERSION} AS vbf_build
+ARG ROOT_VERSION=6.30.02-alma9
+FROM rootproject/root:${ROOT_VERSION} AS build
+ARG VBF_VERSION=0.3.4
+ARG BUILD_BRANCH=main
 
 LABEL maintainer.name="Eventdisplay Team"
 LABEL maintainer.email="gernot.maier@desy.de"
 
-COPY VBF.tar.gz VBF.tar.gz
-RUN mkdir VBF &&tar -xzf VBF.tar.gz -C VBF --strip-components=1 \
-    && cd VBF \
-    && ./configure --prefix=/opt/VBF \
-    && make && make install \
-    && make clean
-
-FROM rootproject/root:${ROOT_VERSION} as eventdisplay_build
-WORKDIR /opt/
-COPY --from=vbf_build /opt/VBF /opt/VBF
+# VBF
+ADD https://syncandshare.desy.de/index.php/s/NrnZNKfT8WxFpcn/download /workdir/VBF-$VBF_VERSION.tar.gz
+WORKDIR /workdir/
+RUN mkdir VBF && tar -xzf VBF-$VBF_VERSION.tar.gz -C VBF --strip-components=1 && \
+    cd VBF && \
+    ./configure --prefix=/opt/VBF && \
+    make && make install && make clean
 ENV VBFSYS /opt/VBF
-ENV LD_LIBRARY_PATH "${VBFSYS}/lib/:${LD_LIBRARY_PATH}"
-ENV PATH ${VBFSYS}/bin:${PATH}
-
-COPY EventDisplay_v4 /opt/Eventdisplay
-COPY sofa.tar.gz sofa.tar.gz
-ENV EVNDISPSYS /opt/Eventdisplay
-ENV LD_LIBRARY_PATH "${EVNDISPSYS}/obj:${EVNDISPSYS}/lib:${ROOTSYS}/lib:${VBFSYS}/lib:${LD_LIBRARY_PATH}"
+ENV EVNDISPSYS /opt/EventDisplay_v4
 ENV SOFASYS "${EVNDISPSYS}/sofa"
+ENV PATH ${VBFSYS}/bin:${PATH}
+ENV LD_LIBRARY_PATH "${EVNDISPSYS}/obj:${EVNDISPSYS}/lib:${ROOTSYS}/lib:${VBFSYS}/lib:${LD_LIBRARY_PATH}"
+
+WORKDIR /opt/
+RUN BUILD_BRANCH=$(echo ${BUILD_BRANCH} | sed 's#refs/tags/##') && \
+    git clone -b ${BUILD_BRANCH} https://github.com/VERITAS-Observatory/EventDisplay_v4.git --depth 1
+ADD https://syncandshare.desy.de/index.php/s/jr9NrbWFR5MLaDf/download  ${SOFASYS}/sofa.tar.gz
 
 RUN cd ${EVNDISPSYS} \
-    && mv -f /opt/sofa.tar.gz ./sofa/ \
-    && ./install_sofa.sh \
-    && make VTS
-
+    && ./install_sofa.sh && make VTS
+ 
 FROM rootproject/root:${ROOT_VERSION}
 WORKDIR /opt/
-COPY --from=vbf_build /opt/VBF /opt/VBF
-COPY --from=eventdisplay_build /opt/Eventdisplay /opt/Eventdisplay
-
-ENV EVNDISPSYS /opt/Eventdisplay
+COPY --from=build /opt/VBF /opt/VBF
+COPY --from=build /opt/EventDisplay_v4 /opt/EventDisplay_v4
+ 
+ENV EVNDISPSYS /opt/EventDisplay_v4
 ENV VBFSYS /opt/VBF
 ENV LD_LIBRARY_PATH "${VBFSYS}/lib/:${LD_LIBRARY_PATH}"
 ENV PATH ${VBFSYS}/bin:${PATH}
 ENV LD_LIBRARY_PATH "${EVNDISPSYS}/obj:${EVNDISPSYS}/lib:${ROOTSYS}/lib:${VBFSYS}/lib:${LD_LIBRARY_PATH}"
 ENV SOFASYS "${EVNDISPSYS}/sofa"
+
+ # add main branch of VERITAS Analysis files
+ WORKDIR /opt/
+ RUN git clone https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles_VTS.git --dept 1
+ ENV VERITAS_EVNDISP_AUX_DIR /opt/Eventdisplay_AnalysisFiles_VTS
+
+# data and user data and log directory (to be mounted)
+ENV VERITAS_DATA_DIR /opt/data
+ENV VERITAS_LOG_DIR /opt/data
+ENV VERITAS_USER_DATA_DIR /opt/user_data
+ENV VERITAS_USER_USER_DIR /opt/user_data
