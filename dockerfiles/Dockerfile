@@ -3,9 +3,6 @@ FROM rootproject/root:${ROOT_VERSION} AS build
 ARG VBF_VERSION=0.3.4
 ARG BUILD_BRANCH=main
 
-LABEL maintainer.name="Eventdisplay Team"
-LABEL maintainer.email="gernot.maier@desy.de"
-
 # VBF
 ADD https://syncandshare.desy.de/index.php/s/NrnZNKfT8WxFpcn/download /workdir/VBF-$VBF_VERSION.tar.gz
 WORKDIR /workdir/
@@ -31,6 +28,9 @@ FROM rootproject/root:${ROOT_VERSION}
 WORKDIR /opt/
 COPY --from=build /opt/VBF /opt/VBF
 COPY --from=build /opt/EventDisplay_v4 /opt/EventDisplay_v4
+
+LABEL maintainer.name="Eventdisplay Team"
+LABEL maintainer.email="gernot.maier@desy.de"
  
 ENV EVNDISPSYS /opt/EventDisplay_v4
 ENV VBFSYS /opt/VBF
