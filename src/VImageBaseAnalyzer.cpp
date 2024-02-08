@@ -1023,8 +1023,8 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 	
 	if( iFirst )
 	{
-		// print warning if more than 30 channels are dead
-		if( getNDead( iLowGain ) > 30 )
+		// print warning if more than 40 channels are dead
+		if( getNDead( iLowGain ) > 40 )
 		{
 			cout << "WARNING: number of dead";
 			if( !iLowGain )
@@ -1035,7 +1035,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 			{
 				cout << " low gain ";
 			}
-			cout << "channels on telescope " << getTelID() + 1 << " exceeds 30: " << n_dead << endl;
+			cout << "channels on telescope " << getTelID() + 1 << " exceeds 40: " << n_dead << endl;
 		}
 		// print info when less than 30 channels are dead
 		else
