@@ -38,6 +38,7 @@ void VSQLTextFileReader::readSQLFile( string iSQLFile )
 {
 	cout << "Reading SQLText data from " << iSQLFile << endl;
 	
+	locale::global( std::locale( "C.UTF-8" ) );
 	ifstream sql_file;
 	sql_file.open( iSQLFile.c_str() );
 	if( sql_file.fail() )

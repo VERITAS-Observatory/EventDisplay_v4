@@ -39,13 +39,8 @@ ENV PATH ${VBFSYS}/bin:${PATH}
 ENV LD_LIBRARY_PATH "${EVNDISPSYS}/obj:${EVNDISPSYS}/lib:${ROOTSYS}/lib:${VBFSYS}/lib:${LD_LIBRARY_PATH}"
 ENV SOFASYS "${EVNDISPSYS}/sofa"
 
- # add main branch of VERITAS Analysis files
- WORKDIR /opt/
- RUN git clone https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles_VTS.git --dept 1
- ENV VERITAS_EVNDISP_AUX_DIR /opt/Eventdisplay_AnalysisFiles_VTS
-
 # data and user data and log directory (to be mounted)
 ENV VERITAS_DATA_DIR /opt/data
 ENV VERITAS_LOG_DIR /opt/data
 ENV VERITAS_USER_DATA_DIR /opt/user_data
-ENV VERITAS_USER_USER_DIR /opt/user_data
+ENV VERITAS_USER_LOG_DIR /opt/user_data

@@ -181,7 +181,7 @@ bool VGlobalRunParameter::setDirectories()
 	// test if directory exists
 	if( gSystem->AccessPathName( fEVNDISPAnaDataDirectory.c_str() ) )
 	{
-		cout << "VGlobalRunParameter::setDirectories(): cannot find directory with EVNDISP aux data" << endl;
+		cout << "VGlobalRunParameter::setDirectories() error: cannot find directory with EVNDISP aux data" << endl;
 		cout << "\t looking for " << fEVNDISPAnaDataDirectory << endl;
 		cout << "\t is environmental variable $VERITAS_EVNDISP_AUX_DIR set?" << endl;
 		cout << "\t (see INSTALL.md)" << endl;

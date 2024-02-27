@@ -2337,7 +2337,7 @@ void VExposure::printListOfRuns()
 						stringstream stream2( word1 );
 						string word2;
 						
-						cout << "* " ;
+						cout << "*" ;
 						cout << " " << fRun[j];
 						k = 0;
 						while( getline( stream2, word2, '/' ) )
