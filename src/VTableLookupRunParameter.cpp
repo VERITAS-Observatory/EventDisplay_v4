@@ -10,7 +10,7 @@ ClassImp( VTableLookupRunParameter )
 VTableLookupRunParameter::VTableLookupRunParameter()
 {
 	fDebug = 0;
-	
+
 	outputfile = "";
 	tablefile = "";
 	ze = -1.;
@@ -23,9 +23,8 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	writeoption = "recreate";
 	fMinRequiredShowerPerBin = 5.;
 	bNoNoTrigger = true;
-	fUseSelectedImagesOnly = true;
+	fUseEvndispSelectedImagesOnly = true;
 	bWriteReconstructedEventsOnly = 1;
-	bShortTree = false;
 	bWriteMCPars = true;
 	rec_method = 0;
 	fWrite1DHistograms = false;
@@ -38,6 +37,7 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	fmaxdist = 50000.;
 	fmaxloss = 1.;
 	fminfui = 0.;
+	fminntubes = 5;
 	fminwidth = -1.;
 	fminfitstat = -10.;
 	fSelectRandom = -1.;
@@ -52,17 +52,17 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	fDispSign_BDTFileName = "";
 	fDisp_UseIntersectForHeadTail = false;
 	fQualityCutLevel = 0;
-	
+
 	fLimitEnergyReconstruction = false;
-	
+
 	fMC_distance_to_cameracenter_min =  0.;
 	fMC_distance_to_cameracenter_max =  1.e10;
-	
+
 	fNentries = 1234567890;
 	fMaxRunTime = 1.e9;
-	
+
 	printpara = "";
-	
+
 	meanpedvars = 0.;
 }
 
@@ -296,6 +296,10 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		{
 			fminfui = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
+		else if( iTemp.find( "-minntubes" ) < iTemp.size() )
+		{
+			fminntubes = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+        }
 		else if( iTemp.find( "-minwidth" ) < iTemp.size() )
 		{
 			fminwidth = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -316,6 +320,10 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 			{
 				fMC_distance_to_cameracenter_min = 0.;
 			}
+		}
+		else if( iTemp.find( "-use_evndisp_selected_images" ) < iTemp.size() )
+		{
+			fUseEvndispSelectedImagesOnly = ( bool )atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
 		else if( iTemp.find( "-add_mc_spectral_index" ) < iTemp.size() )
 		{
@@ -360,10 +368,6 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 				bWriteReconstructedEventsOnly = 0;
 			}
 		}
-		else if( iTemp.find( "-short" ) < iTemp.size() )
-		{
-			bShortTree = true;
-		}
 		else if( iTemp.find( "-pe" ) < iTemp.size() )
 		{
 			fPE = true;
@@ -393,7 +397,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 	// =============================================
 	// end of reading command line parameters
 	// =============================================
-	
+
 	// require inputfile name
 	if( inputfile.size() == 0 )
 	{
@@ -408,7 +412,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		cout << "...exiting" << endl;
 		return false;
 	}
-	
+
 	// set output file name (mainly for VTS analysis with a single inputfile)
 	if( outputfile.size() == 0 && inputfile.size() == 1 )
 	{
@@ -429,7 +433,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 	{
 		readTelescopeToAnalyze( inputfile[0] );
 	}
-	
+
 	return true;
 }
 
@@ -441,7 +445,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 bool VTableLookupRunParameter::readTelescopeToAnalyze( string iFile )
 {
 	fTelToAnalyse.clear();
-	
+
 	TFile iF( iFile.c_str() );
 	if( iF.IsZombie() )
 	{
@@ -449,7 +453,7 @@ bool VTableLookupRunParameter::readTelescopeToAnalyze( string iFile )
 		cout << "\t " << iFile.c_str() << endl;
 		return false;
 	}
-	
+
 	// read telescopes to analyse from eventdisplay run parameter list
 	vector< unsigned int > iRunParT;
 	VEvndispRunParameter* iPar = ( VEvndispRunParameter* )iF.Get( "runparameterV2" );
@@ -489,7 +493,7 @@ bool VTableLookupRunParameter::readTelescopeToAnalyze( string iFile )
 		cout << "VTableLookupRunParameter::readTelescopeToAnalyze warning: could not find evndisp reconstruction parameters (EvndispReconstructionParameter)" << endl;
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -584,6 +588,7 @@ void VTableLookupRunParameter::print( int iP )
 			{
 				cout << "\t BDT TMVA stereo reconstruction min fitstat cut < " << fminfitstat << endl;
 			}
+			cout << "\t BDT TMVA stereo reconstruction ntubes cut >= " << fminntubes << endl;
 			cout << "\t Head/tail uncertainty: ";
 			if( fDisp_UseIntersectForHeadTail )
 			{
@@ -603,7 +608,7 @@ void VTableLookupRunParameter::print( int iP )
 	{
 		cout << "random event selection: " << fSelectRandom << ", seed:" << fSelectRandomSeed << endl;
 	}
-	if( fUseSelectedImagesOnly )
+	if( fUseEvndispSelectedImagesOnly )
 	{
 		cout << "\t use evndisp image selection" << endl;
 	}
@@ -631,7 +636,7 @@ void VTableLookupRunParameter::print( int iP )
 	{
 		cout << "updating instrument epoch from default epoch file" << endl;
 	}
-	
+
 	if( iP >= 1 )
 	{
 		cout << endl;
@@ -674,8 +679,8 @@ bool VTableLookupRunParameter::fillInputFile_fromList( string iList )
 		}
 	}
 	is.close();
-	
+
 	cout << "total number of input files " << inputfile.size() << endl;
-	
+
 	return true;
 }

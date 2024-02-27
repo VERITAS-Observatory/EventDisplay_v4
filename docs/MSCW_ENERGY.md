@@ -83,6 +83,7 @@ Additional options for table filling:
 
 Additional options for table reading:
 
+	 -use_evndisp_selected_images=0/1  use images selected by evndisp file reconstruction (default: 1)
 	 -noNoTrigger 		 don't fill events without array trigger into output tree [RECOMMENDED VALUE FOR MC]
 	 -writeReconstructedEventsOnly	 write only reconstructed events to output tree   [RECOMMENDED VALUE FOR MC]
 	 -shorttree 		 write only a short version of the output tree to disk (switch of -noshorttree)
