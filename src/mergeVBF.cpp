@@ -23,7 +23,6 @@
 #include <vector>
 
 using namespace std;
-
 using namespace VConfigMaskUtil;
 
 
@@ -91,22 +90,16 @@ int main( int argc, char** argv )
 			
 			try
 			{
-			
-				//VBankFileReader reader(fileNames.at(fileIndex).c_str(), false, false );
 				VBankFileReader reader( fileNames.at( fileIndex ).c_str() );
-				//reader.generateIndexAndChecksum();
 				int numPackets = reader.numPackets();
 				cout << "\t Packets: " << numPackets << endl;
-				
 				
 				for( int pack = 0; pack < numPackets; pack++ )
 				{
 					packet = reader.readPacket( pack );
 					if( packet )
 					{
-					
 						writePacket = true;
-						
 						if( packet->hasArrayEvent() )
 						{
 							arrayEvent = packet->getArrayEvent();
@@ -128,17 +121,15 @@ int main( int argc, char** argv )
 								}
 							}
 						}
-						
 						if( packet->hasSimulationData() )
 						{
 							sim = packet->getSimulationData();
 							if( sim )
 							{
 								sim->fRunNumber = newRunNumber;
-								sim->fEventNumber =  globalEventCount;
+								sim->fEventNumber = globalEventCount;
 							}
 						}
-						
 						if( packet->hasSimulationHeader() )
 						{
 							header = packet->getSimulationHeader();
@@ -146,55 +137,35 @@ int main( int argc, char** argv )
 							{
 								header->fRunNumber = newRunNumber;
 							}
-							
 							if( wroteSimHeader )
 							{
 								writePacket = false;
 							}
-							
 							wroteSimHeader = true;
-							
 						}
-						
 						if( writePacket )
 						{
 							writer.writePacket( packet );
 							globalEventCount++;
 						}
-						
 						delete packet;
 					}
-					
 				}
 			}
 			catch( const std::exception& ex )
 			{
 				cerr << "For file " << fileNames.at( fileIndex ) << endl;
 				cout << ex.what() << endl;
-				//  cerr <<ex<<endl;
 			}
 		}
 		writer.finish();
 	}
 	catch( const std::exception& ex )
 	{
-		//      cerr<<ex<<endl;
 		exit( EXIT_FAILURE );
 	}
-	/*  catch (const std::exception &ex)
-	  {
-	  //      cerr<<ex<<endl;
-	    exit(EXIT_FAILURE);
-	  }
-	catch (const std::exception& e)
-	  {
-	  //      cerr<<e.what()<<endl;
-	    exit(EXIT_FAILURE);
-	    } */
 	catch( ... )
 	{
-		//      cerr<<"Unknown exception caught! Program crashing and burning"<<endl;
 		exit( EXIT_FAILURE );
 	}
-	
 }
