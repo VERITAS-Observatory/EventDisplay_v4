@@ -31,7 +31,7 @@ COPY --from=build /opt/EventDisplay_v4 /opt/EventDisplay_v4
 
 LABEL maintainer.name="Eventdisplay Team"
 LABEL maintainer.email="gernot.maier@desy.de"
- 
+
 ENV EVNDISPSYS /opt/EventDisplay_v4
 ENV VBFSYS /opt/VBF
 ENV LD_LIBRARY_PATH "${VBFSYS}/lib/:${LD_LIBRARY_PATH}"
