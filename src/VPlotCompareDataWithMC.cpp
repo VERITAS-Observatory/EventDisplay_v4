@@ -1890,7 +1890,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
 	// canvas for all in one
 	if( iOneCanvas )
 	{
-		sprintf( cn, "image parameter comparision (telescope %d, file %s, %s)", telid, fDataFileName.c_str(), iPlot.c_str() );
+		sprintf( cn, "image parameter comparison (telescope %d, file %s, %s)", telid, fDataFileName.c_str(), iPlot.c_str() );
 		sprintf( ct, "cimage_%d_%s_%s", telid, iPlot.c_str(), fDataFileName.c_str() );
 		hc = new TCanvas( ct, cn, 10, 10, 1300, 800 );
 		hc->SetGridx( 0 );

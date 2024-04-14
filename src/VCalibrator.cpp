@@ -2873,7 +2873,7 @@ bool VCalibrator::readAverageTZeros( bool iLowGain )
 			t->GetEntry( i );
 
 			// choose median of distribution as typical average
-			// (distribution is assymetric)
+			// (distribution is asymmetric)
 			setAverageTZero( i, itzero_med, iLowGain );
 			setAverageTZerovars( i, itzero_var, iLowGain );
 			if( getAverageTZeroDist( iLowGain ) )
@@ -3656,7 +3656,7 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 							{
 								cout << "Telescope " << getTelID() + 1 << ": ";
 								cout << "VCalibrator::readLowGainCalibrationValues_fromCalibFile: warning,";
-								cout << "you claim to have low gain multpliers from sw " << jmin << " to " << jmax ;
+								cout << "you claim to have low gain multipliers from sw " << jmin << " to " << jmax ;
 								cout << ", but the last value read in corresponds to sw " << jsum - 1 << ". Please check your config file, line " << endl;
 								cout << is_line << endl;
 							}

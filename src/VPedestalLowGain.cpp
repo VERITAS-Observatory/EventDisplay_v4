@@ -202,7 +202,7 @@ bool VPedestalLowGain::combineLowGainPedestalFileForAllTelescopes( unsigned int 
 	return true;
 }
 
-// pedestal comparision
+// pedestal comparison
 
 bool VPedestalLowGain::readPedestalFiles( string iFile1, string iFile2 )
 {

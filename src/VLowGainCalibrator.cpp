@@ -593,7 +593,7 @@ void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance, bool i
      Return values include the following checks:
      - Do light levels exist?
        If not, return value == 0
-     - Are the peaks distinct/well seperated?
+     - Are the peaks distinct/well separated?
        If not, return value == 2
 
    If everything seems ok so far, return value should be 1.

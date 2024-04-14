@@ -867,7 +867,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 				i_s_z++;
 			}
 		}
-		// take median of distribution (distribution is assymmetric, not sure if this would be correct)
+		// take median of distribution (distribution is asymmetric, not sure if this would be correct)
 		if( i_s_z > 1 )
 		{
 			double i_a[] = { 0.16, 0.5, 0.84 };
@@ -886,7 +886,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 			s_error_U = 0.;
 		}
 
-		// Preliminary: catch cases were lower sensitivity cannnot be calculated
+		// Preliminary: catch cases were lower sensitivity cannot be calculated
 		if( s_error_L < 0. )
 		{
 			s_error_L = s;

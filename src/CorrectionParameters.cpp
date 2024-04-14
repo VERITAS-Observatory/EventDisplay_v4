@@ -45,7 +45,7 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
 	//      el_driveangle     - target elevation drive angle
 	//
 	// Return: true -  target can be pointed at
-	//         false - target cannot be pointed at due to mis-alignments
+	//         false - target cannot be pointed at due to misalignments
 
 #if 0
 	Debug::stream()
@@ -87,8 +87,8 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
 		Angle::rotateCartesians( -az_ns, ns, ud );
 
 		// ----------------------------------------------------------------------
-		// 3: Account for focal plane mis-alignment perp to the EL drive axis
-		// 4: EL drive axis mis-alignment in the UD-EW plane
+		// 3: Account for focal plane misalignment perp to the EL drive axis
+		// 4: EL drive axis misalignment in the UD-EW plane
 		// ----------------------------------------------------------------------
 
 		// I cannot think of a way of inverting 3/4 without doing it
@@ -290,8 +290,8 @@ undoAzElCorrections( double& az_driveangle, double& el_driveangle,
 		el = el * el_ratio;
 
 		// ----------------------------------------------------------------------
-		// 3: EL drive axis mis-alignment in the UD-EW plane
-		// 4: Focal plane mis-alignment perp to the EL drive axis
+		// 3: EL drive axis misalignment in the UD-EW plane
+		// 4: Focal plane misalignment perp to the EL drive axis
 		// ----------------------------------------------------------------------
 
 		// Pretend scope is at 0,0 -- find direction of the focal plane

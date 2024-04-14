@@ -88,7 +88,7 @@ void VPlotAnasumHistograms::help()
 	cout << endl;
 	cout << "plot_mscPlots(char *mscwfile=0, int irebin=2, double xmin=-2, double xmax=4)" << endl;
 	cout << "   plot mean scaled with and length histograms" << endl << endl;
-	cout << "plot_qualityHistograms(double iSt = 1., bool bUpper = true, int iMethod=0)" << endl;
+	cout << "plot_qualityHistograms(double ist = 1., bool bUpper = true, int iMethod=0)" << endl;
 	cout << "   plot quality histograms for mscw, mscl, and theta2" << endl << endl;
 	cout << "plot_theta2(double t2min=0, double t2max=0.3, irbin = 5)" << endl;
 	cout << "   plot theta2 histograms" << endl << endl;

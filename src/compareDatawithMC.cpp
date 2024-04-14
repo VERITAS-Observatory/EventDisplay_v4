@@ -260,7 +260,7 @@ int main( int argc, char* argv[] )
 		{
 			if( fInputData[i].fNTelescopes != iNT )
 			{
-				cout << "error: number of telescopes differ, comparision not possible" << endl;
+				cout << "error: number of telescopes differ, comparison not possible" << endl;
 				cout << "...exiting" << endl;
 				exit( EXIT_FAILURE );
 			}

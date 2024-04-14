@@ -188,7 +188,7 @@ void VDataMCComparision::initialGammaHadronCuts()
 	fCuts->setNTel( 4 );
 	fCuts->setInstrumentEpoch( fEpochATM );
 	// HARDWIRED CUT FILE
-	// used for BDT comparision
+	// used for BDT comparison
 	if( !fCuts->readCuts( "$VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles/ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-BDT.dat" ) )
 	{
 		cout << "exiting..." << endl;

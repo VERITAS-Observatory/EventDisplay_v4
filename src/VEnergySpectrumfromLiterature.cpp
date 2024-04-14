@@ -716,7 +716,7 @@ TCanvas* VEnergySpectrumfromLiterature::plot( string iSelection, TCanvas* c )
 
 	vector< unsigned int > v_id;
 
-	// read list (seperated by spaces)
+	// read list (separated by spaces)
 
 	string itemp;
 	istringstream is_stream( iSelection );
