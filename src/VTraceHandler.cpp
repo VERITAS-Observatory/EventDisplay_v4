@@ -448,7 +448,7 @@ void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpo
 	/////////////////////////////////////////////////////
 	// low gain channel
 	// (needs special treatment as end of the saturated high gain pulse is
-	//  occassionally at the beginning of the readout window)
+	//  occasionally at the beginning of the readout window)
 	else
 	{
 		if( fFirst >= 0 && fFirst < fLast && fLast <= fpTrazeSize )
@@ -734,7 +734,7 @@ double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart
 		ped = 0.;
 	}
 	////////////////////////////////////////
-	// sample time and value (ped subracted)
+	// sample time and value (ped subtracted)
 	float muxBINS[n], FADC[n];
 	for( unsigned int i = 0; i < n; i++ )
 	{

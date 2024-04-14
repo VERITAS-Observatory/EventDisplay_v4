@@ -4775,7 +4775,7 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
 	{
 		// simple peak sensing: sim_telarray uses the maximum bin only
 		// The values for sampleTimeSlice and nBinsADC are set in the cleaning parameter file
-		// For example, for the currect (Apr 17) ASTRI simulation, it is set in sim_telarray as
+		// For example, for the current (Apr 17) ASTRI simulation, it is set in sim_telarray as
 		// fadc_mhz = 500 % MHz ==> sampleTimeSlice = 2 ns
 		// fadc_sum_bins = nBinsADC = 25 % Number of ADC time intervals actually summed up.
 		convToHz /= ( nsToSec

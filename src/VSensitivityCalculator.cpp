@@ -896,7 +896,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 		double energy = TMath::Log10( fDifferentialFlux[i].EnergyWeightedMean );
 		// (int) of energy for maps
 		int energy_intX3 = ( int )( energy * 1.e3 );
-		// get sensitivity limititations
+		// get sensitivity limitations
 		fSignificanceLimited[energy_intX3]        = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
 				noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 1 );
 		fMinEventsLimited[energy_intX3]           = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
@@ -969,7 +969,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 			cout << "\t no background: " << fMinNoBackground[energy_intX3] << endl;
 			cout << "\t cut optimization: " << checkCutOptimization( fDifferentialFlux[i].Energy )  << endl;
 		}
-		// sensitivity limitiations
+		// sensitivity limitations
 		// (TMP differential sensitivity only)
 		if( dE_Log10 > 0. )
 		{

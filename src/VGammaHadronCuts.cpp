@@ -475,7 +475,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				fUseOrbitalPhaseCuts = true;
 			}
 
-			// to define the lower bounds in probablity cut ranges  (e.g. random forest)
+			// to define the lower bounds in probability cut ranges  (e.g. random forest)
 			else if( iCutVariable == "RFCutLowerVals" )
 			{
 				while( !( is_stream >> std::ws ).eof() )
@@ -485,7 +485,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				}
 			}
 
-			// to define the upper bounds in probablity cut ranges  (e.g. random forest)
+			// to define the upper bounds in probability cut ranges  (e.g. random forest)
 			else if( iCutVariable == "RFCutUpperVals" )
 			{
 				while( !( is_stream >> std::ws ).eof() )
@@ -495,7 +495,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 				}
 			}
 
-			// to define the upper bounds in probablity cut ranges  (e.g. random forest)
+			// to define the upper bounds in probability cut ranges  (e.g. random forest)
 			else if( iCutVariable == "RFProbID" )
 			{
 				is_stream >> temp;
@@ -1430,7 +1430,7 @@ bool VGammaHadronCuts::applyProbabilityCut( int i, bool fIsOn )
 		{
 			if( fProbabilityCutRangeLower.size() != fProbabilityCutRangeUpper.size() )
 			{
-				cout << "Error in definitions of RF probablity ranges" << endl
+				cout << "Error in definitions of RF probability ranges" << endl
 					 << "RFCutLowerVals and  RFCutLowerVals have different numbers of entries in cut file" << endl;
 				exit( -1 );
 			}
@@ -2370,7 +2370,7 @@ double VGammaHadronCuts::getProbabilityCutAlpha( bool fIsOn )
 {
 	if( fProbabilityCutRangeLower.size() != fProbabilityCutRangeUpper.size() )
 	{
-		cout << "Error in definitions of RF probablity ranges" << endl;
+		cout << "Error in definitions of RF probability ranges" << endl;
 		cout << "RFCutLowerVals and RFCutLowerVals have different numbers of entries in cut file" << endl;
 		exit( -1 );
 	}
@@ -2396,7 +2396,7 @@ double VGammaHadronCuts::getProbabilityCutAlpha( bool fIsOn )
 		}
 		else
 		{
-			cout << "Error in definitions of RF probablity ranges" << endl;
+			cout << "Error in definitions of RF probability ranges" << endl;
 			cout << "One pair of RFCutLowerVals and RFCutLowerVals values have oposite sign" << endl;
 		}
 	}

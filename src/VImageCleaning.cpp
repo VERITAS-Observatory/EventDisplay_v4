@@ -559,7 +559,7 @@ bool VImageCleaning::InitNNImgClnPerTelType( unsigned int teltype )
 		}
 		fWriteGraphToFileRecreate = false;
 
-		// probablity curves
+		// probability curves
 		writeProbabilityCurve( ( TGraph* )fIPRgraphs->At( teltype ), ( TF1* )fProb4nnCurves->At( teltype ), fMinRate );
 		writeProbabilityCurve( ( TGraph* )fIPRgraphs->At( teltype ), ( TF1* )fProb3nnrelCurves->At( teltype ), fMinRate );
 		writeProbabilityCurve( ( TGraph* )fIPRgraphs->At( teltype ), ( TF1* )fProb2plus1Curves->At( teltype ), fMinRate );
