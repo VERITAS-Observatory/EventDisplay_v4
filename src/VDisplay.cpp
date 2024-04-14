@@ -34,13 +34,13 @@ VDisplay::VDisplay( const TGWindow* p, unsigned int h, unsigned int w, VEventLoo
 	// set telescope number
 	fTelescope = fEventLoop->getTelID();          // telescope ID
 
-	// setting the camera display classes
+	// setting the camera display class
 	for( unsigned int i = 0; i < fEventLoop->getTeltoAna().size(); i++ )
 	{
 		fTelescopesToShow.push_back( fEventLoop->getTeltoAna()[i] );
 		fCamera[fEventLoop->getTeltoAna()[i]] = new VCamera( fEventLoop->getTeltoAna()[i], iEventLoop->getData() );
 	}
-	// drawing mode in the beging is each telescope in seperate canvas
+	// drawing mode in the beginning is each telescope in separate canvas
 	fBoolDrawOne = false;
 	fBoolDrawAllinOne = false;
 	fBool_M_OPT_COL_SCHE_Checked = true;
@@ -672,7 +672,7 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 		{
 			i_his->SetBins( int( fEventLoop->getNSamples() ), 0., double( fEventLoop->getNSamples() ) );
 		}
-		// trace is plotted with negativ values -> minus sign
+		// trace is plotted with negative values -> minus sign
 		double itemp = 0;
 		for( unsigned int i = 0; i < fEventLoop->getNSamples(); i++ )
 		{
@@ -1240,7 +1240,7 @@ void VDisplay::setCameraPads( bool iFieldView )
 		// for the calculation of the pads position
 		double idistmax = 0.;
 		double idistmin = 10000.;
-		// normalisation factor for convertion [m]->padsize
+		// normalisation factor for conversion [m]->padsize
 		double inorm = 1.;
 		// setoff to avoid overlapping pads (min x-dist between pads is 69m)
 		double iOffset = 0.;

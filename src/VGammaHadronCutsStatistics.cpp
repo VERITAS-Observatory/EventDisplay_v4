@@ -38,7 +38,7 @@ void VGammaHadronCutsStatistics::initialize()
 	fCutName.push_back( "IsGamma           " );
 	fCutName.push_back( "EnergyRec         " );
 	fCutName.push_back( "Pointing quality  " );
-	fCutName.push_back( "Unkown cut (problem?) " );
+	fCutName.push_back( "Unknown cut (problem?) " );
 
 	fData = new TTree( "GammaHadronCutsStats", "cut statistics for gamma/hadron cuts" );
 	fData->Branch( "cut", &fCut_bitset_ulong, "cut/l" );

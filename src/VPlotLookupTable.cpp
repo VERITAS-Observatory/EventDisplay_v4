@@ -325,7 +325,7 @@ bool VPlotLookupTable::checkTableName( string iTableName )
 		}
 	}
 
-	cout << "VPlotLookupTable::checkTableName unkown table name: " << iTableName << endl;
+	cout << "VPlotLookupTable::checkTableName unknown table name: " << iTableName << endl;
 	cout << "\t allowed are: ";
 	for( unsigned int i = 0; i < fListOfTableNames.size(); i++ )
 	{

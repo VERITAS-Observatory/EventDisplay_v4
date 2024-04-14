@@ -497,7 +497,7 @@ void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance, bool i
 			continue;
 		}
 
-		// fill paramter estimates for the gaussian fits
+		// fill parameter estimates for the gaussian fits
 		par[3 * npeaks + 3] = iy;
 		par[3 * npeaks + 4] = ix;
 		par[3 * npeaks + 5] = 3;

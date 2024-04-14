@@ -128,7 +128,7 @@ bool VLikelihoodFitter::setAnalysisBinning( int i_fNEnergyBins, vector <double> 
 		ss << "Rebinned Off Counts " << fRunList[i].runnumber;
 		fOffRebinnedHistograms.push_back( ( TH1D* ) i_hOffRaw[i]->Rebin( fNEnergyBins, ss.str().c_str(), &( fEnergyBins )[0] ) );
 
-		// Calcualating totals
+		// Calculating totals
 		fTotalOn.push_back( fOnRebinnedHistograms[i]->Integral( 1, fNEnergyBins ) );
 		fTotalOff.push_back( fOffRebinnedHistograms[i]->Integral( 1, fNEnergyBins ) );
 
@@ -441,7 +441,7 @@ vector <TH2F*> VLikelihoodFitter::getResponseMatrixRaw()
 				ihres_tmp->SetBinContent( ierec + 1, jemc + 1, intep );
 			}
 		}
-		// expect intergral over E_mc (Y) to be 1
+		// expect integral over E_mc (Y) to be 1
 		VHistogramUtilities::normalizeTH2D_y( ihres_tmp );
 		ihres_tmp->SetTitle( ss.str().c_str() );
 		iVtemp.push_back( ( TH2F* )ihres_tmp->Clone() );
@@ -645,7 +645,7 @@ void VLikelihoodFitter::setModel( int i_ID, double ifENorm )
 
 	}
 
-	// Super Exponentialy cut-off power law
+	// Super Exponentially cut-off power law
 	else if( i_ID == 5 )
 	{
 		ss.str( std::string() );
@@ -1111,8 +1111,8 @@ TF1* VLikelihoodFitter::getLikelihoodFit( bool bContours )
 
 
 /*
- *  initalizing the minimizer to be used
-*  iNormGuess - inital guess of the normalization.
+ *  initializing the minimizer to be used
+*  iNormGuess - initial guess of the normalization.
  *  iPrintStatue - level of printing output
  *  iFixShape - Fix the spectral shape (used for getting spectral points)
  */
@@ -1135,13 +1135,13 @@ bool VLikelihoodFitter::initializeMinimizer( double iNormGuess, int iPrintStatus
 
 	// Likelihood ratio test suggests
 	// 2(log(l) - log(lmax)) ~ chi^2
-	// therefore the erorrs are defined as 0.5
+	// therefore the errors are defined as 0.5
 	fMinimizer->SetErrorDef( 0.5 );
 
 	fMinimizer->SetPrintLevel( iPrintStatus );
 
 
-	// Checking the a global fit has been applied before tring to fix the shape
+	// Checking the a global fit has been applied before trying to fix the shape
 	if( !fGlobalBestFitParameters && iFixShape )
 	{
 		cout << "VLikelihoodFitter::initializeMinimizer Global fit must be applied before getting binwise fit "
@@ -1151,7 +1151,7 @@ bool VLikelihoodFitter::initializeMinimizer( double iNormGuess, int iPrintStatus
 	}
 
 
-	// Inital step size and variable estimate
+	// Initial step size and variable estimate
 	double* step = new double[fNParms];
 	double* variable = new double[fNParms];
 
@@ -1183,7 +1183,7 @@ bool VLikelihoodFitter::initializeMinimizer( double iNormGuess, int iPrintStatus
 	fMinimizer->SetFunction( *fFitfunction );
 
 
-	// Setting inital parameters for each model
+	// Setting initial parameters for each model
 
 	// 0 - Power Law
 	// 1 - Power Law with Exponential Cut off
@@ -2062,7 +2062,7 @@ void VLikelihoodFitter::setEBLOpacity( TGraph* i_EBLOpacity )
 }
 
 
-// Fit fuction that takes into account EBL attenuation
+// Fit function that takes into account EBL attenuation
 double VLikelihoodFitter::calculateIntrinsicSpectrum( Double_t* x, Double_t* parm )
 {
 	// Setting parameters
@@ -2078,7 +2078,7 @@ double VLikelihoodFitter::calculateIntrinsicSpectrum( Double_t* x, Double_t* par
 
 
 // Function to evaluate a broken power law
-// Will be accesed via fModel
+// Will be accessed via fModel
 double VLikelihoodFitter::brokenPowerLaw( Double_t* x, Double_t* parm )
 {
 	// Define parameters
@@ -2291,8 +2291,8 @@ float* VLikelihoodFitter::getSpectralPoint( double BinMin, double BinMax, double
 		setModel( fModelID, ifENorm );
 	}
 
-	// initalizing the minimizing
-	// Inital guess is set to the model evaluated at normalization energy
+	// initializing the minimizing
+	// Initial guess is set to the model evaluated at normalization energy
 	// Print status of 0 (quiet)
 	// Spectral shape parameters are frozen (true)
 	if( !initializeMinimizer( iBestFit->Eval( ifENorm ), 0,  true ) )
@@ -2729,7 +2729,7 @@ TCanvas* VLikelihoodFitter::getTotalCountsPlots()
 		i_OffRes [i] =	( i_OffTotal[i] - i_vOffMLETotal[i] ) / i_vOffMLETotal[i];
 
 
-		// Geting max counts for plots later
+		// Getting max counts for plots later
 		if( max_on < i_OnTotal[i] )
 		{
 			max_on = i_OnTotal[i];
@@ -3333,7 +3333,7 @@ double VLikelihoodFitter::getMeanAlpha()
   Using these data bins one calculates:
 
   Log(L) - This is the likelihood obtained when the normalization is allowed to vary
-  Log(L0) - This is the likelihood obtained with the model paramters set to the best fit
+  Log(L0) - This is the likelihood obtained with the model parameters set to the best fit
 
   Function returns -2 (Log(L) - Log(L0)) ~chi^2 distributed
   Confidence intervals should be verified from simulations.
@@ -3491,7 +3491,7 @@ double VLikelihoodFitter::getVariabilityIndex( double i_delT, TF1* i_bestFit, do
 	}
 
 	// Applying Fit to binned data
-	// Initializing Minimizer with inital guess and fit status
+	// Initializing Minimizer with initial guess and fit status
 	initializeMinimizer( i_bestFit->Eval( fENorm ),  iPrintStatus );
 
 	// Getting LogL
@@ -3549,14 +3549,14 @@ double VLikelihoodFitter::getVariabilityIndex( double i_delT, TF1* i_bestFit, do
 			continue;
 		}
 
-		// initalizing the minimizer
+		// initializing the minimizer
 		// Freezing all but the flux normalization
 		for( unsigned int j = 1; j < fNParms; j ++ )
 		{
 			fixParameter( j,  i_timeBinnedFit->GetParameter( j ) );
 		}
 
-		// Initializing Minimizer with inital guess and fit status
+		// Initializing Minimizer with initial guess and fit status
 		initializeMinimizer( i_timeBinnedFit->Eval( fENorm ),  iPrintStatus );
 
 		// Getting LogL
@@ -3649,7 +3649,7 @@ double VLikelihoodFitter::getVariabilityIndex( double i_delT, TF1* i_bestFit, do
 		delete i_flux;
 
 		// Getting LogL0
-		// initalizing the minimizer
+		// initializing the minimizer
 		// Freezing all parameters
 		for( unsigned int j = 0; j < fNParms; j ++ )
 		{
@@ -3866,7 +3866,7 @@ void VLikelihoodFitter::loadSpectraFromLiterature( string filename )
 	{
 		fLiteratureSpectra = new VEnergySpectrumfromLiterature( filename );
 	}
-	// "not" zombie as zombie suggests file couldn't be openned
+	// "not" zombie as zombie suggests file couldn't be opened
 	// Invalid files will print a sane error without thowing errors
 	// Will use bValidLiterature to check we have a valid
 	bValidLiterature = !fLiteratureSpectra->isZombie();

@@ -119,7 +119,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
 
 	fRunPar = irunpar;
 
-	// upper limit for zenith angle interal (18 == [0,18.])
+	// upper limit for zenith angle interval (18 == [0,18.])
 	/*   fZe.push_back( 20. );
 	   fZe.push_back( 30. );
 	   fZe.push_back( 40. ); */
@@ -664,7 +664,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
 			}
 		}
 
-		// fill azimuth angle dependend histograms (camera coordinates)
+		// fill azimuth angle dependent histograms (camera coordinates)
 		i_Phi = atan2( iData->Yoff, iData->Xoff ) * TMath::RadToDeg();
 		hPhiDist->Fill( i_Phi );
 
@@ -694,7 +694,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
 				hAccPhi[j]->Fill( idist );
 			}
 		}
-		// fill azimuth angle dependend histograms (derotated camera coordinates)
+		// fill azimuth angle dependent histograms (derotated camera coordinates)
 		i_Phi = atan2( iData->Yoff_derot, iData->Xoff_derot ) * TMath::RadToDeg();
 		hPhiDistDeRot->Fill( i_Phi );
 		for( unsigned int j = 0; j < fPhiMin.size(); j++ )

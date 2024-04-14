@@ -1,5 +1,5 @@
 /*! \class VVirtualDataReader
-    \brief wrapper classe for data reading
+    \brief wrapper class for data reading
 
 
 

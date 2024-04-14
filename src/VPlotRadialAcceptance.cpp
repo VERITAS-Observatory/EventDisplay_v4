@@ -261,7 +261,7 @@ void VPlotRadialAcceptance::setAxisRange( double x_min, double x_max, double y_m
 }
 
 
-TCanvas* VPlotRadialAcceptance::plotPhiDependentRadialAcceptances( TCanvas* cX, int iIterator, bool iDeRot )
+TCanvas* VPlotRadialAcceptance::plotPhiDependentRadialAcceptances( TCanvas* cX, int iterator, bool iDeRot )
 {
 	if( !fAcceptanceFile || fAcceptanceFile->IsZombie() )
 	{
@@ -309,7 +309,7 @@ TCanvas* VPlotRadialAcceptance::plotPhiDependentRadialAcceptances( TCanvas* cX, 
 
 	// plot all histograms and plot them
 	int i_color = 1;
-	for( unsigned int i = 0; i < iHisto.size(); i += iIterator )
+	for( unsigned int i = 0; i < iHisto.size(); i += iterator )
 	{
 		if( i < iHisto.size() && iHisto[i] )
 		{

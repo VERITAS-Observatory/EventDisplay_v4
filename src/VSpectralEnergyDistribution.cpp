@@ -870,7 +870,7 @@ TGraphErrors* VSpectralEnergyDistribution::readOpticalData( string iname, string
 
     expected file format:
 
-    <band>  <effective wavelenght in micron> <F_0 [Jy] (CIT)> <<F_0 [Jy] (UKIRT)>
+    <band>  <effective wavelength in micron> <F_0 [Jy] (CIT)> <<F_0 [Jy] (UKIRT)>
 
 */
 bool VSpectralEnergyDistribution::readPhotoMetricBands( string ifile, bool iPrint )
@@ -1329,7 +1329,7 @@ void VSpectralEnergyDistribution::printASCII()
 		}
 	}
 
-	// print everthing sorted by energy
+	// print everything sorted by energy
 	// (terrible coding...)
 	vector< string > itemp;
 	char hname[600];

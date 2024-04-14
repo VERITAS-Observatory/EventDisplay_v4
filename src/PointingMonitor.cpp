@@ -32,7 +32,7 @@ uint32_t PointingMonitor::dateToUInt32( const string& dateStr )
 }
 
 /********************************************************************************/
-/* Functions for converting between Modified Julian Date and calender date/time */
+/* Functions for converting between Modified Julian Date and calendar date/time */
 /********************************************************************************/
 
 uint32_t PointingMonitor::mjdToDate( double mjd )

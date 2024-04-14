@@ -71,7 +71,7 @@ vector< string > VTMVAEvaluator::getTrainingVariables( string iXMLFile, vector< 
 		cout << "reading list of variables from TMVA XML file: " << iXMLFile << endl;
 	}
 	// open TMVA XML file
-	// NOTE: extreme dependendence on the structure of the TMVA XML file
+	// NOTE: extreme dependence on the structure of the TMVA XML file
 	ifstream is;
 	is.open( iXMLFile.c_str(), ifstream::in );
 	if( !is )
@@ -96,7 +96,7 @@ vector< string > VTMVAEvaluator::getTrainingVariables( string iXMLFile, vector< 
 				cout << "\t reading TMVA XML file: number of variables is " << nVar << endl;
 			}
 		}
-		// AGAIN, NOTE: extreme dependendence on the structure of the TMVA XML file
+		// AGAIN, NOTE: extreme dependence on the structure of the TMVA XML file
 		if( is_line.find( "Expression=\"" ) != string::npos )
 		{
 			iVar.push_back( is_line.substr( is_line.find( "Expression=\"" ) + 12, is_line.find( "Label=" ) -
@@ -191,7 +191,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 	cout << "(nbinE: " << iNbinE << ", nbinZ: " << iNbinZ << ")" << endl;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	// read energy and zenith binning from root files and check that all neccessary objects are in the file
+	// read energy and zenith binning from root files and check that all necessary objects are in the file
 	unsigned int iMinMissingBin = 0;
 	for( unsigned int i = 0; i < iNbinE; i++ )
 	{
@@ -1551,7 +1551,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 	fTMVAData[iDataBin]->fTMVACutValue               = i_TMVACutValue_AtMaximum;
 	fTMVAData[iDataBin]->fSourceStrengthAtOptimum_CU = i_SourceStrength_atMaximum;
 
-	// plot optimziation procedure and event numbers
+	// plot optimization procedure and event numbers
 	if( bPlotEfficiencyPlotsPerBin )
 	{
 		plotEfficiencyPlotsPerBin( iDataBin, iGSignal_to_sqrtNoise, iGSignal_to_sqrtNoise_Smooth,

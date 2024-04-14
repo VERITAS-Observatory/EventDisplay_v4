@@ -173,7 +173,7 @@ bool VStarCatalogue::readVERITASsourcesfromDB( string iofile )
 
 
 /*!
-     attention: very dependend on format of text file
+     attention: very dependent on format of text file
 
      iV < 3:  Brightstarcatalogue
      iV == 3: tevcat
@@ -236,7 +236,7 @@ bool VStarCatalogue::readCatalogue()
 		{
 			continue;
 		}
-		// skip the commend lines
+		// skip the comment lines
 		if( iLine.substr( 0, 1 ) == "#" )
 		{
 			continue;
@@ -369,7 +369,7 @@ bool VStarCatalogue::readCatalogue()
 			i_Star->fBrightness_B = 9999;
 			i_Star->fMajorDiameter = 0.;
 			i_Star->fMajorDiameter_68 = 0.;
-			// objet name
+			// object name
 			if( fCatalogueVersion == 4 )
 			{
 				i_Star->fStarName = iLine.substr( 24, iLine.size() );
@@ -1409,7 +1409,7 @@ bool VStarCatalogue::writeCatalogueToRootFile( string iRootFile )
 	double fRunGalLat1958 = 0.;
 	double fBrightness_V = 0.;
 	double fBrightness_B = 0.;
-	double fMajorDiameter = 0.;                        // this is either the source diameter or the possitional error
+	double fMajorDiameter = 0.;                        // this is either the source diameter or the positional error
 	double fMinorDiameter = 0.;
 	double fPositionAngle = 0.;
 	double fMajorDiameter_68 = 0.;

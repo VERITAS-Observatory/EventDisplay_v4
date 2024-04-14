@@ -984,7 +984,7 @@ VFun_PSFDescription_LinearSuperposition2DGauss_LL::VFun_PSFDescription_LinearSup
 
 
 /*
-    radial symetrical source (Gaussian shape) (Chi2)
+    radial symmetrical source (Gaussian shape) (Chi2)
 
     fit parameters are:   source position, source extension, normalisation
 
@@ -1007,7 +1007,7 @@ VFun_SourceDescription_RadialSymmetricSource_Chi2::VFun_SourceDescription_Radial
 
 
 /*
-    radial asymetrical source (Gaussian shape) (Chi2)
+    radial asymmetrical source (Gaussian shape) (Chi2)
 
     fit parameters are:   source position, source extension, normalisation
 
@@ -1066,7 +1066,7 @@ VFun_SourceDescription_RadialAsymmetricSource_LL::VFun_SourceDescription_RadialA
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 /* \class VSourceGeometryFitterData
-   \brief containts fit defaults and results
+   \brief contains fit defaults and results
 
 */
 

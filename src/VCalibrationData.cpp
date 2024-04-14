@@ -201,7 +201,7 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
 	valarray< valarray< double > > itemp_pedvars;
 	itemp_pedvars.resize( nSamples + 1, itemp_ped );
 
-	// (time dependent pedestal vectors are initialzed in VCalibrator)
+	// (time dependent pedestal vectors are initialized in VCalibrator)
 
 	// high gain channels
 	fPeds.resize( i_channel, 20. );

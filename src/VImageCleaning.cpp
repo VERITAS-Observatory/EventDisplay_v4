@@ -506,7 +506,7 @@ bool VImageCleaning::InitNNImgClnPerTelType( unsigned int teltype )
 		// simple peak sensing: sim_telarray uses the maximum bin only
 		// (searched for in the window given by SimTime)
 		// The values for sampleTimeSlice and nBinsADC are set in the cleaning parameter file
-		// For example, for the currect (Apr 17) ASTRI simulation, it is set in sim_telarray as
+		// For example, for the current (Apr 17) ASTRI simulation, it is set in sim_telarray as
 		// fadc_mhz = 500 % MHz ==> sampleTimeSlice = 2 ns
 		// fadc_sum_bins = nBinsADC = 25 % Number of ADC time intervals actually summed up.
 		SimTime = sampleTimeSlice * nBinsADC;
@@ -637,7 +637,7 @@ void VImageCleaning::ResetCombFactors( unsigned int type )
 
 bool VImageCleaning::BoundarySearch( unsigned int teltype, float thresh, TF1* fProbCurve, float refdT, int refvalidity, int idx )
 {
-	//idx - should be next neigbour of core!!!
+	//idx - should be next neighbour of core!!!
 	//skip core pix
 	if( ( VALIDITYBUF[idx] > 1.9 && VALIDITYBUF[idx] < 6.1 ) )
 	{
@@ -1930,7 +1930,7 @@ int VImageCleaning::ImageCleaningCharge( unsigned int teltype )
 	/////////////////////////////////////////////////////////////////////////
 	// Discard small images and 4nn with no boundaries:
 	// Important protection from fully fake images which can worsen
-	// shower direction reconstuction
+	// shower direction reconstruction
 	// prob of any of fake group is <0.8%
 	// after this discarding prob of fake image <0.05% !!!
 
@@ -1999,7 +1999,7 @@ void VImageCleaning::cleanNNImageFixed( VImageCleaningRunParameter* iImageCleani
 	setExplicitSampleTimeSlice = iImageCleaningParameters->fNNOpt_ifExplicitSampleTimeSlice;
 	sampleTimeSlice = iImageCleaningParameters->fNNOpt_sampleTimeSlice;
 	nBinsADC = iImageCleaningParameters->fNNOpt_nBinsADC;
-	// init IPR graphs and rate countours
+	// init IPR graphs and rate contours
 	if( !kInitNNImgClnPerTelType[teltype] )
 	{
 		// active multiplicities;
@@ -2354,7 +2354,7 @@ void VImageCleaning::cleanImageWithClusters( VImageCleaningRunParameter* iImageC
 
 }
 
-//recursively add a pixel and its neigboring image pixels to a cluster.
+//recursively add a pixel and its neighboring image pixels to a cluster.
 void VImageCleaning::addToCluster( unsigned int cID, unsigned int iChan )
 {
 	fData->setClusterID( iChan, cID );

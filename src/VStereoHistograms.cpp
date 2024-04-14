@@ -140,7 +140,7 @@ void VStereoHistograms::defineHistograms()
 	sprintf( i_key, "hEChi2_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "Chi2 of energy reconstruction Histogram (%s)", fHisSuffix.c_str() );
 	herecChi2 = new TH1D( i_key, i_name, 500, 0., 500. );
-	herecChi2->SetXTitle( "Chi2 of enery reconstruction" );
+	herecChi2->SetXTitle( "Chi2 of energy reconstruction" );
 	herecChi2->SetYTitle( "No. of Events" );
 	hisList->Add( herecChi2 );
 	hListParameterHistograms->Add( herecChi2 );

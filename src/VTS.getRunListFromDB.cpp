@@ -1,7 +1,7 @@
 /*! VTS.getRunListFromDB read from VERITAS database
  *  and download data from VERITAS archive
  *
- *  Note the bizare usage of VExposure for these
+ *  Note the bizarre usage of VExposure for these
  *  purposes
  *
 */

@@ -673,7 +673,7 @@ bool VMultipleGrIsuReader::getNextEvent()
 			fLocalTrigger[i] = 0;
 		}
 		/////////////////////////////////////////////////////////////////
-		// get telescope poiting
+		// get telescope pointing
 		if( fReader[i] && fSelectedTelescope[i] )
 		{
 			fTelElevation[i] = fReader[i]->getTelElevation()[0];

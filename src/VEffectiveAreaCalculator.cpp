@@ -1714,7 +1714,7 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms(
 					fEsysMCRelative2D_map[i_ID] = 0;
 				}
 			}
-			// this is neeeded only if there are no azimuth dependent effective areas
+			// this is needed only if there are no azimuth dependent effective areas
 			iIndexAz++;
 
 			continue;
@@ -2643,7 +2643,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				eff_error[i] = 0.5 * ( seff_L[i] + seff_U[i] );
 				// Note!
 				// hVEsysMCRelative with a different binning (lower)
-				// than nbins; leads pairs of idential entries
+				// than nbins; leads pairs of identical entries
 				// in esys_rel
 				if( hVEsysMCRelative[s][i_az] )
 				{

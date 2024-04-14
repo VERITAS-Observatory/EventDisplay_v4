@@ -1128,7 +1128,7 @@ bool VGrIsuReader::setTelescopeID( unsigned int i_tel )
      the reader needs to following information from the camera files:
         - trigger information (which tubes exist)
     - analysis pixel (tubes can be switched on/off)
-    - convertion from real data tube numbering to MC numbering
+    - conversion from real data tube numbering to MC numbering
 
     \param iTel telescope number
 */
@@ -1181,7 +1181,7 @@ bool VGrIsuReader::readPixelMix( int iTel )
 	// set telescope number in detector geometry
 	fDetectorGeo->setTelID( iTel );
 
-	// reading vector for convertion of camera pixel numbers from real data numbering to MC numbering
+	// reading vector for conversion of camera pixel numbers from real data numbering to MC numbering
 	if( fTraceFileName.size() > 0 )
 	{
 		if( fDetectorGeo->getRealPixel().size() < fPixelConvertVecM[iTel].size() )
@@ -1543,7 +1543,7 @@ void VGrIsuReader::setRandomDead( int iNC, int iNB )
 			do
 			{
 				iPix = fRandomGen->Integer( ( int )fFullAnaVec[iTel].size() );
-				// check if this one is alread dead
+				// check if this one is already dead
 				if( fFullAnaVec[iTel][iPix] == 1 )
 				{
 					fFullAnaVec[iTel][iPix] = -1;

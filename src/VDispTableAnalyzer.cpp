@@ -275,7 +275,7 @@ void VDispTableAnalyzer::terminate()
 
      Attention analysis of large array data: use first 16 telescopes only
                                              (should be: use try combinations if first XX telescopes; then choose
-					                 the direction with smalles difference to existing mean)
+					                 the direction with smallest difference to existing mean)
 
      input:
 

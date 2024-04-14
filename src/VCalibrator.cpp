@@ -1714,7 +1714,7 @@ void VCalibrator::readCalibrationData()
 		// read pixel status
 		readPixelstatus();
 
-		// read summation window dependend values for second summation window
+		// read summation window dependent values for second summation window
 		readPeds( fPedFileNameC[getTeltoAna()[i]], false, getSumWindow_2() );
 
 		// use for simulations a fixed value for low-gain pedestal
@@ -1852,7 +1852,7 @@ bool VCalibrator::readPeds_from_rootfile( string iFile, bool iLowGain, unsigned 
 				tPed->SetBranchAddress( i_branchname, iTSpedvars[i] );
 			}
 		}
-		// initialize time dependant pedestal vectors
+		// initialize time dependent pedestal vectors
 		if( tPed->GetEntries() > 0 )
 		{
 			valarray< double > i_ts_temp_peds;
@@ -2100,7 +2100,7 @@ bool VCalibrator::readPeds_from_textfile( string iFile, bool iLowGain, unsigned 
 					{
 						is_stream >> rms;
 					}
-					// ther might be more than NSamples values in the file; stop when reached NSamples
+					// there might be more than NSamples values in the file; stop when reached NSamples
 					if( ( count == i_SumWindow || ( iLowGain && count == getNSamples() ) )  && ch < getPedvars( iLowGain, i_SumWindow, -99. ).size() )
 					{
 						getPedvars( iLowGain, i_SumWindow, -99. )[ch] = rms;

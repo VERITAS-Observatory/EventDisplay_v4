@@ -35,7 +35,7 @@ VCamera::VCamera( unsigned int iTel, VEvndispData* iData )
 
 	fData->initializeDataReader();
 
-	// get a nicer color palette and get some informations about colors/contours
+	// get a nicer color palette and get some information about colors/contours
 	gStyle->SetPalette( 1 );
 	gStyle->SetNumberContours( 100 );
 	fncolors = gStyle->GetNumberOfColors();
@@ -1049,7 +1049,7 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
 	}
 	// set up the color scheme
 	// this is some kind of a mess, but it works like that:
-	// - get maximum/minum values in v_value (or take it from input parameters zmin/zmax)
+	// - get maximum/minimum values in v_value (or take it from input parameters zmin/zmax)
 	// -
 	TBox* iBox = new TBox();
 	double wlmin, wlmax;
@@ -1351,7 +1351,7 @@ void VCamera::setPMTColorOff( const vector<bool>& v_value )
      double muonRadius;          //!< radius of muon ring
      double muonRSigma;          //!< std. dev. of radius of muon ring
      double muonSize;            //!< total amount of light in muon ring
-     int    muonValid;           //!< 0/1 depending on wether it satisfies criteria
+     int    muonValid;           //!< 0/1 depending on whether it satisfies criteria
 
 */
 void VCamera::drawMuonResults()

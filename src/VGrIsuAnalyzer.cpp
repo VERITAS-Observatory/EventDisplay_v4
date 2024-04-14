@@ -2,7 +2,7 @@
     \brief analysis routines from GrIsu package
 
     this code is copied from the GrIsu Package, see
-    http://www.physcis.utah.edu/gammaray/GrISU/GrISU/Documentation/grisu.html
+    http://www.physics.utah.edu/gammaray/GrISU/GrISU/Documentation/grisu.html
 
 */
 
@@ -350,7 +350,7 @@ xtel, ytel, ztel are the input positions of the telescopes.
 ytelnew, ytelnew, ztelnew are the rotated positions of the telescopes
 
 I am not using the ta structure since we may well call this routine in an
-interative manner where the input position is not always that given in the
+interactive manner where the input position is not always that given in the
 ta structure*/
 /*.....................................................................*/
 {

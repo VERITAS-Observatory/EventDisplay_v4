@@ -247,7 +247,7 @@ void VPlotCompareDataWithMC::getScaling( TH1D* h_sims, TH1D* h_diff, double& s_s
 		cout << h_sims->GetName() << " scale to 3 bins around maximum " << endl;
 	}
 
-	// make sure that results are positiv
+	// make sure that results are positive
 	if( s_sims < 0. )
 	{
 		s_sims *= -1.;

@@ -32,7 +32,7 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	}
 
 	// data readers
-	fReader = 0;                                  // this pointer is used in the program for accesing any data source (raw or MC)
+	fReader = 0;                                  // this pointer is used in the program for accessing any data source (raw or MC)
 #ifndef NOVBF
 	fRawDataReader = 0;
 #endif
@@ -235,7 +235,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 	fRunPar->fsourcefile = iFileName;
 	fEventNumber = 0;
 
-	// check if file exists (bizzare return value)
+	// check if file exists (bizarre return value)
 	if( gSystem->AccessPathName( iFileName.c_str() ) && fRunPar->fsourcetype != 5 )
 	{
 		cout << endl;
@@ -428,7 +428,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 		}
 	}
 	// ============================
-	// set the data readers for all inherent classes
+	// set the data readers for all inherent class
 	initializeDataReader();
 
 	// ============================
@@ -489,7 +489,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 										 fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumWindow,
 										 fRunPar->fDBDataStartTimeSecOfDay, fRunPar->fDBDataStoppTimeSecOfDay );
 	}
-	// print run informations
+	// print run information
 	printRunInfos();
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -607,7 +607,7 @@ void VEventLoop::initializeAnalyzers()
 		fDST->initialize();
 	}
 
-	// set analysis data storage classes
+	// set analysis data storage class
 	// (slight inconsistency, produce VImageAnalyzerData for all telescopes,
 	//  not only for the requested ones (in teltoana))
 	if( fAnaData.size() == 0 )
@@ -883,7 +883,7 @@ void VEventLoop::gotoEvent( int gEv )
 	// goto event number 0, which means, reset file and look for first event
 	if( gEv == 0 )
 	{
-		// reset file, intialize calibrator and analyzer
+		// reset file, initialize calibrator and analyzer
 		initEventLoop( fRunPar->fsourcefile );
 		return;
 	}
@@ -990,7 +990,7 @@ bool VEventLoop::loop( int iEvents )
   checking event cuts only in analysis mode
 
   \return
-    true if getting the next event was succesful
+    true if getting the next event was successful
 */
 bool VEventLoop::nextEvent()
 {
@@ -1037,7 +1037,7 @@ bool VEventLoop::nextEvent()
 			}
 		}
 		// grisu sims only (currently)
-		// set FADC hilo mulitplier as read from simulation run header in the vbf file
+		// set FADC hilo multiplier as read from simulation run header in the vbf file
 		// do this only for the first event
 		if( getRunParameter()->fsimu_HILO_from_simFile && fReader->getMonteCarloHeader() )
 		{
@@ -1094,7 +1094,7 @@ bool VEventLoop::nextEvent()
 		{
 			gSystem->ProcessEvents();
 		}
-		// analyze event ( do this always except if searching for a specifing event number in the file)
+		// analyze event ( do this always except if searching for a specifying event number in the file)
 		if( fAnalyzeMode )
 		{
 			i_Analysis_cut = analyzeEvent();
@@ -1523,7 +1523,7 @@ int VEventLoop::checkArrayCuts()
 	{
 		cout << "VEventLoop::checkArrayCuts()" << endl;
 	}
-	// donnot apply array cuts when analysing one telescopes only
+	// do not apply array cuts when analysing one telescopes only
 	if( getTeltoAna().size() < 2 )
 	{
 		return 1;
@@ -1571,7 +1571,7 @@ int VEventLoop::checkCuts()
 	}
 
 	// very ugly, but no better idea... (as well no better idea from ROOT people)
-	// define temporarly a root tree and use its selection mechanism
+	// define temporarily a root tree and use its selection mechanism
 	if( fStringCut[getTelID()].length() > 0 )
 	{
 		TTree i_tree( "i_tree", "" );

@@ -4,7 +4,7 @@ void VGPSDecoder::decode( uint32_t word0, uint32_t word1, uint32_t word2 )
 throw()
 {
 
-	// hopefully code below is endian independant!
+	// hopefully code below is endian independent!
 
 	uint16_t TimeArray[5];
 	TimeArray[0] = word0 & 0x0000FFFF;

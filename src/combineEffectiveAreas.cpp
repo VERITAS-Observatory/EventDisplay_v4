@@ -514,7 +514,7 @@ int main( int argc, char* argv[] )
 		cout << endl;
 		cout << "  <effective area file list>  list of effective files to be merged" << endl;
 		cout << "  <tree type>  effective area tree type (defines size of combined tree)" << endl;
-		cout << "                - DL3 (default): entries required for DL3 analyis (large)" << endl;
+		cout << "                - DL3 (default): entries required for DL3 analysis (large)" << endl;
 		cout << "                - all          : all entries of original trees (largest)" << endl;
 		cout << "                - anasum       : entries required for anasum analysis only (smallest)" << endl;
 		cout << "                - DL3reduced   : histograms are written as regular arrays for DL3 analysis" << endl;

@@ -703,7 +703,7 @@ read()
 					   colval->getType(),
 					   colnum,
 					   _rowcount + 1, // first row
-					   1, // first elelement
+					   1, // first element
 					   colval->getSize(), //num elements
 					   &nulval,
 					   colval->getVoidPointerToValue(),

@@ -1119,7 +1119,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			{
 				i_flux.DifferentialFlux = -1.e99;
 			}
-			// flux error is negativ for upper flux value
+			// flux error is negative for upper flux value
 			i_flux.DifferentialFluxError = -1.;
 		}
 		i_flux.fillEvent( fRunList_MJD_min, fRunList_MJD_max );
@@ -1183,7 +1183,7 @@ TCanvas* VEnergySpectrum::plot( TCanvas* c )
 		return 0;
 	}
 
-	// combine historgram of energy spectra from all the runs in the current run lists (herec)
+	// combine histogram of energy spectra from all the runs in the current run lists (herec)
 	if( !bCombineRuns )
 	{
 		combineRuns();
@@ -1440,7 +1440,7 @@ void VEnergySpectrum::plotFitValues()
 	tL1->SetTextSize( 0.030 );
 	tL1->DrawLatex( 0.18, 0.23, hname );
 	TLatex* tL2 = new TLatex();
-	// get exponent (assume negativ exponent)
+	// get exponent (assume negative exponent)
 	int i_expV = ( int )( TMath::Log10( fEnergy->GetParameter( 0 ) ) - 0.5 );
 	// get mantissa
 	double i_manV = fEnergy->GetParameter( 0 ) * TMath::Power( 10, -1.*( double )i_expV );
@@ -1945,7 +1945,7 @@ void VEnergySpectrum::printEnergyBins()
 
 /*
 
-    set error and signficance calculation method
+    set error and significance calculation method
 
     Rolke method is more suitable to bins with low number of events, Li & Ma is good for bins with >10 bins
 

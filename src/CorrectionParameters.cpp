@@ -167,7 +167,7 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
 		// 5: Scale for gear ratio
 		// ----------------------------------------------------------------------
 
-		// CW & CCW cases must be handled seperately in scaling
+		// CW & CCW cases must be handled separately in scaling
 		az1 = fmod( fmod( az, Angle::sc_twoPi ) + Angle::sc_twoPi, Angle::sc_twoPi );
 		az2 = az1 - Angle::sc_twoPi;
 

@@ -26,7 +26,7 @@ int parseOptions( int argc, char* argv[] );
 string listfilename = "";
 string cutfilename = "";
 string outfile = "acceptance.root";
-unsigned int ntel = 4;                   // this shouldn't be changed unless you really unterstand why
+unsigned int ntel = 4;                   // this shouldn't be changed unless you really understand why
 string datadir = "../eventdisplay/output";
 int entries = -1;
 string histdir = "" ;
@@ -165,7 +165,7 @@ int main( int argc, char* argv[] )
 		}
 		sprintf( htemp, "az_%d", i );
 		fDirName.push_back( htemp );
-		sprintf( htemp, "AZ dependend radial acceptance, %.2f < az < %.2f", iAz_min[i], iAz_max[i] );
+		sprintf( htemp, "AZ dependent radial acceptance, %.2f < az < %.2f", iAz_min[i], iAz_max[i] );
 		fDirTitle.push_back( htemp );
 		facc_az_dir.push_back( fo->mkdir( fDirName.back().c_str(), fDirTitle.back().c_str() ) );
 		if( facc_az_dir.back() )
@@ -173,7 +173,7 @@ int main( int argc, char* argv[] )
 			facc_az_dir.back()->cd();
 			facc_az.push_back( new VRadialAcceptance( fCuts, fRunPara ) );
 			facc_az.back()->setAzCut( iAz_min[i], iAz_max[i] );
-			cout << "initializing azimuth dependend radial acceptance class for ";
+			cout << "initializing azimuth dependent radial acceptance class for ";
 			cout << iAz_min[i] << " < az <= " <<   iAz_max[i] << endl;
 		}
 	}

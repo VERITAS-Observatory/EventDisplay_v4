@@ -116,7 +116,7 @@ bool VOrbitalPhase::initialize( int argc, char* argv[] )
 
 
 ////////////////////////////////////////////////////////////////////
-// printing the orbital paramters
+// printing the orbital parameters
 
 void VOrbitalPhase::printBinaryPars()
 {
@@ -127,7 +127,7 @@ void VOrbitalPhase::printBinaryPars()
 }
 
 ////////////////////////////////////////////////////////////////////
-// printing the orbital paramters
+// printing the orbital parameters
 
 void VOrbitalPhase::printHelp()
 {

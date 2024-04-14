@@ -45,7 +45,7 @@ bool VZDCF::readZDCF( string iFile )
 
 		fZDCFData.push_back( new VZDCFData() );
 
-		//! no errors are catched here..
+		//! no errors are caught here..
 		is_stream >> fZDCFData.back()->tau;
 		is_stream >> fZDCFData.back()->sigma_tau_neg;
 		is_stream >> fZDCFData.back()->sigma_tau_pos;

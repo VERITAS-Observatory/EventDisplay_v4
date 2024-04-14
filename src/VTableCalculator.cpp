@@ -713,7 +713,7 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 					}
 				}
 				// accept only values > 0
-				// (expeced width/length should be > 0)
+				// (expected width/length should be > 0)
 				// (log10 energy should be > 0, good reason why we work in GeV here)
 				if( med > 0. )
 				{
@@ -761,7 +761,7 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 						// use relative error as weighting (otherwise: significant bias towards lower energies
 						sigma2_tel.push_back( med / ( sigma * sigma ) );
 						sigma2_tel_noRadiusWeigth.push_back( 1. / ( sigma * sigma ) );
-						// add addional weight for events inside or outside the light pool
+						// add additional weight for events inside or outside the light pool
 						if( r[tel] < 140. )
 						{
 							sigma2_tel.back() = sigma2_tel.back() * 100.;

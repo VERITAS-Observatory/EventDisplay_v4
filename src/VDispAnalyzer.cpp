@@ -289,7 +289,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 			f_angdiff /= fmean_iangdiffN;
 		}
 	}
-	// multiplicity 1 (fix to artifically large value)
+	// multiplicity 1 (fix to artificially large value)
 	else
 	{
 		fmean_iangdiffN = 1.;
@@ -298,7 +298,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 	// check for close to parallel lines for image multiplicity 2
 	// (not so important for disp direction,
 	//  but note that core reconstruction
-	//  is still done the convential way)
+	//  is still done the conventional way)
 	if( f_angdiff < fAxesAngles_min && fmean_iangdiffN < 2.01 )
 	{
 		return;

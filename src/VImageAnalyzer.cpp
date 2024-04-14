@@ -31,7 +31,7 @@ VImageAnalyzer::VImageAnalyzer()
 	fVImageParameterCalculation->setDetectorGeometry( getDetectorGeometry() );
 	fVImageParameterCalculation->setDetectorGeometry( getDetectorGeometry() );
 
-	// initalize minuit for log likelihood method
+	// initialize minuit for log likelihood method
 	if( fRunPar->fImageLL )
 	{
 		fVImageParameterCalculation->initMinuit( fRunPar->fImageLL );

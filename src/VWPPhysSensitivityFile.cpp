@@ -365,7 +365,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
 }
 
 /*
-   fill historgram vs distance to camera centre (off-axis sensitivities)
+   fill histogram vs distance to camera centre (off-axis sensitivities)
 
 */
 bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vector< double > iWobble_max )
@@ -776,7 +776,7 @@ bool VWPPhysSensitivityFile::fillSensitivityHistograms( string iDataDirectory, b
 	{
 		i_Sens.fillSensitivityLimitsHistograms( fSensitivityLimits );
 	}
-	// re-use i_Sens to calculate the integrated sensitivity 0.2 -> -1
+	// reuse i_Sens to calculate the integrated sensitivity 0.2 -> -1
 	i_Sens.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "ENERGY", -1, 0.01, 1.e6 );
 	i_Sens.fillSensitivityHistograms( fIntSensitivity );
 
@@ -786,7 +786,7 @@ bool VWPPhysSensitivityFile::fillSensitivityHistograms( string iDataDirectory, b
 	{
 		i_SensCU.fillSensitivityLimitsHistograms( fSensitivityCULimits );
 	}
-	// re-use i_SensCU to calculate the integrated sensitivity 0.2 -> -1
+	// reuse i_SensCU to calculate the integrated sensitivity 0.2 -> -1
 	i_SensCU.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "CU", -1, 0.01, 1.e6 );
 	i_SensCU.fillSensitivityHistograms( fIntSensitivityCU );
 

@@ -148,7 +148,7 @@ void VNGain::initialize( string gainType, VNPixel* parentVNP )
 // (and not the copies) so we can actually print info
 // Otherwise, if we don't check fPixel and fTelescope,
 // we get segfaults when trying to use these pointers.
-// Really only matters in the constructer, I think.
+// Really only matters in the constructor, I think.
 bool VNGain::isRealObject()
 {
 	if( fPixel )
@@ -341,7 +341,7 @@ void VNGain::updateState( int mjd, double time, PixelStateInt state )
 		int newsize = stateHistory.size() ;
 		if( fPixel->fTelescope->getTelid() <= tellimit && fPixel->pixid_dbtables <= pixUlimit && fPixel->pixid_dbtables >= pixLlimit )
 		{
-			cout << coutprefix << "        updateState(): added new row, histry had " << oldsize << " elements, now has " << newsize << " elements..." << endl;
+			cout << coutprefix << "        updateState(): added new row, history had " << oldsize << " elements, now has " << newsize << " elements..." << endl;
 		}
 	}
 

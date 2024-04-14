@@ -510,7 +510,7 @@ bool VEnergySpectrumfromLiterature::prepare_integration( unsigned int iID, doubl
 /*
    energy on linear scale [TeV]
 
-   observe: somehow sensitive to upper limit for overal integrated flux)
+   observe: somehow sensitive to upper limit for overall integrated flux)
 
    integrated flux in [1/cm2/s]
 */

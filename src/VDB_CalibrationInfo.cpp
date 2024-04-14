@@ -330,7 +330,7 @@ string VDB_CalibrationInfo::WriteQuery_to_write_in_DB()
 //---------------------------------------------------------------------------
 //-- VDB_CalibrationInfo::test_file_format
 //-- test if the given file to be written to the DB has the right format
-//-- usefull if the given file is not constructed by the local function  DoFile_for_DBwriting
+//-- useful if the given file is not constructed by the local function  DoFile_for_DBwriting
 //-- when ready, should be made public
 //-- private
 //---------------------------------------------------------------------------

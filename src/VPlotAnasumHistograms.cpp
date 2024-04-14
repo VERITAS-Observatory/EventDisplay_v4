@@ -124,7 +124,7 @@ void VPlotAnasumHistograms::help()
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 /*
- *  calulate RA/Dec J2000 for a given x_derot, y_derot in camera coordinates
+ *  calculate RA/Dec J2000 for a given x_derot, y_derot in camera coordinates
  *
  *  x_deg on RA axis, y_deg in dec axis
  *
@@ -704,7 +704,7 @@ TCanvas* VPlotAnasumHistograms::plot_theta2( double t2min, double t2max, int irb
 				nt2_68 += htheta2_diff->GetBinContent( i );
 				if( nt2_68 / nt2 > 0.68 )
 				{
-					cout << "Theta2 containment radius (68%, binning dependend): " << htheta2_diff->GetXaxis()->GetBinLowEdge( i ) << " deg2" << endl;
+					cout << "Theta2 containment radius (68%, binning dependent): " << htheta2_diff->GetXaxis()->GetBinLowEdge( i ) << " deg2" << endl;
 					break;
 				}
 			}
@@ -822,7 +822,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	bool  bOldStyleExclusionRegions = false;
 	t->SetBranchAddress( "x", &x );
 	t->SetBranchAddress( "y", &y );
-	// backward compatability with circular exclusion region
+	// backward compatibility with circular exclusion region
 	if( t->GetBranchStatus( "r" ) )
 	{
 		t->SetBranchAddress( "r", &r1 );

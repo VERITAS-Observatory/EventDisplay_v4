@@ -292,7 +292,7 @@ bool VStereoMaps::fillOff( double x, double y, double ze, double erec, int irun,
 
 	///////////////////////////////////////
 	// TEMPLATE MODEL
-	// (work in progress, not completely implemeted yet)
+	// (work in progress, not completely implemented yet)
 	else if( fRunList.fBackgroundModel == eTEMPLATE )
 	{
 		// apply new shape cuts
@@ -754,7 +754,7 @@ bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool 
 		fInitRun = irun;
 		if( !initialize_ReflectedRegionModel() )
 		{
-			// intialization failed, return 0
+			// initialization failed, return 0
 			return false;
 		}
 
@@ -1200,7 +1200,7 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
 					}
 					n_r = ( int )x_off.size();
 
-					// check maximum number of sources, if too many, remove some (randomly choosen)
+					// check maximum number of sources, if too many, remove some (randomly chosen)
 					// (this might introduce a gradient across the sky maps)
 					if( fTMPL_RE_nMaxoffsource )
 					{
@@ -1601,7 +1601,7 @@ void VStereoMaps::calculateTheta2( bool isOn, double x, double y )
 		///////////////////////////////////////////////
 		// RINGMODEL and REFLECTED REGION MODEL
 		//
-		// theta2 plots are ony filled for illustrations, no significances can be calculated
+		// theta2 plots are only filled for illustrations, no significances can be calculated
 		// (background is only sampled once)
 		//
 		// background events come from theta2 region opposite to the potential source region

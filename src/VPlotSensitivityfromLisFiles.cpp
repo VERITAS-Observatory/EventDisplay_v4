@@ -335,7 +335,7 @@ bool VPlotSensitivityfromLisFiles::removeDataSet( unsigned int iID )
    apply cuts:
 
    variable v > 0.: remove all data sets with v == value
-   vairable v < 0.: remove all data sets with v != value
+   variable v < 0.: remove all data sets with v != value
 
 */
 bool VPlotSensitivityfromLisFiles::applycuts( double amp, double NTel, double NPix )

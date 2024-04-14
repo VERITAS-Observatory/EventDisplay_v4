@@ -7,7 +7,7 @@
 #include "VFluxCalculation.h"
 
 /*
-   empy constructor
+   empty constructor
 */
 
 VFluxCalculation::VFluxCalculation()
@@ -78,7 +78,7 @@ void VFluxCalculation::reset()
 	// long printout
 	fDebug = true;
 
-	// formula for significance calulation from Li & Ma
+	// formula for significance calculation from Li & Ma
 	fLiMaEqu = 17;
 
 	// calculate fluxes above this energy
@@ -92,7 +92,7 @@ void VFluxCalculation::reset()
 	// significance parameters: decide when to calculate fluxes and when upper limits
 	setSignificanceParameters( 3., 5., 0.99, 5, 17 );
 
-	// default flux calulation method is Poissonian (unbounded)
+	// default flux calculation method is Poissonian (unbounded)
 	setFluxCalculationMethod();
 
 	// graphs
@@ -1259,7 +1259,7 @@ void VFluxCalculation::setSpectralParameters( double iMinEnergy_TeV, double  E0,
 
 /*
 
-   setting signficance parameters
+   setting significance parameters
 
    (used for the decision of when to use fluxes and when upper flux limits)
 
@@ -1591,7 +1591,7 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
 
 		if( fRunNorm[i] > 0. )
 		{
-			// calculcate significance
+			// calculate significance
 			fRunSigni[i] = VStatistics::calcSignificance( fRunNon[i], fRunNoff[i], fRunNorm[i], fLiMaEqu );
 
 			if( i < fIntraRunNon.size() && i < fIntraRunNoff.size() )

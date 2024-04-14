@@ -135,7 +135,7 @@ TF1* VSpectralFitter::fit( TGraph* g, string fitname )
 
    define fit function
 
-   These are predifined and can be set with a function ID:
+   These are predefined and can be set with a function ID:
 
    fSpectralFitFunction == 0 :  power law
    fSpectralFitFunction == 1 :  power law with exponential cutoff

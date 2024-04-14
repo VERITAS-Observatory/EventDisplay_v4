@@ -72,6 +72,6 @@ int main( int argc, char* argv[] )
 	}
 	iF.Close();
 
-	cout << "file sucess " << iFile << endl;
+	cout << "file success " << iFile << endl;
 	exit( EXIT_SUCCESS );
 }

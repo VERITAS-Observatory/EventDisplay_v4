@@ -148,14 +148,14 @@ void VHoughTransform::analysis( VEvndispData* fData, VImageParameter* fParGeo )
 	double fAverageNonZeroBinContent = 0; //The average non-zero bin content of the accumulator array
 	double fAP = 0; //AP variable. (Max bin content of the accumulator array divided by the average non-zero bin content)
 
-	int fNPR = 0; //NPR varialbe. (Number of non-zero pixels hit by any of the three best parametrizations)
+	int fNPR = 0; //NPR variable. (Number of non-zero pixels hit by any of the three best parametrizations)
 
 	double fNPRCentroidX = 0; //x coordinate of the centroid of the pixels included in the NPR count.
 	double fNPRCentroidY = 0; //y coordinate of the centroid of the pixels included in the NPR count.
 
 	double fCD = 0;//CD variable. (The distance from the centre of the best parametrization to the centroid of the pixels included in the NPR count).
 
-	double fCN = 0; //The C/N varaible. (CD/NPR). Used for determining azimuthal completeness.
+	double fCN = 0; //The C/N variable. (CD/NPR). Used for determining azimuthal completeness.
 
 	double fContained = 0; // Distance from the center of the ring to the center of the camera plus the ring radius in mm
 
@@ -676,7 +676,7 @@ TTree* VHoughTransform::initLookupTable( int fRMinDpmt, int fRMaxDpmt, int fStep
 	TTree* iHTLookupTableTree = new TTree( fLookupTableName, fLookupTableName );
 
 
-	//Set up the branches in the tree. One brach for each pixel. Each brach will have circle parametrizations that hit that pixel.
+	//Set up the branches in the tree. One branch for each pixel. Each branch will have circle parametrizations that hit that pixel.
 	for( int iChannelIndex = 0 ; iChannelIndex < fNumberOfChannels[ iTelescopeIndex ] ; iChannelIndex++ )
 	{
 
@@ -692,7 +692,7 @@ TTree* VHoughTransform::initLookupTable( int fRMinDpmt, int fRMaxDpmt, int fStep
 	}// End of setting up the pixel branches in the HT lookup table tree
 
 
-	//Loop over the pixels for tempalte generation. (The center of the circle tempaltes is the center of the pixels)
+	//Loop over the pixels for template generation. (The center of the circle templates is the center of the pixels)
 	for( int iPixelCenterIndex = 0 ; iPixelCenterIndex < fNumberOfChannels[ iTelescopeIndex ] ; iPixelCenterIndex++ )
 	{
 
@@ -715,7 +715,7 @@ TTree* VHoughTransform::initLookupTable( int fRMinDpmt, int fRMaxDpmt, int fStep
 			fTemplateCircleCoordinates[0] = fDetectorGeometry->getX_MM( iTelescopeIndex )[iPixelCenterIndex]; 	//Get the x coordinate of the channel
 			fTemplateCircleCoordinates[1] = fDetectorGeometry->getY_MM( iTelescopeIndex )[iPixelCenterIndex]; 	//Get the y coordinate of the channel
 
-			//Set the radius coordiante of the template circle. Divide by fStepsPerPMTDiameter to calculate radius.
+			//Set the radius coordinate of the template circle. Divide by fStepsPerPMTDiameter to calculate radius.
 			fTemplateCircleCoordinates[2] = ( ( ( double ) iRadiusIndex ) * fPMTDiameter[ iTelescopeIndex ] ) / ( ( double ) fStepsPerPMTDiameter );
 
 			//End of setting the coordinates of the template circle.
@@ -762,7 +762,7 @@ TTree* VHoughTransform::initLookupTable( int fRMinDpmt, int fRMaxDpmt, int fStep
 			//Make the new template a duplicate by default
 			bool iIsDuplicate = 1;
 
-			//If there is a differnet pixel in the new template, then it is not a duplicate template.
+			//If there is a different pixel in the new template, then it is not a duplicate template.
 			for( int iChannelIndex = 0 ; iChannelIndex < fNumberOfChannels[ iTelescopeIndex ] ; iChannelIndex++ )
 			{
 
@@ -1124,7 +1124,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	if( fStepsPerPMTDiameterIsSet == 0 )
 	{
 
-		//Set the number of steps in radius per PMT diameter to defaut value of 3
+		//Set the number of steps in radius per PMT diameter to default value of 3
 		fStepsPerPMTDiameter.push_back( 3 );
 
 		//cout << "Failed to read the STEPSPERPMTDIAMETERT" << fTelID + 1 <<  " value from the parameter file." << endl;

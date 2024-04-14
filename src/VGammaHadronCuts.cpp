@@ -2397,7 +2397,7 @@ double VGammaHadronCuts::getProbabilityCutAlpha( bool fIsOn )
 		else
 		{
 			cout << "Error in definitions of RF probability ranges" << endl;
-			cout << "One pair of RFCutLowerVals and RFCutLowerVals values have oposite sign" << endl;
+			cout << "One pair of RFCutLowerVals and RFCutLowerVals values have opposite sign" << endl;
 		}
 	}
 

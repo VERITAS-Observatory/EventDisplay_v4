@@ -51,7 +51,7 @@ void VPointing::setTelPointing( int MJD, double time, bool iUseDB, bool iFillPoi
 	{
 		updatePointingfromDB( fMJD, fTime );
 	}
-	// calulation from source should always be successful
+	// calculation from source should always be successful
 	else
 	{
 		fEventStatus = 1;
@@ -286,7 +286,7 @@ void VPointing::fillPointingTree()
 
 /*
 
-   set an artifical pointing error (e.g. from command line)
+   set an artificial pointing error (e.g. from command line)
 
 */
 void VPointing::setPointingError( double iX, double iY )

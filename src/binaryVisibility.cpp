@@ -152,7 +152,7 @@ int main( int argc, char* argv[] )
 	cout << endl;
 	// start date in MJD
 	double fMJDStart = atof( argv[1] );
-	// stopp date in MJD
+	// stop date in MJD
 	double fMJDStopp = atof( argv[2] );
 	if( fMJDStart >= fMJDStopp )
 	{

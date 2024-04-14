@@ -269,7 +269,7 @@ int main( int argc, char* argv[] )
 			fMC_histo->matchDataVectors( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex );
 			fMC_histo->print();
 		}
-		// recalulate MC spectra from MCpars tree. Very slow!
+		// recalculate MC spectra from MCpars tree. Very slow!
 		else if( fRunPara->fMCdatafile_tree.size() > 0 && fRunPara->fMCdatafile_tree != "0" )
 		{
 			TChain* c2 = new TChain( "MCpars" );

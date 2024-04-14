@@ -1766,7 +1766,7 @@ bool VArrayAnalyzer::fillSimulationEvent()
 
 /*
 
-   pass telescope pointing to star catalogue for calcuation of
+   pass telescope pointing to star catalogue for calculation of
    distance to bright stars
 
 */

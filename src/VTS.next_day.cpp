@@ -206,7 +206,7 @@ int main( int argc, char* argv[] )
 		/////////////////////////////////////////
 		// convert to fits
 
-		cout << "---------Start production of FITS ouput file ------" << endl;
+		cout << "---------Start production of FITS output file ------" << endl;
 		VFITS f( fDataFile, fOUTFile + ".fits", fTargetName, fMergeFITSFiles, fDebug );
 		f.writeCumSignificance( fDebug );
 		f.writeSignificanceDistribution( fDebug );

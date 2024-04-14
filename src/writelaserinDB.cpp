@@ -792,7 +792,7 @@ bool read_one_laserRUN_fromVOFFLINE_DB( unsigned int arg_run, vector < unsigned 
 
 	// DONE modified this function considering it should be for only one run!!!! first layer of vector to be removed, and make sure we have only one line
 	// OK   actually. how do I get only one line? even for one run? (multiple version, each pixel???) => Grouped by run_id, and ordered by date
-	// if more than one entry for a given telescope and given run, at smoe point, probably chose to keep only the most recent one. Have to find where this is done!!!!
+	// if more than one entry for a given telescope and given run, at some point, probably chose to keep only the most recent one. Have to find where this is done!!!!
 	// probably after, when reading those vectors, only taking the first entrance for a given run_number/tel_number
 
 	string iTempS;
@@ -952,7 +952,7 @@ string WriteQuery_to_get_one_LaserRun_fromVERITAS_DB( unsigned int arg_run )
 
 
 
-	//begining of the querry
+	//beginning of the query
 	string query1 = "SELECT big_table.run_id, big_table.config_mask, big_table.excluded_telescopes, big_table.data_start_time , big_table.db_start_time FROM (SELECT Info.run_id, Info.run_type, Info.config_mask,Info.data_start_time,Info.db_start_time , grp_cmt.excluded_telescopes, grp_cmt.group_type, grp_cmt.group_id FROM tblRun_Info AS Info, tblRun_Group AS grp, tblRun_GroupComment AS grp_cmt WHERE ";
 	// query a specific run number
 	char c_query[flong_char_query];// has to be long if we ask for a long run list in VDBSourceInfo
@@ -1001,7 +1001,7 @@ string WriteQuery_to_get_one_LaserRun_fromVOFFLINE_DB( unsigned int arg_run, uns
 		query += version_query;
 		std::cout << "VOFFLINE Data Base: reading tblEventDisplay_Analysis_Calibration_Flasher for version = " << fVOFFLINE_version_query << std::endl;
 	}
-	//end of the querry
+	//end of the query
 	query += " ORDER BY update_time) as big_table GROUP BY big_table.run_id;";
 
 	return query;
@@ -1104,7 +1104,7 @@ bool read_calib_file( TString file_root_name, vector < double >& Vchannel, vecto
 	}
 	else
 	{
-		printf( "ERROR: File %s cannot be openned \n", file_root_name.Data() );
+		printf( "ERROR: File %s cannot be opened \n", file_root_name.Data() );
 	}
 	root_file->Close();
 
@@ -1180,7 +1180,7 @@ TH1F* get_h_from_TTree( TFile* file_root, TString string_arbre, TString want, TS
 
 	// initial want, for example gain
 	want += ">>hsqrt";
-	want += histo_bin; // for exemple (500,0,10)
+	want += histo_bin; // for example (500,0,10)
 
 	//    std::cout<<"want "<<want<<std::endl;
 	//   std::cout<<"condition "<<condition<<std::endl;

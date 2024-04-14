@@ -2514,7 +2514,7 @@ void VExposure::outputAnasumRunlist( string fAnasumFile )
 	{
 		cout << endl;
 		cout << "Warning: You are using either old or new data runs for which no transition dates have been set in VExposure::outputAnasumRunlist()" << endl;
-		cout << "         Please check radiosonde measurements to find the transition date (they should optiminally be choosen during a full moon period) ..." << endl;
+		cout << "         Please check radiosonde measurements to find the transition date (they should optiminally be chosen during a full moon period) ..." << endl;
 	}
 
 	cout << endl;

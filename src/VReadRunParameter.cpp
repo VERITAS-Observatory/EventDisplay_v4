@@ -689,7 +689,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fTimeCutsMin_min = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-		// stopp analyzing at this minute
+		// stop analyzing at this minute
 		else if( iTemp.find( "timecutmax" ) < iTemp.size() )
 		{
 			fRunPara->fTimeCutsMin_max = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );

@@ -468,7 +468,7 @@ float VDB_PixelDataReader::getValue( unsigned int iDataType, unsigned int iTel, 
  *
  * case 1: iDataType is an invalid data type:  zero size vector is returned
  * case 2: iTel is an invalid telescope number:  zero size vector is returned
- * case 3: iMJD is insided any known time interval: vector of size npixel filled with zeros is returned
+ * case 3: iMJD is inside any known time interval: vector of size npixel filled with zeros is returned
  */
 vector< float > VDB_PixelDataReader::getDataVector( unsigned int iDataType, unsigned int iTel, int iMJD, float iTime )
 {

@@ -263,7 +263,7 @@ vector< bool >& VBFDataReader::getLocalTrigger()
 	}
 
 	/* -------
-	    additonal test to check local trigger vector with eventtype
+	    additional test to check local trigger vector with eventtype
 	    but: has to be used differently for pedestal runs, etc...
 	         needs some more work
 	// test if vector is nonzero

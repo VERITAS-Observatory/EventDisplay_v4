@@ -430,7 +430,7 @@ void VDisplayBirdsEye::drawImageLines_and_Corepositions()
 		fMarkerMCCore->Draw();
 	}
 	// draw reconstructed shower cores with different colors (method 0 = color 2, method 1 = color 3, method 2 = color 4, ...)
-	// draw the cores only for succesfull reconstruction (Chi2>=0.)
+	// draw the cores only for successful reconstruction (Chi2>=0.)
 	fMarkerCore.clear();
 	fMarkerCore.push_back( new TMarker( convertX( fData->getShowerParameters()->fShowerXcore_SC[iM] ), convertY( fData->getShowerParameters()->fShowerYcore_SC[iM] ), 3 ) );
 	fMarkerCore.back()->SetMarkerColor( 1 );

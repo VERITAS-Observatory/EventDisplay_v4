@@ -448,7 +448,7 @@ bool VFITS::writeExcessSkyMap( bool iPrint )
 }
 
 
-//*******************NECESSARY METHODES************************
+//*******************NECESSARY METHODS************************
 
 double VFITS::getFluxIntegral( TGraphErrors* gEspec, double minE, bool iPrint )
 {
@@ -558,7 +558,7 @@ int VFITS::writeVecTH1DFits( vector<pair<TH1D*, string> > vhist, string DiagName
 			string type2( tType[h] );
 			if( type1 == type2 )
 			{
-				cout << "Some colums have the same name! Give them different names, please!" << endl;
+				cout << "Some columns have the same name! Give them different names, please!" << endl;
 				return -1;
 			}
 		}
@@ -605,7 +605,7 @@ int VFITS::writeTH1DFits( TH1D* h, string DiagName, string x_name, string y_name
 	char* tForm[3] = {( char* )"1D", ( char* )"1D", ( char* )"1D"};
 	if( iPrint )
 	{
-		cout << "   Set names, units and dataformats for different colums " << endl;
+		cout << "   Set names, units and dataformats for different columns " << endl;
 	}
 
 	HduNum = createTableFitsFile( table, tType, tUnit, tForm, DiagName, iPrint );
@@ -651,7 +651,7 @@ int VFITS::writeTGraphFits( TGraph* g, string DiagName, string x_name, string y_
 	char* tForm[3] = {( char* )"1D", ( char* )"1D", ( char* )"1D"};
 	if( iPrint )
 	{
-		cout << "   Set names, units and dataformats for different colums " << endl;
+		cout << "   Set names, units and dataformats for different columns " << endl;
 	}
 
 	createTableFitsFile( table, tType, tUnit, tForm, DiagName, iPrint );
@@ -698,7 +698,7 @@ int VFITS::writeTGraphErrorsFits( TGraphErrors* g, string DiagName, string x_nam
 	char* tForm[4] = {( char* )"1D", ( char* )"1D", ( char* )"1D", ( char* )"1D"};
 	if( iPrint )
 	{
-		cout << "   Set names, units and dataformats for different colums " << endl;
+		cout << "   Set names, units and dataformats for different columns " << endl;
 	}
 
 	createTableFitsFile( table, tType, tUnit, tForm, DiagName, iPrint );
@@ -743,7 +743,7 @@ int VFITS::writeTGraphAsymmErrorsFits( TGraphAsymmErrors* g, string DiagName, st
 	char* tForm[4] = {( char* )"1D", ( char* )"1D", ( char* )"1D", ( char* )"1D"};
 	if( iPrint )
 	{
-		cout << "   Set names, units and dataformats for different colums " << endl;
+		cout << "   Set names, units and dataformats for different columns " << endl;
 	}
 
 	createTableFitsFile( table, tType, tUnit, tForm, DiagName, iPrint );
@@ -1156,7 +1156,7 @@ bool VFITS::writeFITSFile( bool iPrint )
 	return true;
 }
 
-//*****************METHODES UNDER DEVELOPEMENT*****************
+//*****************METHODS UNDER DEVELOPMENT*****************
 
 /***************************************/
 /* Merge columns of FITS BinTables     */

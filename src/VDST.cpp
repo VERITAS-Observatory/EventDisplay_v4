@@ -1,7 +1,7 @@
 /*! \class VDST
     \brief writes data summary files with sums and times for each pixel
 
-    output is after pedestal substraction, gain and toffset correction
+    output is after pedestal subtraction, gain and toffset correction
 
 
 
@@ -18,7 +18,7 @@ VDST::VDST( bool iMode, bool iMC )
 	// laser run as source file? (Hardcoded, should be in VEvndispRunParameter)
 	fBLaser = false;
 
-	// initalize flag (true after first event)
+	// initialize flag (true after first event)
 	fDSTini = false;
 	fDSTfile = 0;
 	// no dst output, don't do anything
@@ -502,7 +502,7 @@ bool VDST::writeCalibrationData()
 		nPixel = ( unsigned int )getNChannels();
 		if( VDST_MAXCHANNELS < nPixel )
 		{
-			cout << "DST_fillCalibrationTree error: number of pixels (" << nPixel << ") exeeds allowed range (" << VDST_MAXCHANNELS << ")" << endl;
+			cout << "DST_fillCalibrationTree error: number of pixels (" << nPixel << ") exceeds allowed range (" << VDST_MAXCHANNELS << ")" << endl;
 			cout << "\t adjust arrays..." << endl;
 			return false;
 		}

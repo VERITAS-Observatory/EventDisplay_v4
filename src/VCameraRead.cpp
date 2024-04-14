@@ -162,7 +162,7 @@ bool VCameraRead::readCameraFile( string iCameraFile, unsigned int i_Nchannel )
        - fine tuned to layout of .cam files
        - exit(-1) if camera geometry file not found
 
-     \return true if reading succesful
+     \return true if reading successful
 */
 bool VCameraRead::readCameraFile( string iCameraFile )
 {
@@ -237,7 +237,7 @@ bool VCameraRead::readCameraFile( string iCameraFile )
 					is_stream >> fAnaTube[fTelID][i_ch];
 				}
 			}
-			// get convertion from MC tube numbering to real data tube numbering
+			// get conversion from MC tube numbering to real data tube numbering
 			if( !( is_stream >> std::ws ).eof() )
 			{
 				is_stream >> i_char;
@@ -355,7 +355,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 			i_stream >> fCFGtype;
 			cout << "\t (file type " << fCFGtype << ")" << endl;
 		}
-		// nubmer of telescopes
+		// number of telescopes
 		if( iline.find( "NBRTL" ) < iline.size() )
 		{
 			i_stream >> i_char;
@@ -1101,7 +1101,7 @@ void VCameraRead::rotateCamera()
 				}
 				else
 				{
-					cout << "VCameraRead::rotateCamera() error: invalid vector sizes (expeced " << i << "," << j << "): ";
+					cout << "VCameraRead::rotateCamera() error: invalid vector sizes (expected " << i << "," << j << "): ";
 					cout << fXTube[i].size() << "\t" << fYTube[i].size() << "\t" << fRotXTube[i].size() << "\t" << fRotYTube[i].size() << endl;
 					cout << "exiting..." << endl;
 					exit( -1 );
@@ -1110,7 +1110,7 @@ void VCameraRead::rotateCamera()
 		}
 		else
 		{
-			cout << "VCameraRead::rotateCamera() error: invalid vector sizes (expeced " << i << "): ";
+			cout << "VCameraRead::rotateCamera() error: invalid vector sizes (expected " << i << "): ";
 			cout << fXTube.size() << "\t" << fYTube.size() << "\t" << fRotXTube.size() << "\t" << fRotYTube.size() << endl;
 			cout << "exiting..." << endl;
 			exit( -1 );
@@ -1236,7 +1236,7 @@ void VCameraRead::resetNeighbourLists( bool bMaxN )
 
 /*
 
-     use positions and tupe radius to prepare a NN neighbour list
+     use positions and tube radius to prepare a NN neighbour list
 
 */
 bool VCameraRead::makeNeighbourList()

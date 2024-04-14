@@ -26,7 +26,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////
 // parameters to be read in from runparameter file
-// (here defaults are defined; are overwritting after reading run parameter file)
+// (here defaults are defined; are overwriting after reading run parameter file)
 ////////////////////////////////////////////////////////////////////////////
 // number of telescopes
 unsigned int fNTel = 4;

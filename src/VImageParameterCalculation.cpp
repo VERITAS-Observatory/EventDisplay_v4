@@ -486,10 +486,10 @@ void VImageParameterCalculation::muonRingFinder()
 /*****************************************************************************
 sizeInMuonRing
 
-input: pointer to  origion of masking ring, radius and sigmaR
+input: pointer to  origin of masking ring, radius and sigmaR
 output: sum of all pixel values in the ring +-2 sigmaR
 notes: this needs to correct for the fraction of tubes off in the ring region
-	   this is rather tricky because the intensity depends on the ring diamter and the blurring!
+	   this is rather tricky because the intensity depends on the ring diameter and the blurring!
 *****************************************************************************/
 void VImageParameterCalculation::sizeInMuonRing()
 {
@@ -707,7 +707,7 @@ float VImageParameterCalculation::correctSizeInMuonRing()
 	float kRatio;
 	kRatio = dc / fParGeo->muonRadius;
 
-	float exi; //Imapct parameter correction factor
+	float exi; //Impact parameter correction factor
 	exi = 0.0;
 
 	float kTest = 0.0;
@@ -734,7 +734,7 @@ float VImageParameterCalculation::correctSizeInMuonRing()
 
 	}//End of elliptical integral for loop
 
-	//Numerically solve the integral equation to calculate IP corrrection factor
+	//Numerically solve the integral equation to calculate IP correction factor
 	for( int i = 0; i < numSteps; i++ )
 	{
 
@@ -765,7 +765,7 @@ void VImageParameterCalculation::houghInitialization()
 
 
 //Hough transform muon identification algorithm.
-//Sets fParGeo->houghMuonValid to 1 if the Hough tansform based muon ID technique find a muon, sets fParGeo->houghMuonValid to 0 otherwise.
+//Sets fParGeo->houghMuonValid to 1 if the Hough transform based muon ID technique find a muon, sets fParGeo->houghMuonValid to 0 otherwise.
 void VImageParameterCalculation::houghMuonPixelDistribution()
 {
 
@@ -1197,7 +1197,7 @@ void VImageParameterCalculation::calcParameters()
 		}
 		else if( dist > 0 )                       // length = width so might as well have semi-major axis
 		{
-			// be consistant with miss = dist, ie alpha = 90
+			// be consistent with miss = dist, ie alpha = 90
 			cosphi = -ymean / dist;
 			// There seems to be a strange FP problem with the code below..
 			//      sinphi= xmean / dist;
@@ -2055,7 +2055,7 @@ Assume Poissonian (ignoring NSB) for measuring amplitude:
 P(n_{i}; S ) = \frac{S^{n}}{n!}\exp^{-S}
 \f]
 
-This gives the extented log likelihood estimator:
+This gives the extended log likelihood estimator:
 
 \f[
 LL = - \sum (n_{i}\ln S_{i} - S_{i} - n_{i}\ln n_{i} + n_{i})

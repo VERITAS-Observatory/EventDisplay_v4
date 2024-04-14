@@ -2925,7 +2925,7 @@ int VAtmosphereSoundings::push_average_atmosphere( string name = "", vector<int>
  * check if data points are inside a certain
  * years / months / days / hours / mjds range
  *
- * note: e.g. years and months are treated separatedly
+ * note: e.g. years and months are treated separately
  */
 bool VAtmosphereSoundings::isDateInRange( VAtmosphereSoundingData* Data, vector<int>* years, vector<int>* months, vector<int>* days, vector<int>* hours, vector<double>* mjds, unsigned int nMinPoints = 20 )
 {

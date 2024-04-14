@@ -419,7 +419,7 @@ int VInstrumentResponseFunctionData::testResponseFunctionType( string iType )
 	}
 
 	cout << "VInstrumentResponseFunctionData::testResponseFunctionType() error: type not found: " << iType << endl;
-	cout << "\t available reponse function types are: " << endl;
+	cout << "\t available response function types are: " << endl;
 	for( unsigned int i = 0; i < fListofResponseFunctionTypes.size(); i++ )
 	{
 		cout << "\t" << fListofResponseFunctionTypes[i] << endl;
@@ -429,7 +429,7 @@ int VInstrumentResponseFunctionData::testResponseFunctionType( string iType )
 }
 
 /*
-    expect that all quality checks happended before
+    expect that all quality checks happened before
 */
 void VInstrumentResponseFunctionData::fill( double iWeight )
 {

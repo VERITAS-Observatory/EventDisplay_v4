@@ -54,7 +54,7 @@ int main( int argc, char* argv[] )
 		exit( EXIT_SUCCESS );
 	}
 
-	// list of prefered logs to print
+	// list of preferred logs to print
 	vector< string > logObjectNames;
 	logObjectNames.push_back( "evndispLog" );
 	logObjectNames.push_back( "evndisptzeroLog" );

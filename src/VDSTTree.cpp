@@ -1,7 +1,7 @@
 /*! \class VDSTTree
     \brief writes data summary files with sums and times for each pixel
 
-    output is after pedestal substraction, gain and toffset correction
+    output is after pedestal subtraction, gain and toffset correction
 
 
 

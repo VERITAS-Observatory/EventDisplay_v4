@@ -95,7 +95,7 @@ void VSensitivityCalculator::reset()
 	fSetEvents_minCutOnly = false;
 
 	// source strength values (in Crab units)
-	// units: fraction of source strenght
+	// units: fraction of source strength
 	fSourceStrength_min = 0.0003;
 	fSourceStrength_max = 3.5;
 	fSourceStrength_step = 0.005;
@@ -1049,7 +1049,7 @@ bool VSensitivityCalculator::printSensitivity()
 
 
 /*!
-    plot an empty canvas for the sensitivy vs energy graphs
+    plot an empty canvas for the sensitivity vs energy graphs
 
     add lines corresponding to XXX% of the Crab
 
@@ -1581,7 +1581,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 
 /*
 
-    read integral/differential sensitivities and backround rates (total, proton, electron) from WP Phys File
+    read integral/differential sensitivities and background rates (total, proton, electron) from WP Phys File
 
 */
 TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( string bUnit, double iEnergyMin_TeV_lin,
@@ -1826,7 +1826,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 
 		if( fMC_Data[1]->effArea_Ebins != ( *i_MCData_iterator ).second->effArea_Ebins )
 		{
-			sprintf( hname, "diffent number of bins in gamma and background effective area (%d, %d)",
+			sprintf( hname, "different number of bins in gamma and background effective area (%d, %d)",
 					 fMC_Data[1]->effArea_Ebins, ( *i_MCData_iterator ).second->effArea_Ebins );
 			return getDifferentialFluxVectorfromMC_ErrorMessage( hname );
 		}
@@ -2724,7 +2724,7 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 		}
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////
-	// read sucess of TMVA cut optimization from gamma/hadron cuts
+	// read success of TMVA cut optimization from gamma/hadron cuts
 	fTMVAEvaluatorResults = ( VTMVAEvaluatorResults* )fEff.Get( "TMVAEvaluatorResults" );
 	if( fTMVAEvaluatorResults )
 	{
@@ -3247,7 +3247,7 @@ bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F
 	}
 
 	// go again over the high energy part of the sensitivity curve and check conditions for sensitivity:
-	// is signal number critera fullfilled early enough so that it can be used?
+	// is signal number criteria fulfilled early enough so that it can be used?
 	if( iHighEnergyFilling )
 	{
 		double x = 0.;

@@ -640,7 +640,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 	}
 
 	////////////////////////////////////////////////////////////
-	// VGammaHadronCuts is needed for calulate of MVA values
+	// VGammaHadronCuts is needed for calculate of MVA values
 	if( fCalculateMVAValues )
 	{
 		initialGammaHadronCuts();

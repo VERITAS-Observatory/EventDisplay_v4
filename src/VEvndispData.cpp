@@ -3,7 +3,7 @@
 
    \attention
 
-     fReader is not static! Call of VEvndispData::initializeDataReader() necessary  in constructors of all inherit classes
+     fReader is not static! Call of VEvndispData::initializeDataReader() necessary  in constructors of all inherit class
 
 */
 

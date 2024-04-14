@@ -60,7 +60,7 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 
 	fAcceptanceFile = "";
 
-	fEffectiveAreaFile = "";                      // file with effective areas, use NOFILE if not avaible
+	fEffectiveAreaFile = "";                      // file with effective areas, use NOFILE if not available
 
 	// smoothing algorithm (don't use it if you don't know it)
 	fNBoxSmooth = 0;
@@ -74,7 +74,7 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 
 	// REFLECTED REGION MODEL
 	fRE_distanceSourceOff = 0.2;                  // minimal distance of off source regions in number of background regions from the source region
-	fRE_nMinoffsource = 3;                        // minmum number of off source regions (default 3)
+	fRE_nMinoffsource = 3;                        // minimum number of off source regions (default 3)
 	fRE_nMaxoffsource = 7;                        // maximum number of off source regions (default 7)
 
 	// TEMPLATE MODEL
@@ -1058,7 +1058,7 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
 					}
 				}
 			}
-			// background model dependend parameters
+			// background model dependent parameters
 			//
 			//	  if( i_sT.fBackgroundModel == eONOFF )
 			//	  {
@@ -1208,7 +1208,7 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
 		}
 		else if( fRunList[i].fBackgroundModel == eRINGMODEL )
 		{
-			cout << "RING BACKROUND MODEL" << endl;
+			cout << "RING BACKGROUND MODEL" << endl;
 			cout << "\t theta2 cut: " << fRunList[i].fSourceRadius << " deg2" << endl;
 			cout << "\t ring radius: " << fRunList[i].fRM_RingRadius << " deg" << endl;
 			cout << "\t ring width: " << fRunList[i].fRM_RingWidth << " deg" << endl;
