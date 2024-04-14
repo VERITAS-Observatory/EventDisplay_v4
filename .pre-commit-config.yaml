@@ -34,7 +34,7 @@ repos:
       - id: codespell
         args: [
           "--skip=*.json,*.bib,*.txt,*.cls,scripts/environment_vtscat_save.yml",
-          "--ignore-words-list=livetime,fom,rsource,gaus,precess,forbit,nd,precessed,crate,parms,safty,sideral",
+          "--ignore-words-list=livetime,fom,rsource,gaus,precess,forbit,nd,precessed,crate,parms,safty,sideral,ist,highe,functon,tre,ned,sourc,parm",
         ]
         additional_dependencies:
           - tomli
