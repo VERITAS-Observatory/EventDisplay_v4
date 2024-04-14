@@ -16,9 +16,9 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	{
 		cout << "VEventLoop::VEventLoop()" << endl;
 	}
-	
+
 	fRunPar = irunparameter;
-	
+
 	// total number of telescopes
 	fNTel = fRunPar->fNTelescopes;
 	if( fNTel < 1 )
@@ -30,7 +30,7 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	{
 		fRunPar->fPrintSmallArray = false;
 	}
-	
+
 	// data readers
 	fReader = 0;                                  // this pointer is used in the program for accesing any data source (raw or MC)
 #ifndef NOVBF
@@ -38,12 +38,12 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 #endif
 	fGrIsuReader = 0;
 	fDSTReader = 0;
-	
+
 	bMCSetAtmosphericID = false;
 	fBoolPrintSample.assign( fNTel, true );
 	fGPSClockWarnings.assign( fNTel, 0 );
 	fTimeCut_RunStartSeconds = 0;
-	
+
 	fAnalyzeMode = true;
 	fRunMode = ( E_runmode )fRunPar->frunmode;
 	fEventNumber = 0;
@@ -52,18 +52,18 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	fEndCalibrationRunNow = false;
 	fBoolSumWindowChangeWarning = 0;
 	fLowGainMultiplierWarning = 0;
-	
+
 	setRunNumber( fRunPar->frunnumber );
-	
+
 	// get the detector settings from the configuration files and set the cameras
 	setDetectorGeometry( fNTel, fRunPar->fcamera, fRunPar->getDirectory_EVNDISPDetectorGeometry() );
-	
+
 	// set which telescopes should be analyzed
 	setTeltoAna( fRunPar->fTelToAnalyze );
-	
+
 	// set dead channel text
 	setDeadChannelText();
-	
+
 	// read reconstruction parameters
 	if( !get_reconstruction_parameters( fRunPar->freconstructionparameterfile ) )
 	{
@@ -71,7 +71,7 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 		cout << fRunPar->freconstructionparameterfile << endl;
 		exit( -1 );
 	}
-	
+
 	// set standard tracehandler
 	if( fRunPar->ftracefit < 0. )
 	{
@@ -94,29 +94,29 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	}
 	fTraceHandler->setMC_FADCTraceStart( getRunParameter()->fMC_FADCTraceStart );
 	fTraceHandler->setPulseTimingLevels( getRunParameter()->fpulsetiminglevels );
-	
+
 	// initialize calibrator (one for all telescopes)
 	if( fCalibrated.size() == 0 ) for( unsigned int i = 0; i < fNTel; i++ )
 		{
 			fCalibrated.push_back( false );
 		}
 	fCalibrator = new VCalibrator();
-	
+
 	// create data summarizer
 	fDST = new VDST( ( fRunMode == R_DST ), ( fRunPar->fsourcetype == 1 || fRunPar->fsourcetype == 2 || fRunPar->fsourcetype == 6 ) );
-	
+
 	// create analyzer (one for all telescopes)
 	fAnalyzer = new VImageAnalyzer();
 	// create new pedestal calculator
 	fPedestalCalculator = new VPedestalCalculator();
-	
+
 	// create array analyzer
 	fArrayAnalyzer = new VArrayAnalyzer();
-	
+
 	// create dead time calculator
 	fDeadTime = new VDeadTime();
 	fDeadTime->defineHistograms( fRunPar->fRunDuration );
-	
+
 	// create dead pixel organizer
 	if( fRunPar->fSaveDeadPixelRegistry )
 	{
@@ -125,13 +125,13 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 			fRunPar->fDBDataStartTimeMJD, fRunPar->fDBDataStartTimeSecOfDay,
 			fRunPar->fDBDataStoppTimeMJD, fRunPar->fDBDataStoppTimeSecOfDay,
 			"deadPixelRegistry", getRunNumber() ) ;
-			
+
 	}
 	else
 	{
 		fDeadPixelOrganizer = 0 ;
 	}
-	
+
 	// reset cut strings and variables
 	resetRunOptions();
 }
@@ -156,7 +156,7 @@ void VEventLoop::printRunInfos()
 	for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
 	{
 		setTelID( fRunPar->fTelToAnalyze[i] );
-		
+
 		cout << "Telescope " << fRunPar->fTelToAnalyze[i] + 1;
 		if( i < getDetectorGeometry()->getTelType().size() )
 		{
@@ -234,7 +234,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 	}
 	fRunPar->fsourcefile = iFileName;
 	fEventNumber = 0;
-	
+
 	// check if file exists (bizzare return value)
 	if( gSystem->AccessPathName( iFileName.c_str() ) && fRunPar->fsourcetype != 5 )
 	{
@@ -242,7 +242,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 		cout << "VEventLoop::initEventLoop error; sourcefile not found: |" << iFileName << "|" << endl;
 		exit( 0 );
 	}
-	
+
 	// set the data readers and open data files
 	//     (different file formats)
 #ifndef NOVBF
@@ -394,7 +394,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 										 fRunPar->fsimu_pedestalfile, fRunPar->fIgnoreCFGversions );
 		fGrIsuReader->setTraceFile( fRunPar->ftracefile );
 	}
-	
+
 	// ============================
 	// source has MC grisu format (multiple files)
 	else if( fRunPar->fsourcetype == 5 )
@@ -430,7 +430,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 	// ============================
 	// set the data readers for all inherent classes
 	initializeDataReader();
-	
+
 	// ============================
 	// read pixel values from DB
 	fDB_PixelDataReader = 0;
@@ -449,13 +449,13 @@ bool VEventLoop::initEventLoop( string iFileName )
 											 fRunPar->fDBRunStartTimeSQL, fRunPar->fDBRunStoppTimeSQL );
 		}
 	}
-	
+
 	// set event number vector
 	fTelescopeEventNumber.assign( fNTel, 0 );
 	// set event times
 	fEventMJD.assign( fNTel, 0 );
 	fEventTime.assign( fNTel, 0. );
-	
+
 	// set number of channels
 	for( unsigned int i = 0; i <  fRunPar->fTelToAnalyze.size(); i++ )
 	{
@@ -474,14 +474,14 @@ bool VEventLoop::initEventLoop( string iFileName )
 	}
 	// initialize analyzers (output files are created as well here)
 	initializeAnalyzers();
-	
-	
+
+
 	// create calibrators, analyzers, etc. at first event
 	if( fCalibrator )
 	{
 		fCalibrator->initialize();
 	}
-	
+
 	// initialize pedestal calculator
 	if( fPedestalCalculator && fRunPar->fPedestalsInTimeSlices )
 	{
@@ -491,7 +491,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 	}
 	// print run informations
 	printRunInfos();
-	
+
 	////////////////////////////////////////////////////////////////////////////////
 	// set array pointing (values valid for all telescope)
 	////////////////////////////////////////////////////////////////////////////////
@@ -521,7 +521,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 	}
 	// add any offsets to the pointing [J2000]
 	fArrayPointing->setPointingOffset( fRunPar->fTargetRAOffset, fRunPar->fTargetDecOffset );
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// set pointing for all telescopes
 	///////////////////////////////////////////////////////////////////////////////////////////
@@ -576,7 +576,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 		getRunParameter()->fTargetDec = getArrayPointing()->getTargetDecJ2000();
 		getRunParameter()->fTargetRA  = getArrayPointing()->getTargetRAJ2000();
 	}
-	
+
 	return true;
 }
 
@@ -587,7 +587,7 @@ void VEventLoop::initializeAnalyzers()
 	{
 		cout << "VEventLoop::initializeAnalyzers()" << endl;
 	}
-	
+
 	// initialize the analyzers
 	if( fAnalyzer && fRunMode != R_PED && fRunMode != R_PEDLOW && fRunMode != R_GTO && fRunMode != R_GTOLOW
 			&& fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
@@ -606,7 +606,7 @@ void VEventLoop::initializeAnalyzers()
 	{
 		fDST->initialize();
 	}
-	
+
 	// set analysis data storage classes
 	// (slight inconsistency, produce VImageAnalyzerData for all telescopes,
 	//  not only for the requested ones (in teltoana))
@@ -688,7 +688,7 @@ void VEventLoop::shutdown()
 	}
 	endOfRunInfo();
 	cout << endl << "-----------------------------------------------" << endl;
-	
+
 	// if we have the proper settings,
 	// print the dead pixel information
 	if( ( fRunPar->frunmode == R_ANA || fRunPar->frunmode == R_GTO ) && fRunPar->fprintdeadpixelinfo )  // DEADCHAN
@@ -701,7 +701,7 @@ void VEventLoop::shutdown()
 			printDeadChannels( true, true );
 		}
 	}
-	
+
 	// write detector parameter tree to disk
 	if( fOutputfile != 0 && fRunPar->foutputfileName != "-1" )
 	{
@@ -781,17 +781,17 @@ void VEventLoop::shutdown()
 				cout << endl;
 			}
 		}
-		
+
 		// orgainze and write out tree
 		if( fRunPar->frunmode == R_ANA && fDeadPixelOrganizer )
 		{
 			fDeadPixelOrganizer->printSummary() ;
-			
+
 			// copy tree to output root file
 			fDeadPixelOrganizer->finalize() ;
-			
+
 		}
-		
+
 		// write array analysis results to output file
 		if( fArrayAnalyzer )
 		{
@@ -941,13 +941,13 @@ bool VEventLoop::loop( int iEvents )
 	bool iEventStatus = true;
 	fNumberofIncompleteEvents = 0;
 	fNumberofGoodEvents = 0;
-	
+
 	// Skip to start eventnumber
 	if( fRunPar->fFirstEvent > 0 )
 	{
 		gotoEvent( fRunPar->fFirstEvent );
 	}
-	
+
 	while( ( i < iEvents || iEvents < 0 ) && iEventStatus )
 	{
 		iEventStatus = nextEvent();
@@ -1126,7 +1126,7 @@ int VEventLoop::analyzeEvent()
 	fAnalyzeMode = true;
 	int i_cut = 0;
 	int i_cutTemp = 0;
-	
+
 	// short cut for dst writing
 	if( fRunMode == R_DST && fDST )
 	{
@@ -1138,24 +1138,24 @@ int VEventLoop::analyzeEvent()
 			return 1;
 		}
 	}
-	
+
 	////////////////////////////////////
 	// analyze all requested telescopes
 	////////////////////////////////////
 	for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
 	{
 		setTelID( fRunPar->fTelToAnalyze[i] );
-		
+
 		if( isMC() && !bMCSetAtmosphericID )
 		{
-		
+
 			if( fRunPar->fAtmosphereID == 0 && getReader()->getMonteCarloHeader() )
 			{
 				fRunPar->fAtmosphereID = getReader()->getMonteCarloHeader()->atmosphere;
 			}
 			bMCSetAtmosphericID = true;
 		}
-		
+
 		// check number of samples
 		if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isDST_MC() )
 		{
@@ -1183,7 +1183,7 @@ int VEventLoop::analyzeEvent()
 			cout << "exiting..." << endl;
 			exit( EXIT_FAILURE );
 		}
-		
+
 		// check the requested sumwindow is not larger than the number of samples. Also check that correct low gain multipliers were read in for all 'reset' sum windows.
 		if( ( int )getNSamples() < ( int )fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] )
 		{
@@ -1403,7 +1403,7 @@ int VEventLoop::analyzeEvent()
 			// this should not happen
 			default:
 				break;
-				
+
 		}
 	}
 	/////////////////////////////////////////////////////////////////////////
@@ -1417,9 +1417,9 @@ int VEventLoop::analyzeEvent()
 			fArrayAnalyzer->doAnalysis();
 		}
 	}
-	
+
 	///!getRunParameter()->fWriteTriggerOnly
-	
+
 	/////////////////////////////////////////////////////////////////////////
 	// dead time calculation
 	if( !isMC() )
@@ -1433,7 +1433,7 @@ int VEventLoop::analyzeEvent()
 			fDeadTime->fillDeadTime( getEventTime(), 0 );
 		}
 	}
-	
+
 	/////////////////////////////////////////////////////////////////////////
 	// calculate pedestals in time slices
 	// (this should be done at this point, as MJD time from array timing is used)
@@ -1448,7 +1448,7 @@ int VEventLoop::analyzeEvent()
 				continue;
 			}
 #endif
-			
+
 			setTelID( fRunPar->fTelToAnalyze[i] );
 			if( fRunPar->fPedestalsInTimeSlices && !fReader->wasLossyCompressed() )
 			{
@@ -1461,7 +1461,7 @@ int VEventLoop::analyzeEvent()
 	{
 		i_cut = int( checkArrayCuts() == 1 && i_cut > 0 );
 	}
-	
+
 	// number of event in calibration runs
 	if( fRunMode == R_PED || fRunMode == R_PEDLOW || fRunMode == R_TZERO || fRunMode == R_TZEROLOW )
 	{
@@ -1474,7 +1474,7 @@ int VEventLoop::analyzeEvent()
 			}
 		}
 	}
-	
+
 	// add dead pixel states to VDeadPixelOrganizer
 	if( fDeadPixelOrganizer )
 	{
@@ -1482,37 +1482,37 @@ int VEventLoop::analyzeEvent()
 		int    eventMJD    = fArrayEventMJD  ;
 		double eventTime   = fArrayEventTime ;
 		int    eventNumber = fEventNumber    ;
-		
+
 		// set up some initial variables
 		bool   higGain   = false ;
 		PixelStateInt lowGainState = 121212 ;
-		
-		
+
+
 		// loop over all telescopes
 		// itel is from 0-3
 		for( unsigned int itel = 0 ; itel < getTeltoAna().size() ; itel++ )
 		{
 			setTelID( getTeltoAna()[itel] ) ;
-			
+
 			// loop over all? lowgain pixels
 			// ipix is from 0-498
 			//cout << coutprefix << "getDead(highGain).size:" << getDead(higGain).size() << endl;
 			for( unsigned int ipix = 0 ; ipix < getDead( higGain ).size() ; ipix++ )
 			{
 				lowGainState  = ( PixelStateInt ) getDead( higGain )[ipix] ;
-				
+
 				fDeadPixelOrganizer->UpdatePixelState( itel + 1, ipix + 1, higGain,  eventMJD, eventTime,  lowGainState ) ;
 			}
-			
+
 		} // endfor: no more telescopes
-		
+
 		fDeadPixelOrganizer->updatePreviousEventInfo( eventNumber, eventMJD, eventTime ) ;
-		
+
 	} // endif: fDeadPixelOrganizer doesn't exist
-	
-	
+
+
 	//}
-	
+
 	return i_cut;
 }
 
@@ -1537,7 +1537,7 @@ int VEventLoop::checkArrayCuts()
 	{
 		return 0;
 	}
-	
+
 	return 1;
 }
 
@@ -1559,7 +1559,7 @@ int VEventLoop::checkCuts()
 	{
 		return 1;    // no cuts are applied
 	}
-	
+
 	int i_cut;
 	// number of triggered channels
 	int i_numtrig = 0;
@@ -1569,7 +1569,7 @@ int VEventLoop::checkCuts()
 	{
 		return 0;
 	}
-	
+
 	// very ugly, but no better idea... (as well no better idea from ROOT people)
 	// define temporarly a root tree and use its selection mechanism
 	if( fStringCut[getTelID()].length() > 0 )
@@ -1586,7 +1586,7 @@ int VEventLoop::checkCuts()
 		int houghMuonValid, houghNpix; //Hough
 		int fitStat = 0;
 		float loss = 0.;
-		
+
 		i_tree.Branch( "eventType", &eventType, "eventType/s" );
 		i_tree.Branch( "cen_x", &cen_x, "cen_x/F" );
 		i_tree.Branch( "cen_y", &cen_y, "cen_y/F" );
@@ -1654,7 +1654,7 @@ int VEventLoop::checkCuts()
 		{
 			i_tree.Branch( "houghContained", &houghContained, "houghContained/D" );
 		}
-		
+
 		eventType = fAnalyzer->getImageParameters()->eventType;
 		cen_x = fAnalyzer->getImageParameters()->cen_x;
 		cen_y = fAnalyzer->getImageParameters()->cen_y;
@@ -1688,7 +1688,7 @@ int VEventLoop::checkCuts()
 		houghNpix = fAnalyzer->getImageParameters()->houghNpix;
 		houghCN = fAnalyzer->getImageParameters()->houghCN;
 		houghContained = fAnalyzer->getImageParameters()->houghContained;
-		
+
 		i_tree.Fill();
 		i_cut = int( i_tree.Draw( "alpha", fStringCut[getTelID()].c_str(), "goff" ) );
 		return i_cut;
@@ -1836,7 +1836,7 @@ void VEventLoop::terminate( int iAna )
 			cout << endl;
 		}
 	}
-	
+
 	cout << endl << "Analyzed " << iAna << " events" << endl;
 }
 
@@ -1855,13 +1855,13 @@ void VEventLoop::setEventTimeFromReader()
 	{
 		return;
 	}
-	
+
 	/////////////////////////////////////////////////////////////////////////
 	// event times setting for VBF sources
 #ifndef NOVBF
 	/////////////////////////////////////////////////////////////////////////
 	unsigned int iCurrentTelID = getTelID();
-	
+
 	VGPSDecoder fGPS;
 	///////////////// /////////////////////////////////// /////////////////
 	// test if all times are the same, apply majority rule otherwise
@@ -1878,12 +1878,12 @@ void VEventLoop::setEventTimeFromReader()
 	map< unsigned int, double > i_telescope_time;
 	map< unsigned int, int > i_telescope_timeN;
 	map< unsigned int, double > i_MJD;
-	
+
 	// get times for each telescope
 	for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
 	{
 		getReader()->setTelescopeID( getTeltoAna()[i] );
-		
+
 		fGPS.decode( fReader->getGPS0(), fReader->getGPS1(), fReader->getGPS2(), fReader->getGPS3(), fReader->getGPS4() );
 		// check status of GPS clock
 		if( fGPS.getStatus() != 0 )
@@ -1894,7 +1894,7 @@ void VEventLoop::setEventTimeFromReader()
 			}
 			if( fGPSClockWarnings[i] < 30 && fDebug )
 			{
-			
+
 				cout << " VEventLoop::setEventTimeFromReader: info, event with GPS error status in telescope " << getTeltoAna()[i] + 1 << endl;
 				cout << "\t error status " << fGPS.getStatus();
 				if( fGPS.getStatus() & 0x0001 )
@@ -1916,7 +1916,7 @@ void VEventLoop::setEventTimeFromReader()
 				cout << " (Telescope " << getTeltoAna()[i] + 1 << ")" << endl;
 			}
 		}
-		
+
 		// time is given in seconds per day
 		if( getTelID() < fEventTime.size() )
 		{
@@ -1948,8 +1948,8 @@ void VEventLoop::setEventTimeFromReader()
 			fArrayEventMJD = ( int )dMJD;
 		}
 	}
-	
-	
+
+
 	///// Time in [s] of the day /////
 	// count equal times
 	for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
@@ -1960,7 +1960,7 @@ void VEventLoop::setEventTimeFromReader()
 			{
 				continue;
 			}
-			
+
 			if( fabs( i_telescope_time[getTeltoAna()[i]] - i_telescope_time[getTeltoAna()[j]] ) < i_max_time_diff )
 			{
 				i_telescope_timeN[getTeltoAna()[i]]++;
@@ -1997,7 +1997,7 @@ void VEventLoop::setEventTimeFromReader()
 			{
 				continue;
 			}
-			
+
 			if( fabs( i_MJD[getTeltoAna()[i]] - i_MJD[getTeltoAna()[j]] ) < i_max_time_diff )
 			{
 				i_telescope_timeN[getTeltoAna()[i]]++;
@@ -2048,7 +2048,7 @@ int VEventLoop::checkTimeCuts()
 	{
 		fTimeCut_RunStartSeconds = fArrayEventTime;
 	}
-	
+
 	if( getRunParameter()->fTimeCutsMin_min > 0 && ( fArrayEventTime - fTimeCut_RunStartSeconds ) < getRunParameter()->fTimeCutsMin_min * 60 )
 	{
 		return 1;
@@ -2057,8 +2057,6 @@ int VEventLoop::checkTimeCuts()
 	{
 		return 2;
 	}
-	
+
 	return 0;
 }
-
-

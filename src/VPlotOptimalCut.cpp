@@ -18,7 +18,7 @@ VPlotOptimalCut::VPlotOptimalCut( string iFile )
 		cout << "VPlotOptimalCut: error finding data tree in " << iFile << endl;
 		return;
 	}
-	
+
 	fListOfVariables.push_back( "MSCW" );
 	fListOfVariables.push_back( "MSCL" );
 	fListOfVariables.push_back( "EChi2" );
@@ -67,7 +67,7 @@ void VPlotOptimalCut::plotHistograms( string iVariable, int i_opt_n, bool bPrint
 	{
 		return;
 	}
-	
+
 	char hname[200];
 	char htitle[200];
 	sprintf( hname, "c%s", iVariable.c_str() );
@@ -76,7 +76,7 @@ void VPlotOptimalCut::plotHistograms( string iVariable, int i_opt_n, bool bPrint
 	c->SetGridx( 0 );
 	c->SetGridy( 0 );
 	c->Draw();
-	
+
 	sprintf( hname, "hOn%s", iVariable.c_str() );
 	TH1F* hon = ( TH1F* )fFile->Get( hname );
 	if( !hon )
@@ -94,12 +94,12 @@ void VPlotOptimalCut::plotHistograms( string iVariable, int i_opt_n, bool bPrint
 		return;
 	}
 	hoff->Draw( "same" );
-	
+
 	double i_opt_min = getCutValue( iVariable + "_min", i_opt_n );
 	double i_opt_max = getCutValue( iVariable + "_max", i_opt_n );
-	
+
 	cout << "Optimal cut values (" << iVariable << "): " << i_opt_min << ", " << i_opt_max << endl;
-	
+
 	// size is on a log scale, also EChi2 and EmissionheightChi2
 	if( iVariable.find( "SizeSecond" ) != string::npos || iVariable.find( "Chi2" ) != string::npos )
 	{
@@ -112,7 +112,7 @@ void VPlotOptimalCut::plotHistograms( string iVariable, int i_opt_n, bool bPrint
 			i_opt_max = log10( i_opt_max );
 		}
 	}
-	
+
 	if( i_opt_min > -9998. )
 	{
 		TLine* iL = new TLine( i_opt_min, hon->GetMinimum(), i_opt_min, hon->GetMaximum() );
@@ -127,14 +127,14 @@ void VPlotOptimalCut::plotHistograms( string iVariable, int i_opt_n, bool bPrint
 		iL->SetLineColor( 4 );
 		iL->Draw();
 	}
-	
+
 	// print all canvases
 	if( bPrint )
 	{
 		sprintf( hname, "%s.eps", iVariable.c_str() );
 		c->Print( hname );
 	}
-	
+
 }
 
 /*
@@ -148,7 +148,7 @@ void VPlotOptimalCut::plotOptimalCuts( string iVariable, int iSourceStrength, bo
 	{
 		return;
 	}
-	
+
 	char hname[200];
 	char htitle[200];
 	sprintf( hname, "c%s_opt_%d_%d_%d", iVariable.c_str(), iMax, ( int )size, iSourceStrength );
@@ -184,7 +184,7 @@ int VPlotOptimalCut::findOptimalCut( int iSourceStrength, double size )
 	{
 		return -1;
 	}
-	
+
 	// hardwired: total number of source strengths
 	double iOpt5sigma[5];
 	if( iSourceStrength > 4 )
@@ -194,13 +194,13 @@ int VPlotOptimalCut::findOptimalCut( int iSourceStrength, double size )
 	fData->SetBranchAddress( "obs5sigma", iOpt5sigma );
 	double iSize = 0.;
 	fData->SetBranchAddress( "SizeSecondMax_min", &iSize );
-	
+
 	double iopt = 1.e20;
 	int iopt_n = -100;
 	for( int i = 0; i < fData->GetEntries(); i++ )
 	{
 		fData->GetEntry( i );
-		
+
 		if( size > 0. )
 		{
 			if( TMath::Abs( size - iSize ) > 10 )
@@ -208,7 +208,7 @@ int VPlotOptimalCut::findOptimalCut( int iSourceStrength, double size )
 				continue;
 			}
 		}
-		
+
 		if( iOpt5sigma[iSourceStrength] > 0. && iOpt5sigma[iSourceStrength] < iopt )
 		{
 			iopt = iOpt5sigma[iSourceStrength];
@@ -223,26 +223,26 @@ int VPlotOptimalCut::findOptimalCut( int iSourceStrength, double size )
 	{
 		cout << "no optimum found" << endl;
 	}
-	
+
 	fData->ResetBranchAddresses();
-	
+
 	return iopt_n;
-	
+
 }
 
 void VPlotOptimalCut::plotScanParameter( string iVar1, string iVar2 )
 {
 	// iVar1 = "MSCW_max";
-	
+
 	string varY = "sig[4]";  //// plot significance vs variable
-	
+
 	const int nVar = 4; //number of variables
 	/// fixed parameter cut values (if not scanned)
 	double fix_MSCW_max = 0.35;
 	double fix_MSCL_max = 0.7;
 	double fix_theta2_max = 0.008;
 	double fix_SizeSecondMax_min = 700;
-	
+
 	/// add fixed parameters
 	char cutexp[nVar][600];
 	int cVar = 0;
@@ -266,10 +266,10 @@ void VPlotOptimalCut::plotScanParameter( string iVar1, string iVar2 )
 		sprintf( cutexp[cVar], "SizeSecondMax_min == %f", fix_SizeSecondMax_min );
 		cVar++;
 	}
-	
+
 	char hname[600]; //TEST
 	sprintf( hname, "SizeSecondMax_min == %f", fix_SizeSecondMax_min ); //TEST
-	
+
 	vector< string > iDraw;
 	vector< string > iCut;
 	vector< string > iName;
@@ -278,16 +278,16 @@ void VPlotOptimalCut::plotScanParameter( string iVar1, string iVar2 )
 	iDraw.push_back( varY + ":" + iVar1 );
 	iCut.push_back( hname );
 	iTitle.push_back( hname );
-	
+
 	TCanvas* c = new TCanvas( "c", "c", 100, 100, 450, 450 );
 	//c->SetLeftMargin( 0.13 );
 	c->Draw();
-	
+
 	int i = 0; //TEST
 	string plot_option = "";
-	
+
 	fData->SetMarkerStyle( 20 );
 	fData->SetMarkerSize( 1.0 );
 	fData->Draw( iDraw[i].c_str(), iCut[i].c_str(), plot_option.c_str() );
-	
+
 }

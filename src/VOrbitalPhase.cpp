@@ -66,11 +66,11 @@ bool VOrbitalPhase::initialize( int argc, char* argv[] )
 			}
 		}
 	}
-	
+
 	// =============================================
 	// end of reading command line parameters
 	// =============================================
-	
+
 	// require inputfile name
 	if( finputfile.size() == 0 )
 	{
@@ -92,7 +92,7 @@ bool VOrbitalPhase::initialize( int argc, char* argv[] )
 		cout << "...exiting" << endl;
 		return false;
 	}
-	
+
 	// set output file name
 	if( foutputfile.size() == 0 )
 	{
@@ -106,11 +106,11 @@ bool VOrbitalPhase::initialize( int argc, char* argv[] )
 			foutputfile += ".orb.root";
 		}
 	}
-	
-	
+
+
 	setInputFile();
 	setOutputFile( "recreate" );
-	
+
 	return true;
 }
 
@@ -150,15 +150,15 @@ bool VOrbitalPhase::setInputFile()
 	{
 		cout << "VOrbitalPhase::setInputFile error while opening output file " << finputfile << endl;
 	}
-	
+
 	// get data tree
 	fDataRunTree = ( TTree* )fInFile->Get( "data" );
 	fDataRun = new CData( fDataRunTree );
-	
+
 	fNentries = fDataRun->fChain->GetEntries();
-	
+
 	cout.precision( 10 );
-	
+
 	return true;
 }
 
@@ -171,19 +171,19 @@ void VOrbitalPhase::fill()
 
 	for( int i = 0; i < fNentries; i++ )
 	{
-	
+
 		fDataRun->GetEntry( i );
-		
+
 		double mjd_event = fDataRun->MJD + fDataRun->Time / 24. / 60. / 60.;
 		calculatePhase( mjd_event );
 		if( i % 10000 == 0 )
 		{
 			cout << mjd_event << " " << fOrbitalPhase <<  endl;
 		}
-		
+
 		fOTree->Fill();
 	}
-	
+
 }
 
 
@@ -197,9 +197,9 @@ bool VOrbitalPhase::terminate()
 	{
 		cout << "Writing events to " << fOutFile->GetName() << endl;
 		fOutFile->cd();
-		
+
 		cout << endl << "\t total number of events in output tree: " << fOTree->GetEntries() << endl;
-		
+
 		if( fOTree->GetEntries() == fNentries )
 		{
 			fOTree->Write( "", TObject::kOverwrite );
@@ -208,14 +208,14 @@ bool VOrbitalPhase::terminate()
 		{
 			cout << "\t error, different number of entries in input and output trees " << endl;
 		}
-		
+
 		copyInputFile();
-		
+
 		fOutFile->Close();
 		cout << "... outputfile closed" << endl;
 	}
-	
-	
+
+
 	return true;
 }
 
@@ -230,26 +230,26 @@ bool VOrbitalPhase::setOutputFile( string iOption )
 		cout << "VOrbitalPhase::setOutputFile error: can't overwrite inputfile" << endl;
 		exit( -1 );
 	}
-	
+
 	// open output file
 	fOutFile = new TFile( foutputfile.c_str(), iOption.c_str() );
 	if( fOutFile->IsZombie() )
 	{
 		cout << "VOrbitalPhase::setOutputFile error while opening output file " << foutputfile << "\t" << iOption << endl;
-		
+
 	}
-	
+
 	// define output tree
 	char ITT[2000];
 	sprintf( ITT, "Orbital Phase information" );
-	
+
 	fOTree = new TTree( "phase", ITT );
 	fOTree->SetMaxTreeSize( 1000 * Long64_t( 2000000000 ) );
-	
+
 	fOTree->Branch( "orbit", &fOrbit, "orbit/D" );
 	fOTree->Branch( "refMJD", &fRefMJD, "refMJD/D" );
 	fOTree->Branch( "phase", &fOrbitalPhase, "phase/D" );
-	
+
 	return true;
 }
 
@@ -259,14 +259,14 @@ void VOrbitalPhase::calculatePhase( double djm )
 {
 
 	double t0 = 2400000.5 + fRefMJD;
-	
+
 	//cout << "MJD: " << djm << "\t" << fixed <<  djm + 2400000.5 << endl;
-	
-	
+
+
 	// calculate phase
 	fOrbitalPhase = ( djm + 2400000.5 - t0 ) / fOrbit - ( int )( ( djm + 2400000.5 - t0 ) / fOrbit );
 	//  cout << "PHASE: " << phase << endl;
-	
+
 }
 
 
@@ -278,7 +278,7 @@ void VOrbitalPhase::copyInputFile()
 	cout << "\t copying input file info " << endl;
 	copyDirectory( fInFile );
 	cout << "done" << endl;
-	
+
 }
 
 
@@ -299,9 +299,9 @@ void VOrbitalPhase::copyDirectory( TDirectory* source )
 	{
 		adir = savdir->mkdir( source->GetName() );
 	}
-	
+
 	adir->cd();
-	
+
 	//loop on all entries of this directory
 	TKey* key;
 	TIter nextkey( source->GetListOfKeys() );
@@ -337,6 +337,6 @@ void VOrbitalPhase::copyDirectory( TDirectory* source )
 			delete obj;
 		}
 	}
-	
-	
+
+
 }

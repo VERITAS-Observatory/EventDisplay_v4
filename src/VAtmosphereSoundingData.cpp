@@ -27,12 +27,12 @@ VAtmosphereSoundingData::VAtmosphereSoundingData()
 	Day = 0;
 	Hour = 0.;
 	Name = "";
-	
+
 	PlotColor = 1;
 	PlotMarker = 20;
 	PlotLineStyle = 1;
 	PlotLineWidth = 2;
-	
+
 	fGraphScaledDensityHeight = 0;
 	fGraphPressureHeight = 0;
 	fGraphHumidityHeight = 0;
@@ -57,12 +57,12 @@ void VAtmosphereSoundingData::setdefaultvalues( unsigned int iN )
 	fIndexofRefraction.clear();
 	fO2_cmkm.clear();
 	fO3_cmkm.clear();
-	
+
 	if( fGraphScaledDensityHeight != 0 )
 	{
 		fGraphScaledDensityHeight->Delete();
 	}
-	
+
 	// set default values
 	for( unsigned int i = 0; i < iN; i++ )
 	{
@@ -92,7 +92,7 @@ void VAtmosphereSoundingData::makeGraphScaledDensity( )
 	{
 		fGraphScaledDensityHeight->Delete();
 	}
-	
+
 	fGraphScaledDensityHeight = new TGraph( 0 );
 	for( unsigned int i = 0; i < fHeight_m.size(); i++ )
 	{
@@ -101,7 +101,7 @@ void VAtmosphereSoundingData::makeGraphScaledDensity( )
 			fGraphScaledDensityHeight->SetPoint( fGraphScaledDensityHeight->GetN(), fHeight_m[i] / 1000.0, fDensity_gcm3[i] * TMath::Exp( fHeight_m[i] / 7739.0 ) );
 		}
 	}
-	
+
 	fGraphScaledDensityHeight->SetMarkerStyle( PlotMarker );
 	fGraphScaledDensityHeight->SetMarkerColor( PlotColor );
 	fGraphScaledDensityHeight->SetLineColor( PlotColor );
@@ -119,7 +119,7 @@ void VAtmosphereSoundingData::makeGraphPressure( )
 	{
 		fGraphPressureHeight->Delete();
 	}
-	
+
 	fGraphPressureHeight = new TGraph( 0 );
 	for( unsigned int i = 0; i < fHeight_m.size(); i++ )
 	{
@@ -128,7 +128,7 @@ void VAtmosphereSoundingData::makeGraphPressure( )
 			fGraphPressureHeight->SetPoint( fGraphPressureHeight->GetN(), fHeight_m[i] / 1000.0, fPressure_Pa[i] );
 		}
 	}
-	
+
 	fGraphPressureHeight->SetMarkerStyle( PlotMarker );
 	fGraphPressureHeight->SetMarkerColor( PlotColor );
 	fGraphPressureHeight->SetLineColor( PlotColor );
@@ -146,7 +146,7 @@ void VAtmosphereSoundingData::makeGraphTemperature( )
 	{
 		fGraphTemperatureHeight->Delete();
 	}
-	
+
 	fGraphTemperatureHeight = new TGraph( 0 );
 	for( unsigned int i = 0; i < fHeight_m.size(); i++ )
 	{
@@ -155,7 +155,7 @@ void VAtmosphereSoundingData::makeGraphTemperature( )
 			fGraphTemperatureHeight->SetPoint( fGraphTemperatureHeight->GetN(), fHeight_m[i] / 1000.0, fTemperature_K[i] );
 		}
 	}
-	
+
 	fGraphTemperatureHeight->SetMarkerStyle( PlotMarker );
 	fGraphTemperatureHeight->SetMarkerColor( PlotColor );
 	fGraphTemperatureHeight->SetLineColor( PlotColor );
@@ -173,7 +173,7 @@ void VAtmosphereSoundingData::makeGraphHumidity( )
 	{
 		fGraphHumidityHeight->Delete();
 	}
-	
+
 	fGraphHumidityHeight = new TGraph( 0 );
 	for( unsigned int i = 0; i < fHeight_m.size(); i++ )
 	{
@@ -182,7 +182,7 @@ void VAtmosphereSoundingData::makeGraphHumidity( )
 			fGraphHumidityHeight->SetPoint( fGraphHumidityHeight->GetN(), fHeight_m[i] / 1000.0, fRelativeHumidity[i] );
 		}
 	}
-	
+
 	fGraphHumidityHeight->SetMarkerStyle( PlotMarker );
 	fGraphHumidityHeight->SetMarkerColor( PlotColor );
 	fGraphHumidityHeight->SetLineColor( PlotColor );
@@ -199,7 +199,7 @@ void VAtmosphereSoundingData::makeGraphThickness( )
 	{
 		fGraphThicknessHeight->Delete();
 	}
-	
+
 	fGraphThicknessHeight = new TGraph( 0 );
 	for( unsigned int i = 0; i < fHeight_m.size(); i++ )
 	{
@@ -208,7 +208,7 @@ void VAtmosphereSoundingData::makeGraphThickness( )
 			fGraphThicknessHeight->SetPoint( fGraphThicknessHeight->GetN(), fHeight_m[i] / 1000.0, fThickness_gcm2[i] );
 		}
 	}
-	
+
 	fGraphThicknessHeight->SetMarkerStyle( PlotMarker );
 	fGraphThicknessHeight->SetMarkerColor( PlotColor );
 	fGraphThicknessHeight->SetLineColor( PlotColor );
@@ -225,7 +225,7 @@ void VAtmosphereSoundingData::makeGraphIndex( )
 	{
 		fGraphIndexHeight->Delete();
 	}
-	
+
 	fGraphIndexHeight = new TGraph( 0 );
 	for( unsigned int i = 0; i < fHeight_m.size(); i++ )
 	{
@@ -234,7 +234,7 @@ void VAtmosphereSoundingData::makeGraphIndex( )
 			fGraphIndexHeight->SetPoint( fGraphIndexHeight->GetN(), fHeight_m[i] / 1000.0, fIndexofRefraction[i] - 1 );
 		}
 	}
-	
+
 	fGraphIndexHeight->SetMarkerStyle( PlotMarker );
 	fGraphIndexHeight->SetMarkerColor( PlotColor );
 	fGraphIndexHeight->SetLineColor( PlotColor );
@@ -248,7 +248,7 @@ void VAtmosphereSoundingData::makeGraphIndex( )
 void VAtmosphereSoundingData::setColor( int color )
 {
 	PlotColor = color;
-	
+
 	if( fGraphIndexHeight )
 	{
 		fGraphIndexHeight->SetLineColor( PlotColor );

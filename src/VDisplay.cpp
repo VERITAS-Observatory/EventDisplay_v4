@@ -28,12 +28,12 @@ VDisplay::VDisplay( const TGWindow* p, unsigned int h, unsigned int w, VEventLoo
 	// set the right color palettes
 	gROOT->SetStyle( "Plain" );
 	gStyle->SetPalette( 1 );
-	
+
 	fEventLoop = iEventLoop;
-	
+
 	// set telescope number
 	fTelescope = fEventLoop->getTelID();          // telescope ID
-	
+
 	// setting the camera display classes
 	for( unsigned int i = 0; i < fEventLoop->getTeltoAna().size(); i++ )
 	{
@@ -56,13 +56,13 @@ VDisplay::VDisplay( const TGWindow* p, unsigned int h, unsigned int w, VEventLoo
 	// fadc canvas
 	fBoolFADC = false;
 	fBoolDrawImageTraces = false;
-	
+
 	fSelectedChan = 0;
 	fCameraTiming = false;
 	fCameraMovie = false;
 	fMoviePictNumber = 0;
 	fAutoRunStatus = false;
-	
+
 	fCanvasesNx = 1;
 	fCanvasesNy = 1;
 	fBWNum = 50;
@@ -85,22 +85,22 @@ VDisplay::VDisplay( const TGWindow* p, unsigned int h, unsigned int w, VEventLoo
 		fEventLoop->setCutNArrayTrigger( 2 );
 	}
 	fEventLoop->setCutNArrayImages( 0 );
-	
+
 	// beginning of gui definitions
 	defineGui();
 	setCameraPads( false );
 	updateCamera( fCameraDisplay );
-	
+
 	// signals (GM)
 	//   to be consistent, should be replace by Associate() mechanismus
 	//    but: how to read out mouse position on canvas?
 	//  leave it like it is, because signal/slot mechanism is more powerful
-	
+
 	fTabAna->Connect( "Selected(Int_t )", "VDisplay", this, "selectAnaTab( Int_t )" );
 	fCanvasCamera->Connect( "ProcessedEvent(Int_t , Int_t , Int_t , TObject* )", "VDisplay", this, "selectChannel( Int_t, Int_t, Int_t, TObject* )" );
 	fCanvasCamera->SetHighLightColor( 10 );
 	fCanvasCamera->SetEditable( false );
-	
+
 	char i_wname[300];
 	sprintf( i_wname, "%s event analysis and display %s (%s)",
 			 fEventLoop->getRunParameter()->getObservatory().c_str(),
@@ -113,7 +113,7 @@ VDisplay::VDisplay( const TGWindow* p, unsigned int h, unsigned int w, VEventLoo
 	SetMWMHints( kMWMDecorAll | kMWMDecorResizeH  | kMWMDecorMaximize | kMWMDecorMinimize | kMWMDecorMenu, kMWMFuncAll |  kMWMFuncResize    | kMWMFuncMaximize | kMWMFuncMinimize, kMWMInputModeless );
 	MapWindow();
 	// end of gui
-	
+
 	resetDisplay();
 	setInfoText();
 	bookHistos();
@@ -182,7 +182,7 @@ void VDisplay::printCanvas( TPad* priCanvas )
 		"All files",     "*",
 		0,               0
 	};
-	
+
 	TGFileInfo fi;
 	fi.fFileTypes = filetypes;
 	new TGFileDialog( fClient->GetRoot(), this, kFDSave, &fi );
@@ -190,9 +190,9 @@ void VDisplay::printCanvas( TPad* priCanvas )
 	{
 		return;
 	}
-	
+
 	priCanvas->Print( fi.fFilename );
-	
+
 	priCanvas->Update();
 }
 
@@ -257,7 +257,7 @@ void VDisplay::updateCamera( Int_t i )
 	{
 		cout << "VDisplay::updateCamera " << i << "\t" << fCamera.size() << "\t" << fTelescopesToShow.size() << endl;
 	}
-	
+
 	fCanvasCamera->SetEditable( true );
 	// get tab identification
 	fCameraDisplay = E_cameraIdent( i );
@@ -270,7 +270,7 @@ void VDisplay::updateCamera( Int_t i )
 	{
 		return;
 	}
-	
+
 	// ==================================================
 	// timing tab
 	if( E_cameraIdent( i ) == C_TIMING && !fBoolDrawAllinOne &&
@@ -281,16 +281,16 @@ void VDisplay::updateCamera( Int_t i )
 		{
 			return;
 		}
-		
+
 		// can't do timing tab and all in one camera
 		if( fBoolDrawAllinOne )
 		{
 			return;
 		}
-		
+
 		fCameraTiming = true;
 		unsigned int winsize = 4;
-		
+
 		// get maximum value in any tube
 		vector< double > i_max;
 		for( unsigned t = 0; t < fTelescopesToShow.size(); t++ )
@@ -328,29 +328,29 @@ void VDisplay::updateCamera( Int_t i )
 				{
 					fCamera[fTelescopesToShow[t]]->setCanvas( fPadsCamera[fTelescopesToShow[t]] );
 				}
-				
+
 				fCamera[fTelescopesToShow[t]]->setMode( i );
 				fCamera[fTelescopesToShow[t]]->setCurrentTimeSlice( j );
 				fCamera[fTelescopesToShow[t]]->draw( i_max[t], fEventLoop->getEventNumber(), fBoolDrawAllinOne );
 				fCanvasCamera->Update();
-				
+
 				gSystem->ProcessEvents();
-				
+
 				if( !checkPlotIntentions( i ) )
 				{
 					return;
 				}
-				
+
 				if( fCameraMovie )
 				{
 					makeMoviePicture();
 				}
-				
+
 				if( !fCameraTiming )
 				{
 					break;
 				}
-				
+
 				fCanvasCamera->Update();
 				usleep( fTimingSleep );
 			}
@@ -421,13 +421,13 @@ void VDisplay::updateCamera( Int_t i )
 	{
 		drawCalibrationHistos();
 	}
-	
+
 	// draw the timing graphs
 	if( fEventLoop->getEventNumber() != 0 && fTabAna->GetCurrent() == 3 )
 	{
 		drawPixelHistos();
 	}
-	
+
 	fCanvasCamera->SetEditable( false );
 	if( fDebug )
 	{
@@ -444,7 +444,7 @@ void VDisplay::makeMoviePicture()
 	string suffix;
 	char i_Temp[500];
 	fMoviePictNumber++;
-	
+
 	if( fMoviePictNumber % fEventLoop->getNTel() == 0 || fCameraDisplay != C_TIMING )
 	{
 		// can be changed to any graphical output
@@ -581,7 +581,7 @@ void VDisplay::selectChannel( Int_t bt, Int_t x, Int_t y, TObject* objSel )
 				{
 					fTabAna->SetTab( 1 );
 				}
-				
+
 				drawFADC( false );
 				fButtonFADCset->SetState( kButtonUp );
 				fButtonFADCunset->SetState( kButtonUp );
@@ -661,7 +661,7 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 		return 0;
 	}
 	i_his->Reset();
-	
+
 	///////////////////////////////////////////////////////////////////////////////
 	// fill trace into histogram
 	///////////////////////////////////////////////////////////////////////////////
@@ -720,13 +720,13 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 		{
 			return 0;
 		}
-		
+
 		// set pedestal value
 		for( unsigned int i = 0; i < nbinsX; i++ )
 		{
 			y[i] = fEventLoop->getPeds()[i_channel];
 		}
-		
+
 		// first bin is at time zero
 		xbins[0] = 0.;
 		unsigned int i_maxPV = fEventLoop->getRunParameter()->fpulsetiming_max_index;
@@ -744,7 +744,7 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 				{
 					xbins[z] = fEventLoop->getPulseTiming()[fEventLoop->getRunParameter()->fpulsetiminglevels.size() - i - 1][i_channel] + fEventLoop->getPulseTiming()[i][i_channel];
 				}
-				
+
 				y[i + 1] += fEventLoop->getRunParameter()->fpulsetiminglevels[i] * fEventLoop->getTraceMax()[i_channel];
 				z++;
 			}
@@ -776,7 +776,7 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 			i_his->SetBinContent( 1, 0. );
 		}
 	}
-	
+
 	return i_his;
 }
 
@@ -809,7 +809,7 @@ void VDisplay::drawFADC( bool iFit )
 		}
 		return;
 	}
-	
+
 	// from here on: draw fHisFADC (at least)
 	fHisFADC->Reset();
 	char histitle[200];
@@ -824,14 +824,14 @@ void VDisplay::drawFADC( bool iFit )
 		sprintf( histitle, "sample number [%.1fns]", fEventLoop->getDetectorGeo()->getLengthOfSampleTimeSlice( fTelescope ) );
 	}
 	fHisFADC->GetXaxis()->SetTitle( histitle );
-	
+
 	TH1D* iTraceFits;
 	iTraceFits = 0;
-	
+
 	// make fadc canvas editable
 	fCanvasFADC->SetEditable( 1 );
 	fCanvasFADC->cd();
-	
+
 	fEventLoop->getAnalyzer()->setTelID( fTelescope );
 	// reset max pixel number in 'show channel' number entry (might change from telescope to telescope)
 	fNEntryFADCsearch->SetLimits( TGNumberFormat::kNELLimitMinMax, 0, fEventLoop->getAnalyzer()->getImage().size() - 1 );
@@ -839,7 +839,7 @@ void VDisplay::drawFADC( bool iFit )
 	if( fSelectedChan >= 200000 && !fEventLoop->getZeroSuppressed()[fSelectedChan - 200000] )
 	{
 		sprintf( histitle, "Channel #%d (Telescope %d)", fSelectedChan - 200000, fTelescope + 1 );
-		
+
 		// fill histogram with fadc trace
 		fHisFADC = fillFADC( fSelectedChan - 200000, fHisFADC );
 		fHisFADC->SetLineStyle( 1 );
@@ -871,7 +871,7 @@ void VDisplay::drawFADC( bool iFit )
 			{
 				fHisFADC->SetLineColor( 9 );
 			}
-			
+
 			fF1Ped->SetParameter( 0, -1.* fEventLoop->getAnalyzer()->getPeds( fEventLoop->getHiLo()[fSelectedChan - 200000] )[fSelectedChan - 200000] );
 		}
 		///////////////////////////////////////////////////////////
@@ -1000,7 +1000,7 @@ void VDisplay::drawFADC( bool iFit )
 		fHisFADC->Draw( fHisFADCDrawString.c_str() );
 	}
 	fCanvasFADC->Update();
-	
+
 	if( fSelectedChan >= 200000 && fSelectedChan - 200000 < fEventLoop->getAnalyzer()->getTCorrectedSumFirst().size() )
 	{
 		// plot box which indicates integration (summation window) window
@@ -1074,7 +1074,7 @@ void VDisplay::drawFADC( bool iFit )
 		fCanvasFADC->Update();
 	}
 	fCanvasFADC->RedrawAxis();
-	
+
 	fCanvasFADC->Update();
 }
 
@@ -1089,7 +1089,7 @@ void VDisplay::processEvent()
 		cout << "VDisplay::processEvent() " << endl;
 	}
 	char c_ev[200];
-	
+
 	do
 	{
 		for( unsigned int i = 0; i < fNumEventIncrement; i++ )
@@ -1155,15 +1155,15 @@ void VDisplay::resetDisplay()
 {
 	resetRunOptions();
 	fEventLoop->resetRunOptions();
-	
+
 	fSelectedChan = 0;
 	fCameraTiming = false;
 	fBoolFADC = false;
-	
+
 	fCanvasCamera->SetEditable( true );
 	//     fCanvasCamera->Clear();
 	fCanvasCamera->SetEditable( false );
-	
+
 	fCanvasFADC->Clear();
 }
 
@@ -1179,13 +1179,13 @@ void VDisplay::setCameraPads( bool iFieldView )
 	fPadsCamera.clear();
 	char i_text[300];
 	double iPadXlow, iPadYlow, iPadXup, iPadYup;
-	
+
 	// each pad beside another
 	if( !iFieldView )
 	{
 		int iNpadX, iNpadY;
 		double iPadXstep, iPadYstep;
-		
+
 		// calculate number of pads in each direction
 		iNpadX = ( int )sqrt( ( double )fEventLoop->getTeltoAna().size() );
 		iNpadY = ( fEventLoop->getTeltoAna().size() + iNpadX - 1 ) / iNpadX;
@@ -1198,10 +1198,10 @@ void VDisplay::setCameraPads( bool iFieldView )
 				iNpadY = mini;
 			}
 		}
-		
+
 		iPadXstep = 1. / ( double )iNpadX;
 		iPadYstep = 1. / ( double )iNpadY;
-		
+
 		// clear the canvas camera
 		fCanvasCamera->SetEditable( true );
 		fCanvasCamera->Clear();
@@ -1310,24 +1310,24 @@ void VDisplay::setFADCText()
 	}
 	char cTemp[500];
 	unsigned int iChannel = unsigned( fSelectedChan - 200000 );
-	
+
 	// don't use this for photodiode
 	if( iChannel >= fEventLoop->getAnalyzer()->getCurrentSumWindow().size() )
 	{
 		return;
 	}
-	
+
 	fCanvasFADCText->SetEditable( true );
-	
+
 	// text placement
 	float xL = 0.02;
 	float yT = 0.92;
 	float ystep = 0.04 * 1.5;
 	float textsize = 0.035 * 1.5;
-	
+
 	fCanvasFADCText->Clear();
 	fTextFADC.clear();
-	
+
 	fEventLoop->getData()->setTelID( fTelescope );
 	// channel number
 	TString iFADCtext = "";
@@ -1430,7 +1430,7 @@ void VDisplay::setFADCText()
 	// low gain multiplier
 	sprintf( cTemp, "low gain multiplier (trace): %.2f", fEventLoop->getAnalyzer()->getLowGainMultiplier_Trace() );
 	fTextFADC.push_back( new TText( xL, yT, cTemp ) );
-	
+
 	// pulse sum
 	sprintf( cTemp, "pulse sum %.1f (2ndWi: %.1f) pulse max %.1f (raw max: %.1f) pulse width: %.1f", fEventLoop->getData()->getSums()[iChannel],
 			 fEventLoop->getData()->getSums2()[iChannel],
@@ -1489,9 +1489,9 @@ void VDisplay::setFADCText()
 	{
 		fTextFADC.back()->SetTextColor( 1 );
 	}
-	
+
 	// dead channel text
-	
+
 	fTextFADC.push_back( new TText( xL, yT, "" ) );
 	sprintf( cTemp, "  " );
 	bitset<15> idead = fEventLoop->getDead()[iChannel];
@@ -1539,7 +1539,7 @@ void VDisplay::setFADCText()
 		}
 	}
 	fTextFADC.push_back( new TText( xL, yT, cTemp ) );
-	
+
 	for( unsigned int i = 0; i < fTextFADC.size(); i++ )
 	{
 		fTextFADC[i]->SetTextSize( textsize );
@@ -1561,14 +1561,14 @@ void VDisplay::setInfoText()
 	fCanvasInfo->SetEditable( true );
 	vector<TText*> i_Text;
 	char c_Text[300];
-	
+
 	float xL = 0.02;
 	float yT = 0.96;
 	float ystep = 0.03;
 	float textsize = 0.030;
-	
+
 	fCanvasInfo->Clear();
-	
+
 	sprintf( c_Text, "run number: %d", fEventLoop->getRunNumber() );
 	i_Text.push_back( new TText( xL, yT, c_Text ) );
 	i_Text.back()->SetTextSize( i_Text.back()->GetTextSize() * 1.1 );
@@ -1577,7 +1577,7 @@ void VDisplay::setInfoText()
 	i_Text.push_back( new TText( xL, yT, c_Text ) );
 	i_Text.push_back( new TText( xL, yT, "" ) );
 	i_Text.back()->SetTextSize( i_Text.back()->GetTextSize() * 1.1 );
-	
+
 	// run info
 	sprintf( c_Text, "Target: %s (ra,dec)=(%.2f,%.2f), wobble E %.2f, N %.2f", fEventLoop->getRunParameter()->fTargetName.c_str(),
 			 fEventLoop->getRunParameter()->fTargetRA,
@@ -1586,7 +1586,7 @@ void VDisplay::setInfoText()
 			 fEventLoop->getRunParameter()->fWobbleNorth );
 	i_Text.push_back( new TText( xL, yT, c_Text ) );
 	i_Text.push_back( new TText( xL, yT, "" ) );
-	
+
 	// calibration and analysis parameters
 	for( unsigned int i = 0; i < fEventLoop->getTeltoAna().size(); i++ )
 	{
@@ -1618,7 +1618,7 @@ void VDisplay::setInfoText()
 				 fEventLoop->getAnalyzer()->getSumFirst() );
 		i_Text.push_back( new TText( xL, yT, c_Text ) );
 	}
-	
+
 	// draw everything
 	for( unsigned int i = 0; i < i_Text.size(); i++ )
 	{
@@ -1638,7 +1638,7 @@ void VDisplay::drawCalibrationHistos()
 	{
 		cout << "VDisplay::drawCalibrationHistos()" << endl;
 	}
-	
+
 	// is there a channel selected
 	unsigned int iChannel = 0;
 	if( fSelectedChan < 200000 )
@@ -1649,9 +1649,9 @@ void VDisplay::drawCalibrationHistos()
 	{
 		iChannel = fSelectedChan - 200000;
 	}
-	
+
 	double iMeanDistributionValue = -99.;
-	
+
 	TH1F* ihis = 0;
 	TH1F* ihis2 = 0;
 	fCanvasCal->cd();
@@ -1777,7 +1777,7 @@ void VDisplay::drawCalibrationHistos()
 					fEventLoop->getEventTime() );
 		}
 	}
-	
+
 	////////////////////////////////////////////
 	// plot everything
 	if( ihis )
@@ -1801,7 +1801,7 @@ void VDisplay::drawCalibrationHistos()
 	{
 		fCanvasCal->Clear();
 	}
-	
+
 	fCanvasCal->Update();
 }
 
@@ -1815,25 +1815,25 @@ void VDisplay::drawPixelHistos()
 
 	fCanvasPixelHisto->Clear();
 	fCanvasPixelHisto->Divide( 1, 3 );
-	
+
 	TPad* iP = ( TPad* )fCanvasPixelHisto->cd( 3 );
 	if( !drawTgradGraphs() )
 	{
 		iP->Clear();
 	}
-	
+
 	iP = ( TPad* )fCanvasPixelHisto->cd( 1 );
 	if( !drawImageBorderCharge() )
 	{
 		iP->Clear();
 	}
-	
+
 	iP = ( TPad* )fCanvasPixelHisto->cd( 2 );
 	if( !drawImageBorderTZero() )
 	{
 		iP->Clear();
 	}
-	
+
 	fCanvasPixelHisto->Update();
 }
 
@@ -1845,7 +1845,7 @@ void VDisplay::drawPixelHistos()
 bool VDisplay::drawImageBorderTZero()
 {
 	fEventLoop->getData()->setTelID( fTelescope );
-	
+
 	// get maximum/minimum  tzero per pixel
 	double y_max = 0.;
 	double y_min = 0.;
@@ -1875,7 +1875,7 @@ bool VDisplay::drawImageBorderTZero()
 	double y_diff = 0.1 * ( y_max - y_min );
 	y_max += y_diff;
 	y_min -= y_diff;
-	
+
 	TH1D* hAll = new TH1D( "hAll", "", 100, y_min, y_max );
 	hAll->SetStats( 0 );
 	hAll->SetLineWidth( 2 );
@@ -1887,12 +1887,12 @@ bool VDisplay::drawImageBorderTZero()
 	hAll->GetYaxis()->SetTitleSize( 0.06 );
 	hAll->GetYaxis()->SetLabelSize( 0.05 );
 	hAll->GetYaxis()->SetTitleOffset( 0.7 );
-	
+
 	TH1D* hImage = new TH1D( "hImage", "", 100, y_min, y_max );
 	hImage->SetStats( 0 );
 	hImage->SetLineWidth( 2 );
 	hImage->SetLineColor( 4 );
-	
+
 	for( unsigned int i = 0; i < fEventLoop->getData()->getTZeros().size(); i++ )
 	{
 		if( fEventLoop->getData()->getSums()[i] > 0. )
@@ -1909,15 +1909,15 @@ bool VDisplay::drawImageBorderTZero()
 		gPad->SetLogy( 1 );
 	}
 	hAll->DrawCopy();
-	
+
 	if( hImage->GetEntries() > 0 )
 	{
 		hImage->DrawCopy( "same" );
 	}
-	
+
 	delete hAll;
 	delete hImage;
-	
+
 	return true;
 }
 
@@ -1925,7 +1925,7 @@ bool VDisplay::drawImageBorderTZero()
 bool VDisplay::drawImageBorderCharge()
 {
 	fEventLoop->getData()->setTelID( fTelescope );
-	
+
 	// get maximum charge per pixel
 	double y_max = 0.;
 	int z = 0;
@@ -1951,12 +1951,12 @@ bool VDisplay::drawImageBorderCharge()
 	{
 		y_max = 1.;
 	}
-	
+
 	if( z < 2 )
 	{
 		return false;
 	}
-	
+
 	TH1D* hAll = new TH1D( "hAll", "", 100, 0., y_max * 1.3 );
 	hAll->SetStats( 0 );
 	hAll->SetLineWidth( 2 );
@@ -1968,7 +1968,7 @@ bool VDisplay::drawImageBorderCharge()
 	hAll->GetYaxis()->SetTitleSize( 0.06 );
 	hAll->GetYaxis()->SetLabelSize( 0.05 );
 	hAll->GetYaxis()->SetTitleOffset( 0.7 );
-	
+
 	TH1D* hImage = new TH1D( "hImage", "", 100, 0., y_max * 1.3 );
 	hImage->SetStats( 0 );
 	hImage->SetLineWidth( 2 );
@@ -1977,7 +1977,7 @@ bool VDisplay::drawImageBorderCharge()
 	hBorder->SetStats( 0 );
 	hBorder->SetLineWidth( 2 );
 	hBorder->SetLineColor( 3 );
-	
+
 	for( unsigned int i = 0; i < fEventLoop->getData()->getSums().size(); i++ )
 	{
 		if( fEventLoop->getData()->getSums()[i] > 0. )
@@ -1998,7 +1998,7 @@ bool VDisplay::drawImageBorderCharge()
 		gPad->SetLogy( 1 );
 	}
 	hAll->DrawCopy();
-	
+
 	if( hBorder->GetEntries() > 0 )
 	{
 		hBorder->DrawCopy( "same" );
@@ -2007,7 +2007,7 @@ bool VDisplay::drawImageBorderCharge()
 	{
 		hImage->DrawCopy( "same" );
 	}
-	
+
 	// draw telescope number
 	char tname[200];
 	sprintf( tname, "T%d", fTelescope + 1 );
@@ -2017,11 +2017,11 @@ bool VDisplay::drawImageBorderCharge()
 	iT->SetY( 0.7 );
 	iT->SetTextSize( 3.*iT->GetTextSize() );
 	iT->Draw();
-	
+
 	delete hAll;
 	delete hImage;
 	delete hBorder;
-	
+
 	return true;
 }
 
@@ -2042,14 +2042,14 @@ bool VDisplay::drawTgradGraphs()
 		}
 		cout << " (should be 3)" << endl;
 	}
-	
+
 	fEventLoop->getData()->setTelID( fTelescope );
 	TGraphErrors* xgraph = fEventLoop->getData()->getXGraph();
 	if( !xgraph || xgraph->GetN() < 1 )
 	{
 		return false;
 	}
-	
+
 	double y_min = 0.;
 	double y_max = 20.;
 	double x_min =  1.e10;
@@ -2083,16 +2083,16 @@ bool VDisplay::drawTgradGraphs()
 	double y_add = 0.2 * ( y_max - y_min );
 	y_min -= y_add;
 	y_max += y_add;
-	
+
 	if( TMath::Abs( y_min - y_max ) < 1.e-2 )
 	{
 		y_min = -0.5;
 		y_max = 0.5;
 	}
-	
+
 	x_max += 1.2;
 	x_min -= 1.2;
-	
+
 	TH2F* h1 = new TH2F( "h1", "", 0, x_min, x_max, 0, y_min, y_max );
 	h1->SetStats( 0 );
 	h1->SetTitle( "" );
@@ -2100,7 +2100,7 @@ bool VDisplay::drawTgradGraphs()
 	h1->GetXaxis()->SetTitleSize( 0.06 );
 	h1->GetXaxis()->SetLabelSize( 0.05 );
 	h1->GetXaxis()->SetTitleOffset( 0.8 );
-	
+
 	char histitle[200];
 	if( TMath::Abs( fEventLoop->getDetectorGeo()->getLengthOfSampleTimeSlice( fTelescope )
 					- TMath::Floor( fEventLoop->getDetectorGeo()->getLengthOfSampleTimeSlice( fTelescope ) ) ) < 1.e-3 )
@@ -2115,7 +2115,7 @@ bool VDisplay::drawTgradGraphs()
 	h1->GetYaxis()->SetTitleSize( 0.06 );
 	h1->GetYaxis()->SetLabelSize( 0.05 );
 	h1->GetYaxis()->SetTitleOffset( 0.7 );
-	
+
 	h1->GetXaxis()->SetTitle( "PMT position on long axis [deg]" );
 	h1->DrawCopy();
 	if( xgraph && xgraph->GetN() > 1 )
@@ -2125,9 +2125,9 @@ bool VDisplay::drawTgradGraphs()
 		xgraph->SetMarkerStyle( 20 );
 		xgraph->Draw( "P" );
 	}
-	
+
 	delete h1;
-	
+
 	return true;
 }
 
@@ -2146,12 +2146,12 @@ void VDisplay::defineGui()
 	fL5 = new TGLayoutHints( kLHintsTop );
 	fL6 = new TGLayoutHints( kLHintsTop | kLHintsLeft, 2, 2, 2, 2 );
 	fL8 = new TGLayoutHints( kLHintsTop | kLHintsRight, 2, 2, 2, 2 );
-	
+
 	fL3 = new TGLayoutHints( kLHintsTop | kLHintsRight, 0, 0, 0, 0 );
 	fL7 = new TGLayoutHints( kLHintsBottom | kLHintsRight, 0, 0, 0, 0 );
-	
+
 	// main menu bar
-	
+
 	fMenuBar = new TGMenuBar( this, 1, 1, kHorizontalFrame );
 	fMenuFile = new TGPopupMenu( fClient->GetRoot() );
 	fMenuFile->AddSeparator();
@@ -2180,38 +2180,38 @@ void VDisplay::defineGui()
 	fMenuBar->AddPopup( "&options", fMenuOpt, fL6 );
 	AddFrame( fMenuBar, fL4 );
 	fMenuOpt->CheckEntry( M_OPT_COL_SCHE );
-	
+
 	// status bar (at the bottom of the window)
-	
+
 	fStatusBar = new TGStatusBar( this, 50, 10, kHorizontalFrame );
 	Int_t parts[] = {45, 30, 25};
 	// three divisions (file name, eventnumber, ??)
 	fStatusBar->SetParts( parts, 3 );
 	AddFrame( fStatusBar, new TGLayoutHints( kLHintsBottom | kLHintsExpandX, 0, 0, 0, 0 ) );
-	
+
 	string iTemp = "reading file ";
 	iTemp += fEventLoop->getDataFileName();
 	fStatusBar->SetText( iTemp.c_str(), 0 );
 	fStatusBar->SetText( "now at event ", 1 );
-	
+
 	// main frame
 	fFrameTable = new TGCompositeFrame( this, 100, 100, kRaisedFrame );
 	AddFrame( fFrameTable, fL1 );
-	
+
 	UInt_t ywm = GetHeight();
 	UInt_t xwm = GetWidth();
 	// camera canvas is quadratic
 	int iCanvasCameraSize = ( int )( 570. / 1000. * ( double )xwm );
 	int iCanvasFADCSIZEX = ( int )( 400. / 700. * ( double )ywm * 1.03 );
 	int iCanvasFADCSIZEY = ( int )( 330. / 700. * ( double )ywm );
-	
+
 	fEmCanvasCamera = new TRootEmbeddedCanvas( "mainCanvas", fFrameTable, iCanvasCameraSize, iCanvasCameraSize );
 	fCanvasCamera = ( TCanvas* )fEmCanvasCamera->GetCanvas();
 	fFrameTable->AddFrame( fEmCanvasCamera, fL2 );
-	
+
 	// event control
 	fFrameControl = new TGCompositeFrame( fFrameTable, iCanvasCameraSize, 100 );
-	
+
 	fHorizontalEvent = new TGHorizontalFrame( fFrameControl, 100, 60 );
 	fButtonNext = new TGTextButton( fHorizontalEvent, "&next", B_NEXT );
 	fButtonNext->Associate( this );
@@ -2257,7 +2257,7 @@ void VDisplay::defineGui()
 	fComboCameraView->Select( 0 );
 	fComboCameraView->Associate( this );
 	fComboCameraView->Resize( 110, 20 );
-	
+
 	fComboTelescopeN = new TGComboBox( fHorizontalEvent, B_TELN );
 	if( fEventLoop->getTeltoAna().size() > 1 )
 	{
@@ -2294,19 +2294,19 @@ void VDisplay::defineGui()
 	fHorizontalEvent->AddFrame( fComboCameraView, fL6 );
 	fFrameControl->AddFrame( fHorizontalEvent, fL4 );
 	fFrameTable->AddFrame( fFrameControl, fL5 );
-	
+
 	/*  fEmCanvasCamera = new TRootEmbeddedCanvas( "mainCanvas", fFrameTable, iCanvasCameraSize, iCanvasCameraSize );
 	  fCanvasCamera = (TCanvas*)fEmCanvasCamera->GetCanvas();
 	  fFrameTable->AddFrame( fEmCanvasCamera, fL2 ); */
-	
+
 	// start with charge display
 	fCameraDisplay = C_CHARGE;
 	fCanvasesNx = ( unsigned int )sqrt( ( double )fCamera.size() );
 	fCanvasesNy = fCamera.size() / fCanvasesNx;
-	
+
 	// tab with analysis canvas, button
 	fTabAna = new TGTab( fFrameTable, 400, 600 );
-	
+
 	// general information tab
 	fFrameInfo = fTabAna->AddTab( "info" );
 	fCompInfo = new TGCompositeFrame( fFrameInfo, 60, 20, kVerticalFrame );
@@ -2316,7 +2316,7 @@ void VDisplay::defineGui()
 	fCanvasInfo = fEmInfo->GetCanvas();
 	fPaveInfo = new TPaveText( 0.01, 0.01, 0.99, 0.99 );
 	fPaveInfo->SetFillColor( 10 );
-	
+
 	// FADC tab
 	fFrameFADC = fTabAna->AddTab( "FADC" );
 	fAnaDisplay = F_FADC;
@@ -2398,7 +2398,7 @@ void VDisplay::defineGui()
 	fNEntryOInc->SetLimits( TGNumberFormat::kNELLimitMin, 1 );
 	fNEntryOInc->Associate( this );
 	fGroupOptRun->AddFrame( fNEntryOInc, fL6 );
-	
+
 	// frame with display options
 	fGroupOptDis = new TGButtonGroup( fCompOpt, "coordinate system", kHorizontalFrame );
 	fCompOpt->AddFrame( fGroupOptDis, fL4 );
@@ -2414,15 +2414,15 @@ void VDisplay::defineGui()
 	fRadioB4->Associate( this );
 	fRadioB1->SetState( kButtonDown );
 	fGroupOptDis->Show();
-	
+
 	// frame with telescope selections
-	
+
 	fGroupTelFrame = new TGGroupFrame( fCompOpt, "run parameters" );
 	fCompOpt->AddFrame( fGroupTelFrame, fL4 );
-	
+
 	fGroupOptTel = new TGButtonGroup( fGroupTelFrame, "telescopes", kHorizontalFrame );
 	fGroupTelFrame->AddFrame( fGroupOptTel, fL4 );
-	
+
 	fRadioTA = new TGRadioButton( fGroupOptTel, "all", B_TALL );
 	fRadioTA->Associate( this );
 	// don't write more than 8 of this radio buttons (no space for more...)
@@ -2437,11 +2437,11 @@ void VDisplay::defineGui()
 	}
 	fRadioTA->SetState( kButtonDown );
 	fGroupOptTel->Show();
-	
+
 	// frame with analysis parameters/cuts
 	fGroupAnaFrame = new TGHorizontalFrame( fGroupTelFrame, 60, 20 );
 	fGroupTelFrame->AddFrame( fGroupAnaFrame, fL4 );
-	
+
 	// frame with analysis parameters
 	fGroupOptAna = new TGGroupFrame( fGroupAnaFrame, "analysis parameters", kVerticalFrame );
 	fGroupAnaFrame->AddFrame( fGroupOptAna, fL4 );
@@ -2466,7 +2466,7 @@ void VDisplay::defineGui()
 	fNEntryOBor = new TGNumberEntry( fGroupOptAna, fEventLoop->getAnalyzer()->getBorderThresh(), 5, B_NBOR, ( TGNumberFormat::EStyle ) 2 );
 	fNEntryOBor->SetLimits( TGNumberFormat::kNELLimitMin, 0. );
 	fGroupOptAna->AddFrame( fNEntryOBor, fL6 );
-	
+
 	// frame with cuts
 	fGroupOptCut = new TGGroupFrame( fGroupAnaFrame, "cuts", kVerticalFrame );
 	fGroupAnaFrame->AddFrame( fGroupOptCut, fL4 );
@@ -2494,7 +2494,7 @@ void VDisplay::defineGui()
 	fTextOptCuts->Resize( 10, fTextOptCuts->GetDefaultHeight() );
 	fTextOptCuts->Associate( this );
 	fGroupOptCut->AddFrame( fTextOptCuts, fL4 );
-	
+
 	fGroupSetFrame = new TGHorizontalFrame( fCompOpt, 60, 20 );
 	fCompOpt->AddFrame( fGroupSetFrame, fL6 );
 	fButtonOptSet = new TGTextButton( fGroupSetFrame, "&set", B_SET );
@@ -2503,7 +2503,7 @@ void VDisplay::defineGui()
 	fButtonOptReset = new TGTextButton( fGroupSetFrame, "&reset", B_RESET );
 	fButtonOptReset->Associate( this );
 	fGroupSetFrame->AddFrame( fButtonOptReset, fL6 );
-	
+
 	// shower reconstruction (array view and reconstructed shower parameters)
 	// birds eye tab
 	fFrameBird = fTabAna->AddTab( "shower" );
@@ -2516,7 +2516,7 @@ void VDisplay::defineGui()
 	fCanvasBird->SetTickx( 1 );
 	fCanvasBird->SetTicky( 1 );
 	fCompBird->AddFrame( fEmBird, fL6 );
-	
+
 	fFrameTable->AddFrame( fTabAna, fL3 );
 }
 
@@ -2580,10 +2580,10 @@ void VDisplay::subprocessMenu( Long_t parm1 )
 		case M_FILE_EXIT:
 			CloseWindow();
 			break;
-			
+
 		// plot signal amplitudes with different colors
 		case M_OPT_COL_SCHE:
-		
+
 			gStyle->SetPalette( 1 );
 			gStyle->SetNumberContours( 100 );
 			if( fBoolDrawAllinOne )
@@ -2611,17 +2611,17 @@ void VDisplay::subprocessMenu( Long_t parm1 )
 			}
 			updateCamera( fCameraDisplay );
 			break;
-			
+
 		// plot signal amplitudes with grey scale
 		case M_OPT_BW_SCHE:
-		
+
 			if( fBoolDrawAllinOne )
 			{
 				break;    // can't draw several images in color scheme into one camera
 			}
 			gStyle->SetPalette( fBWNum, fBWPalette );
 			gStyle->SetNumberContours( 100 );
-			
+
 			for( unsigned int i = 0; i < fTelescopesToShow.size(); i++ )
 			{
 				if( fCamera[fTelescopesToShow[i]]->getPlotColor() == 2 )
@@ -2643,9 +2643,9 @@ void VDisplay::subprocessMenu( Long_t parm1 )
 			}
 			updateCamera( fCameraDisplay );
 			break;
-			
+
 		// plot signals with fixed scale
-		
+
 		case M_OPT_FIX:
 			for( unsigned int i = 0; i < fTelescopesToShow.size(); i++ )
 			{
@@ -2664,7 +2664,7 @@ void VDisplay::subprocessMenu( Long_t parm1 )
 			}
 			updateCamera( fCameraDisplay );
 			break;
-			
+
 		// plot all traces of one telescope in FADC canvas
 		case M_OPT_SING:
 			fBoolDrawImageTraces = !fBoolDrawImageTraces;
@@ -2680,7 +2680,7 @@ void VDisplay::subprocessMenu( Long_t parm1 )
 			break;
 		default:
 			break;
-			
+
 		// dump dead channel list
 		case M_OPT_DEAD:
 			dumpDeadChannels();
@@ -2906,7 +2906,7 @@ void VDisplay::subprocessButton( Long_t parm1 )
 				}
 			}
 			break;
-			
+
 		default:
 			break;
 	}
@@ -3037,7 +3037,7 @@ void VDisplay::subprocessComboBox( Long_t parm1 )
 	{
 		cout << "VDisplay::subprocessComboBox " << parm1 << "\t" << fCamera.size() << "\t" << fComboTelescopeN->GetSelected() << endl;
 	}
-	
+
 	fCameraDisplay = ( E_cameraIdent )fComboCameraView->GetSelected();
 	// draw all telescopes (each in one pad, one pad beside another)
 	if( fComboTelescopeN->GetSelected() == 0 )
@@ -3218,7 +3218,7 @@ void VDisplay::plotFADCFit( int iChanID )
 	{
 		cout << "VDisplay::plotFADCFit() " << iChanID << endl;
 	}
-	
+
 	drawFADC( true );
 }
 
@@ -3229,7 +3229,7 @@ void VDisplay::dumpDeadChannels()
 	{
 		cout << "VDisplay::dumpDeadChannels()" << endl;
 	}
-	
+
 	if( fEventLoop )
 	{
 		for( unsigned int i = 0; i < fEventLoop->getTeltoAna().size(); i++ )
@@ -3251,13 +3251,13 @@ void VDisplay::dumpImageBorderPixels()
 	{
 		cout << "VDisplay::dumpImageBorderPixels()" << endl;
 	}
-	
+
 	if( fEventLoop )
 	{
 		for( unsigned int i = 0; i < fEventLoop->getTeltoAna().size(); i++ )
 		{
 			fEventLoop->setTelID( fEventLoop->getTeltoAna()[i] );
-			
+
 			multimap< double, unsigned int > i_ImagePixel;
 			multimap< double, unsigned int >::iterator it_ImagePixel;
 			multimap< double, unsigned int > i_BorderPixel;

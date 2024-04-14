@@ -42,7 +42,7 @@ bool VBFDataReader::getNextEvent()
 		cout << "VBFDataReader::getNextEvent() " << endl;
 	}
 	bool bSimulations = false;
-	
+
 	try
 	{
 		if( fDebug )
@@ -76,14 +76,14 @@ bool VBFDataReader::getNextEvent()
 			}
 			fEventNumber = index - 1;
 			index++;
-			
+
 			// check if this is a simulation header
 			if( pack->hasSimulationHeader() )
 			{
 				printSimulationHeader( pack, fPrintDetectorConfig );
 				fMonteCarloHeader = fillSimulationHeader( pack );
 			}
-			
+
 			if( setSimulationData( pack ) )
 			{
 				fDataFormat = "MCvbf";
@@ -98,10 +98,10 @@ bool VBFDataReader::getNextEvent()
 				fEventNumber = getSMC_eventNumber();
 				bSimulations = true;
 			}
-			
+
 			bool gotOneEv = false;
 			fArrayTrigger = false;
-			
+
 			if( pack->hasArrayEvent() )
 			{
 				ae = pack->getArrayEvent();
@@ -116,10 +116,10 @@ bool VBFDataReader::getNextEvent()
 					cout << ", counting event number " << fEventNumber;
 					cout << endl;
 				}
-				
+
 				setEventStatus( 0 );
 				bitset< 8 * sizeof( ULong64_t ) > ib;
-				
+
 				// check if event for requested telescopes are available
 				bool bComplete = true;
 				for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
@@ -178,7 +178,7 @@ bool VBFDataReader::getNextEvent()
 					}
 					return false;
 				}
-				
+
 				if( ae->hasTrigger() )
 				{
 					fArrayTrigger = true;
@@ -213,17 +213,17 @@ bool VBFDataReader::getNextEvent()
 				cout << "\t" << gotOneEv;
 				cout << endl;
 			}
-			
+
 			if( !gotOneEv && !bSimulations )
 			{
 				continue;
 			}
-			
+
 			if( fDebug )
 			{
 				cout << "bool VBFRawDataReader::getNextEvent() (end)" << endl;
 			}
-			
+
 			return true;
 		}
 	}
@@ -261,7 +261,7 @@ vector< bool >& VBFDataReader::getLocalTrigger()
 	{
 		ib_temp.clear();
 	}
-	
+
 	/* -------
 	    additonal test to check local trigger vector with eventtype
 	    but: has to be used differently for pedestal runs, etc...
@@ -283,7 +283,7 @@ vector< bool >& VBFDataReader::getLocalTrigger()
 	}
 	}
 	---- */
-	
+
 	return ib_temp;
 }
 
@@ -339,7 +339,7 @@ uint16_t VBFDataReader::getNumSamples()
 	{
 		return fEvent[fTelID]->getNumSamples();
 	}
-	
+
 	return 0;     // note: VEventLoop::initEventLoop depends on this
 }
 

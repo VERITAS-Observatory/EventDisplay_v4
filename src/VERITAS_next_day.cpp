@@ -35,14 +35,14 @@ int main( int argc, char* argv[] )
 {
 	bool fDebug = false;
 	bool fMergeFITSFiles = true;
-	
+
 	/////////////////////////////////////////
 	// read command line parameters
 	if( argc == 1 )
 	{
 		help();
 	}
-	
+
 	string fDataFile = argv[1];
 	string fOUTFile = argv[2];
 	string fTargetName = argv[3];
@@ -54,7 +54,7 @@ int main( int argc, char* argv[] )
 	{
 		fDebug = true;
 	}
-	
+
 	/////////////////////////////////////////
 	// calculate total fluxes and upper limits
 	double fMinEnergy = 0.2;
@@ -81,15 +81,15 @@ int main( int argc, char* argv[] )
 	fluxUL->setDebug( fDebug );
 	fluxUL->setSignificanceParameters( 99999, 999999 );
 	fluxUL->calculateFluxes( fMinEnergy, false );
-	
-	
+
+
 	// read run list
 	VAnalysisUtilities a;
 	a.openFile( fDataFile, -1, true, fDebug );
 	if( !a.IsZombie() )
 	{
 		CRunSummary* c = a.getRunSummaryTree( -1 );
-		
+
 		// open output stream
 		ofstream fResults;
 		fResults.open( ( fOUTFile + ".dat" ).c_str() );
@@ -100,7 +100,7 @@ int main( int argc, char* argv[] )
 				c->GetEntry( i );
 				if( i == 0 )
 				{
-				
+
 					fResults << setw( 12 ) << left << "MJD" ;
 					fResults << setw( 6 ) << left << "RA" ;
 					fResults << setw( 6 ) << left << "Dec" ;
@@ -136,14 +136,14 @@ int main( int argc, char* argv[] )
 					fResults << setw( 14 ) << left << "[percent]";
 					fResults << endl;
 				}
-				
+
 				if( c->runOn > 0 )
 				{
 					flux->getFlux( c->runOn, iFlux, iFluxE, var1 );
 					iFluxInCU = flux->getFluxVsCrab( iFlux, fMinEnergy, fGamma );
 					fluxUL->getFlux( c->runOn, var1, var2, iFluxUL );
 					iFluxULinCU = fluxUL->getFluxVsCrab( iFluxUL, fMinEnergy, fGamma );
-					
+
 					fResults.precision( 9 );
 					fResults << setw( 12 ) << left << c->MJDOn;
 					fResults.precision( 4 );
@@ -170,7 +170,7 @@ int main( int argc, char* argv[] )
 					iFluxInCU = flux->getFluxVsCrab( iFlux, fMinEnergy, fGamma );
 					fluxUL->getFlux( -1, var1, var2, iFluxUL );
 					iFluxULinCU = fluxUL->getFluxVsCrab( iFluxUL, fMinEnergy, fGamma );
-					
+
 					fResults << setw( 12 ) << left << "Total:";
 					fResults << setw( 6 ) << left << c->TargetRAJ2000 ;
 					fResults << setw( 6 ) << left << c->TargetDecJ2000 ;
@@ -189,13 +189,13 @@ int main( int argc, char* argv[] )
 					fResults << setw( 14 ) << left << iFluxULinCU ;
 					fResults << endl;
 				}
-				
+
 			}
 		}
-		
+
 		/////////////////////////////////////////
 		// convert to fits
-		
+
 		cout << "---------Start production of FITS ouput file ------" << endl;
 		VFITS f( fDataFile, fOUTFile + ".fits", fTargetName, fMergeFITSFiles, fDebug );
 		f.writeCumSignificance( fDebug );
@@ -206,6 +206,6 @@ int main( int argc, char* argv[] )
 		f.writeSignificanceSkyMap( fDebug );
 		f.writeExcessSkyMap( fDebug );
 		f.writeFITSFile( fDebug );
-		
+
 	}
 }

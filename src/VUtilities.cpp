@@ -90,7 +90,7 @@ string VUtilities::removeSpaces( string stringIn )
 {
 	string::size_type pos = 0;
 	bool spacesLeft = true;
-	
+
 	while( spacesLeft )
 	{
 		pos = stringIn.find( " " );
@@ -103,7 +103,7 @@ string VUtilities::removeSpaces( string stringIn )
 			spacesLeft = false;
 		}
 	}
-	
+
 	return stringIn;
 }
 
@@ -116,7 +116,7 @@ string VUtilities::remove_leading_spaces( string stringIn )
 {
 	string::size_type pos = 0;
 	bool spacesLeft = true;
-	
+
 	while( spacesLeft )
 	{
 		pos = stringIn.find( " " );
@@ -124,7 +124,7 @@ string VUtilities::remove_leading_spaces( string stringIn )
 		{
 			pos = stringIn.find( "\t" );
 		}
-		
+
 		if( pos == 0 && pos != string::npos )
 		{
 			stringIn.erase( pos, 1 );
@@ -134,7 +134,7 @@ string VUtilities::remove_leading_spaces( string stringIn )
 			spacesLeft = false;
 		}
 	}
-	
+
 	return stringIn;
 }
 
@@ -150,10 +150,10 @@ string VUtilities::trim_spaces( string str, string whitespace )
 	{
 		return "";    // no content
 	}
-	
+
 	const size_t strEnd = str.find_last_not_of( whitespace );
 	const size_t strRange = strEnd - strBegin + 1;
-	
+
 	return str.substr( strBegin, strRange );
 }
 
@@ -193,29 +193,29 @@ double VUtilities::line_point_distance( double x1, double y1, double z1, double 
 {
 	double alt = 90. - ze;
 	az = 180. - az;
-	
+
 	double cx = -1.*cos( alt * TMath::DegToRad() ) * cos( az * TMath::DegToRad() );
 	double cy = -1.*cos( alt * TMath::DegToRad() ) * sin( az * TMath::DegToRad() );
 	double cz = sin( alt * TMath::DegToRad() );
-	
+
 	double a1 = ( y - y1 ) * cz - ( z - z1 ) * cy;
 	double a2 = ( z - z1 ) * cx - ( x - x1 ) * cz;
 	double a3 = ( x - x1 ) * cy - ( y - y1 ) * cx;
 	double a  = a1 * a1 + a2 * a2 + a3 * a3;
 	double b = cx * cx + cy * cy + cz * cz;
-	
+
 	if( a < 0. || b <= 0. )
 	{
 		return -1;
 	}
-	
+
 	return sqrt( a / b );
 }
 
 unsigned int VUtilities::count_number_of_textblocks( string str )
 {
 	str = trim_spaces( str );
-	
+
 	unsigned int z = 0;
 	string iTemp;
 	istringstream is_stream( str );
@@ -224,6 +224,6 @@ unsigned int VUtilities::count_number_of_textblocks( string str )
 		is_stream >> iTemp;
 		z++;
 	}
-	
+
 	return z;
 }

@@ -43,11 +43,11 @@ int main( int argc, char* argv[] )
 		cout << "Error: Cannot use -m and -l at the same time." << endl;
 		return 0;
 	}
-	
+
 	VExposure a;
 	a.setObservingMode( bOBSMODE );
 	a.setDoCheckSums( bCheckSums );
-	
+
 	if( runnumber > 0 )
 	{
 		a.setTelMinElevation( -99999.0 );
@@ -57,14 +57,14 @@ int main( int argc, char* argv[] )
 		a.setSelectLaser( laserruns );
 		a.setPrintVerbose( verbose );
 		a.setPrintTimeMask( timemask );
-		
+
 		a.readRunCommentsFromDB();
 		if( laserruns == 1 )
 		{
 			a.getLaserList();
 		}
 		a.printListOfRuns();
-		
+
 		if( bCHECKDISK )
 		{
 			a.checkRunList();
@@ -80,7 +80,7 @@ int main( int argc, char* argv[] )
 		a.printChecksumSummary();
 		return 0;
 	}
-	
+
 	if( runlist != "" )
 	{
 		a.readRunListFromFile( runlist );
@@ -88,7 +88,7 @@ int main( int argc, char* argv[] )
 		a.setSelectLaser( laserruns );
 		a.setPrintVerbose( verbose );
 		a.setPrintTimeMask( timemask );
-		
+
 		a.readRunCommentsFromDB();
 		if( laserruns == 1 )
 		{
@@ -103,14 +103,14 @@ int main( int argc, char* argv[] )
 		{
 			a.checkRunList();
 		}
-		
+
 		if( bANASUM )
 		{
 			a.outputAnasumRunlist( fAnasumFile );
 		}
-		
+
 		a.printChecksumSummary();
-		
+
 		return 0;
 	}
 	else if( laserlist != "" )
@@ -125,13 +125,13 @@ int main( int argc, char* argv[] )
 		{
 			a.checkRunList();
 		}
-		
+
 		if( bANASUM )
 		{
 			a.outputAnasumRunlist( fAnasumFile );
 		}
 		a.printChecksumSummary();
-		
+
 		return 0;
 	}
 	else
@@ -144,7 +144,7 @@ int main( int argc, char* argv[] )
 		a.setMinDuration( duration );
 		a.setPrintVerbose( verbose );
 		a.setPrintTimeMask( timemask );
-		
+
 		a.readFromDB();
 		a.readRunCommentsFromDB();
 		if( laserruns == 1 )
@@ -160,19 +160,19 @@ int main( int argc, char* argv[] )
 		{
 			a.checkRunList();
 		}
-		
+
 		if( bANASUM )
 		{
 			a.outputAnasumRunlist( fAnasumFile );
 		}
-		
+
 		a.printChecksumSummary();
-		
+
 		return 0;
 	}
-	
+
 	return 0;
-	
+
 }
 
 void parseOptions( int argc, char* argv[] )
@@ -200,7 +200,7 @@ void parseOptions( int argc, char* argv[] )
 			{"nomd5sum", no_argument, NULL, 'n'},
 			{ 0, 0, 0, 0 }
 		};
-		
+
 		int option_index = 0;
 		int c = getopt_long( argc, argv, "ho:l:m:b:e:s:z:d:xgtvr:a:cfn", long_options, &option_index );
 		if( optopt != 0 )
@@ -217,7 +217,7 @@ void parseOptions( int argc, char* argv[] )
 		{
 			break;
 		}
-		
+
 		switch( c )
 		{
 			case 0:
@@ -308,4 +308,3 @@ void parseOptions( int argc, char* argv[] )
 	}
 	return;
 }
-

@@ -22,7 +22,7 @@ VImageParameterCalculation::VImageParameterCalculation( unsigned int iShortTree,
 	fboolCalcTiming = false;
 	fDetectorGeometry = 0;
 	fHoughTransform = 0;
-	
+
 }
 
 
@@ -85,7 +85,7 @@ void VImageParameterCalculation::calcTimingParameters()
 	{
 		return;
 	}
-	
+
 	vector< double > xpos;
 	vector< double > t;
 	vector< double > et;
@@ -154,7 +154,7 @@ void VImageParameterCalculation::calcTimingParameters()
 			fParGeo->tmean += fData->getTZeros()[i];
 		}
 	}
-	
+
 	///////////////////////////////////////////////////
 	// find and remove outliers
 	if( xpos.size() > 9 && i_xmin < i_xmax )
@@ -182,7 +182,7 @@ void VImageParameterCalculation::calcTimingParameters()
 			}
 		}
 	}
-	
+
 	TGraphErrors* xgraph = fData->getXGraph();
 	if( xgraph )
 	{
@@ -192,7 +192,7 @@ void VImageParameterCalculation::calcTimingParameters()
 				nclean++;
 			}
 		xgraph->Set( nclean );
-		
+
 		if( nclean > 2 )
 		{
 			// Fill the graphs for long (x) short(y) and radial (r) axis
@@ -208,7 +208,7 @@ void VImageParameterCalculation::calcTimingParameters()
 			}
 			xgraph->Fit( "pol1", "Q" );
 			TF1* xline = xgraph->GetFunction( "pol1" );
-			
+
 			if( !fData->getRunParameter()->fDoublePassErrorWeighting2005 )
 			{
 				// rescale errors to Chi2/NDF = 1. and redo the fit
@@ -230,7 +230,7 @@ void VImageParameterCalculation::calcTimingParameters()
 				xgraph->Fit( "pol1", "Q" );
 				xline = xgraph->GetFunction( "pol1" );
 			}
-			
+
 			// fill fit results
 			fParGeo->tint_x = xline->GetParameter( 0 );
 			fParGeo->tgrad_x = xline->GetParameter( 1 );
@@ -284,13 +284,13 @@ void VImageParameterCalculation::muonRingFinder()
 		fParGeo->muonRSigma = 0.0;
 		return;
 	}
-	
+
 	if( !getDetectorGeo() )
 	{
 		cout << "VImageParameterCalculation::muonRingFinder error: detector geometry not defined" << endl;
 		exit( EXIT_FAILURE );
 	}
-	
+
 	int counter = 0, safty = 0, noChangeX = 0, noChangeY = 0;
 	unsigned int i;
 	double x0[2] =
@@ -311,7 +311,7 @@ void VImageParameterCalculation::muonRingFinder()
 	};
 	double rTotal = 0.0, rSquaredTotal = 0.0, tmp;
 	double xi, yi;
-	
+
 	//calculate r to each point in the filtered binary image & thereby mean of r
 	for( i = 0; i < fData->getSums().size(); i++ )
 	{
@@ -325,7 +325,7 @@ void VImageParameterCalculation::muonRingFinder()
 			rSquaredTotal += tmp * tmp;
 		}
 	}
-	
+
 	if( counter > 10 )
 	{
 		rVariance[0] = ( rSquaredTotal - rTotal * rTotal / counter ) / counter;
@@ -355,7 +355,7 @@ void VImageParameterCalculation::muonRingFinder()
 		x0[1] = x0[0] + 0.1 / ( 1 + pow( safty, .3 ) );
 		y0[1] = y0[0];
 		noChangeX = 0;                            //reset the end switch
-		
+
 		//calculate r to each point in the filtered binary image
 		rTotal = 0;
 		rSquaredTotal = 0;
@@ -373,7 +373,7 @@ void VImageParameterCalculation::muonRingFinder()
 		}
 		rVariance[1] = ( rSquaredTotal - rTotal * rTotal / counter ) / counter;
 		rBar[1] = rTotal / counter;
-		
+
 		//is rVariance[1] > rVariance[0] ? then try a step in the -x direction
 		if( rVariance[1] > rVariance[0] )
 		{
@@ -395,7 +395,7 @@ void VImageParameterCalculation::muonRingFinder()
 			}
 			rVariance[1] = ( rSquaredTotal - rTotal * rTotal / counter ) / counter;
 			rBar[1] = rTotal / counter;
-			
+
 			//is rVariance[1] > rVariance[0] ? then keep original coordinate
 			if( rVariance[1] > rVariance[0] )
 			{
@@ -405,11 +405,11 @@ void VImageParameterCalculation::muonRingFinder()
 				noChangeX = 1;
 			}
 		}
-		
+
 		rBar[0] = rBar[1];
 		rVariance[0] = rVariance[1];              // why was this commented out??
 		x0[0] = x0[1];
-		
+
 		///*********************************************
 		// TAKE A STEP IN THE Y-DIRECTION ?
 		///*********************************************
@@ -417,7 +417,7 @@ void VImageParameterCalculation::muonRingFinder()
 		x0[1] = x0[0];
 		y0[1] = y0[0] + 0.1 / ( 1 + pow( safty, .3 ) );
 		noChangeY = 0;                            //reset the end switch
-		
+
 		//calculate r to each point in the filtered binary image
 		rTotal = 0;
 		rSquaredTotal = 0;
@@ -435,7 +435,7 @@ void VImageParameterCalculation::muonRingFinder()
 		}
 		rVariance[1] = ( rSquaredTotal - rTotal * rTotal / counter ) / counter;
 		rBar[1] = rTotal / counter;
-		
+
 		//is rVariance[1] > rVariance[0] ? then try a step in the -x direction
 		if( rVariance[1] > rVariance[0] )
 		{
@@ -457,7 +457,7 @@ void VImageParameterCalculation::muonRingFinder()
 			}
 			rVariance[1] = ( rSquaredTotal - rTotal * rTotal / counter ) / counter;
 			rBar[1] = rTotal / counter;
-			
+
 			//is rVariance[1] > rVariance[0] ? then keep original coordinate
 			if( rVariance[1] > rVariance[0] )
 			{
@@ -467,20 +467,20 @@ void VImageParameterCalculation::muonRingFinder()
 				noChangeY = 1;
 			}
 		}
-		
+
 		rBar[0] = rBar[1];
 		rVariance[0] = rVariance[1];
 		y0[0] = y0[1];
-		
+
 	}
-	
+
 	fParGeo->muonX0 = x0[1];
 	fParGeo->muonY0 = y0[1];
 	fParGeo->muonRadius = rBar[1];
 	fParGeo->muonRSigma = sqrt( rVariance[1] );
-	
+
 	//cout <<"x0 "<<fParGeo->muonX0<<",y0 "<<fParGeo->muonY0<<",R "<<fParGeo->muonRadius<<",RS "<<fParGeo->muonRSigma<<" steps: "<<safty<<endl;
-	
+
 }
 
 /*****************************************************************************
@@ -501,21 +501,21 @@ void VImageParameterCalculation::sizeInMuonRing()
 	{
 		return;
 	}
-	
+
 	//if( fParGeo->muonValid == 0 && fParGeo->houghMuonValid == 0 )
 	//{
 	//	fParGeo->muonSize = 0.0;
 	//	fParGeo->muonIPCorrectedSize = 0.0;
 	//	return;
 	//}
-	
+
 	if( fParGeo->muonValid == 0 && fParGeo->houghNpix == 0 )//Calculates size for muonValid or if HT was run.
 	{
 		fParGeo->muonSize = 0.0;
 		fParGeo->muonIPCorrectedSize = 0.0;
 		return;
 	}
-	
+
 	if( fData->getSums().size() == 0 || fParGeo->muonRadius == 0.0 )
 	{
 		fParGeo->muonSize = 0.0;
@@ -527,7 +527,7 @@ void VImageParameterCalculation::sizeInMuonRing()
 		cout << "VImageParameterCalculation::sizeInMuonRing error: detector geometry not defined" << endl;
 		exit( 0 );
 	}
-	
+
 	unsigned int i;
 	double xi, yi, size = 0.0, x0, y0, radius, si;
 	int totalPixels = 0;
@@ -537,24 +537,24 @@ void VImageParameterCalculation::sizeInMuonRing()
 	x0 = fParGeo->muonX0;
 	y0 = fParGeo->muonY0;
 	radius = fParGeo->muonRadius;
-	
+
 	for( i = 0; i < fData->getSums().size(); i++ )
 	{
 		xi = getDetectorGeo()->getX()[i];
 		yi = getDetectorGeo()->getY()[i];
 		double rp = sqrt( pow( xi - x0, 2 ) + pow( yi - y0, 2 ) );
-		
+
 		if( rp > radius - 0.15 && rp < radius + 0.15 )
 		{
 			if( fData->getBorder()[i] || fData->getImage()[i] )
 			{
 				si = ( double )fData->getSums()[i]; // charge (dc)
 				size += si;
-				
+
 				//Calculating the centroid here
 				xc += xi * si;
 				yc += yi * si;
-				
+
 				totalPixels ++;
 			}
 			if( fData->getDead()[i] )
@@ -568,29 +568,29 @@ void VImageParameterCalculation::sizeInMuonRing()
 	{
 		size *= ( 1.*offPixels ) / ( 1.0 * totalPixels ) + 1. ;
 	}
-	
+
 	//Finish calculating the centroid by dividing by size and save.
 	fParGeo->muonXC = xc / size;
 	fParGeo->muonYC = yc / size;
-	
+
 	//Fill size
 	fParGeo->muonSize = size;
-	
+
 	//Fill impact parameter corrected size
-	
+
 	//Impact parameter corrected size
 	float correctedSize = 0.0;
-	
+
 	//If GSL is installed, run the code otherwise set correctedSize to 0.0
 #ifndef NOGSL
 	correctedSize = size / this->correctSizeInMuonRing();
 #else
 	correctedSize = 0.0;
 #endif
-	
+
 	//Fill the tree
 	fParGeo->muonIPCorrectedSize = correctedSize;
-	
+
 }
 
 /*****************************************************************************
@@ -616,18 +616,18 @@ void VImageParameterCalculation::muonPixelDistribution()
 		cout << "VImageParameterCalculation::muonPixelDistribution error: detector geometry not defined" << endl;
 		exit( 0 );
 	}
-	
+
 	int totalPixels = 0, inside = 0, pass = 0;
 	unsigned int i;
 	int q[8] = {0};
 	double rp, phi, xi, yi, x0, y0, radius, rsigma;
-	
+
 	//Get previously determined muon parameters
 	x0 = fParGeo->muonX0;
 	y0 = fParGeo->muonY0;
 	radius = fParGeo->muonRadius;
 	rsigma = fParGeo->muonRSigma;
-	
+
 	for( i = 0; i < fData->getSums().size(); i++ )
 		if( fData->getImage()[i] || fData->getBorder()[i] )
 		{
@@ -636,13 +636,13 @@ void VImageParameterCalculation::muonPixelDistribution()
 			yi = getDetectorGeo()->getY()[i];
 			rp = sqrt( pow( xi - x0, 2 ) + pow( yi - y0, 2 ) );
 			phi = 180.0 / TMath::Pi() * atan2( yi - y0, xi - x0 ) + 180.;
-			
+
 			if( rp > radius - 1.5 * rsigma  && rp < radius + 1.5 * rsigma )
 			{
 				inside++;
-				
+
 				//	    cout << "i "<<i<<" phi "<<phi<<endl;
-				
+
 				if( phi > 0 && phi < 45 )
 				{
 					q[0]++;
@@ -675,20 +675,20 @@ void VImageParameterCalculation::muonPixelDistribution()
 				{
 					q[7]++;
 				}
-				
+
 			}
-			
+
 		}
-		
+
 	//cout <<""<<inside<<" total: "<<totalPixels<<" q0:"<<q[0]<<" q1:"<<q[1]<<" q2:"<<q[2]<<" q3:"<<q[3]<<" q4:"<<q[4]<<" q5:"<<q[5]<<" q6:"<<q[6]<<" q7:"<<q[7]<<endl;
-	
+
 	if( ( 1.0 * inside / totalPixels > 0.7 ) && q[0] > 1 && q[1] > 1 && q[2] > 1 && q[3] > 1 && q[4] > 1 && q[5] > 1 && q[6] > 1 && q[7] > 1 )
 	{
 		pass = 1;
 	}
-	
+
 	fParGeo->muonValid = pass;
-	
+
 }
 
 //Calculates impact parameter correction factor for size
@@ -699,58 +699,58 @@ float VImageParameterCalculation::correctSizeInMuonRing()
 	{
 		cout << "VImageParameterCalculation::correctSizeInMuonRing" << endl;
 	}
-	
+
 	//Calculate the distance from the center of the ring to the centroid of the ring.
 	float dc = TMath::Sqrt( ( fParGeo->muonX0 - fParGeo->muonXC ) * ( fParGeo->muonX0 - fParGeo->muonXC )
 							+ ( fParGeo->muonY0 - fParGeo->muonYC ) * ( fParGeo->muonY0 - fParGeo->muonYC ) );
-							
+
 	float kRatio;
 	kRatio = dc / fParGeo->muonRadius;
-	
+
 	float exi; //Imapct parameter correction factor
 	exi = 0.0;
-	
+
 	float kTest = 0.0;
 	kTest = 0.0;
-	
+
 	// Initialize the elliptic integral
 	int numSteps = 1000;
 	float* ngExi;
-	
+
 	ngExi = new float[numSteps];
-	
+
 	//Calculate the elliptic integral for various values of xi
 	for( int i = 0; i < numSteps; i++ )
 	{
-	
+
 		ngExi[i] = 0.0;
-		
-		
+
+
 		//Calculate the elliptic integral. This requires GSL.
 #ifndef NOGSL
 		float xi_tmp = ( float )i / ( float )numSteps;
 		ngExi[i] = ( 2.0 / TMath::Pi() ) * ( gsl_sf_ellint_E( TMath::Pi() / 2.0, xi_tmp, 0 ) );   //Calculate elliptic integral
 #endif
-		
+
 	}//End of elliptical integral for loop
-	
+
 	//Numerically solve the integral equation to calculate IP corrrection factor
 	for( int i = 0; i < numSteps; i++ )
 	{
-	
+
 		float xi_tmp = ( float )i / ( float )numSteps;
 		float kTest_tmp = 2.0 * ngExi[i] * kRatio / xi_tmp;
-		
+
 		if( fabs( 1.0 - kTest_tmp ) < fabs( 1.0 - kTest ) )
 		{
 			exi = ngExi[i];
 			kTest = kTest_tmp;
 		} //End of if
-		
+
 	}//End of for loop
-	
+
 	return exi; //Return impact parameter correction factor
-	
+
 }
 
 //Hough transform class instantiation
@@ -758,7 +758,7 @@ void VImageParameterCalculation::houghInitialization()
 {
 
 	fHoughTransform = new VHoughTransform( getDetectorGeo() );
-	
+
 }
 
 
@@ -774,30 +774,30 @@ void VImageParameterCalculation::houghMuonPixelDistribution()
 	{
 		cout << "VImageParameterCalculation::houghMuonPixelDistribution" << endl;
 	}
-	
+
 	//Look for data
 	if( fData->getSums().size() == 0 )
 	{
-	
+
 		fParGeo->houghMuonValid = 0;
 		return;
-		
+
 	}
-	
+
 	//Look for detector geometry
 	if( !getDetectorGeo() )
 	{
-	
+
 		cout << "VImageParameterCalculation::houghMuonPixelDistribution error: detector geometry not defined" << endl;
 		exit( 0 );
-		
+
 	}
-	
+
 	//Initial hit pixel cut.
 	//Run the analysis if the number of image or border pixels exceeds 1.
-	
+
 	int iNpix = 0;
-	
+
 	// Loop over the pixels and calculate the hit pixel count.
 	for( unsigned int i = 0; i < fData->getSums().size(); i++ )
 	{
@@ -807,16 +807,16 @@ void VImageParameterCalculation::houghMuonPixelDistribution()
 		{
 			iNpix++;
 		}
-		
+
 	}
-	
+
 	//Read pixel cut values from the Hough transform object
 	int npixMaxVal = 0;
 	int npixMinVal = 0;
-	
+
 	npixMaxVal = fHoughTransform->getNpixMax( fData->getTelID() );//Get the npixmax cut for the given telescope
 	npixMinVal = fHoughTransform->getNpixMin( fData->getTelID() );//Get the npixmin cut for the given telescope
-	
+
 	//Initial pixel cut. Runthe Hough transform analysis if the event passes the pixel cut.
 	if( iNpix >= npixMinVal && iNpix <= npixMaxVal )
 	{
@@ -824,16 +824,16 @@ void VImageParameterCalculation::houghMuonPixelDistribution()
 	}
 	else
 	{
-	
+
 		fParGeo->houghMuonValid = 0;
 		fParGeo->houghAP = 0.;
 		fParGeo->houghTD = 0.;
 		fParGeo->houghNpix = 0;
 		fParGeo->houghCN = 0.;
 		fParGeo->houghContained = 0.;
-		
+
 	}
-	
+
 }
 
 
@@ -845,7 +845,7 @@ void VImageParameterCalculation::calcTriggerParameters( vector<bool> fTrigger )
 	double sumx2_trig = 0.;
 	double sumy2_trig = 0.;
 	int trig_tubes = 0;
-	
+
 	// calculate trigger-level parameters
 	// loop over all pixels
 	for( unsigned int j = 0; j < fTrigger.size(); j++ )
@@ -854,10 +854,10 @@ void VImageParameterCalculation::calcTriggerParameters( vector<bool> fTrigger )
 		if( fTrigger[j] )
 		{
 			trig_tubes += 1;
-			
+
 			double xi = getDetectorGeo()->getX()[j];
 			double yi = getDetectorGeo()->getY()[j];
-			
+
 			sumx_trig += xi;
 			sumy_trig += yi;
 			sumx2_trig += xi * xi;
@@ -865,20 +865,20 @@ void VImageParameterCalculation::calcTriggerParameters( vector<bool> fTrigger )
 		}
 	}
 	fParGeo->trig_tubes = trig_tubes;
-	
+
 	if( fParGeo->trig_tubes != 0 )
 	{
 		const double xmean_trig = sumx_trig / trig_tubes;
 		const double ymean_trig = sumy_trig / trig_tubes;
 		const double x2mean_trig = sumx2_trig / trig_tubes;
 		const double y2mean_trig = sumy2_trig / trig_tubes;
-		
+
 		fParGeo->cen_x_trig = xmean_trig;
 		fParGeo->cen_y_trig = ymean_trig;
 		fParGeo->cen_x2_trig = x2mean_trig;
 		fParGeo->cen_y2_trig = y2mean_trig;
 	}
-	
+
 }
 
 
@@ -895,13 +895,13 @@ void VImageParameterCalculation::calcParameters()
 	{
 		return;
 	}
-	
+
 	if( fDebug )
 	{
 		cout << "VImageParameterCalculation::calcParameters " << fData->getImageBorderNeighbour().size() << endl;
 	}
 	const double ZeroTolerence = 1e-8;
-	
+
 	if( fData->getSums().size() == 0 )
 	{
 		if( fDebug )
@@ -910,13 +910,13 @@ void VImageParameterCalculation::calcParameters()
 		}
 		return;
 	}
-	
+
 	if( !getDetectorGeo() )
 	{
 		cout << "VImageParameterCalculation::calcParameters error: detector geometry not defined" << endl;
 		exit( EXIT_FAILURE );
 	}
-	
+
 	double sumsig = 0;
 	double sumsig_2 = 0.;
 	double sumxsig = 0;
@@ -933,11 +933,11 @@ void VImageParameterCalculation::calcParameters()
 	double sumOuterRing = 0.;                     // sum signal of image in outer ring
 	double sumDeadRing = 0.;                      // sum signal of image ring around dead pixel
 	double sumLowGain = 0.;
-	
+
 	// calculate mean ped and pedvar
 	fParGeo->fmeanPed_Image = 0.;
 	fParGeo->fmeanPedvar_Image = 0.;
-	
+
 	if( fData->getRunParameter()->doFADCAnalysis() && fData->getReader()->hasFADCTrace() )
 	{
 		double nPixPed = 0.;
@@ -975,13 +975,13 @@ void VImageParameterCalculation::calcParameters()
 			}
 		}
 	}
-	
+
 	/////////////////////////////////////////
 	// calculate image parameters
 	/////////////////////////////////////////
-	
+
 	setImageBorderPixelPosition( fParGeo );
-	
+
 	// loop over all pixels
 	for( unsigned int j = 0; j < fData->getSums().size(); j++ )
 	{
@@ -989,16 +989,16 @@ void VImageParameterCalculation::calcParameters()
 		{
 			pntubesBrightNoImage++;
 		}
-		
+
 		// loop over image tubes
 		// select image or border pixel
 		if( fData->getImage()[j] || fData->getBorder()[j] )
 		{
 			pntubes += 1;
-			
+
 			double xi = getDetectorGeo()->getX()[j];
 			double yi = getDetectorGeo()->getY()[j];
-			
+
 			double si = ( double )fData->getSums()[j]; // charge (dc)
 			sumsig += si;
 			double si2 = ( double )fData->getSums2()[j];
@@ -1031,21 +1031,21 @@ void VImageParameterCalculation::calcParameters()
 			{
 				sumLowGain += si2;
 			}
-			
+
 			const double sixi = si * xi;
 			const double siyi = si * yi;
-			
+
 			sumxsig += sixi;
 			sumysig += siyi;
-			
+
 			const double sixi2 = sixi * xi;
 			const double siyi2 = siyi * yi;
 			const double sixiyi = sixi * yi;
-			
+
 			sumx2sig += sixi2;
 			sumy2sig += siyi2;
 			sumxysig += sixiyi;
-			
+
 			sumx3sig += sixi2 * xi;
 			sumy3sig += siyi2 * yi;
 			sumx2ysig += sixi2 * yi;
@@ -1072,7 +1072,7 @@ void VImageParameterCalculation::calcParameters()
 	{
 		fParGeo->fracLow = 0.;
 	}
-	
+
 	//! clumsy, but effective, algorithm for finding 3 largest sums and pixel indices
 	double i_max[3];
 	i_max[0] = -1000.;
@@ -1082,7 +1082,7 @@ void VImageParameterCalculation::calcParameters()
 	i_index[0] = 0;
 	i_index[1] = 0;
 	i_index[2] = 0;
-	
+
 	for( unsigned int i = 0; i < fData->getSums().size(); i++ )
 	{
 		if( fData->getSums()[i] > i_max[0] )
@@ -1107,7 +1107,7 @@ void VImageParameterCalculation::calcParameters()
 			i_index[2] = i;
 		}
 	}
-	
+
 	for( unsigned int i = 0; i < 3; i++ )
 	{
 		fParGeo->max[i] = i_max[i];
@@ -1117,7 +1117,7 @@ void VImageParameterCalculation::calcParameters()
 		}
 		fParGeo->index_of_max[i] = i_index[i];
 	}
-	
+
 	if( fParGeo->ntubes == 0 )
 	{
 		fParGeo->reset( 1 );   // reset level 1: don't reset run numbers, event numbers, etc.
@@ -1137,17 +1137,17 @@ void VImageParameterCalculation::calcParameters()
 			y2mean = sumy2sig / sumsig;
 			xymean = sumxysig / sumsig;
 		}
-		
+
 		const double xmean2 = xmean * xmean;
 		const double ymean2 = ymean * ymean;
 		const double meanxy = xmean * ymean;
-		
+
 		double sdevx2 = x2mean - xmean2;
 		double sdevy2 = y2mean - ymean2;
 		const double sdevxy = xymean - meanxy;
-		
+
 		const double dist    = sqrt( xmean2 + ymean2 );
-		
+
 		fParGeo->size = sumsig;
 		fParGeo->size2 = sumsig_2;
 		fParGeo->sizeLL = -1.;
@@ -1165,21 +1165,21 @@ void VImageParameterCalculation::calcParameters()
 			sdevy2 = 0.;
 		}
 		fParGeo->sigmaY = sqrt( sdevy2 );
-		
+
 		////////////////////////////////////////////////////////////////////////////
 		/////////////// directional cosines of the semi-major axis /////////////////
 		////////////////////////////////////////////////////////////////////////////
-		
+
 		const double d = sdevy2 - sdevx2;
 		const double z = sqrt( d * d + 4.0 * sdevxy * sdevxy );
-		
+
 		fParGeo->f_d = d;
 		fParGeo->f_s = z;
 		fParGeo->f_sdevxy = sdevxy;
-		
+
 		double cosphi = 0;
 		double sinphi = 0;
-		
+
 		if( fabs( sdevxy ) > ZeroTolerence )      // length != width, semi-major axis
 		{
 			// not along x or y
@@ -1208,29 +1208,29 @@ void VImageParameterCalculation::calcParameters()
 			cosphi = 1;
 			sinphi = 0;
 		}
-		
+
 		fParGeo->cosphi = cosphi;
 		fParGeo->sinphi = sinphi;
-		
+
 		////////////////////////////////////////////////////////////////////////////
 		//////////////// length, width and miss - image parameters /////////////////
 		////////////////////////////////////////////////////////////////////////////
-		
+
 		double length2 = ( sdevx2 + sdevy2 + z ) / 2.0;
 		if( length2 < ZeroTolerence )
 		{
 			length2 = 0;
 		}
-		
+
 		double width2  = ( sdevx2 + sdevy2 - z ) / 2.0;
 		if( width2 < ZeroTolerence )
 		{
 			width2 = 0;
 		}
-		
+
 		const double length  = sqrt( length2 );
 		const double width   = sqrt( width2 );
-		
+
 #ifdef OLDMISS
 		double miss2 = 0;
 		if( z > ZeroTolerence )
@@ -1238,12 +1238,12 @@ void VImageParameterCalculation::calcParameters()
 			const double u = 1 + d / z;
 			const double v = 2 - u;
 			miss2 = ( u * xmean2 + v * ymean2 ) / 2.0 - meanxy * ( 2.0 * sdevxy / z );
-			
+
 			if( miss2 < ZeroTolerence )
 			{
 				//if ( miss2 < -(ZeroTolerence) )
 				//throw Error("Miss squared is less than -ZeroTolerence");
-				
+
 				miss2 = 0;
 			}
 		}
@@ -1259,33 +1259,33 @@ void VImageParameterCalculation::calcParameters()
 			miss = dist;    // Weird rounding error
 		}
 #endif
-		
+
 		fParGeo->length = length;
 		fParGeo->width = width;
 		fParGeo->miss = miss;
-		
+
 		fParGeo->los = length / sumsig;
-		
+
 		///////////////////////////////////////////////////////////////////////////////////
 		///////// fraction of image/border pixels located under image ellipse /////////////
 		///////////////////////////////////////////////////////////////////////////////////
-		
+
 		fParGeo->fui = getFractionOfImageBorderPixelUnderImage( xmean, ymean, width, length, cosphi, sinphi );
-		
+
 		////////////////////////////////////////////////////////////////////////////
 		/////////////////////// orientation: sinalpha and alpha ////////////////////
 		////////////////////////////////////////////////////////////////////////////
-		
+
 		const double sinalpha = ( dist > ZeroTolerence ) ? miss / dist : 0;
-		
+
 		const double alpha = fabs( TMath::RadToDeg() * asin( sinalpha ) );
-		
+
 		fParGeo->alpha = alpha;
-		
+
 		////////////////////////////////////////////////////////////////////////////
 		//////////////////////////////// Azwidth ///////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////
-		
+
 		double azwidth;
 		if( width2 > ZeroTolerence )
 		{
@@ -1300,11 +1300,11 @@ void VImageParameterCalculation::calcParameters()
 			azwidth = length;
 		}
 		fParGeo->azwidth = azwidth;
-		
+
 		////////////////////////////////////////////////////////////////////////////
 		//////////////////////// asymmetry major and minor /////////////////////////
 		////////////////////////////////////////////////////////////////////////////
-		
+
 		double asymmetry = 0;
 		if( length2 > ZeroTolerence )
 		{
@@ -1312,21 +1312,21 @@ void VImageParameterCalculation::calcParameters()
 			const double y3mean = sumy3sig / sumsig;
 			const double x2ymean = sumx2ysig / sumsig;
 			const double xy2mean = sumxy2sig / sumsig;
-			
+
 			const double sdevx3 = x3mean - 3.0 * xmean * x2mean + 2.0 * xmean * xmean2;
 			const double sdevy3 = y3mean - 3.0 * ymean * y2mean + 2.0 * ymean * ymean2;
 			const double sdevx2y =
 				x2ymean - 2.0 * xymean * xmean + 2.0 * xmean2 * ymean - x2mean * ymean;
 			const double sdevxy2 =
 				xy2mean - 2.0 * xymean * ymean + 2.0 * xmean * ymean2 - xmean * y2mean;
-				
+
 			const double cosphi2 = cosphi * cosphi;
 			const double sinphi2 = sinphi * sinphi;
-			
+
 			const double asymmetry3length3 =
 				sdevx3 * cosphi * cosphi2 + 3.0 * sdevx2y * sinphi * cosphi2 +
 				3.0 * sdevxy2 * cosphi * sinphi2 + sdevy3 * sinphi * sinphi2;
-				
+
 			if( fabs( asymmetry3length3 ) > ZeroTolerence )
 			{
 				asymmetry = pow( fabs( asymmetry3length3 ), 0.333333333333 ) / length;
@@ -1336,14 +1336,14 @@ void VImageParameterCalculation::calcParameters()
 				}
 			}
 		}
-		
+
 		fParGeo->asymmetry = asymmetry;
-		
+
 		fParGeo->phi = atan2( fParGeo->sinphi, fParGeo->cosphi );
 	}
-	
+
 	fboolCalcGeo = true;
-	
+
 }
 
 
@@ -1388,11 +1388,11 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 		cout << "=================================================================" << endl;
 		cout << endl;
 	}
-	
+
 	const double ZeroTolerence = 1e-8;
 	// fit will fail for width < this value
 	const double iFMinWidth = 0.001;
-	
+
 	// get pixel values, all nonimage/nonborder pixels have fData->getSums()=0.
 	// if there are dead channels, size of these vectors is < fData->getSums().size() !!
 	fll_X.clear();
@@ -1418,7 +1418,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 		{
 			double xi = getDetectorGeo()->getX()[j];
 			double yi = getDetectorGeo()->getY()[j];
-			
+
 			if( xi > fdistXmax )
 			{
 				fdistXmax = xi;
@@ -1435,10 +1435,10 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 			{
 				fdistYmin = yi;
 			}
-			
+
 			fll_X.push_back( xi );
 			fll_Y.push_back( yi );
-			
+
 			if( fData->getImage()[j] || fData->getBorder()[j] )
 			{
 				if( iUseSums2 )
@@ -1465,13 +1465,13 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 		cout << "FLL FITTER limits:  xmax: " << fdistXmax << "  xmin: " << fdistXmin;
 		cout << " ymax: " << fdistYmax << " ymin: " << fdistYmin << " #: " << fll_Sums.size() << endl;
 	}
-	
+
 	// take geometrical values as start values (calculate if not already calculated)
 	if( !fboolCalcGeo )
 	{
 		calcParameters();
 	}
-	
+
 	// define fit variables
 	double rho = 0.;
 	double drho = 0.;
@@ -1485,12 +1485,12 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	double dsigmaY = 0.;
 	double signal = i_sumMax;
 	double dsignal = 0.;
-	
+
 	sigmaX = fParGeo->sigmaX;
 	sigmaY = fParGeo->sigmaY;
 	cen_x = fParGeo->cen_x;
 	cen_y = fParGeo->cen_y;
-	
+
 	if( sigmaX > ZeroTolerence && sigmaY > ZeroTolerence )
 	{
 		rho = tan( 2. * fParGeo->phi ) * ( sigmaX * sigmaX - sigmaY * sigmaY ) / sigmaX / sigmaY / 2.;
@@ -1499,7 +1499,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	{
 		rho = 0.;
 	}
-	
+
 	// don't know if this step parameter is the best
 	double step = 1.e-4;
 	if( fParGeo->width < iFMinWidth )
@@ -1603,17 +1603,17 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	fLLFitter->DefineParameter( 3, "meanY", cen_y, step, fdistYmin, fdistYmax );
 	fLLFitter->DefineParameter( 4, "sigmaY", sigmaY, step, 0., 2.*fParGeo->sigmaY + 1. );
 	fLLFitter->DefineParameter( 5, "signal", signal, step, 0., 1.e6 );
-	
+
 	if( fLLDebug )
 	{
 		cout << "FLLFITTER START " << rho << "\t" << cen_x << "\t" << sigmaX << "\t" << cen_y << "\t" << sigmaY << "\t" << signal << endl;
 	}
-	
+
 	// now do the minimization
 	fLLFitter->Command( "MIGRAD" );
 	// don't call HESS, trouble with migrad in the error calculation means usually to not use the errors and LL results
 	//    fLLFitter->Command( "HESSE" );
-	
+
 	// get fit statistics
 	double edm = 0.;
 	double amin = 0.;
@@ -1623,12 +1623,12 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	int nstat = 0;
 	fLLFitter->mnstat( amin, edm, errdef, nvpar, nparx, nstat );
 	fParLL->Fitstat = nstat;
-	
+
 	if( fLLDebug )
 	{
 		cout << "FLLFITTER STAT " << nstat << endl;
 	}
-	
+
 	// get fit results
 	fLLFitter->GetParameter( 0, rho, drho );
 	fLLFitter->GetParameter( 1, cen_x, dcen_x );
@@ -1636,12 +1636,12 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	fLLFitter->GetParameter( 3, cen_y, dcen_y );
 	fLLFitter->GetParameter( 4, sigmaY, dsigmaY );
 	fLLFitter->GetParameter( 5, signal, dsignal );
-	
+
 	if( fLLDebug )
 	{
 		cout << "FLLFITTER FIT " << rho << "\t" << cen_x << "\t" << sigmaX << "\t" << cen_y << "\t" << sigmaY << "\t" << signal << endl;
 	}
-	
+
 	// estimate shower size
 	// integrate over all bins to get fitted size
 	bool   iWidthResetted = false;
@@ -1703,12 +1703,12 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	{
 		sigmaY = 0.;
 	}
-	
+
 	// covariance
 	double sigmaXY = rho * sqrt( sigmaX * sigmaX * sigmaY * sigmaY );
 	double dsx_y2 = sigmaX * sigmaX - sigmaY * sigmaY;
 	double dsxxy2 = sigmaX * sigmaX * sigmaY * sigmaY;
-	
+
 	double d = sigmaY * sigmaY - sigmaX * sigmaX;
 	double z = sqrt( d * d + 4. * sigmaXY * sigmaXY );
 	fParLL->f_d = d;
@@ -1721,7 +1721,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	{
 		width = sqrt( 0.5 * width );
 	}
-	//  fit was not successfull if width is close to zero -> take pargeo parameters
+	//  fit was not successful if width is close to zero -> take pargeo parameters
 	else
 	{
 		if( fLLDebug )
@@ -1744,18 +1744,18 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	}
 	double cosphi = cos( phi );
 	double sinphi = sin( phi );
-	
+
 	double dist = 0.;
 	dist = sqrt( cen_x * cen_x + cen_y * cen_y );
 	double miss = 0.;
 	miss = fabs( cen_y * cosphi - cen_x * sinphi );
-	
+
 	double alpha = 0.;
 	if( dist != 0. )
 	{
 		alpha = asin( miss / dist );
 	}
-	
+
 	double los;
 	if( iSize != 0. )
 	{
@@ -1765,21 +1765,21 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	{
 		los = -1.;
 	}
-	
+
 	// error propagation (uff...)
-	
+
 	double dsigmaXY2;
 	dsigmaXY2  = dsxxy2 * drho * drho;
 	dsigmaXY2 += rho * rho * sigmaX * sigmaX * sigmaY * sigmaY * sigmaY * sigmaY / dsxxy2 * dsigmaX * dsigmaX;
 	dsigmaXY2 += rho * rho * sigmaX * sigmaX * sigmaX * sigmaX * sigmaY * sigmaY / dsxxy2 * dsigmaY * dsigmaY;
-	
+
 	double dd2;
 	dd2 = 4.*sigmaY * sigmaY * dsigmaY * dsigmaY + 4.*sigmaX * sigmaX * dsigmaX * dsigmaX;
-	
+
 	double dz2;
 	dz2  = d * d / ( d * d + 4.*sigmaXY * sigmaXY ) * dd2;
 	dz2 += 16.*sigmaXY * sigmaXY / ( d * d + 4.*sigmaXY * sigmaXY ) * dsigmaXY2;
-	
+
 	double dlength;
 	dlength  = 4.*sigmaX * sigmaX * dsigmaX * dsigmaX;
 	dlength += 4.*sigmaY * sigmaY * dsigmaY * dsigmaY;
@@ -1793,7 +1793,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	{
 		dlength = 0.;
 	}
-	
+
 	double dwidth;
 	dwidth  = 4.*sigmaX * sigmaX * dsigmaX * dsigmaX;
 	dwidth += 4.*sigmaY * sigmaY * dsigmaY * dsigmaY;
@@ -1807,7 +1807,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	{
 		dwidth = 0.;
 	}
-	
+
 	double dphi;
 	if( dsx_y2 == 0. )
 	{
@@ -1823,7 +1823,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 		dphi  = sqrt( dphi );
 		dphi  = redang( dphi, M_PI / 2. );
 	}
-	
+
 	double ddist = 0.;
 	if( dist != 0. )
 	{
@@ -1834,7 +1834,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	dmiss  = cosphi * cosphi * dcen_x * dcen_x + sinphi * sinphi * dcen_y * dcen_y;
 	dmiss += dphi * dphi * ( sinphi * sinphi * cen_x * cen_x + cosphi * cosphi * cen_y * cen_y );
 	dmiss = sqrt( dmiss );
-	
+
 	double dalpha = 0.;
 	if( dist != 0. )
 	{
@@ -1850,9 +1850,9 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	{
 		fParLL->Fitstat = -1;    //  floating point problem
 	}
-	
+
 	// filling of VImageParameter
-	
+
 	setImageBorderPixelPosition( fParLL );
 	fParLL->cen_x = cen_x;
 	fParLL->cen_y = cen_y;
@@ -1914,10 +1914,10 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	fParLL->dsigmaX = dsigmaX;
 	fParLL->dsigmaY = dsigmaY;
 	fParLL->dsignal = dsignal;
-	
+
 	fParLL->ntubes = fParGeo->ntubes;
 	fParLL->bad = fParGeo->bad;
-	
+
 	return fLLEst;
 }
 
@@ -1937,7 +1937,7 @@ double VImageParameterCalculation::getFitValue( unsigned int iChannel, double rh
 	f  = exp( f );
 	f *= 1. / 2. / TMath::Pi() / sigmaX / sigmaY / sqrt( 1. - rho * rho );
 	f *= signal;
-	
+
 	return f;
 }
 
@@ -1959,7 +1959,7 @@ double VImageParameterCalculation::redang( double iangle, double iMax )
 	{
 		iangle = iMax + iangle + int( iangle / iMax ) * iMax;
 	}
-	
+
 	return iangle;
 }
 
@@ -1984,7 +1984,7 @@ double VImageParameterCalculation::getFractionOfImageBorderPixelUnderImage( doub
 	}
 	float i_ImageCoverNPixel = 0;
 	float i_ImageCoverNPixelImageBorder = 0;
-	
+
 	if( length > 1.e-2 && width > 1.e-2 )
 	{
 		// loop over all image and check if they are close to the image ellipse
@@ -1993,7 +1993,7 @@ double VImageParameterCalculation::getFractionOfImageBorderPixelUnderImage( doub
 			// pixel coordinates rotated into frame of image ellipse
 			double xi =     cosphi * ( getDetectorGeo()->getX()[i] - cen_x ) + sinphi * ( getDetectorGeo()->getY()[i] - cen_y );
 			double yi = -1.*sinphi * ( getDetectorGeo()->getX()[i] - cen_x ) + cosphi * ( getDetectorGeo()->getY()[i] - cen_y );
-			
+
 			// check if these pixels are inside the image ellipse
 			if( xi * xi / length / length / i_ImageCoverFactor / i_ImageCoverFactor + yi * yi / width / width / i_ImageCoverFactor / i_ImageCoverFactor < 1. )
 			{
@@ -2022,12 +2022,12 @@ double VImageParameterCalculation::getFractionOfImageBorderPixelUnderImage( doub
 	{
 		return 1.;
 	}
-	
+
 	if( i_ImageCoverNPixel > 0. )
 	{
 		return i_ImageCoverNPixelImageBorder / i_ImageCoverNPixel;
 	}
-	
+
 	return 0.;
 }
 
@@ -2072,21 +2072,21 @@ void get_LL_imageParameter_2DGauss( Int_t& npar, Double_t* gin, Double_t& f, Dou
 {
 	double LL = 0.;
 	double sum = 0.;
-	
+
 	npar = 6;
 	gin = 0;
 	iflag = 0;
-	
+
 	double x = 0.;
 	double y = 0.;
 	double n = 0.;                                // measured sum in channel i
 	//    double iVar = 0.;
-	
+
 	double rho_1 = -1. / 2. / ( 1. - par[0] * par[0] );
 	double rho_s =  1. / 2. / M_PI / par[2] / par[4] / sqrt( 1. - par[0] * par[0] ) * par[5];
-	
+
 	VImageParameterCalculation* iImageCalculation = ( VImageParameterCalculation* )fLLFitter->GetObjectFit();
-	
+
 	if( par[0] * par[0] < 1. && par[2] > 0. && par[4] > 0. )
 	{
 		unsigned int nSums = iImageCalculation->getLLSums().size();
@@ -2101,7 +2101,7 @@ void get_LL_imageParameter_2DGauss( Int_t& npar, Double_t* gin, Double_t& f, Dou
 				sum += ( y - par[3] ) * ( y - par[3] ) / par[4] / par[4];
 				sum += -2. * par[0] * ( x - par[1] ) / par[2] * ( y - par[3] ) / par[4];
 				sum  = rho_s * exp( sum * rho_1 );
-				
+
 				// assume Poisson fluctuations (neglecting background noise)
 				if( n > 0. && sum > 0. )
 				{

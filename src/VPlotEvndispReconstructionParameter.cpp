@@ -14,7 +14,7 @@
 VPlotEvndispReconstructionParameter::VPlotEvndispReconstructionParameter()
 {
 	fDebug = false;
-	
+
 	fDataChain = 0;
 	fDataFileName = "";
 	fDataFile = 0;
@@ -28,7 +28,7 @@ bool VPlotEvndispReconstructionParameter::initialize( string iEventdisplayFileNa
 		int iNEnergyBins, double iEnergy_TeV_log_min, double iEnergy_TeV_log_max )
 {
 	fDataFileName = iEventdisplayFileName;
-	
+
 	fDataChain = new TChain( "showerpars" );
 	fDataChain->Add( fDataFileName.c_str() );
 	if( !fDataChain )
@@ -47,7 +47,7 @@ bool VPlotEvndispReconstructionParameter::initialize( string iEventdisplayFileNa
 		cout << "file " << fDataFileName << " not found" << endl;
 		return false;
 	}
-	
+
 	// read in EvndispReconstructionParameter
 	fEvndispReconstructionParameter = ( VEvndispReconstructionParameter* )fDataFile->Get( "EvndispReconstructionParameter" );
 	if( !fEvndispReconstructionParameter )
@@ -56,7 +56,7 @@ bool VPlotEvndispReconstructionParameter::initialize( string iEventdisplayFileNa
 		cout << " no reconstruction parameters found" << endl;
 		return false;
 	}
-	
+
 	// get telescope type
 	TTree* i_telconfig = ( TTree* )fDataFile->Get( "telconfig" );
 	if( !i_telconfig )
@@ -65,7 +65,7 @@ bool VPlotEvndispReconstructionParameter::initialize( string iEventdisplayFileNa
 		cout << " no telescope configuration found" << endl;
 		return false;
 	}
-	
+
 	fEvndispReconstructionParameterName.push_back( "noCut" );
 	fEvndispReconstructionParameterName.push_back( "Size_min" );
 	fEvndispReconstructionParameterName.push_back( "Ntubes_min" );
@@ -79,7 +79,7 @@ bool VPlotEvndispReconstructionParameter::initialize( string iEventdisplayFileNa
 	//   fEvndispReconstructionParameterName.push_back( "dist_min" );
 	//   fEvndispReconstructionParameterName.push_back( "dist_max" );
 	//   fEvndispReconstructionParameterName.push_back( "widthlength_max" );
-	
+
 	char hname[200];
 	for( unsigned int i = 0; i < fEvndispReconstructionParameterName.size(); i++ )
 	{
@@ -93,8 +93,8 @@ bool VPlotEvndispReconstructionParameter::initialize( string iEventdisplayFileNa
 			fEvndispReconstructionParameterHisto.back()->SetLineStyle( 2 );
 		}
 		fEvndispReconstructionParameterHisto.back()->SetLineColor( i + 1 );
-		
-		
+
+
 		sprintf( hname, "hInt_%s", fEvndispReconstructionParameterName[i].c_str() );
 		fEvndispReconstructionParameterHistoInt.push_back( new TH1D( hname, "", iNEnergyBins, iEnergy_TeV_log_min, iEnergy_TeV_log_max ) );
 		fEvndispReconstructionParameterHistoInt.back()->SetXTitle( "log_{10} energy [TeV]" );
@@ -102,8 +102,8 @@ bool VPlotEvndispReconstructionParameter::initialize( string iEventdisplayFileNa
 		fEvndispReconstructionParameterHistoInt.back()->SetLineWidth( 2 );
 		fEvndispReconstructionParameterHistoInt.back()->SetLineColor( i + 1 );
 	}
-	
-	
+
+
 	return true;
 }
 
@@ -120,10 +120,10 @@ void VPlotEvndispReconstructionParameter::plot( unsigned int iMethod, unsigned i
 {
 	// reset all histograms
 	reset();
-	
+
 	// fill all histograms
 	fill( iMethod, iTelescope, iTelescopeTypeCounter );
-	
+
 	// plot everything
 	char hname[200];
 	char htitle[200];
@@ -131,7 +131,7 @@ void VPlotEvndispReconstructionParameter::plot( unsigned int iMethod, unsigned i
 	sprintf( htitle, "eventdisplay reconstruction parameters (method %d, telescope %d)", iMethod, iTelescope );
 	fPlotCanvas = new TCanvas( hname, htitle, 10, 10, 600, 600 );
 	fPlotCanvas->Draw();
-	
+
 	unsigned int z = 0;
 	for( unsigned int i = 0; i < fEvndispReconstructionParameterHisto.size(); i++ )
 	{
@@ -182,7 +182,7 @@ bool VPlotEvndispReconstructionParameter::fill( unsigned int iMethod, unsigned i
 		cout << iMethod << "\t" << fEvndispReconstructionParameter->fNMethods << endl;
 		return false;
 	}
-	
+
 	// check telescope type
 	if( iTelTypeCounter < 0 )
 	{
@@ -197,27 +197,27 @@ bool VPlotEvndispReconstructionParameter::fill( unsigned int iMethod, unsigned i
 	cout << "ntubes >= " << fEvndispReconstructionParameter->fLocalNtubes_min[iMethod][iTelTypeCounter] << endl;
 	cout << "loss < " << fEvndispReconstructionParameter->fLoss_max[iMethod][iTelTypeCounter] << endl;
 	cout << "FUI > " << fEvndispReconstructionParameter->fFui_min[iMethod][iTelTypeCounter] << endl;
-	
+
 	// shower parameter
 	TChain* i_showerpars = new TChain( "showerpars" );
 	i_showerpars->Add( fDataFileName.c_str() );
 	fDataShowerPars = new Cshowerpars( i_showerpars );
-	
+
 	// telescope (image parameters)
 	char hname[200];
 	sprintf( hname, "%s/Tel_%d/tpars", fDataFileName.c_str(), iTelescope + 1 );
 	TChain* i_tpars = new TChain( "tpars" );
 	i_tpars->Add( hname );
 	fDataTpars = new Ctpars( i_tpars, true, 1 );
-	
+
 	// loop over all entries and fill the histograms
 	cout << "total number of entries : " << fDataShowerPars->fChain->GetEntries() << endl;
-	
+
 	for( int i = 0; i < fDataShowerPars->fChain->GetEntries(); i++ )
 	{
 		fDataShowerPars->GetEntry( i );
 		fDataTpars->GetEntry( i );
-		
+
 		// no cuts
 		if( fEvndispReconstructionParameterHisto[0] && fDataTpars->ntubes > 0 )
 		{
@@ -227,7 +227,7 @@ bool VPlotEvndispReconstructionParameter::fill( unsigned int iMethod, unsigned i
 		{
 			continue;
 		}
-		
+
 		// size cut
 		if( fEvndispReconstructionParameterHisto[1] && fEvndispReconstructionParameterHistoInt[1] )
 		{
@@ -293,9 +293,9 @@ bool VPlotEvndispReconstructionParameter::fill( unsigned int iMethod, unsigned i
 				fEvndispReconstructionParameterHistoInt[4]->Fill( log10( fDataShowerPars->MCe0 ) );
 			}
 		}
-		
-		
+
+
 	}
-	
+
 	return true;
 }

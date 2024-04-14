@@ -8,81 +8,81 @@
 VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 {
 	fEventDisplayVersion = "";
-	
+
 	fRunOn = 0;
 	fRunOnFileName = "";
 	fRunOff = 0;
 	fRunOffFileName = "";
-	
+
 	fMJDOn = 0.;
 	fMJDOff = 0.;
-	
+
 	fMJDOnStart = 0.;
 	fMJDOnStop = 0.;
-	
+
 	fTarget = "";
 	fTargetRAJ2000 = 0.;
 	fTargetDecJ2000 = -90.;
 	fTargetRA = 0.;
 	fTargetDec = 0.;
-	
+
 	fArrayPointingRA = 0.;
 	fArrayPointingDec = 0.;
 	fArrayPointingRAJ2000 = 0.;
 	fArrayPointingDecJ2000 = 0.;
-	
+
 	fPairOffset = 0.;
-	
+
 	fWobbleNorth = 0.;                            // [deg]
 	fWobbleWest = 0.;                             // [deg]
 	fWobbleNorthMod = 0.;                         // [deg]
 	fWobbleWestMod = 0.;                          // [deg]
-	
+
 	fSkyMapCentreNorth = 0.;
 	fSkyMapCentreWest = 0.;
 	fSkyMapCentreRAJ2000 = 0.;
 	fSkyMapCentreDecJ2000 = 0.;
-	
+
 	fTargetShiftNorth = 0.;
 	fTargetShiftWest = 0.;
 	fTargetShiftRAJ2000 = 0.;
 	fTargetShiftDecJ2000 = 0.;
-	
+
 	fNTel = 4;
 	fTelToAna = "";
 	fMaxTelID = fNTel;
-	
+
 	fBackgroundModel = 0;
 	fSourceRadius = 0.;                           // actually radius^2
 	fmaxradius = 0.;                              // maximum accepted distance from camera center [deg]
-	
+
 	fCutFile = "";
-	
+
 	fAcceptanceFile = "";
-	
+
 	fEffectiveAreaFile = "";                      // file with effective areas, use NOFILE if not avaible
-	
+
 	// smoothing algorithm (don't use it if you don't know it)
 	fNBoxSmooth = 0;
-	
+
 	// ON/OFF MODEL
 	fOO_alpha = 0.;
-	
+
 	// RING BACKGROUND MODEL
 	fRM_RingRadius = 0.;                          // ring radius [deg]
 	fRM_RingWidth = 0.;                           // ring width [deg]
-	
+
 	// REFLECTED REGION MODEL
 	fRE_distanceSourceOff = 0.2;                  // minimal distance of off source regions in number of background regions from the source region
 	fRE_nMinoffsource = 3;                        // minmum number of off source regions (default 3)
 	fRE_nMaxoffsource = 7;                        // maximum number of off source regions (default 7)
-	
+
 	// TEMPLATE MODEL
 	fTE_mscw_min = 0.;
 	fTE_mscw_max = 0.;
 	fTE_mscl_min = 0.;
 	fTE_mscl_max = 0.;
-	
+
 	f2DAcceptanceMode = 0;
 }
 
@@ -95,7 +95,7 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 {
 	// default version number (important for reading of run parameters from root file)
 	fVersion = 6;
-	
+
 	// bin size for sky maps [deg]
 	//   must be the same for all runs (add up sky maps)
 	fSkyMapBinSize   = 0.01;
@@ -104,19 +104,19 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	fSkyMapSizeXmax =  2.;
 	fSkyMapSizeYmin = -2.;
 	fSkyMapSizeYmax =  2.;
-	
+
 	// sky maps are centred around this point
 	fSkyMapCentreNorth = 0.;
 	fSkyMapCentreWest = 0.;
 	fSkyMapCentreRAJ2000 = 0.;
 	fSkyMapCentreDecJ2000 = 0.;
-	
+
 	// position relative to which 1D histograms are filled
 	fTargetShiftNorth = 0.;                       // [deg]
 	fTargetShiftWest = 0.;                        // [deg];
 	fTargetShiftRAJ2000 = 0.;
 	fTargetShiftDecJ2000 = 0.;
-	
+
 	// parameter for energy spectra (in log E)
 	fEnergyReconstructionSpectralIndex = 2.5;
 	fEnergyReconstructionMethod = 1;
@@ -125,7 +125,7 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	fEnergyEffectiveAreaSmoothingIterations = -1;
 	fEnergyEffectiveAreaSmoothingThreshold = -1.;
 	fDeadTimeCalculationMethod = 0;
-	
+
 	// background model
 	fTMPL_fBackgroundModel = 0;
 	fTMPL_RM_RingRadius = 0.;
@@ -134,14 +134,14 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	fTMPL_RE_nMinoffsource = 0;
 	fTMPL_RE_nMaxoffsource = 0;
 	fTMPL_RE_RemoveOffRegionsRandomly = false;
-	
+
 	// cut, effective areas and acceptance files
 	fTMPL_SourceRadius = 0.;
 	fTMPL_maxradius = 0.;
 	fTMPL_CutFile = "";
 	fTMPL_AcceptanceFile = "";
 	fTMPL_EffectiveAreaFile = "";
-	
+
 	// star catalogue
 	fStarCatalogue = "Hipparcos_MAG8_1997.dat";
 	// minimum brightness of stars
@@ -149,25 +149,25 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	fStarBand = "B";
 	// do not exclude regions around stars by default
 	fStarExlusionRadius = -1.;
-	
-	// length of time intervalls in seconds for rate plots and short term histograms
+
+	// length of time intervals in seconds for rate plots and short term histograms
 	fTimeIntervall = 4. * 60.;
-	
+
 	// likelihood analysis
 	fLikelihoodAnalysis = false;
-	
+
 	// Write all events to DL3 Tree
 	fWriteAllEvents = false;
 	// Write Dataon/dataoff trees
 	fWriteDataOnOffTrees = false;
-	
+
 	// if 0, use default 1D radial acceptance
 	// if >0, use alternate 2D-dependent acceptance
 	f2DAcceptanceMode = 0 ; // USE2DACCEPTANCE
-	
+
 	// for deadtime fraction storage
 	fScalarDeadTimeFrac = 0.0 ;
-	
+
 	// set monte carlo zenith angles
 	setMCZenith();
 }
@@ -212,7 +212,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 	string is_line;
 	string temp;
 	string temp2;
-	
+
 	// loop over all lines in the run parameter file
 	while( getline( is, is_line ) )
 	{
@@ -380,7 +380,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				{
 					return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* SKYMAPCENTRE_XY x y" );
 				}
-				
+
 				fSkyMapCentreWest = -1.*atof( temp2.c_str() );
 				is_stream >> temp2;
 				fSkyMapCentreNorth = -1.*atof( temp2.c_str() );
@@ -425,7 +425,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				{
 					return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* TARGETXYSHIFT x y" );
 				}
-				
+
 				fTargetShiftWest = -1.*atof( temp2.c_str() );
 				is_stream >> temp2;
 				fTargetShiftNorth = -1.*atof( temp2.c_str() );
@@ -436,7 +436,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				{
 					return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* TARGETPOSITION_RADECJ2000_DEG (RA(deg) DEC(deg)" );
 				}
-				
+
 				fTargetShiftRAJ2000 = atof( temp2.c_str() );
 				is_stream >> temp2;
 				fTargetShiftDecJ2000 = atof( temp2.c_str() );
@@ -447,7 +447,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				{
 					return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* TARGETPOSITION_RADECJ2000_HOUR RA(Hour Min Sec)  DEC(Deg Min Sec)" );
 				}
-				
+
 				double d_tt = 0.;
 				d_tt += atof( temp2.c_str() );
 				is_stream >> temp2;
@@ -464,7 +464,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				is_stream >> iDec3;
 				fTargetShiftDecJ2000 = getDeclinationFromStrings( iDec1, iDec2, iDec3 );
 			}
-			
+
 			else if( temp == "REGIONTOEXCLUDE" || temp == "REGIONTOEXCLUDE_RADECJ2000_DEG" )
 			{
 				if( checkNumberOfArguments( is_line ) < 5 )
@@ -472,7 +472,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 					return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REGIONTOEXCLUDE (West(deg)  North(deg)  Radius(deg)) (or * REGIONTOEXCLUDE_RADECJ2000_DEG (RA(deg) DEC(deg) Radius(deg)) OR * REGIONTOEXCLUDE (West(deg)  North(deg)  Radius1(deg) Radius2(deg) RotAngle(deg)) (or * REGIONTOEXCLUDE_RADECJ2000_DEG (RA(deg) DEC(deg) Radius1(deg) Radius2(deg) RotAngle(deg)). Check if you want extended or point source!" );
 				}
 				fExclusionRegions.push_back( new VAnaSumRunParameterListOfExclusionRegions() );
-				
+
 				if( temp == "REGIONTOEXCLUDE" )
 				{
 					fExclusionRegions.back()->fExcludeFromBackground_West = -1.* ( double )atof( temp2.c_str() );
@@ -519,7 +519,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 					return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REGIONTOEXCLUDE_RADECJ2000_HOUR (RA(Hour Min Sec)  DEC(Deg Min Sec)  Radius(deg)) OR * REGIONTOEXCLUDE_RADECJ2000_HOUR (RA(Hour Min Sec)  DEC(Deg Min Sec)  Radius1(deg) Radius2(deg) RotAngle(deg)). Check if you want extended or point source!" );
 				}
 				fExclusionRegions.push_back( new VAnaSumRunParameterListOfExclusionRegions() );
-				
+
 				// ra
 				double d_tt = 0.;
 				d_tt += ( double )atof( temp2.c_str() );
@@ -658,7 +658,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				{
 					fLikelihoodAnalysis = false;
 				}
-				
+
 			}
 			// Write all events to DL3 run. This will write out also hadronic events and
 			// add the MVA score and IsGamma to the tree.
@@ -717,7 +717,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 	cout << "        end reading run parameters                      " << endl;
 	cout << "========================================================" << endl;
 	cout << endl;
-	
+
 	return 1;
 }
 
@@ -736,9 +736,9 @@ int VAnaSumRunParameter::loadShortFileList( string i_listfilename, string iDataD
 	string temp;
 	VAnaSumRunParameterDataClass i_sT;
 	reset( i_sT );
-	
+
 	cout << "Reading short run list from " << i_listfilename << endl;
-	
+
 	while( getline( is, is_line ) )
 	{
 		if( is_line.size() > 0 )
@@ -821,19 +821,19 @@ int VAnaSumRunParameter::loadShortFileList( string i_listfilename, string iDataD
 					cout << "VAnaSumRunParameter warning: ";
 					cout << " short runlist not implemented yet for this background model " << i_sT.fBackgroundModel << endl;
 				}
-				
+
 				i_sT.f2DAcceptanceMode = f2DAcceptanceMode ; // USE2DACCEPTANCE
 			}
-			
+
 			// fill the runlist vector
 			fRunList.push_back( i_sT );
 			// fill the runlist map
 			fMapRunList[i_sT.fRunOn] = fRunList.back();
 			++i_nline;
-			
+
 		}
 	}
-	
+
 	return i_nline;
 }
 
@@ -852,9 +852,9 @@ int VAnaSumRunParameter::loadSimpleFileList( string i_listfilename )
 	string temp;
 	VAnaSumRunParameterDataClass i_sT;
 	reset( i_sT );
-	
+
 	cout << "Reading simple run list from: " << i_listfilename << endl;
-	
+
 	while( getline( is, is_line ) )
 	{
 		if( is_line.size() > 0 )
@@ -895,9 +895,9 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
 	string temp;
 	VAnaSumRunParameterDataClass i_sT;
 	reset( i_sT );
-	
+
 	cout << "Reading long run list from (S" << bShortList << ", TA" << bTotalAnalysisOnly << "): " << i_listfilename << endl;
-	
+
 	while( getline( is, is_line ) )
 	{
 		if( is_line.size() > 0 )
@@ -908,13 +908,13 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
 			{
 				continue;
 			}
-			
+
 			int narg = checkNumberOfArguments( is_line );
 			// check version number
 			if( narg == 3 )
 			{
 				is_stream >> temp;
-				
+
 				if( temp == "VERSION" || temp == "Version" || temp == "version" )
 				{
 					is_stream >> temp;
@@ -928,7 +928,7 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
 			i_sT.fRunOn = atoi( temp.c_str() );
 			is_stream >> temp;
 			i_sT.fRunOff = atoi( temp.c_str() );
-			
+
 			// short list, only read run numbers and target name
 			if( bShortList )
 			{
@@ -940,7 +940,7 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
 				++i_nline;
 				continue;
 			}
-			
+
 			// offset in min between on and off run (positive if off run after on run)
 			// (now read from VEvndispRunParameter)
 			if( fVersion < 6 )
@@ -1036,7 +1036,7 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
 				{
 					// check if IRF runparameters are consistent with ANASUM.runparameter file
 					checkAnasumParameter( i_sT.fEffectiveAreaFile );
-					
+
 					i_sT.fCutFile = temp;
 					// source radius (actually (source radius)^2 )
 					// (read theta2 cut from cut file)
@@ -1073,7 +1073,7 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
 				is_stream >> temp;
 				i_sT.fAcceptanceFile = temp;
 			}
-			
+
 			else if( i_sT.fBackgroundModel == eREFLECTEDREGION )
 			{
 				is_stream >> temp;
@@ -1085,9 +1085,9 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
 				is_stream >> temp;
 				i_sT.fAcceptanceFile = temp;
 			}
-			
+
 			/////////////////
-			
+
 			else if( i_sT.fBackgroundModel == eTEMPLATE )
 			{
 				is_stream >> temp;
@@ -1114,7 +1114,7 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
 			++i_nline;
 		}
 	}
-	
+
 	return i_nline;
 }
 
@@ -1136,7 +1136,7 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
 	if( i < fRunList.size() )
 	{
 		int ioff = fRunList[i].fRunOff;
-		
+
 		cout << "Stereo analysis for run: " << fRunList[i].fRunOn << "\t" << ioff;
 		cout << "  (run " << i + 1 << " out of " << fRunList.size() << ")";
 		if( fRunList[i].fEventDisplayVersion.size() > 0 )
@@ -1174,7 +1174,7 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
 			}
 		}
 		cout << "\t number of telescopes: " << fRunList[i].fNTel << endl;
-		cout << "\t time intervall for rate plots: " << fTimeIntervall << " s (" << fTimeIntervall / 60. << " min)" << endl;
+		cout << "\t time interval for rate plots: " << fTimeIntervall << " s (" << fTimeIntervall / 60. << " min)" << endl;
 		cout << "\t effective areas from " << fRunList[i].fEffectiveAreaFile << endl;
 		cout << "\t sky plot binning [deg] " << fSkyMapBinSize << "\t" << fSkyMapBinSizeUC << endl;
 		cout << "\t sky plot size [deg]: " << fSkyMapSizeXmin << " < X < " << fSkyMapSizeXmax;
@@ -1198,7 +1198,7 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
 		{
 			cout << "tdiff method" << endl;
 		}
-		
+
 		cout << "\t background model: ";
 		if( fRunList[i].fBackgroundModel == eONOFF )
 		{
@@ -1231,9 +1231,9 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
 			cout << "\t acceptance file (for theta2 plots): " << fRunList[i].fAcceptanceFile << endl;
 			cout << "\t maximum distance to camera center: " << fRunList[i].fmaxradius << " deg" << endl;
 		}
-		
+
 		////////////////////////////////
-		
+
 		else if( fRunList[i].fBackgroundModel == eTEMPLATE )
 		{
 			cout << "TEMPLATE BACKGROUND MODEL" << endl;
@@ -1273,7 +1273,7 @@ void VAnaSumRunParameter::checkNumberOfArguments( int im, int narg, string i_lis
 	{
 		return;
 	}
-	
+
 	int n_tot = 0;
 	if( im == -1 )
 	{
@@ -1301,7 +1301,7 @@ void VAnaSumRunParameter::checkNumberOfArguments( int im, int narg, string i_lis
 		cout << "exiting..." << endl;
 		exit( -1 );
 	}
-	
+
 	// wobble offsets removed with version >=3
 	if( iversion > 2 )
 	{
@@ -1323,7 +1323,7 @@ void VAnaSumRunParameter::checkNumberOfArguments( int im, int narg, string i_lis
 	{
 		n_tot -= 1;    // no more cut file
 	}
-	
+
 	if( ( im == -1 && narg < n_tot ) || ( im >= 0 && narg != n_tot ) )
 	{
 		cout << "error: not enough/too many parameter in " << i_listfilename << ": " << endl;
@@ -1357,22 +1357,22 @@ void VAnaSumRunParameter::reset( VAnaSumRunParameterDataClass it )
 	it.fBackgroundModel = 0;
 	it.fSourceRadius = 0.;
 	it.fmaxradius = 0.;
-	
+
 	it.fAcceptanceFile = "";
-	
+
 	it.fNBoxSmooth = 0;
 	it.fOO_alpha = 0.;
-	
+
 	it.fRM_RingRadius = 0.;
 	it.fRM_RingWidth = 0.;
 	it.fAcceptanceFile = "";
-	
+
 	it.fRE_distanceSourceOff = 0.;
 	it.fRE_nMinoffsource = 0;
 	it.fRE_nMaxoffsource = 0;
-	
+
 	it.fAcceptanceFile = "";
-	
+
 	it.fTE_mscw_min = 0.;
 	it.fTE_mscw_max = 0.;
 	it.fTE_mscl_min = 0.;
@@ -1386,7 +1386,7 @@ double VAnaSumRunParameter::getRingWidth( double a_on, double rr, double rat )
 	{
 		return 0.;
 	}
-	
+
 	return rat / 4. / TMath::Pi() / rr * a_on * 2.;
 }
 
@@ -1399,7 +1399,7 @@ double VAnaSumRunParameter::readSourceRadius( string ifile )
 	{
 		return -1;
 	};
-	
+
 	if( iC.getTheta2Cut_max() < 0. && iC.getDirectionCutSelector() == 2 )
 	{
 		return iC.getAngularResolutionAbsoluteMaximum();
@@ -1415,9 +1415,9 @@ bool VAnaSumRunParameter::readCutParameter( string ifile, double& iSourceRadius,
 {
 	iSourceRadius = -1.;
 	iMaximumDistance = -1.;
-	
+
 	string iEffFile = VUtilities::testFileLocation( ifile, "EffectiveAreas", true );
-	
+
 	TFile* iF  = new TFile( iEffFile.c_str() );
 	if( iF->IsZombie() )
 	{
@@ -1443,12 +1443,12 @@ bool VAnaSumRunParameter::readCutParameter( string ifile, double& iSourceRadius,
 		iSourceRadius = iC->getTheta2Cut_max();
 	}
 	iMaximumDistance = iC->fCut_CameraFiducialSize_max;
-	
+
 	if( iF )
 	{
 		iF->Close();
 	}
-	
+
 	return true;
 }
 
@@ -1498,12 +1498,12 @@ bool VAnaSumRunParameter::checkAnasumParameter( string ifile )
 				 << iIndexMin << "-" << iIndexMax << "]." << endl << endl;
 		}
 	}
-	
+
 	if( iF )
 	{
 		iF->Close();
 	}
-	
+
 	return true;
 }
 
@@ -1517,7 +1517,7 @@ double VAnaSumRunParameter::readMaximumDistance( string ifile )
 	{
 		return -1;
 	}
-	
+
 	return iC.fCut_CameraFiducialSize_max;
 }
 
@@ -1601,7 +1601,7 @@ bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i )
 			fRunList[i].fSkyMapCentreWest     = 0.;
 			fRunList[i].fSkyMapCentreRAJ2000  = fRunList[i].fTargetRAJ2000;
 			fRunList[i].fSkyMapCentreDecJ2000 = fRunList[i].fTargetDecJ2000;
-			
+
 			if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
 			{
 				fMapRunList[fRunList[i].fRunOn].fSkyMapCentreNorth    = 0.;
@@ -1624,7 +1624,7 @@ void VAnaSumRunParameter::setArrayPointing(
 	{
 		return;
 	}
-	
+
 	fRunList[i].fArrayPointingRA = i_radec.first;
 	fRunList[i].fArrayPointingDec = i_radec.second;
 	fRunList[i].fArrayPointingRAJ2000 = i_radecJ2000.first;
@@ -1664,7 +1664,7 @@ void VAnaSumRunParameter::getEventdisplayRunParameter( string fDatadir )
 	for( unsigned int i = 0; i < fRunList.size(); i++ )
 	{
 		i_run = fRunList[i].fRunOn;
-		
+
 		sprintf( i_temp, "%s/%s%d%s", fDatadir.c_str(), fPrefix.c_str(), i_run, fSuffix.c_str() );
 		TFile* i_f = new TFile( i_temp );
 		if( i_f->IsZombie() )
@@ -1711,7 +1711,7 @@ void VAnaSumRunParameter::getEventdisplayRunParameter( string fDatadir )
 		if( fRunList[i].fRunOn != fRunList[i].fRunOff )
 		{
 			i_run = fRunList[i].fRunOff;
-			
+
 			sprintf( i_temp, "%s%s%d%s", fDatadir.c_str(), fPrefix.c_str(), i_run, fSuffix.c_str() );
 			TFile* i_f = new TFile( i_temp );
 			if( i_f->IsZombie() )
@@ -1736,7 +1736,7 @@ void VAnaSumRunParameter::getEventdisplayRunParameter( string fDatadir )
 void VAnaSumRunParameter::setMCZenith()
 {
 	fMCZe.clear();
-	
+
 	fMCZe.push_back( 0.0 );
 	fMCZe.push_back( 20.0 );
 	fMCZe.push_back( 30.0 );
@@ -1775,7 +1775,7 @@ bool VAnaSumRunParameter::writeListOfExcludedSkyRegions()
 	tEx.Branch( "star_id", &id, "star_id/I" );
 	tEx.Branch( "Vmag", &iStarBrightness_V, "Vmag/F" );
 	tEx.Branch( "Bmag", &iStarBrightness_B, "Bmag/F" );
-	
+
 	for( unsigned int i = 0; i < fExclusionRegions.size(); i++ )
 	{
 		x = fExclusionRegions[i]->fExcludeFromBackground_West;
@@ -1789,12 +1789,12 @@ bool VAnaSumRunParameter::writeListOfExcludedSkyRegions()
 		id = fExclusionRegions[i]->fExcludeFromBackground_StarID;
 		iStarBrightness_V = fExclusionRegions[i]->fExcludeFromBackground_StarBrightness_V;
 		iStarBrightness_B = fExclusionRegions[i]->fExcludeFromBackground_StarBrightness_B;
-		
+
 		tEx.Fill();
 	}
-	
+
 	tEx.Write();
-	
+
 	return true;
 }
 
@@ -1809,13 +1809,13 @@ bool VAnaSumRunParameter::getListOfExcludedSkyRegions( TFile* f )
 	{
 		return false;
 	}
-	
+
 	TTree* tEx = ( ( TTree* )f->Get( "total_1/stereo/tExcludedRegions" ) );
 	if( !tEx )
 	{
 		return false;
 	}
-	
+
 	float x = 0.;
 	float y = 0.;
 	float r1 = 0.;
@@ -1859,7 +1859,7 @@ bool VAnaSumRunParameter::getListOfExcludedSkyRegions( TFile* f )
 	{
 		tEx->SetBranchAddress( "Bmag", &iB );
 	}
-	
+
 	for( unsigned int i = 0; i < tEx->GetEntries(); i++ )
 	{
 		tEx->GetEntry( i );
@@ -1882,9 +1882,9 @@ bool VAnaSumRunParameter::getListOfExcludedSkyRegions( TFile* f )
 		fExclusionRegions.back()->fExcludeFromBackground_StarBrightness_V = iV;
 		fExclusionRegions.back()->fExcludeFromBackground_StarBrightness_B = iB;
 	}
-	
+
 	delete tEx;
-	
+
 	return true;
 }
 

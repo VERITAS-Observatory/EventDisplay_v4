@@ -47,13 +47,13 @@ int main( int argc, char* argv[] )
 	string fLogFile;
 	// log file name
 	string fLogFileName;
-	
+
 	if( argc != 3 && argc != 4 )
 	{
 		printHelp();
 		exit( EXIT_SUCCESS );
 	}
-	
+
 	// list of prefered logs to print
 	vector< string > logObjectNames;
 	logObjectNames.push_back( "evndispLog" );
@@ -64,14 +64,14 @@ int main( int argc, char* argv[] )
 	logObjectNames.push_back( "tmvaLog" );
 	logObjectNames.push_back( "effAreaLog" );
 	logObjectNames.push_back( "IRFLog" );
-	
+
 	fLogFileName = argv[1];
 	fRootFile = argv[2];
-	
+
 	// ignore all warnings
 	// "Warning in <TClass::Init>: no dictionary for class .. available..
 	gErrorIgnoreLevel = kError;
-	
+
 	////////////////////////////////////////////////
 	if( argc == 3 )
 	{

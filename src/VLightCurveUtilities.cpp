@@ -10,12 +10,12 @@ VLightCurveUtilities::VLightCurveUtilities()
 
 	fIsZombie = false;
 	fASCIIFormSecondColumnIsObservingInterval = false;
-	
+
 	resetLightCurveData();
-	
+
 	setXRTTimeSettings( false );
 	setPhaseFoldingValues();
-	
+
 }
 
 /*
@@ -27,7 +27,7 @@ VLightCurveUtilities::VLightCurveUtilities()
 void VLightCurveUtilities::resetLightCurveData()
 {
 	fLightCurveData.clear();
-	
+
 	fLightCurveMJD_min =  1.e99;
 	fLightCurveMJD_max = -1.e99;
 }
@@ -55,7 +55,7 @@ bool VLightCurveUtilities::writeASCIIFile( string iFile, vector< VLightCurveData
 		}
 	}
 	is.close();
-	
+
 	return true;
 }
 
@@ -67,7 +67,7 @@ bool VLightCurveUtilities::writeASCIIFile( string iFile, vector< VLightCurveData
 bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double iMJDMax, double iFluxMultiplier )
 {
 	resetLightCurveData();
-	
+
 	// open ascii file
 	ifstream is( iFile.c_str() );
 	if( !is )
@@ -81,14 +81,14 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 	{
 		cout << "\t XRT Time settings: time offset is " << fXRTMissionTimeStart << " [s]" << endl;
 	}
-	
+
 	double iTemp1 = 0.;
 	double iTemp2 = 0.;
 	double iTemp3 = 0.;
 	string iTemp4 = "";
-	
+
 	string is_line;
-	
+
 	//////////////////////
 	// loop over all lines
 	//   (take differences in file format into account)
@@ -98,11 +98,11 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 		{
 			continue;
 		}
-		
+
 		istringstream is_stream( is_line );
-		
+
 		// little errors catching here...
-		
+
 		// a '!' in the first column is a comment
 		is_stream >> iTemp4;     // second since fXRTMissionTimeStart or MJD (depends on fXRTTimeSettings)
 		if( iTemp4.size() == 0 || iTemp4.substr( 0, 1 ) == "!" )
@@ -111,7 +111,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 		}
 		iTemp1 = atof( iTemp4.c_str() );
 		is_stream >> iTemp2;     // error [s]
-		
+
 		// times are given in XRT mission in seconds
 		// convert to days and add mission start offsets (in days)
 		if( fXRTTimeSettings )
@@ -129,9 +129,9 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 		{
 			continue;
 		}
-		
+
 		fLightCurveData.push_back( new VLightCurveData() );
-		// second column is observing intervall
+		// second column is observing interval
 		if( fASCIIFormSecondColumnIsObservingInterval )
 		{
 			fLightCurveData.back()->fMJD_Data_min = iTemp1 - iTemp2;
@@ -151,7 +151,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 			}
 			fLightCurveData.back()->setMJDInterval( fLightCurveData.back()->fMJD_Data_min, fLightCurveData.back()->fMJD_Data_max );
 		}
-		
+
 		if( fLightCurveData.back()->fMJD_Data_min < fLightCurveMJD_min )
 		{
 			fLightCurveMJD_min = fLightCurveData.back()->fMJD_Data_min;
@@ -164,13 +164,13 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 		{
 			fLightCurveMJD_max = fLightCurveData.back()->fMJD_Data_min;
 		}
-		
+
 		//////////////////////////////////
 		// read in rates or fluxes + errors
-		
+
 		is_stream >> iTemp1;     // rate or flux
 		is_stream >> iTemp2;     // rate or flux error
-		
+
 		// upper error (if available)
 		if( !is_stream )
 		{
@@ -180,17 +180,17 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 		{
 			iTemp3 = iTemp2;
 		}
-		
+
 		iTemp1 *= iFluxMultiplier;
 		iTemp2 *= iFluxMultiplier;
 		iTemp3 *= iFluxMultiplier;
-		
+
 		// flux state (if available)
 		if( !( is_stream >> std::ws ).eof() )
 		{
 			is_stream >> iTemp4;
 		}
-		
+
 		// fill light curve data element
 		if( iTemp2 > 0. && iTemp3 > 0. )
 		{
@@ -207,19 +207,19 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 			fLightCurveData.back()->setFluxError( -99. );
 			fLightCurveData.back()->fFluxState = iTemp4;
 		}
-		
+
 	}
 	is.close();
-	
+
 	// update phase folding values
 	updatePhaseFoldingValues();
-	
+
 	cout << "VLightCurve::readASCIIFile() total number of light curve data: " << fLightCurveData.size() << endl;
 	if( fLightCurveData.size() > 0 )
 	{
 		cout << "\t(MJD range: " << fLightCurveMJD_min << "," << fLightCurveMJD_max << ")" << endl;
 	}
-	
+
 	return true;
 }
 
@@ -292,7 +292,7 @@ void VLightCurveUtilities::printLightCurveWiki( double iMinEnergy_TeV )
 	cout << "!Noff" << endl;
 	cout << "!Alpha" << endl;
 	cout << "!Flux (>" << setprecision( 2 ) << fLightCurveData[0]->fEnergy_min_TeV << " TeV) [cm^-2 s^-1]" << endl;
-	
+
 	for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
 	{
 		cout << "|- align=\"center\"" << endl;
@@ -315,10 +315,10 @@ void VLightCurveUtilities::printLightCurveWiki( double iMinEnergy_TeV )
 			cout << "| <" << setprecision( 1 ) << scientific << fLightCurveData[i]->fUpperFluxLimit << endl;
 		}
 	}
-	
+
 	cout << "|}" << fixed << endl;
-	
-	
+
+
 }
 
 void VLightCurveUtilities::printLightCurveDCF()
@@ -406,10 +406,10 @@ void VLightCurveUtilities::printLightCurve( int bFullDetail )
 			cout << "     " << scientific;
 			cout << 0.5 * ( fLightCurveData[i]->fFlux - fLightCurveData[i]->fRunFluxCI_lo_1sigma + fLightCurveData[i]->fRunFluxCI_up_1sigma - fLightCurveData[i]->fFlux );
 			cout << fixed << endl;
-			
+
 		}
 	}
-	
+
 }
 
 void VLightCurveUtilities::setPhaseFoldingValues( double iZeroPhase_MJD, double iPhase_Days,
@@ -421,7 +421,7 @@ void VLightCurveUtilities::setPhaseFoldingValues( double iZeroPhase_MJD, double 
 	fPhaseError_low_fPhase_Period_days = iPhaseError_low_Days;
 	fPhaseError_up_fPhase_Period_days = iPhaseError_up_Days;
 	fPhasePlotting = bPlotPhase;
-	
+
 	updatePhaseFoldingValues();
 }
 
@@ -440,7 +440,7 @@ double VLightCurveUtilities::getPhase( double iMJD )
 	{
 		iMJD = -99.;
 	}
-	
+
 	return iMJD;
 }
 
@@ -451,9 +451,9 @@ double VLightCurveUtilities::getPhaseError( double iMJD )
 {
 	double iError = sqrt( fPhaseError_up_fPhase_Period_days * fPhaseError_up_fPhase_Period_days
 						  + fPhaseError_low_fPhase_Period_days * fPhaseError_low_fPhase_Period_days );
-						  
+
 	double iP = 0.;
-	
+
 	if( fPhase_Period_days > 0. )
 	{
 		iP  = ( iMJD - fPhase_MJD0 ) * ( iMJD - fPhase_MJD0 ) / fPhase_Period_days / fPhase_Period_days / fPhase_Period_days / fPhase_Period_days;
@@ -463,7 +463,7 @@ double VLightCurveUtilities::getPhaseError( double iMJD )
 	{
 		return -99.;
 	}
-	
+
 	return sqrt( iP );
 }
 
@@ -483,7 +483,7 @@ double VLightCurveUtilities::getFlux_Mean()
 	{
 		return iMean / iNN;
 	}
-	
+
 	return -1.e99;
 }
 
@@ -503,7 +503,7 @@ double VLightCurveUtilities::getFluxError_Mean()
 	{
 		return iMean / iNN;
 	}
-	
+
 	return -1.e99;
 }
 
@@ -512,7 +512,7 @@ double VLightCurveUtilities::getFlux_Variance()
 	double Sx = 0.;
 	double Sxx = 0.;
 	double iNN = 0.;
-	
+
 	for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
 	{
 		if( fLightCurveData[i] )
@@ -522,19 +522,19 @@ double VLightCurveUtilities::getFlux_Variance()
 			iNN++;
 		}
 	}
-	
+
 	if( iNN > 1. )
 	{
 		return ( 1. / ( iNN - 1. ) * ( Sxx - 1. / iNN * Sx * Sx ) );
 	}
-	
+
 	return 0.;
 }
 
 double VLightCurveUtilities::getFlux_Max()
 {
 	double iF_max = -1.e90;
-	
+
 	for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
 	{
 		if( fLightCurveData[i] )
@@ -545,14 +545,14 @@ double VLightCurveUtilities::getFlux_Max()
 			}
 		}
 	}
-	
+
 	return iF_max;
 }
 
 double VLightCurveUtilities::getFlux_Min()
 {
 	double iF_Min = 1.e90;
-	
+
 	for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
 	{
 		if( fLightCurveData[i] )
@@ -563,7 +563,7 @@ double VLightCurveUtilities::getFlux_Min()
 			}
 		}
 	}
-	
+
 	return iF_Min;
 }
 
@@ -573,7 +573,7 @@ bool VLightCurveUtilities::updatePhaseFoldingValues()
 	{
 		return false;
 	}
-	
+
 	for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
 	{
 		if( fLightCurveData[i] )
@@ -589,7 +589,7 @@ double VLightCurveUtilities::getMeanObservationInterval()
 {
 	double iM = 0.;
 	double iN = 0.;
-	
+
 	for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
 	{
 		if( fLightCurveData[i] )
@@ -598,12 +598,12 @@ double VLightCurveUtilities::getMeanObservationInterval()
 			iN++;
 		}
 	}
-	
+
 	if( iN > 0. )
 	{
 		return iM / iN;
 	}
-	
+
 	return 0.;
 }
 
@@ -618,11 +618,11 @@ bool VLightCurveUtilities::writeASCIIFile( string iFile, TF1* f1, unsigned int i
 	{
 		return false;
 	}
-	
+
 	if( bClear )
 	{
 		fLightCurveData.clear();
-		
+
 		for( unsigned int i = 0; i < iNPoints; i++ )
 		{
 			fLightCurveData.push_back( new VLightCurveData() );
@@ -660,13 +660,13 @@ double VLightCurveUtilities::getVariabilityIndex( TGraphAsymmErrors* g, double i
 	{
 		return 0;
 	}
-	
+
 	vector< double > F;
 	vector< double > sigmaF;
 	vector< double > w;
 	double w_sum = 0.;
 	double w_F = 0.;
-	
+
 	// fill vectors and calculate weights
 	double x = 0.;
 	double y = 0.;
@@ -675,7 +675,7 @@ double VLightCurveUtilities::getVariabilityIndex( TGraphAsymmErrors* g, double i
 		g->GetPoint( i, x, y );
 		F.push_back( y );
 		sigmaF.push_back( g->GetErrorY( i ) );
-		
+
 		if( sigmaF.back() > 0. )
 		{
 			w.push_back( 1. / ( sigmaF.back()*sigmaF.back() + ( iSystematicFraction * F.back() ) * ( iSystematicFraction * F.back() ) ) );
@@ -687,21 +687,20 @@ double VLightCurveUtilities::getVariabilityIndex( TGraphAsymmErrors* g, double i
 			w.push_back( 0. );
 		}
 	}
-	
+
 	// mean weighted flux
 	double F_mean = 0.;
 	if( w_sum > 0. )
 	{
 		F_mean = w_F / w_sum;
 	}
-	
+
 	// calculate variability index
 	double V = 0.;
 	for( unsigned int j = 0; j < F.size(); j++ )
 	{
 		V += w[j] * ( F[j] - F_mean ) * ( F[j] - F_mean );
 	}
-	
+
 	return V;
 }
-

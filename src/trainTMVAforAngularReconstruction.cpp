@@ -45,10 +45,10 @@ using namespace std;
 pair<float, float> getArrayPointing( Cshowerpars* i_showerpars )
 {
 	pair< float, float> i_mean_pointing;
-	
+
 	i_mean_pointing.first = 0.;
 	i_mean_pointing.second = 0.;
-	
+
 	return i_mean_pointing;
 }
 
@@ -87,14 +87,14 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	cout << " training for telescope type " << iTelType << endl;
 	cout << "----------------------------------------------------------------" << endl;
 	cout << endl;
-	
+
 	if( !iDataTree )
 	{
 		cout << "Error: data tree for telescope type " << iTelType << " does not exist" << endl;
 		return false;
 	}
 	char htitle[6000];
-	
+
 	// Determine the number of training and test events
 	unsigned int ntrain   = 0 ;
 	unsigned int ntest    = 0 ;
@@ -137,8 +137,8 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	train_and_test_conditions << "ScaleWithPreselEff=True";
 	cout << "Train and test condition: " << train_and_test_conditions.str() << endl;
 	cout << endl;
-	
-	
+
+
 	// output file name
 	ostringstream iFileName;
 	iFileName << iOutputDir << "/" << iTargetML << "_" << iTelType << ".tmva.root";
@@ -148,19 +148,19 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 		cout << "error while creating tmva root file: " << iFileName.str() << endl;
 		return false;
 	}
-	
+
 	// set output directory
 	gSystem->mkdir( iOutputDir.c_str() );
 	TString iOutputDirectory( iOutputDir.c_str() );
 	gSystem->ExpandPathName( iOutputDirectory );
 	( TMVA::gConfig().GetIONames() ).fWeightFileDir = iOutputDirectory;
-	
+
 	// tmva regression
 	TMVA::Factory* factory = new TMVA::Factory( iTargetML.c_str(), i_tmva,
 			"V:!DrawProgressBar:!Color:!Silent:AnalysisType=Regression:VerboseLevel=Debug:Correlations=True" );
 	factory->SetVerbose( true );
 	TMVA::DataLoader* dataloader = new TMVA::DataLoader( "" );
-	
+
 	// list of variables used by MVA method
 	dataloader->AddVariable( "width", 'F' );
 	dataloader->AddVariable( "length", 'F' );
@@ -250,10 +250,10 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	}
 	// add weights (optional)
 	//    dataloader->SetWeightExpression( "MCe0*MCe0", "Regression" );
-	
+
 	// regression tree
 	dataloader->AddRegressionTree( iDataTree, 1. );
-	
+
 	// quality cuts
 	// (determined by plotting all variables with
 	//  macro plot_dispBDT_inputVariables.C)
@@ -262,9 +262,9 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	//  (otherwise large bias in the energy reconstruction)
 	TCut fQualityCut = iQualityCut.c_str();
 	cout << "Quality cuts applied: " << iQualityCut << endl;
-	
+
 	dataloader->PrepareTrainingAndTestTree( fQualityCut, train_and_test_conditions.str().c_str() ) ;
-	
+
 	ostringstream iMVAName;
 	if( iTargetML.find( "MLP" ) != string::npos )
 	{
@@ -275,9 +275,9 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 		iMVAName << "BDT_" << iTelType;
 	}
 	sprintf( htitle, "%s", iMVAName.str().c_str() );
-	
+
 	TString methodstr( iTMVAOptions.c_str() );
-	
+
 	cout << "Built MethodStringStream: " << iTMVAOptions << endl;
 	cout << endl;
 	TString methodTitle( htitle );
@@ -289,15 +289,15 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	{
 		factory->BookMethod( dataloader, TMVA::Types::kBDT, methodTitle, methodstr ) ;
 	}
-	
+
 	factory->TrainAllMethods();
-	
+
 	factory->TestAllMethods();
-	
+
 	factory->EvaluateAllMethods();
-	
+
 	factory->Delete();
-	
+
 	return true;
 }
 
@@ -310,8 +310,8 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 vector< string > fillInputFile_fromList( string iList )
 {
 	vector< string > inputfile;
-	
-	
+
+
 	ifstream is;
 	is.open( iList.c_str(), ifstream::in );
 	if( !is )
@@ -332,9 +332,9 @@ vector< string > fillInputFile_fromList( string iList )
 		}
 	}
 	is.close();
-	
+
 	cout << "total number of input files " << inputfile.size() << endl;
-	
+
 	return inputfile;
 }
 
@@ -347,7 +347,7 @@ vector< string > fillInputFile_fromList( string iList )
 bool readTrainingFile( string iTargetML, ULong64_t iTelType, string iDataDirectory )
 {
 	fMapOfTrainingTree.clear();
-	
+
 	ostringstream iFileName;
 	iFileName << iDataDirectory << "/" << iTargetML;
 	if( iTelType != 0 )
@@ -368,7 +368,7 @@ bool readTrainingFile( string iTargetML, ULong64_t iTelType, string iDataDirecto
 	{
 		fMapOfTrainingTree[iTelType] = ( TTree* )iO->Get( iTreeName.str().c_str() );
 	}
-	
+
 	return true;
 }
 
@@ -393,34 +393,34 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 		return false;
 	}
 	// (assume in the following that iInputFileList has a reasonable size)
-	
+
 	/////////////////////////////
 	// telescope configuration
 	TChain i_telChain( "telconfig" );
 	i_telChain.Add( iInputFileList[0].c_str(), 0 );
 	cout << "reading telescope list from ";
 	cout << iInputFileList[0] << endl;
-	
+
 	Ctelconfig i_tel( &i_telChain );
 	i_tel.GetEntry( 0 );
 	unsigned int i_ntel = i_tel.NTel;
-	
+
 	vector< unsigned int > iHyperArrayID;
 	vector< float > iFOV_tel;
-	
+
 	// get list of telescopes - hyperarray values
 	for( int t = 0; t < i_tel.fChain->GetEntries(); t++ )
 	{
 		i_tel.GetEntry( t );
-		
+
 		iHyperArrayID.push_back( i_tel.TelID_hyperArray );
 		iFOV_tel.push_back( i_tel.FOV );
 		cout << "\t FOV for telescope " << iHyperArrayID.back() << ": " << iFOV_tel.back() << endl;
 	}
-	
+
 	// use all telescope for reconstruction
 	vector< bool > fUseTelescope( i_ntel, true );
-	
+
 	// vector with telescope position
 	// (includes all telescopes, even those
 	// of other types)
@@ -437,7 +437,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 	for( unsigned int i = 0; i < i_ntel; i++ )
 	{
 		i_tel.GetEntry( i );
-		
+
 		fTelX.push_back( i_tel.TelX );
 		fTelY.push_back( i_tel.TelY );
 		fTelZ.push_back( i_tel.TelZ );
@@ -445,7 +445,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 		fEM_TelY.push_back( i_tel.TelY );
 		fEM_TelZ.push_back( i_tel.TelZ );
 		fTelType.push_back( i_tel.TelType );
-		
+
 		if( i < fUseTelescope.size() && !fUseTelescope[i] )
 		{
 			continue;
@@ -456,10 +456,10 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			f_ntelType++;
 		}
 	}
-	
+
 	///////////////////////////////////////////////////
 	// definition of training trees (one per telescope type)
-	
+
 	int runNumber = -1;
 	int eventNumber = -1;
 	unsigned int tel = 0;
@@ -507,14 +507,14 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 	float az = -1.;
 	float EmissionHeight = -1.;
 	int   Fitstat = -1;
-	
+
 	fMapOfTrainingTree.clear();
 	cout << "total number of telescopes: " << i_ntel;
 	cout << " (selected " << f_ntelType << ")" << endl;
 	for( unsigned int i = 0; i < i_ntel; i++ )
 	{
 		i_tel.GetEntry( i );
-		
+
 		// select telescope type
 		if( iTelType != 0 && i_tel.TelType != iTelType )
 		{
@@ -525,7 +525,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 		{
 			continue;
 		}
-		
+
 		if( fMapOfTrainingTree.find( i_tel.TelType ) == fMapOfTrainingTree.end() )
 		{
 			ostringstream iTreeName;
@@ -533,7 +533,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			ostringstream iTreeTitle;
 			iTreeTitle << "training tree for modified disp method (telescope type " << i_tel.TelType << ")";
 			fMapOfTrainingTree[i_tel.TelType] = new TTree( iTreeName.str().c_str(), iTreeTitle.str().c_str() );
-			
+
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "runNumber", &runNumber, "runNumber/I" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "eventNumber", &eventNumber, "eventNumber/I" );
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "tel",         &tel, "tel/i" );
@@ -583,7 +583,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispCore", &dispCore, "dispCore/F" );
 		}
 	}
-	
+
 	////////////////////////////////////////////
 	// filling of training trees;
 	cout << "filling training trees for " << fMapOfTrainingTree.size() << " telescope type(s)" << endl;
@@ -595,7 +595,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 		cout << "\t single telescope analysis" << endl;
 	}
 	fMapOfNTelescopeType[iTelType] = f_ntelType;
-	
+
 	// get showerpars tree
 	TChain i_showerparsTree( "showerpars" );
 	for( unsigned int f = 0; f < iInputFileList.size(); f++ )
@@ -603,7 +603,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 		i_showerparsTree.Add( iInputFileList[f].c_str(), 0 );
 	}
 	Cshowerpars i_showerpars( &i_showerparsTree, true, true );
-	
+
 	// get all tpars tree
 	vector< TChain* > i_tparsTree;
 	vector< Ctpars* > i_tpars;
@@ -630,7 +630,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			cout << "\t ignore tree for telescope type " << fTelType[i] << endl;
 		}
 	}
-	
+
 	// temporary variables for emission height calculation
 	VEmissionHeightCalculator* fEmissionHeightCalculator = new VEmissionHeightCalculator();
 	fEmissionHeightCalculator->setTelescopePositions( fTelX, fTelY, fTelZ );
@@ -642,22 +642,22 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 	double fEM_cosphi[fTelType.size()];
 	double fEM_sinphi[fTelType.size()];
 	double fEM_weight[fTelType.size()];
-	
+
 	// stereo (intersection of line) reconstruction
 	// needed for the re-calculation of 'cross'
 	VSimpleStereoReconstructor i_SR;
 	i_SR.initialize();
-	
+
 	/////////////////////////////////////////////////
 	// loop over all events in trees
 	int nentries = i_showerpars.fChain->GetEntries();
 	cout << "Loop over " << nentries << " entries in source files" << endl;
-	
+
 	for( int n = 0; n < nentries; n++ )
 	{
 		// read events from event trees
 		i_showerpars.GetEntry( n );
-		
+
 		// check recid
 		if( iRecID >= i_showerpars.NMethods )
 		{
@@ -665,7 +665,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			cout << " Maximum allowed value is " << i_showerpars.NMethods << endl;
 			return false;
 		}
-		
+
 		// require:
 		// - reconstructed event
 		// - at least two telescopes
@@ -684,7 +684,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 				continue;
 			}
 		}
-		
+
 		// check if there are image of this telescope type
 		// (hyper-array)
 		int i_nteltypecounter = 0;
@@ -700,7 +700,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 		{
 			continue;
 		}
-		
+
 		/////////////////////////////////////////////////////////
 		// calculate emission height and cross
 		for( unsigned int i = 0; i < i_tpars.size(); i++ )
@@ -713,7 +713,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			fEM_cosphi[i] = 0.;
 			fEM_sinphi[i] = 0.;
 			fEM_weight[i] = 0.;
-			
+
 			if( ( int )i_showerpars.ImgSel_list[iRecID][i] < 1
 					&& ( i_showerpars.NImages[iRecID] > 1 || !iSingleTelescopeAnalysis ) )
 			{
@@ -726,9 +726,9 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			{
 				continue;
 			}
-			
+
 			i_tpars[i]->GetEntry( n );
-			
+
 			if( i_tpars[i]->size > 0. )
 			{
 				fEM_size[i] = i_tpars[i]->size;
@@ -744,10 +744,10 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			}
 		}
 		pair< float, float> i_mean_array_pointing = getArrayPointing( &i_showerpars );
-		
+
 		EmissionHeight = fEmissionHeightCalculator->getEmissionHeight( fEM_cen_x, fEM_cen_y, fEM_size,
 						 i_mean_array_pointing.first, i_mean_array_pointing.second );
-						 
+
 		if( !iSingleTelescopeAnalysis )
 		{
 			i_SR.reconstruct_direction(
@@ -764,7 +764,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 				fEM_length,
 				fEM_weight );
 		}
-		
+
 		//////////////////////////////////////
 		// loop over all telescopes
 		for( unsigned int i = 0; i < i_tpars.size(); i++ )
@@ -788,14 +788,14 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 				continue;
 			}
 			i_tpars[i]->GetEntry( n );
-			
+
 			/////////////////////////////////
 			// quality cuts
 			if( i_tpars[i]->size <= 0 )
 			{
 				continue;
 			}
-			
+
 			runNumber   = i_showerpars.runNumber;
 			eventNumber = i_showerpars.eventNumber;
 			tel         = i + 1;
@@ -839,15 +839,15 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			MCaz        = i_showerpars.MCaz;
 			TelElevation = i_showerpars.TelElevation[i];
 			TelAzimuth = i_showerpars.TelAzimuth[i];
-			
+
 			Rcore       = VUtilities::line_point_distance( Ycore,   -1.*Xcore,   0., ze, az, fTelY[i], -1.*fTelX[i], fTelZ[i] );
 			MCrcore     = VUtilities::line_point_distance( MCycore, -1.*MCxcore, 0., MCze, MCaz, fTelY[i], -1.*fTelX[i], fTelZ[i] );
-			
+
 			if( Rcore < 0. && !iSingleTelescopeAnalysis )
 			{
 				continue;
 			}
-			
+
 			//////////////////////////////////////////////////////////////////////////////////////////////////
 			// calculate disp (observe sign convention for MC in y direction for MCyoff and Yoff)
 			disp  = sqrt( ( cen_y + MCyoff ) * ( cen_y + MCyoff ) + ( cen_x - MCxoff ) * ( cen_x - MCxoff ) );
@@ -867,7 +867,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			}
 			dispCrossError = disp - cross;
 			dispPhi = TMath::ATan2( sinphi, cosphi ) - TMath::ATan2( cen_y + MCyoff, cen_x - MCxoff );
-			
+
 			// disp error: the expected difference between true and
 			//             reconstructed direction
 			// Note that this is only the error expected due to the mismatch
@@ -890,11 +890,11 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 				dispError = sqrt( ( x2 - MCxoff ) * ( x2 - MCxoff ) + ( y2 + MCyoff ) * ( y2 + MCyoff ) );
 				dispSign = -1.;
 			}
-			
+
 			// training target in ratio to size
 			dispEnergy = log10( i_showerpars.MCe0 ) / log10( i_tpars[i]->size );
 			dispCore   = Rcore;
-			
+
 			if( fMapOfTrainingTree.find( fTelType[i] ) != fMapOfTrainingTree.end() )
 			{
 				fMapOfTrainingTree[fTelType[i]]->Fill();
@@ -909,7 +909,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			delete i_tpars[i];
 		}
 	}
-	
+
 	return true;
 }
 
@@ -933,7 +933,7 @@ int main( int argc, char* argv[] )
 		}
 	}
 	cout << endl;
-	
+
 	// print help text
 	if( argc < 6 )
 	{
@@ -944,7 +944,7 @@ int main( int argc, char* argv[] )
 		cout << "                                     [quality cut] [use image parameter errors (default=off=0)]";
 		cout << endl;
 		cout << endl;
-		
+
 		cout << "     <list of input eventdisplay files (MC)> : test files with input evndisplay files" << endl;
 		cout << "     <train vs test fraction> fraction of events to be used for training (typical 0.5)" << endl;
 		cout << "     <reconstruction ID>:  e.g. 0,1,2,3" << endl;
@@ -989,7 +989,7 @@ int main( int argc, char* argv[] )
 		iQualityCut = argv[10];
 	}
 	bool redo_stereo_reconstruction = false;
-	
+
 	///////////////////////////
 	// print runparameters to screen
 	cout << "trainTMVAforAngularReconstruction (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
@@ -1009,7 +1009,7 @@ int main( int argc, char* argv[] )
 	}
 	cout << endl;
 	cout << "using events for reconstruction ID " << iRecID << endl;
-	
+
 	/////////////////////////
 	if( fTrainTest <= 0.0 || fTrainTest >= 1.0 )
 	{
@@ -1019,7 +1019,7 @@ int main( int argc, char* argv[] )
 		cout << endl;
 		exit( EXIT_FAILURE );
 	}
-	
+
 	///////////////////////////
 	// output file
 	ostringstream iFileName;
@@ -1088,9 +1088,9 @@ int main( int argc, char* argv[] )
 				   iTargetML, iTMVAOptions, iQualityCut,
 				   iSingleTel );
 	}
-	
+
 	//////////////////////
 	// close output file
 	iO.Close();
-	
+
 }

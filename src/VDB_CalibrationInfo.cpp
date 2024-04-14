@@ -12,7 +12,7 @@ VDB_CalibrationInfo::VDB_CalibrationInfo()
 	//..........................
 	// TO BE COMPLETED maybe
 	//..........................
-	
+
 	fread_flag = false;
 	fcurrent_run = -111;
 	fcurrent_tel = -111 ;
@@ -21,16 +21,16 @@ VDB_CalibrationInfo::VDB_CalibrationInfo()
 	fVOFFLINE_version_query = -111;
 	fLOW_GAIN = -111;
 	fServer  = "";
-	
+
 	fwrite_flag = false;
 	fdofile_flag = false;
 	fVOFFLINE_version_query = -1000;
 	fquery_read = "";
 	fNOW_DB = "demain";
-	
+
 	flong_char_query = 100000;
 	fseparation = "|";
-	
+
 }
 VDB_CalibrationInfo::VDB_CalibrationInfo( TString file_to_write_in_DB, TString DBserver, int low_gain )
 {
@@ -39,7 +39,7 @@ VDB_CalibrationInfo::VDB_CalibrationInfo( TString file_to_write_in_DB, TString D
 	fServer  = DBserver;
 	fFile_to_write = file_to_write_in_DB;
 	fLOW_GAIN = low_gain;
-	
+
 	//--- global parameter not specified in the call
 	fcurrent_run = -1000;
 	fcurrent_tel = -1000 ;
@@ -48,7 +48,7 @@ VDB_CalibrationInfo::VDB_CalibrationInfo( TString file_to_write_in_DB, TString D
 	fdofile_flag = false;
 	fread_flag = false;
 	fquery_read = "";
-	
+
 	flong_char_query = 100000;
 	fseparation = "|";
 }
@@ -60,14 +60,14 @@ VDB_CalibrationInfo::VDB_CalibrationInfo( int current_run, int current_tel, TStr
 	fNOW_DB = NOW_DB;
 	fVOFFLINE_version_query = VOFFLINE_version_query;
 	fLOW_GAIN = LOW_GAIN;
-	
+
 	//--- global parameter not specified in the call
 	fServer  = "";
 	fFile_to_write = "";
 	fwrite_flag = false;
 	fread_flag = false;
 	fquery_read = "";
-	
+
 	flong_char_query = 100000;
 	fseparation = "|";
 }
@@ -81,7 +81,7 @@ VDB_CalibrationInfo::VDB_CalibrationInfo( int laserrun, int tel, string name_out
 	fVOFFLINE_version_query = VOFFLINE_version_query;
 	fLOW_GAIN = LOW_GAIN;
 	fServer  = DBserver;
-	
+
 	//--- global parameter not specified in the call
 	fwrite_flag = false;
 	fdofile_flag = false;
@@ -90,7 +90,7 @@ VDB_CalibrationInfo::VDB_CalibrationInfo( int laserrun, int tel, string name_out
 	fNOW_DB = "demain";
 	flong_char_query = 100000;
 	fseparation = "|";
-	
+
 }
 
 /******************************* Writing function *******************************/
@@ -117,7 +117,7 @@ bool VDB_CalibrationInfo::DoFile_for_DBwriting( vector < double > Vchannel_gain,
 	}
 	for( unsigned int i = 0; i < Vchannel_gain.size(); i++ )
 	{
-	
+
 		if( Vchannel_gain[i] != Vchannel_toff[i] )
 		{
 			printf( " WARNING: RUN %d tel %d \n channel in gain (%f) different from channel in toff (%f) \n", fcurrent_run, fcurrent_tel, Vchannel_gain[i], Vchannel_toff[i] );
@@ -126,13 +126,13 @@ bool VDB_CalibrationInfo::DoFile_for_DBwriting( vector < double > Vchannel_gain,
 		else
 		{
 			fprintf( wDB_file, "%5d %s %d %s %3d %s %s %s %.4f %s %.4f %s %+.4f %s %+.4f %s %5d %s %5d \n", fcurrent_run, fseparation.Data(), fcurrent_tel, fseparation.Data(), ( int ) Vchannel_gain[i], fseparation.Data(), fNOW_DB.Data(), fseparation.Data(), Vmean_gain[i], fseparation.Data(), Vvar_gain[i], fseparation.Data(), Vmean_toff[i], fseparation.Data(), Vvar_toff[i], fseparation.Data(), fVOFFLINE_version_query, fseparation.Data(), fLOW_GAIN );
-			
-			
+
+
 			writing_ok = true;
 		}
-		
+
 	}
-	
+
 	return writing_ok;
 }
 
@@ -181,11 +181,11 @@ void VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file( string pass_word )
 		std::cout << "if you want to call  VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file()" << std::endl;
 		return;
 	}
-	
+
 	//---- open the DB and check
 	string iTempS;
 	iTempS =  fServer + "/VOFFLINE?local";
-	
+
 	std::cout << "You are in the process of WRITING in VOFFLINE Data Base " << std::endl;
 	std::cout << "in order to complete the process: " << std::endl;
 	string the_password = pass_word;
@@ -193,7 +193,7 @@ void VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file( string pass_word )
 	{
 		please_give_the_password();
 	}
-	
+
 	//std::cout<<"VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file "<<std::endl;
 	VDB_Connection my_connection( iTempS.c_str(), "readwrite", the_password.c_str() ) ;
 	if( !my_connection.Get_Connection_Status() )
@@ -202,14 +202,14 @@ void VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file( string pass_word )
 	}
 	string query = WriteQuery_to_write_in_DB();
 	std::cout << "query " << query << std::endl;
-	
+
 	//---- do the query and check
 	if( !my_connection.make_query( query.c_str() ) )
 	{
 		cout << "WARNING VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file: failed to get something from the query " << endl;
 		return;
 	}
-	
+
 	return;
 }
 
@@ -231,18 +231,18 @@ bool VDB_CalibrationInfo::readVOFFLINE()
 		Vvar.clear();
 		return false;
 	}
-	
+
 	//-- Create the query to read the DB
 	Create_query_read();
-	
+
 	//-- read the DB and put the result in the vector
 	if( Read_the_DB() )
 	{
-	
+
 		//-- write the result of the reading in a FILE
 		if( Vchannel.size() > 0 && fFile_to_write.Length() > 0 )
 		{
-		
+
 			// make sure that directory exists
 			gSystem->mkdir( gSystem->DirName( fFile_to_write.Data() ), true );
 			FILE* file_output;
@@ -257,20 +257,20 @@ bool VDB_CalibrationInfo::readVOFFLINE()
 		else if( Vchannel.size() == 0 )
 		{
 			std::cout << "ERROR  VDB_CalibrationInfo::readVOFFLINE Vchannel.size()<1" << std::endl;
-			
+
 			return false;
 		}
 		return true;
-		
+
 	}
 	else
 	{
-	
+
 		std::cout << "ERROR reading went wrong " << std::endl;
 		return false;
-		
+
 	}
-	
+
 }
 
 
@@ -290,18 +290,18 @@ string VDB_CalibrationInfo::please_give_the_password()
 
 	string password = "";
 	char str [80];
-	
-	
+
+
 	printf( "Please enter the password: " );
 	int result_scan = scanf( "%79s", str );
-	
+
 	if( result_scan > 0 )
 	{
 		password = str;
 	}
-	
+
 	return password;
-	
+
 }
 //------------------------------------------------------------------------
 //-- VDB_CalibrationInfo::WriteQuery_to_write_in_DB()
@@ -312,19 +312,19 @@ string VDB_CalibrationInfo::WriteQuery_to_write_in_DB()
 {
 
 	string query = "";
-	
+
 	if( !test_file_format( fFile_to_write ) )
 	{
 		return query;
 	}
-	
+
 	char c_query[flong_char_query];// has to be long if we ask for a long run list in VDBSourceInfo
 	sprintf( c_query, "LOAD DATA LOCAL INFILE '%s' INTO TABLE tblEventDisplay_Analysis_Calibration_Flasher FIELDS TERMINATED BY '%s' ;", fFile_to_write.Data(), fseparation.Data() );
-	
-	
+
+
 	query = c_query;
 	return query;
-	
+
 }
 
 //---------------------------------------------------------------------------
@@ -338,16 +338,16 @@ bool VDB_CalibrationInfo::test_file_format( TString file_to_be_copied )
 {
 
 	bool good_format = false;
-	
+
 	//............................
 	// TO DO
 	//............................
-	
-	
+
+
 	good_format = true;
-	
+
 	return good_format;
-	
+
 }
 
 /******************** Reading VOFFLINE DB functions *******************************/
@@ -364,11 +364,11 @@ bool VDB_CalibrationInfo::Read_the_DB()
 	Vchannel.clear();
 	Vmean.clear();
 	Vvar.clear();
-	
+
 	//---- open the DB and check
 	stringstream iTempS;
 	iTempS << fServer << "/VOFFLINE";
-	
+
 	//std::cout<<"VDB_CalibrationInfo::Read_the_DB "<<std::endl;
 	VDB_Connection my_connection( iTempS.str().c_str(), "readonly", "" ) ;
 	if( !my_connection.Get_Connection_Status() )
@@ -385,7 +385,7 @@ bool VDB_CalibrationInfo::Read_the_DB()
 		return false;
 	}
 	TSQLResult* db_res = my_connection.Get_QueryResult();
-	
+
 	//---- read the query
 	if( db_res->GetRowCount() > 0 )
 	{
@@ -397,7 +397,7 @@ bool VDB_CalibrationInfo::Read_the_DB()
 				cout << "ERROR laser run  " << fcurrent_run << " tel " << fcurrent_tel << " is not in the VOFFLINE DB (yet?)" << std::endl;
 				return false;
 			}
-			
+
 			Vchannel.push_back( ( unsigned int )atoi( db_row->GetField( 0 ) ) ) ;
 			Vmean.push_back( atof( db_row->GetField( 1 ) ) ) ;
 			Vvar.push_back( atof( db_row->GetField( 2 ) ) );
@@ -405,10 +405,10 @@ bool VDB_CalibrationInfo::Read_the_DB()
 	}
 	else
 	{
-	
+
 		cout << "ERROR laser run  " << fcurrent_run << " tel " << fcurrent_tel << " is not in the VOFFLINE DB (yet?)" << std::endl;
 		return false;
-		
+
 	}
 	// HARDWIRED TOTAL NUMBER OF CHANNELS
 	if( Vchannel.size() < 499 )
@@ -416,10 +416,10 @@ bool VDB_CalibrationInfo::Read_the_DB()
 		cout << "ERROR laser run  " << fcurrent_run << " tel " << fcurrent_tel << " has " << Vchannel.size() << " channel filled in the DB. Should be 499" << std::endl;
 		return false;
 	}
-	
-	
-	
-	
+
+
+
+
 	return true;
 }
 //---------------------------------------------------------------------------
@@ -432,11 +432,11 @@ void VDB_CalibrationInfo::Create_query_read()
 {
 
 	char c_query[flong_char_query];// has to be long if we ask for a long run list in VDBSourceInfo
-	
+
 	//--- gain only
 	if( freading_gain_or_toff == 1 )
 	{
-	
+
 		if( fVOFFLINE_version_query > 0 )
 		{
 			sprintf( c_query, " SELECT * FROM(SELECT tbl.channel_id, tbl.gain_mean, tbl.gain_var FROM tblEventDisplay_Analysis_Calibration_Flasher AS tbl WHERE tbl.telescope = %d AND  tbl.run_id = %d AND tbl.code_version = %d AND tbl.high_low_gain_flag = %d ORDER BY tbl.update_time DESC ) AS BIG_table GROUP BY channel_id ;", fcurrent_tel, fcurrent_run, fVOFFLINE_version_query, fLOW_GAIN );
@@ -445,12 +445,12 @@ void VDB_CalibrationInfo::Create_query_read()
 		{
 			sprintf( c_query, " SELECT * FROM(SELECT tbl.channel_id, tbl.gain_mean, tbl.gain_var FROM tblEventDisplay_Analysis_Calibration_Flasher AS tbl WHERE tbl.telescope = %d AND  tbl.run_id = %d AND tbl.high_low_gain_flag = %d ORDER BY tbl.update_time DESC ) AS BIG_table GROUP BY channel_id;", fcurrent_tel, fcurrent_run, fLOW_GAIN );
 		}
-		
+
 	}
 	//--- toff only
 	else if( freading_gain_or_toff == 2 )
 	{
-	
+
 		if( fVOFFLINE_version_query > 0 )
 		{
 			sprintf( c_query, " SELECT * FROM(SELECT tbl.channel_id, tbl.toffset_mean, tbl.toffset_var FROM tblEventDisplay_Analysis_Calibration_Flasher AS tbl WHERE tbl.telescope = %d AND  tbl.run_id = %d AND tbl.code_version = %d AND tbl.high_low_gain_flag = %d ORDER BY tbl.update_time DESC )AS BIG_table GROUP BY channel_id ;", fcurrent_tel, fcurrent_run, fVOFFLINE_version_query, fLOW_GAIN );
@@ -459,16 +459,16 @@ void VDB_CalibrationInfo::Create_query_read()
 		{
 			sprintf( c_query, " SELECT * FROM(SELECT tbl.channel_id, tbl.toffset_mean, tbl.toffset_var FROM tblEventDisplay_Analysis_Calibration_Flasher AS tbl WHERE tbl.telescope = %d AND  tbl.run_id = %d AND tbl.high_low_gain_flag = %d ORDER BY tbl.update_time DESC )AS BIG_table GROUP BY channel_id ;", fcurrent_tel, fcurrent_run, fLOW_GAIN );
 		}
-		
-		
+
+
 	}
 	else
 	{
 		std::cout << "VDB_CalibrationInfo::Create_query_read() ERROR:  " << freading_gain_or_toff << " wrong value for freading_gain_or_toff (should be 0 or 1 or2 )" << std::endl;
 	}
-	
+
 	fquery_read = c_query;
-	
+
 	return;
 }
 
@@ -509,7 +509,3 @@ void VDB_CalibrationInfo::Create_query_read()
 AS BIG_table
     GROUP BY channel_id
 */
-
-
-
-

@@ -9,7 +9,7 @@
 VRunSummary::VRunSummary()
 {
 	fRunSummaryTree = new TTree( "tRunSummary", "anasum results" );
-	
+
 	setBranches();
 }
 
@@ -20,7 +20,7 @@ bool VRunSummary::setBranches()
 	{
 		return false;
 	}
-	
+
 	fRunSummaryTree->Branch( "runOn", &runOn, "runOn/I" );
 	fRunSummaryTree->Branch( "runOff", &runOff, "runOff/I" );
 	fRunSummaryTree->Branch( "MJDOn", &MJDOn, "MJDOn/D" );
@@ -67,9 +67,9 @@ bool VRunSummary::setBranches()
 	fRunSummaryTree->Branch( "MaxSigni", &MaxSigni, "MaxSigni/D" );
 	fRunSummaryTree->Branch( "MaxSigniX", &MaxSigniX, "MaxSigniX/D" );
 	fRunSummaryTree->Branch( "MaxSigniY", &MaxSigniY, "MaxSigniY/D" );
-	
+
 	init();
-	
+
 	return true;
 }
 
@@ -122,7 +122,7 @@ void VRunSummary::init()
 	MaxSigni = 0.;
 	MaxSigniX = 0.;
 	MaxSigniY = 0.;
-	
+
 	fRunMJD.clear();
 	fTotalExposureOn = 0.;
 	fTotalExposureOff = 0.;
@@ -143,7 +143,7 @@ void VRunSummary::init()
 	fTotTargetDec = 0.;
 	fTotTargetRAJ2000 = 0.;
 	fTotTargetDecJ2000 = 0.;
-	
+
 }
 
 
@@ -167,14 +167,14 @@ void VRunSummary::print()
 {
 	initTree();
 	char itemp[200];
-	
+
 	cout << endl << endl;
 	cout << "RUN SUMMARY: " << endl << endl;
-	
+
 	for( int i = 0; i < fRunSummaryTree->GetEntries(); i++ )
 	{
 		fRunSummaryTree->GetEntry( i );
-		
+
 		if( runOn == -1 )
 		{
 			cout << endl;
@@ -224,7 +224,7 @@ void VRunSummary::print()
 		sprintf( itemp, "%7.3f", RateOff );
 		cout << " (background: " << itemp << " events/min)" << endl;
 	}
-	
+
 }
 
 /*
@@ -237,7 +237,7 @@ bool VRunSummary::fill( string iDataDirectory,
 						vector< VAnaSumRunParameterDataClass > iRunList )
 {
 	char i_temp[2000];
-	
+
 	// current directory
 	TDirectory* iCurrentDirectory = gDirectory;
 	// copy relevant entries
@@ -250,10 +250,10 @@ bool VRunSummary::fill( string iDataDirectory,
 	fRunSummaryTree = i_runSumChain->CopyTree( "runOn>0" );
 	fRunSummaryTree->SetDirectory( iCurrentDirectory );
 	fRunSummaryTree->AutoSave();
-	
+
 	// reset variables
 	fRunMJD.clear();
-	
+
 	fTotalExposureOn = 0.;
 	fTotalExposureOff = 0.;
 	f_exposureOn.clear();
@@ -269,13 +269,13 @@ bool VRunSummary::fill( string iDataDirectory,
 	fMeanRawRateOff = 0.;
 	fMeanPedVarsOn = 0.;
 	fMeanPedVarsOff = 0.;
-	
+
 	CRunSummary i_runSum( i_runSumChain );
 	double iTargetRA = 0.;
 	double iTargetDec = 0.;
 	double iTargetRAJ2000 = 0.;
 	double iTargetDecJ2000 = 0.;
-	
+
 	for( int n = 0; n < i_runSum.fChain->GetEntries(); n++ )
 	{
 		i_runSum.GetEntry( n );
@@ -285,7 +285,7 @@ bool VRunSummary::fill( string iDataDirectory,
 			{
 				runOn = iRunList[i].fRunOn;
 				runOff = iRunList[i].fRunOff;
-				
+
 				// add values to run list
 				fRunMJD[runOn] = i_runSum.MJDOn;
 				fRunMJD[runOff] = i_runSum.MJDOff;
@@ -304,7 +304,7 @@ bool VRunSummary::fill( string iDataDirectory,
 				fMeanPedVarsOn += i_runSum.pedvarsOn;
 				fMeanPedVarsOff += i_runSum.pedvarsOff;
 				fNMeanElevation++;
-				
+
 				if( fNMeanElevation == 0. )
 				{
 					iTargetRA = i_runSum.TargetRA;
@@ -323,15 +323,15 @@ bool VRunSummary::fill( string iDataDirectory,
 			}
 		}
 	}
-	
+
 	// set target coordinates
 	fTotTargetRA = iTargetRA;
 	fTotTargetDec = iTargetDec;
 	fTotTargetRAJ2000 = iTargetRAJ2000;
 	fTotTargetDecJ2000 = iTargetDecJ2000;
-	
+
 	iCurrentDirectory->cd();
-	
+
 	return true;
 }
 
@@ -342,7 +342,7 @@ bool VRunSummary::initTree()
 	{
 		return false;
 	}
-	
+
 	fRunSummaryTree->SetBranchAddress( "runOn", &runOn );
 	fRunSummaryTree->SetBranchAddress( "runOff", &runOff );
 	fRunSummaryTree->SetBranchAddress( "MJDOn", &MJDOn );
@@ -389,6 +389,6 @@ bool VRunSummary::initTree()
 	fRunSummaryTree->SetBranchAddress( "MaxSigni", &MaxSigni );
 	fRunSummaryTree->SetBranchAddress( "MaxSigniX", &MaxSigniX );
 	fRunSummaryTree->SetBranchAddress( "MaxSigniY", &MaxSigniY );
-	
+
 	return true;
 }

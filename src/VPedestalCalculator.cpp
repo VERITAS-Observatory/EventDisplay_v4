@@ -10,13 +10,13 @@
 VPedestalCalculator::VPedestalCalculator()
 {
 	fDebug = getDebugFlag();
-	
+
 	// default parameters (can be adjusted later in initialize())
 	fLengthofTimeSlice = 180.;                     // in [s]
 	fSumWindow = 24;
 	fNPixel = 500;
 	fSumFirst = 0;
-	
+
 	bCalibrationRun = false;
 }
 
@@ -74,23 +74,23 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 	}
 	// reset all variables
 	reset();
-	
+
 	// pedestal histogram binning
 	int i_hist_nbin = 2000.;
 	float i_hist_xmin = 0.;
 	float i_hist_xmax = 2000.;
-	
+
 	// set up the trees
 	TDirectory* iDir = gDirectory;
-	
+
 	char hname[200];
 	char htitle[200];
-	
+
 	vector< float > iped_cal;
 	vector< vector< float > > iped_cal2;
 	vector< TH1F* > iped_histo;
 	vector< vector< TH1F* > > iped_histo2;
-	
+
 	for( unsigned int p = 0; p < fNPixel; p++ )
 	{
 		iped_cal.clear();
@@ -104,14 +104,14 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		v_temp_ped_median.push_back( iped_cal );
 		v_temp_pedvar68.push_back( iped_cal );
 	}
-	
+
 	// vectors
 	vector< int > iv_vint;
 	vector< float > iv_vdouble;
 	vector< double > iv_vdoubleX;
 	vector< vector< unsigned int > > iv_ivuint;
 	vector< vector< vector< float > > > iv_vvdouble;
-	
+
 	for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
 	{
 		// define data vectors
@@ -122,16 +122,16 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		v_pedvar.push_back( iv_vvdouble );
 		v_ped_median.push_back( iv_vvdouble );
 		v_pedvar68.push_back( iv_vvdouble );
-		
+
 		setTelID( i );
 		unsigned int t = getTeltoAna()[i];
-		
+
 		// define the output tree
 		if( !bCalibrationRun )
 		{
-		
+
 			getAnaDirectories()[t]->cd();
-			
+
 			sprintf( hname, "tPedVar" );
 			sprintf( htitle, "pedestal variations (telescope %d)", t + 1 );
 			fTree.push_back( new TTree( hname, htitle ) );
@@ -161,7 +161,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		}
 		// get run number
 		runNumber = getRunNumber();
-		
+
 		// initialise the pedvars variables
 		iped_cal2.clear();
 		iped_histo2.clear();
@@ -184,17 +184,17 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		fpedcal_mean.push_back( iped_cal2 );
 		fpedcal_mean2.push_back( iped_cal2 );
 		fpedcal_histo.push_back( iped_histo2 );
-		
+
 		// define the time vector
 		fTimeVec.push_back( 0 );
 	}
 	iDir->cd();
-	
+
 	if( fDebug )
 	{
 		cout << "END: VPedestalCalculator::initialize " << endl;
 	}
-	
+
 	return true;
 }
 
@@ -259,13 +259,13 @@ void VPedestalCalculator::fillTimeSlice( unsigned int telID )
 			getPointing()[getTelID()]->derotateCoords( VSkyCoordinatesUtilities::getUTC( getEventMJD(), getEventTime() ), x[p], y[p], xRot[p], yRot[p] );
 		}
 	}
-	
+
 	// fill the tree
 	if( telID < fTree.size() && fTree[telID] )
 	{
 		fTree[telID]->Fill();
 	}
-	
+
 	// fill the data vectors
 	v_MJD[telID].push_back( getEventMJD() );
 	v_time[telID].push_back( getEventTime() );
@@ -290,7 +290,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
 			break;
 		}
 	}
-	
+
 	// temporary vectors
 	if( telID < fTimeVec.size() )
 	{
@@ -308,7 +308,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
 			fTimeVec[telID] = t;
 		}  // if( t - fTimeVec[telID] > fLengthofTimeSlice )
 		///////////////////////////////////////////////////////
-		
+
 		double i_tr_sum = 0.;
 		// calculate the sums (don't use calcsums because it overwrites getSums() )
 		// and fill the histograms
@@ -320,7 +320,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
 				try
 				{
 					chanID = fReader->getHitID( i );
-					
+
 					// don't use low gain channels
 					if( chanID >= getHiLo().size() || ( iLowGain && !getHiLo()[chanID] ) )
 					{
@@ -332,7 +332,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
 						fReader->selectHitChan( i );
 						fTraceHandler->setTrace( fReader, getNSamples(), getPeds()[chanID], getPedrms()[chanID], chanID, i,
 												 getLowGainMultiplier_Trace()*getHiLo()[chanID] );
-												 
+
 						//////////////////////////
 						// loop over all summation windows
 						unsigned int iTempSW = fpedcal_mean[telID][chanID].size();
@@ -389,7 +389,7 @@ void VPedestalCalculator::terminate( bool iWrite, bool iDebug_IO )
 		if( getOutputFile()->IsOpen() && getOutputFile()->cd() )
 		{
 			TDirectory* iDir = gDirectory;
-			
+
 			for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
 			{
 				if( getTeltoAna()[i] < getAnaDirectories().size() && getAnaDirectories()[getTeltoAna()[i]]->cd() )
@@ -422,7 +422,7 @@ void VPedestalCalculator::terminate( bool iWrite, bool iDebug_IO )
 			fillTimeSlice( i );
 		}
 	}
-	
+
 }
 
 
@@ -451,15 +451,15 @@ double VPedestalCalculator::adjustTimeSliceLength( double iLengthofTimeSlice, do
 	{
 		return iLengthofTimeSlice;
 	}
-	
+
 	double iRunLength = iRunStoppTime - iRunStartTime;
-	
+
 	double iNSlices = ( int )( ( iRunStoppTime - iRunStartTime ) / iLengthofTimeSlice );
 	if( iNSlices > 0. )
 	{
 		double iR = iRunLength - iNSlices * iLengthofTimeSlice;
 		return iLengthofTimeSlice + iR / iNSlices;
 	}
-	
+
 	return iLengthofTimeSlice;
 }

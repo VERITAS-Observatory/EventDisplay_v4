@@ -39,9 +39,9 @@ int main( int argc, char** argv )
 	{
 		usage( argv[0] );
 	}
-	
+
 	vector<string> fileNames;
-	
+
 	ifstream infile;
 	infile.open( argv[1] );
 	if( !infile.is_open() )
@@ -49,10 +49,10 @@ int main( int argc, char** argv )
 		cerr << "Couldn't open " << argv[1] << endl;
 		exit( -1 );
 	}
-	
+
 	int newRunNumber = 0;
 	sscanf( argv[3], "%d", &newRunNumber );
-	
+
 	while( true )
 	{
 		char buffer[1000];
@@ -63,37 +63,37 @@ int main( int argc, char** argv )
 		}
 		fileNames.push_back( buffer );
 	}
-	
+
 	cout << "Collected " << fileNames.size() << " files" << endl;
-	
+
 	try
 	{
-	
+
 		VBankFileWriter writer( argv[2], newRunNumber, parseConfigMask( "0,1,2,3" ) );
-		
+
 		VPacket* packet = NULL;
 		VArrayTrigger* trigger = NULL;
 		VArrayEvent* arrayEvent = NULL;
 		VSimulationData* sim = NULL;
 		VSimulationHeader* header = NULL;
 		VEvent* telEvent = NULL;
-		
+
 		bool wroteSimHeader = false;
-		
+
 		int globalEventCount = 0;
-		
+
 		bool writePacket = true;
-		
+
 		for( unsigned fileIndex = 0; fileIndex < fileNames.size(); fileIndex++ )
 		{
 			cout << "reading file " << fileIndex << ": " << fileNames[fileIndex] << endl;
-			
+
 			try
 			{
 				VBankFileReader reader( fileNames.at( fileIndex ).c_str() );
 				int numPackets = reader.numPackets();
 				cout << "\t Packets: " << numPackets << endl;
-				
+
 				for( int pack = 0; pack < numPackets; pack++ )
 				{
 					packet = reader.readPacket( pack );
