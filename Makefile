@@ -280,6 +280,7 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 		./obj/VPedestalCalculator.o \
+		./obj/VIPRCalculator.o \
 		./obj/VDeadChannelFinder.o \
 		./obj/VSpecialChannel.o \
 		./obj/VDeadTime.o \
