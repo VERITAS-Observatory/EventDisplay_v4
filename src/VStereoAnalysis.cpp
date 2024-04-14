@@ -1708,7 +1708,7 @@ void VStereoAnalysis::astro_setup_star_cataloge( unsigned int runlist_iter )
 		}
 		iStarCatalogue->getListOfStarsinFOV()[i]->printStar_for_anasum( fRunPara->fStarBand );
 
-		// check if this region is already excluded (avoid dublications)
+		// check if this region is already excluded (avoid duplications)
 		bool b_isExcluded = false;
 		for( unsigned int e = 0; e < fRunPara->fExclusionRegions.size(); e++ )
 		{
@@ -2266,8 +2266,8 @@ void VStereoAnalysis::fill_DL3Tree( CData* c, double i_xderot, double i_yderot, 
 	fDL3EventTree_eventNumber    = c->eventNumber;
 	fDL3EventTree_Time           = c->Time;         // Time of day (seconds) of gamma ray event
 	fDL3EventTree_MJD            = c->MJD;
-	fDL3EventTree_Xoff           = c->Xoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
-	fDL3EventTree_Yoff           = c->Yoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
+	fDL3EventTree_Xoff           = c->Xoff;         // Gamma Point-Of-Origin, in camera coordinates (deg)
+	fDL3EventTree_Yoff           = c->Yoff;         // Gamma Point-Of-Origin, in camera coordinates (deg)
 	fDL3EventTree_Xderot         = i_xderot;        // Derotated Gamma Point-Of-Origin (deg, RA)
 	fDL3EventTree_Yderot         = i_yderot;        // Derotated Gamma Point-Of-Origin (deg, DEC)
 	if( fCuts )

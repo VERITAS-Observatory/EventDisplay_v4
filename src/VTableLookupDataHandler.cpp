@@ -208,7 +208,7 @@ bool VTableLookupDataHandler::getNextEvent()
 /*!
     return values:
 
-    true:     get successfuly an event
+    true:     get successfully an event
     false:    end of data chain or time limit exceeded
 */
 bool VTableLookupDataHandler::getNextEvent( bool bShort )
@@ -2218,7 +2218,7 @@ void VTableLookupDataHandler::resetImageParameters( unsigned int i )
 
 /*
  *
- * quick test if an event has been successfuly
+ * quick test if an event has been successfully
  * reconstructed in eventdisplay
  *
  */
@@ -2635,7 +2635,7 @@ void VTableLookupDataHandler::setNEntries( int iN )
    get array pointing
 
    if array pointing does not exist:
-   return most propable telescope elevation (majority vote)
+   return most probable telescope elevation (majority vote)
 */
 double VTableLookupDataHandler::getTelElevation()
 {

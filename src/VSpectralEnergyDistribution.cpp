@@ -1017,7 +1017,7 @@ bool VSpectralEnergyDistribution::readGalacticExtinction( string ifile, bool iPr
 	}
 	if( iPrint )
 	{
-		cout << "successfuly opened file " << ifile << endl;
+		cout << "successfully opened file " << ifile << endl;
 	}
 
 	//    vector< sGalacticExtinction > fGalacticExtinction;
