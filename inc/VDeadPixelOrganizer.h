@@ -104,7 +104,7 @@ class VNGain
 		vector<VNStateDuration> stateHistory ;
 
 		// functions
-		VNGain() {} ;
+		VNGain() { fIsLow = false; } ;
 		void initialize( string gainType, VNPixel* parentVNP ) ;
 		void updateState( int mjd, double time, PixelStateInt state ) ;
 		void setParentVNPixelPointer( VNPixel* ptr ) ;
