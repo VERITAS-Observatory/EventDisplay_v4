@@ -424,7 +424,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		NImages_Ttype[i] = 0;
 	}
 	// list of selected telescopes
-	// (migth be re-filled later if stereo reconstructed
+	// (might be re-filled later if stereo reconstructed
 	// is repeated)
 	for( unsigned int i = 0; i < getNTel(); i++ )
 	{
