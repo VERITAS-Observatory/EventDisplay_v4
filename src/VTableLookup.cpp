@@ -1412,9 +1412,9 @@ void VTableLookup::calculateMSFromTables( VTablesToRead* s, double esys )
 		return;
 	}
 	double i_dummy = 0.;
-	
+
 	double* i_s2 = fData->getSize2( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly );
-	
+
 	f_calc_msc->setCalculateEnergies( false );
 	///////////////////
 	// calculate mscw
