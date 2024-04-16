@@ -27,13 +27,13 @@ using namespace std;
 class VCameraRead : public VGlobalRunParameter
 {
 	private:
-	
+
 	protected:
 		bool fDebug;
 		unsigned int fGrIsuVersion;               //!< GrIsu Version
 		unsigned int fCFGtype;                    //!< cfg file type (0=std, 1 = mirrors and pixels for 1 telelescope only)
 		unsigned int fTelID;                      //!< telescope ID
-		
+
 		int          fsourcetype;
 		//!< telescope ID for multiple data readers
 		map< unsigned int, unsigned int > fTelIDGrisu;
@@ -48,7 +48,7 @@ class VCameraRead : public VGlobalRunParameter
 		vector< float > fTelRad;                  //!< telescope mirror radius in [m]
 		// mirror design
 		vector< float > fMirFocalLength;          //!< mirror focal length in [m]
-		vector< unsigned int > fNMirrors;         //!< number of mirros
+		vector< unsigned int > fNMirrors;         //!< number of mirrors
 		vector< float > fMirrorArea;              //!< mirror area
 		// camera data
 		vector< string > fCameraName;             //!< camera name
@@ -62,7 +62,7 @@ class VCameraRead : public VGlobalRunParameter
 		vector< float > fSample_time_slice;       //!< length of time slice
 		// 2D camera data
 		vector< vector<float> > fXTube;           //!< x-position of tube in [deg] (in camera coordinates)
-		vector< vector<float> > fYTube;           //!< y-position of tube in [deg] (in camera coordiantes)
+		vector< vector<float> > fYTube;           //!< y-position of tube in [deg] (in camera coordinates)
 		vector< vector<float> > fRTube;           //!< tube radius in [deg]
 		vector< vector<float> > fRotXTube;        //!< x-position of tube in [deg] (rotated, x-axis is now horizontal for telescope at elevation 90)
 		vector< vector<float> > fRotYTube;        //!< y-position of tube in [deg] (rotated, x-axis is now horizontal for telescope at elevation 90)
@@ -78,7 +78,7 @@ class VCameraRead : public VGlobalRunParameter
 		// pattern trigger
 		int fNPatches;                            //!< number of trigger patches
 		vector< vector<int> > fPatch;             //!< pattern trigger patches
-		
+
 		vector<unsigned int> fMix;                //!< pixel number in real data .cam file
 		vector<unsigned int> fXim;                //!< pixel number in real data .cam file
 		// calibration data
@@ -90,7 +90,7 @@ class VCameraRead : public VGlobalRunParameter
 		bool                  fLowGainIsSet;       //!< low gain multiplier is set in cfg file
 		vector< double >      fLowGainMultiplier_Trace;  //!< low gain multiplier (usually 6.)
 		vector< unsigned int> fLowGainActivator;  //!< threshold for low gain activation (usually 255)
-		
+
 		void                 cleanNeighbourList();
 		void                 convertMMtoDeg();    //!< convert camera vectors from mm to deg
 		void                 fillTelescopeVectors();
@@ -100,11 +100,11 @@ class VCameraRead : public VGlobalRunParameter
 		void                 resetCamVectors( bool bMaxN = true );
 		void                 resetNeighbourLists( bool bMaxN = true );
 		void                 resetTelVectors();
-		
+
 		// coordinate transformer
 		float    fCoordinateTransformerX;
 		float    fCoordinateTransformerY;
-		
+
 	public:
 		VCameraRead();
 		~VCameraRead() {};
@@ -343,7 +343,7 @@ class VCameraRead : public VGlobalRunParameter
 		{
 			return fYTube[iTel];
 		}
-		
+
 		bool                 initialize( unsigned int i_Ntel, vector< string > iCamera );
 		//!< set number of telescopes and channels (only necessary for readCameraFile() )
 		bool                 initialize( unsigned int iNtel, unsigned int iNchannel );

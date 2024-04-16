@@ -45,19 +45,19 @@ class VFITS : public VAnalysisUtilities, public VPlotUtilities, public VHistogra
 {
 	private:
 		fitsfile* fptr;
-		
+
 		string fEVDversion;
 		string fFile_anasum;
 		string fFile_FITS;
 		string fTarget_Name;
-		
+
 		bool fWriteOneFile;
-		
+
 		CRunSummary* ctRunSum;
 		float fTarget_Exposure;
 		float fTarget_RAJ2000;
 		float fTarget_DecJ2000;
-		
+
 		bool printerror( int status );
 		int writeTH1DFits( TH1D* h, string DiagName, string x_name, string y_name, string x_unit, string y_unit, bool iPrint );
 		int writeTGraphFits( TGraph* g, string DiagName, string x_name, string y_name, string x_unit, string y_unit, bool iPrint );
@@ -70,9 +70,9 @@ class VFITS : public VAnalysisUtilities, public VPlotUtilities, public VHistogra
 		bool writeFITSimageInfo( long naxis, long* naxes, TH2D* hSkyMap, string DiagName, bool iPrint = false );
 		bool mergeColumns( fitsfile* fPtr, vector<int> hdunums, vector<vector <int> > columns, int nRows, bool iPrint );
 		double getFluxIntegral( TGraphErrors* gEspec, double minE, bool iPrint );
-		
+
 	public:
-	
+
 		VFITS( string anasum_file, string fits_file, string object_name, bool iOneFile = true, bool iPrint = false );
 		~VFITS() {}
 		bool readAnasumFile( bool iPrint = false );
@@ -86,7 +86,7 @@ class VFITS : public VAnalysisUtilities, public VPlotUtilities, public VHistogra
 		bool writeFITSFile( bool iPrint = false );
 		bool writeNightlyFlux( bool iPrint = false, string outfile = "" );
 		bool writeMonthlyFlux( bool iPrint = false, string outfile = "" );
-		
+
 		ClassDef( VFITS, 1 ); //(increase this number)
 };
 #endif

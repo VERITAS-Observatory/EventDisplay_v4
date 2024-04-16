@@ -43,50 +43,50 @@ using namespace std;
 class VExposure : public TObject, public VGlobalRunParameter
 {
 	private:
-	
+
 		bool   fDebug;
-		
+
 		bool bPlotElevationPlots;
-		
+
 		bool fMakeRunList;
 		int fSelectLaser;
 		int fDataStartTime; // Start Date
 		vector< unsigned int > fLaserRunID; // Laser Runs
 		bool bPrintVerbose;
 		bool bPrintTimeMask;
-		
+
 		// Type of observing mode
 		string fObservingMode;
-		
-		// Minimium Duration
+
+		// Minimum Duration
 		double fMinDuration;
-		
+
 		// Telscope Min Elevation
 		double fTelMinElevation;
-		
+
 		// Target Name
 		string fTargetSourceName;
-		
+
 		// date range
 		string fStartDate_SQL;
 		string fStopDate_SQL;
-		
+
 		// acceptance curves
 		TF1* fAcceptance;
 		double fAcceptance_MaxDistance;
 		double fMaximumIntegrationRadius;
-		
+
 		bool fPlotExtendedSources;
 		bool fPlotSourceNames;
-		
+
 		bool fDoCheckSums;
 		vector<int> fRunsNoChecksum;
 		vector<int> fRunsGoodChecksum;
 		vector<int> fRunsBadChecksum;
-		
+
 		// list of sources from DB
 		VDB_ObservingSources* fVDB_ObservingSources;
-		
+
 		vector< int > fRun;
 		vector< unsigned int> fRunConfigMask;
 		vector< string > fRunStatus;
@@ -108,7 +108,7 @@ class VExposure : public TObject, public VGlobalRunParameter
 		vector< int >    fRunDate;
 		vector< vector < unsigned int > > fRunLaserList;
 		vector< unsigned int > fDateLaserList;
-		
+
 		vector< int > fRunDownload;
 		vector< int > fRunDownloadDate;
 		vector< unsigned int > fLaserDownload;
@@ -124,26 +124,26 @@ class VExposure : public TObject, public VGlobalRunParameter
 		vector< string > fVPMcon;
 		vector< string > fAuthor;
 		vector< string > fComment;
-		
+
 		TH2D* fMapGal2D;
 		TH2D* fRadAccMapGal2D;
 		TH2D* fMapGal2D_aitoff;
 		TH2D* fRadAccMapGal2D_aitoff;
-		
+
 		TH1D* fTimeDifferencesBetweenRuns;
-		
+
 		vector< TCanvas* > fPlottingCanvas;
-		
+
 		bool   fPlotVTSObjects;
 		vector< string > fCatalogue;
 		vector< int >    fCatalogueMarkerColor;
 		vector< int >    fCatalogueMarkerStyle;
 		vector< double > fCatalogueTextAngle;
-		
+
 		vector< string > fTexTable;
 		double fTexTable_EFlux_min;
 		double fTexTable_EFlux_max;
-		
+
 		void   aitoff2xy( Double_t l, Double_t b, Double_t& Al, Double_t& Ab );
 		bool   doDQM( unsigned int iIndex, double iMinDuration = 600. );
 		void   drawAitoffCoordinateSystem();
@@ -164,9 +164,9 @@ class VExposure : public TObject, public VGlobalRunParameter
 		void set_plot_style();
 		void resetDataVectors();
 	public:
-	
+
 		VExposure( int nBinsL = 5000, int nBinB = 2000 );
-		
+
 		bool readFromDB();
 		bool readFromDBList();
 		bool setPlannedObservation( vector<double> ra, vector<double> dec, vector<double> t );
@@ -234,20 +234,20 @@ class VExposure : public TObject, public VGlobalRunParameter
 		{
 			fPlotVTSObjects = iVTS;
 		}
-		
+
 		vector< unsigned int > getLaserRun( string iDBserver, unsigned int iRunNumber, unsigned int iNTel );
 		//	TSQLServer* connectToSQLServer( string iServer );
-		
+
 		void addCatalogue( string, int iMarker = 5, int iColor = 50, double iAngle = 45. );
 		void listCatalogues();
 		bool removeCataloge( unsigned int iB );
-		
+
 		TString getArchiveMD5sum( int date, int run, bool force_download = false );
 		TString calcMD5sum( int date, int run );
 		TString readMD5sumFromFile( TString filename, int run, bool warn = true );
 		int checkMD5sum( int date, int run, bool force_download = false ) ;
 		void printChecksumSummary();
-		
+
 		ClassDef( VExposure, 8 );
 };
 #endif

@@ -36,36 +36,36 @@ using namespace std;
 class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 {
 	private:
-	
+
 		bool  bZombie;                            //! status of files
 		bool  bCombineRuns;                       //! rerun combine runs
 		bool  bAsciiDataFile;
-		
+
 		int  fTotalRun;                           // total number of runs found and used
-		
+
 		string fDataSetName;                      //! name for histogram, canvases, etc. (no spaces, special characters)
-		
+
 		// vector with differential flux values and upper limits
 		vector< VDifferentialFlux > fDifferentialFlux;
-		
+
 		double fAnalysisMinEnergy;                // linear energy axis [TeV]
 		double fAnalysisMaxEnergy;                // linear energy axis [TeV]
 		double fAnalysisEnergyBinning;            // log energy axis [log10(TeV)]
 		bool   fAnalysisHistogramAddingUseLowEdge;
 		bool   bEnergyAxisLinear;
-		
+
 		unsigned int fAnalysisEnergyThresholdDefinition; // 0 = no energy threshold, 1 = XX % systematic in energy reconstruction,
 		// 2 = fraction of maximum effective area, 3 = user defined
 		double fAnalysisMaxEnergySystematic;      // maximum allowed systematic error in energy reconstruction
 		double fAnalysisMaxEffectiveAreaFraction; // energy threshold is defined as fraction of maximum effective area
-		
+
 		double fAnalysisSignificance;
 		double fAnalysisMinEvents;
 		double fAnalysisUpperLimits;
 		int    fAnalysisLiAndMaEquation;
 		int    fAnalysisUpperLimitAlgorithm;
 		string fErrorCalculationMethod;
-		
+
 		// spectral fit variables
 		VSpectralFitter* fSpectralFitter;
 		int    fSpectralFitFunction;              // 0: power law
@@ -74,9 +74,9 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		double fSpectralFitEnergy_min;
 		double fSpectralFitEnergy_max;
 		double fCL;								// Confidence Level
-		
+
 		double fOffsetDistance;                  // offset distance to get correct counting histograms
-		
+
 		// plotting variables
 		TCanvas* fPlottingCanvas;
 		// spectral weight to calculate bin centers
@@ -90,20 +90,20 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		bool   fPlottingUpperLimits;              // plot upper limits
 		TGraphAsymmErrors* gEnergySpectrum;
 		TGraphAsymmErrors* gEnergySpectrumFitResiduals;
-		
+
 		// rebinning of energy spectra
 		TH1D* nRebinner;
 		TH1D* nOriginalBinner;
-		
+
 		bool   bUseRebinner;
 		vector< int > newBinningGroupings;
-		
+
 		int    fPlottingEnergySpectrumFitLineColor;
 		int    fPlottingEnergySpectrumFitLineStyle;
 		float  fPlottingEnergySpectrumFitLineWidth;
-		
+
 		TF1*   fEnergySpectrumFit;
-		
+
 		void   addValueToHistogram( TH1* h, double iTObs, double iEThreshold, bool bLinearX = false );
 		void   addValueToHistogram( TH1* h, TGraph* g, double iTObs, double iEThreshold, bool bLinearX = false );
 		void   addHistogram( TH1* h1, TH1* h2, double iEThreshold, bool bLinearX );
@@ -114,39 +114,39 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		void   multiplyEnergySpectrumbydE( TH1* h, bool blin = false );
 		TH1*   setVariableBinning( TH1* a );
 		void   setOriginalBinner( TH1* a );
-		
+
 		// histograms
 		TH1D* hErecCountsOn;
 		TH1D* hErecCountsOff;
 		TH1D* hErecTotalTime;
 		TH1D* hErecTotalTimeDeadTimeCorrected;
 		TH1D* hEffArea;
-		
+
 		// definition of energy value in a log bin
 		unsigned int fEnergyInBinDefinition;    // 0 = mean of (lin) energy, 1 = barycentric mean, 2 = spectral weighted mean
-		
+
 		// energy thresholds
 		string fEnergyThresholdFileName;
 		double fEnergyThresholdFixedValue;
-		
+
 		// total numbers
 		double fTotalObservationTime;
 		double fTotalObservationTimeDeadTimeCorrected;
 		double fTotalNormalisationFactor;
-		
+
 		// initialize all variables
 		void               initializeRunVariables();
 		// fill and plot energy spectrum graph
 		TGraphAsymmErrors* plot_energySpectrum();
-		
+
 		/////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////
 	public:
-	
+
 		VEnergySpectrum();
 		VEnergySpectrum( string ifile, string iname = "E", int irun = -1, bool iSourceTypeIsAscii = false );
 		~VEnergySpectrum() {}
-		
+
 		double    calculateIntegralFluxFromFitFunction( double iMinEnergy_TeV, double iMaxEnergy_TeV = 1.e6 );
 		void      calculateDifferentialFluxes();
 		bool      combineRuns();
@@ -208,7 +208,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		TCanvas*  plotMeanEffectiveArea( TCanvas* c = 0, double i_effMin = 0., double i_effMax = -99. );
 		TCanvas*  plotResiduals( TCanvas* c = 0, TF1* f = 0 );
 		TCanvas*  plotLifeTimevsEnergy( TCanvas* c = 0 );
-		
+
 		void printEnergyBins();
 		void setAddHistogramParameters( bool iB = false )
 		{
@@ -240,9 +240,9 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		}
 		void setSignificanceParameters( double iSig = 2., double iMinOnEvents = 3., double iUpperLimit = 0.95,
 										int iLiAndMa = 17, int iULAlgo = 5 );
-										
+
 		TF1* fitEnergySpectrum( string iname = "fit", bool bDraw = true );
-		
+
 		void setConfidenceLevel( double i_CL = 0.68 )
 		{
 			fCL = i_CL;
@@ -274,7 +274,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 			fSpectralFitEnergy_max = TMath::Power( 10., xmax );
 		}
 		void setSpectralFitPlottingStyle( int iColor = 1, int iStyle = 1, float iWidth = 2. );
-		
+
 		TCanvas* getPlottingCanvas()
 		{
 			return fPlottingCanvas;
@@ -311,8 +311,8 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 			fPlottingYaxisMax = iMax;
 		}
 		bool writeSpectralPointsToCSVFile( string iOFileName, TGraphAsymmErrors* iDiffFlux = 0 );
-		
-		
+
+
 		ClassDef( VEnergySpectrum, 17 );
 };
 #endif

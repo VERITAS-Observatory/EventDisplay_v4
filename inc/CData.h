@@ -22,17 +22,17 @@ using namespace std;
 class CData
 {
 	public :
-	
+
 		bool            fMC;
 		bool            fBOOLtheta2_All;
 		bool            fBOOLteltype;
 		bool            fBOOLdE;
-		
+
 		bool            fShort;
 		int             fVersion;
 		TTree*          fChain;                   //!pointer to the analyzed TTree or TChain
 		Int_t           fCurrent;                 //!current Tree number in a TChain
-		
+
 		// Declaration of leave types
 		Int_t           runNumber;
 		Int_t           eventNumber;
@@ -56,7 +56,7 @@ class CData
 		Double_t        MCze;
 		Double_t        MCxoff;
 		Double_t        MCyoff;
-		
+
 		UInt_t          LTrigS;
 		ULong64_t       LTrig;
 		UInt_t          NTrig;
@@ -142,7 +142,7 @@ class CData
 		Double_t        DispDiff;  // from disp method
 		Float_t         Xoff_intersect;
 		Float_t         Yoff_intersect;
-		
+
 		// List of branches
 		TBranch*        b_runNumber;              //!
 		TBranch*        b_eventNumber;            //!
@@ -166,7 +166,7 @@ class CData
 		TBranch*        b_MCze;                   //!
 		TBranch*        b_MCxoff;                 //!
 		TBranch*        b_MCyoff;                 //!
-		
+
 		TBranch*        b_LTrig;                  //!
 		TBranch*        b_NTrig;                  //!
 		TBranch*        b_NImages;                //!
@@ -240,7 +240,7 @@ class CData
 		TBranch*        b_DispDiff; //disp
 		TBranch*        b_Xoff_intersect;
 		TBranch*        b_Yoff_intersect;
-		
+
 		CData( TTree* tree = 0, bool bMC = false, int iVersion = 5, bool bShort = false );
 		virtual ~CData();
 		virtual Int_t    Cut( Long64_t entry );
@@ -271,7 +271,7 @@ CData::CData( TTree* tree, bool bMC, int iVersion, bool bShort )
 	fBOOLtheta2_All = false;
 	fBOOLteltype = false;
 	fBOOLdE = false;
-	
+
 	Init( tree );
 }
 
@@ -293,7 +293,7 @@ Int_t CData::GetEntry( Long64_t entry )
 	{
 		return 0;
 	}
-	
+
 	int a = fChain->GetEntry( entry );
 	if( a > 0 && fVersion < 6 )
 	{
@@ -338,7 +338,7 @@ void CData::Init( TTree* tree )
 	{
 		return;
 	}
-	
+
 	// get version number
 	string itemp = tree->GetTitle();
 	if( itemp.find( "VERSION" ) < itemp.size() )
@@ -380,11 +380,11 @@ void CData::Init( TTree* tree )
 	{
 		fBOOLdE = true;
 	}
-	
+
 	fChain = tree;
 	fCurrent = -1;
 	fChain->SetMakeClass( 1 );
-	
+
 	fChain->SetBranchAddress( "runNumber", &runNumber );
 	fChain->SetBranchAddress( "eventNumber", &eventNumber );
 	if( !fShort )
@@ -420,7 +420,7 @@ void CData::Init( TTree* tree )
 	{
 		Array_PointingStatus = 0;
 	}
-	
+
 	// MC tree
 	if( fMC )
 	{
@@ -466,8 +466,8 @@ void CData::Init( TTree* tree )
 		MCxoff = 0.;
 		MCyoff = 0.;
 	}
-	
-	
+
+
 	if( fVersion < 6 )
 	{
 		fChain->SetBranchAddress( "LTrig", &LTrigS );
@@ -508,7 +508,7 @@ void CData::Init( TTree* tree )
 	{
 		fChain->SetBranchAddress( "Yoff_derot", &Yoff_derot );
 	}
-	
+
 	if( !fShort )
 	{
 		fChain->SetBranchAddress( "stdS", &stdS );
@@ -546,7 +546,7 @@ void CData::Init( TTree* tree )
 				meanPedvar_ImageT[i] = 0.;
 			}
 		}
-		
+
 	}
 	else
 	{
@@ -556,9 +556,9 @@ void CData::Init( TTree* tree )
 			meanPedvar_ImageT[i] = 0.;
 		}
 	}
-	
+
 	fChain->SetBranchAddress( "SizeSecondMax", &SizeSecondMax );
-	
+
 	if( fBOOLtheta2_All )
 	{
 		fChain->SetBranchAddress( "theta2_All", &theta2_All );
@@ -570,7 +570,7 @@ void CData::Init( TTree* tree )
 			theta2_All[dex] = 99.0;
 		}
 	}
-	
+
 	if( fBOOLteltype )
 	{
 		fChain->SetBranchAddress( "ImgSel_list", ImgSel_list );
@@ -585,7 +585,7 @@ void CData::Init( TTree* tree )
 			NImages_Ttype[tt] = 0;
 		}
 	}
-	
+
 	if( !fShort )
 	{
 		fChain->SetBranchAddress( "dist", dist );
@@ -623,7 +623,7 @@ void CData::Init( TTree* tree )
 				loss[i] = 0.;
 			}
 		}
-		
+
 		fChain->SetBranchAddress( "max1", max1 );
 		fChain->SetBranchAddress( "max2", max2 );
 		fChain->SetBranchAddress( "max3", max3 );
@@ -831,7 +831,7 @@ void CData::Init( TTree* tree )
 	{
 		Yoff_intersect = 0.;
 	}
-	
+
 	Notify();
 }
 
@@ -841,10 +841,10 @@ Bool_t CData::Notify()
 	// The Notify() function is called when a new file is opened. This
 	// can be either for a new TTree in a TChain or when when a new TTree
 	// is started when using PROOF. Typically here the branch pointers
-	// will be retrieved. It is normaly not necessary to make changes
+	// will be retrieved. It is normally not necessary to make changes
 	// to the generated code, but the routine can be extended by the
 	// user if needed.
-	
+
 	// Get branch pointers
 	b_runNumber = fChain->GetBranch( "runNumber" );
 	b_eventNumber = fChain->GetBranch( "eventNumber" );
@@ -854,7 +854,7 @@ Bool_t CData::Notify()
 	b_TelAzimuth = fChain->GetBranch( "TelAzimuth" );
 	b_TelDec = fChain->GetBranch( "TelDec" );
 	b_TelRA = fChain->GetBranch( "TelRA" );
-	
+
 	if( fMC )
 	{
 		b_MCprimary = fChain->GetBranch( "MCprimary" );
@@ -870,7 +870,7 @@ Bool_t CData::Notify()
 		b_MCxoff = fChain->GetBranch( "MCxoff" );
 		b_MCyoff = fChain->GetBranch( "MCyoff" );
 	}
-	
+
 	b_LTrig = fChain->GetBranch( "LTrig" );
 	b_NTrig = fChain->GetBranch( "NTrig" );
 	b_NImages = fChain->GetBranch( "NImages" );
@@ -902,9 +902,9 @@ Bool_t CData::Notify()
 		b_meanPedvar_Image = 0;
 		b_meanPedvar_ImageT = 0;
 	}
-	
+
 	b_SizeSecondMax = fChain->GetBranch( "SizeSecondMax" );
-	
+
 	if( fBOOLtheta2_All )
 	{
 		b_theta2_All = fChain->GetBranch( "theta2_All" );
@@ -913,7 +913,7 @@ Bool_t CData::Notify()
 	{
 		b_theta2_All = 0;
 	}
-	
+
 	b_dist = fChain->GetBranch( "dist" );
 	b_size = fChain->GetBranch( "size" );
 	b_size2 = fChain->GetBranch( "size2" );
@@ -998,7 +998,7 @@ Bool_t CData::Notify()
 	{
 		b_Yoff_intersect = 0;
 	}
-	
+
 	return kTRUE;
 }
 
@@ -1021,7 +1021,7 @@ Int_t CData::Cut( Long64_t entry )
 	// returns  1 if entry is accepted.
 	// returns -1 otherwise.
 	entry = 0;
-	
+
 	return 1;
 }
 #endif                                            // #ifdef CData_cxx

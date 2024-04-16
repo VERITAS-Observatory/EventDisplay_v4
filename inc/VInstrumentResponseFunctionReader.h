@@ -31,12 +31,12 @@ using namespace std;
 class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlotUtilities, public VHistogramUtilities
 {
 	private:
-	
+
 		bool   fIsZombie;
 		bool   fDebug;
-		
+
 		int    fGammaHadronCuts_directionCut_selector;
-		
+
 		bool                             calculateCutEfficiencies();
 		TGraphAsymmErrors*               calculateEffectiveAreaRatios( TGraphAsymmErrors* g0, TGraphAsymmErrors* g1 );
 		bool                             fill_from_effectiveArea( TTree* t );
@@ -47,14 +47,14 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 		void                             getEnergyResolutionPlot( TProfile* iP, int i_rebin = 2, double iMinEnergy = -10. );
 		void                             getEnergyResolutionPlot( TH2D* iP, double iMinEnergy = -10. );
 		void                             getEnergyResolutionPlot68( TH2D* iP, double iMinEnergy = -10., double iReferenceValue = -999. );
-		
+
 		bool                             initializeIRFData();
-		
+
 	public:
-	
+
 		string fFile;
 		string fA_MC;
-		
+
 		//////////////////////////////////
 		// conditions
 		//////////////////////////////////
@@ -63,10 +63,10 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 		int    fAzbin;
 		double fIndex;
 		int    fNoise;
-		
+
 		float  fEnergyLinTeV_min;
 		float  fEnergyLinTeV_max;
-		
+
 		//////////////////////////////////
 		// data
 		//////////////////////////////////
@@ -109,11 +109,11 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 		vector< TH1D* > hCutEfficiencyRelativePlots;
 		// weight histograms
 		TH1D* hWeightedRate;
-		
+
 		// resolution graphs
 		vector< string >                           fIRF_TreeNames;
 		vector< VInstrumentResponseFunctionData* > fIRF_Data;
-		
+
 		//////////////////////////////////
 		// plotting
 		//////////////////////////////////
@@ -122,10 +122,10 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 		int    fLineStyle;
 		int    fMarkerStyle;
 		string fLegend;
-		
+
 		VInstrumentResponseFunctionReader();
 		~VInstrumentResponseFunctionReader() {}
-		
+
 		bool calculateEffectiveAreaRatios( TGraphAsymmErrors* g0 );
 		bool fillBiasHistograms( TH1F* h = 0, string iMeanOrMedian = "mean" );
 		bool fillEffectiveAreasHistograms( TH1F* h = 0, string iContainmentRadius = "", TH1F* hMC = 0 );
@@ -154,7 +154,7 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 			fEnergyLinTeV_min = iEmin_linTeV;
 			fEnergyLinTeV_max = iEmax_linTeV;
 		}
-		
+
 		ClassDef( VInstrumentResponseFunctionReader, 9 );
 };
 

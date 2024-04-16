@@ -24,7 +24,7 @@ using namespace std;
 class VStereoReconstructionData
 {
 	public:
-	
+
 		string  fTitle;
 		int     fColor;
 		int     fMarkerStyle;
@@ -33,9 +33,9 @@ class VStereoReconstructionData
 		Width_t fLineWidth;
 		int     fFillStyle;
 		string  fPlotStyle;
-		
+
 		TGraphAsymmErrors* gData;
-		
+
 		VStereoReconstructionData();
 		~VStereoReconstructionData() {}
 		void   draw();
@@ -47,13 +47,13 @@ class VStereoReconstructionData
 class VStereoReconstruction : public VPlotUtilities
 {
 	private:
-	
+
 		string fName;
 		bool bDebug;
-		
+
 		// vector containing all the plotting data
 		vector< VStereoReconstructionData* > fData;
-		
+
 		// plotting variables
 		string fPlottingVariable;
 		TCanvas* fPlottingCanvas;
@@ -65,17 +65,17 @@ class VStereoReconstruction : public VPlotUtilities
 		bool   fPlottingLogEnergyAxis;            // plot log or lin values on energy axis (default=true)
 		int    fPlottingCanvasSizeX;
 		int    fPlottingCanvasSizeY;
-		
+
 	public:
-	
+
 		VStereoReconstruction();
 		~VStereoReconstruction() {}
-		
+
 		bool      addDataSet( string iTitle, string iFile, double emin_lin = -1., double emax_lin = -1., bool bEnergyAxis_linear_GeV = false, bool bResolutionAxis_arcmin = false );   // linear energy axis [TeV]
 		bool      readDataSetsfromTextFile( string iFile, unsigned int iSet, bool bClearExistingDataSet = true );
 		bool      removeDataSet( unsigned int iDataSet );
 		bool      setPlottingAtt( unsigned int iDataSet, string iPlotStyle = "pc", int iColor = 1, int iMarkerStyle = 20, float iMarkerSize = 1., int iLineStyle = 1, float iLineWidth = 1., int iFillStyle = 1001 );
-		
+
 		TCanvas*  plot( TCanvas* c = 0 );
 		void      plotLegend();
 		void      setDebug( bool iB = false )
@@ -106,7 +106,7 @@ class VStereoReconstruction : public VPlotUtilities
 			fPlottingMinEnergy = TMath::Power( 10., xmin );
 			fPlottingMaxEnergy = TMath::Power( 10., xmax );
 		}
-		
+
 		void      setPlottingLogEnergyAxis( bool iB = true )
 		{
 			fPlottingLogEnergyAxis = iB;
@@ -116,7 +116,7 @@ class VStereoReconstruction : public VPlotUtilities
 			fPlottingYaxisMin = iMin;
 			fPlottingYaxisMax = iMax;
 		}
-		
+
 };
 
 

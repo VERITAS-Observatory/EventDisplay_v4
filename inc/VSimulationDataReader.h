@@ -26,7 +26,7 @@ class VSimulationDataReader
 	private:
 		VSimulationData* fSimulationData;
 		bool fDebug;
-		
+
 		uint32_t  fEventNumber;
 		long      fRunNumber;
 		int    fMCprimary;
@@ -41,13 +41,13 @@ class VSimulationDataReader
 		float  fMCYoff;
 		double fTel_Elevation;
 		double fTel_Azimuth;
-		
+
 		vector< bool > fLocalTrigger;
-		
+
 	public:
 		VSimulationDataReader();
 		~VSimulationDataReader() {}
-		
+
 		vector< bool >&            getSLocalTrigger()
 		{
 			return fLocalTrigger;
@@ -114,7 +114,7 @@ class VSimulationDataReader
 		bool                       printSimulationHeader( VPacket* packet, int bPrintCFG = 0 );
 		bool                       setSimulationData( VRawEventData* iraweventData );
 		bool                       setSimulationData( VPacket* packet );
-		
+
 		void                       setSimuDebugFlag()
 		{
 			fDebug = true;

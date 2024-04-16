@@ -25,30 +25,30 @@ using namespace std;
 class VLombScargle : public VLightCurveUtilities, public VPlotUtilities, public VHistogramUtilities
 {
 	private:
-	
+
 		bool fDebug;
-		
+
 		vector< double > fVFrequency;
 		vector< double > fVPeriodigram;
-		
+
 		TGraph*      fPeriodigramGraph;
 		TH1D*        fPeriodigramHisto;
 		TCanvas*     fPeriodigramCanvas;
-		
+
 		unsigned int fNFrequencies;
 		double       fFrequency_min;
 		double       fFrequency_max;
-		
+
 		TRandom3*    fRandom;
-		
+
 		vector< double > fProbabilityLevels;
 		vector< int >    fProbabilityLevelDigits;
-		
+
 	public:
-	
+
 		VLombScargle();
 		~VLombScargle() {}
-		
+
 		void    fillPeriodigram( bool iShuffle = false );
 		TGraph* getPeriodigramGraph();
 		TH1D*   getPeriodigramHistogram( string iName );

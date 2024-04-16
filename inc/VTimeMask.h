@@ -33,21 +33,21 @@ class VTimeMask : public TNamed
 		Int_t           run_id;                   // Run number
 		Double_t        start_time;               // Start of run: decimal MJD in units of seconds
 		string          mask_file;                // Location of file containing mask definitions
-		
+
 		vector< Bool_t >    mask;                 // One entry for each second of the run
 		vector< UInt_t >    checked;              // Number of events checked against mask for each second
 		vector< UInt_t >    accepted;             // Number of events allowed by the mask for each second
 		vector< UInt_t >    counted;              // Number of events passing gamma and direction cuts
-		
+
 		Bool_t          set_success;              // If the mask was set from the mask_file
 		Bool_t          override;                 // If we have encountered an error
 		Int_t           outside_count;            // Number of events checked which weren't inside the mask time domain
 		// i.e. those before the start or after the end
-		
+
 		void            initialise( Int_t run_number, Double_t run_startMJD_secs, Double_t run_endMJD_secs, string file_name );
 		// Flake out in a dignified manner.
 		void            problem( string reason, ostream& terminal = cout );
-		
+
 		// Internal time format is exact decimal MJD converted into seconds (<MJD>.<fraction of day> * secs_day)
 		static const    Int_t           secs_day    = 24 * 60 * 60;
 		// Create internal time format: double VAnaUtils::getUTC(int i_mjd, double i_seconds) returns <MJD>.<fraction of day>
@@ -65,12 +65,12 @@ class VTimeMask : public TNamed
 		{
 			return internal_time - Double_t( secs_day ) * timeMJD( internal_time );
 		}
-		
+
 		// How is the mask set at this internal time?
 		Bool_t          checkMaskNow( Double_t now );
 		// Make it up as we go along; collate statistics even if there was problem.
 		Bool_t          loadMaskNow( Double_t now );
-		
+
 	public:
 		VTimeMask();                              // Default constructor gives mask of zero size but reserves storage for 1200 seconds
 		//~VTimeMask();	// Remove any ROOT objects with pointers
@@ -79,8 +79,8 @@ class VTimeMask : public TNamed
 		VTimeMask( Int_t run_number, Int_t run_startMJD, Double_t run_startTime, Int_t run_endMJD, Double_t run_endTime, string file_name = "" );
 		// run_startUTC and run_endUTC are decimal MJD (<MJD>.<fraction of day>) following [double VAnaUtils::getUTC(int i_mjd, double i_seconds)]
 		VTimeMask( Int_t run_number, Double_t run_startUTC, Double_t run_endUTC, string file_name = "" );
-		
-		// Intialise now
+
+		// Initialise now
 		// To read in the 'timeMask' directory from an anasum file,
 		// you need to first do
 		// VTimeMask * vtm = VTimeMask( runid, runstart, runend ) ;
@@ -88,10 +88,10 @@ class VTimeMask : public TNamed
 		// vtm->setMask( runid, runstart, runend ) ;
 		Bool_t      setMask( Int_t run_number, Double_t run_startUTC, Double_t run_endUTC, string file_name = "" );
 		Bool_t      setMask();                    // Retrieve user-defined mask from mask_file
-		
+
 		Bool_t      setMaskDuringPhaseCuts( Double_t eventUTC );
-		
-		
+
+
 		// Is the event allowed to pass the mask?
 		// if true, then that instant of time passes the cut
 		// if false, does not pass cut.
@@ -103,14 +103,14 @@ class VTimeMask : public TNamed
 		{
 			return checkMaskNow( secs_day * eventUTC );
 		}
-		
+
 		// Count events passing gamma and direction cuts
 		void        countOn( Double_t eventUTC )
 		{
 			counted.at( Int_t( floor( secs_day * eventUTC - start_time ) ) )++;
 		}
-		
-		
+
+
 		Bool_t      getMaskStatus() const         // Has the mask encountered any errors; is it still active?
 		{
 			return !override;
@@ -148,7 +148,7 @@ class VTimeMask : public TNamed
 			checked.assign( mask.size(), 0 );
 			accepted.assign( mask.size(), 0 );
 		}
-		
+
 		// Various takes on the mean time of the run; all in seconds since the beginning of the run.
 		Double_t    getMeanTime_Run() const;      // Mid-point of the run
 		Double_t    getMeanTime_Mask() const;     // Weighted by open seconds
@@ -171,10 +171,10 @@ class VTimeMask : public TNamed
 		{
 			return ( start_time + getMeanTime_Accepted() ) / secs_day;
 		}
-		
+
 		//Fill vectors with statistics for use by VRatePlots, over intervals defined as near as possible to a user defined width
 		void        getIntervalRates( vector< double >& event_count, vector< double >& interval_time, vector< double >& interval_size, double width ) const;
-		
+
 		// ROOT object versions of the internal arrays, to be saved to a ROOT file.
 		void        writeObjects() const;
 		const   TBits*      getMaskBits() const;  // Copy of the mask as a TBits object.
@@ -188,7 +188,7 @@ class VTimeMask : public TNamed
 		const   TVector*    getAcceptedVector() const;
 		// Read stored ROOT versions of a time mask and fill initialised internal vectors.
 		Bool_t      readObjects( TDirectory* iDir );
-		
+
 		// Display mean times determined according to open portions of the mask and optionally to event counts
 		void        printMeanTime( Bool_t event_statistics = kFALSE, ostream& terminal = cout ) const;
 		// Display summary of mask with optional event counts
@@ -200,7 +200,7 @@ class VTimeMask : public TNamed
 		{
 			return mask_file ;
 		}
-		
+
 		ClassDef( VTimeMask, 3 ) ;
 };
 #endif                                            /* ifndef VTIMEMASK_H */

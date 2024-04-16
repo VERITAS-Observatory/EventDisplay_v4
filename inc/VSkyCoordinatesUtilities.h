@@ -44,4 +44,3 @@ namespace VSkyCoordinatesUtilities
 }
 
 #endif
-

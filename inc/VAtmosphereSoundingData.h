@@ -28,7 +28,7 @@ using namespace std;
 class VAtmosphereSoundingData
 {
 	public:
-	
+
 		double MJD;
 		int Year;
 		int Month;
@@ -53,18 +53,18 @@ class VAtmosphereSoundingData
 		int PlotMarker;
 		int PlotLineStyle;
 		Width_t PlotLineWidth;
-		
+
 		VAtmosphereSoundingData();
 		~VAtmosphereSoundingData() {}
 		void setdefaultvalues( unsigned int iN );
-		
+
 		void makeGraphScaledDensity( );
 		void makeGraphPressure( );
 		void makeGraphHumidity( );
 		void makeGraphTemperature( );
 		void makeGraphIndex( );
 		void makeGraphThickness( );
-		
+
 		TGraph* getDensityGraph()
 		{
 			if( !fGraphScaledDensityHeight )
@@ -143,22 +143,22 @@ class VAtmosphereSoundingData
 			{
 				return 0;
 			}
-			
+
 		}
-		
+
 		TGraph* fGraphScaledDensityHeight;
 		TGraph* fGraphPressureHeight;
 		TGraph* fGraphHumidityHeight;
 		TGraph* fGraphTemperatureHeight;
 		TGraph* fGraphIndexHeight;
 		TGraph* fGraphThicknessHeight;
-		
+
 		void setColor( int color );
 		int getColor( )
 		{
 			return PlotColor;
 		}
-		
+
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////

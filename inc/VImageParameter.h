@@ -18,7 +18,7 @@ class VImageParameter
 		bool fMC;
 		unsigned int fShortTree;                 // if set, only a subset of the parameters are written to the tree of parameters
 		bool fWriteNImagePixels;
-		
+
 	public:
 		// global parameters
 		int fTelID;                               //!< telescope ID
@@ -29,9 +29,9 @@ class VImageParameter
 		double time;
 		unsigned int nanosec;
 		int nsamples;
-		
+
 		unsigned int eventStatus;
-		
+
 		// telescope parameters
 		double fimagethresh;                      //!< parameter for image threshold
 		double fborderthresh;                     //!< parameter for border threshold
@@ -42,12 +42,12 @@ class VImageParameter
 		int fncluster_cleaned;                    //!< number of clusters after image cleaning
 		int fncluster_uncleaned;                  //!< number of clusters after image cleaning
 		unsigned short int fTrig_type;            //  trigger type (e.g. in CTA prod2)
-		
+
 		// telescope position in shower parameter
 		double Tel_x_SC;                          //!< telescope position in shower coordinates
 		double Tel_y_SC;                          //!< telescope position in shower coordinates
 		double Tel_z_SC;                          //!< telescope position in shower coordinates
-		
+
 		// image parameters
 		float fmeanPed_Image;                     //!< mean pedestal in this image
 		float fmeanPedvar_Image;                  //!< mean pedestal variation in this image
@@ -77,12 +77,12 @@ class VImageParameter
 		float cosphi;                             //!< cos of Angle betw major axis and x-axis
 		float sinphi;                             //!< sin of Angle betw major axis and x-axis
 		float asymmetry;                          //!< measure of shower skew
-		
+
 		float loss;                               //!< fraction of image size in outer pixel
 		float lossAndDead;                        //!< fraction if image size in outer pixels and at the edge of dead pixels
 		float fracLow;                            //!< fraction of image size in low gain pixel
 		float fui;                                //!< fraction of image/border pixel under estimate image ellipse
-		
+
 		// muon parameters
 		float muonX0;                             //!< center of muon ring X-coord
 		float muonY0;                             //!< center of muon ring Y-coord
@@ -91,9 +91,9 @@ class VImageParameter
 		float muonRadius;                         //!< radius of muon ring
 		float muonRSigma;                         //!< std. dev. of radius of muon ring
 		float muonSize;                           //!< total amount of light in muon ring
-		int   muonValid;                          //!< 0/1 depending on wether it satisfies criteria
+		int   muonValid;                          //!< 0/1 depending on whether it satisfies criteria
 		float muonIPCorrectedSize;                //!< total amount of light in muon ring corrected by impact paameter
-		
+
 		// Hough transform muon parameters
 		double 	houghAP; 						  //!< AP parameter
 		double 	houghTD; 					      //!< TD parameter
@@ -101,7 +101,7 @@ class VImageParameter
 		double 	houghCN; 						  //!< C/N parameter
 		double 	houghContained; 			  //!< Distance from the center of the ring to the center of the camera plus the ring radius in mm. Before filling tree, this is divided by the pixel diameter
 		int 	houghMuonValid;					  //!< 0/1 depending on whether it satisfies the Hough transform muon ID criteria
-		
+
 		// signal section
 		unsigned short int ntubes;                //!< number of tubes in the picture
 		unsigned short int trig_tubes;            //!< number of tubes selected in the trigger algorithm
@@ -116,7 +116,7 @@ class VImageParameter
 		float max[3];                             //!< The three largest adc values
 		unsigned short int  index_of_max[3];      //!< The tube indices of the max[3] values
 		float frac[3];                            //!< fraction of maximum digital counts
-		
+
 		// timing parameters
 		float tgrad_x;                            //!< Timing gradient in X-direction
 		float tint_x;                             //!< Timing intercept for X-direction
@@ -126,7 +126,7 @@ class VImageParameter
 		float tmin;                               //!< time minimum for image/border pixels
 		float tmax;                               //!< time maximum for image/border pixels
 		float tmean;                              //!< mean time of image/border pixels
-		
+
 		// MC parameters
 		unsigned short int MCprimary;
 		float MCenergy;
@@ -138,8 +138,8 @@ class VImageParameter
 		float MCLocalDelayedTriggerTime;          //!  delayed local trigger time (preli! no MC info, should be somewhere else)
 		float MCTel_Xoff;                         //!< source offset in MC in deg (grisudet telescope coordinate system)
 		float MCTel_Yoff;                         //!< source offset in MC in deg (grisudet telescope coordinate system)
-		
-		// log likelihood fit parameters and erros
+
+		// log likelihood fit parameters and errors
 		int ntfit;                                //!< number of restored tubes
 		float Fitmin;
 		float Fitedm;
@@ -161,17 +161,17 @@ class VImageParameter
 		float drho;
 		float signal;
 		float dsignal;                            //!< error in signal (normalisation parameter for fit)
-		
+
 		// image / border list
 		unsigned int PixelListN;
 		unsigned int PixelID[VDST_MAXCHANNELS];
 		unsigned int PixelType[VDST_MAXCHANNELS];
 		float PixelIntensity[VDST_MAXCHANNELS];
 		float PixelTimingT0[VDST_MAXCHANNELS];
-		
+
 		vector< float > fImageBorderPixelPosition_x;              //! list of image+border pixel
 		vector< float > fImageBorderPixelPosition_y;              //! list of image+border pixel
-		
+
 		VImageParameter( unsigned int iShortTree = 0, bool iWriteNImagePixels = false );
 		~VImageParameter();
 		void fill();
@@ -179,7 +179,7 @@ class VImageParameter
 		{
 			return tpars;
 		}
-		bool hasImage();                          //!< succesfull image reconstruction
+		bool hasImage();                          //!< successful image reconstruction
 		void initTree( string, string, bool, bool, bool, bool );
 		bool isMC()
 		{

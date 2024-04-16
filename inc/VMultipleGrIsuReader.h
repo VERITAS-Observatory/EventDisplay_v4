@@ -22,48 +22,48 @@ using namespace std;
 class VMultipleGrIsuReader : public VVirtualDataReader
 {
 	private:
-	
+
 		bool fDebug;
-		
+
 		unsigned int fNFiles;                     // number of files to be open
 		string fSelectedTelescopes;
-		
+
 		vector< unsigned int > fTeltoAna;
 		vector< bool > fSelectedTelescope;
 		vector< string > fSourceFileName;
 		vector< VGrIsuReader* > fReader;
-		
+
 		VNoiseFileReader* fNoiseFileReader;
-		
+
 		VDetectorGeometry* fDetectorGeo;
-		
+
 		unsigned int fTelescopeID;
 		unsigned int fFileID;
-		
+
 		vector< bool > fLocalTrigger;
-		
+
 		// telescope pointing
 		vector< double > fTelElevation;           //!< telescope pointing, elevation [deg]
 		vector< double > fTelAzimuth;             //!< telescope pointing, azimuth [deg]
-		
+
 		///////////////////////////////////////////////////////////////////////////
 		// needed for good return values only
 		std::vector< bool > vv_bool;
 		std::valarray< double > vvv_valarray;
 		std::vector< valarray<double> > vvv_v_vvv_valarray;
 		///////////////////////////////////////////////////////////////////////////
-		
+
 		bool          checkTelescopeID( unsigned int );
 		void          fillRandomPeds( VGrIsuReader* g, int iseed );
 		VGrIsuReader* getReader();
-		
+
 	public:
-	
+
 		VMultipleGrIsuReader( unsigned int nFiles, vector< unsigned int > iteltoana, bool iDebug );
 		~VMultipleGrIsuReader() {}
-		
+
 		bool                        init( VDetectorGeometry*, string i_sourcefile, vector< int > i_sumwindow, int i_telnumberoffset, int i_sampleoffset, double ifadcscale, int iseed, string iExPedFile = "", bool iSingleExternalPedFile = true, double iDefaultPed = 20. );
-		
+
 		string                      getDataFormat();
 		unsigned int                getDataFormatNum()
 		{
@@ -166,12 +166,12 @@ class VMultipleGrIsuReader : public VVirtualDataReader
 		double                      getXimpactrot();
 		double                      getYimpactrot();
 		void                        setDefaultPed( double iD );
-		
+
 		bool                        wasLossyCompressed()
 		{
 			return false;
 		}
-		
+
 		// rawfile
 		//!< read in next event
 		bool                        getNextEvent();
@@ -179,7 +179,7 @@ class VMultipleGrIsuReader : public VVirtualDataReader
 		bool                        getNextPedestalEvent();
 		//!< read next shower event from file
 		bool                        getNextShowerEvent();
-		
+
 		// MC
 		bool                       isMC()         //!< GrIsu type data is always MC
 		{
@@ -199,7 +199,7 @@ class VMultipleGrIsuReader : public VVirtualDataReader
 		float                      getMC_Az();
 		float                      getMC_Xoffset();
 		float                      getMC_Yoffset();
-		
+
 		VMonteCarloRunHeader* getMonteCarloHeader()
 		{
 			return 0;

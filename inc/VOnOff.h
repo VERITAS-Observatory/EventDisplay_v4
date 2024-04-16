@@ -23,28 +23,28 @@ class VOnOff
 {
 	private:
 		bool fDebug;
-		
+
 		TList* hList;
 		TList* hQList;
 		TList* hSList;
 		TList* hPList;
-		
+
 		TList* hListSkyHistograms;
 		TList* hListStereoParameterHistograms;
 		TList* hListRandomForestHistograms;
 		TList* hListEnergyHistograms;
-		
+
 		TH1D*  h1Dsig;
 		TH2D*  hmap_stereo_sig;
 		TH1D*  hTheta2_diff;
-		
+
 		double fMaxSigma;
 		double fMaxSigmaX;
 		double fMaxSigmaY;
-		
+
 		void createHistograms( TList*, TList* );
 		void setTitles( TH1*, string, string, string );
-		
+
 	public:
 		VOnOff();
 		~VOnOff();

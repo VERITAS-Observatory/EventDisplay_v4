@@ -27,18 +27,18 @@ using namespace std;
 class VDataMCComparisionHistogramData
 {
 	public:
-	
+
 		string fVarName;
 		string fHistogramType;
 		unsigned int fTelescopeID;                    // 0 = array variable
-		
+
 		TH1D*  fHis1D;
 		TH2D*  fHis2D_Erec;
 		TH2D*  fHis2D_ntubes;
 		TH2D*  fHis2D_size;
 		TH2D*  fHis2D_sizeHG;
 		TH2D*  fHis2D_sizeLG;
-		
+
 		VDataMCComparisionHistogramData( string iVarName = "", string iHistogramType = "", unsigned int iTelescopeID = 0 );
 		~VDataMCComparisionHistogramData() {}
 		bool   initHistogram( string iXTitle, int iNbins, double ix_min, double ix_max );
@@ -50,7 +50,7 @@ class VDataMCComparisionHistogramData
 class VDataMCComparision
 {
 	private:
-	
+
 		enum E_varname { ELENGTH, EWIDTH, EDIST, EALPHA, ENTUBES, ENLOWGAIN, ESIZE, ESIZEHG,
 						 ESIZELG, EFRACLOW, EMAX1, EMAX2, EMAX3, ELOSS, ELOS, EASYM,
 						 ECENX, ECENY, ETGRADX, EMSCWT, EMSCLT, EMWRT, EMLTT,
@@ -59,66 +59,66 @@ class VDataMCComparision
 						 EDISPT, EAEL, EAAZ, EIMGSEL, EEMISSIONHEIGHT, EMVA,
 						 ESIGMAT3D, ENC3D, ESMAX3D, EERRSIGMAT3D, EOMEGA3D, EDEPTH3D, ERWIDTH3D, EERRRWIDTH3D
 					   };
-					   
+
 		string fName;
 		int fNTel;
-		
+
 		vector< double > fTel_x;
 		vector< double > fTel_y;
 		vector< double > fTel_z;
-		
+
 		// wobble north offset
 		double fWobbleNorth;
 		double fWobbleEast;
 		bool   fWobbleFromDataTree;
-		
+
 		double fAzMin;
 		double fAzMax;
 		bool fAzRange;
 		double fZeMin;
 		double fZeMax;
-		
+
 		// spectral weighting
 		VSpectralWeight* fSpectralWeight;
-		
+
 		// data tree
 		CData* fData;
-		
+
 		// cuts
 		VGammaHadronCuts* fCuts;
 		bool fCalculateMVAValues;
 		string fEpochATM;
-		
+
 		// lists with all histograms
 		TList* hisList;
 		vector<TH1D* > hTel;
 		vector<TH2D* > hTel2D;
-		
+
 		// histogram classes
 		map< E_varname, vector< VDataMCComparisionHistogramData* > > fHistoSingleTel;
 		map< E_varname, VDataMCComparisionHistogramData* > fHistoArray;
-		
+
 		// stereo histograms
 		TH2D* hXYcore;
 		TH2D* hAzYcore;
 		TH2D* hYt2;
 		vector<TH2D* > hcen_xy;
 		vector< TH2D* > hdistR;
-		
+
 		// histogram for azimuth weighting
 		TH1D* hAzWeight;
-		
+
 		// angle for shower max correction
 		double fShowerMaxZe_deg;
-		
+
 		void setEntries( TH1D* );
 		void setEntries( TH2D* );
-		
+
 		double getCorrectedEmissionHeight( double iEM, double iZe );
 		void initialGammaHadronCuts();
-		
+
 	public:
-	
+
 		VDataMCComparision( string, int );
 		~VDataMCComparision() {}
 		void defineHistograms();

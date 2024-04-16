@@ -17,15 +17,15 @@ class VInterpolate2DHistos : public TNamed
 {
 	private:
 		TRandom3* fRandom;
-		
+
 	public:
-	
+
 		VInterpolate2DHistos( int iseed = 0 );
 		~VInterpolate2DHistos() {}
-		
+
 		TH2F* doSimpleInterpolation( TH2F*, string, int, int, bool );
 		TH2F* doGaussianInterpolation( TH2F* h, string iname, TH2F* hNevents = 0, int nGausN = 1, double nWidth = 1. );
-		
+
 		ClassDef( VInterpolate2DHistos, 1 );
 };
 #endif

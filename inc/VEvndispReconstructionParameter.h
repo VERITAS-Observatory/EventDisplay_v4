@@ -25,27 +25,27 @@ using namespace std;
 class VEvndispReconstructionParameter : public TNamed
 {
 	private:
-	
+
 		bool   fDebug;
-		
+
 		VEvndispRunParameter*  fRunPara;
-		
+
 		unsigned int fNTel_type;
 		vector< ULong64_t > fTel_type_V;
 		set< ULong64_t > fTel_type;
-		
+
 		void addNewMethod( unsigned int iMethodID );
 		void reset();
-		
+
 	public:
 		unsigned int fNMethods;                   // total number of methods
-		
+
 		vector< unsigned int > fRecordCounter;
 		vector< unsigned int > fMethodID;
 		vector< int > fNImages_min;
 		vector< int > fNImages_max;
 		vector< double > fAxesAngles_min;
-		
+
 		// [methodID][telescope type] (not telescope number!!)
 		vector< vector< int > >    fLocalNtubes_min;
 		vector< vector< int > >    fLocalNLowGain_max;
@@ -67,22 +67,22 @@ class VEvndispReconstructionParameter : public TNamed
 		vector< vector< unsigned int > > fL2TriggerType;
 		vector< vector< double > > fMCEnergy_linTeV_min;
 		vector< vector< double > > fMCEnergy_linTeV_max;
-		
+
 		vector< bool > fUseEventdisplayPointing;
 		vector< vector< bool > > fLocalUseImage;
-		
+
 		vector< string > fMLPFileName;
 		vector< vector< double > > fMTVAZenithBin;
 		vector< vector< string > > fTMVAFileNameVector;
 		vector< string > fDispFileName;
-		
+
 		vector< float >  fMODDISP_MinAngleForDisp;
 		vector< float >  fMODDISP_MinAngleExpFactor;
-		
+
 		VEvndispReconstructionParameter();
 		VEvndispReconstructionParameter( vector< ULong64_t > itel_type, VEvndispRunParameter* iRunPara );
 		~VEvndispReconstructionParameter() {}
-		
+
 		bool   applyArrayAnalysisCuts( unsigned int iMeth, unsigned int iTel, unsigned int iTelType,
 									   VImageParameter* iImageParameter, unsigned short int iLocalTriggerType,
 									   VStarCatalogue* iStar = 0 );
@@ -98,7 +98,7 @@ class VEvndispReconstructionParameter : public TNamed
 		{
 			fDebug = iD;
 		}
-		
+
 		ClassDef( VEvndispReconstructionParameter, 22 );
 };
 #endif

@@ -17,7 +17,7 @@ class VTraceHandler
 	private:
 		//!< linear interpolation
 		double getLinInterpol( double y5, int x1, double y1, int x2, double y2 );
-		
+
 	protected:
 		unsigned int    fTraceIntegrationMethod;  //   set trace integration method (see setter in source file for definition)
 		vector< double >  fpTrace;                //!< the FADC trace
@@ -25,7 +25,7 @@ class VTraceHandler
 		unsigned int fpulsetiminglevels_size;
 		vector< float > fpulsetiminglevels;       //!< levels in fraction of maximum for pulse timing calculation
 		vector< float > fpulsetiming;             //!< pulse timing vector (refilled for each call)
-		bool fFindPulseTiming;                    //!< true if pulse timing finder was successfull
+		bool fFindPulseTiming;                    //!< true if pulse timing finder was successful
 		int fpTrazeSize;                          //!< length of the FADC trace
 		double fPed;                              //!< Ped value for this trace
 		double fPedrms;                           //!< Ped rms for this trace (needed for VFitTraceHandler)
@@ -38,17 +38,17 @@ class VTraceHandler
 		int fMaxThreshold;
 		unsigned int fMC_FADCTraceStart;          // start of FADC trace (in case the simulated trace is longer than needed)
 		bool     kIPRmeasure;                     // if signal extractor is in IPR measurements mode
-		
+
 		double   getQuickMaximumSum( unsigned int iSearchStart, unsigned int iSearchEnd, int iIntegrationWindow, bool fRaw = false );
-		
+
 		double   calculateTraceSum_slidingWindow( unsigned int iSearchStart, unsigned int iSearchEnd, int iIntegrationWindow, bool fRaw );
-		
+
 		void     reset();
-		
+
 	public:
 		VTraceHandler();
 		virtual ~VTraceHandler() {};
-		
+
 		virtual void setTrace( vector< uint8_t >, double, double, unsigned int, double iHiLo = -1. ); //!< pass the trace values (with hilo)
 		virtual void setTrace( vector< uint16_t >, double, double, unsigned int, double iHilo = -1. ); //!< pass the trace values (with hilo)
 		virtual void setTrace( VVirtualDataReader* iReader, unsigned int iNSamples, double ped, double pedrms,
