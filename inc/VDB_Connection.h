@@ -57,11 +57,11 @@ class VDB_Connection
 
 		bool Get_Connection_Status()
 		{
-			return fDB_Connection_successfull;
+			return fDB_Connection_successful;
 		}
 		bool Get_Query_Status()
 		{
-			return fDB_Query_successfull;
+			return fDB_Query_successful;
 		}
 		TSQLResult* Get_QueryResult()
 		{
