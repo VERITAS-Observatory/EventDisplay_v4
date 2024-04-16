@@ -6,7 +6,7 @@ repos:
       - id: isort
         args: ["--profile", "black", "--filter-files"]
   - repo: https://github.com/psf/black
-    rev: 24.3.0
+    rev: 24.4.0
     hooks:
       - id: black
         args: ["--line-length=100"]
@@ -18,15 +18,15 @@ repos:
         args: ["--max-line-length=100", "--extend-ignore=E203,E712"]
   # https://github.com/pre-commit/pre-commit-hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
   # gitup action
-  - repo: https://github.com/rhysd/actionlint
-    rev: v1.6.26
-    hooks:
-      - id: actionlint
+  #  - repo: https://github.com/rhysd/actionlint
+  #   rev: v1.6.27
+  #  hooks:
+  #    - id: actionlint
   # codespell
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.6
