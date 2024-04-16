@@ -32,9 +32,9 @@ using namespace std;
 class VXRayData : public TObject
 {
 	private:
-	
+
 		bool bDebug;
-		
+
 	public:
 		// X-ray data
 		vector< double > fMJD;
@@ -43,10 +43,10 @@ class VXRayData : public TObject
 		vector< double > fFlux;
 		vector< double > fFluxEup;
 		vector< double > fFluxEdown;
-		
+
 		TGraphAsymmErrors* gFluxPhase;
 		TGraphAsymmErrors* gFluxMJD;
-		
+
 		VXRayData();
 		~VXRayData() {}
 		TGraphAsymmErrors* getFluxPhase()
@@ -59,7 +59,7 @@ class VXRayData : public TObject
 		}
 		bool  readFile( string ifile, string tname = "RXTE", double iMJDmin = -1., double iMJDmax = -1. );
 		void  reset();
-		
+
 		ClassDef( VXRayData, 1 );
 };
 
@@ -69,13 +69,13 @@ class VFluxCalculation : public TObject
 		vector< TFile* > fFile;
 		bool bZombie;                             //!< no file or invalid file connected
 		CRunSummary* fData;
-		
+
 		bool fDebug;
-		
+
 		bool fTimebinned;
 		double fMJD_min;
 		double fMJD_max;
-		
+
 		// input parameters read from anasum file (from run summary tree)
 		vector< double > fRunList;                //!< run number
 		vector< double > fRunMJD;                 //!< MJD
@@ -110,7 +110,7 @@ class VFluxCalculation : public TObject
 		vector< vector< double > > fIntraRunCI_lo_3sigma;
 		vector< double > fRunCI_up_3sigma;        //!< counts: upper value of 3 sigma confidence interval
 		vector< vector< double > > fIntraRunCI_up_3sigma;
-		
+
 		// intermediate results
 		vector< double > fRunEffArea;             //!< normalize effective area
 		vector < vector< double > > fIntraRunEffArea;
@@ -130,14 +130,14 @@ class VFluxCalculation : public TObject
 		vector< vector< double > > fIntraRunFluxCI_lo_3sigma;
 		vector< double > fRunFluxCI_up_3sigma;    //!< flux: upper value of 3 sigma confidence interval
 		vector< vector< double > > fIntraRunFluxCI_up_3sigma;
-		
+
 		// spectral parameters (assuming power law)
 		double fMinEnergy;                        //!< calculate flux limit above this energy [TeV]
 		double fMaxEnergy;                        //!< maximum energy to be taken into account [TeV]
 		double fE0;                               //!< calculate flux normalization at this energy [TeV]
 		double fAlpha;                            //!< assumed spectral index
-		
-		
+
+
 		// significance and upper flux limit parameters
 		int    fLiMaEqu;
 		double fThresholdSignificance;
@@ -145,10 +145,10 @@ class VFluxCalculation : public TObject
 		double fUpperLimit;
 		int    fUpperLimitMethod;
 		bool   fFluxCalculationUseRolke;
-		
+
 		// X-ray data
 		VXRayData* fRXTE;
-		
+
 		// graphs
 		TGraphErrors* gFluxElevation;
 		TGraphErrors* gFluxAzimuth;
@@ -156,7 +156,7 @@ class VFluxCalculation : public TObject
 		TGraphErrors* gFluxPedvars;
 		TCanvas* fCanvasFluxesVSMJD;
 		TCanvas* fCanvasFluxesInBINs;
-		
+
 		void   calculateFluxes();
 		void   calculateSignificancesAndUpperLimits();
 		void   cleanRunList();
@@ -171,14 +171,14 @@ class VFluxCalculation : public TObject
 		void   reset();
 		void   resetRunList();
 		void   writeTexFileForFluxValues( string, vector< int > iMJD, vector< double > iFlux, vector< double > iFluxE, double iFac, string iL1, string iL2 );
-		
+
 	public:
-	
+
 		VFluxCalculation();
 		VFluxCalculation( string ifile, unsigned int iTot = 1, int iRunMin = -1, int iRunMax = -1, double iMJDMin = -99., double iMJDMax = -99., bool iDebug = false );
 		VFluxCalculation( vector< string > ifile, unsigned int iTot, int iRunMin = -1, int iRunMax = -1, double iMJDMin = -99., double iMJDMax = -99. );
 		~VFluxCalculation();
-		
+
 		void          calculateIntegralFlux( double iMinEnergy_TeV );
 		TGraphErrors* getFluxvsElevation()
 		{
@@ -298,7 +298,7 @@ class VFluxCalculation : public TObject
 			fTimebinned = iB;
 		}
 		void          writeResults( char* ifile );
-		
+
 		ClassDef( VFluxCalculation, 20 );
 };
 #endif

@@ -47,7 +47,7 @@ double getTelescopePositions( string iF, vector< double >& iX, vector< double >&
 {
 	cout << "reading telescope positions for " << iF << endl;
 	double r_max = 0.;
-	
+
 	TChain* c = new TChain( "telconfig" );
 	if( !c->Add( iF.c_str() ) )
 	{
@@ -72,7 +72,7 @@ double getTelescopePositions( string iF, vector< double >& iX, vector< double >&
 	for( int i = 0; i < iNTel; i++ )
 	{
 		c->GetEntry( i );
-		
+
 		iX.push_back( ( double )x );
 		iY.push_back( ( double )y );
 		iZ.push_back( ( double )z );
@@ -83,7 +83,7 @@ double getTelescopePositions( string iF, vector< double >& iX, vector< double >&
 		}
 	}
 	cout << endl;
-	
+
 	return r_max;
 }
 
@@ -105,9 +105,9 @@ void readInputfile( string fInputFile )
 	cout << endl;
 	string is_line;
 	string temp;
-	
+
 	sInputData a;
-	
+
 	while( getline( is, is_line ) )
 	{
 		if( is_line.size() > 0 )
@@ -118,7 +118,7 @@ void readInputfile( string fInputFile )
 			{
 				continue;
 			}
-			
+
 			// check that there are enough parameters in this line
 			istringstream is_check( is_line );
 			int z = 0;
@@ -134,7 +134,7 @@ void readInputfile( string fInputFile )
 				cout << "...exiting" << endl;
 				exit( EXIT_FAILURE );
 			}
-			
+
 			is_stream >> a.fType;
 			is_stream >> a.fFileName;
 			is_stream >> temp;
@@ -151,7 +151,7 @@ void readInputfile( string fInputFile )
 			{
 				a.fWobbleFromDataTree = false;
 			}
-			
+
 			// az range
 			if( !( is_stream >> std::ws ).eof() )
 			{
@@ -170,9 +170,9 @@ void readInputfile( string fInputFile )
 			{
 				is_stream >> a.fZe_deg_max;
 			}
-			
+
 			getTelescopePositions( a.fFileName, a.fTelX, a.fTelY, a.fTelZ, a.fNTelescopes );
-			
+
 			fInputData.push_back( a );
 		}
 	}
@@ -201,7 +201,7 @@ int main( int argc, char* argv[] )
 	cout << endl;
 	cout << "compareDatawithMC (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
 	cout << "==========================" << endl << endl;
-	
+
 	if( argc < 4 )
 	{
 		cout << "compare MC simulations with excess events from data runs " << endl;
@@ -230,13 +230,13 @@ int main( int argc, char* argv[] )
 		exit( EXIT_SUCCESS );
 	}
 	string fInputFile = argv[1];
-	
+
 	// read input parameters and files from parameter file
 	readInputfile( fInputFile );
-	
+
 	int fSingleTelescopeCuts = atoi( argv[2] );
 	string fOutputfile = argv[3];
-	
+
 	bool fCalculateMVACut = false;
 	if( argc > 4 && atoi( argv[4] ) == 1 )
 	{
@@ -247,7 +247,7 @@ int main( int argc, char* argv[] )
 	{
 		fEpochATM = argv[5];
 	}
-	
+
 	// test number of telescopes
 	int iNT = 0;
 	for( unsigned int i = 0; i < fInputData.size(); i++ )
@@ -260,18 +260,18 @@ int main( int argc, char* argv[] )
 		{
 			if( fInputData[i].fNTelescopes != iNT )
 			{
-				cout << "error: number of telescopes differ, comparision not possible" << endl;
+				cout << "error: number of telescopes differ, comparison not possible" << endl;
 				cout << "...exiting" << endl;
 				exit( EXIT_FAILURE );
 			}
 		}
 	}
 	// -------- end of reading input parameters
-	
+
 	TH1D* hAzOn = 0;
 	// output file
 	TFile* fout = new TFile( fOutputfile.c_str(), "RECREATE" );
-	
+
 	////////////////////////////////////////////////
 	// get AZ weighted histogram
 	for( unsigned int i = 0; i < fInputData.size(); i++ )
@@ -290,20 +290,20 @@ int main( int argc, char* argv[] )
 		}
 	}
 	fout->Close();
-	
+
 	if( hAzOn )
 	{
 		cout  << "Number of entries / mean of az weighting histogram: ";
 		cout <<  hAzOn->GetEntries() << ", " << hAzOn->GetMean() << endl;
 	}
-	
-	
+
+
 	////////////////////////////////////////////////
 	// now analyse the data
 	vector< VDataMCComparision* > fStereoCompare;
 	VDataMCComparision* fStereoCompareOn = 0;
 	VDataMCComparision* fStereoCompareOff = 0;
-	
+
 	for( unsigned int i = 0; i < fInputData.size(); i++ )
 	{
 		cout << fInputData[i].fType << endl;
@@ -337,7 +337,7 @@ int main( int argc, char* argv[] )
 		// fill histograms
 		fStereoCompare.back()->fillHistograms( fInputData[i].fFileName, fSingleTelescopeCuts );
 		fStereoCompare.back()->writeHistograms( fOutputfile );
-		
+
 		if( fInputData[i].fType == "ON" )
 		{
 			fStereoCompareOn = fStereoCompare.back();
@@ -348,7 +348,7 @@ int main( int argc, char* argv[] )
 		}
 		cout << endl;
 	}
-	
+
 	////////////////////////////////////////
 	// calculate difference histograms
 	cout << "DIFF" << endl;

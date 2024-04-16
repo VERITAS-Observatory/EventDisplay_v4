@@ -19,33 +19,33 @@ using namespace std;
 class VLightCurveUtilities
 {
 	private:
-	
+
 		bool fIsZombie;
-		
+
 		bool   fASCIIFormSecondColumnIsObservingInterval;
-		
+
 		bool   fXRTTimeSettings;
 		double fXRTMissionTimeStart;
-		
+
 		double fLightCurveMJD_min;
 		double fLightCurveMJD_max;
-		
+
 	protected:
-	
+
 		vector< VLightCurveData* >  fLightCurveData;
-		
+
 		// phases
 		double   fPhase_MJD0;
 		double   fPhase_Period_days;
 		double   fPhaseError_low_fPhase_Period_days;
 		double   fPhaseError_up_fPhase_Period_days;
 		bool     fPhasePlotting;
-		
+
 	public:
-	
+
 		VLightCurveUtilities();
 		~VLightCurveUtilities() {}
-		
+
 		vector< VLightCurveData* > getLightCurveData()
 		{
 			return fLightCurveData;

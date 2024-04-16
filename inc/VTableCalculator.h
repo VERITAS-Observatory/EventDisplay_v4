@@ -29,10 +29,10 @@ class VTableCalculator
 		// mode can be 'r' or 'w'
 		VTableCalculator( int intel = 0, bool iEnergy = false, bool iPE = false );
 		VTableCalculator( string fpara, string hname, char m, TDirectory* iDir, bool iEnergy, bool iPE = false, int iUseMedianEnergy = 1 );
-		
+
 		// Destructor
 		~VTableCalculator() {}
-		
+
 		// Fill Histos and Calc Mean Scaled Width
 		double calc( int ntel, double* r, double* s, double* w, double* mt, double& chi2, double& dE, double* st = 0 );
 		const char* getInputTable()
@@ -78,15 +78,15 @@ class VTableCalculator
 			fWrite1DHistograms = iB;
 		}
 		void terminate( TDirectory* iOut = 0, char* xtitle = 0 );
-		
+
 	private:
 		unsigned int fDebug;
-		
+
 		double fBinning1DXlow;
 		double fBinning1DXhigh;
-		
+
 		float fMinShowerPerBin;        // minimum number per bin required (table writing)
-		
+
 		// histogram definitions
 		int   NumSize;
 		float amp_offset;
@@ -96,13 +96,13 @@ class VTableCalculator
 		int   HistBins;
 		float xlow;
 		float xhigh;
-		
+
 		string fName;
 		string fHName_Add;
-		
+
 		bool fEnergy;                             //!< true if tables are used for energy calculation
 		int  fUseMedianEnergy;
-		
+
 		bool fFillMedianApproximations;
 		vector< vector< TH1F* > > Oh;
 		vector< vector< VMedianCalculator* > > OMedian;
@@ -110,18 +110,18 @@ class VTableCalculator
 		TH2F* hMedian;
 		string hMedianName;
 		vector< TH2F* > hVMedian;
-		
+
 		// histogram interpolation
 		int fInterPolWidth;
 		int fInterPolIter;
-		
+
 		TDirectory* fOutDir;
 		bool fWrite1DHistograms;
 		bool fReadHistogramsFromFile;
-		
+
 		char    Omode;
 		bool    fwrite;
-		
+
 		bool   create1DHistogram( int i, int j, double w_first_event );
 		bool   createMedianApprox( int i, int j );
 		double getWeightMeanBinContent( TH2F*, int, int, double, double );
@@ -130,6 +130,6 @@ class VTableCalculator
 		bool   readHistograms();
 		void   setBinning();
 		void   setConstants( bool iPE = false );
-		
+
 };
 #endif

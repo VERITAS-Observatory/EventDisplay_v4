@@ -15,21 +15,21 @@ void VSiteData::reset()
 	fSite_B_dB = 0.;
 	fSiteRequirementID = 0;
 	fReferenceSiteName = "";
-	
+
 	fObservationTime_s.clear();
 	fCameraOffset_deg.clear();
 	fArray.clear();
-	
+
 	fSiteFileName.clear();
 	fSiteFile_exists.clear();
 	fSiteFile_Emin.clear();
 	fSiteFile_Emax.clear();
-	
+
 	fPlottingColor.clear();
 	fPlottingLineStyle.clear();
 	fPlottingFillStyle.clear();
 	fLegend.clear();
-	
+
 	fGraphSensitivity.clear();
 }
 
@@ -41,7 +41,7 @@ void VSiteData::reset()
 bool VSiteData::checkIntegrity()
 {
 	unsigned int iS = fSiteFileName.size();
-	
+
 	if( iS != fObservationTime_s.size() )
 	{
 		return false;
@@ -86,7 +86,7 @@ bool VSiteData::checkIntegrity()
 	{
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -120,7 +120,7 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 	string is_line;
 	string iTemp = "";
 	string iTempSite = "";
-	
+
 	// get list of sites
 	vector< string > iListOfSites;
 	while( getline( is, is_line ) )
@@ -154,11 +154,11 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 		return false;
 	}
 	cout << "reading from " << iDataList << " : " << iSiteCounter << "=" << iListOfSites[iSiteCounter] << endl;
-	
+
 	// reset stream (??!?!?!)
 	is.close();
 	is.open( iDataList.c_str(), ifstream::in );
-	
+
 	unsigned int z = 0;
 	while( getline( is, is_line ) )
 	{
@@ -293,12 +293,12 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 		z++;
 	}
 	is.close();
-	
+
 	if( fDebug )
 	{
 		cout << "VSiteData::addDataSet: integrity: " << checkIntegrity() << endl;
 	}
-	
+
 	// add observing time to legend
 	char hname[200];
 	for( unsigned int i = 0; i < fObservationTime_s.size(); i++ )
@@ -316,7 +316,7 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 			fLegend[i] = hname;
 		}
 	}
-	
+
 	// set data files correctly
 	for( unsigned int i = 0; i < fSiteFileName.size(); i++ )
 	{
@@ -348,7 +348,7 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 			fSiteFileName[i] += ".root";
 		}
 	}
-	
+
 	// check that file exists
 	for( unsigned int i = 0; i < fSiteFileName.size(); i++ )
 	{
@@ -357,11 +357,11 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 		{
 			fSiteFile_exists[i] = false;
 		}
-		
+
 		fSiteFile_exists[i] = true;
 		iF.Close();
 	}
-	
+
 	return true;
 }
 
@@ -375,7 +375,7 @@ TGraphAsymmErrors* VSiteData::getCombinedSensitivityGraph( bool iInterpolate, st
 		iGraphSensitivity->SetFillColor( fPlottingColor[0] );
 		iGraphSensitivity->SetLineStyle( fPlottingLineStyle[0] );
 	}
-	
+
 	unsigned int z = 0;
 	for( unsigned int f = 0; f < fSiteFileName.size(); f++ )
 	{
@@ -432,14 +432,14 @@ TGraphAsymmErrors* VSiteData::getCombinedSensitivityGraph( bool iInterpolate, st
 		{
 			return 0;
 		}
-		
+
 		if( fDebug )
 		{
 			cout << "VSiteData::getCombinedSensitivityGraph: reading for site " << fSiteName << "[";
 			cout << fSiteFile_Emin[f] << ", " << fSiteFile_Emax[f] << "] from file: " << endl;
 			cout << "\t" << fSiteFileName[f].c_str() << endl;
 		}
-		
+
 		for( int i = 1; i <= h->GetNbinsX(); i++ )
 		{
 			if( h->GetXaxis()->GetBinCenter( i ) > log10( fSiteFile_Emin[f] ) && h->GetXaxis()->GetBinCenter( i ) <= log10( fSiteFile_Emax[f] ) )
@@ -477,7 +477,7 @@ TGraphAsymmErrors* VSiteData::getCombinedSensitivityGraph( bool iInterpolate, st
 			}
 		}
 	}
-	
+
 	return iGraphSensitivity;
 }
 
@@ -568,4 +568,3 @@ TGraphAsymmErrors* VSiteData::getCombinedSensitivityGraph( bool iInterpolate, st
    }
 
 */
-

@@ -26,7 +26,7 @@ int main( int argc, char* argv[] )
 	cout << endl;
 	cout << "combineDISPTables " << VGlobalRunParameter::getEVNDISP_VERSION() << endl;
 	cout << "=======================================================" << endl;
-	
+
 	if( argc != 3 && argc != 4 )
 	{
 		cout << "combineDISPTables " << "<file list> <output root file> [options]" << endl;
@@ -34,12 +34,12 @@ int main( int argc, char* argv[] )
 		cout << endl;
 		exit( 0 );
 	}
-	
+
 	string fFileList = argv[1];
 	string fOutFile  = argv[2];
-	
+
 	vector< string > fInputFile;
-	
+
 	ifstream is;
 	is.open( fFileList.c_str(), ifstream::in );
 	if( !is )
@@ -56,7 +56,7 @@ int main( int argc, char* argv[] )
 		}
 	}
 	is.close();
-	
+
 	// new disp table (merger product)
 	TFile* fTot = new TFile( fOutFile.c_str(), "RECREATE" );
 	if( fTot->IsZombie() )
@@ -67,7 +67,7 @@ int main( int argc, char* argv[] )
 	VDispTableReader* fData = new VDispTableReader();
 	fData->SetName( "dispTable" );
 	fData->initialize( false );
-	
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// loop over all files
 	for( unsigned int i = 0; i < fInputFile.size(); i++ )
@@ -97,11 +97,11 @@ int main( int argc, char* argv[] )
 		for( int j = 0; j < t->GetEntries(); j++ )
 		{
 			t->GetEntry( j );
-			
+
 			cout << "\t filling entry " << j << "\t" << a->ze << "\t" << a->az_min << "\t" << a->az_max << "\t" << a->woff << "\t" << a->pedvar << endl;
-			
+
 			fData->fill( a->ze, a->az_bin, a->az_min, a->az_max, a->woff, a->pedvar, ( TH2* )a->h2D_DispTable, ( TH2* )a->h2D_DispTableN, ( TH2* )a->h2D_DispPhiTable, ( TH2* )a->h2D_DispMissTable, ( TH3* )a->h3D_DispTable, ( TH3* )a->h3D_DispTableN, ( TH3* )a->h3D_DispPhiTable, ( TH3* )a->h3D_DispMissTable );
-			
+
 			if( j == 0 )
 			{
 				fData->fWidthScaleParameter = a->fWidthScaleParameter;
@@ -118,5 +118,3 @@ int main( int argc, char* argv[] )
 	fData->print( true );
 	fTot->Close();
 }
-
-

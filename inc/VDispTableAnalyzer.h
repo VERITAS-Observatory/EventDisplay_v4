@@ -28,27 +28,27 @@ struct sDispTableEventData
 class VDispTableAnalyzer
 {
 	private:
-	
+
 		bool bDebug;
 		bool bZombie;
-		
+
 		TFile* fFile;
 		VDispTableReader* fData;
-		
+
 		float f_disp;
 		float f_dispE;
 		float f_disp_Phi;
 		float f_disp_PhiE;
 		float f_disp_Miss;
-		
+
 		vector< float > x_disp;          // x coordinate of disp calculation
 		vector< float > y_disp;          // y coordinate of disp calculation
-		
+
 		float calculateDisp( float iWidth, float iLength, float iSize, float iPedvar, float iZe, float iAz, bool b2D = true );
 		double interpolate( double w1, double ze1, double w2, double ze2, double ze, bool iCos = false );
-		
+
 	public:
-	
+
 		VDispTableAnalyzer( string iFile = "" );
 		~VDispTableAnalyzer();
 		void  calculateMeanDirection( float& xs, float& ys, vector< float > x, vector< float > y,

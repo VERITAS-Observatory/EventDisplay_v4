@@ -63,16 +63,16 @@ iii) at a fraction of the maximum value of the effective area (i.e.10%)
 VEnergyThreshold::VEnergyThreshold()
 {
 	fDebug = false;
-	
+
 	fEffArea = 0;
-	
+
 	fOutFile = 0;
 	fTreeEth = 0;
-	
+
 	fEnergyThresholdFile = 0;
 	fEnergyThresholdFixedValue = 0.001;
 	fEnergyThresholdFileName = "";
-	
+
 	setPlottingStyle();
 	setPlottingYaxis();
 }
@@ -81,18 +81,18 @@ VEnergyThreshold::VEnergyThreshold()
 VEnergyThreshold::VEnergyThreshold( string ioutfilename )
 {
 	fDebug = false;
-	
+
 	fEffArea = 0;
-	
+
 	cout << "opening output file " << ioutfilename << endl;
 	fOutFile = new TFile( ioutfilename.c_str(), "RECREATE" );
 	if( fOutFile->IsZombie() )
 	{
 		cout << "Error opening output file " << ioutfilename << endl;
 	}
-	
+
 	fTreeEth = 0;
-	
+
 	setPlottingStyle();
 	setPlottingYaxis();
 }
@@ -101,17 +101,17 @@ VEnergyThreshold::VEnergyThreshold( string ioutfilename )
 VEnergyThreshold::VEnergyThreshold( double iEnergyThresholdFixed, string iEnergyThresholdFile )
 {
 	fDebug = false;
-	
+
 	fEffArea = 0;
-	
+
 	fOutFile = 0;
 	fTreeEth = 0;
-	
+
 	fEnergyThresholdFile = 0;
-	
+
 	fEnergyThresholdFixedValue = iEnergyThresholdFixed;
 	fEnergyThresholdFileName = iEnergyThresholdFile;
-	
+
 	setPlottingStyle();
 	setPlottingYaxis();
 }
@@ -140,7 +140,7 @@ bool VEnergyThreshold::openEffectiveAreaFile( string iname )
 	{
 		cout << "VEnergyThreshold::openEffectiveAreaFile " << iname << endl;
 	}
-	
+
 	fEffArea = new TChain( "fEffAreaH2F" );
 	fEffArea->Add( iname.c_str() );
 	if( fEffArea->GetListOfFiles()->GetEntries() == 0 )
@@ -148,10 +148,10 @@ bool VEnergyThreshold::openEffectiveAreaFile( string iname )
 		cout << "error opening " << iname << "(" << fEffArea->GetListOfFiles()->GetEntries() << ")" << endl;
 		return false;
 	}
-	
+
 	cout << "reading effective areas from " << iname << endl;
 	cout << "total number of effective areas: " << fEffArea->GetEntries() << endl;
-	
+
 	fEffArea->SetBranchAddress( "ze", &fze );
 	fEffArea->SetBranchAddress( "az", &fAzBin );
 	fEffArea->SetBranchAddress( "azMin", &fAzMin );
@@ -167,7 +167,7 @@ bool VEnergyThreshold::openEffectiveAreaFile( string iname )
 	fEffArea->SetBranchAddress( "nbins_esys", &nbins_esys );
 	fEffArea->SetBranchAddress( "e0_esys", e0_esys );
 	fEffArea->SetBranchAddress( "esys_rel", esys_rel );
-	
+
 	return true;
 }
 
@@ -179,7 +179,7 @@ bool VEnergyThreshold::writeResults()
 		cout << "writing threshold tree to " << fOutFile->GetName() << endl;
 		fTreeEth->Write();
 	}
-	
+
 	return true;
 }
 
@@ -196,13 +196,13 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 	{
 		cout << "VEnergyThreshold::calculateEnergyThreshold " << fTreeEth << endl;
 	}
-	
+
 	if( !fEffArea )
 	{
 		cout << "VEnergyThreshold::calculateEnergyThreshold() error reading effective area file" << endl;
 		return false;
 	}
-	
+
 	if( !fTreeEth )
 	{
 		if( !setUpThresholdTree() )
@@ -210,7 +210,7 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 			return false;
 		}
 	}
-	
+
 	if( nentries < 0 ||  nentries > fEffArea->GetEntries() )
 	{
 		nentries = fEffArea->GetEntries();
@@ -218,29 +218,29 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 	for( int i = 0; i < nentries; i++ )
 	{
 		fEffArea->GetEntry( i );
-		
+
 		if( i % 10000 == 0 && i > 0 )
 		{
 			cout << "\t now at entry " << i << endl;
 		}
-		
+
 		feth = 0.;
 		fesys_10p = 0.;
 		fesys_15p = 0.;
 		fesys_20p = 0.;
-		
+
 		feffFract_05p = 0;
 		feffFract_10p = 0;
 		feffFract_20p = 0;
 		feffFract_50p = 0;
 		feffFract_90p = 0;
-		
+
 		feff_150GeV = 0.;
 		feff_300GeV = 0.;
 		feff_500GeV = 0.;
 		feff_1TeV = 0.;
 		feff_10TeV = 0.;
-		
+
 		if( nbins > 1 )
 		{
 			double idE = e0[1] - e0[0];
@@ -256,7 +256,7 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 			}
 			feth = getEnergyThreshold( &hLin, true, bFit );
 		}
-		
+
 		if( nbins_esys > 1 )
 		{
 			vector< double > x;
@@ -289,7 +289,7 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 		feffFract_50p = getEnergy_MaxEffectiveAreaFraction( gEffAreaRec, 0.50 );
 		feffFract_90p = getEnergy_MaxEffectiveAreaFraction( gEffAreaRec, 0.90 );
 		delete gEffAreaRec;
-		
+
 		if( TMath::Abs( fAzMax - 1000. ) < 1.e-3 )
 		{
 			cout << "Threshold : ";
@@ -329,7 +329,7 @@ double VEnergyThreshold::getEnergy_maxSystematic( TGraphErrors* g, double iSys )
 double VEnergyThreshold::getEnergy_maxSystematic( vector< double > x, vector< double > y, double iSys )
 {
 	double x1, x2, y1, y2, a, b;
-	
+
 	for( unsigned int i = 0; i < x.size(); i++ )
 	{
 		y1 =  y[i];
@@ -340,7 +340,7 @@ double VEnergyThreshold::getEnergy_maxSystematic( vector< double > x, vector< do
 			{
 				y2 = y[i - 1];
 				x2 = x[i - 1];
-				
+
 				if( x1 - x2 != 0. )
 				{
 					a = ( y1 - y2 ) / ( x1 - x2 );
@@ -361,7 +361,7 @@ double VEnergyThreshold::getEnergy_maxSystematic( vector< double > x, vector< do
 			}
 		}
 	}
-	
+
 	return 0.;
 }
 
@@ -372,9 +372,9 @@ double VEnergyThreshold::getEnergyThreshold( TH1D* h, bool bLogEnergyAxis, bool 
 	{
 		return 0.;
 	}
-	
+
 	int iMaxBin = h->GetMaximumBin();
-	
+
 	// weighed bin of three largest bins
 	if( !bFit )
 	{
@@ -417,7 +417,7 @@ double VEnergyThreshold::getEnergyThreshold( TH1D* h, bool bLogEnergyAxis, bool 
 			feth = i_f.GetMaximumX();
 		}
 	}
-	
+
 	return feth;
 }
 
@@ -432,7 +432,7 @@ bool VEnergyThreshold::setUpThresholdTree()
 	{
 		return true;
 	}
-	
+
 	if( !fOutFile )
 	{
 		cout << "VEnergyThreshold::setUpThresholdTree: no output file defined" << endl;
@@ -443,9 +443,9 @@ bool VEnergyThreshold::setUpThresholdTree()
 		cout << "Error in setting up trees: no output file found" << endl;
 		return false;
 	}
-	
+
 	fOutFile->cd();
-	
+
 	fTreeEth = new TTree( "fTreeEth", "thresholds in energy reconstruction" );
 	fTreeEth->Branch( "ze", &fze, "ze/F" );
 	fTreeEth->Branch( "az", &fAzBin, "az/s" );
@@ -468,7 +468,7 @@ bool VEnergyThreshold::setUpThresholdTree()
 	fTreeEth->Branch( "EffArea_500GeV", &feff_500GeV, "EffArea_500GeV/F" );
 	fTreeEth->Branch( "EffArea_1TeV", &feff_1TeV, "EffArea_1TeV/F" );
 	fTreeEth->Branch( "EffArea_10TeV", &feff_10TeV, "EffArea_10TeV/F" );
-	
+
 	return true;
 }
 
@@ -488,25 +488,25 @@ double VEnergyThreshold::getEnergyThreshold( VRunList* iRunData )
 		cout << "VEnergyThreshold::getEnergyThreshold " << iRunData << " ";
 		cout << fEnergyThresholdFileName.size() << " " << fEnergyThresholdFixedValue << endl;
 	}
-	
+
 	// no file with energy thresholds given; return fixed value
 	if( fEnergyThresholdFileName.size() <= 0 )
 	{
 		return fEnergyThresholdFixedValue;
 	}
-	
+
 	// no run data given, return 0 energy threshold
 	if( iRunData == 0 )
 	{
 		return 0.001;
 	}
-	
+
 	// open file with energy thresholds
 	if( !fEnergyThresholdFile && !openEnergyThresholdFile() )
 	{
 		return 0.001;
 	}
-	
+
 	// interpolate between energy thresholds
 	return interpolateEnergyThreshold( iRunData );
 }
@@ -518,7 +518,7 @@ bool VEnergyThreshold::openEnergyThresholdFile()
 	{
 		return false;
 	}
-	
+
 	fEnergyThresholdFile = new TFile( fEnergyThresholdFileName.c_str() );
 	if( fEnergyThresholdFile->IsZombie() )
 	{
@@ -531,26 +531,26 @@ bool VEnergyThreshold::openEnergyThresholdFile()
 		return false;
 	}
 	int nentries = fTreeEth->GetEntries();
-	
+
 	cout << "reading " << fEnergyThresholdFile->GetName() << endl;
 	cout << "total number of entries in energy threshold tree: " << nentries << endl;
-	
+
 	fTreeEth->SetBranchAddress( "ze", &fze );
 	// DO THIS WITH INTEGERS!!!!!
 	// read in all entries and see what values are available
 	vector< double > fv_Ze;
 	fv_Ze.reserve( nentries );
-	
+
 	for( int i = 0; i < fTreeEth->GetEntries(); i++ )
 	{
 		fTreeEth->GetEntry( i );
-		
+
 		fv_Ze.push_back( fze );
 	}
 	sort( fv_Ze.begin(), fv_Ze.end() );
 	vector<double>::iterator p_d = unique( fv_Ze.begin(), fv_Ze.end() );
 	fv_Ze.erase( p_d, fv_Ze.end() );
-	
+
 	return true;
 }
 
@@ -578,19 +578,19 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
 			return;
 		}
 	}
-	
+
 	char hname[600];
-	
+
 	gStyle->SetPadTopMargin( 0.1 );
 	gStyle->SetTitleAlign( 23 );
 	gStyle->SetTitleFontSize( 0.05 );
 	gStyle->SetTitleX( 0.5 );
-	
+
 	vector< string > iDraw;
 	vector< string > iCut;
 	vector< string > iName;
 	vector< string > iTitle;
-	
+
 	// energy threshold vs zenith angle
 	iName.push_back( "zenith angle [deg]" );
 	iDraw.push_back( var + "*1.e3:ze" );
@@ -598,7 +598,7 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
 	iCut.push_back( hname );
 	sprintf( hname, "woff = %.2f deg, noise level = %d", woff, noise );
 	iTitle.push_back( hname );
-	
+
 	// energy threshold vs wobble offsets
 	iName.push_back( "wobble offset [deg]" );
 	iDraw.push_back( var + "*1.e3:Woff" );
@@ -606,7 +606,7 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
 	iCut.push_back( hname );
 	sprintf( hname, "ze=%d deg, noise level = %d", ( int )ze, noise );
 	iTitle.push_back( hname );
-	
+
 	// energy threshold vs pedestal variations
 	iName.push_back( "pedestal variation" );
 	iDraw.push_back( var + "*1.e3:pedvar" );
@@ -614,7 +614,7 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
 	iCut.push_back( hname );
 	sprintf( hname, "ze=%d deg, woff = %.2f deg", ( int )ze, woff );
 	iTitle.push_back( hname );
-	
+
 	// energy threshold vs azimuth angle
 	iName.push_back( "azimuth angle [deg]" );
 	iDraw.push_back( var + "*1.e3:azMin+30." );
@@ -622,9 +622,9 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
 	iCut.push_back( hname );
 	sprintf( hname, "ze=%d deg, woff = %.2f deg, noise level = %d", ( int )ze, woff, noise );
 	iTitle.push_back( hname );
-	
+
 	TCanvas* c = 0;
-	
+
 	for( unsigned int i = 0; i < iDraw.size(); i++ )
 	{
 		sprintf( hname, "c_%d", i );
@@ -645,13 +645,13 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
 			}
 			c->cd();
 		}
-		
+
 		fTreeEth->SetMarkerStyle( fPlottingMarkerStyle );
 		fTreeEth->SetMarkerColor( fPlottingMarkerColor );
 		fTreeEth->SetLineColor( fPlottingMarkerColor );
 		fTreeEth->SetMarkerSize( fPlottingMarkerSize );
 		fTreeEth->SetLineWidth( ( Width_t )fPlottingLineWidth );
-		
+
 		if( bPlot )
 		{
 			fTreeEth->Draw( iDraw[i].c_str(), iCut[i].c_str(), plot_option.c_str() );
@@ -706,7 +706,7 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
 		        } */
 		c->Update();
 	}
-	
+
 }
 
 
@@ -716,11 +716,11 @@ double VEnergyThreshold::getEnergy_MaxEffectiveAreaFraction( TObject* h, double 
 	{
 		return 0.;
 	}
-	
+
 	vector< double > x;
 	vector< double > y;
 	double max = 0.;
-	
+
 	if( strcmp( "TGraphErrors", h->ClassName() ) == 0 || strcmp( "TGraph", h->ClassName() ) == 0 || strcmp( "TGraphAsymmErrors", h->ClassName() ) == 0 )
 	{
 		TGraph* g = ( TGraph* )h;
@@ -736,12 +736,12 @@ double VEnergyThreshold::getEnergy_MaxEffectiveAreaFraction( TObject* h, double 
 			}
 		}
 	}
-	
+
 	if( max <= 0. )
 	{
 		return 0.;
 	}
-	
+
 	for( unsigned int i = 0; i < x.size(); i++ )
 	{
 		if( y[i] / max > iFrac )
@@ -749,6 +749,6 @@ double VEnergyThreshold::getEnergy_MaxEffectiveAreaFraction( TObject* h, double 
 			return TMath::Power( 10., x[i] );
 		}
 	}
-	
+
 	return 0.;
 }

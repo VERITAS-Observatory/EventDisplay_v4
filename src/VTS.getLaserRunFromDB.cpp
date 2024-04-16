@@ -39,10 +39,10 @@ int main( int argc, char* argv[] )
 		cout << "error: first telescope is T1 (1)" << endl;
 		exit( -1 );
 	}
-	
+
 	// get DBservers
 	VGlobalRunParameter* fRunPara = new VGlobalRunParameter();
-	
+
 	// DB run info
 	VDBRunInfo i_DBinfo( fRunNumber, fRunPara->getDBServer(), fNTel );
 	if( i_DBinfo.isGood() )
@@ -58,4 +58,3 @@ int main( int argc, char* argv[] )
 		}
 	}
 }
-

@@ -58,7 +58,7 @@ using namespace std;
 class VDisplay : public TGMainFrame
 {
 		RQ_OBJECT( "VDisplay" )
-		
+
 		//! menu identifier
 		enum E_menuIdentifer
 		{
@@ -88,7 +88,7 @@ class VDisplay : public TGMainFrame
 						   };
 		//! FADC/ana tab identifier
 		enum E_fadcIDENT {F_FADC, F_ANA};
-		
+
 	private:
 		bool fDebug;
 		VEventLoop* fEventLoop;                   //!< main event loop, steering of data reading
@@ -96,11 +96,11 @@ class VDisplay : public TGMainFrame
 		map<unsigned int, VCamera* > fCamera;     //!< vector of fNTelescopes cameras
 		vector< unsigned int > fTelescopesToShow; //!< vector with telescope numbers for plotting
 		VDisplayBirdsEye* fBirdsEye;                 //!< drawing the telescopes from above
-		
+
 		unsigned int fTelescope;                  //!< telesope to draw (first telescope = 0)
 		bool fBoolDrawOne;                        //!< draw only one telescope or all X in window
 		bool fBoolDrawAllinOne;                   //!< draw all results into one camera
-		
+
 		TGCompositeFrame* fFrameTable;            //!< main frame, containing all widgets
 		TGLayoutHints* fL1;
 		TGLayoutHints* fL2;
@@ -154,15 +154,15 @@ class VDisplay : public TGMainFrame
 		TGCompositeFrame* fCompBird;
 		TRootEmbeddedCanvas* fEmBird;
 		TCanvas* fCanvasBird;
-		
+
 		TGCompositeFrame* fFrameCal;
 		TRootEmbeddedCanvas* fEmCal;
 		TCanvas* fCanvasCal;
-		
+
 		TGCompositeFrame* fFrameTgrad;
 		TRootEmbeddedCanvas* fEmTgrad;
 		TCanvas* fCanvasPixelHisto;
-		
+
 		TGCompositeFrame* fFrameAna;
 		TGCompositeFrame* fCompAna;
 		TRootEmbeddedCanvas* fEmAna;
@@ -174,7 +174,7 @@ class VDisplay : public TGMainFrame
 		TGNumberEntry* fNEntryOAutoRun;
 		TGLabel* fLabelOptInc;
 		TGNumberEntry* fNEntryOInc;
-		
+
 		TGGroupFrame* fGroupTelFrame;
 		TGHorizontalFrame* fGroupAnaFrame;
 		TGHorizontalFrame* fGroupSetFrame;
@@ -188,8 +188,8 @@ class VDisplay : public TGMainFrame
 		TGButtonGroup* fGroupOptTel;
 		TGRadioButton* fRadioTA;
 		vector< TGRadioButton* > fRadioTel;
-		
-		// frame with cut optiones
+
+		// frame with cut options
 		TGGroupFrame* fGroupOptCut;
 		TGLabel* fLabelOptATri;
 		TGNumberEntry* fNEntryOATri;
@@ -209,7 +209,7 @@ class VDisplay : public TGMainFrame
 		TGNumberEntry* fNEntryOIma;
 		TGLabel* fLabelOptBor;
 		TGNumberEntry* fNEntryOBor;
-		
+
 		TGTextButton* fButtonOptSet;
 		TGTextButton* fButtonOptReset;
 		TGCompositeFrame* fFrameInfo;
@@ -217,7 +217,7 @@ class VDisplay : public TGMainFrame
 		TRootEmbeddedCanvas* fEmInfo;
 		TCanvas* fCanvasInfo;
 		TPaveText* fPaveInfo;
-		
+
 		E_cameraIdent fCameraDisplay;             //!< which camera display is active
 		bool fBoolDrawImageTraces;                //!< draw individual image traces, not sum signal into FADC canvas
 		unsigned int fSelectedChan;               //!< selected FADC channel
@@ -229,19 +229,19 @@ class VDisplay : public TGMainFrame
 		TGraph* fGraphFADC_2;                       //!< graph to indicate summation window (second summation window)
 		TLine* fLineFADC;                         //!< line to indicate Tzero
 		bool fBoolFADC;                           //!< draw FADC
-		
+
 		int fBWNum;                               //! Number of colours in BW palette
 		int fBWPalette[50];                       //! BW (greyscale) palette
-		
+
 		bool fCameraMovie;                        //!< plot every new camera view
 		string fMovieFileName;                    //!< name of gifs for camera movie + number
 		unsigned int fMoviePictNumber;            //!< movie picture number
-		
+
 		unsigned int fNumEventIncrement;          //!< increment for nextEvent()
 		bool fAutoRunStatus;                      //!< true = autorunmodus is on
 		unsigned int fTimingSleep;                //!< pause between each event in autorunmodus (microseconds)
 		bool fCameraTiming;                       //!< last tab was timing tab (read again data)
-		
+
 		void     bookHistos();                    //!< book histograms
 		//!< not all plots make sense
 		bool     checkPlotIntentions( unsigned int iCamTab );
@@ -253,13 +253,13 @@ class VDisplay : public TGMainFrame
 		bool     drawImageBorderTZero();          //!< draw image border graphs
 		void     drawPixelHistos();               //!< draw pixel histos
 		void     dumpDeadChannels();              //!< dump dead channels to screen
-		void     dumpImageBorderPixels();         //!< pring image/border pixels
+		void     dumpImageBorderPixels();         //!< bring image/border pixels
 		TH1D*    fillFADC( int, TH1D* );          //!< fill FADC histogram
 		void     makeMoviePicture();              //!< make a new camera movie picture
 		void     plotFADCFit( int );              //!< plot FADC trace with fit function
 		void     printCanvas( TPad* );            //!< print canvas in eps,ps,gif,root
 		void     processEvent();
-		//!< process input of buttons, menues, etc.
+		//!< process input of buttons, menus, etc.
 		virtual Bool_t ProcessMessage( Long_t msg, Long_t parm1, Long_t );
 		void     resetDisplay();                  //!< reset display
 		void     resetRunOptions();               //!< reset run variables to standard values
@@ -276,24 +276,24 @@ class VDisplay : public TGMainFrame
 		void     subprocessRadioButton( Long_t ); //!< process radio buttion interactions
 		void     subprocessTextChanged( Long_t ); //!< process text changed interactions
 		void     subprocessTextEnter( Long_t );   //!< process text entered interactions
-		
+
 	public:
 		VDisplay();
 		//!< standard constructor, sourceFile = source data file
 		VDisplay( const TGWindow* p, unsigned int w, unsigned int h, VEventLoop* iEventLoop );
 		virtual ~VDisplay();                      //!< destructor
-		
+
 		//  void setDisplayTraceFit(bool infit){fTraceFit=infit;}
-		
+
 		// slots
 		void     CloseWindow();                   //!< close application (TGMainFrame method)
 		void     selectAnaTab( Int_t );           //!< select tab for FADC/analysis
 		//!< select channel for FADC histogram by clicking on channel
 		void     selectChannel( Int_t, Int_t, Int_t, TObject* );
 		void     updateCamera( Int_t );           //!< update camera view with new event
-		
+
 		void     makeFullMovie();
-		
+
 #ifndef __APPLE__
 		ClassDef( VDisplay, 1 )
 #endif

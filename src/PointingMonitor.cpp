@@ -32,7 +32,7 @@ uint32_t PointingMonitor::dateToUInt32( const string& dateStr )
 }
 
 /********************************************************************************/
-/* Functions for converting between Modified Julian Date and calender date/time */
+/* Functions for converting between Modified Julian Date and calendar date/time */
 /********************************************************************************/
 
 uint32_t PointingMonitor::mjdToDate( double mjd )
@@ -74,7 +74,7 @@ double PointingMonitor::dateTimeToMjd( uint64_t dateTime )
 vector<pointingmonitor::CameraParameters> PointingMonitor::getCameraParametersList( uint32_t telescope_id, uint32_t date, uint32_t limit )
 {
 	vector<pointingmonitor::CameraParameters> parametersVec;
-	
+
 	// create database command string
 	ostringstream strbuf;
 	strbuf << "select * from tblPointing_Monitor_Camera_Parameters";
@@ -89,7 +89,7 @@ vector<pointingmonitor::CameraParameters> PointingMonitor::getCameraParametersLi
 	{
 		strbuf << " limit " << limit;
 	}
-	
+
 	string fDBserver = getDBServer() + "VOFFLINE";
 	//std::cout<<"PointingMonitor::getCameraParametersList "<<std::endl;
 	VDB_Connection my_connection( fDBserver.c_str(), "readonly", "" ) ;
@@ -103,9 +103,9 @@ vector<pointingmonitor::CameraParameters> PointingMonitor::getCameraParametersLi
 		return parametersVec;
 	}
 	TSQLResult* db_res = my_connection.Get_QueryResult();
-	
+
 	int fNRows = db_res->GetRowCount();
-	
+
 	for( int i = 0; i < fNRows; i++ )
 	{
 		TSQLRow* db_row = db_res->Next();
@@ -113,11 +113,11 @@ vector<pointingmonitor::CameraParameters> PointingMonitor::getCameraParametersLi
 		{
 			continue;
 		}
-		
+
 		// add new element to result vector and fill with numbers
 		parametersVec.push_back( pointingmonitor::CameraParameters() );
 		pointingmonitor::CameraParameters& parameters = parametersVec.back();
-		
+
 		parameters.isValid =           true;
 		parameters.startDate =         dateToUInt32( db_row->GetField( 1 ) );
 		parameters.endDate =           dateToUInt32( db_row->GetField( 2 ) );
@@ -129,7 +129,7 @@ vector<pointingmonitor::CameraParameters> PointingMonitor::getCameraParametersLi
 		parameters.referencePixelX =   atof( db_row->GetField( 16 ) );
 		parameters.referencePixelY =   atof( db_row->GetField( 17 ) );
 	}
-	
+
 	return parametersVec;
 }
 
@@ -153,7 +153,7 @@ pointingmonitor::CameraParameters PointingMonitor::getCameraParameters( uint32_t
 vector<pointingmonitor::CalibrationParameters> PointingMonitor::getCalibrationParametersList( uint32_t telescope_id, uint32_t date, uint32_t limit )
 {
 	vector<pointingmonitor::CalibrationParameters> parametersVec;
-	
+
 	// create database command string
 	ostringstream strbuf;
 	strbuf << "select * from tblPointing_Monitor_Calibration_Parameters";
@@ -168,7 +168,7 @@ vector<pointingmonitor::CalibrationParameters> PointingMonitor::getCalibrationPa
 	{
 		strbuf << " limit " << limit;
 	}
-	
+
 	string fDBserver = getDBServer() + "VOFFLINE";
 	//std::cout<<"PointingMonitor::getCalibrationParametersList "<<std::endl;
 	VDB_Connection my_connection( fDBserver.c_str(), "readonly", "" ) ;
@@ -182,9 +182,9 @@ vector<pointingmonitor::CalibrationParameters> PointingMonitor::getCalibrationPa
 		return parametersVec;
 	}
 	TSQLResult* db_res = my_connection.Get_QueryResult();
-	
+
 	int fNRows = db_res->GetRowCount();
-	
+
 	for( int i = 0; i < fNRows; i++ )
 	{
 		TSQLRow* db_row = db_res->Next();
@@ -192,11 +192,11 @@ vector<pointingmonitor::CalibrationParameters> PointingMonitor::getCalibrationPa
 		{
 			continue;
 		}
-		
+
 		// add new element to result vector and fill with numbers
 		parametersVec.push_back( pointingmonitor::CalibrationParameters() );
 		pointingmonitor::CalibrationParameters& parameters = parametersVec.back();
-		
+
 		parameters.isValid =   true;
 		parameters.startDate = dateToUInt32( db_row->GetField( 1 ) );
 		parameters.endDate =   dateToUInt32( db_row->GetField( 2 ) );
@@ -218,7 +218,7 @@ vector<pointingmonitor::CalibrationParameters> PointingMonitor::getCalibrationPa
 		parameters.l2 =        atof( db_row->GetField( 18 ) );
 		parameters.l3 =        atof( db_row->GetField( 19 ) );
 	}
-	
+
 	return parametersVec;
 }
 
@@ -242,13 +242,13 @@ pointingmonitor::CalibrationParameters PointingMonitor::getCalibrationParameters
 vector<pointingmonitor::UncalibratedPointing> PointingMonitor::getUncalibratedPointing( uint32_t telescope_id, double startmjd, double stopmjd )
 {
 	vector<pointingmonitor::UncalibratedPointing> pointingVec;
-	
+
 	// create database command string
 	ostringstream strbuf;
 	strbuf.precision( 13 );
 	strbuf << "select * from tblPointing_Monitor_Telescope" << telescope_id << "_Pointing";
 	strbuf << " where mjd<=" << stopmjd << " and mjd>=" << startmjd;
-	
+
 	string fDBserver = getDBServer() + "VOFFLINE";
 	//std::cout<<"PointingMonitor::getUncalibratedPointing "<<std::endl;
 	VDB_Connection my_connection( fDBserver.c_str(), "readonly", "" ) ;
@@ -262,9 +262,9 @@ vector<pointingmonitor::UncalibratedPointing> PointingMonitor::getUncalibratedPo
 		return  pointingVec;
 	}
 	TSQLResult* db_res = my_connection.Get_QueryResult();
-	
+
 	int fNRows = db_res->GetRowCount();
-	
+
 	for( int i = 0; i < fNRows; i++ )
 	{
 		TSQLRow* db_row = db_res->Next();
@@ -272,11 +272,11 @@ vector<pointingmonitor::UncalibratedPointing> PointingMonitor::getUncalibratedPo
 		{
 			continue;
 		}
-		
+
 		// add new element to result vector and fill with numbers
 		pointingVec.push_back( pointingmonitor::UncalibratedPointing() );
 		pointingmonitor::UncalibratedPointing& pointing = pointingVec.back();
-		
+
 		pointing.mjd =       atof( db_row->GetField( 0 ) );
 		pointing.ra =        atof( db_row->GetField( 1 ) );
 		pointing.dec =       atof( db_row->GetField( 2 ) );
@@ -284,7 +284,7 @@ vector<pointingmonitor::UncalibratedPointing> PointingMonitor::getUncalibratedPo
 		pointing.elevation = atof( db_row->GetField( 4 ) );
 		pointing.ledPosY =   atof( db_row->GetField( 5 ) );
 	}
-	
+
 	return pointingVec;
 }
 
@@ -299,12 +299,12 @@ vector<pointingmonitor::CalibratedPointing> PointingMonitor::calibratedPointing(
 {
 	vector<pointingmonitor::CalibratedPointing> calPointingVec;
 	calPointingVec.reserve( pointingVec.size() );
-	
+
 	for( uint32_t i = 0; i < pointingVec.size(); ++i )
 	{
-	
+
 		const pointingmonitor::UncalibratedPointing& pointing = pointingVec[i];
-		
+
 		// calculate pixel in sky camera that corresponds to central PMT
 		float el = pointing.elevation - float( 60 * 3.14159265 / 180 );
 		float centerX = calParameters.x0 + calParameters.x1 * el + calParameters.x2 * el * el
@@ -316,13 +316,13 @@ vector<pointingmonitor::CalibratedPointing> PointingMonitor::calibratedPointing(
 		float zz = calParameters.z0 + calParameters.z1 * el + calParameters.z2 * el * el
 				   + calParameters.z3 * el * el * el;
 		float centerY = ( pointing.ledPosY > 0 ) ? yy + ( pointing.ledPosY - ledy ) * zz : yy;
-		
+
 		// calculate offset from reference pixel in radians
 		float dx = centerX - camParameters.referencePixelX;
 		float dy = centerY - camParameters.referencePixelY;
 		dx *= camParameters.skyCameraScale;
 		dy *= camParameters.skyCameraScale;
-		
+
 		// calculate RA and Dec of central PMT using tangential projection
 		float cosr, sinr, tx;
 		cosr = cos( pointing.rotation );
@@ -330,7 +330,7 @@ vector<pointingmonitor::CalibratedPointing> PointingMonitor::calibratedPointing(
 		tx = dx * cosr - dy * sinr;
 		dy = dx * sinr + dy * cosr;
 		dx = tx;
-		
+
 		float cos0, sin0, dect, rat;
 		cos0 = cos( pointing.dec );
 		sin0 = sin( pointing.dec );
@@ -338,15 +338,14 @@ vector<pointingmonitor::CalibratedPointing> PointingMonitor::calibratedPointing(
 		rat = pointing.ra + atan2( dx, dect );
 		dect = sqrt( dx * dx + dect * dect );
 		dect = atan2( dy * cos0 + sin0, dect );
-		
+
 		// rotation angle calculation is not yet implemented
 		// float rot = pointing.rotation - camParameters.skyCameraRotation;
 		float rot = 0.0;
-		
+
 		calPointingVec.push_back( pointingmonitor::CalibratedPointing( pointing.mjd, rat, dect, rot ) );
-		
+
 	}
-	
+
 	return calPointingVec;
 }
-

@@ -37,7 +37,7 @@ void copyDirectory( TDirectory* source, const char* hx, vector< string > hist_to
 string check_for_similar_noise_values( const char* hx, float noise_tolerance )
 {
 	string iTemp = hx;
-	
+
 	if( iTemp.find( "_" ) != string::npos )
 	{
 		int i_noise = atoi( iTemp.substr( iTemp.find( "_" ) + 1, iTemp.size() ).c_str() );
@@ -56,14 +56,14 @@ string check_for_similar_noise_values( const char* hx, float noise_tolerance )
 		fNoiseLevel.push_back( i_noise );
 		cout << "\t new noise level directory: " << iTemp << "(" << fNoiseLevel.size() << ")" << endl;
 	}
-	
+
 	return iTemp;
 }
 
 vector< string > readListOfFiles( string iFile )
 {
 	vector< string > iList;
-	
+
 	ifstream is;
 	is.open( iFile.c_str() );
 	if( !is )
@@ -73,14 +73,14 @@ vector< string > readListOfFiles( string iFile )
 		exit( EXIT_FAILURE );
 	}
 	string is_line;
-	
+
 	while( getline( is, is_line ) )
 	{
 		iList.push_back( is_line );
 	}
-	
+
 	is.close();
-	
+
 	return iList;
 }
 
@@ -98,14 +98,14 @@ int main( int argc, char* argv[] )
 			exit( EXIT_FAILURE );
 		}
 	}
-	
-	
+
+
 	VGlobalRunParameter* iT = new VGlobalRunParameter();
 	cout << endl;
 	cout << "combineLookupTables (" << iT->getEVNDISP_VERSION() << ")" << endl;
 	cout << "-----------------------------" << endl;
 	cout << endl;
-	
+
 	if( argc < 2 )
 	{
 		cout << "combine several tables from different files into one single table file" << endl << endl;
@@ -128,7 +128,7 @@ int main( int argc, char* argv[] )
 	{
 		noise_tolerance = atof( argv[4] );
 	}
-	
+
 	vector< string > hist_to_copy;
 	if( histogram_types == "all" )
 	{
@@ -157,7 +157,7 @@ int main( int argc, char* argv[] )
 		cout << hist_to_copy[i] << "  ";
 	}
 	cout << endl;
-	
+
 	vector< string > fInFiles = readListOfFiles( fListOfFiles );
 	unsigned int nFiles = fInFiles.size();
 	if( nFiles == 0 )
@@ -167,7 +167,7 @@ int main( int argc, char* argv[] )
 		exit( EXIT_FAILURE );
 	}
 	cout << "combining " << nFiles << " table files into " << fOFile << endl;
-	
+
 	TFile* fROFile = new TFile( fOFile.c_str(), "RECREATE" );
 	if( fROFile->IsZombie() )
 	{
@@ -184,7 +184,7 @@ int main( int argc, char* argv[] )
 			continue;
 		}
 		cout << "now reading file " << f << ": " << fInFiles[f] << endl;
-		
+
 		//loop on all entries of this directory
 		TKey* key;
 		TIter nextkey( fIn->GetListOfKeys() );
@@ -211,7 +211,7 @@ int main( int argc, char* argv[] )
 		}
 		fIn->Close();
 	}
-	
+
 	fROFile->Close();
 	cout << endl;
 	cout << "total number of noise levels found: " << fNoiseLevel.size() << " (is this ok? check!)" << endl;
@@ -232,7 +232,7 @@ void copyDirectory( TDirectory* source,
 	//copy all objects and subdirs of directory source as a subdir of the current directory
 	TDirectory* savdir = gDirectory;
 	TDirectory* adir = 0;
-	
+
 	// 1. case: top directory exists (NOISE_...)
 	if( hx )
 	{
@@ -243,7 +243,7 @@ void copyDirectory( TDirectory* source,
 	{
 		adir = ( TDirectory* )savdir->Get( source->GetName() );
 	}
-	
+
 	if( !adir )
 	{
 		// 2. case: make top directory

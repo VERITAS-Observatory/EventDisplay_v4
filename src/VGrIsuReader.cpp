@@ -42,9 +42,9 @@ VGrIsuReader::VGrIsuReader( VDetectorGeometry* iDetGeo, unsigned int intel, stri
 	fNoiseTraceStart = 0;
 	bNoiseTraceFilled = false;
 	fdefaultPedvars = 3.;                         // should be greater than zero, otherwise VAnalyzer declares pixel dead
-	
+
 	degrad = 45. / atan( 1. );
-	
+
 	// constants
 	fTelescopeID = 0;
 	fTelNumberOffset = 1;
@@ -58,20 +58,20 @@ VGrIsuReader::VGrIsuReader( VDetectorGeometry* iDetGeo, unsigned int intel, stri
 	fNTel =  intel;
 	// standard eventtype is IGNORE
 	fEventType = 0;
-	
+
 	// attention! hard coded numbers for pedestals
 	// this must be the same as in the grisu pilot file (in the case of using the tracelibrary)
 	fdefaultPed = fDetectorGeo->getDefaultPedestal();
 	fdefaultPedUI = ( uint8_t )fdefaultPed;
-	
+
 	// initialize data vectors
 	initVectors();
-	
+
 	// random generator (needed for background generation)
 	int iseed = igrisuseed;
 	fRandomGen = new TRandom3( iseed );
 	cout << "\t VGrIsuReader::VGrIsuReader(): random number generator seed: " << fRandomGen->GetSeed() << endl;
-	
+
 	// read the pedestals
 	readPeds();
 }
@@ -97,9 +97,9 @@ VGrIsuReader::VGrIsuReader( VDetectorGeometry* iDetGeo, unsigned int intel, stri
 	fIgnoreCFGVersions = iIgnoreCFGFiles;
 	fNoiseTraceStart = 0;
 	bNoiseTraceFilled = false;
-	
+
 	degrad = 45. / atan( 1. );
-	
+
 	// constants
 	fTelescopeID = 0;
 	fTelNumberOffset = i_telnumberoffset;
@@ -114,34 +114,34 @@ VGrIsuReader::VGrIsuReader( VDetectorGeometry* iDetGeo, unsigned int intel, stri
 	fNTel =  intel;
 	// standard eventtype is IGNORE
 	fEventType = 0;
-	
+
 	// attention! hard coded numbers for pedestals
 	// this must be the same as in the grisu pilot file (in the case of using the tracelibrary)
 	fdefaultPed = fDetectorGeo->getDefaultPedestal();
 	fdefaultPedUI = ( uint8_t )fdefaultPed;
 	fdefaultPedvars = 3.;                         // should be greater than zero, otherwise VAnalyzer declares pixel dead
-	
+
 	// initialize data vectors
 	initVectors();
-	
+
 	// open source data file
 	openDataFile( false );
-	
+
 	// open files with pedestals
 	openDataFile( true );
-	
+
 	// random generator (needed for background generation)
 	int iseed = igrisuseed;
 	//   iseed = atoi( fSourceFileName.substr( fSourceFileName.rfind( "/" ) + 4, 6 ).c_str() );
 	fRandomGen = new TRandom3( iseed );
 	cout << "\t VGrIsuReader::VGrIsuReader(): random number generator seed: " << fRandomGen->GetSeed() << endl;
-	
+
 	// read some camera infos
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
 		readCamera( i );
 	}
-	
+
 	// get and test grisu version
 	fGrisuVersion = getGrisuVersion();
 	if( ( fDetectorGeo->getGrIsuVersion() >= 411 || fGrisuVersion >= 411 ) && fGrisuVersion != fDetectorGeo->getGrIsuVersion() && fGrisuVersion != 0 )
@@ -165,7 +165,7 @@ VGrIsuReader::VGrIsuReader( VDetectorGeometry* iDetGeo, unsigned int intel, stri
 	{
 		cout << "\t GrIsu simulations uses configuration file with version number " << fGrisuVersion << endl;
 	}
-	
+
 	// read the pedestals
 	readPeds();
 }
@@ -227,7 +227,7 @@ void VGrIsuReader::openDataFile( bool iPeds )
 			gSystem->Exec( i_com.c_str() );
 			fBZipped2 = true;
 		}
-		
+
 		// open the source file
 		is.open( fSourceFileName.c_str() );
 		if( !is.is_open() )
@@ -295,9 +295,9 @@ void VGrIsuReader::readPeds( unsigned int iDummy )
 	{
 		cout << "VGrIsuReader::readPeds() " << iDummy << endl;
 	}
-	
+
 	char hname[200];
-	
+
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
 		// reset everything
@@ -328,7 +328,7 @@ void VGrIsuReader::readPeds( unsigned int iDummy )
 			i_hpeds.push_back( new TH1F( hname, "", 50 * fSumWindow[i], 0, 50 * fSumWindow[i] ) );
 		}
 		fhPeds.push_back( i_hpeds );
-		
+
 		if( fSumWindow[i] <= 0. )
 		{
 			cout << "VGrIsuReader::readPeds() error: sumwindow <= 0. for telescope " << i << endl;
@@ -336,7 +336,7 @@ void VGrIsuReader::readPeds( unsigned int iDummy )
 			exit( 0 );
 		}
 	}
-	
+
 	// case A:
 	//    using background traces (read pedestal variations from trace library file)
 	//      one tree entry per tube -> entry number = tubenumber
@@ -377,7 +377,7 @@ void VGrIsuReader::readPedsfromLibrary( unsigned int iTelID )
 		return;
 	}
 	unsigned int i = iTelID;
-	
+
 	fTraceFile->cd();
 	char iTreeName[200];
 	sprintf( iTreeName, "pedTree_%d", i );
@@ -442,7 +442,7 @@ void VGrIsuReader::readPedsfromPlines()
 	{
 		cout << "VGrIsuReader::readPedsfromPlines: scale fadc traces by " << fFADCScale << endl;
 	}
-	
+
 	if( is_ped.is_open() )
 	{
 		is_ped.close();
@@ -463,10 +463,10 @@ void VGrIsuReader::readPedsfromPlines()
 		cout << "VGrIsuReader::VGrIsuReader() - error opening pedestal file (" << fExternalPedFile << ")" << endl;
 		exit( -1 );
 	}
-	
+
 	string is_line;
 	string is_Temp;
-	
+
 	unsigned int i_telID = 0;
 	unsigned int i_channel = 0;
 	vector<double> i_val;
@@ -479,7 +479,7 @@ void VGrIsuReader::readPedsfromPlines()
 	double mean2 = 0.;
 	double rms = 0.;
 	int i_sampleTemp;
-	
+
 	// fixed number of pedestal signal, maximum is 1500 samples
 	vector<uint8_t> i_pedSample( 1500, 0 );
 	for( unsigned int i_telID = 0; i_telID < fNTel; i_telID++ )
@@ -488,7 +488,7 @@ void VGrIsuReader::readPedsfromPlines()
 		fGrIsuPeds.push_back( i_pedChannelSample );
 	}
 	i_pedSample.reserve( 1500 );
-	
+
 	bool pedFound = false;
 	while( getline( is_ped, is_line ) )
 	{
@@ -550,7 +550,7 @@ void VGrIsuReader::readPedsfromPlines()
 				}
 				fGrIsuPeds[i_telID][i_channel] = i_pedSample;
 				fGrIsuPedsN[i_telID][i_channel] = i_pedSample.size();
-				
+
 				// calculate pedestal variations for different summation windows
 				if( i_channel < fMaxChannels[i_telID] )
 				{
@@ -650,7 +650,7 @@ bool VGrIsuReader::getNextEvent()
 	{
 		cout << "VGrIsuReader::getNextEvent " << fPedestalMode << endl;
 	}
-	
+
 	bool iSuccess = false;
 	if( fPedestalMode )
 	{
@@ -660,17 +660,17 @@ bool VGrIsuReader::getNextEvent()
 	{
 		iSuccess = getNextShowerEvent();
 	}
-	
+
 	if( !iSuccess )
 	{
 		setEventStatus( 999 );
 	}
-	
+
 	if( fDebug )
 	{
 		cout << "VGrIsuReader::getNextEvent, event status: " << getEventStatus() << endl;
 	}
-	
+
 	return iSuccess;
 }
 
@@ -737,20 +737,20 @@ bool VGrIsuReader::getNextShowerEvent()
 	{
 		return false;
 	}
-	
+
 	unsigned int i_telID = 0;
 	uint32_t i_channel = 0;
 	uint16_t i_nsample = 0;
-	
+
 	cout << fNumSamples[0] << endl;
-	
+
 	string is_line = "";
 	string is_Temp = "";
 	bool i_eventFound = false;
-	
+
 	int iRecord = 0;
 	int iEvent = 0;
-	
+
 	// read triggered pixels from GrIsu file
 	sp = is.tellg();
 	char iSRecord;
@@ -829,7 +829,7 @@ bool VGrIsuReader::getNextShowerEvent()
 			// calculate zenith and azimuth angle from direction cosinii
 			// (GM 20090728)	 fMC_Az = atan2( fMC_Xcos, fMC_Ycos ) + 180./degrad;
 			fMC_Az = atan2( fMC_Xcos, fMC_Ycos );
-			
+
 			fMC_Ze = 1. - ( fMC_Xcos * fMC_Xcos + fMC_Ycos * fMC_Ycos );
 			if( fMC_Ze < 0. )
 			{
@@ -1000,7 +1000,7 @@ bool VGrIsuReader::getNextShowerEvent()
 				{
 					fHiLo[i_telID][i_channel] = true;
 				}
-				
+
 				if( i >= fSampleOffset )
 				{
 					ftempSampleUI[i - fSampleOffset] = iRecord;
@@ -1032,7 +1032,7 @@ bool VGrIsuReader::getNextShowerEvent()
 			}
 		}
 	}
-	
+
 	// only make background trace if there was an arraytrigger
 	if( fArrayTrigger != 0 || fMultiGrIsuReader )
 	{
@@ -1049,7 +1049,7 @@ bool VGrIsuReader::getNextShowerEvent()
 			fillBackgroundfromPlines();
 		}
 	}
-	
+
 	return true;
 }
 
@@ -1072,7 +1072,7 @@ std::pair<bool, uint32_t> VGrIsuReader::getChannelHitIndex( uint32_t hit )
 		return std::make_pair( true, hit );
 	}
 	return std::make_pair( false, ( uint32_t ) 0 );
-	
+
 }
 
 
@@ -1119,7 +1119,7 @@ bool VGrIsuReader::setTelescopeID( unsigned int i_tel )
 	{
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -1128,7 +1128,7 @@ bool VGrIsuReader::setTelescopeID( unsigned int i_tel )
      the reader needs to following information from the camera files:
         - trigger information (which tubes exist)
     - analysis pixel (tubes can be switched on/off)
-    - convertion from real data tube numbering to MC numbering
+    - conversion from real data tube numbering to MC numbering
 
     \param iTel telescope number
 */
@@ -1138,10 +1138,10 @@ bool VGrIsuReader::readCamera( int iTel )
 	{
 		cout << "bool VGrIsuReader::readCamera( int iTel ) " << iTel << endl;
 	}
-	
+
 	// set telescope number in detector geometry
 	fDetectorGeo->setTelID( iTel );
-	
+
 	if( fDetectorGeo->getTrigger().size() < fFullHitVec[iTel].size() )
 	{
 		cout << "VGrIsuReader::readCameraInfo: no trigger info" << endl;
@@ -1177,11 +1177,11 @@ bool VGrIsuReader::readPixelMix( int iTel )
 	{
 		cout << "bool VGrIsuReader::readPixelMix( iTel ) " << iTel << endl;
 	}
-	
+
 	// set telescope number in detector geometry
 	fDetectorGeo->setTelID( iTel );
-	
-	// reading vector for convertion of camera pixel numbers from real data numbering to MC numbering
+
+	// reading vector for conversion of camera pixel numbers from real data numbering to MC numbering
 	if( fTraceFileName.size() > 0 )
 	{
 		if( fDetectorGeo->getRealPixel().size() < fPixelConvertVecM[iTel].size() )
@@ -1258,7 +1258,7 @@ void VGrIsuReader::initVectors()
 	{
 		fMaxChannels.push_back( fDetectorGeo->getNChannels( i ) );
 		fNumSamples.push_back( fDetectorGeo->getNSamples( i ) );
-		
+
 		v_temp.resize( fMaxChannels.back(), true );
 		fFullHitVec.push_back( v_temp );
 		v_temp_int2.resize( fMaxChannels.back(), 1 );
@@ -1271,15 +1271,15 @@ void VGrIsuReader::initVectors()
 		fFullTrigVec.push_back( v_temp );
 		fNumberofFullTrigger.push_back( 0 );
 		fHiLo.push_back( v_temp );
-		
+
 		fGrIsuPedsN.push_back( v_temp_int );
-		
+
 		ftempSampleUI.resize( fNumSamples.back(), 0 );
 		ftempSampleFL.resize( fNumSamples.back(), 0 );
 		ftempSample.resize( fNumSamples.back(), 0 );
 		v_tempSample.resize( fMaxChannels.back(), ftempSample );
 		fSamplesVec.push_back( v_tempSample );
-		
+
 		valarray<double> v_dtemp( 0., fMaxChannels.back() );
 		fPeds.push_back( v_dtemp );
 		fPedvars.push_back( v_dtemp );
@@ -1290,11 +1290,11 @@ void VGrIsuReader::initVectors()
 			vv_dtemp.push_back( v_dtemp );
 		}
 		fVPedvars.push_back( vv_dtemp );
-		
+
 		// trigger vectors
 		fLocalTriggerTime.push_back( 0. );
 		fLocalDelayedTriggerTime.push_back( 0. );
-		
+
 		// pointing vectors
 		fTelElevation.push_back( 0. );
 		fTelAzimuth.push_back( 0. );
@@ -1313,7 +1313,7 @@ void VGrIsuReader::fillBackgroundfromTraceLibrary()
 	double i_newPed = 0.;
 	int i_newPedN = 0;
 	cout << "void VGrIsuReader::fillBackgroundfromTraceLibrary()" << endl;
-	
+
 	for( unsigned int h = 0; h < fNTel; h++ )
 	{
 		// get randomly a event from the trace library
@@ -1387,7 +1387,7 @@ void VGrIsuReader::fillBackgroundfromPlines()
 	{
 		bAdd = true;
 	}
-	
+
 	for( unsigned int h = 0; h < fNTel; h++ )
 	{
 		// take background generated by grisu ('P' lines)
@@ -1395,7 +1395,7 @@ void VGrIsuReader::fillBackgroundfromPlines()
 		{
 			// select a random start point in long background trace
 			unsigned int nstart = fRandomGen->Integer( fGrIsuPeds[h][i].size() - fNumSamples[h] - 1 );
-			
+
 			if( fFullHitVec[h][i] )
 			{
 				// generate a trace from background
@@ -1521,7 +1521,7 @@ void VGrIsuReader::setRandomDead( int iNC, int iNB )
 {
 	fMCNdead = iNC;
 	fMCNdeadboard = iNB;
-	
+
 	if( fMCNdead )
 	{
 		cout << "VGrIsuReader: setting " << fMCNdead << " channels randomly dead" << endl;
@@ -1530,7 +1530,7 @@ void VGrIsuReader::setRandomDead( int iNC, int iNB )
 	{
 		cout << "VGrIsuReader: setting " << fMCNdeadboard << "boards randomly dead" << endl;
 	}
-	
+
 	// loop over all telescopes and set channel dead in all of them
 	for( unsigned int iTel = 0; iTel < fNTel; iTel++ )
 	{
@@ -1543,7 +1543,7 @@ void VGrIsuReader::setRandomDead( int iNC, int iNB )
 			do
 			{
 				iPix = fRandomGen->Integer( ( int )fFullAnaVec[iTel].size() );
-				// check if this one is alread dead
+				// check if this one is already dead
 				if( fFullAnaVec[iTel][iPix] == 1 )
 				{
 					fFullAnaVec[iTel][iPix] = -1;
@@ -1590,14 +1590,14 @@ unsigned int VGrIsuReader::getGrisuVersion()
 {
 	// set stream to beginning of file
 	is.seekg( 0, ios::beg );
-	
+
 	string is_line;
 	string is_Temp;
-	
+
 	unsigned int iV = 0;
-	
+
 	sp = is.tellg();
-	
+
 	while( getline( is, is_line ) )
 	{
 		if( is_line.size() > 0 )
@@ -1639,7 +1639,7 @@ uint8_t VGrIsuReader::getNoiseSample( unsigned int iTel, uint32_t iHitID, unsign
 		}
 		return fGrIsuPeds[iTel][iHitID][fNoiseTraceStart + iSample];
 	}
-	
+
 	return 0;
 }
 
@@ -1656,7 +1656,7 @@ vector< uint8_t >& VGrIsuReader::getNoiseVec( unsigned int iTel, uint32_t iHitID
 		if( iNewTrace )
 		{
 			fNoiseTraceStart = fRandomGen->Integer( fGrIsuPeds[iTel][iHitID].size() - fNumSamples[iTel] );
-			
+
 			for( unsigned int j = 0; j < fNumSamples[iTel]; j++ )
 			{
 				fSamplesVec[iTel][iHitID][j] = ( uint8_t )fGrIsuPeds[iTel][iHitID][fNoiseTraceStart + j];
@@ -1664,7 +1664,7 @@ vector< uint8_t >& VGrIsuReader::getNoiseVec( unsigned int iTel, uint32_t iHitID
 		}
 		return fSamplesVec[iTel][iHitID];
 	}
-	
+
 	return vv8;
 }
 
@@ -1675,7 +1675,7 @@ vector< vector< uint8_t > >& VGrIsuReader::getFullNoiseVec( unsigned int iTel )
 	{
 		return fGrIsuPeds[iTel];
 	}
-	
+
 	return v8;
 }
 
@@ -1686,7 +1686,7 @@ vector< uint8_t >& VGrIsuReader::getFullNoiseVec( unsigned int iTel, unsigned in
 	{
 		return fGrIsuPeds[iTel][iChannel];
 	}
-	
+
 	return vv8;
 }
 
@@ -1709,7 +1709,7 @@ uint8_t VGrIsuReader::getSample( unsigned channel, unsigned sample, bool iNewNoi
 	{
 		return fSamplesVec[fTelescopeID][channel][sample];
 	}
-	
+
 	iNewNoiseTrace = false;
 	return 0;
 }

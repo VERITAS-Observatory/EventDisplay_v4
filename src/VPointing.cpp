@@ -8,27 +8,27 @@
 VPointing::VPointing( unsigned int iTelID )
 {
 	fTelID = iTelID;
-	
+
 	fPointingTree = 0;
 	fPointingDB = 0;
 	fUseDB = false;
 	fPointingType = 0;
-	
+
 	fTelAzimuthDB = 0.;
 	fTelElevationDB = 0.;
 	fNEventsWithNoDBPointing = 0;
 	fEventStatus = 0;
-	
+
 	fPointingErrorX = 0.;
 	fPointingErrorY = 0.;
 	fMeanPointingErrorN = 0;
 	fMeanPointingErrorX = 0.;
 	fMeanPointingErrorY = 0.;
 	fMeanPointingDistance = 0.;
-	
+
 	reset();
 	setObservatory();
-	
+
 	initializePointingTree();
 }
 
@@ -42,21 +42,21 @@ VPointing::VPointing( unsigned int iTelID )
 void VPointing::setTelPointing( int MJD, double time, bool iUseDB, bool iFillPointingTree )
 {
 	fUseDB = iUseDB;
-	
+
 	// update pointing
 	updatePointing( MJD, time );
-	
+
 	// telescope elevation/azimuth calculated from VERITAS DB entries
 	if( fUseDB )
 	{
 		updatePointingfromDB( fMJD, fTime );
 	}
-	// calulation from source should always be successful
+	// calculation from source should always be successful
 	else
 	{
 		fEventStatus = 1;
 	}
-	
+
 	// now set the global elevation/azimuth to be used for the analysis
 	if( fUseDB && fPointingType > 1 )
 	{
@@ -68,13 +68,13 @@ void VPointing::setTelPointing( int MJD, double time, bool iUseDB, bool iFillPoi
 		fTelElevation = fTelElevationCalculated;
 		fTelAzimuth   = fTelAzimuthCalculated;
 	}
-	
+
 	// fill pointing tree
 	if( iFillPointingTree )
 	{
 		fillPointingTree();
 	}
-	
+
 }
 
 void VPointing::getPointingFromDB(
@@ -99,7 +99,7 @@ void VPointing::getPointingFromDB(
 	{
 		fPointingType = 2;    // read T-Point corrected positioner data from VERITAS DB
 	}
-	
+
 #ifdef RUNWITHDB
 	fPointingDB = new VPointingDB( fTelID, irun );
 	fPointingDB->setObservatory( fObsLongitude * TMath::RadToDeg(), fObsLatitude * TMath::RadToDeg() );      // work in [deg]
@@ -127,12 +127,12 @@ bool VPointing::updatePointingfromDB( int MJD, double iTime )
 	if( fPointingDB )
 	{
 		fPointingDB->updatePointing( MJD, iTime );
-		
+
 		// telescope pointings
 		fTelAzimuthDB   = fPointingDB->getTelAzimuthDB();
 		fTelElevationDB = fPointingDB->getTelElevationDB();
 		fEventStatus    = fPointingDB->getEventStatus();
-		
+
 		if( fEventStatus != 3 )
 		{
 			// calculate pointing error in camera coordinates
@@ -172,7 +172,7 @@ bool VPointing::updatePointingfromDB( int MJD, double iTime )
 	{
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -190,7 +190,7 @@ void VPointing::terminate( bool i_isMC )
 	{
 		return;
 	}
-	
+
 	cout << "\t mean pointing mismatch between eventdisplay and DB for telescope " << getTelID() + 1 << ":  (x,y,r) [deg] ";
 	if( fMeanPointingErrorN > 0 )
 	{
@@ -206,12 +206,12 @@ void VPointing::terminate( bool i_isMC )
 		cout << ", number of events with no pointing information from the database: " << fNEventsWithNoDBPointing;
 	}
 	cout << endl;
-	
+
 	if( fMeanPointingErrorN > 0 && ( fMeanPointingDistance / ( double )fMeanPointingErrorN > 0.1 ) )
 	{
 		cout << "WARNING: LARGE MISMATCH BETWEEN EVENTDISPLAY AND DB POINTING DATA FOR TELESCOPE " << getTelID() + 1 << endl;
 	}
-	
+
 	//  write results to disk
 	if( fPointingDB )
 	{
@@ -233,7 +233,7 @@ void VPointing::initializePointingTree()
 {
 	char hname[200];
 	char htitle[200];
-	
+
 	sprintf( hname, "pointing_%d", getTelID() + 1 );
 	sprintf( htitle, "pointing (Telescope %d)", getTelID() + 1 );
 	fPointingTree = new TTree( hname, htitle );
@@ -286,7 +286,7 @@ void VPointing::fillPointingTree()
 
 /*
 
-   set an artifical pointing error (e.g. from command line)
+   set an artificial pointing error (e.g. from command line)
 
 */
 void VPointing::setPointingError( double iX, double iY )
@@ -294,7 +294,7 @@ void VPointing::setPointingError( double iX, double iY )
 	fPointingType = 1;
 	fPointingErrorX = iX;
 	fPointingErrorY = iY;
-	
+
 	fMeanPointingErrorN = 1;
 	fMeanPointingErrorX = fPointingErrorX;
 	fMeanPointingErrorY = fPointingErrorY;

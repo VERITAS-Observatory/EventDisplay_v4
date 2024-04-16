@@ -10,17 +10,17 @@
 VPlotInstrumentResponseFunction::VPlotInstrumentResponseFunction()
 {
 	fDebug = false;
-	
+
 	fName = "EA";
-	
+
 	fTF1_fitResolution = 0;
 	gLastPlottedGraph = 0;
-	
+
 	setResolutionFitting();
 	setCanvasSize();
-	
+
 	setPlottingDefaults();
-	
+
 }
 
 void VPlotInstrumentResponseFunction::setPlottingDefaults()
@@ -28,12 +28,12 @@ void VPlotInstrumentResponseFunction::setPlottingDefaults()
 	setPlottingAxis( "energy_Lin", "X", false, 0.005, 200., "energy [TeV]" );
 	setPlottingAxis( "distance_Lin", "X", false, 0., 500., "distance [m]" );
 	setPlottingAxis( "nimages_Lin", "X", false, 0., 5., "number of images" );
-	
+
 	setPlottingAxis( "effarea_Lin", "Y", true, 1.0, 5.e7, "effective area [m^{2}]" );
 	setPlottingAxis( "angularesolution_Lin", "Y", false, 0., 0.35, "angular resolution [deg]" );
 	setPlottingAxis( "coreresolution_Lin", "Y", false, 0., 40.0, "core resolution [m]" );
 	setPlottingAxis( "energyresolution_Lin", "Y", false, 0., 0.40, "energy resolution" );
-	
+
 }
 
 /*
@@ -80,9 +80,9 @@ bool VPlotInstrumentResponseFunction::addInstrumentResponseData( int iDataID, st
 		fData.back()->fillData( is_line, iDataID );
 	}
 	is.close();
-	
+
 	listDataSets();
-	
+
 	return true;
 }
 
@@ -124,9 +124,9 @@ bool VPlotInstrumentResponseFunction::addInstrumentResponseData( string iFile, d
 		return false;
 	}
 	fData.push_back( iTempIRFReader );
-	
+
 	listDataSets();
-	
+
 	return true;
 }
 
@@ -136,11 +136,11 @@ bool VPlotInstrumentResponseFunction::removeInstrumentResponseData( int iDataSet
 	{
 		return false;
 	}
-	
+
 	fData.erase( fData.begin() + iDataSetID );
-	
+
 	listDataSets();
-	
+
 	return true;
 }
 
@@ -155,7 +155,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMin_
 	{
 		return 0;
 	}
-	
+
 	// set min/maximum value in effective area axis
 	if( iEffAreaMin_m2 > 0. )
 	{
@@ -165,9 +165,9 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMin_
 	{
 		getPlottingAxis( "effarea_Lin" )->fMaxValue = iEffAreaMax_m2;
 	}
-	
+
 	char hname[200];
-	
+
 	TCanvas* iEffectiveAreaPlottingCanvas = 0;
 	if( iEffAreaPad )
 	{
@@ -187,7 +187,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMin_
 		return 0;
 	}
 	iEffectiveAreaPlottingCanvas->cd();
-	
+
 	if( !iEffectiveAreaPlottingCanvas->GetListOfPrimitives()->FindObject( "heff" ) )
 	{
 		TH1D* heff = new TH1D( "heff", "", 100, log10( getPlottingAxis( "energy_Lin" )->fMinValue ), log10( getPlottingAxis( "energy_Lin" )->fMaxValue ) );
@@ -198,17 +198,17 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMin_
 		heff->SetMaximum( getPlottingAxis( "effarea_Lin" )->fMaxValue );
 		heff->Draw( "" );
 		heff->Draw( "AH" );
-		
+
 		plot_nullHistogram( iEffectiveAreaPlottingCanvas, heff, getPlottingAxis( "energy_Lin" )->fLogAxis,
 							getPlottingAxis( "effarea_Lin" )->fLogAxis, 1.3,
 							getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" )->fMaxValue );
 	}
-	
+
 	int z = 0;
 	for( unsigned int i = 0; i < fData.size(); i++ )
 	{
 		TGraphAsymmErrors* g = 0;
-		
+
 		if( fData[i]->fA_MC == "A_MC" )
 		{
 			g = fData[i]->gEffArea_MC;
@@ -217,14 +217,14 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMin_
 		{
 			g = fData[i]->gEffArea_Rec;
 		}
-		
+
 		if( !g )
 		{
 			cout << "VPlotInstrumentResponseFunction::plotEffectiveArea() warning: no graph (" << fData[i]->fA_MC << ")";
 			cout << " found for data set " << i << endl;
 			continue;
 		}
-		
+
 		if( g->GetN() > 0. )
 		{
 			if( fDebug )
@@ -239,7 +239,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMin_
 	{
 		iEffectiveAreaPlottingCanvas->SetLogy( 1 );
 	}
-	
+
 	return iEffectiveAreaPlottingCanvas;
 }
 
@@ -249,16 +249,16 @@ TCanvas* VPlotInstrumentResponseFunction::plotWeightedRate()
 	{
 		return 0;
 	}
-	
+
 	char hname[200];
-	
+
 	sprintf( hname, "cEA_WR" );
 	TCanvas* iWeightedRatePlottingCanvas = new TCanvas( hname, "rate", 10, 10, fCanvasSize_X, fCanvasSize_Y );
 	iWeightedRatePlottingCanvas->SetGridx( 0 );
 	iWeightedRatePlottingCanvas->SetGridy( 0 );
 	iWeightedRatePlottingCanvas->SetLeftMargin( 0.15 );
 	iWeightedRatePlottingCanvas->SetRightMargin( 0.07 );
-	
+
 	TH1D* hWeightedRate = new TH1D( "hWeightedRate", "", 100, log10( getPlottingAxis( "energy_Lin" )->fMinValue ),
 									log10( getPlottingAxis( "energy_Lin" )->fMaxValue ) );
 	hWeightedRate->SetStats( 0 );
@@ -270,11 +270,11 @@ TCanvas* VPlotInstrumentResponseFunction::plotWeightedRate()
 	}
 	hWeightedRate->Draw( "" );
 	hWeightedRate->Draw( "AH" );
-	
+
 	plot_nullHistogram( iWeightedRatePlottingCanvas, hWeightedRate, getPlottingAxis( "energy_Lin" )->fLogAxis,
 						getPlottingAxis( "effarea_Lin" )->fLogAxis, 1.3,
 						getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" )->fMaxValue );
-						
+
 	for( unsigned int i = 0; i < fData.size(); i++ )
 	{
 		if( fData[i] && fData[i]->hWeightedRate )
@@ -283,7 +283,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotWeightedRate()
 			fData[i]->hWeightedRate->Draw( "same" );
 		}
 	}
-	
+
 	// return plotting canvas
 	return iWeightedRatePlottingCanvas;
 }
@@ -304,14 +304,14 @@ void VPlotInstrumentResponseFunction::plotCutEfficiency( unsigned int iDataSetID
 	{
 		return;
 	}
-	
+
 	char hname[200];
-	
+
 	sprintf( hname, "cEA_cuteff_%d", iDataSetID );
 	TCanvas* iCutEfficencyPlottingCanvas = new TCanvas( hname, "cut efficiency", 10, 10, fCanvasSize_X, fCanvasSize_Y );
 	iCutEfficencyPlottingCanvas->SetGridx( 0 );
 	iCutEfficencyPlottingCanvas->SetGridy( 0 );
-	
+
 	sprintf( hname, "hceff_%d", iDataSetID );
 	TH1D* hceff = new TH1D( hname, "", 100, log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ) );
 	hceff->SetStats( 0 );
@@ -324,10 +324,10 @@ void VPlotInstrumentResponseFunction::plotCutEfficiency( unsigned int iDataSetID
 	}
 	hceff->Draw( "" );
 	hceff->Draw( "AH" );
-	
+
 	plot_nullHistogram( iCutEfficencyPlottingCanvas, hceff, getPlottingAxis( "energy_Lin" )->fLogAxis, true,
 						hceff->GetYaxis()->GetTitleOffset(), getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" ) ->fMaxValue );
-						
+
 	int z = 0;
 	for( unsigned int i = 0; i < fData[iDataSetID]->hCutEfficiency.size(); i++ )
 	{
@@ -353,17 +353,17 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionBias2D( unsigned i
 	{
 		return;
 	}
-	
+
 	char hname[200];
 	char htitle[200];
-	
+
 	sprintf( hname, "cREA_Eerr_%d", iDataSetID );
 	sprintf( htitle, "relative error in energy reconstruction (%d)", iDataSetID );
 	TCanvas* iEnergyReconstructionErrorCanvas = new TCanvas( hname, htitle, 610, 10, fCanvasSize_X, fCanvasSize_Y );
 	iEnergyReconstructionErrorCanvas->SetGridx( 0 );
 	iEnergyReconstructionErrorCanvas->SetGridy( 0 );
 	iEnergyReconstructionErrorCanvas->Draw();
-	
+
 	if( fData[iDataSetID]->hEsysMCRelative2D )
 	{
 		fData[iDataSetID]->hEsysMCRelative2D->SetTitle( "" );
@@ -391,17 +391,17 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionLogBias2D( unsigne
 	{
 		return;
 	}
-	
+
 	char hname[200];
 	char htitle[200];
-	
+
 	sprintf( hname, "cEA_Eerr_%d", iDataSetID );
 	sprintf( htitle, "error in energy reconstruction (%d)", iDataSetID );
 	TCanvas* iEnergyReconstructionErrorCanvas = new TCanvas( hname, htitle, 610, 10, fCanvasSize_X, fCanvasSize_Y );
 	iEnergyReconstructionErrorCanvas->SetGridx( 0 );
 	iEnergyReconstructionErrorCanvas->SetGridy( 0 );
 	iEnergyReconstructionErrorCanvas->Draw();
-	
+
 	if( fData[iDataSetID]->hEsys )
 	{
 		fData[iDataSetID]->hEsys->SetTitle( "" );
@@ -423,7 +423,7 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionLogBias2D( unsigne
 		{
 			fData[iDataSetID]->gEnergyLogBias_Median->Draw( "p" );
 		}
-		
+
 		// line at 0
 		TLine* iL = new TLine( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), 0., log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), 0. );
 		iL->SetLineStyle( 2 );
@@ -437,9 +437,9 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
 	{
 		return;
 	}
-	
+
 	char hname[200];
-	
+
 	sprintf( hname, "cEA_Ematrix_%d_%d_%d_%d", iDataSetID, bFineBinning, bQualityCuts, bInterPol );
 	ostringstream htitle;
 	htitle << "energy reconstruction matrix (" << iDataSetID << "," << bInterPol << ")";
@@ -456,9 +456,9 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
 	iEnergyReconstructionMatrixCanvas->SetGridy( 0 );
 	iEnergyReconstructionMatrixCanvas->SetLeftMargin( 0.11 );
 	iEnergyReconstructionMatrixCanvas->SetRightMargin( 0.13 );
-	
+
 	TH2D* i_hRecMatrix = 0;
-	
+
 	if( bFineBinning && !bQualityCuts && fData[iDataSetID]->hERecMatrix )
 	{
 		i_hRecMatrix = fData[iDataSetID]->hERecMatrix;
@@ -479,7 +479,7 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
 	{
 		return;
 	}
-	
+
 	i_hRecMatrix->SetTitle( "" );
 	i_hRecMatrix->GetYaxis()->SetTitleOffset( 1.2 );
 	i_hRecMatrix->SetStats( 0 );
@@ -513,12 +513,12 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
 						   log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ) );
 	iL->SetLineStyle( 2 );
 	iL->Draw();
-	
+
 	if( !bPlotMedian )
 	{
 		return;
 	}
-	
+
 	// plot median
 	double xq[3];
 	double yq[] = { 0.0,  0.0, 0.0  };
@@ -573,7 +573,7 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
 	gReco->SetMarkerColor( 4 );
 	gReco->SetMarkerStyle( 28 );
 	gReco->Draw( "pl" );
-	
+
 }
 
 
@@ -583,16 +583,16 @@ void VPlotInstrumentResponseFunction::plotCutEfficiencyRatio( unsigned int iData
 	{
 		return;
 	}
-	
+
 	char hname[200];
 	char htitle[200];
-	
+
 	sprintf( hname, "cEA_cuteffratio_%d_%d", iDataSetID, iCutID );
 	sprintf( htitle, "cut efficiency ratio (%d, %d)", iDataSetID, iCutID );
 	TCanvas* iCutEfficencyRatioPlottingCanvas = new TCanvas( hname, htitle, 10, 10, 600, 600 );
 	iCutEfficencyRatioPlottingCanvas->SetGridx( 1 );
 	iCutEfficencyRatioPlottingCanvas->SetGridy( 1 );
-	
+
 	sprintf( hname, "hceffratio_%d", iDataSetID );
 	TH1D* hceff = new TH1D( hname, "", 100, log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ) );
 	hceff->SetStats( 0 );
@@ -602,9 +602,9 @@ void VPlotInstrumentResponseFunction::plotCutEfficiencyRatio( unsigned int iData
 	hceff->SetMaximum( iPlotMaximum );
 	hceff->Draw( "" );
 	hceff->Draw( "AH" );
-	
+
 	plot_nullHistogram( iCutEfficencyRatioPlottingCanvas, hceff, getPlottingAxis( "energy_Lin" )->fLogAxis, false, hceff->GetYaxis()->GetTitleOffset(), getPlottingAxis( "energy_Lin" ) ->fMinValue, getPlottingAxis( "energy_Lin" ) ->fMaxValue );
-	
+
 	if( iDataSetID < 999 )
 	{
 		for( unsigned int i = 0; i < fData[iDataSetID]->hCutEfficiencyRelativePlots.size(); i++ )
@@ -632,7 +632,7 @@ void VPlotInstrumentResponseFunction::plotCutEfficiencyRatio( unsigned int iData
 			}
 		}
 	}
-	
+
 }
 
 void VPlotInstrumentResponseFunction::listDataSets()
@@ -665,14 +665,14 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveAreaRatio( unsigned int i
 	{
 		return 0;
 	}
-	
+
 	char hname[200];
-	
+
 	sprintf( hname, "cEA_EFFRatio" );
 	TCanvas* iEffectiveAreaRatioPlottingCanvas = new TCanvas( hname, "effective area ratio", 10, 10, fCanvasSize_X, fCanvasSize_Y );
 	iEffectiveAreaRatioPlottingCanvas->SetGridx( 0 );
 	iEffectiveAreaRatioPlottingCanvas->SetGridy( 0 );
-	
+
 	TH1D* heffR = new TH1D( "heffR", "", 100, log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ) );
 	heffR->SetStats( 0 );
 	heffR->SetXTitle( "log_{10} energy [TeV]" );
@@ -681,9 +681,9 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveAreaRatio( unsigned int i
 	heffR->SetMaximum( ymax );
 	heffR->Draw( "" );
 	heffR->Draw( "AH" );
-	
+
 	plot_nullHistogram( iEffectiveAreaRatioPlottingCanvas, heffR, getPlottingAxis( "energy_Lin" )->fLogAxis, false, 1.3, getPlottingAxis( "energy_Lin" ) ->fMinValue, getPlottingAxis( "energy_Lin" ) ->fMaxValue );
-	
+
 	TLine* iL = new TLine( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), 1., log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), 1. );
 	iL->SetLineWidth( 2 );
 	iL->SetLineStyle( 1 );
@@ -695,7 +695,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveAreaRatio( unsigned int i
 			continue;
 		}
 		TGraphAsymmErrors* g = 0;
-		
+
 		if( fData[i]->fA_MC == "A_MC" )
 		{
 			fData[i]->calculateEffectiveAreaRatios( fData[iDataSetID]->gEffArea_MC );
@@ -706,12 +706,12 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveAreaRatio( unsigned int i
 			fData[i]->calculateEffectiveAreaRatios( fData[iDataSetID]->gEffArea_Rec );
 			g = fData[i]->gEffArea_Rec_Ratio;
 		}
-		
+
 		if( !g )
 		{
 			continue;
 		}
-		
+
 		g->Draw( fData[i]->fPlotOption.c_str() );
 	}
 	return iEffectiveAreaRatioPlottingCanvas;
@@ -723,7 +723,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax, TPa
 	{
 		cout << "VPlotInstrumentResponseFunction::plotEnergyResolution " << ymax << endl;
 	}
-	
+
 	// canvas
 	char hname[200];
 	sprintf( hname, "cEA_energyResolution" );
@@ -745,7 +745,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax, TPa
 		return 0;
 	}
 	iEnergyResolutionPlottingCanvas->cd();
-	
+
 	// plotting frame
 	TH1D* he0 = 0;
 	if( !iEnergyResolutionPlottingCanvas->GetListOfPrimitives()->FindObject( "he0" ) )
@@ -769,7 +769,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax, TPa
 							false, he0->GetYaxis()->GetTitleOffset() * 1.3,
 							getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" )->fMaxValue );
 	}
-	
+
 	for( unsigned int i = 0; i < fData.size(); i++ )
 	{
 		if( fData[i]->gEnergyResolution )
@@ -777,7 +777,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax, TPa
 			fData[i]->gEnergyResolution->Draw( "pl" );
 		}
 	}
-	
+
 	return iEnergyResolutionPlottingCanvas;
 }
 
@@ -785,7 +785,7 @@ void VPlotInstrumentResponseFunction::plotEnergySpectra( bool iWeighted, double 
 {
 	char hname[200];
 	char htitle[200];
-	
+
 	if( iWeighted )
 	{
 		sprintf( hname, "cEA_energy" );
@@ -801,7 +801,7 @@ void VPlotInstrumentResponseFunction::plotEnergySpectra( bool iWeighted, double 
 	iEnergySpectraPlottingCanvas->SetGridy( 0 );
 	iEnergySpectraPlottingCanvas->SetLeftMargin( 0.15 );
 	iEnergySpectraPlottingCanvas->SetRightMargin( 0.07 );
-	
+
 	if( iWeighted )
 	{
 		sprintf( hname, "he0" );
@@ -826,10 +826,10 @@ void VPlotInstrumentResponseFunction::plotEnergySpectra( bool iWeighted, double 
 	}
 	he0->Draw( "" );
 	he0->Draw( "AH" );
-	
+
 	plot_nullHistogram( iEnergySpectraPlottingCanvas, he0, getPlottingAxis( "energy_Lin" )->fLogAxis, true, he0->GetYaxis()->GetTitleOffset() * 1.3,
 						getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" )->fMaxValue );
-						
+
 	for( unsigned int i = 0; i < fData.size(); i++ )
 	{
 		if( fData[i]->hEmc )
@@ -894,7 +894,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEnergyReconstructionBias( string i
 {
 	char hname[200];
 	char htitle[200];
-	
+
 	sprintf( hname, "cEA_energy_bias_%d", ( int )iLogBias );
 	if( iLogBias )
 	{
@@ -909,7 +909,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEnergyReconstructionBias( string i
 	iEnergySystematicsPlottingCanvas->SetGridy( 0 );
 	iEnergySystematicsPlottingCanvas->SetLeftMargin( 0.15 );
 	iEnergySystematicsPlottingCanvas->SetRightMargin( 0.07 );
-	
+
 	sprintf( hname, "he0_sys" );
 	if( iLogBias )
 	{
@@ -930,11 +930,11 @@ TCanvas* VPlotInstrumentResponseFunction::plotEnergyReconstructionBias( string i
 	he0_sys->SetMaximum( ymax );
 	he0_sys->Draw( "" );
 	he0_sys->Draw( "AH" );
-	
+
 	plot_nullHistogram( iEnergySystematicsPlottingCanvas, he0_sys, getPlottingAxis( "energy_Lin" )->fLogAxis,
 						false, he0_sys->GetYaxis()->GetTitleOffset() * 1.3,
 						getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" ) ->fMaxValue );
-						
+
 	for( unsigned int i = 0; i < fData.size(); i++ )
 	{
 		if( iLogBias )
@@ -984,7 +984,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEnergyReconstructionBias( string i
 			}
 		}
 	}
-	
+
 	return iEnergySystematicsPlottingCanvas;
 }
 
@@ -1061,15 +1061,15 @@ TCanvas* VPlotInstrumentResponseFunction::plotResolution2D( unsigned int iDataSe
 	{
 		return 0;
 	}
-	
+
 	if( fData.size() == 0 )
 	{
 		return 0;
 	}
-	
+
 	char hname[800];
 	char htitle[800];
-	
+
 	unsigned int i_Plotting_Selector = 0;
 	double i_Plotting_Min = 0.;
 	double i_Plotting_Max = 0.;
@@ -1136,7 +1136,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotResolution2D( unsigned int iDataSe
 		cout << ", Y " << iYmin << "\t" << iYmax;
 		cout << endl;
 	}
-	
+
 	// create canvas
 	sprintf( hname, "c2D%s_%s_%d_%d", iName.c_str(), iXaxis.c_str(), iDataSetID, ( int )iEnergySlice_GeV );
 	sprintf( htitle, "%s (data set %d)", iCanvasTitle.c_str(), iDataSetID );
@@ -1145,7 +1145,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotResolution2D( unsigned int iDataSe
 	iResolutionPlottingCanvas->SetGridy( 0 );
 	iResolutionPlottingCanvas->SetLeftMargin( 0.13 );
 	iResolutionPlottingCanvas->SetRightMargin( 0.13 );
-	
+
 	// get 2D histo
 	TH2D* h = 0;
 	for( unsigned int j = 0; j < fData[iDataSetID]->fIRF_TreeNames.size(); j++ )
@@ -1204,7 +1204,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotResolution2D( unsigned int iDataSe
 	{
 		cout << "VPlotInstrumentResponseFunction::plotResolution2D() warning: no histogram found for data set " << iDataSetID << endl;
 	}
-	
+
 	return iResolutionPlottingCanvas;
 }
 
@@ -1220,9 +1220,9 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
 	{
 		return 0;
 	}
-	
+
 	char hname[200];
-	
+
 	unsigned int i_Plotting_Selector = 0;
 	// plotting axis
 	double i_Plotting_Min = 0.;
@@ -1290,7 +1290,7 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
 		cout << ", Y " << iYmin << "\t" << iYmax;
 		cout << endl;
 	}
-	
+
 	// create canvas
 	TCanvas* iResolutionPlottingCanvas = 0;
 	if( iResolutionPad )
@@ -1311,7 +1311,7 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
 		return 0;
 	}
 	iResolutionPlottingCanvas->cd();
-	
+
 	sprintf( hname, "har_%s_%s", iName.c_str(), iXaxis.c_str() );
 	TH1D* har = 0;
 	if( !iResolutionPlottingCanvas->GetListOfPrimitives()->FindObject( hname ) )
@@ -1324,14 +1324,14 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
 		har->SetMaximum( iYmax );
 		har->Draw( "" );
 		har->Draw( "AH" );
-		
+
 		plot_nullHistogram( iResolutionPlottingCanvas, har, i_Plotting_log, false, 1.6, i_Plotting_Min, i_Plotting_Max );
 	}
 	else
 	{
 		har = ( TH1D* )iResolutionPlottingCanvas->GetListOfPrimitives()->FindObject( hname );
 	}
-	
+
 	// get resolution graphs for the whole data sample
 	int z = 0;
 	for( unsigned int i = 0; i < fData.size(); i++ )
@@ -1415,7 +1415,7 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
 		}
 		gLastPlottedGraph = g;
 	}
-	
+
 	return iResolutionPlottingCanvas;
 }
 
@@ -1424,7 +1424,7 @@ bool VPlotInstrumentResponseFunction::setResolutionFitting( string iFitFunction,
 	fFunction_fitResolution = iFitFunction;
 	fXmin_fitResolution = iFitXmin;
 	fXmax_fitResolution = iFitXmax;
-	
+
 	return true;
 }
 
@@ -1434,13 +1434,13 @@ bool VPlotInstrumentResponseFunction::fitResolution( TGraphErrors* g )
 	{
 		return false;
 	}
-	
+
 	char hname[400];
 	sprintf( hname, "fitResolution" );
 	fTF1_fitResolution = new TF1( hname, fFunction_fitResolution.c_str(), fXmin_fitResolution, fXmax_fitResolution );
-	
+
 	g->Fit( fTF1_fitResolution, "R" );
-	
+
 	return true;
 }
 
@@ -1463,7 +1463,7 @@ bool VPlotInstrumentResponseFunction::write_fitResolutionFunction( string iOutNa
 	}
 	fTF1_fitResolution->Write();
 	f.Close();
-	
+
 	return true;
 }
 
@@ -1474,22 +1474,22 @@ TH1D* VPlotInstrumentResponseFunction::getTheta2orThetaHistogram( unsigned int i
 	{
 		return 0;
 	}
-	
+
 	if( fData.size() == 0 )
 	{
 		return 0;
 	}
-	
+
 	string iResolutionTreeName = "t_angular_resolution";
-	
+
 	// check if theta or theta2 histograms should be used
 	unsigned int i_Plotting_Selector = VInstrumentResponseFunctionData::E_DIFF2;
 	if( !iTheta2 )
 	{
 		i_Plotting_Selector = VInstrumentResponseFunctionData::E_DIFF;
 	}
-	
-	
+
+
 	// get 2D histo
 	TH2D* h2D = 0;
 	TH1D* h1D = 0;
@@ -1525,7 +1525,7 @@ TH1D* VPlotInstrumentResponseFunction::getTheta2orThetaHistogram( unsigned int i
 			}
 		}
 	}
-	
+
 	return h1D;
 }
 
@@ -1563,7 +1563,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotPSF( vector< double > i_Energy_TeV
 		i_Energy_TeV_lin.push_back( 1.0 );
 		i_Energy_TeV_lin.push_back( 5.0 );
 	}
-	
+
 	char hname[600];
 	if( iPlotTheta2 )
 	{
@@ -1603,7 +1603,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotPSF( vector< double > i_Energy_TeV
 		plot_nullHistogram( ( TPad* )gPad, hnull, false, false, 1.3, 0., iTheta2AxisMax );
 		hnull->GetXaxis()->SetNdivisions( 505 );
 		hnull->Draw();
-		
+
 		if( i_Energy_TeV_lin[j] < 0.1 )
 		{
 			sprintf( hname, "%.2f TeV", i_Energy_TeV_lin[j] );
@@ -1614,9 +1614,9 @@ TCanvas* VPlotInstrumentResponseFunction::plotPSF( vector< double > i_Energy_TeV
 		}
 		TText* iT = new TText( iTheta2AxisMax * 0.6, hnull->GetMaximum() * 0.5, hname );
 		iT->Draw();
-		
+
 	}
-	
+
 	// loop over all data sets
 	for( unsigned int i = 0; i < fData.size(); i++ )
 	{
@@ -1625,7 +1625,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotPSF( vector< double > i_Energy_TeV
 			c->cd( j + 1 );
 			gPad->SetGridx( 0 );
 			gPad->SetGridy( 0 );
-			
+
 			TH1D* h = getTheta2orThetaHistogram( i, i_Energy_TeV_lin[j], iPlotTheta2 );
 			if( h )
 			{
@@ -1687,4 +1687,3 @@ TCanvas* VPlotInstrumentResponseFunction::plotPSF( vector< double > i_Energy_TeV
 	}
 	return c;
 }
-

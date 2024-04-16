@@ -30,39 +30,39 @@
 class VPlotWPPhysSensitivity : public VPlotUtilities
 {
 	private:
-	
+
 		VPlotInstrumentResponseFunction* fIRF;
-		
+
 		vector< VSiteData* > fData;
-		
+
 		double fMinEnergy_TeV;
 		double fMaxEnergy_TeV;
 		string fCrabSpectraFile;
 		unsigned int fCrabSpectraID;
-		
+
 		int fPlotCTARequirementsID;
 		bool fPlotCTARequirementGoals;
-		
+
 		bool fUseIntegratedSensitivityForOffAxisPlots;
-		
+
 		// FOM variables
 		double fSensitivityFOM;
 		double fSensitivityFOM_error;
-		
-		// projected sensitvity plots
+
+		// projected sensitivity plots
 		vector< double >  fProjectionEnergy_min_logTeV;
 		vector< double >  fProjectionEnergy_max_logTeV;
 		map< string, vector< TGraphAsymmErrors* > > fProjectionSensitivityvsCameraOffset;
-		
+
 		void    fillProjectedSensitivityPlot( unsigned int i, TGraphAsymmErrors* g );
 		void    initialProjectedSensitivityPlots();
 		bool    plotLegend( TCanvas* c = 0, bool iDown = false, bool iLeft = false, bool iAddFirst = true );
-		
+
 	public:
-	
+
 		VPlotWPPhysSensitivity();
 		~VPlotWPPhysSensitivity() {}
-		
+
 		bool addDataSet( VSiteData* iData );
 		bool addDataSet( string iAnalysis, string iSubArray = "E", double iObservationTime_s = 180000., double iOffset_deg = 0.0,
 						 string iLegend = "", int iColor = 1, int iLineStyle = 1, int iFillStyle = 3001 );
@@ -97,7 +97,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
 			fMinEnergy_TeV = iMinEnergy_TeV;
 			fMaxEnergy_TeV = iMaxEnergy_TeV;
 		}
-		
+
 		bool setPlotCTARequirements( int iRequirementID = -1, bool iPlotRequirementGoals = false );
 		bool setCTARequirements( int iRequirementID = -1, bool iPlotRequirementGoals = true )
 		{

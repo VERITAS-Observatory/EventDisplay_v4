@@ -16,20 +16,20 @@ using namespace std;
 class VSimpleStereoReconstructor : public VGrIsuAnalyzer
 {
 	private:
-	
+
 		unsigned int fNImages_min;
 		float fAxesAngles_min;
-		
+
 		// telescope pointing
 		double  fTelElevation;
 		double  fTelAzimuth;
-		
-		
+
+
 		bool fillShowerCore( float ximp, float yimp );
 		void reset();
-		
+
 	public:
-	
+
 		// results shower direction
 		float fiangdiff;
 		float fmean_iangdiff;
@@ -40,16 +40,16 @@ class VSimpleStereoReconstructor : public VGrIsuAnalyzer
 		float fShower_Ze;
 		float fShower_Az;
 		float fShower_DispDiff;
-		
+
 		// results core position
 		float fShower_Xcore;
 		float fShower_Ycore;
 		float fShower_stdP;
-		
-		
+
+
 		VSimpleStereoReconstructor();
 		~VSimpleStereoReconstructor() {}
-		
+
 		bool fillShowerDirection( float xoff, float yoff );
 		void initialize( unsigned int iNImages_min = 0, float iAxesAngles_min = 0. );
 		bool reconstruct_direction( unsigned int i_ntel,
@@ -79,7 +79,7 @@ class VSimpleStereoReconstructor : public VGrIsuAnalyzer
 							   double* img_width,
 							   double* img_length,
 							   double* img_weight );
-							   
+
 };
 
 #endif

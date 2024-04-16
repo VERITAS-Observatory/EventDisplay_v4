@@ -22,11 +22,11 @@ using namespace std;
 class VSiteData
 {
 	private:
-	
+
 		bool             fDebug;
-		
+
 	public:
-	
+
 		string           fSiteName;
 		float            fSite_asl;
 		float            fSite_B_N;
@@ -42,13 +42,13 @@ class VSiteData
 		vector< float >  fCameraOffset_deg;
 		vector< string > fArray;
 		vector< TGraphAsymmErrors* > fGraphSensitivity;
-		
+
 		vector< int >    fPlottingColor;
 		vector< int >    fPlottingLineStyle;
 		vector< int >    fPlottingFillStyle;
 		vector< string > fLegend;
-		
-		
+
+
 		VSiteData();
 		~VSiteData() {}
 		bool  addDataSet( string iDataList, unsigned int iSiteCounter, string iDirectionString = "" );

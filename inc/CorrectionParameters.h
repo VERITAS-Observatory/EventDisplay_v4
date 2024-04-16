@@ -35,23 +35,23 @@ namespace SEphem
 				el_pos_vff_s( 0.0 ), el_pos_vff_t( 0.0 ), el_neg_vff_s( 0.0 ), el_neg_vff_t( 0 ),
 				az_pos_vff_s( 0.0 ), az_pos_vff_t( 0.0 ), az_neg_vff_s( 0.0 ), az_neg_vff_t( 0 )
 			{}
-			
+
 			bool doAzElCorrections( double& az_driveangle, double& el_driveangle,
 									const double& tel_az_driveangle,
 									bool do_corrections ) const;
 			void undoAzElCorrections( double& az_driveangle, double& el_driveangle,
 									  bool do_corrections ) const;
-									  
+
 			bool save( const char* filename ) const;
 			bool load( const char* filename );
-			
+
 			static std::string loadFilename( unsigned scope_num );
 			static std::string saveFilename( unsigned scope_num );
-			
+
 			// ------------------------------------------------------------------------
 			// CORRECTION PARAMETERS
 			// ------------------------------------------------------------------------
-			
+
 			bool enable_offsets;
 			bool enable_corrections;
 			bool enable_vff;
@@ -61,8 +61,8 @@ namespace SEphem
 			double el_offset;                     // El encoder offset                 [El_encoder_rad]
 			double az_ns;                         // NS az table angle                            [rad]
 			double az_ew;                         // EW az table angle                            [rad]
-			double el_udew;                       // UD-EW (in stow position) el mis-alignment    [rad]
-			double fp_az;                         // NS-EW (in stow position) focus mis-alignment [rad]
+			double el_udew;                       // UD-EW (in stow position) el misalignment    [rad]
+			double fp_az;                         // NS-EW (in stow position) focus misalignment [rad]
 			double flex_el_A;                     // Coefficiant of cos(elevation) flexure        [rad]
 			double flex_el_B;                     // Coefficiant of cos(2 * elevation) flexure    [rad]
 			double el_pos_vff_s;                  // Elevation positive VFF slope                   [s]
@@ -73,19 +73,19 @@ namespace SEphem
 			double az_pos_vff_t;                  // Azimuth positive VFF intercept             [rad/s]
 			double az_neg_vff_s;                  // Azimuth negative VFF slope                     [s]
 			double az_neg_vff_t;                  // Azimuth negative VFF intercept             [rad/s]
-			
+
 		private:
 			static const double sc_lim_az_cw;
 			static const double sc_lim_az_cc;
-			
+
 			static const double sc_inversion_tol;
 			static const int    sc_inversion_it_max;
 			/*            static const double sc_lim_az_cw =     270.0 * ANGLE_RADPERDEG;
 			            static const double sc_lim_az_cc =    -270.0 * ANGLE_RADPERDEG;
-			
+
 			            static const double sc_inversion_tol = 0.0001 * ANGLE_RADPERDEG;
 			            static const int    sc_inversion_it_max = 20; */
 	};
-	
+
 }                                                 // namespace SEphem
 #endif                                            // SEPHEM_CORRECTIONPARAMETERS_H

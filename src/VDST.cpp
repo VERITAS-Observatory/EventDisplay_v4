@@ -1,7 +1,7 @@
 /*! \class VDST
     \brief writes data summary files with sums and times for each pixel
 
-    output is after pedestal substraction, gain and toffset correction
+    output is after pedestal subtraction, gain and toffset correction
 
 
 
@@ -17,8 +17,8 @@ VDST::VDST( bool iMode, bool iMC )
 	}
 	// laser run as source file? (Hardcoded, should be in VEvndispRunParameter)
 	fBLaser = false;
-	
-	// initalize flag (true after first event)
+
+	// initialize flag (true after first event)
 	fDSTini = false;
 	fDSTfile = 0;
 	// no dst output, don't do anything
@@ -33,10 +33,10 @@ VDST::VDST( bool iMode, bool iMC )
 		cout << "VDST::VDST error while create dst file" << endl;
 		exit( -1 );
 	}
-	
+
 	initDSTTree( true, false, getTraceFit() > -1 );
 	setMC( iMC );
-	
+
 	fVImageCleaning = new VImageCleaning( getData() );
 }
 
@@ -82,7 +82,7 @@ void VDST::fill()
 			// find dead channels
 			findDeadChans( false, true );
 			findDeadChans( true, true );
-			
+
 			// set special channels
 			setSpecialChannels();
 		}
@@ -182,17 +182,17 @@ void VDST::fill()
 		fDST_tree->Fill();
 		return;
 	}
-	
+
 	// temporary variable
 	vector< float >  t_PulseTimingTemp;
-	
+
 	// ntel is always to total number of telescopes in the DST file
 	fDSTntel_data = getNTel();
 	for( unsigned int i = 0; i < fDSTntel_data; i++ )
 	{
 		fDSTtel_data[i] = i;
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// loop over all telescope and analyse channel by channel
 	// get sums and toffsets
@@ -204,7 +204,7 @@ void VDST::fill()
 		{
 			intubes = 0;
 			setTelID( i );
-			
+
 			// set number of samples
 			setNSamples( fReader->getNumSamples() );
 			// set hilo
@@ -252,12 +252,12 @@ void VDST::fill()
 				fDSTpulsetiminglevels[i][t] = fRunPar->fpulsetiminglevels[t];
 			}
 		}
-		
+
 		// fill dst arrays
 		for( unsigned int j = 0; j < getNChannels(); j++ )
 		{
 			fDSTChan[i][j] = j;
-			
+
 			// fill values for this event, this telescope and this pixel if:
 			//    i) this is a valid laser event
 			//           or
@@ -271,7 +271,7 @@ void VDST::fill()
 				if( fBLaser )
 				{
 					int corrfirst = TMath::Nint( getTZeros()[j] ) - 3;
-					
+
 					fDSTsums[i][j] = ( float )fTraceHandler->getTraceSum( corrfirst, corrfirst + getSumWindow(), false );
 					fDSTsums2[i][j] = fDSTsums[i][j];
 					// ignore dead low gain channels
@@ -434,7 +434,7 @@ bool VDST::writeCalibrationData()
 	{
 		fDSTfile->cd();
 	}
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// DST analysis
 	// (same code as in c_VDST)
@@ -450,7 +450,7 @@ bool VDST::writeCalibrationData()
 	float fConv_high[VDST_MAXCHANNELS];
 	float fConv_low[VDST_MAXCHANNELS];
 	float fTZero[VDST_MAXCHANNELS];
-	
+
 	for( unsigned int i = 0; i < VDST_MAXCHANNELS; i++ )
 	{
 		fPed_high[i] = 0.;
@@ -464,9 +464,9 @@ bool VDST::writeCalibrationData()
 			fPedvar_low[i * VDST_MAXSUMWINDOW + j] = 0;
 		}
 	}
-	
+
 	TTree* t = new TTree( "calibration", "calibration data" );
-	
+
 	char hname[200];
 	t->Branch( "TelID", &fTelID, "TelID/I" );
 	t->Branch( "NPixel", &nPixel, "NPixel/i" );
@@ -481,35 +481,35 @@ bool VDST::writeCalibrationData()
 	t->Branch( "conv_high", fConv_high, "conv_high[NPixel]/F" );
 	t->Branch( "conv_low", fConv_low, "conv_low[NPixel]/F" );
 	t->Branch( "tzero", fTZero, "tzero[NPixel]/F" );
-	
+
 	fnum_sumwindow = getRunParameter()->fCalibrationSumWindow;
 	for( unsigned int i = 0; i < ( unsigned int )getRunParameter()->fCalibrationSumWindow; i++ )
 	{
 		fsumwindow[i] = i + 1;
 	}
-	
+
 	for( unsigned int itel = 0; itel <  getNTel(); itel++ )
 	{
 		setTelID( itel );
 		fTelID = getTelID();
-		
+
 		// correct number of samples
 		if( getNSamples() < fnum_sumwindow )
 		{
 			fnum_sumwindow = getNSamples();
 		}
-		
+
 		nPixel = ( unsigned int )getNChannels();
 		if( VDST_MAXCHANNELS < nPixel )
 		{
-			cout << "DST_fillCalibrationTree error: number of pixels (" << nPixel << ") exeeds allowed range (" << VDST_MAXCHANNELS << ")" << endl;
+			cout << "DST_fillCalibrationTree error: number of pixels (" << nPixel << ") exceeds allowed range (" << VDST_MAXCHANNELS << ")" << endl;
 			cout << "\t adjust arrays..." << endl;
 			return false;
 		}
 		for( unsigned int p = 0; p < nPixel; p++ )
 		{
 			fPed_high[p] = getPeds()[p];
-			
+
 			for( unsigned int i = 0; i < ( unsigned int )fnum_sumwindow; i++ )
 			{
 				fPedvar_high[p * VDST_MAXSUMWINDOW + i] = getPedvars( i + 1 )[p];
@@ -520,15 +520,15 @@ bool VDST::writeCalibrationData()
 			fConv_low[p] = 1.;
 			fTZero[p] = getAverageTZeros()[p];
 		}
-		
+
 		t->Fill();
 	}
 	t->Write();
-	
+
 	if( fDebug )
 	{
 		cout << "END VDST::writeCalibrationData()" << endl;
 	}
-	
+
 	return true;
 }

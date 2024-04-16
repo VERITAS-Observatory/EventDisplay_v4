@@ -1,5 +1,5 @@
 /*! \class VVirtualDataReader
-    \brief wrapper classe for data reading
+    \brief wrapper class for data reading
 
 
 
@@ -19,6 +19,6 @@ double VVirtualDataReader::getSample_double( unsigned channel, unsigned sample, 
 	{
 		return ( double )getSample16Bit( channel, sample, iNewNoiseTrace );
 	}
-	
+
 	return ( double )getSample( channel, sample, iNewNoiseTrace );
 }

@@ -12,10 +12,10 @@
 VSpectralWeight::VSpectralWeight()
 {
 	fDebug = false;
-	
+
 	fIndex = 2.;
 	fSpectralWeightAlpha = 1.;
-	
+
 	fMCSpectralIndex = 2.;
 	fMCMinEnergy_TeV_Lin = 0.03;
 	fMCMaxEnergy_TeV_Lin = 200.;
@@ -38,9 +38,9 @@ void VSpectralWeight::setMCParameter( double iMCSpectralIndex, double iMCEnergy_
 	fMCMaxEnergy_TeV_Lin = iMCEnergy_max_TeV_Lin;
 	fMCMaxConeAngle_deg = iMCMaxConeAngle_deg;
 	fMCSimulatedEvents = iMCSimulatedEvents;
-	
+
 	calculateMCFluxConstant();
-	
+
 	setSpectralIndex( fIndex );
 }
 
@@ -53,7 +53,7 @@ void VSpectralWeight::calculateMCFluxConstant()
 	}
 	// solid angle
 	double iS = 2. * TMath::Pi() * ( 1. - cos( fMCMaxConeAngle_deg * TMath::DegToRad() ) );
-	
+
 	double iP = TMath::Power( fMCMaxEnergy_TeV_Lin, -1.*fMCSpectralIndex + 1 ) - TMath::Power( fMCMinEnergy_TeV_Lin, -1.*fMCSpectralIndex + 1 );
 	if( iS > 0. && iP > 0. )
 	{
@@ -73,12 +73,12 @@ void VSpectralWeight::calculateMCFluxConstant()
 void VSpectralWeight::setSpectralIndex( double iG, bool iPrint )
 {
 	fIndex = iG;
-	
+
 	if( iPrint )
 	{
 		cout << "weighting events to spectral index of " << fIndex << endl;
 	}
-	
+
 	if( fabs( fIndex - fMCSpectralIndex ) < 0.02 )
 	{
 		fSpectralWeightAlpha = 1.;

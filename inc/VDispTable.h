@@ -25,7 +25,7 @@ class VDispTable
 {
 	private:
 		bool fDebug;
-		
+
 		unsigned int fNTel;
 		vector< float > fAz_min;
 		vector< float > fAz_max;
@@ -39,25 +39,25 @@ class VDispTable
 		vector< TH3F* >       h3D_AzDispTableN;
 		vector< TProfile3D* > h3D_AzDispPhiTable;
 		vector< TProfile3D* > h3D_AzDispMissTable;
-		
+
 		TFile* fTableFile;
 		VDispTableReader* fData;
-		
+
 		// scaling parameter
 		double fWidthScaleParameter;
 		double fLengthScaleParameter;
-		
+
 		// quality cuts
 		int    fQC_Ntubes_min;
 		double fQC_Size_min;
 		double fQC_Length_min;
 		double fQC_Loss_max;
-		
+
 		bool prepareTraining( string );
 		bool isGoodEvent( Ctpars* );                              // check quality cuts
-		
+
 	public:
-	
+
 		VDispTable();
 		VDispTable( unsigned int iNtel, string iOutFile );
 		~VDispTable() {}
@@ -82,6 +82,6 @@ class VDispTable
 			fLengthScaleParameter = iLS;
 		}
 		bool terminate();
-		
+
 };
 #endif

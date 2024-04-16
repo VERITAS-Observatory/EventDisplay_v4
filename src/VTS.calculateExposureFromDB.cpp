@@ -25,11 +25,11 @@ int main( int argc, char* argv[] )
 		cout << endl;
 		exit( 0 );
 	}
-	
+
 	string iA = argv[1];
 	string iB = argv[2];
 	string iO = argv[3];
-	
+
 	VExposure a;
 	a.setTimeRange( iA, iB );
 	a.readFromDB();

@@ -23,10 +23,10 @@ VTraceHandler::VTraceHandler()
 	fpulsetiming_maxPV = 0;
 	fpulsetiminglevels_size = 0;
 	fFindPulseTiming = false;
-	
+
 	fTraceIntegrationMethod = 1;
 	kIPRmeasure  = false;
-	
+
 }
 
 void VTraceHandler::reset()
@@ -47,15 +47,15 @@ void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSample
 	fPed = ped;
 	fPedrms = pedrms;
 	fChanID = iChanID;
-	
+
 	reset();
-	
+
 	if( !iReader )
 	{
 		cout << "VTraceHandler::setTrace( VVirtualDataReader* iReader, double ped, double pedrms, unsigned int iChanID ): no reader set" << endl;
 		return;
 	}
-	
+
 	///////////////////////////////////////
 	// copy trace from raw data reader
 	if( iNSamples != fpTrace.size() )
@@ -70,9 +70,9 @@ void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSample
 		{
 			fpTrace[i] = iReader->getSample_double( iHitID, i + fMC_FADCTraceStart, ( i == 0 ) );
 		}
-		
+
 	fpTrazeSize = int( fpTrace.size() );
-	
+
 	////////////////////////////
 	// apply hi-lo gain ratio
 	fHiLo = apply_lowgain( iHiLo );
@@ -102,7 +102,7 @@ void VTraceHandler::setTrace( vector<uint16_t> pTrace, double ped, double pedrms
 		{
 			fpTrace[i] = ( double )pTrace[i];
 		}
-		
+
 	fpTrazeSize = int( fpTrace.size() );
 	fHiLo = apply_lowgain( iHiLo );
 }
@@ -134,7 +134,7 @@ void VTraceHandler::setTrace( vector<uint8_t> pTrace, double ped, double pedrms,
 			fpTrace[i] = ( double )pTrace[i];
 		}
 	}
-	
+
 	fpTrazeSize = int( fpTrace.size() );
 	fHiLo = apply_lowgain( iHiLo );
 }
@@ -261,14 +261,14 @@ vector<float> VTraceHandler::getFADCTiming( int fFirst, int fLast, bool debug )
 	unsigned int n255 = 0;
 	int maxpos = 0;
 	getQuickMax( fFirst, fLast, trace_max, maxpos, n255 );
-	
+
 	bool have_first = false;
 	bool have_second = false;
-	
+
 	float temp = 0;
-	
+
 	//cout << "VTraceHandler::getFADCTiming(): maxpos " << maxpos << ", trace_max " << trace_max  << endl;
-	
+
 	//find first bin above 50 dc & first bin after that where the trace goes down again
 	for( int i = fFirst; i < fLast && !have_second; i++ )
 	{
@@ -284,7 +284,7 @@ vector<float> VTraceHandler::getFADCTiming( int fFirst, int fLast, bool debug )
 		}
 		temp = fpTrace[i] - fPed;
 	}
-	
+
 	if( !have_first && debug )
 	{
 		cout << "VTraceHandler::getFADCTiming()  Warning: coulnd't find bin with signal > 40 dc in range " << fFirst << " - " << fLast << endl;
@@ -329,17 +329,17 @@ vector< float >& VTraceHandler::getPulseTiming( int fFirst, int fLast, int fTFir
 		fpulsetiming[i] = 0.;
 	}
 	unsigned int m_pos = 0;
-	
+
 	// by definition are there always an odd number of values -> centre value is 1
 	double i_trace = 0.;
-	
+
 	// get pulse maximum
 	double trace_max = 0.;
 	unsigned int n255 = 0;
 	int maxpos = 0;
 	getQuickMax( fFirst, fLast, trace_max, maxpos, n255 );
 	fpulsetiming[fpulsetiming_maxPV] = ( float )maxpos + 0.5;
-	
+
 	// first half of the pulse
 	// (loop backwards over pulse)
 	bool bBreak = false;
@@ -399,7 +399,7 @@ vector< float >& VTraceHandler::getPulseTiming( int fFirst, int fLast, int fTFir
 			}
 		}
 	}
-	
+
 	return fpulsetiming;
 }
 
@@ -448,7 +448,7 @@ void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpo
 	/////////////////////////////////////////////////////
 	// low gain channel
 	// (needs special treatment as end of the saturated high gain pulse is
-	//  occassionally at the beginning of the readout window)
+	//  occasionally at the beginning of the readout window)
 	else
 	{
 		if( fFirst >= 0 && fFirst < fLast && fLast <= fpTrazeSize )
@@ -526,7 +526,7 @@ double VTraceHandler::getQuickPulseWidth( int fFirst, int fLast, double fPed )
 	unsigned int n255 = 0;
 	// first get pulse maximum
 	getQuickMax( fFirst, fLast, imax, maxpos, n255 );
-	
+
 	if( fFirst >= 0 && fFirst < fLast && fLast <= fpTrazeSize )
 	{
 		for( int i = maxpos; i >= fFirst; i-- )
@@ -569,7 +569,7 @@ double VTraceHandler::getQuickPulseWidth( int fFirst, int fLast, double fPed )
 	{
 		return 0.;
 	}
-	
+
 	return 0.;
 }
 
@@ -587,12 +587,12 @@ double VTraceHandler::getLinInterpol( double y5, int x1, double y1, int x2, doub
 	{
 		b = y2 - a * ( ( double )( x2 ) + 0.5 );
 	}
-	
+
 	if( a != 0. )
 	{
 		return ( y5 - b ) / a;
 	}
-	
+
 	return 0.;
 }
 
@@ -620,9 +620,9 @@ bool VTraceHandler::setTraceIntegrationmethod( unsigned int iT )
 	{
 		return false;
 	}
-	
+
 	fTraceIntegrationMethod = iT;
-	
+
 	return true;
 }
 
@@ -641,7 +641,7 @@ double VTraceHandler::getTraceSum( int iSumWindowFirst, int iSumWindowLast, bool
 	{
 		fTraceIntegrationMethod = iTraceIntegrationMethod;
 	}
-	
+
 	// integrate from fFirst to fLast
 	if( fTraceIntegrationMethod == 1 )
 	{
@@ -696,7 +696,7 @@ double VTraceHandler::getTraceSum( int iSumWindowFirst, int iSumWindowLast, bool
 		}
 		return result;
 	}
-	
+
 	return 0.;
 }
 
@@ -715,7 +715,7 @@ double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart
 		bool fRaw )
 {
 	unsigned int n = fpTrace.size();
-	
+
 	// zero length trace
 	if( n == 0 )
 	{
@@ -734,14 +734,14 @@ double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart
 		ped = 0.;
 	}
 	////////////////////////////////////////
-	// sample time and value (ped subracted)
+	// sample time and value (ped subtracted)
 	float muxBINS[n], FADC[n];
 	for( unsigned int i = 0; i < n; i++ )
 	{
 		muxBINS[i] = i + 0.5;
 		FADC[i] = ( float )fpTrace.at( i ) - ped;
 	}
-	
+
 	////////////////////////////////////////
 	// special case for ped calculation
 	if( fRaw )
@@ -753,15 +753,15 @@ double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart
 		fTraceAverageTime = muxBINS[n - 1];
 		fSumWindowFirst = n - iIntegrationWindow;
 		fSumWindowLast  = n;
-		
+
 		return FADC[1];
 	}
-	
+
 	////////////////////////////////////////
 	// sliding window
 	fSumWindowFirst = 0;
 	fSumWindowLast = 0;
-	
+
 	// first window
 	float xmax = 0.;
 	for( unsigned int i = iSearchStart; i < iIntegrationWindow + iSearchStart; i++ )
@@ -801,6 +801,6 @@ double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart
 	{
 		fTraceAverageTime = ( ( int )iSearchEnd + ( int )iIntegrationWindow - 1 );
 	}
-	
+
 	return charge;
 }

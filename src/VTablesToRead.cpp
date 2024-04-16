@@ -8,7 +8,7 @@
 VTablesToRead::VTablesToRead( int iNTel )
 {
 	fNTel = ( unsigned int )iNTel;
-	
+
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
 		hmscwMedian.push_back( 0 );
@@ -20,7 +20,7 @@ VTablesToRead::VTablesToRead( int iNTel )
 		henergySRMedian.push_back( 0 );
 		henergySRSigma.push_back( 0 );
 	}
-	
+
 	mscw_T = new double[fNTel];
 	mscl_T = new double[fNTel];
 	energyER_T = new double[fNTel];
@@ -28,9 +28,9 @@ VTablesToRead::VTablesToRead( int iNTel )
 	mscw_Tsigma = new double[fNTel];
 	mscl_Tsigma = new double[fNTel];
 	energySR_Tsigma = new double[fNTel];
-	
+
 	reset();
-	
+
 }
 
 
@@ -44,7 +44,7 @@ void VTablesToRead::reset()
 	energySR_Chi2 = -99.;
 	energyER_dE   = -99.;
 	energySR_dE   = -99.;
-	
+
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
 		mscw_T[i] = -99.;

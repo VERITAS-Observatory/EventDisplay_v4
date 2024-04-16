@@ -12,13 +12,13 @@ using namespace std;
 class VMCParameters
 {
 	private:
-	
+
 		bool fDebug;
-		
+
 		TTree* fTree;
-		
+
 	public:
-	
+
 		unsigned int runNumber;
 		unsigned int eventNumber;
 		short int MCprimary;
@@ -32,10 +32,10 @@ class VMCParameters
 		float MCze;
 		float MCTel_Xoff;                         //!< source offset in MC in deg (grisudet telescope coordinate system)
 		float MCTel_Yoff;                         //!< source offset in MC in deg (grisudet telescope coordinate system)
-		
+
 		VMCParameters( bool iDebug = false );
 		~VMCParameters();
-		
+
 		void fill()
 		{
 			if( fTree )

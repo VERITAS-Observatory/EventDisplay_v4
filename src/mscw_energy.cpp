@@ -39,7 +39,7 @@ void printParametersFromFile( string ff )
 		cout << "no table lookup run parameters found" << endl;
 	}
 	iF.Close();
-	
+
 	exit( EXIT_SUCCESS );
 }
 
@@ -63,10 +63,10 @@ int main( int argc, char* argv[] )
 	// timing
 	TStopwatch fStopWatch;
 	fStopWatch.Start();
-	
+
 	VTableLookupRunParameter* fTLRunParameter = new VTableLookupRunParameter();
 	fTLRunParameter->SetNameTitle( "TLRunParameter", fTLRunParameter->getEVNDISP_VERSION().c_str() );
-	
+
 	cout << endl;
 	cout << "mscw_energy (" << fTLRunParameter->getEVNDISP_VERSION() << ")" << endl;
 	cout << "=======================" << endl;
@@ -74,19 +74,19 @@ int main( int argc, char* argv[] )
 	cout << "calculation of mean scaled width and length, and energy with lookup tables" << endl;
 	cout << "--------------------------------------------------------------------------" << endl;
 	cout << endl;
-	
+
 	if( !fTLRunParameter->fillParameters( argc, argv ) )
 	{
 		exit( EXIT_SUCCESS );
 	}
-	
+
 	if( fTLRunParameter->printpara.size() > 0 )
 	{
 		printParametersFromFile( fTLRunParameter->printpara );
 		exit( EXIT_SUCCESS );
 	}
 	fTLRunParameter->print();
-	
+
 	// initialize lookup tables
 	VTableLookup* fTLook = new VTableLookup( fTLRunParameter->readwrite, fTLRunParameter->fDebug );
 	if( !fTLook->initialize( fTLRunParameter ) )
@@ -95,7 +95,7 @@ int main( int argc, char* argv[] )
 		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
 	}
-	
+
 	cout << endl << "loop over all events ";
 	if( fTLook->getNEntries() != TChain::kBigNumber )
 	{
@@ -106,17 +106,17 @@ int main( int argc, char* argv[] )
 	{
 		cout << "\t maximum run time [s]: " << fTLook->getMaxTotalTime() << endl;
 	}
-	
+
 	//////////////////////////
 	// loop over all events
 	fTLook->loop();
-	
+
 	cout << "... end of loop" << endl;
-	
+
 	// stopwatch results
 	fStopWatch.Stop();
 	fStopWatch.Print();
-	
+
 	//////////////////////////
 	// write tables to disk
 	fTLook->terminate();

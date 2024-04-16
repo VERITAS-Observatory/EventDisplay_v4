@@ -24,21 +24,21 @@ VWPPhysSensitivityPlotsMaker::VWPPhysSensitivityPlotsMaker()
 	iOffAxisValue.push_back( 3.75 );
 	//    iOffAxisValue.push_back( 4.25 );
 	//    iOffAxisValue.push_back( 4.75 );
-	
+
 	cout << "VWPPhysSensitivityPlotsMaker: hardwired offsets from camera center: ";
 	for( unsigned int i = 0; i < iOffAxisValue.size(); i++ )
 	{
 		cout << iOffAxisValue[i] << ", ";
 	}
 	cout << " [deg]" << endl;
-	
+
 	setOffAxisAngle( iOffAxisValue );
 	setEnergyRange_Lin_TeV();
 	setObservingTime();
 	setAxisUnits();
 	setPrintingOptions();
 	setPlotRequirements();
-	
+
 	fPlotAllInOneCanvas = 0;
 	fSensitivityPad = 0;
 	fSensitivityRatioPad = 0;
@@ -46,7 +46,7 @@ VWPPhysSensitivityPlotsMaker::VWPPhysSensitivityPlotsMaker()
 	fBckRatesPad = 0;
 	fERes = 0;
 	fAngRes = 0;
-	
+
 }
 
 void VWPPhysSensitivityPlotsMaker::plotAllInOneCanvas()
@@ -54,34 +54,34 @@ void VWPPhysSensitivityPlotsMaker::plotAllInOneCanvas()
 	fPlotAllInOneCanvas = new TCanvas( "cSensitivityFullCanvas", "sensitivity", 400, 10, 900, 720 );
 	fPlotAllInOneCanvas->SetGridx( 0 );
 	fPlotAllInOneCanvas->SetGridy( 0 );
-	
+
 	fSensitivityPad = new TPad( "cSensitivityPad", "sensitivity", 0.01, 0.34, 0.68, 0.99 );
 	fSensitivityPad->SetLeftMargin( 0.15 );
 	fSensitivityPad->SetRightMargin( 0.03 );
 	fSensitivityPad->Draw();
-	
+
 	fSensitivityRatioPad = new TPad( "cSensitivityPadRatio", "sensitivity ratio", 0.02, 0.01, 0.38, 0.34 );
 	fSensitivityRatioPad->SetBottomMargin( 0.13 );
 	fSensitivityRatioPad->SetTopMargin( 0.05 );
 	fSensitivityRatioPad->Draw();
-	
+
 	fEffAreaPad = new TPad( "cEffAreaPad", "effective area", 0.69, 0.67, 0.99, 0.99 );
 	fEffAreaPad->SetLeftMargin( 0.15 );
 	fEffAreaPad->SetRightMargin( 0.05 );
 	fEffAreaPad->Draw();
-	
+
 	fBckRatesPad = new TPad( "cBckRatesPad", "background rates", 0.69, 0.34, 0.99, 0.67 );
 	fBckRatesPad->SetLeftMargin( 0.15 );
 	fBckRatesPad->SetRightMargin( 0.05 );
 	fBckRatesPad->Draw();
-	
+
 	fERes = new TPad( "cERes", "energy resolution", 0.69, 0.01, 0.99, 0.34 );
 	fERes->SetLeftMargin( 0.15 );
 	fERes->SetRightMargin( 0.05 );
 	fERes->SetBottomMargin( 0.13 );
 	fERes->SetTopMargin( 0.05 );
 	fERes->Draw();
-	
+
 	fAngRes = new TPad( "cAngRes", "angular resolution", 0.40, 0.01, 0.68, 0.34 );
 	fAngRes->SetLeftMargin( 0.13 );
 	fAngRes->SetRightMargin( 0.05 );
@@ -154,7 +154,7 @@ void VWPPhysSensitivityPlotsMaker::compareOffAxisSensitivities( string iSubArray
 		fListofDataSets = iDataSet;
 	}
 	cout << "Compare " << fListOfArrays.size() << " array(s) in " << fListofDataSets.size() << " data set(s)" << endl;
-	
+
 	TCanvas* c = 0;
 	for( unsigned int j = 0; j < fListofDataSets.size(); j++ )
 	{
@@ -174,7 +174,7 @@ void VWPPhysSensitivityPlotsMaker::compareOffAxisSensitivities( string iSubArray
 			}
 			a.plotIRF( iP );
 			a.plotSensitivity( iP, fSensitivity_min, fSensitivity_max, fSensitivity_Unit );
-			
+
 			c = a.plotProjectedSensitivities( c, fOffAxisAngle.back(), j + 1 );
 		}
 	}
@@ -206,25 +206,25 @@ bool VWPPhysSensitivityPlotsMaker::writeTexFileBody( string iTexFile, string iTe
 		cout << "VWPPhysSensitivityPlotsMaker::writeTexFileBody: failed writing to " << iTexFile << endl;
 		return false;
 	}
-	
+
 	// intro
 	os << "\\documentclass[11pt]{scrartcl}" << endl;
 	os << "\\usepackage[a4paper,landscape,scale=0.9]{geometry}" << endl;
 	os << "\\usepackage{graphicx}" << endl;
 	os << "\\usepackage{epstopdf}" << endl;
 	os << "\\usepackage[pdftex,colorlinks=true,bookmarks=false,bookmarksopen=false]{hyperref}" << endl;
-	
+
 	os << "\\title{CTA sensitivities with EVNDISP \\\\ ";
 	os << iTexFileTitle << "}" << endl;
 	os << "\\author{Gernot Maier \\\\ DESY}" << endl;
 	os << "\\date{\\today}" << endl;
-	
+
 	os << "\\begin{document}" << endl;
 	os << "\\maketitle" << endl;
 	os << "\\tableofcontents" << endl;
-	
+
 	os << "\\newpage" << endl;
-	
+
 	// images
 	if( fListOfArrays.size() > 0 )
 	{
@@ -260,9 +260,8 @@ bool VWPPhysSensitivityPlotsMaker::writeTexFileBody( string iTexFile, string iTe
 	// tex file closing
 	os << endl;
 	os << "\\end{document}" << endl;
-	
+
 	os.close();
-	
+
 	return true;
 }
-

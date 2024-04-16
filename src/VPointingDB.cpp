@@ -10,11 +10,11 @@ VPointingDB::VPointingDB( unsigned int iTelID, unsigned int irun )
 	fStatus = false;
 	fRunNumber = irun;
 	fTelID = iTelID;
-	
+
 	degrad = 45. / atan( 1. );
-	
+
 	setObservatory();
-	
+
 	fMJD = 0;
 	fTime = 0.;
 	fTelAzimuth = 0.;
@@ -22,25 +22,25 @@ VPointingDB::VPointingDB( unsigned int iTelID, unsigned int irun )
 	fTelExpectedAzimuth = 0.;
 	fTelExpectedElevation = 0.;
 	fEventStatus = 0;
-	
+
 	fMJDRunStart = 0;
 	fTimeRunStart = 0.;
 	fMJDRunStopp = 0;
 	fTimeRunStopp = 0.;
-	
+
 	fDBSourceName = "don't know";
 	fDBTargetDec = 0.;
 	fDBTargetRA = 0.;
 	fDBWobbleNorth = 0.;
 	fDBWobbleEast = 0.;
-	
+
 	fCounter = 0;
 	fDBNrows = 0;
-	
+
 	fmy_connection = 0;
-	
+
 	fNWarnings = 0;
-	
+
 	fTrackingCorrections = 0;
 }
 
@@ -71,7 +71,7 @@ void VPointingDB::setup_DB_connection()
 	string iTempS  = getDBServer();
 	iTempS        += "/VERITAS";
 	fmy_connection = new VDB_Connection( iTempS.c_str(), "readonly", "" ) ;
-	
+
 	if( !fmy_connection->Get_Connection_Status() )
 	{
 		cout << "VPointingDB: failed to connect to database server: " << iTempS << endl;
@@ -87,7 +87,7 @@ bool VPointingDB::initialize(
 {
 
 	readTrackingCorrections( iTPointCorrection );
-	
+
 	if( iDBTextDirectory.size() > 0 )
 	{
 		fmy_connection = 0;
@@ -147,11 +147,11 @@ bool VPointingDB::initialize(
 	{
 		fStatus = readPointingFromDB();
 	}
-	
+
 	// Close the connection immediately after all the reading is complete
 	// this is important - open connections to the DB cause DB replication problems.
 	delete_myconnection();
-	
+
 	return fStatus;
 }
 
@@ -160,7 +160,7 @@ bool VPointingDB::updatePointing( int iMJD, double iTime )
 {
 	fMJD = ( unsigned int )iMJD;
 	fTime = iTime;
-	
+
 	// safety net
 	if( fCounter > 3 )
 	{
@@ -170,7 +170,7 @@ bool VPointingDB::updatePointing( int iMJD, double iTime )
 	{
 		fCounter  = 0;
 	}
-	
+
 	bool iBreak = false;
 	for( unsigned int i = fCounter; i < fDBNrows; i++ )
 	{
@@ -303,14 +303,14 @@ bool VPointingDB::updatePointing( int iMJD, double iTime )
 				cout << "                  all following warning are suppressed " << endl;
 			}
 		}
-		
+
 		fTelAzimuth = 0.;
 		fTelElevation = 0.;
 		fTelExpectedAzimuth = 0.;
 		fTelExpectedElevation = 0.;
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -340,7 +340,7 @@ void VPointingDB::getDBMJDTime( string itemp, int& MJD, double& Time, bool bStri
 	int y, m, d, h, min, s, ms, l;
 	double gMJD;
 	// get y, m, d
-	
+
 	try
 	{
 		y = atoi( itemp.substr( 0, 4 ).c_str() );
@@ -403,29 +403,29 @@ bool VPointingDB::getDBRunInfo()
 	{
 		return false;
 	}
-	
+
 	char c_query[1000];
-	
+
 	sprintf( c_query, "select * from tblRun_Info where run_id=%d", fRunNumber );
-	
+
 	if( !fmy_connection->make_query( c_query ) )
 	{
 		fStatus = false;
 		return false;
 	}
-	
+
 	TSQLResult* db_res = fmy_connection->Get_QueryResult();
 	if( !db_res )
 	{
 		return false;
 	}
-	
+
 	TSQLRow* db_row = db_res->Next();
 	if( !db_row )
 	{
 		return false;
 	}
-	
+
 	if( db_row->GetField( 6 ) && db_row->GetField( 7 ) && db_row->GetField( 17 ) &&
 			db_row->GetField( 18 ) && db_row->GetField( 19 ) )
 	{
@@ -435,10 +435,10 @@ bool VPointingDB::getDBRunInfo()
 		getDBMJDTime( itemp, fMJDRunStopp, fTimeRunStopp, true );
 		// add 1 min to be save
 		fTimeRunStopp += 60.;
-		
+
 		fDBSourceName = db_row->GetField( 19 );
 		getDBSourceCoordinates( fDBSourceName, fDBTargetDec, fDBTargetRA );
-		
+
 		float dist = atof( db_row->GetField( 17 ) );
 		float angl = atof( db_row->GetField( 18 ) );
 		fDBWobbleNorth = dist * cos( angl * TMath::DegToRad() );
@@ -448,7 +448,7 @@ bool VPointingDB::getDBRunInfo()
 	{
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -470,7 +470,7 @@ bool VPointingDB::readPointingCalibratedVPMFromDBTextFile( string iDBTextDirecto
 	{
 		return false;
 	}
-	
+
 	// VPM data
 	VSQLTextFileReader vpm( iDBTextDirectory, fRunNumber, "VPM", getTelID() );
 	if( !vpm.isGood() || !vpm.checkDataVectorsForSameLength() )
@@ -503,7 +503,7 @@ bool VPointingDB::readPointingCalibratedVPMFromDBTextFile( string iDBTextDirecto
 		fDBTelExpectedAzimuth.push_back( 0. );
 	}
 	fDBNrows = fDBMJD.size();
-	
+
 	return ( fDBNrows != 0 );
 }
 
@@ -514,32 +514,32 @@ bool VPointingDB::readPointingCalibratedVPMFromDB()
 {
 	double startMJD = fMJDRunStart + ( fTimeRunStart / 86400. );
 	double stopMJD = fMJDRunStopp + ( fTimeRunStopp / 86400. );
-	
+
 	// mysql query //
 	char c_query[1000];
 	sprintf( c_query, "SELECT mjd,ra,decl FROM tblPointing_Monitor_Telescope%d_Calibrated_Pointing WHERE mjd<=%.13f AND mjd>=%.13f", getTelID(), stopMJD, startMJD );
-	
+
 	// use VOFFLINE database for calibrated VPM //
 	string iTempS  = getDBServer();
 	iTempS += "/VOFFLINE";
-	
+
 	VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ;
 	if( !my_connection.Get_Connection_Status() )
 	{
 		cout << "VPointingDB: failed to connect to database server: " << iTempS << endl;
 		return false;
 	}
-	
+
 	if( !my_connection.make_query( c_query ) )
 	{
 		return false;
 	}
 	TSQLResult* db_res = my_connection.Get_QueryResult();
-	
+
 	int fNRows = db_res->GetRowCount();
 	cout << "Reading calibrated pointing monitor (VPM) data from database for telescope " << getTelID() + 1;
 	cout << ": found " << fNRows << " rows in database" << endl;
-	
+
 	// get VPM quality flag from database
 	char cflag_query[1000];
 	sprintf( cflag_query, "SELECT vpm_config_mask FROM tblRun_Analysis_Comments WHERE run_id = %d", fRunNumber );
@@ -549,8 +549,8 @@ bool VPointingDB::readPointingCalibratedVPMFromDB()
 		return false;
 	}
 	TSQLResult* db_flag = my_connection.Get_QueryResult();
-	
-	
+
+
 	TSQLRow* flag_row = db_flag->Next();
 	if( !flag_row || !flag_row->GetField( 0 ) )
 	{
@@ -562,7 +562,7 @@ bool VPointingDB::readPointingCalibratedVPMFromDB()
 	{
 		return false;
 	}
-	
+
 	// loop over all db entries
 	string itemp;
 	double iMJD;
@@ -571,7 +571,7 @@ bool VPointingDB::readPointingCalibratedVPMFromDB()
 	double ze = 0.;
 	double iRA = 0.;
 	double iDec = 0.;
-	
+
 	for( int j = 0; j < fNRows; j++ )
 	{
 		TSQLRow* db_row = db_res->Next();
@@ -579,7 +579,7 @@ bool VPointingDB::readPointingCalibratedVPMFromDB()
 		{
 			continue;
 		}
-		
+
 		iMJD = atof( db_row->GetField( 0 ) );
 		iITime = modf( iMJD, &iMJD );
 		fDBMJD.push_back( ( unsigned int )iMJD );
@@ -596,9 +596,9 @@ bool VPointingDB::readPointingCalibratedVPMFromDB()
 		fDBTelExpectedElevation.push_back( 0. );
 		fDBTelExpectedAzimuth.push_back( 0. );
 	}
-	
+
 	fDBNrows = fDBMJD.size();
-	
+
 	return true;
 }
 
@@ -667,24 +667,24 @@ bool VPointingDB::readPointingUncalibratedVPMFromDB()
 	double iDec = 0.;
 	double az = 0.;
 	double ze = 0.;
-	
+
 	// get date in year/month/day
 	int year, month, day, j_status;
 	double fracday;
 	VAstronometry::vlaDjcl( ( double )fMJDRunStart, &year, &month, &day, &fracday, &j_status );
 	year = year * 10000;
 	month = month * 100;
-	
+
 	uint32_t telescopeID = getTelID();
 	uint32_t obsDate = year + month + day;
 	double startMJD = fMJDRunStart + ( fTimeRunStart / 86400. );
 	double stopMJD = fMJDRunStopp + ( fTimeRunStopp / 86400. );
-	
+
 	vector< pointingmonitor::UncalibratedPointing > uncalibratedPointing;
 	vector< pointingmonitor::CalibratedPointing > VPMcalibratedPointing;
 	pointingmonitor::CameraParameters cameraParameters;
 	pointingmonitor::CalibrationParameters calibrationParameters;
-	
+
 	pointingmonitor::PointingMonitor vpm;
 	// read vector of uncalibrated pointings
 	uncalibratedPointing = vpm.getUncalibratedPointing( telescopeID, startMJD, stopMJD );
@@ -702,22 +702,22 @@ bool VPointingDB::readPointingUncalibratedVPMFromDB()
 		cout << "VPointingDB::readPointingMonitorFromDB warning: Unable to find any pointing monitor data for this telescope during the run," << endl;
 		cout << "   reverting to encoder data for this telescope for full duration of the run";
 		cout << " (telescope " << telescopeID + 1 << ")" << endl;
-		
+
 		return false;
 	}
-	
+
 	if( cameraParameters.isValid && calibrationParameters.isValid )
 	{
 		VPMcalibratedPointing = vpm.calibratedPointing( uncalibratedPointing, cameraParameters, calibrationParameters );
 	}
-	
+
 	// hard-wired limit (in arcsec) for offset between VPM and target position //
 	// note: previously was 180, now loosened to 300
 	double vpmlimit = 300.;
-	
+
 	double decoff = 0;
 	double raoff = 0;
-	
+
 	for( uint32_t i = 0; i < VPMcalibratedPointing.size(); i++ )
 	{
 		decoff = fabs( ( 3600. * VPMcalibratedPointing[0].dec * degrad ) - ( 3600. * ( fDBTargetDec + fDBWobbleNorth ) ) );
@@ -727,37 +727,37 @@ bool VPointingDB::readPointingUncalibratedVPMFromDB()
 			cout << "VPointingDB::readPointingMonitorFromDB warning: For part of this run the pointing monitor data is off by more than ";
 			cout << vpmlimit;
 			cout << " arcsec from the target position for this telescope, reverting to encoder data for this telescope for full duration of the run" << endl;
-			
+
 			return false;
 		}
-		
+
 	}
-	
+
 	// hard-wired time bin (in sec) to check for VPM data //
 	int tbinwidth = 10;
 	// hard-wired minimum fraction of run missing VPM data //
 	double vpmrunfrac = 0.10;
-	
+
 	double timebin = 0;
 	if( tbinwidth != 0 )
 	{
 		timebin = ( fTimeRunStopp - fTimeRunStart ) / tbinwidth;
 	}
-	
+
 	double timelimit = timebin * vpmrunfrac;
 	timebin = ( int )timebin;
 	timelimit = ( int )timelimit;
-	
+
 	double starttime = startMJD * 86400.;
 	int nbad = 0;
-	
+
 	for( int k = 0; k < timebin; k++ )
 	{
 		bool timegood = false;
-		
+
 		for( uint32_t i = 0; i < VPMcalibratedPointing.size(); i++ )
 		{
-		
+
 			if( starttime < ( VPMcalibratedPointing[i].mjd * 86400 ) && ( starttime + tbinwidth ) > ( VPMcalibratedPointing[i].mjd * 86400 ) )
 			{
 				timegood = true;
@@ -768,19 +768,19 @@ bool VPointingDB::readPointingUncalibratedVPMFromDB()
 		{
 			nbad += 1;
 		}
-		
+
 		starttime += tbinwidth;
 	}
-	
+
 	if( nbad > timelimit )
 	{
 		cout << "VPointingDB::readPointingMonitorFromDB warning: pointing monitor data is missing for more than ";
 		cout << vpmrunfrac * 100.;
 		cout << "% of the run for this telescope, reverting to encoder data for this telescope for full duration of the run" << endl;
-		
+
 		return false;
 	}
-	
+
 	for( uint32_t i = 0; i < VPMcalibratedPointing.size(); i++ )
 	{
 		iMJD = VPMcalibratedPointing[i].mjd;
@@ -789,7 +789,7 @@ bool VPointingDB::readPointingUncalibratedVPMFromDB()
 		fDBTime.push_back( iITime * 86400. );
 		fDBTelElevationRaw.push_back( 0. );
 		fDBTelAzimuthRaw.push_back( 0. );
-		
+
 		iDec = VPMcalibratedPointing[i].dec;
 		iRA = VPMcalibratedPointing[i].ra;
 		getHorizonCoordinates( fDBMJD.back(), fDBTime.back(), iDec * degrad, iRA * degrad, az, ze );
@@ -798,9 +798,9 @@ bool VPointingDB::readPointingUncalibratedVPMFromDB()
 		fDBTelExpectedElevation.push_back( 0. );
 		fDBTelExpectedAzimuth.push_back( 0. );
 	}
-	
+
 	fDBNrows = fDBMJD.size();
-	
+
 	return true;
 }
 
@@ -819,7 +819,7 @@ bool VPointingDB::readPointingFromDBText( string iDBTextDirectory )
 	vector< double > i_az_meas = a.getValueVector_from_key_as_double( "azimuth_meas" );
 	vector< double > i_el_target = a.getValueVector_from_key_as_double( "elevation_target" );
 	vector< double > i_az_target = a.getValueVector_from_key_as_double( "azimuth_target" );
-	
+
 	int iMJD = 0;
 	double iTime = 0.;
 	for( unsigned int i = 0; i < i_timestamp.size(); i++ )
@@ -847,45 +847,45 @@ bool VPointingDB::readPointingFromDB()
 	{
 		return false;
 	}
-	
+
 	char iDate1[200];
 	char iDate2[200];
-	
+
 	// get date in year/month/day
 	int year, month, day, j_status;
 	double fracday;
 	VAstronometry::vlaDjcl( ( double )fMJDRunStart, &year, &month, &day, &fracday, &j_status );
-	
+
 	int hour = ( int )( fTimeRunStart / 3600. );
 	int minute = ( int )( ( fTimeRunStart - hour * 3600. ) / 60. );
 	int sec = ( int )( fTimeRunStart - hour * 3600. - minute * 60. );
 	sprintf( iDate1, "%d%02d%02d%02d%02d%02d000", ( int )year, ( int )month, ( int )day, hour, minute, sec );
-	
+
 	VAstronometry::vlaDjcl( ( double )fMJDRunStopp, &year, &month, &day, &fracday, &j_status );
 	hour = ( int )( fTimeRunStopp / 3600. );
 	minute = ( int )( ( fTimeRunStopp - hour * 3600. ) / 60. );
 	sec = ( int )( fTimeRunStopp - hour * 3600. - minute * 60. );
 	sprintf( iDate2, "%d%02d%02d%02d%02d%02d000", ( int )year, ( int )month, ( int )day, hour, minute, sec );
-	
+
 	// mysql queries
 	char c_query[1000];
 	sprintf( c_query, "SELECT timestamp, elevation_raw, azimuth_raw, elevation_meas, azimuth_meas, elevation_target, azimuth_target FROM tblPositioner_Telescope%d_Status WHERE timestamp >= %s AND timestamp <= %s", getTelID(), iDate1, iDate2 );
-	
+
 	if( !fmy_connection->make_query( c_query ) )
 	{
 		return false;
 	}
 	TSQLResult* db_res = fmy_connection->Get_QueryResult();
-	
+
 	int fNRows = db_res->GetRowCount();
-	
+
 	// loop over all db entries
 	int iMJD = 0;
 	double iTime = 0.;
-	
+
 	cout << "Reading pointing data from VERITAS database for telescope " << getTelID() + 1;
 	cout << ": found " << fNRows << " rows in database" << endl;
-	
+
 	string itemp;
 	double el = 0.;
 	double az = 0.;
@@ -932,19 +932,19 @@ void VPointingDB::getDBSourceCoordinates( string iSource, float& iEVNTargetDec, 
 	{
 		return;
 	}
-	
+
 	char c_query[1000];
-	
+
 	sprintf( c_query, "select * from tblObserving_Sources where source_id like convert( _utf8 \'%s\' using latin1)", iSource.c_str() );
-	
+
 	if( !fmy_connection->make_query( c_query ) )
 	{
 		return;
 	}
 	TSQLResult* db_res = fmy_connection->Get_QueryResult();
-	
+
 	TSQLRow* db_row = db_res->Next();
-	
+
 	iEVNTargetDec = atof( db_row->GetField( 2 ) ) * 180. / TMath::Pi();
 	iEVNTargetRA = atof( db_row->GetField( 1 ) ) * 180. / TMath::Pi();
 	return;
@@ -958,7 +958,7 @@ TTree* VPointingDB::getTreePointingDB()
 {
 	char hname[200];
 	char htitle[200];
-	
+
 	unsigned int MJD = 0;
 	double Time = 0.;
 	float iTelElR = 0.;
@@ -969,7 +969,7 @@ TTree* VPointingDB::getTreePointingDB()
 	float iTelAzT = 0.;
 	float iTelRA = 0.;
 	float iTelDec = 0.;
-	
+
 	sprintf( hname, "db_pointing_%d", getTelID() + 1 );
 	sprintf( htitle, "pointing from DB (Telescope %d)", getTelID() + 1 );
 	TTree* tD = new TTree( hname, htitle );
@@ -987,7 +987,7 @@ TTree* VPointingDB::getTreePointingDB()
 	// ra/dec as read from DB
 	tD->Branch( "RA", &iTelRA, "RA/F" );
 	tD->Branch( "Dec", &iTelDec, "Dec/F" );
-	
+
 	for( unsigned int i = 0; i < fDBMJD.size(); i++ )
 	{
 		MJD = fDBMJD[i];
@@ -1000,10 +1000,10 @@ TTree* VPointingDB::getTreePointingDB()
 		iTelAzT = fDBTelExpectedAzimuth[i];
 		iTelRA = fDBTelRA[i];
 		iTelDec = fDBTelDec[i];
-		
+
 		tD->Fill();
 	}
-	
+
 	return tD;
 }
 
@@ -1015,10 +1015,10 @@ void VPointingDB::getHorizonCoordinates( int MJD, double time, double decJ2000, 
 {
 	raJ2000 /= degrad;
 	decJ2000 /= degrad;
-	
+
 	// first precess target to current epoch
 	VAstronometry::vlaPreces( 2451545.0 - 2400000.5, ( double )( MJD + 0.5 ), &raJ2000, &decJ2000 );
-	
+
 	// convert ra into hour angle
 	double ha = 0.;
 	double iTime = 0.;
@@ -1035,7 +1035,7 @@ void VPointingDB::getHorizonCoordinates( int MJD, double time, double decJ2000, 
 	double el = 0.;
 	VAstronometry::vlaDe2h( ha, decJ2000, fObsLatitude, &az, &el );
 	el *= degrad;
-	
+
 	ze = 90. - el;
 	az *= degrad;
 }

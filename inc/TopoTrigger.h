@@ -1202,7 +1202,7 @@ short int overlap_veritas_to_sector_channel[499][3] =
 	{ 497, 500, 500  },
 	{ 498, 500, 500  },
 	{ 499, 500, 500  },
-	
+
 };
 
 // nearest neighbors
