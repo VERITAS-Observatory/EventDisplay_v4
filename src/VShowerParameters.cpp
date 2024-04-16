@@ -24,7 +24,7 @@ VShowerParameters::VShowerParameters( int iNTel, unsigned int iShortTree, unsign
 	fNMethods = iNMethod;
 	fShortTree = iShortTree;
 	reset();
-	
+
 	vector< bool > it( fNTel, 0 );
 	vector< float > i_f( fNTel, -99. );
 	for( unsigned int i = 0; i < fNMethods; i++ )
@@ -51,7 +51,7 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 	fTreeSC = new TTree( iName.c_str(), iTitle.c_str() );
 	fTreeSC->SetMaxTreeSize( 1000 * Long64_t( 2000000000 ) );
 	fTreeSC->SetAutoSave( 1024 * 1024 );          // autosave when 100 Mbytes written
-	
+
 	fTreeSC->Branch( "runNumber", &runNumber, "runNumber/I" );
 	fTreeSC->Branch( "eventNumber",  &eventNumber,  "eventNumber/I" );
 	fTreeSC->Branch( "eventStatus", &eventStatus, "eventStatus/i" );
@@ -66,7 +66,7 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 	{
 		fTreeSC->Branch( "traceFit", &fTraceFit, "traceFit/I" );
 	}
-	
+
 	fTreeSC->Branch( "TelElevation", fTelElevation, "TelElevation[NTel]/F" );
 	fTreeSC->Branch( "TelAzimuth", fTelAzimuth, "TelAzimuth[NTel]/F" );
 	if( !iMC )
@@ -81,7 +81,7 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 		fTreeSC->Branch( "TelPointingMismatch", fTelPointingMismatch, "TelPointingMismatch[NTel]/F" );
 		fTreeSC->Branch( "PointingErrorX", fTelPointingErrorX, "PointingErrorX[NTel]/F" );
 		fTreeSC->Branch( "PointingErrorY", fTelPointingErrorY, "PointingErrorY[NTel]/F" );
-		
+
 		//C. Duke 19Oct06 added locations of telescopes in SC plane
 		sprintf( i_des, "Tel_x_SC[%d]/F", fNTel );
 		fTreeSC->Branch( "Tel_x_SC", fTel_x_SC, i_des );
@@ -89,7 +89,7 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 		fTreeSC->Branch( "Tel_y_SC", fTel_y_SC, i_des );
 		sprintf( i_des, "Tel_z_SC[%d]/F", fNTel );
 		fTreeSC->Branch( "Tel_z_SC", fTel_z_SC, i_des );
-		
+
 		// added C.Duke 21dec06
 		fTreeSC->Branch( "TargetElev", &fTargetElevation, "TargetElev/F" );
 		fTreeSC->Branch( "TargetAzim", &fTargetAzimuth, "TargetAzim/F" );
@@ -98,14 +98,14 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 	}
 	fTreeSC->Branch( "WobbleN", &fWobbleNorth, "WobbleN/F" );
 	fTreeSC->Branch( "WobbleE", &fWobbleEast, "WobbleE/F" );
-	
+
 	fTreeSC->Branch( "NTrig", &fNTrig, "NTrig/i" );
 	fTreeSC->Branch( "LTrig", &fLTrig, "LTrig/l" );
 	fTreeSC->Branch( "Trig_list", fTrig_list, "Trig_list[NTrig]/s" );
 	fTreeSC->Branch( "Trig_type", fTrig_type, "Trig_type[NTrig]/s" );
 	///////////////////////////////////
 	// reconstructed shower parameters
-	
+
 	// number of different methods
 	sprintf( i_des, "NMethods/i" );
 	fTreeSC->Branch( "NMethods", &fNMethods, i_des );
@@ -114,19 +114,19 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 		sprintf( i_des, "MethodID[NMethods]/s" );
 		fTreeSC->Branch( "MethodID", fMethodID, i_des );
 	}
-	
+
 	sprintf( i_des, "NImages[NMethods]/s" );
 	fTreeSC->Branch( "NImages", fShowerNumImages, i_des );
-	
+
 	// C. Duke 19Oct06  added bitmapped unsigned int array for images selected
 	sprintf( i_des, "ImgSel[NMethods]/l" );
 	fTreeSC->Branch( "ImgSel", fTelIDImageSelected_bitcode, i_des );
 	sprintf( i_des, "ImgSel_list[NMethods][%d]/b", VDST_MAXTELESCOPES );
 	fTreeSC->Branch( "ImgSel_list", fTelIDImageSelected_list, i_des );
-	
+
 	sprintf( i_des, "img2_ang[NMethods]/F" );
 	fTreeSC->Branch( "img2_ang", fiangdiff, i_des );
-	
+
 	sprintf( i_des, "Ze[NMethods]/F" );
 	fTreeSC->Branch( "Ze", fShowerZe, i_des );
 	sprintf( i_des, "Az[NMethods]/F" );
@@ -188,10 +188,10 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 	}
 	sprintf( i_des, "Chi2[NMethods]/F" );
 	fTreeSC->Branch( "Chi2", fShower_Chi2, i_des );
-	
+
 	//DispDiff
 	fTreeSC->Branch( "DispDiff", &fDispDiff, "DispDiff[NMethods]/F" );
-	
+
 	// MC parameters
 	if( iMC )
 	{
@@ -208,7 +208,7 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 		fTreeSC->Branch( "MCaz", &MCaz, "MCaz/F" );
 		fTreeSC->Branch( "MCxoff", &MCTel_Xoff, "MCxoff/F" );
 		fTreeSC->Branch( "MCyoff", &MCTel_Yoff, "MCyoff/F" );
-		
+
 		if( fShortTree < 1 )
 		{
 			fTreeSC->Branch( "MCxcore_SC", &MCxcore_SC, "MCxcore_SC/F" );
@@ -232,7 +232,7 @@ void VShowerParameters::reset( unsigned int iNTel )
 	eventStatus = 0;
 	time = 0.;
 	MJD = 0;
-	
+
 	fsourcetype = 0;
 	fsourcefile = "../data/328";
 	fNTelescopes = 1;
@@ -240,7 +240,7 @@ void VShowerParameters::reset( unsigned int iNTel )
 	fTraceFit = -1;
 	fNTrig = 0;
 	fLTrig = 0;
-	
+
 	// added C.Duke 21dec06
 	fTargetElevation = 0.0;
 	fTargetAzimuth   = 0.0;
@@ -248,7 +248,7 @@ void VShowerParameters::reset( unsigned int iNTel )
 	fTargetRA        = 0.0;
 	fWobbleNorth     = 0.0;
 	fWobbleEast      = 0.0;
-	
+
 	// reconstructed shower parameters
 	fNumImages = 0;
 	for( unsigned int i = 0; i < fNMethods; i++ )
@@ -273,7 +273,7 @@ void VShowerParameters::reset( unsigned int iNTel )
 		fShower_Chi2[i] = -1.;
 		fiangdiff[i] = 0.0;
 		fDispDiff[i] = -9999.;
-		
+
 		fShower_NPair = 0;
 		fShower_PairXS[i] = 0.;
 		fShower_PairYS[i] = 0.;
@@ -318,7 +318,7 @@ void VShowerParameters::reset( unsigned int iNTel )
 	MCze = 0.;
 	MCTel_Xoff = 0.;
 	MCTel_Yoff = 0.;
-	
+
 	resetDispVectors();
 }
 
@@ -330,12 +330,12 @@ void VShowerParameters::printParameters()
 	cout << time << "\t" << fNTelescopes << endl;
 	cout << "Trigger: " << endl;
 	cout << fNTrig << "\t" << fLTrig << endl;
-	
+
 	cout << "Target elev,azim,dec,ra,wobblenorth,wobbleease" << endl;
 	cout << fTargetElevation <<  "\t" << fTargetAzimuth << endl;
 	cout <<  fTargetDec <<  "\t" << fTargetRA << endl;
 	cout << fWobbleNorth <<  "\t" << fWobbleEast << endl;
-	
+
 	cout << "reconstructed parameters: " << endl;
 	for( unsigned int i = 0; i < fNMethods; i++ )
 	{

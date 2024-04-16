@@ -28,13 +28,12 @@ void printHelp()
 	cout << "\t ./logFile <log name> <root file>" << endl;
 	cout << endl;
 	cout << "\t examples are: " << endl;
-	cout << "\t\t convLog, evndispLog" << endl;
+	cout << "\t\t evndispLog" << endl;
 	cout << "\t\t evndisptzeroLog, evndisppedLog" << endl;
 	cout << "\t\t makeTableLog, makeTableFileList" << endl;
 	cout << "\t\t smoothTableLog, mscwTableLog, mscwTableList" << endl;
 	cout << "\t\t tmvaLog, tmvaRunparameter" << endl;
 	cout << "\t\t effAreaLog, effAreaCuts, effAreaParameters" << endl;
-	cout << "\t\t IRFLog" << endl;
 	cout << "\t to print all log files in the root file: use `printAll`" << endl;
 	cout << endl;
 }
@@ -47,14 +46,14 @@ int main( int argc, char* argv[] )
 	string fLogFile;
 	// log file name
 	string fLogFileName;
-	
+
 	if( argc != 3 && argc != 4 )
 	{
 		printHelp();
 		exit( EXIT_SUCCESS );
 	}
-	
-	// list of prefered logs to print
+
+	// list of preferred logs to print
 	vector< string > logObjectNames;
 	logObjectNames.push_back( "evndispLog" );
 	logObjectNames.push_back( "evndisptzeroLog" );
@@ -63,15 +62,14 @@ int main( int argc, char* argv[] )
 	logObjectNames.push_back( "mscwTableLog" );
 	logObjectNames.push_back( "tmvaLog" );
 	logObjectNames.push_back( "effAreaLog" );
-	logObjectNames.push_back( "IRFLog" );
-	
+
 	fLogFileName = argv[1];
 	fRootFile = argv[2];
-	
+
 	// ignore all warnings
 	// "Warning in <TClass::Init>: no dictionary for class .. available..
 	gErrorIgnoreLevel = kError;
-	
+
 	////////////////////////////////////////////////
 	if( argc == 3 )
 	{

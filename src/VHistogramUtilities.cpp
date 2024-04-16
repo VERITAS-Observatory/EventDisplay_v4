@@ -35,9 +35,9 @@ TH1D* VHistogramUtilities::get_ResidualHistogram_from_TF1( string iname, TH1* h,
 	{
 		return 0;
 	}
-	
+
 	TH1D* hDiff = new TH1D( iname.c_str(), "", h->GetNbinsX(), h->GetXaxis()->GetXmin(), h->GetXaxis()->GetXmax() );
-	
+
 	for( int i = 1; i <= hDiff->GetNbinsX(); i++ )
 	{
 		if( h->GetBinContent( i ) )
@@ -46,7 +46,7 @@ TH1D* VHistogramUtilities::get_ResidualHistogram_from_TF1( string iname, TH1* h,
 			hDiff->SetBinError( i, h->GetBinError( i ) / h->GetBinContent( i ) );
 		}
 	}
-	
+
 	return hDiff;
 }
 
@@ -69,12 +69,12 @@ TGraphErrors* VHistogramUtilities::get_Profile_from_TH2D( TH2D* iP, TGraphErrors
 	{
 		return 0;
 	}
-	
+
 	if( g == 0 )
 	{
 		g = new TGraphErrors( 1 );
 	}
-	
+
 	int zz = 0;
 	//////////////////////////////////////////////////////////////////////
 	// median
@@ -82,21 +82,21 @@ TGraphErrors* VHistogramUtilities::get_Profile_from_TH2D( TH2D* iP, TGraphErrors
 	{
 		double i_a[] = { 0.32, 0.5, 0.68 };
 		double i_b[] = { 0.0,  0.0, 0.0  };
-		
+
 		for( int b = 1; b <= iP->GetNbinsX(); b++ )
 		{
 			if( iP->GetXaxis()->GetBinCenter( b ) < iXaxisValue )
 			{
 				continue;
 			}
-			
+
 			string hname = iP->GetName();
 			hname += "_AA";
 			TH1D* h = ( TH1D* )iP->ProjectionY( hname.c_str(), b, b );
 			if( h && h->GetEntries() > 3. )
 			{
 				h->GetQuantiles( 3, i_b, i_a );
-				
+
 				g->SetPoint( zz, iP->GetXaxis()->GetBinCenter( b ), i_b[1] - iMinusValue );
 				g->SetPointError( zz, 0., ( i_b[0] + i_b[2] ) / 2. / TMath::Sqrt( h->GetEntries() ) );
 				zz++;
@@ -114,7 +114,7 @@ TGraphErrors* VHistogramUtilities::get_Profile_from_TH2D( TH2D* iP, TGraphErrors
 			{
 				continue;
 			}
-			
+
 			TH1D* h = ( TH1D* )iP->ProjectionY( "a", b, b );
 			if( h && h->GetEntries() > 3. )
 			{
@@ -135,7 +135,7 @@ TGraphErrors* VHistogramUtilities::get_Profile_from_TH2D( TH2D* iP, TGraphErrors
 			}
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// rebinning
 	if( rbin == 2 )
@@ -144,7 +144,7 @@ TGraphErrors* VHistogramUtilities::get_Profile_from_TH2D( TH2D* iP, TGraphErrors
 		for( int b = 0; b < g->GetN() - 1; b = b + 2 )
 		{
 			double x1, y1, x2, y2 ;
-			
+
 			g->GetPoint( b, x1, y1 );
 			g->GetPoint( b + 1, x2, y2 );
 			g->SetPoint( z, ( x1 + x2 ) / 2., ( y1 + y2 ) / 2. );
@@ -170,7 +170,7 @@ TH2* VHistogramUtilities::interpolateResponseMatrix( TH2* hResponseMatrix, strin
 	{
 		return 0;
 	}
-	
+
 	// clone input histogram
 	char hname[600];
 	if( iNewHistoName.size() == 0 )
@@ -182,7 +182,7 @@ TH2* VHistogramUtilities::interpolateResponseMatrix( TH2* hResponseMatrix, strin
 		sprintf( hname, "%s", iNewHistoName.c_str() );
 	}
 	TH2* iHInter = ( TH2* )hResponseMatrix->Clone( hname );
-	
+
 	// calculate median energy for each y-bin (true energy axis)
 	double xq[] = { 0.16, 0.50, 0.84 };
 	double yq[] = { 0.0,  0.0, 0.0  };
@@ -251,7 +251,7 @@ TH2* VHistogramUtilities::interpolateResponseMatrix( TH2* hResponseMatrix, strin
 		}
 	}
 	normalizeTH2D_y( iHInter );
-	
+
 	return iHInter;
 }
 
@@ -266,7 +266,7 @@ bool VHistogramUtilities::normalizeTH2D_y( TH2* h )
 	{
 		return false;
 	}
-	
+
 	double i_sum = 0.;
 	for( int i = 1; i <= h->GetNbinsY(); i++ )
 	{
@@ -297,7 +297,7 @@ bool VHistogramUtilities::normalizeTH2D_x( TH2* h )
 	{
 		return false;
 	}
-	
+
 	double i_sum = 0.;
 	for( int i = 1; i <= h->GetNbinsX(); i++ )
 	{
@@ -323,15 +323,15 @@ TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormaliz
 	{
 		return 0;
 	}
-	
+
 	// clone input histogram
 	char hname[600];
 	sprintf( hname, "%s_CUMU", iH_in->GetName() );
 	TH1D* iH_out = ( TH1D* )iH_in->Clone( hname );
 	iH_out->Reset();
-	
+
 	float z = iH_out->GetNbinsX();
-	
+
 	if( iLeft_to_right )
 	{
 		iH_out->SetBinContent( 1, iH_in->GetBinContent( 1 ) );
@@ -380,9 +380,9 @@ TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormaliz
 	{
 		iH_out->Scale( 1. / iH_out->GetBinContent( z ) );
 	}
-	
+
 	iH_out->SetMaximum( iH_out->GetMaximum() * 1.2 );
-	
+
 	return iH_out;
 }
 
@@ -400,13 +400,13 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 	{
 		return 0;
 	}
-	
+
 	// no distance cut for rmax < 0
 	if( rmax < 0. )
 	{
 		rmax = 1.e6;
 	}
-	
+
 	// get binning
 	int nbin = 100;
 	double xmin = 9999999.;
@@ -433,18 +433,18 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 	{
 		nbin = 50;
 	}
-	
+
 	xmin = -7.1;
 	xmax = 10.9;
 	nbin = 100;
-	
+
 	char regioncode_histname[100] = "" ;
 	if( regioncode.length() > 0 )
 	{
 		sprintf( regioncode_histname, "_%s", regioncode.c_str() ) ;
 	}
-	
-	
+
+
 	char hname[200];
 	if( iDiff )
 	{
@@ -454,7 +454,7 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 	{
 		sprintf( hname, "hsig1D_%d_%f_%d%s", ion, rSource, iExcN, regioncode_histname );
 	}
-	
+
 	TH1D* h1D = 0;
 	if( gDirectory->Get( hname ) )
 	{
@@ -465,7 +465,7 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 	{
 		h1D = new TH1D( hname, "", nbin, xmin, xmax );
 	}
-	
+
 	// setup regioncode flags
 	string regioncode_a = "a" ;
 	bool   regioncodeflag_a = false ;
@@ -479,7 +479,7 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 	{
 		regioncodeflag_b = true ;
 	}
-	
+
 	// fill the histogram
 	for( int i = 1; i <= h->GetNbinsX(); i++ )
 	{
@@ -491,14 +491,14 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 			{
 				continue;
 			}
-			
+
 			double y_r = h->GetYaxis()->GetBinCenter( j );
 			// radius cut
 			if( TMath::Sqrt( x_r * x_r + y_r * y_r ) > rmax )
 			{
 				continue;
 			}
-			
+
 			// regioncode cuts
 			// regioncode = "a" , exclude x<0
 			if( regioncodeflag_a )
@@ -516,7 +516,7 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 					continue ;
 				}
 			}
-			
+
 			// exclusion regions
 			bool iBBreak = false;
 			for( int e = 0; e < iExcN; e++ )
@@ -548,7 +548,7 @@ bool VHistogramUtilities::get_Graph_from_Histogram( TH1* h, TGraphErrors* g, boo
 	{
 		return false;
 	}
-	
+
 	unsigned int z = 0;
 	for( int i = 1; i <= h->GetNbinsX(); i++ )
 	{
@@ -584,7 +584,7 @@ bool VHistogramUtilities::get_Graph_from_Histogram( TH1* h, TGraphAsymmErrors* g
 	{
 		return false;
 	}
-	
+
 	unsigned int z = 0;
 	for( int i = 1; i <= h->GetNbinsX(); i++ )
 	{
@@ -676,7 +676,7 @@ TH1F* VHistogramUtilities::get_CTA_IRF_Histograms( string iHistogramName, double
 			return 0;
 		}
 	}
-	
+
 	return h;
 }
 
@@ -704,7 +704,7 @@ TH1F* VHistogramUtilities::get_CTA_IRF_Histograms_from2D( string iHistogramName,
 			return h;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -714,7 +714,7 @@ int VHistogramUtilities::findBinInGraph( TGraph* g, double x )
 	{
 		return -1;
 	}
-	
+
 	double i_x = 0.;
 	double i_x_low = 0.;
 	double i_x_high = 0.;
@@ -724,13 +724,13 @@ int VHistogramUtilities::findBinInGraph( TGraph* g, double x )
 		g->GetPoint( i, i_x, i_y );
 		i_x_low  = g->GetErrorXlow( i );
 		i_x_high = g->GetErrorXhigh( i );
-		
+
 		if( x > i_x - i_x_low && x <= i_x + i_x_high )
 		{
 			return i;
 		}
 	}
-	
+
 	return -1;
 }
 
@@ -740,16 +740,16 @@ TH1* VHistogramUtilities::normalizeTH1( TH1* h, bool iIntegral )
 	{
 		return 0;
 	}
-	
+
 	double iSum = 0.;
 	double iN = 0.;
-	
+
 	for( int i = 1; i <= h->GetNbinsX(); i++ )
 	{
 		iSum += h->GetBinContent( i );
 		iN++;
 	}
-	
+
 	double f = 1.;
 	if( iSum > 0. )
 	{
@@ -762,13 +762,13 @@ TH1* VHistogramUtilities::normalizeTH1( TH1* h, bool iIntegral )
 			f = iN / iSum;
 		}
 	}
-	
+
 	for( int i = 1; i <= h->GetNbinsX(); i++ )
 	{
 		h->SetBinError( i, h->GetBinError( i ) * f );
 		h->SetBinContent( i, h->GetBinContent( i ) * f );
 	}
-	
+
 	return h;
 }
 
@@ -778,28 +778,28 @@ bool VHistogramUtilities::divide( TGraphAsymmErrors* g, TGraphAsymmErrors* g1, T
 	{
 		return false;
 	}
-	
+
 	double x1 = 0.;
 	double y1 = 0.;
-	
+
 	int z = 0;
 	for( int i = 0; i < g1->GetN(); i++ )
 	{
 		g1->GetPoint( i, x1, y1 );
-		
+
 		double y2 = g2->Eval( x1 );
-		
+
 		if( y1 != 0. )
 		{
 			g->SetPoint( z, x1, y2 / y1 );
-			
+
 			g->SetPointError( z, g1->GetErrorXlow( i ), g1->GetErrorXhigh( i ),
 							  y2 * 0.5 * ( g1->GetErrorYhigh( i ) + g1->GetErrorYlow( i ) ) / y1 / y1,
 							  y2 * 0.5 * ( g1->GetErrorYhigh( i ) + g1->GetErrorYlow( i ) ) / y1 / y1 );
 			z++;
 		}
 	}
-	
+
 	return true;
 }
 
@@ -809,26 +809,26 @@ bool VHistogramUtilities::divide( TGraphAsymmErrors* g, TGraphAsymmErrors* g1, T
 	{
 		return false;
 	}
-	
+
 	double x1 = 0.;
 	double y1 = 0.;
 	double x2 = 0.;
 	double y2 = 0.;
-	
+
 	int z = 0;
 	for( int i = 0; i < g1->GetN(); i++ )
 	{
 		g1->GetPoint( i, x1, y1 );
-		
+
 		for( int j = 0; j < g2->GetN(); j++ )
 		{
 			g2->GetPoint( j, x2, y2 );
-			
+
 			if( TMath::Abs( x1 - x2 ) < epsilon && y1 != 0. && y2 != 0. )
 			{
 				double y = y2 / y1;
 				g->SetPoint( z, x1, y );
-				
+
 				double iErr1 = 1. / y1 * 0.5 * ( g1->GetErrorYhigh( i ) + g1->GetErrorYlow( i ) );
 				double iErr2 = 1. / y2 * 0.5 * ( g2->GetErrorYhigh( j ) + g2->GetErrorYlow( j ) );
 				double yErr = y * sqrt( iErr1 * iErr1 + iErr2 * iErr2 );
@@ -838,7 +838,7 @@ bool VHistogramUtilities::divide( TGraphAsymmErrors* g, TGraphAsymmErrors* g1, T
 			}
 		}
 	}
-	
+
 	return true;
 }
 
@@ -853,13 +853,13 @@ double VHistogramUtilities::interpolateTH2D( TH2* h, double x, double y )
 	{
 		return 0.;
 	}
-	
+
 	if( x >= h->GetXaxis()->GetXmin() && x <= h->GetXaxis()->GetXmax()
 			&& y >= h->GetYaxis()->GetXmin() && y <= h->GetYaxis()->GetXmax() )
 	{
 		return h->Interpolate( x, y );
 	}
-	
+
 	return 0.;
 }
 
@@ -869,14 +869,14 @@ TH2D* VHistogramUtilities::calculateContainmentDistance( TH2D* h, string inewHis
 	{
 		return 0;
 	}
-	
+
 	TH2D* hNew = new TH2D( inewHistogramName.c_str(), h->GetTitle(), h->GetNbinsX(),
 						   h->GetXaxis()->GetXmin(), h->GetXaxis()->GetXmax(),
 						   100, 0., 1. );
 	hNew->SetXTitle( h->GetXaxis()->GetTitle() );
 	hNew->SetYTitle( "containment" );
 	hNew->SetZTitle( "angular resolution [deg]" );
-	
+
 	// loop over all energy bins
 	for( int i = 1; i <= h->GetNbinsX(); i++ )
 	{
@@ -912,12 +912,12 @@ TH2F* VHistogramUtilities::reduce2DHistogramSize( TH2* h, string inewHistogramNa
 	{
 		return 0;
 	}
-	
+
 	int nBinX_min = 99999;
 	int nBinX_max = -1;
 	int nBinY_min = 99999;
 	int nBinY_max = -1;
-	
+
 	// get minima and maxima
 	for( int i = 1; i <= h->GetNbinsX(); i++ )
 	{
@@ -969,13 +969,13 @@ TH2F* VHistogramUtilities::reduce2DHistogramSize( TH2* h, string inewHistogramNa
 	{
 		ymax = h->GetYaxis()->GetBinLowEdge( nBinY_max ) + h->GetYaxis()->GetBinWidth( nBinY_max );
 	}
-	
+
 	TH2F* hNew = new TH2F( inewHistogramName.c_str(), "", nBinX_max - nBinX_min + 1, xmin, xmax, nBinY_max, ymin, ymax );
 	hNew->SetXTitle( h->GetXaxis()->GetTitle() );
 	hNew->SetYTitle( h->GetYaxis()->GetTitle() );
 	hNew->SetZTitle( h->GetZaxis()->GetTitle() );
 	hNew->Sumw2();
-	
+
 	for( int i = nBinX_min; i <= nBinX_max; i++ )
 	{
 		for( int j = nBinY_min; j <= nBinY_max; j++ )
@@ -987,6 +987,6 @@ TH2F* VHistogramUtilities::reduce2DHistogramSize( TH2* h, string inewHistogramNa
 			}
 		}
 	}
-	
+
 	return hNew;
 }

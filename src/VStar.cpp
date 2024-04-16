@@ -17,7 +17,7 @@ VStar::VStar()
 	fRunGalLat1958 = 0.;
 	fBrightness_V = 0.;
 	fBrightness_B = 0.;
-	fMajorDiameter = 0.;                        // this is either the source diameter or the possitional error
+	fMajorDiameter = 0.;                        // this is either the source diameter or the positional error
 	fMinorDiameter = 0.;
 	fPositionAngle = 0.;
 	fMajorDiameter_68 = 0.;
@@ -45,13 +45,13 @@ double VStar::getDistance( VStar* iStar1, VStar* iStar2 )
 	{
 		return -99.;
 	}
-	
+
 	if( iStar2 == 0 )
 	{
 		return TMath::RadToDeg() * VAstronometry::vlaDsep( iStar1->fRA2000 * TMath::DegToRad(), iStar1->fDec2000 * TMath::DegToRad(),
 				fRA2000 * TMath::DegToRad(), fDec2000 * TMath::DegToRad() );
 	}
-	
+
 	return TMath::RadToDeg() * VAstronometry::vlaDsep( iStar1->fRA2000 * TMath::DegToRad(), iStar1->fDec2000 * TMath::DegToRad(),
 			iStar2->fRA2000 * TMath::DegToRad(), iStar2->fDec2000 * TMath::DegToRad() );
 }

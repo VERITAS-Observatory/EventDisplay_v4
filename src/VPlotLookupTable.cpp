@@ -16,7 +16,7 @@ VPlotLookupTable::VPlotLookupTable()
 	fListOfTableNames.push_back( "mscl" );
 	fListOfTableNames.push_back( "energyER" );
 	fListOfTableNames.push_back( "energySR" );
-	
+
 	setPlottingLogEnergyAxis();
 	setPlottingLogSizeAxis();
 	setPlottingDistanceAxis();
@@ -50,7 +50,7 @@ void VPlotLookupTable::plot2DHistogram( TH2F* h, unsigned int iSetID, string iti
 		cout << endl;
 		return;
 	}
-	
+
 	char hname[600];
 	char htitle[600];
 	sprintf( hname, "c%s_%d_%s_%d_%d_%d_%d", h->GetName(), iSetID, fLookupTableData[iSetID]->fLookupTable.c_str(), fLookupTableData[iSetID]->fZe,
@@ -58,7 +58,7 @@ void VPlotLookupTable::plot2DHistogram( TH2F* h, unsigned int iSetID, string iti
 	sprintf( htitle, "lookup table (%s, %s, %d deg, az %d, noise %d, woff %.2f", ititle.c_str(),
 			 fLookupTableData[iSetID]->fLookupTable.c_str(), fLookupTableData[iSetID]->fZe,
 			 fLookupTableData[iSetID]->fAz, fLookupTableData[iSetID]->fNoise, 1. / 100.*( double )fLookupTableData[iSetID]->fWobbleOffset );
-			 
+
 	TCanvas* cE = new TCanvas( hname, htitle, iCanvasX, 10, fPlottingCanvasX, fPlottingCanvasY );
 	cE->SetGridx( 0 );
 	cE->SetGridy( 0 );
@@ -69,7 +69,7 @@ void VPlotLookupTable::plot2DHistogram( TH2F* h, unsigned int iSetID, string iti
 		cE->SetLogz( 1 );
 	}
 	cE->Draw();
-	
+
 	h->SetStats( 0 );
 	h->SetTitle( "" );
 	h->GetYaxis()->SetTitleOffset( 1.4 );
@@ -83,7 +83,7 @@ void VPlotLookupTable::plot2DHistogram( TH2F* h, unsigned int iSetID, string iti
 		h->SetAxisRange( fLogSizeAxis_min, fLogSizeAxis_max, "X" );
 	}
 	h->SetAxisRange( fDistanceAxis_min, fDistanceAxis_max, "Y" );
-	
+
 	if( i_min > -998. )
 	{
 		h->SetMinimum( i_min );
@@ -92,7 +92,7 @@ void VPlotLookupTable::plot2DHistogram( TH2F* h, unsigned int iSetID, string iti
 	{
 		h->SetMaximum( i_max );
 	}
-	
+
 	h->Draw( "colz" );
 }
 
@@ -102,16 +102,16 @@ TH2F* VPlotLookupTable::divide2DHistograms( TH2F* h1, TH2F* h2, char* hname )
 	{
 		return 0;
 	}
-	
+
 	TH2F* hMM = new TH2F( hname, "", h1->GetNbinsX(), h1->GetXaxis()->GetXmin(), h1->GetXaxis()->GetXmax(),
 						  h1->GetNbinsY(), h1->GetYaxis()->GetXmin(), h1->GetYaxis()->GetXmax() );
 	hMM->SetXTitle( h1->GetXaxis()->GetTitle() );
 	hMM->SetYTitle( h1->GetYaxis()->GetTitle() );
 	hMM->SetZTitle( h1->GetZaxis()->GetTitle() );
-	
+
 	int ii = 0;
 	int jj = 0;
-	
+
 	for( int i = 1; i <= hMM->GetNbinsX(); i++ )
 	{
 		for( int j = 1; j <= hMM->GetNbinsY(); j++ )
@@ -128,7 +128,7 @@ TH2F* VPlotLookupTable::divide2DHistograms( TH2F* h1, TH2F* h2, char* hname )
 			}
 		}
 	}
-	
+
 	return hMM;
 }
 
@@ -145,19 +145,19 @@ void VPlotLookupTable::plotLookupTables( unsigned int iSetID, double i_ymin )
 	plot2DHistogram( fLookupTableData[iSetID]->hmpv,    iSetID, "mpv", 200, i_ymin, -999., ( fLookupTableData[iSetID]->fLookupTable == "energySR" ) );
 	plot2DHistogram( fLookupTableData[iSetID]->hsigma,  iSetID, "sigma", 300, i_ymin, -999., false );
 	plot2DHistogram( fLookupTableData[iSetID]->hnevents, iSetID, "number of events", 400, i_ymin, -999., true );
-	
+
 	// divide mean by median
 	if( fLookupTableData[iSetID]->hmedian && fLookupTableData[iSetID]->hmean )
 	{
 		char hname[200];
 		sprintf( hname, "hMM_%d", iSetID );
-		
+
 		TH2F* hMM = divide2DHistograms( fLookupTableData[iSetID]->hmean, fLookupTableData[iSetID]->hmedian, hname );
 		if( hMM )
 		{
 			hMM->SetZTitle( "mean / median" );
 		}
-		
+
 		plot2DHistogram( hMM, iSetID, "mean / median", 200, 0.95, 1.05 );
 	}
 	// divide MPV by median
@@ -165,17 +165,17 @@ void VPlotLookupTable::plotLookupTables( unsigned int iSetID, double i_ymin )
 	{
 		char hname[200];
 		sprintf( hname, "hMP_%d", iSetID );
-		
+
 		TH2F* hMP = divide2DHistograms( fLookupTableData[iSetID]->hmpv, fLookupTableData[iSetID]->hmedian, hname );
 		if( hMP )
 		{
 			hMP->SetZTitle( "mpv/ median" );
 		}
-		
+
 		plot2DHistogram( hMP, iSetID, "mpv / median", 200, 0.95, 1.05 );
 	}
-	
-	
+
+
 }
 
 void VPlotLookupTable::plotRelativeTables( unsigned int iSetID1, unsigned int iSetID2, double iMin, double iMax )
@@ -191,47 +191,47 @@ void VPlotLookupTable::plotRelativeTables( unsigned int iSetID1, unsigned int iS
 		cout << "\t" << fLookupTableData[iSetID1]->fLookupTable << "\t" << fLookupTableData[iSetID2]->fLookupTable << endl;
 		return;
 	}
-	
+
 	// median
 	char hname[200];
 	sprintf( hname, "hMM_DIV_median_%d_%d", iSetID1, iSetID2 );
-	
+
 	TH2F* hMM_median = divide2DHistograms( fLookupTableData[iSetID1]->hmedian, fLookupTableData[iSetID2]->hmedian, hname );
 	sprintf( hname, "%s (%d/%d)", hMM_median->GetZaxis()->GetTitle(), iSetID1, iSetID2 );
 	if( hMM_median )
 	{
 		hMM_median->SetZTitle( hname );
 	}
-	
+
 	sprintf( hname, "median (%d/%d)", iSetID1, iSetID2 );
 	plot2DHistogram( hMM_median, iSetID1, hname, 500, iMin, iMax );
-	
+
 	// sigma
 	sprintf( hname, "hMM_DIV_sigma_%d_%d", iSetID1, iSetID2 );
-	
+
 	TH2F* hMM_sigma = divide2DHistograms( fLookupTableData[iSetID1]->hsigma, fLookupTableData[iSetID2]->hsigma, hname );
 	sprintf( hname, "%s (%d/%d)", hMM_sigma->GetZaxis()->GetTitle(), iSetID1, iSetID2 );
 	if( hMM_sigma )
 	{
 		hMM_sigma->SetZTitle( hname );
 	}
-	
+
 	sprintf( hname, "sigma (%d/%d)", iSetID1, iSetID2 );
 	plot2DHistogram( hMM_sigma, iSetID1, hname, 550, iMin, iMax );
-	
+
 	// mean
 	sprintf( hname, "hMM_DIV_mean_%d_%d", iSetID1, iSetID2 );
-	
+
 	TH2F* hMM_mean = divide2DHistograms( fLookupTableData[iSetID1]->hmean, fLookupTableData[iSetID2]->hmean, hname );
 	sprintf( hname, "%s (%d/%d)", hMM_mean->GetZaxis()->GetTitle(), iSetID1, iSetID2 );
 	if( hMM_mean )
 	{
 		hMM_mean->SetZTitle( hname );
 	}
-	
+
 	sprintf( hname, "mean (%d/%d)", iSetID1, iSetID2 );
 	plot2DHistogram( hMM_mean, iSetID1, hname, 600, iMin, iMax );
-	
+
 }
 
 bool VPlotLookupTable::addLookupTable( string iLookupTableFile, string iTable, int ze, int az, int telID, int noise, int woff )
@@ -241,7 +241,7 @@ bool VPlotLookupTable::addLookupTable( string iLookupTableFile, string iTable, i
 	{
 		return false;
 	}
-	
+
 	TFile* fI = new TFile( iLookupTableFile.c_str() );
 	if( fI->IsZombie() )
 	{
@@ -264,7 +264,7 @@ bool VPlotLookupTable::addLookupTable( string iLookupTableFile, string iTable, i
 		cout << "VPlotLookupTable::addLookupTable error: directory for variable " << iTable << " not found" << endl;
 		return false;
 	}
-	
+
 	// now everything seems to be fine, fill new data entry
 	fLookupTableData.push_back( new VPlotLookupTableData() );
 	fLookupTableData.back()->fLookupTable = iTable;
@@ -273,7 +273,7 @@ bool VPlotLookupTable::addLookupTable( string iLookupTableFile, string iTable, i
 	fLookupTableData.back()->fZe = ze;
 	fLookupTableData.back()->fAz = az;
 	fLookupTableData.back()->fWobbleOffset = woff;
-	
+
 	if( iTable == "mscw" )
 	{
 		fLookupTableData.back()->hmedian = ( TH2F* )gDirectory->Get( "width_median_tb" );
@@ -311,7 +311,7 @@ bool VPlotLookupTable::addLookupTable( string iLookupTableFile, string iTable, i
 	{
 		cout << "all histograms found..." << endl;
 	}
-	
+
 	return true;
 }
 
@@ -324,8 +324,8 @@ bool VPlotLookupTable::checkTableName( string iTableName )
 			return true;
 		}
 	}
-	
-	cout << "VPlotLookupTable::checkTableName unkown table name: " << iTableName << endl;
+
+	cout << "VPlotLookupTable::checkTableName unknown table name: " << iTableName << endl;
 	cout << "\t allowed are: ";
 	for( unsigned int i = 0; i < fListOfTableNames.size(); i++ )
 	{
@@ -334,7 +334,7 @@ bool VPlotLookupTable::checkTableName( string iTableName )
 	cout << endl;
 	cout << endl;
 	return false;
-	
+
 }
 
 // ====================================================================================
@@ -349,11 +349,10 @@ VPlotLookupTableData::VPlotLookupTableData()
 	fTelID = 0;
 	fNoise = 0;
 	fWobbleOffset = 0;
-	
+
 	hmedian = 0;
 	hmean = 0;
 	hmpv = 0;
 	hsigma = 0;
 	hnevents = 0;
 }
-

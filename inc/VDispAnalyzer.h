@@ -114,7 +114,7 @@ class VDispAnalyzer
 								double* img_fui,
 								float* img_pedvar,
 								int* img_fitstat );
-								
+
 		void  calculateMeanDirection( float& xs, float& ys,
 									  vector< float >& x, vector< float >& y,
 									  vector< float >& cosphi, vector< float >& sinphi,
@@ -140,7 +140,7 @@ class VDispAnalyzer
 										 double* pointing_dx, double* pointing_dy,
 										 bool UseIntersectForHeadTail,
 										 int* img_fitstat );
-										 
+
 		vector< float > calculateExpectedDirectionError_or_Sign( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
 				ULong64_t* iTelType,
 				double* img_size, double* img_cen_x, double* img_cen_y,
@@ -150,7 +150,7 @@ class VDispAnalyzer
 				double* img_weight,
 				double xoff_4, double yoff_4,
 				double* img_fui, float* img_pedvar, int* img_fitstat );
-				
+
 		float evaluate( float iWidth, float iLength, float iAsymm, float iDist,
 						float iSize, float iPedvar, float itgrad, float iLoss,
 						float icen_x, float icen_y, float xoff_4, float yoff_4, ULong64_t iTelType,

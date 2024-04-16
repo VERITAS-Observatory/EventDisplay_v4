@@ -31,21 +31,21 @@ class VCamera
 {
 	private:
 		bool        fDebug;                       //!< debug switch
-		
+
 		VEvndispData*      fData;                 //!< pointer to data class
 		unsigned int fTelescope;                  //!< this is the camera of telescope fTelescope
-		
+
 		enum cameraMode {C_CHARGE, C_TZERO, C_TRIGGER, C_HIT, C_HILO, C_TIMING, C_SUMWINDOW, C_SUMWINDOWSTART,
 						 C_PEDMEAN, C_PEDVAR, C_PEDMEANLOW, C_PEDVARLOW, C_GAINS, C_GAINVARS, C_GAINSLOW, C_GAINVARSLOW,
 						 C_TOFF, C_TOFFLOW, C_LOWGAIN, C_CALTZERO, C_CALTZEROLOW, C_STATUS, C_STATUSLOW,
 						 C_L1, C_HV, C_CURRENTS,
 						 C_TRIGGER_EVNDISP
 						};
-						
+
 		unsigned int fcameraModus;                //!< camera modus (trigger/charge/hit/timing/etc.)
 		bool fBoolAllinOne;                       //!< plot all images in one camera
 		TPad* fCanvas;                            //!< canvas for camera
-		vector<TLatex* > fTextEvent;              //!< event info text (eventnumber, eventtime, ...) and analyis text
+		vector<TLatex* > fTextEvent;              //!< event info text (eventnumber, eventtime, ...) and analysis text
 		vector<TLatex* > fTextMC;                 //!< MC parameters
 		TLatex* fTextTelescopeN;                  //!< telescope numbering
 		TLatex* fTextEventPlotPaper;
@@ -64,22 +64,22 @@ class VCamera
 		TMarker* fCameraCentreDir;                //!< camera centre
 		TEllipse* fCameraCentreEllipse;
 		double fmaxPlot;                          //!< relative size of camera (0.5 = full canvas)
-		double fmaxRad;                           //!< relativ maximum of radius for inner ellipses (1=maximum = radius of fgraphTubes)
+		double fmaxRad;                           //!< relative maximum of radius for inner ellipses (1=maximum = radius of fgraphTubes)
 		double fScaleMax;
 		double fdist_edgeX;                        //!< maximum distance from canvas center to edge of camera
 		double fdist_edgeY;                        //!< maximum distance from canvas center to edge of camera
 		double fmax_dist_edge;
 		unsigned int fEventCounter;               //!< event number
 		int fTubeSelected;                        //!< number of mouse pointer selected channel (-1=nothing selected)
-		
+
 		bool bFixScale;
-		
+
 		int fCurrentTimeSlice;                    //!< time slice number for C_TIMING
-		
+
 		valarray< double > fPMTData;              //!< array with PMT data values
-		
+
 		vector< TEllipse* > fTheta2Circle;
-		
+
 		// things plotted while showing the channel numbers
 		int fPrintChannel;                        //!< print channel numbers (0=none,1=channels,2=tubes)
 		vector<TText*> fTextChannelNumber;        //!< channel number
@@ -88,18 +88,18 @@ class VCamera
 		TGaxis* fCameraYaxis;
 		TLine* fEllipseLine;
 		TLine* fCenterLine;
-		
+
 		// stuff need for color scheme mode
 		unsigned int fPlotColor;                  //!< color scheme plot (1) or circles size plot (0)
 		TGaxis* fColourAxis;                      //!< axis on the right to color palette
 		int fncolors;                             //!< number of colors in current style
 		int fndivz;                               //!< number of contours in current color style
-		
+
 		valarray<bool> fDeadChan;                 //!< vector with dead channels
-		
+
 		bool fFirstTelescopeToDraw;
 		int  fTelescopeEllipseColor;
-		
+
 		// color definitions
 		unsigned int fColorEmpty;
 		unsigned int fColorImage;
@@ -120,10 +120,10 @@ class VCamera
 		unsigned int fFillStylePos;
 		unsigned int fFillStyleNeg;
 		unsigned int fFillStyleFADCTrig;
-		
+
 		bool fAnaVis;                             //!< for pedestrians....
 		bool fPlotPaper;                          //!< nicer plot for papers, no small text, no dead channels
-		
+
 		double         convertX( double x, double iOffSet = 0.5 );        //!< convert from camera to canvas coordinates
 		double         convertY( double y, double iOffSet = 0.5 );        //!< convert from camera to canvas coordinates
 		void           drawMuonResults();         //!< draw muon analysis results Martin
@@ -151,7 +151,7 @@ class VCamera
 		void           setUpCamera();             //!< initialize the camera
 		//!< setup camera in charge/timing mode
 		void           setPMTColorForChargeTiming();
-		
+
 	public:
 		VCamera() {}
 		//!< standard constructor for telescope iTelescope

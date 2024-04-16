@@ -12,10 +12,10 @@ VCalibrationData::VCalibrationData( unsigned int iTel, string iDir, string iPedf
 {
 	fUsePedestalsInTimeSlices = true;
 	fLowGainUsePedestalsInTimeSlices = true;
-	
+
 	fTelID = iTel;
 	fCalDirName = iDir;
-	
+
 	fFileName.push_back( iPedfile );
 	fHistoName.push_back( "pedestal" );
 	fFileName.push_back( iGainfile );
@@ -34,32 +34,32 @@ VCalibrationData::VCalibrationData( unsigned int iTel, string iDir, string iPedf
 	fHistoName.push_back( "tzero" );
 	fFileName.push_back( iTzeroLowGainfile );
 	fHistoName.push_back( "tzero_lowGain" );
-	
+
 	for( unsigned int i = 0; i < fFileName.size(); i++ )
 	{
 		fFile.push_back( 0 );
 	}
-	
-	
+
+
 	fPedFromPLine = false;
-	
+
 	fReader = 0;
-	
+
 	fBoolLowGainPedestals = false;
 	fBoolLowGainGains = false;
 	fBoolLowGainTOff = false;
-	
+
 	fSumWindow = 0;
-	
+
 	fTS_ped_temp_time = 0.;
-	
+
 	setAverageTZero( 0., true );
 	setAverageTZero( 0., false );
-	
+
 	// summary histograms
-	
+
 	hisList = new TList();
-	
+
 	char hname[200];
 	char hname_var[200];
 	for( unsigned int i = 0; i < fFile.size(); i++ )
@@ -115,12 +115,12 @@ VCalibrationData::VCalibrationData( unsigned int iTel, string iDir, string iPedf
 			fHisto_variance.push_back( new TH1F( hname_var, "", 200, 0., 20. ) );
 			fHisto_variance.back()->SetXTitle( "average pulse time t_{0} (variance) [sample]" );
 		}
-		
+
 		hisList->Add( fHisto_mean.back() );
 		hisList->Add( fHisto_variance.back() );
 	}
-	
-	
+
+
 }
 
 
@@ -132,11 +132,11 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
 	{
 		cout << "VCalibrationData::initialize " << i_channel << "\t" << fTelID << endl;
 	}
-	
+
 	fPedFromPLine = iPedsFromPLine;
 	fUsePedestalsInTimeSlices = iUsePedestalsInTimeSlices;
 	fLowGainUsePedestalsInTimeSlices = iLowGainUsePedestalsInTimeSlices;
-	
+
 	for( unsigned int i = 0; i < fHisto_mean.size(); i++ )
 	{
 		if( fHisto_mean[i] )
@@ -151,7 +151,7 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
 			fHisto_variance[i]->Reset();
 		}
 	}
-	
+
 	char c_name[2000];
 	for( unsigned int i = 0; i < fFileName.size(); i++ )
 	{
@@ -193,59 +193,59 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
 			fFile[i] = 0;
 		}
 	}
-	
+
 	fFADCStopOffsets.resize( i_channel, 0. );
 	fChannelStatus.resize( i_channel, 1 );
-	
+
 	valarray< double > itemp_ped;
 	valarray< valarray< double > > itemp_pedvars;
 	itemp_pedvars.resize( nSamples + 1, itemp_ped );
-	
-	// (time dependent pedestal vectors are initialzed in VCalibrator)
-	
+
+	// (time dependent pedestal vectors are initialized in VCalibrator)
+
 	// high gain channels
 	fPeds.resize( i_channel, 20. );
 	fVPedvars.resize( nSamples + 1, sqrt( fPeds ) );
 	fPedrms.resize( i_channel, 0. );
 	fVmeanPedvars.resize( nSamples + 1, 0. );
 	fVmeanRMSPedvars.resize( nSamples + 1, 0. );
-	
+
 	fLowGainPedsrms.resize( i_channel, 0. );
-	
+
 	fGains.resize( i_channel, 0. );
 	fGains_DefaultSetting.resize( i_channel, true );
 	fGainvars.resize( i_channel, 0. );
-	
+
 	fTOffsets.resize( i_channel, 0. );
 	fTOffsetvars.resize( i_channel, 0. );
-	
+
 	fAverageTzero.resize( i_channel, 0. );
 	fAverageTzerovars.resize( i_channel, 0. );
-	
+
 	fFADCtoPhe.resize( i_channel, 1. );
-	
+
 	// low gain channels
 	fLowGainPeds.resize( i_channel, 20. );
 	fVLowGainPedvars.resize( nSamples + 1, fLowGainPeds );
 	fVmeanLowGainPedvars.resize( nSamples + 1, 0. );
 	fVmeanRMSLowGainPedvars.resize( nSamples + 1, 0. );
-	
+
 	fLowGainGains.resize( i_channel, 0. );
 	fLowGainGains_DefaultSetting.resize( i_channel, 0. );
 	fLowGainGainvars.resize( i_channel, 0. );
-	
+
 	fLowGainTOffsets.resize( i_channel, 0. );
 	fLowGainTOffsetvars.resize( i_channel, 0. );
 	fLowGainAverageTzero.resize( i_channel, 0. );
 	fLowGainAverageTzerovars.resize( i_channel, 0. );
-	
+
 	fLowGainFADCtoPhe.resize( i_channel, 1. );
-	
+
 	itemp_ped.resize( i_channel, 1. );
 	// low gain multiplier settings
 	fLowGainMultiplier_Trace = 0;
 	fLowGainMultiplier_Camera.resize( i_channel, 0. );
-	
+
 	if( iDebug )
 	{
 		cout << "END VCalibrationData::initialize " << endl;
@@ -256,7 +256,7 @@ TH1F* VCalibrationData::getHistogram( unsigned int iTel, unsigned int iChannel, 
 {
 	char iHName[200];
 	std::ostringstream iSname;
-	
+
 	if( iType == C_PED || iType == C_PEDLOW )
 	{
 		sprintf( iHName, "distributions/hped_%d_%d_%d", iTel, iWindowSize, iChannel );
@@ -289,7 +289,7 @@ TH1F* VCalibrationData::getHistogram( unsigned int iTel, unsigned int iChannel, 
 	{
 		return ( TH1F* )fFile[iType]->Get( iHName );
 	}
-	
+
 	return 0;
 }
 
@@ -311,7 +311,7 @@ TH1F* VCalibrationData::getHistoPed( unsigned int iTel, unsigned int iChannel, u
 	{
 		return getHistogram( iTel, iChannel, iWindowSize, C_PEDLOW, iTelType );
 	}
-	
+
 	return getHistogram( iTel, iChannel, iWindowSize, C_PED, iTelType );
 }
 
@@ -322,7 +322,7 @@ TH1F* VCalibrationData::getHistoGain( unsigned int iTel, unsigned int iChannel, 
 	{
 		return getHistogram( iTel, iChannel, 0, C_GAINLOW );
 	}
-	
+
 	return getHistogram( iTel, iChannel, 0, C_GAIN );
 }
 
@@ -333,7 +333,7 @@ TH1F* VCalibrationData::getHistoToff( unsigned int iTel, unsigned int iChannel, 
 	{
 		return getHistogram( iTel, iChannel, 0, C_TOFFLOW );
 	}
-	
+
 	return getHistogram( iTel, iChannel, 0, C_TOFF );
 }
 
@@ -343,7 +343,7 @@ TH1F* VCalibrationData::getHistoAverageTzero( unsigned int iTel, unsigned int iC
 	{
 		return getHistogram( iTel, iChannel, 0, C_TZEROLOW );
 	}
-	
+
 	return getHistogram( iTel, iChannel, 0, C_TZERO );
 }
 
@@ -372,7 +372,7 @@ double VCalibrationData::getAverageTZero( bool iLowGain )
 	{
 		return fAverageTZero_lowgain;
 	}
-	
+
 	return fAverageTZero_highgain;
 }
 
@@ -382,7 +382,7 @@ void  VCalibrationData::setAverageTZero( double iAverageTzero, bool iLowGain )
 	{
 		fAverageTZero_lowgain = iAverageTzero;
 	}
-	
+
 	fAverageTZero_highgain = iAverageTzero;
 }
 
@@ -390,12 +390,12 @@ void  VCalibrationData::setAverageTZero( double iAverageTzero, bool iLowGain )
 bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned int > iDeadLow, unsigned int iTraceIntegrationMethod, bool iDST )
 {
 	TDirectory* iDir = gDirectory;
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// no DST analysis
 	if( !iDST )
 	{
-	
+
 		// fill tree with used calibration data
 		const unsigned int iMAXSUMWINDOWS = 1000;
 		const unsigned int iMAXDEFWINDOWS = 10;
@@ -477,8 +477,8 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 		fCalibrationTree->Branch( "lowgainmultiplier_sum", &ilowgainmultiplier_sum, "lowgainmultiplier_sum[10][1000]/D" );
 		fCalibrationTree->Branch( "nlowgaindefaultsumwindows", &inlowgaindefaultsumwindows, "nlowgaindefaultsumwindows/i" );
 		fCalibrationTree->Branch( "lowgaindefaultsumwindows", &ilowgaindefaultsumwindows, "lowgaindefaultsumwindows[nlowgaindefaultsumwindows]/D" );
-		
-		
+
+
 		if( fPeds.size() == fPedrms.size() && fPeds.size() == fGains.size() && fPeds.size() == fGainvars.size()
 				&& fPeds.size() == fTOffsets.size() && fPeds.size() == fTOffsetvars.size() && fPeds.size() == fLowGainPeds.size()
 				&& fPeds.size() == fFADCtoPhe.size() && fPeds.size() == fLowGainFADCtoPhe.size() )
@@ -507,7 +507,7 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 				{
 					ipedvar = 0.;
 				}
-				
+
 				nsumwindows = fVPedvars.size();
 				if( nsumwindows < iMAXSUMWINDOWS )
 				{
@@ -570,10 +570,10 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 						}
 					}
 				}
-				
+
 				ilowgainmultiplier_trace = fLowGainMultiplier_Trace;
 				inlowgaindefaultsumwindows = getLowGainDefaultSumWindows().size();
-				
+
 				for( unsigned int k = 0; k < inlowgaindefaultsumwindows && k < iMAXDEFWINDOWS; k++ )
 				{
 					ilowgaindefaultsumwindows[k] = getLowGainDefaultSumWindows()[k];
@@ -582,10 +582,10 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 						ilowgainmultiplier_sum[k][j] = getLowGainMultiplier_Sum( getLowGainDefaultSumWindows()[k], j );
 					}
 				}
-				
-				
-				
-				
+
+
+
+
 				if( i < fLowGainGains.size() )
 				{
 					igainlowgain = fLowGainGains[i];
@@ -618,7 +618,7 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 				{
 					itzerovarlowgain = fLowGainAverageTzerovars[i];
 				}
-				
+
 				fCalibrationTree->Fill();
 			}
 		}
@@ -626,9 +626,9 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 		// do not write histograms -> same information as in fCalibrationTree
 		//       hisList->Write();
 	}
-	
+
 	iDir->cd();
-	
+
 	return true;
 }
 
@@ -636,12 +636,12 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 unsigned int VCalibrationData::getTSTimeIndex( double iTime, unsigned int& i1, unsigned int& i2, double& ifrac1, double& ifrac2 )
 {
 	unsigned iTS_size = getTimeTS_vector().size();
-	
+
 	i1 = 0;
 	i2 = 0;
 	ifrac1 = 1.0;
 	ifrac2 = 0.;
-	
+
 	if( iTS_size > 0 )
 	{
 		// time is before first time point
@@ -699,7 +699,7 @@ unsigned int VCalibrationData::getTSTimeIndex( double iTime, unsigned int& i1, u
 					i2 = 0;
 				}
 			}
-			
+
 			double id = getTimeTS_vector()[i1] - getTimeTS_vector()[i2];
 			if( id != 0. )
 			{
@@ -727,31 +727,31 @@ valarray<double>& VCalibrationData::getPeds( bool iLowGain, double iTime )
 			return fTS_ped_temp;
 		}
 		fTS_ped_temp_time = iTime;
-		
+
 		unsigned int i1 = 0;
 		unsigned int i2 = 0;
 		double ifrac1 = 0.;
 		double ifrac2 = 0.;
 		getTSTimeIndex( iTime, i1, i2, ifrac1, ifrac2 );
-		
+
 		if( fTS_ped_temp.size() != getPedsTS_vector( iLowGain )[i1].size() )
 		{
 			fTS_ped_temp.resize( getPedsTS_vector( iLowGain )[i1].size(), 0. );
 		}
-		
+
 		for( unsigned int i = 0; i < fTS_ped_temp.size(); i++ )
 		{
 			fTS_ped_temp[i] = ( ifrac1 * getPedsTS_vector( iLowGain )[i1][i] + ifrac2 * getPedsTS_vector( iLowGain )[i2][i] );
 		}
-		
+
 		return fTS_ped_temp;
 	}
-	
+
 	if( iLowGain )
 	{
 		return fLowGainPeds;
 	}
-	
+
 	return fPeds;
 }
 
@@ -773,25 +773,25 @@ valarray<double>& VCalibrationData::getPedvars( bool iLowGain, unsigned int iSW,
 			}
 			// no search for a pedvars for given time
 			fTS_pedvar_temp_time[iSW] = iTime;
-			
+
 			// get time index
 			unsigned int i1 = 0;
 			unsigned int i2 = 0;
 			double ifrac1 = 0.;
 			double ifrac2 = 0.;
 			getTSTimeIndex( iTime, i1, i2, ifrac1, ifrac2 );
-			
+
 			if( fTS_pedvar_temp[iSW].size() != getPedvarsVTS_vector( iLowGain )[i1][iSW - 1].size() )
 			{
 				fTS_pedvar_temp[iSW].resize( getPedvarsVTS_vector( iLowGain )[i1][iSW - 1].size(), 0. );
 			}
-			
+
 			// loop over all channels and calculate pedvars for this time (weighted mean between time bins)
 			for( unsigned int i = 0; i < fTS_pedvar_temp[iSW].size(); i++ )
 			{
 				fTS_pedvar_temp[iSW][i] = ( ifrac1 * getPedvarsVTS_vector( iLowGain )[i1][iSW - 1][i] + ifrac2 * getPedvarsVTS_vector( iLowGain )[i2][iSW - 1][i] );
 			}
-			
+
 			return fTS_pedvar_temp[iSW];
 		}
 		else
@@ -830,7 +830,7 @@ valarray<double>& VCalibrationData::getPedvars( bool iLowGain, unsigned int iSW,
 			return fVPedvars[0];
 		}
 	}
-	
+
 	// should never arrive here
 	return fValArrayDouble;
 }
@@ -842,12 +842,12 @@ void VCalibrationData::setPeds( unsigned int iChannel, double iPed, bool iLowGai
 	{
 		fLowGainPeds[iChannel] = iPed;
 	}
-	
+
 	if( iChannel < fPeds.size() )
 	{
 		fPeds[iChannel] = iPed;
 	}
-	
+
 }
 
 
@@ -857,12 +857,12 @@ double VCalibrationData::getmeanPedvars( bool iLowGain, unsigned int iSW )
 	{
 		return fVmeanPedvars[iSW];
 	}
-	
+
 	if( iLowGain && iSW < fVmeanLowGainPedvars.size() )
 	{
 		return fVmeanLowGainPedvars[iSW];
 	}
-	
+
 	return 0.;
 }
 
@@ -873,12 +873,12 @@ double VCalibrationData::getmeanRMSPedvars( bool iLowGain, unsigned int iSW )
 	{
 		return fVmeanRMSPedvars[iSW];
 	}
-	
+
 	if( iLowGain && iSW < fVmeanRMSLowGainPedvars.size() )
 	{
 		return fVmeanRMSLowGainPedvars[iSW];
 	}
-	
+
 	return 0.;
 }
 
@@ -887,19 +887,19 @@ void VCalibrationData::getmeanPedvars( double& imean, double& irms, bool iLowGai
 {
 	imean = 0.;
 	irms  = 0.;
-	
+
 	double its_n = 0.;
 	double its_sum = 0.;
 	double its_sum2 = 0.;
-	
+
 	double iMinPedVars = 2.5;
 	if( iSW < 8 )
 	{
 		iMinPedVars = 0.5;
 	}
-	
+
 	valarray< double > ipedvar = getPedvars( iLowGain, iSW, iTime );
-	
+
 	for( unsigned int i = 0; i < ipedvar.size(); i++ )
 	{
 		if( ipedvar[i] > iMinPedVars )

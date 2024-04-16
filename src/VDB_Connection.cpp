@@ -11,15 +11,15 @@ VDB_Connection::VDB_Connection()
 {
 	fMAX_PROCESS = 200;
 	fNumb_Connection = -111;
-	
+
 	fDBserver = "";
 	fconnection_mode = "";
 	fconnection_option = "";
-	fDB_Connection_successfull = false;
-	fDB_Query_successfull = false;
+	fDB_Connection_successful = false;
+	fDB_Query_successful = false;
 	f_db = 0;
-	
-	
+
+
 }
 
 VDB_Connection::VDB_Connection( string DBserver, string connection_mode, string connection_option )
@@ -27,15 +27,15 @@ VDB_Connection::VDB_Connection( string DBserver, string connection_mode, string 
 
 	fMAX_PROCESS = 200;
 	fNumb_Connection = -111;
-	
+
 	fDBserver = DBserver;
 	fconnection_mode = connection_mode;
 	fconnection_option = connection_option;
-	fDB_Connection_successfull = false;
-	fDB_Query_successfull = false;
+	fDB_Connection_successful = false;
+	fDB_Query_successful = false;
 	f_db = 0;
 	Connect();
-	
+
 }
 
 bool VDB_Connection::Connect()
@@ -43,9 +43,9 @@ bool VDB_Connection::Connect()
 
 	// Connect
 	f_db = TSQLServer::Connect( fDBserver.c_str(), fconnection_mode.c_str(), fconnection_option.c_str() );
-	
+
 	// Test the connection
-	
+
 	if( !f_db )
 	{
 		// connection failed
@@ -59,9 +59,9 @@ bool VDB_Connection::Connect()
 			cout << "VDB_Connection: failed to connect to database server" << endl;
 			cout << "\t server: " << fDBserver  << endl;
 			Close_Connection();
-			return fDB_Connection_successfull;
+			return fDB_Connection_successful;
 		}
-		
+
 	}
 	else if( Get_Nb_Connection() > fMAX_PROCESS )
 	{
@@ -74,43 +74,43 @@ bool VDB_Connection::Connect()
 			cout << "VDB_Connection: info: there is still too many (" << fNumb_Connection << ") DB connection, we don't want to open one more ..." << endl;
 			cout << "\t server: " <<  fDBserver << endl;
 			Close_Connection();
-			return fDB_Connection_successfull;
+			return fDB_Connection_successful;
 		}
 	}
-	
-	fDB_Connection_successfull = true;
-	return fDB_Connection_successfull;
+
+	fDB_Connection_successful = true;
+	return fDB_Connection_successful;
 }
 
 bool VDB_Connection::make_query( const char* the_query )
 {
 
-	fDB_Query_successfull = false;
-	
+	fDB_Query_successful = false;
+
 	if( !f_db )
 	{
-	
-		return fDB_Query_successfull;
-		
+
+		return fDB_Query_successful;
+
 	}
 	else
 	{
-	
+
 		fdb_res = f_db->Query( the_query );
-		
+
 		if( !fdb_res )
 		{
 			std::cout << "VDB_Connection::make_query no result for query:  " << the_query << std::endl;
-			return fDB_Query_successfull;
+			return fDB_Query_successful;
 		}
 		else
 		{
-			fDB_Query_successfull = true;
+			fDB_Query_successful = true;
 		}
-		
+
 	}
-	
-	return fDB_Query_successfull;
+
+	return fDB_Query_successful;
 }
 
 int  VDB_Connection::Get_Nb_Connection()
@@ -124,9 +124,7 @@ int  VDB_Connection::Get_Nb_Connection()
 	{
 		return -111;
 	}
-	
+
 	return fNumb_Connection;
-	
+
 }
-
-

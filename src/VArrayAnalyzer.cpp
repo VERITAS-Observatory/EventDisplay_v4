@@ -17,9 +17,9 @@ VArrayAnalyzer::VArrayAnalyzer()
 	{
 		cout << "VArrayAnalyzer::VArrayAnalyzer()" << endl;
 	}
-	
+
 	fInitialized = false;
-	
+
 	// set up data storage class (all analysis results are stored here)
 	fShowerParameters = new VShowerParameters( getNTel(), getRunParameter()->fShortTree, getEvndispReconstructionParameter()->fNMethods );
 	// set up MC data storage class
@@ -50,29 +50,29 @@ void VArrayAnalyzer::doAnalysis()
 	{
 		cout << "void VArrayAnalyzer::doAnalysis()" << endl;
 	}
-	
+
 	// only at first call in the analysis run: initialize data class, set trees
 	if( !fInitialized )
 	{
 		initAnalysis();
 		fInitialized = true;
 	}
-	
+
 	// fill simulation data
 	if( isMC() )
 	{
 		fillSimulationEvent();
 	}
-	
+
 	// return if triggered only events are written to output
 	if( getRunParameter()->fWriteTriggerOnly && !fReader->hasArrayTrigger() )
 	{
 		return;
 	}
-	
+
 	// reset data vectors, etc.
 	initEvent();
-	
+
 	if( isMC() )
 	{
 		// fill shower parameter tree
@@ -91,7 +91,7 @@ void VArrayAnalyzer::doAnalysis()
 			getShowerParameters()->MCaz = fReader->getMC_Az();
 		}
 	}
-	
+
 	// get reference pointing
 	if( getArrayPointing() )
 	{
@@ -111,7 +111,7 @@ void VArrayAnalyzer::doAnalysis()
 		getShowerParameters()->fWobbleNorth = 0.;
 		getShowerParameters()->fWobbleEast = 0.;
 	}
-	
+
 	for( unsigned int i = 0; i < getNTel(); i++ )
 	{
 		// get pointing direction
@@ -133,7 +133,7 @@ void VArrayAnalyzer::doAnalysis()
 	}
 	// compare calculated pointing with vbf pointing
 	checkPointing();
-	
+
 	////////////////////////////////////////////////////////
 	// do array analysis only if there is an array trigger
 	if( getReader()->hasArrayTrigger() )
@@ -151,13 +151,13 @@ void VArrayAnalyzer::doAnalysis()
 		calcShowerDirection_and_Core();
 		//////////////////////////////////////////////////////////////////////////////////////////////
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	// calculate RA and dec of shower direction
 	// (these are current epoch values)
 	for( unsigned int i = 0; i < getShowerParameters()->fNMethods; i++ )
 	{
-		// test for successfull reconstruction (zenith angle > 0.)
+		// test for successful reconstruction (zenith angle > 0.)
 		if( getShowerParameters()->fShowerZe[i] < 0. )
 		{
 			continue;
@@ -181,11 +181,11 @@ void VArrayAnalyzer::doAnalysis()
 		}
 	}
 	getShowerParameters()->eventStatus = getAnalysisArrayEventStatus();
-	
+
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	// fill shower parameter tree with results
 	getShowerParameters()->getTree()->Fill();
-	
+
 }
 
 
@@ -198,24 +198,24 @@ void VArrayAnalyzer::initEvent()
 	{
 		cout << "void VArrayAnalyzer::initEvent()" << endl;
 	}
-	
+
 	setAnalysisArrayEventStatus( 0 );
-	
+
 	// reset shower parameters
 	getShowerParameters()->reset( getNTel() );
-	
+
 	// get basic infos for this event
 	getShowerParameters()->runNumber = getRunNumber();
 	getShowerParameters()->eventNumber = getEventNumber();
 	getShowerParameters()->fsourcetype = fReader->getDataFormatNum();
 	getShowerParameters()->fNTelescopes = getNTel();
-	
+
 	getShowerParameters()->time = getEventTime();
 	getShowerParameters()->MJD  = getEventMJD();
-	
+
 	calcTelescopePointing() ;
 	getArrayPointing()->fillPointingTree();
-	
+
 	// set telescope pointing for data (again) and fill pointing tree
 	if( !fReader->isMC() )
 	{
@@ -229,9 +229,9 @@ void VArrayAnalyzer::initEvent()
 		}
 	}
 	/////////////////////////////////////////////////////////////////////
-	
+
 	getShowerParameters()->fTraceFit = ( ( int )getTraceFit() ) * 100;
-	
+
 	// get number of telescopes with local trigger
 	// (works only for relatively small number of telescopes)
 	bitset<8 * sizeof( unsigned long )> i_ntrigger;
@@ -350,7 +350,7 @@ void VArrayAnalyzer::generateReducedPointingTreeData()
 	{
 		return;
 	}
-	
+
 	int    iMJD  = TMath::Nint( MJDStart );
 	double iTime = TimeStart ;
 	int    timeDur = 0 ;
@@ -358,14 +358,14 @@ void VArrayAnalyzer::generateReducedPointingTreeData()
 	{
 		// loop over run duration, 1 loop per second
 		iTime += 1.0 ;
-		
+
 		// cycle to next MJD if needed
 		if( iTime >= 86400.0 )
 		{
 			iTime = iTime - 86400.0 ;
 			iMJD += 1 ;
 		}
-		
+
 		// set time, init telescope pointing
 		setAnalysisArrayEventStatus( 0 );
 		getShowerParameters()->reset( getNTel() );
@@ -376,7 +376,7 @@ void VArrayAnalyzer::generateReducedPointingTreeData()
 		getShowerParameters()->time = iTime ;
 		getShowerParameters()->MJD  = iMJD  ;
 		updatePointingToArbitraryTime( iMJD, iTime ) ;
-		
+
 		// fill pointing to tree in VArrayPointing
 		getArrayPointing()->fillPntReduced() ;
 		timeDur += 1 ;
@@ -392,10 +392,10 @@ void VArrayAnalyzer::initAnalysis()
 	{
 		cout << "void VArrayAnalyzer::initAnalysis()" << endl;
 	}
-	
+
 	fMeanPointingMismatch.assign( getNTel(), 0. );
 	fNMeanPointingMismatch.assign( getNTel(), 0. );
-	
+
 	// initialize star catalogue
 	initializeStarCatalogue( getEventMJD(), getEventTime() );
 }
@@ -466,9 +466,9 @@ void VArrayAnalyzer::terminate( bool iWriteDebug )
 	{
 		cout << "void VArrayAnalyzer::terminate()" << endl;
 	}
-	
+
 	generateReducedPointingTreeData() ;
-	
+
 	if( fOutputfile != 0 && fRunPar->foutputfileName != "-1" )
 	{
 		// write pointing mismatch
@@ -493,7 +493,7 @@ void VArrayAnalyzer::terminate( bool iWriteDebug )
 			}
 		}
 		fOutputfile->cd();
-		
+
 		if( !getShowerParameters()->getTree() )
 		{
 			return;
@@ -635,26 +635,26 @@ void VArrayAnalyzer::transformTelescopePosition( int iTel, float i_ze, float i_a
 	// calculate direction cosinii
 	i_xcos = sin( i_ze / TMath::RadToDeg() ) * sin( ( i_az - 180. ) / TMath::RadToDeg() );
 	i_ycos = sin( i_ze / TMath::RadToDeg() ) * cos( ( i_az - 180. ) / TMath::RadToDeg() );
-	
+
 	setTelID( iTel );
 	// call to GrIsu routine
 	tel_impact( i_xcos, i_ycos, getDetectorGeo()->getTelXpos()[iTel], getDetectorGeo()->getTelYpos()[iTel], getDetectorGeo()->getTelZpos()[iTel], &i_xrot, &i_yrot, &i_zrot, false );
-	
+
 	getImageParameters()->Tel_x_SC = i_xrot;
 	getImageParameters()->Tel_y_SC = i_yrot;
 	getImageParameters()->Tel_z_SC = i_zrot;
-	
+
 	if( getRunParameter()->fImageLL )
 	{
 		getImageParametersLogL()->Tel_x_SC = i_xrot;
 		getImageParametersLogL()->Tel_y_SC = i_yrot;
 		getImageParametersLogL()->Tel_z_SC = i_zrot;
 	}
-	
+
 	getShowerParameters()->fTel_x_SC[iTel] = i_xrot;
 	getShowerParameters()->fTel_y_SC[iTel] = i_yrot;
 	getShowerParameters()->fTel_z_SC[iTel] = i_zrot;
-	
+
 	if( i_MC )
 	{
 		// transformation of Monte Carlo shower core into shower coordinates
@@ -680,21 +680,21 @@ void VArrayAnalyzer::transformTelescopePosition( int iTel, float i_ze, float i_a
 void VArrayAnalyzer::selectShowerImages( unsigned int iMeth )
 {
 	bool fSelectDebug = false;
-	
+
 	getShowerParameters()->fTelIDImageSelected[iMeth].clear();
 	getShowerParameters()->fTelIDImageSelected_bitcode[iMeth] = 0;
 	getShowerParameters()->fShowerNumImages[iMeth] = 0;
-	
+
 	//////////////////////////////////////////////////////////////////////////////////
 	// loop over all telescopes and check which image is suitable for reconstruction
 	for( unsigned int t = 0; t < getNTel(); t++ )
 	{
 		setTelID( t );
-		
+
 		// reset list with selected images
 		getShowerParameters()->fTelIDImageSelected_list[iMeth][t] = 0;
 		getShowerParameters()->fTelIDImageSelected[iMeth].push_back( true );
-		
+
 		if( fSelectDebug )
 		{
 			cout << "VArrayAnalyzer::selectShowerImages " << getTelID() + 1 << "\t" << getEventNumber() << "\t" << iMeth << endl;
@@ -703,7 +703,7 @@ void VArrayAnalyzer::selectShowerImages( unsigned int iMeth )
 		{
 			cout << "VArrayAnalyzer::selectShowerImages eventstatus " << getImageParameters( getRunParameter()->fImageLL )->eventStatus << endl;
 		}
-		
+
 		// get telescope type for this telescope
 		int iTelType = fEvndispReconstructionParameter->getTelescopeType_counter( getDetectorGeometry()->getTelType()[t] );
 		if( iTelType < 0 )
@@ -712,7 +712,7 @@ void VArrayAnalyzer::selectShowerImages( unsigned int iMeth )
 			exit( -1 );
 			continue;
 		}
-		
+
 		// apply array analysis cuts
 		updatePointingToStarCatalogue( t );
 		getShowerParameters()->fTelIDImageSelected[iMeth].back() = fEvndispReconstructionParameter->applyArrayAnalysisCuts( iMeth, t, iTelType,
@@ -720,22 +720,22 @@ void VArrayAnalyzer::selectShowerImages( unsigned int iMeth )
 				getReader()->getLocalTriggerType( t ),
 				getStarCatalogue() );
 		// apply cut on image distance to stars
-		
+
 		///////////////////////////
-		
-		// check if fit was successfull
+
+		// check if fit was successful
 		if( getRunParameter()->fImageLL && getImageParametersLogL()->Fitstat < 3 )
 		{
 			getShowerParameters()->fTelIDImageSelected[iMeth].back() = false;
 		}
-		
+
 		// list of selected images
 		if( getShowerParameters()->fTelIDImageSelected[iMeth].back() )
 		{
 			getShowerParameters()->fTelIDImageSelected_list[iMeth][getTelID()] = 1;
 			getShowerParameters()->fShowerNumImages[iMeth]++;
 		}
-		
+
 		bitset<8 * sizeof( unsigned long )> i_nimage;
 		if( fNTel < i_nimage.size() )
 		{
@@ -769,7 +769,7 @@ void VArrayAnalyzer::calcShowerDirection_and_Core()
 	{
 		cout << "VArrayAnalyzer::calcShowerDirection_and_Core()" << endl;
 	}
-	
+
 	// loop over all methods
 	for( unsigned int i = 0; i < getShowerParameters()->fNMethods; i++ )
 	{
@@ -779,7 +779,7 @@ void VArrayAnalyzer::calcShowerDirection_and_Core()
 			getShowerParameters()->fMethodID[i] = getEvndispReconstructionParameter()->fMethodID[i];
 			// select shower images to be used to determinate shower coordinates
 			selectShowerImages( i );
-			
+
 			// call reconstruction method
 			if( getEvndispReconstructionParameter()->fMethodID[i] == 0 )
 			{
@@ -829,12 +829,12 @@ int VArrayAnalyzer::rcs_method_0( unsigned int iMethod )
 	{
 		cout << "VArrayAnalyzer::rcs_method_0 " << iMethod << endl;
 	}
-	
+
 	/* Requires phi, xc, yc, and sum image parameters
-	
+
 	   use image parameters, phi, xc, and yc to determine image
 	   axes. Use rcs_perpendicular_fit to find source point.
-	
+
 	   find impact point by rotation through delta to position
 	   source point at camera center, then find impact point
 	   using ground lines connecting the reconstructed shower
@@ -842,17 +842,17 @@ int VArrayAnalyzer::rcs_method_0( unsigned int iMethod )
 	   point found using rcs_perpendicular_fit.
 	*/
 	int num_images = 0;                           /* number of images included in the fit */
-	
+
 	float xs = 0.;
 	float ys = 0.;
 	float stds = 0.;
-	
+
 	float ximp = 0.;                              /* impact point, from perpen. minimization */
 	float yimp = 0.;
 	float stdp = 0.;
-	
+
 	num_images = getShowerParameters()->fShowerNumImages[iMethod];
-	
+
 	// are there enough images the run an array analysis. Also check for less images in order to do event-type analyses.
 	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] &&
 			num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod] )
@@ -864,7 +864,7 @@ int VArrayAnalyzer::rcs_method_0( unsigned int iMethod )
 		fillShowerDirection( iMethod, 0., 0., -1. );
 		return 0;
 	}
-	
+
 	// don't do anything if angle between image axis is too small (for 2 images only)
 	if( num_images == 2 )
 	{
@@ -881,29 +881,29 @@ int VArrayAnalyzer::rcs_method_0( unsigned int iMethod )
 	{
 		getShowerParameters()->fiangdiff[iMethod] = 0.;
 	}
-	
+
 	///////////////////////////////
 	// direction reconstruction
 	///////////////////////////////
 	// calculate offset in camera coordinates
-	
+
 	rcs_perpendicular_fit( x, y, w, m, num_images, &xs, &ys, &stds );
-	
+
 	// assume all focal lengths of all telescopes are the same
 	xs = atan( xs / ( 1000. * getDetectorGeo()->getFocalLength()[0] ) ) * TMath::RadToDeg();
 	ys = atan( ys / ( 1000. * getDetectorGeo()->getFocalLength()[0] ) ) * TMath::RadToDeg();
 	stds = atan( stds / ( 1000. * getDetectorGeo()->getFocalLength()[0] ) ) * TMath::RadToDeg();
-	
+
 	// calculate and fill directions
 	if( !fillShowerDirection( iMethod, xs, ys, stds ) )
 	{
 		return 0;
 	}
-	
+
 	// end of direction reconstruction
 	////////////////////////////////////////////////
 	////////////////////////////////////////////////
-	
+
 	/* - - - - - now find the impact location in the plane
 	    perpendicular to the array. Since we know the source location,
 	    we can rotate the array to point in this direction thus moving
@@ -911,11 +911,11 @@ int VArrayAnalyzer::rcs_method_0( unsigned int iMethod )
 	    will be at (0, 0).
 	*/
 	prepareforCoreReconstruction( iMethod, xs, ys );
-	
+
 	/* Now call perpendicular_distance for the fit, returning ximp and yimp */
-	
+
 	rcs_perpendicular_fit( x, y, w, m, num_images, &ximp, &yimp, &stdp );
-	
+
 	if( isnormal( ximp ) && isnormal( yimp ) )
 	{
 		fillShowerCore( iMethod, ximp, yimp );
@@ -929,7 +929,7 @@ int VArrayAnalyzer::rcs_method_0( unsigned int iMethod )
 		getShowerParameters()->fShower_stdP[iMethod] = 0.;
 		getShowerParameters()->fShower_Chi2[iMethod] = -2.;
 	}
-	
+
 	return 0;
 }
 
@@ -953,7 +953,7 @@ bool VArrayAnalyzer::fillShowerCore( unsigned int iMeth, float ximp, float yimp 
 	// reconstructed shower core in shower coordinates
 	getShowerParameters()->fShowerXcore_SC[iMeth] = ximp;
 	getShowerParameters()->fShowerYcore_SC[iMeth] = yimp;
-	
+
 	// reconstructed shower core in ground coordinates
 	float i_xcos = 0.;
 	float i_ycos = 0.;
@@ -1000,13 +1000,13 @@ bool VArrayAnalyzer::fillShowerCore( unsigned int iMeth, float ximp, float yimp 
 	}
 	getShowerParameters()->fShowerXcore[iMeth] = igx;
 	getShowerParameters()->fShowerYcore[iMeth] = igy;
-	
+
 	// z coordinate should be zero in ground coordinate system, if not -> problem
 	if( fabs( igz ) > 1.e3 )
 	{
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -1014,14 +1014,14 @@ bool VArrayAnalyzer::fillShowerCore( unsigned int iMeth, float ximp, float yimp 
 void VArrayAnalyzer::checkPointing()
 {
 	float iPointingDiff = 0.;
-	
+
 	// there is no pointing available
 	if( getNoPointing() )
 	{
 		return;
 	}
 	bitset<4> bitPointingStatus;
-	
+
 	// calculate difference between calculated pointing direction and vbf pointing direction
 	if( getReader()->getArrayTrigger() )
 	{
@@ -1042,7 +1042,7 @@ void VArrayAnalyzer::checkPointing()
 			{
 				continue;
 			}
-			
+
 			getShowerParameters()->fTelElevationVBF[i] = getReader()->getArrayTrigger()->getAltitude( ivbf );
 			getShowerParameters()->fTelAzimuthVBF[i]   = getReader()->getArrayTrigger()->getAzimuth( ivbf );
 			if( i < getPointing().size() && getPointing()[i] )
@@ -1051,11 +1051,11 @@ void VArrayAnalyzer::checkPointing()
 								( 90. - getPointing()[i]->getTelElevation() ) / TMath::RadToDeg(),
 								getReader()->getArrayTrigger()->getAzimuth( ivbf ) / TMath::RadToDeg(),
 								( 90. - getReader()->getArrayTrigger()->getAltitude( ivbf ) ) / TMath::RadToDeg() );
-								
+
 				getShowerParameters()->fTelPointingMismatch[i] = iPointingDiff;
 				getShowerParameters()->fTelPointingErrorX[i] = getPointing()[i]->getPointingErrorX();
 				getShowerParameters()->fTelPointingErrorY[i] = getPointing()[i]->getPointingErrorY();
-				
+
 				if( getPointing()[i]->getPointingEventStatus() == 0 )
 				{
 					fMeanPointingMismatch[i] += iPointingDiff;
@@ -1065,7 +1065,7 @@ void VArrayAnalyzer::checkPointing()
 				{
 					bitPointingStatus.set( i, 1 );
 				}
-				
+
 				// check pointing difference, abort if too large
 				if( getRunParameter()->fCheckPointing < 900. && iPointingDiff > getRunParameter()->fCheckPointing )
 				{
@@ -1114,7 +1114,7 @@ double VArrayAnalyzer::getMeanPointingMismatch( unsigned int iTel )
 			}
 		}
 	}
-	
+
 	return -3.;
 }
 
@@ -1141,7 +1141,7 @@ float VArrayAnalyzer::recalculateImagePhi( double iDeltaX, double iDeltaY )
 		float i_sdevxy  = getImageParameters( getRunParameter()->fImageLL )->f_sdevxy;
 		i_phi = atan2( ( i_d + i_s ) * i_cen_y + 2.*i_sdevxy * i_cen_x, 2.*i_sdevxy * i_cen_y - ( i_d - i_s ) * i_cen_x );
 	}
-	
+
 	return i_phi;
 }
 
@@ -1166,19 +1166,19 @@ int VArrayAnalyzer::rcs_method_3( unsigned int iMethod )
 	{
 		cout << "VArrayAnalyzer::rcs_method_3 " << iMethod << endl;
 	}
-	
+
 	int num_images = 0;                           /* number of images included in the fit */
-	
+
 	float xs = 0.;
 	float ys = 0.;
 	float stds = 0.;
-	
+
 	float ximp = 0.;                              /* impact point, from perpen. minimization */
 	float yimp = 0.;
 	float stdp = 0.;
-	
+
 	num_images = getShowerParameters()->fShowerNumImages[iMethod];
-	
+
 	// are there enough images the run an array analysis
 	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] &&
 			num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod] )
@@ -1206,14 +1206,14 @@ int VArrayAnalyzer::rcs_method_3( unsigned int iMethod )
 	{
 		getShowerParameters()->fiangdiff[iMethod] = 0.;
 	}
-	
+
 	///////////////////////////////
 	// direction reconstruction
 	///////////////////////////////
 	/* Now call perpendicular_distance for the fit, returning xs and ys */
-	
+
 	// Hofmann et al 1999, Method 1 (HEGRA method)
-	
+
 	vector< float > xx( 2, 0. );
 	vector< float > yy( 2, 0. );
 	vector< float > ww( 2, 0. );
@@ -1239,11 +1239,11 @@ int VArrayAnalyzer::rcs_method_3( unsigned int iMethod )
 			yy[1] = y[jj];
 			ww[1] = 1.;
 			mm[1] = m[jj];
-			
+
 			rcs_perpendicular_fit( xx, yy, ww, mm, 2, &xs, &ys, &stds );
-			
+
 			iangdiff = sin( fabs( atan( m[jj] ) - atan( m[ii] ) ) );
-			
+
 			// discard all pairs with almost parallel lines
 			float i_diff =  fabs( atan( m[0] ) - atan( m[1] ) );
 			if( i_diff < fEvndispReconstructionParameter->fAxesAngles_min[iMethod] / TMath::RadToDeg() ||
@@ -1251,11 +1251,11 @@ int VArrayAnalyzer::rcs_method_3( unsigned int iMethod )
 			{
 				continue;
 			}
-			
+
 			iweight  = 1. / ( 1. / w[ii] + 1. / w[jj] );
 			iweight *= 1. / ( l[ii] + l[jj] );
 			iweight *= iangdiff;
-			
+
 			ixs += atan( xs / ( 1000. * getDetectorGeo()->getFocalLength()[0] ) ) * iweight * TMath::RadToDeg();
 			iys += atan( ys / ( 1000. * getDetectorGeo()->getFocalLength()[0] ) ) * iweight * TMath::RadToDeg();
 			itotweight += iweight;
@@ -1271,22 +1271,22 @@ int VArrayAnalyzer::rcs_method_3( unsigned int iMethod )
 		xs = -99999.;
 		ys = -99999.;
 	}
-	
+
 	if( !fillShowerDirection( iMethod, xs, ys, stds ) )
 	{
 		return 0;
 	}
-	
+
 	// core reconstruction
-	
+
 	prepareforCoreReconstruction( iMethod, xs, ys );
-	
+
 	// Now call perpendicular_distance for the fit, returning ximp and yimp
-	
+
 	rcs_perpendicular_fit( x, y, w, m, num_images, &ximp, &yimp, &stdp );
-	
+
 	// convert xs,ys into [deg]
-	
+
 	if( isnormal( ximp ) && isnormal( yimp ) )
 	{
 		fillShowerCore( iMethod, ximp, yimp );
@@ -1298,7 +1298,7 @@ int VArrayAnalyzer::rcs_method_3( unsigned int iMethod )
 	{
 		getShowerParameters()->fShower_Chi2[iMethod] = -2.;
 	}
-	
+
 	return 0;
 }
 
@@ -1325,16 +1325,16 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
 		cout << "VArrayAnalyzer::rcs_method_4 " << iMethod << endl;
 	}
 	int num_images = 0;                           /* number of images included in the fit */
-	
+
 	float xs = 0.;
 	float ys = 0.;
-	
+
 	float ximp = 0.;                              /* impact point, from perpen. minimization */
 	float yimp = 0.;
 	float stdp = 0.;
-	
+
 	num_images = getShowerParameters()->fShowerNumImages[iMethod];
-	
+
 	// are there enough images the run an array analysis
 	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] &&
 			num_images <= ( int )fEvndispReconstructionParameter->fNImages_max[iMethod] )
@@ -1346,7 +1346,7 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
 		fillShowerDirection( iMethod, 0., 0., -1. );
 		return 0;
 	}
-	
+
 	// don't do anything if angle between image axis is too small (for 2 images only)
 	if( num_images == 2 )
 	{
@@ -1363,13 +1363,13 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
 	{
 		getShowerParameters()->fiangdiff[iMethod] = 0.;
 	}
-	
+
 	///////////////////////////////
 	// direction reconstruction
 	////////////////////////////////////////////////
 	// Hofmann et al 1999, Method 1 (HEGRA method)
 	// (modified weights)
-	
+
 	float itotweight = 0.;
 	float iweight = 1.;
 	float ixs = 0.;
@@ -1377,9 +1377,9 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
 	float iangdiff = 0.;
 	float b1 = 0.;
 	float b2 = 0.;
-	
+
 	double i_weight_max = 0.;
-	
+
 	for( unsigned int ii = 0; ii < m.size(); ii++ )
 	{
 		for( unsigned int jj = 1; jj < m.size(); jj++ )
@@ -1388,7 +1388,7 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
 			{
 				continue;
 			}
-			
+
 			// check minimum angle between image lines; ignore if too small
 			iangdiff = fabs( atan( m[jj] ) - atan( m[ii] ) );
 			if( iangdiff < fEvndispReconstructionParameter->fAxesAngles_min[iMethod] / TMath::RadToDeg() ||
@@ -1398,10 +1398,10 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
 			}
 			// weight is sin of angle between image lines
 			iangdiff = fabs( sin( fabs( atan( m[jj] ) - atan( m[ii] ) ) ) );
-			
+
 			b1 = y[ii] - m[ii] * x[ii];
 			b2 = y[jj] - m[jj] * x[jj];
-			
+
 			// line intersection
 			if( m[ii] != m[jj] )
 			{
@@ -1412,18 +1412,18 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
 				xs = 0.;
 			}
 			ys = m[ii] * xs + b1;
-			
-			
+
+
 			iweight  = 1. / ( 1. / w[ii] + 1. / w[jj] ); // weight 1: size of images
 			iweight *= ( 1. - l[ii] ) * ( 1. - l[jj] ); // weight 2: elongation of images (width/length)
 			iweight *= iangdiff;                      // weight 3: angular differences between the two image axis
 			iweight *= iweight;                       // use squared value
-			
+
 			if( iweight > i_weight_max )
 			{
 				i_weight_max = iweight;
 			}
-			
+
 			/*  DEBUG for reconstruction
 				    cout << "PAIR " << telID[ii] << "," << telID[jj] << ": ";
 				    cout << iweight << ", " << w[ii] << ", " << w[jj] << ", S: " << 1./(1./w[ii] + 1./w[jj]);
@@ -1432,7 +1432,7 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
 				    cout << ",I " << x[ii] << ", " << y[ii];
 				    cout << ",J " << x[jj] << ", " << y[jj];
 				    cout << ", X " << xs << " Y " << ys << endl; */
-			
+
 			ixs += xs * iweight;
 			iys += ys * iweight;
 			itotweight += iweight;
@@ -1448,29 +1448,29 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
 		xs = -99999.;
 		ys = -99999.;
 	}
-	
+
 	if( !fillShowerDirection( iMethod, xs, ys, 0. ) )
 	{
 		return 0;
 	}
-	
+
 	////////////////////////////////////////////////
-	
+
 	// core reconstruction
-	
+
 	prepareforCoreReconstruction( iMethod, xs, ys );
-	
+
 	// Now call perpendicular_distance for the fit, returning ximp and yimp
-	
+
 	rcs_perpendicular_fit( x, y, w, m, num_images, &ximp, &yimp, &stdp );
-	
+
 	// convert xs,ys into [deg]
-	
+
 	fillShowerCore( iMethod, ximp, yimp );
 	getShowerParameters()->fShower_stdP[iMethod] = stdp;
 	/* indicates fit ok */
 	getShowerParameters()->fShower_Chi2[iMethod] = 0.0;
-	
+
 	return 0;
 }
 
@@ -1487,14 +1487,14 @@ bool VArrayAnalyzer::fillShowerDirection( unsigned int iMethod, float xs, float 
 		getShowerParameters()->fShowerAz[iMethod] = -99999.;
 		getShowerParameters()->fShower_stdS[iMethod] = -99999.;
 		getShowerParameters()->fShower_Chi2[iMethod] = -99999.;
-		
+
 		return false;
 	}
 	if( xs < -9998. || ys < -9998. )
 	{
 		getShowerParameters()->fShower_Chi2[iMethod] = -99999.;
 	}
-	
+
 	getShowerParameters()->fShower_Xoffset[iMethod] = xs;
 	if( getDetectorGeo()->getGrIsuVersion() >= 412 )
 	{
@@ -1504,7 +1504,7 @@ bool VArrayAnalyzer::fillShowerDirection( unsigned int iMethod, float xs, float 
 	{
 		getShowerParameters()->fShower_Yoffset[iMethod] = ys;
 	}
-	
+
 	double ze = 0.;
 	double az = 0.;
 	if( getArrayPointing() )
@@ -1523,7 +1523,7 @@ bool VArrayAnalyzer::fillShowerDirection( unsigned int iMethod, float xs, float 
 	getShowerParameters()->fShowerZe[iMethod] = ze;
 	getShowerParameters()->fShowerAz[iMethod] = VSkyCoordinatesUtilities::adjustAzimuthToRange( az );
 	getShowerParameters()->fShower_stdS[iMethod] = stds;
-	
+
 	// calculate derotated shower directions
 	if( !fReader->isMC() )
 	{
@@ -1535,7 +1535,7 @@ bool VArrayAnalyzer::fillShowerDirection( unsigned int iMethod, float xs, float 
 			iUTC = VSkyCoordinatesUtilities::getUTC( getShowerParameters()->MJD, getShowerParameters()->time );
 			getArrayPointing()->derotateCoords( iUTC, getShowerParameters()->fShower_Xoffset[iMethod], -1.*getShowerParameters()->fShower_Yoffset[iMethod], xrot, yrot );
 		}
-		
+
 		getShowerParameters()->fShower_XoffsetDeRot[iMethod] = xrot;
 		getShowerParameters()->fShower_YoffsetDeRot[iMethod] = -1.*yrot;
 	}
@@ -1544,7 +1544,7 @@ bool VArrayAnalyzer::fillShowerDirection( unsigned int iMethod, float xs, float 
 		getShowerParameters()->fShower_XoffsetDeRot[iMethod] = getShowerParameters()->fShower_Xoffset[iMethod];
 		getShowerParameters()->fShower_YoffsetDeRot[iMethod] = getShowerParameters()->fShower_Yoffset[iMethod];
 	}
-	
+
 	return true;
 }
 
@@ -1555,13 +1555,13 @@ void VArrayAnalyzer::prepareforDirectionReconstruction( unsigned int iMethodInde
 	{
 		cout << "VArrayAnalyzer::prepareforDirectionReconstruction; preparing method " << iMethodIndex << endl;
 	}
-	
+
 	double iPointingErrorX = 0.;
 	double iPointingErrorY = 0.;
 	float i_cen_x = 0.;
 	float i_cen_y = 0.;
 	float i_phi = 0.;
-	
+
 	// reset data vectors
 	telID.clear();
 	x.clear();
@@ -1589,7 +1589,7 @@ void VArrayAnalyzer::prepareforDirectionReconstruction( unsigned int iMethodInde
 	ltrig.clear();
 	ze.clear();
 	az.clear();
-	
+
 	///////////////////////////////////////////////
 	// fill the x, y, w, and m arrays for the fit
 	for( unsigned int tel = 0; tel < getNTel(); tel++ )
@@ -1638,7 +1638,7 @@ void VArrayAnalyzer::prepareforDirectionReconstruction( unsigned int iMethodInde
 			{
 				m.push_back( 1.e9 );
 			}
-			
+
 			phi.push_back( i_phi );
 			sinphi.push_back( sin( i_phi ) );
 			cosphi.push_back( cos( i_phi ) );
@@ -1692,7 +1692,7 @@ void VArrayAnalyzer::prepareforCoreReconstruction( unsigned int iMethodIndex, fl
 		ztelnew.push_back( 0. );
 	}
 	rcs_rotate_delta( xtel, ytel, ztel, xtelnew, ytelnew, ztelnew, xs / TMath::RadToDeg(), ys / TMath::RadToDeg(), getNTel() );
-	
+
 	/* fill the x, y, w, and m arrays  */
 	x.clear();
 	y.clear();
@@ -1740,7 +1740,7 @@ bool VArrayAnalyzer::fillSimulationEvent()
 		return false;
 	}
 #endif
-	
+
 	if( fReader->isMC() )
 	{
 		if( getMCParameters() )
@@ -1766,7 +1766,7 @@ bool VArrayAnalyzer::fillSimulationEvent()
 
 /*
 
-   pass telescope pointing to star catalogue for calcuation of
+   pass telescope pointing to star catalogue for calculation of
    distance to bright stars
 
 */
@@ -1776,7 +1776,7 @@ bool VArrayAnalyzer::updatePointingToStarCatalogue( unsigned int iTelescope )
 	{
 		return false;
 	}
-	
+
 	// get pointing of telescope
 	float iTel_dec = 0.;
 	float iTel_ra  = 0.;
@@ -1799,10 +1799,10 @@ bool VArrayAnalyzer::updatePointingToStarCatalogue( unsigned int iTelescope )
 	{
 		iScale = getDetectorGeometry()->getCameraScaleFactor()[iTelescope];
 	}
-	
+
 	getStarCatalogue()->setTelescopePointing( iTelescope, getArrayPointing()->getDerotationAngle( getEventMJD(), getEventTime() ) * TMath::RadToDeg(),
 			iTel_ra, iTel_dec, iScale );
-			
+
 	return true;
 }
 
@@ -1818,7 +1818,7 @@ void VArrayAnalyzer::updatePointingToArbitraryTime( int iMJD, double iTime )
 			getArrayPointing()->isSet() &&
 			( getArrayPointing()->getTargetName() != "laser" ) )
 	{
-	
+
 		getArrayPointing()->updatePointing( iMJD, iTime );
 		if( !getArrayPointing()->isPrecessed() )
 		{
@@ -1827,7 +1827,7 @@ void VArrayAnalyzer::updatePointingToArbitraryTime( int iMJD, double iTime )
 			getArrayPointing()->setWobbleOffset( getRunParameter()->fWobbleNorth, getRunParameter()->fWobbleEast, -1, iMJD );
 			getArrayPointing()->updatePointing( iMJD, iTime );
 		}
-		
+
 	}
-	
+
 }

@@ -8,12 +8,12 @@
 VSpecialChannel::VSpecialChannel( unsigned int iTelID )
 {
 	fTelID = iTelID;
-	
+
 	fDebug = false;
-	
-	// zombie until successfull reading of a file
+
+	// zombie until successful reading of a file
 	fIsZombie = true;
-	
+
 	fSpecialChannelFile = "";
 }
 
@@ -38,14 +38,14 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 		cout << "reading special channels (L2 channels, etc) from: " << endl;
 		cout << "Telescope " << getTelID() + 1 << ": ";
 		cout << ifile << endl;
-		
+
 		string is_line;
 		string is_temp;
-		
+
 		int iRunMin = 0;
 		int iRunMax = 0;
 		bool bRunFound = false;
-		
+
 		while( getline( is, is_line ) )
 		{
 			if( is_line.size() <= 0 )
@@ -56,10 +56,10 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 			{
 				continue;
 			}
-			
+
 			istringstream is_stream( is_line );
 			is_stream >> is_temp;
-			
+
 			// check range of runs
 			is_stream >> is_temp;
 			if( is_temp == "RUN" )
@@ -91,7 +91,7 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 				{
 					continue;
 				}
-				
+
 				///////////////////////////////////////
 				// special channel types
 				//
@@ -101,7 +101,7 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 				//
 				///////////////////////////////////////
 				is_stream >> is_temp;
-				
+
 				///////////////////////////////////////
 				// L2 channels
 				if( is_temp == "L2" )
@@ -143,7 +143,7 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 							fChannelStatus[iC] = iStatusFlag;
 						}
 					}
-					
+
 				}
 				///////////////////////////////////////
 				// HIGHQE channels
@@ -174,7 +174,7 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 		is.close();
 		//////////////////////////////////////////////////////////////
 		// print channels to screen
-		
+
 		// print L2 channels
 		if( getFADCstopTrigChannelID().size() > 0 )
 		{
@@ -211,7 +211,7 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 			cout << endl;
 		}
 	}
-	
+
 	return true;
 }
 
@@ -236,7 +236,7 @@ bool VSpecialChannel::readThroughput( string iEpoch, string ifile, string iDirec
 	cout << "reading throughput correction from: " << endl;
 	cout << "Telescope " << getTelID() + 1 << ": ";
 	cout << ifile << endl;
-	
+
 	string is_line;
 	string is_temp;
 	while( getline( is, is_line ) )
@@ -249,10 +249,10 @@ bool VSpecialChannel::readThroughput( string iEpoch, string ifile, string iDirec
 		{
 			continue;
 		}
-		
+
 		istringstream is_stream( is_line );
 		is_stream >> is_temp;
-		
+
 		// check epoch
 		is_stream >> is_temp;
 		if( is_temp == "s" )
@@ -308,7 +308,7 @@ double VSpecialChannel::getHIGHQE_gainfactor( unsigned int chanID )
 	{
 		return fHIGHQE_gainfactor[chanID];
 	}
-	
+
 	return -1;
 }
 
@@ -318,6 +318,6 @@ unsigned int VSpecialChannel::getChannelStatus( unsigned int chanID )
 	{
 		return fChannelStatus[chanID];
 	}
-	
+
 	return 1;
 }

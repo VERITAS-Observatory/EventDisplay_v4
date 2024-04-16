@@ -59,22 +59,22 @@ FITSRecord::FITSRecord( std::string fits_filename,
 	//string templatename = locateTemplate( template_filename );
 	// this segfaults out when it tries to get environment variable FITSRECORD_PATH
 	string templatename = template_filename ;
-	
+
 	if( DEBUG )
 	{
 		cout << "DEBUG: " << fits_filename << "  " << template_filename << endl;
 	}
-	
+
 	int status = 0;
 	string fullname = fits_filename + "(" + templatename + ")";
-	
+
 	// first try to open the file
 	if( _verbose >= 2 )
 	{
 		cout << "Looking for: " << fits_filename << endl;
 	}
 	fits_open_file( &_fptr, fits_filename.c_str(), READWRITE, &status );
-	
+
 	if( status )
 	{
 		if( _verbose >= 2 )
@@ -84,55 +84,55 @@ FITSRecord::FITSRecord( std::string fits_filename,
 		fitsfile* newfptr;
 		fits_reopen_file( _fptr, &newfptr, &status );
 	}
-	
+
 	// try to create the file
 	if( status )
 	{
-	
+
 		// the file may not exist, so try to create it:
-		
+
 		if( _verbose >= 2 )
 		{
 			cout << "CREATING " << fullname.c_str() << endl;
 		}
-		
+
 		status = 0;
 		fits_create_file( &_fptr, fullname.c_str(), &status );
-		
+
 	}
-	
+
 	// finally give up
 	if( status )
 	{
 		throw FITSRecordError( "FITSRecord create file: " + getFITSError( status ) );
 	}
-	
-	
+
+
 	if( extension_name != "" )
 	{
-	
+
 		if( DEBUG )
 		{
 			cout << "MOVING TO EXTENSION: " << extension_name << endl;
 		}
-		
+
 		fits_movnam_hdu( _fptr, BINARY_TBL,
 						 const_cast<char*>( extension_name.c_str() ),
 						 extension_version, &status );
 	}
 	else
 	{
-	
+
 		int type = 0;
 		fits_movabs_hdu( _fptr, 1, &type, &status );
-		
+
 	}
-	
+
 	if( status )
 	{
 		throw FITSRecordError( "FITSRecord hdu: " + getFITSError( status ) );
 	}
-	
+
 	// check the version number:
 	int real_extension_version;
 	char comment[100];
@@ -142,9 +142,9 @@ FITSRecord::FITSRecord( std::string fits_filename,
 	{
 		_extension_version = real_extension_version;
 	}
-	
+
 	writeDate();
-	
+
 }
 
 void
@@ -167,25 +167,25 @@ lookupColInfo( string column )
 	FITSRecord::ColInfo col;
 	int colnum = -1;
 	int status = 0;
-	
+
 	char name[100];
 	strncpy( name, column.c_str(), 100 ) ;
-	
+
 	fits_get_colnum( _fptr, CASEINSEN, name, &colnum, &status );
-	
+
 	if( status )
 	{
 		throw FITSRecordError( "Couldn't find column " + column
 							   + " in the table (check the template or code for typos)" );
 	}
-	
+
 	col.name = name;
 	col.num = colnum;
-	
+
 	fits_get_coltype( _fptr, col.num,
 					  &col.typecode, &col.repeat, &col.width,
 					  &status );
-					  
+
 	return col;
 }
 
@@ -204,17 +204,17 @@ addToMap( string column, Val* colval )
 {
 
 	// look up the column number of the column (and its datatype).
-	
+
 	ColInfo colinfo = lookupColInfo( column );
-	
+
 	if( _verbose >= 1 )
 		cout << " adding Column: " << column
 			 << " with colnum " << colinfo.num
 			 << ", type=" << colinfo.typecode
 			 << ", and repeat=" << colinfo.repeat
 			 << endl;
-			 
-			 
+
+
 	// check that the data types are the same (ignoring the case when
 	// ULONG and LONG types are used, which are always stored as LONG
 	// with an offset by FITS convention)
@@ -229,8 +229,8 @@ addToMap( string column, Val* colval )
 			 << " (" << colinfo.typecode << ") "
 			 << "Type conversion may occur." << endl;
 	}
-	
-	
+
+
 	// check that the data typeshes are the same:
 	if( !colval->isVariableLength() && colval->getSize() != colinfo.repeat )
 	{
@@ -238,7 +238,7 @@ addToMap( string column, Val* colval )
 			 << " (" << colval->getSize() << ") "
 			 << "doesn't agree with template definition "
 			 << " (" << colinfo.repeat << ") Updating column length..." << endl;
-			 
+
 		int status = 0;
 		fits_modify_vector_len(	_fptr, colinfo.num,
 								colval->getSize(),
@@ -246,14 +246,14 @@ addToMap( string column, Val* colval )
 		if( status )
 			throw FITSRecordError( string( __func__ ) + ": modify vector length: "
 								   + getFITSError( status ) );
-								   
+
 	}
-	
-	
+
+
 	_colmap[colinfo.num] = colval;
 	_namemap[colinfo.num] = column;
-	
-	
+
+
 }
 
 
@@ -262,7 +262,7 @@ FITSRecord::~FITSRecord()
 {
 
 	// clean up the colmap
-	
+
 	map<int, Val*>::iterator it;
 	for( it = _colmap.begin(); it != _colmap.end(); ++it )
 	{
@@ -271,31 +271,31 @@ FITSRecord::~FITSRecord()
 			delete it->second;
 		}
 	}
-	
+
 	// if we own the fptr, close the file and finish
-	
+
 	if( _own_fptr )
 	{
-	
+
 		int status = 0;
-		
+
 		if( _is_writable )
 		{
 			finishWriting();
 		}
-		
+
 		fits_close_file( _fptr, &status );
 		if( status )
 			throw FITSRecordError( string( __func__ ) + " "
 								   + getFITSError( status ) );
-								   
+
 		if( _verbose >= 1 )
 		{
 			cout << "File closed. _fptr=" << _fptr << endl;
 		}
 	}
-	
-	
+
+
 }
 
 /**
@@ -309,20 +309,20 @@ finishWriting()
 {
 
 	int status = 0;
-	
+
 	fits_update_key( _fptr, TULONG, "NAXIS2",
 					 &_rowcount, ( char* )"number of events", &status );
 	if( status )
 		cout << "ERROR: KEYWORD UPDATE FAILED FOR NAXIS2."
 			 << " File may be corrupt." << endl;
-			 
+
 	// write the Checksum too:
-	
+
 	fits_write_chksum( _fptr, &status );
 	if( status )
 		cout << "ERROR: CHECKSUM couldn't be written."
 			 << " File may be corrupt." << endl;
-			 
+
 }
 
 /**
@@ -341,22 +341,22 @@ print( ostream& stream )
 {
 
 	stream << setw( 6 ) << _rowcount << ": ";
-	
+
 	map<int, Val*>::iterator it;
-	
+
 	for( it = _colmap.begin(); it != _colmap.end(); ++it )
 	{
-	
+
 		int colnum = it->first;
 		Val* colval = it->second;
-		
+
 		stream << _namemap[colnum] << "="
 			   << *colval << "; ";
-			   
+
 	}
-	
+
 	return stream;
-	
+
 }
 
 
@@ -374,39 +374,39 @@ locateTemplate( string template_filename )
 	vector<string> directories;
 	string delimiters = ":";
 	string str = "";
-	
+
 	try
 	{
 		str = getenv( "FITSRECORD_PATH" );
 	}
 	catch( ... )
 	{
-	
+
 	}
-	
+
 	directories.push_back( "." );
-	
+
 	string::size_type lastPos = str.find_first_not_of( delimiters, 0 );
 	string::size_type pos     = str.find_first_of( delimiters, lastPos );
-	
+
 	while( string::npos != pos || string::npos != lastPos )
 	{
 		directories.push_back( str.substr( lastPos, pos - lastPos ) );
 		lastPos = str.find_first_not_of( delimiters, pos );
 		pos = str.find_first_of( delimiters, lastPos );
 	}
-	
+
 	// try each directory in the path
 	for( vector<string>::iterator dir = directories.begin();
 			dir != directories.end(); dir++ )
 	{
-	
+
 		string templatefile = *dir + "/" + template_filename;
-		
+
 		if( DEBUG )
 			cout << "DEBUG: searching " << *dir
 				 << " for " << template_filename << endl;
-				 
+
 		// try to open the specified file:
 		ifstream infile( templatefile.c_str() );
 		if( infile )
@@ -414,12 +414,12 @@ locateTemplate( string template_filename )
 			infile.close();
 			return templatefile;
 		}
-		
+
 	}
-	
+
 	throw FITSRecordError( "Template '" + template_filename
 						   + "' not found in FITSRECORD_PATH" );
-						   
+
 }
 
 string
@@ -428,23 +428,23 @@ getFITSError( int status )
 {
 
 	string strerr = "";
-	
+
 	if( status )
 	{
 		char text[80];
 		fits_get_errstatus( status, text );
 		strerr = text;
-		
+
 		// get any other error messages on the stack:
 		while( fits_read_errmsg( text ) )
 		{
 			strerr += "\n" + string( text );
 		}
-		
+
 	}
-	
+
 	return " [" + strerr + "] ";
-	
+
 }
 
 
@@ -465,17 +465,17 @@ write() throw( FITSRecordError )
 	{
 		throw FITSRecordError( "can't call write() on a read-only FITSRecord" );
 	}
-	
+
 	int status = 0;
-	
+
 	map<int, Val*>::iterator it;
-	
+
 	for( it = _colmap.begin(); it != _colmap.end(); ++it )
 	{
-	
+
 		int colnum = it->first;
 		Val* colval = it->second;
-		
+
 		fits_write_col( _fptr,
 						colval->getType(),
 						colnum,
@@ -487,19 +487,19 @@ write() throw( FITSRecordError )
 		if( status )
 			throw FITSRecordError( "write failed for column "
 								   + _namemap[colnum] + getFITSError( status ) );
-								   
-								   
+
+
 		if( DEBUG )
 		{
 			long nrows;
 			fits_get_num_rows( _fptr, &nrows, &status );
 			cout << "DEBUG: nrows=" << nrows << endl;
 		}
-		
+
 	}
-	
+
 	_rowcount++;
-	
+
 }
 
 /**
@@ -518,14 +518,14 @@ allocateRows( size_t num_rows )
 		cout << "Reserving " << num_rows << " rows..." << endl;
 	}
 	fits_insert_rows( _fptr, _rowcount, num_rows, &status ) ;
-	
+
 	if( status )
 	{
 		throw FITSRecordError( "allocateRows: " + getFITSError( status ) );
 	}
-	
-	
-	
+
+
+
 }
 
 
@@ -539,26 +539,26 @@ truncateRows( size_t start_row )
 {
 
 	int status = 0;
-	
+
 	if( start_row >= _rowcount )
 	{
 		cout << "truncateRows: there are no rows to truncate after " << start_row << endl;
 		return;
 	}
-	
+
 	if( _verbose >= 1 )
 	{
 		cout << "Deleting the last " << _rowcount - start_row << " rows..." << endl;
 	}
-	
+
 	fits_delete_rows( _fptr, start_row, _rowcount - start_row, &status );
-	
+
 	if( status )
 	{
 		throw FITSRecordError( "truncateRows: " + getFITSError( status ) );
 	}
-	
-	
+
+
 }
 
 
@@ -574,18 +574,18 @@ hasColumn( std::string colname )
 
 	int status = 0;
 	int colnum;
-	
+
 	char name[100]; // needed since doesn't work properly with
 	// c_str(), which returns a const char*
 	strncpy( name, colname.c_str(), 100 );
-	
+
 	fits_get_colnum( _fptr, CASEINSEN, name, &colnum, &status );
-	
+
 	if( status == 0 )
 	{
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -597,40 +597,40 @@ bool FITSRecord::printFITSTypes()
 
 	double d = 0;
 	cout << "double -> " << getFITSType( d ) << endl;
-	
+
 	float f = 0;
 	cout << "float  -> " << getFITSType( f ) << endl;
-	
+
 	int i = 0;
 	cout << "int    -> " << getFITSType( i ) << endl;
-	
+
 	unsigned long ul = 0;
 	cout << "ulong  -> " << getFITSType( ul ) << endl;
-	
+
 	long l = 0;
 	cout << "long    -> " << getFITSType( l ) << endl;
-	
+
 	long long ll = 0;
 	cout << "longlong-> " << getFITSType( ll ) << endl;
-	
+
 	bool b = 0;
 	cout << "bool    -> " << getFITSType( b ) << endl;
-	
+
 	char c = 0;
 	cout << "char    -> " << getFITSType( c ) << endl;
-	
+
 	unsigned char uc = 0;
 	cout << "uchar   -> " << getFITSType( uc ) << endl;
-	
-	
+
+
 	unsigned short us = 0;
 	cout << "ushort  -> " << getFITSType( us ) << endl;
-	
+
 	string s;
 	cout << "string  -> " << getFITSType( s ) << endl;
-	
+
 	return true;
-	
+
 }
 
 
@@ -640,19 +640,19 @@ FITSRecord::FITSRecord( std::string url )
 {
 
 	int status = 0;
-	
+
 	if( _verbose >= 1 )
 	{
 		cout << "OPENING URL: " << url << endl;
 	}
 	fits_open_file( &_fptr, url.c_str(), READONLY, &status );
-	
+
 	if( status )
 	{
 		throw FITSRecordError( "FITSRecord open file  " + url
 							   + ": " + getFITSError( status ) );
 	}
-	
+
 	// check the version number:
 	// int real_extension_version;
 	// char comment[100];
@@ -660,14 +660,14 @@ FITSRecord::FITSRecord( std::string url )
 	// 		   comment, &status) ;
 	// if (!status)
 	// 	_extension_version = real_extension_version;
-	
+
 	if( _verbose > 1 )
 	{
 		cout << "EXTENSION VERSION: " <<  _extension_version << endl;
 	}
-	
+
 	_is_finished = false; // now ready to read
-	
+
 }
 
 
@@ -686,30 +686,30 @@ read()
 	int status = 0;
 	int nulval = 0;
 	int anynull = 0;
-	
+
 	if( _is_finished )
 	{
 		return false;
 	}
-	
+
 	map<int, Val*>::iterator it;
 	for( it = _colmap.begin(); it != _colmap.end(); ++it )
 	{
-	
+
 		int colnum = it->first;
 		Val* colval = it->second;
-		
+
 		fits_read_col( _fptr,
 					   colval->getType(),
 					   colnum,
 					   _rowcount + 1, // first row
-					   1, // first elelement
+					   1, // first element
 					   colval->getSize(), //num elements
 					   &nulval,
 					   colval->getVoidPointerToValue(),
 					   &anynull,
 					   &status );
-					   
+
 		if( status )
 		{
 			_is_finished = true;
@@ -719,12 +719,12 @@ read()
 			}
 			break;
 		}
-		
+
 	}
-	
+
 	_rowcount++;
 	return true;
-	
+
 }
 
 

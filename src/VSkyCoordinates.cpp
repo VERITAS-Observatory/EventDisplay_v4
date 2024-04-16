@@ -8,7 +8,7 @@
 VSkyCoordinates::VSkyCoordinates()
 {
 	fStarCatalogue = 0;
-	
+
 	reset();
 	setObservatory();
 }
@@ -34,7 +34,7 @@ void VSkyCoordinates::reset()
 	fSet = false;
 	fPrecessed = false;
 	fWobbleSet = false;
-	
+
 	fTelDec = 0.;
 	fTelRA  = 0.;
 	fTelDecJ2000 = 0.;
@@ -47,15 +47,15 @@ void VSkyCoordinates::reset()
 	fTelElevation = 0.;
 	fTelAzimuthCalculated = 0.;
 	fTelElevationCalculated = 0.;
-	
+
 	fTargetAzimuth = 0.;
 	fTargetElevation = 0.;
 	fWobbleNorth = 0.;
 	fWobbleEast = 0.;
-	
+
 	fMJD = 0;
 	fTime = 0.;
-	
+
 	fSupressStdoutText = false ;
 }
 
@@ -87,7 +87,7 @@ void VSkyCoordinates::precessTarget( int iMJD, int iTelID )
 		// ENDTEMP
 		// precess target coordinates
 		VSkyCoordinatesUtilities::precessTarget( iMJD, fTargetRA, fTargetDec );
-		
+
 		if( !fSupressStdoutText )
 		{
 			cout << "\tMJD " << iMJD;
@@ -95,7 +95,7 @@ void VSkyCoordinates::precessTarget( int iMJD, int iTelID )
 		}
 		// precess telescope coordinates
 		VSkyCoordinatesUtilities::precessTarget( iMJD, fTelRA, fTelDec );
-		
+
 		fPrecessed = true;
 	}
 }
@@ -112,19 +112,19 @@ bool VSkyCoordinates::setTargetJ2000( double iDec, double iRA )
 {
 	fTargetDecJ2000 = iDec / TMath::RadToDeg();
 	fTargetRAJ2000  = iRA / TMath::RadToDeg();
-	
+
 	// unprecessed -> precess later in the analysis
 	fTargetDec = iDec / TMath::RadToDeg();
 	fTargetRA  = iRA / TMath::RadToDeg();
-	
+
 	fTelDecJ2000 = iDec / TMath::RadToDeg();
 	fTelRAJ2000  = iRA / TMath::RadToDeg();
 	// unprecessed -> precess later in the analysis
 	fTelDec = iDec / TMath::RadToDeg();
 	fTelRA  = iRA / TMath::RadToDeg();
-	
+
 	fSet = true;
-	
+
 	return true;
 }
 
@@ -137,10 +137,10 @@ void VSkyCoordinates::updatePointing( int MJD, double time )
 {
 	fMJD = ( unsigned int )MJD;
 	fTime = time;
-	
+
 	double az = 0.;
 	double el = 0.;
-	
+
 	// telescope elevation/azimuth calculated from source coordinates and time
 	VSkyCoordinatesUtilities::getHorizontalCoordinates( MJD, time, fTelDec * TMath::RadToDeg(), fTelRA * TMath::RadToDeg(), az, el );
 	el = 90. - el;
@@ -148,7 +148,7 @@ void VSkyCoordinates::updatePointing( int MJD, double time )
 	fTelElevationCalculated = ( float )el;
 	fTelElevation = fTelElevationCalculated;
 	fTelAzimuth   = fTelAzimuthCalculated;
-	
+
 	// set target azimuth/elevation
 	VSkyCoordinatesUtilities::getHorizontalCoordinates( MJD, time, fTargetDec * TMath::RadToDeg(), fTargetRA * TMath::RadToDeg(), fTargetAzimuth, fTargetElevation );
 	fTargetElevation = 90. - fTargetElevation;
@@ -189,13 +189,13 @@ bool VSkyCoordinates::setPointingOffset( double i_raOff_deg, double i_decOff_deg
 		fTelDecJ2000 = -9999.;
 		return false;
 	}
-	
+
 	fTelRA      = fTargetRA + i_raOff_deg * TMath::DegToRad();
 	fTelDec     = fTargetDec + i_decOff_deg * TMath::DegToRad();
-	
+
 	fTelRAJ2000      = fTargetRAJ2000 + i_raOff_deg * TMath::DegToRad();
 	fTelDecJ2000     = fTargetDecJ2000 + i_decOff_deg * TMath::DegToRad();
-	
+
 	return true;
 }
 
@@ -258,7 +258,7 @@ void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast, int iTelID, 
 {
 	fWobbleNorth = iNorth;
 	fWobbleEast = iEast;
-	
+
 	if( !fWobbleSet )
 	{
 		double i_decDiff = 0.;
@@ -268,10 +268,10 @@ void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast, int iTelID, 
 		{
 			i_RADiff += 360.;
 		}
-		
+
 		fTelRA  = fTargetRA + i_RADiff * TMath::DegToRad();
 		fTelDec = fTargetDec + i_decDiff * TMath::DegToRad();
-		
+
 		if( iTelID >= 0 )
 		{
 			cout << "\tWobble mode, telescope " << iTelID + 1;
@@ -283,12 +283,12 @@ void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast, int iTelID, 
 		cout << " pointing to (ra,dec) = (" << fTelRA* TMath::RadToDeg() << ", " << fTelDec* TMath::RadToDeg() << ")";
 		cout << ", (delta ra, delta dec) = (" << i_RADiff << ", " << i_decDiff << ")";
 		cout << endl;
-		
+
 		// set J2000 telescope coordinates
 		fTelRAJ2000 = fTelRA;
 		fTelDecJ2000 = fTelDec;
 		VSkyCoordinatesUtilities::precessTarget( 51544., fTelRAJ2000, fTelDecJ2000, iMJD );
-		
+
 		fWobbleSet = true;
 	}
 	else
@@ -343,6 +343,6 @@ bool VSkyCoordinates::initStarCatalogue( string iCatalogueName, double iMJD,
 		}
 		fStarCatalogue->setFOV( iRASkyMapCentre_J2000, iDecSkyMapCentre_J2000, i_x, i_y, true );
 	}
-	
+
 	return true;
 }

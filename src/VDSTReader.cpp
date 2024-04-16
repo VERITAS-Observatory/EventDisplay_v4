@@ -13,18 +13,18 @@ VDSTReader::VDSTReader( string isourcefile, bool iMC, int iNTel, bool iDebug )
 	{
 		cout << "VDSTReader::VDSTReader" << endl;
 	}
-	
+
 	fNTelescopes = iNTel;
 	fSourceFileName = isourcefile;
-	
+
 	setPerformFADCAnalysis( true );
-	
+
 	fDSTtreeEvent = 0;
-	
+
 	fMC = iMC;
-	
+
 	fDSTTree = new VDSTTree();
-	
+
 	// open source file and init tree
 	init();
 }
@@ -36,7 +36,7 @@ TTree* VDSTReader::getMCTree()
 	{
 		return 0;
 	}
-	
+
 	if( !fDSTfile )
 	{
 		return 0;
@@ -45,7 +45,7 @@ TTree* VDSTReader::getMCTree()
 	{
 		return 0;
 	}
-	
+
 	return ( TTree* )fDSTfile->Get( "mc" );
 }
 
@@ -61,7 +61,7 @@ bool VDSTReader::init()
 	{
 		cout << " VDSTReader::init()" << endl;
 	}
-	
+
 	// open file
 	fDSTfile = new TFile( fSourceFileName.c_str() );
 	if( fDSTfile->IsZombie() )
@@ -70,7 +70,7 @@ bool VDSTReader::init()
 		cout << "... exiting ... " << endl;
 		exit( -1 );
 	}
-	
+
 	// get and init tree
 	if( !fDSTfile->Get( "dst" ) || !fDSTfile->Get( "telconfig" ) )
 	{
@@ -83,7 +83,7 @@ bool VDSTReader::init()
 	{
 		fNChannel.push_back( fDSTTree->getDSTNChannels( i ) );
 	}
-	
+
 	// init data vectors
 	for( unsigned int i = 0; i < fNTelescopes; i++ )
 	{
@@ -123,7 +123,7 @@ bool VDSTReader::init()
 		fFADCTrace.push_back( i_trace_sample_VV );
 	}
 	fDummySample.assign( VDST_MAXSUMWINDOW, 0 );
-	
+
 	return fDSTTree->isMC();
 }
 
@@ -138,7 +138,7 @@ bool VDSTReader::setTelescopeID( unsigned int iTelID )
 	{
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -149,15 +149,15 @@ bool VDSTReader::getNextEvent()
 	{
 		cout << "VDSTReader::getNextEvent()" << endl;
 	}
-	
+
 	if( !fDSTTree || !fDSTTree->getDSTTree() )
 	{
 		return false;
 	}
-	
+
 	int i_succ = 0;
 	i_succ = fDSTTree->getDSTTree()->GetEntry( fDSTtreeEvent );
-	
+
 	// no next event
 	if( i_succ <= 0 )
 	{
@@ -170,15 +170,15 @@ bool VDSTReader::getNextEvent()
 		cout << fNTelescopes << "\t" << fDSTTree->getDSTNTel() << endl;
 		return false;
 	}
-	
+
 	// fill data vectors
 	for( unsigned int i = 0; i < fNTelescopes; i++ )
 	{
 		fTelAzimuth[i] = fDSTTree->getDSTTelAzimuth( i );
 		fTelElevation[i] = fDSTTree->getDSTTelElevation( i );
-		
+
 		fDSTTree->setTelCounter( i );
-		
+
 		for( unsigned int j = 0; j < fNChannel[i]; j++ )
 		{
 			fSums[i][j] = fDSTTree->getDSTSums( j );
@@ -230,8 +230,8 @@ bool VDSTReader::getNextEvent()
 			}
 		}
 	}
-	
-	// successfull event
+
+	// successful event
 	setEventStatus( 1 );
 	// increment tree event number
 	fDSTtreeEvent++;
@@ -294,7 +294,7 @@ vector< uint16_t > VDSTReader::getSamplesVec16Bit()
 			return fFADCTrace[fTelID][fSelectedHitChannel];
 		}
 	}
-	
+
 	return fDummySample16Bit;
 }
 
@@ -312,7 +312,7 @@ vector< uint8_t > VDSTReader::getSamplesVec()
 		}
 	}
 	fDummySample.assign( VDST_MAXSUMWINDOW, 0 );
-	
+
 	return fDummySample;
 }
 
@@ -334,7 +334,7 @@ uint16_t VDSTReader::getSample16Bit( unsigned channel, unsigned sample, bool iNe
 		}
 	}
 	iNewNoiseTrace = true;
-	
+
 	return 3;
 }
 
@@ -344,6 +344,6 @@ bool VDSTReader::isZeroSuppressed( unsigned int iChannel )
 	{
 		return false;
 	}
-	
+
 	return true;
 }

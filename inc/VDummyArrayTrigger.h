@@ -8,7 +8,7 @@
 class VDummyArrayTrigger
 {
 	public:
-	
+
 		uint32_t getEventNumber()
 		{
 			return 0;
@@ -37,7 +37,7 @@ class VDummyArrayTrigger
 		{
 			return false;
 		}
-		
+
 		VDummyArrayTrigger() {}
 		~VDummyArrayTrigger() {}
 };

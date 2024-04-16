@@ -41,16 +41,16 @@ using namespace std;
 class VEvndispData
 {
 	private:
-	
+
 	protected:
 		static bool fDebug;
 		static int  fDebugLevel;
 		static int  fNDebugMessages;
-		
+
 		// global run parameters
 		static int fRunNumber;                    //!< run number
 		static VEvndispRunParameter* fRunPar;          //!< all command line/configuration parameters
-		
+
 		// telescope data
 		static unsigned int fNTel;                //!< total number of telescopes
 		static unsigned int fTelID;               //!< telescope number of current telescope
@@ -63,7 +63,7 @@ class VEvndispData
 		// cameras
 		static VDetectorGeometry* fDetectorGeo;
 		static VDetectorTree* fDetectorTree;
-		
+
 		// reader
 		VVirtualDataReader*  fReader;
 		static VGrIsuReader* fGrIsuReader;
@@ -72,10 +72,10 @@ class VEvndispData
 		static VBaseRawDataReader* fRawDataReader;
 #endif
 		static VDSTReader* fDSTReader;
-		
+
 		// DB pixel data
 		static VDB_PixelDataReader* fDB_PixelDataReader;
-		
+
 		// event data
 		static unsigned int fEventNumber;         //!< current event number (array event)
 		//!< event number of telescope event
@@ -86,10 +86,10 @@ class VEvndispData
 		static double fArrayEventTime;            //!< time of current event
 		static vector< int > fEventMJD;           //!< MJD of current event (per telescope)
 		static vector< double > fEventTime;       //!< time of current event (per telescope)
-		
+
 		static vector< vector< int > > fTriggeredTel;
 		static vector< int > fTriggeredTelN;
-		
+
 		// event status from data reader
 		static unsigned long int fExpectedEventStatus;
 		static unsigned int fNumberofGoodEvents;
@@ -99,11 +99,11 @@ class VEvndispData
 		static unsigned int fAnalysisArrayEventStatus;
 		//!< 0: good event
 		static vector< unsigned int > fAnalysisTelescopeEventStatus;
-		
+
 		// global trace handler
 		static VTraceHandler* fTraceHandler;
 		static VFitTraceHandler* fFitTraceHandler;
-		
+
 		// calibrator and calibration data
 		static vector< bool > fCalibrated;        //!< this telescope is calibrated
 		//! data class for calibration data
@@ -111,11 +111,11 @@ class VEvndispData
 		// dead channel finder
 		static vector< VDeadChannelFinder* > fDeadChannelDefinition_HG;
 		static vector< VDeadChannelFinder* > fDeadChannelDefinition_LG;
-		
+
 		//  analysis cuts
 		//!< cuts for array analysis
 		static VEvndispReconstructionParameter* fEvndispReconstructionParameter;
-		
+
 		// analysis results
 		static TFile* fOutputfile;                //!< root output file for image parameter trees, histograms, etc.
 		static vector< TDirectory* > fAnaDir;     //! directories in root file
@@ -123,28 +123,28 @@ class VEvndispData
 		//!< data class with analysis results from all telescopes
 		static VShowerParameters* fShowerParameters;
 		static VMCParameters* fMCParameters;      //!< data class with MC parameters
-		
+
 		// timing results
 		static vector< TGraphErrors* > fXGraph;   //!< Long axis timing graph
 		static vector< TGraphErrors* > fYGraph;   //!< Short axis timing graph
 		static vector< TGraphErrors* > fRGraph;   //!< Radial timing graph
-		
+
 		// default pedestals for plotraw option
 		static valarray<double> fPlotRawPedestals;
-		
+
 		// set detector geometry
 		unsigned int        checkSummationWindow( unsigned int iTelID, unsigned int iSumWindow );
 		void                setDetectorGeometry( unsigned int iNTel, vector< string > icamera, string idir );
-		
+
 		// names of dead channels
 		static vector< string > fDeadChannelText;
-		
+
 		// star catalogue
 		static VStarCatalogue* fStarCatalogue;
-		
+
 		// dummy vector
 		static vector< float > fDummyVector_float;
-		
+
 	public:
 		VEvndispData();
 		~VEvndispData() {}
@@ -637,7 +637,7 @@ class VEvndispData
 		{
 			return fRunPar->fMC_FADCTraceStart;
 		}
-		
+
 		double              getmeanPedvars( bool iLowGain = false, unsigned int iSumWindow = 0 )
 		{
 			return getCalData()->getmeanPedvars( iLowGain, iSumWindow );
@@ -657,7 +657,7 @@ class VEvndispData
 				getCalData()->getmeanPedvars( imean, irms, iLowGain, iSumWindow, getEventTime() );
 			}
 		}
-		
+
 		vector< double >&   getmeanPedvarsAllSumWindow( bool iLowGain = false )
 		{
 			if( !iLowGain )
@@ -743,7 +743,7 @@ class VEvndispData
 		{
 			return fCalData[fTelID]->getPedvarsDist( true );
 		}
-		
+
 		///////////////// pedestals /////////////////////////////////
 		// getters for pedestals
 		valarray<double>&   getPeds( bool iLowGain = false, double iTime = -99. );
@@ -751,7 +751,7 @@ class VEvndispData
 		{
 			return getPeds( true, iTime );
 		}
-		
+
 		// getters for pedestal variation
 		valarray<double>&   getPedvars( bool iLowGain = false, unsigned int iSW = 0, double iTime = -99. );
 		valarray<double>&   getPedvars( unsigned int iSW, bool iLowGain = false )
@@ -762,7 +762,7 @@ class VEvndispData
 		{
 			return getPedvars( true );
 		}
-		
+
 		vector< valarray<double> >& getPedvarsAllSumWindows( bool iLowGain = false )
 		{
 			if( !iLowGain )
@@ -796,7 +796,7 @@ class VEvndispData
 		}
 		// padding stuff (probably out of date)
 		/////////////// end pedestals //////////////////////////////
-		
+
 		valarray<double>&   getRawTZeros()
 		{
 			return fAnaData[fTelID]->getTZeros( false );
@@ -1393,7 +1393,7 @@ class VEvndispData
 		{
 			fCalData[fTelID]->setLowGainMultiplier_Sum( iSumWindow, jSumWindow, lmult );
 		}
-		
+
 		void                setNChannels( unsigned int iChan )
 		{
 			fDetectorGeo->setNChannels( fTelID, iChan );
@@ -1475,7 +1475,7 @@ class VEvndispData
 				return 0;
 			}
 		}
-		
+
 		void             setClusterNpix( int iID, int clusterNpix )
 		{
 			fAnaData[fTelID]->fClusterNpix[iID] = clusterNpix;
@@ -1500,7 +1500,7 @@ class VEvndispData
 		{
 			return fAnaData[fTelID]->fMainClusterID;
 		}
-		
+
 		void             setClusterSize( int iID, double clustersize )
 		{
 			fAnaData[fTelID]->fClusterSize[iID] = clustersize;
@@ -1517,7 +1517,7 @@ class VEvndispData
 		{
 			return fAnaData[fTelID]->fClusterTime;
 		}
-		
+
 		void             setClusterCenx( int iID, double clustercenx )
 		{
 			fAnaData[fTelID]->fClusterCenx[iID] = clustercenx;
@@ -1534,7 +1534,7 @@ class VEvndispData
 		{
 			return fAnaData[fTelID]->fClusterCeny;
 		}
-		
+
 		void             setNcluster_cleaned( int i_Ncluster )
 		{
 			fAnaData[fTelID]->fncluster_cleaned = i_Ncluster;
@@ -1831,7 +1831,7 @@ class VEvndispData
 				return getRunParameter()->fLowGainUsePedestalsInTimeSlices;
 			}
 		}
-		
+
 		void                testDataReader();     //!< check if reader is available, set pointers
 };
 #endif

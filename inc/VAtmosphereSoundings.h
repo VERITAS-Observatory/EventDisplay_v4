@@ -33,15 +33,15 @@ using namespace std;
 class VAtmosphereSoundings
 {
 	private:
-	
+
 		bool             bDebug;
-		
+
 		vector< string > fListTextFile;
-		
+
 		// tree writing and reading
 		TFile* fDataFile;
 		TTree* fDataTree;
-		
+
 		double MJD;
 		int Year;
 		int Month;
@@ -59,23 +59,23 @@ class VAtmosphereSoundings
 		double MixingRatio_gkg[VMAXNUMBEROFSOUNDINGPOINTS];
 		double WindDirection_deg[VMAXNUMBEROFSOUNDINGPOINTS];
 		double WindSpeed_ms[VMAXNUMBEROFSOUNDINGPOINTS];
-		
+
 		string           fTXTSearch_DataString;
-		
+
 		// data containers
 		vector< VAtmosphereSoundingData* > fData;                         // profile from soundings data
 		vector< VAtmosphereSoundingData* > fDataInterpol;
 		vector< VAtmosphereSoundingData* > fDataCORSIKAMODTRAN;           // CORSIKA/MODTRAN profile
 		vector< VAtmosphereSoundingData* > fDataUserProfile;              // user created profile
 		vector< VAtmosphereSoundingData* > fAverageProfile;              // user created profile, henrikes method
-		
+
 		vector <double> fHeights;
 		vector <double> fModtranHeights;
-		
+
 		// periods to calculate average over
 		map< unsigned int, string > fPlottingPeriodFiles;
 		map< unsigned int, vector< unsigned int > > fPlottingPeriodDates;
-		
+
 		// plotting
 		bool   fPlotRelativePlots;
 		bool   fBoolColorChange;
@@ -86,11 +86,11 @@ class VAtmosphereSoundings
 		string fPlottingPeriod;
 		double fPlottingHeight_min;
 		double fPlottingHeight_max;
-		
+
 		// observatory
 		double fObservatoryLatitude;
 		double fObservatoryHeight_km;
-		
+
 		unsigned int checkPlottingPeriodIdentifier( unsigned int );
 		void   fillAtmosphericDensity();
 		void   fillAtmosphericDensity( VAtmosphereSoundingData* );
@@ -114,9 +114,9 @@ class VAtmosphereSoundings
 							 string iPlotOption = "", bool bSames = false );
 		bool   readPlottingPeriodsFromTextFile( string );
 		bool   readRootFile();
-		
+
 	public:
-	
+
 		VAtmosphereSoundings();
 		VAtmosphereSoundings( string iRootFile );
 		~VAtmosphereSoundings() {}
@@ -126,7 +126,7 @@ class VAtmosphereSoundings
 		double   getDewPoint( double temperature, double relativeHumidity, int iMethod = 0 );
 		void     list_datasets();
 		void     list_datasets_CORSIKAMODTRAN();
-		
+
 		TCanvas* plotCORSIKA_Density_vs_Height( TCanvas* c = 0, double iHeightMin = 0., double iHeightMax = 120. )
 		{
 			return plotCORSIKA( c, 0, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax );
@@ -159,7 +159,7 @@ class VAtmosphereSoundings
 		{
 			return plotCORSIKA( c, 7, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax );
 		}
-		
+
 		TCanvas* plotUserAtmosphere_Density_vs_Height( TCanvas* c = 0, double iHeightMin = 0., double iHeightMax = 120. )
 		{
 			return plotCORSIKA( c, 0, fDataUserProfile, iHeightMin, iHeightMax );
@@ -192,7 +192,7 @@ class VAtmosphereSoundings
 		{
 			return plotCORSIKA( c, 7, fDataUserProfile, iHeightMin, iHeightMax );
 		}
-		
+
 		void     plot2DProfiles( unsigned int iYearStart = 1980, unsigned int iMonthStart = 1,
 								 unsigned int iYearStop = 2020, unsigned int iMonthStop = 12 );
 		void     plotAverages( unsigned int iYearStart = 1980, unsigned int iMonthStart = 1,
@@ -227,7 +227,7 @@ class VAtmosphereSoundings
 		bool     write_CORSIKA_UserProfile( unsigned int iMODTRANIndex, unsigned int atmprofmodel, string iName = "user profile" );
 		bool     write_MODTRAN_UserProfile( unsigned int iIndexUserData, unsigned int defaultModel = 6, bool iWriteDewPoint = false );
 		bool     writeRootFile( string iFile );
-		
+
 		int push_average_atmosphere( string name, vector<int>* years, vector<int>* months, vector<int>* days, vector<int>* hours, vector<double>* mjds, unsigned int nMinPoints, int nMinFlights );
 		bool isDateInRange( VAtmosphereSoundingData* Data, vector<int>* years, vector<int>* months, vector<int>* days, vector<int>* hours, vector<double>* mjds, unsigned int nMinPoints );
 		bool isDateInRange( VAtmosphereSoundingData* Data, vector<double>* mjds, unsigned int nMinPoints );
@@ -237,10 +237,10 @@ class VAtmosphereSoundings
 		VAtmosphereSoundingData* makeMeanMonthlyAtmosphere( int month, string name, string opt, int yearMin, int yearMax );
 		VAtmosphereSoundingData* makeOneFlightAtmosphere( int year, int month, int day, int hour, string name, string opt );
 		VAtmosphereSoundingData* makeMeanAtmosphereMJD( double minMJD, double maxMJD, string name, string opt );
-		
+
 		double interpolate( vector<double> raw, vector<double> raw_heights, vector<double>& result, string opt, double h );
 		double safe_eval( TGraph* g, double h, string opt );
-		
+
 		VAtmosphereSoundingData* make_interpolated_atmosphere( VAtmosphereSoundingData* RawData );
 		void make_interpolated_atmospheres();
 		void setModtranHeights();
@@ -264,7 +264,7 @@ class VAtmosphereSoundings
 				fHeights.push_back( h );
 			}
 		}
-		
+
 		VAtmosphereSoundingData* getData( unsigned int i )
 		{
 			return i >= fData.size()		? 	0	:	fData.at( i );
@@ -285,14 +285,14 @@ class VAtmosphereSoundings
 		{
 			return i >= fAverageProfile.size()	? 	0	:	fAverageProfile.at( i );
 		}
-		
+
 		bool write_2C1( unsigned int iIndexAverageData, string filename, double max_height );
-		
+
 		TGraph* getResidualGraph( TGraph* data, TGraph* model, int color = 2 ) ;
 		void plot_season( double mjd_start, double mjd_end, TString season_name, char* value, TString outfileprefix ) ;
 		void plot_season( int year_start, int month_start, int day_start, int year_end, int month_end, int day_end, char* value, TString outfileprefix = "" ) ;
-		
-		
+
+
 };
 
 #endif

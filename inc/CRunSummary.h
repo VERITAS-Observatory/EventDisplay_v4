@@ -17,7 +17,7 @@ class CRunSummary : public TObject
 	public :
 		TTree*          fChain;                   //!pointer to the analyzed TTree or TChain
 		Int_t           fCurrent;                 //!current Tree number in a TChain
-		
+
 		// Declaration of leave types
 		Int_t           runOn;
 		Int_t           runOff;
@@ -65,7 +65,7 @@ class CRunSummary : public TObject
 		Double_t        MaxSigni;
 		Double_t        MaxSigniX;
 		Double_t        MaxSigniY;
-		
+
 		// List of branches
 		TBranch*        b_runOn;                  //!
 		TBranch*        b_runOff;                 //!
@@ -113,7 +113,7 @@ class CRunSummary : public TObject
 		TBranch*        b_MaxSigni;               //!
 		TBranch*        b_MaxSigniX;              //!
 		TBranch*        b_MaxSigniY;              //!
-		
+
 		CRunSummary( TTree* tree = 0 );
 		virtual ~CRunSummary();
 		virtual Int_t    Cut( Long64_t entry );
@@ -123,7 +123,7 @@ class CRunSummary : public TObject
 		virtual void     Loop();
 		virtual Bool_t   Notify();
 		virtual void     Show( Long64_t entry = -1 );
-		
+
 		ClassDef( CRunSummary, 1 );
 };
 #endif
@@ -187,10 +187,10 @@ void CRunSummary::Init( TTree* tree )
 {
 	// The Init() function is called when the selector needs to initialize
 	// a new tree or chain. Typically here the branch addresses of the tree
-	// will be set. It is normaly not necessary to make changes to the
+	// will be set. It is normally not necessary to make changes to the
 	// generated code, but the routine can be extended by the user if needed.
 	// Init() will be called many times when running with PROOF.
-	
+
 	// Set branch addresses
 	if( tree == 0 )
 	{
@@ -199,7 +199,7 @@ void CRunSummary::Init( TTree* tree )
 	fChain = tree;
 	fCurrent = -1;
 	fChain->SetMakeClass( 1 );
-	
+
 	fChain->SetBranchAddress( "runOn", &runOn );
 	fChain->SetBranchAddress( "runOff", &runOff );
 	fChain->SetBranchAddress( "MJDOn", &MJDOn );
@@ -264,10 +264,10 @@ Bool_t CRunSummary::Notify()
 	// The Notify() function is called when a new file is opened. This
 	// can be either for a new TTree in a TChain or when when a new TTree
 	// is started when using PROOF. Typically here the branch pointers
-	// will be retrieved. It is normaly not necessary to make changes
+	// will be retrieved. It is normally not necessary to make changes
 	// to the generated code, but the routine can be extended by the
 	// user if needed.
-	
+
 	// Get branch pointers
 	b_runOn = fChain->GetBranch( "runOn" );
 	b_runOff = fChain->GetBranch( "runOff" );
@@ -318,7 +318,7 @@ Bool_t CRunSummary::Notify()
 	b_MaxSigni = fChain->GetBranch( "MaxSigni" );
 	b_MaxSigniX = fChain->GetBranch( "MaxSigniX" );
 	b_MaxSigniY = fChain->GetBranch( "MaxSigniY" );
-	
+
 	return kTRUE;
 }
 

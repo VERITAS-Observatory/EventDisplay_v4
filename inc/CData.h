@@ -841,7 +841,7 @@ Bool_t CData::Notify()
 	// The Notify() function is called when a new file is opened. This
 	// can be either for a new TTree in a TChain or when when a new TTree
 	// is started when using PROOF. Typically here the branch pointers
-	// will be retrieved. It is normaly not necessary to make changes
+	// will be retrieved. It is normally not necessary to make changes
 	// to the generated code, but the routine can be extended by the
 	// user if needed.
 

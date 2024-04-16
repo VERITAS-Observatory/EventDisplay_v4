@@ -84,24 +84,24 @@ int main( int argc, char* argv[] )
 			exit( EXIT_SUCCESS );
 		}
 	}
-	
+
 	cout << endl << "VERITAS Analysis Summary (University of Delaware & DESY) ";
 	cout << " (version " << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
 	cout <<         "==========================================================================" << endl;
 	cout << endl;
-	
+
 	parseOptions( argc, argv );
-	
+
 	if( !testCommandlineArguments() )
 	{
 		exit( EXIT_FAILURE );
 	}
-	
+
 	// initialize analysis
 	VAnaSum* anasum = new VAnaSum( datadir, analysisType );
 	anasum->initialize( listfilename, listShortfilename, singletel - 1, runType, outfile, fRandomSeed, fRunParameterfile );
 	cout << endl;
-	
+
 	// stereo analysis (default)
 	if( analysisType == 3 || analysisType == 4 )
 	{
@@ -114,9 +114,9 @@ int main( int argc, char* argv[] )
 	}
 	// clean up and write results to disk
 	anasum->terminate();
-	
+
 	cout << endl << "analysis results written to " << outfile << endl;
-	
+
 	return 0;
 }
 

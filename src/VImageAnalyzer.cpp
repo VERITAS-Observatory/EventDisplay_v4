@@ -21,17 +21,17 @@ VImageAnalyzer::VImageAnalyzer()
 	fRaw = false;
 	fOutputfile = 0;
 	fInit = false;
-	
+
 	// image cleaning
 	fVImageCleaning = new VImageCleaning( getData() );
-	
+
 	// image parameterisation (Hillas parameters)
 	fVImageParameterCalculation = new VImageParameterCalculation( getRunParameter()->fShortTree, getData() );
 	fVImageParameterCalculation->setDebug( fDebug );
 	fVImageParameterCalculation->setDetectorGeometry( getDetectorGeometry() );
 	fVImageParameterCalculation->setDetectorGeometry( getDetectorGeometry() );
-	
-	// initalize minuit for log likelihood method
+
+	// initialize minuit for log likelihood method
 	if( fRunPar->fImageLL )
 	{
 		fVImageParameterCalculation->initMinuit( fRunPar->fImageLL );
@@ -40,7 +40,7 @@ VImageAnalyzer::VImageAnalyzer()
 	{
 		fVImageParameterCalculation->initMinuit( 1 );
 	}
-	
+
 	// initialize root directories
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
@@ -53,7 +53,7 @@ VImageAnalyzer::VImageAnalyzer()
 		fYGraph.push_back( new TGraphErrors( 1 ) );
 		fRGraph.push_back( new TGraphErrors( 1 ) );
 	}
-	
+
 	//If -hough is specified on the command line, run the hough transform initialization method in
 	//VImageParameterCalculation
 	if( fRunPar->fhoughmuonmode || fRunPar->fmuonmode )
@@ -92,9 +92,9 @@ void VImageAnalyzer::doAnalysis()
 		cout << "VImageAnalyzer::doAnalysis() for telescope " << getTelID() + 1 << endl;
 	}
 	setDebugLevel( 0 );
-	
+
 	getAnalysisTelescopeEventStatus()[getTelID()] = 0;
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// first call -> initialize and read calibration data
 	//            -> find dead channels
@@ -117,7 +117,7 @@ void VImageAnalyzer::doAnalysis()
 		findDeadChans( true, false );
 	}
 	initEvent();
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// don't do analysis if init event failed or if there was no array trigger
 	bool bTrigger = getReader()->hasArrayTrigger();
@@ -143,7 +143,7 @@ void VImageAnalyzer::doAnalysis()
 	{
 		cout << "VImageAnalyzer:doAnalysis array trigger: " << getReader()->hasArrayTrigger() << endl;
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// integrate pulses and calculate timing parameters
 	if( fRunPar->fDoublePass )
@@ -155,42 +155,42 @@ void VImageAnalyzer::doAnalysis()
 	{
 		calcTZerosSums( getSumFirst(), getSumFirst() + getSumWindow(), getTraceIntegrationMethod() );
 	}
-	
+
 	// number of saturated channels
 	getImageParameters()->nsat = fillSaturatedChannels();
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// correct for FADC crate jitter timing
 	if( fRunPar->fL2TimeCorrect )
 	{
 		FADCStopCorrect();
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// apply timing correction from laser calibration (flatfielding in time)
 	timingCorrect();
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// image cleaning & gain correction
 	imageCleaning();
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// MC trigger parameter
 	if( fReader->isGrisuMC() )
 	{
 		setNTrigger();
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// set parameters required for image parameter calculation
 	fVImageParameterCalculation->setDetectorGeometry( getDetectorGeometry() );
 	fVImageParameterCalculation->setParameters( getImageParameters() );
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// image parameter calculation
 	fVImageParameterCalculation->calcParameters();
 	fVImageParameterCalculation->calcTimingParameters();
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// here: no double pass trace integration
 	// do a log likelihood image fitting on events on the camera edge only
@@ -205,21 +205,21 @@ void VImageAnalyzer::doAnalysis()
 			setLLEst( fVImageParameterCalculation->calcLL( false ) );
 		}
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// muon ring analysis
 	if( fRunPar->fmuonmode && !fRunPar->fDoublePass )
 	{
 		muonRingAnalysis();
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// Hough transform muon ring analysis
 	if( fRunPar->fhoughmuonmode && !fRunPar->fDoublePass )
 	{
 		houghMuonRingAnalysis();
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// second pass of image calculation with using time gradient to adjust sum window
 	if( fRunPar->fDoublePass && fReader->hasFADCTrace() && getRunParameter()->doFADCAnalysis() )
@@ -230,35 +230,35 @@ void VImageAnalyzer::doAnalysis()
 		{
 			calcSecondTZerosSums();
 		}
-		
+
 		///////////////////////////////////////////////////////////////////////////////////////////
 		// smoothing of dead or disabled pixels (first part)
 		if( fRunPar->fSmoothDead )
 		{
 			smoothDeadTubes();
 		}
-		
+
 		///////////////////////////////////////////////////////////////////////////////////////////
 		// image cleaning & gain correction (second pass)
 		imageCleaning();
-		
+
 		///////////////////////////////////////////////////////////////////////////////////////////
 		// muon ring analysis (second pass)
 		if( fRunPar->fmuonmode )
 		{
 			muonRingAnalysis();
 		}
-		
+
 		///////////////////////////////////////////////////////////////////////////////////////////
-		
+
 		////////////////////////////////////////////////////////////////////////////////////////////////
 		//Hough transform muon ring analysis (second pass)
-		
+
 		if( fRunPar->fhoughmuonmode )
 		{
 			houghMuonRingAnalysis();
 		}
-		
+
 		///////////////////////////////////////////////////////////////////////////////////////////
 		// smoothing of dead or disabled pixels (second part)
 		if( fRunPar->fSmoothDead )
@@ -271,12 +271,12 @@ void VImageAnalyzer::doAnalysis()
 				getGains( true )[i] = savedGainsLow[i];
 			}
 		}
-		
+
 		///////////////////////////////////////////////////////////////////////////////////////////
 		// image parameter calculation
 		fVImageParameterCalculation->calcParameters();
 		fVImageParameterCalculation->calcTimingParameters();
-		
+
 		///////////////////////////////////////////////////////////////////////////////////////////
 		// do a log likelihood image fitting on events on the camera edge only
 		if( getImageParameters()->ntubes > fRunPar->fLogLikelihood_Ntubes_min[getTelID()]
@@ -287,9 +287,9 @@ void VImageAnalyzer::doAnalysis()
 			fVImageParameterCalculation->setParametersLogL( getImageParameters() );
 			setLLEst( fVImageParameterCalculation->calcLL( false ) );
 		}
-		
+
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// log likelihood image analysis (not default)
 	// calculate image parameters (mainly for edge images)
@@ -308,7 +308,7 @@ void VImageAnalyzer::doAnalysis()
 			getImageParameters( fRunPar->fImageLL )->reset();
 		}
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// fill results into output tree
 	fillOutputTree();
@@ -321,7 +321,7 @@ void VImageAnalyzer::fillOutputTree()
 	{
 		cout << "VImageAnalyzer::fillOutputTree()" << endl;
 	}
-	
+
 	// fill some run quality histograms
 	if( !fReader->isMC() )
 	{
@@ -330,7 +330,7 @@ void VImageAnalyzer::fillOutputTree()
 	}
 	// fill (optionally) image/border tree lists
 	fVImageParameterCalculation->fillImageBorderPixelTree();
-	
+
 	// fill some basic run parameters
 	getImageParameters()->fimagethresh = getImageThresh();
 	getImageParameters()->fborderthresh = getBorderThresh();
@@ -386,16 +386,16 @@ void VImageAnalyzer::initAnalysis()
 	{
 		cout << "VImageAnalyzer::initAnalysis()" << endl;
 	}
-	
+
 	fVImageParameterCalculation->setParameters( getImageParameters() );
 	if( fRunPar->fImageLL )
 	{
 		fVImageParameterCalculation->setParametersLogL( getImageParametersLogL() );
 	}
-	
+
 	initOutput();
 	initTrees();
-	
+
 	// temporary vectors for dead pixel smoothing
 	savedDead.assign( getDead().size(), false );
 	savedDeadLow.assign( getDead( true ).size(), false );
@@ -456,7 +456,7 @@ void VImageAnalyzer::terminate( bool iDebug_IO )
 			getImageParametersLogL()->getTree()->Write();
 		}
 	}
-	
+
 	if( fRunPar->ftracefit >= 0. )
 	{
 		fOutputfile->cd();
@@ -506,7 +506,7 @@ void VImageAnalyzer::initOutput()
 			exit( EXIT_FAILURE );
 		}
 	}
-	
+
 	// creating the directories in the root output file
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
@@ -546,13 +546,13 @@ void VImageAnalyzer::initTrees()
 	{
 		cout << "VImageAnalyzer::initTrees() " <<  endl;
 	}
-	
+
 	fOutputfile->cd();
 	if( !fAnaDir[getTelID()]->cd() )
 	{
 		cout << "VImageAnalyzer::initTrees() unable to enter directory: " << fAnaDir[getTelID()]->GetName() << endl;
 	}
-	
+
 	// now book the trees (for MC with additional MC block)
 	// tree versioning numbers used in mscw_energy
 	char i_text[300];
@@ -565,7 +565,7 @@ void VImageAnalyzer::initTrees()
 		iSTRText << " (short tree)";
 	}
 	fVImageParameterCalculation->getParameters()->initTree( i_text, iSTRText.str().c_str(), fReader->isMC(), false, fRunPar->fmuonmode, fRunPar->fhoughmuonmode );
-	
+
 	// for log likelihood method, book a second image parameter tree
 	if( fRunPar->fImageLL )
 	{
@@ -593,20 +593,20 @@ bool VImageAnalyzer::initEvent()
 	setImage( false );
 	setBorder( false );
 	setImageBorderNeighbour( false );
-	
+
 	// set all variables in getImageParameters() to zero
 	getImageParameters()->reset();
 	if( fRunPar->fImageLL )
 	{
 		getImageParameters( fRunPar->fImageLL )->reset();
 	}
-	
+
 	//!Initialize this event
 	getImageParameters()->fTelID = getTelID();
-	
+
 	getImageParameters()->MJD  = getEventMJD();
 	getImageParameters()->time = getEventTime();
-	
+
 	// get time since run start
 	if( getAnaData()->fTimeSinceRunStart < 0. )
 	{
@@ -625,24 +625,24 @@ bool VImageAnalyzer::initEvent()
 			getAnaData()->fTimeSinceRunStart = 86400. - idiff;
 		}
 	}
-	
+
 	getImageParameters()->eventNumber = getTelescopeEventNumber( getTelID() );
 	getImageParameters()->nsamples = getNSamples();
 	getImageParameters()->runNumber = getRunNumber();
 	getImageParameters()->eventType = ( unsigned short int )getReader()->getNewEventType();
-	
+
 	getImageParameters()->fTrig_type = fReader->getLocalTriggerType( getTelID() );
 	if( fReader->isGrisuMC() )
 	{
 		setNTrigger();
 	}
-	
+
 	// fill high/low gain vector
 	getImageParameters()->nlowgain = fillHiLo();
 	// fill vector with zero suppressed channels
 	// (return number of zero suppressed channels)
 	getImageParameters()->nzerosuppressed = fillZeroSuppressed();
-	
+
 	if( fRunPar->fImageLL )
 	{
 		getImageParametersLogL()->time = getImageParameters()->time;
@@ -651,7 +651,7 @@ bool VImageAnalyzer::initEvent()
 		getImageParametersLogL()->nsamples = getImageParameters()->nsamples;
 		getImageParametersLogL()->runNumber = getImageParameters()->runNumber;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	// get the telescope pointing
 	//////////////////////////////////////////////////////////////////////////////////////////////
@@ -715,7 +715,7 @@ bool VImageAnalyzer::initEvent()
 			getPointing()[getTelID()]->setTelAzimuth( 0. );
 		}
 	}
-	
+
 	return true;
 }
 
@@ -726,7 +726,7 @@ derived by taking the average of the neighbouring tubes
 void VImageAnalyzer::smoothDeadTubes()
 {
 	unsigned int i_nchannel = getNChannels();
-	
+
 	// reset vectors
 	for( unsigned int i = 0; i < getDead().size(); i++ )
 	{
@@ -736,7 +736,7 @@ void VImageAnalyzer::smoothDeadTubes()
 		savedDeadLow[i] = getDead( true )[i];
 		savedGainsLow = getGains( true )[i];
 	}
-	
+
 	// loop over all channels
 	for( unsigned int i = 0; i < i_nchannel; i++ )
 	{
@@ -751,7 +751,7 @@ void VImageAnalyzer::smoothDeadTubes()
 		// {
 		//	continue;
 		// }
-		
+
 		double ave_sum = 0.;
 		double ave_pedvar = 0.;
 		double ave_gain = 0.;
@@ -762,12 +762,12 @@ void VImageAnalyzer::smoothDeadTubes()
 		for( unsigned int j = 0; j < getDetectorGeo()->getNeighbours()[i].size(); j++ )
 		{
 			unsigned int k = getDetectorGeo()->getNeighbours()[i][j];
-			
+
 			if( getDead()[k] )
 			{
 				continue;
 			}
-			
+
 			ave_sum += getSums()[k];
 			ave_pedvar += getPedvars()[k];
 			ave_gain += getGains()[k];
@@ -782,7 +782,7 @@ void VImageAnalyzer::smoothDeadTubes()
 			ave_gain /= count;
 			ave_tzero /= count;
 			ave_toffvars /= count;
-			
+
 			// this does not work when dead channel list is time dependent
 			getSums()[i] = ave_sum;
 			getPedvars()[i] = ave_pedvar;
@@ -793,7 +793,7 @@ void VImageAnalyzer::smoothDeadTubes()
 			getDeadRecovered()[i] = true;
 		}
 	}
-	
+
 }
 
 
@@ -842,7 +842,7 @@ void VImageAnalyzer::printTrace( int iChannel )
 	{
 		i_totSum /= i_totSumN;
 	}
-	
+
 	// now print everything out
 	cout << getTelescopeEventNumber( getTelID() ) << " " << getSums()[fReader->getHitID( iChannel )] << " " << i_totSum << "    ";
 	unsigned int chanID = fReader->getHitID( iChannel );
@@ -897,16 +897,16 @@ void VImageAnalyzer::setNTrigger()
 		cout << "VImageAnalyzer::setNTrigger" << endl;
 	}
 	getImageParameters()->ntrig = getReader()->getNumberofFullTrigger();
-	
+
 	if( getRunParameter()->fsourcetype == 6 )
 	{
 		return;
 	}
-	
+
 	std::vector<bool> triggered = getReader()->getFullTrigVec();
 	unsigned int triggered_size = triggered.size();
 	unsigned short max_num_in_patch = 0;
-	
+
 	for( unsigned int i = 0; i < triggered_size; i++ )
 	{
 		if( triggered[i] && i < getDetectorGeo()->getNumChannels() )
@@ -962,7 +962,7 @@ void VImageAnalyzer::imageCleaning()
 	{
 		return;
 	}
-	
+
 	/////////////////////////////
 	// fixed threshold cleaning
 	if( getImageCleaningParameter()->fUseFixedThresholds )
@@ -1039,22 +1039,20 @@ void VImageAnalyzer::houghMuonRingAnalysis()
 
 	// Iterative fit muon analysis
 	fVImageParameterCalculation->muonRingFinder();
-	
+
 	//Hough transform based muon parametrization algorithm invoked here
 	//fVImageParameterCalculation->houghMuonRingFinder();
-	
+
 	// Iterative fit muon analysis
 	fVImageParameterCalculation->muonPixelDistribution();
-	
+
 	//Hough transform muon ID technique
 	fVImageParameterCalculation->houghMuonPixelDistribution();
-	
+
 	//Hough transform based size calculation algorithm
 	//fVImageParameterCalculation->houghSizeInMuonRing();
-	
+
 	// Iterative fit muon analysis
 	fVImageParameterCalculation->sizeInMuonRing();
-	
+
 }
-
-

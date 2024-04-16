@@ -21,5 +21,3 @@ void VTMVARunDataZenithCut::print()
 	cout << ", " << fZenithCut_max << "] deg";
 	cout << "\t cuts: " << fZenithCut.GetTitle() << endl;
 }
-
-

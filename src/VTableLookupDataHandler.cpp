@@ -635,7 +635,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			fEmissionHeightMean,
 			fMCEnergy,
 			ffui, fmeanPedvar_ImageT, fFitstat );
-			
+
 		// fill results
 		setEnergy( fDispAnalyzerEnergy->getEnergy(), false );
 		setChi2( fDispAnalyzerEnergy->getEnergyChi2(), false );
@@ -919,7 +919,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		iNFil_sum += iNFil;
 	}
 	cout << iNFil_sum << " file(s) in chain " << endl;
-	// don't check each file for CTA sims -> this is very inefficent and it takes a long time
+	// don't check each file for CTA sims -> this is very inefficient and it takes a long time
 	if( !fTLRunParameter->fPE && fTLRunParameter->readwrite != 'W' )
 	{
 		if( checkIfFilesInChainAreRecovered( fTtelconfig ) )
@@ -1403,7 +1403,6 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 	fOTree->Branch( "Chi2", &fchi2, "Chi2/D" );
 
 	fOTree->Branch( "meanPedvar_Image", &fmeanPedvar_Image, "meanPedvar_Image/F" );
-<<<<<<< HEAD
 
 	sprintf( iTT, "meanPedvar_ImageT[%d]/F", fNTel );
 	fOTree->Branch( "meanPedvar_ImageT", fmeanPedvar_ImageT, iTT );
@@ -2062,7 +2061,7 @@ void VTableLookupDataHandler::reset()
 */
 void VTableLookupDataHandler::calcDistances()
 {
-	// check for successfull reconstruction
+	// check for successful reconstruction
 	for( unsigned int tel = 0; tel < fNTel; tel++ )
 	{
 		if( fImgSel_list[tel] && fZe >= 0. && fXcore > -9998. && fYcore > -9998. )
@@ -2401,7 +2400,7 @@ void VTableLookupDataHandler::resetAll()
 
 
 /*!
-  apply cuts on successfull reconstruction to input data
+  apply cuts on successful reconstruction to input data
 */
 bool VTableLookupDataHandler::cut( bool bWrite )
 {
@@ -2463,7 +2462,7 @@ void VTableLookupDataHandler::setSelectRandom( double iF, int iS )
 {
 	if( iF > 1. )
 	{
-		cout << "VTableLookupDataHandler::setSelectRandom error: random selector outside intervall [0,1]: " << iF << endl;
+		cout << "VTableLookupDataHandler::setSelectRandom error: random selector outside interval [0,1]: " << iF << endl;
 		exit( EXIT_FAILURE );
 	}
 
@@ -2535,7 +2534,7 @@ void VTableLookupDataHandler::setNEntries( int iN )
    get array pointing
 
    if array pointing does not exist:
-   return most propable telescope elevation (majority vote)
+   return most probable telescope elevation (majority vote)
 */
 double VTableLookupDataHandler::getTelElevation()
 {

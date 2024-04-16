@@ -1,4 +1,4 @@
-//! VWPPhysSensitivityPlotsMaker class to produce a tex files for CTA/VTS sensitivties
+//! VWPPhysSensitivityPlotsMaker class to produce a tex files for CTA/VTS sensitivities
 
 #ifndef VWPPhysSensitivityPlotsMaker_H
 #define VWPPhysSensitivityPlotsMaker_H
@@ -15,23 +15,23 @@ using namespace std;
 class VWPPhysSensitivityPlotsMaker
 {
 	private:
-	
+
 		double           fObservingTime_s;
 		vector< string > fListofDataSets;
 		vector< string > fListOfArrays;
 		vector< double > fOffAxisAngle;
-		
+
 		double fSensitivity_min;
 		double fSensitivity_max;
 		string fSensitivity_Unit;
 		double fMinEnergy_TeV;
 		double fMaxEnergy_TeV;
-		
+
 		string fPrintingOptions;
-		
+
 		int   fPlotCTARequirements;
 		bool  fPlotCTARequirementGoals;
-		
+
 		// pads for plotAllInOneCanvas()
 		TCanvas* fPlotAllInOneCanvas;
 		TPad* fSensitivityPad;
@@ -40,12 +40,12 @@ class VWPPhysSensitivityPlotsMaker
 		TPad* fBckRatesPad;
 		TPad* fERes;
 		TPad* fAngRes;
-		
+
 	public:
-	
+
 		VWPPhysSensitivityPlotsMaker();
 		~VWPPhysSensitivityPlotsMaker() {}
-		
+
 		void compareDataSets( string iDataSetFile, string iDirectionString = "", bool IntegratedSensitivityForOffAxisPlots = false );
 		void compareOffAxisSensitivities( string iSubArray, vector< string > iDataSet );
 		void compareOffAxisSensitivities( string iSubArray = "", string iDataSet = "" );

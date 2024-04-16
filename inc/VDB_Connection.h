@@ -23,45 +23,45 @@ using namespace std;
 class VDB_Connection
 {
 	protected:
-	
+
 		TSQLServer* f_db;
 		TSQLResult* fdb_res;
-		
+
 		bool Connect();
-		bool fDB_Connection_successfull;
-		bool fDB_Query_successfull;
-		
+		bool fDB_Connection_successful;
+		bool fDB_Query_successful;
+
 		string fDBserver;
 		string fconnection_mode;
 		string fconnection_option;
-		
+
 		int fMAX_PROCESS;
 		int fNumb_Connection;
-		
+
 	public:
 		VDB_Connection(); // default constructor
-		
+
 		VDB_Connection( string DBserver, string connection_mode, string connection_option );
-		
+
 		~VDB_Connection()
 		{
 			if( f_db )
 			{
 				Close_Connection();
 			}
-			
-			
+
+
 		}
-		
+
 		bool make_query( const char* the_query );
-		
+
 		bool Get_Connection_Status()
 		{
-			return fDB_Connection_successfull;
+			return fDB_Connection_successful;
 		}
 		bool Get_Query_Status()
 		{
-			return fDB_Query_successfull;
+			return fDB_Query_successful;
 		}
 		TSQLResult* Get_QueryResult()
 		{
@@ -71,8 +71,8 @@ class VDB_Connection
 		{
 			return f_db;
 		}
-		
-		
+
+
 		void Close_Connection()
 		{
 			if( f_db )
@@ -82,14 +82,9 @@ class VDB_Connection
 			}
 			return;
 		}
-		
+
 		int  Get_Nb_Connection();
-		
+
 };
 
 #endif
-
-
-
-
-

@@ -13,7 +13,7 @@ using namespace std;
 class VRunList : public TObject
 {
 	public:
-	
+
 		int runnumber;
 		double MJD;
 		double tOn;                               // [s]
@@ -29,13 +29,13 @@ class VRunList : public TObject
 		double alpha;
 		double energyThreshold;                   //  TeV (lin)
 		double phase;                             //  e.g. orbital phase
-		
+
 		VRunList();
 		~VRunList() {}
 		void print();
 		void print( bool csv );
 		void reset();
-		
+
 		ClassDef( VRunList, 4 );
 };
 #endif

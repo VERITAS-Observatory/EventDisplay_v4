@@ -25,11 +25,11 @@ class VDST : public VImageBaseAnalyzer, public VDSTTree
 		bool fBLaser;
 		VImageCleaning* fVImageCleaning;
 		TFile* fDSTfile;
-		
+
 		bool fDSTini;
-		
+
 		bool writeCalibrationData();
-		
+
 	public:
 		VDST( bool iMode, bool iMC );
 		~VDST();

@@ -34,7 +34,7 @@ int main( int argc, char* argv[] )
 		exit( 0 );
 	}
 	cout << endl;
-	
+
 	string ifile = argv[1];
 	string iplot = argv[2];
 	string iDB = argv[3];
@@ -45,7 +45,7 @@ int main( int argc, char* argv[] )
 	{
 		dir = argv[6];
 	}
-	
+
 	bool bplot = false;
 	bool bDB = false;
 	if( iplot == "yes" || iplot == "y" )
@@ -63,14 +63,14 @@ int main( int argc, char* argv[] )
 	Float_t CUTUPmuonRadius = 1.55;
 	Float_t CUTUPmuonRSigma = 0.15;
 	Float_t CUTUPmuonSize = 10000.;
-	
+
 	// arrays for muon size vs radius
 	Float_t  x[10000];
 	Float_t  y[10000];
 	Float_t xe[10000];
 	Float_t ye[10000];
 	Int_t j = 0;
-	
+
 	// open input file
 	TFile* f = new TFile( ifile.c_str() );
 	if( f->IsZombie() )
@@ -187,7 +187,7 @@ int main( int argc, char* argv[] )
 		nMuons[i] = j;
 		cout << "\t events passing cuts: " << j << endl;
 	}
-	
+
 	//// fit muon size vs radius
 	TF1* g2 = new TF1( "g2", "[0]*x" );
 	g2->SetParName( 0, "slope" );
@@ -207,7 +207,7 @@ int main( int argc, char* argv[] )
 		}
 		cout << "\t size vs. radius: " << slope[i] << " +/- " << slopeErr[i] << endl;
 	}
-	
+
 	//// plot muon size vs radius
 	if( bplot )
 	{
@@ -249,7 +249,7 @@ int main( int argc, char* argv[] )
 			canRadiusSize[i]->Print( ctitle );
 		}
 	}
-	
+
 	/// write slope and error to DB
 	if( bDB )
 	{
@@ -257,7 +257,7 @@ int main( int argc, char* argv[] )
 		string DBserver = globalrunpar->getDBServer();
 		string DBstring = DBserver + "/VOFFLINE?local";
 		cout << "writing to database: " << DBstring << endl;
-		
+
 		VDB_Connection my_connection( DBstring.c_str(), iDB_user.c_str(), iDB_passwd.c_str() );
 		if( !my_connection.Get_Connection_Status() )
 		{
@@ -286,7 +286,7 @@ int main( int argc, char* argv[] )
 		{
 			calib_ID = atoi( Description_row->GetField( 0 ) );
 		}
-		
+
 		/// if missing evndisp version create a row in the table tblCalib_Description
 		if( bNewDescription )
 		{
@@ -327,7 +327,7 @@ int main( int argc, char* argv[] )
 		bool bNewData[ntel];
 		for( unsigned int i = 0; i < ntel; i++ )
 		{
-		
+
 			if( !bMinEvents[i] )
 			{
 				continue;
@@ -349,7 +349,7 @@ int main( int argc, char* argv[] )
 			if( bNewData[i] )
 			{
 				sprintf( c_query, "INSERT INTO tblCalib_Run_Data (calib_id,run_id,telescope_id,val1,err1,val2) VALUES (%i, %i, %i, %.1f, %.1f, %i )", calib_ID, RunNumber, i, slope[i], slopeErr[i], nMuons[i] );
-				
+
 				if( !my_connection.make_query( c_query ) )
 				{
 					cout << "error: failed to create new row in tblCalib_Run_Data for telescope " << i + 1 << endl;
@@ -368,6 +368,6 @@ int main( int argc, char* argv[] )
 				cout << "\t updated row in tblCalib_Run_Data for telescope " << i + 1 << endl;
 			}
 		}
-		
+
 	}
 }

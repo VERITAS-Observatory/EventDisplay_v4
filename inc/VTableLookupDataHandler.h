@@ -328,7 +328,7 @@ class VTableLookupDataHandler
 		VTableLookupDataHandler( bool iWrite, VTableLookupRunParameter* iT = 0 );
 		~VTableLookupDataHandler() {}
 
-		bool cut()                                //!< apply cuts on successfull reconstruction to input data
+		bool cut()                                //!< apply cuts on successful reconstruction to input data
 		{
 			return cut( false );
 		}

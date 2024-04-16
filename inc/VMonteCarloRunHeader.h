@@ -14,14 +14,14 @@ using namespace std;
 class VMonteCarloRunHeader : public TNamed
 {
 	public:
-	
+
 		long int runnumber;
 		int shower_prog_id;      ///< CORSIKA=1, ALTAI=2, KASCADE=3, MOCCA=4.
 		int shower_prog_vers;    ///< version * 1000
 		int detector_prog_id;    ///< sim_telarray=1, grisudet=2, CARE=3
 		int detector_prog_vers;  ///< version * 1000
 		int converter_prog_vers; ///< version * 1000
-		
+
 		int shower_date;         ///< date of shower simulations
 		int detector_date;       ///< date of detector simulations
 		/* ... shower MC   */
@@ -56,9 +56,9 @@ class VMonteCarloRunHeader : public TNamed
 		/* ... + detector MC specific ... */
 		string detector_Simulator;
 		bool combined_runHeader;  // incomplete run header from several simtel input files
-		
+
 		float fFADC_hilo_multipler;
-		
+
 		VMonteCarloRunHeader();
 		~VMonteCarloRunHeader() {}
 		double getMeanZenithAngle_Deg();
@@ -67,7 +67,7 @@ class VMonteCarloRunHeader : public TNamed
 		void   printRunNumber();
 		void   reset();
 		bool   VOLUMEDET_set();
-		
+
 		ClassDef( VMonteCarloRunHeader, 8 );
 };
 #endif
