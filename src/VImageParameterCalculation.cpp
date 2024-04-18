@@ -1149,9 +1149,7 @@ void VImageParameterCalculation::calcParameters()
 		const double dist    = sqrt( xmean2 + ymean2 );
 
 		fParGeo->size = sumsig;
-		fParGeo->size2 = sumsig_2;
 		fParGeo->sizeLL = -1.;
-		fParGeo->size2LL = -1.;
 		fParGeo->cen_x = xmean;
 		fParGeo->cen_y = ymean;
 		fParGeo->dist = dist;
@@ -1372,7 +1370,7 @@ void VImageParameterCalculation::calcParameters()
     In this case there is a large probablitity that the parameters are wrong.
 
 */
-vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
+vector<bool> VImageParameterCalculation::calcLL()
 {
 	if( !fData )
 	{
@@ -1441,14 +1439,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 
 			if( fData->getImage()[j] || fData->getBorder()[j] )
 			{
-				if( iUseSums2 )
-				{
-					fll_Sums.push_back( fData->getSums2()[j] );
-				}
-				else
-				{
-					fll_Sums.push_back( fData->getSums()[j] );
-				}
+                fll_Sums.push_back( fData->getSums()[j] );
 			}
 			else
 			{
@@ -1646,10 +1637,6 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	// integrate over all bins to get fitted size
 	bool   iWidthResetted = false;
 	float  iSize = fParGeo->size;
-	if( iUseSums2 )
-	{
-		iSize = fParGeo->size2;
-	}
 	if( fParLL->Fitstat > 0 )
 	{
 		// assume that all pixel are of the same size
@@ -1733,14 +1720,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 		cen_x  = fParGeo->cen_x;
 		cen_y  = fParGeo->cen_y;
 		phi    = fParGeo->phi;
-		if( iUseSums2 )
-		{
-			iSize  = fParGeo->size2;
-		}
-		else
-		{
-			iSize  = fParGeo->size;
-		}
+        iSize  = fParGeo->size;
 	}
 	double cosphi = cos( phi );
 	double sinphi = sin( phi );
@@ -1858,32 +1838,15 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	fParLL->cen_y = cen_y;
 	fParLL->length = length;
 	fParLL->width = width;
-	fParLL->size2LL = fParGeo->size2;
 	fParLL->sizeLL =  fParGeo->size;
-	if( iUseSums2 )
-	{
-		if( iWidthResetted )
-		{
-			fParLL->size2 = fParGeo->size2;
-		}
-		else
-		{
-			fParLL->size2 = iSize;
-		}
-		fParLL->size = fParGeo->size;
-	}
-	else
-	{
-		if( iWidthResetted )
-		{
-			fParLL->size = fParGeo->size;
-		}
-		else
-		{
-			fParLL->size = iSize;
-		}
-		fParLL->size2 = fParGeo->size2;
-	}
+    if( iWidthResetted )
+    {
+        fParLL->size = fParGeo->size;
+    }
+    else
+    {
+        fParLL->size = iSize;
+    }
 	fParLL->dist = dist;
 	fParLL->azwidth = -1.;                        // !!!!!!!!!!!!!! to tired for calculation
 	fParLL->alpha = alpha * TMath::RadToDeg();

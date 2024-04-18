@@ -1495,7 +1495,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 */
 unsigned int VImageBaseAnalyzer::getDynamicSummationWindow( unsigned int i_channelHitID )
 {
-	// low gain: return larger integration window (from size2)
+	// low gain: return larger integration window
 	if( getHiLo()[i_channelHitID] )
 	{
 		return getSumWindow_2();

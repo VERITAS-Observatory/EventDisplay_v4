@@ -238,7 +238,6 @@ class VTableLookupDataHandler
 		double ffui       [VDST_MAXTELESCOPES];
 		double fdist_telType[VDST_MAXTELESCOPES];
 		double fsize     [VDST_MAXTELESCOPES];
-		double fsize2    [VDST_MAXTELESCOPES];
 		double fsizeCorr [VDST_MAXTELESCOPES];
 		double fsize_telType[VDST_MAXTELESCOPES];
 		double floss     [VDST_MAXTELESCOPES];
@@ -502,26 +501,8 @@ class VTableLookupDataHandler
 		{
 			return fOutFile;
 		}
-		double* getSize( double iSizeCorrection = 1., bool iSelectedImagesOnly = false, bool iSize2 = false );        // deprecated
-		double* getSize( double iSizeCorrection, ULong64_t iTelType, bool iSelectedImagesOnly, bool iSize2 = false ); // deprecated
-		double* getSize( vector<double> iSizeCorrection, bool iSelectedImagesOnly = false, bool iSize2 = false );
-		double* getSize( vector<double> iSizeCorrection, ULong64_t iTelType, bool iSelectedImagesOnly = false, bool iSize2 = false );
-		double* getSize2( double iSizeCorrection = 1., bool iSelectedImagesOnly = false ) // deprecated
-		{
-			return getSize( iSizeCorrection, iSelectedImagesOnly, true );
-		}
-		double* getSize2( double iSizeCorrection, ULong64_t iTelType, bool iSelectedImagesOnly ) // deprecated
-		{
-			return getSize( iSizeCorrection, iTelType, iSelectedImagesOnly, true );
-		}
-		double* getSize2( vector<double> iSizeCorrection, bool iSelectedImagesOnly )
-		{
-			return getSize( iSizeCorrection, iSelectedImagesOnly, true );
-		}
-		double* getSize2( vector<double> iSizeCorrection, ULong64_t iTelType, bool iSelectedImagesOnly )
-		{
-			return getSize( iSizeCorrection, iTelType, iSelectedImagesOnly, true );
-		}
+		double* getSize( double iSizeCorrection = 1., bool iSelectedImagesOnly = false );
+		double* getSize( double iSizeCorrection, ULong64_t iTelType, bool iSelectedImagesOnly);
 		double* getWeight()
 		{
 			return fweight;

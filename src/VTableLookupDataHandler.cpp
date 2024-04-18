@@ -517,7 +517,6 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			fdist[i] = ftpars[i]->dist;
 			ffui[i] = ftpars[i]->fui;
 			fsize[i] = ftpars[i]->size;
-			fsize2[i] = ftpars[i]->size2;
 			floss[i] = ftpars[i]->loss;
 			ffracLow[i] = ftpars[i]->fracLow;
 			fwidth[i] = ftpars[i]->width;
@@ -623,7 +622,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			getNTel(),
 			fArrayPointing_Elevation, fArrayPointing_Azimuth,
 			fTel_type,
-			getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly, false ),
+			getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly),
 			fcen_x, fcen_y,
 			fcosphi, fsinphi,
 			fwidth, flength,
@@ -673,7 +672,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 	i_SR.reconstruct_direction( getNTel(),
 								fArrayPointing_Elevation, fArrayPointing_Azimuth,
 								fTelX, fTelY, fTelZ,
-								getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly, false ),
+								getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly),
 								fcen_x, fcen_y,
 								fcosphi, fsinphi,
 								fwidth, flength,
@@ -708,7 +707,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 							 getNTel(),
 							 fArrayPointing_Elevation, fArrayPointing_Azimuth,
 							 fTel_type,
-							 getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly, false ),
+							 getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly),
 							 fcen_x, fcen_y,
 							 fcosphi, fsinphi,
 							 fwidth, flength,
@@ -728,7 +727,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 							getNTel(),
 							fArrayPointing_Elevation, fArrayPointing_Azimuth,
 							fTel_type,
-							getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly, false ),
+							getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly),
 							fcen_x, fcen_y,
 							fcosphi, fsinphi,
 							fwidth, flength,
@@ -754,7 +753,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 			getNTel(),
 			fArrayPointing_Elevation, fArrayPointing_Azimuth,
 			fTel_type,
-			getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly, false ),
+			getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly),
 			fcen_x, fcen_y,
 			fcosphi, fsinphi,
 			fwidth, flength,
@@ -833,7 +832,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 						   fArrayPointing_Elevation, fArrayPointing_Azimuth,
 						   fXoff, fYoff,
 						   fTelX, fTelY, fTelZ,
-						   getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly, false ),
+						   getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly),
 						   fcen_x, fcen_y,
 						   fcosphi, fsinphi,
 						   fwidth, flength,
@@ -1410,8 +1409,6 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 	fOTree->Branch( "dist", fdist, iTT );
 	sprintf( iTT, "size[%d]/D", fNTel );
 	fOTree->Branch( "size", fsize, iTT );
-	sprintf( iTT, "size2[%d]/D", fNTel );
-	fOTree->Branch( "size2", fsize2, iTT );
 	sprintf( iTT, "loss[%d]/D", fNTel );
 	fOTree->Branch( "loss", floss, iTT );
 	sprintf( iTT, "fracLow[%d]/D", fNTel );
@@ -2098,7 +2095,6 @@ void VTableLookupDataHandler::resetImageParameters( unsigned int i )
 	fdist[i] = 0.;
 	ffui[i] = 0.;
 	fsize[i] = 0.;
-	fsize2[i] = 0.;
 	floss[i] = 0.;
 	ffracLow[i] = 0.;
 	fwidth[i] = 0.;
@@ -2308,7 +2304,6 @@ void VTableLookupDataHandler::resetAll()
 		fdist[i] = 0.;
 		ffui[i] = 0.;
 		fsize[i] = 0.;
-		fsize2[i] = 0.;
 		fsizeCorr[i] = 0.;
 		fsize_telType[i] = 0.;
 		floss[i] = 0.;
@@ -2591,7 +2586,7 @@ double* VTableLookupDataHandler::getDistanceToCore( ULong64_t iTelType )
  * used for table filling only
  *
  */
-double* VTableLookupDataHandler::getSize( double iSizeCorrection, bool iSelectedImagesOnly, bool iSize2 )
+double* VTableLookupDataHandler::getSize( double iSizeCorrection, bool iSelectedImagesOnly)
 {
 	for( unsigned int i = 0; i < getNTel(); i++ )
 	{
@@ -2600,19 +2595,12 @@ double* VTableLookupDataHandler::getSize( double iSizeCorrection, bool iSelected
 			fsizeCorr[i] = -99.;
 			continue;
 		}
-		if( !iSize2 )
-		{
-			fsizeCorr[i] = fsize[i] * iSizeCorrection;
-		}
-		else
-		{
-			fsizeCorr[i] = fsize2[i] * iSizeCorrection;
-		}
+        fsizeCorr[i] = fsize[i] * iSizeCorrection;
 	}
 	return fsizeCorr;
 }
 
-double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTelType, bool iSelectedImagesOnly, bool iSize2 )
+double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTelType, bool iSelectedImagesOnly)
 {
 	unsigned int z = 0;
 	for( unsigned int i = 0; i < getNTel(); i++ )
@@ -2625,78 +2613,7 @@ double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTe
 				z++;
 				continue;
 			}
-			if( !iSize2 )
-			{
-				fsize_telType[z] = fsize[i] * iSizeCorrection;
-			}
-			else
-			{
-				fsize_telType[z] = fsize2[i] * iSizeCorrection;
-			}
-			z++;
-		}
-	}
-	return fsize_telType;
-}
-
-/*
- * get an array with image size
- *
- * called while reading lookup tables
- *
- * iSelectedImagesOnly = true: use eventdisplay selection
- *
- */
-double* VTableLookupDataHandler::getSize( vector<double> iSizeCorrection, bool iSelectedImagesOnly, bool iSize2 )
-{
-	for( unsigned int i = 0; i < getNTel(); i++ )
-	{
-		if( iSelectedImagesOnly && !fImgSel_list[i] )
-		{
-			fsizeCorr[i] = -99.;
-			continue;
-		}
-		if( !iSize2 )
-		{
-			fsizeCorr[i] = fsize[i] * iSizeCorrection[i];
-		}
-		else
-		{
-			fsizeCorr[i] = fsize2[i] * iSizeCorrection[i];
-		}
-	}
-	return fsizeCorr;
-}
-
-/*
- * get an array with image size
- *
- * called while filling lookup tables
- *
- * iSelectedImagesOnly = true: use eventdisplay selection
- *
- */
-double* VTableLookupDataHandler::getSize( vector<double> iSizeCorrection,  ULong64_t iTelType, bool iSelectedImagesOnly, bool iSize2 )
-{
-	unsigned int z = 0;
-	for( unsigned int i = 0; i < getNTel(); i++ )
-	{
-		if( fTel_type[i] == iTelType )
-		{
-			if( iSelectedImagesOnly && !fImgSel_list[i] )
-			{
-				fsize_telType[z] = -99.;
-				z++;
-				continue;
-			}
-			if( !iSize2 )
-			{
-				fsize_telType[z] = fsize[i] * iSizeCorrection[i];
-			}
-			else
-			{
-				fsize_telType[z] = fsize2[i] * iSizeCorrection[i];
-			}
+            fsize_telType[z] = fsize[i] * iSizeCorrection;
 			z++;
 		}
 	}
