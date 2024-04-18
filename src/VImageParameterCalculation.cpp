@@ -1848,7 +1848,7 @@ vector<bool> VImageParameterCalculation::calcLL()
         fParLL->size = iSize;
     }
 	fParLL->dist = dist;
-	fParLL->azwidth = -1.;                        // !!!!!!!!!!!!!! to tired for calculation
+	fParLL->azwidth = -1.;                        // !!!!!!!!!!!!!! too tired for calculation
 	fParLL->alpha = alpha * TMath::RadToDeg();
 	fParLL->los = los;
 	fParLL->miss = miss;
