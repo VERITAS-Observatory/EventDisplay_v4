@@ -52,12 +52,11 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 
 		float fMinRequiredShowerPerBin;    // minimum number of showers required per table bin
 
-		bool  fUseSelectedImagesOnly;
+		bool  fUseEvndispSelectedImagesOnly;
 
 		string writeoption;
 		bool bNoNoTrigger;
 		int  bWriteReconstructedEventsOnly;
-		bool bShortTree;
 		bool bWriteMCPars;
 		int  rec_method;
 		// quality cut level
@@ -78,9 +77,10 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		double       fmaxdist;   // note: same for all telescope types
 		double       fmaxloss;   // note: same for all telescope types
 		double       fminfui ;   // note: same for all telescope types
-		double       fminsize;   // note: same for all telescope times
-		double       fminwidth;  // note: same for all telescope times
-		double       fminfitstat;  // note: same for all telescope times
+		double       fminsize;   // note: same for all telescope types
+		int          fminntubes; // note: same for all telescope types
+		double       fminwidth;  // note: same for all telescope types
+		double       fminfitstat;  // note: same for all telescope types
 		// seed for random selection of showers before table filling
 		double fSelectRandom;
 		int fSelectRandomSeed;
@@ -112,6 +112,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		void print( int iB = 0 );
 		void printHelp();
 
-		ClassDef( VTableLookupRunParameter, 31 );
+		ClassDef( VTableLookupRunParameter, 32 );
 };
 #endif

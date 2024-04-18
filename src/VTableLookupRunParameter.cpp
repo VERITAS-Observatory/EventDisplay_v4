@@ -23,9 +23,8 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	writeoption = "recreate";
 	fMinRequiredShowerPerBin = 5.;
 	bNoNoTrigger = true;
-	fUseSelectedImagesOnly = true;
+	fUseEvndispSelectedImagesOnly = true;
 	bWriteReconstructedEventsOnly = 1;
-	bShortTree = false;
 	bWriteMCPars = true;
 	rec_method = 0;
 	fWrite1DHistograms = false;
@@ -38,6 +37,7 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	fmaxdist = 50000.;
 	fmaxloss = 1.;
 	fminfui = 0.;
+	fminntubes = 5;
 	fminwidth = -1.;
 	fminfitstat = -10.;
 	fSelectRandom = -1.;
@@ -296,6 +296,10 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		{
 			fminfui = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
+		else if( iTemp.find( "-minntubes" ) < iTemp.size() )
+		{
+			fminntubes = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+        }
 		else if( iTemp.find( "-minwidth" ) < iTemp.size() )
 		{
 			fminwidth = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -316,6 +320,10 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 			{
 				fMC_distance_to_cameracenter_min = 0.;
 			}
+		}
+		else if( iTemp.find( "-use_evndisp_selected_images" ) < iTemp.size() )
+		{
+			fUseEvndispSelectedImagesOnly = ( bool )atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
 		else if( iTemp.find( "-add_mc_spectral_index" ) < iTemp.size() )
 		{
@@ -359,10 +367,6 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 			{
 				bWriteReconstructedEventsOnly = 0;
 			}
-		}
-		else if( iTemp.find( "-short" ) < iTemp.size() )
-		{
-			bShortTree = true;
 		}
 		else if( iTemp.find( "-pe" ) < iTemp.size() )
 		{
@@ -584,6 +588,7 @@ void VTableLookupRunParameter::print( int iP )
 			{
 				cout << "\t BDT TMVA stereo reconstruction min fitstat cut < " << fminfitstat << endl;
 			}
+			cout << "\t BDT TMVA stereo reconstruction ntubes cut >= " << fminntubes << endl;
 			cout << "\t Head/tail uncertainty: ";
 			if( fDisp_UseIntersectForHeadTail )
 			{
@@ -603,7 +608,7 @@ void VTableLookupRunParameter::print( int iP )
 	{
 		cout << "random event selection: " << fSelectRandom << ", seed:" << fSelectRandomSeed << endl;
 	}
-	if( fUseSelectedImagesOnly )
+	if( fUseEvndispSelectedImagesOnly )
 	{
 		cout << "\t use evndisp image selection" << endl;
 	}

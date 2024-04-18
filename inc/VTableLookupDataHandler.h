@@ -141,7 +141,6 @@ class VTableLookupDataHandler
 
 		// output trees
 		TTree* fOTree;
-		bool fShortTree;                          //!< use short version of output tree
 		bool bWriteMCPars;
 
 		// cut statistics
@@ -167,6 +166,7 @@ class VTableLookupDataHandler
 		void   copyMCTree();
 		void   copy_telconfig();
 		void   doStereoReconstruction();
+		void   fill_selected_images_after_redo_stereo_reconstruction();
 		void   initializeTelTypeVector();
 		int    fillNextEvent( bool bShort );
 		pair<float, float > getArrayPointing();
@@ -206,6 +206,7 @@ class VTableLookupDataHandler
 		ULong64_t LTrig;
 		unsigned int fNTrig;
 		int fNImages;
+		int fNImages_intersect;
 		ULong64_t fImgSel;
 		bool fImgSel_list[VDST_MAXTELESCOPES];
 		unsigned int fImgSel_list_short[VDST_MAXTELESCOPES];

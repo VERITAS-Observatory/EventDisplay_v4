@@ -499,7 +499,7 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
 	for( unsigned int i = 0; i < i_ntel; i++ )
 	{
 		// quality cuts
-		if( img_size[i] > 0. && img_length[i] > 0. && img_ntubes[i] > 0
+		if( img_size[i] > 0. && img_length[i] > 0. && img_ntubes[i] > fntubes_min
 				&& sqrt( img_cen_x[i]*img_cen_x[i] + img_cen_y[i]*img_cen_y[i] ) < fdistance_max
 				&& img_loss[i] < floss_max
 				&& img_fui[i] > fFui_min
@@ -624,7 +624,7 @@ vector< float > VDispAnalyzer::calculateExpectedDirectionError_or_Sign( unsigned
 		// quality cuts
 		if( img_size[i] > 0. && img_length[i] > 0.
 				&& sqrt( img_cen_x[i]*img_cen_x[i] + img_cen_y[i]*img_cen_y[i] ) < fdistance_max
-				&& img_loss[i] < floss_max
+				&& img_loss[i] < floss_max && img_ntubes[i] > fntubes_min
 				&& img_fui[i] > fFui_min
 				&& img_width[i] > fWidth_min
 				&& ( img_fitstat[i] < 1 || img_fitstat[i] >= fFitstat_min ) )
@@ -744,7 +744,7 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
 	{
 		if( img_size[i] > 0. && iRcore[i] > 0. && iArrayElevation > 0.
 				&& sqrt( img_cen_x[i]*img_cen_x[i] + img_cen_y[i]*img_cen_y[i] ) < fdistance_max
-				&& img_loss[i] < floss_max
+				&& img_loss[i] < floss_max && img_ntubes[i] > fntubes_min
 				&& img_fui[i] > fFui_min
 				&& img_width[i] > fWidth_min
 				&& ( img_fitstat[i] < 1 || img_fitstat[i] >= fFitstat_min ) )

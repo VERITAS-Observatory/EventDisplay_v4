@@ -35,6 +35,7 @@ class VDispAnalyzer
 		float fdistance_max;
 		float floss_max;
 		float fFui_min;
+		int   fntubes_min;
 		float fWidth_min;
 		float fFitstat_min;
 		bool  fDispErrorWeighting;
@@ -245,7 +246,8 @@ class VDispAnalyzer
 		}
 		void  setQualityCuts( unsigned int iNImages_min = 0, float iAxesAngles_min = 0.,
 							  float imaxdist = 1.e5, float imaxloss = 1.,
-							  float iminfui = 0., float iminwidth = -1., float iminfitstat = -10. )
+							  float iminfui = 0., float iminwidth = -1., float iminfitstat = -10.,
+                              int iminntubes = 0 )
 		{
 			fAxesAngles_min = iAxesAngles_min;
 			fNImages_min    = iNImages_min;
@@ -254,6 +256,7 @@ class VDispAnalyzer
 			fFui_min        = iminfui;
 			fWidth_min      = iminwidth;
 			fFitstat_min    = iminfitstat;
+			fntubes_min     = iminntubes;
 		}
 		void  setTelescopeTypeList( vector<ULong64_t> iTelescopeTypeList );
 		void  setTelescopeFOV( vector< float > iTelFOV )

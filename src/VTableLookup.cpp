@@ -632,7 +632,7 @@ void VTableLookup::fillLookupTable()
 				ULong64_t t = iter_i_list_of_Tel_type->first;
 
 				// This should be already the corrected/scaled size value for MC.
-				double* i_s2 = fData->getSize2( 1., t, fTLRunParameter->fUseSelectedImagesOnly );
+				double* i_s2 = fData->getSize2( 1., t, fTLRunParameter->fUseEvndispSelectedImagesOnly );
 				double* i_r = fData->getDistanceToCore( t );
 				unsigned int i_type = fData->getNTel_type( t );
 				////////////////////////////////////////////////
@@ -958,7 +958,7 @@ void VTableLookup::readLookupTable()
 			imr = 0.;
 			inr = 0.;
 			// require size2 > 0 (to use only selected images for the MWR/MWL calculation)
-			double* i_s2 = fData->getSize2( 1., fTLRunParameter->fUseSelectedImagesOnly );
+			double* i_s2 = fData->getSize2( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly );
 			for( unsigned int j = 0; j < s_N->fNTel; j++ )
 			{
 				if( s_N->mscw_T[j] > 0. && fData->getWidth() && i_s2 && i_s2[j] > 0. )
@@ -1413,7 +1413,7 @@ void VTableLookup::calculateMSFromTables( VTablesToRead* s, double esys )
 	}
 	double i_dummy = 0.;
 
-	double* i_s2 = fData->getSize2( 1., fTLRunParameter->fUseSelectedImagesOnly );
+	double* i_s2 = fData->getSize2( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly );
 
 	f_calc_msc->setCalculateEnergies( false );
 	///////////////////

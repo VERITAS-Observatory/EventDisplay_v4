@@ -381,7 +381,7 @@ bool readTrainingFile( string iTargetML, ULong64_t iTelType, string iDataDirecto
 
 */
 bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
-						unsigned int iRecID, string iArrayList,
+						unsigned int iRecID,
 						bool redo_stereo_reconstruction )
 {
 	////////////////////////////
@@ -940,8 +940,7 @@ int main( int argc, char* argv[] )
 		cout << "./trainTMVAforAngularReconstruction <list of input eventdisplay files (MC)> <output directory>" << endl;
 		cout << "                                     <train vs test fraction> <RecID> <telescope type>" << endl;
 		cout << "                                     [train for angular / energy / core reconstruction]" << endl;
-		cout << "                                     [MVA options] [array layout file] [directory with training trees]" << endl;
-		cout << "                                     [quality cut] [use image parameter errors (default=off=0)]";
+		cout << "                                     [quality cuts] [directory with training trees]" << endl;
 		cout << endl;
 		cout << endl;
 
@@ -964,7 +963,6 @@ int main( int argc, char* argv[] )
 	// tmva options likely overwritten from command line
 	string iTMVAOptions = "VarTransform=N:NTrees=200:BoostType=AdaBoost:MaxDepth=8";
 	string       iDataDirectory = "";
-	string       iLayoutFile = "";
 	// quality cut likely overwritten from command line
 	string       iQualityCut = "size>1.&&ntubes>log10(4.)&&width>0.&&width<2.&&length>0.&&length<10.";
 	iQualityCut = iQualityCut + "&&tgrad_x<100.*100.&&loss<0.20&&cross<20.0&&Rcore<2000.";
@@ -974,19 +972,11 @@ int main( int argc, char* argv[] )
 	}
 	if( argc >=  8 )
 	{
-		iTMVAOptions = argv[7];
+		iQualityCut = argv[7];
 	}
 	if( argc >= 9 )
 	{
-		iLayoutFile = argv[8];
-	}
-	if( argc >= 10 )
-	{
-		iDataDirectory = argv[9];
-	}
-	if( argc >= 11 )
-	{
-		iQualityCut = argv[10];
+		iDataDirectory = argv[8];
 	}
 	bool redo_stereo_reconstruction = false;
 
@@ -1039,7 +1029,7 @@ int main( int argc, char* argv[] )
 	//////////////////////
 	// fill training file
 	if( iDataDirectory.size() == 0
-			&& !writeTrainingFile( fInputFile, iTelType, iRecID, iLayoutFile, redo_stereo_reconstruction ) )
+			&& !writeTrainingFile( fInputFile, iTelType, iRecID, redo_stereo_reconstruction ) )
 	{
 		cout << "error writing training file " << endl;
 		cout << "exiting..." << endl;
