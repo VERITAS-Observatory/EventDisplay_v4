@@ -103,7 +103,11 @@ VEventLoop::VEventLoop( VEvndispRunParameter* irunparameter )
 	fCalibrator = new VCalibrator();
 
 	// create data summarizer
-	fDST = new VDST( ( fRunMode == R_DST ), ( fRunPar->fsourcetype == 1 || fRunPar->fsourcetype == 2 || fRunPar->fsourcetype == 6 ) );
+	fDST = 0;
+	if( fRunMode == R_DST )
+	{
+		fDST = new VDST( ( fRunMode == R_DST ), ( fRunPar->fsourcetype == 1 || fRunPar->fsourcetype == 2 || fRunPar->fsourcetype == 6 ) );
+	}
 
 	// create analyzer (one for all telescopes)
 	fAnalyzer = new VImageAnalyzer();
