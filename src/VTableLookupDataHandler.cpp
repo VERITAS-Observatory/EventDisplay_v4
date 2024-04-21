@@ -622,7 +622,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			getNTel(),
 			fArrayPointing_Elevation, fArrayPointing_Azimuth,
 			fTel_type,
-			getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly),
+			getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
 			fcen_x, fcen_y,
 			fcosphi, fsinphi,
 			fwidth, flength,
@@ -672,7 +672,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 	i_SR.reconstruct_direction( getNTel(),
 								fArrayPointing_Elevation, fArrayPointing_Azimuth,
 								fTelX, fTelY, fTelZ,
-								getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly),
+								getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
 								fcen_x, fcen_y,
 								fcosphi, fsinphi,
 								fwidth, flength,
@@ -707,7 +707,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 							 getNTel(),
 							 fArrayPointing_Elevation, fArrayPointing_Azimuth,
 							 fTel_type,
-							 getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly),
+							 getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
 							 fcen_x, fcen_y,
 							 fcosphi, fsinphi,
 							 fwidth, flength,
@@ -727,7 +727,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 							getNTel(),
 							fArrayPointing_Elevation, fArrayPointing_Azimuth,
 							fTel_type,
-							getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly),
+							getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
 							fcen_x, fcen_y,
 							fcosphi, fsinphi,
 							fwidth, flength,
@@ -753,7 +753,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 			getNTel(),
 			fArrayPointing_Elevation, fArrayPointing_Azimuth,
 			fTel_type,
-			getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly),
+			getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
 			fcen_x, fcen_y,
 			fcosphi, fsinphi,
 			fwidth, flength,
@@ -832,7 +832,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
 						   fArrayPointing_Elevation, fArrayPointing_Azimuth,
 						   fXoff, fYoff,
 						   fTelX, fTelY, fTelZ,
-						   getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly),
+						   getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
 						   fcen_x, fcen_y,
 						   fcosphi, fsinphi,
 						   fwidth, flength,
@@ -2586,7 +2586,7 @@ double* VTableLookupDataHandler::getDistanceToCore( ULong64_t iTelType )
  * used for table filling only
  *
  */
-double* VTableLookupDataHandler::getSize( double iSizeCorrection, bool iSelectedImagesOnly)
+double* VTableLookupDataHandler::getSize( double iSizeCorrection, bool iSelectedImagesOnly )
 {
 	for( unsigned int i = 0; i < getNTel(); i++ )
 	{
@@ -2595,12 +2595,12 @@ double* VTableLookupDataHandler::getSize( double iSizeCorrection, bool iSelected
 			fsizeCorr[i] = -99.;
 			continue;
 		}
-        fsizeCorr[i] = fsize[i] * iSizeCorrection;
+		fsizeCorr[i] = fsize[i] * iSizeCorrection;
 	}
 	return fsizeCorr;
 }
 
-double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTelType, bool iSelectedImagesOnly)
+double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTelType, bool iSelectedImagesOnly )
 {
 	unsigned int z = 0;
 	for( unsigned int i = 0; i < getNTel(); i++ )
@@ -2613,7 +2613,7 @@ double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTe
 				z++;
 				continue;
 			}
-            fsize_telType[z] = fsize[i] * iSizeCorrection;
+			fsize_telType[z] = fsize[i] * iSizeCorrection;
 			z++;
 		}
 	}
