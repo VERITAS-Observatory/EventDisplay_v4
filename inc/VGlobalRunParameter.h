@@ -8,6 +8,10 @@
 #include <TTree.h>
 #include <TROOT.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include <fstream>
 #include <iostream>
 #include <stdlib.h>
