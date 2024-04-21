@@ -66,7 +66,7 @@ class VImageParameterCalculation : public TObject
 
 		VImageParameterCalculation( unsigned int iShortTree = 0, VEvndispData* iData = 0 );
 		~VImageParameterCalculation();
-		vector<bool> calcLL();                                                                 //!< calculate image parameters (log like)
+		vector<bool> calcLL(bool);                                                                 //!< calculate image parameters (log like)
 		void muonRingFinder();                                                                 //!< fit a single ring to the image to look for muons
 		void sizeInMuonRing();                                                                 //! calculate the brightness of the muon ring
 		void muonPixelDistribution();                                                          //!< determine the distribution of pixels in the image

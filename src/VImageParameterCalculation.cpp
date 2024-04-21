@@ -1370,7 +1370,7 @@ void VImageParameterCalculation::calcParameters()
     In this case there is a large probablitity that the parameters are wrong.
 
 */
-vector<bool> VImageParameterCalculation::calcLL()
+vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 {
 	if( !fData )
 	{
@@ -1439,7 +1439,14 @@ vector<bool> VImageParameterCalculation::calcLL()
 
 			if( fData->getImage()[j] || fData->getBorder()[j] )
 			{
-                fll_Sums.push_back( fData->getSums()[j] );
+				if( iUseSums2 )
+				{
+					fll_Sums.push_back( fData->getSums2()[j] );
+				}
+				else
+				{
+					fll_Sums.push_back( fData->getSums()[j] );
+				}
 			}
 			else
 			{
@@ -1720,7 +1727,7 @@ vector<bool> VImageParameterCalculation::calcLL()
 		cen_x  = fParGeo->cen_x;
 		cen_y  = fParGeo->cen_y;
 		phi    = fParGeo->phi;
-        iSize  = fParGeo->size;
+		iSize  = fParGeo->size;
 	}
 	double cosphi = cos( phi );
 	double sinphi = sin( phi );
@@ -1839,14 +1846,14 @@ vector<bool> VImageParameterCalculation::calcLL()
 	fParLL->length = length;
 	fParLL->width = width;
 	fParLL->sizeLL =  fParGeo->size;
-    if( iWidthResetted )
-    {
-        fParLL->size = fParGeo->size;
-    }
-    else
-    {
-        fParLL->size = iSize;
-    }
+	if( iWidthResetted )
+	{
+		fParLL->size = fParGeo->size;
+	}
+	else
+	{
+		fParLL->size = iSize;
+	}
 	fParLL->dist = dist;
 	fParLL->azwidth = -1.;                        // !!!!!!!!!!!!!! too tired for calculation
 	fParLL->alpha = alpha * TMath::RadToDeg();

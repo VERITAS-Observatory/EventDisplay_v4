@@ -200,7 +200,9 @@ void VImageAnalyzer::doAnalysis()
 				&& getImageParameters()->loss > fRunPar->fLogLikelihoodLoss_min[getTelID()] )
 		{
 			fVImageParameterCalculation->setParametersLogL( getImageParameters() );
-			setLLEst( fVImageParameterCalculation->calcLL() );
+			setLLEst( fVImageParameterCalculation->calcLL( true ) );
+			fVImageParameterCalculation->setParametersLogL( getImageParameters() );
+			setLLEst( fVImageParameterCalculation->calcLL( false ) );
 		}
 	}
 
@@ -281,7 +283,9 @@ void VImageAnalyzer::doAnalysis()
 				&& ( fRunPar->fForceLLImageFit || ( getImageParameters()->loss > fRunPar->fLogLikelihoodLoss_min[getTelID()] ) ) ) // FORCELL
 		{
 			fVImageParameterCalculation->setParametersLogL( getImageParameters() );
-			setLLEst( fVImageParameterCalculation->calcLL() );
+			setLLEst( fVImageParameterCalculation->calcLL( true ) );
+			fVImageParameterCalculation->setParametersLogL( getImageParameters() );
+			setLLEst( fVImageParameterCalculation->calcLL( false ) );
 		}
 
 	}
@@ -295,7 +299,9 @@ void VImageAnalyzer::doAnalysis()
 		if( getImageParameters()->ntubes > 0 )
 		{
 			fVImageParameterCalculation->setParametersLogL( getImageParametersLogL() );
-			setLLEst( fVImageParameterCalculation->calcLL() );
+			setLLEst( fVImageParameterCalculation->calcLL( true ) );
+			fVImageParameterCalculation->setParametersLogL( getImageParametersLogL() );
+			setLLEst( fVImageParameterCalculation->calcLL( false ) );
 		}
 		else
 		{
