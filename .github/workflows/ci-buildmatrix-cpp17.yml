@@ -4,8 +4,7 @@ name: cpp17-buildmatrix
 # Controls when the workflow will run
 on:
   pull_request:
-    branches: [main, master, v490-dev-v0.7]
-  # run this workflow manually from the Actions tab
+    branches: [main, master]
   workflow_dispatch:
 
 jobs:
@@ -16,13 +15,16 @@ jobs:
         root:
           - "rootproject/root:latest"
           - "rootproject/root:6.26.06-ubuntu22.04"
-          - "rootproject/root:6.26.06-fedora35"
+          - "rootproject/root:6.30.02-alma9
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.root }}
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
+
+      - name: install libblas
+        if: ${{ matrix.root == 'rootproject/root:latest' || matrix.root == 'rootproject/root:6.26.06-ubuntu22.04' }}
+        run: apt-get install -y libblas-dev
 
       - name: vbf
         run: |
