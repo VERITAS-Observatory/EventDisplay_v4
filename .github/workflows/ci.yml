@@ -26,10 +26,11 @@ jobs:
     container: ${{ matrix.root }}
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
 
-      # Runs a set of commands using the runners shell
+      - name: install libblas
+        run: sudo apt-get install -y libblas-dev
+
       - name: build
         run: |
           root-config --version
