@@ -47,4 +47,4 @@ jobs:
           export LD_LIBRARY_PATH="${EVNDISPSYS}/obj:${EVNDISPSYS}/lib:${LD_LIBRARY_PATH}"
           export LD_LIBRARY_PATH="${VBFSYS}/lib:${LD_LIBRARY_PATH}"
           export SOFASYS=/sofa
-          make VTS
+          make -j 4 VTS
