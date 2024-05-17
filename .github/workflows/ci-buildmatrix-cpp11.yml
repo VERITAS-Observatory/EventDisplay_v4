@@ -3,9 +3,8 @@ name: cpp11-buildmatrix
 
 # Controls when the workflow will run
 on:
-  #  pull_request:
-  #  branches: [main, master, v490-dev-v0.7]
-  # run this workflow manually from the Actions tab
+  pull_request:
+    branches: [main, master]
   workflow_dispatch:
 
 jobs:
@@ -20,8 +19,7 @@ jobs:
     container: ${{ matrix.root }}
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: vbf
         run: |
