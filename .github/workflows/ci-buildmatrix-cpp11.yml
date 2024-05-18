@@ -3,8 +3,8 @@ name: cpp11-buildmatrix
 
 # Controls when the workflow will run
 on:
-  pull_request:
-    branches: [main, master]
+  #  pull_request:
+  #  branches: [main, master]
   workflow_dispatch:
 
 jobs:
