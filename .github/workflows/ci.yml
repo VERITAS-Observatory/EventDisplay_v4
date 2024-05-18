@@ -3,12 +3,8 @@ name: CI
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request
-  # events but only for the main branch
   pull_request:
     branches: [main, master]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
@@ -26,10 +22,11 @@ jobs:
     container: ${{ matrix.root }}
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
 
-      # Runs a set of commands using the runners shell
+      - name: install libblas
+        run: apt-get install -y libblas-dev
+
       - name: build
         run: |
           root-config --version
@@ -37,4 +34,4 @@ jobs:
           export SOFASYS=${EVNDISPSYS}/sofa
           ./install_sofa.sh CI
           make config
-          make VTS
+          make -j 4 VTS

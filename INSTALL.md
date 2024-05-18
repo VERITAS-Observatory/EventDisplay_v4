@@ -8,7 +8,7 @@ Eventdisplay is a C++ based library and designed to run in typical Linux environ
 
 CERN's [ROOT](https://root.cern.ch/) library for I/O, histogramming, and statistical applications:
 
-- ROOT versions >= 6.20
+- ROOT versions >= 6.28
 - the first-stage tool `evndisp` requires ROOT compiled with mysql for access to the VERITAS database. Pre-compiled version of ROOT (downloaded from [here](https://root.cern/install/)) have mysql installed. If building from source, ensure the mysql dependencies are installed and compiler flags are added (see [root installation page](https://root.cern/install/build_from_source/)). All other stages of Eventdisplay do not required mysql - meaning e.g., the conda-based installation of Eventdisplay is fine.
 - paths for ROOT should be set through e.g.,
 
@@ -28,7 +28,7 @@ root-config --has-mysql
 ### SOFA
 
 [SOFA](http://www.iausofa.org/current_C.html) for all astronometry transformations.
- 
+
 Download and install using this script in the $EVNDISPSYS directory:
 
 ```
@@ -63,7 +63,7 @@ Eventdisplay can be used efficiently with the correct environmental variables se
 
 ### Compiling and Linking
 
-ROOTSYS :   (required) ROOT installation; add $ROOTSYS/lib to $LD_LIBRARY_PATH and $ROOTSYS/bin to $PATH 
+ROOTSYS :   (required) ROOT installation; add $ROOTSYS/lib to $LD_LIBRARY_PATH and $ROOTSYS/bin to $PATH
 
 SOFASYS:    (required) Astronomy library from Sofa
 
@@ -83,11 +83,11 @@ EVNDISPSCRIPTS: Eventdisplay scripts directory
 
 Assume a computing environment, where several users are analysis the same raw data
 (would be in $VERITAS_DATA_DIR), but having their analysis results written to their own
-directories ($VERITAS_USER_DATA_DIR). 
+directories ($VERITAS_USER_DATA_DIR).
 Note that $VERITAS_DATA_DIR and $VERITAS_USER_DATA_DIR can point to the same directory.
 
 - VERITAS_EVNDISP_AUX_DIR:  directory with all auxiliary data like calibration files, lookup tables, effective areas, etc
-- VERITAS_DATA_DIR :        directory containing the raw telescope data or input simulation files 
+- VERITAS_DATA_DIR :        directory containing the raw telescope data or input simulation files
 - VERITAS_USER_DATA_DIR :   user data directory: containing output files from this analysis package
 - VERITAS_USER_LOG_DIR :    user log file directory: log files and temporary scripts are written to this directory
 
@@ -107,14 +107,14 @@ make config
 
 Compare the output with the requirements on software and environmental variable settings described above.
 
-In the main Eventdisplay directory ($EVNDISPSYS is pointing to this directory), compile all Eventdisplay binaries with 
+In the main Eventdisplay directory ($EVNDISPSYS is pointing to this directory), compile all Eventdisplay binaries with
 
 ```
-source ./setObservatory.sh VTS 
+source ./setObservatory.sh VTS
 make VTS
 ```
 
-If you are working on a computing with several cores, this can be accelerated by e.g. compiling with four cores in parallel: 
+If you are working on a computing with several cores, this can be accelerated by e.g. compiling with four cores in parallel:
 
 ```
 source ./setObservatory.sh VTS

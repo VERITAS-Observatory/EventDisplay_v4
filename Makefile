@@ -16,7 +16,7 @@
 #
 #  Optional libraries:
 #
-#  for using GSL libraries (as part of ROO  mathmore)
+#  for using GSL libraries (as part of ROOT mathmore)
 #
 #  for using FITS (optional)
 #    FITSSYS (pointing to FITS installation)
@@ -540,7 +540,7 @@ printCrabSensitivity =		./obj/printCrabSensitivity.o \
 							./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
 							./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
 							./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
-					
+
 
 ./obj/printCrabSensitivity.o:	./src/printCrabSensitivity.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -555,7 +555,7 @@ printCrabSensitivity:	$(printCrabSensitivity)
 # logFile
 ########################################################
 LOGFILE =		./obj/logFile.o \
-					
+
 
 ./obj/logFile.o:	./src/logFile.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -725,7 +725,7 @@ ifneq ($(TSPECTRUMFLAG),-DNOSPECTRUM)
 endif
 
 ifeq ($(ASTRONMETRY),-DASTROSLALIB)
-  SHAREDOBJS += ./obj/VASlalib.o ./obj/VASlalib_Dict.o 
+  SHAREDOBJS += ./obj/VASlalib.o ./obj/VASlalib_Dict.o
 endif
 
 ifneq ($(GSLFLAG),-DNOGSL)
@@ -925,7 +925,7 @@ compareDatawithMC:	$(COMPAREDATAMCOBJ)
 	@echo "$@ done"
 
 ########################################################
-# printMJD 
+# printMJD
 ########################################################
 PRINTMJDOBJ=		./obj/VSkyCoordinatesUtilities.o \
 					./obj/VAstronometry.o \
@@ -940,7 +940,7 @@ printMJD:	$(PRINTMJDOBJ)
 	@echo "$@ done"
 
 ########################################################
-# printSQLDate 
+# printSQLDate
 ########################################################
 printSQLDateOBJ=		./obj/VSkyCoordinatesUtilities.o \
 					./obj/VAstronometry.o \
@@ -1532,7 +1532,7 @@ ifeq ($(GSLFLAG),-DNOGSL)
 	@echo "evndisp without GSL libraries (no Hough muon calibration, no likelihood fitter)"
 else
 	@echo "evndisp with GSL libraries (used in Hough muon calibration, likelihood fitter)"
-	@echo "   GSL  $(GSLFLAG)" 
+	@echo "   GSL  $(GSLFLAG)"
 	@echo "   $(GSLCFLAGS) $(GSLLIBS)"
 endif
 	@echo ""
@@ -1602,7 +1602,7 @@ else
 endif
 
 ###############################################################################################################################
-# source code formating
+# source code formatting
 ###############################################################################################################################
 formatSourceCode:
 	@echo ""

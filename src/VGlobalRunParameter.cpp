@@ -178,8 +178,9 @@ bool VGlobalRunParameter::setDirectories()
 		fEVNDISPAnaDataDirectory = data_dir;
 		fEVNDISPAnaDataDirectory += "/";
 	}
-	// test if directory exists
-	if( gSystem->AccessPathName( fEVNDISPAnaDataDirectory.c_str() ) )
+	struct stat s;
+	int err = stat( fEVNDISPAnaDataDirectory.c_str(), &s );
+	if( err == -1  || !S_ISDIR( s.st_mode ) )
 	{
 		cout << "VGlobalRunParameter::setDirectories() error: cannot find directory with EVNDISP aux data" << endl;
 		cout << "\t looking for " << fEVNDISPAnaDataDirectory << endl;

@@ -299,7 +299,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		else if( iTemp.find( "-minntubes" ) < iTemp.size() )
 		{
 			fminntubes = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-        }
+		}
 		else if( iTemp.find( "-minwidth" ) < iTemp.size() )
 		{
 			fminwidth = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
