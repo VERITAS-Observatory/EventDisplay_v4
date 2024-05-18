@@ -14,7 +14,6 @@ jobs:
         os: [ubuntu-latest]
         root:
           - "rootproject/root:6.24.06-centos7"
-          - "rootproject/root:6.22.08-ubuntu20.04"
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.root }}
 
