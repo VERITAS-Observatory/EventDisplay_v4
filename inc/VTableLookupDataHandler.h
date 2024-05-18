@@ -502,7 +502,7 @@ class VTableLookupDataHandler
 			return fOutFile;
 		}
 		double* getSize( double iSizeCorrection = 1., bool iSelectedImagesOnly = false );
-		double* getSize( double iSizeCorrection, ULong64_t iTelType, bool iSelectedImagesOnly);
+		double* getSize( double iSizeCorrection, ULong64_t iTelType, bool iSelectedImagesOnly );
 		double* getWeight()
 		{
 			return fweight;
