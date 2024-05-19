@@ -57,7 +57,6 @@ class Ctpars
 		Float_t         length;
 		Float_t         width;
 		Float_t         size;
-		Float_t         size2;
 		Float_t         loss;
 		Float_t         fracLow;
 		Float_t         fui;
@@ -129,7 +128,6 @@ class Ctpars
 		TBranch*        b_length;                 //!
 		TBranch*        b_width;                  //!
 		TBranch*        b_size;                   //!
-		TBranch*        b_size2;                  //!
 		TBranch*        b_loss;                   //!
 		TBranch*        b_fracLow;                //!
 		TBranch*        b_fui;                    //!
@@ -296,15 +294,7 @@ void Ctpars::Init( TTree* tree )
 		}
 		fChain->SetBranchAddress( "length", &length );
 		fChain->SetBranchAddress( "width", &width );
-		if( fChain->GetBranchStatus( "size2" ) )
-		{
-			fChain->SetBranchAddress( "size2", &size2 );
-		}
-		else
-		{
-			size2 = 0.;
-		}
-		size = 0.;
+		fChain->SetBranchAddress( "size", &size );
 	}
 	//    bShort = 1:  read limited number of branches needed for lookup table analysis
 	if( bShort <= 1 )
@@ -353,7 +343,6 @@ void Ctpars::Init( TTree* tree )
 			f_sdevxy = 0.;
 		}
 
-		fChain->SetBranchAddress( "size", &size );
 		fChain->SetBranchAddress( "loss", &loss );
 		if( fChain->GetBranchStatus( "fracLow" ) )
 		{
@@ -508,7 +497,6 @@ Bool_t Ctpars::Notify()
 	b_length = 0;
 	b_width = 0;
 	b_size = 0;
-	b_size2 = 0;
 	b_cen_x = 0;
 	b_cen_y = 0;
 	b_f_s = 0;
@@ -553,15 +541,8 @@ Bool_t Ctpars::Notify()
 		fChain->AddBranchToCache( b_length );
 		b_width = fChain->GetBranch( "width" );
 		fChain->AddBranchToCache( b_width );
-		if( fChain->GetBranchStatus( "size2" ) )
-		{
-			b_size2 = fChain->GetBranch( "size2" );
-		}
-		else
-		{
-			b_size2 = 0;
-		}
-		fChain->AddBranchToCache( b_size2 );
+        b_size = fChain->GetBranch( "size" );
+		fChain->AddBranchToCache( b_size );
 	}
 	if( bShort <= 1 )
 	{
@@ -596,8 +577,6 @@ Bool_t Ctpars::Notify()
 			b_f_sdevxy = fChain->GetBranch( "f_sdevxy" );
 			fChain->AddBranchToCache( b_f_sdevxy );
 		}
-		b_size = fChain->GetBranch( "size" );
-		fChain->AddBranchToCache( b_size );
 		b_loss = fChain->GetBranch( "loss" );
 		fChain->AddBranchToCache( b_loss );
 		if( fChain->GetBranchStatus( "fracLow" ) )
