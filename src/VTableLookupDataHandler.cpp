@@ -2768,7 +2768,7 @@ float VTableLookupDataHandler::getArrayPointingDeRotationAngle()
 */
 void VTableLookupDataHandler::fill_selected_images_after_redo_stereo_reconstruction()
 {
-	double* tmp_size = getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly, false );
+	double* tmp_size = getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly);
 	unsigned int ii = 0;
 	fImgSel = 0;
 	bitset<8 * sizeof( unsigned long )> i_nimage;

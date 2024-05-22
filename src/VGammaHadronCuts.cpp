@@ -1114,7 +1114,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 		double iErec  = getReconstructedEnergy( iEnergyReconstructionMethod );
 		double iEchi2 = getReconstructedEnergyChi2( iEnergyReconstructionMethod );
 
-		if( iErec > 0. && iEchi2 <= 0. )
+		if( iErec > 0. && iEchi2 <= fCut_EChi2_min )
 		{
 			if( bCount && fStats )
 			{
