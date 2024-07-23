@@ -748,8 +748,8 @@ void VFluxCalculation::printECSVLine()
 	{
 		if( fRunList[i] < 0 )
 		{
-			cout << "   " << fixed << setprecision( 1 ) <<  fMJD_min;
-			cout << "   " << fixed << setprecision( 1 ) << fMJD_max;
+			cout << "   " << fixed << setprecision( 8 ) <<  fMJD_min;
+			cout << "   " << fixed << setprecision( 8 ) << fMJD_max;
 			cout << fixed << setprecision( 4 ) << "   " << fRunTOn[i] / 3600.;
 			cout << scientific << "   " << fRunFlux[i];
 			cout << scientific << "   " << fRunFluxE[i];
