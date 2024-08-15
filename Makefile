@@ -730,6 +730,8 @@ endif
 
 ifneq ($(GSLFLAG),-DNOGSL)
   SHAREDOBJS	+= ./obj/VLikelihoodFitter.o ./obj/VLikelihoodFitter_Dict.o
+  SHAREDOBJS	+= ./obj/VLikelihoodObject.o ./obj/VLikelihoodObject_Dict.o
+  SHAREDOBJS	+= ./obj/VLikelihoodFitter2.o ./obj/VLikelihoodFitter2_Dict.o
 endif
 
 ifneq ($(FITS),FALSE)
@@ -1023,6 +1025,8 @@ WRITEVTSPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 
 ifneq ($(GSLFLAG),-DNOGSL)
   WRITEVTSPHYSOBJ	+= ./obj/VLikelihoodFitter.o ./obj/VLikelihoodFitter_Dict.o
+  WRITEVTSPHYSOBJ	+= ./obj/VLikelihoodObject.o ./obj/VLikelihoodObject_Dict.o
+  WRITEVTSPHYSOBJ	+= ./obj/VLikelihoodFitter2.o ./obj/VLikelihoodFitter2_Dict.o
 endif
 
 ifeq ($(ASTRONMETRY),-DASTROSLALIB)
