@@ -27,6 +27,8 @@
 // #include "VEnergySpectrum.h"
 // #include "VEnergySpectrumfromLiterature.h"
 
+#include <ROOT/TProcessExecutor.hxx>
+
 
 // #ifdef __CINT__
 
@@ -52,8 +54,15 @@ class VLikelihoodFitter2
 		bool addRun(string filename, int i_runNumber);
 		
 
+		// Setters
+		// Set the model
 		void setModel( int ID = 0,  double ifENorm = 0 );
+		// Let the user set the model from a custom 
+		// ToDo implment this with safety checks
 		void setModel(TF1* i_model);
+
+		// Set the number of threads
+		void setNumThreads(int i_numThreads);
 
 		bool setEnergyRange(double i_min, double i_max, bool is_linear);
 		void setEnergyThreshold(int i_method, double i_value, bool is_linear = false );
@@ -97,8 +106,14 @@ class VLikelihoodFitter2
 
 	private:
 
+		// Parallel
+		int fNumThreads;
+		ROOT::TProcessExecutor *fPool;
+
+
 		// Model Parameters
 		int fModelID;
+		int fFitStatus;
 		unsigned int fNParms;
 		double fENorm;
 		TF1 *fModel;
@@ -106,7 +121,13 @@ class VLikelihoodFitter2
 		TF1 *fModel_linear;
 		TF1 *fEBLOpacityGraph;
 		bool fEBLAnalysis;
-
+		vector <string> fParmName; 		// Names of the parameters
+		vector <double> fFixedParameters;	// Fixed parameters
+		double *fGlobalBestFitParameters;	// (Global) Best fit parameters
+		
+		// Minimizer
+		ROOT::Math::Minimizer* fMinimizer;
+		ROOT::Math::Functor* fFitfunction;
 
 		// Updaters
 		// These are private functions to loop and update individual VLikelihoodObjects

@@ -130,7 +130,11 @@ void VLikelihoodObject::initialize(string filename, int indx){
 }
 
 VLikelihoodObject::~VLikelihoodObject(){
-	VLikelihoodObject::clearPointers();
+	// cout <<"VLikelihoodObject::~VLikelihoodObject" << endl;
+	// cout << "Clearing Pointers" << endl;
+	clearPointers();
+	// cout << "Done!" << endl;
+	
 }
 
 
@@ -862,14 +866,17 @@ bool VLikelihoodObject::setAnalysisBinning( int i_fNBins, vector <double> i_fBin
 
 
 void VLikelihoodObject::clearPointers(){
-
+	if (fOnHistogramRebinned) { delete fOnHistogramRebinned;}
+	if (fOffHistogramRebinned) { delete fOffHistogramRebinned;}
 	if (fOnHistogram) { delete fOnHistogram;}
 	if (fOffHistogram) { delete fOffHistogram;}
-	if (fModel) { delete fModel;}
-	// if (fAnaFile) { delete fAnaFile;}
+	if (fMeanEffectiveAreaMC) { delete fMeanEffectiveAreaMC;}
 	if (fResponseMatrix) { delete fResponseMatrix;}
 	if (fResponseMatrixRebinned) { delete fResponseMatrixRebinned;}
-	if (fMeanEffectiveAreaMC) { delete fMeanEffectiveAreaMC;}
+
+	// Model is external to VLikelihoodObject
+	fModel = 0;
+	
 }
 
 
