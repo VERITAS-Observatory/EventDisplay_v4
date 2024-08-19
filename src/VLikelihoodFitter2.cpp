@@ -37,7 +37,6 @@ VLikelihoodFitter2::VLikelihoodFitter2(){
     fModel_linear = 0;
     fModel_intrinsic = 0;
 	fGlobalBestFitParameters = 0;
-	fPool = 0;
 	setNumThreads(1);
     setModel( fModelID,  fENorm);
 
@@ -50,25 +49,14 @@ VLikelihoodFitter2::~VLikelihoodFitter2(){
 	for (unsigned int i = 0; i < fLikelihoodObjects.size(); i++){
 		delete fLikelihoodObjects[i];
 	}
-	cout << "VLikelihoodFitter2::~VLikelihoodFitter2" << endl;
 	// Deleting the minimizer
-	cout << "VLikelihoodFitter2::~VLikelihoodFitter2: Deleting minimizer" << endl;
 	if (fMinimizer) {delete fMinimizer;}
-	cout << "VLikelihoodFitter2::~VLikelihoodFitter2: Deleting fit function" << endl;
 	if (fFitfunction) {delete fFitfunction;}
 	
-	cout << "VLikelihoodFitter2::~VLikelihoodFitter2: Deleting model" << endl;
 	if (fModel) {delete fModel;}
-	cout << "VLikelihoodFitter2::~VLikelihoodFitter2: Deleting linear model" << endl;
 	if (fModel_linear) {delete fModel_linear;}
-	cout << "VLikelihoodFitter2::~VLikelihoodFitter2: Deleting intrinsic model" << endl;
 	if (fModel_intrinsic) {delete fModel_intrinsic;}
-	cout << "VLikelihoodFitter2::~VLikelihoodFitter2: Deleting global best fit parameters" << endl;
 	if (fGlobalBestFitParameters) {delete fGlobalBestFitParameters;}
-	cout << "VLikelihoodFitter2::~VLikelihoodFitter2: Deleting thread pool" << endl;
-	if (fPool) {delete fPool;}
-	// cout << "VLikelihoodFitter2::~VLikelihoodFitter2: Deleting likelihood objects" << endl;
-	cout << "VLikelihoodFitter2::~VLikelihoodFitter2: Done" << endl;
 }
 
 void VLikelihoodFitter2::setNormalisationEnergyLinear( double iNormEnergy )
@@ -585,23 +573,30 @@ double VLikelihoodFitter2::getLogL_internal( const double* i_parms ){
     }
     double val = 0;
 
-	// Single thread
-	if (fNumThreads == 1){
-		for (auto i_obj : fLikelihoodObjects ){
-			val += i_obj->getLogL();
-		}
-		return val;
+	#pragma omp parallel for reduction(+:val)
+	for (unsigned int i = 0; i < fLikelihoodObjects.size(); i++){
+		val += fLikelihoodObjects[i]->getLogL();
 	}
-	// Multi-threaded
-	else{
-		// Get the individual logL values for each object
-		auto logl = fPool->Map([](VLikelihoodObject *i_obj) { return i_obj->getLogL(); }, fLikelihoodObjects);
-		// combine in serial
-		for (auto i_logl : logl){
-			val += i_logl;
-		}
-		return val;
-	}
+
+	return val;
+	
+	// // Single thread
+	// if (fNumThreads == 1){
+	// 	for (auto i_obj : fLikelihoodObjects ){
+	// 		val += i_obj->getLogL();
+	// 	}
+	// 	return val;
+	// }
+	// // Multi-threaded
+	// else{
+	// 	// Get the individual logL values for each object
+	// 	auto logl = fPool->Map([](VLikelihoodObject *i_obj) { return i_obj->getLogL(); }, fLikelihoodObjects);
+	// 	// combine in serial
+	// 	for (auto i_logl : logl){
+	// 		val += i_logl;
+	// 	}
+	// 	return val;
+	// }
 
 }
 
@@ -1208,18 +1203,18 @@ TF1* VLikelihoodFitter2::fitEnergySpectrum()
 
 
 void VLikelihoodFitter2::setNumThreads( int i_numThreads ){
-	if (i_numThreads < 1){
-		cout << "VLikelihoodFitter2::setNumThreads Error invalid number of threads: " << i_numThreads << endl;
-		// default to 1
-		fNumThreads = 1;
-		return;
-	}
-	else if (i_numThreads == 1){
-		fNumThreads = 1;
-	}
-	else {
-		if (fPool){delete fPool;}
+	// todo add compiler flag for this
+	// cout << "OpenMP is not enabled. Please enable OpenMP in your compiler settings to use multi-threading." << endl;
+	if (i_numThreads > 0){
 		fNumThreads = i_numThreads;
-		fPool = new ROOT::TProcessExecutor(fNumThreads);
 	}
+	else{
+		cout << "VLikelihoodFitter2::setNumThreads Error invalid number of threads! \n\t Defaulting to 1" << endl;
+		fNumThreads = 1;
+	}
+
+	omp_set_num_threads(fNumThreads);
+	// // default to 1
+	// int num_threads = omp_get_max_threads();
+	// cout << "Number of threads available: " << num_threads << endl;
 }

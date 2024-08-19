@@ -27,8 +27,7 @@
 // #include "VEnergySpectrum.h"
 // #include "VEnergySpectrumfromLiterature.h"
 
-#include <ROOT/TProcessExecutor.hxx>
-
+#include <omp.h>
 
 // #ifdef __CINT__
 
@@ -108,7 +107,6 @@ class VLikelihoodFitter2
 
 		// Parallel
 		int fNumThreads;
-		ROOT::TProcessExecutor *fPool;
 
 
 		// Model Parameters

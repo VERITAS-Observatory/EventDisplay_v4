@@ -115,25 +115,23 @@ void VLikelihoodObject::initialize(string filename, int indx){
 	// fMeanEffectiveAreaMC->SetDirectory(0);
 	fResponseMatrix->SetDirectory(0);
 
-	// fAnaFile->Close();
 	if( !fMeanEffectiveAreaMC )
 	{
 		cout << "2VLikelihoodObject::VLikelihoodObject error getting effective areas" << endl;
 		return;
 	}
-	// delete fAnaFile;
 	setBinning(0.15);
 	setEnergyThreshold(1, 0.2);
 	setEnergyRange(-1,2, false);
 	fThresholdBias = 0.15;
+	fAnaFile->Close();
+	fAnaFile = 0;
+	// delete fAnaFile;
 
 }
 
 VLikelihoodObject::~VLikelihoodObject(){
-	// cout <<"VLikelihoodObject::~VLikelihoodObject" << endl;
-	// cout << "Clearing Pointers" << endl;
 	clearPointers();
-	// cout << "Done!" << endl;
 	
 }
 
@@ -856,6 +854,11 @@ bool VLikelihoodObject::setAnalysisBinning( int i_fNBins, vector <double> i_fBin
 	fOffCounts = getCounts( fOffHistogramRebinned );
 
 
+	fOnHistogramRebinned->SetDirectory(0);
+	fOffHistogramRebinned->SetDirectory(0);
+	fResponseMatrixRebinned->SetDirectory(0);
+
+
 	// delete i_xAxis;
 	// delete i_yAxis;
 	// delete i_htmp2D;
@@ -865,15 +868,14 @@ bool VLikelihoodObject::setAnalysisBinning( int i_fNBins, vector <double> i_fBin
 }
 
 
-void VLikelihoodObject::clearPointers(){
-	if (fOnHistogramRebinned) { delete fOnHistogramRebinned;}
-	if (fOffHistogramRebinned) { delete fOffHistogramRebinned;}
+void VLikelihoodObject::clearPointers() {
 	if (fOnHistogram) { delete fOnHistogram;}
 	if (fOffHistogram) { delete fOffHistogram;}
+	if (fOnHistogramRebinned) {  delete fOnHistogramRebinned;}
+	if (fOffHistogramRebinned) { delete fOffHistogramRebinned;}
 	if (fMeanEffectiveAreaMC) { delete fMeanEffectiveAreaMC;}
 	if (fResponseMatrix) { delete fResponseMatrix;}
 	if (fResponseMatrixRebinned) { delete fResponseMatrixRebinned;}
-
 	// Model is external to VLikelihoodObject
 	fModel = 0;
 	

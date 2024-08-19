@@ -144,13 +144,14 @@ ifeq ($(GCC_GT_4_9),true)
 else
    ROOTCFLAGS   = $(shell root-config --auxcflags)
 endif
+OMPFLAGS 	= -fopenmp -D_USEOPENMP
 CXXFLAGS     += $(ROOTCFLAGS)
 CXXFLAGS     += -I$(shell root-config --incdir) -I$(shell root-config --incdir)/TMVA
 ########################################################
 # root libs
 ########################################################
 ROOTGLIBS     = $(shell root-config --glibs)
-GLIBS         = $(ROOTGLIBS)
+GLIBS         = $(ROOTGLIBS) $(OMPFLAGS)
 # GLIBS        += -lMLP -lTreePlayer -lTMVA -lMinuit -lXMLIO -lSpectrum
 ifeq ($(TSPECTRUMFLAG),-DNOSPECTRUM)
 GLIBS        += -lMLP -lTMVA -lMinuit -lXMLIO
@@ -1527,6 +1528,7 @@ printconfig configuration config:
 	@echo "    $(GCC_VER_MAJOR) $(GCC_VER_MINOR) $(GCC_GT_4_8)"
 	@echo "    $(CXXFLAGS)"
 	@echo "    $(GLIBS)"
+	@echo "    $(OMPFLAGS)"
 	@echo ""
 	@echo "using root version $(ROOTVERSION)"
 	@echo "    $(ROOT_MYSQL)"
