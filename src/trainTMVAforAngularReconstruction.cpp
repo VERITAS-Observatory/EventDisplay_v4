@@ -3,7 +3,6 @@
 
    this code is used for training for angular and energy reconstruction
 
-
 */
 
 #include "TChain.h"
@@ -55,11 +54,9 @@ pair<float, float> getArrayPointing( Cshowerpars* i_showerpars )
 /////////////////////////////////////////////////////
 // one tree per telescope type
 map< ULong64_t, TTree* > fMapOfTrainingTree;
-map< ULong64_t, unsigned int > fMapOfNTelescopeType;
 /////////////////////////////////////////////////////
 
 /*
-
     train TVMA method and write results into the corresponding directory
 
     one MVA per telescope type
@@ -73,14 +70,13 @@ map< ULong64_t, unsigned int > fMapOfNTelescopeType;
     BDTDispEnergy
     BDTDispCore
 
-    Default is always BDT (but other MLs like MLPs are allowed)
-
+    Default is the BDT trainer (but other MLs like MLPs are allowed, but not well tested)
 
 */
 bool trainTMVA( string iOutputDir, float iTrainTest,
 				ULong64_t iTelType, TTree* iDataTree,
 				string iTargetML, string iTMVAOptions,
-				string iQualityCut, bool iSingleTelescopeAnalysis )
+				string iQualityCut )
 {
 	cout << endl;
 	cout << "Starting " << iTargetML;
@@ -102,26 +98,18 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	cout << endl;
 	ntrain = floor( nentries * iTrainTest ) ;
 	ntest  = nentries - ntrain ;
-	if( ntrain <= 100 )
+	if( ntrain <= 100 || ntest <= 100 )
 	{
 		cout << endl;
-		cout << "Error, 4th argument train/test fraction is so small that only " << ntrain;
-		cout << " events were selected for training, while TMVA usually needs thousands of training events to work properly.";
-		cout << "Try increasing the 4th argument... (you only have " << nentries;
+		cout << "Error, <train/test fraction> is so small that only " << ntrain;
+		cout << " events were selected for training, while TMVA usually needs thousands of training/testing events to work properly.";
+		cout << "Try increasing the <train/test fraction>... (you only have " << nentries;
 		cout << " total events to designate for either training or testing...)" << endl;
+		cout << "(number of available events (train/test): " << ntrain << ", " << ntest << ")" << endl;
 		cout << endl;
 		exit( EXIT_FAILURE );
 	}
-	if( ntest <= 100 )
-	{
-		cout << endl;
-		cout << "Error, 4th argument train/test fraction is so large that only " << ntest;
-		cout << " events were selected for testing, while TMVA usually needs thousands of testing events to work properly.";
-		cout << " Try decreasing the 4th argument... (you only have " << nentries;
-		cout << " total events to designate for either training or testing...)" << endl;
-		cout << endl;
-		exit( EXIT_FAILURE );
-	}
+	// TODO unclear why factor of 0.8
 	ntrain *= 0.8;
 	ntest *= 0.8;
 	cout << "\tnumber of training events: " << ntrain << endl;
@@ -137,7 +125,6 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	train_and_test_conditions << "ScaleWithPreselEff=True";
 	cout << "Train and test condition: " << train_and_test_conditions.str() << endl;
 	cout << endl;
-
 
 	// output file name
 	ostringstream iFileName;
@@ -168,15 +155,11 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	dataloader->AddVariable( "size", 'F' );
 	dataloader->AddVariable( "ntubes", 'F' );
 	dataloader->AddVariable( "tgrad_x*tgrad_x", 'F' );
-	if( !iSingleTelescopeAnalysis )
-	{
-		dataloader->AddVariable( "cross", 'F' );
-	}
 	dataloader->AddVariable( "asym", 'F' );
 	dataloader->AddVariable( "loss", 'F' );
 	dataloader->AddVariable( "dist", 'F' );
 	dataloader->AddVariable( "fui", 'F' );
-	if( iTargetML.find( "DispEnergy" ) != string::npos && !iSingleTelescopeAnalysis )
+	if( iTargetML.find( "DispEnergy" ) != string::npos )
 	{
 		dataloader->AddVariable( "EHeight", 'F' );
 		dataloader->AddVariable( "Rcore", 'F' );
@@ -198,7 +181,7 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	// train for energy reconstruction
 	if( iTargetML.find( "DispEnergy" ) != string::npos )
 	{
-		// dispEnergy is log10(E)/log10(size)
+		// dispEnergy is defined as log10(E)/log10(size)
 		dataloader->AddTarget( "dispEnergy", 'F' );
 	}
 	// rotation angle
@@ -405,27 +388,18 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 	i_tel.GetEntry( 0 );
 	unsigned int i_ntel = i_tel.NTel;
 
-	vector< unsigned int > iHyperArrayID;
+	// get FOV
 	vector< float > iFOV_tel;
-
-	// get list of telescopes - hyperarray values
 	for( int t = 0; t < i_tel.fChain->GetEntries(); t++ )
 	{
 		i_tel.GetEntry( t );
 
-		iHyperArrayID.push_back( i_tel.TelID_hyperArray );
 		iFOV_tel.push_back( i_tel.FOV );
-		cout << "\t FOV for telescope " << iHyperArrayID.back() << ": " << iFOV_tel.back() << endl;
+		cout << "\t FOV for telescope " << t + 1 << ": " << iFOV_tel.back() << endl;
 	}
 
-	// use all telescope for reconstruction
-	vector< bool > fUseTelescope( i_ntel, true );
-
 	// vector with telescope position
-	// (includes all telescopes, even those
-	// of other types)
-	// (unfortunately inconsistent in data
-	//  types required)
+	// (unfortunately inconsistent in data types)
 	vector< float > fTelX;
 	vector< float > fTelY;
 	vector< float > fTelZ;
@@ -433,7 +407,6 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 	vector< double > fEM_TelY;
 	vector< double > fEM_TelZ;
 	vector< ULong64_t > fTelType;
-	unsigned int f_ntelType = 0;
 	for( unsigned int i = 0; i < i_ntel; i++ )
 	{
 		i_tel.GetEntry( i );
@@ -445,16 +418,6 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 		fEM_TelY.push_back( i_tel.TelY );
 		fEM_TelZ.push_back( i_tel.TelZ );
 		fTelType.push_back( i_tel.TelType );
-
-		if( i < fUseTelescope.size() && !fUseTelescope[i] )
-		{
-			continue;
-		}
-		if( i_tel.TelType == iTelType
-				|| iTelType == 0 )
-		{
-			f_ntelType++;
-		}
 	}
 
 	///////////////////////////////////////////////////
@@ -509,19 +472,13 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 	int   Fitstat = -1;
 
 	fMapOfTrainingTree.clear();
-	cout << "total number of telescopes: " << i_ntel;
-	cout << " (selected " << f_ntelType << ")" << endl;
+	cout << "total number of telescopes: " << i_ntel << endl;
 	for( unsigned int i = 0; i < i_ntel; i++ )
 	{
 		i_tel.GetEntry( i );
 
 		// select telescope type
 		if( iTelType != 0 && i_tel.TelType != iTelType )
-		{
-			continue;
-		}
-		// check if telescope is in telescope list
-		if( i < fUseTelescope.size() && !fUseTelescope[i] )
 		{
 			continue;
 		}
@@ -587,14 +544,6 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 	////////////////////////////////////////////
 	// filling of training trees;
 	cout << "filling training trees for " << fMapOfTrainingTree.size() << " telescope type(s)" << endl;
-	cout << "\t found " << f_ntelType << " telescopes of telescope type " << iTelType << endl;
-	bool iSingleTelescopeAnalysis = false;
-	if( f_ntelType == 1 )
-	{
-		iSingleTelescopeAnalysis = true;
-		cout << "\t single telescope analysis" << endl;
-	}
-	fMapOfNTelescopeType[iTelType] = f_ntelType;
 
 	// get showerpars tree
 	TChain i_showerparsTree( "showerpars" );
@@ -666,41 +615,6 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			return false;
 		}
 
-		// require:
-		// - reconstructed event
-		// - at least two telescopes
-		if( !iSingleTelescopeAnalysis )
-		{
-			if( i_showerpars.Chi2[iRecID] < -999.
-					||  i_showerpars.NImages[iRecID] < 2 )
-			{
-				continue;
-			}
-		}
-		else
-		{
-			if( i_showerpars.NImages[iRecID] < 1 )
-			{
-				continue;
-			}
-		}
-
-		// check if there are image of this telescope type
-		// (hyper-array)
-		int i_nteltypecounter = 0;
-		for( unsigned int i = 0; i < fTelType.size(); i++ )
-		{
-			if( ( fTelType[i] == iTelType || iTelType == 0 )
-					&& ( int )i_showerpars.ImgSel_list[iRecID][i] > 0 )
-			{
-				i_nteltypecounter++;
-			}
-		}
-		if( i_nteltypecounter == 0 )
-		{
-			continue;
-		}
-
 		/////////////////////////////////////////////////////////
 		// calculate emission height and cross
 		for( unsigned int i = 0; i < i_tpars.size(); i++ )
@@ -712,22 +626,20 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			fEM_length[i] = 0.;
 			fEM_cosphi[i] = 0.;
 			fEM_sinphi[i] = 0.;
-			fEM_weight[i] = 0.;
+			fEM_weight[i] = 1.;
 
-			if( ( int )i_showerpars.ImgSel_list[iRecID][i] < 1
-					&& ( i_showerpars.NImages[iRecID] > 1 || !iSingleTelescopeAnalysis ) )
-			{
-				continue;
-			}
-			// note: this is different to what happens in the analysis:
-			// here the emissionheight / direction is calculated only from the
-			// telescopes of the given telescope type
 			if( !i_tpars[i] )
 			{
 				continue;
 			}
 
 			i_tpars[i]->GetEntry( n );
+
+			// TODO TMP - hardwired loss cut
+			if( i_tpars[i]->size < 1. && i_tpars[i]->loss > 0.4 )
+			{
+				continue;
+			}
 
 			if( i_tpars[i]->size > 0. )
 			{
@@ -738,9 +650,6 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 				fEM_length[i] = i_tpars[i]->length;
 				fEM_cosphi[i] = i_tpars[i]->cosphi;
 				fEM_sinphi[i] = i_tpars[i]->sinphi;
-				// weight is always 1: all telescopes
-				// are of same type
-				fEM_weight[i] = 1.;
 			}
 		}
 		pair< float, float> i_mean_array_pointing = getArrayPointing( &i_showerpars );
@@ -748,32 +657,24 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 		EmissionHeight = fEmissionHeightCalculator->getEmissionHeight( fEM_cen_x, fEM_cen_y, fEM_size,
 						 i_mean_array_pointing.first, i_mean_array_pointing.second );
 
-		if( !iSingleTelescopeAnalysis )
-		{
-			i_SR.reconstruct_direction(
-				fEM_TelX.size(),
-				i_mean_array_pointing.first,
-				i_mean_array_pointing.second,
-				&fEM_TelX[0], &fEM_TelY[0], &fEM_TelZ[0],
-				fEM_size,
-				fEM_cen_x,
-				fEM_cen_y,
-				fEM_cosphi,
-				fEM_sinphi,
-				fEM_width,
-				fEM_length,
-				fEM_weight );
-		}
+		i_SR.reconstruct_direction(
+			fEM_TelX.size(),
+			i_mean_array_pointing.first,
+			i_mean_array_pointing.second,
+			&fEM_TelX[0], &fEM_TelY[0], &fEM_TelZ[0],
+			fEM_size,
+			fEM_cen_x,
+			fEM_cen_y,
+			fEM_cosphi,
+			fEM_sinphi,
+			fEM_width,
+			fEM_length,
+			fEM_weight );
 
 		//////////////////////////////////////
 		// loop over all telescopes
 		for( unsigned int i = 0; i < i_tpars.size(); i++ )
 		{
-			// check if telescope was reconstructed
-			if( ( int )i_showerpars.ImgSel_list[iRecID][i] < 1 )
-			{
-				continue;
-			}
 			// check if telescope is of valid telescope type
 			if( ( fTelType[i] != iTelType && iTelType != 0 ) || !i_tpars[i] )
 			{
@@ -787,7 +688,15 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			{
 				continue;
 			}
+
 			i_tpars[i]->GetEntry( n );
+
+			// check if telescope was reconstructed
+			// TODO TMP - hardwired loss cut
+			if( i_tpars[i]->size < 1. && i_tpars[i]->loss > 0.4 )
+			{
+				continue;
+			}
 
 			/////////////////////////////////
 			// quality cuts
@@ -842,20 +751,16 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 
 			Rcore       = VUtilities::line_point_distance( Ycore,   -1.*Xcore,   0., ze, az, fTelY[i], -1.*fTelX[i], fTelZ[i] );
 			MCrcore     = VUtilities::line_point_distance( MCycore, -1.*MCxcore, 0., MCze, MCaz, fTelY[i], -1.*fTelX[i], fTelZ[i] );
-
-			if( Rcore < 0. && !iSingleTelescopeAnalysis )
-			{
-				continue;
-			}
+			// TODO - TMP save to remove?
+			// if( Rcore < 0. )
+			// 	{
+			//	continue;
+			// }
 
 			//////////////////////////////////////////////////////////////////////////////////////////////////
 			// calculate disp (observe sign convention for MC in y direction for MCyoff and Yoff)
 			disp  = sqrt( ( cen_y + MCyoff ) * ( cen_y + MCyoff ) + ( cen_x - MCxoff ) * ( cen_x - MCxoff ) );
-			if( iSingleTelescopeAnalysis )
-			{
-				cross = 0.;
-			}
-			else if( redo_stereo_reconstruction )
+			if( redo_stereo_reconstruction )
 			{
 				cross = sqrt( ( cen_y + i_SR.fShower_Yoffset ) * ( cen_y + i_SR.fShower_Yoffset )
 							  + ( cen_x - i_SR.fShower_Xoffset ) * ( cen_x - i_SR.fShower_Xoffset ) );
@@ -950,7 +855,7 @@ int main( int argc, char* argv[] )
 		cout << "     telescope type ID (if not given: all telescope types are used)" << endl;
 		cout << "                       (for VTS - these are telescope numbers)" << endl;
 		cout << "     optional: train for energy/core reconstruction = \"BDTDispEnergy\"/\"BDTDispCore\"";
-		cout << "(default = \"BDTDisp\": train for angular reconstrution)" << endl;
+		cout << "(default = \"BDTDisp\": train for angular reconstruction)" << endl;
 		cout << endl;
 		exit( EXIT_SUCCESS );
 	}
@@ -960,7 +865,7 @@ int main( int argc, char* argv[] )
 	unsigned int iRecID      = atoi( argv[4] );
 	ULong64_t    iTelType    = atoi( argv[5] ) ;
 	string       iTargetML  = "BDTDisp";
-	// tmva options likely overwritten from command line
+	// TMVA options (hardwired)
 	string iTMVAOptions = "VarTransform=N:NTrees=200:BoostType=AdaBoost:MaxDepth=8";
 	string       iDataDirectory = "";
 	// quality cut likely overwritten from command line
@@ -1004,7 +909,7 @@ int main( int argc, char* argv[] )
 	if( fTrainTest <= 0.0 || fTrainTest >= 1.0 )
 	{
 		cout << endl;
-		cout << "Error, 4th argument <train vs test fraction> = '";
+		cout << "Error, <train vs test fraction> = '";
 		cout << fTrainTest << "' must fall in the range 0.0 < x < 1.0" << endl;
 		cout << endl;
 		exit( EXIT_FAILURE );
@@ -1053,7 +958,8 @@ int main( int argc, char* argv[] )
 		if( fMapOfTrainingTree_iter->second )
 		{
 			cout << "\t writing training tree for telescope type " << fMapOfTrainingTree_iter->first;
-			cout << " with " << fMapOfTrainingTree_iter->second->GetEntries() << " entries" << endl;
+			cout << " with " << fMapOfTrainingTree_iter->second->GetEntries() << " entries ";
+			cout << "to " << iFileName.str() << endl;
 			fMapOfTrainingTree_iter->second->Write();
 		}
 	}
@@ -1064,19 +970,10 @@ int main( int argc, char* argv[] )
 			fMapOfTrainingTree_iter != fMapOfTrainingTree.end();
 			++fMapOfTrainingTree_iter )
 	{
-		bool iSingleTel = false;
-		if( fMapOfNTelescopeType.find( fMapOfTrainingTree_iter->first ) != fMapOfNTelescopeType.end() )
-		{
-			if( fMapOfNTelescopeType[fMapOfTrainingTree_iter->first] == 1 )
-			{
-				iSingleTel = true;
-			}
-		}
 		trainTMVA( fOutputDir, fTrainTest,
 				   fMapOfTrainingTree_iter->first,
 				   fMapOfTrainingTree_iter->second,
-				   iTargetML, iTMVAOptions, iQualityCut,
-				   iSingleTel );
+				   iTargetML, iTMVAOptions, iQualityCut );
 	}
 
 	//////////////////////
