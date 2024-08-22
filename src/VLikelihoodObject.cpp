@@ -869,12 +869,20 @@ bool VLikelihoodObject::setAnalysisBinning( int i_fNBins, vector <double> i_fBin
 
 
 void VLikelihoodObject::clearPointers() {
+	// cout << "Deleting VLikelihoodObject pointers" << endl;
+	// cout << "Deleting fOnHistogram" << endl;
 	if (fOnHistogram) { delete fOnHistogram;}
+	// cout << "Deleting fOffHistogram" << endl;
 	if (fOffHistogram) { delete fOffHistogram;}
+	// cout << "Deleting fOnHistogramRebinned" << endl;
 	if (fOnHistogramRebinned) {  delete fOnHistogramRebinned;}
+	// cout << "Deleting fOffHistogramRebinned" << endl;
 	if (fOffHistogramRebinned) { delete fOffHistogramRebinned;}
+	// cout << "Deleting fMeanEffectiveAreaMC" << endl;
 	if (fMeanEffectiveAreaMC) { delete fMeanEffectiveAreaMC;}
+	// cout << "Deleting fResponseMatrix" << endl;
 	if (fResponseMatrix) { delete fResponseMatrix;}
+	// cout << "Deleting fResponseMatrixRebinned" << endl;
 	if (fResponseMatrixRebinned) { delete fResponseMatrixRebinned;}
 	// Model is external to VLikelihoodObject
 	fModel = 0;
@@ -1000,3 +1008,59 @@ TCanvas *VLikelihoodObject::peak(){
 // bool isPointerValid( TGraphAsymmErrors* i_obj );
 // bool isPointerValid( TH2F* i_obj );
 
+
+
+VLikelihoodObject * VLikelihoodObject::fakeIt(TF1 *i_model, int i_run_num, double i_mjd){
+	// Get a copy of the current object
+	int i_current_run = fRunNumber;
+	TF1 *i_current_model = fModel;
+	double i_current_mjd = fMJD;
+	vector <double> i_current_on = fOnCounts;
+	vector <double> i_current_off = fOffCounts;
+
+	// Assign the simulated values
+	fModel = i_model;
+	fMJD =  (i_mjd > 0)? i_mjd : fMJD;
+	fRunNumber =  (i_run_num > 0)? i_run_num : fRunNumber;
+
+	// Get the model predicted counts
+	vector <double> i_model_counts = getModelPredictedExcess();
+	vector <double> i_model_off = getModelPredictedOff();
+
+	// Assign the model predicted counts
+	TRandom3 i_rand(0);
+	// i_rand.SetSeed(0);
+	for (unsigned int i = 0; i < i_model_counts.size(); i++){
+		fOnCounts[i] = i_rand.Poisson(i_model_counts[i]);
+		fOnCounts[i] += fAlpha * i_rand.Poisson(i_model_off[i]);
+		fOffCounts[i] = i_rand.Poisson(i_model_off[i]);
+	}
+
+	// Return the object
+	VLikelihoodObject *i_fake = new VLikelihoodObject(*this);
+	
+	// Reclone the various pointers (otherwise i_fake points towards this->pointer...)
+	// i_fake getting deleted will delete the pointers of this object
+	fOnHistogram = (TH1D*)fOnHistogram->Clone();
+	fOffHistogram = (TH1D*)fOffHistogram->Clone();
+	fOnHistogramRebinned = (TH1D*)fOnHistogramRebinned->Clone();
+	fOffHistogramRebinned = (TH1D*)fOffHistogramRebinned->Clone();
+	fMeanEffectiveAreaMC = (TGraphAsymmErrors*)fMeanEffectiveAreaMC->Clone();
+	fResponseMatrix = (TH2F*)fResponseMatrix->Clone();
+	fResponseMatrixRebinned = (TH2F*)fResponseMatrixRebinned->Clone();
+
+	// Reset the values
+	fModel = i_current_model;
+	fRunNumber = i_current_run;
+	fMJD = i_current_mjd;
+	fOnCounts = i_current_on;
+	fOffCounts = i_current_off;
+
+	return i_fake;
+}
+
+
+VLikelihoodObject * VLikelihoodObject::clone(){
+	VLikelihoodObject *i_clone = new VLikelihoodObject(*this);
+	return i_clone;
+}

@@ -37,6 +37,7 @@ VLikelihoodFitter2::VLikelihoodFitter2(){
     fModel_linear = 0;
     fModel_intrinsic = 0;
 	fGlobalBestFitParameters = 0;
+	fEnergySpectrum = 0;
 	setNumThreads(1);
     setModel( fModelID,  fENorm);
 
@@ -46,17 +47,37 @@ VLikelihoodFitter2::VLikelihoodFitter2(){
 // Destructor
 VLikelihoodFitter2::~VLikelihoodFitter2(){
 	
+	// cout << "Deleting VLikelihoodFitter2" << endl;
+	// Deleting the likelihood objects
+	// cout << "Deleting likelihood objects" << endl;
 	for (unsigned int i = 0; i < fLikelihoodObjects.size(); i++){
 		delete fLikelihoodObjects[i];
 	}
+	// cout << "Deleting likelihood objects...done!" << endl;
 	// Deleting the minimizer
+	// cout << "Deleting minimizer" << endl;
 	if (fMinimizer) {delete fMinimizer;}
+	// Deleting the fit function
+	// cout << "Deleting fit function" << endl;
 	if (fFitfunction) {delete fFitfunction;}
-	
+	// cout << "Deleting fit function...done!" << endl;
+	// Deleting the model
+	// cout << "Deleting model" << endl;
 	if (fModel) {delete fModel;}
+	// cout << "Deleting model...done!" << endl;
+	// cout << "Deleting fModel_linear" << endl;
 	if (fModel_linear) {delete fModel_linear;}
+	// cout << "Deleting fModel_linear...done!" << endl;
+	// cout << "Deleting fModel_intrinsic" << endl;
 	if (fModel_intrinsic) {delete fModel_intrinsic;}
+	// cout << "Deleting fModel_intrinsic...done!" << endl;
+	// cout << "Deleting fGlobalBestFitParameters" << endl;
 	if (fGlobalBestFitParameters) {delete fGlobalBestFitParameters;}
+	// cout << "Deleting fGlobalBestFitParameters...done!" << endl;
+	// cout << "Deleting fEnergySpectrum" << endl;
+	if (fEnergySpectrum) {delete fEnergySpectrum;}
+	// cout << "Deleting fEnergySpectrum...done!" << endl;
+	// cout << "Deleting VLikelihoodFitter2...done!" << endl;
 }
 
 void VLikelihoodFitter2::setNormalisationEnergyLinear( double iNormEnergy )
@@ -131,8 +152,8 @@ void VLikelihoodFitter2::setModel( int i_ID, double ifENorm )
 
 		ss.str( std::string() );
 		ss << "[0]*TMath::Power(x / " << ifENorm << ", [1])";
-		fModel_linear = new TF1( "fModel", ss.str().c_str(), TMath::Power( 10, fEnergyMin_linear ), TMath::Power( 10, fEnergyMax_linear ) );
-		fModel_intrinsic = new TF1( "fModel_intrinsic", ss.str().c_str(), TMath::Power( 10, fEnergyMin_linear ), TMath::Power( 10, fEnergyMax_linear ) );
+		fModel_linear = new TF1( "fModel", ss.str().c_str(), fEnergyMin_linear, fEnergyMax_linear );
+		fModel_intrinsic = new TF1( "fModel_intrinsic", ss.str().c_str(), fEnergyMin_linear, fEnergyMax_linear );
 
         fModel->SetParameter(0, 1e-12);
         fModel->SetParameter(1, -2.5);
@@ -158,9 +179,7 @@ void VLikelihoodFitter2::setModel( int i_ID, double ifENorm )
 
 		ss.str( std::string() );
 		ss << "[0] * TMath::Power( x  / " << ifENorm << ", [1] ) * TMath::Exp( -1. *  x / [2] )";
-		fModel_linear = new TF1( "fModel", ss.str().c_str(), TMath::Power( 10, fEnergyMin_linear ), TMath::Power( 10, fEnergyMax_linear ) );
-		fModel_intrinsic = new TF1( "fModel_intrinsic", ss.str().c_str(), TMath::Power( 10, fEnergyMin_linear ), TMath::Power( 10, fEnergyMax_linear ) );
-
+		fModel_linear = new TF1( "fModel", ss.str().c_str(), fEnergyMin_linear, fEnergyMax_linear );
 
         fModel->SetParameter(0, 1e-12);
         fModel->SetParameter(1, -2.5);
@@ -190,8 +209,8 @@ void VLikelihoodFitter2::setModel( int i_ID, double ifENorm )
 
 		ss.str( std::string() );
 		ss << "[0] * TMath::Power(  x / " << ifENorm << ", [1]+[2]* x  )";
-		fModel_linear = new TF1( "fModel", ss.str().c_str(), TMath::Power( 10, fEnergyMin_linear ), TMath::Power( 10, fEnergyMax_linear ) );
-		fModel_intrinsic = new TF1( "fModel_intrinsic", ss.str().c_str(), TMath::Power( 10, fEnergyMin_linear ), TMath::Power( 10, fEnergyMax_linear ) );
+		fModel_linear = new TF1( "fModel", ss.str().c_str(), fEnergyMin_linear, fEnergyMax_linear);
+		fModel_intrinsic = new TF1( "fModel_intrinsic", ss.str().c_str(), fEnergyMin_linear, fEnergyMax_linear );
 
         fModel->SetParameter(0, 1e-12);
         fModel->SetParameter(1, -2.5);
@@ -223,8 +242,8 @@ void VLikelihoodFitter2::setModel( int i_ID, double ifENorm )
 
 		ss.str( std::string() );
 		ss <<  "[0] * TMath::Power(  x  / " << ifENorm << " , [1]+[2]*TMath::Log( x / " << ifENorm << " ) )";
-		fModel_linear = new TF1( "fModel", ss.str().c_str(), TMath::Power( 10, fEnergyMin_linear ), TMath::Power( 10, fEnergyMax_linear ) );
-		fModel_intrinsic = new TF1( "fModel_intrinsic", ss.str().c_str(), TMath::Power( 10, fEnergyMin_linear ), TMath::Power( 10, fEnergyMax_linear ) );
+		fModel_linear = new TF1( "fModel", ss.str().c_str(), fEnergyMin_linear, fEnergyMax_linear );
+		fModel_intrinsic = new TF1( "fModel_intrinsic", ss.str().c_str(), fEnergyMin_linear, fEnergyMax_linear );
 
         fModel->SetParameter(0, 1e-12);
         fModel->SetParameter(1, -2.5);
@@ -258,8 +277,8 @@ void VLikelihoodFitter2::setModel( int i_ID, double ifENorm )
 
 		ss.str( std::string() );
 		ss << "[0] * TMath::Exp( " << ifENorm << "  / [2] ) * TMath::Power( x  / " << ifENorm << ", [1] ) * TMath::Exp( -1. *  x / [2] )";
-		fModel_linear = new TF1( "fModel", ss.str().c_str(), TMath::Power( 10, fEnergyMin_linear ), TMath::Power( 10, fEnergyMax_linear ) );
-		fModel_intrinsic = new TF1( "fModel_intrinsic", ss.str().c_str(), TMath::Power( 10, fEnergyMin_linear ), TMath::Power( 10, fEnergyMax_linear ) );
+		fModel_linear = new TF1( "fModel", ss.str().c_str(), fEnergyMin_linear, fEnergyMax_linear );
+		fModel_intrinsic = new TF1( "fModel_intrinsic", ss.str().c_str(), fEnergyMin_linear, fEnergyMax_linear );
 
         fModel->SetParameter(0, 1e-12);
         fModel->SetParameter(1, -2.5);
@@ -289,8 +308,8 @@ void VLikelihoodFitter2::setModel( int i_ID, double ifENorm )
 
 		ss.str( std::string() );
 		ss <<  "[0] * TMath::Power(  x  / " << ifENorm << " , [1]+[2]*TMath::Log( x / " << ifENorm << " ) )* TMath::Exp( -1. *  x   / [3] )";
-		fModel_linear = new TF1( "fModel", ss.str().c_str(), TMath::Power( 10, fEnergyMin_linear ), TMath::Power( 10, fEnergyMax_linear ) );
-		fModel_intrinsic = new TF1( "fModel_intrinsic", ss.str().c_str(), TMath::Power( 10, fEnergyMin_linear ), TMath::Power( 10, fEnergyMax_linear ) );
+		fModel_linear = new TF1( "fModel", ss.str().c_str(), fEnergyMin_linear, fEnergyMax_linear );
+		fModel_intrinsic = new TF1( "fModel_intrinsic", ss.str().c_str(), fEnergyMin_linear, fEnergyMax_linear );
 
 		fModelID = i_ID;
 		fNParms = 4;
@@ -327,8 +346,8 @@ void VLikelihoodFitter2::setModel( int i_ID, double ifENorm )
 
 		ss.str( std::string() );
 		ss << "[0] * TMath::Power( x  / " << ifENorm << ", [1] ) * TMath::Exp( -1. * TMath::Power( x / [2], [3] ) )";
-		fModel_linear = new TF1( "fModel", ss.str().c_str(), TMath::Power( 10, fEnergyMin_linear ), TMath::Power( 10, fEnergyMax_linear ) );
-		fModel_intrinsic = new TF1( "fModel_intrinsic", ss.str().c_str(), TMath::Power( 10, fEnergyMin_linear ), TMath::Power( 10, fEnergyMax_linear ) );
+		fModel_linear = new TF1( "fModel", ss.str().c_str(), fEnergyMin_linear, fEnergyMax_linear );
+		fModel_intrinsic = new TF1( "fModel_intrinsic", ss.str().c_str(), fEnergyMin_linear, fEnergyMax_linear );
 
 
         fModel->SetParameter(0, 1e-12);
@@ -368,8 +387,8 @@ void VLikelihoodFitter2::setModel( int i_ID, double ifENorm )
 
 
 
-		fModel_linear = new TF1( "fModel_linear", this, &VLikelihoodFitter2::brokenPowerLaw, TMath::Power( 10, fEnergyMin_linear ), TMath::Power( 10, fEnergyMax_linear ), fNParms + 1 );
-		fModel_intrinsic = new TF1( "fModel_intrinsic", this, &VLikelihoodFitter2::brokenPowerLaw, TMath::Power( 10, fEnergyMin_linear ), TMath::Power( 10, fEnergyMax_linear ), fNParms + 1 );
+		fModel_linear = new TF1( "fModel_linear", this, &VLikelihoodFitter2::brokenPowerLaw, fEnergyMin_linear, fEnergyMax_linear, fNParms + 1 );
+		fModel_intrinsic = new TF1( "fModel_intrinsic", this, &VLikelihoodFitter2::brokenPowerLaw, fEnergyMin_linear, fEnergyMax_linear, fNParms + 1 );
 
 
 		// Setting the break energy
@@ -520,6 +539,34 @@ double VLikelihoodFitter2::calculateIntrinsicSpectrum( Double_t* x, Double_t* pa
 }
 
 
+bool VLikelihoodFitter2::addFromCombined(string filename){
+	TFile *i_file = new TFile(filename.c_str(), "READ");
+	TTree* i_run_summary = (TTree*)i_file->Get("total_1/stereo/tRunSummary");
+	int i_runnum;
+	vector <int> i_runlist;
+
+	i_run_summary->SetBranchAddress("runOn", &i_runnum);
+	for (unsigned int i = 0; i < i_run_summary->GetEntries(); i ++){
+		i_run_summary->GetEntry(i);
+		if (i_runnum > 0){
+			i_runlist.push_back(i_runnum);
+		}
+	}
+	delete i_run_summary;
+	i_file->Close();
+	delete i_file;
+
+	for (unsigned int i = 0; i < i_runlist.size(); i++){
+		bool i_success = addRun(filename, i_runlist[i]);
+		if (!i_success){
+			cout << "VLikelihoodFitter2::addFromCombined Error adding run: " << i_runlist[i] << endl;
+		}
+		return i_success;
+	}
+	return true;
+	
+}
+
 bool VLikelihoodFitter2::addRun(string filename){
 
     VLikelihoodObject *i_obj = new VLikelihoodObject(filename);
@@ -535,7 +582,38 @@ bool VLikelihoodFitter2::addRun(string filename){
 
     fLikelihoodObjects.push_back(i_obj);
     return true;
+}
 
+
+bool VLikelihoodFitter2::addRun(string filename, int runnum){
+
+    VLikelihoodObject *i_obj = new VLikelihoodObject(filename, runnum);
+
+    if (!i_obj) {
+        cout << "VLikelihoodFitter2::addRun Error adding from file: " << filename << endl; 
+        return false;
+    }
+    // i_obj->setBinning(fEnergyBinWidth, fEnergyBinMin, fEnergyBinMax);
+    i_obj->setEnergyRange(fEnergyMin, fEnergyMax, false);
+    i_obj->setModel(fModel);
+    i_obj->setEnergyThreshold(fEnergyThresholdMethod, fEnergyThresholdValue, fEnergyThreaholdBool);
+
+    fLikelihoodObjects.push_back(i_obj);
+    return true;
+}
+
+
+bool VLikelihoodFitter2::addObject(VLikelihoodObject *i_obj){
+	if (!i_obj) {
+		cout << "VLikelihoodFitter2::addObject Error adding object\n"; 
+		return false;
+	}
+	i_obj->setEnergyRange(fEnergyMin, fEnergyMax, false);
+	i_obj->setModel(fModel);
+	i_obj->setEnergyThreshold(fEnergyThresholdMethod, fEnergyThresholdValue, fEnergyThreaholdBool);
+
+	fLikelihoodObjects.push_back(i_obj);
+	return true;
 }
 
 // A more user safe implementation
@@ -573,8 +651,15 @@ double VLikelihoodFitter2::getLogL_internal( const double* i_parms ){
     }
     double val = 0;
 
-	#pragma omp parallel for reduction(+:val)
+	omp_set_num_threads(fNumThreads);
+	// // default to 1
+	int num_threads = omp_get_max_threads();
+	// cout << "Number of threads available: " << num_threads << endl;
+
+    #pragma omp parallel for reduction (+:val)
 	for (unsigned int i = 0; i < fLikelihoodObjects.size(); i++){
+		// int thread_id = omp_get_thread_num();
+		// cout << "Calculation from thread: " << thread_id << endl;
 		val += fLikelihoodObjects[i]->getLogL();
 	}
 
@@ -1176,20 +1261,20 @@ TF1* VLikelihoodFitter2::fitEnergySpectrum()
 	// if( fModelID != 4 )
 	// {
 
-	// 	float* i_flux = getIntegralFlux( fFitMin_logTeV, fFitMax_logTeV, fModel, true );
+	// 	float* i_flux = getIntegralFlux( fEnergyMin, fFitMax_logTeV, fModel, true fEnergyMax
 
 	// 	cout << "Integral Flux:\n";
-	// 	cout << "F (" << TMath::Power( 10, fFitMin_logTeV ) << " TeV < E < " << TMath::Power( 10, fFitMax_logTeV ) << ") = " << i_flux[0] << "+/-" << i_flux[1] << " [Photons/cm^2/s] \n";
-	// 	cout << "F (" << TMath::Power( 10, fFitMin_logTeV ) << " TeV < E < " << TMath::Power( 10, fFitMax_logTeV ) << ") = " << i_flux[2] << "+/-" << i_flux[3] << " [Crab] \n";
-	// }
+	// 	cout << "F (" << TMath::Power( 10, fEnergyMin ) << " TeV < E < " << TMath::Power( 10, fFitMax_logTeV ) << ") = " << i_flux[0] << "+/-" << i_flux[1] << " [Photons/cm^2/s] \n";
+	// 	cout << "F (" << TMath::Power( 10, fEnergyMax ) << " TeV < E < " << TMath::Power( 10, fFitMax_logTeV ) << ") = " << i_flux[2] << "+/-" << i_flux[3] << " [Crab] \n";
+	// fEnergyMax
 
 	// else
 	// {
 
 
 	// 	cout << "Integral Flux:\n";
-	// 	cout << "F (" << TMath::Power( 10, fFitMin_logTeV ) << " TeV < E < " << TMath::Power( 10, fFitMax_logTeV ) << ") = " << i_BestFit->GetParameter( 0 ) << "+/-" << i_BestFit->GetParError( 0 ) << " [Photons/cm^2/s] \n";
-	// }
+	// 	cout << "F (" << TMath::Power( 10, fEnergyMin ) << " TeV < E < " << TMath::Power( 10, fFitMax_logTeV ) << ") = " << i_BestFit->GetParameter( 0 ) << "+/-" << i_BestFit->GetParError( 0 ) << " [Photons/cm^2/s] \n";
+	// fEnergyMax
 
 
 	// // Getting Decorrelation Energy
@@ -1200,6 +1285,420 @@ TF1* VLikelihoodFitter2::fitEnergySpectrum()
 	return i_BestFit;
 }
 
+
+
+// Getting the confidence interval
+// SOB use TF1::Derivative ?
+TGraphAsymmErrors* VLikelihoodFitter2::calculateConfidenceInterval( double* i_covmat, TF1* i_fitfunction, int i_model, int i_fNparms )
+{
+
+	int i_nsteps = 1000;
+	double i_start = fEnergyMin;
+	double i_stop = fEnergyMax;
+
+	double i_step = ( i_stop - i_start ) / i_nsteps;
+
+	TGraphAsymmErrors* i_ConfidenceInterval = new TGraphAsymmErrors( i_nsteps );
+
+
+	for( int i = 0; i < i_nsteps; i++ )
+	{
+		double i_energy = i_start + i * i_step ;
+		double i_flux_err = 0;
+
+		i_flux_err = 0;
+		double i_flux = 0;
+
+		if( fEBLAnalysis )
+		{
+			i_flux = i_fitfunction->Eval( i_energy ) * TMath::Exp( fEBLOpacityGraph->Eval( TMath::Power( 10, i_energy ) ) );
+		}
+
+		else
+		{
+			i_flux = i_fitfunction->Eval( i_energy );
+		}
+
+
+		// Power Law
+		if( i_model == 0 )
+		{
+
+			// errN^2/N^2
+			i_flux_err = i_covmat[ 0 ] / i_fitfunction->GetParameter( 0 ) / i_fitfunction->GetParameter( 0 );
+			// errGamma^2/log^2(E/E0)
+			i_flux_err += TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * i_covmat[ 3 ];
+			// 2 log(E/E0) cov_Gamma_N / N
+			i_flux_err += -2. * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * i_covmat[ 1 ] /  i_fitfunction->GetParameter( 0 );
+			// F(E) * sqrt(previous)
+			i_flux_err = i_flux * TMath::Sqrt( i_flux_err );
+		}
+
+
+		// Exponential Cut Off
+		else if( i_model == 1 )
+		{
+			// errN^2/N^2
+			i_flux_err = i_covmat[ 0 ] / i_fitfunction->GetParameter( 0 ) / i_fitfunction->GetParameter( 0 );
+			// log^2(E/E0) * errGamma^2
+			i_flux_err += TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * i_covmat[ 4 ];
+			// (E/EC^2)^2 * errEC^2
+			i_flux_err += TMath::Power( TMath::Power( 10., i_energy ) / i_fitfunction->GetParameter( 2 ) / i_fitfunction->GetParameter( 2 ), 2 ) * i_covmat[ 8 ];
+			// 2 * log(E/E0) * cov_N_Gamma / N
+			i_flux_err += -2. * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * i_covmat[ 1 ] /  i_fitfunction->GetParameter( 0 );
+			// 2 * (E/E_C^2) * cov_N_EC / N
+			i_flux_err += 2. * TMath::Power( 10., i_energy ) / i_fitfunction->GetParameter( 2 ) / i_fitfunction->GetParameter( 2 ) * i_covmat[ 2 ] /  i_fitfunction->GetParameter( 0 );
+			// 2 * log(E/E0) * (E/E_C^2) * cov_Gamma_EC
+			i_flux_err += -2. * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * TMath::Power( 10., i_energy ) / i_fitfunction->GetParameter( 2 ) / i_fitfunction->GetParameter( 2 ) * i_covmat[ 5 ] ;
+
+			i_flux_err = i_flux * TMath::Sqrt( i_flux_err );
+		}
+
+
+
+		// Curved Power Law
+		else if( i_model == 2 )
+		{
+			// errN^2/N^2
+			i_flux_err = i_covmat[ 0 ] / i_fitfunction->GetParameter( 0 ) / i_fitfunction->GetParameter( 0 );
+			// log^2(E/E0) * errAlpha^2
+			i_flux_err += TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * i_covmat[ 4 ];
+			// (E/E0) * log^2(E/E0) * errBeta
+			i_flux_err += TMath::Power( TMath::Power( 10., i_energy ) / fENorm * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ), 2 ) * i_covmat[ 8 ];
+			// 2 * log(E/E0) * cov_N_Alpha / N
+			i_flux_err += -2. * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * i_covmat[ 1 ] /  i_fitfunction->GetParameter( 0 );
+			// 2 * (E/E0) log(E/E0) * cov_N_Beta / N
+			i_flux_err += -2. * ( TMath::Power( 10., i_energy ) / fENorm * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) ) * i_covmat[ 2 ] /  i_fitfunction->GetParameter( 0 );
+			// 2 * log^2(E/E0) * (E/E0) * cov_Alpha_Beta
+			i_flux_err += 2. * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * TMath::Power( 10., i_energy ) / fENorm * i_covmat[ 5 ] ;
+
+			i_flux_err = i_flux * TMath::Sqrt( i_flux_err );
+		}
+
+
+
+		// Log Parabola
+		else if( i_model == 3 )
+		{
+			// errN^2/N^2
+			i_flux_err = i_covmat[ 0 ] / i_fitfunction->GetParameter( 0 ) / i_fitfunction->GetParameter( 0 );
+			// log^2(E/E0) * errAlpha^2
+			i_flux_err += TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * i_covmat[ 4 ];
+			// log^4(E/E0) * errBeta^2
+			i_flux_err += TMath::Power( TMath::Log( TMath::Power( 10., i_energy ) / fENorm ), 4 ) * i_covmat[ 8 ];
+			// 2 * log(E/E0) * cov_N_alpha / N
+			i_flux_err += -2. * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * i_covmat[ 1 ] /  i_fitfunction->GetParameter( 0 );
+			// 2 * log^2(E/E0) * cov_N_beta / N
+			i_flux_err += -2. * TMath::Power( TMath::Log( TMath::Power( 10., i_energy ) / fENorm ), 2 ) * i_covmat[ 2 ] /  i_fitfunction->GetParameter( 0 );
+			// 2 * log^3(E/E0) * cov_alpha_beta / N
+			i_flux_err += 2. *  TMath::Power( TMath::Log( TMath::Power( 10., i_energy ) / fENorm ), 3 ) * i_covmat[ 5 ] ;
+
+			i_flux_err = i_flux * TMath::Sqrt( i_flux_err );
+		}
+
+
+
+		i_ConfidenceInterval->SetPoint( i, TMath::Power( 10., i_energy ), i_flux );
+		i_ConfidenceInterval->SetPointError( i, 0, 0, i_flux_err, i_flux_err ) ; // * TMath::Exp(fEBLOpacityGraph->Eval( TMath::Power(10,i_energy) ) ) );
+
+
+	}
+
+	return i_ConfidenceInterval;
+}
+
+
+void VLikelihoodFitter2::clearSpectralPoints(){
+	fEnergyBins.clear();
+	fEnergyBinCentres.clear();
+	fSpectralPoint_likelihood_max.clear();
+	fSpectralPoint_TS.clear();
+	fSpectralPoint_FitStatus.clear();
+}
+
+/*
+* Getting the energy spectrum
+* This is done by applying a fit each energy bin
+* with the spectral shape parameters frozen to the best fit values
+* iBestFit - Best fit function
+* bPrintAll == True - save results for all energy bins
+* bPrintAll == False - save results for energy bins with a valid fit
+*/
+TGraphAsymmErrors* VLikelihoodFitter2::getEnergySpectrum( TF1* iBestFit, bool bPrintAll )
+{
+
+	// Clear previous fit details
+	clearSpectralPoints();
+	fEnergyBins = fLikelihoodObjects[0]->getEnergyBins();
+	fEnergyBinCentres = fLikelihoodObjects[0]->getEnergyBinCentres();
+	fNEnergyBins = fEnergyBinCentres.size();
+
+	// Checking parameters (note expecting 1 - nPar for broken pwl)
+	if( ( iBestFit->GetNpar() != ( int )fNParms )  && ( fModelID != 6 ) )
+	{
+		cout << "VLikelihoodFitter2::getEnergySpectrum Error invalid number of parameters!\n"
+			 << "\t\tExpected: " << fNParms << endl
+			 << "\t\tRecieved: " << iBestFit->GetNpar() << endl;
+		return 0;
+	}
+
+
+	// Saving current fit details to reset later
+	double iGlobalMin = fEnergyMin;
+	double iGlobalMax = fEnergyMax;
+	double iGlobalNorm = fENorm;
+
+	double ifENorm;
+	double* parms = iBestFit->GetParameters();
+	cout << "\n\nGetting Energy Spectrum\n";
+
+	for( unsigned int i = 0; i < fNParms; i++ )
+	{
+		cout << fParmName[i] << " : " << parms[i] << endl;
+	}
+
+	// Deleting any previous saved spectra
+	if( fEnergySpectrum )
+	{
+		delete fEnergySpectrum;
+	}
+
+	fEnergySpectrum = new TGraphAsymmErrors();
+
+	for(unsigned int i = 0 ; i < fNEnergyBins; i++ )
+	{
+		// Excluding bins outside of the minimum and maximum energy range
+		// if ( ( fEnergyBins[i] < iGlobalMin ) ||   (fEnergyBins[i] > iGlobalMax || fEnergyBins[i+1] > iGlobalMax)  )
+		if( ( fEnergyBins[i] < iGlobalMin ) || ( fEnergyBins[i] > iGlobalMax ) )
+		{
+			continue;
+		}
+
+
+		cout << "Getting energy bin : " << fEnergyBins[i]  << " - " <<  fEnergyBins[i + 1] << endl;
+
+
+		// Applying fit to energy bin
+		setEnergyRange( fEnergyBins[i], fEnergyBins[i + 1], false );
+		ifENorm = TMath::Power( 10., fEnergyBinCentres[i] );
+
+		// Getting fit
+		getSpectralPoint( fEnergyBins[i], fEnergyBins[i + 1], ifENorm, iBestFit, bPrintAll );
+
+	}
+
+	// Resetting range and normalisation
+	setEnergyRange( iGlobalMin, iGlobalMax, false );
+	setNormalisationEnergyLinear( iGlobalNorm );
+	setModel( fModelID, iGlobalNorm );
+
+	cout << "Bin No.\tE\t\tEMin\t\tEMax\tdN/dE\terr(dN/dE)_low\terr(dN/dE)_high\tTS\tLog-Likelihood\tFitStatus\n";
+
+	// Printing out energy spectrum
+	for( int i = 0 ; i < fEnergySpectrum->GetN(); i++ )
+	{
+
+
+		cout << i << "\t" << fEnergySpectrum->GetX()[i] << "\t" << fEnergySpectrum->GetErrorXlow( i ) << "\t" << fEnergySpectrum->GetErrorXhigh( i ) << "\t"
+			 << fEnergySpectrum->GetY()[i] << "\t" << fEnergySpectrum->GetErrorYlow( i ) << "\t" << fEnergySpectrum->GetErrorYhigh( i ) << "\t"
+			//  << fSpectralPoint_TS[i] << "\t" << fSpectralPoint_likelihood_max[i] << "\t" << fSpectralPoint_FitStatus[i] << endl;
+			 << 0 << "\t" << fSpectralPoint_likelihood_max[i] << "\t" << fSpectralPoint_FitStatus[i] << endl;
+
+	}
+
+	return fEnergySpectrum;
+}
+
+
+/*
+* Function to apply fit to only the energy bin of interest
+* Details of the best fit parameters are saved to a TGraphAsymmErrors
+*	BinMin - Lower edge of energy bin
+* BinMin - Upper edge of energy bin
+* iBestFit - Best fit function
+* bPrintAll == True - save results for all energy bins
+* bPrintAll == False - save results for energy bins with a valid fit
+*/
+float* VLikelihoodFitter2::getSpectralPoint( double BinMin, double BinMax, double ifENorm, TF1* iBestFit, bool bPrintAll )
+{
+
+	// Setting fit range to that of the enrgy bin
+	setEnergyRange( BinMin, BinMax, false );
+
+	// Setting the normalization energy to the bin centre
+	if( fModelID == 1 )
+	{
+		setModel( fModelID + 10, ifENorm );
+	}
+	else if( fModelID == 6 )
+	{
+		setModel( 0, ifENorm );
+		if( ifENorm < iBestFit->GetParameter( 3 ) )
+		{
+			fModel->SetParameter( 1, iBestFit->GetParameter( 1 ) );
+		}
+		else
+		{
+			fModel->SetParameter( 1, iBestFit->GetParameter( 2 ) );
+		}
+	}
+	else
+	{
+		setModel( fModelID, ifENorm );
+	}
+
+	// initializing the minimizing
+	// Initial guess is set to the model evaluated at normalization energy
+	// Print status of 0 (quiet)
+	// Spectral shape parameters are frozen (true)
+	if( !initializeMinimizer( iBestFit->Eval( ifENorm ), 0,  true ) )
+	{
+		cout << "VLikelihoodFitter2::getSpectralPoint minimizer initialization failed."
+			 << endl << "\t Please run VLikelihoodFitter2::getLikelihoodFit() " << endl;
+		return 0;
+	}
+
+	// Checking TS before applying fit
+	cout << "Getting Total Counts for TS" << endl;
+	float* i_fluxPoint = new float[3];
+
+
+	// double i_onTotal = 0;
+	// double i_offTotal = 0;
+	// double i_mean_alpha = getMeanAlpha();
+
+
+	// // Getting the total counts
+	// for( unsigned int i = 0; i < fOnCounts.size(); i++ )
+	// {
+
+	// 	// Making sure run isn't excluded
+	// 	if( isMJDExcluded( fRunList[i].MJD ) || isRunExcluded( fRunList[i].runnumber ) )
+	// 	{
+	// 		continue;
+	// 	}
+
+	// 	for( unsigned int j = 0; j < fOnCounts[0].size(); j++ )
+	// 	{
+	// 		if( fEnergyBinCentres[j] < fFitMin_logTeV )
+	// 		{
+	// 			continue;
+	// 		}
+	// 		if( fEnergyBinCentres[j] > fFitMax_logTeV )
+	// 		{
+	// 			continue;
+	// 		}
+	// 		i_onTotal += fOnCounts[i][j];
+	// 		i_offTotal += fOffCounts[i][j];
+
+	// 	}
+	// }
+
+
+
+	// do the minimization
+	fMinimizer->Minimize();
+
+	// Fit details are saved if the fit is valid
+	// If the fit isn't valid, the details are only outputted if bPrintAll == True
+	if( ( fMinimizer->Status() != 0 ) && !bPrintAll )
+	{
+		return 0;
+	}
+
+	// Best fit and errors
+	const double* i_FitValues = fMinimizer->X();
+	const double* i_Errors = fMinimizer->Errors();
+
+
+	i_fluxPoint[0] = i_FitValues[0];
+	i_fluxPoint[1] = i_Errors[0];
+
+
+	// Getting asymmetric errors
+	double i_err_low = 0;
+	double i_err_up = 0;
+
+	fMinimizer->GetMinosError( 0, i_err_low, i_err_up );
+
+
+	// Saving fit details to the TGraphAsymmErrors
+	// (int) fEnergySpectrum->GetN() is always the next point to be set
+	int npoints = fEnergySpectrum->GetN();
+
+
+	// Saving the point to fEnergySpectrum
+	fEnergySpectrum->SetPoint( npoints, ifENorm, i_FitValues[0] );
+
+	// Checking if the errors are valid
+	if( fMinimizer->Status() == 0 )
+	{
+		cout << "Setting Error " << npoints << " " << i_FitValues[0] << " " << abs( i_err_low ) << " " << i_err_up << endl;
+		fEnergySpectrum->SetPointError( npoints,
+										ifENorm - TMath::Power( 10., BinMin ), // E Min
+										TMath::Power( 10., BinMax ) - ifENorm, // E Max
+										abs( i_err_low ), // dNdE err low  SOB why abs?
+										i_err_up ); // dNdE err high
+	}
+
+	else
+	{
+		fEnergySpectrum->SetPointError( npoints,
+										ifENorm - TMath::Power( 10., BinMin ), // E Min
+										TMath::Power( 10., BinMax ) - ifENorm, // E Max
+										0, // dNdE err low
+										0 ); // dNdE err high
+	}
+
+
+	// Saving some useful information
+	fSpectralPoint_FitStatus.push_back( fMinimizer->Status() );
+	// fSpectralPoint_TS.push_back( 0 );
+	fSpectralPoint_likelihood_max.push_back( -1 * fMinimizer->MinValue() );
+
+	return i_fluxPoint;
+}
+
+
+
+// // Returning Contour plot
+// // Normalisation (parameter 0 of model) vs Index (or whatever parameter 1 is )
+// TGraph* VLikelihoodFitter2::getContours( unsigned int i, unsigned int j )
+// {
+
+// 	// Checking the parameters are in the acceptable range
+// 	if( ( i >= fNParms ) || ( j >= fNParms ) )
+// 	{
+// 		cout << "VLikelihoodFitter2::getContours invalid search parameters: "
+// 			 << "\n\ti :" << i << " , j:" << j
+// 			 << "\n Allowed range [0-" << fNParms - 1 <<  "]" << endl;
+// 		return 0;
+// 	}
+
+// 	// Rejecting i = j
+// 	if( i == j )
+// 	{
+// 		cout << "VLikelihoodFitter2::getContours cannot get contour of i = j" << endl;
+// 		return 0;
+// 	}
+
+// 	// Getting contour vectors from map
+// 	std::ostringstream ss;
+// 	ss << i << "," << j;
+
+// 	if( fContourMap.find( ss.str().c_str() ) != fContourMap.end() )
+// 	{
+// 		TGraph* i_contour = new TGraph( fNContours, &( fContourMap[ss.str().c_str()][0] )[0], &( fContourMap[ss.str().c_str()][1] )[0] );
+// 		i_contour->GetXaxis()->SetTitle( fParmName[i].c_str() );
+// 		i_contour->GetYaxis()->SetTitle( fParmName[j].c_str() );
+// 		i_contour->SetTitle( "" );
+
+// 		return i_contour;
+// 	}
+
+// 	return 0;
+
+// }
 
 
 void VLikelihoodFitter2::setNumThreads( int i_numThreads ){
@@ -1215,6 +1714,6 @@ void VLikelihoodFitter2::setNumThreads( int i_numThreads ){
 
 	omp_set_num_threads(fNumThreads);
 	// // default to 1
-	// int num_threads = omp_get_max_threads();
+	int num_threads = omp_get_max_threads();
 	// cout << "Number of threads available: " << num_threads << endl;
 }

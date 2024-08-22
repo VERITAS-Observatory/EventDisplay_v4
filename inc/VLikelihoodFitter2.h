@@ -24,6 +24,8 @@
 #include <Math/GSLMinimizer.h>
 #include <Math/Functor.h>
 #include <Math/Factory.h>
+
+// #include "ROOT/TProcessExecutor.hxx"
 // #include "VEnergySpectrum.h"
 // #include "VEnergySpectrumfromLiterature.h"
 
@@ -51,7 +53,10 @@ class VLikelihoodFitter2
 		void loadFromFile(string filename);
 		bool addRun(string filename);
 		bool addRun(string filename, int i_runNumber);
-		
+		bool addObject(VLikelihoodObject* i_object);
+
+		bool addFromCombined(string filename);
+
 
 		// Setters
 		// Set the model
@@ -102,6 +107,11 @@ class VLikelihoodFitter2
 		// Set the Energy binning
 		void setEnergyBinning(double i_binw, double i_binMin, double i_binMax);
 
+		// Get the binned best fit spectral points
+		TGraphAsymmErrors* getEnergySpectrum( TF1* iBestFit, bool bPrintAll = false );
+
+		// Getters
+		TF1* getModel() { return (TF1*)fModel->Clone(); }
 
 	private:
 
@@ -126,6 +136,11 @@ class VLikelihoodFitter2
 		// Minimizer
 		ROOT::Math::Minimizer* fMinimizer;
 		ROOT::Math::Functor* fFitfunction;
+		// ROOT::TProcessExecutor* fExecutor;
+
+		// Energy Spectrum and confidence intervals
+		TGraphAsymmErrors* fConfidenceInterval;
+		TGraphAsymmErrors* fEnergySpectrum;
 
 		// Updaters
 		// These are private functions to loop and update individual VLikelihoodObjects
@@ -156,6 +171,14 @@ class VLikelihoodFitter2
 		double fEnergyBinMin;
 		double fEnergyBinMax;
 
+		// Energy Spectrum
+		unsigned int fNEnergyBins;
+		vector <double> fEnergyBins;
+		vector <double> fEnergyBinCentres;
+		vector <double> fSpectralPoint_likelihood_max;
+		vector <double> fSpectralPoint_TS;
+		vector <double> fSpectralPoint_FitStatus;
+
 		vector <int> fExcludeRun;
 		bool setRunExclusion(int i_run);
 
@@ -166,6 +189,14 @@ class VLikelihoodFitter2
 
 		// Intrinsic model
 		double calculateIntrinsicSpectrum( Double_t* x, Double_t* parm );
+
+		// Confidince interval
+		TGraphAsymmErrors*calculateConfidenceInterval( double* i_covmat, TF1* i_fitfunction, int i_model, int i_fNparms );
+
+
+		// Get the spectral points
+		float* getSpectralPoint( double BinMin, double BinMax, double ifENorm, TF1* iBestFit, bool bPrintAll );
+		void clearSpectralPoints();
 
 
 };

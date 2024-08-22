@@ -145,7 +145,7 @@ else
    ROOTCFLAGS   = $(shell root-config --auxcflags)
 endif
 OMPFLAGS 	= -fopenmp -D_USEOPENMP
-CXXFLAGS     += $(ROOTCFLAGS)
+CXXFLAGS     += $(ROOTCFLAGS) $(OMPFLAGS)
 CXXFLAGS     += -I$(shell root-config --incdir) -I$(shell root-config --incdir)/TMVA
 ########################################################
 # root libs

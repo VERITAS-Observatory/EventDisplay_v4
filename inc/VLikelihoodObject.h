@@ -18,6 +18,9 @@
 #include "TLine.h"
 #include "VMathsandFunctions.h"
 #include "VHistogramUtilities.h"
+
+#include "TRandom3.h"
+
 // #include <Math/GSLMinimizer.h>
 // #include <Math/Functor.h>
 // #include <Math/Factory.h>
@@ -103,6 +106,8 @@ class VLikelihoodObject
 		// Set the energy binning
 		void setBinning(double i_binWidth, double i_binMin = -1.5, double i_binMax = 2);
 
+		vector <double> getEnergyBins () {return fEnergyBins;}
+		vector <double> getEnergyBinCentres () {return fEnergyBinCentres;}
 
 		// TCanvas *drawEffectiveArea(){
 		// 	TCanvas* c1 = new TCanvas();
@@ -111,6 +116,9 @@ class VLikelihoodObject
 			
 		// }
 
+		VLikelihoodObject *fakeIt(TF1 *i_model, int i_run_num = -1, double i_mjd = -1);
+
+		VLikelihoodObject  *clone();
 
 		TCanvas *peak();
 		
