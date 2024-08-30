@@ -25,7 +25,7 @@ void print_output( TH1F *h, string print_out )
 
 
 
-void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW2 = 1., string iAddCut = "ErecS>0.", bool short_MC  = false )
+void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW2 = 1., string iAddCut = "ErecS>0.", string plot_type = "short_mc", string i_print_file = "" )
 {
     TFile* f1 = new TFile( iFile1.c_str() );
     if( f1->IsZombie() )
@@ -84,7 +84,7 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
     Vmin.push_back( 0. );
     Vmax.push_back( 70. );
     Vprintout.push_back( "" );
-    if( !short_MC )
+    if( plot_type.find("short_mc") == string::npos )
     {
         V.push_back( "EmissionHeight" );
         Vmin.push_back( 0. );
@@ -129,7 +129,7 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
         Vmax.push_back( log10( 300. ) );
         Vprintout.push_back( "" );
     }
-    if( short_MC )
+    if( plot_type.find("short_mc") != string::npos )
     {
         V.push_back( "(ErecS-MCe0)/MCe0" );
         Vmin.push_back( -1. );
@@ -139,7 +139,14 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
 
     if( is_MC )
     {
-        V.push_back( "sqrt( (Xoff-MCxoff)*(Xoff-MCxoff)+(Yoff-MCyoff)*(Yoff-MCyoff))" );
+        if( plot_type.find("geo") != string::npos )
+        {
+            V.push_back( "sqrt( (Xoff_intersect-MCxoff)*(Xoff_intersect-MCxoff)+(Yoff_intersect-MCyoff)*(Yoff_intersect-MCyoff))" );
+        }
+        else
+        {
+            V.push_back( "sqrt( (Xoff-MCxoff)*(Xoff-MCxoff)+(Yoff-MCyoff)*(Yoff-MCyoff))" );
+        }
         Vprintout.push_back( "68p" );
     }
     else
@@ -187,5 +194,10 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
             T2->Draw( V[i].c_str(), Vcut, "sames" );
             print_output( (TH1F*)primitives->At(primitives->GetSize() - 1), Vprintout[i] );
         }
+    }
+
+    if( i_print_file.size() > 0 )
+    {
+        c->Print( i_print_file.c_str() );
     }
 }
