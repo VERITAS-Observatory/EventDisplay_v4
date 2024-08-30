@@ -3,6 +3,27 @@
  *
 */
 
+void print_output( TH1F *h, string print_out )
+{
+    if( !h || print_out.size() == 0 )
+    {
+        return;
+    }
+    if( print_out == "RMS" )
+    {
+        cout << "\t " << print_out << ": " << h->GetRMS() << endl;
+    }
+    else if( print_out == "68p" )
+    {
+        int nQuantiles = 1;
+        double value[1];
+        double prob[1] = {0.68};
+        h->GetQuantiles(nQuantiles, value, prob);
+        cout << "\t 68% value: " << value[0] << endl;
+    }
+}
+
+
 
 void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW2 = 1., string iAddCut = "ErecS>0.", bool short_MC  = false )
 {
@@ -49,66 +70,82 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
     vector< string > V;
     vector< float > Vmax;
     vector< float > Vmin;
+    vector< string > Vprintout;
 
     V.push_back( "MSCW" );
     Vmin.push_back( -2. );
     Vmax.push_back( 3. );
+    Vprintout.push_back( "RMS" );
     V.push_back( "MSCL" );
     Vmin.push_back( -2. );
     Vmax.push_back( 3. );
+    Vprintout.push_back( "RMS" );
     V.push_back( "NImages" );
     Vmin.push_back( 0. );
     Vmax.push_back( 70. );
+    Vprintout.push_back( "" );
     if( !short_MC )
     {
         V.push_back( "EmissionHeight" );
         Vmin.push_back( 0. );
         Vmax.push_back( 40. );
+        Vprintout.push_back( "" );
         V.push_back( "log10(EChi2S)" );
         Vmin.push_back( -2. );
         Vmax.push_back( 4. );
+        Vprintout.push_back( "" );
         V.push_back( "log10(EmissionHeightChi2)" );
         Vmin.push_back( -11. );
         Vmax.push_back( 3. );
+        Vprintout.push_back( "" );
         V.push_back( "log10(SizeSecondMax)" );
         Vmin.push_back( 2. );
         Vmax.push_back( 8. );
+        Vprintout.push_back( "" );
         V.push_back( "log10(DispDiff)" );
         Vmin.push_back( -10. );
         Vmax.push_back( 3. );
+        Vprintout.push_back( "" );
         V.push_back( "dES" );
         Vmin.push_back( 0. );
         Vmax.push_back( 3. );
+        Vprintout.push_back( "" );
         V.push_back( "sqrt( Xcore*Xcore+Ycore*Ycore)" );
         Vmin.push_back( 0. );
         Vmax.push_back( 2500. );
+        Vprintout.push_back( "" );
     }
     if( is_MC )
     {
         V.push_back( "log10(MCe0)" );
         Vmin.push_back( -2. );
         Vmax.push_back( log10( 300. ) );
+        Vprintout.push_back( "" );
     }
     else
     {
         V.push_back( "log10(ErecS)" );
         Vmin.push_back( -2. );
         Vmax.push_back( log10( 300. ) );
+        Vprintout.push_back( "" );
     }
     if( short_MC )
     {
         V.push_back( "(ErecS-MCe0)/MCe0" );
         Vmin.push_back( -1. );
         Vmax.push_back( 1. );
+        Vprintout.push_back( "RMS" );
     }
 
     if( is_MC )
     {
         V.push_back( "sqrt( (Xoff-MCxoff)*(Xoff-MCxoff)+(Yoff-MCyoff)*(Yoff-MCyoff))" );
+        Vprintout.push_back( "68p" );
     }
     else
     {
         V.push_back( "sqrt( Xoff*Xoff+Yoff*Yoff)" );
+        Vprintout.push_back( "68p" );
     }
     Vmin.push_back( 0. );
     Vmax.push_back( 1.5 );
@@ -141,10 +178,14 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
         f1->cd();
         T1->Draw( V[i].c_str(), Vcut );
 
+        print_output( (TH1F*)gPad->GetPrimitive("htemp"), Vprintout[i] );
+
         if( T2 )
         {
+            TList* primitives = gPad->GetListOfPrimitives();
             f2->cd();
             T2->Draw( V[i].c_str(), Vcut, "sames" );
+            print_output( (TH1F*)primitives->At(primitives->GetSize() - 1), Vprintout[i] );
         }
     }
 }
