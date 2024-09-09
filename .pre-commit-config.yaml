@@ -39,3 +39,8 @@ repos:
         ]
         additional_dependencies:
           - tomli
+  - repo: https://github.com/igrr/astyle_py.git
+    rev: v1.0.5
+    hooks:
+    -   id: astyle_py
+        args: [--astyle-version=3.6.1 --options=./.astylerc]
