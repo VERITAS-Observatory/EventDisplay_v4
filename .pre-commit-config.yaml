@@ -44,3 +44,4 @@ repos:
     hooks:
     -   id: astyle_py
         args: [--astyle-version=3.6.1 --options=./.astylerc]
+        files: '^.*\.(c|cpp|cxx|h|hpp|inc|C)$'
