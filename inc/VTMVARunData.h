@@ -32,89 +32,89 @@ using namespace std;
 
 class VTMVARunData : public TNamed
 {
-	private:
+    private:
 
-		bool              fDebug;
+        bool              fDebug;
 
-		bool         fillEnergyCutData(
-			vector< double > iEnergyCut_Log10TeV_min, vector< double > iEnergyCut_Log10TeV_max );
-		unsigned int getTrainOptionValue( string iVarName, unsigned int i_default );
+        bool         fillEnergyCutData(
+            vector< double > iEnergyCut_Log10TeV_min, vector< double > iEnergyCut_Log10TeV_max );
+        unsigned int getTrainOptionValue( string iVarName, unsigned int i_default );
 
-	public:
+    public:
 
-		string            fName;
-		string            fRunOption;
+        string            fName;
+        string            fRunOption;
 
-		// run type
-		bool fTrainGammaHadronSeparation;
-		bool fTrainReconstructionQuality;
+        // run type
+        bool fTrainGammaHadronSeparation;
+        bool fTrainReconstructionQuality;
 
-		// output file
-		string            fOutputFileName;
-		string            fOutputDirectoryName;
-		vector< vector< TFile* > >  fOutputFile;
-		string            fSelectedEventFileName;
+        // output file
+        string            fOutputFileName;
+        string            fOutputDirectoryName;
+        vector< vector< TFile* > >  fOutputFile;
+        string            fSelectedEventFileName;
 
-		// training data
-		double            fSignalWeight;
-		vector< string >  fSignalFileName;
-		vector< TChain* > fSignalTree;
-		double            fBackgroundWeight;
-		vector< string >  fBackgroundFileName;
-		vector< TChain* > fBackgroundTree;
-		unsigned int      fnTrain_Signal;
-		unsigned int      fnTrain_Background;
+        // training data
+        double            fSignalWeight;
+        vector< string >  fSignalFileName;
+        vector< TChain* > fSignalTree;
+        double            fBackgroundWeight;
+        vector< string >  fBackgroundFileName;
+        vector< TChain* > fBackgroundTree;
+        unsigned int      fnTrain_Signal;
+        unsigned int      fnTrain_Background;
 
-		// list of training variables
-		vector< string >  fTrainingVariable;
-		vector< char >    fTrainingVariableType;
-		vector< float >   fTrainingVariable_CutRangeMin;
-		vector< float >   fTrainingVariable_CutRangeMax;
-		vector< string >  fTrainingVariable_VarProp;
+        // list of training variables
+        vector< string >  fTrainingVariable;
+        vector< char >    fTrainingVariableType;
+        vector< float >   fTrainingVariable_CutRangeMin;
+        vector< float >   fTrainingVariable_CutRangeMax;
+        vector< string >  fTrainingVariable_VarProp;
 
-		// spectator variables
-		vector< string > fSpectatorVariable;
+        // spectator variables
+        vector< string > fSpectatorVariable;
 
-		// quality and energy and zenith cuts
-		unsigned int      fMinSignalEvents;
-		unsigned int      fMinBackgroundEvents;
-		TCut              fQualityCuts;
-		TCut              fQualityCutsBkg;
-		TCut              fMCxyoffCut;
-		bool              fMCxyoffCutSignalOnly;
-		string            fPrepareTrainingOptions;
-		vector< VTMVARunDataEnergyCut* > fEnergyCutData;
-		vector< VTMVARunDataZenithCut* > fZenithCutData;
+        // quality and energy and zenith cuts
+        unsigned int      fMinSignalEvents;
+        unsigned int      fMinBackgroundEvents;
+        TCut              fQualityCuts;
+        TCut              fQualityCutsBkg;
+        TCut              fMCxyoffCut;
+        bool              fMCxyoffCutSignalOnly;
+        string            fPrepareTrainingOptions;
+        vector< VTMVARunDataEnergyCut* > fEnergyCutData;
+        vector< VTMVARunDataZenithCut* > fZenithCutData;
 
-		// analysis variables
-		int               fNTtype;
+        // analysis variables
+        int               fNTtype;
 
-		// MVA methods
-		vector< string >  fMVAMethod;
-		vector< string >  fMVAMethod_Options;
+        // MVA methods
+        vector< string >  fMVAMethod;
+        vector< string >  fMVAMethod_Options;
 
-		// reconstruction quality target
-		string            fReconstructionQualityTarget;
-		string            fReconstructionQualityTargetName;
+        // reconstruction quality target
+        string            fReconstructionQualityTarget;
+        string            fReconstructionQualityTargetName;
 
-		VTMVARunData();
-		~VTMVARunData() {}
-		void print();
-		VTableLookupRunParameter* getTLRunParameter();
-		bool readConfigurationFile( char* );
-		bool openDataFiles();
-		void setDebug( bool iB = true )
-		{
-			fDebug = iB;
-		}
-		void setName( string iN )
-		{
-			fName = iN;
-		}
-		void shuffleFileVectors();
-		void updateTrainingEvents( string iVarName, unsigned int iNEvents );
+        VTMVARunData();
+        ~VTMVARunData() {}
+        void print();
+        VTableLookupRunParameter* getTLRunParameter();
+        bool readConfigurationFile( char* );
+        bool openDataFiles();
+        void setDebug( bool iB = true )
+        {
+            fDebug = iB;
+        }
+        void setName( string iN )
+        {
+            fName = iN;
+        }
+        void shuffleFileVectors();
+        void updateTrainingEvents( string iVarName, unsigned int iNEvents );
 
-		ClassDef( VTMVARunData, 11 );
+        ClassDef( VTMVARunData, 11 );
 };
 
 #endif

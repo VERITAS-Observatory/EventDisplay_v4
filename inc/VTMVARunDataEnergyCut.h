@@ -11,20 +11,20 @@ using namespace std;
 
 class VTMVARunDataEnergyCut : public TNamed
 {
-	public:
+    public:
 
-		unsigned int fEnergyCutBin;
-		double       fEnergyCut_Log10TeV_min;
-		double       fEnergyCut_Log10TeV_max;
-		TCut         fEnergyCut;
-		unsigned int fEnergyReconstructionMethod;
+        unsigned int fEnergyCutBin;
+        double       fEnergyCut_Log10TeV_min;
+        double       fEnergyCut_Log10TeV_max;
+        TCut         fEnergyCut;
+        unsigned int fEnergyReconstructionMethod;
 
-		VTMVARunDataEnergyCut();
-		~VTMVARunDataEnergyCut() {}
+        VTMVARunDataEnergyCut();
+        ~VTMVARunDataEnergyCut() {}
 
-		void print();
+        void print();
 
-		ClassDef( VTMVARunDataEnergyCut, 2 );
+        ClassDef( VTMVARunDataEnergyCut, 2 );
 };
 
 #endif

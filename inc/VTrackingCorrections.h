@@ -21,23 +21,23 @@ using namespace SEphem;
 
 class VTrackingCorrections : public VGlobalRunParameter
 {
-	private:
+    private:
 
-		bool fStatus;
+        bool fStatus;
 
-		unsigned int fTelID;
+        unsigned int fTelID;
 
-		CorrectionParameters* correctionParameters;
+        CorrectionParameters* correctionParameters;
 
-	public:
+    public:
 
-		VTrackingCorrections( unsigned int iTelID );
-		~VTrackingCorrections() {};
-		bool   isGood()
-		{
-			return fStatus;
-		}
-		bool   readTrackingCorrectionsFromDB( string iSQLDate );
-		bool   applyTrackingCorrections( double iElRaw, double iAzRaw, double& iElCorr, double& iElAzCorr );
+        VTrackingCorrections( unsigned int iTelID );
+        ~VTrackingCorrections() {};
+        bool   isGood()
+        {
+            return fStatus;
+        }
+        bool   readTrackingCorrectionsFromDB( string iSQLDate );
+        bool   applyTrackingCorrections( double iElRaw, double iAzRaw, double& iElCorr, double& iElAzCorr );
 };
 #endif

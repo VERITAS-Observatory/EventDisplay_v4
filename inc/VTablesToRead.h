@@ -13,36 +13,36 @@ using namespace std;
 
 class VTablesToRead
 {
-	public:
+    public:
 
-		unsigned int    fNTel;
-		vector< TH2F* > hmscwMedian;
-		vector< TH2F* > hmscwSigma;
-		vector< TH2F* > hmsclMedian;
-		vector< TH2F* > hmsclSigma;
-		vector< TH2F* > henergyERMedian;
-		vector< TH2F* > henergyERSigma;
-		vector< TH2F* > henergySRMedian;
-		vector< TH2F* > henergySRSigma;
+        unsigned int    fNTel;
+        vector< TH2F* > hmscwMedian;
+        vector< TH2F* > hmscwSigma;
+        vector< TH2F* > hmsclMedian;
+        vector< TH2F* > hmsclSigma;
+        vector< TH2F* > henergyERMedian;
+        vector< TH2F* > henergyERSigma;
+        vector< TH2F* > henergySRMedian;
+        vector< TH2F* > henergySRSigma;
 
-		double mscw;
-		double mscl;
-		double energyER;
-		double energyER_Chi2;
-		double energyER_dE;
-		double energySR;
-		double energySR_Chi2;
-		double energySR_dE;
-		double* mscw_T;
-		double* mscl_T;
-		double* energyER_T;
-		double* energySR_T;
-		double* mscw_Tsigma;
-		double* mscl_Tsigma;
-		double* energySR_Tsigma;
+        double mscw;
+        double mscl;
+        double energyER;
+        double energyER_Chi2;
+        double energyER_dE;
+        double energySR;
+        double energySR_Chi2;
+        double energySR_dE;
+        double* mscw_T;
+        double* mscl_T;
+        double* energyER_T;
+        double* energySR_T;
+        double* mscw_Tsigma;
+        double* mscl_Tsigma;
+        double* energySR_Tsigma;
 
-		VTablesToRead( int nTel );
-		~VTablesToRead() {}
-		void reset();
+        VTablesToRead( int nTel );
+        ~VTablesToRead() {}
+        void reset();
 };
 #endif

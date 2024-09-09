@@ -21,64 +21,64 @@ using namespace std;
 
 class VPlotMonteCarloQualityFactorData
 {
-	public:
+    public:
 
-		double fVar_max;
-		double fVar_min;
-		TH1D*  hSignal;
-		TH1D*  hBackground;
-		TH1D*  hQFactors_LowerCut;
-		TH1D*  hQFactors_UpperCut;
-		TGraphErrors* gQFactor_LowerCutE;
-		TGraphErrors* gQFactor_UpperCutE;
-		TGraphErrors* gQFactorMax_LowerCutE;
-		TGraphErrors* gQFactorMax_UpperCutE;
+        double fVar_max;
+        double fVar_min;
+        TH1D*  hSignal;
+        TH1D*  hBackground;
+        TH1D*  hQFactors_LowerCut;
+        TH1D*  hQFactors_UpperCut;
+        TGraphErrors* gQFactor_LowerCutE;
+        TGraphErrors* gQFactor_UpperCutE;
+        TGraphErrors* gQFactorMax_LowerCutE;
+        TGraphErrors* gQFactorMax_UpperCutE;
 
-		VPlotMonteCarloQualityFactorData();
-		~VPlotMonteCarloQualityFactorData() {}
+        VPlotMonteCarloQualityFactorData();
+        ~VPlotMonteCarloQualityFactorData() {}
 };
 
 
 class VPlotMonteCarloQualityFactor : public VPlotUtilities
 {
-	private:
+    private:
 
-		bool fDebug;
+        bool fDebug;
 
-		double fEnergy_min;
-		double fEnergy_max;
-		double fMSCW_min;
-		double fMSCW_max;
-		double fMSCL_min;
-		double fMSCL_max;
+        double fEnergy_min;
+        double fEnergy_max;
+        double fMSCW_min;
+        double fMSCW_max;
+        double fMSCL_min;
+        double fMSCL_max;
 
-		CData* fSignalChain;
-		CData* fBackgroundChain;
+        CData* fSignalChain;
+        CData* fBackgroundChain;
 
-		map< string, VPlotMonteCarloQualityFactorData* > fData;
+        map< string, VPlotMonteCarloQualityFactorData* > fData;
 
-		void calculateQfactors();
-		void fill( int iMaxNevents, CData* c, bool bSignal );
-		void initializeHistograms();
-		void resetHistograms();
-		bool setDataChain( string iChain, bool bSignal );
+        void calculateQfactors();
+        void fill( int iMaxNevents, CData* c, bool bSignal );
+        void initializeHistograms();
+        void resetHistograms();
+        bool setDataChain( string iChain, bool bSignal );
 
-	public:
+    public:
 
-		VPlotMonteCarloQualityFactor();
-		~VPlotMonteCarloQualityFactor() {}
+        VPlotMonteCarloQualityFactor();
+        ~VPlotMonteCarloQualityFactor() {}
 
-		bool setBackgroundDataChain( string iChain );
-		bool setSignalDataChain( string iChain );
-		void setMSCCuts( double iMSCW_min = -2., double iMSCW_max = 0.5, double iMSCL_min = -2., double iMSCL_max = 0.5 );
-		void setEnergyRange( double iEmin = -10., double iEmax = 10. )
-		{
-			fEnergy_min = iEmin;    // log10 [TeV]
-			fEnergy_max = iEmax;
-		}
-		bool fill( int iMaxEvents = -1 );
-		void fillEnergyDependence( int iMaxNevents = -1, double iEmin = -2., double iEmax = 2., double iEbin = 0.25 );
-		void plot( bool iPrint = false );
+        bool setBackgroundDataChain( string iChain );
+        bool setSignalDataChain( string iChain );
+        void setMSCCuts( double iMSCW_min = -2., double iMSCW_max = 0.5, double iMSCL_min = -2., double iMSCL_max = 0.5 );
+        void setEnergyRange( double iEmin = -10., double iEmax = 10. )
+        {
+            fEnergy_min = iEmin;    // log10 [TeV]
+            fEnergy_max = iEmax;
+        }
+        bool fill( int iMaxEvents = -1 );
+        void fillEnergyDependence( int iMaxNevents = -1, double iEmin = -2., double iEmax = 2., double iEbin = 0.25 );
+        void plot( bool iPrint = false );
 };
 
 #endif

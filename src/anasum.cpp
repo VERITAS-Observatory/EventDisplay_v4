@@ -46,25 +46,25 @@ int fRandomSeed = 17;
 */
 bool testCommandlineArguments()
 {
-	// MONO ANALYSIS PROBABLY DOES NOT WORK ANYMORE
-	if( analysisType != 3 && analysisType != 4 )
-	{
-		cout << "Mono analysis not well tested and disabled; DO NOT USE!" << endl;
-		return false;
-	}
-	// require a runlist file
-	if( listfilename.size() < 1 && listShortfilename.size() < 1 )
-	{
-		cout << "error: missing required command line argument --runlist (-l) or --shortlist (-s)" << endl;
-		return false;
-	}
-	// require data directory
-	if( datadir.size() < 1 )
-	{
-		cout << "error: missing required command line argument --datadir (-d)" << endl;
-		return false;
-	}
-	return true;
+    // MONO ANALYSIS PROBABLY DOES NOT WORK ANYMORE
+    if( analysisType != 3 && analysisType != 4 )
+    {
+        cout << "Mono analysis not well tested and disabled; DO NOT USE!" << endl;
+        return false;
+    }
+    // require a runlist file
+    if( listfilename.size() < 1 && listShortfilename.size() < 1 )
+    {
+        cout << "error: missing required command line argument --runlist (-l) or --shortlist (-s)" << endl;
+        return false;
+    }
+    // require data directory
+    if( datadir.size() < 1 )
+    {
+        cout << "error: missing required command line argument --datadir (-d)" << endl;
+        return false;
+    }
+    return true;
 }
 
 
@@ -73,51 +73,51 @@ bool testCommandlineArguments()
 int main( int argc, char* argv[] )
 {
 
-	// print version only
-	if( argc == 2 )
-	{
-		string fCommandLine = argv[1];
-		if( fCommandLine == "-v" || fCommandLine == "--version" )
-		{
-			VGlobalRunParameter fRunPara;
-			cout << fRunPara.getEVNDISP_VERSION() << endl;
-			exit( EXIT_SUCCESS );
-		}
-	}
+    // print version only
+    if( argc == 2 )
+    {
+        string fCommandLine = argv[1];
+        if( fCommandLine == "-v" || fCommandLine == "--version" )
+        {
+            VGlobalRunParameter fRunPara;
+            cout << fRunPara.getEVNDISP_VERSION() << endl;
+            exit( EXIT_SUCCESS );
+        }
+    }
 
-	cout << endl << "VERITAS Analysis Summary (University of Delaware & DESY) ";
-	cout << " (version " << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
-	cout <<         "==========================================================================" << endl;
-	cout << endl;
+    cout << endl << "VERITAS Analysis Summary (University of Delaware & DESY) ";
+    cout << " (version " << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
+    cout <<         "==========================================================================" << endl;
+    cout << endl;
 
-	parseOptions( argc, argv );
+    parseOptions( argc, argv );
 
-	if( !testCommandlineArguments() )
-	{
-		exit( EXIT_FAILURE );
-	}
+    if(!testCommandlineArguments() )
+    {
+        exit( EXIT_FAILURE );
+    }
 
-	// initialize analysis
-	VAnaSum* anasum = new VAnaSum( datadir, analysisType );
-	anasum->initialize( listfilename, listShortfilename, singletel - 1, runType, outfile, fRandomSeed, fRunParameterfile );
-	cout << endl;
+    // initialize analysis
+    VAnaSum* anasum = new VAnaSum( datadir, analysisType );
+    anasum->initialize( listfilename, listShortfilename, singletel - 1, runType, outfile, fRandomSeed, fRunParameterfile );
+    cout << endl;
 
-	// stereo analysis (default)
-	if( analysisType == 3 || analysisType == 4 )
-	{
-		anasum->doStereoAnalysis( ( analysisType == 3 ) || ( analysisType == 5 ) );
-	}
-	else
-	{
-		cout << endl << "error: unknown run analysisType" << endl;
-		exit( EXIT_FAILURE );
-	}
-	// clean up and write results to disk
-	anasum->terminate();
+    // stereo analysis (default)
+    if( analysisType == 3 || analysisType == 4 )
+    {
+        anasum->doStereoAnalysis(( analysisType == 3 ) || ( analysisType == 5 ) );
+    }
+    else
+    {
+        cout << endl << "error: unknown run analysisType" << endl;
+        exit( EXIT_FAILURE );
+    }
+    // clean up and write results to disk
+    anasum->terminate();
 
-	cout << endl << "analysis results written to " << outfile << endl;
+    cout << endl << "analysis results written to " << outfile << endl;
 
-	return 0;
+    return 0;
 }
 
 
@@ -126,98 +126,98 @@ int main( int argc, char* argv[] )
  */
 int parseOptions( int argc, char* argv[] )
 {
-	while( 1 )
-	{
-		static struct option long_options[] =
-		{
-			{"help", no_argument, 0, 'h'},
-			{"runlist", required_argument, 0, 'l'},
-			{"shortlist", required_argument, 0, 'k'},
-			{"analysisType", required_argument, 0, 'm'},
-			{"outfile", required_argument, 0, 'o'},
-			{"datadir", required_argument, 0, 'd'},
-			{"singletelescope", required_argument, 0, 's'},
-			{"randomseed", required_argument, 0, 'r'},
-			{"runType", required_argument, 0, 'i'},
-			{"parameterfile",  required_argument, 0, 'f'},
-			{0, 0, 0, 0}
-		};
-		int option_index = 0;
-		int c = getopt_long( argc, argv, "h:l:k:m:o:d:s:r:i:u:f:g", long_options, &option_index );
-		if( optopt != 0 )
-		{
-			cout << "error: unknown option" << endl;
-			cout << "exiting..." << endl;
-			exit( EXIT_FAILURE );
-		}
-		if( argc == 1 )
-		{
-			c = 'h';
-		}
-		if( c == -1 )
-		{
-			break;
-		}
-		switch( c )
-		{
-			case 0:
-				if( long_options[option_index].flag != 0 )
-				{
-					break;
-				}
-				printf( "option %s", long_options[option_index].name );
-				if( optarg )
-				{
-					printf( " with arg %s", optarg );
-				}
-				printf( "\n" );
-				break;
-			case 'h':
-				if( gSystem->Getenv( "EVNDISPSYS" ) )
-				{
-					if( system( "cat $EVNDISPSYS/docs/ANASUM.md" ) != 0 )
-					{
-						cout << "error reading docs" << endl;
-					}
-				}
-				else
-				{
-					cout << " no help find (environmental variable EVNDISPSYS not set)" << endl;
-				}
-				exit( EXIT_FAILURE );
-				break;
-			case 'd':
-				datadir = optarg;
-				break;
-			case 'o':
-				outfile = optarg;
-				break;
-			case 'i':
-				runType = ( unsigned int )atoi( optarg );
-				break;
-			case 'm':
-				analysisType = atoi( optarg );
-				break;
-			case 's':
-				singletel = atoi( optarg );
-				break;
-			case 'l':
-				listfilename = optarg;
-				break;
-			case 'k':
-				listShortfilename = optarg;
-				break;
-			case 'r':
-				fRandomSeed = atoi( optarg );
-				break;
-			case 'f':
-				fRunParameterfile = optarg;
-				break;
-			case '?':
-				break;
-			default:
-				abort();
-		}
-	}
-	return optind;
+    while( 1 )
+    {
+        static struct option long_options[] =
+        {
+            {"help", no_argument, 0, 'h'},
+            {"runlist", required_argument, 0, 'l'},
+            {"shortlist", required_argument, 0, 'k'},
+            {"analysisType", required_argument, 0, 'm'},
+            {"outfile", required_argument, 0, 'o'},
+            {"datadir", required_argument, 0, 'd'},
+            {"singletelescope", required_argument, 0, 's'},
+            {"randomseed", required_argument, 0, 'r'},
+            {"runType", required_argument, 0, 'i'},
+            {"parameterfile",  required_argument, 0, 'f'},
+            {0, 0, 0, 0}
+        };
+        int option_index = 0;
+        int c = getopt_long( argc, argv, "h:l:k:m:o:d:s:r:i:u:f:g", long_options, &option_index );
+        if( optopt != 0 )
+        {
+            cout << "error: unknown option" << endl;
+            cout << "exiting..." << endl;
+            exit( EXIT_FAILURE );
+        }
+        if( argc == 1 )
+        {
+            c = 'h';
+        }
+        if( c == -1 )
+        {
+            break;
+        }
+        switch( c )
+        {
+            case 0:
+                if( long_options[option_index].flag != 0 )
+                {
+                    break;
+                }
+                printf( "option %s", long_options[option_index].name );
+                if( optarg )
+                {
+                    printf( " with arg %s", optarg );
+                }
+                printf( "\n" );
+                break;
+            case 'h':
+                if( gSystem->Getenv( "EVNDISPSYS" ) )
+                {
+                    if( system( "cat $EVNDISPSYS/docs/ANASUM.md" ) != 0 )
+                    {
+                        cout << "error reading docs" << endl;
+                    }
+                }
+                else
+                {
+                    cout << " no help find (environmental variable EVNDISPSYS not set)" << endl;
+                }
+                exit( EXIT_FAILURE );
+                break;
+            case 'd':
+                datadir = optarg;
+                break;
+            case 'o':
+                outfile = optarg;
+                break;
+            case 'i':
+                runType = ( unsigned int )atoi( optarg );
+                break;
+            case 'm':
+                analysisType = atoi( optarg );
+                break;
+            case 's':
+                singletel = atoi( optarg );
+                break;
+            case 'l':
+                listfilename = optarg;
+                break;
+            case 'k':
+                listShortfilename = optarg;
+                break;
+            case 'r':
+                fRandomSeed = atoi( optarg );
+                break;
+            case 'f':
+                fRunParameterfile = optarg;
+                break;
+            case '?':
+                break;
+            default:
+                abort();
+        }
+    }
+    return optind;
 }

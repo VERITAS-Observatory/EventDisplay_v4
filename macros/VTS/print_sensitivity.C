@@ -1,4 +1,4 @@
-/* 
+/*
  * calculate sensitivity from Crab runs and
  * print in latex and markdown
  *
@@ -6,9 +6,9 @@
  *
 */
 
-R__LOAD_LIBRARY( $EVNDISPSYS/lib/libVAnaSum.so );
+R__LOAD_LIBRARY($EVNDISPSYS / lib / libVAnaSum.so );
 
-void print_sensitivity( string anasum_file, string latex_table_title = "", double alpha = 1./6. )
+void print_sensitivity( string anasum_file, string latex_table_title = "", double alpha = 1. / 6. )
 {
     // get on and off counts
     TFile f( anasum_file.c_str() );
@@ -18,8 +18,8 @@ void print_sensitivity( string anasum_file, string latex_table_title = "", doubl
         cout << "Exiting...";
         return;
     }
-    TTree *t = (TTree*)f.Get( "total_1/stereo/tRunSummary" );
-    if( !t )
+    TTree *t = ( TTree* )f.Get( "total_1/stereo/tRunSummary" );
+    if(!t )
     {
         cout << "Error reading run summary tree from " << anasum_file << endl;
         cout << "Exiting...";
@@ -34,12 +34,12 @@ void print_sensitivity( string anasum_file, string latex_table_title = "", doubl
     t->SetBranchAddress( "RateE", &RateE );
     t->SetBranchAddress( "RateOffE", &RateOffE );
 
-    t->GetEntry( t->GetEntries()-1 );
+    t->GetEntry( t->GetEntries() - 1 );
 
     cout << "Rates (on/Off): " << Rate << "\t" << RateOff << endl;
 
     VSensitivityCalculator a;
     a.addDataSet( Rate, RateOff, alpha, "" );
     a.list_sensitivity();
-    a.list_sensitivity_latex_table( 0, latex_table_title, RateE);
+    a.list_sensitivity_latex_table( 0, latex_table_title, RateE );
 }

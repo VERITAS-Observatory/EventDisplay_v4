@@ -26,66 +26,66 @@ TMinuit* fLLFitter;
 
 int main( int argc, char* argv[] )
 {
-	// some timing
-	TStopwatch fStopWatch;
-	fStopWatch.Start();
+    // some timing
+    TStopwatch fStopWatch;
+    fStopWatch.Start();
 
-	// print version only
-	if( argc == 2 )
-	{
-		string fCommandLine = argv[1];
-		if( fCommandLine == "-v" || fCommandLine == "--version" )
-		{
-			VGlobalRunParameter fRunPara;
-			cout << fRunPara.getEVNDISP_VERSION() << endl;
-			exit( 0 );
-		}
-	}
+    // print version only
+    if( argc == 2 )
+    {
+        string fCommandLine = argv[1];
+        if( fCommandLine == "-v" || fCommandLine == "--version" )
+        {
+            VGlobalRunParameter fRunPara;
+            cout << fRunPara.getEVNDISP_VERSION() << endl;
+            exit( 0 );
+        }
+    }
 
-	// read the command line parameters
-	VReadRunParameter* fReadRunParameter = new VReadRunParameter();
-	if( !fReadRunParameter->readCommandline( argc, argv ) )
-	{
-		exit( -1 );
-	}
-	fReadRunParameter->getRunParameter()->print();
+    // read the command line parameters
+    VReadRunParameter* fReadRunParameter = new VReadRunParameter();
+    if(!fReadRunParameter->readCommandline( argc, argv ) )
+    {
+        exit(-1 );
+    }
+    fReadRunParameter->getRunParameter()->print();
 
-	// initialize main loop
-	VEventLoop mainEventLoop( fReadRunParameter->getRunParameter() );
-	if( !mainEventLoop.initEventLoop() )
-	{
-		exit( -1 );
-	}
+    // initialize main loop
+    VEventLoop mainEventLoop( fReadRunParameter->getRunParameter() );
+    if(!mainEventLoop.initEventLoop() )
+    {
+        exit(-1 );
+    }
 
-	// no display, command line mode
-	if( !fReadRunParameter->getRunParameter()->fdisplaymode )
-	{
-		mainEventLoop.loop( fReadRunParameter->getRunParameter()->fnevents );
-		fStopWatch.Stop();
-		fStopWatch.Print();
-		mainEventLoop.shutdown();
-	}
-	// display mode
-	else
-	{
-		// number of options set to one, otherwise TApplication prints sometimes help text (don't know how to switch that of in ROOT)
-		Int_t targv = 1;
-		TApplication app( "app", &targv, argv );
-		VDisplay display( gClient->GetRoot(), fReadRunParameter->getRunParameter()->fw, fReadRunParameter->getRunParameter()->fh, &mainEventLoop );
-		display.Draw();
+    // no display, command line mode
+    if(!fReadRunParameter->getRunParameter()->fdisplaymode )
+    {
+        mainEventLoop.loop( fReadRunParameter->getRunParameter()->fnevents );
+        fStopWatch.Stop();
+        fStopWatch.Print();
+        mainEventLoop.shutdown();
+    }
+    // display mode
+    else
+    {
+        // number of options set to one, otherwise TApplication prints sometimes help text (don't know how to switch that of in ROOT)
+        Int_t targv = 1;
+        TApplication app( "app", &targv, argv );
+        VDisplay display( gClient->GetRoot(), fReadRunParameter->getRunParameter()->fw, fReadRunParameter->getRunParameter()->fh, &mainEventLoop );
+        display.Draw();
 
-		if( fReadRunParameter->getRunParameter()->fMovieBool )
-		{
-			display.makeFullMovie();
-		}
-		else
-		{
-			app.Run();
-		}
+        if( fReadRunParameter->getRunParameter()->fMovieBool )
+        {
+            display.makeFullMovie();
+        }
+        else
+        {
+            app.Run();
+        }
 
 
-	}
-	delete fReadRunParameter;
+    }
+    delete fReadRunParameter;
 
-	return 0;
+    return 0;
 }

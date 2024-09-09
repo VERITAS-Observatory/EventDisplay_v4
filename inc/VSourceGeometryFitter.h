@@ -28,76 +28,76 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 class VSourceGeometryFitterData
 {
-	public:
+    public:
 
-		string           fFitterName;
-		string           fFitterDescription;
-		vector< string > fParameterName;
-		vector< double > fParameterInitValue;
-		vector< double > fParameterStep;
-		vector< double > fParameterLowerLimit;
-		vector< double > fParameterUpperLimit;
-		int              fFitResult_Status;
-		vector< double > fFitResult_Parameter;
-		vector< double > fFitResult_ParameterError;
+        string           fFitterName;
+        string           fFitterDescription;
+        vector< string > fParameterName;
+        vector< double > fParameterInitValue;
+        vector< double > fParameterStep;
+        vector< double > fParameterLowerLimit;
+        vector< double > fParameterUpperLimit;
+        int              fFitResult_Status;
+        vector< double > fFitResult_Parameter;
+        vector< double > fFitResult_ParameterError;
 
-		VSourceGeometryFitterData();
-		~VSourceGeometryFitterData() {}
+        VSourceGeometryFitterData();
+        ~VSourceGeometryFitterData() {}
 };
 
 class VSourceGeometryFitter : public VAnalysisUtilities, public VPlotUtilities
 {
-	private:
+    private:
 
-		bool   fDebug;
+        bool   fDebug;
 
-		string fAnasumDataFile;
-		int    fRunNumber;
-		double fXStart;
-		double fYStart;
-		double fPSF;
+        string fAnasumDataFile;
+        int    fRunNumber;
+        double fXStart;
+        double fYStart;
+        double fPSF;
 
-		// sky map to be fitted
-		TH2D* fHisSkyMap;
+        // sky map to be fitted
+        TH2D* fHisSkyMap;
 
-		// default fitter data
-		vector< VSourceGeometryFitterData* > fDefaultFitterData;
+        // default fitter data
+        vector< VSourceGeometryFitterData* > fDefaultFitterData;
 
-		// fitter used
-		VSourceGeometryFitterData*            fFitter;
+        // fitter used
+        VSourceGeometryFitterData*            fFitter;
 
-		void setFitterDefaultData();
+        void setFitterDefaultData();
 
-	public:
+    public:
 
-		VSourceGeometryFitter();
-		VSourceGeometryFitter( string iAnaSumDataFile, int irun = -1 );
-		~VSourceGeometryFitter() {}
+        VSourceGeometryFitter();
+        VSourceGeometryFitter( string iAnaSumDataFile, int irun = -1 );
+        ~VSourceGeometryFitter() {}
 
-		void     fitSource( string iHisName = "hmap_stereoUC_diff", double xStart = 0., double yStart = 0., double xyRange = 0.15 );
-		TH2D*    getSkyMap()
-		{
-			return fHisSkyMap;
-		}
-		void     help();
-		TCanvas* plot( double rmax = 0.2, double zmin = -1000., double zmax = -1000., string iPlotMode = "colz" );
-		void     plotFitResult();
-		TGraph*  plotSourceGeometry( int iColor = 1 );
-		void     setDebug( bool iB = true )
-		{
-			fDebug = iB;
-		}
-		bool     setFitter( string iFitter );
-		void     setPSF( double psf )
-		{
-			fPSF = psf;
-		}
-		double   getPSF()
-		{
-			return fPSF;
-		}
+        void     fitSource( string iHisName = "hmap_stereoUC_diff", double xStart = 0., double yStart = 0., double xyRange = 0.15 );
+        TH2D*    getSkyMap()
+        {
+            return fHisSkyMap;
+        }
+        void     help();
+        TCanvas* plot( double rmax = 0.2, double zmin = -1000., double zmax = -1000., string iPlotMode = "colz" );
+        void     plotFitResult();
+        TGraph*  plotSourceGeometry( int iColor = 1 );
+        void     setDebug( bool iB = true )
+        {
+            fDebug = iB;
+        }
+        bool     setFitter( string iFitter );
+        void     setPSF( double psf )
+        {
+            fPSF = psf;
+        }
+        double   getPSF()
+        {
+            return fPSF;
+        }
 
-		ClassDef( VSourceGeometryFitter, 1 );
+        ClassDef( VSourceGeometryFitter, 1 );
 };
 
 
@@ -117,105 +117,105 @@ class VSourceGeometryFitter : public VAnalysisUtilities, public VPlotUtilities
 ///////////////////////////////////////////////////////////////////////////////
 class VFun_PSFDescription_2DGauss_Chi2 : public ROOT::Minuit2::FCNBase
 {
-	private:
+    private:
 
-		TH2D* hSkyMap;
-		double xmin;
-		double xmax;
-		double ymin;
-		double ymax;
+        TH2D* hSkyMap;
+        double xmin;
+        double xmax;
+        double ymin;
+        double ymax;
 
-	public:
+    public:
 
-		VFun_PSFDescription_2DGauss_Chi2( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1. );
+        VFun_PSFDescription_2DGauss_Chi2( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1. );
 
-		/////////////////////////////////
-		// function to be minimized
-		double operator()( const std::vector<double>& par ) const
-		{
-			// check size fo parameter vector
-			if( par.size() != 5 )
-			{
-				cout << "VFun_PSFDescription_2DGauss_Chi2: error in parameter vector size; expect 5, is " << par.size() << endl;
-				return 0.;
-			}
+        /////////////////////////////////
+        // function to be minimized
+        double operator()( const std::vector<double>& par ) const
+        {
+            // check size fo parameter vector
+            if( par.size() != 5 )
+            {
+                cout << "VFun_PSFDescription_2DGauss_Chi2: error in parameter vector size; expect 5, is " << par.size() << endl;
+                return 0.;
+            }
 
-			// set variables
-			double x = 0.;
-			double y = 0.;
+            // set variables
+            double x = 0.;
+            double y = 0.;
 
-			double sum = 0.;
-			double fT = 0.;
-			double fH = 0.;
-			double fHErr = 0.;
+            double sum = 0.;
+            double fT = 0.;
+            double fH = 0.;
+            double fHErr = 0.;
 
-			double t2 = 0.;
-			double sigmaSource2 = par[2] * par[2];
+            double t2 = 0.;
+            double sigmaSource2 = par[2] * par[2];
 
-			// loop over sky map
-			if( hSkyMap )
-			{
-				int nbinsX = hSkyMap->GetNbinsX();
-				int nbinsY = hSkyMap->GetNbinsY();
-				for( int i = 1; i <= nbinsX; i++ )
-				{
-					x = hSkyMap->GetXaxis()->GetBinCenter( i );
-					// check x-range
-					if( x > xmax )
-					{
-						continue;
-					}
-					if( x < xmin )
-					{
-						continue;
-					}
-					for( int j = 1; j <= nbinsY; j++ )
-					{
-						y = hSkyMap->GetYaxis()->GetBinCenter( j );
-						// check y-range
-						if( y > ymax )
-						{
-							continue;
-						}
-						if( y < ymin )
-						{
-							continue;
-						}
+            // loop over sky map
+            if( hSkyMap )
+            {
+                int nbinsX = hSkyMap->GetNbinsX();
+                int nbinsY = hSkyMap->GetNbinsY();
+                for( int i = 1; i <= nbinsX; i++ )
+                {
+                    x = hSkyMap->GetXaxis()->GetBinCenter( i );
+                    // check x-range
+                    if( x > xmax )
+                    {
+                        continue;
+                    }
+                    if( x < xmin )
+                    {
+                        continue;
+                    }
+                    for( int j = 1; j <= nbinsY; j++ )
+                    {
+                        y = hSkyMap->GetYaxis()->GetBinCenter( j );
+                        // check y-range
+                        if( y > ymax )
+                        {
+                            continue;
+                        }
+                        if( y < ymin )
+                        {
+                            continue;
+                        }
 
-						// skip empty bins
-						// if( hSkyMap->GetBinContent( i, j ) <= 0. )
-						// {
-						//	continue;
-						// }
+                        // skip empty bins
+                        // if( hSkyMap->GetBinContent( i, j ) <= 0. )
+                        // {
+                        //	continue;
+                        // }
 
-						// calculate theta2
-						t2 = ( x - par[3] ) * ( x - par[3] ) + ( y - par[4] ) * ( y - par[4] );
+                        // calculate theta2
+                        t2 = ( x - par[3] ) * ( x - par[3] ) + ( y - par[4] ) * ( y - par[4] );
 
-						// calculate expectation from model function
-						fT = par[0] + par[1] * TMath::Exp( -1.*t2 / 2. / sigmaSource2 );
-						if( isnan( fT ) )
-						{
-							continue;
-						}
+                        // calculate expectation from model function
+                        fT = par[0] + par[1] * TMath::Exp(-1.*t2 / 2. / sigmaSource2 );
+                        if( isnan( fT ) )
+                        {
+                            continue;
+                        }
 
-						// get value and error in histogram
-						fH = hSkyMap->GetBinContent( i, j );
-						fHErr = hSkyMap->GetBinError( i, j );
+                        // get value and error in histogram
+                        fH = hSkyMap->GetBinContent( i, j );
+                        fHErr = hSkyMap->GetBinError( i, j );
 
-						// calculate chi2
-						if( fHErr > 0. && fH > -90. )
-						{
-							sum += ( fT - fH ) * ( fT - fH ) / fHErr / fHErr;
-						}
-					}
-				}
-			}
-			return sum;
-		}
-		double Up() const
-		{
-			return 1.;
-		}
+                        // calculate chi2
+                        if( fHErr > 0. && fH > -90. )
+                        {
+                            sum += ( fT - fH ) * ( fT - fH ) / fHErr / fHErr;
+                        }
+                    }
+                }
+            }
+            return sum;
+        }
+        double Up() const
+        {
+            return 1.;
+        }
 };
 
 
@@ -227,100 +227,100 @@ class VFun_PSFDescription_2DGauss_Chi2 : public ROOT::Minuit2::FCNBase
 ///////////////////////////////////////////////////////////////////////////////
 class VFun_PSFDescription_2DGauss_LL : public ROOT::Minuit2::FCNBase
 {
-	private:
+    private:
 
-		TH2D* hSkyMap;
-		double xmin;
-		double xmax;
-		double ymin;
-		double ymax;
+        TH2D* hSkyMap;
+        double xmin;
+        double xmax;
+        double ymin;
+        double ymax;
 
-	public:
+    public:
 
-		VFun_PSFDescription_2DGauss_LL( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1. );
+        VFun_PSFDescription_2DGauss_LL( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1. );
 
-		/////////////////////////////////
-		// function to be minimized
-		double operator()( const std::vector<double>& par ) const
-		{
-			// check size fo parameter vector
-			if( par.size() != 3 )
-			{
-				cout << "VFun_PSFDescription_2DGauss_LL: error in parameter vector size; expect 3, is " << par.size() << endl;
-			}
+        /////////////////////////////////
+        // function to be minimized
+        double operator()( const std::vector<double>& par ) const
+        {
+            // check size fo parameter vector
+            if( par.size() != 3 )
+            {
+                cout << "VFun_PSFDescription_2DGauss_LL: error in parameter vector size; expect 3, is " << par.size() << endl;
+            }
 
-			// initialize variables
-			double  LL = 0.;
-			double  sum = 0.;
-			double  meanX  = par[0];
-			double  meanY  = par[1];
-			double  sigma = par[2];
+            // initialize variables
+            double  LL = 0.;
+            double  sum = 0.;
+            double  meanX  = par[0];
+            double  meanY  = par[1];
+            double  sigma = par[2];
 
-			double x = 0.;
-			double y = 0.;
-			double n = 0.;                                // measured sum in channel i
+            double x = 0.;
+            double y = 0.;
+            double n = 0.;                                // measured sum in channel i
 
-			if( sigma >= 0. ) // && sigmaH >= 0. )
-			{
-				int nbinsX = hSkyMap->GetNbinsX();
-				int nbinsY = hSkyMap->GetNbinsY();
-				for( int i = 1; i <= nbinsX; i++ )
-				{
-					x = hSkyMap->GetXaxis()->GetBinCenter( i );
-					// check x-range
-					if( x > xmax )
-					{
-						continue;
-					}
-					if( x < xmin )
-					{
-						continue;
-					}
-					for( int j = 1; j <= nbinsY; j++ )
-					{
-						y = hSkyMap->GetYaxis()->GetBinCenter( j );
-						// check y-range
-						if( y > ymax )
-						{
-							continue;
-						}
-						if( y < ymin )
-						{
-							continue;
-						}
+            if( sigma >= 0. ) // && sigmaH >= 0. )
+            {
+                int nbinsX = hSkyMap->GetNbinsX();
+                int nbinsY = hSkyMap->GetNbinsY();
+                for( int i = 1; i <= nbinsX; i++ )
+                {
+                    x = hSkyMap->GetXaxis()->GetBinCenter( i );
+                    // check x-range
+                    if( x > xmax )
+                    {
+                        continue;
+                    }
+                    if( x < xmin )
+                    {
+                        continue;
+                    }
+                    for( int j = 1; j <= nbinsY; j++ )
+                    {
+                        y = hSkyMap->GetYaxis()->GetBinCenter( j );
+                        // check y-range
+                        if( y > ymax )
+                        {
+                            continue;
+                        }
+                        if( y < ymin )
+                        {
+                            continue;
+                        }
 
-						n = hSkyMap->GetBinContent( i, j );
+                        n = hSkyMap->GetBinContent( i, j );
 
-						// check for valid entries
-						if( n > -999. )
-						{
-							// calculate log-likelihood
-							sum  = ( x - meanX ) * ( x - meanX ) / sigma / sigma ;
-							sum += ( y - meanY ) * ( y - meanY ) / sigma / sigma ;
-							sum *= -1. / 2. ;
-							sum  = sqrt( 1. / 2. / M_PI / sigma / sigma ) * exp( sum );
+                        // check for valid entries
+                        if( n > -999. )
+                        {
+                            // calculate log-likelihood
+                            sum  = ( x - meanX ) * ( x - meanX ) / sigma / sigma ;
+                            sum += ( y - meanY ) * ( y - meanY ) / sigma / sigma ;
+                            sum *= -1. / 2. ;
+                            sum  = sqrt( 1. / 2. / M_PI / sigma / sigma ) * exp( sum );
 
-							// assume Poisson fluctuations (neglecting background noise)
-							if( n > 0. && sum > 0. )
-							{
-								LL += n * log( sum ) - sum - n * log( n ) + n;
-							}
-							else
-							{
-								LL += -1. * sum;
-							}
-						}
-					}
-				}
-			}
+                            // assume Poisson fluctuations (neglecting background noise)
+                            if( n > 0. && sum > 0. )
+                            {
+                                LL += n * log( sum ) - sum - n * log( n ) + n;
+                            }
+                            else
+                            {
+                                LL += -1. * sum;
+                            }
+                        }
+                    }
+                }
+            }
 
-			return -1. * LL;
-		}
+            return -1. * LL;
+        }
 
-		double Up() const
-		{
-			return 1.;
-		}
+        double Up() const
+        {
+            return 1.;
+        }
 };
 
 
@@ -332,111 +332,111 @@ class VFun_PSFDescription_2DGauss_LL : public ROOT::Minuit2::FCNBase
 ///////////////////////////////////////////////////////////////////////////////
 class VFun_PSFDescription_LinearSuperposition2DGauss_LL: public ROOT::Minuit2::FCNBase
 {
-	private:
+    private:
 
-		TH2D* hSkyMap;
-		double xmin;
-		double xmax;
-		double ymin;
-		double ymax;
+        TH2D* hSkyMap;
+        double xmin;
+        double xmax;
+        double ymin;
+        double ymax;
 
-	public:
+    public:
 
-		VFun_PSFDescription_LinearSuperposition2DGauss_LL( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1. );
+        VFun_PSFDescription_LinearSuperposition2DGauss_LL( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1. );
 
-		/////////////////////////////////
-		// function to be minimized
-		double operator()( const std::vector<double>& par ) const
-		{
-			// check size fo parameter vector
-			if( par.size() != 5 )
-			{
-				cout << "VFun_PSFDescription_LinearSuperposition2DGauss_LL: error in parameter vector size; expect 5, is " << par.size() << endl;
-			}
+        /////////////////////////////////
+        // function to be minimized
+        double operator()( const std::vector<double>& par ) const
+        {
+            // check size fo parameter vector
+            if( par.size() != 5 )
+            {
+                cout << "VFun_PSFDescription_LinearSuperposition2DGauss_LL: error in parameter vector size; expect 5, is " << par.size() << endl;
+            }
 
-			// initialize variables
-			double  LL = 0.;
-			double  sum = 0.;
-			double  sum1 = 0.; // central spot
-			double  sum2 = 0.; // broad halo
-			double  meanX  = par[0];
-			double  meanY  = par[1];
-			double  sigma1 = par[2];
-			double  sigma2 = par[3];
-			double  alpha  = par[4]; // relative importance of each component , alpha = 1 only central spot matters
-
-
-			double x = 0.;
-			double y = 0.;
-			double n = 0.;                                // measured sum in channel i
-
-			if( sigma1 >= 0. && sigma2 >= 0. )
-			{
-				int nbinsX = hSkyMap->GetNbinsX();
-				int nbinsY = hSkyMap->GetNbinsY();
-				for( int i = 1; i <= nbinsX; i++ )
-				{
-					x = hSkyMap->GetXaxis()->GetBinCenter( i );
-					// check x-range
-					if( x > xmax )
-					{
-						continue;
-					}
-					if( x < xmin )
-					{
-						continue;
-					}
-					for( int j = 1; j <= nbinsY; j++ )
-					{
-						y = hSkyMap->GetYaxis()->GetBinCenter( j );
-						// check y-range
-						if( y > ymax )
-						{
-							continue;
-						}
-						if( y < ymin )
-						{
-							continue;
-						}
-
-						n = hSkyMap->GetBinContent( i, j );
-
-						// check for valid entries
-						if( n > -999. )
-						{
-							// calculate log-likelihood
-							sum1  = ( x - meanX ) * ( x - meanX ) / sigma1 / sigma1 ;
-							sum1 += ( y - meanY ) * ( y - meanY ) / sigma1 / sigma1 ;
-							sum1 *= -1. / 2. ;
-
-							sum2  = ( x - meanX ) * ( x - meanX ) / sigma2 / sigma2 ;
-							sum2 += ( y - meanY ) * ( y - meanY ) / sigma2 / sigma2 ;
-							sum2 *= -1. / 2. ;
-
-							sum  = alpha * sqrt( 1. / 2. / M_PI / sigma1 / sigma1 ) * exp( sum1 );
-							sum += ( 1 - alpha ) * sqrt( 1. / 2. / M_PI / sigma2 / sigma2 ) * exp( sum2 );
+            // initialize variables
+            double  LL = 0.;
+            double  sum = 0.;
+            double  sum1 = 0.; // central spot
+            double  sum2 = 0.; // broad halo
+            double  meanX  = par[0];
+            double  meanY  = par[1];
+            double  sigma1 = par[2];
+            double  sigma2 = par[3];
+            double  alpha  = par[4]; // relative importance of each component , alpha = 1 only central spot matters
 
 
-							// assume Poisson fluctuations (neglecting background noise)
-							if( n > 0. && sum > 0. )
-							{
-								LL += n * log( sum ) - sum - n * log( n ) + n;
-							}
-							else
-							{
-								LL += -1. * sum;
-							}
-						}
-					}
-				}
-			}
-			return -1. * LL;
-		}
+            double x = 0.;
+            double y = 0.;
+            double n = 0.;                                // measured sum in channel i
 
-		double Up() const
-		{
-			return 1.;
-		}
+            if( sigma1 >= 0. && sigma2 >= 0. )
+            {
+                int nbinsX = hSkyMap->GetNbinsX();
+                int nbinsY = hSkyMap->GetNbinsY();
+                for( int i = 1; i <= nbinsX; i++ )
+                {
+                    x = hSkyMap->GetXaxis()->GetBinCenter( i );
+                    // check x-range
+                    if( x > xmax )
+                    {
+                        continue;
+                    }
+                    if( x < xmin )
+                    {
+                        continue;
+                    }
+                    for( int j = 1; j <= nbinsY; j++ )
+                    {
+                        y = hSkyMap->GetYaxis()->GetBinCenter( j );
+                        // check y-range
+                        if( y > ymax )
+                        {
+                            continue;
+                        }
+                        if( y < ymin )
+                        {
+                            continue;
+                        }
+
+                        n = hSkyMap->GetBinContent( i, j );
+
+                        // check for valid entries
+                        if( n > -999. )
+                        {
+                            // calculate log-likelihood
+                            sum1  = ( x - meanX ) * ( x - meanX ) / sigma1 / sigma1 ;
+                            sum1 += ( y - meanY ) * ( y - meanY ) / sigma1 / sigma1 ;
+                            sum1 *= -1. / 2. ;
+
+                            sum2  = ( x - meanX ) * ( x - meanX ) / sigma2 / sigma2 ;
+                            sum2 += ( y - meanY ) * ( y - meanY ) / sigma2 / sigma2 ;
+                            sum2 *= -1. / 2. ;
+
+                            sum  = alpha * sqrt( 1. / 2. / M_PI / sigma1 / sigma1 ) * exp( sum1 );
+                            sum += ( 1 - alpha ) * sqrt( 1. / 2. / M_PI / sigma2 / sigma2 ) * exp( sum2 );
+
+
+                            // assume Poisson fluctuations (neglecting background noise)
+                            if( n > 0. && sum > 0. )
+                            {
+                                LL += n * log( sum ) - sum - n * log( n ) + n;
+                            }
+                            else
+                            {
+                                LL += -1. * sum;
+                            }
+                        }
+                    }
+                }
+            }
+            return -1. * LL;
+        }
+
+        double Up() const
+        {
+            return 1.;
+        }
 };
 
 
@@ -454,106 +454,106 @@ class VFun_PSFDescription_LinearSuperposition2DGauss_LL: public ROOT::Minuit2::F
 ///////////////////////////////////////////////////////////////////////////////
 class VFun_SourceDescription_RadialSymmetricSource_Chi2 : public ROOT::Minuit2::FCNBase
 {
-	private:
+    private:
 
-		TH2D* hSkyMap;
-		double xmin;
-		double xmax;
-		double ymin;
-		double ymax;
-		double sigmaPSF;
+        TH2D* hSkyMap;
+        double xmin;
+        double xmax;
+        double ymin;
+        double ymax;
+        double sigmaPSF;
 
-	public:
+    public:
 
-		VFun_SourceDescription_RadialSymmetricSource_Chi2( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1., double i_psf = 0.063 );
+        VFun_SourceDescription_RadialSymmetricSource_Chi2( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1., double i_psf = 0.063 );
 
-		/////////////////////////////////
-		// function to be minimized
-		double operator()( const std::vector<double>& par ) const
-		{
-			// check size fo parameter vector
-			if( par.size() != 4 )
-			{
-				cout << "VFun_SourceDescription_RadialSymmetricSource_Chi2: error in parameter vector size; expect 4, is " << par.size() << endl;
-				return 0.;
-			}
+        /////////////////////////////////
+        // function to be minimized
+        double operator()( const std::vector<double>& par ) const
+        {
+            // check size fo parameter vector
+            if( par.size() != 4 )
+            {
+                cout << "VFun_SourceDescription_RadialSymmetricSource_Chi2: error in parameter vector size; expect 4, is " << par.size() << endl;
+                return 0.;
+            }
 
-			// set variables
-			double x = 0.;
-			double y = 0.;
+            // set variables
+            double x = 0.;
+            double y = 0.;
 
-			double sum = 0.;
-			double fT = 0.;
-			double fH = 0.;
-			double fHErr = 0;
+            double sum = 0.;
+            double fT = 0.;
+            double fH = 0.;
+            double fHErr = 0;
 
-			double t2 = 0.;
-			double sigmaSRC = par[2];
+            double t2 = 0.;
+            double sigmaSRC = par[2];
 
-			// loop over sky map
-			if( hSkyMap )
-			{
-				int nbinsX = hSkyMap->GetNbinsX();
-				int nbinsY = hSkyMap->GetNbinsY();
-				for( int i = 1; i <= nbinsX; i++ )
-				{
-					x = hSkyMap->GetXaxis()->GetBinCenter( i );
-					// check x-range
-					if( x > xmax )
-					{
-						continue;
-					}
-					if( x < xmin )
-					{
-						continue;
-					}
-					for( int j = 1; j <= nbinsY; j++ )
-					{
-						y = hSkyMap->GetYaxis()->GetBinCenter( j );
-						// check y-range
-						if( y > ymax )
-						{
-							continue;
-						}
-						if( y < ymin )
-						{
-							continue;
-						}
+            // loop over sky map
+            if( hSkyMap )
+            {
+                int nbinsX = hSkyMap->GetNbinsX();
+                int nbinsY = hSkyMap->GetNbinsY();
+                for( int i = 1; i <= nbinsX; i++ )
+                {
+                    x = hSkyMap->GetXaxis()->GetBinCenter( i );
+                    // check x-range
+                    if( x > xmax )
+                    {
+                        continue;
+                    }
+                    if( x < xmin )
+                    {
+                        continue;
+                    }
+                    for( int j = 1; j <= nbinsY; j++ )
+                    {
+                        y = hSkyMap->GetYaxis()->GetBinCenter( j );
+                        // check y-range
+                        if( y > ymax )
+                        {
+                            continue;
+                        }
+                        if( y < ymin )
+                        {
+                            continue;
+                        }
 
-						// skip empty bins
-						//	if( hSkyMap->GetBinContent( i, j ) <= 0. )
-						//	{
-						//		continue;
-						//	}
+                        // skip empty bins
+                        //	if( hSkyMap->GetBinContent( i, j ) <= 0. )
+                        //	{
+                        //		continue;
+                        //	}
 
-						// calculate theta2
-						t2 = ( x - par[0] ) * ( x - par[0] ) + ( y - par[1] ) * ( y - par[1] );
+                        // calculate theta2
+                        t2 = ( x - par[0] ) * ( x - par[0] ) + ( y - par[1] ) * ( y - par[1] );
 
-						// calculate expectation from model function
-						fT = par[3] * TMath::Exp( -1.*t2 / 2. / ( sigmaSRC * sigmaSRC + sigmaPSF * sigmaPSF ) );
-						if( isnan( fT ) )
-						{
-							continue;
-						}
+                        // calculate expectation from model function
+                        fT = par[3] * TMath::Exp(-1.*t2 / 2. / ( sigmaSRC* sigmaSRC + sigmaPSF* sigmaPSF ) );
+                        if( isnan( fT ) )
+                        {
+                            continue;
+                        }
 
-						// get value and error in histogram
-						fH = hSkyMap->GetBinContent( i, j );
-						fHErr = hSkyMap->GetBinError( i, j );
+                        // get value and error in histogram
+                        fH = hSkyMap->GetBinContent( i, j );
+                        fHErr = hSkyMap->GetBinError( i, j );
 
-						// calculate chi2
-						if( fHErr > 0. && fH > -90. )
-						{
-							sum += ( fT - fH ) * ( fT - fH ) / fHErr / fHErr;
-						}
-					}
-				}
-			}
-			return sum;
-		}
-		double Up() const
-		{
-			return 1.;
-		}
+                        // calculate chi2
+                        if( fHErr > 0. && fH > -90. )
+                        {
+                            sum += ( fT - fH ) * ( fT - fH ) / fHErr / fHErr;
+                        }
+                    }
+                }
+            }
+            return sum;
+        }
+        double Up() const
+        {
+            return 1.;
+        }
 };
 
 
@@ -663,102 +663,102 @@ class VFun_SourceDescription_RadialSymmetricSource_Chi2 : public ROOT::Minuit2::
 ///////////////////////////////////////////////////////////////////////////////
 class VFun_SourceDescription_RadialSymmetricSource_LL: public ROOT::Minuit2::FCNBase
 {
-	private:
+    private:
 
-		TH2D* hSkyMap;
-		double xmin;
-		double xmax;
-		double ymin;
-		double ymax;
-		double sigmaPSF;
+        TH2D* hSkyMap;
+        double xmin;
+        double xmax;
+        double ymin;
+        double ymax;
+        double sigmaPSF;
 
-	public:
+    public:
 
-		VFun_SourceDescription_RadialSymmetricSource_LL( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1., double i_psf = 0.063 );
+        VFun_SourceDescription_RadialSymmetricSource_LL( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1., double i_psf = 0.063 );
 
-		/////////////////////////////////
-		// function to be minimized
-		double operator()( const std::vector<double>& par ) const
-		{
-			// check size fo parameter vector
-			if( par.size() != 3 )
-			{
-				cout << "VFun_SourceDescription_RadialSymmetricSource_LL: error in parameter vector size; expect 3, is " << par.size() << endl;
-			}
+        /////////////////////////////////
+        // function to be minimized
+        double operator()( const std::vector<double>& par ) const
+        {
+            // check size fo parameter vector
+            if( par.size() != 3 )
+            {
+                cout << "VFun_SourceDescription_RadialSymmetricSource_LL: error in parameter vector size; expect 3, is " << par.size() << endl;
+            }
 
 
-			// initialize variables
-			double  LL = 0.;
-			double  sum = 0.;
-			double  meanX = par[0];
-			double  meanY = par[1];
-			double  sigmaSRC = par[2];
+            // initialize variables
+            double  LL = 0.;
+            double  sum = 0.;
+            double  meanX = par[0];
+            double  meanY = par[1];
+            double  sigmaSRC = par[2];
 
-			double x = 0.;
-			double y = 0.;
-			double n = 0.;                                // measured sum in channel i
+            double x = 0.;
+            double y = 0.;
+            double n = 0.;                                // measured sum in channel i
 
-			if( sigmaSRC > 0. )
-			{
-				int nbinsX = hSkyMap->GetNbinsX();
-				int nbinsY = hSkyMap->GetNbinsY();
-				for( int i = 1; i <= nbinsX; i++ )
-				{
-					x = hSkyMap->GetXaxis()->GetBinCenter( i );
-					// check x-range
-					if( x > xmax )
-					{
-						continue;
-					}
-					if( x < xmin )
-					{
-						continue;
-					}
-					for( int j = 1; j <= nbinsY; j++ )
-					{
-						y = hSkyMap->GetYaxis()->GetBinCenter( j );
-						// check y-range
-						if( y > ymax )
-						{
-							continue;
-						}
-						if( y < ymin )
-						{
-							continue;
-						}
+            if( sigmaSRC > 0. )
+            {
+                int nbinsX = hSkyMap->GetNbinsX();
+                int nbinsY = hSkyMap->GetNbinsY();
+                for( int i = 1; i <= nbinsX; i++ )
+                {
+                    x = hSkyMap->GetXaxis()->GetBinCenter( i );
+                    // check x-range
+                    if( x > xmax )
+                    {
+                        continue;
+                    }
+                    if( x < xmin )
+                    {
+                        continue;
+                    }
+                    for( int j = 1; j <= nbinsY; j++ )
+                    {
+                        y = hSkyMap->GetYaxis()->GetBinCenter( j );
+                        // check y-range
+                        if( y > ymax )
+                        {
+                            continue;
+                        }
+                        if( y < ymin )
+                        {
+                            continue;
+                        }
 
-						n = hSkyMap->GetBinContent( i, j );
+                        n = hSkyMap->GetBinContent( i, j );
 
-						// check for valid entries
-						if( n > -999. )
-						{
-							// calculate log-likelihood
-							sum  = ( x - meanX ) * ( x - meanX ) / ( sigmaSRC * sigmaSRC + sigmaPSF * sigmaPSF );
-							sum += ( y - meanY ) * ( y - meanY ) / ( sigmaSRC * sigmaSRC + sigmaPSF * sigmaPSF );
-							sum *= -1. / 2.;
-							sum  = exp( sum );
-							sum *= 1. / 2. / M_PI / ( sigmaSRC * sigmaSRC + sigmaPSF * sigmaPSF );
+                        // check for valid entries
+                        if( n > -999. )
+                        {
+                            // calculate log-likelihood
+                            sum  = ( x - meanX ) * ( x - meanX ) / ( sigmaSRC* sigmaSRC + sigmaPSF* sigmaPSF );
+                            sum += ( y - meanY ) * ( y - meanY ) / ( sigmaSRC* sigmaSRC + sigmaPSF* sigmaPSF );
+                            sum *= -1. / 2.;
+                            sum  = exp( sum );
+                            sum *= 1. / 2. / M_PI / ( sigmaSRC* sigmaSRC + sigmaPSF* sigmaPSF );
 
-							// assume Poisson fluctuations (neglecting background noise)
-							if( n > 0. && sum > 0. )
-							{
-								LL += n * log( sum ) - sum - n * log( n ) + n;
-							}
-							else
-							{
-								LL += -1. * sum;
-							}
-						}
-					}
-				}
-			}
-			return -1. * LL;
-		}
+                            // assume Poisson fluctuations (neglecting background noise)
+                            if( n > 0. && sum > 0. )
+                            {
+                                LL += n * log( sum ) - sum - n * log( n ) + n;
+                            }
+                            else
+                            {
+                                LL += -1. * sum;
+                            }
+                        }
+                    }
+                }
+            }
+            return -1. * LL;
+        }
 
-		double Up() const
-		{
-			return 1.;
-		}
+        double Up() const
+        {
+            return 1.;
+        }
 };
 
 
@@ -770,108 +770,108 @@ class VFun_SourceDescription_RadialSymmetricSource_LL: public ROOT::Minuit2::FCN
 ///////////////////////////////////////////////////////////////////////////////
 class VFun_SourceDescription_RadialAsymmetricSource_LL: public ROOT::Minuit2::FCNBase
 {
-	private:
+    private:
 
-		TH2D* hSkyMap;
-		double xmin;
-		double xmax;
-		double ymin;
-		double ymax;
-		double sigmaPSF;
+        TH2D* hSkyMap;
+        double xmin;
+        double xmax;
+        double ymin;
+        double ymax;
+        double sigmaPSF;
 
-	public:
+    public:
 
-		VFun_SourceDescription_RadialAsymmetricSource_LL( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1., double i_psf = 0.063 );
+        VFun_SourceDescription_RadialAsymmetricSource_LL( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1., double i_psf = 0.063 );
 
-		/////////////////////////////////
-		// function to be minimized
-		double operator()( const std::vector<double>& par ) const
-		{
-			// check size fo parameter vector
-			if( par.size() != 5 )
-			{
-				cout << "VFun_SourceDescription_RadialAsymmetricSource_LL: error in parameter vector size; expect 5, is " << par.size() << endl;
-			}
-
-
-			// initialize variables
-			double  LL = 0.;
-			double  sum = 0.;
-			//    double  rho =  par[0];
-			double  meanX = par[1];
-			double  sigmaX = par[2];
-			double  meanY = par[3];
-			double  sigmaY = par[4];
-			double  angle = par[0];
-			double  rho = 1. / 2. * tan( 2 * angle ) * ( sigmaX * sigmaX - sigmaY * sigmaY ) / sqrt( sigmaX * sigmaX + sigmaPSF * sigmaPSF ) / sqrt( sigmaY * sigmaY + sigmaPSF * sigmaPSF );
+        /////////////////////////////////
+        // function to be minimized
+        double operator()( const std::vector<double>& par ) const
+        {
+            // check size fo parameter vector
+            if( par.size() != 5 )
+            {
+                cout << "VFun_SourceDescription_RadialAsymmetricSource_LL: error in parameter vector size; expect 5, is " << par.size() << endl;
+            }
 
 
-			double x = 0.;
-			double y = 0.;
-			double n = 0.;                                // measured sum in channel i
+            // initialize variables
+            double  LL = 0.;
+            double  sum = 0.;
+            //    double  rho =  par[0];
+            double  meanX = par[1];
+            double  sigmaX = par[2];
+            double  meanY = par[3];
+            double  sigmaY = par[4];
+            double  angle = par[0];
+            double  rho = 1. / 2. * tan( 2 * angle ) * ( sigmaX* sigmaX - sigmaY* sigmaY ) / sqrt( sigmaX* sigmaX + sigmaPSF* sigmaPSF ) / sqrt( sigmaY* sigmaY + sigmaPSF* sigmaPSF );
 
-			if( rho * rho < 1. && sigmaX > 0. && sigmaY > 0. )
-			{
-				int nbinsX = hSkyMap->GetNbinsX();
-				int nbinsY = hSkyMap->GetNbinsY();
-				for( int i = 1; i <= nbinsX; i++ )
-				{
-					x = hSkyMap->GetXaxis()->GetBinCenter( i );
-					// check x-range
-					if( x > xmax )
-					{
-						continue;
-					}
-					if( x < xmin )
-					{
-						continue;
-					}
-					for( int j = 1; j <= nbinsY; j++ )
-					{
-						y = hSkyMap->GetYaxis()->GetBinCenter( j );
-						// check y-range
-						if( y > ymax )
-						{
-							continue;
-						}
-						if( y < ymin )
-						{
-							continue;
-						}
 
-						n = hSkyMap->GetBinContent( i, j );
+            double x = 0.;
+            double y = 0.;
+            double n = 0.;                                // measured sum in channel i
 
-						// check for valid entries
-						if( n > -999. )
-						{
-							// calculate log-likelihood
-							sum  = ( x - meanX ) * ( x - meanX ) / ( sigmaX * sigmaX + sigmaPSF * sigmaPSF );
-							sum += ( y - meanY ) * ( y - meanY ) / ( sigmaY * sigmaY + sigmaPSF * sigmaPSF );
-							sum += -2. * rho * ( x - meanX ) / sqrt( sigmaX * sigmaX + sigmaPSF * sigmaPSF ) * ( y - meanY ) / sqrt( sigmaY * sigmaY + sigmaPSF * sigmaPSF );
-							sum *= -1. / 2. / ( 1. - rho * rho );
-							sum  = exp( sum );
-							sum *= 1. / 2. / M_PI / sqrt( sigmaX * sigmaX + sigmaPSF * sigmaPSF ) /  sqrt( sigmaY * sigmaY + sigmaPSF * sigmaPSF ) / sqrt( 1. - rho * rho );
+            if( rho * rho < 1. && sigmaX > 0. && sigmaY > 0. )
+            {
+                int nbinsX = hSkyMap->GetNbinsX();
+                int nbinsY = hSkyMap->GetNbinsY();
+                for( int i = 1; i <= nbinsX; i++ )
+                {
+                    x = hSkyMap->GetXaxis()->GetBinCenter( i );
+                    // check x-range
+                    if( x > xmax )
+                    {
+                        continue;
+                    }
+                    if( x < xmin )
+                    {
+                        continue;
+                    }
+                    for( int j = 1; j <= nbinsY; j++ )
+                    {
+                        y = hSkyMap->GetYaxis()->GetBinCenter( j );
+                        // check y-range
+                        if( y > ymax )
+                        {
+                            continue;
+                        }
+                        if( y < ymin )
+                        {
+                            continue;
+                        }
 
-							// assume Poisson fluctuations (neglecting background noise)
-							if( n > 0. && sum > 0. )
-							{
-								LL += n * log( sum ) - sum - n * log( n ) + n;
-							}
-							else
-							{
-								LL += -1. * sum;
-							}
-						}
-					}
-				}
-			}
-			return -1. * LL;
-		}
+                        n = hSkyMap->GetBinContent( i, j );
 
-		double Up() const
-		{
-			return 1.;
-		}
+                        // check for valid entries
+                        if( n > -999. )
+                        {
+                            // calculate log-likelihood
+                            sum  = ( x - meanX ) * ( x - meanX ) / ( sigmaX* sigmaX + sigmaPSF* sigmaPSF );
+                            sum += ( y - meanY ) * ( y - meanY ) / ( sigmaY* sigmaY + sigmaPSF* sigmaPSF );
+                            sum += -2. * rho * ( x - meanX ) / sqrt( sigmaX* sigmaX + sigmaPSF* sigmaPSF ) * ( y - meanY ) / sqrt( sigmaY* sigmaY + sigmaPSF* sigmaPSF );
+                            sum *= -1. / 2. / ( 1. - rho* rho );
+                            sum  = exp( sum );
+                            sum *= 1. / 2. / M_PI / sqrt( sigmaX* sigmaX + sigmaPSF* sigmaPSF ) /  sqrt( sigmaY* sigmaY + sigmaPSF* sigmaPSF ) / sqrt( 1. - rho* rho );
+
+                            // assume Poisson fluctuations (neglecting background noise)
+                            if( n > 0. && sum > 0. )
+                            {
+                                LL += n * log( sum ) - sum - n * log( n ) + n;
+                            }
+                            else
+                            {
+                                LL += -1. * sum;
+                            }
+                        }
+                    }
+                }
+            }
+            return -1. * LL;
+        }
+
+        double Up() const
+        {
+            return 1.;
+        }
 };
 
 
