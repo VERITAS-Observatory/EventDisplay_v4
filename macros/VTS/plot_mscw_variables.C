@@ -1,5 +1,5 @@
 /*
- *  Compare distributions of some variables from two mscw files
+ *  Compare distributions of variables from two mscw files
  *
 */
 
@@ -24,7 +24,11 @@ void print_output( TH1F *h, string print_out )
 }
 
 
-
+/*
+ * plot_type:
+ * - short_mc: expecting MC input; six plots only
+ * - (anything else): plot large number of variables
+*/
 void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW2 = 1., string iAddCut = "ErecS>0.", string plot_type = "short_mc", string i_print_file = "" )
 {
     TFile* f1 = new TFile( iFile1.c_str() );
