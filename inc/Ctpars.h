@@ -592,19 +592,8 @@ Bool_t Ctpars::Notify()
             b_fracLow = fChain->GetBranch( "fracLow" );
             fChain->AddBranchToCache( b_fracLow );
         }
-<<<<<<< HEAD
         b_dist = fChain->GetBranch( "dist" );
         fChain->AddBranchToCache( b_dist );
-=======
-        if( fChain->GetBranchStatus( "fui" ) )
-        {
-            b_fui = fChain->GetBranch( "fui" );
-        }
-        b_dist = fChain->GetBranch( "dist" );
-        fChain->AddBranchToCache( b_dist );
-        b_ntubes = fChain->GetBranch( "ntubes" );
-        fChain->AddBranchToCache( b_ntubes );
->>>>>>> main
         if( fChain->GetBranchStatus( "ntubesBNI" ) )
         {
             b_ntubesBNI = fChain->GetBranch( "ntubesBNI" );
@@ -669,11 +658,6 @@ Bool_t Ctpars::Notify()
         b_alpha = fChain->GetBranch( "alpha" );
         b_los = fChain->GetBranch( "los" );
         b_phi = fChain->GetBranch( "phi" );
-<<<<<<< HEAD
-=======
-        b_cosphi = fChain->GetBranch( "cosphi" );
-        b_sinphi = fChain->GetBranch( "sinphi" );
->>>>>>> main
         b_max = fChain->GetBranch( "max" );
         b_index_of_max = fChain->GetBranch( "index_of_max" );
         b_tchisq_x = fChain->GetBranch( "tchisq_x" );
