@@ -39,9 +39,9 @@ repos:
         ]
         additional_dependencies:
           - tomli
-  - repo: https://github.com/igrr/astyle_py.git
-    rev: v1.0.5
-    hooks:
-    -   id: astyle_py
-        args: [--options=./.astylerc]
-        files: '^.*\.(c|cpp|cxx|h|hpp|inc|C)$'
+#  - repo: https://github.com/Freed-Wu/mirrors-astyle
+#    rev: v3.4.13
+#    hooks:
+#    -   id: astyle
+#        args: [--options=./.astylerc]
+#        files: '^.*\.(c|cpp|cxx|h|hpp|inc|C)$'
