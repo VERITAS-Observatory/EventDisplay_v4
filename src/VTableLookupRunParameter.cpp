@@ -563,6 +563,26 @@ void VTableLookupRunParameter::print( int iP )
 	if( fRerunStereoReconstruction )
 	{
 		cout << "\t rerunning stereo reconstruction" << endl;
+        if( fminsize > 0. )
+        {
+            cout << "\t stereo reconstruction size cut > " << fminsize << endl;
+        }
+        if( fmaxdist < 1.e3 )
+        {
+            cout << "\t stereo reconstruction distance cut < " << fmaxdist << endl;
+        }
+        if( fmaxloss < 1. )
+        {
+            cout << "\t stereo reconstruction loss cut < " << fmaxloss << endl;
+        }
+        if( fminfui > 0. )
+        {
+            cout << "\t stereo reconstruction fui cut > " << fminfui << endl;
+        }
+        if( fminwidth > 0. )
+        {
+            cout << "\t stereo reconstruction min width cut < " << fminwidth << endl;
+        }
 		if( fRerunStereoReconstruction_BDTFileName.size() > 0 )
 		{
 			cout << "\t reading BDT TMVA files from " << fRerunStereoReconstruction_BDTFileName << endl;
@@ -571,18 +591,6 @@ void VTableLookupRunParameter::print( int iP )
 			if( fmaxdist < 1.e3 )
 			{
 				cout << "\t BDT TMVA stereo reconstruction distance cut < " << fmaxdist << endl;
-			}
-			if( fmaxloss < 1. )
-			{
-				cout << "\t BDT TMVA stereo reconstruction loss cut < " << fmaxloss << endl;
-			}
-			if( fminfui > 0. )
-			{
-				cout << "\t BDT TMVA stereo reconstruction fui cut > " << fminfui << endl;
-			}
-			if( fminwidth > 0. )
-			{
-				cout << "\t BDT TMVA stereo reconstruction min width cut < " << fminwidth << endl;
 			}
 			if( fminfitstat > 0. )
 			{
