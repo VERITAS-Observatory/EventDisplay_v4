@@ -11,43 +11,43 @@ using namespace std;
 
 class VMCParameters
 {
-	private:
+    private:
 
-		bool fDebug;
+        bool fDebug;
 
-		TTree* fTree;
+        TTree* fTree;
 
-	public:
+    public:
 
-		unsigned int runNumber;
-		unsigned int eventNumber;
-		short int MCprimary;
-		float MCenergy;                           //!< energy in [TeV]
-		float MCxcore;
-		float MCycore;
-		float MCzcore;
-		float MCxcos;
-		float MCycos;
-		float MCaz;
-		float MCze;
-		float MCTel_Xoff;                         //!< source offset in MC in deg (grisudet telescope coordinate system)
-		float MCTel_Yoff;                         //!< source offset in MC in deg (grisudet telescope coordinate system)
+        unsigned int runNumber;
+        unsigned int eventNumber;
+        short int MCprimary;
+        float MCenergy;                           //!< energy in [TeV]
+        float MCxcore;
+        float MCycore;
+        float MCzcore;
+        float MCxcos;
+        float MCycos;
+        float MCaz;
+        float MCze;
+        float MCTel_Xoff;                         //!< source offset in MC in deg (grisudet telescope coordinate system)
+        float MCTel_Yoff;                         //!< source offset in MC in deg (grisudet telescope coordinate system)
 
-		VMCParameters( bool iDebug = false );
-		~VMCParameters();
+        VMCParameters( bool iDebug = false );
+        ~VMCParameters();
 
-		void fill()
-		{
-			if( fTree )
-			{
-				fTree->Fill();
-			}
-		}
-		void initTree();
-		TTree* getTree()
-		{
-			return fTree;
-		}
-		void reset();
+        void fill()
+        {
+            if( fTree )
+            {
+                fTree->Fill();
+            }
+        }
+        void initTree();
+        TTree* getTree()
+        {
+            return fTree;
+        }
+        void reset();
 };
 #endif

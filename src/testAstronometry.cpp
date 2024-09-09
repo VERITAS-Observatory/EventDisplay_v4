@@ -10,5 +10,5 @@ using namespace std;
 
 int main( int argc, char* argv[] )
 {
-	VAstronometry::test();
+    VAstronometry::test();
 }

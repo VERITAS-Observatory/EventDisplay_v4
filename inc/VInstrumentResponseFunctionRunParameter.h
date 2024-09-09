@@ -24,93 +24,93 @@ using namespace std;
 
 class VInstrumentResponseFunctionRunParameter : public TNamed
 {
-	private:
+    private:
 
-		bool            readRunParameters( string ifilename );
-		bool            readCRSpectralParameters();
+        bool            readRunParameters( string ifilename );
+        bool            readCRSpectralParameters();
 
-	public:
+    public:
 
-		string fObservatory;
-		unsigned int    fFillingMode;              // filling mode
+        string fObservatory;
+        unsigned int    fFillingMode;              // filling mode
 
-		string          fCutFileName;
-		string          fInstrumentEpoch;
-		string          fInstrumentEpochATM;
-		vector< unsigned int > fTelToAnalyse;             // telescopes used in analysis (optional, not always filled)
-		int             fGammaHadronCutSelector;
-		int             fDirectionCutSelector;
+        string          fCutFileName;
+        string          fInstrumentEpoch;
+        string          fInstrumentEpochATM;
+        vector< unsigned int > fTelToAnalyse;             // telescopes used in analysis (optional, not always filled)
+        int             fGammaHadronCutSelector;
+        int             fDirectionCutSelector;
 
-		unsigned int    fEnergyReconstructionMethod;
-		unsigned int    fEnergyAxisBins_log10;
-		bool            fIgnoreEnergyReconstructionQuality;
-		unsigned int    fNSpectralIndex;
-		double          fSpectralIndexMin;
-		double          fSpectralIndexStep;
-		vector< double > fSpectralIndex;
-		double          fMCEnergy_min;
-		double          fMCEnergy_max;
-		double          fMCEnergy_index;
-		bool            fFillMCHistograms;
-		bool            fgetXoff_Yoff_afterCut;
+        unsigned int    fEnergyReconstructionMethod;
+        unsigned int    fEnergyAxisBins_log10;
+        bool            fIgnoreEnergyReconstructionQuality;
+        unsigned int    fNSpectralIndex;
+        double          fSpectralIndexMin;
+        double          fSpectralIndexStep;
+        vector< double > fSpectralIndex;
+        double          fMCEnergy_min;
+        double          fMCEnergy_max;
+        double          fMCEnergy_index;
+        bool            fFillMCHistograms;
+        bool            fgetXoff_Yoff_afterCut;
 
-		// IRF histogram bin definition
-		unsigned int fBiasBin;                       // Energy bias (bias bins)
-		unsigned int fLogAngularBin;                 // Angular resolution Log10 (bins)
-		unsigned int fResponseMatricesEbinning;      // bins in the ResponseMatrices
-		unsigned int fhistoNEbins;                   // E binning (affects 2D histograms only)
+        // IRF histogram bin definition
+        unsigned int fBiasBin;                       // Energy bias (bias bins)
+        unsigned int fLogAngularBin;                 // Angular resolution Log10 (bins)
+        unsigned int fResponseMatricesEbinning;      // bins in the ResponseMatrices
+        unsigned int fhistoNEbins;                   // E binning (affects 2D histograms only)
 
-		string          fCoreScatterMode;
-		double          fCoreScatterRadius;
+        string          fCoreScatterMode;
+        double          fCoreScatterRadius;
 
-		double          fViewcone_min;
-		double          fViewcone_max;
+        double          fViewcone_min;
+        double          fViewcone_max;
 
-		bool            fAzimuthBins;
-		bool            fIsotropicArrivalDirections;
-		float           fIgnoreFractionOfEvents;
+        bool            fAzimuthBins;
+        bool            fIsotropicArrivalDirections;
+        float           fIgnoreFractionOfEvents;
 
-		bool            fTelescopeTypeCuts;
+        bool            fTelescopeTypeCuts;
 
-		string          fdatafile;
-		string          fMCdatafile_tree;
-		string          fMCdatafile_histo;
-		string          fGammaHadronProbabilityFile;
+        string          fdatafile;
+        string          fMCdatafile_tree;
+        string          fMCdatafile_histo;
+        string          fGammaHadronProbabilityFile;
 
-		double          fze;
-		int             fnoise;
-		double          fpedvar;
-		double          fXoff;
-		double          fYoff;
-		vector< double > fAzMin;
-		vector< double > fAzMax;
+        double          fze;
+        int             fnoise;
+        double          fpedvar;
+        double          fXoff;
+        double          fYoff;
+        vector< double > fAzMin;
+        vector< double > fAzMax;
 
-		double          fWobbleIsotropic;
+        double          fWobbleIsotropic;
 
-		unsigned int    telconfig_ntel;
-		double          telconfig_arraycentre_X;
-		double          telconfig_arraycentre_Y;
-		double          telconfig_arraymax;
+        unsigned int    telconfig_ntel;
+        double          telconfig_arraycentre_X;
+        double          telconfig_arraycentre_Y;
+        double          telconfig_arraymax;
 
-		string          fCREnergySpectrumFile;
-		unsigned int    fCREnergySpectrumID;
-		TF1*            fCREnergySpectrum;
+        string          fCREnergySpectrumFile;
+        unsigned int    fCREnergySpectrumID;
+        TF1*            fCREnergySpectrum;
 
 
-		VInstrumentResponseFunctionRunParameter();
-		~VInstrumentResponseFunctionRunParameter() {}
+        VInstrumentResponseFunctionRunParameter();
+        ~VInstrumentResponseFunctionRunParameter() {}
 
-		string                getInstrumentEpoch( bool iMajor = false );
-		string                getInstrumentATMString()
-		{
-			return fInstrumentEpochATM;
-		}
-		void                  print();
-		VMonteCarloRunHeader* readMCRunHeader();
-		bool                  readRunParameterFromTextFile( string iFile );
-		bool                  testRunparameters();
+        string                getInstrumentEpoch( bool iMajor = false );
+        string                getInstrumentATMString()
+        {
+            return fInstrumentEpochATM;
+        }
+        void                  print();
+        VMonteCarloRunHeader* readMCRunHeader();
+        bool                  readRunParameterFromTextFile( string iFile );
+        bool                  testRunparameters();
 
-		ClassDef( VInstrumentResponseFunctionRunParameter, 17 );
+        ClassDef( VInstrumentResponseFunctionRunParameter, 17 );
 };
 
 #endif

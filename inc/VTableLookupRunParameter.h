@@ -25,93 +25,93 @@ using namespace std;
 
 class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 {
-	private:
+    private:
 
-		bool fillInputFile_fromList( string iList );
-		bool readTelescopeToAnalyze( string iFile );
+        bool fillInputFile_fromList( string iList );
+        bool readTelescopeToAnalyze( string iFile );
 
-	public:
+    public:
 
-		// debug levels 0 = off, 1 = default debug level, 2 = detailed
-		unsigned int fDebug;
+        // debug levels 0 = off, 1 = default debug level, 2 = detailed
+        unsigned int fDebug;
 
-		// list of evndisp input files
-		vector< string > inputfile;
-		string outputfile;
-		// name of lookup table file
-		string tablefile;
-		double ze;
-		bool isMC;
-		int fUseMedianEnergy;
-		bool fPE;                          // input size type is 'pe' (not [dc])
-		string fInterpolateString;
-		char readwrite;
-		bool fUpdateInstrumentEpoch;
+        // list of evndisp input files
+        vector< string > inputfile;
+        string outputfile;
+        // name of lookup table file
+        string tablefile;
+        double ze;
+        bool isMC;
+        int fUseMedianEnergy;
+        bool fPE;                          // input size type is 'pe' (not [dc])
+        string fInterpolateString;
+        char readwrite;
+        bool fUpdateInstrumentEpoch;
 
-		bool  fLimitEnergyReconstruction;
+        bool  fLimitEnergyReconstruction;
 
-		float fMinRequiredShowerPerBin;    // minimum number of showers required per table bin
+        float fMinRequiredShowerPerBin;    // minimum number of showers required per table bin
 
-		bool  fUseEvndispSelectedImagesOnly;
+        bool  fUseEvndispSelectedImagesOnly;
 
-		string writeoption;
-		bool bNoNoTrigger;
-		int  bWriteReconstructedEventsOnly;
-		bool bWriteMCPars;
-		int  rec_method;
-		// quality cut level
-		unsigned int fQualityCutLevel;
-		bool fWrite1DHistograms;
-		double fSpectralIndex;
-		// wobble offset
-		int fWobbleOffset;
-		// NSB (pedvars) level
-		int fNoiseLevel;
+        string writeoption;
+        bool bNoNoTrigger;
+        int  bWriteReconstructedEventsOnly;
+        bool bWriteMCPars;
+        int  rec_method;
+        // quality cut level
+        unsigned int fQualityCutLevel;
+        bool fWrite1DHistograms;
+        double fSpectralIndex;
+        // wobble offset
+        int fWobbleOffset;
+        // NSB (pedvars) level
+        int fNoiseLevel;
 
-		vector< unsigned int > fTelToAnalyse;             // telescopes used in analysis
+        vector< unsigned int > fTelToAnalyse;             // telescopes used in analysis
 
-		unsigned int fTableFillingCut_NImages_min;
-		double       fTableFillingCut_WobbleCut_max;
-		double fMC_distance_to_cameracenter_min;
-		double fMC_distance_to_cameracenter_max;
-		double       fmaxdist;   // note: same for all telescope types
-		double       fmaxloss;   // note: same for all telescope types
-		double       fminfui ;   // note: same for all telescope types
-		double       fminsize;   // note: same for all telescope types
-		int          fminntubes; // note: same for all telescope types
-		double       fminwidth;  // note: same for all telescope types
-		double       fminfitstat;  // note: same for all telescope types
-		// seed for random selection of showers before table filling
-		double fSelectRandom;
-		int fSelectRandomSeed;
-		vector< double > fAddMC_spectral_index;
+        unsigned int fTableFillingCut_NImages_min;
+        double       fTableFillingCut_WobbleCut_max;
+        double fMC_distance_to_cameracenter_min;
+        double fMC_distance_to_cameracenter_max;
+        double       fmaxdist;   // note: same for all telescope types
+        double       fmaxloss;   // note: same for all telescope types
+        double       fminfui ;   // note: same for all telescope types
+        double       fminsize;   // note: same for all telescope types
+        int          fminntubes; // note: same for all telescope types
+        double       fminwidth;  // note: same for all telescope types
+        double       fminfitstat;  // note: same for all telescope types
+        // seed for random selection of showers before table filling
+        double fSelectRandom;
+        int fSelectRandomSeed;
+        vector< double > fAddMC_spectral_index;
 
-		Long64_t fNentries;
-		double fMaxRunTime;
-		// parameters to be used in anasum
-		double meanpedvars;                       // mean pedvar
-		vector< double > pedvars;                 // mean pedvar per telescope
+        Long64_t fNentries;
+        double fMaxRunTime;
+        // parameters to be used in anasum
+        double meanpedvars;                       // mean pedvar
+        vector< double > pedvars;                 // mean pedvar per telescope
 
-		string printpara;
-		// rerun stereo reconstruction
-		bool  fRerunStereoReconstruction;
-		double fRerunStereoReconstruction_minAngle;
-		string fRerunStereoReconstruction_BDTFileName;
-		unsigned int fRerunStereoReconstruction_BDTNImages_max;
-		string fEnergyReconstruction_BDTFileName;
-		string fDispError_BDTFileName;
-		float  fDispError_BDTWeight;
-		string fDispSign_BDTFileName;
-		bool fDisp_UseIntersectForHeadTail;
+        string printpara;
+        // rerun stereo reconstruction
+        bool  fRerunStereoReconstruction;
+        double fRerunStereoReconstruction_minAngle;
+        string fRerunStereoReconstruction_BDTFileName;
+        unsigned int fRerunStereoReconstruction_BDTNImages_max;
+        string fEnergyReconstruction_BDTFileName;
+        string fDispError_BDTFileName;
+        float  fDispError_BDTWeight;
+        string fDispSign_BDTFileName;
+        bool fDisp_UseIntersectForHeadTail;
 
-		// functions...
-		VTableLookupRunParameter();
-		~VTableLookupRunParameter() {}
+        // functions...
+        VTableLookupRunParameter();
+        ~VTableLookupRunParameter() {}
 
-		bool fillParameters( int argc, char* argv[] );
-		void print( int iB = 0 );
-		void printHelp();
+        bool fillParameters( int argc, char* argv[] );
+        void print( int iB = 0 );
+        void printHelp();
 
-		ClassDef( VTableLookupRunParameter, 32 );
+        ClassDef( VTableLookupRunParameter, 32 );
 };
 #endif

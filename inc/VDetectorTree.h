@@ -13,25 +13,25 @@ using namespace std;
 
 class VDetectorTree
 {
-	private:
-		bool fDebug;
+    private:
+        bool fDebug;
 
-		TTree* fTreeDet;
+        TTree* fTreeDet;
 
-	public:
+    public:
 
-		unsigned int fNTel;
-		float fTelxpos;
-		float fTelypos;
-		float fTelzpos;
+        unsigned int fNTel;
+        float fTelxpos;
+        float fTelypos;
+        float fTelzpos;
 
-		VDetectorTree();
-		~VDetectorTree();
-		bool fillDetectorTree( VDetectorGeometry* iDet );
-		bool readDetectorTree( VDetectorGeometry* iDet, TTree* iTree, bool iCTA = false );
-		TTree* getTree()
-		{
-			return fTreeDet;
-		}
+        VDetectorTree();
+        ~VDetectorTree();
+        bool fillDetectorTree( VDetectorGeometry* iDet );
+        bool readDetectorTree( VDetectorGeometry* iDet, TTree* iTree, bool iCTA = false );
+        TTree* getTree()
+        {
+            return fTreeDet;
+        }
 };
 #endif

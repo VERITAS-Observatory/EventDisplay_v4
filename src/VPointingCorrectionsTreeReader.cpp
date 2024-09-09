@@ -10,51 +10,51 @@
 
 VPointingCorrectionsTreeReader::VPointingCorrectionsTreeReader( TChain* t )
 {
-	fEventStatus = 0;
-	fPointingErrorX = 0.;
-	fPointingErrorY = 0.;
-	fPointingCorrectionTreeSetting = false;
+    fEventStatus = 0;
+    fPointingErrorX = 0.;
+    fPointingErrorY = 0.;
+    fPointingCorrectionTreeSetting = false;
 
-	fTree = t;
-	if( fTree )
-	{
-		fTree->SetBranchAddress( "EventStatus", &fEventStatus );
-		if( fTree->GetBranchStatus( "PointingErrorX" ) &&
-				fTree->GetBranchStatus( "PointingErrorY" ) )
-		{
-			fTree->SetBranchAddress( "PointingErrorX", &fPointingErrorX );
-			fTree->SetBranchAddress( "PointingErrorY", &fPointingErrorY );
-			fPointingCorrectionTreeSetting = true;
-		}
-	}
+    fTree = t;
+    if( fTree )
+    {
+        fTree->SetBranchAddress( "EventStatus", &fEventStatus );
+        if( fTree->GetBranchStatus( "PointingErrorX" ) &&
+                fTree->GetBranchStatus( "PointingErrorY" ) )
+        {
+            fTree->SetBranchAddress( "PointingErrorX", &fPointingErrorX );
+            fTree->SetBranchAddress( "PointingErrorY", &fPointingErrorY );
+            fPointingCorrectionTreeSetting = true;
+        }
+    }
 
 }
 
 
 int VPointingCorrectionsTreeReader::getEntry( Long64_t iEntry )
 {
-	if( !fTree )
-	{
-		fEventStatus = 0;
-		fPointingErrorX = 0.;
-		fPointingErrorY = 0.;
-		return 0;
-	}
-	return fTree->GetEntry( iEntry );
+    if(!fTree )
+    {
+        fEventStatus = 0;
+        fPointingErrorX = 0.;
+        fPointingErrorY = 0.;
+        return 0;
+    }
+    return fTree->GetEntry( iEntry );
 }
 
 
 Long64_t VPointingCorrectionsTreeReader::getEntries()
 {
-	if( !fTree )
-	{
-		fEventStatus = 0;
-		fPointingErrorX = 0.;
-		fPointingErrorY = 0.;
-		return 0;
-	}
+    if(!fTree )
+    {
+        fEventStatus = 0;
+        fPointingErrorX = 0.;
+        fPointingErrorY = 0.;
+        return 0;
+    }
 
-	return fTree->GetEntries();
+    return fTree->GetEntries();
 }
 
 /*
@@ -62,7 +62,7 @@ Long64_t VPointingCorrectionsTreeReader::getEntries()
  */
 float VPointingCorrectionsTreeReader::getCorrected_cen_x( float cen_x )
 {
-	return cen_x + fPointingErrorX;
+    return cen_x + fPointingErrorX;
 }
 
 /*
@@ -70,7 +70,7 @@ float VPointingCorrectionsTreeReader::getCorrected_cen_x( float cen_x )
  */
 float VPointingCorrectionsTreeReader::getCorrected_cen_y( float cen_y )
 {
-	return cen_y + fPointingErrorY;
+    return cen_y + fPointingErrorY;
 }
 
 
@@ -79,11 +79,11 @@ float VPointingCorrectionsTreeReader::getCorrected_cen_y( float cen_y )
 */
 float VPointingCorrectionsTreeReader::getCorrected_phi( float cen_x, float cen_y, float d, float s, float sdevxy )
 {
-	float xmean = cen_x + fPointingErrorX;
-	float ymean = cen_y + fPointingErrorY;
+    float xmean = cen_x + fPointingErrorX;
+    float ymean = cen_y + fPointingErrorY;
 
-	const double ac = ( d + s ) * ymean + 2.0 * sdevxy * xmean;
-	const double bc = 2.0 * sdevxy * ymean - ( d - s ) * xmean;
+    const double ac = ( d + s ) * ymean + 2.0 * sdevxy * xmean;
+    const double bc = 2.0 * sdevxy * ymean - ( d - s ) * xmean;
 
-	return atan2( ac, bc );
+    return atan2( ac, bc );
 }

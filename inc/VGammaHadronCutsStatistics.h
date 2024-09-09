@@ -14,41 +14,41 @@ using namespace std;
 
 class VGammaHadronCutsStatistics : public TNamed
 {
-	private:
+    private:
 
-		TTree* fData;              //!
+        TTree* fData;              //!
 
-		bitset< 32 >           fCut_bitset;  //!
-		unsigned long int      fCut_bitset_ulong;  //!
-		vector< string >       fCutName;  //!
-		vector< unsigned int > fCutCounter;  //!
+        bitset< 32 >           fCut_bitset;  //!
+        unsigned long int      fCut_bitset_ulong;  //!
+        vector< string >       fCutName;  //!
+        vector< unsigned int > fCutCounter;  //!
 
-	public:
+    public:
 
-		// enum for efficiency counting of the different types of cuts
-		enum EN_AnaCutsStats { eTot, eMC_XYoff, eXYoff, eStereoQuality, eArrayChi2, eNImages, eMSC_Quality,
-							   eErec, eCorePos, eLTrig, eArrayDispDiff, eSizeSecondMax, eTelType, eDirection,
-							   eIsGamma, eEnergyRec, ePointing, eError
-							 };
+        // enum for efficiency counting of the different types of cuts
+        enum EN_AnaCutsStats { eTot, eMC_XYoff, eXYoff, eStereoQuality, eArrayChi2, eNImages, eMSC_Quality,
+                               eErec, eCorePos, eLTrig, eArrayDispDiff, eSizeSecondMax, eTelType, eDirection,
+                               eIsGamma, eEnergyRec, ePointing, eError
+                             };
 
 
-		VGammaHadronCutsStatistics();
-		~VGammaHadronCutsStatistics() {};
+        VGammaHadronCutsStatistics();
+        ~VGammaHadronCutsStatistics() {};
 
-		void         fill();
-		unsigned int getCounterValue( unsigned int iCut );
-		TTree*       getDataTree()
-		{
-			return fData;
-		}
-		void         initialize();
-		void         printCutStatistics();
-		void         reset();
-		void         setCutCounter( unsigned int iCut, unsigned int iValue );
-		void         terminate();
-		void         updateCutCounter( unsigned int iCut );
+        void         fill();
+        unsigned int getCounterValue( unsigned int iCut );
+        TTree*       getDataTree()
+        {
+            return fData;
+        }
+        void         initialize();
+        void         printCutStatistics();
+        void         reset();
+        void         setCutCounter( unsigned int iCut, unsigned int iValue );
+        void         terminate();
+        void         updateCutCounter( unsigned int iCut );
 
-		ClassDef( VGammaHadronCutsStatistics, 4 );
+        ClassDef( VGammaHadronCutsStatistics, 4 );
 };
 
 

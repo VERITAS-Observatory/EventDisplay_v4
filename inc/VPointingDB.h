@@ -30,146 +30,146 @@ using namespace std;
 
 class VPointingDB : public VGlobalRunParameter
 {
-	private:
-		double degrad;
+    private:
+        double degrad;
 
-		double fObsLongitude;
-		double fObsLatitude;
+        double fObsLongitude;
+        double fObsLatitude;
 
-		bool fStatus;
+        bool fStatus;
 
-		bool fGoodVPM;
+        bool fGoodVPM;
 
-		unsigned int fTelID;
-		unsigned int fRunNumber;
+        unsigned int fTelID;
+        unsigned int fRunNumber;
 
-		int fMJDRunStart;                         // run start time
-		double fTimeRunStart;
-		int fMJDRunStopp;                         // run stop time
-		double fTimeRunStopp;
+        int fMJDRunStart;                         // run start time
+        double fTimeRunStart;
+        int fMJDRunStopp;                         // run stop time
+        double fTimeRunStopp;
 
-		unsigned int fMJD;
-		double fTime;
+        unsigned int fMJD;
+        double fTime;
 
-		unsigned int fEventStatus;
-		float fTelAzimuth;
-		float fTelElevation;
-		float fTelExpectedAzimuth;
-		float fTelExpectedElevation;
+        unsigned int fEventStatus;
+        float fTelAzimuth;
+        float fTelElevation;
+        float fTelExpectedAzimuth;
+        float fTelExpectedElevation;
 
-		string fDBSourceName;
-		float fDBTargetDec;
-		float fDBTargetRA;
-		float fDBWobbleNorth;
-		float fDBWobbleEast;
+        string fDBSourceName;
+        float fDBTargetDec;
+        float fDBTargetRA;
+        float fDBWobbleNorth;
+        float fDBWobbleEast;
 
-		unsigned int fCounter;
-		unsigned int fDBNrows;
-		vector< unsigned int > fDBMJD;
-		vector< double > fDBTime;
-		vector< float > fDBTelElevationRaw;
-		vector< float > fDBTelAzimuthRaw;
-		vector< float > fDBTelRA;
-		vector< float > fDBTelDec;
-		vector< float > fDBTelElevation;
-		vector< float > fDBTelAzimuth;
-		vector< float > fDBTelExpectedElevation;
-		vector< float > fDBTelExpectedAzimuth;
+        unsigned int fCounter;
+        unsigned int fDBNrows;
+        vector< unsigned int > fDBMJD;
+        vector< double > fDBTime;
+        vector< float > fDBTelElevationRaw;
+        vector< float > fDBTelAzimuthRaw;
+        vector< float > fDBTelRA;
+        vector< float > fDBTelDec;
+        vector< float > fDBTelElevation;
+        vector< float > fDBTelAzimuth;
+        vector< float > fDBTelExpectedElevation;
+        vector< float > fDBTelExpectedAzimuth;
 
-		int fNWarnings;
+        int fNWarnings;
 
 
-		VDB_Connection* fmy_connection;
+        VDB_Connection* fmy_connection;
 
-		VTrackingCorrections* fTrackingCorrections;
-		string fTPointCorrectionDate;
+        VTrackingCorrections* fTrackingCorrections;
+        string fTPointCorrectionDate;
 
-		bool check_maskVPM( int maskVPM );
-		bool getDBRunInfo();
-		bool getDBTextRunInfo( string iDBTextDirectory );
-		void getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip );
-		void getDBSourceCoordinates( string iSource, float& iEVNTargetDec, float& iEVNTargetRA );
-		bool readPointingFromDB();
-		bool readPointingFromDBText( string iDBTextDirectory );
-		bool readPointingCalibratedVPMFromDB();
-		bool readPointingCalibratedVPMFromDBTextFile( string iDBTextDirectory );
-		bool readPointingUncalibratedVPMFromDB();
-		void readTrackingCorrections( string iTPointCorrection );
-		void setup_DB_connection();
+        bool check_maskVPM( int maskVPM );
+        bool getDBRunInfo();
+        bool getDBTextRunInfo( string iDBTextDirectory );
+        void getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip );
+        void getDBSourceCoordinates( string iSource, float& iEVNTargetDec, float& iEVNTargetRA );
+        bool readPointingFromDB();
+        bool readPointingFromDBText( string iDBTextDirectory );
+        bool readPointingCalibratedVPMFromDB();
+        bool readPointingCalibratedVPMFromDBTextFile( string iDBTextDirectory );
+        bool readPointingUncalibratedVPMFromDB();
+        void readTrackingCorrections( string iTPointCorrection );
+        void setup_DB_connection();
 
-		void delete_myconnection()
-		{
-			if( fmy_connection )
-			{
-				delete fmy_connection;
-				fmy_connection = 0;
-			}
-		}
+        void delete_myconnection()
+        {
+            if( fmy_connection )
+            {
+                delete fmy_connection;
+                fmy_connection = 0;
+            }
+        }
 
-	public:
+    public:
 
-		VPointingDB( unsigned int iTelID, unsigned int iRun );
-		~VPointingDB()
-		{
-			delete_myconnection();
-		}
-		bool   isGood()
-		{
-			return fStatus;
-		}
-		unsigned int getEventStatus()
-		{
-			return fEventStatus;
-		}
-		string getSourceNameDB()
-		{
-			return fDBSourceName;
-		}
-		float  getTargetDecDB()
-		{
-			return fDBTargetDec;
-		}
-		float  getTargetRADB()
-		{
-			return fDBTargetRA;
-		}
-		float  getTelExpectedAzimuthDB()
-		{
-			return fTelExpectedAzimuth;
-		}
-		float  getTelExpectedElevationDB()
-		{
-			return fTelExpectedElevation;
-		}
-		float  getTelAzimuthDB()
-		{
-			return fTelAzimuth;
-		}
-		float  getTelElevationDB()
-		{
-			return fTelElevation;
-		}
-		TTree* getTreePointingDB();
-		float  getWobbleNorthDB()
-		{
-			return fDBWobbleNorth;
-		}
-		float  getWobbleEastDB()
-		{
-			return fDBWobbleEast;
-		}
-		unsigned int getTelID()
-		{
-			return fTelID;
-		}
-		bool   initialize(
-			string iTPointCorrection,
-			bool iVPMDB,
-			bool iUncalibratedVPM,
-			string iDBTextDirectory );
-		void   setObservatory( double iLongitude_deg = 0., double iLatitude_deg = 0. );
-		bool   terminate();
-		bool   updatePointing( int MJD, double iTime );
-		void   getHorizonCoordinates( int MJD, double time, double dec, double ra, double& az, double& ze );
+        VPointingDB( unsigned int iTelID, unsigned int iRun );
+        ~VPointingDB()
+        {
+            delete_myconnection();
+        }
+        bool   isGood()
+        {
+            return fStatus;
+        }
+        unsigned int getEventStatus()
+        {
+            return fEventStatus;
+        }
+        string getSourceNameDB()
+        {
+            return fDBSourceName;
+        }
+        float  getTargetDecDB()
+        {
+            return fDBTargetDec;
+        }
+        float  getTargetRADB()
+        {
+            return fDBTargetRA;
+        }
+        float  getTelExpectedAzimuthDB()
+        {
+            return fTelExpectedAzimuth;
+        }
+        float  getTelExpectedElevationDB()
+        {
+            return fTelExpectedElevation;
+        }
+        float  getTelAzimuthDB()
+        {
+            return fTelAzimuth;
+        }
+        float  getTelElevationDB()
+        {
+            return fTelElevation;
+        }
+        TTree* getTreePointingDB();
+        float  getWobbleNorthDB()
+        {
+            return fDBWobbleNorth;
+        }
+        float  getWobbleEastDB()
+        {
+            return fDBWobbleEast;
+        }
+        unsigned int getTelID()
+        {
+            return fTelID;
+        }
+        bool   initialize(
+            string iTPointCorrection,
+            bool iVPMDB,
+            bool iUncalibratedVPM,
+            string iDBTextDirectory );
+        void   setObservatory( double iLongitude_deg = 0., double iLatitude_deg = 0. );
+        bool   terminate();
+        bool   updatePointing( int MJD, double iTime );
+        void   getHorizonCoordinates( int MJD, double time, double dec, double ra, double& az, double& ze );
 };
 #endif

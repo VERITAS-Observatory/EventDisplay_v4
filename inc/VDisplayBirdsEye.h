@@ -21,54 +21,54 @@
 
 class VDisplayBirdsEye : public VGrIsuAnalyzer, public VPlotUtilities
 {
-	private:
-		bool fDebug;
-		double fMCSign;                           //!< +-1 to correct for sign errors in MC
-		unsigned int fNTel;
-		double fFieldX;
-		double fFieldY;
-		double fFieldCentreX;
-		double fFieldCentreY;
-		double fXScale;
-		double fYScale;
-		vector<double> fTelPosX;
-		vector<double> fTelPosY;
-		vector<double> fTelRad;
+    private:
+        bool fDebug;
+        double fMCSign;                           //!< +-1 to correct for sign errors in MC
+        unsigned int fNTel;
+        double fFieldX;
+        double fFieldY;
+        double fFieldCentreX;
+        double fFieldCentreY;
+        double fXScale;
+        double fYScale;
+        vector<double> fTelPosX;
+        vector<double> fTelPosY;
+        vector<double> fTelRad;
 
-		vector< TEllipse* > fElTel;
-		vector< TEllipse* > fElTelImage;
-		vector< TMarker* > fMarkerCore;
-		TMarker* fMarkerMCCore;
-		TArrow* fAxis_SC_X;
-		TArrow* fAxis_SC_Y;
-		vector< TLine* > fLiImage;
-		vector< TText* > fTextTel;
-		vector< TText* > fTextRec;
+        vector< TEllipse* > fElTel;
+        vector< TEllipse* > fElTelImage;
+        vector< TMarker* > fMarkerCore;
+        TMarker* fMarkerMCCore;
+        TArrow* fAxis_SC_X;
+        TArrow* fAxis_SC_Y;
+        vector< TLine* > fLiImage;
+        vector< TText* > fTextTel;
+        vector< TText* > fTextRec;
 
-		VEvndispData* fData;
-		vector< VImageParameter* > fParameters;
+        VEvndispData* fData;
+        vector< VImageParameter* > fParameters;
 
-		bool fPlotPaper;
+        bool fPlotPaper;
 
-		double convertX( double );
-		double convertY( double );
-		double scaleX( double a, double iCentre = 0. );
-		double scaleY( double a, double iCentre = 0. );
-		void drawEventText();
-		void drawImagesinCamera();
-		void drawImageLines_and_Corepositions();
-		void drawTelescopes();
-		void drawTelescopes_with_sizeAxis();
-		void setGeometry();
+        double convertX( double );
+        double convertY( double );
+        double scaleX( double a, double iCentre = 0. );
+        double scaleY( double a, double iCentre = 0. );
+        void drawEventText();
+        void drawImagesinCamera();
+        void drawImageLines_and_Corepositions();
+        void drawTelescopes();
+        void drawTelescopes_with_sizeAxis();
+        void setGeometry();
 
-	public:
+    public:
 
-		VDisplayBirdsEye();
-		~VDisplayBirdsEye() {}
-		void draw( TPad* );
-		void setData( VEvndispData* );
-		void setNTel( unsigned int iNTel );
-		void setParameters( VImageParameter* iParameters );
-		void setPlotPaper();
+        VDisplayBirdsEye();
+        ~VDisplayBirdsEye() {}
+        void draw( TPad* );
+        void setData( VEvndispData* );
+        void setNTel( unsigned int iNTel );
+        void setParameters( VImageParameter* iParameters );
+        void setPlotPaper();
 };
 #endif
