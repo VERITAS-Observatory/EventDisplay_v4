@@ -17,14 +17,14 @@ using namespace std;
 class VDeadChannelFinder
 {
     private:
-    
+
         bool         fDebug;
-        
+
         int          frunmode;
         unsigned int fTelID;
         bool         fLowGain;
         bool         fIsMC;
-        
+
         // dead channel definitions
         double fDEAD_ped_min;
         double fDEAD_ped_max;
@@ -43,9 +43,9 @@ class VDeadChannelFinder
         double fDEAD_l1rates_max;
         double fDead_HVrms_min;
         double fDead_HVrms_max;
-        
+
     public:
-    
+
         VDeadChannelFinder( int irunmode = 0, unsigned int iTelID = 0, bool bLowGain = false, bool isMC = false );
         ~VDeadChannelFinder() {};
         double    getDeadChannelDefinition_HVrms_min()

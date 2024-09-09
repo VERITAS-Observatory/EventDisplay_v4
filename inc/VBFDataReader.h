@@ -21,30 +21,30 @@ class VBFDataReader : public VBaseRawDataReader
         VPacket* pack;
         VBankFileReader reader;
         unsigned index;
-        
+
         VArrayEvent*   ae;
         VArrayTrigger* at;
-        
+
         bool fArrayTrigger;
         unsigned int fPrintDetectorConfig;
-        
+
         vector< bool > ib_temp;
-        
+
     public:
         VBFDataReader( string,
                        int isourcetype,
                        unsigned int iNTel,
                        bool iDebug, unsigned int iPrintDetectorConfig = 0 );
-                       
+
         virtual ~VBFDataReader();
-        
+
         unsigned int getNTel();
-        
+
         bool hasAT()
         {
             return at != NULL;
         }
-        
+
         uint8_t getATEventType()
         {
             if( at == NULL )
@@ -56,9 +56,9 @@ class VBFDataReader : public VBaseRawDataReader
                 return at->getEventType().trigger;
             }
         }
-        
+
         uint16_t getATGPSYear();
-        
+
         VArrayEvent*      getArrayEvent()
         {
             return ae;

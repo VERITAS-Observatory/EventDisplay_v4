@@ -15,16 +15,16 @@ class VDetectorTree
 {
     private:
         bool fDebug;
-        
+
         TTree* fTreeDet;
-        
+
     public:
-    
+
         unsigned int fNTel;
         float fTelxpos;
         float fTelypos;
         float fTelzpos;
-        
+
         VDetectorTree();
         ~VDetectorTree();
         bool fillDetectorTree( VDetectorGeometry* iDet );

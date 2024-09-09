@@ -32,20 +32,20 @@ using namespace std;
 class VEnergyThreshold : public TObject
 {
     private:
-    
+
         bool fDebug;
-        
+
         TFile* fEffAreaFile;
         TChain* fEffArea;
-        
+
         TFile* fEnergyThresholdFile;
-        
+
         double fEnergyThresholdFixedValue;
         string fEnergyThresholdFileName;
-        
+
         TFile* fOutFile;
         TTree* fTreeEth;
-        
+
         float fze;
         UShort_t fAzBin;
         float fAzMin;
@@ -67,29 +67,29 @@ class VEnergyThreshold : public TObject
         float feff_500GeV;
         float feff_1TeV;
         float feff_10TeV;
-        
+
         UShort_t nbins;
         float e0[1000];
         float eff[1000];
         UShort_t nbins_esys;
         float e0_esys[1000];
         float esys_rel[1000];
-        
+
         int fPlottingMarkerStyle;
         int fPlottingMarkerColor;
         float fPlottingMarkerSize;
         float fPlottingLineWidth;
         double fPlottingYmin;
         double fPlottingYmax;
-        
+
         double getEnergyThreshold( TH1D* h = 0, bool bLogEnergyAxis = true, bool bFit = true );
         bool openEnergyThresholdFile();
         bool setUpThresholdTree();
-        
+
         double interpolateEnergyThreshold( VRunList* );
-        
+
     public:
-    
+
         VEnergyThreshold();
         VEnergyThreshold( string ioutfilename );
         VEnergyThreshold( double iEthFixed, string iInFile = "" );
@@ -118,9 +118,9 @@ class VEnergyThreshold : public TObject
             fPlottingYmax = ymax;
         }
         bool writeResults();
-        
+
         double getEnergyThreshold( VRunList* );
-        
+
         ClassDef( VEnergyThreshold, 2 );
 };
 #endif

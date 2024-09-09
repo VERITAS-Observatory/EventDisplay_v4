@@ -22,7 +22,7 @@ using namespace std;
 class VPlotMonteCarloQualityFactorData
 {
     public:
-    
+
         double fVar_max;
         double fVar_min;
         TH1D*  hSignal;
@@ -33,7 +33,7 @@ class VPlotMonteCarloQualityFactorData
         TGraphErrors* gQFactor_UpperCutE;
         TGraphErrors* gQFactorMax_LowerCutE;
         TGraphErrors* gQFactorMax_UpperCutE;
-        
+
         VPlotMonteCarloQualityFactorData();
         ~VPlotMonteCarloQualityFactorData() {}
 };
@@ -42,32 +42,32 @@ class VPlotMonteCarloQualityFactorData
 class VPlotMonteCarloQualityFactor : public VPlotUtilities
 {
     private:
-    
+
         bool fDebug;
-        
+
         double fEnergy_min;
         double fEnergy_max;
         double fMSCW_min;
         double fMSCW_max;
         double fMSCL_min;
         double fMSCL_max;
-        
+
         CData* fSignalChain;
         CData* fBackgroundChain;
-        
+
         map< string, VPlotMonteCarloQualityFactorData* > fData;
-        
+
         void calculateQfactors();
         void fill( int iMaxNevents, CData* c, bool bSignal );
         void initializeHistograms();
         void resetHistograms();
         bool setDataChain( string iChain, bool bSignal );
-        
+
     public:
-    
+
         VPlotMonteCarloQualityFactor();
         ~VPlotMonteCarloQualityFactor() {}
-        
+
         bool setBackgroundDataChain( string iChain );
         bool setSignalDataChain( string iChain );
         void setMSCCuts( double iMSCW_min = -2., double iMSCW_max = 0.5, double iMSCL_min = -2., double iMSCL_max = 0.5 );

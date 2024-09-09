@@ -24,9 +24,9 @@ using namespace std;
 class VWPPhysSensitivityFile
 {
     private:
-    
+
         bool         fDebug;
-        
+
         TFile*       fOutFile;
         string       fDataFile_gamma_onSource;
         string       fDataFile_gamma_cone;
@@ -34,23 +34,23 @@ class VWPPhysSensitivityFile
         string       fDataFile_proton_onSource;
         string       fDataFile_electron;
         string       fDataFile_electron_onSource;
-        
+
         string       fSubArray;
         string       fObservatory;
         double       fObservingTime_h;
-        
+
         string       fCrabSpectrumFile;
         unsigned int fCrabSpectrumID;
         string       fCosmicRaySpectrumFile;
         unsigned int fProtonSpectrumID;
         unsigned int fElectronSpectrumID;
-        
+
         unsigned int fOffsetCounter;
-        
+
         vector< TH1* > hisList;
         vector< TH1* > hisListToDisk;
         vector< TH1* > hisListToDiskDebug;
-        
+
         TH1F* fSensitivity;
         vector< TH1F* > fSensitivityLimits;
         TH1F* fSensitivityCU;
@@ -72,12 +72,12 @@ class VWPPhysSensitivityFile
         TH1F* fAngRes80;
         TH1F* fEres;
         TH1F* fEbias;
-        
+
     public:
-    
+
         VWPPhysSensitivityFile();
         ~VWPPhysSensitivityFile() {}
-        
+
         bool fillIRFHistograms( string iEffectiveAreaFile, double iZe = 20., double iWoff = 0. );
         bool fillHistograms1D( string iDataDirectory, bool iFill1D = true );
         bool fillHistograms2D( vector< double > iWobble_min, vector< double > iWobble_max );
@@ -121,7 +121,7 @@ class VWPPhysSensitivityFile
         }
         void setDataFiles( string iA = "E", int iRecID = 0 );
         bool terminate();
-        
+
 };
 
 #endif

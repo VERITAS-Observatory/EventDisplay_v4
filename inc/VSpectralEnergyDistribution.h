@@ -71,35 +71,35 @@ struct sPhotonFlux
 class VSpectralEnergyDistribution
 {
     private:
-    
+
         bool fDebug;
-        
+
         string fName;                             // project name
-        
+
         // constants
         vector< sPhotoMetricBand >      fPhotoMetricBand;
         vector< sGalacticExtinction >   fGalacticExtinction;
-        
+
         // data sets
         // [dataset][data points]
         vector< vector< sPhotonFlux > > fSpectralFlux;
-        
+
         // plot/print variables
         double fMJDMin;
         double fMJDMax;
-        
+
         double fPlotting_EnergyRange_min_Hz;
         double fPlotting_EnergyRange_max_Hz;
         double fPlotting_FluxRange_min;
         double fPlotting_FluxRange_max;
-        
+
         TCanvas* plotCanvas( int canvas_x = 600, int canvas_y = 600 );
-        
+
     public:
-    
+
         VSpectralEnergyDistribution( string name = "SED" );
         virtual ~VSpectralEnergyDistribution() {}
-        
+
         TCanvas* plot( TCanvas* c = 0, int bLegend = false, int canvas_x = 900, int canvas_y = 600, bool bErrorX = true, bool bPlotName = false );
         double   getEffectiveWavelength( string iband, string iunit );
         double   getGalacticExtinctionCorrection( string iband );
@@ -130,7 +130,7 @@ class VSpectralEnergyDistribution
             fPlotting_FluxRange_max = iMax;
         }
         void setTimeRange( double iMJDmin = 0., double iMJDmax = 1.e14 );
-        
+
         ClassDef( VSpectralEnergyDistribution, 2 );
 };
 #endif

@@ -32,17 +32,17 @@ class VVirtualDataReader
         std::vector<bool> f;
         std::vector<double> d;
         std::vector< uint16_t > iSampleVec16bit;
-        
+
         string           fSourceFileName;
         vector< unsigned int > fTeltoAna;
         unsigned int fEventStatus;
         uint16_t     fNumSamplesTemp;
-        
+
     public:
         VVirtualDataReader();
         //        VVirtualDataReader() throw (VFileException);
         virtual                            ~VVirtualDataReader() {}
-        
+
         //!< get data format (MC/rawdata/MCvbf/Rawvbf)
         virtual string                      getDataFormat()
         {
@@ -173,7 +173,7 @@ class VVirtualDataReader
             fEventStatus = iS;
         }
         virtual bool                        wasLossyCompressed() = 0;
-        
+
         // rawfile
         virtual bool                        getNextEvent() = 0;
         virtual bool                        getPrevEvent()
@@ -191,7 +191,7 @@ class VVirtualDataReader
             return 0;
         }
 #endif
-        
+
         // telescopes pointing
         virtual std::vector< double >       getTelElevation()
         {
@@ -201,7 +201,7 @@ class VVirtualDataReader
         {
             return d;
         }
-        
+
         // MC
         virtual void                       setTrigger( vector<bool> iImage, vector<bool> iBorder ) {}
         virtual bool                       isMC() //!< is data MC?
@@ -300,7 +300,7 @@ class VVirtualDataReader
         {
             return  0.;
         }
-        
+
         virtual bool hasFADCTrace()
         {
             return true;
@@ -313,7 +313,7 @@ class VVirtualDataReader
         {
             return false;
         }
-        
+
         //!< has this event an array trigger or not
         virtual bool                       hasArrayTrigger()
         {
@@ -344,7 +344,7 @@ class VVirtualDataReader
         {
             return 0;
         }
-        
+
         // DST returns
         virtual std::valarray< double >&     getSums( unsigned int iNChannel = 99999 )
         {
@@ -374,11 +374,11 @@ class VVirtualDataReader
         {
             return vUI;
         }
-        
+
         virtual void setPerformFADCAnalysis( bool iB )
         {
             iB = false;
         }
-        
+
 };
 #endif

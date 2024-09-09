@@ -25,39 +25,39 @@ using namespace std;
 class VInstrumentResponseFunctionData : public TObject, public VHistogramUtilities
 {
     private:
-    
+
         // data tree
         CData*   fData;               //!
-        
+
         // energy binning
         int     fHistogrambinningEnergy_TeV_Log;
         double  fHistogrambinningEnergy_Min_Tev_Log;
         double  fHistogrambinningEnergy_Max_Tev_Log;
-        
+
         // angular binning
         int     fHistogrambinningAngular_Log;
         double  fHistogrambinningAngular_Min_Log;
         double  fHistogrambinningAngular_Max_Log;
-        
+
         // array centre
         double  fArrayCentre_X;
         double  fArrayCentre_Y;
-        
+
         TList*  calculateResolution( TH2D* iHistogram, TGraphErrors* iResult, string iHistoName,
                                      double iContainmentProbability, double iContainmentProbabilityError );
         double  getResolutionErrorfromToyMC( double i68, double iN );
         int     testResponseFunctionType( string iType );
-        
+
     public:
-    
+
         // list of function types
         vector< string > fListofResponseFunctionTypes;
-        
+
         // basic data
         string  fName;
         string  fType;                // describes type of response function (e.g. angular resolution or core resolution)
         int     fType_numeric;        //    (same as integer)
-        
+
         // characteristics (all angles in [deg])
         double  fZe;
         int     fAz_bin;
@@ -69,12 +69,12 @@ class VInstrumentResponseFunctionData : public TObject, public VHistogramUtiliti
         int     fNoise;
         double  fPedvars;
         double  fSpectralIndex;
-        
+
         double  fMCMaxCoreRadius;
         unsigned int fNTel;
-        
+
         unsigned int fEnergyReconstructionMethod;
-        
+
         // list of histograms
         enum    E_HISTOID { E_DIFF, E_DIFF2, E_LOGDIFF, E_NIMAG, E_DIST, E_ERROR, E_RELA,
                             E_DIFF_MC, E_DIFF2_MC, E_LOGDIFF_MC
@@ -83,7 +83,7 @@ class VInstrumentResponseFunctionData : public TObject, public VHistogramUtiliti
         vector< TH2D* >            f2DHisto;
         vector< TGraphErrors* >    fResolutionGraph;
         vector< double >           fContainmentProbability;
-        
+
         VInstrumentResponseFunctionData();
         ~VInstrumentResponseFunctionData() {}
         void   fill( double iWeigth );
@@ -120,7 +120,7 @@ class VInstrumentResponseFunctionData : public TObject, public VHistogramUtiliti
             fHistogrambinningAngular_Max_Log = iMax;
         }
         bool   terminate( double iContainmentProbability, double iContainmentProbabilityError );
-        
+
         ClassDef( VInstrumentResponseFunctionData, 9 );
 };
 

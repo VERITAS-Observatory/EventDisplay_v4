@@ -28,17 +28,17 @@ class VOrbitalPhase : public TObject
         TTree* fDataRunTree; // input tree
         TTree* fOTree;       // output tree
         int fNentries;       // entries input and output trees
-        
+
         // data written in output tree
         double fOrbit;    // in days
         double fRefMJD;
         double fOrbitalPhase;
-        
-        
+
+
     public:
         VOrbitalPhase();
         ~VOrbitalPhase() {};
-        
+
         /// set and get functions
         bool setInputFile();
         bool setOutputFile( string iOption );
@@ -63,7 +63,7 @@ class VOrbitalPhase : public TObject
         bool terminate();
         void printBinaryPars();
         void printHelp();
-        
+
         ClassDef( VOrbitalPhase, 1 );
 };
 

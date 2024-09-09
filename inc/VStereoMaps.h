@@ -28,18 +28,18 @@ struct sRE_REGIONS
 class VStereoMaps
 {
     private:
-    
+
         VAnaSumRunParameterDataClass fRunList;
         CData* fData;
-        
+
         // theta2 cut (might be energy dependent)
         double fTheta2Cut_Max;
-        
+
         double fTargetShiftWest;
         double fTargetShiftNorth;
-        
+
         bool   fTMPL_RE_nMaxoffsource;
-        
+
         // regions excluded from sky maps
         vector<double> vXTOEXCLUDE;
         vector<double> vYTOEXCLUDE;
@@ -50,60 +50,60 @@ class VStereoMaps
         vector<double> vAngTOEXCLUDE;
         vector<double> vXTOEXCLUDE_CameraCoordinates;
         vector<double> vYTOEXCLUDE_CameraCoordinates;
-        
+
         VRadialAcceptance* fAcceptance;
-        
+
         bool bUncorrelatedSkyMaps;
         bool fNoSkyPlots;                         //!< do full sky analysis (if false, analyse source region only)
-        
+
         double fNLoop;                            //!< calculation of bin area in fiducal area with random number method
-        
+
         TH2D* hmap_stereo;
         TH2D* hmap_alpha;
         TH1D* hmap_ratio;
         int fSourcePositionBinX;
         int fSourcePositionBinY;
-        
+
         TRandom3* fRandom;
-        
+
         int fInitRun;
-        
+
         void makeTwoDStereo_BoxSmooth( double, double, double, double, double );
-        
+
         // theta2 calculation
         unsigned int fTheta2_length;
         vector< double > fTheta2;
         vector< double > fTheta2_weight;
         vector< double > fTheta2_weightREonly;
         vector< double > fTheta2_All;
-        
+
         void initialize_theta2();
-        
+
         // RING BACKGROUND MODEL
         TFile* fRM_file;
-        
+
         bool fill_RingBackgroundModel( double, double, double, double, int, bool );
         bool initialize_RingBackgroundModel( bool iIsOn );
         void RM_calculate_norm();
         void RM_getAlpha( bool );
-        
+
         // REFLECTED REGION MODEL:
         vector< vector< sRE_REGIONS > > fRE_off;  //!< off region parameters
         double fRE_roffTemp;                      //!< radius of off source region
-        
+
         bool fill_ReflectedRegionModel( double, double, int, bool );
         bool fill_ReflectedRegionModel( double, double, int, bool, double& i_theta2 );
         void RE_getAlpha( bool iIsOn );
         bool initialize_ReflectedRegionModel();
         void initialize_ReflectedRegionHistograms();
-        
+
         // histograms related to reflected region model
         TH2D* hRE_NRegions;
         TTree* hRE_regions;
-        
+
         bool initialize_Histograms();
         TList* hAuxHisList;                       //!< histograms needed for various calculations
-        
+
         // some variables needed for efficient filling
         double f_RE_binXW;
         double f_RE_binYW;
@@ -114,7 +114,7 @@ class VStereoMaps
         double f_RE_AreaNorm;
         int f_RE_WW;
         int f_RE_WN;
-        
+
         // etc
         void   cleanup();                         // delete all objects not needed anymore
         bool   defineAcceptance();
@@ -125,15 +125,15 @@ class VStereoMaps
         bool   fillOff( double x_sky, double y_sky, double ze, double erec, int irun, bool ishapecuts );
         bool   fillOff( double x_sky, double y_sky, double ze, double erec, int irun, bool ishapecuts, double& i_theta2 );
         double phiInt( double );
-        
+
     public:
         TH1D* hAux_theta2On;                      //
         TH1D* hAux_theta2Off;
         TH1D* hAux_theta2Ratio;
-        
+
         VStereoMaps( bool, int, bool );
         ~VStereoMaps() {}
-        
+
         void              calculateTheta2( bool, double, double );
         bool              fill( bool is_on, double x_sky, double y_sky, double theta2CutMax, double ze,
                                 double erec, int irun, bool ishapecuts, double& i_theta2 );

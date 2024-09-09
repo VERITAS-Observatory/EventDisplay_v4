@@ -20,13 +20,13 @@
 class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
 {
     private:
-    
+
         bool fDebug;
         bool fInitialized;                        //!< true after initialization
-        
+
         vector< double > fMeanPointingMismatch;   //!< mean pointing mismatch between eventdisplay and vbf (per telescope)
         vector< double > fNMeanPointingMismatch;
-        
+
         // temporary variables needed for array reconstruction
         vector< unsigned int > telID;
         vector< float > x;
@@ -54,13 +54,13 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
         vector< float > az;
         vector< float > ze;
         vector<ULong64_t> teltype;
-        
+
         vector< float > xtelnew;
         vector< float > ytelnew;
         vector< float > ztelnew;
-        
+
         // private functions
-        
+
         void calcShowerDirection_and_Core();      //!< calculate shower core and direction
         void checkPointing();                     //!< check for mismatching between different pointing values
         void prepareforCoreReconstruction( unsigned int iMeth, float xs, float ys );
@@ -78,9 +78,9 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
         //!< transform telescope positions into shower coordinates
         void transformTelescopePosition( int iTel, float ize, float iaz, bool i_MC );
         bool updatePointingToStarCatalogue( unsigned int iTelescopeID );
-        
+
     public:
-    
+
         VArrayAnalyzer();
         ~VArrayAnalyzer();
         void doAnalysis();

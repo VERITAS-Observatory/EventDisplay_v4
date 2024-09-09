@@ -22,14 +22,14 @@ using namespace std;
 class VTMVADispAnalyzer
 {
     private:
-    
+
         bool fDebug;
         bool bZombie;
         string fDispType;
-        
+
         vector<ULong64_t> fTelescopeTypeList;
         map< ULong64_t, TMVA::Reader* > fTMVAReader;
-        
+
         float fWidth;
         float fLength;
         float fWoL;
@@ -48,12 +48,12 @@ class VTMVADispAnalyzer
         float fcross;
         float fRcore;
         float fEHeight;
-        
+
     public:
-    
+
         VTMVADispAnalyzer( string iFile, vector< ULong64_t > iTelTypeList, string iDispType = "BDTDisp" );
         ~VTMVADispAnalyzer() {}
-        
+
         float evaluate( float iWidth, float iLength, float iSize, float iAsymm, float iLoss,
                         float iTGrad, float icen_x, float icen_y, float xoff_4, float yoff_4,
                         ULong64_t iTelType, float iZe, float iAz, float iRcore,
@@ -64,7 +64,7 @@ class VTMVADispAnalyzer
             return bZombie;
         }
         void terminate();
-        
+
 };
 
 #endif

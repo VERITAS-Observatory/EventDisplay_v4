@@ -24,11 +24,11 @@ using namespace std;
 class VPlotRadialAcceptance : public VPlotUtilities
 {
     private:
-    
+
         bool fDebug;
-        
+
         string fName;
-        
+
         TFile* fAcceptanceFile;
         TH1F*  fAcceptanceHisto;
         TH1F*  fAcceptanceHistoFit;
@@ -39,17 +39,17 @@ class VPlotRadialAcceptance : public VPlotUtilities
         vector< TF1* >  fAcceptancePhiFitFunctionDeRot;
         TH1F*  hPhiDist;
         TH1F*  hPhiDistDeRot;
-        
+
         double fAxis_x_min;
         double fAxis_x_max;
         double fAxis_y_min;
         double fAxis_y_max;
-        
+
     public:
-    
+
         VPlotRadialAcceptance( string iFile = "", int iAzBin = -1 );
         ~VPlotRadialAcceptance() {}
-        
+
         TF1*  getAcceptanceFunction()
         {
             return fAcceptanceFunction;
@@ -62,7 +62,7 @@ class VPlotRadialAcceptance : public VPlotUtilities
         {
             return fAcceptanceHistoFit;
         }
-        
+
         //TCanvas* plotRadialAcceptance( TCanvas* cX = 0 );
         TCanvas* plotRadialAcceptance( TCanvas* cX = 0, int iColor = 1 );
         TCanvas* plotPhiDependentRadialAcceptances( TCanvas* cX = 0, int iterator = 4, bool iDeRot = false );
@@ -74,7 +74,7 @@ class VPlotRadialAcceptance : public VPlotUtilities
         {
             fName = iName;
         }
-        
+
         ClassDef( VPlotRadialAcceptance, 1 );
 };
 

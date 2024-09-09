@@ -37,16 +37,16 @@ using namespace std;
 class VGlobalRunParameter
 {
     private:
-    
+
         static bool      bReadRunParameter;
         static bool      bDebug;                                         // print debug output
-        
+
         static string       fObservatory;
         static double       fObservatory_Latitude_deg;
         static double       fObservatory_Longitude_deg;
         static double       fObservatory_Height_m;
-        
-        
+
+
         // OUTPUT TREE VERSION
         //
         // changes from 5 to 6: LTrig  now ULong64_t
@@ -55,24 +55,24 @@ class VGlobalRunParameter
         //
         // changes from 7 to 8: add MC primary to showerpars
         static unsigned int fEVNDISP_TREE_VERSION;
-        
+
         static string    fDBServer;                                         // database location (VTS)
         static string    fRawDataServer;                                    // location of raw data (VTS)
-        
+
         // DIRECTORIES
         static string fEVNDISPAnaDataDirectory;          // directory where all data (detectorgeometry, ...) is expected and written to (output file)
         static string fEVNDISPAnaDataDirectory_tmp;      // tmp directories for aux data (rarely used)
         static string fVBFRawDataDirectory;              // directory with VERITAS vbf data (vbf files)
         static string fEVNDISPCalibrationDataDirectory;  // directory where calibration data is expected and written to
         static string fEVNDISPOutputDirectory;           // output- and result files are written into this directory
-        
+
     public:
-    
+
         static string       fEVNDISP_VERSION;                             // EVNDISPLAY VERSION
-        
+
         VGlobalRunParameter( bool bSetGlobalParameter = true );
         virtual ~VGlobalRunParameter();
-        
+
         string       getDBServer() const
         {
             return fDBServer;
@@ -156,7 +156,7 @@ class VGlobalRunParameter
         }
         bool         setDirectory_EVNDISPCalibrationData( string iDir );
         bool         update( TChain* ic );
-        
+
         ClassDef( VGlobalRunParameter, 11 );
 };
 

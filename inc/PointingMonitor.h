@@ -45,15 +45,15 @@ namespace pointingmonitor
         float skyCameraScale;                ///< Plate scale of the sky camera (radians/pixel)
         float referencePixelX;               ///< X-position of reference CCD pixel
         float referencePixelY;               ///< Y-position of reference CCD pixel
-        
+
         /// Constructor: sets all members to 0
         CameraParameters() : isValid( false ), startDate( 0 ), endDate( 0 ), version( 0 ),
             pmtRotation( 0.0 ), pmtScale( 0.0 ),
             skyCameraRotation( 0.0 ), skyCameraScale( 0.0 ),
             referencePixelX( 0.0 ), referencePixelY( 0.0 ) {}
     };
-    
-    
+
+
     /// Structure holding the calibration parameters
     struct CalibrationParameters
     {
@@ -77,7 +77,7 @@ namespace pointingmonitor
         float l1;                            ///< Polynomial 4, 1st order
         float l2;                            ///< Polynomial 4, 2nd order
         float l3;                            ///< Polynomial 4, 3rd order
-        
+
         /// Constructor: sets all members to 0
         CalibrationParameters() : isValid( false ), startDate( 0 ), endDate( 0 ), version( 0 ),
             x0( 0.0 ), x1( 0.0 ), x2( 0.0 ), x3( 0.0 ),
@@ -85,8 +85,8 @@ namespace pointingmonitor
             z0( 0.0 ), z1( 0.0 ), z2( 0.0 ), z3( 0.0 ),
             l0( 0.0 ), l1( 0.0 ), l2( 0.0 ), l3( 0.0 ) {}
     };
-    
-    
+
+
     /// Structure holding the MJD(UTC) time and the uncalibrated pointing
     struct UncalibratedPointing
     {
@@ -96,19 +96,19 @@ namespace pointingmonitor
         float rotation;                      ///< Rotation angle (radians)
         float elevation;                     ///< Elevation from positioner (radians)
         float ledPosY;                       ///< Average y-position of LEDs (pixel)
-        
+
         /// Constructor: sets all members to 0
         UncalibratedPointing() : mjd( 0.0 ), ra( 0.0 ), dec( 0.0 ), rotation( 0.0 ),
             elevation( 0.0 ), ledPosY( 0.0 ) {}
-            
+
         /// Constructor: initializes all members
         UncalibratedPointing( double mjd, float ra, float dec, float rotation,
                               float elevation, float ledPosY )
             : mjd( mjd ), ra( ra ), dec( dec ), rotation( rotation ),
               elevation( elevation ), ledPosY( ledPosY ) {}
     };
-    
-    
+
+
     /// Structure holding the MJD(UTC) time and the calibrated pointing
     struct CalibratedPointing
     {
@@ -116,25 +116,25 @@ namespace pointingmonitor
         float ra;                            ///< Right ascension (radians)
         float dec;                           ///< Rotation angle (radians)
         float rotation;                      ///< Rotation angle (radians)
-        
+
         /// Constructor: sets all members to 0
         CalibratedPointing() : mjd( 0.0 ), ra( 0.0 ), dec( 0.0 ), rotation( 0.0 ) {}
-        
+
         /// Constructor: initializes all members
         CalibratedPointing( double mjd, float ra, float dec, float rotation )
             : mjd( mjd ), ra( ra ), dec( dec ), rotation( rotation ) {}
     };
-    
-    
-    
+
+
+
     /********************************************************************************/
     /* Functions for converting between Modified Julian Date and calendar date/time */
     /********************************************************************************/
-    
+
     class PointingMonitor : public VGlobalRunParameter
     {
         public:
-        
+
             /**
              * \brief Convert Modified Julian Date to a date integer
              *
@@ -143,7 +143,7 @@ namespace pointingmonitor
              * \param mjd          Modified Julian Date
              */
             uint32_t mjdToDate( double mjd );
-            
+
             /**
              * \brief Convert a date/time integer to Modified Julian Date
              *
@@ -151,13 +151,13 @@ namespace pointingmonitor
              * \param dateTime     Date and time in the form YYYYMMDDhhmmss
              */
             double dateTimeToMjd( uint64_t dateTime );
-            
+
             uint32_t dateToUInt32( const string& dateStr );
-            
+
             /************************************************************************/
             /* Functions for writing/reading camera parameters to/from the database */
             /************************************************************************/
-            
+
             /**
              * \brief Read sets of camera parameters for one telescope from the database
              *
@@ -173,7 +173,7 @@ namespace pointingmonitor
              */
             vector<CameraParameters>
             getCameraParametersList( uint32_t telescope_id, uint32_t date = 0, uint32_t limit = 0 );
-            
+
             /**
              * \brief Read latest set of camera parameters for a specified date from the database
              *
@@ -185,12 +185,12 @@ namespace pointingmonitor
              * \param date         Date (yyyymmdd)
              */
             CameraParameters getCameraParameters( uint32_t telescope_id, uint32_t date );
-            
-            
+
+
             /*****************************************************************************/
             /* Functions for writing/reading calibration parameters to/from the database */
             /*****************************************************************************/
-            
+
             /**
              * \brief Read sets of calibration parameters for one telescope from the database
              *
@@ -205,8 +205,8 @@ namespace pointingmonitor
              */
             vector<CalibrationParameters>
             getCalibrationParametersList( uint32_t telescope_id, uint32_t date = 0, uint32_t limit = 0 );
-            
-            
+
+
             /**
              * \brief Read latest set of calibration parameters for a specified date from the database
              *
@@ -217,12 +217,12 @@ namespace pointingmonitor
              * \param date         Date (yyyymmdd)
              */
             CalibrationParameters getCalibrationParameters( uint32_t telescope_id, uint32_t date );
-            
-            
+
+
             /****************************************************************************/
             /* Functions for writing/reading uncalibrated pointing to/from the database */
             /****************************************************************************/
-            
+
             /**
              * \brief Read uncalibrated pointings for a given time interval from the database
              *
@@ -234,13 +234,13 @@ namespace pointingmonitor
              */
             vector<UncalibratedPointing>
             getUncalibratedPointing( uint32_t telescope_id, double startmjd, double stopmjd );
-            
-            
+
+
             /*****************************************************/
             /* Functions for calculating the calibrated pointing */
             /*****************************************************/
-            
-            
+
+
             /**
              * \brief Calculates the calibrated pointing
              *
@@ -255,11 +255,11 @@ namespace pointingmonitor
             calibratedPointing( const vector<UncalibratedPointing>& pointingVec,
                                 const CameraParameters& camParameters,
                                 const CalibrationParameters& calParameters );
-                                
+
             PointingMonitor();
             ~PointingMonitor() {}
     };
-    
+
 }   // end of namespace
 
 #endif

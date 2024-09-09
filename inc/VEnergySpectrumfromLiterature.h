@@ -50,37 +50,37 @@ struct sEnergyFun
 class VEnergySpectrumfromLiterature : public VPlotUtilities
 {
     private:
-    
+
         bool  bIsZombie;
-        
+
         bool  fPlottingLogEnergyAxis;
         float fPlottingMinEnergy;
         float fPlottingMaxEnergy;
         float fPlottingYaxisMin;
         float fPlottingYaxisMax;
         float fPlottingMultiplierIndex;
-        
+
         vector< sEnergyFun > fEnergyFun;
-        
+
         vector< sData > fData;
-        
+
         vector< TH1D* > fRandomErrorHistograms;
-        
+
         bool checkIDRange( unsigned int iID );
-        
+
         unsigned int fIntegral_ID;
         TF1*         fIntegral_TF1;
         double       fIntegral_x[1000];
         double       fIntegral_y[1000];
-        
+
         bool         prepare_integration( unsigned int iID = 0, double iEmin = 1.e-3, double iEmax = 1.e3 );
         void         setFunctions();
-        
+
     public:
-    
+
         VEnergySpectrumfromLiterature( string ifile = "", bool iprint = true );
         ~VEnergySpectrumfromLiterature() {}
-        
+
         sData  getEnergySpectrumDataField( unsigned int iID = 0 );
         TF1*   getEnergySpectrum( unsigned int iID = 0, bool bLogEnergy = true, double iEnergyMin_Lin = -99., double iEnergyMax_Lin = -99. );
         TGraphAsymmErrors* getEnergySpectrumWithErrors( unsigned int iID = 0, bool bLogEnergy = true );
@@ -107,13 +107,13 @@ class VEnergySpectrumfromLiterature : public VPlotUtilities
         {
             return bIsZombie;
         }
-        
+
         void listValues();
         void listValues( unsigned int iID );
         TCanvas* plot( unsigned int iID = 0, TCanvas* c = 0, bool iPlotY = true );
         TCanvas* plot( string iselection, TCanvas* c = 0 );
         bool readValuesFromFile( string ifile = "$VERITAS_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues.dat", bool iPrint = true );
-        
+
         void setPlottingLogEnergyAxis( bool iB = true )
         {
             fPlottingLogEnergyAxis = iB;
@@ -137,7 +137,7 @@ class VEnergySpectrumfromLiterature : public VPlotUtilities
             fPlottingYaxisMin = iMin;
             fPlottingYaxisMax = iMax;
         }
-        
+
         ClassDef( VEnergySpectrumfromLiterature, 5 );
 };
 #endif

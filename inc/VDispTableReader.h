@@ -24,23 +24,23 @@ using namespace std;
 class VDispTableReader : public TNamed
 {
     private:
-    
+
         TList* hisList;
         TTree* fData;
-        
+
         void         getIndexBoundary( unsigned int* ib, unsigned int* il, vector< float >& iV, float x );
         unsigned int getTreeEntryID( int i_found_ze, int i_found_az, int i_found_woff, int i_found_noise );
         bool         isHistoBinningSet( string iVarName );
-        
+
     public:
-    
+
         map<unsigned int, int> fTreeEntry_Map;
         vector< float > f_ze;
         vector< float > f_az_min;
         vector< float > f_az_max;
         vector< float > f_woff;
         vector< float > f_noise;
-        
+
         float ze;
         unsigned int az_bin;
         float az_min;
@@ -62,15 +62,15 @@ class VDispTableReader : public TNamed
         map< string, int >    fHisto_binning;
         map< string, double > fHisto_min;
         map< string, double > fHisto_max;
-        
-        
+
+
         // disp table scaling
         double fWidthScaleParameter;
         double fLengthScaleParameter;
-        
+
         VDispTableReader();
         ~VDispTableReader() {}
-        
+
         bool fill( float i_ze, unsigned int i_az, float i_az_min, float i_az_max, float i_woff, float i_meanPedvars, TH2* iH2D, TH2* iH2DN, TH2* h2DPhi, TH2* h2DMiss, TH3* iH3D, TH3* iH3DN, TH3* h3DPhi, TH3* h3DMiss );
         unsigned int getAzBin( float az );
         float getLowerZe( float );
@@ -109,7 +109,7 @@ class VDispTableReader : public TNamed
             fLengthScaleParameter = iLS;
         }
         void terminate();
-        
+
         ClassDef( VDispTableReader, 6 );
 };
 #endif

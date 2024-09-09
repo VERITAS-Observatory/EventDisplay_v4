@@ -21,7 +21,7 @@ class CEffArea : public TObject
     public :
         TTree*          fChain;                   //!pointer to the analyzed TTree or TChain
         Int_t           fCurrent;                 //!current Tree number in a TChain
-        
+
         // Declaration of leaf types
         Double_t        ze;
         Int_t           az;
@@ -73,7 +73,7 @@ class CEffArea : public TObject
         TH1D*            hhEcutGammaHadron;
         TH1D*            hhEcutEnergyReconstruction;
         TH1D*            hWeightedRate;
-        
+
         // List of branches
         TBranch*        b_ze;                     //!
         TBranch*        b_az;                     //!
@@ -125,7 +125,7 @@ class CEffArea : public TObject
         TBranch*        b_hhEcutGammaHadron;   //!
         TBranch*        b_hhEcutEnergyReconstruction;   //!
         TBranch*        b_hWeightedRate; //!
-        
+
         CEffArea( TTree* tree = 0 );
         virtual ~CEffArea();
         virtual Int_t    Cut( Long64_t entry );
@@ -155,7 +155,7 @@ CEffArea::CEffArea( TTree* tree )
             f = new TFile( "effectiveArea.root" );
         }
         tree = ( TTree* )gDirectory->Get( "fEffArea" );
-        
+
     }
     Init( tree );
 }
@@ -217,7 +217,7 @@ void CEffArea::Init( TTree* tree )
     // code, but the routine can be extended by the user if needed.
     // Init() will be called many times when running on PROOF
     // (once per file to be processed).
-    
+
     // Set object pointer
     hEmc = 0;
     hEcut = 0;
@@ -256,7 +256,7 @@ void CEffArea::Init( TTree* tree )
     fChain = tree;
     fCurrent = -1;
     fChain->SetMakeClass( 1 );
-    
+
     fChain->SetBranchAddress( "ze", &ze, &b_ze );
     fChain->SetBranchAddress( "az", &az, &b_az );
     fChain->SetBranchAddress( "azMin", &azMin, &b_azMin );
@@ -490,7 +490,7 @@ void CEffArea::Init( TTree* tree )
     {
         hWeightedRate = 0;
     }
-    
+
     Notify();
 }
 
@@ -502,7 +502,7 @@ Bool_t CEffArea::Notify()
     // is started when using PROOF. It is normally not necessary to make changes
     // to the generated code, but the routine can be extended by the
     // user if needed. The return value is currently not used.
-    
+
     return kTRUE;
 }
 

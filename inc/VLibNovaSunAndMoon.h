@@ -15,15 +15,15 @@ using namespace std;
 class VLibNovaSunAndMoon
 {
     private:
-    
+
         struct ln_lnlat_posn fObserver;
-        
+
         double fJD;
-        
+
         void reset();
-        
+
     public:
-    
+
         VLibNovaSunAndMoon( double MJD );
         VLibNovaSunAndMoon( double ilong = 249.0478, double ilat = 31.675 );
         VLibNovaSunAndMoon( int year, int month, int day, int hour, int minute, int second );

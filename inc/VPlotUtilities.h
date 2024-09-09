@@ -31,17 +31,17 @@ using namespace std;
 class VPlottingAxisData
 {
     public:
-    
+
         string fName;
         string fAxis;           // X, Y, Z, ...
         string fAxisTitle;
         bool   fLogAxis;
         double fMinValue;
         double fMaxValue;
-        
+
         VPlottingAxisData();
         virtual ~VPlottingAxisData() {}
-        
+
         ClassDef( VPlottingAxisData, 1 );
 };
 
@@ -51,7 +51,7 @@ class VPlottingAxisData
 class VPlotUtilities
 {
     protected:
-    
+
         int    fPlottingCanvasX;
         int    fPlottingCanvasY;
         int    fPlottingColor;
@@ -60,28 +60,28 @@ class VPlotUtilities
         int    fPlottingLineStyle;
         double fPlottingLineWidth;
         int    fPlottingFillStyle;
-        
+
         int    fColorAxis_ncolor;
         int    fColorAxis_ncont;
         double fColorAxis_vmin;
         double fColorAxis_vmax;
         TGaxis* fColorAxis_axis;
-        
+
         string fPlotHistogramTitle;
         double fPlotHistogramTitle_x;
         double fPlotHistogramTitle_y;
-        
+
         map< string, VPlottingAxisData* > fPlottingAxisData;
-        
-        
+
+
     public:
-    
+
         VPlotUtilities();
         virtual ~VPlotUtilities();
         void default_settings();
         void plot_nullHistogram( TPad* c, TH1* h, bool bLogX = false, bool bLogY = false, double yTitleOffset = 1., double xmin = 0., double xmax = 0. );
         void plotHistogramTitle( TH1* h );
-        
+
         TGaxis* getColorAxisAxis( double x1 = 0.9, double x2 = 0.93, double y1 = 0.7, double y2 = 0.95, string AxisTitle = "", Int_t ndiv = 10, string iOption = "+L" );
         VPlottingAxisData* getPlottingAxis( string iName );
         int    getPlottingCanvasX()
@@ -155,7 +155,7 @@ class VPlotUtilities
         void   setTitles( TH1* his, string iname, string ititle, string ytitle );
         void   setBlackAndWhitePalette();
         TH2D*  removeOuterRing( TH2D* h, double r, double ivalue );
-        
+
         ClassDef( VPlotUtilities, 13 );
 };
 #endif

@@ -27,38 +27,38 @@ using namespace std;
 class VTableLookup
 {
     private:
-    
+
         unsigned int fDebug;                     // print debug output
         bool fwrite;                        // true for table filling, false for table reading
         char freadwrite;                    // 'w' for table filling, 'r' for table reading
         VTableLookupDataHandler* fData;
-        
+
         int fNumberOfIgnoredEvents;
-        
+
         VTableLookupRunParameter* fTLRunParameter;
-        
+
         int fNTel;
-        
+
         vector< int > fTelComb;
         vector< int > fTelCombID;
         string fTelCombString;
-        
+
         bool fUseMedianSizeforEnergyDetermination;
-        
+
         TFile* fLookupTableFile;                  // root files with lookup tables
         TDirectory* fDirMSCW;
         TDirectory* fDirMSCL;
         TDirectory* fDirEnergySR;
-        
+
         bool fWriteNoTriggerEvent;                // fill events with no triggers into the output tree
         bool fWrite1DHistograms;                  // write all 1D-histograms for median determination to disk
-        
+
         string fMCtable;
-        
+
         unsigned int fTableAzBins;
         vector< double > fTableAzLowEdge;
         vector< double > fTableAzUpEdge;
-        
+
         bool bEcorr;                              // do energy correction for height of shower maximum
         int fnmscw;
         vector< bool > fTelToAnalyze;
@@ -66,23 +66,23 @@ class VTableLookup
         vector< vector< double > > fTableZe;      // fZe[nnoiselevel][nze]
         // fDirectionOffset[nnoiselevel][nze][nwoff]
         vector< vector< vector< double > > > fTableDirectionOffset;
-        
+
         // tables
         // fmscw[noise][ze][woff][az][tel]
         vector< vector< vector< vector< vector< ULong64_t > > > > > fTelType_tables;
         vector< vector< vector< vector< vector< VTableCalculator* > > > > > fmscw;
         vector< vector< vector< vector< vector< VTableCalculator* > > > > > fmscl;
         vector< vector< vector< vector< vector< VTableCalculator* > > > > > fenergySizevsRadius;
-        
+
         // used for calculations
         VTableCalculator* f_calc_msc;
         VTableCalculator* f_calc_energySR;
-        
-        
+
+
         double fMeanNoiseLevel;
         vector< double > fNoiseLevel;             // pedestal variances per telescope from source file
         unsigned int fNNoiseLevelWarnings;
-        
+
         VTablesToRead* s_NupZupWup;
         VTablesToRead* s_NupZupWlow;
         VTablesToRead* s_NupZup;
@@ -98,7 +98,7 @@ class VTableLookup
         VTablesToRead* s_NlowZlow;
         VTablesToRead* s_Nlow;
         VTablesToRead* s_N;
-        
+
         void calculateMSFromTables( VTablesToRead* s, double esys );
         void configureTelescopeVector();
         bool cut( bool bWrite = false );  // apply cuts on successful reconstruction to input data
@@ -111,7 +111,7 @@ class VTableLookup
         void readLookupTable();
         void   readNoiseLevel( bool bWriteToRunPara = true ); // read noise level from pedvar histograms of data files
         bool sanityCheckLookupTableFile( bool iPrint = false );
-        
+
     public:
         VTableLookup( char readwrite, unsigned int iDebug = 0 );
         ~VTableLookup() {}
@@ -169,6 +169,6 @@ class VTableLookup
             fWrite1DHistograms = iB;
         }
         void   terminate();
-        
+
 };
 #endif

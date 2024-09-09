@@ -23,15 +23,15 @@ using namespace std;
 class VHistogramUtilities
 {
     private:
-    
+
         bool fDebug;
-        
-        
+
+
     public:
-    
+
         VHistogramUtilities();
         ~VHistogramUtilities() {}
-        
+
         static bool      divide( TGraphAsymmErrors* g, TGraphAsymmErrors* g1, TGraph* g2, double epsilon = 1.e-3 );
         static bool      divide( TGraphAsymmErrors* g, TGraphAsymmErrors* g1, TGraphAsymmErrors* g2, double epsilon = 1.e-3 );
         int              findBinInGraph( TGraph* g, double x );
@@ -47,25 +47,25 @@ class VHistogramUtilities
         TGraphErrors*    get_Profile_from_TH2D( TH2D* iH, TGraphErrors* g = 0, string iM = "median", int i_rebin = 2,
                                                 double iXaxisValue = -10., double iMinusValue = 0. );
         static TH1D*     get_ResidualHistogram_from_TF1( string iname = "", TH1* h = 0, TF1* f = 0 );
-        
+
         TH1F*            get_CTA_IRF_Histograms( string iHistogramName, double iCameraOffset );
         TH1F*            get_CTA_IRF_Histograms_from2D( string iHistogramName,  double iSummand = 0. );
-        
+
         static TH1*      normalizeTH1( TH1* h, bool iIntegral );
-        
+
         static TH2F*     reduce2DHistogramSize( TH2* h, string inewHistogramName );
         static TH2D*     calculateContainmentDistance( TH2D* h, string inewHistogramName );
         static double    interpolateTH2D( TH2* h, double x, double y );
-        
+
         static TH2*      interpolateResponseMatrix( TH2*, string iNewHistoName = "" );
         static bool      normalizeTH2D_y( TH2* h );
         static bool      normalizeTH2D_x( TH2* h );
-        
+
         void             setDebug( bool iB = true )
         {
             fDebug = iB;
         }
-        
+
         ClassDefNV( VHistogramUtilities, 12 );
 };
 

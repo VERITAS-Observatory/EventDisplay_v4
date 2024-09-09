@@ -101,7 +101,7 @@ class Val
 {
 
     public:
-    
+
         Val()
             : _valp( NULL ), _type( TINT ), _nelements( 1 ), _is_hex( 0 )
         {
@@ -111,7 +111,7 @@ class Val
         {
             ;
         }
-        
+
         virtual std::ostream& stream( std::ostream& ) = 0;
         virtual void*  getVoidPointerToValue()
         {
@@ -129,14 +129,14 @@ class Val
         {
             return false;
         }
-        
+
     protected:
-    
+
         void*  _valp;   //!< the stored value as a void* pointer
         int    _type;   //!< the FITS data type
         unsigned long   _nelements;  //!< width of data if array (default 1)
         bool   _is_hex; //!< whether or not to print as hexadecimal
-        
+
 };
 
 /**
@@ -209,15 +209,15 @@ class ArrayVal : public Val
                 return _nelements;
             }
         }
-        
+
         virtual bool isVariableLength()
         {
             return _sizep != NULL;
         }
-        
+
     private:
         unsigned long*  _sizep;  //!< pointer to a size for var-length arrays
-        
+
 };
 
 
@@ -362,17 +362,17 @@ class FITSRecord
 {
 
     public:
-    
+
         FITSRecord( fitsfile* fptr );
         FITSRecord( std::string fits_filename, std::string template_filename,
                     std::string extension_name = "", int extension_version = 0 );
         FITSRecord( std::string url );
-        
+
         ~FITSRecord();
-        
-        
-        
-        
+
+
+
+
         /**
          * Handle mapping of scalar values to columns (assume values
          * that are not pointers are single values)
@@ -388,7 +388,7 @@ class FITSRecord
         {
             addToMap( column, new ScalarVal<Type>( value ) );
         }
-        
+
         /**
          * Handle mapping of (fixed-length) arrays to columns. You
          * should specify the size of the array too (otherwise only
@@ -408,8 +408,8 @@ class FITSRecord
         {
             addToMap( column, new ArrayVal<Type>( value, n, sizep ) );
         }
-        
-        
+
+
         void	   write() throw( FITSRecordError );
         std::ostream&  print( std::ostream& stream );
         unsigned long  getNumWritten()
@@ -433,8 +433,8 @@ class FITSRecord
         bool hasColumn( std::string colname );
         void finishWriting();
         std::string locateTemplate( std::string template_filename );
-        
-        
+
+
         /**
          * write a header keyword to the current HDU. \throws
          * runtime_error if the header isn't already
@@ -449,27 +449,27 @@ class FITSRecord
         template<class Type>
         void writeHeader( std::string keyword, Type value )
         {
-        
+
             if(!_is_writable )
             {
                 throw FITSRecordError( "writeHeader: can't write to read-only file" );
             }
-            
+
             Type dummy;
             int fitstype = getFITSType( dummy );
             int status = 0;
-            
+
             // check if keyword is defined:
             char junk[81], comment[81];
             char ckeyword[81];
             strcpy( ckeyword, keyword.c_str() );
             fits_read_keyword( _fptr, ckeyword, junk, comment, &status );
-            
+
             if( status )
                 throw FITSRecordError( "writeHeader: " + keyword + " "
                                        + getFITSError( status ) );
-                                       
-                                       
+
+
             if( fitstype == USE_STREAMER_TO_STRING )
             {
                 // handle this type specially: convert it to a string using
@@ -477,7 +477,7 @@ class FITSRecord
                 if( _verbose >= 2 )
                     std::cout << "Writing " << keyword
                               << " using streamer -> TSTRING" << std::endl;
-                              
+
                 std::ostringstream str;
                 str << value;
                 // write with the longstr version, in case the string is
@@ -486,34 +486,34 @@ class FITSRecord
                 strcpy( longstr, str.str().c_str() );
                 fits_update_key_longstr( _fptr, ckeyword, longstr, NULL, &status );
                 delete longstr;
-                
+
             }
             else
             {
-            
+
                 if( _verbose >= 2 )
                     std::cout << "Writing " << keyword
                               << " using type " << fitstype << std::endl;
-                              
+
                 fits_update_key( _fptr, fitstype, ckeyword, ( void* )&value,
                                  NULL, &status );
             }
-            
-            
+
+
             if( status )
                 throw FITSRecordError( "writeHeader: " + keyword + " "
                                        + getFITSError( status ) );
-                                       
+
         }
-        
+
         bool printFITSTypes();
-        
+
         int isFinished()
         {
             return _is_finished;
         }
         bool read();
-        
+
         std::string readHeader( std::string keyword )
         {
             int status = 0;
@@ -526,11 +526,11 @@ class FITSRecord
                                        + getFITSError( status ) );
             return std::string( val );
         }
-        
-        
-        
+
+
+
     protected:
-    
+
         // helper struct for returning information about a column
         struct ColInfo
         {
@@ -540,12 +540,12 @@ class FITSRecord
             long int repeat;
             long int width;
         };
-        
+
         void		 addToMap( std::string column, Val* colval );
         ColInfo		 lookupColInfo( std::string column );
         void		 writeDate();
         std::string	 getFITSError( int status );
-        
+
         std::map<int, std::string> _namemap;
         std::map<int, Val*> _colmap; //!< maps column number to variable
         fitsfile* _fptr; //!
@@ -555,8 +555,8 @@ class FITSRecord
         int _extension_version;
         bool _is_finished;
         bool _is_writable;
-        
-        
+
+
 };
 
 

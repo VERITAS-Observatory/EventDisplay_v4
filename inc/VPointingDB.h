@@ -32,37 +32,37 @@ class VPointingDB : public VGlobalRunParameter
 {
     private:
         double degrad;
-        
+
         double fObsLongitude;
         double fObsLatitude;
-        
+
         bool fStatus;
-        
+
         bool fGoodVPM;
-        
+
         unsigned int fTelID;
         unsigned int fRunNumber;
-        
+
         int fMJDRunStart;                         // run start time
         double fTimeRunStart;
         int fMJDRunStopp;                         // run stop time
         double fTimeRunStopp;
-        
+
         unsigned int fMJD;
         double fTime;
-        
+
         unsigned int fEventStatus;
         float fTelAzimuth;
         float fTelElevation;
         float fTelExpectedAzimuth;
         float fTelExpectedElevation;
-        
+
         string fDBSourceName;
         float fDBTargetDec;
         float fDBTargetRA;
         float fDBWobbleNorth;
         float fDBWobbleEast;
-        
+
         unsigned int fCounter;
         unsigned int fDBNrows;
         vector< unsigned int > fDBMJD;
@@ -75,15 +75,15 @@ class VPointingDB : public VGlobalRunParameter
         vector< float > fDBTelAzimuth;
         vector< float > fDBTelExpectedElevation;
         vector< float > fDBTelExpectedAzimuth;
-        
+
         int fNWarnings;
-        
-        
+
+
         VDB_Connection* fmy_connection;
-        
+
         VTrackingCorrections* fTrackingCorrections;
         string fTPointCorrectionDate;
-        
+
         bool check_maskVPM( int maskVPM );
         bool getDBRunInfo();
         bool getDBTextRunInfo( string iDBTextDirectory );
@@ -96,7 +96,7 @@ class VPointingDB : public VGlobalRunParameter
         bool readPointingUncalibratedVPMFromDB();
         void readTrackingCorrections( string iTPointCorrection );
         void setup_DB_connection();
-        
+
         void delete_myconnection()
         {
             if( fmy_connection )
@@ -105,9 +105,9 @@ class VPointingDB : public VGlobalRunParameter
                 fmy_connection = 0;
             }
         }
-        
+
     public:
-    
+
         VPointingDB( unsigned int iTelID, unsigned int iRun );
         ~VPointingDB()
         {

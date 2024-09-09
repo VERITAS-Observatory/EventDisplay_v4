@@ -33,33 +33,33 @@ class VStarCatalogue : public TObject, public VGlobalRunParameter
 {
     private:
         bool   fDebug;
-        
+
         string fCatalogue;
         unsigned int fCatalogueVersion;
-        
+
         vector< VStar* > fStars;
         vector< VStar* > fStarsinFOV;
-        
+
         // telescope pointing
         unsigned int fTel_telescopeID;
         double       fTel_deRotationAngle_deg;
         double       fTel_ra;
         double       fTel_dec;
         double       fTel_camerascale;
-        
+
         bool readCatalogue();
         VStar* readCommaSeparatedLine_Fermi( string, int, VStar* );
         VStar* readCommaSeparatedLine_Fermi_Catalogue( string, int, VStar* );
         VStar* readCommaSeparatedLine_Fermi2nd_Catalogue( string, int, VStar* );
         VStar* readCommaSeparatedLine_FAVA( string, int, VStar* );
-        
+
     public:
-    
+
         VStarCatalogue();
         ~VStarCatalogue() {}
         bool          init( double MJD );
         bool          init( double MJD, string iCatalogue );
-        
+
         //    void          getStar( unsigned int ID, double &dec, double &ra, double &brightness );
         double        getDistanceToClosestStar( double x_cam_deg, double y_cam_deg );
         unsigned int  getNStar()
@@ -107,9 +107,9 @@ class VStarCatalogue : public TObject, public VGlobalRunParameter
         void          setTelescopePointing( unsigned int iTelID = 0, double iDerotationAngle = 0.,
                                             double ra_deg = -99., double dec_deg = -99., double iCameraScale = 1. );
         bool          writeCatalogueToRootFile( string iRootFile );
-        
+
         bool          checkTextBlocks( string iL, unsigned int iV );
-        
+
         ClassDef( VStarCatalogue, 7 );
 };
 #endif

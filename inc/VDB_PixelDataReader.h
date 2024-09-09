@@ -25,16 +25,16 @@ using namespace std;
 class VDB_PixelData
 {
     private:
-    
-    
+
+
     public:
-    
+
         string  fDataType;
         float   fTimeBinWidth_s;                    // typical interval of readout [s]
         vector< float > fMJD;                       // one entry per time bin
         vector< float > fsec_of_day;                // one entry per time bin
         vector< float > fData;                      // one entry per time bin
-        
+
         VDB_PixelData( string iDataType = "" );
         ~VDB_PixelData() {};
         void         print();
@@ -45,27 +45,27 @@ class VDB_PixelData
 class VDB_PixelDataReader
 {
     private:
-    
+
         bool  fDebug;
         bool  fDBStatus;
-        
+
         vector< unsigned int > fNPixel;
-        
+
         vector< float > fDummyReturnVector;
-        
+
         vector< string > fPixelDataType;
         vector< vector< vector< VDB_PixelData* > > > fPixelData;   // array [ndatatype][ntel][npixel]
         vector< vector< TH1F* > >  fPixelData_histogram;
-        
+
         void fillDataRow( unsigned int iDataType, string iTimeStamp, int iTel, int iPix, float iData );
         vector< unsigned int > getDeadChannelList( unsigned int iDataType, unsigned int iTel, int iMJD, float iTime,
                 float i_min, float i_max, bool bRMS = false );
         vector< float > getDataVector( unsigned int iDataType, unsigned int iTel, int iMJD, float iTime );
         TH1F*           getDataHistogram( unsigned int iDataType, unsigned int iTel, int iMJD, float iTime );
         float           getValue( unsigned int iDataType, unsigned int iTel, unsigned int iChannel, int iMJD, float iTime );
-        
+
     public:
-    
+
         VDB_PixelDataReader( vector< unsigned int > nPixel_per_telescope );
         ~VDB_PixelDataReader() {};
         bool   getDBStatus()

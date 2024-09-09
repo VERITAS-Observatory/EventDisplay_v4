@@ -40,13 +40,13 @@ using namespace std;
 class VTMVAEvaluatorData : public TNamed
 {
     public:
-    
+
         string            fTMVAName;
         string            fTMVAFileName;
         string            fTMVAFileNameXML;
         string            fTMVAMethodTag;
         string            fTMVAMethodTag_2;
-        
+
         unsigned int      fEnergyBin;
         double            fEnergyCut_Log10TeV_min;
         double            fEnergyCut_Log10TeV_max;
@@ -54,19 +54,19 @@ class VTMVAEvaluatorData : public TNamed
         unsigned int      fZenithBin;
         double            fZenithCut_min;
         double            fZenithCut_max;
-        
+
         double            fSignalEfficiency;
         double            fBackgroundEfficiency;
         double            fTMVACutValue;
         bool              fTMVAOptimumCutValueFound;
         double            fSourceStrengthAtOptimum_CU;
-        
+
         TMVA::Reader*     fTMVAReader;                       //!
-        
+
         VTMVAEvaluatorData();
         ~VTMVAEvaluatorData() {}
         void print();
-        
+
         ClassDef( VTMVAEvaluatorData, 3 );
 };
 
@@ -77,12 +77,12 @@ class VTMVAEvaluatorData : public TNamed
 class VTMVAEvaluatorResults : public TNamed
 {
     public:
-    
+
         vector< VTMVAEvaluatorData* > fTMVAData;
-        
+
         VTMVAEvaluatorResults() {}
         ~VTMVAEvaluatorResults() {}
-        
+
         ClassDef( VTMVAEvaluatorResults, 8 );
 };
 
@@ -91,20 +91,20 @@ class VTMVAEvaluatorResults : public TNamed
 class VTMVAEvaluator : public TNamed, public VPlotUtilities
 {
     private:
-    
+
         bool     fDebug;
         bool     fIsZombie;
-        
+
         VTMVAEvaluatorResults*  fTMVAEvaluatorResults;
         vector< VTMVAEvaluatorData* > fTMVAData;
-        
+
         CData*   fData;
-        
+
         map< unsigned int, double > fSignalEfficiencyMap;         // from user: energy dependent signal efficiency
         double                      fSignalEfficiencyNoVec;
         map< unsigned int, double > fTMVACutValueMap;
         double                      fTMVACutValueNoVec;
-        
+
         string                  fParticleNumberFileName;          // particle numbers are read from this file
         double                  fParticleNumberFile_Conversion_Rate_to_seconds;
         double                  fOptimizationSourceSignificance;
@@ -114,15 +114,15 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         double                  fOptimizationMinBackGroundEvents;
         double                  fOptimizationBackgroundAlpha;
         double                  fOptimizationObservingTime_h;
-        
+
         double   fTMVA_EvaluationResult;         // result from TVMA evaluator
         bool     fSmoothAndInterpolateMVAValues;
-        
+
         string   fTMVAMethodName;
         double   fTMVAErrorFraction_min;             // remove bins from background efficiency curves with large errors
-        
+
         double   fSpectralIndexForEnergyWeighting;        // used to calculate the spectral weighted mean of an energy bin
-        
+
         // gamma/hadron separation variables
         float    fNImages;
         float    fMSCW;
@@ -140,10 +140,10 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         float    fDispDiff;
         float    fDispDiff_log10;
         float    fDummy;
-        
+
         bool     bPlotEfficiencyPlotsPerBin;
         bool     fPrintPlotting;
-        
+
         TH1F*            getEfficiencyHistogram( string iName, TFile* iF, string iMethodTag_2 );
         bool             optimizeSensitivity( unsigned int iDataBin );
         TGraph*          fillfromGraph2D( TObject* i_G, double i_ze_min, double i_ze_max );
@@ -169,12 +169,12 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         void             smoothAndInterPolateMVAValue_EnergyOnly( TH1F*, TH1F* );
         void             smoothAndInterPolateMVAValue_Energy_and_Zenith( TH1F*, TH1F*,
                 unsigned int iE_min, unsigned int iE_max, unsigned int iZ_min, unsigned int iZ_max );
-                
+
     public:
-    
+
         VTMVAEvaluator();
         ~VTMVAEvaluator() {};
-        
+
         bool    evaluate();
         vector< double > getBackgroundEfficiency();
         vector< bool >   getOptimumCutValueFound();
@@ -214,7 +214,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
             fOptimizationBackgroundAlpha = iMinBackgroundRateRatio;
             fOptimizationObservingTime_h = iObservationTime_h;
         }
-        
+
         void   setSensitivityOptimizationFixedSignalEfficiency( double iOptimizationFixedSignalEfficiency = 1. );
         void   setSensitivityOptimizationMinSourceStrength( double iOptimizationMinSourceStrength = 0.001 );
         void   setParticleNumberFile( string iParticleNumberFile = "", double iConversionFactor_to_seconds = 60. )
@@ -247,7 +247,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
             fTMVAErrorFraction_min = iTMVAErrorFraction_min;
         }
         void   setTMVAMethod( string iMethodName = "BDT" );
-        
+
         ClassDef( VTMVAEvaluator, 33 );
 };
 

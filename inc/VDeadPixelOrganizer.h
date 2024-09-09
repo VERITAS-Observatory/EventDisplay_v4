@@ -34,15 +34,15 @@ class VNPixel             ;
 class VNTime
 {
     public :
-    
+
         // variables
         double mjd  ;
         double time ;
-        
+
         // functions
         VNTime( int mjd_days = -1, double time_seconds = -1.0 ) ;
         VNTime halfwayTime( const VNTime vnt ) ;
-        
+
         friend ostream& operator<<( ostream& os, const VNTime& vnt )
         {
             os << "MJD" << vnt.mjd << ":" << ( int )vnt.time << "s" ;
@@ -53,7 +53,7 @@ class VNTime
             os << (*vnt ) ;
             return os ;
         }
-        
+
 } ;
 
 // Everywhere you see PixelStateInt, this refers to
@@ -99,10 +99,10 @@ class VNGain
         bool   fIsLow ; // true if lowgain, false if highGain
         string fGainName ;
         char   fGainChar ;
-        
+
         VNPixel* fPixel ;  // pointer to parent VNPixel
         vector<VNStateDuration> stateHistory ;
-        
+
         // functions
         VNGain()
         {
@@ -120,35 +120,35 @@ class VNGain
             return !fIsLow ;
         } ;
         bool isRealObject() ; // for testing if this is a real object or an empty copy
-        
+
         // cout << VNGain
         friend ostream& operator<<( ostream& os, const VNGain& vng )
         {
             cout << coutprefix << "======== VNGain " << vng.fGainName << " : " << vng.stateHistory.size() << " rows of history" << endl;
             return os ;
         }
-        
+
         // cout << * VNGain
         friend ostream& operator<<( ostream& os, const VNGain* vng )
         {
             os << (*vng ) ;
             return os ;
         }
-        
+
 } ;
 
 typedef map<string, VNGain> MapOfVNGains ;
 class VNPixel
 {
     public :
-    
+
         // variables
         int pixid_evndisp  ; // 0-498
         int pixid_dbtables ; // 1-499
         VNCameraCoordinate pixelCoord ;
         MapOfVNGains gainMap ; // "high" or "low"
         VNTelescope* fTelescope ;  // this pixel's parent telescope
-        
+
         // functions
         VNPixel() {} ;
         void initialize( int pixid, VNTelescope* parentVNT ) ;
@@ -162,7 +162,7 @@ class VNPixel
         void setParentVNTelescopePointer( VNTelescope* ptr ) ;
         bool isRealObject() ;
         //void updateState( bool lowGain, int mjd, double ti, PixelStateInt st ) ;
-        
+
         // cout << VNPixel
         friend ostream& operator<<( ostream& os, const VNPixel& vnp )
         {
@@ -175,25 +175,25 @@ class VNPixel
             }
             return os ;
         }
-        
+
         // cout << * VNPixel
         friend ostream& operator<<( ostream& os, const VNPixel* vnp )
         {
             os << (*vnp ) ;
             return os ;
         }
-        
+
 } ;
 
 typedef map<int, VNPixel> MapOfVNPixels ;
 class VNTelescope
 {
     public :
-    
+
         // variables
         MapOfVNPixels pixelMap ; // 1-499
         VDeadPixelOrganizer* fOrganizer ;  // pointer to parent class
-        
+
         // functions
         VNTelescope() {} ;
         void initialize( int telid, int npix, VDeadPixelOrganizer* parentVDPO ) ;
@@ -216,7 +216,7 @@ class VNTelescope
         void setParentVDeadPixelOrganizerPointer( VDeadPixelOrganizer* vdpo ) ;
         void setupMap() ;
         bool isRealObject() ;
-        
+
         // cout << VNTelescope
         friend ostream& operator<<( ostream& os, const VNTelescope& vnt )
         {
@@ -228,16 +228,16 @@ class VNTelescope
             }
             return os ;
         }
-        
+
         // cout << *VNTelescope
         friend ostream& operator<<( ostream& os, const VNTelescope* vnt )
         {
             os << (*vnt ) ;
             return os ;
         }
-        
+
     private :
-    
+
         // variables
         int fTelID ;
         int npix   ;
@@ -247,7 +247,7 @@ typedef map<int, VNTelescope> MapOfVNTelescopes ;
 class VDeadPixelOrganizer
 {
     public :
-    
+
         // variables
         VNTime  fRunStart      ;
         VNTime  fRunEnd        ;
@@ -255,7 +255,7 @@ class VDeadPixelOrganizer
         MapOfVNTelescopes   telescopeMap ;
         VDetectorGeometry* fDetectorGeo ;  // for getting pixel numbers and coordinates
         bool fWriteCSV ;
-        
+
         // functions
         VDeadPixelOrganizer( int ntel = 0, int npix = 0, VDetectorGeometry* detGeo = 0, int startMJD = 0, double startSec = 0.0, int endMJD = 0, double endSec = 0.0, string treename = "deadPixReg", int runNumber = 0 ) ;
         void     setNtel( int    ntelescopes )
@@ -299,13 +299,13 @@ class VDeadPixelOrganizer
         void updatePreviousEventInfo( int eventNumber, int eventMJD, double eventTime ) ;
         void setupMap() ; // call this to initialize object properly
         // call set_ntel() and set_npix() before this, though
-        
+
         void UpdatePixelState( int tel, int pix, bool lowGain, int mjd, double time, PixelStateInt state ) ;
         void topOffRows() ;
         void printSummary() ;
         void organize() ;
         void finalize() ;     // call to write tree to file
-        
+
         // cout << VDeadPixelOrganizer
         friend ostream& operator<<( ostream& os, const VDeadPixelOrganizer& dpo )
         {
@@ -316,24 +316,24 @@ class VDeadPixelOrganizer
             {
                 os << coutprefix << telIter->second ;
             }
-            
+
             return os ;
         }
-        
+
         // cout << * VDeadPixelOrganizer
         friend ostream& operator<<( ostream& os, const VDeadPixelOrganizer* dpo )
         {
             os << (*dpo ) ;
             return os ;
         }
-        
+
     private :
-    
+
         // variables
         int      ntel       ;
         int      npix       ;
         int      fRunNumber ;
         string   fTreeName  ;
         TTree*   fRegTree   ;
-        
+
 } ;

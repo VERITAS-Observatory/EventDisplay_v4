@@ -37,47 +37,47 @@ extern TMinuit* fLLFitter;
 class VImageParameterCalculation : public TObject
 {
     private:
-    
+
         bool fDebug;
         bool fLLDebug;
-        
+
         VDetectorGeometry* fDetectorGeometry;     //< the detector geometry
         VImageParameter* fParGeo;                 //!< image parameters (geo.)
         bool fboolCalcGeo;                        //!< switch to show if there was a geometrical analysis
         bool fboolCalcTiming;                     //!< switch to show if there was a timing analysis
         VImageParameter* fParLL;                      //!< image parameters (log likelihood)
-        
+
         VEvndispData* fData;
-        
+
         vector<double> fll_X;                     //!< data vector for minuit function (x-coordinate of pmt)
         vector<double> fll_Y;                     //!< data vector for minuit function (y-coordinate of pmt)
         vector<double> fll_Sums;                  //!< data vector for minuit function
         vector<double> fll_Pedvars;               //!< data vector for minuit function
         vector<bool> fLLEst;                      //!< true if channel has an estimated sum from the LL fit
-        
+
         double getFractionOfImageBorderPixelUnderImage( double, double, double, double, double, double );
         double redang( double angle, double maxI );  //!< reduce angle to interval [0.,maxI]
         void   setImageBorderPixelPosition( VImageParameter* iPar );
-        
+
         // Hough transform
         VHoughTransform* fHoughTransform;
-        
+
     public:
-    
+
         VImageParameterCalculation( unsigned int iShortTree = 0, VEvndispData* iData = 0 );
         ~VImageParameterCalculation();
         vector<bool> calcLL( bool );                                                               //!< calculate image parameters (log like)
         void muonRingFinder();                                                                 //!< fit a single ring to the image to look for muons
         void sizeInMuonRing();                                                                 //! calculate the brightness of the muon ring
         void muonPixelDistribution();                                                          //!< determine the distribution of pixels in the image
-        
+
         //Impact parameter correction factor for size
         float correctSizeInMuonRing();
-        
+
         //Hough transform
         void houghInitialization(); 				//Initialize the Hough transform class
         void houghMuonPixelDistribution();          //!< determine the distribution of pixels in the image
-        
+
         void calcTriggerParameters( vector<bool> fTrigger );                                   //!< MS: calculate trigger-level image parameters
         void calcParameters();                                                                 //!< calculate image parameters (geo.)
         void calcTimingParameters();

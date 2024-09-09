@@ -27,51 +27,51 @@ using namespace std;
 class VInstrumentResponseFunction
 {
     private:
-    
+
         bool  fDebug;
-        
+
         // basic data
         string  fName;
         string  fType;                // describes type of response function (e.g. angular resolution or core resolution)
-        
+
         // run parameter
         VInstrumentResponseFunctionRunParameter* fRunPara;
-        
+
         // data tree
         CData*   fData;
-        
+
         // return data tree
         TTree*    fDataProduct;
         VInstrumentResponseFunctionData* fIRFData_Tree;
-        
+
         // histograms are not re-filled but duplicated
         unsigned int fDuplicationID;
-        
+
         unsigned int fEnergyReconstructionMethod;
-        
+
         // histograms and data
         vector< vector< VInstrumentResponseFunctionData* > > fIRFData;
-        
+
         // cuts
         VGammaHadronCuts* fAnaCuts;
         bool    fTelescopeTypeCutsSet;
-        
+
         // effective area calculation
         vector< double > fVMinAz;
         vector< double > fVMaxAz;
         // spectral weighting
         vector< double > fVSpectralIndex;
         VSpectralWeight* fSpectralWeight;
-        
+
         // containment probabilities
         double  fContainmentProbability;
         double  fContainmentProbabilityError;
-        
+
         bool    defineHistograms();
         bool    fillEventData();
-        
+
     public:
-    
+
         VInstrumentResponseFunction();
         ~VInstrumentResponseFunction() {}
         bool   doNotDuplicateIRFs()
@@ -92,8 +92,8 @@ class VInstrumentResponseFunction
         {
             return fDataProduct;
         }
-        
-        
+
+
         vector< TH2D* > getAngularResolution2D( unsigned int iAzBin, unsigned int iSpectralIndexBin );
         TGraphErrors* getAngularResolutionGraph( unsigned int iAzBin, unsigned int iSpectralIndexBin );
         unsigned int getDuplicationID()
@@ -112,7 +112,7 @@ class VInstrumentResponseFunction
         {
             return fType;
         }
-        
+
         bool   initialize( string iName, string iType, unsigned int iNTel, double iMCMaxCoreRadius,
                            double iZe, int iNoise, double iPedvars, double iXoff, double iYoff );
         void   setDuplicationID( unsigned int iDuplicationID = 9999 );
@@ -130,7 +130,7 @@ class VInstrumentResponseFunction
             fTelescopeTypeCutsSet = iB;
         }
         void   setRunParameter( VInstrumentResponseFunctionRunParameter* iRunPar = 0 );
-        
+
 };
 
 #endif

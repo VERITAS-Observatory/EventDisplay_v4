@@ -34,11 +34,11 @@ class VPlotRunSummary : public VPlotUtilities, public TObject
 {
     private:
         bool bIsZombie;
-        
+
         TFile* fIn;
         TTree* t;
         CRunSummary* c;
-        
+
         vector< double > fPhaseMin;
         vector< double > fPhaseMax;
         vector< double > fRunList;
@@ -47,7 +47,7 @@ class VPlotRunSummary : public VPlotUtilities, public TObject
         vector< vector< double > > fPhaseRatePerRun;
         vector< vector< double > > fPhaseRateEPerRun;
         vector< vector< double > > fPhaseSigniPerRun;
-        
+
         // daily values
         vector< double > fDayDate;
         vector< double > fDayMJD;
@@ -59,38 +59,38 @@ class VPlotRunSummary : public VPlotUtilities, public TObject
         vector< double > fDayRate;
         vector< double > fDayRateE;
         vector< double > fDaySigni;
-        
+
         void defineGraphsAndHistograms( string iname, int icolor, int imarker, bool b1129 );
         double getPhase( double iMJD );
         bool openfile( string ifile, int iTot = 1 );
-        
+
         int fMinRun;
         int fMaxRun;
         vector< int > fListofExcludedRuns;
-        
+
         double fMinElevation;
         double fMaxElevation;
-        
+
         // orbital phase related variables
         unsigned int fNPhaseBins;
         double fPhaseOrbit;
         double fPhaseT0;
         double fPhasePoff;
-        
+
     public:
-    
+
         TList* gList;
-        
+
         TH1D* hRunDuration;
-        
+
         TH1D* hRate;
         TH1D* hSignificance;
-        
+
         TGraphErrors* gRatevsTime;
         TGraphErrors* gRateOffvsTime;
         TGraphErrors* gSignificancevsTime;
         TGraphErrors* gCumSignificancevsTime;
-        
+
         TGraphErrors* gRatevsElevation;
         TGraphErrors* gRateOffvsElevation;
         TGraphErrors* gRatevsElevationBinned;
@@ -99,16 +99,16 @@ class VPlotRunSummary : public VPlotUtilities, public TObject
         TGraphErrors* gRawRatevsElevationBinned;
         TGraphErrors* gSignificancevsElevation;
         TGraphErrors* gSignificancevsElevationBinned;
-        
+
         TGraphErrors* gRatevsWobbleDirection;
         TGraphErrors* gRateOffvsWobbleDirection;
         TGraphErrors* gSignificancevsWobbleDirection;
         TGraphErrors* gElevationvsWobbleDirection;
-        
+
         TGraphErrors* gRatevsWobbleOffset;
         TGraphErrors* gRateOffvsWobbleOffset;
         TGraphErrors* gSignificancevsWobbleOffset;
-        
+
         TGraphErrors* gRatevsPhase;
         TGraphErrors* gRatevsPhaseBinned;
         TGraphErrors* gRawRatevsPhase;
@@ -117,17 +117,17 @@ class VPlotRunSummary : public VPlotUtilities, public TObject
         TGraphErrors* gElevationvsPhaseBinned;
         TGraphErrors* gSignificancevsPhase;
         TGraphErrors* gSignificancevsPhaseBinned;
-        
+
         TGraphErrors* gRatesvsTimeDaily;
         TGraphErrors* gRatevsPhaseDaily;
         TGraphErrors* gSignificancevsPhaseDaily;
-        
+
         TH1D* hPedvars;
         TH1D* hAbsAzimuth;
         TH1D* hElevation;
-        
+
         TH2D* hMaxSigniXY;
-        
+
         VPlotRunSummary( string ifile, unsigned int iTot = 1, string iname = "A", int icolor = 1, int imarker = 20, bool b1129 = true );
         ~VPlotRunSummary() {}
         void fill();
@@ -164,7 +164,7 @@ class VPlotRunSummary : public VPlotUtilities, public TObject
         }
         void writeRunTable();
         void writeRunTable( string iout, bool iPhases = false, bool iSignificancePerHour = false, bool iCorrectForDeadTimes = false );
-        
+
         ClassDef( VPlotRunSummary, 2 );
 };
 #endif

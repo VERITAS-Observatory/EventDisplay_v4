@@ -31,10 +31,10 @@ class Cshowerpars
         bool            bMC;
         bool            bDeRot;
         bool            bShort;
-        
+
         TTree*          fChain;                   //!pointer to the analyzed TTree or TChain
         Int_t           fCurrent;                 //!current Tree number in a TChain
-        
+
         // Declaration of leave types
         Int_t           runNumber;
         Int_t           eventNumber;
@@ -119,7 +119,7 @@ class Cshowerpars
         Float_t        MCxcore_SC;
         Float_t        MCycore_SC;
         Float_t        MCzcore_SC;
-        
+
         // List of branches
         TBranch*        b_runNumber;              //!
         TBranch*        b_eventNumber;            //!
@@ -184,7 +184,7 @@ class Cshowerpars
         TBranch*        b_MCxcore_SC;             //!
         TBranch*        b_MCycore_SC;             //!
         TBranch*        b_MCzcore_SC;             //!
-        
+
         Cshowerpars( TTree* tree = 0, bool iMC = false, bool iShort = false );
         virtual ~Cshowerpars();
         virtual Int_t    GetEntry( Long64_t entry );
@@ -212,11 +212,11 @@ Cshowerpars::Cshowerpars( TTree* tree, bool iMC, bool iShort )
     {
         return;
     }
-    
+
     bMC = iMC;
     bDeRot = false;
     bShort = iShort;
-    
+
     Init( tree );
 }
 
@@ -238,7 +238,7 @@ Int_t Cshowerpars::GetEntry( Long64_t entry )
     {
         return 0;
     }
-    
+
     return fChain->GetEntry( entry );
 }
 
@@ -280,7 +280,7 @@ void Cshowerpars::Init( TTree* tree )
     fChain = tree;
     fCurrent = -1;
     fChain->SetMakeClass( 1 );
-    
+
     if( tree->GetBranchStatus( "MCe0" ) )
     {
         bMC = true;
@@ -289,7 +289,7 @@ void Cshowerpars::Init( TTree* tree )
     {
         bDeRot = true;
     }
-    
+
     fChain->SetBranchAddress( "runNumber", &runNumber );
     fChain->SetBranchAddress( "eventNumber", &eventNumber );
     if( fChain->GetBranchStatus( "eventStatus" ) )
@@ -321,7 +321,7 @@ void Cshowerpars::Init( TTree* tree )
     }
     fChain->SetBranchAddress( "TelElevation", TelElevation );
     fChain->SetBranchAddress( "TelAzimuth", TelAzimuth );
-    
+
     if(!bMC )
     {
         fChain->SetBranchAddress( "TelDec", TelDec );
@@ -335,7 +335,7 @@ void Cshowerpars::Init( TTree* tree )
             TelRA[i] = 0;
         }
     }
-    
+
     if(!bMC && !bShort )
     {
         fChain->SetBranchAddress( "TelElevationVBF", TelElevationVBF );
@@ -393,7 +393,7 @@ void Cshowerpars::Init( TTree* tree )
             MethodID[i] = 0;
         }
     }
-    
+
     fChain->SetBranchAddress( "NImages", NImages );
     fChain->SetBranchAddress( "img2_ang", img2_ang );
     fChain->SetBranchAddress( "ImgSel", ImgSel );
@@ -623,7 +623,7 @@ Bool_t Cshowerpars::Notify()
         b_Ycore_SC = 0;
         b_stdp = 0;
     }
-    
+
     b_Chi2 = fChain->GetBranch( "Chi2" );
     b_DispDiff = fChain->GetBranch( "DispDiff" );
     if( bMC )
@@ -666,7 +666,7 @@ Bool_t Cshowerpars::Notify()
             b_MCycore_SC = 0;
         }
     }
-    
+
     return kTRUE;
 }
 
