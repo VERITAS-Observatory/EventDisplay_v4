@@ -313,13 +313,14 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 	fXoff = fshowerpars->Xoff[fMethod];
 	fYoff = fshowerpars->Yoff[fMethod];
 	// for table filling: check as soon as possible if the event is useful
-	if( fwrite && !isReconstructed() )
+    // TMP TODO TMP
+/*	if( fwrite && !isReconstructed() )
 	{
 		fEventStatus = false;
 		fEventCounter++;
 		fNStats_Chi2Cut++;
 		return 0;
-	}
+        } */
 	// fill MC parameters
 	if( fIsMC )
 	{
@@ -450,7 +451,8 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 	}
 
 	// for filling of lookup tables: first do quality cuts, if not return
-	if( fwrite )
+    // TMPTMPTMP
+/*	if( fwrite )
 	{
 		if( !cut( true ) )
 		{
@@ -466,7 +468,9 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		{
 			fEventStatus = true;
 		}
-	}
+	}*/
+    fEventStatus = true;
+    // END TMP TMP TMP
 	// (end of accessing showerpars tree)
 	//////////////////////////////////////////
 
@@ -514,6 +518,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			}
 			ftpars[i]->GetEntry( fEventCounter );
 
+            fntubes[i] = ftpars[i]->ntubes;
 			fdist[i] = ftpars[i]->dist;
 			ffui[i] = ftpars[i]->fui;
 			fsize[i] = ftpars[i]->size;
@@ -562,7 +567,6 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			if( !bShort )
 			{
 				fmeanPedvar_ImageT[i] = ftpars[i]->meanPedvar_Image;
-				fntubes[i] = ftpars[i]->ntubes;
 				fnsat[i] = ftpars[i]->nsat;
 				fnlowgain[i] = ftpars[i]->nlowgain;
 				falpha[i] = ftpars[i]->alpha;
@@ -2100,6 +2104,8 @@ void VTableLookupDataHandler::resetImageParameters( unsigned int i )
 	fwidth[i] = 0.;
 	flength[i] = 0.;
 	fmeanPedvar_ImageT[i] = 0.;
+	fcen_x[i] = 0.;
+	fcen_y[i] = 0.;
 	if( fwrite )
 	{
 		return;
@@ -2111,8 +2117,6 @@ void VTableLookupDataHandler::resetImageParameters( unsigned int i )
 	falpha[i] = 0.;
 	flos[i] = 0.;
 	fasym[i] = 0.;
-	fcen_x[i] = 0.;
-	fcen_y[i] = 0.;
 	fpointing_dx[i] = 0.;
 	fpointing_dy[i] = 0.;
 	fcosphi[i] = 0.;
