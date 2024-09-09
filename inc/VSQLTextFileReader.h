@@ -15,35 +15,35 @@ using namespace std;
 
 class VSQLTextFileReader
 {
-	private:
+    private:
 
-		bool fIsGood;
-		map<string, vector< string >> fData;
+        bool fIsGood;
+        map<string, vector< string >> fData;
 
-		void readSQLFile( string iSQLFile );
+        void readSQLFile( string iSQLFile );
 
-	public:
+    public:
 
-		VSQLTextFileReader( string iSQLFile );
-		VSQLTextFileReader(
-			string iSQLFileDirectory,
-			unsigned irunnumber,
-			string iSQLFileType,
-			unsigned int iTelID = 9999 );
-		~VSQLTextFileReader() {}
+        VSQLTextFileReader( string iSQLFile );
+        VSQLTextFileReader(
+            string iSQLFileDirectory,
+            unsigned irunnumber,
+            string iSQLFileType,
+            unsigned int iTelID = 9999 );
+        ~VSQLTextFileReader() {}
 
-		string getValue_from_key( string iKey );
-		vector< string > getValueVector_from_key( string iKey );
-		vector< unsigned int > getValueVector_from_key_as_integer( string iKey );
-		vector< double > getValueVector_from_key_as_double( string iKey );
-		string getValue_from_key( string iKey, string iSearchKey, string iValue );
+        string getValue_from_key( string iKey );
+        vector< string > getValueVector_from_key( string iKey );
+        vector< unsigned int > getValueVector_from_key_as_integer( string iKey );
+        vector< double > getValueVector_from_key_as_double( string iKey );
+        string getValue_from_key( string iKey, string iSearchKey, string iValue );
 
-		bool checkDataVectorsForSameLength();
-		bool isGood()
-		{
-			return fIsGood;
-		}
-		void printData();
+        bool checkDataVectorsForSameLength();
+        bool isGood()
+        {
+            return fIsGood;
+        }
+        void printData();
 };
 
 #endif

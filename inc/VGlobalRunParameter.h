@@ -36,128 +36,128 @@ using namespace std;
 
 class VGlobalRunParameter
 {
-	private:
+    private:
 
-		static bool      bReadRunParameter;
-		static bool      bDebug;                                         // print debug output
+        static bool      bReadRunParameter;
+        static bool      bDebug;                                         // print debug output
 
-		static string       fObservatory;
-		static double       fObservatory_Latitude_deg;
-		static double       fObservatory_Longitude_deg;
-		static double       fObservatory_Height_m;
+        static string       fObservatory;
+        static double       fObservatory_Latitude_deg;
+        static double       fObservatory_Longitude_deg;
+        static double       fObservatory_Height_m;
 
 
-		// OUTPUT TREE VERSION
-		//
-		// changes from 5 to 6: LTrig  now ULong64_t
-		//                      ImgSel now ULong64_t
-		// changes from 6 to 7: introduced list of selected telescopes
-		//
-		// changes from 7 to 8: add MC primary to showerpars
-		static unsigned int fEVNDISP_TREE_VERSION;
+        // OUTPUT TREE VERSION
+        //
+        // changes from 5 to 6: LTrig  now ULong64_t
+        //                      ImgSel now ULong64_t
+        // changes from 6 to 7: introduced list of selected telescopes
+        //
+        // changes from 7 to 8: add MC primary to showerpars
+        static unsigned int fEVNDISP_TREE_VERSION;
 
-		static string    fDBServer;                                         // database location (VTS)
-		static string    fRawDataServer;                                    // location of raw data (VTS)
+        static string    fDBServer;                                         // database location (VTS)
+        static string    fRawDataServer;                                    // location of raw data (VTS)
 
-		// DIRECTORIES
-		static string fEVNDISPAnaDataDirectory;          // directory where all data (detectorgeometry, ...) is expected and written to (output file)
-		static string fEVNDISPAnaDataDirectory_tmp;      // tmp directories for aux data (rarely used)
-		static string fVBFRawDataDirectory;              // directory with VERITAS vbf data (vbf files)
-		static string fEVNDISPCalibrationDataDirectory;  // directory where calibration data is expected and written to
-		static string fEVNDISPOutputDirectory;           // output- and result files are written into this directory
+        // DIRECTORIES
+        static string fEVNDISPAnaDataDirectory;          // directory where all data (detectorgeometry, ...) is expected and written to (output file)
+        static string fEVNDISPAnaDataDirectory_tmp;      // tmp directories for aux data (rarely used)
+        static string fVBFRawDataDirectory;              // directory with VERITAS vbf data (vbf files)
+        static string fEVNDISPCalibrationDataDirectory;  // directory where calibration data is expected and written to
+        static string fEVNDISPOutputDirectory;           // output- and result files are written into this directory
 
-	public:
+    public:
 
-		static string       fEVNDISP_VERSION;                             // EVNDISPLAY VERSION
+        static string       fEVNDISP_VERSION;                             // EVNDISPLAY VERSION
 
-		VGlobalRunParameter( bool bSetGlobalParameter = true );
-		virtual ~VGlobalRunParameter();
+        VGlobalRunParameter( bool bSetGlobalParameter = true );
+        virtual ~VGlobalRunParameter();
 
-		string       getDBServer() const
-		{
-			return fDBServer;
-		}
-		static string getDirectory_EVNDISPAnaData()
-		{
-			return fEVNDISPAnaDataDirectory;
-		}
-		static string getDirectory_EVNDISPAnaDataTMP()
-		{
-			return fEVNDISPAnaDataDirectory_tmp;
-		}
-		string       getDirectory_EVNDISPCalibrationData()
-		{
-			return fEVNDISPAnaDataDirectory + "/Calibration/";
-		}
-		string       getDirectory_EVNDISPCalibrationData_perRun()
-		{
-			return fEVNDISPCalibrationDataDirectory + "/Calibration/";
-		}
-		string       getDirectory_EVNDISPDetectorGeometry()
-		{
-			return fEVNDISPAnaDataDirectory + "/DetectorGeometry/";
-		}
-		string       getDirectory_EVNDISPParameterFiles()
-		{
-			return fEVNDISPAnaDataDirectory + "/ParameterFiles/";
-		}
-		string       getDirectory_VBFRawData()
-		{
-			return fVBFRawDataDirectory;
-		}
-		string       getDirectory_EVNDISPOutput()
-		{
-			return fEVNDISPOutputDirectory;
-		}
-		static string getEVNDISP_VERSION()
-		{
-			return fEVNDISP_VERSION;
-		}
-		static float  getEVNDISP_VERSION_FL()
-		{
-			return atof( fEVNDISP_VERSION.substr( 2, 5 ).c_str() );
-		}
-		static unsigned int getEVNDISP_VERSION_UI()
-		{
-			return ( unsigned int )( 100.*getEVNDISP_VERSION_FL() );
-		}
-		static unsigned int getEVNDISP_TREE_VERSION()
-		{
-			return fEVNDISP_TREE_VERSION;
-		}
-		static unsigned int getEVNDISP_TREE_VERSION( TTree* );
-		static bool         getEVNDISP_TREE_isShort( TTree* );
-		string       getObservatory()
-		{
-			return fObservatory;
-		}
-		double       getObservatory_Height_m()
-		{
-			return fObservatory_Height_m;
-		}
-		static double       getObservatory_Latitude_deg()
-		{
-			return fObservatory_Latitude_deg;
-		}
-		static double       getObservatory_Longitude_deg()
-		{
-			return fObservatory_Longitude_deg;
-		}
-		string       getRawDataServer() const
-		{
-			return fRawDataServer;
-		}
-		void         printGlobalRunParameter();
-		bool         readRunparameterFile( string iFile );
-		bool         setDirectories();
-		void         setDirectory_EVNDISPOutput( string iDir )
-		{
-			fEVNDISPOutputDirectory = iDir;
-		}
-		bool         setDirectory_EVNDISPCalibrationData( string iDir );
-		bool         update( TChain* ic );
+        string       getDBServer() const
+        {
+            return fDBServer;
+        }
+        static string getDirectory_EVNDISPAnaData()
+        {
+            return fEVNDISPAnaDataDirectory;
+        }
+        static string getDirectory_EVNDISPAnaDataTMP()
+        {
+            return fEVNDISPAnaDataDirectory_tmp;
+        }
+        string       getDirectory_EVNDISPCalibrationData()
+        {
+            return fEVNDISPAnaDataDirectory + "/Calibration/";
+        }
+        string       getDirectory_EVNDISPCalibrationData_perRun()
+        {
+            return fEVNDISPCalibrationDataDirectory + "/Calibration/";
+        }
+        string       getDirectory_EVNDISPDetectorGeometry()
+        {
+            return fEVNDISPAnaDataDirectory + "/DetectorGeometry/";
+        }
+        string       getDirectory_EVNDISPParameterFiles()
+        {
+            return fEVNDISPAnaDataDirectory + "/ParameterFiles/";
+        }
+        string       getDirectory_VBFRawData()
+        {
+            return fVBFRawDataDirectory;
+        }
+        string       getDirectory_EVNDISPOutput()
+        {
+            return fEVNDISPOutputDirectory;
+        }
+        static string getEVNDISP_VERSION()
+        {
+            return fEVNDISP_VERSION;
+        }
+        static float  getEVNDISP_VERSION_FL()
+        {
+            return atof( fEVNDISP_VERSION.substr( 2, 5 ).c_str() );
+        }
+        static unsigned int getEVNDISP_VERSION_UI()
+        {
+            return ( unsigned int )( 100.*getEVNDISP_VERSION_FL() );
+        }
+        static unsigned int getEVNDISP_TREE_VERSION()
+        {
+            return fEVNDISP_TREE_VERSION;
+        }
+        static unsigned int getEVNDISP_TREE_VERSION( TTree* );
+        static bool         getEVNDISP_TREE_isShort( TTree* );
+        string       getObservatory()
+        {
+            return fObservatory;
+        }
+        double       getObservatory_Height_m()
+        {
+            return fObservatory_Height_m;
+        }
+        static double       getObservatory_Latitude_deg()
+        {
+            return fObservatory_Latitude_deg;
+        }
+        static double       getObservatory_Longitude_deg()
+        {
+            return fObservatory_Longitude_deg;
+        }
+        string       getRawDataServer() const
+        {
+            return fRawDataServer;
+        }
+        void         printGlobalRunParameter();
+        bool         readRunparameterFile( string iFile );
+        bool         setDirectories();
+        void         setDirectory_EVNDISPOutput( string iDir )
+        {
+            fEVNDISPOutputDirectory = iDir;
+        }
+        bool         setDirectory_EVNDISPCalibrationData( string iDir );
+        bool         update( TChain* ic );
 
-		ClassDef( VGlobalRunParameter, 11 );
+        ClassDef( VGlobalRunParameter, 11 );
 };
 
 #endif

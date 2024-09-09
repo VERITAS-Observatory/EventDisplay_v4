@@ -22,17 +22,17 @@ using namespace std;
 
 class VLisFileData
 {
-	public:
+    public:
 
-		unsigned int fID;
-		string  fName;
-		string  fFileName;
+        unsigned int fID;
+        string  fName;
+        string  fFileName;
 
-		// data from list file
-		map< string, vector< double > > fVar;
+        // data from list file
+        map< string, vector< double > > fVar;
 
-		VLisFileData();
-		~VLisFileData() {};
+        VLisFileData();
+        ~VLisFileData() {};
 };
 
 /////////////////////////////////////////////////////////////
@@ -40,41 +40,41 @@ class VLisFileData
 
 class VPlotSensitivityfromLisFiles : public VPlotUtilities
 {
-	private:
+    private:
 
-		bool fDebug;
+        bool fDebug;
 
-		// Variables
-		vector< string > fVarName;
+        // Variables
+        vector< string > fVarName;
 
-		// min/max for plotting
-		map< string, double > fVarMin;
-		map< string, double > fVarMax;
+        // min/max for plotting
+        map< string, double > fVarMin;
+        map< string, double > fVarMax;
 
-		// data
-		vector< VLisFileData* > fData;
+        // data
+        vector< VLisFileData* > fData;
 
-	public:
+    public:
 
-		VPlotSensitivityfromLisFiles();
-		~VPlotSensitivityfromLisFiles() {}
+        VPlotSensitivityfromLisFiles();
+        ~VPlotSensitivityfromLisFiles() {}
 
-		bool addLisFile( string iFile, string iCut = "" );
-		bool applycuts( double amp = 1., double NTel = 1., double NPix = 1. );
-		bool checkVarName( string V );
-		void compare_cuts();
-		unsigned int getID_Index( unsigned int iID );
-		void listDataSets();
-		void listVariableNames();
-		bool printDataSet( unsigned int iID );
-		bool removeDataSet( unsigned int iDataSetID );
-		void setDebug( bool iB = true )
-		{
-			fDebug = iB;
-		}
+        bool addLisFile( string iFile, string iCut = "" );
+        bool applycuts( double amp = 1., double NTel = 1., double NPix = 1. );
+        bool checkVarName( string V );
+        void compare_cuts();
+        unsigned int getID_Index( unsigned int iID );
+        void listDataSets();
+        void listVariableNames();
+        bool printDataSet( unsigned int iID );
+        bool removeDataSet( unsigned int iDataSetID );
+        void setDebug( bool iB = true )
+        {
+            fDebug = iB;
+        }
 
-		TCanvas* plot( string iVName, unsigned int iDataSetID = 0, TCanvas* c = 0, Style_t iLineStyle = 1, Style_t iMarkerStyle = 20 );
-		TCanvas* plot_AllIDs( string iVName, Style_t iLineStyle = 1, Style_t iMarkerStyle = 20, TCanvas* c = 0 );
+        TCanvas* plot( string iVName, unsigned int iDataSetID = 0, TCanvas* c = 0, Style_t iLineStyle = 1, Style_t iMarkerStyle = 20 );
+        TCanvas* plot_AllIDs( string iVName, Style_t iLineStyle = 1, Style_t iMarkerStyle = 20, TCanvas* c = 0 );
 };
 
 #endif

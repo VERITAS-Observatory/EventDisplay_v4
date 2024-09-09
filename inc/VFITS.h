@@ -43,50 +43,50 @@ using namespace std;
 
 class VFITS : public VAnalysisUtilities, public VPlotUtilities, public VHistogramUtilities
 {
-	private:
-		fitsfile* fptr;
+    private:
+        fitsfile* fptr;
 
-		string fEVDversion;
-		string fFile_anasum;
-		string fFile_FITS;
-		string fTarget_Name;
+        string fEVDversion;
+        string fFile_anasum;
+        string fFile_FITS;
+        string fTarget_Name;
 
-		bool fWriteOneFile;
+        bool fWriteOneFile;
 
-		CRunSummary* ctRunSum;
-		float fTarget_Exposure;
-		float fTarget_RAJ2000;
-		float fTarget_DecJ2000;
+        CRunSummary* ctRunSum;
+        float fTarget_Exposure;
+        float fTarget_RAJ2000;
+        float fTarget_DecJ2000;
 
-		bool printerror( int status );
-		int writeTH1DFits( TH1D* h, string DiagName, string x_name, string y_name, string x_unit, string y_unit, bool iPrint );
-		int writeTGraphFits( TGraph* g, string DiagName, string x_name, string y_name, string x_unit, string y_unit, bool iPrint );
-		int writeVecTH1DFits( vector<pair<TH1D*, string> > vhist, string DiagName,  char* tType[], char* tUnit[], char* tForm[], bool iPrint );
-		int writeTGraphErrorsFits( TGraphErrors* g, string DiagName, string x_name, string y_name, string x_unit, string y_unit, bool iPrint );
-		int writeTGraphAsymmErrorsFits( TGraphAsymmErrors* g, string DiagName, string x_name, string y_name, string x_unit, string y_unit, bool iPrint );
-		int createTableFitsFile( vector< vector<double> > Table, char* ttype[], char* tunit[], char* tform[], string DiagName, bool iPrint );
-		int createImageFitsFile( TH2D* hSkyMap, string DiagName, bool iPrint );
-		bool writeFITSInfo( bool iPrint = false );
-		bool writeFITSimageInfo( long naxis, long* naxes, TH2D* hSkyMap, string DiagName, bool iPrint = false );
-		bool mergeColumns( fitsfile* fPtr, vector<int> hdunums, vector<vector <int> > columns, int nRows, bool iPrint );
-		double getFluxIntegral( TGraphErrors* gEspec, double minE, bool iPrint );
+        bool printerror( int status );
+        int writeTH1DFits( TH1D* h, string DiagName, string x_name, string y_name, string x_unit, string y_unit, bool iPrint );
+        int writeTGraphFits( TGraph* g, string DiagName, string x_name, string y_name, string x_unit, string y_unit, bool iPrint );
+        int writeVecTH1DFits( vector<pair<TH1D*, string> > vhist, string DiagName,  char* tType[], char* tUnit[], char* tForm[], bool iPrint );
+        int writeTGraphErrorsFits( TGraphErrors* g, string DiagName, string x_name, string y_name, string x_unit, string y_unit, bool iPrint );
+        int writeTGraphAsymmErrorsFits( TGraphAsymmErrors* g, string DiagName, string x_name, string y_name, string x_unit, string y_unit, bool iPrint );
+        int createTableFitsFile( vector< vector<double> > Table, char* ttype[], char* tunit[], char* tform[], string DiagName, bool iPrint );
+        int createImageFitsFile( TH2D* hSkyMap, string DiagName, bool iPrint );
+        bool writeFITSInfo( bool iPrint = false );
+        bool writeFITSimageInfo( long naxis, long* naxes, TH2D* hSkyMap, string DiagName, bool iPrint = false );
+        bool mergeColumns( fitsfile* fPtr, vector<int> hdunums, vector<vector <int> > columns, int nRows, bool iPrint );
+        double getFluxIntegral( TGraphErrors* gEspec, double minE, bool iPrint );
 
-	public:
+    public:
 
-		VFITS( string anasum_file, string fits_file, string object_name, bool iOneFile = true, bool iPrint = false );
-		~VFITS() {}
-		bool readAnasumFile( bool iPrint = false );
-		bool writeCumSignificance( bool iPrint = false );
-		bool writeSignificanceDistribution( bool iPrint = false );
-		bool writeSignificanceSkyMap( bool iPrint = false );
-		bool writeExcessSkyMap( bool iPrint = false );
-		bool writeLightCurve( bool iPrint = false );
-		bool writeThetaSquareDistribution( bool iPrint = false );
-		bool writeEnergySpectrum( bool iPrint = false );
-		bool writeFITSFile( bool iPrint = false );
-		bool writeNightlyFlux( bool iPrint = false, string outfile = "" );
-		bool writeMonthlyFlux( bool iPrint = false, string outfile = "" );
+        VFITS( string anasum_file, string fits_file, string object_name, bool iOneFile = true, bool iPrint = false );
+        ~VFITS() {}
+        bool readAnasumFile( bool iPrint = false );
+        bool writeCumSignificance( bool iPrint = false );
+        bool writeSignificanceDistribution( bool iPrint = false );
+        bool writeSignificanceSkyMap( bool iPrint = false );
+        bool writeExcessSkyMap( bool iPrint = false );
+        bool writeLightCurve( bool iPrint = false );
+        bool writeThetaSquareDistribution( bool iPrint = false );
+        bool writeEnergySpectrum( bool iPrint = false );
+        bool writeFITSFile( bool iPrint = false );
+        bool writeNightlyFlux( bool iPrint = false, string outfile = "" );
+        bool writeMonthlyFlux( bool iPrint = false, string outfile = "" );
 
-		ClassDef( VFITS, 1 ); //(increase this number)
+        ClassDef( VFITS, 1 ); //(increase this number)
 };
 #endif

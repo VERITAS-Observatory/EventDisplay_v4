@@ -16,55 +16,55 @@
 // Let the compiler deal with mapping C++ types to FITS DTYPES:
 static int getFITSType( double x )
 {
-	return TDOUBLE;
+    return TDOUBLE;
 }
 static int getFITSType( long double x )
 {
-	return TDOUBLE;
+    return TDOUBLE;
 }
 static int getFITSType( float x )
 {
-	return TFLOAT;
+    return TFLOAT;
 }
 static int getFITSType( int x )
 {
-	return TINT;
+    return TINT;
 }
 static int getFITSType( unsigned long x )
 {
-	return TULONG;
+    return TULONG;
 }
 static int getFITSType( long x )
 {
-	return TLONG;
+    return TLONG;
 }
 static int getFITSType( long long x )
 {
-	return TLONGLONG;
+    return TLONGLONG;
 }
 static int getFITSType( bool x )
 {
-	return TBIT;
+    return TBIT;
 }
 static int getFITSType( char x )
 {
-	return TBYTE;
+    return TBYTE;
 }
 static int getFITSType( unsigned char x )
 {
-	return TBYTE;
+    return TBYTE;
 }
 static int getFITSType( unsigned short x )
 {
-	return TUSHORT;
+    return TUSHORT;
 }
 static int getFITSType( short x )
 {
-	return TSHORT;
+    return TSHORT;
 }
 static int getFITSType( std::string x )
 {
-	return USE_STREAMER_TO_STRING;
+    return USE_STREAMER_TO_STRING;
 }
 
 
@@ -73,12 +73,12 @@ static int getFITSType( std::string x )
  */
 class FITSRecordError : public std::runtime_error
 {
-	public:
-		FITSRecordError( std::string what )
-			: std::runtime_error( std::string( "(FITSRecord) " + what ).c_str() )
-		{
-			;
-		}
+    public:
+        FITSRecordError( std::string what )
+            : std::runtime_error( std::string( "(FITSRecord) " + what ).c_str() )
+        {
+            ;
+        }
 };
 
 
@@ -100,42 +100,42 @@ class FITSRecordError : public std::runtime_error
 class Val
 {
 
-	public:
+    public:
 
-		Val()
-			: _valp( NULL ), _type( TINT ), _nelements( 1 ), _is_hex( 0 )
-		{
-			;
-		}
-		virtual ~Val()
-		{
-			;
-		}
+        Val()
+            : _valp( NULL ), _type( TINT ), _nelements( 1 ), _is_hex( 0 )
+        {
+            ;
+        }
+        virtual ~Val()
+        {
+            ;
+        }
 
-		virtual std::ostream& stream( std::ostream& ) = 0;
-		virtual void*  getVoidPointerToValue()
-		{
-			return _valp;
-		}
-		int    getType()
-		{
-			return _type;
-		}
-		virtual int    getSize()
-		{
-			return _nelements;
-		}
-		virtual bool isVariableLength()
-		{
-			return false;
-		}
+        virtual std::ostream& stream( std::ostream& ) = 0;
+        virtual void*  getVoidPointerToValue()
+        {
+            return _valp;
+        }
+        int    getType()
+        {
+            return _type;
+        }
+        virtual int    getSize()
+        {
+            return _nelements;
+        }
+        virtual bool isVariableLength()
+        {
+            return false;
+        }
 
-	protected:
+    protected:
 
-		void*  _valp;   //!< the stored value as a void* pointer
-		int    _type;   //!< the FITS data type
-		unsigned long   _nelements;  //!< width of data if array (default 1)
-		bool   _is_hex; //!< whether or not to print as hexadecimal
+        void*  _valp;   //!< the stored value as a void* pointer
+        int    _type;   //!< the FITS data type
+        unsigned long   _nelements;  //!< width of data if array (default 1)
+        bool   _is_hex; //!< whether or not to print as hexadecimal
 
 };
 
@@ -145,18 +145,18 @@ class Val
 template <class Type>
 class ScalarVal : public Val
 {
-	public:
-		ScalarVal( Type& val )
-		{
-			_valp = ( void* ) &val;
-			_type = getFITSType( val );
-		}
-		virtual std::ostream& stream( std::ostream& stream )
-		{
-			Type val = *( ( Type* ) _valp );
-			stream << val;
-			return stream;
-		}
+    public:
+        ScalarVal( Type& val )
+        {
+            _valp = ( void* ) &val;
+            _type = getFITSType( val );
+        }
+        virtual std::ostream& stream( std::ostream& stream )
+        {
+            Type val = *(( Type* ) _valp );
+            stream << val;
+            return stream;
+        }
 };
 
 /**
@@ -166,57 +166,57 @@ class ScalarVal : public Val
 template <class Type>
 class ArrayVal : public Val
 {
-	public:
-		ArrayVal( Type val[], size_t arraysize, unsigned long* sizep = NULL )
-		{
-			_valp = ( void* ) &val[0];
-			_type = getFITSType( val[0] );
-			_nelements = ( int ) arraysize;
-			_sizep = sizep;
-		}
-		virtual std::ostream& stream( std::ostream& stream )
-		{
-			Type* val = ( ( Type* ) _valp );
-			size_t num = _nelements;
-			if( isVariableLength() )
-			{
-				num = *_sizep;
-			}
-			stream << "[" << num << "/" <<  _nelements << ":";
-			for( size_t ii = 0; ii < num; ii++ )
-			{
-				if( _is_hex )
-				{
-					stream << "0x" << std::hex ;
-				}
-				stream << val[ii];
-				if( ii != _nelements - 1 )
-				{
-					stream << ",";
-				}
-			}
-			stream << "]";
-			return stream;
-		}
-		virtual int  getSize()
-		{
-			if( _sizep )
-			{
-				return *_sizep;
-			}
-			else
-			{
-				return _nelements;
-			}
-		}
+    public:
+        ArrayVal( Type val[], size_t arraysize, unsigned long* sizep = NULL )
+        {
+            _valp = ( void* ) &val[0];
+            _type = getFITSType( val[0] );
+            _nelements = ( int ) arraysize;
+            _sizep = sizep;
+        }
+        virtual std::ostream& stream( std::ostream& stream )
+        {
+            Type* val = (( Type* ) _valp );
+            size_t num = _nelements;
+            if( isVariableLength() )
+            {
+                num = *_sizep;
+            }
+            stream << "[" << num << "/" <<  _nelements << ":";
+            for( size_t ii = 0; ii < num; ii++ )
+            {
+                if( _is_hex )
+                {
+                    stream << "0x" << std::hex ;
+                }
+                stream << val[ii];
+                if( ii != _nelements - 1 )
+                {
+                    stream << ",";
+                }
+            }
+            stream << "]";
+            return stream;
+        }
+        virtual int  getSize()
+        {
+            if( _sizep )
+            {
+                return *_sizep;
+            }
+            else
+            {
+                return _nelements;
+            }
+        }
 
-		virtual bool isVariableLength()
-		{
-			return _sizep != NULL;
-		}
+        virtual bool isVariableLength()
+        {
+            return _sizep != NULL;
+        }
 
-	private:
-		unsigned long*  _sizep;  //!< pointer to a size for var-length arrays
+    private:
+        unsigned long*  _sizep;  //!< pointer to a size for var-length arrays
 
 };
 
@@ -361,200 +361,200 @@ class ArrayVal : public Val
 class FITSRecord
 {
 
-	public:
+    public:
 
-		FITSRecord( fitsfile* fptr );
-		FITSRecord( std::string fits_filename, std::string template_filename,
-					std::string extension_name = "", int extension_version = 0 );
-		FITSRecord( std::string url );
+        FITSRecord( fitsfile* fptr );
+        FITSRecord( std::string fits_filename, std::string template_filename,
+                    std::string extension_name = "", int extension_version = 0 );
+        FITSRecord( std::string url );
 
-		~FITSRecord();
-
-
-
-
-		/**
-		 * Handle mapping of scalar values to columns (assume values
-		 * that are not pointers are single values)
-		 *
-		 * Example
-		 * \code
-		 * double energy = 10.6;
-		 * mapColumnToVar( "ENERGY", energy );
-		 * \endcode
-		 */
-		template <class Type>
-		void mapColumnToVar( std::string column, Type& value )
-		{
-			addToMap( column, new ScalarVal<Type>( value ) );
-		}
-
-		/**
-		 * Handle mapping of (fixed-length) arrays to columns. You
-		 * should specify the size of the array too (otherwise only
-		 * the first element will be written).
-		 *
-		 * the last option, sizep, can be used to specify a pointer to a
-		 * size for variable-length arrays.
-		 *
-		 * Example
-		 * \code
-		 * double arrval[10];
-		 * mapColumnToVar( "ARRVAL", arrval, 10 );
-		 * \endcode
-		 */
-		template <class Type>
-		void mapColumnToVar( std::string column, Type value[], int n = 1, unsigned long* sizep = NULL )
-		{
-			addToMap( column, new ArrayVal<Type>( value, n, sizep ) );
-		}
-
-
-		void	   write() throw( FITSRecordError );
-		std::ostream&  print( std::ostream& stream );
-		unsigned long  getNumWritten()
-		{
-			return _rowcount;
-		}
-		fitsfile*	getFITSFilePointer()
-		{
-			return _fptr;
-		}
-		void	allocateRows( size_t num_rows );
-		void        truncateRows( size_t start_row );
-		void setVerbose( int level = 1 )
-		{
-			_verbose = level;
-		}
-		int  getExtensionVersion()
-		{
-			return _extension_version;
-		}
-		bool hasColumn( std::string colname );
-		void finishWriting();
-		std::string locateTemplate( std::string template_filename );
-
-
-		/**
-		 * write a header keyword to the current HDU. \throws
-		 * runtime_error if the header isn't already
-		 * defined. Variables of any type that is mapped by
-		 * getFITSType(x) can be used.
-		 *
-		 * \code
-		 * rec.writeHeader( "EMAX", 2.0f );  // writes a float
-		 * rec.writeHeader( "VERSION", 6 );  // writes int
-		 * \endcode
-		 */
-		template<class Type>
-		void writeHeader( std::string keyword, Type value )
-		{
-
-			if( !_is_writable )
-			{
-				throw FITSRecordError( "writeHeader: can't write to read-only file" );
-			}
-
-			Type dummy;
-			int fitstype = getFITSType( dummy );
-			int status = 0;
-
-			// check if keyword is defined:
-			char junk[81], comment[81];
-			char ckeyword[81];
-			strcpy( ckeyword, keyword.c_str() );
-			fits_read_keyword( _fptr, ckeyword, junk, comment, &status );
-
-			if( status )
-				throw FITSRecordError( "writeHeader: " + keyword + " "
-									   + getFITSError( status ) );
-
-
-			if( fitstype == USE_STREAMER_TO_STRING )
-			{
-				// handle this type specially: convert it to a string using
-				// a streamer, and write it as a string
-				if( _verbose >= 2 )
-					std::cout << "Writing " << keyword
-							  << " using streamer -> TSTRING" << std::endl;
-
-				std::ostringstream str;
-				str << value;
-				// write with the longstr version, in case the string is
-				// larger than 68 characters!
-				char* longstr = new char[str.str().length() + 1];
-				strcpy( longstr, str.str().c_str() );
-				fits_update_key_longstr( _fptr, ckeyword, longstr, NULL, &status );
-				delete longstr;
-
-			}
-			else
-			{
-
-				if( _verbose >= 2 )
-					std::cout << "Writing " << keyword
-							  << " using type " << fitstype << std::endl;
-
-				fits_update_key( _fptr, fitstype, ckeyword, ( void* )&value,
-								 NULL, &status );
-			}
-
-
-			if( status )
-				throw FITSRecordError( "writeHeader: " + keyword + " "
-									   + getFITSError( status ) );
-
-		}
-
-		bool printFITSTypes();
-
-		int isFinished()
-		{
-			return _is_finished;
-		}
-		bool read();
-
-		std::string readHeader( std::string keyword )
-		{
-			int status = 0;
-			char val[81], comment[81];
-			char ckeyword[81];
-			strcpy( ckeyword, keyword.c_str() );
-			fits_read_keyword( _fptr, ckeyword, val, comment, &status );
-			if( status )
-				throw FITSRecordError( "readHeader: " + keyword + " "
-									   + getFITSError( status ) );
-			return std::string( val );
-		}
+        ~FITSRecord();
 
 
 
-	protected:
 
-		// helper struct for returning information about a column
-		struct ColInfo
-		{
-			std::string name;
-			int num;
-			int typecode;
-			long int repeat;
-			long int width;
-		};
+        /**
+         * Handle mapping of scalar values to columns (assume values
+         * that are not pointers are single values)
+         *
+         * Example
+         * \code
+         * double energy = 10.6;
+         * mapColumnToVar( "ENERGY", energy );
+         * \endcode
+         */
+        template <class Type>
+        void mapColumnToVar( std::string column, Type& value )
+        {
+            addToMap( column, new ScalarVal<Type>( value ) );
+        }
 
-		void		 addToMap( std::string column, Val* colval );
-		ColInfo		 lookupColInfo( std::string column );
-		void		 writeDate();
-		std::string	 getFITSError( int status );
+        /**
+         * Handle mapping of (fixed-length) arrays to columns. You
+         * should specify the size of the array too (otherwise only
+         * the first element will be written).
+         *
+         * the last option, sizep, can be used to specify a pointer to a
+         * size for variable-length arrays.
+         *
+         * Example
+         * \code
+         * double arrval[10];
+         * mapColumnToVar( "ARRVAL", arrval, 10 );
+         * \endcode
+         */
+        template <class Type>
+        void mapColumnToVar( std::string column, Type value[], int n = 1, unsigned long* sizep = NULL )
+        {
+            addToMap( column, new ArrayVal<Type>( value, n, sizep ) );
+        }
 
-		std::map<int, std::string> _namemap;
-		std::map<int, Val*> _colmap; //!< maps column number to variable
-		fitsfile* _fptr; //!
-		bool  _own_fptr;  //!< whether or not we own the fptr or if it was passed in
-		unsigned long _rowcount;
-		int _verbose;
-		int _extension_version;
-		bool _is_finished;
-		bool _is_writable;
+
+        void	   write() throw( FITSRecordError );
+        std::ostream&  print( std::ostream& stream );
+        unsigned long  getNumWritten()
+        {
+            return _rowcount;
+        }
+        fitsfile*	getFITSFilePointer()
+        {
+            return _fptr;
+        }
+        void	allocateRows( size_t num_rows );
+        void        truncateRows( size_t start_row );
+        void setVerbose( int level = 1 )
+        {
+            _verbose = level;
+        }
+        int  getExtensionVersion()
+        {
+            return _extension_version;
+        }
+        bool hasColumn( std::string colname );
+        void finishWriting();
+        std::string locateTemplate( std::string template_filename );
+
+
+        /**
+         * write a header keyword to the current HDU. \throws
+         * runtime_error if the header isn't already
+         * defined. Variables of any type that is mapped by
+         * getFITSType(x) can be used.
+         *
+         * \code
+         * rec.writeHeader( "EMAX", 2.0f );  // writes a float
+         * rec.writeHeader( "VERSION", 6 );  // writes int
+         * \endcode
+         */
+        template<class Type>
+        void writeHeader( std::string keyword, Type value )
+        {
+
+            if(!_is_writable )
+            {
+                throw FITSRecordError( "writeHeader: can't write to read-only file" );
+            }
+
+            Type dummy;
+            int fitstype = getFITSType( dummy );
+            int status = 0;
+
+            // check if keyword is defined:
+            char junk[81], comment[81];
+            char ckeyword[81];
+            strcpy( ckeyword, keyword.c_str() );
+            fits_read_keyword( _fptr, ckeyword, junk, comment, &status );
+
+            if( status )
+                throw FITSRecordError( "writeHeader: " + keyword + " "
+                                       + getFITSError( status ) );
+
+
+            if( fitstype == USE_STREAMER_TO_STRING )
+            {
+                // handle this type specially: convert it to a string using
+                // a streamer, and write it as a string
+                if( _verbose >= 2 )
+                    std::cout << "Writing " << keyword
+                              << " using streamer -> TSTRING" << std::endl;
+
+                std::ostringstream str;
+                str << value;
+                // write with the longstr version, in case the string is
+                // larger than 68 characters!
+                char* longstr = new char[str.str().length() + 1];
+                strcpy( longstr, str.str().c_str() );
+                fits_update_key_longstr( _fptr, ckeyword, longstr, NULL, &status );
+                delete longstr;
+
+            }
+            else
+            {
+
+                if( _verbose >= 2 )
+                    std::cout << "Writing " << keyword
+                              << " using type " << fitstype << std::endl;
+
+                fits_update_key( _fptr, fitstype, ckeyword, ( void* )&value,
+                                 NULL, &status );
+            }
+
+
+            if( status )
+                throw FITSRecordError( "writeHeader: " + keyword + " "
+                                       + getFITSError( status ) );
+
+        }
+
+        bool printFITSTypes();
+
+        int isFinished()
+        {
+            return _is_finished;
+        }
+        bool read();
+
+        std::string readHeader( std::string keyword )
+        {
+            int status = 0;
+            char val[81], comment[81];
+            char ckeyword[81];
+            strcpy( ckeyword, keyword.c_str() );
+            fits_read_keyword( _fptr, ckeyword, val, comment, &status );
+            if( status )
+                throw FITSRecordError( "readHeader: " + keyword + " "
+                                       + getFITSError( status ) );
+            return std::string( val );
+        }
+
+
+
+    protected:
+
+        // helper struct for returning information about a column
+        struct ColInfo
+        {
+            std::string name;
+            int num;
+            int typecode;
+            long int repeat;
+            long int width;
+        };
+
+        void		 addToMap( std::string column, Val* colval );
+        ColInfo		 lookupColInfo( std::string column );
+        void		 writeDate();
+        std::string	 getFITSError( int status );
+
+        std::map<int, std::string> _namemap;
+        std::map<int, Val*> _colmap; //!< maps column number to variable
+        fitsfile* _fptr; //!
+        bool  _own_fptr;  //!< whether or not we own the fptr or if it was passed in
+        unsigned long _rowcount;
+        int _verbose;
+        int _extension_version;
+        bool _is_finished;
+        bool _is_writable;
 
 
 };

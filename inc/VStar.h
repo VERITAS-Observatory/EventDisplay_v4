@@ -16,49 +16,49 @@ using namespace std;
 
 class VStar : public TObject
 {
-	public:
+    public:
 
-		unsigned int fStarID;
-		string fStarName;
-		double fDec2000;
-		double fRA2000;
-		double fDecCurrentEpoch;
-		double fRACurrentEpoch;
-		double fRunGalLong1958;
-		double fRunGalLat1958;
-		double fBrightness_V;
-		double fBrightness_B;
-		double fMajorDiameter;                        // this is either the source diameter or the positional error
-		double fMinorDiameter;
-		double fPositionAngle;
-		double fMajorDiameter_68;
-		double fMinorDiameter_68;
-		double fPositionAngle_68;
-		double fSignificance;
-		double fSpectralIndex;
-		double fSpectralIndexError;
-		string fSpectrumType;
-		double fCutOff_MeV;
-		double fCutOffError_MeV;
-		vector< double > fFluxEnergyMin;
-		vector< double > fFluxEnergyMax;
-		vector< double > fFlux;
-		vector< double > fFluxError;
-		bool   fVariability;
-		vector< string > fOtherNames;
-		string fType;
-		vector< string > fAssociations;
-		int fQualityFlag;
+        unsigned int fStarID;
+        string fStarName;
+        double fDec2000;
+        double fRA2000;
+        double fDecCurrentEpoch;
+        double fRACurrentEpoch;
+        double fRunGalLong1958;
+        double fRunGalLat1958;
+        double fBrightness_V;
+        double fBrightness_B;
+        double fMajorDiameter;                        // this is either the source diameter or the positional error
+        double fMinorDiameter;
+        double fPositionAngle;
+        double fMajorDiameter_68;
+        double fMinorDiameter_68;
+        double fPositionAngle_68;
+        double fSignificance;
+        double fSpectralIndex;
+        double fSpectralIndexError;
+        string fSpectrumType;
+        double fCutOff_MeV;
+        double fCutOffError_MeV;
+        vector< double > fFluxEnergyMin;
+        vector< double > fFluxEnergyMax;
+        vector< double > fFlux;
+        vector< double > fFluxError;
+        bool   fVariability;
+        vector< string > fOtherNames;
+        string fType;
+        vector< string > fAssociations;
+        int fQualityFlag;
 
-		VStar();
-		~VStar() {};
+        VStar();
+        ~VStar() {};
 
-		double getDistance( VStar* iStar1, VStar* iStar2 = 0 );
-		double getBrightness( string iBand );
-		void printStar();
-		void printStar_for_anasum( string iBand );
+        double getDistance( VStar* iStar1, VStar* iStar2 = 0 );
+        double getBrightness( string iBand );
+        void printStar();
+        void printStar_for_anasum( string iBand );
 
-		ClassDef( VStar, 5 );
+        ClassDef( VStar, 5 );
 };
 
 
