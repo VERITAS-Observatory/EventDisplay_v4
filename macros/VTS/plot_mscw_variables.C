@@ -3,7 +3,11 @@
  *
 */
 
-void print_output( TH1F *h, string print_out )
+/*
+ * print RMS or containment radii to screen
+ *
+ */
+void print_statistics_output( TH1F *h, string print_out )
 {
     if( !h || print_out.size() == 0 )
     {
@@ -189,14 +193,14 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
         f1->cd();
         T1->Draw( V[i].c_str(), Vcut );
 
-        print_output( (TH1F*)gPad->GetPrimitive("htemp"), Vprintout[i] );
+        print_statistics_output( (TH1F*)gPad->GetPrimitive("htemp"), Vprintout[i] );
 
         if( T2 )
         {
             TList* primitives = gPad->GetListOfPrimitives();
             f2->cd();
             T2->Draw( V[i].c_str(), Vcut, "sames" );
-            print_output( (TH1F*)primitives->At(primitives->GetSize() - 1), Vprintout[i] );
+            print_statistics_output( (TH1F*)primitives->At(primitives->GetSize() - 1), Vprintout[i] );
         }
     }
 
