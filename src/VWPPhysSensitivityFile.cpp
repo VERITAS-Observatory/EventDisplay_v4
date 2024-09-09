@@ -13,26 +13,26 @@
 VWPPhysSensitivityFile::VWPPhysSensitivityFile()
 {
     fDebug = false;
-    
+
     fSubArray = "";
     fObservingTime_h = 0.;
     fObservatory = "CTA";
-    
+
     fDataFile_gamma_onSource = "";
     fDataFile_gamma_cone = "";
     fDataFile_proton = "";
     fDataFile_proton_onSource = "";
     fDataFile_electron = "";
     fDataFile_electron_onSource = "";
-    
+
     fOutFile = 0;
-    
+
     fCrabSpectrumFile = "";
     fCrabSpectrumID = 0;
     fCosmicRaySpectrumFile = "";
     fProtonSpectrumID = 0;
     fElectronSpectrumID = 2;
-    
+
     fSensitivity = 0;
     fSensitivityCU = 0;
     fBGRate = 0;
@@ -47,7 +47,7 @@ VWPPhysSensitivityFile::VWPPhysSensitivityFile()
     fAngRes80 = 0;
     fEres = 0;
     fEbias = 0;
-    
+
     fOffsetCounter = 9999;
 }
 
@@ -65,7 +65,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     char hname[200];
     char htitle[200];
     fOffsetCounter = iOffsetCounter;
-    
+
     // integrated sensitivity
     sprintf( hname, "IntSens" );
     if( fOffsetCounter < 9999 )
@@ -81,7 +81,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     {
         hisListToDisk.push_back( fIntSensitivity );
     }
-    
+
     sprintf( hname, "IntSensCU" );
     if( fOffsetCounter < 9999 )
     {
@@ -96,7 +96,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     {
         hisListToDisk.push_back( fIntSensitivityCU );
     }
-    
+
     // sensitivity and background rates
     sprintf( hname, "DiffSens" );
     if( fOffsetCounter < 9999 )
@@ -112,7 +112,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     {
         hisListToDisk.push_back( fSensitivity );
     }
-    
+
     sprintf( hname, "DiffSensCU" );
     if( fOffsetCounter < 9999 )
     {
@@ -127,7 +127,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     {
         hisListToDisk.push_back( fSensitivityCU );
     }
-    
+
     // sensitivity limits (for on source only)
     if( fOffsetCounter == 9999 )
     {
@@ -139,7 +139,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
         fSensitivityLimits.push_back( new TH1F( hname, "Diff. Sens. (systematics limit)", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max ) );
         sprintf( hname, "DiffSens_OffEvents" );
         fSensitivityLimits.push_back( new TH1F( hname, "Diff. Sens. (off number limit)", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max ) );
-        
+
         for( unsigned int i = 0; i < fSensitivityLimits.size(); i++ )
         {
             fSensitivityLimits[i]->SetXTitle( "log_{10} (E/TeV)" );
@@ -150,7 +150,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
             hisList.push_back( fSensitivityLimits[i] );
             hisListToDiskDebug.push_back( fSensitivityLimits[i] );
         }
-        
+
         for( unsigned int i = 0; i < fSensitivityLimits.size(); i++ )
         {
             sprintf( hname, "%s_CU", fSensitivityLimits[i]->GetName() );
@@ -165,7 +165,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
             hisListToDiskDebug.push_back( fSensitivityCULimits[i] );
         }
     }
-    
+
     sprintf( hname, "BGRate" );
     if( fOffsetCounter < 9999 )
     {
@@ -179,7 +179,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     {
         hisListToDisk.push_back( fBGRate );
     }
-    
+
     sprintf( hname, "ProtRate" );
     if( fOffsetCounter < 9999 )
     {
@@ -193,7 +193,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     {
         hisListToDisk.push_back( fProtRate );
     }
-    
+
     sprintf( hname, "ElecRate" );
     if( fOffsetCounter < 9999 )
     {
@@ -207,7 +207,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     {
         hisListToDisk.push_back( fElecRate );
     }
-    
+
     sprintf( hname, "BGRatePerSqDeg" );
     if( fOffsetCounter < 9999 )
     {
@@ -221,7 +221,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     {
         hisListToDisk.push_back( fBGRateSqDeg );
     }
-    
+
     sprintf( hname, "ProtRateSqDeg" );
     if( fOffsetCounter < 9999 )
     {
@@ -235,7 +235,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     {
         hisListToDisk.push_back( fProtRateSqDeg );
     }
-    
+
     sprintf( hname, "ElecRateSqDeg" );
     if( fOffsetCounter < 9999 )
     {
@@ -249,7 +249,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     {
         hisListToDisk.push_back( fElecRateSqDeg );
     }
-    
+
     sprintf( hname, "EffectiveArea" );
     if( fOffsetCounter < 9999 )
     {
@@ -263,7 +263,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     {
         hisListToDisk.push_back( fEffArea );
     }
-    
+
     sprintf( hname, "EffectiveAreaEtrue" );
     if( fOffsetCounter < 9999 )
     {
@@ -278,7 +278,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     {
         hisListToDisk.push_back( fEffAreaMC );
     }
-    
+
     sprintf( hname, "EffectiveArea80" );
     if( fOffsetCounter < 9999 )
     {
@@ -292,7 +292,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     {
         hisListToDisk.push_back( fEffArea80 );
     }
-    
+
     // angular resolution histograms
     sprintf( hname, "AngRes" );
     if( fOffsetCounter < 9999 )
@@ -307,7 +307,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     {
         hisListToDisk.push_back( fAngRes68 );
     }
-    
+
     sprintf( hname, "AngRes80" );
     if( fOffsetCounter < 9999 )
     {
@@ -321,7 +321,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     {
         hisListToDisk.push_back( fAngRes80 );
     }
-    
+
     sprintf( hname, "ERes" );
     if( fOffsetCounter < 9999 )
     {
@@ -336,7 +336,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     {
         hisListToDisk.push_back( fEres );
     }
-    
+
     sprintf( hname, "Ebias" );
     if( fOffsetCounter < 9999 )
     {
@@ -350,7 +350,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
     {
         hisListToDisk.push_back( fEbias );
     }
-    
+
     // loop over all histograms
     for( unsigned int i = 0; i < hisList.size(); i++ )
     {
@@ -377,7 +377,7 @@ bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vec
         return false;
     }
     char hname[200];
-    
+
     // wobble offset might be variable binning
     int nbins_woff = ( int ) iWobble_min.size();
     if( nbins_woff > 2000 )
@@ -391,7 +391,7 @@ bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vec
         woff[i] = iWobble_min[i];
     }
     woff[nbins_woff] = iWobble_max[iWobble_max.size() - 1];
-    
+
     // fill all multidimensional histograms
     map< string, TH2F* > iHis2D;
     map< string, TH3F* > iHis3D;
@@ -437,7 +437,7 @@ bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vec
                                 yaxis[z] = hisList[i]->GetYaxis()->GetBinLowEdge( z );
                             }
                             yaxis[hisList[i]->GetNbinsY()] = hisList[i]->GetYaxis()->GetBinUpEdge( hisList[i]->GetNbinsY() );
-                            
+
                             iHis3D[iHisName2D] = new TH3F( iHisName2D.c_str(), hisList[i]->GetTitle(),
                                                            hisList[i]->GetNbinsX(), xaxis,
                                                            hisList[i]->GetNbinsY(), yaxis,
@@ -473,7 +473,7 @@ bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vec
             }
         }
     }
-    
+
     return true;
 }
 
@@ -506,7 +506,7 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
     cout << "=================================================================" << endl;
     cout << "reading " << iEffectiveAreaFile.str() << endl;
     cout << endl;
-    
+
     return ( fillIRFHistograms( iEffectiveAreaFile.str() ) && fillSensitivityHistograms( iDataDirectory, iFill1D ) );
 }
 
@@ -519,7 +519,7 @@ bool VWPPhysSensitivityFile::fillIRFHistograms( string iEffectiveAreaFile, doubl
 {
 
     std::cout << "VWPPhysSensitivityFile::fillHistograms1D " << std::endl;
-    
+
     ////////////////////////////////////////////////////////////////////////
     // instrument response function reader
     VInstrumentResponseFunctionReader i_IRF;
@@ -609,7 +609,7 @@ bool VWPPhysSensitivityFile::fillIRFHistograms( string iEffectiveAreaFile, doubl
 bool VWPPhysSensitivityFile::fillSensitivityHistograms( string iDataDirectory, bool iFill1D )
 {
     char hname[2000];
-    
+
     VSensitivityCalculator i_Sens;
     VSensitivityCalculator i_SensCU;
     // set Crab Nebula spectrum
@@ -628,17 +628,17 @@ bool VWPPhysSensitivityFile::fillSensitivityHistograms( string iDataDirectory, b
     double i_index_gamma = 2.5;
     int i_noise_gamma = 250;
     double i_woff_gamma = 0.;
-    
+
     int i_Azbin_proton = 0;
     double i_index_proton = 2.6;
     int i_noise_proton = 250;
     double i_woff_proton = 0.;
-    
+
     int i_Azbin_electron = 0;
     double i_index_electron = 3.0;
     int i_noise_electron = 250;
     double i_woff_electron = 0.;
-    
+
     //////////////////////////////////////////////////////////////
     // VTS only
     if( fSubArray == "V5" )
@@ -651,7 +651,7 @@ bool VWPPhysSensitivityFile::fillSensitivityHistograms( string iDataDirectory, b
         i_index_proton = 2.6;
         i_noise_proton = i_noise_gamma;
         i_woff_proton = 0.;
-        
+
         i_Azbin_electron = i_Azbin_gamma;
         i_index_electron = 3.0;
         i_noise_electron = i_noise_gamma;
@@ -667,7 +667,7 @@ bool VWPPhysSensitivityFile::fillSensitivityHistograms( string iDataDirectory, b
         i_index_proton = 2.0;
         i_noise_proton = i_noise_gamma;
         i_woff_proton = 0.;
-        
+
         i_Azbin_electron = i_Azbin_gamma;
         i_index_electron = 3.0;
         i_noise_electron = i_noise_gamma;
@@ -675,7 +675,7 @@ bool VWPPhysSensitivityFile::fillSensitivityHistograms( string iDataDirectory, b
     }
     // (END VTS only)
     //////////////////////////////////////////////////////////////
-    
+
     cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO " << fSubArray << endl;
     //////////////////////////////////////////////////////////////////////////
     // effective area files
@@ -743,12 +743,12 @@ bool VWPPhysSensitivityFile::fillSensitivityHistograms( string iDataDirectory, b
         {
             sprintf( hname, "NOFILE" );
         }
-        
+
     }
     string iMC_Electron = hname;
-    
+
     // initialize sensitivity calculator
-    
+
     // gammas
     std::cout << " iMC_Gamma " << iMC_Gamma << std::endl;
     i_Sens.setMonteCarloParameters( 1, fCrabSpectrumFile, fCrabSpectrumID, iMC_Gamma, 20.,
@@ -779,7 +779,7 @@ bool VWPPhysSensitivityFile::fillSensitivityHistograms( string iDataDirectory, b
     // reuse i_Sens to calculate the integrated sensitivity 0.2 -> -1
     i_Sens.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "ENERGY", -1, 0.01, 1.e6 );
     i_Sens.fillSensitivityHistograms( fIntSensitivity );
-    
+
     i_SensCU.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "CU", 0.2, 0.01, 1.e6 );
     i_SensCU.fillSensitivityHistograms( fSensitivityCU, fBGRate, fBGRateSqDeg, fProtRate, fProtRateSqDeg, fElecRate, fElecRateSqDeg, iHighEnergyFilling );
     if( iFill1D )
@@ -789,7 +789,7 @@ bool VWPPhysSensitivityFile::fillSensitivityHistograms( string iDataDirectory, b
     // reuse i_SensCU to calculate the integrated sensitivity 0.2 -> -1
     i_SensCU.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "CU", -1, 0.01, 1.e6 );
     i_SensCU.fillSensitivityHistograms( fIntSensitivityCU );
-    
+
     return true;
 }
 
@@ -811,7 +811,7 @@ bool VWPPhysSensitivityFile::initializeOutputFile( string iOutputFile )
         return false;
     }
     fOutFile->SetTitle( "EVNDISP sensitivity calculation" );
-    
+
     return true;
 }
 
@@ -844,7 +844,7 @@ bool VWPPhysSensitivityFile::terminate()
             }
             cout << endl;
         }
-        
+
         fOutFile->Close();
     }
     return true;
@@ -854,9 +854,9 @@ void VWPPhysSensitivityFile::setDataFiles( string iArray, int iRecID )
 {
 
     std::cout << "VWPPhysSensitivityFile::setDataFiles " << fObservatory << std::endl;
-    
+
     fSubArray = iArray;
-    
+
     // set data files for CTA
     if( isVTS() == 0 )
     {
@@ -902,10 +902,10 @@ void VWPPhysSensitivityFile::setDataFiles( string iArray, int iRecID )
         fDataFile_gamma_cone = "gamma_0-20_Norm_Pointing." + fSubArray + "_ID" + hname + ".eff-";
         fDataFile_proton = "proton_0-20_rER_Norm_Pointing." + fSubArray + "_ID" + hname + ".eff-";
         fDataFile_electron = "";
-        
-        
+
+
     }
-    
+
     std::cout << "fDataFile_gamma_cone " << fDataFile_gamma_cone << std::endl;
     std::cout << "fDataFile_proton     " << fDataFile_proton << std::endl;
 }
@@ -935,6 +935,6 @@ unsigned int VWPPhysSensitivityFile::isVTS()
     {
         return 9;
     }
-    
+
     return 0;
 }

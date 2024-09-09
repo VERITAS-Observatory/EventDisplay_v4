@@ -10,20 +10,20 @@
 VFitEffectiveArea::VFitEffectiveArea( string ifile )
 {
     fInputFile = ifile;
-    
+
     bZombie = false;
-    
+
     gEff = 0;
     gEffLog = 0;
     cEffLog = 0;
     cEffLin = 0;
     bAMC = false;
-    
+
     fCanvasMaximum = 1.e5;
-    
+
     // his list for output tree
     hList = new TList();
-    
+
     // fit function (on log Aeff scale)
     fEff = new TF1( "fEffLog", fun_eff, -1.5, 2.0, 7 );
     fEff->SetLineColor( 2 );
@@ -32,7 +32,7 @@ VFitEffectiveArea::VFitEffectiveArea( string ifile )
     fEffLin->SetLineColor( 2 );
     hList->Add( fEffLin );
     resetFitParameters();
-    
+
     fZe = 0.;
     fAz = 0;
     fAzMin = 0.;
@@ -68,12 +68,12 @@ void VFitEffectiveArea::fit( double xmin, double xmax )
     {
         return;
     }
-    
+
     fFitMin = xmin;
     fFitMax = xmax;
-    
+
     makeCanvases();
-    
+
     if( cEffLog )
     {
         cEffLog->cd();
@@ -82,13 +82,13 @@ void VFitEffectiveArea::fit( double xmin, double xmax )
     {
         return;
     }
-    
+
     gEffLog->Draw( "p" );
-    
+
     gEffLog->Fit( fEff, "em", "", xmin, xmax );
-    
+
     cEffLog->Update();
-    
+
     if( cEffLin )
     {
         cEffLin->cd();
@@ -98,7 +98,7 @@ void VFitEffectiveArea::fit( double xmin, double xmax )
         return;
     }
     setLinearFitParameters();
-    
+
     gEff->Draw( "p" );
     fEffLin->DrawCopy( "same" );
 }
@@ -107,15 +107,15 @@ void VFitEffectiveArea::fit( double xmin, double xmax )
 void VFitEffectiveArea::makeCanvases()
 {
     char hname[1000];
-    
+
     gStyle->SetStatX( 0.8 );
     gStyle->SetStatY( 0.4 );
-    
+
     cEffLog = new TCanvas( fName.c_str(), fTitle.c_str(), 10, 10, 600, 400 );
     cEffLog->SetGridx( 0 );
     cEffLog->SetGridy( 0 );
     cEffLog->Draw();
-    
+
     sprintf( hname, "hnullLog_%s", fName.c_str() );
     hnullLog = new TH1D( hname, "", 100, -1.5, 2.0 );
     hnullLog->SetStats( 0 );
@@ -131,13 +131,13 @@ void VFitEffectiveArea::makeCanvases()
     hnullLog->SetMinimum( 0. );
     hnullLog->SetMaximum( 7. );
     hnullLog->Draw();
-    
+
     sprintf( hname, "cLin_%s", fName.c_str() );
     cEffLin = new TCanvas( hname, fTitle.c_str(), 650, 10, 600, 400 );
     cEffLin->SetGridx( 0 );
     cEffLin->SetGridy( 0 );
     cEffLin->Draw();
-    
+
     sprintf( hname, "hnullin_%s", fName.c_str() );
     hnullLin = new TH1D( hname, "", 100, -1.5, 2.0 );
     hnullLin->SetStats( 0 );
@@ -153,7 +153,7 @@ void VFitEffectiveArea::makeCanvases()
     hnullLin->SetMinimum( 1. );
     hnullLin->SetMaximum( fCanvasMaximum );
     hnullLin->Draw();
-    
+
 }
 
 
@@ -163,7 +163,7 @@ void VFitEffectiveArea::resetFitParameters()
     {
         return;
     }
-    
+
     // set start parameters for fit
     fEff->SetParameter( 0, 3.5e4 );
     fEff->SetParameter( 1, 25. );
@@ -183,9 +183,9 @@ void VFitEffectiveArea::resetFitParameters()
     //       fEff->SetParLimits( 6, -0.7, 0.6+i*0.1 );
     // for three telescopes and Arec
     fEff->SetParLimits( 6, -0.7, 0. );
-    
+
     setLinearFitParameters();
-    
+
 }
 
 
@@ -195,7 +195,7 @@ void VFitEffectiveArea::setLinearFitParameters()
     {
         return;
     }
-    
+
     // set parameters for linear Aeff axis
     fEffLin->SetParameter( 0, fEff->GetParameter( 0 ) );
     fEffLin->SetParameter( 1, fEff->GetParameter( 1 ) );
@@ -225,7 +225,7 @@ void VFitEffectiveArea::getEffectiveArea( double iZe, int az, double index, bool
         bZombie = true;
         return;
     }
-    
+
     TTree* ts = ( TTree* )gDirectory->Get( "fEffArea" );
     if(!ts )
     {
@@ -233,19 +233,19 @@ void VFitEffectiveArea::getEffectiveArea( double iZe, int az, double index, bool
         return;
     }
     CEffArea c( ts );
-    
+
     char hname[1000];
     sprintf( hname, "c_%d_%d_%d_%d", ( int )iZe, az, ( int )( index * 100 ), ( int )bAMC );
     fName = hname;
     sprintf( hname, "%d_%d_%d_%d", ( int )iZe, az, ( int )( index * 100 ), ( int )bAMC );
     fTitle = hname;
-    
+
     int nentries = c.fChain->GetEntries();
-    
+
     for( int i = 0; i < nentries; i++ )
     {
         c.GetEntry( i );
-        
+
         if( fabs( iZe - c.ze ) < 0.1 && az == c.az && fabs( index - c.index ) < 0.05 )
         {
             if( bAMC )
@@ -263,7 +263,7 @@ void VFitEffectiveArea::getEffectiveArea( double iZe, int az, double index, bool
             getLogGraph();
             setMarkers( gEffLog, 20, 2, 1 );
             hList->Add( gEffLog );
-            
+
             fZe = iZe;
             fAz = az;
             fIndex = index;
@@ -282,7 +282,7 @@ void VFitEffectiveArea::setMarkers( TGraph* g, int iMarker, double iSize, int iC
     {
         return;
     }
-    
+
     g->SetMarkerSize( iSize );
     g->SetMarkerColor( iColor );
     g->SetLineColor( iColor );
@@ -301,9 +301,9 @@ void VFitEffectiveArea::setMarkers( TGraph* g, int iMarker, double iSize, int iC
 double fun_eff( double* e, double* p )
 {
     double x = e[0];
-    
+
     double f = 0.;
-    
+
     // combined power law at low energies
     if( x < p[6] )
     {
@@ -312,7 +312,7 @@ double fun_eff( double* e, double* p )
     else
     {
         // polinominal at high energies
-        
+
         // match derivatives at x = p[6]
         double d  = ( 1 + TMath::Power( 10, ( p[6] - p[3] ) * ( p[1] - p[2] ) ) );
         d *= d;
@@ -324,10 +324,10 @@ double fun_eff( double* e, double* p )
         {
             d = 1.;
         }
-        
+
         d = d * p[0] * log( 10. ) * TMath::Power( 10., ( p[6] - p[3] ) * p[1] );
         d *= ( p[1] + p[2] * TMath::Power( 10., ( p[6] - p[3] ) * ( p[1] - p[2] ) ) );
-        
+
         double f2 = 2.*p[4] * p[6] + 3.*p[5] * p[6] * p[6];
         if( f2 != 0. )
         {
@@ -337,7 +337,7 @@ double fun_eff( double* e, double* p )
         {
             d = 1.;
         }
-        
+
         // match function values at x = p[6]
         double c = p[0] * TMath::Power( 10, ( p[6] - p[3] ) * p[1] ) / ( 1 + TMath::Power( 10, ( p[6] - p[3] ) * ( p[1] - p[2] ) ) );
         f2 = p[6] * d + p[6] * p[6] * p[4] + p[6] * p[6] * p[6] * p[5];
@@ -349,7 +349,7 @@ double fun_eff( double* e, double* p )
         {
             c = 1.;
         }
-        
+
         // calculate polynominal
         f = c + x * d + x * x * p[4] + x * x * x * p[5];
     }
@@ -361,7 +361,7 @@ double fun_eff( double* e, double* p )
     {
         return 0.;
     }
-    
+
     // should never arrive here
     return f;
 }
@@ -370,7 +370,7 @@ double fun_eff( double* e, double* p )
 double fun_effLin( double* e, double* p )
 {
     double f = fun_eff( e, p );
-    
+
     return TMath::Power( 10., f );
 }
 
@@ -381,7 +381,7 @@ TGraphAsymmErrors* VFitEffectiveArea::getLogGraph()
     {
         return 0;
     }
-    
+
     if( gEffLog )
     {
         gEffLog->Set( gEff->GetN() );
@@ -390,7 +390,7 @@ TGraphAsymmErrors* VFitEffectiveArea::getLogGraph()
     {
         gEffLog = new TGraphAsymmErrors( gEff->GetN() );
     }
-    
+
     double x, y;
     for( int i = 0; i < gEff->GetN(); i++ )
     {
@@ -422,7 +422,7 @@ TGraphAsymmErrors* VFitEffectiveArea::getLogGraph()
             gEffLog->SetPointEYlow( i, 0. );
         }
     }
-    
+
     return gEffLog;
 }
 
@@ -444,10 +444,10 @@ void VFitEffectiveArea::smoothGraph( double iOut, int iIter )
     {
         return;
     }
-    
+
     double x1, x2, x3;
     double y1, y2, y3;
-    
+
     for( int t = 0; t < iIter; t++ )
     {
         for( int i = 1; i < gEff->GetN() - 1; i++ )
@@ -455,12 +455,12 @@ void VFitEffectiveArea::smoothGraph( double iOut, int iIter )
             gEff->GetPoint( i - 1, x1, y1 );
             gEff->GetPoint( i, x2, y2 );
             gEff->GetPoint( i + 1, x3, y3 );
-            
+
             if( y1 <= 0. || y2 <= 0. || y3 == 0. )
             {
                 continue;
             }
-            
+
             if( y2 / y1 > ( 1. + iOut ) && y2 / y3 > ( 1. + iOut ) )
             {
                 y2 = 0.5 * ( y1 + y3 );
@@ -470,7 +470,7 @@ void VFitEffectiveArea::smoothGraph( double iOut, int iIter )
             {
                 y2 = 0.5 * ( y1 + y3 );
             }
-            
+
             gEff->SetPoint( i, x2, y2 );
         }
     }

@@ -9,17 +9,17 @@ VAnaSum::VAnaSum( string i_datadir, unsigned int iAnalysisType )
 {
     fAnalysisType = iAnalysisType;
     fAnalysisRunMode = 0;
-    
+
     fDatadir = i_datadir + "/";
     fPrefix = "";
     fSuffix = ".mscw.root";
-    
+
     fRunPara = 0;
     fStereoOn = 0;
     fStereoOff = 0;
     fRatePlots = 0;
     fRunSummary = 0;
-    
+
     fOPfile = 0;
     fTotalDir = 0;
     fTotalDirName = "total_1";
@@ -43,7 +43,7 @@ void VAnaSum::initialize(
 {
     char i_temp[2000];
     char i_title[200];
-    
+
     ///////////////////////////////////////////////////////////////////////////////
     // check analysis run mode
     fAnalysisRunMode = iRunType;
@@ -57,7 +57,7 @@ void VAnaSum::initialize(
     {
         cout << "sequentiell analysis" << endl << endl;
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////
     // define run parameter, load list of runs
     fRunPara = new VAnaSumRunParameter();
@@ -96,7 +96,7 @@ void VAnaSum::initialize(
         cout << " (" << i_npair << " runs found in list)";
         cout << endl;
     }
-    
+
     if( fAnalysisRunMode != 1 )
     {
         fRunPara->getEventdisplayRunParameter( fDatadir );
@@ -107,7 +107,7 @@ void VAnaSum::initialize(
     {
         fTelOffset = i_singletel;
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////
     // open output root file for all the results and create directory structure
     fOPfile = new TFile( i_outfile.c_str(), "recreate" );
@@ -117,7 +117,7 @@ void VAnaSum::initialize(
         cout << "exiting..." << endl;
         exit( EXIT_FAILURE );
     }
-    
+
     // make directories with combined result
     fOPfile->cd();
     fTotalDir = fOPfile->mkdir( fTotalDirName.c_str(), "combined results from all runs" );
@@ -133,7 +133,7 @@ void VAnaSum::initialize(
         cout << "VAnaSum::initialize error creating directory stereo in output file " << fOPfile->GetName() << endl;
         exit( EXIT_FAILURE );
     }
-    
+
     // directories with run wise results
     for( unsigned int j = 0; j < fRunPara->fRunList.size(); j++ )
     {
@@ -142,7 +142,7 @@ void VAnaSum::initialize(
         sprintf( i_temp, "%s%s%d%s", fDatadir.c_str(), fPrefix.c_str(), fRunPara->fRunList[j].fRunOff, fSuffix.c_str() );
         fRunPara->fRunList[j].fRunOffFileName = i_temp;
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////
     // merging analysis
     // (combine several anasum files into one analysis file)
@@ -183,14 +183,14 @@ void VAnaSum::initialize(
             }
             iDir = fOPfile->GetDirectory( i_temp );
             fStereoRunDir.push_back( iDir );
-            
+
             // get list of excluded regions
             // (note: list is read only from first file)
             if( j == 0 )
             {
                 fRunPara->getListOfExcludedSkyRegions(&iAnasumInputFile );
             }
-            
+
             // close input file
             iAnasumInputFile.Close();
         }
@@ -222,12 +222,12 @@ void VAnaSum::initialize(
                     cout << "(run " << fRunPara->fRunList[j].fRunOn << ")" << endl;
                     exit( EXIT_FAILURE );
                 }
-                
+
                 sprintf( i_temp, "stereo" );
                 sprintf( i_title, "stereo results for run %d", fRunPara->fRunList[j].fRunOn );
                 fRunDir.back()->cd();
                 fStereoRunDir.push_back( fRunDir.back()->mkdir( i_temp, i_title ) );
-                
+
                 if(!fStereoRunDir.back() )
                 {
                     cout << "VAnaSum::initialize error creating stereo run directory ";
@@ -237,7 +237,7 @@ void VAnaSum::initialize(
                 }
             }
         }
-        
+
         //////////////////////////////////////////////////
         // set up data chains (all runs combined)
         // get wobble offsets
@@ -249,33 +249,33 @@ void VAnaSum::initialize(
         {
             sprintf( i_temp, "%s%s%d%s", fDatadir.c_str(), fPrefix.c_str(), fRunPara->fRunList[j].fRunOn, fSuffix.c_str() );
             cout << "Chaining run " << j << " of " << fRunPara->fRunList.size() << " runs with source data: " << i_temp << endl;
-            
+
             // get azimuth range
             double azmin, azmax = 0.;
             fRunAzMeanOn[fRunPara->fRunList[j].fRunOn] = getAzRange( fRunPara->fRunList[j].fRunOn, "data", azmin, azmax );
             fRunAzMinOn[fRunPara->fRunList[j].fRunOn] = azmin;
             fRunAzMaxOn[fRunPara->fRunList[j].fRunOn] = azmax;
-            
+
             // get mean noise level
             fRunPedVarsOn[fRunPara->fRunList[j].fRunOn] = getNoiseLevel( fRunPara->fRunList[j].fRunOn );
         }
         fTotalExposureOff = 0.;
-        
+
         cout << "-----------------------------------------------------------------------(4)" << endl;
         for( unsigned int j = 0; j < fRunPara->fRunList.size(); j++ )
         {
             sprintf( i_temp, "%s%s%d%s", fDatadir.c_str(), fPrefix.c_str(), fRunPara->fRunList[j].fRunOff, fSuffix.c_str() );
             cout << "Chaining run " << j << " of " << fRunPara->fRunList.size() << " runs with background data: " << i_temp << endl;
-            
+
             // get azimuth range
             double azmin, azmax = 0.;
             fRunAzMeanOff[fRunPara->fRunList[j].fRunOff] = getAzRange( fRunPara->fRunList[j].fRunOff, "data", azmin, azmax );
             fRunAzMinOff[fRunPara->fRunList[j].fRunOff] = azmin;
             fRunAzMaxOff[fRunPara->fRunList[j].fRunOff] = azmax;
-            
+
             // get noise level
             fRunPedVarsOff[fRunPara->fRunList[j].fRunOff] = getNoiseLevel( fRunPara->fRunList[j].fRunOff );
-            
+
             // cp some information over to anasum file from mscw file
             if( j < fStereoRunDir.size() && fStereoRunDir[j] )
             {
@@ -301,7 +301,7 @@ void VAnaSum::initialize(
                         TTree* newtreej = jTree->CloneTree();
                         newtreej->Write();
                     }
-                    
+
                     // copy TTree deadPixelRegistry to anasum.root file
                     TTree* kTree = ( TTree* )oldfile->Get( "deadPixelRegistry" ) ;
                     if( kTree )
@@ -323,7 +323,7 @@ void VAnaSum::initialize(
                         fStereoRunDir[j]->cd();
                         mscwTableLog->Write( "mscwTableLog" );
                     }
-                    
+
                 }
                 // copy VEvndispRunParameter 'runparameterV2' to anasum.root file
                 fStereoRunDir[j]->cd();
@@ -331,11 +331,11 @@ void VAnaSum::initialize(
                 evnrunpar->Write();
                 delete oldfile;
             }
-            
+
         }
     }
     cout << "-----------------------------------------------------------------------(5)" << endl;
-    
+
     /////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////
     // VStereoAnalysis will check validity of the data trees.
@@ -344,12 +344,12 @@ void VAnaSum::initialize(
     fStereoOff = new VStereoAnalysis( false, "off", fRunPara, fStereoRunDir, fStereoTotalDir, fDatadir, iRandomSeed, ( fAnalysisRunMode == 1 ) );
     // Default exposure is run duration
     fRunExposureOff = fStereoOff->getRunDuration();
-    
+
     // rate plots and run summary
     // (rate plot times are relevant for ON runs only)
     fRatePlots = new VRatePlots( fRunPara, fStereoOn->getRunMJD() );
     fRunSummary = new VRunSummary();
-    
+
     fMeanRawRateOn = 0.;
     fMeanRawRateOff = 0.;
     fMeanElevationOn = 0.;
@@ -361,13 +361,13 @@ void VAnaSum::initialize(
     fMeanDeadTimeOff = 0.;
     fMeanPedVarsOn = 0.;
     fMeanPedVarsOff = 0.;
-    
+
     //////////////////////////////////////////////////////////
     // fill runsummary (running from anasum, new total only)
     if( fAnalysisRunMode == 1 )
     {
         fRunSummary->fill( fDatadir, fTotalDirName, fRunPara->fRunList );
-        
+
         fTotalExposureOn = fRunSummary->fTotalExposureOn;
         fTotalExposureOff = fRunSummary->fTotalExposureOff;
         fRunExposureOn  = fRunSummary->f_exposureOn;
@@ -411,7 +411,7 @@ void VAnaSum::doStereoAnalysis( bool iSkyPlots )
         fStereoOn->setNoSkyPlots( true );
         fStereoOff->setNoSkyPlots( true );
     }
-    
+
     if( fAnalysisRunMode != 1 )
     {
         // do stereo analysis for each run
@@ -420,25 +420,25 @@ void VAnaSum::doStereoAnalysis( bool iSkyPlots )
             cout << endl;
             cout << "---------------------------------------" << endl;
             fRunPara->printStereoParameter( i );
-            
+
             // analyze run
             doStereoAnalysis( i, fRunPara->fRunList[i].fRunOn, fRunPara->fRunList[i].fRunOff, fStereoRunDir[i] );
-            
+
             cout << "---------------------------------------" << endl;
         }
     }
     fStereoTotalDir->cd();
     fRatePlots->write();
-    
+
     // now combine all runs to give 'total' results
     cout << endl;
     cout << "---------------------------------------" << endl;
     cout << "Stereo analysis for all runs:" << endl;
-    
+
     doStereoAnalysis(-1, -1, -1, fStereoTotalDir );
-    
+
     cout << "---------------------------------------" << endl;
-    
+
     // print table with all results
     if( fRunSummary )
     {
@@ -458,12 +458,12 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
     {
         cout << "VAnaSum::doStereoAnalysis error, directory not found " << endl;
     }
-    
+
     ////////////////////////////////////////////////////////////
     // fill on and off histograms and sky maps
     fStereoOn->fillHistograms( icounter, onrun, fRunAzMinOn[onrun], fRunAzMaxOn[onrun], fRunPedVarsOn[onrun] );
     fStereoOff->fillHistograms( icounter, offrun, fRunAzMinOff[offrun], fRunAzMaxOff[offrun], fRunPedVarsOff[offrun] );
-    
+
     ////////////////////////////////////////////////////////////
     // get and print exposures
     double iexp_on    = fTotalExposureOn;
@@ -473,12 +473,12 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
         iexp_on = fStereoOn->getEffectiveExposure( onrun );
         fRunExposureOn[onrun] = iexp_on;
         fTotalExposureOn += iexp_on;
-        
+
         iexp_off = fStereoOff->getEffectiveExposure( offrun );
         fRunExposureOff[offrun] = iexp_off;
         fTotalExposureOff += iexp_off;
     }
-    
+
     if( onrun != -1 && offrun != -1 )
     {
         cout << endl << "Mean properties for this pair: ON=" << onrun;
@@ -488,7 +488,7 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
     cout <<               "  OFF=" << iexp_off << " secs (" << iexp_off / 60. << " min),";
     cout << "\t Az range ON [" << fRunAzMinOn[onrun] << "," << fRunAzMaxOn[onrun] << "],";
     cout << " OFF [" << fRunAzMinOff[offrun] << "," << fRunAzMaxOff[offrun] << "]" << endl;
-    
+
     ////////////////////////////////////////////////////////////
     // calculate and print mean elevation and raw rate
     if( onrun != -1 )
@@ -543,46 +543,46 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
         cout << "\t trigger rate : " << fMeanRawRateOn << " Hz (ON), " << fMeanRawRateOff << " Hz (Off)" << endl;
         cout << "\t mean pedvars: " << fMeanPedVarsOn << " (ON), " << fMeanPedVarsOff << " (OFF)" << endl;
     }
-    
+
     ////////////////////////////////////////////////////////////
     // create alpha histogram for significance calculations
     // (called for correlated and uncorrelated histograms)
     fStereoOff->scaleAlpha( fStereoOn->getAlpha(), false );
     fStereoOff->scaleAlpha( fStereoOn->getAlphaUC(), true );
-    
+
     ////////////////////////////////////////////////////////////
     // ON / OFF Analysis
     ////////////////////////////////////////////////////////////
     VOnOff* fstereo_onoff = new VOnOff();
-    
+
     // normalization at target position
     double i_norm_alpha = fStereoOff->getAlphaNorm()->GetBinContent( fStereoOff->getAlphaNorm()->GetXaxis()->FindBin(-1.*fRunPara->fTargetShiftWest ),
                           fStereoOff->getAlphaNorm()->GetYaxis()->FindBin(-1.*fRunPara->fTargetShiftNorth ) );
-                          
+
     // on-off for 1D histograms
     fstereo_onoff->doOnOffforParameterHistograms( fStereoOn->getParameterHistograms(), fStereoOff->getParameterHistograms(), i_norm_alpha, ( onrun == -1 ) );
-    
+
     // on-off for correlated maps
     fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( false ), fStereoOff->getSkyHistograms( false ), fStereoOff->getAlphaNorm() );
     // on-off for uncorrelated maps
     fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( true ), fStereoOff->getSkyHistograms( true ), fStereoOff->getAlphaNormUC() );
-    
+
     // print out maximum in maps
     cout << "\t Maximum in CORRELATED maps: " << endl;
     TH2D* hStSig = ( TH2D* )fstereo_onoff->do2DSignificance( fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(), fStereoOff->getAlphaNorm() );
     cout << "\t Maximum in UNCORRELATED maps: " << endl;
     TH2D* hStSigUC = ( TH2D* )fstereo_onoff->do2DSignificance( fStereoOn->getStereoSkyMapUC(), fStereoOff->getStereoSkyMapUC(), fStereoOff->getAlphaNormUC() );
-    
+
     ////////////////////////////////////////////////////////////
     // calculate significance in source bin
-    
+
     // number of on events
     double i_nevts_on = fStereoOn->getStereoSkyMap()->GetBinContent( fStereoOn->getStereoSkyMap()->GetXaxis()->FindBin(-1.*fRunPara->fTargetShiftWest ),
                         fStereoOn->getStereoSkyMap()->GetYaxis()->FindBin(-1.*fRunPara->fTargetShiftNorth ) );
     // number of off events
     double i_nevts_off = fStereoOff->getStereoSkyMap()->GetBinContent( fStereoOff->getStereoSkyMap()->GetXaxis()->FindBin(-1.*fRunPara->fTargetShiftWest ),
                          fStereoOff->getStereoSkyMap()->GetYaxis()->FindBin(-1.*fRunPara->fTargetShiftNorth ) );
-                         
+
     double i_sig = VStatistics::calcSignificance( i_nevts_on, i_nevts_off, i_norm_alpha );
     double i_rate = 0.;
     double i_rateE = 0.;
@@ -593,7 +593,7 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
         i_rateOFF = i_norm_alpha * i_nevts_off * 60. / iexp_off;                    // rates in 1/min
         i_rateE = sqrt( i_nevts_on + i_norm_alpha* i_norm_alpha* i_nevts_off ) * 60. / iexp_on;
     }
-    
+
     cout << endl;
     cout << "\t ---------------------------- " << endl;
     cout << "\t RESULTS FOR SOURCE POSITION: " << endl;
@@ -603,22 +603,22 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
     cout << "\t " << setprecision( 4 ) <<  i_sig << " Sigma  " << i_rate << "+/-" << i_rateE << " gammas/min" << endl;
     cout << "\t background rate: " << i_rateOFF << " CR/min" << endl;
     cout << endl;
-    
+
     // calculate q-factors
     fstereo_onoff->doQfactors( fStereoOn->getParameterHistograms(), fStereoOff->getParameterHistograms(), 1. );
-    
+
     // fill rate graphs by run
     if( onrun != -1 && hStSig )
     {
         fRatePlots->fill( onrun, fStereoOn->getMJD( onrun ), i_sig, hStSig->GetMaximum(), i_nevts_on, i_nevts_off * 1., i_rate );
     }
-    
+
     // rate graphs by interval
     doLightCurves( idir, i_norm_alpha, fStereoOn, fStereoOff );
-    
+
     // fill run summary tree
     fillRunSummary( onrun, offrun, iexp_on, iexp_off, i_nevts_on, i_nevts_off, i_norm_alpha, i_sig, i_rate, i_rateOFF, fstereo_onoff );
-    
+
     /////////////////////////////////////////////////////////
     // finalize and write everything to disk
     idir->cd();
@@ -637,11 +637,11 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
         // write list of excluded regions to disk (as a tree)
         fRunPara->writeListOfExcludedSkyRegions();
     }
-    
+
     // close data files, etc.
     fStereoOn->terminate();
     fStereoOff->terminate();
-    
+
     // clean up
     delete fstereo_onoff;
 }
@@ -657,7 +657,7 @@ void VAnaSum::doLightCurves( TDirectory* iDir, double ialpha, VStereoAnalysis* i
     vector< double > isig;
     vector< double > irate;
     vector< double > itime;
-    
+
     for( unsigned int i = 0; i < ion->getRateTime().size(); i++ )
     {
         isig.push_back( VStatistics::calcSignificance( ion->getRateCounts()[i], ioff->getRateCounts()[i], ialpha ) );
@@ -672,11 +672,11 @@ void VAnaSum::doLightCurves( TDirectory* iDir, double ialpha, VStereoAnalysis* i
         // mean time of time interval
         itime.push_back( ion->getRateTime()[i] + ion->getRateTimeIntervall()[i] / 2. / 86400. );
     }
-    
+
     VRatePlots iRate;
-    
+
     iRate.fill( itime, ion->getRateCounts(), ioff->getRateCounts(), isig, irate );
-    
+
     iDir->cd();
     iRate.write( "rateIntervallPlots" );
 }
@@ -767,7 +767,7 @@ void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp
     {
         return;
     }
-    
+
     // fill results tree
     fRunSummary->runOn = onrun;
     fRunSummary->runOff = offrun;
@@ -1051,10 +1051,10 @@ void VAnaSum::terminate()
 double VAnaSum::getAzRange( int i_run, string i_treename, double& azmin, double& azmax )
 {
     double azmean = 0.;
-    
+
     azmin = 1.e3;
     azmax = -1.e3;
-    
+
     char i_temp[2000];
     sprintf( i_temp, "%s%s%d%s", fDatadir.c_str(), fPrefix.c_str(), i_run, fSuffix.c_str() );
     TFile* i_f = new TFile( i_temp );
@@ -1063,7 +1063,7 @@ double VAnaSum::getAzRange( int i_run, string i_treename, double& azmin, double&
         cout << "VAnaSum::getAZRange fatal error: file not found, " << i_temp << endl;
         exit( EXIT_FAILURE );
     }
-    
+
     TTree* i_tree = ( TTree* )i_f->Get( i_treename.c_str() );
     if(!i_tree )
     {
@@ -1090,7 +1090,7 @@ double VAnaSum::getAzRange( int i_run, string i_treename, double& azmin, double&
         i_tree->SetBranchAddress( "ImgSel", &ImgSel_64 );
     }
     i_tree->SetBranchAddress( "TelAzimuth", telaz );
-    
+
     bool bSet = false;
     for( int i = 0; i < i_tree->GetEntries(); i++ )
     {
@@ -1099,7 +1099,7 @@ double VAnaSum::getAzRange( int i_run, string i_treename, double& azmin, double&
         {
             ImgSel_64 = ( ULong64_t )ImgSel;
         }
-        
+
         if( ImgSel_64 > 0 )
         {
             bitset<8 * sizeof(ULong64_t )> a = ImgSel_64;
@@ -1122,12 +1122,12 @@ double VAnaSum::getAzRange( int i_run, string i_treename, double& azmin, double&
     for( int i = i_tree->GetEntries() - 1; i >= 0; i-- )
     {
         i_tree->GetEntry( i );
-        
+
         if( i_v < 6 )
         {
             ImgSel_64 = ( ULong64_t )ImgSel;
         }
-        
+
         if( ImgSel_64 > 0 )
         {
             bitset<8 * sizeof(ULong64_t )> a = ImgSel_64;
@@ -1155,7 +1155,7 @@ double VAnaSum::getAzRange( int i_run, string i_treename, double& azmin, double&
         azmax -= 360.;
     }
     cout << "\t azimuth range: [" << azmin << "," << azmax << "]" << endl;
-    
+
     // calculate mean az
     // mean azimuth angle
     if( azmin > 120. && azmax < -120. )
@@ -1166,16 +1166,16 @@ double VAnaSum::getAzRange( int i_run, string i_treename, double& azmin, double&
     {
         azmin += 360.;
     }
-    
+
     azmean = 0.5 * ( azmin + azmax );
     if( azmean > 180. )
     {
         azmean -= 360.;
     }
-    
+
     i_f->Close();
     delete i_f;
-    
+
     return azmean;
 }
 
@@ -1188,7 +1188,7 @@ double VAnaSum::getNoiseLevel( int i_run )
 {
     char i_temp[2000];
     double ipedv = -1.;
-    
+
     sprintf( i_temp, "%s%s%d%s", fDatadir.c_str(), fPrefix.c_str(), i_run, fSuffix.c_str() );
     TFile* i_f = new TFile( i_temp );
     if( i_f->IsZombie() )

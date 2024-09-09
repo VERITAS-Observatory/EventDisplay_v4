@@ -34,7 +34,7 @@ double VFitTraceHandler_tracefunction( double* x, double* p )
     double ped = p[4];
     double xd = x[0] - xbar;
     double f = 0.;
-    
+
     if( x[0] < xbar )
     {
         f = A * exp(-0.5 * xd* xd / sig / sig ) + ped;
@@ -60,19 +60,19 @@ double VFitTraceHandler_tracefunction_Grisu( double* x, double* par )
     double tstart = par[3];
     double norm = par[4];
     double ped = par[5];
-    
+
     double rtn;
     double alpha;                                 /*Power index in the pulse shape definition*/
     double wid = 0.;                              /*Photo electron pulse width*/
     double renorm;                                /*Photo electron pulse normalisation factor*/
-    
+
     t -= tstart;
     /*In case it is earlier than the p.e. arrival we return 0*/
     if( t < 0. )
     {
         return ped;
     }
-    
+
     /*The first component is the single p.e.pulse*/
     if( t < ( fall + rize ) )
     {
@@ -94,7 +94,7 @@ double VFitTraceHandler_tracefunction_Grisu( double* x, double* par )
     {
         rtn = 0.0;
     }
-    
+
     rtn *= norm;
     rtn += ped;
     return rtn;
@@ -115,7 +115,7 @@ VFitTraceHandler::VFitTraceHandler( string iFit )
     fMaxSamples = 64;
     fpTrace.reserve( fMaxSamples );
     fpTrazeSize = 0;
-    
+
     fFitFunction = iFit;
     if(!setFitFunction( fFitFunction ) )
     {
@@ -139,12 +139,12 @@ VFitTraceHandler::VFitTraceHandler( string iFit )
     fHalpha = new TH2D( "fHFitalpha", "Tracefit: #alpha vs. tube number", 499, 0., 499., 100, 0., 10. );
     fHalpha->SetXTitle( "tube number" );
     fHalpha->SetYTitle( "#alpha" );
-    
+
     fChi2 = 0.;
     fRT = 0.;
     fFT = 0.;
     fTraceNorm = 0.;
-    
+
     fMC_FADCTraceStart = 0;
 }
 
@@ -165,13 +165,13 @@ void VFitTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSam
 {
     fPed = ped;
     fPedrms = pedrms;
-    
+
     if(!iReader )
     {
         cout << "VFitTraceHandler::setTrace: no reader set" << endl;
         return;
     }
-    
+
     // copy trace
     if( iNSamples != fpTrace.size() )
     {
@@ -185,10 +185,10 @@ void VFitTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSam
         {
             fpTrace[i] = iReader->getSample_double( iHitID, i + fMC_FADCTraceStart, ( i == 0 ) );
         }
-        
+
     fpTrazeSize = int( fpTrace.size() );
     apply_lowgain( iHiLo );
-    
+
     fitTrace( iChanID );
 }
 
@@ -211,7 +211,7 @@ void VFitTraceHandler::setTrace( vector<uint16_t> pTrace, double ped, double ped
 {
     fPed = ped;
     fPedrms = pedrms;
-    
+
     // copy trace
     unsigned int i_tsize = pTrace.size();
     if( i_tsize != fpTrace.size() )
@@ -226,10 +226,10 @@ void VFitTraceHandler::setTrace( vector<uint16_t> pTrace, double ped, double ped
         {
             fpTrace[i] = ( double )pTrace[i];
         }
-        
+
     fpTrazeSize = int( fpTrace.size() );
     apply_lowgain( iHiLo );
-    
+
     fitTrace( chanID );
 }
 
@@ -241,7 +241,7 @@ void VFitTraceHandler::setTrace( vector<uint8_t> pTrace, double ped, double pedr
 {
     fPed = ped;
     fPedrms = pedrms;
-    
+
     // copy trace
     unsigned int i_tsize = pTrace.size();
     if( i_tsize != fpTrace.size() )
@@ -256,10 +256,10 @@ void VFitTraceHandler::setTrace( vector<uint8_t> pTrace, double ped, double pedr
         {
             fpTrace[i] = ( double )pTrace[i];
         }
-        
+
     fpTrazeSize = int( fpTrace.size() );
     apply_lowgain( iHiLo );
-    
+
     fitTrace( chanID );
 }
 
@@ -272,7 +272,7 @@ void VFitTraceHandler::fitTrace( unsigned int chanID )
     fRT = 0.;
     fFT = 0.;
     fTraceNorm = 0.;
-    
+
     fH1TraceData->Reset();
     fH1Trace->SetLineStyle( 1 );
     // check if histogram size is still correct
@@ -287,12 +287,12 @@ void VFitTraceHandler::fitTrace( unsigned int chanID )
         // errors are signal+rms of pedestal
         fH1TraceData->SetBinError( i + 1, sqrt( fabs( fpTrace[i] - fPed ) + fPedrms* fPedrms ) / 2. );
     }
-    
+
     // find start parameters
     double ipeak = 0.;
     int ipeakpos = 0;
     getQuickMax( 0, fpTrace.size(), ipeak, ipeakpos );
-    
+
     // fit only if peak value of trace is above threshold
     if( ipeak > fFitThresh * fPedrms )
     {
@@ -323,7 +323,7 @@ void VFitTraceHandler::fitTrace( unsigned int chanID )
             fF1Trace->SetParLimits( 0, 0., 20. );
             fF1Trace->SetParLimits( 1, 0., 2000. );
         }
-        
+
         // now fit everything
         if(!fMinuitPrint )
         {
@@ -403,7 +403,7 @@ double VFitTraceHandler::getTraceSum( int iFirst, int iLast, bool iRaw )
     {
         isum = calculateTraceSum_fixedWindow( iFirst, iLast, iRaw );
     }
-    
+
     return isum;
 }
 
@@ -484,7 +484,7 @@ bool VFitTraceHandler::setFitFunction( string iFunc )
     {
         return false;
     }
-    
+
     if( iFunc == "ev" )
     {
         fF1Trace = new TF1( "fF1tracehandler", VFitTraceHandler_tracefunction, 0., fMaxSamples, 5 );
@@ -508,15 +508,15 @@ double VFitTraceHandler::getTraceWidth( int fFirst, int fLast, double fPed )
     {
         return -1.;
     }
-    
+
     double iMax = fTraceMax;
     iMax *= -1.;
     iMax = fPed + 0.5 * ( iMax - fPed );
     iMax *= -1.;
-    
+
     fFirst = 0;
     fLast  = 0;
-    
+
     return ( fF1Trace->GetX( iMax, fTraceMaxX, ( double )fMaxSamples ) - fF1Trace->GetX( iMax, 0., fTraceMaxX ) );
 }
 
@@ -537,11 +537,11 @@ double VFitTraceHandler::getTraceRiseTime( double fPed, double ystart, double ys
     }
     double t1 = 0.;
     double t2 = 0.;
-    
+
     double iMax = fTraceMax;
     t1 = fF1Trace->GetX(-1.*( fPed + ystart * (-1.*iMax - fPed ) ), 0., fTraceMaxX );
     t2 = fF1Trace->GetX(-1.*( fPed + ystop * (-1.*iMax - fPed ) ), 0., fTraceMaxX );
-    
+
     return t2 - t1;
 }
 
@@ -562,10 +562,10 @@ double VFitTraceHandler::getTraceFallTime( double fPed, double ystart, double ys
     }
     double t1 = 0.;
     double t2 = 0.;
-    
+
     double iMax = fTraceMax;
     t1 = fF1Trace->GetX(-1.*( fPed + ystart * (-1.*iMax - fPed ) ), fTraceMaxX, ( double )fMaxSamples );
     t2 = fF1Trace->GetX(-1.*( fPed + ystop * (-1.*iMax - fPed ) ), fTraceMaxX, ( double )fMaxSamples );
-    
+
     return t2 - t1;
 }

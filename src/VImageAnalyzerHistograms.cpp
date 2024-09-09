@@ -11,7 +11,7 @@
 VImageAnalyzerHistograms::VImageAnalyzerHistograms( unsigned int iTel )
 {
     fTelescopeID = iTel;
-    
+
     hisList = new TList();
 }
 
@@ -26,12 +26,12 @@ void VImageAnalyzerHistograms::init()
 
     char hisname[800];
     char histitle[800];
-    
+
     sprintf( hisname, "fFADCStop" );
     sprintf( histitle, "FADC stop diagnostic tree (telescope %d)", fTelescopeID + 1 );
     fdiagno = new TTree( hisname, histitle );
     fdiagno->SetAutoSave( 100000000 );
-    
+
     fdiagno->Branch( "runNumber", &runNumber, "runNumber/I" );
     fdiagno->Branch( "eventNumber", &eventNumber,  "eventNumber/I" );
     fdiagno->Branch( "MJD", &MJD,  "MJD/I" );
@@ -39,7 +39,7 @@ void VImageAnalyzerHistograms::init()
     fdiagno->Branch( "FADCstopTZero", fFADCstopTZero, "fFADCstopTZero[4]/F" );
     fdiagno->Branch( "FADCstopSum", fFADCstopSum, "fFADCstopSum[4]/F" );
     hisList->Add( fdiagno );
-    
+
 }
 
 
@@ -55,7 +55,7 @@ void VImageAnalyzerHistograms::fillL2DiagnosticTree( int rN, int eN, int iMJD, d
     eventNumber = eN;
     MJD = iMJD;
     time = it;
-    
+
     if( iTZero.size() == 4 )
     {
         for( unsigned int i = 0; i < 4; i++ )
@@ -78,7 +78,7 @@ void VImageAnalyzerHistograms::fillL2DiagnosticTree( int rN, int eN, int iMJD, d
         {
             fFADCstopSum[i] = 0.;
         }
-        
+
     if( fdiagno )
     {
         fdiagno->Fill();
@@ -98,9 +98,9 @@ void VImageAnalyzerHistograms::terminate( TFile* outputfile )
         return;
     }
     TDirectory* iDir = gDirectory;
-    
+
     hisList->Write();
-    
+
     outputfile->cd();
     iDir->cd();
 }

@@ -9,34 +9,34 @@
 VTableCalculator::VTableCalculator( int intel, bool iEnergy, bool iPE )
 {
     setDebug();
-    
+
     setConstants( iPE );
-    
+
     if( intel == 0 )
     {
         return;
     }
-    
+
     fEnergy = iEnergy;
     fUseMedianEnergy = 0;
-    
+
     for( int i = 0; i < intel; i++ )
     {
         hVMedian.push_back( 0 );
     }
     hMedian = 0;
     hMean = 0;
-    
+
     Omode = 'r';
     fwrite = false;
     if(( Omode == 'w' ) || ( Omode == 'W' ) )
     {
         fwrite = true;
     }
-    
+
     fInterPolWidth = 1;
     fInterPolIter = 3;
-    
+
     fBinning1DXlow = 1.e-5;
     fBinning1DXhigh = 1. + 1.e-5;
     if( fEnergy )
@@ -44,36 +44,36 @@ VTableCalculator::VTableCalculator( int intel, bool iEnergy, bool iPE )
         fBinning1DXlow =  1.;
         fBinning1DXhigh = 5.;
     }
-    
+
     fReadHistogramsFromFile = false;
-    
+
 }
 
 
 VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDirectory* iDir, bool iEnergy, bool iPE, int iUseMedianEnergy )
 {
     setDebug();
-    
+
     // use 1D histograms to calculate medians (more precise, but needs much more memory and is slower)
     fWrite1DHistograms = false;
     // use median approximation (faster)
     fFillMedianApproximations = true;
-    
+
     setConstants( iPE );
     // using lookup tables to calculate energies
     fEnergy = iEnergy;
     fUseMedianEnergy = iUseMedianEnergy;
     fReadHistogramsFromFile = false;
-    
+
     fHName_Add = hname_add;
-    
+
     fName = fpara;
-    
+
     fInterPolWidth = 1;
     fInterPolIter = 3;
-    
+
     setBinning();
-    
+
     fOutDir = iDir;
     if(!fOutDir )
     {
@@ -91,11 +91,11 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
     {
         fwrite = true;
     }
-    
+
     int i = 0;
     int j = 0;
     char hname[1000];
-    
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // table writing
     if( fwrite )
@@ -105,7 +105,7 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
             cout << "VTableCalculator: error data directory in root file not writable" << endl;
             exit(-1 );
         }
-        
+
         /* HSTOGRAM BOOKING */
         char htitle[1000];
         // median of variable
@@ -158,7 +158,7 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
     else
     {
         fReadHistogramsFromFile = false;
-        
+
         if( fUseMedianEnergy == 1 )
         {
             sprintf( hname, "%s_median_%s", fpara.c_str(), fHName_Add.c_str() );
@@ -180,7 +180,7 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
         }
         hMedianName = hname;
     }
-    
+
 }
 
 void VTableCalculator::setBinning()
@@ -219,14 +219,14 @@ bool VTableCalculator::create1DHistogram( int i, int j, double w_first_event )
         char hisname[200];
         char histitle[200];
         int id = i * 1000 + j;
-        
+
         sprintf( hisname, "h%d", id );
         double is1 = hMedian->GetXaxis()->GetBinLowEdge( i + 1 );
         double is2 = hMedian->GetXaxis()->GetBinLowEdge( i + 1 ) + hMedian->GetXaxis()->GetBinWidth( i + 1 );
         double id1 = hMedian->GetYaxis()->GetBinLowEdge( j + 1 );
         double id2 = hMedian->GetYaxis()->GetBinLowEdge( j + 1 ) + hMedian->GetYaxis()->GetBinWidth( j + 1 );
         sprintf( histitle, "%.2f < log10 size < %.2f, %.1f < r < %.1f (%s)", is1, is2, id1, id2, fHName_Add.c_str() );
-        
+
         Oh[i][j] = new TH1F( hisname, histitle, HistBins, fBinning1DXlow, fBinning1DXhigh );
         Oh[i][j]->SetXTitle( fName.c_str() );
     }
@@ -249,14 +249,14 @@ void VTableCalculator::setConstants( bool iPE )
     xlow = 0.;
     xhigh = 1.;
     fMinShowerPerBin = 5.;
-    
+
     // binning is different for MC with values in PE
     if( iPE )
     {
         NumSize = 45;
         amp_offset = 1.0;
         amp_delta = 0.15;
-        
+
         NumDist = 75;
         dist_delta = 20.;
         HistBins = 500;
@@ -270,13 +270,13 @@ void VTableCalculator::terminate( TDirectory* iOut, char* xtitle )
     {
         fOutDir = iOut;
     }
-    
+
     if(!fOutDir->cd() )
     {
         cout << "Error: unable to reach writing directory ( VTableCalculator::terminate())" << endl;
         return;
     }
-    
+
     /////////////////////////////////////////////////////////////////////////////////////////////
     // table writing
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -288,7 +288,7 @@ void VTableCalculator::terminate( TDirectory* iOut, char* xtitle )
         {
             iDir1D = fOutDir->mkdir( "histos1D" );
         }
-        
+
         ///////////////////////////////////
         // 2D histograms
         // number of events
@@ -330,18 +330,18 @@ void VTableCalculator::terminate( TDirectory* iOut, char* xtitle )
             sprintf( htitle, "%s (2xsigma) [TeV]", fName.c_str() );
         }
         hSigma->SetZTitle( htitle );
-        
+
         ///////////////////////////////////
         // EVALUATION OF HISTOGRAMS
         cout << "\t tables (msc style): evaluating " << fName << " histograms ";
-        
+
         float med = 0.;
         float sigma = 0.;
         int   nevents = 0;
-        
+
         double i_a[] = { 0.16, 0.5, 0.84 };
         double i_b[] = { 0.0,  0.0, 0.0  };
-        
+
         // loop over all size bin and distance bins
         for( int i = 0; i < NumSize; i++ )
         {
@@ -543,7 +543,7 @@ return value is energy (linear scale)
 double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double* mt, double& chi2, double& dE, double* st )
 {
     int tel = 0;
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////
     // fill the tables
     //
@@ -640,21 +640,21 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
     //
     else
     {
-    
+
         // tables are accessed for the first time: get the from the file
         if(!fReadHistogramsFromFile )
         {
             cout << "read tables from " << fOutDir->GetPath() << endl;
             hMedian = ( TH2F* )fOutDir->Get( hMedianName.c_str() );
             fReadHistogramsFromFile = true;
-            
+
             if(!hMedian )
             {
                 cout << "VTableCalculator error: table histograms not found in " << gDirectory->GetName() << endl;
                 exit(-1 );
             }
         }
-        
+
         chi2 = 0.;
         dE   = 0.;
         double med = 0.;
@@ -666,7 +666,7 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
         vector< double > sigma2_tel;
         vector< double > sigma2_tel_noRadiusWeigth;
         vector< double > sigma_tel;
-        
+
         // reset everything
         for( tel = 0; tel < ntel; tel++ )
         {
@@ -676,7 +676,7 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
                 st[tel] = -99.;
             }
         }
-        
+
         ////////////////////////////////////////////////////
         // loop over all telescopes
         ////////////////////////////////////////////////////
@@ -819,7 +819,7 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
             {
                 value /= weight;
             }
-            
+
             // loop over number if images with valid entries
             if( energy_tel.size() > 1 )
             {
@@ -871,7 +871,7 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
             return -99.;
         }
     }
-    
+
     // should never reach this point
     return -99.;
 }
@@ -889,14 +889,14 @@ double VTableCalculator::getWeightMeanBinContent( TH2F* h, int ix0, int iy0, dou
     {
         return 0.;
     }
-    
+
     if( h->GetBinContent( ix0, iy0 ) == 0. )
     {
         return 0.;
     }
-    
+
     double ibc = 0.;
-    
+
     // get bin centers
     double i_bc_x0 = h->GetXaxis()->GetBinCenter( ix0 );
     double i_bc_y0 = h->GetYaxis()->GetBinCenter( iy0 );
@@ -920,10 +920,10 @@ double VTableCalculator::getWeightMeanBinContent( TH2F* h, int ix0, int iy0, dou
     }
     double i_bc_x1 = h->GetXaxis()->GetBinCenter( ix1 );
     double i_bc_y1 = h->GetYaxis()->GetBinCenter( iy1 );
-    
+
     double weight = 0.;
     double dist = 0.;
-    
+
     // first bin (x,y is inside this bin)
     dist = sqrt(( i_bc_x0 - x ) * ( i_bc_x0 - x ) + ( i_bc_y0 - y ) * ( i_bc_y0 - y ) );
     // return bin content if x,y is very close to bin center
@@ -932,10 +932,10 @@ double VTableCalculator::getWeightMeanBinContent( TH2F* h, int ix0, int iy0, dou
         return h->GetBinContent( ix0, iy0 );
     }
     dist = 1. / dist;
-    
+
     weight += dist;
     ibc += h->GetBinContent( ix0, iy0 ) * dist;
-    
+
     // second bin
     if( h->GetBinContent( ix1, iy0 ) > 0. )
     {
@@ -946,7 +946,7 @@ double VTableCalculator::getWeightMeanBinContent( TH2F* h, int ix0, int iy0, dou
             ibc += h->GetBinContent( ix1, iy0 ) / dist;
         }
     }
-    
+
     // third bin
     if( h->GetBinContent( ix1, iy1 ) > 0. && dist > 0. )
     {
@@ -957,7 +957,7 @@ double VTableCalculator::getWeightMeanBinContent( TH2F* h, int ix0, int iy0, dou
             ibc += h->GetBinContent( ix1, iy1 ) / dist;
         }
     }
-    
+
     // fourth bin
     if( h->GetBinContent( ix0, iy1 ) > 0. )
     {
@@ -968,12 +968,12 @@ double VTableCalculator::getWeightMeanBinContent( TH2F* h, int ix0, int iy0, dou
             ibc += h->GetBinContent( ix0, iy1 ) / dist;
         }
     }
-    
+
     if( weight > 0. )
     {
         return ibc / weight;
     }
-    
+
     return 0.;
 }
 
@@ -981,7 +981,7 @@ double VTableCalculator::getWeightMeanBinContent( TH2F* h, int ix0, int iy0, dou
 void VTableCalculator::setVHistograms( vector< TH2F* >& hM )
 {
     hVMedian = hM;
-    
+
     fReadHistogramsFromFile = true;
 }
 
@@ -992,7 +992,7 @@ TH2F* VTableCalculator::getHistoMedian()
     {
         fReadHistogramsFromFile = readHistograms();
     }
-    
+
     return hMedian;
 }
 
@@ -1002,7 +1002,7 @@ bool VTableCalculator::readHistograms()
     if( fOutDir )
     {
         hMedian = ( TH2F* )fOutDir->Get( hMedianName.c_str() );
-        
+
         if( hMedian )
         {
             return true;
@@ -1022,7 +1022,7 @@ double VTableCalculator::interpolate( TH2F* h, double x, double y, bool iError )
     {
         return 0.;
     }
-    
+
     int i_x = h->GetXaxis()->FindFixBin( x );
     int i_y = h->GetYaxis()->FindFixBin( y );
     // handle under and overflows ( bin nBinsX+1 is needed)
@@ -1045,11 +1045,11 @@ double VTableCalculator::interpolate( TH2F* h, double x, double y, bool iError )
     {
         i_y--;
     }
-    
+
     double e1 = 0.;
     double e2 = 0.;
     double v = 0.;
-    
+
     // first interpolate on distance axis, then on size axis
     if(!iError )
     {
@@ -1071,7 +1071,7 @@ double VTableCalculator::interpolate( TH2F* h, double x, double y, bool iError )
         e2 = VStatistics::interpolate( h->GetBinError( i_x + 1, i_y ), h->GetYaxis()->GetBinCenter( i_y ),
                                        h->GetBinError( i_x + 1, i_y + 1 ), h->GetYaxis()->GetBinCenter( i_y + 1 ),
                                        y, false );
-                                       
+
         v = VStatistics::interpolate( e1, h->GetXaxis()->GetBinCenter( i_x ), e2, h->GetXaxis()->GetBinCenter( i_x + 1 ), x, false );
     }
     // final check on consistency of results
@@ -1084,7 +1084,7 @@ double VTableCalculator::interpolate( TH2F* h, double x, double y, bool iError )
     {
         return e2;
     }
-    
+
     return v;
 }
 
@@ -1101,7 +1101,7 @@ void VTableCalculator::fillMPV( TH2F* h, int i, int j, TH1F* h1D, double iMedian
     {
         return;
     }
-    
+
     // only fit well filled histograms -> otherwise will median
     if( h1D->GetEntries() <= 50 || iMedianValue <= 0. )
     {
@@ -1114,7 +1114,7 @@ void VTableCalculator::fillMPV( TH2F* h, int i, int j, TH1F* h1D, double iMedian
         h->SetBinContent( i, j, iMedianValue );
         return;
     }
-    
+
     /////////////////////////////////////////
     // try a Landau fit
     TF1 iLandau( "iLandau", "TMath::Landau(x,[0],[1],0)*[2]", iMedianValue / 3., iMedianValue * 3. );
@@ -1127,7 +1127,7 @@ void VTableCalculator::fillMPV( TH2F* h, int i, int j, TH1F* h1D, double iMedian
             && iLandau.GetParameter( 0 ) > 0. && iMedianValue / iLandau.GetParameter( 0 ) < 2.5 )
     {
         h->SetBinContent( i, j, iLandau.GetParameter( 0 ) );
-        
+
         if( fDebug )
         {
             cout << "\t\t Landau interpolation for energy tables: " << i << "\t" << j << "\t";
@@ -1141,5 +1141,5 @@ void VTableCalculator::fillMPV( TH2F* h, int i, int j, TH1F* h1D, double iMedian
     {
         h->SetBinContent( i, j, iMedianValue );
     }
-    
+
 }

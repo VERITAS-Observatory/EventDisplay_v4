@@ -41,11 +41,11 @@ void print_sensitivity( string anasum_file, double alpha = 1. / 6. )
     t->SetBranchAddress( "RateOff", &RateOff );
     t->SetBranchAddress( "RateE", &RateE );
     t->SetBranchAddress( "RateOffE", &RateOffE );
-    
+
     t->GetEntry( t->GetEntries() - 1 );
-    
+
     cout << "Rates (on/Off): " << Rate << "\t" << RateOff << endl;
-    
+
     vector< double > fSourceStrength;
     fSourceStrength.push_back( 1. );
     fSourceStrength.push_back( 0.3 );

@@ -46,7 +46,7 @@ int main( int argc, char* argv[] )
         day = 1;
         bPrintWholeYear = true;
     }
-    
+
     string object = argv[5];
     double orbit = 0.;
     double t0 = 0.;
@@ -98,12 +98,12 @@ int main( int argc, char* argv[] )
     {
         t0 = atof( argv[7] );
     }
-    
+
     cout << "Orbital parameters for " << object << ": ";
     cout << "MJD_0 = " << t0;
     cout << ", Orbit [d]: " << orbit;
     cout << endl << endl;
-    
+
     // get mjd for given date
     VAstronometry::vlaCldj( year, month, day, &djm, &j );
     if( j == 0 )

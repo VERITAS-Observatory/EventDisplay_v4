@@ -16,7 +16,7 @@
 VSourceGeometryFitter::VSourceGeometryFitter()
 {
     fDebug = false;
-    
+
     fAnasumDataFile = "";
     fRunNumber      = -1;
     fHisSkyMap      = 0;
@@ -25,13 +25,13 @@ VSourceGeometryFitter::VSourceGeometryFitter()
     fPSF            = 0.063;
     setFitterDefaultData();
     setFitter( "RadialAsymmetricSource_LL" );
-    
+
 }
 
 VSourceGeometryFitter::VSourceGeometryFitter( string iAnaSumDataFile, int iRunNumber )
 {
     fDebug = false;
-    
+
     fAnasumDataFile = iAnaSumDataFile;
     fRunNumber      = iRunNumber;
     fHisSkyMap      = 0;
@@ -42,134 +42,134 @@ VSourceGeometryFitter::VSourceGeometryFitter( string iAnaSumDataFile, int iRunNu
     {
         return;
     }
-    
+
     setFitterDefaultData();
     setFitter( "RadialAsymmetricSource_LL" );
-    
+
 }
 
 void VSourceGeometryFitter::setFitterDefaultData()
 {
 
     fDefaultFitterData.clear();
-    
-    
+
+
     ////////
     // SRC 1: radial symmetric 2D source
     ////////
     fDefaultFitterData.push_back( new VSourceGeometryFitterData() );
     fDefaultFitterData.back()->fFitterName = "RadialSymmetricSource_Chi2";
     fDefaultFitterData.back()->fFitterDescription = "Radial Symmetric 2D gaussian convolved with gaussian PSF, chisquare fit";
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "Xpos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "Ypos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "sigmaSRC" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0.1 );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( 0. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1.e2 );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "constant" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 1.e5 );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( 0. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 0. );
-    
-    
-    
-    
+
+
+
+
     ////////
     // SRC 2: radial asymmetric 2D source - does not work at the moment!!!
     ////////
     /* fDefaultFitterData.push_back( new VSourceGeometryFitterData() );
     fDefaultFitterData.back()->fFitterName = "RadialAsymmetricSource_Chi2";
     fDefaultFitterData.back()->fFitterDescription = "Radial Asymmetric 2D gaussian convolved with gaussian PSF, chisquare fit";
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "Xpos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back(  1. );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "Ypos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back(  1. );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "sigmaSRC_X" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0.1 );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( 0. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1.e2 );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "sigmaSRC_Y" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0.1 );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( 0. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1.e2 );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "theta" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0.0 );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1.e3 );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1.e3 );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "constant" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 1.e5 );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( 0. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1.e5 );*/
-    
+
     /*
     // 2D Normal distribution (LL)
     fDefaultFitterData.push_back( new VSourceGeometryFitterData() );
     fDefaultFitterData.back()->fFitterName = "2DAsymGauss_LL";
     fDefaultFitterData.back()->fFitterDescription = "Asymmetrical Gaussian";
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "rho" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back(  0. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back(  1. );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "Xpos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back(  1. );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "sigmaX" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0.1 );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( 0. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1.e2 );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "Ypos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back(  1. );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "sigmaY" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0.1 );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( 0. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1.e2 );
-    
+
     */
-    
-    
+
+
     ////////
     // SRC 3: radial symmetric 2D source, LL
     ////////
@@ -177,26 +177,26 @@ void VSourceGeometryFitter::setFitterDefaultData()
     fDefaultFitterData.push_back( new VSourceGeometryFitterData() );
     fDefaultFitterData.back()->fFitterName = "RadialSymmetricSource_LL";
     fDefaultFitterData.back()->fFitterDescription = "Bi-variate normal function with rho=0 (correlation coefficient) convolved with PSF";
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "Xpos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "Ypos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "sigma" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0.1 );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( 0. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1.e2 );
-    
-    
+
+
     ////////
     // SRC 4: radial asymmetric 2D source
     ////////
@@ -204,141 +204,141 @@ void VSourceGeometryFitter::setFitterDefaultData()
     fDefaultFitterData.push_back( new VSourceGeometryFitterData() );
     fDefaultFitterData.back()->fFitterName = "RadialAsymmetricSource_LL";
     fDefaultFitterData.back()->fFitterDescription = "Bi-variate normal function convolved with PSF";
-    
+
     //   fDefaultFitterData.back()->fParameterName.push_back( "rho" );
     fDefaultFitterData.back()->fParameterName.push_back( "angle" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( 0. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 2 );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "Xpos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "sigmaX" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0.1 );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( 0. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1.e2 );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "Ypos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "sigmaY" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0.1 );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( 0. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1.e2 );
-    
-    
+
+
     ////////
     // PSF 1: radial symmetric 2D gaussian with an offset (Chi2)
     ////////
     fDefaultFitterData.push_back( new VSourceGeometryFitterData() );
     fDefaultFitterData.back()->fFitterName = "2DGauss_Chi2";
     fDefaultFitterData.back()->fFitterDescription = "Radial symmetric 2D gaussian with an offset, chisquare fit";
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "background" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 30. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1.e5 );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1.e5 );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "constant" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 1.e5 );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( 0. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 0. );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "sigma" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0.1 );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( 1.e-3 );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1.0 );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "Xpos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "Ypos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
-    
-    
+
+
     ////////
     // PSF 2: radial symmetric 2D gaussian (LL)
     ////////
     fDefaultFitterData.push_back( new VSourceGeometryFitterData() );
     fDefaultFitterData.back()->fFitterName = "2DGauss_LL";
     fDefaultFitterData.back()->fFitterDescription = "Radial Symmetric 2D gaussian, binned log-likelihood fit";
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "Xpos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "Ypos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "sigma" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0.1 );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( 0. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1.e2 );
-    
-    
+
+
     ////////
     // PSF 3: linear superposition of two gaussians (LL)
     ////////
     fDefaultFitterData.push_back( new VSourceGeometryFitterData() );
     fDefaultFitterData.back()->fFitterName = "LinearSuperposition2DGauss_LL";
     fDefaultFitterData.back()->fFitterDescription = "Superposition of two radial symmetric 2D gaussians (central spot + broad halo)";
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "Xpos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "Ypos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "sigma" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0.1 );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( 0. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1.e2 );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "sigmaH" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0.2 );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( 0. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1.e2 );
-    
+
     fDefaultFitterData.back()->fParameterName.push_back( "alpha" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0.9 );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
     fDefaultFitterData.back()->fParameterLowerLimit.push_back( 0. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
-    
-    
+
+
 }
 
 void VSourceGeometryFitter::help()
@@ -361,11 +361,11 @@ TCanvas* VSourceGeometryFitter::plot( double rmax, double zmin, double zmax, str
     // preliminary
     double xcenter = -1 * fXStart;
     double ycenter = -1 * fYStart;
-    
+
     // style settings
     default_settings();
     setHistogramPlottingStyle( fHisSkyMap, 1.5 );
-    
+
     // signi
     char hname[800];
     char htitle[800];
@@ -377,9 +377,9 @@ TCanvas* VSourceGeometryFitter::plot( double rmax, double zmin, double zmax, str
     c_sky->SetLeftMargin( 0.11 );
     c_sky->SetGridx( 1 );
     c_sky->SetGridy( 1 );
-    
+
     fHisSkyMap->SetTitle( "" );
-    
+
     double x1 = -1.*rmax - xcenter;
     double x2 = rmax - xcenter;
     double y1 = -1.*rmax - ycenter;
@@ -402,7 +402,7 @@ TCanvas* VSourceGeometryFitter::plot( double rmax, double zmin, double zmax, str
     }
     fHisSkyMap->SetAxisRange( x1, x2, "X" );
     fHisSkyMap->SetAxisRange( y1, y2, "Y" );
-    
+
     if( zmin > -1000. )
     {
         fHisSkyMap->SetMinimum( zmin );
@@ -411,15 +411,15 @@ TCanvas* VSourceGeometryFitter::plot( double rmax, double zmin, double zmax, str
     {
         fHisSkyMap->SetMaximum( zmax );
     }
-    
+
     fHisSkyMap->Draw( iPlotMode.data() );
-    
+
     // plot reconstructed source geometry
     plotSourceGeometry();
-    
+
     // plot fit result
     plotFitResult();
-    
+
     // return canvas
     return c_sky;
 }
@@ -435,7 +435,7 @@ void VSourceGeometryFitter::plotFitResult()
     {
         return;
     }
-    
+
     /////////////////////////////////////////////////////////////////////////////////////////////
     // symmetric Gauss fit
     if( fFitter->fFitterName == "2DGauss_Chi2" )
@@ -452,15 +452,15 @@ void VSourceGeometryFitter::plotFitResult()
             c_skyFitResult->SetLeftMargin( 0.11 );
             c_skyFitResult->SetGridx( 1 );
             c_skyFitResult->SetGridy( 1 );
-            
+
             sprintf( hname, "hFitResult_%d", fRunNumber );
             TH1D* hFitResult = new TH1D( hname, "", 4 * ( int )( sqrt( fFitter->fParameterUpperLimit[3]*fFitter->fParameterUpperLimit[3] + fFitter->fParameterUpperLimit[4]*fFitter->fParameterUpperLimit[4] ) / 0.025 / 0.025 ), 0., sqrt( fFitter->fParameterUpperLimit[3]*fFitter->fParameterUpperLimit[3] + fFitter->fParameterUpperLimit[4]*fFitter->fParameterUpperLimit[4] ) );
             hFitResult->SetXTitle( "#Theta^{2} [deg]" );
             hFitResult->SetYTitle( "dN/d#Theta^{2}" );
             setHistogramPlottingStyle( hFitResult, 1, 2. );
-            
+
             // fill theta2 histogram
-            
+
             double x = 0.;
             double y = 0.;
             double t2 = 0.;
@@ -490,7 +490,7 @@ void VSourceGeometryFitter::plotFitResult()
             fFitResult->SetLineColor( 2 );
             fFitResult->Draw( "same" );
         }
-        
+
     }
 }
 
@@ -507,7 +507,7 @@ TGraph* VSourceGeometryFitter::plotSourceGeometry( int iColor )
     {
         return 0;
     }
-    
+
     /////////////////////////////////////////////////////////////////////////////////////////////
     // PSF #1: radial symmetric Gauss fit + constant, Chi2
     if( fFitter->fFitterName == "2DGauss_Chi2" )
@@ -515,11 +515,11 @@ TGraph* VSourceGeometryFitter::plotSourceGeometry( int iColor )
         // define graph
         TGraphErrors* g = new TGraphErrors( 1 );
         setGraphPlottingStyle( g, iColor, 2., 7, 2. );
-        
+
         g->SetPoint( 0, fFitter->fFitResult_Parameter[3], fFitter->fFitResult_Parameter[4] );
         g->SetPointError( 0, fFitter->fFitResult_ParameterError[3], fFitter->fFitResult_ParameterError[4] );
         g->Draw( "p" );
-        
+
         if( fFitter->fFitResult_Parameter[2] > 0. )
         {
             TEllipse* e = new TEllipse( fFitter->fFitResult_Parameter[3], fFitter->fFitResult_Parameter[4], fFitter->fFitResult_Parameter[2], fFitter->fFitResult_Parameter[2] );
@@ -528,23 +528,23 @@ TGraph* VSourceGeometryFitter::plotSourceGeometry( int iColor )
             e->SetLineColor( kPink );
             e->Draw();
         }
-        
+
         return g;
     }
     /////////////////////////////////////////
     // PSF #2: radial symmetric Gauss fit, LL
     else if( fFitter->fFitterName == "2DGauss_LL" )
     {
-    
+
         // define graph
         TGraphErrors* g = new TGraphErrors( 1 );
         setGraphPlottingStyle( g, iColor, 2., 7, 2. );
-        
+
         g->SetPoint( 0, fFitter->fFitResult_Parameter[0], fFitter->fFitResult_Parameter[1] );
         g->SetPointError( 0, fFitter->fFitResult_ParameterError[0], fFitter->fFitResult_ParameterError[1] );
         g->Draw( "p" );
-        
-        
+
+
         if( fFitter->fFitResult_Parameter[2] > 0. )
         {
             TEllipse* e = new TEllipse( fFitter->fFitResult_Parameter[0], fFitter->fFitResult_Parameter[1], fFitter->fFitResult_Parameter[2], fFitter->fFitResult_Parameter[2] );
@@ -553,23 +553,23 @@ TGraph* VSourceGeometryFitter::plotSourceGeometry( int iColor )
             e->SetLineColor( kPink );
             e->Draw();
         }
-        
+
         return g;
     }
     ////////////////////////////////////////////
     // PSF #3: linear superposition of two radial symmetric Gaussians
     else if( fFitter->fFitterName == "LinearSuperposition2DGauss_LL" )
     {
-    
+
         // define graph
         TGraphErrors* g = new TGraphErrors( 1 );
         setGraphPlottingStyle( g, iColor, 2., 7, 2. );
-        
+
         g->SetPoint( 0, fFitter->fFitResult_Parameter[0], fFitter->fFitResult_Parameter[1] );
         g->SetPointError( 0, fFitter->fFitResult_ParameterError[0], fFitter->fFitResult_ParameterError[1] );
         g->Draw( "p" );
-        
-        
+
+
         if( fFitter->fFitResult_Parameter[2] > 0. )
         {
             TEllipse* e = new TEllipse( fFitter->fFitResult_Parameter[0], fFitter->fFitResult_Parameter[1], fFitter->fFitResult_Parameter[2], fFitter->fFitResult_Parameter[2] );
@@ -577,14 +577,14 @@ TGraph* VSourceGeometryFitter::plotSourceGeometry( int iColor )
             e->SetLineWidth( 2 );
             e->SetLineColor( kPink );
             e->Draw();
-            
+
             TEllipse* e2 = new TEllipse( fFitter->fFitResult_Parameter[0], fFitter->fFitResult_Parameter[1], fFitter->fFitResult_Parameter[3], fFitter->fFitResult_Parameter[3] );
             e2->SetFillStyle( 0 );
             e->SetLineWidth( 2 );
             e->SetLineColor( kPink );
             e2->Draw();
         }
-        
+
         return g;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -594,11 +594,11 @@ TGraph* VSourceGeometryFitter::plotSourceGeometry( int iColor )
         // define graph
         TGraphErrors* g = new TGraphErrors( 1 );
         setGraphPlottingStyle( g, iColor, 2., 7, 2. );
-        
+
         g->SetPoint( 0, fFitter->fFitResult_Parameter[0], fFitter->fFitResult_Parameter[1] );
         g->SetPointError( 0, fFitter->fFitResult_ParameterError[0], fFitter->fFitResult_ParameterError[1] );
         g->Draw( "p" );
-        
+
         if( fFitter->fFitResult_Parameter[2] > 0. )
         {
             TEllipse* e = new TEllipse( fFitter->fFitResult_Parameter[0], fFitter->fFitResult_Parameter[1], fFitter->fFitResult_Parameter[2], fFitter->fFitResult_Parameter[2] );
@@ -607,7 +607,7 @@ TGraph* VSourceGeometryFitter::plotSourceGeometry( int iColor )
             e->SetLineColor( kPink );
             e->Draw();
         }
-        
+
         return g;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -617,11 +617,11 @@ TGraph* VSourceGeometryFitter::plotSourceGeometry( int iColor )
         // define graph
         TGraphErrors* g = new TGraphErrors( 1 );
         setGraphPlottingStyle( g, iColor, 2., 7, 2. );
-        
+
         g->SetPoint( 0, fFitter->fFitResult_Parameter[0], fFitter->fFitResult_Parameter[1] );
         g->SetPointError( 0, fFitter->fFitResult_ParameterError[0], fFitter->fFitResult_ParameterError[1] );
         g->Draw( "p" );
-        
+
         if( fFitter->fFitResult_Parameter[2] > 0. )
         {
             TEllipse* e = new TEllipse( fFitter->fFitResult_Parameter[0], fFitter->fFitResult_Parameter[1], fFitter->fFitResult_Parameter[2], fFitter->fFitResult_Parameter[3], fFitter->fFitResult_Parameter[4] );
@@ -630,7 +630,7 @@ TGraph* VSourceGeometryFitter::plotSourceGeometry( int iColor )
             e->SetLineColor( kPink );
             e->Draw();
         }
-        
+
         return g;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -640,31 +640,31 @@ TGraph* VSourceGeometryFitter::plotSourceGeometry( int iColor )
         // define graph
         TGraphErrors* g = new TGraphErrors( 1 );
         setGraphPlottingStyle( g, iColor, 2., 7, 2. );
-        
+
         g->SetPoint( 0, fFitter->fFitResult_Parameter[1], fFitter->fFitResult_Parameter[3] );
         g->SetPointError( 0, fFitter->fFitResult_ParameterError[1], fFitter->fFitResult_ParameterError[3] );
         g->Draw( "p" );
-        
+
         if( fFitter->fFitResult_Parameter[2] > 0. )
         {
             // double angle = 2*fFitter->fFitResult_Parameter[0]*fFitter->fFitResult_Parameter[2]*fFitter->fFitResult_Parameter[4];
             //angle /= (fFitter->fFitResult_Parameter[2]*fFitter->fFitResult_Parameter[2] - fFitter->fFitResult_Parameter[4]*fFitter->fFitResult_Parameter[4]);
             //angle = 1./2*atan(angle);
-            
+
             double angle = fFitter->fFitResult_Parameter[0];
-            
+
             TEllipse* e = new TEllipse( fFitter->fFitResult_Parameter[1], fFitter->fFitResult_Parameter[3], fFitter->fFitResult_Parameter[2], fFitter->fFitResult_Parameter[4], 0, 360,  angle * 180. / acos(-1. ) );
             e->SetFillStyle( 0 );
             e->SetLineWidth( 2 );
             e->SetLineColor( kPink );
             e->Draw();
         }
-        
+
         return g;
     }
-    
-    
-    
+
+
+
     /////////////////////////////////////////////////////////////////////////////////////////////
     // 2D normal distribution
     /*  else if( fFitter->fFitterName == "2DAsymGauss_LL" )
@@ -672,22 +672,22 @@ TGraph* VSourceGeometryFitter::plotSourceGeometry( int iColor )
      // define graph
        TGraphErrors *g = new TGraphErrors( 1 );
        setGraphPlottingStyle( g, iColor, 2., 7, 2. );
-    
+
        g->SetPoint( 0, fFitter->fFitResult_Parameter[1], fFitter->fFitResult_Parameter[3] );
        g->SetPointError( 0, fFitter->fFitResult_ParameterError[1], fFitter->fFitResult_ParameterError[3] );
        g->Draw( "p" );
-    
+
        if( fFitter->fFitResult_Parameter[2] > 0. )
        {
      TEllipse *e = new TEllipse( fFitter->fFitResult_Parameter[1], fFitter->fFitResult_Parameter[3], fFitter->fFitResult_Parameter[2], fFitter->fFitResult_Parameter[4] );
      e->SetFillStyle( 0 );
      e->Draw();
        }
-    
+
        return g;
     }
     */
-    
+
     return 0;
 }
 
@@ -702,7 +702,7 @@ bool VSourceGeometryFitter::setFitter( string iDescription )
         }
     }
     fFitter = 0;
-    
+
     return false;
 }
 
@@ -712,31 +712,31 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
     fXStart = xStart;
     fYStart = yStart;
     fPSF = getPSF();
-    
+
     if(!fFitter )
     {
         cout << "VSourceGeometryFitter::fitSource: undefined fitter" << endl;
         return;
     }
-    
+
     // get sky map histogram
     fHisSkyMap = ( TH2D* )getHistogram( iHisName, fRunNumber, "skyHistograms" );
-    
+
     if(!fHisSkyMap )
     {
         cout << "VSourceGeometryFitter::fitSource: histogram not found: " << iHisName << endl;
         return;
     }
-    
+
     //////////////////////////////////////
     // define minuit
     //////////////////////////////////////
     TFitterMinuit* fSourceGeometryFitter_MINUIT = new TFitterMinuit();
-    
+
     //////////////////////////////////////
     // set fit function
     //////////////////////////////////////
-    
+
     // Source #1 radial symmetric source, Chi2
     VFun_SourceDescription_RadialSymmetricSource_Chi2 fcn_RadialSymmetricSource_Chi2( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange, fPSF );
     if( fFitter->fFitterName == "RadialSymmetricSource_Chi2" )
@@ -750,7 +750,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
         fFitter->fParameterLowerLimit[1] = yStart - xyRange;
         fFitter->fParameterUpperLimit[1] = yStart + xyRange;
     }
-    
+
     // Source #2 radial asymmetric source, Chi2
     /*  VFun_SourceDescription_RadialAsymmetricSource_Chi2 fcn_RadialAsymmetricSource_Chi2( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange );
     if( fFitter->fFitterName == "RadialAsymmetricSource_Chi2" )
@@ -764,8 +764,8 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
       fFitter->fParameterLowerLimit[1] = yStart - xyRange;
       fFitter->fParameterUpperLimit[1] = yStart + xyRange;
       }*/
-    
-    
+
+
     // Source #3 radial symmetric source, LL
     VFun_SourceDescription_RadialSymmetricSource_LL fcn_RadialSymmetricSource_LL( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange, fPSF );
     if( fFitter->fFitterName == "RadialSymmetricSource_LL" )
@@ -779,7 +779,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
         fFitter->fParameterLowerLimit[1] = yStart - xyRange;
         fFitter->fParameterUpperLimit[1] = yStart + xyRange;
     }
-    
+
     // Source #4 radial asymmetric source, LL
     VFun_SourceDescription_RadialAsymmetricSource_LL fcn_RadialAsymmetricSource_LL( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange, fPSF );
     if( fFitter->fFitterName == "RadialAsymmetricSource_LL" )
@@ -793,8 +793,8 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
         fFitter->fParameterLowerLimit[3] = yStart - xyRange;
         fFitter->fParameterUpperLimit[3] = yStart + xyRange;
     }
-    
-    
+
+
     //// 0thers
     // Source description #3
     /*    VFun_SourceDescription_2DNormal_LL fcn_2DNormal_LL( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange );
@@ -809,9 +809,9 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
            fFitter->fParameterLowerLimit[3] = yStart - xyRange;
            fFitter->fParameterUpperLimit[3] = yStart + xyRange;
         }
-    
+
     */
-    
+
     // PSF description #1
     VFun_PSFDescription_2DGauss_Chi2 fcn_2DGauss_Chi2( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange );
     if( fFitter->fFitterName == "2DGauss_Chi2" )
@@ -825,7 +825,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
         fFitter->fParameterLowerLimit[4] = yStart - xyRange;
         fFitter->fParameterUpperLimit[4] = yStart + xyRange;
     }
-    
+
     // PSF description #2
     VFun_PSFDescription_2DGauss_LL fcn_2DGauss_LL( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange );
     if( fFitter->fFitterName == "2DGauss_LL" )
@@ -839,7 +839,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
         fFitter->fParameterLowerLimit[1] = yStart - xyRange;
         fFitter->fParameterUpperLimit[1] = yStart + xyRange;
     }
-    
+
     // PSF description #3
     VFun_PSFDescription_LinearSuperposition2DGauss_LL fcn_LinearSuperposition2DGauss_LL( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange );
     if( fFitter->fFitterName == "LinearSuperposition2DGauss_LL" )
@@ -853,23 +853,23 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
         fFitter->fParameterLowerLimit[1] = yStart - xyRange;
         fFitter->fParameterUpperLimit[1] = yStart + xyRange;
     }
-    
+
     fSourceGeometryFitter_MINUIT->SetPrintLevel( 3 );
-    
+
     // set parameters
     for( unsigned int i = 0; i < fFitter->fParameterName.size(); i++ )
     {
         fSourceGeometryFitter_MINUIT->SetParameter( i, fFitter->fParameterName[i].c_str(), fFitter->fParameterInitValue[i], fFitter->fParameterStep[i], fFitter->fParameterLowerLimit[i], fFitter->fParameterUpperLimit[i] );
     }
-    
-    
+
+
     // start minimizing
     // (default is kMigrad)
     fSourceGeometryFitter_MINUIT->CreateMinimizer();
-    
+
     fFitter->fFitResult_Status = fSourceGeometryFitter_MINUIT->Minimize();
     cout << "Fit status " << fFitter->fFitResult_Status << endl;
-    
+
     // retrieve parameters
     fFitter->fFitResult_Parameter.clear();
     fFitter->fFitResult_ParameterError.clear();
@@ -878,39 +878,39 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
         fFitter->fFitResult_Parameter.push_back( fSourceGeometryFitter_MINUIT->GetParameter( i ) );
         fFitter->fFitResult_ParameterError.push_back( fSourceGeometryFitter_MINUIT->GetParError( i ) );
     }
-    
-    
+
+
     if( fFitter->fFitterName == "RadialAsymmetricSource_LL" )
     {
         //double rho = fFitter->fFitResult_Parameter[0];
         double angle = fFitter->fFitResult_Parameter[0];
         double sX = sqrt( fFitter->fFitResult_Parameter[2] * fFitter->fFitResult_Parameter[2] + fPSF* fPSF );
         double sY = sqrt( fFitter->fFitResult_Parameter[4] * fFitter->fFitResult_Parameter[4] + fPSF* fPSF );
-        
+
         double angle_err = fFitter->fFitResult_ParameterError[0];
         double rho =  1. / 2. * tan( 2 * angle ) * ( sX* sX - sY* sY ) / sX / sY ;
-        
+
         double p1 = sX * sX * sY * sY * ( 1 - rho* rho );
         p1 = p1 / ( sY* sY* pow( cos( angle ), 2 ) - 2 * rho* sX* sY* sin( angle ) * cos( angle ) + sX* sX* pow( sin( angle ), 2 ) );
         p1 = sqrt( p1 );
-        
+
         double p2 = sX * sX * sY * sY * ( 1 - rho* rho );
         p2 = p2 / ( sY* sY* pow( sin( angle ), 2 ) + 2 * rho* sX* sY* sin( angle ) * cos( angle ) + sX* sX* pow( cos( angle ), 2 ) );
         p2 = sqrt( p2 );
-        
+
         // approximate error, rho approximately 0
         //double errTanAngle =  pow(2*sX*sY/( sX * sX + sY * sY ) * rho_err, 2)  + pow(2*rho*sY/( sX * sX + sY * sY) + 2 * rho * sX * sY /(sX*sX+sY*sY)/(sX*sX+sY*sY)*2*sX ,2)*sX_err*sX_err ;
         //errTanAngle = sqrt(errTanAngle);
         //double errAngle = 1./2/(1+angle*angle)*errTanAngle;
-        
-        
+
+
         cout << "The semi-axis of the ellipse are p1 = " << p1 << " deg  and p2 = " << p2 << " deg " << endl;
         cout << "The correlation between X and Y is defined by the parameter rho = " << rho << endl;
         cout << "The angle a is the angle between the X axis and the semi-axis of the ellipse p1. Expressed in degrees the result of the fit gives an  angle a = " << angle * 180 / acos(-1 ) << " +/- " << angle_err * 180 / acos(-1 ) << " deg " << endl;
-        
-        
+
+
     }
-    
+
     ///////////////////////////////////////////////////////////////
     // convert centroid from camera coordinates to sky coordinates
     ///////////////////////////////////////////////////////////////
@@ -934,8 +934,8 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
         VPlotAnasumHistograms myAna( fAnasumDataFile, -1 );
         myAna.convert_derotated_RADECJ2000( fFitter->fFitResult_Parameter[1], fFitter->fFitResult_Parameter[3], fFitter->fFitResult_ParameterError[1], fFitter->fFitResult_ParameterError[3] );
     }
-    
-    
+
+
     // combined error calculation for 5 parameters (see Minuit manual Table 7.1)
     //    fMinuit.Command( "SET ERR 6.06" );
 }

@@ -25,9 +25,9 @@ bool readRunParameter( TFile* fIn, string iPara )
     {
         return false;
     }
-    
+
     VEvndispRunParameter* fPar = 0;
-    
+
     fPar = ( VEvndispRunParameter* )fIn->Get( "runparameterV2" );
     // possibly a DST file
     if(!fPar )
@@ -53,7 +53,7 @@ bool readRunParameter( TFile* fIn, string iPara )
     {
         return false;
     }
-    
+
     if( iPara == "-mcsourcefile" )
     {
         cout << fPar->fsourcefile << endl;
@@ -109,7 +109,7 @@ bool readRunParameter( TFile* fIn, string iPara )
         cout << "\t" << fPar->fTargetName;
         cout << endl;
     }
-    
+
     return true;
 }
 
@@ -183,7 +183,7 @@ bool readMeanElevation( TFile* fIn, bool print_zenith = false )
                 TelElevation[i] = TelElevationFloat[i];
             }
         }
-        
+
         double iMean_f = 0.;
         double iMeanN = 0.;
         for( unsigned int i = 0; i < iNTel; i++ )
@@ -230,7 +230,7 @@ bool readMeanElevation( TFile* fIn, bool print_zenith = false )
     {
         cout << "not implemented" << endl;
     }
-    
+
     return true;
 }
 
@@ -242,15 +242,15 @@ bool readMCParameter( TFile* fIn, string iPara )
     {
         return false;
     }
-    
+
     VMonteCarloRunHeader* fMC = 0;
-    
+
     fMC = ( VMonteCarloRunHeader* )fIn->Get( "MC_runheader" );
     if(!fMC )
     {
         return false;
     }
-    
+
     if( iPara == "-mcaz" )
     {
         fMC->printMCAz();
@@ -263,7 +263,7 @@ bool readMCParameter( TFile* fIn, string iPara )
     {
         return false;
     }
-    
+
     return true;
 }
 
@@ -280,7 +280,7 @@ int main( int argc, char* argv[] )
             exit( 0 );
         }
     }
-    
+
     if( argc != 2 && argc != 3 )
     {
         cout << endl;
@@ -324,7 +324,7 @@ int main( int argc, char* argv[] )
         cout << "printRunParameter " << VGlobalRunParameter::getEVNDISP_VERSION() << endl;
         cout << "==========================" << endl;
     }
-    
+
     // open file
     gErrorIgnoreLevel = kError;
     TFile* fIn = new TFile( argv[1] );
@@ -334,7 +334,7 @@ int main( int argc, char* argv[] )
         cout << "exiting..." << endl;
         exit( 0 );
     }
-    
+
     if( fOption.size() > 0 )
     {
         if( fOption.find( "-elevation" ) != string::npos )
@@ -359,9 +359,9 @@ int main( int argc, char* argv[] )
         }
         exit( 0 );
     }
-    
+
     VEvndispRunParameter* fPar = 0;
-    
+
     fPar = ( VEvndispRunParameter* )fIn->Get( "runparameterV2" );
     if(!fPar )
     {
@@ -383,7 +383,7 @@ int main( int argc, char* argv[] )
             }
         }
     }
-    
+
     if( fPar )
     {
         if( fPar->fEventDisplayUser != "CTA-DST" )
@@ -395,11 +395,11 @@ int main( int argc, char* argv[] )
             fPar->printCTA_DST();
         }
     }
-    
+
     // array analysis cuts
-    
+
     VEvndispReconstructionParameter* fArrayCuts = 0;
-    
+
     fArrayCuts = ( VEvndispReconstructionParameter* )fIn->Get( "EvndispReconstructionParameter" );
     if( fArrayCuts )
     {
@@ -408,11 +408,11 @@ int main( int argc, char* argv[] )
         cout << "===========================================" << endl;
         fArrayCuts->print_arrayAnalysisCuts();
     }
-    
+
     VTableLookupRunParameter* fTPar = 0;
-    
+
     fTPar = ( VTableLookupRunParameter* )fIn->Get( "TLRunParameter" );
-    
+
     if( fTPar )
     {
         cout << endl << endl;
@@ -420,9 +420,9 @@ int main( int argc, char* argv[] )
         cout << "===========================================" << endl;
         fTPar->print( 2 );
     }
-    
+
     VMonteCarloRunHeader* fMC = 0;
-    
+
     //    if( fPar && fPar->fEventDisplayUser != "CTA-DST" )
     {
         fMC = ( VMonteCarloRunHeader* )fIn->Get( "MC_runheader" );
@@ -434,8 +434,8 @@ int main( int argc, char* argv[] )
             fMC->print();
         }
     }
-    
-    
+
+
     fIn->Close();
-    
+
 }

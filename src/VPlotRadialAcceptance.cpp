@@ -8,18 +8,18 @@
 VPlotRadialAcceptance::VPlotRadialAcceptance( string iFile, int iAz )
 {
     fDebug = false;
-    
+
     setName( "radial acceptance" );
-    
+
     setAxisRange();
-    
+
     fAcceptanceFile = 0;
     fAcceptanceHisto = 0;
     fAcceptanceHistoFit = 0;
     fAcceptanceFunction = 0;
     hPhiDist = 0;
     hPhiDistDeRot = 0;
-    
+
     if( iFile.size() > 0 )
     {
         openAcceptanceFile( iFile, 0, iAz );
@@ -118,7 +118,7 @@ bool VPlotRadialAcceptance::openAcceptanceFile( string iFile, unsigned int iZeBi
     {
         hPhiDistDeRot->Rebin( 5 );
     }
-    
+
     return true;
 }
 
@@ -134,7 +134,7 @@ TCanvas* VPlotRadialAcceptance::plotRadialAcceptance( TCanvas* cX, int iColor )
         cout << "VPlotRadialAcceptance::plot() error: data missing";
         return 0;
     }
-    
+
     bool bPlotSame = false;
     // canvas
     if( cX )
@@ -152,9 +152,9 @@ TCanvas* VPlotRadialAcceptance::plotRadialAcceptance( TCanvas* cX, int iColor )
         cX->SetGridx( 0 );
         cX->SetGridy( 0 );
     }
-    
+
     // plot all histograms and plot them
-    
+
     if( fAcceptanceHisto )
     {
         fAcceptanceHisto->SetMinimum( fAxis_y_min );
@@ -179,7 +179,7 @@ TCanvas* VPlotRadialAcceptance::plotRadialAcceptance( TCanvas* cX, int iColor )
         setFunctionPlottingStyle( fAcceptanceFunction, iColor );
         fAcceptanceFunction->Draw( "same" );
     }
-    
+
     return cX;
 }
 
@@ -195,7 +195,7 @@ TCanvas* VPlotRadialAcceptance::plotResiduals( TCanvas* cX, double i_res_min, do
         cout << "VPlotRadialAcceptance::plotResiduals() error: data missing";
         return 0;
     }
-    
+
     // canvas
     char hname[2000];
     if( cX )
@@ -211,12 +211,12 @@ TCanvas* VPlotRadialAcceptance::plotResiduals( TCanvas* cX, double i_res_min, do
         cX->SetGridx( 0 );
         cX->SetGridy( 0 );
     }
-    
+
     if( fAcceptanceHisto )
     {
         sprintf( hname, "%s_residual", fAcceptanceHisto->GetName() );
         TH1D* hRes = VHistogramUtilities::get_ResidualHistogram_from_TF1( hname, fAcceptanceHisto, fAcceptanceFunction );
-        
+
         if( hRes )
         {
             setHistogramPlottingStyle( hRes );
@@ -227,7 +227,7 @@ TCanvas* VPlotRadialAcceptance::plotResiduals( TCanvas* cX, double i_res_min, do
             hRes->Draw();
             TLine* iL = new TLine( hRes->GetXaxis()->GetXmin(), 0., fAxis_x_max, 0. );
             iL->Draw();
-            
+
             if( iPlotChi2 )
             {
                 double sum2 = 0.;
@@ -248,7 +248,7 @@ TCanvas* VPlotRadialAcceptance::plotResiduals( TCanvas* cX, double i_res_min, do
             }
         }
     }
-    
+
     return cX;
 }
 
@@ -268,7 +268,7 @@ TCanvas* VPlotRadialAcceptance::plotPhiDependentRadialAcceptances( TCanvas* cX, 
         cout << "VPlotRadialAcceptance::plotPhiDependentRadialAcceptances() error: data missing";
         return 0;
     }
-    
+
     bool bPlotSame = false;
     // canvas
     if( cX )
@@ -293,7 +293,7 @@ TCanvas* VPlotRadialAcceptance::plotPhiDependentRadialAcceptances( TCanvas* cX, 
         cX->SetGridx( 0 );
         cX->SetGridy( 0 );
     }
-    
+
     vector< TH1F* > iHisto;
     vector< TF1* > iF1;
     if(!iDeRot )
@@ -306,7 +306,7 @@ TCanvas* VPlotRadialAcceptance::plotPhiDependentRadialAcceptances( TCanvas* cX, 
         iHisto = fAcceptancePhiHistoDeRot;
         iF1    = fAcceptancePhiFitFunctionDeRot;
     }
-    
+
     // plot all histograms and plot them
     int i_color = 1;
     for( unsigned int i = 0; i < iHisto.size(); i += iterator )
@@ -335,7 +335,7 @@ TCanvas* VPlotRadialAcceptance::plotPhiDependentRadialAcceptances( TCanvas* cX, 
                 iF1[i]->SetLineStyle( 2 );
                 iF1[i]->Draw( "same" );
             }
-            
+
             i_color++;
         }
     }
@@ -344,7 +344,7 @@ TCanvas* VPlotRadialAcceptance::plotPhiDependentRadialAcceptances( TCanvas* cX, 
         setFunctionPlottingStyle( fAcceptanceFunction, 1, 2 );
         fAcceptanceFunction->Draw( "same" );
     }
-    
+
     return cX;
 }
 
@@ -355,7 +355,7 @@ TCanvas*  VPlotRadialAcceptance::plotPhiDistributions( TCanvas* cX, int iColor )
         cout << "VPlotRadialAcceptance::plotPhiDistributions() error: data missing";
         return 0;
     }
-    
+
     bool bPlotSame = false;
     // canvas
     if( cX )
@@ -373,7 +373,7 @@ TCanvas*  VPlotRadialAcceptance::plotPhiDistributions( TCanvas* cX, int iColor )
         cX->SetGridx( 0 );
         cX->SetGridy( 0 );
     }
-    
+
     if( hPhiDist )
     {
         setHistogramPlottingStyle( hPhiDist, iColor );
@@ -389,7 +389,7 @@ TCanvas*  VPlotRadialAcceptance::plotPhiDistributions( TCanvas* cX, int iColor )
         {
             hPhiDist->Draw( "he" );
         }
-        
+
         /*        if( hPhiDistDeRot )
         	{
         	   hPhiDistDeRot = (TH1F*)VHistogramUtilities::normalizeTH1( (TH1*)hPhiDistDeRot, false );

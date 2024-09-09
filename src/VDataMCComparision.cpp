@@ -21,7 +21,7 @@ VDataMCComparisionHistogramData::VDataMCComparisionHistogramData(
     fHis2D_size = 0;
     fHis2D_sizeHG = 0;
     fHis2D_sizeLG = 0;
-    
+
 }
 
 TH2D* VDataMCComparisionHistogramData::newHistogram( string iName, string iYTitle, string iXTitle, int iNbins, double ix_min, double ix_max, double iy_min, double iy_max )
@@ -35,14 +35,14 @@ TH2D* VDataMCComparisionHistogramData::newHistogram( string iName, string iYTitl
     {
         sprintf( hname, "h%s%s_%s", fVarName.c_str(), iName.c_str(), fHistogramType.c_str() );
     }
-    
+
     TH2D* h = new TH2D( hname, "",  6, iy_min, iy_max, iNbins, ix_min, ix_max );
     h->SetXTitle( iYTitle.c_str() );
     h->SetYTitle( iXTitle.c_str() );
     h->Sumw2();
     h->SetLineColor( 2 );
     h->SetMarkerColor( 2 );
-    
+
     return h;
 }
 
@@ -50,7 +50,7 @@ TH2D* VDataMCComparisionHistogramData::newHistogram( string iName, string iYTitl
 bool VDataMCComparisionHistogramData::initHistogram( string iXTitle, int iNbins, double ix_min, double ix_max )
 {
     char hname[200];
-    
+
     if( fTelescopeID > 0 )
     {
         sprintf( hname, "h%s_%d_%s", fVarName.c_str(), fTelescopeID, fHistogramType.c_str() );
@@ -59,32 +59,32 @@ bool VDataMCComparisionHistogramData::initHistogram( string iXTitle, int iNbins,
     {
         sprintf( hname, "h%s_%s", fVarName.c_str(), fHistogramType.c_str() );
     }
-    
+
     fHis1D = new TH1D( hname, "", iNbins, ix_min, ix_max );
     fHis1D->SetXTitle( iXTitle.c_str() );
     fHis1D->Sumw2();
-    
+
     // variable vs energy
     fHis2D_Erec = newHistogram( "Erec", "log_{10} energy_{rec} [TeV]", iXTitle, iNbins, ix_min, ix_max, -1., 1. );
-    
+
     // variable vs ntubes
     fHis2D_ntubes = newHistogram( "ntubes", "ntubes", iXTitle, iNbins, ix_min, ix_max, 0., 60. );
-    
+
     // variable vs size
     fHis2D_size = newHistogram( "size", "size", iXTitle, iNbins, ix_min, ix_max, 2., 5. );
-    
+
     // variable vs sizeHG
     fHis2D_sizeHG = newHistogram( "sizeHG", "sizeHG", iXTitle, iNbins, ix_min, ix_max, 2., 5. );
-    
+
     // variable vs sizeLG
     fHis2D_sizeLG = newHistogram( "sizeLG", "sizeLG", iXTitle, iNbins, ix_min, ix_max, 2., 5. );
-    
+
     if( fHistogramType == "OFF" )
     {
         fHis1D->SetLineColor( 2 );
         fHis1D->SetMarkerColor( 2 );
     }
-    
+
     return true;
 }
 
@@ -135,42 +135,42 @@ VDataMCComparision::VDataMCComparision( string iname, int intel )
         cout << "...exiting" << endl;
         exit( EXIT_FAILURE );
     }
-    
+
     fData = 0;
     fCuts = 0;
     fCalculateMVAValues = false;
     fEpochATM = "";
-    
+
     // spectral weighting (will be set later correctly, as it is run from MC run header)
     fSpectralWeight = new VSpectralWeight();
     //	fSpectralWeight->setMCParameter( 2.0, 0.05, 20. );
     fSpectralWeight->setMCParameter( 2.0, 0.003, 200. );
     // index MC events are weighted to
     fSpectralWeight->setSpectralIndex( 2.5 );
-    
+
     // weighting in azimuth
     hAzWeight = 0;
-    
+
     // setting all variables
     hisList = 0;
-    
+
     // 2D histograms
     hXYcore = 0;
     hAzYcore = 0;
     hYt2 = 0;
-    
+
     fAzRange = false;
     fAzMin = 0.;
     fAzMax = 0.;
     fZeMin = 0.;
     fZeMax = 90.;
-    
+
     fWobbleNorth = 0.;
     fWobbleEast  = 0.;
     fWobbleFromDataTree = false;
-    
+
     setShowerMaximZe_deg();
-    
+
     defineHistograms();
 }
 
@@ -220,167 +220,167 @@ void VDataMCComparision::defineHistograms()
 {
     hisList = new TList();
     char hname[200];
-    
+
     double core_max = 350.;
-    
+
     fHistoArray[ETHETA2] = new VDataMCComparisionHistogramData( "theta2", fName, 0 );
     fHistoArray[ETHETA2]->initHistogram( "#theta^{2} [deg^{2}]", 100, 0., 0.3 );
-    
+
     fHistoArray[ELTHETA2] = new VDataMCComparisionHistogramData( "ltheta2", fName, 0 );
     fHistoArray[ELTHETA2]->initHistogram( "log_{10} #theta^{2} [deg^{2}]", 30, -5., 2. );
-    
+
     fHistoArray[EMSCW] = new VDataMCComparisionHistogramData( "MSCW", fName, 0 );
     fHistoArray[EMSCW]->initHistogram( "mean reduced scaled width", 500, -5., 10. );
-    
+
     fHistoArray[EMSCL] = new VDataMCComparisionHistogramData( "MSCL", fName, 0 );
     fHistoArray[EMSCL]->initHistogram( "mean reduced scaled length", 500, -5., 10. );
-    
+
     fHistoArray[EMWR] = new VDataMCComparisionHistogramData( "MWR", fName, 0 );
     fHistoArray[EMWR]->initHistogram( "mean scaled width", 500, -2., 2. );
-    
+
     fHistoArray[EMLR] = new VDataMCComparisionHistogramData( "MLR", fName, 0 );
     fHistoArray[EMLR]->initHistogram( "mean scaled length", 500, -2., 2. );
-    
+
     fHistoArray[EXCORE] = new VDataMCComparisionHistogramData( "Xcore", fName, 0 );
     fHistoArray[EXCORE]->initHistogram( "core position x [m]", 200, -1.*core_max, core_max );
-    
+
     fHistoArray[EYCORE] = new VDataMCComparisionHistogramData( "Ycore", fName, 0 );
     fHistoArray[EYCORE]->initHistogram( "core position y [m]", 200, -1.*core_max, core_max );
-    
+
     fHistoArray[EAEL] = new VDataMCComparisionHistogramData( "ArrayEl", fName, 0 );
     fHistoArray[EAEL]->initHistogram( "elevation [deg]", 180, 0., 90. );
-    
+
     fHistoArray[EAAZ] = new VDataMCComparisionHistogramData( "ArrayAz", fName, 0 );
     fHistoArray[EAAZ]->initHistogram( "azimuth [deg]", 180, 0., 360. );
-    
+
     fHistoArray[ENIMAGES] = new VDataMCComparisionHistogramData( "NImages", fName, 0 );
     fHistoArray[ENIMAGES]->initHistogram( "number of images", 5, 0., 5. );
-    
+
     fHistoArray[EIMGSEL] = new VDataMCComparisionHistogramData( "ImgSel", fName, 0 );
     fHistoArray[EIMGSEL]->initHistogram( "telescope combinations", 16, 0., 16. );
-    
+
     fHistoArray[EEMISSIONHEIGHT] = new VDataMCComparisionHistogramData( "EmissionHeight", fName, 0 );
     fHistoArray[EEMISSIONHEIGHT]->initHistogram( "estimated height of maximum emission [km]", 50, 0., 25. );
-    
+
     fHistoArray[EEREC] = new VDataMCComparisionHistogramData( "Erec", fName, 0 );
     fHistoArray[EEREC]->initHistogram( "log_{10} energy_{MC}", 50, -2., 2. );
-    
+
     fHistoArray[EPEDVAR] = new VDataMCComparisionHistogramData( "pedvar", fName, 0 );
     fHistoArray[EPEDVAR]->initHistogram( "mean pedvar", 100., 5., 10. );
-    
+
     fHistoArray[EMVA] = new VDataMCComparisionHistogramData( "MVA", fName, 0 );
     fHistoArray[EMVA]->initHistogram( "MVA value #Tau", 100, -1., 1. );
-    
+
     // additional 2D histograms
     sprintf( hname, "hXYcore_%s", fName.c_str() );
     hXYcore = new TH2D( hname, "", 75, -1.*core_max, core_max, 75, -core_max, core_max );
     hXYcore->SetXTitle( "core position X [m]" );
     hXYcore->SetYTitle( "core position Y [m]" );
     hisList->Add( hXYcore );
-    
+
     sprintf( hname, "hAzYcore_%s", fName.c_str() );
     hAzYcore = new TH2D( hname, "", 360, -180., 180., 300, -1.*core_max, core_max );
     hAzYcore->SetXTitle( "core position X [m]" );
     hAzYcore->SetYTitle( "core position Y [m]" );
     hisList->Add( hAzYcore );
-    
+
     sprintf( hname, "hYt2_%s", fName.c_str() );
     hYt2 = new TH2D( hname, "", 100, -6., 0., 800, -200., 200. );
     hYt2->SetXTitle( "log_{10} #Theta^{2}" );
     hYt2->SetYTitle( "core position Y [m]" );
     hisList->Add( hYt2 );
-    
+
     // telescope numbering starts at 1!
     for( int i = 1; i <= fNTel; i++ )
     {
         fHistoSingleTel[ELENGTH].push_back( new VDataMCComparisionHistogramData( "length", fName, i ) );
         fHistoSingleTel[ELENGTH].back()->initHistogram( "length [deg]",  100, 0., 0.5 );
-        
+
         fHistoSingleTel[EWIDTH].push_back( new VDataMCComparisionHistogramData( "width", fName, i ) );
         fHistoSingleTel[EWIDTH].back()->initHistogram( "width [deg]",  100, 0., 0.25 );
-        
+
         fHistoSingleTel[EDIST].push_back( new VDataMCComparisionHistogramData( "dist", fName, i ) );
         fHistoSingleTel[EDIST].back()->initHistogram( "dist [deg]",  100, 0., 2.0 );
-        
+
         fHistoSingleTel[EALPHA].push_back( new VDataMCComparisionHistogramData( "alpha", fName, i ) );
         fHistoSingleTel[EALPHA].back()->initHistogram( "alpha [deg]",  100, 0., 25 );
-        
+
         fHistoSingleTel[ENTUBES].push_back( new VDataMCComparisionHistogramData( "ntubes", fName, i ) );
         fHistoSingleTel[ENTUBES].back()->initHistogram( "ntubes",  100, 0., 200. );
-        
+
         fHistoSingleTel[ENLOWGAIN].push_back( new VDataMCComparisionHistogramData( "nlowgain", fName, i ) );
         fHistoSingleTel[ENLOWGAIN].back()->initHistogram( "nlowgain",  100, 0., 100. );
-        
+
         fHistoSingleTel[ESIZE].push_back( new VDataMCComparisionHistogramData( "size", fName, i ) );
         fHistoSingleTel[ESIZE].back()->initHistogram( "log_{10} size [d.c.]",  100, 1., 8. );
-        
+
         fHistoSingleTel[ESIZEHG].push_back( new VDataMCComparisionHistogramData( "sizeHG", fName, i ) );
         fHistoSingleTel[ESIZEHG].back()->initHistogram( "log_{10} sizeHG [d.c.]",  100, 1., 8. );
-        
+
         fHistoSingleTel[ESIZELG].push_back( new VDataMCComparisionHistogramData( "sizeLG", fName, i ) );
         fHistoSingleTel[ESIZELG].back()->initHistogram( "log_{10} sizeLG [d.c.]",  100, 1., 8. );
-        
+
         fHistoSingleTel[EFRACLOW].push_back( new VDataMCComparisionHistogramData( "fraclow", fName, i ) );
         fHistoSingleTel[EFRACLOW].back()->initHistogram( "fraclow",  100, 0., 1. );
-        
+
         fHistoSingleTel[EMAX1].push_back( new VDataMCComparisionHistogramData( "max1", fName, i ) );
         fHistoSingleTel[EMAX1].back()->initHistogram( "log_{10} size_{max1} [d.c.]",  100, 1., 4. );
-        
+
         fHistoSingleTel[EMAX2].push_back( new VDataMCComparisionHistogramData( "max2", fName, i ) );
         fHistoSingleTel[EMAX2].back()->initHistogram( "log_{10} size_{max2} [d.c.]",  100, 1., 4. );
-        
+
         fHistoSingleTel[EMAX3].push_back( new VDataMCComparisionHistogramData( "max3", fName, i ) );
         fHistoSingleTel[EMAX3].back()->initHistogram( "log_{10} size_{max3} [d.c.]",  100, 1., 4. );
-        
+
         fHistoSingleTel[ELOSS].push_back( new VDataMCComparisionHistogramData( "loss", fName, i ) );
         fHistoSingleTel[ELOSS].back()->initHistogram( "loss",  100, 0., 1. );
-        
+
         fHistoSingleTel[ELOS].push_back( new VDataMCComparisionHistogramData( "los", fName, i ) );
         fHistoSingleTel[ELOS].back()->initHistogram( "length/size [deg] x 1000",  100, 0., 1. );
-        
+
         fHistoSingleTel[EASYM].push_back( new VDataMCComparisionHistogramData( "asym", fName, i ) );
         fHistoSingleTel[EASYM].back()->initHistogram( "asymmetry",  100, -2., 2. );
-        
+
         fHistoSingleTel[ECENX].push_back( new VDataMCComparisionHistogramData( "cen_x", fName, i ) );
         fHistoSingleTel[ECENX].back()->initHistogram( "image centroid (x) [deg]",  100, -2., 2. );
-        
+
         fHistoSingleTel[ECENY].push_back( new VDataMCComparisionHistogramData( "cen_y", fName, i ) );
         fHistoSingleTel[ECENY].back()->initHistogram( "image centroid (y) [deg]",  100, -2., 2. );
-        
+
         fHistoSingleTel[ETGRADX].push_back( new VDataMCComparisionHistogramData( "tgrad_x", fName, i ) );
         fHistoSingleTel[ETGRADX].back()->initHistogram( "time gradient (x)",  100, -30., 30. );
-        
+
         fHistoSingleTel[EMSCWT].push_back( new VDataMCComparisionHistogramData( "mscwt", fName, i ) );
         fHistoSingleTel[EMSCWT].back()->initHistogram( "expected width",  100, 0., 2. );
-        
+
         fHistoSingleTel[EMWRT].push_back( new VDataMCComparisionHistogramData( "mwrt", fName, i ) );
         fHistoSingleTel[EMWRT].back()->initHistogram( "width/expected width",  100, 0., 2. );
-        
+
         fHistoSingleTel[EMSCLT].push_back( new VDataMCComparisionHistogramData( "msclt", fName, i ) );
         fHistoSingleTel[EMSCLT].back()->initHistogram( "expected length",  100, 0., 2. );
-        
+
         fHistoSingleTel[EMLTT].push_back( new VDataMCComparisionHistogramData( "mltt", fName, i ) );
         fHistoSingleTel[EMLTT].back()->initHistogram( "length/expected length",  100, 0., 2. );
-        
+
         fHistoSingleTel[ETELDIST].push_back( new VDataMCComparisionHistogramData( "r", fName, i ) );
         fHistoSingleTel[ETELDIST].back()->initHistogram( "distance telescope - core [m]",  100, 0., 400. );
-        
+
         fHistoSingleTel[ERECRAT].push_back( new VDataMCComparisionHistogramData( "erecratio", fName, i ) );
         fHistoSingleTel[ERECRAT].back()->initHistogram( "E_{rec,T}/E_{rec}",  100, 0., 5. );
-        
+
         fHistoSingleTel[EPEDVART].push_back( new VDataMCComparisionHistogramData( "pedvarT", fName, i ) );
         fHistoSingleTel[EPEDVART].back()->initHistogram( "pedvar (T)",  100, 5., 10. );
-        
+
         fHistoSingleTel[EDISPT].push_back( new VDataMCComparisionHistogramData( "disp", fName, i ) );
         fHistoSingleTel[EDISPT].back()->initHistogram( "disp (T)",  100, -2.5, 2.5 );
-        
+
         sprintf( hname, "hcen_xy%d_%s", i, fName.c_str() );
         hcen_xy.push_back( new TH2D( hname, "", 100, -2., 2., 100, -2., 2. ) );
         hcen_xy.back()->SetXTitle( "image centroid (x) [deg]" );
         hcen_xy.back()->SetYTitle( "image centroid (y) [deg]" );
         hTel2D.push_back( hcen_xy.back() );
         hisList->Add( hcen_xy.back() );
-        
+
         sprintf( hname, "hdistR%d_%s", i, fName.c_str() );
         hdistR.push_back( new TH2D( hname, "", 20, 0., 300., 20, 0., 2. ) );
         sprintf( hname, "distance to T%d [m]", i );
@@ -389,7 +389,7 @@ void VDataMCComparision::defineHistograms()
         hisList->Add( hdistR.back() );
         hTel2D.push_back( hdistR.back() );
     }
-    
+
     // add all histograms to list of histograms (for 1D and 2D)
     for( map <E_varname, vector< VDataMCComparisionHistogramData* > >::iterator it = fHistoSingleTel.begin(); it != fHistoSingleTel.end(); it++ )
     {
@@ -424,7 +424,7 @@ void VDataMCComparision::defineHistograms()
         hTel2D.push_back( it->second->fHis2D_sizeHG );
         hTel2D.push_back( it->second->fHis2D_sizeLG );
     }
-    
+
 }
 
 /*
@@ -439,11 +439,11 @@ bool VDataMCComparision::setOnOffHistograms( VDataMCComparision* on, VDataMCComp
         return false;
     }
     norm *= -1.;
-    
+
     hXYcore->Add( on->hXYcore, off->hXYcore, 1., norm );
     hAzYcore->Add( on->hAzYcore, off->hAzYcore, 1., norm );
     hYt2->Add( on->hYt2, off->hYt2, 1., norm );
-    
+
     // 1D histograms
     for( unsigned int j = 0; j < hTel.size(); j++ )
     {
@@ -454,7 +454,7 @@ bool VDataMCComparision::setOnOffHistograms( VDataMCComparision* on, VDataMCComp
     {
         hTel2D[j]->Add( on->hTel2D[j], off->hTel2D[j], 1., norm );
     }
-    
+
     return true;
 }
 
@@ -468,7 +468,7 @@ void VDataMCComparision::setEntries( TH1D* iH )
             ie += iH->GetBinContent( i );
         }
     }
-    
+
     iH->SetEntries( ie );
 }
 
@@ -512,16 +512,16 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
     {
         theta2_cut = 0.035; //0.035;
     }
-    
+
     double theta2_min = 0.;
     double msw_max = 2.0;
     double msw_min = -1.2;
     double msl_max = 0.5;
     double msl_min = -1.2;
-    
+
     double size_min = 200.;
     double size2ndmax_min = 0.;
-    
+
     // single telescope cuts
     int    ntubes_min = 4;
     double alpha_max = 8.;
@@ -532,7 +532,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
     double los_max = 0.0003;
     double dist_min = -10.;
     double dist_max = 1.e10;
-    
+
     // chain data files
     TChain* iC = new TChain( "data" );
     if(!iC->Add( ifile.c_str() ) )
@@ -544,7 +544,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
     if( iC->GetFile()->Get( "data" ) )
     {
         iC->SetTitle( iC->GetFile()->Get( "data" )->GetTitle() );
-        
+
         // get MC data
         VMonteCarloRunHeader* iMC_H = ( VMonteCarloRunHeader* )iC->GetFile()->Get( "MC_runheader" );
         if( iMC_H )
@@ -553,7 +553,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
             {
                 fSpectralWeight->setMCParameter(-1.*iMC_H->spectral_index, iMC_H->E_range[0], iMC_H->E_range[1] );
                 fSpectralWeight->print();
-                
+
                 // Deals with CARE sims without full information in the run header
                 if( fSpectralWeight->getSpectralWeight( 1.0 ) == 0 )
                 {
@@ -565,16 +565,16 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
             }
         }
     }
-    
+
     // set this false for stereo cuts
     int fSingleTelescopeCuts = iSingleTelescopeCuts;
-    
+
     if( fName == "SIMS" )
     {
         cout << "\t reading simulations..." << endl;
     }
     fData = new CData( iC, fName == "SIMS" );
-    
+
     int nentries =  fData->fChain->GetEntries();
     cout << "\t entries: " << nentries << " (" << fNTel << " telescopes)" << endl;
     cout << "\t quality cuts: " << endl;
@@ -586,7 +586,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
     }
     cout << "\t\t zenith cut: [" << fZeMin << ", " << fZeMax << "]" << endl;
     cout << "\t cuts: ";
-    
+
     if( fSingleTelescopeCuts == -1 )
     {
         cout << " stereo cuts (hardwired)" << endl;
@@ -613,14 +613,14 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
         cout << "\t los < " << los_max << endl;
         cout << "\t " << dist_min << " < dist < " << dist_max << endl;
     }
-    
+
     double rdist1 = 0.;
     double theta2 = 0.;
-    
+
     int iOldRun = 0;
-    
+
     double weight = 1.;
-    
+
     // code the different input sources
     // 0 = SIMS
     // 1 = ON
@@ -638,25 +638,25 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
     {
         fInput = 2;
     }
-    
+
     ////////////////////////////////////////////////////////////
     // VGammaHadronCuts is needed for calculate of MVA values
     if( fCalculateMVAValues )
     {
         initialGammaHadronCuts();
     }
-    
+
     ////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////
     // now loop over all events
     for( int i = 0; i < nentries; i++ )
     {
         fData->GetEntry( i );
-        
+
         // define astro object (each time a new run starts)
         if( iOldRun != fData->runNumber && fWobbleFromDataTree )
         {
-        
+
             TFile* iCurrentFile = iC->GetFile();
             if( iCurrentFile )
             {
@@ -681,17 +681,17 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                 cout << "exiting..." << endl;
                 exit( EXIT_FAILURE );
             }
-            
+
             cout << "\t now at run " << fData->runNumber << " (" << fData->eventNumber << "):";
             cout << " N " << fWobbleNorth << ", E " << fWobbleEast << endl;
-            
+
             iOldRun = fData->runNumber;
         }
-        
+
         /////////////////////////////////////////////////
         /////////////////////////////////////////////////
         // quality cuts
-        
+
         // nimage cut
         if( fData->NImages < fNImages_min )
         {
@@ -717,7 +717,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
         {
             continue;
         }
-        
+
         // azimuth cuts (should be adjusted to match the azimuth distribution of the data runs)
         if( fAzRange && ( fData->Az < fAzMin || fData->Az > fAzMax ) )
         {
@@ -728,7 +728,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
         {
             continue;
         }
-        
+
         /////////////////////////////////////////////////
         // direction cut
         theta2 = fData->theta2;
@@ -766,7 +766,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                 theta2 = on_x * on_x + on_y * on_y;
             }
         }
-        
+
         // MC energy and spectral weight is filled for simulations only
         weight = 1.;
         if( fInput == 0 && fData->MCe0 > 0 )
@@ -785,7 +785,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                 weight *= hAzWeight->GetBinContent( hAzWeight->FindBin( fData->Az ) );
             }
         }
-        
+
         /////////////////////////////////////////////////////////
         //   ---    apply theta2 cuts ---
         /////////////////////////////////////////////////////////
@@ -796,7 +796,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                 continue;
             }
         }
-        
+
         /////////////////////////////////////////////////////////
         //   ---    apply single telescope cuts  ----
         /////////////////////////////////////////////////////////
@@ -835,13 +835,13 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
             {
                 continue;
             }
-            
+
             if( fData->size[iTelIndex]
                     && fData->size[iTelIndex] < size_min )
             {
                 continue;
             }
-            
+
             if( fData->length[iTelIndex] < length_min ||  fData->length[iTelIndex] > length_max )
             {
                 continue;
@@ -851,10 +851,10 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                 continue;
             }
         }
-        
+
         /////////////////////////////////////////////
         // fill histograms with all cuts applied
-        
+
         if( fSingleTelescopeCuts != -1
                 || ( theta2 >= 0. && fData->MSCW < msw_max && fData->MSCW > msw_min && fData->MSCL > msl_min && fData->MSCL < msl_max ) )
         {
@@ -878,7 +878,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
             {
                 // telescope ID
                 UInt_t iTelImage = fData->ImgSel_list[j];
-                
+
                 if( fData->MSCWT[iTelImage] > 0. && fHistoSingleTel[EMWRT].size() > 0
                         && iTelImage < fHistoSingleTel[EMWRT].size() && fHistoSingleTel[EMWRT][iTelImage] )
                 {
@@ -914,7 +914,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
             {
                 // telescope ID
                 UInt_t iTelImage = fData->ImgSel_list[j];
-                
+
                 if( fData->MSCLT[iTelImage] > 0. && fHistoSingleTel[EMLTT].size() > 0
                         && iTelImage < fHistoSingleTel[EMLTT].size() && fHistoSingleTel[EMLTT][iTelImage] )
                 {
@@ -952,7 +952,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
             {
                 fHistoArray[EIMGSEL]->fill( fData->ImgSel, weight, log10( fData->ErecS ) );
             }
-            
+
             if( fCuts )
             {
                 fCuts->newEvent();
@@ -969,7 +969,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                 }
             }
         }
-        
+
         ////////////////////////////////////////////////////////////////////////////////////////////////
         // stereo parameters
         if( fSingleTelescopeCuts != -1
@@ -1006,14 +1006,14 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
             {
                 fHistoArray[EAAZ]->fill( 90. - fData->Ze, weight );
             }
-            
+
             ///////////////////////////////////////////////////////////////
             // core position relative to each telescope
             for( int j = 0; j < fData->NImages; j++ )
             {
                 // telescope ID
                 UInt_t iTelImage = fData->ImgSel_list[j];
-                
+
                 if( fData->ntubes[iTelImage] > ntubes_min )
                 {
                     rdist1 = VUtilities::line_point_distance( fData->Ycore, -1.*fData->Xcore, 0., fData->Ze, fData->Az,
@@ -1023,7 +1023,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                                                            + fData->cen_y[iTelImage]*fData->cen_y[iTelImage] ), weight );
                 }
             }
-            
+
             ///////////////////////////////////////////////////////////////
             // single telescope distributions
             //  (loop over all images -> use selected images only)
@@ -1031,7 +1031,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
             {
                 // telescope ID (0...3)
                 UInt_t iTelImage = fData->ImgSel_list[t];
-                
+
                 // telescope wise quality cuts
                 if( fData->ntubes[iTelImage] > ntubes_min && fData->size[t] > 0. && fData->ErecS > 0. )
                 {
@@ -1186,7 +1186,7 @@ void VDataMCComparision::scaleHistograms( string ifile )
         return;
     }
     double iEntries = ( double )hEmc->GetEntries();
-    
+
     TIter next( hisList );
     while( TH1* h = ( TH1* )next() )
     {
@@ -1208,7 +1208,7 @@ bool VDataMCComparision::writeHistograms( string iOutFile )
     }
     // iOut->cd();
     cout << "\t writing results (" << fName << ") to " << iOut.GetName() << endl;
-    
+
     TIter next( hisList );
     while( TObject* h = next() )
     {
@@ -1219,7 +1219,7 @@ bool VDataMCComparision::writeHistograms( string iOutFile )
         hAzWeight->Write();
     }
     cout << "end writing histograms to disk" << endl;
-    
+
     return true;
 }
 
@@ -1234,7 +1234,7 @@ void VDataMCComparision::setAzRange( double iMin, double iMax )
     fAzMin = 0.;
     fAzMax = 0.;
     fAzRange = false;
-    
+
     if( TMath::Abs( iMin ) > 5. && TMath::Abs( iMax ) > 5. )
     {
         fAzMin = iMin;
@@ -1255,8 +1255,8 @@ TH1D*  VDataMCComparision::getAzimuthWeightingHistogram( string ifile )
     sprintf( hname, "hAzWeight_%s", fName.c_str() );
     hAzWeight = new TH1D( hname, "", 360., 0., 360. );
     hAzWeight->SetXTitle( "azimuth [deg]" );
-    
-    
+
+
     // chain data files
     TChain* iC = new TChain( "data" );
     if(!iC->Add( ifile.c_str() ) )
@@ -1269,12 +1269,12 @@ TH1D*  VDataMCComparision::getAzimuthWeightingHistogram( string ifile )
     int nentries =  tData->fChain->GetEntries();
     cout << "Filling Az distributions for entries: " << nentries << endl;
     cout << "(requires loop over all ON files)" << endl;
-    
+
     // now loop over all events
     for( int i = 0; i < nentries; i++ )
     {
         tData->GetEntry( i );
-        
+
         // nimage cut
         if( tData->NImages < 2 )
         {
@@ -1295,18 +1295,18 @@ TH1D*  VDataMCComparision::getAzimuthWeightingHistogram( string ifile )
         {
             continue;
         }
-        
+
         hAzWeight->Fill( tData->Az );
     }
-    
+
     if( hAzWeight->GetEntries() > 0. )
     {
         hAzWeight->Scale( 1. / hAzWeight->GetEntries() );
     }
-    
+
     delete tData;
     delete iC;
-    
+
     return hAzWeight;
 }
 

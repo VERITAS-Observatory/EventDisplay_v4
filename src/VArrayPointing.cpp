@@ -14,7 +14,7 @@ VArrayPointing::VArrayPointing( bool bInitTree )
 {
     setObservatory();
     reset();
-    
+
     if( bInitTree )
     {
         initializePointingTree();
@@ -26,7 +26,7 @@ void VArrayPointing::initializePointingTree()
 {
     char hname[200];
     char htitle[200];
-    
+
     sprintf( hname, "pointingData" );
     sprintf( htitle, "pointing (Array)" );
     fPointingTree = new TTree( hname, htitle );
@@ -47,8 +47,8 @@ void VArrayPointing::initializePointingTree()
     fPointingTree->Branch( "TelDecJ2000", &fTelDecJ2000, "TelDecJ2000/D" );
     fPointingTree->Branch( "TelRA", &fTelRA, "TelRA/D" );
     fPointingTree->Branch( "TelDec", &fTelDec, "TelDec/D" );
-    
-    
+
+
     sprintf( hname, "pointingDataReduced" );
     sprintf( htitle, "pointing information for the entire array, at 1 interpolated measurement per second" );
     fPntReduced = new TTree( hname, htitle );

@@ -6,7 +6,7 @@ VFITS::VFITS( string anasum_file, string fits_file, string object_name, bool iOn
     fFile_anasum = anasum_file;
     fFile_FITS   = fits_file;
     fWriteOneFile = iOneFile;
-    
+
     fTarget_Name = object_name;
     fTarget_Exposure = 0.;
     fTarget_RAJ2000 = 0.;
@@ -43,7 +43,7 @@ bool VFITS::readAnasumFile( bool iPrint )
         cout << "VFITS::readAnasumFile() Error reading anasum file: " << fFile_anasum << endl;
         return false;
     }
-    
+
     ctRunSum = getRunSummaryTree( 1 );
     ctRunSum->GetEntry( 0 );
     fTarget_RAJ2000 = ( float )ctRunSum->SkyMapCentreRAJ2000;
@@ -53,7 +53,7 @@ bool VFITS::readAnasumFile( bool iPrint )
         fTarget_RAJ2000 = ( float )ctRunSum->TargetRAJ2000;
         fTarget_DecJ2000 = ( float )ctRunSum->TargetDecJ2000;
     }
-    
+
     ctRunSum->GetEntry(( ctRunSum->fChain->GetEntries() ) - 1 );
     if( ctRunSum->runOn == -1 )
     {
@@ -64,14 +64,14 @@ bool VFITS::readAnasumFile( bool iPrint )
         cout << "VFITS::readAnasumFile() Error, no info for all runs " << endl;
         return false;
     }
-    
+
     if( iPrint )
     {
         //  cout << "Histogram found with " << hSkyMap->GetEntries() << " entries" << endl;
         cout << "Pointing direction  (ra,dec): " << fTarget_RAJ2000 << " " << fTarget_DecJ2000 << endl;
         cout << "Exposure [s]: " << fTarget_Exposure << endl;
     }
-    
+
     if( fWriteOneFile == true )
     {
         // create new FITS file
@@ -88,9 +88,9 @@ bool VFITS::readAnasumFile( bool iPrint )
         }
         writeFITSInfo( iPrint );
         cout << "Created FITS file: " << fFileName << endl;
-        
+
     }
-    
+
     return true;
 }
 
@@ -106,13 +106,13 @@ bool VFITS::writeCumSignificance( bool iPrint )
     {
         cout << " Calculated the cumulative significance" << endl;
     }
-    
+
     writeTGraphFits( gCumSig, "cumulativeSignificance", "time", "cumSig", "min", "sigma", iPrint );
     if( iPrint )
     {
         cout << " transformed cumulative significance into FITS-table" << endl;
     }
-    
+
     return true;
 }
 
@@ -127,7 +127,7 @@ bool VFITS::writeMonthlyFlux( bool iPrint, string outfile )
     flux2.setSpectralParameters( 0.35, 1.0, -2.2 );
     flux2.setSignificanceParameters(-9, -9 );
     flux2.calculateIntegralFlux( 0.35 );
-    
+
     VLightCurve flux;
     flux.initializeTeVLightCurve( fFile_anasum, 30, 54500, 59200 );
     flux.setSpectralParameters( 0.35, 1.0, -2.2 );
@@ -135,8 +135,8 @@ bool VFITS::writeMonthlyFlux( bool iPrint, string outfile )
     flux.fill( 0.35 );
     flux.plotLightCurve();
     TGraphAsymmErrors* gFlux = flux.getLightCurveGraph();
-    
-    
+
+
     if( iPrint )
     {
         cout << " Calculated the integral flux " << endl;
@@ -146,7 +146,7 @@ bool VFITS::writeMonthlyFlux( bool iPrint, string outfile )
     {
         cout << " transformed monthly flux into FITS-table" << endl;
     }
-    
+
     if( outfile != "" )
     {
         ofstream out;
@@ -154,28 +154,28 @@ bool VFITS::writeMonthlyFlux( bool iPrint, string outfile )
         out << "MJD\tF(>350GeV) [/cm^2/s]\tFlux in C.U." << endl;
         TString line;
         double mjd, flx, flxE, flxCrab, flxCrabE;
-        
+
         for( int i = 0; i < gFlux->GetN(); i++ )
         {
             mjd = gFlux->GetX()[i];
             flx = gFlux->GetY()[i];
             flxE = ( gFlux->GetErrorYhigh( i ) + gFlux->GetErrorYlow( i ) ) / 2.0;
-            
+
             flxCrab = flux2.getFluxVsCrab( flx, 0.35, 2.2 );
             flxCrabE = flux2.getFluxVsCrab( flxE, 0.35, 2.2 );
-            
+
             line.Form( "%d\t%.3e\t%.3e\t%.2f\t%.2f\n", ( int )mjd, flx, flxE, flxCrab, flxCrabE );
             out << line ;
-            
+
         }
         flux2.getFlux(-1, flx, flxE, mjd );
         flxCrab = flux2.getFluxVsCrab( flx, 0.35, 2.2 );
         flxCrabE = flux2.getFluxVsCrab( flxE, 0.35, 2.2 );
-        
+
         line.Form( "Total:\t%.3e\t%.3e\t%.2f\t%.2f\n", flx, flxE, flxCrab, flxCrabE );
         out << line << endl;
     }
-    
+
     return true;
 }
 
@@ -190,7 +190,7 @@ bool VFITS::writeNightlyFlux( bool iPrint, string outfile )
     flux2.setSpectralParameters( 0.2, 1.0, -2.5 );
     flux2.setSignificanceParameters(-9, -9 );
     flux2.calculateIntegralFlux( 0.2 );
-    
+
     VLightCurve flux;
     flux.initializeTeVLightCurve( fFile_anasum );
     flux.setSpectralParameters( 0.2, 1.0, -2.5 );
@@ -198,8 +198,8 @@ bool VFITS::writeNightlyFlux( bool iPrint, string outfile )
     flux.fill( 0.2 );
     flux.plotLightCurve();
     TGraphAsymmErrors* gFlux = flux.getLightCurveGraph();
-    
-    
+
+
     if( iPrint )
     {
         cout << " Calculated the integral flux " << endl;
@@ -209,7 +209,7 @@ bool VFITS::writeNightlyFlux( bool iPrint, string outfile )
     {
         cout << " transformed nightly flux into FITS-table" << endl;
     }
-    
+
     if( outfile != "" )
     {
         ofstream out;
@@ -217,28 +217,28 @@ bool VFITS::writeNightlyFlux( bool iPrint, string outfile )
         out << "MJD\tF(>200GeV) [/cm^2/s]\tFlux in C.U." << endl;
         TString line;
         double mjd, flx, flxE, flxCrab, flxCrabE;
-        
+
         for( int i = 0; i < gFlux->GetN(); i++ )
         {
             mjd = gFlux->GetX()[i];
             flx = gFlux->GetY()[i];
             flxE = ( gFlux->GetErrorYhigh( i ) + gFlux->GetErrorYlow( i ) ) / 2.0;
-            
+
             flxCrab = flux2.getFluxVsCrab( flx, 0.2, 2.5 );
             flxCrabE = flux2.getFluxVsCrab( flxE, 0.2, 2.5 );
-            
+
             line.Form( "%d\t%.3e\t%.3e\t%.2f\t%.2f\n", ( int )mjd, flx, flxE, flxCrab, flxCrabE );
             out << line ;
-            
+
         }
         flux2.getFlux(-1, flx, flxE, mjd );
         flxCrab = flux2.getFluxVsCrab( flx, 0.2, 2.5 );
         flxCrabE = flux2.getFluxVsCrab( flxE, 0.2, 2.5 );
-        
+
         line.Form( "Total:\t%.3e\t%.3e\t%.2f\t%.2f\n", flx, flxE, flxCrab, flxCrabE );
         out << line << endl;
     }
-    
+
     return true;
 }
 
@@ -252,16 +252,16 @@ bool VFITS::writeSignificanceDistribution( bool iPrint )
     // get all histograms
     TH2D* hmap_stereo_sig = 0;
     TH2D* hmap_stereo_on = 0;
-    
+
     hmap_stereo_sig = ( TH2D* )getHistogram( "hmap_stereo_sig", 1, "skyHistograms" );
     hmap_stereo_on = ( TH2D* )getHistogram( "hmap_stereo_on", 1, "skyHistograms" );
     if( iPrint )
     {
         cout << " Got necessary histograms from file" << endl;
     }
-    
+
     // get 1D histograms
-    
+
     vector<pair<TH1D*, string> > vhist;
     // with source
     TH1D* hsig_1Dall  = get_Bin_Distribution( hmap_stereo_sig, -1, 1.2, 0., false, hmap_stereo_on );
@@ -277,7 +277,7 @@ bool VFITS::writeSignificanceDistribution( bool iPrint )
     {
         cout << " Calculated 1-dim significance distribution" << endl;
     }
-    
+
     char* colNames[10] = {( char* )"Sigma", ( char* )"SigmaWidth", ( char* )"Counts", ( char* )"CountsMinusSource", ( char* )"CountsMinusStars", ( char* )"CountsMinusAll"};
     char* colUnits[10] = {( char* )"sigma", ( char* )"Delta sigma", ( char* )"counts", ( char* )"counts", ( char* )"counts", ( char* )"counts"};
     char* colDataFormat[10] = {( char* )"1D", ( char* )"1D", ( char* )"1D", ( char* )"1D", ( char* )"1D", ( char* )"1D"};
@@ -286,12 +286,12 @@ bool VFITS::writeSignificanceDistribution( bool iPrint )
     {
         cout << " transformed significance distribution into FITS-table" << endl;
     }
-    
+
     //     vector<int> hdunums;
     //     hdunums.push_back(WriteTH1DFits(hsig_1D,"significanceDist", "significance", "w/o Source", "sigma", "counts ", iPrint));
     //     hdunums.push_back(WriteTH1DFits(hsig_1Dall,"significanceDistAll", "significance", "w/ Source", "sigma", "counts ", iPrint));
     //     hdunums.push_back(WriteTH1DFits(hsig_1Dtest,"significanceDistTest", "significance", "w/o Source", "sigma", "counts ", iPrint));
-    
+
     return true;
 }
 /********************************************/
@@ -307,14 +307,14 @@ bool VFITS::writeLightCurve( bool iPrint )
     {
         cout << " Got the rate TGraphErrors" << endl;
     }
-    
+
     writeTGraphErrorsFits( gRates, "Rates", "run", "rate", " ", "1/min", iPrint );
     if( iPrint )
     {
         cout << " transformed rates into FITS-table" << endl;
     }
-    
-    
+
+
     return true;
 }
 
@@ -343,7 +343,7 @@ bool VFITS::writeThetaSquareDistribution( bool iPrint )
     {
         cout << " Got the theta2 histograms" << endl;
     }
-    
+
     char* colNames[10] = {( char* )"ThetaSq", ( char* )"ThetaSqWidth", ( char* )"ON", ( char* )"OFF", ( char* )"Excess", ( char* )"ExcessError"};
     char* colUnits[10] = {( char* )"deg^2", ( char* )"Delta deg^2", ( char* )"counts", ( char* )"counts", ( char* )"counts", ( char* )"counts"};
     char* colDataFormat[10] = {( char* )"1D", ( char* )"1D", ( char* )"1D", ( char* )"1D", ( char* )"1D", ( char* )"1D"};
@@ -352,8 +352,8 @@ bool VFITS::writeThetaSquareDistribution( bool iPrint )
     {
         cout << " transformed rates into FITS-table" << endl;
     }
-    
-    
+
+
     return true;
 }
 
@@ -376,7 +376,7 @@ bool VFITS::writeEnergySpectrum( bool iPrint )
     {
         cout << " combine all runs" << endl;
     }
-    
+
     //calculate energy Spectrum
     fEspec.calculateDifferentialFluxes();
     TGraphErrors* gEspec = ( TGraphErrors* )fEspec.getEnergySpectrumGraph();
@@ -384,14 +384,14 @@ bool VFITS::writeEnergySpectrum( bool iPrint )
     {
         cout << " Got the energy spectrum TGraphErrors" << endl;
     }
-    
+
     if( gEspec == 0 )
     {
         return false ;
     }
     //integral = getFluxIntegral(gEspec, 0.2, iPrint);
-    
-    
+
+
     //Transform to Fits
     writeTGraphErrorsFits( gEspec, "EnergySpectrum", "Energy", "dN_over_dE", "log10[TeV]", "1/[cm^2*TeV*s]", iPrint );
     if( iPrint )
@@ -414,7 +414,7 @@ bool VFITS::writeSignificanceSkyMap( bool iPrint )
     {
         cout << " Got the SignificanceSkyMap TH2D" << endl;
     }
-    
+
     //Transform to Fits
     createImageFitsFile( hSkyMap, "SignificanceMap", iPrint );
     if( iPrint )
@@ -437,7 +437,7 @@ bool VFITS::writeExcessSkyMap( bool iPrint )
     {
         cout << " Got the ExcessSkyMap TH2D" << endl;
     }
-    
+
     //Transform to Fits
     createImageFitsFile( hSkyMap, "ExcessSkyMap", iPrint );
     if( iPrint )
@@ -474,7 +474,7 @@ double VFITS::getFluxIntegral( TGraphErrors* gEspec, double minE, bool iPrint )
         }
     }
     return integral;
-    
+
 }
 
 
@@ -493,18 +493,18 @@ int VFITS::writeVecTH1DFits( vector<pair<TH1D*, string> > vhist, string DiagName
      y is y-Value(3.col.)
      e is y-Error(4.col.)
     */
-    
+
     if( iPrint )
     {
         cout << " Write Vector of TH1Ds to fits file ..." << endl;
     }
-    
+
     //create a table
     int size =  0;
     int HduNum = -99;
     vector< double> runValues;
     vector< vector<double> > table;
-    
+
     //get the histograms and the column information from the vector
     for( int i = 0; i < vhist[0].first->GetNbinsX(); i++ )
     {
@@ -532,7 +532,7 @@ int VFITS::writeVecTH1DFits( vector<pair<TH1D*, string> > vhist, string DiagName
             {
                 runValues.push_back( vhist[k].first->GetBinError( i ) );    //4.row = Y Error
             }
-            
+
         }
         if( i == 0 )
         {
@@ -540,7 +540,7 @@ int VFITS::writeVecTH1DFits( vector<pair<TH1D*, string> > vhist, string DiagName
         }
         table.push_back( runValues );
     }
-    
+
     //change column names if they are equal
     if( iPrint )
     {
@@ -568,7 +568,7 @@ int VFITS::writeVecTH1DFits( vector<pair<TH1D*, string> > vhist, string DiagName
     {
         cout << "   Wrote table into FITS-table" << endl;
     }
-    
+
     return HduNum;
 }
 
@@ -583,7 +583,7 @@ int VFITS::writeTH1DFits( TH1D* h, string DiagName, string x_name, string y_name
     int HduNum = -99;
     vector< double> runValues;
     vector< vector<double> > table;
-    
+
     for( int i = 0; i < h->GetNbinsX(); i++ )
     {
         runValues.clear();
@@ -591,7 +591,7 @@ int VFITS::writeTH1DFits( TH1D* h, string DiagName, string x_name, string y_name
         runValues.push_back( h->GetBinContent( i ) ); //2.row = Y values
         runValues.push_back( h->GetBinError( i ) ); //3.row = Y Error
         table.push_back( runValues );
-        
+
     }
     if( iPrint )
     {
@@ -607,13 +607,13 @@ int VFITS::writeTH1DFits( TH1D* h, string DiagName, string x_name, string y_name
     {
         cout << "   Set names, units and dataformats for different columns " << endl;
     }
-    
+
     HduNum = createTableFitsFile( table, tType, tUnit, tForm, DiagName, iPrint );
     if( iPrint )
     {
         cout << "   Wrote table into FITS-table" << endl;
     }
-    
+
     return HduNum;
 }
 
@@ -637,13 +637,13 @@ int VFITS::writeTGraphFits( TGraph* g, string DiagName, string x_name, string y_
         runValues.push_back( y );  //3.row = Y values
         table.push_back( runValues );
         x1 = x;
-        
+
     }
     if( iPrint )
     {
         cout << "   Got X and Y values from TGraph and stored them in a table" << endl;
     }
-    
+
     // define Names, Units and DataForms for new FITS BinTable
     string DeltaX( "Delta_" + x_name );
     char* tType[3] = {const_cast<char*>( x_name.c_str() ), const_cast<char*>( DeltaX.c_str() ), const_cast<char*>( y_name.c_str() )};
@@ -653,13 +653,13 @@ int VFITS::writeTGraphFits( TGraph* g, string DiagName, string x_name, string y_
     {
         cout << "   Set names, units and dataformats for different columns " << endl;
     }
-    
+
     createTableFitsFile( table, tType, tUnit, tForm, DiagName, iPrint );
     if( iPrint )
     {
         cout << "   Wrote table into FITS-table" << endl;
     }
-    
+
     return true;
 }
 
@@ -689,7 +689,7 @@ int VFITS::writeTGraphErrorsFits( TGraphErrors* g, string DiagName, string x_nam
     {
         cout << "   Got X value, Y values and Y_errors from TGraphErrors and stored them in a table" << endl;
     }
-    
+
     // define Names, Units and DataForms for new FITS BinTable
     string DeltaX( "Delta_" + x_name );
     string ErrorY( y_name + "_Error" );
@@ -700,13 +700,13 @@ int VFITS::writeTGraphErrorsFits( TGraphErrors* g, string DiagName, string x_nam
     {
         cout << "   Set names, units and dataformats for different columns " << endl;
     }
-    
+
     createTableFitsFile( table, tType, tUnit, tForm, DiagName, iPrint );
     if( iPrint )
     {
         cout << "   Wrote table into FITS-table" << endl;
     }
-    
+
     return true;
 }
 
@@ -734,7 +734,7 @@ int VFITS::writeTGraphAsymmErrorsFits( TGraphAsymmErrors* g, string DiagName, st
     {
         cout << "   Got X value, Y values and Y_errors from TGraphErrors and stored them in a table" << endl;
     }
-    
+
     // define Names, Units and DataForms for new FITS BinTable
     string DeltaX( "Delta_" + x_name );
     string ErrorY( y_name + "_Error" );
@@ -745,13 +745,13 @@ int VFITS::writeTGraphAsymmErrorsFits( TGraphAsymmErrors* g, string DiagName, st
     {
         cout << "   Set names, units and dataformats for different columns " << endl;
     }
-    
+
     createTableFitsFile( table, tType, tUnit, tForm, DiagName, iPrint );
     if( iPrint )
     {
         cout << "   Wrote table into FITS-table" << endl;
     }
-    
+
     return true;
 }
 
@@ -773,8 +773,8 @@ int VFITS::createTableFitsFile( vector< vector<double> > Table, char* ttype[], c
     int status = 0;
     string fFileName = fFile_FITS;
     fFileName.insert( fFileName.size() - 5, "_" + DiagName );
-    
-    
+
+
     if( fWriteOneFile == false )
     {
         // create new FITS file
@@ -795,7 +795,7 @@ int VFITS::createTableFitsFile( vector< vector<double> > Table, char* ttype[], c
         }
         //for (int j = 0; j<nCol; j++) { cout<<"tForm["<<j<<"] = "<<tform[j]<<endl;}
     }
-    
+
     if( fits_create_tbl( fptr, BINARY_TBL, nRows, nCol, ttype, tform, tunit, DiagName.c_str(), &status ) )
     {
         return printerror( status );
@@ -805,7 +805,7 @@ int VFITS::createTableFitsFile( vector< vector<double> > Table, char* ttype[], c
     {
         cout << "      Created BinaryTable ..." << endl;
     }
-    
+
     for( int k = 0; k < nCol; k++ )
     {
         for( int i = 0; i < nRows; i++ )
@@ -852,7 +852,7 @@ int VFITS::createImageFitsFile( TH2D* hSkyMap, string DiagName, bool iPrint )
     int status = 0;
     string fFileName = fFile_FITS;
     fFileName.insert( fFileName.size() - 5, "_" + DiagName );
-    
+
     // initialize FITS image parameters
     int bitpix   =  DOUBLE_IMG;                   /* 16-bit unsigned short pixel values   */
     const long naxis    =   2;                    /* 2-dimensional image                  */
@@ -860,16 +860,16 @@ int VFITS::createImageFitsFile( TH2D* hSkyMap, string DiagName, bool iPrint )
     {
         hSkyMap->GetNbinsX(), hSkyMap->GetNbinsY()
     };
-    
+
     // allocate memory for the whole image
     array[0] = ( double* )malloc( naxes[0] * naxes[1] * sizeof( double ) );
-    
+
     // initialize pointers to the start of each row of the image
     for( int ii = 1; ii < naxes[1]; ii++ )
     {
         array[ii] = array[ii - 1] + naxes[0];
     }
-    
+
     if( fWriteOneFile == false )
     {
         // create new FITS file
@@ -889,7 +889,7 @@ int VFITS::createImageFitsFile( TH2D* hSkyMap, string DiagName, bool iPrint )
             cout << "       Created FITS file: " << fFileName << endl;
         }
     }
-    
+
     if( fits_create_img( fptr,  bitpix, naxis, naxes, &status ) )
     {
         return printerror( status );
@@ -899,7 +899,7 @@ int VFITS::createImageFitsFile( TH2D* hSkyMap, string DiagName, bool iPrint )
     {
         cout << "      Created image ..." << endl;
     }
-    
+
     // initialize the values in the image with a linear ramp function
     for( int a = 0; a < naxes[0]; a++ )
     {
@@ -914,16 +914,16 @@ int VFITS::createImageFitsFile( TH2D* hSkyMap, string DiagName, bool iPrint )
     }
     fpixel = 1;                                   /* first pixel to write      */
     nelements = naxes[0] * naxes[1];              /* number of pixels to write */
-    
+
     // write the array of unsigned integers to the FITS file
     if( fits_write_img( fptr, TDOUBLE, fpixel, nelements, array[0], &status ) )
     {
         return printerror( status );
     }
     writeFITSimageInfo( naxis, naxes, hSkyMap, DiagName, iPrint );
-    
+
     free( array[0] );                             /* free previously allocated memory */
-    
+
     if( fWriteOneFile == false )
     {
         if( fits_close_file( fptr, &status ) )
@@ -945,75 +945,75 @@ int VFITS::createImageFitsFile( TH2D* hSkyMap, string DiagName, bool iPrint )
 bool VFITS::writeFITSimageInfo( long naxis, long* naxes, TH2D* hSkyMap, string DiagName, bool iPrint )
 {
     int status = 0;
-    
+
     char extname[100];
     sprintf( extname, "%s", DiagName.c_str() );
     if( fits_write_key_str( fptr, "EXTNAME", extname, "Extension Name", &status ) )
     {
         return printerror( status );
     }
-    
+
     char radecsys[] = "FK5";
     if( fits_update_key( fptr, TSTRING, "RADECSYS", radecsys, ( char* )"WCS for this file", &status ) )
     {
         return printerror( status );
     }
-    
+
     float equinoxsys = 2000.;
     if( fits_update_key( fptr, TFLOAT, "EQUINOX", &equinoxsys, ( char* )"Epoch of coordinate system", &status ) )
     {
         return printerror( status );
     }
-    
-    
+
+
     char ctype1[] = "RA---TAN";
     if( fits_update_key( fptr, TSTRING, "CTYPE1", ctype1, ( char* )"Axis type for dim 1 (RA)", &status ) )
     {
         return printerror( status );
     }
-    
+
     if( fits_update_key( fptr, TFLOAT, "CRVAL1", &fTarget_RAJ2000, ( char* )"Sky coord of 1st axis (deg)", &status ) )
     {
         return printerror( status );
     }
-    
+
     float pix1_origin = hSkyMap->GetNbinsX() - hSkyMap->GetXaxis()->FindFixBin( 0. ) + 1;
     if( fits_update_key( fptr, TFLOAT, "CRPIX1", &pix1_origin, ( char* )"Reference point of pixel location axis 1", &status ) )
     {
         return printerror( status );
     }
-    
+
     float xbinwidth = -1.*hSkyMap->GetXaxis()->GetBinWidth( 1 );
     if( fits_update_key( fptr, TFLOAT, "CDELT1", &xbinwidth, ( char* )"X degrees per pixel", &status ) )
     {
         return printerror( status );
     }
-    
-    
+
+
     char ctype2[] = "DEC--TAN";
     if( fits_update_key( fptr, TSTRING, "CTYPE2", ctype2, ( char* )"Axis type for dim 2 (DEC)", &status ) )
     {
         return printerror( status );
     }
-    
+
     if( fits_update_key( fptr, TFLOAT, "CRVAL2", &fTarget_DecJ2000, ( char* )"Sky coord of 2nd axis (deg)", &status ) )
     {
         return printerror( status );
     }
-    
+
     float pix2_origin = hSkyMap->GetYaxis()->FindFixBin( 0. );
     if( fits_update_key( fptr, TFLOAT, "CRPIX2", &pix2_origin, ( char* )"Reference point of pixel location axis 2", &status ) )
     {
         return printerror( status );
     }
-    
+
     float ybinwidth = hSkyMap->GetYaxis()->GetBinWidth( 1 );
     if( fits_update_key( fptr, TFLOAT, "CDELT2", &ybinwidth, ( char* )"Y degrees per pixel", &status ) )
     {
         return printerror( status );
     }
-    
-    
+
+
     return true;
 }
 
@@ -1027,32 +1027,32 @@ bool VFITS::writeFITSInfo( bool iPrint )
 
     TDatime* temps = new TDatime();
     temps->Set();
-    
+
     int YYYY = temps->GetYear();
     int MM = temps->GetMonth();
     int DD = temps->GetDay();
     int HH = temps->GetHour();
     int MN = temps->GetMinute();
     int SS = temps->GetSecond();
-    
+
     delete temps;
-    
+
     if( iPrint )
     {
         cout << "--> current date is: " << DD << MM << YYYY << "   time:" << HH << ":" << MN << ":" << SS << endl;
     }
-    
+
     /* write another optional keyword to the header */
     /* Note that the ADDRESS of the value is passed in the routine */
-    
+
     int status = 0;
-    
+
     char author[] = "VERITAS_Collaboration";
     if( fits_update_key( fptr, TSTRING, ( char* )"AUTHOR", author, ( char* )"Author", &status ) )
     {
         return printerror( status );
     }
-    
+
     char name[] = "VERITAS";
     if( fits_update_key( fptr, TSTRING, ( char* )"TELESCOP", name, ( char* )"Telescope name", &status ) )
     {
@@ -1064,29 +1064,29 @@ bool VFITS::writeFITSInfo( bool iPrint )
     {
         return printerror( status );
     }
-    
+
     if( fits_update_key( fptr, TFLOAT, ( char* )"RA_OBJ", &fTarget_RAJ2000, ( char* )"RA (deg) of the object", &status ) )
     {
         return printerror( status );
     }
-    
+
     if( fits_update_key( fptr, TFLOAT, ( char* )"DEC_OBJ", &fTarget_DecJ2000, ( char* )"Dec (deg) of the Object", &status ) )
     {
         return printerror( status );
     }
-    
+
     float equinoxsys = 2000.;
     if( fits_update_key( fptr, TFLOAT, ( char* )"EQUINOX", &equinoxsys, ( char* )"Epoch of coordinate system", &status ) )
     {
         return printerror( status );
     }
-    
+
     if( fits_update_key( fptr, TFLOAT, ( char* )"EXPOSURE", &fTarget_Exposure, ( char* )"Total exposure time in sec", &status ) )
     {
         return printerror( status );
     }
-    
-    
+
+
     string str_temp;
     stringstream dd;
     char* date;
@@ -1094,13 +1094,13 @@ bool VFITS::writeFITSInfo( bool iPrint )
     dd >> str_temp;
     date = new char[str_temp.size() + 1];
     strcpy( date, str_temp.c_str() );
-    
+
     if( fits_update_key( fptr, TSTRING, ( char* )"DATE", date, ( char* )"FITS file creation date (yyyy-mm-dd)", &status ) )
     {
         return printerror( status );
     }
     delete date;
-    
+
     string str_temp2;
     stringstream tt;
     char* time;
@@ -1108,26 +1108,26 @@ bool VFITS::writeFITSInfo( bool iPrint )
     tt >> str_temp2;
     time = new char[str_temp2.size() + 1];
     strcpy( time, str_temp2.c_str() );
-    
+
     if( fits_update_key( fptr, TSTRING, ( char* )"TIME", time, ( char* )"FITS file creation time (hh:mm:ss)", &status ) )
     {
         return printerror( status );
     }
     delete time;
-    
+
     char iCreator[100];
     sprintf( iCreator, "EVENTDISPLAY_%s", fEVNDISPVersion.c_str() );
     if( fits_update_key( fptr, TSTRING, ( char* )"CREATOR", iCreator, ( char* )"Software package and version creating file", &status ) )
     {
         return printerror( status );
     }
-    
+
     char iVersion[] = "0.2";
     if( fits_update_key( fptr, TSTRING, ( char* )"VERSION", iVersion, ( char* )"VERITAS FITS standard version", &status ) )
     {
         return printerror( status );
     }
-    
+
     return true;
 }
 
@@ -1152,7 +1152,7 @@ bool VFITS::writeFITSFile( bool iPrint )
         }
     }
     cout << "END of VFITS" << endl;
-    
+
     return true;
 }
 
@@ -1173,11 +1173,11 @@ bool VFITS::mergeColumns( fitsfile* fPtr, vector<int> hdunums, vector<vector <in
         cout << "!!!Number of HDUs is not the same as the Number of column_configuration_string ('columns' Parameter) " << endl;
         return false;
     }
-    
+
     char* tType[10];
     char* tUnit[10];
     char* tForm[10];
-    
+
     vector< double> rows;
     vector< vector<double> > table;
     int hdutype = 0;
@@ -1270,8 +1270,8 @@ bool VFITS::mergeColumns( fitsfile* fPtr, vector<int> hdunums, vector<vector <in
             }
         }
     }
-    
-    
+
+
     vector< double> cols;
     vector< vector<double> > table2;
     for( unsigned int k = 0; k < table[1].size(); k++ )
@@ -1287,8 +1287,8 @@ bool VFITS::mergeColumns( fitsfile* fPtr, vector<int> hdunums, vector<vector <in
         }
         table2.push_back( cols );
     }
-    
+
     createTableFitsFile( table2, tType, tUnit, tForm, "test", iPrint );
-    
+
     return true;
 }

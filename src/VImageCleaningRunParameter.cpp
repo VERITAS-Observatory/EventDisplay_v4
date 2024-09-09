@@ -10,34 +10,34 @@ VImageCleaningRunParameter::VImageCleaningRunParameter( string iName )
 {
     fName  = iName;
     fTelID = 0;
-    
+
     fUseFixedThresholds = false;
     fImageCleaningMethod = 0;
-    
+
     // default two-level threshold cleaning
     fimagethresh = 5.0;
     fborderthresh = 2.5;
     fbrightnonimagetresh = 2.5;
     fremoveIslandOfImageBorderPair = false;
-    
+
     // time cluster cleaning
     ftimecutpixel = 0.5;
     ftimecutcluster = 2.0;
     fminpixelcluster = 3;
     floops = 2;
-    
+
     //cluster cleaning
     fnmaxcluster = 1;
     fminsizecluster = 0;
-    
+
     // Trace Correlation Cleaning
     fCorrelationCleanBoardThresh = 1.0; // S/N ratio of 1
     fCorrelationCleanCorrelThresh = 0.75; // Sample correlation coefficient of 0.75
     fCorrelationCleanNpixThresh = 15;  // Images whose number of pixels is above this value will skip correlation cleaning
-    
+
     // time two-level cleaning
     ftimediff = 1.0;
-    
+
     // optimized next-neighbour cleaning
     fNNOpt_FakeImageProb = 1.e-4;
     fNNOpt_ActiveNN.assign( 5, false );
@@ -46,13 +46,13 @@ VImageCleaningRunParameter::VImageCleaningRunParameter( string iName )
     fNNOpt_Multiplicities.push_back( "3NN" );
     fNNOpt_Multiplicities.push_back( "2NN" );
     fNNOpt_Multiplicities.push_back( "BOUND" );
-    
+
     fNNOpt_nRings = 3;
     fNNOpt_CoincWinLimit = 8;
     fNNOpt_ifExplicitSampleTimeSlice = false;
     fNNOpt_sampleTimeSlice = 1;
     fNNOpt_nBinsADC = 25;
-    
+
 }
 
 bool VImageCleaningRunParameter::initialize()
@@ -90,7 +90,7 @@ void VImageCleaningRunParameter::print()
             cout << "\t\t\t\t sampleTimeSlice = " << fNNOpt_sampleTimeSlice << " ns" << endl;
             cout << "\t\t\t\t nBinsADC = " << fNNOpt_nBinsADC << endl;
         }
-        
+
     }
     if( fUseFixedThresholds && getImageCleaningMethod() != "TIMENEXTNEIGHBOUR" )
     {
@@ -194,6 +194,6 @@ bool VImageCleaningRunParameter::setImageCleaningMethod( string iMethod )
     {
         return false;
     }
-    
+
     return true;
 }

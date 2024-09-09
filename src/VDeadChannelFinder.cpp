@@ -8,12 +8,12 @@
 VDeadChannelFinder::VDeadChannelFinder( int irunmode, unsigned int iTelID, bool iLowGain, bool isMC )
 {
     fDebug = false;
-    
+
     frunmode = irunmode;
     fTelID = iTelID;
     fLowGain = iLowGain;
     fIsMC = isMC;
-    
+
     // default values for high gain channels
     if(!fLowGain )
     {
@@ -64,7 +64,7 @@ bool VDeadChannelFinder::readDeadChannelFile( string ifile )
     {
         return false;
     }
-    
+
     ifstream is;
     is.open( ifile.c_str(), ifstream::in );
     if(!is )
@@ -89,7 +89,7 @@ bool VDeadChannelFinder::readDeadChannelFile( string ifile )
     string iTemp;
     string iTemp2;
     int t_temp;
-    
+
     while( getline( is, iLine ) )
     {
         // line without '*' in the beginning are ignored
@@ -114,7 +114,7 @@ bool VDeadChannelFinder::readDeadChannelFile( string ifile )
             {
                 continue;
             }
-            
+
             is_stream >> iTemp;
             if( iTemp == "PEDESTAL" )
             {
@@ -184,7 +184,7 @@ bool VDeadChannelFinder::readDeadChannelFile( string ifile )
             }
         }
     }
-    
+
     return false;
 }
 
@@ -242,7 +242,7 @@ unsigned int VDeadChannelFinder::testPedestals( unsigned int ichannel, double iP
         }
         return 1;
     }
-    
+
     return 0;
 }
 
@@ -258,7 +258,7 @@ unsigned int VDeadChannelFinder::testPedestalVariations( unsigned int ichannel, 
         }
         return 2;
     }
-    
+
     return 0;
 }
 
@@ -276,7 +276,7 @@ unsigned int VDeadChannelFinder::testPedestalVariationsMinOut( unsigned int icha
         }
         return 3;
     }
-    
+
     return 0;
 }
 
@@ -294,7 +294,7 @@ unsigned int VDeadChannelFinder::testPedestalVariationsMaxOut( unsigned int icha
         }
         return 4;
     }
-    
+
     return 0;
 }
 
@@ -305,7 +305,7 @@ unsigned int VDeadChannelFinder::testGains( unsigned int ichannel, double iGain 
     {
         return 0;
     }
-    
+
     if( iGain < fDEAD_gain_min )
     {
         if( fDebug )
@@ -322,7 +322,7 @@ unsigned int VDeadChannelFinder::testGains( unsigned int ichannel, double iGain 
         }
         return 5;
     }
-    
+
     return 0;
 }
 
@@ -333,7 +333,7 @@ unsigned int VDeadChannelFinder::testGainVariations( unsigned int ichannel, doub
     {
         return 0;
     }
-    
+
     if( iGainVar < fDEAD_gainvar_min )
     {
         if( fDebug )
@@ -350,7 +350,7 @@ unsigned int VDeadChannelFinder::testGainVariations( unsigned int ichannel, doub
         }
         return 6;
     }
-    
+
     return 0;
 }
 
@@ -361,7 +361,7 @@ unsigned int VDeadChannelFinder::testGainDev( unsigned int ichannel, double iGai
     {
         return 0;
     }
-    
+
     if( iGainVar > 0. && iGain / iGainVar < fDEAD_gaindev_max && fabs( iGain - 1. ) < 1.e-3 && !iDefault )
     {
         if( fDebug )
@@ -370,7 +370,7 @@ unsigned int VDeadChannelFinder::testGainDev( unsigned int ichannel, double iGai
         }
         return 7;
     }
-    
+
     return 0;
 }
 
@@ -381,7 +381,7 @@ unsigned int VDeadChannelFinder::testTimeOffsets( unsigned int ichannel, double 
     {
         return 0;
     }
-    
+
     if( fabs( iT ) > fDEAD_toffset_max )
     {
         if( fDebug )
@@ -390,6 +390,6 @@ unsigned int VDeadChannelFinder::testTimeOffsets( unsigned int ichannel, double 
         }
         return 8;
     }
-    
+
     return 0;
 }

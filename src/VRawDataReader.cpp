@@ -55,7 +55,7 @@ bool VRawDataReader::getNextEvent()
             std::cout << "VRawDataReader::getNextEvent: exception while reading file" << std::endl;
             return false;
         }
-        
+
         if(!iStatus )
         {
             return false;
@@ -78,6 +78,6 @@ bool VRawDataReader::getNextEvent()
     {
         cout << "bool VRawDataReader::getNextEvent() (end)" << endl;
     }
-    
+
     return true;
 }

@@ -11,7 +11,7 @@ VSimulationDataReader::VSimulationDataReader()
 {
     fDebug = false;
     fSimulationData = 0;
-    
+
     fEventNumber = 0;
     fRunNumber = 0;
     fMCprimary = 0;
@@ -47,9 +47,9 @@ bool VSimulationDataReader::printSimulationHeader( VPacket* packet, int bPrintCF
     {
         return false;
     }
-    
+
     VSimulationHeader* h = packet->getSimulationHeader();
-    
+
     if( h )
     {
         cout << "================================================================================" << endl;
@@ -87,7 +87,7 @@ bool VSimulationDataReader::printSimulationHeader( VPacket* packet, int bPrintCF
         }
         cout << "================================================================================" << endl;
     }
-    
+
     return true;
 }
 
@@ -97,17 +97,17 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
     {
         return 0;
     }
-    
+
     VSimulationHeader* h = packet->getSimulationHeader();
     if(!h )
     {
         return 0;
     }
-    
+
     // new MC run header
     VMonteCarloRunHeader* iMCRunHeader = new VMonteCarloRunHeader();
     iMCRunHeader->SetName( "MC_runheader" );
-    
+
     iMCRunHeader->runnumber = h->fRunNumber;
     iMCRunHeader->detector_Simulator = h->fSimulator;
     iMCRunHeader->detector_date = h->fDateOfSimsUTC;
@@ -119,21 +119,21 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
     }
     iMCRunHeader->atmosphere = ( int )h->fAtmosphericModel;
     iMCRunHeader->obsheight = ( double )h->fObsAltitudeM;
-    
+
     // read long string of fSimConfigFile and extract all the necessary information
     // (very dependent on structure of string)
     if( h->fSimConfigFile.size() > 0 )
     {
         istringstream is_stream( h->fSimConfigFile );
         string iTemp = "";
-        
+
         while(!( is_stream >> std::ws ).eof() )
         {
             if(!( is_stream >> std::ws ).eof() )
             {
                 is_stream >> iTemp;
             }
-            
+
             if( iTemp == "corsikaIOreader" )
             {
                 if(!( is_stream >> std::ws ).eof() )
@@ -443,7 +443,7 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
                     }
                 }
             }
-            
+
         }
     }
     // scatter mode (y=0)
@@ -461,7 +461,7 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
     {
         iMCRunHeader->B_inclination = 0.;
     }
-    
+
     return iMCRunHeader;
 }
 
@@ -476,12 +476,12 @@ bool VSimulationDataReader::setSimulationData( VPacket* packet )
         cout << "\t\t VSimulationDataReader::setSimulationData" << endl;
     }
     bool iReturn = false;
-    
+
     if(!packet )
     {
         return iReturn;
     }
-    
+
     fMCprimary = 0;
     fMCenergy = 0.;
     fMCX = 0.;
@@ -490,7 +490,7 @@ bool VSimulationDataReader::setSimulationData( VPacket* packet )
     fMCYcos = 0.;
     fMCZe = 0.;
     fMCAz = 0.;
-    
+
     // get local trigger information
     // this should be somewhere else, since trigger info is
     // no simulation data (preliminary)
@@ -513,7 +513,7 @@ bool VSimulationDataReader::setSimulationData( VPacket* packet )
     {
         fLocalTrigger.assign( 255, false );
     }
-    
+
     if( packet->hasSimulationData() )
     {
         if( fDebug )
@@ -550,7 +550,7 @@ bool VSimulationDataReader::setSimulationData( VPacket* packet )
         fMCAz = fSimulationData->fPrimaryAzimuthDeg;
         fTel_Elevation = 90. - fSimulationData->fObservationZenithDeg;
         fTel_Azimuth = fSimulationData->fObservationAzimuthDeg;
-        
+
         float x = 0.;
         float y = 0.;
         float z = 0.;
@@ -591,6 +591,6 @@ bool VSimulationDataReader::setSimulationData( VPacket* packet )
         }
         iReturn = false;
     }
-    
+
     return iReturn;
 }

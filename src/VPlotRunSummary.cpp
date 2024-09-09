@@ -11,23 +11,23 @@ VPlotRunSummary::VPlotRunSummary( string ifile, unsigned int iTot, string iname,
 {
     fMinRun = -1;
     fMaxRun = -1;
-    
+
     setElevationRange();
-    
+
     fNPhaseBins = 0;
     fPhaseOrbit = 0.;
     fPhaseT0 = 0.;
     fPhasePoff = 0.;
-    
+
     bIsZombie = false;
-    
+
     if(!openfile( ifile, iTot ) )
     {
         cout << "file not found " << ifile << endl;
         bIsZombie = true;
         return;
     }
-    
+
     defineGraphsAndHistograms( iname, icolor, imarker, b1129 );
     default_settings();
 }
@@ -39,7 +39,7 @@ void VPlotRunSummary::printDailyRates()
     {
         cout << "printing daily rates for " << fIn->GetName() << endl;
     }
-    
+
     for( unsigned int i = 0; i < fDayDate.size(); i++ )
     {
         cout << ( int )fDayDate[i] << "\t";
@@ -60,10 +60,10 @@ void VPlotRunSummary::makeNewPhaseRunList( string ifile, string ilist )
 {
     string iListName = ilist.substr( 0, ilist.rfind( "." ) );
     cout << "creating new run lists from " << ilist << endl;
-    
+
     // read in run list
     vector< string > iListFileLine;
-    
+
     ifstream is;
     is.open( ilist.c_str(), ifstream::in );
     if(!is )
@@ -82,7 +82,7 @@ void VPlotRunSummary::makeNewPhaseRunList( string ifile, string ilist )
     is.close();
     cout << "total number of runs in list file: " << iListFileLine.size() << endl;
     cout << "total number of runs in root file: " << fRunList.size() << endl;
-    
+
     char hname[600];
     // write a shell script to run anasum over all new runlist
     sprintf( hname, "%s_%dPhases.sh", iListName.c_str(), ( int )fPhaseRunlist.size() );
@@ -97,7 +97,7 @@ void VPlotRunSummary::makeNewPhaseRunList( string ifile, string ilist )
     os_script << "# source file: " << ifile << endl;
     os_script << "# source run list: " << ilist << endl;
     os_script << endl;
-    
+
     // now loop over all phases, get the runs and write new run list
     for( unsigned int l = 0; l < fPhaseRunlist.size(); l++ )
     {
@@ -106,7 +106,7 @@ void VPlotRunSummary::makeNewPhaseRunList( string ifile, string ilist )
         {
             continue;
         }
-        
+
         // open new output file
         sprintf( hname, "%s_%dPhases_%d.dat", iListName.c_str(), ( int )fPhaseRunlist.size(), l );
         cout << "\t writing phase " << l << " to " << hname << endl;
@@ -168,7 +168,7 @@ void VPlotRunSummary::setPhaseValues( unsigned int inPhase, double orbit, double
     fPhaseOrbit = orbit;
     fPhaseT0 = t0;
     fPhasePoff = poff;
-    
+
     hRunDuration->SetBins( fNPhaseBins, 0. + poff, 1. + poff );
 }
 
@@ -176,31 +176,31 @@ void VPlotRunSummary::setPhaseValues( unsigned int inPhase, double orbit, double
 void VPlotRunSummary::defineGraphsAndHistograms( string iname, int icolor, int imarker, bool b1129 )
 {
     // define graphs and histograms
-    
+
     char hname[200];
-    
+
     gList = new TList();
-    
+
     sprintf( hname, "hRate_%s", iname.c_str() );
     hRate = new TH1D( hname, "", 100, 0., 20. );
     hRate->SetXTitle( "#gamma-ray rate [1/min]" );
     hRate->SetYTitle( "entries" );
     setHistogramPlottingStyle( hRate, icolor, 2, 2, imarker, 1, -1 );
     gList->Add( hRate );
-    
+
     sprintf( hname, "hSignificance_%s", iname.c_str() );
     hSignificance = new TH1D( hname, "", 100, 0., 30. );
     hSignificance->SetXTitle( "significance" );
     hSignificance->SetYTitle( "entries" );
     setHistogramPlottingStyle( hSignificance, icolor, 2, 2, imarker, 1, -1 );
     gList->Add( hSignificance );
-    
+
     int npoints = c->fChain->GetEntries() - 1;
     if( b1129 )
     {
         npoints -= 2;
     }
-    
+
     sprintf( hname, "hRunDuration_%s", iname.c_str() );
     hRunDuration = new TH1D( hname, "", fNPhaseBins, 0., 1. );
     hRunDuration->SetStats( 0 );
@@ -209,118 +209,118 @@ void VPlotRunSummary::defineGraphsAndHistograms( string iname, int icolor, int i
     hRunDuration->SetLineWidth( 2 );
     hRunDuration->SetLineColor( icolor );
     gList->Add( hRunDuration );
-    
+
     gRatevsTime = new TGraphErrors( 1 );
     setGraphPlottingStyle( gRatevsTime, icolor, 2, imarker, 2 );
-    
+
     gRateOffvsTime = new TGraphErrors( 1 );
     setGraphPlottingStyle( gRateOffvsTime, icolor, 2, imarker, 2 );
-    
+
     gSignificancevsTime = new TGraphErrors( 1 );
     setGraphPlottingStyle( gSignificancevsTime, icolor, 2, imarker, 2 );
-    
+
     gCumSignificancevsTime = new TGraphErrors( 1 );
     setGraphPlottingStyle( gCumSignificancevsTime, icolor, 2, imarker, 2 );
-    
+
     gRatevsWobbleDirection = new TGraphErrors( 1 );
     setGraphPlottingStyle( gRatevsWobbleDirection, icolor, 2, imarker, 2 );
-    
+
     gRateOffvsWobbleDirection = new TGraphErrors( 1 );
     setGraphPlottingStyle( gRateOffvsWobbleDirection, icolor, 2, imarker, 2 );
-    
+
     gSignificancevsWobbleDirection = new TGraphErrors( 4 );
     setGraphPlottingStyle( gSignificancevsWobbleDirection, icolor, 2, imarker, 2 );
-    
+
     gElevationvsWobbleDirection = new TGraphErrors( 4 );
     setGraphPlottingStyle( gElevationvsWobbleDirection, icolor, 2, imarker, 2 );
-    
+
     gRatevsElevation = new TGraphErrors( 1 );
     setGraphPlottingStyle( gRatevsElevation, icolor, 2, imarker, 2 );
-    
+
     gRateOffvsElevation = new TGraphErrors( 1 );
     setGraphPlottingStyle( gRateOffvsElevation, icolor, 2, imarker, 2 );
-    
+
     gRatevsWobbleOffset = new TGraphErrors( 1 );
     setGraphPlottingStyle( gRatevsWobbleOffset, icolor, 2, imarker, 2 );
-    
+
     gRateOffvsWobbleOffset = new TGraphErrors( 1 );
     setGraphPlottingStyle( gRateOffvsWobbleOffset, icolor, 2, imarker, 2 );
-    
+
     gRatevsElevationBinned = new TGraphErrors( 5 );
     setGraphPlottingStyle( gRatevsElevationBinned, icolor, 2, imarker, 2 );
-    
+
     gRawRatevsElevation = new TGraphErrors( npoints );
     setGraphPlottingStyle( gRawRatevsElevation, icolor, 2, imarker, 2 );
-    
+
     gRawRateOffvsElevation = new TGraphErrors( npoints );
     setGraphPlottingStyle( gRawRateOffvsElevation, icolor, 2, imarker, 2 );
-    
+
     gRawRatevsElevationBinned = new TGraphErrors( 5 );
     setGraphPlottingStyle( gRawRatevsElevationBinned, icolor, 2, imarker, 2 );
-    
+
     gSignificancevsElevation = new TGraphErrors( npoints );
     setGraphPlottingStyle( gSignificancevsElevation, icolor, 2, imarker, 2 );
-    
+
     gSignificancevsElevationBinned = new TGraphErrors( 5 );
     setGraphPlottingStyle( gSignificancevsElevationBinned, icolor, 2, imarker, 2 );
-    
+
     sprintf( hname, "hMaxSigniXY_%s", iname.c_str() );
     hMaxSigniXY = new TH2D( hname, "", 200, -1., 1., 200, -1., 1. );
     hMaxSigniXY->SetXTitle( "x-position on sky of maximum significance [deg]" );
     hMaxSigniXY->SetYTitle( "y-position on sky of maximum significance [deg]" );
     hMaxSigniXY->SetStats( 0 );
-    
+
     gRatevsPhase = new TGraphErrors( 1 );
     setGraphPlottingStyle( gRatevsPhase, icolor, 2, imarker, 2 );
-    
+
     gSignificancevsPhase = new TGraphErrors( 1 );
     setGraphPlottingStyle( gSignificancevsPhase, icolor, 2, imarker, 2 );
-    
+
     gElevationvsPhase = new TGraphErrors( 1 );
     setGraphPlottingStyle( gElevationvsPhase, icolor, 2, imarker, 2 );
-    
+
     gRawRatevsPhase = new TGraphErrors( 1 );
     setGraphPlottingStyle( gRawRatevsPhase, icolor, 2, imarker, 2 );
-    
+
     gRatevsPhaseBinned = new TGraphErrors( fNPhaseBins );
     setGraphPlottingStyle( gRatevsPhaseBinned, icolor, 2, imarker, 2 );
-    
+
     gSignificancevsPhaseBinned = new TGraphErrors( fNPhaseBins );
     setGraphPlottingStyle( gSignificancevsPhaseBinned, icolor, 2, imarker, 2 );
-    
+
     gElevationvsPhaseBinned = new TGraphErrors( fNPhaseBins );
     setGraphPlottingStyle( gElevationvsPhaseBinned, icolor, 2, imarker, 2 );
-    
+
     gRawRatevsPhaseBinned = new TGraphErrors( fNPhaseBins );
     setGraphPlottingStyle( gRawRatevsPhaseBinned, icolor, 2, imarker, 2 );
-    
+
     gRatesvsTimeDaily = new TGraphErrors( 1 );
     setGraphPlottingStyle( gRatesvsTimeDaily, icolor, 2, imarker, 2 );
-    
+
     gRatevsPhaseDaily = new TGraphErrors( 1 );
     setGraphPlottingStyle( gRatevsPhaseDaily, icolor, 2, imarker, 2 );
-    
+
     gSignificancevsPhaseDaily = new TGraphErrors( 1 );
     setGraphPlottingStyle( gSignificancevsPhaseDaily, icolor, 2, imarker, 2 );
-    
+
     sprintf( hname, "hPedvars_%s", iname.c_str() );
     hPedvars = new TH1D( hname, "", 150, 0., 20. );
     hPedvars->SetXTitle( "mean pedestal variations" );
     setHistogramPlottingStyle( hPedvars );
     hPedvars->SetStats( 1 );
-    
+
     sprintf( hname, "hAbsAzimuth_%s", iname.c_str() );
     hAbsAzimuth = new TH1D( hname, "", 25, 0., 180. );
     hAbsAzimuth->SetXTitle( "azimuth (absolute value) [deg]" );
     setHistogramPlottingStyle( hAbsAzimuth );
     hAbsAzimuth->SetStats( 1 );
-    
+
     sprintf( hname, "hElevation_%s", iname.c_str() );
     hElevation = new TH1D( hname, "", 50, 20., 90. );
     hElevation->SetXTitle( "elevation [deg]" );
     setHistogramPlottingStyle( hElevation );
     hElevation->SetStats( 1 );
-    
+
 }
 
 
@@ -331,7 +331,7 @@ bool VPlotRunSummary::openfile( string file, int iTot )
     {
         return false;
     }
-    
+
     char hfile[200];
     if( iTot > 0 )
     {
@@ -349,15 +349,15 @@ bool VPlotRunSummary::openfile( string file, int iTot )
     {
         return false;
     }
-    
+
     t = ( TTree* )gDirectory->Get( "tRunSummary" );
     if(!t )
     {
         return false;
     }
-    
+
     c = new CRunSummary( t );
-    
+
     return true;
 }
 
@@ -365,7 +365,7 @@ bool VPlotRunSummary::openfile( string file, int iTot )
 void VPlotRunSummary::fill()
 {
     int nentries = c->fChain->GetEntries();
-    
+
     // reset some histograms
     hRate->Reset();
     hSignificance->Reset();
@@ -373,9 +373,9 @@ void VPlotRunSummary::fill()
     hPedvars->Reset();
     hAbsAzimuth->Reset();
     hElevation->Reset();
-    
+
     // mean rate calculation
-    
+
     // mean vs wobble direction (in steps of 0.05)
     const int i_nWobble = 40;
     double i_ratevsWobbleDirectionX[i_nWobble];
@@ -403,7 +403,7 @@ void VPlotRunSummary::fill()
     {
         i_ratevsWobbleDirectionN[i] = 0.;
     }
-    
+
     double i_SignificancevsWobbleDirectionX[i_nWobble];
     for( int i = 0; i < i_nWobble; i++ )
     {
@@ -419,7 +419,7 @@ void VPlotRunSummary::fill()
     {
         i_SignificancevsWobbleDirectionN[i] = 0.;
     }
-    
+
     double i_ElevationvsWobbleDirectionX[i_nWobble];
     for( int i = 0; i < i_nWobble; i++ )
     {
@@ -435,7 +435,7 @@ void VPlotRunSummary::fill()
     {
         i_ElevationvsWobbleDirectionN[i] = 0.;
     }
-    
+
     // mean vs elevation
     double i_ratevsElevationX[5];
     double i_ratevsElevationXX[5];
@@ -458,10 +458,10 @@ void VPlotRunSummary::fill()
         i_SignificancevsElevationXX[i] = 0.;
         i_SignificancevsElevationN[i] = 0.;
     }
-    
+
     //////////////////////////////////
     // phase plots
-    
+
     // rate vs phase
     vector< double > i_ratevsPhaseX;
     vector< double > i_ratevsPhaseXX;
@@ -501,7 +501,7 @@ void VPlotRunSummary::fill()
             fPhaseSigniPerRun.push_back( itempD );
         }
     }
-    
+
     //////////////////////////////////
     //////////////////////////////////
     // now loop over all runs
@@ -513,24 +513,24 @@ void VPlotRunSummary::fill()
     {
         fSetRunRange = true;
     }
-    
+
     double cum_Non = 0.;
     double cum_Noff = 0.;
     double cum_alpha = 0.;
     double cum_t = 0.;
-    
+
     bool bBreak = false;
-    
+
     for( int i = 0; i < nentries; i++ )
     {
         c->GetEntry( i );
-        
+
         ///// test run range
         if(!fSetRunRange && (( fMinRun > 0 && c->runOn < fMinRun ) || ( fMaxRun > 0 && c->runOn > fMaxRun ) ) )
         {
             continue;
         }
-        
+
         if( fSetRunRange && c->runOn > 0 && ( c->runOn < fMinRun || fMinRun < 0 ) )
         {
             fMinRun = c->runOn;
@@ -539,7 +539,7 @@ void VPlotRunSummary::fill()
         {
             fMaxRun = c->runOn;
         }
-        
+
         // loop over list of runs to be excluded
         bBreak = false;
         for( unsigned int r = 0; r < fListofExcludedRuns.size(); r++ )
@@ -553,12 +553,12 @@ void VPlotRunSummary::fill()
         {
             continue;
         }
-        
+
         if( c->elevationOn < fMinElevation || c->elevationOn > fMaxElevation )
         {
             continue;
         }
-        
+
         // exclude runs with 0 rate and no error on rate
         if( c->runOn > 0 && !( TMath::Abs( c->Rate ) < 1.e-5 && TMath::Abs( c->RateE ) < 1.e-5 ) )
         {
@@ -573,22 +573,22 @@ void VPlotRunSummary::fill()
             hPedvars->Fill( c->pedvarsOn );
             hAbsAzimuth->Fill( TMath::Abs( c->azimuthOn ) );
             hElevation->Fill( c->elevationOn );
-            
+
             gRatevsTime->SetPoint( t, c->MJDOn, c->Rate );
             if( c->tOn > 0. )
             {
                 gRatevsTime->SetPointError( t, 0., sqrt( c->NOn + c->OffNorm* c->OffNorm* c->NOff ) / c->tOn * 60. );
             }
-            
+
             gRateOffvsTime->SetPoint( t, c->MJDOn, c->RateOff );
             if( c->tOn > 0. )
             {
                 gRateOffvsTime->SetPointError( t, 0., c->OffNorm* sqrt( c->NOff ) / c->tOn * 60. );
             }
-            
+
             gSignificancevsTime->SetPoint( t, c->MJDOn, c->Signi );
             gSignificancevsTime->SetPointError( t, 0., 0. );
-            
+
             // cumulative significance vs time
             if( c->OffNorm > 0 )
             {
@@ -596,7 +596,7 @@ void VPlotRunSummary::fill()
                 cum_Noff += c->NOff;
                 cum_alpha += c->OffNorm * c->NOff;
                 cum_t += c->tOn;
-                
+
                 if( cum_Noff > 0. )
                 {
                     gCumSignificancevsTime->SetPoint( t_f, cum_t / 60., VStatistics::calcSignificance( cum_Non, cum_Noff, cum_alpha / cum_Noff ) );
@@ -606,16 +606,16 @@ void VPlotRunSummary::fill()
                     t_f++;
                 }
             }
-            
+
             // wobble direction plots
             int iAng = ( int )( sqrt( c->WobbleNorth* c->WobbleNorth + c->WobbleWest* c->WobbleWest ) * 20. + 0.5 );
-            
+
             // (Temporary: dirty fix to get 1.43 point into 1.5 bin)
             if( iAng == 29 )
             {
                 iAng = 30;
             }
-            
+
             if( iAng < 40 )
             {
                 i_ratevsWobbleDirectionX[iAng] += c->Rate;
@@ -626,12 +626,12 @@ void VPlotRunSummary::fill()
                 i_SignificancevsWobbleDirectionX[iAng] += c->Signi;
                 i_SignificancevsWobbleDirectionXX[iAng] += c->Signi * c->Signi;
                 i_SignificancevsWobbleDirectionN[iAng]++;
-                
+
                 i_ElevationvsWobbleDirectionX[iAng] += c->elevationOn;
                 i_ElevationvsWobbleDirectionXX[iAng] += c->elevationOn * c->elevationOn;
                 i_ElevationvsWobbleDirectionN[iAng]++;
             }
-            
+
             // elevation plots
             if( c->elevationOn > 0. )
             {
@@ -644,25 +644,25 @@ void VPlotRunSummary::fill()
             gRatevsElevation->SetPointError( t, 0., c->RateE );
             gRateOffvsElevation->SetPoint( t, c->elevationOff, c->RateOff );
             gRateOffvsElevation->SetPointError( t, 0., c->RateOffE );
-            
+
             if( c->tOn > 0. )
             {
                 gSignificancevsElevation->SetPoint( t, c->elevationOn, c->Signi / sqrt( c->tOn / 3600. ) );
             }
             gSignificancevsElevation->SetPointError( t, 0., 0. );
-            
+
             gRawRatevsElevation->SetPoint( t, c->elevationOn, c->RawRateOn );
             gRawRatevsElevation->SetPointError( t, 0., 0. );
-            
+
             gRawRateOffvsElevation->SetPoint( t, c->elevationOff, c->RawRateOff );
             gRawRateOffvsElevation->SetPointError( t, 0., 0. );
-            
+
             gRatevsWobbleOffset->SetPoint( t, sqrt( c->WobbleNorth* c->WobbleNorth + c->WobbleWest* c->WobbleWest ), c->Rate );
             gRatevsWobbleOffset->SetPointError( t, 0., c->RateE );
-            
+
             gRateOffvsWobbleOffset->SetPoint( t, sqrt( c->WobbleNorth* c->WobbleNorth + c->WobbleWest* c->WobbleWest ), c->RateOff );
             gRateOffvsWobbleOffset->SetPointError( t, 0., c->RateOffE );
-            
+
             int iElevationBin = 0;
             double iEl = c->elevationOn;
             if( iEl < 1. )
@@ -689,7 +689,7 @@ void VPlotRunSummary::fill()
             {
                 iElevationBin = 4;
             }
-            
+
             if( c->Rate > 0. )
             {
                 i_ratevsElevationX[iElevationBin] += c->Rate;
@@ -702,17 +702,17 @@ void VPlotRunSummary::fill()
                 i_rawRatevsElevationXX[iElevationBin] += c->RawRateOn * c->RawRateOn;
                 i_rawRatevsElevationN[iElevationBin]++;
             }
-            
+
             i_SignificancevsElevationX[iElevationBin] += c->Signi;
             i_SignificancevsElevationXX[iElevationBin] += c->Signi * c->Signi;
             i_SignificancevsElevationN[iElevationBin]++;
-            
+
             fRunList.push_back( c->runOn );
-            
+
             // phase plots
             if( fNPhaseBins > 0 )
             {
-            
+
                 double iPhase = getPhase( c->MJDOn );
                 hRunDuration->Fill( iPhase, c->tOn / 60. );
                 gRatevsPhase->SetPoint( t, iPhase, c->Rate );
@@ -746,7 +746,7 @@ void VPlotRunSummary::fill()
                     }
                 }
             }
-            
+
             // position of maximum significance
             hMaxSigniXY->Fill( c->MaxSigniX, c->MaxSigniY );
             t++;
@@ -754,10 +754,10 @@ void VPlotRunSummary::fill()
     }
     cout << "range of runs: " << fMinRun << "\t" << fMaxRun;
     cout << ", number of runs: " << t << endl;
-    
+
     /////////////////////////////
     // fill mean rates
-    
+
     // set rate vs wobble direction
     int z = 0;
     for( int i = 0; i < 40; i++ )
@@ -766,10 +766,10 @@ void VPlotRunSummary::fill()
         {
             gRatevsWobbleDirection->SetPoint( z, ( double )i / 20., i_ratevsWobbleDirectionX[i] / i_ratevsWobbleDirectionN[i] );
             gRatevsWobbleDirection->SetPointError( z, 0., sqrt( 1. / i_ratevsWobbleDirectionN[i] / ( i_ratevsWobbleDirectionN[i] - 1 ) * ( i_ratevsWobbleDirectionXX[i] - 1. / i_ratevsWobbleDirectionN[i]*i_ratevsWobbleDirectionX[i]*i_ratevsWobbleDirectionX[i] ) ) );
-            
+
             gRateOffvsWobbleDirection->SetPoint( z, ( double )i / 20., i_rateOffvsWobbleDirectionX[i] / i_ratevsWobbleDirectionN[i] );
             gRateOffvsWobbleDirection->SetPointError( z, 0., sqrt( 1. / i_ratevsWobbleDirectionN[i] / ( i_ratevsWobbleDirectionN[i] - 1 ) * ( i_rateOffvsWobbleDirectionXX[i] - 1. / i_ratevsWobbleDirectionN[i]*i_rateOffvsWobbleDirectionX[i]*i_rateOffvsWobbleDirectionX[i] ) ) );
-            
+
             z++;
         }
     }
@@ -795,7 +795,7 @@ void VPlotRunSummary::fill()
             z++;
         }
     }
-    
+
     // rate vs elevation
     double elevation = 55.;
     for( int i = 0; i < 5; i++ )
@@ -820,7 +820,7 @@ void VPlotRunSummary::fill()
         {
             elevation = 80.;
         }
-        
+
         if( i_ratevsElevationN[i] > 1. )
         {
             gRatevsElevationBinned->SetPoint( i, elevation, i_ratevsElevationX[i] / i_ratevsElevationN[i] );
@@ -835,7 +835,7 @@ void VPlotRunSummary::fill()
         {
             gRatevsElevationBinned->RemovePoint( i );
         }
-        
+
         if( i_SignificancevsElevationN[i] > 1. )
         {
             gSignificancevsElevationBinned->SetPoint( i, elevation, i_SignificancevsElevationX[i] / i_SignificancevsElevationN[i] );
@@ -850,7 +850,7 @@ void VPlotRunSummary::fill()
         {
             gSignificancevsElevationBinned->RemovePoint( i );
         }
-        
+
         if( i_rawRatevsElevationN[i] > 1. )
         {
             gRawRatevsElevationBinned->SetPoint( i, elevation, i_rawRatevsElevationX[i] / i_rawRatevsElevationN[i] );
@@ -866,7 +866,7 @@ void VPlotRunSummary::fill()
             gRawRatevsElevationBinned->RemovePoint( i );
         }
     }
-    
+
     // rate vs phase bins
     for( unsigned int j = 0; j < fNPhaseBins; j++ )
     {
@@ -883,9 +883,9 @@ void VPlotRunSummary::fill()
         else
         {
             gRatevsPhaseBinned->SetPoint( j, ( fPhaseMin[j] + fPhaseMax[j] ) / 2., -999 );
-            
+
         }
-        
+
         if( i_rawRatevsPhaseN[j] > 1. )
         {
             gRawRatevsPhaseBinned->SetPoint( j, ( fPhaseMin[j] + fPhaseMax[j] ) / 2., i_rawRatevsPhaseX[j] / i_rawRatevsPhaseN[j] );
@@ -915,7 +915,7 @@ void VPlotRunSummary::fill()
             gElevationvsPhaseBinned->SetPoint( j, ( fPhaseMin[j] + fPhaseMax[j] ) / 2., -999 );
         }
     }
-    
+
     // daily rates and significances
     fillDailyRates();
 }
@@ -927,7 +927,7 @@ double VPlotRunSummary::getPhase( double iMJD )
     {
         return 0.;
     }
-    
+
     return ( iMJD + 2400000.5 - fPhaseT0 ) / fPhaseOrbit - ( int )(( iMJD + 2400000.5 - fPhaseT0 ) / fPhaseOrbit ) + fPhasePoff;
 }
 
@@ -938,7 +938,7 @@ void VPlotRunSummary::fillDailyRates( bool iCorrectForDeadTimes )
     {
         return;
     }
-    
+
     fDayDate.clear();
     fDayMJD.clear();
     fDayPhase.clear();
@@ -949,10 +949,10 @@ void VPlotRunSummary::fillDailyRates( bool iCorrectForDeadTimes )
     fDayRate.clear();
     fDayRateE.clear();
     fDaySigni.clear();
-    
+
     int iy, im, id, j;
     double fd;
-    
+
     vector< double > iDate;
     bool iNewDay = false;
     for( unsigned int i = 0; i < c->fChain->GetEntries(); i++ )
@@ -962,7 +962,7 @@ void VPlotRunSummary::fillDailyRates( bool iCorrectForDeadTimes )
         {
             continue;
         }
-        
+
         // get date from mjd
         VAstronometry::vlaDjcl( c->MJDOn, &iy, &im, &id, &fd, &j );
         iDate.push_back( iy * 10000 + im * 100 + id );
@@ -978,7 +978,7 @@ void VPlotRunSummary::fillDailyRates( bool iCorrectForDeadTimes )
         {
             iNewDay = false;
         }
-        
+
         if( iNewDay )
         {
             // scale previous days
@@ -1017,7 +1017,7 @@ void VPlotRunSummary::fillDailyRates( bool iCorrectForDeadTimes )
                     fDayNOff.back() += c->NOff * ( 1. + c->DeadTimeFracOff );
                 }
             }
-            
+
             fDayAlpha.back() += c->tOn / 60. * c->OffNorm;
         }
     }
@@ -1029,7 +1029,7 @@ void VPlotRunSummary::fillDailyRates( bool iCorrectForDeadTimes )
             fDayAlpha.back() /= fDayDuration.back();
         }
     }
-    
+
     // day wise rates and significances
     double ii_rate, ii_rateE, ii_rateSigni;
     for( unsigned int i = 0; i < fDayDate.size(); i++ )
@@ -1048,30 +1048,30 @@ void VPlotRunSummary::fillDailyRates( bool iCorrectForDeadTimes )
         {
             ii_rate = 0.;
         }
-        
+
         fDayRate.push_back( ii_rate );
         fDayRateE.push_back( ii_rateE );
         fDaySigni.push_back( ii_rateSigni );
     }
-    
+
     // fill graphs
     if( gRatevsPhaseDaily && gSignificancevsPhaseDaily )
     {
         gRatesvsTimeDaily->Set(( int )fDayRate.size() );
         gRatevsPhaseDaily->Set(( int )fDayRate.size() );
         gSignificancevsPhaseDaily->Set(( int )fDaySigni.size() );
-        
+
         for( unsigned int i = 0; i < fDayRate.size(); i++ )
         {
             gRatesvsTimeDaily->SetPoint( i, fDayMJD[i], fDayRate[i] );
             gRatesvsTimeDaily->SetPointError( i, 0., fDayRateE[i] );
             gRatevsPhaseDaily->SetPoint( i, fDayPhase[i], fDayRate[i] );
             gRatevsPhaseDaily->SetPointError( i, 0., fDayRateE[i] );
-            
+
             gSignificancevsPhaseDaily->SetPoint( i, fDayPhase[i], fDaySigni[i] );
         }
     }
-    
+
 }
 
 
@@ -1081,16 +1081,16 @@ void VPlotRunSummary::writeRunTable()
     {
         return;
     }
-    
+
     for( unsigned int i = 0; i < c->fChain->GetEntries(); i++ )
     {
         c->GetEntry( i );
-        
+
         if( c->elevationOn < fMinElevation || c->elevationOn > fMaxElevation )
         {
             continue;
         }
-        
+
         // loop over list of runs to be excluded
         bool bBreak = false;
         for( unsigned int r = 0; r < fListofExcludedRuns.size(); r++ )
@@ -1104,7 +1104,7 @@ void VPlotRunSummary::writeRunTable()
         {
             continue;
         }
-        
+
         if( c->runOn == -1 )
         {
             cout << endl << " ALL RUNS (" << c->fChain->GetEntries() - 1 << ")";
@@ -1147,7 +1147,7 @@ void VPlotRunSummary::writeRunTable( string ioutfile, bool iPhases, bool iSignif
     {
         return;
     }
-    
+
     ofstream is;
     is.open( ioutfile.c_str() );
     if(!is )
@@ -1156,14 +1156,14 @@ void VPlotRunSummary::writeRunTable( string ioutfile, bool iPhases, bool iSignif
         return;
     }
     cout << "writing run table to " << ioutfile << endl;
-    
+
     vector< double > ifirstRun;                   // this is true if this is the first run of the day
     vector< double > iDate;
     vector< int > iMJD;
     int iy, im, id, j;
     double fd;
     vector< double > iPhase;
-    
+
     for( unsigned int i = 0; i < c->fChain->GetEntries(); i++ )
     {
         c->GetEntry( i );
@@ -1171,7 +1171,7 @@ void VPlotRunSummary::writeRunTable( string ioutfile, bool iPhases, bool iSignif
         {
             continue;
         }
-        
+
         // get date from mjd
         VAstronometry::vlaDjcl( c->MJDOn, &iy, &im, &id, &fd, &j );
         iDate.push_back( iy * 10000 + im * 100 + id );
@@ -1188,17 +1188,17 @@ void VPlotRunSummary::writeRunTable( string ioutfile, bool iPhases, bool iSignif
         {
             ifirstRun.push_back( 0 );
         }
-        
+
         iPhase.push_back( getPhase( c->MJDOn ) );
     }
     fillDailyRates( iCorrectForDeadTimes );
-    
+
     is << "\\documentclass[a4paper]{article}" << endl;
     is << "\\usepackage{longtable}" << endl;
     is << "\\usepackage{lscape}" << endl;
-    
+
     is << "\\begin{document}" << endl;
-    
+
     is << "%% result table produced from file " << fIn->GetName() << endl;
     is << endl;
     is << "\\begin{footnotesize}" << endl;
@@ -1227,17 +1227,17 @@ void VPlotRunSummary::writeRunTable( string ioutfile, bool iPhases, bool iSignif
     for( unsigned int i = 0; i < c->fChain->GetEntries(); i++ )
     {
         c->GetEntry( i );
-        
+
         if( c->runOn == -1 )
         {
             continue;
         }
-        
+
         if( ifirstRun[i] == 1 )
         {
             is << "\\hline" << endl;
         }
-        
+
         is << c->runOn << " & ";
         is << ( int )iDate[i] << " & ";
         //       is << iMJD[i] << " & ";
@@ -1368,14 +1368,14 @@ TCanvas* VPlotRunSummary::plot_dailyRates( bool iDeadTimeCorrection )
         return 0;
     }
     fillDailyRates( iDeadTimeCorrection );
-    
+
     char hname[200];
     sprintf( hname, "cR_%d", gRandom->Integer( 10000 ) );
     TCanvas* cR = new TCanvas( hname, "daily rates", 10, 10, 400, 400 );
     cR->SetGridx( 0 );
     cR->SetGridy( 0 );
     cR->Draw();
-    
+
     gRatesvsTimeDaily->Draw( "ap" );
     gRatesvsTimeDaily->GetHistogram()->GetXaxis()->SetTitle( "MJD" );
     gRatesvsTimeDaily->GetHistogram()->GetYaxis()->SetTitle( "#gamma-ray rate [1/min]" );
@@ -1386,7 +1386,7 @@ TCanvas* VPlotRunSummary::plot_dailyRates( bool iDeadTimeCorrection )
         iL->SetLineStyle( 2 );
         iL->Draw();
     }
-    
+
     return cR;
 }
 
@@ -1397,14 +1397,14 @@ TCanvas* VPlotRunSummary::plot_rates( bool iOff )
     {
         return 0;
     }
-    
+
     fill();
-    
+
     TCanvas* cRR = new TCanvas( "cRR", "rates", 10, 10, 400, 400 );
     cRR->SetGridx( 0 );
     cRR->SetGridy( 0 );
     cRR->Draw();
-    
+
     TGraphErrors* g = 0;
     if( iOff )
     {
@@ -1414,12 +1414,12 @@ TCanvas* VPlotRunSummary::plot_rates( bool iOff )
     {
         g = gRatevsTime;
     }
-    
+
     if(!g )
     {
         return 0;
     }
-    
+
     g->Draw( "ap" );
     g->GetHistogram()->SetXTitle( "MJD" );
     if( iOff )
@@ -1431,7 +1431,7 @@ TCanvas* VPlotRunSummary::plot_rates( bool iOff )
         g->GetHistogram()->SetYTitle( "#gamma-ray rate [1/min]" );
     }
     g->GetHistogram()->GetXaxis()->SetNdivisions( 505 );
-    
+
     // draw zero line
     if( g->GetHistogram()->GetMinimum() < 0 )
     {
@@ -1439,7 +1439,7 @@ TCanvas* VPlotRunSummary::plot_rates( bool iOff )
         iL->SetLineStyle( 2 );
         iL->Draw();
     }
-    
+
     return cRR;
 }
 
@@ -1450,14 +1450,14 @@ TCanvas* VPlotRunSummary::plot_ratevsElevation( bool iOff )
     {
         return 0;
     }
-    
+
     fill();
-    
+
     TCanvas* cRatevsElevation = new TCanvas( "cRatevsElevation", "Rate vs elevation", 10, 10, 400, 400 );
     cRatevsElevation->SetGridx( 0 );
     cRatevsElevation->SetGridy( 0 );
     cRatevsElevation->Draw();
-    
+
     TGraphErrors* g = 0;
     if(!iOff )
     {
@@ -1471,7 +1471,7 @@ TCanvas* VPlotRunSummary::plot_ratevsElevation( bool iOff )
     {
         return 0;
     }
-    
+
     g->Draw( "ap" );
     g->GetHistogram()->SetXTitle( "elevation [deg]" );
     if( iOff )
@@ -1482,7 +1482,7 @@ TCanvas* VPlotRunSummary::plot_ratevsElevation( bool iOff )
     {
         g->GetHistogram()->SetYTitle( "#gamma-ray rate [1/min]" );
     }
-    
+
     // draw zero line
     if( g->GetHistogram()->GetMinimum() < 0 )
     {
@@ -1490,14 +1490,14 @@ TCanvas* VPlotRunSummary::plot_ratevsElevation( bool iOff )
         iL->SetLineStyle( 2 );
         iL->Draw();
     }
-    
+
     if(!iOff )
     {
         TCanvas* cRatevsElevationBinned = new TCanvas( "cRatevsElevationBinned", "Rate vs elevation", 410, 10, 400, 400 );
         cRatevsElevationBinned->SetGridx( 0 );
         cRatevsElevationBinned->SetGridy( 0 );
         cRatevsElevationBinned->Draw();
-        
+
         gRatevsElevationBinned->Draw( "ap" );
         gRatevsElevationBinned->GetHistogram()->SetXTitle( "elevation [deg]" );
         gRatevsElevationBinned->GetHistogram()->SetYTitle( "#gamma-ray rate [1/min]" );
@@ -1516,23 +1516,23 @@ TCanvas* VPlotRunSummary::plot_cumSignificance()
     {
         return 0;
     }
-    
+
     fill();
-    
+
     char hname[600];
     sprintf( hname, "cCS_%d", gRandom->Integer( 10000000 ) );
     TCanvas* cRR = new TCanvas( hname, "cumulative significance vs time", 10, 10, 400, 400 );
     cRR->SetGridx( 0 );
     cRR->SetGridy( 0 );
     cRR->Draw();
-    
+
     gCumSignificancevsTime->SetLineWidth(( Width_t )3. );
     gCumSignificancevsTime->SetMarkerStyle( 2 );
     gCumSignificancevsTime->SetMarkerSize( 1. );
     gCumSignificancevsTime->Draw( "apl" );
     gCumSignificancevsTime->GetHistogram()->SetXTitle( "time [min]" );
     gCumSignificancevsTime->GetHistogram()->SetYTitle( "cumulative significance" );
-    
+
     // plot zero line
     if( gCumSignificancevsTime && gCumSignificancevsTime->GetHistogram() && gCumSignificancevsTime->GetHistogram()->GetMinimum() < 0. )
     {
@@ -1540,7 +1540,7 @@ TCanvas* VPlotRunSummary::plot_cumSignificance()
         iL->SetLineStyle( 2 );
         iL->Draw();
     }
-    
+
     return cRR;
 }
 
@@ -1551,20 +1551,20 @@ TCanvas* VPlotRunSummary::plot_ratevsWobbleDirection( TCanvas* c, bool bPlotBack
     {
         return 0;
     }
-    
+
     fill();
-    
+
     // rates and significance vs wobble direction
-    
+
     if( c == 0 )
     {
         c = new TCanvas( "cRatevsWobbleDirection", "cRatevsWobbleDirection", 10, 10, 400, 400 );
         c->Draw();
-        
+
         gRatevsWobbleDirection->GetXaxis()->SetLimits( 0., 2. );
         gRatevsWobbleDirection->Draw( "ap" );
     }
-    
+
     if( bPlotIndividualRuns )
     {
         gRatevsWobbleOffset->SetMarkerStyle( 25 );
@@ -1584,27 +1584,27 @@ TCanvas* VPlotRunSummary::plot_ratevsWobbleDirection( TCanvas* c, bool bPlotBack
     gRatevsWobbleDirection->GetHistogram()->SetAxisRange( 0., 2. );
     gRatevsWobbleDirection->GetHistogram()->SetXTitle( "wobble direction [deg]" );
     gRatevsWobbleDirection->GetHistogram()->SetYTitle( "mean rate [#gamma/min]" );
-    
+
     TCanvas* cSignificancevsWobbleDirection = new TCanvas( "cSignificancevsWobbleDirection", "cSignificancevsWobbleDirection", 410, 10, 400, 400 );
     cSignificancevsWobbleDirection->Draw();
-    
+
     gSignificancevsWobbleDirection->GetXaxis()->SetLimits( 0., 2. );
     gSignificancevsWobbleDirection->Draw( "ap" );
     gSignificancevsWobbleDirection->GetHistogram()->SetAxisRange( 0., 2. );
     gSignificancevsWobbleDirection->GetHistogram()->SetXTitle( "wobble direction [deg]" );
     gSignificancevsWobbleDirection->GetHistogram()->SetYTitle( "mean significance" );
     gSignificancevsWobbleDirection->GetYaxis()->SetTitleOffset( 1.3 );
-    
+
     TCanvas* cElevationvsWobbleDirection = new TCanvas( "cElevationvsWobbleDirection", "cElevationvsWobbleDirection", 820, 10, 400, 400 );
     cElevationvsWobbleDirection->Draw();
-    
+
     gElevationvsWobbleDirection->GetXaxis()->SetLimits( 0., 2. );
     gElevationvsWobbleDirection->Draw( "ap" );
     gElevationvsWobbleDirection->GetHistogram()->SetAxisRange( 0., 2. );
     gElevationvsWobbleDirection->GetHistogram()->SetXTitle( "wobble direction [deg]" );
     gElevationvsWobbleDirection->GetHistogram()->SetYTitle( "mean Elevation" );
     gElevationvsWobbleDirection->GetYaxis()->SetTitleOffset( 1.3 );
-    
+
     return c;
 }
 
@@ -1623,7 +1623,7 @@ void VPlotRunSummary::setListofExcludedRuns( string iList )
     {
         fListofExcludedRuns.clear();
     }
-    
+
     string itemp;
     istringstream is_stream( iList );
     while(!( is_stream >> std::ws ).eof() )
@@ -1646,32 +1646,32 @@ TCanvas* VPlotRunSummary::plot_stats()
     {
         return 0;
     }
-    
+
     fill();
-    
+
     TCanvas* cPed = new TCanvas( "cRunSummaryStatsPeds", "pedestal variations", 10, 10, 400, 400 );
     cPed->Draw();
-    
+
     if( hPedvars )
     {
         hPedvars->Draw();
     }
-    
+
     TCanvas* cAz = new TCanvas( "cRunSummaryStatsAz", "azimuth (absolute value)", 450, 10, 400, 400 );
     cAz->Draw();
-    
+
     if( hAbsAzimuth )
     {
         hAbsAzimuth->Draw();
     }
-    
+
     TCanvas* cElevation = new TCanvas( "cRunSummaryStatsElevation", "elevation", 850, 10, 400, 400 );
     cElevation->Draw();
-    
+
     if( hElevation )
     {
         hElevation->Draw();
     }
-    
+
     return cPed;
 }

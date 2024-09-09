@@ -70,7 +70,7 @@ bool readInputParameter( string i_filename )
     string is_line;
     string temp;
     string temp2;
-    
+
     while( getline( is, is_line ) )
     {
         if( is_line.size() > 0 )
@@ -161,7 +161,7 @@ bool readInputParameter( string i_filename )
     cout << "read in " << f_ze.size() << " zenith bins, " << f_woff.size() << " wobble offset bins and " << f_noise.size() << " noise level bins" << endl;
     cout << "(total number of events to read from each MC data file: " << fNTotEvents << ")" << endl;
     cout << endl;
-    
+
     return true;
 }
 
@@ -174,7 +174,7 @@ int main( int argc, char* argv[] )
     cout << endl;
     cout << "makeDISPTables " << VGlobalRunParameter::getEVNDISP_VERSION() << endl;
     cout << "=======================================================" << endl;
-    
+
     if( argc != 3 && argc != 4 )
     {
         cout << "makeDISPTables " << "<runparameter file> <output root file> [options]" << endl;
@@ -187,33 +187,33 @@ int main( int argc, char* argv[] )
         cout << "(ARGC " << argc << ")" << endl;
         exit( 0 );
     }
-    
+
     // run timing
     TStopwatch fStopWatch;
     fStopWatch.Start();
-    
+
     if(!readInputParameter( argv[1] ) )
     {
         exit( 0 );
     }
-    
+
     // output root file
     string iTableFile = argv[2];
-    
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     // disp table
     VDispTable* fDisp = new VDispTable( fNTel, iTableFile );
     fDisp->setQualityCuts( f_ntubes_min, f_size_min, f_length_min, f_loss_max );
     fDisp->setWidthLengthScalingParameters( fWidthScaleParameter, fLengthScaleParameter );
-    
+
     // add four azimuth bins
     fDisp->addAzBin( 135., -135. );
     fDisp->addAzBin(-135., -45. );
     fDisp->addAzBin(-45., 45. );
     fDisp->addAzBin( 45., 135. );
-    
+
     fDisp->setDataVectors( f_ze, f_woff, f_noise );
-    
+
     // loop over all files
     for( unsigned int i = 0; i < f_ze.size(); i++ )
     {
@@ -236,18 +236,18 @@ int main( int argc, char* argv[] )
                 }
                 // hardwired file name (!)
                 iName += "100" + f_ze[i] + ".root";
-                
+
                 float iNoise = fDisp->fillTable( iName, atof( f_ze[i].c_str() ), atof( f_woff[j].c_str() ), fNTotEvents );
                 fDisp->setNoise( k, iNoise );
             }
         }
     }
     fDisp->terminate();
-    
+
     fStopWatch.Stop();
     fStopWatch.Print();
-    
+
     cout << "exiting...(success)" << endl;
-    
+
     return 0;
 }

@@ -17,7 +17,7 @@ VStereoReconstructionData::VStereoReconstructionData()
     fLineWidth = 1;
     fFillStyle = 1001;
     fPlotStyle = "cp";
-    
+
     gData = new TGraphAsymmErrors( 1 );
 }
 
@@ -27,7 +27,7 @@ void VStereoReconstructionData::draw()
     {
         return;
     }
-    
+
     gData->SetLineColor( fColor );
     gData->SetMarkerColor( fColor );
     gData->SetFillColor( fColor );
@@ -36,7 +36,7 @@ void VStereoReconstructionData::draw()
     gData->SetMarkerStyle( fMarkerStyle );
     gData->SetMarkerSize( fMarkerSize );
     gData->SetFillStyle( fFillStyle );
-    
+
     gData->Draw( fPlotStyle.c_str() );
 }
 
@@ -50,7 +50,7 @@ void VStereoReconstructionData::draw()
 VStereoReconstruction::VStereoReconstruction()
 {
     bDebug = false;
-    
+
     setName();
     setPlottingVariable( "direction" );
     setPlottingEnergyRangeLinear();
@@ -65,7 +65,7 @@ VStereoReconstruction::VStereoReconstruction()
 bool VStereoReconstruction::setPlottingVariable( string iVar )
 {
     fPlottingVariable = iVar;
-    
+
     return true;
 }
 
@@ -76,12 +76,12 @@ TCanvas* VStereoReconstruction::plot( TCanvas* c )
           cout << "VStereoReconstruction::plot error: empty data vector" << endl;
           return 0;
        } */
-    
+
     char hname[800];
     char htitle[800];
-    
+
     TH1D* hNull = 0;
-    
+
     if( c == 0 )
     {
         sprintf( hname, "c_%s_%s",  fName.c_str(), fPlottingVariable.c_str() );
@@ -89,9 +89,9 @@ TCanvas* VStereoReconstruction::plot( TCanvas* c )
         c = new TCanvas( hname, htitle, 10, 10, fPlottingCanvasSizeX, fPlottingCanvasSizeY );
         c->SetGridx( 0 );
         c->SetGridy( 0 );
-        
+
         c->SetLeftMargin( 0.13 );
-        
+
         sprintf( hname, "hnull_%s", fName.c_str() );
         hNull = new TH1D( hname, "", 100, log10( fPlottingMinEnergy ), log10( fPlottingMaxEnergy ) );
         hNull->SetMinimum( fPlottingYaxisMin );
@@ -106,17 +106,17 @@ TCanvas* VStereoReconstruction::plot( TCanvas* c )
         plot_nullHistogram( c, hNull, fPlottingLogEnergyAxis, false, hNull->GetYaxis()->GetTitleOffset(), fPlottingMinEnergy, fPlottingMaxEnergy );
     }
     fPlottingCanvas = c;
-    
+
     fPlottingCanvas->cd();
-    
+
     for( unsigned int i = 0; i < fData.size(); i++ )
     {
         fData[i]->draw();
     }
-    
+
     return c;
-    
-    
+
+
 }
 
 bool VStereoReconstruction::setPlottingAtt( unsigned int iDataSet, string iPlotStyle, int iColor, int iMarkerStyle, float iMarkerSize, int iLineStyle, float iLineWidth, int iFillStyle )
@@ -125,7 +125,7 @@ bool VStereoReconstruction::setPlottingAtt( unsigned int iDataSet, string iPlotS
     {
         return false;
     }
-    
+
     fData[iDataSet]->fColor = iColor;
     fData[iDataSet]->fMarkerStyle = iMarkerStyle;
     fData[iDataSet]->fMarkerSize = iMarkerSize;
@@ -133,7 +133,7 @@ bool VStereoReconstruction::setPlottingAtt( unsigned int iDataSet, string iPlotS
     fData[iDataSet]->fLineWidth = ( Width_t )iLineWidth;
     fData[iDataSet]->fFillStyle = iFillStyle;
     fData[iDataSet]->fPlotStyle = iPlotStyle;
-    
+
     return true;
 }
 
@@ -144,7 +144,7 @@ bool VStereoReconstruction::setPlottingAtt( unsigned int iDataSet, string iPlotS
 bool VStereoReconstruction::addDataSet( string iTitle, string iFile, double emin_lin, double emax_lin, bool bEnergyAxis_linear_GeV, bool bResolutionAxis_arcmin )
 {
     unsigned int i_oldDataSize = fData.size();
-    
+
     /////////////////////////////////////////////////////////////////////////
     // add a root file
     if( iFile.size() > 4 && iFile.substr( iFile.size() - 4, 4 ) == "root" )
@@ -168,7 +168,7 @@ bool VStereoReconstruction::addDataSet( string iTitle, string iFile, double emin
             {
                 AngRes = ( TH1F* )f.Get( "AngRes" );
             }
-            
+
             // add a eventdisplay style root file
             if( gE0 && gE0->GetN() > 0 )
             {
@@ -192,7 +192,7 @@ bool VStereoReconstruction::addDataSet( string iTitle, string iFile, double emin
                     {
                         continue;
                     }
-                    
+
                     fData.back()->gData->SetPoint( z, x, y );
                     fData.back()->gData->SetPointEYhigh( z, gE0->GetErrorY( i ) );
                     fData.back()->gData->SetPointEYlow( z, gE0->GetErrorY( i ) );
@@ -256,7 +256,7 @@ bool VStereoReconstruction::addDataSet( string iTitle, string iFile, double emin
                 {
                     y /= 60.;
                 }
-                
+
                 if( emin_lin > 0. && log10( emin_lin ) > x )
                 {
                     continue;
@@ -265,7 +265,7 @@ bool VStereoReconstruction::addDataSet( string iTitle, string iFile, double emin
                 {
                     continue;
                 }
-                
+
                 fData.back()->gData->SetPoint( i, x, y );
                 fData.back()->gData->SetPointEYhigh( i, 0. );
                 fData.back()->gData->SetPointEYlow( i, 0. );
@@ -283,7 +283,7 @@ bool VStereoReconstruction::addDataSet( string iTitle, string iFile, double emin
         fData.back()->fColor = fData.size();
         fData.back()->fMarkerStyle = 20 + fData.size() - 1;
     }
-    
+
     return true;
 }
 
@@ -302,7 +302,7 @@ void VStereoReconstruction::plotLegend()
     {
         return;
     }
-    
+
     TLegend* iLAng = 0;
     if( fData.size() < 3 )
     {
@@ -312,7 +312,7 @@ void VStereoReconstruction::plotLegend()
     {
         iLAng = new TLegend( 0.6, 0.6, 0.85, 0.85 );
     }
-    
+
     for( unsigned int i = 0; i < fData.size(); i++ )
     {
         iLAng->AddEntry( fData[i]->gData, fData[i]->fTitle.c_str(), "pl" );
@@ -326,7 +326,7 @@ bool VStereoReconstruction::readDataSetsfromTextFile( string ifile, unsigned int
     {
         fData.clear();
     }
-    
+
     // temporary data set
     string iFile;
     string iName;
@@ -341,7 +341,7 @@ bool VStereoReconstruction::readDataSetsfromTextFile( string ifile, unsigned int
     double emax = -1.;
     bool bEnergyAxis_linear_GeV = false;
     bool bResolutionAxis_arcmin = false;
-    
+
     // open text file
     ifstream is;
     is.open( ifile.c_str(), ifstream::in );
@@ -369,7 +369,7 @@ bool VStereoReconstruction::readDataSetsfromTextFile( string ifile, unsigned int
             {
                 continue;
             }
-            
+
             // read file name
             is_stream >> iFile;
             is_stream >> temp;
@@ -392,13 +392,13 @@ bool VStereoReconstruction::readDataSetsfromTextFile( string ifile, unsigned int
             is_stream >> temp;
             iLineWidth = ( Width_t )( atof( temp.c_str() ) );
             iName = is_stream.str().substr( is_stream.tellg(), is_stream.str().size() );
-            
+
             if( addDataSet( iName, iFile, emin, emax, bEnergyAxis_linear_GeV, bResolutionAxis_arcmin ) )
             {
                 setPlottingAtt( fData.size() - 1, iPlotStyle, iColor, iMarkerStyle, iMarkerSize, iLineStyle, iLineWidth, iFillStyle );
             }
         }
     }
-    
+
     return true;
 }

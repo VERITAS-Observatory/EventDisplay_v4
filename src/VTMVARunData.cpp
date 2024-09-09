@@ -8,33 +8,33 @@
 VTMVARunData::VTMVARunData()
 {
     setDebug( false );
-    
+
     fName = "noname";
     fRunOption = "TRAIN";
-    
+
     fTrainGammaHadronSeparation = true;
     fTrainReconstructionQuality = false;  // in development: please ignore
-    
+
     fOutputDirectoryName = "";
     fOutputFileName = "";
-    
+
     fnTrain_Signal = 0;
     fnTrain_Background = 0;
-    
+
     fQualityCuts = "1";
     fQualityCutsBkg = "1";
     fMCxyoffCut = "1";
     fMCxyoffCutSignalOnly = false;
     fPrepareTrainingOptions = "SplitMode=random:!V";
-    
+
     fSignalWeight = 1.;
     fBackgroundWeight = 1.;
     fMinSignalEvents = 50;
     fMinBackgroundEvents = 0;
     fSelectedEventFileName = "";
-    
+
     fNTtype = -1;
-    
+
     fReconstructionQualityTarget = "ErecS/MCe0";
     fReconstructionQualityTargetName = "EQuality";
 }
@@ -52,7 +52,7 @@ bool VTMVARunData::openDataFiles()
     }
     // open signal trees
     fSignalTree.clear();
-    
+
     for( unsigned int i = 0; i < fSignalFileName.size(); i++ )
     {
         fSignalTree.push_back( new TChain( "data" ) );
@@ -89,21 +89,21 @@ bool VTMVARunData::openDataFiles()
             return false;
         }
     }
-    
+
     if( fDebug )
     {
         cout << "VTMVARunData::openDataFiles() open output files " << endl;
     }
-    
+
     ///////////////////////////////////////////////////////////////////
     // check how many events there are in signal and background trees (after cuts)
-    
+
     if( fMinSignalEvents > 0 && fMinBackgroundEvents > 0 )
     {
         TEntryList* i_j_SignalList = 0;
         TEntryList* i_j_BackgroundList = 0;
         bool iEnoughEvents = true;
-        
+
         // loop over all energy and zenith bins
         for( unsigned int i = 0; i < fEnergyCutData.size(); i++ )
         {
@@ -124,7 +124,7 @@ bool VTMVARunData::openDataFiles()
                             i_j_SignalList = ( TEntryList* )gDirectory->Get( "signalList" );
                         }
                     }
-                    
+
                     if( i_j_SignalList )
                     {
                         cout << "number of signal events in energy bin " << i << " zenith bin " << j << ": ";
@@ -185,7 +185,7 @@ bool VTMVARunData::openDataFiles()
             exit( EXIT_FAILURE );
         }
     }
-    
+
     ///////////////////////////////////////////////////////////////////
     // open output file
     if( fOutputFileName.size() > 0 && fOutputDirectoryName.size() > 0 )
@@ -249,12 +249,12 @@ bool VTMVARunData::openDataFiles()
             fOutputFile.push_back( output_zenith );
         }
     }
-    
+
     if( fDebug )
     {
         cout << "VTMVARunData::openDataFiles() END" << endl;
     }
-    
+
     return true;
 }
 
@@ -270,7 +270,7 @@ unsigned int VTMVARunData::getTrainOptionValue( string iVarName, unsigned int i_
     }
     size_t s_0 = fPrepareTrainingOptions.find( iVarName ) + iVarName.size() + 1;
     size_t s_1 = fPrepareTrainingOptions.find( ":", s_0 );
-    
+
     return ( unsigned int )atoi( fPrepareTrainingOptions.substr( s_0, s_1 - s_0 ).c_str() );
 }
 
@@ -282,10 +282,10 @@ unsigned int VTMVARunData::getTrainOptionValue( string iVarName, unsigned int i_
 void VTMVARunData::updateTrainingEvents( string iVarName, unsigned int iNEvents )
 {
     unsigned int i_requested_nevents = getTrainOptionValue( iVarName, 0 );
-    
+
     size_t s_0 = fPrepareTrainingOptions.find( iVarName ) + iVarName.size() + 1;
     size_t s_1 = fPrepareTrainingOptions.find( ":", s_0 );
-    
+
     if( iNEvents < i_requested_nevents )
     {
         cout << "WARNING: changing " << iVarName << " from ";
@@ -406,7 +406,7 @@ void VTMVARunData::print()
 bool VTMVARunData::readConfigurationFile( char* iC )
 {
     cout << "reading TMVA optimizer configuration from " << iC << endl;
-    
+
     ifstream is;
     is.open( iC, ifstream::in );
     if(!is )
@@ -414,12 +414,12 @@ bool VTMVARunData::readConfigurationFile( char* iC )
         cout << "VTMVARunData::readConfigurationFile error configuration file not found: " << iC << endl;
         return false;
     }
-    
+
     string is_line;
     string temp;
     fMVAMethod.clear();
     fMVAMethod_Options.clear();
-    
+
     while( getline( is, is_line ) )
     {
         if( is_line.size() > 0 )
@@ -429,7 +429,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
             {
                 continue;
             }
-            
+
             is_stream >> temp;
             if( temp != "*" )
             {
@@ -439,7 +439,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
             {
                 continue;
             }
-            
+
             is_stream >> temp;
             ///////////////////////////////////////////////////////////////////////////////////////////
             // MVA method and options
@@ -660,7 +660,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
             {
                 vector< double > iEnergyCut_Log10TeV_min;
                 vector< double > iEnergyCut_Log10TeV_max;
-                
+
                 // read in energy bin
                 while(!( is_stream >> std::ws ).eof() )
                 {
@@ -679,7 +679,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
             {
                 vector< double > iEnergyCut_Log10TeV_min;
                 vector< double > iEnergyCut_Log10TeV_max;
-                
+
                 // read in energy bin
                 while(!( is_stream >> std::ws ).eof() )
                 {
@@ -707,7 +707,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
                 vector< double > iZenithCut_min;
                 vector< double > iZenithCut_max;
                 vector< TCut > iZenithCut;
-                
+
                 // read in zenith angle bin
                 while(!( is_stream >> std::ws ).eof() )
                 {
@@ -736,7 +736,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
                 {
                     ostringstream iCut;
                     iCut << "Ze>0.&&"  << iZenithCut_min[i]  <<  "<Ze&&Ze<" << iZenithCut_max[i];
-                    
+
                     iZenithCut.push_back( iCut.str().c_str() );
                 }
                 // filling everything into the zenith data structure
@@ -765,7 +765,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
             }
         }
     }
-    
+
     return true;
 }
 

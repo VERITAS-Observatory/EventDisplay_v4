@@ -14,7 +14,7 @@ void CData::Loop()
     //      Root > t.Show(16);     // Read and show values of entry 16
     //      Root > t.Loop();       // Loop on all entries
     //
-    
+
     //     This is the loop skeleton where:
     //    jentry is the global entry number in the chain
     //    ientry is the entry number in the current Tree
@@ -33,9 +33,9 @@ void CData::Loop()
     {
         return;
     }
-    
+
     Long64_t nentries = fChain->GetEntriesFast();
-    
+
     Long64_t nbytes = 0, nb = 0;
     for( Long64_t jentry = 0; jentry < nentries; jentry++ )
     {

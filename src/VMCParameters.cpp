@@ -8,9 +8,9 @@
 VMCParameters::VMCParameters( bool iDebug )
 {
     fDebug = iDebug;
-    
+
     fTree = 0;
-    
+
     reset();
 }
 
@@ -20,7 +20,7 @@ void VMCParameters::initTree()
     fTree = new TTree( "MCpars", "Monte Carlo Parameters" );
     fTree->SetMaxTreeSize( 1000 * Long64_t( 2000000000 ) );
     fTree->SetAutoSave( 100000000 );              // autosave when 100 Mbytes written
-    
+
     fTree->Branch( "runNumber", &runNumber, "runNumber/i" );
     fTree->Branch( "eventNumber", &eventNumber,  "eventNumber/i" );
     fTree->Branch( "MCprim", &MCprimary, "MCprimary/s" );

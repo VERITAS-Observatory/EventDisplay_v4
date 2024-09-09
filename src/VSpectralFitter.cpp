@@ -16,7 +16,7 @@ VSpectralFitter::VSpectralFitter( string fitname )
     fFitFunction_CovarianceMatrix = 0;
     fFitName = fitname;
     fConfidenceInterval = 0;
-    
+
     setSpectralFitFunction();
     setSpectralFitFluxNormalisationEnergy();
     setSpectralFitRangeLin();
@@ -46,15 +46,15 @@ TF1* VSpectralFitter::fit( TGraph* g, string fitname )
     {
         fFitName = fitname;
     }
-    
+
     cout << "VSpectralFitter::fit Applying Fit\n";
-    
+
     // define fit function
     defineFitFunction();
-    
+
     // gets the current default fitter
     TVirtualFitter* fitter = TVirtualFitter::GetFitter();
-    
+
     if( fSpectralFitFunction == 2 ) // i.e. for the broken power law
     {
         // Change the tolerance of the EDM, and loosen the convergence condition, since BPL has more free parameters
@@ -62,7 +62,7 @@ TF1* VSpectralFitter::fit( TGraph* g, string fitname )
         cout << "Setting default tolerance EDM to ~ 1.E-4" << endl;
         cout << "Coder's WARNING: Use this with care, and check the output of the fitter and the Error Matrix is not from MINOS" << endl;
     }
-    
+
     // fit
     if( fSpectralFitFunction == 2 ) // i.e. for the broken power law
     {
@@ -72,8 +72,8 @@ TF1* VSpectralFitter::fit( TGraph* g, string fitname )
     {
         g->Fit( fFitFunction, "0MNER" );
     }
-    
-    
+
+
     // Getting Fit Confidince interval.
     fConfidenceInterval = new TGraphErrors( g->GetX()[g->GetN() - 1] / 0.001 );
     int i_tmp = 0;
@@ -84,13 +84,13 @@ TF1* VSpectralFitter::fit( TGraph* g, string fitname )
         i_tmp++;
         i_energy += 0.001;
     }
-    
+
     cout << "VSpectralFitter::fit Getting Confidence Interval (cl = " << fCL << ")\n";
     ( TVirtualFitter::GetFitter() )->GetConfidenceIntervals( fConfidenceInterval, fCL );
-    
+
     //	fConfidenceInterval->SetFillColorAlpha(kRed,0.5);
     fConfidenceInterval->SetFillStyle( 1001 );
-    
+
     // covariance matrix
     if( fitter )
     {
@@ -118,15 +118,15 @@ TF1* VSpectralFitter::fit( TGraph* g, string fitname )
         	     {
         		double rho = TMath::Abs( fitter->GetCovarianceMatrixElement( 0, 1 ) );
         		rho /= sqrt( fitter->GetCovarianceMatrixElement( 0, 0 )*fitter->GetCovarianceMatrixElement( 1, 1 ) );
-        
+
                         cout << "\tCorrelation coefficient: " << rho << endl;
                       }
                  }
                } */
     }
-    
+
     updateFitFunction_lin();
-    
+
     return fFitFunction;
 }
 
@@ -146,7 +146,7 @@ bool VSpectralFitter::defineFitFunction()
 {
     char hname[2000];
     string iFitName_lin = fFitName + "_lin";
-    
+
     /////////////////////////////////////////////////////////
     // power law
     if( fSpectralFitFunction == 0 )
@@ -216,10 +216,10 @@ bool VSpectralFitter::defineFitFunction()
         cout << "VSpectralFitter::defineFitFunction: unknown spectral fit function: " << fSpectralFitFunction << endl;
         return false;
     }
-    
+
     // set all parameters for the function with linear energy axis
     updateFitFunction_lin();
-    
+
     // set plotting style
     if( fFitFunction )
     {
@@ -227,7 +227,7 @@ bool VSpectralFitter::defineFitFunction()
         fFitFunction->SetLineColor( fPlottingEnergySpectrumLineColor );
         fFitFunction->SetLineWidth(( Width_t )fPlottingEnergySpectrumLineWidth );
     }
-    
+
     return true;
 }
 
@@ -237,7 +237,7 @@ void VSpectralFitter::updateFitFunction_lin()
     {
         return;
     }
-    
+
     for( int i = 0; i < fFitFunction->GetNpar(); i++ )
     {
         fFitFunction_lin->SetParameter( i, fFitFunction->GetParameter( i ) );
@@ -252,7 +252,7 @@ void VSpectralFitter::print()
     {
         return;
     }
-    
+
     cout << endl;
     if( fSpectralFitFunction == 0 )
     {
@@ -306,7 +306,7 @@ double VSpectralFitter::getIntegralFlux( double iMinEnergy_TeV, double iMaxEnerg
         cout << "VSpectralFitter::getIntegralFlux(): error: no fit function" << endl;
         return -99999.;
     }
-    
+
     // analytical calculation for power law (fSpectralFitFunction == 0)
     /*   if( fSpectralFitFunction == 0 )
        {
@@ -317,7 +317,7 @@ double VSpectralFitter::getIntegralFlux( double iMinEnergy_TeV, double iMaxEnerg
     	  return iFL;
            }
         }     */
-    
+
     return fFitFunction_lin->Integral( iMinEnergy_TeV, iMaxEnergy_TeV, 1.e-30 );
 }
 
@@ -335,6 +335,6 @@ double VSpectralFitter::getIntegralFluxError( double iMinEnergy_TeV, double iMax
         cout << "VSpectralFitter::getIntegralFlux(): error: no fit function" << endl;
         return -99999.;
     }
-    
+
     return fFitFunction_lin->IntegralError( iMinEnergy_TeV, iMaxEnergy_TeV, fFitFunction_lin->GetParameters(), fFitFunction_CovarianceMatrix );
 }

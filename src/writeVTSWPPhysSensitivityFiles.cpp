@@ -50,7 +50,7 @@ string fObservatory;
 bool readRunParameterFile( string ifile )
 {
     fMCset.clear();
-    
+
     ifstream is;
     is.open( ifile.c_str(), ifstream::in );
     if(!is )
@@ -63,7 +63,7 @@ bool readRunParameterFile( string ifile )
     cout << endl;
     cout << "========================================" << endl;
     cout << "run parameter file(" << ifile << ")" << endl;
-    
+
     while( getline( is, is_line ) )
     {
         if( is_line.size() > 0 )
@@ -100,7 +100,7 @@ bool readRunParameterFile( string ifile )
         }
     }
     is.close();
-    
+
     return true;
 }
 
@@ -117,7 +117,7 @@ bool fillBackgroundRateHistograms( TH1F* hBckRate, TH1F* hBckRateDeq, double wof
     {
         return false;
     }
-    
+
     cout << endl;
     cout << "reading anasum file " << fAnaSumFile << endl;
     cout << endl;
@@ -150,7 +150,7 @@ bool fillBackgroundRateHistograms( TH1F* hBckRate, TH1F* hBckRateDeq, double wof
         /////////////////////////////////
         // backgrounds per square degrees
         /////////////////////////////////
-        
+
         // read gamma/hadron cuts from effective area file
         // note: assume same gamma/hadron cuts applied for effective area generation
         //       as for anasum analysis
@@ -213,7 +213,7 @@ int main( int argc, char* argv[] )
         return false;
     }
     string fOutputFile = argv[2];
-    
+
     cout << endl;
     cout << "writing VTS sensitivity file (" << fObservatory << ")" << endl;
     cout << endl;
@@ -237,7 +237,7 @@ int main( int argc, char* argv[] )
         cout << "error: no effective area files given" << endl;
         return false;
     }
-    
+
     /////////////////////
     // initialization
     VWPPhysSensitivityFile* iData = new VWPPhysSensitivityFile();
@@ -252,12 +252,12 @@ int main( int argc, char* argv[] )
     iData->setCrabSpectrum( "$VERITAS_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat", 5 );
     // CR spectra (protons + electrons)
     iData->setCosmicRaySpectrum( "$VERITAS_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat", 0, 8 );
-    
+
     /////////////////////////////////////
     // on source histograms
     // initialize histogram with the standard binning used in the VTS WP Phys group
     iData->initializeHistograms( 21, -1.9, 2.3, 500, -1.9, 2.3, 400, -2.3, 2.7, 9999 );
-    
+
     // first element is used for on source histograms
     if(!iData->fillIRFHistograms( fMCset.begin()->second, 20., fMCset.begin()->first ) )
     {
@@ -286,15 +286,15 @@ int main( int argc, char* argv[] )
             i_woff_min.push_back( it->first );
         }
         i_woff_max.push_back( it->first + 0.1 );
-        
+
         z++;
     }
     cout << "found " << z << " off-axis effective areas " << endl;
     iData->fillHistograms2D( i_woff_min, i_woff_max );
-    
+
     iData->terminate();
-    
+
     exit( 0 );
-    
+
     cout << endl << "all histograms written to " << fOutputFile << endl;
 }

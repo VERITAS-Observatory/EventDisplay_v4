@@ -59,7 +59,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
     {
         return true;
     }
-    
+
     if( file_list.size() == 0 )
     {
         cout << "error: no files found to merge" << endl;
@@ -71,7 +71,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
     {
         f.Add( file_list[i].c_str() );
     }
-    
+
     // observational parameters and effective areas
     Double_t ze = 0.;
     Int_t az = 0;
@@ -125,7 +125,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
         cout << "exiting..." << endl;
         exit( EXIT_FAILURE );
     }
-    
+
     // histograms
     vector< string > hist_names;
     hist_names.push_back( "hEsysMCRelative2D" );
@@ -145,7 +145,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
     {
         hist_value.push_back( new float[max_nxy] );
     }
-    
+
     // initialize reading tree
     for( unsigned int i = 0; i < hist_names.size(); i++ )
     {
@@ -205,7 +205,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
     t->Branch( "nbins_esys", &t_esys_nbins, "nbins_esys/s" );
     t->Branch( "e0_esys", t_esys_e0, "e0_esys[nbins_esys]/F" );
     t->Branch( "esys_rel", t_esys_rel, "esys_rel[nbins_esys]/F" );
-    
+
     // initialize branches
     // assume that histograms are equivalent for all entries
     f.GetEntry( 0 );
@@ -254,7 +254,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
                   hist_value[h],
                   ( hist_names[h] + "_value[" + hist_names[h] + "_binsxy]/F" ).c_str() );
     }
-    
+
     // loop over all entries and copy histograms to arrays
     Long64_t nentries = f.GetEntries();
     cout << "prepare reduced arrays for " << nentries << " entries" << endl;
@@ -299,7 +299,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
         {
             t_esys_rel[b] = hEsysMCRelative->GetBinContent( b + 1 );
         }
-        
+
         // histograms
         for( unsigned int h = 0; h < hist_to_read.size(); h++ )
         {
@@ -344,7 +344,7 @@ void merge( vector< string > file_list,
         outputfile += ".root";
     }
     cout << "merging " << file_list.size() << " files to " << outputfile << endl;
-    
+
     // set branches to be included in merged files
     f.SetBranchStatus( "*", 0 );
     f.SetBranchStatus( "ze", 1 );
@@ -381,7 +381,7 @@ void merge( vector< string > file_list,
     }
     f.Merge( outputfile.c_str() );
     cout << "done.." << endl;
-    
+
     // get one example of hEmc
     // (this is needed later to get the binning right)
     TFile* fO = new TFile( outputfile.c_str(), "UPDATE" );
@@ -452,7 +452,7 @@ void write_log_files( vector< string > file_list, string outputfile )
             i_sys << "cat " << file_list[i] << ".log > ";
         }
     }
-    
+
     i_sys << outputfile << ".combine.log";
     cout << "merge log files into " << i_sys.str() << endl;
     int sys_ret = system( i_sys.str().c_str() );
@@ -471,7 +471,7 @@ void write_log_files( vector< string > file_list, string outputfile )
 vector< string > readListOfFiles( string iFile )
 {
     vector< string > iList;
-    
+
     ifstream is;
     is.open( iFile.c_str() );
     if(!is )
@@ -481,14 +481,14 @@ vector< string > readListOfFiles( string iFile )
         exit( EXIT_FAILURE );
     }
     string is_line;
-    
+
     while( getline( is, is_line ) )
     {
         iList.push_back( is_line );
     }
-    
+
     is.close();
-    
+
     return iList;
 }
 
@@ -526,12 +526,12 @@ int main( int argc, char* argv[] )
     cout << "combineEffectiveAreas (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
     cout << "------------------------------------" << endl;
     cout << endl;
-    
+
     vector< string > file_list = readListOfFiles( argv[1] );
-    
+
     merge( file_list, argv[2], argv[3] );
     write_reduced_merged_tree( file_list, argv[2], argv[3] );
     // write_log_files( file_list, argv[2] );
-    
+
     cout << endl << "end combineEffectiveAreas" << endl;
 }

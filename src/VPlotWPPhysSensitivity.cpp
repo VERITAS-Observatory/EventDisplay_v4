@@ -12,12 +12,12 @@ VPlotWPPhysSensitivity::VPlotWPPhysSensitivity()
     setEnergyRange_Lin_TeV();
     setCrabSpectraFile();
     setPlotCTARequirements();
-    
+
     fSensitivityFOM = -1.;
     fSensitivityFOM_error = -1.;
-    
+
     fPlotCTARequirementsID = -99;
-    
+
     fUseIntegratedSensitivityForOffAxisPlots = false;
 }
 
@@ -35,12 +35,12 @@ bool VPlotWPPhysSensitivity::addDataSet( VSiteData* iData )
     fData.back()->fCameraOffset_deg = iData->fCameraOffset_deg;
     fData.back()->fSiteFile_Emin = iData->fSiteFile_Emin;
     fData.back()->fSiteFile_Emax = iData->fSiteFile_Emax;
-    
+
     fData.back()->fPlottingColor = iData->fPlottingColor;
     fData.back()->fPlottingLineStyle = iData->fPlottingLineStyle;
     fData.back()->fPlottingFillStyle = iData->fPlottingFillStyle;
     fData.back()->fLegend = iData->fLegend;
-    
+
     return true;
 }
 
@@ -52,12 +52,12 @@ bool VPlotWPPhysSensitivity::addDataSet( string iAnalysis, string iSubArray, dou
     i_temp.fArray.push_back( iSubArray );
     i_temp.fObservationTime_s.push_back( iObservationTime_s );
     i_temp.fCameraOffset_deg.push_back( iOffset_deg );
-    
+
     i_temp.fPlottingColor.push_back( iColor );
     i_temp.fPlottingLineStyle.push_back( iLineStyle );
     i_temp.fPlottingFillStyle.push_back( iFillStyle );
     i_temp.fLegend.push_back( iLegend );
-    
+
     return addDataSet(&i_temp );
 }
 
@@ -76,12 +76,12 @@ bool VPlotWPPhysSensitivity::addDataSets( string iDataSettxtFile, string iDirect
         }
         z_site++;
     }
-    
+
     if( fData.size() == 0 )
     {
         return false;
     }
-    
+
     return true;
 }
 
@@ -94,12 +94,12 @@ bool VPlotWPPhysSensitivity::addDataSets( string iDataSettxtFile, string iDirect
 bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double iEffAreaMax, double iEnergyResolutionMax, TPad* iEffAreaPad, TPad* iAngResPad, TPad* iEResPad )
 {
     fIRF = new VPlotInstrumentResponseFunction();
-    
+
     fIRF->setCanvasSize( 400, 400 );
     fIRF->setPlottingAxis( "energy_Lin", "X", true, fMinEnergy_TeV, fMaxEnergy_TeV, "energy [TeV]" );
     fIRF->setPlottingAxis( "effarea_Lin", "X", true, iEffAreaMin, iEffAreaMax );
     fIRF->setPlottingAxis( "energyresolution_Lin", "X", false, 0., 0.7 );
-    
+
     for( unsigned int i = 0; i < fData.size(); i++ )
     {
         if( fData[i] )
@@ -115,7 +115,7 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
             }
         }
     }
-    
+
     char hname[2000];
     ////////////////////////////
     // effective areas
@@ -167,7 +167,7 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
             c->Print( hname );
         }
     }
-    
+
     return true;
 }
 
@@ -205,7 +205,7 @@ void VPlotWPPhysSensitivity::initialProjectedSensitivityPlots()
                 sprintf( hname, "fProjectionSensitivityvsCameraOffset_%s_%d", fData[i]->fReferenceSiteName.c_str(), j );
                 fProjectionSensitivityvsCameraOffset[fData[i]->fReferenceSiteName].back()->SetName( hname );
                 fProjectionSensitivityvsCameraOffset[fData[i]->fReferenceSiteName].back()->SetTitle( "" );
-                
+
                 setGraphPlottingStyle( fProjectionSensitivityvsCameraOffset[fData[i]->fReferenceSiteName].back(), i + 1, 1., 20, 1.5 );
             }
         }
@@ -223,12 +223,12 @@ void VPlotWPPhysSensitivity::fillProjectedSensitivityPlot( unsigned int iDataSet
     {
         return;
     }
-    
+
     if( fProjectionSensitivityvsCameraOffset.find( fData[iDataSet]->fReferenceSiteName ) == fProjectionSensitivityvsCameraOffset.end() )
     {
         return;
     }
-    
+
     if( g )
     {
         VHistogramUtilities h;
@@ -255,7 +255,7 @@ void VPlotWPPhysSensitivity::fillProjectedSensitivityPlot( unsigned int iDataSet
                         double x = 0.;
                         double y = 0.;
                         g->GetPoint( b, x, y );
-                        
+
                         i_m += y;
                         i_m_lE += g->GetErrorYlow( b ) * g->GetErrorYlow( b );
                         i_m_hE += g->GetErrorYhigh( b ) * g->GetErrorYhigh( b );
@@ -298,12 +298,12 @@ TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas* c, double 
         iLi->Draw();
     }
     cC->cd();
-    
+
     TLegend* iL = new TLegend( 0.15, 0.15, 0.4, 0.4 );
     char hname[200];
-    
+
     map< string, vector< TGraphAsymmErrors* > >::iterator i_fProjectionSensitivityvsCameraOffset_iter;
-    
+
     for( i_fProjectionSensitivityvsCameraOffset_iter = fProjectionSensitivityvsCameraOffset.begin();
             i_fProjectionSensitivityvsCameraOffset_iter != fProjectionSensitivityvsCameraOffset.end();
             i_fProjectionSensitivityvsCameraOffset_iter++ )
@@ -323,7 +323,7 @@ TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas* c, double 
                 y_norm = 0.5 * ( y + y_norm );
                 double y_normE_low  = sqrt( iGraph->GetErrorYlow( 0 ) * iGraph->GetErrorYlow( 0 ) );
                 double y_normE_high = sqrt( iGraph->GetErrorYhigh( 0 ) * iGraph->GetErrorYhigh( 0 ) );
-                
+
                 for( int p = 0; p < iGraph->GetN(); p++ )
                 {
                     iGraph->GetPoint( p, x, y );
@@ -350,7 +350,7 @@ TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas* c, double 
     {
         iL->Draw();
     }
-    
+
     return cC;
 }
 
@@ -379,7 +379,7 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
         cSensRatio = ( TCanvas* )iSensRatio;
     }
     cSensRatio->cd();
-    
+
     sprintf( hname, "hSensRatio_%d", ( int )iRatoToGoal );
     TH1D* hNull = new TH1D( hname, "", 10, log10( fMinEnergy_TeV ), log10( fMaxEnergy_TeV ) );
     hNull->SetStats( 0 );
@@ -396,16 +396,16 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
     hNull->SetMaximum( ymax );
     hNull->Draw( "" );
     hNull->Draw( "AH" );
-    
+
     plot_nullHistogram( cSensRatio, hNull, true, false, 1.2, fMinEnergy_TeV, fMaxEnergy_TeV );
-    
+
     TLine* iL = new TLine( log10( fMinEnergy_TeV ), 1., log10( fMaxEnergy_TeV ), 1. );
     iL->SetLineStyle( 2 );
     iL->SetLineWidth( 3 );
     iL->Draw();
-    
+
     TGraph* gRelG = 0;
-    
+
     // loop over all data sets and divide it by the first
     for( unsigned int i = 0; i < fData.size(); i++ )
     {
@@ -413,7 +413,7 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
         {
             continue;
         }
-        
+
         for( unsigned int j = 0; j < fData[i]->fGraphSensitivity.size(); j++ )
         {
             if( fData[i]->fGraphSensitivity[j] )
@@ -471,7 +471,7 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
             }
         }
     }
-    
+
     return true;
 }
 
@@ -499,10 +499,10 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( TGraphAsymmErrors* g
         return;
     }
     return;
-    
+
     iEmin_TeV = log10( iEmin_TeV );
     iEmax_TeV = log10( iEmax_TeV );
-    
+
     double m = 1.;
     double dm = 0.;
     double z = 0.;
@@ -510,7 +510,7 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( TGraphAsymmErrors* g
     double y = 0.;
     double dy = 0.;
     double req = 0.;
-    
+
     for( int p = 0; p < gSensitivity->GetN(); p++ )
     {
         gSensitivity->GetPoint( p, x, y );
@@ -524,7 +524,7 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( TGraphAsymmErrors* g
                 m  *= req / y;
                 dm += dy * dy * req * req / y / y / y / y;
             }
-            
+
             z++;
         }
     }
@@ -554,9 +554,9 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
     TCanvas* cSens = 0;
     TCanvas* cSensInter = ( TCanvas* )iSensitivityPad;
     TCanvas* cBck = ( TCanvas* )iBckPad;
-    
+
     initialProjectedSensitivityPlots();
-    
+
     ////////////////////////////////////////////////////////
     // loop over all data sets
     unsigned int z = 0;
@@ -675,7 +675,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
             }
         }
     }
-    
+
     return true;
 }
 
@@ -686,7 +686,7 @@ bool VPlotWPPhysSensitivity::plotLegend( TCanvas* c, bool iDown, bool iLeft, boo
         return false;
     }
     c->cd();
-    
+
     double x = 0.2 + 0.35;
     if( iLeft )
     {
@@ -704,7 +704,7 @@ bool VPlotWPPhysSensitivity::plotLegend( TCanvas* c, bool iDown, bool iLeft, boo
     }
     TLegend* iL = new TLegend( x, y, x + 0.30, y_yp );
     iL->SetFillColor( 0 );
-    
+
     for( unsigned int i = 0; i < fData.size(); i++ )
     {
         if( i == 0 && !iAddFirst )
@@ -741,6 +741,6 @@ bool VPlotWPPhysSensitivity::setPlotCTARequirements( int iRequirementID, bool iP
 {
     fPlotCTARequirementGoals = iPlotRequirementGoals;
     fPlotCTARequirementsID = iRequirementID;
-    
+
     return false;
 }

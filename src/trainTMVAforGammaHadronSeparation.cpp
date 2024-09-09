@@ -102,9 +102,9 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
     iDataTree_reduced->Branch( "SizeSecondMax", &SizeSecondMax, "SizeSecondMax/D" );
     iDataTree_reduced->Branch( "DispDiff", &DispDiff, "DispDiff/D" );
     iDataTree_reduced->Branch( "MCe0", &MCe0, "MCe0/D" );
-    
+
     Long64_t n = 0;
-    
+
     for( unsigned  int i = 0; i < iTreeVector.size(); i++ )
     {
         if( iTreeVector[i] )
@@ -268,23 +268,23 @@ bool train( VTMVARunData* iRun,
                       && iRun->fMCxyoffCut &&
                       iRun->fEnergyCutData[iEnergyBin]->fEnergyCut
                       && iRun->fZenithCutData[iZenithBin]->fZenithCut;
-                      
+
     TCut iCutBck = iRun->fQualityCuts && iRun->fQualityCutsBkg
                    && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut
                    && iRun->fZenithCutData[iZenithBin]->fZenithCut;
-                   
+
     if(!iRun->fMCxyoffCutSignalOnly )
     {
         iCutBck = iCutBck && iRun->fMCxyoffCut;
     }
-    
+
     // adding training variables
     if( iRun->fTrainingVariable.size() != iRun->fTrainingVariableType.size() )
     {
         cout << "train: error: training-variable vectors have different size" << endl;
         return false;
     }
-    
+
     // prepare trees for training and testing with selected events only
     // this step is necessary to minimise the memory impact for the BDT
     // training
@@ -339,13 +339,13 @@ bool train( VTMVARunData* iRun,
     }
     iRun->updateTrainingEvents( "nTrain_Signal", ( unsigned int )iSignalTree_reduced->GetEntries() * 0.7 );
     iRun->updateTrainingEvents( "nTrain_Background", ( unsigned int )iBackgroundTree_reduced->GetEntries() * 0.7 );
-    
+
     TMVA::Tools::Instance();
     gSystem->mkdir( iRun->fOutputDirectoryName.c_str() );
     TString iOutputDirectory( iRun->fOutputDirectoryName.c_str() );
     gSystem->ExpandPathName( iOutputDirectory );
     ( TMVA::gConfig().GetIONames() ).fWeightFileDir = iOutputDirectory;
-    
+
     //////////////////////////////////////////
     // defining training class
     TMVA::Factory* factory = new TMVA::Factory( iRun->fOutputFile[iEnergyBin][iZenithBin]->GetTitle(),
@@ -366,7 +366,7 @@ bool train( VTMVARunData* iRun,
         dataloader->AddSignalTree( iSignalTree_reduced, iRun->fSignalWeight );
         dataloader->AddRegressionTarget( iRun->fReconstructionQualityTarget.c_str(), iRun->fReconstructionQualityTargetName.c_str() );
     }
-    
+
     // loop over all trainingvariables and add them to TMVA
     for( unsigned int i = 0; i < iRun->fTrainingVariable.size(); i++ )
     {
@@ -377,19 +377,19 @@ bool train( VTMVARunData* iRun,
     {
         dataloader->AddSpectator( iRun->fSpectatorVariable[i].c_str() );
     }
-    
+
     //////////////////////////////////////////
     // prepare training events
     // nTrain Signal=5000:nTrain Background=5000: nTest Signal=4000:nTest Background=5000
-    
+
     dataloader->PrepareTrainingAndTestTree( iCutSignal,
                                             iCutBck,
                                             iRun->fPrepareTrainingOptions );
-                                            
+
     //////////////////////////////////////////
     // book all methods
     char htitle[6000];
-    
+
     for( unsigned int i = 0; i < iRun->fMVAMethod.size(); i++ )
     {
         TMVA::Types::EMVA i_tmva_type = TMVA::Types::kBDT;
@@ -409,7 +409,7 @@ bool train( VTMVARunData* iRun,
         {
             i_tmva_type = TMVA::Types::kMLP;
         }
-        
+
         //////////////////////////
         if( iRun->fMVAMethod[i] != "BOXCUTS" )
         {
@@ -454,23 +454,23 @@ bool train( VTMVARunData* iRun,
             factory->BookMethod( dataloader, TMVA::Types::kCuts, htitle, i_opt.str().c_str() );
         }
     }
-    
-    
+
+
     //////////////////////////////////////////
     // start training
-    
+
     factory->TrainAllMethods();
-    
+
     //////////////////////////////////////////
     // evaluate results
-    
+
     factory->TestAllMethods();
-    
+
     factory->EvaluateAllMethods();
-    
+
     dataloader->Delete();
     factory->Delete();
-    
+
     return true;
 }
 
@@ -504,12 +504,12 @@ int main( int argc, char* argv[] )
         exit( EXIT_SUCCESS );
     }
     cout << endl;
-    
+
     //////////////////////////////////////
     // data object
     VTMVARunData* fData = new VTMVARunData();
     fData->fName = "OO";
-    
+
     //////////////////////////////////////
     // read run parameters from configuration file
     if(!fData->readConfigurationFile( argv[1] ) )
@@ -526,7 +526,7 @@ int main( int argc, char* argv[] )
     // randomize list of input files
     cout << "randomizing input files" << endl;
     fData->print();
-    
+
     //////////////////////////////////////
     // read and prepare data files
     if(!fData->openDataFiles() )
@@ -534,7 +534,7 @@ int main( int argc, char* argv[] )
         cout << "error opening data files" << endl;
         exit( EXIT_FAILURE );
     }
-    
+
     //////////////////////////////////////
     // train MVA
     // (one training per energy and zenith bin)
@@ -590,7 +590,7 @@ int main( int argc, char* argv[] )
                 iTempS << fData->fOutputDirectoryName << "/" << fData->fOutputFileName << ".bin.root";
                 iTempS2 << fData->fOutputFileName << ".root";
             }
-            
+
             // prepare a short root file with the necessary values only
             // write energy & zenith cuts, plus signal and background efficiencies
             TFile* root_file = fData->fOutputFile[i][j];
@@ -630,7 +630,7 @@ int main( int argc, char* argv[] )
             string iOutputFileNameComplete( iOutputFileNameCompleteDir + iTempS2.str() );
             rename( iOutputFileName.c_str(), iOutputFileNameComplete.c_str() );
             cout << "Complete TMVA output root-file moved to: " << iOutputFileNameComplete << endl;
-            
+
             // rename .bin.root file to .root-file
             string iFinalRootFileName( iTempS.str() );
             string iBinRootString( ".bin.root" );

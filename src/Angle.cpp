@@ -46,7 +46,7 @@ void SEphem::Angle::hms( unsigned& h, unsigned& m, unsigned& s, unsigned& f,
 {
     unsigned multiplier = divisor10[sec_digits];
     unsigned iangle = unsigned( floor( hrs() * 60 * 60 * multiplier + 0.5 ) );
-    
+
     h = iangle / ( 60 * 60 * multiplier );
     m = ( iangle / ( 60 * multiplier ) ) % 60;
     s = ( iangle / multiplier ) % 60;
@@ -59,10 +59,10 @@ void SEphem::Angle::dmsPM180( bool& negative, unsigned& d,
                               unsigned sec_digits ) const
 {
     unsigned multiplier = divisor10[sec_digits];
-    
+
     double df = degPM180();
     unsigned iangle = unsigned( floor( fabs( df ) * 60 * 60 * multiplier + 0.5 ) );
-    
+
     negative = ( df < 0 );
     d = iangle / ( 60 * 60 * multiplier );
     m = ( iangle / ( 60 * multiplier ) ) % 60;
@@ -76,10 +76,10 @@ void SEphem::Angle::dmsPM360( bool& negative, unsigned& d,
                               unsigned sec_digits ) const
 {
     unsigned multiplier = divisor10[sec_digits];
-    
+
     double df = degPM();
     unsigned iangle = unsigned( floor( fabs( df ) * 60 * 60 * multiplier + 0.5 ) );
-    
+
     negative = ( df < 0 );
     d = iangle / ( 60 * 60 * multiplier );
     m = ( iangle / ( 60 * multiplier ) ) % 60;
@@ -96,7 +96,7 @@ const
     unsigned secs;
     unsigned fsec;
     hms( hours, mins, secs, fsec, sec_digits );
-    
+
     std::ostringstream stream;
     stream << std::setfill( '0' )
            << std::setw( 2 ) << std::setprecision( 2 ) << hours << ( hmsSep ? 'h' : ':' )
@@ -108,7 +108,7 @@ const
     {
         stream << 's';
     }
-    
+
     return stream.str();
 }
 
@@ -121,7 +121,7 @@ const
     unsigned secs;
     unsigned fsec;
     bool negative = false;
-    
+
     if( rad() <= Angle::sc_Pi )
     {
         hms( hours, mins, secs, fsec, sec_digits );
@@ -132,7 +132,7 @@ const
         Angle::makeRad(-rad() ).hms( hours, mins, secs, fsec, sec_digits );
         negative = true;
     }
-    
+
     std::ostringstream stream;
     stream << ( negative ? '-' : '+' ) << std::setfill( '0' )
            << std::setw( 2 ) << std::setprecision( 2 ) << hours << ( hmsSep ? 'h' : ':' )
@@ -144,7 +144,7 @@ const
     {
         stream << 's';
     }
-    
+
     return stream.str();
 }
 
@@ -158,7 +158,7 @@ const
     unsigned secs;
     unsigned fsec;
     dmsPM180( negative, degs, mins, secs, fsec, sec_digits );
-    
+
     std::ostringstream stream;
     stream << ( negative ? '-' : '+' )
            << std::setfill( '0' )
@@ -171,7 +171,7 @@ const
     {
         stream << 's';
     }
-    
+
     return stream.str();
 }
 
@@ -185,7 +185,7 @@ const
     unsigned secs;
     unsigned fsec;
     dmsPM360( negative, degs, mins, secs, fsec, sec_digits );
-    
+
     std::ostringstream stream;
     stream << ( negative ? '-' : '+' )
            << std::setfill( '0' )
@@ -198,7 +198,7 @@ const
     {
         stream << 's';
     }
-    
+
     return stream.str();
 }
 
@@ -209,7 +209,7 @@ SEphem::Angle::degString( unsigned dec_digits ) const
     std::ostringstream stream;
     int ideg = int( floor( deg() * divisor10[dec_digits] + 0.5 ) ) / divisor10[dec_digits];
     int fdeg = int( floor( deg() * divisor10[dec_digits] + 0.5 ) ) % divisor10[dec_digits];
-    
+
     stream << '+' << ideg;
     if( dec_digits )
         stream << '.' << std::setw( dec_digits ) << std::setprecision( dec_digits )
@@ -227,7 +227,7 @@ SEphem::Angle::degPMString( unsigned dec_digits ) const
         int( floor( fabs( degPM ) * divisor10[dec_digits] + 0.5 ) ) / divisor10[dec_digits];
     int fdeg =
         int( floor( fabs( degPM ) * divisor10[dec_digits] + 0.5 ) ) % divisor10[dec_digits];
-        
+
     stream << ( degPM >= 0 ? '+' : '-' ) << ideg;
     if( dec_digits )
         stream << '.' << std::setw( dec_digits ) << std::setprecision( dec_digits )
@@ -245,7 +245,7 @@ SEphem::Angle::degPM180String( unsigned dec_digits ) const
         int( floor( fabs( degPM ) * divisor10[dec_digits] + 0.5 ) ) / divisor10[dec_digits];
     int fdeg =
         int( floor( fabs( degPM ) * divisor10[dec_digits] + 0.5 ) ) % divisor10[dec_digits];
-        
+
     stream << ( degPM >= 0 ? '+' : '-' ) << ideg;
     if( dec_digits )
         stream << '.' << std::setw( dec_digits ) << std::setprecision( dec_digits )
@@ -263,7 +263,7 @@ SEphem::Angle::deg180String( unsigned dec_digits ) const
         int( floor( fabs( degPM ) * divisor10[dec_digits] + 0.5 ) ) / divisor10[dec_digits];
     int fdeg =
         int( floor( fabs( degPM ) * divisor10[dec_digits] + 0.5 ) ) % divisor10[dec_digits];
-        
+
     stream << ( degPM >= 0 ? '+' : '-' ) << ideg;
     if( dec_digits )
         stream << '.' << std::setw( dec_digits ) << std::setprecision( dec_digits )
@@ -280,7 +280,7 @@ bool SEphem::Angle::setFromHMSString( std::string str )
     unsigned fracs = 0;
     unsigned frac10s = 1;
     unsigned i = 0;
-    
+
     while( i < str.length() )
     {
         if(( str[i] >= '0' ) && ( str[i] <= '9' ) )
@@ -297,7 +297,7 @@ bool SEphem::Angle::setFromHMSString( std::string str )
             return false;
         }
     }
-    
+
     while( i < str.length() )
     {
         if(( str[i] >= '0' ) && ( str[i] <= '9' ) )
@@ -314,7 +314,7 @@ bool SEphem::Angle::setFromHMSString( std::string str )
             return false;
         }
     }
-    
+
     while( i < str.length() )
     {
         if(( str[i] >= '0' ) && ( str[i] <= '9' ) )
@@ -335,7 +335,7 @@ bool SEphem::Angle::setFromHMSString( std::string str )
             return false;
         }
     }
-    
+
     while( i < str.length() )
     {
         if(( str[i] >= '0' ) && ( str[i] <= '9' ) )
@@ -352,10 +352,10 @@ bool SEphem::Angle::setFromHMSString( std::string str )
             return false;
         }
     }
-    
+
     setHrs( double( hours ) + double( mins ) / 60 + double( secs ) / ( 60 * 60 ) +
             double( fracs ) / double( frac10s ) / ( 60 * 60 ) );
-            
+
     return true;
 }
 
@@ -368,7 +368,7 @@ bool SEphem::Angle::setFromDMSString( std::string str )
     unsigned fracs = 0;
     unsigned frac10s = 1;
     unsigned i = 0;
-    
+
     bool negative = false;
     if( str[i] == '-' )
     {
@@ -380,7 +380,7 @@ bool SEphem::Angle::setFromDMSString( std::string str )
         negative = false;
         i++;
     }
-    
+
     while( i < str.length() )
     {
         if(( str[i] >= '0' ) && ( str[i] <= '9' ) )
@@ -397,7 +397,7 @@ bool SEphem::Angle::setFromDMSString( std::string str )
             return false;
         }
     }
-    
+
     while( i < str.length() )
     {
         if(( str[i] >= '0' ) && ( str[i] <= '9' ) )
@@ -414,7 +414,7 @@ bool SEphem::Angle::setFromDMSString( std::string str )
             return false;
         }
     }
-    
+
     while( i < str.length() )
     {
         if(( str[i] >= '0' ) && ( str[i] <= '9' ) )
@@ -435,7 +435,7 @@ bool SEphem::Angle::setFromDMSString( std::string str )
             return false;
         }
     }
-    
+
     while( i < str.length() )
     {
         if(( str[i] >= '0' ) && ( str[i] <= '9' ) )
@@ -453,16 +453,16 @@ bool SEphem::Angle::setFromDMSString( std::string str )
             return false;
         }
     }
-    
+
     if( i < str.length() )
     {
         return false;
     }
-    
+
     setDeg(( negative ? -1 : 1 ) *
            ( double( degs ) + double( mins ) / 60 + double( secs ) / ( 60 * 60 ) +
              double( fracs ) / double( frac10s ) / ( 60 * 60 ) ) );
-             
+
     return true;
 }
 

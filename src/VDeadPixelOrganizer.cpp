@@ -14,13 +14,13 @@ using namespace std ;
 void VDeadPixelOrganizer::setupMap()
 {
     //cout << coutprefix << "VDeadPixelOrganizer::setupMaps()" << endl;
-    
+
     if( ntel <= 0 || npix <= 0 )
     {
         cout << coutprefix << "VDeadPixelOrganizer::setupMaps(): Error, must have ntel and npix > 0, exiting..." << endl;
         exit( 1 ) ;
     }
-    
+
     int telid = 0 ;
     for( int i_tel = 0 ; i_tel < ntel ; i_tel++ )
     {
@@ -29,10 +29,10 @@ void VDeadPixelOrganizer::setupMap()
         telescopeMap[telid] = VNTelescope() ;
         telescopeMap[telid].initialize( telid, npix, this ) ;
         //cout << telescopeMap[telid] << endl;
-        
+
     }
     //cout << "NKH VDeadPixelOrganizer::VDeadPixelOrganizer(" << ntel<< "," << npix << "): telescopeMap.size()=" << telescopeMap.size() << endl;
-    
+
 }
 
 void VNTelescope::initialize( int telid, int npix, VDeadPixelOrganizer* parentVDPO )
@@ -41,7 +41,7 @@ void VNTelescope::initialize( int telid, int npix, VDeadPixelOrganizer* parentVD
     setTelid( telid ) ;
     setNpix( npix ) ;
     setupMap() ;
-    
+
 }
 
 void VNTelescope::setupMap()
@@ -108,7 +108,7 @@ void VNGain::initialize( string gainType, VNPixel* parentVNP )
 
     // handle the parent pointer and the pixel's camera coordinate
     setParentVNPixelPointer( parentVNP ) ;
-    
+
     // figure out which gain we're using
     fGainName = gainType ;
     if( strcmp( "low", gainType.c_str() ) == 0 )
@@ -128,17 +128,17 @@ void VNGain::initialize( string gainType, VNPixel* parentVNP )
         cerr << coutprefix << "VNGain::VNGain() Error, gainType '" << gainType << "' unrecognized, exiting..." << endl;
         exit( 1 ) ;
     }
-    
+
     // set up the first entry of stateHistory
     // starts at beginning of run, with state 0 (ok)
     // leave endtime empty until the next time updateState is called
     stateHistory.push_back( VNStateDuration() ) ;
     stateHistory.back().begtime = fPixel->fTelescope->fOrganizer->fRunStart ;
     stateHistory.back().state   = 0 ;
-    
+
     // add the beginning
-    
-    
+
+
 }
 
 // I think c++ creates an empty copy of this class first
@@ -162,7 +162,7 @@ bool VNGain::isRealObject()
         }
     }
     return false ;
-    
+
 }
 
 bool VNPixel::isRealObject()
@@ -202,7 +202,7 @@ void VDeadPixelOrganizer::UpdatePixelState( int tel, int pix, bool lowGain, int 
     	cout << coutprefix << buff << endl;
     }
     */
-    
+
     if( tel <= ntel )
     {
         if( pix <= telescopeMap[tel].getNpix() )
@@ -241,7 +241,7 @@ VDeadPixelOrganizer::VDeadPixelOrganizer( int ntel, int npix, VDetectorGeometry*
     fPreviousEvent.fEventTime   = fRunStart ;
     setRunNumber( runNumber ) ;
     setupMap() ;
-    
+
     // writes copy of output tree to csv, in addition to the TTree
     fWriteCSV = true ;
 }
@@ -251,37 +251,37 @@ void VDeadPixelOrganizer::printSummary()
 
     cout << endl;
     cout << coutprefix << " VDeadPixelOrganizer::printSummary():" << endl ;
-    
+
     VNTelescope vnt ;
     VNPixel     vnp ;
     VNGain      vng ;
     MapOfVNTelescopes::const_iterator telIter ;
     for( telIter  = telescopeMap.begin() ; telIter != telescopeMap.end() ; ++telIter )
     {
-    
+
         vnt = telIter->second ;
         MapOfVNPixels::const_iterator pixIter ;
         for( pixIter = vnt.pixelMap.begin() ; pixIter != vnt.pixelMap.end() ; ++pixIter )
         {
-        
+
             vnp = pixIter->second ;
             /*
             MapOfVNGains::const_iterator gainIter ;
             for ( gainIter = vnp.gainMap.begin() ; gainIter != vnp.gainMap.end() ; ++gainIter ) {
-            
+
                 vng = gainIter->second ;
-            
+
             	char buff[200] ;
             	sprintf( buff, "T%d P%3d G%c #%d", vnt.getTelid(), vnp.pixid_dbtables, vng.fGainChar, (int)vng.stateHistory.size()  ) ;
             	cout << coutprefix << "sum: " << buff << endl;
-            
-            
+
+
             }
             */
             vng = vnp.gainMap["high"] ;
             char buff[200] ;
             sprintf( buff, "T%d P%3d GL #%d", vnt.getTelid(), vnp.pixid_dbtables, ( int )vng.stateHistory.size() ) ;
-            
+
             if( vnt.getTelid() <= tellimit && vnp.pixid_dbtables <= pixUlimit && vnp.pixid_dbtables >= pixLlimit )
             {
                 cout << coutprefix << "sum: " << buff << endl;
@@ -290,14 +290,14 @@ void VDeadPixelOrganizer::printSummary()
     }
     cout << coutprefix << " VDeadPixelOrganizer::printSummary()" << endl ;
     cout << endl;
-    
+
 }
 
 void VNGain::updateState( int mjd, double time, PixelStateInt state )
 {
     //int telid = fPixel->fTelescope->getTelid() ;
     //int pixid = fPixel->pixid_dbtables ;
-    
+
     char buff[200] ;
     sprintf( buff, "VNGain::updateState( tel=%d, pix=%d, gain=%s, mjd=%d, time=%f, state=%d )",
              fPixel->fTelescope->getTelid(),
@@ -309,7 +309,7 @@ void VNGain::updateState( int mjd, double time, PixelStateInt state )
     	cout << coutprefix << "        updateState( seeing if new state(" << state << ") matches old state(" << stateHistory.back().state << ") needs to be added..." << endl;
     }
     */
-    
+
     // if the last state doesn't match the current state,
     // we should end the last state's duration, and add a new one
     if( stateHistory.back().state != state )
@@ -318,25 +318,25 @@ void VNGain::updateState( int mjd, double time, PixelStateInt state )
         sprintf( buff, "T%d P%3d G%c (%f,%f)", telid, pixid, fGainChar, fPixel->pixelCoord.xcam, fPixel->pixelCoord.ycam ) ;
         cout << coutprefix << "        updateState(" << buff << "): NEW STATE: state(" << state << ", mjd=" << mjd<< ", time=" << time << ") doesn't match previous state(" << stateHistory.back().state << "), will add new history row" << endl;
         */
-        
+
         // if its different, then add it to the history
         int oldsize = stateHistory.size() ;
-        
+
         // figure out the previous event's time was
         // (*not* the previous row's time)
         VNTime lastCheckedTime = fPixel->fTelescope->fOrganizer->fPreviousEvent.fEventTime ;
-        
+
         // find halfway between the current events time and the previous event's time
         VNTime dividingTime    = lastCheckedTime.halfwayTime( VNTime( mjd, time ) ) ;
-        
+
         // close off the last history row
         stateHistory.back().endtime = dividingTime ;
-        
+
         // add a new history row for the new state
         stateHistory.push_back( VNStateDuration() ) ;
         stateHistory.back().begtime = dividingTime ;
         stateHistory.back().state   = state ;
-        
+
         // output size change
         int newsize = stateHistory.size() ;
         if( fPixel->fTelescope->getTelid() <= tellimit && fPixel->pixid_dbtables <= pixUlimit && fPixel->pixid_dbtables >= pixLlimit )
@@ -344,17 +344,17 @@ void VNGain::updateState( int mjd, double time, PixelStateInt state )
             cout << coutprefix << "        updateState(): added new row, history had " << oldsize << " elements, now has " << newsize << " elements..." << endl;
         }
     }
-    
+
     /*
     else
     {
-    
+
     	if ( fPixel->fTelescope->getTelid() <= tellimit && fPixel->pixid_dbtables <= pixUlimit && fPixel->pixid_dbtables >= pixLlimit ) {
     		cout << coutprefix << "        updateState(): state(" << state << ") matches previous state, not doing anything..." << endl;
     	}
     }
     */
-    
+
 }
 
 VNTime::VNTime( int mjd_days, double time_seconds )
@@ -377,16 +377,16 @@ VNTime VNTime::halfwayTime( const VNTime vnt )
     {
         double objtime =     mjd + ( time / 86400.0 ) ;
         double argtime = vnt.mjd + ( vnt.time / 86400.0 ) ;
-        
+
         double halftime = ( objtime + argtime ) / 2.0 ;
-        
+
         // strip off the mantissa to get the mjd
         out.mjd  = ( int ) halftime ;
-        
+
         // get the seconds from the mantissa
         out.time = ( halftime - out.mjd ) * 86400.0 ;
         return out ;
-        
+
     }
     return out ;
 }
@@ -412,17 +412,17 @@ void VDeadPixelOrganizer::topOffRows()
     MapOfVNGains     ::iterator gainIter ;
     for( telIter  = telescopeMap.begin() ; telIter != telescopeMap.end() ; ++telIter )
     {
-    
+
         vnt = &telIter->second ;
         for( pixIter = vnt->pixelMap.begin() ; pixIter != vnt->pixelMap.end() ; ++pixIter )
         {
-        
+
             vnp = &pixIter->second ;
             for( gainIter = vnp->gainMap.begin() ; gainIter != vnp->gainMap.end() ; ++gainIter )
             {
-            
+
                 vng = &gainIter->second ;
-                
+
                 //sprintf( buff, "T%d P%3d G%c", vnt->getTelid(), vnp->getPixid(), vng->fGainChar ) ;
                 // close off this gain's last duration in its state history
                 //char buff2[200] = "" ;
@@ -444,7 +444,7 @@ void VDeadPixelOrganizer::organize()
     double begtimeSec, endtimeSec, pixXcam, pixYcam ;
     char gainChar ;
     PixelStateInt state ;
-    
+
     // start
     FILE* pFile = 0 ;
     if( fWriteCSV )
@@ -452,7 +452,7 @@ void VDeadPixelOrganizer::organize()
         pFile = fopen( "pixReg.csv", "w" ) ;
         fprintf( pFile, "runnumber, telid, pixid, gain,       xcam,       ycam, begMJD,         begSec, endMJD,         endSec, state\n" ) ;
     }
-    
+
     // branches
     fRegTree->Branch( "runnumber", &runnum, "runnumber/I" ) ;
     fRegTree->Branch( "telid", &telid, "telid/I" ) ;
@@ -465,58 +465,58 @@ void VDeadPixelOrganizer::organize()
     fRegTree->Branch( "endTimeMJD", &begtimeMJD, "endTimeMJD/I" ) ;
     fRegTree->Branch( "endTimeSec", &begtimeSec, "endTimeSec/D" ) ;
     fRegTree->Branch( "state", &state, "state/s" ) ;
-    
+
     // loop over all telescopes, pixels, and gains
     VNTelescope* vnt ;
     VNPixel*      vnp ;
     VNGain*       vng ;
     runnum = getRunNumber() ;
-    
+
     // our loop iterators
     MapOfVNTelescopes::iterator  telIter ;
     MapOfVNPixels    ::iterator  pixIter ;
     MapOfVNGains     ::iterator gainIter ;
     vector<VNStateDuration>::iterator histIter ;
-    
+
     // loop over each telescope
     for( telIter  = telescopeMap.begin() ; telIter != telescopeMap.end() ; ++telIter )
     {
-    
+
         vnt   = &telIter->second ;
         telid = vnt->getTelid()  ;
-        
+
         // loop over each pixel
         for( pixIter = vnt->pixelMap.begin() ; pixIter != vnt->pixelMap.end() ; ++pixIter )
         {
-        
+
             vnp     = &pixIter->second     ;
             pixid   = vnp->pixid_dbtables  ;
             pixXcam = vnp->pixelCoord.xcam ;
             pixYcam = vnp->pixelCoord.ycam ;
-            
+
             // loop over each gain type
             for( gainIter = vnp->gainMap.begin() ; gainIter != vnp->gainMap.end() ; ++gainIter )
             {
-            
+
                 vng      = &gainIter->second ;
                 gainChar = vng->fGainChar    ;
-                
+
                 // loop over each row of history
                 for( histIter = vng->stateHistory.begin() ; histIter != vng->stateHistory.end() ; ++histIter )
                 {
-                
+
                     // load the variables describing the state and its duration
                     state      = (*histIter ).state        ;
                     begtimeMJD = (*histIter ).begtime.mjd  ;
                     begtimeSec = (*histIter ).begtime.time ;
                     endtimeMJD = (*histIter ).endtime.mjd  ;
                     endtimeSec = (*histIter ).endtime.time ;
-                    
+
                     // add it to our tree if the pixel duration is not functional
                     if( state != 0 )
                     {
                         fRegTree->Fill() ;
-                        
+
                         // write our extra csv file for double checking
                         if( fWriteCSV )
                         {
@@ -524,20 +524,20 @@ void VDeadPixelOrganizer::organize()
                                      runnum, telid, pixid, gainChar, pixXcam, pixYcam,
                                      begtimeMJD, begtimeSec, endtimeMJD, endtimeSec, state ) ;
                         }
-                        
+
                     } // endif: state was fine(0)
                 } // endfor: no more entries in the state history
             } // endfor: no more gains to loop over
         } // endfor: no more pixels to loop over
     } // endfor: no more telescopes to loop over
-    
+
     cout << coutprefix << "fRegTree now has '" << fRegTree->GetEntries() << "' entries..." << endl;
-    
+
     if( fWriteCSV )
     {
         fclose( pFile ) ;
     }
-    
+
 }
 
 
@@ -546,10 +546,10 @@ void VDeadPixelOrganizer::finalize()
 {
     // close up all open durations in all histories
     topOffRows() ;
-    
+
     // organize data structs into TTree
     organize() ;
-    
+
     // write TTree to output evndisp.root file
     getTree()->Write() ;
 }

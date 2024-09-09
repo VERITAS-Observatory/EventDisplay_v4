@@ -10,7 +10,7 @@ ClassImp( VTableLookupRunParameter )
 VTableLookupRunParameter::VTableLookupRunParameter()
 {
     fDebug = 0;
-    
+
     outputfile = "";
     tablefile = "";
     ze = -1.;
@@ -52,17 +52,17 @@ VTableLookupRunParameter::VTableLookupRunParameter()
     fDispSign_BDTFileName = "";
     fDisp_UseIntersectForHeadTail = false;
     fQualityCutLevel = 0;
-    
+
     fLimitEnergyReconstruction = false;
-    
+
     fMC_distance_to_cameracenter_min =  0.;
     fMC_distance_to_cameracenter_max =  1.e10;
-    
+
     fNentries = 1234567890;
     fMaxRunTime = 1.e9;
-    
+
     printpara = "";
-    
+
     meanpedvars = 0.;
 }
 
@@ -397,7 +397,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
     // =============================================
     // end of reading command line parameters
     // =============================================
-    
+
     // require inputfile name
     if( inputfile.size() == 0 )
     {
@@ -412,7 +412,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
         cout << "...exiting" << endl;
         return false;
     }
-    
+
     // set output file name (mainly for VTS analysis with a single inputfile)
     if( outputfile.size() == 0 && inputfile.size() == 1 )
     {
@@ -433,7 +433,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
     {
         readTelescopeToAnalyze( inputfile[0] );
     }
-    
+
     return true;
 }
 
@@ -445,7 +445,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 bool VTableLookupRunParameter::readTelescopeToAnalyze( string iFile )
 {
     fTelToAnalyse.clear();
-    
+
     TFile iF( iFile.c_str() );
     if( iF.IsZombie() )
     {
@@ -453,7 +453,7 @@ bool VTableLookupRunParameter::readTelescopeToAnalyze( string iFile )
         cout << "\t " << iFile.c_str() << endl;
         return false;
     }
-    
+
     // read telescopes to analyse from eventdisplay run parameter list
     vector< unsigned int > iRunParT;
     VEvndispRunParameter* iPar = ( VEvndispRunParameter* )iF.Get( "runparameterV2" );
@@ -493,7 +493,7 @@ bool VTableLookupRunParameter::readTelescopeToAnalyze( string iFile )
         cout << "VTableLookupRunParameter::readTelescopeToAnalyze warning: could not find evndisp reconstruction parameters (EvndispReconstructionParameter)" << endl;
         return false;
     }
-    
+
     return true;
 }
 
@@ -644,7 +644,7 @@ void VTableLookupRunParameter::print( int iP )
     {
         cout << "updating instrument epoch from default epoch file" << endl;
     }
-    
+
     if( iP >= 1 )
     {
         cout << endl;
@@ -687,8 +687,8 @@ bool VTableLookupRunParameter::fillInputFile_fromList( string iList )
         }
     }
     is.close();
-    
+
     cout << "total number of input files " << inputfile.size() << endl;
-    
+
     return true;
 }

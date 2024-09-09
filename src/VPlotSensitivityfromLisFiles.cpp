@@ -18,7 +18,7 @@ VLisFileData::VLisFileData()
 VPlotSensitivityfromLisFiles::VPlotSensitivityfromLisFiles()
 {
     fDebug = true;
-    
+
     // set variable names and min/max
     fVarName.push_back( "E1" );
     fVarMin[fVarName.back()] =  -2.0;
@@ -29,77 +29,77 @@ VPlotSensitivityfromLisFiles::VPlotSensitivityfromLisFiles()
     fVarName.push_back( "Emean" );
     fVarMin[fVarName.back()] =  -2.0;
     fVarMax[fVarName.back()] =   2.5;
-    
+
     fVarName.push_back( "NTel" );
     fVarMin[fVarName.back()] =  0.;
     fVarMax[fVarName.back()] =  10.;
-    
+
     fVarName.push_back( "NPix" );
     fVarMin[fVarName.back()] =  0.;
     fVarMax[fVarName.back()] =  20.;
-    
+
     fVarName.push_back( "Amp" );
     fVarMin[fVarName.back()] =  0.;
     fVarMax[fVarName.back()] =  1.3;
-    
+
     fVarName.push_back( "BorderTh" );
     fVarMin[fVarName.back()] =  0.;
     fVarMax[fVarName.back()] =  20.;
-    
+
     fVarName.push_back( "ImageTh" );
     fVarMin[fVarName.back()] =  0.;
     fVarMax[fVarName.back()] =  20.;
-    
+
     fVarName.push_back( "Eres" );
     fVarMin[fVarName.back()] =  0.;
     fVarMax[fVarName.back()] =  1.;
-    
+
     fVarName.push_back( "Hist" );
     fVarMin[fVarName.back()] =  0.;
     fVarMax[fVarName.back()] =  1.6;
-    
+
     fVarName.push_back( "AngRes68" );
     fVarMin[fVarName.back()] =  0.;
     fVarMax[fVarName.back()] =  0.5;
-    
+
     fVarName.push_back( "AngRes80" );
     fVarMin[fVarName.back()] =  0.;
     fVarMax[fVarName.back()] =  0.5;
-    
+
     fVarName.push_back( "Tr" );
     fVarMin[fVarName.back()] =  0.;
     fVarMax[fVarName.back()] =  1.e2;
-    
+
     fVarName.push_back( "S_diff_D" );
     fVarMin[fVarName.back()] =  0.;
     fVarMax[fVarName.back()] =  1.e2;
-    
+
     fVarName.push_back( "S_diff" );
     fVarMin[fVarName.back()] =  1.e-15;
     fVarMax[fVarName.back()] =  1.e-3;
     fVarMin[fVarName.back()] =  1.e-3;
     fVarMax[fVarName.back()] =  1.e1;
-    
+
     fVarName.push_back( "S_int_D" );
     fVarMin[fVarName.back()] =  0.;
     fVarMax[fVarName.back()] =  1.e2;
-    
+
     fVarName.push_back( "S_int" );
     fVarMin[fVarName.back()] =  1.e-3;
     fVarMax[fVarName.back()] =  1.e1;
-    
+
     fVarName.push_back( "N_Gamma" );
     fVarMin[fVarName.back()] =  1.e-3;
     fVarMax[fVarName.back()] =  1.e5;
-    
+
     fVarName.push_back( "N_Proton" );
     fVarMin[fVarName.back()] =  1.e-3;
     fVarMax[fVarName.back()] =  1.e6;
-    
+
     fVarName.push_back( "N_Electron" );
     fVarMin[fVarName.back()] =  1.e-3;
     fVarMax[fVarName.back()] =  1.e6;
-    
+
     fVarName.push_back( "N_Nuclei" );
     fVarMin[fVarName.back()] =  1.e-3;
     fVarMax[fVarName.back()] =  1.e6;
@@ -114,7 +114,7 @@ bool VPlotSensitivityfromLisFiles::addLisFile( string iFile, string iCut )
         cout << "VPlotSensitivityfromLisFiles::addLisFile: error opening input file: " << iFile << endl;
         return false;
     }
-    
+
     // read file and fill data vector
     string is_line;
     string temp;
@@ -147,7 +147,7 @@ bool VPlotSensitivityfromLisFiles::addLisFile( string iFile, string iCut )
         {
             continue;
         }
-        
+
         if( is_line.substr( 0, 1 ) == "#" )
         {
             if( is_line.find( "<lg E>" ) < is_line.size() )
@@ -156,11 +156,11 @@ bool VPlotSensitivityfromLisFiles::addLisFile( string iFile, string iCut )
             }
             continue;
         }
-        
+
         if( fData.size() > 0 )
         {
             istringstream is_stream( is_line );
-            
+
             for( unsigned int i = 0; i < fVarName.size(); i++ )
             {
                 if( i == 2 && !bMean )
@@ -177,7 +177,7 @@ bool VPlotSensitivityfromLisFiles::addLisFile( string iFile, string iCut )
         }
     }
     is.close();
-    
+
     return true;
 }
 
@@ -198,7 +198,7 @@ bool VPlotSensitivityfromLisFiles::printDataSet( unsigned int iID )
         cout << "VPlotSensitivityfromLisFiles::printDataSet error: data set ID not found: " << iID << "\t" << fData.size() << endl;
         return 0;
     }
-    
+
     cout << fData[iID]->fID << "\t" << fData[iID]->fFileName << endl;
     map< string, vector< double > >::iterator fVarIter;
     for( fVarIter = fData[iID]->fVar.begin(); fVarIter != fData[iID]->fVar.end(); fVarIter++ )
@@ -234,7 +234,7 @@ unsigned int VPlotSensitivityfromLisFiles::getID_Index( unsigned int iID )
             return i;
         }
     }
-    
+
     return 9999;
 }
 
@@ -247,16 +247,16 @@ TCanvas* VPlotSensitivityfromLisFiles::plot( string iVName, unsigned int iID, TC
         cout << "VPlotSensitivityfromLisFiles::plot error: data set ID not found: " << iID << "\t" << fData.size() << endl;
         return 0;
     }
-    
+
     if(!checkVarName( iVName ) )
     {
         cout << "VPlotSensitivityfromLisFiles::plot error: variable not found: " << iVName << endl;
         return 0;
     }
-    
+
     char hname[800];
     char htitle[800];
-    
+
     if(!c )
     {
         sprintf( hname, "c_%s_%d", iVName.c_str(), iID );
@@ -264,7 +264,7 @@ TCanvas* VPlotSensitivityfromLisFiles::plot( string iVName, unsigned int iID, TC
         c = new TCanvas( hname, htitle, 10, 10, 600, 600 );
         c->SetGridx( 0 );
         c->SetGridy( 0 );
-        
+
         sprintf( hname, "hnull_%s_%d", iVName.c_str(), iID );
         TH1D* hnull = new TH1D( hname, "", 100, fVarMin["E1"], fVarMax["E2"] );
         hnull->SetMaximum( fVarMax[iVName] );
@@ -274,19 +274,19 @@ TCanvas* VPlotSensitivityfromLisFiles::plot( string iVName, unsigned int iID, TC
         hnull->SetStats( 0 );
         hnull->Draw();
     }
-    
+
     // fill graph
-    
+
     TGraph* g = new TGraph( 1 );
     setGraphPlottingStyle( g, iID + 1, 2., iMarkerStyle, 1, 0, iLineStyle );
-    
+
     for( unsigned int i = 0; i < fData[iID]->fVar[iVName].size(); i++ )
     {
         g->SetPoint( i, fData[iID]->fVar["Emean"][i], fData[iID]->fVar[iVName][i] );
     }
-    
+
     g->Draw( "pc" );
-    
+
     return c;
 }
 
@@ -296,7 +296,7 @@ TCanvas* VPlotSensitivityfromLisFiles::plot_AllIDs( string iVName, Style_t iLine
     {
         return 0;
     }
-    
+
     TCanvas* d = plot( iVName, fData[0]->fID, c, iLineStyle, iMarkerStyle );
     if( d )
     {
@@ -326,7 +326,7 @@ bool VPlotSensitivityfromLisFiles::removeDataSet( unsigned int iID )
             return true;
         }
     }
-    
+
     cout << "VPlotSensitivityfromLisFiles::removeDataSet error: data set ID not found: " << iID << "\t" << fData.size() << endl;
     return false;
 }
@@ -397,16 +397,16 @@ bool VPlotSensitivityfromLisFiles::applycuts( double amp, double NTel, double NP
             }
         }
     }
-    
+
     // now remove all marked data sets
     set< unsigned int >::iterator a;
-    
+
     for( a = fRemoveID.begin(); a != fRemoveID.end(); a++ )
     {
         cout << "removing data set with ID " << *a << endl;
         removeDataSet(*a );
     }
-    
+
     return true;
 }
 

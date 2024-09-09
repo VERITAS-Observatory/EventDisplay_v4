@@ -43,11 +43,11 @@ void VGrIsuAnalyzer::tel_impact( float xcos, float ycos, float xfield, float yfi
         { 0., 0., 0. },
         { 0., 0., 0. }
     };
-    
+
     float dl = 0.;
     float dm = 0.;
     float dn = 0.;                               /*Direction cos of the primary in the ground frame*/
-    
+
     /* determine the rotation matrix from setup_matrix */
     dl = xcos;
     dm = ycos;
@@ -64,9 +64,9 @@ void VGrIsuAnalyzer::tel_impact( float xcos, float ycos, float xfield, float yfi
     {
         c[i] = 0.;
     }
-    
+
     /* determine the location of the telescope in the rotated frame */
-    
+
     b[0] = xfield;
     b[1] = yfield;
     b[2] = zfield;
@@ -82,9 +82,9 @@ void VGrIsuAnalyzer::tel_impact( float xcos, float ycos, float xfield, float yfi
     {
         dl = 0.;
     }
-    
+
     mtxmlt( matrix, b, c );
-    
+
     if( c[0] )
     {
         dl = 0.;
@@ -97,13 +97,13 @@ void VGrIsuAnalyzer::tel_impact( float xcos, float ycos, float xfield, float yfi
     {
         dl = 0.;
     }
-    
+
     // (GM) small number check
     for( unsigned int i = 0; i < 3; i++ ) if( TMath::Abs( c[i] ) < 1.e-5 )
         {
             c[i] = 0.;
         }
-        
+
     *xtelrot = c[0];
     *ytelrot = c[1];
     *ztelrot = c[2];
@@ -133,33 +133,33 @@ incoming primary */
 void VGrIsuAnalyzer::setup_matrix( float matrix[3][3], float dl, float dm, float dn, bool bInvers )
 {
     float sv = 0.;
-    
+
     /* sv is the projection of the primary vector onto the xy plane */
-    
+
     sv = sqrt( dl* dl + dm* dm );
-    
+
     if( sv > 1.0E-09 )
     {
-    
+
         /* rotation about z axis to place y axis in the plane
            created by the vertical axis and the direction of the
            incoming primary followed by a rotation about the new x
            axis (still in the horizontal plane) until the new z axis
            points in the direction of the primary.
         */
-        
+
         matrix[0][0] = -dm / sv;
         matrix[0][1] = dl / sv;
         matrix[0][2] = 0;
-        
+
         matrix[1][0] = dn * dl / sv ;
         matrix[1][1] = dn * dm / sv;
         matrix[1][2] =  - sv;
-        
+
         matrix[2][0] = -dl;
         matrix[2][1] = -dm;
         matrix[2][2] = -dn;
-        
+
     }
     /* for verital incident showers, return identity matrix */
     else
@@ -167,16 +167,16 @@ void VGrIsuAnalyzer::setup_matrix( float matrix[3][3], float dl, float dm, float
         matrix[0][0] = 1;
         matrix[0][1] = 0;
         matrix[0][2] = 0;
-        
+
         matrix[1][0] = 0;
         matrix[1][1] = 1;
         matrix[1][2] = 0;
-        
+
         matrix[2][0] = 0;
         matrix[2][1] = 0;
         matrix[2][2] = 1;
     }
-    
+
     // invert matrix for rotations from shower coordinates into ground coordinates
     if( bInvers )
     {
@@ -191,7 +191,7 @@ void VGrIsuAnalyzer::setup_matrix( float matrix[3][3], float dl, float dm, float
         matrix[1][2] = matrix[2][1];
         matrix[2][1] = temp;
     }
-    
+
 }
 
 
@@ -254,33 +254,33 @@ passes through the point (x[i],y[i]) and has slope m[i].
     float D = 0.;
     float m2 = 0.;
     float d = 0.0;
-    
+
     /* initialize variables */
     *sx = -999.;
     *sy = -999.;
     *std = 0.0;
-    
+
     // check length of vectors
-    
+
     if( x.size() == num_images && y.size() == num_images && w.size() == num_images && m.size() == num_images )
     {
         for( unsigned int i = 0; i < num_images; i++ )
         {
             totweight = totweight + w[i];
-            
+
             m2 = m[i] * m[i];
             gamma  = 1.0 / ( 1. + m2 );
-            
+
             /* set up constants for array  */
             D = y[i] - ( m[i] * x[i] );
-            
+
             a1 = a1 + ( w[i] *  m2* gamma );
             a2 = a2 + ( w[i] * (-m[i] ) * gamma );
             b1 = a2;
             b2 = b2 + ( w[i] *  gamma );
             c1 = c1 + ( w[i] * D* m[i] * gamma );
             c2 = c2 + ( w[i] * (-D ) * gamma );
-            
+
         }
         /* do fit if have more than one telescope */
         if(( num_images > 1 ) )
@@ -292,17 +292,17 @@ passes through the point (x[i],y[i]) and has slope m[i].
             a2 = a2 / totweight;
             b2 = b2 / totweight;
             c2 = c2 / totweight;
-            
+
             /*
             The source coordinates xs,ys should be solution
             of the equations system:
             a1*xs+b1*ys+c1=0.
             a2*xs+b2*ys+c2=0.
             */
-            
+
             *sx = -( c1 / b1 - c2 / b2 ) / ( a1 / b1 - a2 / b2 );
             *sy = -( c1 / a1 - c2 / a2 ) / ( b1 / a1 - b2 / a2 );
-            
+
             /* std is average of square of distances to the line */
             for( unsigned int i = 0; i < num_images; i++ )
             {
@@ -355,14 +355,14 @@ ta structure*/
 /*.....................................................................*/
 {
     int tel = 0;
-    
+
     for( tel = 0; tel < nbr_tel; tel++ )
     {
         xtelnew[tel] = xtel[tel] - thetax * ztel[tel];
         ytelnew[tel] = ytel[tel] - thetay * ztel[tel];
         ztelnew[tel] = ztel[tel] + thetax * xtel[tel] + thetay * ytel[tel];
     }
-    
+
     return 0;
 }
 
@@ -385,19 +385,19 @@ float VGrIsuAnalyzer::rcs_perpendicular_dist( float xs, float ys, float xp, floa
     float d = 0.;
     float dl = 0.;
     float dm = 0.;
-    
+
     theta = atan( m );
     /* get direction cosines of the line from the slope of the line*/
     dl = cos( theta );
     dm = sin( theta );
-    
+
     /* get x and y components of vector from (xp,yp) to (xs,ys) */
     x = xs - xp;
     y = ys - yp;
-    
+
     /* get perpendicular distance */
     d = fabs( dl* y - dm* x );
-    
+
     return d;
 }
 
@@ -407,7 +407,7 @@ int VGrIsuAnalyzer::two_line_intersect( vector<float> x, vector<float> y, vector
     *sx = 0.;
     *sy = 0.;
     *std = 0.;
-    
+
     float wsum  = 0.;
     float a1 = 0.;
     float a2 = 0.;
@@ -417,7 +417,7 @@ int VGrIsuAnalyzer::two_line_intersect( vector<float> x, vector<float> y, vector
     vector< float > ycore;
     vector< float > weight;
     num_images = x.size();
-    
+
     // get intersections for all possible two-telescope combinations
     for( unsigned int i = 0; i < x.size(); i++ )
     {
@@ -462,7 +462,7 @@ int VGrIsuAnalyzer::two_line_intersect( vector<float> x, vector<float> y, vector
     {
         *std = 0.;
     }
-    
+
     return 0;
 }
 
@@ -476,7 +476,7 @@ bool VGrIsuAnalyzer::get_intersection( float x1, float mx1, float y1, float my1,
     *a2 = -1.;
     *xc = 0.;
     *yc = 0.;
-    
+
     // accept currently no zero direction vectors
     if( mx1 == 0. || my1 == 0. )
     {
@@ -495,9 +495,9 @@ bool VGrIsuAnalyzer::get_intersection( float x1, float mx1, float y1, float my1,
         *a2  = (( y2 - y1 ) / my1 - ( x2 - x1 ) / mx1 ) / ( mx2 / mx1 - my2 / my1 );
         *a1  = (( y1 - y2 ) / my2 - ( x1 - x2 ) / mx2 ) / ( mx1 / mx2 - my1 / my2 );
     }
-    
+
     *xc = ( x1 + *a1* mx1 );
     *yc = ( y1 + *a1* my1 );
-    
+
     return true;
 }

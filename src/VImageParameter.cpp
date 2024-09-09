@@ -15,7 +15,7 @@ VImageParameter::VImageParameter(
     tpars = 0;
     fShortTree = iShortTree;
     fWriteNImagePixels = iWriteNImagePixels;
-    
+
     reset();
 }
 
@@ -32,7 +32,7 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL,
     tpars = new TTree( iName.c_str(), iTitle.c_str() );
     tpars->SetMaxTreeSize( 1000 * Long64_t( 2000000000 ) );
     tpars->SetAutoSave( 150000000 );               // autosave when 150 Mbytes written
-    
+
     if( fShortTree < 1 )
     {
         tpars->Branch( "telID", &fTelID, "telID/I" );
@@ -48,7 +48,7 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL,
         tpars->Branch( "eventNumber", &eventNumber,  "eventNumber/I" );
     }
     tpars->Branch( "eventStatus", &eventStatus, "eventStatus/i" );
-    
+
     if( fShortTree < 1 )
     {
         tpars->Branch( "fimagethresh", &fimagethresh, "fimagethresh/D" );
@@ -60,7 +60,7 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL,
         tpars->Branch( "fncluster_cleaned", &fncluster_cleaned, "fncluster_cleaned/I" );
         tpars->Branch( "fncluster_uncleaned", &fncluster_uncleaned, "fncluster_uncleaned/I" );
     }
-    
+
     // MC parameters
     if( iMC && fShortTree < 1 )
     {
@@ -75,7 +75,7 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL,
         tpars->Branch( "MCTel_Xoff", &MCTel_Xoff, "MCTel_Xoff/F" );
         tpars->Branch( "MCTel_Yoff", &MCTel_Yoff, "MCTel_Yoff/F" );
     }
-    
+
     // image parameters
     if( fShortTree < 1 )
     {
@@ -116,7 +116,7 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL,
     }
     tpars->Branch( "cosphi", &cosphi, "cosphi/F" );
     tpars->Branch( "sinphi", &sinphi, "sinphi/F" );
-    
+
     tpars->Branch( "ntubes", &ntubes, "ntubes/s" );
     // contains number of triggered pixels
     tpars->Branch( "trig_tubes", &trig_tubes, "trig_tubes/s" );
@@ -146,7 +146,7 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL,
         tpars->Branch( "tint_dx", &tint_dx, "tint_dx/F" );
         tpars->Branch( "tchisq_x", &tchisq_x, "tchisq_x/F" );
     }
-    
+
     // muon parameters (Iterative fit muon analysis)
     if( iMuon || iHough )
     {
@@ -163,16 +163,16 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL,
     // muon parameters (Hough transform)
     if( iHough )
     {
-    
+
         tpars->Branch( "houghAP", &houghAP, "houghAP/D" );
         tpars->Branch( "houghTD", &houghTD, "houghTD/D" );
         tpars->Branch( "houghNpix", &houghNpix, "houghNpix/I" );
         tpars->Branch( "houghCN", &houghCN, "houghCN/D" );
         tpars->Branch( "houghContained", &houghContained, "houghContained/D" );
         tpars->Branch( "houghMuonValid", &houghMuonValid, "houghMuonValid/I" );
-        
+
     }
-    
+
     // log likelihood fit errors/results
     tpars->Branch( "Fitstat", &Fitstat, "Fitstat/I" );
     if( iLL )
@@ -206,7 +206,7 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL,
     tpars->Branch( "dlength", &dlength, "dlength/F" );
     tpars->Branch( "dwidth", &dwidth, "dwidth/F" );
     tpars->Branch( "dphi", &dphi, "dphi/F" );
-    
+
     // image / border pixel list
     if( fWriteNImagePixels )
     {
@@ -231,7 +231,7 @@ void VImageParameter::reset( unsigned int resetLevel )
         time = 0.;
         MJD = 0;
         eventStatus = 0;
-        
+
         // telescope parameters
         fimagethresh = 4.;
         fborderthresh = 2.;
@@ -239,13 +239,13 @@ void VImageParameter::reset( unsigned int resetLevel )
         fsumwindow = 15;
         fsumwindow_2 = 5;
         fLocalTrigger = 0;
-        
+
         // telescope positions in shower coordinates
         Tel_x_SC = 0.;
         Tel_y_SC = 0.;
         Tel_z_SC = 0.;
     }
-    
+
     // MC parameters
     MCprimary = 0;
     MCenergy = 0.;
@@ -291,7 +291,7 @@ void VImageParameter::reset( unsigned int resetLevel )
     asymmetry = 0.;
     fncluster_cleaned = 0;
     fncluster_uncleaned = 0;
-    
+
     nsamples = 0;
     ntubes = 0;
     ntubesBrightNoImage = 0;
@@ -315,7 +315,7 @@ void VImageParameter::reset( unsigned int resetLevel )
     {
         frac[i] = 0.;
     }
-    
+
     // timing parameters
     tint_x = 0.;
     tgrad_x = 0.;
@@ -325,13 +325,13 @@ void VImageParameter::reset( unsigned int resetLevel )
     tmin = 999.;
     tmax = 0.;
     tmean = 0.;
-    
+
     // log likelihood fit parameters and errors
     ntfit = 0;
     Fitmin = 0.;
     Fitedm = 0.;
     Fitstat = -1;
-    
+
     dcen_x = 0.;
     dcen_y = 0.;
     dsigmaX = 0.;
@@ -347,7 +347,7 @@ void VImageParameter::reset( unsigned int resetLevel )
     drho = 0.;
     signal = 0.;
     dsignal = 0.;
-    
+
     // Iterative fit muon analysis
     muonX0 = 0.;
     muonY0 = 0.;
@@ -358,7 +358,7 @@ void VImageParameter::reset( unsigned int resetLevel )
     muonSize = 0.;
     muonIPCorrectedSize = 0.;
     muonValid = 0;
-    
+
     // Hough transform muon parameters
     houghAP = 0.;
     houghTD = 0.;
@@ -366,7 +366,7 @@ void VImageParameter::reset( unsigned int resetLevel )
     houghCN = 0.;
     houghContained = 0.;
     houghMuonValid = 0;
-    
+
     if( fWriteNImagePixels )
     {
         PixelListN = 0;
@@ -391,7 +391,7 @@ bool VImageParameter::hasImage()
     {
         return true;
     }
-    
+
     return false;
 }
 
