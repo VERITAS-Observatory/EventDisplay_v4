@@ -101,15 +101,14 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	if( ntrain <= 100 || ntest <= 100 )
 	{
 		cout << endl;
-		cout << "Error, <train/test fraction> is so small that only " << ntrain;
+		cout << "Error, train/test fraction is so small that only " << ntrain << "(" << ntest << ")";
 		cout << " events were selected for training, while TMVA usually needs thousands of training/testing events to work properly.";
-		cout << "Try increasing the <train/test fraction>... (you only have " << nentries;
+		cout << "Try increasing the train/test fraction... (you only have " << nentries;
 		cout << " total events to designate for either training or testing...)" << endl;
-		cout << "(number of available events (train/test): " << ntrain << ", " << ntest << ")" << endl;
 		cout << endl;
 		exit( EXIT_FAILURE );
 	}
-	// TODO unclear why factor of 0.8
+	// unclear why factor of 0.8
 	ntrain *= 0.8;
 	ntest *= 0.8;
 	cout << "\tnumber of training events: " << ntrain << endl;
@@ -399,7 +398,6 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 	}
 
 	// vector with telescope position
-	// (unfortunately inconsistent in data types)
 	vector< float > fTelX;
 	vector< float > fTelY;
 	vector< float > fTelZ;
@@ -635,8 +633,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 
 			i_tpars[i]->GetEntry( n );
 
-			// TODO TMP - hardwired loss cut
-			if( i_tpars[i]->size < 1. && i_tpars[i]->loss > 0.4 )
+			if( i_tpars[i]->size < 1. )
 			{
 				continue;
 			}
@@ -692,8 +689,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 			i_tpars[i]->GetEntry( n );
 
 			// check if telescope was reconstructed
-			// TODO TMP - hardwired loss cut
-			if( i_tpars[i]->size < 1. && i_tpars[i]->loss > 0.4 )
+			if( i_tpars[i]->size < 1. )
 			{
 				continue;
 			}
@@ -751,11 +747,6 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 
 			Rcore       = VUtilities::line_point_distance( Ycore,   -1.*Xcore,   0., ze, az, fTelY[i], -1.*fTelX[i], fTelZ[i] );
 			MCrcore     = VUtilities::line_point_distance( MCycore, -1.*MCxcore, 0., MCze, MCaz, fTelY[i], -1.*fTelX[i], fTelZ[i] );
-			// TODO - TMP save to remove?
-			// if( Rcore < 0. )
-			// 	{
-			//	continue;
-			// }
 
 			//////////////////////////////////////////////////////////////////////////////////////////////////
 			// calculate disp (observe sign convention for MC in y direction for MCyoff and Yoff)
