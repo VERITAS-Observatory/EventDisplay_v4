@@ -8,11 +8,11 @@
 VAnalysisUtilities::VAnalysisUtilities()
 {
     fDebug = 0;
-
+    
     bZombie = false;
-
+    
     fAnasumDataFile = 0;
-
+    
     fSkyMapCentreDecJ2000 = 0.;
     fSkyMapCentreRAJ2000 = 0.;
     fTargetShiftWest = 0.;
@@ -21,16 +21,16 @@ VAnalysisUtilities::VAnalysisUtilities()
     fTargetRA = 0.;
     fTargetDecJ2000 = 0.;
     fTargetRAJ2000 = 0.;
-
+    
     fRunList_MJD_min = 0.;
     fRunList_MJD_max = 0.;
-
+    
     fAnasumDataFile = 0;
     fEVNDISPVersion = "noVersionSet";
-
+    
     setRunListMJDRange();
     setPhaseFoldingValues();
-
+    
     setRunListCutMJDRange();
     setRunListCutPhaseRange();
 }
@@ -50,8 +50,8 @@ bool VAnalysisUtilities::openFile( string iname, int irun, bool iStereo, bool iP
     {
         fEVNDISPVersion = iPar->getEVNDISP_VERSION();
     }
-
-
+    
+    
     if( iStereo )
     {
         char dname[200];
@@ -115,7 +115,7 @@ bool VAnalysisUtilities::openFile( string iname, int irun, bool iStereo, bool iP
     {
         cout << "file open: " << iname << " (" << irun << ")" << endl;
     }
-
+    
     return true;
 }
 
@@ -125,7 +125,7 @@ bool VAnalysisUtilities::readTargetCoordinatesFromtRunSummary( TTree* t, int ion
     {
         return false;
     }
-
+    
     int iRun;
     t->SetBranchAddress( "runOn", &iRun );
     t->SetBranchAddress( "TargetRA", &fTargetRA );
@@ -164,11 +164,11 @@ bool VAnalysisUtilities::readTargetCoordinatesFromtRunSummary( TTree* t, int ion
     {
         fTargetShiftNorth = 0.;
     }
-
+    
     for( int i = 0; i < t->GetEntries(); i++ )
     {
         t->GetEntry( i );
-
+        
         // order matters!
         if( fSkyMapCentreDecJ2000 < -90. || ( TMath::Abs( fSkyMapCentreRAJ2000 ) < 1.e-8 && TMath::Abs( fSkyMapCentreDecJ2000 ) < 1.e-8 ) )
         {
@@ -197,7 +197,7 @@ bool VAnalysisUtilities::readTargetCoordinatesFromtRunSummary( TTree* t, int ion
             break;
         }
     }
-
+    
     return true;
 }
 
@@ -211,7 +211,7 @@ bool VAnalysisUtilities::closeFile()
     {
         return false;
     }
-
+    
     return true;
 }
 
@@ -219,7 +219,7 @@ bool VAnalysisUtilities::closeFile()
 bool VAnalysisUtilities::readRunList()
 {
     vector< int > irunlist;
-
+    
     return readRunList( irunlist );
 }
 
@@ -229,7 +229,7 @@ CRunSummary* VAnalysisUtilities::getRunSummaryTree( int iTot )
     {
         return 0;
     }
-
+    
     char hname[200];
     if( iTot > 0 )
     {
@@ -244,7 +244,7 @@ CRunSummary* VAnalysisUtilities::getRunSummaryTree( int iTot )
         sprintf( hname, "total/stereo" );
     }
     fAnasumDataFile->cd( hname );
-
+    
     TTree* t = ( TTree* )gDirectory->Get( "tRunSummary" );
     if(!t )
     {
@@ -252,7 +252,7 @@ CRunSummary* VAnalysisUtilities::getRunSummaryTree( int iTot )
         return 0;
     }
     CRunSummary* c = new CRunSummary( t );
-
+    
     return c;
 }
 
@@ -261,21 +261,21 @@ TGraph* VAnalysisUtilities::calcCumulativeSig( int iTot )
 
     CRunSummary* ctRunSum = getRunSummaryTree( iTot );
     int nentries = ctRunSum->fChain->GetEntries();
-
+    
     double cum_Non = 0;
     double cum_Noff = 0;
     double cum_alpha = 0;
     double cum_t = 0;
     int cum_N = 0;
     TGraph* gCumSig = new TGraph( 0 );
-
+    
     for( int i = 0; i < nentries; i++ )
     {
         ctRunSum->GetEntry( i );
         // exclude runs with 0 rate and no error on rate
         if( ctRunSum->runOn > 0 && !( TMath::Abs( ctRunSum->Rate ) < 1.e-5 && TMath::Abs( ctRunSum->RateE ) < 1.e-5 ) )
         {
-
+        
             // cumulative significance vs time
             cum_Non += ctRunSum->NOn;
             cum_Noff += ctRunSum->NOff;
@@ -283,7 +283,7 @@ TGraph* VAnalysisUtilities::calcCumulativeSig( int iTot )
             cum_t += ctRunSum->tOn;
             cum_N++;
             gCumSig->SetPoint( cum_N, cum_t / 60, VStatistics::calcSignificance( cum_Non, cum_Noff, cum_alpha / cum_Noff ) );
-
+            
         }
     }
     return gCumSig;
@@ -294,25 +294,25 @@ TGraph* VAnalysisUtilities::calcCumulativeSig( int iTot )
 bool VAnalysisUtilities::readRunList( vector< int > irunlist, int iTot )
 {
     VRunList i_temp;
-
+    
     // reset run list
     fRunList.clear();
-
+    
     CRunSummary* c = getRunSummaryTree( iTot );
     if(!c )
     {
         return false;
     }
-
+    
     fRunList_MJD_min = 1.e14;
     fRunList_MJD_max = 0.;
-
+    
     bool bFoundRun = false;
-
+    
     for( int i = 0; i < c->fChain->GetEntries(); i++ )
     {
         c->GetEntry( i );
-
+        
         if( c->runOn > 0 )
         {
             // check if this run is in runlist
@@ -332,12 +332,12 @@ bool VAnalysisUtilities::readRunList( vector< int > irunlist, int iTot )
             {
                 bFoundRun = true;
             }
-
+            
             if(!bFoundRun )
             {
                 continue;
             }
-
+            
             i_temp.runnumber = c->runOn;
             i_temp.MJD = c->MJDOn;
             if( i_temp.runnumber > 0 &&  i_temp.MJD > fRunList_MJD_max )
@@ -359,13 +359,13 @@ bool VAnalysisUtilities::readRunList( vector< int > irunlist, int iTot )
             i_temp.TargetDecJ2000 = c->TargetDecJ2000;
             i_temp.pedvarsOn = c->pedvarsOn;
             i_temp.alpha = c->OffNorm;
-
+            
             if( fPhase_MJD0 > 0. && fPhase_Period_days > 0. )
             {
                 i_temp.phase = ( i_temp.MJD - fPhase_MJD0 ) / fPhase_Period_days;
                 i_temp.phase = i_temp.phase - TMath::Floor( i_temp.phase );
             }
-
+            
             // apply run list cuts
             bool iCut = true;
             for( unsigned int i = 0; i < fRunListCut_MJD_min.size(); i++ )
@@ -384,7 +384,7 @@ bool VAnalysisUtilities::readRunList( vector< int > irunlist, int iTot )
             {
                 continue;
             }
-
+            
             iCut = true;
             for( unsigned int i = 0; i < fRunListCut_Phase_min.size(); i++ )
             {
@@ -402,12 +402,12 @@ bool VAnalysisUtilities::readRunList( vector< int > irunlist, int iTot )
             {
                 continue;
             }
-
-
+            
+            
             fRunList.push_back( i_temp );
         }
     }
-
+    
     return true;
 }
 
@@ -420,7 +420,7 @@ TObject* VAnalysisUtilities::getHistogram( string hisname, int runnumber, string
     {
         return 0;
     }
-
+    
     char dx[600];
     if( runnumber > 1 )
     {
@@ -441,16 +441,16 @@ TObject* VAnalysisUtilities::getHistogram( string hisname, int runnumber, string
             sprintf( dx, "total_%d/stereo/%s", -1 * runnumber, dirname.c_str() );
         }
     }
-
+    
     fAnasumDataFile->cd( dx );
     TDirectory* iDir = gDirectory;
     if(!iDir )
     {
         return 0;
     }
-
+    
     TObject* h = ( TObject* )iDir->Get( hisname.c_str() );
-
+    
     if( h && iSlizeY < -9998. )
     {
         return h->Clone();
@@ -466,8 +466,8 @@ TObject* VAnalysisUtilities::getHistogram( string hisname, int runnumber, string
             return i_h->Clone();
         }
     }
-
-
+    
+    
     return 0;
 }
 
@@ -478,23 +478,23 @@ double VAnalysisUtilities::getNormalisationFactor( int iRun )
     {
         return -1;
     }
-
+    
     TDirectory* iDir = gDirectory;
     TTree* t = ( TTree* )iDir->Get( "tRunSummary" );
-
+    
     if(!t )
     {
         return -1.;
     }
-
+    
     CRunSummary* c = new CRunSummary( t );
-
+    
     int nentries = c->fChain->GetEntries();
-
+    
     for( int i = 0; i < nentries; i++ )
     {
         c->GetEntry( i );
-
+        
         double ivalue = c->OffNorm;
         if( iRun == c->runOn )
         {
@@ -503,7 +503,7 @@ double VAnalysisUtilities::getNormalisationFactor( int iRun )
         }
     }
     return -1.;
-
+    
 }
 
 void VAnalysisUtilities::printEnergyThresholds()
@@ -541,7 +541,7 @@ void VAnalysisUtilities::setRunListCutMJDRange( double iMJDMin, double iMJDMax )
 {
     fRunListCut_MJD_min.clear();
     fRunListCut_MJD_min.push_back( iMJDMin );
-
+    
     fRunListCut_MJD_max.clear();
     fRunListCut_MJD_max.push_back( iMJDMax );
 }
@@ -556,7 +556,7 @@ void VAnalysisUtilities::setRunListCutPhaseRange( double iPhaseMin, double iPhas
 {
     fRunListCut_Phase_min.clear();
     fRunListCut_Phase_min.push_back( iPhaseMin );
-
+    
     fRunListCut_Phase_max.clear();
     fRunListCut_Phase_max.push_back( iPhaseMax );
 }
@@ -570,14 +570,14 @@ void VAnalysisUtilities::setRunListCutPhaseRangeVector( vector< double > iPhaseM
 vector< int > VAnalysisUtilities::getRunListVector()
 {
     vector< int > r;
-
+    
     CRunSummary* c = getRunSummaryTree( 1 );
     int nentries = c->fChain->GetEntries();
-
+    
     for( int i = 0; i < nentries; i++ )
     {
         c->GetEntry( i );
-
+        
         if( c->runOn > 0 )
         {
             r.push_back( c->runOn );

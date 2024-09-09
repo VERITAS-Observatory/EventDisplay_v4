@@ -42,7 +42,7 @@ using namespace std;
 class VStereoAnalysis
 {
     public:
-
+    
         VStereoAnalysis( bool isOnrun, string i_hsuffix, VAnaSumRunParameter* irunpara,
                          vector< TDirectory* > iRDir, TDirectory* iDir, string iDataDir, int iRandomSeed, bool iTotalAnalysisOnly );
         ~VStereoAnalysis() {}
@@ -114,26 +114,26 @@ class VStereoAnalysis
         bool   terminate();
         void   writeDebugHistograms();
         void   writeHistograms( bool bOn );
-
-
+        
+        
     private:
-
+    
         bool fDebug;
         bool bIsGamma;
         bool bTotalAnalysisOnly;
-
+        
         bool fIsOn;
         bool fNoSkyPlots;                         //! do full sky plots (if false, analysed source region only)
-
+        
         VAnaSumRunParameter* fRunPara;
-
+        
         TGraphAsymmErrors* gMeanEffectiveArea;
         TGraph2DErrors*    gTimeBinnedMeanEffectiveArea;
         TGraphErrors*      gMeanEsys_MC;
-
+        
         TGraphAsymmErrors* gMeanEffectiveAreaMC;
         TH2F*			   hResponseMatrix;
-
+        
         VStereoMaps* fMap;
         VStereoMaps* fMapUC;
         int fHisCounter;
@@ -147,7 +147,7 @@ class VStereoAnalysis
         map< int, double > fRunExposure;          // Open portion of time mask
         vector< VStereoHistograms* > fHisto;
         VStereoHistograms* fHistoTot;
-
+        
         TTree* fTreeSelectedEvents;
         int    fTreeSelected_runNumber;
         int    fTreeSelected_eventNumber;
@@ -174,7 +174,7 @@ class VStereoAnalysis
         float fTreeSelected_EmissionHeightChi2;
         double fTreeSelected_SizeSecondMax;
         UInt_t fTreeSelected_IsGamma;
-
+        
         TTree* fDL3EventTree;
         int     fDL3EventTree_runNumber;
         int     fDL3EventTree_eventNumber;
@@ -202,34 +202,34 @@ class VStereoAnalysis
         double  fDL3EventTree_MVA;
         UInt_t  fDL3EventTree_IsGamma;
         VRadialAcceptance* fDL3_Acceptance;
-
+        
         double  fDeadTimeStorage ;
         //double fullMJD ;
         VSkyCoordinates* fVsky ;  // for RADec to AzimElev conversion
-
+        
         double fTreeSelected_MVA;
-
+        
         double fTotCount;
-
+        
         map < int, double > f_t_in_s_min;
         map < int, double > f_t_in_s_max;
         double fMeanAzimuth;
         double fMeanElevation;
         double fNMeanElevation;
-
+        
         CData* fDataRun;
         TTree* fDataRunTree;
         TFile* fDataFile;
         string fInstrumentEpochMinor;
         vector< unsigned int > fTelToAnalyze;
-
+        
         vector< VSkyCoordinates* > fAstro;        //!< Astronomical source parameters for this analysis
         VGammaHadronCuts* fCuts;                  //!< Parameter Cuts
         VTimeMask* fTimeMask;                     //!< Time Cuts
-
+        
         // dead time calculators
         vector< VDeadTime* > fDeadTime;
-
+        
         // rate counters
         vector< vector< double > > fRateCounts;
         vector< vector< double > > fRateTime;
@@ -237,11 +237,11 @@ class VStereoAnalysis
         vector< double > fRateCountsTot;
         vector< double > fRateTimeTot;
         vector< double > fRateTimeIntervallTot;
-
+        
         // directories
         TDirectory* fDirTot;
         vector< TDirectory* > fDirTotRun;
-
+        
         void astro_check_for_valid_coordinates( unsigned int runlist_iter );
         void astro_set_skymap_center_from_runparameters( unsigned int runlist_iter );
         void astro_set_skymap_centershift_from_runparameters( unsigned int runlist_iter );
@@ -254,25 +254,25 @@ class VStereoAnalysis
         void astro_calculate_modified_wobbleoffset( unsigned int runlist_iter );
         void astro_set_exclusionsregions( unsigned int runlist_iter );
         void astro_setup_star_cataloge( unsigned int runlist_iter );
-
+        
         double combineHistograms();
         void   defineAstroSource();
         bool   closeDataFile();
         CData* getDataFromFile( int i_runNumber );
-
+        
         void fill_TreeWithSelectedEvents( CData*, double, double, double );
         bool init_TreeWithSelectedEvents( int, bool );
         void reset_TreeWithSelectedEvents();
-
+        
         void fill_DL3Tree( CData* c,
                            double i_xderot, double i_yderot,
                            unsigned int icounter, double i_UTC );
         bool init_DL3Tree( int irun, int icounter );
         void write_DL3Tree();
-
+        
         // derotation and J2000
         void getDerotatedCoordinates( unsigned int, double i_UTC, double x, double y, double& x_derot, double& y_derot );
-
+        
         int  getDataRunNumber() const;            // Check for existence of fDataRun and try to retrieve run number from first entry of the tree
 };
 #endif

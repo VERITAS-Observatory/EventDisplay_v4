@@ -23,10 +23,10 @@ VDetectorGeometry::VDetectorGeometry( unsigned int iNTel, vector< string > iCame
     }
     setCoordinateTransformer( iCoordinateTransformerX, iCoordinateTransformerY );
     setSourceType( iSourceType );
-
+    
     // set directory with all configuration files
     setConfigDir( iDir );
-
+    
     // detector configuration file from GrIsu (.cfg)
     if( iCamera[0].find( ".cfg" ) < iCamera[0].size() || iCamera[0].find( ".txt" ) < iCamera[0].size() )
     {
@@ -50,7 +50,7 @@ VDetectorGeometry::VDetectorGeometry( unsigned int iNTel, vector< string > iCame
             readCameraFile( iCamera[i] );
         }
     }
-
+    
     for( unsigned int i = 0; i < iNTel; i++ )
     {
         // set channels and samples
@@ -59,7 +59,7 @@ VDetectorGeometry::VDetectorGeometry( unsigned int iNTel, vector< string > iCame
         fNSamples.push_back( getNumSamples() );
         fSampleWarning.push_back( true );
     }
-
+    
     //    if( fDebug ) print();
     if( fDebug )
     {

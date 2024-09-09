@@ -28,9 +28,9 @@ class VDSTReader : public VVirtualDataReader
         unsigned int fDSTtreeEvent;               //!< tree event number
         VDSTTree* fDSTTree;                       //!< data tree
         bool   fMC;                               //!< source data is Monte Carlo
-
+        
         bool   fPerformFADCAnalysis;              //!< look at FADC traces
-
+        
         unsigned int fTelID;
         unsigned int fNTelescopes;
         vector< uint16_t >     fNumSamples;
@@ -46,21 +46,21 @@ class VDSTReader : public VVirtualDataReader
         vector< float > fLDTtime;
         vector< double > fTelAzimuth;
         vector< double > fTelElevation;
-
+        
         vector< vector< bool > > fFullHitVec;
         vector< vector< bool > > fFullTrigVec;
         vector< vector < bool > > fHiLo;
         vector< int > fNumberofFullTrigger;
-
+        
         vector< uint8_t > fDummySample;
         vector< uint16_t > fDummySample16Bit;
         vector< vector< vector< uint16_t > > > fFADCTrace;
-
+        
         vector< bool > fDSTvltrig;
         vector< unsigned short int > fDSTl2trig_type;
-
+        
         bool init();                              //!< open source file and init tree
-
+        
     public:
         VDSTReader( string isourcefile, bool iMC, int iNTel, bool iDebug );
         ~VDSTReader() {}

@@ -19,7 +19,7 @@ VSQLTextFileReader::VSQLTextFileReader(
     unsigned int iTelID )
 {
     fIsGood = false;
-
+    
     string iSQLFile =
         iSQLFileDirectory + "/" +
         to_string( irunnumber / 10000 ) + "/" +
@@ -37,7 +37,7 @@ VSQLTextFileReader::VSQLTextFileReader(
 void VSQLTextFileReader::readSQLFile( string iSQLFile )
 {
     cout << "Reading SQLText data from " << iSQLFile << endl;
-
+    
     locale::global( std::locale( "C.UTF-8" ) );
     ifstream sql_file;
     sql_file.open( iSQLFile.c_str() );
@@ -46,7 +46,7 @@ void VSQLTextFileReader::readSQLFile( string iSQLFile )
         cout << "Error opening SQLText data from " << iSQLFile << endl;
         exit( EXIT_FAILURE );
     }
-
+    
     string line;
     unsigned int z = 0;
     vector< string > temp_string;
@@ -89,7 +89,7 @@ void VSQLTextFileReader::readSQLFile( string iSQLFile )
         z++;
     };
     sql_file.close();
-
+    
     fIsGood = true;
 }
 

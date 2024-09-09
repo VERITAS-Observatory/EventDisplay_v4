@@ -19,6 +19,6 @@ double VVirtualDataReader::getSample_double( unsigned channel, unsigned sample, 
     {
         return ( double )getSample16Bit( channel, sample, iNewNoiseTrace );
     }
-
+    
     return ( double )getSample( channel, sample, iNewNoiseTrace );
 }

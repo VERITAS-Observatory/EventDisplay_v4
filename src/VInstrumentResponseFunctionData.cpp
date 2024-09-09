@@ -15,15 +15,15 @@ VInstrumentResponseFunctionData::VInstrumentResponseFunctionData()
     fName = "";
     fNTel = 0;
     fMCMaxCoreRadius = 0.;
-
+    
     fData = 0;
-
+    
     fListofResponseFunctionTypes.push_back( "angular_resolution" );    // fType_numeric == 0
     fListofResponseFunctionTypes.push_back( "core_resolution" );       // fType_numeric == 1
     fListofResponseFunctionTypes.push_back( "energy_resolution" );     // fType_numeric == 2
-
+    
     setEnergyReconstructionMethod();
-
+    
     fHistogramList = 0;
     setHistogramEbinning();
     setHistogramLogAngbinning();
@@ -38,7 +38,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
         return false;
     }
     fType = iType;
-
+    
     fName = iName;
     fNTel = iNTel;
     fMCMaxCoreRadius = iMCMaxCoreRadius;
@@ -46,9 +46,9 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
     {
         fMCMaxCoreRadius = 500.;
     }
-
+    
     fHistogramList = new TList();
-
+    
     // histograms
     vector< string > iHisName;
     vector< string > iHisXaxisName;
@@ -67,7 +67,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
     //         exactly the same as the one of E_HISTOID
     /////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////
-
+    
     /////////////////////////////////////////////////////////////////////////////////////////////////
     // angular resolution plots
     if( fType == "angular_resolution" )
@@ -393,18 +393,18 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
         f2DHisto.back()->SetXTitle( iHisXaxisName[i].c_str() );
         f2DHisto.back()->SetYTitle( iHisYaxisName[i].c_str() );
         fHistogramList->Add( f2DHisto.back() );
-
+        
         // corresponding resolution graph
         fResolutionGraph.push_back( new TGraphErrors( 1 ) );
         fResolutionGraph.back()->SetName(( "g" + iHisName[i] ).c_str() );
         fResolutionGraph.back()->SetTitle();
         fHistogramList->Add( fResolutionGraph.back() );
-
+        
         // containment probability
         fContainmentProbability.push_back( 0. );
-
+        
     }
-
+    
     return true;
 }
 
@@ -417,14 +417,14 @@ int VInstrumentResponseFunctionData::testResponseFunctionType( string iType )
             return ( int )i;
         }
     }
-
+    
     cout << "VInstrumentResponseFunctionData::testResponseFunctionType() error: type not found: " << iType << endl;
     cout << "\t available response function types are: " << endl;
     for( unsigned int i = 0; i < fListofResponseFunctionTypes.size(); i++ )
     {
         cout << "\t" << fListofResponseFunctionTypes[i] << endl;
     }
-
+    
     return -99;
 }
 
@@ -437,16 +437,16 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
     {
         return;
     }
-
+    
     // default is true here
     bool bPlotResolution_vs_reconstructedEnergy = true;
-
+    
     // simple quality check (FOV shouldn't be larger than 50 deg)
     if( fData->Xoff < -50. || fData->Yoff < -50. )
     {
         return;
     }
-
+    
     // get reconstructed energy
     double iErec_lin = -99.e6;
     if( fEnergyReconstructionMethod == 0 && fData->Erec > 0. )
@@ -461,7 +461,7 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
     {
         return;
     }
-
+    
     double iDiff = -99.e6;
     double iError = -99.e6;
     double iErrorRelative = -99.e6;
@@ -516,16 +516,16 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
             iErrorRelative = -99.e6;
         }
     }
-
+    
     if(!bPlotResolution_vs_reconstructedEnergy )
     {
         iErec_lin = fData->MCe0;
     }
-
-
+    
+    
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     // fill histograms
-
+    
     // difference vs energy
     if( E_DIFF < f2DHisto.size() && f2DHisto[E_DIFF] )
     {
@@ -561,20 +561,20 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
     {
         f2DHisto[E_NIMAG]->Fill( fData->NImages, iDiff, iWeight );
     }
-
+    
     // difference vs core distance
     if( E_DIST < f2DHisto.size() && f2DHisto[E_DIST] )
     {
         f2DHisto[E_DIST]->Fill( sqrt(( fData->MCxcore - fArrayCentre_X ) * ( fData->MCxcore - fArrayCentre_X ) +
                                      ( fData->MCycore - fArrayCentre_Y ) * ( fData->MCycore - fArrayCentre_Y ) ), iDiff, iWeight );
     }
-
+    
     // error vs energy
     if( E_ERROR < f2DHisto.size() && f2DHisto[E_ERROR] )
     {
         f2DHisto[E_ERROR]->Fill( log10( iErec_lin ), iError, iWeight );
     }
-
+    
     // relative error vs energy
     if( E_RELA < f2DHisto.size() && f2DHisto[E_RELA] && iErrorRelative > -98.e6 )
     {
@@ -599,7 +599,7 @@ bool VInstrumentResponseFunctionData::terminate( double iContainmentProbability,
             get_Profile_from_TH2D( f2DHisto[i], fResolutionGraph[i], "meanS" );
         }
     }
-
+    
     return true;
 }
 
@@ -612,27 +612,27 @@ TList*  VInstrumentResponseFunctionData::calculateResolution( TH2D* iHistogram, 
     {
         return 0;
     }
-
+    
     TH1D* iTemp = 0;
     TList* hList = new TList();
-
+    
     char iname[800];
-
+    
     // set number of points in graph
     iResult->Set( iHistogram->GetNbinsX() );
-
+    
     // temporary vectors
     vector< double > vEnergy;
     vector< double > vRes;
     vector< double > vResE;
-
+    
     double i_energy = 0.;
-
+    
     //////////////////////////////////////////////////////////////////////////////
     // loop over all energy bins and project each bin into a TH1D
     for( int i = 1; i <= iHistogram->GetNbinsX(); i++ )
     {
-
+    
         // define temporary histogram and fill with projection
         if( iHistoName.size() > 0 )
         {
@@ -645,9 +645,9 @@ TList*  VInstrumentResponseFunctionData::calculateResolution( TH2D* iHistogram, 
         iTemp = iHistogram->ProjectionY( iname, i, i );
         sprintf( iname, "log_{10} E_{0} = %.2f", iHistogram->GetXaxis()->GetBinCenter( i ) );
         iTemp->SetTitle( iname );
-
+        
         i_energy = iHistogram->GetXaxis()->GetBinCenter( i );
-
+        
         //////////////////////////////////////////////////////////
         // calculate containment
         double iTotSum = 0.;
@@ -689,7 +689,7 @@ TList*  VInstrumentResponseFunctionData::calculateResolution( TH2D* iHistogram, 
             delete iTemp;
         }
     }
-
+    
     // fill graph
     iResult->Set(( int )vEnergy.size() );
     for( unsigned i = 0; i < vEnergy.size(); i++ )
@@ -697,7 +697,7 @@ TList*  VInstrumentResponseFunctionData::calculateResolution( TH2D* iHistogram, 
         iResult->SetPoint( i, vEnergy[i], vRes[i] );
         iResult->SetPointError( i, 0., vResE[i] );
     }
-
+    
     return hList;
 }
 
@@ -707,29 +707,29 @@ double VInstrumentResponseFunctionData::getResolutionErrorfromToyMC( double i68,
     {
         return 0.;
     }
-
+    
     // number of times to run the experiment
     const int nRun = 100;
-
+    
     // histogram with results from each experiment
     TH1D h68( "h68", "h68", 1000, 0., 1.5 );
-
+    
     // histogram with angular differences
     TH1D hDiff( "hDiff", "", 1000, 0., 1.0 );
-
+    
     // normal distribution
     TF1 f( "f", "gaus(0)", 0., 5. );
     f.SetParameter( 0, 1. );
     f.SetParameter( 1, 0. );
     // normalized to 2D distribution, see Minuit table 7.1
     f.SetParameter( 2, i68 / sqrt( 2.41 ) );
-
+    
     double x = 0;
     double y = 0.;
     double q[] = { 0 };
     int nq = 1;
     double d[] = { 0.68 };
-
+    
     for( int j = 0; j < nRun; j++ )
     {
         hDiff.Reset();
@@ -737,7 +737,7 @@ double VInstrumentResponseFunctionData::getResolutionErrorfromToyMC( double i68,
         {
             x = f.GetRandom();
             y = f.GetRandom();
-
+            
             hDiff.Fill( sqrt( x* x + y* y ) );
         }
         if( hDiff.GetEntries() > 0 )
@@ -746,7 +746,7 @@ double VInstrumentResponseFunctionData::getResolutionErrorfromToyMC( double i68,
             h68.Fill( q[0] );
         }
     }
-
+    
     return h68.GetRMS();
 }
 

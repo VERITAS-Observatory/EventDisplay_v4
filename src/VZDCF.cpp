@@ -17,14 +17,14 @@ VZDCF::VZDCF()
 {
 
     setMLinterval();
-
+    
 }
 
 bool VZDCF::readZDCF( string iFile )
 {
 
     fZDCFData.clear();
-
+    
     // read in ascii file
     ifstream is( iFile.c_str() );
     if(!is )
@@ -33,18 +33,18 @@ bool VZDCF::readZDCF( string iFile )
         return false;
     }
     string is_line;
-
+    
     while( getline( is, is_line ) )
     {
         if( is_line.size() == 0 )
         {
             continue;
         }
-
+        
         istringstream is_stream( is_line );
-
+        
         fZDCFData.push_back( new VZDCFData() );
-
+        
         //! no errors are caught here..
         is_stream >> fZDCFData.back()->tau;
         is_stream >> fZDCFData.back()->sigma_tau_neg;
@@ -55,9 +55,9 @@ bool VZDCF::readZDCF( string iFile )
         is_stream >> fZDCFData.back()->nbins;
     }
     is.close();
-
+    
     cout << "total number of ZDCF data points: " << fZDCFData.size() << endl;
-
+    
     return true;
 }
 
@@ -67,14 +67,14 @@ bool VZDCF::print()
     {
         fZDCFData[i]->print();
     }
-
+    
     return true;
 }
 
 double VZDCF::getZDCFData_tau_min( bool bError )
 {
     double i_m = 1.e19;
-
+    
     for( unsigned int i = 0; i < fZDCFData.size(); i++ )
     {
         if( fZDCFData[i] )
@@ -95,7 +95,7 @@ double VZDCF::getZDCFData_tau_min( bool bError )
 double VZDCF::getZDCFData_tau_max( bool bError )
 {
     double i_m = -1.e19;
-
+    
     for( unsigned int i = 0; i < fZDCFData.size(); i++ )
     {
         if( fZDCFData[i] )
@@ -116,7 +116,7 @@ double VZDCF::getZDCFData_tau_max( bool bError )
 double VZDCF::getZDCFData_dcf_min( bool bError, double iTauMin, double iTauMax )
 {
     double i_m = 1.e19;
-
+    
     for( unsigned int i = 0; i < fZDCFData.size(); i++ )
     {
         if( fZDCFData[i] )
@@ -145,7 +145,7 @@ double VZDCF::getZDCFData_dcf_min( bool bError, double iTauMin, double iTauMax )
 double VZDCF::getZDCFData_dcf_max( bool bError, double iTauMin, double iTauMax )
 {
     double i_m = -1.e19;
-
+    
     for( unsigned int i = 0; i < fZDCFData.size(); i++ )
     {
         if( fZDCFData[i] )
@@ -179,7 +179,7 @@ TCanvas* VZDCF::plot( TCanvas* c, bool bzdcf, double taumin, double taumax, doub
     char htitle[800];
     // empty histogram for axis
     TH1D* hZDCF = 0;
-
+    
     // canvas
     if(!c )
     {
@@ -193,11 +193,11 @@ TCanvas* VZDCF::plot( TCanvas* c, bool bzdcf, double taumin, double taumax, doub
             sprintf( hname, "cZDCF_sig" );
             sprintf( htitle, "ZDCF (dcf/error)" );
         }
-
+        
         c = new TCanvas( hname, htitle, 10, 10, 600, 600 );
         c->SetGridx( 0 );
         c->SetGridy( 0 );
-
+        
         if( bzdcf )
         {
             sprintf( hname, "hZDCF" );
@@ -206,7 +206,7 @@ TCanvas* VZDCF::plot( TCanvas* c, bool bzdcf, double taumin, double taumax, doub
         {
             sprintf( hname, "hZDCF_sig" );
         }
-
+        
         // histogram values
         if( taumin < -9990. )
         {
@@ -216,7 +216,7 @@ TCanvas* VZDCF::plot( TCanvas* c, bool bzdcf, double taumin, double taumax, doub
         {
             taumax = getZDCFData_tau_max( true ) + 5.;
         }
-
+        
         hZDCF = new TH1D( hname, "", 100, taumin, taumax );
         hZDCF->SetStats( 0 );
         hZDCF->SetXTitle( "time delay [days]" );
@@ -246,9 +246,9 @@ TCanvas* VZDCF::plot( TCanvas* c, bool bzdcf, double taumin, double taumax, doub
         }
         hZDCF->Draw( "" );
         hZDCF->Draw( "AH" );
-
+        
         plot_nullHistogram( c, hZDCF, false, true, 1.2, taumin, taumax );
-
+        
     }
     else
     {
@@ -267,13 +267,13 @@ TCanvas* VZDCF::plot( TCanvas* c, bool bzdcf, double taumin, double taumax, doub
             return 0;
         }
     }
-
+    
     // fill graph
     TGraphAsymmErrors* g = new TGraphAsymmErrors( 1 );
     setGraphPlottingStyle(( TGraph* )g, 1, 1., 20, 1. );
-
+    
     int z = 0;
-
+    
     for( unsigned int i = 0; i < fZDCFData.size(); i++ )
     {
         if( fZDCFData[i] )
@@ -301,24 +301,24 @@ TCanvas* VZDCF::plot( TCanvas* c, bool bzdcf, double taumin, double taumax, doub
             }
         }
     }
-
+    
     // draw ML interval
-
+    
     if( fMLPeakposition > -9998. )
     {
         TBox* iB = new TBox( fML1Sigmainterval_low, hZDCF->GetMinimum(), fML1Sigmainterval_up, hZDCF->GetMaximum() );
         iB->SetFillColor( 38 );
         iB->Draw();
-
+        
         TLine* iL = new TLine( fMLPeakposition, hZDCF->GetMinimum(), fMLPeakposition, hZDCF->GetMaximum() );
         iL->SetLineStyle( 2 );
         iL->SetLineWidth( 2 );
         iL->Draw();
     }
-
+    
     // draw graph
     g->Draw( "p" );
-
+    
     return c;
 }
 

@@ -40,15 +40,15 @@ enum E_AnalysisType { GEO = 0, MVAAnalysis = 1 };
 class VNTelTypeCut : public TNamed
 {
     public:
-
+    
         vector< unsigned int > fTelType_counter;
         unsigned int           fNTelType_min;
-
+        
         VNTelTypeCut();
         ~VNTelTypeCut() {}
         void print();
         bool test( CData* );
-
+        
         ClassDef( VNTelTypeCut, 2 );
 };
 
@@ -62,19 +62,19 @@ class VNTelTypeCut : public TNamed
 class VGammaHadronCutsStats : public TNamed
 {
     private:
-
+    
         vector< string > fName;
-
+        
     public:
-
+    
         vector< unsigned int > fN;
-
+        
         VGammaHadronCutsStats() {}
         ~VGammaHadronCutsStats() {}
-
+        
         void printCutStatistics() {}
         void reset() {}
-
+        
         ClassDef( VGammaHadronCutsStats, 3 );
 };
 
@@ -84,34 +84,34 @@ class VGammaHadronCutsStats : public TNamed
 class VGammaHadronCuts : public VAnalysisUtilities
 {
     private:
-
+    
         bool   fDebug;                               // lots of debug output
-
+        
         CData* fData;                                       //! transient
         string fDataDirectory;
         string fInstrumentEpoch;
-
+        
         // cut selector
         int fGammaHadronCutSelector;                            // see description at beginning of VGammaHadronCuts.cpp
         int fDirectionCutSelector;
         E_AnalysisType fAnalysisType;
-
+        
         // array characteristics (number of telescopes, centre of array)
         unsigned int fNTel;
         double       fArrayCentre_X;
         double       fArrayCentre_Y;
-
+        
         // number of possible telescope combinations
         unsigned int fNLTrigs;
-
+        
         // telescope used in analysis (optional)
         vector< unsigned int > fTelToAnalyze;
-
+        
         // values calculated from shower/image parameter
         double fMeanImageDistance;
         double fMeanImageLength;
         double fMeanImageWidth;
-
+        
         // event by event cuts (read in from an additional friend tree, used by random forest analysis, pulsar analysis, etc)
         TFile* fProbabilityCut_File;                  //!
         TTree* fProbabilityCut_Tree;                  //!
@@ -119,7 +119,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         unsigned int fProbabilityCut_NSelectors;      // number of elements in fProbabilityCut_SelectionCut[]
         unsigned int fProbabilityCut_ProbID;          // array element to be used from fProbabilityCut_SelectionCut[]
         double fProbabilityCut_SelectionCut[VANACUTS_PROBSELECTIONCUTS_MAX];    // selection cut
-
+        
         //////////////////////////
         // TMVA evaluator
         VTMVAEvaluator* fTMVAEvaluator;                             //!
@@ -143,12 +143,12 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double          fTMVA_EvaluationResult;
         VTMVAEvaluatorResults* fTMVAEvaluatorResults;
         // TMVA results read from the
-
+        
         // orbital phase analysis
         TFile* fPhaseCut_File;                                      //!
         TTree* fPhaseCut_Tree;                                      //!
         double fOrbitalPhase;
-
+        
         // parameters for energy dependent theta2 cuts
         // (implemented for MC only)
         string fFileNameAngRes;
@@ -159,14 +159,14 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double       fAngRes_AbsoluteMinimum;
         double       fAngRes_AbsoluteMaximum;
         unsigned int fAngResContainmentProbability;
-
+        
         //////////////////////////
         // energy dependent cuts
         map< string, TGraph* > fEnergyDependentCut;
-
+        
         // cut statistics
         VGammaHadronCutsStatistics* fStats;                       //!
-
+        
         bool   applyProbabilityCut( int i, bool fIsOn );
         double getEnergyDependentCut( double energy_TeV, TGraph* iG, bool bUseEvalue = true, bool bMaxCut = true );
         TGraph* getEnergyDependentCut( string iCutName );
@@ -178,11 +178,11 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool   initProbabilityCuts( string iDir );
         bool   initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_Emin, unsigned int iTMVAWeightFileIndex_Emax, unsigned int iTMVAWeightFileIndex_Zmin, unsigned int iTMVAWeightFileIndex_Zmax );
         string getTelToAnalyzeString();
-
-
+        
+        
         ////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////
-
+        
     public:
         // stereo cuts
         double fCut_MeanImageDistance_min;
@@ -191,7 +191,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double fCut_MeanImageLength_max;
         double fCut_MeanImageWidth_min;
         double fCut_MeanImageWidth_max;
-
+        
         double fCut_Theta2_min;
         double fCut_Theta2_max;
         double fCut_Chi2_min;
@@ -240,16 +240,16 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double fProbabilityCut;
         vector <double> fProbabilityCutRangeLower;
         vector <double> fProbabilityCutRangeUpper;
-
+        
         vector< VNTelTypeCut* > fNTelTypeCut;
-
+        
         bool   fUseOrbitalPhaseCuts;
         double fOrbitalPhase_min;
         double fOrbitalPhase_max;
-
+        
         VGammaHadronCuts();
         ~VGammaHadronCuts();
-
+        
         bool   applyDirectionCuts( unsigned int iEnergyReconstructionMethod = 0, bool bCount = false, double x0 = -99999., double y0 = -99999. );
         bool   applyEnergyReconstructionQualityCuts( unsigned int iEnergyReconstructionMethod = 0, bool bCount = false );
         bool   applyInsideFiducialAreaCut( bool bCount = false );
@@ -264,7 +264,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool   applyStereoShapeCuts();
         bool   applyTMVACut( int i );
         bool   applyTelTypeTest( bool bCount = false );
-
+        
         TF1*   getAngularResolutionFunction()
         {
             return fF1AngRes;
@@ -430,7 +430,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         {
             return fUseOrbitalPhaseCuts;
         }
-
+        
         ClassDef( VGammaHadronCuts, 59 );
 };
 #endif

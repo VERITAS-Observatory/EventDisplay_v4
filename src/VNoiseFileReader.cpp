@@ -12,12 +12,12 @@ VNoiseFileReader::VNoiseFileReader( unsigned int iType, string iFileName )
 {
     fNoiseFileType = iType;
     fNoiseFileName = iFileName;
-
+    
     fDebug = false;
     fZombie = false;
-
+    
     fGrIsuReader = 0;
-
+    
     if( fNoiseFileType == 0 )
     {
         cout << "VNoiseFileReader: noise file type is grisu style" << endl;
@@ -44,13 +44,13 @@ bool VNoiseFileReader::init( VDetectorGeometry* iD, unsigned int intel, vector<i
     {
         return false;
     }
-
+    
     // initialize grisu reader
     if( fNoiseFileType == 0 )
     {
         fGrIsuReader = new VGrIsuReader( iD, intel,  fNoiseFileName, iSW, iDebug, iseed, iFADCorrect );
     }
-
+    
     return true;
 }
 
@@ -61,7 +61,7 @@ vector< uint8_t >& VNoiseFileReader::getNoiseVec( unsigned int iTel, uint32_t iH
     {
         return fGrIsuReader->getNoiseVec( iTel, iHitID, iNewTrace );
     }
-
+    
     return vv8;
 }
 
@@ -72,7 +72,7 @@ uint8_t VNoiseFileReader::getNoiseSample( unsigned int iTel, uint32_t iHitID, un
     {
         return fGrIsuReader->getNoiseSample( iTel, iHitID, iSample, iNewTrace );
     }
-
+    
     return 0;
 }
 
@@ -102,7 +102,7 @@ valarray<double>& VNoiseFileReader::getPeds()
     {
         return fGrIsuReader->getPeds();
     }
-
+    
     return v;
 }
 
@@ -113,7 +113,7 @@ valarray<double>& VNoiseFileReader::getPedvars()
     {
         return fGrIsuReader->getPedvars();
     }
-
+    
     return v;
 }
 
@@ -124,7 +124,7 @@ vector< valarray<double> >& VNoiseFileReader::getPedvarsAllSumWindows()
     {
         return fGrIsuReader->getPedvarsAllSumWindows();
     }
-
+    
     return vv;
 }
 
@@ -135,7 +135,7 @@ valarray<double>& VNoiseFileReader::getPedRMS()
     {
         return fGrIsuReader->getPedRMS();
     }
-
+    
     return v;
 }
 
@@ -146,9 +146,9 @@ vector< vector< vector< uint8_t > > > VNoiseFileReader::getFullNoiseVec()
     {
         return fGrIsuReader->getFullNoiseVec();
     }
-
+    
     vector< vector< vector< uint8_t > > > a;
-
+    
     return a;
 }
 
@@ -159,7 +159,7 @@ vector< vector< uint8_t > >& VNoiseFileReader::getFullNoiseVec( unsigned int iTe
     {
         return fGrIsuReader->getFullNoiseVec( iTel );
     }
-
+    
     return v8;
 }
 
@@ -170,6 +170,6 @@ vector< uint8_t >& VNoiseFileReader::getFullNoiseVec( unsigned int iTel, int iCh
     {
         return fGrIsuReader->getFullNoiseVec( iTel, iChannel );
     }
-
+    
     return vv8;
 }

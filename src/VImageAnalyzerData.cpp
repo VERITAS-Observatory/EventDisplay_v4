@@ -14,35 +14,35 @@ VImageAnalyzerData::VImageAnalyzerData( unsigned int iTelID, unsigned int iShort
         fAnaHistos = new VImageAnalyzerHistograms( iTelID );
         fAnaHistos->init();
     }
-
+    
     fFillMeanTraces = false;
     fFillPulseSum = false;
-
+    
     if(!bCalibration )
     {
         fImageParameter = new VImageParameter( iShortTree, bWriteImagePixelList );
         fImageParameterLogL = new VImageParameter( iShortTree, bWriteImagePixelList );
     }
-
+    
     // initialize time since run start
     fTimeSinceRunStart = -1.;
     fTimeRunStart = 0.;
-
+    
     // random generator for setting randomly channels dead
     fRandomMakeDeadChannelsSeed = 0;
     fRandomMakeDeadChannels = new TRandom3( fRandomMakeDeadChannelsSeed );
-
+    
     fNDead = 0;
     fLowGainNDead = 0;
-
+    
     hMeanPulses = 0;
     hPulseSum = 0;
-
+    
     fSpecialChannel = 0;
-
+    
     fpulsetiming_tzero_index = 9999;
     fpulsetiming_width_index = 9999;
-
+    
     setTraceIntegrationMethod();
 }
 
@@ -93,7 +93,7 @@ void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxCh
     fTraceN255.resize( iChannels, 0 );
     fRawTraceMax.resize( iChannels, 0. );
     fImageUser.resize( iChannels, 0 );
-
+    
     fClusterID.resize( iChannels, 0 );
     fClusterNpix.resize( iChannels, 0 );
     fClusterSize.resize( iChannels, 0. );
@@ -102,9 +102,9 @@ void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxCh
     fClusterCeny.resize( iChannels, 0. );
     fncluster_cleaned = 0;
     fncluster_uncleaned = 0;
-
+    
     fCorrelationCoefficient.resize( iChannels, false );
-
+    
     // fit value results
     if( iTraceFit )
     {
@@ -117,7 +117,7 @@ void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxCh
     }
     fFADCstopTZero.resize( 4, 0. );
     fFADCstopSum.resize( 4, 0. );
-
+    
     fRandomMakeDeadChannelsSeed = iseed;
     fRandomMakeDeadChannels->SetSeed( fRandomMakeDeadChannelsSeed );
 }
@@ -126,7 +126,7 @@ void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxCh
 void VImageAnalyzerData::initializeMeanPulseHistograms()
 {
     fFillMeanTraces = true;
-
+    
     // set mean pulse histograms
     hMeanPulses = new TList();
     char hname[200];
@@ -152,7 +152,7 @@ void VImageAnalyzerData::initializeMeanPulseHistograms()
 void VImageAnalyzerData::initializeIntegratedChargeHistograms()
 {
     fFillPulseSum = true;
-
+    
     hPulseSum = new TList();
     char hname[200];
     char htitle[200];
@@ -163,7 +163,7 @@ void VImageAnalyzerData::initializeIntegratedChargeHistograms()
         hPulseSumHigh.push_back( new TH1F( hname, htitle, 200, 0., 6. ) );
         hPulseSumHigh.back()->SetXTitle( "log_{10} integrated charge" );
         hPulseSum->Add( hPulseSumHigh.back() );
-
+        
         sprintf( hname, "hSumLow_%d_%u", fTelID + 1, j );
         sprintf( htitle, "integrated charge, low gain (tel %d, channel %u)", fTelID + 1, j );
         hPulseSumLow.push_back( new TH1F( hname, htitle, 200, 0., 6. ) );
@@ -217,7 +217,7 @@ vector<unsigned int>& VImageAnalyzerData::getFADCstopTrigChannelID()
     {
         return fSpecialChannel->getFADCstopTrigChannelID();
     }
-
+    
     return iDummyVectorUI;
 }
 
@@ -243,7 +243,7 @@ bool VImageAnalyzerData::readSpecialChannels( int iRunNumber, string iEpoch,
     }
     fSpecialChannel->readSpecialChannels( iRunNumber, ispecialchannelfile, iDirectory );
     fSpecialChannel->readThroughput( iEpoch, ithroughputfile, iDirectory, fNChannels );
-
+    
     return !fSpecialChannel->isZombie();
 }
 
@@ -253,7 +253,7 @@ double VImageAnalyzerData::getHIGHQE_gainfactor( unsigned int iChannel )
     {
         return fSpecialChannel->getHIGHQE_gainfactor( iChannel );
     }
-
+    
     return -1.;
 }
 
@@ -263,7 +263,7 @@ valarray<double>& VImageAnalyzerData::getTraceAverageTime( bool iCorrected )
     {
         return fPulseTimingAverageTimeCorrected;
     }
-
+    
     return fPulseTimingAverageTime;
 }
 
@@ -275,7 +275,7 @@ valarray<double>& VImageAnalyzerData::getTZeros( bool iCorrected )
     {
         return fPulseTimingAverageTime;
     }
-
+    
     // return tzero according to pulse timing vector
     if( iCorrected && fpulsetiming_tzero_index < fPulseTimingCorrected.size() )
     {
@@ -285,12 +285,12 @@ valarray<double>& VImageAnalyzerData::getTZeros( bool iCorrected )
     {
         return fPulseTimingUncorrected[fpulsetiming_tzero_index];
     }
-
+    
     // this is a serious problem and should never happen
     cout << "VImageAnalyzerData::getTZeros error: tzero index out of range" << endl;
     cout << "\t" << fpulsetiming_tzero_index << "\t" << fPulseTimingCorrected.size() << "\t" << fPulseTimingUncorrected.size() << endl;
     exit( EXIT_FAILURE );
-
+    
     return fPulseTimingUncorrected[0]; // should never happen
 }
 
@@ -310,12 +310,12 @@ valarray<double>& VImageAnalyzerData::getTraceWidth( bool iCorrected )
             return fPulseTimingUncorrected[fpulsetiming_width_index];
         }
     }
-
+    
     // this is a serious problem and should never happen
     cout << "VImageAnalyzerData::getTraceWidth error: tzero or width index out of range" << endl;
     cout << fpulsetiming_width_index << "\t";
     cout << fPulseTimingCorrected.size() << "\t" << fPulseTimingUncorrected.size() << endl;
     exit(-1 );
-
+    
     return fPulseTimingUncorrected[0]; // should never happen
 }

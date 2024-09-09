@@ -17,7 +17,7 @@ using namespace std;
 class VStar : public TObject
 {
     public:
-
+    
         unsigned int fStarID;
         string fStarName;
         double fDec2000;
@@ -49,15 +49,15 @@ class VStar : public TObject
         string fType;
         vector< string > fAssociations;
         int fQualityFlag;
-
+        
         VStar();
         ~VStar() {};
-
+        
         double getDistance( VStar* iStar1, VStar* iStar2 = 0 );
         double getBrightness( string iBand );
         void printStar();
         void printStar_for_anasum( string iBand );
-
+        
         ClassDef( VStar, 5 );
 };
 

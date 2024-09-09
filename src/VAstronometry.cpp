@@ -120,21 +120,21 @@ void VAstronometry::vlaPreces( double MJD_ep0, double MJD_ep1, double* ra, doubl
     slaDjcl( MJD_ep1, &oy, &om, &od, &ofd, &j );
     slaClyd( oy, om, od, &ny, &nd, &j );
     ep1  = ny + nd / 365.25;
-
+    
     slaPreces( "FK5", ep0, ep1, ra, dc );
-
+    
 #elif ASTROSOFA
-
+    
     // precession matrix
     double rot_prec[3][3];
-
+    
     // days since year 2000
     double ep0_days_2000 = MJD_ep0 - DJM00;
     double ep1_days_2000 = MJD_ep1 - DJM00;
-
+    
     /////////////////////////////////
     // Three cases in the following
-
+    
     // MJD_ep0 is J2000
     if( ep0_days_2000 == 2000.0 )
     {
@@ -157,7 +157,7 @@ void VAstronometry::vlaPreces( double MJD_ep0, double MJD_ep1, double* ra, doubl
     }
     double e1[3];
     double e2[3];
-
+    
     // Convert spherical coordinates to Cartesian
     iauS2c(*ra, *dc, e1 );
     // apply precession matrix
@@ -293,7 +293,7 @@ void VAstronometry::test_vlaDjcl()
 {
     double fd;
     int iy, im, id, j;
-
+    
     VAstronometry::vlaDjcl( 58401.87500000, &iy, &im, &id, &fd, &j );
     cout << "VAstronometry::vlaDjcl " << getAstronometryLibrary();
     cout << " (2018, 10, 10, 0.853) \t\t";
@@ -316,9 +316,9 @@ void VAstronometry::test_vlaPreces()
     double MJD_ep1 = 58082.4;
     double ra = 83.6333 * DD2R;
     double dec = 22.0145 * DD2R;
-
+    
     vlaPreces( MJD_ep0, MJD_ep1, &ra, &dec );
-
+    
     cout << "VAstronometry::vlaPreces " << getAstronometryLibrary();
     cout << " (83.9027, 22.0253) \t\t";
     cout << setprecision( 16 ) << ra* DR2D << "\t" << dec* DR2D << endl;
@@ -368,7 +368,7 @@ void VAstronometry::test_vlaEqgal()
 {
     double b, l;
     VAstronometry::vlaEqgal( 83.633076 * DD2R, 22.014493 * DD2R, &b, &l );
-
+    
     cout << "VAstronometry::vlaEqgal " << getAstronometryLibrary();
     cout << " (184.557451, -5.784369) \t\t";
     cout << setprecision( 16 ) << b* DR2D << ", " << l* DR2D << endl;

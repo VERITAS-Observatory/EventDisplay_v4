@@ -26,18 +26,18 @@ VEvndispReconstructionParameter::VEvndispReconstructionParameter()
 VEvndispReconstructionParameter::VEvndispReconstructionParameter( vector< ULong64_t > i_telType, VEvndispRunParameter* iRunPara )
 {
     reset();
-
+    
     fRunPara = iRunPara;
-
+    
     fTel_type_V = i_telType;
-
+    
     // get set with telescope types
     for( unsigned int i = 0; i < i_telType.size(); i++ )
     {
         fTel_type.insert( fTel_type_V[i] );
     }
     fNTel_type = fTel_type.size();
-
+    
 }
 
 void VEvndispReconstructionParameter::reset()
@@ -79,15 +79,15 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
         cout << "exiting..." << endl;
         exit(-1 );
     }
-
+    
     if( fDebug )
     {
         cout << "APPLY ARRAY ANALYSIS CUTS FOR METHOD " << iMeth << " AND TELESCOPE " << iTel + 1 << ", TYPE " << iTelType << endl;
     }
-
+    
     // return value
     bool iArrayCut = true;
-
+    
     // eventstatus
     if( iImageParameter->eventStatus > 0 )
     {
@@ -97,10 +97,10 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut: event status > 0: " << iImageParameter->eventStatus << endl;
         }
     }
-
+    
     ////////////////////////////////////////////
     // L2 trigger type (mainly for CTA prod2)
-
+    
     // 9999: any trigger
     if( fL2TriggerType[iMeth][iTelType] != 9999 )
     {
@@ -118,7 +118,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             cout << " (require " << fL2TriggerType[iMeth][iTelType] << ")" << endl;
         }
     }
-
+    
     ////////////////////////////////////////////
     // image size
     if( iImageParameter->size < fSize_min[iMeth][iTelType] || iImageParameter->size <= 0. )
@@ -130,7 +130,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             cout << " (" << fSize_min[iMeth][iTelType] << ")" << endl;
         }
     }
-
+    
     ////////////////////////////////////////////
     // number of ntubes (<=!!!)
     if( iImageParameter->ntubes <= fLocalNtubes_min[iMeth][iTelType] )
@@ -142,7 +142,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             cout << " (" << fLocalNtubes_min[iMeth][iTelType] << ")" << endl;
         }
     }
-
+    
     ////////////////////////////////////////////
     // number of saturated channels
     if( iImageParameter->nlowgain > fLocalNLowGain_max[iMeth][iTelType] )
@@ -154,7 +154,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             cout << " (" << fLocalNLowGain_max[iMeth][iTelType] << ")" << endl;
         }
     }
-
+    
     ////////////////////////////////////////////
     // image length
     if( iImageParameter->length < fLength_min[iMeth][iTelType] || iImageParameter->length > fLength_max[iMeth][iTelType] )
@@ -166,7 +166,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             cout << " (" << fLength_min[iMeth][iTelType] << ", " << fLength_max[iMeth][iTelType] << ")" << endl;
         }
     }
-
+    
     ////////////////////////////////////////////
     // image width
     if( iImageParameter->width < fWidth_min[iMeth][iTelType] || iImageParameter->width > fWidth_max[iMeth][iTelType] )
@@ -178,7 +178,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             cout << " (" << fWidth_min[iMeth][iTelType] << ", " << fWidth_max[iMeth][iTelType] << ")" << endl;
         }
     }
-
+    
     ////////////////////////////////////////////
     // image distance to camera centre
     if( iImageParameter->dist < fLocalDistance_min[iMeth][iTelType] || iImageParameter->dist > fLocalDistance_max[iMeth][iTelType] )
@@ -190,7 +190,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             cout << " (" << fLocalDistance_min[iMeth][iTelType] << ", " << fLocalDistance_max[iMeth][iTelType] << ")" << endl;
         }
     }
-
+    
     ////////////////////////////////////////////
     // image alpha
     if( iImageParameter->alpha < fLocalAlpha_min[iMeth][iTelType] || iImageParameter->alpha > fLocalAlpha_max[iMeth][iTelType] )
@@ -202,7 +202,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             cout << " (" << fLocalAlpha_min[iMeth][iTelType] << ", " << fLocalAlpha_max[iMeth][iTelType] << ")" << endl;
         }
     }
-
+    
     ////////////////////////////////////////////
     // loss cut
     if( iImageParameter->loss > fLoss_max[iMeth][iTelType] )
@@ -214,7 +214,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             cout << " (" << fLoss_max[iMeth][iTelType] << ")" << endl;
         }
     }
-
+    
     ////////////////////////////////////////////
     // cut on successful LL reconstruction on the edge of the FOV
     if( fRunPara )
@@ -249,7 +249,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             }
         }
     }
-
+    
     ////////////////////////////////////////////
     // width/length cut
     if( iImageParameter->length > 0. && iImageParameter->width / iImageParameter->length > fWidthLength_max[iMeth][iTelType] )
@@ -261,7 +261,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             cout << " (" << fWidthLength_max[iMeth][iTelType] << ")" << endl;
         }
     }
-
+    
     ////////////////////////////////////////////
     // image asymmetry
     if( iImageParameter->asymmetry < fAsym_min[iMeth][iTelType] || iImageParameter->asymmetry > fAsym_max[iMeth][iTelType] )
@@ -273,7 +273,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             cout << " (" << fAsym_min[iMeth][iTelType] << ", " << fAsym_max[iMeth][iTelType] << ")" << endl;
         }
     }
-
+    
     ////////////////////////////////////////////
     // fui: fraction of image under 2D Gauss
     if( iImageParameter->fui < fFui_min[iMeth][iTelType] )
@@ -285,7 +285,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             cout << " (" << fFui_min[iMeth][iTelType] << ")" << endl;
         }
     }
-
+    
     ////////////////////////////////////////////
     // user set: remove image
     if(!fLocalUseImage[iMeth][iTelType] )
@@ -296,7 +296,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut: image removed by user selection" << endl;
         }
     }
-
+    
     /////////////////////////////////////////////
     // MC only: cut on MC energy (use with care!)
     if( fRunPara->isMC()
@@ -308,9 +308,9 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut: MC energy cut:" << endl;
             cout << iImageParameter->MCenergy << " [" << fMCEnergy_linTeV_min[iMeth][iTelType] << "," << fMCEnergy_linTeV_max[iMeth][iTelType] << "]" << endl;
         }
-
+        
     }
-
+    
     ////////////////////////////////////////////
     // remove image which is too close to a bright star
     // (use list of image and border pixels)
@@ -340,12 +340,12 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             }
         }
     }
-
+    
     if( fDebug )
     {
         cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut: cut: " << iArrayCut << endl;
     }
-
+    
     return iArrayCut;
 }
 
@@ -365,14 +365,14 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
         }
     }
     fNMethods++;
-
+    
     // standard values
-
+    
     vector< int > i_t;
     vector< double > i_d;
     vector< bool > i_b;
     vector< unsigned int > i_u;
-
+    
     fRecordCounter.push_back( iRecordID );
     // standard array reconstruction method is '0'
     fMethodID.push_back( 0 );
@@ -387,7 +387,7 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
     fDispFileName.push_back( "" );
     fMODDISP_MinAngleForDisp.push_back( 25. );
     fMODDISP_MinAngleExpFactor.push_back( 0.02 );
-
+    
     for( unsigned int i = 0; i < fNTel_type; i++ )
     {
         i_t.push_back( 2 );
@@ -426,7 +426,7 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
     i_d.clear();
     for( unsigned int i = 0; i < fNTel_type; i++ )
     {
-        i_d.push_back(-1.e-2 );    // to allow for width==0
+        i_d.push_back(-1.e-2 );   // to allow for width==0
     }
     fWidth_min.push_back( i_d );
     i_d.clear();
@@ -678,7 +678,7 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
             }
             cout << endl;
         }
-
+        
         for( unsigned int i = 0; i < fNTel_type; i++ )
         {
             if( fLocalNtubes_min[m][i] < 2 || fLoss_max[m][i] == 1.e10 )
@@ -688,7 +688,7 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
             }
         }
     }
-
+    
     if( fRunPara && fRunPara->fStarCatalogueName.size() > 0 )
     {
         cout << endl;
@@ -722,7 +722,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
     {
         return 0;
     }
-
+    
     ifstream is;
     is.open( ifile.c_str(), ifstream::in );
     if(!is )
@@ -744,7 +744,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
     int t_temp = 0;
     vector< int > v_temp;
     int m_temp = -1;
-
+    
     while( getline( is, iLine ) )
     {
         // line without '*' in the beginning are ignored
@@ -783,7 +783,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
             {
                 continue;
             }
-
+            
             // read variable identifier
             is_stream >> iTemp;
             iTemp = VUtilities::upperCase( iTemp );
@@ -820,7 +820,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
             {
                 iTemp6 = "";
             }
-
+            
             //////////////////////////////////////////////////////////////////////////////////////////////
             // fadc trace analysis
             if( iTemp == "FADCANALYSIS" && fRunPara )
@@ -889,7 +889,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                         }
                     }
                 }
-
+                
                 continue;
             }
             else if( iTemp == "FADCSUMMATIONWINDOW" && fRunPara )
@@ -1188,7 +1188,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                 }
                 continue;
             }
-
+            
             else if( iTemp == "BRIGHTSTARS" && fRunPara )
             {
                 fRunPara->fStarCatalogueName = iTemp2;
@@ -1227,7 +1227,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                 }
                 continue;
             }
-
+            
             // FORCELL
             // Set in EVNDISP.reconstruction.runparameter , for example:
             // * -1 FORCELL 1
@@ -1251,8 +1251,8 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                 cout << endl;
                 continue;
             }
-
-
+            
+            
             /////////////////////////////////////////////////
             // check for exit statement
             if( iTemp == "EXIT" )
@@ -1271,8 +1271,8 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                     continue;
                 }
             }
-
-
+            
+            
             /////////////////////////////////////////////////
             /////////////////////////////////////////////////
             /////////////////////////////////////////////////
@@ -1617,7 +1617,7 @@ int VEvndispReconstructionParameter::getTelescopeType_counter_from_MirrorArea( U
     {
         v = *fTel_type_iter;
         v /= 100000;
-
+        
         if( v > 2000 )
         {
             v -= 2000;
@@ -1647,14 +1647,14 @@ int VEvndispReconstructionParameter::getTelescopeType_counter_from_MirrorArea_an
     for( fTel_type_iter = fTel_type.begin(); fTel_type_iter != fTel_type.end(); fTel_type_iter++ )
     {
         v = *fTel_type_iter;
-
+        
         ULong64_t v1 = v / 100000;
         if( v1 > 1000 )
         {
             v1 -= 1000;
         }
         v2 = v1 * 100 + ( v % 100 );
-
+        
         if( v2 == t )
         {
             return z;
@@ -1694,7 +1694,7 @@ vector< int > VEvndispReconstructionParameter::getTelescopeType_counter_from_Mir
     {
         v = *fTel_type_iter;
         v /= 100000;
-
+        
         if( v > 2000 )
         {
             v -= 2000;
@@ -1725,14 +1725,14 @@ vector< int > VEvndispReconstructionParameter::getTelescopeType_counter_from_Mir
     for( fTel_type_iter = fTel_type.begin(); fTel_type_iter != fTel_type.end(); fTel_type_iter++ )
     {
         v = *fTel_type_iter;
-
+        
         ULong64_t v1 = v / 100000;
         if( v1 > 1000 )
         {
             v1 -= 1000;
         }
         v2 = v1 * 100 + ( v % 100 );
-
+        
         if( v2 == t )
         {
             x.push_back( z );

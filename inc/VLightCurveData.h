@@ -16,24 +16,24 @@ using namespace std;
 class VLightCurveData : public TObject
 {
     private:
-
+    
         bool   bIsZombie;
-
+        
     public:
-
+    
         string fName;
         string fDataFileName;
-
+        
         double fMJD_min;
         double fMJD_max;
-
+        
         double fEnergy_min_TeV;
         double fEnergy_max_TeV;
         double fMinEnergy;
         double fMaxEnergy;
         double fE0;
         double fAlpha;
-
+        
         vector< double > fRunList;
         double fMJD_Data_min;
         double fMJD_Data_max;
@@ -54,8 +54,8 @@ class VLightCurveData : public TObject
         double fRunFluxCI_lo_3sigma;
         double fRunFluxCI_up_3sigma;
         string fFluxState;
-
-
+        
+        
         VLightCurveData( string iName = "lightcurvedata" );
         VLightCurveData( const VLightCurveData& );
         ~VLightCurveData() {}
@@ -86,26 +86,26 @@ class VLightCurveData : public TObject
             fMJD_min = iMJD_min;
             fMJD_max = iMJD_max;
         }
-
+        
         ClassDef( VLightCurveData, 6 );
 };
 
 class VLightCurveDataLessThan
 {
     public:
-
+    
         bool operator()( const VLightCurveData* a, const VLightCurveData* b )
         {
             if(!a || !b )
             {
                 return false;
             }
-
+            
             if( a->fMJD_Data_max != b->fMJD_Data_max )
             {
                 return a->fMJD_Data_max < b->fMJD_Data_min;
             }
-
+            
             return false;
         }
         VLightCurveDataLessThan() {}

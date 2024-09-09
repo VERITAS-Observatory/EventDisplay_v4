@@ -25,8 +25,8 @@ int main( int argc, char* argv[] )
     cout << "calculate orbital phase of a binary and save it in a tree called phase" << endl;
     cout << endl;
     cout << "(Note: missing documentation)" << endl;
-
-
+    
+    
     // binary analysis : calculates the orbital phase in a binary system, file extension will be "orb"
     VOrbitalPhase* fOrb = new VOrbitalPhase();
     fOrb->initialize( argc, argv );
@@ -36,6 +36,6 @@ int main( int argc, char* argv[] )
     fOrb->printBinaryPars();
     fOrb->fill();
     fOrb->terminate();
-
+    
     return 1;
 }

@@ -15,7 +15,7 @@ VDBRunInfo::VDBRunInfo( int irun, string iDBserver, unsigned int iNTel, string i
     fDBStatus = false;
     fDBServer = iDBserver;
     fDBTextDirectory = iDBTextDirectory;
-
+    
     fNTel = iNTel;
     fTargetName = "";
     fTargetDec = -99.;
@@ -37,7 +37,7 @@ VDBRunInfo::VDBRunInfo( int irun, string iDBserver, unsigned int iNTel, string i
     fDataStartTimeMJD = 0.;
     fDataStoppTimeMJD = 0.;
     fDuration = 0;
-
+    
     if( fDBTextDirectory.size() == 0 )
     {
         readRunInfoFromDB();
@@ -63,12 +63,12 @@ void VDBRunInfo::readRunDQM()
 unsigned int VDBRunInfo::readRunDQM( int run_number, unsigned int config_mask )
 {
     unsigned int ConfigMaskDQM = 0;
-
+    
     stringstream iTempS;
     iTempS << fDBServer << "/VOFFLINE";
     char c_query[1000];
     sprintf( c_query, "SELECT run_id , data_category   , status   , status_reason , tel_cut_mask , usable_duration , time_cut_mask , light_level , vpm_config_mask , authors  , comment from tblRun_Analysis_Comments where run_id=%d", run_number );
-
+    
     VDB_Connection my_connection( iTempS.str().c_str(), "readonly", "" ) ;
     if(!my_connection.Get_Connection_Status() )
     {
@@ -79,7 +79,7 @@ unsigned int VDBRunInfo::readRunDQM( int run_number, unsigned int config_mask )
         return config_mask;
     }
     TSQLResult* db_res = my_connection.Get_QueryResult();
-
+    
     TSQLRow* db_row = db_res->Next();
     if(!db_row )
     {
@@ -94,7 +94,7 @@ unsigned int VDBRunInfo::readRunDQM( int run_number, unsigned int config_mask )
     {
         return config_mask;
     }
-
+    
     // Check if the mask is 0
     if( ConfigMaskDQM == 0 )
     {
@@ -108,16 +108,16 @@ unsigned int VDBRunInfo::get_dqm_configmask( unsigned int config_mask, unsigned 
     bitset<4> bitConfig( config_mask );
     bitset<4> bitDQM( ConfigMaskDQM );
     bitset<4> bitNDQM;
-
+    
     for( int i = 0; i < ( int )bitDQM.size(); i++ )
     {
         bitNDQM.set(( int )bitDQM.size() - i - 1, bitDQM.test( i ) );
     }
-
+    
     bitNDQM = ~bitNDQM;
     bitset<4> bitNewConfig = bitConfig& bitNDQM;
     unsigned int ConfigMaskNew = 0;
-
+    
     for( int i = 0; i < ( int )bitNewConfig.size(); i++ )
     {
         if( bitNewConfig.test( i ) )
@@ -134,7 +134,7 @@ void VDBRunInfo::readRunInfoFromDB()
     iTempS << fDBServer << "/VERITAS";
     char c_query[1000];
     sprintf( c_query, "select * from tblRun_Info where run_id=%d", fRunNumber );
-
+    
     VDB_Connection my_connection( iTempS.str(), "readonly", "" ) ;
     if(!my_connection.Get_Connection_Status() )
     {
@@ -147,7 +147,7 @@ void VDBRunInfo::readRunInfoFromDB()
         return;
     }
     TSQLResult* db_res = my_connection.Get_QueryResult();
-
+    
     TSQLRow* db_row = db_res->Next();
     if(!db_row )
     {
@@ -198,7 +198,7 @@ void VDBRunInfo::readRunInfoFromDB()
         fDataStoppTimeHMS = 0;
         fDataStoppTimeSQL = "";
     }
-
+    
     if( db_row->GetField( 8 ) )
     {
         fDuration = get_duration( db_row->GetField( 8 ) );
@@ -211,7 +211,7 @@ void VDBRunInfo::readRunInfoFromDB()
     {
         fDuration = get_duration_from_sql_string();
     }
-
+    
     if( db_row->GetField( 19 ) )
     {
         fTargetName = db_row->GetField( 19 );
@@ -241,7 +241,7 @@ void VDBRunInfo::readRunInfoFromDB()
         fWobbleNorth = get_wobble_north( db_row->GetField( 17 ), db_row->GetField( 18 ) );
         fWobbleEast = get_wobble_east( db_row->GetField( 17 ), db_row->GetField( 18 ) );
     }
-
+    
     // get config mask
     if( db_row->GetField( 10 ) )
     {
@@ -252,7 +252,7 @@ void VDBRunInfo::readRunInfoFromDB()
         fConfigMask = 0;
     }
     set_telescope_to_analyse();
-
+    
     // get source coordinates
     sprintf( c_query, "select * from tblObserving_Sources where source_id like convert( _utf8 \'%s\' using latin1)", fTargetName.c_str() );
     if(!my_connection.make_query( c_query ) )
@@ -261,7 +261,7 @@ void VDBRunInfo::readRunInfoFromDB()
         return;
     }
     db_res = my_connection.Get_QueryResult();
-
+    
     db_row = db_res->Next();
     if(!db_row )
     {
@@ -273,7 +273,7 @@ void VDBRunInfo::readRunInfoFromDB()
         fTargetDec = atof( db_row->GetField( 2 ) ) * 180. / TMath::Pi();
         fTargetRA = atof( db_row->GetField( 1 ) ) * 180. / TMath::Pi();
     }
-
+    
     fDBStatus = true;
     return;
 }
@@ -303,9 +303,9 @@ vector< unsigned int > VDBRunInfo::readLaserRun()
     stringstream iTempS;
     iTempS << fDBServer << "/VERITAS";
     char c_query[1000];
-
+    
     sprintf( c_query, "SELECT info.run_id, grp_cmt.excluded_telescopes, info.config_mask FROM tblRun_Info AS info, tblRun_Group AS grp, tblRun_GroupComment AS grp_cmt, (SELECT group_id FROM tblRun_Group WHERE run_id=%d) AS run_grp WHERE grp_cmt.group_id = run_grp.group_id AND grp_cmt.group_type='laser' AND grp_cmt.group_id=grp.group_id AND grp.run_id=info.run_id AND (info.run_type='flasher' OR info.run_type='laser')", fRunNumber );
-
+    
     //std::cout<<"VDBRunInfo::getLaserRun "<<std::endl;
     VDB_Connection my_connection( iTempS.str(), "readonly", "" ) ;
     if(!my_connection.Get_Connection_Status() )
@@ -319,11 +319,11 @@ vector< unsigned int > VDBRunInfo::readLaserRun()
         return fLaserRunID;
     }
     TSQLResult* db_res = my_connection.Get_QueryResult();
-
+    
     vector< unsigned int > iLaserList;
     vector< unsigned int > iLaserConfigMask;
     vector< unsigned int > iLaserExclude;
-
+    
     if( db_res->GetRowCount() > 0 )
     {
         while( TSQLRow* db_row = db_res->Next() )
@@ -343,9 +343,9 @@ vector< unsigned int > VDBRunInfo::readLaserRun()
     {
         cout << "WARNING: VDBRunInfo::readLaserRun() no laser run found for telescope " << fNTel << " and run " << fRunNumber << endl;
     }
-
+    
     set_laser_run( iLaserList, iLaserExclude, iLaserConfigMask );
-
+    
     return fLaserRunID;
 }
 
@@ -627,7 +627,7 @@ bool VDBRunInfo::readTargetFromDBTextFile()
         cout << "Error reading target (" << fTargetName << ") from DB text file" << endl;
         return false;
     }
-
+    
     return true;
 }
 
@@ -642,9 +642,9 @@ vector< unsigned int > VDBRunInfo::readLaserFromDBTextFile()
     vector< unsigned int > iLaserList = a.getValueVector_from_key_as_integer( "run_id" );
     vector< unsigned int > iLaserConfigMask = a.getValueVector_from_key_as_integer( "config_mask" );
     vector< unsigned int > iLaserExclude = a.getValueVector_from_key_as_integer( "excluded_telescopes" );
-
+    
     set_laser_run( iLaserList, iLaserExclude, iLaserConfigMask );
-
+    
     return fLaserRunID;
 }
 
@@ -658,7 +658,7 @@ void VDBRunInfo::readRunDQMFromDBTextFile()
 unsigned int VDBRunInfo::readRunDQMFromDBTextFile( int run_number, unsigned int config_mask )
 {
     unsigned int ConfigMaskDQM = 0;
-
+    
     VSQLTextFileReader a( fDBTextDirectory, fRunNumber, "rundqm" );
     if(!a.isGood() )
     {

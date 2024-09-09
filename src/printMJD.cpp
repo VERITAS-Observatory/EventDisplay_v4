@@ -21,10 +21,10 @@ int main( int argc, char* argv[] )
         exit( EXIT_SUCCESS );
     }
     string iSQLData = argv[1];
-
+    
     double mjd = 0.;
     double sec_of_day = 0;
     VSkyCoordinatesUtilities::getMJD_from_SQLstring( iSQLData, mjd, sec_of_day );
-
+    
     cout << setprecision( 18 ) << mjd + sec_of_day / 86400. << endl;
 }

@@ -14,14 +14,14 @@ VDetectorTree::VDetectorTree()
     {
         cout << "VDetectorTree::VDetectorTree()" << endl;
     }
-
+    
     fTreeDet = 0;
-
+    
     fNTel = 0;
     fTelxpos = 0.;
     fTelypos = 0.;
     fTelzpos = 0.;
-
+    
 }
 
 
@@ -37,12 +37,12 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
     {
         cout << "VDetectorTree::fill" << endl;
     }
-
+    
     if( iDet == 0 )
     {
         return false;
     }
-
+    
     // define tree
     int fTelID = 0;
     unsigned int fTelID_hyperArray = 0;
@@ -68,11 +68,11 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
     float fRTubeDeg[fMaxPixel];
     float fMirrorArea = 0.;
     int   fNMirrors = 0;
-
+    
     if( fTreeDet == 0 )
     {
         fTreeDet = new TTree( "telconfig", "detector configuration (v2)" );
-
+        
         fTreeDet->Branch( "NTel", &fNTel, "NTel/i" );
         fTreeDet->Branch( "TelID", &fTelID, "TelID/I" );
         fTreeDet->Branch( "TelType", &fTelType, "TelType/l" );
@@ -101,7 +101,7 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
         fTreeDet->Branch( "YTubeDeg", fYTubeDeg, "YTubeDeg[NPixel]/F" );
         fTreeDet->Branch( "RTubeDeg", fRTubeDeg, "RTubeDeg[NPixel]/F" );
     }
-
+    
     // fill the tree
     if( iDet != 0 )
     {
@@ -179,7 +179,7 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
                     }
                 }
             }
-
+            
             fTreeDet->Fill();
         }
     }
@@ -193,9 +193,9 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry* iDet, TTree* iTree, boo
     {
         return false;
     }
-
+    
     cout << "Reading the detector tree: " << iTree->GetName() << endl;
-
+    
     // versioning due to bug in assigning mirror and nmirror variables
     unsigned int iDetTreeVersion = 1;
     string iN = iTree->GetTitle();
@@ -203,7 +203,7 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry* iDet, TTree* iTree, boo
     {
         iDetTreeVersion = 2;
     }
-
+    
     // define tree
     float fFocalLength = 0.;
     float fCameraScaleFactor = 1.;
@@ -233,7 +233,7 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry* iDet, TTree* iTree, boo
     int fTelID = 0;
     int fNMirrors = 0;
     float fMirrorArea = 0.;
-
+    
     iTree->SetBranchAddress( "NTel", &fNTel );
     iTree->SetBranchAddress( "TelID", &fTelID );
     iTree->SetBranchAddress( "TelType", &fTelType );
@@ -288,43 +288,43 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry* iDet, TTree* iTree, boo
     {
         iTree->SetBranchAddress( "MirrorArea", &fMirrorArea );
     }
-
+    
     vector< unsigned int > i_npix;
     for( int i = 0; i < iTree->GetEntries(); i++ )
     {
         iTree->GetEntry( i );
-
+        
         i_npix.push_back( nPixel );
     }
     iDet->addDataVector( fNTel, i_npix );
-
+    
     map< unsigned int, unsigned int > i_telID_matrix;
-
+    
     for( int i = 0; i < iTree->GetEntries(); i++ )
     {
         iTree->GetEntry( i );
-
+        
         i_telID_matrix[( unsigned int )i] = ( unsigned int )fTelID;
-
+        
         iDet->getTelType()[i] = fTelType;
-
+        
         iDet->getTelXpos()[i] = fTelxpos;
         iDet->getTelYpos()[i] = fTelypos;
         iDet->getTelZpos()[i] = fTelzpos;
-
+        
         iDet->getFocalLength()[i] = fFocalLength;
         iDet->getFieldofView()[i] = fFOV;
-
+        
         iDet->getCameraScaleFactor()[i] = fCameraScaleFactor;
         iDet->getCameraCentreOffset()[i] = fCameraCentreOffset;
         iDet->getCameraRotation()[i] = fCameraRotation;
-
+        
         iDet->getNChannels()[i] = nPixel;
         iDet->setNSamples( i, nSamples, true );
         iDet->setLengthOfSampleTimeSlice( i, Sample_time_slice );
         iDet->setLowGainMultiplier_Trace( i, fHiLoScale );
         iDet->setLowGainThreshold( i, ( unsigned int )fHiLoThreshold );
-
+        
         // fudge to be able to read old files with mixup of mirror area and number of mirrors
         if( iDetTreeVersion > 1 )
         {
@@ -336,8 +336,8 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry* iDet, TTree* iTree, boo
             iDet->getNMirrors()[i] = ( unsigned int )fNMirrors;
             iDet->getMirrorArea()[i] = fMirrorArea;
         }
-
-
+        
+        
         for( unsigned int p = 0; p < nPixel; p++ )
         {
             if( p < iDet->getX( i ).size() && p < iDet->getY( i ).size() )
@@ -402,7 +402,7 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry* iDet, TTree* iTree, boo
         }
     }
     iDet->setTelID_matrix( i_telID_matrix );
-
+    
     // rotate and stretch only CTA simulations
     // (VTS sims are already simulated)
     if( bCTA )
@@ -411,10 +411,10 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry* iDet, TTree* iTree, boo
         iDet->rotateCamera();
     }
     iDet->setCameraCentreTubeIndex();
-
+    
     iDet->makeNeighbourList();
-
+    
     cout << "..done (" << fNTel << ")" << endl;
-
+    
     return true;
 }

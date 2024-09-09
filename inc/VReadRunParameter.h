@@ -30,13 +30,13 @@ class VReadRunParameter
         void test_and_adjustParams();             //!< get run number, default camera..
         void printHelp();                         //!< print a short help
         void printShortHelp();
-
+        
         bool f_boolCommandline;                   //!< reading parameters from command line
         bool f_boolConfigfile;                    //!< reading parameters from config file
-
+        
         unsigned int fTelToAna;
         string       fTelToAnaString;
-
+        
         map< unsigned int, double > f_pointingErrorX;
         map< unsigned int, double > f_pointingErrorY;
         double       fWobbleNorth_overwriteDB;
@@ -44,7 +44,7 @@ class VReadRunParameter
         double       fTargetDec_overwriteDB;
         double       fTargetRA_overwriteDB;
         string       fTargetName_overwriteDB;
-
+        
         bool checkSecondArgument( std::string, std::string, bool );
         void isCompiledWithDB();
         bool getRunParametersFromDST();
@@ -53,7 +53,7 @@ class VReadRunParameter
         bool readTraceAmplitudeCorrections( string ifile );
         void setDirectories();
         double setParameterOverwrite( string ipar_name, double ipar_db, double ipar_db_overwrite );
-
+        
     public:
         VReadRunParameter();
         ~VReadRunParameter() {}

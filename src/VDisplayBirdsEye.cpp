@@ -37,7 +37,7 @@ void VDisplayBirdsEye::setNTel( unsigned int iNTel )
     {
         fNTel = 4;
     }
-
+    
     if( fNTel == 2 )
     {
         fFieldX = 350;
@@ -121,14 +121,14 @@ void VDisplayBirdsEye::draw( TPad* iPad )
 void VDisplayBirdsEye::drawEventText()
 {
     char iText [2000];
-
+    
     if( fPlotPaper )
     {
         return;
     }
-
+    
     unsigned int iM = fData->getRunParameter()->fPlotAllInOneMethod;
-
+    
     fTextRec.clear();
     // run and event number:
     sprintf( iText, "Run/Event: %d/%d", fData->getRunNumber(), fData->getEventNumber() );
@@ -160,10 +160,10 @@ void VDisplayBirdsEye::drawEventText()
         i_stext << " " << fData->getShowerParameters()->fTrig_list[i] + 1;
     }
     fTextRec.push_back( new TText( 0.02, 0.06, i_stext.str().c_str() ) );
-
+    
     sprintf( iText, "Ze=%.1f, Az=%.1f, Xoff=%.2f, Yoff=%.2f, Xcore=%.0f, Ycore=%.0f", fData->getShowerParameters()->fShowerZe[iM], fData->getShowerParameters()->fShowerAz[iM], fData->getShowerParameters()->fShower_Xoffset[iM], fData->getShowerParameters()->fShower_Yoffset[iM], fData->getShowerParameters()->fShowerXcore[iM], fData->getShowerParameters()->fShowerYcore[iM] );
     fTextRec.push_back( new TText( 0.02, 0.03, iText ) );
-
+    
     for( unsigned int i = 0; i < fTextRec.size(); i++ )
     {
         fTextRec[i]->SetTextSize( 0.03 );
@@ -182,13 +182,13 @@ void VDisplayBirdsEye::drawTelescopes_with_sizeAxis()
         fElTel[i]->SetY1( convertY( fTelPosY[i] ) );
         fElTel[i]->SetR1( scaleX( fTelRad[i] ) );
         fElTel[i]->SetR2( scaleY( fTelRad[i] ) );
-
+        
         fElTelImage[i]->SetX1( convertX( fTelPosX[i] ) );
         fElTelImage[i]->SetY1( convertY( fTelPosY[i] ) );
         fElTelImage[i]->SetR1( scaleX( fTelRad[i] ) );
         fElTelImage[i]->SetR2( scaleY( fTelRad[i] ) );
     }
-
+    
     // get min/max size or nphotons
     double iMin = 1.e20;
     double iMax = 0.;
@@ -206,7 +206,7 @@ void VDisplayBirdsEye::drawTelescopes_with_sizeAxis()
         }
     }
     setColorAxisDataVector_minmax( iMin * 0.99, iMax * 1.01 );
-
+    
     // fill histogram
     unsigned int i_tel_with_images = 0;
     for( unsigned int i = 0; i < fData->getTeltoAna().size(); i++ )
@@ -222,7 +222,7 @@ void VDisplayBirdsEye::drawTelescopes_with_sizeAxis()
             fElTelImage[i]->SetFillColor( getColorAxisColor( log10( fData->getImageParameters()->size ) ) );
             fElTelImage[i]->SetLineColor( getColorAxisColor( log10( fData->getImageParameters()->size ) ) );
             fElTelImage[i]->Draw();
-
+            
             fElTel[i]->SetFillStyle( 4001 );
             fElTel[i]->SetFillColor( getColorAxisColor( log10( fData->getImageParameters()->size ) ) );
             fElTel[i]->SetLineColor( 1 );
@@ -265,9 +265,9 @@ void VDisplayBirdsEye::drawTelescopes_with_sizeAxis()
             g->Draw();
         }
     }
-
+    
     drawImageLines_and_Corepositions();
-
+    
 }
 
 
@@ -284,7 +284,7 @@ void VDisplayBirdsEye::drawTelescopes()
     {
         cout << "VDisplayBirdsEye::drawTelescopes()" << endl;
     }
-
+    
     ///////////////////////////////
     // now loop over all telescopes
     ///////////////////////////////
@@ -360,7 +360,7 @@ void VDisplayBirdsEye::drawImageLines_and_Corepositions()
             return;
         }
     }
-
+    
     for( unsigned int i = 0; i < fData->getTeltoAna().size(); i++ )
     {
         // image lines
@@ -376,17 +376,17 @@ void VDisplayBirdsEye::drawImageLines_and_Corepositions()
             {
                 i_y *= -1.;
             }
-
+            
             if( i_y < 99998. && i_x < 99998. )
             {
                 double i_cen_x = ( fParameters[i]->cen_x + i_x );
                 double i_cen_y = ( fParameters[i]->cen_y + i_y );
-
+                
                 i_x1 = convertX( fTelPosX[i] + 2.*fFieldX* cos( atan2( fMCSign* i_cen_y, i_cen_x ) ) );
                 i_y1 = convertY( fTelPosY[i] + 2.*fFieldY* sin( atan2( fMCSign* i_cen_y, i_cen_x ) ) );
                 i_x2 = convertX( fTelPosX[i] - 2.*fFieldX* cos( atan2( fMCSign* i_cen_y, i_cen_x ) ) );
                 i_y2 = convertY( fTelPosY[i] - 2.*fFieldY* sin( atan2( fMCSign* i_cen_y, i_cen_x ) ) );
-
+                
                 double xC = convertX( fData->getShowerParameters()->MCxcore_SC );
                 double yC = convertY( fData->getShowerParameters()->MCycore_SC );
                 if( fData->getShowerParameters()->fShowerXcore_SC[iM] > -99998. )
@@ -394,7 +394,7 @@ void VDisplayBirdsEye::drawImageLines_and_Corepositions()
                     xC = convertX( fData->getShowerParameters()->fShowerXcore_SC[iM] );
                     yC = convertY( fData->getShowerParameters()->fShowerYcore_SC[iM] );
                 }
-
+                
                 if(( i_x1 - xC ) * ( i_x1 - xC ) + ( i_y1 - yC ) * ( i_y1 - yC ) > ( i_x2 - xC ) * ( i_x2 - xC ) + ( i_y2 - yC ) * ( i_y2 - yC ) )
                 {
                     i_x1 = convertX( fTelPosX[i] );
@@ -405,7 +405,7 @@ void VDisplayBirdsEye::drawImageLines_and_Corepositions()
                     i_x2 = convertX( fTelPosX[i] );
                     i_y2 = convertY( fTelPosY[i] );
                 }
-
+                
                 // set image line coordinates
                 fLiImage[i]->SetX1( i_x1 );
                 fLiImage[i]->SetX2( i_x2 );
@@ -413,13 +413,13 @@ void VDisplayBirdsEye::drawImageLines_and_Corepositions()
                 fLiImage[i]->SetY2( i_y2 );
                 fLiImage[i]->Draw();
             }
-
+            
         }
         else
         {
             // don't draw anything
         }
-
+        
     }
     // draw MC core position as a black cross
     if( fData->getReader()->isMC() )
@@ -502,7 +502,7 @@ void VDisplayBirdsEye::setGeometry()
     fElTelImage.clear();
     fLiImage.clear();
     fTextTel.clear();
-
+    
     double i_meanX = 0.;
     double i_meanY = 0.;
     double i_meanN = 0.;
@@ -537,7 +537,7 @@ void VDisplayBirdsEye::setGeometry()
     }
     fFieldX = max( fFieldX, fFieldY ) + 350.;
     fFieldY = fFieldX;
-
+    
     char i_text[200];
     for( unsigned int i = 0; i < fData->getTeltoAna().size(); i++ )
     {

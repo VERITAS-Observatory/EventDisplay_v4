@@ -16,7 +16,7 @@ class VDetectorGeometry : public VCameraRead
         vector< unsigned int > fNSamples;
         vector< unsigned int > fNChannels;
         vector< bool >         fSampleWarning;
-
+        
     public:
         VDetectorGeometry() {}
         VDetectorGeometry( unsigned int iNTel, bool iDebug = false );

@@ -17,10 +17,10 @@
 VPedestalLowGain::VPedestalLowGain()
 {
     fDebug = false;
-
+    
     fFile1 = 0;
     fFile2 = 0;
-
+    
     setChannelNumberRange();
     setSummationWindowRange();
     setTelescopeID();
@@ -46,14 +46,14 @@ bool VPedestalLowGain::readLowGainPedestalFiles( string iFile1, string iFile2 )
     {
         return false;
     }
-
+    
     return true;
 }
 
 TFile* VPedestalLowGain::readLowGainHistograms( string iFile, unsigned int iChannel_min, unsigned int iChannel_max )
 {
     char hname[2000];
-
+    
     // read root file
     sprintf( hname, "%s.root", iFile.c_str() );
     TFile* fFile = new TFile( hname );
@@ -70,7 +70,7 @@ TFile* VPedestalLowGain::readLowGainHistograms( string iFile, unsigned int iChan
         return fFile;
     }
     cout << "reading " << iFile << " (telescope ID " <<  fTelescopeID << ")" << endl;
-
+    
     for( unsigned int i = iChannel_min; i <= iChannel_max; i++ )
     {
         for( unsigned int s = fSumWindow_min; s <= fSumWindow_max; s++ )
@@ -87,7 +87,7 @@ TFile* VPedestalLowGain::readLowGainHistograms( string iFile, unsigned int iChan
             }
         }
     }
-
+    
     // read text file
     sprintf( hname, "%s", iFile.c_str() );
     ifstream is;
@@ -98,36 +98,36 @@ TFile* VPedestalLowGain::readLowGainHistograms( string iFile, unsigned int iChan
     }
     string is_line;
     unsigned int iTemp;
-
+    
     while( getline( is, is_line ) )
     {
         if( is_line.size() == 0 )
         {
             continue;
         }
-
+        
         istringstream is_stream( is_line );
-
+        
         is_stream >> iTemp;
         if( iTemp != fTelescopeID - 1 )
         {
             continue;
         }
-
+        
         is_stream >> iTemp;
         if( iTemp >= iChannel_min && iTemp <= iChannel_max )
         {
             fPedLine.push_back( is_line );
         }
     }
-
+    
     return fFile;
 }
 
 bool VPedestalLowGain::writeLowGainPedestalFile( string iOutFileName )
 {
     char hname[2000];
-
+    
     // write root file
     sprintf( hname, "%s.root", iOutFileName.c_str() );
     TFile iF( hname, "RECREATE" );
@@ -138,7 +138,7 @@ bool VPedestalLowGain::writeLowGainPedestalFile( string iOutFileName )
     }
     cout << "writing root file: " << hname << endl;
     iF.mkdir( "distributions" )->cd();
-
+    
     for( unsigned int i = 0; i < fHped.size(); i++ )
     {
         if( fHped[i] )
@@ -146,9 +146,9 @@ bool VPedestalLowGain::writeLowGainPedestalFile( string iOutFileName )
             fHped[i]->Write();
         }
     }
-
+    
     iF.Close();
-
+    
     // write text file
     sprintf( hname, "%s", iOutFileName.c_str() );
     ofstream is;
@@ -163,7 +163,7 @@ bool VPedestalLowGain::writeLowGainPedestalFile( string iOutFileName )
         is << fPedLine[i] << endl;
     }
     is.close();
-
+    
     return true;
 }
 
@@ -185,19 +185,19 @@ bool VPedestalLowGain::combineLowGainPedestalFileForAllTelescopes( unsigned int 
 {
     char hname1[2000];
     char hname2[2000];
-
+    
     for( unsigned int i = 0; i < iNTel; i++ )
     {
         reset();
         setTelescopeID( i + 1 );
-
+        
         sprintf( hname1, "%s/Tel_%d/%s.lped", iCalibrationDirectory.c_str(), i + 1, iRun1.c_str() );
         sprintf( hname2, "%s/Tel_%d/%s.lped", iCalibrationDirectory.c_str(), i + 1, iRun2.c_str() );
         readLowGainPedestalFiles( hname1, hname2 );
-
+        
         sprintf( hname1, "%s/Tel_%d/%s.lped", iCalibrationDirectory.c_str(), i + 1, iOutRun.c_str() );
         writeLowGainPedestalFile( hname1 );
-
+        
     }
     return true;
 }
@@ -208,7 +208,7 @@ bool VPedestalLowGain::readPedestalFiles( string iFile1, string iFile2 )
 {
     fPed1 = readPedestalFiles( iFile1 );
     fPed2 = readPedestalFiles( iFile2 );
-
+    
     return true;
 }
 
@@ -216,7 +216,7 @@ bool VPedestalLowGain::readPedestalFiles( string iFile1, string iFile2 )
 vector< double > VPedestalLowGain::readPedestalFiles( string iFile )
 {
     vector< double > iPed;
-
+    
     // read text file
     ifstream is;
     is.open( iFile.c_str(), ifstream::in );
@@ -228,25 +228,25 @@ vector< double > VPedestalLowGain::readPedestalFiles( string iFile )
     string is_line;
     unsigned int iTemp = 0;
     double iTempD = 0.;
-
+    
     while( getline( is, is_line ) )
     {
         if( is_line.size() == 0 )
         {
             continue;
         }
-
+        
         istringstream is_stream( is_line );
-
+        
         is_stream >> iTemp;
-
+        
         is_stream >> iTemp;
-
+        
         is_stream >> iTempD;
-
+        
         iPed.push_back( iTempD );
     }
-
+    
     cout << "Found " << iPed.size() << " pedestals in file " << iFile << endl;
     return iPed;
 }
@@ -259,7 +259,7 @@ void VPedestalLowGain::printDifferences( double iTolerance )
         cout << "\t" << fPed1.size() << "\t" << fPed2.size() << endl;
         return;
     }
-
+    
     for( unsigned int i = 0; i < fPed1.size(); i++ )
     {
         if( TMath::Abs( fPed1[i] - fPed2[i] ) > iTolerance )
@@ -267,5 +267,5 @@ void VPedestalLowGain::printDifferences( double iTolerance )
             cout << "difference > tolerance for channel " << i << " (" << fPed1[i] << ", " << fPed2[i] << ")" << endl;
         }
     }
-
+    
 }

@@ -12,17 +12,17 @@ using namespace std;
 class VTMVARunDataZenithCut : public TNamed
 {
     public:
-
+    
         unsigned int fZenithCutBin;
         double       fZenithCut_min;
         double       fZenithCut_max;
         TCut         fZenithCut;
-
+        
         VTMVARunDataZenithCut();
         ~VTMVARunDataZenithCut() {}
-
+        
         void print();
-
+        
         ClassDef( VTMVARunDataZenithCut, 2 );
 };
 

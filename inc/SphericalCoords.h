@@ -36,11 +36,11 @@ namespace SEphem
             {
                 rationalize();
             }
-
+            
             // ----------------------------------------------------------------------
             // Getters
             // ----------------------------------------------------------------------
-
+            
             const Angle& theta() const
             {
                 return m_theta;
@@ -49,7 +49,7 @@ namespace SEphem
             {
                 return m_phi;
             }
-
+            
             double thetaRad() const
             {
                 return m_theta.rad();
@@ -78,7 +78,7 @@ namespace SEphem
             {
                 return m_phi.hrs();
             }
-
+            
             Angle latitude() const
             {
                 return m_theta.coAngle();
@@ -87,7 +87,7 @@ namespace SEphem
             {
                 return phi();
             }
-
+            
             double latitudeRad() const
             {
                 return m_theta.coAngleRadPM180();
@@ -112,12 +112,12 @@ namespace SEphem
             {
                 return phiRot();
             }
-
+            
             bool isPole() const
             {
                 return(( m_theta == 0 ) || ( m_theta == Angle::sc_Pi ) );
             }
-
+            
             double z() const
             {
                 return cos( m_theta );
@@ -131,7 +131,7 @@ namespace SEphem
                 return sin( m_theta ) * sin( m_phi );
             }
             void cartesian( double& x, double& y, double& z ) const;
-
+            
             Angle separation( const SphericalCoords& c ) const;
             Angle directionTo( const SphericalCoords& c ) const;
             Angle directionFrom( const SphericalCoords& c ) const;
@@ -139,11 +139,11 @@ namespace SEphem
             Angle compassDirectionFrom( const SphericalCoords& c ) const;
             void separationAndDirectionTo( const SphericalCoords& c,
                                            Angle& s, Angle& d ) const;
-
+                                           
             // ----------------------------------------------------------------------
             // Setters
             // ----------------------------------------------------------------------
-
+            
             void set( const Angle& theta, const Angle& phi )
             {
                 m_theta = theta;
@@ -194,11 +194,11 @@ namespace SEphem
             {
                 setDeg( 90 - latitude, longitude );
             }
-
+            
             // ----------------------------------------------------------------------
             // Operations
             // ----------------------------------------------------------------------
-
+            
             void rotate( const Angle& phi, const Angle& theta, const Angle& psi )
             {
                 rotateRad( phi, theta, psi );
@@ -207,7 +207,7 @@ namespace SEphem
             {
                 rotateRad( thetaPhi.phi(), thetaPhi.theta(), psi );
             }
-
+            
             void rotateRad( double phi, double theta, double psi );
             void rotateDeg( double phi, double theta, double psi )
             {
@@ -217,36 +217,36 @@ namespace SEphem
             {
                 rotateRad( Angle::frRot( phi ), Angle::frRot( theta ), Angle::frRot( psi ) );
             }
-
+            
             // ----------------------------------------------------------------------
             // Wobble
             // ----------------------------------------------------------------------
-
+            
             inline void wobble( const double theta_rad, const double phi_rad );
             inline bool wobble_inv( const double theta_rad, const double phi_rad,
                                     const double tol_rad = 1e-11 );
-
+                                    
             // ----------------------------------------------------------------------
             // Static functions and constants
             // ----------------------------------------------------------------------
-
+            
             static SphericalCoords make( Angle theta, Angle phi );
             static SphericalCoords makeRad( double theta, double phi );
             static SphericalCoords makeDeg( double theta, double phi );
             static SphericalCoords makeRot( double theta, double phi );
-
+            
             static SphericalCoords makeLatLong( Angle latitude, Angle longitude );
             static SphericalCoords makeLatLongRad( double latitude, double longitude );
             static SphericalCoords makeLatLongDeg( double latitude, double longitude );
             static SphericalCoords makeLatLongRot( double latitude, double longitude );
-
+            
         private:
             void rationalize();
-
+            
             Angle m_theta;
             Angle m_phi;
     };                                            // SphericalCoords
-
+    
     inline void SphericalCoords::rationalize()
     {
         if( m_theta.rad() > Angle::sc_Pi )
@@ -255,7 +255,7 @@ namespace SEphem
             m_phi.rotate( Angle::sc_Pi );
         }
     }
-
+    
     inline void SphericalCoords::rotateRad( double phi, double theta, double psi )
     {
         m_phi.rotateRad( psi );
@@ -271,7 +271,7 @@ namespace SEphem
         set( atan2( sqrt( y* y + xx* xx ), zz ), atan2( y, xx ) );
         m_phi.rotateRad( phi );
     }
-
+    
     inline Angle
     SphericalCoords::separation( const SphericalCoords& c ) const
     {
@@ -296,7 +296,7 @@ namespace SEphem
         return atan2( sqrt( x* x + y* y ), z );
 #endif
     }
-
+    
     inline Angle
     SphericalCoords::directionTo( const SphericalCoords& c ) const
     {
@@ -316,7 +316,7 @@ namespace SEphem
         double costh2 = cos( m_theta );
         return atan2(-sinth1* costh2* cosdphi + costh1* sinth2, sinth1* sindphi );
     }
-
+    
     inline void
     SphericalCoords::separationAndDirectionTo( const SphericalCoords& c,
             Angle& s, Angle& d ) const
@@ -341,25 +341,25 @@ namespace SEphem
         s = atan2( sqrt( x* x + y* y ), z );
         d = atan2( x, y );
     }
-
+    
     inline Angle
     SphericalCoords::directionFrom( const SphericalCoords& c ) const
     {
         return c.directionTo(*this );
     }
-
+    
     inline Angle
     SphericalCoords::compassDirectionTo( const SphericalCoords& c ) const
     {
         return directionTo( c ).coAngleRad();
     }
-
+    
     inline Angle
     SphericalCoords::compassDirectionFrom( const SphericalCoords& c ) const
     {
         return directionFrom( c ).coAngleRad();
     }
-
+    
     inline void
     SphericalCoords::cartesian( double& x, double& y, double& z ) const
     {
@@ -368,7 +368,7 @@ namespace SEphem
         x = rho * cos( m_phi );
         y = rho * sin( m_phi );
     }
-
+    
     inline void
     SphericalCoords::wobble( const double theta_rad, const double phi_rad )
     {
@@ -376,17 +376,17 @@ namespace SEphem
         c.rotate( phi(), theta(), 0 );
         *this = c;
     }
-
+    
     inline bool
     SphericalCoords::wobble_inv( const double theta_rad, const double phi_rad,
                                  const double tol_rad )
     {
         SphericalCoords c_test( theta_rad, -phi_rad );
         c_test.rotateRad( phiRad(), thetaRad(), 0 );
-
+        
         SphericalCoords c_test_wob( theta_rad, Angle::sc_Pi - phi_rad );
         c_test_wob.rotateRad( c_test.phiRad(), c_test.thetaRad(), 0 );
-
+        
         unsigned nrounds = 50;
         while( separation( c_test_wob ).rad() > tol_rad )
         {
@@ -394,15 +394,15 @@ namespace SEphem
             {
                 return false;
             }
-
+            
             c_test_wob.rotateRad( 0, -thetaRad(), -phiRad() );
             c_test_wob.rotateRad( c_test.phiRad(), c_test.thetaRad(), M_PI );
-
+            
             c_test = c_test_wob;
-
+            
             c_test_wob.setRad( theta_rad, Angle::sc_Pi - phi_rad );
             c_test_wob.rotateRad( c_test.phiRad(), c_test.thetaRad(), 0 );
-
+            
 #if 0
             std::cout << phi().hmsString( 4 ) << ' '
                       << latitude().dmsString( 4 ) << ' '
@@ -412,61 +412,61 @@ namespace SEphem
                       << c_test_wob.latitude().dmsString( 4 ) << '\n';
 #endif
         }
-
+        
         *this = c_test;
         return true;
     }
-
+    
     inline SphericalCoords SphericalCoords::make( Angle theta, Angle phi )
     {
         return SphericalCoords( theta, phi );
     }
-
+    
     inline SphericalCoords
     SphericalCoords::makeRad( double theta, double phi )
     {
         return SphericalCoords( Angle::makeRad( theta ), Angle::makeRad( phi ) );
     }
-
+    
     inline SphericalCoords
     SphericalCoords::makeDeg( double theta, double phi )
     {
         return SphericalCoords( Angle::makeDeg( theta ), Angle::makeDeg( phi ) );
     }
-
+    
     inline SphericalCoords
     SphericalCoords::makeRot( double theta, double phi )
     {
         return SphericalCoords( Angle::makeRot( theta ), Angle::makeRot( phi ) );
     }
-
+    
     inline SphericalCoords
     SphericalCoords::makeLatLong( Angle latitude, Angle longitude )
     {
         return SphericalCoords( Angle::makeCoAngleRad( latitude ),
                                 Angle::makeRad( longitude ) );
     }
-
+    
     inline SphericalCoords
     SphericalCoords::makeLatLongRad( double latitude, double longitude )
     {
         return SphericalCoords( Angle::makeCoAngleRad( latitude ),
                                 Angle::makeRad( longitude ) );
     }
-
+    
     inline SphericalCoords
     SphericalCoords::makeLatLongDeg( double latitude, double longitude )
     {
         return SphericalCoords( Angle::makeCoAngleDeg( latitude ),
                                 Angle::makeDeg( longitude ) );
     }
-
+    
     inline SphericalCoords
     SphericalCoords::makeLatLongRot( double latitude, double longitude )
     {
         return SphericalCoords( Angle::makeCoAngleRot( latitude ),
                                 Angle::makeRot( longitude ) );
     }
-
+    
 }                                                 // namespace SEphem
 #endif                                            // SEPHEM_SPHERICALCOORDS_H

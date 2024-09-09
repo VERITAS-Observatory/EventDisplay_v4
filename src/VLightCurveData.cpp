@@ -10,15 +10,15 @@ VLightCurveData::VLightCurveData( string iName )
 {
     fName = iName;
     fDataFileName = "";
-
+    
     bIsZombie = false;
-
+    
     fMJD_min = 0.;
     fMJD_max = 0.;
-
+    
     fEnergy_min_TeV = 0.;
     fEnergy_max_TeV = -1.;
-
+    
     fMJD_Data_min = 0.;
     fMJD_Data_max = 0.;
     fPhase_Data_min = 0.;
@@ -43,18 +43,18 @@ VLightCurveData::VLightCurveData( string iName )
 VLightCurveData::VLightCurveData( const VLightCurveData& p )
 {
     bIsZombie = p.bIsZombie;
-
+    
     fName = p.fName;
     fDataFileName = p.fDataFileName;
-
+    
     fRunList = p.fRunList;
-
+    
     fMJD_min = p.fMJD_min;
     fMJD_max = p.fMJD_max;
-
+    
     fEnergy_min_TeV = p.fEnergy_min_TeV;
     fEnergy_max_TeV = p.fEnergy_max_TeV;
-
+    
     fMJD_Data_min = p.fMJD_Data_min;
     fMJD_Data_max = p.fMJD_Data_max;
     fPhase_Data_min = p.fPhase_Data_min;
@@ -74,7 +74,7 @@ VLightCurveData::VLightCurveData( const VLightCurveData& p )
     fRunFluxCI_lo_3sigma = p.fRunFluxCI_lo_3sigma;
     fRunFluxCI_up_3sigma = p.fRunFluxCI_up_3sigma;
     fFluxState = p.fFluxState;
-
+    
 }
 
 void VLightCurveData::setFluxCalculationEnergyInterval( double iEMin, double iEMax )
@@ -92,7 +92,7 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
         int iUpperlimitMethod, int iLiMaEqu, double iMinEnergy, double E0, double alpha, bool i_bRolke )
 {
     fDataFileName = iAnaSumFile;
-
+    
     VFluxCalculation fFluxCalculation( fDataFileName, 1, 0, 1000000, fMJD_min, fMJD_max, false );
     if( fFluxCalculation.IsZombie() )
     {
@@ -113,8 +113,8 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
     {
         fFluxCalculation.setSpectralParameters( iMinEnergy, E0, alpha );
     }
-
-
+    
+    
     // reset min/max values
     double iMJDMin = 1.e10;
     double iMJDMax = -1.;
@@ -135,9 +135,9 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
     }
     fMJD_Data_min = iMJDMin;
     fMJD_Data_max = iMJDMax;
-
+    
     fFluxCalculation.calculateIntegralFlux( fEnergy_min_TeV );
-
+    
     fRunList  = fFluxCalculation.getRunList();
     fNon      = fFluxCalculation.getNOn(-1 );
     fNoff     = fFluxCalculation.getNOff(-1 );
@@ -145,7 +145,7 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
     fRunTime  = fFluxCalculation.getRunTime(-1 );
     fRunElevation = fFluxCalculation.getRunElevation(-1 );
     fSignificance = fFluxCalculation.getSignificance(-1 );
-
+    
     //////////////////////////////////////
     // get fluxes and errors
     double iFluxError = 0;
@@ -161,7 +161,7 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
     }
     fFluxCalculation.getFluxConfidenceInterval(-1, fRunFluxCI_lo_1sigma, fRunFluxCI_up_1sigma, true );
     fFluxCalculation.getFluxConfidenceInterval(-1, fRunFluxCI_lo_3sigma, fRunFluxCI_up_3sigma, false );
-
+    
     if( fEnergy_max_TeV > 0. )
     {
         fFluxCalculation.calculateIntegralFlux( fEnergy_max_TeV );
@@ -175,7 +175,7 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
             setFluxError( sqrt( getFluxError()*getFluxError() + iFluxE* iFluxE ) );
         }
     }
-
+    
     return true;
 }
 
@@ -193,7 +193,7 @@ double VLightCurveData::getFluxError()
     {
         return fFluxErrorDown;
     }
-
+    
     return 0.;
 }
 

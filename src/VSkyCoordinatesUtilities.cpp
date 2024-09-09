@@ -16,8 +16,8 @@ int VSkyCoordinatesUtilities::getMJD_from_SQLstring( string iSQLData, double& i_
     int i_year  = atoi( iSQLData.substr( 0, 4 ).c_str() );
     int i_month = atoi( iSQLData.substr( 5, 2 ).c_str() );
     int i_day   = atoi( iSQLData.substr( 8, 2 ).c_str() );
-
-
+    
+    
     // MJD
     int i_stat = 0;
     if( i_year > 0 )
@@ -35,7 +35,7 @@ int VSkyCoordinatesUtilities::getMJD_from_SQLstring( string iSQLData, double& i_
         sec_of_day += atof( iSQLData.substr( 14, 2 ).c_str() ) * 60.;
         sec_of_day += atof( iSQLData.substr( 17, 2 ).c_str() );
     }
-
+    
     return i_stat;
 }
 
@@ -51,7 +51,7 @@ string VSkyCoordinatesUtilities::getSQLstring_fromMJD( double MJD )
     iSQL << year << "-";
     iSQL << setfill( '0' ) << setw( 2 ) << month << "-";
     iSQL << setfill( '0' ) << setw( 2 ) << day;
-
+    
     return iSQL.str();
 }
 
@@ -60,7 +60,7 @@ double VSkyCoordinatesUtilities::getMJD( int i_year, int i_month, int i_day )
     double i_mjd = 0.;
     int i_stat = 0;
     VAstronometry::vlaCldj( i_year, i_month, i_day, &i_mjd, &i_stat );
-
+    
     return i_mjd;
 }
 
@@ -95,7 +95,7 @@ void VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( double iNorth, double i
 {
     idec *= TMath::DegToRad();
     ira  *= TMath::DegToRad();
-
+    
     double x = 0.;
     double y = 0.;
     double z = 1.;
@@ -105,7 +105,7 @@ void VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( double iNorth, double i
     {
         phi_rad += TMath::TwoPi();
     }
-
+    
     VSkyCoordinatesUtilities::rotate(-theta_rad, z, x );
     VSkyCoordinatesUtilities::rotate( phi_rad, y, x );
     // declination
@@ -118,7 +118,7 @@ void VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( double iNorth, double i
         idiffra += TMath::TwoPi();
     }
     idiffra *= -1.*TMath::RadToDeg();
-
+    
     if( TMath::Abs( idiffra ) < 1.e-9 )
     {
         idiffra  = 0.;
@@ -140,7 +140,7 @@ void VSkyCoordinatesUtilities::getWobbledDirection( double iNorth, double iEast,
 {
     dec_W = idec * TMath::DegToRad();
     ra_W  = ira * TMath::DegToRad();
-
+    
     double x = 0.;
     double y = 0.;
     double z = 1.;
@@ -150,7 +150,7 @@ void VSkyCoordinatesUtilities::getWobbledDirection( double iNorth, double iEast,
     {
         phi_rad += TMath::TwoPi();
     }
-
+    
     VSkyCoordinatesUtilities::rotate(-theta_rad, z, x );
     VSkyCoordinatesUtilities::rotate( phi_rad, y, x );
     VSkyCoordinatesUtilities::rotate( TMath::PiOver2() - dec_W, z, x );
@@ -161,7 +161,7 @@ void VSkyCoordinatesUtilities::getWobbledDirection( double iNorth, double iEast,
         ra_W += TMath::TwoPi();
     }
     dec_W = atan2( z, sqrt( x* x + y* y ) );
-
+    
     dec_W *= TMath::RadToDeg();
     ra_W  *= TMath::RadToDeg();
 }
@@ -181,9 +181,9 @@ void VSkyCoordinatesUtilities::precessTarget( double iMJD_end, double& ra_rad, d
         ra_rad *= TMath::DegToRad();
         dec_rad *= TMath::DegToRad();
     }
-
+    
     VAstronometry::vlaPreces( iMJD_start, iMJD_end, &ra_rad, &dec_rad );
-
+    
     if( iUnitIsDeg )
     {
         ra_rad *= TMath::RadToDeg();
@@ -206,7 +206,7 @@ double VSkyCoordinatesUtilities::addToMeanAzimuth( double iMean, double iAz )
     {
         iMean += iAz;
     }
-
+    
     return iMean;
 }
 
@@ -225,18 +225,18 @@ void VSkyCoordinatesUtilities::getDifferenceInCameraCoordinates( double tel_ze, 
     shower_az /= TMath::RadToDeg();
     double tel_el    = ( 90. - tel_ze ) / TMath::RadToDeg();
     double shower_el = ( 90. - shower_ze ) / TMath::RadToDeg();
-
+    
     double cx = cos( shower_el ) * sin( shower_az );
     double cy = cos( shower_el ) * cos( shower_az );
     double cz = sin( shower_el );
-
+    
     double i_temp = sin( tel_az ) * cx + cos( tel_az ) * cy;
-
+    
     x = ( cos( tel_az ) * cx - sin( tel_az ) * cy ) * TMath::RadToDeg();
     z = ( cos( tel_el ) * i_temp + sin( tel_el ) * cz );
     y = (-1.*sin( tel_el ) * i_temp + cos( tel_el ) * cz ) * TMath::RadToDeg();
     y *= -1.;
-
+    
     if( fabs( x ) < 1.e-4 )
     {
         x = 0.;
@@ -266,12 +266,12 @@ void VSkyCoordinatesUtilities::getRotatedShowerDirection( double ze, double az, 
     double el = ( 90. - ze ) / TMath::RadToDeg();
     az = az / TMath::RadToDeg();
     // these are the resulting directions
-
+    
     double r = sqrt( 1. + x* x + y* y );
     double cx = x / r;
     double cy = 1. / r;
     double cz = y / r;
-
+    
     // rotate telescope around elevation axis
     double ex = cx;
     double ey = cy * cos( el ) - cz * sin( el );
@@ -300,7 +300,7 @@ void VSkyCoordinatesUtilities::getRotatedShowerDirection( double ze, double az, 
     {
         rz = 0.;
     }
-
+    
     if( r == 0. )
     {
         raz = az * TMath::RadToDeg();
@@ -344,14 +344,14 @@ double VSkyCoordinatesUtilities::getTargetShiftWest( double iTargetRA_deg, doubl
                                           ira_deg* TMath::DegToRad(), idec_deg* TMath::DegToRad() );
     double bear = VAstronometry::vlaDbear( iTargetRA_deg* TMath::DegToRad(), iTargetDec_deg* TMath::DegToRad(),
                                            ira_deg* TMath::DegToRad(), idec_deg* TMath::DegToRad() );
-
+                                           
     double iShift = sep * sin( bear ) * TMath::RadToDeg();
-
+    
     if( TMath::Abs( iShift ) < 1.e-8 )
     {
         iShift = 0.;
     }
-
+    
     return iShift;
 }
 
@@ -362,14 +362,14 @@ double VSkyCoordinatesUtilities::getTargetShiftNorth( double iTargetRA_deg, doub
                                           ira_deg* TMath::DegToRad(), idec_deg* TMath::DegToRad() );
     double bear = VAstronometry::vlaDbear( iTargetRA_deg* TMath::DegToRad(), iTargetDec_deg* TMath::DegToRad(),
                                            ira_deg* TMath::DegToRad(), idec_deg* TMath::DegToRad() );
-
+                                           
     double iShift = sep * cos( bear ) * TMath::RadToDeg();
-
+    
     if( TMath::Abs( iShift ) < 1.e-8 )
     {
         iShift = 0.;
     }
-
+    
     return iShift;
 }
 
@@ -385,7 +385,7 @@ void VSkyCoordinatesUtilities::convert_derotatedCoordinates_to_J2000( double iMJ
     double i_ra = i_RA_J2000_deg * TMath::DegToRad();
     double i_dec = i_DEC_J2000_deg * TMath::DegToRad();
     precessTarget( iMJD, i_ra, i_dec );
-
+    
     // calculate wobble offset in ra/dec for current epoch
     double i_decDiff = 0.;
     double i_raDiff = 0.;
@@ -396,7 +396,7 @@ void VSkyCoordinatesUtilities::convert_derotatedCoordinates_to_J2000( double iMJ
     }
     double i_decWobble = i_dec * TMath::RadToDeg() + i_decDiff;
     double i_raWobble  = i_ra * TMath::RadToDeg()  + i_raDiff;
-
+    
     // correct for precession (from current epoch to J2000=MJD51544)
     precessTarget( 51544., i_raWobble, i_decWobble, iMJD, true );
     x = getTargetShiftWest( i_RA_J2000_deg, i_DEC_J2000_deg, i_raWobble, i_decWobble ) * -1.;
@@ -414,7 +414,7 @@ void VSkyCoordinatesUtilities::convert_derotatedCoordinates_to_J2000( double iMJ
 double VSkyCoordinatesUtilities::angularDistance( double Az, double Ze, double Traz, double Trze )
 {
     double value;
-
+    
     value  = sin( Ze ) * sin( Trze ) * cos(( Az - Traz ) );
     value += cos( Ze ) * cos( Trze );
     // limited accuracy results sometimes in values slightly larger than 1
@@ -424,7 +424,7 @@ double VSkyCoordinatesUtilities::angularDistance( double Az, double Ze, double T
     }
     value = acos( value );
     value *= TMath::RadToDeg();
-
+    
     return value;
 }
 

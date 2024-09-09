@@ -16,24 +16,24 @@ using namespace std;
 class VSpecialChannel
 {
     private:
-
+    
         bool  fDebug;
         bool  fIsZombie;               // state of this class: was reading of data file successful?
-
+        
         unsigned int fTelID;           // telescope identifier
         string fSpecialChannelFile;    // file name
-
+        
         vector< unsigned int >      fFADCstopTrigChannelID;      // L2 channels fed into the FADCs crates
         map< unsigned int, double > fHIGHQE_gainfactor;          // relative gain of HIGHQE channels to ordinary channels
         map< unsigned int, unsigned int > fChannelStatus;              // channel status (0 for switched off)
-
-
+        
+        
     public:
-
+    
         VSpecialChannel() {}
         VSpecialChannel( unsigned int iTelID );      // telescope ID: T1=0
         ~VSpecialChannel() {}
-
+        
         unsigned int            getTelID()
         {
             return fTelID;

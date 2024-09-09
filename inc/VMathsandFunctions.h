@@ -13,19 +13,19 @@ using namespace std;
 class VDouble_gauss : public VAnalysisUtilities, public VPlotUtilities
 {
     public:
-
+    
         double operator()( double* x, double* par );
-
+        
         ClassDef( VDouble_gauss, 1 );
-
+        
 };
 
 class VFun_gauss : public VAnalysisUtilities, public VPlotUtilities
 {
     public:
-
+    
         double operator()( double* x, double* par );
-
+        
         ClassDef( VFun_gauss, 1 );
 };
 

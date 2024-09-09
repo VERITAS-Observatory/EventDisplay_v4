@@ -16,24 +16,24 @@ using namespace std;
 class VArrayPointing : public VSkyCoordinates
 {
     private:
-
+    
         TTree* fPointingTree;
-
+        
         // smaller version of fPointingTree
         // contains pointing info at 1/second, instead of 1/event
         // pointing is from interpolated
         TTree* fPntReduced;
-
+        
         void initializePointingTree();
-
+        
     public:
-
+    
         VArrayPointing( bool bInitTree = true );
         ~VArrayPointing() {}
         void fillPointingTree();
         void fillPntReduced();
         void terminate( bool iDebug_IO = false );
-
+        
 };
 
 #endif

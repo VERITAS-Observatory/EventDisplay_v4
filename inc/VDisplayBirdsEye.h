@@ -34,7 +34,7 @@ class VDisplayBirdsEye : public VGrIsuAnalyzer, public VPlotUtilities
         vector<double> fTelPosX;
         vector<double> fTelPosY;
         vector<double> fTelRad;
-
+        
         vector< TEllipse* > fElTel;
         vector< TEllipse* > fElTelImage;
         vector< TMarker* > fMarkerCore;
@@ -44,12 +44,12 @@ class VDisplayBirdsEye : public VGrIsuAnalyzer, public VPlotUtilities
         vector< TLine* > fLiImage;
         vector< TText* > fTextTel;
         vector< TText* > fTextRec;
-
+        
         VEvndispData* fData;
         vector< VImageParameter* > fParameters;
-
+        
         bool fPlotPaper;
-
+        
         double convertX( double );
         double convertY( double );
         double scaleX( double a, double iCentre = 0. );
@@ -60,9 +60,9 @@ class VDisplayBirdsEye : public VGrIsuAnalyzer, public VPlotUtilities
         void drawTelescopes();
         void drawTelescopes_with_sizeAxis();
         void setGeometry();
-
+        
     public:
-
+    
         VDisplayBirdsEye();
         ~VDisplayBirdsEye() {}
         void draw( TPad* );

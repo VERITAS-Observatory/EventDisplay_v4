@@ -60,23 +60,23 @@ int main( int argc, char* argv[] )
             exit( EXIT_SUCCESS );
         }
     }
-
+    
     ///////////////////////////////////////////
     // use VAnaSumRunParameter to read run lists and list of
     // exclusion regions
     VAnaSumRunParameter* fRunPara = new VAnaSumRunParameter();
-
+    
     ///////////////////////////////////////////
     // print general stuff and version numbers
     cout << endl;
     cout << "makeRadialAcceptance (" << fRunPara->getEVNDISP_VERSION() << ")" << endl << endl;
     cout << "determine radial acceptance from off events (after cuts)" << endl;
     cout << endl;
-
+    
     ///////////////////////////////////////////
     // read options from command line
     parseOptions( argc, argv );
-
+    
     ///////////////////////////////////////////
     //find telescopes to analyse
     for( unsigned int i = 0; i < teltoanastring.length(); i++ )
@@ -84,7 +84,7 @@ int main( int argc, char* argv[] )
         string i_tel = teltoanastring.substr( i, 1 );
         teltoana.push_back( atoi( i_tel.c_str() ) - 1 );
     }
-
+    
     ///////////////////////////////////////////
     // read file list from run list file
     if( listfilename.size() > 0 )
@@ -97,7 +97,7 @@ int main( int argc, char* argv[] )
         cout << "exiting..";
         exit( EXIT_FAILURE );
     }
-
+    
     // read gamma/hadron cuts from cut file
     VGammaHadronCuts* fCuts = new VGammaHadronCuts();
     fCuts->initialize();
@@ -109,9 +109,9 @@ int main( int argc, char* argv[] )
         cout << "exiting..." << endl;
         exit( EXIT_FAILURE );
     }
-
+    
     cout << "total number of files to read: " << fRunPara->fRunList.size() << endl;
-
+    
     // create output file
     TFile* fo = new TFile( outfile.c_str(), "RECREATE" );
     if( fo->IsZombie() )
@@ -121,10 +121,10 @@ int main( int argc, char* argv[] )
     }
     cout << endl << "open output file for acceptance curves: " << fo->GetName() << endl;
     TDirectory* facc_dir = ( TDirectory* )fo;
-
+    
     // create acceptance object
     VRadialAcceptance* facc = new VRadialAcceptance( fCuts, fRunPara, fMaxDistanceAllowed );
-
+    
     // set facc to write extra histograms if necessary
     if( histdir.size() > 0 )
     {
@@ -140,7 +140,7 @@ int main( int argc, char* argv[] )
             exit( EXIT_FAILURE );
         }
     }
-
+    
     // az dependent radial acceptance curves
     vector< VRadialAcceptance* > facc_az;
     vector< string > fDirName;
@@ -148,7 +148,7 @@ int main( int argc, char* argv[] )
     vector< TDirectory* > facc_az_dir;
     vector< double > iAz_min;
     vector< double > iAz_max;
-
+    
     iAz_min.push_back( 337.5 );
     iAz_max.push_back( 22.5 );
     for( unsigned int i = 1; i < 8; i++ )
@@ -177,7 +177,7 @@ int main( int argc, char* argv[] )
             cout << iAz_min[i] << " < az <= " <<   iAz_max[i] << endl;
         }
     }
-
+    
     //////////////////////////////////////////////////////////////
     // main loop over all runs
     //   - fill radial acceptances per run
@@ -209,7 +209,7 @@ int main( int argc, char* argv[] )
         }
         TTree* c = ( TTree* )fTest.Get( "data" );
         CData* d = new CData( c, false, 5, true );
-
+        
         // Check number of telescopes in run
         VEvndispRunParameter* iParV2 = ( VEvndispRunParameter* )fTest.Get( "runparameterV2" );
         if(!iParV2 )
@@ -239,7 +239,7 @@ int main( int argc, char* argv[] )
             cout << "Ignoring this file" << endl;
             continue;
         }
-
+        
         // set gamma/hadron cuts
         fCuts->setInstrumentEpoch( iParV2->getInstrumentATMString() );
         if(!fCuts->readCuts( cutfilename, 2 ) )
@@ -251,7 +251,7 @@ int main( int argc, char* argv[] )
         fCuts->initializeCuts( fRunPara->fRunList[i].fRunOff, datadir );
         // pointer to data tree
         fCuts->setDataTree( d );
-
+        
         if(!d )
         {
             cout << "makeRadialAcceptance: no data tree defined: run " << fRunPara->fRunList[i].fRunOff << endl;
@@ -263,30 +263,30 @@ int main( int argc, char* argv[] )
         {
             nentries = entries;
         }
-
+        
         cout << "filling acceptance curves with " << nentries << " events (before cuts)" << endl;
-
+        
         if( fCuts )
         {
             fCuts->printCutSummary();
         }
-
+        
         int neventStats = 0;
         int i_entries_after_cuts = 0;
-
+        
         // loop over all entries in data trees and fill acceptance curves
         for( int n = 0; n < nentries; n++ )
         {
             d->GetEntry( n );
-
+            
             // printout for MC
             if( n == 0 and d->isMC() )
             {
                 cout << "\t (analysing MC data)" << endl;
             }
-
+            
             neventStats = facc->fillAcceptanceFromData( d, n );
-
+            
             for( unsigned int a = 0; a < facc_az.size(); a++ )
             {
                 if( facc_az[a] )
@@ -294,7 +294,7 @@ int main( int argc, char* argv[] )
                     facc_az[a]->fillAcceptanceFromData( d, n );
                 }
             }
-
+            
             if( neventStats < 0 )
             {
                 break;
@@ -303,13 +303,13 @@ int main( int argc, char* argv[] )
         }
         cout << "total number of entries after cuts: " << i_entries_after_cuts << endl;
         cout << endl << endl;
-
+        
         fTest.Close();
     }
-
+    
     /////////////////////////////////////////
     // write acceptance files to disk
-
+    
     facc->calculate2DBinNormalizationConstant() ;
     facc->terminate( facc_dir );
     for( unsigned int a = 0; a < facc_az_dir.size(); a++ )
@@ -319,10 +319,10 @@ int main( int argc, char* argv[] )
             facc_az[a]->terminate( facc_az_dir[a] );
         }
     }
-
+    
     fo->Close();
     cout << "closing radial acceptance file: " << fo->GetName() << endl;
-
+    
     cout << "exiting.." << endl;
 }
 

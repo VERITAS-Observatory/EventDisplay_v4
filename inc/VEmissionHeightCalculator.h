@@ -23,24 +23,24 @@ using namespace std;
 class VEmissionHeightCalculator
 {
     private:
-
+    
         bool fDebug;
-
+        
         unsigned int fNTelPairs;
         double fEmissionHeight;
         double fEmissionHeightChi2;
         vector< double > fEmissionHeightT;
-
+        
         unsigned int fNTel;
         vector< double > fTelX;
         vector< double > fTelY;
         vector< double > fTelZ;
-
+        
         double getTelescopeDistanceSC( unsigned int iTel1, unsigned int iTel2, double az, double z );
         double imageDistance( double c1x, double c2x, double c1y, double c2y );
-
+        
     public:
-
+    
         VEmissionHeightCalculator();
         ~VEmissionHeightCalculator();
         double getEmissionHeight( double* cen_x, double* cen_y, double* size, double az, double el );

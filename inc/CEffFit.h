@@ -17,7 +17,7 @@ class cEffFit
     public :
         TTree*          fChain;                   //!pointer to the analyzed TTree or TChain
         Int_t           fCurrent;                 //!current Tree number in a TChain
-
+        
         // Declaration of leave types
         Double_t        Ze;
         Int_t           AMC;
@@ -26,7 +26,7 @@ class cEffFit
         TGraphAsymmErrors* gEffArea;
         Double_t        Fitxmin;
         Double_t        Fitxmax;
-
+        
         // List of branches
         TBranch*        b_Ze;                     //!
         TBranch*        b_AMC;                    //!
@@ -35,7 +35,7 @@ class cEffFit
         TBranch*        b_gEffArea;               //!
         TBranch*        b_Fitxmin;                //!
         TBranch*        b_Fitxmax;                //!
-
+        
         cEffFit( TTree* tree = 0 );
         virtual ~cEffFit();
         virtual Int_t    Cut( Long64_t entry );
@@ -61,7 +61,7 @@ cEffFit::cEffFit( TTree* tree )
             f = new TFile( "EffectiveAreas/effectiveArea_w0.5_ID08_ana12Fit.root" );
         }
         tree = ( TTree* )gDirectory->Get( "EffFit" );
-
+        
     }
     Init( tree );
 }
@@ -123,7 +123,7 @@ void cEffFit::Init( TTree* tree )
     // code, but the routine can be extended by the user if needed.
     // Init() will be called many times when running on PROOF
     // (once per file to be processed).
-
+    
     // Set object pointer
     fEff = 0;
     gEffAreaLog = 0;
@@ -136,7 +136,7 @@ void cEffFit::Init( TTree* tree )
     fChain = tree;
     fCurrent = -1;
     fChain->SetMakeClass( 1 );
-
+    
     fChain->SetBranchAddress( "Ze", &Ze, &b_Ze );
     fChain->SetBranchAddress( "AMC", &AMC, &b_AMC );
     fChain->SetBranchAddress( "fEff", &fEff, &b_fEff );
@@ -155,7 +155,7 @@ Bool_t cEffFit::Notify()
     // is started when using PROOF. It is normally not necessary to make changes
     // to the generated code, but the routine can be extended by the
     // user if needed. The return value is currently not used.
-
+    
     return kTRUE;
 }
 

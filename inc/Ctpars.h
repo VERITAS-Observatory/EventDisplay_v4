@@ -23,7 +23,7 @@ class Ctpars
         unsigned int    bShort;
         TTree*          fChain;                   //!pointer to the analyzed TTree or TChain
         Int_t           fCurrent;                 //!current Tree number in a TChain
-
+        
         // Declaration of leave types
         Int_t           telID;
         Int_t           runNumber;
@@ -93,7 +93,7 @@ class Ctpars
         Int_t           muonValid;
         Int_t           houghMuonValid;
         Int_t           Fitstat;
-
+        
         // List of branches
         TBranch*        b_telID;                  //!
         TBranch*        b_runNumber;              //!
@@ -169,7 +169,7 @@ class Ctpars
         TBranch*        b_muonIPCorrectedSize;
         TBranch*        b_muonValid;
         TBranch*        b_houghMuonValid;
-
+        
         Ctpars( TTree* tree = 0, bool iMC = false, unsigned int iShort = false );
         virtual ~Ctpars();
         virtual Int_t    GetEntry( Long64_t entry );
@@ -217,7 +217,7 @@ Ctpars::Ctpars( TTree* tree, bool iMC, unsigned int iShort )
     // problem: large memory consumption (>12 GB for certain cta arrays)
     //    tree->SetCacheSize(10000000);
     bsdevxy = false;
-
+    
     Init( tree );
 }
 
@@ -354,10 +354,10 @@ void Ctpars::Init( TTree* tree )
         {
             f_sdevxy = 0.;
         }
-
+        
         if( fChain->GetBranchStatus( "fracLow" ) )
         {
-
+        
             fChain->SetBranchAddress( "fracLow", &fracLow );
         }
         else
@@ -396,7 +396,7 @@ void Ctpars::Init( TTree* tree )
         index_of_max[1] = 0;
         index_of_max[2] = 0;
         tchisq_x = 0.;
-
+        
         //muon analysis//
         if( fChain->GetBranchStatus( "muonX0" ) )
         {
@@ -470,7 +470,7 @@ void Ctpars::Init( TTree* tree )
         {
             houghMuonValid = 0;
         }
-
+        
     }
     // bShort == 0: read all branches
     if( bShort == 0 )
@@ -524,7 +524,7 @@ Bool_t Ctpars::Notify()
     b_muonIPCorrectedSize = 0;
     b_muonValid = 0;
     b_houghMuonValid = 0;
-
+    
     // get branch pointers
     if( bShort <= 2 )
     {
@@ -662,7 +662,7 @@ Bool_t Ctpars::Notify()
         b_index_of_max = fChain->GetBranch( "index_of_max" );
         b_tchisq_x = fChain->GetBranch( "tchisq_x" );
     }
-
+    
     return kTRUE;
 }
 

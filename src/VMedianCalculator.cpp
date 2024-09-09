@@ -18,10 +18,10 @@ void VMedianCalculator::reset()
 {
     n_counter = 0.;
     x.clear();
-
+    
     mean_x  = 0.;
     mean_xx = 0.;
-
+    
     for( unsigned int i = 0; i < 3; i++ )
     {
         quantiles[i] = 0.;
@@ -29,7 +29,7 @@ void VMedianCalculator::reset()
     prob[0] = 0.16;
     prob[1] = 0.50;
     prob[2] = 0.84;
-
+    
     setNExact( 100000 );
     setEta();
 }
@@ -41,7 +41,7 @@ void VMedianCalculator::fill( double ivalue )
     {
         x.push_back( ivalue );
     }
-
+    
     ////////////////////////////////////////////////////////////////////////////////
     // median approximation is not accurate enough
     // for larger sets: calculate average
@@ -65,11 +65,11 @@ void VMedianCalculator::fill( double ivalue )
             quantiles[i] += eta * (TMath::Sign( 1., ivalue - quantiles[i] ) + 2. * prob[i] - 1. );
           }
        } */
-
+    
     // mean and rms
     mean_x  += ivalue;
     mean_xx += ivalue * ivalue;
-
+    
     n_counter++;
 }
 
@@ -79,7 +79,7 @@ double VMedianCalculator::getMean()
     {
         return mean_x / (( float )n_counter );
     }
-
+    
     return 0.;
 }
 
@@ -89,7 +89,7 @@ double VMedianCalculator::getRMS()
     {
         return 1. / (( float( n_counter ) - 1. ) * ( mean_xx - mean_x* mean_x ) );
     }
-
+    
     return 0.;
 }
 

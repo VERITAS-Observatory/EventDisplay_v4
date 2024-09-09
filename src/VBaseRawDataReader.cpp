@@ -29,11 +29,11 @@ VBaseRawDataReader::VBaseRawDataReader( string sourcefile, int isourcetype, unsi
     fNoiseFileReader = 0;
     fNoiseFilePedestal = 0;
     fNoiseFileFADCRange = 250;
-
+    
     // additional Gaussian noise
     finjectGaussianNoise = -1.;
     fRandomInjectGaussianNoise = 0;
-
+    
     // source types
     if( isourcetype == 2 )
     {
@@ -69,7 +69,7 @@ bool VBaseRawDataReader::isMC()
     {
         return true;
     }
-
+    
     return false;
 }
 
@@ -173,12 +173,12 @@ uint8_t VBaseRawDataReader::getNewEventType( unsigned int itelID )
     {
         return 0;
     }
-
+    
     if( itelID < fEvent.size() )
     {
         return fEvent[itelID]->getEventType().getBestNewStyleCode();
     }
-
+    
     return 0;
 }
 
@@ -189,7 +189,7 @@ uint8_t VBaseRawDataReader::getEventType()
     {
         return fEvent[fTelID]->getEventType().getBestOldStyleCode();
     }
-
+    
     return 0;
 }
 
@@ -200,7 +200,7 @@ uint8_t VBaseRawDataReader::getNewEventType()
     {
         return fEvent[fTelID]->getEventType().getBestNewStyleCode();
     }
-
+    
     return 0;
 }
 
@@ -252,7 +252,7 @@ bool VBaseRawDataReader::wasLossyCompressed()
         return false;
     }
 #endif
-
+    
     return false;
 }
 
@@ -271,7 +271,7 @@ bool VBaseRawDataReader::getHiLo( uint32_t i )
             return false;
         }
     }
-
+    
     return false;
 }
 
@@ -304,9 +304,9 @@ bool VBaseRawDataReader::initThroughputCorrection( double iMCPed,
         cout << fTraceAmplitudeCorrectionG.size() << ", " << fNTel << ")" << endl;
         return false;
     }
-
+    
     fNoiseFilePedestal = ( uint8_t )iMCPed;
-
+    
     return true;
 }
 
@@ -320,7 +320,7 @@ bool VBaseRawDataReader::initThroughputCorrection( double iMCPed,
 void VBaseRawDataReader::injectGaussianNoise( double injectGaussianNoise,  UInt_t seed )
 {
     finjectGaussianNoise = injectGaussianNoise;
-
+    
     if(!fRandomInjectGaussianNoise )
     {
         fRandomInjectGaussianNoise = new TRandom3( seed );
@@ -340,7 +340,7 @@ bool VBaseRawDataReader::initTraceNoiseGenerator( unsigned int iType, string iT,
     {
         fNoiseFileFADCRange = ( uint8_t )iD->getFADCRange();
     }
-
+    
     // preliminary: use value from Telescope 1 for all telescopes
     double iCorrection = 1.;
     if( iFADCCorrect.size() > 0 && iFADCCorrect[0] > 0. )
@@ -353,19 +353,19 @@ bool VBaseRawDataReader::initTraceNoiseGenerator( unsigned int iType, string iT,
     }
     bool iB = fNoiseFileReader->init( iD, iD->getNumTelescopes(), iSW, iDebug, iseed, iCorrection );
     fNoiseFileReader->setDefaultGrisuPed( iDefaultPed );
-
+    
     return iB;
 }
 
 bool VBaseRawDataReader::isZeroSuppressed( unsigned int channel )
 {
     pair< bool, uint32_t > i_hitIndexPair = getChannelHitIndex( channel );
-
+    
     if(!i_hitIndexPair.first )
     {
         return true;
     }
-
+    
     return false;
 }
 
@@ -385,7 +385,7 @@ uint8_t VBaseRawDataReader::getSample( unsigned channel, unsigned sample, bool i
         cout << "VBaseRawDataReader::getSample error: failed for channel " << channel << " and sample " << sample << endl;
         return 0;
     }
-
+    
     // add noise from external noise library to traces
     // (e.g. VTS grisu MC are simulated without noise, noise is added here to the samples)
     if( fNoiseFileReader && !getHiLo( channel ) )
@@ -421,7 +421,7 @@ uint8_t VBaseRawDataReader::getSample( unsigned channel, unsigned sample, bool i
         {
             iS += iNoiseGaus;
         }
-
+        
         if( iS < 256 )
         {
             return iS;
@@ -442,7 +442,7 @@ uint8_t VBaseRawDataReader::getSample( unsigned channel, unsigned sample, bool i
             return iSampleValue;
         }
     }
-
+    
     return iSampleValue;
 }
 
@@ -491,12 +491,12 @@ std::vector< uint8_t > VBaseRawDataReader::getSamplesVec()
 void VBaseRawDataReader::selectHitChan( uint32_t i )
 {
     fHitID = i;
-
+    
     if( fEvent[fTelID] )
     {
         return fEvent[fTelID]->selectHitChan( i );
     }
-
+    
     return;
 }
 
@@ -516,7 +516,7 @@ valarray<double>& VBaseRawDataReader::getPeds()
     {
         return fNoiseFileReader->getPeds();
     }
-
+    
     return v;
 }
 
@@ -527,7 +527,7 @@ valarray<double>& VBaseRawDataReader::getPedvars()
     {
         return fNoiseFileReader->getPedvars();
     }
-
+    
     return v;
 }
 
@@ -538,7 +538,7 @@ vector< valarray<double> >& VBaseRawDataReader::getPedvarsAllSumWindows()
     {
         return fNoiseFileReader->getPedvarsAllSumWindows();
     }
-
+    
     return vv;
 }
 
@@ -549,7 +549,7 @@ valarray<double>& VBaseRawDataReader::getPedRMS()
     {
         return fNoiseFileReader->getPedRMS();
     }
-
+    
     return v;
 }
 
@@ -571,7 +571,7 @@ valarray< double >& VBaseRawDataReader::getSums( unsigned int iNChannel )
     {
         fSums.resize( iNChannel );
     }
-
+    
     if( fTelID < fEvent.size() && fEvent[fTelID] )
     {
         fSums = 0.;
@@ -598,7 +598,7 @@ valarray< double >& VBaseRawDataReader::getTraceMax( unsigned int iNChannel )
         fTraceMax.resize( iNChannel );
     }
     fTraceMax = 0.;
-
+    
     return fTraceMax;
 }
 
@@ -619,5 +619,5 @@ vector< valarray< double > >& VBaseRawDataReader::getTracePulseTiming( unsigned 
         }
     }
     return fTracePulseTiming;
-
+    
 }

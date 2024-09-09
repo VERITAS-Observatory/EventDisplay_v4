@@ -27,19 +27,19 @@ using namespace std;
 class VPlotCompareDataWithMC : public VHistogramUtilities
 {
     private:
-
+    
         bool fDebug;
         bool fPlotPoster;
         string fPrintName;
         unsigned int fNTel;
-
+        
         string  fDataFileName;
         TFile*  fDataFile;
-
+        
         double fRelatePlotRange_min;
         double fRelatePlotRange_max;
         int    fScalingMethod;
-
+        
         void   drawMatchingTests( TH1D* h1, TH1D* h2, double xmin = -9999., double xmax = 9999. );
         TF1*   do_theta2Fit( TH1D* h, int icolor = 1, int istyle = 1 );
         void   getScaling( TH1D* h_sims, TH1D* h_diff, double& s_sims, double& s_diff,
@@ -55,12 +55,12 @@ class VPlotCompareDataWithMC : public VHistogramUtilities
         void   setAxisTitles( TH2D* h, string iS, int iTel );
         void   setHistogramAtt( TH1D* his, int icolor, double iwidth, double isize, int imarker = 1, int irebin = 1, double iTitleOffset = 1.3 );
         void   setHistogramAtt( TH2D* his, double imin );
-
+        
     public:
-
+    
         VPlotCompareDataWithMC( string iFile = "" );
         ~VPlotCompareDataWithMC() {}
-
+        
         void help();
         void centroids();
         TCanvas* core_plots( int iRebin = 1 );
@@ -92,7 +92,7 @@ class VPlotCompareDataWithMC : public VHistogramUtilities
         TCanvas* single_telescope( int telid, string iPlot, bool iOneCanvas = true, int i_rebin = 1 );
         TCanvas* stereo_parameter();
         void mva_parameter();
-
+        
         void setDebug( bool iB = false )
         {
             fDebug = iB;

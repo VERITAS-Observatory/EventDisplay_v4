@@ -22,15 +22,15 @@ using namespace SEphem;
 class VTrackingCorrections : public VGlobalRunParameter
 {
     private:
-
+    
         bool fStatus;
-
+        
         unsigned int fTelID;
-
+        
         CorrectionParameters* correctionParameters;
-
+        
     public:
-
+    
         VTrackingCorrections( unsigned int iTelID );
         ~VTrackingCorrections() {};
         bool   isGood()

@@ -61,7 +61,7 @@ bool VGlobalRunParameter::readRunparameterFile( string i_filename )
     string is_line;
     string temp;
     string temp2;
-
+    
     while( getline( is, is_line ) )
     {
         if( is_line.size() > 0 )
@@ -131,9 +131,9 @@ bool VGlobalRunParameter::readRunparameterFile( string i_filename )
             }
         }
     }
-
+    
     is.close();
-
+    
     return true;
 }
 
@@ -160,7 +160,7 @@ bool VGlobalRunParameter::setDirectory_EVNDISPCalibrationData( string iDir )
     }
     cout << "VGlobalRunParameter::setDirectory_EVNDISPCalibrationData(): calibration directory is " << endl;
     cout << "   " << fEVNDISPCalibrationDataDirectory << endl;
-
+    
     return true;
 }
 
@@ -205,7 +205,7 @@ bool VGlobalRunParameter::setDirectories()
     {
         fVBFRawDataDirectory = "./data/";
     }
-
+    
     //////////////////////////////////////////////////////////////////////
     // output is written to this directory (unless stated otherwise on command line)
     const char* vcal_out = gSystem->Getenv( "VERITAS_USER_DATA_DIR" );
@@ -223,7 +223,7 @@ bool VGlobalRunParameter::setDirectories()
         cout << "exiting..." << endl;
         exit( EXIT_FAILURE );
     }
-
+    
     //////////////////////////////////////////////////////////////////////
     // some scripts require a temporary directory for auxiliary files
     // if note set: use fEVNDISPAnaDataDirectory
@@ -238,7 +238,7 @@ bool VGlobalRunParameter::setDirectories()
     {
         fEVNDISPAnaDataDirectory_tmp = fEVNDISPAnaDataDirectory;
     }
-
+    
     return true;
 }
 
@@ -252,7 +252,7 @@ unsigned int VGlobalRunParameter::getEVNDISP_TREE_VERSION( TTree* t )
     {
         return 0;
     }
-
+    
     string itemp = t->GetTitle();
     if( itemp.find( "VERSION" ) < itemp.size() )
     {
@@ -267,7 +267,7 @@ bool VGlobalRunParameter::getEVNDISP_TREE_isShort( TTree* t )
     {
         return false;
     }
-
+    
     string itemp = t->GetTitle();
     if( itemp.find( "short tree" ) < itemp.size() )
     {
@@ -277,7 +277,7 @@ bool VGlobalRunParameter::getEVNDISP_TREE_isShort( TTree* t )
     {
         return true;
     }
-
+    
     return false;
 }
 
@@ -290,9 +290,9 @@ bool VGlobalRunParameter::update( TChain* c )
     {
         return false;
     }
-
+    
     fEVNDISP_TREE_VERSION = getEVNDISP_TREE_VERSION( c->GetTree() );
-
+    
     return true;
 }
 
@@ -303,7 +303,7 @@ void VGlobalRunParameter::printGlobalRunParameter()
         cout << "VGlobalRunParameter::printGlobalRunParameter(): no global run parameters read" << endl;
         return;
     }
-
+    
     cout << "reading global run parameters from " << getDirectory_EVNDISPParameterFiles();
     cout << "EVNDISP.global.runparameter" << endl;
     cout << endl;

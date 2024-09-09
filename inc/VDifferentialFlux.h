@@ -15,9 +15,9 @@ class VDifferentialFlux : public TObject
 {
     private:
         double constant_TeVtoHz;
-
+        
     public:
-
+    
         double MJD_min;                           // time range of observations
         double MJD_max;                           // time range of observations
         double Energy;                            // [TeV]
@@ -44,18 +44,18 @@ class VDifferentialFlux : public TObject
         double NOff_error;
         double NOff_alpha;
         double Significance;
-
+        
         VDifferentialFlux();
         ~VDifferentialFlux() {}
         void fillEvent( double iMinMJD = 0., double iMaxMJD = 1.e14 );  // calculate vFv etc., fill MJDs, etc.
         void print( bool bSED = false );
         void printClean( bool bSED = false );
-
+        
         double convertEnergy_keV_to_Hz( double energy_keV );
         double convertEnergy_TeV_to_Hz( double energy_TeV );
         double convertPhotonFlux_to_Ergs( double energy_TeV, double flux_photons_per_cm2_s, bool bLin = true );
         double nuFnu( double F, double gamma, double e1, double e2, double e3 = -9999. );
-
+        
         ClassDef( VDifferentialFlux, 8 );
 };
 #endif

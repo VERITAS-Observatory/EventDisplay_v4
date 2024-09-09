@@ -11,11 +11,11 @@
 VDispTable::VDispTable()
 {
     fDebug = false;
-
+    
     fNTel = 0;
     fTableFile = 0;
     fData = 0;
-
+    
     setQualityCuts();
     setWidthLengthScalingParameters();
 }
@@ -24,15 +24,15 @@ VDispTable::VDispTable()
 VDispTable::VDispTable( unsigned int iNTel, string ioutFile )
 {
     fDebug = false;
-
+    
     fNTel = iNTel;
-
+    
     fTableFile = 0;
     fData = 0;
-
+    
     setQualityCuts();
     setWidthLengthScalingParameters();
-
+    
     prepareTraining( ioutFile );
 }
 
@@ -48,12 +48,12 @@ bool VDispTable::prepareTraining( string iOutFile )
         cout << "...exiting" << endl;
         exit( 0 );
     }
-
+    
     // create data class
     fData = new VDispTableReader();
     fData->SetName( "dispTable" );
     fData->initialize( false );
-
+    
     return true;
 }
 
@@ -74,7 +74,7 @@ bool VDispTable::terminate()
     {
         fTableFile->Close();
     }
-
+    
     return true;
 }
 
@@ -83,10 +83,10 @@ void VDispTable::addAzBin( float iMin, float iMax, bool iPe )
 {
     fAz_min.push_back( iMin );
     fAz_max.push_back( iMax );
-
+    
     char hname[500];
     char htitle[500];
-
+    
     // 2D disp tables
     if( fData->h2D_DispTable )
     {
@@ -125,7 +125,7 @@ void VDispTable::addAzBin( float iMin, float iMax, bool iPe )
         h2D_AzDispMissTable.back()->SetYTitle( "log_{10} size" );
         h2D_AzDispMissTable.back()->SetZTitle( "miss" );
     }
-
+    
     // 3D disp tables
     if( fData->h3D_DispTable )
     {
@@ -137,7 +137,7 @@ void VDispTable::addAzBin( float iMin, float iMax, bool iPe )
         h3D_AzDispTable.back()->SetYTitle( "log_{10} size" );
         h3D_AzDispTable.back()->SetZTitle( "disp [deg]" );
     }
-
+    
     if( fData->h3D_DispTableN )
     {
         sprintf( hname, "h3D_DispTableN_%d", ( int )fAz_min.size() );
@@ -148,7 +148,7 @@ void VDispTable::addAzBin( float iMin, float iMax, bool iPe )
         h3D_AzDispTableN.back()->SetYTitle( "log_{10} size" );
         h3D_AzDispTableN.back()->SetZTitle( "number of events/bin" );
     }
-
+    
     if( fData->h3D_DispPhiTable )
     {
         sprintf( hname, "h3D_DispPhiTable_%d", ( int )fAz_min.size() );
@@ -159,7 +159,7 @@ void VDispTable::addAzBin( float iMin, float iMax, bool iPe )
         h3D_AzDispPhiTable.back()->SetYTitle( "log_{10} size" );
         h3D_AzDispPhiTable.back()->SetZTitle( "phi [deg]" );
     }
-
+    
     if( fData->h3D_DispMissTable )
     {
         sprintf( hname, "h3D_DispMiss_%d", ( int )fAz_min.size() );
@@ -171,7 +171,7 @@ void VDispTable::addAzBin( float iMin, float iMax, bool iPe )
         h3D_AzDispMissTable.back()->SetYTitle( "log_{10} size" );
         h3D_AzDispMissTable.back()->SetZTitle( "miss" );
     }
-
+    
 }
 
 
@@ -201,7 +201,7 @@ bool VDispTable::isGoodEvent( Ctpars* c )
     {
         return false;
     }
-
+    
     if( c->ntubes <= fQC_Ntubes_min )
     {
         return false;
@@ -218,7 +218,7 @@ bool VDispTable::isGoodEvent( Ctpars* c )
     {
         return false;
     }
-
+    
     return true;
 }
 
@@ -229,18 +229,18 @@ bool VDispTable::isGoodEvent( Ctpars* c )
 bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentries )
 {
     char hname[600];
-
+    
     /////////////////////////////////////////////////////////////////////////////////////
     // reset variables
     /////////////////////////////////////////////////////////////////////////////////////
     float disp = 0.;
     float dispPhi = 0.;
     unsigned int azBin = 0;
-
+    
     // assume same pedvars for all telescopes (is this true in the simulations?)
     float i_meanPedvars = 0.;
     float i_meanPedvarsN = 0.;
-
+    
     // reset histograms
     fData->reset();
     for( unsigned int i = 0; i < h2D_AzDispTable.size(); i++ )
@@ -249,18 +249,18 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
         h2D_AzDispPhiTable[i]->Reset();
         h2D_AzDispTableN[i]->Reset();
         h2D_AzDispMissTable[i]->Reset();
-
+        
         h3D_AzDispTable[i]->Reset();
         h3D_AzDispPhiTable[i]->Reset();
         h3D_AzDispTableN[i]->Reset();
         h3D_AzDispMissTable[i]->Reset();
     }
-
-
+    
+    
     /////////////////////////////////////////////////////////////////////////////////////
     // prepare MC data files and trees
     /////////////////////////////////////////////////////////////////////////////////////
-
+    
     // data file with MC input
     TFile iFile( iMCFile.c_str() );
     if( iFile.IsZombie() )
@@ -268,9 +268,9 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
         cout << "VDispTable::fillTable error reading MC file " << iMCFile << endl;
         return false;
     }
-
+    
     cout << "filling tables for " << iMCFile << endl;
-
+    
     // get showerpars tree
     TTree* s = ( TTree* )iFile.Get( "showerpars" );
     if(!s )
@@ -283,7 +283,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
     {
         return false;
     }
-
+    
     // get tpars trees (fNTel times)
     for( unsigned int i = 0; i < fNTel; i++ )
     {
@@ -299,7 +299,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
         {
             continue;
         }
-
+        
         if( m->fChain->GetEntries() != c->fChain->GetEntries() )
         {
             cout << "\t error: different number of events in showerpars and tpars trees for telescope " << i + 1 << endl;
@@ -307,7 +307,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
             continue;
         }
         cout << "\t telescope " << i + 1 << ", " << c->fChain->GetEntries() << " entries in data tree" << endl;
-
+        
         /////////////////////////////////////////////////////////////////////////////////////
         // loop over all events for this telescope
         if( iNentries < 0 )
@@ -323,13 +323,13 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
         {
             c->GetEntry( n );
             m->GetEntry( n );
-
+            
             // apply quality cuts
             if( isGoodEvent( c ) )
             {
                 i_meanPedvars += c->meanPedvar_Image;
                 i_meanPedvarsN++;
-
+                
                 // calculate disp (observe sign convention for MCyoff)
                 disp  = sqrt(( c->cen_y + m->MCyoff ) * ( c->cen_y + m->MCyoff ) + ( c->cen_x - m->MCxoff ) * ( c->cen_x - m->MCxoff ) );
                 disp  = TMath::Abs( disp );
@@ -347,7 +347,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
                 {
                     dispPhi  = TMath::Pi() - dispPhi;
                 }
-
+                
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // fill tables
                 azBin = fData->getAzBin( m->MCaz );
@@ -371,7 +371,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
         i_meanPedvars /= i_meanPedvarsN;
     }
     cout << "\t mean pedvars: " << i_meanPedvars << endl;
-
+    
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -391,7 +391,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
         {
             continue;
         }
-
+        
         if( m->fChain->GetEntries() != c->fChain->GetEntries() )
         {
             cout << "\t error: different number of events in showerpars and tpars trees for telescope " << i + 1 << endl;
@@ -399,7 +399,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
             continue;
         }
         cout << "\t telescope " << i + 1 << ", " << c->fChain->GetEntries() << " entries in data tree" << endl;
-
+        
         // loop over all events for this telescope
         double miss = 0.;
         int x_bin = 0;
@@ -419,7 +419,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
         {
             c->GetEntry( n );
             m->GetEntry( n );
-
+            
             // quality cuts
             if( isGoodEvent( c ) )
             {
@@ -455,12 +455,12 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
             }
         }
     }
-
+    
     // fill data carrier
     for( unsigned int i = 0; i < fAz_min.size(); i++ )
     {
         fData->fill( i_ze, i, fAz_min[i], fAz_max[i], i_woff, i_meanPedvars, ( TH2* )h2D_AzDispTable[i], ( TH2* )h2D_AzDispTableN[i], ( TH2* )h2D_AzDispPhiTable[i], ( TH2* )h2D_AzDispMissTable[i], ( TH3* )h3D_AzDispTable[i], ( TH3* )h3D_AzDispTableN[i], ( TH3* )h3D_AzDispPhiTable[i], ( TH3* )h3D_AzDispMissTable[i] );
     }
-
+    
     return true;
 }

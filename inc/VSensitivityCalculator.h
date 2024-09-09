@@ -59,7 +59,7 @@ struct sSensitivityData
 class VSensitivityCalculatorDataResponseFunctions
 {
     public:
-
+    
         string fName;
         unsigned int fParticleID;                              //              particle ID (1=gamma,2=electron,14=proton,402=helium)
         string fSpectralParameterFile;                         //              data file (+path) with spectral information
@@ -91,10 +91,10 @@ class VSensitivityCalculatorDataResponseFunctions
         vector< double > effArea_error;
         TH2D* hResponseMatrix;
         TH1D* hWeightedRate;
-
+        
         VSensitivityCalculatorDataResponseFunctions();
         ~VSensitivityCalculatorDataResponseFunctions();
-
+        
         double getSolidAngle_DirectionCut( double e );         // get solid angle for direction cut ( energy in lg10 [TeV] )
         void   initializeHistograms( string );
 };
@@ -107,32 +107,32 @@ class VSensitivityCalculatorDataResponseFunctions
 class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHistogramUtilities
 {
     private:
-
+    
         double fConstant_Flux_To_Ergs;
-
+        
         bool fDebug;
-
+        
         // source strength vector (to plot and to list)
         vector< double > fSourceStrength;
         double fSourceStrength_min;
         double fSourceStrength_max;
         double fSourceStrength_step;
-
+        
         // energy spectrum from literature
         VEnergySpectrumfromLiterature* fEnergySpectrumfromLiterature;
         unsigned int fEnergySpectrumfromLiterature_ID;
         vector< TGraph* > fCrabFlux_SourceStrength;
-
+        
         // TMVA cut optimization results
         VTMVAEvaluatorResults* fTMVAEvaluatorResults;
         bool   fRequireCutsToBeOptimized;
-
+        
         // observing time
         double fObservationTime_h;                  // [h]
         double fObservationTime_min;
         double fObservationTime_max;
         int    fObservationTime_steps;
-
+        
         // significance calculation
         unsigned int fLiAndMaEqu;
         double       fSignificance_min;
@@ -141,30 +141,30 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         double       fMinBackgroundRateRatio_min;
         double       fAlpha;
         bool         fSetEvents_minCutOnly;
-
+        
         map< int, double > fSignificanceLimited;             // sensitivity is significance limited at this energy (linear) [GeV] !!!
         map< int, double > fMinEventsLimited;                // sensitivity is limited by minimum number of events at this energy [GeV] !!!
         map< int, double > fMinBackgroundEventsLimited;      // sensitivity is limited by minimum number of background events at this energy [GeV] !!!
         map< int, double > fMinNoBackground;                 // no background events
-
+        
         double fEnergy_min_Log;
         double fEnergy_max_Log;
         double fEnergy_dE_log10;
-
+        
         // data vectors for MC and int/diff sensitivity calculation
         map< unsigned int, VSensitivityCalculatorDataResponseFunctions* > fMC_Data;                        //! [particle ID]
         map< unsigned int, VSensitivityCalculatorDataResponseFunctions* >::iterator fMC_Data_iterator;     //! [particle ID]
         VSensitivityCalculatorDataResponseFunctions fMC_GammaData;
         VSensitivityCalculatorDataResponseFunctions fMC_ProtonData;
         double fMC_BackgroundMissingParticleFraction;     //! this is the fraction of background missing due to missing He/.. simulations
-
+        
         string fMCCTA_File;
         double fMCCTA_cameraoffset_deg;
-
+        
         unsigned int    fCurrentDataSet;
         vector< sSensitivityData > fData;
         map< unsigned int, TGraph* > fGraphObsvsTime;
-
+        
         // plotting values
         TH1D*  hnull;
         string fPlot_CanvasName;
@@ -177,7 +177,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         double fPlot_flux_ENERG_max;
         double fPlot_flux_CU_min;
         double fPlot_flux_CU_max;
-
+        
         // sensitivity and rate graph
         TGraphAsymmErrors* gSensitivityvsEnergy;
         TGraphAsymmErrors* gSignalRate;
@@ -186,14 +186,14 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         //	TGraphErrors *gElectronRate;
         TGraphAsymmErrors* gProtonRate;
         TGraphAsymmErrors* gElectronRate;
-
+        
         // plotting debug stuff
         vector< TCanvas* > cPlotDebug;
         string fPlotDebugName;
         string fDebugParticleNumberFile;                // write non/noff to disk
         // values of Crab fluxes to be plotted as lines into the sensitivity vs energy graph (in Crab Units)
         vector< double > fPlottingCrabFlux_CU;
-
+        
         // private functions
         bool       checkCutOptimization( double iEnergy );
         bool       checkDataSet( unsigned int iD, string iName );
@@ -202,12 +202,12 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         bool       fillSensitivityHistogramfromMap( map< int, double > m, TH1F* h );
         TGraph*           getCrabSpectrum( bool bIntegralSpectrum,  string bUnit = "CU", bool bReset = true );
         vector< TGraph* > getCrabSpectrum( vector< double > i_fCrabFlux, bool bIntegralSpectrum,  string bUnit = "CU", bool bReset = true );
-
+        
         vector< VDifferentialFlux > getDifferentFluxVectorfromData( string iAnasumCrabFile, double dE_Log10, double& iNorm );
         vector< VDifferentialFlux > getDifferentialFluxVectorfromMC( double dE_Log10, double& iNorm );
         vector< VDifferentialFlux > getDifferentialFluxVectorfromCTA_MC( double dE_Log10, double& iNorm );
         vector< VDifferentialFlux > getDifferentialFluxVectorfromMC_ErrorMessage( string );
-
+        
         void       fillBackgroundParticleNumbers( vector< VDifferentialFlux > iDifferentialFlux,
                 map< unsigned int, vector< double > > i_flux_NOff,
                 map< unsigned int, vector< double > > i_flux_NOff_error );
@@ -224,8 +224,8 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
                                        bool iRateError = false, VMonteCarloRateCalculator* iMCR = 0, TH1D* iWeightedRate = 0,
                                        double i_ElowW = 0., double iE_upW = 0. );
         double     getMonteCarloRateFromWeightedRateHistogram( double iE_low, double iE_up, bool iRateError, TH1D* iWeightedRateHistogram );
-
-
+        
+        
         TGraphAsymmErrors* getSensitivityGraphFromWPPhysFile( string bUnit, double iEnergyMin_TeV_lin, double iEnergyMax_TeV_lin, double dE_Log10 );
         void     list_sensitivity_table( unsigned int iD );
         void       plot_guidingLines( double x, TGraph* g, bool iHours );
@@ -235,12 +235,12 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
                 map< unsigned int, vector< double > > i_flux_NOff_error );
         void       plotDebugPlotsParticleNumbers();
         void       prepareDebugPlots();
-
+        
     public:
-
+    
         VSensitivityCalculator();
         ~VSensitivityCalculator() {}
-
+        
         unsigned int  addDataSet( double iGammaRayRate, double iBackGroundRate, double iAlpha, string iName = "" );
         unsigned int  addDataSetOnOff( double iOnRate, double iOffRate, double iAlpha, string iName = "" );
         double   calculateObservationTimevsFlux( unsigned int iD );
@@ -359,7 +359,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         {
             fDebugParticleNumberFile = iFile;
         }
-
+        
         ClassDef( VSensitivityCalculator, 26 );
 };
 #endif

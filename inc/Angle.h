@@ -35,9 +35,9 @@ namespace SEphem
     class Angle
     {
         public:
-
+        
             // Constructor, Destructor and Assignment
-
+            
             Angle(): m_angle() {}
             Angle( double a ): m_angle( a )
             {
@@ -49,16 +49,16 @@ namespace SEphem
                 m_angle = a.m_angle;
                 return *this;
             }
-
+            
             // ----------------------------------------------------------------------
             // Getters
             // ----------------------------------------------------------------------
-
+            
             operator double() const
             {
                 return m_angle;
             }
-
+            
             double rad() const
             {
                 return m_angle;
@@ -87,7 +87,7 @@ namespace SEphem
             {
                 return toHrs( rad() );
             }
-
+            
             double radPM() const
             {
                 return toRadPM( m_angle );
@@ -116,7 +116,7 @@ namespace SEphem
             {
                 return toHrs( radPM() );
             }
-
+            
             double rad180() const
             {
                 return toRad180( m_angle );
@@ -145,7 +145,7 @@ namespace SEphem
             {
                 return toHrs( rad180() );
             }
-
+            
             double radPM180() const
             {
                 return toRadPM180( m_angle );
@@ -174,12 +174,12 @@ namespace SEphem
             {
                 return toHrs( radPM180() );
             }
-
+            
             Angle coAngle() const
             {
                 return coAngleRad();
             }
-
+            
             double coAngleRad() const
             {
                 return toCoAngle( m_angle );
@@ -196,7 +196,7 @@ namespace SEphem
             {
                 return toHrs( coAngleRad() );
             }
-
+            
             double coAngleRadPM() const
             {
                 return toRadPM( toCoAngle( m_angle ) );
@@ -213,7 +213,7 @@ namespace SEphem
             {
                 return toHrs( coAngleRadPM() );
             }
-
+            
             double coAngleRad180() const
             {
                 return toRad180( toCoAngle( m_angle ) );
@@ -230,7 +230,7 @@ namespace SEphem
             {
                 return toHrs( coAngleRad180() );
             }
-
+            
             double coAngleRadPM180() const
             {
                 return toRadPM180( toCoAngle( m_angle ) );
@@ -247,7 +247,7 @@ namespace SEphem
             {
                 return toHrs( coAngleRadPM180() );
             }
-
+            
             void hms( unsigned& h, unsigned& m, unsigned& s, unsigned& f,
                       unsigned sec_digits = 1 ) const;
             void dmsPM180( bool& negative,
@@ -256,7 +256,7 @@ namespace SEphem
             void dmsPM360( bool& negative,
                            unsigned& d, unsigned& m, unsigned& s, unsigned& f,
                            unsigned sec_digits = 1 ) const;
-
+                           
             std::string hmsString( unsigned sec_digits = 1, bool hmsSep = false ) const;
             std::string hmsPMString( unsigned sec_digits = 1, bool hmsSep = false ) const;
             std::string dmsString( unsigned sec_digits = 1, bool dmsSep = false ) const
@@ -271,7 +271,7 @@ namespace SEphem
             std::string degPMString( unsigned dec_digits = 1 ) const;
             std::string deg180String( unsigned dec_digits = 1 ) const;
             std::string degPM180String( unsigned dec_digits = 1 ) const;
-
+            
             Angle separation( const Angle& a ) const
             {
                 Angle b = a - m_angle;
@@ -293,7 +293,7 @@ namespace SEphem
             {
                 return toHrs( separationRad( a ) );
             }
-
+            
             double x() const
             {
                 return cos( m_angle );
@@ -307,16 +307,16 @@ namespace SEphem
                 x = Angle::x();
                 y = Angle::y();
             }
-
+            
             unsigned long bar( unsigned radix, bool round = false ) const
             {
                 return toBAR( rad(), radix, round );
             }
-
+            
             // ----------------------------------------------------------------------
             // Setters
             // ----------------------------------------------------------------------
-
+            
             void setRad( double a )
             {
                 m_angle = a;
@@ -346,7 +346,7 @@ namespace SEphem
             {
                 setRad( frHrs( a ) );
             }
-
+            
             void setCoAngleRad( double a )
             {
                 m_angle = frCoAngle( a );
@@ -364,20 +364,20 @@ namespace SEphem
             {
                 setCoAngleRad( frHrs( a ) );
             }
-
+            
             bool setFromHMSString( std::string str );
             bool setFromDMSString( std::string str );
             inline bool setCoAngleFromDMSString( std::string str );
-
+            
             void setBAR( unsigned long a, unsigned radix, bool round = false )
             {
                 setRad( frBAR( a, radix, round ) );
             }
-
+            
             // ----------------------------------------------------------------------
             // Operations
             // ----------------------------------------------------------------------
-
+            
             void rotate( Angle a )
             {
                 m_angle += a.m_angle;
@@ -403,7 +403,7 @@ namespace SEphem
             {
                 rotateRad( frHrs( a ) );
             }
-
+            
             Angle& operator+= ( const Angle a )
             {
                 m_angle += a.m_angle;
@@ -416,7 +416,7 @@ namespace SEphem
                 rationalize();
                 return *this;
             }
-
+            
             Angle& operator+= ( double a )
             {
                 m_angle += a;
@@ -429,11 +429,11 @@ namespace SEphem
                 rationalize();
                 return *this;
             }
-
+            
             // ----------------------------------------------------------------------
             // Static functions and constants
             // ----------------------------------------------------------------------
-
+            
             static double frDeg( double a )
             {
                 return a * sc_radPerDeg;
@@ -470,10 +470,10 @@ namespace SEphem
             {
                 return a * sc_hrsPerRad;
             }
-
+            
             static unsigned long toBAR( double a, unsigned radix, bool round = false );
             static double frBAR( unsigned long a, unsigned radix, bool round = false );
-
+            
             static double frCoAngle( double a )
             {
                 return a <= sc_halfPi ? sc_halfPi - a : sc_5HalfPi - a;
@@ -486,18 +486,18 @@ namespace SEphem
             {
                 return frCoAngle( a );
             }
-
+            
             inline static double toRadPM( double a );
             inline static double toRad180( double a );
             inline static double toRadPM180( double a );
-
+            
 #if 0
             static double frHMSString( const std::string& a );
             static double frDMSString( const std::string& a );
             static std::string toHMSString( double a );
             static std::string toDMSString( double a );
 #endif
-
+            
             static Angle makeRad( double a )
             {
                 return Angle( a );
@@ -514,7 +514,7 @@ namespace SEphem
             {
                 return Angle( frHrs( a ) );
             }
-
+            
             static Angle makeCoAngleRad( double a )
             {
                 return Angle( toCoAngle( a ) );
@@ -531,14 +531,14 @@ namespace SEphem
             {
                 return makeCoAngleRad( frHrs( a ) );
             }
-
+            
             static Angle makeBAR( unsigned long a, unsigned radix, bool round = false )
             {
                 return Angle( frBAR( a, radix, round ) );
             }
-
+            
             static void rotateCartesians( const Angle& a, double& x, double& y );
-
+            
             static const double sc_halfPi;
             static const double sc_Pi;
             static const double sc_3HalfPi;
@@ -550,13 +550,13 @@ namespace SEphem
             static const double sc_radPerDeg;
             static const double sc_radPerRot;
             static const double sc_radPerHrs;
-
+            
         private:
             double m_angle;
-
+            
             inline void rationalize();
     };                                            // class Angle
-
+    
     inline void Angle::rationalize()
     {
         if( m_angle < 0 )
@@ -568,7 +568,7 @@ namespace SEphem
             m_angle = fmod( m_angle, sc_twoPi );
         }
     }
-
+    
     inline double Angle::toRadPM( double a )
     {
         if( a <= sc_Pi )
@@ -580,7 +580,7 @@ namespace SEphem
             return a - sc_twoPi;
         }
     }
-
+    
     inline double Angle::toRad180( double a )
     {
         if( a <= sc_Pi )
@@ -592,7 +592,7 @@ namespace SEphem
             return sc_twoPi - a;
         }
     }
-
+    
     inline double Angle::toRadPM180( double a )
     {
         if( a <= sc_halfPi )
@@ -608,7 +608,7 @@ namespace SEphem
             return a - sc_twoPi;
         }
     }
-
+    
     inline void Angle::rotateCartesians( const Angle& a, double& x, double& y )
     {
         double c = cos( a.rad() );
@@ -617,7 +617,7 @@ namespace SEphem
         y = y * c + x * s;
         x = t;
     }
-
+    
     inline bool Angle::setCoAngleFromDMSString( std::string str )
     {
         Angle a;
@@ -631,6 +631,6 @@ namespace SEphem
         }
         return true;
     }
-
+    
 }                                                 // namespace SEphem
 #endif                                            // SEPHEM_ANGLE_H

@@ -34,7 +34,7 @@ class VAnalysisUtilities : public TNamed
     protected:
         unsigned int fDebug;
         bool bZombie;
-
+        
         //some run summary parameters
         double fSkyMapCentreDecJ2000;
         double fSkyMapCentreRAJ2000;
@@ -44,35 +44,35 @@ class VAnalysisUtilities : public TNamed
         double fTargetRA;
         double fTargetDecJ2000;
         double fTargetRAJ2000;
-
+        
         // anasum data file
         TFile* fAnasumDataFile;                                                //!
         // evndisplay version
         string fEVNDISPVersion;
-
+        
         // run list
         double fRunList_MJD_min;
         double fRunList_MJD_max;
         vector< VRunList > fRunList;
-
+        
         // phase folding
         double  fPhase_MJD0;
         double  fPhase_Period_days;
-
+        
         // run list cuts
         vector< double > fRunListCut_MJD_min;
         vector< double > fRunListCut_MJD_max;
         vector< double > fRunListCut_Phase_min;
         vector< double > fRunListCut_Phase_max;
-
+        
         bool openEnergyThresholdFile();
         bool readTargetCoordinatesFromtRunSummary( TTree* t, int irun );
-
+        
     public:
-
+    
         VAnalysisUtilities();
         ~VAnalysisUtilities() {}
-
+        
         bool     closeFile();
         TGraph*  calcCumulativeSig( int iTot );
         TObject* getHistogram( string, int, string,  double iSlizeY = -9999. );
@@ -143,7 +143,7 @@ class VAnalysisUtilities : public TNamed
         void     setRunListCutMJDRangeVector( vector< double > iMJDMin, vector< double > iMDJMax );
         void     setRunListCutPhaseRange( double iPhaseMin = -1., double iPhaseMax = -1. );
         void     setRunListCutPhaseRangeVector( vector< double > iPhaseMinV, vector< double > iPhaseMaxV );
-
+        
         ClassDef( VAnalysisUtilities, 14 );
 };
 #endif

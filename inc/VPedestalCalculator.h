@@ -24,13 +24,13 @@ class VPedestalCalculator : public VImageBaseAnalyzer
 {
     private:
         bool fDebug;
-
+        
         bool bCalibrationRun;
-
+        
         double fLengthofTimeSlice;
         int fSumFirst;
         int fSumWindow;
-
+        
         int runNumber;
         int MJD;
         double time;
@@ -39,30 +39,30 @@ class VPedestalCalculator : public VImageBaseAnalyzer
         double y[VDST_MAXCHANNELS];
         double xRot[VDST_MAXCHANNELS];
         double yRot[VDST_MAXCHANNELS];
-
+        
         vector< TTree* > fTree;
-
+        
         // [telID][pixelID][summation window]
         vector< vector< vector< float > > > fpedcal_n;
         vector< vector< vector< float > > > fpedcal_mean;
         vector< vector< vector< float > > > fpedcal_mean2;
         vector< vector< vector< TH1F* > > > fpedcal_histo;
-
+        
         vector< vector< float > > v_temp_pedEntries;
         vector< vector< float > > v_temp_ped;
         vector< vector< float > > v_temp_pedvar;
         vector< vector< float > > v_temp_ped_median;
         vector< vector< float > > v_temp_pedvar68;
-
+        
         // timing vector
         vector< double > fTimeVec;
-
+        
         double adjustTimeSliceLength( double iLengthofTimeSlice, double iRunStartTime, double iRunStoppTime );
         void fillTimeSlice( unsigned int );
         void reset();
-
+        
     public:
-
+    
         vector< vector< int > > v_MJD;            //! [telid][time slice]
         vector< vector< double > > v_time;        //! [telid][time slice]
         //! [telid][time slice][npixel][summation window]
@@ -73,10 +73,10 @@ class VPedestalCalculator : public VImageBaseAnalyzer
         vector< vector< vector< vector< float > > > > v_pedvar;
         vector< vector< vector< vector< float > > > > v_ped_median;
         vector< vector< vector< vector< float > > > > v_pedvar68;
-
+        
         VPedestalCalculator();
         ~VPedestalCalculator() {}
-
+        
         void doAnalysis( bool iLowGain = false );
         vector< TTree* > getPedestalTree()
         {

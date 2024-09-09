@@ -69,7 +69,7 @@ int main( int argc, char* argv[] )
         cout << endl;
         return 1 ;
     }
-
+    
     int IRUN  = 1;  // 1 is for runnumber
     int IFILE = 2; // 2 is for simple list of runnumbers
     //cout << "IRUN:  " << IRUN << endl;
@@ -108,7 +108,7 @@ int main( int argc, char* argv[] )
     //cout << "inputrun : " << inputrun  << endl;
     //cout << "inputfile: " << inputfile << endl;
     //cout << endl;
-
+    
     int runnumber = 0 ;
     vector<int> runlist ;
     if( inputmode == IRUN )
@@ -156,7 +156,7 @@ int main( int argc, char* argv[] )
         }
     }
     //cout << "runlist.size(): " << runlist.size() << endl;
-
+    
     VGlobalRunParameter* blah = new VGlobalRunParameter() ;
     //cout << " VGlobal->getDBServer(): " << blah->getDBServer() << endl;
     // start connection
@@ -170,12 +170,12 @@ int main( int argc, char* argv[] )
         cout << "error connecting to db" << endl;
         return -1;
     }
-
+    
     for( unsigned int i_run = 0 ; i_run < runlist.size() ; i_run++ )
     {
         cout << "Downloading observatory data for run " << runlist[i_run] << "..." << endl;
         runnumber = runlist[i_run] ;
-
+        
         // get run start and finish, # of telescopes
         char c_query[1000] ;
         sprintf( c_query, "select run_id, data_start_time, data_end_time, config_mask from tblRun_Info where run_id = %d", runnumber ) ;
@@ -186,10 +186,10 @@ int main( int argc, char* argv[] )
             cout << "Exiting..." << endl;
             return -1;
         }
-
+        
         //TSQLResult *db_res = f_db->Query( query );
         TSQLResult* db_res = my_connection_ver.Get_QueryResult();
-
+        
         if(!db_res )
         {
             cout << "TSQLResult empty, exiting..." << endl ;
@@ -208,22 +208,22 @@ int main( int argc, char* argv[] )
             }
             int iMJD = 0;
             double iTime = 0.;
-
+            
             itemp = db_row->GetField( 1 );
             getDBMJDTime( itemp, iMJD, iTime, true );
             MJDStart = ( double )iMJD + iTime / 86400.0;
             //printf("date to MJD: %s : %f : sec %f\n", itemp.c_str(), MJDStart, (MJDStart-(int)MJDStart)*86400.0 ) ;
-
+            
             itemp = db_row->GetField( 2 );
             getDBMJDTime( itemp, iMJD, iTime, true );
             MJDEnd = ( double )iMJD + iTime / 86400.0;
             //printf("date to MJD: %s : %f : sec %f\n", itemp.c_str(), MJDEnd, (MJDEnd-(int)MJDEnd)*86400.0 ) ;
-
+            
             ImgSel = ( unsigned long int )db_row->GetField( 3 ) ;
         }
-
+        
         //printf( "Run %d started at %f and ended at %f, using telescope combo %lu\n", runnumber, MJDStart, MJDEnd, ImgSel ) ;
-
+        
         string tmpdb_vof;
         tmpdb_vof = blah->getDBServer() + "/VOFFLINE" ;
         VDB_Connection my_connection_vof( tmpdb_ver.c_str(), "readonly", "" ) ;
@@ -232,7 +232,7 @@ int main( int argc, char* argv[] )
             cout << "error connecting to db VOFFLINE" << endl;
             return -1;
         }
-
+        
         // request pointing data
         vector <double> mjd  ;
         vector <int>    mjdDay ;
@@ -256,7 +256,7 @@ int main( int argc, char* argv[] )
                 cout << "Exiting..." << endl;
                 return -1;
             }
-
+            
             //TSQLResult *db_res2 = f_db->Query( query );
             TSQLResult* db_res2 = my_connection_vof.Get_QueryResult();
             fNRows = db_res2->GetRowCount();
@@ -271,7 +271,7 @@ int main( int argc, char* argv[] )
                     break;
                 }
                 //if ( count<8 ) { count++ ; printf( "Row %d  :  %s  :  %s  :  %s\n", j, db_row->GetField(0), db_row->GetField(1), db_row->GetField(2) ) ; }
-
+                
                 // time
                 itemp = db_row->GetField( 0 ) ;
                 sscanf( itemp.c_str(), "%lf", &imjd ) ;
@@ -279,7 +279,7 @@ int main( int argc, char* argv[] )
                 mjdDay.push_back(( int )imjd ) ;
                 mjdDayFraction.push_back(( double )( imjd - ( int )imjd ) ) ;
                 mjdSecondsOfDay.push_back( mjdDayFraction.back() * 86400.0 ) ;
-
+                
                 // ra decl
                 itemp = db_row->GetField( 1 ) ;
                 sscanf( itemp.c_str(), "%lf", &ira ) ;
@@ -288,9 +288,9 @@ int main( int argc, char* argv[] )
                 sscanf( itemp.c_str(), "%lf", &idecl ) ;
                 decl.push_back( idecl );
                 //if ( count<8 ) { printf("     imjd:%.8f   ra:%f, decl:%f\n", imjd, ira, idecl ) ; }
-
+                
             }
-
+            
             // stop after first telescope, we only need one
             if( a.test( i_tel ) && fNRows > 0 )
             {
@@ -299,7 +299,7 @@ int main( int argc, char* argv[] )
             }
         }
         //f_db->Close() ;
-
+        
         // convert pointing data from ra/dec to elev/azi
         //float lat = 31.675  ; // observatory coordinates
         float lat = blah->getObservatory_Latitude_deg() ;
@@ -372,10 +372,10 @@ int main( int argc, char* argv[] )
             }
             */
         }
-
-
+        
+        
     }
-
+    
     return 0 ;
 }
 
@@ -398,7 +398,7 @@ void getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip )
     }
     int y, m, d, h, min, s, ms, l;
     double gMJD;
-
+    
     // get y, m, d
     y = atoi( itemp.substr( 0, 4 ).c_str() );
     m = atoi( itemp.substr( 4, 2 ).c_str() );
@@ -414,7 +414,7 @@ void getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip )
     {
         ms = 0;
     }
-
+    
     // calculate MJD
     VAstronometry::vlaCldj( y, m, d, &gMJD, &l );
     MJD = ( int )gMJD;

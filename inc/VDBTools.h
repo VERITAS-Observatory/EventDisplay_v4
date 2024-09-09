@@ -19,28 +19,28 @@ using namespace std;
 class VDB_ObservingSources_Data : public TObject
 {
     public:
-
+    
         string SourceID;
         float fDec;
         float fRA;
         float fEpoch;
-
+        
         VDB_ObservingSources_Data();
         ~VDB_ObservingSources_Data() {}
-
+        
         ClassDef( VDB_ObservingSources_Data, 1 );
 };
 
 class VDB_ObservingSources : public TObject
 {
     private:
-
+    
         bool   fDebug;
-
+        
         map< string, VDB_ObservingSources_Data* > fVDB_ObservingSources_Data;
-
+        
     public:
-
+    
         VDB_ObservingSources();
         ~VDB_ObservingSources() {}
         bool fill( TSQLServer* i_db = 0 );
@@ -50,7 +50,7 @@ class VDB_ObservingSources : public TObject
         {
             fDebug = iB;
         }
-
+        
         ClassDef( VDB_ObservingSources, 1 );
 };
 

@@ -21,7 +21,7 @@ VEvndispData::VEvndispData()
 void VEvndispData::setTeltoAna( vector< unsigned int > iT )
 {
     fTeltoAna = iT;
-
+    
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // fExpectedEventStatus is used in VDisplay -> don't allow to display more than 8*sizeof(size_t) telescope (64?)
     //
@@ -61,13 +61,13 @@ void VEvndispData::setTeltoAna( vector< unsigned int > iT )
         fExpectedEventStatus = ( unsigned long int ) ib.to_ulong();
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+    
     // init event counting statistics
     vector< int > itemp;
     itemp.assign( fNTel + 1, 0 );
     fTriggeredTel.assign( fNTel, itemp );
     fTriggeredTelN.assign( getTeltoAna().size() + 1, 0 );
-
+    
     // analysis event status
     fAnalysisArrayEventStatus = 0;
     fAnalysisTelescopeEventStatus.assign( fNTel, 0 );
@@ -110,7 +110,7 @@ bool VEvndispData::initializeDataReader()
     {
         cout << "VEvndispData::initializeDataReader()" << endl;
     }
-
+    
     if( fGrIsuReader != 0 )
     {
         fReader = ( VVirtualDataReader* )fGrIsuReader;
@@ -129,12 +129,12 @@ bool VEvndispData::initializeDataReader()
     {
         fReader = ( VVirtualDataReader* )fMultipleGrIsuReader;
     }
-
+    
     if(!fReader )
     {
         return false;
     }
-
+    
     fReader->setTeltoAna( fTeltoAna );
     // PRELI: require right now that all telescopes should have FADCs (or not)
     bool iperformFADCAnalysis = true;
@@ -147,7 +147,7 @@ bool VEvndispData::initializeDataReader()
     }
     getRunParameter()->fperformFADCAnalysis = iperformFADCAnalysis;
     fReader->setPerformFADCAnalysis( iperformFADCAnalysis );
-
+    
     return true;
 }
 
@@ -196,7 +196,7 @@ void VEvndispData::resetAnaData()
         fAnaData[fTelID]->fTCorrectedSumLast = fRunPar->fsumfirst[fTelID] + fRunPar->fsumwindow_1[fTelID];
         fAnaData[fTelID]->fCurrentSummationWindow = fRunPar->fsumwindow_1[fTelID];
         fAnaData[fTelID]->fCurrentSummationWindow_2 = fRunPar->fsumwindow_2[fTelID];
-
+        
         if( getTraceFit() > -1. )
         {
             fAnaData[fTelID]->fRiseTime = 0.;
@@ -276,10 +276,10 @@ TTree* VEvndispData::getDetectorTree()
     {
         return fDetectorTree->getTree();
     }
-
+    
     fDetectorTree = new VDetectorTree();
     fDetectorTree->fillDetectorTree( fDetectorGeo );
-
+    
     return fDetectorTree->getTree();
 }
 
@@ -292,9 +292,9 @@ void VEvndispData::setDeadChannelText()
     {
         cout << "VEvndispData::setDeadChannelText()" << endl;
     }
-
+    
     fDeadChannelText.clear();
-
+    
     fDeadChannelText.push_back( "working" );
     fDeadChannelText.push_back( "dead: out of pedestal range" );
     fDeadChannelText.push_back( "dead: small absolute pedvars" );
@@ -317,7 +317,7 @@ bool VEvndispData::get_reconstruction_parameters( string ifile )
 {
     fEvndispReconstructionParameter = new VEvndispReconstructionParameter( getDetectorGeometry()->getTelType(), getRunParameter() );
     fEvndispReconstructionParameter->SetName( "EvndispReconstructionParameter" );
-
+    
     unsigned int iNMethods = 0;
     if( ifile.size() > 0 )
     {
@@ -347,7 +347,7 @@ bool VEvndispData::get_reconstruction_parameters( string ifile )
     {
         return false;
     }
-
+    
     return true;
 }
 
@@ -367,7 +367,7 @@ void VEvndispData::dumpTreeData()
             cout << endl << "telescopes" << endl;
     cout << fDetectorTree->getTree()->GetName() << endl;
     fDetectorTree->getTree()->Print();
-
+    
             fDetectorTree->getTree()->Scan();
             cout << endl;
         } */
@@ -432,7 +432,7 @@ void VEvndispData::setDead( unsigned int iChannel, unsigned int iDead, bool iLow
         {
             return;
         }
-
+        
         if( iChannel < getDead( iLowGain ).size() )
         {
             bitset<8 * sizeof(uint32_t )> ibit_dead = getDead( iLowGain )[iChannel];
@@ -491,13 +491,13 @@ void VEvndispData::endOfRunInfo()
 void VEvndispData::printDeadChannels( bool iLowGain, bool iGrepAble )
 {
     TString mode = iLowGain ? " low" : "high" ;
-
+    
     unsigned int idead = 0;
     cout << endl;
-
+    
     cout << "Dead channel list (" << mode << " gain) for Telescope " << getTelID() + 1 << endl;
     cout << "==================================" << endl;
-
+    
     for( unsigned int i = 0; i < getDead( iLowGain ).size(); i++ )
     {
         if( getDead( iLowGain )[i] > 0 )
@@ -512,7 +512,7 @@ void VEvndispData::printDeadChannels( bool iLowGain, bool iGrepAble )
             {
                 linestart.Form( "\t%3d: ", i );
             }
-
+            
             if( i_dead.test( 9 ) ) //L2 channel
             {
                 cout << linestart  << fDeadChannelText[9] << endl;
@@ -524,7 +524,7 @@ void VEvndispData::printDeadChannels( bool iLowGain, bool iGrepAble )
             else //set dead by eventdisplay
             {
                 extrainfo.Form( "(pedestal %5.1f, pedvar %5.1f, rel. gain %3.2f, gainvar %3.2f, L1 rate %.2e Hz, HV %4d V, I %4.1f muA)", getPeds( iLowGain )[i], getPedvars(( bool )iLowGain, getSumWindow() )[ i ], getGains( iLowGain )[i], getGainvars( iLowGain )[i], getL1Rate( i ), ( int )getHV( i ), getCurrent( i ) );
-
+                
                 cout << linestart << extrainfo ;
                 for( unsigned j = 0; j < i_dead.size(); j++ )
                 {
@@ -535,9 +535,9 @@ void VEvndispData::printDeadChannels( bool iLowGain, bool iGrepAble )
                 }
                 cout << endl;
                 idead++;
-
+                
             }
-
+            
         }
     }
     cout << "Total number of dead channels (" << mode << " gain) for Telescope " << getTelID() + 1 << ": " << idead << endl;
@@ -552,7 +552,7 @@ VImageParameter* VEvndispData::getImageParameters( int iselect )
     {
         return fAnaData[fTelID]->fImageParameterLogL;
     }
-
+    
     return fAnaData[fTelID]->fImageParameter;
 }
 
@@ -566,7 +566,7 @@ bool VEvndispData::initializeDeadChannelFinder()
     for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
     {
         bool itelStats = getTelescopeStatus( getTeltoAna()[i] );
-
+        
         fDeadChannelDefinition_HG.push_back( new VDeadChannelFinder( getRunParameter()->frunmode, getTeltoAna()[i], false, fReader->isMC() ) );
         fDeadChannelDefinition_LG.push_back( new VDeadChannelFinder( getRunParameter()->frunmode, getTeltoAna()[i], true, fReader->isMC() ) );
         if( itelStats && getRunParameter()->fsourcetype != 6
@@ -622,7 +622,7 @@ valarray<double>& VEvndispData::getPeds( bool iLowGain, double iTime )
         }
     }
     fPlotRawPedestals.resize( getNChannels(), getDetectorGeometry()->getDefaultPedestal() );
-
+    
     return fPlotRawPedestals;
 }
 
@@ -636,7 +636,7 @@ valarray<double>& VEvndispData::getPedvars( bool iLowGain, unsigned int iSW, dou
     {
         return fCalData[fTelID]->getPedvars( iLowGain, iSW, getEventTime() );
     }
-
+    
     return fCalData[fTelID]->getPedvars( iLowGain, iSW, iTime );
 }
 
@@ -654,7 +654,7 @@ void VEvndispData::setDebugLevel( int i )
 int VEvndispData::getDebugLevel()
 {
     int nDebugMessagesMax = 100;
-
+    
     // allow a maximum of 100 debug messages
     if( fNDebugMessages > nDebugMessagesMax )
     {
@@ -667,7 +667,7 @@ int VEvndispData::getDebugLevel()
         fNDebugMessages++;
         return 2;
     }
-
+    
     return fDebugLevel;
 }
 
@@ -679,7 +679,7 @@ void VEvndispData::setCurrentSummationWindow( unsigned int imin, unsigned int im
     {
         iT = imax - imin;
     }
-
+    
     // this should never happen
     if( iT > getNSamples() )
     {
@@ -703,7 +703,7 @@ void VEvndispData::setCurrentSummationWindow( unsigned int imin, unsigned int im
     {
         fAnaData[fTelID]->fCurrentSummationWindow_2 = iT;
     }
-
+    
 }
 
 
@@ -720,7 +720,7 @@ void VEvndispData::setCurrentSummationWindow( unsigned int iChannel, unsigned in
         {
             fAnaData[fTelID]->fCurrentSummationWindow[iChannel] = 0;
         }
-
+        
         // this should never happen
         if( fAnaData[fTelID]->fCurrentSummationWindow[iChannel] > getNSamples() )
         {
@@ -740,7 +740,7 @@ void VEvndispData::setCurrentSummationWindow( unsigned int iChannel, unsigned in
         {
             fAnaData[fTelID]->fCurrentSummationWindow_2[iChannel] = 0;
         }
-
+        
         // this should never happen
         if( fAnaData[fTelID]->fCurrentSummationWindow_2[iChannel] > getNSamples() )
         {
@@ -771,7 +771,7 @@ VDeadChannelFinder* VEvndispData::getDeadChannelFinder( bool iLowGain )
     {
         return fDeadChannelDefinition_HG[getTeltoAnaID()];
     }
-
+    
     return fDeadChannelDefinition_LG[getTeltoAnaID()];
 }
 
@@ -784,7 +784,7 @@ bool VEvndispData::isTeltoAna( unsigned int iTel )
             return true;
         }
     }
-
+    
     return false;
 }
 
@@ -801,7 +801,7 @@ valarray<double>& VEvndispData::getPulseTime( bool iCorrected )
     {
         return fAnaData[fTelID]->getTZeros( iCorrected );
     }
-
+    
     // default: return average pulse time
     // in run parameter file: FADCSUMMATIONSTART set to TAVERAGE
     return fAnaData[fTelID]->getTraceAverageTime( iCorrected );
@@ -819,7 +819,7 @@ vector< valarray<double> >& VEvndispData::getPulseTiming( bool iCorrected )
     {
         return fAnaData[fTelID]->fPulseTimingCorrected;
     }
-
+    
     return fAnaData[fTelID]->fPulseTimingUncorrected;
 }
 
@@ -889,7 +889,7 @@ void VEvndispData::setPulseTimingCorrection( unsigned int iChannel, double iCorr
 unsigned int VEvndispData::getLargestSumWindow()
 {
     unsigned int iSW = 0;
-
+    
     if( getSumWindow() > iSW )
     {
         iSW = getSumWindow();
@@ -902,14 +902,14 @@ unsigned int VEvndispData::getLargestSumWindow()
     {
         iSW = getSumWindow_Pass1();
     }
-
+    
     return iSW;
 }
 
 unsigned int VEvndispData::getLargestSumWindow( unsigned int iTelID )
 {
     unsigned int iSW = 0;
-
+    
     if( getSumWindow() > iSW )
     {
         iSW = getSumWindow( iTelID );
@@ -922,7 +922,7 @@ unsigned int VEvndispData::getLargestSumWindow( unsigned int iTelID )
     {
         iSW = getSumWindow_Pass1( iTelID );
     }
-
+    
     return iSW;
 }
 
@@ -936,7 +936,7 @@ unsigned int VEvndispData::checkSummationWindow( unsigned int iTelID, unsigned i
     {
         return iSumWindow;
     }
-
+    
     return getNSamples( iTelID );
 }
 
@@ -1071,9 +1071,9 @@ unsigned int VEvndispData::getDead( unsigned int iChannel, bool iLowGain = false
     {
         return getDead( iLowGain )[iChannel];
     }
-
+    
     // for low gain channels only:
-
+    
     // low gain is dead
     if( getDead( iLowGain )[iChannel] )
     {
@@ -1111,7 +1111,7 @@ double VEvndispData::getAverageElevation()
         {
             i_stopp = getRunParameter()->fDBDataStartTimeSecOfDay + ( float )( getRunParameter()->fTimeCutsMin_max ) * 60.;
         }
-
+        
         for( float i = i_start; i < i_stopp; i++ )
         {
             VSkyCoordinatesUtilities::getHorizontalCoordinates( getRunParameter()->fDBDataStartTimeMJD, i,
@@ -1129,7 +1129,7 @@ double VEvndispData::getAverageElevation()
             iAverageElevation = 0.;
         }
     }
-
+    
     return iAverageElevation;
 }
 

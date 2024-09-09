@@ -23,14 +23,14 @@ class VRunSummary
 {
     private:
         TTree* fRunSummaryTree;
-
+        
         void fitEnergyHistogram( TH1D*, double minE, double maxE );
         void init();
         bool initTree();
         bool setBranches();
-
+        
     public:
-
+    
         int runOn;
         int runOff;
         double MJDOn;
@@ -77,7 +77,7 @@ class VRunSummary
         double MaxSigni;
         double MaxSigniX;
         double MaxSigniY;
-
+        
         ////////////////
         // variables used for total analysis only
         //
@@ -97,12 +97,12 @@ class VRunSummary
         double fMeanRawRateOff;
         double fMeanPedVarsOn;
         double fMeanPedVarsOff;
-
+        
         double fTotTargetRA;
         double fTotTargetDec;
         double fTotTargetRAJ2000;
         double fTotTargetDecJ2000;
-
+        
         VRunSummary();
         ~VRunSummary() {}
         void fill();

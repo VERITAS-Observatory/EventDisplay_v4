@@ -54,7 +54,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( int nbins, double* e, doubl
     {
         return 0.;
     }
-
+    
     fenergy.clear();
     feffectiveArea.clear();
     for( int i = 0; i < nbins; i++ )
@@ -75,9 +75,9 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double >& e, vector
 {
     iEMin = log10( iEMin );
     iEMax = log10( iEMax );
-
+    
     i_phi *= TMath::Power( iE0, -1.*i_gamma );
-
+    
     // dN
     double y1 = 0.;
     // rate
@@ -85,7 +85,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double >& e, vector
     double x1 = 0.;
     double x2 = 0.;
     double i_bflux = 0.;
-
+    
     for( unsigned int i = 0; i < e.size(); i++ )
     {
         // get lower and upper energy bin
@@ -106,19 +106,19 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double >& e, vector
         }
         // effective area (m2 -> cm2) (fluxes are given in cm^-2)
         y1 = eff[i] * 1.e4;
-
+        
         // calculate number of events per energy bin
         // (energy (x) is in log E [TeV]
-
+        
         // (this is the integral flux above energy of upper bin edge)
         i_bflux  = i_phi / ( i_gamma + 1 ) * pow( pow( 10., x2 ), i_gamma + 1 );
         // (subtract integral flux above energy of lower bin edge)
         i_bflux  -= i_phi / ( i_gamma + 1 ) * pow( pow( 10., x1 ), i_gamma + 1 );
-
+        
         // multiply flux by effective areas
         // (this is the number of gammas per energy bin (dN not dN/dE)
         y1  *= i_bflux;
-
+        
         // this is approximate, iEMin and iEMax can be much smaller than interval x1, x2
         if( x1 > iEMin && x2 < iEMax )
         {
@@ -137,7 +137,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double >& e, vector
     {
         return 0.;
     }
-
+    
     // convert rate [1/s] to [1/min]
     return iTot * 60.;
 }
@@ -154,7 +154,7 @@ TCanvas* VMonteCarloRateCalculator::plot_MonteCarloRate_vs_wobbleOffsets( TCanva
     {
         c->cd();
     }
-
+    
     TGraphAsymmErrors* g = getMonteCarloRate_vs_wobbleOffsets( ze, az, noise );
     if( g )
     {
@@ -164,7 +164,7 @@ TCanvas* VMonteCarloRateCalculator::plot_MonteCarloRate_vs_wobbleOffsets( TCanva
     {
         g->Draw( iPlottingOption.c_str() );
     }
-
+    
     return c;
 }
 
@@ -175,19 +175,19 @@ TGraphAsymmErrors* VMonteCarloRateCalculator::getMonteCarloRate_vs_wobbleOffsets
     {
         return 0;
     }
-
+    
     TGraphAsymmErrors* g = new TGraphAsymmErrors( 1 );
     setGraphPlottingStyle( g );
-
+    
     double i_mean = 0.;
     double i_min = 0.;
     double i_max = 0.;
-
+    
     int z = 0;
     for( int i = 0; i < fMCTree->GetEntries(); i++ )
     {
         fMCTree->GetEntry( i );
-
+        
         if( faz != az )
         {
             continue;
@@ -200,16 +200,16 @@ TGraphAsymmErrors* VMonteCarloRateCalculator::getMonteCarloRate_vs_wobbleOffsets
         {
             continue;
         }
-
+        
         getMinMaxRates( fnrates, fMCrate, i_mean, i_min, i_max );
-
+        
         g->SetPoint( z, fwoff, i_mean );
         g->SetPointEYhigh( z, i_max - i_mean );
         g->SetPointEYlow( z, i_mean - i_min );
-
+        
         z++;
     }
-
+    
     return g;
 }
 
@@ -220,7 +220,7 @@ void VMonteCarloRateCalculator::getMinMaxRates( unsigned int n, double* r, doubl
     double z = 0;
     i_min = 1.e10;
     i_max = -1.e10;
-
+    
     for( unsigned int i = 0; i < n; i++ )
     {
         if( TMath::Abs( r[i] < 1.e-2 ) )
@@ -257,7 +257,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( int nbins, double* e, doubl
     {
         return 0.;
     }
-
+    
     vector< double > energy;
     vector< double > effectiveArea;
     for( int i = 0; i < nbins; i++ )
@@ -295,7 +295,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
         double iEMin, double iEMax, TH2* iResponseMatrix, bool bDebug )
 {
     vector< double > e_gamma;
-
+    
     return getMonteCarloRate( e, eff, e_lit, e_lit_ID, iEMinBin, iEMaxBin, iEMin, iEMax, iResponseMatrix, e_gamma, bDebug );
 }
 
@@ -326,20 +326,20 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
     {
         iEMaxBin = e_gamma.size() - 1;
     }
-
+    
     if(!iResponseMatrix && e_gamma.size() != eff.size() )
     {
         cout <<  "VMonteCarloRateCalculator::getMonteCarloRate error: energy and effective area vector have different length: ";
         cout << e_gamma.size() << "\t" << eff.size() << endl;
         return -99.;
     }
-
+    
     // check function ID of cosmic ray / gamma spectrum
     if(!e_lit || !e_lit->isValidID( e_lit_ID ) )
     {
         return -99.;
     }
-
+    
     // dN
     double y1 = 0.;
     // rate
@@ -349,7 +349,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
     double i_bflux = 0.;
     int i_Rec_Bin = 0;
     int j_Rec_Bin = 0;
-
+    
     if( bDebug )
     {
         cout << "VMonteCarloRateCalculator::getMonteCarloRate " << e_lit_ID << ": " << e.size() << "\t" << eff.size();
@@ -359,7 +359,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
         cout << " EMax: " << e_gamma[iEMaxBin] << " (" << iEMaxBin << ")";
         cout << endl;
     }
-
+    
     // loop over energy interval in units of effective area vector
     for( unsigned int i = iEMinBin; i <= iEMaxBin; i++ )
     {
@@ -416,17 +416,17 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
         {
             // effective area (m2 -> cm2)
             y1 = eff[i] * 1.e4;
-
+            
             // calculate number of events per energy bin
             // (energy (x) is in log E [TeV]
-
+            
             // get integral flux for this bin
             i_bflux = e_lit->getIntegralFlux( pow( 10., x1 ), pow( 10., x2 ), e_lit_ID );
-
+            
             // multiply flux by effective areas
             // (this is the number of gammas per energy bin (dN not dN/dE)
             y1  *= i_bflux;
-
+            
             // this is approximate, iEMin and iEMax can be much smaller than interval x1, x2
             if( iEMin > 0. && iEMax > 0. )
             {
@@ -446,7 +446,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
     {
         cout << "\tRate [1/s]: " << iTot << " Rate [1/min]: " << iTot * 60. << endl;
     }
-
+    
     // convert rate [1/s] to [1/min]
     return iTot * 60.;
 }

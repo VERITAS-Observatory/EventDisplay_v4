@@ -21,6 +21,6 @@ int main( int argc, char* argv[] )
         exit( EXIT_SUCCESS );
     }
     double iMJD = atof( argv[1] );
-
+    
     cout << VSkyCoordinatesUtilities::getSQLstring_fromMJD( iMJD ) << endl;
 }

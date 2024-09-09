@@ -20,11 +20,11 @@ TH2F* VInterpolate2DHistos::doSimpleInterpolation( TH2F* h, string iname, int iw
     {
         return 0;
     }
-
+    
     char hname[600];
     sprintf( hname, "%s_%s", h->GetName(), iname.c_str() );
     TH2F* hs = ( TH2F* )h->Clone( hname );
-
+    
     double z = 0.;
     double imean = 0.;
     double ierror = 0.;
@@ -89,24 +89,24 @@ TH2F* VInterpolate2DHistos::doGaussianInterpolation( TH2F* h, string iname, TH2F
     {
         return 0;
     }
-
+    
     char hname[600];
     sprintf( hname, "%s_%s", h->GetName(), iname.c_str() );
     TH2F* hs = ( TH2F* )h->Clone( hname );
-
+    
     sprintf( hname, "%s_%s_%s", h->GetName(), iname.c_str(), "temp" );
     TProfile2D h2D( hname, "", hs->GetNbinsX(), hs->GetXaxis()->GetXmin(), hs->GetXaxis()->GetXmax(), hs->GetNbinsY(), hs->GetYaxis()->GetXmin(), hs->GetYaxis()->GetXmax(), -100., 100. );
-
+    
     double x = 0.;
     double y = 0.;
     double xc = 0.;
     double yc = 0.;
     double z = 0.;
     int n = 0;
-
+    
     double xWidth = hs->GetXaxis()->GetBinWidth( 1 );
     double yWidth = hs->GetYaxis()->GetBinWidth( 1 );
-
+    
     for( int i = 1; i <= hs->GetNbinsX(); i++ )
     {
         xc = hs->GetXaxis()->GetBinCenter( i );
@@ -115,7 +115,7 @@ TH2F* VInterpolate2DHistos::doGaussianInterpolation( TH2F* h, string iname, TH2F
             yc = hs->GetYaxis()->GetBinCenter( j );
             z  = hs->GetBinContent( i, j );
             n  = ( int )( hNevents->GetBinContent( i, j ) * nGausN );
-
+            
             // loop over all bin entries
             for( int k = 0; k < n; k++ )
             {
@@ -125,7 +125,7 @@ TH2F* VInterpolate2DHistos::doGaussianInterpolation( TH2F* h, string iname, TH2F
             }
         }
     }
-
+    
     // copy histograms
     for( int i = 1; i <= hs->GetNbinsX(); i++ )
     {

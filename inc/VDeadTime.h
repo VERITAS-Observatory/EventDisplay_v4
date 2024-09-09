@@ -20,16 +20,16 @@ using namespace std;
 class VDeadTime
 {
     private:
-
+    
         bool bIsOn;
-
+        
         double fDeadTimeMiss;
         double fDeadTimeMS;
         double fDeadTimeFrac;
-
+        
         double fTFitMin;
         double fTFitMax;
-
+        
         double ft0;
         double fRunStart;
         TH1D* hTimeDiff;
@@ -39,7 +39,7 @@ class VDeadTime
         TGraphErrors* hgDeadTime;
         TH1D* hNEventTime;
         TList* hisList;
-
+        
         // scalar related histograms
         TH1D* hScalarClock;
         TH1D* hScalarBusy;
@@ -50,12 +50,12 @@ class VDeadTime
         double fScalarTimeOfFirstEvent;
         double fScalarDeadTimeFrac;
         double fScalarDeadTimeChi2;
-
+        
         double  calculateDeadTimeFromScalars();
         double  calculateDeadTimeFromTimeDifferences();
-
+        
     public:
-
+    
         VDeadTime( bool iIsOn = true );
         ~VDeadTime() {}
         double calculateDeadTime();

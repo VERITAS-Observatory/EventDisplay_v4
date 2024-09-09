@@ -22,7 +22,7 @@ class Ctelconfig
     public :
         TTree*          fChain;                   //!pointer to the analyzed TTree or TChain
         Int_t           fCurrent;                 //!current Tree number in a TChain
-
+        
         // Declaration of leaf types
         UInt_t          NTel;
         Int_t           TelID;
@@ -53,7 +53,7 @@ class Ctelconfig
         Float_t         YTubeDeg[VDST_MAXCHANNELS];
         //[NPixel]
         Float_t         RTubeDeg[VDST_MAXCHANNELS];
-
+        
         // List of branches
         TBranch*        b_NTel;                   //!
         TBranch*        b_TelID;                  //!
@@ -81,7 +81,7 @@ class Ctelconfig
         TBranch*        b_XTubeDeg;               //!
         TBranch*        b_YTubeDeg;               //!
         TBranch*        b_RTubeDeg;               //!
-
+        
         Ctelconfig( TTree* tree = 0 );
         virtual ~Ctelconfig();
         virtual Int_t    Cut( Long64_t entry );
@@ -121,7 +121,7 @@ bool Ctelconfig::IsZombie()
     {
         return false;
     }
-
+    
     return true;
 }
 
@@ -172,7 +172,7 @@ void Ctelconfig::Init( TTree* tree )
     // code, but the routine can be extended by the user if needed.
     // Init() will be called many times when running on PROOF
     // (once per file to be processed).
-
+    
     // Set branch addresses and branch pointers
     if(!tree )
     {
@@ -181,7 +181,7 @@ void Ctelconfig::Init( TTree* tree )
     fChain = tree;
     fCurrent = -1;
     fChain->SetMakeClass( 1 );
-
+    
     NTel = 0;
     fChain->SetBranchAddress( "NTel", &NTel, &b_NTel );
     if( fChain->GetBranchStatus( "TelID" ) )
@@ -290,7 +290,7 @@ Bool_t Ctelconfig::Notify()
     // is started when using PROOF. It is normally not necessary to make changes
     // to the generated code, but the routine can be extended by the
     // user if needed. The return value is currently not used.
-
+    
     return kTRUE;
 }
 
@@ -324,7 +324,7 @@ double Ctelconfig::getArrayCentreX()
         for( Long64_t i = 0; i < fChain->GetEntries(); i++ )
         {
             fChain->GetEntry( i );
-
+            
             iX += TelX;
             iN++;
         }
@@ -345,7 +345,7 @@ double Ctelconfig::getArrayCentreY()
         for( Long64_t i = 0; i < fChain->GetEntries(); i++ )
         {
             fChain->GetEntry( i );
-
+            
             iY += TelY;
             iN++;
         }
@@ -367,16 +367,16 @@ double Ctelconfig::getArrayMaxSize()
         for( Long64_t i = 0; i < fChain->GetEntries(); i++ )
         {
             fChain->GetEntry( i );
-
+            
             if( TMath::Sqrt(( TelX - iXc ) * ( TelX - iXc ) + ( TelY - iYc ) * ( TelY - iYc ) ) > iMax )
             {
                 iMax = TMath::Sqrt(( TelX - iXc ) * ( TelX - iXc ) + ( TelY - iYc ) * ( TelY - iYc ) );
             }
         }
-
+        
         return iMax;
     }
-
+    
     return 0.;
 }
 
@@ -386,13 +386,13 @@ unsigned int Ctelconfig::getNTel()
     {
         return NTel;
     }
-
+    
     if( fChain && fChain->GetEntries() > 0 )
     {
         fChain->GetEntry( 0 );
         return NTel;
     }
-
+    
     return 0;
 }
 

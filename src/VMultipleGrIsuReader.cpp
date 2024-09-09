@@ -10,14 +10,14 @@
 VMultipleGrIsuReader::VMultipleGrIsuReader( unsigned int nFiles, vector< unsigned int > iTelToAna, bool iDebug )
 {
     fDebug = iDebug;
-
+    
     fNFiles = nFiles;
     fTelescopeID = 0;
     fFileID = 0;
     fTeltoAna = iTelToAna;
-
+    
     setEventStatus( 1 );
-
+    
     for( unsigned int i = 0; i < fNFiles; i++ )
     {
         fSelectedTelescope.push_back( true );
@@ -34,9 +34,9 @@ bool VMultipleGrIsuReader::init( VDetectorGeometry* iD, string i_sourcefile, vec
 {
     char hname[2000];
     bool iB = true;
-
+    
     map< unsigned int, unsigned int > iTelGrisu = iD->getTelIDGrisu();
-
+    
     //////////////////////////////////////////////////////////////////
     // make file names
     cout << "VMultipleGrIsuReader::init source file: " << fNFiles << endl;
@@ -48,7 +48,7 @@ bool VMultipleGrIsuReader::init( VDetectorGeometry* iD, string i_sourcefile, vec
             {
                 bAna = true;
             }
-
+            
         // make file names for source file
         if( bAna )
         {
@@ -71,7 +71,7 @@ bool VMultipleGrIsuReader::init( VDetectorGeometry* iD, string i_sourcefile, vec
             fSourceFileName.push_back( "" );
         }
     }
-
+    
     /////////////////////////////////////////////////////////
     // create noise file reader
     // (one single noise file for all grisu files)
@@ -121,23 +121,23 @@ void VMultipleGrIsuReader::fillRandomPeds( VGrIsuReader* g, int iseed )
     {
         return;
     }
-
+    
     cout << "\t VMultipleGrIsuReader: randomizing pedestals" << endl;
-
+    
     TRandom3 iRandom( iseed );
-
+    
     if( fNoiseFileReader->getFullNoiseVec().size() > 0 && fNoiseFileReader->getFullNoiseVec()[0].size() > 0 )
     {
         g->assignGrisuPeds( fNoiseFileReader->getFullNoiseVec()[0][0].size() );
     }
-
+    
     // randomize all values
     if( fNoiseFileReader->getPeds().size() == g->getPeds().size() && g->getPedvars().size() == fNoiseFileReader->getPedvars().size() && g->getPedvarsAllSumWindows().size() == fNoiseFileReader->getPedvarsAllSumWindows().size() && g->getPedRMS().size() == fNoiseFileReader->getPedRMS().size() )
     {
         for( unsigned int i = 0; i < fNoiseFileReader->getPeds().size(); i++ )
         {
             int f = iRandom.Integer( fNoiseFileReader->getPeds().size() );
-
+            
             g->getPeds()[i] = fNoiseFileReader->getPeds()[f];
             g->getPedvars()[i] = fNoiseFileReader->getPedvars()[f];
             for( unsigned int w = 0; w < g->getPedvarsAllSumWindows().size(); w++ )
@@ -145,7 +145,7 @@ void VMultipleGrIsuReader::fillRandomPeds( VGrIsuReader* g, int iseed )
                 g->getPedvarsAllSumWindows()[w][i] = fNoiseFileReader->getPedvarsAllSumWindows()[w][f];
             }
             g->getPedRMS()[i] = fNoiseFileReader->getPedRMS()[i];
-
+            
             for( unsigned int b = 0; b < fNoiseFileReader->getFullNoiseVec( 0, f ).size(); b++ )
             {
                 g->getFullNoiseVec( 0, i )[b] = fNoiseFileReader->getFullNoiseVec( 0, f )[b];
@@ -166,9 +166,9 @@ bool VMultipleGrIsuReader::checkTelescopeID( unsigned int iT )
     {
         return true;
     }
-
+    
     cout << "VMultipleGrIsuReader::checkTelescopeID; ERROR: telescope ID out of range: " << iT << " " << fNFiles << " " << fReader.size() << endl;
-
+    
     return false;
 }
 
@@ -179,7 +179,7 @@ VGrIsuReader* VMultipleGrIsuReader::getReader()
     {
         return fReader[fTelescopeID];
     }
-
+    
     return 0;
 }
 
@@ -190,7 +190,7 @@ string VMultipleGrIsuReader::getDataFormat()
     {
         return getReader()->getDataFormat();
     }
-
+    
     string a;
     return a;
 }
@@ -202,7 +202,7 @@ string VMultipleGrIsuReader::getSourceFileName()
     {
         return fSourceFileName[fTelescopeID];
     }
-
+    
     string a;
     return a;
 }
@@ -214,7 +214,7 @@ std::pair< bool, uint32_t > VMultipleGrIsuReader::getChannelHitIndex( uint32_t t
     {
         return getReader()->getChannelHitIndex( t );
     }
-
+    
     pair< bool, uint32_t > a;
     return a;
 }
@@ -226,7 +226,7 @@ uint32_t VMultipleGrIsuReader::getEventNumber()
     {
         return getReader()->getEventNumber();
     }
-
+    
     return 0;
 }
 
@@ -238,7 +238,7 @@ std::vector< bool > VMultipleGrIsuReader::getFullHitVec()
     {
         return getReader()->getFullHitVec();
     }
-
+    
     vector< bool > a;
     return a;
 }
@@ -250,7 +250,7 @@ std::vector< bool > VMultipleGrIsuReader::getFullTrigVec()
     {
         return getReader()->getFullTrigVec();
     }
-
+    
     vector< bool > a;
     return a;
 }
@@ -262,7 +262,7 @@ int VMultipleGrIsuReader::getNumberofFullTrigger()
     {
         return getReader()->getNumberofFullTrigger();
     }
-
+    
     return 0;
 }
 
@@ -273,7 +273,7 @@ std::vector< int > VMultipleGrIsuReader::getFullAnaVec()
     {
         return getReader()->getFullAnaVec();
     }
-
+    
     vector< int > a;
     return a;
 }
@@ -285,7 +285,7 @@ uint8_t VMultipleGrIsuReader::getEventType()
     {
         return getReader()->getEventType();
     }
-
+    
     return 0;
 }
 
@@ -296,7 +296,7 @@ uint8_t VMultipleGrIsuReader::getATEventType()
     {
         return getReader()->getATEventType();
     }
-
+    
     return 0;
 }
 
@@ -307,7 +307,7 @@ uint32_t VMultipleGrIsuReader::getHitID( uint32_t t )
     {
         return getReader()->getHitID( t );
     }
-
+    
     return 0;
 }
 
@@ -318,7 +318,7 @@ bool VMultipleGrIsuReader::getHiLo( uint32_t i )
     {
         return getReader()->getHiLo( i );
     }
-
+    
     return 0;
 }
 
@@ -329,7 +329,7 @@ uint16_t VMultipleGrIsuReader::getMaxChannels()
     {
         return getReader()->getMaxChannels();
     }
-
+    
     return 0;
 }
 
@@ -340,7 +340,7 @@ std::vector< uint8_t > VMultipleGrIsuReader::getNoiseVec( unsigned int iTel, uin
     {
         return fReader[iTel]->getNoiseVec( 0, iHitID );
     }
-
+    
     std::vector< uint8_t > a;
     return a;
 }
@@ -352,7 +352,7 @@ uint16_t VMultipleGrIsuReader::getNumChannelsHit()
     {
         return getReader()->getNumChannelsHit();
     }
-
+    
     return 0;
 }
 
@@ -363,7 +363,7 @@ uint16_t VMultipleGrIsuReader::getNumSamples()
     {
         return getReader()->getNumSamples();
     }
-
+    
     return 0;
 }
 
@@ -374,7 +374,7 @@ TH1F* VMultipleGrIsuReader::getPedHisto( unsigned int iTel, unsigned int ichanne
     {
         return fReader[iTel]->getPedHisto( 0, ichannel );
     }
-
+    
     return 0;
 }
 
@@ -385,7 +385,7 @@ std::valarray< double >& VMultipleGrIsuReader::getPeds()
     {
         return getReader()->getPeds();
     }
-
+    
     return vvv_valarray;
 }
 
@@ -396,7 +396,7 @@ std::valarray< double >& VMultipleGrIsuReader::getPedvars()
     {
         return getReader()->getPedvars();
     }
-
+    
     return vvv_valarray;
 }
 
@@ -407,7 +407,7 @@ std::vector< valarray<double> >& VMultipleGrIsuReader::getPedvarsAllSumWindows()
     {
         return getReader()->getPedvarsAllSumWindows();
     }
-
+    
     return vvv_v_vvv_valarray;
 }
 
@@ -418,7 +418,7 @@ std::valarray< double >& VMultipleGrIsuReader::getPedRMS()
     {
         return getReader()->getPedRMS();
     }
-
+    
     return vvv_valarray;
 }
 
@@ -429,7 +429,7 @@ std::vector< uint8_t > VMultipleGrIsuReader::getSamplesVec()
     {
         return getReader()->getSamplesVec();
     }
-
+    
     std::vector< uint8_t > a;
     return a;
 }
@@ -559,7 +559,7 @@ float VMultipleGrIsuReader::getLocalTriggerTime( unsigned int iTel )
     {
         return fReader[iTel]->getLocalTriggerTime( 0 );
     }
-
+    
     return 0.;
 }
 
@@ -570,7 +570,7 @@ float VMultipleGrIsuReader::getLocalDelayedTriggerTime( unsigned int iTel )
     {
         return fReader[iTel]->getLocalDelayedTriggerTime( 0 );
     }
-
+    
     return 0.;
 }
 
@@ -581,7 +581,7 @@ unsigned int VMultipleGrIsuReader::getNTelLocalTrigger()
     {
         return getReader()->getNTelLocalTrigger();
     }
-
+    
     return 0;
 }
 
@@ -590,7 +590,7 @@ bool VMultipleGrIsuReader::hasArrayTrigger()
 {
     // require at least two telescopes with local trigger
     unsigned int ntrig = 0;
-
+    
     for( unsigned int i = 0; i < fReader.size(); i++ )
     {
         if( fReader[i] && fReader[i]->hasLocalTrigger( 0 ) )
@@ -602,7 +602,7 @@ bool VMultipleGrIsuReader::hasArrayTrigger()
             return true;
         }
     }
-
+    
     return false;
 }
 
@@ -613,7 +613,7 @@ bool VMultipleGrIsuReader::hasLocalTrigger( unsigned int iTel )
     {
         return fReader[iTel]->hasLocalTrigger( 0 );
     }
-
+    
     return false;
 }
 
@@ -624,7 +624,7 @@ double VMultipleGrIsuReader::getXimpactrot()
     {
         return getReader()->getXimpactrot();
     }
-
+    
     return 0.;
 }
 
@@ -635,7 +635,7 @@ double VMultipleGrIsuReader::getYimpactrot()
     {
         return getReader()->getYimpactrot();
     }
-
+    
     return 0.;
 }
 
@@ -733,7 +733,7 @@ int VMultipleGrIsuReader::getMC_primary()
     {
         return getReader()->getMC_primary();
     }
-
+    
     return 0;
 }
 
@@ -744,7 +744,7 @@ float VMultipleGrIsuReader::getMC_energy()
     {
         return getReader()->getMC_energy();
     }
-
+    
     return 0.;
 }
 
@@ -755,7 +755,7 @@ float VMultipleGrIsuReader::getMC_X()
     {
         return getReader()->getMC_X();
     }
-
+    
     return 0.;
 }
 
@@ -766,7 +766,7 @@ float VMultipleGrIsuReader::getMC_Y()
     {
         return getReader()->getMC_Y();
     }
-
+    
     return 0.;
 }
 
@@ -777,7 +777,7 @@ float VMultipleGrIsuReader::getMC_Xcos()
     {
         return getReader()->getMC_Xcos();
     }
-
+    
     return 0.;
 }
 
@@ -788,7 +788,7 @@ float VMultipleGrIsuReader::getMC_Ycos()
     {
         return getReader()->getMC_Ycos();
     }
-
+    
     return 0.;
 }
 
@@ -799,7 +799,7 @@ float VMultipleGrIsuReader::getMC_Ze()
     {
         return getReader()->getMC_Ze();
     }
-
+    
     return 0.;
 }
 
@@ -810,7 +810,7 @@ float VMultipleGrIsuReader::getMC_Az()
     {
         return getReader()->getMC_Az();
     }
-
+    
     return 0.;
 }
 
@@ -821,7 +821,7 @@ float VMultipleGrIsuReader::getMC_Xoffset()
     {
         return getReader()->getMC_Xoffset();
     }
-
+    
     return 0.;
 }
 
@@ -832,6 +832,6 @@ float VMultipleGrIsuReader::getMC_Yoffset()
     {
         return getReader()->getMC_Yoffset();
     }
-
+    
     return 0.;
 }

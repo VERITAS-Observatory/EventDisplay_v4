@@ -28,36 +28,36 @@ using namespace std;
 class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
 {
     private:
-
+    
         string fName;
-
+        
         string fAnaSumFile;
         double fDayInterval;
-
+        
         string fDataType;           // possible data types are TeV_anasum, TeV_ascii, XRT_ascii
-
+        
         VFluxCalculation*           fFluxCombined;     // does this has to be global? used in initializeTeVLightCurve() only
-
+        
         double                      fEnergy_min_TeV;
         double                      fEnergy_max_TeV;
-
+        
         // spectral parameters (assuming power law)
         double fMinEnergy;   //!< calculate flux limit above this energy [TeV]
         double fMaxEnergy;   //!< maximum energy to be taken into account [TeV]
         double fE0;          //!< calculate flux at this energy [TeV]
         double fAlpha;       //!< assumed spectral index
         bool   fFluxCalculationUseRolke;   //!< use Rolke for flux calculation
-
+        
         // significance and upper flux limit parameters
         int    fLiMaEqu;
         double fThresholdSignificance;
         double fMinEvents;
         double fUpperLimit;
         int    fUpperLimitMethod;
-
+        
         // light curve filling
         TH1D*    fObservingInvervallHisto;
-
+        
         // plotting
         TCanvas* fCanvasLightCurve;
         double   fPlottingMJDMin;
@@ -66,22 +66,22 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
         TH2D*    fMCRandomizedPhaseogram;
         TProfile* fMCRandomizedPhaseogramProf;
         TCanvas* fCanvasPhaseDistribution;
-
+        
         double   fRateAxisMin;
         double   fRateAxisMax;
         string   fRateAxisTitle;
         bool     fRateAxisTitleUnSet;
-
+        
         // private functions
         bool     fillTeV_anasum( bool iPrint );
         bool     fillTeV_ascii( bool iPrint );
         bool     fillXRT_ascii( bool iPrint );
-
+        
         double   getLightCurveAxisRange_Min();
         double   getLightCurveAxisRange_Max();
-
+        
     public:
-
+    
         VLightCurve();
         ~VLightCurve() {}
         bool     fill( double iEMin_TeV = 1., double iEMax_TeV = -1., bool iPrint = false );       // energy [TeV]
@@ -129,7 +129,7 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
             fFluxCalculationUseRolke = i_bRolke;
         }
         void     setSpectralParameters( double iMinEnergy = 0., double E0 = 1., double alpha = -2.5, double iMaxEnergy = MAX_SAFE_MC_ENERGY );
-
+        
         ClassDef( VLightCurve, 9 );
 };
 

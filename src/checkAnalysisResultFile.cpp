@@ -27,7 +27,7 @@ int main( int argc, char* argv[] )
     {
         ntel = atoi( argv[2] );
     }
-
+    
     TFile iF( iFile.c_str() );
     if( iF.IsZombie() )
     {
@@ -71,7 +71,7 @@ int main( int argc, char* argv[] )
         cout << "file has been recoverd " << iFile << endl;
     }
     iF.Close();
-
+    
     cout << "file success " << iFile << endl;
     exit( EXIT_SUCCESS );
 }

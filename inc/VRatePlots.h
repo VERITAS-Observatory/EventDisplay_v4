@@ -19,31 +19,31 @@ using namespace std;
 class VRatePlots
 {
     private:
-
+    
         vector< int > fRuns;
         map< int, double > fTime;
-
+        
         TList* hList;
         TList* hListTime;
         TList* hListRun;
-
+        
         TGraph* hSig_run;
         TGraph* hSigMax_run;
         TGraphErrors* hOn_run;
         TGraphErrors* hOff_run;
         TGraphErrors* hRate_run;
-
+        
         TGraph* hSig_time;
         TGraph* hSigMax_time;
         TGraphErrors* hOn_time;
         TGraphErrors* hOff_time;
         TGraphErrors* hRate_time;
-
+        
         void defineRunGraphs( int );
         void defineTimeGraphs( int );
-
+        
     public:
-
+    
         VRatePlots();
         VRatePlots( VAnaSumRunParameter*, map< int, double > );
         ~VRatePlots() {}

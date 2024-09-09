@@ -23,7 +23,7 @@ using namespace std;
 class VAstronometry
 {
     private:
-
+    
         static void test_vlaDjcl();
         static void test_vlaCldj();
         static void test_vlaPreces();
@@ -39,17 +39,17 @@ class VAstronometry
         static void test_vlaDr2tf();
         static void test_vlaDbear();
         static void test_vlaPa();
-
+        
     public:
-
+    
         VAstronometry();
         ~VAstronometry() {}
-
+        
         static void vlaDjcl( double djm, int* iy, int* im, int* id, double* fd, int* j );
         static void vlaCldj( int iy, int im, int id, double* djm, int* j );
         static double vlaGmst( double ut1 );
         static double vlaGmsta( double date, double ut1 );
-
+        
         static void vlaClyd( int iy, int im, int id, int* ny, int* nd, int* jstat );
         static double vlaDranrm( double angle );
         static double vlaDsep( double a1, double b1, double a2, double b2 );
@@ -60,12 +60,12 @@ class VAstronometry
         static void vlaDr2tf( int ndp, double angle, char* sign, int ihmsf[4] );
         static double vlaDbear( double a1, double b1, double a2, double b2 );
         static double vlaPa( double ha, double dec, double phi );
-
+        
         static void vlaEqgal( double dr, double dd, double* dl, double* db );
         static void vlaDe2h( double ha, double dec, double phi, double* az, double* el );
         static void vlaDh2e( double az, double el, double phi, double* ha, double* dec );
         static void vlaPreces( double MJD_ep0, double MJD_ep1, double* ra, double* dc );
-
+        
         static string getAstronometryLibrary();
         static void test();
 };

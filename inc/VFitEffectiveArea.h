@@ -29,20 +29,20 @@ double fun_effLin( double* e, double* p );
 class VFitEffectiveArea
 {
     public:
-
+    
         bool bZombie;
-
+        
         string fInputFile;
-
+        
         TF1* fEff;
         TF1* fEffLin;
         TList* hList;
         TGraphAsymmErrors* gEff;
         TGraphAsymmErrors* gEffLog;
-
+        
         bool bAMC;
         int fAMC;
-
+        
         TTree* fTree;
         double fZe;
         int fAz;
@@ -51,16 +51,16 @@ class VFitEffectiveArea
         double fIndex;
         double fFitMin;
         double fFitMax;
-
+        
         string fName;
         string fTitle;
-
+        
         TCanvas* cEffLog;
         TH1D* hnullLog;
         TCanvas* cEffLin;
         TH1D* hnullLin;
         double fCanvasMaximum;
-
+        
         VFitEffectiveArea( string ifile );
         void fill();
         void fit( double xmin = -1., double xmax = 1. );

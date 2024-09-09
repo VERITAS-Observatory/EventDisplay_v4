@@ -18,13 +18,13 @@ using namespace std;
 class VSkyCoordinates
 {
     protected:
-
+    
         VStarCatalogue* fStarCatalogue;
-
+        
         bool   fSet;                              //!< true if target or dec/ra is set
         bool   fPrecessed;                        //!< true if target position has been precessed
         bool   fMC;                               //!< true for Monte Carlo run
-
+        
         unsigned int fMJD;
         double fTime;
         double fTelDec;                           //!< [rad] //! declination of pointing direction
@@ -41,24 +41,24 @@ class VSkyCoordinates
         bool   fWobbleSet;                        //!< be sure that wobble offset is only applied once
         double fWobbleNorth;                      //!< [deg] wobble offset north
         double fWobbleEast;                       //!< [deg] wobble offset east
-
+        
         // telescope orientation
         double fTelAzimuth;                       //!< [deg]  return value to be used in the analysis
         double fTelElevation;                     //!< [deg]  return value to be used in the analysis
         float  fTelAzimuthCalculated;             //!< [deg]  elevation from source coordinates
         float  fTelElevationCalculated;           //!< [deg]  elevation from source coordinates
-
+        
         double fObsLatitude;                      //!< [rad]
         double fObsLongitude;                     //!< [rad]
         double fSupressStdoutText ;
-
+        
         void reset();
-
+        
     public:
-
+    
         VSkyCoordinates();
         ~VSkyCoordinates();
-
+        
         double derotateCoords( int MJD, double time, double i_xin, double i_yin, double& i_xout, double& i_yout );
         double derotateCoords( double i_UTC, double i_xin, double i_yin, double& i_xout, double& i_yout );
         double getDerotationAngle( int MJD, double time );
@@ -183,7 +183,7 @@ class VSkyCoordinates
         }
         void   setWobbleOffset( double iWobbleNorth, double iWobbleEast, int iTelID, int iMJD );
         void   updatePointing( int MJD, double time );
-
+        
         // for hiding some text (so other output text shows up cleanly)
         // if setting = true, will hid some stdout text
         // if setting = false, class will behave normally

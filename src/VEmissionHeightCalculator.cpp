@@ -8,7 +8,7 @@
 VEmissionHeightCalculator::VEmissionHeightCalculator()
 {
     fDebug = false;
-
+    
     fNTel = 0;
     fNTelPairs = 0;
     fEmissionHeight = 0.;
@@ -30,12 +30,12 @@ double VEmissionHeightCalculator::getEmissionHeight( double* cen_x, double* cen_
     double iEmissionHeight2 = 0.;
     double iEmissionHeightTemp = 0.;
     double iNEM_pairs = 0.;
-
+    
     double fTelescopeDistanceSC = 0.;
     double fImageDistance = 0.;
     // counter for telescope pairs
     int nTPair = 0;
-
+    
     // reset emission heights
     fEmissionHeight = 0.;
     fEmissionHeightChi2 = 0.;
@@ -93,7 +93,7 @@ double VEmissionHeightCalculator::getEmissionHeight( double* cen_x, double* cen_
     {
         fEmissionHeight = 0.;
     }
-
+    
     return fEmissionHeight;
 }
 
@@ -144,20 +144,20 @@ double VEmissionHeightCalculator::getTelescopeDistanceSC( unsigned int iTel1, un
         cout << "VEmissionHeightCalculator::getTelescopeDistanceSC error: telescope identifier out of range: " << fTelX.size() << "\t" << iTel1 << "\t" << iTel2 << endl;
         return -999.;
     }
-
+    
     double t1[3], t2[3];
-
+    
     az /= TMath::RadToDeg();
     z  /= TMath::RadToDeg();
-
+    
     t1[0] = fTelX[iTel1];
     t1[1] = fTelY[iTel1];
     t1[2] = fTelZ[iTel1];
-
+    
     t2[0] = fTelX[iTel2];
     t2[1] = fTelY[iTel2];
     t2[2] = fTelZ[iTel2];
-
+    
     return VUtilities::line_point_distance( t1[0], t1[1], t1[2], 90. - z* TMath::RadToDeg(), az* TMath::RadToDeg(), t2[0], t2[1], t2[2] );
 }
 

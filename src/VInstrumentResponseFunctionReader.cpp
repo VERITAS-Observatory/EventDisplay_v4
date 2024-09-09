@@ -11,9 +11,9 @@ VInstrumentResponseFunctionReader::VInstrumentResponseFunctionReader()
 {
     fIsZombie = true;
     fDebug = false;
-
+    
     fGammaHadronCuts_directionCut_selector = 0;
-
+    
     fFile = "";
     fA_MC = "A_MC";
     fZe = 0.;
@@ -26,12 +26,12 @@ VInstrumentResponseFunctionReader::VInstrumentResponseFunctionReader()
     fLineStyle = 1;
     fMarkerStyle = 20;
     fLegend = "";
-
+    
     gEffArea_MC = 0;
     gEffArea_MC_Ratio = 0;
     gEffArea_Rec = 0;
     gEffArea_Rec_Ratio = 0;
-
+    
     hEmc = 0;
     hEcut = 0;
     hEcut_rec = 0;
@@ -52,7 +52,7 @@ VInstrumentResponseFunctionReader::VInstrumentResponseFunctionReader()
     gAngularResolution80 = 0;
     gEffArea_Recp80 = 0;
     hWeightedRate = 0;
-
+    
     initializeIRFData();
 }
 
@@ -63,13 +63,13 @@ bool VInstrumentResponseFunctionReader::initializeIRFData()
     fIRF_TreeNames.push_back( "t_angular_resolution_095p" );
     fIRF_TreeNames.push_back( "t_core_resolution" );
     fIRF_TreeNames.push_back( "t_energy_resolution" );
-
+    
     for( unsigned int i = 0; i < fIRF_TreeNames.size(); i++ )
     {
         vector< TH2D* > iTemp;
         fIRF_Data.push_back( 0 );
     }
-
+    
     return true;
 }
 
@@ -81,7 +81,7 @@ bool VInstrumentResponseFunctionReader::fillData( string iDataLine, int iDataID 
         return false;
     }
     string temp;
-
+    
     istringstream is_stream( iDataLine );
     is_stream >> temp;
     if( temp != "*" )
@@ -107,7 +107,7 @@ bool VInstrumentResponseFunctionReader::fillData( string iDataLine, int iDataID 
     is_stream >> temp;
     fNoise = atoi( temp.c_str() );
     is_stream >> fA_MC;
-
+    
     // plotting options
     is_stream >> fPlotOption;
     is_stream >> temp;
@@ -118,7 +118,7 @@ bool VInstrumentResponseFunctionReader::fillData( string iDataLine, int iDataID 
     fPlottingMarkerStyle = atoi( temp.c_str() );
     fLegend = is_stream.str();
     fLegend = is_stream.str().substr( is_stream.tellg(), is_stream.str().size() );
-
+    
     return fillData();
 }
 
@@ -131,28 +131,28 @@ bool VInstrumentResponseFunctionReader::fillData( string iFile, double iZe, doub
     fIndex = iIndex;
     fNoise = iNoise;
     fA_MC = iA_MC;
-
+    
     return fillData();
 }
 
 bool VInstrumentResponseFunctionReader::fillData()
 {
     // read in all the necessary data from the effective area tree
-
+    
     if(!getDataFromFile() )
     {
         fIsZombie = true;
         return false;
     }
-
+    
     // calculate ratio of cut - efficiencies
     if(!calculateCutEfficiencies() )
     {
         return false;
     }
-
+    
     fIsZombie = false;
-
+    
     return true;
 }
 
@@ -166,7 +166,7 @@ bool VInstrumentResponseFunctionReader::fillData()
 bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
 {
     bool bLinX = false;  // energy axis for effective areas
-
+    
     TH1F* h = 0;
     // gamma-ray effective area vs reconstruction energy
     h = get_CTA_IRF_Histograms( "EffectiveArea", fWoff );
@@ -208,13 +208,13 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     {
         gEffArea_MC = 0;
     }
-
+    
     ///////////////////////////////////////////////////////////////
-
+    
     ///////////////////////////////////////////////////////////////
     // name and axis units are not consistent in the CTA files!!!
     ///////////////////////////////////////////////////////////////
-
+    
     ///////////////////////////////////////////////////////////////
     // energy resolution
     h = 0;
@@ -244,7 +244,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
         setGraphPlottingStyle( gEnergyBias_Mean );
     }
     ///////////////////////////////////////////////////////////////
-
+    
     ///////////////////////////////////////////////////////////////
     // 68% angular resolution
     h = 0;
@@ -265,7 +265,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
         get_Graph_from_Histogram( h, gAngularResolution, true, 0., log10( fEnergyLinTeV_min ), log10( fEnergyLinTeV_max ) );   // ignore errors in resolution graph
         setGraphPlottingStyle( gAngularResolution );
     }
-
+    
     ///////////////////////////////////////////////////////////////
     // 80% angular resolution
     h = 0;
@@ -291,7 +291,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
         get_Graph_from_Histogram( h, gAngularResolution80, true );   // ignore errors in resolution graph
         setGraphPlottingStyle( gAngularResolution80 );
     }
-
+    
     return true;
 }
 
@@ -307,7 +307,7 @@ bool VInstrumentResponseFunctionReader::fill_from_effectiveAreaFromH2( TTree* t 
         return false;
     }
     bool bFound = false;
-
+    
     Float_t ze;
     UShort_t az;
     Float_t Woff;
@@ -326,7 +326,7 @@ bool VInstrumentResponseFunctionReader::fill_from_effectiveAreaFromH2( TTree* t 
     Float_t maxy;
     Int_t binsxy;
     Float_t value[10000];
-
+    
     t->SetBranchAddress( "ze", &ze );
     t->SetBranchAddress( "az", &az );
     t->SetBranchAddress( "Woff", &Woff );
@@ -345,7 +345,7 @@ bool VInstrumentResponseFunctionReader::fill_from_effectiveAreaFromH2( TTree* t 
     t->SetBranchAddress( "hEsysMCRelative2D_maxy", &maxy );
     t->SetBranchAddress( "hEsysMCRelative2D_binsxy", &binsxy );
     t->SetBranchAddress( "hEsysMCRelative2D_value", value );
-
+    
     for( int j = 0; j < t->GetEntries(); j++ )
     {
         t->GetEntry( j );
@@ -353,7 +353,7 @@ bool VInstrumentResponseFunctionReader::fill_from_effectiveAreaFromH2( TTree* t 
         {
             cout << "VInstrumentResponseFunctionReader::getDataFromFile: reading event " << j << endl;
         }
-
+        
         // ignore all checks if there is only one entry in this tree
         if( t->GetEntries() > 1 )
         {
@@ -419,11 +419,11 @@ bool VInstrumentResponseFunctionReader::fill_from_effectiveAreaFromH2( TTree* t 
             int ny = ( i - nx ) / binsx;
             hEsysMCRelative2D->SetBinContent( nx + 1, ny + 1, value[i] );
         }
-
+        
         break;
     }
-
-
+    
+    
     return bFound;
 }
 
@@ -438,17 +438,17 @@ bool VInstrumentResponseFunctionReader::fill_from_effectiveArea( TTree* t )
         return false;
     }
     CEffArea* c = new CEffArea( t );
-
+    
     bool bFound = false;
     for( int j = 0; j < c->fChain->GetEntries(); j++ )
     {
         c->GetEntry( j );
-
+        
         if( fDebug )
         {
             cout << "VInstrumentResponseFunctionReader::getDataFromFile: reading event " << j << endl;
         }
-
+        
         // ignore all checks if there is only one entry in this tree
         if( c->fChain->GetEntries() > 1 )
         {
@@ -500,7 +500,7 @@ bool VInstrumentResponseFunctionReader::fill_from_effectiveArea( TTree* t )
         }
         cout << "\t FOUND EFFECTIVE AREA (entry " << j << ")" << endl;
         bFound = true;
-
+        
         // get effective areas (these are effective area after the usual angular cut)
         if( c->gEffAreaMC )
         {
@@ -661,7 +661,7 @@ bool VInstrumentResponseFunctionReader::fill_from_effectiveArea( TTree* t )
         {
             setHistogramPlottingStyle( hCutEfficiency[i], i + 1, 1., 1.5, fPlottingMarkerStyle );
         }
-
+        
         break;
     }
     return bFound;
@@ -683,14 +683,14 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
     {
         cout << "VInstrumentResponseFunctionReader::getDataFromFile" << endl;
     }
-
+    
     TFile* iFile = new TFile( fFile.c_str() );
     if( iFile->IsZombie() )
     {
         return false;
     }
     bool bFound = false;
-
+    
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     // read effective areas
     // (take into account that in combined file effective areas are in a separate file)
@@ -719,10 +719,10 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
             return true;
         }
     }
-
+    
     //////////////////////////////////////////////////////////////
     // read resolution files
-
+    
     for( unsigned int i = 0; i < fIRF_TreeNames.size(); i++ )
     {
         cout << "reading IRF " << fIRF_TreeNames[i].c_str() << endl;
@@ -744,7 +744,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
     //
     // for this: read theta2 cut, get containment radius for this theta2 cut,
     //           then scale the effective areas accordingly
-
+    
     // read gamma/hadron cuts
     VGammaHadronCuts* i_cuts = ( VGammaHadronCuts* )iFile->Get( "GammaHadronCuts" );
     if( i_cuts )
@@ -816,12 +816,12 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
     {
         fGammaHadronCuts_directionCut_selector = 0;
     }
-
+    
     if(!bFound )
     {
         return false;
     }
-
+    
     return true;
 }
 
@@ -833,26 +833,26 @@ VInstrumentResponseFunctionData* VInstrumentResponseFunctionReader::getIRFFromFi
     {
         return 0;
     }
-
+    
     VInstrumentResponseFunctionData* c = new VInstrumentResponseFunctionData();
     TBranch* br = t->GetBranch( "IRF" );
     br->SetAddress(&c );
-
+    
     for( int j = 0; j < t->GetEntries(); j++ )
     {
         t->GetEntry( j );
-
+        
         if( fDebug )
         {
             cout << "VInstrumentResponseFunctionReader::getDataFromFile (resolution data): reading event " << j << endl;
         }
-
+        
         // check that there is data for this tree entry
         if(!c )
         {
             continue;
         }
-
+        
         // ignore all values if there is only one entry in this tree
         if( t->GetEntries() > 1 )
         {
@@ -912,11 +912,11 @@ VInstrumentResponseFunctionData* VInstrumentResponseFunctionReader::getIRFFromFi
                 }
             }
         }
-
+        
         return ( VInstrumentResponseFunctionData* )c->Clone();
-
+        
     }
-
+    
     return 0;
 }
 
@@ -927,7 +927,7 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot68( TH2D* iP, dou
         gEnergyResolution = 0;
         return;
     }
-
+    
     gEnergyResolution = new TGraphErrors( 1 );
     gEnergyResolution->SetMarkerStyle( 20 );
     gEnergyResolution->SetMarkerSize( 2 );
@@ -935,7 +935,7 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot68( TH2D* iP, dou
     gEnergyResolution->SetTitle( "" );
     gEnergyResolution->SetName( "" );
     setGraphPlottingStyle( gEnergyResolution );
-
+    
     int zz = 0;
     double e_res = 0.;
     for( int b = 1; b <= iP->GetNbinsX(); b++ )
@@ -1005,7 +1005,7 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot( TH2D* iP, doubl
         gEnergyResolution = 0;
         return;
     }
-
+    
     gEnergyResolution = new TGraphErrors( 1 );
     gEnergyResolution->SetMarkerStyle( 20 );
     gEnergyResolution->SetMarkerSize( 2 );
@@ -1013,7 +1013,7 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot( TH2D* iP, doubl
     gEnergyResolution->SetTitle( "" );
     gEnergyResolution->SetName( "" );
     setGraphPlottingStyle( gEnergyResolution );
-
+    
     int zz = 0;
     for( int b = 1; b <= iP->GetNbinsX(); b++ )
     {
@@ -1040,9 +1040,9 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot( TProfile* iP, i
         gEnergyResolution = 0;
         return;
     }
-
+    
     iP->Rebin( i_rebin );
-
+    
     gEnergyResolution = new TGraphErrors( 1 );
     gEnergyResolution->SetMarkerStyle( 20 );
     gEnergyResolution->SetMarkerSize( 2 );
@@ -1050,9 +1050,9 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot( TProfile* iP, i
     gEnergyResolution->SetTitle( "" );
     gEnergyResolution->SetName( "" );
     setGraphPlottingStyle( gEnergyResolution );
-
+    
     string iErrorOption = iP->GetErrorOption();
-
+    
     int zz = 0;
     for( int b = 1; b <= iP->GetNbinsX(); b++ )
     {
@@ -1111,7 +1111,7 @@ bool VInstrumentResponseFunctionReader::calculateCutEfficiencies()
             hCutEfficiencyRelativePlots[i]->Divide( hCutEfficiency[i], hCutEfficiency[0] );
         }
     }
-
+    
     return true;
 }
 
@@ -1121,10 +1121,10 @@ bool VInstrumentResponseFunctionReader::calculateEffectiveAreaRatios( TGraphAsym
     {
         return false;
     }
-
+    
     gEffArea_MC_Ratio  = calculateEffectiveAreaRatios( g0, gEffArea_MC );
     gEffArea_Rec_Ratio = calculateEffectiveAreaRatios( g0, gEffArea_Rec );
-
+    
     return true;
 }
 
@@ -1134,28 +1134,28 @@ TGraphAsymmErrors* VInstrumentResponseFunctionReader::calculateEffectiveAreaRati
     {
         return 0;
     }
-
+    
     TGraphAsymmErrors* g = new TGraphAsymmErrors( 1 );
-
+    
     double e = 0.;
     int z = 0;
-
+    
     double x0 = 0.;
     double y0 = 0.;
     double y0_U = 0.;
     double y0_L = 0.;
-
+    
     double x1 = 0.;
     double y1 = 0.;
     double y1_U = 0.;
     double y1_L = 0.;
-
+    
     for( int f = 0; f < g1->GetN(); f++ )
     {
         g1->GetPoint( f, x1, y1 );
         y1_U = g1->GetErrorYhigh( f );
         y1_L = g1->GetErrorYlow( f );
-
+        
         for( int k = 0; k < g0->GetN(); k++ )
         {
             //	   g0->GetPoint( k, x0, y0 );
@@ -1163,31 +1163,31 @@ TGraphAsymmErrors* VInstrumentResponseFunctionReader::calculateEffectiveAreaRati
             y0 = g0->Eval( x0 );
             y0_U = g0->GetErrorYhigh( k );
             y0_L = g0->GetErrorYlow( k );
-
+            
             if( y0 > 0. )
             {
                 if( TMath::Abs( x0 - x1 ) < 0.001 )
                 {
                     g->SetPoint( z, x0, y1 / y0 );
-
+                    
                     // note: standard error propagation not correct in this case
                     e = y1_U * y1_U / y0 / y0 + y1 * y1 / y0 / y0 / y0 / y0 * y0_U * y0_U;
                     g->SetPointEYhigh( z, sqrt( e ) );
                     // (Preli)
                     g->SetPointEYhigh( z, 0. );
-
+                    
                     e = y1_L * y1_L / y0 / y0 + y1 * y1 / y0 / y0 / y0 / y0 * y0_L * y0_L;
                     g->SetPointEYlow( z, sqrt( e ) );
                     // (Preli)
                     g->SetPointEYlow( z, 0. );
-
+                    
                     z++;
                 }
             }
         }
     }
     setGraphPlottingStyle( g );
-
+    
     return g;
 }
 
@@ -1199,7 +1199,7 @@ bool VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms( TH1F* hEff
         return false;
     }
     TGraphAsymmErrors* g = gEffArea_Rec;
-
+    
     double i_EffAreaScaleFactor = 1.;
     // make sure that 80% containment radius effective areas are available
     if( fGammaHadronCuts_directionCut_selector > 0 && iContainmentRadius.size() > 0 )
@@ -1225,7 +1225,7 @@ bool VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms( TH1F* hEff
             return false;
         }
     }
-
+    
     if( g )
     {
         double x = 0.;
@@ -1260,7 +1260,7 @@ bool VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms( TH1F* hEff
             }
         }
     }
-
+    
     return true;
 }
 
@@ -1270,7 +1270,7 @@ bool VInstrumentResponseFunctionReader::fillBiasHistograms( TH1F* h, string iMea
     {
         return false;
     }
-
+    
     TGraphErrors* g = 0;
     if( iMeanOrMedian == "median" )
     {
@@ -1315,7 +1315,7 @@ bool VInstrumentResponseFunctionReader::fillBiasHistograms( TH1F* h, string iMea
         h->SetBinContent( i + 1, y );
         h->SetBinError( i + 1, g->GetErrorY( i ) );
     };
-
+    
     return true;
 }
 
@@ -1327,12 +1327,12 @@ bool VInstrumentResponseFunctionReader::fillResolutionHistogram( TH1F* h, string
     {
         return false;
     }
-
+    
     if( iContainmentRadius != "68" )
     {
         iResolutionTreeName += "_0" + iContainmentRadius + "p";
     }
-
+    
     for( unsigned int j = 0; j < fIRF_TreeNames.size(); j++ )
     {
         if( fIRF_TreeNames[j] == iResolutionTreeName )

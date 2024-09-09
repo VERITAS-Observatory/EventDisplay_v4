@@ -28,15 +28,15 @@ class VImageAnalyzer : public VImageBaseAnalyzer
         bool fDebug;
         VImageCleaning* fVImageCleaning;                            //!< image cleaning
         VImageParameterCalculation* fVImageParameterCalculation;    //!< image calculation
-
+        
         bool fInit;
-
+        
         // temporary vectors for dead pixel smoothing
         vector< unsigned int > savedDead;
         vector< unsigned int > savedDeadLow;
         valarray< double > savedGains;
         valarray< double > savedGainsLow;
-
+        
         void fillOutputTree();                    //!< fill tree with image parameterisation results
         void imageCleaning();                     //!< image cleaning
         bool initEvent();                         //! reset image calculation for next event
@@ -46,11 +46,11 @@ class VImageAnalyzer : public VImageBaseAnalyzer
         void setAnaDir( unsigned int iTel );      //!< set directories in root output file
         void setNTrigger();
         void smoothDeadTubes();                   //!< reduce the effect of dead tubes
-
+        
     public:
         VImageAnalyzer();
         ~VImageAnalyzer();
-
+        
         void doAnalysis();                        //!< do the actual analysis (called for each event)
         VImageCleaning*  getImageCleaner()
         {

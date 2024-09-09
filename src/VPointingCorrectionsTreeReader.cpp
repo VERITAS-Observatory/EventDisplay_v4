@@ -14,7 +14,7 @@ VPointingCorrectionsTreeReader::VPointingCorrectionsTreeReader( TChain* t )
     fPointingErrorX = 0.;
     fPointingErrorY = 0.;
     fPointingCorrectionTreeSetting = false;
-
+    
     fTree = t;
     if( fTree )
     {
@@ -27,7 +27,7 @@ VPointingCorrectionsTreeReader::VPointingCorrectionsTreeReader( TChain* t )
             fPointingCorrectionTreeSetting = true;
         }
     }
-
+    
 }
 
 
@@ -53,7 +53,7 @@ Long64_t VPointingCorrectionsTreeReader::getEntries()
         fPointingErrorY = 0.;
         return 0;
     }
-
+    
     return fTree->GetEntries();
 }
 
@@ -81,9 +81,9 @@ float VPointingCorrectionsTreeReader::getCorrected_phi( float cen_x, float cen_y
 {
     float xmean = cen_x + fPointingErrorX;
     float ymean = cen_y + fPointingErrorY;
-
+    
     const double ac = ( d + s ) * ymean + 2.0 * sdevxy * xmean;
     const double bc = 2.0 * sdevxy * ymean - ( d - s ) * xmean;
-
+    
     return atan2( ac, bc );
 }

@@ -25,26 +25,26 @@ using namespace std;
 class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogramUtilities
 {
     private:
-
+    
         bool   fDebug;
         string fName;
-
+        
         // effective area data
         vector< VInstrumentResponseFunctionReader* > fData;
-
+        
         // resolution fitter
         string fFunction_fitResolution;
         double fXmin_fitResolution;
         double fXmax_fitResolution;
         TF1*   fTF1_fitResolution;
-
+        
         // last plotted graph
         TGraphErrors* gLastPlottedGraph;
-
+        
         // canvas size
         int    fCanvasSize_X;
         int    fCanvasSize_Y;
-
+        
         // general resolution plotter
         TCanvas* plotPSF( vector< double > i_Energy_TeV_lin, double iTheta2AxisMax = 0.05,
                           bool iCumulative = false, bool iPlotTheta2 = false );
@@ -53,12 +53,12 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
                                  string iXaxis, TPad* iResolutionPad = 0 );
         TCanvas* plotResolution2D( unsigned int iDataSetID, string iName, string iCanvasTitle, string iYTitle,
                                    double iYmin, double iYmax, string iResolutionTreeName, string iXaxis, double iEnergySlice_GeV = -1. );
-
+                                   
     public:
-
+    
         VPlotInstrumentResponseFunction();
         ~VPlotInstrumentResponseFunction() {}
-
+        
         bool         addInstrumentResponseData( int iDataID, string iFileList );
         bool         addInstrumentResponseData( string iInstrumentResponseFile, string iA_MC );
         bool         addInstrumentResponseData( string iInstrumentResponseFile,
@@ -124,7 +124,7 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
             }
         }
         bool         write_fitResolutionFunction( string iOutName, string iName = "" );
-
+        
 };
 
 #endif

@@ -14,14 +14,14 @@ VPlotCompareDataWithMC::VPlotCompareDataWithMC( string iFile )
     setPrintName();
     setRelativePlotRange();
     setScalingMethod();
-
+    
     fDataFileName = iFile;
     fDataFile = 0;
     if( fDataFileName.size() > 0 )
     {
         openDataFile( fDataFileName );
     }
-
+    
     gStyle->SetPadGridX( 0 );
     gStyle->SetPadGridY( 0 );
     gStyle->SetPalette( 1 );
@@ -73,7 +73,7 @@ bool VPlotCompareDataWithMC::openDataFile( string ifile )
         cout << "VPlotCompareDataWithMC::openDataFile() error opening " << fDataFileName << endl;
         return false;
     }
-
+    
     return true;
 }
 
@@ -83,7 +83,7 @@ void VPlotCompareDataWithMC::drawMatchingTests( TH1D* h1, TH1D* h2, double x_min
     {
         return;
     }
-
+    
     if( x_min < -998. )
     {
         x_min = h1->GetXaxis()->GetXmin();
@@ -92,13 +92,13 @@ void VPlotCompareDataWithMC::drawMatchingTests( TH1D* h1, TH1D* h2, double x_min
     {
         x_max = h1->GetXaxis()->GetXmax();
     }
-
+    
     // calculate matching of distributions
     double KSProb = h1->KolmogorovTest( h2 );
     double KSSig  = TMath::ErfInverse( 1. - KSProb ) * TMath::Sqrt( 2. );
     double Chi2Prob = h2->Chi2Test( h1, "WW" );
     double Chi2Sig = TMath::ErfInverse( 1. - Chi2Prob ) * TMath::Sqrt( 2. );
-
+    
     char hname[200];
     sprintf( hname, "mean (MC): %.2f#pm %.2f, mean (data): %.2f#pm %.2f", h1->GetMean(), h1->GetRMS(), h2->GetMean(), h2->GetRMS() );
     TLatex* iM = new TLatex( x_min + 0.1 * ( x_max - x_min ), 0.84 * h1->GetMaximum(), hname );
@@ -121,7 +121,7 @@ void VPlotCompareDataWithMC::plotLegend( TH1D* hsims, TH1D* hdiff, double x0 )
     {
         return;
     }
-
+    
     TLegend* iLegend = new TLegend( x0, 0.68, 0.85 + ( x0 - 0.5 ), 0.85 );
     iLegend->AddEntry( hsims, "simulations", "pl" );
     iLegend->AddEntry( hdiff, "On-Off", "pl" );
@@ -193,7 +193,7 @@ void VPlotCompareDataWithMC::getScaling( TH1D* h_sims, TH1D* h_diff, double& s_s
                 z += h_diff->GetBinContent( i );
             }
         }
-
+        
         s_diff = 1.;
         cout << " Bin Content:  data: " << z << "\t sims: " << s_sims << endl;
         if( s_sims > 0. )
@@ -228,7 +228,7 @@ void VPlotCompareDataWithMC::getScaling( TH1D* h_sims, TH1D* h_diff, double& s_s
         {
             s_sims += h_sims->GetBinContent( imaxbin + 1 );
         }
-
+        
         imaxbin = h_diff->GetMaximumBin();
         z = h_diff->GetBinContent( imaxbin );
         if( imaxbin > 1 )
@@ -246,7 +246,7 @@ void VPlotCompareDataWithMC::getScaling( TH1D* h_sims, TH1D* h_diff, double& s_s
         s_diff = 1.;
         cout << h_sims->GetName() << " scale to 3 bins around maximum " << endl;
     }
-
+    
     // make sure that results are positive
     if( s_sims < 0. )
     {
@@ -279,7 +279,7 @@ void VPlotCompareDataWithMC::getScaling( double& s_sims, double& s_diff, string 
     {
         cout << " histogram maximum (peak)" << endl;
     }
-
+    
     char hname[200];
     sprintf( hname, "h%s_SIMS", his.c_str() );
     TH1D* h_sims = ( TH1D* )fDataFile->Get( hname );
@@ -292,7 +292,7 @@ void VPlotCompareDataWithMC::getScaling( double& s_sims, double& s_diff, string 
         s_diff = 1.;
         return;
     }
-
+    
     getScaling( h_sims, h_diff, s_sims, s_diff, fScalingMethod, xmin, xmax );
 }
 
@@ -303,7 +303,7 @@ void VPlotCompareDataWithMC::setHistogramAtt( TH2D* his, double imin )
     {
         return;
     }
-
+    
     if( imin > -900. )
     {
         his->SetMinimum( imin );
@@ -338,9 +338,9 @@ TF1* VPlotCompareDataWithMC::do_theta2Fit( TH1D* h, int icolor, int istyle )
     {
         return 0;
     }
-
+    
     cout << "now fitting " << h->GetName() << endl;
-
+    
     char hname[200];
     sprintf( hname, "fT2_%s", h->GetName() );
     TF1* fTheta2 = new TF1( hname, "[0]*([1]/2./[2]/[2]*TMath::Exp(-x/2./[2]/[2])+(1-[1])/2./[3]/[3]*TMath::Exp(-x/2./[3]/[3]))", 0., 0.3 );
@@ -353,12 +353,12 @@ TF1* VPlotCompareDataWithMC::do_theta2Fit( TH1D* h, int icolor, int istyle )
     fTheta2->SetParLimits( 3, 0., 1. );
     fTheta2->SetLineColor( icolor );
     fTheta2->SetLineStyle( istyle );
-
+    
     h->Fit( fTheta2, "REM0" );
     //  cout << "CHI2 " << fTheta2->GetChisquare()/htheta2_diff->GetXaxis()->GetXmax() << endl;
-
+    
     cout << endl;
-
+    
     return fTheta2;
 }
 
@@ -368,7 +368,7 @@ void VPlotCompareDataWithMC::plotCummulativePlot( TH1D* h1, TH1D* h2, double xmi
     {
         return;
     }
-
+    
     if( xmin < -998. )
     {
         xmin = h1->GetXaxis()->GetXmin();
@@ -383,28 +383,28 @@ void VPlotCompareDataWithMC::plotCummulativePlot( TH1D* h1, TH1D* h2, double xmi
     {
         return;
     }
-
+    
     hCumu_1->SetMaximum( 1.15 );
     hCumu_1->SetMinimum( 0. );
     hCumu_1->SetAxisRange( xmin, xmax );
     hCumu_1->SetYTitle( "cumulative distribution" );
     hCumu_1->SetLineWidth( 2 );
     hCumu_2->SetLineWidth( 2 );
-
+    
     if( iTelescope > 0 )
     {
         char hname[500];
         sprintf( hname, "%s (T%d)", hCumu_1->GetXaxis()->GetTitle(), iTelescope );
         hCumu_1->SetXTitle( hname );
     }
-
+    
     hCumu_1->Draw();
     hCumu_2->Draw( "sames" );
-
+    
     TLine* iL = new TLine( xmin, 1., xmax, 1. );
     iL->SetLineStyle( 2 );
     iL->Draw();
-
+    
     // calculate systematics a certain value
     if( iSystematicCutCheck > xmin && iSystematicCutCheck < xmax )
     {
@@ -425,7 +425,7 @@ void VPlotCompareDataWithMC::plotRelativePlot( TH1D* h1, TH1D* h2, double xmin, 
     {
         return;
     }
-
+    
     if( xmin < -998. )
     {
         xmin = h1->GetXaxis()->GetXmin();
@@ -434,27 +434,27 @@ void VPlotCompareDataWithMC::plotRelativePlot( TH1D* h1, TH1D* h2, double xmin, 
     {
         xmax = h1->GetXaxis()->GetXmax();
     }
-
+    
     char hname[200];
     sprintf( hname, "%s_rel", h1->GetName() );
     TH1D* hRel = ( TH1D* )h1->Clone( hname );
     hRel->Divide( h2 );
-
+    
     setHistogramAtt( hRel, 1, 1, 1, 20, 1 );
     hRel->SetAxisRange( xmin, xmax );
     hRel->SetYTitle( "sims/data" );
     hRel->SetMinimum( fRelatePlotRange_min );
     hRel->SetMaximum( fRelatePlotRange_max );
-
+    
     if( iTelescope > 0 )
     {
         char hname[500];
         sprintf( hname, "%s (T%d)", hRel->GetXaxis()->GetTitle(), iTelescope );
         hRel->SetXTitle( hname );
     }
-
+    
     hRel->Draw();
-
+    
     TLine* iL = new TLine( xmin, 1., xmax, 1. );
     iL->SetLineStyle( 2 );
     iL->Draw();
@@ -466,7 +466,7 @@ TCanvas* VPlotCompareDataWithMC::plotRelativePlots( char* i_CanvasName, char* i_
     {
         return 0;
     }
-
+    
     char hname[600];
     char htitle[600];
     sprintf( hname, "rel_%s", i_CanvasName );
@@ -475,7 +475,7 @@ TCanvas* VPlotCompareDataWithMC::plotRelativePlots( char* i_CanvasName, char* i_
     cRel->SetGridx( 0 );
     cRel->SetGridy( 0 );
     cRel->SetLeftMargin( 0.13 );
-
+    
     sprintf( hname, "rel_%s", h1->GetName() );
     TH1D* hR = ( TH1D* )h1->Clone( hname );
     setHistogramAtt( hR, 1, 3, 1, 20, 1 );
@@ -484,13 +484,13 @@ TCanvas* VPlotCompareDataWithMC::plotRelativePlots( char* i_CanvasName, char* i_
     hR->SetMaximum( fRelatePlotRange_max );
     hR->GetYaxis()->SetTitle( "sims / data" );
     hR->SetAxisRange( xmin, xmax );
-
+    
     hR->Draw();
-
+    
     TLine* iL = new TLine( xmin, 1., xmax, 1. );
     iL->SetLineStyle( 2 );
     iL->Draw();
-
+    
     return cRel;
 }
 
@@ -504,15 +504,15 @@ void VPlotCompareDataWithMC::multiplicity_plots()
     {
         return;
     }
-
+    
     // get the scaling between simulations and data
     double s_sims = 1.;
     double s_diff = 1.;
     getScaling( s_sims, s_diff, "NImages", fScalingMethod );
-
+    
     char hname[600];
     char htitle[600];
-
+    
     // canvases
     sprintf( hname, "cTrigger_%s", fDataFileName.c_str() );
     sprintf( htitle, "multiplicity plots (%s)", fDataFileName.c_str() );
@@ -520,25 +520,25 @@ void VPlotCompareDataWithMC::multiplicity_plots()
     cTrigger->SetGridx( 0 );
     cTrigger->SetGridy( 0 );
     cTrigger->Divide( 2, 1 );
-
+    
     sprintf( hname, "cTriggerRel_%s", fDataFileName.c_str() );
     sprintf( htitle, "multiplicity plots (relative dist., %s)", fDataFileName.c_str() );
     TCanvas* cTriggerRel = new TCanvas( hname, htitle, 410, 10, 800, 400 );
     cTriggerRel->SetGridx( 0 );
     cTriggerRel->SetGridy( 0 );
     cTriggerRel->Divide( 2, 1 );
-
+    
     TH1D* hNImages_SIMS = ( TH1D* )fDataFile->Get( "hNImages_SIMS" );
     TH1D* hNImages_DIFF = ( TH1D* )fDataFile->Get( "hNImages_DIFF" );
     TH1D* hImgSel_SIMS = ( TH1D* )fDataFile->Get( "hImgSel_SIMS" );
     TH1D* hImgSel_DIFF = ( TH1D* )fDataFile->Get( "hImgSel_DIFF" );
-
+    
     if(!hNImages_SIMS || !hNImages_DIFF || !hImgSel_SIMS || !hImgSel_DIFF )
     {
         cout << hNImages_SIMS << "\t" << hNImages_DIFF << "\t" << hImgSel_SIMS << "\t" << hImgSel_DIFF << endl;
         return;
     }
-
+    
     setHistogramAtt( hNImages_SIMS, 2, 3, 1, 20, 1 );
     setHistogramAtt( hNImages_DIFF, 1, 3, 1, 21, 1 );
     if( hNImages_SIMS->GetEntries() > 0 )
@@ -549,7 +549,7 @@ void VPlotCompareDataWithMC::multiplicity_plots()
     {
         hNImages_DIFF->Scale( s_diff );
     }
-
+    
     cTrigger->cd( 1 );
     gPad->SetGridx( 0 );
     gPad->SetGridy( 0 );
@@ -558,7 +558,7 @@ void VPlotCompareDataWithMC::multiplicity_plots()
     hNImages_SIMS->Draw();
     hNImages_SIMS->SetYTitle( "number of showers [a.u.]" );
     hNImages_DIFF->Draw( "same" );
-
+    
     setHistogramAtt( hImgSel_SIMS, 2, 3, 1, 20, 1 );
     setHistogramAtt( hImgSel_DIFF, 1, 3, 1, 21, 1 );
     if( hImgSel_SIMS->GetEntries() > 0 )
@@ -569,7 +569,7 @@ void VPlotCompareDataWithMC::multiplicity_plots()
     {
         hImgSel_DIFF->Scale( s_diff );
     }
-
+    
     cTrigger->cd( 2 );
     gPad->SetGridx( 0 );
     gPad->SetGridy( 0 );
@@ -586,13 +586,13 @@ void VPlotCompareDataWithMC::multiplicity_plots()
         sprintf( hname, "%s-Trigger.pdf", fPrintName.c_str() );
         cTrigger->Print( hname );
     }
-
-
+    
+    
     // relative plots
     cTriggerRel->cd( 1 );
     gPad->SetLeftMargin( 0.13 );
     plotRelativePlot( hNImages_SIMS, hNImages_DIFF );
-
+    
     cTriggerRel->cd( 2 );
     gPad->SetLeftMargin( 0.13 );
     plotRelativePlot( hImgSel_SIMS, hImgSel_DIFF );
@@ -603,7 +603,7 @@ void VPlotCompareDataWithMC::multiplicity_plots()
         sprintf( hname, "%s-TriggerRel.pdf", fPrintName.c_str() );
         cTriggerRel->Print( hname );
     }
-
+    
 }
 
 /*
@@ -617,31 +617,31 @@ TCanvas* VPlotCompareDataWithMC::plot_singleCanvas( string iHistoName, string iC
     {
         return 0;
     }
-
+    
     char hname[600];
     char htitle[600];
-
+    
     // get the scaling between simulations and data
     double s_sims = 1.;
     double s_diff = 1.;
     getScaling( s_sims, s_diff, iScalingVariable, fScalingMethod, -9999., iHistoXAxisMax );
-
+    
     sprintf( hname, "c%s_%s", iHistoName.c_str(), fDataFileName.c_str() );
     sprintf( htitle, "%s (%s)", iCanvasTitle.c_str(), fDataFileName.c_str() );
     TCanvas* cEMH = new TCanvas( hname, htitle, 610, 410, 900, 600 );
     cEMH->SetGridx( 0 );
     cEMH->SetGridy( 0 );
-
+    
     sprintf( hname, "%s_SIMS", iHistoName.c_str() );
     TH1D* hHistogram_SIMS = ( TH1D* )fDataFile->Get( hname );
     sprintf( hname, "%s_DIFF", iHistoName.c_str() );
     TH1D* hHistogram_DIFF = ( TH1D* )fDataFile->Get( hname );
-
+    
     if(!hHistogram_SIMS || !hHistogram_DIFF )
     {
         return 0;
     }
-
+    
     setHistogramAtt( hHistogram_SIMS, 2, 3, 1, 20, 1 );
     setHistogramAtt( hHistogram_DIFF, 1, 3, 1, 21, 1 );
     cout << "SCALE " << s_sims << "\t" << s_diff << endl;
@@ -653,19 +653,19 @@ TCanvas* VPlotCompareDataWithMC::plot_singleCanvas( string iHistoName, string iC
     {
         hHistogram_DIFF->Scale( s_diff );
     }
-
+    
     hHistogram_SIMS->SetMaximum( hHistogram_SIMS->GetMaximum() * 1.4 );
     hHistogram_SIMS->SetAxisRange( 0., iHistoXAxisMax );
     hHistogram_SIMS->Draw();
     hHistogram_DIFF->Draw( "same" );
-
+    
     // print the canvas
     if( fPrintName.size() > 0 )
     {
         sprintf( hname, "%s-%s.pdf", fPrintName.c_str(), iHistoName.c_str() );
         cEMH->Print( hname );
     }
-
+    
     TCanvas* c = plotRelativePlots( hname, htitle, hHistogram_SIMS, hHistogram_DIFF, 0., iHistoXAxisMax );
     if( c && fPrintName.size() > 0 )
     {
@@ -686,12 +686,12 @@ void VPlotCompareDataWithMC::widthlength_vs_energy_plots( int iTelescope, int iR
     {
         return;
     }
-
+    
     plot_energyDependentDistributions( "length", iRebin, xmin, xmax, "REL", iTelescope );
     plot_energyDependentDistributions( "width", iRebin, xmin, xmax, "REL", iTelescope );
     plot_energyDependentDistributions( "length", iRebin, xmin, xmax, "SIMSDIFF", iTelescope );
     plot_energyDependentDistributions( "width", iRebin, xmin, xmax, "SIMSDIFF", iTelescope );
-
+    
 }
 
 
@@ -706,7 +706,7 @@ void VPlotCompareDataWithMC::msc_vs_energy_plots( int iRebin, double xmin, doubl
     {
         return;
     }
-
+    
     plot_energyDependentDistributions( "MSCW", iRebin, xmin, xmax, "CUMU", 0, iSystematicCutCheck );
     plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax, "CUMU", 0, iSystematicCutCheck );
     plot_energyDependentDistributions( "MSCL", iRebin, xmin, xmax, "REL" );
@@ -726,7 +726,7 @@ void VPlotCompareDataWithMC::mva_vs_energy_plots( int iRebin, double xmin, doubl
     {
         return;
     }
-
+    
     plot_energyDependentDistributions( "MVA", iRebin, xmin, xmax, "CUMU", 0, iSystematicCutCheck );
     plot_energyDependentDistributions( "MVA", iRebin, xmin, xmax, "REL" );
     plot_energyDependentDistributions( "MVA", iRebin, xmin, xmax );
@@ -743,7 +743,7 @@ void VPlotCompareDataWithMC::erecRatio_vs_energy_plots( int iTelescope, int iReb
     {
         return;
     }
-
+    
     plot_energyDependentDistributions( "erecratio", iRebin, xmin, xmax, "REL", iTelescope );
     plot_energyDependentDistributions( "erecratio", iRebin, xmin, xmax, "SIMSDIFF", iTelescope );
 }
@@ -760,19 +760,19 @@ TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVari
     {
         return 0;
     }
-
+    
     double KSProb = 0;
     double KSSig = 0;
     double Chi2Prob = 0.;
     double Chi2Sig = 0.;
-
+    
     // get the scaling between simulations and data
     double s_sims = 1.;
     double s_diff = 1.;
-
+    
     double error_sims = 0.;
     double error_diff = 0.;
-
+    
     char hname[600];
     char htitle[600];
     if( iTelescope > 0 )
@@ -789,7 +789,7 @@ TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVari
     c_MS->SetGridx( 0 );
     c_MS->SetGridy( 0 );
     c_MS->Divide( 3, 2 );
-
+    
     if( iTelescope > 0 )
     {
         sprintf( hname, "h%s%s_%d_SIMS", iVariable.c_str(), iXVariable.c_str(), iTelescope );
@@ -808,12 +808,12 @@ TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVari
         sprintf( hname, "h%s%s_DIFF", iVariable.c_str(), iXVariable.c_str() );
     }
     TH2D* h_diff = ( TH2D* )fDataFile->Get( hname );
-
+    
     if(!h_sims || !h_diff )
     {
         return 0;
     }
-
+    
     // loop over all bins in energy
     for( int i = 1; i <= h_sims->GetXaxis()->GetNbins(); i++ )
     {
@@ -837,7 +837,7 @@ TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVari
         }
         TH1D* hDiff = h_diff->ProjectionY( hname, i, i );
         setHistogramAtt( hDiff, 1, 1, 1, 21, iRebin );
-
+        
         // getScaling( hSims, hDiff, s_sims, s_diff, 3 );
         getScaling( hSims, hDiff, s_sims, s_diff, fScalingMethod );
         if( hSims->GetEntries() > 0 )
@@ -848,7 +848,7 @@ TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVari
         {
             hDiff->Scale( s_diff );
         }
-
+        
         for( int j = 0; j < hSims->GetNbinsX(); j++ )
         {
             error_sims = hSims->GetBinError( j ) * s_sims;
@@ -856,7 +856,7 @@ TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVari
             error_diff = hDiff->GetBinError( j ) * s_diff;
             hDiff->SetBinError( j, error_diff );
         }
-
+        
         hSims->SetAxisRange( x_min, x_max );
         hDiff->SetAxisRange( x_min, x_max );
         if(!iPlotLogY )
@@ -875,13 +875,13 @@ TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVari
         {
             hSims->SetMinimum( 0. );
         }
-
+        
         // calculate matching of distributions
         KSProb = hSims->KolmogorovTest( hDiff );
         KSSig  = TMath::ErfInverse( 1. - KSProb ) * TMath::Sqrt( 2. );
         Chi2Prob = hDiff->Chi2Test( hSims, "WW" );
         Chi2Sig = TMath::ErfInverse( 1. - Chi2Prob ) * TMath::Sqrt( 2. );
-
+        
         // draw histograms
         TPad* g = ( TPad* )c_MS->cd( i );
         if( g )
@@ -903,7 +903,7 @@ TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVari
             }
             hSims->Draw();
             hDiff->Draw( "same" );
-
+            
             float x = 0.;
             if( iVariable.find( "MW" ) != string::npos || iVariable.find( "ML" ) != string::npos )
             {
@@ -928,8 +928,8 @@ TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVari
                 plotCummulativePlot( hSims, hDiff, x_min, x_max, iSystematicCutCheck, iTelescope );
             }
         }
-
-
+        
+        
         if( iXVariable == "Erec" )
         {
             sprintf( hname, "%.1f < log_{10} E_{rec} < %.1f", h_sims->GetXaxis()->GetBinLowEdge( i ),  h_sims->GetXaxis()->GetBinUpEdge( i ) );
@@ -950,13 +950,13 @@ TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVari
         {
             sprintf( hname, "%.1f < log_{10} sizeLG < %.1f", h_sims->GetXaxis()->GetBinLowEdge( i ),  h_sims->GetXaxis()->GetBinUpEdge( i ) );
         }
-
-
+        
+        
         TLatex* iT = new TLatex;
         iT->SetTextSize( iT->GetTextSize() * 0.6 );
         iT->DrawLatexNDC( 0.22, 0.84, hname );
-
-
+        
+        
         //don't print the rest of the stuff if we are plotting relative or cumulative distributions.
         if( iPlot == "SIMSDIFF" )
         {
@@ -967,7 +967,7 @@ TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVari
             sprintf( hname, "Chi2 | P = %1.2e (%1.1f #sigma)", Chi2Prob, Chi2Sig );
             iT->DrawLatexNDC( 0.22, 0.72, hname );
         }
-
+        
     }
     // print the canvas
     if( fPrintName.size() > 0 )
@@ -982,7 +982,7 @@ TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVari
         }
         c_MS->Print( hname );
     }
-
+    
     return c_MS;
 }
 
@@ -997,44 +997,44 @@ TCanvas* VPlotCompareDataWithMC::stereo_parameter()
     {
         return 0;
     }
-
+    
     // two canvases, one with sims and diff, one with on/off histograms
-
+    
     char hname[600];
     char htitle[600];
     TCanvas* cOO = new TCanvas( "cOO", "relative plots (stereo parameter)", 100, 10, 900, 600 );
     cOO->SetGridx( 0 );
     cOO->SetGridy( 0 );
     cOO->Divide( 2, 2 );
-
+    
     sprintf( hname, "cSD_%s", fDataFileName.c_str() );
     sprintf( htitle, "sims/diff (stereo parameter, %s)", fDataFileName.c_str() );
     TCanvas* cSD = new TCanvas( hname, htitle, 10, 10, 900, 600 );
     cSD->SetGridx( 0 );
     cSD->SetGridy( 0 );
     cSD->Divide( 2, 2 );
-
+    
     // theta2 < 0.02
     //
-
+    
     TH1D* ht2_sims = ( TH1D* )fDataFile->Get( "htheta2_SIMS" );
     setHistogramAtt( ht2_sims, 2, 1, 1, 20, 1 );
     ht2_sims->SetYTitle( "number of shower [a.u.]" );
-
+    
     TH1D* ht2_diff = ( TH1D* )fDataFile->Get( "htheta2_DIFF" );
     setHistogramAtt( ht2_diff, 1, 1, 1, 25, 1 );
-
-
+    
+    
     // get the scaling between simulations and data
     double s_sims = 1.;
     double s_diff = 1.;
     getScaling( s_sims, s_diff, "theta2", fScalingMethod );
-
+    
     ht2_sims->Scale( s_sims );
     ht2_diff->Scale( s_diff );
-
+    
     // plot everything
-
+    
     cSD->cd( 1 );
     gPad->SetLeftMargin( 0.14 );
     gPad->SetBottomMargin( 0.12 );
@@ -1042,30 +1042,30 @@ TCanvas* VPlotCompareDataWithMC::stereo_parameter()
     ht2_sims->SetAxisRange( 0., 0.05 );
     ht2_sims->Draw();
     ht2_diff->Draw( "same" );
-
+    
     drawMatchingTests( ht2_sims, ht2_diff, 0., 0.05 );
-
+    
     cOO->cd( 1 );
     gPad->SetLeftMargin( 0.14 );
     gPad->SetBottomMargin( 0.12 );
     plotRelativePlot( ht2_sims, ht2_diff, 0., 0.05 );
-
+    
     // theta2 < 0.02
     //
-
+    
     TH1D* hlt2_sims = ( TH1D* )fDataFile->Get( "hltheta2_SIMS" );
     setHistogramAtt( hlt2_sims, 2, 3, 1, 20, 1 );
     hlt2_sims->SetYTitle( "number of shower [a.u.]" );
-
+    
     TH1D* hlt2_diff = ( TH1D* )fDataFile->Get( "hltheta2_DIFF" );
     setHistogramAtt( hlt2_diff, 1, 3, 1, 25, 1 );
-
+    
     getScaling( s_sims, s_diff, "ltheta2", fScalingMethod );
     hlt2_sims->Scale( s_sims );
     hlt2_diff->Scale( s_diff );
-
+    
     hlt2_sims->SetAxisRange(-5., -1. );
-
+    
     cSD->cd( 2 );
     gPad->SetLeftMargin( 0.14 );
     gPad->SetBottomMargin( 0.12 );
@@ -1073,24 +1073,24 @@ TCanvas* VPlotCompareDataWithMC::stereo_parameter()
     hlt2_sims->SetMaximum( hlt2_sims->GetMaximum() * 1.3 );
     hlt2_sims->Draw();
     hlt2_diff->Draw( "same" );
-
+    
     drawMatchingTests( hlt2_sims, hlt2_diff, -5., 1. );
-
+    
     cOO->cd( 2 );
     gPad->SetLeftMargin( 0.14 );
     gPad->SetBottomMargin( 0.12 );
     plotRelativePlot( hlt2_sims, hlt2_diff, -5., 1. );
-
+    
     // MSCW
     //
-
+    
     TH1D* hmscw_sims = ( TH1D* )fDataFile->Get( "hMSCW_SIMS" );
     setHistogramAtt( hmscw_sims, 2, 1, 1, 20, 2 );
     hmscw_sims->SetYTitle( "number of shower [a.u.]" );
-
+    
     TH1D* hmscw_diff = ( TH1D* )fDataFile->Get( "hMSCW_DIFF" );
     setHistogramAtt( hmscw_diff, 1, 1, 1, 25, 2 );
-
+    
     hmscw_sims->SetAxisRange(-1., 1. );
     getScaling( s_sims, s_diff, "MSCW", fScalingMethod, -0.5, 0.5 );
     if( hmscw_sims->GetEntries() > 0 )
@@ -1101,7 +1101,7 @@ TCanvas* VPlotCompareDataWithMC::stereo_parameter()
     {
         hmscw_diff->Scale( s_diff );
     }
-
+    
     cSD->cd( 3 );
     gPad->SetLeftMargin( 0.14 );
     gPad->SetBottomMargin( 0.12 );
@@ -1112,26 +1112,26 @@ TCanvas* VPlotCompareDataWithMC::stereo_parameter()
     TLine* lmscw = new TLine( 0., hmscw_sims->GetMinimum(), 0., hmscw_sims->GetMaximum() );
     lmscw->SetLineStyle( 2 );
     lmscw->Draw();
-
+    
     drawMatchingTests( hmscw_sims, hmscw_diff, -1., 1. );
-
+    
     cOO->cd( 3 );
     gPad->SetLeftMargin( 0.14 );
     gPad->SetBottomMargin( 0.12 );
     plotRelativePlot( hmscw_sims, hmscw_diff, -1., 1. );
-
+    
     // MSCL
     //
-
+    
     TH1D* hmscl_sims = ( TH1D* )fDataFile->Get( "hMSCL_SIMS" );
     setHistogramAtt( hmscl_sims, 2, 3, 1, 21, 2 );
     hmscl_sims->SetYTitle( "number of shower [a.u.]" );
-
+    
     TH1D* hmscl_diff = ( TH1D* )fDataFile->Get( "hMSCL_DIFF" );
     setHistogramAtt( hmscl_diff, 1, 3, 1, 25, 2 );
     hmscl_diff->SetLineWidth( 3 );
     hmscl_diff->SetStats( 0 );
-
+    
     hmscl_sims->SetAxisRange(-1., 1. );
     getScaling( s_sims, s_diff, "MSCL", fScalingMethod, -0.75, 0.75 );
     if( hmscl_sims->GetEntries() > 0 )
@@ -1142,7 +1142,7 @@ TCanvas* VPlotCompareDataWithMC::stereo_parameter()
     {
         hmscl_diff->Scale( s_diff );
     }
-
+    
     cSD->cd( 4 );
     gPad->SetLeftMargin( 0.14 );
     gPad->SetBottomMargin( 0.12 );
@@ -1154,12 +1154,12 @@ TCanvas* VPlotCompareDataWithMC::stereo_parameter()
     lmscl->SetLineStyle( 2 );
     lmscl->Draw();
     drawMatchingTests( hmscl_sims, hmscl_diff, -1., 1. );
-
+    
     cOO->cd( 4 );
     gPad->SetLeftMargin( 0.14 );
     gPad->SetBottomMargin( 0.12 );
     plotRelativePlot( hmscl_sims, hmscl_diff, -1., 1. );
-
+    
     // print the canvas
     if( fPrintName.size() > 0 )
     {
@@ -1184,35 +1184,35 @@ void VPlotCompareDataWithMC::mva_parameter()
     {
         return;
     }
-
+    
     char hname[600];
     char htitle[600];
     TCanvas* cOO = new TCanvas( "cOO", "relative plots (mva parameter)", 100, 10, 600, 600 );
     cOO->SetGridx( 0 );
     cOO->SetGridy( 0 );
-
+    
     sprintf( hname, "cSD_%s", fDataFileName.c_str() );
     sprintf( htitle, "sims/diff (mva parameter, %s)", fDataFileName.c_str() );
     TCanvas* cSD = new TCanvas( hname, htitle, 10, 10, 600, 600 );
     cSD->SetGridx( 0 );
     cSD->SetGridy( 0 );
-
+    
     TH1D* hmva_sims = ( TH1D* )fDataFile->Get( "hMVA_SIMS" );
     setHistogramAtt( hmva_sims, 2, 3, 1, 20, 2 );
     hmva_sims->SetYTitle( "number of events per bin" );
-
+    
     TH1D* hmva_diff = ( TH1D* )fDataFile->Get( "hMVA_DIFF" );
     setHistogramAtt( hmva_diff, 1, 3, 1, 21, 2 );
     hmva_diff->SetLineWidth( 3 );
     hmva_diff->SetStats( 0 );
-
+    
     // scaling of the histograms
     double s_sims = 1.;
     double s_diff = 1.;
-
+    
     double error_sims = 0.;
     double error_diff = 0.;
-
+    
     hmva_sims->SetAxisRange(-1., 1. );
     getScaling( s_sims, s_diff, "MVA", fScalingMethod, -0.75, 0.75 );
     if( hmva_sims->GetEntries() > 0 )
@@ -1223,7 +1223,7 @@ void VPlotCompareDataWithMC::mva_parameter()
     {
         hmva_diff->Scale( s_diff );
     }
-
+    
     for( int j = 0; j < hmva_sims->GetNbinsX(); j++ )
     {
         error_sims = hmva_sims->GetBinError( j ) * s_sims;
@@ -1231,7 +1231,7 @@ void VPlotCompareDataWithMC::mva_parameter()
         error_diff = hmva_diff->GetBinError( j ) * s_diff;
         hmva_diff->SetBinError( j, error_diff );
     }
-
+    
     cSD->cd();
     gPad->SetLeftMargin( 0.14 );
     gPad->SetBottomMargin( 0.12 );
@@ -1243,12 +1243,12 @@ void VPlotCompareDataWithMC::mva_parameter()
     lmva->SetLineStyle( 2 );
     lmva->Draw();
     drawMatchingTests( hmva_sims, hmva_diff, -1., 1. );
-
+    
     cOO->cd();
     gPad->SetLeftMargin( 0.14 );
     gPad->SetBottomMargin( 0.12 );
     plotRelativePlot( hmva_sims, hmva_diff, -1., 1. );
-
+    
     if( fPrintName.size() > 0 )
     {
         char hn[200];
@@ -1272,98 +1272,98 @@ TCanvas* VPlotCompareDataWithMC::core_plots( int iRebin )
     {
         return 0;
     }
-
+    
     TCanvas* cOCore = new TCanvas( "cOCore", "on/off (core positions)", 100, 10, 1200, 600 );
     cOCore->SetGridx( 0 );
     cOCore->SetGridy( 0 );
     cOCore->Divide( 3, 2 );
-
+    
     TCanvas* cSCore = new TCanvas( "cSCore", "sims & diff (core positions)", 10, 10, 1200, 600 );
     cSCore->SetGridx( 0 );
     cSCore->SetGridy( 0 );
     cSCore->Divide( 3, 2 );
-
+    
     TCanvas* cSCoreRel = new TCanvas( "cSCoreRel", "sims/diff (core positions)", 10, 110, 600, 630 );
     cSCoreRel->SetGridx( 0 );
     cSCoreRel->SetGridy( 0 );
     cSCoreRel->Divide( 2, 2 );
-
+    
     // xcore
     //
     TH1D* hXcore_sims = ( TH1D* )fDataFile->Get( "hXcore_SIMS" );
     setHistogramAtt( hXcore_sims, 2, 1, 1, 20, iRebin );
-
+    
     TH1D* hXcore_on = ( TH1D* )fDataFile->Get( "hXcore_ON" );
     setHistogramAtt( hXcore_on, 3, 1, 1, 20, iRebin );
-
+    
     TH1D* hXcore_off = ( TH1D* )fDataFile->Get( "hXcore_OFF" );
     setHistogramAtt( hXcore_off, 4, 1, 1, 20, iRebin );
-
+    
     TH1D* hXcore_diff = ( TH1D* )fDataFile->Get( "hXcore_DIFF" );
     setHistogramAtt( hXcore_diff, 1, 1, 1, 21, iRebin );
-
+    
     hXcore_sims->SetAxisRange(-250., 250. );
     hXcore_on->SetAxisRange(-250., 250. );
-
+    
     double nSims = 0.;
     double nDiff = 0.;
-
+    
     getScaling( nSims, nDiff, "Xcore", fScalingMethod );
     hXcore_diff->Scale( nDiff );
     hXcore_sims->Scale( nSims );
-
+    
     cSCore->cd( 1 );
     gPad->SetLeftMargin( 0.13 );
     hXcore_sims->SetMaximum( hXcore_sims->GetMaximum() * 1.8 );
     hXcore_sims->Draw();
     hXcore_diff->Draw( "same" );
     plotLegend( hXcore_sims, hXcore_diff, 0.15 );
-
+    
     cSCoreRel->cd( 1 );
     gPad->SetLeftMargin( 0.13 );
     plotRelativePlot( hXcore_sims, hXcore_diff, -250., 250. );
-
+    
     cOCore->cd( 1 );
     gPad->SetLeftMargin( 0.13 );
     hXcore_on->Draw();
     hXcore_off->Draw( "same" );
-
+    
     // Ycore
     //
-
+    
     TH1D* hYcore_sims = ( TH1D* )fDataFile->Get( "hYcore_SIMS" );
     setHistogramAtt( hYcore_sims, 2, 1, 1, 20, iRebin );
     hYcore_sims->SetMaximum( hYcore_sims->GetMaximum() * 1.5 );
-
+    
     TH1D* hYcore_on = ( TH1D* )fDataFile->Get( "hYcore_ON" );
     setHistogramAtt( hYcore_on, 3, 1, 1, 20, iRebin );
-
+    
     TH1D* hYcore_off = ( TH1D* )fDataFile->Get( "hYcore_OFF" );
     setHistogramAtt( hYcore_off, 4, 1, 1, 20, iRebin );
-
+    
     TH1D* hYcore_diff = ( TH1D* )fDataFile->Get( "hYcore_DIFF" );
     setHistogramAtt( hYcore_diff, 1, 1, 1, 21, iRebin );
-
+    
     hYcore_sims->SetAxisRange(-250., 250. );
     hYcore_on->SetAxisRange(-250., 250. );
-
+    
     getScaling( nSims, nDiff, "Ycore", fScalingMethod );
     hYcore_diff->Scale( nDiff );
     hYcore_sims->Scale( nSims );
-
+    
     cSCore->cd( 2 );
     hYcore_sims->SetMaximum( hYcore_sims->GetMaximum() * 1.8 );
     hYcore_sims->Draw();
     hYcore_diff->Draw( "same" );
     plotLegend( hYcore_sims, hYcore_diff, 0.13 );
-
+    
     cSCoreRel->cd( 2 );
     plotRelativePlot( hYcore_sims, hYcore_diff, -250., 250. );
-
+    
     cOCore->cd( 2 );
     hYcore_on->Draw();
     hYcore_off->Draw( "same" );
-
+    
     // az & elevation
     cSCore->cd( 3 );
     TH1D* hArrayEl_sims = ( TH1D* )fDataFile->Get( "hArrayEl_SIMS" );
@@ -1381,15 +1381,15 @@ TCanvas* VPlotCompareDataWithMC::core_plots( int iRebin )
         getScaling( nSims, nDiff, "ArrayEl", fScalingMethod );
         hArrayEl_diff->Scale( nDiff );
         hArrayEl_sims->Scale( nSims );
-
+        
         cSCore->cd( 3 );
         hArrayEl_sims->Draw();
         hArrayEl_diff->Draw( "same" );
         plotLegend( hArrayEl_sims, hArrayEl_diff, 0.13 );
-
+        
         cSCoreRel->cd( 3 );
         plotRelativePlot( hArrayEl_sims, hArrayEl_diff, 40., 90. );
-
+        
         cOCore->cd( 3 );
         hArrayEl_off->Draw();
         hArrayEl_on->Draw( "same" );
@@ -1408,57 +1408,57 @@ TCanvas* VPlotCompareDataWithMC::core_plots( int iRebin )
         getScaling( nSims, nDiff, "ArrayAz", fScalingMethod );
         hArrayAz_diff->Scale( nDiff );
         hArrayAz_sims->Scale( nSims );
-
+        
         cSCore->cd( 6 );
         hArrayAz_sims->SetMaximum( hArrayAz_sims->GetMaximum() * 1.8 );
         hArrayAz_sims->Draw();
         hArrayAz_diff->Draw( "same" );
         plotLegend( hArrayAz_sims, hArrayAz_diff, 0.13 );
-
+        
         cSCoreRel->cd( 4 );
         plotRelativePlot( hArrayAz_sims, hArrayAz_diff, 0., 360. );
-
+        
         cOCore->cd( 6 );
         hArrayAz_off->Draw();
         hArrayAz_on->Draw( "same" );
     }
-
+    
     // //////////////////////
     // XY plot
-
+    
     cOCore->cd( 4 );
     TH2D* hXYcore_on = ( TH2D* )fDataFile->Get( "hXYcore_ON" );
     setHistogramAtt( hXYcore_on, 1. );
     hXYcore_on->SetXTitle( "core position X (ON) [m]" );
     hXYcore_on->SetYTitle( "core position Y (ON) [m]" );
-
+    
     hXYcore_on->Draw( "colz" );
-
+    
     cOCore->cd( 5 );
     TH2D* hXYcore_off = ( TH2D* )fDataFile->Get( "hXYcore_OFF" );
     setHistogramAtt( hXYcore_off, 1. );
     hXYcore_off->SetXTitle( "core position X (OFF) [m]" );
     hXYcore_off->SetYTitle( "core position Y (OFF) [m]" );
-
+    
     hXYcore_off->Draw( "colz" );
-
+    
     cSCore->cd( 4 );
     TH2D* hXYcore_diff = ( TH2D* )fDataFile->Get( "hXYcore_DIFF" );
     setHistogramAtt( hXYcore_diff, 1. );
     hXYcore_diff->SetXTitle( "core position X (ON-OFF) [m]" );
     hXYcore_diff->SetYTitle( "core position Y (ON-OFF) [m]" );
-
+    
     hXYcore_diff->Draw( "colz" );
-
+    
     cSCore->cd( 5 );
     TH2D* hXYcore_sims = ( TH2D* )fDataFile->Get( "hXYcore_SIMS" );
     setHistogramAtt( hXYcore_sims, 1. );
-
+    
     hXYcore_sims->SetXTitle( "core position X (SIMS) [m]" );
     hXYcore_sims->SetYTitle( "core position Y (SIMS) [m]" );
     hXYcore_sims->Draw( "colz" );
-
-
+    
+    
     // print the canvas
     if( fPrintName.size() > 0 )
     {
@@ -1480,25 +1480,25 @@ void VPlotCompareDataWithMC::centroids()
     {
         return;
     }
-
+    
     TCanvas* cOCentro = new TCanvas( "cOCentro", "on/off (centroids plots)", 100, 10, 600, fNTel * 300 );
     cOCentro->SetGridx( 0 );
     cOCentro->SetGridy( 0 );
     cOCentro->Divide( 2, fNTel );
-
+    
     TCanvas* cSCentro = new TCanvas( "cSCentro", "sims/diff (centroids plots)", 10, 10, 600, fNTel * 300 );
     cSCentro->SetGridx( 0 );
     cSCentro->SetGridy( 0 );
     cSCentro->Divide( 2, fNTel );
-
+    
     int iC = 1;
-
+    
     TH2D* hCenXY_sims[200];
     TH2D* hCenXY_diff[200];
-
+    
     TH2D* hCenXY_off[200];
     TH2D* hCenXY_on[200];
-
+    
     char hname[200];
     for( unsigned int i = 0; i < fNTel; i++ )
     {
@@ -1506,35 +1506,35 @@ void VPlotCompareDataWithMC::centroids()
         hCenXY_sims[i] = ( TH2D* )fDataFile->Get( hname );
         setHistogramAtt( hCenXY_sims[i], -999. );
         setAxisTitles( hCenXY_sims[i], "sims", i + 1 );
-
+        
         sprintf( hname, "hcen_xy%u_DIFF", i + 1 );
         hCenXY_diff[i] = ( TH2D* )fDataFile->Get( hname );
         setHistogramAtt( hCenXY_diff[i], 0.01 );
         setAxisTitles( hCenXY_diff[i], "on-off", i + 1 );
-
+        
         sprintf( hname, "hcen_xy%u_ON", i + 1 );
         hCenXY_on[i] = ( TH2D* )fDataFile->Get( hname );
         setHistogramAtt( hCenXY_on[i], -999. );
         setAxisTitles( hCenXY_on[i], "on", i + 1 );
-
+        
         sprintf( hname, "hcen_xy%u_OFF", i + 1 );
         hCenXY_off[i] = ( TH2D* )fDataFile->Get( hname );
         setHistogramAtt( hCenXY_off[i], -999. );
         setAxisTitles( hCenXY_off[i], "off", i + 1 );
-
+        
         cSCentro->cd( iC );
         hCenXY_sims[i]->Draw( "contz" );
-
+        
         cOCentro->cd( iC );
         hCenXY_on[i]->Draw( "contz" );
-
+        
         iC++;
         cSCentro->cd( iC );
         hCenXY_diff[i]->Draw( "contz" );
-
+        
         cOCentro->cd( iC );
         hCenXY_off[i]->Draw( "contz" );
-
+        
         iC++;
     }
 }
@@ -1550,20 +1550,20 @@ TCanvas* VPlotCompareDataWithMC::distance_plots()
     {
         return 0;
     }
-
+    
     TCanvas* cODist = new TCanvas( "cODist", "on/off (distance plots)", 100, 10, 900, fNTel * 150 );
     cODist->SetGridx( 0 );
     cODist->SetGridy( 0 );
     cODist->Divide( 3, fNTel );
-
+    
     TCanvas* cSDist = new TCanvas( "cSDist", "sims/diff (distance plots)", 10, 10, 900, fNTel * 150 );
     cSDist->SetGridx( 0 );
     cSDist->SetGridy( 0 );
     cSDist->Divide( 4, fNTel );
-
+    
     char hname[200];
     char htitle[200];
-
+    
     TCanvas* cdistsim[100];
     for( int i = 0; i < 100; i++ )
     {
@@ -1585,24 +1585,24 @@ TCanvas* VPlotCompareDataWithMC::distance_plots()
             cdistsim[i]->SetGridy( 0 );
         }
     }
-
+    
     // get histogram scaling
     double s_sims = 1.;
     double s_diff = 1.;
-
+    
     int iCsi = 1;
     int iCoo = 1;
-
+    
     TH1D* hR_sims[200];
     TH1D* hR_diff[200];
     TH1D* hR_on[200];
     TH1D* hR_off[200];
-
+    
     TH2D* hdistR_sims[200];
     TH2D* hdistR_diff[200];
     TH2D* hdistR_on[200];
     TH2D* hdistR_off[200];
-
+    
     TH1D* hrel = 0;
     for( unsigned int i = 0; i < fNTel; i++ )
     {
@@ -1612,20 +1612,20 @@ TCanvas* VPlotCompareDataWithMC::distance_plots()
         setHistogramAtt( hR_sims[i], 2, 1, 0.5, 20, 1 );
         hR_sims[i]->SetMaximum( hR_sims[i]->GetMaximum() * 1.3 );
         hR_sims[i]->SetYTitle( "number of shower [a.u.]" );
-
+        
         sprintf( hname, "hr_%u_DIFF", i + 1 );
         hR_diff[i] = ( TH1D* )fDataFile->Get( hname );
         setHistogramAtt( hR_diff[i], 1, 1, 0.5, 21, 1 );
-
+        
         sprintf( hname, "hr_%u_ON", i + 1 );
         hR_on[i] = ( TH1D* )fDataFile->Get( hname );
         setHistogramAtt( hR_on[i], 3, 1, 0.5, 20, 1 );
-
+        
         sprintf( hname, "hr_%u_OFF", i + 1 );
         hR_off[i] = ( TH1D* )fDataFile->Get( hname );
         setHistogramAtt( hR_off[i], 4, 1, 0.5, 21, 1 );
-
-
+        
+        
         sprintf( hname, "r_%u", i + 1 );
         getScaling( s_sims, s_diff, hname, fScalingMethod );
         if( hR_sims[i]->GetEntries() > 0 )
@@ -1636,20 +1636,20 @@ TCanvas* VPlotCompareDataWithMC::distance_plots()
         {
             hR_diff[i]->Scale( s_diff );
         }
-
+        
         cSDist->cd( iCsi );
         gPad->SetLeftMargin( 0.13 );
         hR_sims[i]->Draw( "e" );
         hR_diff[i]->Draw( "e same" );
-
+        
         cODist->cd( iCoo );
         gPad->SetLeftMargin( 0.13 );
         hR_on[i]->Draw( "e" );
         hR_off[i]->Draw( "e same" );
-
+        
         iCsi++;
         iCoo++;
-
+        
         // relative plots
         if( hR_sims[i] && hR_diff[i] )
         {
@@ -1668,7 +1668,7 @@ TCanvas* VPlotCompareDataWithMC::distance_plots()
             iLine->Draw();
         }
         iCsi++;
-
+        
         // distR
         //
         sprintf( hname, "hdistR%u_SIMS", i + 1 );
@@ -1676,41 +1676,41 @@ TCanvas* VPlotCompareDataWithMC::distance_plots()
         setHistogramAtt( hdistR_sims[i], -999. );
         setAxisTitles( hdistR_sims[i], "sims", i + 1 );
         hdistR_sims[i]->SetAxisRange( 0., 1.5, "Y" );
-
+        
         sprintf( hname, "hdistR%u_DIFF", i + 1 );
         hdistR_diff[i] = ( TH2D* )fDataFile->Get( hname );
         setHistogramAtt( hdistR_diff[i], 0.001 );
         setAxisTitles( hdistR_diff[i], "on-off", i + 1 );
         hdistR_diff[i]->SetAxisRange( 0., 1.5, "Y" );
-
+        
         sprintf( hname, "hdistR%u_ON", i + 1 );
         hdistR_on[i] = ( TH2D* )fDataFile->Get( hname );
         setHistogramAtt( hdistR_on[i], -999. );
         setAxisTitles( hdistR_on[i], "on", i + 1 );
         hdistR_on[i]->SetAxisRange( 0., 1.5, "Y" );
-
+        
         sprintf( hname, "hdistR%u_OFF", i + 1 );
         hdistR_off[i] = ( TH2D* )fDataFile->Get( hname );
         setHistogramAtt( hdistR_off[i], -999. );
         setAxisTitles( hdistR_off[i], "off", i + 1 );
         hdistR_off[i]->SetAxisRange( 0., 1.5, "Y" );
-
+        
         // draw everything
         cSDist->cd( iCsi );
         hdistR_sims[i]->Draw( "contz" );
-
+        
         cODist->cd( iCoo );
         hdistR_on[i]->Draw( "contz" );
-
+        
         iCsi++;
         iCoo++;
-
+        
         cSDist->cd( iCsi );
         hdistR_diff[i]->Draw( "contz" );
-
+        
         cODist->cd( iCoo );
         hdistR_off[i]->Draw( "contz" );
-
+        
         iCsi++;
         iCoo++;
     }
@@ -1766,7 +1766,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
     {
         return 0;
     }
-
+    
     double KSProb = 0;
     double KSSig = 0;
     char text[1000];
@@ -1776,7 +1776,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
     char htitle[600];
     sprintf( htitle, "width_%d", telid );
     getScaling( s_sims, s_diff, htitle, fScalingMethod );
-
+    
     //////////////////////////////////////
     // histogram names to be plotted
     vector< string > hname;
@@ -1874,18 +1874,18 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
     f_logy.push_back( 0 );
     f_x_min.push_back( 5. );
     f_x_max.push_back( 10. );
-
+    
     // loop over all histograms and plot them
     char hn[600];
     char cn[600];
     char ct[600];
-
+    
     TH1D* hsims = 0;
     TH1D* hdiff = 0;
     TH1D* hon = 0;
     TH1D* hoff = 0;
     TH1D* hrel = 0;
-
+    
     TCanvas* hc = 0;
     // canvas for all in one
     if( iOneCanvas )
@@ -1898,7 +1898,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
         hc->Divide( 6, 3 );
     }
     TLegend* iL = 0;
-
+    
     /////////////////////////////////////////////////
     // loop over all histograms and plot them
     for( unsigned int j = 0; j < hname.size(); j++ )
@@ -1948,7 +1948,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
         sprintf( hn, "h%s_%d_RE", hname[j].c_str(), telid );
         hrel = ( TH1D* )hsims->Clone( hn );
         hrel->Divide( hdiff );
-
+        
         if( iOneCanvas )
         {
             TPad* g = ( TPad* )hc->cd( j + 1 );
@@ -1978,13 +1978,13 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
             hc->cd();
         }
         //		iL = new TLegend( 0.80 , 0.80, 1.05, 1.05 );
-
+        
         double iTitleOffset = 1.3;
         if(!iOneCanvas )
         {
             iTitleOffset = 1.;
         }
-
+        
         setHistogramAtt( hsims, 2, 1, 0.5, 20, 1, iTitleOffset );
         if( fPlotPoster )
         {
@@ -2010,7 +2010,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
         {
             setHistogramAtt( hrel, 1, 3, 1, 21, 1 );
         }
-
+        
         hdiff->SetYTitle( "number of shower [a.u.]" );
         if(!f_logy[j] && hdiff->GetMinimum() < -5. )
         {
@@ -2027,7 +2027,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
         hrel->SetYTitle( "sims/data" );
         hrel->SetMinimum( fRelatePlotRange_min );
         hrel->SetMaximum( fRelatePlotRange_max );
-
+        
         if( hdiff->GetXaxis()->GetXmin() > f_x_min[j] )
         {
             f_x_min[j] = hdiff->GetXaxis()->GetXmin();
@@ -2041,7 +2041,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
         hon->SetAxisRange( f_x_min[j], f_x_max[j] );
         hoff->SetAxisRange( f_x_min[j], f_x_max[j] );
         hrel->SetAxisRange( f_x_min[j], f_x_max[j] );
-
+        
         ////////////////////////////////////////////////
         // difference plots
         if( iPlot == "SIMSDIFF" )
@@ -2055,7 +2055,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
                 sprintf( cn, "simulations" );
                 iL->AddEntry( hsims, cn, "pl" );
             }
-
+            
             if(!gPad->GetLogy() )
             {
                 TLine* iL0 = new TLine( f_x_min[j], 0., f_x_max[j], 0. );
@@ -2090,7 +2090,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
                 iL->Draw();
             }
         }
-
+        
         // line for mscwt and msclt histograms
         if( iPlot != "REL" )
         {
@@ -2122,7 +2122,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
                 sprintf( text, "%s (TEL%d) | KS P = %1.2e (#infty #sigma)", hname[j].c_str(), telid, KSProb );
             }
             cout << text << endl;
-
+            
             TLatex* iT = new TLatex();
             iT->SetText( 0.11, 0.92, text );
             iT->SetNDC();
@@ -2141,32 +2141,32 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
 void VPlotCompareDataWithMC::msc_plots( char* offFile, char* helium, char* proton, double xmin, double xmax, string ivar )
 {
     char hname[200];
-
+    
     if(!fDataFile )
     {
         return;
     }
-
+    
     TCanvas* cMSCsim = 0;
     sprintf( hname, "c%sSim", ivar.c_str() );
     cMSCsim = new TCanvas( hname, hname, 450, 510, 400, 400 );
     cMSCsim->SetGridx( 0 );
     cMSCsim->SetGridy( 0 );
-
+    
     sprintf( hname, "h%s_SIMS", ivar.c_str() );
     TH1D* hMSC_sims = ( TH1D* )fDataFile->Get( hname );
     setHistogramAtt( hMSC_sims, 2, 1, 1, 24, 1 );
     hMSC_sims->SetYTitle( "number of showers [a.u.]" );
-
+    
     sprintf( hname, "h%s_DIFF", ivar.c_str() );
     TH1D* hMSC_diff = ( TH1D* )fDataFile->Get( hname );
     setHistogramAtt( hMSC_diff, 1, 1, 1, 21, 1 );
-
+    
     sprintf( hname, "h%s_OFF", ivar.c_str() );
     TH1D* hMSC_off = ( TH1D* )fDataFile->Get( hname );
     setHistogramAtt( hMSC_off, 4, 1, 1, 21, 1 );
     hMSC_off->Rebin( 2 );
-
+    
     // get the scaling between simulations and data
     double s_sims = 1.;
     double s_diff = 1.;
@@ -2184,7 +2184,7 @@ void VPlotCompareDataWithMC::msc_plots( char* offFile, char* helium, char* proto
     {
         hMSC_off->Scale( hMSC_diff->GetMaximum() / hMSC_off->GetMaximum() / 2. );
     }
-
+    
     cMSCsim->cd();
     hMSC_sims->SetMaximum( hMSC_sims->GetMaximum() * 1.3 );
     if( ivar == "MSCW" )
@@ -2205,7 +2205,7 @@ void VPlotCompareDataWithMC::msc_plots( char* offFile, char* helium, char* proto
     hMSC_sims->Draw( "e same" );
     hMSC_diff->Draw( "e same" );
     //   hMSC_off->Draw( "e same" );
-
+    
     // get off histogram from anasum output file
     if( offFile )
     {
@@ -2227,7 +2227,7 @@ void VPlotCompareDataWithMC::msc_plots( char* offFile, char* helium, char* proto
                 cout << "histogram not found: " << hname << endl;
                 return;
             }
-
+            
             hMSC_off_ana->Rebin( 2 );
             hMSC_off_ana->SetLineColor( 4 );
             hMSC_off_ana->SetMarkerColor( 4 );
@@ -2274,7 +2274,7 @@ void VPlotCompareDataWithMC::msc_plots( char* offFile, char* helium, char* proto
         double iHEScale = 6.6e7 / 2.55e7 * 0.3;
         cout << "scaling helium histogram by " << iHEScale << endl;
         hCR->Add( hHelium, hProton, iHEScale, 1. );
-
+        
         if( hCR->GetMaximum() > 0. )
         {
             hCR->Scale( hMSC_diff->GetMaximum() / hCR->GetMaximum() / 2. * 1.05 );
@@ -2300,14 +2300,14 @@ void VPlotCompareDataWithMC::mwr_vs_energy_plots( int iRebin, double xmin, doubl
     {
         return;
     }
-
+    
     plot_energyDependentDistributions( "MLR", iRebin, xmin, xmax, "CUMU", 0, iSystematicCutCheck );
     plot_energyDependentDistributions( "MWR", iRebin, xmin, xmax, "CUMU", 0, iSystematicCutCheck );
     plot_energyDependentDistributions( "MLR", iRebin, xmin, xmax, "REL" );
     plot_energyDependentDistributions( "MWR", iRebin, xmin, xmax, "REL" );
     plot_energyDependentDistributions( "MLR", iRebin, xmin, xmax );
     plot_energyDependentDistributions( "MWR", iRebin, xmin, xmax );
-
+    
     return;
 }
 
@@ -2719,8 +2719,8 @@ void VPlotCompareDataWithMC::plot( string iPrintName )
     {
         cP->Print( hname );
     }
-
+    
     sprintf( hname, "%s.pdf)", iPrintName.c_str() );
     c->Print( hname );
-
+    
 }

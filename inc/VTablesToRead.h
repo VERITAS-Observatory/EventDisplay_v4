@@ -14,7 +14,7 @@ using namespace std;
 class VTablesToRead
 {
     public:
-
+    
         unsigned int    fNTel;
         vector< TH2F* > hmscwMedian;
         vector< TH2F* > hmscwSigma;
@@ -24,7 +24,7 @@ class VTablesToRead
         vector< TH2F* > henergyERSigma;
         vector< TH2F* > henergySRMedian;
         vector< TH2F* > henergySRSigma;
-
+        
         double mscw;
         double mscl;
         double energyER;
@@ -40,7 +40,7 @@ class VTablesToRead
         double* mscw_Tsigma;
         double* mscl_Tsigma;
         double* energySR_Tsigma;
-
+        
         VTablesToRead( int nTel );
         ~VTablesToRead() {}
         void reset();

@@ -13,9 +13,9 @@
 VGammaHadronCutsStatistics::VGammaHadronCutsStatistics()
 {
     fData = 0;
-
+    
     fData = 0;
-
+    
     reset();
 }
 
@@ -39,7 +39,7 @@ void VGammaHadronCutsStatistics::initialize()
     fCutName.push_back( "EnergyRec         " );
     fCutName.push_back( "Pointing quality  " );
     fCutName.push_back( "Unknown cut (problem?) " );
-
+    
     fData = new TTree( "GammaHadronCutsStats", "cut statistics for gamma/hadron cuts" );
     fData->Branch( "cut", &fCut_bitset_ulong, "cut/l" );
 }
@@ -47,10 +47,10 @@ void VGammaHadronCutsStatistics::initialize()
 void VGammaHadronCutsStatistics::reset()
 {
     fCutCounter.clear();
-
+    
     fCut_bitset.reset();
     fCut_bitset_ulong = 0;
-
+    
     // the vector will have exactly the name of EN_AnaCutsStats
     for( unsigned int i = 0; i < fCutName.size(); i++ )
     {
@@ -64,7 +64,7 @@ unsigned int VGammaHadronCutsStatistics::getCounterValue( unsigned int iCut )
     {
         return fCutCounter[iCut];
     }
-
+    
     return 0;
 }
 
@@ -73,7 +73,7 @@ void VGammaHadronCutsStatistics::fill()
     // fill data tree
     fCut_bitset_ulong = fCut_bitset.to_ulong();
     fData->Fill();
-
+    
     // reset bit counter
     fCut_bitset.reset();
     fCut_bitset_ulong = 0;

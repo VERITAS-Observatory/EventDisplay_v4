@@ -18,10 +18,10 @@ using namespace std;
 class VPointing : public VSkyCoordinates
 {
     private:
-
+    
         unsigned int fTelID;
         bool         fUseDB;                      //!< uses DB to calculate pointing directions
-
+        
         unsigned int fPointingType;               //!< 0: pointing calculated from source coordinates (+wobble offsets)
         //!< 1: pointing calculated from source coordinates (+wobble offsets), added error from command line,
         //!< 2: read T-Point corrected positioner data from VERITAS DB
@@ -30,7 +30,7 @@ class VPointing : public VSkyCoordinates
         //!< 5: from pointing monitor (DB)
         unsigned int fEventStatus;
         unsigned int fNEventsWithNoDBPointing;
-
+        
         float  fTelAzimuthDB;                     //!< [deg]  azimuth from VTS DB (from positioner or pointing monitor)
         float  fTelElevationDB;                   //!< [deg]  elevation from VTS DB (from positioner or pointing monitor)
         // difference between DB/VPM pointing and position
@@ -40,19 +40,19 @@ class VPointing : public VSkyCoordinates
         double fMeanPointingErrorX;               //!< [deg]
         double fMeanPointingErrorY;               //!< [deg]
         double fMeanPointingDistance;             //!< [deg]
-
+        
         VPointingDB* fPointingDB;
         TTree* fPointingTree;
-
+        
         // private functions
         void initializePointingTree();
         bool updatePointingfromDB( int, double );
-
+        
     public:
-
+    
         VPointing( unsigned int itelID );
         ~VPointing() {}
-
+        
         void         fillPointingTree();
         unsigned int getPointingEventStatus()
         {

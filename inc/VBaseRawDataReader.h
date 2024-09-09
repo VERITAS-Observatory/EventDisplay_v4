@@ -33,45 +33,45 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
         unsigned int    fNTel;
         unsigned int    fTelID;
         uint32_t        fHitID;
-
+        
         vector< double > fTelElevation;
         vector< double > fTelAzimuth;
-
+        
         vector< int > fNIncompleteEvent;
-
+        
         vector< bool > fDummyBoolV;
         vector< uint8_t > fDummyUint8V;
         std::pair< bool, uint32_t > fDummyPair;
-
+        
         VNoiseFileReader* fNoiseFileReader;
         uint8_t           fNoiseFilePedestal;
         uint8_t           fNoiseFileFADCRange;
-
+        
         double            finjectGaussianNoise;
         TRandom3*         fRandomInjectGaussianNoise;
-
+        
         // trace amplitude correction
         vector< float > fTraceAmplitudeCorrectionS;
         vector< float > fTraceAmplitudeCorrectionG;
-
+        
         VMonteCarloRunHeader* fMonteCarloHeader;
-
+        
         // QADC values
         std::valarray<double> fSums;
         std::valarray<double> fTraceMax;
         std::vector< valarray< double > > fTracePulseTiming;
-
+        
         // placeholders
         std::valarray<double> v;
         std::vector< std::valarray<double> > vv;
-
+        
     public:
         VBaseRawDataReader( string,
                             int isourcetype,
                             unsigned int iNTel,
                             bool iDebug );
         virtual ~VBaseRawDataReader();
-
+        
         string                      getDataFormat()
         {
             return fDataFormat;
@@ -81,7 +81,7 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
         {
             return fSourceFileName;
         }
-
+        
         // raweventparser
         virtual bool                hasAT()
         {
@@ -247,11 +247,11 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
         void                        selectHitChan( uint32_t i );
         bool                        isZeroSuppressed( unsigned int iChannel );
         bool                        wasLossyCompressed();
-
+        
         // rawfile
         virtual bool                getNextEvent() = 0;
         bool                        setTelescopeID( unsigned int iTelID );
-
+        
         bool                       isMC();
         int                        getMC_primary()
         {
@@ -294,7 +294,7 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
         {
             return -1. * getSMC_Yoffset();
         }
-
+        
         // return QADC values
         valarray< double >&        getSums( unsigned int iNChannel = 99999 );
         valarray< double >&        getTraceMax( unsigned int iNChannel = 99999 );
@@ -303,7 +303,7 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
             return getTraceMax( iNChannel );
         }
         vector< valarray< double > >& getTracePulseTiming( unsigned int iNChannel = 99999 );
-
+        
         // noise file related stuff
         valarray<double>&          getPeds();
         valarray<double>&          getPedvars();
@@ -313,11 +313,11 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
         void                       injectGaussianNoise( double injectGaussianNoise, UInt_t seed = 0 );
         bool                       initThroughputCorrection( double, vector< float >, vector< float > );
         void                       setSumWindow( unsigned int iTelID, int isw );
-
+        
         //      vector< bool >&             getLocalTrigger() { return getSLocalTrigger(); }
         //      unsigned int               getNTelLocalTrigger();         //!< return number of telescopes with local trigger
         //      bool                       hasLocalTrigger( unsigned int iTel );
-
+        
         vector< double >           getTelElevation()
         {
             return fTelElevation;
@@ -326,9 +326,9 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
         {
             return fTelAzimuth;
         }
-
+        
         void                       setDebug( bool iDebug = false );
-
+        
         VMonteCarloRunHeader* getMonteCarloHeader()
         {
             return fMonteCarloHeader;

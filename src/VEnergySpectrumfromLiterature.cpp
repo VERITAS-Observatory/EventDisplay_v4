@@ -10,21 +10,21 @@ VEnergySpectrumfromLiterature::VEnergySpectrumfromLiterature( string ifile, bool
 {
     bIsZombie = false;
     setFunctions();
-
+    
     if( ifile.size() > 0 )
     {
         readValuesFromFile( ifile, iprint );
     }
-
+    
     fIntegral_ID = 0;
     fIntegral_TF1 = 0;
-
+    
     setPlottingLogEnergyAxis();
     setPlottingStyle();
     setPlottingMultiplierIndex();
     setPlottingEnergyRangeLinear();
     setPlottingYaxis();
-
+    
 }
 
 /*
@@ -33,43 +33,43 @@ VEnergySpectrumfromLiterature::VEnergySpectrumfromLiterature( string ifile, bool
 void VEnergySpectrumfromLiterature::setFunctions()
 {
     sEnergyFun a;
-
+    
     // power law
     a.Name = "PL";
     a.Description = "power law";
     a.NumParameters = 3;
     fEnergyFun.push_back( a );
-
+    
     // power law with exponential cut off
     a.Name = "PLEC";
     a.Description = "power law with exponential cut off";
     a.NumParameters = 4;
     fEnergyFun.push_back( a );
-
+    
     // curved power law
     a.Name = "VPL";
     a.Description = "curved power law";
     a.NumParameters = 4;
     fEnergyFun.push_back( a );
-
+    
     // broken power law
     a.Name = "BRPL";
     a.Description = "broken power law";
     a.NumParameters = 6;
     fEnergyFun.push_back( a );
-
+    
     // broken power law (2)
     a.Name = "BRPL_2";
     a.Description = "broken power law (2)";
     a.NumParameters = 4;
     fEnergyFun.push_back( a );
-
+    
     // power law with exponential cut off (with beta factor for cut-off strength)
     a.Name = "PLEC_SF";
     a.Description = "power law with exponential cut off (+cut-off strength)";
     a.NumParameters = 5;
     fEnergyFun.push_back( a );
-
+    
     // power law with exponential cut off (Gaussian factor)
     a.Name = "PLEC_GF";
     a.Description = "power law with exponential cut off (Gaussian factor)";
@@ -81,7 +81,7 @@ bool VEnergySpectrumfromLiterature::readValuesFromFile( string ifile, bool iPrin
 {
     // clear existing data
     fData.clear();
-
+    
     ifstream is;
     is.open( gSystem->ExpandPathName( ifile.c_str() ), ifstream::in );
     if(!is )
@@ -92,33 +92,33 @@ bool VEnergySpectrumfromLiterature::readValuesFromFile( string ifile, bool iPrin
     }
     string is_line;
     string is_temp;
-
+    
     if( iPrint )
     {
         cout << "reading spectral parameters from " << ifile << endl;
     }
-
+    
     sData itemp;
-
+    
     // vectors for diff flux
     vector< double > diff_e;
     vector< double > diff_v;
     vector< double > diff_ve;
-
+    
     while( getline( is, is_line ) )
     {
         if( is_line.size() <= 0 )
         {
             continue;
         }
-
+        
         if( is_line.substr( 0, 1 ) != "*" )
         {
             continue;
         }
-
+        
         istringstream is_stream( is_line );
-
+        
         is_stream >> is_temp;
         is_stream >> is_temp;
         if( is_temp == "NAME" )
@@ -152,10 +152,10 @@ bool VEnergySpectrumfromLiterature::readValuesFromFile( string ifile, bool iPrin
         {
             is_stream >> is_temp;
             itemp.Type = atoi( is_temp.c_str() );
-
+            
             vector< double > v;
             vector< double > ve;
-
+            
             if( itemp.Type < fEnergyFun.size() )
             {
                 for( unsigned int i = 0; i < fEnergyFun[itemp.Type].NumParameters; i++ )
@@ -193,11 +193,11 @@ bool VEnergySpectrumfromLiterature::readValuesFromFile( string ifile, bool iPrin
             itemp.FluxV_energy = diff_e;
             itemp.FluxV_DiffFlux = diff_v;
             itemp.FluxV_DiffFluxError = diff_ve;
-
+            
             fData.push_back( itemp );
         }
     }
-
+    
     return true;
 }
 
@@ -208,9 +208,9 @@ TGraphErrors* VEnergySpectrumfromLiterature::getDifferentialFluxPoints( unsigned
     {
         return 0;
     }
-
+    
     TGraphErrors* g = 0;
-
+    
     if( fData[iID].FluxV_energy.size() > 0 && fData[iID].FluxV_energy.size() == fData[iID].FluxV_DiffFlux.size() && fData[iID].FluxV_energy.size() == fData[iID].FluxV_DiffFluxError.size() )
     {
         g = new TGraphErrors( 1 );
@@ -221,7 +221,7 @@ TGraphErrors* VEnergySpectrumfromLiterature::getDifferentialFluxPoints( unsigned
         g->SetMarkerStyle( fPlottingMarkerStyle );
         g->SetMarkerSize( fPlottingMarkerSize );
         g->SetTitle( "" );
-
+        
         for( unsigned int i = 0; i < fData[iID].FluxV_energy.size(); i++ )
         {
             if( bLogEnergy )
@@ -235,7 +235,7 @@ TGraphErrors* VEnergySpectrumfromLiterature::getDifferentialFluxPoints( unsigned
             g->SetPointError( i, 0., fData[iID].FluxV_DiffFluxError[i] * TMath::Power( fData[iID].FluxV_energy[i], fPlottingMultiplierIndex ) );
         }
     }
-
+    
     return g;
 }
 
@@ -246,9 +246,9 @@ TGraphAsymmErrors* VEnergySpectrumfromLiterature::getEnergySpectrumWithErrors( u
     {
         return 0;
     }
-
+    
     TF1* f = getEnergySpectrum( iID, bLogEnergy );
-
+    
     if(!f )
     {
         return 0;
@@ -257,17 +257,17 @@ TGraphAsymmErrors* VEnergySpectrumfromLiterature::getEnergySpectrumWithErrors( u
     f->Copy(*fTemp );
     fTemp->SetParameter( 0, f->GetParameter( 0 ) / TMath::Power( fData[iID].Parameter[0], fPlottingMultiplierIndex ) );
     fTemp->SetParameter( 1, f->GetParameter( 1 ) - fPlottingMultiplierIndex );
-
+    
     if( TMath::Abs( fPlottingMultiplierIndex ) > 1.e-2 )
     {
         cout << "WARNING: getEnergySpectrumWithErrors does not work with different multiplier index" << endl;
     }
-
+    
     // number of points in graph
     int nPoints = 100;
     // number of random cycles
     int nRandom = 10000;
-
+    
     TGraphAsymmErrors* g = new TGraphAsymmErrors( nPoints );
     g->SetMarkerColor( fPlottingColor );
     g->SetLineColor( fPlottingColor );
@@ -278,13 +278,13 @@ TGraphAsymmErrors* VEnergySpectrumfromLiterature::getEnergySpectrumWithErrors( u
     g->SetFillStyle( fPlottingFillStyle );
     g->SetFillColor( fPlottingColor );
     g->SetTitle( "" );
-
+    
     int nPara = f->GetNpar();
-
+    
     double x = 0.;
     double ymin = 0.;
     double ymax = 0.;
-
+    
     // energy axis range
     double xmin = 0.;
     double xmax = 0.;
@@ -293,12 +293,12 @@ TGraphAsymmErrors* VEnergySpectrumfromLiterature::getEnergySpectrumWithErrors( u
     {
         return 0;
     }
-
+    
     if( nPoints < 2 )
     {
         return 0;
     }
-
+    
     //////////////////////////////////////////////////////////////
     // make histograms
     if( fRandomErrorHistograms.size() == 0 )
@@ -310,7 +310,7 @@ TGraphAsymmErrors* VEnergySpectrumfromLiterature::getEnergySpectrumWithErrors( u
             // get minimum and maximum for histogram
             ymin = 0.01 * f->Eval( x );
             ymax = 100. * f->Eval( x );
-
+            
             sprintf( hname, "i_RandomErrorHistogram_%d", i );
             fRandomErrorHistograms.push_back( new TH1D( hname, "", 10000, ymin, ymax ) );
         }
@@ -322,13 +322,13 @@ TGraphAsymmErrors* VEnergySpectrumfromLiterature::getEnergySpectrumWithErrors( u
             fRandomErrorHistograms[i]->Reset();
         }
     }
-
+    
     /////////////////////////////////////////////////////////////////
     // now loop over all points and calculate error range
     for( int i = 0; i < nPoints; i++ )
     {
         x = xmin + i * ( xmax - xmin ) / ( double )( nPoints - 1 );
-
+        
         for( int r = 0; r < nRandom; r++ )
         {
             // set random parameters
@@ -342,7 +342,7 @@ TGraphAsymmErrors* VEnergySpectrumfromLiterature::getEnergySpectrumWithErrors( u
         g->SetPointEYhigh( i, fRandomErrorHistograms[i]->GetRMS() * TMath::Power( TMath::Power( 10., x ), fPlottingMultiplierIndex ) );
         g->SetPointEYlow( i, fRandomErrorHistograms[i]->GetRMS() * TMath::Power( TMath::Power( 10., x ), fPlottingMultiplierIndex ) );
     }
-
+    
     return g;
 }
 
@@ -353,9 +353,9 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
     {
         return 0;
     }
-
+    
     TF1* f = 0;
-
+    
     // define energy range
     double xmin = 0.;
     double xmax = 0.;
@@ -385,7 +385,7 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
             xmax = iEnergyMax_Lin;
         }
     }
-
+    
     // define functions
     char hname[6000];
     char h_exponent[600];
@@ -399,7 +399,7 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
     {
         sprintf( h_energy, "x" );
     }
-
+    
     if( fData[iID].Type < fEnergyFun.size() )
     {
         if( fEnergyFun[fData[iID].Type].NumParameters == fData[iID].Parameter.size() && fEnergyFun[fData[iID].Type].NumParameters == fData[iID].ParError.size() )
@@ -445,7 +445,7 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
                 sprintf( h_exponent, "[0]*TMath::Power( %s / %f, [4] ) ", h_energy, fData[iID].Parameter[0] );
                 sprintf( hname, "%s * (1.+[1]*(exp(TMath::Gaus(log10(%s),[2], [3] ))-1.))", h_exponent, h_energy );
             }
-
+            
         }
         else
         {
@@ -456,14 +456,14 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
     {
         return 0;
     }
-
+    
     // plotting multiplier
     char hisnmae[10000];
     sprintf( hisnmae, "%s * TMath::Power( %s, %f )", hname, h_energy, fPlottingMultiplierIndex );
-
+    
     // create function
     f = new TF1( fData[iID].Name.c_str(), hisnmae, xmin, xmax );
-
+    
     // set parameters
     for( unsigned int i = 1; i < fData[iID].Parameter.size(); i++ )
     {
@@ -473,7 +473,7 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
     {
         f->SetParError( i - 1, fData[iID].ParError[i] );
     }
-
+    
     if( f )
     {
         f->SetLineColor( fPlottingColor );
@@ -481,7 +481,7 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
         f->SetLineStyle( fPlottingLineStyle );
         f->SetTitle( "" );
     }
-
+    
     return f;
 }
 
@@ -497,12 +497,12 @@ bool VEnergySpectrumfromLiterature::prepare_integration( unsigned int iID, doubl
     {
         return false;
     }
-
+    
     fIntegral_TF1->CalcGaussLegendreSamplingPoints( 1000, fIntegral_x, fIntegral_y, 1.e-15 );
-
+    
     // save that this function has already been integrated
     fIntegral_ID = iID;
-
+    
     return true;
 }
 
@@ -523,7 +523,7 @@ double VEnergySpectrumfromLiterature::getIntegralFlux( double iEmin, double iEma
             cout << "VEnergySpectrumfromLiterature::getIntegralFlux() error: preparation for integral failed" << endl;
         }
     }
-
+    
     return fIntegral_TF1->IntegralFast( 1000, fIntegral_x, fIntegral_y, iEmin, iEmax );
 }
 
@@ -543,9 +543,9 @@ void VEnergySpectrumfromLiterature::listValues( unsigned int i )
         cout << "VEnergySpectrumfromLiterature::listValues error: index out of range (<" << fData.size() << ")" << endl;
         return;
     }
-
+    
     char hname[800];
-
+    
     cout << "ID: " << i << ", " << fData[i].Source << ", " << fData[i].Observatory <<  " (";
     cout << fData[i].Name << ")" << endl;
     if( fData[i].Type == 0 && fData[i].Parameter.size() == 3 && fData[i].ParError.size() == 3 )
@@ -654,11 +654,11 @@ TCanvas* VEnergySpectrumfromLiterature::plot( unsigned int iID, TCanvas* c, bool
     {
         return 0;
     }
-
+    
     char hname[600];
     char htitle[600];
     TH1D* hNull = 0;
-
+    
     if( c == 0 )
     {
         sprintf( hname, "c_%s", fData[iID].Name.c_str() );
@@ -667,7 +667,7 @@ TCanvas* VEnergySpectrumfromLiterature::plot( unsigned int iID, TCanvas* c, bool
         c->SetGridx( 0 );
         c->SetGridy( 0 );
         gPad->SetLeftMargin( 0.13 );
-
+        
         sprintf( hname, "hnull_%s", fData[iID].Name.c_str() );
         hNull = new TH1D( hname, "", 100, log10( fPlottingMinEnergy ), log10( fPlottingMaxEnergy ) );
         hNull->SetMinimum( fPlottingYaxisMin );
@@ -681,7 +681,7 @@ TCanvas* VEnergySpectrumfromLiterature::plot( unsigned int iID, TCanvas* c, bool
             hNull->SetYTitle( hname );
         }
         hNull->GetYaxis()->SetTitleOffset( 1.6 );
-
+        
         plot_nullHistogram( c, hNull, fPlottingLogEnergyAxis, iLogY, hNull->GetYaxis()->GetTitleOffset(), fPlottingMinEnergy, fPlottingMaxEnergy );
         c->SetLogy( iLogY );
     }
@@ -689,9 +689,9 @@ TCanvas* VEnergySpectrumfromLiterature::plot( unsigned int iID, TCanvas* c, bool
     {
         c->cd();
     }
-
+    
     f->Draw( "same" );
-
+    
     return c;
 }
 
@@ -702,7 +702,7 @@ bool VEnergySpectrumfromLiterature::checkIDRange( unsigned int iID )
     {
         return true;
     }
-
+    
     return false;
 }
 
@@ -713,11 +713,11 @@ TCanvas* VEnergySpectrumfromLiterature::plot( string iSelection, TCanvas* c )
     {
         return 0;
     }
-
+    
     vector< unsigned int > v_id;
-
+    
     // read list (separated by spaces)
-
+    
     string itemp;
     istringstream is_stream( iSelection );
     while(!( is_stream >> std::ws ).eof() )
@@ -725,14 +725,14 @@ TCanvas* VEnergySpectrumfromLiterature::plot( string iSelection, TCanvas* c )
         is_stream >> itemp;
         v_id.push_back(( unsigned int )atoi( itemp.c_str() ) );
     }
-
+    
     for( unsigned int i = 0; i < v_id.size(); i++ )
     {
         setPlottingStyle( i + 1, gRandom->Integer( 4 ) );
-
+        
         c = plot( v_id[i], c );
     }
-
+    
     return c;
 }
 
@@ -758,12 +758,12 @@ double VEnergySpectrumfromLiterature::getPowerLaw_Index( unsigned int iID )
     {
         return -9999.;
     }
-
+    
     if( fData[iID].Type != 0 || fData[iID].Parameter.size() != 3 )
     {
         return -9999.;
     }
-
+    
     return fData[iID].Parameter[2];
 }
 
@@ -776,11 +776,11 @@ double VEnergySpectrumfromLiterature::getPowerLaw_FluxConstant_at1TeV( unsigned 
     {
         return -9999.;
     }
-
+    
     if( fData[iID].Type != 0 || fData[iID].Parameter.size() != 3 || fData[iID].Parameter[0] == 0. )
     {
         return -9999.;
     }
-
+    
     return ( fData[iID].Parameter[1] * TMath::Power( 1. / fData[iID].Parameter[0], fData[iID].Parameter[2] ) );
 }

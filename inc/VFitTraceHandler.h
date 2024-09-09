@@ -39,16 +39,16 @@ class VFitTraceHandler : public VTraceHandler
         int fMaxSamples;                          //!< sample maximum (usually 64)
         bool fFitted;                             //!< true after trace fit
         bool fMinuitPrint;                        //!< if true, long printout from minuit
-
+        
         double fChi2;                             //!< Chi2 for this trace
         double fTraceNorm;                        //!< trace normalisation
         double fRT;                               //!< rise time for this trace (obs: different definitions for different fit functions)
         double fFT;                               //!< fall time for this trace (obs: different definitions for different fit functions)
         double fTraceMax;                         //!< maximum of trace
         double fTraceMaxX;                        //!< position of maximum of trace
-
+        
         unsigned int fMC_FADCTraceStart;          // start of FADC trace (in case the simulated trace is longer than needed)
-
+        
         // analysis histograms
         TH1D* fHfitstat;
         int fnstat;                               //!< fit status ( bad if < 3 )
@@ -56,15 +56,15 @@ class VFitTraceHandler : public VTraceHandler
         TH2D* fHxbar;                             //!< fit parameter xbar vs. tube number
         TH2D* fHsigma;                            //!< fit parameter sigma vs. tube number
         TH2D* fHalpha;                            //!< fit parameter alpha vs. tube number
-
+        
         double fFitThresh;                        //!< threshold above trace is fitted
-
+        
         void fitTrace( unsigned int chanID );
-
+        
     public:
         VFitTraceHandler( string );
         ~VFitTraceHandler();
-
+        
         TF1*   getFitFun()                        //!< get fit function
         {
             return fF1Trace;

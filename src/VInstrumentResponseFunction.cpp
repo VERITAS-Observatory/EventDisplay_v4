@@ -9,18 +9,18 @@
 VInstrumentResponseFunction::VInstrumentResponseFunction()
 {
     fDebug = false;
-
+    
     fName = "";
     fType = "";
-
+    
     fData = 0;
     fAnaCuts = 0;
     fEnergyReconstructionMethod = 0;
-
+    
     fSpectralWeight = new VSpectralWeight();
-
+    
     fDataProduct = 0;
-
+    
     setContainmentProbability();
     setTelescopeTypeCuts();
     setDuplicationID();
@@ -38,7 +38,7 @@ void VInstrumentResponseFunction::setRunParameter( VInstrumentResponseFunctionRu
     setEnergyReconstructionMethod( iRunPara->fEnergyReconstructionMethod );
     setMonteCarloEnergyRange( iRunPara->fMCEnergy_min, iRunPara->fMCEnergy_max, TMath::Abs( iRunPara->fMCEnergy_index ) );
     setTelescopeTypeCuts( iRunPara->fTelescopeTypeCuts );
-
+    
     fVMinAz = iRunPara->fAzMin;
     fVMaxAz = iRunPara->fAzMax;
     // preli: use only first spectral index bin
@@ -65,7 +65,7 @@ bool VInstrumentResponseFunction::initialize( string iName, string iType, unsign
 {
     fName = iName;
     fType = iType;
-
+    
     cout << "======================================================================================================" << endl;
     cout << endl;
     cout << "initializing instrument response function calculator (" << iName << ", type " << iType << ")" << endl;
@@ -80,9 +80,9 @@ bool VInstrumentResponseFunction::initialize( string iName, string iType, unsign
         cout << ", spectral index " << fVSpectralIndex[0];
     }
     cout << ")" << endl;
-
+    
     char hname[800];
-
+    
     for( unsigned int i = 0; i < fVSpectralIndex.size(); i++ )
     {
         vector< VInstrumentResponseFunctionData* > i_irf;
@@ -96,21 +96,21 @@ bool VInstrumentResponseFunction::initialize( string iName, string iType, unsign
             {
                 return false;
             }
-
+            
             i_irf.back()->setData( iZe, ( int )j, fVMinAz[j], fVMaxAz[j], iNoise, iPedvars, fVSpectralIndex[i], iXoff, iYoff );
             i_irf.back()->setEnergyReconstructionMethod( fEnergyReconstructionMethod );
         }
         fIRFData.push_back( i_irf );
     }
-
+    
     // output tree
-
+    
     fIRFData_Tree = new VInstrumentResponseFunctionData();
-
+    
     sprintf( hname, "t_%s", fName.c_str() );
     fDataProduct = new TTree( hname, fType.c_str() );
     fDataProduct->Branch( "IRF", "VInstrumentResponseFunctionData", &fIRFData_Tree, 16000, 0 );
-
+    
     return true;
 }
 
@@ -124,7 +124,7 @@ bool VInstrumentResponseFunction::fill()
     {
         return false;
     }
-
+    
     return fillResolutionGraphs( getIRFData() );
 }
 
@@ -145,11 +145,11 @@ bool VInstrumentResponseFunction::fillEventData()
     {
         return false;
     }
-
+    
     // spectral weight
     double i_weight = 1.;
     // MC energy (log10)
-
+    
     ///////////////////////////////////
     // get full data set
     ///////////////////////////////////
@@ -158,15 +158,15 @@ bool VInstrumentResponseFunction::fillEventData()
     for( Long64_t i = 0; i < d_nentries; i++ )
     {
         fData->GetEntry( i );
-
+        
         fAnaCuts->newEvent( false );
-
+        
         // apply MC cuts
         if(!fAnaCuts->applyMCXYoffCut( fData->MCxoff, fData->MCyoff, true ) )
         {
             continue;
         }
-
+        
         ////////////////////////////////
         // apply general quality and gamma/hadron separation cuts
         // apply fiducial area cuts
@@ -174,27 +174,27 @@ bool VInstrumentResponseFunction::fillEventData()
         {
             continue;
         }
-
+        
         // apply reconstruction quality cuts
         if(!fAnaCuts->applyStereoQualityCuts( fEnergyReconstructionMethod, true, i, true ) )
         {
             continue;
         }
-
+        
         // apply telescope type cut
         //	 if( fAnaCuts->applyTelTypeTest( true ) ) continue;
-
+        
         // apply gamma/hadron cuts
         if(!fAnaCuts->isGamma( i, true ) )
         {
             continue;
         }
-
+        
         //////////////////////////////////////
         // loop over all az bins
         for( unsigned int i_az = 0; i_az < fVMinAz.size(); i_az++ )
         {
-
+        
             // check which azimuth bin we are
             if( fData->MCze > 3. )
             {
@@ -233,7 +233,7 @@ bool VInstrumentResponseFunction::fillEventData()
                 {
                     i_weight = 0.;
                 }
-
+                
                 // fill histograms
                 if( s < fIRFData.size() && i_az < fIRFData[s].size() )
                 {
@@ -252,7 +252,7 @@ bool VInstrumentResponseFunction::fillEventData()
 bool VInstrumentResponseFunction::fillResolutionGraphs( vector< vector< VInstrumentResponseFunctionData* > > iIRFData )
 {
     fIRFData = iIRFData;
-
+    
     // fill resolution graphs
     cout << "VInstrumentResponseFunction::terminate ";
     cout << " (integration probability: " << fContainmentProbability << ")" << endl;
@@ -266,7 +266,7 @@ bool VInstrumentResponseFunction::fillResolutionGraphs( vector< vector< VInstrum
             }
         }
     }
-
+    
     // fill data product tree
     cout << "VInstrumentResponseFunction:: fill data tree ";
     if( fIRFData.size() > 0 )
@@ -284,7 +284,7 @@ bool VInstrumentResponseFunction::fillResolutionGraphs( vector< vector< VInstrum
             }
         }
     }
-
+    
     return true;
 }
 
@@ -321,7 +321,7 @@ void VInstrumentResponseFunction::setEnergyReconstructionMethod( unsigned int iM
 void VInstrumentResponseFunction::setCuts( VGammaHadronCuts* iCuts )
 {
     fAnaCuts = iCuts;
-
+    
     if( fAnaCuts )
     {
         for( unsigned int i = 0; i < fIRFData.size(); i++ )
@@ -346,7 +346,7 @@ TGraphErrors* VInstrumentResponseFunction::getAngularResolutionGraph( unsigned i
     {
         return fIRFData[iSpectralIndexBin][iAzBin]->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF];
     }
-
+    
     cout << "VInstrumentResponseFunction::getAngularResolutionGraph: warning index out of range ";
     cout << iAzBin << "\t" << iSpectralIndexBin << "\t";
     cout << "(" << fIRFData.size();
@@ -355,7 +355,7 @@ TGraphErrors* VInstrumentResponseFunction::getAngularResolutionGraph( unsigned i
         cout << "\t" << fIRFData[iSpectralIndexBin].size();
     }
     cout << ")" << endl;
-
+    
     return 0;
 }
 
@@ -371,7 +371,7 @@ vector< TH2D* > VInstrumentResponseFunction::getAngularResolution2D( unsigned in
         h.push_back( fIRFData[iSpectralIndexBin][iAzBin]->f2DHisto[VInstrumentResponseFunctionData::E_LOGDIFF_MC] );
         return h;
     }
-
+    
     cout << "VInstrumentResponseFunction::getAngularResolution2D: warning index out of range ";
     cout << iAzBin << "\t" << iSpectralIndexBin << "\t";
     cout << "(" << fIRFData.size();
@@ -380,7 +380,7 @@ vector< TH2D* > VInstrumentResponseFunction::getAngularResolution2D( unsigned in
         cout << "\t" << fIRFData[iSpectralIndexBin].size();
     }
     cout << ")" << endl;
-
+    
     return h;
 }
 

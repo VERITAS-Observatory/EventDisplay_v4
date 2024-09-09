@@ -11,7 +11,7 @@ VDifferentialFlux::VDifferentialFlux()
 {
     // constants
     constant_TeVtoHz = TMath::C() * 1.e12 /  1.239841875e-6;
-
+    
     MJD_min = 0.;
     MJD_max = 0.;
     Energy = 0.;
@@ -139,9 +139,9 @@ void VDifferentialFlux::fillEvent( double iMJD_min, double iMJD_max )
 {
     MJD_min = iMJD_min;
     MJD_max = iMJD_max;
-
+    
     Energy_Hz = convertEnergy_TeV_to_Hz( Energy );
-
+    
     DifferentialFlux_vFv      = convertPhotonFlux_to_Ergs( Energy, DifferentialFlux );
     DifferentialFluxError_vFv = convertPhotonFlux_to_Ergs( Energy, DifferentialFluxError );
 }
@@ -186,12 +186,12 @@ double VDifferentialFlux::convertPhotonFlux_to_Ergs( double e, double f, bool bL
     }
     // eV / cm2 / s
     f *= e * e / 1.e12;
-
+    
     // eV -> J
     f *= TMath::Qe();
     // J -> ergs
     f /= 1.e-7;
-
+    
     return f;
 }
 
@@ -213,7 +213,7 @@ double VDifferentialFlux::nuFnu( double F, double gamma, double e1, double e2, d
         cout << "invalid energy interval " << e1 << ", " << e2 << endl;
         return -99.;
     }
-
+    
     // calculate constant
     double c = 0.;
     if( gamma != -1. )
@@ -225,7 +225,7 @@ double VDifferentialFlux::nuFnu( double F, double gamma, double e1, double e2, d
     {
         c = F * ( log( e2 ) - log( e1 ) );
     }
-
+    
     // calculate nuFu
     double nF = 0.;
     if( e3 > 0. )
@@ -238,10 +238,10 @@ double VDifferentialFlux::nuFnu( double F, double gamma, double e1, double e2, d
     {
         nF = c * TMath::Power( sqrt( e1* e2 ) / e3, gamma + 2. );
     }
-
+    
     // from eV to ergs
     nF *= TMath::Qe();
     nF /= 1.e-7;
-
+    
     return nF;
 }

@@ -29,7 +29,7 @@ int main( int argc, char* argv[] )
     // some timing
     TStopwatch fStopWatch;
     fStopWatch.Start();
-
+    
     // print version only
     if( argc == 2 )
     {
@@ -41,7 +41,7 @@ int main( int argc, char* argv[] )
             exit( 0 );
         }
     }
-
+    
     // read the command line parameters
     VReadRunParameter* fReadRunParameter = new VReadRunParameter();
     if(!fReadRunParameter->readCommandline( argc, argv ) )
@@ -49,14 +49,14 @@ int main( int argc, char* argv[] )
         exit(-1 );
     }
     fReadRunParameter->getRunParameter()->print();
-
+    
     // initialize main loop
     VEventLoop mainEventLoop( fReadRunParameter->getRunParameter() );
     if(!mainEventLoop.initEventLoop() )
     {
         exit(-1 );
     }
-
+    
     // no display, command line mode
     if(!fReadRunParameter->getRunParameter()->fdisplaymode )
     {
@@ -73,7 +73,7 @@ int main( int argc, char* argv[] )
         TApplication app( "app", &targv, argv );
         VDisplay display( gClient->GetRoot(), fReadRunParameter->getRunParameter()->fw, fReadRunParameter->getRunParameter()->fh, &mainEventLoop );
         display.Draw();
-
+        
         if( fReadRunParameter->getRunParameter()->fMovieBool )
         {
             display.makeFullMovie();
@@ -82,10 +82,10 @@ int main( int argc, char* argv[] )
         {
             app.Run();
         }
-
-
+        
+        
     }
     delete fReadRunParameter;
-
+    
     return 0;
 }

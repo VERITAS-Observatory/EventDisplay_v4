@@ -34,10 +34,10 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
     // read templates from template directory
     char* TEMPLATE_DIR;
     TEMPLATE_DIR = getenv( "EVLIOSYS" );
-
+    
     char templ[1200];
     sprintf( templ, "%s/../templates/evl/1.0.0/EventList.tpl", TEMPLATE_DIR );
-
+    
     ///////////////////////////////
     // open and read data file
     TFile* mscwfile = new TFile( iInputFile.c_str() );
@@ -47,14 +47,14 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
         cout << "exiting..." << endl;
         exit( EXIT_FAILURE );
     }
-
+    
     //////////////////////////////////////
     // header
-
-
+    
+    
     //////////////////////////////////////
     // array and telescope configuration
-
+    
     TTree* fTreeDet = ( TTree* )mscwfile->Get( "telconfig" );
     if(!fTreeDet )
     {
@@ -62,8 +62,8 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
         cout << "exiting..." << endl;
         exit( EXIT_FAILURE );
     }
-
-
+    
+    
     // define tree
     UInt_t fNTel = 0;
     int fTelID = 0;
@@ -104,7 +104,7 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
         fATube_m2[i] = 0.;
         fTubeOFF[i] = 0;
     }
-
+    
     fTreeDet->SetBranchAddress( "NTel", &fNTel );
     fTreeDet->SetBranchAddress( "TelID", &fTelID );
     fTreeDet->SetBranchAddress( "TelType", &fTelType );
@@ -159,12 +159,12 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
     {
         fTreeDet->SetBranchAddress( "MirrorArea", &fMirrorArea );
     }
-
+    
     ///////////////////////////////////////////////////////////////////
     // FITS record: telescope array
     FITSRecord recTelArray( iOutputFile, templ, "TELARRAY" );
     recTelArray.setVerbose( 0 );
-
+    
     int16_t telid = 0;
     const size_t NAMELEN = 10;
     //char telclass[NAMELEN];
@@ -181,16 +181,16 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
     double pix_size = 0.14;
     double pix_sep = fieldofview / pix_size;
     double npix = 0.;
-
+    
     std::string telescop = "VERITAS";
     std::string array; //  name of array layout for reference
     int obs_id; //  name of observation this array corresponds to, or 0 if general
     int geolat; //  latitude of observatory
     int geolon; //  longitude of observatory
     int altitude; //  altitude of observatory (km)
-
+    
     recTelArray.writeHeader( "TELESCOP", telescop );
-
+    
     recTelArray.mapColumnToVar( "TELID", telid );
     recTelArray.mapColumnToVar( "TELCLASS", telclass );
     recTelArray.mapColumnToVar( "SUBCLASS", subclass );
@@ -204,12 +204,12 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
     recTelArray.mapColumnToVar( "N_PIX", npix );
     recTelArray.mapColumnToVar( "PIX_SIZE", pix_size );
     recTelArray.mapColumnToVar( "PIX_SEP", pix_sep );
-
+    
     for( unsigned int i = 0; i < fTreeDet->GetEntries(); i++ )
     {
-
+    
         fTreeDet->GetEntry( i );
-
+        
         telid		= fTelID;
         telclass[i]      = ( long long int )fTelType;
         subclass[i]      = ( long long int )fTelType;
@@ -226,13 +226,13 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
             pix_size = 2.*fRTubeDeg[0];
         }
         pix_sep 		= 2.*fRTubeDeg[0];
-
+        
         recTelArray.write();
     }
     recTelArray.finishWriting();
-
+    
     /////////////////////////////////////////////////////////////////////
-
+    
     /*    int    event_id = -9999;
         bool flags = 0;
         int    multip = -9999;
@@ -254,14 +254,14 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
         double xmax_err = -9999.0;
         double energy = -9999.0;
         double energy_err = -9999.0;
-
+    
         double mscw = -9999.;
         double mscw_err = -9999.;
         double mscl = -9999.;
         double mscl_err = -9999.;
-
+    
         double i_UTC;
-
+    
         rec2.mapColumnToVar( "EVENT_ID", event_id );
         rec2.mapColumnToVar( "FLAGS", flags );
         rec2.mapColumnToVar( "TIME", ttime );
@@ -287,17 +287,17 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
         rec2.mapColumnToVar( "HIL_MSW_ERR", mscw_err );
         rec2.mapColumnToVar( "HIL_MSL", mscl );
         rec2.mapColumnToVar( "HIL_MSL_ERR", mscl_err );
-
+    
         double start = -9999.;
         double stop  =  9999.;
-
+    
         rec3.mapColumnToVar( "START", start );
         rec3.mapColumnToVar( "STOP", stop );
-
+    
         //strncpy( telclass, "VERITAS", NAMELEN );
-
+    
     //    for( unsigned int i = 0; i < fTreeDet->GetEntries(); i++ )
-
+    
     //////////////////////////////////////////////////////////
         //FITSRecord hdu( iOutputFile );
         FITSRecord rec2( iOutputFile, templ, "EVENTS" );
@@ -305,14 +305,14 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
         TChain *chain = new TChain("data");
         chain->Add( iInputFile.c_str() );
         CData dchain( chain, true, 6, false );
-
+    
         double decDiff = 0.;
         double raDiff = 0.;
         double tra = 83.6331;
         double tdec = 22.0145;
         double wobbleN = -99.;
         double wobbleE = -99.;
-
+    
         string creator = "Hughes";
         //string telescop = "VERITAS";
         string telescop = "CTA";
@@ -327,7 +327,7 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
         string object = "Crab";
         string radesys = "FK5";
         string obs_mode = "on";
-
+    
         rec2.writeHeader( "CREATOR", creator );
     	cout << "111" << endl;
         rec2.writeHeader( "TELESCOP", telescop );
@@ -366,16 +366,16 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
         rec2.writeHeader( "GEOLAT", 0 );
         rec2.writeHeader( "GEOLON", 0 );
         rec2.writeHeader( "ALTITUDE", 0 );
-
+    
         for( unsigned int i = 0; i <  chain->GetEntries(); i++ )
         {
             chain->GetEntry(i);
-
+    
     	event_id = dchain.runNumber;
     	flags    = false;
     	multip   = dchain.NImages;
     	telmask  = true;
-
+    
             ttime    = dchain.Time;
     	detx     = dchain.Xoff_derot;
     	dety     = dchain.Yoff_derot;
@@ -384,23 +384,23 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
     //XXXX
     	wobbleN  = 0.;
     	wobbleE  = 0.;
-
+    
     	ra  = tra  + detx;
     	dec = tdec + dety;
     	ra  = detx;
     	dec = dety;
     	ra  += wobbleE;
     	dec += wobbleN;
-
+    
     	ra  += tra;
     	dec += tdec;
-
-
+    
+    
     	alt_pnt  = 90. - dchain.TelElevation[0];
     	az_pnt    = dchain.TelAzimuth[0];
     	alt      = 90. - dchain.Ze;
     	az       = dchain.Az;
-
+    
     	corex    = dchain.Xcore;
     	corey    = dchain.Ycore;
     //	core_err = dchain.;
@@ -412,23 +412,23 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
     //	mscw_err   = dchain.;
     	mscl       = dchain.MSCL;
     //	mscl_err   = dchain.;
-
+    
     //        if( mscw > -1.2 && mscw < 0.35)
     //          if( mscl > -1.2 && mscl < 0.7)
     //	    if( energy > 0. ) rec2.write();
-
+    
         }
     */
     //    rec2.write();
     //    rec3.write();
-
+    
     //    rec2.finishWriting();
     //    rec3.finishWriting();
-
+    
     mscwfile->Close();
-
+    
     return 0;
-
+    
 }
 
 int main( int argc, char* argv[] )
@@ -441,12 +441,12 @@ int main( int argc, char* argv[] )
         cout << endl;
         exit(-1 );
     }
-
+    
     string iInputFile  = argv[1];
     string iOutputFile = argv[2];
-
+    
     writeTELARRAY( iInputFile, iOutputFile );
-
+    
     return 0;
-
+    
 }

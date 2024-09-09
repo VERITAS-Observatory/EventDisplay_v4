@@ -9,40 +9,40 @@
 VCamera::VCamera( unsigned int iTel, VEvndispData* iData )
 {
     fDebug = iData->getDebugFlag();
-
+    
     fTelescope = iTel;
     fData = iData;
     fData->getDetectorGeometry()->setTelID( fTelescope );
     fCanvas = 0;
     fEventCounter = 0;
-
+    
     fmaxPlot = 0.45;                              /* 2*fmaxPlot = Radius of camera, total pad size is 1.0x1.0 */
     fmaxRad = 0.85;                               /* the tube signal is at its maximum fmaxRad * tube radius */
     fScaleMax = 0.;                               /* maximum value in tube */
-
+    
     fPrintChannel = 0;                            /* no printing of channel numbers */
     fTubeSelected = -1;                           /* no tube is selected through mouse clicks */
-
+    
     fBoolAllinOne = false;                        /* plot tube entries of all cameras into one camera */
-
+    
     fPlotColor = 1;                               /* signals are represented by the size of the filled circle in the PMT */
     fAnaVis = true;
     fPlotPaper = fData->getRunParameter()->fPlotPaper;
-
+    
     bFixScale = false;                            /* set fixed scale for colz plots */
-
+    
     setUpCamera();
-
+    
     fData->initializeDataReader();
-
+    
     // get a nicer color palette and get some information about colors/contours
     gStyle->SetPalette( 1 );
     gStyle->SetNumberContours( 100 );
     fncolors = gStyle->GetNumberOfColors();
     fndivz   = gStyle->GetNumberContours();
-
+    
     fCurrentTimeSlice = -1;
-
+    
     fFirstTelescopeToDraw = false;
 }
 
@@ -89,8 +89,8 @@ void VCamera::setUpCamera()
     fFillStylePos = 1001;
     fFillStyleNeg = 0;
     fTelescopeEllipseColor = 1;
-
-
+    
+    
     // get maximum distance of tubes from centre, rescale to canvas NDC
     fdist_edgeX = 0.;
     fdist_edgeY = 0.;
@@ -106,10 +106,10 @@ void VCamera::setUpCamera()
         }
     }
     fmax_dist_edge = fData->getDetectorGeo()->getMaximumFOV_deg();
-
+    
     // array with pmt data (rescaled data)
     fPMTData.resize( int( fData->getDetectorGeo()->getNumChannels() ), 0. );
-
+    
     // rescale to canvas NDC, shift coordinate system by 0.5
     double x, y, rx, ry;
     char c_number[100];
@@ -119,7 +119,7 @@ void VCamera::setUpCamera()
         Never loop over fgraphTubes/fgraphTubesEntry without testing the
         radius (GetR1()>0.)
         This is hopefully only valid for the prototype. */
-
+    
     double iMaxDist = 0.;
     for( int i = 0; i < int( fData->getDetectorGeo()->getNumChannels() ); i++ )
     {
@@ -196,7 +196,7 @@ void VCamera::setUpCamera()
     fAnaEllipse2->SetFillStyle( 0 );
     fAnaEllipse2->SetLineWidth( 2 );
     fAnaEllipse2->SetUniqueID( 2991 );
-
+    
     // lines showing the image axis and rotation
     fCenterLine = new TLine( 0., 0., 0., 0. );
     fEllipseLine = new TLine( 0., 0., 0., 0. );
@@ -275,15 +275,15 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
     }
     fScaleMax = i_max;
     fBoolAllinOne = iAllinOne;
-
+    
     fCanvas->cd();
     fCanvas->SetEditable( true );
-
+    
     if(!iAllinOne )
     {
         fCanvas->Clear();
     }
-
+    
     if( iEventNumber != 0 )                       /* first time, there is no content in the tubes */
     {
         switch( fcameraModus )
@@ -475,7 +475,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
             case C_TRIGGER_EVNDISP:
                 setPMTColorOnOff( fData->getTrigger(), fColorTrigger, fColorTrigger, fFillStylePos );
                 break;
-
+                
             default:
                 break;
         }
@@ -597,13 +597,13 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
         {
             drawMuonResults();
         }
-
+        
         // draw bottom line with results from image calculation
         drawEventText();
-
+        
         // draw stars in field of view
         drawStarsInFOV();
-
+        
     }
     //   fCanvas->Update();
     fEventCounter++;
@@ -631,7 +631,7 @@ void VCamera::setPMTColorForChargeTiming()
     {
         cout << "VCamera::setPMTColorForChargeTiming() " << fData->getTelID() << "\t" << fData->getReader()->getTelescopeID() << endl;
     }
-
+    
     if( fPMTData.size() != fData->getSums().size() )
     {
         fPMTData.resize( fData->getSums().size(), 0. );
@@ -643,14 +643,14 @@ void VCamera::setPMTColorForChargeTiming()
     }
     // rescale data to maximum values of 1
     fPMTData = rescaleSums( fPMTData, false );
-
+    
     // all colors > 10 are greyish/brown. Start at 1 again
     int iTelescopeColor = ( fTelescope % 10 ) + 1;
     if( iTelescopeColor % 10 == 0 )
     {
         iTelescopeColor += 1;
     }
-
+    
     // loop over all pmts and set tube radii and colors
     for( unsigned int i = 0; i < fPMTData.size(); i++ )
     {
@@ -738,7 +738,7 @@ void VCamera::setPMTColorForChargeTiming()
             fgraphTubesEntry[i]->SetFillColor( 0 );
             fgraphTubesEntry[i]->SetFillStyle( 0 );
         }
-
+        
         // check if pixel is a L2 trigger signal
         for( unsigned int l = 0; l < fData->getFADCstopTrig().size(); l++ )
         {
@@ -761,7 +761,7 @@ void VCamera::drawEventText()
         cout << "VCamera::drawEventText()" << endl;
     }
     char iText[600];
-
+    
     // big T1/T2... in lower right corner
     //   red means telescope has triggered
     if( fData->getReader()->hasLocalTrigger( fTelescope ) )
@@ -785,7 +785,7 @@ void VCamera::drawEventText()
         fTextTelescopeN->SetTitle( iText );
         //        fTextTelescopeN->DrawLatex( 0.85, 0.1, fTextTelescopeN->GetTitle() );
     }
-
+    
     // muon text in upper right corner
     if( fData->getRunParameter()->fmuonmode == 1 )
     {
@@ -795,7 +795,7 @@ void VCamera::drawEventText()
         fTextEvent[1]->SetTitle( iText );
         sprintf( iText, "Muon size %.2f", fData->getImageParameters()->muonSize );
         fTextEvent[2]->SetTitle( iText );
-
+        
         float i_TextX = 0.72;
         float i_TextY = 0.97;
         float i_TextdY = 0.03;
@@ -832,7 +832,7 @@ void VCamera::drawEventText()
         fTextEventPlotPaper->SetTitle( i_stext.str().c_str() );
         fTextEventPlotPaper->DrawLatex( 0.02, 0.95, fTextEventPlotPaper->GetTitle() );
     }
-
+    
     // event text in upper left corner
     // no GPS times for MC
     if( fData->getReader()->isMC() )
@@ -890,7 +890,7 @@ void VCamera::drawEventText()
         }
     sprintf( iText, "Num Dead %d/%d", i_numtrig, i_numtrig2 );
     fTextEvent[6]->SetTitle( iText );
-
+    
     if( fData->getImageParameters()->ntubes > 0 )
     {
         sprintf( iText, "MLL: c_x=%.2f,c_y=%.2f,dist=%.2f,length=%.3f,width=%.3f,#alpha=%.2f,size=%.0f,Fitstat=%d",
@@ -915,7 +915,7 @@ void VCamera::drawEventText()
                  fData->getImageParameters()->fui );
         fTextEvent[fTextEvent.size() - 2]->SetTitle( iText );
     }
-
+    
     float i_TextX = 0.01;
     float i_TextY = 1.00;
     float i_TextdY = 0.03;
@@ -954,7 +954,7 @@ void VCamera::drawEventText()
             }
         }
     }
-
+    
     // draw MC infos (if fBoolAllinOne only for first telescope)
     if( fData->getReader()->isMC() && fTextMC.size() > 0 && (!fBoolAllinOne || fTelescope == 0 ) )
     {
@@ -990,7 +990,7 @@ void VCamera::setPMTColorScheme( vector< float > v_value, bool i_select, double 
     {
         it[i] = ( double )( v_value[i] );
     }
-
+    
     setPMTColorScheme( it, i_select, zmin, zmax, i_axisTitle, i_scale, i_DrawDead, iLowGain, iDrawAllChannels );
 }
 
@@ -1001,7 +1001,7 @@ void VCamera::setPMTColorScheme( vector<unsigned int> v_value, bool i_select, do
     {
         it[i] = ( double )( v_value[i] + 0.5 );
     }
-
+    
     setPMTColorScheme( it, i_select, zmin, zmax, i_axisTitle, i_scale, i_DrawDead, iLowGain );
 }
 
@@ -1013,7 +1013,7 @@ void VCamera::setPMTColorScheme( valarray<unsigned int> v_value, bool i_select, 
     {
         it[i] = ( double )( v_value[i] + 0.5 );
     }
-
+    
     setPMTColorScheme( it, i_select, zmin, zmax, i_axisTitle, i_scale, i_DrawDead, iLowGain );
 }
 
@@ -1052,7 +1052,7 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
     // -
     TBox* iBox = new TBox();
     double wlmin, wlmax;
-
+    
     // channel status takes only 12 values -> only 12 colours
     if( i_DrawDead )
     {
@@ -1142,7 +1142,7 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
     double ymin = 0.7;
     double ymax = 0.95;
     double y1, y2;
-
+    
     // plot axis on the right side
     for( int i = 0; i < fndivz; i++ )
     {
@@ -1173,7 +1173,7 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
     fColourAxis->SetTitleSize( 0.02 );
     fColourAxis->SetTitleOffset( 1.6 );
     fColourAxis->Draw();
-
+    
     // now assign colours the PMTs
     //  image pixels have full radius
     //  border pixels have 60% radius
@@ -1221,7 +1221,7 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
                 scaler = 1.;
             }
             w1 = v_value[i];
-
+            
             color = int( 0.01 + ( w1 - wlmin ) * scale );
             theColor = int(( color + 0.99 ) * float( fncolors ) / float( fndivz ) );
             fgraphTubesEntry[i]->SetR1( fgraphTubes[i]->GetR1() * fmaxRad* scaler );
@@ -1335,7 +1335,7 @@ void VCamera::setPMTColorOff( const vector<bool>& v_value )
         }
         if(!fData->getDead( i, fData->getHiLo()[i] ) )
         {
-            if(! v_value[i] )   // draw empty circle
+            if(! v_value[i] )  // draw empty circle
             {
                 fgraphTubesEntry[i]->SetFillColor( 10 );
                 fgraphTubesEntry[i]->SetLineColor( 10 );
@@ -1365,7 +1365,7 @@ void VCamera::drawMuonResults()
         fAnaEllipse->SetR2( convertY( fData->getImageParameters()->muonRadius, 0. ) );
         fAnaEllipse->SetTheta( 0 );
         fAnaEllipse->Draw();
-
+        
         fAnaEllipse1->SetX1( convertX( fData->getImageParameters()->muonX0 ) );
         fAnaEllipse1->SetY1( convertY( fData->getImageParameters()->muonY0 ) );
         fAnaEllipse1->SetR1( convertX( fData->getImageParameters()->muonRadius -
@@ -1374,7 +1374,7 @@ void VCamera::drawMuonResults()
                                        fData->getImageParameters()->muonRSigma, 0. ) );
         fAnaEllipse1->SetTheta( 0 );
         fAnaEllipse1->Draw();
-
+        
         fAnaEllipse2->SetX1( convertX( fData->getImageParameters()->muonX0 ) );
         fAnaEllipse2->SetY1( convertY( fData->getImageParameters()->muonY0 ) );
         fAnaEllipse2->SetR1( convertX( fData->getImageParameters()->muonRadius +
@@ -1383,7 +1383,7 @@ void VCamera::drawMuonResults()
                                        fData->getImageParameters()->muonRSigma, 0. ) );
         fAnaEllipse2->SetTheta( 0 );
         fAnaEllipse2->Draw();
-
+        
     }
 }
 
@@ -1409,7 +1409,7 @@ void VCamera::drawAnaResults()
             return;
         }
     }
-
+    
     if( fBoolAllinOne )
     {
         fTelescopeEllipseColor = 0;
@@ -1433,7 +1433,7 @@ void VCamera::drawAnaResults()
     {
         fTelescopeEllipseColor = 1;
     }
-
+    
     if( fData->getImageParameters()->ntubes > 0 && fData->getRunParameter()->fTargetName != "laser" && !fData->getRunParameter()->fPlotRaw )
     {
         // draw the analysis ellipse
@@ -1549,7 +1549,7 @@ void VCamera::drawAnaResults()
                           + i_scale1 * fAnaEllipse->GetR1() * sin( fAnaEllipse->GetTheta() * TMath::Pi() / 180. );
             double i_y2 = convertY( fData->getImageParameters()->cen_y )
                           - i_scale2 * fAnaEllipse->GetR1() * sin( fAnaEllipse->GetTheta() * TMath::Pi() / 180. );
-
+                          
             fEllipseLine->SetX1( i_x1 );
             fEllipseLine->SetY1( i_y1 );
             fEllipseLine->SetX2( i_x2 );
@@ -1709,14 +1709,14 @@ int VCamera::getChannel( int px, int py, TObject* objSel )
     double x = fCanvas->PadtoX( fCanvas->AbsPixeltoX( px ) );
     double y = fCanvas->PadtoY( fCanvas->AbsPixeltoY( py ) );
     double dist;
-
+    
     fCanvas->SetEditable( true );
     fCanvas->cd();
     if( fTubeSelected >= 0 && fTubeSelected < ( int )fgraphTubes.size() )
     {
         hideSelectedChannel();
     }
-
+    
     for( unsigned int i = 0; i < fgraphTubes.size(); i++ )
     {
         dist = sqrt(( x - fgraphTubes[i]->GetX1() ) * ( x - fgraphTubes[i]->GetX1() ) + ( y - fgraphTubes[i]->GetY1() ) * ( y - fgraphTubes[i]->GetY1() ) );
@@ -1816,7 +1816,7 @@ valarray<double>& VCamera::rescaleSums( valarray<double>& v_value, bool iOffset 
     {
         imax = fScaleMax;
     }
-
+    
     if( iOffset )
     {
         for( unsigned i = 0; i < i_v_valueSize; i++ )
@@ -1961,7 +1961,7 @@ void VCamera::drawStarsInFOV()
     {
         return;
     }
-
+    
     // get pointing of telescope
     float iTel_dec = 0.;
     float iTel_ra  = 0.;
@@ -1980,9 +1980,9 @@ void VCamera::drawStarsInFOV()
     {
         iScale = fData->getDetectorGeometry()->getCameraScaleFactor()[fTelescope];
     }
-
+    
     vector< VStar* > iStar = fData->getStarCatalogue()->getListOfStarsinFOV();
-
+    
     // draw a marker for each star
     double x_rot = 0.;
     double y_rot = 0.;
@@ -1998,7 +1998,7 @@ void VCamera::drawStarsInFOV()
                 x = -1. * ( iStar[i]->fRACurrentEpoch - iTel_ra ) * cos( iTel_dec* TMath::DegToRad() );
             }
             fData->getArrayPointing()->derotateCoords( fData->getEventMJD(), fData->getEventTime(), x, y, x_rot, y_rot );
-
+            
             TMarker* iM = new TMarker( convertX(-1.*x_rot* iScale ), convertY( y_rot* iScale ), 5 );
             iM->SetMarkerColor( 2 );
             iM->Draw();
@@ -2010,5 +2010,5 @@ void VCamera::drawStarsInFOV()
             iT->Draw();
         }
     }
-
+    
 }

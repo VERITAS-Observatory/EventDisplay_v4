@@ -32,7 +32,7 @@ int main( int argc, char* argv[] )
     {
         exit( 0 );
     }
-
+    
     VDispTableReader* fData = ( VDispTableReader* )f->Get( "dispTable" );
     if( fData )
     {

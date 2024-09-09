@@ -9,9 +9,9 @@ VDB_PixelDataReader::VDB_PixelDataReader( vector< unsigned int > nPixel_per_tele
 {
     setDebug( true );
     fDBStatus = true;
-
+    
     fNPixel = nPixel_per_telescope;
-
+    
     //////////////////////////////////////////////////////////////////
     // coding of different data vectors:
     //  ID = 0: L1 rates
@@ -23,7 +23,7 @@ VDB_PixelDataReader::VDB_PixelDataReader( vector< unsigned int > nPixel_per_tele
     fPixelDataType.push_back( "Currents" );
     fPixelDataType.push_back( "FADC_board" );
     fPixelDataType.push_back( "FADC_channel" );
-
+    
     // define data vectors and histograms
     char htitle[800];
     char hname[800];
@@ -182,7 +182,7 @@ bool VDB_PixelDataReader::readFromDBTextFiles( string iDBTextDirectory, unsigned
             fillDataRow( 4, iDBStartTimeSQL, t, i_pixel_id[i], i_fadc_channel[i] );
         }
     }
-
+    
     return true;
 }
 
@@ -197,7 +197,7 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
     {
         cout << "VDB_PixelDataReader::readFromDB: " << runNumber << endl;
     }
-
+    
     stringstream iTempS;
     iTempS << iDBserver << "/VERITAS";
     char c_query[1000];
@@ -207,23 +207,23 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
         fDBStatus = false;
         return false;
     }
-
+    
     /////////////////////////////////////////////////////
     // read L1 rates
-
+    
     ostringstream c_queryS;
     c_queryS << "select timestamp, telescope_id, pixel_id, rate from tblL1_TriggerInfo, tblRun_Info where timestamp";
     c_queryS << " >= tblRun_Info.data_start_time - INTERVAL 1 MINUTE AND timestamp ";
     c_queryS << " <=  tblRun_Info.data_end_time + INTERVAL 1 MINUTE AND tblRun_Info.run_id=";
     c_queryS << runNumber;
-
+    
     if(!my_connection.make_query( c_queryS.str().c_str() ) )
     {
         fDBStatus = false;
         return false;
     }
     TSQLResult* db_res = my_connection.Get_QueryResult();
-
+    
     if( db_res && db_res->GetRowCount() > 0 )
     {
         while( TSQLRow* db_row = db_res->Next() )
@@ -250,17 +250,17 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
             }
         }
     }
-
+    
     /////////////////////////////////////////////////////
     // read HV and currents measured
-
+    
     for( unsigned int i = 0; i < getNTel(); i++ )
     {
         ostringstream c_queryS;
         c_queryS << "select * FROM tblHV_Telescope" << i << "_Status WHERE channel > 0 AND";
         c_queryS << " (db_start_time >= \"" << iDBStartTimeSQL << "\"";
         c_queryS << "- INTERVAL 1 MINUTE) AND (db_start_time <= \" " << fDBRunStoppTimeSQL << "\" )";
-
+        
         if(!my_connection.make_query( c_queryS.str().c_str() ) )
         {
             fDBStatus = false;
@@ -268,7 +268,7 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
             return false;
         }
         TSQLResult* db_res = my_connection.Get_QueryResult();
-
+        
         if( db_res && db_res->GetRowCount() > 0 )
         {
             while( TSQLRow* db_row = db_res->Next() )
@@ -299,27 +299,27 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
             }
         }
     }
-
-
+    
+    
     //read FADC settings
     for( unsigned int i = 0; i < getNTel(); i++ )
     {
         //GetField( 0 ) = pixel_id (really channel, starts counting at 0)
         //GetField( 1 ) = fadc_id i.e. FADC module number
         //GetField( 2 ) = fadc_channel (per module)
-
-
+        
+        
         sprintf( c_query, "select c.pixel_id , s.fadc_id, c.fadc_channel from tblFADC_Slot_Relation as s, tblFADC_Channel_Relation as c where s.db_start_time < \"%s\" and c.db_start_time < \"%s\" and ( s.db_end_time IS NULL or s.db_end_time > \"%s\" ) and ( c.db_end_time IS NULL or c.db_end_time > \"%s\" ) and s.fadc_crate=c.fadc_crate and s.fadc_slot=c.fadc_slot and s.telescope_id=c.telescope_id and c.pixel_id IS NOT NULL and s.telescope_id=%d order by c.pixel_id ;", iDBStartTimeSQL.c_str(), iDBStartTimeSQL.c_str(), fDBRunStoppTimeSQL.c_str(), fDBRunStoppTimeSQL.c_str(), i );
-
+        
         if(!my_connection.make_query( c_query ) )
         {
             fDBStatus = false;
             cout << "VDB_PixelDataReader::readFromDB: FAILED making query for reading FADC status" << endl;
             return false;
         }
-
+        
         TSQLResult* db_res = my_connection.Get_QueryResult();
-
+        
         if( db_res && db_res->GetRowCount() > 0 )
         {
             while( TSQLRow* db_row = db_res->Next() )
@@ -330,7 +330,7 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
                     fDBStatus = false;
                     return false;
                 }
-
+                
                 if( db_row->GetField( 0 ) && db_row->GetField( 1 ) && db_row->GetField( 2 ) )
                 {
                     fillDataRow( 3, iDBStartTimeSQL, i, atoi( db_row->GetField( 0 ) ), atof( db_row->GetField( 1 ) ) );
@@ -340,7 +340,7 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
         }
     }
     print();
-
+    
     return true;
 }
 
@@ -370,7 +370,7 @@ bool VDB_PixelDataReader::writeDataTree( unsigned int iTel )
         sprintf( hname, "%s", fPixelDataType[i].c_str() );
         sprintf( htitle, "%s[npixel]", fPixelDataType[i].c_str() );
         iTree.Branch( hname, value, htitle );
-
+        
         if( fPixelData[i][iTel].size() > 0 )
         {
             nPixel = fPixelData[i][iTel].size();
@@ -393,7 +393,7 @@ bool VDB_PixelDataReader::writeDataTree( unsigned int iTel )
                 iTree.Fill();
             }
         }
-
+        
         iTree.Write();
     }
     return true;
@@ -411,7 +411,7 @@ TH1F* VDB_PixelDataReader::getDataHistogram( unsigned int iDataType, unsigned in
     {
         return 0;
     }
-
+    
     // get min/maximum
     float v_min = *std::min_element( fDummyReturnVector.begin(), fDummyReturnVector.end() );
     float v_max = *std::max_element( fDummyReturnVector.begin(), fDummyReturnVector.end() );
@@ -434,7 +434,7 @@ TH1F* VDB_PixelDataReader::getDataHistogram( unsigned int iDataType, unsigned in
         }
         return fPixelData_histogram[iDataType][iTel];
     }
-
+    
     return 0;
 }
 
@@ -451,12 +451,12 @@ float VDB_PixelDataReader::getValue( unsigned int iDataType, unsigned int iTel, 
     {
         return 0;
     }
-
+    
     if( iChannel < fDummyReturnVector.size() )
     {
         return fDummyReturnVector[iChannel];
     }
-
+    
     return 0.;
 }
 
@@ -533,7 +533,7 @@ vector< float > VDB_PixelDataReader::getDataVector( unsigned int iDataType, unsi
                 else if( fPixelData[iDataType][iTel][i]->fMJD.size() == 1 )
                 {
                     fDummyReturnVector[i] = fPixelData[iDataType][iTel][i]->fData[0];
-
+                    
                 }
             }
         }
@@ -555,7 +555,7 @@ vector< unsigned int > VDB_PixelDataReader::getDeadChannelList( unsigned int iDa
     {
         return i_channelList;
     }
-
+    
     // for relative differences, calculate mean and rms
     double i_mean = 0.;
     double i_rms = 0.;
@@ -577,11 +577,11 @@ vector< unsigned int > VDB_PixelDataReader::getDeadChannelList( unsigned int iDa
             i_rms = sqrt(( 1. / ( i_n - 1. ) ) * ( i_mean2 - i_mean* i_mean / i_n ) );
             i_mean /= i_n;
         }
-
+        
         i_min = i_mean - TMath::Abs( i_min ) * i_rms;
         i_max = i_mean + TMath::Abs( i_max ) * i_rms;
     }
-
+    
     for( unsigned int i = 0; i < fDummyReturnVector.size(); i++ )
     {
         if( fDummyReturnVector[i] < i_min )
@@ -593,7 +593,7 @@ vector< unsigned int > VDB_PixelDataReader::getDeadChannelList( unsigned int iDa
             i_channelList.push_back( i );
         }
     }
-
+    
     return i_channelList;
 }
 
