@@ -15,7 +15,9 @@ void print_statistics_output( TH1F* h, string print_out )
     }
     if( print_out == "RMS" )
     {
-        cout << "\t " << print_out << ": " << h->GetRMS() << endl;
+        cout << "\t " << print_out << ": " << h->GetRMS();
+        cout << " (" << h->GetEntries() << " entries)";
+        cout <<  endl;
     }
     else if( print_out == "68p" )
     {
@@ -23,7 +25,9 @@ void print_statistics_output( TH1F* h, string print_out )
         double value[1];
         double prob[1] = {0.68};
         h->GetQuantiles( nQuantiles, value, prob );
-        cout << "\t 68% value: " << value[0] << endl;
+        cout << "\t 68% value: " << value[0];
+        cout << " (" << h->GetEntries() << " entries)";
+        cout << endl;
     }
 }
 
