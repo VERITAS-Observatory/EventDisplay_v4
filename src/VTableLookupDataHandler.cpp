@@ -576,15 +576,13 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     if( fTLRunParameter->fRerunStereoReconstruction )
     {
         fill_selected_images_before_redo_stereo_reconstruction();
-        fTLRunParameter->fUseEvndispSelectedImagesOnly = true;
-        doStereoReconstruction();
+        doStereoReconstruction( true );
         fmeanPedvar_Image = calculateMeanNoiseLevel( true );
     }
 
     // dispEnergy
     // energy reconstruction using the disp MVA
     // This is preliminary and works for MC events only!
-    //
     if( fDispAnalyzerEnergy )
     {
         fDispAnalyzerEnergy->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
@@ -634,7 +632,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
  * does not take into account pointing corrections
  * (as e.g. given by the VPM)
 */
-void VTableLookupDataHandler::doStereoReconstruction()
+void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
 {
     // save original values
     fXoff_edisp = fXoff;
@@ -647,7 +645,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
     i_SR.reconstruct_direction( getNTel(),
                                 fArrayPointing_Elevation, fArrayPointing_Azimuth,
                                 fTelX, fTelY, fTelZ,
-                                getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
+                                getSize( 1., bSelectedImagesOnly ),
                                 fcen_x, fcen_y,
                                 fcosphi, fsinphi,
                                 fwidth, flength,
@@ -682,7 +680,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
                              getNTel(),
                              fArrayPointing_Elevation, fArrayPointing_Azimuth,
                              fTel_type,
-                             getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
+                             getSize( 1., bSelectedImagesOnly ),
                              fcen_x, fcen_y,
                              fcosphi, fsinphi,
                              fwidth, flength,
@@ -811,7 +809,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
                                fArrayPointing_Elevation, fArrayPointing_Azimuth,
                                fXoff, fYoff,
                                fTelX, fTelY, fTelZ,
-                               getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
+                               getSize( 1., bSelectedImagesOnly ),
                                fcen_x, fcen_y,
                                fcosphi, fsinphi,
                                fwidth, flength,

@@ -165,7 +165,7 @@ class VTableLookupDataHandler
         bool   copyMCRunheader();
         void   copyMCTree();
         void   copy_telconfig();
-        void   doStereoReconstruction();
+        void   doStereoReconstruction( bool bSelectedImagesOnly );
         void   fill_selected_images_before_redo_stereo_reconstruction();
         void   initializeTelTypeVector();
         int    fillNextEvent( bool bShort );
