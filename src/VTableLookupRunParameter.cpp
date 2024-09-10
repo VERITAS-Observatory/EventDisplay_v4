@@ -563,6 +563,7 @@ void VTableLookupRunParameter::print( int iP )
     if( fRerunStereoReconstruction )
     {
         cout << "\t rerunning stereo reconstruction" << endl;
+        cout << "\t minimum angle between images >= " << fRerunStereoReconstruction_minAngle << " [deg]" << endl;
         cout << "\t stereo reconstruction ntubes cut >= " << fminntubes << endl;
         if( fminsize > 0. )
         {

@@ -672,8 +672,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
     // stereo reconstruction
     // (rcs_method4)
     VSimpleStereoReconstructor i_SR;
-    // minimal value; just used to initialize disp method
-    i_SR.initialize( fSSR_NImages_min, fSSR_AxesAngles_min );
+    i_SR.initialize( fSSR_NImages_min, fTLRunParameter->fRerunStereoReconstruction_minAngle );
     i_SR.reconstruct_direction( getNTel(),
                                 fArrayPointing_Elevation, fArrayPointing_Azimuth,
                                 fTelX, fTelY, fTelZ,
