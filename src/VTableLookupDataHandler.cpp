@@ -604,8 +604,9 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     // redo the stereo (direction and core) reconstruction
     if( fTLRunParameter->fRerunStereoReconstruction )
     {
+        fill_selected_images_before_redo_stereo_reconstruction();
+        fTLRunParameter->fUseEvndispSelectedImagesOnly = true;
         doStereoReconstruction();
-        fill_selected_images_after_redo_stereo_reconstruction();
         fmeanPedvar_Image = calculateMeanNoiseLevel( true );
     }
 
@@ -2043,8 +2044,8 @@ void VTableLookupDataHandler::reset()
     fYoff_intersect = -99.;
     fXoff_edisp = -99.;
     fYoff_edisp = -99.;
-    fXcore = -99.;
-    fYcore = -99.;
+    fXcore = -9999.;
+    fYcore = -9999.;
     fstdP = -99.;
 
     fEmissionHeightMean = -99.;
@@ -2763,14 +2764,11 @@ float VTableLookupDataHandler::getArrayPointingDeRotationAngle()
 }
 
 /*
- * Re-fill list of selected images after re-doing stereo
- * reconstruction.
- * Disp analyzer might have recovered some images or
- * different quality cuts might have been applied.
+ * Re-fill list of selected images before re-doing stereo reconstruction.
  * Similar image selection as in VDispAnalyser.
  *
 */
-void VTableLookupDataHandler::fill_selected_images_after_redo_stereo_reconstruction()
+void VTableLookupDataHandler::fill_selected_images_before_redo_stereo_reconstruction()
 {
     double* tmp_size = getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly );
     unsigned int ii = 0;

@@ -256,8 +256,8 @@ passes through the point (x[i],y[i]) and has slope m[i].
     float d = 0.0;
 
     /* initialize variables */
-    *sx = -999.;
-    *sy = -999.;
+    *sx = -99999.;
+    *sy = -99999.;
     *std = 0.0;
 
     // check length of vectors

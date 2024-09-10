@@ -426,7 +426,7 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
     i_d.clear();
     for( unsigned int i = 0; i < fNTel_type; i++ )
     {
-        i_d.push_back(-1.e-2 );  // to allow for width==0
+        i_d.push_back(-1.e-2 ); // to allow for width==0
     }
     fWidth_min.push_back( i_d );
     i_d.clear();

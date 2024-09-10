@@ -385,6 +385,7 @@ bool VSimpleStereoReconstructor::reconstruct_core( unsigned int i_ntel,
 
     // perpendicular_distance calculation for the fit, returning shower core positions
     rcs_perpendicular_fit( x, y, w, m, ( int )w.size(), &ximp, &yimp, &stdp );
+
     // return to ground coordinates
     if( fillShowerCore( ximp, yimp ) )
     {
