@@ -383,14 +383,18 @@ bool VSimpleStereoReconstructor::reconstruct_core( unsigned int i_ntel,
         }
     }
 
-    // Now call perpendicular_distance for the fit, returning ximp and yimp
+    // perpendicular_distance calculation for the fit, returning shower core positions
     rcs_perpendicular_fit( x, y, w, m, ( int )w.size(), &ximp, &yimp, &stdp );
-
     // return to ground coordinates
-    fillShowerCore( ximp, yimp );
+    if( fillShowerCore( ximp, yimp ) )
+    {
+        fShower_Chi2 = 0.;
+    }
+    else
+    {
+        fShower_Chi2 = -1.;
+    }
     fShower_stdP = stdp;
-
-    fShower_Chi2 = 0.;
 
     return true;
 }
@@ -439,8 +443,8 @@ bool VSimpleStereoReconstructor::fillShowerCore( float ximp, float yimp )
     // check validity
     if(!isnormal( ximp ) || !isnormal( yimp ) )
     {
-        ximp = -99999.;
-        yimp = -99999.;
+        fShower_Xcore = -99999.;
+        fShower_Ycore = -99999.;
         return false;
     }
     // reconstructed shower core in ground coordinates
@@ -473,6 +477,7 @@ bool VSimpleStereoReconstructor::fillShowerCore( float ximp, float yimp )
     {
         fShower_Xcore = -99999;
         fShower_Ycore = -99999;
+        return false;
     }
     return true;
 }
