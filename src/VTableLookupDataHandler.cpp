@@ -312,15 +312,6 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     fchi2 = fshowerpars->Chi2[fMethod];
     fXoff = fshowerpars->Xoff[fMethod];
     fYoff = fshowerpars->Yoff[fMethod];
-    // for table filling: check as soon as possible if the event is useful
-    // TMP TODO TMP
-    /*	if( fwrite && !isReconstructed() )
-    	{
-    		fEventStatus = false;
-    		fEventCounter++;
-    		fNStats_Chi2Cut++;
-    		return 0;
-            } */
     // fill MC parameters
     if( fIsMC )
     {
@@ -449,28 +440,8 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
         fYcore_SC = fshowerpars->Ycore_SC[fMethod];
         fstdP = fshowerpars->stdp[fMethod];
     }
-
-    // for filling of lookup tables: first do quality cuts, if not return
-    // TMPTMPTMP
-    /*	if( fwrite )
-    	{
-    		if( !cut( true ) )
-    		{
-    			fEventCounter++;
-    			fEventStatus = false;
-    			if( fDebug > 1 )
-    			{
-    				cout << "\t CUT FAILED" << endl;
-    			}
-    			return 0;
-    		}
-    		else
-    		{
-    			fEventStatus = true;
-    		}
-    	}*/
+    // (ignore event status)
     fEventStatus = true;
-    // END TMP TMP TMP
     // (end of accessing showerpars tree)
     //////////////////////////////////////////
 
