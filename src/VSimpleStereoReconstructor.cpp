@@ -382,6 +382,20 @@ bool VSimpleStereoReconstructor::reconstruct_core( unsigned int i_ntel,
             w.push_back( iweight* iweight );
         }
     }
+    // check minimum angle between image lines; ignore if too small
+    // Note difference to evndisp reconstruction: apply this here for 2-tel events only
+    if( m.size() == 2 )
+    {
+        float iangdiff = fabs( atan( m[0] ) - atan( m[1] ) ) * TMath::RadToDeg();
+        if( iangdiff < fAxesAngles_min || TMath::Abs( 180. - iangdiff ) < fAxesAngles_min )
+        {
+            fShower_Xcore = -99999.;
+            fShower_Ycore = -99999.;
+            fShower_Chi2 = 1.;
+            return false;
+        }
+    }
+
 
     // perpendicular_distance calculation for the fit, returning shower core positions
     rcs_perpendicular_fit( x, y, w, m, ( int )w.size(), &ximp, &yimp, &stdp );

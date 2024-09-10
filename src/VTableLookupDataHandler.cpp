@@ -833,18 +833,27 @@ void VTableLookupDataHandler::doStereoReconstruction()
 
     ////////////////////////////////////////////////////////////
     // shower core reconstruction
-    i_SR.reconstruct_core( getNTel(),
-                           fArrayPointing_Elevation, fArrayPointing_Azimuth,
-                           fXoff, fYoff,
-                           fTelX, fTelY, fTelZ,
-                           getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
-                           fcen_x, fcen_y,
-                           fcosphi, fsinphi,
-                           fwidth, flength,
-                           getWeight() );
-    // store results from line intersection for debugging
-    fXcore = i_SR.fShower_Xcore;
-    fYcore = i_SR.fShower_Ycore;
+    // (require successful direction reconstruction)
+
+    if( fXoff > -99998. && fYoff > -99998. )
+    {
+        i_SR.reconstruct_core( getNTel(),
+                               fArrayPointing_Elevation, fArrayPointing_Azimuth,
+                               fXoff, fYoff,
+                               fTelX, fTelY, fTelZ,
+                               getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
+                               fcen_x, fcen_y,
+                               fcosphi, fsinphi,
+                               fwidth, flength,
+                               getWeight() );
+        fXcore = i_SR.fShower_Xcore;
+        fYcore = i_SR.fShower_Ycore;
+    }
+    else
+    {
+        fXcore = -99999.;
+        fYcore = -99999.;
+    }
 }
 
 /*
