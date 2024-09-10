@@ -1811,7 +1811,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
                             }
                             else if( k == 6 )
                             {
-                                h->SetAxisRange(-13., -5., "Y" );   // atmospheric thickness
+                                h->SetAxisRange(-13., -5., "Y" );  // atmospheric thickness
                             }
                             h->Draw( hname );
                         }

@@ -1335,7 +1335,7 @@ void VCamera::setPMTColorOff( const vector<bool>& v_value )
         }
         if(!fData->getDead( i, fData->getHiLo()[i] ) )
         {
-            if(! v_value[i] )  // draw empty circle
+            if(! v_value[i] ) // draw empty circle
             {
                 fgraphTubesEntry[i]->SetFillColor( 10 );
                 fgraphTubesEntry[i]->SetLineColor( 10 );
