@@ -563,6 +563,7 @@ void VTableLookupRunParameter::print( int iP )
     if( fRerunStereoReconstruction )
     {
         cout << "\t rerunning stereo reconstruction" << endl;
+        cout << "\t stereo reconstruction ntubes cut >= " << fminntubes << endl;
         if( fminsize > 0. )
         {
             cout << "\t stereo reconstruction size cut > " << fminsize << endl;
@@ -596,7 +597,6 @@ void VTableLookupRunParameter::print( int iP )
             {
                 cout << "\t BDT TMVA stereo reconstruction min fitstat cut < " << fminfitstat << endl;
             }
-            cout << "\t BDT TMVA stereo reconstruction ntubes cut >= " << fminntubes << endl;
             cout << "\t Head/tail uncertainty: ";
             if( fDisp_UseIntersectForHeadTail )
             {
