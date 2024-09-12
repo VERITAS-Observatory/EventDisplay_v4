@@ -20,7 +20,7 @@ VPlotLookupTable::VPlotLookupTable()
     setPlottingLogEnergyAxis();
     setPlottingLogSizeAxis();
     setPlottingDistanceAxis();
-    setCanvasSize( 450, 400 );
+    setCanvasSize( 650, 600 );
 }
 
 void VPlotLookupTable::printLookupTables()
