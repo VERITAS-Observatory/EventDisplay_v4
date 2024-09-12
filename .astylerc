@@ -8,7 +8,6 @@
 --indent-preproc-define
 --pad-oper
 --unpad-paren
---fill-empty-lines
 --align-pointer=type
 --preserve-date
 --verbose

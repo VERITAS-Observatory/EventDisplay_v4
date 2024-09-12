@@ -358,8 +358,16 @@ bool VSimpleStereoReconstructor::reconstruct_core( unsigned int i_ntel,
             y.push_back( i_yrot - iShowerDir_ys / TMath::RadToDeg() * i_zrot );
 
             // gradient of image
-            i_cenx = img_cen_x[i] - iShowerDir_xs;
-            i_ceny = img_cen_y[i] - iShowerDir_ys;
+            if( iShowerDir_xs > -99998 && iShowerDir_ys > -99998 )
+            {
+                i_cenx = img_cen_x[i] - iShowerDir_xs;
+                i_ceny = img_cen_y[i] - iShowerDir_ys;
+            }
+            else
+            {
+                i_cenx = img_cen_x[i];
+                i_ceny = img_cen_y[i];
+            }
             if( i_cenx != 0. )
             {
                 m.push_back(-1. * i_ceny / i_cenx );
@@ -374,15 +382,34 @@ bool VSimpleStereoReconstructor::reconstruct_core( unsigned int i_ntel,
             w.push_back( iweight* iweight );
         }
     }
+    // check minimum angle between image lines; ignore if too small
+    // Note difference to evndisp reconstruction: apply this here for 2-tel events only
+    if( m.size() == 2 )
+    {
+        float iangdiff = fabs( atan( m[0] ) - atan( m[1] ) ) * TMath::RadToDeg();
+        if( iangdiff < fAxesAngles_min || TMath::Abs( 180. - iangdiff ) < fAxesAngles_min )
+        {
+            fShower_Xcore = -99999.;
+            fShower_Ycore = -99999.;
+            fShower_Chi2 = 1.;
+            return false;
+        }
+    }
 
-    // Now call perpendicular_distance for the fit, returning ximp and yimp
+
+    // perpendicular_distance calculation for the fit, returning shower core positions
     rcs_perpendicular_fit( x, y, w, m, ( int )w.size(), &ximp, &yimp, &stdp );
 
     // return to ground coordinates
-    fillShowerCore( ximp, yimp );
+    if( fillShowerCore( ximp, yimp ) )
+    {
+        fShower_Chi2 = 0.;
+    }
+    else
+    {
+        fShower_Chi2 = -1.;
+    }
     fShower_stdP = stdp;
-
-    fShower_Chi2 = 0.;
 
     return true;
 }
@@ -431,8 +458,8 @@ bool VSimpleStereoReconstructor::fillShowerCore( float ximp, float yimp )
     // check validity
     if(!isnormal( ximp ) || !isnormal( yimp ) )
     {
-        ximp = -99999.;
-        yimp = -99999.;
+        fShower_Xcore = -99999.;
+        fShower_Ycore = -99999.;
         return false;
     }
     // reconstructed shower core in ground coordinates
@@ -465,6 +492,7 @@ bool VSimpleStereoReconstructor::fillShowerCore( float ximp, float yimp )
     {
         fShower_Xcore = -99999;
         fShower_Ycore = -99999;
+        return false;
     }
     return true;
 }

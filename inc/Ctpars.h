@@ -292,9 +292,23 @@ void Ctpars::Init( TTree* tree )
         {
             meanPedvar_Image = 0;
         }
+        fChain->SetBranchAddress( "ntubes", &ntubes );
         fChain->SetBranchAddress( "length", &length );
         fChain->SetBranchAddress( "width", &width );
         fChain->SetBranchAddress( "size", &size );
+        fChain->SetBranchAddress( "cen_x", &cen_x );
+        fChain->SetBranchAddress( "cen_y", &cen_y );
+        fChain->SetBranchAddress( "loss", &loss );
+        fChain->SetBranchAddress( "cosphi", &cosphi );
+        fChain->SetBranchAddress( "sinphi", &sinphi );
+        if( fChain->GetBranchStatus( "fui" ) )
+        {
+            fChain->SetBranchAddress( "fui", &fui );
+        }
+        else
+        {
+            fui = 0.;
+        }
     }
     //    bShort = 1:  read limited number of branches needed for lookup table analysis
     if( bShort <= 1 )
@@ -315,8 +329,6 @@ void Ctpars::Init( TTree* tree )
         {
             meanPed_Image = 0;
         }
-        fChain->SetBranchAddress( "cen_x", &cen_x );
-        fChain->SetBranchAddress( "cen_y", &cen_y );
         if( fChain->GetBranchStatus( "f_d" ) )
         {
             fChain->SetBranchAddress( "f_d", &f_d );
@@ -343,7 +355,6 @@ void Ctpars::Init( TTree* tree )
             f_sdevxy = 0.;
         }
 
-        fChain->SetBranchAddress( "loss", &loss );
         if( fChain->GetBranchStatus( "fracLow" ) )
         {
 
@@ -353,18 +364,7 @@ void Ctpars::Init( TTree* tree )
         {
             fracLow = 0.;
         }
-        if( fChain->GetBranchStatus( "fui" ) )
-        {
-            fChain->SetBranchAddress( "fui", &fui );
-        }
-        else
-        {
-            fui = 0.;
-        }
         fChain->SetBranchAddress( "dist", &dist );
-        fChain->SetBranchAddress( "ntubes", &ntubes );
-        fChain->SetBranchAddress( "cosphi", &cosphi );
-        fChain->SetBranchAddress( "sinphi", &sinphi );
         if( fChain->GetBranchStatus( "ntubesBNI" ) )
         {
             fChain->SetBranchAddress( "ntubesBNI", &ntubesBNI );
@@ -537,12 +537,24 @@ Bool_t Ctpars::Notify()
         {
             b_meanPedvar_Image = 0;
         }
+        b_ntubes = fChain->GetBranch( "ntubes" );
+        fChain->AddBranchToCache( b_ntubes );
         b_length = fChain->GetBranch( "length" );
         fChain->AddBranchToCache( b_length );
         b_width = fChain->GetBranch( "width" );
         fChain->AddBranchToCache( b_width );
         b_size = fChain->GetBranch( "size" );
         fChain->AddBranchToCache( b_size );
+        b_cen_x = fChain->GetBranch( "cen_x" );
+        fChain->AddBranchToCache( b_cen_x );
+        b_cen_y = fChain->GetBranch( "cen_y" );
+        fChain->AddBranchToCache( b_cen_y );
+        b_cosphi = fChain->GetBranch( "cosphi" );
+        b_sinphi = fChain->GetBranch( "sinphi" );
+        if( fChain->GetBranchStatus( "fui" ) )
+        {
+            b_fui = fChain->GetBranch( "fui" );
+        }
     }
     if( bShort <= 1 )
     {
@@ -558,10 +570,6 @@ Bool_t Ctpars::Notify()
         {
             b_meanPed_Image = 0;
         }
-        b_cen_x = fChain->GetBranch( "cen_x" );
-        fChain->AddBranchToCache( b_cen_x );
-        b_cen_y = fChain->GetBranch( "cen_y" );
-        fChain->AddBranchToCache( b_cen_y );
         if( fChain->GetBranchStatus( "f_d" ) )
         {
             b_f_d = fChain->GetBranch( "f_d" );
@@ -584,14 +592,8 @@ Bool_t Ctpars::Notify()
             b_fracLow = fChain->GetBranch( "fracLow" );
             fChain->AddBranchToCache( b_fracLow );
         }
-        if( fChain->GetBranchStatus( "fui" ) )
-        {
-            b_fui = fChain->GetBranch( "fui" );
-        }
         b_dist = fChain->GetBranch( "dist" );
         fChain->AddBranchToCache( b_dist );
-        b_ntubes = fChain->GetBranch( "ntubes" );
-        fChain->AddBranchToCache( b_ntubes );
         if( fChain->GetBranchStatus( "ntubesBNI" ) )
         {
             b_ntubesBNI = fChain->GetBranch( "ntubesBNI" );
@@ -656,8 +658,6 @@ Bool_t Ctpars::Notify()
         b_alpha = fChain->GetBranch( "alpha" );
         b_los = fChain->GetBranch( "los" );
         b_phi = fChain->GetBranch( "phi" );
-        b_cosphi = fChain->GetBranch( "cosphi" );
-        b_sinphi = fChain->GetBranch( "sinphi" );
         b_max = fChain->GetBranch( "max" );
         b_index_of_max = fChain->GetBranch( "index_of_max" );
         b_tchisq_x = fChain->GetBranch( "tchisq_x" );

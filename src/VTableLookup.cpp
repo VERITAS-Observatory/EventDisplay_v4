@@ -14,7 +14,6 @@ VTableLookup::VTableLookup( char ireadwrite, unsigned int iDebug )
 
     // total number of telescopes
     fNTel = 0;
-    // look up table file
     fLookupTableFile = 0;
     fDirMSCW = 0;
     fDirMSCL = 0;
@@ -25,7 +24,6 @@ VTableLookup::VTableLookup( char ireadwrite, unsigned int iDebug )
 
     fNumberOfIgnoredEvents = 0;
     fNNoiseLevelWarnings = 0;
-
 
     // use median size for energy determination
     fUseMedianSizeforEnergyDetermination = true;
@@ -73,10 +71,7 @@ VTableLookup::VTableLookup( char ireadwrite, unsigned int iDebug )
     fTableAzUpEdge.push_back( 45. );
     fTableAzLowEdge.push_back( 45. );
     fTableAzUpEdge.push_back( 135 );
-    // azimuth independent bins
-    //    fTableAzLowEdge.push_back(  -1.e3 );   fTableAzUpEdge.push_back( 1.e3 );
     fTableAzBins = fTableAzLowEdge.size();
-
 }
 
 
@@ -580,9 +575,9 @@ void VTableLookup::loop()
 }
 
 /*
-    fill the tables
+    fill lookup tables
 
-    (fmscw,fmscl,fenerrgySR are vectors of size 1)
+    (fmscw, fmscl, fenergySR are vectors of size 1)
 */
 void VTableLookup::fillLookupTable()
 {

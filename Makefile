@@ -32,7 +32,7 @@ ARCH = $(shell uname)
 # basic numbers
 #############################
 package = EVNDISP
-version = 490
+version = 491
 #############################
 #############################
 # check root version number

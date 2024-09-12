@@ -39,3 +39,9 @@ repos:
         ]
         additional_dependencies:
           - tomli
+#  - repo: https://github.com/Freed-Wu/mirrors-astyle
+#    rev: v3.4.13
+#    hooks:
+#    -   id: astyle
+#        args: [--options=./.astylerc]
+#        files: '^.*\.(c|cpp|cxx|h|hpp|inc|C)$'

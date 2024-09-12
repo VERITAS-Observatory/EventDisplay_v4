@@ -312,14 +312,6 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     fchi2 = fshowerpars->Chi2[fMethod];
     fXoff = fshowerpars->Xoff[fMethod];
     fYoff = fshowerpars->Yoff[fMethod];
-    // for table filling: check as soon as possible if the event is useful
-    if( fwrite && !isReconstructed() )
-    {
-        fEventStatus = false;
-        fEventCounter++;
-        fNStats_Chi2Cut++;
-        return 0;
-    }
     // fill MC parameters
     if( fIsMC )
     {
@@ -448,25 +440,8 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
         fYcore_SC = fshowerpars->Ycore_SC[fMethod];
         fstdP = fshowerpars->stdp[fMethod];
     }
-
-    // for filling of lookup tables: first do quality cuts, if not return
-    if( fwrite )
-    {
-        if(!cut( true ) )
-        {
-            fEventCounter++;
-            fEventStatus = false;
-            if( fDebug > 1 )
-            {
-                cout << "\t CUT FAILED" << endl;
-            }
-            return 0;
-        }
-        else
-        {
-            fEventStatus = true;
-        }
-    }
+    // (ignore event status)
+    fEventStatus = true;
     // (end of accessing showerpars tree)
     //////////////////////////////////////////
 
@@ -514,6 +489,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
             }
             ftpars[i]->GetEntry( fEventCounter );
 
+            fntubes[i] = ftpars[i]->ntubes;
             fdist[i] = ftpars[i]->dist;
             ffui[i] = ftpars[i]->fui;
             fsize[i] = ftpars[i]->size;
@@ -562,7 +538,6 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
             if(!bShort )
             {
                 fmeanPedvar_ImageT[i] = ftpars[i]->meanPedvar_Image;
-                fntubes[i] = ftpars[i]->ntubes;
                 fnsat[i] = ftpars[i]->nsat;
                 fnlowgain[i] = ftpars[i]->nlowgain;
                 falpha[i] = ftpars[i]->alpha;
@@ -600,15 +575,14 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     // redo the stereo (direction and core) reconstruction
     if( fTLRunParameter->fRerunStereoReconstruction )
     {
-        doStereoReconstruction();
-        fill_selected_images_after_redo_stereo_reconstruction();
+        fill_selected_images_before_redo_stereo_reconstruction();
+        doStereoReconstruction( true );
         fmeanPedvar_Image = calculateMeanNoiseLevel( true );
     }
 
     // dispEnergy
     // energy reconstruction using the disp MVA
     // This is preliminary and works for MC events only!
-    //
     if( fDispAnalyzerEnergy )
     {
         fDispAnalyzerEnergy->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
@@ -658,7 +632,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
  * does not take into account pointing corrections
  * (as e.g. given by the VPM)
 */
-void VTableLookupDataHandler::doStereoReconstruction()
+void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
 {
     // save original values
     fXoff_edisp = fXoff;
@@ -667,12 +641,11 @@ void VTableLookupDataHandler::doStereoReconstruction()
     // stereo reconstruction
     // (rcs_method4)
     VSimpleStereoReconstructor i_SR;
-    // minimal value; just used to initialize disp method
-    i_SR.initialize( fSSR_NImages_min, fSSR_AxesAngles_min );
+    i_SR.initialize( fSSR_NImages_min, fTLRunParameter->fRerunStereoReconstruction_minAngle );
     i_SR.reconstruct_direction( getNTel(),
                                 fArrayPointing_Elevation, fArrayPointing_Azimuth,
                                 fTelX, fTelY, fTelZ,
-                                getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
+                                getSize( 1., bSelectedImagesOnly ),
                                 fcen_x, fcen_y,
                                 fcosphi, fsinphi,
                                 fwidth, flength,
@@ -707,7 +680,7 @@ void VTableLookupDataHandler::doStereoReconstruction()
                              getNTel(),
                              fArrayPointing_Elevation, fArrayPointing_Azimuth,
                              fTel_type,
-                             getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
+                             getSize( 1., bSelectedImagesOnly ),
                              fcen_x, fcen_y,
                              fcosphi, fsinphi,
                              fwidth, flength,
@@ -828,18 +801,27 @@ void VTableLookupDataHandler::doStereoReconstruction()
 
     ////////////////////////////////////////////////////////////
     // shower core reconstruction
-    i_SR.reconstruct_core( getNTel(),
-                           fArrayPointing_Elevation, fArrayPointing_Azimuth,
-                           fXoff, fYoff,
-                           fTelX, fTelY, fTelZ,
-                           getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
-                           fcen_x, fcen_y,
-                           fcosphi, fsinphi,
-                           fwidth, flength,
-                           getWeight() );
-    // store results from line intersection for debugging
-    fXcore = i_SR.fShower_Xcore;
-    fYcore = i_SR.fShower_Ycore;
+    // (require successful direction reconstruction)
+
+    if( fXoff > -99998. && fYoff > -99998. )
+    {
+        i_SR.reconstruct_core( getNTel(),
+                               fArrayPointing_Elevation, fArrayPointing_Azimuth,
+                               fXoff, fYoff,
+                               fTelX, fTelY, fTelZ,
+                               getSize( 1., bSelectedImagesOnly ),
+                               fcen_x, fcen_y,
+                               fcosphi, fsinphi,
+                               fwidth, flength,
+                               getWeight() );
+        fXcore = i_SR.fShower_Xcore;
+        fYcore = i_SR.fShower_Ycore;
+    }
+    else
+    {
+        fXcore = -99999.;
+        fYcore = -99999.;
+    }
 }
 
 /*
@@ -2039,8 +2021,8 @@ void VTableLookupDataHandler::reset()
     fYoff_intersect = -99.;
     fXoff_edisp = -99.;
     fYoff_edisp = -99.;
-    fXcore = -99.;
-    fYcore = -99.;
+    fXcore = -9999.;
+    fYcore = -9999.;
     fstdP = -99.;
 
     fEmissionHeightMean = -99.;
@@ -2100,6 +2082,8 @@ void VTableLookupDataHandler::resetImageParameters( unsigned int i )
     fwidth[i] = 0.;
     flength[i] = 0.;
     fmeanPedvar_ImageT[i] = 0.;
+    fcen_x[i] = 0.;
+    fcen_y[i] = 0.;
     if( fwrite )
     {
         return;
@@ -2111,8 +2095,6 @@ void VTableLookupDataHandler::resetImageParameters( unsigned int i )
     falpha[i] = 0.;
     flos[i] = 0.;
     fasym[i] = 0.;
-    fcen_x[i] = 0.;
-    fcen_y[i] = 0.;
     fpointing_dx[i] = 0.;
     fpointing_dy[i] = 0.;
     fcosphi[i] = 0.;
@@ -2759,14 +2741,11 @@ float VTableLookupDataHandler::getArrayPointingDeRotationAngle()
 }
 
 /*
- * Re-fill list of selected images after re-doing stereo
- * reconstruction.
- * Disp analyzer might have recovered some images or
- * different quality cuts might have been applied.
+ * Re-fill list of selected images before re-doing stereo reconstruction.
  * Similar image selection as in VDispAnalyser.
  *
 */
-void VTableLookupDataHandler::fill_selected_images_after_redo_stereo_reconstruction()
+void VTableLookupDataHandler::fill_selected_images_before_redo_stereo_reconstruction()
 {
     double* tmp_size = getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly );
     unsigned int ii = 0;

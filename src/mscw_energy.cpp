@@ -1,5 +1,5 @@
 /*! \file mscw_energy.cpp
-    \brief calculate mean scaled width and length,  energy with lookup tables
+    \brief calculate mean scaled width and length, energy with lookup tables
 
 */
 

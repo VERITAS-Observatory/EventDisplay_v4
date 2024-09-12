@@ -695,7 +695,7 @@ void VEventLoop::shutdown()
 
     // if we have the proper settings,
     // print the dead pixel information
-    if(( fRunPar->frunmode == R_ANA || fRunPar->frunmode == R_GTO ) && fRunPar->fprintdeadpixelinfo )  // DEADCHAN
+    if(( fRunPar->frunmode == R_ANA || fRunPar->frunmode == R_GTO ) && fRunPar->fprintdeadpixelinfo ) // DEADCHAN
     {
         for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
         {
