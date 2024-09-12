@@ -18,6 +18,8 @@
 #include "TLine.h"
 #include "VMathsandFunctions.h"
 #include "VHistogramUtilities.h"
+#include "VEnergySpectrumfromLiterature.h"
+
 
 #include "VLikelihoodObject.h"
 
@@ -73,7 +75,7 @@ class VLikelihoodFitter2
 		void setBinning(double i_binWidth, double i_binMin = -1.5, double i_binMax = 2);
 
 
-		TF1 *fitEnergySpectrum();
+		TF1 *fitEnergySpectrum(int verbosity = 1);
 		TGraphAsymmErrors *getSpectralPoints();
 		void setTimeRange(double i_mjd_min = -1, double i_mjd_max = 999999);
 
@@ -86,6 +88,8 @@ class VLikelihoodFitter2
 		double getLogL0();
 		// Number of degrees of freedom
 		int getNDF();
+		double getChi2( vector <double> i_parms, bool i_print = false );
+
 
 		vector <VLikelihoodObject*> fLikelihoodObjects;
 
@@ -112,6 +116,18 @@ class VLikelihoodFitter2
 
 		// Getters
 		TF1* getModel() { return (TF1*)fModel->Clone(); }
+
+		// Calculate the variability index
+		double getVariabilityIndex( double i_delT, TF1* i_bestFit, double i_mjdMin = -999, double i_mjdMax = -999, int iPrintStatus = 1, bool i_ul = false );
+
+
+		void setCrabSpectrum( int id ) {fCrabID = id;};
+
+		TGraph* getProfileLikelihood( int i_parm, double i_min, double i_max, int i_nsteps, bool is_linear = false );
+		vector <VLikelihoodFitter2*> getTimeBinnedData( double i_deltaT, double i_mjdMin, double i_mjdMax );
+		vector <VLikelihoodFitter2*> getTimeBinnedData( vector <double> i_timeBins );
+
+		int  getNRuns() { return fLikelihoodObjects.size(); }
 
 	private:
 
@@ -164,12 +180,14 @@ class VLikelihoodFitter2
 		// Energy Threshold
 		int fEnergyThresholdMethod;
 		double fEnergyThresholdValue;
-		bool fEnergyThreaholdBool;
+		bool fEnergyThresholdBool;
 		
 		// Energy Binning
 		double fEnergyBinWidth;
 		double fEnergyBinMin;
 		double fEnergyBinMax;
+		int fNBinsFit_Total;
+
 
 		// Energy Spectrum
 		unsigned int fNEnergyBins;
@@ -197,6 +215,22 @@ class VLikelihoodFitter2
 		// Get the spectral points
 		float* getSpectralPoint( double BinMin, double BinMax, double ifENorm, TF1* iBestFit, bool bPrintAll );
 		void clearSpectralPoints();
+
+
+		// Light curve
+		float* getIntegralFlux( double i_EMin, double i_EMax, TF1* i_Model, bool i_log = true, bool i_ul = false );
+		double getCrabFlux( double iF, double i_EMin, double i_EMax );
+
+		// Spectrum from literature
+		bool bValidLiterature;            // Valid spectral file read in
+		int fCrabID;
+		VEnergySpectrumfromLiterature* fLiteratureSpectra;
+
+
+		// Function to handle crab spectra from literature
+		void loadSpectraFromLiterature( string filename = "" );
+
+
 
 
 };

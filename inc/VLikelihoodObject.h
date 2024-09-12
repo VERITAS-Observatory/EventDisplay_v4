@@ -121,6 +121,9 @@ class VLikelihoodObject
 		VLikelihoodObject  *clone();
 
 		TCanvas *peak();
+
+		int getNBins();
+
 		
 	private:
 

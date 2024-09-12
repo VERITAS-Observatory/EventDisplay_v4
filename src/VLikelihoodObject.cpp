@@ -1064,3 +1064,17 @@ VLikelihoodObject * VLikelihoodObject::clone(){
 	VLikelihoodObject *i_clone = new VLikelihoodObject(*this);
 	return i_clone;
 }
+
+
+int VLikelihoodObject::getNBins(){
+	int i_nBins = 0;
+	for (unsigned int i = 0; i < fEnergyBinCentres.size(); i++){
+		// Fit min/max
+		if( (fEnergyBinCentres[i] < fEnergyMin) || (fEnergyBinCentres[i] > fEnergyMax))  
+		{
+			continue;
+		}
+		i_nBins += 1;
+	}
+	return i_nBins;
+}
