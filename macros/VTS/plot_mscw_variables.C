@@ -29,6 +29,14 @@ void print_statistics_output( TH1F* h, string print_out )
         cout << " (" << h->GetEntries() << " entries)";
         cout << endl;
     }
+    else if( print_out == "VALUE" )
+    {
+        cout << "\t Value at 10 (30) TeV: ";
+        cout << h->GetBinContent( h->FindBin( log10( 10 ) ) );
+        cout << " (" << h->GetBinContent( h->FindBin( log10( 30. ) ) ) << ") ";
+        cout << " (" << h->GetEntries() << " entries)";
+        cout << endl;
+    }
 }
 
 
@@ -133,14 +141,14 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
         V.push_back( "log10(MCe0)" );
         Vmin.push_back(-2. );
         Vmax.push_back( log10( 300. ) );
-        Vprintout.push_back( "" );
+        Vprintout.push_back( "VALUE" );
     }
     else
     {
         V.push_back( "log10(ErecS)" );
         Vmin.push_back(-2. );
         Vmax.push_back( log10( 300. ) );
-        Vprintout.push_back( "" );
+        Vprintout.push_back( "VALUE" );
     }
     if( plot_type.find( "short_mc" ) != string::npos )
     {
