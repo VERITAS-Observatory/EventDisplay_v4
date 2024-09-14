@@ -37,17 +37,31 @@
 using namespace std;
 
 /*
- * return average pointing elevation
+ * Return array pointing
+ * Note approximate implementation - assume that all triggered telescopes
+ * point in the same direction.
  *
- * NOT IMPLEMENTED - this is used for the dispEnergy reconstruction
+ * Used for the dispEnergy reconstruction
+ *
+ * first: elevation
+ * second: azimuth
  */
 pair<float, float> getArrayPointing( Cshowerpars* i_showerpars )
 {
     pair< float, float> i_mean_pointing;
-
     i_mean_pointing.first = 0.;
     i_mean_pointing.second = 0.;
-
+    if(!i_showerpars )
+    {
+        return i_mean_pointing;
+    }
+    // approximation: use first triggered telescope
+    unsigned int first_tel = ( unsigned int )i_showerpars->Trig_list[0];
+    if( first_tel < i_showerpars->NTel )
+    {
+        i_mean_pointing.first = i_showerpars->TelElevation[first_tel];
+        i_mean_pointing.second = i_showerpars->TelAzimuth[first_tel];
+    }
     return i_mean_pointing;
 }
 
@@ -594,7 +608,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
     // stereo (intersection of line) reconstruction
     // needed for the re-calculation of 'cross'
     VSimpleStereoReconstructor i_SR;
-    i_SR.initialize();
+    i_SR.initialize( 2, 10. ); // 'reasonable' starting values
 
     /////////////////////////////////////////////////
     // loop over all events in trees
