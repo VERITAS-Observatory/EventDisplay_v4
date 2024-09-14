@@ -576,8 +576,8 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     if( fTLRunParameter->fRerunStereoReconstruction )
     {
         fill_selected_images_before_redo_stereo_reconstruction();
-        doStereoReconstruction( true );
         fmeanPedvar_Image = calculateMeanNoiseLevel( true );
+        doStereoReconstruction( true );
     }
 
     // dispEnergy
