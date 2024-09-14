@@ -154,6 +154,7 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
     dataloader->AddVariable( "size", 'F' );
     dataloader->AddVariable( "ntubes", 'F' );
     dataloader->AddVariable( "tgrad_x*tgrad_x", 'F' );
+    dataloader->AddVariable( "cross", 'F' );
     dataloader->AddVariable( "asym", 'F' );
     dataloader->AddVariable( "loss", 'F' );
     dataloader->AddVariable( "dist", 'F' );
