@@ -113,8 +113,7 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "size", &fSize );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "ntubes", &fNtubes );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "tgrad_x*tgrad_x", &fTGrad );
-        // cross variable should be on this spot
-        // fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "cross", &fcross );
+        fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "cross", &fcross );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "asym", &fAsymm );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "loss", &fLoss );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "dist", &fDist );
