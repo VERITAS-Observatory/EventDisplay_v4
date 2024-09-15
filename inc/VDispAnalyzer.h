@@ -86,21 +86,6 @@ class VDispAnalyzer
         VDispAnalyzer();
         ~VDispAnalyzer() {}
 
-        void calculateCore( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
-                            double* itelX, double* itelY, double* itelZ,
-                            ULong64_t* iTelType,
-                            double* img_size, double* img_cen_x, double* img_cen_y,
-                            double* img_cosphi, double* img_sinphi,
-                            double* img_width, double* img_length, double* img_asym,
-                            double* img_tgrad, double* img_loss, int* img_ntubes,
-                            double* img_weight,
-                            double xoff_4, double yoff_4,
-                            double* iR,
-                            double xcore, double ycore,
-                            double xs, double ys,
-                            double* img_fui,
-                            float* img_pedvar );
-
         void calculateEnergies( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
                                 ULong64_t* iTelType,
                                 double* img_size, double* img_cen_x, double* img_cen_y,
@@ -172,7 +157,6 @@ class VDispAnalyzer
         {
             return f_dispE;
         }
-        float getCoreDistance( unsigned int iTelescopeNumber );
         float getEnergy();
         float getEnergyChi2();
         float getEnergydES();

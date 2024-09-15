@@ -763,7 +763,7 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
             // dispEnergy is trained as log10(MCe0) in GeV
             if( fdisp_energy_T[i] > -98. )
             {
-                fdisp_energy_T[i] = TMath::Power( 10., fdisp_energy_T[i] * log10( img_size[i] ) );
+                fdisp_energy_T[i] = TMath::Power( 10., fdisp_energy_T[i] );
             }
 
             if( fDebug )
@@ -823,9 +823,8 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
     }
 
     // Occasionally one energy is significantly off and distorts the mean.
-    // therefore: get rid of N sigma outliers
+    // therefore: get rid of N (3) sigma outliers
     // use robust statistics (median and median absolute error)
-    // Note: applied only to larger events > 4 telescopes
     fdisp_energy_median = TMath::Median( energy_tel.size(), &energy_tel[0] );
     fdisp_energy_medianAbsoluteError = VStatistics::getMedianAbsoluteError( energy_tel, fdisp_energy_median );
     double w = 0.;
@@ -841,19 +840,12 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
             n2++;
         }
     }
-    fdisp_energy_NT = energy_tel.size();
-    // check minimum number of valid energies
-    /*     if( energy_tel.size() <= 4 && w > 0. )
-         {
-             fdisp_energy /= w;
-             fdisp_energy_NT = n2;
-         }  */
-    // use median for energy estimation (removes outliers)
-    // (for all cases)
-    if( n2 >= fNImages_min )
+
+    fdisp_energy_NT = n2;
+    if( w > 0. )
     {
-        fdisp_energy = fdisp_energy_median;
-        if( n2 == 1 )
+        fdisp_energy /= w;
+        if( fdisp_energy_NT == 1 )
         {
             fdisp_energyQL = 1;
         }
@@ -934,183 +926,4 @@ float VDispAnalyzer::getEnergyT( unsigned int iTelescopeNumber )
     }
 
     return -9999.;
-}
-
-/**************************************************************************************
- * everything below is related to dispCore
- **************************************************************************************/
-
-void VDispAnalyzer::calculateCore( unsigned int i_ntel,
-                                   float iArrayElevation,
-                                   float iArrayAzimuth,
-                                   double* iTelX,
-                                   double* iTelY,
-                                   double* iTelZ,
-                                   ULong64_t* iTelType,
-                                   double* img_size,
-                                   double* img_cen_x,
-                                   double* img_cen_y,
-                                   double* img_cosphi,
-                                   double* img_sinphi,
-                                   double* img_width,
-                                   double* img_length,
-                                   double* img_asym,
-                                   double* img_tgrad,
-                                   double* img_loss,
-                                   int* img_ntubes,
-                                   double* img_weight,
-                                   double xoff_4,
-                                   double yoff_4,
-                                   double* iRcore,
-                                   double xcoreSR,
-                                   double ycoreSR,
-                                   double xs,
-                                   double ys,
-                                   double* img_fui,
-                                   float* img_pedvar )
-{
-    fdisp_core_T.clear();
-    fdisp_core_T.assign( i_ntel, -99. );
-
-    // make sure that all data arrays exist
-    if(!img_size || !img_cen_x || !img_cen_y
-            || !img_cosphi || !img_sinphi
-            || !img_width || !img_length
-            || !img_asym || !img_tgrad
-            || !img_loss || !img_ntubes
-            || !img_weight || !iRcore
-            || !iTelX || !iTelY || !iTelZ || !img_fui )
-    {
-        return;
-    }
-
-    ////////////////////////////////////////////
-    // calculate for each image the core distance
-
-    for( unsigned int i = 0; i < i_ntel; i++ )
-    {
-        if( img_size[i] > 0. && iArrayElevation > 0. )
-        {
-            fdisp_core_T[i] = fTMVADispAnalyzer->evaluate(
-                                  ( float )img_width[i], ( float )img_length[i],
-                                  ( float )img_size[i], ( float )img_asym[i],
-                                  ( float )img_loss[i], ( float )img_tgrad[i],
-                                  ( float )img_cen_x[i], ( float )img_cen_y[i],
-                                  ( float )xoff_4, ( float )yoff_4, ( ULong64_t )iTelType[i],
-                                  ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
-                                  ( float )iRcore[i], -1.,
-                                  ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
-                                  ( float )img_fui[i], ( float )img_ntubes[i], ( float )img_pedvar[i] );
-        }
-        else
-        {
-            fdisp_core_T[i] = -99.;
-        }
-    }
-
-    return;
-
-    ///////////////////////////////////////////////
-    // core position in shower coordinates
-
-    VGrIsuAnalyzer i_A;
-
-    // calculated telescope positions in shower coordinates
-    float i_xcos = sin(( 90. - iArrayElevation ) / TMath::RadToDeg() ) * sin(( iArrayAzimuth - 180. ) / TMath::RadToDeg() );
-    float i_ycos = sin(( 90. - iArrayElevation ) / TMath::RadToDeg() ) * cos(( iArrayAzimuth - 180. ) / TMath::RadToDeg() );
-    float i_xrot, i_yrot, i_zrot = 0.;
-    float xcoreSC = 0.;
-    float ycoreSC = 0.;
-    i_A.tel_impact( i_xcos, i_ycos, xcoreSR, ycoreSR, 0., &xcoreSC, &ycoreSC, &i_zrot, false );
-
-    float m = 0.;
-    float theta = 0.;
-    float x = 0.;
-    float y = 0.;
-    float x1 = 0.;
-    float x2 = 0.;
-    float y1 = 0.;
-    float y2 = 0.;
-
-    float iweight = 0.;
-    float xw = 0.;
-    float yw = 0.;
-    float ww = 0.;
-
-    for( unsigned int i = 0; i < i_ntel; i++ )
-    {
-        if( fdisp_core_T[i] > 0. && img_cen_x[i] - xs > 0. && xcoreSC > -9000. && ycoreSC > -9000. )
-        {
-            // telescope coordinates
-            // shower coordinates (telecope pointing)
-            i_A.tel_impact( i_xcos, i_ycos, iTelX[i], iTelY[i], iTelZ[i], &i_xrot, &i_yrot, &i_zrot, false );
-
-            m = -1. * ( img_cen_y[i] - ys ) / ( img_cen_x[i] - xs );
-
-            theta = atan( m );
-
-            // not clear which sign to use
-            // simple approximation: assume
-            // that intersection by line solution
-            // is not hugely wrong; look for closest
-            // solution
-            x1 = i_xrot + fdisp_core_T[i] * cos( theta );
-            y1 = i_yrot + fdisp_core_T[i] * sin( theta );
-            x2 = i_xrot - fdisp_core_T[i] * cos( theta );
-            y2 = i_yrot - fdisp_core_T[i] * sin( theta );
-            if( sqrt(( x1 - xcoreSC ) * ( x1 - xcoreSC )
-                     + ( y1 - ycoreSC ) * ( y1 - ycoreSC ) )
-                    < sqrt(( x2 - xcoreSC ) * ( x2 - xcoreSC )
-                           + ( y2 - ycoreSC ) * ( y2 - ycoreSC ) ) )
-            {
-                x = x1;
-                y = y1;
-            }
-            else
-            {
-                x = x2;
-                y = y2;
-            }
-
-            // weight
-            // (not clear if sum is a good choice,
-            //  as we do not do a dc-to-pe calibration)
-            iweight = img_size[i];
-            iweight *= ( 1. - img_width[i] / img_length[i] );
-            iweight *= iweight;
-
-            xw += x * iweight;
-            yw += y * iweight;
-            ww += iweight;
-        }
-    }
-
-    // average core position (in shower coordinates)
-    if( ww > 0. )
-    {
-        xw /= ww;
-        yw /= ww;
-    }
-
-    // calculate core distance for each telescopes
-    // (simple - as we are working in shower coordinates)
-    for( unsigned int i = 0; i < i_ntel; i++ )
-    {
-        if( fdisp_core_T[i] > 0. && ww > 0. && img_cen_x[i] > 0. )
-        {
-            i_A.tel_impact( i_xcos, i_ycos, iTelX[i], iTelY[i], iTelZ[i], &i_xrot, &i_yrot, &i_zrot, false );
-            fdisp_core_T[i] = sqrt(( xw - i_xrot ) * ( xw - i_xrot )
-                                   + ( yw - i_yrot ) * ( yw - i_yrot ) );
-        }
-    }
-
-}
-
-float VDispAnalyzer::getCoreDistance( unsigned int iTelescopeNumber )
-{
-    if( iTelescopeNumber < fdisp_core_T.size() )
-    {
-        return fdisp_core_T[iTelescopeNumber];
-    }
-    return -99.;
 }

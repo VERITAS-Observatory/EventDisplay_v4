@@ -801,9 +801,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
                 dispError = sqrt(( x2 - MCxoff ) * ( x2 - MCxoff ) + ( y2 + MCyoff ) * ( y2 + MCyoff ) );
                 dispSign = -1.;
             }
-
-            // training target in ratio to size
-            dispEnergy = log10( i_showerpars.MCe0 ) / log10( i_tpars[i]->size );
+            dispEnergy = log10( i_showerpars.MCe0 );
             dispCore   = Rcore;
 
             if( fMapOfTrainingTree.find( fTelType[i] ) != fMapOfTrainingTree.end() )
