@@ -580,11 +580,13 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
         doStereoReconstruction( true );
     }
 
-    // dispEnergy
-    // energy reconstruction using the disp MVA
-    // This is preliminary and works for MC events only!
+    // dispEnergy - energy reconstruction using the disp MVA
     if( fDispAnalyzerEnergy )
     {
+        // calculate distances and emission height
+        calcDistances();
+        calcEmissionHeights();
+
         fDispAnalyzerEnergy->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
                                              fTLRunParameter->fmaxdist,
                                              fTLRunParameter->fmaxloss,
@@ -1245,9 +1247,6 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     if( fTLRunParameter->fEnergyReconstruction_BDTFileName.size() > 0. )
     {
         cout << endl;
-        cout << "*******************************************************" << endl;
-        cout << "WARNING: dispBDT energy reconstruction not fully tested" << endl;
-        cout << "*******************************************************" << endl;
         cout << "Initializing BDT disp analyzer for energy reconstruction" << endl;
         cout << "===========================================================" << endl << endl;
         fDispAnalyzerEnergy = new VDispAnalyzer();
