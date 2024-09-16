@@ -90,7 +90,7 @@ map< ULong64_t, TTree* > fMapOfTrainingTree;
 bool trainTMVA( string iOutputDir, float iTrainTest,
                 ULong64_t iTelType, TTree* iDataTree,
                 string iTargetML, string iTMVAOptions,
-                string iQualityCut )
+                string iQualityCut, string iWeightExpression )
 {
     cout << endl;
     cout << "Starting " << iTargetML;
@@ -246,7 +246,11 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
         dataloader->AddTarget( "disp", 'F' );
     }
     // add weights (optional)
-    //    dataloader->SetWeightExpression( "MCe0*MCe0", "Regression" );
+    if( iWeightExpression.size() > 0 )
+    {
+        cout << "Weight expression (per event) applied: " << iWeightExpression << endl;
+        dataloader->SetWeightExpression( iWeightExpression.c_str(), "Regression" );
+    }
 
     // regression tree
     dataloader->AddRegressionTree( iDataTree, 1. );
@@ -849,7 +853,7 @@ int main( int argc, char* argv[] )
         cout << "./trainTMVAforAngularReconstruction <list of input eventdisplay files (MC)> <output directory>" << endl;
         cout << "                                     <train vs test fraction> <RecID> <telescope type>" << endl;
         cout << "                                     [train for angular / energy / core reconstruction]" << endl;
-        cout << "                                     [quality cuts] [directory with training trees]" << endl;
+        cout << "                                     [quality cuts] [weight expression] [directory with training trees]" << endl;
         cout << endl;
         cout << endl;
 
@@ -872,6 +876,7 @@ int main( int argc, char* argv[] )
     // TMVA options (hardwired)
     string iTMVAOptions = "VarTransform=N:NTrees=200:BoostType=AdaBoost:MaxDepth=8";
     string       iDataDirectory = "";
+    string iWeightExpression = "";
     // quality cut likely overwritten from command line
     string       iQualityCut = "size>1.&&ntubes>log10(4.)&&width>0.&&width<2.&&length>0.&&length<10.";
     iQualityCut = iQualityCut + "&&tgrad_x<100.*100.&&loss<0.20&&cross<20.0&&Rcore<2000.";
@@ -885,7 +890,11 @@ int main( int argc, char* argv[] )
     }
     if( argc >= 9 )
     {
-        iDataDirectory = argv[8];
+        iWeightExpression = argv[8];
+    }
+    if( argc >= 10 )
+    {
+        iDataDirectory = argv[9];
     }
     bool redo_stereo_reconstruction = false;
 
@@ -977,7 +986,8 @@ int main( int argc, char* argv[] )
         trainTMVA( fOutputDir, fTrainTest,
                    fMapOfTrainingTree_iter->first,
                    fMapOfTrainingTree_iter->second,
-                   iTargetML, iTMVAOptions, iQualityCut );
+                   iTargetML, iTMVAOptions, iQualityCut,
+                   iWeightExpression );
     }
 
     //////////////////////
