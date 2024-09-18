@@ -760,12 +760,6 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
                                     ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
                                     ( float )img_fui[i], ( float )img_ntubes[i], ( float )img_pedvar[i] );
 
-            // dispEnergy is trained as log10(MCe0) in GeV
-            if( fdisp_energy_T[i] > -98. )
-            {
-                fdisp_energy_T[i] = TMath::Power( 10., fdisp_energy_T[i] );
-            }
-
             if( fDebug )
             {
                 cout << "VDispAnalyzer::calculateEnergies: tel " << i << " (teltype " << ( ULong64_t )iTelType[i] << ") ";
