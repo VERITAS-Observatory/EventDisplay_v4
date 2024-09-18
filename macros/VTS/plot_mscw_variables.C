@@ -179,7 +179,7 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
     Vmax.push_back( 1.5 );
 
 
-    TCanvas* c = new TCanvas( "c", "mscw variables", 0, 100, 1600, 1100 );
+    TCanvas* c = new TCanvas( "c", "mscw variables", 0, 200, 1200, 800 );
     if( is_MC )
     {
         c->Divide( 3, 2 );
