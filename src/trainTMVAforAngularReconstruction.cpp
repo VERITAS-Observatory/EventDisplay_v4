@@ -195,7 +195,6 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
     // train for energy reconstruction
     if( iTargetML.find( "DispEnergy" ) != string::npos )
     {
-        // dispEnergy is defined as log10(E)/log10(size)
         dataloader->AddTarget( "dispEnergy", 'F' );
     }
     // rotation angle
@@ -805,7 +804,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
                 dispError = sqrt(( x2 - MCxoff ) * ( x2 - MCxoff ) + ( y2 + MCyoff ) * ( y2 + MCyoff ) );
                 dispSign = -1.;
             }
-            dispEnergy = log10( i_showerpars.MCe0 );
+            dispEnergy = i_showerpars.MCe0;
             dispCore   = Rcore;
 
             if( fMapOfTrainingTree.find( fTelType[i] ) != fMapOfTrainingTree.end() )
