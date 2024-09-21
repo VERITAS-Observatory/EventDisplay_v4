@@ -852,7 +852,7 @@ int main( int argc, char* argv[] )
         cout << "./trainTMVAforAngularReconstruction <list of input eventdisplay files (MC)> <output directory>" << endl;
         cout << "                                     <train vs test fraction> <RecID> <telescope type>" << endl;
         cout << "                                     [train for angular / energy / core reconstruction]" << endl;
-        cout << "                                     [quality cuts] [weight expression] [directory with training trees]" << endl;
+        cout << "                                     [quality cuts] [MVA options] [weight expression] [directory with training trees]" << endl;
         cout << endl;
         cout << endl;
 
@@ -872,28 +872,33 @@ int main( int argc, char* argv[] )
     unsigned int iRecID      = atoi( argv[4] );
     ULong64_t    iTelType    = atoi( argv[5] ) ;
     string       iTargetML  = "BDTDisp";
-    // TMVA options (hardwired)
-    string iTMVAOptions = "VarTransform=N:NTrees=200:BoostType=AdaBoost:MaxDepth=8";
-    string       iDataDirectory = "";
-    string iWeightExpression = "";
-    // quality cut likely overwritten from command line
-    string       iQualityCut = "size>1.&&ntubes>log10(4.)&&width>0.&&width<2.&&length>0.&&length<10.";
-    iQualityCut = iQualityCut + "&&tgrad_x<100.*100.&&loss<0.20&&cross<20.0&&Rcore<2000.";
     if( argc >=  7 )
     {
         iTargetML = argv[6];
     }
+    // quality cut likely overwritten from command line
+    string       iQualityCut = "size>1.&&ntubes>log10(4.)&&width>0.&&width<2.&&length>0.&&length<10.";
+    iQualityCut = iQualityCut + "&&tgrad_x<100.*100.&&loss<0.20&&cross<20.0&&Rcore<2000.";
     if( argc >=  8 )
     {
         iQualityCut = argv[7];
     }
+    // TMVA options (default options derived from hyperparameter optimisation on CTAO prod3 simulations)
+    string iTMVAOptions = "NTrees=100:BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:GradBaggingFraction=0.5:nCuts=20:MaxDepth=10:";
+    iMVAOptions += "PruneMethod=ExpectedError:RegressionLossFunctionBDTG=Huber:MinNodeSize=0.02:VarTransform=N";
     if( argc >= 9 )
     {
-        iWeightExpression = argv[8];
+        iTMVAOptions = argv[8];
     }
+    string iWeightExpression = "";
     if( argc >= 10 )
     {
-        iDataDirectory = argv[9];
+        iWeightExpression = argv[9];
+    }
+    string       iDataDirectory = "";
+    if( argc >= 11 )
+    {
+        iDataDirectory = argv[10];
     }
     bool redo_stereo_reconstruction = false;
 
