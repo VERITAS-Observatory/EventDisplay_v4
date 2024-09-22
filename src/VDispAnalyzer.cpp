@@ -32,6 +32,7 @@ VDispAnalyzer::VDispAnalyzer()
     fdisp_energy_medianAbsoluteError = -9999.;
     fdisp_energy_NT = 0;
     fdisp_energyQL = -1;
+    fdisp_sum_abs_weigth = 0.;
 
     setQualityCuts();
     setDispErrorWeighting();
@@ -568,6 +569,14 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
                             tel_pointing_dx, tel_pointing_dy,
                             f_dispDiff, xoff_4, yoff_4, UseIntersectForHeadTail );
     fdisp_xy_weight_T = v_weight;
+    fdisp_sum_abs_weigth = 0.;
+    for( unsigned int i = 0; i < fdisp_xy_weight_T.size(); i++ )
+    {
+        if( fdisp_xy_weight_T[i] > 0. )
+        {
+            fdisp_sum_abs_weigth += fdisp_xy_weight_T[i];
+        }
+    }
     fdisp_T = v_disp;
     fdisplist_T = v_displist;
 }

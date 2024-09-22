@@ -139,6 +139,7 @@ class CData
         //[NTelPairs]
         Float_t         EmissionHeightT[VDST_MAXTELESCOPES * VDST_MAXTELESCOPES];
         Double_t        DispDiff;  // from disp method
+        Float_t         DispAbsSumWeigth;
         Float_t         Xoff_intersect;
         Float_t         Yoff_intersect;
 
@@ -236,6 +237,7 @@ class CData
         TBranch*        b_NTelPairs;              //!
         TBranch*        b_EmissionHeightT;        //!
         TBranch*        b_DispDiff; //disp
+        TBranch*        b_DispAbsSumWeigth;
         TBranch*        b_Xoff_intersect;
         TBranch*        b_Yoff_intersect;
 
@@ -801,6 +803,14 @@ void CData::Init( TTree* tree )
     {
         DispDiff = 0.;
     }
+    if( fChain->GetBranchStatus( "DispAbsSumWeigth" ) )
+    {
+        fChain->SetBranchAddress( "DispAbsSumWeigth", &DispAbsSumWeigth );
+    }
+    else
+    {
+        DispAbsSumWeigth = 0.;
+    }
     if( fChain->GetBranchStatus( "Xoff_intersect" ) )
     {
         fChain->SetBranchAddress( "Xoff_intersect", &Xoff_intersect );
@@ -966,6 +976,14 @@ Bool_t CData::Notify()
     else
     {
         b_DispDiff = 0;
+    }
+    if( fChain->GetBranchStatus( "DispAbsSumWeigth" ) )
+    {
+        b_DispAbsSumWeigth = fChain->GetBranch( "DispAbsSumWeigth" );
+    }
+    else
+    {
+        b_DispAbsSumWeigth = 0;
     }
     if( fChain->GetBranchStatus( "Xoff_intersect" ) )
     {
