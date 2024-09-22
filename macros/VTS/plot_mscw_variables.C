@@ -24,12 +24,12 @@ void print_statistics_output( TH1F* h, string print_out )
     }
     else if( print_out == "68p" )
     {
-        int nQuantiles = 1;
-        double value[1];
-        double prob[1] = {0.68};
+        int nQuantiles = 2;
+        double value[2];
+        double prob[2] = {0.68, 0.95};
         h->GetQuantiles( nQuantiles, value, prob );
-        cout << "\t 68% value: " << value[0];
-        cout << " (" << h->GetEntries() << " entries)";
+        cout << "\t 68% (95%) value: " << value[0] << "( " << value[1] << ", ";
+        cout << h->GetEntries() << " entries)";
         cout << endl;
     }
     else if( print_out == "VALUE" )
@@ -219,7 +219,6 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
                 if (pos != std::string::npos) {
                     V[i].replace(pos, 5, "Erec" );
                 }
-                cout << "Energy " << i << "\t" << V[i] << endl;
             }
 
             TList* primitives = gPad->GetListOfPrimitives();
