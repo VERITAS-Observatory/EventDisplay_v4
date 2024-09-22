@@ -800,7 +800,6 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
         if( fdisp_energy_T[i] > 0. && img_weight[i] > 0. && img_size[i] > 0. )
         {
             energy_tel.push_back( fdisp_energy_T[i] );
-            // Weighting with size may lead to a long tail towards large eres/mce0
             energy_weight.push_back( img_size[i] * img_weight[i] * img_size[i] * img_weight[i] );
             if( fDebug )
             {

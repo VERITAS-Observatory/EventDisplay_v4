@@ -7,6 +7,9 @@
  * print RMS or containment radii to screen
  *
  */
+
+#include <string>
+
 void print_statistics_output( TH1F* h, string print_out )
 {
     if(!h || print_out.size() == 0 )
@@ -210,6 +213,15 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
 
         if( T2 )
         {
+            if( i >= 0 && plot_type.find("table") == string::npos )
+            {
+                size_t pos = V[i].find("ErecS");
+                if (pos != std::string::npos) {
+                    V[i].replace(pos, 5, "Erec" );
+                }
+                cout << "Energy " << i << "\t" << V[i] << endl;
+            }
+
             TList* primitives = gPad->GetListOfPrimitives();
             f2->cd();
             T2->Draw( V[i].c_str(), Vcut, "sames" );
