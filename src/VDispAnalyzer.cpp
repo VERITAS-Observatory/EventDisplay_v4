@@ -572,10 +572,7 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
     fdisp_sum_abs_weigth = 0.;
     for( unsigned int i = 0; i < fdisp_xy_weight_T.size(); i++ )
     {
-        if( fdisp_xy_weight_T[i] > 0. )
-        {
-            fdisp_sum_abs_weigth += fdisp_xy_weight_T[i];
-        }
+        fdisp_sum_abs_weigth += TMath::Abs(fdisp_xy_weight_T[i]);
     }
     fdisp_T = v_disp;
     fdisplist_T = v_displist;
