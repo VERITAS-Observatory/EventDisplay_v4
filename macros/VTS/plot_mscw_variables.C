@@ -49,7 +49,7 @@ void print_statistics_output( TH1F* h, string print_out )
  * - (anything else): plot large number of variables
  * - string includes 'geo': use intersection method for angular reconstruction
 */
-void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW2 = 1., string iAddCut = "ErecS>0.", string plot_type = "short_mc", string i_print_file = "" )
+void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW2 = 1., string iAddCut1 = "ErecS>0.", string iAddCut2 = "ErecS>0.", string plot_type = "short_mc", string i_print_file = "" )
 {
     TFile* f1 = new TFile( iFile1.c_str() );
     if( f1->IsZombie() )
@@ -203,7 +203,7 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
         }
 
         char Vcut[400];
-        sprintf( Vcut, "MSCW>-2.&&MSCW<3.&&dES>0.&&%s>%f&&%s<%f&&%s", V[i].c_str(), Vmin[i], V[i].c_str(), Vmax[i], iAddCut.c_str() );
+        sprintf( Vcut, "MSCW>-2.&&MSCW<3.&&%s>%f&&%s<%f&&%s", V[i].c_str(), Vmin[i], V[i].c_str(), Vmax[i], iAddCut1.c_str() );
         cout << "Canvas " << i + 1 << ", variable " << V[i] << " cut: " << Vcut << endl;
 
         f1->cd();
@@ -220,6 +220,7 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
                     V[i].replace(pos, 5, "Erec" );
                 }
             }
+            sprintf( Vcut, "MSCW>-2.&&MSCW<3.&&%s>%f&&%s<%f&&%s", V[i].c_str(), Vmin[i], V[i].c_str(), Vmax[i], iAddCut2.c_str() );
 
             TList* primitives = gPad->GetListOfPrimitives();
             f2->cd();
