@@ -5,6 +5,7 @@
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
+#include <algorithm>
 #include <TTree.h>
 #include <vector>
 #include "TH1F.h"
@@ -129,6 +130,7 @@ class VLikelihoodFitter2
 
 		int  getNRuns() { return fLikelihoodObjects.size(); }
 
+		void fixParameter( int i_parm, double i_value );
 	private:
 
 		// Parallel
@@ -230,6 +232,9 @@ class VLikelihoodFitter2
 		// Function to handle crab spectra from literature
 		void loadSpectraFromLiterature( string filename = "" );
 
+
+		// Get the active runs (not excluded)
+		vector <VLikelihoodObject*> getActiveRuns();
 
 
 

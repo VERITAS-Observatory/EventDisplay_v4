@@ -101,6 +101,7 @@ class VLikelihoodObject
 		double getEnergyThreshold() {return fEnergyThreshold;}
 		double getDuration() {return fDuration;}
 		double getDeadTimeFraction() {return fDeadTimeFraction;}
+		int getRunNumber() {return fRunNumber;}
 		
 		
 		// Set the energy binning

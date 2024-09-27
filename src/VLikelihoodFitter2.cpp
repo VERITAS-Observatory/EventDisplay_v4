@@ -433,6 +433,8 @@ void VLikelihoodFitter2::setModel( int i_ID, double ifENorm )
 		// fModel_linear = new TF1("fModel",this, &VLikelihoodFitter2::calculateIntrinsicSpectrum, fEnergyMin_linear, fEnergyMax_linear, fNParms);
 	}
 
+
+	fFixedParameters = vector <double> (fNParms, -999);
     updateModel();
 }
 
@@ -836,11 +838,12 @@ double VLikelihoodFitter2::getLogL_internal( const double* i_parms ){
     }
     double val = 0;
 
+	vector <VLikelihoodObject*> i_objs = getActiveRuns();
 	omp_set_num_threads(fNumThreads);
 
     #pragma omp parallel for reduction (+:val)
-	for (unsigned int i = 0; i < fLikelihoodObjects.size(); i++){
-		val += fLikelihoodObjects[i]->getLogL();
+	for (unsigned int i = 0; i < i_objs.size(); i++){
+		val += i_objs[i]->getLogL();
 	}
 
 	return val;
@@ -851,14 +854,36 @@ double VLikelihoodFitter2::getLogL_internal( const double* i_parms ){
 double VLikelihoodFitter2::getLogL0 (){
     double val = 0;
 	omp_set_num_threads(fNumThreads);
+	vector <VLikelihoodObject*> i_objs = getActiveRuns();
+
     #pragma omp parallel for reduction (+:val)
-	for (unsigned int i = 0; i < fLikelihoodObjects.size(); i++){
-		val += fLikelihoodObjects[i]->getLogL0();
+	for (unsigned int i = 0; i < i_objs.size(); i++){
+		val += i_objs[i]->getLogL0();
 	}
 	return val;
 
 }
 
+
+vector <VLikelihoodObject*> VLikelihoodFitter2::getActiveRuns(){
+	vector <VLikelihoodObject*> i_likeObjs;
+	for (unsigned int i = 0; i < fLikelihoodObjects.size(); i++){
+		double i_mjd = fLikelihoodObjects[i]->getMJD();
+		int i_run = fLikelihoodObjects[i]->getRunNumber();
+		// Check if the run is in the excluded run list
+		if ( find(fExcludeRun.begin(), fExcludeRun.end(), i_run) != fExcludeRun.end()) {
+			continue;
+		}
+		// Check if the run's MJD is excluded
+		else if (i_mjd > fMJDMax || i_mjd < fMJDMin){
+			continue;
+		}
+		else{
+			i_likeObjs.push_back(fLikelihoodObjects[i]);
+		}
+	}
+	return i_likeObjs;
+}
 
 /*
  *  initializing the minimizer to be used
@@ -1243,6 +1268,15 @@ bool VLikelihoodFitter2::initializeMinimizer( double i_normGuess, int i_printSta
 
 }
 
+
+void VLikelihoodFitter2:: fixParameter( int i_parm, double i_value ){
+	if (i_parm < fNParms){
+		fFixedParameters[i_parm] = i_value;
+	}
+	else {
+		cout << "Parameter " << i_parm << " is out of range" << endl;
+	}
+}
 
 
 /*
