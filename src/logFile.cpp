@@ -35,6 +35,7 @@ void printHelp()
     cout << "\t\t tmvaLog, tmvaRunparameter" << endl;
     cout << "\t\t radAccLOG" << endl;
     cout << "\t\t effAreaLog, effAreaCuts, effAreaParameters" << endl;
+    cout << "\t\t effAreaCombineLog" << endl;
     cout << "\t to print all log files in the root file: use `printAll`" << endl;
     cout << endl;
 }
