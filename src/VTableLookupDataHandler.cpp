@@ -576,15 +576,17 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     if( fTLRunParameter->fRerunStereoReconstruction )
     {
         fill_selected_images_before_redo_stereo_reconstruction();
-        doStereoReconstruction( true );
         fmeanPedvar_Image = calculateMeanNoiseLevel( true );
+        doStereoReconstruction( true );
     }
 
-    // dispEnergy
-    // energy reconstruction using the disp MVA
-    // This is preliminary and works for MC events only!
+    // dispEnergy - energy reconstruction using the disp MVA
     if( fDispAnalyzerEnergy )
     {
+        // calculate distances and emission height
+        calcDistances();
+        calcEmissionHeights();
+
         fDispAnalyzerEnergy->setQualityCuts( fSSR_NImages_min, fSSR_AxesAngles_min,
                                              fTLRunParameter->fmaxdist,
                                              fTLRunParameter->fmaxloss,
@@ -759,6 +761,7 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
             fDoff_T[t] = fDispAnalyzerDirection->get_disp( t );
             fToff_T[t] = fDispAnalyzerDirection->get_disp_tel_list( t );
         }
+        fDispAbsSumWeigth = fDispAnalyzerDirection->get_abs_sum_disp_weight();
     }
     ////////////////////////////////////////////////////////////////////
     // Standard (intersection) method for all other cases
@@ -774,6 +777,7 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
         fXoff_derot = i_SR.fShower_Xoffset;
         fYoff_derot = i_SR.fShower_Yoffset;
         fstdS = i_SR.fShower_DispDiff;
+        fDispAbsSumWeigth = 0.;
     }
 
     // overwrite the values read from the evndisp file with the newly
@@ -1245,9 +1249,6 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     if( fTLRunParameter->fEnergyReconstruction_BDTFileName.size() > 0. )
     {
         cout << endl;
-        cout << "*******************************************************" << endl;
-        cout << "WARNING: dispBDT energy reconstruction not fully tested" << endl;
-        cout << "*******************************************************" << endl;
         cout << "Initializing BDT disp analyzer for energy reconstruction" << endl;
         cout << "===========================================================" << endl << endl;
         fDispAnalyzerEnergy = new VDispAnalyzer();
@@ -1441,6 +1442,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "DispXoff_T", fXoff_T, "DispXoff_T[NImages]/F" );
     fOTree->Branch( "DispYoff_T", fYoff_T, "DispYoff_T[NImages]/F" );
     fOTree->Branch( "DispWoff_T", fWoff_T, "DispWoff_T[NImages]/F" );
+    fOTree->Branch( "DispAbsSumWeigth", &fDispAbsSumWeigth, "fDispAbsSumWeigth/F" );
     fOTree->Branch( "Disp_T", fDoff_T, "Disp_T[NImages]/F" );
     fOTree->Branch( "DispTelList_T", fToff_T, "DispTelList_T[NImages]/i" );
     fOTree->Branch( "DispDiff", &fDispDiff, "DispDiff/D" );
@@ -2359,6 +2361,7 @@ void VTableLookupDataHandler::resetAll()
     fMC_distance_to_cameracenter_min = 0.;
     fMC_distance_to_cameracenter_max = 1.e10;
     fDispDiff = 0;
+    fDispAbsSumWeigth = 0.;
     fXoff_intersect = 0.;
     fYoff_intersect = 0.;
     fXoff_edisp = 0.;

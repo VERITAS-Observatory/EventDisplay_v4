@@ -37,17 +37,31 @@
 using namespace std;
 
 /*
- * return average pointing elevation
+ * Return array pointing
+ * Note approximate implementation - assume that all triggered telescopes
+ * point in the same direction.
  *
- * NOT IMPLEMENTED - this is used for the dispEnergy reconstruction
+ * Used for the dispEnergy reconstruction
+ *
+ * first: elevation
+ * second: azimuth
  */
 pair<float, float> getArrayPointing( Cshowerpars* i_showerpars )
 {
     pair< float, float> i_mean_pointing;
-
     i_mean_pointing.first = 0.;
     i_mean_pointing.second = 0.;
-
+    if(!i_showerpars )
+    {
+        return i_mean_pointing;
+    }
+    // approximation: use first triggered telescope
+    unsigned int first_tel = ( unsigned int )i_showerpars->Trig_list[0];
+    if( first_tel < i_showerpars->NTel )
+    {
+        i_mean_pointing.first = i_showerpars->TelElevation[first_tel];
+        i_mean_pointing.second = i_showerpars->TelAzimuth[first_tel];
+    }
     return i_mean_pointing;
 }
 
@@ -76,7 +90,7 @@ map< ULong64_t, TTree* > fMapOfTrainingTree;
 bool trainTMVA( string iOutputDir, float iTrainTest,
                 ULong64_t iTelType, TTree* iDataTree,
                 string iTargetML, string iTMVAOptions,
-                string iQualityCut )
+                string iQualityCut, string iWeightExpression )
 {
     cout << endl;
     cout << "Starting " << iTargetML;
@@ -154,6 +168,7 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
     dataloader->AddVariable( "size", 'F' );
     dataloader->AddVariable( "ntubes", 'F' );
     dataloader->AddVariable( "tgrad_x*tgrad_x", 'F' );
+    dataloader->AddVariable( "cross", 'F' );
     dataloader->AddVariable( "asym", 'F' );
     dataloader->AddVariable( "loss", 'F' );
     dataloader->AddVariable( "dist", 'F' );
@@ -180,7 +195,6 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
     // train for energy reconstruction
     if( iTargetML.find( "DispEnergy" ) != string::npos )
     {
-        // dispEnergy is defined as log10(E)/log10(size)
         dataloader->AddTarget( "dispEnergy", 'F' );
     }
     // rotation angle
@@ -231,7 +245,11 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
         dataloader->AddTarget( "disp", 'F' );
     }
     // add weights (optional)
-    //    dataloader->SetWeightExpression( "MCe0*MCe0", "Regression" );
+    if( iWeightExpression.size() > 0 )
+    {
+        cout << "Weight expression (per event) applied: " << iWeightExpression << endl;
+        dataloader->SetWeightExpression( iWeightExpression.c_str(), "Regression" );
+    }
 
     // regression tree
     dataloader->AddRegressionTree( iDataTree, 1. );
@@ -593,7 +611,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
     // stereo (intersection of line) reconstruction
     // needed for the re-calculation of 'cross'
     VSimpleStereoReconstructor i_SR;
-    i_SR.initialize();
+    i_SR.initialize( 2, 10. ); // 'reasonable' starting values
 
     /////////////////////////////////////////////////
     // loop over all events in trees
@@ -786,9 +804,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
                 dispError = sqrt(( x2 - MCxoff ) * ( x2 - MCxoff ) + ( y2 + MCyoff ) * ( y2 + MCyoff ) );
                 dispSign = -1.;
             }
-
-            // training target in ratio to size
-            dispEnergy = log10( i_showerpars.MCe0 ) / log10( i_tpars[i]->size );
+            dispEnergy = i_showerpars.MCe0;
             dispCore   = Rcore;
 
             if( fMapOfTrainingTree.find( fTelType[i] ) != fMapOfTrainingTree.end() )
@@ -836,7 +852,7 @@ int main( int argc, char* argv[] )
         cout << "./trainTMVAforAngularReconstruction <list of input eventdisplay files (MC)> <output directory>" << endl;
         cout << "                                     <train vs test fraction> <RecID> <telescope type>" << endl;
         cout << "                                     [train for angular / energy / core reconstruction]" << endl;
-        cout << "                                     [quality cuts] [directory with training trees]" << endl;
+        cout << "                                     [quality cuts] [MVA options] [weight expression] [directory with training trees]" << endl;
         cout << endl;
         cout << endl;
 
@@ -856,23 +872,33 @@ int main( int argc, char* argv[] )
     unsigned int iRecID      = atoi( argv[4] );
     ULong64_t    iTelType    = atoi( argv[5] ) ;
     string       iTargetML  = "BDTDisp";
-    // TMVA options (hardwired)
-    string iTMVAOptions = "VarTransform=N:NTrees=200:BoostType=AdaBoost:MaxDepth=8";
-    string       iDataDirectory = "";
-    // quality cut likely overwritten from command line
-    string       iQualityCut = "size>1.&&ntubes>log10(4.)&&width>0.&&width<2.&&length>0.&&length<10.";
-    iQualityCut = iQualityCut + "&&tgrad_x<100.*100.&&loss<0.20&&cross<20.0&&Rcore<2000.";
     if( argc >=  7 )
     {
         iTargetML = argv[6];
     }
+    // quality cut likely overwritten from command line
+    string       iQualityCut = "size>1.&&ntubes>log10(4.)&&width>0.&&width<2.&&length>0.&&length<10.";
+    iQualityCut = iQualityCut + "&&tgrad_x<100.*100.&&loss<0.20&&cross<20.0&&Rcore<2000.";
     if( argc >=  8 )
     {
         iQualityCut = argv[7];
     }
+    // TMVA options (default options derived from hyperparameter optimisation on CTAO prod3 simulations)
+    string iTMVAOptions = "NTrees=100:BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:GradBaggingFraction=0.5:nCuts=20:MaxDepth=10:";
+    iTMVAOptions += "PruneMethod=ExpectedError:RegressionLossFunctionBDTG=Huber:MinNodeSize=0.02:VarTransform=N";
     if( argc >= 9 )
     {
-        iDataDirectory = argv[8];
+        iTMVAOptions = argv[8];
+    }
+    string iWeightExpression = "";
+    if( argc >= 10 )
+    {
+        iWeightExpression = argv[9];
+    }
+    string       iDataDirectory = "";
+    if( argc >= 11 )
+    {
+        iDataDirectory = argv[10];
     }
     bool redo_stereo_reconstruction = false;
 
@@ -964,7 +990,8 @@ int main( int argc, char* argv[] )
         trainTMVA( fOutputDir, fTrainTest,
                    fMapOfTrainingTree_iter->first,
                    fMapOfTrainingTree_iter->second,
-                   iTargetML, iTMVAOptions, iQualityCut );
+                   iTargetML, iTMVAOptions, iQualityCut,
+                   iWeightExpression );
     }
 
     //////////////////////

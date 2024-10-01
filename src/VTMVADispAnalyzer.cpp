@@ -104,28 +104,7 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
             bZombie = true;
             return;
         }
-        bool iSingleTelescopeAnalysis = true;
-        // try to detect if this is a single telescope analysis
-        string iLine;
-        if( i_temp_TMVAFILE.is_open() )
-        {
-            while( getline( i_temp_TMVAFILE, iLine ) )
-            {
-                if( iLine.find( "cross" ) != string::npos )
-                {
-                    iSingleTelescopeAnalysis = false;
-                    break;
-                }
-            }
-        }
-        if( iSingleTelescopeAnalysis )
-        {
-            cout << "\t single-telescope disp analysis" << endl;
-        }
-        else
-        {
-            cout << "\t multi-telescope disp analysis" << endl;
-        }
+        cout << "\t multi-telescope disp analysis" << endl;
 
         fTMVAReader[fTelescopeTypeList[i]] = new TMVA::Reader( "!Color:!Silent" );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "width", &fWidth );
@@ -134,16 +113,12 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "size", &fSize );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "ntubes", &fNtubes );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "tgrad_x*tgrad_x", &fTGrad );
-        // cross variable should be on this spot
-        if(!iSingleTelescopeAnalysis )
-        {
-            fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "cross", &fcross );
-        }
+        fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "cross", &fcross );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "asym", &fAsymm );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "loss", &fLoss );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "dist", &fDist );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "fui", &fFui );
-        if( fDispType == "BDTDispEnergy" && !iSingleTelescopeAnalysis )
+        if( fDispType == "BDTDispEnergy" )
         {
             fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "EHeight", &fEHeight );
             fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "Rcore", &fRcore );

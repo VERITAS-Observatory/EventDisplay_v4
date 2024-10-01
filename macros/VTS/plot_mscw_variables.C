@@ -7,6 +7,9 @@
  * print RMS or containment radii to screen
  *
  */
+
+#include <string>
+
 void print_statistics_output( TH1F* h, string print_out )
 {
     if(!h || print_out.size() == 0 )
@@ -21,11 +24,19 @@ void print_statistics_output( TH1F* h, string print_out )
     }
     else if( print_out == "68p" )
     {
-        int nQuantiles = 1;
-        double value[1];
-        double prob[1] = {0.68};
+        int nQuantiles = 2;
+        double value[2];
+        double prob[2] = {0.68, 0.95};
         h->GetQuantiles( nQuantiles, value, prob );
-        cout << "\t 68% value: " << value[0];
+        cout << "\t 68% (95%) value: " << value[0] << "( " << value[1] << ", ";
+        cout << h->GetEntries() << " entries)";
+        cout << endl;
+    }
+    else if( print_out == "VALUE" )
+    {
+        cout << "\t Value at 10 (30) TeV: ";
+        cout << h->GetBinContent( h->FindBin( log10( 10 ) ) );
+        cout << " (" << h->GetBinContent( h->FindBin( log10( 30. ) ) ) << ") ";
         cout << " (" << h->GetEntries() << " entries)";
         cout << endl;
     }
@@ -38,7 +49,7 @@ void print_statistics_output( TH1F* h, string print_out )
  * - (anything else): plot large number of variables
  * - string includes 'geo': use intersection method for angular reconstruction
 */
-void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW2 = 1., string iAddCut = "ErecS>0.", string plot_type = "short_mc", string i_print_file = "" )
+void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW2 = 1., string iAddCut1 = "ErecS>0.", string iAddCut2 = "ErecS>0.", string plot_type = "short_mc", string i_print_file = "" )
 {
     TFile* f1 = new TFile( iFile1.c_str() );
     if( f1->IsZombie() )
@@ -133,14 +144,14 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
         V.push_back( "log10(MCe0)" );
         Vmin.push_back(-2. );
         Vmax.push_back( log10( 300. ) );
-        Vprintout.push_back( "" );
+        Vprintout.push_back( "VALUE" );
     }
     else
     {
         V.push_back( "log10(ErecS)" );
         Vmin.push_back(-2. );
         Vmax.push_back( log10( 300. ) );
-        Vprintout.push_back( "" );
+        Vprintout.push_back( "VALUE" );
     }
     if( plot_type.find( "short_mc" ) != string::npos )
     {
@@ -171,7 +182,7 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
     Vmax.push_back( 1.5 );
 
 
-    TCanvas* c = new TCanvas( "c", "mscw variables", 0, 100, 1600, 1100 );
+    TCanvas* c = new TCanvas( "c", "mscw variables", 0, 200, 1200, 800 );
     if( is_MC )
     {
         c->Divide( 3, 2 );
@@ -192,7 +203,7 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
         }
 
         char Vcut[400];
-        sprintf( Vcut, "MSCW>-2.&&MSCW<3.&&dES>0.&&%s>%f&&%s<%f&&%s", V[i].c_str(), Vmin[i], V[i].c_str(), Vmax[i], iAddCut.c_str() );
+        sprintf( Vcut, "MSCW>-2.&&MSCW<3.&&%s>%f&&%s<%f&&%s", V[i].c_str(), Vmin[i], V[i].c_str(), Vmax[i], iAddCut1.c_str() );
         cout << "Canvas " << i + 1 << ", variable " << V[i] << " cut: " << Vcut << endl;
 
         f1->cd();
@@ -202,6 +213,15 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
 
         if( T2 )
         {
+            if( i >= 0 && plot_type.find("table") == string::npos )
+            {
+                size_t pos = V[i].find("ErecS");
+                if (pos != std::string::npos) {
+                    V[i].replace(pos, 5, "Erec" );
+                }
+            }
+            sprintf( Vcut, "MSCW>-2.&&MSCW<3.&&%s>%f&&%s<%f&&%s", V[i].c_str(), Vmin[i], V[i].c_str(), Vmax[i], iAddCut2.c_str() );
+
             TList* primitives = gPad->GetListOfPrimitives();
             f2->cd();
             T2->Draw( V[i].c_str(), Vcut, "sames" );
