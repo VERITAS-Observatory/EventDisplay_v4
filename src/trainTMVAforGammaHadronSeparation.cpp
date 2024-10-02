@@ -82,6 +82,7 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
     Float_t EmissionHeightChi2 = 0.;
     Double_t SizeSecondMax = 0.;
     Double_t DispDiff = 0.;
+    Double_t DispAbsSumWeigth = 0.;
     Double_t MCe0 = 0.;
     iDataTree_reduced = new TTree( iDataTree_reducedName.c_str(), iDataTree_reducedName.c_str() );
     iDataTree_reduced->Branch( "Ze", &Ze, "Ze/D" );
@@ -101,6 +102,7 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
     iDataTree_reduced->Branch( "EmissionHeightChi2", &EmissionHeightChi2, "EmissionHeightChi2/F" );
     iDataTree_reduced->Branch( "SizeSecondMax", &SizeSecondMax, "SizeSecondMax/D" );
     iDataTree_reduced->Branch( "DispDiff", &DispDiff, "DispDiff/D" );
+    iDataTree_reduced->Branch( "DispAbsSumWeigth", &DispAbsSumWeigth, "DispAbsSumWeigth/F" );
     iDataTree_reduced->Branch( "MCe0", &MCe0, "MCe0/D" );
 
     Long64_t n = 0;
@@ -126,6 +128,7 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
             iTreeVector[i]->SetBranchAddress( "EmissionHeightChi2", &EmissionHeightChi2 );
             iTreeVector[i]->SetBranchAddress( "SizeSecondMax", &SizeSecondMax );
             iTreeVector[i]->SetBranchAddress( "DispDiff", &DispDiff );
+            iTreeVector[i]->SetBranchAddress( "DispAbsSumWeigth", &DispAbsSumWeigth);
             if( iTreeVector[i]->GetBranchStatus( "MCe0" ) )
             {
                 iTreeVector[i]->SetBranchAddress( "MCe0", &MCe0 );
