@@ -742,6 +742,15 @@ bool VTMVAEvaluator::evaluate(bool interpolate_mva)
         return false;
     }
 
+    // find correct bin (e.g. depending on energy or zenith)
+    unsigned int iDataBin = getDataBin();
+    if( fDebug )
+    {
+        cout << "VTMVAEvaluator::evaluate: data bin " << iDataBin;
+        cout << ", MVA Method Tag " << fTMVAData[iDataBin]->fTMVAMethodTag;
+        cout << ", MVA Cut value " << fTMVAData[iDataBin]->fTMVACutValue;
+        cout << endl;
+    }
     fTMVA_EvaluationResult = -99.;
     if( bool interpolate_mva )
     {
@@ -749,15 +758,6 @@ bool VTMVAEvaluator::evaluate(bool interpolate_mva)
     }
     else
     {
-        // find correct bin (e.g. depending on energy or zenith)
-        unsigned int iDataBin = getDataBin();
-        if( fDebug )
-        {
-            cout << "VTMVAEvaluator::evaluate: data bin " << iDataBin;
-            cout << ", MVA Method Tag " << fTMVAData[iDataBin]->fTMVAMethodTag;
-            cout << ", MVA Cut value " << fTMVAData[iDataBin]->fTMVACutValue;
-            cout << endl;
-        }
         fTMVA_EvaluationResult = fTMVAData[iDataBin]->fTMVAReader->EvaluateMVA( fTMVAData[iDataBin]->fTMVAMethodTag_2 );
     }
 
