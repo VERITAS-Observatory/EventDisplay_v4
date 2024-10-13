@@ -761,7 +761,7 @@ bool VTMVAEvaluator::evaluate(bool interpolate_mva)
         fTMVA_EvaluationResult = fTMVAData[iDataBin]->fTMVAReader->EvaluateMVA( fTMVAData[iDataBin]->fTMVAMethodTag_2 );
     }
 
-    // apply MVA cut
+    // apply MVA cut (cut value not interpolated in zenith)
     if( fTMVA_EvaluationResult < fTMVAData[iDataBin]->fTMVACutValue )
     {
         return false;
