@@ -677,7 +677,7 @@ bool VTMVAEvaluator::getValuesFromEfficiencyHistograms( unsigned int b )
     evaluate this event using the MVA and return passed/not passed
 
 */
-bool VTMVAEvaluator::evaluate()
+bool VTMVAEvaluator::evaluate(bool interpolate_mva)
 {
     if( fDebug )
     {
@@ -744,44 +744,60 @@ bool VTMVAEvaluator::evaluate()
 
     // find correct bin (e.g. depending on energy or zenith)
     unsigned int iDataBin = getDataBin();
-
-    fTMVA_EvaluationResult = -99.;
-
-    if( iDataBin < fTMVAData.size() )
+    if( fDebug )
     {
-        if( fDebug )
-        {
-            cout << "VTMVAEvaluator::evaluate: data bin " << iDataBin;
-            cout << ", MVA Method Tag " << fTMVAData[iDataBin]->fTMVAMethodTag;
-            cout << ", MVA Cut value " << fTMVAData[iDataBin]->fTMVACutValue;
-            cout << endl;
-        }
-
-        // evaluate MVA for this event
-        fTMVA_EvaluationResult = fTMVAData[iDataBin]->fTMVAReader->EvaluateMVA( fTMVAData[iDataBin]->fTMVAMethodTag_2 );
-
-        // apply MVA cut
-        bool i_useTMVAGraph = false;
-        // interpolate cuts
-        if( i_useTMVAGraph )
-        {
-            // TMPTMPTMP to be implemented
-            cout << "NOT IMPLEMENTED" << endl;
-        }
-        // no interpolation applied
-        else
-        {
-            if( fTMVA_EvaluationResult < fTMVAData[iDataBin]->fTMVACutValue )
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
+        cout << "VTMVAEvaluator::evaluate: data bin " << iDataBin;
+        cout << ", MVA Method Tag " << fTMVAData[iDataBin]->fTMVAMethodTag;
+        cout << ", MVA Cut value " << fTMVAData[iDataBin]->fTMVACutValue;
+        cout << endl;
     }
-    return false;
+    fTMVA_EvaluationResult = -99.;
+    if( interpolate_mva )
+    {
+        fTMVA_EvaluationResult = interpolate_mva_evaluation();
+    }
+    else
+    {
+        fTMVA_EvaluationResult = fTMVAData[iDataBin]->fTMVAReader->EvaluateMVA( fTMVAData[iDataBin]->fTMVAMethodTag_2 );
+    }
+
+    // apply MVA cut (cut value not interpolated in zenith)
+    if( fTMVA_EvaluationResult < fTMVAData[iDataBin]->fTMVACutValue )
+    {
+        return false;
+    }
+    return true;
+}
+
+
+/*
+ * Interpolate between MVA responses in zenith angle
+ * (training in energy axis is on overlapping energy bins)
+ *
+*/
+double VTMVAEvaluator::interpolate_mva_evaluation()
+{
+    if(!fData || fData->ErecS <= 0 )
+    {
+        return 9999.;
+    }
+    set<unsigned int> data_bins;
+    for( unsigned int i = 0; i < fTMVAData.size(); i++ )
+    {
+        data_bins.insert(getDataBin(log10( fData->ErecS ), 0.5*(fTMVAData[i]->fZenithCut_max+fTMVAData[i]->fZenithCut_min) ));
+    }
+    TGraph iG((int)data_bins.size());
+    unsigned int i = 0;
+    for (set<unsigned int>::iterator it = data_bins.begin(); it != data_bins.end(); ++it)
+    {
+        iG.SetPoint(
+                i,
+                0.5*(fTMVAData[*it]->fZenithCut_max+fTMVAData[*it]->fZenithCut_min),
+                fTMVAData[*it]->fTMVAReader->EvaluateMVA( fTMVAData[*it]->fTMVAMethodTag_2 )
+        );
+        i++;
+    }
+    return iG.Eval(fData->Ze, 0); // linear interpolation
 }
 
 

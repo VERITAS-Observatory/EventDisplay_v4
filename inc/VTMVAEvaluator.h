@@ -14,6 +14,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -24,6 +25,7 @@
 #include "TGraph2D.h"
 #include "TGraphAsymmErrors.h"
 #include "TGraphSmooth.h"
+#include "TH2D.h"
 #include "TLine.h"
 #include "TMath.h"
 #include "TMVA/Config.h"
@@ -162,6 +164,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
                 TGraph* iGSignal_to_sqrtNoise, TGraph* iGSignal_to_sqrtNoise_Smooth,
                 TH1F* hEffS, TH1F* hEffB,
                 TGraph* iGSignalEvents, TGraph* iGBackgroundEvents );
+        double           interpolate_mva_evaluation();
         TGraph*          readNonNoffGraphsFromFile( TFile* iF, double i_ze_min, double i_ze_max, bool bIsOn = true );
         void             reset();
         void             smoothAndInterPolateMVAValue( TH1F*, TH1F*,
@@ -175,7 +178,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         VTMVAEvaluator();
         ~VTMVAEvaluator() {};
 
-        bool    evaluate();
+        bool    evaluate(bool interpolate_mva=true);
         vector< double > getBackgroundEfficiency();
         vector< bool >   getOptimumCutValueFound();
         vector< double > getSignalEfficiency();
@@ -248,7 +251,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         }
         void   setTMVAMethod( string iMethodName = "BDT" );
 
-        ClassDef( VTMVAEvaluator, 33 );
+        ClassDef( VTMVAEvaluator, 34 );
 };
 
 #endif
