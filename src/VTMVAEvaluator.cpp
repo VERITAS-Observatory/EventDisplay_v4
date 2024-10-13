@@ -752,7 +752,7 @@ bool VTMVAEvaluator::evaluate(bool interpolate_mva)
         cout << endl;
     }
     fTMVA_EvaluationResult = -99.;
-    if( bool interpolate_mva )
+    if( interpolate_mva )
     {
         fTMVA_EvaluationResult = interpolate_mva_evaluation();
     }
