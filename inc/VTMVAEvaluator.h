@@ -141,6 +141,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         float    fImages_Ttype[VDST_MAXTELESCOPES];
         float    fDispDiff;
         float    fDispDiff_log10;
+        float    fDispAbsSumWeigth;
         float    fDummy;
 
         bool     bPlotEfficiencyPlotsPerBin;
@@ -178,7 +179,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         VTMVAEvaluator();
         ~VTMVAEvaluator() {};
 
-        bool    evaluate(bool interpolate_mva=true);
+        bool    evaluate( bool interpolate_mva = true );
         vector< double > getBackgroundEfficiency();
         vector< bool >   getOptimumCutValueFound();
         vector< double > getSignalEfficiency();
@@ -251,7 +252,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         }
         void   setTMVAMethod( string iMethodName = "BDT" );
 
-        ClassDef( VTMVAEvaluator, 34 );
+        ClassDef( VTMVAEvaluator, 35 );
 };
 
 #endif
