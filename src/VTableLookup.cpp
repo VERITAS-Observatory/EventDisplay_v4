@@ -305,7 +305,7 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
             // try to see of file exists in directory ./tables
             ostringstream itablefile_full_path;
             itablefile_full_path << itablefile << "/Tables/" << itablefile;
-            fLookupTableFile = new TFile( itablefile.str().c_str() );
+            fLookupTableFile = new TFile( itablefile.c_str().c_str() );
             if( fLookupTableFile->IsZombie() )
             {
                 cout << "VTableLookup::setMCTableFiles error (reading): unable to open table file: " << itablefile << endl;
