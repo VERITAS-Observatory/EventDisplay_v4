@@ -303,24 +303,24 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
         if( data_dir )
         {
             // try to see of file exists in directory ./tables
-            ostringstream itablefile_full_path;
             itablefile_full_path << itablefile << "/Tables/" << itablefile;
-            fLookupTableFile = new TFile( itablefile_full_path.str().c_str() );
+            itablefile = itablefile_full_path.str();
+            fLookupTableFile = new TFile( itablefile.c_str() );
             if( fLookupTableFile->IsZombie() )
             {
-                cout << "VTableLookup::setMCTableFiles error (reading): unable to open table file: " << itablefile_full_path.str() << endl;
+                cout << "VTableLookup::setMCTableFiles error (reading): unable to open table file: " << itablefile << endl;
                 exit( EXIT_FAILURE );
             }
         }
         else
         {
-            cout << "VTableLookup::setMCTableFiles error (reading): unable to open table file: " << itablefile_full_path.str() << endl;
+            cout << "VTableLookup::setMCTableFiles error (reading): unable to open table file: " << itablefile << endl;
             cout << " (no $VERITAS_EVNDISP_AUX_DIR defined)" << endl;
             exit( EXIT_FAILURE );
         }
     }
     gErrorIgnoreLevel = 0;
-    cout << "reading table file ( may take a while ): " << itablefile_full_path.str() << endl;
+    cout << "reading table file ( may take a while ): " << itablefile << endl;
 
     vector< VTableCalculator* > i_mscw;
     vector< VTableCalculator* > i_mscl;
