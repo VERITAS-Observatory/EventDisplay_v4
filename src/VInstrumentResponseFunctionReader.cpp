@@ -797,9 +797,9 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
                                 {
                                     if( iSum / iTot > 0. )
                                     {
-                                        gEffArea_Recp80->SetPoint( z, i_x, i_y * 0.8 / iSum* iTot );
-                                        gEffArea_Recp80->SetPointEYhigh( z, gEffArea_Rec->GetErrorYhigh( p )  * 0.8 / iSum* iTot );
-                                        gEffArea_Recp80->SetPointEYlow( z, gEffArea_Rec->GetErrorYlow( p )  * 0.8 / iSum* iTot );
+                                        gEffArea_Recp80->SetPoint( z, i_x, i_y * 0.8 / iSum * iTot );
+                                        gEffArea_Recp80->SetPointEYhigh( z, gEffArea_Rec->GetErrorYhigh( p )  * 0.8 / iSum * iTot );
+                                        gEffArea_Recp80->SetPointEYlow( z, gEffArea_Rec->GetErrorYlow( p )  * 0.8 / iSum * iTot );
                                         z++;
                                     }
                                     break;
@@ -1235,7 +1235,7 @@ bool VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms( TH1F* hEff
             g->GetPoint( i, x, y );
             if( y > 0. )
             {
-                hEffRec->SetBinContent( hEffRec->FindBin( x ), y*   i_EffAreaScaleFactor );
+                hEffRec->SetBinContent( hEffRec->FindBin( x ), y *   i_EffAreaScaleFactor );
                 hEffRec->SetBinError( hEffRec->FindBin( x ), 0.5 * ( g->GetErrorYlow( i ) + g->GetErrorYhigh( i ) ) );
             }
         }

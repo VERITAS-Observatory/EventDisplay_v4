@@ -370,10 +370,10 @@ void VImageParameter::reset( unsigned int resetLevel )
     if( fWriteNImagePixels )
     {
         PixelListN = 0;
-        memset( PixelID, 0, VDST_MAXCHANNELS* sizeof( unsigned int ) );
-        memset( PixelType, 0, VDST_MAXCHANNELS* sizeof( unsigned int ) );
-        memset( PixelIntensity, 0, VDST_MAXCHANNELS* sizeof( float ) );
-        memset( PixelTimingT0, 0, VDST_MAXCHANNELS* sizeof( float ) );
+        memset( PixelID, 0, VDST_MAXCHANNELS * sizeof( unsigned int ) );
+        memset( PixelType, 0, VDST_MAXCHANNELS * sizeof( unsigned int ) );
+        memset( PixelIntensity, 0, VDST_MAXCHANNELS * sizeof( float ) );
+        memset( PixelTimingT0, 0, VDST_MAXCHANNELS * sizeof( float ) );
     }
 }
 

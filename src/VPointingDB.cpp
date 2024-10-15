@@ -384,8 +384,8 @@ bool VPointingDB::getDBTextRunInfo( string iDBTextDirectory )
     fDBSourceName = a.getValue_from_key( "source_id" );
     float dist = atof( a.getValue_from_key( "offset_distance" ).c_str() );
     float angl = atof( a.getValue_from_key( "offset_angle" ).c_str() );
-    fDBWobbleNorth = dist * cos( angl* TMath::DegToRad() );
-    fDBWobbleEast = dist * sin( angl* TMath::DegToRad() );
+    fDBWobbleNorth = dist * cos( angl * TMath::DegToRad() );
+    fDBWobbleEast = dist * sin( angl * TMath::DegToRad() );
     VSQLTextFileReader t( iDBTextDirectory, fRunNumber, "target" );
     if(!t.isGood() )
     {
@@ -441,8 +441,8 @@ bool VPointingDB::getDBRunInfo()
 
         float dist = atof( db_row->GetField( 17 ) );
         float angl = atof( db_row->GetField( 18 ) );
-        fDBWobbleNorth = dist * cos( angl* TMath::DegToRad() );
-        fDBWobbleEast = dist * sin( angl* TMath::DegToRad() );
+        fDBWobbleNorth = dist * cos( angl * TMath::DegToRad() );
+        fDBWobbleEast = dist * sin( angl * TMath::DegToRad() );
     }
     else
     {
@@ -588,9 +588,9 @@ bool VPointingDB::readPointingCalibratedVPMFromDB()
         fDBTelAzimuthRaw.push_back( 0. );
         iRA = atof( db_row->GetField( 1 ) );
         iDec = atof( db_row->GetField( 2 ) );
-        fDBTelRA.push_back( iRA* degrad );
-        fDBTelDec.push_back( iDec* degrad );
-        getHorizonCoordinates( fDBMJD.back(), fDBTime.back(), iDec* degrad, iRA* degrad, az, ze );
+        fDBTelRA.push_back( iRA * degrad );
+        fDBTelDec.push_back( iDec * degrad );
+        getHorizonCoordinates( fDBMJD.back(), fDBTime.back(), iDec * degrad, iRA * degrad, az, ze );
         fDBTelElevation.push_back( 90. - ze );
         fDBTelAzimuth.push_back( az );
         fDBTelExpectedElevation.push_back( 0. );
@@ -720,8 +720,8 @@ bool VPointingDB::readPointingUncalibratedVPMFromDB()
 
     for( uint32_t i = 0; i < VPMcalibratedPointing.size(); i++ )
     {
-        decoff = fabs(( 3600. * VPMcalibratedPointing[0].dec* degrad ) - ( 3600. * ( fDBTargetDec + fDBWobbleNorth ) ) );
-        raoff = fabs(( 3600. * VPMcalibratedPointing[0].ra* degrad ) - ( 3600. * ( fDBTargetRA + fDBWobbleEast ) ) );
+        decoff = fabs(( 3600. * VPMcalibratedPointing[0].dec * degrad ) - ( 3600. * ( fDBTargetDec + fDBWobbleNorth ) ) );
+        raoff = fabs(( 3600. * VPMcalibratedPointing[0].ra * degrad ) - ( 3600. * ( fDBTargetRA + fDBWobbleEast ) ) );
         if( decoff > vpmlimit || raoff > vpmlimit )
         {
             cout << "VPointingDB::readPointingMonitorFromDB warning: For part of this run the pointing monitor data is off by more than ";
@@ -792,7 +792,7 @@ bool VPointingDB::readPointingUncalibratedVPMFromDB()
 
         iDec = VPMcalibratedPointing[i].dec;
         iRA = VPMcalibratedPointing[i].ra;
-        getHorizonCoordinates( fDBMJD.back(), fDBTime.back(), iDec* degrad, iRA* degrad, az, ze );
+        getHorizonCoordinates( fDBMJD.back(), fDBTime.back(), iDec * degrad, iRA * degrad, az, ze );
         fDBTelElevation.push_back( 90. - ze );
         fDBTelAzimuth.push_back( az );
         fDBTelExpectedElevation.push_back( 0. );

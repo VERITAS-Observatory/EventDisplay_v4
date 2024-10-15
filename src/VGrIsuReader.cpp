@@ -584,7 +584,7 @@ void VGrIsuReader::readPedsfromPlines()
                                 {
                                     fhPeds[i_telID][i_channel]->Fill( mean );
                                 }
-                                i_valMean2.push_back( mean* mean );
+                                i_valMean2.push_back( mean * mean );
                             }
                         }
                         i_valMean_Size = i_valMean.size();
@@ -830,7 +830,7 @@ bool VGrIsuReader::getNextShowerEvent()
             // (GM 20090728)	 fMC_Az = atan2( fMC_Xcos, fMC_Ycos ) + 180./degrad;
             fMC_Az = atan2( fMC_Xcos, fMC_Ycos );
 
-            fMC_Ze = 1. - ( fMC_Xcos* fMC_Xcos + fMC_Ycos* fMC_Ycos );
+            fMC_Ze = 1. - ( fMC_Xcos * fMC_Xcos + fMC_Ycos * fMC_Ycos );
             if( fMC_Ze < 0. )
             {
                 fMC_Ze = 0.;
@@ -845,7 +845,7 @@ bool VGrIsuReader::getNextShowerEvent()
             // add wobble offset
             double az = 0.;
             double ze = 0.;
-            VSkyCoordinatesUtilities::getRotatedShowerDirection( fMC_Ze* degrad, fMC_Az* degrad, fMC_Yoffset, -1.*fMC_Xoffset, ze, az );
+            VSkyCoordinatesUtilities::getRotatedShowerDirection( fMC_Ze * degrad, fMC_Az * degrad, fMC_Yoffset, -1.*fMC_Xoffset, ze, az );
             fMC_Ze = ze / degrad;
             fMC_Az = VSkyCoordinatesUtilities::adjustAzimuthToRange( az ) / degrad;
             resetEvent();

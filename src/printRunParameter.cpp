@@ -125,11 +125,11 @@ bool readWobbleOffset( TFile* fIn, bool printInteger )
         cout << "Wobble offset: ";
         if( printInteger )
         {
-            cout << TMath::Nint( sqrt( fPar->fWobbleNorth* fPar->fWobbleNorth + fPar->fWobbleEast* fPar->fWobbleEast ) * 100. );
+            cout << TMath::Nint( sqrt( fPar->fWobbleNorth * fPar->fWobbleNorth + fPar->fWobbleEast * fPar->fWobbleEast ) * 100. );
         }
         else
         {
-            cout << sqrt( fPar->fWobbleNorth* fPar->fWobbleNorth + fPar->fWobbleEast* fPar->fWobbleEast );
+            cout << sqrt( fPar->fWobbleNorth * fPar->fWobbleNorth + fPar->fWobbleEast * fPar->fWobbleEast );
         }
         cout << endl;
         return true;

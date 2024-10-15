@@ -148,7 +148,7 @@ double VMathsandFunctions::getRatioError( double x1, double x2, double ex1, doub
 {
     if( x2 != 0. )
     {
-        return TMath::Sqrt( 1. / x2 / x2* ex1* ex1 + x1* x1 / x2 / x2 / x2 / x2* ex2* ex2 );
+        return TMath::Sqrt( 1. / x2 / x2 * ex1 * ex1 + x1 * x1 / x2 / x2 / x2 / x2 * ex2 * ex2 );
     }
 
     return 0.;

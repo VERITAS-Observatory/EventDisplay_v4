@@ -72,7 +72,7 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
         // both elevation and azimuth but I expect them to be small.
 
         // zero at zenith
-        el = el - ( flex_el_A* cos( el ) + flex_el_B* sin( 2 * el ) );
+        el = el - ( flex_el_A * cos( el ) + flex_el_B * sin( 2 * el ) );
 
         // Transform to Cartesians for next corrections
         double ud = sin( el );
@@ -97,7 +97,7 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
         // Initial guess: just do the transformations in
         // reverse.. should get us close to the correct point.
         az = atan2( ew, ns );
-        el = atan2( ud, sqrt( ns* ns + ew* ew ) );
+        el = atan2( ud, sqrt( ns * ns + ew * ew ) );
 
         ud = 0.0;
         ns = cos(-fp_az );
@@ -111,7 +111,7 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
         // give the real az and el if they were uncorrected using the
         // undoCorrections routines below
         double xaz = atan2( ew, ns );
-        double xel = atan2( ud, sqrt( ew* ew + ns* ns ) );
+        double xel = atan2( ud, sqrt( ew * ew + ns * ns ) );
 
         SphericalCoords here = SphericalCoords::makeLatLongRad( el, az );
         SphericalCoords there;
@@ -128,7 +128,7 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
             Angle::rotateCartesians( xaz, ns, ew );
             // ------------------------------------------------------------------
 
-            there = SphericalCoords::makeLatLongRad( atan2( ud, sqrt( ew* ew + ns* ns ) ),
+            there = SphericalCoords::makeLatLongRad( atan2( ud, sqrt( ew * ew + ns * ns ) ),
                     atan2( ew, ns ) );
 
 #if 0
@@ -286,7 +286,7 @@ undoAzElCorrections( double& az_driveangle, double& el_driveangle,
         // 2: Remove gear ratio scaling
         // ----------------------------------------------------------------------
 
-        az = fmod( az* az_ratio + Angle::sc_twoPi, Angle::sc_twoPi );
+        az = fmod( az * az_ratio + Angle::sc_twoPi, Angle::sc_twoPi );
         el = el * el_ratio;
 
         // ----------------------------------------------------------------------
@@ -316,7 +316,7 @@ undoAzElCorrections( double& az_driveangle, double& el_driveangle,
 
         // Back to Spherical coordinates
         az = atan2( ew, ns );
-        el = atan2( ud, sqrt( ew* ew + ns* ns ) );
+        el = atan2( ud, sqrt( ew * ew + ns * ns ) );
 
         // ----------------------------------------------------------------------
         // 6: Compensate for flexure in the mount
@@ -334,7 +334,7 @@ undoAzElCorrections( double& az_driveangle, double& el_driveangle,
         do
         {
             last_el = el;
-            el = real_el + ( flex_el_A* cos( el ) + flex_el_B* sin( 2 * el ) );
+            el = real_el + ( flex_el_A * cos( el ) + flex_el_B * sin( 2 * el ) );
             i++;
         }
         while(( fabs( last_el - el ) > sc_inversion_tol ) &&

@@ -142,7 +142,7 @@ void VCamera::setUpCamera()
         fgraphTubes.back()->SetUniqueID( 200000 + i );
         fgraphTubes.back()->SetLineColor( 15 );
         // PMT values
-        fgraphTubesEntry.push_back( new TEllipse( x, y, rx* fmaxRad * 0.5, ry* fmaxRad * 0.5 ) );
+        fgraphTubesEntry.push_back( new TEllipse( x, y, rx * fmaxRad * 0.5, ry * fmaxRad * 0.5 ) );
         fgraphTubesEntry.back()->SetLineColor( 10 );
         fgraphTubesEntry.back()->SetFillColor( 10 );
         fgraphTubesEntry.back()->SetFillStyle( 0 );
@@ -1224,8 +1224,8 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
 
             color = int( 0.01 + ( w1 - wlmin ) * scale );
             theColor = int(( color + 0.99 ) * float( fncolors ) / float( fndivz ) );
-            fgraphTubesEntry[i]->SetR1( fgraphTubes[i]->GetR1() * fmaxRad* scaler );
-            fgraphTubesEntry[i]->SetR2( fgraphTubes[i]->GetR2() * fmaxRad* scaler );
+            fgraphTubesEntry[i]->SetR1( fgraphTubes[i]->GetR1() * fmaxRad * scaler );
+            fgraphTubesEntry[i]->SetR2( fgraphTubes[i]->GetR2() * fmaxRad * scaler );
             fgraphTubesEntry[i]->SetLineColor( gStyle->GetColorPalette( theColor ) );
             fgraphTubesEntry[i]->SetFillColor( gStyle->GetColorPalette( theColor ) );
             fgraphTubesEntry[i]->SetFillStyle( 1001 );
@@ -1931,7 +1931,7 @@ double VCamera::convertX( double i_x, double i_off )
     {
         return 0.;
     }
-    return ( i_x / iDist_edge* fmaxPlot + i_off );
+    return ( i_x / iDist_edge * fmaxPlot + i_off );
 }
 
 
@@ -1946,7 +1946,7 @@ double VCamera::convertY( double i_y, double i_off )
     {
         return 0.;
     }
-    return ( i_y / iDist_edge* fmaxPlot + i_off );
+    return ( i_y / iDist_edge * fmaxPlot + i_off );
 }
 
 /*
@@ -1995,11 +1995,11 @@ void VCamera::drawStarsInFOV()
             double x = 0.;
             if( cos( iTel_dec * TMath::DegToRad() ) != 0. )
             {
-                x = -1. * ( iStar[i]->fRACurrentEpoch - iTel_ra ) * cos( iTel_dec* TMath::DegToRad() );
+                x = -1. * ( iStar[i]->fRACurrentEpoch - iTel_ra ) * cos( iTel_dec * TMath::DegToRad() );
             }
             fData->getArrayPointing()->derotateCoords( fData->getEventMJD(), fData->getEventTime(), x, y, x_rot, y_rot );
 
-            TMarker* iM = new TMarker( convertX(-1.*x_rot* iScale ), convertY( y_rot* iScale ), 5 );
+            TMarker* iM = new TMarker( convertX(-1.*x_rot * iScale ), convertY( y_rot * iScale ), 5 );
             iM->SetMarkerColor( 2 );
             iM->Draw();
             sprintf( hname, "BMAG %.1f", iStar[i]->fBrightness_B );

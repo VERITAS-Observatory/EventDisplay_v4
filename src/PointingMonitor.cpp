@@ -336,8 +336,8 @@ vector<pointingmonitor::CalibratedPointing> PointingMonitor::calibratedPointing(
         sin0 = sin( pointing.dec );
         dect = cos0 - dy * sin0;
         rat = pointing.ra + atan2( dx, dect );
-        dect = sqrt( dx* dx + dect* dect );
-        dect = atan2( dy* cos0 + sin0, dect );
+        dect = sqrt( dx * dx + dect * dect );
+        dect = atan2( dy * cos0 + sin0, dect );
 
         // rotation angle calculation is not yet implemented
         // float rot = pointing.rotation - camParameters.skyCameraRotation;

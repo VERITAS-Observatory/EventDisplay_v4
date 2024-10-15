@@ -195,7 +195,7 @@ void VPlotMonteCarloQualityFactor::fillEnergyDependence( int iMaxNevents, double
     for( int i = 0; i < iNbin; i++ )
     {
         resetHistograms();
-        setEnergyRange( iEmin + i* iEbin, iEmin + ( i + 1 )*iEbin );
+        setEnergyRange( iEmin + i * iEbin, iEmin + ( i + 1 )*iEbin );
         cout << endl;
         cout << "==========================================================================" << endl;
         cout << "Energybin: " << i << "\t" << iEmin + i* iEbin << "\t" << iEmin + ( i + 1 )*iEbin << endl;
@@ -204,11 +204,11 @@ void VPlotMonteCarloQualityFactor::fillEnergyDependence( int iMaxNevents, double
         // get maximum values from q-factor histograms
         for( iData = fData.begin(); iData != fData.end(); iData++ )
         {
-            (*iData ).second->gQFactor_LowerCutE->SetPoint( i, iEmin + i* iEbin + 0.5 * iEbin, (*iData ).second->hQFactors_LowerCut->GetBinCenter((*iData ).second->hQFactors_LowerCut->GetMaximumBin() ) );
-            (*iData ).second->gQFactor_UpperCutE->SetPoint( i, iEmin + i* iEbin + 0.5 * iEbin, (*iData ).second->hQFactors_UpperCut->GetBinCenter((*iData ).second->hQFactors_UpperCut->GetMaximumBin() ) );
+            (*iData ).second->gQFactor_LowerCutE->SetPoint( i, iEmin + i * iEbin + 0.5 * iEbin, (*iData ).second->hQFactors_LowerCut->GetBinCenter((*iData ).second->hQFactors_LowerCut->GetMaximumBin() ) );
+            (*iData ).second->gQFactor_UpperCutE->SetPoint( i, iEmin + i * iEbin + 0.5 * iEbin, (*iData ).second->hQFactors_UpperCut->GetBinCenter((*iData ).second->hQFactors_UpperCut->GetMaximumBin() ) );
 
-            (*iData ).second->gQFactorMax_LowerCutE->SetPoint( i, iEmin + i* iEbin + 0.5 * iEbin, (*iData ).second->hQFactors_LowerCut->GetMaximum() );
-            (*iData ).second->gQFactorMax_UpperCutE->SetPoint( i, iEmin + i* iEbin + 0.5 * iEbin, (*iData ).second->hQFactors_UpperCut->GetMaximum() );
+            (*iData ).second->gQFactorMax_LowerCutE->SetPoint( i, iEmin + i * iEbin + 0.5 * iEbin, (*iData ).second->hQFactors_LowerCut->GetMaximum() );
+            (*iData ).second->gQFactorMax_UpperCutE->SetPoint( i, iEmin + i * iEbin + 0.5 * iEbin, (*iData ).second->hQFactors_UpperCut->GetMaximum() );
         }
     }
     setEnergyRange();

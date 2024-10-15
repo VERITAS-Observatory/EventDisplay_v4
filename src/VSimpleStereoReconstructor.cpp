@@ -184,7 +184,7 @@ bool VSimpleStereoReconstructor::reconstruct_direction( unsigned int i_ntel,
             }
             else
             {
-                fmean_iangdiff += ( 180. - iangdiff* TMath::RadToDeg() );
+                fmean_iangdiff += ( 180. - iangdiff * TMath::RadToDeg() );
             }
             fmean_iangdiffN++;
 
@@ -379,7 +379,7 @@ bool VSimpleStereoReconstructor::reconstruct_core( unsigned int i_ntel,
             // image weight
             iweight = img_size[i];
             iweight *= ( 1. - img_width[i] / img_length[i] );
-            w.push_back( iweight* iweight );
+            w.push_back( iweight * iweight );
         }
     }
     // check minimum angle between image lines; ignore if too small
@@ -431,10 +431,10 @@ bool VSimpleStereoReconstructor::fillShowerDirection( float xoff, float yoff )
 
     double el = 0.;
     double az = 0.;
-    VAstronometry::vlaDtp2s(-1.* fShower_Xoffset* TMath::DegToRad(),
-                            fShower_Yoffset* TMath::DegToRad(),
-                            fTelAzimuth* TMath::DegToRad(),
-                            fTelElevation* TMath::DegToRad(),
+    VAstronometry::vlaDtp2s(-1.* fShower_Xoffset * TMath::DegToRad(),
+                            fShower_Yoffset * TMath::DegToRad(),
+                            fTelAzimuth * TMath::DegToRad(),
+                            fTelElevation * TMath::DegToRad(),
                             &az, &el );
     if( TMath::IsNaN( el ) )
     {

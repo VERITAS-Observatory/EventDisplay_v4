@@ -101,13 +101,13 @@ class VTimeMask : public TNamed
         }
         Bool_t      checkAgainstMask( Double_t eventUTC )
         {
-            return checkMaskNow( secs_day* eventUTC );
+            return checkMaskNow( secs_day * eventUTC );
         }
 
         // Count events passing gamma and direction cuts
         void        countOn( Double_t eventUTC )
         {
-            counted.at( Int_t( floor( secs_day* eventUTC - start_time ) ) )++;
+            counted.at( Int_t( floor( secs_day * eventUTC - start_time ) ) )++;
         }
 
 

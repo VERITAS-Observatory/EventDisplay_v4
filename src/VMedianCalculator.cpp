@@ -87,7 +87,7 @@ double VMedianCalculator::getRMS()
 {
     if( n_counter > 1 )
     {
-        return 1. / (( float( n_counter ) - 1. ) * ( mean_xx - mean_x* mean_x ) );
+        return 1. / (( float( n_counter ) - 1. ) * ( mean_xx - mean_x * mean_x ) );
     }
 
     return 0.;

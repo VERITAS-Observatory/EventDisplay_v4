@@ -52,7 +52,7 @@ void VSpectralWeight::calculateMCFluxConstant()
         return;
     }
     // solid angle
-    double iS = 2. * TMath::Pi() * ( 1. - cos( fMCMaxConeAngle_deg* TMath::DegToRad() ) );
+    double iS = 2. * TMath::Pi() * ( 1. - cos( fMCMaxConeAngle_deg * TMath::DegToRad() ) );
 
     double iP = TMath::Power( fMCMaxEnergy_TeV_Lin, -1.*fMCSpectralIndex + 1 ) - TMath::Power( fMCMinEnergy_TeV_Lin, -1.*fMCSpectralIndex + 1 );
     if( iS > 0. && iP > 0. )

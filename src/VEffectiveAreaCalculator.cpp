@@ -1133,7 +1133,7 @@ void VEffectiveAreaCalculator::multiplyByScatterArea( TGraphAsymmErrors* g )
     for( int i = 0; i < g->GetN(); i++ )
     {
         g->GetPoint( i, x, y );
-        g->SetPoint( i, x, y* fMC_ScatterArea );
+        g->SetPoint( i, x, y * fMC_ScatterArea );
         g->SetPointEYlow( i, g->GetErrorYlow( i ) * fMC_ScatterArea );
         g->SetPointEYhigh( i, g->GetErrorYhigh( i ) * fMC_ScatterArea );
     }
@@ -1675,7 +1675,7 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms(
             {
                 iEffAreaH2F->GetEntry(
                     count_max_az_bins
-                    * ( iIndexAz / ( fH2F_treecounter_offset* count_max_az_bins ) )
+                    * ( iIndexAz / ( fH2F_treecounter_offset * count_max_az_bins ) )
                     + iIndexAz % count_max_az_bins );
             }
 
@@ -1948,16 +1948,16 @@ double VEffectiveAreaCalculator::getMCSolidAngleNormalization()
                 && fCuts->fCut_CameraFiducialSize_MC_max < fRunPara->fViewcone_max )
         {
             // solid angle of simulated showers
-            double iSN_mc = ( 1. - cos( fRunPara->fViewcone_max* TMath::DegToRad() ) );
+            double iSN_mc = ( 1. - cos( fRunPara->fViewcone_max * TMath::DegToRad() ) );
             if( fRunPara->fViewcone_min > 0. )
             {
-                iSN_mc -= ( 1. - cos( fRunPara->fViewcone_min* TMath::DegToRad() ) );
+                iSN_mc -= ( 1. - cos( fRunPara->fViewcone_min * TMath::DegToRad() ) );
             }
             // solid angle of angular bin
-            double iSN_cu = ( 1. - cos( fCuts->fCut_CameraFiducialSize_MC_max* TMath::DegToRad() ) );
+            double iSN_cu = ( 1. - cos( fCuts->fCut_CameraFiducialSize_MC_max * TMath::DegToRad() ) );
             if( fCuts->fCut_CameraFiducialSize_MC_min > 0. )
             {
-                iSN_cu -= ( 1. - cos( fCuts->fCut_CameraFiducialSize_MC_min* TMath::DegToRad() ) );
+                iSN_cu -= ( 1. - cos( fCuts->fCut_CameraFiducialSize_MC_min * TMath::DegToRad() ) );
             }
 
             if( iSN_mc > 0. )
@@ -2146,7 +2146,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
     Long64_t i_start = 0;
     if( fRunPara && fRunPara->fIgnoreFractionOfEvents > 0. )
     {
-        i_start = ( Long64_t )( fRunPara->fIgnoreFractionOfEvents* d_nentries );
+        i_start = ( Long64_t )( fRunPara->fIgnoreFractionOfEvents * d_nentries );
     }
     cout << "\t total number of data events: " << d_nentries << " (start at event " << i_start << ")" << endl;
 
@@ -2558,7 +2558,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
     fTPedvar = fPedVar[ize];
     fXoff = fXWobble[ize];
     fYoff = fYWobble[ize];
-    fWoff = sqrt( fXoff* fXoff + fYoff* fYoff );
+    fWoff = sqrt( fXoff * fXoff + fYoff * fYoff );
 
     // loop over all spectral index
     for( unsigned int s = 0; s < fVSpectralIndex.size(); s++ )
@@ -3526,7 +3526,7 @@ bool VEffectiveAreaCalculator::binomialDivide( TGraphAsymmErrors* g, TH1D* hrec,
                 pm = hmc->GetBinError( b );
                 if( pj != 1. )
                 {
-                    sj_low = TMath::Abs((( 1. - 2.*pj ) * pr* pr + pj* pj* pm* pm ) / ( hmc->GetBinContent( b ) * hmc->GetBinContent( b ) ) );
+                    sj_low = TMath::Abs((( 1. - 2.*pj ) * pr * pr + pj * pj * pm * pm ) / ( hmc->GetBinContent( b ) * hmc->GetBinContent( b ) ) );
                 }
                 else
                 {
@@ -3617,7 +3617,7 @@ void VEffectiveAreaCalculator::copyProfileHistograms( TProfile* h1,  TProfile* h
                 {
                     iE = h2->GetBinError( b ) * sqrt( h2->GetBinEntries( b ) );
                 }
-                h1->SetBinError( b,  sqrt( h2->GetBinEntries( b ) * ( h2->GetBinContent( b ) *  h2->GetBinContent( b ) + iE* iE ) ) );
+                h1->SetBinError( b,  sqrt( h2->GetBinEntries( b ) * ( h2->GetBinContent( b ) *  h2->GetBinContent( b ) + iE * iE ) ) );
             }
             else
             {
@@ -4266,7 +4266,7 @@ void VEffectiveAreaCalculator::Calculate_Bck_solid_angle_norm()
     if( fRunPara->fViewcone_max > 0. )
     {
         // solid angle in which the particule have been simulated
-        double SolidAngle_MCScatterAngle  =  2 * TMath::Pi() * ( 1. - cos( fRunPara->fViewcone_max* TMath::DegToRad() ) );
+        double SolidAngle_MCScatterAngle  =  2 * TMath::Pi() * ( 1. - cos( fRunPara->fViewcone_max * TMath::DegToRad() ) );
 
         fsolid_angle_norm = SolidAngle_MCScatterAngle;
         fsolid_angle_norm_done = true;

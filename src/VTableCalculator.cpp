@@ -111,7 +111,7 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
         // median of variable
         sprintf( hname, "%s_median_%s", fpara.c_str(), fHName_Add.c_str() );
         sprintf( htitle, "%s vs. dist. vs. log10 size (median)", fpara.c_str() );
-        hMedian = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize* amp_delta, NumDist, 0., dist_delta* NumDist );
+        hMedian = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize * amp_delta, NumDist, 0., dist_delta * NumDist );
         hMedian->SetXTitle( "log_{10} size" );
         hMedian->SetYTitle( "distance [m]" );
         if(!fEnergy )
@@ -126,7 +126,7 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
         // mean and rms
         sprintf( hname, "%s_mean_%s", fpara.c_str(), fHName_Add.c_str() );
         sprintf( htitle, "%s vs. dist. vs. log10 size (mean)", fpara.c_str() );
-        hMean = new TProfile2D( hname, htitle, NumSize, amp_offset, amp_offset + NumSize* amp_delta, NumDist, 0., dist_delta* NumDist, fBinning1DXlow, fBinning1DXhigh );
+        hMean = new TProfile2D( hname, htitle, NumSize, amp_offset, amp_offset + NumSize * amp_delta, NumDist, 0., dist_delta * NumDist, fBinning1DXlow, fBinning1DXhigh );
         hMean->SetXTitle( "log_{10} size" );
         hMean->SetYTitle( "distance [m]" );
         if(!fEnergy )
@@ -296,14 +296,14 @@ void VTableCalculator::terminate( TDirectory* iOut, char* xtitle )
         char htitle[1000];
         sprintf( hname, "%s_nevents_%s", fName.c_str(), fHName_Add.c_str() );
         sprintf( htitle, "%s vs. dist. vs. log10 size (# of events)", fName.c_str() );
-        TH2F* hNevents = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize* amp_delta, NumDist, 0., dist_delta* NumDist );
+        TH2F* hNevents = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize * amp_delta, NumDist, 0., dist_delta * NumDist );
         hNevents->SetXTitle( "log_{10} size" );
         hNevents->SetYTitle( "distance [m]" );
         hNevents->SetZTitle( "# of events/bin" );
         // most probable of variable
         sprintf( hname, "%s_mpv_%s", fName.c_str(), fHName_Add.c_str() );
         sprintf( htitle, "%s vs. dist. vs. log10 size (mpv)", fName.c_str() );
-        TH2F* hMPV = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize* amp_delta, NumDist, 0., dist_delta* NumDist );
+        TH2F* hMPV = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize * amp_delta, NumDist, 0., dist_delta * NumDist );
         hMPV->SetXTitle( "log_{10} size" );
         hMPV->SetYTitle( "distance [m]" );
         if(!fEnergy )
@@ -318,7 +318,7 @@ void VTableCalculator::terminate( TDirectory* iOut, char* xtitle )
         // sigma of median (16-84% (2sigma for Gauss))
         sprintf( hname, "%s_sigma_%s", fName.c_str(), fHName_Add.c_str() );
         sprintf( htitle, "%s vs. dist. vs. log10 size (sigma)", fName.c_str() );
-        TH2F* hSigma = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize* amp_delta, NumDist, 0., dist_delta* NumDist );
+        TH2F* hSigma = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize * amp_delta, NumDist, 0., dist_delta * NumDist );
         hSigma->SetXTitle( "log_{10} size" );
         hSigma->SetYTitle( "distance [m]" );
         if(!fEnergy )
@@ -746,8 +746,8 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
                         // handle showers with (width==0.) correctly
                         if( w[tel] > 0. )
                         {
-                            value  += ( w[tel] - med ) / sigma * ( med* med ) / ( sigma* sigma );
-                            weight += ( med* med ) / ( sigma* sigma );
+                            value  += ( w[tel] - med ) / sigma * ( med * med ) / ( sigma * sigma );
+                            weight += ( med * med ) / ( sigma * sigma );
                         }
                     }
                     ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -759,8 +759,8 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
                         // store expected relative error
                         sigma_tel.push_back( sigma / med );
                         // use relative error as weighting (otherwise: significant bias towards lower energies
-                        sigma2_tel.push_back( med / ( sigma* sigma ) );
-                        sigma2_tel_noRadiusWeigth.push_back( 1. / ( sigma* sigma ) );
+                        sigma2_tel.push_back( med / ( sigma * sigma ) );
+                        sigma2_tel_noRadiusWeigth.push_back( 1. / ( sigma * sigma ) );
                         // add additional weight for events inside or outside the light pool
                         if( r[tel] < 140. )
                         {

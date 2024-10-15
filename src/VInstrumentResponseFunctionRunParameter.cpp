@@ -386,7 +386,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
     fSpectralIndex.clear();
     for( unsigned int i = 0; i < fNSpectralIndex; i++ )
     {
-        fSpectralIndex.push_back( fSpectralIndexMin + ( double )i* fSpectralIndexStep );
+        fSpectralIndex.push_back( fSpectralIndexMin + ( double )i * fSpectralIndexStep );
     }
 
     return true;
@@ -654,7 +654,7 @@ void VInstrumentResponseFunctionRunParameter::print()
     }
     cout << ", energy range [TeV]: " << fMCEnergy_min << ", " << fMCEnergy_max << ", " << fMCEnergy_index << endl;
     cout << "\t ze=" << fze << " [deg], noise=" << fnoise << " (pedvar: " << fpedvar;
-    cout << "), wobble offset w=" << sqrt( fXoff* fXoff + fYoff* fYoff ) << " [deg]";
+    cout << "), wobble offset w=" << sqrt( fXoff * fXoff + fYoff * fYoff ) << " [deg]";
     cout << endl;
 
     cout << "azimuth bins (" << fAzMin.size() << "): ";

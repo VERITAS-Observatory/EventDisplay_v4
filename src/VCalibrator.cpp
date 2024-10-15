@@ -2006,7 +2006,7 @@ bool VCalibrator::readPeds_from_rootfile( string iFile, bool iLowGain, unsigned 
                 if( its_n > 1. )
                 {
                     its_mean[sw] = its_sum / its_n;
-                    its_rms[sw]  = sqrt( 1. / ( its_n - 1. ) * ( its_sum2 - 1. / its_n* its_sum* its_sum ) );
+                    its_rms[sw]  = sqrt( 1. / ( its_n - 1. ) * ( its_sum2 - 1. / its_n * its_sum * its_sum ) );
                 }
                 else
                 {
@@ -2456,7 +2456,7 @@ bool VCalibrator::readPeds( string i_pedfile, bool iLowGain, unsigned int i_SumW
             if( i_n > 1. )
             {
                 getmeanPedvarsAllSumWindow( iLowGain )[i] = i_sum / i_n;
-                getmeanRMSPedvarsAllSumWindow( iLowGain )[i] = sqrt( 1 / ( i_n - 1 ) * ( i_sum2 - 1. / i_n* i_sum* i_sum ) );
+                getmeanRMSPedvarsAllSumWindow( iLowGain )[i] = sqrt( 1 / ( i_n - 1 ) * ( i_sum2 - 1. / i_n * i_sum * i_sum ) );
             }
             else
             {
@@ -4170,7 +4170,7 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
                         {
                             if( iPedVarTreeTypeNew )
                             {
-                                getPedvarsDist()->Fill( fPedvar_high[p* VDST_MAXSUMWINDOW + s] );
+                                getPedvarsDist()->Fill( fPedvar_high[p * VDST_MAXSUMWINDOW + s] );
                             }
                         }
                     }
@@ -4204,7 +4204,7 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
                         {
                             if( iPedVarTreeTypeNew )
                             {
-                                getPedvarsDist( true )->Fill( fPedvar_low[p* VDST_MAXSUMWINDOW + s] );
+                                getPedvarsDist( true )->Fill( fPedvar_low[p * VDST_MAXSUMWINDOW + s] );
                             }
                         }
                     }
@@ -4722,7 +4722,7 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
                         }
                         if( i_gainCorrect > 0. )
                         {
-                            hIPR->Fill(( h->GetBinCenter( j ) - ped* iSummationWindow ) / i_gainCorrect, h->GetBinContent( j ) );
+                            hIPR->Fill(( h->GetBinCenter( j ) - ped * iSummationWindow ) / i_gainCorrect, h->GetBinContent( j ) );
                         }
                     }
                 }
@@ -4767,7 +4767,7 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
     float convToHz = 1.;
     if( nsToSec > 0. && Tsearch > 0. )
     {
-        convToHz /= ( nsToSec* Tsearch );
+        convToHz /= ( nsToSec * Tsearch );
     }
     else if( getRunParameter()->fImageCleaningParameters[i_tel]->fNNOpt_ifExplicitSampleTimeSlice
              && getRunParameter()->fImageCleaningParameters[i_tel]->fNNOpt_sampleTimeSlice > 0
@@ -4986,7 +4986,7 @@ TH1F* VCalibrator::calculateIPRGraphAveraged( unsigned int iSummationWindow )
                             }
                             if( i_gainCorrect > 0. )
                             {
-                                hIPR->Fill(( h->GetBinCenter( j ) - ped* iSummationWindow ) / i_gainCorrect, h->GetBinContent( j ) );
+                                hIPR->Fill(( h->GetBinCenter( j ) - ped * iSummationWindow ) / i_gainCorrect, h->GetBinContent( j ) );
                             }
                         }
                     }

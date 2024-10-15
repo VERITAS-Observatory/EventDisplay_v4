@@ -502,7 +502,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
             fHisto[fHisCounter]->hTriggerPatternBeforeCuts->Fill( fDataRun->LTrig );
             fHisto[fHisCounter]->hImagePatternBeforeCuts->Fill( fDataRun->ImgSel );
 
-            iDirectionOffset = sqrt( iXoff* iXoff + iYoff* iYoff );
+            iDirectionOffset = sqrt( iXoff * iXoff + iYoff * iYoff );
             getDerotatedCoordinates( icounter, i_UTC, iXoff, iYoff,  i_xderot, i_yderot );
 
             // gamma/hadron cuts
@@ -607,8 +607,8 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
                                     fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->FindBin( iDirectionOffset ) );
                 double i_ymin = fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->GetBinLowEdge(
                                     fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->FindBin( iDirectionOffset ) );
-                double iSoli = 2. * TMath::Pi() * ( 1. - cos( i_ymax* TMath::Pi() / 180. ) );
-                iSoli       -= 2. * TMath::Pi() * ( 1. - cos( i_ymin* TMath::Pi() / 180. ) );
+                double iSoli = 2. * TMath::Pi() * ( 1. - cos( i_ymax * TMath::Pi() / 180. ) );
+                iSoli       -= 2. * TMath::Pi() * ( 1. - cos( i_ymin * TMath::Pi() / 180. ) );
                 iWeight = fCuts->getTheta2Cut_max( iErec );
                 if( iWeight > 0. )
                 {
@@ -1596,8 +1596,8 @@ pair< double, double > VStereoAnalysis::astro_calculate_ra_dec_currentEpoch( uns
     // set target coordinates into run parameter list
     fRunPara->setTargetRADec_currentEpoch(
         runlist_iter,
-        i_radec.first* TMath::RadToDeg(),
-        i_radec.second* TMath::RadToDeg() );
+        i_radec.first * TMath::RadToDeg(),
+        i_radec.second * TMath::RadToDeg() );
 
     return i_radec;
 }
@@ -2301,17 +2301,17 @@ void VStereoAnalysis::fill_DL3Tree( CData* c, double i_xderot, double i_yderot, 
     {
         double i_Spherical_RA  = 0.;
         double i_Spherical_DEC = 0.;
-        VAstronometry::vlaDtp2s( fDL3EventTree_Xderot* TMath::DegToRad(),
-                                 fDL3EventTree_Yderot* TMath::DegToRad(),
-                                 fRunPara->fRunList[icounter].fArrayPointingRAJ2000* TMath::DegToRad(),
-                                 fRunPara->fRunList[icounter].fArrayPointingDecJ2000* TMath::DegToRad(),
+        VAstronometry::vlaDtp2s( fDL3EventTree_Xderot * TMath::DegToRad(),
+                                 fDL3EventTree_Yderot * TMath::DegToRad(),
+                                 fRunPara->fRunList[icounter].fArrayPointingRAJ2000 * TMath::DegToRad(),
+                                 fRunPara->fRunList[icounter].fArrayPointingDecJ2000 * TMath::DegToRad(),
                                  &i_Spherical_RA, &i_Spherical_DEC );
         fDL3EventTree_RA  = i_Spherical_RA * TMath::RadToDeg();
         fDL3EventTree_DEC = i_Spherical_DEC * TMath::RadToDeg();
 
         // Convert from spherical RA and DEC to Azimuth and Zenith
         // convert to degrees and do calculation
-        fVsky->setTargetJ2000( i_Spherical_DEC* TMath::RadToDeg(), i_Spherical_RA* TMath::RadToDeg() );
+        fVsky->setTargetJ2000( i_Spherical_DEC * TMath::RadToDeg(), i_Spherical_RA * TMath::RadToDeg() );
         fVsky->precessTarget( fDL3EventTree_MJD, 0 ) ;
 
         // calculate new param

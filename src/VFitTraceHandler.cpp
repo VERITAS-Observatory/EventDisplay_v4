@@ -37,11 +37,11 @@ double VFitTraceHandler_tracefunction( double* x, double* p )
 
     if( x[0] < xbar )
     {
-        f = A * exp(-0.5 * xd* xd / sig / sig ) + ped;
+        f = A * exp(-0.5 * xd * xd / sig / sig ) + ped;
     }
     else
     {
-        f = A * exp(-0.5 * xd* xd / ( sig* sig + ( alp* xd ) ) ) + ped;
+        f = A * exp(-0.5 * xd * xd / ( sig * sig + ( alp * xd ) ) ) + ped;
     }
     return f;
 }
@@ -285,7 +285,7 @@ void VFitTraceHandler::fitTrace( unsigned int chanID )
     {
         fH1TraceData->SetBinContent( i + 1, -1. * fpTrace[i] );
         // errors are signal+rms of pedestal
-        fH1TraceData->SetBinError( i + 1, sqrt( fabs( fpTrace[i] - fPed ) + fPedrms* fPedrms ) / 2. );
+        fH1TraceData->SetBinError( i + 1, sqrt( fabs( fpTrace[i] - fPed ) + fPedrms * fPedrms ) / 2. );
     }
 
     // find start parameters

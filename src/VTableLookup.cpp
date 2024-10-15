@@ -281,7 +281,7 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, vec
 
     this function is called in table READING mode
 
-    input file must be sorted in zenith angles (lowest first)
+    expected directory structure: Ze/wobble/azimuth/telescope type/noise level
 
     \param itablefile   root file with all the tables
     \param isuff        histogram suffix
@@ -303,9 +303,7 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
         if( data_dir )
         {
             // try to see of file exists in directory ./tables
-            string itemp = data_dir;
-            itemp += "/Tables/" + itablefile;
-            itablefile = itemp;
+            itablefile = data_dir + "/Tables/" + itablefile;
             fLookupTableFile = new TFile( itablefile.c_str() );
             if( fLookupTableFile->IsZombie() )
             {
@@ -338,81 +336,80 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
     vector< vector< vector< vector< VTableCalculator* > > > > iiii_mscw;
     vector< vector< vector< vector< VTableCalculator* > > > > iiii_mscl;
     vector< vector< vector< vector< VTableCalculator* > > > > iiii_energySR;
-    vector< vector< vector< vector< ULong64_t > > > > iiii_telType;
 
-    // vector with available NSB levels [tel_type][NSB]
-    fTableNoiseLevel.clear();
-    // vector with available zenith angles [tel_type][NSB][ze]
+    // vector with available zenith angles [ze]
     fTableZe.clear();
-    vector< double > i_ze;
-    // vector with available wobble offsets [tel_type][NSB][ze][woff]
+    // vector with available wobble offsets [ze][woff]
     fTableZeOffset.clear();
     vector< double > i_DirectionOffset;
-    vector< vector< double > > ii_DirectionOffset;
 
-    // NOISE LEVEL
-    vector< string > iDName = getSortedListOfDirectories( fLookupTableFile );
-    for( unsigned int n = 0; n < iDName.size(); n++ )
+    // ZENITH ANGLE
+    TDirectory* iDirZe = gDirectory;
+    vector< string > iDNameZE = getSortedListOfDirectories( iDirZe );
+    for( unsigned z = 0; z < iDNameZE.size(); z++ )
     {
-        fTableNoiseLevel.push_back( atof( iDName[n].substr( 6, 5 ).c_str() ) / 100. );
-
-        fLookupTableFile->cd( iDName[n].c_str() );
-        if( fDebug == 2 )
-        {
-            cout << "DEBUG  DIR " << " " << gDirectory->GetPath() << endl;
-        }
-        // ZENITH ANGLE
-        TDirectory* iDirZe = gDirectory;
-        vector< string > iDNameZE = getSortedListOfDirectories( iDirZe );
-        i_ze.clear();
-        ii_DirectionOffset.clear();
+        fTableZe.push_back( atof( iDNameZE[z].substr( 3, 3 ).c_str() ) / 10. );
         iiii_mscw.clear();
         iiii_mscl.clear();
         iiii_energySR.clear();
-        iiii_telType.clear();
-        for( unsigned z = 0; z < iDNameZE.size(); z++ )
+        iii_telType.clear();
+
+        iDirZe->cd( iDNameZE[z].c_str() );
+
+        // DIRECTION OFFSET
+        TDirectory* iDirWoff = gDirectory;
+        vector< string > iDNameWoff  = getSortedListOfDirectories( iDirWoff );
+        i_DirectionOffset.clear();
+        for( unsigned int w = 0; w < iDNameWoff.size(); w++ )
         {
-            i_ze.push_back( atof( iDNameZE[z].substr( 3, 3 ).c_str() ) / 10. );
+            i_DirectionOffset.push_back( atof( iDNameWoff[w].substr( 5, 4 ).c_str() ) / 1000. );
             iii_mscw.clear();
             iii_mscl.clear();
             iii_energySR.clear();
-            iii_telType.clear();
+            ii_telType.clear();
 
-            iDirZe->cd( iDNameZE[z].c_str() );
-            // DIRECTION OFFSET
-            TDirectory* iDirWoff = gDirectory;
-            vector< string > iDNameWoff  = getSortedListOfDirectories( iDirWoff );
-            i_DirectionOffset.clear();
-            for( unsigned int w = 0; w < iDNameWoff.size(); w++ )
+            iDirWoff->cd( iDNameWoff[w].c_str() );
+
+            // AZIMUTH ANGLE
+            TDirectory* iDirAz = gDirectory;
+            vector< string > iDNameAz  = getSortedListOfDirectories( iDirAz );
+            for( unsigned int a = 0; a < iDNameAz.size(); a++ )
             {
-                i_DirectionOffset.push_back( atof( iDNameWoff[w].substr( 5, 4 ).c_str() ) / 1000. );
                 ii_mscw.clear();
                 ii_mscl.clear();
                 ii_energySR.clear();
-                ii_telType.clear();
+                i_telType.clear();
 
-                iDirWoff->cd( iDNameWoff[w].c_str() );
-                // AZIMUTH ANGLE
-                TDirectory* iDirAz = gDirectory;
-                vector< string > iDNameAz  = getSortedListOfDirectories( iDirAz );
-                for( unsigned int a = 0; a < iDNameAz.size(); a++ )
+                iDirAz->cd( iDNameAz[a].c_str() );
+
+                // TELESCOPE
+                TDirectory* iDirTel = gDirectory;
+                vector< string > iDNameTel = getSortedListOfDirectories( iDirTel );
+                for( unsigned int t = 0; t < iDNameTel.size(); t++ )
                 {
                     i_mscw.clear();
                     i_mscl.clear();
                     i_energySR.clear();
                     i_telType.clear();
 
-                    iDirAz->cd( iDNameAz[a].c_str() );
-                    // TELESCOPE
-                    TDirectory* iDirTel = gDirectory;
-                    vector< string > iDNameTel = getSortedListOfDirectories( iDirTel );
-                    for( unsigned int t = 0; t < iDNameTel.size(); t++ )
+                    // telescope type
+                    i_telType.push_back(( ULong64_t )( atoi )( iDNameTel[t].substr( 4, iDNameTel[t].size() ).c_str() ) );
+
+                    iDirTel->cd( iDNameTel[t].c_str() );
+
+                    // NOISE LEVEL
+                    vector< string > iDName = getSortedListOfDirectories( fLookupTableFile );
+                    TDirectory *iDirNoise = gDirectory;
+                    for( unsigned int n = 0; n < iDName.size(); n++ )
                     {
+                        iDirNoise->cd( iDName[n].c_str() );
+                        if( fDebug == 2 )
+                        {
+                            cout << "DEBUG  DIR " << " " << gDirectory->GetPath() << endl;
+                        }
+
                         // READ IN ALL TABLES
-                        iDirTel->cd( iDNameTel[t].c_str() );
                         TDirectory* iDir = ( TDirectory* )gDirectory->Get( "mscw" );
-                        // telescope type
-                        i_telType.push_back(( ULong64_t )( atoi )( iDNameTel[t].substr( 4, iDNameTel[t].size() ).c_str() ) );
                         // get mscw directory
                         i_mscw.push_back( new VTableCalculator( "width", isuff.c_str(), freadwrite, iDir, false ) );
                         // get mscl directory
@@ -423,31 +420,29 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
                         iDirTel->cd( iDNameTel[t].c_str() );
                         iDir = ( TDirectory* )gDirectory->Get( "energySR" );
                         i_energySR.push_back( new VTableCalculator( "energySR", isuff.c_str(), freadwrite, iDir, true, fTLRunParameter->fPE, fTLRunParameter->fUseMedianEnergy ) );
-                    }                             // telescopes
+                    }                             // noise levels
                     ii_mscw.push_back( i_mscw );
                     ii_mscl.push_back( i_mscl );
                     ii_energySR.push_back( i_energySR );
-                    ii_telType.push_back( i_telType );
-                }                                 // az
+                }                                 // telescopes
                 iii_mscw.push_back( ii_mscw );
                 iii_mscl.push_back( ii_mscl );
                 iii_energySR.push_back( ii_energySR );
-                iii_telType.push_back( ii_telType );
-            }                                     // woff
+                ii_telType.push_back( i_telType );
+            }                                     // az
             iiii_mscw.push_back( iii_mscw );
             iiii_mscl.push_back( iii_mscl );
             iiii_energySR.push_back( iii_energySR );
-            iiii_telType.push_back( iii_telType );
-            ii_DirectionOffset.push_back( i_DirectionOffset );
-        }                                         // ze
+            iii_telType.push_back( ii_telType );
+        }                                         // woff
         fmscw.push_back( iiii_mscw );
         fmscl.push_back( iiii_mscl );
         fenergySizevsRadius.push_back( iiii_energySR );
-        fTelType_tables.push_back( iiii_telType );
+        fTelType_tables.push_back( iii_telType );
 
-        fTableZeOffset.push_back( ii_DirectionOffset );
+        fTableZeOffset.push_back( i_DirectionOffset );
         fTableZe.push_back( i_ze );
-    }
+    }   // ze
 
     // apply sanity check to the lookup table file
     if( sanityCheckLookupTableFile() )
@@ -470,84 +465,17 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 
 /*
 
-     sanity checks for lookup tables
+     sanity checks for lookup tables (not fully implemented)
 
      - make sure that the same number of zenith, az, NSB tables are given for each telescope type
 
 */
 bool VTableLookup::sanityCheckLookupTableFile( bool iPrint )
 {
-    if( iPrint == false )
-    {
-        cout << "lookup table file sanity check..." << endl;
-    }
-    if( iPrint == true )
-    {
-        cout << "this screen printing will help you to locate the missing LTs..." << endl;
-    }
-
-    for( unsigned int i = 0; i < fTableNoiseLevel.size(); i++ )
-    {
-        if( iPrint == true )
-        {
-            cout << " Noise level index  " << i << " has " << fTableZe[i].size() << " zenith angles" << endl;
-        }
-        if( iPrint == false )
-            if(( i > 0 ) && ( fTableZe[i] != fTableZe[i - 1] ) )
-            {
-                return false;
-            }
-
-        for( unsigned int j = 0; j < fTableZe[i].size(); j++ )
-        {
-            if( iPrint == true )
-            {
-                cout << "Zenith index " << j <<  " has " << fTableZeOffset[i][j].size() << " wobble offsets" << endl;
-            }
-            if( iPrint == false )
-            {
-                if(( j > 0 ) && ( fTableZeOffset[i][j] != fTableZeOffset[i][j - 1] ) )
-                {
-                    return false;
-                }
-                if(( i > 0 ) && ( fTableZeOffset[i][j] != fTableZeOffset[i - 1][j] ) )
-                {
-                    return false;
-                }
-            }
-
-            for( unsigned int k = 0; k < fTableZeOffset[i][j].size(); k++ )
-                for( unsigned int l = 0; l < fTableAzBins ; l++ )
-                {
-                    //cout << "Telescopes/Azimuth " << fTelType_tables[i][j][k][l].size() << endl;
-
-                    if( iPrint == false )
-                    {
-                        if(( i > 0 ) && ( fTelType_tables[i][j][k][l] != fTelType_tables[i - 1][j][k][l] ) )
-                        {
-                            return false;
-                        }
-                        if(( j > 0 ) && ( fTelType_tables[i][j][k][l] != fTelType_tables[i][j - 1][k][l] ) )
-                        {
-                            return false;
-                        }
-                        if(( k > 0 ) && ( fTelType_tables[i][j][k][l] != fTelType_tables[i][j][k - 1][l] ) )
-                        {
-                            return false;
-                        }
-                        if(( l > 0 ) && ( fTelType_tables[i][j][k][l] != fTelType_tables[i][j][k][l - 1] ) )
-                        {
-                            return false;
-                        }
-                    }
-                }
-        }
-    }
-
     // print a summary of the number of tables found
     if( iPrint == false )
     {
-        cout << "Found " << fTableNoiseLevel.size() << " noise levels, " << fTableZe[0].size() << " zenith angles, " << fTableZeOffset[0][0].size() << " wobble offsets, " << fTableAzBins << " azimuth bins and " << fTelType_tables[0][0][0][0].size() << " telescope types" << endl;
+        cout << "Found " << fTableZe.size() << " zenith angles, " << fTableZeOffset[0].size() << " wobble offsets, " << fTableAzBins << " azimuth bins and " << fTelType_tables[0][0][0][0].size() << " telescope types" << endl;
     }
     return true;
 }
@@ -683,13 +611,13 @@ void VTableLookup::readLookupTable()
     unsigned int iwoff_up = 0;
     unsigned int iwoff_low = 0;
 
-    s_ZupWup    = new VTablesToRead( fNTel );
-    s_ZupWlow   = new VTablesToRead( fNTel );
-    s_Zup       = new VTablesToRead( fNTel );
-    s_ZlowWup   = new VTablesToRead( fNTel );
-    s_ZlowWlow  = new VTablesToRead( fNTel );
-    s_Zlow      = new VTablesToRead( fNTel );
-    s_N            = new VTablesToRead( fNTel );
+    VTablesToRead *s_ZupWup    = new VTablesToRead( fNTel );
+    VTablesToRead *s_ZupWlow   = new VTablesToRead( fNTel );
+    VTablesToRead *s_Zup       = new VTablesToRead( fNTel );
+    VTablesToRead *s_ZlowWup   = new VTablesToRead( fNTel );
+    VTablesToRead *s_ZlowWlow  = new VTablesToRead( fNTel );
+    VTablesToRead *s_Zlow      = new VTablesToRead( fNTel );
+    VTablesToRead *s_N         = new VTablesToRead( fNTel );
 
     // first event
     bool bFirst = true;
@@ -783,20 +711,15 @@ void VTableLookup::readLookupTable()
                     cout << "DEBUG      zenith " << ze << ", noise " << fNoiseLevel[t] << ", woff " << woff << ", az " << fData->getAz() << ", az bin " << i_az_bin << endl;
                 }
                 // get noise bin (not interpolated; closest value)
-                unsigned int i_noise_bin = getNoiseBin(t, fNoiseLevel[t]);
+                unsigned int i_noise_bin = getNoiseBin( t, fNoiseLevel[t] );
                 // get zenith angle (low)
-                getIndexBoundary(&ize_up, &ize_low, fTableZe[i_noise_bin], ze );
+                getIndexBoundary(&ize_up, &ize_low, fTableZe, ze );
                 if( fDebug == 2 )
                 {
-                    cout << "DEBUG  WOFF " << t << " " << i_noise_bin << "\t" << fNoiseLevel[t] << "\t" << fTableNoiseLevel.size();
-                    for( unsigned int ii = 0; ii < fTableNoiseLevel.size(); ii++ )
-                    {
-                        cout << "    " << fTableNoiseLevel[ii];
-                    }
-                    cout << endl;
+                    cout << "DEBUG  WOFF " << t << " " << i_noise_bin << "\t" << endl;
                 }
                 // get direction offset index
-                getIndexBoundary(&iwoff_up, &iwoff_low, fTableZeOffset[i_noise_bin][ize_low], woff );
+                getIndexBoundary(&iwoff_up, &iwoff_low, fTableZeOffset[ize_low], woff );
                 getTables( i_noise_bin, ize_low, iwoff_up, i_az_bin, t, s_ZlowWup );
                 getTables( i_noise_bin, ize_low, iwoff_low, i_az_bin, t, s_ZlowWlow );
             }
@@ -816,11 +739,11 @@ void VTableLookup::readLookupTable()
             for( int t = 0; t < fNTel; t++ )
             {
                 // noise (not interpolated; closest value)
-                unsigned int i_noise_bin = getNoiseBin(t, fNoiseLevel[t]);
+                unsigned int i_noise_bin = getNoiseBin( t, fNoiseLevel[t] );
                 // get zenith angle (up)
-                getIndexBoundary(&ize_up, &ize_low, fTableZe[i_noise_bin], ze );
+                getIndexBoundary(&ize_up, &ize_low, fTableZe, ze );
                 // get direction offset index
-                getIndexBoundary(&iwoff_up, &iwoff_low, fTableZeOffset[i_noise_bin][ize_up], woff );
+                getIndexBoundary(&iwoff_up, &iwoff_low, fTableZeOffset[ize_up], woff );
                 getTables( i_noise_bin, ize_up, iwoff_up, i_az_bin, t, s_ZupWup );
                 getTables( i_noise_bin, ize_up, iwoff_low, i_az_bin, t, s_ZupWlow );
             }
@@ -999,7 +922,7 @@ void VTableLookup::terminate()
  * get closes bin number for noise level
  * (no interpolation)
  */
-unsigned int VTableLookup::getNoiseBin(unsigned int tel, double noise )
+unsigned int VTableLookup::getNoiseBin( unsigned int tel, double noise )
 {
     // TMP TMP TMP
     return 0;
@@ -1263,9 +1186,9 @@ void VTableLookup::getTables( unsigned int inoise, unsigned int ize,
     }
 
     unsigned int telX = 0;
-    for( unsigned int i = 0; i < fTelType_tables[inoise][ize][iwoff][iaz].size(); i++ )
+    for( unsigned int i = 0; i < fTelType_tables[ize][iwoff][iaz].size(); i++ )
     {
-        if( fData->getTelType( tel ) == fTelType_tables[inoise][ize][iwoff][iaz][i] )
+        if( fData->getTelType( tel ) == fTelType_tables[ize][iwoff][iaz][i][inoise] )
         {
             telX = i;
             break;
@@ -1283,26 +1206,26 @@ void VTableLookup::getTables( unsigned int inoise, unsigned int ize,
         cout << "DEBUG  getTables() "  << inoise << " " << ize << " " << iwoff << " " << iaz << " " << telX << endl;
         cout << "DEBUG  " << fmscw[inoise][ize][iwoff][iaz][telX] << endl;
         cout << "DEBUG  MEDIAN (MSCW) " << inoise << " " << ize << " " << iwoff << " " << iaz << " " << telX << " ";
-        if( fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian() )
+        if( fmscw[ize][iwoff][iaz][telX][inoise]->getHistoMedian() )
         {
-            cout << fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetEntries() << "\t";
-            cout << fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetTitle() << "\t";
-            cout << fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetDirectory()->GetPath() << endl;
+            cout << fmscw[ize][iwoff][iaz][telX][inoise]->getHistoMedian()->GetEntries() << "\t";
+            cout << fmscw[ize][iwoff][iaz][telX][inoise]->getHistoMedian()->GetTitle() << "\t";
+            cout << fmscw[ize][iwoff][iaz][telX][inoise]->getHistoMedian()->GetDirectory()->GetPath() << endl;
         }
-        cout << "DEBUG  MEDIAN (MSCW,2) " << fmscw[inoise].size() << endl;
+        cout << "DEBUG  MEDIAN (MSCW,2) " << fmscw.size() << endl;
         cout << "DEBUG  MEDIAN (MSCL) " << inoise << " " << ize << " " << iwoff << " " << iaz << " " << telX << " ";
-        if( fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian() )
+        if( fmscl[ize][iwoff][iaz][telX][inoise]->getHistoMedian() )
         {
-            cout << fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetEntries() << "\t";
-            cout << fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetTitle() << "\t";
-            cout << fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetDirectory()->GetPath() << endl;
+            cout << fmscl[ize][iwoff][iaz][telX][inoise]->getHistoMedian()->GetEntries() << "\t";
+            cout << fmscl[ize][iwoff][iaz][telX][inoise]->getHistoMedian()->GetTitle() << "\t";
+            cout << fmscl[ize][iwoff][iaz][telX][inoise]->getHistoMedian()->GetDirectory()->GetPath() << endl;
         }
-        cout << "DEBUG  MEDIAN (MSCL,2) " << fmscl[inoise].size() << endl;
+        cout << "DEBUG  MEDIAN (MSCL,2) " << fmscl.size() << endl;
     }
 
-    s->hmscwMedian[tel] = fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian();
-    s->hmsclMedian[tel] = fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian();
-    s->henergySRMedian[tel] = fenergySizevsRadius[inoise][ize][iwoff][iaz][telX]->getHistoMedian();
+    s->hmscwMedian[tel] = fmscw[ize][iwoff][iaz][telX][inoise]->getHistoMedian();
+    s->hmsclMedian[tel] = fmscl[ize][iwoff][iaz][telX][inoise]->getHistoMedian();
+    s->henergySRMedian[tel] = fenergySizevsRadius[ize][iwoff][iaz][telX][inoise]->getHistoMedian();
 }
 
 

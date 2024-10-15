@@ -530,7 +530,7 @@ class VFun_SourceDescription_RadialSymmetricSource_Chi2 : public ROOT::Minuit2::
                         t2 = ( x - par[0] ) * ( x - par[0] ) + ( y - par[1] ) * ( y - par[1] );
 
                         // calculate expectation from model function
-                        fT = par[3] * TMath::Exp(-1.*t2 / 2. / ( sigmaSRC* sigmaSRC + sigmaPSF* sigmaPSF ) );
+                        fT = par[3] * TMath::Exp(-1.*t2 / 2. / ( sigmaSRC * sigmaSRC + sigmaPSF * sigmaPSF ) );
                         if( isnan( fT ) )
                         {
                             continue;
@@ -733,11 +733,11 @@ class VFun_SourceDescription_RadialSymmetricSource_LL: public ROOT::Minuit2::FCN
                         if( n > -999. )
                         {
                             // calculate log-likelihood
-                            sum  = ( x - meanX ) * ( x - meanX ) / ( sigmaSRC* sigmaSRC + sigmaPSF* sigmaPSF );
-                            sum += ( y - meanY ) * ( y - meanY ) / ( sigmaSRC* sigmaSRC + sigmaPSF* sigmaPSF );
+                            sum  = ( x - meanX ) * ( x - meanX ) / ( sigmaSRC * sigmaSRC + sigmaPSF * sigmaPSF );
+                            sum += ( y - meanY ) * ( y - meanY ) / ( sigmaSRC * sigmaSRC + sigmaPSF * sigmaPSF );
                             sum *= -1. / 2.;
                             sum  = exp( sum );
-                            sum *= 1. / 2. / M_PI / ( sigmaSRC* sigmaSRC + sigmaPSF* sigmaPSF );
+                            sum *= 1. / 2. / M_PI / ( sigmaSRC * sigmaSRC + sigmaPSF * sigmaPSF );
 
                             // assume Poisson fluctuations (neglecting background noise)
                             if( n > 0. && sum > 0. )
@@ -803,7 +803,7 @@ class VFun_SourceDescription_RadialAsymmetricSource_LL: public ROOT::Minuit2::FC
             double  meanY = par[3];
             double  sigmaY = par[4];
             double  angle = par[0];
-            double  rho = 1. / 2. * tan( 2 * angle ) * ( sigmaX* sigmaX - sigmaY* sigmaY ) / sqrt( sigmaX* sigmaX + sigmaPSF* sigmaPSF ) / sqrt( sigmaY* sigmaY + sigmaPSF* sigmaPSF );
+            double  rho = 1. / 2. * tan( 2 * angle ) * ( sigmaX * sigmaX - sigmaY * sigmaY ) / sqrt( sigmaX * sigmaX + sigmaPSF * sigmaPSF ) / sqrt( sigmaY * sigmaY + sigmaPSF * sigmaPSF );
 
 
             double x = 0.;
@@ -845,12 +845,12 @@ class VFun_SourceDescription_RadialAsymmetricSource_LL: public ROOT::Minuit2::FC
                         if( n > -999. )
                         {
                             // calculate log-likelihood
-                            sum  = ( x - meanX ) * ( x - meanX ) / ( sigmaX* sigmaX + sigmaPSF* sigmaPSF );
-                            sum += ( y - meanY ) * ( y - meanY ) / ( sigmaY* sigmaY + sigmaPSF* sigmaPSF );
-                            sum += -2. * rho * ( x - meanX ) / sqrt( sigmaX* sigmaX + sigmaPSF* sigmaPSF ) * ( y - meanY ) / sqrt( sigmaY* sigmaY + sigmaPSF* sigmaPSF );
-                            sum *= -1. / 2. / ( 1. - rho* rho );
+                            sum  = ( x - meanX ) * ( x - meanX ) / ( sigmaX * sigmaX + sigmaPSF * sigmaPSF );
+                            sum += ( y - meanY ) * ( y - meanY ) / ( sigmaY * sigmaY + sigmaPSF * sigmaPSF );
+                            sum += -2. * rho * ( x - meanX ) / sqrt( sigmaX * sigmaX + sigmaPSF * sigmaPSF ) * ( y - meanY ) / sqrt( sigmaY * sigmaY + sigmaPSF * sigmaPSF );
+                            sum *= -1. / 2. / ( 1. - rho * rho );
                             sum  = exp( sum );
-                            sum *= 1. / 2. / M_PI / sqrt( sigmaX* sigmaX + sigmaPSF* sigmaPSF ) /  sqrt( sigmaY* sigmaY + sigmaPSF* sigmaPSF ) / sqrt( 1. - rho* rho );
+                            sum *= 1. / 2. / M_PI / sqrt( sigmaX * sigmaX + sigmaPSF * sigmaPSF ) /  sqrt( sigmaY * sigmaY + sigmaPSF * sigmaPSF ) / sqrt( 1. - rho * rho );
 
                             // assume Poisson fluctuations (neglecting background noise)
                             if( n > 0. && sum > 0. )

@@ -179,7 +179,7 @@ void VPlotUtilities::setHistogramPlottingStyle( TH2D* his, double iminF )
                 }
             }
         }
-        his->SetMinimum( idiffmin* iminF );
+        his->SetMinimum( idiffmin * iminF );
     }
     if( his->GetMinimum() == his->GetMaximum() )
     {

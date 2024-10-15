@@ -173,8 +173,8 @@ void VTableLookupDataHandler::fillMChistograms()
     {
         // fill histograms with all simulated events
         double ilogE = log10( fMCEnergy );
-        double idist = sqrt( fMCxcore* fMCxcore + fMCycore* fMCycore );
-        double ioff  = sqrt( fMCxoff* fMCxoff + fMCyoff* fMCyoff );
+        double idist = sqrt( fMCxcore * fMCxcore + fMCycore * fMCycore );
+        double ioff  = sqrt( fMCxoff * fMCxoff + fMCyoff * fMCyoff );
 
         hE0mc->Fill( ilogE );
         hDE0mc->Fill( ilogE, idist );
@@ -195,7 +195,7 @@ void VTableLookupDataHandler::fillMChistograms()
 
 double VTableLookupDataHandler::getMCDistance()
 {
-    return sqrt( fMCxcore* fMCxcore + fMCycore* fMCycore );
+    return sqrt( fMCxcore * fMCxcore + fMCycore * fMCycore );
 }
 
 
@@ -2736,7 +2736,7 @@ float VTableLookupDataHandler::getArrayPointingDeRotationAngle()
 
     float derot = VSkyCoordinatesUtilities::getDerotationAngle(
                       MJD, time,
-                      i_array_ra* TMath::DegToRad(), i_array_dec* TMath::DegToRad(),
+                      i_array_ra * TMath::DegToRad(), i_array_dec * TMath::DegToRad(),
                       VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad(),
                       VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad() );
 

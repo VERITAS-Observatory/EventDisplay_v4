@@ -194,11 +194,11 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
                     fLightCurveData.push_back( new VLightCurveData() );
                     if( iMJDMin + ( i + 1 ) * fDayInterval < iMJDMax )
                     {
-                        fLightCurveData.back()->setMJDInterval( iMJDMin + i* fDayInterval, iMJDMin + ( i + 1 ) * fDayInterval );
+                        fLightCurveData.back()->setMJDInterval( iMJDMin + i * fDayInterval, iMJDMin + ( i + 1 ) * fDayInterval );
                     }
                     else
                     {
-                        fLightCurveData.back()->setMJDInterval( iMJDMin + i* fDayInterval, iMJDMax );
+                        fLightCurveData.back()->setMJDInterval( iMJDMin + i * fDayInterval, iMJDMax );
                     }
                 }
                 if( fLightCurveData.back() )

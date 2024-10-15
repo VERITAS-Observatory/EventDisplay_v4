@@ -224,7 +224,7 @@ double VSensitivityCalculator::getSensitivity( double iSignal, double iBackgroun
         f = fSourceStrength[n];
 
         // default significance calculation
-        s = VStatistics::calcSignificance( t * ( f* n_diff + iBackground* iAlpha ), t* iBackground, iAlpha, fLiAndMaEqu );
+        s = VStatistics::calcSignificance( t * ( f * n_diff + iBackground * iAlpha ), t * iBackground, iAlpha, fLiAndMaEqu );
         // significance calculation for Crab flares (don't use!)
         //        s = VStatistics::calcSignificance( t * ( f * n_diff + iBackground * iAlpha + n_diff),
         //	                                   t * ( iBackground + n_diff / iAlpha ), iAlpha, fLiAndMaEqu );
@@ -235,17 +235,17 @@ double VSensitivityCalculator::getSensitivity( double iSignal, double iBackgroun
         // require a certain significance
         bool bPassed_MinimumSignificance = ( s >= fSignificance_min );
         // require a minimum number of events
-        bool bPassed_MinimumSignalEvents = ( t* f* n_diff >= fEvents_min );
+        bool bPassed_MinimumSignalEvents = ( t * f * n_diff >= fEvents_min );
         // require background events
         // (removes most sensitivity values at large energies, but otherwise transition zone
         //  between signal and background limited zone not well defined)
         // NOTE: this cut depends on your MC statistics, not on the sensitivity of your observatory
-        bool bPasses_MinimumNumberofBackGroundEvents = ( iBackground* iAlpha > 0. );
+        bool bPasses_MinimumNumberofBackGroundEvents = ( iBackground * iAlpha > 0. );
         // require the signal to be larger than a certain fraction of background
         bool bPasses_MinimumSystematicCut = false;
         if( iBackground * iAlpha > 0. )
         {
-            bPasses_MinimumSystematicCut = ( f* n_diff / ( iBackground* iAlpha ) >= fMinBackgroundRateRatio_min );
+            bPasses_MinimumSystematicCut = ( f * n_diff / ( iBackground * iAlpha ) >= fMinBackgroundRateRatio_min );
         }
 
         // PRELI: allow calculation of sensitivity in event limited region
@@ -289,14 +289,14 @@ double VSensitivityCalculator::getSensitivity( double iSignal, double iBackgroun
             cout << "\t n: " << n - 1 << "\t f " << f;
             cout << "\t significance: " << s;
             cout << "\t min events: " << t* f* iSignal;
-            cout << "\t ndiff: " << t * ( f* n_diff );
-            cout << "\t non: " << t * ( f* n_diff + iBackground* iAlpha );
+            cout << "\t ndiff: " << t * ( f * n_diff );
+            cout << "\t non: " << t * ( f * n_diff + iBackground * iAlpha );
             cout << "\t noff: " << t* iBackground;
             cout << "\t alpha: " << iAlpha;
             cout << "\t t: " << t;
             cout << endl;
             cout << "\t" << iBackground* iAlpha;
-            cout << "\t" << ( f* n_diff ) / ( iBackground* iAlpha ) * 100. << endl;
+            cout << "\t" << ( f * n_diff ) / ( iBackground * iAlpha ) * 100. << endl;
         }
     }
 
@@ -423,7 +423,7 @@ void VSensitivityCalculator::setSourceStrengthRange_CU( double iMin, double iMax
     unsigned int i_Steps = ( unsigned int )(( fSourceStrength_max - fSourceStrength_min ) / fSourceStrength_step ) + 1;
     for( unsigned int n = 0; n < i_Steps; n++ )
     {
-        fSourceStrength.push_back( fSourceStrength_max - n* fSourceStrength_step );
+        fSourceStrength.push_back( fSourceStrength_max - n * fSourceStrength_step );
     }
 
     if( iLog )
@@ -610,7 +610,7 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
         for( int p = 0; p < i_GraphCrabFlux->GetN(); p++ )
         {
             i_GraphCrabFlux->GetPoint( p, xx, yy );
-            fCrabFlux_SourceStrength.back()->SetPoint( p, xx, yy* i_fCrabFlux[i] );
+            fCrabFlux_SourceStrength.back()->SetPoint( p, xx, yy * i_fCrabFlux[i] );
         }
         fCrabFlux_SourceStrength.back()->SetLineStyle( 9 );
     }
@@ -874,7 +874,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
             double i_b[] = { 0.0,  0.0, 0.0  };
             TMath::Quantiles( i_s_z, 3, i_s_v, i_b, i_a, kFALSE );
             cout << "\t Quantiles " << i_b[1] << "\t" << i_b[1] - i_b[0] << "\t" << i_b[2] - i_b[1] << "\t" << i_s_z << endl;
-            cout << "\t Mean      " << i_s_x / i_s_z << "\t" << 1. / ( i_s_z - 1. )*( i_s_xx - i_s_x* i_s_x ) << endl;
+            cout << "\t Mean      " << i_s_x / i_s_z << "\t" << 1. / ( i_s_z - 1. )*( i_s_xx - i_s_x * i_s_x ) << endl;
             s = i_b[1];
             s_error_L = i_b[0];
             s_error_U = i_b[2];
@@ -945,7 +945,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
                 }
                 else if( bUnit == "ENERGY" )
                 {
-                    gSensitivityvsEnergy->SetPoint( z, energy, s* i_fFunCrabFlux->Eval( energy ) );
+                    gSensitivityvsEnergy->SetPoint( z, energy, s * i_fFunCrabFlux->Eval( energy ) );
                     gSensitivityvsEnergy->SetPointEYhigh( z, TMath::Abs( s - s_error_U ) * i_fFunCrabFlux->Eval( energy ) );
                     gSensitivityvsEnergy->SetPointEYlow( z, TMath::Abs( s - s_error_L ) * i_fFunCrabFlux->Eval( energy ) );
                 }
@@ -1480,7 +1480,7 @@ double VSensitivityCalculator::calculateObservationTimevsFlux( unsigned int iD )
             // log10 hours to min
             t = TMath::Power( 10., t ) * 60.;
 
-            s = VStatistics::calcSignificance( iG* t* x + iB* t* alpha, iB* t, alpha, fLiAndMaEqu );
+            s = VStatistics::calcSignificance( iG * t * x + iB * t * alpha, iB * t, alpha, fLiAndMaEqu );
 
             if( s > fSignificance_min && t * x * iG >= fEvents_min )
             {
@@ -2201,7 +2201,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
             v_flux[z].NOff *= fObservationTime_h * 60.;
             v_flux[z].NOn_error  *= fObservationTime_h * 60.;
             v_flux[z].NOff_error *= fObservationTime_h * 60.;
-            iTotG += ( v_flux[z].NOn - v_flux[z].NOff* alpha ) / ( fObservationTime_h * 60. );
+            iTotG += ( v_flux[z].NOn - v_flux[z].NOff * alpha ) / ( fObservationTime_h * 60. );
             iTotB += v_flux[z].NOff * alpha / ( fObservationTime_h * 60. );
             if( fDebug )
             {
@@ -2897,8 +2897,8 @@ void VSensitivityCalculator::plotDebugPlotsBackgroundParticleNumbers( vector< VD
     {
         if( iDifferentialFlux[i].Energy > 0. )
         {
-            gNon->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOn* fObservationTime_h * 60. );
-            gNoff->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOff* fObservationTime_h * 60. );
+            gNon->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOn * fObservationTime_h * 60. );
+            gNoff->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOff * fObservationTime_h * 60. );
             z++;
         }
     }
@@ -2975,7 +2975,7 @@ void VSensitivityCalculator::fillParticleNumbersGraphs( vector< VDifferentialFlu
             gSignalRate->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOn / ( fObservationTime_h * 60. ) );
             gSignalRate->SetPointEXhigh( z, log10( iDifferentialFlux[i].Energy_upEdge ) - log10( iDifferentialFlux[i].Energy ) );
             gSignalRate->SetPointEXlow( z, log10( iDifferentialFlux[i].Energy ) - log10( iDifferentialFlux[i].Energy_lowEdge ) );
-            gBGRate->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOff* alpha / ( fObservationTime_h * 60. ) );
+            gBGRate->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOff * alpha / ( fObservationTime_h * 60. ) );
             gBGRate->SetPointEXhigh( z, log10( iDifferentialFlux[i].Energy_upEdge ) - log10( iDifferentialFlux[i].Energy ) );
             gBGRate->SetPointEXlow( z, log10( iDifferentialFlux[i].Energy ) - log10( iDifferentialFlux[i].Energy_lowEdge ) );
             z++;
@@ -3197,7 +3197,7 @@ bool VSensitivityCalculator::fillBackroundvsSquareDegree( TGraphAsymmErrors* i_R
                     y /= iSolidAngle * TMath::RadToDeg() * TMath::RadToDeg();
                     iH_sqDeg->SetBinContent( iH_sqDeg->FindBin( x ), y / 60. );
                     iH_sqDeg->SetBinError( iH_sqDeg->FindBin( x ), 0.5 * ( i_R->GetErrorYlow( i ) + i_R->GetErrorYhigh( i ) )
-                                           / ( iSolidAngle* TMath::DegToRad() * TMath::DegToRad() ) / 60. );
+                                           / ( iSolidAngle * TMath::DegToRad() * TMath::DegToRad() ) / 60. );
                 }
             }
         }
@@ -3353,7 +3353,7 @@ bool VSensitivityCalculator::fillSensitivityHistogramfromGraph( TGraph* g, TH1F*
         g->GetPoint( i, x, y );
         if( y > 0. && iScale != 0. )
         {
-            h->SetBinContent( h->FindBin( x ), y* iScale );
+            h->SetBinContent( h->FindBin( x ), y * iScale );
             if( 0.5 * ( g->GetErrorYlow( i ) + g->GetErrorYhigh( i ) )*iScale < y * iScale )
             {
                 h->SetBinError( h->FindBin( x ), 0.5 * ( g->GetErrorYlow( i ) + g->GetErrorYhigh( i ) )*iScale );

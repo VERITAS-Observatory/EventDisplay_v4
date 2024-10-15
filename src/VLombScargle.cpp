@@ -81,8 +81,8 @@ void VLombScargle::fillPeriodigram( bool iShuffle )
         {
             if( fLightCurveData[j] )
             {
-                i_sin += TMath::Sin( 2.*w* fLightCurveData[j]->getMJD() );
-                i_cos += TMath::Cos( 2.*w* fLightCurveData[j]->getMJD() );
+                i_sin += TMath::Sin( 2.*w * fLightCurveData[j]->getMJD() );
+                i_cos += TMath::Cos( 2.*w * fLightCurveData[j]->getMJD() );
             }
         }
         tau = TMath::ATan2( i_sin, i_cos ) / 2. / w;
@@ -121,7 +121,7 @@ void VLombScargle::fillPeriodigram( bool iShuffle )
         if( i_A_den > 0. && i_B_den > 0. )
         {
             fVFrequency.push_back( f );
-            fVPeriodigram.push_back(( i_A_num* i_A_num / i_A_den + i_B_num* i_B_num / i_B_den ) / 2. / iVar );
+            fVPeriodigram.push_back(( i_A_num * i_A_num / i_A_den + i_B_num * i_B_num / i_B_den ) / 2. / iVar );
         }
     }
 }

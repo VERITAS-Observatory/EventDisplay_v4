@@ -136,7 +136,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
     hscale = new TH1F( "hscale", "", nxybin, 0., xymax );
     for( int i = 1; i < nxybin; i++ )
     {
-        hscale->SetBinContent( i, TMath::Pi()*xymax* xymax / (( double )( nxybin* nxybin ) ) * ( 2 * i - 1 ) );
+        hscale->SetBinContent( i, TMath::Pi()*xymax * xymax / (( double )( nxybin * nxybin ) ) * ( 2 * i - 1 ) );
     }
     for( int i = 1; i < nxybin; i++ )
     {
@@ -415,7 +415,7 @@ double VRadialAcceptance::getAcceptance( double x, double y, double erec, double
     if( f2DAcceptanceMode == 0 )  // then we give a normal, 1D radial acceptance
     {
 
-        double idist = sqrt( x* x + y* y );
+        double idist = sqrt( x * x + y * y );
         double iacc = 1.;
 
         if( fAcceptanceFunctionDefined && fAccZe.size() > 0 )
@@ -615,7 +615,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
         // no more cuts after this statement
         bPassed = true;
 
-        idist = sqrt( iData->Xoff* iData->Xoff + iData->Yoff* iData->Yoff );
+        idist = sqrt( iData->Xoff * iData->Xoff + iData->Yoff * iData->Yoff );
 
         // fill 2D distribution of events
         hXYAccTot->Fill( iData->Xoff, iData->Yoff );
@@ -628,7 +628,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
 
         // 1D histograms
         // Radius Dependent Histograms
-        eventradius = sqrt( iData->Xoff_derot* iData->Xoff_derot + iData->Yoff_derot* iData->Yoff_derot ) ;
+        eventradius = sqrt( iData->Xoff_derot * iData->Xoff_derot + iData->Yoff_derot * iData->Yoff_derot ) ;
         eventphi    = atan2( iData->Yoff_derot, iData->Xoff_derot ) ; // radians
         if( eventphi < 0.0 )
         {
@@ -895,7 +895,7 @@ void VRadialAcceptance::scaleArea( TH1F* h )
         double iL = h->GetXaxis()->GetBinLowEdge( i );
         double iU = h->GetXaxis()->GetBinLowEdge( i ) + h->GetXaxis()->GetBinWidth( i );
 
-        iA = TMath::Pi() * ( iU* iU - iL* iL );
+        iA = TMath::Pi() * ( iU * iU - iL * iL );
 
         if( iA > 0. )
         {
@@ -923,7 +923,7 @@ Double_t VRadialAcceptance_fit_acceptance_function( Double_t* x, Double_t* par )
     double x0 = par[4];
 
     double a1 = -1.*( x0 * ( 2.*a2 + x0 * ( 3.*a3 + x0 * ( 4.*a4 + x0 * 5. * a5 ) ) ) );
-    double a0 = 1. - ( x0 * ( a1 + x0 * ( a2 + x0 * ( a3 + x0 * ( a4 + x0* a5 ) ) ) ) );
+    double a0 = 1. - ( x0 * ( a1 + x0 * ( a2 + x0 * ( a3 + x0 * ( a4 + x0 * a5 ) ) ) ) );
 
     if( x[0] < x0 )
     {
@@ -961,7 +961,7 @@ double VRadialAcceptance::calculate2DBinNormalizationConstant( double radius ) /
         hXYAccTotDeRot->GetBinXYZ( i_bin, i_binx, i_biny, i_binz ) ;
         bincentx = hXYAccTotDeRot->GetXaxis()->GetBinCenter( i_binx ) ;
         bincenty = hXYAccTotDeRot->GetYaxis()->GetBinCenter( i_biny ) ;
-        iradius  = sqrt( bincentx* bincentx + bincenty* bincenty ) ;
+        iradius  = sqrt( bincentx * bincentx + bincenty * bincenty ) ;
         binCont  = hXYAccTotDeRot->GetBinContent( i_binx, i_biny ) ;
         if( iradius < radius )  // bin center < 0.3 deg
         {

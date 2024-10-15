@@ -59,16 +59,14 @@ class VTableLookup
         vector< double > fTableAzLowEdge;
         vector< double > fTableAzUpEdge;
 
-        bool bEcorr;                              // do energy correction for height of shower maximum
         int fnmscw;
         vector< bool > fTelToAnalyze;
-        vector< double > fTableNoiseLevel;
         vector< double > fTableZe;      // [nze]
         vector< vector< double > > fTableZeOffset;  // [nze][nwoff]
 
         // tables
-        // fmscw[ze][woff][az][tel][noise]
-        vector< vector< vector< vector< vector< ULong64_t > > > > > fTelType_tables;
+        // fmscw[ze][woff][az][tel]
+        vector< vector< vector< vector< ULong64_t > > > > fTelType_tables;
         vector< vector< vector< vector< vector< VTableCalculator* > > > > > fmscw;
         vector< vector< vector< vector< vector< VTableCalculator* > > > > > fmscl;
         vector< vector< vector< vector< vector< VTableCalculator* > > > > > fenergySizevsRadius;
@@ -77,26 +75,9 @@ class VTableLookup
         VTableCalculator* f_calc_msc;
         VTableCalculator* f_calc_energySR;
 
-
         double fMeanNoiseLevel;
         vector< double > fNoiseLevel;             // pedestal variances per telescope from source file
         unsigned int fNNoiseLevelWarnings;
-
-        VTablesToRead* s_NupZupWup;
-        VTablesToRead* s_NupZupWlow;
-        VTablesToRead* s_NupZup;
-        VTablesToRead* s_NupZlowWup;
-        VTablesToRead* s_NupZlowWlow;
-        VTablesToRead* s_NupZlow;
-        VTablesToRead* s_Nup;
-        VTablesToRead* s_NlowZupWup;
-        VTablesToRead* s_NlowZupWlow;
-        VTablesToRead* s_NlowZup;
-        VTablesToRead* s_NlowZlowWup;
-        VTablesToRead* s_NlowZlowWlow;
-        VTablesToRead* s_NlowZlow;
-        VTablesToRead* s_Nlow;
-        VTablesToRead* s_N;
 
         void calculateMSFromTables( VTablesToRead* s, double esys );
         void configureTelescopeVector();
@@ -137,10 +118,6 @@ class VTableLookup
         bool   initialize( VTableLookupRunParameter* );
         void   loop();                              // loop over all events
         bool   setInputFiles( vector< string > iInputFiles ); // set input files from evndisp
-        void   setEnergyCorrection( bool iEcorr )
-        {
-            bEcorr = iEcorr;    // apply energy correction for shower maximum
-        }
         void   setMCTableFiles( string, string, string ); // set MC table file names (reading tables)
         void   setMCTableFiles( string, double, int, vector< double >, string, string, bool ); // set MC table file names (writing tables)
         void   setNEntries( int iN )

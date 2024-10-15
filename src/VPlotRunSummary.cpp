@@ -564,7 +564,7 @@ void VPlotRunSummary::fill()
         {
             cout << "Run " << c->runOn << ": rate " << c->Rate << " +- " << c->RateE << " g/min";
             cout << ", elevation: " << c->elevationOn;
-            cout << ", wobble: " << sqrt( c->WobbleNorth* c->WobbleNorth + c->WobbleWest* c->WobbleWest );
+            cout << ", wobble: " << sqrt( c->WobbleNorth * c->WobbleNorth + c->WobbleWest * c->WobbleWest );
             cout << ", alpha: " << c->OffNorm;
             cout << endl;
             // 1D histograms
@@ -577,13 +577,13 @@ void VPlotRunSummary::fill()
             gRatevsTime->SetPoint( t, c->MJDOn, c->Rate );
             if( c->tOn > 0. )
             {
-                gRatevsTime->SetPointError( t, 0., sqrt( c->NOn + c->OffNorm* c->OffNorm* c->NOff ) / c->tOn * 60. );
+                gRatevsTime->SetPointError( t, 0., sqrt( c->NOn + c->OffNorm * c->OffNorm * c->NOff ) / c->tOn * 60. );
             }
 
             gRateOffvsTime->SetPoint( t, c->MJDOn, c->RateOff );
             if( c->tOn > 0. )
             {
-                gRateOffvsTime->SetPointError( t, 0., c->OffNorm* sqrt( c->NOff ) / c->tOn * 60. );
+                gRateOffvsTime->SetPointError( t, 0., c->OffNorm * sqrt( c->NOff ) / c->tOn * 60. );
             }
 
             gSignificancevsTime->SetPoint( t, c->MJDOn, c->Signi );
@@ -608,7 +608,7 @@ void VPlotRunSummary::fill()
             }
 
             // wobble direction plots
-            int iAng = ( int )( sqrt( c->WobbleNorth* c->WobbleNorth + c->WobbleWest* c->WobbleWest ) * 20. + 0.5 );
+            int iAng = ( int )( sqrt( c->WobbleNorth * c->WobbleNorth + c->WobbleWest * c->WobbleWest ) * 20. + 0.5 );
 
             // (Temporary: dirty fix to get 1.43 point into 1.5 bin)
             if( iAng == 29 )
@@ -657,10 +657,10 @@ void VPlotRunSummary::fill()
             gRawRateOffvsElevation->SetPoint( t, c->elevationOff, c->RawRateOff );
             gRawRateOffvsElevation->SetPointError( t, 0., 0. );
 
-            gRatevsWobbleOffset->SetPoint( t, sqrt( c->WobbleNorth* c->WobbleNorth + c->WobbleWest* c->WobbleWest ), c->Rate );
+            gRatevsWobbleOffset->SetPoint( t, sqrt( c->WobbleNorth * c->WobbleNorth + c->WobbleWest * c->WobbleWest ), c->Rate );
             gRatevsWobbleOffset->SetPointError( t, 0., c->RateE );
 
-            gRateOffvsWobbleOffset->SetPoint( t, sqrt( c->WobbleNorth* c->WobbleNorth + c->WobbleWest* c->WobbleWest ), c->RateOff );
+            gRateOffvsWobbleOffset->SetPoint( t, sqrt( c->WobbleNorth * c->WobbleNorth + c->WobbleWest * c->WobbleWest ), c->RateOff );
             gRateOffvsWobbleOffset->SetPointError( t, 0., c->RateOffE );
 
             int iElevationBin = 0;

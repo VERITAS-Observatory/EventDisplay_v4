@@ -473,10 +473,10 @@ bool VDST::writeCalibrationData()
     t->Branch( "num_sumwindow", &fnum_sumwindow, "num_sumwindow/i" );
     t->Branch( "sumwindow", fsumwindow, "sumwindow[num_sumwindow]/i" );
     t->Branch( "ped_high", fPed_high, "ped_high[NPixel]/F" );
-    sprintf( hname, "pedvar_high[%d]/F", VDST_MAXCHANNELS* VDST_MAXSUMWINDOW );
+    sprintf( hname, "pedvar_high[%d]/F", VDST_MAXCHANNELS * VDST_MAXSUMWINDOW );
     t->Branch( "pedvar_high", fPedvar_high, hname );
     t->Branch( "ped_low", fPed_low, "ped_low[NPixel]/F" );
-    sprintf( hname, "pedvar_low[%d]/F", VDST_MAXCHANNELS* VDST_MAXSUMWINDOW );
+    sprintf( hname, "pedvar_low[%d]/F", VDST_MAXCHANNELS * VDST_MAXSUMWINDOW );
     t->Branch( "pedvar_low", fPedvar_low, hname );
     t->Branch( "conv_high", fConv_high, "conv_high[NPixel]/F" );
     t->Branch( "conv_low", fConv_low, "conv_low[NPixel]/F" );

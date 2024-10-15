@@ -172,7 +172,7 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
         if( iFluxE > 0. )
         {
             fFlux -= iFlux;
-            setFluxError( sqrt( getFluxError()*getFluxError() + iFluxE* iFluxE ) );
+            setFluxError( sqrt( getFluxError()*getFluxError() + iFluxE * iFluxE ) );
         }
     }
 

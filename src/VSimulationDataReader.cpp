@@ -452,7 +452,7 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
         iMCRunHeader->core_pos_mode = 1;
     }
     // geomagnetic field
-    iMCRunHeader->B_total = sqrt( iMCRunHeader->B_total* iMCRunHeader->B_total + iMCRunHeader->B_inclination* iMCRunHeader->B_inclination );
+    iMCRunHeader->B_total = sqrt( iMCRunHeader->B_total * iMCRunHeader->B_total + iMCRunHeader->B_inclination * iMCRunHeader->B_inclination );
     if( iMCRunHeader->B_total > 0. )
     {
         iMCRunHeader->B_inclination = acos( iMCRunHeader->B_inclination / iMCRunHeader->B_total );

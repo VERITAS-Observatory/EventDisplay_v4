@@ -211,8 +211,8 @@ bool VEnergySpectrum::openAsciiFile( string iFile )
 
         if( i_flux.DifferentialFluxError_low > 0. && i_flux.DifferentialFluxError_low > 0. )
         {
-            i_flux.DifferentialFluxError = sqrt( i_flux.DifferentialFluxError_low* i_flux.DifferentialFluxError_low
-                                                 + i_flux.DifferentialFluxError_up* i_flux.DifferentialFluxError_up );
+            i_flux.DifferentialFluxError = sqrt( i_flux.DifferentialFluxError_low * i_flux.DifferentialFluxError_low
+                                                 + i_flux.DifferentialFluxError_up * i_flux.DifferentialFluxError_up );
         }
         else
         {
@@ -476,7 +476,7 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
         // calculate total observation time (take the energy threshold into account)
         addValueToHistogram( hErecTotalTime, i_obsTime, fRunList[i].energyThreshold, bLinearX );
         fTotalObservationTime += i_obsTime;
-        addValueToHistogram( hErecTotalTimeDeadTimeCorrected, i_obsTime* fRunList[i].deadTimeFraction, fRunList[i].energyThreshold, bLinearX );
+        addValueToHistogram( hErecTotalTimeDeadTimeCorrected, i_obsTime * fRunList[i].deadTimeFraction, fRunList[i].energyThreshold, bLinearX );
         fTotalObservationTimeDeadTimeCorrected += i_obsTime * fRunList[i].deadTimeFraction;
         // add current histogram to combined histogram (take energy threshold into account)
         // (counting histograms are not dead time corrected)
@@ -1088,7 +1088,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
                 i_flux.DifferentialFluxError_low = TMath::Abs(( i_ndiff - i_Rolke.GetLowerLimit() ) * i_flux.DifferentialFlux / i_ndiff );
                 i_flux.DifferentialFluxError_up  = TMath::Abs(( i_Rolke.GetUpperLimit() - i_ndiff ) * i_flux.DifferentialFlux  / i_ndiff );
                 // recalculate poissonian flux error
-                i_flux.DifferentialFluxError =  sqrt( i_flux.NOn + fTotalNormalisationFactor* fTotalNormalisationFactor* i_flux.NOff )
+                i_flux.DifferentialFluxError =  sqrt( i_flux.NOn + fTotalNormalisationFactor * fTotalNormalisationFactor * i_flux.NOff )
                                                 * i_flux.DifferentialFlux / i_ndiff;
             }
             // that probably does not make sense
@@ -1137,7 +1137,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
             cout << ", Norm " << fTotalNormalisationFactor;
             cout << ", TOn " << i_flux.ObsTime;
             cout << ", Flux " << scientific << i_flux.DifferentialFlux;
-            cout << ", (F2 " << ( i_flux.NOn - i_flux.NOff* fTotalNormalisationFactor ) / i_flux.dE / i_flux.ObsTime
+            cout << ", (F2 " << ( i_flux.NOn - i_flux.NOff * fTotalNormalisationFactor ) / i_flux.dE / i_flux.ObsTime
                  / hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) ) * 1.e-4 << ")";
             cout << fixed << endl;
             cout << endl;
@@ -1313,17 +1313,17 @@ TGraphAsymmErrors* VEnergySpectrum::getEnergySpectrumGraph()
         }
         // error on flux
         gEnergySpectrum->SetPoint( z, log10( fDifferentialFlux[i].EnergyWeightedMean ),
-                                   fDifferentialFlux[i].DifferentialFlux* TMath::Power( fDifferentialFlux[i].Energy, fPlottingMultiplierIndex ) );
+                                   fDifferentialFlux[i].DifferentialFlux * TMath::Power( fDifferentialFlux[i].Energy, fPlottingMultiplierIndex ) );
         // error on differential flux
         if( fErrorCalculationMethod == "Poisson" )
         {
-            gEnergySpectrum->SetPointEYhigh( z, fDifferentialFlux[i].DifferentialFluxError* TMath::Power( fDifferentialFlux[i].Energy, fPlottingMultiplierIndex ) );
-            gEnergySpectrum->SetPointEYlow( z, fDifferentialFlux[i].DifferentialFluxError* TMath::Power( fDifferentialFlux[i].Energy, fPlottingMultiplierIndex ) );
+            gEnergySpectrum->SetPointEYhigh( z, fDifferentialFlux[i].DifferentialFluxError * TMath::Power( fDifferentialFlux[i].Energy, fPlottingMultiplierIndex ) );
+            gEnergySpectrum->SetPointEYlow( z, fDifferentialFlux[i].DifferentialFluxError * TMath::Power( fDifferentialFlux[i].Energy, fPlottingMultiplierIndex ) );
         }
         else if( fErrorCalculationMethod == "Rolke" || fErrorCalculationMethod == "UPDOWN" )
         {
-            gEnergySpectrum->SetPointEYhigh( z, fDifferentialFlux[i].DifferentialFluxError_up* TMath::Power( fDifferentialFlux[i].Energy, fPlottingMultiplierIndex ) );
-            gEnergySpectrum->SetPointEYlow( z, fDifferentialFlux[i].DifferentialFluxError_low* TMath::Power( fDifferentialFlux[i].Energy, fPlottingMultiplierIndex ) );
+            gEnergySpectrum->SetPointEYhigh( z, fDifferentialFlux[i].DifferentialFluxError_up * TMath::Power( fDifferentialFlux[i].Energy, fPlottingMultiplierIndex ) );
+            gEnergySpectrum->SetPointEYlow( z, fDifferentialFlux[i].DifferentialFluxError_low * TMath::Power( fDifferentialFlux[i].Energy, fPlottingMultiplierIndex ) );
         }
         z++;
     }
@@ -1705,7 +1705,7 @@ TCanvas*  VEnergySpectrum::plotCountingHistograms( TCanvas* c )
     for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ )
     {
         gErecOn->SetPoint( i, log10( fDifferentialFlux[i].EnergyWeightedMean ), fDifferentialFlux[i].NOn );
-        gErecOff->SetPoint( i, log10( fDifferentialFlux[i].EnergyWeightedMean ), fDifferentialFlux[i].NOff* fTotalNormalisationFactor );
+        gErecOff->SetPoint( i, log10( fDifferentialFlux[i].EnergyWeightedMean ), fDifferentialFlux[i].NOff * fTotalNormalisationFactor );
         i_non += fDifferentialFlux[i].NOn;
         i_noff += fDifferentialFlux[i].NOff * fTotalNormalisationFactor;
     }
@@ -1788,7 +1788,7 @@ void VEnergySpectrum::plotEventNumbers( Double_t ts )
     char hnum[500];
     for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ )
     {
-        sprintf( hnum, "%.1f events (%.1f #sigma)", ( fDifferentialFlux[i].NOn - fTotalNormalisationFactor* fDifferentialFlux[i].NOff ),
+        sprintf( hnum, "%.1f events (%.1f #sigma)", ( fDifferentialFlux[i].NOn - fTotalNormalisationFactor * fDifferentialFlux[i].NOff ),
                  fDifferentialFlux[i].Significance );
 
         double y  = ( fDifferentialFlux[i].DifferentialFlux + fDifferentialFlux[i].DifferentialFluxError ) * 1.75;

@@ -103,7 +103,7 @@ void VImageParameterCalculation::calcTimingParameters()
             double xpmt = xi - fParGeo->cen_x;
             double ypmt = yi - fParGeo->cen_y;
             // position along the major axis of the image (relative to centroid position)
-            xpos.push_back( xpmt* fParGeo->cosphi + ypmt* fParGeo->sinphi );
+            xpos.push_back( xpmt * fParGeo->cosphi + ypmt * fParGeo->sinphi );
             if( xpos.back() > i_xmax )
             {
                 i_xmax =  xpos.back();
@@ -328,7 +328,7 @@ void VImageParameterCalculation::muonRingFinder()
 
     if( counter > 10 )
     {
-        rVariance[0] = ( rSquaredTotal - rTotal* rTotal / counter ) / counter;
+        rVariance[0] = ( rSquaredTotal - rTotal * rTotal / counter ) / counter;
         rBar[0] = rTotal / counter;
         rBar[1] = 20.0;                           //so we have a starting value to enter the loop
     }
@@ -371,7 +371,7 @@ void VImageParameterCalculation::muonRingFinder()
                 rSquaredTotal += tmp * tmp;
             }
         }
-        rVariance[1] = ( rSquaredTotal - rTotal* rTotal / counter ) / counter;
+        rVariance[1] = ( rSquaredTotal - rTotal * rTotal / counter ) / counter;
         rBar[1] = rTotal / counter;
 
         //is rVariance[1] > rVariance[0] ? then try a step in the -x direction
@@ -393,7 +393,7 @@ void VImageParameterCalculation::muonRingFinder()
                     rSquaredTotal += tmp * tmp;
                 }
             }
-            rVariance[1] = ( rSquaredTotal - rTotal* rTotal / counter ) / counter;
+            rVariance[1] = ( rSquaredTotal - rTotal * rTotal / counter ) / counter;
             rBar[1] = rTotal / counter;
 
             //is rVariance[1] > rVariance[0] ? then keep original coordinate
@@ -433,7 +433,7 @@ void VImageParameterCalculation::muonRingFinder()
                 rSquaredTotal += tmp * tmp;
             }
         }
-        rVariance[1] = ( rSquaredTotal - rTotal* rTotal / counter ) / counter;
+        rVariance[1] = ( rSquaredTotal - rTotal * rTotal / counter ) / counter;
         rBar[1] = rTotal / counter;
 
         //is rVariance[1] > rVariance[0] ? then try a step in the -x direction
@@ -455,7 +455,7 @@ void VImageParameterCalculation::muonRingFinder()
                     rSquaredTotal += tmp * tmp;
                 }
             }
-            rVariance[1] = ( rSquaredTotal - rTotal* rTotal / counter ) / counter;
+            rVariance[1] = ( rSquaredTotal - rTotal * rTotal / counter ) / counter;
             rBar[1] = rTotal / counter;
 
             //is rVariance[1] > rVariance[0] ? then keep original coordinate
@@ -1169,7 +1169,7 @@ void VImageParameterCalculation::calcParameters()
         ////////////////////////////////////////////////////////////////////////////
 
         const double d = sdevy2 - sdevx2;
-        const double z = sqrt( d* d + 4.0 * sdevxy* sdevxy );
+        const double z = sqrt( d * d + 4.0 * sdevxy * sdevxy );
 
         fParGeo->f_d = d;
         fParGeo->f_s = z;
@@ -1183,7 +1183,7 @@ void VImageParameterCalculation::calcParameters()
             // not along x or y
             const double ac = ( d + z ) * ymean + 2.0 * sdevxy * xmean;
             const double bc = 2.0 * sdevxy * ymean - ( d - z ) * xmean;
-            const double cc = sqrt( ac* ac + bc* bc );
+            const double cc = sqrt( ac * ac + bc * bc );
             cosphi = bc / cc;
             sinphi = ac / cc;
         }
@@ -1199,7 +1199,7 @@ void VImageParameterCalculation::calcParameters()
             cosphi = -ymean / dist;
             // There seems to be a strange FP problem with the code below..
             //      sinphi= xmean / dist;
-            sinphi = sqrt( 1.0 - cosphi* cosphi );
+            sinphi = sqrt( 1.0 - cosphi * cosphi );
         }
         else
         {
@@ -1235,7 +1235,7 @@ void VImageParameterCalculation::calcParameters()
         {
             const double u = 1 + d / z;
             const double v = 2 - u;
-            miss2 = ( u* xmean2 + v* ymean2 ) / 2.0 - meanxy * ( 2.0 * sdevxy / z );
+            miss2 = ( u * xmean2 + v * ymean2 ) / 2.0 - meanxy * ( 2.0 * sdevxy / z );
 
             if( miss2 < ZeroTolerence )
             {
@@ -1251,7 +1251,7 @@ void VImageParameterCalculation::calcParameters()
         }
         const double miss = sqrt( miss2 );
 #else
-        double miss    = fabs(-sinphi* xmean + cosphi* ymean );
+        double miss    = fabs(-sinphi * xmean + cosphi * ymean );
         if( miss > dist )
         {
             miss = dist;    // Weird rounding error
@@ -1290,7 +1290,7 @@ void VImageParameterCalculation::calcParameters()
             const double s2a = sinalpha * sinalpha;
             const double c2a = 1.0 - s2a;
             const double azfactor =
-                1.0 + (( sinalpha == 0 ) ? 0.0 : ( length2 - width2 ) / ( width2 + length2* c2a / s2a ) );
+                1.0 + (( sinalpha == 0 ) ? 0.0 : ( length2 - width2 ) / ( width2 + length2 * c2a / s2a ) );
             azwidth = width * sqrt( azfactor );
         }
         else
@@ -1491,7 +1491,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 
     if( sigmaX > ZeroTolerence && sigmaY > ZeroTolerence )
     {
-        rho = tan( 2. * fParGeo->phi ) * ( sigmaX* sigmaX - sigmaY* sigmaY ) / sigmaX / sigmaY / 2.;
+        rho = tan( 2. * fParGeo->phi ) * ( sigmaX * sigmaX - sigmaY * sigmaY ) / sigmaX / sigmaY / 2.;
     }
     else
     {
@@ -1699,18 +1699,18 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     }
 
     // covariance
-    double sigmaXY = rho * sqrt( sigmaX* sigmaX* sigmaY* sigmaY );
+    double sigmaXY = rho * sqrt( sigmaX * sigmaX * sigmaY * sigmaY );
     double dsx_y2 = sigmaX * sigmaX - sigmaY * sigmaY;
     double dsxxy2 = sigmaX * sigmaX * sigmaY * sigmaY;
 
     double d = sigmaY * sigmaY - sigmaX * sigmaX;
-    double z = sqrt( d* d + 4. * sigmaXY* sigmaXY );
+    double z = sqrt( d * d + 4. * sigmaXY * sigmaXY );
     fParLL->f_d = d;
     fParLL->f_s = z;
     fParLL->f_sdevxy = sigmaXY;
-    double length = sqrt( 0.5 * ( sigmaX* sigmaX + sigmaY* sigmaY + z ) );
+    double length = sqrt( 0.5 * ( sigmaX * sigmaX + sigmaY * sigmaY + z ) );
     double width = sigmaX * sigmaX + sigmaY * sigmaY - z;
-    double phi = atan2( 2.*rho* sigmaX* sigmaY, dsx_y2 ) / 2.;
+    double phi = atan2( 2.*rho * sigmaX * sigmaY, dsx_y2 ) / 2.;
     if( width > ZeroTolerence )
     {
         width = sqrt( 0.5 * width );
@@ -1733,9 +1733,9 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     double sinphi = sin( phi );
 
     double dist = 0.;
-    dist = sqrt( cen_x* cen_x + cen_y* cen_y );
+    dist = sqrt( cen_x * cen_x + cen_y * cen_y );
     double miss = 0.;
-    miss = fabs( cen_y* cosphi - cen_x* sinphi );
+    miss = fabs( cen_y * cosphi - cen_x * sinphi );
 
     double alpha = 0.;
     if( dist != 0. )
@@ -1764,14 +1764,14 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     dd2 = 4.*sigmaY * sigmaY * dsigmaY * dsigmaY + 4.*sigmaX * sigmaX * dsigmaX * dsigmaX;
 
     double dz2;
-    dz2  = d * d / ( d* d + 4.*sigmaXY* sigmaXY ) * dd2;
-    dz2 += 16.*sigmaXY * sigmaXY / ( d* d + 4.*sigmaXY* sigmaXY ) * dsigmaXY2;
+    dz2  = d * d / ( d * d + 4.*sigmaXY * sigmaXY ) * dd2;
+    dz2 += 16.*sigmaXY * sigmaXY / ( d * d + 4.*sigmaXY * sigmaXY ) * dsigmaXY2;
 
     double dlength;
     dlength  = 4.*sigmaX * sigmaX * dsigmaX * dsigmaX;
     dlength += 4.*sigmaY * sigmaY * dsigmaY * dsigmaY;
     dlength += 1. / 2. * dz2;
-    dlength *= 1. / 8. / ( sigmaX* sigmaX + sigmaY* sigmaY + z );
+    dlength *= 1. / 8. / ( sigmaX * sigmaX + sigmaY * sigmaY + z );
     if( dlength > 0. )
     {
         dlength = sqrt( dlength );
@@ -1785,7 +1785,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     dwidth  = 4.*sigmaX * sigmaX * dsigmaX * dsigmaX;
     dwidth += 4.*sigmaY * sigmaY * dsigmaY * dsigmaY;
     dwidth += dz2;
-    dwidth *= 1. / 8. / ( sigmaX* sigmaX + sigmaY* sigmaY - z );
+    dwidth *= 1. / 8. / ( sigmaX * sigmaX + sigmaY * sigmaY - z );
     if( dwidth > 0. )
     {
         dwidth  = sqrt( dwidth );
@@ -1803,10 +1803,10 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     else
     {
         dphi  = 4.* dsxxy2 / dsx_y2 / dsx_y2 * drho * drho;
-        dphi += ( 2.*rho* sigmaY* dsx_y2 - 4.*rho* sigmaY* sigmaX* sigmaX ) * ( 2.*rho* sigmaY* dsx_y2 - 4.*rho* sigmaY* sigmaX* sigmaX ) / dsx_y2 / dsx_y2 / dsx_y2 / dsx_y2 * dsigmaX * dsigmaX;
-        dphi += ( 2.*rho* sigmaX* dsx_y2 + 4.*rho* sigmaY* sigmaY* sigmaX ) * ( 2.*rho* sigmaX* dsx_y2 + 4.*rho* sigmaY* sigmaY* sigmaX ) / dsx_y2 / dsx_y2 / dsx_y2 / dsx_y2 * dsigmaY * dsigmaY;
-        dphi *= 1. / ( 1. + 2.*rho* sigmaX* sigmaY / dsx_y2 * 2.*rho* sigmaX* sigmaY / dsx_y2 );
-        dphi *= 1. / ( 1. + 2.*rho* sigmaX* sigmaY / dsx_y2 * 2.*rho* sigmaX* sigmaY / dsx_y2 );
+        dphi += ( 2.*rho * sigmaY * dsx_y2 - 4.*rho * sigmaY * sigmaX * sigmaX ) * ( 2.*rho * sigmaY * dsx_y2 - 4.*rho * sigmaY * sigmaX * sigmaX ) / dsx_y2 / dsx_y2 / dsx_y2 / dsx_y2 * dsigmaX * dsigmaX;
+        dphi += ( 2.*rho * sigmaX * dsx_y2 + 4.*rho * sigmaY * sigmaY * sigmaX ) * ( 2.*rho * sigmaX * dsx_y2 + 4.*rho * sigmaY * sigmaY * sigmaX ) / dsx_y2 / dsx_y2 / dsx_y2 / dsx_y2 * dsigmaY * dsigmaY;
+        dphi *= 1. / ( 1. + 2.*rho * sigmaX * sigmaY / dsx_y2 * 2.*rho * sigmaX * sigmaY / dsx_y2 );
+        dphi *= 1. / ( 1. + 2.*rho * sigmaX * sigmaY / dsx_y2 * 2.*rho * sigmaX * sigmaY / dsx_y2 );
         dphi  = sqrt( dphi );
         dphi  = redang( dphi, M_PI / 2. );
     }
@@ -1819,14 +1819,14 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     ddist = sqrt( ddist );
     double dmiss = 0.;
     dmiss  = cosphi * cosphi * dcen_x * dcen_x + sinphi * sinphi * dcen_y * dcen_y;
-    dmiss += dphi * dphi * ( sinphi* sinphi* cen_x* cen_x + cosphi* cosphi* cen_y* cen_y );
+    dmiss += dphi * dphi * ( sinphi * sinphi * cen_x * cen_x + cosphi * cosphi * cen_y * cen_y );
     dmiss = sqrt( dmiss );
 
     double dalpha = 0.;
     if( dist != 0. )
     {
         dalpha  = dmiss * dmiss / dist / dist + miss * miss / dist / dist / dist / dist * ddist * dist;
-        dalpha *= 1. / sqrt( 1. - miss* miss / dist / dist );
+        dalpha *= 1. / sqrt( 1. - miss * miss / dist / dist );
     }
     else
     {
@@ -1903,9 +1903,9 @@ double VImageParameterCalculation::getFitValue( unsigned int iChannel, double rh
     f  = ( x - meanX ) * ( x - meanX ) / sigmaX / sigmaX;
     f += ( y - meanY ) * ( y - meanY ) / sigmaY / sigmaY;
     f += -2. * rho * ( x - meanX ) / sigmaX * ( y - meanY ) / sigmaY;
-    f *= -1. / 2. / ( 1. - rho* rho );
+    f *= -1. / 2. / ( 1. - rho * rho );
     f  = exp( f );
-    f *= 1. / 2. / TMath::Pi() / sigmaX / sigmaY / sqrt( 1. - rho* rho );
+    f *= 1. / 2. / TMath::Pi() / sigmaX / sigmaY / sqrt( 1. - rho * rho );
     f *= signal;
 
     return f;
@@ -2070,7 +2070,7 @@ void get_LL_imageParameter_2DGauss( Int_t& npar, Double_t* gin, Double_t& f, Dou
                 sum  = ( x - par[1] ) * ( x - par[1] ) / par[2] / par[2];
                 sum += ( y - par[3] ) * ( y - par[3] ) / par[4] / par[4];
                 sum += -2. * par[0] * ( x - par[1] ) / par[2] * ( y - par[3] ) / par[4];
-                sum  = rho_s * exp( sum* rho_1 );
+                sum  = rho_s * exp( sum * rho_1 );
 
                 // assume Poisson fluctuations (neglecting background noise)
                 if( n > 0. && sum > 0. )

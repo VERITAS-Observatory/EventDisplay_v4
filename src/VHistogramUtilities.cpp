@@ -831,7 +831,7 @@ bool VHistogramUtilities::divide( TGraphAsymmErrors* g, TGraphAsymmErrors* g1, T
 
                 double iErr1 = 1. / y1 * 0.5 * ( g1->GetErrorYhigh( i ) + g1->GetErrorYlow( i ) );
                 double iErr2 = 1. / y2 * 0.5 * ( g2->GetErrorYhigh( j ) + g2->GetErrorYlow( j ) );
-                double yErr = y * sqrt( iErr1* iErr1 + iErr2* iErr2 );
+                double yErr = y * sqrt( iErr1 * iErr1 + iErr2 * iErr2 );
                 g->SetPointError( z, g1->GetErrorXlow( i ), g1->GetErrorXhigh( i ), yErr, yErr );
                 z++;
                 break;
