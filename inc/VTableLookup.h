@@ -109,7 +109,7 @@ class VTableLookup
         void getTables( unsigned int inoise, unsigned int ize, unsigned int iwoff, unsigned int iaz, unsigned int tel, VTablesToRead* s );
         void interpolate( VTablesToRead* s1, double w1, VTablesToRead* s2, double w2, VTablesToRead* s, double w, bool iCos = false );
         void readLookupTable();
-        void   readNoiseLevel( bool bWriteToRunPara = true ); // read noise level from pedvar histograms of data files
+        void readNoiseLevel( bool bWriteToRunPara = true ); // read noise level from pedvar histograms of data files
         bool sanityCheckLookupTableFile( bool iPrint = false );
 
     public:
@@ -142,7 +142,7 @@ class VTableLookup
             bEcorr = iEcorr;    // apply energy correction for shower maximum
         }
         void   setMCTableFiles( string, string, string ); // set MC table file names (reading tables)
-        void   setMCTableFiles( string, double, int, int, string, string, bool ); // set MC table file names (writing tables)
+        void   setMCTableFiles( string, double, int, vector< double >, string, string, bool ); // set MC table file names (writing tables)
         void   setNEntries( int iN )
         {
             if( fData )

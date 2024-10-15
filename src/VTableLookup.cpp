@@ -100,7 +100,7 @@ void VTableLookup::setOutputFile( string ifile, string ioption, string ioutputfi
      \param noise       noise level (mean pedvar) to be filled
      \param isuff       histogram suffix
 */
-void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int noise, string isuff, string iFileTitle, bool iWrite1DHistograms )
+void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, vector<double> noise, string isuff, string iFileTitle, bool iWrite1DHistograms )
 {
     if( fDebug )
     {
@@ -159,16 +159,6 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
     }
     char hname[800];
     char htitle[800];
-    // NOISE LEVEL
-    sprintf( hname, "NOISE_%05d", noise );
-    if( fLookupTableFile->Get( hname ) )
-    {
-        fLookupTableFile->cd( hname );
-    }
-    else
-    {
-        fLookupTableFile->mkdir( hname )->cd();
-    }
     // ZENITH ANGLE
     sprintf( hname, "ze_%03d", ( int )( ize * 10. + 0.5 ) );
     if( gDirectory->Get( hname ) )
@@ -227,6 +217,7 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
             //////////////////
             // TELESCOPE TYPES
             TDirectory* i_curDire2 = gDirectory;
+            unsigned int tel_counter = 0;
             for( iter_i_list_of_Tel_type = i_list_of_Tel_type.begin(); iter_i_list_of_Tel_type != i_list_of_Tel_type.end(); iter_i_list_of_Tel_type++ )
             {
                 ULong64_t t = iter_i_list_of_Tel_type->first;
@@ -242,6 +233,10 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
                 }
                 sprintf( htitle, "telescope type %lld", t );
                 gDirectory->mkdir( hname, htitle )->cd();
+
+                // NOISE LEVEL (telescope type dependent)
+                sprintf( hname, "NOISE_%05d", ( int )( noise[tel_counter] * 100. ) );
+                gDirectory->mkdir( hname )->cd();
 
                 cout << "create tables in path " << gDirectory->GetPath() << endl;
 
@@ -262,6 +257,7 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
                                       fTLRunParameter->fUseMedianEnergy ) );
                 i_energySR.back()->setWrite1DHistograms( fWrite1DHistograms );
                 i_energySR.back()->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
+                tel_counter++;
             }   // telescope types
             ii_mscw.push_back( i_mscw );
             ii_mscl.push_back( i_mscl );
@@ -1474,16 +1470,14 @@ bool VTableLookup::initialize( VTableLookupRunParameter* iTLRunParameter )
         }
 
         string iTitle = ihname;
-        int i_mean_pedvarlevel = ( int )( fData->getMeanNoiseLevel() * 100 );
-        cout << "setting mean pedvar level for table selection to : " << fData->getMeanNoiseLevel() << endl;
-        cout << "   (pedvar levels per telescopes are ";
+        cout << "Pedvar levels per telescopes: ";
         for( unsigned int i = 0; i < fData->getNoiseLevel().size(); i++ )
         {
             cout << " " << fData->getNoiseLevel()[i];
         }
         cout << ")" << endl;
         setMCTableFiles( fTLRunParameter->tablefile, fTLRunParameter->ze, fTLRunParameter->fWobbleOffset,
-                         i_mean_pedvarlevel, "tb", ihname, fTLRunParameter->fWrite1DHistograms );
+                         fData->getNoiseLevel(), "tb", ihname, fTLRunParameter->fWrite1DHistograms );
 
         // set min/max distance to camera center
         if( fData )
