@@ -207,7 +207,7 @@ void copyDirectory( TDirectory* source,
         adir = ( TDirectory* )savdir->Get( source->GetName() );
     }
 
-    if( !adir )
+    if(!adir )
     {
         // 2. case: make top directory
         if( hx )
