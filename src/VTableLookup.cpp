@@ -303,8 +303,9 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
         if( data_dir )
         {
             // try to see of file exists in directory ./tables
-            itablefile = data_dir + "/Tables/" + itablefile;
-            fLookupTableFile = new TFile( itablefile.c_str() );
+            ostringstream itablefile_full_path;
+            itablefile_full_path << itablefile << "/Tables/" << itablefile;
+            fLookupTableFile = new TFile( itablefile.str().c_str() );
             if( fLookupTableFile->IsZombie() )
             {
                 cout << "VTableLookup::setMCTableFiles error (reading): unable to open table file: " << itablefile << endl;
@@ -441,7 +442,6 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
         fTelType_tables.push_back( iii_telType );
 
         fTableZeOffset.push_back( i_DirectionOffset );
-        fTableZe.push_back( i_ze );
     }   // ze
 
     // apply sanity check to the lookup table file
@@ -475,7 +475,7 @@ bool VTableLookup::sanityCheckLookupTableFile( bool iPrint )
     // print a summary of the number of tables found
     if( iPrint == false )
     {
-        cout << "Found " << fTableZe.size() << " zenith angles, " << fTableZeOffset[0].size() << " wobble offsets, " << fTableAzBins << " azimuth bins and " << fTelType_tables[0][0][0][0].size() << " telescope types" << endl;
+        cout << "Found " << fTableZe.size() << " zenith angles, " << fTableZeOffset[0].size() << " wobble offsets, " << fTableAzBins << " azimuth bins and " << fTelType_tables[0][0][0].size() << " telescope types" << endl;
     }
     return true;
 }
@@ -731,7 +731,7 @@ void VTableLookup::readLookupTable()
             {
                 cout << "DEBUG WOFF INTER 1 ";
                 cout << woff << " " << fTableZeOffset[ize_low][iwoff_low] << " " << fTableZeOffset[ize_low][iwoff_up];
-                cout << " " << ize_low << " " << s_NlowZlowWlow->mscl << " " << s_NlowZlowWup->mscl << " " << s_NlowZlow->mscl << endl;
+                cout << " " << ize_low << " " << s_ZlowWlow->mscl << " " << s_ZlowWup->mscl << " " << s_Zlow->mscl << endl;
             }
 
             ///////////////////////////
@@ -756,10 +756,10 @@ void VTableLookup::readLookupTable()
                 cout << "DEBUG  WOFF INTER 2 ";
                 cout << woff << " " << fTableZeOffset[ize_up][iwoff_low] << " ";
                 cout << fTableZeOffset[ize_up][iwoff_up] << " " << ize_up;
-                cout << " " << s_NlowZupWlow->mscl << " " << s_NlowZupWup->mscl << " " << s_NlowZup->mscl << endl;
+                cout << " " << s_ZupWlow->mscl << " " << s_ZupWup->mscl << " " << s_Zup->mscl << endl;
             }
             // interpolate zenith angles
-            interpolate( s_Zlow, fTableZe[ize_low], s_NZup, fTableZe[ize_up], s_N, ze, true );
+            interpolate( s_Zlow, fTableZe[ize_low], s_Zup, fTableZe[ize_up], s_N, ze, true );
             if( fDebug == 2 )
             {
                 cout << "DEBUG  ZE INTER 1 " << ze << " " << fTableZe[ize_low] << " ";
@@ -1188,7 +1188,7 @@ void VTableLookup::getTables( unsigned int inoise, unsigned int ize,
     unsigned int telX = 0;
     for( unsigned int i = 0; i < fTelType_tables[ize][iwoff][iaz].size(); i++ )
     {
-        if( fData->getTelType( tel ) == fTelType_tables[ize][iwoff][iaz][i][inoise] )
+        if( fData->getTelType( tel ) == fTelType_tables[ize][iwoff][iaz][i] )
         {
             telX = i;
             break;
