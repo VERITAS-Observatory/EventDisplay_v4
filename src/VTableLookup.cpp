@@ -303,6 +303,7 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
         if( data_dir )
         {
             // try to see of file exists in directory ./tables
+            ostringstream itablefile_full_path;
             itablefile_full_path << itablefile << "/Tables/" << itablefile;
             itablefile = itablefile_full_path.str();
             fLookupTableFile = new TFile( itablefile.c_str() );
