@@ -1235,7 +1235,7 @@ bool VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms( TH1F* hEff
             g->GetPoint( i, x, y );
             if( y > 0. )
             {
-                hEffRec->SetBinContent( hEffRec->FindBin( x ), y*   i_EffAreaScaleFactor );
+                hEffRec->SetBinContent( hEffRec->FindBin( x ), y*    i_EffAreaScaleFactor );
                 hEffRec->SetBinError( hEffRec->FindBin( x ), 0.5 * ( g->GetErrorYlow( i ) + g->GetErrorYhigh( i ) ) );
             }
         }

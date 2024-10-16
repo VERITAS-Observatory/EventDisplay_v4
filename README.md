@@ -1,13 +1,14 @@
 # Eventdisplay: An Analysis and Reconstruction Package for VERITAS
 
 [![DOI](https://zenodo.org/badge/221041866.svg)](https://zenodo.org/badge/latestdoi/221041866)
+[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![CI](https://github.com/VERITAS-Observatory/EventDisplay_v4/actions/workflows/ci.yml/badge.svg)](https://github.com/VERITAS-Observatory/EventDisplay_v4/actions/workflows/ci.yml)
 
 ## Overview
 
 Eventdisplay is a reconstruction and analysis pipeline for data of
 Imaging Atmospheric Cherenkov Telescopes.
-It has been primarily developed for VERITAS and CTA analysis and publications. 
+It has been primarily developed for VERITAS and CTA analysis and publications.
 This repository contains the Eventdisplay version used for VERITAS analysis (see [here](https://github.com/Eventdisplay/Eventdisplay) for the CTA version).
 
 * Original developers: Gernot Maier and Jamie Holder
@@ -19,7 +20,7 @@ In case Eventdisplay is used in a research project, please cite this repository 
 the following publication:
 
 ```
-Maier, G.; Holder, J., Eventdisplay: An Analysis and Reconstruction Package for 
+Maier, G.; Holder, J., Eventdisplay: An Analysis and Reconstruction Package for
 Ground-based Gamma-ray Astronomy,  35th International Cosmic Ray Conference.
 10-20 July, 2017. Bexco, Busan, Korea, Proceedings of Science, Vol. 301.
 Online at [https://pos.sissa.it/cgi-bin/reader/conf.cgi?confid=301], id.747
@@ -30,7 +31,7 @@ The package consists of several analysis steps and tools:
 
 1. `evndisp`: calibrate and parametrize images, event reconstruction, stereo analysis
 2. `trainTMVAforAngularReconstruction`: train boosted decision trees for direction and energy reconstruction
-3. `mscw_energy`: fill and use lookup tables for mean scaled with and lenght calculation, energy reconstruction, stereo reconstruction
+3. `mscw_energy`: fill and use lookup tables for mean scaled with and length calculation, energy reconstruction, stereo reconstruction
 4. `trainTMVAforGammaHadronSeparation`: train boosted decision trees for gamma/hadron separation
 5. `makeEffectiveArea`: calculation of the instrument response functions (effective areas, angular point-spread function, energy resolution)
 6. `makeRadialAcceptance`: calculation of radial camera acceptance from data files

@@ -284,7 +284,7 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
         // number of gamma-like events per run (this might be overwritten later)
         fRunNdiff.push_back( fData->NOn - fData->NOff* fData->OffNorm );
         // error on number of gamma-like events
-        fRunNdiffE.push_back( sqrt( fData->NOn + fData->NOff*   fData->OffNorm*   fData->OffNorm ) );
+        fRunNdiffE.push_back( sqrt( fData->NOn + fData->NOff*    fData->OffNorm*    fData->OffNorm ) );
         if( fData->tOn > 0. )
         {
             fRunRate.push_back( fRunNdiff.back() / fData->tOn * 60. );

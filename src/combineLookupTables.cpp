@@ -23,42 +23,7 @@
 
 using namespace std;
 
-// list with noise levels
-vector< int > fNoiseLevel;
-
 void copyDirectory( TDirectory* source, const char* hx, vector< string > hist_to_copy, float noise_tolerance );
-
-/*
- * noise directory names are determined in the lookup table code using the
- * mean pedvar level. These can vary by a small around from simulation to
- * simulation file. We search here therefore for very similar noise levels,
- * and return those directory names if available
- */
-string check_for_similar_noise_values( const char* hx, float noise_tolerance )
-{
-    string iTemp = hx;
-
-    if( iTemp.find( "_" ) != string::npos )
-    {
-        int i_noise = atoi( iTemp.substr( iTemp.find( "_" ) + 1, iTemp.size() ).c_str() );
-        for( unsigned int i = 0; i < fNoiseLevel.size(); i++ )
-        {
-            if( TMath::Abs( fNoiseLevel[i] - i_noise ) < noise_tolerance )
-            {
-                char hname[200];
-                sprintf( hname, "NOISE_%05d", fNoiseLevel[i] );
-                iTemp = hname;
-                cout << "\t found similar noise level, save into directory: " << iTemp << "\t" << fNoiseLevel[i];
-                cout << " (" << fNoiseLevel.size() << ")" << endl;
-                return iTemp;
-            }
-        }
-        fNoiseLevel.push_back( i_noise );
-        cout << "\t new noise level directory: " << iTemp << "(" << fNoiseLevel.size() << ")" << endl;
-    }
-
-    return iTemp;
-}
 
 vector< string > readListOfFiles( string iFile )
 {
@@ -214,7 +179,6 @@ int main( int argc, char* argv[] )
 
     fROFile->Close();
     cout << endl;
-    cout << "total number of noise levels found: " << fNoiseLevel.size() << " (is this ok? check!)" << endl;
     cout << "finished..." << endl;
 }
 
@@ -233,11 +197,10 @@ void copyDirectory( TDirectory* source,
     TDirectory* savdir = gDirectory;
     TDirectory* adir = 0;
 
-    // 1. case: top directory exists (NOISE_...)
+    // 1. case: top directory exists (ze_...)
     if( hx )
     {
-        string noise_dir = check_for_similar_noise_values( hx, noise_tolerance );
-        adir = ( TDirectory* )savdir->Get( noise_dir.c_str() );
+        adir = ( TDirectory* )savdir->Get( hx );
     }
     else
     {
