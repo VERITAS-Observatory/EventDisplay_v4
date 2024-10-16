@@ -198,7 +198,7 @@ unsigned int VDispAnalyzer::find_smallest_diff_element(
         }
         calculateMeanShowerDirection( v_xs, v_ys, v_weight, xs, ys, disp_diff, v_xs.size() );
         v_disp_diff[s] = disp_diff;
-        v_dist[s] = sqrt( xs * xs + ys * ys );
+        v_dist[s] = sqrt( xs* xs + ys* ys );
     }
     // fixed average FOV
     //    float i_average_FOV = 3.5;
@@ -280,7 +280,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
                 }
                 else
                 {
-                    f_angdiff += ( 180. - iangdiff * TMath::RadToDeg() );
+                    f_angdiff += ( 180. - iangdiff* TMath::RadToDeg() );
                 }
                 fmean_iangdiffN++;
             }
@@ -534,7 +534,7 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
             {
                 if( i < dispErrorT.size() )
                 {
-                    v_weight.push_back( exp(-1. * fDispErrorExponential * TMath::Abs( dispErrorT[i] ) ) );
+                    v_weight.push_back( exp(-1. * fDispErrorExponential* TMath::Abs( dispErrorT[i] ) ) );
                     if(!UseIntersectForHeadTail && i < dispSignT.size() && dispSignT[i] > -99. )
                     {
                         v_weight.back() *= dispSignT[i];

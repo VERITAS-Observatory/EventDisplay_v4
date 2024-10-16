@@ -870,7 +870,7 @@ unsigned int VImageCleaning::NNGroupSearchProbCurve( unsigned int type, TF1* fPr
                     Double_t xx = x - fData->getDetectorGeo()->getX()[k];
                     Double_t yy = y - fData->getDetectorGeo()->getY()[k];
 
-                    Double_t dist = sqrt( xx * xx + yy * yy );
+                    Double_t dist = sqrt( xx* xx + yy* yy );
                     // assume that all pixel have the same tube radius
                     Double_t diam = 2.*fData->getDetectorGeo()->getTubeRadius()[1];
                     if( dist > 0.01 * diam && dist < 1.1 * diam )
@@ -1368,7 +1368,7 @@ void VImageCleaning::DiscardLocalTimeOutlayers( float NNthresh[6] )
             }
             xx = x - fData->getDetectorGeo()->getX()[pp] / diam; // coord in pixels units
             yy = y - fData->getDetectorGeo()->getY()[pp] / diam; // coord in pixels units
-            Double_t dist = sqrt( xx * xx + yy * yy );
+            Double_t dist = sqrt( xx* xx + yy* yy );
             if( dist > 6.1 )
             {
                 continue;
@@ -1428,7 +1428,7 @@ void VImageCleaning::DiscardLocalTimeOutlayers( float NNthresh[6] )
         if( Tcnt > 1 && nimagepix > 4 )
         {
             meanT /= ( float )Tcnt;
-            radicand = ( sigmaT - Tcnt * meanT * meanT ) / ( float( Tcnt ) - 1. );
+            radicand = ( sigmaT - Tcnt* meanT* meanT ) / ( float( Tcnt ) - 1. );
             if( radicand > 0. )
             {
                 sigmaT = sqrt( radicand );
@@ -3213,7 +3213,7 @@ double getTraceCorrelationValue( double Amean, double Bmean,
         N = N + ( vA[i] - Amean ) * ( vB[i] - Bmean );
     }
 
-    return N / TMath::Sqrt( Avar * Bvar );
+    return N / TMath::Sqrt( Avar* Bvar );
 }
 
 double getTraceMean( vector < double > vA )

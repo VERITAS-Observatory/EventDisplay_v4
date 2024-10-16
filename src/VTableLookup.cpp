@@ -400,11 +400,11 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
                     iDirTel->cd( iDNameTel[t].c_str() );
 
                     // NOISE LEVEL
-                    vector< string > iDName = getSortedListOfDirectories( fLookupTableFile );
                     TDirectory *iDirNoise = gDirectory;
-                    for( unsigned int n = 0; n < iDName.size(); n++ )
+                    vector< string > iDNameNoise = getSortedListOfDirectories( iDirNoise );
+                    for( unsigned int n = 0; n < iDNameNoise.size(); n++ )
                     {
-                        iDirNoise->cd( iDName[n].c_str() );
+                        iDirNoise->cd( iDNameNoise[n].c_str() );
                         if( fDebug == 2 )
                         {
                             cout << "DEBUG  DIR " << " " << gDirectory->GetPath() << endl;
@@ -415,11 +415,11 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
                         // get mscw directory
                         i_mscw.push_back( new VTableCalculator( "width", isuff.c_str(), freadwrite, iDir, false ) );
                         // get mscl directory
-                        iDirTel->cd( iDNameTel[t].c_str() );
+                        iDirNoise->cd( iDNameNoise[n].c_str() );
                         iDir = ( TDirectory* )gDirectory->Get( "mscl" );
                         i_mscl.push_back( new VTableCalculator( "length", isuff.c_str(), freadwrite, iDir, false ) );
                         // get energy directory (size vs radius method)
-                        iDirTel->cd( iDNameTel[t].c_str() );
+                        iDirNoise->cd( iDNameNoise[n].c_str() );
                         iDir = ( TDirectory* )gDirectory->Get( "energySR" );
                         i_energySR.push_back( new VTableCalculator( "energySR", isuff.c_str(), freadwrite, iDir, true, fTLRunParameter->fPE, fTLRunParameter->fUseMedianEnergy ) );
                     }                             // noise levels

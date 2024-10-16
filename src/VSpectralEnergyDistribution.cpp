@@ -818,7 +818,7 @@ TGraphErrors* VSpectralEnergyDistribution::readOpticalData( string iname, string
             flux_ergscms      += getFluxfromMagnitude( imagnitude, iband ) * i_pF_temp.energy_Hz.back();
         }
 
-        g->SetPoint( z, i_pF_temp.MJD_min, imagnitude * iPlotMagnitudeMultiplier );
+        g->SetPoint( z, i_pF_temp.MJD_min, imagnitude* iPlotMagnitudeMultiplier );
         g->SetPointError( z, 0., imagnitudeError );
 
         z++;
@@ -1486,8 +1486,8 @@ TCanvas* VSpectralEnergyDistribution::plotPowerLaw( TCanvas* c, string iName, do
             double er = 0.;
 
             er += c1 * c1 * iNormError * iNormError;
-            er += ( iNorm * TMath::H() * 1.e7 * e * log( c2 ) * TMath::Power( c2, -1.*iGamma + 1. ) )
-                  * ( iNorm * TMath::H() * 1.e7 * e * log( c2 ) * TMath::Power( c2, -1.*iGamma + 1. ) )
+            er += ( iNorm* TMath::H() * 1.e7* e* log( c2 ) * TMath::Power( c2, -1.*iGamma + 1. ) )
+                  * ( iNorm* TMath::H() * 1.e7* e* log( c2 ) * TMath::Power( c2, -1.*iGamma + 1. ) )
                   * iGammaError * iGammaError;
 
             er = sqrt( er );

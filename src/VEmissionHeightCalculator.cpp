@@ -82,7 +82,7 @@ double VEmissionHeightCalculator::getEmissionHeight( double* cen_x, double* cen_
         iEmissionHeight2 /= iEmissionHeightWeight;
         if( iNEM_pairs > 1. )
         {
-            fEmissionHeightChi2 = sqrt( 1. / ( iNEM_pairs - 1. ) * ( iEmissionHeight2 - fEmissionHeight * fEmissionHeight ) );
+            fEmissionHeightChi2 = sqrt( 1. / ( iNEM_pairs - 1. ) * ( iEmissionHeight2 - fEmissionHeight* fEmissionHeight ) );
         }
         else
         {
@@ -158,7 +158,7 @@ double VEmissionHeightCalculator::getTelescopeDistanceSC( unsigned int iTel1, un
     t2[1] = fTelY[iTel2];
     t2[2] = fTelZ[iTel2];
 
-    return VUtilities::line_point_distance( t1[0], t1[1], t1[2], 90. - z * TMath::RadToDeg(), az * TMath::RadToDeg(), t2[0], t2[1], t2[2] );
+    return VUtilities::line_point_distance( t1[0], t1[1], t1[2], 90. - z* TMath::RadToDeg(), az* TMath::RadToDeg(), t2[0], t2[1], t2[2] );
 }
 
 

@@ -115,7 +115,7 @@ unsigned int VDBRunInfo::get_dqm_configmask( unsigned int config_mask, unsigned 
     }
 
     bitNDQM = ~bitNDQM;
-    bitset<4> bitNewConfig = bitConfig & bitNDQM;
+    bitset<4> bitNewConfig = bitConfig& bitNDQM;
     unsigned int ConfigMaskNew = 0;
 
     for( int i = 0; i < ( int )bitNewConfig.size(); i++ )

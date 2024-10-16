@@ -102,7 +102,7 @@ void VPointing::getPointingFromDB(
 
 #ifdef RUNWITHDB
     fPointingDB = new VPointingDB( fTelID, irun );
-    fPointingDB->setObservatory( fObsLongitude * TMath::RadToDeg(), fObsLatitude * TMath::RadToDeg() );      // work in [deg]
+    fPointingDB->setObservatory( fObsLongitude* TMath::RadToDeg(), fObsLatitude* TMath::RadToDeg() );        // work in [deg]
     fPointingDB->initialize( iTCorrection, iVPMDB, iUncalibratedVPM, iDBTextDirectory );
     if(!fPointingDB->isGood() )
     {
@@ -166,7 +166,7 @@ bool VPointing::updatePointingfromDB( int MJD, double iTime )
         fMeanPointingErrorN++;
         fMeanPointingErrorX += fPointingErrorX;
         fMeanPointingErrorY += fPointingErrorY;
-        fMeanPointingDistance += sqrt( fPointingErrorX * fPointingErrorX + fPointingErrorY * fPointingErrorY );
+        fMeanPointingDistance += sqrt( fPointingErrorX* fPointingErrorX + fPointingErrorY* fPointingErrorY );
     }
     if( fEventStatus != 3 && fEventStatus != 4 )
     {
@@ -298,5 +298,5 @@ void VPointing::setPointingError( double iX, double iY )
     fMeanPointingErrorN = 1;
     fMeanPointingErrorX = fPointingErrorX;
     fMeanPointingErrorY = fPointingErrorY;
-    fMeanPointingDistance = sqrt( fPointingErrorX * fPointingErrorX + fPointingErrorY * fPointingErrorY );
+    fMeanPointingDistance = sqrt( fPointingErrorX* fPointingErrorX + fPointingErrorY* fPointingErrorY );
 }

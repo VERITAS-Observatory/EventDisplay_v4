@@ -421,7 +421,7 @@ void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpo
 void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpos, unsigned int& n255 )
 {
     double it = 0.;
-    int nMax = ( int )( fDynamicRange * tmax );
+    int nMax = ( int )( fDynamicRange* tmax );
     n255 = 0;
     // value at maximum
     tmax = -10000.;

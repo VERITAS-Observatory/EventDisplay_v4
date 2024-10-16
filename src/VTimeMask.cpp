@@ -860,7 +860,7 @@ void VTimeMask::displayMask( ostream& terminal )
             terminal << " - "     ;
         }
         // display mask status at currMJD
-        terminal << checkMaskNow( secs_day * currMJD ) ;
+        terminal << checkMaskNow( secs_day* currMJD ) ;
     }
     terminal << endl;
 }

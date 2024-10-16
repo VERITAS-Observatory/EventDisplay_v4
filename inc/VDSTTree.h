@@ -335,11 +335,11 @@ class VDSTTree
         }
         float        getDSTMCxcos()
         {
-            return TMath::Cos( fDSTze * atan( 1. ) / 45. ) * TMath::Cos( fDSTaz * atan( 1. ) / 45. );
+            return TMath::Cos( fDSTze* atan( 1. ) / 45. ) * TMath::Cos( fDSTaz* atan( 1. ) / 45. );
         }
         float        getDSTMCycos()
         {
-            return TMath::Cos( fDSTze * atan( 1. ) / 45. ) * TMath::Sin( fDSTaz * atan( 1. ) / 45. );
+            return TMath::Cos( fDSTze* atan( 1. ) / 45. ) * TMath::Sin( fDSTaz* atan( 1. ) / 45. );
         }
         float        getDSTMCxoff()               // offset of source from camera centre (in camera coordinates) [deg]
         {

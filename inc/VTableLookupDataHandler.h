@@ -389,7 +389,7 @@ class VTableLookupDataHandler
         }
         double getMCWobbleOffset()
         {
-            return sqrt( fMCxoff * fMCxoff + fMCyoff * fMCyoff );
+            return sqrt( fMCxoff* fMCxoff + fMCyoff* fMCyoff );
         }
         double* getE()
         {
@@ -534,7 +534,7 @@ class VTableLookupDataHandler
         }
         double getWobbleOffset()
         {
-            return sqrt( fXoff * fXoff + fYoff * fYoff );
+            return sqrt( fXoff* fXoff + fYoff* fYoff );
         }
         bool isReconstructed();
         bool readRunParameter();

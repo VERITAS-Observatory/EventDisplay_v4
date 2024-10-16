@@ -1139,7 +1139,7 @@ float VArrayAnalyzer::recalculateImagePhi( double iDeltaX, double iDeltaY )
         float i_d = getImageParameters( getRunParameter()->fImageLL )->f_d;
         float i_s = getImageParameters( getRunParameter()->fImageLL )->f_s;
         float i_sdevxy  = getImageParameters( getRunParameter()->fImageLL )->f_sdevxy;
-        i_phi = atan2(( i_d + i_s ) * i_cen_y + 2.*i_sdevxy * i_cen_x, 2.*i_sdevxy * i_cen_y - ( i_d - i_s ) * i_cen_x );
+        i_phi = atan2(( i_d + i_s ) * i_cen_y + 2.*i_sdevxy* i_cen_x, 2.*i_sdevxy* i_cen_y - ( i_d - i_s ) * i_cen_x );
     }
 
     return i_phi;
@@ -1623,8 +1623,8 @@ void VArrayAnalyzer::prepareforDirectionReconstruction( unsigned int iMethodInde
             }
             else
             {
-                x.push_back( tan( i_cen_x * TMath::DegToRad() )*getDetectorGeo()->getFocalLength()[tel] * 1000. );
-                y.push_back( tan( i_cen_y * TMath::DegToRad() )*getDetectorGeo()->getFocalLength()[tel] * 1000. );
+                x.push_back( tan( i_cen_x* TMath::DegToRad() )*getDetectorGeo()->getFocalLength()[tel] * 1000. );
+                y.push_back( tan( i_cen_y* TMath::DegToRad() )*getDetectorGeo()->getFocalLength()[tel] * 1000. );
             }
             // weight is size
             w.push_back( getImageParameters( getRunParameter()->fImageLL )->size );
@@ -1711,7 +1711,7 @@ void VArrayAnalyzer::prepareforCoreReconstruction( unsigned int iMethodIndex, fl
             i_weight  = getImageParameters( getRunParameter()->fImageLL )->size;
             i_weight *= ( 1. - getImageParameters( getRunParameter()->fImageLL )->width /
                           getImageParameters( getRunParameter()->fImageLL )->length );
-            w.push_back( i_weight * i_weight );
+            w.push_back( i_weight* i_weight );
             i_cen_x = getImageParameters( getRunParameter()->fImageLL )->cen_x - xs;
             i_cen_y = getImageParameters( getRunParameter()->fImageLL )->cen_y - ys;
             ///////////////////////////////

@@ -59,7 +59,7 @@ void VDisplayBirdsEye::setPlotPaper()
 */
 double VDisplayBirdsEye::scaleX( double iS, double iCentre )
 {
-    return (( iS - iCentre ) / 2. / fFieldX * fXScale );
+    return (( iS - iCentre ) / 2. / fFieldX* fXScale );
 }
 
 
@@ -68,7 +68,7 @@ double VDisplayBirdsEye::scaleX( double iS, double iCentre )
 */
 double VDisplayBirdsEye::scaleY( double iS, double iCentre )
 {
-    return (( iS - iCentre ) / 2. / fFieldY * fYScale );
+    return (( iS - iCentre ) / 2. / fFieldY* fYScale );
 }
 
 
@@ -382,10 +382,10 @@ void VDisplayBirdsEye::drawImageLines_and_Corepositions()
                 double i_cen_x = ( fParameters[i]->cen_x + i_x );
                 double i_cen_y = ( fParameters[i]->cen_y + i_y );
 
-                i_x1 = convertX( fTelPosX[i] + 2.*fFieldX * cos( atan2( fMCSign * i_cen_y, i_cen_x ) ) );
-                i_y1 = convertY( fTelPosY[i] + 2.*fFieldY * sin( atan2( fMCSign * i_cen_y, i_cen_x ) ) );
-                i_x2 = convertX( fTelPosX[i] - 2.*fFieldX * cos( atan2( fMCSign * i_cen_y, i_cen_x ) ) );
-                i_y2 = convertY( fTelPosY[i] - 2.*fFieldY * sin( atan2( fMCSign * i_cen_y, i_cen_x ) ) );
+                i_x1 = convertX( fTelPosX[i] + 2.*fFieldX* cos( atan2( fMCSign* i_cen_y, i_cen_x ) ) );
+                i_y1 = convertY( fTelPosY[i] + 2.*fFieldY* sin( atan2( fMCSign* i_cen_y, i_cen_x ) ) );
+                i_x2 = convertX( fTelPosX[i] - 2.*fFieldX* cos( atan2( fMCSign* i_cen_y, i_cen_x ) ) );
+                i_y2 = convertY( fTelPosY[i] - 2.*fFieldY* sin( atan2( fMCSign* i_cen_y, i_cen_x ) ) );
 
                 double xC = convertX( fData->getShowerParameters()->MCxcore_SC );
                 double yC = convertY( fData->getShowerParameters()->MCycore_SC );

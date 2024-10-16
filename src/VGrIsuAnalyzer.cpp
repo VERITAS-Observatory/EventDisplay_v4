@@ -57,7 +57,7 @@ void VGrIsuAnalyzer::tel_impact( float xcos, float ycos, float xfield, float yfi
     }
     else
     {
-        dn = -sqrt( 1. - dl * dl - dm * dm );
+        dn = -sqrt( 1. - dl* dl - dm* dm );
     }
     setup_matrix( matrix, dl, dm, dn, bInv );
     for( unsigned int i = 0; i < 3; i++ )
@@ -136,7 +136,7 @@ void VGrIsuAnalyzer::setup_matrix( float matrix[3][3], float dl, float dm, float
 
     /* sv is the projection of the primary vector onto the xy plane */
 
-    sv = sqrt( dl * dl + dm * dm );
+    sv = sqrt( dl* dl + dm* dm );
 
     if( sv > 1.0E-09 )
     {
@@ -274,11 +274,11 @@ passes through the point (x[i],y[i]) and has slope m[i].
             /* set up constants for array  */
             D = y[i] - ( m[i] * x[i] );
 
-            a1 = a1 + ( w[i] *  m2 * gamma );
+            a1 = a1 + ( w[i] *  m2* gamma );
             a2 = a2 + ( w[i] * (-m[i] ) * gamma );
             b1 = a2;
             b2 = b2 + ( w[i] *  gamma );
-            c1 = c1 + ( w[i] * D * m[i] * gamma );
+            c1 = c1 + ( w[i] * D* m[i] * gamma );
             c2 = c2 + ( w[i] * (-D ) * gamma );
 
         }
@@ -396,7 +396,7 @@ float VGrIsuAnalyzer::rcs_perpendicular_dist( float xs, float ys, float xp, floa
     y = ys - yp;
 
     /* get perpendicular distance */
-    d = fabs( dl * y - dm * x );
+    d = fabs( dl* y - dm* x );
 
     return d;
 }
@@ -496,8 +496,8 @@ bool VGrIsuAnalyzer::get_intersection( float x1, float mx1, float y1, float my1,
         *a1  = (( y1 - y2 ) / my2 - ( x1 - x2 ) / mx2 ) / ( mx1 / mx2 - my1 / my2 );
     }
 
-    *xc = ( x1 + *a1 * mx1 );
-    *yc = ( y1 + *a1 * my1 );
+    *xc = ( x1 + *a1* mx1 );
+    *yc = ( y1 + *a1* my1 );
 
     return true;
 }

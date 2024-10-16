@@ -1576,12 +1576,12 @@ double VStarCatalogue::getDistanceToClosestStar( double x_cam_deg, double y_cam_
         double x = 0.;
         if( cos( fTel_dec * TMath::DegToRad() ) != 0. )
         {
-            x = -1. * ( fStarsinFOV[i]->fRACurrentEpoch - fTel_ra ) * cos( fTel_dec * TMath::DegToRad() );
+            x = -1. * ( fStarsinFOV[i]->fRACurrentEpoch - fTel_ra ) * cos( fTel_dec* TMath::DegToRad() );
         }
         x_rot = x;
         y_rot = y;
         // derotation
-        VSkyCoordinatesUtilities::rotate(-1.*fTel_deRotationAngle_deg * TMath::DegToRad(), x_rot, y_rot );
+        VSkyCoordinatesUtilities::rotate(-1.*fTel_deRotationAngle_deg* TMath::DegToRad(), x_rot, y_rot );
         x_rot *= -1. * fTel_camerascale;
         y_rot *= fTel_camerascale;
 

@@ -114,11 +114,11 @@ void VDataMCComparisionHistogramData::fill(
     }
     if( fHis2D_sizeHG && i_size - i_size * i_fracLow > 0. )
     {
-        fHis2D_sizeHG->Fill( log10( i_size - i_size * i_fracLow ), iV, iWeight );
+        fHis2D_sizeHG->Fill( log10( i_size - i_size* i_fracLow ), iV, iWeight );
     }
     if( fHis2D_sizeLG && i_size * i_fracLow > 0. )
     {
-        fHis2D_sizeLG->Fill( log10( i_size * i_fracLow ), iV, iWeight );
+        fHis2D_sizeLG->Fill( log10( i_size* i_fracLow ), iV, iWeight );
     }
 }
 
@@ -1320,7 +1320,7 @@ double VDataMCComparision::getCorrectedEmissionHeight( double iEM, double iZe )
     double iCorr = 1.;
     if( cos( fShowerMaxZe_deg * TMath::DegToRad() ) != 0. )
     {
-        iCorr = cos( iZe * TMath::DegToRad() ) / cos( fShowerMaxZe_deg * TMath::DegToRad() );
+        iCorr = cos( iZe* TMath::DegToRad() ) / cos( fShowerMaxZe_deg* TMath::DegToRad() );
     }
     return iEM * iCorr;
 }

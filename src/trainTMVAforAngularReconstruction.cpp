@@ -110,7 +110,7 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
     unsigned int ntest    = 0 ;
     unsigned int nentries = iDataTree->GetEntries() ;
     cout << endl;
-    ntrain = floor( nentries * iTrainTest ) ;
+    ntrain = floor( nentries* iTrainTest ) ;
     ntest  = nentries - ntrain ;
     if( ntrain <= 100 || ntest <= 100 )
     {

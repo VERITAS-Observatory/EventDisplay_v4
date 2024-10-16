@@ -812,7 +812,7 @@ bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool 
     // first check if (x,y) is inside the fiducal area in the camera
     // (fiducal area is defined as distance to center + ringradius < cameraradius)
     //
-    double i_evDist = sqrt( x * x + y * y );
+    double i_evDist = sqrt( x* x + y* y );
     if( i_evDist > fRunList.fmaxradius )
     {
         return false;
@@ -835,7 +835,7 @@ bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool 
                 i_cy =  hmap_stereo->GetYaxis()->GetBinCenter( j );
 
                 // check if event is in the same ring as this bin (all off regions are in a ring around the camera center)
-                i_binDist = sqrt( i_cx * i_cx + i_cy * i_cy );
+                i_binDist = sqrt( i_cx* i_cx + i_cy* i_cy );
 
                 if( i_evDist > i_binDist + fRE_roffTemp )
                 {
@@ -863,7 +863,7 @@ bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool 
                     {
                         i_theta2 = theta2;
                         hmap_stereo->Fill( i_cx - fRunList.fWobbleWestMod, i_cy - fRunList.fWobbleNorthMod );
-                        hmap_alpha->Fill( i_cx - fRunList.fWobbleWestMod, i_cy - fRunList.fWobbleNorthMod, ( double )fRE_off[i][j].noff * f_RE_AreaNorm );
+                        hmap_alpha->Fill( i_cx - fRunList.fWobbleWestMod, i_cy - fRunList.fWobbleNorthMod, ( double )fRE_off[i][j].noff* f_RE_AreaNorm );
                     }
                 }
             }
@@ -1099,7 +1099,7 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
             }
 
             // distance of this bin from camera center
-            ids = sqrt( x * x + y * y );
+            ids = sqrt( x* x + y* y );
 
             r_off.clear();
             x_off.clear();

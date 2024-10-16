@@ -884,18 +884,18 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
     {
         //double rho = fFitter->fFitResult_Parameter[0];
         double angle = fFitter->fFitResult_Parameter[0];
-        double sX = sqrt( fFitter->fFitResult_Parameter[2] * fFitter->fFitResult_Parameter[2] + fPSF * fPSF );
-        double sY = sqrt( fFitter->fFitResult_Parameter[4] * fFitter->fFitResult_Parameter[4] + fPSF * fPSF );
+        double sX = sqrt( fFitter->fFitResult_Parameter[2] * fFitter->fFitResult_Parameter[2] + fPSF* fPSF );
+        double sY = sqrt( fFitter->fFitResult_Parameter[4] * fFitter->fFitResult_Parameter[4] + fPSF* fPSF );
 
         double angle_err = fFitter->fFitResult_ParameterError[0];
-        double rho =  1. / 2. * tan( 2 * angle ) * ( sX * sX - sY * sY ) / sX / sY ;
+        double rho =  1. / 2. * tan( 2 * angle ) * ( sX* sX - sY* sY ) / sX / sY ;
 
-        double p1 = sX * sX * sY * sY * ( 1 - rho * rho );
-        p1 = p1 / ( sY * sY * pow( cos( angle ), 2 ) - 2 * rho * sX * sY * sin( angle ) * cos( angle ) + sX * sX * pow( sin( angle ), 2 ) );
+        double p1 = sX * sX * sY * sY * ( 1 - rho* rho );
+        p1 = p1 / ( sY* sY* pow( cos( angle ), 2 ) - 2 * rho* sX* sY* sin( angle ) * cos( angle ) + sX* sX* pow( sin( angle ), 2 ) );
         p1 = sqrt( p1 );
 
-        double p2 = sX * sX * sY * sY * ( 1 - rho * rho );
-        p2 = p2 / ( sY * sY * pow( sin( angle ), 2 ) + 2 * rho * sX * sY * sin( angle ) * cos( angle ) + sX * sX * pow( cos( angle ), 2 ) );
+        double p2 = sX * sX * sY * sY * ( 1 - rho* rho );
+        p2 = p2 / ( sY* sY* pow( sin( angle ), 2 ) + 2 * rho* sX* sY* sin( angle ) * cos( angle ) + sX* sX* pow( cos( angle ), 2 ) );
         p2 = sqrt( p2 );
 
         // approximate error, rho approximately 0

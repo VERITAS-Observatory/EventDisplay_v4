@@ -724,7 +724,7 @@ bool VTMVAEvaluator::evaluate( bool interpolate_mva )
         {
             fSizeSecondMax_log10 = 0.;    // !!! not clear what the best value is
         }
-        fCoreDist = sqrt( fData->Xcore * fData->Xcore + fData->Ycore * fData->Ycore );
+        fCoreDist = sqrt( fData->Xcore* fData->Xcore + fData->Ycore* fData->Ycore );
         fDispDiff = fData->DispDiff;
         if( fDispDiff > 0. )
         {

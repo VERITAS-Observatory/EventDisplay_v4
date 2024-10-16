@@ -146,8 +146,8 @@ void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x_deg, double y
     // sign error; see http://veritash.sao.arizona.edu:8081/Eventdisplay-WG/1912
     // x_deg *= -1.;
 
-    VAstronometry::vlaDtp2s( x_deg * TMath::DegToRad(), y_deg * TMath::DegToRad(), fSkyMapCentreRAJ2000 * TMath::DegToRad(), fSkyMapCentreDecJ2000 * TMath::DegToRad(), &ra, &dec );
-    VAstronometry::vlaDtp2s(( x_deg + xerr_deg )*TMath::DegToRad(), ( y_deg + yerr_deg )*TMath::DegToRad(), fSkyMapCentreRAJ2000 * TMath::DegToRad(), fSkyMapCentreDecJ2000 * TMath::DegToRad(), &ra_err_deg, &dec_err_deg );
+    VAstronometry::vlaDtp2s( x_deg* TMath::DegToRad(), y_deg* TMath::DegToRad(), fSkyMapCentreRAJ2000* TMath::DegToRad(), fSkyMapCentreDecJ2000* TMath::DegToRad(), &ra, &dec );
+    VAstronometry::vlaDtp2s(( x_deg + xerr_deg )*TMath::DegToRad(), ( y_deg + yerr_deg )*TMath::DegToRad(), fSkyMapCentreRAJ2000* TMath::DegToRad(), fSkyMapCentreDecJ2000* TMath::DegToRad(), &ra_err_deg, &dec_err_deg );
 
     ra          *= TMath::RadToDeg();
     dec         *= TMath::RadToDeg();
@@ -186,7 +186,7 @@ void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x_deg, double y
     cout << " )" << endl;
 
     // calculating and printing the offset of the position wrt camera center
-    double offset = sqrt( x_deg * x_deg + y_deg * y_deg );
+    double offset = sqrt( x_deg* x_deg + y_deg* y_deg );
     cout << "Offset from camera center = " << offset << " deg" << endl;
 
 }
@@ -1261,7 +1261,7 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
             // convert angle to hours/min/seconds
             char iSign[10];
             int ihmsf[4];
-            VAstronometry::vlaDr2tf( 4, -1.*Xmax * TMath::DegToRad(), iSign, ihmsf );
+            VAstronometry::vlaDr2tf( 4, -1.*Xmax* TMath::DegToRad(), iSign, ihmsf );
             iRA_hrs = ihmsf[0];
             iRA_min = ihmsf[1];
             iRA_sec = ihmsf[2];
@@ -1568,12 +1568,12 @@ vector<sSource> VPlotAnasumHistograms::plot_catalogue( TCanvas* c, string iCatal
     double iRAMin  = fSkyMapCentreRAJ2000;
     if( cos( dec * TMath::Pi() / 180. ) )
     {
-        iRAMin  = fSkyMapCentreRAJ2000 + h->GetXaxis()->GetXmax() / cos( dec * TMath::Pi() / 180. );
+        iRAMin  = fSkyMapCentreRAJ2000 + h->GetXaxis()->GetXmax() / cos( dec* TMath::Pi() / 180. );
     }
     double iRAMax  = fSkyMapCentreRAJ2000;
     if( cos( dec * TMath::Pi() / 180. ) )
     {
-        iRAMax  = fSkyMapCentreRAJ2000 + h->GetXaxis()->GetXmin() / cos( dec * TMath::Pi() / 180. );
+        iRAMax  = fSkyMapCentreRAJ2000 + h->GetXaxis()->GetXmin() / cos( dec* TMath::Pi() / 180. );
     }
 
     cout << "MINMAX  " << iDecMin << " " << iDecMax << " " << iRAMin << " " << iRAMax << endl;
@@ -1587,7 +1587,7 @@ vector<sSource> VPlotAnasumHistograms::plot_catalogue( TCanvas* c, string iCatal
                 double x = 0.;
                 double y = 0.;
                 int j = 0;
-                VAstronometry::vlaDs2tp( s.getStarRA2000( i )*TMath::Pi() / 180., s.getStarDec2000( i )*TMath::Pi() / 180., ra * TMath::Pi() / 180., dec * TMath::Pi() / 180., &x, &y, &j );
+                VAstronometry::vlaDs2tp( s.getStarRA2000( i )*TMath::Pi() / 180., s.getStarDec2000( i )*TMath::Pi() / 180., ra* TMath::Pi() / 180., dec* TMath::Pi() / 180., &x, &y, &j );
                 x *= -1. * 180. / TMath::Pi();
                 y *= 180. / TMath::Pi();
 
@@ -1871,7 +1871,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
     cout << n_r << "\t" << r << "\t" << x << "\t" << y << "\t" << x_bin << "\t" << y_bin << "\t" << x_bin_wobble << "\t" << y_bin_wobble << endl;
 
     // source region
-    TEllipse* iR = new TEllipse( iSign * x, y, r, r );
+    TEllipse* iR = new TEllipse( iSign* x, y, r, r );
     iR->SetFillStyle( 3004 );
     iR->SetFillColor( 2 );
     iR->SetLineColor( 2 );
@@ -1890,7 +1890,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
     for( int n = 0; n < n_r; n++ )
     {
         cout << "\t background region " << n << "\t" << x_r[n] << "\t" << y_r[n] << "\t" << r_r[n] << endl;
-        TEllipse* iL = new TEllipse( iSign * x_r[n], y_r[n], r_r[n], r_r[n] );
+        TEllipse* iL = new TEllipse( iSign* x_r[n], y_r[n], r_r[n], r_r[n] );
         iL->SetFillStyle( 0 );
         iL->SetLineWidth( 2 );
         iL->SetLineColor( iColor );
@@ -1911,7 +1911,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
     // excluded regions
     for( int e = 0; e < n_ex; e++ )
     {
-        TEllipse* iEx = new TEllipse( iSign * x_ex[e], y_ex[e], r1_ex[e], r2_ex[e], 0, 360, iSign * theta_ex[e] );
+        TEllipse* iEx = new TEllipse( iSign* x_ex[e], y_ex[e], r1_ex[e], r2_ex[e], 0, 360, iSign* theta_ex[e] );
         iEx->SetFillStyle( 0 );
         iEx->SetLineStyle( 3 );
         iEx->SetLineWidth( 2 );
@@ -2009,7 +2009,7 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas* c, int iLineColor )
     for( int i = 0; i < t->GetEntries(); i++ )
     {
         t->GetEntry( i );
-        TEllipse* e = new TEllipse( iSign * x, y, r1, r2, 0, 360, iSign * theta );
+        TEllipse* e = new TEllipse( iSign* x, y, r1, r2, 0, 360, iSign* theta );
         e->SetFillStyle( 0 );
         e->SetLineColor( iLineColor );
         e->Draw();

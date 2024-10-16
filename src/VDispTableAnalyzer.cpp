@@ -99,9 +99,9 @@ double VDispTableAnalyzer::interpolate( double w1, double ze1, double w2, double
     double id, f1, f2;
     if( iCos )
     {
-        id = cos( ze1 * TMath::DegToRad() ) - cos( ze2 * TMath::DegToRad() );
-        f1 = 1. - ( cos( ze1 * TMath::DegToRad() ) - cos( ze * TMath::DegToRad() ) ) / id;
-        f2 = 1. - ( cos( ze * TMath::DegToRad() ) - cos( ze2 * TMath::DegToRad() ) ) / id;
+        id = cos( ze1* TMath::DegToRad() ) - cos( ze2* TMath::DegToRad() );
+        f1 = 1. - ( cos( ze1* TMath::DegToRad() ) - cos( ze* TMath::DegToRad() ) ) / id;
+        f2 = 1. - ( cos( ze* TMath::DegToRad() ) - cos( ze2* TMath::DegToRad() ) ) / id;
     }
     else
     {
@@ -135,7 +135,7 @@ double VDispTableAnalyzer::interpolate( double w1, double ze1, double w2, double
         }
     }
 
-    return ( w1 * f1 + w2 * f2 );
+    return ( w1* f1 + w2* f2 );
 }
 
 /*!
@@ -375,8 +375,8 @@ void VDispTableAnalyzer::calculateMeanDirection( float& xs, float& ys, vector< f
 
             if( v_weight[k] > 0. )
             {
-                t_RMS[i] += (( x[k] - iSign * v_disp[k] * cosphi[k] - x_mean[i] ) * ( x[k] - iSign * v_disp[k] * cosphi[k] - x_mean[i] ) ) / v_weight[k];
-                t_RMS[i] += (( y[k] - iSign * v_disp[k] * sinphi[k] - y_mean[i] ) * ( y[k] - iSign * v_disp[k] * sinphi[k] - y_mean[i] ) ) / v_weight[k];
+                t_RMS[i] += (( x[k] - iSign* v_disp[k] * cosphi[k] - x_mean[i] ) * ( x[k] - iSign* v_disp[k] * cosphi[k] - x_mean[i] ) ) / v_weight[k];
+                t_RMS[i] += (( y[k] - iSign* v_disp[k] * sinphi[k] - y_mean[i] ) * ( y[k] - iSign* v_disp[k] * sinphi[k] - y_mean[i] ) ) / v_weight[k];
             }
         }
         t_RMS[i] *= t_weight[i];
@@ -405,8 +405,8 @@ void VDispTableAnalyzer::calculateMeanDirection( float& xs, float& ys, vector< f
         {
             iSign =  1.;
         }
-        x_disp.push_back( x[k] - iSign * v_disp[k] * cosphi[k] );
-        y_disp.push_back( y[k] - iSign * v_disp[k] * sinphi[k] );
+        x_disp.push_back( x[k] - iSign* v_disp[k] * cosphi[k] );
+        y_disp.push_back( y[k] - iSign* v_disp[k] * sinphi[k] );
     }
 
     xs = x_mean[t_RMS_bin];

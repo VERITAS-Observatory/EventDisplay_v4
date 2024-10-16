@@ -32,7 +32,7 @@ bool VLikelihoodFitter::initialize()
     vector <double> i_fEnergyBins;
     for( int i = 0; i <= i_fNEnergyBins; i ++ )
     {
-        i_fEnergyBins.push_back(-1.1 + i * fEnergyBinWidth );
+        i_fEnergyBins.push_back(-1.1 + i* fEnergyBinWidth );
     }
 
     // Setting energy binning
@@ -1600,7 +1600,7 @@ double VLikelihoodFitter::getRunwiseLogL( int i_run, vector <double> parms )
         // Avoiding 0*log(0)
         if( fOnCounts[i_run][j] > 0 )
         {
-            a = fOnCounts[i_run][j] * log( i_myModel[i_run][j] + fRunList[i_run].alpha * i_myvOffMLE[i_run][j] );
+            a = fOnCounts[i_run][j] * log( i_myModel[i_run][j] + fRunList[i_run].alpha* i_myvOffMLE[i_run][j] );
         }
 
         else
@@ -1836,7 +1836,7 @@ double VLikelihoodFitter::getLogL_internal( const double* parms )
 
             if( i_total_On[j] >= 1 )
             {
-                a = i_total_On[j] * TMath::Log( i_total_Model[j] + i_mean_alpha * i_total_ModelOff[j] );
+                a = i_total_On[j] * TMath::Log( i_total_Model[j] + i_mean_alpha* i_total_ModelOff[j] );
             }
 
             // 0*log(0)
@@ -2188,11 +2188,11 @@ TGraphAsymmErrors* VLikelihoodFitter::calculateConfidenceInterval( double* i_cov
             // log^2(E/E0) * errAlpha^2
             i_flux_err += TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * i_covmat[ 4 ];
             // (E/E0) * log^2(E/E0) * errBeta
-            i_flux_err += TMath::Power( TMath::Power( 10., i_energy ) / fENorm * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ), 2 ) * i_covmat[ 8 ];
+            i_flux_err += TMath::Power( TMath::Power( 10., i_energy ) / fENorm* TMath::Log( TMath::Power( 10., i_energy ) / fENorm ), 2 ) * i_covmat[ 8 ];
             // 2 * log(E/E0) * cov_N_Alpha / N
             i_flux_err += -2. * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * i_covmat[ 1 ] /  i_fitfunction->GetParameter( 0 );
             // 2 * (E/E0) log(E/E0) * cov_N_Beta / N
-            i_flux_err += -2. * ( TMath::Power( 10., i_energy ) / fENorm * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) ) * i_covmat[ 2 ] /  i_fitfunction->GetParameter( 0 );
+            i_flux_err += -2. * ( TMath::Power( 10., i_energy ) / fENorm* TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) ) * i_covmat[ 2 ] /  i_fitfunction->GetParameter( 0 );
             // 2 * log^2(E/E0) * (E/E0) * cov_Alpha_Beta
             i_flux_err += 2. * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * TMath::Power( 10., i_energy ) / fENorm * i_covmat[ 5 ] ;
 
@@ -2723,7 +2723,7 @@ TCanvas* VLikelihoodFitter::getTotalCountsPlots()
     for( unsigned int i = 0 ; i < i_vOffMLE[0].size(); i++ )
     {
 
-        i_vModelOnCounts[i] = ( i_vModelTotal[i]  + i_mean_alpha * i_vOffMLETotal[i] );
+        i_vModelOnCounts[i] = ( i_vModelTotal[i]  + i_mean_alpha* i_vOffMLETotal[i] );
 
         i_OnRes [i] = ( i_OnTotal[i] - i_vModelOnCounts[i] ) / i_vModelOnCounts[i];
         i_OffRes [i] =	( i_OffTotal[i] - i_vOffMLETotal[i] ) / i_vOffMLETotal[i];
@@ -3014,7 +3014,7 @@ TCanvas* VLikelihoodFitter::getRunPlots( unsigned int i_Entry )
 
     for( unsigned int i = 0; i < fOffCounts[i_Entry].size(); i++ )
     {
-        i_vExcess.push_back( fOnCounts[i_Entry][i] - fRunList[i_Entry].alpha * fOffCounts[i_Entry][i] );
+        i_vExcess.push_back( fOnCounts[i_Entry][i] - fRunList[i_Entry].alpha* fOffCounts[i_Entry][i] );
     }
 
     TGraphAsymmErrors* i_gExcess = new TGraphAsymmErrors( fEnergyBinCentres.size(), &( fEnergyBinCentres[0] ), &( i_vExcess[0] ) );
@@ -3104,7 +3104,7 @@ float* VLikelihoodFitter::getIntegralFlux( double i_EMin, double i_EMax, TF1* i_
 
 
     // Calculating Error
-    i_flux[1] = sqrt( a * a * i_Model->GetParError( 0 ) * i_Model->GetParError( 0 ) + ( b + c + d ) * ( b + c + d ) *  i_Model->GetParError( 1 ) * i_Model->GetParError( 1 ) );
+    i_flux[1] = sqrt( a* a* i_Model->GetParError( 0 ) * i_Model->GetParError( 0 ) + ( b + c + d ) * ( b + c + d ) *  i_Model->GetParError( 1 ) * i_Model->GetParError( 1 ) );
 
 
 
@@ -3606,7 +3606,7 @@ double VLikelihoodFitter::getVariabilityIndex( double i_delT, TF1* i_bestFit, do
                 // Last two parameters are:
                 // epislon (default of 1.e-11 is too coarse)
                 // number of iterations (default is 100, playing it a bit safer)
-                ul = i_profile->GetX(-2.71 / 2, i_localFit->GetParameter( 0 ), i_localFit->GetParameter( 0 ) + n_mult * i_localFit->GetParError( 0 ),  1.e-15, 500 );
+                ul = i_profile->GetX(-2.71 / 2, i_localFit->GetParameter( 0 ), i_localFit->GetParameter( 0 ) + n_mult* i_localFit->GetParError( 0 ),  1.e-15, 500 );
                 n_mult += 1.;
 
                 delete i_profile;

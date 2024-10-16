@@ -268,7 +268,7 @@ namespace SEphem
         const double xx = x * cos_theta + z * sin_theta;
         const double zz = z * cos_theta - x * sin_theta;
         // ATAN2 BETTEAR THAN ACOS FOR SMALL ANGLES
-        set( atan2( sqrt( y * y + xx * xx ), zz ), atan2( y, xx ) );
+        set( atan2( sqrt( y* y + xx* xx ), zz ), atan2( y, xx ) );
         m_phi.rotateRad( phi );
     }
 
@@ -293,7 +293,7 @@ namespace SEphem
         double x = sinth2 * costh1 - costh2 * sinth1 * cosdphi;
         double y = sinth1 * sindphi;
         double z = costh2 * costh1 + sinth2 * sinth1 * cosdphi;
-        return atan2( sqrt( x * x + y * y ), z );
+        return atan2( sqrt( x* x + y* y ), z );
 #endif
     }
 
@@ -314,7 +314,7 @@ namespace SEphem
         double costh1 = cos( c.m_theta );
         double sinth2 = sin( m_theta );
         double costh2 = cos( m_theta );
-        return atan2(-sinth1 * costh2 * cosdphi + costh1 * sinth2, sinth1 * sindphi );
+        return atan2(-sinth1* costh2* cosdphi + costh1* sinth2, sinth1* sindphi );
     }
 
     inline void
@@ -338,7 +338,7 @@ namespace SEphem
         double x = sinth2 * costh1 - costh2 * sinth1 * cosdphi;
         double y = sinth1 * sindphi;
         double z = costh2 * costh1 + sinth2 * sinth1 * cosdphi;
-        s = atan2( sqrt( x * x + y * y ), z );
+        s = atan2( sqrt( x* x + y* y ), z );
         d = atan2( x, y );
     }
 
@@ -364,7 +364,7 @@ namespace SEphem
     SphericalCoords::cartesian( double& x, double& y, double& z ) const
     {
         z = cos( m_theta );
-        double rho = sqrt( 1 - z * z );
+        double rho = sqrt( 1 - z* z );
         x = rho * cos( m_phi );
         y = rho * sin( m_phi );
     }

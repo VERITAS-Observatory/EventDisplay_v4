@@ -449,8 +449,8 @@ double VLightCurveUtilities::getPhase( double iMJD )
 */
 double VLightCurveUtilities::getPhaseError( double iMJD )
 {
-    double iError = sqrt( fPhaseError_up_fPhase_Period_days * fPhaseError_up_fPhase_Period_days
-                          + fPhaseError_low_fPhase_Period_days * fPhaseError_low_fPhase_Period_days );
+    double iError = sqrt( fPhaseError_up_fPhase_Period_days* fPhaseError_up_fPhase_Period_days
+                          + fPhaseError_low_fPhase_Period_days* fPhaseError_low_fPhase_Period_days );
 
     double iP = 0.;
 
@@ -525,7 +525,7 @@ double VLightCurveUtilities::getFlux_Variance()
 
     if( iNN > 1. )
     {
-        return ( 1. / ( iNN - 1. ) * ( Sxx - 1. / iNN * Sx * Sx ) );
+        return ( 1. / ( iNN - 1. ) * ( Sxx - 1. / iNN* Sx* Sx ) );
     }
 
     return 0.;
@@ -678,7 +678,7 @@ double VLightCurveUtilities::getVariabilityIndex( TGraphAsymmErrors* g, double i
 
         if( sigmaF.back() > 0. )
         {
-            w.push_back( 1. / ( sigmaF.back()*sigmaF.back() + ( iSystematicFraction * F.back() ) * ( iSystematicFraction * F.back() ) ) );
+            w.push_back( 1. / ( sigmaF.back()*sigmaF.back() + ( iSystematicFraction* F.back() ) * ( iSystematicFraction* F.back() ) ) );
             w_sum += w.back();
             w_F += F.back() * w.back();
         }

@@ -172,8 +172,8 @@ bool fillBackgroundRateHistograms( TH1F* hBckRate, TH1F* hBckRateDeq, double wof
                     }
                     if( i_omega > 0. )
                     {
-                        hBckRateDeq->SetBinContent( b, hBckRate->GetBinContent( b ) / ( i_omega * TMath::RadToDeg() * TMath::RadToDeg() ) );
-                        hBckRateDeq->SetBinError( b, hBckRate->GetBinError( b ) / ( i_omega * TMath::RadToDeg() * TMath::RadToDeg() ) );
+                        hBckRateDeq->SetBinContent( b, hBckRate->GetBinContent( b ) / ( i_omega* TMath::RadToDeg() * TMath::RadToDeg() ) );
+                        hBckRateDeq->SetBinError( b, hBckRate->GetBinError( b ) / ( i_omega* TMath::RadToDeg() * TMath::RadToDeg() ) );
                     }
                 }
             }

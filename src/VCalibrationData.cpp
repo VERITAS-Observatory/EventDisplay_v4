@@ -741,7 +741,7 @@ valarray<double>& VCalibrationData::getPeds( bool iLowGain, double iTime )
 
         for( unsigned int i = 0; i < fTS_ped_temp.size(); i++ )
         {
-            fTS_ped_temp[i] = ( ifrac1 * getPedsTS_vector( iLowGain )[i1][i] + ifrac2 * getPedsTS_vector( iLowGain )[i2][i] );
+            fTS_ped_temp[i] = ( ifrac1* getPedsTS_vector( iLowGain )[i1][i] + ifrac2* getPedsTS_vector( iLowGain )[i2][i] );
         }
 
         return fTS_ped_temp;
@@ -789,7 +789,7 @@ valarray<double>& VCalibrationData::getPedvars( bool iLowGain, unsigned int iSW,
             // loop over all channels and calculate pedvars for this time (weighted mean between time bins)
             for( unsigned int i = 0; i < fTS_pedvar_temp[iSW].size(); i++ )
             {
-                fTS_pedvar_temp[iSW][i] = ( ifrac1 * getPedvarsVTS_vector( iLowGain )[i1][iSW - 1][i] + ifrac2 * getPedvarsVTS_vector( iLowGain )[i2][iSW - 1][i] );
+                fTS_pedvar_temp[iSW][i] = ( ifrac1* getPedvarsVTS_vector( iLowGain )[i1][iSW - 1][i] + ifrac2* getPedvarsVTS_vector( iLowGain )[i2][iSW - 1][i] );
             }
 
             return fTS_pedvar_temp[iSW];
@@ -915,7 +915,7 @@ void VCalibrationData::getmeanPedvars( double& imean, double& irms, bool iLowGai
     }
     if( its_n > 1. )
     {
-        irms = sqrt( 1. / ( its_n - 1. ) * ( its_sum2 - 1. / its_n * its_sum * its_sum ) );
+        irms = sqrt( 1. / ( its_n - 1. ) * ( its_sum2 - 1. / its_n* its_sum* its_sum ) );
     }
 }
 

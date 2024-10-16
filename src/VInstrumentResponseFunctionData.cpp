@@ -473,8 +473,8 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
         iDiff = sqrt(( fData->Xoff - fData->MCxoff ) * ( fData->Xoff - fData->MCxoff ) +
                      ( fData->Yoff - fData->MCyoff ) * ( fData->Yoff - fData->MCyoff ) );
         // error
-        iError = sqrt( fData->Xoff * fData->Xoff + fData->Xoff * fData->Xoff ) -
-                 sqrt( fData->MCxoff * fData->MCxoff + fData->MCyoff * fData->MCyoff );
+        iError = sqrt( fData->Xoff* fData->Xoff + fData->Xoff* fData->Xoff ) -
+                 sqrt( fData->MCxoff* fData->MCxoff + fData->MCyoff* fData->MCyoff );
         // relative error (not sure if it is useful)
         iErrorRelative = -99.e6;
     }
@@ -486,12 +486,12 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
         iDiff = sqrt(( fData->Xcore - fData->MCxcore ) * ( fData->Xcore - fData->MCxcore ) +
                      ( fData->Ycore - fData->MCycore ) * ( fData->Ycore - fData->MCycore ) );
         // core error
-        iError = sqrt( fData->Xcore * fData->Xcore + fData->Xcore * fData->Xcore ) -
-                 sqrt( fData->MCxcore * fData->MCxcore + fData->MCycore * fData->MCycore );
+        iError = sqrt( fData->Xcore* fData->Xcore + fData->Xcore* fData->Xcore ) -
+                 sqrt( fData->MCxcore* fData->MCxcore + fData->MCycore* fData->MCycore );
         // relative error
         if( sqrt( fData->MCxcore * fData->MCxcore + fData->MCycore * fData->MCycore ) > 0. )
         {
-            iErrorRelative = iError / sqrt( fData->MCxcore * fData->MCxcore + fData->MCycore * fData->MCycore );
+            iErrorRelative = iError / sqrt( fData->MCxcore* fData->MCxcore + fData->MCycore* fData->MCycore );
         }
         else
         {
@@ -539,12 +539,12 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
     // squared difference vs energy
     if( E_DIFF2 < f2DHisto.size() && f2DHisto[E_DIFF2] )
     {
-        f2DHisto[E_DIFF2]->Fill( log10( iErec_lin ), iDiff * iDiff, iWeight );
+        f2DHisto[E_DIFF2]->Fill( log10( iErec_lin ), iDiff* iDiff, iWeight );
     }
     // squared difference vs true energy
     if( E_DIFF2_MC < f2DHisto.size() && f2DHisto[E_DIFF2_MC] )
     {
-        f2DHisto[E_DIFF2_MC]->Fill( log10( fData->MCe0 ), iDiff * iDiff, iWeight );
+        f2DHisto[E_DIFF2_MC]->Fill( log10( fData->MCe0 ), iDiff* iDiff, iWeight );
     }
     // log10 difference vs energy
     if( E_LOGDIFF < f2DHisto.size() && f2DHisto[E_LOGDIFF] && iDiff > 0. )
@@ -738,7 +738,7 @@ double VInstrumentResponseFunctionData::getResolutionErrorfromToyMC( double i68,
             x = f.GetRandom();
             y = f.GetRandom();
 
-            hDiff.Fill( sqrt( x * x + y * y ) );
+            hDiff.Fill( sqrt( x* x + y* y ) );
         }
         if( hDiff.GetEntries() > 0 )
         {
@@ -759,7 +759,7 @@ void VInstrumentResponseFunctionData::setData( double iZe, int iAz_bin, double i
     fAz_max = iAz_max;
     fXoff = iXoff;
     fYoff = iYoff;
-    fWobble = sqrt( fXoff * fXoff + fYoff * fYoff );
+    fWobble = sqrt( fXoff* fXoff + fYoff* fYoff );
     fNoise = iNoise;
     fPedvars = iPedvars;
     fSpectralIndex = iIndex;

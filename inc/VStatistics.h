@@ -43,7 +43,7 @@ namespace VStatistics
 
         if( Non + alphasq * Noff > 0. )
         {
-            Sig5 = Nsig / sqrt( Non + alphasq * Noff );
+            Sig5 = Nsig / sqrt( Non + alphasq* Noff );
         }
         else
         {
@@ -51,7 +51,7 @@ namespace VStatistics
         }
         if( alpha * Ntot > 0. )
         {
-            Sig9 = Nsig / sqrt( alpha * Ntot );
+            Sig9 = Nsig / sqrt( alpha* Ntot );
         }
         else
         {
@@ -63,15 +63,15 @@ namespace VStatistics
         }
         else if( Non == 0 && Noff != 0. )
         {
-            Sig17 = sqrt( 2.*( Noff * log( oneplusalpha * ( Noff / Ntot ) ) ) );
+            Sig17 = sqrt( 2.*( Noff* log( oneplusalpha * ( Noff / Ntot ) ) ) );
         }
         else if( Non != 0 && Noff == 0. )
         {
-            Sig17 = sqrt( 2.*( Non * log( oneplusalphaoveralpha * ( Non / Ntot ) ) ) );
+            Sig17 = sqrt( 2.*( Non* log( oneplusalphaoveralpha * ( Non / Ntot ) ) ) );
         }
         else
         {
-            Sig17 = 2.*( Non * log( oneplusalphaoveralpha * ( Non / Ntot ) ) + Noff * log( oneplusalpha * ( Noff / Ntot ) ) );
+            Sig17 = 2.*( Non* log( oneplusalphaoveralpha * ( Non / Ntot ) ) + Noff* log( oneplusalpha * ( Noff / Ntot ) ) );
             // value in brackets can be a small negative number
             if( TMath::Abs( Sig17 ) < 1.e-15 )
             {
@@ -133,7 +133,7 @@ namespace VStatistics
     inline double Helene( double nOn, double nOff, double alpha, double CL )
     {
         double nDiff = nOn - alpha * nOff;
-        double sigma = sqrt( nOn + alpha * alpha * nOff );
+        double sigma = sqrt( nOn + alpha* alpha* nOff );
 
         double ulim = 0.;
 
@@ -243,7 +243,7 @@ namespace VStatistics
             {
                 i_FeldmanCousins.SetMuStep( 0.5 );
             }
-            return i_FeldmanCousins.CalculateUpperLimit( nOn, ratio * nOff );
+            return i_FeldmanCousins.CalculateUpperLimit( nOn, ratio* nOff );
         }
         // Rolke Model 3 Background - Gaussian, Efficiency - Gaussian
         //
@@ -257,7 +257,7 @@ namespace VStatistics
 
             double sdb = ratio * sqrt( nOff );
 
-            i_Rolke.SetGaussBkgGaussEff(( int )nOn, ratio * nOff, 1., 0.3, sdb );
+            i_Rolke.SetGaussBkgGaussEff(( int )nOn, ratio* nOff, 1., 0.3, sdb );
 
             return i_Rolke.GetUpperLimit();
         }
@@ -317,9 +317,9 @@ namespace VStatistics
         double f2 = 0.;
         if( iCos )
         {
-            id = cos( ze1 * TMath::DegToRad() ) - cos( ze2 * TMath::DegToRad() );
-            f1 = 1. - ( cos( ze1 * TMath::DegToRad() ) - cos( ze * TMath::DegToRad() ) ) / id;
-            f2 = 1. - ( cos( ze * TMath::DegToRad() ) - cos( ze2 * TMath::DegToRad() ) ) / id;
+            id = cos( ze1* TMath::DegToRad() ) - cos( ze2* TMath::DegToRad() );
+            f1 = 1. - ( cos( ze1* TMath::DegToRad() ) - cos( ze* TMath::DegToRad() ) ) / id;
+            f2 = 1. - ( cos( ze* TMath::DegToRad() ) - cos( ze2* TMath::DegToRad() ) ) / id;
         }
         else
         {
@@ -353,7 +353,7 @@ namespace VStatistics
             }
         }
 
-        return ( w1 * f1 + w2 * f2 );
+        return ( w1* f1 + w2* f2 );
     }
 
     /*

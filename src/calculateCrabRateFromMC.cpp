@@ -417,7 +417,7 @@ void fillBackgroundRates_perRun(
             h->Fill(
                 0.5 * ( ebins[e].first + ebins[e].second ),
                 90. - elevationOff,
-                iR * OffNorm / tOff * 60. );
+                iR* OffNorm / tOff * 60. );
         }
     }
 

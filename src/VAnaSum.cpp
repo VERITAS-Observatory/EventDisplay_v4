@@ -589,9 +589,9 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
     double i_rateOFF = 0.;
     if( iexp_on > 0. && iexp_off > 0. )
     {
-        i_rate = ( i_nevts_on - i_norm_alpha * i_nevts_off ) * 60. / iexp_on;       // rates in 1/min
+        i_rate = ( i_nevts_on - i_norm_alpha* i_nevts_off ) * 60. / iexp_on;        // rates in 1/min
         i_rateOFF = i_norm_alpha * i_nevts_off * 60. / iexp_off;                    // rates in 1/min
-        i_rateE = sqrt( i_nevts_on + i_norm_alpha * i_norm_alpha * i_nevts_off ) * 60. / iexp_on;
+        i_rateE = sqrt( i_nevts_on + i_norm_alpha* i_norm_alpha* i_nevts_off ) * 60. / iexp_on;
     }
 
     cout << endl;
@@ -663,7 +663,7 @@ void VAnaSum::doLightCurves( TDirectory* iDir, double ialpha, VStereoAnalysis* i
         isig.push_back( VStatistics::calcSignificance( ion->getRateCounts()[i], ioff->getRateCounts()[i], ialpha ) );
         if( ion->getRateTimeIntervall()[i] > 0. && ion->getRateCounts()[i] > 0. )
         {
-            irate.push_back(( ion->getRateCounts()[i] - ialpha * ioff->getRateCounts()[i] ) * 60. / ion->getRateTimeIntervall()[i] );
+            irate.push_back(( ion->getRateCounts()[i] - ialpha* ioff->getRateCounts()[i] ) * 60. / ion->getRateTimeIntervall()[i] );
         }
         else
         {
@@ -990,7 +990,7 @@ void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp
     }
     if( fRunSummary->tOn > 0. )
     {
-        fRunSummary->RateE = sqrt( i_nevts_on + i_tnorm * i_tnorm * i_norm_alpha * i_norm_alpha * i_nevts_off ) / fRunSummary->tOn * 60.;
+        fRunSummary->RateE = sqrt( i_nevts_on + i_tnorm* i_tnorm* i_norm_alpha* i_norm_alpha* i_nevts_off ) / fRunSummary->tOn * 60.;
     }
     else
     {
@@ -999,7 +999,7 @@ void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp
     fRunSummary->RateOff = i_rateOFF;
     if( fRunSummary->tOff > 0. )
     {
-        fRunSummary->RateOffE = sqrt( i_tnorm * i_tnorm * i_norm_alpha * i_norm_alpha * i_nevts_off ) / fRunSummary->tOff * 60.;
+        fRunSummary->RateOffE = sqrt( i_tnorm* i_tnorm* i_norm_alpha* i_norm_alpha* i_nevts_off ) / fRunSummary->tOff * 60.;
     }
     else
     {

@@ -406,7 +406,7 @@ uint8_t VBaseRawDataReader::getSample( unsigned channel, unsigned sample, bool i
         if( fTraceAmplitudeCorrectionG.size() > 0 && fTelID < fTraceAmplitudeCorrectionG.size() )
         {
             iNoiseGaus = fRandomInjectGaussianNoise->Gaus( 0.,
-                         finjectGaussianNoise * fTraceAmplitudeCorrectionG[fTelID] );
+                         finjectGaussianNoise* fTraceAmplitudeCorrectionG[fTelID] );
         }
         else
         {

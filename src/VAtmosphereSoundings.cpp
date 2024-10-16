@@ -882,7 +882,7 @@ double VAtmosphereSoundings::getWaterVaporMassDensity( double ATEMP )
     double AMWT = 18.015;           // molecular weight of water
     double B = AVOGAD / AMWT;
 
-    return ATEMP * B * TMath::Exp( C1 + C2 * ATEMP + C3 * ATEMP * ATEMP ) * 1.0e-6;
+    return ATEMP * B * TMath::Exp( C1 + C2* ATEMP + C3* ATEMP* ATEMP ) * 1.0e-6;
 }
 
 
@@ -3197,7 +3197,7 @@ void VAtmosphereSoundings::plot_season( double mjd_start, double mjd_end, TStrin
     vector<double> start, end;
     for( int i = 0; i < Nmonth; i++ )
     {
-        start.push_back( mjd_start + i * month + 1 );
+        start.push_back( mjd_start + i* month + 1 );
         end.push_back( mjd_start + ( i + 1 )*month - 1 );
 
         int y1, y2, m1, m2, d1, d2, j;

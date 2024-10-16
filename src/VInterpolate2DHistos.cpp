@@ -119,8 +119,8 @@ TH2F* VInterpolate2DHistos::doGaussianInterpolation( TH2F* h, string iname, TH2F
             // loop over all bin entries
             for( int k = 0; k < n; k++ )
             {
-                x = fRandom->Gaus( xc, xWidth * nWidth / 2. );
-                y = fRandom->Gaus( yc, yWidth * nWidth / 2. );
+                x = fRandom->Gaus( xc, xWidth* nWidth / 2. );
+                y = fRandom->Gaus( yc, yWidth* nWidth / 2. );
                 h2D.Fill( x, y, z );
             }
         }

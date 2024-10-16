@@ -79,7 +79,7 @@ double getTelescopePositions( string iF, vector< double >& iX, vector< double >&
         cout << "\t telescope " << i + 1 << "\t" << x << "\t" << y << "\t" << z << endl;
         if( sqrt( x * x + y * y ) > r_max )
         {
-            r_max = sqrt( x * x + y * y );
+            r_max = sqrt( x* x + y* y );
         }
     }
     cout << endl;

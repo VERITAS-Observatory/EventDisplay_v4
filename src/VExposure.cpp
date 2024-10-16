@@ -396,8 +396,8 @@ bool VExposure::readFromDB()
         {
             angl = atof( db_row->GetField( 18 ) );
         }
-        fWobbleNorth = dist * cos( angl * TMath::DegToRad() );
-        fWobbleEast  = dist * sin( angl * TMath::DegToRad() );
+        fWobbleNorth = dist * cos( angl* TMath::DegToRad() );
+        fWobbleEast  = dist * sin( angl* TMath::DegToRad() );
         if( TMath::Abs( fWobbleNorth ) < 1.e-15 )
         {
             fWobbleNorth = 0.;
@@ -578,8 +578,8 @@ bool VExposure::readFromDBList()
         {
             angl = atof( db_row->GetField( 18 ) );
         }
-        fWobbleNorth = dist * cos( angl * TMath::DegToRad() );
-        fWobbleEast  = dist * sin( angl * TMath::DegToRad() );
+        fWobbleNorth = dist * cos( angl* TMath::DegToRad() );
+        fWobbleEast  = dist * sin( angl* TMath::DegToRad() );
         if( TMath::Abs( fWobbleNorth ) < 1.e-15 )
         {
             fWobbleNorth = 0.;
@@ -939,7 +939,7 @@ void VExposure::fillElevationPlot( int iYear, int iMonth, int ze_max_deg )
                 for( int a = 0; a < 360; a++ )
                 {
                     VSkyCoordinatesUtilities::getEquatorialCoordinates( imjd, time, ( double )a, ( double )z, dec, ra );
-                    VAstronometry::vlaEqgal( ra * TMath::DegToRad(), dec * TMath::DegToRad(), &l, &b );
+                    VAstronometry::vlaEqgal( ra* TMath::DegToRad(), dec* TMath::DegToRad(), &l, &b );
 
                     l *= TMath::RadToDeg();
                     if( l > 180 )
@@ -1034,7 +1034,7 @@ void VExposure::fillExposureMap()
             int i_r_l = 1;
             if( cos( b_pos * TMath::Pi() / 180. ) > 0. )
             {
-                i_r_l = ( int )( fMaximumIntegrationRadius / cos( b_pos * TMath::Pi() / 180. ) / fMapGal2D->GetXaxis()->GetBinWidth( 2 ) + 0.5 );
+                i_r_l = ( int )( fMaximumIntegrationRadius / cos( b_pos* TMath::Pi() / 180. ) / fMapGal2D->GetXaxis()->GetBinWidth( 2 ) + 0.5 );
             }
             else
             {
@@ -1055,7 +1055,7 @@ void VExposure::fillExposureMap()
             {
                 double l_pos = fMapGal2D->GetXaxis()->GetBinCenter( l );
 
-                r_dist = VAstronometry::vlaDsep( l_pos * TMath::Pi() / 180., b_pos * TMath::Pi() / 180., fRunGalLong1958[i] * TMath::Pi() / 180.,
+                r_dist = VAstronometry::vlaDsep( l_pos* TMath::Pi() / 180., b_pos* TMath::Pi() / 180., fRunGalLong1958[i] * TMath::Pi() / 180.,
                                                  fRunGalLat1958[i] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
                 if( r_dist < fMaximumIntegrationRadius && fRunDuration[i] > 0. )
                 {
@@ -1273,9 +1273,9 @@ void VExposure::drawAitoffCoordinateSystem()
         for( int i = 0; i < M + 1; ++i )
         {
             lo = -180. + 360. / M * i;
-            z  = sqrt( 1 + cos( la * radeg ) * cos( lo * radeg / 2. ) );
-            x  = 180.*cos( la * radeg ) * sin( lo * radeg / 2. ) / z;
-            y  = 90.*sin( la * radeg ) / z;
+            z  = sqrt( 1 + cos( la* radeg ) * cos( lo* radeg / 2. ) );
+            x  = 180.*cos( la* radeg ) * sin( lo* radeg / 2. ) / z;
+            y  = 90.*sin( la* radeg ) / z;
             latitudes[j]->SetPoint( i, x, y );
         }
     }
@@ -1291,9 +1291,9 @@ void VExposure::drawAitoffCoordinateSystem()
         for( int i = 0; i < M + 1; ++i )
         {
             la = -90. + 180. / M * i;
-            z  = sqrt( 1 + cos( la * radeg ) * cos( lo * radeg / 2. ) );
-            x  = 180.*cos( la * radeg ) * sin( lo * radeg / 2. ) / z;
-            y  = 90.*sin( la * radeg ) / z;
+            z  = sqrt( 1 + cos( la* radeg ) * cos( lo* radeg / 2. ) );
+            x  = 180.*cos( la* radeg ) * sin( lo* radeg / 2. ) / z;
+            y  = 90.*sin( la* radeg ) / z;
             longitudes[j]->SetPoint( i, x, y );
         }
     }
@@ -1324,7 +1324,7 @@ void VExposure::plotVTSObjects( bool bAitoff, double ibmin, double ibmax, double
             dec = fRunDec[i];
             VAstronometry::vlaEqgal( ra / 180. * TMath::Pi(), dec / 180. * TMath::Pi(), &l, &b );
 
-            plotObject( l * TMath::RadToDeg(), b * TMath::RadToDeg(), fRunSourceID[i], 0.,
+            plotObject( l* TMath::RadToDeg(), b* TMath::RadToDeg(), fRunSourceID[i], 0.,
                         ibmin, ibmax, ilmin, ilmax, h,
                         bAitoff, iMarkerStyle, iMarkerColor, iTextAngle );
         }
@@ -1426,13 +1426,13 @@ void VExposure::plotObject( double l, double b, string l_name, double iExtension
             {
                 if( bAitoff )
                 {
-                    al = al + il_range * 0.01 * ( cos( iTextAngle * TMath::DegToRad() ) + sin( iTextAngle * TMath::DegToRad() ) );
-                    ab = ab + ib_range * 0.01 * (-1.*sin( iTextAngle * TMath::DegToRad() ) + cos( iTextAngle * TMath::DegToRad() ) );
+                    al = al + il_range * 0.01 * ( cos( iTextAngle* TMath::DegToRad() ) + sin( iTextAngle* TMath::DegToRad() ) );
+                    ab = ab + ib_range * 0.01 * (-1.*sin( iTextAngle* TMath::DegToRad() ) + cos( iTextAngle* TMath::DegToRad() ) );
                 }
                 else
                 {
-                    al = -1.*l + il_range * 0.01 * ( cos( iTextAngle * TMath::DegToRad() ) + sin( iTextAngle * TMath::DegToRad() ) );
-                    ab = b + ib_range * 0.01 * (-1.*sin( iTextAngle * TMath::DegToRad() ) + cos( iTextAngle * TMath::DegToRad() ) );
+                    al = -1.*l + il_range * 0.01 * ( cos( iTextAngle* TMath::DegToRad() ) + sin( iTextAngle* TMath::DegToRad() ) );
+                    ab = b + ib_range * 0.01 * (-1.*sin( iTextAngle* TMath::DegToRad() ) + cos( iTextAngle* TMath::DegToRad() ) );
                 }
                 TText* t = new TText( al, ab, l_name.c_str() );
                 t->SetTextColor( iMarkerColor );
@@ -1999,7 +1999,7 @@ void VExposure::printListOfRuns( double il, double ib, double iR, double iMinDur
     }
     for( unsigned int i = 0; i < fRunGalLong1958.size(); i++ )
     {
-        r_dist = VAstronometry::vlaDsep( il * TMath::Pi() / 180., ib * TMath::Pi() / 180., fRunGalLong1958[i] * TMath::Pi() / 180., fRunGalLat1958[i] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
+        r_dist = VAstronometry::vlaDsep( il* TMath::Pi() / 180., ib* TMath::Pi() / 180., fRunGalLong1958[i] * TMath::Pi() / 180., fRunGalLat1958[i] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
 
         if( r_dist < iR && fRunDuration[i] > iMinDuration )
         {
@@ -2072,7 +2072,7 @@ void VExposure::aitoff2xy( Double_t l, Double_t b, Double_t& Al, Double_t& Ab )
     Double_t r2     = TMath::Sqrt( 2. );
     Double_t f      = 2 * r2 / TMath::Pi();
     Double_t cdec   = TMath::Cos( delta );
-    Double_t denom  = TMath::Sqrt( 1. + cdec * TMath::Cos( alpha2 ) );
+    Double_t denom  = TMath::Sqrt( 1. + cdec* TMath::Cos( alpha2 ) );
     x      = cdec * TMath::Sin( alpha2 ) * 2.*r2 / denom;
     y      = TMath::Sin( delta ) * r2 / denom;
     x     *= TMath::RadToDeg() / f;

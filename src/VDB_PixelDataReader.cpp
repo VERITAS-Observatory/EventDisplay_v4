@@ -574,7 +574,7 @@ vector< unsigned int > VDB_PixelDataReader::getDeadChannelList( unsigned int iDa
         }
         if( i_n > 1 )
         {
-            i_rms = sqrt(( 1. / ( i_n - 1. ) ) * ( i_mean2 - i_mean * i_mean / i_n ) );
+            i_rms = sqrt(( 1. / ( i_n - 1. ) ) * ( i_mean2 - i_mean* i_mean / i_n ) );
             i_mean /= i_n;
         }
 

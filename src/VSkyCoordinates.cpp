@@ -142,7 +142,7 @@ void VSkyCoordinates::updatePointing( int MJD, double time )
     double el = 0.;
 
     // telescope elevation/azimuth calculated from source coordinates and time
-    VSkyCoordinatesUtilities::getHorizontalCoordinates( MJD, time, fTelDec * TMath::RadToDeg(), fTelRA * TMath::RadToDeg(), az, el );
+    VSkyCoordinatesUtilities::getHorizontalCoordinates( MJD, time, fTelDec* TMath::RadToDeg(), fTelRA* TMath::RadToDeg(), az, el );
     el = 90. - el;
     fTelAzimuthCalculated   = ( float )az;
     fTelElevationCalculated = ( float )el;
@@ -150,7 +150,7 @@ void VSkyCoordinates::updatePointing( int MJD, double time )
     fTelAzimuth   = fTelAzimuthCalculated;
 
     // set target azimuth/elevation
-    VSkyCoordinatesUtilities::getHorizontalCoordinates( MJD, time, fTargetDec * TMath::RadToDeg(), fTargetRA * TMath::RadToDeg(), fTargetAzimuth, fTargetElevation );
+    VSkyCoordinatesUtilities::getHorizontalCoordinates( MJD, time, fTargetDec* TMath::RadToDeg(), fTargetRA* TMath::RadToDeg(), fTargetAzimuth, fTargetElevation );
     fTargetElevation = 90. - fTargetElevation;
 }
 
@@ -263,7 +263,7 @@ void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast, int iTelID, 
     {
         double i_decDiff = 0.;
         double i_RADiff = 0.;
-        VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( iNorth, iEast, fTargetDec * TMath::RadToDeg(), fTargetRA * TMath::RadToDeg(), i_decDiff, i_RADiff );
+        VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( iNorth, iEast, fTargetDec* TMath::RadToDeg(), fTargetRA* TMath::RadToDeg(), i_decDiff, i_RADiff );
         if( i_RADiff < -180. )
         {
             i_RADiff += 360.;

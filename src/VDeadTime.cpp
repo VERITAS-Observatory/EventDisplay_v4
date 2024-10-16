@@ -433,7 +433,7 @@ double VDeadTime::calculateDeadTimeFromTimeDifferences()
 
     fDeadTimeMiss = nmiss;
     fDeadTimeMS = ix * 1000.;
-    fDeadTimeFrac = 1. - TMath::Power( TMath::E(), ix * hFTimeDiff->GetParameter( 1 ) );
+    fDeadTimeFrac = 1. - TMath::Power( TMath::E(), ix* hFTimeDiff->GetParameter( 1 ) );
     if( fDeadTimeFrac < 1.e-5 )
     {
         fDeadTimeFrac = 0.;
@@ -461,10 +461,10 @@ double VDeadTime::calculateDeadTimeFromTimeDifferences()
                     break;
                 }
             }
-            hgDeadTime->SetPoint( i - 1, hTimeDiff2D->GetXaxis()->GetBinCenter( i ), ( 1. - TMath::Power( TMath::E(), ix * fFit.GetParameter( 1 ) ) ) * 100. );
+            hgDeadTime->SetPoint( i - 1, hTimeDiff2D->GetXaxis()->GetBinCenter( i ), ( 1. - TMath::Power( TMath::E(), ix* fFit.GetParameter( 1 ) ) ) * 100. );
             double iDE = 0.;
-            iDE += ix * TMath::Power( TMath::E(), ix * fFit.GetParameter( 1 ) ) * fFit.GetParError( 1 ) * ix * TMath::Power( TMath::E(), ix * fFit.GetParameter( 1 ) ) * fFit.GetParError( 1 );
-            iDE += fFit.GetParameter( 1 ) * TMath::Power( TMath::E(), ix * fFit.GetParameter( 1 ) ) * h->GetBinWidth( 1 ) * fFit.GetParameter( 1 ) * TMath::Power( TMath::E(), ix * fFit.GetParameter( 1 ) ) * h->GetBinWidth( 1 ) / 4.;
+            iDE += ix * TMath::Power( TMath::E(), ix* fFit.GetParameter( 1 ) ) * fFit.GetParError( 1 ) * ix * TMath::Power( TMath::E(), ix* fFit.GetParameter( 1 ) ) * fFit.GetParError( 1 );
+            iDE += fFit.GetParameter( 1 ) * TMath::Power( TMath::E(), ix* fFit.GetParameter( 1 ) ) * h->GetBinWidth( 1 ) * fFit.GetParameter( 1 ) * TMath::Power( TMath::E(), ix* fFit.GetParameter( 1 ) ) * h->GetBinWidth( 1 ) / 4.;
             iDE = sqrt( iDE );
             hgDeadTime->SetPointError( i - 1, 0., iDE * 100. );
 
