@@ -64,6 +64,7 @@ class VTableLookup
         vector< bool > fTelToAnalyze;
         vector< double > fTableZe;      // [nze]
         vector< vector< double > > fTableZeOffset;  // [nze][nwoff]
+        vector< vector< vector< vector< vector< double > > > > > fTableZeOffsetAzTelNoise;  // [nze][nwoff][naz][ntel][n
 
         // tables
         // fmscw[ze][woff][az][tel]
@@ -86,7 +87,7 @@ class VTableLookup
         void fillLookupTable();
         unsigned int  getAzBin( double az );
         void getIndexBoundary( unsigned int* ib, unsigned int* il, vector< double >& iV, double x );
-        unsigned int  getNoiseBin( unsigned int tel, double noise );
+        unsigned int  getNoiseBin( unsigned int ize, unsigned int iwoff, unsigned int iaz, unsigned int tel, double noise );
         vector< string > getSortedListOfDirectories( TDirectory* );
         void getTables( unsigned int inoise, unsigned int ize, unsigned int iwoff, unsigned int iaz, unsigned int tel, VTablesToRead* s );
         void interpolate( VTablesToRead* s1, double w1, VTablesToRead* s2, double w2, VTablesToRead* s, double w, bool iCos = false );
