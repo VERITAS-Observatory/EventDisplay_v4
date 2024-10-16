@@ -461,6 +461,7 @@ void VLikelihoodFitter2::updateEnergyRange(){
 
 void VLikelihoodFitter2::updateEnergyBinning(){
     for (unsigned int i = 0; i < fLikelihoodObjects.size() ; i++){
+		// cout << "Updating energy binning for object " << i << " " << fEnergyBinWidth << " " << fEnergyBinMin << " " << fEnergyBinMax << endl;
         fLikelihoodObjects[i]->setBinning(fEnergyBinWidth, fEnergyBinMin, fEnergyBinMax);
     }
 }
@@ -487,6 +488,8 @@ void VLikelihoodFitter2::setEnergyBinning(double i_binw, double i_binMin, double
              << "Defaulting to 0.2 log spaced bins between 0.1-10 (-1, 1) TeV (log10 TeV)\n";
         setEnergyBinning(0.2,-1,1);
     }
+
+	updateEnergyBinning();
 
 }
 
