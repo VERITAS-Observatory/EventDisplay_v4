@@ -2472,7 +2472,7 @@ TF1* VLikelihoodFitter::getProfileLikelihood( unsigned int par, double min, doub
     // global scan
     if( energybin == -1 )
     {
-        // Setting parameters to the global fit's parametesr
+        // Setting parameters to the global fit's parameters
         for( unsigned int i = 0; i < fNParms; i++ )
         {
             i_bestfitparms[i] = fGlobalBestFitParameters[i];
@@ -3587,7 +3587,7 @@ double VLikelihoodFitter::getVariabilityIndex( double i_delT, TF1* i_bestFit, do
 
         fLCFluxTS.push_back( getBinTS( i_totalOn, i_totalOff, getMeanAlpha() ) );
 
-        // Gettin Upper limits (95%)
+        // Getting Upper limits (95%)
         // (SOB) UL code needs work...
         if( i_ul )
         {
@@ -3867,7 +3867,7 @@ void VLikelihoodFitter::loadSpectraFromLiterature( string filename )
         fLiteratureSpectra = new VEnergySpectrumfromLiterature( filename );
     }
     // "not" zombie as zombie suggests file couldn't be opened
-    // Invalid files will print a sane error without thowing errors
+    // Invalid files will print a sane error without throwing errors
     // Will use bValidLiterature to check we have a valid
     bValidLiterature = !fLiteratureSpectra->isZombie();
 }

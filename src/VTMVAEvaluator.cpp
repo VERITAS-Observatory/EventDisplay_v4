@@ -34,6 +34,7 @@ void VTMVAEvaluator::reset()
     fCoreDist = 0.;
     fDispDiff = 0.;
     fDispDiff_log10 = 0.;
+    fDispAbsSumWeigth = 0.;
     fDummy = 0.;
     for( int i = 0; i < VDST_MAXTELESCOPES; i++ )
     {
@@ -462,6 +463,10 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
             {
                 fTMVAData[b]->fTMVAReader->AddVariable( "log10(DispDiff)", &fDispDiff_log10 );
             }
+            else if( iTrainingVariables[t] == "DispAbsSumWeigth" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "DispAbsSumWeigth", &fDispAbsSumWeigth );
+            }
             // Note: assume not more then 3 different telescope types
             else if( iTrainingVariables[t] == "NImages_Ttype[0]" && !iVariableIsASpectator[t] )
             {
@@ -677,7 +682,7 @@ bool VTMVAEvaluator::getValuesFromEfficiencyHistograms( unsigned int b )
     evaluate this event using the MVA and return passed/not passed
 
 */
-bool VTMVAEvaluator::evaluate(bool interpolate_mva)
+bool VTMVAEvaluator::evaluate( bool interpolate_mva )
 {
     if( fDebug )
     {
@@ -729,6 +734,7 @@ bool VTMVAEvaluator::evaluate(bool interpolate_mva)
         {
             fDispDiff_log10 = 0.;    // !!! not clear what the best value is
         }
+        fDispAbsSumWeigth = fData->DispAbsSumWeigth;
         if( fData->NTtype < VDST_MAXTELESCOPES )
         {
             for( int i = 0; i < fData->NTtype; i++ )
@@ -784,20 +790,20 @@ double VTMVAEvaluator::interpolate_mva_evaluation()
     set<unsigned int> data_bins;
     for( unsigned int i = 0; i < fTMVAData.size(); i++ )
     {
-        data_bins.insert(getDataBin(log10( fData->ErecS ), 0.5*(fTMVAData[i]->fZenithCut_max+fTMVAData[i]->fZenithCut_min) ));
+        data_bins.insert( getDataBin( log10( fData->ErecS ), 0.5 * ( fTMVAData[i]->fZenithCut_max + fTMVAData[i]->fZenithCut_min ) ) );
     }
-    TGraph iG((int)data_bins.size());
+    TGraph iG(( int )data_bins.size() );
     unsigned int i = 0;
-    for (set<unsigned int>::iterator it = data_bins.begin(); it != data_bins.end(); ++it)
+    for( set<unsigned int>::iterator it = data_bins.begin(); it != data_bins.end(); ++it )
     {
         iG.SetPoint(
-                i,
-                0.5*(fTMVAData[*it]->fZenithCut_max+fTMVAData[*it]->fZenithCut_min),
-                fTMVAData[*it]->fTMVAReader->EvaluateMVA( fTMVAData[*it]->fTMVAMethodTag_2 )
+            i,
+            0.5 * ( fTMVAData[*it]->fZenithCut_max + fTMVAData[*it]->fZenithCut_min ),
+            fTMVAData[*it]->fTMVAReader->EvaluateMVA( fTMVAData[*it]->fTMVAMethodTag_2 )
         );
         i++;
     }
-    return iG.Eval(fData->Ze, 0); // linear interpolation
+    return iG.Eval( fData->Ze, 0 ); // linear interpolation
 }
 
 
