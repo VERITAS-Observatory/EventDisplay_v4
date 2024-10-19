@@ -250,7 +250,7 @@ bool VPlotLookupTable::addLookupTable( string iLookupTableFile, string iTable, i
     }
     char hname[600];
     // create full directory name
-    sprintf( hname, "NOISE_%05d/ze_%03d/woff_%04d/az_%d/tel_%d", noise, ze * 10, woff, az, telID );
+    sprintf( hname, "ze_%03d/woff_%04d/az_%d/tel_%d/NOISE_%05d", ze * 10, woff, az, telID, noise );
     if(!fI->cd( hname ) )
     {
         cout << "VPlotLookupTable::addLookupTable error: directory  " << hname << " not found" << endl;
