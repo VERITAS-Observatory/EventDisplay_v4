@@ -461,9 +461,14 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
             fReadTPars = true;
         }
         // check if the tpars for this telescope should be read
+        // missing tpars are treated as missing telescopes
         if(!fTLRunParameter->fUseEvndispSelectedImagesOnly )
         {
             fReadTPars = true;
+            if(!ftpars[i] )
+            {
+                fReadTPars = false;
+            }
         }
         else if(( fTLRunParameter->bWriteReconstructedEventsOnly >= 0 )
                 || fTLRunParameter->bWriteReconstructedEventsOnly == -2 || fwrite )
