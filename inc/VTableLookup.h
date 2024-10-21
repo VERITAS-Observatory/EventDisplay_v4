@@ -64,10 +64,10 @@ class VTableLookup
         vector< bool > fTelToAnalyze;
         vector< double > fTableZe;      // [nze]
         vector< vector< double > > fTableZeOffset;  // [nze][nwoff]
-        vector< vector< vector< vector< vector< double > > > > > fTableZeOffsetAzTelNoise;  // [nze][nwoff][naz][ntel][n
+        vector< vector< vector< vector< vector< double > > > > > fTableZeOffsetAzTelNoise;  // [nze][nwoff][naz][ntel][nnoise]
 
         // tables
-        // fmscw[ze][woff][az][tel]
+        // fmscw[ze][woff][az][tel][noise]
         vector< vector< vector< vector< ULong64_t > > > > fTelType_tables;
         vector< vector< vector< vector< vector< VTableCalculator* > > > > > fmscw;
         vector< vector< vector< vector< vector< VTableCalculator* > > > > > fmscl;
