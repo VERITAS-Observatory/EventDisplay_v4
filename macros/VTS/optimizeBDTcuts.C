@@ -8,7 +8,7 @@
  *
 */
 
-R__LOAD_LIBRARY($EVNDISPSYS / lib / libVAnaSum.so );
+R__LOAD_LIBRARY($EVNDISPSYS/lib/libVAnaSum.so );
 
 
 void help()
