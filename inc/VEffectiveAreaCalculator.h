@@ -230,7 +230,6 @@ class VEffectiveAreaCalculator
         double fWoff;
         double fSpectralIndex;
         int fTNoise;
-        double fTNoisePE;
         double fTPedvar;
         int nbins;
         double e0[1000];
