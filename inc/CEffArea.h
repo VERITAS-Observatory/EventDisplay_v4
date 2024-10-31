@@ -31,7 +31,6 @@ class CEffArea : public TObject
         Double_t        Yoff;
         Double_t        Woff;
         Int_t           noise;
-        Double_t        noisePE;
         Double_t        pedvar;
         Double_t        index;
         Int_t           nbins;
@@ -83,7 +82,6 @@ class CEffArea : public TObject
         TBranch*        b_Yoff;                   //!
         TBranch*        b_Woff;                   //!
         TBranch*        b_noise;                  //!
-        TBranch*        b_noisePE;                //!
         TBranch*        b_pedvar;                 //!
         TBranch*        b_index;                  //!
         TBranch*        b_nbins;                  //!
@@ -273,14 +271,6 @@ void CEffArea::Init( TTree* tree )
     }
     fChain->SetBranchAddress( "Woff", &Woff, &b_Woff );
     fChain->SetBranchAddress( "noise", &noise, &b_noise );
-    if( fChain->GetBranchStatus( "noisePE" ) )
-    {
-        fChain->SetBranchAddress( "noisePE", &noisePE, &b_noisePE );
-    }
-    else
-    {
-        noisePE = 0.;
-    }
     fChain->SetBranchAddress( "pedvar", &pedvar, &b_pedvar );
     if( fChain->GetBranchStatus( "index" ) )
     {
