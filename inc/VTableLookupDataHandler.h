@@ -272,8 +272,6 @@ class VTableLookupDataHandler
         double fR        [VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core
         double fRTel        [VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core
         double fR_telType[VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core (depending on tel type)
-        //        double fMCR        [VDST_MAXTELESCOPES];  //!< distance from each telescope to reconstructed shower core
-        //        double fMCR_telType[VDST_MAXTELESCOPES];  //!< distance from each telescope to reconstructed shower core
         double fE        [VDST_MAXTELESCOPES];    //!< energy assigned to each telescope (method 0)
         double fES       [VDST_MAXTELESCOPES];    //!< energy assigned to each telescope (method 1)
         int    fnenergyT;                         //!< number of images used for the energy calculation
