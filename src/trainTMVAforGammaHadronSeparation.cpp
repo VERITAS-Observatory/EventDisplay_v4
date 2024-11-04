@@ -143,7 +143,7 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
             if( elist && elist->GetN() > 0 )
             {
                 // select a random subsample
-                // require trainging and testing sample
+                // require training and testing sample
                 // (add factor 10 to make sure that there are plenty
                 // of testing events)
                 double i_event_selected = ( double )iRun->fnTrain_Background;

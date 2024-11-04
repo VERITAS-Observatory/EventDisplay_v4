@@ -372,7 +372,6 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     fEffArea->Branch( "Yoff", &fYoff, "Yoff/D" );
     fEffArea->Branch( "Woff", &fWoff, "Woff/D" );
     fEffArea->Branch( "noise", &fTNoise, "noise/I" );
-    fEffArea->Branch( "noisePE", &fTNoisePE, "noisePE/D" );
     fEffArea->Branch( "pedvar", &fTPedvar, "pedvar/D" );
     fEffArea->Branch( "index", &fSpectralIndex, "index/D" );
     //
@@ -1839,7 +1838,6 @@ void VEffectiveAreaCalculator::reset()
     fCuts = 0;
 
     fTNoise = 0;
-    fTNoisePE = 0.;
     fTPedvar = 0.;
 
     fAzBin = 0;
@@ -2553,8 +2551,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 
     ze = fZe[ize];
     fTNoise = fNoise[ize];
-    // WARNING: hardwired values - not used to my knowledge anywhere? (GM)
-    fTNoisePE = ( double )( fNoise[ize] ) / 0.15 * 1.e9;
     fTPedvar = fPedVar[ize];
     fXoff = fXWobble[ize];
     fYoff = fYWobble[ize];
