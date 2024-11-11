@@ -757,6 +757,12 @@ bool VTMVAEvaluator::evaluate( bool interpolate_mva )
         cout << ", MVA Cut value " << fTMVAData[iDataBin]->fTMVACutValue;
         cout << endl;
     }
+    // invalid data bin (e.g., event zenith is outside range of TMVA evaluator)
+    if( iDataBin > 9998 )
+    {
+        return false;
+    }
+
     fTMVA_EvaluationResult = -99.;
     if( interpolate_mva )
     {
