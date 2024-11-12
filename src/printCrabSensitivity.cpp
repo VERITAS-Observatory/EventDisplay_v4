@@ -44,7 +44,7 @@ void print_sensitivity( string anasum_file, double alpha = 1. / 6. )
 
     t->GetEntry( t->GetEntries() - 1 );
 
-    cout << "Rates (on/Off): " << Rate << "\t" << RateOff << endl;
+    cout << "Rates (on/off): " << Rate << "\t" << RateOff << endl;
 
     vector< double > fSourceStrength;
     fSourceStrength.push_back( 1. );
