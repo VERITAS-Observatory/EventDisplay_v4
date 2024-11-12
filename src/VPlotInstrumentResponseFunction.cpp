@@ -102,7 +102,7 @@ bool VPlotInstrumentResponseFunction::addInstrumentResponseData( string iFile, d
     iTempIRFReader->setDebug( fDebug );
     if( iColor < 0 )
     {
-        iColor = fData.size() + 1;
+        iColor = VUtilities::color_id(fData.size() + 1);
     }
     if( iLineStyle < 0 )
     {

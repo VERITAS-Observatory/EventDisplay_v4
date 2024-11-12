@@ -48,5 +48,20 @@ namespace VUtilities
 
         return (*p == 0 ) ;
     }
+
+    // friendlier colors
+    inline int color_id(unsigned int index)
+    {
+        // Array containing the specified ROOT color ID
+        int colors[] = {12, 633, 9, 418, 801, 881, 900, 32, 423, 393, 798, 616, 409};
+        unsigned int size = sizeof(colors) / sizeof(colors[0]);
+
+        if (index >= size)
+        {
+            return index;
+        }
+        return colors[index];
+    }
+
 }
 #endif

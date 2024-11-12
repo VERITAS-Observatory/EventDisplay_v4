@@ -19,6 +19,7 @@
 #include "VHistogramUtilities.h"
 #include "VInstrumentResponseFunctionReader.h"
 #include "VPlotUtilities.h"
+#include "VUtilities.h"
 
 using namespace std;
 
