@@ -720,12 +720,13 @@ TCanvas* VPlotAnasumHistograms::plot_theta2( double t2min, double t2max, int irb
         cout << "Theta2 containment radius (95%, binning dependent): " << t_95 << " deg2" << endl;
 
         c_t2_diff->cd();
+        c_t2_diff->SetLeftMargin( 0.14 );
         htheta2_diff->SetFillColor( 418 );
         htheta2_diff->SetXTitle( "#Theta^{2} [deg^{2}]" );
         htheta2_diff->SetTitle( "" );
         sprintf( hname, "Number of events / %.3f deg^{2}", htheta2_diff->GetXaxis()->GetBinWidth( 2 ) );
         htheta2_diff->SetYTitle( hname );
-        htheta2_diff->GetYaxis()->SetTitleOffset( 1.6 );
+        htheta2_diff->GetYaxis()->SetTitleOffset( 3.0 );
         setHistogramPlottingStyle( htheta2_diff, 418, 2, 1, 1, irbin, 1001 );
         htheta2_diff->SetAxisRange( t2min, t2max );
         if( setYMax > -999. )
