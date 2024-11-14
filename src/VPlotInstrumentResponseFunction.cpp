@@ -1574,7 +1574,9 @@ TCanvas* VPlotInstrumentResponseFunction::plotPSF( vector< double > i_Energy_TeV
         sprintf( hname, "Theta_ID_%d", iCumulative );
     }
     TCanvas* c = new TCanvas( hname, hname, 10, 10, 600, 600 );
-    c->Divide( TMath::Nint( sqrt( i_Energy_TeV_lin.size() ) ), TMath::Nint( sqrt( i_Energy_TeV_lin.size() ) ) );
+    cout << "PSF plotting: " << i_Energy_TeV_lin.size() << " energies (";
+    cout << TMath::Ceil( sqrt( i_Energy_TeV_lin.size() ) ) << ")" << endl;
+    c->Divide( TMath::Ceil( sqrt( i_Energy_TeV_lin.size() ) ), TMath::Ceil( sqrt( i_Energy_TeV_lin.size() ) ) );
     for( unsigned int j = 0; j < i_Energy_TeV_lin.size(); j++ )
     {
         c->cd( j + 1 );
@@ -1632,10 +1634,12 @@ TCanvas* VPlotInstrumentResponseFunction::plotPSF( vector< double > i_Energy_TeV
                 TH1D* hCumu = get_Cumulative_Histogram( h, true, true );
                 if( iCumulative )
                 {
+                    hCumu->SetLineColor( VUtilities::color_id(i+1) );
                     hCumu->Draw( "same" );
                 }
                 else
                 {
+                    h->SetLineColor( VUtilities::color_id(i+1) );
                     // rebin
                     if( iPlotTheta2 )
                     {
