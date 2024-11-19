@@ -757,7 +757,7 @@ bool VTMVAEvaluator::evaluate( bool interpolate_mva, bool use_average_zenith_ang
     }
     if( fData->ErecS <= 0. )
     {
-        return 0.;
+        return false;
     }
     unsigned int iDataBin = getDataBin( log10( fData->ErecS ), i_ze );
     if( fDebug )
