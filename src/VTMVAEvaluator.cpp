@@ -2185,8 +2185,6 @@ void VTMVAEvaluator::calculate_average_zenith_angle()
 {
     if( !fData ) return;
 
-    cout << "reading average zenith" << endl;
-
     double i_ze = 0.;
     double i_n = 0.;
 
@@ -2207,7 +2205,7 @@ void VTMVAEvaluator::calculate_average_zenith_angle()
     {
         fAverageZenithPerRun = i_ze / i_n;
     }
-    cout << "average zenith " << fAverageZenithPerRun << endl;
+    cout << "VTMVAEvaluator: average zenith " << fAverageZenithPerRun << endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
