@@ -1154,7 +1154,7 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
     {
         sprintf( hname, "c_skysig_%d_%d", fRunNumber, sPlot );
         sprintf( htitle, "sky map, run %d", fRunNumber );
-        c_skysig  = new TCanvas( hname, htitle, 10, 10, 400, 400 );
+        c_skysig  = new TCanvas( hname, htitle, 10, 10, 800, 800 );
         c_skysig->Draw();
         c_skysig->SetRightMargin( 0.14 );
         c_skysig->SetLeftMargin( 0.11 );
