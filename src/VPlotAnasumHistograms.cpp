@@ -645,7 +645,7 @@ void VPlotAnasumHistograms::plot_CorrelatedSkyPlots()
  *
  *
  */
-TCanvas* VPlotAnasumHistograms::plot_theta2( double t2min, double t2max, int irbin, double setYMax, double setYMin )
+TCanvas* VPlotAnasumHistograms::plot_theta2( double t2min, double t2max, int irbin, double setYMax, double setYMin, bool containment_lines )
 {
     // int iPlotPSF = 0;
 
@@ -690,33 +690,43 @@ TCanvas* VPlotAnasumHistograms::plot_theta2( double t2min, double t2max, int irb
         htheta2_off->Draw( "hist e" );
         htheta2_on->Draw( "hist e same" );
 
-        // get 68% containment radius (up to theta2 = 0.05deg2)
+        // get 68% containment radius (up to theta2 = 0.2deg2)
         double nt2 = 0.;
-        for( int i = 1; i < htheta2_diff->GetXaxis()->FindBin( 0.05 ); i++ )
+        double max_integration_radius = 0.1;
+        for( int i = 1; i < htheta2_diff->GetXaxis()->FindBin( max_integration_radius ); i++ )
         {
             nt2 += htheta2_diff->GetBinContent( i );
         }
         double nt2_68 = 0.;
+        double t_68 = -1.;
+        double t_95 = 0.;
         if( nt2 > 0. )
         {
-            for( int i = 1; i < htheta2_diff->GetXaxis()->FindBin( 0.05 ); i++ )
+            for( int i = 1; i < htheta2_diff->GetXaxis()->FindBin( max_integration_radius ); i++ )
             {
                 nt2_68 += htheta2_diff->GetBinContent( i );
-                if( nt2_68 / nt2 > 0.68 )
+                if( nt2_68 / nt2 > 0.68 && t_68 < 0. )
                 {
-                    cout << "Theta2 containment radius (68%, binning dependent): " << htheta2_diff->GetXaxis()->GetBinLowEdge( i ) << " deg2" << endl;
+                    t_68 = htheta2_diff->GetXaxis()->GetBinLowEdge( i );
+                }
+                if( nt2_68 / nt2 > 0.95 )
+                {
+                    t_95 = htheta2_diff->GetXaxis()->GetBinLowEdge( i );
                     break;
                 }
             }
         }
+        cout << "Theta2 containment radius (68%, binning dependent): " << t_68 << " deg2" << endl;
+        cout << "Theta2 containment radius (95%, binning dependent): " << t_95 << " deg2" << endl;
 
         c_t2_diff->cd();
+        c_t2_diff->SetLeftMargin( 0.14 );
         htheta2_diff->SetFillColor( 418 );
         htheta2_diff->SetXTitle( "#Theta^{2} [deg^{2}]" );
         htheta2_diff->SetTitle( "" );
         sprintf( hname, "Number of events / %.3f deg^{2}", htheta2_diff->GetXaxis()->GetBinWidth( 2 ) );
         htheta2_diff->SetYTitle( hname );
-        htheta2_diff->GetYaxis()->SetTitleOffset( 1.6 );
+        htheta2_diff->GetYaxis()->SetTitleOffset( 3.0 );
         setHistogramPlottingStyle( htheta2_diff, 418, 2, 1, 1, irbin, 1001 );
         htheta2_diff->SetAxisRange( t2min, t2max );
         if( setYMax > -999. )
@@ -729,6 +739,18 @@ TCanvas* VPlotAnasumHistograms::plot_theta2( double t2min, double t2max, int irb
         }
 
         htheta2_diff->Draw( "hist e" );
+
+        if( containment_lines )
+        {
+            TLine *iL_68 = new TLine( t_68, 0., t_68, htheta2_diff->GetMaximum()*0.5);
+            iL_68->SetLineStyle(2);
+            iL_68->SetLineColor(2);
+            iL_68->Draw();
+            TLine *iL_95 = new TLine( t_95, 0., t_95, htheta2_diff->GetMaximum()*0.5);
+            iL_95->SetLineStyle(2);
+            iL_95->SetLineColor(2);
+            iL_95->Draw();
+        }
 
 
         if( fDebug )
@@ -1132,7 +1154,7 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
     {
         sprintf( hname, "c_skysig_%d_%d", fRunNumber, sPlot );
         sprintf( htitle, "sky map, run %d", fRunNumber );
-        c_skysig  = new TCanvas( hname, htitle, 10, 10, 400, 400 );
+        c_skysig  = new TCanvas( hname, htitle, 10, 10, 800, 800 );
         c_skysig->Draw();
         c_skysig->SetRightMargin( 0.14 );
         c_skysig->SetLeftMargin( 0.11 );
