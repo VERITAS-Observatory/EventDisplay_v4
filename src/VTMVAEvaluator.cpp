@@ -751,7 +751,7 @@ bool VTMVAEvaluator::evaluate( bool interpolate_mva, bool use_average_zenith_ang
 
     // find correct bin (e.g. depending on energy or zenith)
     double i_ze = fData->Ze;
-    if( use_average_zenith_angle && fAverageZenithPerRun > 0. )
+    if( use_average_zenith_angle && fAverageZenithPerRun >= 0. )
     {
         i_ze = fAverageZenithPerRun;
     }
@@ -2203,7 +2203,7 @@ void VTMVAEvaluator::calculate_average_zenith_angle()
     }
     if( i_n > 0. )
     {
-        fAverageZenithPerRun = i_ze / i_n;
+        fAverageZenithPerRun = 90. - i_ze / i_n;
     }
     cout << "VTMVAEvaluator: average zenith " << fAverageZenithPerRun << endl;
 }
