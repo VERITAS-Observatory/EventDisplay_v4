@@ -40,7 +40,6 @@ The package consists of several analysis steps and tools:
 
 ## Releases
 
-
 Check the [release pages](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases) for the most recent versions to be used for VERITAS publications.
 For older versions of Eventdisplay, see the release pages on the [VERITAS wiki (internal pages)](https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual#Versions_of_eventdisplay).
 
@@ -81,13 +80,14 @@ http://astyle.sourceforge.net/
 Usage:
 
 do either
-```
+
+```console
 make formatSourceCode
 ```
 
  or
 
-```
+```console
 astyle  --options=./.astylerc <.cpp, .h or .C file>
 ```
 

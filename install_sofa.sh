@@ -1,5 +1,5 @@
 #!/bin/bash
-# 
+#
 # install the sofa package into the $EVNDISPSYS directory
 #
 # see https://www.iausofa.org for a description
@@ -11,10 +11,10 @@ echo "Installation of sofa into $EVNDISPSYS "
 
 [[ "$1" ]] && DOWNL=$1 || DOWNL=""
 
-CURDIR=`pwd`
+CURDIR=$(pwd)
 cd "$EVNDISPSYS"
 
-echo "Checking for existing sofa installation " 
+echo "Checking for existing sofa installation "
 
 if [ -d "sofa" ] && [ -d "sofa/lib" ]
 then
@@ -50,7 +50,7 @@ rm -f ${SOFA}
 cd sofa/${SOFAD}/c/src/
 sed -i -- "s/\$(HOME)/\$(EVNDISPSYS)\/sofa/" makefile
 # use clang on OSX
-OS=`uname -s`
+OS=$(uname -s)
 echo "$OS"
 if [ "$OS" = "Darwin" ]
 then
