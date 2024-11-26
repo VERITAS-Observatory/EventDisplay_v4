@@ -4,13 +4,13 @@ Prepared for each release.
 
 ## Using the docker image
 
-```
-$ docker run --rm -it -v "$(pwd):/data" vts-image bash
+```console
+docker run --rm -it -v "$(pwd):/data" vts-image bash
 ```
 
 Or to execute directly an Eventdisplay executable:
 
-```
+```console
 docker run --rm -it -v "$(pwd):/data" vts-test /opt/Eventdisplay/bin/printRunParameter
 ```
 

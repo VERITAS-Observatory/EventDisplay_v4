@@ -7,7 +7,8 @@ You are very welcome to contribute to Eventdisplay!
 Please try to be as concise as possible when reporting issue. Whenever possible add a small code example and a clear description of the problem.
 
 Report your system configuration by pasting the output of the following command to the issue:
-```
+
+```console
 make config
 ```
 
