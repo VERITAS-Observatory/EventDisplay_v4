@@ -53,6 +53,7 @@ Eventdisplay consists of the following main components:
 - [Eventdisplay_AnalysisScripts_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisScripts_VTS): a library of scripts to use Eventdisplay efficiently on a computing cluster
 - [Eventdisplay_AnalysisFiles_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisFiles_VTS): a set of auxiliary files with information on the instrument (e.g., telescope positions), access information to data bases, parameters for the analysis (e.g., image cleaning parameters or instruction for the gamma/hadron separation), or basic calibration values (note that this is a VERITAS private repository)
 - [V2DL3](https://github.com/VERITAS-Observatory/V2DL3): a converter of Eventdisplay data products to GADF DL3 Format to be used in science tools like [gammapy](https://github.com/gammapy/gammapy).
+- [Eventdisplay_Preprocessing](https://github.com/VERITAS-Observatory/EventDisplay_Preprocessing/blob/main/README.md): Documentation and scripts related to the pre-processing all VERITAS observations with Eventdisplay.
 
 Additional components:
 
