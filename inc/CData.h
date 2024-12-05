@@ -42,6 +42,8 @@ class CData
         Double_t        TelAzimuth[VDST_MAXTELESCOPES];
         Double_t        TelDec[VDST_MAXTELESCOPES];
         Double_t        TelRA[VDST_MAXTELESCOPES];
+        Float_t         ArrayPointing_Elevation;
+        Float_t         ArrayPointing_Azimuth;
         UInt_t          Array_PointingStatus;
         // MC parameters
         Int_t           MCprimary;
@@ -153,6 +155,8 @@ class CData
         TBranch*        b_TelDec;                 //!
         TBranch*        b_TelRA;                  //!
         TBranch*        b_Array_PointingStatus;   //!
+        TBranch*        b_ArrayPointing_Elevation;
+        TBranch*        b_ArrayPointing_Azimuth;
         // MC parameter
         TBranch*        b_MCprimary;
         TBranch*        b_MCe0;                   //!
@@ -412,6 +416,8 @@ void CData::Init( TTree* tree )
             TelRA[i] = 0.;
         }
     }
+    fChain->SetBranchAddress( "ArrayPointing_Azimuth", &ArrayPointing_Azimuth);
+    fChain->SetBranchAddress( "ArrayPointing_Elevation", &ArrayPointing_Elevation);
     if( fChain->GetBranchStatus( "Array_PointingStatus" ) )
     {
         fChain->SetBranchAddress( "Array_PointingStatus", &Array_PointingStatus );
@@ -850,6 +856,8 @@ Bool_t CData::Notify()
     b_TelAzimuth = fChain->GetBranch( "TelAzimuth" );
     b_TelDec = fChain->GetBranch( "TelDec" );
     b_TelRA = fChain->GetBranch( "TelRA" );
+    b_ArrayPointing_Elevation = fChain->GetBranch( "ArrayPointing_Elevation" );
+    b_ArrayPointing_Azimuth = fChain->GetBranch( "ArrayPointing_Azimuth" );
 
     if( fMC )
     {

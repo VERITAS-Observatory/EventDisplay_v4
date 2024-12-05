@@ -1406,7 +1406,7 @@ bool VGammaHadronCuts::applyTMVACut( int i )
     fTMVA_EvaluationResult = -99.;
     if( fTMVAEvaluator )
     {
-        bool i_TMVA_Evaluation = fTMVAEvaluator->evaluate();
+        bool i_TMVA_Evaluation = fTMVAEvaluator->evaluate(false, true);
         fTMVA_EvaluationResult = fTMVAEvaluator->getTMVA_EvaluationResult();
         return i_TMVA_Evaluation;
     }
