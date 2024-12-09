@@ -35,7 +35,7 @@ jobs:
 
       - name: sofa
         run: |
-          curl https://syncandshare.desy.de/index.php/s/${{ secrets.SOFA }}/download > sofa/sofa.tar.gz
+          curl https://syncandshare.desy.de/index.php/s/${{ secrets.SOFA20231011 }}/download > sofa/sofa.tar.gz
           ./install_sofa.sh
 
       - name: eventdisplay
