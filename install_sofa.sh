@@ -42,7 +42,7 @@ then
     echo "error in downloading sofa package"
     exit
 fi
-tar -xzf ${SOFA}
+tar -xvzf ${SOFA}
 rm -f ${SOFA}
 
 ##########################
