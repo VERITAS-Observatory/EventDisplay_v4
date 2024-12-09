@@ -13,6 +13,7 @@ VTMVAEvaluator::VTMVAEvaluator()
 
     fData = 0;
     fTMVAEvaluatorResults = 0;
+    fAverageZenithPerRun = -9999.;
 
     reset();
 }
@@ -682,7 +683,7 @@ bool VTMVAEvaluator::getValuesFromEfficiencyHistograms( unsigned int b )
     evaluate this event using the MVA and return passed/not passed
 
 */
-bool VTMVAEvaluator::evaluate( bool interpolate_mva )
+bool VTMVAEvaluator::evaluate( bool interpolate_mva, bool use_average_zenith_angle )
 {
     if( fDebug )
     {
@@ -749,7 +750,16 @@ bool VTMVAEvaluator::evaluate( bool interpolate_mva )
     }
 
     // find correct bin (e.g. depending on energy or zenith)
-    unsigned int iDataBin = getDataBin();
+    double i_ze = fData->Ze;
+    if( use_average_zenith_angle && fAverageZenithPerRun >= 0. )
+    {
+        i_ze = fAverageZenithPerRun;
+    }
+    if( fData->ErecS <= 0. )
+    {
+        return false;
+    }
+    unsigned int iDataBin = getDataBin( log10( fData->ErecS ), i_ze );
     if( fDebug )
     {
         cout << "VTMVAEvaluator::evaluate: data bin " << iDataBin;
@@ -875,6 +885,7 @@ bool VTMVAEvaluator::initializeDataStrutures( CData* iC )
         fIsZombie = true;
         return false;
     }
+    calculate_average_zenith_angle();
 
     return true;
 }
@@ -2163,6 +2174,38 @@ TGraph* VTMVAEvaluator::fillfromGraph2D( TObject* i_G, double i_ze_min, double i
 
     // graph is already 1D
     return ( TGraph* )i_G;
+}
+
+/*
+ * Calculate rough average zenith angle per run
+ *
+ * Optionally used for selection of data bin for MVA evaluation
+ */
+void VTMVAEvaluator::calculate_average_zenith_angle()
+{
+    if( !fData ) return;
+
+    double i_ze = 0.;
+    double i_n = 0.;
+
+    fData->GetEntry( 0 );
+    i_ze = fData->ArrayPointing_Elevation;
+    i_n++;
+    Long64_t nEntries = fData->fChain->GetEntries();
+    if( nEntries > 1 )
+    {
+        fData->GetEntry(nEntries/2);
+        i_ze += fData->ArrayPointing_Elevation;
+        i_n++;
+        fData->GetEntry(nEntries-1);
+        i_ze += fData->ArrayPointing_Elevation;
+        i_n++;
+    }
+    if( i_n > 0. )
+    {
+        fAverageZenithPerRun = 90. - i_ze / i_n;
+    }
+    cout << "VTMVAEvaluator: average zenith " << fAverageZenithPerRun << endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
