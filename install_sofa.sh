@@ -31,11 +31,8 @@ SOFAD="20231011"
 SOFA="sofa_c-${SOFAD}.tar.gz"
 if [[ -e sofa.tar.gz ]]; then
     mv -f sofa.tar.gz ${SOFA}
-elif [[ $DOWNL == "CI" ]]; then
-    wget https://syncandshare.desy.de/index.php/s/RamRFYJtZjDGsfL/download
-    mv -f download ${SOFA}
 else
-    wget --no-check-certificate https://www.iausofa.org/2023_1011_C/${SOFA}
+    wget --no-check-certificate https://www.iausofa.org/"${SOFAD:0:4}_${SOFAD:4}_C"/${SOFA}
 fi
 if [ ! -e ${SOFA} ]
 then
