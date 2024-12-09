@@ -1,0 +1,12 @@
+# Changelog
+
+Note that this changelog starts only with version v492.0
+
+## v492.0
+
+### Maintenance
+
+- improve efficiency oF MVA calling for gamma/hadron separation cuts
+- update SOFA to version 2023-10-11
+
+
