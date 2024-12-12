@@ -27,22 +27,19 @@ mkdir -p sofa
 cd sofa
 
 # get sofa package from the web page and install
-SOFAD="20210512"
+SOFAD="20231011"
 SOFA="sofa_c-${SOFAD}.tar.gz"
 if [[ -e sofa.tar.gz ]]; then
     mv -f sofa.tar.gz ${SOFA}
-elif [[ $DOWNL == "CI" ]]; then
-    wget https://syncandshare.desy.de/index.php/s/jr9NrbWFR5MLaDf/download
-    mv -f download ${SOFA}
 else
-    wget --no-check-certificate https://www.iausofa.org/2021_0512_C/${SOFA}
+    wget --no-check-certificate https://www.iausofa.org/"${SOFAD:0:4}_${SOFAD:4}_C"/${SOFA}
 fi
 if [ ! -e ${SOFA} ]
 then
     echo "error in downloading sofa package"
     exit
 fi
-tar -xzf ${SOFA}
+tar -xvzf ${SOFA}
 rm -f ${SOFA}
 
 ##########################
