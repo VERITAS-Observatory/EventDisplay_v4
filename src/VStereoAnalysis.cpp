@@ -235,8 +235,8 @@ int VStereoAnalysis::getDataRunNumber() const
         }
         else if( fDataRun->GetEntry( 0 ) == 0 )
         {
-            cout << "VStereoAnalysis::getDataRunNumber error: tree is empty." << endl;
-            fDataRun->fChain->Print();
+            cout << "VStereoAnalysis::getDataRunNumber error: mscw data tree is empty." << endl;
+            cout << "exiting...";
         }
         else
         {
@@ -244,8 +244,9 @@ int VStereoAnalysis::getDataRunNumber() const
         }
     }
 
+    gROOT->SetMustClean(false);
     exit( EXIT_FAILURE );
-    return 0;
+    return -1;
 }
 
 
