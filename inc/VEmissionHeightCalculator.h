@@ -43,7 +43,7 @@ class VEmissionHeightCalculator
 
         VEmissionHeightCalculator();
         ~VEmissionHeightCalculator();
-        double getEmissionHeight( double* cen_x, double* cen_y, double* size, double az, double el );
+        double getEmissionHeight( float* cen_x, float* cen_y, float* size, double az, double el );
         double getMeanEmissionHeight()
         {
             return fEmissionHeight;

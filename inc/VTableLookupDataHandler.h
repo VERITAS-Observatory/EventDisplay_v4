@@ -231,16 +231,16 @@ class VTableLookupDataHandler
         double fchi2;                             //!< chi2 from array reconstruction
         //
         // {1}
-        double fMCEnergyArray [VDST_MAXTELESCOPES];
+        float  fMCEnergyArray [VDST_MAXTELESCOPES];
         float  fmeanPedvar_ImageT[VDST_MAXTELESCOPES];
         float  fmeanPedvar_Image;
-        double fdist     [VDST_MAXTELESCOPES];
+        float  fdist     [VDST_MAXTELESCOPES];
         double ffui       [VDST_MAXTELESCOPES];
         double fdist_telType[VDST_MAXTELESCOPES];
-        double fsize     [VDST_MAXTELESCOPES];
-        double fsizeCorr [VDST_MAXTELESCOPES];
-        double fsize_telType[VDST_MAXTELESCOPES];
-        double floss     [VDST_MAXTELESCOPES];
+        float  fsize     [VDST_MAXTELESCOPES];
+        float  fsizeCorr [VDST_MAXTELESCOPES];
+        float  fsize_telType[VDST_MAXTELESCOPES];
+        float  floss     [VDST_MAXTELESCOPES];
         double ffracLow  [VDST_MAXTELESCOPES];
         double fmax1     [VDST_MAXTELESCOPES];
         double fmax2     [VDST_MAXTELESCOPES];
@@ -248,21 +248,21 @@ class VTableLookupDataHandler
         int    fmaxindex1     [VDST_MAXTELESCOPES];
         int    fmaxindex2     [VDST_MAXTELESCOPES];
         int    fmaxindex3     [VDST_MAXTELESCOPES];
-        double fwidth    [VDST_MAXTELESCOPES];
-        double fwidth_telType[VDST_MAXTELESCOPES];
-        double flength   [VDST_MAXTELESCOPES];
-        double flength_telType[VDST_MAXTELESCOPES];
+        float  fwidth    [VDST_MAXTELESCOPES];
+        float  fwidth_telType[VDST_MAXTELESCOPES];
+        float  flength   [VDST_MAXTELESCOPES];
+        float  flength_telType[VDST_MAXTELESCOPES];
         int    fntubes   [VDST_MAXTELESCOPES];
         unsigned short int fnsat[VDST_MAXTELESCOPES];
         unsigned short int fnlowgain[VDST_MAXTELESCOPES];
         double falpha    [VDST_MAXTELESCOPES];
         double flos      [VDST_MAXTELESCOPES];
-        double fasym     [VDST_MAXTELESCOPES];
-        double fcen_x    [VDST_MAXTELESCOPES];
-        double fcen_y    [VDST_MAXTELESCOPES];
-        double fcosphi   [VDST_MAXTELESCOPES];
-        double fsinphi   [VDST_MAXTELESCOPES];
-        double ftgrad_x  [VDST_MAXTELESCOPES];
+        float  fasym     [VDST_MAXTELESCOPES];
+        float  fcen_x    [VDST_MAXTELESCOPES];
+        float  fcen_y    [VDST_MAXTELESCOPES];
+        float  fcosphi   [VDST_MAXTELESCOPES];
+        float  fsinphi   [VDST_MAXTELESCOPES];
+        float  ftgrad_x  [VDST_MAXTELESCOPES];
         double ftchisq_x [VDST_MAXTELESCOPES];
         double fweight   [VDST_MAXTELESCOPES];    //!< always 1.
         double fpointing_dx[VDST_MAXTELESCOPES];
@@ -341,11 +341,6 @@ class VTableLookupDataHandler
         {
             return fMethod;
         }
-        double* getDistance()
-        {
-            return fdist;
-        }
-        double* getDistance( ULong64_t iTelType );
         float* getDistanceToCore()
         {
             return fR_core;
@@ -380,7 +375,7 @@ class VTableLookupDataHandler
             return fAz;
         };
         double getMCDistance();
-        double* getMCEnergyArray();
+        float* getMCEnergyArray();
         double getMCEnergy()
         {
             return fMCEnergy;
@@ -393,11 +388,11 @@ class VTableLookupDataHandler
         {
             return fEventCounter;
         }
-        double* getLength()
+        float* getLength()
         {
             return flength;
         }
-        double* getLength( ULong64_t iTelType );
+        float* getLength( ULong64_t iTelType );
         map<ULong64_t, unsigned int > getList_of_Tel_type()
         {
             return fList_of_Tel_type;
@@ -496,17 +491,17 @@ class VTableLookupDataHandler
         {
             return fOutFile;
         }
-        double* getSize( double iSizeCorrection = 1., bool iSelectedImagesOnly = false );
-        double* getSize( double iSizeCorrection, ULong64_t iTelType, bool iSelectedImagesOnly );
+        float* getSize( double iSizeCorrection = 1., bool iSelectedImagesOnly = false );
+        float* getSize( double iSizeCorrection, ULong64_t iTelType, bool iSelectedImagesOnly );
         double* getWeight()
         {
             return fweight;
         }
-        double* getWidth()
+        float* getWidth()
         {
             return fwidth;
         }
-        double* getWidth( ULong64_t iTelType );
+        float* getWidth( ULong64_t iTelType );
         double getMaxTotalTime()
         {
             return fMaxTotalTime;

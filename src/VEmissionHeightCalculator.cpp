@@ -22,7 +22,7 @@ VEmissionHeightCalculator::~VEmissionHeightCalculator()
 }
 
 
-double VEmissionHeightCalculator::getEmissionHeight( double* cen_x, double* cen_y, double* size, double az, double el )
+double VEmissionHeightCalculator::getEmissionHeight( float* cen_x, float* cen_y, float* size, double az, double el )
 {
     double iEmissionHeight = 0.;
     double iEmissionHeightWeight = 0.;

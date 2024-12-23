@@ -1393,11 +1393,11 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 
     sprintf( iTT, "meanPedvar_ImageT[%d]/F", fNTel );
     fOTree->Branch( "meanPedvar_ImageT", fmeanPedvar_ImageT, iTT );
-    sprintf( iTT, "dist[%d]/D", fNTel );
+    sprintf( iTT, "dist[%d]/F", fNTel );
     fOTree->Branch( "dist", fdist, iTT );
-    sprintf( iTT, "size[%d]/D", fNTel );
+    sprintf( iTT, "size[%d]/F", fNTel );
     fOTree->Branch( "size", fsize, iTT );
-    sprintf( iTT, "loss[%d]/D", fNTel );
+    sprintf( iTT, "loss[%d]/F", fNTel );
     fOTree->Branch( "loss", floss, iTT );
     sprintf( iTT, "fracLow[%d]/D", fNTel );
     fOTree->Branch( "fracLow", ffracLow, iTT );
@@ -1413,9 +1413,9 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "maxindex2", fmaxindex2, iTT );
     sprintf( iTT, "maxindex3[%d]/I", fNTel );
     fOTree->Branch( "maxindex3", fmaxindex3, iTT );
-    sprintf( iTT, "width[%d]/D", fNTel );
+    sprintf( iTT, "width[%d]/F", fNTel );
     fOTree->Branch( "width", fwidth, iTT );
-    sprintf( iTT, "length[%d]/D", fNTel );
+    sprintf( iTT, "length[%d]/F", fNTel );
     fOTree->Branch( "length", flength, iTT );
     sprintf( iTT, "ntubes[%d]/I", fNTel );
     fOTree->Branch( "ntubes", fntubes, iTT );
@@ -1427,17 +1427,17 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "alpha", falpha, iTT );
     sprintf( iTT, "los[%d]/D", fNTel );
     fOTree->Branch( "los", flos, iTT );
-    sprintf( iTT, "asym[%d]/D", fNTel );
+    sprintf( iTT, "asym[%d]/F", fNTel );
     fOTree->Branch( "asym", fasym, iTT );
-    sprintf( iTT, "cen_x[%d]/D", fNTel );
+    sprintf( iTT, "cen_x[%d]/F", fNTel );
     fOTree->Branch( "cen_x", fcen_x, iTT );
-    sprintf( iTT, "cen_y[%d]/D", fNTel );
+    sprintf( iTT, "cen_y[%d]/F", fNTel );
     fOTree->Branch( "cen_y", fcen_y, iTT );
-    sprintf( iTT, "cosphi[%d]/D", fNTel );
+    sprintf( iTT, "cosphi[%d]/F", fNTel );
     fOTree->Branch( "cosphi", fcosphi, iTT );
-    sprintf( iTT, "sinphi[%d]/D", fNTel );
+    sprintf( iTT, "sinphi[%d]/F", fNTel );
     fOTree->Branch( "sinphi", fsinphi, iTT );
-    sprintf( iTT, "tgrad_x[%d]/D", fNTel );
+    sprintf( iTT, "tgrad_x[%d]/F", fNTel );
     fOTree->Branch( "tgrad_x", ftgrad_x, iTT );
     sprintf( iTT, "tchisq_x[%d]/D", fNTel );
     fOTree->Branch( "tchisq_x", ftchisq_x, iTT );
@@ -2208,7 +2208,7 @@ double VTableLookupDataHandler::getZe()
   (note that mscw modifies these values)
 
 */
-double* VTableLookupDataHandler::getMCEnergyArray()
+float* VTableLookupDataHandler::getMCEnergyArray()
 {
     for( unsigned int i = 0; i < fNTel; i++ )
     {
@@ -2576,7 +2576,7 @@ float* VTableLookupDataHandler::getDistanceToCore( ULong64_t iTelType )
  * used for table filling only
  *
  */
-double* VTableLookupDataHandler::getSize( double iSizeCorrection, bool iSelectedImagesOnly )
+float* VTableLookupDataHandler::getSize( double iSizeCorrection, bool iSelectedImagesOnly )
 {
     for( unsigned int i = 0; i < getNTel(); i++ )
     {
@@ -2590,7 +2590,7 @@ double* VTableLookupDataHandler::getSize( double iSizeCorrection, bool iSelected
     return fsizeCorr;
 }
 
-double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTelType, bool iSelectedImagesOnly )
+float* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTelType, bool iSelectedImagesOnly )
 {
     unsigned int z = 0;
     for( unsigned int i = 0; i < getNTel(); i++ )
@@ -2615,7 +2615,7 @@ double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTe
  * used for table filling only
  *
  */
-double* VTableLookupDataHandler::getWidth( ULong64_t iTelType )
+float* VTableLookupDataHandler::getWidth( ULong64_t iTelType )
 {
     unsigned int z = 0;
     for( unsigned int i = 0; i < getNTel(); i++ )
@@ -2633,7 +2633,7 @@ double* VTableLookupDataHandler::getWidth( ULong64_t iTelType )
  * used for table filling only
  *
  */
-double* VTableLookupDataHandler::getLength( ULong64_t iTelType )
+float* VTableLookupDataHandler::getLength( ULong64_t iTelType )
 {
     unsigned int z = 0;
     for( unsigned int i = 0; i < getNTel(); i++ )
@@ -2645,20 +2645,6 @@ double* VTableLookupDataHandler::getLength( ULong64_t iTelType )
         }
     }
     return flength_telType;
-}
-
-double* VTableLookupDataHandler::getDistance( ULong64_t iTelType )
-{
-    unsigned int z = 0;
-    for( unsigned int i = 0; i < getNTel(); i++ )
-    {
-        if( fTel_type[i] == iTelType )
-        {
-            fdist_telType[z] = fdist[i];
-            z++;
-        }
-    }
-    return fdist_telType;
 }
 
 unsigned int VTableLookupDataHandler::getTelType_arraycounter( unsigned int iTelID )
@@ -2755,7 +2741,7 @@ float VTableLookupDataHandler::getArrayPointingDeRotationAngle()
 */
 void VTableLookupDataHandler::fill_selected_images_before_redo_stereo_reconstruction()
 {
-    double* tmp_size = getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly );
+    float* tmp_size = getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly );
     unsigned int ii = 0;
     fImgSel = 0;
     bitset<8 * sizeof(unsigned long )> i_nimage;
