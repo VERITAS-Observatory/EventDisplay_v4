@@ -272,8 +272,8 @@ class VTableLookupDataHandler
         double fR        [VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core
         double fRTel        [VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core
         double fR_telType[VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core (depending on tel type)
-        double fE        [VDST_MAXTELESCOPES];    //!< energy assigned to each telescope (method 0)
-        double fES       [VDST_MAXTELESCOPES];    //!< energy assigned to each telescope (method 1)
+        float  fE        [VDST_MAXTELESCOPES];    //!< energy assigned to each telescope (method 0)
+        float  fES       [VDST_MAXTELESCOPES];    //!< energy assigned to each telescope (method 1)
         int    fnenergyT;                         //!< number of images used for the energy calculation
         int    fenergyQL;                         //!< quality label for energy calculation
         double ftmscw    [VDST_MAXTELESCOPES];    //!< mscw assigned to each telescope
@@ -286,15 +286,15 @@ class VTableLookupDataHandler
         double fmscl;                             //!< mean scaled length
         float  fmwr;                              //!< mean width ratio
         float  fmlr;                              //!< mean length ratio
-        double fenergy;                           //!< reconstructed primary energy
-        double fechi2;                            //!< chi2 from reconstructed primary energy
-        double fdE;                               //!< dE from reconstructed primary energy
+        float  fenergy;                           //!< reconstructed primary energy
+        float  fechi2;                            //!< chi2 from reconstructed primary energy
+        float  fdE;                               //!< dE from reconstructed primary energy
         float  fesys;                             //!< energy correction
         float  fesysVar;                          //!< energy correction (variance)
         float  fesysDist;                         //!< mean distance to maximum in emission height
-        double fenergyS;                          //!< reconstructed primary energy
-        double fechi2S;                           //!< chi2 from reconstructed primary energy
-        double fdES;                              //!< dE from reconstructed primary energy
+        float  fenergyS;                          //!< reconstructed primary energy
+        float  fechi2S;                           //!< chi2 from reconstructed primary energy
+        float  fdES;                              //!< dE from reconstructed primary energy
 
         // emission height
         unsigned int fNTelPairs;
@@ -389,7 +389,7 @@ class VTableLookupDataHandler
         {
             return sqrt( fMCxoff* fMCxoff + fMCyoff* fMCyoff );
         }
-        double* getE()
+        float* getE()
         {
             return fE;
         }
@@ -538,7 +538,7 @@ class VTableLookupDataHandler
         bool readRunParameter();
         void reset();                             //!< reset a few output variables
         void resetAll();
-        void setChi2( double iChi2, bool iTableErecS = true )
+        void setChi2( float iChi2, bool iTableErecS = true )
         {
             if( iTableErecS )
             {
@@ -549,7 +549,7 @@ class VTableLookupDataHandler
                 fechi2 = iChi2;
             }
         }
-        void setdE( double idE, bool iTableErecS = true )
+        void setdE( float idE, bool iTableErecS = true )
         {
             if( iTableErecS )
             {
@@ -565,7 +565,7 @@ class VTableLookupDataHandler
         {
             fR[itel] = iR;
         }
-        void setEnergy( double iE, bool iTableErecS = true )
+        void setEnergy( float iE, bool iTableErecS = true )
         {
             if( iTableErecS )
             {
@@ -576,7 +576,7 @@ class VTableLookupDataHandler
                 fenergy = iE;
             }
         }
-        void setEnergyT( int i, double iET, bool iTableErecS = true )
+        void setEnergyT( int i, float iET, bool iTableErecS = true )
         {
             if( iTableErecS )
             {

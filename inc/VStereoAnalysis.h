@@ -166,10 +166,10 @@ class VStereoAnalysis
         double fTreeSelected_MSCL;
         double fTreeSelected_MWR;
         double fTreeSelected_MLR;
-        double fTreeSelected_Erec;
-        double fTreeSelected_EChi2;
-        double fTreeSelected_ErecS;
-        double fTreeSelected_EChi2S;
+        float fTreeSelected_Erec;
+        float fTreeSelected_EChi2;
+        float fTreeSelected_ErecS;
+        float fTreeSelected_EChi2S;
         float fTreeSelected_EmissionHeight;
         float fTreeSelected_EmissionHeightChi2;
         double fTreeSelected_SizeSecondMax;

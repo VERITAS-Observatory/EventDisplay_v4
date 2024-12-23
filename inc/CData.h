@@ -127,12 +127,12 @@ class CData
         Double_t        MSCL;
         Float_t         MWR;
         Float_t         MLR;
-        Double_t        Erec;
-        Double_t        EChi2;
-        Double_t        dE;        // Error on Erec
-        Double_t        ErecS;
-        Double_t        EChi2S;
-        Double_t        dES;       // Error on ErecS
+        Float_t        Erec;
+        Float_t        EChi2;
+        Float_t        dE;        // Error on Erec
+        Float_t        ErecS;
+        Float_t        EChi2S;
+        Float_t        dES;       // Error on ErecS
         Double_t        SizeSecondMax;
         Double_t        theta2_All[25];
         Float_t         EmissionHeight;

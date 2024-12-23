@@ -1465,9 +1465,9 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "MSCWTSigma", ftmscw_sigma, iTT );
     sprintf( iTT, "MSCLTSigma[%d]/F", fNTel );
     fOTree->Branch( "MSCLTSigma", ftmscl_sigma, iTT );
-    sprintf( iTT, "E[%d]/D", fNTel );
+    sprintf( iTT, "E[%d]/F", fNTel );
     fOTree->Branch( "E", fE, iTT );
-    sprintf( iTT, "ES[%d]/D", fNTel );
+    sprintf( iTT, "ES[%d]/F", fNTel );
     fOTree->Branch( "ES", fES, iTT );
 
     sprintf( iTT, "NMSCW/I" );
@@ -1480,11 +1480,11 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "MWR", &fmwr, iTT );
     sprintf( iTT, "MLR/F" );
     fOTree->Branch( "MLR", &fmlr, iTT );
-    sprintf( iTT, "Erec/D" );
+    sprintf( iTT, "Erec/F" );
     fOTree->Branch( "Erec", &fenergy, iTT );
-    sprintf( iTT, "EChi2/D" );
+    sprintf( iTT, "EChi2/F" );
     fOTree->Branch( "EChi2", &fechi2, iTT );
-    sprintf( iTT, "dE/D" );
+    sprintf( iTT, "dE/F" );
     fOTree->Branch( "dE", &fdE, iTT );
     sprintf( iTT, "Esys/F" );
     fOTree->Branch( "Esys", &fesys, iTT );
@@ -1492,11 +1492,11 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "EsysVar", &fesysVar, iTT );
     sprintf( iTT, "EsysDist/F" );
     fOTree->Branch( "EsysDist", &fesysDist, iTT );
-    sprintf( iTT, "ErecS/D" );
+    sprintf( iTT, "ErecS/F" );
     fOTree->Branch( "ErecS", &fenergyS, iTT );
-    sprintf( iTT, "EChi2S/D" );
+    sprintf( iTT, "EChi2S/F" );
     fOTree->Branch( "EChi2S", &fechi2S, iTT );
-    sprintf( iTT, "dES/D" );
+    sprintf( iTT, "dES/F" );
     fOTree->Branch( "dES", &fdES, iTT );
     fOTree->Branch( "NErecST", &fnenergyT, "NErecST" );
     fOTree->Branch( "ErecQL", &fenergyQL, "ErecQL/I" );
