@@ -118,21 +118,21 @@ class CData
         Float_t         DispWoff_T[VDST_MAXTELESCOPES];
         Float_t         Disp_T[VDST_MAXTELESCOPES];
         Float_t         R_core[VDST_MAXTELESCOPES];
-        Double_t        MSCWT[VDST_MAXTELESCOPES];
-        Double_t        MSCLT[VDST_MAXTELESCOPES];
-        Float_t        E[VDST_MAXTELESCOPES];
-        Float_t        ES[VDST_MAXTELESCOPES];
+        Float_t         MSCWT[VDST_MAXTELESCOPES];
+        Float_t         MSCLT[VDST_MAXTELESCOPES];
+        Float_t         E[VDST_MAXTELESCOPES];
+        Float_t         ES[VDST_MAXTELESCOPES];
         Int_t           NMSCW;
-        Double_t        MSCW;
-        Double_t        MSCL;
+        Float_t         MSCW;
+        Float_t         MSCL;
         Float_t         MWR;
         Float_t         MLR;
-        Float_t        Erec;
-        Float_t        EChi2;
-        Float_t        dE;        // Error on Erec
-        Float_t        ErecS;
-        Float_t        EChi2S;
-        Float_t        dES;       // Error on ErecS
+        Float_t         Erec;
+        Float_t         EChi2;
+        Float_t         dE;        // Error on Erec
+        Float_t         ErecS;
+        Float_t         EChi2S;
+        Float_t         dES;       // Error on ErecS
         Double_t        SizeSecondMax;
         Double_t        theta2_All[25];
         Float_t         EmissionHeight;

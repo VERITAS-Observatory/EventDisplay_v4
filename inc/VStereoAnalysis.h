@@ -162,8 +162,8 @@ class VStereoAnalysis
         double fTreeSelected_Yoff_derot;
         double fTreeSelected_Xcore;
         double fTreeSelected_Ycore;
-        double fTreeSelected_MSCW;
-        double fTreeSelected_MSCL;
+        float  fTreeSelected_MSCW;
+        float  fTreeSelected_MSCL;
         double fTreeSelected_MWR;
         double fTreeSelected_MLR;
         float fTreeSelected_Erec;

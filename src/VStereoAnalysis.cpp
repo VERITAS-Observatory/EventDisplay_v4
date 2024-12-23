@@ -2050,8 +2050,8 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
     fTreeSelectedEvents->Branch( "Yoff_derot", &fTreeSelected_Yoff_derot, "Yoff_derot/D" );
     fTreeSelectedEvents->Branch( "Xcore", &fTreeSelected_Xcore, "Xcore/D" );
     fTreeSelectedEvents->Branch( "Ycore", &fTreeSelected_Ycore, "Ycore/D" );
-    fTreeSelectedEvents->Branch( "MSCW", &fTreeSelected_MSCW, "MSCW/D" );
-    fTreeSelectedEvents->Branch( "MSCL", &fTreeSelected_MSCL, "MSCL/D" );
+    fTreeSelectedEvents->Branch( "MSCW", &fTreeSelected_MSCW, "MSCW/F" );
+    fTreeSelectedEvents->Branch( "MSCL", &fTreeSelected_MSCL, "MSCL/F" );
     fTreeSelectedEvents->Branch( "MWR", &fTreeSelected_MWR, "MWR/D" );
     fTreeSelectedEvents->Branch( "MLR", &fTreeSelected_MLR, "MLR/D" );
     fTreeSelectedEvents->Branch( "Erec", &fTreeSelected_Erec, "Erec/F" );

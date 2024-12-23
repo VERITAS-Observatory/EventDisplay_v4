@@ -1457,9 +1457,9 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 
     sprintf( iTT, "R_core[%d]/F", fNTel );
     fOTree->Branch( "R_core", fR_core, iTT );
-    sprintf( iTT, "MSCWT[%d]/D", fNTel );
+    sprintf( iTT, "MSCWT[%d]/F", fNTel );
     fOTree->Branch( "MSCWT", ftmscw, iTT );
-    sprintf( iTT, "MSCLT[%d]/D", fNTel );
+    sprintf( iTT, "MSCLT[%d]/F", fNTel );
     fOTree->Branch( "MSCLT", ftmscl, iTT );
     sprintf( iTT, "MSCWTSigma[%d]/F", fNTel );
     fOTree->Branch( "MSCWTSigma", ftmscw_sigma, iTT );
@@ -1472,9 +1472,9 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 
     sprintf( iTT, "NMSCW/I" );
     fOTree->Branch( "NMSCW", &fnmscw, iTT );
-    sprintf( iTT, "MSCW/D" );
+    sprintf( iTT, "MSCW/F" );
     fOTree->Branch( "MSCW", &fmscw, iTT );
-    sprintf( iTT, "MSCL/D" );
+    sprintf( iTT, "MSCL/F" );
     fOTree->Branch( "MSCL", &fmscl, iTT );
     sprintf( iTT, "MWR/F" );
     fOTree->Branch( "MWR", &fmwr, iTT );

@@ -276,14 +276,14 @@ class VTableLookupDataHandler
         float  fES       [VDST_MAXTELESCOPES];    //!< energy assigned to each telescope (method 1)
         int    fnenergyT;                         //!< number of images used for the energy calculation
         int    fenergyQL;                         //!< quality label for energy calculation
-        double ftmscw    [VDST_MAXTELESCOPES];    //!< mscw assigned to each telescope
-        double ftmscl    [VDST_MAXTELESCOPES];    //!< mscl assigned to each telescope
+        float  ftmscw    [VDST_MAXTELESCOPES];    //!< mscw assigned to each telescope
+        float  ftmscl    [VDST_MAXTELESCOPES];    //!< mscl assigned to each telescope
         float  ftmscw_sigma[VDST_MAXTELESCOPES];  //!< mscw  sigma  assigned to each telescope
         float  ftmscl_sigma[VDST_MAXTELESCOPES];  //!< mscl  sigma  assigned to each telescope
 
         int    fnmscw;                            //!< number of images used for mscw/mscl/energy calculation
-        double fmscw;                             //!< mean scaled width
-        double fmscl;                             //!< mean scaled length
+        float  fmscw;                             //!< mean scaled width
+        float  fmscl;                             //!< mean scaled length
         float  fmwr;                              //!< mean width ratio
         float  fmlr;                              //!< mean length ratio
         float  fenergy;                           //!< reconstructed primary energy
@@ -421,11 +421,11 @@ class VTableLookupDataHandler
         {
             return fntubes;
         }
-        double* getMSCWtel()
+        float* getMSCWtel()
         {
             return ftmscw;
         }
-        double* getMSCLtel()
+        float* getMSCLtel()
         {
             return ftmscl;
         }
@@ -596,11 +596,11 @@ class VTableLookupDataHandler
             fSpectralIndex = iB;
         }
         void setMethod( int );                    //!< data from which evndisp reconstruction method should be used?
-        void setMSCL( double iMSLC )
+        void setMSCL( float iMSLC )
         {
             fmscl = iMSLC;
         }
-        void setMSCLT( int i, double iMSLC, float iMSLC_T = -99. )
+        void setMSCLT( int i, float iMSLC, float iMSLC_T = -99. )
         {
             ftmscl[i] = iMSLC;
             ftmscl_sigma[i] = iMSLC_T;
@@ -617,11 +617,11 @@ class VTableLookupDataHandler
         {
             fnmscw = in;
         }
-        void setMSCW( double iMSWC )
+        void setMSCW( float iMSWC )
         {
             fmscw = iMSWC;
         }
-        void setMSCWT( int i, double iMSWC, float iMSWC_T = -99. )
+        void setMSCWT( int i, float iMSWC, float iMSWC_T = -99. )
         {
             ftmscw[i] = iMSWC;
             ftmscw_sigma[i] = iMSWC_T;
