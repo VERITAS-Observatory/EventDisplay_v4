@@ -389,10 +389,6 @@ class VTableLookupDataHandler
         {
             return sqrt( fMCxoff* fMCxoff + fMCyoff* fMCyoff );
         }
-        float* getE()
-        {
-            return fE;
-        }
         int    getEventCounter()
         {
             return fEventCounter;

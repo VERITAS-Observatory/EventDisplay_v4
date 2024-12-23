@@ -120,8 +120,8 @@ class CData
         Double_t        R[VDST_MAXTELESCOPES];
         Double_t        MSCWT[VDST_MAXTELESCOPES];
         Double_t        MSCLT[VDST_MAXTELESCOPES];
-        Double_t        E[VDST_MAXTELESCOPES];
-        Double_t        ES[VDST_MAXTELESCOPES];
+        Float_t        E[VDST_MAXTELESCOPES];
+        Float_t        ES[VDST_MAXTELESCOPES];
         Int_t           NMSCW;
         Double_t        MSCW;
         Double_t        MSCL;
