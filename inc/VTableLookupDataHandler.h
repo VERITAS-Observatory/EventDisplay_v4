@@ -269,9 +269,9 @@ class VTableLookupDataHandler
         double fpointing_dy[VDST_MAXTELESCOPES];
         int    fFitstat  [VDST_MAXTELESCOPES];
         // {-1}
-        double fR        [VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core
-        double fRTel        [VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core
-        double fR_telType[VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core (depending on tel type)
+        float  fR_core      [VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core
+        float  fRTel        [VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core
+        float  fR_telType[VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core (depending on tel type)
         float  fE        [VDST_MAXTELESCOPES];    //!< energy assigned to each telescope (method 0)
         float  fES       [VDST_MAXTELESCOPES];    //!< energy assigned to each telescope (method 1)
         int    fnenergyT;                         //!< number of images used for the energy calculation
@@ -346,15 +346,15 @@ class VTableLookupDataHandler
             return fdist;
         }
         double* getDistance( ULong64_t iTelType );
-        double* getDistanceToCore()
+        float* getDistanceToCore()
         {
-            return fR;
+            return fR_core;
         }
-        double* getDistanceToCoreTel()
+        float* getDistanceToCoreTel()
         {
             return fRTel;
         }
-        double* getDistanceToCore( ULong64_t iTelType );
+        float * getDistanceToCore( ULong64_t iTelType );
         int    getEventNumber()
         {
             return eventNumber;
@@ -555,11 +555,6 @@ class VTableLookupDataHandler
             {
                 fdE = idE;
             }
-        }
-        //!< no check of boundaries!!
-        void setDistanceToCore( int itel, double iR )
-        {
-            fR[itel] = iR;
         }
         void setEnergy( float iE, bool iTableErecS = true )
         {

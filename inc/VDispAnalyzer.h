@@ -95,7 +95,7 @@ class VDispAnalyzer
                                 double* img_tgrad, double* img_loss, int* img_ntubes,
                                 double* img_weight,
                                 double xoff_4, double yoff_4,
-                                double* iR, double iEHeight,
+                                float* iR, double iEHeight,
                                 double iMCEnergy,
                                 double* img_fui,
                                 float* img_pedvar,

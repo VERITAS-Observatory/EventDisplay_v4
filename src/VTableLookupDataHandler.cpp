@@ -1455,8 +1455,8 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "Xoff_intersect", &fXoff_intersect, "Xoff_intersect/F" );
     fOTree->Branch( "Yoff_intersect", &fYoff_intersect, "Yoff_intersect/F" );
 
-    sprintf( iTT, "R[%d]/D", fNTel );
-    fOTree->Branch( "R", fR, iTT );
+    sprintf( iTT, "R_core[%d]/F", fNTel );
+    fOTree->Branch( "R_core", fR_core, iTT );
     sprintf( iTT, "MSCWT[%d]/D", fNTel );
     fOTree->Branch( "MSCWT", ftmscw, iTT );
     sprintf( iTT, "MSCLT[%d]/D", fNTel );
@@ -1995,7 +1995,7 @@ void VTableLookupDataHandler::reset()
 {
     for( unsigned int i = 0; i < fNTel; i++ )
     {
-        fR[i] = -99.;
+        fR_core[i] = -99.;
         fE[i] = -99.;
         fRTel[i] = -99.;
         fES[i] = -99.;
@@ -2052,12 +2052,12 @@ void VTableLookupDataHandler::calcDistances()
     {
         if( fImgSel_list[tel] && fZe >= 0. && fXcore > -9998. && fYcore > -9998. )
         {
-            fR[tel] = VUtilities::line_point_distance( fYcore, -1.*fXcore, 0., fZe, fAz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
+            fR_core[tel] = VUtilities::line_point_distance( fYcore, -1.*fXcore, 0., fZe, fAz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
             fRTel[tel] = VUtilities::line_point_distance( fYcore, -1.*fXcore, 0., 90. - fArrayPointing_Elevation, fArrayPointing_Azimuth, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
         }
         else
         {
-            fR[tel] = -99.;
+            fR_core[tel] = -99.;
             fRTel[tel] = -99.;
         }
     }
@@ -2321,7 +2321,7 @@ void VTableLookupDataHandler::resetAll()
         ftgrad_x[i] = 0.;
         fFitstat[i] = 0;
         ftchisq_x[i] = 0.;
-        fR[i] = 0.;
+        fR_core[i] = 0.;
         fRTel[i] = 0.;
         fR_telType[i] = 0.;
         ftmscw[i] = 0.;
@@ -2558,14 +2558,14 @@ double VTableLookupDataHandler::getTelElevation()
  * used for table filling only
  *
  */
-double* VTableLookupDataHandler::getDistanceToCore( ULong64_t iTelType )
+float* VTableLookupDataHandler::getDistanceToCore( ULong64_t iTelType )
 {
     unsigned int z = 0;
     for( unsigned int i = 0; i < getNTel(); i++ )
     {
         if( fTel_type[i] == iTelType )
         {
-            fR_telType[z] = fR[i];
+            fR_telType[z] = fR_core[i];
             z++;
         }
     }

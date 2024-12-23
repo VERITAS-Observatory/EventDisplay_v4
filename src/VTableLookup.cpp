@@ -568,7 +568,7 @@ void VTableLookup::fillLookupTable()
 
                 // This should be already the corrected/scaled size value for MC.
                 double* i_s = fData->getSize( 1., t, fTLRunParameter->fUseEvndispSelectedImagesOnly );
-                double* i_r = fData->getDistanceToCore( t );
+                float* i_r = fData->getDistanceToCore( t );
                 unsigned int i_type = fData->getNTel_type( t );
                 ////////////////////////////////////////////////
                 // for zenith-angle == 0 deg fill all az bins

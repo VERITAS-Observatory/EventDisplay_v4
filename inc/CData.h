@@ -117,7 +117,7 @@ class CData
         Float_t         DispYoff_T[VDST_MAXTELESCOPES];
         Float_t         DispWoff_T[VDST_MAXTELESCOPES];
         Float_t         Disp_T[VDST_MAXTELESCOPES];
-        Double_t        R[VDST_MAXTELESCOPES];
+        Float_t         R_core[VDST_MAXTELESCOPES];
         Double_t        MSCWT[VDST_MAXTELESCOPES];
         Double_t        MSCLT[VDST_MAXTELESCOPES];
         Float_t        E[VDST_MAXTELESCOPES];
@@ -220,7 +220,7 @@ class CData
         TBranch*        b_tgrad_x;                //!
         TBranch*        b_Fitstat;                //!
         TBranch*        b_tchisq_x;               //!
-        TBranch*        b_R;                      //!
+        TBranch*        b_R_core;                 //!
         TBranch*        b_MSCWT;                  //!
         TBranch*        b_MSCLT;                  //!
         TBranch*        b_E;                      //!
@@ -712,7 +712,7 @@ void CData::Init( TTree* tree )
             tchisq_x[i] = 0.;
         }
     }
-    fChain->SetBranchAddress( "R", R );
+    fChain->SetBranchAddress( "R_core", R_core );
     if(!fShort )
     {
         fChain->SetBranchAddress( "MSCWT", MSCWT );
@@ -941,7 +941,7 @@ Bool_t CData::Notify()
     b_tgrad_x = fChain->GetBranch( "tgrad_x" );
     b_Fitstat = fChain->GetBranch( "Fitstat" );
     b_tchisq_x = fChain->GetBranch( "tchisq_x" );
-    b_R = fChain->GetBranch( "R" );
+    b_R_core = fChain->GetBranch( "R_core" );
     b_MSCWT = fChain->GetBranch( "MSCWT" );
     b_MSCLT = fChain->GetBranch( "MSCLT" );
     b_E = fChain->GetBranch( "E" );
