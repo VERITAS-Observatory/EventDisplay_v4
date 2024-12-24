@@ -674,8 +674,7 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
     ////////////////////////////////////////////////////////////////////
     // DISP method for updated disp reconstruction
     ////////////////////////////////////////////////////////////////////
-    if( fDispAnalyzerDirection
-            && fNImages <= ( int )fTLRunParameter->fRerunStereoReconstruction_BDTNImages_max )
+    if( fDispAnalyzerDirection )
     {
         ////////////////////////////////////////////////////////////////////
         // estimate error on direction reconstruction from DISP method

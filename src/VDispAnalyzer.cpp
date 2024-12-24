@@ -28,8 +28,6 @@ VDispAnalyzer::VDispAnalyzer()
     fdisp_energy = -9999.;
     fdisp_energy_chi = -9999.;
     fdisp_energy_dEs = -9999.;
-    fdisp_energy_median = -9999.;
-    fdisp_energy_medianAbsoluteError = -9999.;
     fdisp_energy_NT = 0;
     fdisp_energyQL = -1;
     fdisp_sum_abs_weigth = 0.;
@@ -820,23 +818,14 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
         }
     }
 
-    // Occasionally one energy is significantly off and distorts the mean.
-    // therefore: get rid of N (3) sigma outliers
-    // use robust statistics (median and median absolute error)
-    fdisp_energy_median = TMath::Median( energy_tel.size(), &energy_tel[0] );
-    fdisp_energy_medianAbsoluteError = VStatistics::getMedianAbsoluteError( energy_tel, fdisp_energy_median );
     double w = 0.;
     unsigned int n2 = 0;
     fdisp_energy = 0.;
     for( unsigned int j = 0; j < energy_tel.size(); j++ )
     {
-        if( energy_tel.size() < 5
-                || TMath::Abs( energy_tel[j] - fdisp_energy_median ) < fdisp_energy_medianAbsoluteError * 3. )
-        {
-            fdisp_energy += energy_tel[j] * energy_weight[j];
-            w += energy_weight[j];
-            n2++;
-        }
+        fdisp_energy += energy_tel[j] * energy_weight[j];
+        w += energy_weight[j];
+        n2++;
     }
 
     fdisp_energy_NT = n2;
@@ -904,16 +893,6 @@ float VDispAnalyzer::getEnergyChi2()
 float VDispAnalyzer::getEnergydES()
 {
     return fdisp_energy_dEs;
-}
-
-float VDispAnalyzer::getEnergyMedian()
-{
-    return fdisp_energy_median;
-}
-
-float VDispAnalyzer::getEnergyMedianAbsoluteError()
-{
-    return fdisp_energy_medianAbsoluteError;
 }
 
 float VDispAnalyzer::getEnergyT( unsigned int iTelescopeNumber )

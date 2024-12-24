@@ -97,7 +97,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
         bool  fRerunStereoReconstruction;
         double fRerunStereoReconstruction_minAngle;
         string fRerunStereoReconstruction_BDTFileName;
-        unsigned int fRerunStereoReconstruction_BDTNImages_max;
         string fEnergyReconstruction_BDTFileName;
         string fDispError_BDTFileName;
         float  fDispError_BDTWeight;

@@ -44,7 +44,6 @@ VTableLookupRunParameter::VTableLookupRunParameter()
     fSelectRandomSeed = 17;
     fRerunStereoReconstruction = false;
     fRerunStereoReconstruction_minAngle = -1.;
-    fRerunStereoReconstruction_BDTNImages_max = 4;
     fRerunStereoReconstruction_BDTFileName = "";
     fEnergyReconstruction_BDTFileName = "";
     fDispError_BDTFileName = "";
@@ -194,19 +193,6 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
             {
                 fRerunStereoReconstruction_BDTFileName = iTemp2;
                 i++;
-            }
-        }
-        // DISP BDT reconstruction is applied for images with up to this multiplicity
-        else if( iTemp.find( "-tmva_nimages_max_stereo_reconstruction" ) < iTemp.size() )
-        {
-            fRerunStereoReconstruction_BDTNImages_max = ( unsigned int )( atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() ) );
-            if( fRerunStereoReconstruction_BDTNImages_max > 40000 )
-            {
-                cout << "VTableLookupRunParameter::fillParameters() error:";
-                cout << " maximum number of images for TMVA disp reconstruction is 4";
-                cout << " (selection was " << fRerunStereoReconstruction_BDTNImages_max << ")" << endl;
-                cout << "exiting..." << endl;
-                exit( EXIT_FAILURE );
             }
         }
         // BDT directory and file name for disp stereo reconstruction (energy)
@@ -589,7 +575,6 @@ void VTableLookupRunParameter::print( int iP )
         {
             cout << "\t reading BDT TMVA files from " << fRerunStereoReconstruction_BDTFileName << endl;
             cout << "\t BDT TMVA stereo reconstruction is applied for events with <= ";
-            cout << fRerunStereoReconstruction_BDTNImages_max << " images" << endl;
             if( fmaxdist < 1.e3 )
             {
                 cout << "\t BDT TMVA stereo reconstruction distance cut < " << fmaxdist << endl;
