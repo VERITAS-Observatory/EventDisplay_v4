@@ -24,7 +24,6 @@ class CData
     public :
 
         bool            fMC;
-        bool            fBOOLtheta2_All;
         bool            fBOOLteltype;
         bool            fBOOLdE;
 
@@ -78,7 +77,7 @@ class CData
         Double_t        Xoff_derot;
         Double_t        Yoff_derot;
         Double_t        stdS;
-        Double_t        theta2;
+        Float_t        theta2;
         Double_t        Xcore;
         Double_t        Ycore;
         Double_t        Xcore_SC;
@@ -89,11 +88,11 @@ class CData
         Float_t         meanPedvar_ImageT[VDST_MAXTELESCOPES];
         Float_t         dist[VDST_MAXTELESCOPES];
         Float_t         size[VDST_MAXTELESCOPES];
-        Double_t        fraclow[VDST_MAXTELESCOPES];
+        Float_t         fraclow[VDST_MAXTELESCOPES];
         Float_t         loss[VDST_MAXTELESCOPES];
-        Double_t        max1[VDST_MAXTELESCOPES];
-        Double_t        max2[VDST_MAXTELESCOPES];
-        Double_t        max3[VDST_MAXTELESCOPES];
+        Float_t         max1[VDST_MAXTELESCOPES];
+        Float_t         max2[VDST_MAXTELESCOPES];
+        Float_t         max3[VDST_MAXTELESCOPES];
         Int_t           maxindex1[VDST_MAXTELESCOPES];
         Int_t           maxindex2[VDST_MAXTELESCOPES];
         Int_t           maxindex3[VDST_MAXTELESCOPES];
@@ -103,15 +102,15 @@ class CData
         Int_t           ntubesBNI[VDST_MAXTELESCOPES];
         UShort_t        nsat[VDST_MAXTELESCOPES];
         UShort_t        nlowgain[VDST_MAXTELESCOPES];
-        Double_t        alpha[VDST_MAXTELESCOPES];
-        Double_t        los[VDST_MAXTELESCOPES];
+        Float_t         alpha[VDST_MAXTELESCOPES];
+        Float_t         los[VDST_MAXTELESCOPES];
         Float_t         asym[VDST_MAXTELESCOPES];
         Float_t         cen_x[VDST_MAXTELESCOPES];
         Float_t         cen_y[VDST_MAXTELESCOPES];
         Float_t         cosphi[VDST_MAXTELESCOPES];
         Float_t         sinphi[VDST_MAXTELESCOPES];
         Float_t         tgrad_x[VDST_MAXTELESCOPES];
-        Double_t        tchisq_x[VDST_MAXTELESCOPES];
+        Float_t         tchisq_x[VDST_MAXTELESCOPES];
         Int_t           Fitstat[VDST_MAXTELESCOPES];
         Float_t         DispXoff_T[VDST_MAXTELESCOPES];
         Float_t         DispYoff_T[VDST_MAXTELESCOPES];
@@ -134,7 +133,6 @@ class CData
         Float_t         EChi2S;
         Float_t         dES;       // Error on ErecS
         Double_t        SizeSecondMax;
-        Double_t        theta2_All[25];
         Float_t         EmissionHeight;
         Float_t         EmissionHeightChi2;
         UInt_t          NTelPairs;
@@ -235,7 +233,6 @@ class CData
         TBranch*        b_ErecS;                  //!
         TBranch*        b_EChi2S;                 //!
         TBranch*        b_SizeSecondMax;          //!
-        TBranch*        b_theta2_All;             //!
         TBranch*        b_EmissionHeight;         //!
         TBranch*        b_EmissionHeightChi2;     //!
         TBranch*        b_NTelPairs;              //!
@@ -272,7 +269,6 @@ CData::CData( TTree* tree, bool bMC, int iVersion, bool bShort )
     fMC = bMC;
     fShort = bShort;
     fVersion = iVersion;
-    fBOOLtheta2_All = false;
     fBOOLteltype = false;
     fBOOLdE = false;
 
@@ -369,10 +365,6 @@ void CData::Init( TTree* tree )
     if( tree->GetBranchStatus( "MCe0" ) )
     {
         fMC = true;
-    }
-    if( tree->GetBranchStatus( "theta2_All" ) )
-    {
-        fBOOLtheta2_All = true;
     }
     // test if teltype branches exist
     if( tree->GetBranchStatus( "NTtype" ) )
@@ -564,18 +556,6 @@ void CData::Init( TTree* tree )
     }
 
     fChain->SetBranchAddress( "SizeSecondMax", &SizeSecondMax );
-
-    if( fBOOLtheta2_All )
-    {
-        fChain->SetBranchAddress( "theta2_All", &theta2_All );
-    }
-    else
-    {
-        for( unsigned int dex = 0; dex < 25; dex++ )
-        {
-            theta2_All[dex] = 99.0;
-        }
-    }
 
     if( fBOOLteltype )
     {
@@ -908,16 +888,6 @@ Bool_t CData::Notify()
     }
 
     b_SizeSecondMax = fChain->GetBranch( "SizeSecondMax" );
-
-    if( fBOOLtheta2_All )
-    {
-        b_theta2_All = fChain->GetBranch( "theta2_All" );
-    }
-    else
-    {
-        b_theta2_All = 0;
-    }
-
     b_dist = fChain->GetBranch( "dist" );
     b_size = fChain->GetBranch( "size" );
     b_fraclow = fChain->GetBranch( "fraclow" );

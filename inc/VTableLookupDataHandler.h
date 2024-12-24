@@ -181,8 +181,6 @@ class VTableLookupDataHandler
 
     public:
 
-        //  data written to output file
-
         int runNumber;
         int eventNumber;
         int MJD;
@@ -213,7 +211,7 @@ class VTableLookupDataHandler
         int fNTelTypes;
         unsigned int NImages_Ttype[VDST_MAXTELESCOPES];
         double fimg2_ang;
-        double fZe;                               //!< zenith angle
+        double fZe;
         double fAz;
         double fRA;
         double fDec;
@@ -222,29 +220,26 @@ class VTableLookupDataHandler
         double fXoff_derot;
         double fYoff_derot;
         double fstdS;
-        double ftheta2;
+        float ftheta2;
         double fXcore;
         double fYcore;
         double fXcore_SC;
         double fYcore_SC;
         double fstdP;
         double fchi2;                             //!< chi2 from array reconstruction
-        //
-        // {1}
         float  fMCEnergyArray [VDST_MAXTELESCOPES];
         float  fmeanPedvar_ImageT[VDST_MAXTELESCOPES];
         float  fmeanPedvar_Image;
         float  fdist     [VDST_MAXTELESCOPES];
         double ffui       [VDST_MAXTELESCOPES];
-        double fdist_telType[VDST_MAXTELESCOPES];
         float  fsize     [VDST_MAXTELESCOPES];
         float  fsizeCorr [VDST_MAXTELESCOPES];
         float  fsize_telType[VDST_MAXTELESCOPES];
         float  floss     [VDST_MAXTELESCOPES];
-        double ffracLow  [VDST_MAXTELESCOPES];
-        double fmax1     [VDST_MAXTELESCOPES];
-        double fmax2     [VDST_MAXTELESCOPES];
-        double fmax3     [VDST_MAXTELESCOPES];
+        float  ffracLow  [VDST_MAXTELESCOPES];
+        float  fmax1     [VDST_MAXTELESCOPES];
+        float  fmax2     [VDST_MAXTELESCOPES];
+        float  fmax3     [VDST_MAXTELESCOPES];
         int    fmaxindex1     [VDST_MAXTELESCOPES];
         int    fmaxindex2     [VDST_MAXTELESCOPES];
         int    fmaxindex3     [VDST_MAXTELESCOPES];
@@ -255,15 +250,15 @@ class VTableLookupDataHandler
         int    fntubes   [VDST_MAXTELESCOPES];
         unsigned short int fnsat[VDST_MAXTELESCOPES];
         unsigned short int fnlowgain[VDST_MAXTELESCOPES];
-        double falpha    [VDST_MAXTELESCOPES];
-        double flos      [VDST_MAXTELESCOPES];
+        float  falpha    [VDST_MAXTELESCOPES];
+        float  flos      [VDST_MAXTELESCOPES];
         float  fasym     [VDST_MAXTELESCOPES];
         float  fcen_x    [VDST_MAXTELESCOPES];
         float  fcen_y    [VDST_MAXTELESCOPES];
         float  fcosphi   [VDST_MAXTELESCOPES];
         float  fsinphi   [VDST_MAXTELESCOPES];
         float  ftgrad_x  [VDST_MAXTELESCOPES];
-        double ftchisq_x [VDST_MAXTELESCOPES];
+        float  ftchisq_x [VDST_MAXTELESCOPES];
         double fweight   [VDST_MAXTELESCOPES];    //!< always 1.
         double fpointing_dx[VDST_MAXTELESCOPES];
         double fpointing_dy[VDST_MAXTELESCOPES];
@@ -304,7 +299,6 @@ class VTableLookupDataHandler
         float  fEmissionHeightT[VDST_MAXTELESCOPES];
 
         double fSizeSecondMax;
-        double ftheta2_All[25];
 
         // disp related variables
         float fXoff_edisp;
@@ -517,7 +511,7 @@ class VTableLookupDataHandler
         }
         unsigned int getTelType_arraycounter( unsigned int iTelID );      // return position of tel type for this telescope in array counter
         double getZe();
-        double getTheta2()
+        float getTheta2()
         {
             return ftheta2;
         }

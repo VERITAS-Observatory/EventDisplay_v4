@@ -523,11 +523,6 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 
             // theta2 ---
             fMap->calculateTheta2( fIsOn, i_xderot, i_yderot );
-            // theta2 values for debugging
-            for( unsigned int dex = 0; dex < 25; dex++ )
-            {
-                fDataRun->theta2_All[dex] = fMap->getTheta2_All()[dex];
-            }
 
             for( unsigned int t = 0; t < fMap->getTheta2_length(); t++ )
             {

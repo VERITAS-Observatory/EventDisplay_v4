@@ -1380,8 +1380,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "Xoff_derot", &fXoff_derot, "Xoff_derot/D" );
     fOTree->Branch( "Yoff_derot", &fYoff_derot, "Yoff_derot/D" );
     fOTree->Branch( "stdS", &fstdS, "stdS/D" );
-    fOTree->Branch( "theta2", &ftheta2, "theta2/D" );
-    fOTree->Branch( "theta2_All", &ftheta2_All, "theta2_All[25]/D" );
+    fOTree->Branch( "theta2", &ftheta2, "theta2/F" );
     fOTree->Branch( "Xcore", &fXcore, "Xcore/D" );
     fOTree->Branch( "Ycore", &fYcore, "Ycore/D" );
     fOTree->Branch( "Xcore_SC", &fXcore_SC, "Xcore_SC/D" );
@@ -1399,13 +1398,13 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "size", fsize, iTT );
     sprintf( iTT, "loss[%d]/F", fNTel );
     fOTree->Branch( "loss", floss, iTT );
-    sprintf( iTT, "fracLow[%d]/D", fNTel );
+    sprintf( iTT, "fracLow[%d]/F", fNTel );
     fOTree->Branch( "fracLow", ffracLow, iTT );
-    sprintf( iTT, "max1[%d]/D", fNTel );
+    sprintf( iTT, "max1[%d]/F", fNTel );
     fOTree->Branch( "max1", fmax1, iTT );
-    sprintf( iTT, "max2[%d]/D", fNTel );
+    sprintf( iTT, "max2[%d]/F", fNTel );
     fOTree->Branch( "max2", fmax2, iTT );
-    sprintf( iTT, "max3[%d]/D", fNTel );
+    sprintf( iTT, "max3[%d]/F", fNTel );
     fOTree->Branch( "max3", fmax3, iTT );
     sprintf( iTT, "maxindex1[%d]/I", fNTel );
     fOTree->Branch( "maxindex1", fmaxindex1, iTT );
@@ -1423,9 +1422,9 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "nsat", fnsat, iTT );
     sprintf( iTT, "nlowgain[%d]/s", fNTel );
     fOTree->Branch( "nlowgain", fnlowgain, iTT );
-    sprintf( iTT, "alpha[%d]/D", fNTel );
+    sprintf( iTT, "alpha[%d]/F", fNTel );
     fOTree->Branch( "alpha", falpha, iTT );
-    sprintf( iTT, "los[%d]/D", fNTel );
+    sprintf( iTT, "los[%d]/F", fNTel );
     fOTree->Branch( "los", flos, iTT );
     sprintf( iTT, "asym[%d]/F", fNTel );
     fOTree->Branch( "asym", fasym, iTT );
@@ -1439,7 +1438,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "sinphi", fsinphi, iTT );
     sprintf( iTT, "tgrad_x[%d]/F", fNTel );
     fOTree->Branch( "tgrad_x", ftgrad_x, iTT );
-    sprintf( iTT, "tchisq_x[%d]/D", fNTel );
+    sprintf( iTT, "tchisq_x[%d]/F", fNTel );
     fOTree->Branch( "tchisq_x", ftchisq_x, iTT );
     sprintf( iTT, "Fitstat[%d]/I", fNTel );
     fOTree->Branch( "Fitstat", fFitstat, iTT );
@@ -2331,10 +2330,6 @@ void VTableLookupDataHandler::resetAll()
         ftmscl_sigma[i] = 0.;
         fE[i] = 0.;
         fES[i] = 0.;
-    }
-    for( unsigned int i = 0; i < 25; i++ )
-    {
-        ftheta2_All[i] = 99.;
     }
     fnmscw = 0;
     fnenergyT = 0;
