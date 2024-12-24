@@ -634,6 +634,6 @@ class VTableLookupDataHandler
             fDebug = iD;
         }
         bool setOutputFile( string, string, string );
-        bool terminate( TNamed* );                //!< write everything to disk
+        bool terminate( TNamed* );
 };
 #endif
