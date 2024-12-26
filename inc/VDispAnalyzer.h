@@ -93,9 +93,9 @@ class VDispAnalyzer
                                 float* img_tgrad, float* img_loss, int* img_ntubes,
                                 double* img_weight,
                                 double xoff_4, double yoff_4,
-                                float* iR, double iEHeight,
+                                float* iR, float iEHeight,
                                 double iMCEnergy,
-                                double* img_fui,
+                                float* img_fui,
                                 float* img_pedvar,
                                 int* img_fitstat );
 
@@ -119,7 +119,7 @@ class VDispAnalyzer
                                          double xoff_4, double yoff_4,
                                          vector< float >& dispErrorT,
                                          vector< float >& dispSignT,
-                                         double* img_fui,
+                                         float* img_fui,
                                          float* img_pedvar,
                                          double* pointing_dx, double* pointing_dy,
                                          bool UseIntersectForHeadTail,
@@ -133,7 +133,7 @@ class VDispAnalyzer
                 float* img_tgrad, float* img_loss, int* img_ntubes,
                 double* img_weight,
                 double xoff_4, double yoff_4,
-                double* img_fui, float* img_pedvar, int* img_fitstat );
+                float * img_fui, float* img_pedvar, int* img_fitstat );
 
         float evaluate( float iWidth, float iLength, float iAsymm, float iDist,
                         float iSize, float iPedvar, float itgrad, float iLoss,

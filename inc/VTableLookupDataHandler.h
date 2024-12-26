@@ -231,7 +231,7 @@ class VTableLookupDataHandler
         float  fmeanPedvar_ImageT[VDST_MAXTELESCOPES];
         float  fmeanPedvar_Image;
         float  fdist     [VDST_MAXTELESCOPES];
-        double ffui       [VDST_MAXTELESCOPES];
+        float  ffui       [VDST_MAXTELESCOPES];
         float  fsize     [VDST_MAXTELESCOPES];
         float  fsizeCorr [VDST_MAXTELESCOPES];
         float  fsize_telType[VDST_MAXTELESCOPES];
