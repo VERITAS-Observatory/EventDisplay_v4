@@ -634,10 +634,9 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 }
 
 /*
- * redo stereo reconstruction (core and direction)
+ * Stereo reconstruction (core and direction)
  *
- * does not take into account pointing corrections
- * (as e.g. given by the VPM)
+ * using geometrical and disp methods
 */
 void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
 {
@@ -646,7 +645,7 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
     fYoff_edisp = fYoff;
     ///////////////////////////
     // stereo reconstruction
-    // (rcs_method4)
+    // (equivalent to rcs_method4)
     VSimpleStereoReconstructor i_SR;
     i_SR.initialize( fSSR_NImages_min, fTLRunParameter->fRerunStereoReconstruction_minAngle );
     i_SR.reconstruct_direction( getNTel(),

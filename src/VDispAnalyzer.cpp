@@ -361,7 +361,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
     }
     calculateMeanShowerDirection( fdisp_xs_T, fdisp_ys_T, v_weight, xs, ys, dispdiff, fdisp_xs_T.size() );
 
-    // apply a completely necessary sign flip
+    // apply sign flip
     if( ys > -9998. )
     {
         ys *= -1.;
@@ -370,10 +370,6 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 
 /*
  * calculate average shower directions from a vector of disp direction
- *
- * use given weights
- *
- * (internal function)
  *
 */
 void VDispAnalyzer::calculateMeanShowerDirection(
