@@ -9,6 +9,7 @@
 #include "VGlobalRunParameter.h"
 #include "VDispAnalyzer.h"
 
+#include <bitset>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -17,6 +18,11 @@ using namespace std;
 
 class CData
 {
+    private :
+        void reconstruct_3tel_images_scaled_variables();
+        void reconstruct_3tel_images_scaled_emission_height();
+        void reconstruct_3tel_images(long unsigned int);
+
     public :
 
         bool            fMC;
@@ -53,15 +59,13 @@ class CData
         Double_t        MCxoff;
         Double_t        MCyoff;
 
-        UInt_t          LTrigS;
         ULong64_t       LTrig;
         UInt_t          NTrig;
         Int_t           NImages;
-        UInt_t          ImgSelS;
         ULong64_t       ImgSel;
         UInt_t          ImgSel_list[VDST_MAXTELESCOPES];
         Int_t           NTtype;
-        UInt_t		NImages_Ttype[VDST_MAXTELESCOPES];
+        UInt_t		    NImages_Ttype[VDST_MAXTELESCOPES];
         Double_t        img2_ang;
         Double_t        Ze;
         Double_t        Az;
@@ -72,7 +76,7 @@ class CData
         Double_t        Xoff_derot;
         Double_t        Yoff_derot;
         Double_t        stdS;
-        Float_t        theta2;
+        Float_t         theta2;
         Double_t        Xcore;
         Double_t        Ycore;
         Double_t        Xcore_SC;
@@ -237,7 +241,7 @@ class CData
 
         CData( TTree* tree = 0, bool bMC = false, int iVersion = 5, bool bShort = false );
         virtual ~CData();
-        virtual Int_t    GetEntry( Long64_t entry );
+        virtual Int_t    GetEntry( Long64_t entry, unsigned long int telescope_combination = 15 );
         virtual Long64_t LoadTree( Long64_t entry );
         virtual void     Init( TTree* tree );
         virtual Bool_t   Notify();
@@ -249,6 +253,5 @@ class CData
         {
             return fVersion;
         }
-        void            reconstruct_3tel_images();
 };
 #endif

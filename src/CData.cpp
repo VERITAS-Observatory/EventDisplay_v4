@@ -31,7 +31,7 @@ CData::~CData()
 }
 
 
-Int_t CData::GetEntry( Long64_t entry )
+Int_t CData::GetEntry( Long64_t entry, unsigned long int telescope_combination )
 {
     if(!fChain )
     {
@@ -39,15 +39,10 @@ Int_t CData::GetEntry( Long64_t entry )
     }
 
     int a = fChain->GetEntry( entry );
-    if( a > 0 && fVersion < 6 )
+
+    if( telescope_combination != 15 && NImages == 4 )
     {
-        LTrig = ( ULong64_t )LTrigS;
-        ImgSel = ( ULong64_t )ImgSelS;
-    }
-    bool fMC_3tel_reconstruction = true;
-    if( fMC_3tel_reconstruction && NImages == 4 )
-    {
-        reconstruct_3tel_images();
+        reconstruct_3tel_images(telescope_combination);
     }
     return a;
 }
@@ -168,14 +163,7 @@ void CData::Init( TTree* tree )
     // MC tree
     if( fMC )
     {
-        if( fVersion > 7 )
-        {
-            fChain->SetBranchAddress( "MCprimary", &MCprimary );
-        }
-        else
-        {
-            MCprimary = -99;
-        }
+        fChain->SetBranchAddress( "MCprimary", &MCprimary );
         fChain->SetBranchAddress( "MCe0", &MCe0 );
         fChain->SetBranchAddress( "MCxcore", &MCxcore );
         fChain->SetBranchAddress( "MCycore", &MCycore );
@@ -212,24 +200,10 @@ void CData::Init( TTree* tree )
     }
 
 
-    if( fVersion < 6 )
-    {
-        fChain->SetBranchAddress( "LTrig", &LTrigS );
-    }
-    else
-    {
-        fChain->SetBranchAddress( "LTrig", &LTrig );
-    }
+    fChain->SetBranchAddress( "LTrig", &LTrig );
     fChain->SetBranchAddress( "NTrig", &NTrig );
     fChain->SetBranchAddress( "NImages", &NImages );
-    if( fVersion < 6 )
-    {
-        fChain->SetBranchAddress( "ImgSel", &ImgSelS );
-    }
-    else
-    {
-        fChain->SetBranchAddress( "ImgSel", &ImgSel );
-    }
+    fChain->SetBranchAddress( "ImgSel", &ImgSel );
     fChain->SetBranchAddress( "img2_ang", &img2_ang );
     fChain->SetBranchAddress( "Ze", &Ze );
     fChain->SetBranchAddress( "Az", &Az );
@@ -276,26 +250,14 @@ void CData::Init( TTree* tree )
     }
     fChain->SetBranchAddress( "stdP", &stdP );
     fChain->SetBranchAddress( "Chi2", &Chi2 );
-    if( fVersion > 4 )
+    fChain->SetBranchAddress( "meanPedvar_Image", &meanPedvar_Image );
+    if(!fShort )
     {
-        fChain->SetBranchAddress( "meanPedvar_Image", &meanPedvar_Image );
-        if(!fShort )
-        {
-            fChain->SetBranchAddress( "meanPedvar_ImageT", meanPedvar_ImageT );
-        }
-        else
-        {
-            for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
-            {
-                meanPedvar_ImageT[i] = 0.;
-            }
-        }
-
+        fChain->SetBranchAddress( "meanPedvar_ImageT", meanPedvar_ImageT );
     }
     else
     {
-        meanPedvar_Image = 0.;
-        for( int i = 0; i < VDST_MAXTELESCOPES; i++ )
+        for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
         {
             meanPedvar_ImageT[i] = 0.;
         }
@@ -333,18 +295,7 @@ void CData::Init( TTree* tree )
                 fraclow[i] = 0.;
             }
         }
-        if( fVersion > 2 )
-        {
-            fChain->SetBranchAddress( "loss", loss );
-        }
-        else
-        {
-            for( int i = 0; i < VDST_MAXTELESCOPES; i++ )
-            {
-                loss[i] = 0.;
-            }
-        }
-
+        fChain->SetBranchAddress( "loss", loss );
         fChain->SetBranchAddress( "max1", max1 );
         fChain->SetBranchAddress( "max2", max2 );
         fChain->SetBranchAddress( "max3", max3 );
@@ -354,17 +305,7 @@ void CData::Init( TTree* tree )
         fChain->SetBranchAddress( "width", width );
         fChain->SetBranchAddress( "length", length );
         fChain->SetBranchAddress( "ntubes", ntubes );
-        if( fVersion > 2 )
-        {
-            fChain->SetBranchAddress( "nsat", nsat );
-        }
-        else
-        {
-            for( int i = 0; i < VDST_MAXTELESCOPES; i++ )
-            {
-                nsat[i] = 0;
-            }
-        }
+        fChain->SetBranchAddress( "nsat", nsat );
         if( fChain->GetBranchStatus( "nlowgain" ) )
         {
             fChain->SetBranchAddress( "nlowgain", nlowgain );
@@ -475,16 +416,8 @@ void CData::Init( TTree* tree )
     }
     fChain->SetBranchAddress( "MSCW", &MSCW );
     fChain->SetBranchAddress( "MSCL", &MSCL );
-    if( fVersion > 3 )
-    {
-        fChain->SetBranchAddress( "MWR", &MWR );
-        fChain->SetBranchAddress( "MLR", &MLR );
-    }
-    else
-    {
-        MWR = 0.;
-        MLR = 0.;
-    }
+    fChain->SetBranchAddress( "MWR", &MWR );
+    fChain->SetBranchAddress( "MLR", &MLR );
     fChain->SetBranchAddress( "Erec", &Erec );
     fChain->SetBranchAddress( "EChi2", &EChi2 );
     fChain->SetBranchAddress( "ErecS", &ErecS );
@@ -499,29 +432,16 @@ void CData::Init( TTree* tree )
         dE = 0.;
         dES = 0.;
     }
-    if( fVersion > 3 )
+    EmissionHeight = -99.;
+    fChain->SetBranchAddress( "EmissionHeight", &EmissionHeight );
+    fChain->SetBranchAddress( "EmissionHeightChi2", &EmissionHeightChi2 );
+    fChain->SetBranchAddress( "NTelPairs", &NTelPairs );
+    if(!fShort )
     {
-        EmissionHeight = -99.;
-        fChain->SetBranchAddress( "EmissionHeight", &EmissionHeight );
-        fChain->SetBranchAddress( "EmissionHeightChi2", &EmissionHeightChi2 );
-        fChain->SetBranchAddress( "NTelPairs", &NTelPairs );
-        if(!fShort )
-        {
-            fChain->SetBranchAddress( "EmissionHeightT", EmissionHeightT );
-        }
-        else
-        {
-            for( unsigned int i = 0; i < VDST_MAXTELESCOPES * VDST_MAXTELESCOPES; i++ )
-            {
-                EmissionHeightT[i] = 0.;
-            }
-        }
+        fChain->SetBranchAddress( "EmissionHeightT", EmissionHeightT );
     }
     else
     {
-        EmissionHeight = -999.;
-        EmissionHeightChi2 = -999.;
-        NTelPairs = 0;
         for( unsigned int i = 0; i < VDST_MAXTELESCOPES * VDST_MAXTELESCOPES; i++ )
         {
             EmissionHeightT[i] = 0.;
@@ -614,17 +534,8 @@ Bool_t CData::Notify()
     b_Ycore_SC = fChain->GetBranch( "Ycore_SC" );
     b_stdP = fChain->GetBranch( "stdP" );
     b_Chi2 = fChain->GetBranch( "Chi2" );
-    if( fVersion > 4 )
-    {
-        b_meanPedvar_Image = fChain->GetBranch( "meanPedvar_Image" );
-        b_meanPedvar_ImageT = fChain->GetBranch( "meanPedvar_ImageT" );
-    }
-    else
-    {
-        b_meanPedvar_Image = 0;
-        b_meanPedvar_ImageT = 0;
-    }
-
+    b_meanPedvar_Image = fChain->GetBranch( "meanPedvar_Image" );
+    b_meanPedvar_ImageT = fChain->GetBranch( "meanPedvar_ImageT" );
     b_SizeSecondMax = fChain->GetBranch( "SizeSecondMax" );
     b_dist = fChain->GetBranch( "dist" );
     b_size = fChain->GetBranch( "size" );
@@ -657,34 +568,16 @@ Bool_t CData::Notify()
     b_NMSCW = fChain->GetBranch( "NMSCW" );
     b_MSCW = fChain->GetBranch( "MSCW" );
     b_MSCL = fChain->GetBranch( "MSCL" );
-    if( fVersion > 3 )
-    {
-        b_MWR = fChain->GetBranch( "MWR" );
-        b_MLR = fChain->GetBranch( "MLR" );
-    }
-    else
-    {
-        b_MWR = 0;
-        b_MLR = 0;
-    }
+    b_MWR = fChain->GetBranch( "MWR" );
+    b_MLR = fChain->GetBranch( "MLR" );
     b_Erec = fChain->GetBranch( "Erec" );
     b_EChi2 = fChain->GetBranch( "EChi2" );
     b_ErecS = fChain->GetBranch( "ErecS" );
     b_EChi2S = fChain->GetBranch( "EChi2S" );
-    if( fVersion > 3 )
-    {
-        b_EmissionHeight = fChain->GetBranch( "EmissionHeight" );
-        b_EmissionHeightChi2 = fChain->GetBranch( "EmissionHeightChi2" );
-        b_NTelPairs = fChain->GetBranch( "NTelPairs" );
-        b_EmissionHeightT = fChain->GetBranch( "EmissionHeightT" );
-    }
-    else
-    {
-        b_EmissionHeight = 0;
-        b_EmissionHeightChi2 = 0;
-        b_NTelPairs = 0;
-        b_EmissionHeightT = 0;
-    }
+    b_EmissionHeight = fChain->GetBranch( "EmissionHeight" );
+    b_EmissionHeightChi2 = fChain->GetBranch( "EmissionHeightChi2" );
+    b_NTelPairs = fChain->GetBranch( "NTelPairs" );
+    b_EmissionHeightT = fChain->GetBranch( "EmissionHeightT" );
     if( fChain->GetBranchStatus( "DispDiff" ) )
     {
         b_DispDiff = fChain->GetBranch( "DispDiff" );
@@ -728,29 +621,48 @@ Bool_t CData::Notify()
  *
  * Note! This is very fine tuned and should be used for effective area calculation only
  */
-void CData::reconstruct_3tel_images()
+void CData::reconstruct_3tel_images(unsigned long int telescope_combination)
 {
-    //    reconstruct_3tel_images_scaled_variables();
-    //    reconstruct_3tel_images_scaled_emission_height();
+    bitset<sizeof(long int) * 4> tel_bitset(telescope_combination);
+    NImages = (Int_t)tel_bitset.count();
+    ImgSel = telescope_combination;
+    unsigned int z = 0;
+    SizeSecondMax = 0.;
+    for(unsigned int t = 0; t < 4; t++ )
+    {
+        if( tel_bitset.test(t) )
+        {
+            ImgSel_list[z] = t;
+            z++;
+            if( size[t] > SizeSecondMax )
+            {
+                SizeSecondMax = size[t];
+            }
+        }
+    }
+
+    reconstruct_3tel_images_scaled_emission_height();
+    reconstruct_3tel_images_scaled_variables();
     //    reconstruct_3tel_images_direction();
     //    reconstruct_3tel_images_energy();
-    VDispAnalyzer i_dispAnalyzer;
-    NImages = 3;
-    // ImgSel_list
-    // ImgSel
-    SizeSecondMax = 0.;
 }
+
 /*
-
-void reconstruct_3tel_images_scaled_emission_height()
+ * Calculate average emission height for 3-telescope image
+ *
+ * TODO requires telescope position vector
+*/
+void CData::reconstruct_3tel_images_scaled_emission_height()
 {
-    EmissionHeight = -9999.;
-    EmissionHeightChi2 = -9999.;
-
+    EmissionHeight = EmissionHeight;
+    EmissionHeightChi2 = EmissionHeightChi2;
 }
 
-
-void reconstruct_3tel_images_scaled_variables()
+/*
+ * Calculate mean scaled variables for 3-telescope image
+ *
+*/
+void CData::reconstruct_3tel_images_scaled_variables()
 {
     MSCW = -9999.;
     MSCL = -9999.;
@@ -758,8 +670,11 @@ void reconstruct_3tel_images_scaled_variables()
     MLR = -9999.;
 }
 
+/*
+
 void reconstruct_3tel_images_direction()
 {
+    VDispAnalyzer i_dispAnalyzer;
     Chi2 = -9999.;
 
     Xoff = -9999.;
@@ -793,3 +708,4 @@ void reconstruct_3tel_images_energy()
 
 /*
  * - is applyMeanStereoShapeCuts correct? Loop over ntel?
+ */
