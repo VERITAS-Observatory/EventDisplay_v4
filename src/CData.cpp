@@ -630,6 +630,8 @@ Bool_t CData::Notify()
 void CData::reconstruct_3tel_images(unsigned long int telescope_combination)
 {
     bitset<sizeof(long int) * 4> tel_bitset(telescope_combination);
+    // TODO below is wrong: need to check if those images
+    // are actually available; otherwise discard the event
     NImages = (Int_t)tel_bitset.count();
     ImgSel = telescope_combination;
     unsigned int z = 0;
@@ -644,6 +646,11 @@ void CData::reconstruct_3tel_images(unsigned long int telescope_combination)
             {
                 SizeSecondMax = size[t];
             }
+        }
+        else
+        {
+            MSCWT[t] = -9999.;
+            MSCLT[t] = -9999.;
         }
     }
 
@@ -670,27 +677,35 @@ void CData::reconstruct_3tel_images_scaled_emission_height()
 */
 void CData::reconstruct_3tel_images_scaled_variables()
 {
-    MSCW = -9999.;
-    MSCL = -9999.;
-    MWR = -9999.;
-    MLR = -9999.;
+    MSCW = VMeanScaledVariables::mean_reduced_scaled_variable(4, width, MSCWT, MSCWTSigma );
+    MSCL = VMeanScaledVariables::mean_reduced_scaled_variable(4, length, MSCLT, MSCLTSigma );
+    MWR = VMeanScaledVariables::mean_scaled_variable(4, width, size, MSCWT );
+    MLR = VMeanScaledVariables::mean_scaled_variable(4, length, size, MSCLT );
 }
-
-/*
 
 void reconstruct_3tel_images_direction()
 {
-    VDispAnalyzer i_dispAnalyzer;
-    Chi2 = -9999.;
+    vector< float > v_x;
+    vector< float > v_y;
+    vector< float > v_weight;
+    float xs;
+    float ys;
+    float dispdiff;
 
-    Xoff = -9999.;
-    Yoff = -9999.;
-    Xoff_derot = -9999.;
-    Yoff_derot = -9999.;
+    VDispAnalyzer i_dispAnalyzer;
+    i_dispAnalyzer->calculateMeanShowerDirection(v_x, v_y, v_weigth, xs, ys, dispdiff, v_x.size() );
+    Xoff = xs;
+    Yoff = ys;
+    DispAbsSumWeigth = i_dispAnalyzer->get_abs_sum_disp_weight();  // (!) needs to be checked; fdisp_sum_abs_weigth
+    DispDiff = fDispAnalyzerDirection->getDispDiff();
+    Chi2 = DispDiff;
+    fimg2_ang = fDispAnalyzerDirection->getAngDiff();
+    // expect that this is called for MC only
+    Xoff_derot = Xoff;
+    Yoff_derot = Yoff;
+
     Xoff_intersect = -9999.;
     Yoff_intersect = -9999.;
-    DispAbsSumWeigth = -9999.;
-    DispDiff = -9999.;
 
     Ze = Ze;
 
@@ -698,6 +713,9 @@ void reconstruct_3tel_images_direction()
     Ycore = -9999.;
     // R_core[t]
 }
+
+/*
+
 
 void reconstruct_3tel_images_energy()
 {
@@ -714,4 +732,5 @@ void reconstruct_3tel_images_energy()
 
 /*
  * - is applyMeanStereoShapeCuts correct? Loop over ntel?
+ * - remove arraydispdiff? Only parameter which requires Xoff_intersect
  */

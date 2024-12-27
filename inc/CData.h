@@ -7,6 +7,7 @@
 #include <TFile.h>
 
 #include "VGlobalRunParameter.h"
+#include "VMeanScaledVariables.h"
 #include "VDispAnalyzer.h"
 
 #include <bitset>

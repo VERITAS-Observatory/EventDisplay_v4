@@ -502,7 +502,7 @@ EFFOBJECT =	./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o
 		./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 		./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
 		./obj/VDispAnalyzer.o ./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o ./obj/VDispTableAnalyzer.o \
-		./obj/VTMVADispAnalyzer.o \
+		./obj/VTMVADispAnalyzer.o ./obj/VMeanScaledVariables.o \
 		./obj/makeEffectiveArea.o
 
 ifeq ($(ASTRONMETRY),-DASTROSLALIB)
