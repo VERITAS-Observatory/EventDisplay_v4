@@ -37,10 +37,6 @@ void VTMVAEvaluator::reset()
     fDispDiff_log10 = 0.;
     fDispAbsSumWeigth = 0.;
     fDummy = 0.;
-    for( int i = 0; i < VDST_MAXTELESCOPES; i++ )
-    {
-        fImages_Ttype[i] = 0.;
-    }
 
     setTMVACutValue();
     setSignalEfficiency();
@@ -468,19 +464,6 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
             {
                 fTMVAData[b]->fTMVAReader->AddVariable( "DispAbsSumWeigth", &fDispAbsSumWeigth );
             }
-            // Note: assume not more then 3 different telescope types
-            else if( iTrainingVariables[t] == "NImages_Ttype[0]" && !iVariableIsASpectator[t] )
-            {
-                fTMVAData[b]->fTMVAReader->AddVariable( "NImages_Ttype[0]", &fImages_Ttype[0] );
-            }
-            else if( iTrainingVariables[t] == "NImages_Ttype[1]" && !iVariableIsASpectator[t] )
-            {
-                fTMVAData[b]->fTMVAReader->AddVariable( "NImages_Ttype[1]", &fImages_Ttype[1] );
-            }
-            else if( iTrainingVariables[t] == "NImages_Ttype[2]" && !iVariableIsASpectator[t] )
-            {
-                fTMVAData[b]->fTMVAReader->AddVariable( "NImages_Ttype[2]", &fImages_Ttype[2] );
-            }
             else if( iVariableIsASpectator[t] )
             {
                 fTMVAData[b]->fTMVAReader->AddSpectator( iTrainingVariables[t].c_str(), &fDummy );
@@ -736,13 +719,6 @@ bool VTMVAEvaluator::evaluate( bool interpolate_mva, bool use_average_zenith_ang
             fDispDiff_log10 = 0.;    // !!! not clear what the best value is
         }
         fDispAbsSumWeigth = fData->DispAbsSumWeigth;
-        if( fData->NTtype < VDST_MAXTELESCOPES )
-        {
-            for( int i = 0; i < fData->NTtype; i++ )
-            {
-                fImages_Ttype[i] = ( float )fData->NImages_Ttype[i];
-            }
-        }
     }
     else
     {
