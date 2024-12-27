@@ -736,6 +736,8 @@ void CData::reconstruct_3tel_images()
     //    reconstruct_3tel_images_energy();
     VDispAnalyzer i_dispAnalyzer;
     NImages = 3;
+    // ImgSel_list
+    // ImgSel
     SizeSecondMax = 0.;
 }
 /*
@@ -758,20 +760,36 @@ void reconstruct_3tel_images_scaled_variables()
 
 void reconstruct_3tel_images_direction()
 {
+    Chi2 = -9999.;
+
     Xoff = -9999.;
     Yoff = -9999.;
     Xoff_derot = -9999.;
     Yoff_derot = -9999.;
+    Xoff_intersect = -9999.;
+    Yoff_intersect = -9999.;
     DispAbsSumWeigth = -9999.;
+    DispDiff = -9999.;
+
+    Ze = Ze;
 
     Xcore = -9999.;
-    Xcore+Ycore = -9999.;
+    Ycore = -9999.;
+    // R_core[t]
 }
 
 void reconstruct_3tel_images_energy()
 {
     ErecS = -9999.;
     EChi2S = EChi2S
+    dES = dES;
+
+    Erec // (?)
+    EChi2 // (?)
+    dE // (?)
 }
 
 */
+
+/*
+ * - is applyMeanStereoShapeCuts correct? Loop over ntel?
