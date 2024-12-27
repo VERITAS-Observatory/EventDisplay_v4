@@ -383,14 +383,18 @@ void CData::Init( TTree* tree )
     if(!fShort )
     {
         fChain->SetBranchAddress( "MSCWT", MSCWT );
+        fChain->SetBranchAddress( "MSCWTSigma", MSCWTSigma );
         fChain->SetBranchAddress( "MSCLT", MSCLT );
+        fChain->SetBranchAddress( "MSCLTSigma", MSCLTSigma );
     }
     else
     {
         for( int i = 0; i < VDST_MAXTELESCOPES; i++ )
         {
             MSCWT[i] = 0.;
+            MSCWTSigma[i] = 0.;
             MSCLT[i] = 0.;
+            MSCLTSigma[i] = 0.;
         }
     }
     if(!fShort )
@@ -562,7 +566,9 @@ Bool_t CData::Notify()
     b_tchisq_x = fChain->GetBranch( "tchisq_x" );
     b_R_core = fChain->GetBranch( "R_core" );
     b_MSCWT = fChain->GetBranch( "MSCWT" );
+    b_MSCWTSigma = fChain->GetBranch( "MSCWTSigma" );
     b_MSCLT = fChain->GetBranch( "MSCLT" );
+    b_MSCLTSigma = fChain->GetBranch( "MSCLTSigma" );
     b_E = fChain->GetBranch( "E" );
     b_ES = fChain->GetBranch( "ES" );
     b_NMSCW = fChain->GetBranch( "NMSCW" );

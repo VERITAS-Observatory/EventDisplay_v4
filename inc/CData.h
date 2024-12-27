@@ -117,7 +117,9 @@ class CData
         Float_t         Disp_T[VDST_MAXTELESCOPES];
         Float_t         R_core[VDST_MAXTELESCOPES];
         Float_t         MSCWT[VDST_MAXTELESCOPES];
+        Float_t         MSCWTSigma[VDST_MAXTELESCOPES];
         Float_t         MSCLT[VDST_MAXTELESCOPES];
+        Float_t         MSCLTSigma[VDST_MAXTELESCOPES];
         Float_t         E[VDST_MAXTELESCOPES];
         Float_t         ES[VDST_MAXTELESCOPES];
         Int_t           NMSCW;
@@ -217,7 +219,9 @@ class CData
         TBranch*        b_tchisq_x;               //!
         TBranch*        b_R_core;                 //!
         TBranch*        b_MSCWT;                  //!
+        TBranch*        b_MSCWTSigma;             //!
         TBranch*        b_MSCLT;                  //!
+        TBranch*        b_MSCLTSigma;             //!
         TBranch*        b_E;                      //!
         TBranch*        b_ES;                     //!
         TBranch*        b_NMSCW;                  //!

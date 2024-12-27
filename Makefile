@@ -355,6 +355,7 @@ MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o \
 		./obj/VStatistics_Dict.o \
 		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
 		./obj/VSimpleStereoReconstructor.o \
+		./obj/VMeanScaledVariables.o \
 		./obj/VGrIsuAnalyzer.o \
 		./obj/VDispAnalyzer.o \
 		./obj/VDispTableReader.o \
