@@ -1,9 +1,4 @@
-//////////////////////////////////////////////////////////
-// This class has been automatically generated on
-// Fri Sep 22 23:32:42 2006 by ROOT version 5.06/00
-// from TTree data/MSWC and energy lookup results
-// found on file: 31391.mscw.root
-//////////////////////////////////////////////////////////
+// Reading of 'data' tree for mscw_energy output.
 
 #ifndef CData_h
 #define CData_h
@@ -30,10 +25,9 @@ class CData
 
         bool            fShort;
         int             fVersion;
-        TTree*          fChain;                   //!pointer to the analyzed TTree or TChain
-        Int_t           fCurrent;                 //!current Tree number in a TChain
+        TTree*          fChain;
+        Int_t           fCurrent;
 
-        // Declaration of leave types
         Int_t           runNumber;
         Int_t           eventNumber;
         Int_t           MJD;
@@ -45,7 +39,7 @@ class CData
         Float_t         ArrayPointing_Elevation;
         Float_t         ArrayPointing_Azimuth;
         UInt_t          Array_PointingStatus;
-        // MC parameters
+
         Int_t           MCprimary;
         Double_t        MCe0;
         Double_t        MCxcore;
@@ -137,14 +131,12 @@ class CData
         Float_t         EmissionHeight;
         Float_t         EmissionHeightChi2;
         UInt_t          NTelPairs;
-        //[NTelPairs]
         Float_t         EmissionHeightT[VDST_MAXTELESCOPES * VDST_MAXTELESCOPES];
         Double_t        DispDiff;  // from disp method
         Float_t         DispAbsSumWeigth;
         Float_t         Xoff_intersect;
         Float_t         Yoff_intersect;
 
-        // List of branches
         TBranch*        b_runNumber;              //!
         TBranch*        b_eventNumber;            //!
         TBranch*        b_MJD;                    //!

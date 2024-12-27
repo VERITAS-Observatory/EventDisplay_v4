@@ -1,6 +1,13 @@
+/*
+ * Reading of 'data' tree from mscw_energy output
+ *
+ * Allows a simplified 3-telescope reconstruction for
+ * 4-telescope data (for MC data and for effective area
+ * calculation only)
+ *
+ */
 
 #include "CData.h"
-
 
 CData::CData( TTree* tree, bool bMC, int iVersion, bool bShort )
 {
@@ -147,8 +154,8 @@ void CData::Init( TTree* tree )
             TelRA[i] = 0.;
         }
     }
-    fChain->SetBranchAddress( "ArrayPointing_Azimuth", &ArrayPointing_Azimuth);
-    fChain->SetBranchAddress( "ArrayPointing_Elevation", &ArrayPointing_Elevation);
+    fChain->SetBranchAddress( "ArrayPointing_Azimuth", &ArrayPointing_Azimuth );
+    fChain->SetBranchAddress( "ArrayPointing_Elevation", &ArrayPointing_Elevation );
     if( fChain->GetBranchStatus( "Array_PointingStatus" ) )
     {
         fChain->SetBranchAddress( "Array_PointingStatus", &Array_PointingStatus );
@@ -723,10 +730,10 @@ Bool_t CData::Notify()
  */
 void CData::reconstruct_3tel_images()
 {
-//    reconstruct_3tel_images_scaled_variables();
-//    reconstruct_3tel_images_scaled_emission_height();
-//    reconstruct_3tel_images_direction();
-//    reconstruct_3tel_images_energy();
+    //    reconstruct_3tel_images_scaled_variables();
+    //    reconstruct_3tel_images_scaled_emission_height();
+    //    reconstruct_3tel_images_direction();
+    //    reconstruct_3tel_images_energy();
     VDispAnalyzer i_dispAnalyzer;
     NImages = 3;
     SizeSecondMax = 0.;
