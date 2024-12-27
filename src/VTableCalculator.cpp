@@ -540,7 +540,7 @@ Energy calculation:
 return value is energy (linear scale)
 
 */
-double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double* mt, double& chi2, double& dE, double* st )
+double VTableCalculator::calc( int ntel, float* r, float* s, float* w, double* mt, double& chi2, double& dE, double* st )
 {
     int tel = 0;
 

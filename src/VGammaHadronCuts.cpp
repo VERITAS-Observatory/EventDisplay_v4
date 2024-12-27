@@ -1157,13 +1157,13 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
             continue;
         }
 
-        if( fData->R[fData->ImgSel_list[i]] > 0. )
+        if( fData->R_core[fData->ImgSel_list[i]] > 0. )
         {
-            iR += fData->R[fData->ImgSel_list[i]];
+            iR += fData->R_core[fData->ImgSel_list[i]];
             iNTR++;
-            if( fData->R[fData->ImgSel_list[i]] < iR_min )
+            if( fData->R_core[fData->ImgSel_list[i]] < iR_min )
             {
-                iR_min = fData->R[fData->ImgSel_list[i]];
+                iR_min = fData->R_core[fData->ImgSel_list[i]];
             }
         }
     }

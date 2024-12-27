@@ -24,7 +24,6 @@ class CData
     public :
 
         bool            fMC;
-        bool            fBOOLtheta2_All;
         bool            fBOOLteltype;
         bool            fBOOLdE;
 
@@ -78,7 +77,7 @@ class CData
         Double_t        Xoff_derot;
         Double_t        Yoff_derot;
         Double_t        stdS;
-        Double_t        theta2;
+        Float_t        theta2;
         Double_t        Xcore;
         Double_t        Ycore;
         Double_t        Xcore_SC;
@@ -87,54 +86,53 @@ class CData
         Double_t        Chi2;
         Float_t         meanPedvar_Image;
         Float_t         meanPedvar_ImageT[VDST_MAXTELESCOPES];
-        Double_t        dist[VDST_MAXTELESCOPES];
-        Double_t        size[VDST_MAXTELESCOPES];
-        Double_t        fraclow[VDST_MAXTELESCOPES];
-        Double_t        loss[VDST_MAXTELESCOPES];
-        Double_t        max1[VDST_MAXTELESCOPES];
-        Double_t        max2[VDST_MAXTELESCOPES];
-        Double_t        max3[VDST_MAXTELESCOPES];
+        Float_t         dist[VDST_MAXTELESCOPES];
+        Float_t         size[VDST_MAXTELESCOPES];
+        Float_t         fraclow[VDST_MAXTELESCOPES];
+        Float_t         loss[VDST_MAXTELESCOPES];
+        Float_t         max1[VDST_MAXTELESCOPES];
+        Float_t         max2[VDST_MAXTELESCOPES];
+        Float_t         max3[VDST_MAXTELESCOPES];
         Int_t           maxindex1[VDST_MAXTELESCOPES];
         Int_t           maxindex2[VDST_MAXTELESCOPES];
         Int_t           maxindex3[VDST_MAXTELESCOPES];
-        Double_t        width[VDST_MAXTELESCOPES];
-        Double_t        length[VDST_MAXTELESCOPES];
+        Float_t         width[VDST_MAXTELESCOPES];
+        Float_t         length[VDST_MAXTELESCOPES];
         Int_t           ntubes[VDST_MAXTELESCOPES];
         Int_t           ntubesBNI[VDST_MAXTELESCOPES];
         UShort_t        nsat[VDST_MAXTELESCOPES];
         UShort_t        nlowgain[VDST_MAXTELESCOPES];
-        Double_t        alpha[VDST_MAXTELESCOPES];
-        Double_t        los[VDST_MAXTELESCOPES];
-        Double_t        asym[VDST_MAXTELESCOPES];
-        Double_t        cen_x[VDST_MAXTELESCOPES];
-        Double_t        cen_y[VDST_MAXTELESCOPES];
-        Double_t        cosphi[VDST_MAXTELESCOPES];
-        Double_t        sinphi[VDST_MAXTELESCOPES];
-        Double_t        tgrad_x[VDST_MAXTELESCOPES];
-        Double_t        tchisq_x[VDST_MAXTELESCOPES];
+        Float_t         alpha[VDST_MAXTELESCOPES];
+        Float_t         los[VDST_MAXTELESCOPES];
+        Float_t         asym[VDST_MAXTELESCOPES];
+        Float_t         cen_x[VDST_MAXTELESCOPES];
+        Float_t         cen_y[VDST_MAXTELESCOPES];
+        Float_t         cosphi[VDST_MAXTELESCOPES];
+        Float_t         sinphi[VDST_MAXTELESCOPES];
+        Float_t         tgrad_x[VDST_MAXTELESCOPES];
+        Float_t         tchisq_x[VDST_MAXTELESCOPES];
         Int_t           Fitstat[VDST_MAXTELESCOPES];
         Float_t         DispXoff_T[VDST_MAXTELESCOPES];
         Float_t         DispYoff_T[VDST_MAXTELESCOPES];
         Float_t         DispWoff_T[VDST_MAXTELESCOPES];
         Float_t         Disp_T[VDST_MAXTELESCOPES];
-        Double_t        R[VDST_MAXTELESCOPES];
-        Double_t        MSCWT[VDST_MAXTELESCOPES];
-        Double_t        MSCLT[VDST_MAXTELESCOPES];
-        Double_t        E[VDST_MAXTELESCOPES];
-        Double_t        ES[VDST_MAXTELESCOPES];
+        Float_t         R_core[VDST_MAXTELESCOPES];
+        Float_t         MSCWT[VDST_MAXTELESCOPES];
+        Float_t         MSCLT[VDST_MAXTELESCOPES];
+        Float_t         E[VDST_MAXTELESCOPES];
+        Float_t         ES[VDST_MAXTELESCOPES];
         Int_t           NMSCW;
-        Double_t        MSCW;
-        Double_t        MSCL;
+        Float_t         MSCW;
+        Float_t         MSCL;
         Float_t         MWR;
         Float_t         MLR;
-        Double_t        Erec;
-        Double_t        EChi2;
-        Double_t        dE;        // Error on Erec
-        Double_t        ErecS;
-        Double_t        EChi2S;
-        Double_t        dES;       // Error on ErecS
+        Float_t         Erec;
+        Float_t         EChi2;
+        Float_t         dE;        // Error on Erec
+        Float_t         ErecS;
+        Float_t         EChi2S;
+        Float_t         dES;       // Error on ErecS
         Double_t        SizeSecondMax;
-        Double_t        theta2_All[25];
         Float_t         EmissionHeight;
         Float_t         EmissionHeightChi2;
         UInt_t          NTelPairs;
@@ -220,7 +218,7 @@ class CData
         TBranch*        b_tgrad_x;                //!
         TBranch*        b_Fitstat;                //!
         TBranch*        b_tchisq_x;               //!
-        TBranch*        b_R;                      //!
+        TBranch*        b_R_core;                 //!
         TBranch*        b_MSCWT;                  //!
         TBranch*        b_MSCLT;                  //!
         TBranch*        b_E;                      //!
@@ -235,7 +233,6 @@ class CData
         TBranch*        b_ErecS;                  //!
         TBranch*        b_EChi2S;                 //!
         TBranch*        b_SizeSecondMax;          //!
-        TBranch*        b_theta2_All;             //!
         TBranch*        b_EmissionHeight;         //!
         TBranch*        b_EmissionHeightChi2;     //!
         TBranch*        b_NTelPairs;              //!
@@ -272,7 +269,6 @@ CData::CData( TTree* tree, bool bMC, int iVersion, bool bShort )
     fMC = bMC;
     fShort = bShort;
     fVersion = iVersion;
-    fBOOLtheta2_All = false;
     fBOOLteltype = false;
     fBOOLdE = false;
 
@@ -369,10 +365,6 @@ void CData::Init( TTree* tree )
     if( tree->GetBranchStatus( "MCe0" ) )
     {
         fMC = true;
-    }
-    if( tree->GetBranchStatus( "theta2_All" ) )
-    {
-        fBOOLtheta2_All = true;
     }
     // test if teltype branches exist
     if( tree->GetBranchStatus( "NTtype" ) )
@@ -565,18 +557,6 @@ void CData::Init( TTree* tree )
 
     fChain->SetBranchAddress( "SizeSecondMax", &SizeSecondMax );
 
-    if( fBOOLtheta2_All )
-    {
-        fChain->SetBranchAddress( "theta2_All", &theta2_All );
-    }
-    else
-    {
-        for( unsigned int dex = 0; dex < 25; dex++ )
-        {
-            theta2_All[dex] = 99.0;
-        }
-    }
-
     if( fBOOLteltype )
     {
         fChain->SetBranchAddress( "ImgSel_list", ImgSel_list );
@@ -712,7 +692,7 @@ void CData::Init( TTree* tree )
             tchisq_x[i] = 0.;
         }
     }
-    fChain->SetBranchAddress( "R", R );
+    fChain->SetBranchAddress( "R_core", R_core );
     if(!fShort )
     {
         fChain->SetBranchAddress( "MSCWT", MSCWT );
@@ -908,16 +888,6 @@ Bool_t CData::Notify()
     }
 
     b_SizeSecondMax = fChain->GetBranch( "SizeSecondMax" );
-
-    if( fBOOLtheta2_All )
-    {
-        b_theta2_All = fChain->GetBranch( "theta2_All" );
-    }
-    else
-    {
-        b_theta2_All = 0;
-    }
-
     b_dist = fChain->GetBranch( "dist" );
     b_size = fChain->GetBranch( "size" );
     b_fraclow = fChain->GetBranch( "fraclow" );
@@ -941,7 +911,7 @@ Bool_t CData::Notify()
     b_tgrad_x = fChain->GetBranch( "tgrad_x" );
     b_Fitstat = fChain->GetBranch( "Fitstat" );
     b_tchisq_x = fChain->GetBranch( "tchisq_x" );
-    b_R = fChain->GetBranch( "R" );
+    b_R_core = fChain->GetBranch( "R_core" );
     b_MSCWT = fChain->GetBranch( "MSCWT" );
     b_MSCLT = fChain->GetBranch( "MSCLT" );
     b_E = fChain->GetBranch( "E" );

@@ -181,8 +181,6 @@ class VTableLookupDataHandler
 
     public:
 
-        //  data written to output file
-
         int runNumber;
         int eventNumber;
         int MJD;
@@ -213,7 +211,7 @@ class VTableLookupDataHandler
         int fNTelTypes;
         unsigned int NImages_Ttype[VDST_MAXTELESCOPES];
         double fimg2_ang;
-        double fZe;                               //!< zenith angle
+        double fZe;
         double fAz;
         double fRA;
         double fDec;
@@ -222,79 +220,76 @@ class VTableLookupDataHandler
         double fXoff_derot;
         double fYoff_derot;
         double fstdS;
-        double ftheta2;
+        float ftheta2;
         double fXcore;
         double fYcore;
         double fXcore_SC;
         double fYcore_SC;
         double fstdP;
         double fchi2;                             //!< chi2 from array reconstruction
-        //
-        // {1}
-        double fMCEnergyArray [VDST_MAXTELESCOPES];
+        float  fMCEnergyArray [VDST_MAXTELESCOPES];
         float  fmeanPedvar_ImageT[VDST_MAXTELESCOPES];
         float  fmeanPedvar_Image;
-        double fdist     [VDST_MAXTELESCOPES];
-        double ffui       [VDST_MAXTELESCOPES];
-        double fdist_telType[VDST_MAXTELESCOPES];
-        double fsize     [VDST_MAXTELESCOPES];
-        double fsizeCorr [VDST_MAXTELESCOPES];
-        double fsize_telType[VDST_MAXTELESCOPES];
-        double floss     [VDST_MAXTELESCOPES];
-        double ffracLow  [VDST_MAXTELESCOPES];
-        double fmax1     [VDST_MAXTELESCOPES];
-        double fmax2     [VDST_MAXTELESCOPES];
-        double fmax3     [VDST_MAXTELESCOPES];
+        float  fdist     [VDST_MAXTELESCOPES];
+        float  ffui       [VDST_MAXTELESCOPES];
+        float  fsize     [VDST_MAXTELESCOPES];
+        float  fsizeCorr [VDST_MAXTELESCOPES];
+        float  fsize_telType[VDST_MAXTELESCOPES];
+        float  floss     [VDST_MAXTELESCOPES];
+        float  ffracLow  [VDST_MAXTELESCOPES];
+        float  fmax1     [VDST_MAXTELESCOPES];
+        float  fmax2     [VDST_MAXTELESCOPES];
+        float  fmax3     [VDST_MAXTELESCOPES];
         int    fmaxindex1     [VDST_MAXTELESCOPES];
         int    fmaxindex2     [VDST_MAXTELESCOPES];
         int    fmaxindex3     [VDST_MAXTELESCOPES];
-        double fwidth    [VDST_MAXTELESCOPES];
-        double fwidth_telType[VDST_MAXTELESCOPES];
-        double flength   [VDST_MAXTELESCOPES];
-        double flength_telType[VDST_MAXTELESCOPES];
+        float  fwidth    [VDST_MAXTELESCOPES];
+        float  fwidth_telType[VDST_MAXTELESCOPES];
+        float  flength   [VDST_MAXTELESCOPES];
+        float  flength_telType[VDST_MAXTELESCOPES];
         int    fntubes   [VDST_MAXTELESCOPES];
         unsigned short int fnsat[VDST_MAXTELESCOPES];
         unsigned short int fnlowgain[VDST_MAXTELESCOPES];
-        double falpha    [VDST_MAXTELESCOPES];
-        double flos      [VDST_MAXTELESCOPES];
-        double fasym     [VDST_MAXTELESCOPES];
-        double fcen_x    [VDST_MAXTELESCOPES];
-        double fcen_y    [VDST_MAXTELESCOPES];
-        double fcosphi   [VDST_MAXTELESCOPES];
-        double fsinphi   [VDST_MAXTELESCOPES];
-        double ftgrad_x  [VDST_MAXTELESCOPES];
-        double ftchisq_x [VDST_MAXTELESCOPES];
+        float  falpha    [VDST_MAXTELESCOPES];
+        float  flos      [VDST_MAXTELESCOPES];
+        float  fasym     [VDST_MAXTELESCOPES];
+        float  fcen_x    [VDST_MAXTELESCOPES];
+        float  fcen_y    [VDST_MAXTELESCOPES];
+        float  fcosphi   [VDST_MAXTELESCOPES];
+        float  fsinphi   [VDST_MAXTELESCOPES];
+        float  ftgrad_x  [VDST_MAXTELESCOPES];
+        float  ftchisq_x [VDST_MAXTELESCOPES];
         double fweight   [VDST_MAXTELESCOPES];    //!< always 1.
         double fpointing_dx[VDST_MAXTELESCOPES];
         double fpointing_dy[VDST_MAXTELESCOPES];
         int    fFitstat  [VDST_MAXTELESCOPES];
         // {-1}
-        double fR        [VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core
-        double fRTel        [VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core
-        double fR_telType[VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core (depending on tel type)
-        double fE        [VDST_MAXTELESCOPES];    //!< energy assigned to each telescope (method 0)
-        double fES       [VDST_MAXTELESCOPES];    //!< energy assigned to each telescope (method 1)
+        float  fR_core      [VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core
+        float  fRTel        [VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core
+        float  fR_telType[VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core (depending on tel type)
+        float  fE        [VDST_MAXTELESCOPES];    //!< energy assigned to each telescope (method 0)
+        float  fES       [VDST_MAXTELESCOPES];    //!< energy assigned to each telescope (method 1)
         int    fnenergyT;                         //!< number of images used for the energy calculation
         int    fenergyQL;                         //!< quality label for energy calculation
-        double ftmscw    [VDST_MAXTELESCOPES];    //!< mscw assigned to each telescope
-        double ftmscl    [VDST_MAXTELESCOPES];    //!< mscl assigned to each telescope
+        float  ftmscw    [VDST_MAXTELESCOPES];    //!< mscw assigned to each telescope
+        float  ftmscl    [VDST_MAXTELESCOPES];    //!< mscl assigned to each telescope
         float  ftmscw_sigma[VDST_MAXTELESCOPES];  //!< mscw  sigma  assigned to each telescope
         float  ftmscl_sigma[VDST_MAXTELESCOPES];  //!< mscl  sigma  assigned to each telescope
 
         int    fnmscw;                            //!< number of images used for mscw/mscl/energy calculation
-        double fmscw;                             //!< mean scaled width
-        double fmscl;                             //!< mean scaled length
+        float  fmscw;                             //!< mean scaled width
+        float  fmscl;                             //!< mean scaled length
         float  fmwr;                              //!< mean width ratio
         float  fmlr;                              //!< mean length ratio
-        double fenergy;                           //!< reconstructed primary energy
-        double fechi2;                            //!< chi2 from reconstructed primary energy
-        double fdE;                               //!< dE from reconstructed primary energy
+        float  fenergy;                           //!< reconstructed primary energy
+        float  fechi2;                            //!< chi2 from reconstructed primary energy
+        float  fdE;                               //!< dE from reconstructed primary energy
         float  fesys;                             //!< energy correction
         float  fesysVar;                          //!< energy correction (variance)
         float  fesysDist;                         //!< mean distance to maximum in emission height
-        double fenergyS;                          //!< reconstructed primary energy
-        double fechi2S;                           //!< chi2 from reconstructed primary energy
-        double fdES;                              //!< dE from reconstructed primary energy
+        float  fenergyS;                          //!< reconstructed primary energy
+        float  fechi2S;                           //!< chi2 from reconstructed primary energy
+        float  fdES;                              //!< dE from reconstructed primary energy
 
         // emission height
         unsigned int fNTelPairs;
@@ -304,7 +299,6 @@ class VTableLookupDataHandler
         float  fEmissionHeightT[VDST_MAXTELESCOPES];
 
         double fSizeSecondMax;
-        double ftheta2_All[25];
 
         // disp related variables
         float fXoff_edisp;
@@ -341,20 +335,15 @@ class VTableLookupDataHandler
         {
             return fMethod;
         }
-        double* getDistance()
+        float* getDistanceToCore()
         {
-            return fdist;
+            return fR_core;
         }
-        double* getDistance( ULong64_t iTelType );
-        double* getDistanceToCore()
-        {
-            return fR;
-        }
-        double* getDistanceToCoreTel()
+        float* getDistanceToCoreTel()
         {
             return fRTel;
         }
-        double* getDistanceToCore( ULong64_t iTelType );
+        float * getDistanceToCore( ULong64_t iTelType );
         int    getEventNumber()
         {
             return eventNumber;
@@ -380,7 +369,7 @@ class VTableLookupDataHandler
             return fAz;
         };
         double getMCDistance();
-        double* getMCEnergyArray();
+        float* getMCEnergyArray();
         double getMCEnergy()
         {
             return fMCEnergy;
@@ -389,19 +378,15 @@ class VTableLookupDataHandler
         {
             return sqrt( fMCxoff* fMCxoff + fMCyoff* fMCyoff );
         }
-        double* getE()
-        {
-            return fE;
-        }
         int    getEventCounter()
         {
             return fEventCounter;
         }
-        double* getLength()
+        float* getLength()
         {
             return flength;
         }
-        double* getLength( ULong64_t iTelType );
+        float* getLength( ULong64_t iTelType );
         map<ULong64_t, unsigned int > getList_of_Tel_type()
         {
             return fList_of_Tel_type;
@@ -425,11 +410,11 @@ class VTableLookupDataHandler
         {
             return fntubes;
         }
-        double* getMSCWtel()
+        float* getMSCWtel()
         {
             return ftmscw;
         }
-        double* getMSCLtel()
+        float* getMSCLtel()
         {
             return ftmscl;
         }
@@ -500,17 +485,17 @@ class VTableLookupDataHandler
         {
             return fOutFile;
         }
-        double* getSize( double iSizeCorrection = 1., bool iSelectedImagesOnly = false );
-        double* getSize( double iSizeCorrection, ULong64_t iTelType, bool iSelectedImagesOnly );
+        float* getSize( double iSizeCorrection = 1., bool iSelectedImagesOnly = false );
+        float* getSize( double iSizeCorrection, ULong64_t iTelType, bool iSelectedImagesOnly );
         double* getWeight()
         {
             return fweight;
         }
-        double* getWidth()
+        float* getWidth()
         {
             return fwidth;
         }
-        double* getWidth( ULong64_t iTelType );
+        float* getWidth( ULong64_t iTelType );
         double getMaxTotalTime()
         {
             return fMaxTotalTime;
@@ -526,7 +511,7 @@ class VTableLookupDataHandler
         }
         unsigned int getTelType_arraycounter( unsigned int iTelID );      // return position of tel type for this telescope in array counter
         double getZe();
-        double getTheta2()
+        float getTheta2()
         {
             return ftheta2;
         }
@@ -538,7 +523,7 @@ class VTableLookupDataHandler
         bool readRunParameter();
         void reset();                             //!< reset a few output variables
         void resetAll();
-        void setChi2( double iChi2, bool iTableErecS = true )
+        void setChi2( float iChi2, bool iTableErecS = true )
         {
             if( iTableErecS )
             {
@@ -549,7 +534,7 @@ class VTableLookupDataHandler
                 fechi2 = iChi2;
             }
         }
-        void setdE( double idE, bool iTableErecS = true )
+        void setdE( float idE, bool iTableErecS = true )
         {
             if( iTableErecS )
             {
@@ -560,12 +545,7 @@ class VTableLookupDataHandler
                 fdE = idE;
             }
         }
-        //!< no check of boundaries!!
-        void setDistanceToCore( int itel, double iR )
-        {
-            fR[itel] = iR;
-        }
-        void setEnergy( double iE, bool iTableErecS = true )
+        void setEnergy( float iE, bool iTableErecS = true )
         {
             if( iTableErecS )
             {
@@ -576,7 +556,7 @@ class VTableLookupDataHandler
                 fenergy = iE;
             }
         }
-        void setEnergyT( int i, double iET, bool iTableErecS = true )
+        void setEnergyT( int i, float iET, bool iTableErecS = true )
         {
             if( iTableErecS )
             {
@@ -605,11 +585,11 @@ class VTableLookupDataHandler
             fSpectralIndex = iB;
         }
         void setMethod( int );                    //!< data from which evndisp reconstruction method should be used?
-        void setMSCL( double iMSLC )
+        void setMSCL( float iMSLC )
         {
             fmscl = iMSLC;
         }
-        void setMSCLT( int i, double iMSLC, float iMSLC_T = -99. )
+        void setMSCLT( int i, float iMSLC, float iMSLC_T = -99. )
         {
             ftmscl[i] = iMSLC;
             ftmscl_sigma[i] = iMSLC_T;
@@ -626,11 +606,11 @@ class VTableLookupDataHandler
         {
             fnmscw = in;
         }
-        void setMSCW( double iMSWC )
+        void setMSCW( float iMSWC )
         {
             fmscw = iMSWC;
         }
-        void setMSCWT( int i, double iMSWC, float iMSWC_T = -99. )
+        void setMSCWT( int i, float iMSWC, float iMSWC_T = -99. )
         {
             ftmscw[i] = iMSWC;
             ftmscw_sigma[i] = iMSWC_T;
@@ -654,6 +634,6 @@ class VTableLookupDataHandler
             fDebug = iD;
         }
         bool setOutputFile( string, string, string );
-        bool terminate( TNamed* );                //!< write everything to disk
+        bool terminate( TNamed* );
 };
 #endif

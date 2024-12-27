@@ -28,8 +28,6 @@ VDispAnalyzer::VDispAnalyzer()
     fdisp_energy = -9999.;
     fdisp_energy_chi = -9999.;
     fdisp_energy_dEs = -9999.;
-    fdisp_energy_median = -9999.;
-    fdisp_energy_medianAbsoluteError = -9999.;
     fdisp_energy_NT = 0;
     fdisp_energyQL = -1;
     fdisp_sum_abs_weigth = 0.;
@@ -363,7 +361,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
     }
     calculateMeanShowerDirection( fdisp_xs_T, fdisp_ys_T, v_weight, xs, ys, dispdiff, fdisp_xs_T.size() );
 
-    // apply a completely necessary sign flip
+    // apply sign flip
     if( ys > -9998. )
     {
         ys *= -1.;
@@ -372,10 +370,6 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 
 /*
  * calculate average shower directions from a vector of disp direction
- *
- * use given weights
- *
- * (internal function)
  *
 */
 void VDispAnalyzer::calculateMeanShowerDirection(
@@ -443,23 +437,23 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
         float iArrayElevation,
         float iArrayAzimuth,
         ULong64_t* iTelType,
-        double* img_size,
-        double* img_cen_x,
-        double* img_cen_y,
-        double* img_cosphi,
-        double* img_sinphi,
-        double* img_width,
-        double* img_length,
-        double* img_asym,
-        double* img_tgrad,
-        double* img_loss,
+        float* img_size,
+        float* img_cen_x,
+        float* img_cen_y,
+        float* img_cosphi,
+        float* img_sinphi,
+        float* img_width,
+        float* img_length,
+        float* img_asym,
+        float* img_tgrad,
+        float* img_loss,
         int* img_ntubes,
         double* img_weight,
         double xoff_4,
         double yoff_4,
         vector< float >& dispErrorT,
         vector< float >& dispSignT,
-        double* img_fui,
+        float* img_fui,
         float* img_pedvar,
         double* pointing_dx,
         double* pointing_dy,
@@ -591,21 +585,21 @@ vector< float > VDispAnalyzer::calculateExpectedDirectionError_or_Sign( unsigned
         float iArrayElevation,
         float iArrayAzimuth,
         ULong64_t* iTelType,
-        double* img_size,
-        double* img_cen_x,
-        double* img_cen_y,
-        double* img_cosphi,
-        double* img_sinphi,
-        double* img_width,
-        double* img_length,
-        double* img_asym,
-        double* img_tgrad,
-        double* img_loss,
+        float* img_size,
+        float* img_cen_x,
+        float* img_cen_y,
+        float* img_cosphi,
+        float* img_sinphi,
+        float* img_width,
+        float* img_length,
+        float* img_asym,
+        float* img_tgrad,
+        float* img_loss,
         int* img_ntubes,
         double* img_weight,
         double xoff_4,
         double yoff_4,
-        double* img_fui,
+        float* img_fui,
         float* img_pedvar,
         int* img_fitstat )
 {
@@ -700,24 +694,24 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
                                        float iArrayElevation,
                                        float iArrayAzimuth,
                                        ULong64_t* iTelType,
-                                       double* img_size,
-                                       double* img_cen_x,
-                                       double* img_cen_y,
-                                       double* img_cosphi,
-                                       double* img_sinphi,
-                                       double* img_width,
-                                       double* img_length,
-                                       double* img_asym,
-                                       double* img_tgrad,
-                                       double* img_loss,
+                                       float* img_size,
+                                       float* img_cen_x,
+                                       float* img_cen_y,
+                                       float* img_cosphi,
+                                       float* img_sinphi,
+                                       float* img_width,
+                                       float* img_length,
+                                       float* img_asym,
+                                       float* img_tgrad,
+                                       float* img_loss,
                                        int* img_ntubes,
                                        double* img_weight,
                                        double xoff_4,
                                        double yoff_4,
-                                       double* iRcore,
-                                       double iEHeight,
+                                       float* iRcore,
+                                       float iEHeight,
                                        double iMCEnergy,
-                                       double* img_fui,
+                                       float* img_fui,
                                        float* img_pedvar,
                                        int* img_fitstat )
 {
@@ -820,23 +814,14 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
         }
     }
 
-    // Occasionally one energy is significantly off and distorts the mean.
-    // therefore: get rid of N (3) sigma outliers
-    // use robust statistics (median and median absolute error)
-    fdisp_energy_median = TMath::Median( energy_tel.size(), &energy_tel[0] );
-    fdisp_energy_medianAbsoluteError = VStatistics::getMedianAbsoluteError( energy_tel, fdisp_energy_median );
     double w = 0.;
     unsigned int n2 = 0;
     fdisp_energy = 0.;
     for( unsigned int j = 0; j < energy_tel.size(); j++ )
     {
-        if( energy_tel.size() < 5
-                || TMath::Abs( energy_tel[j] - fdisp_energy_median ) < fdisp_energy_medianAbsoluteError * 3. )
-        {
-            fdisp_energy += energy_tel[j] * energy_weight[j];
-            w += energy_weight[j];
-            n2++;
-        }
+        fdisp_energy += energy_tel[j] * energy_weight[j];
+        w += energy_weight[j];
+        n2++;
     }
 
     fdisp_energy_NT = n2;
@@ -904,16 +889,6 @@ float VDispAnalyzer::getEnergyChi2()
 float VDispAnalyzer::getEnergydES()
 {
     return fdisp_energy_dEs;
-}
-
-float VDispAnalyzer::getEnergyMedian()
-{
-    return fdisp_energy_median;
-}
-
-float VDispAnalyzer::getEnergyMedianAbsoluteError()
-{
-    return fdisp_energy_medianAbsoluteError;
 }
 
 float VDispAnalyzer::getEnergyT( unsigned int iTelescopeNumber )

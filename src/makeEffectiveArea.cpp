@@ -310,7 +310,6 @@ int main( int argc, char* argv[] )
                 {
                     for( unsigned int i = 0; i < fRunPara->fAzMin.size(); i++ )
                     {
-                        //cout << "copy/setAngularResolution (" << f << " " << i << ")" << endl;
                         fEffectiveAreaCalculator.setAngularResolutionGraph( i,
                             f_IRF[f]->getAngularResolutionGraph( i, 0 ),
                             false );
@@ -353,14 +352,6 @@ int main( int argc, char* argv[] )
         {
             fEffectiveAreaCalculator.getHistogramhEmc()->Write();
         }
-
-        if( fRunPara->fgetXoff_Yoff_afterCut && fEffectiveAreaCalculator.getAcceptance_AfterCuts() )
-        {
-            cout << "writing acceptance tree (" << fEffectiveAreaCalculator.getAcceptance_AfterCuts()->GetName() << ") to " << fOutputfile->GetName() << endl;
-            fOutputfile->cd();
-            fEffectiveAreaCalculator.getAcceptance_AfterCuts()->Write();
-        }
-
     }
     for( unsigned int i = 0; i < f_IRF_Name.size(); i++ )
     {

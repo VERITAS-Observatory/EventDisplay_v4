@@ -523,11 +523,6 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 
             // theta2 ---
             fMap->calculateTheta2( fIsOn, i_xderot, i_yderot );
-            // theta2 values for debugging
-            for( unsigned int dex = 0; dex < 25; dex++ )
-            {
-                fDataRun->theta2_All[dex] = fMap->getTheta2_All()[dex];
-            }
 
             for( unsigned int t = 0; t < fMap->getTheta2_length(); t++ )
             {
@@ -2050,14 +2045,14 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
     fTreeSelectedEvents->Branch( "Yoff_derot", &fTreeSelected_Yoff_derot, "Yoff_derot/D" );
     fTreeSelectedEvents->Branch( "Xcore", &fTreeSelected_Xcore, "Xcore/D" );
     fTreeSelectedEvents->Branch( "Ycore", &fTreeSelected_Ycore, "Ycore/D" );
-    fTreeSelectedEvents->Branch( "MSCW", &fTreeSelected_MSCW, "MSCW/D" );
-    fTreeSelectedEvents->Branch( "MSCL", &fTreeSelected_MSCL, "MSCL/D" );
+    fTreeSelectedEvents->Branch( "MSCW", &fTreeSelected_MSCW, "MSCW/F" );
+    fTreeSelectedEvents->Branch( "MSCL", &fTreeSelected_MSCL, "MSCL/F" );
     fTreeSelectedEvents->Branch( "MWR", &fTreeSelected_MWR, "MWR/D" );
     fTreeSelectedEvents->Branch( "MLR", &fTreeSelected_MLR, "MLR/D" );
-    fTreeSelectedEvents->Branch( "Erec", &fTreeSelected_Erec, "Erec/D" );
-    fTreeSelectedEvents->Branch( "EChi2", &fTreeSelected_EChi2, "EChi2/D" );
-    fTreeSelectedEvents->Branch( "ErecS", &fTreeSelected_ErecS, "ErecS/D" );
-    fTreeSelectedEvents->Branch( "EChi2S", &fTreeSelected_EChi2S, "EChi2S/D" );
+    fTreeSelectedEvents->Branch( "Erec", &fTreeSelected_Erec, "Erec/F" );
+    fTreeSelectedEvents->Branch( "EChi2", &fTreeSelected_EChi2, "EChi2/F" );
+    fTreeSelectedEvents->Branch( "ErecS", &fTreeSelected_ErecS, "ErecS/F" );
+    fTreeSelectedEvents->Branch( "EChi2S", &fTreeSelected_EChi2S, "EChi2S/F" );
     fTreeSelectedEvents->Branch( "EmissionHeight", &fTreeSelected_EmissionHeight, "EmissionHeight/F" );
     fTreeSelectedEvents->Branch( "EmissionHeightChi2", &fTreeSelected_EmissionHeightChi2, "EmissionHeightChi2/F" );
     fTreeSelectedEvents->Branch( "SizeSecondMax", &fTreeSelected_SizeSecondMax, "SizeSecondMax/D" );
