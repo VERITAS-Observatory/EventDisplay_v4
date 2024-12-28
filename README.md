@@ -16,8 +16,7 @@ This repository contains the Eventdisplay version used for VERITAS analysis (see
 * License: [LICENSE](LICENSE)
 * Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
 
-In case Eventdisplay is used in a research project, please cite this repository using the [Zenodo entry](https://zenodo.org/badge/latestdoi/221041866) and
-the following publication:
+In case Eventdisplay is used in a research project, please cite this repository using the [Zenodo entry](https://zenodo.org/badge/latestdoi/221041866) and the following publication:
 
 ```text
 Maier, G.; Holder, J., Eventdisplay: An Analysis and Reconstruction Package for
@@ -71,7 +70,7 @@ Extensive documentation on how to use Eventdisplay are available through the [VE
 * VERITAS internal [ELOG](http://veritas.sao.arizona.edu/private/elog/Eventdisplay-WG/) used for announcements, discussions, questions
 * Bugs and issues should be reported through the [GitHub issue tracker](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues)
 
-For any questions, contact Gernot Maier
+For any questions, contact Gernot Maier.
 
 ## Development
 
