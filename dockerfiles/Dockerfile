@@ -2,7 +2,7 @@ ARG ROOT_VERSION=6.30.02-alma9
 FROM rootproject/root:${ROOT_VERSION} AS build
 ARG VBF_VERSION=0.3.4
 ARG BUILD_BRANCH=main
-ARG NUM_CORES=2
+ARG NUM_CORES=4
 
 RUN dnf install -y diffutils && dnf clean all
 
