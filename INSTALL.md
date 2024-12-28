@@ -1,4 +1,4 @@
-#  INSTALLATION
+# INSTALLATION
 
 Eventdisplay is a C++ based library and designed to run in typical Linux environments. It has not been tested on MacOS (use Docker containers in this instance).
 
@@ -8,19 +8,19 @@ Eventdisplay is a C++ based library and designed to run in typical Linux environ
 
 CERN's [ROOT](https://root.cern.ch/) library for I/O, histogramming, and statistical applications:
 
-- ROOT versions >= 6.28
-- the first-stage tool `evndisp` requires ROOT compiled with mysql for access to the VERITAS database. Pre-compiled version of ROOT (downloaded from [here](https://root.cern/install/)) have mysql installed. If building from source, ensure the mysql dependencies are installed and compiler flags are added (see [root installation page](https://root.cern/install/build_from_source/)). All other stages of Eventdisplay do not required mysql - meaning e.g., the conda-based installation of Eventdisplay is fine.
-- paths for ROOT should be set through e.g.,
+* ROOT versions >= 6.28
+* the first-stage tool `evndisp` requires ROOT compiled with mysql for access to the VERITAS database. Pre-compiled version of ROOT (downloaded from [here](https://root.cern/install/)) have mysql installed. If building from source, ensure the mysql dependencies are installed and compiler flags are added (see [root installation page](https://root.cern/install/build_from_source/)). All other stages of Eventdisplay do not required mysql - meaning e.g., the conda-based installation of Eventdisplay is fine.
+* paths for ROOT should be set through e.g.,
 
-```
+```console
 export ROOTSYS=<Path to ROOT installation>/root/
 cd $ROOTSYS
 source ./bin/thisroot.sh
 ```
 
-- test your ROOT installation using the `root-config` tool, which should be accessible from any directory (through the `PATH` variable) if the system is setup correctly:
+Test your ROOT installation using the `root-config` tool, which should be accessible from any directory (through the `PATH` variable) if the system is setup correctly:
 
-```
+```console
 root-config --version
 root-config --has-mysql
 ```
@@ -31,7 +31,7 @@ root-config --has-mysql
 
 Download and install using this script in the $EVNDISPSYS directory:
 
-```
+```console
 ./install_sofa.sh
 ```
 
@@ -41,9 +41,9 @@ Set the following environmental variable: `SOFASYS=$EVNDISPSYS/sofa`
 
 The first-stage tool `evndisp` requires the [VBF](https://github.com/VERITAS-Observatory/VBF) (VERITAS bank format) library to read VERITAS raw data files.
 
-- use VBF version VBF >= 0.3.4
-- https://github.com/VERITAS-Observatory/VBF/releases/tag/0.3.4-1-c%2B%2B17 for newer Linux systems C++17 support
-- https://github.com/VERITAS-Observatory/VBF/releases/tag/0.3.4-1 for all other systems
+* use VBF version VBF >= 0.3.4
+* https://github.com/VERITAS-Observatory/VBF/releases/tag/0.3.4-1-c%2B%2B17 for newer Linux systems C++17 support
+* https://github.com/VERITAS-Observatory/VBF/releases/tag/0.3.4-1 for all other systems
 
 Simple installation instructions are found in `VBF/README`. To install in a local directory instead of the first installation command in VBF/README use `$ /.configure --prefix=<local directory>` and change the environment variable `VBFSYS` to `<local directory>`.
 
@@ -65,21 +65,21 @@ Eventdisplay can be used efficiently with the correct environmental variables se
 
 ### Compiling and Linking
 
-ROOTSYS :   (required) ROOT installation; add $ROOTSYS/lib to $LD_LIBRARY_PATH and $ROOTSYS/bin to $PATH
+`ROOTSYS` :   (required) ROOT installation; add $ROOTSYS/lib to $LD_LIBRARY_PATH and $ROOTSYS/bin to $PATH
 
-SOFASYS:    (required) Astronomy library from Sofa
+`SOFASYS` :    (required) Astronomy library from Sofa
 
-VBSYS :     (optional) VBF libraries (for `evndisp` analysis only); add $VBFSYS/bin to $PATH and $VBFSYS/lib to $LD_LIBRARY_PATH
+`VBFSYS` :     (optional) VBF libraries (for `evndisp` analysis only); add $VBFSYS/bin to $PATH and $VBFSYS/lib to $LD_LIBRARY_PATH
 
-FITSSYS :   (optional, not needed in most cases) FITS libraries
+`FITSSYS` :   (optional, not needed in most cases) FITS libraries
 
-GSLSYS :    (optional, not needed in most cases) GSL libraries
+`GSLSYS` :    (optional, not needed in most cases) GSL libraries
 
 ### Analysis
 
-EVNDISPSYS : Eventdisplay code directory (scripts expect binaries in $EVNDISPSYS/bin and libraries in $EVNDISPSYS/lib). Add $EVNDISPSYS/obj to LD_LIBRARY_PATH.
+`EVNDISPSYS` : Eventdisplay code directory (scripts expect binaries in `$EVNDISPSYS/bin` and libraries in `$EVNDISPSYS/lib`). Add `$EVNDISPSYS/obj` to `LD_LIBRARY_PATH`.
 
-EVNDISPSCRIPTS: Eventdisplay scripts directory
+`EVNDISPSCRIPTS`: Eventdisplay scripts directory (see [Eventdisplay_AnalysisScripts_VTS](https://github.com/VERITAS-Observatory/Eventdisplay_AnalysisScripts_VTS)).
 
 ### Data directories
 
@@ -88,22 +88,22 @@ Assume a computing environment, where several users are analysis the same raw da
 directories ($VERITAS_USER_DATA_DIR).
 Note that $VERITAS_DATA_DIR and $VERITAS_USER_DATA_DIR can point to the same directory.
 
-- VERITAS_EVNDISP_AUX_DIR:  directory with all auxiliary data like calibration files, lookup tables, effective areas, etc
-- VERITAS_DATA_DIR :        directory containing the raw telescope data or input simulation files
-- VERITAS_USER_DATA_DIR :   user data directory: containing output files from this analysis package
-- VERITAS_USER_LOG_DIR :    user log file directory: log files and temporary scripts are written to this directory
+* VERITAS_EVNDISP_AUX_DIR:  directory with all auxiliary data like calibration files, lookup tables, effective areas, etc
+* VERITAS_DATA_DIR :        directory containing the raw telescope data or input simulation files
+* VERITAS_USER_DATA_DIR :   user data directory: containing output files from this analysis package
+* VERITAS_USER_LOG_DIR :    user log file directory: log files and temporary scripts are written to this directory
 
 To set the variables for VERITAS:
 
-```
+```console
 ./setObservatory.sh VERITAS
 ```
 
-# Compiling
+## Compiling
 
 Check your systems configuration:
 
-```
+```console
 make config
 ```
 
@@ -111,34 +111,34 @@ Compare the output with the requirements on software and environmental variable 
 
 In the main Eventdisplay directory ($EVNDISPSYS is pointing to this directory), compile all Eventdisplay binaries with
 
-```
+```console
 source ./setObservatory.sh VTS
 make VTS
 ```
 
 If you are working on a computing with several cores, this can be accelerated by e.g. compiling with four cores in parallel:
 
-```
+```console
 source ./setObservatory.sh VTS
 make -j 12 VTS
 ```
 
 To compile a single component of the software only, e.g.:
 
-```
+```console
 source ./setObservatory.sh VTS
 make slib
 ```
 
 Use `make clean` to remove any files produced in earlier compilation runs.
 
-# Troubleshooting
+## Troubleshooting
 
-- many compilation issues are related to incorrect settings of the environmental variables, especially `ROOTSYS` and `VBFSYS`.
-- ask via ELOG, slack, or GitHub issues for persistent issues
-- check your installation, it should look something like this (with different directories):
+* many compilation issues are related to incorrect settings of the environmental variables, especially `ROOTSYS` and `VBFSYS`.
+* ask via ELOG, slack, or GitHub issues for persistent issues
+* check your installation, it should look something like this (with different directories):
 
-```
+```console
 CONFIGURATION SUMMARY FOR EVNDISP version 490
 ======================================================
 
