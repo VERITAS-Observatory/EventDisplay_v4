@@ -21,5 +21,5 @@ Note that Eventdisplay is installed into `/opt/Eventdisplay/`
 Developers can build the docker image locally:
 
 ```console
-docker build --platform linux/amd64 -f Dockerfile -t evndisplay_v4 .
+podman build --build-arg NUM_CORES=8 --platform linux/amd64 -f Dockerfile -t evndisplay_v4 .
 ```
