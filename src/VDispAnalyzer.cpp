@@ -424,6 +424,11 @@ void VDispAnalyzer::calculateMeanShowerDirection(
         xs = -99999.;
         ys = -99999.;
     }
+    fdisp_sum_abs_weigth = 0.;
+    for( unsigned int i = 0; i < v_weight.size(); i++ )
+    {
+        fdisp_sum_abs_weigth += TMath::Abs( v_weight[i] );
+    }
 }
 
 /*
@@ -563,11 +568,6 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
                             tel_pointing_dx, tel_pointing_dy,
                             f_dispDiff, xoff_4, yoff_4, UseIntersectForHeadTail );
     fdisp_xy_weight_T = v_weight;
-    fdisp_sum_abs_weigth = 0.;
-    for( unsigned int i = 0; i < fdisp_xy_weight_T.size(); i++ )
-    {
-        fdisp_sum_abs_weigth += TMath::Abs( fdisp_xy_weight_T[i] );
-    }
     fdisp_T = v_disp;
     fdisplist_T = v_displist;
 }

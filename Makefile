@@ -414,7 +414,8 @@ ACCOBJECT = 	./obj/makeRadialAcceptance.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		./obj/VDispAnalyzer.o ./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o ./obj/VDispTableAnalyzer.o \
-		./obj/VTMVADispAnalyzer.o \
+		./obj/VTMVADispAnalyzer.o ./obj/VMeanScaledVariables.o \
+		./obj/VEmissionHeightCalculator.o ./obj/VSimpleStereoReconstructor.o ./obj/VGrIsuAnalyzer.o \
 		 ./obj/VUtilities.o
 
 
@@ -461,7 +462,8 @@ ACCOBJECT = ./obj/VTS.getRun_TimeElevAzim.o \
 		./obj/VStar.o ./obj/VStar_Dict.o \
 		./obj/VDB_Connection.o \
 		./obj/VDispAnalyzer.o ./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o ./obj/VDispTableAnalyzer.o \
-		./obj/VTMVADispAnalyzer.o \
+		./obj/VTMVADispAnalyzer.o ./obj/VMeanScaledVariables.o \
+		./obj/VEmissionHeightCalculator.o ./obj/VSimpleStereoReconstructor.o ./obj/VGrIsuAnalyzer.o \
 		./obj/VUtilities.o
 
 ifeq ($(ASTRONMETRY),-DASTROSLALIB)
@@ -503,6 +505,7 @@ EFFOBJECT =	./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o
 		./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
 		./obj/VDispAnalyzer.o ./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o ./obj/VDispTableAnalyzer.o \
 		./obj/VTMVADispAnalyzer.o ./obj/VMeanScaledVariables.o \
+		./obj/VEmissionHeightCalculator.o ./obj/VSimpleStereoReconstructor.o ./obj/VGrIsuAnalyzer.o \
 		./obj/makeEffectiveArea.o
 
 ifeq ($(ASTRONMETRY),-DASTROSLALIB)
@@ -632,7 +635,8 @@ ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_
 		./obj/VSkyCoordinatesUtilities.o ./obj/VUtilities.o \
 		./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
 		./obj/VDispAnalyzer.o ./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o ./obj/VDispTableAnalyzer.o \
-		./obj/VTMVADispAnalyzer.o \
+		./obj/VTMVADispAnalyzer.o ./obj/VMeanScaledVariables.o \
+		./obj/VEmissionHeightCalculator.o ./obj/VSimpleStereoReconstructor.o ./obj/VGrIsuAnalyzer.o \
 		./obj/anasum.o
 
 ifeq ($(ASTRONMETRY),-DASTROSLALIB)
@@ -921,7 +925,8 @@ COMPAREDATAMCOBJ=	./obj/CData.o \
 			./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
 			./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
 			./obj/VDispAnalyzer.o ./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o ./obj/VDispTableAnalyzer.o \
-			./obj/VTMVADispAnalyzer.o \
+			./obj/VTMVADispAnalyzer.o  ./obj/VMeanScaledVariables.o \
+			./obj/VEmissionHeightCalculator.o ./obj/VSimpleStereoReconstructor.o ./obj/VGrIsuAnalyzer.o \
 			./obj/compareDatawithMC.o
 
 ifeq ($(ASTRONMETRY),-DASTROSLALIB)
@@ -1265,7 +1270,8 @@ calculateCrabRateFromMC:	./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 				./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
 				./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
 				./obj/VDispAnalyzer.o ./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o ./obj/VDispTableAnalyzer.o \
-				./obj/VTMVADispAnalyzer.o \
+				./obj/VTMVADispAnalyzer.o  ./obj/VMeanScaledVariables.o \
+				./obj/VEmissionHeightCalculator.o ./obj/VSimpleStereoReconstructor.o ./obj/VGrIsuAnalyzer.o \
 				./obj/calculateCrabRateFromMC.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
@@ -1373,7 +1379,8 @@ calculateBinaryPhases:	./obj/CData.o \
 			./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VDispAnalyzer.o ./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o ./obj/VDispTableAnalyzer.o \
-			./obj/VTMVADispAnalyzer.o \
+			./obj/VTMVADispAnalyzer.o ./obj/VMeanScaledVariables.o ./obj/VUtilities.o \
+			./obj/VEmissionHeightCalculator.o ./obj/VSimpleStereoReconstructor.o ./obj/VGrIsuAnalyzer.o \
 			./obj/VOrbitalPhase.o ./obj/VOrbitalPhase_Dict.o \
 			./obj/VSkyCoordinatesUtilities.o \
 			./obj/VAstronometry.o \

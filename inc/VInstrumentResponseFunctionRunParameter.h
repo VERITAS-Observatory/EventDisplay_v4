@@ -84,6 +84,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
         double          fYoff;
         vector< double > fAzMin;
         vector< double > fAzMax;
+        double          fRerunStereoReconstruction_minAngle;
 
         double          fWobbleIsotropic;
 
@@ -91,6 +92,9 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
         double          telconfig_arraycentre_X;
         double          telconfig_arraycentre_Y;
         double          telconfig_arraymax;
+        vector<double>  telconfig_telx;
+        vector<double>  telconfig_tely;
+        vector<double>  telconfig_telz;
 
         string          fCREnergySpectrumFile;
         unsigned int    fCREnergySpectrumID;

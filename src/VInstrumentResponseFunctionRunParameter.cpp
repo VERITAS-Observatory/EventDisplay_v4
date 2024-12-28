@@ -61,8 +61,9 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
     fpedvar = 0.;
     fXoff  = 0.;
     fYoff  = 0.;
+    fRerunStereoReconstruction_minAngle = 0;
 
-    fWobbleIsotropic = 0.; //DS
+    fWobbleIsotropic = 0.;
 
     telconfig_ntel = 0;
     telconfig_arraycentre_X = 0.;
@@ -494,6 +495,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
         fnoise = fR->fNoiseLevel;
     }
     fpedvar = fR->meanpedvars;
+    fRerunStereoReconstruction_minAngle = fR->fRerunStereoReconstruction_minAngle;
     // get wobble offset from first event in file
     // (should not change during a simulation run!)
     TTree* i_data = ( TTree* )iFile->Get( "data" );
@@ -534,12 +536,19 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
     if( telconfig->IsZombie() )
     {
         cout << "error while reading telescope configuration" << endl;
-        exit( 0 );
+        exit( EXIT_FAILURE );
     }
     telconfig_ntel = telconfig->getNTel();
     telconfig_arraycentre_X = telconfig->getArrayCentreX();
     telconfig_arraycentre_Y = telconfig->getArrayCentreY();
     telconfig_arraymax      = telconfig->getArrayMaxSize();
+    for(unsigned int t = 0; t < telconfig->fChain->GetEntries(); t++ )
+    {
+        telconfig->GetEntry( t );
+        telconfig_telx.push_back( telconfig->TelX );
+        telconfig_tely.push_back( telconfig->TelY );
+        telconfig_telz.push_back( telconfig->TelZ );
+    }
 
     ////////////////////////////////////////
 

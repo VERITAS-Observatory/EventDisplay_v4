@@ -69,9 +69,6 @@ class VDispAnalyzer
         vector<ULong64_t> fTelescopeTypeList;
         vector<float> fTelescopeFOV;
 
-        void calculateMeanShowerDirection( vector< float >& v_x, vector< float >& v_y, vector< float >& v_weight,
-                                           float& xs, float& ys, float& dispdiff, unsigned int iMaxN );
-
         unsigned int find_smallest_diff_element(
             vector< vector< float > >& i_sign,
             vector< float >& x, vector< float >& y,
@@ -124,6 +121,9 @@ class VDispAnalyzer
                                          double* pointing_dx, double* pointing_dy,
                                          bool UseIntersectForHeadTail,
                                          int* img_fitstat );
+
+        void calculateMeanShowerDirection( vector< float >& v_x, vector< float >& v_y, vector< float >& v_weight,
+                                           float& xs, float& ys, float& dispdiff, unsigned int iMaxN );
 
         vector< float > calculateExpectedDirectionError_or_Sign( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
                 ULong64_t* iTelType,

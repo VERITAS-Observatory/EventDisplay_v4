@@ -6,23 +6,34 @@
 #include <TChain.h>
 #include <TFile.h>
 
+#include "VEmissionHeightCalculator.h"
 #include "VGlobalRunParameter.h"
 #include "VMeanScaledVariables.h"
 #include "VDispAnalyzer.h"
+#include "VSimpleStereoReconstructor.h"
 
 #include <bitset>
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
 class CData
 {
     private :
-        void reconstruct_3tel_images_scaled_variables();
-        void reconstruct_3tel_images_scaled_emission_height();
+        unsigned long int fTelescopeCombination;
+        double fStereoMinAngle;
+        vector< double > fTelX;
+        vector< double > fTelY;
+        vector< double > fTelZ;
+
         void reconstruct_3tel_images(long unsigned int);
+        void reconstruct_3tel_images_direction();
+        void reconstruct_3tel_images_scaled_emission_height();
+        void reconstruct_3tel_images_scaled_variables();
+        void reconstruct_3tel_reset_variables();
 
     public :
 
@@ -246,7 +257,7 @@ class CData
 
         CData( TTree* tree = 0, bool bMC = false, int iVersion = 5, bool bShort = false );
         virtual ~CData();
-        virtual Int_t    GetEntry( Long64_t entry, unsigned long int telescope_combination = 15 );
+        virtual Int_t    GetEntry( Long64_t entry );
         virtual Long64_t LoadTree( Long64_t entry );
         virtual void     Init( TTree* tree );
         virtual Bool_t   Notify();
@@ -258,5 +269,8 @@ class CData
         {
             return fVersion;
         }
+        void initialize_3tel_reconstruction(
+                unsigned long int telescope_combination,
+                double stereo_reconstruction_min_angle, vector< double > tel_x, vector< double > tel_y, vector< double > tel_z );
 };
 #endif

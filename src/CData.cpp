@@ -16,6 +16,7 @@ CData::CData( TTree* tree, bool bMC, int iVersion, bool bShort )
     fVersion = iVersion;
     fBOOLteltype = false;
     fBOOLdE = false;
+    fTelescopeCombination = 0;
 
     Init( tree );
 }
@@ -31,7 +32,7 @@ CData::~CData()
 }
 
 
-Int_t CData::GetEntry( Long64_t entry, unsigned long int telescope_combination )
+Int_t CData::GetEntry( Long64_t entry )
 {
     if(!fChain )
     {
@@ -40,9 +41,9 @@ Int_t CData::GetEntry( Long64_t entry, unsigned long int telescope_combination )
 
     int a = fChain->GetEntry( entry );
 
-    if( telescope_combination != 15 && NImages == 4 )
+    if( fTelescopeCombination > 0 && fTelescopeCombination != 15 )
     {
-        reconstruct_3tel_images(telescope_combination);
+        reconstruct_3tel_images(fTelescopeCombination);
     }
     return a;
 }
@@ -629,46 +630,100 @@ Bool_t CData::Notify()
  */
 void CData::reconstruct_3tel_images(unsigned long int telescope_combination)
 {
+    reconstruct_3tel_reset_variables();
     bitset<sizeof(long int) * 4> tel_bitset(telescope_combination);
-    // TODO below is wrong: need to check if those images
-    // are actually available; otherwise discard the event
-    NImages = (Int_t)tel_bitset.count();
-    ImgSel = telescope_combination;
+    bitset<sizeof(long int) * 4> tel_nimages(0);
+
+    // update list of available images
+    UInt_t tel_list[VDST_MAXTELESCOPES];
     unsigned int z = 0;
-    SizeSecondMax = 0.;
-    for(unsigned int t = 0; t < 4; t++ )
+    for(int i = 0; i < NImages; i++ )
     {
+        unsigned int t = ImgSel_list[i];
         if( tel_bitset.test(t) )
         {
-            ImgSel_list[z] = t;
+            tel_list[z]=t;
+            tel_nimages.set(t);
             z++;
-            if( size[t] > SizeSecondMax )
-            {
-                SizeSecondMax = size[t];
-            }
         }
         else
         {
+            size[t] = 0.;
+            ntubes[t] = 0;
             MSCWT[t] = -9999.;
             MSCLT[t] = -9999.;
+        }
+    }
+    for(unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
+    {
+        ImgSel_list[i] = tel_list[i];
+    }
+    NImages = z;
+    ImgSel = tel_nimages.to_ulong();
+    // require at least two images to continue
+    if( z < 2 )
+    {
+        return;
+    }
+
+    SizeSecondMax = 0.;
+    for(int i = 0; i < NImages; i++ )
+    {
+        unsigned int t = ImgSel_list[i];
+        if( size[t] > SizeSecondMax )
+        {
+            SizeSecondMax = size[t];
         }
     }
 
     reconstruct_3tel_images_scaled_emission_height();
     reconstruct_3tel_images_scaled_variables();
-    //    reconstruct_3tel_images_direction();
+    reconstruct_3tel_images_direction();
     //    reconstruct_3tel_images_energy();
+}
+
+/*
+ * Reset all variables relevant for 3-telescope reconstruction
+ *
+ */
+void CData::reconstruct_3tel_reset_variables()
+{
+    NImages = 0;
+    ImgSel = 0;
+    SizeSecondMax = -9999.;
+    EmissionHeight = -9999.;
+    EmissionHeightChi2 = -9999.;
+    MSCW = -9999.;
+    MSCL = -9999.;
+    MWR = -9999.;
+    MLR = -9999.;
+    Xoff = Xoff_derot = -9999.;
+    Yoff = Yoff_derot = -9999.;
+    DispAbsSumWeigth = -9999.;
+    DispDiff = Chi2 = -9999.;
+    Xoff_intersect = Yoff_intersect = -9999.;
+    Xcore = -9999.;
+    Ycore = -9999.;
+    ErecS = -9999.;
+    EChi2S = -9999.;
+    dES = -999.;
 }
 
 /*
  * Calculate average emission height for 3-telescope image
  *
- * TODO requires telescope position vector
 */
 void CData::reconstruct_3tel_images_scaled_emission_height()
 {
-    EmissionHeight = EmissionHeight;
-    EmissionHeightChi2 = EmissionHeightChi2;
+    VEmissionHeightCalculator fEmissionHeightCalculator;
+    fEmissionHeightCalculator.setTelescopePositions( fTelX.size(), fTelX.data(), fTelY.data(), fTelZ.data() );
+    fEmissionHeightCalculator.getEmissionHeight( cen_x, cen_y, size, ArrayPointing_Azimuth, ArrayPointing_Elevation );
+    EmissionHeight = ( float )fEmissionHeightCalculator.getMeanEmissionHeight();
+    EmissionHeightChi2 = ( float )fEmissionHeightCalculator.getMeanEmissionHeightChi2();
+    if( EmissionHeightChi2 <= 0. )
+    {
+        EmissionHeightChi2 = 1.e-10;
+    }
 }
 
 /*
@@ -683,8 +738,20 @@ void CData::reconstruct_3tel_images_scaled_variables()
     MLR = VMeanScaledVariables::mean_scaled_variable(4, length, size, MSCLT );
 }
 
-void reconstruct_3tel_images_direction()
+void CData::reconstruct_3tel_images_direction()
 {
+    // intersection method
+    VSimpleStereoReconstructor i_SR;
+    i_SR.initialize(2, fStereoMinAngle);
+    i_SR.reconstruct_direction(
+            fTelX.size(),
+            ArrayPointing_Elevation, ArrayPointing_Azimuth,
+            fTelX.data(), fTelY.data(), fTelZ.data(),
+            size, cen_x, cen_y, cosphi, sinphi, width, length, 0 );
+    Xoff_intersect = i_SR.fShower_Xoffset;
+    Yoff_intersect = i_SR.fShower_Yoffset;
+
+    // disp method
     vector< float > v_x;
     vector< float > v_y;
     vector< float > v_weight;
@@ -693,25 +760,32 @@ void reconstruct_3tel_images_direction()
     float dispdiff;
 
     VDispAnalyzer i_dispAnalyzer;
-    i_dispAnalyzer->calculateMeanShowerDirection(v_x, v_y, v_weigth, xs, ys, dispdiff, v_x.size() );
-    Xoff = xs;
-    Yoff = ys;
-    DispAbsSumWeigth = i_dispAnalyzer->get_abs_sum_disp_weight();  // (!) needs to be checked; fdisp_sum_abs_weigth
-    DispDiff = fDispAnalyzerDirection->getDispDiff();
-    Chi2 = DispDiff;
-    fimg2_ang = fDispAnalyzerDirection->getAngDiff();
+    i_dispAnalyzer.calculateMeanShowerDirection(v_x, v_y, v_weight, xs, ys, dispdiff, v_x.size() );
     // expect that this is called for MC only
-    Xoff_derot = Xoff;
-    Yoff_derot = Yoff;
+    Xoff = Xoff_derot = xs;
+    Yoff = Yoff_derot = ys;
+    DispAbsSumWeigth = i_dispAnalyzer.get_abs_sum_disp_weight();
+    DispDiff = Chi2 = dispdiff;
 
-    Xoff_intersect = -9999.;
-    Yoff_intersect = -9999.;
+    // Average/min angle between images not updated
+    // approximiation for events which are reduced to 2-tel images;
+    // the cut on the minimal angle between images is not applied.
+    img2_ang = -9999.;
 
-    Ze = Ze;
+    i_SR.fillShowerDirection( Xoff, Yoff );
+    Ze    = i_SR.fShower_Ze;
+    Az    = i_SR.fShower_Az;
 
-    Xcore = -9999.;
-    Ycore = -9999.;
-    // R_core[t]
+    // core reconstruction
+    i_SR.reconstruct_core(
+           fTelX.size(),
+           ArrayPointing_Elevation, ArrayPointing_Azimuth,
+           Xoff, Yoff,
+           fTelX.data(), fTelY.data(), fTelZ.data(),
+           size, cen_x, cen_y, cosphi, sinphi, width, length, 0 );
+    Xcore = i_SR.fShower_Xcore;
+    Ycore = i_SR.fShower_Ycore;
+    // R_core[t]  // TODO
 }
 
 /*
@@ -734,3 +808,18 @@ void reconstruct_3tel_images_energy()
  * - is applyMeanStereoShapeCuts correct? Loop over ntel?
  * - remove arraydispdiff? Only parameter which requires Xoff_intersect
  */
+
+/*
+ * initialize stereo reconstruction for 3-telescope
+ *
+ */
+void CData::initialize_3tel_reconstruction(
+        unsigned long int telescope_combination,
+        double stereo_reconstruction_min_angle, vector< double > tel_x, vector< double > tel_y, vector< double > tel_z )
+{
+    fTelescopeCombination = telescope_combination;
+    fStereoMinAngle = stereo_reconstruction_min_angle;
+    fTelX = tel_x;
+    fTelY = tel_y;
+    fTelZ = tel_z;
+}

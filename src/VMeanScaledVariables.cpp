@@ -21,7 +21,7 @@ double VMeanScaledVariables::mean_reduced_scaled_variable(unsigned int ntel, flo
 
     for( unsigned int t = 0; t < ntel; t++ )
     {
-        if( mc_value[t] > -90. && mc_sigma[t] > -99. )
+        if( mc_value[t] > -90. && mc_sigma[t] > -90. )
         {
             value += ( data_value[t] - mc_value[t] ) / mc_sigma[t] * (mc_value[t] * mc_value[t]) / ( mc_sigma[t] * mc_sigma[t] );
             weight += ( mc_value[t] * mc_value[t] ) / ( mc_sigma[t] * mc_sigma[t] );
