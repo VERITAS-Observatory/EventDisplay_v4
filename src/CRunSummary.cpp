@@ -2,7 +2,7 @@
  * Anasum run summary tree definition.
  */
 
-#define CRunSummary_cxx
+#include "CRunSummary.h"
 
 CRunSummary::CRunSummary( TTree* tree )
 {
