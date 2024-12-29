@@ -284,9 +284,6 @@ class VTableLookupDataHandler
         float  fenergy;                           //!< reconstructed primary energy
         float  fechi2;                            //!< chi2 from reconstructed primary energy
         float  fdE;                               //!< dE from reconstructed primary energy
-        float  fesys;                             //!< energy correction
-        float  fesysVar;                          //!< energy correction (variance)
-        float  fesysDist;                         //!< mean distance to maximum in emission height
         float  fenergyS;                          //!< reconstructed primary energy
         float  fechi2S;                           //!< chi2 from reconstructed primary energy
         float  fdES;                              //!< dE from reconstructed primary energy
@@ -547,11 +544,11 @@ class VTableLookupDataHandler
         }
         void setEnergy( float iE, bool iTableErecS = true )
         {
-            if( iTableErecS )
+            if( iTableErecS )  // table energy reconstruction
             {
                 fenergyS = iE;
             }
-            else
+            else  // dispBDT energy reconstruction
             {
                 fenergy = iE;
             }

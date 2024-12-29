@@ -440,12 +440,12 @@ void CData::Init( TTree* tree )
     if( fChain->GetBranchStatus( "ErecQL" ) )
     {
         fChain->SetBranchAddress( "ErecQL", &ErecQL );
-        fChain->SetBranchAddress( "NErecST", &NErecST );
+        fChain->SetBranchAddress( "NErecT", &NErecT );
     }
     else
     {
         ErecQL = 0;
-        NErecST = 0;
+        NErecT = 0;
     }
     EmissionHeight = -99.;
     fChain->SetBranchAddress( "EmissionHeight", &EmissionHeight );
@@ -641,6 +641,7 @@ Bool_t CData::Notify()
  * Following variables are approximated or not calculated correctly:
  *
  * - img2_ang
+ * - ErecS, EChi2S, dES (lookup table based energy reconstruction results)
  *
  */
 void CData::reconstruct_3tel_images(unsigned long int telescope_combination)
@@ -720,11 +721,16 @@ void CData::reconstruct_3tel_reset_variables()
     Xoff_intersect = Yoff_intersect = -9999.;
     Xcore = -9999.;
     Ycore = -9999.;
+    Erec = -9999.;
+    EChi2 = -9999.;
+    dE = -999.;
+    NErecT = 0;
+    ErecQL = -99;
+
+    // not filled in 3-tel reconstruction
     ErecS = -9999.;
     EChi2S = -9999.;
     dES = -999.;
-    NErecST = 0;
-    ErecQL = -99;
 
 }
 
@@ -829,15 +835,11 @@ void CData:reconstruct_3tel_images_energy()
         disp_energy_T.push_back( E[t] );
     }
     i_dispAnalyzer.calculateMeanEnergy( disp_energy_T, size, 0);
-    ErecS = i_dispAnalyzer.getEnergy();
-    EChi2S = i_dispAnalyzer.getEnergyChi2();
-    dES = i_dispAnalyzer.getEnergydES();
-    NErecST = i_dispAnalyzer.getEnergyNT();
+    Erec = i_dispAnalyzer.getEnergy();
+    EChi2 = i_dispAnalyzer.getEnergyChi2();
+    dE = i_dispAnalyzer.getEnergydES();
+    NErecT = i_dispAnalyzer.getEnergyNT();
     ErecQL = i_dispAnalyzer.getEnergyQualityLabel();
-
-    Erec = -9999.;
-    EChi2 = -9999.;
-    dE = -9999.;
 }
 
 /*

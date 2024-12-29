@@ -1483,19 +1483,13 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "EChi2", &fechi2, iTT );
     sprintf( iTT, "dE/F" );
     fOTree->Branch( "dE", &fdE, iTT );
-    sprintf( iTT, "Esys/F" );
-    fOTree->Branch( "Esys", &fesys, iTT );
-    sprintf( iTT, "EsysVar/F" );
-    fOTree->Branch( "EsysVar", &fesysVar, iTT );
-    sprintf( iTT, "EsysDist/F" );
-    fOTree->Branch( "EsysDist", &fesysDist, iTT );
     sprintf( iTT, "ErecS/F" );
     fOTree->Branch( "ErecS", &fenergyS, iTT );
     sprintf( iTT, "EChi2S/F" );
     fOTree->Branch( "EChi2S", &fechi2S, iTT );
     sprintf( iTT, "dES/F" );
     fOTree->Branch( "dES", &fdES, iTT );
-    fOTree->Branch( "NErecST", &fnenergyT, "NErecST" );
+    fOTree->Branch( "NErecT", &fnenergyT, "NErecT" );
     fOTree->Branch( "ErecQL", &fenergyQL, "ErecQL/I" );
 
     sprintf( iTT, "EmissionHeight/F" );
@@ -2012,9 +2006,6 @@ void VTableLookupDataHandler::reset()
     fenergy = -99.;
     fechi2 = -99.;
     fdE = -99.;
-    fesys = 0.;
-    fesysVar = 0.;
-    fesysDist = 0.;
     fenergyS = -99.;
     fechi2S = -99.;
     fdES = -99.;
@@ -2340,9 +2331,6 @@ void VTableLookupDataHandler::resetAll()
     fenergy = 0.;
     fechi2 = 0.;
     fdE = 0.;
-    fesys = 0.;
-    fesysVar = 0.;
-    fesysDist = 0.;
     fenergyS = 0.;
     fechi2S = 0.;
     fdES = 0.;

@@ -146,7 +146,7 @@ class CData
         Float_t         ErecS;
         Float_t         EChi2S;
         Float_t         dES;       // Error on ErecS
-        Int_t           NErecST;
+        Int_t           NErecT;
         Int_t           ErecQL;
         Double_t        SizeSecondMax;
         Float_t         EmissionHeight;
@@ -249,7 +249,7 @@ class CData
         TBranch*        b_ErecS;                  //!
         TBranch*        b_EChi2S;                 //!
         TBranch*        b_ErecQL;                 //!
-        TBranch*        b_NErecST;                //!
+        TBranch*        b_NErecT;                //!
         TBranch*        b_SizeSecondMax;          //!
         TBranch*        b_EmissionHeight;         //!
         TBranch*        b_EmissionHeightChi2;     //!
