@@ -39,8 +39,6 @@ class CData
     public :
 
         bool            fMC;
-        bool            fBOOLteltype;
-        bool            fBOOLdE;
 
         bool            fShort;
         int             fVersion;

@@ -190,7 +190,7 @@ int main( int argc, char* argv[] )
         exit( EXIT_FAILURE );
     }
 
-    CData d( c, true, 6, true );
+    CData d( c, true, true );
     d.initialize_3tel_reconstruction(
             fRunPara->fRerunStereoReconstruction_3telescopes,
             fRunPara->fRerunStereoReconstruction_minAngle,

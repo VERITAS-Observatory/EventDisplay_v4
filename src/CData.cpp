@@ -9,13 +9,11 @@
 
 #include "CData.h"
 
-CData::CData( TTree* tree, bool bMC, int iVersion, bool bShort )
+CData::CData( TTree* tree, bool bMC, bool bShort )
 {
     fMC = bMC;
     fShort = bShort;
-    fVersion = iVersion;
-    fBOOLteltype = false;
-    fBOOLdE = false;
+    fVersion = 6;
     fTelescopeCombination = 0;
 
     Init( tree );
@@ -107,16 +105,6 @@ void CData::Init( TTree* tree )
     if( tree->GetBranchStatus( "MCe0" ) )
     {
         fMC = true;
-    }
-    // test if teltype branches exist
-    if( tree->GetBranchStatus( "NTtype" ) )
-    {
-        fBOOLteltype = true;
-    }
-    // test if dE branches exist
-    if( tree->GetBranchStatus( "dE" ) )
-    {
-        fBOOLdE = true;
     }
 
     fChain = tree;
@@ -266,7 +254,7 @@ void CData::Init( TTree* tree )
 
     fChain->SetBranchAddress( "SizeSecondMax", &SizeSecondMax );
 
-    if( fBOOLteltype )
+    if( tree->GetBranchStatus( "NTtype" ) )
     {
         fChain->SetBranchAddress( "ImgSel_list", ImgSel_list );
         fChain->SetBranchAddress( "NTtype", &NTtype );
@@ -427,7 +415,7 @@ void CData::Init( TTree* tree )
     fChain->SetBranchAddress( "EChi2", &EChi2 );
     fChain->SetBranchAddress( "ErecS", &ErecS );
     fChain->SetBranchAddress( "EChi2S", &EChi2S );
-    if( fBOOLdE )
+    if( tree->GetBranchStatus( "dE" ) )
     {
         fChain->SetBranchAddress( "dE", &dE );
         fChain->SetBranchAddress( "dES", &dES );

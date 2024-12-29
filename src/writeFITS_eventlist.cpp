@@ -304,7 +304,7 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
         FITSRecord rec3( iOutputFile, templ, "GTI" );
         TChain *chain = new TChain("data");
         chain->Add( iInputFile.c_str() );
-        CData dchain( chain, true, 6, false );
+        CData dchain( chain, true, false );
 
         double decDiff = 0.;
         double raDiff = 0.;
