@@ -584,13 +584,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             else if( temp == "ENERGYRECONSTRUCTIONMETHOD" )
             {
                 fEnergyReconstructionMethod = ( unsigned int )atoi( temp2.c_str() );
-                // horrible detour to make sure that users don't use the wrong method
-                else if( fEnergyReconstructionMethod == 100 )
-                {
-                    cout << "Warning: using energy reconstruction method 0" << endl;
-                    fEnergyReconstructionMethod = 0;
-                }
-                else if( fEnergyReconstructionMethod > 1 )
+                if( fEnergyReconstructionMethod > 1 )
                 {
                     cout << "Unknown parameter for ENERGYRECONSTRUCTIONMETHOD in parameter file " << i_filename << ": " << temp2 << endl;
                     cout << "allowed values are 0 and 1" << endl;
