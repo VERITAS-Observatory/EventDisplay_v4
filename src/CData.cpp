@@ -652,6 +652,10 @@ void CData::reconstruct_3tel_images(unsigned long int telescope_combination)
 
     // update list of available images
     UInt_t tel_list[VDST_MAXTELESCOPES];
+    for(unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
+    {
+        tel_list[i] = 9999;
+    }
     unsigned int z = 0;
     for(int i = 0; i < NImages; i++ )
     {
@@ -670,15 +674,15 @@ void CData::reconstruct_3tel_images(unsigned long int telescope_combination)
             MSCLT[t] = -9999.;
         }
     }
-    // TODO is this correct? Or is it a list of NTel length with 0/1 for telescopes set?
-    for(unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
+    // ImgSel_list lists the available images (e.g., 2, 3, 4) and is of length NImages
+    NImages = z;
+    for(int i = 0; i < NImages; i++ )
     {
         ImgSel_list[i] = tel_list[i];
     }
-    NImages = z;
     ImgSel = tel_nimages.to_ulong();
     // require at least two images to continue
-    if( z < 2 )
+    if( NImages < 2 )
     {
         return;
     }
@@ -810,10 +814,11 @@ void CData::reconstruct_3tel_images_direction()
            size, cen_x, cen_y, cosphi, sinphi, width, length, 0 );
     Xcore = i_SR.fShower_Xcore;
     Ycore = i_SR.fShower_Ycore;
+    bitset<sizeof(long int) * 4> tel_nimages(ImgSel);
     for( unsigned int t = 0; t < fTelX.size(); t++ )
     {
         R_core[t] = -9999.;
-        if( ImgSel_list[t] && Ze >= 0. && Xcore > -9998. && Ycore > -9998. )
+        if( tel_nimages.test(t) && Ze >= 0. && Xcore > -9998. && Ycore > -9998. )
         {
             R_core[t] = VUtilities::line_point_distance(
                  Ycore, -1.*Xcore, 0., Ze, Az, fTelY[t], -1.*fTelX[t], fTelZ[t] );
@@ -829,9 +834,8 @@ void CData:reconstruct_3tel_images_energy()
 {
     VDispAnalyzer i_dispAnalyzer;
     vector< float > disp_energy_T;
-    for(int i = 0; i < NImages; i++ )
+    for(unsigned int t = 0; t < fTelX.size(); t++ )
     {
-        unsigned int t = ImgSel_list[i];
         disp_energy_T.push_back( E[t] );
     }
     i_dispAnalyzer.calculateMeanEnergy( disp_energy_T, size, 0);
@@ -858,8 +862,8 @@ void CData::initialize_3tel_reconstruction(
 }
 
 /*
- * - is applyMeanStereoShapeCuts correct? Loop over ntel?
- * - remove arraydispdiff? Only parameter which requires Xoff_intersect
- * - unclear throughout the code if img_sel_list is NImages of NTel long
- * - crosscheck usage of ErecS and Erec (which one is disp method result?)
+ * - crosscheck usage of ErecS and Erec
+ *     - VGammaHadronCuts::getReconstructedEnergy()
+ *     - Erec is dispEnergy (ErecS is simple table energy)
+ *
  */

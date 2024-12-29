@@ -1345,8 +1345,6 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
         fOTree->Branch( "MCe0", &fMCEnergy, "MCe0/D" );
         fOTree->Branch( "MCxcore", &fMCxcore, "MCxcore/D" );
         fOTree->Branch( "MCycore", &fMCycore, "MCycore/D" );
-        sprintf( iTT, "MCR[%d]/D", fNTel );
-        // (nowhere needed)        fOTree->Branch( "MCR", fMCR, iTT );
         fOTree->Branch( "MCxcore_SC", &fMCxcore_SC, "MCxcore_SC/D" );
         fOTree->Branch( "MCycore_SC", &fMCycore_SC, "MCycore_SC/D" );
         fOTree->Branch( "MCxcos", &fMCxcos, "MCxcos/D" );
@@ -1489,7 +1487,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "EChi2S", &fechi2S, iTT );
     sprintf( iTT, "dES/F" );
     fOTree->Branch( "dES", &fdES, iTT );
-    fOTree->Branch( "NErecT", &fnenergyT, "NErecT" );
+    fOTree->Branch( "NErecT", &fnenergyT, "NErecT/I" );
     fOTree->Branch( "ErecQL", &fenergyQL, "ErecQL/I" );
 
     sprintf( iTT, "EmissionHeight/F" );
@@ -2039,7 +2037,6 @@ void VTableLookupDataHandler::calcDistances()
     // check for successful reconstruction
     for( unsigned int tel = 0; tel < fNTel; tel++ )
     {
-        // TODO - check if fImgSel_List is fNTel or NImages long
         if( fImgSel_list[tel] && fZe >= 0. && fXcore > -9998. && fYcore > -9998. )
         {
             fR_core[tel] = VUtilities::line_point_distance( fYcore, -1.*fXcore, 0., fZe, fAz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );

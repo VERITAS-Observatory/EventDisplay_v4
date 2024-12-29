@@ -1652,7 +1652,7 @@ void VGammaHadronCuts::initializeCuts( int irun, string iFile )
         {
             cout << "VGammaHadronCuts::initializeCuts: failed setting probability cuts for " << irun << " " << iFile << endl;
             cout << "exiting..." << endl;
-            exit(-1 );
+            exit( EXIT_FAILURE );
         }
     }
     // TMVA cuts
