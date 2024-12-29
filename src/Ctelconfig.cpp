@@ -4,7 +4,7 @@
 
 #include "Ctelconfig.h"
 
-telconfig::Ctelconfig( TTree* tree )
+Ctelconfig::Ctelconfig( TTree* tree )
 {
     Init( tree );
 }
