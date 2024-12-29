@@ -790,7 +790,7 @@ void VTableLookup::readLookupTable()
             }
             fData->setNMSCW( fnmscw );
             // set msc value (mean reduced scaled variables)
-            // TODO - change of interpolation approach
+            // Note change of interpolation approach with v492.0
             // fData->setMSCW( s_N->mscw );
             fData->setMSCW( VMeanScaledVariables::mean_reduced_scaled_variable(s_N->fNTel, fData->getWidth(), s_N->mscw_T, s_N->mscw_Tsigma) );
             // fData->setMSCL( s_N->mscl );
