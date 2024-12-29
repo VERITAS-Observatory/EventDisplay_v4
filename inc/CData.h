@@ -31,6 +31,7 @@ class CData
 
         void reconstruct_3tel_images(long unsigned int);
         void reconstruct_3tel_images_direction();
+        void reconstruct_3tel_images_energy();
         void reconstruct_3tel_images_scaled_emission_height();
         void reconstruct_3tel_images_scaled_variables();
         void reconstruct_3tel_reset_variables();
@@ -145,6 +146,8 @@ class CData
         Float_t         ErecS;
         Float_t         EChi2S;
         Float_t         dES;       // Error on ErecS
+        Int_t           NErecST;
+        Int_t           ErecQL;
         Double_t        SizeSecondMax;
         Float_t         EmissionHeight;
         Float_t         EmissionHeightChi2;
@@ -245,6 +248,8 @@ class CData
         TBranch*        b_EChi2;                  //!
         TBranch*        b_ErecS;                  //!
         TBranch*        b_EChi2S;                 //!
+        TBranch*        b_ErecQL;                 //!
+        TBranch*        b_NErecST;                //!
         TBranch*        b_SizeSecondMax;          //!
         TBranch*        b_EmissionHeight;         //!
         TBranch*        b_EmissionHeightChi2;     //!

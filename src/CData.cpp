@@ -437,6 +437,16 @@ void CData::Init( TTree* tree )
         dE = 0.;
         dES = 0.;
     }
+    if( fChain->GetBranchStatus( "ErecQL" ) )
+    {
+        fChain->SetBranchAddress( "ErecQL", &ErecQL );
+        fChain->SetBranchAddress( "NErecST", &NErecST );
+    }
+    else
+    {
+        ErecQL = 0;
+        NErecST = 0;
+    }
     EmissionHeight = -99.;
     fChain->SetBranchAddress( "EmissionHeight", &EmissionHeight );
     fChain->SetBranchAddress( "EmissionHeightChi2", &EmissionHeightChi2 );
@@ -623,10 +633,15 @@ Bool_t CData::Notify()
 
 
 /*
- * Redo stereo reconstruction for a selection of 3-telescope images.
- * Used for calculation of effective areas from 4-telescope mscw files
+ * Redo stereo reconstruction for a selection of 3-telescope events.
+ * Used for calculation of effective areas from 4-telescope mscw files.
  *
  * Note! This is very fine tuned and should be used for effective area calculation only
+ *
+ * Following variables are approximated or not calculated correctly:
+ *
+ * - img2_ang
+ *
  */
 void CData::reconstruct_3tel_images(unsigned long int telescope_combination)
 {
@@ -654,6 +669,7 @@ void CData::reconstruct_3tel_images(unsigned long int telescope_combination)
             MSCLT[t] = -9999.;
         }
     }
+    // TODO is this correct? Or is it a list of NTel length with 0/1 for telescopes set?
     for(unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
     {
         ImgSel_list[i] = tel_list[i];
@@ -679,11 +695,11 @@ void CData::reconstruct_3tel_images(unsigned long int telescope_combination)
     reconstruct_3tel_images_scaled_emission_height();
     reconstruct_3tel_images_scaled_variables();
     reconstruct_3tel_images_direction();
-    //    reconstruct_3tel_images_energy();
+    reconstruct_3tel_images_energy();
 }
 
 /*
- * Reset all variables relevant for 3-telescope reconstruction
+ * Reset all variables relevant for 3-telescope reconstruction.
  *
  */
 void CData::reconstruct_3tel_reset_variables()
@@ -707,10 +723,13 @@ void CData::reconstruct_3tel_reset_variables()
     ErecS = -9999.;
     EChi2S = -9999.;
     dES = -999.;
+    NErecST = 0;
+    ErecQL = -99;
+
 }
 
 /*
- * Calculate average emission height for 3-telescope image
+ * Calculate average emission height for 3-telescope events.
  *
 */
 void CData::reconstruct_3tel_images_scaled_emission_height()
@@ -727,7 +746,7 @@ void CData::reconstruct_3tel_images_scaled_emission_height()
 }
 
 /*
- * Calculate mean scaled variables for 3-telescope image
+ * Calculate mean scaled variables for 3-telescope events.
  *
 */
 void CData::reconstruct_3tel_images_scaled_variables()
@@ -738,6 +757,10 @@ void CData::reconstruct_3tel_images_scaled_variables()
     MLR = VMeanScaledVariables::mean_scaled_variable(4, length, size, MSCLT );
 }
 
+/*
+ * Reconstruct shower direction and core for 3-telescope events.
+ *
+*/
 void CData::reconstruct_3tel_images_direction()
 {
     // intersection method
@@ -752,12 +775,8 @@ void CData::reconstruct_3tel_images_direction()
     Yoff_intersect = i_SR.fShower_Yoffset;
 
     // disp method
-    vector< float > v_x;
-    vector< float > v_y;
-    vector< float > v_weight;
-    float xs;
-    float ys;
-    float dispdiff;
+    vector<float> v_x, v_y, v_weight;
+    float xs, ys, dispdiff;
 
     VDispAnalyzer i_dispAnalyzer;
     i_dispAnalyzer.calculateMeanShowerDirection(v_x, v_y, v_weight, xs, ys, dispdiff, v_x.size() );
@@ -767,7 +786,7 @@ void CData::reconstruct_3tel_images_direction()
     DispAbsSumWeigth = i_dispAnalyzer.get_abs_sum_disp_weight();
     DispDiff = Chi2 = dispdiff;
 
-    // Average/min angle between images not updated
+    // Average/min angle between images not updated. TODO
     // approximiation for events which are reduced to 2-tel images;
     // the cut on the minimal angle between images is not applied.
     img2_ang = -9999.;
@@ -785,29 +804,41 @@ void CData::reconstruct_3tel_images_direction()
            size, cen_x, cen_y, cosphi, sinphi, width, length, 0 );
     Xcore = i_SR.fShower_Xcore;
     Ycore = i_SR.fShower_Ycore;
-    // R_core[t]  // TODO
+    for( unsigned int t = 0; t < fTelX.size(); t++ )
+    {
+        R_core[t] = -9999.;
+        if( ImgSel_list[t] && Ze >= 0. && Xcore > -9998. && Ycore > -9998. )
+        {
+            R_core[t] = VUtilities::line_point_distance(
+                 Ycore, -1.*Xcore, 0., Ze, Az, fTelY[t], -1.*fTelX[t], fTelZ[t] );
+        }
+    }
 }
 
 /*
-
-
-void reconstruct_3tel_images_energy()
-{
-    ErecS = -9999.;
-    EChi2S = EChi2S
-    dES = dES;
-
-    Erec // (?)
-    EChi2 // (?)
-    dE // (?)
-}
-
+ * Reconstruct shower energy for 3-telescope events.
+ *
 */
+void CData:reconstruct_3tel_images_energy()
+{
+    VDispAnalyzer i_dispAnalyzer;
+    vector< float > disp_energy_T;
+    for(int i = 0; i < NImages; i++ )
+    {
+        unsigned int t = ImgSel_list[i];
+        disp_energy_T.push_back( E[t] );
+    }
+    i_dispAnalyzer.calculateMeanEnergy( disp_energy_T, size, 0);
+    ErecS = i_dispAnalyzer.getEnergy();
+    EChi2S = i_dispAnalyzer.getEnergyChi2();
+    dES = i_dispAnalyzer.getEnergydES();
+    NErecST = i_dispAnalyzer.getEnergyNT();
+    ErecQL = i_dispAnalyzer.getEnergyQualityLabel();
 
-/*
- * - is applyMeanStereoShapeCuts correct? Loop over ntel?
- * - remove arraydispdiff? Only parameter which requires Xoff_intersect
- */
+    Erec = -9999.;
+    EChi2 = -9999.;
+    dE = -9999.;
+}
 
 /*
  * initialize stereo reconstruction for 3-telescope
@@ -823,3 +854,10 @@ void CData::initialize_3tel_reconstruction(
     fTelY = tel_y;
     fTelZ = tel_z;
 }
+
+/*
+ * - is applyMeanStereoShapeCuts correct? Loop over ntel?
+ * - remove arraydispdiff? Only parameter which requires Xoff_intersect
+ * - unclear throughout the code if img_sel_list is NImages of NTel long
+ * - crosscheck usage of ErecS and Erec (which one is disp method result?)
+ */

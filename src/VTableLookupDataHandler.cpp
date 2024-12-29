@@ -2048,6 +2048,7 @@ void VTableLookupDataHandler::calcDistances()
     // check for successful reconstruction
     for( unsigned int tel = 0; tel < fNTel; tel++ )
     {
+        // TODO - check if fImgSel_List is fNTel or NImages long
         if( fImgSel_list[tel] && fZe >= 0. && fXcore > -9998. && fYcore > -9998. )
         {
             fR_core[tel] = VUtilities::line_point_distance( fYcore, -1.*fXcore, 0., fZe, fAz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );

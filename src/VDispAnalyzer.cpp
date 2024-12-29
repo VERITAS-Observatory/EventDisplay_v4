@@ -779,52 +779,46 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
     {
         return;
     }
+    calculateMeanEnergy(fdisp_energy_T, img_size, img_weight);
+}
 
-    ///////////////////
-    // calculate average energy
-    // (require at least two telescopes)
-
-    // fill a 'clean' vector with good energy per telescopes
+/*
+ * Calculate average energy
+ * (require at least two telescopes)
+ *
+*/
+void VDispAnalyzer::calculateMeanEnergy(
+    vector< float >& disp_energy_T,
+    float *img_size,
+    double* img_weight)
+{
     vector< double > energy_tel;
     vector< double > energy_weight;
-    vector< double > iR;
-    vector< double > iS;
-    vector< double > iW;
-    vector< double > iL;
-    vector< double > iT;
-    vector< double > iLe;
-    vector< double > iWi;
-
-    for( unsigned int i = 0; i < fdisp_energy_T.size(); i++ )
+    for( unsigned int i = 0; i < disp_energy_T.size(); i++ )
     {
-        if( fdisp_energy_T[i] > 0. && img_weight[i] > 0. && img_size[i] > 0. )
+        if( disp_energy_T[i] > 0. && img_size[i] > 0. )
         {
-            energy_tel.push_back( fdisp_energy_T[i] );
-            energy_weight.push_back( img_size[i] * img_weight[i] * img_size[i] * img_weight[i] );
-            if( fDebug )
+            energy_tel.push_back( disp_energy_T[i] );
+            if( img_weight )
             {
-                iR.push_back( iRcore[i] );
-                iW.push_back( img_weight[i] );
-                iS.push_back( img_size[i] );
-                iL.push_back( img_loss[i] );
-                iT.push_back( img_tgrad[i] );
-                iLe.push_back( img_length[i] );
-                iWi.push_back( img_width[i] );
+                energy_weight.push_back( img_size[i] * img_weight[i] * img_size[i] * img_weight[i] );
+            }
+            else
+            {
+                energy_weight.push_back( img_size[i] * img_size[i] );
             }
         }
     }
 
     double w = 0.;
-    unsigned int n2 = 0;
     fdisp_energy = 0.;
     for( unsigned int j = 0; j < energy_tel.size(); j++ )
     {
         fdisp_energy += energy_tel[j] * energy_weight[j];
         w += energy_weight[j];
-        n2++;
     }
 
-    fdisp_energy_NT = n2;
+    fdisp_energy_NT = energy_tel.size();
     if( w > 0. )
     {
         fdisp_energy /= w;
@@ -848,24 +842,19 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
     // calculate chi2 and dE
     // (note: different definition for dE
     //        than in lookup table code)
-    z = 0.;
     fdisp_energy_chi = 0.;
     fdisp_energy_dEs = 0.;
-    for( unsigned int i = 0; i < fdisp_energy_T.size(); i++ )
+    for( unsigned int i = 0; i < energy_tel.size(); i++ )
     {
-        if( fdisp_energy_T[i] > 0. && fdisp_energy > 0. )
-        {
-            fdisp_energy_chi += ( fdisp_energy_T[i] - fdisp_energy ) *
-                                ( fdisp_energy_T[i] - fdisp_energy ) /
-                                fdisp_energy / fdisp_energy;
-            fdisp_energy_dEs += TMath::Abs( fdisp_energy_T[i] - fdisp_energy ) / fdisp_energy;
-            z++;
-        }
+        fdisp_energy_chi += ( energy_tel[i] - fdisp_energy ) *
+                            ( energy_tel[i] - fdisp_energy ) /
+                            fdisp_energy / fdisp_energy;
+        fdisp_energy_dEs += TMath::Abs( energy_tel[i] - fdisp_energy ) / fdisp_energy;
     }
-    if( z > 1.5 )
+    if( energy_tel.size() > 1 )
     {
-        fdisp_energy_chi /= ( z - 1. );
-        fdisp_energy_dEs /= z;
+        fdisp_energy_chi /= ( (float)energy_tel.size() - 1. );
+        fdisp_energy_dEs /= (float)energy_tel.size();
     }
     else
     {
