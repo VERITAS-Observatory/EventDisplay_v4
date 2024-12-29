@@ -62,6 +62,7 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
     fXoff  = 0.;
     fYoff  = 0.;
     fRerunStereoReconstruction_minAngle = 0;
+    fRerunStereoReconstruction_3telescopes = 15;  // 15 == use all available telescopes
 
     fWobbleIsotropic = 0.;
 
@@ -316,28 +317,36 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
                     is_stream >> fCREnergySpectrumID;
                 }
             }
-            //DS manually input the zenith
-            else if( temp == "ZENITH" ) //DS
+            // manually input the zenith
+            else if( temp == "ZENITH" )
             {
                 if(!( is_stream >> std::ws ).eof() )
                 {
-                    is_stream >> fze;    //DS
+                    is_stream >> fze;
                 }
             }
-            //DS manually input the zenith
-            else if( temp == "NOISE" ) //DS
+            // manually input the zenith
+            else if( temp == "NOISE" )
             {
                 if(!( is_stream >> std::ws ).eof() )
                 {
-                    is_stream >> fnoise;    //DS
+                    is_stream >> fnoise;
                 }
             }
-            //DS manually input the wobble
-            else if( temp == "WOBBLEISOTROPIC" ) //DS
+            // manually input the wobble
+            else if( temp == "WOBBLEISOTROPIC" )
             {
                 if(!( is_stream >> std::ws ).eof() )
                 {
-                    is_stream >> fWobbleIsotropic;    //DS
+                    is_stream >> fWobbleIsotropic;
+                }
+            }
+            // 3-telescope reconstruction (MC only)
+            else if( temp == "RERUN_STEREO_RECONSTRUCTION_3TEL" )
+            {
+                if(!( is_stream >> std::ws ).eof() )
+                {
+                    is_stream >> fRerunStereoReconstruction_3telescopes;
                 }
             }
         }
