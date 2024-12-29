@@ -4,7 +4,7 @@
 
 #include "Cshowerpars.h"
 
-showerpars::Cshowerpars( TTree* tree, bool iMC, bool iShort )
+Cshowerpars::Cshowerpars( TTree* tree, bool iMC, bool iShort )
 {
     if(!tree )
     {
