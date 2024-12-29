@@ -60,7 +60,6 @@ Long64_t Ctelconfig::LoadTree( Long64_t entry )
     if( chain->GetTreeNumber() != fCurrent )
     {
         fCurrent = chain->GetTreeNumber();
-        Notify();
     }
     return centry;
 }
