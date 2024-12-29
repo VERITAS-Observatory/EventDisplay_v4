@@ -1,4 +1,4 @@
-// Image parameter tpars definition
+// Image parameter tree 'tpars' definition.
 
 #ifndef Ctpars_h
 #define Ctpars_h
