@@ -860,10 +860,3 @@ void CData::initialize_3tel_reconstruction(
     fTelY = tel_y;
     fTelZ = tel_z;
 }
-
-/*
- * - crosscheck usage of ErecS and Erec
- *     - VGammaHadronCuts::getReconstructedEnergy()
- *     - Erec is dispEnergy (ErecS is simple table energy)
- *
- */
