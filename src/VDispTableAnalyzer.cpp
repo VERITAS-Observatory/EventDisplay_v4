@@ -294,7 +294,14 @@ void VDispTableAnalyzer::calculateMeanDirection( float& xs, float& ys, vector< f
         return;
     }
 
+    // use first NTOT_MAX telescopes for event reconstruction only
+    // (number of possible combinations is 2^NTOT_MAX )
+    const unsigned int NTOT_MAX = 16;
     unsigned int iNTel_max = x.size();
+    if( x.size() > NTOT_MAX )
+    {
+        iNTel_max = NTOT_MAX;
+    }
 
     // prepare bit mask to go through all possible combinations of sign for disp calculation
     vector< bitset< NTOT_MAX > > iComb;

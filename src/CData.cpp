@@ -818,7 +818,7 @@ void CData::reconstruct_3tel_images_direction()
  * Reconstruct shower energy for 3-telescope events.
  *
 */
-void CData:reconstruct_3tel_images_energy()
+void CData::reconstruct_3tel_images_energy()
 {
     VDispAnalyzer i_dispAnalyzer;
     vector< float > disp_energy_T;
