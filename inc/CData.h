@@ -29,7 +29,7 @@ class CData
         vector< double > fTelY;
         vector< double > fTelZ;
 
-        void reconstruct_3tel_images(long unsigned int);
+        void reconstruct_3tel_images( long unsigned int );
         void reconstruct_3tel_images_direction();
         void reconstruct_3tel_images_energy();
         void reconstruct_3tel_images_scaled_emission_height();
@@ -273,7 +273,7 @@ class CData
             return fVersion;
         }
         void initialize_3tel_reconstruction(
-                unsigned long int telescope_combination,
-                double stereo_reconstruction_min_angle, vector< double > tel_x, vector< double > tel_y, vector< double > tel_z );
+            unsigned long int telescope_combination,
+            double stereo_reconstruction_min_angle, vector< double > tel_x, vector< double > tel_y, vector< double > tel_z );
 };
 #endif

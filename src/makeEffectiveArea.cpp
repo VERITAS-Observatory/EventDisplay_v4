@@ -192,9 +192,9 @@ int main( int argc, char* argv[] )
 
     CData d( c, true, true );
     d.initialize_3tel_reconstruction(
-            fRunPara->fRerunStereoReconstruction_3telescopes,
-            fRunPara->fRerunStereoReconstruction_minAngle,
-            fRunPara->telconfig_telx, fRunPara->telconfig_tely, fRunPara->telconfig_telz
+        fRunPara->fRerunStereoReconstruction_3telescopes,
+        fRunPara->fRerunStereoReconstruction_minAngle,
+        fRunPara->telconfig_telx, fRunPara->telconfig_tely, fRunPara->telconfig_telz
     );
     fCuts->setDataTree(&d );
     TH1D* hE0mc = ( TH1D* )gDirectory->Get( "hE0mc" );

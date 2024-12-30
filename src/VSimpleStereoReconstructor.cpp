@@ -80,7 +80,7 @@ bool VSimpleStereoReconstructor::reconstruct_direction( unsigned int i_ntel,
 
     if( img_weight == 0 )
     {
-        for(unsigned int i = 0; i < i_ntel; i++ )
+        for( unsigned int i = 0; i < i_ntel; i++ )
         {
             img_weight[i] = 1.;
         }
@@ -325,7 +325,7 @@ bool VSimpleStereoReconstructor::reconstruct_core( unsigned int i_ntel,
 
     if( img_weight == 0 )
     {
-        for(unsigned int i = 0; i < i_ntel; i++ )
+        for( unsigned int i = 0; i < i_ntel; i++ )
         {
             img_weight[i] = 1.;
         }

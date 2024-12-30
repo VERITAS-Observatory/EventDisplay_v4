@@ -779,7 +779,7 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
     {
         return;
     }
-    calculateMeanEnergy(fdisp_energy_T, img_size, img_weight);
+    calculateMeanEnergy( fdisp_energy_T, img_size, img_weight );
 }
 
 /*
@@ -789,8 +789,8 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
 */
 void VDispAnalyzer::calculateMeanEnergy(
     vector< float >& disp_energy_T,
-    float *img_size,
-    double* img_weight)
+    float* img_size,
+    double* img_weight )
 {
     vector< double > energy_tel;
     vector< double > energy_weight;
@@ -853,8 +853,8 @@ void VDispAnalyzer::calculateMeanEnergy(
     }
     if( energy_tel.size() > 1 )
     {
-        fdisp_energy_chi /= ( (float)energy_tel.size() - 1. );
-        fdisp_energy_dEs /= (float)energy_tel.size();
+        fdisp_energy_chi /= (( float )energy_tel.size() - 1. );
+        fdisp_energy_dEs /= ( float )energy_tel.size();
     }
     else
     {

@@ -792,16 +792,16 @@ void VTableLookup::readLookupTable()
             // set msc value (mean reduced scaled variables)
             // Note change of interpolation approach with v492.0
             // fData->setMSCW( s_N->mscw );
-            fData->setMSCW( VMeanScaledVariables::mean_reduced_scaled_variable(s_N->fNTel, fData->getWidth(), s_N->mscw_T, s_N->mscw_Tsigma) );
+            fData->setMSCW( VMeanScaledVariables::mean_reduced_scaled_variable( s_N->fNTel, fData->getWidth(), s_N->mscw_T, s_N->mscw_Tsigma ) );
             // fData->setMSCL( s_N->mscl );
-            fData->setMSCL( VMeanScaledVariables::mean_reduced_scaled_variable(s_N->fNTel, fData->getLength(), s_N->mscl_T, s_N->mscl_Tsigma) );
+            fData->setMSCL( VMeanScaledVariables::mean_reduced_scaled_variable( s_N->fNTel, fData->getLength(), s_N->mscl_T, s_N->mscl_Tsigma ) );
 
             fData->setMWR( VMeanScaledVariables::mean_scaled_variable(
-                        s_N->fNTel, fData->getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
-                        fData->getWidth(), s_N->mscw_T ) );
+                               s_N->fNTel, fData->getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
+                               fData->getWidth(), s_N->mscw_T ) );
             fData->setMLR( VMeanScaledVariables::mean_scaled_variable(
-                        s_N->fNTel, fData->getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
-                        fData->getLength(), s_N->mscl_T ) );
+                               s_N->fNTel, fData->getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
+                               fData->getLength(), s_N->mscl_T ) );
 
             // set energy values
             fData->setEnergy( s_N->energySR, true );

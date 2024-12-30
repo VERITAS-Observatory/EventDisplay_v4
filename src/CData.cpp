@@ -41,7 +41,7 @@ Int_t CData::GetEntry( Long64_t entry )
 
     if( fTelescopeCombination > 0 && fTelescopeCombination != 15 )
     {
-        reconstruct_3tel_images(fTelescopeCombination);
+        reconstruct_3tel_images( fTelescopeCombination );
     }
     return a;
 }
@@ -632,26 +632,26 @@ Bool_t CData::Notify()
  * - ErecS, EChi2S, dES (lookup table based energy reconstruction results)
  *
  */
-void CData::reconstruct_3tel_images(unsigned long int telescope_combination)
+void CData::reconstruct_3tel_images( unsigned long int telescope_combination )
 {
     reconstruct_3tel_reset_variables();
-    bitset<sizeof(long int) * 4> tel_bitset(telescope_combination);
-    bitset<sizeof(long int) * 4> tel_nimages(0);
+    bitset<sizeof(long int ) * 4> tel_bitset( telescope_combination );
+    bitset<sizeof(long int ) * 4> tel_nimages( 0 );
 
     // update list of available images
     UInt_t tel_list[VDST_MAXTELESCOPES];
-    for(unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
+    for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
     {
         tel_list[i] = 9999;
     }
     unsigned int z = 0;
-    for(int i = 0; i < NImages; i++ )
+    for( int i = 0; i < NImages; i++ )
     {
         unsigned int t = ImgSel_list[i];
-        if( tel_bitset.test(t) )
+        if( tel_bitset.test( t ) )
         {
-            tel_list[z]=t;
-            tel_nimages.set(t);
+            tel_list[z] = t;
+            tel_nimages.set( t );
             z++;
         }
         else
@@ -664,7 +664,7 @@ void CData::reconstruct_3tel_images(unsigned long int telescope_combination)
     }
     // ImgSel_list lists the available images (e.g., 2, 3, 4) and is of length NImages
     NImages = z;
-    for(int i = 0; i < NImages; i++ )
+    for( int i = 0; i < NImages; i++ )
     {
         ImgSel_list[i] = tel_list[i];
     }
@@ -676,7 +676,7 @@ void CData::reconstruct_3tel_images(unsigned long int telescope_combination)
     }
 
     SizeSecondMax = 0.;
-    for(int i = 0; i < NImages; i++ )
+    for( int i = 0; i < NImages; i++ )
     {
         unsigned int t = ImgSel_list[i];
         if( size[t] > SizeSecondMax )
@@ -749,10 +749,10 @@ void CData::reconstruct_3tel_images_scaled_emission_height()
 */
 void CData::reconstruct_3tel_images_scaled_variables()
 {
-    MSCW = VMeanScaledVariables::mean_reduced_scaled_variable(4, width, MSCWT, MSCWTSigma );
-    MSCL = VMeanScaledVariables::mean_reduced_scaled_variable(4, length, MSCLT, MSCLTSigma );
-    MWR = VMeanScaledVariables::mean_scaled_variable(4, width, size, MSCWT );
-    MLR = VMeanScaledVariables::mean_scaled_variable(4, length, size, MSCLT );
+    MSCW = VMeanScaledVariables::mean_reduced_scaled_variable( 4, width, MSCWT, MSCWTSigma );
+    MSCL = VMeanScaledVariables::mean_reduced_scaled_variable( 4, length, MSCLT, MSCLTSigma );
+    MWR = VMeanScaledVariables::mean_scaled_variable( 4, width, size, MSCWT );
+    MLR = VMeanScaledVariables::mean_scaled_variable( 4, length, size, MSCLT );
 }
 
 /*
@@ -763,12 +763,12 @@ void CData::reconstruct_3tel_images_direction()
 {
     // intersection method
     VSimpleStereoReconstructor i_SR;
-    i_SR.initialize(2, fStereoMinAngle);
+    i_SR.initialize( 2, fStereoMinAngle );
     i_SR.reconstruct_direction(
-            fTelX.size(),
-            ArrayPointing_Elevation, ArrayPointing_Azimuth,
-            fTelX.data(), fTelY.data(), fTelZ.data(),
-            size, cen_x, cen_y, cosphi, sinphi, width, length, 0 );
+        fTelX.size(),
+        ArrayPointing_Elevation, ArrayPointing_Azimuth,
+        fTelX.data(), fTelY.data(), fTelZ.data(),
+        size, cen_x, cen_y, cosphi, sinphi, width, length, 0 );
     Xoff_intersect = i_SR.fShower_Xoffset;
     Yoff_intersect = i_SR.fShower_Yoffset;
 
@@ -777,7 +777,7 @@ void CData::reconstruct_3tel_images_direction()
     float xs, ys, dispdiff;
 
     VDispAnalyzer i_dispAnalyzer;
-    i_dispAnalyzer.calculateMeanShowerDirection(v_x, v_y, v_weight, xs, ys, dispdiff, v_x.size() );
+    i_dispAnalyzer.calculateMeanShowerDirection( v_x, v_y, v_weight, xs, ys, dispdiff, v_x.size() );
     // expect that this is called for MC only
     Xoff = Xoff_derot = xs;
     Yoff = Yoff_derot = ys;
@@ -795,21 +795,21 @@ void CData::reconstruct_3tel_images_direction()
 
     // core reconstruction
     i_SR.reconstruct_core(
-           fTelX.size(),
-           ArrayPointing_Elevation, ArrayPointing_Azimuth,
-           Xoff, Yoff,
-           fTelX.data(), fTelY.data(), fTelZ.data(),
-           size, cen_x, cen_y, cosphi, sinphi, width, length, 0 );
+        fTelX.size(),
+        ArrayPointing_Elevation, ArrayPointing_Azimuth,
+        Xoff, Yoff,
+        fTelX.data(), fTelY.data(), fTelZ.data(),
+        size, cen_x, cen_y, cosphi, sinphi, width, length, 0 );
     Xcore = i_SR.fShower_Xcore;
     Ycore = i_SR.fShower_Ycore;
-    bitset<sizeof(long int) * 4> tel_nimages(ImgSel);
+    bitset<sizeof(long int ) * 4> tel_nimages( ImgSel );
     for( unsigned int t = 0; t < fTelX.size(); t++ )
     {
         R_core[t] = -9999.;
-        if( tel_nimages.test(t) && Ze >= 0. && Xcore > -9998. && Ycore > -9998. )
+        if( tel_nimages.test( t ) && Ze >= 0. && Xcore > -9998. && Ycore > -9998. )
         {
             R_core[t] = VUtilities::line_point_distance(
-                 Ycore, -1.*Xcore, 0., Ze, Az, fTelY[t], -1.*fTelX[t], fTelZ[t] );
+                            Ycore, -1.*Xcore, 0., Ze, Az, fTelY[t], -1.*fTelX[t], fTelZ[t] );
         }
     }
 }
@@ -822,11 +822,11 @@ void CData::reconstruct_3tel_images_energy()
 {
     VDispAnalyzer i_dispAnalyzer;
     vector< float > disp_energy_T;
-    for(unsigned int t = 0; t < fTelX.size(); t++ )
+    for( unsigned int t = 0; t < fTelX.size(); t++ )
     {
         disp_energy_T.push_back( E[t] );
     }
-    i_dispAnalyzer.calculateMeanEnergy( disp_energy_T, size, 0);
+    i_dispAnalyzer.calculateMeanEnergy( disp_energy_T, size, 0 );
     Erec = i_dispAnalyzer.getEnergy();
     EChi2 = i_dispAnalyzer.getEnergyChi2();
     dE = i_dispAnalyzer.getEnergydES();
@@ -839,8 +839,8 @@ void CData::reconstruct_3tel_images_energy()
  *
  */
 void CData::initialize_3tel_reconstruction(
-        unsigned long int telescope_combination,
-        double stereo_reconstruction_min_angle, vector< double > tel_x, vector< double > tel_y, vector< double > tel_z )
+    unsigned long int telescope_combination,
+    double stereo_reconstruction_min_angle, vector< double > tel_x, vector< double > tel_y, vector< double > tel_z )
 {
     fTelescopeCombination = telescope_combination;
     fStereoMinAngle = stereo_reconstruction_min_angle;

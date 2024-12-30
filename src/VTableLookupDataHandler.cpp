@@ -1498,9 +1498,9 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "NTelPairs", &fNTelPairs, iTT );
     fOTree->Branch( "SizeSecondMax", &fSizeSecondMax, "SizeSecondMax/D" );
 
-// large storage footprint; not used anywhere
-//    sprintf( iTT, "fEmissionHeightT[NTelPairs]/F" );
-//    fOTree->Branch( "EmissionHeightT", fEmissionHeightT, iTT );
+    // large storage footprint; not used anywhere
+    //    sprintf( iTT, "fEmissionHeightT[NTelPairs]/F" );
+    //    fOTree->Branch( "EmissionHeightT", fEmissionHeightT, iTT );
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
     {
         fEmissionHeightT[i] = -99.;

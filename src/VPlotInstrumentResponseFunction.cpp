@@ -102,7 +102,7 @@ bool VPlotInstrumentResponseFunction::addInstrumentResponseData( string iFile, d
     iTempIRFReader->setDebug( fDebug );
     if( iColor < 0 )
     {
-        iColor = VUtilities::color_id(fData.size() + 1);
+        iColor = VUtilities::color_id( fData.size() + 1 );
     }
     if( iLineStyle < 0 )
     {
@@ -1634,12 +1634,12 @@ TCanvas* VPlotInstrumentResponseFunction::plotPSF( vector< double > i_Energy_TeV
                 TH1D* hCumu = get_Cumulative_Histogram( h, true, true );
                 if( iCumulative )
                 {
-                    hCumu->SetLineColor( VUtilities::color_id(i+1) );
+                    hCumu->SetLineColor( VUtilities::color_id( i + 1 ) );
                     hCumu->Draw( "same" );
                 }
                 else
                 {
-                    h->SetLineColor( VUtilities::color_id(i+1) );
+                    h->SetLineColor( VUtilities::color_id( i + 1 ) );
                     // rebin
                     if( iPlotTheta2 )
                     {

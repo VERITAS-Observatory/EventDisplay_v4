@@ -9,21 +9,21 @@
  * Mean reduced scaled variable (e.g. mscw)
  *
 */
-double VMeanScaledVariables::mean_reduced_scaled_variable(unsigned int ntel, float *data_value, float *mc_value, float *mc_sigma)
+double VMeanScaledVariables::mean_reduced_scaled_variable( unsigned int ntel, float* data_value, float* mc_value, float* mc_sigma )
 {
-   double value = 0.;
-   double weight = 0;
+    double value = 0.;
+    double weight = 0;
 
-   if(ntel < 1)
-   {
-       return -9999.;
-   }
+    if( ntel < 1 )
+    {
+        return -9999.;
+    }
 
     for( unsigned int t = 0; t < ntel; t++ )
     {
         if( mc_value[t] > -90. && mc_sigma[t] > -90. )
         {
-            value += ( data_value[t] - mc_value[t] ) / mc_sigma[t] * (mc_value[t] * mc_value[t]) / ( mc_sigma[t] * mc_sigma[t] );
+            value += ( data_value[t] - mc_value[t] ) / mc_sigma[t] * ( mc_value[t] * mc_value[t] ) / ( mc_sigma[t] * mc_sigma[t] );
             weight += ( mc_value[t] * mc_value[t] ) / ( mc_sigma[t] * mc_sigma[t] );
         }
     }
@@ -34,23 +34,23 @@ double VMeanScaledVariables::mean_reduced_scaled_variable(unsigned int ntel, flo
     return value / weight;
 }
 
-double VMeanScaledVariables::mean_reduced_scaled_variable(unsigned int ntel, float *data_value, double *mc_value, double *mc_sigma)
+double VMeanScaledVariables::mean_reduced_scaled_variable( unsigned int ntel, float* data_value, double* mc_value, double* mc_sigma )
 {
     float f_mc_value[ntel];
     float f_mc_sigma[ntel];
-    for(unsigned int t = 0; t < ntel; t++ )
+    for( unsigned int t = 0; t < ntel; t++ )
     {
-        f_mc_value[t] = (float)mc_value[t];
-        f_mc_sigma[t] = (float)mc_sigma[t];
+        f_mc_value[t] = ( float )mc_value[t];
+        f_mc_sigma[t] = ( float )mc_sigma[t];
     }
-    return VMeanScaledVariables::mean_reduced_scaled_variable(ntel, data_value, f_mc_value, f_mc_sigma );
+    return VMeanScaledVariables::mean_reduced_scaled_variable( ntel, data_value, f_mc_value, f_mc_sigma );
 }
 
 /*
  * mean scaled variables (e.g. MWR)
  *
 */
-double VMeanScaledVariables::mean_scaled_variable(unsigned int ntel, float *data, float *size, float *mc_value )
+double VMeanScaledVariables::mean_scaled_variable( unsigned int ntel, float* data, float* size, float* mc_value )
 {
     double imr = 0.;
     double inr = 0.;
@@ -70,12 +70,12 @@ double VMeanScaledVariables::mean_scaled_variable(unsigned int ntel, float *data
     return -9999.;
 }
 
-double VMeanScaledVariables::mean_scaled_variable(unsigned int ntel, float *data, float *size, double *mc_value )
+double VMeanScaledVariables::mean_scaled_variable( unsigned int ntel, float* data, float* size, double* mc_value )
 {
     float f_mc_value[ntel];
-    for(unsigned int t = 0; t < ntel; t++ )
+    for( unsigned int t = 0; t < ntel; t++ )
     {
-        f_mc_value[t] = (float)mc_value[t];
+        f_mc_value[t] = ( float )mc_value[t];
     }
-    return VMeanScaledVariables::mean_scaled_variable(ntel, data, size, f_mc_value );
+    return VMeanScaledVariables::mean_scaled_variable( ntel, data, size, f_mc_value );
 }

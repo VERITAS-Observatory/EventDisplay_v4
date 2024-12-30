@@ -122,7 +122,7 @@ class VDispAnalyzer
                                          bool UseIntersectForHeadTail,
                                          int* img_fitstat );
 
-        void calculateMeanEnergy(vector< float >& disp_energy_T, float* img_size, double* img_weight);
+        void calculateMeanEnergy( vector< float >& disp_energy_T, float* img_size, double* img_weight );
         void calculateMeanShowerDirection( vector< float >& v_x, vector< float >& v_y, vector< float >& v_weight,
                                            float& xs, float& ys, float& dispdiff, unsigned int iMaxN );
 
@@ -134,7 +134,7 @@ class VDispAnalyzer
                 float* img_tgrad, float* img_loss, int* img_ntubes,
                 double* img_weight,
                 double xoff_4, double yoff_4,
-                float * img_fui, float* img_pedvar, int* img_fitstat );
+                float* img_fui, float* img_pedvar, int* img_fitstat );
 
         float evaluate( float iWidth, float iLength, float iAsymm, float iDist,
                         float iSize, float iPedvar, float itgrad, float iLoss,

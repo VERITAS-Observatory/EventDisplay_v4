@@ -2159,7 +2159,7 @@ TGraph* VTMVAEvaluator::fillfromGraph2D( TObject* i_G, double i_ze_min, double i
  */
 void VTMVAEvaluator::calculate_average_zenith_angle()
 {
-    if( !fData ) return;
+    if(!fData ) return;
 
     double i_ze = 0.;
     double i_n = 0.;
@@ -2170,10 +2170,10 @@ void VTMVAEvaluator::calculate_average_zenith_angle()
     Long64_t nEntries = fData->fChain->GetEntries();
     if( nEntries > 1 )
     {
-        fData->GetEntry(nEntries/2);
+        fData->GetEntry( nEntries / 2 );
         i_ze += fData->ArrayPointing_Elevation;
         i_n++;
-        fData->GetEntry(nEntries-1);
+        fData->GetEntry( nEntries - 1 );
         i_ze += fData->ArrayPointing_Elevation;
         i_n++;
     }

@@ -551,7 +551,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
     telconfig_arraycentre_X = telconfig->getArrayCentreX();
     telconfig_arraycentre_Y = telconfig->getArrayCentreY();
     telconfig_arraymax      = telconfig->getArrayMaxSize();
-    for(unsigned int t = 0; t < telconfig->fChain->GetEntries(); t++ )
+    for( unsigned int t = 0; t < telconfig->fChain->GetEntries(); t++ )
     {
         telconfig->GetEntry( t );
         telconfig_telx.push_back( telconfig->TelX );

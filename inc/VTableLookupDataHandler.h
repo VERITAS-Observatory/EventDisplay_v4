@@ -340,7 +340,7 @@ class VTableLookupDataHandler
         {
             return fRTel;
         }
-        float * getDistanceToCore( ULong64_t iTelType );
+        float* getDistanceToCore( ULong64_t iTelType );
         int    getEventNumber()
         {
             return eventNumber;
