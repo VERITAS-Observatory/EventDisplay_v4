@@ -574,7 +574,7 @@ void VTableLookupRunParameter::print( int iP )
         if( fRerunStereoReconstruction_BDTFileName.size() > 0 )
         {
             cout << "\t reading BDT TMVA files from " << fRerunStereoReconstruction_BDTFileName << endl;
-            cout << "\t BDT TMVA stereo reconstruction is applied for events with <= ";
+            cout << "\t BDT TMVA stereo reconstruction is applied for events with: ";
             if( fmaxdist < 1.e3 )
             {
                 cout << "\t BDT TMVA stereo reconstruction distance cut < " << fmaxdist << endl;
