@@ -1976,7 +1976,7 @@ void VTableLookupDataHandler::copyMCHistograms()
         if( iMC_his && fOutFile )
         {
             cout << "\t writing MC histograms" << endl;
-            iMC_his->print(true);
+            iMC_his->print( true );
             fOutFile->cd();
             iMC_his->Write();
         }

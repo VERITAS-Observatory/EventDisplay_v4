@@ -83,7 +83,7 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
         {
             print();
         }
-        void      print(bool bTruncate = false);
+        void      print( bool bTruncate = false );
         bool      readFromEffectiveAreaTree( string iFile );
         bool      readFromEffectiveAreaFile( string iFile );
         bool      matchDataVectors( vector< double > iAzMin, vector< double > iAzMax, vector< double > iSpectralIndex );
@@ -95,7 +95,7 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
         void      setDefaultValues();
         bool      setMonteCarloEnergyRange( double iMin, double iMax, double iMCIndex = 2. );
 
-        ClassDef( VEffectiveAreaCalculatorMCHistograms, 14 );
+        ClassDef( VEffectiveAreaCalculatorMCHistograms, 13 );
 };
 
 #endif

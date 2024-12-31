@@ -95,11 +95,6 @@ void VEffectiveAreaCalculatorMCHistograms::print( bool bTruncate )
                     cout << getHistogram_EmcUnweighted( j )->GetEntries();
                 }
                 cout << endl;
-                if( bTruncate )
-                {
-                    cout << "\t ...not printing other spectral index bins" << endl;
-                    return;
-                }
             }
             if( bTruncate )
             {
