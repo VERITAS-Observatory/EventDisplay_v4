@@ -506,6 +506,7 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
                 && img_width[i] > fWidth_min
                 && ( img_fitstat[i] < 1 || img_fitstat[i] >= fFitstat_min ) )
         {
+            cout << "NDISP " << i << "\t" << img_size[i] << endl;
             disp = evaluate(( float )img_width[i], ( float )img_length[i], ( float )img_asym[i],
                             ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
                             ( float )img_size[i], img_pedvar[i], ( float )img_tgrad[i], ( float )img_loss[i],

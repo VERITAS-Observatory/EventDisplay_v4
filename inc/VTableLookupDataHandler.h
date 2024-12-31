@@ -300,6 +300,7 @@ class VTableLookupDataHandler
         // disp related variables
         float fXoff_edisp;
         float fYoff_edisp;
+        float fChi2_edisp;
         float fXoff_intersect;                  //! keep direction from intersection method
         float fYoff_intersect;                  //! keep direction from intersection method
         float fXoff_T[VDST_MAXTELESCOPES];      //! direction reconstructed for each telescope
@@ -482,8 +483,8 @@ class VTableLookupDataHandler
         {
             return fOutFile;
         }
-        float* getSize( double iSizeCorrection = 1., bool iSelectedImagesOnly = false );
-        float* getSize( double iSizeCorrection, ULong64_t iTelType, bool iSelectedImagesOnly );
+        float* getSize( bool iSelectedImagesOnly = false );
+        float* getSize( ULong64_t iTelType, bool iSelectedImagesOnly );
         double* getWeight()
         {
             return fweight;

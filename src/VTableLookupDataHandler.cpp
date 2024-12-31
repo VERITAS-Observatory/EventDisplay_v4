@@ -603,7 +603,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
             getNTel(),
             fArrayPointing_Elevation, fArrayPointing_Azimuth,
             fTel_type,
-            getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
+            getSize( true ),
             fcen_x, fcen_y,
             fcosphi, fsinphi,
             fwidth, flength,
@@ -643,6 +643,7 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
     // save original values
     fXoff_edisp = fXoff;
     fYoff_edisp = fYoff;
+    fChi2_edisp = fchi2;
     ///////////////////////////
     // stereo reconstruction
     // (equivalent to rcs_method4)
@@ -651,7 +652,7 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
     i_SR.reconstruct_direction( getNTel(),
                                 fArrayPointing_Elevation, fArrayPointing_Azimuth,
                                 fTelX, fTelY, fTelZ,
-                                getSize( 1., bSelectedImagesOnly ),
+                                getSize( bSelectedImagesOnly ),
                                 fcen_x, fcen_y,
                                 fcosphi, fsinphi,
                                 fwidth, flength,
@@ -660,14 +661,15 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
     // (used also as seed values for DispAnalyzers)
     fXoff_intersect = i_SR.fShower_Xoffset;
     fYoff_intersect = i_SR.fShower_Yoffset;
+    fchi2 = i_SR.fShower_Chi2;
 
     // fall back to original eventdisplay results in case
     // simple reconstructor fails
-    if(( fXoff_intersect < -999. || fYoff_intersect < -999. )
-            && fchi2 >= 0 && isReconstructed() )
+    if(( fXoff_intersect < -999. || fYoff_intersect < -999. ) && fChi2_edisp >= 0 )
     {
         fXoff_intersect = fXoff_edisp;
         fYoff_intersect = fYoff_edisp;
+        fchi2 = fChi2_edisp;
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -685,7 +687,7 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
                              getNTel(),
                              fArrayPointing_Elevation, fArrayPointing_Azimuth,
                              fTel_type,
-                             getSize( 1., bSelectedImagesOnly ),
+                             getSize( bSelectedImagesOnly ),
                              fcen_x, fcen_y,
                              fcosphi, fsinphi,
                              fwidth, flength,
@@ -705,7 +707,7 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
                             getNTel(),
                             fArrayPointing_Elevation, fArrayPointing_Azimuth,
                             fTel_type,
-                            getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
+                            getSize( bSelectedImagesOnly ),
                             fcen_x, fcen_y,
                             fcosphi, fsinphi,
                             fwidth, flength,
@@ -731,7 +733,7 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
             getNTel(),
             fArrayPointing_Elevation, fArrayPointing_Azimuth,
             fTel_type,
-            getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
+            getSize( bSelectedImagesOnly ),
             fcen_x, fcen_y,
             fcosphi, fsinphi,
             fwidth, flength,
@@ -756,6 +758,7 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
         i_SR.fillShowerDirection( fXoff, fYoff );
         fnxyoff = fDispAnalyzerDirection->getXYWeight_disp().size();
         fNImages = ( int )fnxyoff;
+
         for( unsigned int t = 0; t < fnxyoff; t++ )
         {
             fXoff_T[t] = fDispAnalyzerDirection->getXcoordinate_disp( t );
@@ -816,7 +819,7 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
                                fArrayPointing_Elevation, fArrayPointing_Azimuth,
                                fXoff, fYoff,
                                fTelX, fTelY, fTelZ,
-                               getSize( 1., bSelectedImagesOnly ),
+                               getSize( bSelectedImagesOnly ),
                                fcen_x, fcen_y,
                                fcosphi, fsinphi,
                                fwidth, flength,
@@ -1973,7 +1976,7 @@ void VTableLookupDataHandler::copyMCHistograms()
         if( iMC_his && fOutFile )
         {
             cout << "\t writing MC histograms" << endl;
-            iMC_his->print();
+            iMC_his->print(true);
             fOutFile->cd();
             iMC_his->Write();
         }
@@ -2015,6 +2018,7 @@ void VTableLookupDataHandler::reset()
     fYoff_intersect = -99.;
     fXoff_edisp = -99.;
     fYoff_edisp = -99.;
+    fChi2_edisp = -999.;
     fXcore = -9999.;
     fYcore = -9999.;
     fstdP = -99.;
@@ -2266,6 +2270,7 @@ void VTableLookupDataHandler::resetAll()
     fYoff_intersect = 0.;
     fXoff_edisp = 0.;
     fYoff_edisp = 0.;
+    fChi2_edisp = 0.;
     fstdS = 0.;
     ftheta2 = 0.;
     fXcore = 0.;
@@ -2351,6 +2356,7 @@ void VTableLookupDataHandler::resetAll()
     fYoff_intersect = 0.;
     fXoff_edisp = 0.;
     fYoff_edisp = 0.;
+    fChi2_edisp = 0.;
 
     // cut efficiency counter
     fNStats_All = 0;
@@ -2556,21 +2562,23 @@ float* VTableLookupDataHandler::getDistanceToCore( ULong64_t iTelType )
  * used for table filling only
  *
  */
-float* VTableLookupDataHandler::getSize( double iSizeCorrection, bool iSelectedImagesOnly )
+float* VTableLookupDataHandler::getSize( bool iSelectedImagesOnly )
 {
     for( unsigned int i = 0; i < getNTel(); i++ )
     {
         if( iSelectedImagesOnly && !fImgSel_list[i] )
         {
             fsizeCorr[i] = -99.;
-            continue;
         }
-        fsizeCorr[i] = fsize[i] * iSizeCorrection;
+        else
+        {
+            fsizeCorr[i] = fsize[i];
+        }
     }
     return fsizeCorr;
 }
 
-float* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTelType, bool iSelectedImagesOnly )
+float* VTableLookupDataHandler::getSize( ULong64_t iTelType, bool iSelectedImagesOnly )
 {
     unsigned int z = 0;
     for( unsigned int i = 0; i < getNTel(); i++ )
@@ -2583,7 +2591,7 @@ float* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTel
                 z++;
                 continue;
             }
-            fsize_telType[z] = fsize[i] * iSizeCorrection;
+            fsize_telType[z] = fsize[i];
             z++;
         }
     }
@@ -2721,13 +2729,24 @@ float VTableLookupDataHandler::getArrayPointingDeRotationAngle()
 */
 void VTableLookupDataHandler::fill_selected_images_before_redo_stereo_reconstruction()
 {
-    float* tmp_size = getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly );
+    float* tmp_size = getSize( fTLRunParameter->fUseEvndispSelectedImagesOnly );
     unsigned int ii = 0;
     fImgSel = 0;
     bitset<8 * sizeof(unsigned long )> i_nimage;
+    bool i_analyse_telescope = false;
     for( unsigned int i = 0; i < getNTel(); i++ )
     {
-        if( tmp_size[i] > 0. && flength[i] > 0. && fntubes[i] > fTLRunParameter->fminntubes && fArrayPointing_Elevation > 0.
+        i_analyse_telescope = false;
+        for( unsigned int t = 0; t < fTLRunParameter->fTelToAnalyse.size(); t++ )
+        {
+            if( i == fTLRunParameter->fTelToAnalyse[t] )
+            {
+                i_analyse_telescope = true;
+                break;
+            }
+        }
+        if( i_analyse_telescope &&
+                tmp_size[i] > 0. && flength[i] > 0. && fntubes[i] > fTLRunParameter->fminntubes && fArrayPointing_Elevation > 0.
                 && sqrt( fcen_x[i]*fcen_x[i] + fcen_y[i]*fcen_y[i] ) < fTLRunParameter->fmaxdist
                 && floss[i] < fTLRunParameter->fmaxloss
                 && ffui[i] > fTLRunParameter->fminfui )
@@ -2745,4 +2764,5 @@ void VTableLookupDataHandler::fill_selected_images_before_redo_stereo_reconstruc
         }
     }
     fImgSel = i_nimage.to_ulong();
+    fNImages = i_nimage.count();
 }
