@@ -742,13 +742,13 @@ TCanvas* VPlotAnasumHistograms::plot_theta2( double t2min, double t2max, int irb
 
         if( containment_lines )
         {
-            TLine *iL_68 = new TLine( t_68, 0., t_68, htheta2_diff->GetMaximum()*0.5);
-            iL_68->SetLineStyle(2);
-            iL_68->SetLineColor(2);
+            TLine *iL_68 = new TLine( t_68, 0., t_68, htheta2_diff->GetMaximum() * 0.5 );
+            iL_68->SetLineStyle( 2 );
+            iL_68->SetLineColor( 2 );
             iL_68->Draw();
-            TLine *iL_95 = new TLine( t_95, 0., t_95, htheta2_diff->GetMaximum()*0.5);
-            iL_95->SetLineStyle(2);
-            iL_95->SetLineColor(2);
+            TLine *iL_95 = new TLine( t_95, 0., t_95, htheta2_diff->GetMaximum() * 0.5 );
+            iL_95->SetLineStyle( 2 );
+            iL_95->SetLineColor( 2 );
             iL_95->Draw();
         }
 

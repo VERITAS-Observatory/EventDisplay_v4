@@ -244,7 +244,7 @@ int VStereoAnalysis::getDataRunNumber() const
         }
     }
 
-    gROOT->SetMustClean(false);
+    gROOT->SetMustClean( false );
     exit( EXIT_FAILURE );
     return -1;
 }

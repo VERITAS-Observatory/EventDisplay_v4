@@ -1,8 +1,6 @@
 /*! \file VDispTableAnalyzer
     \brief get DISP values from tables
 
-
-
 */
 
 #include "VDispTableAnalyzer.h"
@@ -270,12 +268,6 @@ void VDispTableAnalyzer::terminate()
      Problem: don't really now on which site of the image the arrival direction is.
 
      Choose combination with smallest RMS compared to computed mean direction
-
-     Preliminary and todo :
-
-     Attention analysis of large array data: use first 16 telescopes only
-                                             (should be: use try combinations if first XX telescopes; then choose
-					                 the direction with smallest difference to existing mean)
 
      input:
 

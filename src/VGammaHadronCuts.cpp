@@ -1406,7 +1406,7 @@ bool VGammaHadronCuts::applyTMVACut( int i )
     fTMVA_EvaluationResult = -99.;
     if( fTMVAEvaluator )
     {
-        bool i_TMVA_Evaluation = fTMVAEvaluator->evaluate(false, true);
+        bool i_TMVA_Evaluation = fTMVAEvaluator->evaluate( false, true );
         fTMVA_EvaluationResult = fTMVAEvaluator->getTMVA_EvaluationResult();
         return i_TMVA_Evaluation;
     }
@@ -1652,7 +1652,7 @@ void VGammaHadronCuts::initializeCuts( int irun, string iFile )
         {
             cout << "VGammaHadronCuts::initializeCuts: failed setting probability cuts for " << irun << " " << iFile << endl;
             cout << "exiting..." << endl;
-            exit(-1 );
+            exit( EXIT_FAILURE );
         }
     }
     // TMVA cuts

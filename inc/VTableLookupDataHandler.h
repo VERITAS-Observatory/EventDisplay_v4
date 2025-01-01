@@ -284,9 +284,6 @@ class VTableLookupDataHandler
         float  fenergy;                           //!< reconstructed primary energy
         float  fechi2;                            //!< chi2 from reconstructed primary energy
         float  fdE;                               //!< dE from reconstructed primary energy
-        float  fesys;                             //!< energy correction
-        float  fesysVar;                          //!< energy correction (variance)
-        float  fesysDist;                         //!< mean distance to maximum in emission height
         float  fenergyS;                          //!< reconstructed primary energy
         float  fechi2S;                           //!< chi2 from reconstructed primary energy
         float  fdES;                              //!< dE from reconstructed primary energy
@@ -303,6 +300,7 @@ class VTableLookupDataHandler
         // disp related variables
         float fXoff_edisp;
         float fYoff_edisp;
+        float fChi2_edisp;
         float fXoff_intersect;                  //! keep direction from intersection method
         float fYoff_intersect;                  //! keep direction from intersection method
         float fXoff_T[VDST_MAXTELESCOPES];      //! direction reconstructed for each telescope
@@ -343,7 +341,7 @@ class VTableLookupDataHandler
         {
             return fRTel;
         }
-        float * getDistanceToCore( ULong64_t iTelType );
+        float* getDistanceToCore( ULong64_t iTelType );
         int    getEventNumber()
         {
             return eventNumber;
@@ -485,8 +483,8 @@ class VTableLookupDataHandler
         {
             return fOutFile;
         }
-        float* getSize( double iSizeCorrection = 1., bool iSelectedImagesOnly = false );
-        float* getSize( double iSizeCorrection, ULong64_t iTelType, bool iSelectedImagesOnly );
+        float* getSize( bool iSelectedImagesOnly = false );
+        float* getSize( ULong64_t iTelType, bool iSelectedImagesOnly );
         double* getWeight()
         {
             return fweight;
@@ -547,11 +545,11 @@ class VTableLookupDataHandler
         }
         void setEnergy( float iE, bool iTableErecS = true )
         {
-            if( iTableErecS )
+            if( iTableErecS )  // table energy reconstruction
             {
                 fenergyS = iE;
             }
-            else
+            else  // dispBDT energy reconstruction
             {
                 fenergy = iE;
             }

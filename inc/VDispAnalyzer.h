@@ -69,9 +69,6 @@ class VDispAnalyzer
         vector<ULong64_t> fTelescopeTypeList;
         vector<float> fTelescopeFOV;
 
-        void calculateMeanShowerDirection( vector< float >& v_x, vector< float >& v_y, vector< float >& v_weight,
-                                           float& xs, float& ys, float& dispdiff, unsigned int iMaxN );
-
         unsigned int find_smallest_diff_element(
             vector< vector< float > >& i_sign,
             vector< float >& x, vector< float >& y,
@@ -125,6 +122,10 @@ class VDispAnalyzer
                                          bool UseIntersectForHeadTail,
                                          int* img_fitstat );
 
+        void calculateMeanEnergy( vector< float >& disp_energy_T, float* img_size, double* img_weight );
+        void calculateMeanShowerDirection( vector< float >& v_x, vector< float >& v_y, vector< float >& v_weight,
+                                           float& xs, float& ys, float& dispdiff, unsigned int iMaxN );
+
         vector< float > calculateExpectedDirectionError_or_Sign( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
                 ULong64_t* iTelType,
                 float* img_size, float* img_cen_x, float* img_cen_y,
@@ -133,7 +134,7 @@ class VDispAnalyzer
                 float* img_tgrad, float* img_loss, int* img_ntubes,
                 double* img_weight,
                 double xoff_4, double yoff_4,
-                float * img_fui, float* img_pedvar, int* img_fitstat );
+                float* img_fui, float* img_pedvar, int* img_fitstat );
 
         float evaluate( float iWidth, float iLength, float iAsymm, float iDist,
                         float iSize, float iPedvar, float itgrad, float iLoss,

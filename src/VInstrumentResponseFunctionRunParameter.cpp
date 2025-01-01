@@ -16,7 +16,7 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
     fSpectralIndexMin = 2.0;
     fSpectralIndexStep = 0.1;
 
-    fEnergyReconstructionMethod = 1;
+    fEnergyReconstructionMethod = 0;
     fEnergyAxisBins_log10 = 60;
     fIgnoreEnergyReconstructionQuality = false;
 
@@ -61,8 +61,10 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
     fpedvar = 0.;
     fXoff  = 0.;
     fYoff  = 0.;
+    fRerunStereoReconstruction_minAngle = 0;
+    fRerunStereoReconstruction_3telescopes = 15;  // 15 == use all available telescopes
 
-    fWobbleIsotropic = 0.; //DS
+    fWobbleIsotropic = 0.;
 
     telconfig_ntel = 0;
     telconfig_arraycentre_X = 0.;
@@ -315,28 +317,36 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
                     is_stream >> fCREnergySpectrumID;
                 }
             }
-            //DS manually input the zenith
-            else if( temp == "ZENITH" ) //DS
+            // manually input the zenith
+            else if( temp == "ZENITH" )
             {
                 if(!( is_stream >> std::ws ).eof() )
                 {
-                    is_stream >> fze;    //DS
+                    is_stream >> fze;
                 }
             }
-            //DS manually input the zenith
-            else if( temp == "NOISE" ) //DS
+            // manually input the zenith
+            else if( temp == "NOISE" )
             {
                 if(!( is_stream >> std::ws ).eof() )
                 {
-                    is_stream >> fnoise;    //DS
+                    is_stream >> fnoise;
                 }
             }
-            //DS manually input the wobble
-            else if( temp == "WOBBLEISOTROPIC" ) //DS
+            // manually input the wobble
+            else if( temp == "WOBBLEISOTROPIC" )
             {
                 if(!( is_stream >> std::ws ).eof() )
                 {
-                    is_stream >> fWobbleIsotropic;    //DS
+                    is_stream >> fWobbleIsotropic;
+                }
+            }
+            // 3-telescope reconstruction (MC only)
+            else if( temp == "RERUN_STEREO_RECONSTRUCTION_3TEL" )
+            {
+                if(!( is_stream >> std::ws ).eof() )
+                {
+                    is_stream >> fRerunStereoReconstruction_3telescopes;
                 }
             }
         }
@@ -494,6 +504,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
         fnoise = fR->fNoiseLevel;
     }
     fpedvar = fR->meanpedvars;
+    fRerunStereoReconstruction_minAngle = fR->fRerunStereoReconstruction_minAngle;
     // get wobble offset from first event in file
     // (should not change during a simulation run!)
     TTree* i_data = ( TTree* )iFile->Get( "data" );
@@ -534,12 +545,19 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
     if( telconfig->IsZombie() )
     {
         cout << "error while reading telescope configuration" << endl;
-        exit( 0 );
+        exit( EXIT_FAILURE );
     }
     telconfig_ntel = telconfig->getNTel();
     telconfig_arraycentre_X = telconfig->getArrayCentreX();
     telconfig_arraycentre_Y = telconfig->getArrayCentreY();
     telconfig_arraymax      = telconfig->getArrayMaxSize();
+    for( unsigned int t = 0; t < telconfig->fChain->GetEntries(); t++ )
+    {
+        telconfig->GetEntry( t );
+        telconfig_telx.push_back( telconfig->TelX );
+        telconfig_tely.push_back( telconfig->TelY );
+        telconfig_telz.push_back( telconfig->TelZ );
+    }
 
     ////////////////////////////////////////
 

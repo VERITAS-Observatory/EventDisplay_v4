@@ -59,9 +59,6 @@ VStereoReconstruction::VStereoReconstruction()
     setPlottingCanvasSize();
 }
 
-/*
-   todo: check if this is valid
-*/
 bool VStereoReconstruction::setPlottingVariable( string iVar )
 {
     fPlottingVariable = iVar;

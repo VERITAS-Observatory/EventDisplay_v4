@@ -486,12 +486,14 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
      - make sure that the same number of zenith, az, NSB tables are given for each telescope type
 
 */
-bool VTableLookup::sanityCheckLookupTableFile( bool iPrint )
+bool VTableLookup::sanityCheckLookupTableFile( bool iNoPrint )
 {
     // print a summary of the number of tables found
-    if( iPrint == false )
+    if( iNoPrint == false )
     {
-        cout << "Found " << fTableZe.size() << " zenith angles, " << fTableZeOffset[0].size() << " wobble offsets, " << fTableAzBins << " azimuth bins and " << fTelType_tables[0][0][0].size() << " telescope types" << endl;
+        cout << "Found " << fTableZe.size() << " zenith angles, ";
+        cout << fTableZeOffset[0].size() << " wobble offsets, ";
+        cout << fTableAzBins << " azimuth bins and " << fTelType_tables[0][0][0].size() << " telescope types" << endl;
     }
     return true;
 }
@@ -503,7 +505,6 @@ bool VTableLookup::sanityCheckLookupTableFile( bool iPrint )
 */
 void VTableLookup::loop()
 {
-
     if( fwrite )
     {
         fillLookupTable();
@@ -567,7 +568,7 @@ void VTableLookup::fillLookupTable()
                 ULong64_t t = iter_i_list_of_Tel_type->first;
 
                 // This should be already the corrected/scaled size value for MC.
-                float* i_s = fData->getSize( 1., t, fTLRunParameter->fUseEvndispSelectedImagesOnly );
+                float* i_s = fData->getSize( t, fTLRunParameter->fUseEvndispSelectedImagesOnly );
                 float* i_r = fData->getDistanceToCore( t );
                 unsigned int i_type = fData->getNTel_type( t );
                 ////////////////////////////////////////////////
@@ -618,8 +619,6 @@ void VTableLookup::readLookupTable()
     double ze = 0.;
     double woff = 0.;
     int fevent = 0;
-    double imr = 0.;
-    double inr = 0.;
 
     // lookup table index for interpolation
     unsigned int ize_up = 0;
@@ -792,49 +791,18 @@ void VTableLookup::readLookupTable()
             }
             fData->setNMSCW( fnmscw );
             // set msc value (mean reduced scaled variables)
-            fData->setMSCW( s_N->mscw );
-            fData->setMSCL( s_N->mscl );
+            // Note change of interpolation approach with v492.0
+            // fData->setMSCW( s_N->mscw );
+            fData->setMSCW( VMeanScaledVariables::mean_reduced_scaled_variable( s_N->fNTel, fData->getWidth(), s_N->mscw_T, s_N->mscw_Tsigma ) );
+            // fData->setMSCL( s_N->mscl );
+            fData->setMSCL( VMeanScaledVariables::mean_reduced_scaled_variable( s_N->fNTel, fData->getLength(), s_N->mscl_T, s_N->mscl_Tsigma ) );
 
-            // calculate mean width ratio (mean scaled variables)
-            imr = 0.;
-            inr = 0.;
-            // require size > 0 (to use only selected images for the MWR/MWL calculation)
-            float* i_s = fData->getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly );
-            for( unsigned int j = 0; j < s_N->fNTel; j++ )
-            {
-                if( s_N->mscw_T[j] > 0. && fData->getWidth() && i_s && i_s[j] > 0. )
-                {
-                    imr += fData->getWidth()[j] / s_N->mscw_T[j];
-                    inr++;
-                }
-            }
-            if( inr > 0. )
-            {
-                fData->setMWR( imr / inr );
-            }
-            else
-            {
-                fData->setMWR(-99. );
-            }
-            // calculate mean length ratio (mean scaled variables)
-            imr = 0.;
-            inr = 0.;
-            for( unsigned int j = 0; j < s_N->fNTel; j++ )
-            {
-                if( s_N->mscl_T[j] > 0. && fData->getLength() && i_s && i_s[j] > 0. )
-                {
-                    imr += fData->getLength()[j] / s_N->mscl_T[j];
-                    inr++;
-                }
-            }
-            if( inr > 0. )
-            {
-                fData->setMLR( imr / inr );
-            }
-            else
-            {
-                fData->setMLR(-99. );
-            }
+            fData->setMWR( VMeanScaledVariables::mean_scaled_variable(
+                               s_N->fNTel, fData->getSize( fTLRunParameter->fUseEvndispSelectedImagesOnly ),
+                               fData->getWidth(), s_N->mscw_T ) );
+            fData->setMLR( VMeanScaledVariables::mean_scaled_variable(
+                               s_N->fNTel, fData->getSize( fTLRunParameter->fUseEvndispSelectedImagesOnly ),
+                               fData->getLength(), s_N->mscl_T ) );
 
             // set energy values
             fData->setEnergy( s_N->energySR, true );
@@ -1296,7 +1264,7 @@ void VTableLookup::calculateMSFromTables( VTablesToRead* s, double esys )
     }
     double i_dummy = 0.;
 
-    float* i_s = fData->getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly );
+    float* i_s = fData->getSize( fTLRunParameter->fUseEvndispSelectedImagesOnly );
 
     f_calc_msc->setCalculateEnergies( false );
     ///////////////////

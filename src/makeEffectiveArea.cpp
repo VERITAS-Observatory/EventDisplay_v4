@@ -16,7 +16,6 @@
 
 #include "VGlobalRunParameter.h"
 #include "CData.h"
-#include "Ctelconfig.h"
 #include "VGammaHadronCuts.h"
 #include "VEffectiveAreaCalculatorMCHistograms.h"
 #include "VEffectiveAreaCalculator.h"
@@ -191,7 +190,12 @@ int main( int argc, char* argv[] )
         exit( EXIT_FAILURE );
     }
 
-    CData d( c, true, 6, true );
+    CData d( c, true, true );
+    d.initialize_3tel_reconstruction(
+        fRunPara->fRerunStereoReconstruction_3telescopes,
+        fRunPara->fRerunStereoReconstruction_minAngle,
+        fRunPara->telconfig_telx, fRunPara->telconfig_tely, fRunPara->telconfig_telz
+    );
     fCuts->setDataTree(&d );
     TH1D* hE0mc = ( TH1D* )gDirectory->Get( "hE0mc" );
 
