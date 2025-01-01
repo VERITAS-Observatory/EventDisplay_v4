@@ -642,7 +642,7 @@ void CData::reconstruct_3tel_images( unsigned long int telescope_combination )
     UInt_t tel_list[VDST_MAXTELESCOPES];
     for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
     {
-        tel_list[i] = 9999;
+        tel_list[i] = -9999;
     }
     unsigned int z = 0;
     for( int i = 0; i < NImages; i++ )
@@ -784,7 +784,7 @@ void CData::reconstruct_3tel_images_direction()
     DispAbsSumWeigth = i_dispAnalyzer.get_abs_sum_disp_weight();
     DispDiff = Chi2 = dispdiff;
 
-    // Average/min angle between images not updated. TODO
+    // Average/min angle between images not updated.
     // approximiation for events which are reduced to 2-tel images;
     // the cut on the minimal angle between images is not applied.
     img2_ang = -9999.;
