@@ -626,6 +626,14 @@ Bool_t CData::Notify()
  *
  * Note! This is very fine tuned and should be used for effective area calculation only
  *
+ *
+ * Approximations:
+ *
+ * - lookup table values like MSCWT or MSCL are read from lookup tables using the 4-tel
+ *   reconstructed shower core and direction
+ * - dispEnergy per telescope is calculated using the 4-tel reconstructed shower core
+ *   and direction
+ *
  * Following variables are approximated or not calculated correctly:
  *
  * - img2_ang
@@ -637,7 +645,7 @@ void CData::reconstruct_3tel_images( unsigned long int telescope_combination )
     reconstruct_3tel_reset_variables();
     bitset<sizeof(long int ) * 4> tel_bitset( telescope_combination );
     bitset<sizeof(long int ) * 4> tel_nimages( 0 );
-    int NImages_saved = NImages;
+    int NImages_saved = (int)NImages;
 
     // update list of available images
     UInt_t tel_list[VDST_MAXTELESCOPES];
@@ -664,7 +672,7 @@ void CData::reconstruct_3tel_images( unsigned long int telescope_combination )
         }
     }
     // ImgSel_list lists the available images (e.g., 2, 3, 4) and is of length NImages
-    NImages = z;
+    NImages = (UShort_t)z;
     ImgSel = tel_nimages.to_ulong();
     for( int i = 0; i < NImages_saved; i++ )
     {
@@ -698,7 +706,6 @@ void CData::reconstruct_3tel_images( unsigned long int telescope_combination )
  */
 void CData::reconstruct_3tel_reset_variables()
 {
-    ImgSel = 0;
     SizeSecondMax = -9999.;
     EmissionHeight = -9999.;
     EmissionHeightChi2 = -9999.;
@@ -763,7 +770,7 @@ void CData::reconstruct_3tel_images_direction()
 {
     // intersection method
     double img_weight[fTelX.size()];
-    for(  unsigned int t = 0; t < fTelX.size(); t++ ) img_weight[t] = 1.;
+    for( unsigned int t = 0; t < fTelX.size(); t++ ) img_weight[t] = 1.;
     VSimpleStereoReconstructor i_SR;
     i_SR.initialize( 2, fStereoMinAngle );
     i_SR.reconstruct_direction(
@@ -777,7 +784,7 @@ void CData::reconstruct_3tel_images_direction()
     // disp method
     vector<float> v_x, v_y, v_weight;
     float xs, ys, dispdiff;
-    for(int i = 0; i < NImages; i++ )
+    for( int i = 0; i < NImages; i++ )
     {
         unsigned int t = ImgSel_list[i];
         v_x.push_back( DispXoff_T[t] );
