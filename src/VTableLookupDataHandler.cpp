@@ -2143,7 +2143,8 @@ bool VTableLookupDataHandler::isReconstructed()
  */
 void VTableLookupDataHandler::calcEmissionHeights()
 {
-    fEmissionHeightCalculator->getEmissionHeight( fcen_x, fcen_y, fsize,
+    fEmissionHeightCalculator->getEmissionHeight( fcen_x, fcen_y,
+            getSize( fTLRunParameter->fUseEvndispSelectedImagesOnly ),
             fArrayPointing_Azimuth, fArrayPointing_Elevation );
     fNTelPairs = fEmissionHeightCalculator->getNTelPairs();
     fEmissionHeightMean = ( float )fEmissionHeightCalculator->getMeanEmissionHeight();
