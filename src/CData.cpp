@@ -439,7 +439,7 @@ void CData::Init( TTree* tree )
     fChain->SetBranchAddress( "EmissionHeight", &EmissionHeight );
     fChain->SetBranchAddress( "EmissionHeightChi2", &EmissionHeightChi2 );
     fChain->SetBranchAddress( "NTelPairs", &NTelPairs );
-    if(!fShort )
+    if(!fShort && fChain->GetBranchStatus( "EmissionHeightT" ) )
     {
         fChain->SetBranchAddress( "EmissionHeightT", EmissionHeightT );
     }
@@ -637,12 +637,13 @@ void CData::reconstruct_3tel_images( unsigned long int telescope_combination )
     reconstruct_3tel_reset_variables();
     bitset<sizeof(long int ) * 4> tel_bitset( telescope_combination );
     bitset<sizeof(long int ) * 4> tel_nimages( 0 );
+    int NImages_saved = NImages;
 
     // update list of available images
     UInt_t tel_list[VDST_MAXTELESCOPES];
     for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
     {
-        tel_list[i] = -9999;
+        tel_list[i] = 0;
     }
     unsigned int z = 0;
     for( int i = 0; i < NImages; i++ )
@@ -664,11 +665,11 @@ void CData::reconstruct_3tel_images( unsigned long int telescope_combination )
     }
     // ImgSel_list lists the available images (e.g., 2, 3, 4) and is of length NImages
     NImages = z;
-    for( int i = 0; i < NImages; i++ )
+    ImgSel = tel_nimages.to_ulong();
+    for( int i = 0; i < NImages_saved; i++ )
     {
         ImgSel_list[i] = tel_list[i];
     }
-    ImgSel = tel_nimages.to_ulong();
     // require at least two images to continue
     if( NImages < 2 )
     {
@@ -697,7 +698,6 @@ void CData::reconstruct_3tel_images( unsigned long int telescope_combination )
  */
 void CData::reconstruct_3tel_reset_variables()
 {
-    NImages = 0;
     ImgSel = 0;
     SizeSecondMax = -9999.;
     EmissionHeight = -9999.;
@@ -762,19 +762,28 @@ void CData::reconstruct_3tel_images_scaled_variables()
 void CData::reconstruct_3tel_images_direction()
 {
     // intersection method
+    double img_weight[fTelX.size()];
+    for(  unsigned int t = 0; t < fTelX.size(); t++ ) img_weight[t] = 1.;
     VSimpleStereoReconstructor i_SR;
     i_SR.initialize( 2, fStereoMinAngle );
     i_SR.reconstruct_direction(
         fTelX.size(),
         ArrayPointing_Elevation, ArrayPointing_Azimuth,
         fTelX.data(), fTelY.data(), fTelZ.data(),
-        size, cen_x, cen_y, cosphi, sinphi, width, length, 0 );
+        size, cen_x, cen_y, cosphi, sinphi, width, length, img_weight );
     Xoff_intersect = i_SR.fShower_Xoffset;
     Yoff_intersect = i_SR.fShower_Yoffset;
 
     // disp method
     vector<float> v_x, v_y, v_weight;
     float xs, ys, dispdiff;
+    for(int i = 0; i < NImages; i++ )
+    {
+        unsigned int t = ImgSel_list[i];
+        v_x.push_back( DispXoff_T[t] );
+        v_y.push_back( DispYoff_T[t] );
+        v_weight.push_back( DispWoff_T[t] );
+    }
 
     VDispAnalyzer i_dispAnalyzer;
     i_dispAnalyzer.calculateMeanShowerDirection( v_x, v_y, v_weight, xs, ys, dispdiff, v_x.size() );
@@ -799,7 +808,7 @@ void CData::reconstruct_3tel_images_direction()
         ArrayPointing_Elevation, ArrayPointing_Azimuth,
         Xoff, Yoff,
         fTelX.data(), fTelY.data(), fTelZ.data(),
-        size, cen_x, cen_y, cosphi, sinphi, width, length, 0 );
+        size, cen_x, cen_y, cosphi, sinphi, width, length, img_weight );
     Xcore = i_SR.fShower_Xcore;
     Ycore = i_SR.fShower_Ycore;
     bitset<sizeof(long int ) * 4> tel_nimages( ImgSel );
