@@ -475,6 +475,31 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
         cout << "VInstrumentResponseFunctionRunParameter::readRunParameters() error reading simulation file: " << ifilename << endl;
         return false;
     }
+
+    ////////////////////////////////////////////////
+    // read array parameters
+    ////////////////////////////////////////
+    // get number of telescopes from file
+    TTree* t = ( TTree* )iFile->Get( "telconfig" );
+    Ctelconfig* telconfig = new Ctelconfig( t );
+    if( telconfig->IsZombie() )
+    {
+        cout << "error while reading telescope configuration" << endl;
+        exit( EXIT_FAILURE );
+    }
+    telconfig_ntel = telconfig->getNTel();
+    telconfig_arraycentre_X = telconfig->getArrayCentreX();
+    telconfig_arraycentre_Y = telconfig->getArrayCentreY();
+    telconfig_arraymax      = telconfig->getArrayMaxSize();
+    for( unsigned int t = 0; t < telconfig->fChain->GetEntries(); t++ )
+    {
+        telconfig->GetEntry( t );
+        telconfig_telx.push_back( telconfig->TelX );
+        telconfig_tely.push_back( telconfig->TelY );
+        telconfig_telz.push_back( telconfig->TelZ );
+    }
+
+    ////////////////////////////////////////
     // read instrument epoch from run parameters
     VEvndispRunParameter* i_runPara = ( VEvndispRunParameter* )iFile->Get( "runparameterV2" );
     if( i_runPara )
@@ -482,7 +507,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
         fObservatory = i_runPara->getObservatory();
         fInstrumentEpoch = i_runPara->fInstrumentEpoch;
         fInstrumentEpochATM = i_runPara->getInstrumentATMString();
-        fTelToAnalyse = i_runPara->fTelToAnalyze;
+        fTelToAnalyse = fillTelToAnalyze( i_runPara->fTelToAnalyze, fRerunStereoReconstruction_3telescopes );
     }
     else
     {
@@ -536,30 +561,6 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
         }
     }
 
-    ////////////////////////////////////////////////
-    // read array parameters
-    ////////////////////////////////////////
-    // get number of telescopes from file
-    TTree* t = ( TTree* )iFile->Get( "telconfig" );
-    Ctelconfig* telconfig = new Ctelconfig( t );
-    if( telconfig->IsZombie() )
-    {
-        cout << "error while reading telescope configuration" << endl;
-        exit( EXIT_FAILURE );
-    }
-    telconfig_ntel = telconfig->getNTel();
-    telconfig_arraycentre_X = telconfig->getArrayCentreX();
-    telconfig_arraycentre_Y = telconfig->getArrayCentreY();
-    telconfig_arraymax      = telconfig->getArrayMaxSize();
-    for( unsigned int t = 0; t < telconfig->fChain->GetEntries(); t++ )
-    {
-        telconfig->GetEntry( t );
-        telconfig_telx.push_back( telconfig->TelX );
-        telconfig_tely.push_back( telconfig->TelY );
-        telconfig_telz.push_back( telconfig->TelZ );
-    }
-
-    ////////////////////////////////////////
 
     return true;
 }
@@ -749,4 +750,27 @@ string VInstrumentResponseFunctionRunParameter::getInstrumentEpoch( bool iMajor 
         return fInstrumentEpoch.substr( 0, fInstrumentEpoch.find( "_" ) );
     }
     return fInstrumentEpoch;
+}
+
+vector< unsigned int > VInstrumentResponseFunctionRunParameter::fillTelToAnalyze( vector< unsigned int > inital_tel_vector, unsigned long int tel_combo )
+{
+    vector< unsigned int > tel_to_analyze;
+    bitset<sizeof(long int ) * 10> tel_bitset( tel_combo );
+    for( unsigned int i = 0; i < telconfig_telx.size(); i++ )
+    {
+        bool tel_is_set = false;
+        for( unsigned int t = 0; t < inital_tel_vector.size(); t++ )
+        {
+            if( i == inital_tel_vector[t] )
+            {
+                tel_is_set = true;
+                break;
+            }
+        }
+        if( tel_bitset.test( i ) && tel_is_set )
+        {
+            tel_to_analyze.push_back( i );
+        }
+    }
+    return tel_to_analyze;
 }

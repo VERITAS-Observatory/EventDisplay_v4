@@ -9,6 +9,7 @@
 #include "VTableLookupRunParameter.h"
 #include "VEnergySpectrumfromLiterature.h"
 
+#include <bitset>
 #include <fstream>
 #include <getopt.h>
 #include <iostream>
@@ -28,6 +29,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
 
         bool            readRunParameters( string ifilename );
         bool            readCRSpectralParameters();
+        vector< unsigned int > fillTelToAnalyze( vector< unsigned int > inital_tel_vector, unsigned long int tel_combo );
 
     public:
 
