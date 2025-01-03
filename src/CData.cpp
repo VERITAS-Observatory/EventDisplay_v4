@@ -684,13 +684,22 @@ void CData::reconstruct_3tel_images( unsigned long int telescope_combination )
         return;
     }
 
-    SizeSecondMax = 0.;
+    float SizeFirstMax = -1000.;
+    SizeSecondMax = -100.;
     for( int i = 0; i < NImages; i++ )
     {
         unsigned int t = ImgSel_list[i];
         if( size[t] > SizeSecondMax )
         {
-            SizeSecondMax = size[t];
+            if( size[t] > SizeFirstMax )
+            {
+                SizeFirstMax = size[t];
+                SizeSecondMax = SizeFirstMax;
+            }
+            else
+            {
+                SizeSecondMax = size[t];
+            }
         }
     }
 
