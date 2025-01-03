@@ -736,6 +736,7 @@ void CData::reconstruct_3tel_reset_variables()
     ErecQL = -99;
 
     // not filled in 3-tel reconstruction
+    // (requires access to lookup tables or storage of ErecST)
     ErecS = -9999.;
     EChi2S = -9999.;
     dES = -999.;
