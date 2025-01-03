@@ -693,8 +693,8 @@ void CData::reconstruct_3tel_images( unsigned long int telescope_combination )
         {
             if( size[t] > SizeFirstMax )
             {
-                SizeFirstMax = size[t];
                 SizeSecondMax = SizeFirstMax;
+                SizeFirstMax = size[t];
             }
             else
             {

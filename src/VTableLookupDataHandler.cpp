@@ -451,8 +451,6 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     bitset<8 * sizeof(unsigned long )> i_nimage; // for imagepattern
     i_nimage.reset();
 
-    Double_t SizeFirstMax_temp = -1000.;
-    Double_t SizeSecondMax_temp = -100.;
     for( unsigned int i = 0; i < fNTel; i++ )
     {
         bool fReadTPars = false;
@@ -526,18 +524,6 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
                 }
             }
 
-            if( fsize[i] > SizeSecondMax_temp )
-            {
-                if( fsize[i] > SizeFirstMax_temp )
-                {
-                    SizeSecondMax_temp = SizeFirstMax_temp;
-                    SizeFirstMax_temp = fsize[i];
-                }
-                else
-                {
-                    SizeSecondMax_temp = fsize[i];
-                }
-            }
             fCurrentNoiseLevel[i] = ftpars[i]->meanPedvar_Image;
             fFitstat[i] = ftpars[i]->Fitstat;
             if(!bShort )
@@ -571,11 +557,6 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
         }
     }
     fmeanPedvar_Image = calculateMeanNoiseLevel( true );
-
-    if( SizeSecondMax_temp > 0. )
-    {
-        fSizeSecondMax = SizeSecondMax_temp;
-    }
     //////////////////////////////////////////////////////////
     // redo the stereo (direction and core) reconstruction
     if( fTLRunParameter->fRerunStereoReconstruction )
@@ -583,6 +564,31 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
         fill_selected_images_before_redo_stereo_reconstruction();
         fmeanPedvar_Image = calculateMeanNoiseLevel( true );
         doStereoReconstruction( true );
+    }
+
+
+    // SizeSecondMax calculation
+    Double_t SizeFirstMax_temp = -1000.;
+    Double_t SizeSecondMax_temp = -100.;
+    for( int i = 0; i < fNImages; i++ )
+    {
+        unsigned int t = fImgSel_list_short[i];
+        if( fsize[t] > SizeSecondMax_temp )
+        {
+            if( fsize[t] > SizeFirstMax_temp )
+            {
+                SizeSecondMax_temp = SizeFirstMax_temp;
+                SizeFirstMax_temp = fsize[t];
+            }
+            else
+            {
+                SizeSecondMax_temp = fsize[t];
+            }
+        }
+    }
+    if( SizeSecondMax_temp > 0. )
+    {
+        fSizeSecondMax = SizeSecondMax_temp;
     }
 
     // dispEnergy - energy reconstruction using the disp MVA
