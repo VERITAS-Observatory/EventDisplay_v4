@@ -645,7 +645,7 @@ void CData::reconstruct_3tel_images( unsigned long int telescope_combination )
     reconstruct_3tel_reset_variables();
     bitset<sizeof(long int ) * 4> tel_bitset( telescope_combination );
     bitset<sizeof(long int ) * 4> tel_nimages( 0 );
-    int NImages_saved = (int)NImages;
+    int NImages_saved = ( int )NImages;
 
     // update list of available images
     UInt_t tel_list[VDST_MAXTELESCOPES];
@@ -672,7 +672,7 @@ void CData::reconstruct_3tel_images( unsigned long int telescope_combination )
         }
     }
     // ImgSel_list lists the available images (e.g., 2, 3, 4) and is of length NImages
-    NImages = (UShort_t)z;
+    NImages = ( UShort_t )z;
     ImgSel = tel_nimages.to_ulong();
     for( int i = 0; i < NImages_saved; i++ )
     {
