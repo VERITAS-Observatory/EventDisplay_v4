@@ -665,7 +665,7 @@ void CData::reconstruct_3tel_images( unsigned long int telescope_combination )
         }
         else
         {
-            size[t] = 0.;
+            size[t] = -99.;
             ntubes[t] = 0;
             MSCWT[t] = -9999.;
             MSCLT[t] = -9999.;
@@ -775,6 +775,12 @@ void CData::reconstruct_3tel_images_scaled_variables()
 /*
  * Reconstruct shower direction and core for 3-telescope events.
  *
+ * Using the 4-telescope disp results approximates the exact result:
+ *
+ * - cross is among the most relevant parameters for the dispBDTs, and
+ *   disp is calculating using the 4-telescope cross
+ * - angular resolutions are better than they should be (approx 0.02 deg at 1 TeV)
+ *
 */
 void CData::reconstruct_3tel_images_direction()
 {
@@ -803,7 +809,7 @@ void CData::reconstruct_3tel_images_direction()
     }
 
     VDispAnalyzer i_dispAnalyzer;
-    i_dispAnalyzer.calculateMeanShowerDirection( v_x, v_y, v_weight, xs, ys, dispdiff, v_x.size() );
+    i_dispAnalyzer.calculateMeanShowerDirection( v_x, v_y, v_weight, xs, ys, dispdiff );
     // expect that this is called for MC only
     Xoff = Xoff_derot = xs;
     Yoff = Yoff_derot = ys;

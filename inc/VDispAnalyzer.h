@@ -124,7 +124,7 @@ class VDispAnalyzer
 
         void calculateMeanEnergy( vector< float >& disp_energy_T, float* img_size, double* img_weight );
         void calculateMeanShowerDirection( vector< float >& v_x, vector< float >& v_y, vector< float >& v_weight,
-                                           float& xs, float& ys, float& dispdiff, unsigned int iMaxN );
+                                           float& xs, float& ys, float& dispdiff );
 
         vector< float > calculateExpectedDirectionError_or_Sign( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
                 ULong64_t* iTelType,
