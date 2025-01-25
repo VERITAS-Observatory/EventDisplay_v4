@@ -439,7 +439,7 @@ void CData::Init( TTree* tree )
     fChain->SetBranchAddress( "EmissionHeight", &EmissionHeight );
     fChain->SetBranchAddress( "EmissionHeightChi2", &EmissionHeightChi2 );
     fChain->SetBranchAddress( "NTelPairs", &NTelPairs );
-    if(!fShort )
+    if(!fShort && fChain->GetBranchStatus( "EmissionHeightT" ) )
     {
         fChain->SetBranchAddress( "EmissionHeightT", EmissionHeightT );
     }
@@ -626,6 +626,14 @@ Bool_t CData::Notify()
  *
  * Note! This is very fine tuned and should be used for effective area calculation only
  *
+ *
+ * Approximations:
+ *
+ * - lookup table values like MSCWT or MSCL are read from lookup tables using the 4-tel
+ *   reconstructed shower core and direction
+ * - dispEnergy per telescope is calculated using the 4-tel reconstructed shower core
+ *   and direction
+ *
  * Following variables are approximated or not calculated correctly:
  *
  * - img2_ang
@@ -637,12 +645,13 @@ void CData::reconstruct_3tel_images( unsigned long int telescope_combination )
     reconstruct_3tel_reset_variables();
     bitset<sizeof(long int ) * 4> tel_bitset( telescope_combination );
     bitset<sizeof(long int ) * 4> tel_nimages( 0 );
+    int NImages_saved = ( int )NImages;
 
     // update list of available images
     UInt_t tel_list[VDST_MAXTELESCOPES];
     for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
     {
-        tel_list[i] = -9999;
+        tel_list[i] = 0;
     }
     unsigned int z = 0;
     for( int i = 0; i < NImages; i++ )
@@ -656,32 +665,41 @@ void CData::reconstruct_3tel_images( unsigned long int telescope_combination )
         }
         else
         {
-            size[t] = 0.;
+            size[t] = -99.;
             ntubes[t] = 0;
             MSCWT[t] = -9999.;
             MSCLT[t] = -9999.;
         }
     }
     // ImgSel_list lists the available images (e.g., 2, 3, 4) and is of length NImages
-    NImages = z;
-    for( int i = 0; i < NImages; i++ )
+    NImages = ( UShort_t )z;
+    ImgSel = tel_nimages.to_ulong();
+    for( int i = 0; i < NImages_saved; i++ )
     {
         ImgSel_list[i] = tel_list[i];
     }
-    ImgSel = tel_nimages.to_ulong();
     // require at least two images to continue
     if( NImages < 2 )
     {
         return;
     }
 
-    SizeSecondMax = 0.;
+    float SizeFirstMax = -1000.;
+    SizeSecondMax = -100.;
     for( int i = 0; i < NImages; i++ )
     {
         unsigned int t = ImgSel_list[i];
         if( size[t] > SizeSecondMax )
         {
-            SizeSecondMax = size[t];
+            if( size[t] > SizeFirstMax )
+            {
+                SizeSecondMax = SizeFirstMax;
+                SizeFirstMax = size[t];
+            }
+            else
+            {
+                SizeSecondMax = size[t];
+            }
         }
     }
 
@@ -697,8 +715,6 @@ void CData::reconstruct_3tel_images( unsigned long int telescope_combination )
  */
 void CData::reconstruct_3tel_reset_variables()
 {
-    NImages = 0;
-    ImgSel = 0;
     SizeSecondMax = -9999.;
     EmissionHeight = -9999.;
     EmissionHeightChi2 = -9999.;
@@ -720,6 +736,7 @@ void CData::reconstruct_3tel_reset_variables()
     ErecQL = -99;
 
     // not filled in 3-tel reconstruction
+    // (requires access to lookup tables or storage of ErecST)
     ErecS = -9999.;
     EChi2S = -9999.;
     dES = -999.;
@@ -758,26 +775,41 @@ void CData::reconstruct_3tel_images_scaled_variables()
 /*
  * Reconstruct shower direction and core for 3-telescope events.
  *
+ * Using the 4-telescope disp results approximates the exact result:
+ *
+ * - cross is among the most relevant parameters for the dispBDTs, and
+ *   disp is calculating using the 4-telescope cross
+ * - angular resolutions are better than they should be (approx 0.02 deg at 1 TeV)
+ *
 */
 void CData::reconstruct_3tel_images_direction()
 {
     // intersection method
+    double img_weight[fTelX.size()];
+    for( unsigned int t = 0; t < fTelX.size(); t++ ) img_weight[t] = 1.;
     VSimpleStereoReconstructor i_SR;
     i_SR.initialize( 2, fStereoMinAngle );
     i_SR.reconstruct_direction(
         fTelX.size(),
         ArrayPointing_Elevation, ArrayPointing_Azimuth,
         fTelX.data(), fTelY.data(), fTelZ.data(),
-        size, cen_x, cen_y, cosphi, sinphi, width, length, 0 );
+        size, cen_x, cen_y, cosphi, sinphi, width, length, img_weight );
     Xoff_intersect = i_SR.fShower_Xoffset;
     Yoff_intersect = i_SR.fShower_Yoffset;
 
     // disp method
     vector<float> v_x, v_y, v_weight;
     float xs, ys, dispdiff;
+    for( int i = 0; i < NImages; i++ )
+    {
+        unsigned int t = ImgSel_list[i];
+        v_x.push_back( DispXoff_T[t] );
+        v_y.push_back( DispYoff_T[t] );
+        v_weight.push_back( DispWoff_T[t] );
+    }
 
     VDispAnalyzer i_dispAnalyzer;
-    i_dispAnalyzer.calculateMeanShowerDirection( v_x, v_y, v_weight, xs, ys, dispdiff, v_x.size() );
+    i_dispAnalyzer.calculateMeanShowerDirection( v_x, v_y, v_weight, xs, ys, dispdiff );
     // expect that this is called for MC only
     Xoff = Xoff_derot = xs;
     Yoff = Yoff_derot = ys;
@@ -799,7 +831,7 @@ void CData::reconstruct_3tel_images_direction()
         ArrayPointing_Elevation, ArrayPointing_Azimuth,
         Xoff, Yoff,
         fTelX.data(), fTelY.data(), fTelZ.data(),
-        size, cen_x, cen_y, cosphi, sinphi, width, length, 0 );
+        size, cen_x, cen_y, cosphi, sinphi, width, length, img_weight );
     Xcore = i_SR.fShower_Xcore;
     Ycore = i_SR.fShower_Ycore;
     bitset<sizeof(long int ) * 4> tel_nimages( ImgSel );

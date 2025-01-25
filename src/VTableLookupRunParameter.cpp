@@ -414,8 +414,8 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
             outputfile += ".mscw.root";
         }
     }
-    // for VTS analysis with a single inputfile: get telescope combinations
-    if( inputfile.size() == 1 && inputfile[0].find( "*" ) == string::npos )
+    // get telescope combinations (from first file if several files are given)
+    if( inputfile[0].find( "*" ) == string::npos )
     {
         readTelescopeToAnalyze( inputfile[0] );
     }
@@ -426,7 +426,6 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 /*
  * read telescope combination for analysis
  *
- * this works only for a small number of telescopes (<10)
  */
 bool VTableLookupRunParameter::readTelescopeToAnalyze( string iFile )
 {

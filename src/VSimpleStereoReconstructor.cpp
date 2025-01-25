@@ -78,14 +78,6 @@ bool VSimpleStereoReconstructor::reconstruct_direction( unsigned int i_ntel,
     fTelElevation = iArrayElevation;
     fTelAzimuth   = iArrayAzimuth;
 
-    if( img_weight == 0 )
-    {
-        for( unsigned int i = 0; i < i_ntel; i++ )
-        {
-            img_weight[i] = 1.;
-        }
-    }
-
     // make sure that all data arrays exist
     if(!img_size || !img_cen_x || !img_cen_y
             || !img_cosphi || !img_sinphi
@@ -322,14 +314,6 @@ bool VSimpleStereoReconstructor::reconstruct_core( unsigned int i_ntel,
     fTelAzimuth   = iArrayAzimuth;
     // sign flip in reconstruction
     iShowerDir_ys *= -1.;
-
-    if( img_weight == 0 )
-    {
-        for( unsigned int i = 0; i < i_ntel; i++ )
-        {
-            img_weight[i] = 1.;
-        }
-    }
 
     // make sure that all data arrays exist
     if(!img_size || !img_cen_x || !img_cen_y

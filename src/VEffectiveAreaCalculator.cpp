@@ -2131,6 +2131,8 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
     {
         d->GetEntry( i );
 
+        if( d->Xoff < -999. || d->Yoff < -999. ) continue;
+
         // update cut statistics
         fCuts->newEvent();
 
@@ -2161,19 +2163,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
         // apply general quality and gamma/hadron separation cuts
 
         // apply reconstruction cuts
-        if( bDebugCuts )
-        {
-            cout << "#1 CUT applyInsideFiducialAreaCut ";
-            cout << fCuts->applyInsideFiducialAreaCut();
-            cout << "\t" << fCuts->applyStereoQualityCuts( iMethod, false, i, true ) << endl;
-        }
-
-        // apply fiducial area cuts
-        if(!fCuts->applyInsideFiducialAreaCut( true ) )
-        {
-            continue;
-        }
-        hEcutSub[1]->Fill( eMC, 1. );
 
         // apply reconstruction quality cuts
         if(!fCuts->applyStereoQualityCuts( iMethod, true, i, true ) )
@@ -2181,6 +2170,19 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
             continue;
         }
         hEcutSub[2]->Fill( eMC, 1. );
+
+        // apply fiducial area cuts
+        if( bDebugCuts )
+        {
+            cout << "#1 CUT applyInsideFiducialAreaCut ";
+            cout << fCuts->applyInsideFiducialAreaCut();
+            cout << "\t" << fCuts->applyStereoQualityCuts( iMethod, false, i, true ) << endl;
+        }
+        if(!fCuts->applyInsideFiducialAreaCut( true ) )
+        {
+            continue;
+        }
+        hEcutSub[1]->Fill( eMC, 1. );
 
         // apply telescope type cut (e.g. for CTA simulations)
         if( fTelescopeTypeCutsSet )
@@ -2195,7 +2197,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
             }
         }
         hEcutSub[3]->Fill( eMC, 1. );
-
 
         //////////////////////////////////////
         // apply direction cut
@@ -2218,8 +2219,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
                 bDirectionCut = true;
             }
         }
-
-
         if(!bDirectionCut )
         {
             hEcutSub[4]->Fill( eMC, 1. );
@@ -2238,7 +2237,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
                 continue;
             }
         }
-
         if(!bDirectionCut )
         {
             hEcutSub[5]->Fill( eMC, 1. );

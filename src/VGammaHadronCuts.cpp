@@ -1050,6 +1050,18 @@ void VGammaHadronCuts::printCutSummary()
 */
 bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructionMethod, bool bCount, int iEntry, bool fIsOn )
 {
+    /////////////////////////////////////////////////////////////////////////////////
+    // apply number of images cut
+    if( fData->NImages < fCut_NImages_min || fData->NImages > fCut_NImages_max )
+    {
+        if( bCount && fStats )
+        {
+            fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+            fStats->updateCutCounter( VGammaHadronCutsStatistics::eNImages );
+        }
+        return false;
+    }
+
     // require good pointing
     if( fData->Array_PointingStatus != 0 )
     {
@@ -1069,18 +1081,6 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
         {
             fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
             fStats->updateCutCounter( VGammaHadronCutsStatistics::eArrayChi2 );
-        }
-        return false;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////
-    // apply number of images cut
-    if( fData->NImages < fCut_NImages_min || fData->NImages > fCut_NImages_max )
-    {
-        if( bCount && fStats )
-        {
-            fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
-            fStats->updateCutCounter( VGammaHadronCutsStatistics::eNImages );
         }
         return false;
     }

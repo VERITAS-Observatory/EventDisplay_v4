@@ -194,7 +194,7 @@ unsigned int VDispAnalyzer::find_smallest_diff_element(
             v_xs[i] = x[i] - i_sign[s][i] * v_disp[i] * cosphi[i] + tel_pointing_dx[i];
             v_ys[i] = y[i] - i_sign[s][i] * v_disp[i] * sinphi[i] + tel_pointing_dy[i];
         }
-        calculateMeanShowerDirection( v_xs, v_ys, v_weight, xs, ys, disp_diff, v_xs.size() );
+        calculateMeanShowerDirection( v_xs, v_ys, v_weight, xs, ys, disp_diff );
         v_disp_diff[s] = disp_diff;
         v_dist[s] = sqrt( xs* xs + ys* ys );
     }
@@ -359,7 +359,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
             }
         }
     }
-    calculateMeanShowerDirection( fdisp_xs_T, fdisp_ys_T, v_weight, xs, ys, dispdiff, fdisp_xs_T.size() );
+    calculateMeanShowerDirection( fdisp_xs_T, fdisp_ys_T, v_weight, xs, ys, dispdiff );
 
     // apply sign flip
     if( ys > -9998. )
@@ -374,23 +374,15 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
 */
 void VDispAnalyzer::calculateMeanShowerDirection(
     vector< float >& v_x, vector< float >& v_y, vector< float >& v_weight,
-    float& xs, float& ys, float& dispdiff,
-    unsigned int iMaxN )
+    float& xs, float& ys, float& dispdiff )
 {
     xs = 0.;
     ys = 0.;
     dispdiff = 0.;
     float d_w_sum = 0.;
 
-    if( iMaxN > v_x.size() )
-    {
-        cout << "VDispAnalyzer::calculateMeanShowerDirection error: ";
-        cout << "invalid vector size " << endl;
-        exit( EXIT_FAILURE );
-    }
-
     // single image
-    if( iMaxN == 1 )
+    if( v_x.size() == 1 )
     {
         dispdiff = 0.;
         xs = v_x[0];
@@ -399,9 +391,9 @@ void VDispAnalyzer::calculateMeanShowerDirection(
     }
 
     float z = 0.;
-    for( unsigned int n = 0; n < iMaxN; n++ )
+    for( unsigned int n = 0; n < v_x.size(); n++ )
     {
-        for( unsigned int m = n + 1; m < iMaxN; m++ )
+        for( unsigned int m = n + 1; m < v_x.size(); m++ )
         {
             dispdiff += sqrt(( v_x[n] - v_x[m] ) * ( v_x[n] - v_x[m] )
                              + ( v_y[n] - v_y[m] ) * ( v_y[n] - v_y[m] ) )

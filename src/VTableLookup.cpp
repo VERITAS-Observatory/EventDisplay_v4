@@ -811,9 +811,9 @@ void VTableLookup::readLookupTable()
             // set mean reduced scaled widths and energies per telescope
             for( unsigned int j = 0; j < s_N->fNTel; j++ )
             {
-                fData->setMSCWT( j, s_N->mscw_T[j], s_N->mscw_Tsigma[j] );
-                fData->setMSCLT( j, s_N->mscl_T[j], s_N->mscl_Tsigma[j] );
-                fData->setEnergyT( j, s_N->energySR_T[j], true );
+                fData->setMSCWT( j, ( float )s_N->mscw_T[j], ( float )s_N->mscw_Tsigma[j] );
+                fData->setMSCLT( j, ( float )s_N->mscl_T[j], ( float )s_N->mscl_Tsigma[j] );
+                fData->setEnergyT( j, ( float )s_N->energySR_T[j], true );
             }
 
             fData->fill();
