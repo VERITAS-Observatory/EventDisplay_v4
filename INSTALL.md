@@ -47,6 +47,8 @@ The first-stage tool `evndisp` requires the [VBF](https://github.com/VERITAS-Obs
 
 Simple installation instructions are found in `VBF/README`. To install in a local directory instead of the first installation command in VBF/README use `$ /.configure --prefix=<local directory>` and change the environment variable `VBFSYS` to `<local directory>`.
 
+Compilation of VBF requires `libtool` to be available on the system. If not installed, use your package manage to install it (e.g., doing `sudo apt install libtool-bin` on Debian based systems.)
+
 Set the following environmental variable: `VBFSYS=<directory with VBF installation>`
 
 ### GSL (optional)
