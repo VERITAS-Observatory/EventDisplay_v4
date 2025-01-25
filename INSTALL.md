@@ -55,6 +55,8 @@ Set the following environmental variable: `VBFSYS=<directory with VBF installati
 
 GSL libraries are used for very specific tasks (Hough muon calibration, likelihood fitter) and are not required for most users. GSL is included in all pre-compiled ROOT versions; for building from source, see the [gsl web page](http://www.gnu.org/software/gsl/).
 
+To manually switch the GSL option off, set `GSLFLAG=-DNOGSL` after the corresponding entry in the [Makefile](./Makefile) (roughly line 80).
+
 ### cfitsio (optional)
 
 FITS related output as used for the next-day analysis and requires installation of cfitsio (see http://heasarc.gsfc.nasa.gov/fitsio/).
