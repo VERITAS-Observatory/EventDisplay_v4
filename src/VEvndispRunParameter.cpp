@@ -80,7 +80,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
     // geometry/calibration parameters
     fNTelescopes = 4;                             // there is always at least one telescope
     fcamera.push_back( "EVN_V4_Autumn2007_20130110.txt" );
-    fCalibrationDataType = 1;  // should be 0 for e.g. CTA DSTs
+    fCalibrationDataType = 1;  // should be 0 for e.g. DSTs
     fcalibrationfile = "";
     fLowGainCalibrationFile = "calibrationlist.LowGain.dat";
     fcalibrationrun = false;
@@ -861,27 +861,6 @@ void VEvndispRunParameter::setPulseZeroIndex()
             break;
         }
     }
-}
-
-void VEvndispRunParameter::printCTA_DST()
-{
-    cout << "Eventdisplay version: " << getEVNDISP_VERSION() << endl;
-    cout << "============================" << endl << endl;
-    cout << fEventDisplayDate << endl;
-
-    cout << "Observatory: " << getObservatory() << endl;
-
-    cout << "RUN " << frunnumber << endl;
-    cout << endl;
-    cout << "source file " << fsourcefile << endl;
-    cout << "number of telescope: " << fNTelescopes << endl;
-    cout << "pulse timing levels: ";
-    for( unsigned int i = 0; i < fpulsetiminglevels.size(); i++ )
-    {
-        cout << fpulsetiminglevels[i] << ", ";
-    }
-    cout << "L2 timing correct: " << fL2TimeCorrect << endl;
-    cout << endl;
 }
 
 void VEvndispRunParameter::setSystemParameters()
