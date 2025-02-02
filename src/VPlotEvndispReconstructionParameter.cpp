@@ -1,8 +1,6 @@
 /*! \file VPlotEvndispReconstructionParameter
     \brief plot eventdisplay reconstruction parameters
 
-    ***** CTA *****
-
     plot events lossed due to image quality cuts applied before the stereo reconstruction
 
     Note: not all cuts are implemented yet

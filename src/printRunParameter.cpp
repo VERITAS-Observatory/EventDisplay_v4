@@ -386,14 +386,7 @@ int main( int argc, char* argv[] )
 
     if( fPar )
     {
-        if( fPar->fEventDisplayUser != "CTA-DST" )
-        {
-            fPar->print( 2 );
-        }
-        else
-        {
-            fPar->printCTA_DST();
-        }
+        fPar->print( 2 );
     }
 
     // array analysis cuts
@@ -423,18 +416,14 @@ int main( int argc, char* argv[] )
 
     VMonteCarloRunHeader* fMC = 0;
 
-    //    if( fPar && fPar->fEventDisplayUser != "CTA-DST" )
+    fMC = ( VMonteCarloRunHeader* )fIn->Get( "MC_runheader" );
+    if( fMC )
     {
-        fMC = ( VMonteCarloRunHeader* )fIn->Get( "MC_runheader" );
-        if( fMC )
-        {
-            cout << endl << endl;
-            cout << "===========================================" << endl;
-            cout << "===========================================" << endl;
-            fMC->print();
-        }
+        cout << endl << endl;
+        cout << "===========================================" << endl;
+        cout << "===========================================" << endl;
+        fMC->print();
     }
-
 
     fIn->Close();
 

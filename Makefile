@@ -32,7 +32,7 @@ ARCH = $(shell uname)
 # basic numbers
 #############################
 package = EVNDISP
-version = 491
+version = 492
 #############################
 #############################
 # check root version number
@@ -1509,31 +1509,6 @@ binaryVisibility:	./obj/VLibNovaStar.o ./obj/VLibNovaSunAndMoon.o ./obj/binaryVi
 	$(LD) $(LDFLAGS) $^ $(GLIBS) -L$(LIBNOVASYS)/lib/ -lnova $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
-
-########################################################
-# writeFITS_eventlist
-########################################################
-writeFITS_eventlistOBJ	= ./obj/writeFITS_eventlist.o \
-			  ./obj/CData.o \
-			  ./obj/VSkyCoordinates.o \
-			  ./obj/VSkyCoordinatesUtilities.o \
-			  ./obj/VDB_Connection.o \
-			  ./obj/VStarCatalogue.o  ./obj/VStarCatalogue_Dict.o \
-			  ./obj/VStar.o ./obj/VStar_Dict.o \
-			  ./obj/VUtilities.o  \
-			  ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-			  ./obj/VAstronometry.o ./obj/VAstronometry_Dict.o
-
-ifeq ($(ASTRONMETRY),-DASTROSLALIB)
-    writeEventListTMVAOBJ += ./obj/VASlalib.o
-endif
-
-./obj/writeFITS_eventlist.o:	./src/writeFITS_eventlist.cpp
-	$(CXX) $(CXXFLAGS) -I $(EVLIOSYS)/records/ -I $(EVLIOSYS)/include/ -c -o $@ $<
-
-writeFITS_eventlist:	$(writeFITS_eventlistOBJ)
-	$(LD) $(LDFLAGS) $^ $(GLIBS) -L $(EVLIOSYS)/lib -lfitsrecord $(OutPutOpt) ./bin/$@
-	@echo "$@ done"
 
 ###############################################################################################################################
 # print environment and compilation parameters
