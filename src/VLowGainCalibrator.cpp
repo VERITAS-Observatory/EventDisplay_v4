@@ -757,7 +757,6 @@ bool VLowGainCalibrator::calculateMeanCharges()
                 {
                     continue;
                 }
-                //todo test this			if( fabs( sumfirst[tel][iChan] - start[ HiLo[tel][iChan] ] ) > 2*start2[ HiLo[tel][iChan] ] ) continue;
 
                 if( level > -1 )
                 {

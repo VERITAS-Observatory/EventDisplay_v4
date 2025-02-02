@@ -404,18 +404,6 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     fEffArea->Branch( hisTreeList, 64000, 1 );
     fEffArea->SetMarkerStyle( 20 );
 
-    fAcceptance_AfterCuts_tree = new TTree( "Acceptance_AfterCuts", "Info to conctruct background map" );
-    fAcceptance_AfterCuts_tree->Branch( "Xoff_aC", &fXoff_aC, "Xoff_aC/D" );
-    fAcceptance_AfterCuts_tree->Branch( "Yoff_aC", &fYoff_aC, "Yoff_aC/D" );
-    fAcceptance_AfterCuts_tree->Branch( "Xoff_derot_aC", &fXoff_derot_aC, "Xoff_derot_aC/D" );
-    fAcceptance_AfterCuts_tree->Branch( "Yoff_derot_aC", &fYoff_derot_aC, "Yoff_derot_aC/D" );
-    fAcceptance_AfterCuts_tree->Branch( "Erec", &fErec, "Erec/D" );
-    fAcceptance_AfterCuts_tree->Branch( "EMC", &fEMC, "EMC/D" );
-    fAcceptance_AfterCuts_tree->Branch( "CRweight", &fCRweight, "CRweight/D" );
-
-    fsolid_angle_norm_done = false;
-    fsolid_angle_norm = 1.;
-
 }
 
 
@@ -1926,15 +1914,6 @@ void VEffectiveAreaCalculator::reset()
 
     gMeanSystematicErrorGraph = 0;
 
-    fXoff_aC = -99;
-    fYoff_aC = -99;
-    fXoff_derot_aC = -99;
-    fYoff_derot_aC = -99;
-    fErec = -99;
-    fEMC = -99;
-    fCRweight = -99;
-
-
 }
 
 double VEffectiveAreaCalculator::getMCSolidAngleNormalization()
@@ -2148,18 +2127,11 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
     }
     cout << "\t total number of data events: " << d_nentries << " (start at event " << i_start << ")" << endl;
 
-    //--- for the CR normalisation filling Acceptance tree total number of simulated is needed
-    //-- WARNING if the rule for the azimuth bin changes in VInstrumentResponseFunctionRunParameter the following line must be adapted!!!!
-    unsigned int number_of_az_bin = fRunPara->fAzMin.size();
-    int az_bin_index = 0;// if no azimuth bin, all events are in bin 0. if azimuth bin, all event are in the last bin.
-    if( number_of_az_bin > 0 )
-    {
-        az_bin_index = ( int ) number_of_az_bin - 1;
-    }
-
     for( Long64_t i = i_start; i < d_nentries; i++ )
     {
         d->GetEntry( i );
+
+        if( d->Xoff < -999. || d->Yoff < -999. ) continue;
 
         // update cut statistics
         fCuts->newEvent();
@@ -2191,19 +2163,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
         // apply general quality and gamma/hadron separation cuts
 
         // apply reconstruction cuts
-        if( bDebugCuts )
-        {
-            cout << "#1 CUT applyInsideFiducialAreaCut ";
-            cout << fCuts->applyInsideFiducialAreaCut();
-            cout << "\t" << fCuts->applyStereoQualityCuts( iMethod, false, i, true ) << endl;
-        }
-
-        // apply fiducial area cuts
-        if(!fCuts->applyInsideFiducialAreaCut( true ) )
-        {
-            continue;
-        }
-        hEcutSub[1]->Fill( eMC, 1. );
 
         // apply reconstruction quality cuts
         if(!fCuts->applyStereoQualityCuts( iMethod, true, i, true ) )
@@ -2211,6 +2170,19 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
             continue;
         }
         hEcutSub[2]->Fill( eMC, 1. );
+
+        // apply fiducial area cuts
+        if( bDebugCuts )
+        {
+            cout << "#1 CUT applyInsideFiducialAreaCut ";
+            cout << fCuts->applyInsideFiducialAreaCut();
+            cout << "\t" << fCuts->applyStereoQualityCuts( iMethod, false, i, true ) << endl;
+        }
+        if(!fCuts->applyInsideFiducialAreaCut( true ) )
+        {
+            continue;
+        }
+        hEcutSub[1]->Fill( eMC, 1. );
 
         // apply telescope type cut (e.g. for CTA simulations)
         if( fTelescopeTypeCutsSet )
@@ -2225,7 +2197,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
             }
         }
         hEcutSub[3]->Fill( eMC, 1. );
-
 
         //////////////////////////////////////
         // apply direction cut
@@ -2248,8 +2219,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
                 bDirectionCut = true;
             }
         }
-
-
         if(!bDirectionCut )
         {
             hEcutSub[4]->Fill( eMC, 1. );
@@ -2268,7 +2237,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
                 continue;
             }
         }
-
         if(!bDirectionCut )
         {
             hEcutSub[5]->Fill( eMC, 1. );
@@ -2393,21 +2361,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
                     }
                 }
             }
-
-            //fill tree with acceptance information after cuts (needed to construct background model in ctools)
-            if(!bDirectionCut && fRunPara->fgetXoff_Yoff_afterCut )
-            {
-                fXoff_aC = d->Xoff;
-                fYoff_aC = d->Yoff;
-                fXoff_derot_aC = d->Xoff_derot;
-                fYoff_derot_aC = d->Yoff_derot;
-                fErec = eRecLin;
-                fEMC  = d->MCe0;
-                fCRweight = getCRWeight( d->MCe0, hVEmc[0][az_bin_index], true );  //So that the acceptance can be normalised to the CR spectrum.
-                // when running on gamma, this should return 1.
-                fAcceptance_AfterCuts_tree->Fill();
-            }
-
 
             // loop over all spectral index
             for( unsigned int s = 0; s < fVSpectralIndex.size(); s++ )
@@ -4187,7 +4140,7 @@ bool VEffectiveAreaCalculator::setMonteCarloEnergyRange( double iMin, double iMa
  * note that this requires the MC spectrum to be a power law
  *
  */
-double VEffectiveAreaCalculator::getCRWeight( double iEMC_TeV_lin, TH1* h, bool for_back_map )
+double VEffectiveAreaCalculator::getCRWeight( double iEMC_TeV_lin, TH1* h )
 {
     if(!h || !fRunPara )
     {
@@ -4198,8 +4151,6 @@ double VEffectiveAreaCalculator::getCRWeight( double iEMC_TeV_lin, TH1* h, bool 
     {
         return 1.;
     }
-
-
 
     // normalization of MC spectrum
     double c_ig = 0.;
@@ -4219,58 +4170,18 @@ double VEffectiveAreaCalculator::getCRWeight( double iEMC_TeV_lin, TH1* h, bool 
     double n_cr = fMC_ScatterArea * fRunPara->fCREnergySpectrum->Eval( log10( iEMC_TeV_lin ) ) * 1.e4 * 60.;
     // fRunPara->fCREnergySpectrum->Eval( log10(iEMC_TeV_lin) ) returns the differential flux multiplied by the energy
 
-    // (ctools) for the acceptance map construction, the weight is in #/s ()
-    if( for_back_map )
+    // getMCSolidAngleNormalization() return a ratio of solid angle (only for gamma? not sure this thing returning something else than 1 here, ever...)
+    if( getMCSolidAngleNormalization() > 0. )
     {
-        //need to normalize this number considering the cone in which the particle are simulated (the offset bin is not consider so the binning can be changed later).
-        if(! fsolid_angle_norm_done )
-        {
-            Calculate_Bck_solid_angle_norm();
-        }
-        n_cr = fsolid_angle_norm * n_cr / 60.;
-        if( n_mc != 0. )
-        {
-            return n_cr / n_mc;
-        }
-        else
-        {
-            return 0.;
-        }
+        n_cr /= getMCSolidAngleNormalization();    // do we want to leave this line here?
     }
-    else
+    // the solid angle normalization is done in VSensitivityCalculator
+    // return #/min/sr
+    if( n_mc != 0. )
     {
-        // getMCSolidAngleNormalization() return a ratio of solid angle (only for gamma? not sure this thing returning something else than 1 here, ever...)
-        if( getMCSolidAngleNormalization() > 0. )
-        {
-            n_cr /= getMCSolidAngleNormalization();    // do we want to leave this line here?
-        }
-        // the solid angle normalization is done in VSensitivityCalculator
-        // return #/min/sr
-        if( n_mc != 0. )
-        {
-            return n_cr / n_mc;
-        }
-        return 0.;
+        return n_cr / n_mc;
     }
-}
-
-// Calculate the ratio between the solid angle of the cone where the MC have been done and the solid angle of the offset bin considered
-void VEffectiveAreaCalculator::Calculate_Bck_solid_angle_norm()
-{
-
-
-    if( fRunPara->fViewcone_max > 0. )
-    {
-        // solid angle in which the particule have been simulated
-        double SolidAngle_MCScatterAngle  =  2 * TMath::Pi() * ( 1. - cos( fRunPara->fViewcone_max* TMath::DegToRad() ) );
-
-        fsolid_angle_norm = SolidAngle_MCScatterAngle;
-        fsolid_angle_norm_done = true;
-
-    }
-
-
-    return;
+    return 0.;
 }
 
 

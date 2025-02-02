@@ -1371,8 +1371,6 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
                 }
                 ///////////////////
                 // low gain channel have different timing
-                // (not for CTA-DSTs)
-                //
                 if( getHiLo()[i_channelHitID] && getRunParameter()->fsourcetype != 7 )
                 {
                     // integrate low-gain pulse only if prediction window start is before the end of the readout window

@@ -190,7 +190,6 @@ class VExposure : public TObject, public VGlobalRunParameter
                               string ofile = "", unsigned int iVerbose = 0 );
         void printListOfRuns();
         void printShortRunList();
-        void outputAnasumRunlist( string fAnasumFile );
         void printTexTable();
         bool readAcceptanceCurveFromFile( string iAcc, double iAcceptance_MaxDistance = 1.e9 );
         bool readRootFile( string iname = "2006_2008.root", double iMinMJD = -99., double iMaxMJD = -99. );

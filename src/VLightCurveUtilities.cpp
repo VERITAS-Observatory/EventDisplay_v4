@@ -22,11 +22,10 @@ VLightCurveUtilities::VLightCurveUtilities()
 
    reset light curve data vector
 
-   (TODO: this is a memory leak, fix it)
 */
 void VLightCurveUtilities::resetLightCurveData()
 {
-    fLightCurveData.clear();
+    fLightCurveData.clear();   // this is a memory leak
 
     fLightCurveMJD_min =  1.e99;
     fLightCurveMJD_max = -1.e99;

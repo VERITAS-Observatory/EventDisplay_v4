@@ -63,7 +63,7 @@ void VEffectiveAreaCalculatorMCHistograms::setDefaultValues()
 }
 
 
-void VEffectiveAreaCalculatorMCHistograms::print()
+void VEffectiveAreaCalculatorMCHistograms::print( bool bTruncate )
 {
     cout << "VEffectiveAreaCalculatorMCHistograms::print(): found ";
     cout << fVSpectralIndex.size() << " spectral index bin(s), ";
@@ -95,6 +95,11 @@ void VEffectiveAreaCalculatorMCHistograms::print()
                     cout << getHistogram_EmcUnweighted( j )->GetEntries();
                 }
                 cout << endl;
+            }
+            if( bTruncate )
+            {
+                cout << "\t ...not printing other spectral index bins" << endl;
+                return;
             }
         }
     }

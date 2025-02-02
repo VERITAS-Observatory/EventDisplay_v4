@@ -7,14 +7,6 @@
 
    PRELIMINARY: many hardcoded values
 
-   # TODO;
-   - background rates same coarse binning as effective areas
-   - effective area vs true energy in fine binning (no)
-   - calculate offaxis values
-     - need to read in run parameters from a file?
-
-
-
 */
 
 #include "VAnalysisUtilities.h"

@@ -167,7 +167,6 @@ double VTraceHandler::calculateTraceSum_fixedWindow( int fFirst, int fLast, bool
     for( int i = fFirst; i < fLast; i++ )
     {
         // require that trace is >0.
-        // (CTA MC write trace values above a certain signal only)
         if( i < fpTrazeSize && fpTrace[i] > 0. )
         {
             if(!iRaw )

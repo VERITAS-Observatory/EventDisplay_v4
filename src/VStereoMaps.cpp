@@ -58,7 +58,6 @@ VStereoMaps::VStereoMaps( bool iuc, int iRandomSeed, bool iTMPL_RE_nMaxoffsource
     fTheta2.assign( 100, 0. );
     fTheta2_weight.assign( 100, 0. );
     fTheta2_weightREonly.assign( 100, 0. );
-    fTheta2_All.assign( 25, 99.0 );
     fTargetShiftNorth = 0;
     fTargetShiftWest = 0.;
 
@@ -874,26 +873,11 @@ bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool 
     // return value for source position (weight to calculate MSCW/MSCL etc. plots)
     if( f_RE_WW < ( int )fRE_off.size() && f_RE_WN < ( int )fRE_off[f_RE_WW].size() )
     {
-        for( unsigned int p = 0; p < fRE_off[f_RE_WW][f_RE_WN].xoff.size(); p++ )
+        i_theta2 = ( x - fRE_off[f_RE_WW][f_RE_WN].xoff[0] ) * ( x - fRE_off[f_RE_WW][f_RE_WN].xoff[0] ) +
+                   ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[0] ) * ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[0] );
+        if( i_theta2 < fRE_off[f_RE_WW][f_RE_WN].roff[0]*fRE_off[f_RE_WW][f_RE_WN].roff[0] )
         {
-            if( p < 25 )
-            {
-                fTheta2_All[p] = ( x - fRE_off[f_RE_WW][f_RE_WN].xoff[p] ) * ( x - fRE_off[f_RE_WW][f_RE_WN].xoff[p] ) +
-                                 ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] ) * ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] );
-            }
-
-            if(( x - fRE_off[f_RE_WW][f_RE_WN].xoff[p] ) * ( x - fRE_off[f_RE_WW][f_RE_WN].xoff[p] ) +
-                    ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] ) * ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] ) <
-                    fRE_off[f_RE_WW][f_RE_WN].roff[p]*fRE_off[f_RE_WW][f_RE_WN].roff[p] )
-            {
-                double t2temp = fTheta2_All[0];
-                fTheta2_All[0] = ( x - fRE_off[f_RE_WW][f_RE_WN].xoff[p] ) * ( x - fRE_off[f_RE_WW][f_RE_WN].xoff[p] ) +
-                                 ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] ) * ( y - fRE_off[f_RE_WW][f_RE_WN].yoff[p] );
-                i_theta2 = fTheta2_All[0];
-                fTheta2_All[p] = t2temp;
-                is_inside = true;
-            }
-
+            is_inside = true;
         }
     }
 

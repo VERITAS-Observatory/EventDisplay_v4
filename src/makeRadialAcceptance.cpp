@@ -208,7 +208,7 @@ int main( int argc, char* argv[] )
             exit( EXIT_FAILURE );
         }
         TTree* c = ( TTree* )fTest.Get( "data" );
-        CData* d = new CData( c, false, 5, true );
+        CData* d = new CData( c, false, true );
 
         // Check number of telescopes in run
         VEvndispRunParameter* iParV2 = ( VEvndispRunParameter* )fTest.Get( "runparameterV2" );

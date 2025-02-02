@@ -162,12 +162,6 @@ class VEffectiveAreaCalculator
         // angular resolution graphs (vector in az)
         vector< TGraphErrors* > fGraph_AngularResolution68p;
         vector< TGraphErrors* > fGraph_AngularResolution95p;
-        /*
-        vector< vector< TH2F* > > hVAngularDiff_2D;
-        vector< vector< TH2F* > > hVAngularDiffEmc_2D;
-        vector< vector< TH2F* > > hVAngularLogDiff_2D;
-        vector< vector< TH2F* > > hVAngularLogDiffEmc_2D;
-        */
         vector< TH2F* > hVAngularDiff_2D;
         vector< TH2F* > hVAngularDiffEmc_2D;
         vector< TH2F* > hVAngularLogDiff_2D;
@@ -265,20 +259,6 @@ class VEffectiveAreaCalculator
         // H2F effective area tree
         float fH2F_e0_esys[1000];
 
-        TTree* fAcceptance_AfterCuts_tree;       //Information for all the events after cuts to construct the background map
-        double fXoff_aC;
-        double fYoff_aC;
-        double fXoff_derot_aC;
-        double fYoff_derot_aC;
-        double fErec;
-        double fEMC;
-        double fCRweight;                         // #/s/sr (the right unit for the ctools acceptance map) This normalise the map to the CR spectrum
-        // Needs option ESPECTRUM_FOR_WEIGHTING to be turned on, which only make sense for CR
-        bool fsolid_angle_norm_done;
-        double fsolid_angle_norm;                   // solid angle normalisation needed for the CRweight filled in fAcceptance_AfterCuts_tree (for the histogram it is done later in VSensitivityCalculator)
-        void Calculate_Bck_solid_angle_norm();
-
-
         // effective area smoothing
         int fSmoothIter;
         double fSmoothThreshold;
@@ -308,7 +288,7 @@ class VEffectiveAreaCalculator
         void   copyHistograms( TH1*,  TH1*, bool );
         void   fillAngularResolution( unsigned int i_az, bool iContaintment_95p );
         double getAzMean( double azmin, double azmax );
-        double getCRWeight( double iEMC_TeV_log10, TH1* h, bool for_back_map = false );
+        double getCRWeight( double iEMC_TeV_log10, TH1* h );
         template <typename T> vector< T > get_irf_vector( int i_nbins, T* i_e0, T* i_irf );
         TH2F*  get_irf2D_vector( int nx, float minx, float maxx, int ny, float miny, float maxy, float* value );
         bool   getEffectiveAreasFromFitFunction( TTree*, double azmin, double azmax, double ispectralindex );
@@ -343,10 +323,6 @@ class VEffectiveAreaCalculator
         TTree* getTree()
         {
             return fEffArea;
-        }
-        TTree* getAcceptance_AfterCuts()
-        {
-            return fAcceptance_AfterCuts_tree;
         }
         int getEnergyAxis_nbins_defaultValue()
         {

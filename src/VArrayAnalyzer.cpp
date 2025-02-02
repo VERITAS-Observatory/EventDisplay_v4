@@ -1157,8 +1157,6 @@ float VArrayAnalyzer::recalculateImagePhi( double iDeltaX, double iDeltaY )
       shower core by intersection of lines connecting reconstruced shower
       direction and image centroids
 
-      todo: core reconstruction
-
 */
 int VArrayAnalyzer::rcs_method_3( unsigned int iMethod )
 {
@@ -1316,7 +1314,6 @@ int VArrayAnalyzer::rcs_method_3( unsigned int iMethod )
 
       (difference to rcs_method_3: direction reconstruction independent of CD routines)
 
-todo: core construction
 */
 int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
 {

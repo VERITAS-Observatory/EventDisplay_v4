@@ -34,7 +34,7 @@ class VTableCalculator
         ~VTableCalculator() {}
 
         // Fill Histos and Calc Mean Scaled Width
-        double calc( int ntel, double* r, double* s, double* w, double* mt, double& chi2, double& dE, double* st = 0 );
+        double calc( int ntel, float* r, float* s, float* w, double* mt, double& chi2, double& dE, double* st = 0 );
         const char* getInputTable()
         {
             if( fOutDir )

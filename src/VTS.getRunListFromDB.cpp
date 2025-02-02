@@ -22,7 +22,6 @@ string runlist = "";
 string startdate = "2000-01-01";
 string enddate = "2050-01-01";
 string sourcename = "Crab";
-bool bANASUM = false;
 bool bCHECKDISK = false;
 bool bOBSMODE = false;
 string fAnasumFile = "";
@@ -73,10 +72,6 @@ int main( int argc, char* argv[] )
         {
             a.downloadRunList();
         }
-        if( bANASUM )
-        {
-            a.outputAnasumRunlist( fAnasumFile );
-        }
         a.printChecksumSummary();
         return 0;
     }
@@ -104,11 +99,6 @@ int main( int argc, char* argv[] )
             a.checkRunList();
         }
 
-        if( bANASUM )
-        {
-            a.outputAnasumRunlist( fAnasumFile );
-        }
-
         a.printChecksumSummary();
 
         return 0;
@@ -126,10 +116,6 @@ int main( int argc, char* argv[] )
             a.checkRunList();
         }
 
-        if( bANASUM )
-        {
-            a.outputAnasumRunlist( fAnasumFile );
-        }
         a.printChecksumSummary();
 
         return 0;
@@ -159,11 +145,6 @@ int main( int argc, char* argv[] )
         if( bCHECKDISK )
         {
             a.checkRunList();
-        }
-
-        if( bANASUM )
-        {
-            a.outputAnasumRunlist( fAnasumFile );
         }
 
         a.printChecksumSummary();
@@ -286,10 +267,6 @@ void parseOptions( int argc, char* argv[] )
                 break;
             case 'r':
                 runnumber = atoi( optarg );
-                break;
-            case 'a':
-                bANASUM = true;
-                fAnasumFile = optarg;
                 break;
             case 'c':
                 bCHECKDISK = true;

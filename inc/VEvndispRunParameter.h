@@ -297,7 +297,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         // functions
         void print();
         void print( int iEV );
-        void printCTA_DST();
 
         VEvndispRunParameter( bool bSetGlobalParameter = true );
         ~VEvndispRunParameter();

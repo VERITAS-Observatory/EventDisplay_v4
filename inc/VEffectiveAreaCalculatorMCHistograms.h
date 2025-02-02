@@ -83,7 +83,7 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
         {
             print();
         }
-        void      print();
+        void      print( bool bTruncate = false );
         bool      readFromEffectiveAreaTree( string iFile );
         bool      readFromEffectiveAreaFile( string iFile );
         bool      matchDataVectors( vector< double > iAzMin, vector< double > iAzMax, vector< double > iSpectralIndex );

@@ -1049,17 +1049,6 @@ void VReadRunParameter::test_and_adjustParams()
         fRunPara->fEpochFile = "";
     }
 
-    // CTA/AGIS adjustments
-    if( fRunPara->getObservatory().find( "cta" ) != string::npos || fRunPara->getObservatory().find( "CTA" ) != string::npos
-            || fRunPara->getObservatory().find( "agis" ) != string::npos || fRunPara->getObservatory().find( "AGIS" ) != string::npos )
-    {
-        // no special channels allowed (e.g. L2 timing channels)
-        fRunPara->fsetSpecialChannels = "";
-        fRunPara->fthroughputCorrectionFile = "";
-        // no dead channels allowed
-        fRunPara->fDeadChannelFile = "";
-    }
-
     ////////////////////////////////////////////////////
     // get runnumbers from file name (if source file is given)
     if( fRunPara->frunnumber <= 0 )
@@ -1505,24 +1494,6 @@ double VReadRunParameter::setParameterOverwrite( string ipar_name, double ipar_d
     }
     return ipar_db;
 }
-
-void VReadRunParameter::printShortHelp()
-{
-    cout << endl;
-    cout << "Type 'evndisp help' for full list of command line parameters";
-    cout << endl;
-    cout << "VERITAS analysis ";
-    cout << " (please check scripts in directory ./scripts/VTS/)" << endl;
-    cout << endl;
-    cout << "  How to display events: " << endl;
-    cout << endl;
-    cout << "  How to analyse a run" << endl;
-    cout << endl;
-    cout << endl;
-    cout << "CTA analysis: please check scripts in directory ./scripts/CTA" << endl;
-    cout << endl;
-}
-
 
 void VReadRunParameter::printHelp()
 {

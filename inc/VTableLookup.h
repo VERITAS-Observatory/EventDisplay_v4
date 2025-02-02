@@ -9,6 +9,7 @@
 #include "TMath.h"
 #include "TSystem.h"
 
+#include "VMeanScaledVariables.h"
 #include "VStatistics.h"
 #include "VTableLookupDataHandler.h"
 #include "VTableLookupRunParameter.h"

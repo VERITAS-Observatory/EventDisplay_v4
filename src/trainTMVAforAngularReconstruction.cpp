@@ -599,13 +599,13 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
     // temporary variables for emission height calculation
     VEmissionHeightCalculator* fEmissionHeightCalculator = new VEmissionHeightCalculator();
     fEmissionHeightCalculator->setTelescopePositions( fTelX, fTelY, fTelZ );
-    double fEM_cen_x[fTelType.size()];
-    double fEM_cen_y[fTelType.size()];
-    double fEM_size[fTelType.size()];
-    double fEM_width[fTelType.size()];
-    double fEM_length[fTelType.size()];
-    double fEM_cosphi[fTelType.size()];
-    double fEM_sinphi[fTelType.size()];
+    float fEM_cen_x[fTelType.size()];
+    float fEM_cen_y[fTelType.size()];
+    float fEM_size[fTelType.size()];
+    float fEM_width[fTelType.size()];
+    float fEM_length[fTelType.size()];
+    float fEM_cosphi[fTelType.size()];
+    float fEM_sinphi[fTelType.size()];
     double fEM_weight[fTelType.size()];
 
     // stereo (intersection of line) reconstruction

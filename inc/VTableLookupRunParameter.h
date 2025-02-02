@@ -50,7 +50,7 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 
         bool  fLimitEnergyReconstruction;
 
-        float fMinRequiredShowerPerBin;    // minimum number of showers required per table bin
+        float fMinRequiredShowerPerBin;
 
         bool  fUseEvndispSelectedImagesOnly;
 
@@ -59,13 +59,10 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
         int  bWriteReconstructedEventsOnly;
         bool bWriteMCPars;
         int  rec_method;
-        // quality cut level
         unsigned int fQualityCutLevel;
         bool fWrite1DHistograms;
         double fSpectralIndex;
-        // wobble offset
         int fWobbleOffset;
-        // NSB (pedvars) level
         int fNoiseLevel;
 
         vector< unsigned int > fTelToAnalyse;             // telescopes used in analysis
@@ -97,7 +94,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
         bool  fRerunStereoReconstruction;
         double fRerunStereoReconstruction_minAngle;
         string fRerunStereoReconstruction_BDTFileName;
-        unsigned int fRerunStereoReconstruction_BDTNImages_max;
         string fEnergyReconstruction_BDTFileName;
         string fDispError_BDTFileName;
         float  fDispError_BDTWeight;
@@ -112,6 +108,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
         void print( int iB = 0 );
         void printHelp();
 
-        ClassDef( VTableLookupRunParameter, 32 );
+        ClassDef( VTableLookupRunParameter, 33 );
 };
 #endif

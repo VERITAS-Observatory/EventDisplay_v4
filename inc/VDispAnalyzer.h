@@ -59,8 +59,6 @@ class VDispAnalyzer
         float fdisp_energy;
         float fdisp_energy_chi;
         float fdisp_energy_dEs;
-        float fdisp_energy_median;
-        float fdisp_energy_medianAbsoluteError;
         vector< float > fdisp_energy_T;
         unsigned int   fdisp_energy_NT;
         int  fdisp_energyQL;
@@ -70,9 +68,6 @@ class VDispAnalyzer
 
         vector<ULong64_t> fTelescopeTypeList;
         vector<float> fTelescopeFOV;
-
-        void calculateMeanShowerDirection( vector< float >& v_x, vector< float >& v_y, vector< float >& v_weight,
-                                           float& xs, float& ys, float& dispdiff, unsigned int iMaxN );
 
         unsigned int find_smallest_diff_element(
             vector< vector< float > >& i_sign,
@@ -89,15 +84,15 @@ class VDispAnalyzer
 
         void calculateEnergies( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
                                 ULong64_t* iTelType,
-                                double* img_size, double* img_cen_x, double* img_cen_y,
-                                double* img_cosphi, double* img_sinphi,
-                                double* img_width, double* img_length, double* img_asym,
-                                double* img_tgrad, double* img_loss, int* img_ntubes,
+                                float* img_size, float* img_cen_x, float* img_cen_y,
+                                float* img_cosphi, float* img_sinphi,
+                                float* img_width, float* img_length, float* img_asym,
+                                float* img_tgrad, float* img_loss, int* img_ntubes,
                                 double* img_weight,
                                 double xoff_4, double yoff_4,
-                                double* iR, double iEHeight,
+                                float* iR, float iEHeight,
                                 double iMCEnergy,
-                                double* img_fui,
+                                float* img_fui,
                                 float* img_pedvar,
                                 int* img_fitstat );
 
@@ -113,29 +108,33 @@ class VDispAnalyzer
 
         void calculateMeanDispDirection( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
                                          ULong64_t* iTelType,
-                                         double* img_size, double* img_cen_x, double* img_cen_y,
-                                         double* img_cosphi, double* img_sinphi,
-                                         double* img_width, double* img_length, double* img_asym,
-                                         double* img_tgrad, double* img_loss, int* img_ntubes,
+                                         float* img_size, float* img_cen_x, float* img_cen_y,
+                                         float* img_cosphi, float* img_sinphi,
+                                         float* img_width, float* img_length, float* img_asym,
+                                         float* img_tgrad, float* img_loss, int* img_ntubes,
                                          double* img_weight,
                                          double xoff_4, double yoff_4,
                                          vector< float >& dispErrorT,
                                          vector< float >& dispSignT,
-                                         double* img_fui,
+                                         float* img_fui,
                                          float* img_pedvar,
                                          double* pointing_dx, double* pointing_dy,
                                          bool UseIntersectForHeadTail,
                                          int* img_fitstat );
 
+        void calculateMeanEnergy( vector< float >& disp_energy_T, float* img_size, double* img_weight );
+        void calculateMeanShowerDirection( vector< float >& v_x, vector< float >& v_y, vector< float >& v_weight,
+                                           float& xs, float& ys, float& dispdiff );
+
         vector< float > calculateExpectedDirectionError_or_Sign( unsigned int i_ntel, float iArrayElevation, float iArrayAzimuth,
                 ULong64_t* iTelType,
-                double* img_size, double* img_cen_x, double* img_cen_y,
-                double* img_cosphi, double* img_sinphi,
-                double* img_width, double* img_length, double* img_asym,
-                double* img_tgrad, double* img_loss, int* img_ntubes,
+                float* img_size, float* img_cen_x, float* img_cen_y,
+                float* img_cosphi, float* img_sinphi,
+                float* img_width, float* img_length, float* img_asym,
+                float* img_tgrad, float* img_loss, int* img_ntubes,
                 double* img_weight,
                 double xoff_4, double yoff_4,
-                double* img_fui, float* img_pedvar, int* img_fitstat );
+                float* img_fui, float* img_pedvar, int* img_fitstat );
 
         float evaluate( float iWidth, float iLength, float iAsymm, float iDist,
                         float iSize, float iPedvar, float itgrad, float iLoss,
@@ -161,8 +160,6 @@ class VDispAnalyzer
         float getEnergy();
         float getEnergyChi2();
         float getEnergydES();
-        float getEnergyMedian();
-        float getEnergyMedianAbsoluteError();
         int   getEnergyQualityLabel()
         {
             return fdisp_energyQL;

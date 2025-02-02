@@ -1,8 +1,6 @@
 /*! \class VInstrumentResponseFunctionData
     \brief data class for instrumental response functions
 
-
-
 */
 
 

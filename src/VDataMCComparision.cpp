@@ -1141,7 +1141,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                     }
                     if( fHistoSingleTel[ETELDIST][iTelImage] )
                     {
-                        fHistoSingleTel[ETELDIST][iTelImage]->fill( fData->R[iTelImage], weight, log10( fData->ErecS ), fData->ntubes[iTelImage],
+                        fHistoSingleTel[ETELDIST][iTelImage]->fill( fData->R_core[iTelImage], weight, log10( fData->ErecS ), fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[ERECRAT][iTelImage] && fData->ErecS > 0. && fData->ES[iTelImage] > 0. )

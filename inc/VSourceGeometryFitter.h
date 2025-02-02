@@ -659,7 +659,7 @@ class VFun_SourceDescription_RadialSymmetricSource_Chi2 : public ROOT::Minuit2::
 
 ///////////////////////////////////////////////////////////////////////////////
 // Source Description (3): Radial Symmetric Sources, LL
-// TODO: needs more work to take zero and negative bins into account
+// Note: needs more work to take zero and negative bins into account
 ///////////////////////////////////////////////////////////////////////////////
 class VFun_SourceDescription_RadialSymmetricSource_LL: public ROOT::Minuit2::FCNBase
 {
@@ -766,7 +766,7 @@ class VFun_SourceDescription_RadialSymmetricSource_LL: public ROOT::Minuit2::FCN
 
 ///////////////////////////////////////////////////////////////////////////////
 // Source Description (4): Radial asymmetric gaussian, convolved with simple PSF
-// TODO: needs more work to take zero and negative bins into account
+// Note: needs more work to take zero and negative bins into account
 ///////////////////////////////////////////////////////////////////////////////
 class VFun_SourceDescription_RadialAsymmetricSource_LL: public ROOT::Minuit2::FCNBase
 {

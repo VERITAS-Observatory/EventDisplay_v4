@@ -47,9 +47,9 @@ a.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( 0, "myCrabFile.root", 1, 
 
 VSensitivityCalculator a;
 // set MC parameter for gamma-ray simulations
-a.setMonteCarloParameters(1, "../data/TeV_data/EnergySpectrum_literatureValues.dat", 1, "/Users/Shared/data/AGIS/Set-Ia/effectiveAreas/CT_SignalNoise_StdCuts_NT2/effectiveArea-CFG1-0100m-ID1.root" );
+a.setMonteCarloParameters(1, "../data/TeV_data/EnergySpectrum_literatureValues.dat", 1, "./effectiveAreas/CT_SignalNoise_StdCuts_NT2/effectiveArea-CFG1-0100m-ID1.root" );
 // set MC parameter for proton simulations
-a.setMonteCarloParameters(14, "../data/TeV_data/EnergySpectrum_literatureValues_CR.dat", 0, "/Users/Shared/data/AGIS/Set-Ib/effectiveAreas/effectiveArea-CFG1-0100m-ID1.root", 20., 0, 0.5, 150, 2.5, 2. );
+a.setMonteCarloParameters(14, "../data/TeV_data/EnergySpectrum_literatureValues_CR.dat", 0, "./effectiveAreas/effectiveArea-CFG1-0100m-ID1.root", 20., 0, 0.5, 150, 2.5, 2. );
 // plot integral sensitivity
 a.plotIntegralSensitivityvsEnergyFromCrabSpectrum( 0, "MC" );
 
