@@ -1,7 +1,7 @@
 # Eventdisplay: An Analysis and Reconstruction Package for VERITAS
 
 [![DOI](https://zenodo.org/badge/221041866.svg)](https://zenodo.org/badge/latestdoi/221041866)
-[![ASCL][(https://img.shields.io/badge/ascl-2212.002-blue.svg?colorB=262255)](https://ascl.net/2212.002)
+[![ASCL](https://img.shields.io/badge/ascl-2212.002-blue.svg?colorB=262255)](https://ascl.net/2212.002)
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![CI](https://github.com/VERITAS-Observatory/EventDisplay_v4/actions/workflows/ci.yml/badge.svg)](https://github.com/VERITAS-Observatory/EventDisplay_v4/actions/workflows/ci.yml)
 
