@@ -168,10 +168,7 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 	dataloader->AddVariable( "size", 'F' );
 	dataloader->AddVariable( "ntubes", 'F' );
 	dataloader->AddVariable( "tgrad_x*tgrad_x", 'F' );
-	if( !iSingleTelescopeAnalysis )
-	{
-		dataloader->AddVariable( "cross", 'F' );
-	}
+    dataloader->AddVariable( "cross", 'F' );
 	dataloader->AddVariable( "asym", 'F' );
 	dataloader->AddVariable( "loss", 'F' );
 	dataloader->AddVariable( "dist", 'F' );
@@ -588,12 +585,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 	// filling of training trees;
 	cout << "filling training trees for " << fMapOfTrainingTree.size() << " telescope type(s)" << endl;
 	cout << "\t found " << f_ntelType << " telescopes of telescope type " << iTelType << endl;
-	bool iSingleTelescopeAnalysis = false;
-	if( f_ntelType == 1 )
-	{
-		iSingleTelescopeAnalysis = true;
-		cout << "\t single telescope analysis" << endl;
-	}
+	bool iSingleTelescopeAnalysis = false;   // set single telescope analysis always false
 	fMapOfNTelescopeType[iTelType] = f_ntelType;
 	
 	// get showerpars tree
