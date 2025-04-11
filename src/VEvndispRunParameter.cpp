@@ -759,7 +759,8 @@ void VEvndispRunParameter::print( int iEv )
                 cout << "\t trace integration method: \t" << fTraceIntegrationMethod[fTelToAnalyze[i]];
                 if( fDoublePass )
                 {
-                    cout << "\t (doublepass, integration method pass 1: " << fTraceIntegrationMethod_pass1[fTelToAnalyze[i]] << ")";
+                    cout << "\t (doublepass, integration method pass 1: " << fTraceIntegrationMethod_pass1[fTelToAnalyze[i]] << ", ";
+                    cout << "\t max LG/HG time difference: " << fSumWindowMaxTimeDifferenceLGtoHG[fTelToAnalyze[i]] << ")";
                 }
                 cout << endl;
                 cout << "\t start of summation window: \t" << fsumfirst[fTelToAnalyze[i]];
