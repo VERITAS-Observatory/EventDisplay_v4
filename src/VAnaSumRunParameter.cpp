@@ -696,7 +696,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
     }
     is.close();
     cout << "========================================================" << endl;
-    cout << "        end reading run parameters                      " << endl;
+    cout << "        end reading run parameters" << endl;
     cout << "========================================================" << endl;
     cout << endl;
 

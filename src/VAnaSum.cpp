@@ -568,9 +568,9 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
     fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( true ), fStereoOff->getSkyHistograms( true ), fStereoOff->getAlphaNormUC() );
 
     // print out maximum in maps
-    cout << "\t Maximum in CORRELATED maps: " << endl;
+    cout << "\t Maximum in CORRELATED maps:" << endl;
     TH2D* hStSig = ( TH2D* )fstereo_onoff->do2DSignificance( fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(), fStereoOff->getAlphaNorm() );
-    cout << "\t Maximum in UNCORRELATED maps: " << endl;
+    cout << "\t Maximum in UNCORRELATED maps:" << endl;
     TH2D* hStSigUC = ( TH2D* )fstereo_onoff->do2DSignificance( fStereoOn->getStereoSkyMapUC(), fStereoOff->getStereoSkyMapUC(), fStereoOff->getAlphaNormUC() );
 
     ////////////////////////////////////////////////////////////
@@ -595,9 +595,9 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
     }
 
     cout << endl;
-    cout << "\t ---------------------------- " << endl;
-    cout << "\t RESULTS FOR SOURCE POSITION: " << endl;
-    cout << "\t ---------------------------- " << endl;
+    cout << "\t ----------------------------" << endl;
+    cout << "\t RESULTS FOR SOURCE POSITION:" << endl;
+    cout << "\t ----------------------------" << endl;
     cout << "\t ON:" << i_nevts_on << "  OFF:" << setprecision( 4 ) << i_nevts_off* i_norm_alpha << " (";
     cout << "off " << i_nevts_off << ", alpha=" << i_norm_alpha << ")" << endl;
     cout << "\t " << setprecision( 4 ) <<  i_sig << " Sigma  " << i_rate << "+/-" << i_rateE << " gammas/min" << endl;
