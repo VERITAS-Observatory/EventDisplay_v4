@@ -169,7 +169,7 @@ void VRunSummary::print()
     char itemp[200];
 
     cout << endl << endl;
-    cout << "RUN SUMMARY: " << endl << endl;
+    cout << "RUN SUMMARY:" << endl << endl;
 
     for( int i = 0; i < fRunSummaryTree->GetEntries(); i++ )
     {

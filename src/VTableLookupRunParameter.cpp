@@ -415,7 +415,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
         }
     }
     // get telescope combinations (from first file if several files are given)
-    if( inputfile[0].find( "*" ) == string::npos )
+    if( inputfile.size() > 0 )
     {
         readTelescopeToAnalyze( inputfile[0] );
     }

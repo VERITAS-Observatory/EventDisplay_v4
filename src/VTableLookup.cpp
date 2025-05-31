@@ -567,7 +567,6 @@ void VTableLookup::fillLookupTable()
                 // get telescope type
                 ULong64_t t = iter_i_list_of_Tel_type->first;
 
-                // This should be already the corrected/scaled size value for MC.
                 float* i_s = fData->getSize( t, fTLRunParameter->fUseEvndispSelectedImagesOnly );
                 float* i_r = fData->getDistanceToCore( t );
                 unsigned int i_type = fData->getNTel_type( t );

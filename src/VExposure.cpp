@@ -2438,8 +2438,8 @@ void VExposure::downloadRunList()
 
     char* ENVIR_VAR;
 
-    char mkdir_string[800];
-    char permision_string[800];
+    char mkdir_string[1800];
+    char permision_string[1800];
 
     ENVIR_VAR = getenv( "VERITAS_DATA_DIR" );
 
