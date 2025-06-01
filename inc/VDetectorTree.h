@@ -28,7 +28,7 @@ class VDetectorTree
         VDetectorTree();
         ~VDetectorTree();
         bool fillDetectorTree( VDetectorGeometry* iDet );
-        bool readDetectorTree( VDetectorGeometry* iDet, TTree* iTree);
+        bool readDetectorTree( VDetectorGeometry* iDet, TTree* iTree );
         TTree* getTree()
         {
             return fTreeDet;
