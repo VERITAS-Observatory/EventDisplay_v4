@@ -119,6 +119,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 
         double   fTMVA_EvaluationResult;         // result from TVMA evaluator
         bool     fSmoothAndInterpolateMVAValues;
+        double   fAverageZenithPerRun;           // (rough) average zenith angle of run
 
         string   fTMVAMethodName;
         double   fTMVAErrorFraction_min;             // remove bins from background efficiency curves with large errors
@@ -138,7 +139,6 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         float    fdES;
         float    fSizeSecondMax_log10;
         float    fCoreDist;
-        float    fImages_Ttype[VDST_MAXTELESCOPES];
         float    fDispDiff;
         float    fDispDiff_log10;
         float    fDispAbsSumWeigth;
@@ -147,6 +147,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         bool     bPlotEfficiencyPlotsPerBin;
         bool     fPrintPlotting;
 
+        void             calculate_average_zenith_angle();
         TH1F*            getEfficiencyHistogram( string iName, TFile* iF, string iMethodTag_2 );
         bool             optimizeSensitivity( unsigned int iDataBin );
         TGraph*          fillfromGraph2D( TObject* i_G, double i_ze_min, double i_ze_max );
@@ -179,7 +180,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         VTMVAEvaluator();
         ~VTMVAEvaluator() {};
 
-        bool    evaluate( bool interpolate_mva = true );
+        bool    evaluate( bool interpolate_mva = false, bool use_average_zenith_angle = true );
         vector< double > getBackgroundEfficiency();
         vector< bool >   getOptimumCutValueFound();
         vector< double > getSignalEfficiency();
@@ -252,7 +253,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         }
         void   setTMVAMethod( string iMethodName = "BDT" );
 
-        ClassDef( VTMVAEvaluator, 35 );
+        ClassDef( VTMVAEvaluator, 36 );
 };
 
 #endif

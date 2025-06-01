@@ -71,8 +71,8 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
     Double_t WobbleE = 0;
     Double_t MSCW = 0.;
     Double_t MSCL = 0.;
-    Double_t ErecS = 0.;
-    Double_t EChi2S = 0.;
+    Float_t ErecS = 0.;
+    Float_t EChi2S = 0.;
     Double_t Xcore = 0.;
     Double_t Ycore = 0.;
     Double_t Xoff_derot = 0.;
@@ -91,8 +91,8 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
     iDataTree_reduced->Branch( "WobbleE", &WobbleE, "WobbleE/D" );
     iDataTree_reduced->Branch( "MSCW", &MSCW, "MSCW/D" );
     iDataTree_reduced->Branch( "MSCL", &MSCL, "MSCL/D" );
-    iDataTree_reduced->Branch( "ErecS", &ErecS, "ErecS/D" );
-    iDataTree_reduced->Branch( "EChi2S", &EChi2S, "EChi2S/D" );
+    iDataTree_reduced->Branch( "ErecS", &ErecS, "ErecS/F" );
+    iDataTree_reduced->Branch( "EChi2S", &EChi2S, "EChi2S/F" );
     iDataTree_reduced->Branch( "Xcore", &Xcore, "Xcore/D" );
     iDataTree_reduced->Branch( "Ycore", &Ycore, "Ycore/D" );
     iDataTree_reduced->Branch( "Xoff_derot", &Xoff_derot, "Xoff_derot/D" );

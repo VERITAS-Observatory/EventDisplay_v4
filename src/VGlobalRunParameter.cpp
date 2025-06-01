@@ -19,7 +19,7 @@ VGlobalRunParameter::VGlobalRunParameter( bool bSetGlobalParameter )
                 cout << "VGlobalRunParameter: error while reading parameter file with global run parameters" << endl;
                 cout << endl;
                 cout << "Note: several parameter files are needed to run the eventdisplay analysis" << endl;
-                cout << "      they are provided in form of a tar ball and are observatory dependent (CTA or VERITAS)" << endl;
+                cout << "      they are provided in form of a tar ball and are observatory dependent (e.g. for VERITAS)" << endl;
                 cout << "The file not found is EVNDISP.global.runparameter" << endl;
                 cout << endl;
                 cout << "Parameter files are expected to be in the following directory: " << endl;
@@ -362,7 +362,7 @@ void VGlobalRunParameter::printGlobalRunParameter()
 string VGlobalRunParameter::fObservatory = "Whipple";
 bool VGlobalRunParameter::bReadRunParameter = false;
 unsigned int VGlobalRunParameter::fEVNDISP_TREE_VERSION = 9;
-string VGlobalRunParameter::fEVNDISP_VERSION = "v.4.91";
+string VGlobalRunParameter::fEVNDISP_VERSION = "v.4.92";
 string VGlobalRunParameter::fDBServer = "";
 string VGlobalRunParameter::fRawDataServer = "";
 string VGlobalRunParameter::fEVNDISPAnaDataDirectory = "";

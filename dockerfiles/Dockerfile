@@ -2,6 +2,9 @@ ARG ROOT_VERSION=6.30.02-alma9
 FROM rootproject/root:${ROOT_VERSION} AS build
 ARG VBF_VERSION=0.3.4
 ARG BUILD_BRANCH=main
+ARG NUM_CORES=4
+
+RUN dnf install -y diffutils && dnf clean all
 
 # VBF
 ADD https://syncandshare.desy.de/index.php/s/NrnZNKfT8WxFpcn/download /workdir/VBF-$VBF_VERSION.tar.gz
@@ -19,11 +22,11 @@ ENV LD_LIBRARY_PATH "${EVNDISPSYS}/obj:${EVNDISPSYS}/lib:${ROOTSYS}/lib:${VBFSYS
 WORKDIR /opt/
 RUN BUILD_BRANCH=$(echo ${BUILD_BRANCH} | sed 's#refs/tags/##') && \
     git clone -b ${BUILD_BRANCH} https://github.com/VERITAS-Observatory/EventDisplay_v4.git --depth 1
-ADD https://syncandshare.desy.de/index.php/s/jr9NrbWFR5MLaDf/download  ${SOFASYS}/sofa.tar.gz
+ADD https://syncandshare.desy.de/index.php/s/RamRFYJtZjDGsfL/download ${SOFASYS}/sofa.tar.gz
 
 RUN cd ${EVNDISPSYS} \
-    && ./install_sofa.sh && make VTS
- 
+    && ./install_sofa.sh && make -j$NUM_CORES VTS
+
 FROM rootproject/root:${ROOT_VERSION}
 WORKDIR /opt/
 COPY --from=build /opt/VBF /opt/VBF

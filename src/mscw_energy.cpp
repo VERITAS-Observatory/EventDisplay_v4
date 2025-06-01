@@ -71,7 +71,8 @@ int main( int argc, char* argv[] )
     cout << "mscw_energy (" << fTLRunParameter->getEVNDISP_VERSION() << ")" << endl;
     cout << "=======================" << endl;
     cout << endl;
-    cout << "calculation of mean scaled width and length, and energy with lookup tables" << endl;
+    cout << "calculation of mean scaled width and length, and energy with lookup tables." << endl;
+    cout << "Stereo reconstruction for direction, core, and energy with dispBDTs." << endl;
     cout << "--------------------------------------------------------------------------" << endl;
     cout << endl;
 

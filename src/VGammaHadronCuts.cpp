@@ -1050,6 +1050,18 @@ void VGammaHadronCuts::printCutSummary()
 */
 bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructionMethod, bool bCount, int iEntry, bool fIsOn )
 {
+    /////////////////////////////////////////////////////////////////////////////////
+    // apply number of images cut
+    if( fData->NImages < fCut_NImages_min || fData->NImages > fCut_NImages_max )
+    {
+        if( bCount && fStats )
+        {
+            fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+            fStats->updateCutCounter( VGammaHadronCutsStatistics::eNImages );
+        }
+        return false;
+    }
+
     // require good pointing
     if( fData->Array_PointingStatus != 0 )
     {
@@ -1069,18 +1081,6 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
         {
             fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
             fStats->updateCutCounter( VGammaHadronCutsStatistics::eArrayChi2 );
-        }
-        return false;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////
-    // apply number of images cut
-    if( fData->NImages < fCut_NImages_min || fData->NImages > fCut_NImages_max )
-    {
-        if( bCount && fStats )
-        {
-            fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
-            fStats->updateCutCounter( VGammaHadronCutsStatistics::eNImages );
         }
         return false;
     }
@@ -1157,13 +1157,13 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
             continue;
         }
 
-        if( fData->R[fData->ImgSel_list[i]] > 0. )
+        if( fData->R_core[fData->ImgSel_list[i]] > 0. )
         {
-            iR += fData->R[fData->ImgSel_list[i]];
+            iR += fData->R_core[fData->ImgSel_list[i]];
             iNTR++;
-            if( fData->R[fData->ImgSel_list[i]] < iR_min )
+            if( fData->R_core[fData->ImgSel_list[i]] < iR_min )
             {
-                iR_min = fData->R[fData->ImgSel_list[i]];
+                iR_min = fData->R_core[fData->ImgSel_list[i]];
             }
         }
     }
@@ -1406,7 +1406,7 @@ bool VGammaHadronCuts::applyTMVACut( int i )
     fTMVA_EvaluationResult = -99.;
     if( fTMVAEvaluator )
     {
-        bool i_TMVA_Evaluation = fTMVAEvaluator->evaluate();
+        bool i_TMVA_Evaluation = fTMVAEvaluator->evaluate( false, true );
         fTMVA_EvaluationResult = fTMVAEvaluator->getTMVA_EvaluationResult();
         return i_TMVA_Evaluation;
     }
@@ -1652,7 +1652,7 @@ void VGammaHadronCuts::initializeCuts( int irun, string iFile )
         {
             cout << "VGammaHadronCuts::initializeCuts: failed setting probability cuts for " << irun << " " << iFile << endl;
             cout << "exiting..." << endl;
-            exit(-1 );
+            exit( EXIT_FAILURE );
         }
     }
     // TMVA cuts

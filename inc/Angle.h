@@ -13,6 +13,7 @@
  * Original Author: Stephen Fegan
  * $Date: 2010/03/08 08:01:35 $
  * $Tag$
+ * Based on code released under https://github.com/sfegan/serial_tracking/tree/main
  *
  **/
 

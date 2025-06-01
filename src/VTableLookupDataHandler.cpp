@@ -451,8 +451,6 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     bitset<8 * sizeof(unsigned long )> i_nimage; // for imagepattern
     i_nimage.reset();
 
-    Double_t SizeFirstMax_temp = -1000.;
-    Double_t SizeSecondMax_temp = -100.;
     for( unsigned int i = 0; i < fNTel; i++ )
     {
         bool fReadTPars = false;
@@ -526,18 +524,6 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
                 }
             }
 
-            if( fsize[i] > SizeSecondMax_temp )
-            {
-                if( fsize[i] > SizeFirstMax_temp )
-                {
-                    SizeSecondMax_temp = SizeFirstMax_temp;
-                    SizeFirstMax_temp = fsize[i];
-                }
-                else
-                {
-                    SizeSecondMax_temp = fsize[i];
-                }
-            }
             fCurrentNoiseLevel[i] = ftpars[i]->meanPedvar_Image;
             fFitstat[i] = ftpars[i]->Fitstat;
             if(!bShort )
@@ -571,11 +557,6 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
         }
     }
     fmeanPedvar_Image = calculateMeanNoiseLevel( true );
-
-    if( SizeSecondMax_temp > 0. )
-    {
-        fSizeSecondMax = SizeSecondMax_temp;
-    }
     //////////////////////////////////////////////////////////
     // redo the stereo (direction and core) reconstruction
     if( fTLRunParameter->fRerunStereoReconstruction )
@@ -583,6 +564,31 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
         fill_selected_images_before_redo_stereo_reconstruction();
         fmeanPedvar_Image = calculateMeanNoiseLevel( true );
         doStereoReconstruction( true );
+    }
+
+
+    // SizeSecondMax calculation
+    Double_t SizeFirstMax_temp = -1000.;
+    Double_t SizeSecondMax_temp = -100.;
+    for( int i = 0; i < fNImages; i++ )
+    {
+        unsigned int t = fImgSel_list_short[i];
+        if( fsize[t] > SizeSecondMax_temp )
+        {
+            if( fsize[t] > SizeFirstMax_temp )
+            {
+                SizeSecondMax_temp = SizeFirstMax_temp;
+                SizeFirstMax_temp = fsize[t];
+            }
+            else
+            {
+                SizeSecondMax_temp = fsize[t];
+            }
+        }
+    }
+    if( SizeSecondMax_temp > 0. )
+    {
+        fSizeSecondMax = SizeSecondMax_temp;
     }
 
     // dispEnergy - energy reconstruction using the disp MVA
@@ -603,7 +609,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
             getNTel(),
             fArrayPointing_Elevation, fArrayPointing_Azimuth,
             fTel_type,
-            getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
+            getSize( true ),
             fcen_x, fcen_y,
             fcosphi, fsinphi,
             fwidth, flength,
@@ -634,25 +640,25 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 }
 
 /*
- * redo stereo reconstruction (core and direction)
+ * Stereo reconstruction (core and direction)
  *
- * does not take into account pointing corrections
- * (as e.g. given by the VPM)
+ * using geometrical and disp methods
 */
 void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
 {
     // save original values
     fXoff_edisp = fXoff;
     fYoff_edisp = fYoff;
+    fChi2_edisp = fchi2;
     ///////////////////////////
     // stereo reconstruction
-    // (rcs_method4)
+    // (equivalent to rcs_method4)
     VSimpleStereoReconstructor i_SR;
     i_SR.initialize( fSSR_NImages_min, fTLRunParameter->fRerunStereoReconstruction_minAngle );
     i_SR.reconstruct_direction( getNTel(),
                                 fArrayPointing_Elevation, fArrayPointing_Azimuth,
                                 fTelX, fTelY, fTelZ,
-                                getSize( 1., bSelectedImagesOnly ),
+                                getSize( bSelectedImagesOnly ),
                                 fcen_x, fcen_y,
                                 fcosphi, fsinphi,
                                 fwidth, flength,
@@ -661,21 +667,21 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
     // (used also as seed values for DispAnalyzers)
     fXoff_intersect = i_SR.fShower_Xoffset;
     fYoff_intersect = i_SR.fShower_Yoffset;
+    fchi2 = i_SR.fShower_Chi2;
 
     // fall back to original eventdisplay results in case
     // simple reconstructor fails
-    if(( fXoff_intersect < -999. || fYoff_intersect < -999. )
-            && fchi2 >= 0 && isReconstructed() )
+    if(( fXoff_intersect < -999. || fYoff_intersect < -999. ) && fChi2_edisp >= 0 )
     {
         fXoff_intersect = fXoff_edisp;
         fYoff_intersect = fYoff_edisp;
+        fchi2 = fChi2_edisp;
     }
 
     ////////////////////////////////////////////////////////////////////
     // DISP method for updated disp reconstruction
     ////////////////////////////////////////////////////////////////////
-    if( fDispAnalyzerDirection
-            && fNImages <= ( int )fTLRunParameter->fRerunStereoReconstruction_BDTNImages_max )
+    if( fDispAnalyzerDirection )
     {
         ////////////////////////////////////////////////////////////////////
         // estimate error on direction reconstruction from DISP method
@@ -687,7 +693,7 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
                              getNTel(),
                              fArrayPointing_Elevation, fArrayPointing_Azimuth,
                              fTel_type,
-                             getSize( 1., bSelectedImagesOnly ),
+                             getSize( bSelectedImagesOnly ),
                              fcen_x, fcen_y,
                              fcosphi, fsinphi,
                              fwidth, flength,
@@ -707,7 +713,7 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
                             getNTel(),
                             fArrayPointing_Elevation, fArrayPointing_Azimuth,
                             fTel_type,
-                            getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
+                            getSize( bSelectedImagesOnly ),
                             fcen_x, fcen_y,
                             fcosphi, fsinphi,
                             fwidth, flength,
@@ -733,7 +739,7 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
             getNTel(),
             fArrayPointing_Elevation, fArrayPointing_Azimuth,
             fTel_type,
-            getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly ),
+            getSize( bSelectedImagesOnly ),
             fcen_x, fcen_y,
             fcosphi, fsinphi,
             fwidth, flength,
@@ -758,6 +764,7 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
         i_SR.fillShowerDirection( fXoff, fYoff );
         fnxyoff = fDispAnalyzerDirection->getXYWeight_disp().size();
         fNImages = ( int )fnxyoff;
+
         for( unsigned int t = 0; t < fnxyoff; t++ )
         {
             fXoff_T[t] = fDispAnalyzerDirection->getXcoordinate_disp( t );
@@ -818,7 +825,7 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
                                fArrayPointing_Elevation, fArrayPointing_Azimuth,
                                fXoff, fYoff,
                                fTelX, fTelY, fTelZ,
-                               getSize( 1., bSelectedImagesOnly ),
+                               getSize( bSelectedImagesOnly ),
                                fcen_x, fcen_y,
                                fcosphi, fsinphi,
                                fwidth, flength,
@@ -1347,8 +1354,6 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
         fOTree->Branch( "MCe0", &fMCEnergy, "MCe0/D" );
         fOTree->Branch( "MCxcore", &fMCxcore, "MCxcore/D" );
         fOTree->Branch( "MCycore", &fMCycore, "MCycore/D" );
-        sprintf( iTT, "MCR[%d]/D", fNTel );
-        // (nowhere needed)        fOTree->Branch( "MCR", fMCR, iTT );
         fOTree->Branch( "MCxcore_SC", &fMCxcore_SC, "MCxcore_SC/D" );
         fOTree->Branch( "MCycore_SC", &fMCycore_SC, "MCycore_SC/D" );
         fOTree->Branch( "MCxcos", &fMCxcos, "MCxcos/D" );
@@ -1380,8 +1385,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "Xoff_derot", &fXoff_derot, "Xoff_derot/D" );
     fOTree->Branch( "Yoff_derot", &fYoff_derot, "Yoff_derot/D" );
     fOTree->Branch( "stdS", &fstdS, "stdS/D" );
-    fOTree->Branch( "theta2", &ftheta2, "theta2/D" );
-    fOTree->Branch( "theta2_All", &ftheta2_All, "theta2_All[25]/D" );
+    fOTree->Branch( "theta2", &ftheta2, "theta2/F" );
     fOTree->Branch( "Xcore", &fXcore, "Xcore/D" );
     fOTree->Branch( "Ycore", &fYcore, "Ycore/D" );
     fOTree->Branch( "Xcore_SC", &fXcore_SC, "Xcore_SC/D" );
@@ -1393,19 +1397,19 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 
     sprintf( iTT, "meanPedvar_ImageT[%d]/F", fNTel );
     fOTree->Branch( "meanPedvar_ImageT", fmeanPedvar_ImageT, iTT );
-    sprintf( iTT, "dist[%d]/D", fNTel );
+    sprintf( iTT, "dist[%d]/F", fNTel );
     fOTree->Branch( "dist", fdist, iTT );
-    sprintf( iTT, "size[%d]/D", fNTel );
+    sprintf( iTT, "size[%d]/F", fNTel );
     fOTree->Branch( "size", fsize, iTT );
-    sprintf( iTT, "loss[%d]/D", fNTel );
+    sprintf( iTT, "loss[%d]/F", fNTel );
     fOTree->Branch( "loss", floss, iTT );
-    sprintf( iTT, "fracLow[%d]/D", fNTel );
+    sprintf( iTT, "fracLow[%d]/F", fNTel );
     fOTree->Branch( "fracLow", ffracLow, iTT );
-    sprintf( iTT, "max1[%d]/D", fNTel );
+    sprintf( iTT, "max1[%d]/F", fNTel );
     fOTree->Branch( "max1", fmax1, iTT );
-    sprintf( iTT, "max2[%d]/D", fNTel );
+    sprintf( iTT, "max2[%d]/F", fNTel );
     fOTree->Branch( "max2", fmax2, iTT );
-    sprintf( iTT, "max3[%d]/D", fNTel );
+    sprintf( iTT, "max3[%d]/F", fNTel );
     fOTree->Branch( "max3", fmax3, iTT );
     sprintf( iTT, "maxindex1[%d]/I", fNTel );
     fOTree->Branch( "maxindex1", fmaxindex1, iTT );
@@ -1413,9 +1417,9 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "maxindex2", fmaxindex2, iTT );
     sprintf( iTT, "maxindex3[%d]/I", fNTel );
     fOTree->Branch( "maxindex3", fmaxindex3, iTT );
-    sprintf( iTT, "width[%d]/D", fNTel );
+    sprintf( iTT, "width[%d]/F", fNTel );
     fOTree->Branch( "width", fwidth, iTT );
-    sprintf( iTT, "length[%d]/D", fNTel );
+    sprintf( iTT, "length[%d]/F", fNTel );
     fOTree->Branch( "length", flength, iTT );
     sprintf( iTT, "ntubes[%d]/I", fNTel );
     fOTree->Branch( "ntubes", fntubes, iTT );
@@ -1423,23 +1427,23 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "nsat", fnsat, iTT );
     sprintf( iTT, "nlowgain[%d]/s", fNTel );
     fOTree->Branch( "nlowgain", fnlowgain, iTT );
-    sprintf( iTT, "alpha[%d]/D", fNTel );
+    sprintf( iTT, "alpha[%d]/F", fNTel );
     fOTree->Branch( "alpha", falpha, iTT );
-    sprintf( iTT, "los[%d]/D", fNTel );
+    sprintf( iTT, "los[%d]/F", fNTel );
     fOTree->Branch( "los", flos, iTT );
-    sprintf( iTT, "asym[%d]/D", fNTel );
+    sprintf( iTT, "asym[%d]/F", fNTel );
     fOTree->Branch( "asym", fasym, iTT );
-    sprintf( iTT, "cen_x[%d]/D", fNTel );
+    sprintf( iTT, "cen_x[%d]/F", fNTel );
     fOTree->Branch( "cen_x", fcen_x, iTT );
-    sprintf( iTT, "cen_y[%d]/D", fNTel );
+    sprintf( iTT, "cen_y[%d]/F", fNTel );
     fOTree->Branch( "cen_y", fcen_y, iTT );
-    sprintf( iTT, "cosphi[%d]/D", fNTel );
+    sprintf( iTT, "cosphi[%d]/F", fNTel );
     fOTree->Branch( "cosphi", fcosphi, iTT );
-    sprintf( iTT, "sinphi[%d]/D", fNTel );
+    sprintf( iTT, "sinphi[%d]/F", fNTel );
     fOTree->Branch( "sinphi", fsinphi, iTT );
-    sprintf( iTT, "tgrad_x[%d]/D", fNTel );
+    sprintf( iTT, "tgrad_x[%d]/F", fNTel );
     fOTree->Branch( "tgrad_x", ftgrad_x, iTT );
-    sprintf( iTT, "tchisq_x[%d]/D", fNTel );
+    sprintf( iTT, "tchisq_x[%d]/F", fNTel );
     fOTree->Branch( "tchisq_x", ftchisq_x, iTT );
     sprintf( iTT, "Fitstat[%d]/I", fNTel );
     fOTree->Branch( "Fitstat", fFitstat, iTT );
@@ -1455,50 +1459,44 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "Xoff_intersect", &fXoff_intersect, "Xoff_intersect/F" );
     fOTree->Branch( "Yoff_intersect", &fYoff_intersect, "Yoff_intersect/F" );
 
-    sprintf( iTT, "R[%d]/D", fNTel );
-    fOTree->Branch( "R", fR, iTT );
-    sprintf( iTT, "MSCWT[%d]/D", fNTel );
+    sprintf( iTT, "R_core[%d]/F", fNTel );
+    fOTree->Branch( "R_core", fR_core, iTT );
+    sprintf( iTT, "MSCWT[%d]/F", fNTel );
     fOTree->Branch( "MSCWT", ftmscw, iTT );
-    sprintf( iTT, "MSCLT[%d]/D", fNTel );
+    sprintf( iTT, "MSCLT[%d]/F", fNTel );
     fOTree->Branch( "MSCLT", ftmscl, iTT );
     sprintf( iTT, "MSCWTSigma[%d]/F", fNTel );
     fOTree->Branch( "MSCWTSigma", ftmscw_sigma, iTT );
     sprintf( iTT, "MSCLTSigma[%d]/F", fNTel );
     fOTree->Branch( "MSCLTSigma", ftmscl_sigma, iTT );
-    sprintf( iTT, "E[%d]/D", fNTel );
+    sprintf( iTT, "E[%d]/F", fNTel );
     fOTree->Branch( "E", fE, iTT );
-    sprintf( iTT, "ES[%d]/D", fNTel );
+    sprintf( iTT, "ES[%d]/F", fNTel );
     fOTree->Branch( "ES", fES, iTT );
 
     sprintf( iTT, "NMSCW/I" );
     fOTree->Branch( "NMSCW", &fnmscw, iTT );
-    sprintf( iTT, "MSCW/D" );
+    sprintf( iTT, "MSCW/F" );
     fOTree->Branch( "MSCW", &fmscw, iTT );
-    sprintf( iTT, "MSCL/D" );
+    sprintf( iTT, "MSCL/F" );
     fOTree->Branch( "MSCL", &fmscl, iTT );
     sprintf( iTT, "MWR/F" );
     fOTree->Branch( "MWR", &fmwr, iTT );
     sprintf( iTT, "MLR/F" );
     fOTree->Branch( "MLR", &fmlr, iTT );
-    sprintf( iTT, "Erec/D" );
+    sprintf( iTT, "Erec/F" );
     fOTree->Branch( "Erec", &fenergy, iTT );
-    sprintf( iTT, "EChi2/D" );
+    sprintf( iTT, "EChi2/F" );
     fOTree->Branch( "EChi2", &fechi2, iTT );
-    sprintf( iTT, "dE/D" );
+    sprintf( iTT, "dE/F" );
     fOTree->Branch( "dE", &fdE, iTT );
-    sprintf( iTT, "Esys/F" );
-    fOTree->Branch( "Esys", &fesys, iTT );
-    sprintf( iTT, "EsysVar/F" );
-    fOTree->Branch( "EsysVar", &fesysVar, iTT );
-    sprintf( iTT, "EsysDist/F" );
-    fOTree->Branch( "EsysDist", &fesysDist, iTT );
-    sprintf( iTT, "ErecS/D" );
+    sprintf( iTT, "ErecS/F" );
     fOTree->Branch( "ErecS", &fenergyS, iTT );
-    sprintf( iTT, "EChi2S/D" );
+    sprintf( iTT, "EChi2S/F" );
     fOTree->Branch( "EChi2S", &fechi2S, iTT );
-    sprintf( iTT, "dES/D" );
+    sprintf( iTT, "dES/F" );
     fOTree->Branch( "dES", &fdES, iTT );
-    fOTree->Branch( "NErecST", &fnenergyT, "NErecST" );
+    fOTree->Branch( "NErecT", &fnenergyT, "NErecT/I" );
     fOTree->Branch( "ErecQL", &fenergyQL, "ErecQL/I" );
 
     sprintf( iTT, "EmissionHeight/F" );
@@ -1509,8 +1507,9 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "NTelPairs", &fNTelPairs, iTT );
     fOTree->Branch( "SizeSecondMax", &fSizeSecondMax, "SizeSecondMax/D" );
 
-    sprintf( iTT, "fEmissionHeightT[NTelPairs]/F" );
-    fOTree->Branch( "EmissionHeightT", fEmissionHeightT, iTT );
+    // large storage footprint; not used anywhere
+    //    sprintf( iTT, "fEmissionHeightT[NTelPairs]/F" );
+    //    fOTree->Branch( "EmissionHeightT", fEmissionHeightT, iTT );
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
     {
         fEmissionHeightT[i] = -99.;
@@ -1983,7 +1982,7 @@ void VTableLookupDataHandler::copyMCHistograms()
         if( iMC_his && fOutFile )
         {
             cout << "\t writing MC histograms" << endl;
-            iMC_his->print();
+            iMC_his->print( true );
             fOutFile->cd();
             iMC_his->Write();
         }
@@ -1995,7 +1994,7 @@ void VTableLookupDataHandler::reset()
 {
     for( unsigned int i = 0; i < fNTel; i++ )
     {
-        fR[i] = -99.;
+        fR_core[i] = -99.;
         fE[i] = -99.;
         fRTel[i] = -99.;
         fES[i] = -99.;
@@ -2014,9 +2013,6 @@ void VTableLookupDataHandler::reset()
     fenergy = -99.;
     fechi2 = -99.;
     fdE = -99.;
-    fesys = 0.;
-    fesysVar = 0.;
-    fesysDist = 0.;
     fenergyS = -99.;
     fechi2S = -99.;
     fdES = -99.;
@@ -2028,6 +2024,7 @@ void VTableLookupDataHandler::reset()
     fYoff_intersect = -99.;
     fXoff_edisp = -99.;
     fYoff_edisp = -99.;
+    fChi2_edisp = -999.;
     fXcore = -9999.;
     fYcore = -9999.;
     fstdP = -99.;
@@ -2052,12 +2049,12 @@ void VTableLookupDataHandler::calcDistances()
     {
         if( fImgSel_list[tel] && fZe >= 0. && fXcore > -9998. && fYcore > -9998. )
         {
-            fR[tel] = VUtilities::line_point_distance( fYcore, -1.*fXcore, 0., fZe, fAz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
+            fR_core[tel] = VUtilities::line_point_distance( fYcore, -1.*fXcore, 0., fZe, fAz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
             fRTel[tel] = VUtilities::line_point_distance( fYcore, -1.*fXcore, 0., 90. - fArrayPointing_Elevation, fArrayPointing_Azimuth, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
         }
         else
         {
-            fR[tel] = -99.;
+            fR_core[tel] = -99.;
             fRTel[tel] = -99.;
         }
     }
@@ -2152,7 +2149,8 @@ bool VTableLookupDataHandler::isReconstructed()
  */
 void VTableLookupDataHandler::calcEmissionHeights()
 {
-    fEmissionHeightCalculator->getEmissionHeight( fcen_x, fcen_y, fsize,
+    fEmissionHeightCalculator->getEmissionHeight( fcen_x, fcen_y,
+            getSize( fTLRunParameter->fUseEvndispSelectedImagesOnly ),
             fArrayPointing_Azimuth, fArrayPointing_Elevation );
     fNTelPairs = fEmissionHeightCalculator->getNTelPairs();
     fEmissionHeightMean = ( float )fEmissionHeightCalculator->getMeanEmissionHeight();
@@ -2208,7 +2206,7 @@ double VTableLookupDataHandler::getZe()
   (note that mscw modifies these values)
 
 */
-double* VTableLookupDataHandler::getMCEnergyArray()
+float* VTableLookupDataHandler::getMCEnergyArray()
 {
     for( unsigned int i = 0; i < fNTel; i++ )
     {
@@ -2279,6 +2277,7 @@ void VTableLookupDataHandler::resetAll()
     fYoff_intersect = 0.;
     fXoff_edisp = 0.;
     fYoff_edisp = 0.;
+    fChi2_edisp = 0.;
     fstdS = 0.;
     ftheta2 = 0.;
     fXcore = 0.;
@@ -2321,7 +2320,7 @@ void VTableLookupDataHandler::resetAll()
         ftgrad_x[i] = 0.;
         fFitstat[i] = 0;
         ftchisq_x[i] = 0.;
-        fR[i] = 0.;
+        fR_core[i] = 0.;
         fRTel[i] = 0.;
         fR_telType[i] = 0.;
         ftmscw[i] = 0.;
@@ -2330,10 +2329,6 @@ void VTableLookupDataHandler::resetAll()
         ftmscl_sigma[i] = 0.;
         fE[i] = 0.;
         fES[i] = 0.;
-    }
-    for( unsigned int i = 0; i < 25; i++ )
-    {
-        ftheta2_All[i] = 99.;
     }
     fnmscw = 0;
     fnenergyT = 0;
@@ -2345,9 +2340,6 @@ void VTableLookupDataHandler::resetAll()
     fenergy = 0.;
     fechi2 = 0.;
     fdE = 0.;
-    fesys = 0.;
-    fesysVar = 0.;
-    fesysDist = 0.;
     fenergyS = 0.;
     fechi2S = 0.;
     fdES = 0.;
@@ -2371,6 +2363,7 @@ void VTableLookupDataHandler::resetAll()
     fYoff_intersect = 0.;
     fXoff_edisp = 0.;
     fYoff_edisp = 0.;
+    fChi2_edisp = 0.;
 
     // cut efficiency counter
     fNStats_All = 0;
@@ -2558,14 +2551,14 @@ double VTableLookupDataHandler::getTelElevation()
  * used for table filling only
  *
  */
-double* VTableLookupDataHandler::getDistanceToCore( ULong64_t iTelType )
+float* VTableLookupDataHandler::getDistanceToCore( ULong64_t iTelType )
 {
     unsigned int z = 0;
     for( unsigned int i = 0; i < getNTel(); i++ )
     {
         if( fTel_type[i] == iTelType )
         {
-            fR_telType[z] = fR[i];
+            fR_telType[z] = fR_core[i];
             z++;
         }
     }
@@ -2576,21 +2569,23 @@ double* VTableLookupDataHandler::getDistanceToCore( ULong64_t iTelType )
  * used for table filling only
  *
  */
-double* VTableLookupDataHandler::getSize( double iSizeCorrection, bool iSelectedImagesOnly )
+float* VTableLookupDataHandler::getSize( bool iSelectedImagesOnly )
 {
     for( unsigned int i = 0; i < getNTel(); i++ )
     {
         if( iSelectedImagesOnly && !fImgSel_list[i] )
         {
             fsizeCorr[i] = -99.;
-            continue;
         }
-        fsizeCorr[i] = fsize[i] * iSizeCorrection;
+        else
+        {
+            fsizeCorr[i] = fsize[i];
+        }
     }
     return fsizeCorr;
 }
 
-double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTelType, bool iSelectedImagesOnly )
+float* VTableLookupDataHandler::getSize( ULong64_t iTelType, bool iSelectedImagesOnly )
 {
     unsigned int z = 0;
     for( unsigned int i = 0; i < getNTel(); i++ )
@@ -2603,7 +2598,7 @@ double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTe
                 z++;
                 continue;
             }
-            fsize_telType[z] = fsize[i] * iSizeCorrection;
+            fsize_telType[z] = fsize[i];
             z++;
         }
     }
@@ -2615,7 +2610,7 @@ double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTe
  * used for table filling only
  *
  */
-double* VTableLookupDataHandler::getWidth( ULong64_t iTelType )
+float* VTableLookupDataHandler::getWidth( ULong64_t iTelType )
 {
     unsigned int z = 0;
     for( unsigned int i = 0; i < getNTel(); i++ )
@@ -2633,7 +2628,7 @@ double* VTableLookupDataHandler::getWidth( ULong64_t iTelType )
  * used for table filling only
  *
  */
-double* VTableLookupDataHandler::getLength( ULong64_t iTelType )
+float* VTableLookupDataHandler::getLength( ULong64_t iTelType )
 {
     unsigned int z = 0;
     for( unsigned int i = 0; i < getNTel(); i++ )
@@ -2645,20 +2640,6 @@ double* VTableLookupDataHandler::getLength( ULong64_t iTelType )
         }
     }
     return flength_telType;
-}
-
-double* VTableLookupDataHandler::getDistance( ULong64_t iTelType )
-{
-    unsigned int z = 0;
-    for( unsigned int i = 0; i < getNTel(); i++ )
-    {
-        if( fTel_type[i] == iTelType )
-        {
-            fdist_telType[z] = fdist[i];
-            z++;
-        }
-    }
-    return fdist_telType;
 }
 
 unsigned int VTableLookupDataHandler::getTelType_arraycounter( unsigned int iTelID )
@@ -2755,13 +2736,24 @@ float VTableLookupDataHandler::getArrayPointingDeRotationAngle()
 */
 void VTableLookupDataHandler::fill_selected_images_before_redo_stereo_reconstruction()
 {
-    double* tmp_size = getSize( 1., fTLRunParameter->fUseEvndispSelectedImagesOnly );
+    float* tmp_size = getSize( fTLRunParameter->fUseEvndispSelectedImagesOnly );
     unsigned int ii = 0;
     fImgSel = 0;
     bitset<8 * sizeof(unsigned long )> i_nimage;
+    bool i_analyse_telescope = false;
     for( unsigned int i = 0; i < getNTel(); i++ )
     {
-        if( tmp_size[i] > 0. && flength[i] > 0. && fntubes[i] > fTLRunParameter->fminntubes && fArrayPointing_Elevation > 0.
+        i_analyse_telescope = false;
+        for( unsigned int t = 0; t < fTLRunParameter->fTelToAnalyse.size(); t++ )
+        {
+            if( i == fTLRunParameter->fTelToAnalyse[t] )
+            {
+                i_analyse_telescope = true;
+                break;
+            }
+        }
+        if( i_analyse_telescope &&
+                tmp_size[i] > 0. && flength[i] > 0. && fntubes[i] > fTLRunParameter->fminntubes && fArrayPointing_Elevation > 0.
                 && sqrt( fcen_x[i]*fcen_x[i] + fcen_y[i]*fcen_y[i] ) < fTLRunParameter->fmaxdist
                 && floss[i] < fTLRunParameter->fmaxloss
                 && ffui[i] > fTLRunParameter->fminfui )
@@ -2779,4 +2771,5 @@ void VTableLookupDataHandler::fill_selected_images_before_redo_stereo_reconstruc
         }
     }
     fImgSel = i_nimage.to_ulong();
+    fNImages = i_nimage.count();
 }

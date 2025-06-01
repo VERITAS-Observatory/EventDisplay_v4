@@ -1,13 +1,7 @@
 /*! \class VSourceGeometryFitter
     \brief analyse source geometry (position and extension)
 
-
-    TODO:
-
-    plotter
-    LL function
-    arcsec calculation
-    look at extension
+    Note: inoomplete functionality
 
 */
 

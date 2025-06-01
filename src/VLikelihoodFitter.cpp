@@ -3118,14 +3118,9 @@ float* VLikelihoodFitter::getIntegralFlux( double i_EMin, double i_EMax, TF1* i_
 /*
  *  calculate flux in Crab units
  *
- *  (GM) which Crab is this? Whipple?
- *  (SOB) Yes Whipple 1998
- *  ToDo: Implement different Crab spectra options
  */
 double VLikelihoodFitter::getCrabFlux( double iF, double i_EMin, double i_EMax )
 {
-    // double i_N0 = 3.20e-11;
-    // double i_Crab = i_N0 * (TMath::Power(i_EMax, i_Gamma +1 ) - TMath::Power(i_EMin, i_Gamma +1 ) ) /( i_Gamma +1);
     if( bValidLiterature )
     {
         double i_Crab = fLiteratureSpectra->getIntegralFlux( i_EMin, i_EMax, fCrabID );

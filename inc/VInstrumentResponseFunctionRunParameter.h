@@ -9,6 +9,7 @@
 #include "VTableLookupRunParameter.h"
 #include "VEnergySpectrumfromLiterature.h"
 
+#include <bitset>
 #include <fstream>
 #include <getopt.h>
 #include <iostream>
@@ -28,6 +29,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
 
         bool            readRunParameters( string ifilename );
         bool            readCRSpectralParameters();
+        vector< unsigned int > fillTelToAnalyze( vector< unsigned int > inital_tel_vector, unsigned long int tel_combo );
 
     public:
 
@@ -84,6 +86,8 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
         double          fYoff;
         vector< double > fAzMin;
         vector< double > fAzMax;
+        double          fRerunStereoReconstruction_minAngle;
+        unsigned long int fRerunStereoReconstruction_3telescopes;
 
         double          fWobbleIsotropic;
 
@@ -91,6 +95,9 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
         double          telconfig_arraycentre_X;
         double          telconfig_arraycentre_Y;
         double          telconfig_arraymax;
+        vector<double>  telconfig_telx;
+        vector<double>  telconfig_tely;
+        vector<double>  telconfig_telz;
 
         string          fCREnergySpectrumFile;
         unsigned int    fCREnergySpectrumID;
@@ -110,7 +117,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
         bool                  readRunParameterFromTextFile( string iFile );
         bool                  testRunparameters();
 
-        ClassDef( VInstrumentResponseFunctionRunParameter, 17 );
+        ClassDef( VInstrumentResponseFunctionRunParameter, 18 );
 };
 
 #endif

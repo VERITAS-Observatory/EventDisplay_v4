@@ -13,6 +13,7 @@ VTMVAEvaluator::VTMVAEvaluator()
 
     fData = 0;
     fTMVAEvaluatorResults = 0;
+    fAverageZenithPerRun = -9999.;
 
     reset();
 }
@@ -36,10 +37,6 @@ void VTMVAEvaluator::reset()
     fDispDiff_log10 = 0.;
     fDispAbsSumWeigth = 0.;
     fDummy = 0.;
-    for( int i = 0; i < VDST_MAXTELESCOPES; i++ )
-    {
-        fImages_Ttype[i] = 0.;
-    }
 
     setTMVACutValue();
     setSignalEfficiency();
@@ -467,19 +464,6 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
             {
                 fTMVAData[b]->fTMVAReader->AddVariable( "DispAbsSumWeigth", &fDispAbsSumWeigth );
             }
-            // Note: assume not more then 3 different telescope types
-            else if( iTrainingVariables[t] == "NImages_Ttype[0]" && !iVariableIsASpectator[t] )
-            {
-                fTMVAData[b]->fTMVAReader->AddVariable( "NImages_Ttype[0]", &fImages_Ttype[0] );
-            }
-            else if( iTrainingVariables[t] == "NImages_Ttype[1]" && !iVariableIsASpectator[t] )
-            {
-                fTMVAData[b]->fTMVAReader->AddVariable( "NImages_Ttype[1]", &fImages_Ttype[1] );
-            }
-            else if( iTrainingVariables[t] == "NImages_Ttype[2]" && !iVariableIsASpectator[t] )
-            {
-                fTMVAData[b]->fTMVAReader->AddVariable( "NImages_Ttype[2]", &fImages_Ttype[2] );
-            }
             else if( iVariableIsASpectator[t] )
             {
                 fTMVAData[b]->fTMVAReader->AddSpectator( iTrainingVariables[t].c_str(), &fDummy );
@@ -682,7 +666,7 @@ bool VTMVAEvaluator::getValuesFromEfficiencyHistograms( unsigned int b )
     evaluate this event using the MVA and return passed/not passed
 
 */
-bool VTMVAEvaluator::evaluate( bool interpolate_mva )
+bool VTMVAEvaluator::evaluate( bool interpolate_mva, bool use_average_zenith_angle )
 {
     if( fDebug )
     {
@@ -735,13 +719,6 @@ bool VTMVAEvaluator::evaluate( bool interpolate_mva )
             fDispDiff_log10 = 0.;    // !!! not clear what the best value is
         }
         fDispAbsSumWeigth = fData->DispAbsSumWeigth;
-        if( fData->NTtype < VDST_MAXTELESCOPES )
-        {
-            for( int i = 0; i < fData->NTtype; i++ )
-            {
-                fImages_Ttype[i] = ( float )fData->NImages_Ttype[i];
-            }
-        }
     }
     else
     {
@@ -749,7 +726,16 @@ bool VTMVAEvaluator::evaluate( bool interpolate_mva )
     }
 
     // find correct bin (e.g. depending on energy or zenith)
-    unsigned int iDataBin = getDataBin();
+    double i_ze = fData->Ze;
+    if( use_average_zenith_angle && fAverageZenithPerRun >= 0. )
+    {
+        i_ze = fAverageZenithPerRun;
+    }
+    if( fData->ErecS <= 0. )
+    {
+        return false;
+    }
+    unsigned int iDataBin = getDataBin( log10( fData->ErecS ), i_ze );
     if( fDebug )
     {
         cout << "VTMVAEvaluator::evaluate: data bin " << iDataBin;
@@ -875,6 +861,7 @@ bool VTMVAEvaluator::initializeDataStrutures( CData* iC )
         fIsZombie = true;
         return false;
     }
+    calculate_average_zenith_angle();
 
     return true;
 }
@@ -2163,6 +2150,38 @@ TGraph* VTMVAEvaluator::fillfromGraph2D( TObject* i_G, double i_ze_min, double i
 
     // graph is already 1D
     return ( TGraph* )i_G;
+}
+
+/*
+ * Calculate rough average zenith angle per run
+ *
+ * Optionally used for selection of data bin for MVA evaluation
+ */
+void VTMVAEvaluator::calculate_average_zenith_angle()
+{
+    if(!fData ) return;
+
+    double i_ze = 0.;
+    double i_n = 0.;
+
+    fData->GetEntry( 0 );
+    i_ze = fData->ArrayPointing_Elevation;
+    i_n++;
+    Long64_t nEntries = fData->fChain->GetEntries();
+    if( nEntries > 1 )
+    {
+        fData->GetEntry( nEntries / 2 );
+        i_ze += fData->ArrayPointing_Elevation;
+        i_n++;
+        fData->GetEntry( nEntries - 1 );
+        i_ze += fData->ArrayPointing_Elevation;
+        i_n++;
+    }
+    if( i_n > 0. )
+    {
+        fAverageZenithPerRun = 90. - i_ze / i_n;
+    }
+    cout << "VTMVAEvaluator: average zenith " << fAverageZenithPerRun << endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

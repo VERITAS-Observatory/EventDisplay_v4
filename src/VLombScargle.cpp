@@ -3,10 +3,6 @@
 
    see e.g. Scargle, J., ApJ 263, 835 (1982)
 
-   TODO:
-
-   calculate of error on resulting period (shuffling of light curve inside errors)
-
 */
 
 #include "VLombScargle.h"

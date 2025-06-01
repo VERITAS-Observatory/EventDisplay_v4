@@ -187,7 +187,7 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
 }
 
 
-bool VDetectorTree::readDetectorTree( VDetectorGeometry* iDet, TTree* iTree, bool bCTA )
+bool VDetectorTree::readDetectorTree( VDetectorGeometry* iDet, TTree* iTree)
 {
     if(!iDet || !iTree )
     {
@@ -342,30 +342,13 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry* iDet, TTree* iTree, boo
         {
             if( p < iDet->getX( i ).size() && p < iDet->getY( i ).size() )
             {
-                // change camera coordinate system to VERITAS one
-                if( bCTA )
-                {
-                    iDet->getX( i )[p] = fYTubeDeg[p];
-                    iDet->getY( i )[p] = fXTubeDeg[p];
-                }
-                else
-                {
-                    iDet->getX( i )[p] = fXTubeDeg[p];
-                    iDet->getY( i )[p] = fYTubeDeg[p];
-                }
+                iDet->getX( i )[p] = fXTubeDeg[p];
+                iDet->getY( i )[p] = fYTubeDeg[p];
             }
-            if( p < iDet->getX( i ).size() && p < iDet->getY( i ).size() )
+            if( p < iDet->getXUnrotated( i ).size() && p < iDet->getYUnrotated( i ).size() )
             {
-                if( bCTA )
-                {
-                    iDet->getXUnrotated( i )[p] = fYTubeDeg[p];
-                    iDet->getYUnrotated( i )[p] = fXTubeDeg[p];
-                }
-                else
-                {
-                    iDet->getXUnrotated( i )[p] = fXTubeDeg[p];
-                    iDet->getYUnrotated( i )[p] = fYTubeDeg[p];
-                }
+                iDet->getXUnrotated( i )[p] = fXTubeDeg[p];
+                iDet->getYUnrotated( i )[p] = fYTubeDeg[p];
             }
             if( p < iDet->getTubeRadius( i ).size() )
             {
@@ -373,16 +356,8 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry* iDet, TTree* iTree, boo
             }
             if( p < iDet->getX_MM( i ).size() && p < iDet->getY_MM( i ).size() )
             {
-                if( bCTA )
-                {
-                    iDet->getX_MM( i )[p] = fYTubeMM[p];
-                    iDet->getY_MM( i )[p] = fXTubeMM[p];
-                }
-                else
-                {
-                    iDet->getX_MM( i )[p] = fXTubeMM[p];
-                    iDet->getY_MM( i )[p] = fYTubeMM[p];
-                }
+                iDet->getX_MM( i )[p] = fXTubeMM[p];
+                iDet->getY_MM( i )[p] = fYTubeMM[p];
             }
             if( p < iDet->getTubeRadius_MM( i ).size() )
             {
@@ -402,16 +377,7 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry* iDet, TTree* iTree, boo
         }
     }
     iDet->setTelID_matrix( i_telID_matrix );
-
-    // rotate and stretch only CTA simulations
-    // (VTS sims are already simulated)
-    if( bCTA )
-    {
-        iDet->stretchAndMoveCamera();
-        iDet->rotateCamera();
-    }
     iDet->setCameraCentreTubeIndex();
-
     iDet->makeNeighbourList();
 
     cout << "..done (" << fNTel << ")" << endl;

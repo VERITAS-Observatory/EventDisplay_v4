@@ -1371,18 +1371,20 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
                 }
                 ///////////////////
                 // low gain channel have different timing
-                // (not for CTA-DSTs)
-                //
                 if( getHiLo()[i_channelHitID] && getRunParameter()->fsourcetype != 7 )
                 {
                     // integrate low-gain pulse only if prediction window start is before the end of the readout window
                     if( corrfirst < ( int )getNSamples() )
                     {
                         // get new tzero for sumwindow starting at corrfirst to the end of the window
-                        // assume that high and low gain timing is not more than 5 samples off
+                        // assume that high and low gain timing is not more than getSumWindowMaxTimeDifferenceLGtoHG samples off
                         if( getSumWindowMaxTimeDifferenceLGtoHG() > -998. )
                         {
                             corrfirst += getSumWindowMaxTimeDifferenceLGtoHG();
+                            if( corrfirst < 0 )
+                            {
+                                corrfirst = 0;
+                            }
                         }
                         else
                         {

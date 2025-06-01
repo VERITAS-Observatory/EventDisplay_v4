@@ -16,7 +16,6 @@
 
 #include "VGlobalRunParameter.h"
 #include "CData.h"
-#include "Ctelconfig.h"
 #include "VGammaHadronCuts.h"
 #include "VEffectiveAreaCalculatorMCHistograms.h"
 #include "VEffectiveAreaCalculator.h"
@@ -191,7 +190,12 @@ int main( int argc, char* argv[] )
         exit( EXIT_FAILURE );
     }
 
-    CData d( c, true, 6, true );
+    CData d( c, true, fRunPara->fRerunStereoReconstruction_minAngle == 15 );
+    d.initialize_3tel_reconstruction(
+        fRunPara->fRerunStereoReconstruction_3telescopes,
+        fRunPara->fRerunStereoReconstruction_minAngle,
+        fRunPara->telconfig_telx, fRunPara->telconfig_tely, fRunPara->telconfig_telz
+    );
     fCuts->setDataTree(&d );
     TH1D* hE0mc = ( TH1D* )gDirectory->Get( "hE0mc" );
 
@@ -310,7 +314,6 @@ int main( int argc, char* argv[] )
                 {
                     for( unsigned int i = 0; i < fRunPara->fAzMin.size(); i++ )
                     {
-                        //cout << "copy/setAngularResolution (" << f << " " << i << ")" << endl;
                         fEffectiveAreaCalculator.setAngularResolutionGraph( i,
                             f_IRF[f]->getAngularResolutionGraph( i, 0 ),
                             false );
@@ -353,14 +356,6 @@ int main( int argc, char* argv[] )
         {
             fEffectiveAreaCalculator.getHistogramhEmc()->Write();
         }
-
-        if( fRunPara->fgetXoff_Yoff_afterCut && fEffectiveAreaCalculator.getAcceptance_AfterCuts() )
-        {
-            cout << "writing acceptance tree (" << fEffectiveAreaCalculator.getAcceptance_AfterCuts()->GetName() << ") to " << fOutputfile->GetName() << endl;
-            fOutputfile->cd();
-            fEffectiveAreaCalculator.getAcceptance_AfterCuts()->Write();
-        }
-
     }
     for( unsigned int i = 0; i < f_IRF_Name.size(); i++ )
     {
