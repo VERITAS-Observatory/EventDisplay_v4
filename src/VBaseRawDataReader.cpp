@@ -265,7 +265,7 @@ bool VBaseRawDataReader::getHiLo( uint32_t i )
         {
             return fEvent[fTelID]->getHiLo( i );
         }
-        catch(...)
+        catch( ... )
         {
             cout << "EXCEPTION " << i << endl;
             return false;
