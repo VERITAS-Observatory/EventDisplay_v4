@@ -675,6 +675,10 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fNCalibrationEvents  = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
+        else if( iTemp.find( "minpedestalevents" ) < iTemp.size() )
+        {
+            fRunPara->fNMinimumNumberOfPedestalEvents = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+        }
 		// first event number (skip to this point)
 		else if( iTemp.rfind( "firstevent" ) < iTemp.size() )
 		{
