@@ -3,7 +3,7 @@ mscw_energy: calculation of mean scaled width and length, and energy with lookup
 ---------------------------------------------------------------------------------------
 
 Input data must be in form of evndisp result files (ROOT files produced by evndisp)
-Output is 
+Output is
    i)  for filling table mode: a lookup table
    ii) for analyzing mode:     a ROOT file with MSCW/MSCL/Energy, etc per event ( .mscw.root )
 
@@ -11,7 +11,7 @@ Output is
 
 command line parameters:
 
-general parameters: 
+general parameters:
 	 -arrayrecid=0/1/... 	 choose eventdisplay array reconstruction record (default 0)
 	 -inputfile FILE 	 evndisp root file as input (wildcards possible use, -inputfile "YOUR_DATA_DIRECTORY/*.root")
 	 -inputfilelist FILELIST list of evndisp root file as input (wildcards possible use, -inputfile "YOUR_DATA_DIRECTORY/*.root")
@@ -36,13 +36,13 @@ For additional optional options, see further below.
 --------------------------------------------
 
 Lookup table files:
-	
-	lookup table files are expected to be in 
+
+	lookup table files are expected to be in
 	$VERITAS_EVNDISP_AUX_DIR/Tables/
 
 --------------------------------------------
 
-EXAMPLES: 
+EXAMPLES:
 
  i) using a eventdisplay output file called 33072.root and a table file called table_ID00.root
 
@@ -57,7 +57,7 @@ EXAMPLES:
       this produces an output file called 33072.mscw.root with mscw, mscl, and energy assign for each event
 
  iii) using a bunch of simulations files (say runnumbers 521000 to 5210010)
-     (with size cut, but no distance cut applied in eventdisplay array analysis): 
+     (with size cut, but no distance cut applied in eventdisplay array analysis):
 
       mscw_energy -tablefile table.root -inputfile "52100[0-1].root" -outputfile simu.mscw.root
 
@@ -94,4 +94,4 @@ Additional options for table reading:
 
 print run parameters for an existing mscw file
 
-	 -printrunparameters FILE 	 
+	 -printrunparameters FILE

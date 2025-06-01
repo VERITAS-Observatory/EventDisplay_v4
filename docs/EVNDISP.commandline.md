@@ -15,7 +15,7 @@ Plot VTS data:
 Quick plotting of VTS data, ignoring all calibration data:
 ./bin/evndisp -plotraw -nocalibnoproblem -display=1 -sourcefile <your vbf data file>
 
-For analysis, use the ANALYSIS.evndisp.sh script. 
+For analysis, use the ANALYSIS.evndisp.sh script.
 To run the calibration steps only, use the ANALYSIS.evndisp.sh with calibration option set to 5.
 
 General:
@@ -40,7 +40,7 @@ General:
                                  7=DST (MC) file
      -runnumber=INT              set runnumber (default: get run number from sourcefile name)
      -useDBinfo                  get run info (target, wobble offsets, etc.) from database
-                                 (attention, this might overwrite some of the given command line parameters, 
+                                 (attention, this might overwrite some of the given command line parameters,
                                  default: on, switch of with -donotusedbinfo )
      -nevents=NEVENTS            loop over NEVENTS events in display=0 mode (<0 = no limit) (default=-10000)
      -firstevent=EVENTNUMBER     start analysis at event EVENTNUMBER (default=-10000)
@@ -57,12 +57,12 @@ Output:
      -writeallMC                 write all events, even those without array trigger, to showerpars and
                                  tpars trees (MC only, default: off)
      -writenoMCTree              do not write MC event tree to output file (MC only, default: 1)
-     -printdeadpixelinfo         print list of the telescope, gain, and channel number of all disabled 
-                                 channels to <runnumber>.evndisp.log 
-                                 each line will contain the word DEADCHAN for easy grep-ability, 
+     -printdeadpixelinfo         print list of the telescope, gain, and channel number of all disabled
+                                 channels to <runnumber>.evndisp.log
+                                 each line will contain the word DEADCHAN for easy grep-ability,
                                  and the reason(s) the channel was disabled
-     -writeextracalibtree        In gain calculating mode: Write additional tree into gain.root file 
-                                 containing channel charge, tzero, and monitor charge for all flasher events. 
+     -writeextracalibtree        In gain calculating mode: Write additional tree into gain.root file
+                                 containing channel charge, tzero, and monitor charge for all flasher events.
 
 Detector definition:
 --------------------
@@ -77,7 +77,7 @@ Calibration:
 ------------
      -readcalibdb                read relative gains and time offsets from offline DB (switch off with -nocalibnoproblem)
      -calibrationfile FILENAME   file with names of pedestal/gain/toffset/pixel status files (assume path $EVNDATA/calibration/)
-     -lowgaincalibrationfile FILENAME    file with names for pedestals and high/low gain multiplier files 
+     -lowgaincalibrationfile FILENAME    file with names for pedestals and high/low gain multiplier files
                                              (assume path $EVNDATA/calibration/)
      -gaincorrection=FLOAT       apply correction to gains (default=1)
      -usepeds                    use only true pedestal events (event type=2; use -donotusepeds to switch it off)
@@ -92,10 +92,10 @@ Calibration:
      -PedestalsLengthOfTimeSlice=FLOAT   length of time slices for pedestal variations (default=180s)
      -deadchannelfile FILE       read this file with dead channel definitions (default=deadChannelDefinition.dat)
 
-Pointing: 
+Pointing:
 ---------
      -elevation                  telescope elevation
-     -azimuth                    telescope azimuth 
+     -azimuth                    telescope azimuth
      -target TARGET              telescope is pointed to this target (use -print targets to print available targets)
      -printtargets               print available targets
      -declination=DEC            target is at this declination (J2000)
@@ -106,20 +106,20 @@ Pointing:
      -wobbleeast=FLOAT           wobble offset EAST (degrees) (this does not overwrite the DB value)
      -overwriteDB_wobblenorth=FLOAT      wobble offset NORTH (degrees) (this does overwrite the DB value)
      -overwriteDB_wobbleeast=FLOAT       wobble offset EAST (degrees) (this does overwrite the DB value)
-     -checkpointing=FLOAT        abort of difference between calculated pointing direction and vbf pointing direction 
+     -checkpointing=FLOAT        abort of difference between calculated pointing direction and vbf pointing direction
                                  is larger than this value ([deg], default=999 deg)
      -pointingErrorX=INT:FLOAT   take pointing error in array reconstruction into account
-                                 (camera x-direction [deg], default 0, 
+                                 (camera x-direction [deg], default 0,
                                  usage: for telescope 1 do for example: -pointingErrorX=1:0.05)
                                  (NOTE: experts only; option disables reading of pointing values from the DB)
      -pointingErrorY=INT:FLOAT   take pointing error in array reconstruction into account
-                                 (camera y-direction [deg], default 0, 
+                                 (camera y-direction [deg], default 0,
                                  usage: for telescope 1 do for example: -pointingErrorY=1:0.05)
                                  (NOTE: experts only; option disables reading of pointing values from the DB)
      -useDBtracking              use database to calculate pointing errors (default: on, switch off with -usenodbtracking )
      -useTCorrectionfrom SQL-DATE        use pointing calculated with T-point correction valid for this data
                                          (default: not applied, example: -useTCorrectionfrom "2007-10-10"
-     -pointingmonitortxt DIRECTORY       find pointing monitor text files in this directory 
+     -pointingmonitortxt DIRECTORY       find pointing monitor text files in this directory
                                          (default: not applied, expect filename as pointing_VPM.37195.t1.dat)
      -usedbvpm                   use calibrated pointing monitor data from DB (usenodbvpm to switch it off)
      -dstfile FILENAME           name of dst output file (root file, default: dstfile.root)
@@ -144,7 +144,7 @@ Display options:
      -starcatalogue Hipparcos_MAG8_1997.dat  plot stars into the display
      -starbrightness=float       plot stars brighter than the given B magnitude
 
-Simulations: 
+Simulations:
 -------------
      -isMC=0/1/2                 source data is MC (not/write all MC events/only triggered MC events, default=0)
      -fillmchisto                fill MC histograms (default 1)
@@ -161,7 +161,7 @@ Simulations:
      -pedestalnoiselevel=int     noise level used for external pedestal file (default=250)
      -pedestalDefaultPedestal=float      default pedestals used in simulations (default=15.)
      -lowgainpedestallevel=float pedestal level to be used for low-gain channels in MC (default=off)
-     -printGrisuHeader=0/1/2     0 (default)=nothing,   
+     -printGrisuHeader=0/1/2     0 (default)=nothing,
                                  1=Reproduce full grisu simulation header including detector config file (from VBF header).
                                  2=Print config file name that was used for detector simulation, if available.
 

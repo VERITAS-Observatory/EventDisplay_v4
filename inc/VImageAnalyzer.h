@@ -58,7 +58,7 @@ class VImageAnalyzer : public VImageBaseAnalyzer
         }
         void initAnalysis();                      //!< set the data vectors, read the calibration data (called once at the beginning of the analysis)
         void initOutput();                        //!< open outputfile
-        void initTrees();                         //!  intitalize output tree
+        void initTrees();                         //!  initialize output tree
         void shutdown();                          //!< close outputfile
         void terminate( bool iDebug_IO = false );            //!< write results to disk
 };

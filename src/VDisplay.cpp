@@ -128,7 +128,7 @@ void VDisplay::CloseWindow()
 
 
 /*!
-   these histograms are only needed for plotting purpuse (like FADC trace)
+   these histograms are only needed for plotting purpose (like FADC trace)
 */
 void VDisplay::bookHistos()
 {

@@ -1494,7 +1494,7 @@ bool VCameraRead::read_camerarotation_fromDBTextFile( unsigned int run_number, s
 
 /*!
 
-     read varios detector parameters from the DB
+     read various detector parameters from the DB
 
 */
 bool VCameraRead::readDetectorGeometryFromDB(

@@ -1,4 +1,4 @@
-hiloAnalysis 
+hiloAnalysis
 
 	-a	Inner HiLo Run Number
 	-b	Outer HiLo Run Number
@@ -35,8 +35,6 @@ VTS.EVNDISP.sub_make_DST.sh <runlist> [pedestal calculation (default=1=on)] [Sum
 
 5. Then put these files into: $VERITAS_EVNDISP_AUX_DIR/Calibration/Tel_X/
 
-For example: 
+For example:
 	if you are looking at runs 12345 and 12346 give them the filename 1234546.lmult.root
 	and add the file to $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGain.dat
-
-

@@ -4,11 +4,11 @@
 #
 
 if ($#argv != 1) then
-   echo 
+   echo
    echo "set the environmental variables for EVNDISP"
-   echo 
+   echo
    echo "   source ./setObservatory.sh <observatory = CTA or VERITAS/VTS>"
-   echo 
+   echo
    exit
 endif
 
@@ -42,6 +42,6 @@ endif
 setenv SOFASYS $EVNDISPSYS/sofa
 
 ######################################################
-## EVNDISP libraries 
+## EVNDISP libraries
 setenv LD_LIBRARY_PATH $EVNDISPSYS/lib/:$EVNDISPSYS/obj/:$LD_LIBRARY_PATH
 ######################################################
