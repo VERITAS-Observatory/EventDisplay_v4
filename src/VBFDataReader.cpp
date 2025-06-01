@@ -43,6 +43,8 @@ bool VBFDataReader::getNextEvent()
 	}
 	bool bSimulations = false;
 	
+    unsigned int n_error_prints = 0;
+
 	try
 	{
 		if( fDebug )
@@ -63,10 +65,15 @@ bool VBFDataReader::getNextEvent()
 			}
 			catch( const std::exception& e )
 			{
-				std::cout << "VBFDataReader::getNextEvent: exception while reading file: "
-						  << e.what() << std::endl;
+                // corrupt files otherwise generated 100s of GB of log files
+                if( n_error_prints < 5000 )
+                {
+                    std::cout << "VBFDataReader::getNextEvent: exception while reading file: "
+                              << e.what() << std::endl;
+                }
 				pack = old_pack;
 				setEventStatus( 0 );
+                n_error_prints++;
 				return false;
 			}
 			delete old_pack;
@@ -263,7 +270,7 @@ vector< bool >& VBFDataReader::getLocalTrigger()
 	}
 	
 	/* -------
-	    additonal test to check local trigger vector with eventtype
+        additional test to check local trigger vector with eventtype
 	    but: has to be used differently for pedestal runs, etc...
 	         needs some more work
 	// test if vector is nonzero
