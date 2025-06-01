@@ -206,7 +206,7 @@ double VTraceHandler::getQuickTZero( int fFirst, int fLast )
 // calculates the half-max time for this channel
 double VTraceHandler::getQuickTZero( int fFirst, int fLast, int fTFirst )
 {
-    cout << "VTraceHandler::getQuickTZero: WARNING DO NOT USE; FUNCTION OBSOLUTE; USE VTraceHandler::getPulseTiming" << endl;
+    cout << "VTraceHandler::getQuickTZero: WARNING DO NOT USE; FUNCTION OBSOLETE; USE VTraceHandler::getPulseTiming" << endl;
     if( fFirst < 0 )
     {
         fFirst = 0;
@@ -516,7 +516,7 @@ void VTraceHandler::getTraceMax( double& tmax, double& maxpos )
 
 double VTraceHandler::getQuickPulseWidth( int fFirst, int fLast, double fPed )
 {
-    cout << "VTraceHandler::getQuickPulseWidth: WARNING DO NOT USE; FUNCTION OBSOLUTE; USE VTraceHandler::getPulseTiming" << endl;
+    cout << "VTraceHandler::getQuickPulseWidth: WARNING DO NOT USE; FUNCTION OBSOLETE; USE VTraceHandler::getPulseTiming" << endl;
     double it = 0.;
     double imax = 0.;
     int maxpos = 0;

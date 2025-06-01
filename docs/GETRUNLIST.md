@@ -1,8 +1,8 @@
 VTS.getRunListFromDB
 
-./VTS.getRunListFromDB 
+./VTS.getRunListFromDB
 
-Examples: 
+Examples:
 
 VTS.getRunListFromDB -b 2009-09-01 -e 2009-10-01  -s Crab -z 60. -d 1200. -g -x
 VTS.getRunListFromDB -l runlist.dat -t -x -v -g

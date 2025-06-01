@@ -9,13 +9,14 @@
 
 Eventdisplay is a reconstruction and analysis pipeline for data of
 Imaging Atmospheric Cherenkov Telescopes.
-It has been primarily developed for VERITAS and CTA analysis and publications.
-This repository contains the Eventdisplay version used for VERITAS analysis (see [here](https://github.com/Eventdisplay/Eventdisplay) for the CTA version).
+It has been primarily developed for the analysis of VERITAS and CTAO data to generate results for scientific publications.
+This repository contains the Eventdisplay version used for VERITAS analysis ([CTAO version](https://github.com/Eventdisplay/Eventdisplay))
 
 * Original developers: Gernot Maier and Jamie Holder
 * Authors and contributors: [CITATION.cff](CITATION.cff)
 * License: [LICENSE](LICENSE)
 * Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
+* Changelog: [CHANGELOG.md](CHANGELOG.md)
 
 In case Eventdisplay is used in a research project, please cite this repository using the [Zenodo entry](https://zenodo.org/badge/latestdoi/221041866) and the following publication:
 
@@ -57,7 +58,7 @@ Eventdisplay consists of the following main components:
 
 Additional components:
 
-* release test macros and results (see internal GitHub repository [Eventdisplay_ReleaseTests](https://github.com/VERITAS-Observatory/EventDisplay_ReleaseTests_code).
+* release test macros and results (see internal GitHub repository [Eventdisplay_ReleaseTests](https://github.com/VERITAS-Observatory/EventDisplay_ReleaseTests_code)).
 
 ## Documentation
 
