@@ -38,7 +38,7 @@ Lists and parameter files:
         see example $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runlist
 
    definition of gamma/hadron cuts:
-	
+
 	see example $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.GammaHadron.dat
 
 	Please check VERITAS analysis wiki for the standard cut files
@@ -56,7 +56,7 @@ Required instrument response function files:
    effective areas, see $VERITAS_EVNDISP_AUX_DIR/EffectiveAreas
 
    radial acceptances, see $VERITAS_EVNDISP_AUX_DIR/RadialAcceptances
-	
+
 --------------------------------------------------------
 
 use the plotting tools in the shared library to plot the results:
