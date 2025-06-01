@@ -221,10 +221,10 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
         }
         fEventWeight = 1.;
 
-        int iNE = 1;
+        int i_NE = 1;
         if( fEventDisplayFileFormat >= 2 )
         {
-            iNE = fillNextEvent( bShort );
+            i_NE = fillNextEvent( bShort );
         }
         else
         {
@@ -233,7 +233,7 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
             cout << "...exiting" << endl;
             exit( EXIT_FAILURE );
         }
-        if( iNE == -1 )
+        if( i_NE == -1 )
         {
             return false;
         }
@@ -244,7 +244,7 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
         }
 
         // return false for non-valid (maybe not reconstructed?) event
-        if( iNE == 0 )
+        if( i_NE == 0 )
         {
             return true;
         }
