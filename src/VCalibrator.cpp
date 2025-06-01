@@ -431,16 +431,15 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 				for( unsigned int i = 0; i < hped_vec[telType][0].size(); i++ )
 				{
 					// get pedestal and pedestal variances from pedestal histograms
-					// (require at least 100 entries in pedestal events)
 					os << t << " " << i << " ";
 					if( hped_vec[telType][fRunPar->fCalibrationSumWindow - 1][i]
-							&& hped_vec[telType][fRunPar->fCalibrationSumWindow - 1][i]->GetEntries() > 50 )
+                            && hped_vec[telType][fRunPar->fCalibrationSumWindow - 1][i]->GetEntries() > fRunPar->fNMinimumNumberOfPedestalEvents )
 					{
 						os << hped_vec[telType][fRunPar->fCalibrationSumWindow - 1][i]->GetMean() / ( double )fRunPar->fCalibrationSumWindow << " ";
 					}
 					else
 					{
-						cout << "VCalibrator::writePeds(): WARNING, less than 50 events ";
+                        cout << "VCalibrator::writePeds(): WARNING, less than " << fRunPar->fNMinimumNumberOfPedestalEvents << " events ";
 						if( hped_vec[telType][fRunPar->fCalibrationSumWindow - 1][i] )
 						{
 							cout << "(";
@@ -454,7 +453,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 					// loop over all window sizes
 					for( unsigned int j = 0; j < hped_vec[telType].size(); j++ )
 					{
-						if( hped_vec[telType][j][i] && hped_vec[telType][j][i]->GetEntries() > 50 )
+                        if( hped_vec[telType][j][i] && hped_vec[telType][j][i]->GetEntries() > fRunPar->fNMinimumNumberOfPedestalEvents )
 						{
 							os << hped_vec[telType][j][i]->GetRMS() << " ";
 						}
@@ -4775,7 +4774,7 @@ bool VCalibrator::calculateIPRGraphs( string iPedFileName, unsigned int iSummati
 	{
 		// simple peak sensing: sim_telarray uses the maximum bin only
 		// The values for sampleTimeSlice and nBinsADC are set in the cleaning parameter file
-		// For example, for the currect (Apr 17) ASTRI simulation, it is set in sim_telarray as
+		// For example, for the current (Apr 17) ASTRI simulation, it is set in sim_telarray as
 		// fadc_mhz = 500 % MHz ==> sampleTimeSlice = 2 ns
 		// fadc_sum_bins = nBinsADC = 25 % Number of ADC time intervals actually summed up.
 		convToHz /= ( nsToSec

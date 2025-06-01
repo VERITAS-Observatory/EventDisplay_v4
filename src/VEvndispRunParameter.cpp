@@ -85,6 +85,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fLowGainCalibrationFile = "calibrationlist.LowGain.dat";
 	fcalibrationrun = false;
 	fNCalibrationEvents = -1;
+    fNMinimumNumberOfPedestalEvents = 50;
 	fLaserSumMin = 50000.;
 	fGainFileNumber.push_back( 0 );
 	fTOffFileNumber.push_back( 0 );
@@ -527,6 +528,10 @@ void VEvndispRunParameter::print( int iEv )
 	{
 		cout << "number of events in calibration analysis: " << fNCalibrationEvents << endl;
 	}
+    if( frunmode == 1 )
+    {
+        cout << "Minimum number of required pedestal events: " << fNMinimumNumberOfPedestalEvents << endl;
+    }
 	if( frunmode == 4 )
 	{
 		cout << "dstfile: " << fdstfile << " (mintubes: " << fdstminntubes << ")" << endl;

@@ -141,6 +141,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool fWriteImagePixelList;        // write image pixel list to tpars tree
 		string fLowGainCalibrationFile;           // file with file name for low-gain calibration
 		int fNCalibrationEvents;                  // events to be used for calibration
+        int fNMinimumNumberOfPedestalEvents;      // minimum number of pedestal events required for pedestal calculation
 		float faverageTZeroFiducialRadius;        // fiducial radius for average tzero calculation (DST), in fraction of FOV
 		unsigned int fCombineChannelsForPedestalCalculation; // combine all channels per telescope type for the pedestal calculation
 		vector< int > fGainFileNumber;
@@ -332,6 +333,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return ( fDBTextDirectory.size() > 0 );
 		}
 		
-		ClassDef( VEvndispRunParameter, 2007 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 2008 ); //(increase this number)
 };
 #endif
