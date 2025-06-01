@@ -8,10 +8,4 @@ Note that changes before release v492.0 are not documented here, but can be foun
 
 This changelog is generated using [Towncrier](https://towncrier.readthedocs.io/).
 
-## v492.0 (dev)
-
-### Maintenance
-
-- improve efficiency oF MVA calling for gamma/hadron separation cuts
-
 <!-- towncrier release notes start -->
