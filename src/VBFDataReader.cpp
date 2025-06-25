@@ -43,17 +43,17 @@ bool VBFDataReader::getNextEvent()
 	}
 	bool bSimulations = false;
 	
-    unsigned int n_error_prints = 0;
-
+	unsigned int n_error_prints = 0;
+	
 	try
 	{
 		if( fDebug )
 		{
 			cout << "bool VBFRawDataReader::getNextEvent() " << index << endl;
 		}
-		for( ;; )
+		for(;; )
 		{
-			if( !reader.hasPacket( index ) )
+			if(!reader.hasPacket( index ) )
 			{
 				setEventStatus( 999 );
 				return false;
@@ -65,15 +65,15 @@ bool VBFDataReader::getNextEvent()
 			}
 			catch( const std::exception& e )
 			{
-                // corrupt files otherwise generated 100s of GB of log files
-                if( n_error_prints < 5000 )
-                {
-                    std::cout << "VBFDataReader::getNextEvent: exception while reading file: "
-                              << e.what() << std::endl;
-                }
+				// corrupt files otherwise generated 100s of GB of log files
+				if( n_error_prints < 5000 )
+				{
+					std::cout << "VBFDataReader::getNextEvent: exception while reading file: "
+							  << e.what() << std::endl;
+				}
 				pack = old_pack;
 				setEventStatus( 0 );
-                n_error_prints++;
+				n_error_prints++;
 				return false;
 			}
 			delete old_pack;
@@ -125,7 +125,7 @@ bool VBFDataReader::getNextEvent()
 				}
 				
 				setEventStatus( 0 );
-				bitset< 8 * sizeof( ULong64_t ) > ib;
+				bitset< 8 * sizeof(ULong64_t ) > ib;
 				
 				// check if event for requested telescopes are available
 				bool bComplete = true;
@@ -133,7 +133,7 @@ bool VBFDataReader::getNextEvent()
 				{
 					if( getTeltoAna()[i] < ae->getPresentTelescopes().size() )
 					{
-						if( !ae->getPresentTelescopes()[getTeltoAna()[i]] )
+						if(!ae->getPresentTelescopes()[getTeltoAna()[i]] )
 						{
 							fNIncompleteEvent[getTeltoAna()[i]]++;
 							bComplete = false;
@@ -158,13 +158,13 @@ bool VBFDataReader::getNextEvent()
 							}
 						}
 					}
-					setEventStatus( ( unsigned int )ib.to_ulong() );
+					setEventStatus(( unsigned int )ib.to_ulong() );
 				}
 				if( fDebug )
 				{
 					cout << "\t VBFRawDataReader::getNextEvent(): hasArrayEvent, complete? " << ib.to_ulong() << " " << bComplete << endl;
 				}
-				if( !bComplete )
+				if(!bComplete )
 				{
 					return false;
 				}
@@ -221,7 +221,7 @@ bool VBFDataReader::getNextEvent()
 				cout << endl;
 			}
 			
-			if( !gotOneEv && !bSimulations )
+			if(!gotOneEv && !bSimulations )
 			{
 				continue;
 			}
@@ -270,7 +270,7 @@ vector< bool >& VBFDataReader::getLocalTrigger()
 	}
 	
 	/* -------
-        additional test to check local trigger vector with eventtype
+	    additional test to check local trigger vector with eventtype
 	    but: has to be used differently for pedestal runs, etc...
 	         needs some more work
 	// test if vector is nonzero

@@ -258,7 +258,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		else if( iTemp.find( "nocalibnoproblem" ) < iTemp.size() )
 		{
 		
-			if( !fRunPara->freadCalibfromDB )
+			if(!fRunPara->freadCalibfromDB )
 			{
 				fRunPara->fNoCalibNoPb = true;    //Security needed for the step in VImageBaseAnalyzer::findDeadChans, where the Gains and TOffsets are not checked if fNoCalibNoPb = true. This should not happen when reading information from the VOFFLine DB (LG)
 			}
@@ -675,10 +675,10 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fNCalibrationEvents  = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-        else if( iTemp.find( "minpedestalevents" ) < iTemp.size() )
-        {
-            fRunPara->fNMinimumNumberOfPedestalEvents = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-        }
+		else if( iTemp.find( "minpedestalevents" ) < iTemp.size() )
+		{
+			fRunPara->fNMinimumNumberOfPedestalEvents = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+		}
 		// first event number (skip to this point)
 		else if( iTemp.rfind( "firstevent" ) < iTemp.size() )
 		{
@@ -763,7 +763,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			if( iTemp2.size() > 0 )
 			{
-				if( !fRunPara->setDirectory_EVNDISPCalibrationData( iTemp2 ) )
+				if(!fRunPara->setDirectory_EVNDISPCalibrationData( iTemp2 ) )
 				{
 					cout << "exiting..." << endl;
 					exit( EXIT_FAILURE );
@@ -1008,7 +1008,7 @@ void VReadRunParameter::test_and_adjustParams()
 	if( fRunPara->frunmode == 0 && fRunPara->getObservatory().find( "VERITAS" ) != string::npos
 			&& fRunPara->fIsMC == 0 )
 	{
-		if( !fRunPara->fNoCalibNoPb && fRunPara->fcalibrationfile == "" )
+		if(!fRunPara->fNoCalibNoPb && fRunPara->fcalibrationfile == "" )
 		{
 			fRunPara->freadCalibfromDB = true;
 		}
@@ -1145,7 +1145,7 @@ void VReadRunParameter::test_and_adjustParams()
 			fRunPara->fPedFileNumber[i] = fRunPara->frunnumber;
 			fRunPara->fTZeroFileNumber[i] = fRunPara->frunnumber;
 		}
-		if( !fRunPara->fPlotRaw )
+		if(!fRunPara->fPlotRaw )
 		{
 			// writing low gain pedestals
 			if( fRunPara->frunmode == 6 )
@@ -1212,7 +1212,7 @@ void VReadRunParameter::test_and_adjustParams()
 	{
 		read_db_runinfo();
 	}
-	if( !readEpochsAndAtmospheres() )
+	if(!readEpochsAndAtmospheres() )
 	{
 		cout << "exiting..." << endl;
 		exit( EXIT_FAILURE );
@@ -1265,7 +1265,7 @@ void VReadRunParameter::test_and_adjustParams()
 	if( fRunPara->fMCScale <= 0. )
 	{
 		cout << "errors: fadcscale <= 0" << endl;
-		exit( -1 );
+		exit(-1 );
 	}
 	
 	
@@ -1300,7 +1300,7 @@ void VReadRunParameter::test_and_adjustParams()
 	//////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////
 	// set default camera configurations
-	if( !fusercamera )
+	if(!fusercamera )
 	{
 		////////////////////////////////////////////
 		// configuration from Sept 2009 to July 2012: V5
@@ -1422,8 +1422,8 @@ void VReadRunParameter::test_and_adjustParams()
 		int pos_prev = -1;
 		size_t pos_curr = 0;
 		vector< int > comma_positions;
-		comma_positions.push_back( -1 );
-		while( ( pos_curr = fTelToAnaString.find( ",", pos_prev + 1 ) ) < fTelToAnaString.size() )
+		comma_positions.push_back(-1 );
+		while(( pos_curr = fTelToAnaString.find( ",", pos_prev + 1 ) ) < fTelToAnaString.size() )
 		{
 			comma_positions.push_back( pos_curr );
 			pos_prev = pos_curr;
@@ -1457,16 +1457,16 @@ void VReadRunParameter::test_and_adjustParams()
 		if( fRunPara->fTelToAnalyze[i] > fRunPara->fNTelescopes )
 		{
 			cout << "telescope number to analyze out of range " << fRunPara->fTelToAnalyze[i] << "\t" << fRunPara->fNTelescopes << endl;
-			exit( -1 );
+			exit(-1 );
 		}
 	}
 	
 	// gain/toff only per telescope
-	if( ( fRunPara->fTelToAnalyze.size() > 1 || fRunPara->fTelToAnalyze.size() == 0 ) && ( fRunPara->frunmode == 2 || fRunPara->frunmode == 5 ) )
+	if(( fRunPara->fTelToAnalyze.size() > 1 || fRunPara->fTelToAnalyze.size() == 0 ) && ( fRunPara->frunmode == 2 || fRunPara->frunmode == 5 ) )
 	{
 		cout << fRunPara->fTelToAnalyze.size() << "\t" << fRunPara->frunmode << endl;
 		cout << "gain/toff calibration only possible for one telescope, use teltoana command line parameter" << endl;
-		exit( -1 );
+		exit(-1 );
 	}
 	
 	// double pass and fixed window start is incompatible
@@ -1474,7 +1474,7 @@ void VReadRunParameter::test_and_adjustParams()
 	{
 		cout << "doublepass and fixed position of integration window is incompatible!" << endl;
 		cout << "...exiting" << endl;
-		exit( -1 );
+		exit(-1 );
 	}
 	// set trace window shift to zero for fixed window start
 	for( unsigned int t = 0; t < fRunPara->fsumfirst_startingMethod.size(); t++ )
@@ -1569,13 +1569,13 @@ void VReadRunParameter::setDirectories()
 		// check if output directory exists, otherwise create it
 		string i_worDir;
 		i_worDir = gSystem->WorkingDirectory();
-		if( !gSystem->cd( fRunPara->getDirectory_EVNDISPOutput().c_str() ) )
+		if(!gSystem->cd( fRunPara->getDirectory_EVNDISPOutput().c_str() ) )
 		{
 			if( gSystem->mkdir( fRunPara->getDirectory_EVNDISPOutput().c_str() ) != 0 )
 			{
 				// check again if the directory exists - might have been created
 				// by another job in the meanwhile
-				if( !gSystem->cd( fRunPara->getDirectory_EVNDISPOutput().c_str() ) )
+				if(!gSystem->cd( fRunPara->getDirectory_EVNDISPOutput().c_str() ) )
 				{
 					cout << "VReadRunParameter::test_and_adjustParams() warning: unable to create output directory: " << endl;
 					cout <<  fRunPara->getDirectory_EVNDISPOutput() << endl;
@@ -1659,7 +1659,7 @@ bool VReadRunParameter::getRunParametersFromDST()
 		exit( EXIT_FAILURE );
 	}
 	// check if this is a MC or data DST
-	if( ( TTree* )iF.Get( "mc" ) )
+	if(( TTree* )iF.Get( "mc" ) )
 	{
 		fRunPara->fsourcetype = 7;
 		fRunPara->fIsMC = 1;
@@ -1673,7 +1673,7 @@ bool VReadRunParameter::getRunParametersFromDST()
 	fRunPara->fDBTextDirectory = "";
 	fRunPara->fDBTracking = false;
 	VEvndispRunParameter* iV = ( VEvndispRunParameter* )iF.Get( "runparameterDST" );
-	if( !iV )
+	if(!iV )
 	{
 		iV = ( VEvndispRunParameter* )iF.Get( "runparameterV2" );
 	}
@@ -1706,10 +1706,10 @@ bool VReadRunParameter::getRunParametersFromDST()
 	{
 		// get dst tree and read run number and number of telescopes
 		TTree* t = ( TTree* )iF.Get( "dst" );
-		if( !t )
+		if(!t )
 		{
 			cout << "VReadRunParameter::getRunParametersFromDST error: DST tree not found" << endl;
-			exit( -1 );
+			exit(-1 );
 		}
 		unsigned int iR = 0;
 		unsigned int iNTel = 0;
@@ -1745,12 +1745,12 @@ void VReadRunParameter::printStartMessage()
 
 bool VReadRunParameter::checkSecondArgument( string iPara1, string iPara2, bool iExitIfFails )
 {
-	if( ( iPara2.size() > 0 && iPara2.substr( 0, 1 ) == "-" ) || iPara2.size() == 0 )
+	if(( iPara2.size() > 0 && iPara2.substr( 0, 1 ) == "-" ) || iPara2.size() == 0 )
 	{
 		if( iExitIfFails )
 		{
 			cout << "command line parameter <" << iPara1 << "> requires second argument" << endl;
-			exit( -1 );
+			exit(-1 );
 		}
 		else
 		{
@@ -1772,7 +1772,7 @@ bool VReadRunParameter::readTraceAmplitudeCorrections( string ifile )
 	ifile = iDirectory + "/" + ifile;
 	ifstream is;
 	is.open( ifile.c_str(), ifstream::in );
-	if( !is )
+	if(!is )
 	{
 		cout << "error reading amplitude correction for telescope from " << ifile << endl;
 		return false;
@@ -1806,7 +1806,7 @@ bool VReadRunParameter::readTraceAmplitudeCorrections( string ifile )
 			if( is_temp == iEpoch )
 			{
 				double iSFactor = 1.;
-				while( !is_stream.eof() )
+				while(!is_stream.eof() )
 				{
 					is_stream >> iSFactor;
 					fRunPara->fthroughoutCorrectionSFactor.push_back( iSFactor );
@@ -1819,7 +1819,7 @@ bool VReadRunParameter::readTraceAmplitudeCorrections( string ifile )
 			if( is_temp == iEpoch )
 			{
 				double iGFactor = 1.;
-				while( !is_stream.eof() )
+				while(!is_stream.eof() )
 				{
 					is_stream >> iGFactor;
 					fRunPara->fthroughoutCorrectionGFactor.push_back( iGFactor );
@@ -1850,7 +1850,7 @@ bool VReadRunParameter::readTraceAmplitudeCorrections( string ifile )
  */
 bool VReadRunParameter::readEpochsAndAtmospheres()
 {
-	if( !fRunPara )
+	if(!fRunPara )
 	{
 		return false;
 	}
