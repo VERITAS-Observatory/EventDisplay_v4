@@ -1384,10 +1384,12 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms(
 	if( iEffAreaH2F )
 	{
 		fH2F_treecounter_offset = iEffArea->GetEntries() / iEffAreaH2F->GetEntries();
-		if( fH2F_treecounter_offset != 20 )
+        // Hardwired number of spectral index bins
+        // Corresponds to parameter ENERGYSPECTRUMINDEX in IRF.effective_area_parallel_sub.sh
+		if( fH2F_treecounter_offset != 20 && fH2F_treecounter_offset != 27 )
 		{
 			cout << "Warning in effective area reading: expected ratio of entries between";
-			cout << " effective area trees to be 20" << endl;
+			cout << " effective area trees to be 20 or 27" << endl;
 		}
 		iEffAreaH2F->SetBranchAddress( "nbins_esys", &fH2F_nbins_esys );
 		iEffAreaH2F->SetBranchAddress( "e0_esys", &fH2F_e0_esys );

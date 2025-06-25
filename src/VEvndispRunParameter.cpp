@@ -85,7 +85,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fLowGainCalibrationFile = "calibrationlist.LowGain.dat";
 	fcalibrationrun = false;
 	fNCalibrationEvents = -1;
-    fNMinimumNumberOfPedestalEvents = 50;
+	fNMinimumNumberOfPedestalEvents = 50;
 	fLaserSumMin = 50000.;
 	fGainFileNumber.push_back( 0 );
 	fTOffFileNumber.push_back( 0 );
@@ -173,12 +173,12 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fDynamicIntegrationWindow = true;
 	frecoverImagePixelNearDeadPixel = true;
 	fFillImageBorderNeighbours = true;
-	fTraceWindowShift.push_back( -1 );
+	fTraceWindowShift.push_back(-1 );
 	fsumfirst_startingMethod.push_back( 1 );
 	fTraceIntegrationMethod.push_back( 1 );
 	fTraceIntegrationMethod_pass1.push_back( 1 );
 	fSumWindowMaxTimedifferenceToDoublePassPosition.push_back( 10. );
-	fSumWindowMaxTimeDifferenceLGtoHG.push_back( -5. );
+	fSumWindowMaxTimeDifferenceLGtoHG.push_back(-5. );
 	fSmoothDead = false;
 	fUsePedEvents = true;
 	fFADCChargeUnit = "DC";
@@ -459,7 +459,7 @@ void VEvndispRunParameter::print( int iEv )
 	if( fTelToAnalyze.size() < 20 )
 	{
 		cout << "\t pointing corrections (x,y): ";
-		if( !fDBTracking )
+		if(!fDBTracking )
 		{
 			for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ )
 			{
@@ -528,10 +528,10 @@ void VEvndispRunParameter::print( int iEv )
 	{
 		cout << "number of events in calibration analysis: " << fNCalibrationEvents << endl;
 	}
-    if( frunmode == 1 )
-    {
-        cout << "Minimum number of required pedestal events: " << fNMinimumNumberOfPedestalEvents << endl;
-    }
+	if( frunmode == 1 )
+	{
+		cout << "Minimum number of required pedestal events: " << fNMinimumNumberOfPedestalEvents << endl;
+	}
 	if( frunmode == 4 )
 	{
 		cout << "dstfile: " << fdstfile << " (mintubes: " << fdstminntubes << ")" << endl;
@@ -555,7 +555,7 @@ void VEvndispRunParameter::print( int iEv )
 	}
 	if( frunmode == 1 )
 	{
-		if( ( fsourcetype == 1 || fsourcetype == 2 || fsourcetype == 5 ) && fsimu_pedestalfile.size() > 0 )
+		if(( fsourcetype == 1 || fsourcetype == 2 || fsourcetype == 5 ) && fsimu_pedestalfile.size() > 0 )
 		{
 			cout << "calculate pedestals from " << fsimu_pedestalfile;
 			cout << " with noise level " << fsimu_noiselevel;
@@ -966,12 +966,12 @@ bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpochFile, str
 	
 	ifstream is;
 	is.open( fEpochFile.c_str(), ifstream::in );
-	if( !is )
+	if(!is )
 	{
 		setDirectories();
 		string iTemp = getDirectory_EVNDISPParameterFiles() + fEpochFile;
 		is.open( iTemp.c_str(), ifstream::in );
-		if( !is )
+		if(!is )
 		{
 			cout << "error opening epoch parameter file " << fEpochFile << endl;
 			cout << iTemp << endl;
@@ -993,20 +993,20 @@ bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpochFile, str
 		{
 			string i_sql_min;
 			string i_sql_max;
-			if( !( is_stream >> std::ws ).eof() )
+			if(!( is_stream >> std::ws ).eof() )
 			{
 				is_stream >> itemp_epoch;
 			}
-			if( !( is_stream >> std::ws ).eof() )
+			if(!( is_stream >> std::ws ).eof() )
 			{
 				is_stream >> i_sql_min;
 			}
-			if( !( is_stream >> std::ws ).eof() )
+			if(!( is_stream >> std::ws ).eof() )
 			{
 				is_stream >> i_sql_max;
 			}
 			double mjd_min = 0;
-			if( !( is_stream >> std::ws ).eof() )
+			if(!( is_stream >> std::ws ).eof() )
 			{
 				is_stream >> mjd_min;
 			}
@@ -1016,7 +1016,7 @@ bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpochFile, str
 				VSkyCoordinatesUtilities::getMJD_from_SQLstring( i_sql_min, mjd_min, i_s );
 			}
 			double mjd_max = 0;
-			if( !( is_stream >> std::ws ).eof() )
+			if(!( is_stream >> std::ws ).eof() )
 			{
 				is_stream >> mjd_max;
 			}

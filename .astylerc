@@ -6,7 +6,6 @@
 --pad-paren-in
 --indent-labels
 --indent-preproc-define
---add-brackets
 --pad-oper
 --unpad-paren
 --fill-empty-lines
