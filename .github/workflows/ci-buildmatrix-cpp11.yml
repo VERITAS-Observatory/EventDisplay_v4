@@ -46,13 +46,13 @@ jobs:
       - name: Build inside ROOT CentOS7 container
         env:
           VBF_TOKEN: ${{ secrets.VBFcpp11 }}
-          SOFA_TOKEN: ${{ secrets.SOFA }}
+          SOFA20231011: ${{ secrets.SOFA20231011 }}
         run: |
           set -euo pipefail
           echo "Using ROOT image: $ROOT_IMAGE"
           docker run --rm \
             -e VBF_TOKEN="$VBF_TOKEN" \
-            -e SOFA_TOKEN="$SOFA_TOKEN" \
+            -e SOFA20231011="$SOFA20231011" \
             -v "$PWD:/workspace" \
             -w /workspace \
             "$ROOT_IMAGE" /bin/bash -c '
