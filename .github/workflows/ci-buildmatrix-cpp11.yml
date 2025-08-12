@@ -68,7 +68,7 @@ jobs:
               popd
               # Install SOFA
               mkdir -p sofa
-              curl -L "https://syncandshare.desy.de/index.php/s/${SOFA_TOKEN}/download" -o sofa/sofa.tar.gz
+              curl -L "https://syncandshare.desy.de/index.php/s/${SOFA20231011}/download" -o sofa/sofa.tar.gz
               ./install_sofa.sh
               # Build EventDisplay
               export EVNDISPSYS=/workspace
