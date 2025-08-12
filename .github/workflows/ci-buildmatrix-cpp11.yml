@@ -22,7 +22,7 @@ jobs:
 
       - name: vbf
         run: |
-          curl https://syncandshare.desy.de/index.php/s/${{ secrets.VBFcpp11 }}/download > VBF.tar.gz
+          curl -L https://syncandshare.desy.de/index.php/s/${{ secrets.VBFcpp11 }}/download -o VBF.tar.gz
           mkdir VBF && tar -xzf VBF.tar.gz -C VBF --strip-components=1
           cd VBF && ./configure --prefix=$(echo $GITHUB_WORKSPACE)/VBF
           make
@@ -30,7 +30,7 @@ jobs:
 
       - name: sofa
         run: |
-          curl https://syncandshare.desy.de/index.php/s/${{ secrets.SOFA }}/download > sofa/sofa.tar.gz
+          curl -L https://syncandshare.desy.de/index.php/s/${{ secrets.SOFA }}/download -o sofa/sofa.tar.gz
           ./install_sofa.sh
 
       - name: eventdisplay
