@@ -3,42 +3,88 @@ name: cpp11-buildmatrix
 
 # Controls when the workflow will run
 on:
-  #  pull_request:
-  #  branches: [main, master]
+  pull_request:
   workflow_dispatch:
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        root:
-          - "rootproject/root:6.24.06-centos7"
-    runs-on: ${{ matrix.os }}
-    container: ${{ matrix.root }}
-
+  # Job 1: run on Ubuntu host (no container) to execute Node20-based actions safely
+  source:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
 
-      - name: vbf
+      - name: Create source tarball
         run: |
-          curl https://syncandshare.desy.de/index.php/s/${{ secrets.VBFcpp11 }}/download > VBF.tar.gz
-          mkdir VBF && tar -xzf VBF.tar.gz -C VBF --strip-components=1
-          cd VBF && ./configure --prefix=$(echo $GITHUB_WORKSPACE)/VBF
-          make
-          make install
+          set -euo pipefail
+          # Use git archive to avoid including .git directory and prevent 'file changed as we read it' warnings
+          git archive --format=tar HEAD | gzip > src.tgz
 
-      - name: sofa
-        run: |
-          curl https://syncandshare.desy.de/index.php/s/${{ secrets.SOFA }}/download > sofa/sofa.tar.gz
-          ./install_sofa.sh
+      - name: Upload source artifact
+        # v4 okay here (runs on ubuntu host with modern glibc)
+        uses: actions/upload-artifact@v4
+        with:
+          name: src
+          path: src.tgz
 
-      - name: eventdisplay
+  # Job 2: build inside CentOS7 ROOT container avoiding Node20 (use only Node16-compatible actions)
+  build:
+    needs: source
+    runs-on: ubuntu-latest
+    env:
+      ROOT_IMAGE: rootproject/root:6.24.06-centos7
+    steps:
+      - name: Download source artifact
+        uses: actions/download-artifact@v4
+        with:
+            name: src
+
+      - name: Extract source
+        run: tar -xzf src.tgz
+
+      - name: Build inside ROOT CentOS7 container
+        env:
+          VBF_TOKEN: ${{ secrets.VBFcpp11 }}
+          SOFA20231011: ${{ secrets.SOFA20231011 }}
         run: |
-          root-config --version
-          export EVNDISPSYS=$(echo $GITHUB_WORKSPACE)
-          export VBFSYS=$(echo $GITHUB_WORKSPACE)/VBF
-          export LD_LIBRARY_PATH="${EVNDISPSYS}/obj:${EVNDISPSYS}/lib:${LD_LIBRARY_PATH}"
-          export LD_LIBRARY_PATH="${VBFSYS}/lib:${LD_LIBRARY_PATH}"
-          export SOFASYS=/sofa
-          make -j 4 VTS
+          set -euo pipefail
+          echo "Using ROOT image: $ROOT_IMAGE"
+          docker run --rm \
+            -e VBF_TOKEN="$VBF_TOKEN" \
+            -e SOFA20231011="$SOFA20231011" \
+            -v "$PWD:/workspace" \
+            -w /workspace \
+            "$ROOT_IMAGE" /bin/bash -c '
+              set -euo pipefail
+              echo "ROOT version: $(root-config --version)"
+              # Build VBF
+              curl -L "https://syncandshare.desy.de/index.php/s/${VBF_TOKEN}/download" -o VBF.tar.gz
+              mkdir -p VBF && tar -xzf VBF.tar.gz -C VBF --strip-components=1
+              pushd VBF
+              ./configure --prefix=/workspace/VBF
+              make -j4
+              make install
+              popd
+              # Install SOFA
+              mkdir -p sofa
+              curl -L "https://syncandshare.desy.de/index.php/s/${SOFA20231011}/download" -o sofa/sofa.tar.gz
+              ./install_sofa.sh
+              # Build EventDisplay
+              export EVNDISPSYS=/workspace
+              export VBFSYS=/workspace/VBF
+              export SOFASYS=/sofa
+              export LD_LIBRARY_PATH=$EVNDISPSYS/obj:$EVNDISPSYS/lib:$VBFSYS/lib:${LD_LIBRARY_PATH:-}
+              make -j4 VTS
+            '
+
+      - name: Archive build outputs
+        if: always()
+        run: |
+          tar -czf build-artifacts.tgz VBF obj lib || true
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: build-artifacts.tgz
