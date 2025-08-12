@@ -73,7 +73,7 @@ jobs:
               # Build EventDisplay
               export EVNDISPSYS=/workspace
               export VBFSYS=/workspace/VBF
-              export SOFASYS=/workspace/sofa
+              export SOFASYS=/sofa
               export LD_LIBRARY_PATH=$EVNDISPSYS/obj:$EVNDISPSYS/lib:$VBFSYS/lib:${LD_LIBRARY_PATH:-}
               make -j4 VTS
             '
