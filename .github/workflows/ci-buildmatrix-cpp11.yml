@@ -31,49 +31,52 @@ jobs:
   # Job 2: build inside CentOS7 ROOT container avoiding Node20 (use only Node16-compatible actions)
   build:
     needs: source
-    strategy:
-      matrix:
-        root:
-          - "rootproject/root:6.24.06-centos7"
     runs-on: ubuntu-latest
-    container: ${{ matrix.root }}
+    env:
+      ROOT_IMAGE: rootproject/root:6.24.06-centos7
     steps:
-      - name: Download source artifact (Node16-compatible action)
-        uses: actions/download-artifact@v3
+      - name: Download source artifact
+        uses: actions/download-artifact@v4
         with:
-          name: src
+            name: src
 
       - name: Extract source
-        run: |
-          tar -xzf src.tgz
+        run: tar -xzf src.tgz
 
-      - name: Build VBF
+      - name: Build inside ROOT CentOS7 container
+        env:
+          VBF_TOKEN: ${{ secrets.VBFcpp11 }}
+          SOFA_TOKEN: ${{ secrets.SOFA }}
         run: |
           set -euo pipefail
-          curl -L https://syncandshare.desy.de/index.php/s/${{ secrets.VBFcpp11 }}/download -o VBF.tar.gz
-          mkdir VBF && tar -xzf VBF.tar.gz -C VBF --strip-components=1
-          pushd VBF
-          ./configure --prefix=$GITHUB_WORKSPACE/VBF
-          make -j4
-          make install
-          popd
-
-      - name: Install SOFA
-        run: |
-          set -euo pipefail
-          mkdir -p sofa
-          curl -L https://syncandshare.desy.de/index.php/s/${{ secrets.SOFA }}/download -o sofa/sofa.tar.gz
-          ./install_sofa.sh
-
-      - name: Build EventDisplay
-        run: |
-          set -euo pipefail
-          root-config --version
-          export EVNDISPSYS=$GITHUB_WORKSPACE
-          export VBFSYS=$GITHUB_WORKSPACE/VBF
-          export SOFASYS=$EVNDISPSYS/sofa
-          export LD_LIBRARY_PATH=$EVNDISPSYS/obj:$EVNDISPSYS/lib:$VBFSYS/lib:${LD_LIBRARY_PATH:-}
-          make -j4 VTS
+          echo "Using ROOT image: $ROOT_IMAGE"
+          docker run --rm \
+            -e VBF_TOKEN="$VBF_TOKEN" \
+            -e SOFA_TOKEN="$SOFA_TOKEN" \
+            -v "$PWD:/workspace" \
+            -w /workspace \
+            "$ROOT_IMAGE" /bin/bash -c '
+              set -euo pipefail
+              echo "ROOT version: $(root-config --version)"
+              # Build VBF
+              curl -L "https://syncandshare.desy.de/index.php/s/${VBF_TOKEN}/download" -o VBF.tar.gz
+              mkdir -p VBF && tar -xzf VBF.tar.gz -C VBF --strip-components=1
+              pushd VBF
+              ./configure --prefix=/workspace/VBF
+              make -j4
+              make install
+              popd
+              # Install SOFA
+              mkdir -p sofa
+              curl -L "https://syncandshare.desy.de/index.php/s/${SOFA_TOKEN}/download" -o sofa/sofa.tar.gz
+              ./install_sofa.sh
+              # Build EventDisplay
+              export EVNDISPSYS=/workspace
+              export VBFSYS=/workspace/VBF
+              export SOFASYS=/workspace/sofa
+              export LD_LIBRARY_PATH=$EVNDISPSYS/obj:$EVNDISPSYS/lib:$VBFSYS/lib:${LD_LIBRARY_PATH:-}
+              make -j4 VTS
+            '
 
       - name: Archive build outputs
         if: always()
