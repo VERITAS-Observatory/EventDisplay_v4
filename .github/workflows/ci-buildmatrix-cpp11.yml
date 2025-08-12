@@ -17,7 +17,9 @@ jobs:
 
       - name: Create source tarball
         run: |
-          tar -czf src.tgz . --exclude '.git'
+          set -euo pipefail
+          # Use git archive to avoid including .git directory and prevent 'file changed as we read it' warnings
+          git archive --format=tar HEAD | gzip > src.tgz
 
       - name: Upload source artifact
         # v4 okay here (runs on ubuntu host with modern glibc)
