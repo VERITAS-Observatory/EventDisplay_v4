@@ -8,37 +8,79 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Job 1: run on Ubuntu host (no container) to execute Node20-based actions safely
+  source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Create source tarball
+        run: |
+          tar -czf src.tgz . --exclude '.git'
+
+      - name: Upload source artifact
+        # v4 okay here (runs on ubuntu host with modern glibc)
+        uses: actions/upload-artifact@v4
+        with:
+          name: src
+          path: src.tgz
+
+  # Job 2: build inside CentOS7 ROOT container avoiding Node20 (use only Node16-compatible actions)
   build:
+    needs: source
     strategy:
       matrix:
-        os: [ubuntu-latest]
         root:
           - "rootproject/root:6.24.06-centos7"
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     container: ${{ matrix.root }}
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Download source artifact (Node16-compatible action)
+        uses: actions/download-artifact@v3
+        with:
+          name: src
 
-      - name: vbf
+      - name: Extract source
         run: |
+          tar -xzf src.tgz
+
+      - name: Build VBF
+        run: |
+          set -euo pipefail
           curl -L https://syncandshare.desy.de/index.php/s/${{ secrets.VBFcpp11 }}/download -o VBF.tar.gz
           mkdir VBF && tar -xzf VBF.tar.gz -C VBF --strip-components=1
-          cd VBF && ./configure --prefix=$(echo $GITHUB_WORKSPACE)/VBF
-          make
+          pushd VBF
+          ./configure --prefix=$GITHUB_WORKSPACE/VBF
+          make -j4
           make install
+          popd
 
-      - name: sofa
+      - name: Install SOFA
         run: |
+          set -euo pipefail
+          mkdir -p sofa
           curl -L https://syncandshare.desy.de/index.php/s/${{ secrets.SOFA }}/download -o sofa/sofa.tar.gz
           ./install_sofa.sh
 
-      - name: eventdisplay
+      - name: Build EventDisplay
         run: |
+          set -euo pipefail
           root-config --version
-          export EVNDISPSYS=$(echo $GITHUB_WORKSPACE)
-          export VBFSYS=$(echo $GITHUB_WORKSPACE)/VBF
-          export LD_LIBRARY_PATH="${EVNDISPSYS}/obj:${EVNDISPSYS}/lib:${LD_LIBRARY_PATH}"
-          export LD_LIBRARY_PATH="${VBFSYS}/lib:${LD_LIBRARY_PATH}"
-          export SOFASYS=/sofa
-          make -j 4 VTS
+          export EVNDISPSYS=$GITHUB_WORKSPACE
+          export VBFSYS=$GITHUB_WORKSPACE/VBF
+          export SOFASYS=$EVNDISPSYS/sofa
+          export LD_LIBRARY_PATH=$EVNDISPSYS/obj:$EVNDISPSYS/lib:$VBFSYS/lib:${LD_LIBRARY_PATH:-}
+          make -j4 VTS
+
+      - name: Archive build outputs
+        if: always()
+        run: |
+          tar -czf build-artifacts.tgz VBF obj lib || true
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: build-artifacts.tgz
