@@ -686,6 +686,11 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
             fEM_length,
             fEM_weight );
 
+        if( i_SR.fShower_Xoffset < -90. || i_SR.fShower_Yoffset < -90. )
+        {
+            continue;
+        }
+
         //////////////////////////////////////
         // loop over all telescopes
         for( unsigned int i = 0; i < i_tpars.size(); i++ )
@@ -699,11 +704,10 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
             // (use 20% x size of the camera)
             if( i < iFOV_tel.size()
                     && sqrt( i_showerpars.MCxoff * i_showerpars.MCxoff
-                             + i_showerpars.MCyoff * i_showerpars.MCyoff ) > iFOV_tel[i] * 0.5 * 1.2 )
+                         + i_showerpars.MCyoff * i_showerpars.MCyoff ) > iFOV_tel[i] * 0.5 * 1.2 )
             {
                 continue;
             }
-
             i_tpars[i]->GetEntry( n );
 
             // check if telescope was reconstructed
@@ -718,7 +722,6 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
             {
                 continue;
             }
-
             runNumber   = i_showerpars.runNumber;
             eventNumber = i_showerpars.eventNumber;
             tel         = i + 1;
@@ -884,7 +887,7 @@ int main( int argc, char* argv[] )
         iQualityCut = argv[7];
     }
     // TMVA options (default options derived from hyperparameter optimisation on CTAO prod3 simulations)
-    string iTMVAOptions = "NTrees=100:BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:GradBaggingFraction=0.5:nCuts=20:MaxDepth=10:";
+    string iTMVAOptions = "NTrees=300:BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:GradBaggingFraction=0.5:nCuts=20:MaxDepth=10:";
     iTMVAOptions += "PruneMethod=ExpectedError:RegressionLossFunctionBDTG=Huber:MinNodeSize=0.02:VarTransform=N";
     if( argc >= 9 )
     {
