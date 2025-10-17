@@ -493,12 +493,6 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
     {
         i_tel.GetEntry( i );
 
-        // select telescope type
-        if( iTelType != 0 && i_tel.TelType != iTelType )
-        {
-            continue;
-        }
-
         if( fMapOfTrainingTree.find( i_tel.TelType ) == fMapOfTrainingTree.end() )
         {
             ostringstream iTreeName;
@@ -574,26 +568,18 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
     vector< Ctpars* > i_tpars;
     for( unsigned int i = 0; i < fTelType.size(); i++ )
     {
-        if( iTelType == 0 || iTelType == fTelType[i] )
+        ostringstream iTreeName;
+        iTreeName << "Tel_" << i + 1 << "/tpars";
+        i_tparsTree.push_back( new TChain( iTreeName.str().c_str() ) );
+        for( unsigned int f = 0; f < iInputFileList.size(); f++ )
         {
-            ostringstream iTreeName;
-            iTreeName << "Tel_" << i + 1 << "/tpars";
-            i_tparsTree.push_back( new TChain( iTreeName.str().c_str() ) );
-            for( unsigned int f = 0; f < iInputFileList.size(); f++ )
-            {
-                i_tparsTree.back()->Add( iInputFileList[f].c_str(), 0 );
-            }
-            i_tpars.push_back( new Ctpars( i_tparsTree.back(), true, true ) );
-            cout << "\t found tree " << iTreeName.str();
-            cout << " (teltype " << fTelType[i] << ")";
-            cout << ", entries: ";
-            cout << i_tpars.back()->fChain->GetEntries() << endl;
+            i_tparsTree.back()->Add( iInputFileList[f].c_str(), 0 );
         }
-        else
-        {
-            i_tpars.push_back( 0 );
-            cout << "\t ignore tree for telescope type " << fTelType[i] << endl;
-        }
+        i_tpars.push_back( new Ctpars( i_tparsTree.back(), true, true ) );
+        cout << "\t found tree " << iTreeName.str();
+        cout << " (teltype " << fTelType[i] << ")";
+        cout << ", entries: ";
+        cout << i_tpars.back()->fChain->GetEntries() << endl;
     }
 
     // temporary variables for emission height calculation
@@ -704,7 +690,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
             // (use 20% x size of the camera)
             if( i < iFOV_tel.size()
                     && sqrt( i_showerpars.MCxoff * i_showerpars.MCxoff
-                         + i_showerpars.MCyoff * i_showerpars.MCyoff ) > iFOV_tel[i] * 0.5 * 1.2 )
+                             + i_showerpars.MCyoff * i_showerpars.MCyoff ) > iFOV_tel[i] * 0.5 * 1.2 )
             {
                 continue;
             }
@@ -812,7 +798,10 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 
             if( fMapOfTrainingTree.find( fTelType[i] ) != fMapOfTrainingTree.end() )
             {
-                fMapOfTrainingTree[fTelType[i]]->Fill();
+                if( iTelType == 0 || iTelType == fTelType[i] )
+                {
+                    fMapOfTrainingTree[fTelType[i]]->Fill();
+                }
             }
         }
     }
@@ -975,7 +964,7 @@ int main( int argc, char* argv[] )
             fMapOfTrainingTree_iter != fMapOfTrainingTree.end();
             ++fMapOfTrainingTree_iter )
     {
-        if( fMapOfTrainingTree_iter->second )
+        if( fMapOfTrainingTree_iter->second && fMapOfTrainingTree_iter->second->GetEntries() > 0 )
         {
             cout << "\t writing training tree for telescope type " << fMapOfTrainingTree_iter->first;
             cout << " with " << fMapOfTrainingTree_iter->second->GetEntries() << " entries ";
@@ -990,11 +979,14 @@ int main( int argc, char* argv[] )
             fMapOfTrainingTree_iter != fMapOfTrainingTree.end();
             ++fMapOfTrainingTree_iter )
     {
-        trainTMVA( fOutputDir, fTrainTest,
-                   fMapOfTrainingTree_iter->first,
-                   fMapOfTrainingTree_iter->second,
-                   iTargetML, iTMVAOptions, iQualityCut,
-                   iWeightExpression );
+        if( fMapOfTrainingTree_iter->second && fMapOfTrainingTree_iter->second->GetEntries() > 0 )
+        {
+            trainTMVA( fOutputDir, fTrainTest,
+                       fMapOfTrainingTree_iter->first,
+                       fMapOfTrainingTree_iter->second,
+                       iTargetML, iTMVAOptions, iQualityCut,
+                       iWeightExpression );
+        }
     }
 
     //////////////////////
