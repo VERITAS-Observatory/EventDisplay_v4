@@ -493,12 +493,6 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
     {
         i_tel.GetEntry( i );
 
-        // select telescope type
-        if( iTelType != 0 && i_tel.TelType != iTelType )
-        {
-            continue;
-        }
-
         if( fMapOfTrainingTree.find( i_tel.TelType ) == fMapOfTrainingTree.end() )
         {
             ostringstream iTreeName;
@@ -574,26 +568,18 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
     vector< Ctpars* > i_tpars;
     for( unsigned int i = 0; i < fTelType.size(); i++ )
     {
-        if( iTelType == 0 || iTelType == fTelType[i] )
+        ostringstream iTreeName;
+        iTreeName << "Tel_" << i + 1 << "/tpars";
+        i_tparsTree.push_back( new TChain( iTreeName.str().c_str() ) );
+        for( unsigned int f = 0; f < iInputFileList.size(); f++ )
         {
-            ostringstream iTreeName;
-            iTreeName << "Tel_" << i + 1 << "/tpars";
-            i_tparsTree.push_back( new TChain( iTreeName.str().c_str() ) );
-            for( unsigned int f = 0; f < iInputFileList.size(); f++ )
-            {
-                i_tparsTree.back()->Add( iInputFileList[f].c_str(), 0 );
-            }
-            i_tpars.push_back( new Ctpars( i_tparsTree.back(), true, true ) );
-            cout << "\t found tree " << iTreeName.str();
-            cout << " (teltype " << fTelType[i] << ")";
-            cout << ", entries: ";
-            cout << i_tpars.back()->fChain->GetEntries() << endl;
+            i_tparsTree.back()->Add( iInputFileList[f].c_str(), 0 );
         }
-        else
-        {
-            i_tpars.push_back( 0 );
-            cout << "\t ignore tree for telescope type " << fTelType[i] << endl;
-        }
+        i_tpars.push_back( new Ctpars( i_tparsTree.back(), true, true ) );
+        cout << "\t found tree " << iTreeName.str();
+        cout << " (teltype " << fTelType[i] << ")";
+        cout << ", entries: ";
+        cout << i_tpars.back()->fChain->GetEntries() << endl;
     }
 
     // temporary variables for emission height calculation
@@ -686,6 +672,11 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
             fEM_length,
             fEM_weight );
 
+        if( i_SR.fShower_Xoffset < -90. || i_SR.fShower_Yoffset < -90. )
+        {
+            continue;
+        }
+
         //////////////////////////////////////
         // loop over all telescopes
         for( unsigned int i = 0; i < i_tpars.size(); i++ )
@@ -703,7 +694,6 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
             {
                 continue;
             }
-
             i_tpars[i]->GetEntry( n );
 
             // check if telescope was reconstructed
@@ -718,7 +708,6 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
             {
                 continue;
             }
-
             runNumber   = i_showerpars.runNumber;
             eventNumber = i_showerpars.eventNumber;
             tel         = i + 1;
@@ -809,7 +798,10 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 
             if( fMapOfTrainingTree.find( fTelType[i] ) != fMapOfTrainingTree.end() )
             {
-                fMapOfTrainingTree[fTelType[i]]->Fill();
+                if( iTelType == 0 || iTelType == fTelType[i] )
+                {
+                    fMapOfTrainingTree[fTelType[i]]->Fill();
+                }
             }
         }
     }
@@ -884,7 +876,7 @@ int main( int argc, char* argv[] )
         iQualityCut = argv[7];
     }
     // TMVA options (default options derived from hyperparameter optimisation on CTAO prod3 simulations)
-    string iTMVAOptions = "NTrees=100:BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:GradBaggingFraction=0.5:nCuts=20:MaxDepth=10:";
+    string iTMVAOptions = "NTrees=300:BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:GradBaggingFraction=0.5:nCuts=20:MaxDepth=10:";
     iTMVAOptions += "PruneMethod=ExpectedError:RegressionLossFunctionBDTG=Huber:MinNodeSize=0.02:VarTransform=N";
     if( argc >= 9 )
     {
@@ -972,7 +964,7 @@ int main( int argc, char* argv[] )
             fMapOfTrainingTree_iter != fMapOfTrainingTree.end();
             ++fMapOfTrainingTree_iter )
     {
-        if( fMapOfTrainingTree_iter->second )
+        if( fMapOfTrainingTree_iter->second && fMapOfTrainingTree_iter->second->GetEntries() > 0 )
         {
             cout << "\t writing training tree for telescope type " << fMapOfTrainingTree_iter->first;
             cout << " with " << fMapOfTrainingTree_iter->second->GetEntries() << " entries ";
@@ -987,11 +979,14 @@ int main( int argc, char* argv[] )
             fMapOfTrainingTree_iter != fMapOfTrainingTree.end();
             ++fMapOfTrainingTree_iter )
     {
-        trainTMVA( fOutputDir, fTrainTest,
-                   fMapOfTrainingTree_iter->first,
-                   fMapOfTrainingTree_iter->second,
-                   iTargetML, iTMVAOptions, iQualityCut,
-                   iWeightExpression );
+        if( fMapOfTrainingTree_iter->second && fMapOfTrainingTree_iter->second->GetEntries() > 0 )
+        {
+            trainTMVA( fOutputDir, fTrainTest,
+                       fMapOfTrainingTree_iter->first,
+                       fMapOfTrainingTree_iter->second,
+                       iTargetML, iTMVAOptions, iQualityCut,
+                       iWeightExpression );
+        }
     }
 
     //////////////////////
