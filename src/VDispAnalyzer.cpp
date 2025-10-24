@@ -785,7 +785,14 @@ void VDispAnalyzer::calculateMeanEnergy(
     double* img_weight )
 {
     vector< double > energy_tel;
-    vector< double > energy_weight;
+    energy_tel.reserve( disp_energy_T.size() );
+    double energy_weight = 0.;
+    double w = 0.;
+    fdisp_energy = 0.;
+    fdisp_energy_NT = 0.;
+    fdisp_energy_chi = 0.;
+    fdisp_energy_dEs = 0.;
+
     for( unsigned int i = 0; i < disp_energy_T.size(); i++ )
     {
         if( disp_energy_T[i] > 0. && img_size[i] > 0. )
@@ -793,24 +800,18 @@ void VDispAnalyzer::calculateMeanEnergy(
             energy_tel.push_back( disp_energy_T[i] );
             if( img_weight )
             {
-                energy_weight.push_back( img_size[i] * img_weight[i] * img_size[i] * img_weight[i] );
+                energy_weight = img_size[i] * img_weight[i] * img_size[i] * img_weight[i];
             }
             else
             {
-                energy_weight.push_back( img_size[i] * img_size[i] );
+                energy_weight = img_size[i] * img_size[i];
             }
+            fdisp_energy += (double)disp_energy_T[i] * energy_weight;
+            w += energy_weight;
+            fdisp_energy_NT++;
         }
     }
 
-    double w = 0.;
-    fdisp_energy = 0.;
-    for( unsigned int j = 0; j < energy_tel.size(); j++ )
-    {
-        fdisp_energy += energy_tel[j] * energy_weight[j];
-        w += energy_weight[j];
-    }
-
-    fdisp_energy_NT = energy_tel.size();
     if( w > 0. )
     {
         fdisp_energy /= w;
@@ -834,8 +835,6 @@ void VDispAnalyzer::calculateMeanEnergy(
     // calculate chi2 and dE
     // (note: different definition for dE
     //        than in lookup table code)
-    fdisp_energy_chi = 0.;
-    fdisp_energy_dEs = 0.;
     for( unsigned int i = 0; i < energy_tel.size(); i++ )
     {
         fdisp_energy_chi += ( energy_tel[i] - fdisp_energy ) *
@@ -843,10 +842,10 @@ void VDispAnalyzer::calculateMeanEnergy(
                             fdisp_energy / fdisp_energy;
         fdisp_energy_dEs += TMath::Abs( energy_tel[i] - fdisp_energy ) / fdisp_energy;
     }
-    if( energy_tel.size() > 1 )
+    if( fdisp_energy_NT > 1 )
     {
-        fdisp_energy_chi /= (( float )energy_tel.size() - 1. );
-        fdisp_energy_dEs /= ( float )energy_tel.size();
+        fdisp_energy_chi /= (fdisp_energy_NT - 1);
+        fdisp_energy_dEs /= ( float )fdisp_energy_NT;
     }
     else
     {
