@@ -1016,7 +1016,7 @@ bool VTableCalculator::readHistograms()
     return false;
 }
 
-double VTableCalculator::interpolate( TH2F* h, double x, double y, bool iError )
+double VTableCalculator::interpolate( TH2F* h, float x, float y, bool iError )
 {
     if(!h )
     {
@@ -1046,33 +1046,33 @@ double VTableCalculator::interpolate( TH2F* h, double x, double y, bool iError )
         i_y--;
     }
 
-    double e1 = 0.;
-    double e2 = 0.;
-    double v = 0.;
+    float e1 = 0.;
+    float e2 = 0.;
+    float v = 0.;
 
     // first interpolate on distance axis, then on size axis
     if(!iError )
     {
-        e1 = VStatistics::interpolate( h->GetBinContent( i_x, i_y ), h->GetYaxis()->GetBinCenter( i_y ),
-                                       h->GetBinContent( i_x, i_y + 1 ), h->GetYaxis()->GetBinCenter( i_y + 1 ),
-                                       y, false, 0.5, 1.e-5 );
-        e2 = VStatistics::interpolate( h->GetBinContent( i_x + 1, i_y ), h->GetYaxis()->GetBinCenter( i_y ),
-                                       h->GetBinContent( i_x + 1, i_y + 1 ), h->GetYaxis()->GetBinCenter( i_y + 1 ),
-                                       y, false, 0.5, 1.e-5 );
-        v = VStatistics::interpolate( e1, h->GetXaxis()->GetBinCenter( i_x ),
-                                      e2, h->GetXaxis()->GetBinCenter( i_x + 1 ),
-                                      x, false, 0.5, 1.e-5 );
+        e1 = VStatistics::interpolate( static_cast<float>(h->GetBinContent( i_x, i_y )), static_cast<float>(h->GetYaxis()->GetBinCenter( i_y )),
+                                       static_cast<float>(h->GetBinContent( i_x, i_y + 1 )), static_cast<float>(h->GetYaxis()->GetBinCenter( i_y + 1 )),
+                                       y, false, static_cast<float>(0.5), static_cast<float>(1.e-5));
+        e2 = VStatistics::interpolate( static_cast<float>(h->GetBinContent( i_x + 1, i_y )), static_cast<float>(h->GetYaxis()->GetBinCenter( i_y )),
+                                       static_cast<float>(h->GetBinContent( i_x + 1, i_y + 1 )), static_cast<float>(h->GetYaxis()->GetBinCenter( i_y + 1 )),
+                                       y, false, static_cast<float>(0.5), static_cast<float>(1.e-5));
+        v = VStatistics::interpolate( e1, static_cast<float>(h->GetXaxis()->GetBinCenter( i_x )),
+                                      e2, static_cast<float>(h->GetXaxis()->GetBinCenter( i_x + 1 )),
+                                      x, false, static_cast<float>(0.5), static_cast<float>(1.e-5));
     }
     else
     {
-        e1 = VStatistics::interpolate( h->GetBinError( i_x, i_y ), h->GetYaxis()->GetBinCenter( i_y ),
-                                       h->GetBinError( i_x, i_y + 1 ), h->GetYaxis()->GetBinCenter( i_y + 1 ),
+        e1 = VStatistics::interpolate( static_cast<float>(h->GetBinError( i_x, i_y )), static_cast<float>(h->GetYaxis()->GetBinCenter( i_y )),
+                                       static_cast<float>(h->GetBinError( i_x, i_y + 1 )), static_cast<float>(h->GetYaxis()->GetBinCenter( i_y + 1 )),
                                        y, false );
-        e2 = VStatistics::interpolate( h->GetBinError( i_x + 1, i_y ), h->GetYaxis()->GetBinCenter( i_y ),
-                                       h->GetBinError( i_x + 1, i_y + 1 ), h->GetYaxis()->GetBinCenter( i_y + 1 ),
+        e2 = VStatistics::interpolate( static_cast<float>(h->GetBinError( i_x + 1, i_y )), static_cast<float>(h->GetYaxis()->GetBinCenter( i_y )),
+                                       static_cast<float>(h->GetBinError( i_x + 1, i_y + 1 )), static_cast<float>(h->GetYaxis()->GetBinCenter( i_y + 1 )),
                                        y, false );
 
-        v = VStatistics::interpolate( e1, h->GetXaxis()->GetBinCenter( i_x ), e2, h->GetXaxis()->GetBinCenter( i_x + 1 ), x, false );
+        v = VStatistics::interpolate( e1, static_cast<float>(h->GetXaxis()->GetBinCenter( i_x )), e2, static_cast<float>(h->GetXaxis()->GetBinCenter( i_x + 1 )), x, false );
     }
     // final check on consistency of results
     // (don't expect to reconstruct anything below 1 GeV)
