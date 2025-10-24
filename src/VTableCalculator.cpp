@@ -600,7 +600,6 @@ double VTableCalculator::calc( int ntel, float* r, float* s, float* w, double* m
                         // fill width/length/energy into a 1D and 2D histogram
                         // (chi2 is here an external weight (from e.g. spectral weighting))
                         //============================================================================================================
-                        // PRELIMINARY_START
                         if( fEnergy )
                         {
                             if( w[tel] < Oh[is][ir]->GetXaxis()->GetXmin() || w[tel] > Oh[is][ir]->GetXaxis()->GetXmax() )
@@ -609,7 +608,6 @@ double VTableCalculator::calc( int ntel, float* r, float* s, float* w, double* m
                                 cout << Oh[is][ir]->GetXaxis()->GetXmin() << "\t" << Oh[is][ir]->GetXaxis()->GetXmax() << endl;
                             }
                         }
-                        // PRELIMINARY_END
                         //============================================================================================================
                         Oh[is][ir]->Fill( w[tel], chi2 );
                     }
@@ -666,6 +664,10 @@ double VTableCalculator::calc( int ntel, float* r, float* s, float* w, double* m
         vector< double > sigma2_tel;
         vector< double > sigma2_tel_noRadiusWeigth;
         vector< double > sigma_tel;
+        energy_tel.reserve( ntel );
+        sigma2_tel.reserve( ntel );
+        sigma2_tel_noRadiusWeigth.reserve( ntel );
+        sigma_tel.reserve( ntel );
 
         // reset everything
         for( tel = 0; tel < ntel; tel++ )
