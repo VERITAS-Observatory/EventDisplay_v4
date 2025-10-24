@@ -318,9 +318,13 @@ inline T interpolate(T w1, T ze1, T w2, T ze2, T ze,
     if (iCos)
     {
         const T d2r = static_cast<T>(TMath::DegToRad());
-        id = std::cos(ze1 * d2r) - std::cos(ze2 * d2r);
-        f1 = static_cast<T>(1) - (std::cos(ze1 * d2r) - std::cos(ze * d2r)) / id;
-        f2 = static_cast<T>(1) - (std::cos(ze * d2r) - std::cos(ze2 * d2r)) / id;
+        const T cos_ze1 = std::cos(ze1 * d2r);
+        const T cos_ze2 = std::cos(ze2 * d2r);
+        const T cos_ze  = std::cos(ze  * d2r);
+
+        id = cos_ze1 - cos_ze2;
+        f1 = static_cast<T>(1) - (cos_ze1 - cos_ze) / id;
+        f2 = static_cast<T>(1) - (cos_ze - cos_ze2) / id;
     }
     else
     {
