@@ -1055,26 +1055,26 @@ double VTableCalculator::interpolate( TH2F* h, float x, float y, bool iError )
     // first interpolate on distance axis, then on size axis
     if(!iError )
     {
-        e1 = VStatistics::interpolate( static_cast<float>(h->GetBinContent( i_x, i_y )), static_cast<float>(h->GetYaxis()->GetBinCenter( i_y )),
-                                       static_cast<float>(h->GetBinContent( i_x, i_y + 1 )), static_cast<float>(h->GetYaxis()->GetBinCenter( i_y + 1 )),
-                                       y, false, static_cast<float>(0.5), static_cast<float>(1.e-5));
-        e2 = VStatistics::interpolate( static_cast<float>(h->GetBinContent( i_x + 1, i_y )), static_cast<float>(h->GetYaxis()->GetBinCenter( i_y )),
-                                       static_cast<float>(h->GetBinContent( i_x + 1, i_y + 1 )), static_cast<float>(h->GetYaxis()->GetBinCenter( i_y + 1 )),
-                                       y, false, static_cast<float>(0.5), static_cast<float>(1.e-5));
-        v = VStatistics::interpolate( e1, static_cast<float>(h->GetXaxis()->GetBinCenter( i_x )),
-                                      e2, static_cast<float>(h->GetXaxis()->GetBinCenter( i_x + 1 )),
-                                      x, false, static_cast<float>(0.5), static_cast<float>(1.e-5));
+        e1 = VStatistics::interpolate( static_cast<float>( h->GetBinContent( i_x, i_y ) ), static_cast<float>( h->GetYaxis()->GetBinCenter( i_y ) ),
+                                       static_cast<float>( h->GetBinContent( i_x, i_y + 1 ) ), static_cast<float>( h->GetYaxis()->GetBinCenter( i_y + 1 ) ),
+                                       y, false, static_cast<float>( 0.5 ), static_cast<float>( 1.e-5 ) );
+        e2 = VStatistics::interpolate( static_cast<float>( h->GetBinContent( i_x + 1, i_y ) ), static_cast<float>( h->GetYaxis()->GetBinCenter( i_y ) ),
+                                       static_cast<float>( h->GetBinContent( i_x + 1, i_y + 1 ) ), static_cast<float>( h->GetYaxis()->GetBinCenter( i_y + 1 ) ),
+                                       y, false, static_cast<float>( 0.5 ), static_cast<float>( 1.e-5 ) );
+        v = VStatistics::interpolate( e1, static_cast<float>( h->GetXaxis()->GetBinCenter( i_x ) ),
+                                      e2, static_cast<float>( h->GetXaxis()->GetBinCenter( i_x + 1 ) ),
+                                      x, false, static_cast<float>( 0.5 ), static_cast<float>( 1.e-5 ) );
     }
     else
     {
-        e1 = VStatistics::interpolate( static_cast<float>(h->GetBinError( i_x, i_y )), static_cast<float>(h->GetYaxis()->GetBinCenter( i_y )),
-                                       static_cast<float>(h->GetBinError( i_x, i_y + 1 )), static_cast<float>(h->GetYaxis()->GetBinCenter( i_y + 1 )),
+        e1 = VStatistics::interpolate( static_cast<float>( h->GetBinError( i_x, i_y ) ), static_cast<float>( h->GetYaxis()->GetBinCenter( i_y ) ),
+                                       static_cast<float>( h->GetBinError( i_x, i_y + 1 ) ), static_cast<float>( h->GetYaxis()->GetBinCenter( i_y + 1 ) ),
                                        y, false );
-        e2 = VStatistics::interpolate( static_cast<float>(h->GetBinError( i_x + 1, i_y )), static_cast<float>(h->GetYaxis()->GetBinCenter( i_y )),
-                                       static_cast<float>(h->GetBinError( i_x + 1, i_y + 1 )), static_cast<float>(h->GetYaxis()->GetBinCenter( i_y + 1 )),
+        e2 = VStatistics::interpolate( static_cast<float>( h->GetBinError( i_x + 1, i_y ) ), static_cast<float>( h->GetYaxis()->GetBinCenter( i_y ) ),
+                                       static_cast<float>( h->GetBinError( i_x + 1, i_y + 1 ) ), static_cast<float>( h->GetYaxis()->GetBinCenter( i_y + 1 ) ),
                                        y, false );
 
-        v = VStatistics::interpolate( e1, static_cast<float>(h->GetXaxis()->GetBinCenter( i_x )), e2, static_cast<float>(h->GetXaxis()->GetBinCenter( i_x + 1 )), x, false );
+        v = VStatistics::interpolate( e1, static_cast<float>( h->GetXaxis()->GetBinCenter( i_x ) ), e2, static_cast<float>( h->GetXaxis()->GetBinCenter( i_x + 1 ) ), x, false );
     }
     // final check on consistency of results
     // (don't expect to reconstruct anything below 1 GeV)

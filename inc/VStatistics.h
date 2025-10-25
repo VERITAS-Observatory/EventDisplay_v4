@@ -290,58 +290,58 @@ namespace VStatistics
     */
 
     template <typename T>
-inline T interpolate(T w1, T ze1, T w2, T ze2, T ze,
-                     bool iCos = false,
-                     T limit_low = static_cast<T>(0.5),
-                     T limit_up  = static_cast<T>(1e-5))
-{
-    const T iMinValidValue = static_cast<T>(-98.0);
-    const T iLimitforInterpolation = static_cast<T>(0.05);
-
-    // both values invalid
-    if (w1 < iMinValidValue && w2 < iMinValidValue)
-        return static_cast<T>(-99.0);
-
-    // same x-value: average or return valid one
-    if (std::fabs(ze1 - ze2) < static_cast<T>(1e-3))
+    inline T interpolate( T w1, T ze1, T w2, T ze2, T ze,
+                          bool iCos = false,
+                          T limit_low = static_cast<T>( 0.5 ),
+                          T limit_up  = static_cast<T>( 1e-5 ) )
     {
-        if (w1 < iMinValidValue) return w2;
-        if (w2 < iMinValidValue) return w1;
-        return (w1 + w2) / static_cast<T>(2);
+        const T iMinValidValue = static_cast<T>(-98.0 );
+        const T iLimitforInterpolation = static_cast<T>( 0.05 );
+
+        // both values invalid
+        if( w1 < iMinValidValue && w2 < iMinValidValue )
+            return static_cast<T>(-99.0 );
+
+        // same x-value: average or return valid one
+        if( std::fabs( ze1 - ze2 ) < static_cast<T>( 1e-3 ) )
+        {
+            if( w1 < iMinValidValue ) return w2;
+            if( w2 < iMinValidValue ) return w1;
+            return ( w1 + w2 ) / static_cast<T>( 2 );
+        }
+
+        // interpolate
+        T id  = static_cast<T>( 0 );
+        T f1  = static_cast<T>( 0 );
+        T f2  = static_cast<T>( 0 );
+
+        if( iCos )
+        {
+            const T d2r = static_cast<T>( TMath::DegToRad() );
+            const T cos_ze1 = std::cos( ze1* d2r );
+            const T cos_ze2 = std::cos( ze2* d2r );
+            const T cos_ze  = std::cos( ze*   d2r );
+
+            id = cos_ze1 - cos_ze2;
+            f1 = static_cast<T>( 1 ) - ( cos_ze1 - cos_ze ) / id;
+            f2 = static_cast<T>( 1 ) - ( cos_ze - cos_ze2 ) / id;
+        }
+        else
+        {
+            id = ze1 - ze2;
+            f1 = static_cast<T>( 1 ) - ( ze1 - ze ) / id;
+            f2 = static_cast<T>( 1 ) - ( ze - ze2 ) / id;
+        }
+
+        // one value invalid → conditional return
+        if( w1 > iMinValidValue && w2 < iMinValidValue )
+            return ( f1 > iLimitforInterpolation ) ? w1 : static_cast<T>(-99.0 );
+        if( w1 < iMinValidValue && w2 > iMinValidValue )
+            return ( f2 > iLimitforInterpolation ) ? w2 : static_cast<T>(-99.0 );
+
+        // normal interpolation
+        return ( w1* f1 + w2* f2 );
     }
-
-    // interpolate
-    T id  = static_cast<T>(0);
-    T f1  = static_cast<T>(0);
-    T f2  = static_cast<T>(0);
-
-    if (iCos)
-    {
-        const T d2r = static_cast<T>(TMath::DegToRad());
-        const T cos_ze1 = std::cos(ze1 * d2r);
-        const T cos_ze2 = std::cos(ze2 * d2r);
-        const T cos_ze  = std::cos(ze  * d2r);
-
-        id = cos_ze1 - cos_ze2;
-        f1 = static_cast<T>(1) - (cos_ze1 - cos_ze) / id;
-        f2 = static_cast<T>(1) - (cos_ze - cos_ze2) / id;
-    }
-    else
-    {
-        id = ze1 - ze2;
-        f1 = static_cast<T>(1) - (ze1 - ze) / id;
-        f2 = static_cast<T>(1) - (ze - ze2) / id;
-    }
-
-    // one value invalid → conditional return
-    if (w1 > iMinValidValue && w2 < iMinValidValue)
-        return (f1 > iLimitforInterpolation) ? w1 : static_cast<T>(-99.0);
-    if (w1 < iMinValidValue && w2 > iMinValidValue)
-        return (f2 > iLimitforInterpolation) ? w2 : static_cast<T>(-99.0);
-
-    // normal interpolation
-    return (w1 * f1 + w2 * f2);
-}
 
     /*
 

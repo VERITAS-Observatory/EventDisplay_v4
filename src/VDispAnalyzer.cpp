@@ -806,7 +806,7 @@ void VDispAnalyzer::calculateMeanEnergy(
             {
                 energy_weight = img_size[i] * img_size[i];
             }
-            fdisp_energy += (double)disp_energy_T[i] * energy_weight;
+            fdisp_energy += ( double )disp_energy_T[i] * energy_weight;
             w += energy_weight;
             fdisp_energy_NT++;
         }
@@ -844,7 +844,7 @@ void VDispAnalyzer::calculateMeanEnergy(
     }
     if( fdisp_energy_NT > 1 )
     {
-        fdisp_energy_chi /= (fdisp_energy_NT - 1);
+        fdisp_energy_chi /= ( fdisp_energy_NT - 1 );
         fdisp_energy_dEs /= ( float )fdisp_energy_NT;
     }
     else
