@@ -126,7 +126,7 @@ class VTableCalculator
         bool   createMedianApprox( int i, int j );
         double getWeightMeanBinContent( TH2F*, int, int, double, double );
         void   fillMPV( TH2F*, int, int, TH1F*, double, double );
-        double interpolate( TH2F* h, double x, double y, bool iError );
+        double interpolate( TH2F* h, float x, float y, bool iError );
         bool   readHistograms();
         void   setBinning();
         void   setConstants( bool iPE = false );

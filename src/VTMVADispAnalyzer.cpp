@@ -37,21 +37,21 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
     fEHeight = 0.;
 
     // spectators (nowhere used)
-    float iMCe0 = 0.;
-    float iMCxoff = 0.;
-    float iMCyoff = 0.;
-    float iMCxcore = 0.;
-    float iMCycore = 0.;
-    float iMCrcore = 0.;
-    float iNImages = 0.;
-    float cen_x = 0;
-    float cen_y = 0;
-    float cosphi = 0.;
-    float sinphi = 0.;
-    float temp1 = 0.;
-    float temp2 = 0.;
-    float temp3 = 0.;
-    float temp4 = 0.;
+    iMCe0 = 0.;
+    iMCxoff = 0.;
+    iMCyoff = 0.;
+    iMCxcore = 0.;
+    iMCycore = 0.;
+    iMCrcore = 0.;
+    iNImages = 0.;
+    cen_x = 0;
+    cen_y = 0;
+    cosphi = 0.;
+    sinphi = 0.;
+    temp1 = 0.;
+    temp2 = 0.;
+    temp3 = 0.;
+    temp4 = 0.;
 
     // list of telescope types: required to selected correct BDT weight file
     fTelescopeTypeList = iTelTypeList;

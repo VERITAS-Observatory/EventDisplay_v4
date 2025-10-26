@@ -48,6 +48,22 @@ class VTMVADispAnalyzer
         float fcross;
         float fRcore;
         float fEHeight;
+        // spectators (nowhere used)
+        float iMCe0;
+        float iMCxoff;
+        float iMCyoff;
+        float iMCxcore;
+        float iMCycore;
+        float iMCrcore;
+        float iNImages;
+        float cen_x;
+        float cen_y;
+        float cosphi;
+        float sinphi;
+        float temp1;
+        float temp2;
+        float temp3;
+        float temp4;
 
     public:
 
