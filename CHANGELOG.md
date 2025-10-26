@@ -9,12 +9,17 @@ This changelog is generated using [Towncrier](https://towncrier.readthedocs.io/)
 
 <!-- towncrier release notes start -->
 
-## [v492.0](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases/tag/v492.0) - 2025-10-21
+## [v492.0](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases/tag/v492.0) - 2025-10-26
 
 ### Bugfixes
 
 - Fix segmentation fault when exiting on error due to an empty tree in anasum. ([#286](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/286))
 - Limit number of errors printed when reading faulty VBF files to avoid TB large log files. ([#298](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/298))
+
+### Documentation
+
+- Add libtool compile instructions to readme. ([#287](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/287))
+- Improved description of docker image building. ([#292](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/292))
 
 ### New Feature
 
@@ -37,3 +42,4 @@ This changelog is generated using [Towncrier](https://towncrier.readthedocs.io/)
   Removed outdated warnings, TODO comments, and deprecated features. ([#289](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/289))
 - Introduce towncrier for changelogs. ([#300](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/300))
 - Fix github action worklows to compile Eventdisplay. Add cpp11 workflow. ([#307](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/307))
+- Performance improvements for mscw energy stage. ([#312](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/312))
