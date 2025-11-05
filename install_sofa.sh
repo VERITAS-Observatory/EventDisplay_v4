@@ -28,11 +28,11 @@ cd sofa
 
 # get sofa package from the web page and install
 SOFAD="20231011"
-SOFA="sofa_c-${SOFAD}.tar.gz"
+SOFA="sofa_c-${SOFAD}tar.gz"
 if [[ -e sofa.tar.gz ]]; then
     mv -f sofa.tar.gz ${SOFA}
 else
-    wget --no-check-certificate https://www.iausofa.org/"${SOFAD:0:4}_${SOFAD:4}_C"/${SOFA}
+    wget --no-check-certificate https://www.iausofa.org/s/${SOFA}
 fi
 if [ ! -e ${SOFA} ]
 then
