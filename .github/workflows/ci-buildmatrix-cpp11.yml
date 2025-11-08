@@ -22,7 +22,7 @@ jobs:
 
       - name: Upload source artifact
         # v4 okay here (runs on ubuntu host with modern glibc)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: src
           path: src.tgz
@@ -35,7 +35,7 @@ jobs:
       ROOT_IMAGE: rootproject/root:6.24.06-centos7
     steps:
       - name: Download source artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
             name: src
 
@@ -84,7 +84,7 @@ jobs:
 
       - name: Upload build artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: build-artifacts
           path: build-artifacts.tgz
