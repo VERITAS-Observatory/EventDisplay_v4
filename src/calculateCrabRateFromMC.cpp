@@ -311,6 +311,11 @@ TTree* fillMCRates(
         MCrate *= ( 1. - fDeadTime / 100. );
         fMC->Fill();
 
+        if( TMath::Abs( Woff - 0.5 ) < 0.01 )
+        {
+            continue;
+        }
+
         for( unsigned int e = 0; e < ebins.size(); e++ )
         {
             fill_profilehistogram_for_TMVA(

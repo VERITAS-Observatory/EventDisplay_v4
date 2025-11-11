@@ -333,7 +333,7 @@ namespace VStatistics
             f2 = static_cast<T>( 1 ) - ( ze - ze2 ) / id;
         }
 
-        // one value invalid → conditional return
+        // one value invalid: conditional return
         if( w1 > iMinValidValue && w2 < iMinValidValue )
             return ( f1 > iLimitforInterpolation ) ? w1 : static_cast<T>(-99.0 );
         if( w1 < iMinValidValue && w2 > iMinValidValue )
