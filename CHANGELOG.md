@@ -9,12 +9,13 @@ This changelog is generated using [Towncrier](https://towncrier.readthedocs.io/)
 
 <!-- towncrier release notes start -->
 
-## [v492.0](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases/tag/v492.0) - 2025-10-26
+## [v492.0](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases/tag/v492.0) - 2025-11-11
 
 ### Bugfixes
 
 - Fix segmentation fault when exiting on error due to an empty tree in anasum. ([#286](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/286))
 - Limit number of errors printed when reading faulty VBF files to avoid TB large log files. ([#298](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/298))
+- Add cut to wobble offset 0.5 for calculation of MC-derived gamma-ray rates used for BDT cut optimization. ([#314](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/314))
 
 ### Documentation
 
@@ -32,6 +33,7 @@ This changelog is generated using [Towncrier](https://towncrier.readthedocs.io/)
 
 ### Maintenance
 
+- Update URL for SOFA download. ([#317](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/317))
 - Update SOFA to version 2023-10-11. ([#284](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/284))
 - Changes in tree structure and variable types to reduce size of output trees (mostly due to change of doubles to floats; removal of unused variables); reduction is on storage requirements is ~25%. ([#288](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/288))
 - Replaced many ROOT auto-generated header/source files (e.g., CData.h, CEffArea.h, CRunSummary.h, Cshowerpars.h, Ctpars.h, Ctelconfig.h) with hand-edited or cleaner C++ code, improving maintainability and readability. Moved implementation code from `.C` files to `.cpp` files, and deleted the old `.C` files.
