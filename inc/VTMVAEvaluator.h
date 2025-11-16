@@ -180,6 +180,14 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         void             smoothAndInterPolateMVAValue_Energy_and_Zenith( TH1F*, TH1F*,
                 unsigned int iE_min, unsigned int iE_max, unsigned int iZ_min, unsigned int iZ_max );
 
+        // Readability helpers (no functional change)
+        bool             buildTMVADataFromFiles( const std::string& iWeightFileName,
+            unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
+            unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax );
+        bool             setupTMVAReaders( unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
+                           unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax );
+        void             bindVariableByName( TMVA::Reader* reader, const std::string& varName, bool isSpectator );
+
     public:
 
         VTMVAEvaluator();
