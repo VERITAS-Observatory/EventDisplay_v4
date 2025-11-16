@@ -178,7 +178,6 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
         fIsZombie = true;
         return false;
     }
-    char hname[800];
 
     //////////////////////////////
     // reset data vector
