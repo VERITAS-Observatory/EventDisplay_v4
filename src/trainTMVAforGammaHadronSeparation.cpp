@@ -78,6 +78,7 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
     Double_t Xoff_derot = 0.;
     Double_t Yoff_derot = 0.;
     Int_t NImages = 0;
+    ULong64_t ImgSel = 0ULL;
     Float_t EmissionHeight = 0.;
     Float_t EmissionHeightChi2 = 0.;
     Double_t SizeSecondMax = 0.;
@@ -193,6 +194,8 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
             iTreeVector[i]->SetBranchAddress( "Xoff_derot", &Xoff_derot );
             iTreeVector[i]->SetBranchAddress( "Yoff_derot", &Yoff_derot );
             iTreeVector[i]->SetBranchAddress( "NImages", &NImages );
+            // selection mask: only use indices present in ImgSel
+            int rc_imgsel = iTreeVector[i]->SetBranchAddress( "ImgSel", &ImgSel );
             iTreeVector[i]->SetBranchAddress( "EmissionHeight", &EmissionHeight );
             iTreeVector[i]->SetBranchAddress( "EmissionHeightChi2", &EmissionHeightChi2 );
             iTreeVector[i]->SetBranchAddress( "SizeSecondMax", &SizeSecondMax );
@@ -202,13 +205,14 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
             {
                 iTreeVector[i]->SetBranchAddress( "MCe0", &MCe0 );
             }
-            // Bind per-telescope arrays (exact names)
+            // Bind per-telescope arrays
             int rc_w = iTreeVector[i]->SetBranchAddress( "width", aWidth );
             int rc_l = iTreeVector[i]->SetBranchAddress( "length", aLength );
             int rc_lo = iTreeVector[i]->SetBranchAddress( "loss", aLoss );
             int rc_rc = iTreeVector[i]->SetBranchAddress( "R_core", aRcore );
             int rc_s = iTreeVector[i]->SetBranchAddress( "size", aSize );
             bool hasPerTel = ( rc_w == 0 && rc_l == 0 && rc_lo == 0 && rc_rc == 0 && rc_s == 0 );
+            bool hasImgSel = ( rc_imgsel == 0 );
             if(!iDataTree_reduced )
             {
                 cout << "Error preparing reduced tree" << endl;
@@ -251,56 +255,65 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
                     Rcore_r1 = Rcore_r2 = Rcore_r3 = Rcore_r4 = 0.0;
                     if( hasPerTel )
                     {
-                        int nim = ( int )NImages;
-                        if( nim < 0 )
+                        // build selected index list from ImgSel (lower 4 bits)
+                        int selIdx[4];
+                        int selCount = 0;
+                        if( hasImgSel )
                         {
-                            nim = 0;
+                            for( int ii = 0; ii < 4; ii++ )
+                            {
+                                if( ( ImgSel & ( 1ULL << ii ) ) != 0 )
+                                {
+                                    selIdx[selCount++] = ii;
+                                }
+                            }
                         }
-                        if( nim > 4 )
+                        else
                         {
-                            nim = 4;
+                            int nim = NImages;
+                            if( nim > 4 ) nim = 4;
+                            if( nim < 0 ) nim = 0;
+                            for( int ii = 0; ii < nim; ii++ ) selIdx[selCount++] = ii;
                         }
-                        int idx[4] = { 0, 1, 2, 3 };
-                        // selection sort indices by aSize desc
-                        for( int ii = 0; ii < nim; ii++ )
+                        // sort selected indices by size desc
+                        for( int ii = 0; ii < selCount; ii++ )
                         {
                             int maxj = ii;
-                            for( int jj = ii + 1; jj < nim; jj++ )
+                            for( int jj = ii + 1; jj < selCount; jj++ )
                             {
-                                if( aSize[idx[jj]] > aSize[idx[maxj]] )
+                                if( aSize[selIdx[jj]] > aSize[selIdx[maxj]] )
                                 {
                                     maxj = jj;
                                 }
                             }
                             if( maxj != ii )
                             {
-                                int tmp = idx[ii];
-                                idx[ii] = idx[maxj];
-                                idx[maxj] = tmp;
+                                int tmp = selIdx[ii];
+                                selIdx[ii] = selIdx[maxj];
+                                selIdx[maxj] = tmp;
                             }
                         }
 
                         // temporary arrays for ranks
                         Float_t Wr[4] = { 0 }, Lr[4] = { 0 }, Lo[4] = { 0 }, Rc[4] = { 0 };
-                        int k;
-                        for( k = 0; k < nim; k++ )
+                        int k = 0;
+                        for( ; k < selCount && k < 4; k++ )
                         {
-                            int src = idx[k];
+                            int src = selIdx[k];
                             Wr[k] = aWidth[src];
                             Lr[k] = aLength[src];
                             Lo[k] = aLoss[src];
                             Rc[k] = aRcore[src];
                         }
-                        if( nim > 0 )
+                        if( selCount > 0 )
                         {
-                            int last = nim - 1;
+                            int lastSrc = selIdx[selCount - 1];
                             for( ; k < 4; k++ )
                             {
-                                int src = idx[last];
-                                Wr[k] = aWidth[src];
-                                Lr[k] = aLength[src];
-                                Lo[k] = aLoss[src];
-                                Rc[k] = aRcore[src];
+                                Wr[k] = aWidth[lastSrc];
+                                Lr[k] = aLength[lastSrc];
+                                Lo[k] = aLoss[lastSrc];
+                                Rc[k] = aRcore[lastSrc];
                             }
                         }
                         // assign to branches

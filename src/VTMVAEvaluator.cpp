@@ -705,60 +705,59 @@ bool VTMVAEvaluator::evaluate( bool interpolate_mva, bool use_average_zenith_ang
             fDispDiff_log10 = 0.;    // !!! not clear what the best value is
         }
         fDispAbsSumWeigth = fData->DispAbsSumWeigth;
-        // Compute ranked per-telescope variables if model may require them
+        // Compute ranked per-telescope variables using ImgSel mask
         // Always compute to keep logic simple; unused values are harmless
         fWidth_r1 = fWidth_r2 = fWidth_r3 = fWidth_r4 = 0.0f;
         fLength_r1 = fLength_r2 = fLength_r3 = fLength_r4 = 0.0f;
         fLoss_r1 = fLoss_r2 = fLoss_r3 = fLoss_r4 = 0.0f;
         fRcore_r1 = fRcore_r2 = fRcore_r3 = fRcore_r4 = 0.0f;
-        int nim = fData->NImages;
-        if( nim < 0 )
+        // Build selected index list from lower 4 bits of ImgSel
+        int selIdx[4];
+        int selCount = 0;
+        for( int ii = 0; ii < 4; ii++ )
         {
-            nim = 0;
+            if( ( fData->ImgSel & ( 1ULL << ii ) ) != 0 )
+            {
+                selIdx[selCount++] = ii;
+            }
         }
-        if( nim > 4 )
+        if( selCount > 0 )
         {
-            nim = 4;
-        }
-        if( nim > 0 )
-        {
-            int idx[4] = { 0, 1, 2, 3 };
-            // selection sort indices by size desc
-            for( int i = 0; i < nim; i++ )
+            // selection sort selected indices by size desc
+            for( int i = 0; i < selCount; i++ )
             {
                 int maxj = i;
-                for( int j = i + 1; j < nim; j++ )
+                for( int j = i + 1; j < selCount; j++ )
                 {
-                    if( fData->size[idx[j]] > fData->size[idx[maxj]] )
+                    if( fData->size[selIdx[j]] > fData->size[selIdx[maxj]] )
                     {
                         maxj = j;
                     }
                 }
                 if( maxj != i )
                 {
-                    int t = idx[i];
-                    idx[i] = idx[maxj];
-                    idx[maxj] = t;
+                    int t = selIdx[i];
+                    selIdx[i] = selIdx[maxj];
+                    selIdx[maxj] = t;
                 }
             }
             float Wr[4] = { 0 }, Lr[4] = { 0 }, Lo[4] = { 0 }, Rc[4] = { 0 };
             int k = 0;
-            for( ; k < nim; k++ )
+            for( ; k < selCount && k < 4; k++ )
             {
-                int s = idx[k];
+                int s = selIdx[k];
                 Wr[k] = fData->width[s];
                 Lr[k] = fData->length[s];
                 Lo[k] = fData->loss[s];
                 Rc[k] = fData->R_core[s];
             }
-            int last = nim - 1;
+            int lastSrc = selIdx[selCount - 1];
             for( ; k < 4; k++ )
             {
-                int s = idx[last];
-                Wr[k] = fData->width[s];
-                Lr[k] = fData->length[s];
-                Lo[k] = fData->loss[s];
-                Rc[k] = fData->R_core[s];
+                Wr[k] = fData->width[lastSrc];
+                Lr[k] = fData->length[lastSrc];
+                Lo[k] = fData->loss[lastSrc];
+                Rc[k] = fData->R_core[lastSrc];
             }
             fWidth_r1 = Wr[0]; fWidth_r2 = Wr[1]; fWidth_r3 = Wr[2]; fWidth_r4 = Wr[3];
             fLength_r1 = Lr[0]; fLength_r2 = Lr[1]; fLength_r3 = Lr[2]; fLength_r4 = Lr[3];
