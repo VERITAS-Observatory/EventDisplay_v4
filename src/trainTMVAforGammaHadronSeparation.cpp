@@ -112,7 +112,7 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
     iDataTree_reduced->Branch( "DispDiff", &DispDiff, "DispDiff/D" );
     iDataTree_reduced->Branch( "DispAbsSumWeigth", &DispAbsSumWeigth, "DispAbsSumWeigth/F" );
     iDataTree_reduced->Branch( "MCe0", &MCe0, "MCe0/D" );
-    // New ranked per-telescope branches
+    // Ranked per-telescope branches
     iDataTree_reduced->Branch( "Width_r1", &Width_r1, "Width_r1/F" );
     iDataTree_reduced->Branch( "Width_r2", &Width_r2, "Width_r2/F" );
     iDataTree_reduced->Branch( "Width_r3", &Width_r3, "Width_r3/F" );

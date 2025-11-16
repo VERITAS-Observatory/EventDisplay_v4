@@ -191,14 +191,13 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
     cout << "VTMVAEvaluator::initializeWeightFiles: reading energy and zenith bins from TMVA root files ";
     cout << "(nbinE: " << iNbinE << ", nbinZ: " << iNbinZ << ")" << endl;
 
-    // Moved into helper for readability
     if(!buildTMVADataFromFiles( iWeightFileName, iWeightFileIndex_Emin, iWeightFileIndex_Emax,
                                 iWeightFileIndex_Zmin, iWeightFileIndex_Zmax ) )
     {
         return false;
     }
 
-    // initialize TMVA readers (moved into helper for readability)
+    // initialize TMVA readers
     if(!setupTMVAReaders( iWeightFileIndex_Emin, iWeightFileIndex_Emax,
                           iWeightFileIndex_Zmin, iWeightFileIndex_Zmax ) )
     {
