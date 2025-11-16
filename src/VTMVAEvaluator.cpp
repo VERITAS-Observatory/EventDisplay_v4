@@ -37,6 +37,10 @@ void VTMVAEvaluator::reset()
     fDispDiff_log10 = 0.;
     fDispAbsSumWeigth = 0.;
     fDummy = 0.;
+    fWidth_r1 = fWidth_r2 = fWidth_r3 = fWidth_r4 = 0.0f;
+    fLength_r1 = fLength_r2 = fLength_r3 = fLength_r4 = 0.0f;
+    fLoss_r1 = fLoss_r2 = fLoss_r3 = fLoss_r4 = 0.0f;
+    fRcore_r1 = fRcore_r2 = fRcore_r3 = fRcore_r4 = 0.0f;
 
     setTMVACutValue();
     setSignalEfficiency();
@@ -464,6 +468,71 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
             {
                 fTMVAData[b]->fTMVAReader->AddVariable( "DispAbsSumWeigth", &fDispAbsSumWeigth );
             }
+            // Ranked per-telescope variables (conditionally add if present in XML)
+            else if( iTrainingVariables[t] == "Width_r1" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "Width_r1", &fWidth_r1 );
+            }
+            else if( iTrainingVariables[t] == "Width_r2" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "Width_r2", &fWidth_r2 );
+            }
+            else if( iTrainingVariables[t] == "Width_r3" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "Width_r3", &fWidth_r3 );
+            }
+            else if( iTrainingVariables[t] == "Width_r4" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "Width_r4", &fWidth_r4 );
+            }
+            else if( iTrainingVariables[t] == "Length_r1" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "Length_r1", &fLength_r1 );
+            }
+            else if( iTrainingVariables[t] == "Length_r2" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "Length_r2", &fLength_r2 );
+            }
+            else if( iTrainingVariables[t] == "Length_r3" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "Length_r3", &fLength_r3 );
+            }
+            else if( iTrainingVariables[t] == "Length_r4" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "Length_r4", &fLength_r4 );
+            }
+            else if( iTrainingVariables[t] == "Loss_r1" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "Loss_r1", &fLoss_r1 );
+            }
+            else if( iTrainingVariables[t] == "Loss_r2" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "Loss_r2", &fLoss_r2 );
+            }
+            else if( iTrainingVariables[t] == "Loss_r3" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "Loss_r3", &fLoss_r3 );
+            }
+            else if( iTrainingVariables[t] == "Loss_r4" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "Loss_r4", &fLoss_r4 );
+            }
+            else if( iTrainingVariables[t] == "Rcore_r1" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "Rcore_r1", &fRcore_r1 );
+            }
+            else if( iTrainingVariables[t] == "Rcore_r2" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "Rcore_r2", &fRcore_r2 );
+            }
+            else if( iTrainingVariables[t] == "Rcore_r3" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "Rcore_r3", &fRcore_r3 );
+            }
+            else if( iTrainingVariables[t] == "Rcore_r4" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "Rcore_r4", &fRcore_r4 );
+            }
             else if( iVariableIsASpectator[t] )
             {
                 fTMVAData[b]->fTMVAReader->AddSpectator( iTrainingVariables[t].c_str(), &fDummy );
@@ -719,6 +788,66 @@ bool VTMVAEvaluator::evaluate( bool interpolate_mva, bool use_average_zenith_ang
             fDispDiff_log10 = 0.;    // !!! not clear what the best value is
         }
         fDispAbsSumWeigth = fData->DispAbsSumWeigth;
+        // Compute ranked per-telescope variables if model may require them
+        // Always compute to keep logic simple; unused values are harmless
+        fWidth_r1 = fWidth_r2 = fWidth_r3 = fWidth_r4 = 0.0f;
+        fLength_r1 = fLength_r2 = fLength_r3 = fLength_r4 = 0.0f;
+        fLoss_r1 = fLoss_r2 = fLoss_r3 = fLoss_r4 = 0.0f;
+        fRcore_r1 = fRcore_r2 = fRcore_r3 = fRcore_r4 = 0.0f;
+        int nim = fData->NImages;
+        if( nim < 0 )
+        {
+            nim = 0;
+        }
+        if( nim > 4 )
+        {
+            nim = 4;
+        }
+        if( nim > 0 )
+        {
+            int idx[4] = { 0, 1, 2, 3 };
+            // selection sort indices by size desc
+            for( int i = 0; i < nim; i++ )
+            {
+                int maxj = i;
+                for( int j = i + 1; j < nim; j++ )
+                {
+                    if( fData->size[idx[j]] > fData->size[idx[maxj]] )
+                    {
+                        maxj = j;
+                    }
+                }
+                if( maxj != i )
+                {
+                    int t = idx[i];
+                    idx[i] = idx[maxj];
+                    idx[maxj] = t;
+                }
+            }
+            float Wr[4] = { 0 }, Lr[4] = { 0 }, Lo[4] = { 0 }, Rc[4] = { 0 };
+            int k = 0;
+            for( ; k < nim; k++ )
+            {
+                int s = idx[k];
+                Wr[k] = fData->width[s];
+                Lr[k] = fData->length[s];
+                Lo[k] = fData->loss[s];
+                Rc[k] = fData->R_core[s];
+            }
+            int last = nim - 1;
+            for( ; k < 4; k++ )
+            {
+                int s = idx[last];
+                Wr[k] = fData->width[s];
+                Lr[k] = fData->length[s];
+                Lo[k] = fData->loss[s];
+                Rc[k] = fData->R_core[s];
+            }
+            fWidth_r1 = Wr[0]; fWidth_r2 = Wr[1]; fWidth_r3 = Wr[2]; fWidth_r4 = Wr[3];
+            fLength_r1 = Lr[0]; fLength_r2 = Lr[1]; fLength_r3 = Lr[2]; fLength_r4 = Lr[3];
+            fLoss_r1 = Lo[0]; fLoss_r2 = Lo[1]; fLoss_r3 = Lo[2]; fLoss_r4 = Lo[3];
+            fRcore_r1 = Rc[0]; fRcore_r2 = Rc[1]; fRcore_r3 = Rc[2]; fRcore_r4 = Rc[3];
+        }
     }
     else
     {
