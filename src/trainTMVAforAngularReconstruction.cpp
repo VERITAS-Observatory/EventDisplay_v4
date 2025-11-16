@@ -171,6 +171,8 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
     dataloader->AddVariable( "cross", 'F' );
     dataloader->AddVariable( "asym", 'F' );
     dataloader->AddVariable( "loss", 'F' );
+    dataloader->AddVariable( "loss*loss", 'F' );
+    dataloader->AddVariable( "loss*dist", 'F' );
     dataloader->AddVariable( "dist", 'F' );
     dataloader->AddVariable( "fui", 'F' );
     if( iTargetML.find( "DispEnergy" ) != string::npos )
@@ -758,9 +760,6 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
             //////////////////////////////////////////////////////////////////////////////////////////////////
             // calculate disp (observe sign convention for MC in y direction for MCyoff and Yoff)
             disp  = sqrt(( cen_y + MCyoff ) * ( cen_y + MCyoff ) + ( cen_x - MCxoff ) * ( cen_x - MCxoff ) );
-            cout << "AAA X " << MCxoff << "\t" << Xoff << "\t" << cen_x << "\t";
-            cout << " Y " << MCyoff << "\t" << Yoff << "\t" << cen_y << "\t";
-            cout << " disp " << disp << endl;
             if( redo_stereo_reconstruction )
             {
                 cross = sqrt(( cen_y + i_SR.fShower_Yoffset ) * ( cen_y + i_SR.fShower_Yoffset )
