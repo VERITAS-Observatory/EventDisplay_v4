@@ -132,22 +132,22 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
     Long64_t n = 0;
     // First pass: compute total number of events after pre-cuts across all runs
     Long64_t i_total_after_precuts = 0;
-    std::vector<TEntryList*> vElists;
-    vElists.resize( iTreeVector.size(), nullptr );
+    // First pass: for each tree, build a temporary entry list, count entries, then delete it immediately
     for( unsigned int i = 0; i < iTreeVector.size(); i++ )
     {
         if( iTreeVector[i] )
         {
             std::ostringstream elname;
-            elname << "elist_" << i;
+            elname << "elist_cnt_" << i;
             std::string eldraw = ">>" + elname.str();
             iTreeVector[i]->Draw( eldraw.c_str(), iCut, "entrylist" );
             TEntryList* elist_sum = ( TEntryList* )gDirectory->Get( elname.str().c_str() );
-            vElists[i] = elist_sum;
             if( elist_sum )
             {
                 i_total_after_precuts += elist_sum->GetN();
             }
+            // cleanup the entry list immediately to avoid holding open files
+            gDirectory->Delete( elname.str().c_str() );
         }
     }
     // determine desired number of training events
@@ -214,7 +214,12 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
                 cout << "Error preparing reduced tree" << endl;
                 return 0;
             }
-            TEntryList* elist = vElists[i];
+            // Build a fresh entry list for this file for sampling
+            std::ostringstream elname;
+            elname << "elist_sel_" << i;
+            std::string eldraw = ">>" + elname.str();
+            iTreeVector[i]->Draw( eldraw.c_str(), iCut, "entrylist" );
+            TEntryList* elist = ( TEntryList* )gDirectory->Get( elname.str().c_str() );
             if( elist && elist->GetN() > 0 )
             {
                 // select a random subsample using global fraction
@@ -308,9 +313,6 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
                     n++;
                 }
                 // cleanup: remove entry list from directory to keep memory bounded
-                // (safe even if used only here)
-                std::ostringstream elname;
-                elname << "elist_" << i;
                 gDirectory->Delete( elname.str().c_str() );
             }
             // remove this tree
