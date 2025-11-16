@@ -106,6 +106,51 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
     iDataTree_reduced->Branch( "MCe0", &MCe0, "MCe0/D" );
 
     Long64_t n = 0;
+    // First pass: compute total number of events after pre-cuts across all runs
+    Long64_t i_total_after_precuts = 0;
+    std::vector<TEntryList*> vElists;
+    vElists.resize( iTreeVector.size(), nullptr );
+    for( unsigned int i = 0; i < iTreeVector.size(); i++ )
+    {
+        if( iTreeVector[i] )
+        {
+            std::ostringstream elname;
+            elname << "elist_" << i;
+            std::string eldraw = ">>" + elname.str();
+            iTreeVector[i]->Draw( eldraw.c_str(), iCut, "entrylist" );
+            TEntryList* elist_sum = ( TEntryList* )gDirectory->Get( elname.str().c_str() );
+            vElists[i] = elist_sum;
+            if( elist_sum )
+            {
+                i_total_after_precuts += elist_sum->GetN();
+            }
+        }
+    }
+    // determine desired number of training events
+    double i_event_selected = ( double )iRun->fnTrain_Background;
+    if( iSignal )
+    {
+        i_event_selected = ( double )iRun->fnTrain_Signal;
+    }
+    // Compute a single global fraction to keep across all runs
+    double i_fraction_of_events_to_keep_global = 0.0;
+    if( i_total_after_precuts > 0 )
+    {
+        i_fraction_of_events_to_keep_global = i_event_selected / ( double )i_total_after_precuts;
+        // keep extra for testing sample (historical factor 10)
+        i_fraction_of_events_to_keep_global *= 10.0;
+        if( i_fraction_of_events_to_keep_global > 1.0 )
+        {
+            i_fraction_of_events_to_keep_global = 1.0;
+        }
+        if( i_fraction_of_events_to_keep_global < 0.0 )
+        {
+            i_fraction_of_events_to_keep_global = 0.0;
+        }
+    }
+    cout << "\t keeping " << i_fraction_of_events_to_keep_global * 100.0 << "\% of events (global)";
+    cout << " (training events: " << i_event_selected;
+    cout << ", events after pre-cuts (total): " << i_total_after_precuts << " number of runs: " << iTreeVector.size() << ")" << endl;
 
     for( unsigned  int i = 0; i < iTreeVector.size(); i++ )
     {
@@ -138,30 +183,13 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
                 cout << "Error preparing reduced tree" << endl;
                 return 0;
             }
-            iTreeVector[i]->Draw( ">>elist", iCut, "entrylist" );
-            TEntryList* elist = ( TEntryList* )gDirectory->Get( "elist" );
+            TEntryList* elist = vElists[i];
             if( elist && elist->GetN() > 0 )
             {
-                // select a random subsample
-                // require training and testing sample
-                // (add factor 10 to make sure that there are plenty
-                // of testing events)
-                double i_event_selected = ( double )iRun->fnTrain_Background;
-                if( iSignal )
-                {
-                    i_event_selected = ( double )iRun->fnTrain_Signal;
-                }
-                double i_fraction_of_events_to_keep =  i_event_selected / ( double )elist->GetN();
-                i_fraction_of_events_to_keep *= 10.;
-                if( iTreeVector.size() > 0. )
-                {
-                    i_fraction_of_events_to_keep /= ( double )iTreeVector.size();
-                }
-                if( i_fraction_of_events_to_keep > 1. )
-                {
-                    i_fraction_of_events_to_keep = 1.;
-                }
-                cout << "\t keeping " << i_fraction_of_events_to_keep * 100. << "\% of events of ";
+                // select a random subsample using global fraction
+                double i_fraction_of_events_to_keep = i_fraction_of_events_to_keep_global;
+                // per-file info
+                cout << "\t file fraction: " << i_fraction_of_events_to_keep * 100.0 << "\% of ";
                 if( iSignal )
                 {
                     cout << iRun->fSignalFileName[i];
@@ -170,9 +198,7 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
                 {
                     cout << iRun->fBackgroundFileName[i];
                 }
-                cout << " (training events: " << i_event_selected;
-                cout << ", events after pre-cuts: " << elist->GetN() << " number of runs: " << iTreeVector.size() << ")";
-                cout << endl;
+                cout << " (events after pre-cuts in file: " << elist->GetN() << ")" << endl;
                 for( Long64_t el = 0; el < elist->GetN(); el++ )
                 {
                     if( gRandom->Uniform() > i_fraction_of_events_to_keep )
@@ -184,6 +210,11 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
                     iDataTree_reduced->Fill();
                     n++;
                 }
+                // cleanup: remove entry list from directory to keep memory bounded
+                // (safe even if used only here)
+                std::ostringstream elname;
+                elname << "elist_" << i;
+                gDirectory->Delete( elname.str().c_str() );
             }
             // remove this tree
             if( iSignal )
