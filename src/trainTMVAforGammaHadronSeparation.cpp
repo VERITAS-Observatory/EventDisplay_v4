@@ -84,6 +84,13 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
     Double_t DispDiff = 0.;
     Float_t DispAbsSumWeigth = 0.;
     Double_t MCe0 = 0.;
+    // Per-telescope (ranked) variables (sorted by Size desc), padded by repeating last available
+    Float_t Width_r1 = 0., Width_r2 = 0., Width_r3 = 0., Width_r4 = 0.;
+    Float_t Length_r1 = 0., Length_r2 = 0., Length_r3 = 0., Length_r4 = 0.;
+    Float_t Loss_r1 = 0., Loss_r2 = 0., Loss_r3 = 0., Loss_r4 = 0.;
+    Float_t Rcore_r1 = 0., Rcore_r2 = 0., Rcore_r3 = 0., Rcore_r4 = 0.;
+    // Scratch arrays for reading per-telescope quantities (assumed up to 4 telescopes)
+    Float_t aWidth[4] = { 0 }, aLength[4] = { 0 }, aLoss[4] = { 0 }, aRcore[4] = { 0 }, aSize[4] = { 0 };
     iDataTree_reduced = new TTree( iDataTree_reducedName.c_str(), iDataTree_reducedName.c_str() );
     iDataTree_reduced->Branch( "Ze", &Ze, "Ze/D" );
     iDataTree_reduced->Branch( "Az", &Az, "Az/D" );
@@ -104,6 +111,23 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
     iDataTree_reduced->Branch( "DispDiff", &DispDiff, "DispDiff/D" );
     iDataTree_reduced->Branch( "DispAbsSumWeigth", &DispAbsSumWeigth, "DispAbsSumWeigth/F" );
     iDataTree_reduced->Branch( "MCe0", &MCe0, "MCe0/D" );
+    // New ranked per-telescope branches
+    iDataTree_reduced->Branch( "Width_r1", &Width_r1, "Width_r1/F" );
+    iDataTree_reduced->Branch( "Width_r2", &Width_r2, "Width_r2/F" );
+    iDataTree_reduced->Branch( "Width_r3", &Width_r3, "Width_r3/F" );
+    iDataTree_reduced->Branch( "Width_r4", &Width_r4, "Width_r4/F" );
+    iDataTree_reduced->Branch( "Length_r1", &Length_r1, "Length_r1/F" );
+    iDataTree_reduced->Branch( "Length_r2", &Length_r2, "Length_r2/F" );
+    iDataTree_reduced->Branch( "Length_r3", &Length_r3, "Length_r3/F" );
+    iDataTree_reduced->Branch( "Length_r4", &Length_r4, "Length_r4/F" );
+    iDataTree_reduced->Branch( "Loss_r1", &Loss_r1, "Loss_r1/F" );
+    iDataTree_reduced->Branch( "Loss_r2", &Loss_r2, "Loss_r2/F" );
+    iDataTree_reduced->Branch( "Loss_r3", &Loss_r3, "Loss_r3/F" );
+    iDataTree_reduced->Branch( "Loss_r4", &Loss_r4, "Loss_r4/F" );
+    iDataTree_reduced->Branch( "Rcore_r1", &Rcore_r1, "Rcore_r1/F" );
+    iDataTree_reduced->Branch( "Rcore_r2", &Rcore_r2, "Rcore_r2/F" );
+    iDataTree_reduced->Branch( "Rcore_r3", &Rcore_r3, "Rcore_r3/F" );
+    iDataTree_reduced->Branch( "Rcore_r4", &Rcore_r4, "Rcore_r4/F" );
 
     Long64_t n = 0;
     // First pass: compute total number of events after pre-cuts across all runs
@@ -178,6 +202,13 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
             {
                 iTreeVector[i]->SetBranchAddress( "MCe0", &MCe0 );
             }
+            // Bind per-telescope arrays (exact names)
+            int rc_w = iTreeVector[i]->SetBranchAddress( "width", aWidth );
+            int rc_l = iTreeVector[i]->SetBranchAddress( "length", aLength );
+            int rc_lo = iTreeVector[i]->SetBranchAddress( "loss", aLoss );
+            int rc_rc = iTreeVector[i]->SetBranchAddress( "R_core", aRcore );
+            int rc_s = iTreeVector[i]->SetBranchAddress( "size", aSize );
+            bool hasPerTel = ( rc_w == 0 && rc_l == 0 && rc_lo == 0 && rc_rc == 0 && rc_s == 0 );
             if(!iDataTree_reduced )
             {
                 cout << "Error preparing reduced tree" << endl;
@@ -207,6 +238,72 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
                     }
                     Long64_t treeEntry = elist->GetEntry( el );
                     iTreeVector[i]->GetEntry( treeEntry );
+                    // Compute ranked per-telescope variables if available
+                    // Default initialize to zeros
+                    Width_r1 = Width_r2 = Width_r3 = Width_r4 = 0.0;
+                    Length_r1 = Length_r2 = Length_r3 = Length_r4 = 0.0;
+                    Loss_r1 = Loss_r2 = Loss_r3 = Loss_r4 = 0.0;
+                    Rcore_r1 = Rcore_r2 = Rcore_r3 = Rcore_r4 = 0.0;
+                    if( hasPerTel )
+                    {
+                        int nim = ( int )NImages;
+                        if( nim < 0 )
+                        {
+                            nim = 0;
+                        }
+                        if( nim > 4 )
+                        {
+                            nim = 4;
+                        }
+                        int idx[4] = { 0, 1, 2, 3 };
+                        // selection sort indices by aSize desc
+                        for( int ii = 0; ii < nim; ii++ )
+                        {
+                            int maxj = ii;
+                            for( int jj = ii + 1; jj < nim; jj++ )
+                            {
+                                if( aSize[idx[jj]] > aSize[idx[maxj]] )
+                                {
+                                    maxj = jj;
+                                }
+                            }
+                            if( maxj != ii )
+                            {
+                                int tmp = idx[ii];
+                                idx[ii] = idx[maxj];
+                                idx[maxj] = tmp;
+                            }
+                        }
+
+                        // temporary arrays for ranks
+                        Float_t Wr[4] = { 0 }, Lr[4] = { 0 }, Lo[4] = { 0 }, Rc[4] = { 0 };
+                        int k;
+                        for( k = 0; k < nim; k++ )
+                        {
+                            int src = idx[k];
+                            Wr[k] = aWidth[src];
+                            Lr[k] = aLength[src];
+                            Lo[k] = aLoss[src];
+                            Rc[k] = aRcore[src];
+                        }
+                        if( nim > 0 )
+                        {
+                            int last = nim - 1;
+                            for( ; k < 4; k++ )
+                            {
+                                int src = idx[last];
+                                Wr[k] = aWidth[src];
+                                Lr[k] = aLength[src];
+                                Lo[k] = aLoss[src];
+                                Rc[k] = aRcore[src];
+                            }
+                        }
+                        // assign to branches
+                        Width_r1 = Wr[0]; Length_r1 = Lr[0]; Loss_r1 = Lo[0]; Rcore_r1 = Rc[0];
+                        Width_r2 = Wr[1]; Length_r2 = Lr[1]; Loss_r2 = Lo[1]; Rcore_r2 = Rc[1];
+                        Width_r3 = Wr[2]; Length_r3 = Lr[2]; Loss_r3 = Lo[2]; Rcore_r3 = Rc[2];
+                        Width_r4 = Wr[3]; Length_r4 = Lr[3]; Loss_r4 = Lo[3]; Rcore_r4 = Rc[3];
+                    }
                     iDataTree_reduced->Fill();
                     n++;
                 }
