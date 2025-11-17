@@ -92,8 +92,7 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
     Float_t Length_r1 = 0., Length_r2 = 0., Length_r3 = 0., Length_r4 = 0.;
     Float_t Loss_r1 = 0., Loss_r2 = 0., Loss_r3 = 0., Loss_r4 = 0.;
     Float_t Rcore_r1 = 0., Rcore_r2 = 0., Rcore_r3 = 0., Rcore_r4 = 0.;
-    // Scratch arrays for reading per-telescope quantities (assumed up to 4 telescopes)
-    Float_t aWidth[4] = { 0 }, aLength[4] = { 0 }, aLoss[4] = { 0 }, aRcore[4] = { 0 }, aSize[4] = { 0 };
+    // Per-telescope scratch buffers allocated per input file (dynamic size matching leaf length)
 
     // Create tree with smaller basket size to limit memory growth
     iDataTree_reduced = new TTree( iDataTree_reducedName.c_str(), iDataTree_reducedName.c_str() );
@@ -215,6 +214,17 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
             {
                 iTreeVector[i]->SetBranchAddress( "MCe0", &MCe0 );
             }
+            // Determine telescope array length from leaves (assume width exists if any per-telescope data)
+            Int_t telLeafLen = 0;
+            TLeaf* wLeaf = iTreeVector[i]->GetLeaf( "width" );
+            if( wLeaf ) telLeafLen = wLeaf->GetLen();
+            if( telLeafLen <= 0 ) telLeafLen = 4; // fallback
+            // allocate dynamic buffers
+            Float_t* aWidth = new Float_t[telLeafLen]();
+            Float_t* aLength = new Float_t[telLeafLen]();
+            Float_t* aLoss = new Float_t[telLeafLen]();
+            Float_t* aRcore = new Float_t[telLeafLen]();
+            Float_t* aSize = new Float_t[telLeafLen]();
             // Bind per-telescope arrays
             int rc_w = iTreeVector[i]->SetBranchAddress( "width", aWidth );
             int rc_l = iTreeVector[i]->SetBranchAddress( "length", aLength );
@@ -291,7 +301,8 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
                             int maxj = ii;
                             for( int jj = ii + 1; jj < selCount; jj++ )
                             {
-                                if( aSize[selIdx[jj]] > aSize[selIdx[maxj]] )
+                                // guard against out-of-range (ImgSel might reference telescopes beyond leaf length)
+                                if( selIdx[jj] < telLeafLen && selIdx[maxj] < telLeafLen && aSize[selIdx[jj]] > aSize[selIdx[maxj]] )
                                 {
                                     maxj = jj;
                                 }
@@ -310,20 +321,26 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
                         for( ; k < selCount && k < 4; k++ )
                         {
                             int src = selIdx[k];
-                            Wr[k] = aWidth[src];
-                            Lr[k] = aLength[src];
-                            Lo[k] = aLoss[src];
-                            Rc[k] = aRcore[src];
+                            if( src < telLeafLen )
+                            {
+                                Wr[k] = aWidth[src];
+                                Lr[k] = aLength[src];
+                                Lo[k] = aLoss[src];
+                                Rc[k] = aRcore[src];
+                            }
                         }
                         if( selCount > 0 )
                         {
                             int lastSrc = selIdx[selCount - 1];
                             for( ; k < 4; k++ )
                             {
-                                Wr[k] = aWidth[lastSrc];
-                                Lr[k] = aLength[lastSrc];
-                                Lo[k] = aLoss[lastSrc];
-                                Rc[k] = aRcore[lastSrc];
+                                if( lastSrc < telLeafLen )
+                                {
+                                    Wr[k] = aWidth[lastSrc];
+                                    Lr[k] = aLength[lastSrc];
+                                    Lo[k] = aLoss[lastSrc];
+                                    Rc[k] = aRcore[lastSrc];
+                                }
                             }
                         }
                         // assign to branches
@@ -384,6 +401,12 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
                     iRun->fBackgroundTree[i] = 0;
                 }
             }
+            // free dynamic buffers for this file
+            delete [] aWidth;
+            delete [] aLength;
+            delete [] aLoss;
+            delete [] aRcore;
+            delete [] aSize;
         }
     }
     if( iSignal && iDataTree_reduced )
