@@ -9,6 +9,7 @@
 #include "TFile.h"
 #include "TH1D.h"
 #include "TMath.h"
+#include "TROOT.h"
 #include "TSystem.h"
 #include "TTree.h"
 
@@ -334,6 +335,7 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
             if( currentChain )
             {
                 // Close all files in the TChain before deleting to release file descriptors
+                // TChain keeps a list of open files; we need to close them explicitly
                 TObjArray* fileElements = currentChain->GetListOfFiles();
                 if( fileElements )
                 {
@@ -341,10 +343,13 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
                     TChainElement* chEl = 0;
                     while( ( chEl = ( TChainElement* )next() ) )
                     {
-                        TFile* f = chEl->GetFile();
+                        // Get the file name and close it if open in ROOT's global list
+                        const char* fname = chEl->GetTitle();
+                        TFile* f = ( TFile* )gROOT->GetListOfFiles()->FindObject( fname );
                         if( f && f->IsOpen() )
                         {
                             f->Close();
+                            delete f;
                         }
                     }
                 }
@@ -388,10 +393,13 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
                 TChainElement* chEl = 0;
                 while( ( chEl = ( TChainElement* )next() ) )
                 {
-                    TFile* f = chEl->GetFile();
+                    // Get the file name and close it if open in ROOT's global list
+                    const char* fname = chEl->GetTitle();
+                    TFile* f = ( TFile* )gROOT->GetListOfFiles()->FindObject( fname );
                     if( f && f->IsOpen() )
                     {
                         f->Close();
+                        delete f;
                     }
                 }
             }
