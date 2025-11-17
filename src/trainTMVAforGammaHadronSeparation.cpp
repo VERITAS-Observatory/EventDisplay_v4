@@ -4,12 +4,10 @@
 */
 
 #include "TChain.h"
-#include "TChainElement.h"
 #include "TCut.h"
 #include "TFile.h"
 #include "TH1D.h"
 #include "TMath.h"
-#include "TROOT.h"
 #include "TSystem.h"
 #include "TTree.h"
 
@@ -80,24 +78,13 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
     Double_t Xoff_derot = 0.;
     Double_t Yoff_derot = 0.;
     Int_t NImages = 0;
-    ULong64_t ImgSel = 0ULL;
     Float_t EmissionHeight = 0.;
     Float_t EmissionHeightChi2 = 0.;
     Double_t SizeSecondMax = 0.;
     Double_t DispDiff = 0.;
     Float_t DispAbsSumWeigth = 0.;
     Double_t MCe0 = 0.;
-    // Per-telescope (ranked) variables (sorted by Size desc), padded by repeating last available
-    Float_t Width_r1 = 0., Width_r2 = 0., Width_r3 = 0., Width_r4 = 0.;
-    Float_t Length_r1 = 0., Length_r2 = 0., Length_r3 = 0., Length_r4 = 0.;
-    Float_t Loss_r1 = 0., Loss_r2 = 0., Loss_r3 = 0., Loss_r4 = 0.;
-    Float_t Rcore_r1 = 0., Rcore_r2 = 0., Rcore_r3 = 0., Rcore_r4 = 0.;
-    // Per-telescope scratch buffers allocated per input file (dynamic size matching leaf length)
-
-    // Create tree with smaller basket size to limit memory growth
     iDataTree_reduced = new TTree( iDataTree_reducedName.c_str(), iDataTree_reducedName.c_str() );
-    iDataTree_reduced->SetAutoFlush( 1000 );  // Flush to disk every 1000 entries
-    iDataTree_reduced->SetAutoSave( 10000000 ); // AutoSave every 10MB
     iDataTree_reduced->Branch( "Ze", &Ze, "Ze/D" );
     iDataTree_reduced->Branch( "Az", &Az, "Az/D" );
     iDataTree_reduced->Branch( "WobbleN", &WobbleN, "WobbleN/D" );
@@ -117,79 +104,13 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
     iDataTree_reduced->Branch( "DispDiff", &DispDiff, "DispDiff/D" );
     iDataTree_reduced->Branch( "DispAbsSumWeigth", &DispAbsSumWeigth, "DispAbsSumWeigth/F" );
     iDataTree_reduced->Branch( "MCe0", &MCe0, "MCe0/D" );
-    // Ranked per-telescope branches
-    iDataTree_reduced->Branch( "Width_r1", &Width_r1, "Width_r1/F" );
-    iDataTree_reduced->Branch( "Width_r2", &Width_r2, "Width_r2/F" );
-    iDataTree_reduced->Branch( "Width_r3", &Width_r3, "Width_r3/F" );
-    iDataTree_reduced->Branch( "Width_r4", &Width_r4, "Width_r4/F" );
-    iDataTree_reduced->Branch( "Length_r1", &Length_r1, "Length_r1/F" );
-    iDataTree_reduced->Branch( "Length_r2", &Length_r2, "Length_r2/F" );
-    iDataTree_reduced->Branch( "Length_r3", &Length_r3, "Length_r3/F" );
-    iDataTree_reduced->Branch( "Length_r4", &Length_r4, "Length_r4/F" );
-    iDataTree_reduced->Branch( "Loss_r1", &Loss_r1, "Loss_r1/F" );
-    iDataTree_reduced->Branch( "Loss_r2", &Loss_r2, "Loss_r2/F" );
-    iDataTree_reduced->Branch( "Loss_r3", &Loss_r3, "Loss_r3/F" );
-    iDataTree_reduced->Branch( "Loss_r4", &Loss_r4, "Loss_r4/F" );
-    iDataTree_reduced->Branch( "Rcore_r1", &Rcore_r1, "Rcore_r1/F" );
-    iDataTree_reduced->Branch( "Rcore_r2", &Rcore_r2, "Rcore_r2/F" );
-    iDataTree_reduced->Branch( "Rcore_r3", &Rcore_r3, "Rcore_r3/F" );
-    iDataTree_reduced->Branch( "Rcore_r4", &Rcore_r4, "Rcore_r4/F" );
 
     Long64_t n = 0;
-    // First pass: compute total number of events after pre-cuts across all runs
-    Long64_t i_total_after_precuts = 0;
-    // First pass: for each tree, build a temporary entry list, count entries, then delete it immediately
-    for( unsigned int i = 0; i < iTreeVector.size(); i++ )
-    {
-        if( iTreeVector[i] )
-        {
-            std::ostringstream elname;
-            elname << "elist_cnt_" << i;
-            std::string eldraw = ">>" + elname.str();
-            iTreeVector[i]->Draw( eldraw.c_str(), iCut, "entrylist" );
-            TEntryList* elist_sum = ( TEntryList* )gDirectory->Get( elname.str().c_str() );
-            if( elist_sum )
-            {
-                i_total_after_precuts += elist_sum->GetN();
-            }
-            // cleanup the entry list immediately to avoid holding open files
-            gDirectory->Delete( elname.str().c_str() );
-        }
-    }
-    // determine desired number of training events
-    double i_event_selected = ( double )iRun->fnTrain_Background;
-    if( iSignal )
-    {
-        i_event_selected = ( double )iRun->fnTrain_Signal;
-    }
-    // Compute a single global fraction to keep across all runs
-    double i_fraction_of_events_to_keep_global = 0.0;
-    if( i_total_after_precuts > 0 )
-    {
-        i_fraction_of_events_to_keep_global = i_event_selected / ( double )i_total_after_precuts;
-        // keep extra for testing sample (historical factor 10)
-        i_fraction_of_events_to_keep_global *= 10.0;
-        if( i_fraction_of_events_to_keep_global > 1.0 )
-        {
-            i_fraction_of_events_to_keep_global = 1.0;
-        }
-        if( i_fraction_of_events_to_keep_global < 0.0 )
-        {
-            i_fraction_of_events_to_keep_global = 0.0;
-        }
-    }
-    cout << "\t keeping " << i_fraction_of_events_to_keep_global * 100.0 << "\% of events (global)";
-    cout << " (training events: " << i_event_selected;
-    cout << ", events after pre-cuts (total): " << i_total_after_precuts << " number of runs: " << iTreeVector.size() << ")" << endl;
 
     for( unsigned  int i = 0; i < iTreeVector.size(); i++ )
     {
         if( iTreeVector[i] )
         {
-            // Disable TChain file caching to minimize memory usage
-            iTreeVector[i]->SetCacheSize( 0 );
-
-            // Set branch addresses only for this specific tree to avoid opening all files at once
             iTreeVector[i]->SetBranchAddress( "Ze", &Ze );
             iTreeVector[i]->SetBranchAddress( "Az", &Az );
             iTreeVector[i]->SetBranchAddress( "WobbleN", &WobbleN );
@@ -203,8 +124,6 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
             iTreeVector[i]->SetBranchAddress( "Xoff_derot", &Xoff_derot );
             iTreeVector[i]->SetBranchAddress( "Yoff_derot", &Yoff_derot );
             iTreeVector[i]->SetBranchAddress( "NImages", &NImages );
-            // selection mask: only use indices present in ImgSel
-            int rc_imgsel = iTreeVector[i]->SetBranchAddress( "ImgSel", &ImgSel );
             iTreeVector[i]->SetBranchAddress( "EmissionHeight", &EmissionHeight );
             iTreeVector[i]->SetBranchAddress( "EmissionHeightChi2", &EmissionHeightChi2 );
             iTreeVector[i]->SetBranchAddress( "SizeSecondMax", &SizeSecondMax );
@@ -214,42 +133,35 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
             {
                 iTreeVector[i]->SetBranchAddress( "MCe0", &MCe0 );
             }
-            // Determine telescope array length from leaves (assume width exists if any per-telescope data)
-            Int_t telLeafLen = 0;
-            TLeaf* wLeaf = iTreeVector[i]->GetLeaf( "width" );
-            if( wLeaf ) telLeafLen = wLeaf->GetLen();
-            if( telLeafLen <= 0 ) telLeafLen = 4; // fallback
-            // allocate dynamic buffers
-            Float_t* aWidth = new Float_t[telLeafLen]();
-            Float_t* aLength = new Float_t[telLeafLen]();
-            Float_t* aLoss = new Float_t[telLeafLen]();
-            Float_t* aRcore = new Float_t[telLeafLen]();
-            Float_t* aSize = new Float_t[telLeafLen]();
-            // Bind per-telescope arrays
-            int rc_w = iTreeVector[i]->SetBranchAddress( "width", aWidth );
-            int rc_l = iTreeVector[i]->SetBranchAddress( "length", aLength );
-            int rc_lo = iTreeVector[i]->SetBranchAddress( "loss", aLoss );
-            int rc_rc = iTreeVector[i]->SetBranchAddress( "R_core", aRcore );
-            int rc_s = iTreeVector[i]->SetBranchAddress( "size", aSize );
-            bool hasPerTel = ( rc_w == 0 && rc_l == 0 && rc_lo == 0 && rc_rc == 0 && rc_s == 0 );
-            bool hasImgSel = ( rc_imgsel == 0 );
             if(!iDataTree_reduced )
             {
                 cout << "Error preparing reduced tree" << endl;
                 return 0;
             }
-            // Build a fresh entry list for this file for sampling
-            std::ostringstream elname;
-            elname << "elist_sel_" << i;
-            std::string eldraw = ">>" + elname.str();
-            iTreeVector[i]->Draw( eldraw.c_str(), iCut, "entrylist" );
-            TEntryList* elist = ( TEntryList* )gDirectory->Get( elname.str().c_str() );
+            iTreeVector[i]->Draw( ">>elist", iCut, "entrylist" );
+            TEntryList* elist = ( TEntryList* )gDirectory->Get( "elist" );
             if( elist && elist->GetN() > 0 )
             {
-                // select a random subsample using global fraction
-                double i_fraction_of_events_to_keep = i_fraction_of_events_to_keep_global;
-                // per-file info
-                cout << "\t file fraction: " << i_fraction_of_events_to_keep * 100.0 << "\% of ";
+                // select a random subsample
+                // require training and testing sample
+                // (add factor 10 to make sure that there are plenty
+                // of testing events)
+                double i_event_selected = ( double )iRun->fnTrain_Background;
+                if( iSignal )
+                {
+                    i_event_selected = ( double )iRun->fnTrain_Signal;
+                }
+                double i_fraction_of_events_to_keep =  i_event_selected / ( double )elist->GetN();
+                i_fraction_of_events_to_keep *= 10.;
+                if( iTreeVector.size() > 0. )
+                {
+                    i_fraction_of_events_to_keep /= ( double )iTreeVector.size();
+                }
+                if( i_fraction_of_events_to_keep > 1. )
+                {
+                    i_fraction_of_events_to_keep = 1.;
+                }
+                cout << "\t keeping " << i_fraction_of_events_to_keep * 100. << "\% of events of ";
                 if( iSignal )
                 {
                     cout << iRun->fSignalFileName[i];
@@ -258,7 +170,9 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
                 {
                     cout << iRun->fBackgroundFileName[i];
                 }
-                cout << " (events after pre-cuts in file: " << elist->GetN() << ")" << endl;
+                cout << " (training events: " << i_event_selected;
+                cout << ", events after pre-cuts: " << elist->GetN() << " number of runs: " << iTreeVector.size() << ")";
+                cout << endl;
                 for( Long64_t el = 0; el < elist->GetN(); el++ )
                 {
                     if( gRandom->Uniform() > i_fraction_of_events_to_keep )
@@ -267,146 +181,21 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
                     }
                     Long64_t treeEntry = elist->GetEntry( el );
                     iTreeVector[i]->GetEntry( treeEntry );
-                    // Compute ranked per-telescope variables if available
-                    // Default initialize to zeros
-                    Width_r1 = Width_r2 = Width_r3 = Width_r4 = 0.0;
-                    Length_r1 = Length_r2 = Length_r3 = Length_r4 = 0.0;
-                    Loss_r1 = Loss_r2 = Loss_r3 = Loss_r4 = 0.0;
-                    Rcore_r1 = Rcore_r2 = Rcore_r3 = Rcore_r4 = 0.0;
-                    if( hasPerTel )
-                    {
-                        // build selected index list from ImgSel (lower 4 bits)
-                        int selIdx[4];
-                        int selCount = 0;
-                        if( hasImgSel )
-                        {
-                            for( int ii = 0; ii < 4; ii++ )
-                            {
-                                if( ( ImgSel & ( 1ULL << ii ) ) != 0 )
-                                {
-                                    selIdx[selCount++] = ii;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            int nim = NImages;
-                            if( nim > 4 ) nim = 4;
-                            if( nim < 0 ) nim = 0;
-                            for( int ii = 0; ii < nim; ii++ ) selIdx[selCount++] = ii;
-                        }
-                        // sort selected indices by size desc
-                        for( int ii = 0; ii < selCount; ii++ )
-                        {
-                            int maxj = ii;
-                            for( int jj = ii + 1; jj < selCount; jj++ )
-                            {
-                                // guard against out-of-range (ImgSel might reference telescopes beyond leaf length)
-                                if( selIdx[jj] < telLeafLen && selIdx[maxj] < telLeafLen && aSize[selIdx[jj]] > aSize[selIdx[maxj]] )
-                                {
-                                    maxj = jj;
-                                }
-                            }
-                            if( maxj != ii )
-                            {
-                                int tmp = selIdx[ii];
-                                selIdx[ii] = selIdx[maxj];
-                                selIdx[maxj] = tmp;
-                            }
-                        }
-
-                        // temporary arrays for ranks
-                        Float_t Wr[4] = { 0 }, Lr[4] = { 0 }, Lo[4] = { 0 }, Rc[4] = { 0 };
-                        int k = 0;
-                        for( ; k < selCount && k < 4; k++ )
-                        {
-                            int src = selIdx[k];
-                            if( src < telLeafLen )
-                            {
-                                Wr[k] = aWidth[src];
-                                Lr[k] = aLength[src];
-                                Lo[k] = aLoss[src];
-                                Rc[k] = aRcore[src];
-                            }
-                        }
-                        if( selCount > 0 )
-                        {
-                            int lastSrc = selIdx[selCount - 1];
-                            for( ; k < 4; k++ )
-                            {
-                                if( lastSrc < telLeafLen )
-                                {
-                                    Wr[k] = aWidth[lastSrc];
-                                    Lr[k] = aLength[lastSrc];
-                                    Lo[k] = aLoss[lastSrc];
-                                    Rc[k] = aRcore[lastSrc];
-                                }
-                            }
-                        }
-                        // assign to branches
-                        Width_r1 = Wr[0]; Length_r1 = Lr[0]; Loss_r1 = Lo[0]; Rcore_r1 = Rc[0];
-                        Width_r2 = Wr[1]; Length_r2 = Lr[1]; Loss_r2 = Lo[1]; Rcore_r2 = Rc[1];
-                        Width_r3 = Wr[2]; Length_r3 = Lr[2]; Loss_r3 = Lo[2]; Rcore_r3 = Rc[2];
-                        Width_r4 = Wr[3]; Length_r4 = Lr[3]; Loss_r4 = Lo[3]; Rcore_r4 = Rc[3];
-                    }
                     iDataTree_reduced->Fill();
                     n++;
                 }
-                // cleanup: remove entry list from directory to keep memory bounded
-                gDirectory->Delete( elname.str().c_str() );
             }
-
-            // Periodically flush tree baskets to limit memory growth
-            // More frequent for large run counts
-            if( i % 5 == 0 && i > 0 )
+            // remove this tree
+            if( iSignal )
             {
-                iDataTree_reduced->FlushBaskets();
-                if( i % 50 == 0 )
-                {
-                    cout << "\\t processed " << i << " / " << iTreeVector.size() << " files..." << endl;
-                }
+                iRun->fSignalTree[i]->Delete();
+                iRun->fSignalTree[i] = 0;
             }
-
-            // remove this tree and close underlying files explicitly
-            TChain* currentChain = iSignal ? iRun->fSignalTree[i] : iRun->fBackgroundTree[i];
-            if( currentChain )
+            else
             {
-                // Close all files in the TChain before deleting to release file descriptors
-                // TChain keeps a list of open files; we need to close them explicitly
-                TObjArray* fileElements = currentChain->GetListOfFiles();
-                if( fileElements )
-                {
-                    TIter next( fileElements );
-                    TChainElement* chEl = 0;
-                    while( ( chEl = ( TChainElement* )next() ) )
-                    {
-                        // Get the file name and close it if open in ROOT's global list
-                        const char* fname = chEl->GetTitle();
-                        TFile* f = ( TFile* )gROOT->GetListOfFiles()->FindObject( fname );
-                        if( f && f->IsOpen() )
-                        {
-                            f->Close();
-                            delete f;
-                        }
-                    }
-                }
-                currentChain->Reset();
-                delete currentChain;
-                if( iSignal )
-                {
-                    iRun->fSignalTree[i] = 0;
-                }
-                else
-                {
-                    iRun->fBackgroundTree[i] = 0;
-                }
+                iRun->fBackgroundTree[i]->Delete();
+                iRun->fBackgroundTree[i] = 0;
             }
-            // free dynamic buffers for this file
-            delete [] aWidth;
-            delete [] aLength;
-            delete [] aLoss;
-            delete [] aRcore;
-            delete [] aSize;
         }
     }
     if( iSignal && iDataTree_reduced )
@@ -422,40 +211,18 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
         cout << "Error in reducing data trees (missing tree)" << endl;
         return 0;
     }
-    // cleanup all remaining trees (if any were skipped)
+    // cleanup all remaining trees
     for( unsigned int i = 0; i < iTreeVector.size(); i++ )
     {
-        TChain* remainingChain = iSignal ? iRun->fSignalTree[i] : iRun->fBackgroundTree[i];
-        if( remainingChain )
+        if( iSignal && iRun->fSignalTree[i] )
         {
-            // Close all files in the TChain before deleting
-            TObjArray* fileElements = remainingChain->GetListOfFiles();
-            if( fileElements )
-            {
-                TIter next( fileElements );
-                TChainElement* chEl = 0;
-                while( ( chEl = ( TChainElement* )next() ) )
-                {
-                    // Get the file name and close it if open in ROOT's global list
-                    const char* fname = chEl->GetTitle();
-                    TFile* f = ( TFile* )gROOT->GetListOfFiles()->FindObject( fname );
-                    if( f && f->IsOpen() )
-                    {
-                        f->Close();
-                        delete f;
-                    }
-                }
-            }
-            remainingChain->Reset();
-            delete remainingChain;
-            if( iSignal )
-            {
-                iRun->fSignalTree[i] = 0;
-            }
-            else
-            {
-                iRun->fBackgroundTree[i] = 0;
-            }
+            iRun->fSignalTree[i]->Delete();
+            iRun->fSignalTree[i] = 0;
+        }
+        else if(!iSignal && iRun->fBackgroundTree[i] )
+        {
+            iRun->fBackgroundTree[i]->Delete();
+            iRun->fBackgroundTree[i] = 0;
         }
     }
     return iDataTree_reduced;
