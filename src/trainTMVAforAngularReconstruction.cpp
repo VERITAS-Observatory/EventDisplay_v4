@@ -127,7 +127,7 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
     ntest *= 0.8;
     cout << "\tnumber of training events: " << ntrain << endl;
     cout << "\tnumber of test events    : " << ntest  << endl;
-    cout << "\tfraction of test events  : " << iTrainTest << endl << endl;
+    cout << "\tfraction of training events  : " << iTrainTest << endl << endl;
     std::ostringstream train_and_test_conditions ;
     train_and_test_conditions << "nTrain_Regression=" << ntrain << ":" ;
     train_and_test_conditions << "nTest_Regression="  << ntest  << ":" ;
@@ -171,6 +171,8 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
     dataloader->AddVariable( "cross", 'F' );
     dataloader->AddVariable( "asym", 'F' );
     dataloader->AddVariable( "loss", 'F' );
+    dataloader->AddVariable( "loss*loss", 'F' );
+    dataloader->AddVariable( "loss*dist", 'F' );
     dataloader->AddVariable( "dist", 'F' );
     dataloader->AddVariable( "fui", 'F' );
     if( iTargetML.find( "DispEnergy" ) != string::npos )

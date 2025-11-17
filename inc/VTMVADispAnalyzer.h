@@ -40,6 +40,8 @@ class VTMVADispAnalyzer
         float fZe;
         float fAz;
         float fLoss;
+        float fLoss_sq;
+        float fLoss_dist;
         float fDist;
         float fFui;
         float fAsymm;

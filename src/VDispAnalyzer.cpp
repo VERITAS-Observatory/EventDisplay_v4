@@ -525,7 +525,16 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
             {
                 if( i < dispErrorT.size() )
                 {
-                    v_weight.push_back( exp(-1. * fDispErrorExponential* TMath::Abs( dispErrorT[i] ) ) );
+                    float dispError_inflated = dispErrorT[i];
+                    // Inflate uncertainty for high-loss (leakage) images
+                    // Loss > 0.05 indicates edge truncation, which systematically biases DISP
+                    // Inflation factor: 1 + 5*loss, so loss=0.1 -> 1.5x, loss=0.2 -> 2.0x
+                    if( img_loss[i] > 0.05 )
+                    {
+                        float loss_inflation = 1.0 + 5.0 * img_loss[i];
+                        dispError_inflated *= loss_inflation;
+                    }
+                    v_weight.push_back( exp(-1. * fDispErrorExponential* TMath::Abs( dispError_inflated ) ) );
                     if(!UseIntersectForHeadTail && i < dispSignT.size() && dispSignT[i] > -99. )
                     {
                         v_weight.back() *= dispSignT[i];
@@ -539,9 +548,16 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
             // no estimated uncertainties: use image size and geometry
             else
             {
-                v_weight.push_back( img_size[i] * img_weight[i] * ( 1. - img_width[i] / img_length[i] )
+                float geom_weight = img_size[i] * img_weight[i] * ( 1. - img_width[i] / img_length[i] )
                                     * img_size[i] * img_weight[i] * ( 1. - img_width[i] / img_length[i] )
-                                    * img_fui[i] * img_fui[i] * img_fui[i] * img_fui[i] );
+                                    * img_fui[i] * img_fui[i] * img_fui[i] * img_fui[i];
+                // Downweight high-loss images: loss=0.1 -> 0.61x, loss=0.2 -> 0.37x
+                if( img_loss[i] > 0.05 )
+                {
+                    float loss_penalty = exp( -5.0 * img_loss[i] );
+                    geom_weight *= loss_penalty;
+                }
+                v_weight.push_back( geom_weight );
             }
 
             x.push_back( img_cen_x[i] );
