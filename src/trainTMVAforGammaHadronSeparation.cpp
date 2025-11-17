@@ -155,24 +155,6 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
             }
             // cleanup the entry list immediately to avoid holding open files
             gDirectory->Delete( elname.str().c_str() );
-
-            // Close files after first pass counting to release memory
-            TObjArray* fileElements = iTreeVector[i]->GetListOfFiles();
-            if( fileElements )
-            {
-                TIter next( fileElements );
-                TChainElement* chEl = 0;
-                while( ( chEl = ( TChainElement* )next() ) )
-                {
-                    const char* fname = chEl->GetTitle();
-                    TFile* f = ( TFile* )gROOT->GetListOfFiles()->FindObject( fname );
-                    if( f && f->IsOpen() )
-                    {
-                        f->Close();
-                        delete f;
-                    }
-                }
-            }
         }
     }
     // determine desired number of training events
