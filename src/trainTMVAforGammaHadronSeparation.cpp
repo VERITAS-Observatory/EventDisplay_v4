@@ -94,7 +94,11 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
     Float_t Rcore_r1 = 0., Rcore_r2 = 0., Rcore_r3 = 0., Rcore_r4 = 0.;
     // Scratch arrays for reading per-telescope quantities (assumed up to 4 telescopes)
     Float_t aWidth[4] = { 0 }, aLength[4] = { 0 }, aLoss[4] = { 0 }, aRcore[4] = { 0 }, aSize[4] = { 0 };
+
+    // Create tree with smaller basket size to limit memory growth
     iDataTree_reduced = new TTree( iDataTree_reducedName.c_str(), iDataTree_reducedName.c_str() );
+    iDataTree_reduced->SetAutoFlush( 1000 );  // Flush to disk every 1000 entries
+    iDataTree_reduced->SetAutoSave( 10000000 ); // AutoSave every 10MB
     iDataTree_reduced->Branch( "Ze", &Ze, "Ze/D" );
     iDataTree_reduced->Branch( "Az", &Az, "Az/D" );
     iDataTree_reduced->Branch( "WobbleN", &WobbleN, "WobbleN/D" );
@@ -151,6 +155,24 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
             }
             // cleanup the entry list immediately to avoid holding open files
             gDirectory->Delete( elname.str().c_str() );
+
+            // Close files after first pass counting to release memory
+            TObjArray* fileElements = iTreeVector[i]->GetListOfFiles();
+            if( fileElements )
+            {
+                TIter next( fileElements );
+                TChainElement* chEl = 0;
+                while( ( chEl = ( TChainElement* )next() ) )
+                {
+                    const char* fname = chEl->GetTitle();
+                    TFile* f = ( TFile* )gROOT->GetListOfFiles()->FindObject( fname );
+                    if( f && f->IsOpen() )
+                    {
+                        f->Close();
+                        delete f;
+                    }
+                }
+            }
         }
     }
     // determine desired number of training events
@@ -183,6 +205,10 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
     {
         if( iTreeVector[i] )
         {
+            // Disable TChain file caching to minimize memory usage
+            iTreeVector[i]->SetCacheSize( 0 );
+
+            // Set branch addresses only for this specific tree to avoid opening all files at once
             iTreeVector[i]->SetBranchAddress( "Ze", &Ze );
             iTreeVector[i]->SetBranchAddress( "Az", &Az );
             iTreeVector[i]->SetBranchAddress( "WobbleN", &WobbleN );
@@ -330,6 +356,18 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
                 // cleanup: remove entry list from directory to keep memory bounded
                 gDirectory->Delete( elname.str().c_str() );
             }
+
+            // Periodically flush tree baskets to limit memory growth
+            // More frequent for large run counts
+            if( i % 5 == 0 && i > 0 )
+            {
+                iDataTree_reduced->FlushBaskets();
+                if( i % 50 == 0 )
+                {
+                    cout << "\\t processed " << i << " / " << iTreeVector.size() << " files..." << endl;
+                }
+            }
+
             // remove this tree and close underlying files explicitly
             TChain* currentChain = iSignal ? iRun->fSignalTree[i] : iRun->fBackgroundTree[i];
             if( currentChain )
