@@ -37,10 +37,6 @@ void VTMVAEvaluator::reset()
     fDispDiff_log10 = 0.;
     fDispAbsSumWeigth = 0.;
     fDummy = 0.;
-    fWidth_r1 = fWidth_r2 = fWidth_r3 = fWidth_r4 = 0.0f;
-    fLength_r1 = fLength_r2 = fLength_r3 = fLength_r4 = 0.0f;
-    fLoss_r1 = fLoss_r2 = fLoss_r3 = fLoss_r4 = 0.0f;
-    fRcore_r1 = fRcore_r2 = fRcore_r3 = fRcore_r4 = 0.0f;
 
     setTMVACutValue();
     setSignalEfficiency();
@@ -178,6 +174,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
         fIsZombie = true;
         return false;
     }
+    char hname[800];
 
     //////////////////////////////
     // reset data vector
@@ -191,47 +188,8 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
     cout << "VTMVAEvaluator::initializeWeightFiles: reading energy and zenith bins from TMVA root files ";
     cout << "(nbinE: " << iNbinE << ", nbinZ: " << iNbinZ << ")" << endl;
 
-    if(!buildTMVADataFromFiles( iWeightFileName, iWeightFileIndex_Emin, iWeightFileIndex_Emax,
-                                iWeightFileIndex_Zmin, iWeightFileIndex_Zmax ) )
-    {
-        return false;
-    }
-
-    // initialize TMVA readers
-    if(!setupTMVAReaders( iWeightFileIndex_Emin, iWeightFileIndex_Emax,
-                          iWeightFileIndex_Zmin, iWeightFileIndex_Zmax ) )
-    {
-        return false;
-    }
-
-    // smooth and interpolate
-    if( fParticleNumberFileName.size() > 0 && fSmoothAndInterpolateMVAValues )
-    {
-        smoothAndInterPolateMVAValue( 0, 0,
-                                      iWeightFileIndex_Emin, iWeightFileIndex_Emax,
-                                      iWeightFileIndex_Zmin, iWeightFileIndex_Zmax );
-    }
-
-    // print some info to screen
-    cout << "VTMVAEvaluator: Initialized " << fTMVAData.size() << " MVA readers " << endl;
-
-    fillTMVAEvaluatorResults();
-
-    return true;
-}
-
-// Helper: build TMVA data by scanning root/xml files and pushing per-bin metadata
-bool VTMVAEvaluator::buildTMVADataFromFiles( const std::string& iWeightFileName,
-        unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
-        unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax )
-{
-    char hname[800];
-    unsigned int iNbinE = iWeightFileIndex_Emax - iWeightFileIndex_Emin + 1;
-    unsigned int iNbinZ = iWeightFileIndex_Zmax - iWeightFileIndex_Zmin + 1;
-
-    cout << "VTMVAEvaluator::initializeWeightFiles: reading energy and zenith bins from TMVA root files ";
-    cout << "(nbinE: " << iNbinE << ", nbinZ: " << iNbinZ << ")" << endl;
-
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    // read energy and zenith binning from root files and check that all necessary objects are in the file
     unsigned int iMinMissingBin = 0;
     for( unsigned int i = 0; i < iNbinE; i++ )
     {
@@ -268,14 +226,18 @@ bool VTMVAEvaluator::buildTMVADataFromFiles( const std::string& iWeightFileName,
                         cout << "  No energy or zenith cut data" << endl;
                         bGoodRun = false;
                     }
+                    // signal efficiency
                     sprintf( hname, "Method_%s/%s_0/MVA_%s_0_effS",
                              fTMVAMethodName.c_str(), fTMVAMethodName.c_str(), fTMVAMethodName.c_str() );
+
                     if(!iF.Get( hname ) )
                     {
                         cout << "  No signal efficiency histogram found (" << hname << ")" << endl;
                         bGoodRun = false;
                     }
                 }
+                // allow that first files are missing
+                // (this happens when there are no training events in the first energy or zenith bins)
                 if(!bGoodRun )
                 {
                     if( i == iMinMissingBin || j == jMinMissingBin )
@@ -325,16 +287,26 @@ bool VTMVAEvaluator::buildTMVADataFromFiles( const std::string& iWeightFileName,
                     fIsZombie = true;
                     return false;
                 }
+                // form here on: expect a good TMVA file
+                // initialize one value per energy/zenith bin
 
+                // set energy binning:
+                //    - one VTMVAEvaluatorData per energy bin
+                //    - bins are set for the energy interval read from the root file:
+                //      [iEnergyData->fEnergyCut_Log10TeV_min, iEnergyData->fEnergyCut_Log10TeV_max]
+                // central data element for this energy bin
                 fTMVAData.push_back( new VTMVAEvaluatorData() );
                 fTMVAData.back()->fEnergyBin = i;
                 fTMVAData.back()->fZenithBin = j;
                 fTMVAData.back()->fEnergyCut_Log10TeV_min = iEnergyData->fEnergyCut_Log10TeV_min;
                 fTMVAData.back()->fEnergyCut_Log10TeV_max = iEnergyData->fEnergyCut_Log10TeV_max;
+
+                // calculate spectral weighted mean energy
                 fTMVAData.back()->fSpectralWeightedMeanEnergy_Log10TeV =
-                    VMathsandFunctions::getSpectralWeightedMeanEnergy( fTMVAData.back()->fEnergyCut_Log10TeV_min,
-                            fTMVAData.back()->fEnergyCut_Log10TeV_max,
-                            fSpectralIndexForEnergyWeighting );
+                             VMathsandFunctions::getSpectralWeightedMeanEnergy( fTMVAData.back()->fEnergyCut_Log10TeV_min,
+                                 fTMVAData.back()->fEnergyCut_Log10TeV_max,
+                                 fSpectralIndexForEnergyWeighting );
+                // zenith angle range
                 if( iZenithData )
                 {
                     fTMVAData.back()->fZenithCut_min = iZenithData->fZenithCut_min;
@@ -345,6 +317,7 @@ bool VTMVAEvaluator::buildTMVADataFromFiles( const std::string& iWeightFileName,
                     fTMVAData.back()->fZenithCut_min = 0.;
                     fTMVAData.back()->fZenithCut_max = 90.;
                 }
+
 
                 fTMVAData.back()->fSignalEfficiency = getSignalEfficiency( iWeightFileIndex_Emin + i,
                                                       iEnergyData->fEnergyCut_Log10TeV_min,
@@ -374,9 +347,13 @@ bool VTMVAEvaluator::buildTMVADataFromFiles( const std::string& iWeightFileName,
                 fTMVAData.back()->fTMVAName = iTMVAName;
                 fTMVAData.back()->fTMVAFileName = iFullFileName;
                 fTMVAData.back()->fTMVAFileNameXML = iFullFileNameXML;
+
+                iF.Close();
             }
-        }
-    }
+        }//end loop on zenith bins
+    }//end loop on energy bins
+
+    // after this stage, there should be no energy/zenith bins (both of them are combined)
 
     if( fTMVAData.size() == 0 )
     {
@@ -387,59 +364,11 @@ bool VTMVAEvaluator::buildTMVADataFromFiles( const std::string& iWeightFileName,
     {
         fTMVAData[i]->print();
     }
-    return true;
-}
 
-// Helper: bind one variable or spectator to reader by name (same mapping as original)
-void VTMVAEvaluator::bindVariableByName( TMVA::Reader* reader, const std::string& varName, bool isSpectator )
-{
-    if( isSpectator )
-    {
-        reader->AddSpectator( varName.c_str(), &fDummy );
-        return;
-    }
-    if( varName == "MSCW" ) reader->AddVariable( "MSCW", &fMSCW );
-    else if( varName == "MSCL" ) reader->AddVariable( "MSCL", &fMSCL );
-    else if( varName == "EmissionHeight" ) reader->AddVariable( "EmissionHeight", &fEmissionHeight );
-    else if( varName == "log10(EmissionHeightChi2)" ) reader->AddVariable( "log10(EmissionHeightChi2)", &fEmissionHeightChi2_log10 );
-    else if( varName == "NImages" ) reader->AddVariable( "NImages", &fNImages );
-    else if( varName == "dE" ) reader->AddVariable( "dE", &fdES );
-    else if( varName == "dES" ) reader->AddVariable( "dES", &fdES );
-    else if( varName == "log10(SizeSecondMax)" ) reader->AddVariable( "log10(SizeSecondMax)", &fSizeSecondMax_log10 );
-    else if( varName == "EChi2S" ) reader->AddVariable( "EChi2S", &fEChi2S );
-    else if( varName == "log10(EChi2S)" ) reader->AddVariable( "log10(EChi2S)", &fEChi2S_log10 );
-    else if( varName == "sqrt(Xcore*Xcore+Ycore*Ycore)" ) reader->AddVariable( "sqrt(Xcore*Xcore+Ycore*Ycore)", &fCoreDist );
-    else if( varName == "DispDiff" ) reader->AddVariable( "DispDiff", &fDispDiff );
-    else if( varName == "log10(DispDiff)" ) reader->AddVariable( "log10(DispDiff)", &fDispDiff_log10 );
-    else if( varName == "DispAbsSumWeigth" ) reader->AddVariable( "DispAbsSumWeigth", &fDispAbsSumWeigth );
-    // Ranked per-telescope variables
-    else if( varName == "Width_r1" ) reader->AddVariable( "Width_r1", &fWidth_r1 );
-    else if( varName == "Width_r2" ) reader->AddVariable( "Width_r2", &fWidth_r2 );
-    else if( varName == "Width_r3" ) reader->AddVariable( "Width_r3", &fWidth_r3 );
-    else if( varName == "Width_r4" ) reader->AddVariable( "Width_r4", &fWidth_r4 );
-    else if( varName == "Length_r1" ) reader->AddVariable( "Length_r1", &fLength_r1 );
-    else if( varName == "Length_r2" ) reader->AddVariable( "Length_r2", &fLength_r2 );
-    else if( varName == "Length_r3" ) reader->AddVariable( "Length_r3", &fLength_r3 );
-    else if( varName == "Length_r4" ) reader->AddVariable( "Length_r4", &fLength_r4 );
-    else if( varName == "Loss_r1" ) reader->AddVariable( "Loss_r1", &fLoss_r1 );
-    else if( varName == "Loss_r2" ) reader->AddVariable( "Loss_r2", &fLoss_r2 );
-    else if( varName == "Loss_r3" ) reader->AddVariable( "Loss_r3", &fLoss_r3 );
-    else if( varName == "Loss_r4" ) reader->AddVariable( "Loss_r4", &fLoss_r4 );
-    else if( varName == "Rcore_r1" ) reader->AddVariable( "Rcore_r1", &fRcore_r1 );
-    else if( varName == "Rcore_r2" ) reader->AddVariable( "Rcore_r2", &fRcore_r2 );
-    else if( varName == "Rcore_r3" ) reader->AddVariable( "Rcore_r3", &fRcore_r3 );
-    else if( varName == "Rcore_r4" ) reader->AddVariable( "Rcore_r4", &fRcore_r4 );
-    else
-    {
-        // default: treat unknowns as spectators to preserve behavior
-        reader->AddSpectator( varName.c_str(), &fDummy );
-    }
-}
-
-// Helper: build readers, bind variables, book MVA, and optionally optimize sensitivity
-bool VTMVAEvaluator::setupTMVAReaders( unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
-                                       unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax )
-{
+    //////////////////////////////////////////////////////////////////////////////////////
+    // create and initialize TMVA readers
+    // loop over all  energy bins: open one weight (XML) file per energy bin
+    //looping over spectral energy and zenith angle bins
     for( unsigned int b = 0; b < fTMVAData.size(); b++ )
     {
         fTMVAData[b]->fTMVAReader = new TMVA::Reader();
@@ -447,29 +376,98 @@ bool VTMVAEvaluator::setupTMVAReaders( unsigned int iWeightFileIndex_Emin, unsig
         {
             cout << "INITIALIZE TMVA file: " << fTMVAData[b]->fTMVAFileName << endl;
         }
+        //////////////////////////////////////////
+        // set TMVA cut value
+        // (optimization later)
 
+        // fixed signal efficiency
         if( fTMVACutValueNoVec < -1. && fSignalEfficiencyNoVec > 0. )
         {
             getValuesFromEfficiencyHistograms( b );
         }
+        // fixed TMVA cut value
         else if( fTMVACutValueNoVec > -1. )
         {
             fTMVAData[b]->fSignalEfficiency = -99.;
             getValuesFromEfficiencyHistograms( b );
         }
+        // no optimization took place
         fTMVAData[b]->fTMVAOptimumCutValueFound = false;
+
+        // weight file for this energy bin
 
         if( fDebug )
         {
             cout << "reading TMVA XML weight file: " << fTMVAData[b]->fTMVAFileNameXML << endl;
         }
 
+        // get list of training variables
         vector< bool > iVariableIsASpectator;
         vector< string > iTrainingVariables = getTrainingVariables( fTMVAData[b]->fTMVAFileNameXML, iVariableIsASpectator );
 
+        // note that the following list of variables must be the same as during training
         for( unsigned int t = 0; t < iTrainingVariables.size(); t++ )
         {
-            bindVariableByName( fTMVAData[b]->fTMVAReader, iTrainingVariables[t], iVariableIsASpectator[t] );
+            if( iTrainingVariables[t] == "MSCW" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "MSCW", &fMSCW );
+            }
+            else if( iTrainingVariables[t] == "MSCL" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "MSCL", &fMSCL );
+            }
+            else if( iTrainingVariables[t] == "EmissionHeight" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "EmissionHeight", &fEmissionHeight );
+            }
+            else if( iTrainingVariables[t] == "log10(EmissionHeightChi2)" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "log10(EmissionHeightChi2)", &fEmissionHeightChi2_log10 );
+            }
+            else if( iTrainingVariables[t] == "NImages" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "NImages", &fNImages );
+            }
+            else if( iTrainingVariables[t] == "dE" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "dE", &fdES );
+            }
+            else if( iTrainingVariables[t] == "dES" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "dES", &fdES );
+            }
+            else if( iTrainingVariables[t] == "log10(SizeSecondMax)" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "log10(SizeSecondMax)", &fSizeSecondMax_log10 );
+            }
+            else if( iTrainingVariables[t] == "EChi2S" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "EChi2S", &fEChi2S );
+            }
+            else if( iTrainingVariables[t] == "log10(EChi2S)" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "log10(EChi2S)", &fEChi2S_log10 );
+            }
+            else if( iTrainingVariables[t] == "sqrt(Xcore*Xcore+Ycore*Ycore)" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "sqrt(Xcore*Xcore+Ycore*Ycore)", &fCoreDist );
+            }
+            else if( iTrainingVariables[t] == "DispDiff" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "DispDiff", &fDispDiff );
+            }
+            else if( iTrainingVariables[t] == "log10(DispDiff)" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "log10(DispDiff)", &fDispDiff_log10 );
+            }
+            else if( iTrainingVariables[t] == "DispAbsSumWeigth" && !iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddVariable( "DispAbsSumWeigth", &fDispAbsSumWeigth );
+            }
+            else if( iVariableIsASpectator[t] )
+            {
+                fTMVAData[b]->fTMVAReader->AddSpectator( iTrainingVariables[t].c_str(), &fDummy );
+            }
         }
         if( fDebug )
         {
@@ -493,7 +491,9 @@ bool VTMVAEvaluator::setupTMVAReaders( unsigned int iWeightFileIndex_Emin, unsig
             fIsZombie = true;
             return false;
         }
-
+        /////////////////////////////////////////////////////////
+        // get optimal signal efficiency (from maximum signal/noise ratio)
+        /////////////////////////////////////////////////////////
         if( fParticleNumberFileName.size() > 0 )
         {
             cout << endl;
@@ -506,7 +506,22 @@ bool VTMVAEvaluator::setupTMVAReaders( unsigned int iWeightFileIndex_Emin, unsig
             cout << "======================= end optimize sensitivity =======================" << endl;
             cout << endl;
         }
+
     }
+
+    // smooth and interpolate
+    if( fParticleNumberFileName.size() > 0 && fSmoothAndInterpolateMVAValues )
+    {
+        smoothAndInterPolateMVAValue( 0, 0,
+                                      iWeightFileIndex_Emin, iWeightFileIndex_Emax,
+                                      iWeightFileIndex_Zmin, iWeightFileIndex_Zmax );
+    }
+
+    // print some info to screen
+    cout << "VTMVAEvaluator: Initialized " << fTMVAData.size() << " MVA readers " << endl;
+
+    fillTMVAEvaluatorResults();
+
     return true;
 }
 
@@ -704,65 +719,6 @@ bool VTMVAEvaluator::evaluate( bool interpolate_mva, bool use_average_zenith_ang
             fDispDiff_log10 = 0.;    // !!! not clear what the best value is
         }
         fDispAbsSumWeigth = fData->DispAbsSumWeigth;
-        // Compute ranked per-telescope variables using ImgSel mask
-        // Always compute to keep logic simple; unused values are harmless
-        fWidth_r1 = fWidth_r2 = fWidth_r3 = fWidth_r4 = 0.0f;
-        fLength_r1 = fLength_r2 = fLength_r3 = fLength_r4 = 0.0f;
-        fLoss_r1 = fLoss_r2 = fLoss_r3 = fLoss_r4 = 0.0f;
-        fRcore_r1 = fRcore_r2 = fRcore_r3 = fRcore_r4 = 0.0f;
-        // Build selected index list from lower 4 bits of ImgSel
-        int selIdx[4];
-        int selCount = 0;
-        for( int ii = 0; ii < 4; ii++ )
-        {
-            if( ( fData->ImgSel & ( 1ULL << ii ) ) != 0 )
-            {
-                selIdx[selCount++] = ii;
-            }
-        }
-        if( selCount > 0 )
-        {
-            // selection sort selected indices by size desc
-            for( int i = 0; i < selCount; i++ )
-            {
-                int maxj = i;
-                for( int j = i + 1; j < selCount; j++ )
-                {
-                    if( fData->size[selIdx[j]] > fData->size[selIdx[maxj]] )
-                    {
-                        maxj = j;
-                    }
-                }
-                if( maxj != i )
-                {
-                    int t = selIdx[i];
-                    selIdx[i] = selIdx[maxj];
-                    selIdx[maxj] = t;
-                }
-            }
-            float Wr[4] = { 0 }, Lr[4] = { 0 }, Lo[4] = { 0 }, Rc[4] = { 0 };
-            int k = 0;
-            for( ; k < selCount && k < 4; k++ )
-            {
-                int s = selIdx[k];
-                Wr[k] = fData->width[s];
-                Lr[k] = fData->length[s];
-                Lo[k] = fData->loss[s];
-                Rc[k] = fData->R_core[s];
-            }
-            int lastSrc = selIdx[selCount - 1];
-            for( ; k < 4; k++ )
-            {
-                Wr[k] = fData->width[lastSrc];
-                Lr[k] = fData->length[lastSrc];
-                Lo[k] = fData->loss[lastSrc];
-                Rc[k] = fData->R_core[lastSrc];
-            }
-            fWidth_r1 = Wr[0]; fWidth_r2 = Wr[1]; fWidth_r3 = Wr[2]; fWidth_r4 = Wr[3];
-            fLength_r1 = Lr[0]; fLength_r2 = Lr[1]; fLength_r3 = Lr[2]; fLength_r4 = Lr[3];
-            fLoss_r1 = Lo[0]; fLoss_r2 = Lo[1]; fLoss_r3 = Lo[2]; fLoss_r4 = Lo[3];
-            fRcore_r1 = Rc[0]; fRcore_r2 = Rc[1]; fRcore_r3 = Rc[2]; fRcore_r4 = Rc[3];
-        }
     }
     else
     {

@@ -143,11 +143,6 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         float    fDispDiff_log10;
         float    fDispAbsSumWeigth;
         float    fDummy;
-        // Ranked per-telescope variables (sorted by per-telescope size desc, padded by last)
-        float    fWidth_r1; float fWidth_r2; float fWidth_r3; float fWidth_r4;
-        float    fLength_r1; float fLength_r2; float fLength_r3; float fLength_r4;
-        float    fLoss_r1; float fLoss_r2; float fLoss_r3; float fLoss_r4;
-        float    fRcore_r1; float fRcore_r2; float fRcore_r3; float fRcore_r4;
 
         bool     bPlotEfficiencyPlotsPerBin;
         bool     fPrintPlotting;
@@ -179,14 +174,6 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         void             smoothAndInterPolateMVAValue_EnergyOnly( TH1F*, TH1F* );
         void             smoothAndInterPolateMVAValue_Energy_and_Zenith( TH1F*, TH1F*,
                 unsigned int iE_min, unsigned int iE_max, unsigned int iZ_min, unsigned int iZ_max );
-
-        // Readability helpers (no functional change)
-        bool             buildTMVADataFromFiles( const std::string& iWeightFileName,
-            unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
-            unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax );
-        bool             setupTMVAReaders( unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
-                           unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax );
-        void             bindVariableByName( TMVA::Reader* reader, const std::string& varName, bool isSpectator );
 
     public:
 
