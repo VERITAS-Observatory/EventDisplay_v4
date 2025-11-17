@@ -4,6 +4,7 @@
 */
 
 #include "TChain.h"
+#include "TChainElement.h"
 #include "TCut.h"
 #include "TFile.h"
 #include "TH1D.h"
@@ -328,16 +329,35 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
                 // cleanup: remove entry list from directory to keep memory bounded
                 gDirectory->Delete( elname.str().c_str() );
             }
-            // remove this tree
-            if( iSignal )
+            // remove this tree and close underlying files explicitly
+            TChain* currentChain = iSignal ? iRun->fSignalTree[i] : iRun->fBackgroundTree[i];
+            if( currentChain )
             {
-                iRun->fSignalTree[i]->Delete();
-                iRun->fSignalTree[i] = 0;
-            }
-            else
-            {
-                iRun->fBackgroundTree[i]->Delete();
-                iRun->fBackgroundTree[i] = 0;
+                // Close all files in the TChain before deleting to release file descriptors
+                TObjArray* fileElements = currentChain->GetListOfFiles();
+                if( fileElements )
+                {
+                    TIter next( fileElements );
+                    TChainElement* chEl = 0;
+                    while( ( chEl = ( TChainElement* )next() ) )
+                    {
+                        TFile* f = chEl->GetFile();
+                        if( f && f->IsOpen() )
+                        {
+                            f->Close();
+                        }
+                    }
+                }
+                currentChain->Reset();
+                delete currentChain;
+                if( iSignal )
+                {
+                    iRun->fSignalTree[i] = 0;
+                }
+                else
+                {
+                    iRun->fBackgroundTree[i] = 0;
+                }
             }
         }
     }
@@ -354,18 +374,37 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
         cout << "Error in reducing data trees (missing tree)" << endl;
         return 0;
     }
-    // cleanup all remaining trees
+    // cleanup all remaining trees (if any were skipped)
     for( unsigned int i = 0; i < iTreeVector.size(); i++ )
     {
-        if( iSignal && iRun->fSignalTree[i] )
+        TChain* remainingChain = iSignal ? iRun->fSignalTree[i] : iRun->fBackgroundTree[i];
+        if( remainingChain )
         {
-            iRun->fSignalTree[i]->Delete();
-            iRun->fSignalTree[i] = 0;
-        }
-        else if(!iSignal && iRun->fBackgroundTree[i] )
-        {
-            iRun->fBackgroundTree[i]->Delete();
-            iRun->fBackgroundTree[i] = 0;
+            // Close all files in the TChain before deleting
+            TObjArray* fileElements = remainingChain->GetListOfFiles();
+            if( fileElements )
+            {
+                TIter next( fileElements );
+                TChainElement* chEl = 0;
+                while( ( chEl = ( TChainElement* )next() ) )
+                {
+                    TFile* f = chEl->GetFile();
+                    if( f && f->IsOpen() )
+                    {
+                        f->Close();
+                    }
+                }
+            }
+            remainingChain->Reset();
+            delete remainingChain;
+            if( iSignal )
+            {
+                iRun->fSignalTree[i] = 0;
+            }
+            else
+            {
+                iRun->fBackgroundTree[i] = 0;
+            }
         }
     }
     return iDataTree_reduced;
