@@ -1,5 +1,7 @@
 /*
  *
+ * - fill disp * cos phi and disp * sin phi for direction reconstruction (check: this should allow to add pointing offsets)
+ * - add intersection point for training?
  */
 
 
@@ -25,6 +27,7 @@ using namespace std;
  * Telescope-type training variables
 */
 const unsigned int n_tel_var = 12;
+// Disp_T needs to be first! Sequence matters for flattening
 static const vector< string > training_variables = {
     "Disp_T", "cen_x", "cen_y", "cosphi", "sinphi", "loss", "size", "dist",
     "width", "length", "asym", "tgrad_x"
@@ -60,6 +63,23 @@ void train(TTree* treeTrain, TFile* tmvaFile, string TMVAOptions, const  unsigne
                 loader.AddVariable(var.str().c_str());
             }
         }
+        for( unsigned int n = 0; n < n_tel; n++ )
+        {
+            ostringstream var;
+            if( t == 0 )
+            {
+                var << "disp_x_" << n;
+                loader.AddVariable(var.str().c_str());
+            }
+            else
+            {
+                var << "disp_y_" << n;
+                loader.AddVariable(var.str().c_str());
+            }
+        }
+        if( t == 0) loader.AddVariable("Xoff_intersect");
+        else        loader.AddVariable("Yoff_intersect");
+
         loader.AddSpectator("MCe0");
 
         loader.AddTarget(tmvaTarget[t].c_str(), tmvaTargetName[t].c_str());
@@ -103,7 +123,8 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
         data_tree.Add(inputFiles[f].c_str());
     }
 
-    float arrBuf[n_tel_var][n_tel];
+    const unsigned int n_tel_max = 4;
+    float arrBuf[n_tel_var][n_tel_max];
 
     for(unsigned v = 0; v < training_variables.size(); v++ )
     {
@@ -112,8 +133,12 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
     double MCxoff;
     double MCyoff;
     double MCe0;
+    float Xoff_intersect;
+    float Yoff_intersect;
     unsigned int DispNImages;
     unsigned int DispTelList_T[4];
+    data_tree.SetBranchAddress("Xoff_intersect", &Xoff_intersect );
+    data_tree.SetBranchAddress("Yoff_intersect", &Yoff_intersect );
     data_tree.SetBranchAddress("MCxoff", &MCxoff );
     data_tree.SetBranchAddress("MCyoff", &MCyoff );
     data_tree.SetBranchAddress("MCe0", &MCe0);
@@ -126,6 +151,8 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
     TTree outTree("Training", "Flattened training tree");
 
     float outArr[n_tel_var][n_tel];
+    float disp_x[n_tel];
+    float disp_y[n_tel];
     for(unsigned v = 0; v < training_variables.size(); v++ )
     {
         for (unsigned int i = 0; i < n_tel; ++i)
@@ -134,6 +161,13 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
             outTree.Branch(bname.c_str(), &outArr[v][i]);
         }
     }
+    for (unsigned int i = 0; i < n_tel; ++i)
+    {
+        outTree.Branch(("disp_x_" + std::to_string(i)).c_str(), &disp_x[i]);
+        outTree.Branch(("disp_y_" + std::to_string(i)).c_str(), &disp_y[i]);
+    }
+    outTree.Branch("Xoff_intersect", &Xoff_intersect);
+    outTree.Branch("Yoff_intersect", &Yoff_intersect);
     outTree.Branch("MCxoff", &MCxoff);
     outTree.Branch("MCyoff", &MCyoff);
     outTree.Branch("MCe0", &MCe0);
@@ -154,7 +188,6 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
 
     unsigned int n_index = 0;
     Long64_t n = data_tree.GetEntries();
-//    n = 1000;
     cout << "Total number of entries in training data (before cuts): " << n << endl;
     vector<unsigned int> perFileTrainingCounts(inputFiles.size(), 0);
     vector<unsigned int> perFileTestingCounts(inputFiles.size(), 0);
@@ -170,20 +203,37 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
 
         if( DispNImages != n_tel ) continue;
 
-
         for (unsigned v = 0; v < n_tel_var; v++)
         {
-            for (unsigned int i = 0; i < n_tel; i++)
+            for (unsigned int i = 0; i < DispNImages; i++)
             {
-                n_index = DispTelList_T[i];
+                if(v == 0) // Disp_T
+                {
+                    n_index = i; // for Disp_T, use index of telescope in flattened array
+                }
+                else
+                {
+                    n_index = DispTelList_T[i];
+                }
+
                 outArr[v][i] = arrBuf[v][n_index];
             }
         }
 
-        if( TrainingEvent ) {
+        for (unsigned int i = 0; i < DispNImages; i++)
+        {
+            n_index = DispTelList_T[i];
+            disp_x[i] = outArr[0][i] * outArr[3][n_index]; // Disp_T * cosphi
+            disp_y[i] = outArr[0][i] * outArr[4][n_index]; // Disp_T * sinphi
+        }
+
+        if( TrainingEvent )
+        {
             trainingEvents++;
             perFileTrainingCounts[fileIndex]++;
-        } else {
+        }
+        else
+        {
             testingEvents++;
             perFileTestingCounts[fileIndex]++;
         }
@@ -257,7 +307,7 @@ int main( int argc, char* argv[] )
     string TMVAOptions="!V:NTrees=800:BoostType=Grad:Shrinkage=0.1:MaxDepth=4:MinNodeSize=1.0%";
     string trainingFileName = "train_events";
     float trainTestFraction = 0.5;
-    unsigned int max_events = 10000;
+    unsigned int max_events = 100000;
     string outputFile = "dir_bdt.root";
 
     vector<string> inputFiles = fillInputFiles_fromList(inputFileList);
