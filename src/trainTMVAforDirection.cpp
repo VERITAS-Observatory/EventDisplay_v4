@@ -1,7 +1,14 @@
-/*
- *
- * - fill disp * cos phi and disp * sin phi for direction reconstruction (check: this should allow to add pointing offsets)
- * - add intersection point for training?
+/* \file trainTMVAforDirection.cpp
+   \brief use TMVA methods for direction reconstruction
+
+   Calculate direction (Xoff, Yoff) in camera coordinates using BDT regression and
+   the following input:
+
+   - Xoff/Yoff from weighted average of single-telescope disp predictions (VDispAnalyzer)
+   - Xoff/Yoff from intersection of image axes (VDispAnalyzer)
+   - telescope specific image parameters
+
+   Separate training for 2, 3, and 4 telescope events.
  */
 
 
@@ -36,7 +43,7 @@ static const vector< string > training_variables = {
 /*
  * Train TMVA BDTs for direction reconstruction
 */
-void train(TTree* treeTrain, TFile* tmvaFile, string TMVAOptions, const  unsigned int n_tel = 4)
+void train(TTree* events, TFile* tmvaFile, string TMVAOptions, const unsigned int n_tel = 4)
 {
     vector< string > tmvaTarget;
     vector< string > tmvaTargetName;
@@ -77,27 +84,24 @@ void train(TTree* treeTrain, TFile* tmvaFile, string TMVAOptions, const  unsigne
                 loader.AddVariable(var.str().c_str());
             }
         }
-        if( tmvaTarget[t] == "MCxoff" ) loader.AddVariable("Xoff_intersect");
-        else                            loader.AddVariable("Yoff_intersect");
+        if( tmvaTarget[t] == "MCxoff" )
+        {
+            loader.AddVariable("Xoff_weighted_bdt");
+            loader.AddVariable("Xoff_intersect");
+        }
+        else
+        {
+           loader.AddVariable("Yoff_weighted_bdt");
+           loader.AddVariable("Yoff_intersect");
+        }
 
         loader.AddSpectator("MCe0");
 
         loader.AddTarget(tmvaTarget[t].c_str(), tmvaTargetName[t].c_str());
 
-        Long64_t nt = treeTrain->GetEntries("size_0 < 10");
-        std::cout << "entries with size_0 < 10 = " << nt << std::endl;
-        if( nt > 0 ) exit( EXIT_FAILURE );
-
         // Create separate trees for training and testing based on TrainingEvent variable
-        TTree* trainTree = treeTrain->CopyTree("TrainingEvent==1");
-        TTree* testTree  = treeTrain->CopyTree("TrainingEvent==0");
-        // Setting directory to 0 keeps them in memory only and avoids writing them implicitly.
-        if( trainTree ) trainTree->SetDirectory( nullptr );
-        if( testTree )  testTree->SetDirectory( nullptr );
-
-        Long64_t n = trainTree->GetEntries("size_0 < 10");
-        std::cout << "entries with size_0 < 10 = " << n << std::endl;
-        if( n > 0 ) exit( EXIT_FAILURE );
+        TTree* trainTree = events->CopyTree("TrainingEvent==1");
+        TTree* testTree  = events->CopyTree("TrainingEvent==0");
 
         loader.AddRegressionTree(trainTree, 1., TMVA::Types::kTraining);
         loader.AddRegressionTree(testTree, 1., TMVA::Types::kTesting);
@@ -141,17 +145,24 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
     double MCxoff;
     double MCyoff;
     double MCe0;
+    double Xoff;
+    double Yoff;
     float Xoff_intersect;
     float Yoff_intersect;
     unsigned int DispNImages;
     unsigned int DispTelList_T[4];
+    // BDT Xoff/Yoff result from averaging over all telescopes (in VDispAnalyzer)
+    data_tree.SetBranchAddress("Xoff", &Xoff);
+    data_tree.SetBranchAddress("Yoff", &Yoff);
+    // Intersection method results
     data_tree.SetBranchAddress("Xoff_intersect", &Xoff_intersect );
     data_tree.SetBranchAddress("Yoff_intersect", &Yoff_intersect );
-    data_tree.SetBranchAddress("MCxoff", &MCxoff );
-    data_tree.SetBranchAddress("MCyoff", &MCyoff );
     data_tree.SetBranchAddress("MCe0", &MCe0);
     data_tree.SetBranchAddress("DispNImages", &DispNImages);
     data_tree.SetBranchAddress("DispTelList_T", DispTelList_T);
+    // target variables
+    data_tree.SetBranchAddress("MCxoff", &MCxoff );
+    data_tree.SetBranchAddress("MCyoff", &MCyoff );
 
     ostringstream ofile_name;
     ofile_name << trainingFileName << "_ntel" << n_tel << ".root";
@@ -174,6 +185,8 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
         outTree.Branch(("disp_x_" + std::to_string(i)).c_str(), &disp_x[i]);
         outTree.Branch(("disp_y_" + std::to_string(i)).c_str(), &disp_y[i]);
     }
+    outTree.Branch("Xoff_weighted_bdt", &Xoff);
+    outTree.Branch("Yoff_weighted_bdt", &Yoff);
     outTree.Branch("Xoff_intersect", &Xoff_intersect);
     outTree.Branch("Yoff_intersect", &Yoff_intersect);
     outTree.Branch("MCxoff", &MCxoff);
@@ -189,7 +202,7 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
     unsigned int trainingEvents = 0;
     unsigned int testingEvents = 0;
     // Balanced training configuration over training files
-    // (approximate: assumes equal distribution of events per file)
+    // (approximate: assumes equal number of events per file)
     unsigned int maxTrainingEventsPerFile = maxEvents / inputFiles.size() * trainTestFraction;
     unsigned int maxTestingEventsPerFile = maxEvents / inputFiles.size() * (1.0 - trainTestFraction);
     int fileIndex = 0;
@@ -202,7 +215,7 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
     for (Long64_t e = 0; e < n; ++e)
     {
         data_tree.GetEntry(e);
-        // ensure balanced training set if requested (this is inefficient for small number of requested training events)
+
         fileIndex = data_tree.GetTreeNumber();
         if( fileIndex < 0 || fileIndex >= (int)inputFiles.size() ) fileIndex = 0;
         TrainingEvent = (rand.Rndm() < trainTestFraction) && (perFileTrainingCounts[fileIndex] < maxTrainingEventsPerFile);
@@ -225,15 +238,6 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
                 }
 
                 outArr[v][i] = arrBuf[v][n_index];
-
-                if( v == 6 && outArr[v][i] == 0)
-                {
-                    cout << "ERROR: size is zero for telescope " << n_index << " in event " << e << endl;
-                    cout << "  DispNImages: " << DispNImages << ", DispTelList_T: ";
-                    for(unsigned int it=0; it<DispNImages; it++) cout << DispTelList_T[it] << " ";
-                    cout << endl;
-                    exit(EXIT_FAILURE);
-                }
             }
         }
 
@@ -320,12 +324,26 @@ int main( int argc, char* argv[] )
             exit( EXIT_SUCCESS );
         }
     }
-    string inputFileList="files.txt";
+    if( argc < 6 )
+    {
+        cout << "./trainTMVAforDirection <list of input eventdisplay files (MC)> <output file>" << endl;
+        cout << "                        <training file name> <train vs test fraction> <max. number of events>" << endl;
+        cout << "                        [TMVA options (optional)]" << endl;
+        cout << endl;
+        cout << "example: ./trainTMVAforDirection files.txt dir_bdt.root train_events 0.5 100000" << endl;
+        cout << endl;
+        exit( EXIT_SUCCESS );
+    }
+    string inputFileList = argv[1];
+    string outputFile = argv[2];
+    string trainingFileName = argv[3];
+    float trainTestFraction = atof(argv[4]);
+    unsigned int max_events = atoi(argv[5]);
     string TMVAOptions="!V:NTrees=800:BoostType=Grad:Shrinkage=0.1:MaxDepth=4:MinNodeSize=1.0%";
-    string trainingFileName = "train_events";
-    float trainTestFraction = 0.5;
-    unsigned int max_events = 100000;
-    string outputFile = "dir_bdt.root";
+    if( argc >= 7 )
+    {
+        TMVAOptions = argv[6];
+    }
 
     vector<string> inputFiles = fillInputFiles_fromList(inputFileList);
     TFile* tmvaFile = new TFile(outputFile.c_str(), "RECREATE");
