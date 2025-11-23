@@ -1163,6 +1163,7 @@ trainTMVAforDirection:	./obj/trainTMVAforDirection.o \
 					./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 					./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 					./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+					./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 					./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 					./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 					./obj/VEmissionHeightCalculator.o \
