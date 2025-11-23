@@ -66,7 +66,7 @@ void train(TTree* treeTrain, TFile* tmvaFile, string TMVAOptions, const  unsigne
         for( unsigned int n = 0; n < n_tel; n++ )
         {
             ostringstream var;
-            if( t == 0 )
+            if( tmvaTarget[t] == "MCxoff" )
             {
                 var << "disp_x_" << n;
                 loader.AddVariable(var.str().c_str());
@@ -77,12 +77,16 @@ void train(TTree* treeTrain, TFile* tmvaFile, string TMVAOptions, const  unsigne
                 loader.AddVariable(var.str().c_str());
             }
         }
-        if( t == 0) loader.AddVariable("Xoff_intersect");
-        else        loader.AddVariable("Yoff_intersect");
+        if( tmvaTarget[t] == "MCxoff" ) loader.AddVariable("Xoff_intersect");
+        else                            loader.AddVariable("Yoff_intersect");
 
         loader.AddSpectator("MCe0");
 
         loader.AddTarget(tmvaTarget[t].c_str(), tmvaTargetName[t].c_str());
+
+        Long64_t nt = treeTrain->GetEntries("size_0 < 10");
+        std::cout << "entries with size_0 < 10 = " << nt << std::endl;
+        if( nt > 0 ) exit( EXIT_FAILURE );
 
         // Create separate trees for training and testing based on TrainingEvent variable
         TTree* trainTree = treeTrain->CopyTree("TrainingEvent==1");
@@ -90,6 +94,10 @@ void train(TTree* treeTrain, TFile* tmvaFile, string TMVAOptions, const  unsigne
         // Setting directory to 0 keeps them in memory only and avoids writing them implicitly.
         if( trainTree ) trainTree->SetDirectory( nullptr );
         if( testTree )  testTree->SetDirectory( nullptr );
+
+        Long64_t n = trainTree->GetEntries("size_0 < 10");
+        std::cout << "entries with size_0 < 10 = " << n << std::endl;
+        if( n > 0 ) exit( EXIT_FAILURE );
 
         loader.AddRegressionTree(trainTree, 1., TMVA::Types::kTraining);
         loader.AddRegressionTree(testTree, 1., TMVA::Types::kTesting);
@@ -217,6 +225,15 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
                 }
 
                 outArr[v][i] = arrBuf[v][n_index];
+
+                if( v == 6 && outArr[v][i] == 0)
+                {
+                    cout << "ERROR: size is zero for telescope " << n_index << " in event " << e << endl;
+                    cout << "  DispNImages: " << DispNImages << ", DispTelList_T: ";
+                    for(unsigned int it=0; it<DispNImages; it++) cout << DispTelList_T[it] << " ";
+                    cout << endl;
+                    exit(EXIT_FAILURE);
+                }
             }
         }
 
