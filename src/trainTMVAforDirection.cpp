@@ -256,8 +256,8 @@ int main( int argc, char* argv[] )
     string inputFileList="files.txt";
     string TMVAOptions="!V:NTrees=800:BoostType=Grad:Shrinkage=0.1:MaxDepth=4:MinNodeSize=1.0%";
     string trainingFileName = "train_events";
-    float trainTestFraction = 0.8;
-    unsigned int max_events = 100;
+    float trainTestFraction = 0.5;
+    unsigned int max_events = 10000;
     string outputFile = "dir_bdt.root";
 
     vector<string> inputFiles = fillInputFiles_fromList(inputFileList);
@@ -272,6 +272,7 @@ int main( int argc, char* argv[] )
         TFile *input_file = new TFile( train_file_name.c_str() );
         TTree *data_tree = (TTree*)input_file->Get("Training");
 
+        tmvaFile->cd();
         train(data_tree, tmvaFile, TMVAOptions, i);
 
         input_file->Close();
