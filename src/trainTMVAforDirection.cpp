@@ -18,6 +18,7 @@
 #include "TTree.h"
 #include "TRandom3.h"
 
+#include "TMVA/Config.h"
 #include "TMVA/DataLoader.h"
 #include "TMVA/Factory.h"
 #include "TMVA/Reader.h"
@@ -43,12 +44,18 @@ static const vector< string > training_variables = {
 /*
  * Train TMVA BDTs for direction reconstruction
 */
-void train(TTree* events, TFile* tmvaFile, string TMVAOptions, const unsigned int n_tel = 4)
+void train(TTree* trainingTree, TTree* testingTree, TFile* tmvaFile, string TMVAOptions, string iOutputDir, const unsigned int n_tel = 4)
 {
     vector< string > tmvaTarget;
     vector< string > tmvaTargetName;
     tmvaTarget.push_back( "MCxoff" );   tmvaTarget.push_back( "MCyoff" );
     tmvaTargetName.push_back( "Xoff" ); tmvaTargetName.push_back( "Yoff" );
+
+    // set output directory
+    gSystem->mkdir( iOutputDir.c_str() );
+    TString iOutputDirectory( iOutputDir.c_str() );
+    gSystem->ExpandPathName( iOutputDirectory );
+    ( TMVA::gConfig().GetIONames() ).fWeightFileDir = iOutputDirectory;
 
     for(unsigned int t = 0; t < tmvaTarget.size(); t++ )
     {
@@ -59,6 +66,7 @@ void train(TTree* events, TFile* tmvaFile, string TMVAOptions, const unsigned in
             tmvaFile,
             "!V:!Silent:Color:DrawProgressBar:AnalysisType=Regression");
 
+        factory.SetVerbose( true );
         TMVA::DataLoader loader(fac_name.str().c_str());
 
         for( unsigned int v = 0; v < training_variables.size(); v++ )
@@ -99,12 +107,8 @@ void train(TTree* events, TFile* tmvaFile, string TMVAOptions, const unsigned in
 
         loader.AddTarget(tmvaTarget[t].c_str(), tmvaTargetName[t].c_str());
 
-        // Create separate trees for training and testing based on TrainingEvent variable
-        TTree* trainTree = events->CopyTree("TrainingEvent==1");
-        TTree* testTree  = events->CopyTree("TrainingEvent==0");
-
-        loader.AddRegressionTree(trainTree, 1., TMVA::Types::kTraining);
-        loader.AddRegressionTree(testTree, 1., TMVA::Types::kTesting);
+        loader.AddRegressionTree(trainingTree, 1., TMVA::Types::kTraining);
+        loader.AddRegressionTree(testingTree, 1., TMVA::Types::kTesting);
         loader.PrepareTrainingAndTestTree("", "NormMode=NumEvents");
 
         factory.BookMethod(&loader, TMVA::Types::kBDT, ("BDT_" + tmvaTargetName[t]).c_str(), TMVAOptions.c_str());
@@ -113,9 +117,6 @@ void train(TTree* events, TFile* tmvaFile, string TMVAOptions, const unsigned in
         factory.TestAllMethods();
         factory.EvaluateAllMethods();
         factory.Delete();
-
-        delete trainTree;
-        delete testTree;
     }
 }
 
@@ -167,35 +168,41 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
     ostringstream ofile_name;
     ofile_name << trainingFileName << "_ntel" << n_tel << ".root";
     TFile outFile(ofile_name.str().c_str(), "RECREATE" );
-    TTree outTree("Training", "Flattened training tree");
 
+    // two trees for training (index 0) and testing (index 1)
+    vector<TTree*> outTrees;
     float outArr[n_tel_var][n_tel];
     float disp_x[n_tel];
     float disp_y[n_tel];
-    for(unsigned v = 0; v < training_variables.size(); v++ )
-    {
-        for (unsigned int i = 0; i < n_tel; ++i)
-        {
-            string bname = training_variables[v] + "_" + std::to_string(i);
-            outTree.Branch(bname.c_str(), &outArr[v][i]);
-        }
-    }
-    for (unsigned int i = 0; i < n_tel; ++i)
-    {
-        outTree.Branch(("disp_x_" + std::to_string(i)).c_str(), &disp_x[i]);
-        outTree.Branch(("disp_y_" + std::to_string(i)).c_str(), &disp_y[i]);
-    }
-    outTree.Branch("Xoff_weighted_bdt", &Xoff);
-    outTree.Branch("Yoff_weighted_bdt", &Yoff);
-    outTree.Branch("Xoff_intersect", &Xoff_intersect);
-    outTree.Branch("Yoff_intersect", &Yoff_intersect);
-    outTree.Branch("MCxoff", &MCxoff);
-    outTree.Branch("MCyoff", &MCyoff);
-    outTree.Branch("MCe0", &MCe0);
-
-    // Add TrainingEvent variable for explicit train/test split
     bool TrainingEvent;
-    outTree.Branch("TrainingEvent", &TrainingEvent);
+    for(unsigned int i = 0; i < 2; i++ )
+    {
+        TTree* outTree = 0;
+        if( i == 0 ) outTree = new TTree("Training", "Flattened training tree");
+        else         outTree = new TTree("Testing", "Flattened testing tree");
+        outTrees.push_back(outTree);
+        for(unsigned v = 0; v < training_variables.size(); v++ )
+        {
+            for (unsigned int t = 0; t < n_tel; ++t)
+            {
+                string bname = training_variables[v] + "_" + std::to_string(t);
+                outTrees.back()->Branch(bname.c_str(), &outArr[v][t]);
+            }
+        }
+        for (unsigned int t = 0; t < n_tel; ++t)
+        {
+            outTrees.back()->Branch(("disp_x_" + std::to_string(t)).c_str(), &disp_x[t]);
+            outTrees.back()->Branch(("disp_y_" + std::to_string(t)).c_str(), &disp_y[t]);
+        }
+
+        outTrees.back()->Branch("Xoff_weighted_bdt", &Xoff);
+        outTrees.back()->Branch("Yoff_weighted_bdt", &Yoff);
+        outTrees.back()->Branch("Xoff_intersect", &Xoff_intersect);
+        outTrees.back()->Branch("Yoff_intersect", &Yoff_intersect);
+        outTrees.back()->Branch("MCxoff", &MCxoff);
+        outTrees.back()->Branch("MCyoff", &MCyoff);
+        outTrees.back()->Branch("MCe0", &MCe0);
+    }
 
     // Random number generator for train/test split
     TRandom3 rand(0);
@@ -252,11 +259,13 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
         {
             trainingEvents++;
             perFileTrainingCounts[fileIndex]++;
+            outTrees[0]->Fill();
         }
         else
         {
             testingEvents++;
             perFileTestingCounts[fileIndex]++;
+            outTrees[1]->Fill();
         }
 
         // Skip to next file if both training and testing quotas are met
@@ -270,10 +279,12 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
             continue;
         }
 
-        outTree.Fill();
     }
-
-    outTree.Write();
+    for(unsigned int i = 0; i < 2; i++ )
+    {
+        outTrees[i]->Write();
+        delete outTrees[i];
+    }
 
     cout << "Total training events: " << trainingEvents << ", testing events: " << testingEvents << endl;
     cout << "Per-file training and testing event counts:" << endl;
@@ -326,16 +337,16 @@ int main( int argc, char* argv[] )
     }
     if( argc < 6 )
     {
-        cout << "./trainTMVAforDirection <list of input eventdisplay files (MC)> <output file>" << endl;
+        cout << "./trainTMVAforDirection <list of input eventdisplay files (MC)> <output directory>" << endl;
         cout << "                        <training file name> <train vs test fraction> <max. number of events>" << endl;
         cout << "                        [TMVA options (optional)]" << endl;
         cout << endl;
-        cout << "example: ./trainTMVAforDirection files.txt dir_bdt.root train_events 0.5 100000" << endl;
+        cout << "example: ./trainTMVAforDirection files.txt ./ train_events 0.5 100000" << endl;
         cout << endl;
         exit( EXIT_SUCCESS );
     }
     string inputFileList = argv[1];
-    string outputFile = argv[2];
+    string outputDir = argv[2];
     string trainingFileName = argv[3];
     float trainTestFraction = atof(argv[4]);
     unsigned int max_events = atoi(argv[5]);
@@ -345,25 +356,35 @@ int main( int argc, char* argv[] )
         TMVAOptions = argv[6];
     }
 
+    cout << "trainTMVAforDirection (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
+    cout << "------------------------------------" << endl;
+    cout << endl;
     vector<string> inputFiles = fillInputFiles_fromList(inputFileList);
-    TFile* tmvaFile = new TFile(outputFile.c_str(), "RECREATE");
+    cout << "Output directory for TMVA weight files: " << outputDir << endl;
+    cout << "Training TMVA BDTs with options: " << TMVAOptions << endl;
+    cout << "Train vs test fraction: " << trainTestFraction << ", max. events: " << max_events << endl;
+    cout << endl;
 
+    // Train separate BDTs for 2, 3, and 4 telescope multiplicity
     for(unsigned int i = 2; i <= 4; i++ )
     {
         cout << "Preparing training data for n_tel = " << i << endl;
         string train_file_name = prepare(
-            inputFiles, trainingFileName, trainTestFraction, max_events, i);
+            inputFiles, outputDir + "/" + trainingFileName, trainTestFraction, max_events, i);
 
         TFile *input_file = new TFile( train_file_name.c_str() );
-        TTree *data_tree = (TTree*)input_file->Get("Training");
+        TTree *training_tree = (TTree*)input_file->Get("Training");
+        TTree *testing_tree = (TTree*)input_file->Get("Testing");
 
-        tmvaFile->cd();
-        train(data_tree, tmvaFile, TMVAOptions, i);
+        string output_file = outputDir + "/dirBDTs_ntel" + to_string(i) + ".root";
+        TFile* tmvaFile = new TFile((output_file).c_str(), "RECREATE");
+
+        train(training_tree, testing_tree, tmvaFile, TMVAOptions, outputDir, i);
+
+        tmvaFile->Close();
+        delete tmvaFile;
 
         input_file->Close();
         delete input_file;
    }
-
-   tmvaFile->Close();
-   delete tmvaFile;
 }
