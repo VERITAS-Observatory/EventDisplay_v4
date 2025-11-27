@@ -11,6 +11,8 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
     fDebug = false;
 
     fDataFile = 0;
+    fDataDirFile = 0;
+    fDataDirTree = 0;
     fInstrumentEpochMinor = "NOT_SET";
     fDirTot = iDirTot;
     fDirTotRun = iDirRun;
@@ -1966,7 +1968,18 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
             cout << "exiting..." << endl;
             exit( EXIT_FAILURE );
         }
-        c = new CData( fDataRunTree );
+        // try to read dataDir tree from file with file suffix ".dirBDT.root"
+        fDataDirFile = new TFile( iFileName.replace( iFileName.find( ".root" ), 5, ".dirBDT.root" ).c_str() );
+        if( fDataDirFile->IsZombie() )
+        {
+            fDataDirTree = 0;
+        }
+        else
+        {
+            fDataDirTree = ( TTree* )fDataDirFile->Get( "DispDirection" );
+        }
+
+        c = new CData( fDataRunTree, false, false, fDataDirTree);
         // read current (major) epoch from data file
         VEvndispRunParameter* i_runPara = ( VEvndispRunParameter* )fDataFile->Get( "runparameterV2" );
         if( i_runPara )
