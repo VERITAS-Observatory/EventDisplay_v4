@@ -51,8 +51,8 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
     }
     unsigned int DispNImages;
     unsigned int DispTelList_T[4];
-    double Xoff;
-    double Yoff;
+    double Xoff_weighted_bdt;
+    double Yoff_weighted_bdt;
     float Xoff_intersect;
     float Yoff_intersect;
     float arrBuf[n_tel_var][n_tel_max];
@@ -62,18 +62,20 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
     }
     data_tree->SetBranchAddress("DispNImages", &DispNImages);
     data_tree->SetBranchAddress("DispTelList_T", DispTelList_T);
-    data_tree->SetBranchAddress("Xoff", &Xoff);
-    data_tree->SetBranchAddress("Yoff", &Yoff);
+    data_tree->SetBranchAddress("Xoff", &Xoff_weighted_bdt);
+    data_tree->SetBranchAddress("Yoff", &Yoff_weighted_bdt);
     data_tree->SetBranchAddress("Xoff_intersect", &Xoff_intersect );
     data_tree->SetBranchAddress("Yoff_intersect", &Yoff_intersect );
 
     // init TMVA evaluator
     // (variables defined separately from data tree for flattening)
     float mva_arrBuf[n_tel_var][n_tel_max];
-    float mva_Xoff;
-    float mva_Yoff;
+    float mva_disp_x[n_tel_max];
+    float mva_disp_y[n_tel_max];
     float mva_Xoff_intersect;
     float mva_Yoff_intersect;
+    float mva_Xoff_weighted_bdt;
+    float mva_Yoff_weighted_bdt;
 
     cout << "Input file: " << iInputFile << endl;
     cout << "TMVA weights directory: " << iTMVAWeightsDir << endl;
@@ -101,14 +103,20 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
                     cout << "  var " << xy << "\t" << i << "\t" << var.str() << endl;
                 }
             }
+            ostringstream var_x;
+            var_x << "disp_x_" << i;
+            reader->AddVariable(var_x.str().c_str(), &mva_disp_x[i-2]);
+            ostringstream var_y;
+            var_y << "disp_y_" << i;
+            reader->AddVariable(var_y.str().c_str(), &mva_disp_y[i-2]);
             if( xy == 0 )
             {
-                reader->AddVariable("Xoff", &mva_Xoff);
+                reader->AddVariable("Xoff_weighted_bdt", &mva_Xoff_weighted_bdt);
                 reader->AddVariable("Xoff_intersect", &mva_Xoff_intersect);
             }
             else
             {
-                reader->AddVariable("Yoff", &mva_Yoff);
+                reader->AddVariable("Yoff_weighted_bdt", &mva_Yoff_weighted_bdt);
                 reader->AddVariable("Yoff_intersect", &mva_Yoff_intersect);
             }
             ostringstream mva_name;
@@ -131,10 +139,10 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
     {
         data_tree->GetEntry(e);
 
-        mva_Xoff = (float)Xoff;
-        mva_Yoff = (float)Yoff;
         mva_Xoff_intersect = Xoff_intersect;
         mva_Yoff_intersect = Yoff_intersect;
+        mva_Xoff_weighted_bdt = (float)Xoff_weighted_bdt;
+        mva_Yoff_weighted_bdt = (float)Yoff_weighted_bdt;
 
         if( DispNImages < 2 || DispNImages > n_tel_max )
         {
@@ -149,6 +157,12 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
                 unsigned int n_index = (v == 0) ? i : DispTelList_T[i];
                 mva_arrBuf[v][i] = arrBuf[v][n_index];
             }
+        }
+        for (unsigned int i = 0; i < DispNImages; i++)
+        {
+            unsigned int n_index = DispTelList_T[i];
+            mva_disp_x[i] = arrBuf[0][i] * arrBuf[3][n_index]; // Disp_T * cosphi
+            mva_disp_y[i] = arrBuf[0][i] * arrBuf[4][n_index]; // Disp_T * sinphi
         }
         // evaluate TMVA
         dir_Xoff = fTMVAReader[0][DispNImages-2]->EvaluateMVA("BDT");
