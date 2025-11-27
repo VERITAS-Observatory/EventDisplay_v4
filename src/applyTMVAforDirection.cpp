@@ -100,16 +100,16 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
                     reader->AddVariable(var.str().c_str(), &mva_arrBuf[v][n]);
                     cout << "  var " << xy << "\t" << i << "\t" << var.str() << endl;
                 }
-                if( xy == 0 )
-                {
-                    reader->AddVariable("Xoff", &mva_Xoff);
-                    reader->AddVariable("Xoff_intersect", &mva_Xoff_intersect);
-                }
-                else
-                {
-                    reader->AddVariable("Yoff", &mva_Yoff);
-                    reader->AddVariable("Yoff_intersect", &mva_Yoff_intersect);
-                }
+            }
+            if( xy == 0 )
+            {
+                reader->AddVariable("Xoff", &mva_Xoff);
+                reader->AddVariable("Xoff_intersect", &mva_Xoff_intersect);
+            }
+            else
+            {
+                reader->AddVariable("Yoff", &mva_Yoff);
+                reader->AddVariable("Yoff_intersect", &mva_Yoff_intersect);
             }
             ostringstream mva_name;
             mva_name << "BDT_" << xy << "\t" << i << endl;
