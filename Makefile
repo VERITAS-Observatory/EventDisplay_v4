@@ -1180,6 +1180,35 @@ trainTMVAforDirection:	./obj/trainTMVAforDirection.o \
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
+
+########################################################
+# applyTMVAforDirection
+########################################################
+./obj/applyTMVAforDirection.o:	./src/applyTMVAforDirection.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+applyTMVAforDirection:	./obj/applyTMVAforDirection.o \
+					./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+					./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
+					./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
+					./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+					./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
+					./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
+					./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+					./obj/VEmissionHeightCalculator.o \
+					./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
+					./obj/VStar.o ./obj/VStar_Dict.o \
+					./obj/VDB_Connection.o \
+					./obj/VSkyCoordinatesUtilities.o \
+					./obj/VSimpleStereoReconstructor.o \
+					./obj/VGrIsuAnalyzer.o \
+					./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
+					./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
+					./obj/VUtilities.o \
+					./obj/Ctelconfig.o ./obj/Cshowerpars.o ./obj/Ctpars.o
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
 ########################################################
 # writelaserinDB
 # ########################################################
