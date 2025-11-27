@@ -87,7 +87,8 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
         for( unsigned int i = 2; i <= n_tel_max; i++ )
         {
             ostringstream weightFileName;
-            weightFileName << iTMVAWeightsDir << "/" << coord << "/dirBDTs_ntel" << i << ".weights.xml";
+            weightFileName << iTMVAWeightsDir << "/DISPDir" << coord << "off_ntel" << i << "_BDT_" << coord << "off.weights.xml";
+            cout << "  weight file " << weightFileName.str() << endl;
             TMVA::Reader* reader = new TMVA::Reader("!Color:!Silent");
             // Add variables to reader
             for( unsigned int v = 0; v < training_variables.size(); v++ )
@@ -97,6 +98,7 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
                     ostringstream var;
                     var << training_variables[v] << "_" << n;
                     reader->AddVariable(var.str().c_str(), &mva_arrBuf[v][n]);
+                    cout << "  var " << xy << "\t" << i << "\t" << var.str() << endl;
                 }
                 if( xy == 0 )
                 {
@@ -109,7 +111,9 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
                     reader->AddVariable("Yoff_intersect", &mva_Yoff_intersect);
                 }
             }
-            if( !reader->BookMVA("BDT", weightFileName.str().c_str()) )
+            ostringstream mva_name;
+            mva_name << "BDT_" << xy << "\t" << i << endl;
+            if( !reader->BookMVA(mva_name.str().c_str(), weightFileName.str().c_str()) )
             {
                 cout << "Error: cannot find TMVA weight file: " << weightFileName.str() << endl;
                 exit( EXIT_FAILURE );
