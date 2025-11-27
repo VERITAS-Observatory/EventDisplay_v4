@@ -76,6 +76,7 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
     float mva_Yoff_intersect;
     float mva_Xoff_weighted_bdt;
     float mva_Yoff_weighted_bdt;
+    float tmp_var = 0;
 
     cout << "Input file: " << iInputFile << endl;
     cout << "TMVA weights directory: " << iTMVAWeightsDir << endl;
@@ -100,28 +101,32 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
                     ostringstream var;
                     var << training_variables[v] << "_" << n;
                     reader->AddVariable(var.str().c_str(), &mva_arrBuf[v][n]);
-                    cout << "  var " << xy << "\t" << i << "\t" << var.str() << endl;
                 }
             }
-            ostringstream var_x;
-            var_x << "disp_x_" << i;
-            reader->AddVariable(var_x.str().c_str(), &mva_disp_x[i-2]);
-            ostringstream var_y;
-            var_y << "disp_y_" << i;
-            reader->AddVariable(var_y.str().c_str(), &mva_disp_y[i-2]);
             if( xy == 0 )
             {
+                for( unsigned int n = 0; n < i; n++ )
+                {
+                    ostringstream var;
+                    var << "disp_x_" << n;
+                    reader->AddVariable(var.str().c_str(), &mva_disp_x[n]);
+                }
                 reader->AddVariable("Xoff_weighted_bdt", &mva_Xoff_weighted_bdt);
                 reader->AddVariable("Xoff_intersect", &mva_Xoff_intersect);
             }
             else
             {
+                for( unsigned int n = 0; n < i; n++ )
+                {
+                    ostringstream var;
+                    var << "disp_y_" << n;
+                    reader->AddVariable(var.str().c_str(), &mva_disp_y[n]);
+                }
                 reader->AddVariable("Yoff_weighted_bdt", &mva_Yoff_weighted_bdt);
                 reader->AddVariable("Yoff_intersect", &mva_Yoff_intersect);
             }
-            ostringstream mva_name;
-            mva_name << "BDT_" << xy << "\t" << i << endl;
-            if( !reader->BookMVA(mva_name.str().c_str(), weightFileName.str().c_str()) )
+            reader->AddSpectator("MCe0", &tmp_var);
+            if( !reader->BookMVA("BDT", weightFileName.str().c_str()) )
             {
                 cout << "Error: cannot find TMVA weight file: " << weightFileName.str() << endl;
                 exit( EXIT_FAILURE );
@@ -164,7 +169,6 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
             mva_disp_x[i] = arrBuf[0][i] * arrBuf[3][n_index]; // Disp_T * cosphi
             mva_disp_y[i] = arrBuf[0][i] * arrBuf[4][n_index]; // Disp_T * sinphi
         }
-        // evaluate TMVA
         dir_Xoff = fTMVAReader[0][DispNImages-2]->EvaluateMVA("BDT");
         dir_Yoff = fTMVAReader[1][DispNImages-2]->EvaluateMVA("BDT");
 
