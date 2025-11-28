@@ -50,16 +50,20 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
         exit( EXIT_FAILURE );
     }
     unsigned int DispNImages;
-    unsigned int DispTelList_T[4];
+    unsigned int DispTelList_T[n_tel_max];
     double Xoff_weighted_bdt;
     double Yoff_weighted_bdt;
     float Xoff_intersect;
     float Yoff_intersect;
     float arrBuf[n_tel_var][n_tel_max];
+    double fpointing_dx[n_tel_max];
+    double fpointing_dy[n_tel_max];
     for(unsigned v = 0; v < training_variables.size(); v++ )
     {
         data_tree->SetBranchAddress(training_variables[v].c_str(), arrBuf[v] );
     }
+    data_tree->SetBranchAddress("fpointing_dx", fpointing_dx );
+    data_tree->SetBranchAddress("fpointing_dy", fpointing_dy );
     data_tree->SetBranchAddress("DispNImages", &DispNImages);
     data_tree->SetBranchAddress("DispTelList_T", DispTelList_T);
     data_tree->SetBranchAddress("Xoff", &Xoff_weighted_bdt);
@@ -111,8 +115,6 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
                     var << "disp_x_" << n;
                     reader->AddVariable(var.str().c_str(), &mva_disp_x[n]);
                 }
-                reader->AddVariable("Xoff_weighted_bdt", &mva_Xoff_weighted_bdt);
-                reader->AddVariable("Xoff_intersect", &mva_Xoff_intersect);
             }
             else
             {
@@ -122,7 +124,15 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
                     var << "disp_y_" << n;
                     reader->AddVariable(var.str().c_str(), &mva_disp_y[n]);
                 }
-                reader->AddVariable("Yoff_weighted_bdt", &mva_Yoff_weighted_bdt);
+            }
+            reader->AddVariable("Xoff_weighted_bdt", &mva_Xoff_weighted_bdt);
+            reader->AddVariable("Yoff_weighted_bdt", &mva_Yoff_weighted_bdt);
+            if( xy == 0 )
+            {
+                reader->AddVariable("Xoff_intersect", &mva_Xoff_intersect);
+            }
+            else
+            {
                 reader->AddVariable("Yoff_intersect", &mva_Yoff_intersect);
             }
             reader->AddSpectator("MCe0", &tmp_var);
@@ -166,8 +176,8 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
         for (unsigned int i = 0; i < DispNImages; i++)
         {
             unsigned int n_index = DispTelList_T[i];
-            mva_disp_x[i] = arrBuf[0][i] * arrBuf[3][n_index]; // Disp_T * cosphi
-            mva_disp_y[i] = arrBuf[0][i] * arrBuf[4][n_index]; // Disp_T * sinphi
+            mva_disp_x[i] = arrBuf[0][i] * arrBuf[3][n_index] + fpointing_dx[n_index]; // Disp_T * cosphi
+            mva_disp_y[i] = arrBuf[0][i] * arrBuf[4][n_index] + fpointing_dy[n_index]; // Disp_T * sinphi
         }
         dir_Xoff = fTMVAReader[0][DispNImages-2]->EvaluateMVA("BDT");
         dir_Yoff = fTMVAReader[1][DispNImages-2]->EvaluateMVA("BDT");

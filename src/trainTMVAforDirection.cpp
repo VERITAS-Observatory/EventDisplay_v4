@@ -92,14 +92,14 @@ void train(TTree* trainingTree, TTree* testingTree, TFile* tmvaFile, string TMVA
                 loader.AddVariable(var.str().c_str());
             }
         }
+        loader.AddVariable("Xoff_weighted_bdt");
+        loader.AddVariable("Yoff_weighted_bdt");
         if( tmvaTarget[t] == "MCxoff" )
         {
-            loader.AddVariable("Xoff_weighted_bdt");
             loader.AddVariable("Xoff_intersect");
         }
         else
         {
-           loader.AddVariable("Yoff_weighted_bdt");
            loader.AddVariable("Yoff_intersect");
         }
 
