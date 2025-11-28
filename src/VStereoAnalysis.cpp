@@ -1977,6 +1977,7 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
         else
         {
             fDataDirTree = ( TTree* )fDataDirFile->Get( "DispDirection" );
+            cout << "VStereoAnalysis::getDataFromFile(): adding DispDirection from " << fDataDirFile->GetName() << endl;
         }
 
         c = new CData( fDataRunTree, false, false, fDataDirTree);
