@@ -1184,10 +1184,10 @@ trainTMVAforDirection:	./obj/trainTMVAforDirection.o \
 ########################################################
 # trainTMVAforDirection2d
 ########################################################
-./obj/trainTMVAforDirection2d.o:	./src/trainTMVAforDirection2d.cpp
+./obj/trainTMVAforDirection2D.o:	./src/trainTMVAforDirection2D.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-trainTMVAforDirection2d:	./obj/trainTMVAforDirection2d.o \
+trainTMVAforDirection2D:	./obj/trainTMVAforDirection2D.o \
 					./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 					./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 					./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
