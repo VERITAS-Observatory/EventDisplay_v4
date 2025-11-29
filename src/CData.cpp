@@ -9,14 +9,26 @@
 
 #include "CData.h"
 
-CData::CData( TTree* tree, bool bMC, bool bShort )
+
+CData::CData( TTree* tree, bool bMC, bool bShort, TTree* friendTree)
 {
     fMC = bMC;
     fShort = bShort;
     fVersion = 6;
     fTelescopeCombination = 0;
 
+    fFriendTree = friendTree;
     Init( tree );
+    if( fFriendTree )
+    {
+        fFriendTree->SetBranchAddress( "Dir_Xoff", &Dir_Xoff );
+        fFriendTree->SetBranchAddress( "Dir_Yoff", &Dir_Yoff );
+    }
+    else
+    {
+        Dir_Xoff = -9999.;
+        Dir_Yoff = -9999.;
+    }
 }
 
 
@@ -30,6 +42,7 @@ CData::~CData()
 }
 
 
+
 Int_t CData::GetEntry( Long64_t entry )
 {
     if(!fChain )
@@ -38,6 +51,10 @@ Int_t CData::GetEntry( Long64_t entry )
     }
 
     int a = fChain->GetEntry( entry );
+    if( fFriendTree )
+    {
+        fFriendTree->GetEntry( entry );
+    }
 
     if( fTelescopeCombination > 0 && fTelescopeCombination != 15 )
     {

@@ -258,7 +258,11 @@ class CData
         TBranch*        b_Xoff_intersect;
         TBranch*        b_Yoff_intersect;
 
-        CData( TTree* tree = 0, bool bMC = false, bool bShort = false );
+        TTree*          fFriendTree;              //!
+        float         Dir_Xoff;                 //!
+        float         Dir_Yoff;                 //!
+
+        CData( TTree* tree = 0, bool bMC = false, bool bShort = false, TTree *friendTree = 0 );
         virtual ~CData();
         virtual Int_t    GetEntry( Long64_t entry );
         virtual Long64_t LoadTree( Long64_t entry );
