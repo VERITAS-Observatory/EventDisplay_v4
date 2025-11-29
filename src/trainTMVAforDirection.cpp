@@ -49,7 +49,7 @@ void train(TTree* trainingTree, TTree* testingTree, TFile* tmvaFile, string TMVA
     vector< string > tmvaTarget;
     vector< string > tmvaTargetName;
     tmvaTarget.push_back( "MCxoff" );   tmvaTarget.push_back( "MCyoff" );
-    tmvaTargetName.push_back( "Xoff" ); tmvaTargetName.push_back( "Yoff" );
+    tmvaTargetName.push_back( "Xoff_mva" ); tmvaTargetName.push_back( "Yoff_mva" );
 
     // set output directory
     gSystem->mkdir( iOutputDir.c_str() );
@@ -109,7 +109,7 @@ void train(TTree* trainingTree, TTree* testingTree, TFile* tmvaFile, string TMVA
 
         loader.AddRegressionTree(trainingTree, 1., TMVA::Types::kTraining);
         loader.AddRegressionTree(testingTree, 1., TMVA::Types::kTesting);
-        loader.PrepareTrainingAndTestTree("", "NormMode=NumEvents");
+        loader.PrepareTrainingAndTestTree("", "");
 
         factory.BookMethod(&loader, TMVA::Types::kBDT, ("BDT_" + tmvaTargetName[t]).c_str(), TMVAOptions.c_str());
 
@@ -243,16 +243,14 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
                 {
                     n_index = DispTelList_T[i];
                 }
-
                 outArr[v][i] = arrBuf[v][n_index];
             }
         }
 
         for (unsigned int i = 0; i < DispNImages; i++)
         {
-            n_index = DispTelList_T[i];
-            disp_x[i] = outArr[0][i] * outArr[3][n_index]; // Disp_T * cosphi
-            disp_y[i] = outArr[0][i] * outArr[4][n_index]; // Disp_T * sinphi
+            disp_x[i] = outArr[0][i] * outArr[3][i]; // Disp_T * cosphi
+            disp_y[i] = outArr[0][i] * outArr[4][i]; // Disp_T * sinphi
         }
 
         if( TrainingEvent )

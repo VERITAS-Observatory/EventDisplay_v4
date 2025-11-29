@@ -44,7 +44,7 @@ static const vector< string > training_variables = {
 /*
  * Train TMVA MLPs for direction reconstruction
 */
-void train(TTree* trainingTree, TTree* testingTree, TFile* tmvaFile, string TMVAOptions, string iOutputDir, const unsigned int n_tel = 4)
+void train(TTree* trainingTree, TTree* testingTree, TFile* tmvaFile, string iOutputDir, const unsigned int n_tel = 4)
 {
     vector< string > tmvaTarget;
     vector< string > tmvaTargetName;
@@ -93,12 +93,20 @@ void train(TTree* trainingTree, TTree* testingTree, TFile* tmvaFile, string TMVA
 
     loader.AddSpectator("MCe0");
 
-    loader.AddTarget("MCxoff", "Xoff");
-    loader.AddTarget("MCyoff", "Yoff");
+    loader.AddTarget("MCxoff", "Xoff_mva");
+    loader.AddTarget("MCyoff", "Yoff_mva");
 
     loader.AddRegressionTree(trainingTree, 1., TMVA::Types::kTraining);
     loader.AddRegressionTree(testingTree, 1., TMVA::Types::kTesting);
-    loader.PrepareTrainingAndTestTree("", "NormMode=NumEvents");
+    loader.PrepareTrainingAndTestTree("", "");
+
+    unsigned N = loader.GetNVariables();
+    unsigned h1  = 2 * N;
+    unsigned h2  = N / 2;
+    std::ostringstream hl;
+    hl << h1 << "," << h2;
+    string TMVAOptions = "!V:NCycles=600:HiddenLayers=" + hl.str() + ":NeuronType=tanh:VarTransform=Norm";
+    cout << "Training TMVA MLPs with options: " << TMVAOptions << endl;
 
     factory.BookMethod(&loader, TMVA::Types::kMLP, "MLP_MultiTarget", TMVAOptions.c_str());
 
@@ -231,16 +239,14 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
                 {
                     n_index = DispTelList_T[i];
                 }
-
                 outArr[v][i] = arrBuf[v][n_index];
             }
         }
 
         for (unsigned int i = 0; i < DispNImages; i++)
         {
-            n_index = DispTelList_T[i];
-            disp_x[i] = outArr[0][i] * outArr[3][n_index]; // Disp_T * cosphi
-            disp_y[i] = outArr[0][i] * outArr[4][n_index]; // Disp_T * sinphi
+            disp_x[i] = outArr[0][i] * outArr[3][i]; // Disp_T * cosphi
+            disp_y[i] = outArr[0][i] * outArr[4][i]; // Disp_T * sinphi
         }
 
         if( TrainingEvent )
@@ -338,7 +344,6 @@ int main( int argc, char* argv[] )
     string trainingFileName = argv[3];
     float trainTestFraction = atof(argv[4]);
     unsigned int max_events = atoi(argv[5]);
-    string TMVAOptions = "!V:NCycles=600:HiddenLayers=N,N:NeuronType=tanh:VarTransform=Norm";
     if( argc >= 7 )
     {
         TMVAOptions = argv[6];
@@ -349,7 +354,6 @@ int main( int argc, char* argv[] )
     cout << endl;
     vector<string> inputFiles = fillInputFiles_fromList(inputFileList);
     cout << "Output directory for TMVA weight files: " << outputDir << endl;
-    cout << "Training TMVA MLPs with options: " << TMVAOptions << endl;
     cout << "Train vs test fraction: " << trainTestFraction << ", max. events: " << max_events << endl;
     cout << endl;
 
@@ -367,7 +371,7 @@ int main( int argc, char* argv[] )
         string output_file = outputDir + "/dirMLPs_ntel" + to_string(i) + ".root";
         TFile* tmvaFile = new TFile((output_file).c_str(), "RECREATE");
 
-        train(training_tree, testing_tree, tmvaFile, TMVAOptions, outputDir, i);
+        train(training_tree, testing_tree, tmvaFile, outputDir, i);
 
         tmvaFile->Close();
         delete tmvaFile;
