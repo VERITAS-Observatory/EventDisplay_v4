@@ -67,6 +67,7 @@ void train(TTree* trainingTree, TTree* testingTree, TFile* tmvaFile, string iOut
 
     factory.SetVerbose( true );
     TMVA::DataLoader loader(fac_name.str().c_str());
+    unsigned N = 0;
 
     for( unsigned int v = 0; v < training_variables.size(); v++ )
     {
@@ -75,6 +76,7 @@ void train(TTree* trainingTree, TTree* testingTree, TFile* tmvaFile, string iOut
             ostringstream var;
             var << training_variables[v] << "_" << n;
             loader.AddVariable(var.str().c_str());
+            N++;
         }
     }
     for( unsigned int n = 0; n < n_tel; n++ )
@@ -82,14 +84,20 @@ void train(TTree* trainingTree, TTree* testingTree, TFile* tmvaFile, string iOut
         ostringstream var;
         var << "disp_x_" << n;
         loader.AddVariable(var.str().c_str());
+        N++;
         var.str("");
         var << "disp_y_" << n;
         loader.AddVariable(var.str().c_str());
+        N++;
     }
     loader.AddVariable("Xoff_weighted_bdt");
+    N++;
     loader.AddVariable("Yoff_weighted_bdt");
+    N++;
     loader.AddVariable("Xoff_intersect");
+    N++;
     loader.AddVariable("Yoff_intersect");
+    N++;
 
     loader.AddSpectator("MCe0");
 
@@ -100,7 +108,6 @@ void train(TTree* trainingTree, TTree* testingTree, TFile* tmvaFile, string iOut
     loader.AddRegressionTree(testingTree, 1., TMVA::Types::kTesting);
     loader.PrepareTrainingAndTestTree("", "");
 
-    unsigned N = loader.GetNVariables();
     unsigned h1  = 2 * N;
     unsigned h2  = N / 2;
     std::ostringstream hl;
@@ -333,7 +340,6 @@ int main( int argc, char* argv[] )
     {
         cout << "./trainTMVAforDirection <list of input eventdisplay files (MC)> <output directory>" << endl;
         cout << "                        <training file name> <train vs test fraction> <max. number of events>" << endl;
-        cout << "                        [TMVA options (optional)]" << endl;
         cout << endl;
         cout << "example: ./trainTMVAforDirection files.txt ./ train_events 0.5 100000" << endl;
         cout << endl;
@@ -344,10 +350,6 @@ int main( int argc, char* argv[] )
     string trainingFileName = argv[3];
     float trainTestFraction = atof(argv[4]);
     unsigned int max_events = atoi(argv[5]);
-    if( argc >= 7 )
-    {
-        TMVAOptions = argv[6];
-    }
 
     cout << "trainTMVAforDirection (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
     cout << "------------------------------------" << endl;
