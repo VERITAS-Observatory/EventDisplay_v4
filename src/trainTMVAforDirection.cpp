@@ -15,6 +15,7 @@
 #include "TChain.h"
 #include "TCut.h"
 #include "TFile.h"
+#include "TMath.h"
 #include "TTree.h"
 #include "TRandom3.h"
 
@@ -50,6 +51,8 @@ void train(TTree* trainingTree, TTree* testingTree, TFile* tmvaFile, string TMVA
     vector< string > tmvaTargetName;
     tmvaTarget.push_back( "MCxoff" );   tmvaTarget.push_back( "MCyoff" );
     tmvaTargetName.push_back( "Xoff_mva" ); tmvaTargetName.push_back( "Yoff_mva" );
+    tmvaTargetName.push_back( "R_mva" ); tmvaTargetName.push_back( "MCr" );
+    tmvaTargetName.push_back( "Psi_mva" ); tmvaTargetName.push_back( "MCpsi" );
 
     // set output directory
     gSystem->mkdir( iOutputDir.c_str() );
@@ -81,27 +84,16 @@ void train(TTree* trainingTree, TTree* testingTree, TFile* tmvaFile, string TMVA
         for( unsigned int n = 0; n < n_tel; n++ )
         {
             ostringstream var;
-            if( tmvaTarget[t] == "MCxoff" )
-            {
-                var << "disp_x_" << n;
-                loader.AddVariable(var.str().c_str());
-            }
-            else
-            {
-                var << "disp_y_" << n;
-                loader.AddVariable(var.str().c_str());
-            }
+            var << "disp_x_" << n;
+            loader.AddVariable(var.str().c_str());
+            var.str("");
+            var << "disp_y_" << n;
+            loader.AddVariable(var.str().c_str());
         }
         loader.AddVariable("Xoff_weighted_bdt");
         loader.AddVariable("Yoff_weighted_bdt");
-        if( tmvaTarget[t] == "MCxoff" )
-        {
-            loader.AddVariable("Xoff_intersect");
-        }
-        else
-        {
-           loader.AddVariable("Yoff_intersect");
-        }
+        loader.AddVariable("Xoff_intersect");
+        loader.AddVariable("Yoff_intersect");
 
         loader.AddSpectator("MCe0");
 
@@ -174,6 +166,12 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
     float outArr[n_tel_var][n_tel];
     float disp_x[n_tel];
     float disp_y[n_tel];
+    float R_dispBDT;
+    float psi_dispBDT;
+    float R_intersect;
+    float psi_intersect;
+    double MCr;
+    double MCpsi;
     bool TrainingEvent;
     for(unsigned int i = 0; i < 2; i++ )
     {
@@ -197,10 +195,16 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
 
         outTrees.back()->Branch("Xoff_weighted_bdt", &Xoff);
         outTrees.back()->Branch("Yoff_weighted_bdt", &Yoff);
+        outTrees.back()->Branch("R_weighted_bdt", &R_dispBDT);
+        outTrees.back()->Branch("psi_weighted_bdt", &psi_dispBDT);
         outTrees.back()->Branch("Xoff_intersect", &Xoff_intersect);
         outTrees.back()->Branch("Yoff_intersect", &Yoff_intersect);
+        outTrees.back()->Branch("R_intersect", &R_intersect);
+        outTrees.back()->Branch("psi_intersect", &psi_intersect);
         outTrees.back()->Branch("MCxoff", &MCxoff);
         outTrees.back()->Branch("MCyoff", &MCyoff);
+        outTrees.back()->Branch("MCr", &MCr);
+        outTrees.back()->Branch("MCpsi", &MCpsi);
         outTrees.back()->Branch("MCe0", &MCe0);
     }
 
@@ -252,6 +256,13 @@ string prepare(vector<string> inputFiles, string trainingFileName, float trainTe
             disp_x[i] = outArr[0][i] * outArr[3][i]; // Disp_T * cosphi
             disp_y[i] = outArr[0][i] * outArr[4][i]; // Disp_T * sinphi
         }
+        R_dispBDT = sqrt( Xoff*Xoff + Yoff*Yoff );
+        psi_dispBDT = TMath::ATan2( Yoff, Xoff );
+        R_intersect = sqrt( Xoff_intersect*Xoff_intersect + Yoff_intersect*Yoff_intersect );
+        psi_intersect = TMath::ATan2( Yoff_intersect, Xoff_intersect );
+
+        MCr = sqrt( MCxoff*MCxoff + MCyoff*MCyoff );
+        MCpsi = TMath::ATan2( MCyoff, MCxoff );
 
         if( TrainingEvent )
         {

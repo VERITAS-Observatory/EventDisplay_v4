@@ -28,6 +28,7 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
 {
     const unsigned int n_tel_max = 4;
     bool is_MLP = true;
+    is_MLP = false;
 
     TFile outputFile( iOutputFile.c_str(), "RECREATE" );
     TTree* outTree = new TTree(
@@ -103,7 +104,7 @@ void evaluate( string iInputFile, string iTMVAWeightsDir, string iOutputFile )
             }
             else
             {
-                weightFileName << iTMVAWeightsDir << "/DISPDir" << coord << "off_ntel" << i << "_BDT_" << coord << "off.weights.xml";
+                weightFileName << iTMVAWeightsDir << "/DISPDir" << coord << "off_mva_ntel" << i << "_BDT_" << coord << "off_mva.weights.xml";
             }
             cout << "  weight file " << weightFileName.str() << endl;
             TMVA::Reader* reader = new TMVA::Reader("!Color:!Silent");
