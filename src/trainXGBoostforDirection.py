@@ -24,7 +24,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.multioutput import MultiOutputRegressor
 
 logging.basicConfig(level=logging.INFO)
-_logger = logging.getLogger("trainTMVAforDirection_XGB")
+_logger = logging.getLogger("trainXGBoostforDirection")
 
 # Telescope-type training variables
 # NOTE: Disp_T must be first due to special indexing logic in data prep

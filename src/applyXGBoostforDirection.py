@@ -15,10 +15,10 @@ import numpy as np
 import pandas as pd
 import uproot
 
-from trainMVAforDirection import TRAINING_VARIABLES
+from trainXGBoostforDirection import TRAINING_VARIABLES
 
 logging.basicConfig(level=logging.INFO)
-_logger = logging.getLogger("applyMVAforDirection_XGB")
+_logger = logging.getLogger("applyXGBoostforDirection")
 
 
 def load_all_events(input_file, max_events=None):
