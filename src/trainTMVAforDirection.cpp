@@ -49,10 +49,10 @@ void train(TTree* trainingTree, TTree* testingTree, TFile* tmvaFile, string TMVA
 {
     vector< string > tmvaTarget;
     vector< string > tmvaTargetName;
-    tmvaTarget.push_back( "MCxoff" );   tmvaTarget.push_back( "MCyoff" );
-    tmvaTargetName.push_back( "Xoff_mva" ); tmvaTargetName.push_back( "Yoff_mva" );
-    tmvaTargetName.push_back( "R_mva" ); tmvaTargetName.push_back( "MCr" );
-    tmvaTargetName.push_back( "Psi_mva" ); tmvaTargetName.push_back( "MCpsi" );
+    tmvaTarget.push_back( "MCxoff" );   tmvaTargetName.push_back( "Xoff_mva" );
+    tmvaTarget.push_back( "MCyoff" );   tmvaTargetName.push_back( "Yoff_mva" );
+    tmvaTarget.push_back( "MCr" );      tmvaTargetName.push_back( "R_mva" );
+    tmvaTarget.push_back( "MCpsi" );    tmvaTargetName.push_back( "Psi_mva" );
 
     // set output directory
     gSystem->mkdir( iOutputDir.c_str() );
