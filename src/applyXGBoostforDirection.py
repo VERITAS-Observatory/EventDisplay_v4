@@ -175,12 +175,12 @@ def write_output_root_file(output_file, pred_xoff, pred_yoff):
     _logger.info(f"Writing output to {output_file}")
 
     output_data = {
-        "Xoff_BDT": pred_xoff,
-        "Yoff_BDT": pred_yoff,
+        "Dir_Xoff": pred_xoff,
+        "Dir_Yoff": pred_yoff,
     }
 
     with uproot.recreate(output_file) as root_file:
-        root_file.mktree("predictions", output_data)
+        root_file.mktree("DispDirection", output_data)
 
     _logger.info(f"Output written successfully: {len(pred_xoff)} events")
 
