@@ -1,0 +1,24 @@
+---
+name: eventdisplay_v4
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13
+  - awkward
+  - awkward-pandas
+  - joblib
+  - matplotlib
+  - numpy
+  - pandas
+  - scikit-learn
+  - scipy
+  - tabulate
+  - towncrier
+  - uproot
+  - xgboost
+
+# cheatsheet
+# create: conda env create -f environment.yml
+# activate: conda activate eventdisplay_v4
+# update (conda/mamba): conda env update -f environment.yml --prune
+# update (micromamba): micromamba update -f environment.yml
