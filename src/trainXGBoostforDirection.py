@@ -115,7 +115,7 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
         for i in range(n_tel):
             col_name = f"{var_name}_{i}"
             if var_name.startswith("Disp"):
-                # Disp variables use index i (its position in the disp list)
+                # Disp variables use index i (their position in the disp list)
                 flat_features[col_name] = df[var_name].apply(lambda x: x[i])
             else:
                 tel_indices = df["DispTelList_T"].apply(lambda x: x[i])

@@ -69,8 +69,8 @@ def flatten_event_features(row, n_tel):
     for var_name in TRAINING_VARIABLES:
         for i in range(n_tel):
             col_name = f"{var_name}_{i}"
-            if var_name == "Disp_T":
-                # Disp_T uses index i (its position in the disp list)
+            if var_name.startswith("Disp"):
+                # Disp variables use index i (their position in the disp list)
                 try:
                     flat_features[col_name] = row[var_name][i]
                 except (IndexError, TypeError):
