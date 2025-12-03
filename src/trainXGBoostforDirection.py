@@ -30,6 +30,9 @@ _logger = logging.getLogger("trainXGBoostforDirection")
 # NOTE: Disp_T must be first due to special indexing logic in data prep
 TRAINING_VARIABLES = [
     "Disp_T",
+    "DispXoff_T",
+    "DispYoff_T",
+    "DispWoff_T",
     "cen_x",
     "cen_y",
     "cosphi",
@@ -58,6 +61,9 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
     branch_list = [
         "DispNImages",
         "DispTelList_T",
+        "DispXoff_T",
+        "DispYoff_T",
+        "DispWoff_T",
         "Xoff",
         "Yoff",
         "Xoff_intersect",
@@ -111,8 +117,8 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
     for _, var_name in enumerate(TRAINING_VARIABLES):
         for i in range(n_tel):
             col_name = f"{var_name}_{i}"
-            if var_name == "Disp_T":
-                # Disp_T uses index i (its position in the disp list)
+            if var_name.startswith("Disp"):
+                # Disp variables use index i (its position in the disp list)
                 flat_features[col_name] = df[var_name].apply(lambda x: x[i])
             else:
                 tel_indices = df["DispTelList_T"].apply(lambda x: x[i])
@@ -200,7 +206,7 @@ def train_xgb_model(df, n_tel, TMVAOptions, output_dir, train_test_fraction):
     xgb_params = {
         "n_estimators": 800,
         "learning_rate": 0.1,  # Shrinkage
-        "max_depth": 4,
+        "max_depth": 8,
         "min_child_weight": 1.0,  # Equivalent to MinNodeSize=1.0% for XGBoost
         "objective": "reg:squarederror",
         "n_jobs": -1,
@@ -345,7 +351,7 @@ def main():
     )
     parser.add_argument(
         "--tmva_options",
-        default="!V:NTrees=800:BoostType=Grad:Shrinkage=0.1:MaxDepth=4:MinNodeSize=1.0%",
+        default="!V:NTrees=800:BoostType=Grad:Shrinkage=0.1:MaxDepth=8:MinNodeSize=1.0%",
         help="TMVA options string (used to configure XGBoost parameters).",
     )
 
