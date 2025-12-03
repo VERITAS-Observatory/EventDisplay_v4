@@ -61,9 +61,6 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
     branch_list = [
         "DispNImages",
         "DispTelList_T",
-        "DispXoff_T",
-        "DispYoff_T",
-        "DispWoff_T",
         "Xoff",
         "Yoff",
         "Xoff_intersect",
