@@ -150,10 +150,11 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
         df_flat[f"disp_x_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"cosphi_{i}"]
         df_flat[f"disp_y_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"sinphi_{i}"]
 
-    df_flat["Xoff_weighted_bdt"] = df["Xoff"]
-    df_flat["Yoff_weighted_bdt"] = df["Yoff"]
-    df_flat["Xoff_intersect"] = df["Xoff_intersect"]
-    df_flat["Yoff_intersect"] = df["Yoff_intersect"]
+    # TODO TMP TMP - ablation study
+    # df_flat["Xoff_weighted_bdt"] = df["Xoff"]
+    # df_flat["Yoff_weighted_bdt"] = df["Yoff"]
+    # df_flat["Xoff_intersect"] = df["Xoff_intersect"]
+    # df_flat["Yoff_intersect"] = df["Yoff_intersect"]
 
     if training_step:
         df_flat["MCxoff"] = df["MCxoff"]
@@ -166,14 +167,13 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
     return df_flat
 
 
-def train_xgb_model(df, n_tel, TMVAOptions, output_dir, train_test_fraction):
+def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
     """
     Trains a single XGBoost model for multi-target regression (Xoff, Yoff).
 
     Parameters:
     - df: Pandas DataFrame with training data.
     - n_tel: Telescope multiplicity.
-    - TMVAOptions: TMVA options string to configure XGBoost parameters.
     - output_dir: Directory to save the trained model.
     - train_test_fraction: Fraction of data to use for training.
     """
@@ -203,26 +203,16 @@ def train_xgb_model(df, n_tel, TMVAOptions, output_dir, train_test_fraction):
     xgb_params = {
         "n_estimators": 800,
         "learning_rate": 0.1,  # Shrinkage
-        "max_depth": 8,
+        "max_depth": 5,
         "min_child_weight": 1.0,  # Equivalent to MinNodeSize=1.0% for XGBoost
         "objective": "reg:squarederror",
-        "n_jobs": -1,
+        "n_jobs": 4,
         "random_state": 42,
         "tree_method": "hist",
         "subsample": 0.7,  # Default sensible value
         "colsample_bytree": 0.7,  # Default sensible value
     }
-
-    if TMVAOptions:
-        for opt in TMVAOptions.split(":"):
-            if "=" in opt:
-                key, val = opt.split("=")
-                if key == "NTrees":
-                    xgb_params["n_estimators"] = int(val)
-                elif key == "Shrinkage":
-                    xgb_params["learning_rate"] = float(val)
-                elif key == "MaxDepth":
-                    xgb_params["max_depth"] = int(val)
+    _logger.info(f"XGBoost parameters: {xgb_params}")
 
     base_estimator = xgb.XGBRegressor(**xgb_params)
     model = MultiOutputRegressor(base_estimator)
@@ -333,6 +323,7 @@ def main():
         description=("Train XGBoost Multi-Target BDTs for Direction Reconstruction")
     )
     parser.add_argument("input_file_list", help="List of input mscw ROOT files.")
+    parser.add_argument("ntel", type=int, help="Telescope multiplicity (2, 3, or 4).")
     parser.add_argument(
         "output_dir", help="Output directory for XGBoost models and weights."
     )
@@ -345,11 +336,6 @@ def main():
         "max_events",
         type=int,
         help="Maximum number of events to process across all files.",
-    )
-    parser.add_argument(
-        "--tmva_options",
-        default="!V:NTrees=800:BoostType=Grad:Shrinkage=0.1:MaxDepth=8:MinNodeSize=1.0%",
-        help="TMVA options string (used to configure XGBoost parameters).",
     )
 
     args = parser.parse_args()
@@ -367,19 +353,15 @@ def main():
 
     _logger.info("--- XGBoost Multi-Target Direction Training ---")
     _logger.info(f"Input files: {len(input_files)}")
+    _logger.info(f"Telescope multiplicity: {args.ntel}")
     _logger.info(f"Output directory: {args.output_dir}")
     _logger.info(
         f"Train vs test fraction: {args.train_test_fraction}, Max events: {args.max_events}"
     )
-    _logger.info(f"TMVA/XGB options: {args.tmva_options}")
 
-    # Train separate BDTs for 2, 3, and 4 telescope multiplicity
-    for n_tel in range(2, 5):
-        df_flat = load_and_flatten_data(input_files, n_tel, args.max_events)
-        train_xgb_model(
-            df_flat, n_tel, args.tmva_options, args.output_dir, args.train_test_fraction
-        )
-    _logger.info("\nAll XGBoost models trained successfully.")
+    df_flat = load_and_flatten_data(input_files, args.ntel, args.max_events)
+    train_xgb_model(df_flat, args.ntel, args.output_dir, args.train_test_fraction)
+    _logger.info("\nXGBoost model trained successfully.")
 
 
 if __name__ == "__main__":
