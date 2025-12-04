@@ -196,6 +196,9 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
         // dead time calculation method
         int  fDeadTimeCalculationMethod;
 
+        // direction reconstruction
+        string fXY_DirectionFile;
+
         int f2DAcceptanceMode ; // USE2DACCEPTANCE
 
         // add all events to DL3 tree, no gh cuts but add BDT score and IsGamma
