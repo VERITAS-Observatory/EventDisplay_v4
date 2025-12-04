@@ -43,6 +43,8 @@ def load_all_events(input_file, max_events=None):
         "Yoff",
         "Xoff_intersect",
         "Yoff_intersect",
+        "fpointing_dx",
+        "fpointing_dy",
     ] + [var for var in TRAINING_VARIABLES]
 
     with uproot.open(input_file) as root_file:
@@ -87,12 +89,12 @@ def flatten_event_features(row, n_tel):
                     flat_features[col_name] = np.nan
 
     for i in range(n_tel):
-        flat_features[f"disp_x_{i}"] = (
-            flat_features[f"Disp_T_{i}"] * flat_features[f"cosphi_{i}"]
-        )
-        flat_features[f"disp_y_{i}"] = (
-            flat_features[f"Disp_T_{i}"] * flat_features[f"sinphi_{i}"]
-        )
+        flat_features[f"disp_x_{i}"] = flat_features[f"Disp_T_{i}"] * flat_features[
+            f"cosphi_{i}"
+        ] + flat_features.get(f"fpointing_dx_{i}", 0)
+        flat_features[f"disp_y_{i}"] = flat_features[f"Disp_T_{i}"] * flat_features[
+            f"sinphi_{i}"
+        ] + flat_features.get(f"fpointing_dy_{i}", 0)
 
     flat_features["Xoff_weighted_bdt"] = row["Xoff"]
     flat_features["Yoff_weighted_bdt"] = row["Yoff"]
@@ -152,7 +154,11 @@ def apply_models(df, model_dir):
 
         # Get feature columns (exclude MC truth if present)
         feature_cols = [
-            col for col in df_flat.columns if col not in ["MCxoff", "MCyoff", "MCe0"]
+            col
+            for col in df_flat.columns
+            if col not in ["MCxoff", "MCyoff", "MCe0"]
+            and not col.startswith("fpointing_dx")
+            and not col.startswith("fpointing_dy")
         ]
         X = df_flat[feature_cols]
 

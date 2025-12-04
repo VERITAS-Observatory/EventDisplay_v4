@@ -107,62 +107,74 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
     if data_tree.empty:
         return pd.DataFrame()
 
-    df = data_tree
+    df_flat = flatten_data_vectorized(data_tree, n_tel, TRAINING_VARIABLES)
+
+    if training_step:
+        df_flat["MCxoff"] = data_tree["MCxoff"]
+        df_flat["MCyoff"] = data_tree["MCyoff"]
+        df_flat["MCe0"] = data_tree["MCe0"]
+
+    df_flat.dropna(inplace=True)
+    _logger.info(f"Final events for n_tel={n_tel} after cleanup: {len(df_flat)}")
+
+    return df_flat
+
+
+def flatten_data_vectorized(df, n_tel, training_variables):
+    """
+    Vectorized flattening of telescope array columns.
+    Significantly faster than row-by-row iteration.
+    """
     flat_features = {}
 
-    # 2. Flatten array variables and apply complex indexing logic (Disp_T vs others)
-    for _, var_name in enumerate(TRAINING_VARIABLES):
+    try:
+        tel_list_matrix = np.vstack(df["DispTelList_T"].values)
+    except ValueError:
+        tel_list_matrix = np.array(df["DispTelList_T"].tolist())
+
+    for var_name in training_variables:
+        # Convert the column of arrays to a 2D numpy matrix
+        # Shape: (n_events, max_n_tel)
+        try:
+            data_matrix = np.vstack(df[var_name].values)
+        except ValueError:
+            data_matrix = np.array(df[var_name].tolist())
+
         for i in range(n_tel):
             col_name = f"{var_name}_{i}"
+
             if var_name.startswith("Disp"):
-                # Disp variables use index i (their position in the disp list)
-                flat_features[col_name] = df[var_name].apply(lambda x: x[i])
+                # Case 1: Simple index i
+                if i < data_matrix.shape[1]:
+                    flat_features[col_name] = data_matrix[:, i]
+                else:
+                    flat_features[col_name] = np.full(len(df), np.nan)
             else:
-                tel_indices = df["DispTelList_T"].apply(lambda x: x[i])
-                var_arrays = df[var_name]
+                # Case 2: Index lookup via DispTelList_T
+                target_tel_indices = tel_list_matrix[:, i].astype(int)
 
-                def get_tel_value_at_index(var_array, tel_idx):
-                    try:
-                        tel_idx = int(tel_idx)
-                        if 0 <= tel_idx < len(var_array):
-                            return var_array[tel_idx]
-                        else:
-                            _logger.warning(
-                                f"Warning: Index out of range for {var_name}, "
-                                f"idx={tel_idx}, array length={len(var_array)}"
-                            )
-                            return np.nan
-                    except (IndexError, TypeError) as e:
-                        _logger.warning(
-                            f"Warning: Error accessing {var_name}, "
-                            f"arr={var_array}, idx={tel_idx}, error={e}"
-                        )
-                        return np.nan
-
-                flat_features[col_name] = [
-                    get_tel_value_at_index(arr, idx)
-                    for arr, idx in zip(var_arrays, tel_indices)
+                row_indices = np.arange(len(df))
+                valid_mask = (target_tel_indices >= 0) & (
+                    target_tel_indices < data_matrix.shape[1]
+                )
+                result = np.full(len(df), np.nan)
+                result[valid_mask] = data_matrix[
+                    row_indices[valid_mask], target_tel_indices[valid_mask]
                 ]
 
+                flat_features[col_name] = result
+
+    # Convert dictionary to DataFrame once at the end
     df_flat = pd.DataFrame(flat_features, index=df.index)
 
     for i in range(n_tel):
         df_flat[f"disp_x_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"cosphi_{i}"]
         df_flat[f"disp_y_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"sinphi_{i}"]
 
-    # TODO TMP TMP - ablation study
-    # df_flat["Xoff_weighted_bdt"] = df["Xoff"]
-    # df_flat["Yoff_weighted_bdt"] = df["Yoff"]
-    # df_flat["Xoff_intersect"] = df["Xoff_intersect"]
-    # df_flat["Yoff_intersect"] = df["Yoff_intersect"]
-
-    if training_step:
-        df_flat["MCxoff"] = df["MCxoff"]
-        df_flat["MCyoff"] = df["MCyoff"]
-        df_flat["MCe0"] = df["MCe0"]
-
-    df_flat.dropna(inplace=True)
-    _logger.info(f"Final events for n_tel={n_tel} after cleanup: {len(df_flat)}")
+    df_flat["Xoff_weighted_bdt"] = df["Xoff"]
+    df_flat["Yoff_weighted_bdt"] = df["Yoff"]
+    df_flat["Xoff_intersect"] = df["Xoff_intersect"]
+    df_flat["Yoff_intersect"] = df["Yoff_intersect"]
 
     return df_flat
 
