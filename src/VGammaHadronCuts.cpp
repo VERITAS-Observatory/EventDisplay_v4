@@ -2585,7 +2585,7 @@ double VGammaHadronCuts::getReconstructedXoff()
     {
         return -9999.;
     }
-    if( fData->fFriendTree ))
+    if( fData->fFriendTree )
     {
         return fData->Dir_Xoff;
     }
