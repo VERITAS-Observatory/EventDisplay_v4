@@ -61,47 +61,63 @@ def load_all_events(input_file, max_events=None):
     return df
 
 
-def flatten_event_features(row, n_tel):
+def flatten_data_vectorized(df, n_tel, training_variables):
     """
-    Flatten telescope-array features for a single event row.
-    Returns a dictionary of flattened features.
+    Vectorized flattening of telescope array columns.
+    Significantly faster than row-by-row iteration.
     """
     flat_features = {}
 
-    for var_name in TRAINING_VARIABLES:
+    try:
+        tel_list_matrix = np.vstack(df["DispTelList_T"].values)
+    except ValueError:
+        tel_list_matrix = np.array(df["DispTelList_T"].tolist())
+
+    for var_name in training_variables:
+        # Convert the column of arrays to a 2D numpy matrix
+        # Shape: (n_events, max_n_tel)
+        try:
+            data_matrix = np.vstack(df[var_name].values)
+        except ValueError:
+            data_matrix = np.array(df[var_name].tolist())
+
         for i in range(n_tel):
             col_name = f"{var_name}_{i}"
+
             if var_name.startswith("Disp"):
-                # Disp variables use index i (their position in the disp list)
-                try:
-                    flat_features[col_name] = row[var_name][i]
-                except (IndexError, TypeError):
-                    flat_features[col_name] = np.nan
+                # Case 1: Simple index i
+                if i < data_matrix.shape[1]:
+                    flat_features[col_name] = data_matrix[:, i]
+                else:
+                    flat_features[col_name] = np.full(len(df), np.nan)
             else:
-                # Other variables use telescope index from DispTelList_T
-                try:
-                    tel_idx = int(row["DispTelList_T"][i])
-                    if 0 <= tel_idx < len(row[var_name]):
-                        flat_features[col_name] = row[var_name][tel_idx]
-                    else:
-                        flat_features[col_name] = np.nan
-                except (IndexError, TypeError):
-                    flat_features[col_name] = np.nan
+                # Case 2: Index lookup via DispTelList_T
+                target_tel_indices = tel_list_matrix[:, i].astype(int)
+
+                row_indices = np.arange(len(df))
+                valid_mask = (target_tel_indices >= 0) & (
+                    target_tel_indices < data_matrix.shape[1]
+                )
+                result = np.full(len(df), np.nan)
+                result[valid_mask] = data_matrix[
+                    row_indices[valid_mask], target_tel_indices[valid_mask]
+                ]
+
+                flat_features[col_name] = result
+
+    # Convert dictionary to DataFrame once at the end
+    df_flat = pd.DataFrame(flat_features, index=df.index)
 
     for i in range(n_tel):
-        flat_features[f"disp_x_{i}"] = flat_features[f"Disp_T_{i}"] * flat_features[
-            f"cosphi_{i}"
-        ] + flat_features.get(f"fpointing_dx_{i}", 0)
-        flat_features[f"disp_y_{i}"] = flat_features[f"Disp_T_{i}"] * flat_features[
-            f"sinphi_{i}"
-        ] + flat_features.get(f"fpointing_dy_{i}", 0)
+        df_flat[f"disp_x_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"cosphi_{i}"]
+        df_flat[f"disp_y_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"sinphi_{i}"]
 
-    flat_features["Xoff_weighted_bdt"] = row["Xoff"]
-    flat_features["Yoff_weighted_bdt"] = row["Yoff"]
-    flat_features["Xoff_intersect"] = row["Xoff_intersect"]
-    flat_features["Yoff_intersect"] = row["Yoff_intersect"]
+    df_flat["Xoff_weighted_bdt"] = df["Xoff"]
+    df_flat["Yoff_weighted_bdt"] = df["Yoff"]
+    df_flat["Xoff_intersect"] = df["Xoff_intersect"]
+    df_flat["Yoff_intersect"] = df["Yoff_intersect"]
 
-    return flat_features
+    return df_flat
 
 
 def apply_models(df, model_dir):
@@ -142,23 +158,11 @@ def apply_models(df, model_dir):
 
         _logger.info(f"Processing {len(group_df)} events with n_tel={n_tel}")
 
-        flattened_rows = []
-        indices = []
-        for idx in group_df.index:
-            row = group_df.loc[idx]
-            flat_features = flatten_event_features(row, n_tel)
-            flattened_rows.append(flat_features)
-            indices.append(idx)
-
-        df_flat = pd.DataFrame(flattened_rows, index=indices)
+        df_flat = flatten_data_vectorized(group_df, n_tel, TRAINING_VARIABLES)
 
         # Get feature columns (exclude MC truth if present)
         feature_cols = [
-            col
-            for col in df_flat.columns
-            if col not in ["MCxoff", "MCyoff", "MCe0"]
-            and not col.startswith("fpointing_dx")
-            and not col.startswith("fpointing_dy")
+            col for col in df_flat.columns if col not in ["MCxoff", "MCyoff", "MCe0"]
         ]
         X = df_flat[feature_cols]
 
