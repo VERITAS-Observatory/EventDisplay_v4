@@ -175,8 +175,8 @@ def write_output_root_file(output_file, pred_xoff, pred_yoff):
     _logger.info(f"Writing output to {output_file}")
 
     output_data = {
-        "Dir_Xoff": pred_xoff,
-        "Dir_Yoff": pred_yoff,
+        "Dir_Xoff": np.asarray(pred_xoff, dtype=np.float32),
+        "Dir_Yoff": np.asarray(pred_yoff, dtype=np.float32),
     }
 
     with uproot.recreate(output_file) as root_file:
