@@ -112,8 +112,8 @@ def flatten_data_vectorized(df, n_tel, training_variables):
         df_flat[f"disp_x_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"cosphi_{i}"]
         df_flat[f"disp_y_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"sinphi_{i}"]
 
-    df_flat["Xoff_weighted_bdt"] = df["Xoff"]
-    df_flat["Yoff_weighted_bdt"] = df["Yoff"]
+    # TMP    df_flat["Xoff_weighted_bdt"] = df["Xoff"]
+    # TMP    df_flat["Yoff_weighted_bdt"] = df["Yoff"]
     df_flat["Xoff_intersect"] = df["Xoff_intersect"]
     df_flat["Yoff_intersect"] = df["Yoff_intersect"]
 
