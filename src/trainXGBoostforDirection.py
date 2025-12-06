@@ -49,9 +49,7 @@ TRAINING_VARIABLES = [
 N_TEL_VAR = len(TRAINING_VARIABLES)
 
 
-def load_and_flatten_data(
-    input_files, n_tel, max_events, training_step=True, jitter_seed=None
-):
+def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
     """
     Reads the data from ROOT files, filters for the required multiplicity (n_tel),
     and flattens the telescope-array features into a Pandas DataFrame.
@@ -110,17 +108,10 @@ def load_and_flatten_data(
     if data_tree.empty:
         return pd.DataFrame()
 
-    # Compute weights before jitter is applied: R (to reflect physical sky area)
-    # Training sample is flat in R, but sky area scales as R, so weight by R
+    # Compute weights: R (to reflect physical sky area)
     sample_weights = np.sqrt(data_tree["MCxoff"] ** 2 + data_tree["MCyoff"] ** 2)
 
-    rng = np.random.default_rng(jitter_seed)
-    jitter_offsets = rng.uniform(-0.125, 0.125, len(data_tree))
-    _logger.info("No jitter offsets applied for Xoff/Yoff training.")
-
-    df_flat = flatten_data_vectorized(
-        data_tree, n_tel, TRAINING_VARIABLES, jitter_offsets=jitter_offsets
-    )
+    df_flat = flatten_data_vectorized(data_tree, n_tel, TRAINING_VARIABLES)
 
     if training_step:
         df_flat["MCxoff"] = data_tree["MCxoff"]
@@ -201,7 +192,7 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
     - train_test_fraction: Fraction of data to use for training.
     """
     if df.empty:
-        print(f"Skipping training for n_tel={n_tel} due to empty data.")
+        _logger.warning(f"Skipping training for n_tel={n_tel} due to empty data.")
         return
 
     # Features (X) and targets (Y)
@@ -248,7 +239,7 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
     _logger.info(f"XGBoost parameters: {xgb_params}")
 
     _logger.info(
-        f"Sample weights (MCR^2) - min: {W_train.min():.6f}, "
+        f"Sample weights (MCR) - min: {W_train.min():.6f}, "
         f"max: {W_train.max():.6f}, mean: {W_train.mean():.6f}"
     )
 
@@ -280,6 +271,7 @@ def evaluate_model(model, X_test, Y_test, df, X_cols, Y):
     _logger.info(f"MAE (X_off): {mae_x:.4f}, MAE (Y_off): {mae_y:.4f}")
 
     feature_importance(model, X_cols, Y.columns)
+    shap_feature_importance(model, X_test, Y.columns)
 
     angular_resolution(
         Y_pred,
@@ -311,7 +303,7 @@ def angular_resolution(Y_pred, Y_test, df, percentiles, log_e_min, log_e_max, n_
         + (results_df["MCyoff_true"] - results_df["MCyoff_pred"]) ** 2
     )
 
-    results_df["LogE"] = np.log10(results_df["MCe0"])
+    results_df["LogE"] = results_df["MCe0"]
     bins = np.linspace(log_e_min, log_e_max, n_bins + 1)
     results_df["E_bin"] = pd.cut(results_df["LogE"], bins=bins, include_lowest=True)
     results_df.dropna(subset=["E_bin"], inplace=True)
@@ -356,6 +348,33 @@ def feature_importance(model, X_cols, target_names):
         _logger.info("\n" + importance_df.head(15).to_markdown(index=False))
 
 
+def shap_feature_importance(model, X, target_names, max_points=20000, n_top=25):
+    """
+    Uses XGBoost's builtin SHAP (pred_contribs=True).
+    Avoids SHAP.TreeExplainer compatibility issues with XGBoost ≥1.7.
+    """
+
+    # Subsample
+    X_sample = X.sample(n=min(len(X), max_points), random_state=0)
+
+    # Loop through estimators (one per target)
+    for i, est in enumerate(model.estimators_):
+        target = target_names[i]
+
+        # Builtin XGBoost SHAP values (n_samples, n_features+1)
+        # Last column is the bias term → drop it
+        shap_vals = est.get_booster().predict(xgb.DMatrix(X_sample), pred_contribs=True)
+        shap_vals = shap_vals[:, :-1]  # drop bias column
+
+        # Global importance: mean(|SHAP|)
+        imp = np.abs(shap_vals).mean(axis=0)
+        idx = np.argsort(imp)[::-1]
+
+        _logger.info(f"\n=== Builtin XGBoost SHAP Importance for {target} ===")
+        for j in idx[:n_top]:
+            _logger.info(f"{X.columns[j]:25s}  {imp[j]:.6e}")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description=("Train XGBoost Multi-Target BDTs for Direction Reconstruction")
@@ -374,12 +393,6 @@ def main():
         "max_events",
         type=int,
         help="Maximum number of events to process across all files.",
-    )
-    parser.add_argument(
-        "--jitter-seed",
-        type=int,
-        default=127,
-        help="Random seed for per-event R jitter (default: based on 0.125).",
     )
 
     args = parser.parse_args()
@@ -407,7 +420,6 @@ def main():
         input_files,
         args.ntel,
         args.max_events,
-        jitter_seed=args.jitter_seed,
     )
     train_xgb_model(df_flat, args.ntel, args.output_dir, args.train_test_fraction)
     _logger.info("\nXGBoost model trained successfully.")
