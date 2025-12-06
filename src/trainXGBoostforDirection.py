@@ -27,7 +27,7 @@ logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger("trainXGBoostforDirection")
 
 # Telescope-type training variables
-# NOTE: Disp_T must be first due to special indexing logic in data prep
+# Disp variables with different indexing logic in data preparation
 TRAINING_VARIABLES = [
     "Disp_T",
     "DispXoff_T",
@@ -49,7 +49,9 @@ TRAINING_VARIABLES = [
 N_TEL_VAR = len(TRAINING_VARIABLES)
 
 
-def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
+def load_and_flatten_data(
+    input_files, n_tel, max_events, training_step=True, jitter_seed=None
+):
     """
     Reads the data from ROOT files, filters for the required multiplicity (n_tel),
     and flattens the telescope-array features into a Pandas DataFrame.
@@ -108,12 +110,23 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
     if data_tree.empty:
         return pd.DataFrame()
 
-    df_flat = flatten_data_vectorized(data_tree, n_tel, TRAINING_VARIABLES)
+    # Compute weights before jitter is applied: R (to reflect physical sky area)
+    # Training sample is flat in R, but sky area scales as R, so weight by R
+    sample_weights = np.sqrt(data_tree["MCxoff"] ** 2 + data_tree["MCyoff"] ** 2)
+
+    rng = np.random.default_rng(jitter_seed)
+    jitter_offsets = rng.uniform(-0.125, 0.125, len(data_tree))
+    _logger.info("No jitter offsets applied for Xoff/Yoff training.")
+
+    df_flat = flatten_data_vectorized(
+        data_tree, n_tel, TRAINING_VARIABLES, jitter_offsets=jitter_offsets
+    )
 
     if training_step:
         df_flat["MCxoff"] = data_tree["MCxoff"]
         df_flat["MCyoff"] = data_tree["MCyoff"]
-        df_flat["MCe0"] = data_tree["MCe0"]
+        df_flat["MCe0"] = np.log10(data_tree["MCe0"])
+        df_flat["sample_weight"] = sample_weights
 
     df_flat.dropna(inplace=True)
     _logger.info(f"Final events for n_tel={n_tel} after cleanup: {len(df_flat)}")
@@ -122,10 +135,7 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
 
 
 def flatten_data_vectorized(df, n_tel, training_variables):
-    """
-    Vectorized flattening of telescope array columns.
-    Significantly faster than row-by-row iteration.
-    """
+    """Vectorized flattening of telescope array columns."""
     flat_features = {}
 
     try:
@@ -195,12 +205,22 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
         return
 
     # Features (X) and targets (Y)
-    X_cols = [col for col in df.columns if col not in ["MCxoff", "MCyoff", "MCe0"]]
+    X_cols = [
+        col
+        for col in df.columns
+        if col not in ["MCxoff", "MCyoff", "MCe0", "sample_weight"]
+    ]
     X = df[X_cols]
     Y = df[["MCxoff", "MCyoff"]]
 
-    X_train, X_test, Y_train, Y_test = train_test_split(
-        X, Y, test_size=1.0 - train_test_fraction, random_state=42
+    _logger.info(f"Training variables ({len(X_cols)}): {X_cols}")
+
+    X_train, X_test, Y_train, Y_test, W_train, W_test = train_test_split(
+        X,
+        Y,
+        df["sample_weight"],
+        test_size=1.0 - train_test_fraction,
+        random_state=42,
     )
 
     _logger.info(
@@ -227,10 +247,15 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
     }
     _logger.info(f"XGBoost parameters: {xgb_params}")
 
+    _logger.info(
+        f"Sample weights (MCR^2) - min: {W_train.min():.6f}, "
+        f"max: {W_train.max():.6f}, mean: {W_train.mean():.6f}"
+    )
+
     base_estimator = xgb.XGBRegressor(**xgb_params)
     model = MultiOutputRegressor(base_estimator)
     _logger.info(f"Starting Multi-Target XGBoost Training for n_tel={n_tel}...")
-    model.fit(X_train, Y_train)
+    model.fit(X_train, Y_train, sample_weight=W_train)
 
     output_filename = os.path.join(output_dir, f"dispdir_bdt_ntel{n_tel}.joblib")
     dump(model, output_filename)
@@ -350,6 +375,12 @@ def main():
         type=int,
         help="Maximum number of events to process across all files.",
     )
+    parser.add_argument(
+        "--jitter-seed",
+        type=int,
+        default=127,
+        help="Random seed for per-event R jitter (default: based on 0.125).",
+    )
 
     args = parser.parse_args()
 
@@ -372,7 +403,12 @@ def main():
         f"Train vs test fraction: {args.train_test_fraction}, Max events: {args.max_events}"
     )
 
-    df_flat = load_and_flatten_data(input_files, args.ntel, args.max_events)
+    df_flat = load_and_flatten_data(
+        input_files,
+        args.ntel,
+        args.max_events,
+        jitter_seed=args.jitter_seed,
+    )
     train_xgb_model(df_flat, args.ntel, args.output_dir, args.train_test_fraction)
     _logger.info("\nXGBoost model trained successfully.")
 
