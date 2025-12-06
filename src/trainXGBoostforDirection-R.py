@@ -26,12 +26,32 @@ from sklearn.multioutput import MultiOutputRegressor
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger("trainXGBoostforDirection")
 
-# Telescope-type training variables
+# Telescope-type training variables (read from ROOT file)
 # NOTE: Disp_T must be first due to special indexing logic in data prep
-TRAINING_VARIABLES = [
+TRAINING_VARIABLES_ROOT = [
     "Disp_T",
     "DispXoff_T",
     "DispYoff_T",
+    "DispWoff_T",
+    "cen_x",
+    "cen_y",
+    "cosphi",
+    "sinphi",
+    "loss",
+    "size",
+    "dist",
+    "width",
+    "length",
+    "asym",
+    "tgrad_x",
+    "R_core",
+]
+
+# Training variables after conversion to polar coordinates
+TRAINING_VARIABLES = [
+    "Disp_T",
+    "Disp_R_T",
+    "DispPhi_T",
     "DispWoff_T",
     "cen_x",
     "cen_y",
@@ -71,7 +91,7 @@ def load_and_flatten_data(
         "MCxoff",
         "MCyoff",
         "MCe0",
-    ] + [var for var in TRAINING_VARIABLES]
+    ] + [var for var in TRAINING_VARIABLES_ROOT]
 
     dfs = []
     if max_events > 0:
@@ -110,19 +130,20 @@ def load_and_flatten_data(
     if data_tree.empty:
         return pd.DataFrame()
 
-    # Compute weights before jitter is applied (with minimum weight)
-    mcr_raw = data_tree["MCxoff"] ** 2 + data_tree["MCyoff"] ** 2
-    sample_weights = np.maximum(mcr_raw, 0.125**2)
+    # Compute weights before jitter is applied: R (to reflect physical sky area)
+    # Training sample is flat in R, but sky area scales as R, so weight by R
+    mcr_raw = np.sqrt(data_tree["MCxoff"] ** 2 + data_tree["MCyoff"] ** 2)
+    sample_weights = mcr_raw
 
     rng = np.random.default_rng(jitter_seed)
     jitter_offsets = rng.uniform(-0.125, 0.125, len(data_tree))
 
     df_flat = flatten_data_vectorized(
-        data_tree, n_tel, TRAINING_VARIABLES, jitter_offsets=jitter_offsets
+        data_tree, n_tel, TRAINING_VARIABLES_ROOT, jitter_offsets=jitter_offsets
     )
 
     if training_step:
-        df_flat["MCR"] = np.sqrt(mcr_raw) + jitter_offsets
+        df_flat["MCR"] = mcr_raw + jitter_offsets
         df_flat["MCphi"] = np.arctan2(data_tree["MCyoff"], data_tree["MCxoff"])
         df_flat["MCe0"] = data_tree["MCe0"]
         df_flat["sample_weight"] = sample_weights
@@ -182,12 +203,18 @@ def flatten_data_vectorized(df, n_tel, training_variables, jitter_offsets=None):
     if jitter_offsets is None:
         jitter_offsets = 0.0
 
+    # Convert DispXoff_T and DispYoff_T to Disp_R_T and DispPhi_T
     for i in range(n_tel):
-        x = df_flat[f"Disp_T_{i}"] * df_flat[f"cosphi_{i}"]
-        y = df_flat[f"Disp_T_{i}"] * df_flat[f"sinphi_{i}"]
-        base_r = np.sqrt(x**2 + y**2)
-        df_flat[f"disp_R_{i}"] = base_r + jitter_offsets
-        df_flat[f"disp_phi_{i}"] = np.arctan2(y, x)
+        disp_x = df_flat[f"DispXoff_T_{i}"]
+        disp_y = df_flat[f"DispYoff_T_{i}"]
+        df_flat[f"Disp_R_T_{i}"] = np.sqrt(disp_x**2 + disp_y**2)
+        df_flat[f"DispPhi_T_{i}"] = np.arctan2(disp_y, disp_x)
+        # Drop the Cartesian Disp columns as they're no longer needed
+        df_flat.drop([f"DispXoff_T_{i}", f"DispYoff_T_{i}"], axis=1, inplace=True)
+
+    for i in range(n_tel):
+        df_flat[f"disp_x_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"cosphi_{i}"]
+        df_flat[f"disp_y_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"sinphi_{i}"]
 
     df_flat["R_weighted_bdt"] = (
         np.sqrt(df["Xoff"] ** 2 + df["Yoff"] ** 2) + jitter_offsets
@@ -203,7 +230,7 @@ def flatten_data_vectorized(df, n_tel, training_variables, jitter_offsets=None):
 
 def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
     """
-    Trains a single XGBoost model for multi-target regression (Xoff, Yoff).
+    Trains a single XGBoost model for multi-target regression (R, phi).
 
     Parameters:
     - df: Pandas DataFrame with training data.
@@ -223,6 +250,8 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
     ]
     X = df[X_cols]
     Y = df[["MCR", "MCphi"]]
+
+    _logger.info(f"Training variables ({len(X_cols)}): {X_cols}")
 
     X_train, X_test, Y_train, Y_test, W_train, W_test = train_test_split(
         X,
@@ -257,7 +286,7 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
     _logger.info(f"XGBoost parameters: {xgb_params}")
 
     _logger.info(
-        f"Sample weights (1/MCR^2) - min: {W_train.min():.6f}, "
+        f"Sample weights (MCR^2) - min: {W_train.min():.6f}, "
         f"max: {W_train.max():.6f}, mean: {W_train.mean():.6f}"
     )
 
@@ -281,12 +310,12 @@ def evaluate_model(model, X_test, Y_test, df, X_cols, Y):
     score = model.score(X_test, Y_test)
     _logger.info(f"XGBoost Multi-Target R^2 Score (Testing Set): {score:.4f}")
     Y_pred = model.predict(X_test)
-    mse_x = mean_squared_error(Y_test["MCxoff"], Y_pred[:, 0])
-    mse_y = mean_squared_error(Y_test["MCyoff"], Y_pred[:, 1])
-    _logger.info(f"MSE (X_off): {mse_x:.4f}, MSE (Y_off): {mse_y:.4f}")
-    mae_x = mean_absolute_error(Y_test["MCxoff"], Y_pred[:, 0])
-    mae_y = mean_absolute_error(Y_test["MCyoff"], Y_pred[:, 1])
-    _logger.info(f"MAE (X_off): {mae_x:.4f}, MAE (Y_off): {mae_y:.4f}")
+    mse_r = mean_squared_error(Y_test["MCR"], Y_pred[:, 0])
+    mse_phi = mean_squared_error(Y_test["MCphi"], Y_pred[:, 1])
+    _logger.info(f"MSE (R): {mse_r:.4f}, MSE (phi): {mse_phi:.4f}")
+    mae_r = mean_absolute_error(Y_test["MCR"], Y_pred[:, 0])
+    mae_phi = mean_absolute_error(Y_test["MCphi"], Y_pred[:, 1])
+    _logger.info(f"MAE (R): {mae_r:.4f}, MAE (phi): {mae_phi:.4f}")
 
     feature_importance(model, X_cols, Y.columns)
 
@@ -303,21 +332,33 @@ def evaluate_model(model, X_test, Y_test, df, X_cols, Y):
 
 def angular_resolution(Y_pred, Y_test, df, percentiles, log_e_min, log_e_max, n_bins):
     """
-    Computes and logs the angular resolution based on predicted and true offsets.
+    Computes and logs the angular resolution based on predicted and true R, phi offsets.
     """
+    # Convert R, phi predictions and targets to x, y for angular resolution
+    mcr_true = Y_test["MCR"].values
+    mcphi_true = Y_test["MCphi"].values
+    mcr_pred = Y_pred[:, 0]
+    mcphi_pred = Y_pred[:, 1]
+
+    # Convert to Cartesian
+    mcx_true = mcr_true * np.cos(mcphi_true)
+    mcy_true = mcr_true * np.sin(mcphi_true)
+    mcx_pred = mcr_pred * np.cos(mcphi_pred)
+    mcy_pred = mcr_pred * np.sin(mcphi_pred)
+
     results_df = pd.DataFrame(
         {
-            "MCxoff_true": Y_test["MCxoff"].values,
-            "MCyoff_true": Y_test["MCyoff"].values,
-            "MCxoff_pred": Y_pred[:, 0],
-            "MCyoff_pred": Y_pred[:, 1],
+            "MCx_true": mcx_true,
+            "MCy_true": mcy_true,
+            "MCx_pred": mcx_pred,
+            "MCy_pred": mcy_pred,
             "MCe0": df.loc[Y_test.index, "MCe0"].values,
         }
     )
 
     results_df["DeltaTheta"] = np.sqrt(
-        (results_df["MCxoff_true"] - results_df["MCxoff_pred"]) ** 2
-        + (results_df["MCyoff_true"] - results_df["MCyoff_pred"]) ** 2
+        (results_df["MCx_true"] - results_df["MCx_pred"]) ** 2
+        + (results_df["MCy_true"] - results_df["MCy_pred"]) ** 2
     )
 
     results_df["LogE"] = np.log10(results_df["MCe0"])
