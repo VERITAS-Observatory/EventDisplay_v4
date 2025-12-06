@@ -16,7 +16,7 @@ import pandas as pd
 import uproot
 
 # Import variable list from training script
-from trainXGBoostforDirection import TRAINING_VARIABLES_ROOT
+from trainXGBoostforDirection_R import TRAINING_VARIABLES_ROOT
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger("applyXGBoostforDirection")
