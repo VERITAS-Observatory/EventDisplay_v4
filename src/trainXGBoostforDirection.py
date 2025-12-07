@@ -173,8 +173,8 @@ def flatten_data_vectorized(df, n_tel, training_variables):
         df_flat[f"disp_x_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"cosphi_{i}"]
         df_flat[f"disp_y_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"sinphi_{i}"]
 
-    # TMP    df_flat["Xoff_weighted_bdt"] = df["Xoff"]
-    # TMP    df_flat["Yoff_weighted_bdt"] = df["Yoff"]
+    df_flat["Xoff_weighted_bdt"] = df["Xoff"]
+    df_flat["Yoff_weighted_bdt"] = df["Yoff"]
     df_flat["Xoff_intersect"] = df["Xoff_intersect"]
     df_flat["Yoff_intersect"] = df["Yoff_intersect"]
 
@@ -225,10 +225,10 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
     # Note: XGBoost defaults to gbtree (Gradient Boosting).
     # MultiOutputRegressor requires a base estimator (e.g., plain XGBRegressor)
     xgb_params = {
-        "n_estimators": 1500,
+        "n_estimators": 1000,
         "learning_rate": 0.1,  # Shrinkage
         "max_depth": 4,
-        "min_child_weight": 5.0,  # Equivalent to MinNodeSize=1.0% for XGBoost
+        "min_child_weight": 3.0,  # Equivalent to MinNodeSize=1.0% for XGBoost
         "objective": "reg:squarederror",
         "n_jobs": 4,
         "random_state": 42,
