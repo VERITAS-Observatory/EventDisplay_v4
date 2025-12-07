@@ -27,7 +27,7 @@ logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger("trainXGBoostforDirection")
 
 # Telescope-type training variables (read from ROOT file)
-# NOTE: Disp_T must be first due to special indexing logic in data prep
+# Disp variables with different indexing logic in data preparation
 TRAINING_VARIABLES_ROOT = [
     "Disp_T",
     "DispXoff_T",
@@ -130,11 +130,11 @@ def load_and_flatten_data(
     if data_tree.empty:
         return pd.DataFrame()
 
-    # Compute weights before jitter is applied: R (to reflect physical sky area)
-    # Training sample is flat in R, but sky area scales as R, so weight by R
+    # Compute weights: R (to reflect physical sky area)
     mcr_raw = np.sqrt(data_tree["MCxoff"] ** 2 + data_tree["MCyoff"] ** 2)
     sample_weights = mcr_raw
 
+    # jitter offsets to account for discrete training data in R
     rng = np.random.default_rng(jitter_seed)
     jitter_offsets = rng.uniform(-0.125, 0.125, len(data_tree))
 
@@ -203,7 +203,6 @@ def flatten_data_vectorized(df, n_tel, training_variables, jitter_offsets=None):
     if jitter_offsets is None:
         jitter_offsets = 0.0
 
-    # Convert DispXoff_T and DispYoff_T to Disp_R_T and DispPhi_T
     for i in range(n_tel):
         disp_x = df_flat[f"DispXoff_T_{i}"]
         disp_y = df_flat[f"DispYoff_T_{i}"]
@@ -239,7 +238,7 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
     - train_test_fraction: Fraction of data to use for training.
     """
     if df.empty:
-        print(f"Skipping training for n_tel={n_tel} due to empty data.")
+        _logger.warning(f"Skipping training for n_tel={n_tel} due to empty data.")
         return
 
     # Features (X) and targets (Y)
@@ -286,7 +285,7 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
     _logger.info(f"XGBoost parameters: {xgb_params}")
 
     _logger.info(
-        f"Sample weights (MCR^2) - min: {W_train.min():.6f}, "
+        f"Sample weights (MCR) - min: {W_train.min():.6f}, "
         f"max: {W_train.max():.6f}, mean: {W_train.mean():.6f}"
     )
 
