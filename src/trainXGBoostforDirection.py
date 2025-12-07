@@ -246,7 +246,8 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
     base_estimator = xgb.XGBRegressor(**xgb_params)
     model = MultiOutputRegressor(base_estimator)
     _logger.info(f"Starting Multi-Target XGBoost Training for n_tel={n_tel}...")
-    model.fit(X_train, Y_train, sample_weight=W_train)
+    #    model.fit(X_train, Y_train, sample_weight=W_train)
+    model.fit(X_train, Y_train)
 
     output_filename = os.path.join(output_dir, f"dispdir_bdt_ntel{n_tel}.joblib")
     dump(model, output_filename)
