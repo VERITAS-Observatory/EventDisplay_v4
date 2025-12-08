@@ -227,8 +227,8 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
     xgb_params = {
         "n_estimators": 1000,
         "learning_rate": 0.1,  # Shrinkage
-        "max_depth": 4,
-        "min_child_weight": 3.0,  # Equivalent to MinNodeSize=1.0% for XGBoost
+        "max_depth": 5,
+        "min_child_weight": 1.0,  # Equivalent to MinNodeSize=1.0% for XGBoost
         "objective": "reg:squarederror",
         "n_jobs": 4,
         "random_state": 42,
