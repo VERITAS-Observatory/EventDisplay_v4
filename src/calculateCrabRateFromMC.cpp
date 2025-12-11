@@ -311,7 +311,7 @@ TTree* fillMCRates(
         MCrate *= ( 1. - fDeadTime / 100. );
         fMC->Fill();
 
-        if( TMath::Abs( Woff - 0.5 ) < 0.01 )
+        if( TMath::Abs( Woff - 0.5 ) > 0.01 )
         {
             continue;
         }
