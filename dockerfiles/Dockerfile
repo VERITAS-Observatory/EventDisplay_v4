@@ -1,4 +1,4 @@
-ARG ROOT_VERSION=6.30.02-alma9
+ARG ROOT_VERSION=6.30.06-ubuntu23.10
 FROM rootproject/root:${ROOT_VERSION} AS build
 ARG VBF_VERSION=0.3.4
 ARG BUILD_BRANCH=main
@@ -17,7 +17,8 @@ RUN mkdir VBF && tar -xzf VBF-$VBF_VERSION.tar.gz -C VBF --strip-components=1 &&
     make && make install && make clean
 
 # Environment (build stage)
-ENV VBFSYS=/opt/VBF \
+ENV LD_LIBRARY_PATH="" \
+    VBFSYS=/opt/VBF \
     EVNDISPSYS=/opt/EventDisplay_v4 \
     SOFASYS=/opt/EventDisplay_v4/sofa \
     PATH=/opt/VBF/bin:$PATH \
