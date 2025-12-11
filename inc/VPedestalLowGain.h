@@ -12,6 +12,7 @@
 #include "TH1F.h"
 #include "TFile.h"
 #include "TList.h"
+#include "TMath.h"
 #include "TROOT.h"
 
 using namespace std;
