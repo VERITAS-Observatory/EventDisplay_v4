@@ -73,8 +73,6 @@ def flatten_data_vectorized(df, n_tel, training_variables):
     except ValueError:
         tel_list_matrix = np.array(df["DispTelList_T"].tolist())
 
-    print("AAAAA", training_variables)
-
     for var_name in training_variables:
         # Convert the column of arrays to a 2D numpy matrix
         # Shape: (n_events, max_n_tel)
@@ -114,8 +112,8 @@ def flatten_data_vectorized(df, n_tel, training_variables):
         df_flat[f"disp_x_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"cosphi_{i}"]
         df_flat[f"disp_y_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"sinphi_{i}"]
         # pointing corrections
-        df_flat[f"cen_x_{i}"] = df_flat[f"cen_x_{i}"] + df_flat["fpointing_dx"]
-        df_flat[f"cen_y_{i}"] = df_flat[f"cen_y_{i}"] + df_flat["fpointing_dy"]
+        df_flat[f"cen_x_{i}"] = df_flat[f"cen_x_{i}"] + df["fpointing_dx"].values
+        df_flat[f"cen_y_{i}"] = df_flat[f"cen_y_{i}"] + df["fpointing_dy"].values
 
     df_flat["Xoff_weighted_bdt"] = df["Xoff"]
     df_flat["Yoff_weighted_bdt"] = df["Yoff"]
@@ -163,11 +161,7 @@ def apply_models(df, model_dir):
 
         _logger.info(f"Processing {len(group_df)} events with n_tel={n_tel}")
 
-        # Extend TRAINING_VARIABLES by fpointing_dx and fpointing_dy
-        training_vars_extended = TRAINING_VARIABLES.copy()
-        training_vars_extended += ["fpointing_dx", "fpointing_dy"]
-
-        df_flat = flatten_data_vectorized(group_df, n_tel, training_vars_extended)
+        df_flat = flatten_data_vectorized(group_df, n_tel, TRAINING_VARIABLES)
 
         # Get feature columns (exclude MC truth if present)
         feature_cols = [
