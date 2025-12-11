@@ -73,6 +73,8 @@ def flatten_data_vectorized(df, n_tel, training_variables):
     except ValueError:
         tel_list_matrix = np.array(df["DispTelList_T"].tolist())
 
+    print("AAAAA", training_variables)
+
     for var_name in training_variables:
         # Convert the column of arrays to a 2D numpy matrix
         # Shape: (n_events, max_n_tel)
