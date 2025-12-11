@@ -161,7 +161,11 @@ def apply_models(df, model_dir):
 
         _logger.info(f"Processing {len(group_df)} events with n_tel={n_tel}")
 
-        df_flat = flatten_data_vectorized(group_df, n_tel, TRAINING_VARIABLES)
+        # Extend TRAINING_VARIABLES by fpointing_dx and fpointing_dy
+        training_vars_extended = TRAINING_VARIABLES.copy()
+        training_vars_extended += ["fpointing_dx", "fpointing_dy"]
+
+        df_flat = flatten_data_vectorized(group_df, n_tel, training_vars_extended)
 
         # Get feature columns (exclude MC truth if present)
         feature_cols = [
