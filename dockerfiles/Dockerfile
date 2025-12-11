@@ -1,10 +1,12 @@
-ARG ROOT_VERSION=6.30.02-alma9
+ARG ROOT_VERSION=6.32.04-ubuntu24.04
 FROM rootproject/root:${ROOT_VERSION} AS build
 ARG VBF_VERSION=0.3.4
 ARG BUILD_BRANCH=main
 ARG NUM_CORES=4
 
-RUN dnf install -y diffutils && dnf clean all
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends diffutils && \
+    rm -rf /var/lib/apt/lists/*
 
 # VBF
 ADD https://syncandshare.desy.de/index.php/s/7i29qcgzgS3zpEk/download /workdir/VBF-$VBF_VERSION.tar.gz
@@ -15,15 +17,16 @@ RUN mkdir VBF && tar -xzf VBF-$VBF_VERSION.tar.gz -C VBF --strip-components=1 &&
     make && make install && make clean
 
 # Environment (build stage)
-ENV VBFSYS=/opt/VBF \
+ENV LD_LIBRARY_PATH="" \
+    VBFSYS=/opt/VBF \
     EVNDISPSYS=/opt/EventDisplay_v4 \
     SOFASYS=/opt/EventDisplay_v4/sofa \
     PATH=/opt/VBF/bin:$PATH \
     LD_LIBRARY_PATH=/opt/EventDisplay_v4/obj:/opt/EventDisplay_v4/lib:$ROOTSYS/lib:/opt/VBF/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 
 WORKDIR /opt/
-RUN BUILD_BRANCH=$(echo ${BUILD_BRANCH} | sed 's#refs/tags/##') && \
-    git clone -b ${BUILD_BRANCH} https://github.com/VERITAS-Observatory/EventDisplay_v4.git --depth 1
+RUN BUILD_BRANCH="$(echo "${BUILD_BRANCH}" | sed 's#refs/tags/##')" && \
+    git clone -b "${BUILD_BRANCH}" https://github.com/VERITAS-Observatory/EventDisplay_v4.git --depth 1
 ADD https://syncandshare.desy.de/index.php/s/RamRFYJtZjDGsfL/download ${SOFASYS}/sofa.tar.gz
 
 WORKDIR /opt/EventDisplay_v4
