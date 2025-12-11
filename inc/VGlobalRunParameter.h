@@ -4,6 +4,7 @@
 #define VGlobalRunParameter_H
 
 #include <TChain.h>
+#include <TMath.h>
 #include <TSystem.h>
 #include <TTree.h>
 #include <TROOT.h>

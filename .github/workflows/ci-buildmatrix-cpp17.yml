@@ -14,16 +14,16 @@ jobs:
         root:
           - "rootproject/root:latest"
           - "rootproject/root:6.26.06-ubuntu22.04"
-          - "rootproject/root:6.30.02-alma9"
+          - "rootproject/root:6.32.04-ubuntu24.04"
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.root }}
 
     steps:
       - uses: actions/checkout@v6
 
-      - name: install libblas
-        if: ${{ matrix.root == 'rootproject/root:latest' || matrix.root == 'rootproject/root:6.26.06-ubuntu22.04' }}
-        run: apt-get install -y libblas-dev
+      - name: Install libblas (needed by TMVA)
+        run: |
+          apt-get update && apt-get install -y libopenblas-dev
 
       - name: vbf
         run: |
