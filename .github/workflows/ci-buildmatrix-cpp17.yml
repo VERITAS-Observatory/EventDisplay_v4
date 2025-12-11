@@ -19,7 +19,7 @@ jobs:
     container: ${{ matrix.root }}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: install libblas
         if: ${{ matrix.root == 'rootproject/root:latest' || matrix.root == 'rootproject/root:6.26.06-ubuntu22.04' }}
