@@ -108,17 +108,21 @@ def flatten_data_vectorized(df, n_tel, training_variables):
     # Convert dictionary to DataFrame once at the end
     df_flat = pd.DataFrame(flat_features, index=df.index)
 
+    # Ensure all columns are float type (uproot may load as awkward arrays)
+    for col in df_flat.columns:
+        df_flat[col] = df_flat[col].astype(np.float32)
+
     for i in range(n_tel):
         df_flat[f"disp_x_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"cosphi_{i}"]
         df_flat[f"disp_y_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"sinphi_{i}"]
         # pointing corrections
-        df_flat[f"cen_x_{i}"] = df_flat[f"cen_x_{i}"] + df["fpointing_dx"].values
-        df_flat[f"cen_y_{i}"] = df_flat[f"cen_y_{i}"] + df["fpointing_dy"].values
+        df_flat[f"cen_x_{i}"] = df_flat[f"cen_x_{i}"] + df_flat[f"fpointing_dx_{i}"]
+        df_flat[f"cen_y_{i}"] = df_flat[f"cen_y_{i}"] + df_flat[f"fpointing_dy_{i}"]
 
-    df_flat["Xoff_weighted_bdt"] = df["Xoff"]
-    df_flat["Yoff_weighted_bdt"] = df["Yoff"]
-    df_flat["Xoff_intersect"] = df["Xoff_intersect"]
-    df_flat["Yoff_intersect"] = df["Yoff_intersect"]
+    df_flat["Xoff_weighted_bdt"] = df["Xoff"].astype(np.float32)
+    df_flat["Yoff_weighted_bdt"] = df["Yoff"].astype(np.float32)
+    df_flat["Xoff_intersect"] = df["Xoff_intersect"].astype(np.float32)
+    df_flat["Yoff_intersect"] = df["Yoff_intersect"].astype(np.float32)
 
     return df_flat
 
@@ -161,12 +165,20 @@ def apply_models(df, model_dir):
 
         _logger.info(f"Processing {len(group_df)} events with n_tel={n_tel}")
 
-        df_flat = flatten_data_vectorized(group_df, n_tel, TRAINING_VARIABLES)
+        # Add fpointing_dx and fpointing_dy to the training variables for flattening
+        training_vars_with_pointing = TRAINING_VARIABLES + [
+            "fpointing_dx",
+            "fpointing_dy",
+        ]
+        df_flat = flatten_data_vectorized(group_df, n_tel, training_vars_with_pointing)
 
         # Get feature columns (exclude MC truth if present)
-        feature_cols = [
-            col for col in df_flat.columns if col not in ["MCxoff", "MCyoff", "MCe0"]
-        ]
+        excluded_columns = ["MCxoff", "MCyoff", "MCe0"]
+        for n in range(n_tel):
+            excluded_columns.append(f"fpointing_dx_{n}")
+            excluded_columns.append(f"fpointing_dy_{n}")
+        _logger.info(f"Excluded columns: {excluded_columns}")
+        feature_cols = [col for col in df_flat.columns if col not in excluded_columns]
         X = df_flat[feature_cols]
 
         model = models[n_tel]
@@ -212,7 +224,7 @@ def main():
     _logger.info(f"Model directory: {args.model_dir}")
     _logger.info(f"Output file: {args.output_file}")
 
-    df = load_all_events(args.input_file, max_events=0)
+    df = load_all_events(args.input_file, max_events=1000)
     pred_xoff, pred_yoff = apply_models(df, args.model_dir)
     write_output_root_file(args.output_file, pred_xoff, pred_yoff)
 
