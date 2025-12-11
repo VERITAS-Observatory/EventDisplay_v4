@@ -179,6 +179,7 @@ def apply_models(df, model_dir):
             excluded_columns.append(f"fpointing_dy_{n}")
         _logger.info(f"Excluded columns: {excluded_columns}")
         feature_cols = [col for col in df_flat.columns if col not in excluded_columns]
+        _logger.info(f"Feature columns: {feature_cols}")
         X = df_flat[feature_cols]
 
         model = models[n_tel]
