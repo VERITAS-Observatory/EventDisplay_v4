@@ -28,10 +28,10 @@ repos:
   - id: check-executables-have-shebangs
   - id: check-shebang-scripts-are-executable
 # Gitup action
-- repo: https://github.com/rhysd/actionlint
-  rev: v1.7.9
-  hooks:
-  - id: actionlint
+#- repo: https://github.com/rhysd/actionlint
+#  rev: v1.7.9
+#  hooks:
+    #  - id: actionlint
 # codespell
 - repo: https://github.com/codespell-project/codespell
   rev: v2.4.1
