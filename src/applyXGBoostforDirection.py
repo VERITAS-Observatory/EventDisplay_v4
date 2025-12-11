@@ -111,6 +111,9 @@ def flatten_data_vectorized(df, n_tel, training_variables):
     for i in range(n_tel):
         df_flat[f"disp_x_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"cosphi_{i}"]
         df_flat[f"disp_y_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"sinphi_{i}"]
+        # pointing corrections
+        df_flat[f"cen_x_{i}"] = df_flat[f"cen_x_{i}"] + df_flat["fpointing_dx"]
+        df_flat[f"cen_y_{i}"] = df_flat[f"cen_y_{i}"] + df_flat["fpointing_dy"]
 
     df_flat["Xoff_weighted_bdt"] = df["Xoff"]
     df_flat["Yoff_weighted_bdt"] = df["Yoff"]
