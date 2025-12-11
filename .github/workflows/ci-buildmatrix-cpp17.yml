@@ -23,7 +23,7 @@ jobs:
 
       - name: Install libblas (needed by TMVA)
         run: |
-          apt-get update apt-get install -y libopenblas-dev
+          apt-get update && apt-get install -y libopenblas-dev
 
       - name: vbf
         run: |
