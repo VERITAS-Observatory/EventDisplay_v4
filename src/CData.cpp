@@ -10,7 +10,7 @@
 #include "CData.h"
 
 
-CData::CData( TTree* tree, bool bMC, bool bShort, TTree* friendTree)
+CData::CData( TTree* tree, bool bMC, bool bShort, TTree* friendTree )
 {
     fMC = bMC;
     fShort = bShort;

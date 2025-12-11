@@ -1972,9 +1972,9 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
         if( fRunPara->fXY_DirectionFile != "" && fRunPara->fXY_DirectionFile != "nofile" )
         {
             fDataDirFile = new TFile( iFileName.replace(
-                iFileName.find( ".root" ), 5,
-                "." + fRunPara->fXY_DirectionFile + ".root").c_str()
-             );
+                                          iFileName.find( ".root" ), 5,
+                                          "." + fRunPara->fXY_DirectionFile + ".root" ).c_str()
+                                    );
             if( fDataDirFile->IsZombie() )
             {
                 cout << "VStereoAnalysis::getDataFromFile() warning: cannot open DispDirection file "
@@ -1987,7 +1987,7 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
                 cout << "VStereoAnalysis::getDataFromFile(): adding DispDirection from " << fDataDirFile->GetName() << endl;
             }
         }
-        c = new CData( fDataRunTree, false, false, fDataDirTree);
+        c = new CData( fDataRunTree, false, false, fDataDirTree );
         // read current (major) epoch from data file
         VEvndispRunParameter* i_runPara = ( VEvndispRunParameter* )fDataFile->Get( "runparameterV2" );
         if( i_runPara )
