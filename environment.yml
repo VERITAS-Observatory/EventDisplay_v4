@@ -10,6 +10,7 @@ dependencies:
   - matplotlib
   - numpy
   - pandas
+  - pre-commit
   - scikit-learn
   - scipy
   - tabulate
