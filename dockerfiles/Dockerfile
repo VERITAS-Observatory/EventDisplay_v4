@@ -4,7 +4,9 @@ ARG VBF_VERSION=0.3.4
 ARG BUILD_BRANCH=main
 ARG NUM_CORES=4
 
-RUN dnf install -y diffutils && dnf clean all
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends diffutils && \
+    rm -rf /var/lib/apt/lists/*
 
 # VBF
 ADD https://syncandshare.desy.de/index.php/s/7i29qcgzgS3zpEk/download /workdir/VBF-$VBF_VERSION.tar.gz
@@ -22,8 +24,8 @@ ENV VBFSYS=/opt/VBF \
     LD_LIBRARY_PATH=/opt/EventDisplay_v4/obj:/opt/EventDisplay_v4/lib:$ROOTSYS/lib:/opt/VBF/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 
 WORKDIR /opt/
-RUN BUILD_BRANCH=$(echo ${BUILD_BRANCH} | sed 's#refs/tags/##') && \
-    git clone -b ${BUILD_BRANCH} https://github.com/VERITAS-Observatory/EventDisplay_v4.git --depth 1
+RUN BUILD_BRANCH="$(echo "${BUILD_BRANCH}" | sed 's#refs/tags/##')" && \
+    git clone -b "${BUILD_BRANCH}" https://github.com/VERITAS-Observatory/EventDisplay_v4.git --depth 1
 ADD https://syncandshare.desy.de/index.php/s/RamRFYJtZjDGsfL/download ${SOFASYS}/sofa.tar.gz
 
 WORKDIR /opt/EventDisplay_v4
