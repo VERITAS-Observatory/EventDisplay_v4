@@ -21,9 +21,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: install libblas
-        run: |
-          apt-get install -y libblas-dev libblas3
+#      - name: install libblas
+#        run: |
+#          apt-get install -y libblas-dev libblas3
 
       - name: vbf
         run: |
