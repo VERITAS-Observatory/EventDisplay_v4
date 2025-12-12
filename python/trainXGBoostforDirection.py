@@ -241,7 +241,9 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
         "learning_rate": 0.05,  # Shrinkage
         "max_depth": 5,
         "min_child_weight": 1.0,  # Equivalent to MinNodeSize=1.0% for XGBoost
-        "objective": "reg:squarederror",
+        # "objective": "reg:squarederror",
+        # https://xgboosting.com/configure-xgboost-regpseudohubererror-objective/
+        "objective": "reg:pseudohubererror",
         "n_jobs": 4,
         "random_state": 42,
         "tree_method": "hist",
