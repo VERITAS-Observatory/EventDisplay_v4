@@ -28,6 +28,8 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
     fZe = 0.;
     fAz = 0.;
     fLoss = 0.;
+    fLoss_sq = 0.;
+    fLoss_dist = 0.;
     fXcore = 0.;
     fYcore = 0.;
     fcross = 0.;
@@ -116,6 +118,8 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "cross", &fcross );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "asym", &fAsymm );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "loss", &fLoss );
+        fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "loss*loss", &fLoss_sq );
+        fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "loss*dist", &fLoss_dist );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "dist", &fDist );
         fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "fui", &fFui );
         if( fDispType == "BDTDispEnergy" )
@@ -219,6 +223,8 @@ float VTMVADispAnalyzer::evaluate( float iWidth, float iLength, float iSize, flo
     }
 
     fLoss = iLoss;
+    fLoss_sq = fLoss * fLoss;
+    fLoss_dist = fLoss * iDist;
     fAsymm = iAsymm;
     fRcore = iRcore;
     fEHeight = iEHeight;
