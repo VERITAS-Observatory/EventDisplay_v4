@@ -109,7 +109,9 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
     # - R (to reflect physical sky area)
     # - E (to balance energy distribution)
     sample_weights = (
-        np.sqrt(data_tree["MCxoff"] ** 2 + data_tree["MCyoff"] ** 2) * data_tree["MCe0"]
+        np.sqrt(
+            data_tree["MCxoff"] ** 2 + data_tree["MCyoff"] ** 2
+        )  # * data_tree["MCe0"]
     )
 
     df_flat = flatten_data_vectorized(data_tree, n_tel, TRAINING_VARIABLES)
