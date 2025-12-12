@@ -185,8 +185,8 @@ def flatten_data_vectorized(df, n_tel, training_variables):
     df_flat["Yoff_weighted_bdt"] = df["Yoff"]
     df_flat["Xoff_intersect"] = df["Xoff_intersect"]
     df_flat["Yoff_intersect"] = df["Yoff_intersect"]
-    df_flat["Diff_Xoff"] = df["Xoff"] - df["Xoff_intersect"]
-    df_flat["Diff_Yoff"] = df["Yoff"] - df["Yoff_intersect"]
+    df_flat["Diff_Xoff"] = df["Xoff_weighted_bdt"] - df["Xoff_intersect"]
+    df_flat["Diff_Yoff"] = df["Yoff_weighted_bdt"] - df["Yoff_intersect"]
 
     return df_flat
 
