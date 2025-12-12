@@ -14,7 +14,6 @@ import joblib
 import numpy as np
 import pandas as pd
 import uproot
-
 from trainXGBoostforDirection import TRAINING_VARIABLES
 
 logging.basicConfig(level=logging.INFO)
