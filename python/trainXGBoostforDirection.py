@@ -108,8 +108,12 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
     if data_tree.empty:
         return pd.DataFrame()
 
-    # Compute weights: R (to reflect physical sky area)
-    sample_weights = np.sqrt(data_tree["MCxoff"] ** 2 + data_tree["MCyoff"] ** 2)
+    # Compute weights:
+    # - R (to reflect physical sky area)
+    # - E (to balance energy distribution)
+    sample_weights = (
+        np.sqrt(data_tree["MCxoff"] ** 2 + data_tree["MCyoff"] ** 2) * data_tree["MCe0"]
+    )
 
     df_flat = flatten_data_vectorized(data_tree, n_tel, TRAINING_VARIABLES)
 
@@ -172,6 +176,10 @@ def flatten_data_vectorized(df, n_tel, training_variables):
     for i in range(n_tel):
         df_flat[f"disp_x_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"cosphi_{i}"]
         df_flat[f"disp_y_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"sinphi_{i}"]
+        df_flat[f"loss_loss_{i}"] = df_flat[f"loss_{i}"] ** 2
+        df_flat[f"loss_dist{i}"] = df_flat[f"loss_{i}"] * df_flat[f"dist_{i}"]
+        df_flat[f"width_length_{i}"] = df_flat[f"width_{i}"] / df_flat[f"length_{i}"]
+        df_flat[f"size_{i}"] = np.log10(df_flat[f"size_{i}"] + 1e-6)  # avoid log(0)
 
     df_flat["Xoff_weighted_bdt"] = df["Xoff"]
     df_flat["Yoff_weighted_bdt"] = df["Yoff"]
@@ -226,7 +234,7 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
     # MultiOutputRegressor requires a base estimator (e.g., plain XGBRegressor)
     xgb_params = {
         "n_estimators": 1000,
-        "learning_rate": 0.1,  # Shrinkage
+        "learning_rate": 0.05,  # Shrinkage
         "max_depth": 5,
         "min_child_weight": 1.0,  # Equivalent to MinNodeSize=1.0% for XGBoost
         "objective": "reg:squarederror",
