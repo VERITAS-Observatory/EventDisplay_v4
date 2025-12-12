@@ -185,6 +185,8 @@ def flatten_data_vectorized(df, n_tel, training_variables):
     df_flat["Yoff_weighted_bdt"] = df["Yoff"]
     df_flat["Xoff_intersect"] = df["Xoff_intersect"]
     df_flat["Yoff_intersect"] = df["Yoff_intersect"]
+    df_flat["Diff_Xoff"] = df["Xoff"] - df["Xoff_intersect"]
+    df_flat["Diff_Yoff"] = df["Yoff"] - df["Yoff_intersect"]
 
     return df_flat
 
@@ -254,8 +256,8 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
     base_estimator = xgb.XGBRegressor(**xgb_params)
     model = MultiOutputRegressor(base_estimator)
     _logger.info(f"Starting Multi-Target XGBoost Training for n_tel={n_tel}...")
-    #    model.fit(X_train, Y_train, sample_weight=W_train)
-    model.fit(X_train, Y_train)
+    model.fit(X_train, Y_train, sample_weight=W_train)
+    # model.fit(X_train, Y_train)
 
     output_filename = os.path.join(output_dir, f"dispdir_bdt_ntel{n_tel}.joblib")
     dump(model, output_filename)
