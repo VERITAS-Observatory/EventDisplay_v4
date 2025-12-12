@@ -83,12 +83,9 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
                 if "data" in root_file:
                     _logger.info(f"Processing file: {f}")
                     tree = root_file["data"]
-                    # read only needed branches
                     df = tree.arrays(branch_list, library="pd")
-                    # Filter for n_tel
                     df = df[df["DispNImages"] == n_tel]
                     _logger.info(f"Number of events after n_tel filter: {len(df)}")
-                    # Limit to max_events_per_file
                     if max_events_per_file and len(df) > max_events_per_file:
                         df = df.sample(n=max_events_per_file, random_state=42)
                     if not df.empty:
@@ -173,12 +170,15 @@ def flatten_data_vectorized(df, n_tel, training_variables):
     # Convert dictionary to DataFrame once at the end
     df_flat = pd.DataFrame(flat_features, index=df.index)
 
+    # Additional derived features to support finding certain event classes
     for i in range(n_tel):
         df_flat[f"disp_x_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"cosphi_{i}"]
         df_flat[f"disp_y_{i}"] = df_flat[f"Disp_T_{i}"] * df_flat[f"sinphi_{i}"]
         df_flat[f"loss_loss_{i}"] = df_flat[f"loss_{i}"] ** 2
         df_flat[f"loss_dist{i}"] = df_flat[f"loss_{i}"] * df_flat[f"dist_{i}"]
-        df_flat[f"width_length_{i}"] = df_flat[f"width_{i}"] / df_flat[f"length_{i}"]
+        df_flat[f"width_length_{i}"] = df_flat[f"width_{i}"] / (
+            df_flat[f"length_{i}"] + 1e-6
+        )
         df_flat[f"size_{i}"] = np.log10(df_flat[f"size_{i}"] + 1e-6)  # avoid log(0)
 
     df_flat["Xoff_weighted_bdt"] = df["Xoff"]
