@@ -19,6 +19,7 @@ import pandas as pd
 import uproot
 import xgboost as xgb
 from joblib import dump
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.multioutput import MultiOutputRegressor
@@ -193,7 +194,7 @@ def flatten_data_vectorized(df, n_tel, training_variables):
     return df_flat
 
 
-def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
+def train(df, n_tel, output_dir, train_test_fraction):
     """
     Trains a single XGBoost model for multi-target regression (Xoff, Yoff).
 
@@ -250,29 +251,39 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
         "subsample": 0.7,  # Default sensible value
         "colsample_bytree": 0.7,  # Default sensible value
     }
-
-    _logger.info(f"XGBoost parameters: {xgb_params}")
-
+    rf_params = {
+        "n_estimators": 1000,
+        "max_depth": None,
+        "max_features": "sqrt",
+        "min_samples_leaf": 5,
+        "n_jobs": 4,
+        "random_state": 42,
+    }
+    configs = {
+        "xgboost": xgb.XGBRegressor(**xgb_params),
+        "random_forest": RandomForestRegressor(**rf_params),
+    }
     _logger.info(
-        f"Sample weights (MCR) - min: {W_train.min():.6f}, "
+        f"(No weights used) Sample weights (MCR) - min: {W_train.min():.6f}, "
         f"max: {W_train.max():.6f}, mean: {W_train.mean():.6f}"
     )
 
-    base_estimator = xgb.XGBRegressor(**xgb_params)
-    model = MultiOutputRegressor(base_estimator)
-    _logger.info(f"Starting Multi-Target XGBoost Training for n_tel={n_tel}...")
-    # model.fit(X_train, Y_train, sample_weight=W_train)
-    _logger.info("No sample weights applied")
-    model.fit(X_train, Y_train)
+    for name, estimator in configs.items():
+        _logger.info(f"Training with {name} for n_tel={n_tel}...")
+        _logger.info(f"parameters: {xgb_params if name == 'xgboost' else rf_params}")
+        model = MultiOutputRegressor(estimator)
+        model.fit(X_train, Y_train)
 
-    output_filename = os.path.join(output_dir, f"dispdir_bdt_ntel{n_tel}.joblib")
-    dump(model, output_filename)
-    _logger.info(f"XGBoost model saved to: {output_filename}")
+        output_filename = os.path.join(
+            output_dir, f"dispdir_bdt_ntel{n_tel}_{name}.joblib"
+        )
+        dump(model, output_filename)
+        _logger.info(f"{name} model saved to: {output_filename}")
 
-    evaluate_model(model, X_test, Y_test, df, X_cols, Y)
+        evaluate_model(model, X_test, Y_test, df, X_cols, Y, name)
 
 
-def evaluate_model(model, X_test, Y_test, df, X_cols, Y):
+def evaluate_model(model, X_test, Y_test, df, X_cols, Y, name):
     """
     Evaluates the trained model on the test set and prints performance metrics.
 
@@ -282,13 +293,14 @@ def evaluate_model(model, X_test, Y_test, df, X_cols, Y):
     Y_pred = model.predict(X_test)
     mse_x = mean_squared_error(Y_test["MCxoff"], Y_pred[:, 0])
     mse_y = mean_squared_error(Y_test["MCyoff"], Y_pred[:, 1])
-    _logger.info(f"MSE (X_off): {mse_x:.4f}, MSE (Y_off): {mse_y:.4f}")
+    _logger.info(f"{name} MSE (X_off): {mse_x:.4f}, MSE (Y_off): {mse_y:.4f}")
     mae_x = mean_absolute_error(Y_test["MCxoff"], Y_pred[:, 0])
     mae_y = mean_absolute_error(Y_test["MCyoff"], Y_pred[:, 1])
-    _logger.info(f"MAE (X_off): {mae_x:.4f}, MAE (Y_off): {mae_y:.4f}")
+    _logger.info(f"{name} MAE (X_off): {mae_x:.4f}, MAE (Y_off): {mae_y:.4f}")
 
-    feature_importance(model, X_cols, Y.columns)
-    shap_feature_importance(model, X_test, Y.columns)
+    feature_importance(model, X_cols, Y.columns, name)
+    if name == "xgboost":
+        shap_feature_importance(model, X_test, Y.columns, name=name)
 
     angular_resolution(
         Y_pred,
@@ -298,10 +310,13 @@ def evaluate_model(model, X_test, Y_test, df, X_cols, Y):
         log_e_min=-1,
         log_e_max=2,
         n_bins=5,
+        name=name,
     )
 
 
-def angular_resolution(Y_pred, Y_test, df, percentiles, log_e_min, log_e_max, n_bins):
+def angular_resolution(
+    Y_pred, Y_test, df, percentiles, log_e_min, log_e_max, n_bins, name
+):
     """
     Computes and logs the angular resolution based on predicted and true offsets.
     """
@@ -342,21 +357,21 @@ def angular_resolution(Y_pred, Y_test, df, percentiles, log_e_min, log_e_max, n_
     output_df.index.name = "Log10(E) Bin Range"
     output_df = output_df.dropna()  # Drop bins with no events
 
-    _logger.info("\n--- Angular Resolution vs. Log10(MCe0) ---")
+    _logger.info(f"\n--- {name} Angular Resolution vs. Log10(MCe0) ---")
     _logger.info(
         f"Calculated over {n_bins} bins between Log10(E) = {log_e_min} and {log_e_max}"
     )
     _logger.info("\n" + output_df.to_markdown(floatfmt=".4f"))
 
 
-def feature_importance(model, X_cols, target_names):
+def feature_importance(model, X_cols, target_names, name=None):
     """
     Prints feature importance from the trained XGBoost model.
     """
     _logger.info("--- XGBoost Multi-Regression Feature Importance ---")
     for i, estimator in enumerate(model.estimators_):
         target = target_names[i]
-        _logger.info(f"\n### Importance for Target: **{target}**")
+        _logger.info(f"\n### {name} Importance for Target: **{target}**")
 
         importances = estimator.feature_importances_
         importance_df = pd.DataFrame({"Feature": X_cols, "Importance": importances})
@@ -365,7 +380,9 @@ def feature_importance(model, X_cols, target_names):
         _logger.info("\n" + importance_df.head(15).to_markdown(index=False))
 
 
-def shap_feature_importance(model, X, target_names, max_points=20000, n_top=25):
+def shap_feature_importance(
+    model, X, target_names, max_points=20000, n_top=25, name=None
+):
     """
     Uses XGBoost's builtin SHAP (pred_contribs=True).
     Avoids SHAP.TreeExplainer compatibility issues with XGBoost ≥1.7.
@@ -438,7 +455,7 @@ def main():
         args.ntel,
         args.max_events,
     )
-    train_xgb_model(df_flat, args.ntel, args.output_dir, args.train_test_fraction)
+    train(df_flat, args.ntel, args.output_dir, args.train_test_fraction)
     _logger.info("\nXGBoost model trained successfully.")
 
 
