@@ -218,7 +218,7 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
 
     _logger.info(f"Training variables ({len(X_cols)}): {X_cols}")
 
-    X_train, X_test, Y_train, Y_test, W_train, W_test = train_test_split(
+    X_train, X_test, Y_train, Y_test, W_train, _ = train_test_split(
         X,
         Y,
         df["sample_weight"],
@@ -238,18 +238,19 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
     # MultiOutputRegressor requires a base estimator (e.g., plain XGBRegressor)
     xgb_params = {
         "n_estimators": 1000,
-        "learning_rate": 0.05,  # Shrinkage
+        "learning_rate": 0.1,  # Shrinkage
         "max_depth": 5,
         "min_child_weight": 1.0,  # Equivalent to MinNodeSize=1.0% for XGBoost
-        # "objective": "reg:squarederror",
+        "objective": "reg:squarederror",
         # https://xgboosting.com/configure-xgboost-regpseudohubererror-objective/
-        "objective": "reg:pseudohubererror",
+        # "objective": "reg:pseudohubererror",
         "n_jobs": 4,
         "random_state": 42,
         "tree_method": "hist",
         "subsample": 0.7,  # Default sensible value
         "colsample_bytree": 0.7,  # Default sensible value
     }
+
     _logger.info(f"XGBoost parameters: {xgb_params}")
 
     _logger.info(
@@ -260,8 +261,9 @@ def train_xgb_model(df, n_tel, output_dir, train_test_fraction):
     base_estimator = xgb.XGBRegressor(**xgb_params)
     model = MultiOutputRegressor(base_estimator)
     _logger.info(f"Starting Multi-Target XGBoost Training for n_tel={n_tel}...")
-    model.fit(X_train, Y_train, sample_weight=W_train)
-    # model.fit(X_train, Y_train)
+    # model.fit(X_train, Y_train, sample_weight=W_train)
+    _logger.info("No sample weights applied")
+    model.fit(X_train, Y_train)
 
     output_filename = os.path.join(output_dir, f"dispdir_bdt_ntel{n_tel}.joblib")
     dump(model, output_filename)
