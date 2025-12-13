@@ -2585,7 +2585,10 @@ double VGammaHadronCuts::getReconstructedXoff()
     {
         return -9999.;
     }
-
+    if( fData->fFriendTree )
+    {
+        return fData->Dir_Xoff;
+    }
     return fData->Xoff;
 }
 
@@ -2595,7 +2598,10 @@ double VGammaHadronCuts::getReconstructedYoff()
     {
         return -9999.;
     }
-
+    if( fData->fFriendTree )
+    {
+        return fData->Dir_Yoff;
+    }
     return fData->Yoff;
 }
 

@@ -220,6 +220,7 @@ all VTS:	evndisp \
 	combineEffectiveAreas \
 	makeRadialAcceptance \
 	calculateBinaryPhases \
+	printBinaryOrbitalPhase \
 	compareDatawithMC \
     VTS.analyzeMuonRings \
 	VTS.getRunListFromDB \

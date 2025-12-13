@@ -52,10 +52,10 @@ void VAnaSum::initialize(
     {
         cout << "merging analysis results" << endl << endl;
     }
-    // sequentiell analysis
+    // sequential analysis
     else
     {
-        cout << "sequentiell analysis" << endl << endl;
+        cout << "sequential analysis" << endl << endl;
     }
 
     ///////////////////////////////////////////////////////////////////////////////

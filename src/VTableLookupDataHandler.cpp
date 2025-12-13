@@ -1445,6 +1445,10 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "tgrad_x", ftgrad_x, iTT );
     sprintf( iTT, "tchisq_x[%d]/F", fNTel );
     fOTree->Branch( "tchisq_x", ftchisq_x, iTT );
+    sprintf( iTT, "fpointing_dx[%d]/D", fNTel );
+    fOTree->Branch( "fpointing_dx", fpointing_dx, iTT );
+    sprintf( iTT, "fpointing_dy[%d]/D", fNTel );
+    fOTree->Branch( "fpointing_dy", fpointing_dy, iTT );
     sprintf( iTT, "Fitstat[%d]/I", fNTel );
     fOTree->Branch( "Fitstat", fFitstat, iTT );
     fOTree->Branch( "DispNImages", &fnxyoff, "DispNImages/i" );

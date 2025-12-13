@@ -554,7 +554,7 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
                 // Downweight high-loss images: loss=0.1 -> 0.61x, loss=0.2 -> 0.37x
                 if( img_loss[i] > 0.05 )
                 {
-                    float loss_penalty = exp( -5.0 * img_loss[i] );
+                    float loss_penalty = exp(-5.0 * img_loss[i] );
                     geom_weight *= loss_penalty;
                 }
                 v_weight.push_back( geom_weight );
