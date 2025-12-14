@@ -223,7 +223,7 @@ def train(df, n_tel, output_dir, train_test_fraction):
         Y,
         df["sample_weight"],
         test_size=1.0 - train_test_fraction,
-        random_state=42,
+        random_state=None,
     )
 
     _logger.info(
@@ -245,7 +245,7 @@ def train(df, n_tel, output_dir, train_test_fraction):
         # https://xgboosting.com/configure-xgboost-regpseudohubererror-objective/
         # "objective": "reg:pseudohubererror",
         "n_jobs": 4,
-        "random_state": 42,
+        "random_state": None,
         "tree_method": "hist",
         "subsample": 0.7,  # Default sensible value
         "colsample_bytree": 0.7,  # Default sensible value
@@ -256,7 +256,7 @@ def train(df, n_tel, output_dir, train_test_fraction):
         "max_features": "sqrt",
         "min_samples_leaf": 5,
         "n_jobs": 4,
-        "random_state": 42,
+        "random_state": None,
     }
     # Configure models
     # - xgboost default approach
@@ -301,16 +301,16 @@ def evaluate_model(model, X_test, Y_test, df, X_cols, Y, name):
 
     feature_importance(model, X_cols, Y.columns, name)
     if name == "xgboost":
-        shap_feature_importance(model, X_test, Y.columns, name=name)
+        shap_feature_importance(model, X_test, Y.columns)
 
     angular_resolution(
         Y_pred,
         Y_test,
         df,
-        percentiles=[68, 80, 90],
+        percentiles=[68, 90, 95],
         log_e_min=-1,
         log_e_max=2,
-        n_bins=5,
+        n_bins=6,
         name=name,
     )
 
@@ -381,9 +381,7 @@ def feature_importance(model, X_cols, target_names, name=None):
         _logger.info("\n" + importance_df.head(15).to_markdown(index=False))
 
 
-def shap_feature_importance(
-    model, X, target_names, max_points=20000, n_top=25, name=None
-):
+def shap_feature_importance(model, X, target_names, max_points=20000, n_top=25):
     """
     Uses XGBoost's builtin SHAP (pred_contribs=True).
     Avoids SHAP.TreeExplainer compatibility issues with XGBoost ≥1.7.
@@ -451,11 +449,7 @@ def main():
         f"Train vs test fraction: {args.train_test_fraction}, Max events: {args.max_events}"
     )
 
-    df_flat = load_and_flatten_data(
-        input_files,
-        args.ntel,
-        args.max_events,
-    )
+    df_flat = load_and_flatten_data(input_files, args.ntel, args.max_events)
     train(df_flat, args.ntel, args.output_dir, args.train_test_fraction)
     _logger.info("\nXGBoost model trained successfully.")
 
