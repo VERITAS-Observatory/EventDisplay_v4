@@ -147,7 +147,9 @@ def apply_models(df, model_dir):
     # Load all models (for n_tel = 2, 3, 4)
     models = {}
     for n_tel in range(2, 5):
-        model_filename = os.path.join(model_dir, f"dispdir_bdt_ntel{n_tel}.joblib")
+        model_filename = os.path.join(
+            model_dir, f"dispdir_bdt_ntel{n_tel}_xgboost.joblib"
+        )
         if os.path.exists(model_filename):
             _logger.info(f"Loading model: {model_filename}")
             models[n_tel] = joblib.load(model_filename)
