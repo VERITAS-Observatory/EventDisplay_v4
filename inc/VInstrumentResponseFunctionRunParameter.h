@@ -78,6 +78,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
         string          fMCdatafile_tree;
         string          fMCdatafile_histo;
         string          fGammaHadronProbabilityFile;
+        string          fXGB_file_suffix;
 
         double          fze;
         int             fnoise;
@@ -117,7 +118,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
         bool                  readRunParameterFromTextFile( string iFile );
         bool                  testRunparameters();
 
-        ClassDef( VInstrumentResponseFunctionRunParameter, 18 );
+        ClassDef( VInstrumentResponseFunctionRunParameter, 19 );
 };
 
 #endif

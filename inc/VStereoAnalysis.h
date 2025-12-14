@@ -221,7 +221,7 @@ class VStereoAnalysis
         TTree* fDataRunTree;
         TFile* fDataFile;
         TDirectory* fDataDirFile;
-        TTree* fDataDirTree;
+        TTree* fXGB_tree;
         string fInstrumentEpochMinor;
         vector< unsigned int > fTelToAnalyze;
 

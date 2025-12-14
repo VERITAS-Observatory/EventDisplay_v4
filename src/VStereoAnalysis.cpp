@@ -12,7 +12,7 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 
     fDataFile = 0;
     fDataDirFile = 0;
-    fDataDirTree = 0;
+    fXGB_tree = 0;
     fInstrumentEpochMinor = "NOT_SET";
     fDirTot = iDirTot;
     fDirTotRun = iDirRun;
@@ -1968,12 +1968,12 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
             cout << "exiting..." << endl;
             exit( EXIT_FAILURE );
         }
-        fDataDirTree = 0;
-        if( fRunPara->fXY_DirectionFile != "" && fRunPara->fXY_DirectionFile != "nofile" )
+        fXGB_tree = 0;
+        if( fRunPara->fXGB_file_suffix != "" && fRunPara->fXGB_file_suffix != "nofile" )
         {
             fDataDirFile = new TFile( iFileName.replace(
                                           iFileName.find( ".root" ), 5,
-                                          "." + fRunPara->fXY_DirectionFile + ".root" ).c_str()
+                                          "." + fRunPara->fXGB_file_suffix + ".root" ).c_str()
                                     );
             if( fDataDirFile->IsZombie() )
             {
@@ -1983,11 +1983,11 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
             }
             else
             {
-                fDataDirTree = ( TTree* )fDataDirFile->Get( "DispDirection" );
+                fXGB_tree = ( TTree* )fDataDirFile->Get( "DispDirection" );
                 cout << "VStereoAnalysis::getDataFromFile(): adding DispDirection from " << fDataDirFile->GetName() << endl;
             }
         }
-        c = new CData( fDataRunTree, false, false, fDataDirTree );
+        c = new CData( fDataRunTree, false, false, fXGB_tree );
         // read current (major) epoch from data file
         VEvndispRunParameter* i_runPara = ( VEvndispRunParameter* )fDataFile->Get( "runparameterV2" );
         if( i_runPara )

@@ -196,8 +196,8 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
         // dead time calculation method
         int  fDeadTimeCalculationMethod;
 
-        // direction reconstruction
-        string fXY_DirectionFile;
+        // XGB reconstruction
+        string fXGB_file_suffix;
 
         int f2DAcceptanceMode ; // USE2DACCEPTANCE
 
@@ -275,6 +275,6 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
         bool writeListOfExcludedSkyRegions();
         bool getListOfExcludedSkyRegions( TFile* f );
 
-        ClassDef( VAnaSumRunParameter, 18 ) ;
+        ClassDef( VAnaSumRunParameter, 19 ) ;
 };
 #endif
