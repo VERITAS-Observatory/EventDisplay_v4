@@ -19,7 +19,6 @@ import pandas as pd
 import uproot
 import xgboost as xgb
 from joblib import dump
-from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.multioutput import MultiOutputRegressor
@@ -259,9 +258,11 @@ def train(df, n_tel, output_dir, train_test_fraction):
         "n_jobs": 4,
         "random_state": 42,
     }
+    # Configure models
+    # - xgboost default approach
     configs = {
         "xgboost": xgb.XGBRegressor(**xgb_params),
-        "random_forest": RandomForestRegressor(**rf_params),
+        # "random_forest": RandomForestRegressor(**rf_params),
     }
     _logger.info(
         f"(No weights used) Sample weights (MCR) - min: {W_train.min():.6f}, "
