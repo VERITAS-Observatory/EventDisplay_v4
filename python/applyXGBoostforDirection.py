@@ -1,5 +1,5 @@
 """
-Evaluate XGBoost BDTs for Directory reconstruction
+Evaluate XGBoost BDTs for Direction reconstruction
 
 This script applies trained XGBoost models to predict Xoff and Yoff
 for each event in an input ROOT file. The output ROOT file contains
