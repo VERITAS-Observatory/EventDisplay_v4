@@ -9,6 +9,7 @@ one row per input event, maintaining the original event order.
 import argparse
 import logging
 import os
+import time
 
 import joblib
 import numpy as np
@@ -18,6 +19,78 @@ from trainXGBoostforDirection import TRAINING_VARIABLES
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger("applyXGBoostforDirection")
+
+
+def parse_image_selection(image_selection_str):
+    """
+    Parse the image_selection parameter.
+
+    Can be either:
+    - Bit-coded value (e.g., 14 = 0b1110 = telescopes 1,2,3)
+    - Comma-separated indices (e.g., "1,2,3")
+
+    Returns a list of telescope indices.
+    """
+    if not image_selection_str:
+        return None
+
+    # Parse as comma-separated indices
+    if "," in image_selection_str:
+        try:
+            indices = [int(x.strip()) for x in image_selection_str.split(",")]
+            _logger.info(f"Image selection indices: {indices}")
+            return indices
+        except ValueError:
+            pass
+
+    # Parse as bit-coded value
+    try:
+        bit_value = int(image_selection_str)
+        # Extract bit positions (0-indexed)
+        indices = [i for i in range(4) if (bit_value >> i) & 1]
+        _logger.info(f"Image selection from bit-coded value {bit_value}: {indices}")
+        return indices
+    except ValueError:
+        raise ValueError(
+            f"Invalid image_selection format: {image_selection_str}. "
+            "Use bit-coded value (e.g., 14) or comma-separated indices (e.g., '1,2,3')"
+        )
+
+
+def filter_by_telescope_selection(df, selected_indices):
+    """
+    Filter DataFrame to keep only events where all selected telescope indices
+    are present in DispTelList_T, or events with 4 telescopes.
+
+    Parameters
+    ----------
+    - df: DataFrame with DispTelList_T column
+    - selected_indices: List of selected telescope indices
+
+    Returns
+    -------
+    Filtered DataFrame maintaining original event order.
+    """
+    if selected_indices is None:
+        return df
+
+    _logger.info(f"Filtering events for telescope selection: {selected_indices}")
+
+    def has_selected_telescopes(tel_list):
+        """Check if event has all selected telescopes or has 4 telescopes."""
+        tel_set = set(tel_list)
+        has_all_selected = all(idx in tel_set for idx in selected_indices)
+        has_four_telescopes = len(tel_list) == 4
+        return has_all_selected or has_four_telescopes
+
+    mask = df["DispTelList_T"].apply(has_selected_telescopes)
+    filtered_df = df[mask]
+
+    _logger.info(
+        f"Filtered from {len(df)} to {len(filtered_df)} events "
+        f"({100 * len(filtered_df) / len(df):.1f}%)"
+    )
+    return filtered_df
 
 
 def load_all_events(input_file, max_events=None):
@@ -222,23 +295,44 @@ def write_output_root_file(output_file, pred_xoff, pred_yoff):
 
 def main():
     parser = argparse.ArgumentParser(
-        description=("Apply XGBoost Multi-Target BDTs for Direction Reconstruction")
+        description=("Apply XGBoost Multi-Target BDTs for Stereo Reconstruction")
     )
     parser.add_argument("input_file", help="Input mscw ROOT file.")
     parser.add_argument("model_dir", help="Directory with XGBoost models.")
-    parser.add_argument("output_file", help="Output ROOT file with applied BDTs.")
+    parser.add_argument(
+        "output_file", help="Output ROOT file with applied predictions."
+    )
+    parser.add_argument(
+        "--image-selection",
+        type=str,
+        default=None,
+        help=(
+            "Optional telescope selection. Can be bit-coded (e.g., 14 for telescopes 1,2,3) "
+            "or comma-separated indices (e.g., '1,2,3'). "
+            "Keeps events with all selected telescopes or 4-telescope events."
+        ),
+    )
     args = parser.parse_args()
 
+    start_time = time.time()
     _logger.info("--- XGBoost Multi-Target Direction Evaluation ---")
     _logger.info(f"Input file: {args.input_file}")
     _logger.info(f"Model directory: {args.model_dir}")
     _logger.info(f"Output file: {args.output_file}")
+    if args.image_selection:
+        _logger.info(f"Image selection: {args.image_selection}")
 
     df = load_all_events(args.input_file, max_events=None)
+
+    if args.image_selection:
+        selected_indices = parse_image_selection(args.image_selection)
+        df = filter_by_telescope_selection(df, selected_indices)
+
     pred_xoff, pred_yoff = apply_models(df, args.model_dir)
     write_output_root_file(args.output_file, pred_xoff, pred_yoff)
 
-    _logger.info("Processing complete.")
+    elapsed_time = time.time() - start_time
+    _logger.info(f"Processing complete. Total time: {elapsed_time:.2f} seconds")
 
 
 if __name__ == "__main__":
