@@ -236,7 +236,6 @@ def apply_models(df, model_dir, selection_mask=None):
     pred_xoff = np.full(n_events, np.nan)
     pred_yoff = np.full(n_events, np.nan)
 
-    # Group events by DispNImages for batch processing
     # Group selected events (if mask provided) by DispNImages for batch processing
     df_to_group = df[selection_mask] if selection_mask is not None else df
     grouped = df_to_group.groupby("DispNImages")
@@ -313,10 +312,23 @@ def main():
     parser = argparse.ArgumentParser(
         description=("Apply XGBoost Multi-Target BDTs for Stereo Reconstruction")
     )
-    parser.add_argument("input_file", help="Input mscw ROOT file.")
-    parser.add_argument("model_dir", help="Directory with XGBoost models.")
     parser.add_argument(
-        "output_file", help="Output ROOT file with applied predictions."
+        "--input-file",
+        required=True,
+        metavar="INPUT.root",
+        help="Path to input mscw ROOT file",
+    )
+    parser.add_argument(
+        "--model-dir",
+        required=True,
+        metavar="MODEL_DIR",
+        help="Directory containing XGBoost models",
+    )
+    parser.add_argument(
+        "--output-file",
+        required=True,
+        metavar="OUTPUT.root",
+        help="Output ROOT file path for predictions",
     )
     parser.add_argument(
         "--image-selection",
