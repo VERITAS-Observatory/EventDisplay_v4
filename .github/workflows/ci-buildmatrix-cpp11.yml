@@ -22,7 +22,7 @@ jobs:
 
       - name: Upload source artifact
         # v4 okay here (runs on ubuntu host with modern glibc)
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: src
           path: src.tgz
@@ -84,7 +84,7 @@ jobs:
 
       - name: Upload build artifacts
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: build-artifacts
           path: build-artifacts.tgz
