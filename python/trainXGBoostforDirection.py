@@ -265,7 +265,7 @@ def train(df, n_tel, output_dir, train_test_fraction):
         # "random_forest": RandomForestRegressor(**rf_params),
     }
     _logger.info(
-        f"(No weights used) Sample weights (MCR) - min: {W_train.min():.6f}, "
+        f"Sample weights (not(!) used in training) - min: {W_train.min():.6f}, "
         f"max: {W_train.max():.6f}, mean: {W_train.mean():.6f}"
     )
 

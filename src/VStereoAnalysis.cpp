@@ -1986,6 +1986,12 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
                 fXGB_tree = ( TTree* )fXGBFile->Get( "StereoAnalysis" );
                 // backwards compatibility
                 if(!fXGB_tree ) fXGB_tree = ( TTree* )fXGBFile->Get( "DispDirection" );
+                if(!fXGB_tree )
+                {
+                    cout << "VStereoAnalysis::getDataFromFile() error: cannot find stereo analysis tree in "
+                         << fXGBFile->GetName() << endl;
+                    exit( EXIT_FAILURE );
+                }
                 cout << "VStereoAnalysis::getDataFromFile(): adding DispDirection from " << fXGBFile->GetName() << endl;
             }
         }

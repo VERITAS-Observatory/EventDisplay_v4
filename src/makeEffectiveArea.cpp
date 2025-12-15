@@ -208,6 +208,11 @@ int main( int argc, char* argv[] )
             fXGB_tree = ( TTree* )fXGBFile->Get( "StereoAnalysis" );
             // backwards compatibility
             if(!fXGB_tree ) fXGB_tree = ( TTree* )fXGBFile->Get( "DispDirection" );
+            if(!fXGB_tree )
+            {
+                cout << "Error: cannot find stereo analysis tree in " << fXGBFile->GetName() << endl;
+                exit( EXIT_FAILURE );
+            }
             cout << "Adding XGB DispDirection from " << fXGBFile->GetName() << endl;
         }
     }

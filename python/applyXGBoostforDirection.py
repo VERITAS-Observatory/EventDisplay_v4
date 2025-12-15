@@ -234,7 +234,7 @@ def main():
     _logger.info(f"Model directory: {args.model_dir}")
     _logger.info(f"Output file: {args.output_file}")
 
-    df = load_all_events(args.input_file, max_events=0)
+    df = load_all_events(args.input_file, max_events=None)
     pred_xoff, pred_yoff = apply_models(df, args.model_dir)
     write_output_root_file(args.output_file, pred_xoff, pred_yoff)
 
