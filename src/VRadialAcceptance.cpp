@@ -629,8 +629,8 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
 
         // 1D histograms
         // Radius Dependent Histograms
-        eventradius = sqrt( xy_derot.first*xy_derot.first+ xy_derot.second*xy_derot.second) ;
-        eventphi    = atan2( xy_derot.second, xy_derot.first) ; // radians
+        eventradius = sqrt( xy_derot.first* xy_derot.first + xy_derot.second* xy_derot.second ) ;
+        eventphi    = atan2( xy_derot.second, xy_derot.first ) ; // radians
         if( eventphi < 0.0 )
         {
             eventphi += 2 * TMath::Pi() ;    // atan2 is from -pi to pi, we want 0 to 2pi

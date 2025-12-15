@@ -646,7 +646,7 @@ Bool_t CData::Notify()
  * 2: return Xoff_intersect
  * 3: return friend tree result
  */
-float CData::get_Xoff(unsigned iMethod)
+float CData::get_Xoff( unsigned iMethod )
 {
     if( iMethod == 0 && fFriendTree )
     {
@@ -664,7 +664,7 @@ float CData::get_Xoff(unsigned iMethod)
     {
         return Dir_Xoff;
     }
-    return (float)Xoff;
+    return ( float )Xoff;
 }
 
 /*
@@ -677,7 +677,7 @@ float CData::get_Xoff(unsigned iMethod)
  * 2: return Yoff_intersect
  * 3: return friend tree result
  */
-float CData::get_Yoff(unsigned iMethod)
+float CData::get_Yoff( unsigned iMethod )
 {
     if( iMethod == 0 && fFriendTree )
     {
@@ -695,21 +695,22 @@ float CData::get_Yoff(unsigned iMethod)
     {
         return Dir_Yoff;
     }
-    return (float)Yoff;
+    return ( float )Yoff;
 }
 
-pair<float, float> CData::get_XYoff_derot(unsigned int iMethod)
+pair<float, float> CData::get_XYoff_derot( unsigned int iMethod )
 {
-    float tmp_xoff = get_Xoff(iMethod);
-    float tmp_yoff = get_Yoff(iMethod);
-    if( tmp_xoff < -990. || tmp_yoff < -990. ) return {-999.,-999.};
+    float tmp_xoff = get_Xoff( iMethod );
+    float tmp_yoff = get_Yoff( iMethod );
+    if( tmp_xoff < -990. || tmp_yoff < -990. ) return {-999., -999.};
     if( fMC ) return {tmp_xoff, tmp_yoff};
 
-    float rot_angle = VSkyCoordinatesUtilities::getDerotationAngleFromGroundCoordinates(MJD, Time, ArrayPointing_Azimuth, ArrayPointing_Elevation );
+    float rot_angle = VSkyCoordinatesUtilities::getDerotationAngleFromGroundCoordinates( MJD, Time, ArrayPointing_Azimuth, ArrayPointing_Elevation );
 
-    return {
-        tmp_xoff * cos( rot_angle ) - tmp_yoff * sin( rot_angle),
-        tmp_yoff * cos( rot_angle ) + tmp_xoff * sin( rot_angle),
+    return
+    {
+        tmp_xoff * cos( rot_angle ) - tmp_yoff * sin( rot_angle ),
+        tmp_yoff * cos( rot_angle ) + tmp_xoff * sin( rot_angle ),
     };
 }
 

@@ -333,7 +333,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     pair<float, float > i_array_pointing = getArrayPointing();
     fArrayPointing_Elevation = i_array_pointing.first;
     fArrayPointing_Azimuth = i_array_pointing.second;
-    fArrayPointing_RotationAngle = VSkyCoordinatesUtilities::getDerotationAngleFromGroundCoordinates(MJD, time, fArrayPointing_Azimuth, fArrayPointing_Elevation );
+    fArrayPointing_RotationAngle = VSkyCoordinatesUtilities::getDerotationAngleFromGroundCoordinates( MJD, time, fArrayPointing_Azimuth, fArrayPointing_Elevation );
     fArray_PointingStatus = fshowerpars->eventStatus;
 
     // the following variables are not set in table filling mode

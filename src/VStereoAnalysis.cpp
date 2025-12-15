@@ -1972,9 +1972,9 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
         if( fRunPara->fXGB_file_suffix != "" && fRunPara->fXGB_file_suffix != "nofile" )
         {
             fXGBFile = new TFile( iFileName.replace(
-                                          iFileName.find( ".root" ), 5,
-                                          "." + fRunPara->fXGB_file_suffix + ".root" ).c_str()
-                                    );
+                                      iFileName.find( ".root" ), 5,
+                                      "." + fRunPara->fXGB_file_suffix + ".root" ).c_str()
+                                );
             if( fXGBFile->IsZombie() )
             {
                 cout << "VStereoAnalysis::getDataFromFile() warning: cannot open DispDirection file "
@@ -1983,9 +1983,9 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
             }
             else
             {
-                fXGB_tree = (TTree*)fXGBFile->Get("StereoAnalysis");
+                fXGB_tree = ( TTree* )fXGBFile->Get( "StereoAnalysis" );
                 // backwards compatibility
-                if( !fXGB_tree ) fXGB_tree = ( TTree* )fXGBFile->Get( "DispDirection" );
+                if(!fXGB_tree ) fXGB_tree = ( TTree* )fXGBFile->Get( "DispDirection" );
                 cout << "VStereoAnalysis::getDataFromFile(): adding DispDirection from " << fXGBFile->GetName() << endl;
             }
         }

@@ -2585,7 +2585,7 @@ double VGammaHadronCuts::getReconstructedXoff()
     {
         return -9999.;
     }
-    return fData->get_Xoff(0);
+    return fData->get_Xoff( 0 );
 }
 
 double VGammaHadronCuts::getReconstructedYoff()
@@ -2594,7 +2594,7 @@ double VGammaHadronCuts::getReconstructedYoff()
     {
         return -9999.;
     }
-    return fData->get_Yoff(0);
+    return fData->get_Yoff( 0 );
 }
 
 double VGammaHadronCuts::getReconstructedXcore()

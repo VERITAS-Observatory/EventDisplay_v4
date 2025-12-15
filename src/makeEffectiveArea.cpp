@@ -196,7 +196,7 @@ int main( int argc, char* argv[] )
     if( fRunPara->fXGB_file_suffix != "" && fRunPara->fXGB_file_suffix != "nofile" )
     {
         string xgb_file_name = fRunPara->fdatafile;
-        xgb_file_name.replace(fRunPara->fdatafile.find( ".root" ), 5, "." + fRunPara->fXGB_file_suffix + ".root" );
+        xgb_file_name.replace( fRunPara->fdatafile.find( ".root" ), 5, "." + fRunPara->fXGB_file_suffix + ".root" );
         fXGBFile = new TFile( xgb_file_name.c_str() );
         if( fXGBFile->IsZombie() )
         {
@@ -205,14 +205,14 @@ int main( int argc, char* argv[] )
         }
         else
         {
-            fXGB_tree = (TTree*)fXGBFile->Get("StereoAnalysis");
+            fXGB_tree = ( TTree* )fXGBFile->Get( "StereoAnalysis" );
             // backwards compatibility
-            if( !fXGB_tree ) fXGB_tree = ( TTree* )fXGBFile->Get( "DispDirection" );
+            if(!fXGB_tree ) fXGB_tree = ( TTree* )fXGBFile->Get( "DispDirection" );
             cout << "Adding XGB DispDirection from " << fXGBFile->GetName() << endl;
         }
     }
 
-    CData d( c, true, false, fXGB_tree);
+    CData d( c, true, false, fXGB_tree );
     d.initialize_3tel_reconstruction(
         fRunPara->fRerunStereoReconstruction_3telescopes,
         fRunPara->fRerunStereoReconstruction_minAngle,

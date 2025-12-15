@@ -488,17 +488,17 @@ double VSkyCoordinatesUtilities::getDerotationAngle( double iMJD, double iTime, 
     return getDerotationAngle( getUTC( iMJD, iTime ), iTelRA, iTelDec, iObservatoryLongitude, iObservatoryLatitude );
 }
 
-double VSkyCoordinatesUtilities::getDerotationAngleFromGroundCoordinates(double MJD, double time, double iTelAz_deg, double iTelElevation_deg)
+double VSkyCoordinatesUtilities::getDerotationAngleFromGroundCoordinates( double MJD, double time, double iTelAz_deg, double iTelElevation_deg )
 {
     double dec = 0.;
     double ra = 0.;
-    getEquatorialCoordinates(MJD, time, iTelAz_deg, 90.-iTelElevation_deg, dec, ra);
+    getEquatorialCoordinates( MJD, time, iTelAz_deg, 90. - iTelElevation_deg, dec, ra );
 
     return getDerotationAngle(
-            getUTC( MJD, time ), ra*TMath::DegToRad(), dec*TMath::DegToRad(),
-            VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad(),
-            VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad()
-    );
+               getUTC( MJD, time ), ra* TMath::DegToRad(), dec* TMath::DegToRad(),
+               VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad(),
+               VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad()
+           );
 }
 
 
