@@ -344,6 +344,8 @@ def main():
     if args.image_selection:
         selected_indices = parse_image_selection(args.image_selection)
         selection_mask = filter_by_telescope_selection(df, selected_indices)
+    else:
+        _logger.info("No image selection applied")
 
     pred_xoff, pred_yoff = apply_models(df, args.model_dir, selection_mask)
     write_output_root_file(args.output_file, pred_xoff, pred_yoff)
