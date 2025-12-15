@@ -193,7 +193,7 @@ int main( int argc, char* argv[] )
     // XGB file
     TFile *fXGBFile = 0;
     TTree *fXGB_tree = 0;
-    if( fRunPara->fXGB_file_suffix != "" && fRunPara->fXGB_file_suffix != "nofile" )
+    if( fRunPara->fXGB_file_suffix != "" && fRunPara->fXGB_file_suffix != "None" )
     {
         string xgb_file_name = fRunPara->fdatafile;
         xgb_file_name.replace( fRunPara->fdatafile.find( ".root" ), 5, "." + fRunPara->fXGB_file_suffix + ".root" );

@@ -1185,7 +1185,7 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
         {
             cout << " (lookup table energy reconstruction)" << endl;
         }
-        if( fXGB_file_suffix != "" && fXGB_file_suffix != "nofile" )
+        if( fXGB_file_suffix != "" && fXGB_file_suffix != "None" )
         {
             cout << "\t XY direction file: " << fXGB_file_suffix << endl;
         }

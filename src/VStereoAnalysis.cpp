@@ -1969,7 +1969,7 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
             exit( EXIT_FAILURE );
         }
         fXGB_tree = 0;
-        if( fRunPara->fXGB_file_suffix != "" && fRunPara->fXGB_file_suffix != "nofile" )
+        if( fRunPara->fXGB_file_suffix != "" && fRunPara->fXGB_file_suffix != "None" )
         {
             fXGBFile = new TFile( iFileName.replace(
                                       iFileName.find( ".root" ), 5,
