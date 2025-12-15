@@ -11,7 +11,7 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
     fDebug = false;
 
     fDataFile = 0;
-    fDataDirFile = 0;
+    fXGBFile = 0;
     fXGB_tree = 0;
     fInstrumentEpochMinor = "NOT_SET";
     fDirTot = iDirTot;
@@ -1971,11 +1971,11 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
         fXGB_tree = 0;
         if( fRunPara->fXGB_file_suffix != "" && fRunPara->fXGB_file_suffix != "nofile" )
         {
-            fDataDirFile = new TFile( iFileName.replace(
+            fXGBFile = new TFile( iFileName.replace(
                                           iFileName.find( ".root" ), 5,
                                           "." + fRunPara->fXGB_file_suffix + ".root" ).c_str()
                                     );
-            if( fDataDirFile->IsZombie() )
+            if( fXGBFile->IsZombie() )
             {
                 cout << "VStereoAnalysis::getDataFromFile() warning: cannot open DispDirection file "
                      << iFileName << endl;
@@ -1983,8 +1983,10 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
             }
             else
             {
-                fXGB_tree = ( TTree* )fDataDirFile->Get( "DispDirection" );
-                cout << "VStereoAnalysis::getDataFromFile(): adding DispDirection from " << fDataDirFile->GetName() << endl;
+                fXGB_tree = (TTree*)fXGBFile->Get("StereoAnalysis");
+                // backwards compatibility
+                if( !fXGB_tree ) fXGB_tree = ( TTree* )fXGBFile->Get( "DispDirection" );
+                cout << "VStereoAnalysis::getDataFromFile(): adding DispDirection from " << fXGBFile->GetName() << endl;
             }
         }
         c = new CData( fDataRunTree, false, false, fXGB_tree );

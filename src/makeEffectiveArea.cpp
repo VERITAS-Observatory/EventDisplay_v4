@@ -205,7 +205,9 @@ int main( int argc, char* argv[] )
         }
         else
         {
-            fXGB_tree = ( TTree* )fXGBFile->Get( "DispDirection" );
+            fXGB_tree = (TTree*)fXGBFile->Get("StereoAnalysis");
+            // backwards compatibility
+            if( !fXGB_tree ) fXGB_tree = ( TTree* )fXGBFile->Get( "DispDirection" );
             cout << "Adding XGB DispDirection from " << fXGBFile->GetName() << endl;
         }
     }

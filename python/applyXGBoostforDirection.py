@@ -215,7 +215,7 @@ def write_output_root_file(output_file, pred_xoff, pred_yoff):
     }
 
     with uproot.recreate(output_file) as root_file:
-        root_file.mktree("DispDirection", output_data)
+        root_file.mktree("StereoAnalysis", output_data)
 
     _logger.info(f"Output written successfully: {len(pred_xoff)} events")
 
