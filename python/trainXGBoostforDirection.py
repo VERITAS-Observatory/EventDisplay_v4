@@ -22,31 +22,10 @@ from joblib import dump
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.multioutput import MultiOutputRegressor
+from training_variables import xgb_training_variables
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger("trainXGBoostforDirection")
-
-# Telescope-type training variables
-# Disp variables with different indexing logic in data preparation
-TRAINING_VARIABLES = [
-    "Disp_T",
-    "DispXoff_T",
-    "DispYoff_T",
-    "DispWoff_T",
-    "cen_x",
-    "cen_y",
-    "cosphi",
-    "sinphi",
-    "loss",
-    "size",
-    "dist",
-    "width",
-    "length",
-    "asym",
-    "tgrad_x",
-    "R_core",
-]
-N_TEL_VAR = len(TRAINING_VARIABLES)
 
 
 def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
@@ -69,7 +48,7 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
         "MCxoff",
         "MCyoff",
         "MCe0",
-    ] + [var for var in TRAINING_VARIABLES]
+    ] + [var for var in xgb_training_variables()]
 
     dfs = []
     if max_events > 0:
@@ -114,7 +93,7 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
         )  # * data_tree["MCe0"]
     )
 
-    df_flat = flatten_data_vectorized(data_tree, n_tel, TRAINING_VARIABLES)
+    df_flat = flatten_data_vectorized(data_tree, n_tel, xgb_training_variables())
 
     if training_step:
         df_flat["MCxoff"] = data_tree["MCxoff"]

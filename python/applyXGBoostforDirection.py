@@ -15,7 +15,7 @@ import joblib
 import numpy as np
 import pandas as pd
 import uproot
-from trainXGBoostforDirection import TRAINING_VARIABLES
+from training_variables import xgb_training_variables
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger("applyXGBoostforDirection")
@@ -119,7 +119,7 @@ def load_all_events(input_file, max_events=None):
         "Yoff_intersect",
         "fpointing_dx",
         "fpointing_dy",
-    ] + [var for var in TRAINING_VARIABLES]
+    ] + [var for var in xgb_training_variables()]
 
     with uproot.open(input_file) as root_file:
         if "data" not in root_file:
@@ -252,7 +252,7 @@ def apply_models(df, model_dir, selection_mask=None):
         _logger.info(f"Processing {len(group_df)} events with n_tel={n_tel}")
 
         # Add fpointing_dx and fpointing_dy to the training variables for flattening
-        training_vars_with_pointing = TRAINING_VARIABLES + [
+        training_vars_with_pointing = xgb_training_variables() + [
             "fpointing_dx",
             "fpointing_dy",
         ]

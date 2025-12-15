@@ -11,6 +11,9 @@ dependencies:
   - numpy
   - pandas
   - pre-commit
+  - pytest
+  - pytest-cov
+  - pytest-mock
   - scikit-learn
   - scipy
   - shellcheck
