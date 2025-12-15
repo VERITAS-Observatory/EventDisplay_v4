@@ -736,14 +736,15 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
         // MC data
         if( fInput == 0 )
         {
-            theta2 = ( fData->Yoff - fData->MCyoff ) * ( fData->Yoff - fData->MCyoff )
-                     + ( fData->Xoff - fData->MCxoff ) * ( fData->Xoff - fData->MCxoff );
+            theta2 = ( fData->get_Yoff() - fData->MCyoff ) * ( fData->get_Yoff() - fData->MCyoff )
+                     + ( fData->get_Xoff() - fData->MCxoff ) * ( fData->get_Xoff() - fData->MCxoff );
         }
         // data runs (on and off runs)
         else
         {
-            float on_x = fData->Xoff_derot + fWobbleEast;
-            float on_y = fData->Yoff_derot + fWobbleNorth;
+            pair< float, float > xyoff_derot = fData->get_XYoff_derot();
+            float on_x = xyoff_derot.first + fWobbleEast;
+            float on_y = xyoff_derot.second + fWobbleNorth;
             // off data
             if( fInput == 2 )
             {
@@ -752,8 +753,8 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                 float off_theta = 90. * TMath::DegToRad();
                 for( unsigned int th = 0; th < 5; th++ )
                 {
-                    float off_x = cos( off_theta ) * fWobbleEast - sin( off_theta ) * fWobbleNorth + fData->Xoff_derot;
-                    float off_y = sin( off_theta ) * fWobbleEast + cos( off_theta ) * fWobbleNorth + fData->Yoff_derot;
+                    float off_x = cos( off_theta ) * fWobbleEast - sin( off_theta ) * fWobbleNorth + xyoff_derot.first;
+                    float off_y = sin( off_theta ) * fWobbleEast + cos( off_theta ) * fWobbleNorth + xyoff_derot.second;
                     if( off_x * off_x + off_y * off_y < theta2 )
                     {
                         theta2 = off_x * off_x + off_y * off_y;

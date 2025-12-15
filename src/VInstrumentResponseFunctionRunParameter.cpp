@@ -253,6 +253,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
                 if(!( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> fXGB_file_suffix;
+                    if( fXGB_file_suffix == "None" ) fXGB_file_suffix = "";
                 }
             }
             // * SCATTERMODE <core scatter radius [m]> <type of CORSIKA simulations (FLAT or VIEWCONE)>

@@ -11,11 +11,13 @@
 #include "VMeanScaledVariables.h"
 #include "VDispAnalyzer.h"
 #include "VSimpleStereoReconstructor.h"
+#include "VSkyCoordinatesUtilities.h"
 
 #include <bitset>
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 using namespace std;
@@ -265,6 +267,9 @@ class CData
         CData( TTree* tree = 0, bool bMC = false, bool bShort = false, TTree* friendTree = 0 );
         virtual ~CData();
         virtual Int_t    GetEntry( Long64_t entry );
+        float get_Xoff(unsigned int method = 0);
+        float get_Yoff(unsigned int method = 0);
+        pair<float, float> get_XYoff_derot(unsigned int method = 0);
         virtual Long64_t LoadTree( Long64_t entry );
         virtual void     Init( TTree* tree );
         virtual Bool_t   Notify();

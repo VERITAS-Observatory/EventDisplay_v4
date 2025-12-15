@@ -95,6 +95,8 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut,
     iDataTree_reduced->Branch( "EChi2S", &EChi2S, "EChi2S/F" );
     iDataTree_reduced->Branch( "Xcore", &Xcore, "Xcore/D" );
     iDataTree_reduced->Branch( "Ycore", &Ycore, "Ycore/D" );
+    // note that these are the derotated coordinates from the mscw stage.
+    // No additional (e.g. XGB) reconstruction is applied.
     iDataTree_reduced->Branch( "Xoff_derot", &Xoff_derot, "Xoff_derot/D" );
     iDataTree_reduced->Branch( "Yoff_derot", &Yoff_derot, "Yoff_derot/D" );
     iDataTree_reduced->Branch( "NImages", &NImages, "NImages/I" );

@@ -333,7 +333,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     pair<float, float > i_array_pointing = getArrayPointing();
     fArrayPointing_Elevation = i_array_pointing.first;
     fArrayPointing_Azimuth = i_array_pointing.second;
-    fArrayPointing_RotationAngle = getArrayPointingDeRotationAngle();
+    fArrayPointing_RotationAngle = VSkyCoordinatesUtilities::getDerotationAngleFromGroundCoordinates(MJD, time, fArrayPointing_Azimuth, fArrayPointing_Elevation );
     fArray_PointingStatus = fshowerpars->eventStatus;
 
     // the following variables are not set in table filling mode
@@ -2707,30 +2707,6 @@ pair<float, float > VTableLookupDataHandler::getArrayPointing()
         i_array_pointing.second /= i_N;
     }
     return i_array_pointing;
-}
-
-/*
- * calculate derotation angle
- *
- */
-float VTableLookupDataHandler::getArrayPointingDeRotationAngle()
-{
-    double i_array_dec = 0.;
-    double i_array_ra = 0.;
-
-    VSkyCoordinatesUtilities::getEquatorialCoordinates(
-        MJD, time,
-        fArrayPointing_Azimuth,
-        90. - fArrayPointing_Elevation,
-        i_array_dec, i_array_ra );
-
-    float derot = VSkyCoordinatesUtilities::getDerotationAngle(
-                      MJD, time,
-                      i_array_ra* TMath::DegToRad(), i_array_dec* TMath::DegToRad(),
-                      VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad(),
-                      VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad() );
-
-    return derot;
 }
 
 /*

@@ -1250,8 +1250,8 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
     // apply cut on difference between stereo intersection and disp method
     // (for stereo method only: this should always pass)
     float i_disp_diff = sqrt(
-                            ( fData->Xoff - fData->Xoff_intersect ) * ( fData->Xoff - fData->Xoff_intersect ) +
-                            ( fData->Yoff - fData->Yoff_intersect ) * ( fData->Yoff - fData->Yoff_intersect ) );
+                            ( fData->get_Xoff() - fData->Xoff_intersect ) * ( fData->get_Xoff() - fData->Xoff_intersect ) +
+                            ( fData->get_Yoff() - fData->Yoff_intersect ) * ( fData->get_Yoff() - fData->Yoff_intersect ) );
     if( fCut_DispIntersectSuccess && ( fData->Xoff_intersect < -90. || fData->Yoff_intersect < -90. ) )
     {
         if( bCount && fStats )
@@ -2585,11 +2585,7 @@ double VGammaHadronCuts::getReconstructedXoff()
     {
         return -9999.;
     }
-    if( fData->fFriendTree )
-    {
-        return fData->Dir_Xoff;
-    }
-    return fData->Xoff;
+    return fData->get_Xoff(0);
 }
 
 double VGammaHadronCuts::getReconstructedYoff()
@@ -2598,11 +2594,7 @@ double VGammaHadronCuts::getReconstructedYoff()
     {
         return -9999.;
     }
-    if( fData->fFriendTree )
-    {
-        return fData->Dir_Yoff;
-    }
-    return fData->Yoff;
+    return fData->get_Yoff(0);
 }
 
 double VGammaHadronCuts::getReconstructedXcore()

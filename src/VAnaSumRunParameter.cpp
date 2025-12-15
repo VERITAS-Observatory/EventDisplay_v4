@@ -604,6 +604,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             else if( temp == "XGBFILESUFFIX" )
             {
                 fXGB_file_suffix = temp2;
+                if( fXGB_file_suffix == "None" ) fXGB_file_suffix = "";
             }
             else if( temp == "RATEINTERVALLLENGTH" )
             {

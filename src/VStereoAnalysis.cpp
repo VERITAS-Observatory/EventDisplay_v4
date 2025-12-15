@@ -2132,8 +2132,9 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c, double i_xderot, do
     fTreeSelected_theta2 = i_theta2;
     fTreeSelected_Xoff = c->Xoff;
     fTreeSelected_Yoff = c->Yoff;
-    fTreeSelected_Xoff_derot = c->Xoff_derot;
-    fTreeSelected_Yoff_derot = c->Yoff_derot;
+    pair<float, float> tmp_xy_derot = c->get_XYoff_derot();
+    fTreeSelected_Xoff_derot = tmp_xy_derot.first;
+    fTreeSelected_Yoff_derot = tmp_xy_derot.second;
     fTreeSelected_Xcore = c->Xcore;
     fTreeSelected_Ycore = c->Ycore;
     fTreeSelected_MSCW = c->MSCW;

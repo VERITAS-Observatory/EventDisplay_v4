@@ -636,6 +636,83 @@ Bool_t CData::Notify()
     return kTRUE;
 }
 
+/*
+ * Get stereo Xoff depending on analysis results
+ *
+ * Methods:
+ *
+ * 0: return friend tree result (if available or Xoff)
+ * 1: return Xoff
+ * 2: return Xoff_intersect
+ * 3: return friend tree result
+ */
+float CData::get_Xoff(unsigned iMethod)
+{
+    if( iMethod == 0 && fFriendTree )
+    {
+        return Dir_Xoff;
+    }
+    else if( iMethod == 1 )
+    {
+        return Xoff;
+    }
+    else if( iMethod == 2 )
+    {
+        return Xoff_intersect;
+    }
+    else if( iMethod == 3 )
+    {
+        return Dir_Xoff;
+    }
+    return (float)Xoff;
+}
+
+/*
+ * Get stereo Yoff depending on analysis results
+ *
+ * Methods:
+ *
+ * 0: return friend tree result (if available or Yoff)
+ * 1: return Yoff
+ * 2: return Yoff_intersect
+ * 3: return friend tree result
+ */
+float CData::get_Yoff(unsigned iMethod)
+{
+    if( iMethod == 0 && fFriendTree )
+    {
+        return Dir_Yoff;
+    }
+    else if( iMethod == 1 )
+    {
+        return Yoff;
+    }
+    else if( iMethod == 2 )
+    {
+        return Yoff_intersect;
+    }
+    else if( iMethod == 3 )
+    {
+        return Dir_Yoff;
+    }
+    return (float)Yoff;
+}
+
+pair<float, float> CData::get_XYoff_derot(unsigned int iMethod)
+{
+    float tmp_xoff = get_Xoff(iMethod);
+    float tmp_yoff = get_Yoff(iMethod);
+    if( tmp_xoff < -990. || tmp_yoff < -990. ) return {-999.,-999.};
+    if( fMC ) return {tmp_xoff, tmp_yoff};
+
+    float rot_angle = VSkyCoordinatesUtilities::getDerotationAngleFromGroundCoordinates(MJD, Time, ArrayPointing_Azimuth, ArrayPointing_Elevation );
+
+    return {
+        tmp_xoff * cos( rot_angle ) - tmp_yoff * sin( rot_angle),
+        tmp_yoff * cos( rot_angle ) + tmp_xoff * sin( rot_angle),
+    };
+}
+
 
 /*
  * Redo stereo reconstruction for a selection of 3-telescope events.

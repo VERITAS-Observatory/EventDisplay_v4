@@ -529,6 +529,10 @@ printCrabSensitivity =		./obj/printCrabSensitivity.o \
 							./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
 							./obj/VUtilities.o \
 							./obj/CEffArea.o ./obj/CEffArea_Dict.o \
+							./obj/CData.o \
+							./obj/VTMVADispAnalyzer.o ./obj/VMeanScaledVariables.o \
+							./obj/VDispAnalyzer.o ./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o ./obj/VDispTableAnalyzer.o \
+							./obj/VEmissionHeightCalculator.o ./obj/VSimpleStereoReconstructor.o ./obj/VGrIsuAnalyzer.o \
 							./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o \
 							./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
 							./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
@@ -770,7 +774,10 @@ PRINTANAOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 		./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
 		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 		./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
-		./obj/VUtilities.o \
+		./obj/VUtilities.o ./obj/CData.o \
+		./obj/VTMVADispAnalyzer.o ./obj/VMeanScaledVariables.o \
+		./obj/VDispAnalyzer.o ./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o ./obj/VDispTableAnalyzer.o \
+		./obj/VEmissionHeightCalculator.o ./obj/VSimpleStereoReconstructor.o ./obj/VGrIsuAnalyzer.o \
 		./obj/VAstronometry.o ./obj/VAstronometry_Dict.o \
 		./obj/VSkyCoordinatesUtilities.o \
 		./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
@@ -1073,7 +1080,10 @@ WRITEPARTPHYSOBJ=	./obj/writeParticleRateFilesForTMVA.o \
 			./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
 			./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
 			./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
-			./obj/Ctelconfig.o  \
+			./obj/Ctelconfig.o ./obj/CData.o  \
+			./obj/VTMVADispAnalyzer.o ./obj/VMeanScaledVariables.o \
+			./obj/VDispAnalyzer.o ./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o ./obj/VDispTableAnalyzer.o \
+			./obj/VEmissionHeightCalculator.o ./obj/VSimpleStereoReconstructor.o ./obj/VGrIsuAnalyzer.o \
 			./obj/VSpectralFitter.o ./obj/VSpectralFitter_Dict.o \
 			./obj/VEnergyThreshold.o ./obj/VEnergyThreshold_Dict.o \
 			./obj/VRunList.o ./obj/VRunList_Dict.o \
@@ -1189,7 +1199,11 @@ COMBINEEFFAREAOBJ=	 ./obj/combineEffectiveAreas.o  \
 			 ./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
 			 ./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
 			 ./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
-			./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
+		 	 ./obj/VTMVARunDataZenithCut.o ./obj/VTMVARunDataZenithCut_Dict.o \
+			 ./obj/CData.o \
+			 ./obj/VTMVADispAnalyzer.o ./obj/VMeanScaledVariables.o \
+			 ./obj/VDispAnalyzer.o ./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o ./obj/VDispTableAnalyzer.o \
+			 ./obj/VEmissionHeightCalculator.o ./obj/VSimpleStereoReconstructor.o ./obj/VGrIsuAnalyzer.o \
 			 ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			 ./obj/VSkyCoordinatesUtilities.o ./obj/VUtilities.o \
 			 ./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
