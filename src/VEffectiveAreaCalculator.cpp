@@ -2131,7 +2131,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
     {
         d->GetEntry( i );
 
-        if( d->Xoff < -999. || d->Yoff < -999. ) continue;
+        if( d->get_Xoff() < -999. || d->get_Yoff() < -999. ) continue;
 
         // update cut statistics
         fCuts->newEvent();

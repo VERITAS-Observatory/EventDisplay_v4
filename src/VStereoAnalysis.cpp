@@ -11,6 +11,8 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
     fDebug = false;
 
     fDataFile = 0;
+    fXGBFile = 0;
+    fXGB_tree = 0;
     fInstrumentEpochMinor = "NOT_SET";
     fDirTot = iDirTot;
     fDirTotRun = iDirRun;
@@ -1966,7 +1968,34 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
             cout << "exiting..." << endl;
             exit( EXIT_FAILURE );
         }
-        c = new CData( fDataRunTree );
+        fXGB_tree = 0;
+        if( fRunPara->fXGB_file_suffix != "" && fRunPara->fXGB_file_suffix != "None" )
+        {
+            fXGBFile = new TFile( iFileName.replace(
+                                      iFileName.find( ".root" ), 5,
+                                      "." + fRunPara->fXGB_file_suffix + ".root" ).c_str()
+                                );
+            if( fXGBFile->IsZombie() )
+            {
+                cout << "VStereoAnalysis::getDataFromFile() warning: cannot open DispDirection file "
+                     << iFileName << endl;
+                exit( EXIT_FAILURE );
+            }
+            else
+            {
+                fXGB_tree = ( TTree* )fXGBFile->Get( "StereoAnalysis" );
+                // backwards compatibility
+                if(!fXGB_tree ) fXGB_tree = ( TTree* )fXGBFile->Get( "DispDirection" );
+                if(!fXGB_tree )
+                {
+                    cout << "VStereoAnalysis::getDataFromFile() error: cannot find stereo analysis tree in "
+                         << fXGBFile->GetName() << endl;
+                    exit( EXIT_FAILURE );
+                }
+                cout << "VStereoAnalysis::getDataFromFile(): adding DispDirection from " << fXGBFile->GetName() << endl;
+            }
+        }
+        c = new CData( fDataRunTree, false, false, fXGB_tree );
         // read current (major) epoch from data file
         VEvndispRunParameter* i_runPara = ( VEvndispRunParameter* )fDataFile->Get( "runparameterV2" );
         if( i_runPara )
@@ -2109,8 +2138,9 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c, double i_xderot, do
     fTreeSelected_theta2 = i_theta2;
     fTreeSelected_Xoff = c->Xoff;
     fTreeSelected_Yoff = c->Yoff;
-    fTreeSelected_Xoff_derot = c->Xoff_derot;
-    fTreeSelected_Yoff_derot = c->Yoff_derot;
+    pair<float, float> tmp_xy_derot = c->get_XYoff_derot();
+    fTreeSelected_Xoff_derot = tmp_xy_derot.first;
+    fTreeSelected_Yoff_derot = tmp_xy_derot.second;
     fTreeSelected_Xcore = c->Xcore;
     fTreeSelected_Ycore = c->Ycore;
     fTreeSelected_MSCW = c->MSCW;

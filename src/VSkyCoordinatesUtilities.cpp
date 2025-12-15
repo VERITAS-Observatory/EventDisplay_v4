@@ -472,6 +472,7 @@ void VSkyCoordinatesUtilities::getHorizontalCoordinates( int MJD, double time, d
 }
 
 /*
+ * input in radians
  * returns the camera derotation angle in radians
 */
 double VSkyCoordinatesUtilities::getDerotationAngle( double i_UTC, double iTelRA, double iTelDec,
@@ -485,6 +486,19 @@ double VSkyCoordinatesUtilities::getDerotationAngle( double iMJD, double iTime, 
         double iObservatoryLongitude, double iObservatoryLatitude )
 {
     return getDerotationAngle( getUTC( iMJD, iTime ), iTelRA, iTelDec, iObservatoryLongitude, iObservatoryLatitude );
+}
+
+double VSkyCoordinatesUtilities::getDerotationAngleFromGroundCoordinates( double MJD, double time, double iTelAz_deg, double iTelElevation_deg )
+{
+    double dec = 0.;
+    double ra = 0.;
+    getEquatorialCoordinates( MJD, time, iTelAz_deg, 90. - iTelElevation_deg, dec, ra );
+
+    return getDerotationAngle(
+               getUTC( MJD, time ), ra* TMath::DegToRad(), dec* TMath::DegToRad(),
+               VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad(),
+               VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad()
+           );
 }
 
 

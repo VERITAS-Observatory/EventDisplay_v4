@@ -170,7 +170,6 @@ class VTableLookupDataHandler
         void   initializeTelTypeVector();
         int    fillNextEvent( bool bShort );
         pair<float, float > getArrayPointing();
-        float getArrayPointingDeRotationAngle();
         void   printCutStatistics();
         bool   randomSelected();
         void   resetImageParameters();

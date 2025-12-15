@@ -125,6 +125,7 @@ VAnaSumRunParameter::VAnaSumRunParameter()
     fEnergyEffectiveAreaSmoothingIterations = -1;
     fEnergyEffectiveAreaSmoothingThreshold = -1.;
     fDeadTimeCalculationMethod = 0;
+    fXGB_file_suffix = "";
 
     // background model
     fTMPL_fBackgroundModel = 0;
@@ -599,6 +600,11 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                     cout << "Unknown dead time calculation method (0=scalar method, 1=time difference)" << endl;
                     return 0;
                 }
+            }
+            else if( temp == "XGBFILESUFFIX" )
+            {
+                fXGB_file_suffix = temp2;
+                if( fXGB_file_suffix == "None" ) fXGB_file_suffix = "";
             }
             else if( temp == "RATEINTERVALLLENGTH" )
             {
@@ -1178,6 +1184,14 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
         else
         {
             cout << " (lookup table energy reconstruction)" << endl;
+        }
+        if( fXGB_file_suffix != "" && fXGB_file_suffix != "None" )
+        {
+            cout << "\t XY direction file: " << fXGB_file_suffix << endl;
+        }
+        else
+        {
+            cout << "\t no XY direction file used" << endl;
         }
         cout << "\t dead time calculation method: ";
         if( fDeadTimeCalculationMethod == 0 )

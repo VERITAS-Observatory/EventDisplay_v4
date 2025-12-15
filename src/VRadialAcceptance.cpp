@@ -618,18 +618,19 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
         idist = sqrt( iData->Xoff* iData->Xoff + iData->Yoff* iData->Yoff );
 
         // fill 2D distribution of events
-        hXYAccTot->Fill( iData->Xoff, iData->Yoff );
-        hXYAccTotDeRot->Fill( iData->Xoff_derot, iData->Yoff_derot );
+        hXYAccTot->Fill( iData->get_Xoff(), iData->get_Yoff() );
+        pair<float, float> xy_derot = iData->get_XYoff_derot();
+        hXYAccTotDeRot->Fill( xy_derot.first, xy_derot.second );
 
-        hXYAccImgSel[iData->ImgSel]->Fill( iData->Xoff_derot, iData->Yoff_derot ) ;
-        hXYAccImgSelPreDeRot[iData->ImgSel]->Fill( iData->Xoff, iData->Yoff ) ;
-        hXYAccNImages[iData->NImages]->Fill( iData->Xoff_derot, iData->Yoff_derot ) ;
-        hXYAccNImagesPreDeRot[iData->NImages]->Fill( iData->Xoff, iData->Yoff ) ;
+        hXYAccImgSel[iData->ImgSel]->Fill( xy_derot.first, xy_derot.second ) ;
+        hXYAccImgSelPreDeRot[iData->ImgSel]->Fill( iData->get_Xoff(), iData->get_Yoff() ) ;
+        hXYAccNImages[iData->NImages]->Fill( xy_derot.first, xy_derot.second ) ;
+        hXYAccNImagesPreDeRot[iData->NImages]->Fill( iData->get_Xoff(), iData->get_Yoff() ) ;
 
         // 1D histograms
         // Radius Dependent Histograms
-        eventradius = sqrt( iData->Xoff_derot* iData->Xoff_derot + iData->Yoff_derot* iData->Yoff_derot ) ;
-        eventphi    = atan2( iData->Yoff_derot, iData->Xoff_derot ) ; // radians
+        eventradius = sqrt( xy_derot.first* xy_derot.first + xy_derot.second* xy_derot.second ) ;
+        eventphi    = atan2( xy_derot.second, xy_derot.first ) ; // radians
         if( eventphi < 0.0 )
         {
             eventphi += 2 * TMath::Pi() ;    // atan2 is from -pi to pi, we want 0 to 2pi
@@ -665,7 +666,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
         }
 
         // fill azimuth angle dependent histograms (camera coordinates)
-        i_Phi = atan2( iData->Yoff, iData->Xoff ) * TMath::RadToDeg();
+        i_Phi = atan2( iData->get_Yoff(), iData->get_Xoff() ) * TMath::RadToDeg();
         hPhiDist->Fill( i_Phi );
 
         for( unsigned int j = 0; j < fPhiMin.size(); j++ )
@@ -695,7 +696,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
             }
         }
         // fill azimuth angle dependent histograms (derotated camera coordinates)
-        i_Phi = atan2( iData->Yoff_derot, iData->Xoff_derot ) * TMath::RadToDeg();
+        i_Phi = atan2( xy_derot.second, xy_derot.first ) * TMath::RadToDeg();
         hPhiDistDeRot->Fill( i_Phi );
         for( unsigned int j = 0; j < fPhiMin.size(); j++ )
         {
@@ -734,7 +735,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
                 }
                 if( j < hXYAccRun.size() )
                 {
-                    hXYAccRun[j]->Fill( iData->Xoff, iData->Yoff );
+                    hXYAccRun[j]->Fill( iData->get_Xoff(), iData->get_Yoff() );
                 }
                 break;
             }

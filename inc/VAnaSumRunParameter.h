@@ -196,6 +196,9 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
         // dead time calculation method
         int  fDeadTimeCalculationMethod;
 
+        // XGB reconstruction
+        string fXGB_file_suffix;
+
         int f2DAcceptanceMode ; // USE2DACCEPTANCE
 
         // add all events to DL3 tree, no gh cuts but add BDT score and IsGamma
@@ -272,6 +275,6 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
         bool writeListOfExcludedSkyRegions();
         bool getListOfExcludedSkyRegions( TFile* f );
 
-        ClassDef( VAnaSumRunParameter, 18 ) ;
+        ClassDef( VAnaSumRunParameter, 19 ) ;
 };
 #endif
