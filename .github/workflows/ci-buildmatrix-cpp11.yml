@@ -35,7 +35,7 @@ jobs:
       ROOT_IMAGE: rootproject/root:6.24.06-centos7
     steps:
       - name: Download source artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
             name: src
 
