@@ -13,6 +13,7 @@ dependencies:
   - pre-commit
   - scikit-learn
   - scipy
+  - shellcheck
   - tabulate
   - towncrier
   - uproot
