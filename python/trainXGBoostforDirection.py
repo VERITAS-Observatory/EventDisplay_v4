@@ -391,18 +391,18 @@ def main():
     parser = argparse.ArgumentParser(
         description=("Train XGBoost Multi-Target BDTs for Direction Reconstruction")
     )
-    parser.add_argument("input_file_list", help="List of input mscw ROOT files.")
-    parser.add_argument("ntel", type=int, help="Telescope multiplicity (2, 3, or 4).")
+    parser.add_argument("--input_file_list", help="List of input mscw ROOT files.")
+    parser.add_argument("--ntel", type=int, help="Telescope multiplicity (2, 3, or 4).")
     parser.add_argument(
         "output_dir", help="Output directory for XGBoost models and weights."
     )
     parser.add_argument(
-        "train_test_fraction",
+        "--train_test_fraction",
         type=float,
         help="Fraction of data for training (e.g., 0.5).",
     )
     parser.add_argument(
-        "max_events",
+        "--max_events",
         type=int,
         help="Maximum number of events to process across all files.",
     )
