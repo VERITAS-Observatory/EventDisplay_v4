@@ -57,55 +57,7 @@ def parse_image_selection(image_selection_str):
         )
 
 
-def filter_by_telescope_selection(df, selected_indices):
-    """
-    Build a selection mask for events where all selected telescope indices
-    are present in DispTelList_T, OR events with 4 telescopes.
-
-    IMPORTANT: Does not drop events. Returns a boolean mask of length len(df).
-    Use this mask to process only selected events while preserving original order.
-
-    Parameters
-    ----------
-    - df: DataFrame with DispTelList_T column
-    - selected_indices: List of selected telescope indices (or None)
-
-    Returns
-    -------
-    pd.Series[bool]: selection mask (True = selected, False = unselected)
-    """
-    if selected_indices is None:
-        return pd.Series([True] * len(df), index=df.index)
-
-    _logger.info(f"Filtering events for telescope selection: {selected_indices}")
-
-    def has_selected_telescopes(tel_list):
-        """
-        Allow events that:
-        - have 4 telescopes (always allowed), OR
-        - contain at least two of the user-selected telescopes.
-
-        This enables subsets of the selected telescopes, e.g., for
-        selected_indices [1,2,4], events with [1,2], [1,4], [2,4], or [1,2,4]
-        are all accepted.
-        """
-        tel_set = set(tel_list)
-        has_four_telescopes = len(tel_list) == 4
-        # Count how many of the selected telescopes are present in this event
-        n_selected_present = sum(1 for idx in selected_indices if idx in tel_set)
-        allow_subset = n_selected_present >= 2
-        return has_four_telescopes or allow_subset
-
-    mask = df["DispTelList_T"].apply(has_selected_telescopes)
-
-    _logger.info(
-        f"Selection: {mask.sum()} of {len(df)} events "
-        f"({100 * mask.sum() / len(df):.1f}%)"
-    )
-    return mask
-
-
-def load_all_events(input_file, max_events=None):
+def load_all_events(input_file, max_events=None, selected_indices=None):
     """
     Load all events from the input ROOT file without filtering by n_tel.
     Returns a DataFrame with all events in their original order.
@@ -115,6 +67,7 @@ def load_all_events(input_file, max_events=None):
 
     - input_file: Path to the ROOT file
     - max_events: Maximum number of events to load (None = all events)
+    - selected_indices: List of telescope indices to select (None = no selection)
     """
     _logger.info(f"Loading events from {input_file}")
     if max_events:
@@ -142,6 +95,29 @@ def load_all_events(input_file, max_events=None):
             df = tree.arrays(branch_list, library="pd")
 
     _logger.info(f"Loaded {len(df)} events")
+
+    # Select events based on telescope indices
+    if selected_indices is not None and len(selected_indices) != 4:
+        _logger.info(f"Applying filter for selected_indices: {selected_indices}")
+
+        selected_set = set(selected_indices)
+
+        def calculate_intersection(tel_list):
+            """Returns a new list containing only the elements common to tel_list and selected_set."""
+            return [tel_idx for tel_idx in tel_list if tel_idx in selected_set]
+
+        df["DispTelList_T_new"] = df["DispTelList_T"].apply(calculate_intersection)
+        df["DispNImages_new"] = df["DispTelList_T_new"].apply(len)
+
+        _logger.info(f"selected_indices: {selected_indices}")
+        _logger.info(
+            f"\n{df[['DispNImages', 'DispTelList_T', 'DispNImages_new', 'DispTelList_T_new']].head(20).to_string()}"
+        )
+
+        df["DispTelList_T"] = df["DispTelList_T_new"]
+        df["DispNImages"] = df["DispNImages_new"]
+        df = df.drop(columns=["DispTelList_T_new", "DispNImages_new"])
+
     return df
 
 
@@ -219,7 +195,7 @@ def flatten_data_vectorized(df, n_tel, training_variables):
     return df_flat
 
 
-def apply_models(df, model_dir, selection_mask=None):
+def apply_models(df, model_dir):
     """
     Apply trained XGBoost models to all events in the DataFrame.
     Returns arrays of predicted Xoff and Yoff for each event.
@@ -246,9 +222,7 @@ def apply_models(df, model_dir, selection_mask=None):
     pred_xoff = np.full(n_events, np.nan)
     pred_yoff = np.full(n_events, np.nan)
 
-    # Group selected events (if mask provided) by DispNImages for batch processing
-    df_to_group = df.loc[selection_mask] if selection_mask is not None else df
-    grouped = df_to_group.groupby("DispNImages")
+    grouped = df.groupby("DispNImages")
 
     for n_tel, group_df in grouped:
         n_tel = int(n_tel)
@@ -267,7 +241,7 @@ def apply_models(df, model_dir, selection_mask=None):
         ]
         df_flat = flatten_data_vectorized(group_df, n_tel, training_vars_with_pointing)
 
-        # Get feature columns (exclude MC truth if present)
+        # Feature columns (exclude MC)
         excluded_columns = ["MCxoff", "MCyoff", "MCe0"]
         for n in range(n_tel):
             excluded_columns.append(f"fpointing_dx_{n}")
@@ -283,16 +257,6 @@ def apply_models(df, model_dir, selection_mask=None):
         for i, idx in enumerate(group_df.index):
             pred_xoff[idx] = predictions[i, 0]
             pred_yoff[idx] = predictions[i, 1]
-
-    # Fill unselected events with -999 as requested
-    if selection_mask is not None:
-        # pred_xoff/pred_yoff are NumPy arrays aligned by position
-        unselected = (~selection_mask).to_numpy()
-        pred_xoff[unselected] = -999
-        pred_yoff[unselected] = -999
-        _logger.info(
-            f"Filled {unselected.sum()} unselected events with -999 for predictions"
-        )
 
     _logger.info("Predictions complete")
     _logger.info(
@@ -352,6 +316,12 @@ def main():
             "Default is 15 (0b1111), which selects all 4 telescopes."
         ),
     )
+    parser.add_argument(
+        "--max-events",
+        type=int,
+        default=None,
+        help="Maximum number of events to process (default: all events)",
+    )
     args = parser.parse_args()
 
     start_time = time.time()
@@ -362,16 +332,12 @@ def main():
     if args.image_selection:
         _logger.info(f"Image selection: {args.image_selection}")
 
-    df = load_all_events(args.input_file, max_events=None)
-
-    selection_mask = None
-    if args.image_selection:
-        selected_indices = parse_image_selection(args.image_selection)
-        selection_mask = filter_by_telescope_selection(df, selected_indices)
-    else:
-        _logger.info("No image selection applied")
-
-    pred_xoff, pred_yoff = apply_models(df, args.model_dir, selection_mask)
+    df = load_all_events(
+        args.input_file,
+        max_events=args.max_events,
+        selected_indices=parse_image_selection(args.image_selection),
+    )
+    pred_xoff, pred_yoff = apply_models(df, args.model_dir)
     write_output_root_file(args.output_file, pred_xoff, pred_yoff)
 
     elapsed_time = time.time() - start_time
