@@ -226,6 +226,8 @@ def apply_models(df, model_dir):
 
     for n_tel, group_df in grouped:
         n_tel = int(n_tel)
+        if int(n_tel) < 2:
+            continue
         if n_tel not in models:
             _logger.warning(
                 f"No model available for n_tel={n_tel}, skipping {len(group_df)} events"
