@@ -237,7 +237,7 @@ def apply_models(df, model_dir, selection_mask=None):
     pred_yoff = np.full(n_events, np.nan)
 
     # Group selected events (if mask provided) by DispNImages for batch processing
-    df_to_group = df[selection_mask] if selection_mask is not None else df
+    df_to_group = df.loc[selection_mask] if selection_mask is not None else df
     grouped = df_to_group.groupby("DispNImages")
 
     for n_tel, group_df in grouped:
@@ -333,7 +333,7 @@ def main():
     parser.add_argument(
         "--image-selection",
         type=str,
-        default=None,
+        default="15",
         help=(
             "Optional telescope selection. Can be bit-coded (e.g., 14 for telescopes 1,2,3) "
             "or comma-separated indices (e.g., '1,2,3'). "
