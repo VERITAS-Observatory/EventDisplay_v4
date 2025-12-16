@@ -394,7 +394,7 @@ def main():
     parser.add_argument("--input_file_list", help="List of input mscw ROOT files.")
     parser.add_argument("--ntel", type=int, help="Telescope multiplicity (2, 3, or 4).")
     parser.add_argument(
-        "output_dir", help="Output directory for XGBoost models and weights."
+        "--output_dir", help="Output directory for XGBoost models and weights."
     )
     parser.add_argument(
         "--train_test_fraction",
