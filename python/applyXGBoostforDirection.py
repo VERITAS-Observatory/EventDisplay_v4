@@ -80,11 +80,21 @@ def filter_by_telescope_selection(df, selected_indices):
     _logger.info(f"Filtering events for telescope selection: {selected_indices}")
 
     def has_selected_telescopes(tel_list):
-        """Check if event has all selected telescopes or has 4 telescopes."""
+        """
+        Allow events that:
+        - have 4 telescopes (always allowed), OR
+        - contain at least two of the user-selected telescopes.
+
+        This enables subsets of the selected telescopes, e.g., for
+        selected_indices [1,2,4], events with [1,2], [1,4], [2,4], or [1,2,4]
+        are all accepted.
+        """
         tel_set = set(tel_list)
-        has_all_selected = all(idx in tel_set for idx in selected_indices)
         has_four_telescopes = len(tel_list) == 4
-        return has_all_selected or has_four_telescopes
+        # Count how many of the selected telescopes are present in this event
+        n_selected_present = sum(1 for idx in selected_indices if idx in tel_set)
+        allow_subset = n_selected_present >= 2
+        return has_four_telescopes or allow_subset
 
     mask = df["DispTelList_T"].apply(has_selected_telescopes)
 
