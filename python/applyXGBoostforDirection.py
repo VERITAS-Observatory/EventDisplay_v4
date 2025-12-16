@@ -97,6 +97,7 @@ def load_all_events(input_file, max_events=None, selected_indices=None):
     _logger.info(f"Loaded {len(df)} events")
 
     # Select events based on telescope indices
+    df["DispTelList_T_org"] = df["DispTelList_T"]
     if selected_indices is not None and len(selected_indices) != 4:
         _logger.info(f"Applying filter for selected_indices: {selected_indices}")
 
@@ -129,9 +130,9 @@ def flatten_data_vectorized(df, n_tel, training_variables):
     flat_features = {}
 
     try:
-        tel_list_matrix = np.vstack(df["DispTelList_T"].values)
+        tel_list_matrix = np.vstack(df["DispTelList_T_org"].values)
     except ValueError:
-        tel_list_matrix = np.array(df["DispTelList_T"].tolist())
+        tel_list_matrix = np.array(df["DispTelList_T_org"].tolist())
 
     for var_name in training_variables:
         # Convert the column of arrays to a 2D numpy matrix
@@ -244,7 +245,7 @@ def apply_models(df, model_dir):
         df_flat = flatten_data_vectorized(group_df, n_tel, training_vars_with_pointing)
 
         # Feature columns (exclude MC)
-        excluded_columns = ["MCxoff", "MCyoff", "MCe0"]
+        excluded_columns = ["MCxoff", "MCyoff", "MCe0", "DispTelList_T_org"]
         for n in range(n_tel):
             excluded_columns.append(f"fpointing_dx_{n}")
             excluded_columns.append(f"fpointing_dy_{n}")
