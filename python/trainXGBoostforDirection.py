@@ -1,9 +1,11 @@
 """
-Train XGBoost Multi-Target BDTs for Direction Reconstruction
-=================================================
+Train XGBoost Multi-Target BDTs for Direction and Energy Reconstruction
+========================================================================
 
 Uses x,y offsets calculated from intersection and dispBDT methods plus
 image parameters to train multi-target regression BDTs to predict x,y offsets.
+
+Uses energy related values to estimate event energy.
 
 Separate BDTs are trained for 2, 3, and 4 telescope multiplicity events.
 
@@ -12,7 +14,6 @@ Separate BDTs are trained for 2, 3, and 4 telescope multiplicity events.
 import argparse
 import logging
 import os
-from typing import Dict, List
 
 import numpy as np
 import pandas as pd
@@ -22,7 +23,10 @@ from joblib import dump
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.multioutput import MultiOutputRegressor
-from training_variables import xgb_training_variables
+from training_variables import (
+    xgb_all_training_variables,
+    xgb_per_telescope_training_variables,
+)
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger("trainXGBoostforDirection")
@@ -39,16 +43,10 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
     )
 
     branch_list = [
-        "DispNImages",
-        "DispTelList_T",
-        "Xoff",
-        "Yoff",
-        "Xoff_intersect",
-        "Yoff_intersect",
         "MCxoff",
         "MCyoff",
         "MCe0",
-    ] + [var for var in xgb_training_variables()]
+    ] + [var for var in xgb_all_training_variables()]
 
     dfs = []
     if max_events > 0:
@@ -93,12 +91,15 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
         )  # * data_tree["MCe0"]
     )
 
-    df_flat = flatten_data_vectorized(data_tree, n_tel, xgb_training_variables())
+    df_flat = flatten_data_vectorized(
+        data_tree, n_tel, xgb_per_telescope_training_variables()
+    )
 
     if training_step:
         df_flat["MCxoff"] = data_tree["MCxoff"]
         df_flat["MCyoff"] = data_tree["MCyoff"]
-        df_flat["MCe0"] = np.log10(data_tree["MCe0"])
+        # Clamp energies to avoid log10 of non-positive values
+        df_flat["MCe0"] = np.log10(np.clip(data_tree["MCe0"], 1e-6, None))
         df_flat["sample_weight"] = sample_weights
 
     df_flat.dropna(inplace=True)
@@ -160,7 +161,9 @@ def flatten_data_vectorized(df, n_tel, training_variables):
         df_flat[f"width_length_{i}"] = df_flat[f"width_{i}"] / (
             df_flat[f"length_{i}"] + 1e-6
         )
-        df_flat[f"size_{i}"] = np.log10(df_flat[f"size_{i}"] + 1e-6)  # avoid log(0)
+        df_flat[f"size_{i}"] = np.log10(df_flat[f"size_{i}"] + 1e-6)
+        df_flat[f"E_{i}"] = np.log10(np.clip(df_flat[f"E_{i}"], 1e-6, None))
+        df_flat[f"ES_{i}"] = np.log10(np.clip(df_flat[f"ES_{i}"], 1e-6, None))
 
     df_flat["Xoff_weighted_bdt"] = df["Xoff"]
     df_flat["Yoff_weighted_bdt"] = df["Yoff"]
@@ -168,6 +171,9 @@ def flatten_data_vectorized(df, n_tel, training_variables):
     df_flat["Yoff_intersect"] = df["Yoff_intersect"]
     df_flat["Diff_Xoff"] = df["Xoff"] - df["Xoff_intersect"]
     df_flat["Diff_Yoff"] = df["Yoff"] - df["Yoff_intersect"]
+    df_flat["Erec"] = np.log10(np.clip(df["Erec"], 1e-6, None))
+    df_flat["ErecS"] = np.log10(np.clip(df["ErecS"], 1e-6, None))
+    df_flat["EmissionHeight"] = df["EmissionHeight"]
 
     return df_flat
 
@@ -193,7 +199,7 @@ def train(df, n_tel, output_dir, train_test_fraction):
         if col not in ["MCxoff", "MCyoff", "MCe0", "sample_weight"]
     ]
     X = df[X_cols]
-    Y = df[["MCxoff", "MCyoff"]]
+    Y = df[["MCxoff", "MCyoff", "MCe0"]]
 
     _logger.info(f"Training variables ({len(X_cols)}): {X_cols}")
 
@@ -306,6 +312,7 @@ def angular_resolution(
             "MCyoff_true": Y_test["MCyoff"].values,
             "MCxoff_pred": Y_pred[:, 0],
             "MCyoff_pred": Y_pred[:, 1],
+            "MCe0_pred": Y_pred[:, 2],
             "MCe0": df.loc[Y_test.index, "MCe0"].values,
         }
     )
@@ -314,34 +321,34 @@ def angular_resolution(
         (results_df["MCxoff_true"] - results_df["MCxoff_pred"]) ** 2
         + (results_df["MCyoff_true"] - results_df["MCyoff_pred"]) ** 2
     )
+    results_df["DeltaMCe0"] = np.abs(
+        np.power(10, results_df["MCe0_pred"]) - np.power(10, results_df["MCe0"])
+    ) / np.power(10, results_df["MCe0"])
 
     results_df["LogE"] = results_df["MCe0"]
     bins = np.linspace(log_e_min, log_e_max, n_bins + 1)
     results_df["E_bin"] = pd.cut(results_df["LogE"], bins=bins, include_lowest=True)
     results_df.dropna(subset=["E_bin"], inplace=True)
 
-    resolution_results: Dict[str, List[float]] = {}
-    mean_logE_by_bin = (
-        results_df.groupby("E_bin", observed=False)["LogE"].mean().round(3)
-    )
+    g = results_df.groupby("E_bin", observed=False)
+    mean_logE_by_bin = g["LogE"].mean().round(3)
 
-    # Group and calculate the specified percentile for DeltaTheta
-    for p in percentiles:
-        p_res = results_df.groupby("E_bin", observed=False)["DeltaTheta"].agg(
-            lambda x: np.percentile(x, p) if len(x) > 0 else np.nan
+    def percentile_series(col, p):
+        return g[col].quantile(p / 100)
+
+    for col, label in [("DeltaTheta", "Theta"), ("DeltaMCe0", "DeltaE")]:
+        data = {f"{label}_{p}%": percentile_series(col, p).values for p in percentiles}
+
+        output_df = pd.DataFrame(data, index=mean_logE_by_bin.index)
+        output_df.insert(0, "Mean Log10(E)", mean_logE_by_bin.values)
+        output_df.index.name = "Log10(E) Bin Range"
+        output_df = output_df.dropna()
+
+        _logger.info(f"--- {name} {col} Resolution vs. Log10(MCe0) ---")
+        _logger.info(
+            f"Calculated over {n_bins} bins between Log10(E) = {log_e_min} and {log_e_max}"
         )
-        resolution_results[f"Theta_{p}%"] = p_res.values
-
-    output_df = pd.DataFrame(resolution_results, index=mean_logE_by_bin.index)
-    output_df.insert(0, "Mean Log10(E)", mean_logE_by_bin.values)
-    output_df.index.name = "Log10(E) Bin Range"
-    output_df = output_df.dropna()  # Drop bins with no events
-
-    _logger.info(f"\n--- {name} Angular Resolution vs. Log10(MCe0) ---")
-    _logger.info(
-        f"Calculated over {n_bins} bins between Log10(E) = {log_e_min} and {log_e_max}"
-    )
-    _logger.info("\n" + output_df.to_markdown(floatfmt=".4f"))
+        _logger.info("\n" + output_df.to_markdown(floatfmt=".4f"))
 
 
 def feature_importance(model, X_cols, target_names, name=None):
