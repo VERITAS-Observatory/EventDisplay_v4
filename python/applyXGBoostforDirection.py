@@ -337,7 +337,8 @@ def main():
         help=(
             "Optional telescope selection. Can be bit-coded (e.g., 14 for telescopes 1,2,3) "
             "or comma-separated indices (e.g., '1,2,3'). "
-            "Keeps events with all selected telescopes or 4-telescope events."
+            "Keeps events with all selected telescopes or 4-telescope events. "
+            "Default is 15 (0b1111), which selects all 4 telescopes."
         ),
     )
     args = parser.parse_args()
