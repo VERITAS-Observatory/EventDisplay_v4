@@ -97,7 +97,6 @@ def load_all_events(input_file, max_events=None, selected_indices=None):
     _logger.info(f"Loaded {len(df)} events")
 
     # Select events based on telescope indices
-    df["DispTelList_T_org"] = df["DispTelList_T"]
     if selected_indices is not None and len(selected_indices) != 4:
         _logger.info(f"Applying filter for selected_indices: {selected_indices}")
 
@@ -119,6 +118,20 @@ def load_all_events(input_file, max_events=None, selected_indices=None):
         df["DispNImages"] = df["DispNImages_new"]
         df = df.drop(columns=["DispTelList_T_new", "DispNImages_new"])
 
+        # apply padding to ensure all arrays have length 4
+        for var_name in xgb_training_variables():
+            if var_name in df.columns:
+                df[var_name] = df[var_name].apply(
+                    lambda x: np.pad(
+                        np.array(x),
+                        (0, 4 - len(x)),
+                        mode="constant",
+                        constant_values=np.nan,
+                    )
+                    if isinstance(x, (list, np.ndarray))
+                    else x
+                )
+
     return df
 
 
@@ -128,19 +141,31 @@ def flatten_data_vectorized(df, n_tel, training_variables):
     Significantly faster than row-by-row iteration.
     """
     flat_features = {}
+    tel_list_col = "DispTelList_T"
+
+    def to_padded_array(arrays):
+        """Convert list of variable-length arrays to fixed-size numpy array, padding with NaN."""
+        max_len = max(len(arr) if hasattr(arr, "__len__") else 1 for arr in arrays)
+        result = np.full((len(arrays), max_len), np.nan)
+        for i, arr in enumerate(arrays):
+            if hasattr(arr, "__len__"):
+                result[i, : len(arr)] = arr
+            else:
+                result[i, 0] = arr
+        return result
 
     try:
-        tel_list_matrix = np.vstack(df["DispTelList_T_org"].values)
-    except ValueError:
-        tel_list_matrix = np.array(df["DispTelList_T_org"].tolist())
+        tel_list_matrix = np.vstack(df[tel_list_col].values)
+    except (ValueError, TypeError):
+        tel_list_matrix = to_padded_array(df[tel_list_col].values)
 
     for var_name in training_variables:
         # Convert the column of arrays to a 2D numpy matrix
         # Shape: (n_events, max_n_tel)
         try:
             data_matrix = np.vstack(df[var_name].values)
-        except ValueError:
-            data_matrix = np.array(df[var_name].tolist())
+        except (ValueError, TypeError):
+            data_matrix = to_padded_array(df[var_name].values)
 
         for i in range(n_tel):
             col_name = f"{var_name}_{i}"
@@ -245,7 +270,7 @@ def apply_models(df, model_dir):
         df_flat = flatten_data_vectorized(group_df, n_tel, training_vars_with_pointing)
 
         # Feature columns (exclude MC)
-        excluded_columns = ["MCxoff", "MCyoff", "MCe0", "DispTelList_T_org"]
+        excluded_columns = ["MCxoff", "MCyoff", "MCe0"]
         for n in range(n_tel):
             excluded_columns.append(f"fpointing_dx_{n}")
             excluded_columns.append(f"fpointing_dy_{n}")
