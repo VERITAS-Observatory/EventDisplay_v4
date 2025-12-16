@@ -276,7 +276,8 @@ def apply_models(df, model_dir, selection_mask=None):
 
     # Fill unselected events with -999 as requested
     if selection_mask is not None:
-        unselected = ~selection_mask.values
+        # pred_xoff/pred_yoff are NumPy arrays aligned by position
+        unselected = (~selection_mask).to_numpy()
         pred_xoff[unselected] = -999
         pred_yoff[unselected] = -999
         _logger.info(
