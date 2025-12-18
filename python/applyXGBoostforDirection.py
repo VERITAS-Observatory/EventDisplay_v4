@@ -85,6 +85,10 @@ def apply_image_selection(df, selected_indices):
     df["DispTelList_T_new"] = df["DispTelList_T"].apply(calculate_intersection)
     df["DispNImages_new"] = df["DispTelList_T_new"].apply(len)
 
+    _logger.info(
+        f"\n{df[['DispNImages', 'DispTelList_T', 'DispNImages_new', 'DispTelList_T_new']].head(20).to_string()}"
+    )
+
     df["DispTelList_T"] = df["DispTelList_T_new"]
     df["DispNImages"] = df["DispNImages_new"]
     df = df.drop(columns=["DispTelList_T_new", "DispNImages_new"])
