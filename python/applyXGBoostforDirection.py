@@ -21,6 +21,20 @@ logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger("applyXGBoostforDirection")
 
 
+def get_branch_list():
+    """Branches required for inference."""
+    return [
+        "DispNImages",
+        "DispTelList_T",
+        "Xoff",
+        "Yoff",
+        "Xoff_intersect",
+        "Yoff_intersect",
+        "fpointing_dx",
+        "fpointing_dy",
+    ] + [var for var in xgb_training_variables()]
+
+
 def parse_image_selection(image_selection_str):
     """
     Parse the image_selection parameter.
@@ -57,80 +71,36 @@ def parse_image_selection(image_selection_str):
         )
 
 
-def load_all_events(input_file, max_events=None, selected_indices=None):
-    """
-    Load all events from the input ROOT file without filtering by n_tel.
-    Returns a DataFrame with all events in their original order.
+def apply_image_selection(df, selected_indices):
+    """Filter and pad telescope lists for selected indices."""
+    if selected_indices is None or len(selected_indices) == 4:
+        return df
 
-    Parameters
-    ----------
+    selected_set = set(selected_indices)
 
-    - input_file: Path to the ROOT file
-    - max_events: Maximum number of events to load (None = all events)
-    - selected_indices: List of telescope indices to select (None = no selection)
-    """
-    _logger.info(f"Loading events from {input_file}")
-    if max_events:
-        _logger.info(f"Maximum events to load: {max_events}")
+    def calculate_intersection(tel_list):
+        return [tel_idx for tel_idx in tel_list if tel_idx in selected_set]
 
-    branch_list = [
-        "DispNImages",
-        "DispTelList_T",
-        "Xoff",
-        "Yoff",
-        "Xoff_intersect",
-        "Yoff_intersect",
-        "fpointing_dx",
-        "fpointing_dy",
-    ] + [var for var in xgb_training_variables()]
+    df = df.copy()
+    df["DispTelList_T_new"] = df["DispTelList_T"].apply(calculate_intersection)
+    df["DispNImages_new"] = df["DispTelList_T_new"].apply(len)
 
-    with uproot.open(input_file) as root_file:
-        if "data" not in root_file:
-            raise ValueError(f"File {input_file} does not contain a 'data' tree.")
+    df["DispTelList_T"] = df["DispTelList_T_new"]
+    df["DispNImages"] = df["DispNImages_new"]
+    df = df.drop(columns=["DispTelList_T_new", "DispNImages_new"])
 
-        tree = root_file["data"]
-        if max_events:
-            df = tree.arrays(branch_list, library="pd", entry_stop=max_events)
-        else:
-            df = tree.arrays(branch_list, library="pd")
-
-    _logger.info(f"Loaded {len(df)} events")
-
-    # Select events based on telescope indices
-    if selected_indices is not None and len(selected_indices) != 4:
-        _logger.info(f"Applying filter for selected_indices: {selected_indices}")
-
-        selected_set = set(selected_indices)
-
-        def calculate_intersection(tel_list):
-            """Returns a new list containing only the elements common to tel_list and selected_set."""
-            return [tel_idx for tel_idx in tel_list if tel_idx in selected_set]
-
-        df["DispTelList_T_new"] = df["DispTelList_T"].apply(calculate_intersection)
-        df["DispNImages_new"] = df["DispTelList_T_new"].apply(len)
-
-        _logger.info(f"selected_indices: {selected_indices}")
-        _logger.info(
-            f"\n{df[['DispNImages', 'DispTelList_T', 'DispNImages_new', 'DispTelList_T_new']].head(20).to_string()}"
-        )
-
-        df["DispTelList_T"] = df["DispTelList_T_new"]
-        df["DispNImages"] = df["DispNImages_new"]
-        df = df.drop(columns=["DispTelList_T_new", "DispNImages_new"])
-
-        # apply padding to ensure all arrays have length 4
-        for var_name in xgb_training_variables():
-            if var_name in df.columns:
-                df[var_name] = df[var_name].apply(
-                    lambda x: np.pad(
-                        np.array(x),
-                        (0, 4 - len(x)),
-                        mode="constant",
-                        constant_values=np.nan,
-                    )
-                    if isinstance(x, (list, np.ndarray))
-                    else x
+    for var_name in xgb_training_variables():
+        if var_name in df.columns:
+            df[var_name] = df[var_name].apply(
+                lambda x: np.pad(
+                    np.array(x),
+                    (0, 4 - len(x)),
+                    mode="constant",
+                    constant_values=np.nan,
                 )
+                if isinstance(x, (list, np.ndarray))
+                else x
+            )
 
     return df
 
@@ -154,18 +124,21 @@ def flatten_data_vectorized(df, n_tel, training_variables):
                 result[i, 0] = arr
         return result
 
-    try:
-        tel_list_matrix = np.vstack(df[tel_list_col].values)
-    except (ValueError, TypeError):
-        tel_list_matrix = to_padded_array(df[tel_list_col].values)
+    def to_dense_array(col):
+        """Convert column (potentially awkward) to dense 2D numpy array efficiently."""
+        # Convert to list first to avoid awkward iteration overhead
+        arrays = col.tolist() if hasattr(col, "tolist") else list(col)
+        try:
+            return np.vstack(arrays)
+        except (ValueError, TypeError):
+            return to_padded_array(arrays)
+
+    tel_list_matrix = to_dense_array(df[tel_list_col])
 
     for var_name in training_variables:
         # Convert the column of arrays to a 2D numpy matrix
         # Shape: (n_events, max_n_tel)
-        try:
-            data_matrix = np.vstack(df[var_name].values)
-        except (ValueError, TypeError):
-            data_matrix = to_padded_array(df[var_name].values)
+        data_matrix = to_dense_array(df[var_name])
 
         for i in range(n_tel):
             col_name = f"{var_name}_{i}"
@@ -221,17 +194,8 @@ def flatten_data_vectorized(df, n_tel, training_variables):
     return df_flat
 
 
-def apply_models(df, model_dir):
-    """
-    Apply trained XGBoost models to all events in the DataFrame.
-    Returns arrays of predicted Xoff and Yoff for each event.
-
-    Each event is processed with the model corresponding to its DispNImages value.
-    Events are kept in their original order.
-    """
-    _logger.info("Loading models and applying predictions...")
-
-    # Load all models (for n_tel = 2, 3, 4)
+def load_models(model_dir):
+    """Load models once to reuse across chunks."""
     models = {}
     for n_tel in range(2, 5):
         model_filename = os.path.join(
@@ -242,11 +206,17 @@ def apply_models(df, model_dir):
             models[n_tel] = joblib.load(model_filename)
         else:
             _logger.warning(f"Model not found: {model_filename}")
+    return models
 
-    # Initialize output arrays (NaN by default for events we can't predict)
+
+def apply_models(df, models):
+    """
+    Apply trained XGBoost models to a DataFrame chunk.
+    Returns arrays of predicted Xoff and Yoff for each event in the chunk.
+    """
     n_events = len(df)
-    pred_xoff = np.full(n_events, np.nan)
-    pred_yoff = np.full(n_events, np.nan)
+    pred_xoff = np.full(n_events, np.nan, dtype=np.float32)
+    pred_yoff = np.full(n_events, np.nan, dtype=np.float32)
 
     grouped = df.groupby("DispNImages")
 
@@ -262,21 +232,18 @@ def apply_models(df, model_dir):
 
         _logger.info(f"Processing {len(group_df)} events with n_tel={n_tel}")
 
-        # Add fpointing_dx and fpointing_dy to the training variables for flattening
         training_vars_with_pointing = xgb_training_variables() + [
             "fpointing_dx",
             "fpointing_dy",
         ]
         df_flat = flatten_data_vectorized(group_df, n_tel, training_vars_with_pointing)
 
-        # Feature columns (exclude MC)
         excluded_columns = ["MCxoff", "MCyoff", "MCe0"]
         for n in range(n_tel):
             excluded_columns.append(f"fpointing_dx_{n}")
             excluded_columns.append(f"fpointing_dy_{n}")
-        _logger.info(f"Excluded columns: {excluded_columns}")
+
         feature_cols = [col for col in df_flat.columns if col not in excluded_columns]
-        _logger.info(f"Feature columns: {feature_cols}")
         X = df_flat[feature_cols]
 
         model = models[n_tel]
@@ -286,29 +253,70 @@ def apply_models(df, model_dir):
             pred_xoff[idx] = predictions[i, 0]
             pred_yoff[idx] = predictions[i, 1]
 
-    _logger.info("Predictions complete")
-    _logger.info(
-        f"Prediction arrays length: {len(pred_xoff)} (input events: {len(df)})"
-    )
     return pred_xoff, pred_yoff
 
 
-def write_output_root_file(output_file, pred_xoff, pred_yoff):
-    """
-    Write predictions to a ROOT file with a single tree.
-    Each row contains the predicted Xoff and Yoff for one event.
-    """
-    _logger.info(f"Writing output to {output_file}")
+def process_file_chunked(
+    input_file,
+    model_dir,
+    output_file,
+    image_selection,
+    max_events=None,
+    chunk_size=500000,
+):
+    """Stream events in chunks to limit memory usage."""
+    models = load_models(model_dir)
+    branch_list = get_branch_list()
+    selected_indices = parse_image_selection(image_selection)
 
-    output_data = {
-        "Dir_Xoff": np.asarray(pred_xoff, dtype=np.float32),
-        "Dir_Yoff": np.asarray(pred_yoff, dtype=np.float32),
-    }
+    _logger.info(f"Chunk size: {chunk_size}")
+    if max_events:
+        _logger.info(f"Maximum events to process: {max_events}")
 
     with uproot.recreate(output_file) as root_file:
-        root_file.mktree("StereoAnalysis", output_data)
+        tree = root_file.mktree(
+            "StereoAnalysis",
+            {"Dir_Xoff": np.float32, "Dir_Yoff": np.float32},
+        )
 
-    _logger.info(f"Output written successfully: {len(pred_xoff)} events")
+        total_processed = 0
+
+        for df_chunk in uproot.iterate(
+            f"{input_file}:data",
+            branch_list,
+            library="pd",
+            step_size=chunk_size,
+        ):
+            if df_chunk.empty:
+                continue
+
+            df_chunk = apply_image_selection(df_chunk, selected_indices)
+            if df_chunk.empty:
+                continue
+
+            # Stop early if we've reached max_events limit
+            if max_events is not None and total_processed >= max_events:
+                break
+
+            # Reset index to local chunk indices (0, 1, 2, ...) to avoid
+            # index out-of-bounds when indexing chunk-sized output arrays
+            df_chunk = df_chunk.reset_index(drop=True)
+
+            pred_xoff, pred_yoff = apply_models(df_chunk, models)
+
+            tree.extend(
+                {
+                    "Dir_Xoff": np.asarray(pred_xoff, dtype=np.float32),
+                    "Dir_Yoff": np.asarray(pred_yoff, dtype=np.float32),
+                }
+            )
+
+            total_processed += len(df_chunk)
+            _logger.info(f"Processed {total_processed} events so far")
+
+    _logger.info(
+        f"Streaming complete. Total processed events written: {total_processed}"
+    )
 
 
 def main():
@@ -350,6 +358,12 @@ def main():
         default=None,
         help="Maximum number of events to process (default: all events)",
     )
+    parser.add_argument(
+        "--chunk-size",
+        type=int,
+        default=500000,
+        help="Number of events to process per chunk (default: 500000)",
+    )
     args = parser.parse_args()
 
     start_time = time.time()
@@ -360,13 +374,14 @@ def main():
     if args.image_selection:
         _logger.info(f"Image selection: {args.image_selection}")
 
-    df = load_all_events(
-        args.input_file,
+    process_file_chunked(
+        input_file=args.input_file,
+        model_dir=args.model_dir,
+        output_file=args.output_file,
+        image_selection=args.image_selection,
         max_events=args.max_events,
-        selected_indices=parse_image_selection(args.image_selection),
+        chunk_size=args.chunk_size,
     )
-    pred_xoff, pred_yoff = apply_models(df, args.model_dir)
-    write_output_root_file(args.output_file, pred_xoff, pred_yoff)
 
     elapsed_time = time.time() - start_time
     _logger.info(f"Processing complete. Total time: {elapsed_time:.2f} seconds")
