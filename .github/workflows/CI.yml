@@ -38,4 +38,4 @@ jobs:
       - name: Pre-commit
         run: |
           pip install pre-commit
-          pre-commit run --all-files
+          SKIP=no-commit-to-branch pre-commit run --all-files
