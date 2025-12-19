@@ -129,8 +129,14 @@ def flatten_data_vectorized(df, n_tel, training_variables):
         return result
 
     def to_dense_array(col):
-        """Convert column (potentially awkward) to dense 2D numpy array efficiently."""
-        # Convert to list first to avoid awkward iteration overhead
+        """
+        Convert a column of variable-length telescope data to a dense 2D numpy array.
+
+        Handles uproot's awkward-style variable-length arrays from ROOT files
+        by converting to plain Python lists first to avoid per-element iteration overhead.
+        """
+        # Convert to a plain Python list first to avoid per-element iteration overhead
+        # when dealing with uproot's awkward-style variable-length arrays
         arrays = col.tolist() if hasattr(col, "tolist") else list(col)
         try:
             return np.vstack(arrays)
@@ -199,7 +205,22 @@ def flatten_data_vectorized(df, n_tel, training_variables):
 
 
 def load_models(model_dir):
-    """Load models once to reuse across chunks."""
+    """
+    Load XGBoost models for different telescope multiplicities from a directory.
+
+    Parameters
+    ----------
+    model_dir : str
+        Path to the directory containing the trained model files
+        named ``dispdir_bdt_ntel{n_tel}_xgboost.joblib``.
+
+    Returns
+    -------
+    dict[int, Any]
+        A dictionary mapping the number of telescopes (n_tel) to the
+        corresponding loaded model objects. Only models whose files
+        exist in ``model_dir`` are included.
+    """
     models = {}
     for n_tel in range(2, 5):
         model_filename = os.path.join(
@@ -216,7 +237,26 @@ def load_models(model_dir):
 def apply_models(df, models):
     """
     Apply trained XGBoost models to a DataFrame chunk.
-    Returns arrays of predicted Xoff and Yoff for each event in the chunk.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Chunk of events to process. Must contain at least the columns used in
+        ``xgb_training_variables()`` plus the pointing information
+        ("fpointing_dx", "fpointing_dy") and "DispNImages".
+    models : dict[int, Any]
+        Dictionary mapping the number of images/telescopes (n_tel) to trained
+        XGBoost models, as returned by :func:`load_models`. Each model is used
+        to predict [Xoff, Yoff] for events with the corresponding n_tel.
+
+    Returns
+    -------
+    pred_xoff : numpy.ndarray
+        Array of predicted Xoff values for each event in the chunk, aligned
+        with the index of ``df``.
+    pred_yoff : numpy.ndarray
+        Array of predicted Yoff values for each event in the chunk, aligned
+        with the index of ``df``.
     """
     n_events = len(df)
     pred_xoff = np.full(n_events, np.nan, dtype=np.float32)
@@ -268,7 +308,38 @@ def process_file_chunked(
     max_events=None,
     chunk_size=500000,
 ):
-    """Stream events in chunks to limit memory usage."""
+    """
+    Stream events from an input ROOT file in chunks, apply XGBoost models,
+    and write direction predictions to an output ROOT file.
+
+    Parameters
+    ----------
+    input_file : str
+        Path to the input ROOT file containing a "data" TTree.
+    model_dir : str
+        Directory containing the trained XGBoost model files named
+        ``dispdir_bdt_ntel{n_tel}_xgboost.joblib`` for different telescope
+        multiplicities.
+    output_file : str
+        Path to the output ROOT file to create. The file will contain a
+        "StereoAnalysis" TTree with ``Dir_Xoff`` and ``Dir_Yoff`` branches.
+    image_selection : str
+        String specifying which telescope indices to select, passed to
+        :func:`parse_image_selection` to obtain the corresponding indices
+        used by :func:`apply_image_selection`.
+    max_events : int, optional
+        Maximum number of events to process. If None (default), all
+        available events in the input file are processed.
+    chunk_size : int, optional
+        Number of events to read and process per chunk. Larger values reduce
+        I/O overhead but increase memory usage. Default is 500000.
+
+    Returns
+    -------
+    None
+        This function writes results directly to ``output_file`` and does not
+        return a value.
+    """
     models = load_models(model_dir)
     branch_list = get_branch_list()
     selected_indices = parse_image_selection(image_selection)
