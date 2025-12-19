@@ -109,6 +109,21 @@ def apply_image_selection(df, selected_indices):
     return df
 
 
+def filter_by_telescope_selection(df, selected_indices):
+    """Return a boolean mask: True when all selected telescopes are present or event has 4 images."""
+    if not selected_indices:
+        return pd.Series([True] * len(df), index=df.index)
+
+    selected_set = set(selected_indices)
+
+    def ok(tel_list):
+        if len(tel_list) >= 4:
+            return True
+        return selected_set.issubset(set(tel_list))
+
+    return df["DispTelList_T"].apply(ok)
+
+
 def flatten_data_vectorized(df, n_tel, training_variables):
     """
     Vectorized flattening of telescope array columns.
@@ -234,7 +249,7 @@ def load_models(model_dir):
     return models
 
 
-def apply_models(df, models):
+def apply_models(df, models_or_dir, selection_mask=None):
     """
     Apply trained XGBoost models to a DataFrame chunk.
 
@@ -244,10 +259,12 @@ def apply_models(df, models):
         Chunk of events to process. Must contain at least the columns used in
         ``xgb_training_variables()`` plus the pointing information
         ("fpointing_dx", "fpointing_dy") and "DispNImages".
-    models : dict[int, Any]
-        Dictionary mapping the number of images/telescopes (n_tel) to trained
-        XGBoost models, as returned by :func:`load_models`. Each model is used
-        to predict [Xoff, Yoff] for events with the corresponding n_tel.
+    models_or_dir : dict[int, Any] or str
+        Either a preloaded models dictionary (as returned by :func:`load_models`)
+        or a path to a model directory. If a string is provided, models are
+        loaded on the fly to satisfy test expectations.
+    selection_mask : pandas.Series or None
+        Optional mask; False entries are marked with -999 in outputs.
 
     Returns
     -------
@@ -261,6 +278,11 @@ def apply_models(df, models):
     n_events = len(df)
     pred_xoff = np.full(n_events, np.nan, dtype=np.float32)
     pred_yoff = np.full(n_events, np.nan, dtype=np.float32)
+
+    if isinstance(models_or_dir, str):
+        models = load_models(models_or_dir)
+    else:
+        models = models_or_dir
 
     grouped = df.groupby("DispNImages")
 
@@ -296,6 +318,10 @@ def apply_models(df, models):
         for i, idx in enumerate(group_df.index):
             pred_xoff[idx] = predictions[i, 0]
             pred_yoff[idx] = predictions[i, 1]
+
+    if selection_mask is not None:
+        pred_xoff = np.where(selection_mask, pred_xoff, -999.0)
+        pred_yoff = np.where(selection_mask, pred_yoff, -999.0)
 
     return pred_xoff, pred_yoff
 
