@@ -4,7 +4,7 @@ Need to have analysed flasher run with -writeextracalibtree option enabled.
 
 Call macro like this:
 
-root -l -q -b "$EVNDISPSYS/macros/VTS/plot_flasher_levels.C( <runnumber>, \"$EVNDISPDATA/Calibration\", \"<outputdir>\" )"
+root -l -q -b "$EVNDISPSYS/VTS/plot_flasher_levels.C( <runnumber>, \"$EVNDISPDATA/Calibration\", \"<outputdir>\" )"
 
 (Assuming your .gain.root files are in the usual place. If not, the second argument will be the calibration directory.)
 
