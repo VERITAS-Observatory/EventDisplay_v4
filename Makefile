@@ -1622,7 +1622,7 @@ formatSourceCode:
 	@echo ""
 	astyle --options=./.astylerc src/*
 	astyle --options=./.astylerc inc/*
-#	astyle --options=./.astylerc macros/*.C macros/VTS/*.C
+#	astyle --options=./.astylerc macros/*.C
 
 ###############################################################################################################################
 install:	all
