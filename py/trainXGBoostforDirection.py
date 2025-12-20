@@ -32,7 +32,7 @@ logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger("trainXGBoostforDirection")
 
 
-def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
+def load_and_flatten_data(input_files, n_tel, max_events):
     """
     Reads the data from ROOT files, filters for the required multiplicity (n_tel),
     and flattens the telescope-array features into a Pandas DataFrame.
@@ -82,7 +82,7 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
     if data_tree.empty:
         return pd.DataFrame()
 
-    # Compute weights:
+    # Compute weights (not used in training, but for monitoring)
     # - R (to reflect physical sky area)
     # - E (to balance energy distribution)
     sample_weights = (
@@ -95,12 +95,11 @@ def load_and_flatten_data(input_files, n_tel, max_events, training_step=True):
         data_tree, n_tel, xgb_per_telescope_training_variables()
     )
 
-    if training_step:
-        df_flat["MCxoff"] = data_tree["MCxoff"]
-        df_flat["MCyoff"] = data_tree["MCyoff"]
-        # Clamp energies to avoid log10 of non-positive values
-        df_flat["MCe0"] = np.log10(np.clip(data_tree["MCe0"], 1e-6, None))
-        df_flat["sample_weight"] = sample_weights
+    df_flat["MCxoff"] = data_tree["MCxoff"]
+    df_flat["MCyoff"] = data_tree["MCyoff"]
+    # Clamp energies to avoid log10 of non-positive values
+    df_flat["MCe0"] = np.log10(np.clip(data_tree["MCe0"], 1e-6, None))
+    df_flat["sample_weight"] = sample_weights
 
     df_flat.dropna(inplace=True)
     _logger.info(f"Final events for n_tel={n_tel} after cleanup: {len(df_flat)}")
@@ -396,7 +395,9 @@ def shap_feature_importance(model, X, target_names, max_points=20000, n_top=25):
 
 def main():
     parser = argparse.ArgumentParser(
-        description=("Train XGBoost Multi-Target BDTs for Direction Reconstruction")
+        description=(
+            "Train XGBoost Multi-Target BDTs for Stereo Analysis (Direction, Energy)."
+        )
     )
     parser.add_argument("--input_file_list", help="List of input mscw ROOT files.")
     parser.add_argument("--ntel", type=int, help="Telescope multiplicity (2, 3, or 4).")
@@ -427,7 +428,7 @@ def main():
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
 
-    _logger.info("--- XGBoost Multi-Target Direction Training ---")
+    _logger.info("--- XGBoost Multi-Target Training ---")
     _logger.info(f"Input files: {len(input_files)}")
     _logger.info(f"Telescope multiplicity: {args.ntel}")
     _logger.info(f"Output directory: {args.output_dir}")
