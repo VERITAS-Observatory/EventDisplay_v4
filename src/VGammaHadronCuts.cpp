@@ -2534,7 +2534,7 @@ double VGammaHadronCuts::getReconstructedEnergy( unsigned int iEnergyReconstruct
     {
         return -99.;
     }
-    return fData->get_Erec(iEnergyReconstructionMethod);
+    return fData->get_Erec( iEnergyReconstructionMethod );
 }
 
 double VGammaHadronCuts::getReconstructedEnergyChi2( unsigned int iEnergyReconstructionMethod )

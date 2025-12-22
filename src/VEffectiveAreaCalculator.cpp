@@ -2251,10 +2251,10 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
         }
         else
         {
-            eRecLin = d->get_Erec(iMethod);
+            eRecLin = d->get_Erec( iMethod );
             if( eRecLin > 0. )
             {
-                eRec = log10(eRecLin);
+                eRec = log10( eRecLin );
             }
             else
             {

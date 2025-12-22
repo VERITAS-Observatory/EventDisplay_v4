@@ -446,7 +446,7 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
     }
 
     // get reconstructed energy
-    double iErec_lin = fData->get_Erec(fEnergyReconstructionMethod);
+    double iErec_lin = fData->get_Erec( fEnergyReconstructionMethod );
     if( iErec_lin < 0. )
     {
         return;
