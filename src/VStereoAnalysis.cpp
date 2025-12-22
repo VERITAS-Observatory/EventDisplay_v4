@@ -2149,7 +2149,7 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c, double i_xderot, do
     fTreeSelected_MLR = c->MLR;
     fTreeSelected_Erec = c->Erec;
     fTreeSelected_EChi2 = c->EChi2;
-    fTreeSelected_ErecS = c->ErecS;
+    fTreeSelected_ErecS = c->get_Erec();
     fTreeSelected_EChi2S = c->EChi2S;
     fTreeSelected_EmissionHeight = c->EmissionHeight;
     fTreeSelected_EmissionHeightChi2 = c->EmissionHeightChi2;
