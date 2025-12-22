@@ -927,7 +927,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                 if( fHistoSingleTel[EMSCLT].size() > 0 && iTelImage < fHistoSingleTel[EMSCLT].size()
                         && fHistoSingleTel[EMSCLT][iTelImage] )
                 {
-                    fHistoSingleTel[EMSCLT][iTelImage]->fill( fData->MSCLT[iTelImage], weight, log10( fData->get_Erec(),
+                    fHistoSingleTel[EMSCLT][iTelImage]->fill( fData->MSCLT[iTelImage], weight, log10( fData->get_Erec()),
                             fData->ntubes[iTelImage], fData->size[iTelImage],
                             fData->fraclow[iTelImage] );
                 }
