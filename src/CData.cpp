@@ -643,7 +643,7 @@ Bool_t CData::Notify()
 * Get energy depending on analysis method
 * Methods:
 *
-* 0: (return friend tree result (if available) or Erec)
+* 0: return friend tree result (if available) or Erec
 * 1: return ErecS
 * 2: return Erec
 * 3: return friend tree result
