@@ -52,7 +52,6 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
     fdatafile = "";
     fMCdatafile_tree = "";
     fMCdatafile_histo = "";
-    fGammaHadronProbabilityFile = "";
     fXGB_file_suffix = "";
 
     fze = 0.;
@@ -294,14 +293,6 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
                 if(!( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> fMCdatafile_histo;
-                }
-            }
-            // file with probabilities for gamma/hadron separation (should be a friend to the data tree)
-            else if( temp == "GAMMAHADRONPROBABILITYFILE" )
-            {
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> fGammaHadronProbabilityFile;
                 }
             }
             // name pointing to energy spectra used in event weighting
@@ -619,10 +610,6 @@ void VInstrumentResponseFunctionRunParameter::print()
     if( fMCdatafile_histo.size() > 0 )
     {
         cout << "  MC histograms:   " << fMCdatafile_histo << endl;
-    }
-    if( fGammaHadronProbabilityFile.size() > 0 )
-    {
-        cout << "  gamma/hadron probabilities: " << fGammaHadronProbabilityFile << endl;
     }
     if( fXGB_file_suffix.size() > 0 )
     {

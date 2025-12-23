@@ -69,17 +69,6 @@ VGammaHadronCuts::VGammaHadronCuts()
     fMeanImageLength = 0.;
     fMeanImageDistance = 0.;
 
-    // probabilities cuts
-    fProbabilityCut_File = 0;
-    fProbabilityCut_Tree = 0;
-    fProbabilityCut_QualityFlag = 0;
-    fProbabilityCut_NSelectors = VANACUTS_PROBSELECTIONCUTS_MAX;
-    fProbabilityCut_ProbID = 0;
-    for( unsigned int i = 0; i < fProbabilityCut_NSelectors; i++ )
-    {
-        fProbabilityCut_SelectionCut[i] = -1.;
-    }
-
     // phase cuts
     fOrbitalPhase_min = -1.;
     fOrbitalPhase_max = 1.e10;
@@ -192,8 +181,6 @@ void VGammaHadronCuts::resetCutValues()
     fCut_DispIntersectDiff_min = -1000.;
     fCut_DispIntersectDiff_max = 1.e10;
     fCut_DispIntersectSuccess = 1;
-
-    fProbabilityCut = 0.5;
 
     fOrbitalPhase_min = -1.;
     fOrbitalPhase_max = 1.e10;
@@ -443,21 +430,6 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                     }
                 }
             }
-            // probability cut variables (e.g. random forest)
-            else if( iCutVariable == "RFthresh" || iCutVariable == "Probthresh" )
-            {
-                is_stream >> temp;
-                fProbabilityCut = ( atof( temp.c_str() ) );
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> temp;
-                    fProbabilityCut_ProbID = atoi( temp.c_str() );
-                }
-                else
-                {
-                    fProbabilityCut_ProbID = 0;
-                }
-            }
             // phase cuts
             else if( iCutVariable == "orbitalPhase" )
             {
@@ -473,34 +445,6 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                 }
                 fUseOrbitalPhaseCuts = true;
             }
-
-            // to define the lower bounds in probability cut ranges  (e.g. random forest)
-            else if( iCutVariable == "RFCutLowerVals" )
-            {
-                while(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> temp;
-                    fProbabilityCutRangeLower.push_back( atof( temp.c_str() ) );
-                }
-            }
-
-            // to define the upper bounds in probability cut ranges  (e.g. random forest)
-            else if( iCutVariable == "RFCutUpperVals" )
-            {
-                while(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> temp;
-                    fProbabilityCutRangeUpper.push_back( atof( temp.c_str() ) );
-                }
-            }
-
-            // to define the upper bounds in probability cut ranges  (e.g. random forest)
-            else if( iCutVariable == "RFProbID" )
-            {
-                is_stream >> temp;
-                fProbabilityCut_ProbID = atoi( temp.c_str() );
-            }
-
 
             // energy reconstruction cuts
             else if( iCutVariable == "arrayechi2" )
@@ -948,20 +892,6 @@ void VGammaHadronCuts::printCutSummary()
     }
     cout << "Average core distance < " << fCut_AverageCoreDistanceToTelescopes_max << " m";
     cout << " (max distance to telescopes (mintel) " << fCut_MinimumCoreDistanceToTelescopes_max << " m)";
-    // probability cuts
-    if( fGammaHadronCutSelector / 10 >= 1 && fGammaHadronCutSelector / 10 <= 3 )
-    {
-        cout << endl;
-        cout << "event probability threshold: " << fProbabilityCut << " (element " << fProbabilityCut_ProbID << ")";
-        if( fGammaHadronCutSelector / 10 == 3 )
-        {
-            cout << " (applied as quality cut)";
-        }
-        if( fProbabilityCut_File )
-        {
-            cout << ", read from " << fProbabilityCut_File->GetName();
-        }
-    }
     // phase cuts
     if( useOrbitalPhaseCuts() )
     {
@@ -1232,20 +1162,6 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
     }
 
     /////////////////////////////////////////////////////////////////////////
-    // apply cut selector from probability tree
-    if( fGammaHadronCutSelector / 10 == 3 )
-    {
-        if(!applyProbabilityCut( iEntry, fIsOn ) )
-        {
-            if( bCount && fStats )
-            {
-                fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
-            }
-            return false;
-        }
-    }
-
-    /////////////////////////////////////////////////////////////////////////
     // apply cut on difference between stereo intersection and disp method
     // (for stereo method only: this should always pass)
     float i_disp_diff = sqrt(
@@ -1350,23 +1266,6 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
         }
     }
     /////////////////////////////////////////////////////////////////////////////
-    // apply probability threshold cut (e.g. random forest cuts)
-    if( fGammaHadronCutSelector / 10 == 1 || fGammaHadronCutSelector / 10 == 2 )
-    {
-        if( fDebug )
-        {
-            cout << "VGammaHadronCuts::isGamma: applyProbabilityCut" << endl;
-        }
-        if(!applyProbabilityCut( i, fIsOn ) )
-        {
-            if( bCount && fStats )
-            {
-                fStats->updateCutCounter( VGammaHadronCutsStatistics::eIsGamma );
-            }
-            return false;
-        }
-    }
-    /////////////////////////////////////////////////////////////////////////////
     // apply cut using TMVA reader
     else if( useTMVACuts() )
     {
@@ -1413,50 +1312,6 @@ bool VGammaHadronCuts::applyTMVACut( int i )
     return false;
 }
 
-
-/*
-
-  use cut selector from a friend tree to the given data tree
-
-*/
-bool VGammaHadronCuts::applyProbabilityCut( int i, bool fIsOn )
-{
-    // tree exists and has the requested entry
-    if( fProbabilityCut_Tree && fProbabilityCut_Tree->GetEntry( i ) )
-    {
-        // check cut quality
-        if( fProbabilityCut_QualityFlag > 0 )
-        {
-            if( fProbabilityCutRangeLower.size() != fProbabilityCutRangeUpper.size() )
-            {
-                cout << "Error in definitions of RF probability ranges" << endl
-                     << "RFCutLowerVals and  RFCutLowerVals have different numbers of entries in cut file" << endl;
-                exit(-1 );
-            }
-            else
-            {
-                if( fProbabilityCut_ProbID < fProbabilityCut_NSelectors && fProbabilityCut_NSelectors < VANACUTS_PROBSELECTIONCUTS_MAX )
-                {
-                    for( unsigned int dex = 0; dex < fProbabilityCutRangeLower.size(); dex++ )
-                    {
-                        if( fIsOn && fProbabilityCut_SelectionCut[fProbabilityCut_ProbID] >= fProbabilityCutRangeLower[dex]
-                                && fProbabilityCut_SelectionCut[fProbabilityCut_ProbID] <  fProbabilityCutRangeUpper[dex] )
-                        {
-                            return true;
-                        }
-                        if(!fIsOn && fProbabilityCut_SelectionCut[fProbabilityCut_ProbID] >= -fProbabilityCutRangeLower[dex]
-                                && fProbabilityCut_SelectionCut[fProbabilityCut_ProbID] <  -fProbabilityCutRangeUpper[dex] )
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return false;
-}
 
 /*!
 
@@ -1636,26 +1491,8 @@ bool VGammaHadronCuts::applyStereoShapeCuts()
 */
 void VGammaHadronCuts::initializeCuts( int irun, string iFile )
 {
-    // probability cuts
-    if( fGammaHadronCutSelector / 10 >= 1 && fGammaHadronCutSelector / 10 <= 3 )
-    {
-        if( irun > 0 )
-        {
-            initProbabilityCuts( irun );
-        }
-        else if( iFile.size() > 0 )
-        {
-            initProbabilityCuts( iFile );
-        }
-        else
-        {
-            cout << "VGammaHadronCuts::initializeCuts: failed setting probability cuts for " << irun << " " << iFile << endl;
-            cout << "exiting..." << endl;
-            exit( EXIT_FAILURE );
-        }
-    }
     // TMVA cuts
-    else if( useTMVACuts() )
+    if( useTMVACuts() )
     {
         if(!initTMVAEvaluator( fTMVAWeightFile,
                                fTMVAWeightFileIndex_Emin, fTMVAWeightFileIndex_Emax,
@@ -1767,53 +1604,6 @@ bool VGammaHadronCuts::setDataTree( CData* idata )
     if( fTMVAEvaluator )
     {
         fTMVAEvaluator->initializeDataStrutures( fData );
-    }
-
-    return true;
-}
-
-
-bool VGammaHadronCuts::initProbabilityCuts( int irun )
-{
-    ostringstream iFile;
-    iFile << fDataDirectory << "/" << irun << ".mscw.rf.root";
-
-    return initProbabilityCuts( iFile.str() );
-}
-
-
-bool VGammaHadronCuts::initProbabilityCuts( string iFile )
-{
-    TDirectory* cDir = gDirectory;
-
-    fProbabilityCut_File = new TFile( iFile.c_str() );
-    if( fProbabilityCut_File->IsZombie() )
-    {
-        cout << "Error while opening file with probability cuts: " << iFile << endl;
-        exit( 0 );
-    }
-    cout << "\t opening file with probability cuts: " << fProbabilityCut_File->GetName() << endl;
-
-    fProbabilityCut_Tree = ( TTree* )gDirectory->Get( "rf" );
-    if(!fProbabilityCut_Tree )
-    {
-        cout << "Error: could not find tree with probability cuts" << endl;
-        exit( 0 );
-    }
-    fProbabilityCut_Tree->SetBranchAddress( "cut", &fProbabilityCut_QualityFlag );
-    if( fProbabilityCut_Tree->GetBranchStatus( "Ng" ) )
-    {
-        fProbabilityCut_Tree->SetBranchAddress( "Ng", &fProbabilityCut_NSelectors );
-    }
-    else
-    {
-        fProbabilityCut_NSelectors = 2;
-    }
-    fProbabilityCut_Tree->SetBranchAddress( "g", fProbabilityCut_SelectionCut );
-
-    if( cDir )
-    {
-        cDir->cd();
     }
 
     return true;
@@ -2259,52 +2049,6 @@ void VGammaHadronCuts::newEvent( bool iFillTree )
     fStats->updateCutCounter( VGammaHadronCutsStatistics::eTot );
 }
 
-
-double VGammaHadronCuts::getProbabilityCutAlpha( bool fIsOn )
-{
-    if( fProbabilityCutRangeLower.size() != fProbabilityCutRangeUpper.size() )
-    {
-        cout << "Error in definitions of RF probability ranges" << endl;
-        cout << "RFCutLowerVals and RFCutLowerVals have different numbers of entries in cut file" << endl;
-        exit(-1 );
-    }
-    //////////////////////////////////////////////////////////////
-    // return 1 if probability cuts are not set
-    if( fProbabilityCutRangeLower.size() == 0 && fProbabilityCutRangeUpper.size() == 0 )
-    {
-        return 1.;
-    }
-    //////////////////////////////////////////////////////////////
-
-    double on_size = 0;
-    double off_size = 0;
-    for( unsigned int i = 0; i < fProbabilityCutRangeLower.size(); i++ )
-    {
-        if( fProbabilityCutRangeLower[i] >= 0 && fProbabilityCutRangeUpper[i] >= 0 )
-        {
-            on_size = on_size + ( fProbabilityCutRangeUpper[i] - fProbabilityCutRangeLower[i] );
-        }
-        else if( fProbabilityCutRangeLower[i] <= 0 && fProbabilityCutRangeUpper[i] <= 0 )
-        {
-            off_size = off_size - ( fProbabilityCutRangeUpper[i] - fProbabilityCutRangeLower[i] );
-        }
-        else
-        {
-            cout << "Error in definitions of RF probability ranges" << endl;
-            cout << "One pair of RFCutLowerVals and RFCutLowerVals values have opposite sign" << endl;
-        }
-    }
-
-    if( fIsOn )
-    {
-        return on_size;
-    }
-    else
-    {
-        return off_size;
-    }
-
-}
 
 void VGammaHadronCuts::terminate()
 {

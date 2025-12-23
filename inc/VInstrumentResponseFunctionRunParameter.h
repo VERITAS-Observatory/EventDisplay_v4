@@ -75,7 +75,6 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
         string          fdatafile;
         string          fMCdatafile_tree;
         string          fMCdatafile_histo;
-        string          fGammaHadronProbabilityFile;
         string          fXGB_file_suffix;
 
         double          fze;

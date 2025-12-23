@@ -112,7 +112,7 @@ int main( int argc, char* argv[] )
     }
     fRunPara->fGammaHadronCutSelector = fCuts->getGammaHadronCutSelector();
     fRunPara->fDirectionCutSelector   = fCuts->getDirectionCutSelector();
-    fCuts->initializeCuts(-1, fRunPara->fGammaHadronProbabilityFile );
+    fCuts->initializeCuts(-1 );
     fCuts->printCutSummary();
 
     /////////////////////////////////////////////////////////////////

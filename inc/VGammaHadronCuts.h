@@ -112,14 +112,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double fMeanImageLength;
         double fMeanImageWidth;
 
-        // event by event cuts (read in from an additional friend tree, used by random forest analysis, pulsar analysis, etc)
-        TFile* fProbabilityCut_File;                  //!
-        TTree* fProbabilityCut_Tree;                  //!
-        int fProbabilityCut_QualityFlag;              // quality flag for probability cut 0: cut estimation failed; >0 successful probability estimation
-        unsigned int fProbabilityCut_NSelectors;      // number of elements in fProbabilityCut_SelectionCut[]
-        unsigned int fProbabilityCut_ProbID;          // array element to be used from fProbabilityCut_SelectionCut[]
-        double fProbabilityCut_SelectionCut[VANACUTS_PROBSELECTIONCUTS_MAX];    // selection cut
-
         //////////////////////////
         // TMVA evaluator
         VTMVAEvaluator* fTMVAEvaluator;                             //!
@@ -174,8 +166,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool   initAngularResolutionFile();
         bool   initPhaseCuts( int irun );
         bool   initPhaseCuts( string iDir );
-        bool   initProbabilityCuts( int irun );
-        bool   initProbabilityCuts( string iDir );
         bool   initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_Emin, unsigned int iTMVAWeightFileIndex_Emax, unsigned int iTMVAWeightFileIndex_Zmin, unsigned int iTMVAWeightFileIndex_Zmax );
         string getTelToAnalyzeString();
 
@@ -237,9 +227,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double fCut_DispIntersectDiff_min;
         double fCut_DispIntersectDiff_max;
         int    fCut_DispIntersectSuccess;
-        double fProbabilityCut;
-        vector <double> fProbabilityCutRangeLower;
-        vector <double> fProbabilityCutRangeUpper;
 
         vector< VNTelTypeCut* > fNTelTypeCut;
 
@@ -318,18 +305,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
         {
             return fAngResContainmentProbability;
         }
-        double getProbabilityCut_Selector( unsigned int iID = 0 )
-        {
-            if( iID < fProbabilityCut_NSelectors )
-            {
-                return fProbabilityCut_SelectionCut[iID];
-            }
-            else
-            {
-                return -1;
-            }
-        }
-        double getProbabilityCutAlpha( bool fIsOn );
         double getTheta2Cut_min( double e = 0.1 )
         {
             if( e > 0. )
