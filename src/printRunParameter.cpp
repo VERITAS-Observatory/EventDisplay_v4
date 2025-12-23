@@ -19,6 +19,8 @@
 
 using namespace std;
 
+double readMeanElevation( TFile* fIn );
+
 bool readRunParameter( TFile* fIn, string iPara )
 {
     if(!fIn )
@@ -107,6 +109,7 @@ bool readRunParameter( TFile* fIn, string iPara )
         }
         cout << "\t" << fPar->fRunDuration;
         cout << "\t" << fPar->fTargetName;
+        cout << "\t" << 90. - readMeanElevation( fIn );
         cout << endl;
     }
 
@@ -141,7 +144,7 @@ bool readWobbleOffset( TFile* fIn, bool printInteger )
  * read mean elevation or zenith
  *
  */
-bool readMeanElevation( TFile* fIn, bool print_zenith = false )
+double readMeanElevation( TFile* fIn )
 {
     if(!fIn )
     {
@@ -215,15 +218,7 @@ bool readMeanElevation( TFile* fIn, bool print_zenith = false )
         }
         if( iMeanN > 0. )
         {
-            iMean_f /= iMeanN;
-            if( print_zenith )
-            {
-                cout << "Average zenith angle: " << 90. - iMean_f << endl;
-            }
-            else
-            {
-                cout << "Average elevation: " << iMean_f << endl;
-            }
+            return iMean_f /= iMeanN;
         }
     }
     else
@@ -231,7 +226,7 @@ bool readMeanElevation( TFile* fIn, bool print_zenith = false )
         cout << "not implemented" << endl;
     }
 
-    return true;
+    return -999.;
 }
 
 
@@ -339,11 +334,11 @@ int main( int argc, char* argv[] )
     {
         if( fOption.find( "-elevation" ) != string::npos )
         {
-            readMeanElevation( fIn );
+            cout << "Average elevation: " << readMeanElevation( fIn ) << endl;
         }
         else if( fOption.find( "-zenith" ) != string::npos )
         {
-            readMeanElevation( fIn, true );
+            cout << "Average zenith angle: " << 90. - readMeanElevation( fIn ) << endl;
         }
         else if( fOption.find( "-wobble" ) != string::npos )
         {
@@ -357,7 +352,7 @@ int main( int argc, char* argv[] )
         {
             readRunParameter( fIn, fOption );
         }
-        exit( 0 );
+        exit( EXIT_SUCCESS );
     }
 
     VEvndispRunParameter* fPar = 0;
