@@ -15,7 +15,6 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <random>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -111,10 +110,9 @@ class VTMVARunData : public TNamed
         {
             fName = iN;
         }
-        void shuffleFileVectors();
         void updateTrainingEvents( string iVarName, unsigned int iNEvents );
 
-        ClassDef( VTMVARunData, 11 );
+        ClassDef( VTMVARunData, 12 );
 };
 
 #endif

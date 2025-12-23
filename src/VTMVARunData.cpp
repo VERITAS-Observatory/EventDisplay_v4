@@ -769,14 +769,6 @@ bool VTMVARunData::readConfigurationFile( char* iC )
     return true;
 }
 
-void VTMVARunData::shuffleFileVectors()
-{
-    std::random_device rd;
-    std::mt19937 g( rd() );
-    std::shuffle( fSignalFileName.begin(), fSignalFileName.end(), g );
-    std::shuffle( fBackgroundFileName.begin(), fBackgroundFileName.end(), g );
-}
-
 VTableLookupRunParameter* VTMVARunData::getTLRunParameter()
 {
     TDirectory* iG_CurrentDirectory = gDirectory;
