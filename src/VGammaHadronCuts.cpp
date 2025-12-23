@@ -122,7 +122,6 @@ VGammaHadronCuts::VGammaHadronCuts()
 
 void VGammaHadronCuts::initialize()
 {
-    // statistics
     fStats = new VGammaHadronCutsStatistics();
     fStats->initialize();
 }
@@ -1938,110 +1937,6 @@ bool VGammaHadronCuts::applyMCXYoffCut( double xoff, double yoff, bool bCount )
 }
 
 /*
-
-   check telescope type (e.g. remove all LSTs)
-
-   returns true if current event fails the fulfil the conditions
-
-*/
-bool VGammaHadronCuts::applyTelTypeTest( bool bCount )
-{
-    bool icut = false;
-
-    if( fNTelTypeCut.size() == 0 )
-    {
-        return true;
-    }
-
-    for( unsigned int i = 0; i < fNTelTypeCut.size(); i++ )
-    {
-        // test: true means this event has enough telescopes
-        icut = ( icut || fNTelTypeCut[i]->test( fData ) );
-    }
-
-    if( bCount && fStats && !icut )
-    {
-        fStats->updateCutCounter( VGammaHadronCutsStatistics::eTelType );
-    }
-
-    return icut;
-}
-
-
-/*!
-
-  NOTE: THIS IS NOT USED
-
-  check if core is inside a certain area relative to centre of array (ground, not shower coordinates)
-
-  fCut_CoreDistanceToArrayCentreY_min && fCut_CoreDistanceToArrayCentreY_max == 0: cut area is circle with radius fCut_CoreDistanceToArrayCentreX_max
-  otherwise: cut area is a rectangle
-
-  iMC = true:   use MC core
-  iMC = false:  use reconstructed core position
-*/
-bool VGammaHadronCuts::applyShowerCoreCuts( bool iMC )
-{
-    double xcore = getReconstructedXcore() - fArrayCentre_X;
-    double ycore = getReconstructedYcore( ) - fArrayCentre_Y;
-    // use MC core position
-    if( iMC )
-    {
-        xcore = fData->MCxcore - fArrayCentre_X;
-        ycore = fData->MCycore - fArrayCentre_Y;
-    }
-    ///////////////////////////////////////////////
-    // radius cuts (Y_min and Y_max is 0)
-    if( TMath::Abs( fCut_CoreDistanceToArrayCentreY_min ) < 1.e-5 && TMath::Abs( fCut_CoreDistanceToArrayCentreY_max ) < 1.e-5 )
-    {
-        if( sqrt( xcore * xcore + ycore * ycore ) < fCut_CoreDistanceToArrayCentreX_min )
-        {
-            return false;
-        }
-        if( sqrt( xcore * xcore + ycore * ycore ) > fCut_CoreDistanceToArrayCentreX_max )
-        {
-            return false;
-        }
-    }
-    else
-        ///////////////////////////////////////////////
-        // box cut
-    {
-        if( xcore < fCut_CoreDistanceToArrayCentreX_min - fCut_CoreDistanceEdgeSize )
-        {
-            return false;
-        }
-        if( xcore > fCut_CoreDistanceToArrayCentreX_max + fCut_CoreDistanceEdgeSize )
-        {
-            return false;
-        }
-        if( ycore < fCut_CoreDistanceToArrayCentreY_min - fCut_CoreDistanceEdgeSize )
-        {
-            return false;
-        }
-        if( ycore > fCut_CoreDistanceToArrayCentreY_max + fCut_CoreDistanceEdgeSize )
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-/* DISABLED DO NOT USE
-void VGammaHadronCuts::setShowerCoreCuts( double xmin, double xmax, double ymin, double ymax, double iEdge )
-{
-    fCut_CoreDistanceToArrayCentreX_min = xmin;
-    fCut_CoreDistanceToArrayCentreX_max = xmax;
-    fCut_CoreDistanceToArrayCentreY_min = ymin;
-    fCut_CoreDistanceToArrayCentreY_max = ymax;
-    if( iEdge >= 0. ) fCut_CoreDistanceEdgeSize = iEdge;
-    cout << "setting shower core cuts: " << fCut_CoreDistanceToArrayCentreX_min << "\t" << fCut_CoreDistanceToArrayCentreX_max;
-    cout << "\t" << fCut_CoreDistanceToArrayCentreY_min << "\t" << fCut_CoreDistanceToArrayCentreY_max << "\t" << fCut_CoreDistanceEdgeSize << endl;
-}
-*/
-
-/*
    apply cut on event direction (theta2 cut)
 
   * function is called for effective areas calculations only (MC)
@@ -2211,7 +2106,6 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
    read angular resolution from root file
 
 */
-
 bool VGammaHadronCuts::initAngularResolutionFile()
 {
 

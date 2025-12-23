@@ -39,8 +39,6 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
 
     fIgnoreFractionOfEvents = 0.;
 
-    fTelescopeTypeCuts = false;
-
     fFillMCHistograms = false;
 
     fgetXoff_Yoff_afterCut = false;
@@ -231,14 +229,6 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
                 if(!( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> fIgnoreFractionOfEvents;
-                }
-            }
-            // telescope type dependent cuts
-            else if( temp == "TELESCOPETYPECUTS" )
-            {
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> fTelescopeTypeCuts;
                 }
             }
             else if( temp == "CUTFILE" )
@@ -665,10 +655,6 @@ void VInstrumentResponseFunctionRunParameter::print()
     if( fIgnoreEnergyReconstructionQuality )
     {
         cout << ", ignoring cut on quality of energy reconstruction";
-    }
-    if( fTelescopeTypeCuts )
-    {
-        cout << ", telescope type dependent cuts";
     }
     cout << endl;
     cout << "energy reconstruction method " << fEnergyReconstructionMethod << endl;

@@ -259,11 +259,9 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool   applyMeanStereoShapeCuts();
         bool   applyMeanScaledStereoShapeCuts();
         bool   applyPhaseCut( int i );
-        bool   applyShowerCoreCuts( bool iMC = false );
         bool   applyStereoQualityCuts( unsigned int iEnergyReconstructionMethod = 0, bool bCount = false, int iEntry = 0, bool fIsOn = false );
         bool   applyStereoShapeCuts();
         bool   applyTMVACut( int i );
-        bool   applyTelTypeTest( bool bCount = false );
 
         TF1*   getAngularResolutionFunction()
         {

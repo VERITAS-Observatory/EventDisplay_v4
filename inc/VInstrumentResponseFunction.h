@@ -54,7 +54,6 @@ class VInstrumentResponseFunction
 
         // cuts
         VGammaHadronCuts* fAnaCuts;
-        bool    fTelescopeTypeCutsSet;
 
         // effective area calculation
         vector< double > fVMinAz;
@@ -125,10 +124,6 @@ class VInstrumentResponseFunction
         }
         void   setDataTree( CData* iData );
         void   setMonteCarloEnergyRange( double iMin, double iMax, double iMCIndex = 2. );
-        void   setTelescopeTypeCuts( bool iB = true )
-        {
-            fTelescopeTypeCutsSet = iB;
-        }
         void   setRunParameter( VInstrumentResponseFunctionRunParameter* iRunPar = 0 );
 
 };

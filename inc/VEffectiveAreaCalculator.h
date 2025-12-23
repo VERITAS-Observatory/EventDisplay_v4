@@ -115,7 +115,6 @@ class VEffectiveAreaCalculator
         VGammaHadronCuts* fCuts;
         bool fIgnoreEnergyReconstruction;
         bool fIsotropicArrivalDirections;
-        bool fTelescopeTypeCutsSet;
 
         // effective area calculation
         vector< double > fVMinAz;
@@ -377,10 +376,6 @@ class VEffectiveAreaCalculator
         void setStatisticsOption( bool iClopperPearson = false )
         {
             fClopperPearson = iClopperPearson;
-        }
-        void setTelescopeTypeCuts( bool iB = true )
-        {
-            fTelescopeTypeCutsSet = iB;
         }
         void setWobbleOffset( double x, double y );
         void resetTimeBin();

@@ -72,8 +72,6 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
         bool            fIsotropicArrivalDirections;
         float           fIgnoreFractionOfEvents;
 
-        bool            fTelescopeTypeCuts;
-
         string          fdatafile;
         string          fMCdatafile_tree;
         string          fMCdatafile_histo;

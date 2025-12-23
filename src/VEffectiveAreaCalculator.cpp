@@ -58,7 +58,6 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     }
     setIgnoreEnergyReconstructionCuts( fRunPara->fIgnoreEnergyReconstructionQuality );
     setIsotropicArrivalDirections( fRunPara->fIsotropicArrivalDirections );
-    setTelescopeTypeCuts( fRunPara->fTelescopeTypeCuts );
     setWobbleOffset( fRunPara->fXoff, fRunPara->fYoff );
     setNoiseLevel( fRunPara->fnoise, fRunPara->fpedvar );
 
@@ -2183,19 +2182,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
             continue;
         }
         hEcutSub[1]->Fill( eMC, 1. );
-
-        // apply telescope type cut (e.g. for CTA simulations)
-        if( fTelescopeTypeCutsSet )
-        {
-            if( bDebugCuts )
-            {
-                cout << "#2 Cut NTELType " << fCuts->applyTelTypeTest( false ) << endl;
-            }
-            if(!fCuts->applyTelTypeTest( true ) )
-            {
-                continue;
-            }
-        }
         hEcutSub[3]->Fill( eMC, 1. );
 
         //////////////////////////////////////
