@@ -13,7 +13,7 @@ VTMVARunData::VTMVARunData()
     fRunOption = "TRAIN";
 
     fTrainGammaHadronSeparation = true;
-    fTrainReconstructionQuality = false;  // in development: please ignore
+    fTrainReconstructionQuality = false;
 
     fOutputDirectoryName = "";
     fOutputFileName = "";
@@ -214,7 +214,7 @@ bool VTMVARunData::openDataFiles()
                 {
                     iTempS << fOutputDirectoryName << "/" << fOutputFileName;
                     iTempS << "_0_" << j << ".root";    // append a _# at the file name
-                    iTempS2 << fOutputFileName << "_0_" << i;
+                    iTempS2 << fOutputFileName << "_0_" << j;
                 }
                 else
                 {
