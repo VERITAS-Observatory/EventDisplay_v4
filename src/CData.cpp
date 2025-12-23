@@ -23,11 +23,13 @@ CData::CData( TTree* tree, bool bMC, bool bShort, TTree* friendTree )
     {
         fFriendTree->SetBranchAddress( "Dir_Xoff", &Dir_Xoff );
         fFriendTree->SetBranchAddress( "Dir_Yoff", &Dir_Yoff );
+        fFriendTree->SetBranchAddress( "Dir_Erec", &Dir_Erec );
     }
     else
     {
         Dir_Xoff = -9999.;
         Dir_Yoff = -9999.;
+        Dir_Erec = -9999.;
     }
 }
 
@@ -636,8 +638,39 @@ Bool_t CData::Notify()
     return kTRUE;
 }
 
+
 /*
- * Get stereo Xoff depending on analysis results
+* Get energy depending on analysis method
+* Methods:
+*
+* 0: return friend tree result (if available) or Erec
+* 1: return ErecS
+* 2: return Erec
+* 3: return friend tree result
+*/
+float CData::get_Erec( unsigned iMethod )
+{
+    if( iMethod == 0 && fFriendTree )
+    {
+        return Dir_Erec;
+    }
+    else if( iMethod == 1 )
+    {
+        return ErecS;
+    }
+    else if( iMethod == 2 )
+    {
+        return Erec;
+    }
+    else if( iMethod == 3 )
+    {
+        return Dir_Erec;
+    }
+    return Erec;
+}
+
+/*
+ * Get stereo Xoff depending on analysis method
  *
  * Methods:
  *
@@ -667,8 +700,9 @@ float CData::get_Xoff( unsigned iMethod )
     return ( float )Xoff;
 }
 
+
 /*
- * Get stereo Yoff depending on analysis results
+ * Get stereo Yoff depending on analysis method
  *
  * Methods:
  *

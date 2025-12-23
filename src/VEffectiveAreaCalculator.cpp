@@ -2244,24 +2244,22 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 
         // skip event if no energy has been reconstructed
         // get energy according to which reconstruction method
-        if( iMethod == 0 && d->Erec > 0. )
-        {
-            eRec = log10( d->Erec );
-            eRecLin = d->Erec;
-        }
-        else if( iMethod == 1 && d->ErecS > 0. )
-        {
-            eRec = log10( d->ErecS );
-            eRecLin = d->ErecS;
-        }
-        else if( fIgnoreEnergyReconstruction )
+        if( fIgnoreEnergyReconstruction )
         {
             eRec = log10( d->MCe0 );
             eRecLin = d->MCe0;
         }
         else
         {
-            continue;
+            eRecLin = d->get_Erec( iMethod );
+            if( eRecLin > 0. )
+            {
+                eRec = log10( eRecLin );
+            }
+            else
+            {
+                continue;
+            }
         }
 
         ///////////////////////////////////////////
