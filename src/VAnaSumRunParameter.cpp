@@ -1403,11 +1403,6 @@ double VAnaSumRunParameter::readSourceRadius( string ifile )
     {
         return -1;
     };
-
-    if( iC.getTheta2Cut_max() < 0. && iC.getDirectionCutSelector() == 2 )
-    {
-        return iC.getAngularResolutionAbsoluteMaximum();
-    }
     return iC.getTheta2Cut_max();
 }
 
@@ -1438,14 +1433,7 @@ bool VAnaSumRunParameter::readCutParameter( string ifile, double& iSourceRadius,
         cout << "exiting..." << endl;
         exit( EXIT_FAILURE );
     }
-    if( iC->getTheta2Cut_max() < 0. && iC->getDirectionCutSelector() == 2 )
-    {
-        iSourceRadius = iC->getAngularResolutionAbsoluteMaximum();
-    }
-    else
-    {
-        iSourceRadius = iC->getTheta2Cut_max();
-    }
+    iSourceRadius = iC->getTheta2Cut_max();
     iMaximumDistance = iC->fCut_CameraFiducialSize_max;
 
     if( iF )

@@ -32,7 +32,6 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
 
     fCutFileName = "";
     fGammaHadronCutSelector = -1;
-    fDirectionCutSelector = -1;
 
     fAzimuthBins = true;
     fIsotropicArrivalDirections = false;
@@ -633,7 +632,6 @@ void VInstrumentResponseFunctionRunParameter::print()
     if( fGammaHadronCutSelector >= 0 )
     {
         cout << "Gamma/Hadron " << fGammaHadronCutSelector;
-        cout << " Direction " << fDirectionCutSelector;
     }
     else
     {

@@ -513,9 +513,9 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 
             // fill on/offstereo maps and direction cut
             i_theta2 = -99;
-            bDirectionCuts = fMap->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max( iErec ),
+            bDirectionCuts = fMap->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max(),
                                          fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma, i_theta2 );
-            bDirectionCuts = fMapUC->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max( iErec ),
+            bDirectionCuts = fMapUC->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max(),
                                            fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma, i_theta2 );
 
             // energy reconstruction cut
@@ -602,7 +602,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
                                     fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->FindBin( iDirectionOffset ) );
                 double iSoli = 2. * TMath::Pi() * ( 1. - cos( i_ymax* TMath::Pi() / 180. ) );
                 iSoli       -= 2. * TMath::Pi() * ( 1. - cos( i_ymin* TMath::Pi() / 180. ) );
-                iWeight = fCuts->getTheta2Cut_max( iErec );
+                iWeight = fCuts->getTheta2Cut_max();
                 if( iWeight > 0. )
                 {
                     iWeight = 2. * TMath::Pi() * ( 1. - cos( sqrt( iWeight )  * TMath::Pi() / 180. ) );

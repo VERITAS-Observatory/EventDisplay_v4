@@ -196,7 +196,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         }
         bool   initializeWeightFiles( string iWeightFileName, unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
                                       unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax );
-        bool   initializeDataStrutures( CData* iC );
+        bool   initializeDataStructures( CData* iC );
         bool   IsZombie()
         {
             return fIsZombie;

@@ -41,7 +41,6 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
         string          fInstrumentEpochATM;
         vector< unsigned int > fTelToAnalyse;             // telescopes used in analysis (optional, not always filled)
         int             fGammaHadronCutSelector;
-        int             fDirectionCutSelector;
 
         unsigned int    fEnergyReconstructionMethod;
         unsigned int    fEnergyAxisBins_log10;

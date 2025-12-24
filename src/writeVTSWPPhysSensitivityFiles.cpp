@@ -155,8 +155,8 @@ bool fillBackgroundRateHistograms( TH1F* hBckRate, TH1F* hBckRateDeq, double wof
                 cout << "found gamma/hadron cuts in effective area file" << endl;
                 for( int b = 1; b <= hBckRateDeq->GetNbinsX(); b++ )
                 {
-                    double i_t2_max = i_GammaHadronCuts->getTheta2Cut_max( TMath::Power( 10., hBckRateDeq->GetBinCenter( b ) ) );
-                    double i_t2_min = i_GammaHadronCuts->getTheta2Cut_min( TMath::Power( 10., hBckRateDeq->GetBinCenter( b ) ) );
+                    double i_t2_max = i_GammaHadronCuts->getTheta2Cut_max();
+                    double i_t2_min = i_GammaHadronCuts->getTheta2Cut_min();
                     double i_omega =  2. * TMath::Pi() * ( 1. - cos( sqrt( i_t2_max ) * TMath::Pi() / 180. ) );
                     if( i_t2_min > 0. )
                     {

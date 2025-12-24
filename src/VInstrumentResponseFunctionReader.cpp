@@ -773,7 +773,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
                         for( int p = 0; p < gEffArea_Rec->GetN(); p++ )
                         {
                             gEffArea_Rec->GetPoint( p, i_x, i_y );
-                            i_ffactor_95p = i_cuts->getTheta2Cut_max( TMath::Power( 10., i_x ) );
+                            i_ffactor_95p = i_cuts->getTheta2Cut_max();
                             if( i_ffactor_95p > 0. )
                             {
                                 i_ffactor_95p = sqrt( i_ffactor_95p );
