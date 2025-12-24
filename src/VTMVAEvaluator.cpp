@@ -52,7 +52,7 @@ void VTMVAEvaluator::reset()
     fTMVA_EvaluationResult = -99.;
     fTMVACutValueNoVec = -99.;
 
-    setSmoothAndInterPolateMVAValues();
+    setSmoothAndInterpolateMVAValues();
 }
 
 /*

@@ -237,7 +237,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         }
         void   setSignalEfficiency( double iSignalEfficiency = -99. );
         void   setSignalEfficiency( map< unsigned int, double > iMSignalEfficiency );
-        void   setSmoothAndInterPolateMVAValues( bool iS = true )
+        void   setSmoothAndInterpolateMVAValues( bool iS = true )
         {
             fSmoothAndInterpolateMVAValues = iS;
         }

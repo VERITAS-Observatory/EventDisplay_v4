@@ -1,7 +1,6 @@
 /*! \class VGammaHadronCuts
   \brief class containing parameter cut definitions
 
-
   List of cut selectors:
 
   gamma/hadron cut selector values consist of two digits: ID1+ID2*10
@@ -27,19 +26,6 @@
     cut selector = 0 : apply MSCW/MSCL cuts (default)
     cut selector = 22 : apply event probability cuts
     cut selector = 10 : apply cuts from a tree AND apply MSCW/MSCL cuts
-
-  direction cut selector value consist of one digit:
-
-     0: energy independent direction cut (theta2 cut; set fArrayTheta2_max and fArrayTheta2_min)
-        (in cut file: *theta2cut <theta2cut_min> <theta2cut_max>
-     1: energy dependent TF1 function
-        (in cut file: *theta2file ...)
-     2: graph from instrument response function calculation
-        (in cut file: *theta2file ... IRF)
-     3: TMVA: use gamma/hadron part evaluation (no direction cuts applied in VGammaHadronCuts)
-     4: TMVA: get direction cut from TMVA evaluator for each event
-     5: TMVA: get direction cut from theta2 graph obtained during initialization of TMVA evaluator
-
 
 */
 
@@ -83,13 +69,6 @@ VGammaHadronCuts::VGammaHadronCuts()
     fTMVAWeightFile = "";
     fTMVASignalEfficiency.clear();
     fTMVA_MVACut.clear();
-    fTMVAOptimizeSignalEfficiencyParticleNumberFile = "";
-    fTMVAParticleNumberFile_Conversion_Rate_to_seconds = 60.;
-    fTMVAOptimizeSignalEfficiencySignificance_Min = 5.;
-    fTMVAOptimizeSignalEfficiencySignalEvents_Min = 10.;
-    fTMVAOptimizeSignalEfficiencyObservationTime_h = 50.;
-    fTMVAFixedSignalEfficiencyMax = 1.;
-    fTMVAFixedThetaCutMin = 0.;
     fTMVA_EvaluationResult = -99.;
     fTMVAEvaluatorResults = 0;
 
@@ -568,60 +547,6 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                     }
                 }
             }
-            else if( iCutVariable == "TMVACUTS" )
-            {
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> fTMVAOptimizeSignalEfficiencySignificance_Min;
-                }
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> fTMVAOptimizeSignalEfficiencySignalEvents_Min;
-                }
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> temp;
-                    // observing time is given as "50h", or "5m", "5s"
-                    if( temp.find( "h" ) != temp.npos )
-                    {
-                        fTMVAOptimizeSignalEfficiencyObservationTime_h = atof( temp.substr( 0, temp.find( "h" ) ).c_str() );
-                    }
-                    else if( temp.find( "m" ) != temp.npos )
-                    {
-                        fTMVAOptimizeSignalEfficiencyObservationTime_h = atof( temp.substr( 0, temp.find( "m" ) ).c_str() );
-                        fTMVAOptimizeSignalEfficiencyObservationTime_h /= 60.;
-                    }
-                    else if( temp.find( "s" ) != temp.npos )
-                    {
-                        fTMVAOptimizeSignalEfficiencyObservationTime_h = atof( temp.substr( 0, temp.find( "s" ) ).c_str() );
-                        fTMVAOptimizeSignalEfficiencyObservationTime_h /= 3600.;
-                    }
-                    else
-                    {
-                        fTMVAOptimizeSignalEfficiencyObservationTime_h = atof( temp.c_str() );
-                    }
-                }
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> fTMVAOptimizeSignalEfficiencyParticleNumberFile;
-                }
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> fTMVAFixedSignalEfficiencyMax;
-                }
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> fTMVAMinSourceStrength;
-                }
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> fTMVAFixedThetaCutMin;
-                }
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> fTMVAParticleNumberFile_Conversion_Rate_to_seconds;
-                }
-            }
             else if( iCutVariable == "TMVASignalEfficiency" )
             {
                 while(!( is_stream >> std::ws ).eof() )
@@ -775,24 +700,10 @@ void VGammaHadronCuts::printCutSummary()
         cout << "weight files: " << fTMVAWeightFile;
         cout << " (" << fTMVAWeightFileIndex_Emin << "," << fTMVAWeightFileIndex_Emax << ")";
         cout << " (" << fTMVAWeightFileIndex_Zmin << "," << fTMVAWeightFileIndex_Zmax << ")" << endl;
-        if( fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
+        if( fDebug )
         {
-            cout << "using optimal signal efficiency with a requirement of ";
-            cout << fTMVAOptimizeSignalEfficiencySignificance_Min << " sigma and at least ";
-            cout << fTMVAOptimizeSignalEfficiencySignalEvents_Min << " signal events in ";
-            cout << fTMVAOptimizeSignalEfficiencyObservationTime_h << " h observing time" << endl;
-            cout << "reading particle counts from " << fTMVAOptimizeSignalEfficiencyParticleNumberFile;
-            cout << " (unit of rate graphs: " << fTMVAParticleNumberFile_Conversion_Rate_to_seconds << ")" << endl;
-            cout << "   (max signal efficiency: " << fTMVAFixedSignalEfficiencyMax << ")" << endl;
-            cout << "   (min source strength: " << fTMVAMinSourceStrength << ")" << endl;
-        }
-        else
-        {
-            if( fDebug )
-            {
-                printSignalEfficiency();
-                printTMVA_MVACut();
-            }
+            printSignalEfficiency();
+            printTMVA_MVACut();
         }
     }
     // other cut parameters
@@ -1010,7 +921,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
     }
 
     /////////////////////////////////////////////////////////////////////////////////
-    // apply cuts on second max
+    // apply cuts on size second max
     if( fData->SizeSecondMax < fCut_SizeSecondMax_min || fData->SizeSecondMax > fCut_SizeSecondMax_max )
     {
         if( bCount && fStats )
@@ -1396,26 +1307,13 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile,
 
     fTMVAEvaluator->setDebug( fDebug );
     // smoothing of MVA values
-    fTMVAEvaluator->setSmoothAndInterPolateMVAValues( true );
-    // set parameters for optimal MVA cut value search
-    // (always assume an alpha value of 0.2)
-    if( fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
-    {
-        fTMVAEvaluator->setSensitivityOptimizationParameters( fTMVAOptimizeSignalEfficiencySignificance_Min,
-                fTMVAOptimizeSignalEfficiencySignalEvents_Min,
-                fTMVAOptimizeSignalEfficiencyObservationTime_h,
-                1. / 5. );
-        fTMVAEvaluator->setSensitivityOptimizationFixedSignalEfficiency( fTMVAFixedSignalEfficiencyMax );
-        fTMVAEvaluator->setParticleNumberFile(
-            fTMVAOptimizeSignalEfficiencyParticleNumberFile, fTMVAParticleNumberFile_Conversion_Rate_to_seconds );
-        fTMVAEvaluator->setSensitivityOptimizationMinSourceStrength( fTMVAMinSourceStrength );
-    }
-    // set a constant signal efficiency
-    else if( fTMVASignalEfficiency.size() > 0 )
+    fTMVAEvaluator->setSmoothAndInterpolateMVAValues( true );
+    // constant signal efficiency
+    if( fTMVASignalEfficiency.size() > 0 )
     {
         fTMVAEvaluator->setSignalEfficiency( fTMVASignalEfficiency );
     }
-    // set a fixed probability threshold or (for TMVA) a fixed MVA cut value
+    // fixed threshold or (for TMVA) a fixed MVA cut value
     else if( fTMVA_MVACut.size() > 0 )
     {
         fTMVAEvaluator->setTMVACutValue( fTMVA_MVACut );
@@ -1819,7 +1717,6 @@ double VGammaHadronCuts::getReconstructedXcore()
     {
         return -9999.;
     }
-
     return fData->Xcore;
 }
 
@@ -1829,6 +1726,5 @@ double VGammaHadronCuts::getReconstructedYcore()
     {
         return -9999.;
     }
-
     return fData->Ycore;
 }
