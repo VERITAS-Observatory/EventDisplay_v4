@@ -493,7 +493,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
         /////////////////////////////////////////////////////////
         // get optimal signal efficiency (from maximum signal/noise ratio)
         /////////////////////////////////////////////////////////
-        if( fParticleNumberFileName.size() > 0 )
+        if( readNonNoffGraphsFromFile.size() > 0 )
         {
             cout << endl;
             cout << "======================= optimize sensitivity =======================" << endl;
