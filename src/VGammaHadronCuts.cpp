@@ -84,8 +84,6 @@ VGammaHadronCuts::VGammaHadronCuts()
     fTMVAWeightFile = "";
     fTMVASignalEfficiency.clear();
     fTMVA_MVACut.clear();
-    // Note: for TMVA is this not the probability threshold but the MVA cut value
-    fTMVAProbabilityThreshold = -99.;
     fTMVAOptimizeSignalEfficiencyParticleNumberFile = "";
     fTMVAParticleNumberFile_Conversion_Rate_to_seconds = 60.;
     fTMVAOptimizeSignalEfficiencySignificance_Min = 5.;
@@ -515,19 +513,6 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                 {
                     fCut_SizeSecondMax_min = isize_min;
                     fCut_SizeSecondMax_max = isize_max;
-                }
-            }
-            // telescope type dependent cut on number of images
-            // syntax:  teltype_nnimages <min images> <tel type counter>
-            else if( iCutVariable == "teltypegroup" || iCutVariable == "teltype_nnimages" )
-            {
-                fNTelTypeCut.push_back( new VNTelTypeCut() );
-                is_stream >> temp;
-                fNTelTypeCut.back()->fNTelType_min = atoi( temp.c_str() );
-                while(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> temp;
-                    fNTelTypeCut.back()->fTelType_counter.push_back( atoi( temp.c_str() ) );
                 }
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -961,13 +946,6 @@ void VGammaHadronCuts::printCutSummary()
             }
         }
         cout << endl;
-    }
-    if( fNTelTypeCut.size() > 0 )
-    {
-        for( unsigned int j = 0; j < fNTelTypeCut.size(); j++ )
-        {
-            fNTelTypeCut[j]->print();
-        }
     }
     printEnergyDependentCuts();
     cout << "-----------------------------------------------------------------------------------------" << endl;
@@ -1566,8 +1544,8 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile,
     else
     {
         cout << "VGammaHadronCuts::initTMVAEvaluator error: unclear TMVA cut settings" << endl;
-        cout << "\t fTMVASignalEfficiency: " << fTMVASignalEfficiency.size() << endl;
-        cout << "\t fTMVAProbabilityThreshold: " << fTMVA_MVACut.size() << endl;
+        cout << "\t TMVASignalEfficiency: " << fTMVASignalEfficiency.size() << endl;
+        cout << "\t TMVAProbabilityThreshold: " << fTMVA_MVACut.size() << endl;
         cout << "exiting... " << endl;
         exit( EXIT_FAILURE );
     }
@@ -1608,7 +1586,6 @@ bool VGammaHadronCuts::setDataTree( CData* idata )
 
     return true;
 }
-
 
 bool VGammaHadronCuts::initPhaseCuts( int irun )
 {

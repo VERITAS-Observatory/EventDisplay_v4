@@ -123,7 +123,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
         unsigned int    fTMVAWeightFileIndex_Zmax;
         map< unsigned int, double > fTMVASignalEfficiency;
         map< unsigned int, double > fTMVA_MVACut;
-        double          fTMVAProbabilityThreshold;
         string          fTMVAOptimizeSignalEfficiencyParticleNumberFile;
         double          fTMVAParticleNumberFile_Conversion_Rate_to_seconds;
         double          fTMVAOptimizeSignalEfficiencySignificance_Min;
@@ -227,8 +226,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double fCut_DispIntersectDiff_min;
         double fCut_DispIntersectDiff_max;
         int    fCut_DispIntersectSuccess;
-
-        vector< VNTelTypeCut* > fNTelTypeCut;
 
         bool   fUseOrbitalPhaseCuts;
         double fOrbitalPhase_min;
