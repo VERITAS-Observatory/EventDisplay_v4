@@ -35,24 +35,6 @@ using namespace std;
 enum E_AnalysisType { GEO = 0, MVAAnalysis = 1 };
 
 ////////////////////////////////////////////////////////////////////////////////
-// class for telescope type dependent multiplicity  cut
-////////////////////////////////////////////////////////////////////////////////
-class VNTelTypeCut : public TNamed
-{
-    public:
-
-        vector< unsigned int > fTelType_counter;
-        unsigned int           fNTelType_min;
-
-        VNTelTypeCut();
-        ~VNTelTypeCut() {}
-        void print();
-        bool test( CData* );
-
-        ClassDef( VNTelTypeCut, 2 );
-};
-
-////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 /*
    dummy class (for compatibility reasons)
