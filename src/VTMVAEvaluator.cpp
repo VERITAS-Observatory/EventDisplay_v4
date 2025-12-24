@@ -2136,8 +2136,10 @@ TGraph* VTMVAEvaluator::fillfromGraph2D( TObject* i_G, double i_ze_min, double i
         TGraph2D* iG2D = ( TGraph2D* )i_G;
         TGraph* iG1D = new TGraph( iG2D->GetN() );
         Double_t* x = iG2D->GetX();
-        // TEMP: weight by cos?
-        double ze_mean = 0.5 * ( i_ze_min + i_ze_max );
+        double z1 = i_ze_min * TMath::DegToRad();
+        double z2 = i_ze_max * TMath::DegToRad();
+        double avg_airmass = 0.5 * ( (1.0 / TMath::Cos(z1)) + (1.0 / TMath::Cos(z2)) );
+        double ze_mean = TMath::ACos(1.0 / avg_airmass) * TMath::RadToDeg();
 
         for( int i = 0; i < iG2D->GetN(); i++ )
         {
@@ -2180,7 +2182,11 @@ void VTMVAEvaluator::calculate_average_zenith_angle()
     {
         fAverageZenithPerRun = 90. - i_ze / i_n;
     }
-    cout << "VTMVAEvaluator: average zenith " << fAverageZenithPerRun << endl;
+    else
+    {
+        fAverageZenithPerRun = -1.;
+    }
+    cout << "VTMVAEvaluator: average zenith estimate " << fAverageZenithPerRun << " deg" << endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
