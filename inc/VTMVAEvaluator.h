@@ -117,8 +117,8 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         double                  fOptimizationBackgroundAlpha;
         double                  fOptimizationObservingTime_h;
 
-        double   fTMVA_EvaluationResult;         // result from TVMA evaluator
-        bool     fSmoothAndInterpolateMVAValues;
+        double   fTMVA_EvaluationResult;         // result from TMVA evaluator
+        bool     fsmoothAndInterpolateMVAValues;
         double   fAverageZenithPerRun;           // (rough) average zenith angle of run
 
         string   fTMVAMethodName;
@@ -169,10 +169,10 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         double           interpolate_mva_evaluation();
         TGraph*          readNonNoffGraphsFromFile( TFile* iF, double i_ze_min, double i_ze_max, bool bIsOn = true );
         void             reset();
-        void             smoothAndInterPolateMVAValue( TH1F*, TH1F*,
+        void             smoothAndInterpolateMVAValue( TH1F*, TH1F*,
                 unsigned int iE_min, unsigned int iE_max, unsigned int iZ_min, unsigned int iZ_max );
-        void             smoothAndInterPolateMVAValue_EnergyOnly( TH1F*, TH1F* );
-        void             smoothAndInterPolateMVAValue_Energy_and_Zenith( TH1F*, TH1F*,
+        void             smoothAndInterpolateMVAValue_EnergyOnly( TH1F*, TH1F* );
+        void             smoothAndInterpolateMVAValue_Energy_and_Zenith( TH1F*, TH1F*,
                 unsigned int iE_min, unsigned int iE_max, unsigned int iZ_min, unsigned int iZ_max );
 
     public:
@@ -237,9 +237,9 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         }
         void   setSignalEfficiency( double iSignalEfficiency = -99. );
         void   setSignalEfficiency( map< unsigned int, double > iMSignalEfficiency );
-        void   setSmoothAndInterpolateMVAValues( bool iS = true )
+        void   setsmoothAndInterpolateMVAValues( bool iS = true )
         {
-            fSmoothAndInterpolateMVAValues = iS;
+            fsmoothAndInterpolateMVAValues = iS;
         }
         void   setSpectralIndexForEnergyWeighting( double iS = -2. )
         {

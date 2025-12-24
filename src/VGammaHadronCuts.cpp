@@ -1307,7 +1307,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile,
 
     fTMVAEvaluator->setDebug( fDebug );
     // smoothing of MVA values
-    fTMVAEvaluator->setSmoothAndInterpolateMVAValues( true );
+    fTMVAEvaluator->setsmoothAndInterpolateMVAValues( true );
     // constant signal efficiency
     if( fTMVASignalEfficiency.size() > 0 )
     {

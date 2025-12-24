@@ -52,7 +52,7 @@ void VTMVAEvaluator::reset()
     fTMVA_EvaluationResult = -99.;
     fTMVACutValueNoVec = -99.;
 
-    setSmoothAndInterpolateMVAValues();
+    setsmoothAndInterpolateMVAValues();
 }
 
 /*
@@ -84,7 +84,6 @@ vector< string > VTMVAEvaluator::getTrainingVariables( string iXMLFile, vector< 
 
     while( getline( is, is_line ) )
     {
-
         // number of variables
         if( is_line.find( "NVar=\"" ) != string::npos )
         {
@@ -368,7 +367,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
     //////////////////////////////////////////////////////////////////////////////////////
     // create and initialize TMVA readers
     // loop over all  energy bins: open one weight (XML) file per energy bin
-    //looping over spectral energy and zenith angle bins
+    // looping over spectral energy and zenith angle bins
     for( unsigned int b = 0; b < fTMVAData.size(); b++ )
     {
         fTMVAData[b]->fTMVAReader = new TMVA::Reader();
@@ -510,9 +509,9 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
     }
 
     // smooth and interpolate
-    if( fParticleNumberFileName.size() > 0 && fSmoothAndInterpolateMVAValues )
+    if( fParticleNumberFileName.size() > 0 && fsmoothAndInterpolateMVAValues )
     {
-        smoothAndInterPolateMVAValue( 0, 0,
+        smoothAndInterpolateMVAValue( 0, 0,
                                       iWeightFileIndex_Emin, iWeightFileIndex_Emax,
                                       iWeightFileIndex_Zmin, iWeightFileIndex_Zmax );
     }
@@ -1295,7 +1294,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 
     //////////////////////////////////////////////////////
     // loop over different source strengths (in Crab Units)
-    // (hardwired: start at 0.001 CU to 30 CU)
+    // (up to 30 CU)
     unsigned int iSourceStrengthStepSizeN =
         ( unsigned int )(( log10( 30. ) - log10( fOptimizationMinSourceStrength ) ) / 0.005 );
     cout << "VTVMAEvaluator::optimizeSensitivity(), source strength steps: " << iSourceStrengthStepSizeN << endl;
@@ -1582,7 +1581,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
  (energy axis only)
 
 */
-void VTMVAEvaluator::smoothAndInterPolateMVAValue_EnergyOnly(
+void VTMVAEvaluator::smoothAndInterpolateMVAValue_EnergyOnly(
     TH1F* effS, TH1F* effB )
 {
     int z = 0;
@@ -1659,7 +1658,7 @@ void VTMVAEvaluator::smoothAndInterPolateMVAValue_EnergyOnly(
  (energy and zenith angle dependent)
 
 */
-void VTMVAEvaluator::smoothAndInterPolateMVAValue_Energy_and_Zenith(
+void VTMVAEvaluator::smoothAndInterpolateMVAValue_Energy_and_Zenith(
     TH1F* effS, TH1F* effB,
     unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
     unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax )
@@ -1770,7 +1769,7 @@ void VTMVAEvaluator::smoothAndInterPolateMVAValue_Energy_and_Zenith(
  note: signal and background efficiencies are not updated
 
 */
-void VTMVAEvaluator::smoothAndInterPolateMVAValue(
+void VTMVAEvaluator::smoothAndInterpolateMVAValue(
     TH1F* effS, TH1F* effB,
     unsigned int iWeightFileIndex_Emin, unsigned int iWeightFileIndex_Emax,
     unsigned int iWeightFileIndex_Zmin, unsigned int iWeightFileIndex_Zmax )
@@ -1786,12 +1785,12 @@ void VTMVAEvaluator::smoothAndInterPolateMVAValue(
     // energy dependent TMVA cut optimization only
     if( iWeightFileIndex_Zmax == iWeightFileIndex_Zmin )
     {
-        smoothAndInterPolateMVAValue_EnergyOnly( effS, effB );
+        smoothAndInterpolateMVAValue_EnergyOnly( effS, effB );
     }
     // energy and zenith angle dependent
     else
     {
-        smoothAndInterPolateMVAValue_Energy_and_Zenith(
+        smoothAndInterpolateMVAValue_Energy_and_Zenith(
             effS, effB,
             iWeightFileIndex_Emin, iWeightFileIndex_Emax,
             iWeightFileIndex_Zmin, iWeightFileIndex_Zmax );
