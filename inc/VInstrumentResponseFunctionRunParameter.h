@@ -41,7 +41,6 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
         string          fInstrumentEpochATM;
         vector< unsigned int > fTelToAnalyse;             // telescopes used in analysis (optional, not always filled)
         int             fGammaHadronCutSelector;
-        int             fDirectionCutSelector;
 
         unsigned int    fEnergyReconstructionMethod;
         unsigned int    fEnergyAxisBins_log10;
@@ -72,12 +71,9 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
         bool            fIsotropicArrivalDirections;
         float           fIgnoreFractionOfEvents;
 
-        bool            fTelescopeTypeCuts;
-
         string          fdatafile;
         string          fMCdatafile_tree;
         string          fMCdatafile_histo;
-        string          fGammaHadronProbabilityFile;
         string          fXGB_file_suffix;
 
         double          fze;

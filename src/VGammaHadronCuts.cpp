@@ -55,7 +55,6 @@ VGammaHadronCuts::VGammaHadronCuts()
 
     fAnalysisType = GEO;
     fGammaHadronCutSelector = 0;
-    fDirectionCutSelector = 0;
     bMCCuts = false;
 
     fData = 0;
@@ -68,17 +67,6 @@ VGammaHadronCuts::VGammaHadronCuts()
     fMeanImageWidth = 0.;
     fMeanImageLength = 0.;
     fMeanImageDistance = 0.;
-
-    // probabilities cuts
-    fProbabilityCut_File = 0;
-    fProbabilityCut_Tree = 0;
-    fProbabilityCut_QualityFlag = 0;
-    fProbabilityCut_NSelectors = VANACUTS_PROBSELECTIONCUTS_MAX;
-    fProbabilityCut_ProbID = 0;
-    for( unsigned int i = 0; i < fProbabilityCut_NSelectors; i++ )
-    {
-        fProbabilityCut_SelectionCut[i] = -1.;
-    }
 
     // phase cuts
     fOrbitalPhase_min = -1.;
@@ -95,8 +83,6 @@ VGammaHadronCuts::VGammaHadronCuts()
     fTMVAWeightFile = "";
     fTMVASignalEfficiency.clear();
     fTMVA_MVACut.clear();
-    // Note: for TMVA is this not the probability threshold but the MVA cut value
-    fTMVAProbabilityThreshold = -99.;
     fTMVAOptimizeSignalEfficiencyParticleNumberFile = "";
     fTMVAParticleNumberFile_Conversion_Rate_to_seconds = 60.;
     fTMVAOptimizeSignalEfficiencySignificance_Min = 5.;
@@ -107,22 +93,11 @@ VGammaHadronCuts::VGammaHadronCuts()
     fTMVA_EvaluationResult = -99.;
     fTMVAEvaluatorResults = 0;
 
-    // energy dependent theta2 cut
-    fFileNameAngRes = "";
-    fFileAngRes = 0;
-    fF1AngResName = "";
-    fF1AngRes = 0;
-    fAngRes_ScalingFactor = 1.;
-    fAngRes_AbsoluteMinimum = 0.;
-    fAngRes_AbsoluteMaximum = 1.e10;
-    fAngResContainmentProbability = 0;
-
     setArrayCentre();
 }
 
 void VGammaHadronCuts::initialize()
 {
-    // statistics
     fStats = new VGammaHadronCutsStatistics();
     fStats->initialize();
 }
@@ -194,8 +169,6 @@ void VGammaHadronCuts::resetCutValues()
     fCut_DispIntersectDiff_max = 1.e10;
     fCut_DispIntersectSuccess = 1;
 
-    fProbabilityCut = 0.5;
-
     fOrbitalPhase_min = -1.;
     fOrbitalPhase_max = 1.e10;
 
@@ -253,16 +226,12 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
             }
             is_stream >> iCutVariable;
             //////////////////////////////////////
-            // choose gamma/hadron cut selectors and direction cut selector
+            // gamma/hadron cut selectors
             if( iCutVariable == "cutselection" )
             {
                 if(!( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> fGammaHadronCutSelector;
-                }
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> fDirectionCutSelector;
                 }
             }
             /////////////////////////////////////
@@ -444,21 +413,6 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                     }
                 }
             }
-            // probability cut variables (e.g. random forest)
-            else if( iCutVariable == "RFthresh" || iCutVariable == "Probthresh" )
-            {
-                is_stream >> temp;
-                fProbabilityCut = ( atof( temp.c_str() ) );
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> temp;
-                    fProbabilityCut_ProbID = atoi( temp.c_str() );
-                }
-                else
-                {
-                    fProbabilityCut_ProbID = 0;
-                }
-            }
             // phase cuts
             else if( iCutVariable == "orbitalPhase" )
             {
@@ -474,34 +428,6 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                 }
                 fUseOrbitalPhaseCuts = true;
             }
-
-            // to define the lower bounds in probability cut ranges  (e.g. random forest)
-            else if( iCutVariable == "RFCutLowerVals" )
-            {
-                while(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> temp;
-                    fProbabilityCutRangeLower.push_back( atof( temp.c_str() ) );
-                }
-            }
-
-            // to define the upper bounds in probability cut ranges  (e.g. random forest)
-            else if( iCutVariable == "RFCutUpperVals" )
-            {
-                while(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> temp;
-                    fProbabilityCutRangeUpper.push_back( atof( temp.c_str() ) );
-                }
-            }
-
-            // to define the upper bounds in probability cut ranges  (e.g. random forest)
-            else if( iCutVariable == "RFProbID" )
-            {
-                is_stream >> temp;
-                fProbabilityCut_ProbID = atoi( temp.c_str() );
-            }
-
 
             // energy reconstruction cuts
             else if( iCutVariable == "arrayechi2" )
@@ -572,19 +498,6 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                 {
                     fCut_SizeSecondMax_min = isize_min;
                     fCut_SizeSecondMax_max = isize_max;
-                }
-            }
-            // telescope type dependent cut on number of images
-            // syntax:  teltype_nnimages <min images> <tel type counter>
-            else if( iCutVariable == "teltypegroup" || iCutVariable == "teltype_nnimages" )
-            {
-                fNTelTypeCut.push_back( new VNTelTypeCut() );
-                is_stream >> temp;
-                fNTelTypeCut.back()->fNTelType_min = atoi( temp.c_str() );
-                while(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> temp;
-                    fNTelTypeCut.back()->fTelType_counter.push_back( atoi( temp.c_str() ) );
                 }
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -757,64 +670,6 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                 is_stream >> temp;
                 fCut_Theta2_max = ( atof( temp.c_str() ) );
             }
-            // read in values for energy dependent theta2 cut
-            // * theta2file <root file> <function name>
-            // (note that fF1AngResName == "IRF" means that the graph from the IRF file is extrapolated)
-            else if( iCutVariable == "theta2file" )
-            {
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    string iFileNameAngRes;
-                    is_stream >> iFileNameAngRes;
-                    if( fFileNameAngRes.find( "$" ) != string::npos )
-                    {
-                        fFileNameAngRes = gSystem->ExpandPathName( iFileNameAngRes.c_str() );
-                    }
-                    else
-                    {
-                        fFileNameAngRes = iFileNameAngRes;
-                    }
-                }
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> fF1AngResName;
-                }
-                else
-                {
-                    fF1AngResName = "fitAngRes";
-                }
-            }
-
-            // use angular resolution calculated for example from same data with makeEffectiveArea
-            else if( iCutVariable == "angres" )
-            {
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> fAngResContainmentProbability;    // should be an integer; probability x 100
-                }
-            }
-            // theta2 scaling
-            // * theta2scaling <scale factor> <minimum theta> <maximum theta>
-            else if( iCutVariable == "theta2scaling" )
-            {
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> temp;
-                    fAngRes_ScalingFactor = atof( temp.c_str() );
-                }
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> temp;
-                    fAngRes_AbsoluteMinimum = atof( temp.c_str() );
-                }
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> temp;
-                    fAngRes_AbsoluteMaximum = atof( temp.c_str() );
-                    fCut_Theta2_max = fAngRes_AbsoluteMaximum * fAngRes_AbsoluteMaximum;
-                }
-            }
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
         }
     }
     cout << "========================================" << endl;
@@ -823,74 +678,30 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
         fAnalysisType = MVAAnalysis;
     }
 
-    // initialize theta2 cut (energy dependent)
-    if( fFileNameAngRes.size() > 0 )
-    {
-        if(!initAngularResolutionFile() )
-        {
-            cout << "VGammaHadronCuts::readCuts error: error initializing angular resolution file" << endl;
-            cout << "exiting..." << endl;
-            exit( EXIT_FAILURE );
-        }
-    }
     return true;
 }
 
 void VGammaHadronCuts::printDirectionCuts()
 {
-    cout << "Direction cuts (cut selector " << fDirectionCutSelector << ")" << endl;
+    cout << "Theta2 cut: ";
+    if( fCut_Theta2_min > 0. )
+    {
+        cout << fCut_Theta2_min << " < Theta^2 [deg^2]";
+        if( fCut_Theta2_max > 0. )
+        {
+            cout << "< " << fCut_Theta2_max;
+        }
+    }
+    else if( fCut_Theta2_max > 0. )
+    {
+        cout << "Theta^2 [deg^2] < " << fCut_Theta2_max;
+    }
+    else
+    {
+        cout << "no Theta^2 cut set";
+    }
+    cout << endl;
 
-    // theta2 cut (no energy dependence)
-    if( fDirectionCutSelector == 0 )
-    {
-        cout << "Theta2 cut: ";
-        if( fCut_Theta2_min > 0. )
-        {
-            cout << fCut_Theta2_min << " < Theta^2 [deg^2]";
-            if( fCut_Theta2_max > 0. )
-            {
-                cout << "< " << fCut_Theta2_max;
-            }
-        }
-        else if( fCut_Theta2_max > 0. )
-        {
-            cout << "Theta^2 [deg^2] < " << fCut_Theta2_max;
-        }
-        else
-        {
-            cout << "no Theta^2 cut set";
-        }
-        cout << endl;
-    }
-    // theta cut from TF1 function (energy dependent)
-    else if( fFileAngRes && fF1AngRes )
-    {
-        cout << "Direction cut from angular resolution function in file: ";
-        cout << fFileAngRes->GetName();
-        cout << "(" << fF1AngRes->GetName() << ")";
-    }
-    // theta cut from IRF graph (energy depedendent)
-    else if( getTheta2Cut_IRF_Max() || fDirectionCutSelector == 2 )
-    {
-        cout << "Direction cut from IRF graph " << endl;
-        if( getTheta2Cut_IRF_Max() )
-        {
-            cout << "Number of points: " << getTheta2Cut_IRF_Max()->GetN() << endl;
-            getTheta2Cut_IRF_Max()->Print();
-        }
-        else if( getAngularResolutionContainmentRadius() > 0. )
-        {
-            cout << " (calculated from same file, containment probability " << (( double )getAngularResolutionContainmentRadius() ) / 100. << ")" << endl;
-        }
-        else
-        {
-            cout << endl;
-            cout << "VGammaHadronCuts::printDirectionCuts WARNING: no function found" << endl;
-        }
-    }
-    cout << "Direction cut scale factor " << fAngRes_ScalingFactor;
-    cout << ", minimum : " << fAngRes_AbsoluteMinimum << " [deg] ";
-    cout << ", maximum : " << fAngRes_AbsoluteMaximum << " [deg]" << endl;
     if( fCut_DispIntersectDiff_max < 1.e9 )
     {
         cout << "Direction cut on difference between disp and intersection method: ";
@@ -949,20 +760,6 @@ void VGammaHadronCuts::printCutSummary()
     }
     cout << "Average core distance < " << fCut_AverageCoreDistanceToTelescopes_max << " m";
     cout << " (max distance to telescopes (mintel) " << fCut_MinimumCoreDistanceToTelescopes_max << " m)";
-    // probability cuts
-    if( fGammaHadronCutSelector / 10 >= 1 && fGammaHadronCutSelector / 10 <= 3 )
-    {
-        cout << endl;
-        cout << "event probability threshold: " << fProbabilityCut << " (element " << fProbabilityCut_ProbID << ")";
-        if( fGammaHadronCutSelector / 10 == 3 )
-        {
-            cout << " (applied as quality cut)";
-        }
-        if( fProbabilityCut_File )
-        {
-            cout << ", read from " << fProbabilityCut_File->GetName();
-        }
-    }
     // phase cuts
     if( useOrbitalPhaseCuts() )
     {
@@ -1033,14 +830,6 @@ void VGammaHadronCuts::printCutSummary()
         }
         cout << endl;
     }
-    if( fNTelTypeCut.size() > 0 )
-    {
-        for( unsigned int j = 0; j < fNTelTypeCut.size(); j++ )
-        {
-            fNTelTypeCut[j]->print();
-        }
-    }
-    printEnergyDependentCuts();
     cout << "-----------------------------------------------------------------------------------------" << endl;
 }
 
@@ -1233,20 +1022,6 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
     }
 
     /////////////////////////////////////////////////////////////////////////
-    // apply cut selector from probability tree
-    if( fGammaHadronCutSelector / 10 == 3 )
-    {
-        if(!applyProbabilityCut( iEntry, fIsOn ) )
-        {
-            if( bCount && fStats )
-            {
-                fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
-            }
-            return false;
-        }
-    }
-
-    /////////////////////////////////////////////////////////////////////////
     // apply cut on difference between stereo intersection and disp method
     // (for stereo method only: this should always pass)
     float i_disp_diff = sqrt(
@@ -1320,11 +1095,8 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnerg
 }
 
 /*
-
   apply gamma/hadron separation cut
-
 */
-
 bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
 {
 
@@ -1348,23 +1120,6 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
         if( fGammaHadronCutSelector < 10 )
         {
             return true;
-        }
-    }
-    /////////////////////////////////////////////////////////////////////////////
-    // apply probability threshold cut (e.g. random forest cuts)
-    if( fGammaHadronCutSelector / 10 == 1 || fGammaHadronCutSelector / 10 == 2 )
-    {
-        if( fDebug )
-        {
-            cout << "VGammaHadronCuts::isGamma: applyProbabilityCut" << endl;
-        }
-        if(!applyProbabilityCut( i, fIsOn ) )
-        {
-            if( bCount && fStats )
-            {
-                fStats->updateCutCounter( VGammaHadronCutsStatistics::eIsGamma );
-            }
-            return false;
         }
     }
     /////////////////////////////////////////////////////////////////////////////
@@ -1414,50 +1169,6 @@ bool VGammaHadronCuts::applyTMVACut( int i )
     return false;
 }
 
-
-/*
-
-  use cut selector from a friend tree to the given data tree
-
-*/
-bool VGammaHadronCuts::applyProbabilityCut( int i, bool fIsOn )
-{
-    // tree exists and has the requested entry
-    if( fProbabilityCut_Tree && fProbabilityCut_Tree->GetEntry( i ) )
-    {
-        // check cut quality
-        if( fProbabilityCut_QualityFlag > 0 )
-        {
-            if( fProbabilityCutRangeLower.size() != fProbabilityCutRangeUpper.size() )
-            {
-                cout << "Error in definitions of RF probability ranges" << endl
-                     << "RFCutLowerVals and  RFCutLowerVals have different numbers of entries in cut file" << endl;
-                exit(-1 );
-            }
-            else
-            {
-                if( fProbabilityCut_ProbID < fProbabilityCut_NSelectors && fProbabilityCut_NSelectors < VANACUTS_PROBSELECTIONCUTS_MAX )
-                {
-                    for( unsigned int dex = 0; dex < fProbabilityCutRangeLower.size(); dex++ )
-                    {
-                        if( fIsOn && fProbabilityCut_SelectionCut[fProbabilityCut_ProbID] >= fProbabilityCutRangeLower[dex]
-                                && fProbabilityCut_SelectionCut[fProbabilityCut_ProbID] <  fProbabilityCutRangeUpper[dex] )
-                        {
-                            return true;
-                        }
-                        if(!fIsOn && fProbabilityCut_SelectionCut[fProbabilityCut_ProbID] >= -fProbabilityCutRangeLower[dex]
-                                && fProbabilityCut_SelectionCut[fProbabilityCut_ProbID] <  -fProbabilityCutRangeUpper[dex] )
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return false;
-}
 
 /*!
 
@@ -1637,26 +1348,8 @@ bool VGammaHadronCuts::applyStereoShapeCuts()
 */
 void VGammaHadronCuts::initializeCuts( int irun, string iFile )
 {
-    // probability cuts
-    if( fGammaHadronCutSelector / 10 >= 1 && fGammaHadronCutSelector / 10 <= 3 )
-    {
-        if( irun > 0 )
-        {
-            initProbabilityCuts( irun );
-        }
-        else if( iFile.size() > 0 )
-        {
-            initProbabilityCuts( iFile );
-        }
-        else
-        {
-            cout << "VGammaHadronCuts::initializeCuts: failed setting probability cuts for " << irun << " " << iFile << endl;
-            cout << "exiting..." << endl;
-            exit( EXIT_FAILURE );
-        }
-    }
     // TMVA cuts
-    else if( useTMVACuts() )
+    if( useTMVACuts() )
     {
         if(!initTMVAEvaluator( fTMVAWeightFile,
                                fTMVAWeightFileIndex_Emin, fTMVAWeightFileIndex_Emax,
@@ -1730,8 +1423,8 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile,
     else
     {
         cout << "VGammaHadronCuts::initTMVAEvaluator error: unclear TMVA cut settings" << endl;
-        cout << "\t fTMVASignalEfficiency: " << fTMVASignalEfficiency.size() << endl;
-        cout << "\t fTMVAProbabilityThreshold: " << fTMVA_MVACut.size() << endl;
+        cout << "\t TMVASignalEfficiency: " << fTMVASignalEfficiency.size() << endl;
+        cout << "\t TMVAProbabilityThreshold: " << fTMVA_MVACut.size() << endl;
         cout << "exiting... " << endl;
         exit( EXIT_FAILURE );
     }
@@ -1767,59 +1460,11 @@ bool VGammaHadronCuts::setDataTree( CData* idata )
 
     if( fTMVAEvaluator )
     {
-        fTMVAEvaluator->initializeDataStrutures( fData );
+        fTMVAEvaluator->initializeDataStructures( fData );
     }
 
     return true;
 }
-
-
-bool VGammaHadronCuts::initProbabilityCuts( int irun )
-{
-    ostringstream iFile;
-    iFile << fDataDirectory << "/" << irun << ".mscw.rf.root";
-
-    return initProbabilityCuts( iFile.str() );
-}
-
-
-bool VGammaHadronCuts::initProbabilityCuts( string iFile )
-{
-    TDirectory* cDir = gDirectory;
-
-    fProbabilityCut_File = new TFile( iFile.c_str() );
-    if( fProbabilityCut_File->IsZombie() )
-    {
-        cout << "Error while opening file with probability cuts: " << iFile << endl;
-        exit( 0 );
-    }
-    cout << "\t opening file with probability cuts: " << fProbabilityCut_File->GetName() << endl;
-
-    fProbabilityCut_Tree = ( TTree* )gDirectory->Get( "rf" );
-    if(!fProbabilityCut_Tree )
-    {
-        cout << "Error: could not find tree with probability cuts" << endl;
-        exit( 0 );
-    }
-    fProbabilityCut_Tree->SetBranchAddress( "cut", &fProbabilityCut_QualityFlag );
-    if( fProbabilityCut_Tree->GetBranchStatus( "Ng" ) )
-    {
-        fProbabilityCut_Tree->SetBranchAddress( "Ng", &fProbabilityCut_NSelectors );
-    }
-    else
-    {
-        fProbabilityCut_NSelectors = 2;
-    }
-    fProbabilityCut_Tree->SetBranchAddress( "g", fProbabilityCut_SelectionCut );
-
-    if( cDir )
-    {
-        cDir->cd();
-    }
-
-    return true;
-}
-
 
 bool VGammaHadronCuts::initPhaseCuts( int irun )
 {
@@ -1938,110 +1583,6 @@ bool VGammaHadronCuts::applyMCXYoffCut( double xoff, double yoff, bool bCount )
 }
 
 /*
-
-   check telescope type (e.g. remove all LSTs)
-
-   returns true if current event fails the fulfil the conditions
-
-*/
-bool VGammaHadronCuts::applyTelTypeTest( bool bCount )
-{
-    bool icut = false;
-
-    if( fNTelTypeCut.size() == 0 )
-    {
-        return true;
-    }
-
-    for( unsigned int i = 0; i < fNTelTypeCut.size(); i++ )
-    {
-        // test: true means this event has enough telescopes
-        icut = ( icut || fNTelTypeCut[i]->test( fData ) );
-    }
-
-    if( bCount && fStats && !icut )
-    {
-        fStats->updateCutCounter( VGammaHadronCutsStatistics::eTelType );
-    }
-
-    return icut;
-}
-
-
-/*!
-
-  NOTE: THIS IS NOT USED
-
-  check if core is inside a certain area relative to centre of array (ground, not shower coordinates)
-
-  fCut_CoreDistanceToArrayCentreY_min && fCut_CoreDistanceToArrayCentreY_max == 0: cut area is circle with radius fCut_CoreDistanceToArrayCentreX_max
-  otherwise: cut area is a rectangle
-
-  iMC = true:   use MC core
-  iMC = false:  use reconstructed core position
-*/
-bool VGammaHadronCuts::applyShowerCoreCuts( bool iMC )
-{
-    double xcore = getReconstructedXcore() - fArrayCentre_X;
-    double ycore = getReconstructedYcore( ) - fArrayCentre_Y;
-    // use MC core position
-    if( iMC )
-    {
-        xcore = fData->MCxcore - fArrayCentre_X;
-        ycore = fData->MCycore - fArrayCentre_Y;
-    }
-    ///////////////////////////////////////////////
-    // radius cuts (Y_min and Y_max is 0)
-    if( TMath::Abs( fCut_CoreDistanceToArrayCentreY_min ) < 1.e-5 && TMath::Abs( fCut_CoreDistanceToArrayCentreY_max ) < 1.e-5 )
-    {
-        if( sqrt( xcore * xcore + ycore * ycore ) < fCut_CoreDistanceToArrayCentreX_min )
-        {
-            return false;
-        }
-        if( sqrt( xcore * xcore + ycore * ycore ) > fCut_CoreDistanceToArrayCentreX_max )
-        {
-            return false;
-        }
-    }
-    else
-        ///////////////////////////////////////////////
-        // box cut
-    {
-        if( xcore < fCut_CoreDistanceToArrayCentreX_min - fCut_CoreDistanceEdgeSize )
-        {
-            return false;
-        }
-        if( xcore > fCut_CoreDistanceToArrayCentreX_max + fCut_CoreDistanceEdgeSize )
-        {
-            return false;
-        }
-        if( ycore < fCut_CoreDistanceToArrayCentreY_min - fCut_CoreDistanceEdgeSize )
-        {
-            return false;
-        }
-        if( ycore > fCut_CoreDistanceToArrayCentreY_max + fCut_CoreDistanceEdgeSize )
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-/* DISABLED DO NOT USE
-void VGammaHadronCuts::setShowerCoreCuts( double xmin, double xmax, double ymin, double ymax, double iEdge )
-{
-    fCut_CoreDistanceToArrayCentreX_min = xmin;
-    fCut_CoreDistanceToArrayCentreX_max = xmax;
-    fCut_CoreDistanceToArrayCentreY_min = ymin;
-    fCut_CoreDistanceToArrayCentreY_max = ymax;
-    if( iEdge >= 0. ) fCut_CoreDistanceEdgeSize = iEdge;
-    cout << "setting shower core cuts: " << fCut_CoreDistanceToArrayCentreX_min << "\t" << fCut_CoreDistanceToArrayCentreX_max;
-    cout << "\t" << fCut_CoreDistanceToArrayCentreY_min << "\t" << fCut_CoreDistanceToArrayCentreY_max << "\t" << fCut_CoreDistanceEdgeSize << endl;
-}
-*/
-
-/*
    apply cut on event direction (theta2 cut)
 
   * function is called for effective areas calculations only (MC)
@@ -2082,9 +1623,8 @@ bool VGammaHadronCuts::applyDirectionCuts( unsigned int fEnergyReconstructionMet
     // calculate theta2
     theta2 = ( getReconstructedXoff() - x0 ) * ( getReconstructedXoff() - x0 ) + ( getReconstructedYoff() - y0 ) * ( getReconstructedYoff() - y0 );
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-    // fetch theta2 cut (max) (might be energy dependent)
-    double i_theta2_cut_max = getTheta2Cut_max( getReconstructedEnergy( fEnergyReconstructionMethod ) );
+    // fetch theta2 cut (max)
+    double i_theta2_cut_max = getTheta2Cut_max();
 
     // direction cut (ring around center of camera)
     if( theta2 < i_theta2_cut_max && theta2 > fCut_Theta2_min )
@@ -2100,259 +1640,8 @@ bool VGammaHadronCuts::applyDirectionCuts( unsigned int fEnergyReconstructionMet
     return false;
 }
 
-double VGammaHadronCuts::getEnergyDependentCut( double energy_TeV, TGraph* iG, bool bUseEvalue, bool bMaxCut )
-{
-    double i_cut_value = 99999;
-    if(!bMaxCut )
-    {
-        i_cut_value = -1;
-    }
-    if(!iG )
-    {
-        return i_cut_value;
-    }
-    // use TGraph::Eval
-    if( bUseEvalue )
-    {
-        i_cut_value  = iG->Eval( energy_TeV );
-    }
-    // return value at this point without interpolation
-    else
-    {
-        for( int i = 0; i < iG->GetN() - 1; i++ )
-        {
-            if( energy_TeV >= iG->GetX()[i] && energy_TeV < iG->GetX()[i + 1 ] )
-            {
-                i_cut_value = iG->GetY()[i + 1 ];
-            }
-        }
-    }
-
-    // for e outside of graph range, return edge values
-    if( iG->GetN() > 0 && iG->GetX() && iG->GetY() )
-    {
-        if( energy_TeV < iG->GetX()[0] )
-        {
-            i_cut_value = iG->GetY()[0];
-        }
-        if( energy_TeV > iG->GetX()[iG->GetN() - 1] )
-        {
-            i_cut_value = iG->GetY()[iG->GetN() - 1];
-        }
-    }
-    return i_cut_value;
-}
-
-/*
-   fetch theta2 cut (might be energy dependent)
-
-   e      :   [TeV] energy (linear)
-*/
-double VGammaHadronCuts::getTheta2Cut_max( double e )
-{
-    double theta_cut_max = -1.;
-
-    //////////////////////////////////////////////
-    // energy independent theta2 cut
-    //////////////////////////////////////////////
-    if( fDirectionCutSelector == 0 )
-    {
-        theta_cut_max = TMath::Sqrt( fCut_Theta2_max );   // will be later squared
-    }
-    //////////////////////////////////////////////
-    // energy dependent theta2 cut
-    //////////////////////////////////////////////
-    if( e > 0. )
-    {
-        e = log10( e );
-
-        /////////////////////////////////////////////
-        // use a function to get the angular resolution
-        if( fDirectionCutSelector == 1 && fF1AngRes )
-        {
-            // energy outside of functions range:, return edge values
-            if( e < fF1AngRes->GetXmin() )
-            {
-                e = fF1AngRes->GetXmin();
-            }
-            else if( e > fF1AngRes->GetXmax() )
-            {
-                e = fF1AngRes->GetXmax();
-            }
-
-            // get angular resolution and apply scaling factor
-            theta_cut_max  = fF1AngRes->Eval( e );
-        }
-        /////////////////////////////////////////////
-        // use IRF graph for angular resolution
-        else if(( fDirectionCutSelector == 1 || fDirectionCutSelector == 2 ) && getTheta2Cut_IRF_Max() )
-        {
-            // get theta2 cut
-
-            theta_cut_max  = getEnergyDependentCut( e, getTheta2Cut_IRF_Max(), true );
-        }
-    }
-
-    // apply scale factors
-    theta_cut_max *= fAngRes_ScalingFactor;
-    if( theta_cut_max < fAngRes_AbsoluteMinimum )
-    {
-        return fAngRes_AbsoluteMinimum * fAngRes_AbsoluteMinimum;
-    }
-    if( theta_cut_max > fAngRes_AbsoluteMaximum )
-    {
-        return fAngRes_AbsoluteMaximum * fAngRes_AbsoluteMaximum;
-    }
-    return theta_cut_max * theta_cut_max;
-}
-
-/*
-
-   read angular resolution from root file
-
-*/
-
-bool VGammaHadronCuts::initAngularResolutionFile()
-{
-
-    // open angular resolution file
-    fFileAngRes = new TFile( fFileNameAngRes.c_str() );
-    if( fFileAngRes->IsZombie() )
-    {
-        // try it at the default location
-        string iTempFileL = VGlobalRunParameter::getDirectory_EVNDISPAnaData();
-        iTempFileL += "/GammaHadronCutFiles/" + fFileNameAngRes;
-        fFileAngRes = new TFile( iTempFileL.c_str() );
-        if( fFileAngRes->IsZombie() )
-        {
-            cout << "VGammaHadronCuts::initAngularResolutionFile: error open angular resolution file: " << fFileNameAngRes << endl;
-            cout << " (tried also " << iTempFileL << ")" << endl;
-            return false;
-        }
-    }
-
-    /////////////////////////
-    // get energy dependent theta values (probably angular resolution)
-
-    // read angular resolution as function (TF1) from a fit
-    if( fF1AngResName != "IRF" && fF1AngResName != "GRAPH" )
-    {
-        // get energy dependent theta values (probably angular resolution)
-        if( fFileAngRes->Get( fF1AngResName.c_str() ) )
-        {
-            fF1AngRes = ( TF1* )fFileAngRes->Get( fF1AngResName.c_str() )->Clone();
-            cout << "VGammaHadronCuts::initAngularResolutionFile: read angular resolution fit function from file " << fF1AngResName << " : " << endl;
-            fF1AngRes->Print();
-        }
-        else
-        {
-            cout << "VGammaHadronCuts::initAngularResolutionFile: error finding angular resolution function with name ";
-            cout << fF1AngResName << " in " << fFileAngRes->GetName() << endl;
-            return false;
-        }
-    }
-    // read angular resolution from instrument response function tree
-    else if( fF1AngResName == "IRF" )
-    {
-        char iTreeName[200];
-        if( getAngularResolutionContainmentRadius() - 68 != 0 )
-        {
-            sprintf( iTreeName, "t_angular_resolution_%03dp", getAngularResolutionContainmentRadius() );
-        }
-        else
-        {
-            sprintf( iTreeName, "t_angular_resolution" );
-        }
-
-        cout << "VGammaHadronCuts::initAngularResolutionFile: reading angular resolution graph from file (" << iTreeName << "):" << endl;
-        cout << fFileAngRes->GetName() << endl;
-        TTree* t = ( TTree* )fFileAngRes->Get( iTreeName );
-        if(!t )
-        {
-            cout << "VGammaHadronCuts::initAngularResolutionFile: error finding tree with instrument response function for angular resolution " << endl;
-            return false;
-        }
-        if( t->GetEntries() != 1 )
-        {
-            cout << "VGammaHadronCuts::initAngularResolutionFile error: invalid number of entries in instrument response function tree ";
-            cout << " (should be 1, is " << t->GetEntries() << " )" << endl;
-            cout << "   (as we do not know which tree entry to select...)" << endl;
-            return false;
-        }
-        // read the tree data and clone the angular resolution graph
-        VInstrumentResponseFunctionData* c = 0;
-        TBranch* br = t->GetBranch( "IRF" );
-        br->SetAddress(&c );
-        t->GetEntry( 0 );
-        if( c && c->fResolutionGraph.size() > VInstrumentResponseFunctionData::E_DIFF + 1
-                && c->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF] )
-        {
-            TGraph* iG = ( TGraph* )c->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF]->Clone();
-            if( iG )
-            {
-                iG->SetName( "IRFAngRes" );
-                fEnergyDependentCut[ "IRFAngRes" ] = iG;
-            }
-            else
-            {
-                cout << "VGammaHadronCuts::initAngularResolutionFile error: reading angular resolution graph from ";
-                cout << fF1AngResName << endl;
-                return false;
-            }
-        }
-    }
-    // read a single graph with angular resolution from file
-    else if( fF1AngResName == "GRAPH" )
-    {
-        TGraphErrors* g = ( TGraphErrors* )fFileAngRes->Get( "gAngularResolution" );
-        if(!g )
-        {
-            cout << "VGammaHadronCuts::initAngularResolutionFile error: reading angular resolution graph from " << fF1AngResName << endl;
-            return false;
-        }
-        setIRFGraph( g );
-    }
-    if( fFileAngRes )
-    {
-        fFileAngRes->Close();
-    }
-
-    return true;
-}
-
-bool VGammaHadronCuts::setIRFGraph( TGraphErrors* g )
-{
-    if(!g )
-    {
-        cout << "VGammaHadronCuts::setIRFGraph warning: IRF pointer is zero" << endl;
-        return false;
-    }
-
-
-    TGraphErrors* iG = new TGraphErrors( 1 );
-    double x = 0.;
-    double y = 0.;
-    for( int i = 0; i < g->GetN(); i++ )
-    {
-        g->GetPoint( i, x, y );
-        iG->SetPoint( i, x, y );
-        iG->SetPointError( i, g->GetErrorX( i ), g->GetErrorY( i ) );
-    }
-    iG->SetName( "IRFAngRes" );
-    fEnergyDependentCut[ "IRFAngRes" ] = iG;
-
-    // print results
-    cout << "replaced IRF graph for direction cut" << endl;
-    printDirectionCuts();
-
-    return true;
-}
-
-
 /*!
-
-     update statistics
-
+    update statistics
 */
 void VGammaHadronCuts::newEvent( bool iFillTree )
 {
@@ -2365,52 +1654,6 @@ void VGammaHadronCuts::newEvent( bool iFillTree )
     fStats->updateCutCounter( VGammaHadronCutsStatistics::eTot );
 }
 
-
-double VGammaHadronCuts::getProbabilityCutAlpha( bool fIsOn )
-{
-    if( fProbabilityCutRangeLower.size() != fProbabilityCutRangeUpper.size() )
-    {
-        cout << "Error in definitions of RF probability ranges" << endl;
-        cout << "RFCutLowerVals and RFCutLowerVals have different numbers of entries in cut file" << endl;
-        exit(-1 );
-    }
-    //////////////////////////////////////////////////////////////
-    // return 1 if probability cuts are not set
-    if( fProbabilityCutRangeLower.size() == 0 && fProbabilityCutRangeUpper.size() == 0 )
-    {
-        return 1.;
-    }
-    //////////////////////////////////////////////////////////////
-
-    double on_size = 0;
-    double off_size = 0;
-    for( unsigned int i = 0; i < fProbabilityCutRangeLower.size(); i++ )
-    {
-        if( fProbabilityCutRangeLower[i] >= 0 && fProbabilityCutRangeUpper[i] >= 0 )
-        {
-            on_size = on_size + ( fProbabilityCutRangeUpper[i] - fProbabilityCutRangeLower[i] );
-        }
-        else if( fProbabilityCutRangeLower[i] <= 0 && fProbabilityCutRangeUpper[i] <= 0 )
-        {
-            off_size = off_size - ( fProbabilityCutRangeUpper[i] - fProbabilityCutRangeLower[i] );
-        }
-        else
-        {
-            cout << "Error in definitions of RF probability ranges" << endl;
-            cout << "One pair of RFCutLowerVals and RFCutLowerVals values have opposite sign" << endl;
-        }
-    }
-
-    if( fIsOn )
-    {
-        return on_size;
-    }
-    else
-    {
-        return off_size;
-    }
-
-}
 
 void VGammaHadronCuts::terminate()
 {
@@ -2496,25 +1739,6 @@ bool VGammaHadronCuts::applyPhaseCut( int i )
 
 }
 
-void VGammaHadronCuts::printEnergyDependentCuts()
-{
-    map< string, TGraph* >::iterator it;
-    for( it = fEnergyDependentCut.begin(); it != fEnergyDependentCut.end(); ++it )
-    {
-        if( it->second )
-        {
-            double x = 0.;
-            double y = 0.;
-            cout << "Energy dependent cut variable " << it->first << ": " << endl;
-            for( int i = 0; i < it->second->GetN(); i++ )
-            {
-                it->second->GetPoint( i, x, y );
-                cout <<  "[" << x << ",>" << y << "] ";
-            }
-            cout << endl;
-        }
-    }
-}
 
 string VGammaHadronCuts::getTelToAnalyzeString()
 {
@@ -2607,94 +1831,4 @@ double VGammaHadronCuts::getReconstructedYcore()
     }
 
     return fData->Ycore;
-}
-
-TGraph* VGammaHadronCuts::getEnergyDependentCut( string iCutName )
-{
-    if( fEnergyDependentCut.find( iCutName ) != fEnergyDependentCut.end() )
-    {
-        return fEnergyDependentCut[iCutName];
-    }
-
-    return 0;
-}
-
-bool VGammaHadronCuts::getEnergyDependentCutFromFile( string iFileName, string iVariable )
-{
-    string iTemp = "g" + iVariable;
-    if( gSystem->AccessPathName( iFileName.c_str() ) )
-    {
-        string iTempFileL = VGlobalRunParameter::getDirectory_EVNDISPAnaData();
-        iFileName = iTempFileL + "/GammaHadronCutFiles/" + iFileName;
-    }
-    TFile* i_f = new TFile( iFileName.c_str(), "READ" );
-    if( i_f->IsZombie() )
-    {
-        cout << "VGammaHadronCuts::getEnergyDependentCutFromFile error opening file with energy dependent cut: " << iFileName << endl;
-        cout << "exiting..." << endl;
-        exit( EXIT_FAILURE );
-    }
-
-    TGraph* g = ( TGraph* )i_f->Get( iTemp.c_str() );
-    if(!g )
-    {
-        cout << "VGammaHadronCuts::getEnergyDependentCutFromFile error while reading energy dependent cut: " << iTemp << endl;
-        cout << "\t tried to read from " << iFileName << endl;
-        cout << "exiting..." << endl;
-        exit( EXIT_FAILURE );
-    }
-    else
-    {
-        TGraph* iG = ( TGraph* )g->Clone();
-        iG->SetName( iVariable.c_str() );
-        fEnergyDependentCut[iVariable] = iG;
-    }
-    i_f->Close();
-    return true;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cut on number of images per telescope type depend
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-VNTelTypeCut::VNTelTypeCut()
-{
-    fNTelType_min = 0;
-}
-
-
-bool VNTelTypeCut::test( CData* c )
-{
-    if(!c )
-    {
-        return false;
-    }
-
-    unsigned int ntel_type = 0;
-    for( unsigned int i = 0; i < fTelType_counter.size(); i++ )
-    {
-        if(( int )fTelType_counter[i] < c->NTtype )
-        {
-            ntel_type += c->NImages_Ttype[fTelType_counter[i]];
-        }
-    }
-    // OBS! >=
-    if( ntel_type >= fNTelType_min )
-    {
-        return true;
-    }
-
-    return false;
-}
-
-void VNTelTypeCut::print()
-{
-    cout << "telescope type cut: mintel >= " << fNTelType_min << " for type(s) ";
-    for( unsigned int i = 0; i < fTelType_counter.size(); i++ )
-    {
-        cout << fTelType_counter[i] << " ";
-    }
-    cout << endl;
 }

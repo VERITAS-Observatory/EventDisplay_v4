@@ -852,7 +852,7 @@ unsigned int VTMVAEvaluator::getDataBin( double iErec, double iZe )
     return iBin;
 }
 
-bool VTMVAEvaluator::initializeDataStrutures( CData* iC )
+bool VTMVAEvaluator::initializeDataStructures( CData* iC )
 {
     fData = iC;
 

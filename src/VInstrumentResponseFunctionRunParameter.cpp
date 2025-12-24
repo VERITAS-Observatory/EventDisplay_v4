@@ -32,14 +32,11 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
 
     fCutFileName = "";
     fGammaHadronCutSelector = -1;
-    fDirectionCutSelector = -1;
 
     fAzimuthBins = true;
     fIsotropicArrivalDirections = false;
 
     fIgnoreFractionOfEvents = 0.;
-
-    fTelescopeTypeCuts = false;
 
     fFillMCHistograms = false;
 
@@ -54,7 +51,6 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
     fdatafile = "";
     fMCdatafile_tree = "";
     fMCdatafile_histo = "";
-    fGammaHadronProbabilityFile = "";
     fXGB_file_suffix = "";
 
     fze = 0.;
@@ -233,14 +229,6 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
                     is_stream >> fIgnoreFractionOfEvents;
                 }
             }
-            // telescope type dependent cuts
-            else if( temp == "TELESCOPETYPECUTS" )
-            {
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> fTelescopeTypeCuts;
-                }
-            }
             else if( temp == "CUTFILE" )
             {
                 if(!( is_stream >> std::ws ).eof() )
@@ -304,14 +292,6 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
                 if(!( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> fMCdatafile_histo;
-                }
-            }
-            // file with probabilities for gamma/hadron separation (should be a friend to the data tree)
-            else if( temp == "GAMMAHADRONPROBABILITYFILE" )
-            {
-                if(!( is_stream >> std::ws ).eof() )
-                {
-                    is_stream >> fGammaHadronProbabilityFile;
                 }
             }
             // name pointing to energy spectra used in event weighting
@@ -630,10 +610,6 @@ void VInstrumentResponseFunctionRunParameter::print()
     {
         cout << "  MC histograms:   " << fMCdatafile_histo << endl;
     }
-    if( fGammaHadronProbabilityFile.size() > 0 )
-    {
-        cout << "  gamma/hadron probabilities: " << fGammaHadronProbabilityFile << endl;
-    }
     if( fXGB_file_suffix.size() > 0 )
     {
         cout << "  XGB file suffix: " << fXGB_file_suffix << endl;
@@ -656,7 +632,6 @@ void VInstrumentResponseFunctionRunParameter::print()
     if( fGammaHadronCutSelector >= 0 )
     {
         cout << "Gamma/Hadron " << fGammaHadronCutSelector;
-        cout << " Direction " << fDirectionCutSelector;
     }
     else
     {
@@ -665,10 +640,6 @@ void VInstrumentResponseFunctionRunParameter::print()
     if( fIgnoreEnergyReconstructionQuality )
     {
         cout << ", ignoring cut on quality of energy reconstruction";
-    }
-    if( fTelescopeTypeCuts )
-    {
-        cout << ", telescope type dependent cuts";
     }
     cout << endl;
     cout << "energy reconstruction method " << fEnergyReconstructionMethod << endl;

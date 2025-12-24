@@ -2685,7 +2685,6 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
     {
         // theta2 might be energy dependent
         cout << "calculating solid angle from analysis cuts (might be energy dependent)" << endl;
-        cout << "\t TMVA CUT " << iCuts->getDirectionCutSelector() << endl;
         iMCPara->theta2_min = iCuts->getTheta2Cut_min();       // theta2 min assumed to be energy independent
         if( iMCPara->theta2_min < 0. )
         {
@@ -2704,8 +2703,7 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
         {
             e = fEnergy_min_Log + i * ( fEnergy_max_Log - fEnergy_min_Log ) / iMCPara->gSolidAngle_DirectionCut_vs_EnergylgTeV->GetN();
 
-            // VGammaHadronCuts::getTheta2Cut_max work with lin E
-            itheta2 = iCuts->getTheta2Cut_max( TMath::Power( 10., e ) );
+            itheta2 = iCuts->getTheta2Cut_max();
             if( itheta2 > 0. )
             {
                 iSolidAngle  = 2. * TMath::Pi() * ( 1. - cos( sqrt( itheta2 ) * TMath::Pi() / 180. ) );

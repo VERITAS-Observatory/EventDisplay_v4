@@ -513,9 +513,9 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 
             // fill on/offstereo maps and direction cut
             i_theta2 = -99;
-            bDirectionCuts = fMap->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max( iErec ),
+            bDirectionCuts = fMap->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max(),
                                          fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma, i_theta2 );
-            bDirectionCuts = fMapUC->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max( iErec ),
+            bDirectionCuts = fMapUC->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max(),
                                            fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma, i_theta2 );
 
             // energy reconstruction cut
@@ -569,11 +569,6 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
                 {
                     fHisto[fHisCounter]->hmsc->Fill( fDataRun->MSCW, fDataRun->MSCL );
                 }
-                // probability threshold cuts
-                if( fCuts->getProbabilityCut_Selector() > 0. )
-                {
-                    fHisto[fHisCounter]->hrf->Fill( fCuts->getProbabilityCut_Selector() );
-                }
                 // mean emission height histograms
                 if( fDataRun->EmissionHeight > 0. )
                 {
@@ -607,7 +602,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
                                     fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->FindBin( iDirectionOffset ) );
                 double iSoli = 2. * TMath::Pi() * ( 1. - cos( i_ymax* TMath::Pi() / 180. ) );
                 iSoli       -= 2. * TMath::Pi() * ( 1. - cos( i_ymin* TMath::Pi() / 180. ) );
-                iWeight = fCuts->getTheta2Cut_max( iErec );
+                iWeight = fCuts->getTheta2Cut_max();
                 if( iWeight > 0. )
                 {
                     iWeight = 2. * TMath::Pi() * ( 1. - cos( sqrt( iWeight )  * TMath::Pi() / 180. ) );
@@ -733,8 +728,8 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
     fRateTimeIntervall[fHisCounter] = iRateTimeIntervall;
 
     // finalize sky maps
-    fMap->finalize( fIsOn, fCuts->getProbabilityCutAlpha( fIsOn ) );
-    fMapUC->finalize( fIsOn, fCuts->getProbabilityCutAlpha( fIsOn ) );
+    fMap->finalize( fIsOn, 1. );
+    fMapUC->finalize( fIsOn, 1. );
 
     fTotCount += i_count;
 

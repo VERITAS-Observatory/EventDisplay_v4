@@ -20,6 +20,7 @@
 using namespace std;
 
 double readMeanElevation( TFile* fIn );
+double readWobbleOffset( TFile* fIn, bool printInteger );
 
 bool readRunParameter( TFile* fIn, string iPara )
 {
@@ -110,34 +111,37 @@ bool readRunParameter( TFile* fIn, string iPara )
         cout << "\t" << fPar->fRunDuration;
         cout << "\t" << fPar->fTargetName;
         cout << "\t" << 90. - readMeanElevation( fIn );
+        cout << "\t" << readWobbleOffset( fIn, false );
+        cout << "\t" << readWobbleOffset( fIn, true );
         cout << endl;
     }
 
     return true;
 }
 
-bool readWobbleOffset( TFile* fIn, bool printInteger )
+/*
+ * Read wobble offset. Optionally return as int (x100).
+*/
+double readWobbleOffset( TFile* fIn, bool printInteger )
 {
+    double fWobble = -999;
+    double fWobble_int = -99;
     if(!fIn )
     {
-        return false;
+        if( printInteger ) return fWobble_int;
+        else return fWobble;
     }
     VEvndispRunParameter* fPar = ( VEvndispRunParameter* )fIn->Get( "runparameterV2" );
     if( fPar )
     {
-        cout << "Wobble offset: ";
         if( printInteger )
         {
-            cout << TMath::Nint( sqrt( fPar->fWobbleNorth* fPar->fWobbleNorth + fPar->fWobbleEast* fPar->fWobbleEast ) * 100. );
+            return TMath::Nint( sqrt( fPar->fWobbleNorth* fPar->fWobbleNorth + fPar->fWobbleEast* fPar->fWobbleEast ) * 100. );
         }
-        else
-        {
-            cout << sqrt( fPar->fWobbleNorth* fPar->fWobbleNorth + fPar->fWobbleEast* fPar->fWobbleEast );
-        }
-        cout << endl;
-        return true;
+        return sqrt( fPar->fWobbleNorth* fPar->fWobbleNorth + fPar->fWobbleEast* fPar->fWobbleEast );
     }
-    return false;
+    if( printInteger ) return fWobble_int;
+    return fWobble;
 }
 
 /*
@@ -342,7 +346,7 @@ int main( int argc, char* argv[] )
         }
         else if( fOption.find( "-wobble" ) != string::npos )
         {
-            readWobbleOffset( fIn, ( fOption.find( "-wobbleInt" ) != string::npos ) );
+            cout << "Wobble offset: " << readWobbleOffset( fIn, ( fOption.find( "-wobbleInt" ) != string::npos ) ) << endl;
         }
         else if( fOption == "-mcaz" || fOption == "-runnumber" )
         {

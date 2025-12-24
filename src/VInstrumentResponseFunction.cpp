@@ -22,7 +22,6 @@ VInstrumentResponseFunction::VInstrumentResponseFunction()
     fDataProduct = 0;
 
     setContainmentProbability();
-    setTelescopeTypeCuts();
     setDuplicationID();
     setRunParameter();
 }
@@ -37,7 +36,6 @@ void VInstrumentResponseFunction::setRunParameter( VInstrumentResponseFunctionRu
     fEnergyReconstructionMethod = iRunPara->fEnergyReconstructionMethod;
     setEnergyReconstructionMethod( iRunPara->fEnergyReconstructionMethod );
     setMonteCarloEnergyRange( iRunPara->fMCEnergy_min, iRunPara->fMCEnergy_max, TMath::Abs( iRunPara->fMCEnergy_index ) );
-    setTelescopeTypeCuts( iRunPara->fTelescopeTypeCuts );
 
     fVMinAz = iRunPara->fAzMin;
     fVMaxAz = iRunPara->fAzMax;
@@ -180,9 +178,6 @@ bool VInstrumentResponseFunction::fillEventData()
         {
             continue;
         }
-
-        // apply telescope type cut
-        //	 if( fAnaCuts->applyTelTypeTest( true ) ) continue;
 
         // apply gamma/hadron cuts
         if(!fAnaCuts->isGamma( i, true ) )
