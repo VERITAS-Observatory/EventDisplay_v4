@@ -35,8 +35,6 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
         bool   fIsZombie;
         bool   fDebug;
 
-        int    fGammaHadronCuts_directionCut_selector;
-
         bool                             calculateCutEfficiencies();
         TGraphAsymmErrors*               calculateEffectiveAreaRatios( TGraphAsymmErrors* g0, TGraphAsymmErrors* g1 );
         bool                             fill_from_effectiveArea( TTree* t );

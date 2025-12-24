@@ -12,8 +12,6 @@ VInstrumentResponseFunctionReader::VInstrumentResponseFunctionReader()
     fIsZombie = true;
     fDebug = false;
 
-    fGammaHadronCuts_directionCut_selector = 0;
-
     fFile = "";
     fA_MC = "A_MC";
     fZe = 0.;
@@ -749,8 +747,6 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
     VGammaHadronCuts* i_cuts = ( VGammaHadronCuts* )iFile->Get( "GammaHadronCuts" );
     if( i_cuts )
     {
-        // check if theta2 graph was used
-        fGammaHadronCuts_directionCut_selector = i_cuts->getDirectionCutSelector();
         // read theta2 from disk
         if( gEffArea_Rec )
         {
@@ -811,10 +807,6 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
                 }
             }
         }
-    }
-    else
-    {
-        fGammaHadronCuts_directionCut_selector = 0;
     }
 
     if(!bFound )
@@ -1201,18 +1193,7 @@ bool VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms( TH1F* hEff
     TGraphAsymmErrors* g = gEffArea_Rec;
 
     double i_EffAreaScaleFactor = 1.;
-    // make sure that 80% containment radius effective areas are available
-    if( fGammaHadronCuts_directionCut_selector > 0 && iContainmentRadius.size() > 0 )
-    {
-        if( iContainmentRadius == "80" )
-        {
-            cout << "VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms() warning: " << endl;
-            cout << "\t assuming that effective areas are calculated using a 68\% containment on direction" << endl;
-            cout << "\t (this is hard coded!!!)" << endl;
-            i_EffAreaScaleFactor = 0.80 / 0.68;
-        }
-    }
-    else if( iContainmentRadius.size() > 0 && iContainmentRadius == "80" )
+    if( iContainmentRadius.size() > 0 && iContainmentRadius == "80" )
     {
         cout << "VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms: ";
         cout << "found scaled effective areas for 80\% case " << endl;
