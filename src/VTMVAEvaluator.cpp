@@ -1903,10 +1903,19 @@ TGraph* VTMVAEvaluator::fillfromGraph2D( TObject* i_G, double i_ze_min, double i
         TGraph2D* iG2D = ( TGraph2D* )i_G;
         TGraph* iG1D = new TGraph( iG2D->GetN() );
         Double_t* x = iG2D->GetX();
+        Double_t* y = iG2D->GetY();
+
+        // reset ze max to max of Graph
+        double ze_max_graph = TMath::MaxElement(iG2D->GetN(), y);
+        if( ze_max_graph < i_ze_max ) i_ze_max = ze_max_graph;
+
         double z1 = i_ze_min * TMath::DegToRad();
         double z2 = i_ze_max * TMath::DegToRad();
         double avg_airmass = 0.5 * ( (1.0 / TMath::Cos(z1)) + (1.0 / TMath::Cos(z2)) );
         double ze_mean = TMath::ACos(1.0 / avg_airmass) * TMath::RadToDeg();
+
+        cout << "Graph filling from " << i_G->GetName() << ": average (airmass) ze ";
+        cout << ze_mean << " (" << i_ze_min << ", " << i_ze_max << ") deg " << endl;
 
         for( int i = 0; i < iG2D->GetN(); i++ )
         {
