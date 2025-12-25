@@ -193,7 +193,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         {
             return fIsZombie;
         }
-        TGraphAsymmErrors* plotSignalAndBackgroundEfficiencies( bool iLogY = true, double iYmin = 1.e-4, double iMVA_min = -1., double iMVA_max = 1. );
+        void plotSignalAndBackgroundEfficiencies( bool iLogY = true, double iYmin = 1.e-4, double iMVA_min = -1., double iMVA_max = 1. );
         void   printOptimizedMVACutValues( string iEpoch = "V6" );
         void   printSensitivityOptimizationParameters();
         void   printSignalEfficiency();
