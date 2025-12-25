@@ -863,14 +863,33 @@ TGraphAsymmErrors* VTMVAEvaluator::plotSignalAndBackgroundEfficiencies(
         cout << "TMVAEvaluator::plotSignalAndBackgroundEfficiencies error: signal efficiency vector with size 0" << endl;
         return 0;
     }
+    unsigned int i_ze_min = 9999;
+    unsigned int i_ze_max = 0;
+    for( unsigned int i = 0; i < fTMVAData.size(); i++ )
+    {
+        if( fTMVAData[i]->fZenithBin < i_ze_min )
+        {
+            i_ze_min = fTMVAData[i]->fZenithBin;
+        }
+        if( fTMVAData[i]->fZenithBin > i_ze_max )
+        {
+            i_ze_max = fTMVAData[i]->fZenithBin;
+        }
+    }
+    unsigned int i_n_ze_bins = i_ze_max - i_ze_min + 1;
 
-    // fill graphs
-    TGraphAsymmErrors* igSignal = new TGraphAsymmErrors( 1 );
-    TGraphAsymmErrors* igSignalOpt = new TGraphAsymmErrors( 1 );
-    TGraphAsymmErrors* igBck = new TGraphAsymmErrors( 1 );
-    TGraphAsymmErrors* igBckOpt = new TGraphAsymmErrors( 1 );
-    TGraphAsymmErrors* igCVa = new TGraphAsymmErrors( 1 );
-    TGraphAsymmErrors* igCVaOpt = new TGraphAsymmErrors( 1 );
+    vector<TGraphAsymmErrors*> igSignal_per_ze;
+    vector<TGraphAsymmErrors*> igBck_per_ze;
+    vector<TGraphAsymmErrors*> igCVa_per_ze;
+    for( unsigned int j = 0; j < i_n_ze_bins; j++ )
+    {
+        igSignal_per_ze.push_back( new TGraphAsymmErrors( 1 ) );
+        igSignalOpt_per_ze.push_back( new TGraphAsymmErrors( 1 ) );
+        igBck_per_ze.push_back( new TGraphAsymmErrors( 1 ) );
+        igBckOpt_per_ze.push_back( new TGraphAsymmErrors( 1 ) );
+        igCVa_per_ze.push_back( new TGraphAsymmErrors( 1 ) );
+        igCVaOpt_per_ze.push_back( new TGraphAsymmErrors( 1 ) );
+    }
 
     unsigned int z_opt = 0;
     unsigned int z_noOpt = 0;
@@ -883,6 +902,12 @@ TGraphAsymmErrors* VTMVAEvaluator::plotSignalAndBackgroundEfficiencies(
         {
             continue;
         }
+        TGraphAsymmErrors* igSignal = igSignal_per_ze[fTMVAData[i]->fZenithBin - i_ze_min];
+        TGraphAsymmErrors* igSignalOpt = igSignalOpt_per_ze[fTMVAData[i]->fZenithBin - i_ze_min];
+        TGraphAsymmErrors* igBck = igBck_per_ze[fTMVAData[i]->fZenithBin - i_ze_min];
+        TGraphAsymmErrors* igBckOpt = igBckOpt_per_ze[fTMVAData[i]->fZenithBin - i_ze_min];
+        TGraphAsymmErrors* igCVa = igCVa_per_ze[fTMVAData[i]->fZenithBin - i_ze_min];
+        TGraphAsymmErrors* igCVaOpt = igCVaOpt_per_ze[fTMVAData[i]->fZenithBin - i_ze_min];
 
         if( fTMVAData[i]->fSignalEfficiency < 0. || fTMVAData[i]->fBackgroundEfficiency < 0. )
         {
@@ -967,36 +992,30 @@ TGraphAsymmErrors* VTMVAEvaluator::plotSignalAndBackgroundEfficiencies(
     hnull->SetMaximum( 1. );
     plot_nullHistogram( iCanvas, hnull, false, false, 1.5, iE_min, iE_max );
 
-    setGraphPlottingStyle( igSignal, 1, 1., 20 );
-    setGraphPlottingStyle( igSignalOpt, 1, 1., 24 );
-    if( igBck )
+    for( unsigned int j = 0; j < i_n_ze_bins; j++ )
     {
-        setGraphPlottingStyle( igBck, 2, 1., 21 );
-    }
-    if( igBckOpt )
-    {
-        setGraphPlottingStyle( igBckOpt, 2, 1., 25 );
-    }
+        setGraphPlottingStyle( igSignal_per_ze[j], 1, 1., 20 + j );
+        setGraphPlottingStyle( igSignalOpt_per_ze[j], 1, 1., 24 + j );
+        setGraphPlottingStyle( igBck_per_ze[j], 2, 1., 21 + j );
+        setGraphPlottingStyle( igBckOpt_per_ze[j], 2, 1., 25 + j );
 
-    igSignal->Draw( "pl" );
-    if( z_noOpt )
-    {
-        igSignalOpt->Draw( "pl" );
-    }
-    if( igBck )
-    {
-        igBck->Draw( "pl" );
-    }
-    if( igBckOpt && z_noOpt > 0 )
-    {
-        igBckOpt->Draw( "pl" );
+        igSignal_per_ze[j]->Draw( "pl" );
+        igBck_per_ze[j]->Draw( "pl" );
+        if( z_noOpt )
+        {
+            igSignalOpt_per_ze[j]->Draw( "pl" );
+        }
+        if( igBckOpt_per_ze[j] && z_noOpt > 0 )
+        {
+            igBckOpt_per_ze[j]->Draw( "pl" );
+        }
     }
     if( fPrintPlotting )
     {
         iCanvas->Print( "MVA-SignalBackgroundEfficiency.pdf" );
     }
 
-    // plot MVA cut value
+    // plot MVA cut values
     if( igCVa )
     {
         TCanvas* iCVACanvas = new TCanvas( "iCVACanvas", "MVA cut value", 500, 10, 400, 400 );
@@ -1010,12 +1029,16 @@ TGraphAsymmErrors* VTMVAEvaluator::plotSignalAndBackgroundEfficiencies(
         hnull->SetMinimum( iMVA_min );
         hnull->SetMaximum( iMVA_max );
         plot_nullHistogram( iCanvas, hnull, false, false, 1.3, iE_min, iE_max );
-        setGraphPlottingStyle( igCVa, 1, 1., 20 );
-        igCVa->Draw( "p" );
-        if( igCVaOpt && z_noOpt > 0 )
+        for( unsigned int j = 0; j < i_n_ze_bins; j++ )
         {
-            setGraphPlottingStyle( igCVaOpt, 1, 1., 24 );
-            igCVaOpt->Draw( "p" );
+            setGraphPlottingStyle( igCVa_per_ze[j], 1, 1., 20 + j );
+            setGraphPlottingStyle( igCVaOpt_per_ze[j], 1, 1., 24 + j );
+
+            igCVa_per_ze[j]->Draw( "pl" );
+            if( z_noOpt )
+            {
+                igCVaOpt_per_ze[j]->Draw( "pl" );
+            }
         }
         if( fPrintPlotting )
         {
