@@ -1065,7 +1065,7 @@ bool VGammaHadronCuts::applyTMVACut( int i )
     {
         cout << "VGammaHadronCuts::applyTMVACut event " << i;
         cout << ", signal efficiency " << fTMVASignalEfficiency.size();
-        cout << ", probability threshold/MVA cut " << fTMVA_MVACut.size();
+        cout << ", MVA cut " << fTMVA_MVACut.size();
         cout << " (" << fTMVAEvaluator << ")";
         cout << endl;
     }
@@ -1306,8 +1306,6 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile,
     fTMVAEvaluator = new VTMVAEvaluator();
 
     fTMVAEvaluator->setDebug( fDebug );
-    // smoothing of MVA values
-    fTMVAEvaluator->setsmoothAndInterpolateMVAValues( true );
     // constant signal efficiency
     if( fTMVASignalEfficiency.size() > 0 )
     {
@@ -1321,8 +1319,8 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile,
     else
     {
         cout << "VGammaHadronCuts::initTMVAEvaluator error: unclear TMVA cut settings" << endl;
-        cout << "\t TMVASignalEfficiency: " << fTMVASignalEfficiency.size() << endl;
-        cout << "\t TMVAProbabilityThreshold: " << fTMVA_MVACut.size() << endl;
+        cout << "\t MVA Signal Efficiency: " << fTMVASignalEfficiency.size() << endl;
+        cout << "\t MVA Threshold: " << fTMVA_MVACut.size() << endl;
         cout << "exiting... " << endl;
         exit( EXIT_FAILURE );
     }
