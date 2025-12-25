@@ -1166,9 +1166,10 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
     }
 
     //////////////////////////////////////////////////////
-    // get mean energy of the considered bins
+    // get spectral weighted mean energy of the considered bins
     // interval [fTMVAData[iDataBin]->fEnergyCut_Log10TeV_min,fTMVAData[iDataBin]->fEnergyCut_Log10TeV_max]
     // make sure that energy is not lower or higher then minimum/maximum bins in the rate graphs
+    // This is the energy at which the event numbers are calculated.
 
     double x = 0.;
     double p = 0.;
@@ -1215,7 +1216,6 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
     // Interpolate between the values of the TGraph2D
     //
     // Convert the observing time in seconds as the particle rate is given in 1/seconds
-    // Get the value of the middle of the energy and zenith angle bin
     Non = i_on->Eval( fTMVAData[iDataBin]->fSpectralWeightedMeanEnergy_Log10TeV )
           * fOptimizationObservingTime_h * fParticleNumberFile_Conversion_Rate_to_seconds;
     Nof = i_of->Eval( fTMVAData[iDataBin]->fSpectralWeightedMeanEnergy_Log10TeV )
@@ -1280,16 +1280,18 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
 
     //////////////////////////////////////////////////////
     // loop over different source strengths (in Crab Units)
-    // (up to 30 CU)
+    // start from low values to high values; optimal cut value
+    // is found when we reach fir time the required significance
+    // source strength steps on log scale (up to 30 CU)
     unsigned int iSourceStrengthStepSizeN =
         ( unsigned int )(( log10( 30. ) - log10( fOptimizationMinSourceStrength ) ) / 0.005 );
-    cout << "VTVMAEvaluator::optimizeSensitivity(), source strength steps: " << iSourceStrengthStepSizeN << endl;
+    cout << "VTVMAEvaluator::optimizeSensitivity source strength steps: " << iSourceStrengthStepSizeN << endl;
     for( unsigned int s = 0; s < iSourceStrengthStepSizeN; s++ )
     {
         double iSourceStrength = log10( fOptimizationMinSourceStrength ) + s * 0.005;
         iSourceStrength = TMath::Power( 10., iSourceStrength );
 
-        // source (excess) events
+        // excess events
         Ndif = ( Non - Nof ) * iSourceStrength;
 
         // first quick pass to see if there is a change of reaching the required fOptimizationSourceSignificance
@@ -1343,14 +1345,17 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
         // loop over all signal efficiency bins
         for( int i = 1; i < effS->GetNbinsX(); i++ )
         {
-            if( effB->GetBinContent( i ) > 0. && Nof > 0. )
+            double signalEff = effS->GetBinContent( i );
+            double signalEff_mva = effS->GetBinCenter( i );
+            double backEff   = effB->GetBinContent( i );
+            if( backEff > 0. && Nof > 0. )
             {
                 if( fOptimizationBackgroundAlpha > 0. )
                 {
-                    // optimize signal/sqrt(noise)
+                    // optimize signal/sqrt(noise) - Li & Ma significance
                     i_Signal_to_sqrtNoise = VStatistics::calcSignificance(
-                                                effS->GetBinContent( i ) * Ndif + effB->GetBinContent( i ) * Nof,
-                                                effB->GetBinContent( i ) * Nof / fOptimizationBackgroundAlpha,
+                                                signalEff * Ndif + backEff * Nof,
+                                                backEff * Nof / fOptimizationBackgroundAlpha,
                                                 fOptimizationBackgroundAlpha );
                 }
                 else
@@ -1360,22 +1365,22 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
                 if( fDebug )
                 {
                     cout << "___________________________________________________________" << endl;
-                    cout << i << "\t" << Non << "\t" << effS->GetBinContent( i )  << "\t";
-                    cout << Nof << "\t" << effB->GetBinContent( i ) << "\t";
+                    cout << i << "\t" << Non << "\t" << signalEff  << "\t";
+                    cout << Nof << "\t" << backEff << "\t";
                     cout << Ndif << endl;
-                    cout << "\t" << effS->GetBinContent( i ) * Ndif;
-                    cout << "\t" << effS->GetBinContent( i ) * Ndif + effB->GetBinContent( i ) * Nof;
-                    cout << "\t" << effS->GetBinContent( i ) * Non + effB->GetBinContent( i ) * Nof;
-                    cout << "\t" << effB->GetBinContent( i ) * Nof << endl;
+                    cout << "\t" << signalEff * Ndif;
+                    cout << "\t" << signalEff * Ndif + backEff * Nof;
+                    cout << "\t" << signalEff * Non + backEff * Nof;
+                    cout << "\t" << backEff * Nof << endl;
                 }
-                if( effS->GetBinContent( i ) * Ndif > 0. )
+                if( signalEff * Ndif > 0. )
                 {
-                    iGSignalEvents->SetPoint( z_SB, effS->GetBinCenter( i ),  effS->GetBinContent( i ) * Ndif );
-                    iGBackgroundEvents->SetPoint( z_SB, effS->GetBinCenter( i ), effB->GetBinContent( i ) * Nof );
+                    iGSignalEvents->SetPoint( z_SB, signalEff_mva,  signalEff * Ndif );
+                    iGBackgroundEvents->SetPoint( z_SB, signalEff_mva, backEff * Nof );
                     z_SB++;
                 }
                 // check that a minimum number of off events is available
-                if( effB->GetBinContent( i ) * Nof < fOptimizationMinBackGroundEvents )
+                if( backEff * Nof < fOptimizationMinBackGroundEvents )
                 {
                     if( fDebug )
                     {
@@ -1387,10 +1392,10 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
                 // add results to a graph
                 if( iGSignal_to_sqrtNoise && i_Signal_to_sqrtNoise > 1.e-2 )
                 {
-                    iGSignal_to_sqrtNoise->SetPoint( z, effS->GetBinCenter( i ), i_Signal_to_sqrtNoise );
+                    iGSignal_to_sqrtNoise->SetPoint( z, signalEff_mva, i_Signal_to_sqrtNoise );
                     if( fDebug )
                     {
-                        cout << "\t SET " << z << "\t" << effS->GetBinCenter( i ) << "\t" << i_Signal_to_sqrtNoise << endl;
+                        cout << "\t SET " << z << "\t" << signalEff_mva << "\t" << i_Signal_to_sqrtNoise << endl;
                     }
                     z++;
                 }
@@ -1400,40 +1405,37 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
                     cout << "___________________________________________________________" << endl;
                 }
             }
-        } // END loop over all signal efficiency bins
+        } // END loop over all signal efficiency bins for a given source strength
         /////////////////////////
         // determine position of maximum significance
         // fill a histogram from these values, smooth it, and determine position of maximum significance
         double i_xmax = -99.;
-        if( iGSignal_to_sqrtNoise )
+        TGraphSmooth* iGSmooth = new TGraphSmooth( "s" );
+        iGSignal_to_sqrtNoise_Smooth = iGSmooth->SmoothKern( iGSignal_to_sqrtNoise, "normal", 0.05, 100 );
+        // get maximum values
+        double x = 0.;
+        double y = 0.;
+        double i_ymax = -99.;
+        for( int i = 0; i < iGSignal_to_sqrtNoise_Smooth->GetN(); i++ )
         {
-            TGraphSmooth* iGSmooth = new TGraphSmooth( "s" );
-            iGSignal_to_sqrtNoise_Smooth = iGSmooth->SmoothKern( iGSignal_to_sqrtNoise, "normal", 0.05, 100 );
-            // get maximum values
-            double x = 0.;
-            double y = 0.;
-            double i_ymax = -99.;
-            for( int i = 0; i < iGSignal_to_sqrtNoise_Smooth->GetN(); i++ )
+            iGSignal_to_sqrtNoise_Smooth->GetPoint( i, x, y );
+            if( y > i_ymax )
             {
-                iGSignal_to_sqrtNoise_Smooth->GetPoint( i, x, y );
-                if( y > i_ymax )
-                {
-                    i_ymax = y;
-                    i_xmax = x;
-                }
-                // stop after first maximum (makes maximum research more robust to fluctuations of the
-                // background efficiency)
-                else if( y < i_ymax )
-                {
-                    break;
-                }
+                i_ymax = y;
+                i_xmax = x;
             }
-            i_SignalEfficiency_AtMaximum     = effS->GetBinContent( effS->FindBin( i_xmax ) );
-            i_BackgroundEfficiency_AtMaximum = effB->GetBinContent( effB->FindBin( i_xmax ) );
-            i_TMVACutValue_AtMaximum         = i_xmax;
-            i_Signal_to_sqrtNoise_atMaximum  = i_ymax;
-            i_SourceStrength_atMaximum       = iSourceStrength;
+            // stop after first maximum (makes maximum research more robust to fluctuations of the
+            // background efficiency)
+            else if( y < i_ymax )
+            {
+                break;
+            }
         }
+        i_SignalEfficiency_AtMaximum     = effS->GetBinContent( effS->FindBin( i_xmax ) );
+        i_BackgroundEfficiency_AtMaximum = effB->GetBinContent( effB->FindBin( i_xmax ) );
+        i_TMVACutValue_AtMaximum         = i_xmax;
+        i_Signal_to_sqrtNoise_atMaximum  = i_ymax;
+        i_SourceStrength_atMaximum       = iSourceStrength;
         ///////////////////////////////////////////////////////
         // check if value if really at the optimum or if information is missing from background efficiency curve
         // (check if maximum was find in the last bin or if next bin content is zero)
@@ -1469,7 +1471,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
         }
 
         // check detection criteria
-        if( i_Signal_to_sqrtNoise_atMaximum > fOptimizationSourceSignificance
+        if( i_Signal_to_sqrtNoise_atMaximum >= fOptimizationSourceSignificance
                 && Ndif < fOptimizationMinSignalEvents )
         {
             cout << "\t passed significance but not signal events criterium";
@@ -1477,8 +1479,8 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
             cout << "sig " << i_Signal_to_sqrtNoise_atMaximum;
             cout << ", Ndif " << Ndif << endl;
         }
-        if( i_Signal_to_sqrtNoise_atMaximum > fOptimizationSourceSignificance
-                && Ndif > fOptimizationMinSignalEvents )
+        if( i_Signal_to_sqrtNoise_atMaximum >= fOptimizationSourceSignificance
+                && Ndif >= fOptimizationMinSignalEvents )
         {
             break;
         }
@@ -1723,7 +1725,6 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerBin( unsigned int iBin, TGraph* iGSig
             iLMinBack->Draw();
         }
     }
-
 }
 
 void VTMVAEvaluator::setTMVAMethod( string iMethodName )
@@ -1799,8 +1800,9 @@ void VTMVAEvaluator::printSensitivityOptimizationParameters()
 {
     cout << "VTMAEvaluator: MVA cut parameter is optimized for: " << endl;
     cout << "\t" << fOptimizationObservingTime_h << " hours of observing time" << endl;
-    cout << "\t" << fOptimizationSourceSignificance << " minimum significance" << endl;
+    cout << "\t" << fOptimizationSourceSignificance << " sigma minimum significance" << endl;
     cout << "\t" << fOptimizationMinSignalEvents << " minimum number of on events" << endl;
+    cout << "\t" << fOptimizationMinBackGroundEvents << " minimum number of off events" << endl;
     cout << "\t" << fOptimizationBackgroundAlpha << " signal to background area ratio" << endl;
     cout << "\t" << fOptimizationFixedSignalEfficiency << " maximum signal efficiency" << endl;
     cout << "\t" << fOptimizationMinSourceStrength << " minimum source strength" << endl;
