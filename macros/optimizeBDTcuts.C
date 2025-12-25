@@ -57,7 +57,7 @@ void optimizeBDTcuts(
         weightFileIndex_Zmin, weightFileIndex_Zmax );
 
     // plotting
-    a.plotSignalAndBackgroundEfficiencies();
+    a.plotSignalAndBackgroundEfficiencies(true, 7.e-3, -0.2, 0.7);
 
     // print results to screen
     a.printSignalEfficiency();
