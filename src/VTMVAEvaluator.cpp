@@ -1306,7 +1306,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
     //////////////////////////////////////////////////////
     // loop over different source strengths (in Crab Units)
     // start from low values to high values; optimal cut value
-    // is found when we reach fir time the required significance
+    // is found when we reach first time the required significance
     // source strength steps on log scale (up to 30 CU)
     unsigned int iSourceStrengthStepSizeN =
         ( unsigned int )(( log10( 30. ) - log10( fOptimizationMinSourceStrength ) ) / 0.005 );

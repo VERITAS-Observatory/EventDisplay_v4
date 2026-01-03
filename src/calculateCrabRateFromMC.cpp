@@ -476,7 +476,7 @@ TGraph2DErrors* getTGraph2D( vector< TProfile2D* > h, string iGraphName )
             {
                 i_z += h[0]->GetBinContent( b_x, b_y );
             }
-            // convert expect rate graphs in 1./s
+            // convert rate graphs to 1./s
             i_g->SetPoint(
                 z,
                 h[1]->GetXaxis()->GetBinCenter( b_x ),
