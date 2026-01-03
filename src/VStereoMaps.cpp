@@ -399,7 +399,7 @@ void VStereoMaps::makeTwoDStereo_BoxSmooth( double i_xderot, double i_yderot, do
                     hmap_ratio->Fill( i_MeanSignalBackgroundAreaRatio );
                 }
             }
-    }
+        }
     }
 }
 

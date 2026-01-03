@@ -131,7 +131,7 @@ vector< pair< double, double > > read_energy_minmax_pairs(
  * ENERGYBINEDGES -1.5 -0.5 -1. 0. -0.5 0.5 0.0 1. 0.5 2.0
  * ENERGYBINS -1.50 -0.75 -0.25 0.5 2.0
  */
-vector< double > read_energy_bins(string iTMVAParameterFile, string iEnergyKeyWord )
+vector< double > read_energy_bins( string iTMVAParameterFile, string iEnergyKeyWord )
 {
     vector< double > tmp_e;
     ifstream is( iTMVAParameterFile.c_str(), ifstream::in );

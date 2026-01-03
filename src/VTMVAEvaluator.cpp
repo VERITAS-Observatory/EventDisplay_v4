@@ -855,7 +855,7 @@ bool VTMVAEvaluator::initializeDataStructures( CData* iC )
  * plot signal and background efficiencies
  *
  */
-void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies(bool iLogY, double iYmin, double iMVA_min, double iMVA_max )
+void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYmin, double iMVA_min, double iMVA_max )
 {
     if( fTMVAData.size() == 0 )
     {
@@ -893,8 +893,8 @@ void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies(bool iLogY, double iYmi
         igCVaOpt_per_ze.push_back( new TGraphAsymmErrors( 1 ) );
     }
 
-    vector< unsigned int > z_opt(i_n_ze_bins, 0 );
-    vector< unsigned int > z_noOpt(i_n_ze_bins, 0 );
+    vector< unsigned int > z_opt( i_n_ze_bins, 0 );
+    vector< unsigned int > z_noOpt( i_n_ze_bins, 0 );
 
     double iMinBck = 1.;
     double iE_min =  1.e99;
@@ -973,13 +973,13 @@ void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies(bool iLogY, double iYmi
     // plot everything
     TCanvas* iCanvas = new TCanvas( "cSignalAndBackgroundEfficiencies", "signal and background efficiencies",
                                     10, 10, 1200, 800 );
-    iCanvas->Divide(i_n_ze_bins, 3);
+    iCanvas->Divide( i_n_ze_bins, 3 );
     iCanvas->Draw();
     char hname[200];
     char htitle[200];
     for( unsigned int j = 0; j < i_n_ze_bins; j++ )
     {
-        TPad *iPad = (TPad*)iCanvas->cd(j+1);
+        TPad *iPad = ( TPad* )iCanvas->cd( j + 1 );
         iPad->SetLeftMargin( 0.13 );
         sprintf( hname, "hnullcSignalEfficiencies_%d", j );
         sprintf( htitle, "signal efficiency (ze %d)", j );
@@ -1000,7 +1000,7 @@ void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies(bool iLogY, double iYmi
         }
 
         // background efficiency
-        iPad = (TPad*)iCanvas->cd( j+1+i_n_ze_bins );
+        iPad = ( TPad* )iCanvas->cd( j + 1 + i_n_ze_bins );
         iPad->SetLeftMargin( 0.13 );
         if( iLogY ) iPad->SetLogy();
         else iPad->SetLogy( 0 );
@@ -1023,9 +1023,9 @@ void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies(bool iLogY, double iYmi
         }
 
         // MVA cut
-        iPad = (TPad*)iCanvas->cd( j+1+i_n_ze_bins*2 );
+        iPad = ( TPad* )iCanvas->cd( j + 1 + i_n_ze_bins * 2 );
 
-        sprintf(hname, "hnull_mvacMVACuts_%d", j );
+        sprintf( hname, "hnull_mvacMVACuts_%d", j );
         sprintf( htitle, "MVA cut variable (ze %d)", j );
         TH1D* hnull_mva = new TH1D( hname, htitle, 100, iE_min, iE_max );
         hnull_mva->SetStats( 0 );
@@ -1379,8 +1379,8 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
                 {
                     // optimize signal/sqrt(noise) - Li & Ma significance
                     i_Signal_to_sqrtNoise = VStatistics::calcSignificance(
-                                                signalEff * Ndif + backEff * Nof,
-                                                backEff * Nof / fOptimizationBackgroundAlpha,
+                                                signalEff* Ndif + backEff* Nof,
+                                                backEff* Nof / fOptimizationBackgroundAlpha,
                                                 fOptimizationBackgroundAlpha );
                 }
                 else
@@ -1400,8 +1400,8 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
                 }
                 if( signalEff * Ndif > 0. )
                 {
-                    iGSignalEvents->SetPoint( z_SB, signalEff_mva,  signalEff * Ndif );
-                    iGBackgroundEvents->SetPoint( z_SB, signalEff_mva, backEff * Nof );
+                    iGSignalEvents->SetPoint( z_SB, signalEff_mva,  signalEff* Ndif );
+                    iGBackgroundEvents->SetPoint( z_SB, signalEff_mva, backEff* Nof );
                     z_SB++;
                 }
                 // check that a minimum number of off events is available
@@ -1906,13 +1906,13 @@ TGraph* VTMVAEvaluator::fillfromGraph2D( TObject* i_G, double i_ze_min, double i
         Double_t* y = iG2D->GetY();
 
         // reset ze max to max of Graph
-        double ze_max_graph = TMath::MaxElement(iG2D->GetN(), y);
+        double ze_max_graph = TMath::MaxElement( iG2D->GetN(), y );
         if( ze_max_graph < i_ze_max ) i_ze_max = ze_max_graph;
 
         double z1 = i_ze_min * TMath::DegToRad();
         double z2 = i_ze_max * TMath::DegToRad();
-        double avg_airmass = 0.5 * ( (1.0 / TMath::Cos(z1)) + (1.0 / TMath::Cos(z2)) );
-        double ze_mean = TMath::ACos(1.0 / avg_airmass) * TMath::RadToDeg();
+        double avg_airmass = 0.5 * (( 1.0 / TMath::Cos( z1 ) ) + ( 1.0 / TMath::Cos( z2 ) ) );
+        double ze_mean = TMath::ACos( 1.0 / avg_airmass ) * TMath::RadToDeg();
 
         cout << "Graph filling from " << i_G->GetName() << ": average (airmass) ze ";
         cout << ze_mean << " (" << i_ze_min << ", " << i_ze_max << ") deg " << endl;
