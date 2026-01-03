@@ -769,7 +769,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
     return true;
 }
 
-VTableLookupRunParameter* VTMVARunData::getTLRunParameter()
+VTableLookupRunParameter* VTMVARunData::getTableLookupRunParameters()
 {
     TDirectory* iG_CurrentDirectory = gDirectory;
     if( fSignalFileName.size() > 0 )

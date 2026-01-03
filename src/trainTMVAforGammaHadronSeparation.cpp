@@ -295,9 +295,9 @@ bool train( VTMVARunData* iRun,
         }
         iSignalTree_reduced->Write();
         iBackgroundTree_reduced->Write();
-        if( iRun->getTLRunParameter() )
+        if( iRun->getTableLookupRunParameters() )
         {
-            iRun->getTLRunParameter()->Write();
+            iRun->getTableLookupRunParameters()->Write();
         }
         cout << "Writing reduced event lists for training: ";
         cout << gDirectory->GetName() << endl;

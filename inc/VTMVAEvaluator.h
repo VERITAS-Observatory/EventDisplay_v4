@@ -117,8 +117,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         double                  fOptimizationBackgroundAlpha;
         double                  fOptimizationObservingTime_h;
 
-        double   fTMVA_EvaluationResult;         // result from TVMA evaluator
-        bool     fSmoothAndInterpolateMVAValues;
+        double   fTMVA_EvaluationResult;         // result from TMVA evaluator
         double   fAverageZenithPerRun;           // (rough) average zenith angle of run
 
         string   fTMVAMethodName;
@@ -169,11 +168,6 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         double           interpolate_mva_evaluation();
         TGraph*          readNonNoffGraphsFromFile( TFile* iF, double i_ze_min, double i_ze_max, bool bIsOn = true );
         void             reset();
-        void             smoothAndInterPolateMVAValue( TH1F*, TH1F*,
-                unsigned int iE_min, unsigned int iE_max, unsigned int iZ_min, unsigned int iZ_max );
-        void             smoothAndInterPolateMVAValue_EnergyOnly( TH1F*, TH1F* );
-        void             smoothAndInterPolateMVAValue_Energy_and_Zenith( TH1F*, TH1F*,
-                unsigned int iE_min, unsigned int iE_max, unsigned int iZ_min, unsigned int iZ_max );
 
     public:
 
@@ -181,8 +175,6 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         ~VTMVAEvaluator() {};
 
         bool    evaluate( bool interpolate_mva = false, bool use_average_zenith_angle = true );
-        vector< double > getBackgroundEfficiency();
-        vector< bool >   getOptimumCutValueFound();
         vector< double > getSignalEfficiency();
         double  getOptimalTheta2Cut( double iEnergy_log10TeV, double iZe = -9999 );
         vector< double > getTMVACutValue();
@@ -201,7 +193,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         {
             return fIsZombie;
         }
-        TGraphAsymmErrors* plotSignalAndBackgroundEfficiencies( bool iLogY = true, double iYmin = 1.e-4, double iMVA_min = -1., double iMVA_max = 1. );
+        void plotSignalAndBackgroundEfficiencies( bool iLogY = true, double iYmin = 1.e-4, double iMVA_min = -1., double iMVA_max = 1. );
         void   printOptimizedMVACutValues( string iEpoch = "V6" );
         void   printSensitivityOptimizationParameters();
         void   printSignalEfficiency();
@@ -237,10 +229,6 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         }
         void   setSignalEfficiency( double iSignalEfficiency = -99. );
         void   setSignalEfficiency( map< unsigned int, double > iMSignalEfficiency );
-        void   setSmoothAndInterPolateMVAValues( bool iS = true )
-        {
-            fSmoothAndInterpolateMVAValues = iS;
-        }
         void   setSpectralIndexForEnergyWeighting( double iS = -2. )
         {
             fSpectralIndexForEnergyWeighting = iS;
@@ -253,7 +241,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         }
         void   setTMVAMethod( string iMethodName = "BDT" );
 
-        ClassDef( VTMVAEvaluator, 36 );
+        ClassDef( VTMVAEvaluator, 37 );
 };
 
 #endif

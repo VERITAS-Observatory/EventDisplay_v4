@@ -99,7 +99,7 @@ class VTMVARunData : public TNamed
         VTMVARunData();
         ~VTMVARunData() {}
         void print();
-        VTableLookupRunParameter* getTLRunParameter();
+        VTableLookupRunParameter* getTableLookupRunParameters();
         bool readConfigurationFile( char* );
         bool openDataFiles();
         void setDebug( bool iB = true )
@@ -112,7 +112,7 @@ class VTMVARunData : public TNamed
         }
         void updateTrainingEvents( string iVarName, unsigned int iNEvents );
 
-        ClassDef( VTMVARunData, 12 );
+        ClassDef( VTMVARunData, 13 );
 };
 
 #endif
