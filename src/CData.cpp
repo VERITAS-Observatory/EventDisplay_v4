@@ -10,26 +10,37 @@
 #include "CData.h"
 
 
-CData::CData( TTree* tree, bool bMC, bool bShort, TTree* friendTree )
+CData::CData( TTree* tree, bool bMC, bool bShort, TTree* stereoTree, TTree *ghTree )
 {
     fMC = bMC;
     fShort = bShort;
     fVersion = 6;
     fTelescopeCombination = 0;
 
-    fFriendTree = friendTree;
+    fStereoFriendTree = friendTree;
     Init( tree );
-    if( fFriendTree )
+    if( fStereoFriendTree )
     {
-        fFriendTree->SetBranchAddress( "Dir_Xoff", &Dir_Xoff );
-        fFriendTree->SetBranchAddress( "Dir_Yoff", &Dir_Yoff );
-        fFriendTree->SetBranchAddress( "Dir_Erec", &Dir_Erec );
+        fStereoFriendTree->SetBranchAddress( "Dir_Xoff", &Dir_Xoff );
+        fStereoFriendTree->SetBranchAddress( "Dir_Yoff", &Dir_Yoff );
+        fStereoFriendTree->SetBranchAddress( "Dir_Erec", &Dir_Erec );
     }
     else
     {
         Dir_Xoff = -9999.;
         Dir_Yoff = -9999.;
         Dir_Erec = -9999.;
+    }
+    fGHFriendTree = ghTree;
+    if( fGHFriendTree )
+    {
+        fGHFriendTree->SetBranchAddress( "GH_Gamma_Prediction", &GH_Gamma_Prediction );
+        fGHFriendTree->SetBranchAddress( "Is_Gamma_70, ", &GH_Is_Gamma );
+    }
+    else
+    {
+        GH_Gamma_Prediction = -9999.;
+        GH_Is_Gamma = false;
     }
 }
 
@@ -53,9 +64,9 @@ Int_t CData::GetEntry( Long64_t entry )
     }
 
     int a = fChain->GetEntry( entry );
-    if( fFriendTree )
+    if( fStereoFriendTree )
     {
-        fFriendTree->GetEntry( entry );
+        fStereoFriendTree->GetEntry( entry );
     }
 
     if( fTelescopeCombination > 0 && fTelescopeCombination != 15 )
@@ -638,6 +649,22 @@ Bool_t CData::Notify()
     return kTRUE;
 }
 
+/*
+   Get Gamma/hadron decision from XGB friend tree.
+*/
+float CData::get_GH_Gamma_Prediction()
+{
+    return GH_Gamma_Prediction;
+}
+
+/*
+  Get Gamma/hadron decision from XGB friend tree.
+*/
+bool CData::is_GH_Gamma()
+{
+    return GH_Is_Gamma;
+}
+
 
 /*
 * Get energy depending on analysis method
@@ -650,7 +677,7 @@ Bool_t CData::Notify()
 */
 float CData::get_Erec( unsigned iMethod )
 {
-    if( iMethod == 0 && fFriendTree )
+    if( iMethod == 0 && fStereoFriendTree )
     {
         return Dir_Erec;
     }
@@ -681,7 +708,7 @@ float CData::get_Erec( unsigned iMethod )
  */
 float CData::get_Xoff( unsigned iMethod )
 {
-    if( iMethod == 0 && fFriendTree )
+    if( iMethod == 0 && fStereoFriendTree )
     {
         return Dir_Xoff;
     }
@@ -713,7 +740,7 @@ float CData::get_Xoff( unsigned iMethod )
  */
 float CData::get_Yoff( unsigned iMethod )
 {
-    if( iMethod == 0 && fFriendTree )
+    if( iMethod == 0 && fStereoFriendTree )
     {
         return Dir_Yoff;
     }

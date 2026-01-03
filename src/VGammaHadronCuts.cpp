@@ -14,6 +14,7 @@
      3: apply cuts on probabilities given by a friend to the data tree already at the level of
         the event quality level
      4: TMVA gamma/hadron separation
+     5: XGBoost gamma/hadron separation
 
   ID1:
 
@@ -677,6 +678,14 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
     {
         fAnalysisType = MVAAnalysis;
     }
+    else if( fGammaHadronCutSelector / 10 == 5 )
+    {
+        fAnalysisType = XGBoostAnalysis;
+    }
+    else
+    {
+        fAnalysisType = GEO;
+    }
 
     return true;
 }
@@ -794,6 +803,12 @@ void VGammaHadronCuts::printCutSummary()
                 printTMVA_MVACut();
             }
         }
+    }
+    // XGBoost cuts
+    if( useXGBoostCuts() )
+    {
+        // TODO
+        cout << "XGBoost gamma/hadron separation" << endl;
     }
     // other cut parameters
     if( fNTel == 2 )
@@ -1131,6 +1146,21 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
             cout << "VGammaHadronCuts::isGamma: applyTMVACut" << endl;
         }
         if(!applyTMVACut( i ) )
+        {
+            if( bCount && fStats )
+            {
+                fStats->updateCutCounter( VGammaHadronCutsStatistics::eIsGamma );
+            }
+            return false;
+        }
+    }
+    else if( useXGBoostCuts() )
+    {
+        if( fDebug )
+        {
+            cout << "VGammaHadronCuts::isGamma: applyXGBoostCut" << endl;
+        }
+        if(!applyXGBoostCut( i ) )
         {
             if( bCount && fStats )
             {

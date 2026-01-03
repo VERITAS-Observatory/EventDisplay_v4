@@ -32,7 +32,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // analysis types
 ////////////////////////////////////////////////////////////////////////////////
-enum E_AnalysisType { GEO = 0, MVAAnalysis = 1 };
+enum E_AnalysisType { GEO = 0, MVAAnalysis = 1, XGBoostAnalysis = 2 };
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -325,11 +325,15 @@ class VGammaHadronCuts : public VAnalysisUtilities
         {
             return ( fAnalysisType == MVAAnalysis );
         }
+        bool  useXGBoostCuts()
+        {
+            return ( fAnalysisType == XGBoostAnalysis );
+        }
         bool   useOrbitalPhaseCuts()
         {
             return fUseOrbitalPhaseCuts;
         }
 
-        ClassDef( VGammaHadronCuts, 60 );
+        ClassDef( VGammaHadronCuts, 61 );
 };
 #endif

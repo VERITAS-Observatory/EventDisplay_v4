@@ -260,12 +260,15 @@ class CData
         TBranch*        b_Xoff_intersect;
         TBranch*        b_Yoff_intersect;
 
-        TTree*          fFriendTree;              //!
+        TTree*          fStereoFriendTree;              //!
         float         Dir_Xoff;                 //!
         float         Dir_Yoff;                 //!
         float         Dir_Erec;                 //!
+        TTree*          fGHFriendTree;                 //!
+        float         GH_Gamma_Prediction;      //!
+        bool          GH_Is_Gamma;               //!
 
-        CData( TTree* tree = 0, bool bMC = false, bool bShort = false, TTree* friendTree = 0 );
+        CData( TTree* tree = 0, bool bMC = false, bool bShort = false, TTree* stereoTree = 0, TTree* ghTree = 0 );
         virtual ~CData();
         virtual Int_t    GetEntry( Long64_t entry );
         float get_Erec( unsigned int method = 0 );
