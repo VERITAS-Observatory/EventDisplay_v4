@@ -388,47 +388,15 @@ void VStereoMaps::makeTwoDStereo_BoxSmooth( double i_xderot, double i_yderot, do
                 continue;
             }
 
-            // additional smoothing to get ride of edge feature (not a default feature!)
-            // get filling factor (fraction of bin in theta2 circle)
-            if( fRunList.fNBoxSmooth > 0 )
+            // theta2 cut
+            i_r = sqrt(( i_xderot - i_xbin ) * ( i_xderot - i_xbin ) + ( i_yderot - i_ybin ) * ( i_yderot - i_ybin ) );
+            if( i_r <= thetaCutMax )
             {
-                double p = 0.;
-                for( unsigned int f = 0; f < fRunList.fNBoxSmooth; f++ )
+                hmap_stereo->Fill( i_xbin, i_ybin );
+                hmap_alpha->Fill( i_xbin, i_ybin, i_weight );
+                if( hmap_ratio )
                 {
-                    i_xbin = fRandom->Uniform( hmap_stereo->GetXaxis()->GetBinLowEdge( i + 1 ), hmap_stereo->GetXaxis()->GetBinUpEdge( i + 1 ) );
-                    i_ybin = fRandom->Uniform( hmap_stereo->GetYaxis()->GetBinLowEdge( j + 1 ), hmap_stereo->GetYaxis()->GetBinUpEdge( j + 1 ) );
-                    i_r = sqrt(( i_xderot - i_xbin ) * ( i_xderot - i_xbin ) + ( i_yderot - i_ybin ) * ( i_yderot - i_ybin ) );
-                    if( i_r <= thetaCutMax )
-                    {
-                        p++;
-                    }
-                }
-                p /= ( double )( fRunList.fNBoxSmooth );
-                i_xbin = hmap_stereo->GetXaxis()->GetBinCenter( i + 1 );
-                i_ybin = hmap_stereo->GetYaxis()->GetBinCenter( j + 1 );
-                if( fRandom->Uniform() < p )
-                {
-                    hmap_stereo->Fill( i_xbin, i_ybin );
-                    hmap_alpha->Fill( i_xbin, i_ybin, i_weight );
-                    if( hmap_ratio )
-                    {
-                        hmap_ratio->Fill( i_MeanSignalBackgroundAreaRatio );
-                    }
-                }
-            }
-            // default: filling of the sky map at the corresponding bin
-            else
-            {
-                // theta2 cut
-                i_r = sqrt(( i_xderot - i_xbin ) * ( i_xderot - i_xbin ) + ( i_yderot - i_ybin ) * ( i_yderot - i_ybin ) );
-                if( i_r <= thetaCutMax )
-                {
-                    hmap_stereo->Fill( i_xbin, i_ybin );
-                    hmap_alpha->Fill( i_xbin, i_ybin, i_weight );
-                    if( hmap_ratio )
-                    {
-                        hmap_ratio->Fill( i_MeanSignalBackgroundAreaRatio );
-                    }
+                    hmap_ratio->Fill( i_MeanSignalBackgroundAreaRatio );
                 }
             }
         }

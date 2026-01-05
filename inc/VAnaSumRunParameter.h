@@ -110,9 +110,6 @@ class VAnaSumRunParameterDataClass : public TNamed
 
         string fEffectiveAreaFile;                // file with effective areas, use NOFILE if not available
 
-        // all models
-        unsigned int fNBoxSmooth;
-
         // ON/OFF MODEL
         double fOO_alpha;
 
@@ -139,7 +136,7 @@ class VAnaSumRunParameterDataClass : public TNamed
         {
             return fRunOn < x.fRunOn;
         }
-        ClassDef( VAnaSumRunParameterDataClass, 3 );
+        ClassDef( VAnaSumRunParameterDataClass, 4 );
 };
 
 class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
