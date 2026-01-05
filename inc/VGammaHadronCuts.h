@@ -104,14 +104,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
         unsigned int    fTMVAWeightFileIndex_Zmax;
         map< unsigned int, double > fTMVASignalEfficiency;
         map< unsigned int, double > fTMVA_MVACut;
-        string          fTMVAOptimizeSignalEfficiencyParticleNumberFile;
-        double          fTMVAParticleNumberFile_Conversion_Rate_to_seconds;
-        double          fTMVAOptimizeSignalEfficiencySignificance_Min;
-        double          fTMVAOptimizeSignalEfficiencySignalEvents_Min;
-        double          fTMVAOptimizeSignalEfficiencyObservationTime_h;
-        double          fTMVAFixedSignalEfficiencyMax;
-        double          fTMVAMinSourceStrength;
-        double          fTMVAFixedThetaCutMin;
         double          fTMVA_EvaluationResult;
         VTMVAEvaluatorResults* fTMVAEvaluatorResults;
 

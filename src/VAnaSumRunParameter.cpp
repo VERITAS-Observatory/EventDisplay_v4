@@ -62,9 +62,6 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 
     fEffectiveAreaFile = "";                      // file with effective areas, use NOFILE if not available
 
-    // smoothing algorithm (don't use it if you don't know it)
-    fNBoxSmooth = 0;
-
     // ON/OFF MODEL
     fOO_alpha = 0.;
 
@@ -1243,7 +1240,6 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
             cout << "TEMPLATE BACKGROUND MODEL" << endl;
         }
     }
-    cout << "\t NBoxsmooth: " << fRunList[i].fNBoxSmooth << endl;
     cout << endl;
 }
 
@@ -1364,7 +1360,6 @@ void VAnaSumRunParameter::reset( VAnaSumRunParameterDataClass it )
 
     it.fAcceptanceFile = "";
 
-    it.fNBoxSmooth = 0;
     it.fOO_alpha = 0.;
 
     it.fRM_RingRadius = 0.;

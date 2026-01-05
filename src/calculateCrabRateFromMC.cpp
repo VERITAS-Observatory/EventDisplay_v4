@@ -1,7 +1,7 @@
 /*! \file VTS.calculateCrabRateFromMC.cpp
-    \brief calculate gamma ray rate from Crab Nebula with effective areas from MC
+    \brief calculate gamma-ray and background rates equivalent to Crab Nebula observations
 
-
+    Use effective areas for signal rates and observations for background rates.
 
 */
 
@@ -26,7 +26,7 @@ using namespace std;
  * fill profile histogram with a new rate entry
  *
  */
-void fill_profilehistogram_for_TMVA(
+void fill_profile_histogram_for_TMVA(
     TProfile2D* fMCRates_TMVA,
     double i_E, double i_Ze, double iRate )
 {
@@ -94,6 +94,12 @@ vector< double > read_zenith_bins( string fEffAreaFile )
     return tmp_zebin_edges;
 }
 
+/*
+    * read energy bin pairs from TMVA run parameter file
+    *
+    * ENERGYBINEDGES -1.5 -0.5 -1. 0. -0.5 0.5 0.0 1. 0.5 2.0
+    * ENERGYBINS -1.50 -0.75 -0.25 0.5 2.0
+*/
 vector< pair< double, double > > read_energy_minmax_pairs(
     vector< double > tmp_ebins_histo, string iEnergyKeyWord )
 {
@@ -125,9 +131,7 @@ vector< pair< double, double > > read_energy_minmax_pairs(
  * ENERGYBINEDGES -1.5 -0.5 -1. 0. -0.5 0.5 0.0 1. 0.5 2.0
  * ENERGYBINS -1.50 -0.75 -0.25 0.5 2.0
  */
-vector< double > read_energy_bins(
-    string iTMVAParameterFile,
-    string iEnergyKeyWord )
+vector< double > read_energy_bins( string iTMVAParameterFile, string iEnergyKeyWord )
 {
     vector< double > tmp_e;
     ifstream is( iTMVAParameterFile.c_str(), ifstream::in );
@@ -244,7 +248,7 @@ TTree* fillMCRates(
     float pedvar = 0.;
     float MCrate;
 
-    TTree* fMC = new TTree( "fMCRate", "MC rate predictions" );
+    TTree* fMC = new TTree( "fMCRate", "MC rate predictions (1/min)" );
     fMC->Branch( "ze", &ze, "ze/F" );
     fMC->Branch( "az", &az, "az/I" );
     fMC->Branch( "Woff", &Woff, "Woff/F" );
@@ -279,7 +283,7 @@ TTree* fillMCRates(
     t->SetBranchAddress( "eff", t_eff );
 
     // rate calculator
-    VMonteCarloRateCalculator* fMCR = new VMonteCarloRateCalculator();
+    VMonteCarloRateCalculator fMCR;
     // hardwired Whipple spectrum
     double fWhippleNorm = 3.250e-11;
     double fWhippleIndex = -2.440;
@@ -305,7 +309,7 @@ TTree* fillMCRates(
             feffectivearea.push_back( t_eff[e] );
         }
 
-        MCrate = fMCR->getMonteCarloRate(
+        MCrate = fMCR.getMonteCarloRate(
                      fenergy, feffectivearea,
                      fWhippleIndex, fWhippleNorm, 1., fEnergyThreshold, 1.e7, false );
         MCrate *= ( 1. - fDeadTime / 100. );
@@ -318,11 +322,11 @@ TTree* fillMCRates(
 
         for( unsigned int e = 0; e < ebins.size(); e++ )
         {
-            fill_profilehistogram_for_TMVA(
+            fill_profile_histogram_for_TMVA(
                 h,
                 0.5 * ( ebins[e].first + ebins[e].second ),
                 ze,
-                fMCR->getMonteCarloRate(
+                fMCR.getMonteCarloRate(
                     fenergy, feffectivearea,
                     fWhippleIndex, fWhippleNorm, 1.,
                     TMath::Power( 10., ebins[e].first ),
@@ -447,6 +451,8 @@ void fillBackgroundRates( string iRunList, TProfile2D* h, vector< pair< double, 
 /*
  * convert 2D histograms to 2D graphs
  *
+ * convert rate from 1/min to 1/s
+ *
  */
 TGraph2DErrors* getTGraph2D( vector< TProfile2D* > h, string iGraphName )
 {
@@ -470,7 +476,7 @@ TGraph2DErrors* getTGraph2D( vector< TProfile2D* > h, string iGraphName )
             {
                 i_z += h[0]->GetBinContent( b_x, b_y );
             }
-            // expect rate graphs in 1./s
+            // convert rate graphs to 1./s
             i_g->SetPoint(
                 z,
                 h[1]->GetXaxis()->GetBinCenter( b_x ),
@@ -531,6 +537,7 @@ int main( int argc, char* argv[] )
     {
         tmp_ebins = read_energy_minmax_pairs( tmp_ebins_histo, "ENERGYBINS" );
     }
+    // ENERGYBINEDGES for VTS analysis
     else
     {
         tmp_ebins = read_energy_minmax_pairs(
