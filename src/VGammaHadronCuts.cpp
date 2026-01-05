@@ -1123,7 +1123,7 @@ bool VGammaHadronCuts::applyXGBoostCut( int i )
         cout << ", is gamma (70\% signal efficiency) " << fData->GH_Gamma_IsGamma;
         cout << endl;
     }
-    return fData->GH_Gamma_IsGamma;
+    return fData->GH_Is_Gamma;
 }
 
 
