@@ -718,8 +718,7 @@ void VGammaHadronCuts::printCutSummary()
     // XGBoost cuts
     if( useXGBoostCuts() )
     {
-        // TODO
-        cout << "XGBoost gamma/hadron separation" << endl;
+        cout << "XGBoost gamma/hadron separation with fixed 70\% signal efficiency" << endl;
     }
     // other cut parameters
     if( fNTel == 2 )
@@ -1108,6 +1107,23 @@ bool VGammaHadronCuts::applyTMVACut( int i )
     }
 
     return false;
+}
+
+/*
+
+    apply XGBoost cuts
+
+*/
+bool VGammaHadronCuts::applyXGBoostCut( int i )
+{
+    if( fDebug )
+    {
+        cout << "VGammaHadronCuts::applyXGBoostCut event " << i;
+        cout << ", prediction " << fData->GH_Gamma_Prediction;
+        cout << ", is gamma (70\% signal efficiency) " << fData->GH_Gamma_IsGamma;
+        cout << endl;
+    }
+    return fData->GH_Gamma_IsGamma;
 }
 
 

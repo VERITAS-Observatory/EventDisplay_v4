@@ -198,6 +198,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool   applyStereoQualityCuts( unsigned int iEnergyReconstructionMethod = 0, bool bCount = false, int iEntry = 0, bool fIsOn = false );
         bool   applyStereoShapeCuts();
         bool   applyTMVACut( int i );
+        bool   applyXGBoostCut( int i );
 
         double getArrayCentre_X()
         {

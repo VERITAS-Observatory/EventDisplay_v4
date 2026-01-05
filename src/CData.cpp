@@ -44,6 +44,13 @@ CData::CData( TTree* tree, bool bMC, bool bShort, TTree* stereoTree, TTree *ghTr
     }
 }
 
+CData::CData( TTree* tree, bool bMC, bool bShort, string stereo_suffix, string gamma_hadron_suffix )
+    : CData(tree, bMC, bShort,
+        getXGBTree(stereo_suffix, "StereoAnalysis"),
+        getXGBTree(gamma_hadron_suffix, "Classification"))
+{
+}
+
 
 CData::~CData()
 {
@@ -51,6 +58,15 @@ CData::~CData()
     {
         return;
     }
+    for( unsigned int i = 0; i < fXGBFiles.size(); i++ )
+    {
+        if( fXGBFiles[i] )
+        {
+            fXGBFiles[i]->Close();
+            delete fXGBFiles[i];
+        }
+    }
+    fXGBFiles.clear();
     delete fChain->GetCurrentFile();
 }
 
@@ -67,6 +83,10 @@ Int_t CData::GetEntry( Long64_t entry )
     if( fStereoFriendTree )
     {
         fStereoFriendTree->GetEntry( entry );
+    }
+    if( fGHFriendTree )
+    {
+        fGHFriendTree->GetEntry( entry );
     }
 
     if( fTelescopeCombination > 0 && fTelescopeCombination != 15 )
@@ -1035,4 +1055,36 @@ void CData::initialize_3tel_reconstruction(
     fTelX = tel_x;
     fTelY = tel_y;
     fTelZ = tel_z;
+}
+
+
+/*
+   Read XGB friend tree for gamma/hadron separation and stereo reconstruction
+*/
+/*
+
+*/
+TTree *CData::getXGBTree(string file_suffix, string tree_name)
+{
+    if( file_suffix == "" || file_suffix != "None" )
+    {
+        return 0;
+    }
+
+    string iFileName = iFileName.replace(iFileName.find( ".root" ), 5, "." + file_suffix + ".root" );
+    TFile *iFile = new TFile( iFileName.c_str());
+    if( iFile->IsZombie() )
+    {
+        cout << "CData Error: cannot open XGB file " << iFileName << endl;
+        exit( EXIT_FAILURE );
+    }
+    TTree* iXGB_tree = ( TTree* )iFile->Get( tree_name.c_str() );
+    if(!iXGB_tree )
+    {
+        cout << "CData Error: cannot find " << tree_name << " tree in " << iFileName << endl;
+        exit( EXIT_FAILURE );
+    }
+    fXGBFiles.push_back(iFile);
+    cout << "Adding " << tree_name << " tree from " << iFileName << endl;
+    return iXGB_tree;
 }

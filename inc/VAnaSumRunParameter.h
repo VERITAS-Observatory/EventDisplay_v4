@@ -194,7 +194,8 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
         int  fDeadTimeCalculationMethod;
 
         // XGB reconstruction
-        string fXGB_file_suffix;
+        string fXGB_stereo_file_suffix;
+        string fXGB_gh_file_suffix;
 
         int f2DAcceptanceMode ; // USE2DACCEPTANCE
 

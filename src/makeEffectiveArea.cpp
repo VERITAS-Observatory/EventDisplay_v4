@@ -180,34 +180,7 @@ int main( int argc, char* argv[] )
         exit( EXIT_FAILURE );
     }
 
-    // XGB file
-    TFile *fXGBFile = 0;
-    TTree *fXGB_tree = 0;
-    if( fRunPara->fXGB_file_suffix != "" && fRunPara->fXGB_file_suffix != "None" )
-    {
-        string xgb_file_name = fRunPara->fdatafile;
-        xgb_file_name.replace( fRunPara->fdatafile.find( ".root" ), 5, "." + fRunPara->fXGB_file_suffix + ".root" );
-        fXGBFile = new TFile( xgb_file_name.c_str() );
-        if( fXGBFile->IsZombie() )
-        {
-            cout << "Error: cannot open XGB file " << xgb_file_name << endl;
-            exit( EXIT_FAILURE );
-        }
-        else
-        {
-            fXGB_tree = ( TTree* )fXGBFile->Get( "StereoAnalysis" );
-            // backwards compatibility
-            if(!fXGB_tree ) fXGB_tree = ( TTree* )fXGBFile->Get( "DispDirection" );
-            if(!fXGB_tree )
-            {
-                cout << "Error: cannot find stereo analysis tree in " << fXGBFile->GetName() << endl;
-                exit( EXIT_FAILURE );
-            }
-            cout << "Adding XGB DispDirection from " << fXGBFile->GetName() << endl;
-        }
-    }
-
-    CData d( c, true, false, fXGB_tree );
+    CData d( c, true, false, fRunPara->fXGB_stereo_file_suffix, fRunPara->fXGB_gh_file_suffix );
     d.initialize_3tel_reconstruction(
         fRunPara->fRerunStereoReconstruction_3telescopes,
         fRunPara->fRerunStereoReconstruction_minAngle,

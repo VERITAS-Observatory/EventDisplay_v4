@@ -51,7 +51,8 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
     fdatafile = "";
     fMCdatafile_tree = "";
     fMCdatafile_histo = "";
-    fXGB_file_suffix = "";
+    fXGB_stereo_file_suffix = "";
+    fXGB_gh_file_suffix = "";
 
     fze = 0.;
     fnoise = 0;
@@ -236,12 +237,20 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
                     is_stream >> fCutFileName;
                 }
             }
-            else if( temp == "XGBFILESUFFIX" )
+            else if( temp == "XGBSTEREOFILESUFFIX" )
             {
                 if(!( is_stream >> std::ws ).eof() )
                 {
-                    is_stream >> fXGB_file_suffix;
-                    if( fXGB_file_suffix == "None" ) fXGB_file_suffix = "";
+                    is_stream >> fXGB_stereo_file_suffix;
+                    if( fXGB_stereo_file_suffix == "None" ) fXGB_stereo_file_suffix = "";
+                }
+            }
+            else if( temp == "XGBGAMMAHADRONFILESUFFIX" )
+            {
+                if(!( is_stream >> std::ws ).eof() )
+                {
+                    is_stream >> fXGB_gh_file_suffix;
+                    if( fXGB_gh_file_suffix == "None" ) fXGB_gh_file_suffix = "";
                 }
             }
             // * SCATTERMODE <core scatter radius [m]> <type of CORSIKA simulations (FLAT or VIEWCONE)>
@@ -610,9 +619,13 @@ void VInstrumentResponseFunctionRunParameter::print()
     {
         cout << "  MC histograms:   " << fMCdatafile_histo << endl;
     }
-    if( fXGB_file_suffix.size() > 0 )
+    if( fXGB_stereo_file_suffix.size() > 0 )
     {
-        cout << "  XGB file suffix: " << fXGB_file_suffix << endl;
+        cout << "  XGB file suffix: " << fXGB_stereo_file_suffix << endl;
+    }
+    if( fXGB_gh_file_suffix.size() > 0 )
+    {
+        cout << "  XGB Gamma/Hadron file suffix: " << fXGB_gh_file_suffix << endl;
     }
     if( fInstrumentEpoch != "NOT_SET" )
     {

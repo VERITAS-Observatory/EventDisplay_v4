@@ -122,7 +122,8 @@ VAnaSumRunParameter::VAnaSumRunParameter()
     fEnergyEffectiveAreaSmoothingIterations = -1;
     fEnergyEffectiveAreaSmoothingThreshold = -1.;
     fDeadTimeCalculationMethod = 0;
-    fXGB_file_suffix = "";
+    fXGB_stereo_file_suffix = "";
+    fXGB_gh_file_suffix = "";
 
     // background model
     fTMPL_fBackgroundModel = 0;
@@ -598,10 +599,15 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                     return 0;
                 }
             }
-            else if( temp == "XGBFILESUFFIX" )
+            else if( temp == "XGBSTEREOFILESUFFIX" )
             {
-                fXGB_file_suffix = temp2;
-                if( fXGB_file_suffix == "None" ) fXGB_file_suffix = "";
+                fXGB_stereo_file_suffix = temp2;
+                if( fXGB_stereo_file_suffix == "None" ) fXGB_stereo_file_suffix = "";
+            }
+            else if( temp == "XGBGAMMAHADRONFILESUFFIX" )
+            {
+                fXGB_gh_file_suffix = temp2;
+                if( fXGB_gh_file_suffix == "None" ) fXGB_gh_file_suffix = "";
             }
             else if( temp == "RATEINTERVALLLENGTH" )
             {
@@ -1182,13 +1188,21 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
         {
             cout << " (lookup table energy reconstruction)" << endl;
         }
-        if( fXGB_file_suffix != "" && fXGB_file_suffix != "None" )
+        if( fXGB_stereo_file_suffix != "" && fXGB_stereo_file_suffix != "None" )
         {
-            cout << "\t XY direction file: " << fXGB_file_suffix << endl;
+            cout << "\t XGB stereo analysis file: " << fXGB_stereo_file_suffix << endl;
         }
         else
         {
-            cout << "\t no XY direction file used" << endl;
+            cout << "\t no XGB stereo analysis file used" << endl;
+        }
+        if( fXGB_gh_file_suffix != "" && fXGB_gh_file_suffix != "None" )
+        {
+            cout << "\t XGB gamma-hadron separation file: " << fXGB_gh_file_suffix << endl;
+        }
+        else
+        {
+            cout << "\t no XGB gamma-hadron separation file used" << endl;
         }
         cout << "\t dead time calculation method: ";
         if( fDeadTimeCalculationMethod == 0 )

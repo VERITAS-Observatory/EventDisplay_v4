@@ -74,7 +74,8 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
         string          fdatafile;
         string          fMCdatafile_tree;
         string          fMCdatafile_histo;
-        string          fXGB_file_suffix;
+        string          fXGB_stereo_file_suffix;
+        string          fXGB_gh_file_suffix;
 
         double          fze;
         int             fnoise;
