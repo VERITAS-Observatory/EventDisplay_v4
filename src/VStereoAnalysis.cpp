@@ -11,7 +11,6 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
     fDebug = false;
 
     fDataFile = 0;
-    fXGB_tree = 0;
     fInstrumentEpochMinor = "NOT_SET";
     fDirTot = iDirTot;
     fDirTotRun = iDirRun;
@@ -1967,7 +1966,7 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
             false,
             false,
             fRunPara->fXGB_stereo_file_suffix,
-            fRunPara->fXGB_gamma_hadron_file_suffix
+            fRunPara->fXGB_gh_file_suffix
         );
         // read current (major) epoch from data file
         VEvndispRunParameter* i_runPara = ( VEvndispRunParameter* )fDataFile->Get( "runparameterV2" );

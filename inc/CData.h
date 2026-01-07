@@ -279,6 +279,8 @@ class CData
         TTree *getXGBTree( string suffix, string tree_name );
         pair<float, float> get_XYoff_derot( unsigned int method = 0 );
         virtual Long64_t LoadTree( Long64_t entry );
+        float            get_GH_Gamma_Prediction();
+        bool             is_GH_Gamma();
         virtual void     Init( TTree* tree );
         virtual Bool_t   Notify();
         bool             isMC()

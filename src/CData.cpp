@@ -17,7 +17,7 @@ CData::CData( TTree* tree, bool bMC, bool bShort, TTree* stereoTree, TTree *ghTr
     fVersion = 6;
     fTelescopeCombination = 0;
 
-    fStereoFriendTree = friendTree;
+    fStereoFriendTree = stereoTree;
     Init( tree );
     if( fStereoFriendTree )
     {
