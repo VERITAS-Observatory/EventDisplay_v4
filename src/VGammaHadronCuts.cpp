@@ -1026,7 +1026,6 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnerg
 */
 bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
 {
-
     /////////////////////////////////////////////////////////////////////////////
     // apply box cuts  (e.g. MSCW/MSCL or MWR/MLR)
     if( fGammaHadronCutSelector % 10 <= 3 )
@@ -1051,7 +1050,7 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
     }
     /////////////////////////////////////////////////////////////////////////////
     // apply cut using TMVA reader
-    else if( useTMVACuts() )
+    if( useTMVACuts() )
     {
         if( fDebug )
         {
