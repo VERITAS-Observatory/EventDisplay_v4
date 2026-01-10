@@ -27,6 +27,8 @@
     cut selector = 0 : apply MSCW/MSCL cuts (default)
     cut selector = 22 : apply event probability cuts
     cut selector = 10 : apply cuts from a tree AND apply MSCW/MSCL cuts
+    cut selector = 42: apply TMVA gamma/hadron separation AND apply mean width/length cuts (default TMVA-BDT cut)
+    cut selector = 52: apply XGBoost gamma/hadron separation AND apply mean width/length cuts
 
 */
 

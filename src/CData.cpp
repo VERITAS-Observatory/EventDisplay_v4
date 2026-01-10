@@ -1061,9 +1061,6 @@ void CData::initialize_3tel_reconstruction(
 /*
    Read XGB friend tree for gamma/hadron separation and stereo reconstruction
 */
-/*
-
-*/
 TTree* CData::getXGBTree( string file_suffix, string tree_name )
 {
     if( file_suffix == "" || file_suffix != "None" )
