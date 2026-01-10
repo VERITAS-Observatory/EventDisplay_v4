@@ -1096,7 +1096,7 @@ void CData::initialize_xgb_tree(TTree* stereoTree, TTree* ghTree )
     if( fGHFriendTree )
     {
         fGHFriendTree->SetBranchAddress( "Gamma_Prediction", &GH_Gamma_Prediction );
-        fGHFriendTree->SetBranchAddress( "Is_Gamma_60", &GH_Is_Gamma );
+        fGHFriendTree->SetBranchAddress( "Is_Gamma_70", &GH_Is_Gamma );
     }
     else
     {
