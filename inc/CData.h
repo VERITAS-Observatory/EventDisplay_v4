@@ -261,22 +261,23 @@ class CData
         TBranch*        b_Yoff_intersect;
 
         TTree*          fStereoFriendTree;              //!
-        float         Dir_Xoff;                 //!
-        float         Dir_Yoff;                 //!
-        float         Dir_Erec;                 //!
+        float           Dir_Xoff;                 //!
+        float           Dir_Yoff;                 //!
+        float           Dir_Erec;                 //!
         TTree*          fGHFriendTree;                 //!
-        float         GH_Gamma_Prediction;      //!
-        bool          GH_Is_Gamma;               //!
-        vector<TFile*> fXGBFiles;                //!
+        float           GH_Gamma_Prediction;      //!
+        UChar_t         GH_Is_Gamma;               //!
+        vector<TFile*>  fXGBFiles;                //!
 
         CData( TTree* tree = 0, bool bMC = false, bool bShort = false, TTree* stereoTree = 0, TTree* ghTree = 0 );
-        CData( TTree* tree, bool bMC, bool bShort, string stereo_suffix, string gamma_hadron_suffix );
+        CData( TTree* tree, bool bMC, bool bShort, string file_name, string stereo_suffix, string gamma_hadron_suffix );
         virtual ~CData();
         virtual Int_t    GetEntry( Long64_t entry );
         float get_Erec( unsigned int method = 0 );
         float get_Xoff( unsigned int method = 0 );
         float get_Yoff( unsigned int method = 0 );
-        TTree* getXGBTree( string suffix, string tree_name );
+        void   initialize_xgb_tree(TTree* stereoTree, TTree* ghTree);
+        TTree* getXGBTree( string file_name, string suffix, string tree_name );
         pair<float, float> get_XYoff_derot( unsigned int method = 0 );
         virtual Long64_t LoadTree( Long64_t entry );
         float            get_GH_Gamma_Prediction();

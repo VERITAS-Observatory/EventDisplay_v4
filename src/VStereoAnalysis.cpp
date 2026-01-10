@@ -1965,6 +1965,7 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
             fDataRunTree,
             false,
             false,
+            iFileName,
             fRunPara->fXGB_stereo_file_suffix,
             fRunPara->fXGB_gh_file_suffix
         );

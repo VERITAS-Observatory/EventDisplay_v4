@@ -1190,7 +1190,7 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
         }
         if( fXGB_stereo_file_suffix != "" && fXGB_stereo_file_suffix != "None" )
         {
-            cout << "\t XGB stereo analysis file: " << fXGB_stereo_file_suffix << endl;
+            cout << "\t XGB stereo analysis file suffix: " << fXGB_stereo_file_suffix << endl;
         }
         else
         {
@@ -1198,7 +1198,7 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
         }
         if( fXGB_gh_file_suffix != "" && fXGB_gh_file_suffix != "None" )
         {
-            cout << "\t XGB gamma-hadron separation file: " << fXGB_gh_file_suffix << endl;
+            cout << "\t XGB gamma-hadron separation file suffix: " << fXGB_gh_file_suffix << endl;
         }
         else
         {

@@ -1121,10 +1121,10 @@ bool VGammaHadronCuts::applyXGBoostCut( int i )
     {
         cout << "VGammaHadronCuts::applyXGBoostCut event " << i;
         cout << ", prediction " << fData->GH_Gamma_Prediction;
-        cout << ", is gamma (70\% signal efficiency) " << fData->GH_Is_Gamma;
+        cout << ", is gamma (70\% signal efficiency) " << (bool)fData->GH_Is_Gamma;
         cout << endl;
     }
-    return fData->GH_Is_Gamma;
+    return (bool)fData->GH_Is_Gamma;
 }
 
 

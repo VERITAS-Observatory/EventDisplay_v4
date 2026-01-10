@@ -16,39 +16,27 @@ CData::CData( TTree* tree, bool bMC, bool bShort, TTree* stereoTree, TTree* ghTr
     fShort = bShort;
     fVersion = 6;
     fTelescopeCombination = 0;
+    Init( tree );
 
     fStereoFriendTree = stereoTree;
-    Init( tree );
-    if( fStereoFriendTree )
-    {
-        fStereoFriendTree->SetBranchAddress( "Dir_Xoff", &Dir_Xoff );
-        fStereoFriendTree->SetBranchAddress( "Dir_Yoff", &Dir_Yoff );
-        fStereoFriendTree->SetBranchAddress( "Dir_Erec", &Dir_Erec );
-    }
-    else
-    {
-        Dir_Xoff = -9999.;
-        Dir_Yoff = -9999.;
-        Dir_Erec = -9999.;
-    }
     fGHFriendTree = ghTree;
-    if( fGHFriendTree )
-    {
-        fGHFriendTree->SetBranchAddress( "GH_Gamma_Prediction", &GH_Gamma_Prediction );
-        fGHFriendTree->SetBranchAddress( "Is_Gamma_70, ", &GH_Is_Gamma );
-    }
-    else
-    {
-        GH_Gamma_Prediction = -9999.;
-        GH_Is_Gamma = false;
-    }
+
+    initialize_xgb_tree(fStereoFriendTree, fGHFriendTree);
 }
 
-CData::CData( TTree* tree, bool bMC, bool bShort, string stereo_suffix, string gamma_hadron_suffix )
-    : CData( tree, bMC, bShort,
-             getXGBTree( stereo_suffix, "StereoAnalysis" ),
-             getXGBTree( gamma_hadron_suffix, "Classification" ) )
+
+
+CData::CData( TTree* tree, bool bMC, bool bShort, string file_name, string stereo_suffix, string gamma_hadron_suffix )
 {
+    fMC = bMC;
+    fShort = bShort;
+    fVersion = 6;
+    fTelescopeCombination = 0;
+    Init( tree );
+
+    fStereoFriendTree = getXGBTree( file_name, stereo_suffix, "StereoAnalysis" );
+    fGHFriendTree = getXGBTree( file_name, gamma_hadron_suffix, "Classification" );
+    initialize_xgb_tree(fStereoFriendTree, fGHFriendTree);
 }
 
 
@@ -1061,27 +1049,58 @@ void CData::initialize_3tel_reconstruction(
 /*
    Read XGB friend tree for gamma/hadron separation and stereo reconstruction
 */
-TTree* CData::getXGBTree( string file_suffix, string tree_name )
+TTree* CData::getXGBTree( string file_name, string file_suffix, string tree_name )
 {
-    if( file_suffix == "" || file_suffix != "None" )
+    if( file_suffix == "" || file_suffix == "None" )
     {
         return 0;
     }
 
-    string iFileName = iFileName.replace( iFileName.find( ".root" ), 5, "." + file_suffix + ".root" );
-    TFile *iFile = new TFile( iFileName.c_str() );
-    if( iFile->IsZombie() )
+    file_name = file_name.replace( file_name.find( ".root" ), 5, "." + file_suffix + ".root" );
+    TFile *iFile = TFile::Open( file_name.c_str() );
+    if( !iFile || iFile->IsZombie() )
     {
-        cout << "CData Error: cannot open XGB file " << iFileName << endl;
-        exit( EXIT_FAILURE );
-    }
-    TTree* iXGB_tree = ( TTree* )iFile->Get( tree_name.c_str() );
-    if(!iXGB_tree )
-    {
-        cout << "CData Error: cannot find " << tree_name << " tree in " << iFileName << endl;
+        cout << "CData Error: cannot open XGB file " << file_name << endl;
         exit( EXIT_FAILURE );
     }
     fXGBFiles.push_back( iFile );
-    cout << "Adding " << tree_name << " tree from " << iFileName << endl;
+
+    TTree* iXGB_tree = ( TTree* )iFile->Get( tree_name.c_str() );
+    if(!iXGB_tree )
+    {
+        cout << "CData Error: cannot find " << tree_name << " tree in " << file_name << endl;
+        exit( EXIT_FAILURE );
+    }
+    cout << "Adding " << tree_name << " tree from " << file_name << endl;
     return iXGB_tree;
+}
+
+/*
+ * Initialize XGB trees as kind of friends
+ *
+*/
+void CData::initialize_xgb_tree(TTree* stereoTree, TTree* ghTree )
+{
+    if( fStereoFriendTree )
+    {
+        fStereoFriendTree->SetBranchAddress( "Dir_Xoff", &Dir_Xoff );
+        fStereoFriendTree->SetBranchAddress( "Dir_Yoff", &Dir_Yoff );
+        fStereoFriendTree->SetBranchAddress( "Dir_Erec", &Dir_Erec );
+    }
+    else
+    {
+        Dir_Xoff = -9999.;
+        Dir_Yoff = -9999.;
+        Dir_Erec = -9999.;
+    }
+    if( fGHFriendTree )
+    {
+        fGHFriendTree->SetBranchAddress( "Gamma_Prediction", &GH_Gamma_Prediction );
+        fGHFriendTree->SetBranchAddress( "Is_Gamma_60", &GH_Is_Gamma );
+    }
+    else
+    {
+        GH_Gamma_Prediction = -9999.;
+        GH_Is_Gamma = false;
+    }
 }
