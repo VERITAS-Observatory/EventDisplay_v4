@@ -175,12 +175,12 @@ int main( int argc, char* argv[] )
     TChain* c = new TChain( "data" );
     if(!c->Add( fRunPara->fdatafile.c_str(), -1 ) )
     {
-        cout << "Error while trying to add mscw data tree from file " << fRunPara->fdatafile  << endl;
+        cout << "Error while trying to add mscw data tree from file " << fRunPara->fdatafile << endl;
         cout << "exiting..." << endl;
         exit( EXIT_FAILURE );
     }
 
-    CData d( c, true, false, fRunPara->fXGB_stereo_file_suffix, fRunPara->fXGB_gh_file_suffix );
+    CData d( c, true, false, fRunPara->fdatafile, fRunPara->fXGB_stereo_file_suffix, fRunPara->fXGB_gh_file_suffix );
     d.initialize_3tel_reconstruction(
         fRunPara->fRerunStereoReconstruction_3telescopes,
         fRunPara->fRerunStereoReconstruction_minAngle,
