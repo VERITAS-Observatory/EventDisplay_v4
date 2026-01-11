@@ -90,6 +90,10 @@ class VDataMCComparision
         bool fCalculateMVAValues;
         string fEpochATM;
 
+        // reconstruction methods
+        unsigned int fEnergyReconstructionMethod;
+        unsigned int fDirectionReconstructionMethod;
+
         // lists with all histograms
         TList* hisList;
         vector<TH1D* > hTel;
@@ -142,6 +146,11 @@ class VDataMCComparision
         void setShowerMaximZe_deg( double iZe = 20. )
         {
             fShowerMaxZe_deg = iZe;
+        }
+        void   setStereoReconstructionMethod( unsigned int iEnergyMethod = 0, unsigned int iDirectionMethod = 0 )
+        {
+            fEnergyReconstructionMethod = iEnergyMethod;
+            fDirectionReconstructionMethod = iDirectionMethod;
         }
         bool setTelescopeCoordinates( double x, double y, double z = 0. );
         void setWobbleFromDataTree()

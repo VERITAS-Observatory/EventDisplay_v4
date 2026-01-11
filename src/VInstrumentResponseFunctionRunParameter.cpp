@@ -17,6 +17,7 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
     fSpectralIndexStep = 0.1;
 
     fEnergyReconstructionMethod = 0;
+    fDirectionReconstructionMethod = 0;
     fEnergyAxisBins_log10 = 60;
     fIgnoreEnergyReconstructionQuality = false;
 
@@ -156,6 +157,14 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
                 if(!( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> fEnergyReconstructionMethod;
+                }
+            }
+            // direction reconstruction method
+            else if( temp == "DIRECTIONRECONSTRUCTIONMETHOD" )
+            {
+                if(!( is_stream >> std::ws ).eof() )
+                {
+                    is_stream >> fDirectionReconstructionMethod;
                 }
             }
             // number of bins on log10 energy axis
@@ -653,9 +662,11 @@ void VInstrumentResponseFunctionRunParameter::print()
     if( fIgnoreEnergyReconstructionQuality )
     {
         cout << ", ignoring cut on quality of energy reconstruction";
+        fEnergyReconstructionMethod = 100;
     }
     cout << endl;
     cout << "energy reconstruction method " << fEnergyReconstructionMethod << endl;
+    cout << "direction reconstruction method " << fDirectionReconstructionMethod << endl;
     cout << endl;
 
     cout << "input Monte Carlo with following parameters (will be modified later): " << endl;

@@ -678,30 +678,68 @@ bool CData::is_GH_Gamma()
 * Get energy depending on analysis method
 * Methods:
 *
-* 0: return friend tree result (if available) or Erec
+* 0: return Erec
 * 1: return ErecS
-* 2: return Erec
-* 3: return friend tree result
+* 2: return XGB energy (friend tree)
+* 100: return MC energy
 */
 float CData::get_Erec( unsigned iMethod )
 {
-    if( iMethod == 0 && fStereoFriendTree )
-    {
-        return Dir_Erec;
-    }
-    else if( iMethod == 1 )
+    if( iMethod == 1 )
     {
         return ErecS;
     }
     else if( iMethod == 2 )
     {
-        return Erec;
-    }
-    else if( iMethod == 3 )
-    {
         return Dir_Erec;
     }
+    else if( iMethod == 100 )
+    {
+        return MCe0;
+    }
     return Erec;
+}
+
+/*
+ * Get energy chi2
+ */
+float CData::get_ErecChi2( unsigned iMethod )
+{
+    if( iMethod == 1 )
+    {
+        return EChi2S;
+    }
+    // not defined for XGB methods
+    else if( iMethod == 2 )
+    {
+        return 0.;
+    }
+    else if( iMethod == 100 )
+    {
+        return 0.;
+    }
+    return EChi2S;
+}
+
+/*
+ * Get energy dE
+ */
+float CData::get_ErecdE( unsigned iMethod )
+{
+    if( iMethod == 1 )
+    {
+        return dES;
+    }
+    // not defined for XGB methods
+    else if( iMethod == 2 )
+    {
+        return 0.;
+    }
+    else if( iMethod == 100 )
+    {
+        return 0.;
+    }
+    return dE;
 }
 
 /*
@@ -709,26 +747,17 @@ float CData::get_Erec( unsigned iMethod )
  *
  * Methods:
  *
- * 0: return friend tree result (if available or Xoff)
- * 1: return Xoff
- * 2: return Xoff_intersect
- * 3: return friend tree result
+ * 0: return Xoff
+ * 1: return Xoff_intersect
+ * 2: return friend tree result
  */
 float CData::get_Xoff( unsigned iMethod )
 {
-    if( iMethod == 0 && fStereoFriendTree )
-    {
-        return Dir_Xoff;
-    }
-    else if( iMethod == 1 )
-    {
-        return Xoff;
-    }
-    else if( iMethod == 2 )
+    if( iMethod == 1 )
     {
         return Xoff_intersect;
     }
-    else if( iMethod == 3 )
+    else if( iMethod == 2 )
     {
         return Dir_Xoff;
     }
@@ -741,26 +770,17 @@ float CData::get_Xoff( unsigned iMethod )
  *
  * Methods:
  *
- * 0: return friend tree result (if available or Yoff)
- * 1: return Yoff
- * 2: return Yoff_intersect
- * 3: return friend tree result
+ * 0: return Yoff
+ * 1: return Yoff_intersect
+ * 2: return friend tree result
  */
 float CData::get_Yoff( unsigned iMethod )
 {
-    if( iMethod == 0 && fStereoFriendTree )
-    {
-        return Dir_Yoff;
-    }
-    else if( iMethod == 1 )
-    {
-        return Yoff;
-    }
-    else if( iMethod == 2 )
+    if( iMethod == 1 )
     {
         return Yoff_intersect;
     }
-    else if( iMethod == 3 )
+    else if( iMethod == 2 )
     {
         return Dir_Yoff;
     }
@@ -1048,6 +1068,8 @@ void CData::initialize_3tel_reconstruction(
 
 /*
    Read XGB friend tree for gamma/hadron separation and stereo reconstruction
+
+   Note that this functions returns 0 in case the XGB file is not found.
 */
 TTree* CData::getXGBTree( string file_name, string file_suffix, string tree_name )
 {
@@ -1060,8 +1082,9 @@ TTree* CData::getXGBTree( string file_name, string file_suffix, string tree_name
     TFile *iFile = TFile::Open( file_name.c_str() );
     if(!iFile || iFile->IsZombie() )
     {
-        cout << "CData Error: cannot open XGB file " << file_name << endl;
-        exit( EXIT_FAILURE );
+        cout << "CData warning: cannot open XGB file " << file_name << endl;
+        cout << "(this might be ok if no XGB analysis results are requested)" << endl;
+        return 0;
     }
     fXGBFiles.push_back( iFile );
 

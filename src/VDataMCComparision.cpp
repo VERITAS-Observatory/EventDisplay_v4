@@ -21,7 +21,6 @@ VDataMCComparisionHistogramData::VDataMCComparisionHistogramData(
     fHis2D_size = 0;
     fHis2D_sizeHG = 0;
     fHis2D_sizeLG = 0;
-
 }
 
 TH2D* VDataMCComparisionHistogramData::newHistogram( string iName, string iYTitle, string iXTitle, int iNbins, double ix_min, double ix_max, double iy_min, double iy_max )
@@ -141,6 +140,8 @@ VDataMCComparision::VDataMCComparision( string iname, int intel )
     fCalculateMVAValues = false;
     fEpochATM = "";
 
+    setStereoReconstructionMethod();
+
     // spectral weighting (will be set later correctly, as it is run from MC run header)
     fSpectralWeight = new VSpectralWeight();
     //	fSpectralWeight->setMCParameter( 2.0, 0.05, 20. );
@@ -183,7 +184,7 @@ void VDataMCComparision::initialGammaHadronCuts()
 {
     VGlobalRunParameter( true );
     fCuts = new VGammaHadronCuts();
-    fCuts->initialize();
+    fCuts->initialize( fEnergyReconstructionMethod, fDirectionReconstructionMethod );
     fCuts->resetCutValues();
     fCuts->setNTel( 4 );
     fCuts->setInstrumentEpoch( fEpochATM );
@@ -736,13 +737,13 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
         // MC data
         if( fInput == 0 )
         {
-            theta2 = ( fData->get_Yoff() - fData->MCyoff ) * ( fData->get_Yoff() - fData->MCyoff )
-                     + ( fData->get_Xoff() - fData->MCxoff ) * ( fData->get_Xoff() - fData->MCxoff );
+            theta2 = ( fData->get_Yoff( fDirectionReconstructionMethod ) - fData->MCyoff ) * ( fData->get_Yoff( fDirectionReconstructionMethod ) - fData->MCyoff )
+                     + ( fData->get_Xoff( fDirectionReconstructionMethod ) - fData->MCxoff ) * ( fData->get_Xoff( fDirectionReconstructionMethod ) - fData->MCxoff );
         }
         // data runs (on and off runs)
         else
         {
-            pair< float, float > xyoff_derot = fData->get_XYoff_derot();
+            pair< float, float > xyoff_derot = fData->get_XYoff_derot( fDirectionReconstructionMethod );
             float on_x = xyoff_derot.first + fWobbleEast;
             float on_y = xyoff_derot.second + fWobbleNorth;
             // off data
@@ -959,7 +960,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                 fCuts->newEvent();
                 // apply stereo quality cuts to ensure good response of TMV
                 if( fCuts->applyInsideFiducialAreaCut( true )
-                        && fCuts->applyStereoQualityCuts( 1, true, i, true ) )
+                        && fCuts->applyStereoQualityCuts( true, i, true ) )
                 {
                     fCuts->applyTMVACut( i );
                     if( fCuts->getTMVA_EvaluationResult() > -90. && fHistoArray[EMVA] )

@@ -101,7 +101,7 @@ int main( int argc, char* argv[] )
     /////////////////////////////////////////////////////////////////
     // gamma/hadron cuts
     VGammaHadronCuts* fCuts = new VGammaHadronCuts();
-    fCuts->initialize();
+    fCuts->initialize( fRunPara->fEnergyReconstructionMethod, fRunPara->fDirectionReconstructionMethod );
     fCuts->setNTel( fRunPara->telconfig_ntel, fRunPara->telconfig_arraycentre_X, fRunPara->telconfig_arraycentre_Y );
     fCuts->setInstrumentEpoch( fRunPara->getInstrumentATMString() );
     fCuts->setTelToAnalyze( fRunPara->fTelToAnalyse );
@@ -315,7 +315,7 @@ int main( int argc, char* argv[] )
             }
         }
 
-        fEffectiveAreaCalculator.fill( hE0mc, &d, fMC_histo, fRunPara->fEnergyReconstructionMethod );
+        fEffectiveAreaCalculator.fill( hE0mc, &d, fMC_histo, fRunPara->fEnergyReconstructionMethod, fRunPara->fDirectionReconstructionMethod );
         fStopWatch.Print();
     }
 

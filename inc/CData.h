@@ -274,9 +274,11 @@ class CData
         virtual ~CData();
         virtual Int_t    GetEntry( Long64_t entry );
         float get_Erec( unsigned int method = 0 );
+        float get_ErecChi2( unsigned int method = 0 );
+        float get_ErecdE( unsigned int method = 0 );
         float get_Xoff( unsigned int method = 0 );
         float get_Yoff( unsigned int method = 0 );
-        void   initialize_xgb_tree(TTree* stereoTree, TTree* ghTree);
+        void   initialize_xgb_tree( TTree* stereoTree, TTree* ghTree );
         TTree* getXGBTree( string file_name, string suffix, string tree_name );
         pair<float, float> get_XYoff_derot( unsigned int method = 0 );
         virtual Long64_t LoadTree( Long64_t entry );

@@ -75,11 +75,13 @@ VGammaHadronCuts::VGammaHadronCuts()
     fTMVA_EvaluationResult = -99.;
     fTMVAEvaluatorResults = 0;
 
+    setStereoReconstructionMethod();
     setArrayCentre();
 }
 
-void VGammaHadronCuts::initialize()
+void VGammaHadronCuts::initialize( unsigned int iEnergyMethod, unsigned int iDirectionMethod )
 {
+    setStereoReconstructionMethod( iEnergyMethod, iDirectionMethod );
     fStats = new VGammaHadronCutsStatistics();
     fStats->initialize();
 }
@@ -763,7 +765,7 @@ void VGammaHadronCuts::printCutSummary()
 /*
   ensure event quality, reasonable output from the table variables, etc
 */
-bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructionMethod, bool bCount, int iEntry, bool fIsOn )
+bool VGammaHadronCuts::applyStereoQualityCuts( bool bCount, int iEntry, bool fIsOn )
 {
     /////////////////////////////////////////////////////////////////////////////////
     // apply number of images cut
@@ -801,7 +803,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
     }
 
     /////////////////////////////////////////////////////////////////////////////////
-    if( iEnergyReconstructionMethod != 99 )
+    if( fEnergyReconstructionMethod != 99 )
     {
         // quality cut for MSCW/L reconstruction cuts
         if( fGammaHadronCutSelector % 10 < 1 && ( fData->MSCW < -50. || fData->MSCL < -50. ) )
@@ -826,8 +828,8 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 
         /////////////////////////////////////////////////////////////////////////////////
         // check energy reconstruction
-        double iErec  = getReconstructedEnergy( iEnergyReconstructionMethod );
-        double iEchi2 = getReconstructedEnergyChi2( iEnergyReconstructionMethod );
+        double iErec  = fData->get_Erec( fEnergyReconstructionMethod );
+        double iEchi2 = fData->get_ErecChi2( fEnergyReconstructionMethod );
 
         if( iErec > 0. && iEchi2 <= fCut_EChi2_min )
         {
@@ -981,16 +983,15 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 
   iEnergyReconstructionMethod == 100: return always true
 */
-bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnergyReconstructionMethod, bool bCount )
+bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( bool bCount )
 {
-    double iErec = getReconstructedEnergy( iEnergyReconstructionMethod );
-    double iErecChi2 = getReconstructedEnergyChi2( iEnergyReconstructionMethod );
-    double idE = getReconstructedEnergydE( iEnergyReconstructionMethod );
-
-    if( iEnergyReconstructionMethod == 100 )
+    if( fEnergyReconstructionMethod == 100 )
     {
         return true;
     }
+    double iErec = fData->get_Erec( fEnergyReconstructionMethod );
+    double iErecChi2 = fData->get_ErecChi2( fEnergyReconstructionMethod );
+    double idE = fData->get_ErecdE( fEnergyReconstructionMethod );
 
     if( iErecChi2 < fCut_EChi2_min || iErecChi2 > fCut_EChi2_max )
     {
@@ -1454,7 +1455,7 @@ bool VGammaHadronCuts::initPhaseCuts( string iDir )
 bool VGammaHadronCuts::applyInsideFiducialAreaCut( bool bCount )
 {
 
-    return applyInsideFiducialAreaCut( getReconstructedXoff(), getReconstructedYoff(), bCount );
+    return applyInsideFiducialAreaCut( fData->get_Xoff( fDirectionReconstructionMethod ), fData->get_Yoff( fDirectionReconstructionMethod ), bCount );
 }
 
 bool VGammaHadronCuts::applyInsideFiducialAreaCut( float Xoff, float Yoff, bool bCount )
@@ -1533,7 +1534,7 @@ bool VGammaHadronCuts::applyMCXYoffCut( double xoff, double yoff, bool bCount )
   x0, y0:   calculate theta2 relative to these points (-99999. if relative to MCx/yoff)
 
 */
-bool VGammaHadronCuts::applyDirectionCuts( unsigned int fEnergyReconstructionMethod, bool bCount, double x0, double y0 )
+bool VGammaHadronCuts::applyDirectionCuts( bool bCount, double x0, double y0 )
 {
     double theta2 = 0.;
 
@@ -1563,7 +1564,8 @@ bool VGammaHadronCuts::applyDirectionCuts( unsigned int fEnergyReconstructionMet
     }
 
     // calculate theta2
-    theta2 = ( getReconstructedXoff() - x0 ) * ( getReconstructedXoff() - x0 ) + ( getReconstructedYoff() - y0 ) * ( getReconstructedYoff() - y0 );
+    theta2 = ( fData->get_Xoff( fDirectionReconstructionMethod ) - x0 ) * ( fData->get_Xoff( fDirectionReconstructionMethod ) - x0 )
+             + ( fData->get_Yoff( fDirectionReconstructionMethod ) - y0 ) * ( fData->get_Yoff( fDirectionReconstructionMethod ) - y0 );
 
     // fetch theta2 cut (max)
     double i_theta2_cut_max = getTheta2Cut_max();
@@ -1688,83 +1690,4 @@ string VGammaHadronCuts::getTelToAnalyzeString()
     }
 
     return iTemp.str();
-}
-
-double VGammaHadronCuts::getReconstructedEnergy( unsigned int iEnergyReconstructionMethod )
-{
-    if(!fData )
-    {
-        return -99.;
-    }
-    return fData->get_Erec( iEnergyReconstructionMethod );
-}
-
-double VGammaHadronCuts::getReconstructedEnergyChi2( unsigned int iEnergyReconstructionMethod )
-{
-    if(!fData )
-    {
-        return -99.;
-    }
-    if( iEnergyReconstructionMethod == 0 )
-    {
-        return fData->EChi2;
-    }
-    else if( iEnergyReconstructionMethod == 1 )
-    {
-        return fData->EChi2S;
-    }
-    return -99.;
-}
-
-double VGammaHadronCuts::getReconstructedEnergydE( unsigned int iEnergyReconstructionMethod )
-{
-    if(!fData )
-    {
-        return -99.;
-    }
-    if( iEnergyReconstructionMethod == 0 )
-    {
-        return fData->dE;
-    }
-    else if( iEnergyReconstructionMethod == 1 )
-    {
-        return fData->dES;
-    }
-    return -99.;
-}
-
-double VGammaHadronCuts::getReconstructedXoff()
-{
-    if(!fData )
-    {
-        return -9999.;
-    }
-    return fData->get_Xoff( 0 );
-}
-
-double VGammaHadronCuts::getReconstructedYoff()
-{
-    if(!fData )
-    {
-        return -9999.;
-    }
-    return fData->get_Yoff( 0 );
-}
-
-double VGammaHadronCuts::getReconstructedXcore()
-{
-    if(!fData )
-    {
-        return -9999.;
-    }
-    return fData->Xcore;
-}
-
-double VGammaHadronCuts::getReconstructedYcore()
-{
-    if(!fData )
-    {
-        return -9999.;
-    }
-    return fData->Ycore;
 }

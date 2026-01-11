@@ -584,7 +584,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
     bool bPassed = false;
 
     // apply some basic quality cuts
-    if( fCuts->applyInsideFiducialAreaCut() && fCuts->applyStereoQualityCuts( fEnergyReconstructionMethod, false, entry, true ) )
+    if( fCuts->applyInsideFiducialAreaCut() && fCuts->applyStereoQualityCuts( false, entry, true ) )
     {
         // gamma/hadron cuts
         if(!fCuts->isGamma( entry, false ) )
