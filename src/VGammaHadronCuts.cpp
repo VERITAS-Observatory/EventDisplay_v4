@@ -702,10 +702,15 @@ void VGammaHadronCuts::printCutSummary()
         cout << endl;
         cout << "Orbital Phase bin ( " << fOrbitalPhase_min << ", " << fOrbitalPhase_max << " )";
     }
+    // other cut parameters
+    if( fNTel == 2 )
+    {
+        cout << ", size > " << fCut_Size_min;
+    }
+    cout << endl;
     // TMVA cuts
     if( useTMVACuts() )
     {
-        cout << endl;
         cout << "TMVA gamma/hadron separation with MVA method " << fTMVA_MVAMethod;
         cout << endl;
         cout << "weight files: " << fTMVAWeightFile;
@@ -722,12 +727,6 @@ void VGammaHadronCuts::printCutSummary()
     {
         cout << "XGBoost gamma/hadron separation with fixed 70\% signal efficiency" << endl;
     }
-    // other cut parameters
-    if( fNTel == 2 )
-    {
-        cout << ", size > " << fCut_Size_min;
-    }
-    cout << endl;
     cout << "Fiducial area (camera) < " << fCut_CameraFiducialSize_max << " deg, ";
     cout << " stereo reconstruction: " << fCut_Chi2_min << " <= sChi2 <= " << fCut_Chi2_max << endl;
     cout << "Energy reconstruction: ";
@@ -1121,10 +1120,10 @@ bool VGammaHadronCuts::applyXGBoostCut( int i )
     {
         cout << "VGammaHadronCuts::applyXGBoostCut event " << i;
         cout << ", prediction " << fData->GH_Gamma_Prediction;
-        cout << ", is gamma (70\% signal efficiency) " << (bool)fData->GH_Is_Gamma;
+        cout << ", is gamma (70\% signal efficiency) " << ( bool )fData->GH_Is_Gamma;
         cout << endl;
     }
-    return (bool)fData->GH_Is_Gamma;
+    return ( bool )fData->GH_Is_Gamma;
 }
 
 

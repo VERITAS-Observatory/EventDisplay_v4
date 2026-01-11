@@ -21,7 +21,7 @@ CData::CData( TTree* tree, bool bMC, bool bShort, TTree* stereoTree, TTree* ghTr
     fStereoFriendTree = stereoTree;
     fGHFriendTree = ghTree;
 
-    initialize_xgb_tree(fStereoFriendTree, fGHFriendTree);
+    initialize_xgb_tree( fStereoFriendTree, fGHFriendTree );
 }
 
 
@@ -36,7 +36,7 @@ CData::CData( TTree* tree, bool bMC, bool bShort, string file_name, string stere
 
     fStereoFriendTree = getXGBTree( file_name, stereo_suffix, "StereoAnalysis" );
     fGHFriendTree = getXGBTree( file_name, gamma_hadron_suffix, "Classification" );
-    initialize_xgb_tree(fStereoFriendTree, fGHFriendTree);
+    initialize_xgb_tree( fStereoFriendTree, fGHFriendTree );
 }
 
 
@@ -1058,7 +1058,7 @@ TTree* CData::getXGBTree( string file_name, string file_suffix, string tree_name
 
     file_name = file_name.replace( file_name.find( ".root" ), 5, "." + file_suffix + ".root" );
     TFile *iFile = TFile::Open( file_name.c_str() );
-    if( !iFile || iFile->IsZombie() )
+    if(!iFile || iFile->IsZombie() )
     {
         cout << "CData Error: cannot open XGB file " << file_name << endl;
         exit( EXIT_FAILURE );
@@ -1079,7 +1079,7 @@ TTree* CData::getXGBTree( string file_name, string file_suffix, string tree_name
  * Initialize XGB trees as kind of friends
  *
 */
-void CData::initialize_xgb_tree(TTree* stereoTree, TTree* ghTree )
+void CData::initialize_xgb_tree( TTree* stereoTree, TTree* ghTree )
 {
     if( fStereoFriendTree )
     {
