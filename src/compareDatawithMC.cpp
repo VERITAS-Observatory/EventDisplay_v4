@@ -247,6 +247,11 @@ int main( int argc, char* argv[] )
     {
         fEpochATM = argv[5];
     }
+    unsigned int fEnergyReconstructionMethod = 0;
+    unsigned int fDirectionReconstructionMethod = 0;
+    cout << "Stereo reconstruction methods for energy: " << fEnergyReconstructionMethod;
+    cout << ", direction: " << fDirectionReconstructionMethod << endl;
+
 
     // test number of telescopes
     int iNT = 0;
@@ -309,6 +314,7 @@ int main( int argc, char* argv[] )
         cout << fInputData[i].fType << endl;
         cout << "----" << endl;
         fStereoCompare.push_back( new VDataMCComparision( fInputData[i].fType, fInputData[i].fNTelescopes ) );
+        fStereoCompare.back()->setStereoReconstructionMethod( fEnergyReconstructionMethod, fDirectionReconstructionMethod );
         if( fCalculateMVACut )
         {
             fStereoCompare.back()->setTMVABDTComparision( fEpochATM );
@@ -354,6 +360,7 @@ int main( int argc, char* argv[] )
     cout << "DIFF" << endl;
     cout << "----" << endl;
     VDataMCComparision* fDiff = new VDataMCComparision( "DIFF", iNT );
+    fDiff->setStereoReconstructionMethod( fEnergyReconstructionMethod, fDirectionReconstructionMethod );
     // assume 5 background regions
     fDiff->setOnOffHistograms( fStereoCompareOn, fStereoCompareOff, 1. / 5. );
     fDiff->writeHistograms( fOutputfile );

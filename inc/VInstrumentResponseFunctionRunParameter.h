@@ -43,6 +43,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
         int             fGammaHadronCutSelector;
 
         unsigned int    fEnergyReconstructionMethod;
+        unsigned int    fDirectionReconstructionMethod;
         unsigned int    fEnergyAxisBins_log10;
         bool            fIgnoreEnergyReconstructionQuality;
         unsigned int    fNSpectralIndex;

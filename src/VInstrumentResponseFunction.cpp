@@ -15,7 +15,6 @@ VInstrumentResponseFunction::VInstrumentResponseFunction()
 
     fData = 0;
     fAnaCuts = 0;
-    fEnergyReconstructionMethod = 0;
 
     fSpectralWeight = new VSpectralWeight();
 
@@ -33,8 +32,7 @@ void VInstrumentResponseFunction::setRunParameter( VInstrumentResponseFunctionRu
     {
         return;
     }
-    fEnergyReconstructionMethod = iRunPara->fEnergyReconstructionMethod;
-    setEnergyReconstructionMethod( iRunPara->fEnergyReconstructionMethod );
+    setStereoReconstructionMethod( iRunPara->fEnergyReconstructionMethod, iRunPara->fDirectionReconstructionMethod );
     setMonteCarloEnergyRange( iRunPara->fMCEnergy_min, iRunPara->fMCEnergy_max, TMath::Abs( iRunPara->fMCEnergy_index ) );
 
     fVMinAz = iRunPara->fAzMin;
@@ -96,7 +94,8 @@ bool VInstrumentResponseFunction::initialize( string iName, string iType, unsign
             }
 
             i_irf.back()->setData( iZe, ( int )j, fVMinAz[j], fVMaxAz[j], iNoise, iPedvars, fVSpectralIndex[i], iXoff, iYoff );
-            i_irf.back()->setEnergyReconstructionMethod( fEnergyReconstructionMethod );
+            i_irf.back()->setEnergyReconstructionMethod( fRunPara->fEnergyReconstructionMethod );
+            i_irf.back()->setDirectionReconstructionMethod( fRunPara->fDirectionReconstructionMethod );
         }
         fIRFData.push_back( i_irf );
     }
@@ -174,7 +173,7 @@ bool VInstrumentResponseFunction::fillEventData()
         }
 
         // apply reconstruction quality cuts
-        if(!fAnaCuts->applyStereoQualityCuts( fEnergyReconstructionMethod, true, i, true ) )
+        if(!fAnaCuts->applyStereoQualityCuts( true, i, true ) )
         {
             continue;
         }
@@ -299,7 +298,7 @@ void VInstrumentResponseFunction::setDataTree( CData* iData )
 }
 
 
-void VInstrumentResponseFunction::setEnergyReconstructionMethod( unsigned int iMethod )
+void VInstrumentResponseFunction::setStereoReconstructionMethod( unsigned int iEnergy, unsigned int iDirection )
 {
     for( unsigned int i = 0; i < fIRFData.size(); i++ )
     {
@@ -307,7 +306,8 @@ void VInstrumentResponseFunction::setEnergyReconstructionMethod( unsigned int iM
         {
             if( fIRFData[i][j] )
             {
-                fIRFData[i][j]->setEnergyReconstructionMethod( iMethod );
+                fIRFData[i][j]->setEnergyReconstructionMethod( iEnergy );
+                fIRFData[i][j]->setDirectionReconstructionMethod( iDirection );
             }
         }
     }

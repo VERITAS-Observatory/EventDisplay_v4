@@ -109,6 +109,7 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 
     // define the cuts
     fCuts = new VGammaHadronCuts();
+    fCuts->setStereoReconstructionMethod( fRunPara->fEnergyReconstructionMethod, fRunPara->fDirectionReconstructionMethod );
     char hname[200];
     if( fIsOn )
     {
@@ -478,11 +479,11 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
             }
 
             // get energy (depending on energy reconstruction method)
-            iErec = fCuts->getReconstructedEnergy( fRunPara->fEnergyReconstructionMethod );
-            iErecChi2 = fCuts->getReconstructedEnergyChi2( fRunPara->fEnergyReconstructionMethod );
+            iErec = fDataRun->get_Erec( fRunPara->fEnergyReconstructionMethod );
+            iErecChi2 = fDataRun->get_ErecChi2( fRunPara->fEnergyReconstructionMethod );
             // get shower direction (depending on shower reconstruction method)
-            iXoff = fCuts->getReconstructedXoff();
-            iYoff = fCuts->getReconstructedYoff();
+            iXoff = fDataRun->get_Xoff( fRunPara->fDirectionReconstructionMethod );
+            iYoff = fDataRun->get_Yoff( fRunPara->fDirectionReconstructionMethod );
 
             ////////////////////////////////////////////////
             // apply all quality cuts
@@ -494,7 +495,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
             }
 
             // stereo quality cuts (e.g. successful direction, mscw, mscl reconstruction)
-            if(!fCuts->applyStereoQualityCuts( fRunPara->fEnergyReconstructionMethod, false, i, fIsOn ) )
+            if(!fCuts->applyStereoQualityCuts( false, i, fIsOn ) )
             {
                 continue;
             }
@@ -517,7 +518,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
                                            fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma, i_theta2 );
 
             // energy reconstruction cut
-            bEnergyQualityCuts = fCuts->applyEnergyReconstructionQualityCuts( fRunPara->fEnergyReconstructionMethod );
+            bEnergyQualityCuts = fCuts->applyEnergyReconstructionQualityCuts();
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////
             // following histograms (theta2, mscw, mscl, core position, etc.)  assume source at given target position
@@ -574,7 +575,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
                     fHisto[fHisCounter]->hemissC2->Fill( fDataRun->EmissionHeightChi2 );
                 }
                 // chi2 of energy reconstruction
-                if( iErecChi2 > 0. )
+                if( iErecChi2 >= 0. )
                 {
                     fHisto[fHisCounter]->herecChi2->Fill( iErecChi2 );
                 }
@@ -618,7 +619,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
                 fHisto[fHisCounter]->hTriggerPatternAfterCuts->Fill( fDataRun->LTrig );
                 fHisto[fHisCounter]->hImagePatternAfterCuts->Fill( fDataRun->ImgSel );
                 // make core plots
-                fHisto[fHisCounter]->hcore->Fill( fCuts->getReconstructedXcore(), fCuts->getReconstructedYcore() );
+                fHisto[fHisCounter]->hcore->Fill( fDataRun->Xcore, fDataRun->Ycore );
                 // ##################################
                 // spectral energy reconstruction
                 // apply energy reconstruction cuts
@@ -2111,7 +2112,7 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c, double i_xderot, do
     fTreeSelected_theta2 = i_theta2;
     fTreeSelected_Xoff = c->Xoff;
     fTreeSelected_Yoff = c->Yoff;
-    pair<float, float> tmp_xy_derot = c->get_XYoff_derot();
+    pair<float, float> tmp_xy_derot = c->get_XYoff_derot( fRunPara->fDirectionReconstructionMethod );
     fTreeSelected_Xoff_derot = tmp_xy_derot.first;
     fTreeSelected_Yoff_derot = tmp_xy_derot.second;
     fTreeSelected_Xcore = c->Xcore;
@@ -2122,7 +2123,7 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c, double i_xderot, do
     fTreeSelected_MLR = c->MLR;
     fTreeSelected_Erec = c->Erec;
     fTreeSelected_EChi2 = c->EChi2;
-    fTreeSelected_ErecS = c->get_Erec();
+    fTreeSelected_ErecS = c->get_Erec( fRunPara->fEnergyReconstructionMethod );
     fTreeSelected_EChi2S = c->EChi2S;
     fTreeSelected_EmissionHeight = c->EmissionHeight;
     fTreeSelected_EmissionHeightChi2 = c->EmissionHeightChi2;
@@ -2271,8 +2272,8 @@ void VStereoAnalysis::fill_DL3Tree( CData* c, double i_xderot, double i_yderot, 
     fDL3EventTree_Yderot         = i_yderot;        // Derotated Gamma Point-Of-Origin (deg, DEC)
     if( fCuts )
     {
-        fDL3EventTree_Erec = fCuts->getReconstructedEnergy( fRunPara->fEnergyReconstructionMethod );
-        fDL3EventTree_Erec_Err = fCuts->getReconstructedEnergydE( fRunPara->fEnergyReconstructionMethod ); // Reconstructed Gamma Energy (TeV) Error
+        fDL3EventTree_Erec = c->get_Erec( fRunPara->fEnergyReconstructionMethod );
+        fDL3EventTree_Erec_Err = c->get_ErecdE( fRunPara->fEnergyReconstructionMethod ); // Reconstructed Gamma Energy (TeV) Error
     }
     else
     {

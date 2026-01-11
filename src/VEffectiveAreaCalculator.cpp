@@ -56,7 +56,6 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
         fNoise.push_back( 0 );
         fPedVar.push_back( 0. );
     }
-    setIgnoreEnergyReconstructionCuts( fRunPara->fIgnoreEnergyReconstructionQuality );
     setIsotropicArrivalDirections( fRunPara->fIsotropicArrivalDirections );
     setWobbleOffset( fRunPara->fXoff, fRunPara->fYoff );
     setNoiseLevel( fRunPara->fnoise, fRunPara->fpedvar );
@@ -2017,7 +2016,9 @@ bool VEffectiveAreaCalculator::getMonteCarloSpectra( VEffectiveAreaCalculatorMCH
  *
  */
 bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
-                                     VEffectiveAreaCalculatorMCHistograms* iMC_histo, unsigned int iMethod )
+                                     VEffectiveAreaCalculatorMCHistograms* iMC_histo,
+                                     unsigned int iEnergyReconstructionMethod,
+                                     unsigned int iDirectionReconstructionMethod )
 {
     bool bDebugCuts = false;          // lots of debug output
 
@@ -2029,12 +2030,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
         return false;
     }
     resetHistogramsVectors( ize );
-
-    // do not require successful energy reconstruction
-    if( fIgnoreEnergyReconstruction )
-    {
-        iMethod = 100;
-    }
 
     //////////////////////////////////////////////////////////////////
     // total Monte Carlo core scatter area (depends on CORSIKA shower core scatter mode)
@@ -2066,7 +2061,8 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
     cout << "\t noise level: " << fNoise[ize] << " (pedvar: " << fPedVar[ize] << ")" << endl;
     cout << "\t area (" << fScatterMode[ize] << ") [m^2]: " << fMC_ScatterArea;
     cout << " (scatter radius " << fAreaRadius[ize] << " [m])" << endl;
-    cout << "\t energy reconstruction method: " << iMethod << endl;
+    cout << "\t energy reconstruction method: " << iEnergyReconstructionMethod << endl;
+    cout << "\t direction reconstruction method: " << iDirectionReconstructionMethod << endl;
     if( fIsotropicArrivalDirections )
     {
         cout << "\t assuming isotropic arrival directions" << endl;
@@ -2130,7 +2126,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
     {
         d->GetEntry( i );
 
-        if( d->get_Xoff() < -999. || d->get_Yoff() < -999. ) continue;
+        if( d->get_Xoff( iDirectionReconstructionMethod ) < -999. || d->get_Yoff( iDirectionReconstructionMethod ) < -999. ) continue;
 
         // update cut statistics
         fCuts->newEvent();
@@ -2164,7 +2160,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
         // apply reconstruction cuts
 
         // apply reconstruction quality cuts
-        if(!fCuts->applyStereoQualityCuts( iMethod, true, i, true ) )
+        if(!fCuts->applyStereoQualityCuts( true, i, true ) )
         {
             continue;
         }
@@ -2175,7 +2171,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
         {
             cout << "#1 CUT applyInsideFiducialAreaCut ";
             cout << fCuts->applyInsideFiducialAreaCut();
-            cout << "\t" << fCuts->applyStereoQualityCuts( iMethod, false, i, true ) << endl;
+            cout << "\t" << fCuts->applyStereoQualityCuts( false, i, true ) << endl;
         }
         if(!fCuts->applyInsideFiducialAreaCut( true ) )
         {
@@ -2191,7 +2187,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
         bool bDirectionCut = false;
         if(!fIsotropicArrivalDirections )
         {
-            if(!fCuts->applyDirectionCuts( iMethod, true ) )
+            if(!fCuts->applyDirectionCuts( true ) )
             {
                 bDirectionCut = true;
             }
@@ -2200,7 +2196,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
         // (command line option -d)
         else
         {
-            if(!fCuts->applyDirectionCuts( iMethod, true, 0., 0. ) )
+            if(!fCuts->applyDirectionCuts( true, 0., 0. ) )
             {
                 bDirectionCut = true;
             }
@@ -2212,16 +2208,13 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 
         //////////////////////////////////////
         // apply energy reconstruction quality cut
-        if(!fIgnoreEnergyReconstruction )
+        if( bDebugCuts )
         {
-            if( bDebugCuts )
-            {
-                cout << "#4 EnergyReconstructionQualityCuts " << fCuts->applyEnergyReconstructionQualityCuts( iMethod ) << endl;
-            }
-            if(!fCuts->applyEnergyReconstructionQualityCuts( iMethod, true ) )
-            {
-                continue;
-            }
+            cout << "#4 EnergyReconstructionQualityCuts " << fCuts->applyEnergyReconstructionQualityCuts() << endl;
+        }
+        if(!fCuts->applyEnergyReconstructionQualityCuts( true ) )
+        {
+            continue;
         }
         if(!bDirectionCut )
         {
@@ -2229,23 +2222,14 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
         }
 
         // skip event if no energy has been reconstructed
-        // get energy according to which reconstruction method
-        if( fIgnoreEnergyReconstruction )
+        eRecLin = d->get_Erec( iEnergyReconstructionMethod );
+        if( eRecLin > 0. )
         {
-            eRec = log10( d->MCe0 );
-            eRecLin = d->MCe0;
+            eRec = log10( eRecLin );
         }
         else
         {
-            eRecLin = d->get_Erec( iMethod );
-            if( eRecLin > 0. )
-            {
-                eRec = log10( eRecLin );
-            }
-            else
-            {
-                continue;
-            }
+            continue;
         }
 
         ///////////////////////////////////////////

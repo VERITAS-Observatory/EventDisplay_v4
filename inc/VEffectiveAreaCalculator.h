@@ -113,7 +113,6 @@ class VEffectiveAreaCalculator
         VInstrumentResponseFunctionRunParameter* fRunPara;
 
         VGammaHadronCuts* fCuts;
-        bool fIgnoreEnergyReconstruction;
         bool fIsotropicArrivalDirections;
 
         // effective area calculation
@@ -316,7 +315,7 @@ class VEffectiveAreaCalculator
         ~VEffectiveAreaCalculator();
 
         void cleanup();
-        bool fill( TH1D* hE0mc, CData* d, VEffectiveAreaCalculatorMCHistograms* iMC_histo, unsigned int iMethod );
+        bool fill( TH1D* hE0mc, CData* d, VEffectiveAreaCalculatorMCHistograms* iMC_histo, unsigned int iEnergyReconstructionMethod, unsigned int iDirectionReconstructionMethod );
         TH1D*     getHistogramhEmc();
         TGraphErrors* getMeanSystematicErrorHistogram();
         TTree* getTree()
@@ -362,10 +361,6 @@ class VEffectiveAreaCalculator
         void setEffectiveArea( int iMC )
         {
             fEffectiveAreaVsEnergyMC = iMC;
-        }
-        void setIgnoreEnergyReconstructionCuts( bool iB = false )
-        {
-            fIgnoreEnergyReconstruction = iB;
         }
         void setIsotropicArrivalDirections( bool iB = false )
         {

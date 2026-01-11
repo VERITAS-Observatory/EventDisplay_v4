@@ -100,7 +100,7 @@ int main( int argc, char* argv[] )
 
     // read gamma/hadron cuts from cut file
     VGammaHadronCuts* fCuts = new VGammaHadronCuts();
-    fCuts->initialize();
+    fCuts->initialize( fRunPara->fEnergyReconstructionMethod, fRunPara->fDirectionReconstructionMethod );
     fCuts->setNTel( ntel );
     fCuts->setTelToAnalyze( teltoana );
     if(!fCuts->readCuts( cutfilename, 2 ) )
