@@ -617,6 +617,8 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 
     double rdist1 = 0.;
     double theta2 = 0.;
+    double erec = 0.;
+    double erec_log10 = 0.;
 
     int iOldRun = 0;
 
@@ -692,6 +694,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
         /////////////////////////////////////////////////
         /////////////////////////////////////////////////
         // quality cuts
+        erec = fData->get_Erec(fEnergyReconstructionMethod);
 
         // nimage cut
         if( fData->NImages < fNImages_min )
@@ -699,10 +702,11 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
             continue;
         }
         // successful energy reconstruction
-        if( fData->EChi2S < 0 || fData->get_Erec() <= 0 )
+        if( fData->EChi2S < 0 || erec <= 0 )
         {
             continue;
         }
+        erec_log10 = log10(erec);
         // successful lookup table reconstruction
         if( fData->MSCW < -50. || fData->MSCL < -50. )
         {
@@ -862,11 +866,11 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
         {
             if( fHistoArray[ETHETA2] )
             {
-                fHistoArray[ETHETA2]->fill( theta2, weight, log10( fData->get_Erec() ) );
+                fHistoArray[ETHETA2]->fill( theta2, weight, erec_log10 );
             }
             if( fHistoArray[ELTHETA2] )
             {
-                fHistoArray[ELTHETA2]->fill( log10( theta2 ), weight, log10( fData->get_Erec() ) );
+                fHistoArray[ELTHETA2]->fill( log10( theta2 ), weight, erec_log10 );
             }
             hYt2->Fill( log10( theta2 ), fData->Ycore, weight );
         }
@@ -874,7 +878,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
         {
             if( fHistoArray[EMSCW] )
             {
-                fHistoArray[EMSCW]->fill( fData->MSCW, weight, log10( fData->get_Erec() ) );
+                fHistoArray[EMSCW]->fill( fData->MSCW, weight, erec_log10 );
             }
             for( int j = 0; j < fData->NImages; j++ )
             {
@@ -885,7 +889,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                         && iTelImage < fHistoSingleTel[EMWRT].size() && fHistoSingleTel[EMWRT][iTelImage] )
                 {
                     fHistoSingleTel[EMWRT][iTelImage]->fill( fData->width[iTelImage] / fData->MSCWT[iTelImage],
-                            weight, log10( fData->get_Erec() ),
+                            weight, erec_log10,
                             fData->ntubes[iTelImage], fData->size[iTelImage],
                             fData->fraclow[iTelImage] );
                 }
@@ -893,14 +897,14 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                         && fHistoSingleTel[EMSCWT][iTelImage] )
                 {
                     fHistoSingleTel[EMSCWT][iTelImage]->fill( fData->MSCWT[iTelImage],
-                            weight, log10( fData->get_Erec() ),
+                            weight, erec_log10,
                             fData->ntubes[iTelImage], fData->size[iTelImage],
                             fData->fraclow[iTelImage] );
                 }
             }
             if( fHistoArray[EMWR] )
             {
-                fHistoArray[EMWR]->fill( fData->MWR, weight, log10( fData->get_Erec() ) );
+                fHistoArray[EMWR]->fill( fData->MWR, weight, erec_log10 );
             }
         }
         if( fSingleTelescopeCuts != -1
@@ -908,7 +912,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
         {
             if( fHistoArray[EMSCL] )
             {
-                fHistoArray[EMSCL]->fill( fData->MSCL, weight, log10( fData->get_Erec() ) );
+                fHistoArray[EMSCL]->fill( fData->MSCL, weight, erec_log10 );
             }
             // Again: this is extremely bad as some index have a range of
             // NTel and others a range of NImages
@@ -921,38 +925,38 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                         && iTelImage < fHistoSingleTel[EMLTT].size() && fHistoSingleTel[EMLTT][iTelImage] )
                 {
                     fHistoSingleTel[EMLTT][iTelImage]->fill( fData->length[iTelImage] / fData->MSCLT[iTelImage],
-                            weight, log10( fData->get_Erec() ),
+                            weight, erec_log10,
                             fData->ntubes[iTelImage], fData->size[iTelImage],
                             fData->fraclow[iTelImage] );
                 }
                 if( fHistoSingleTel[EMSCLT].size() > 0 && iTelImage < fHistoSingleTel[EMSCLT].size()
                         && fHistoSingleTel[EMSCLT][iTelImage] )
                 {
-                    fHistoSingleTel[EMSCLT][iTelImage]->fill( fData->MSCLT[iTelImage], weight, log10( fData->get_Erec() ),
+                    fHistoSingleTel[EMSCLT][iTelImage]->fill( fData->MSCLT[iTelImage], weight, erec_log10,
                             fData->ntubes[iTelImage], fData->size[iTelImage],
                             fData->fraclow[iTelImage] );
                 }
             }
             if( fHistoArray[EMLR] )
             {
-                fHistoArray[EMLR]->fill( fData->MLR, weight, log10( fData->get_Erec() ) );
+                fHistoArray[EMLR]->fill( fData->MLR, weight, erec_log10 );
             }
             if( fData->EmissionHeight > 0. && fHistoArray[EEMISSIONHEIGHT] )
             {
                 fHistoArray[EEMISSIONHEIGHT]->fill( getCorrectedEmissionHeight( fData->EmissionHeight, fData->Ze ),
-                                                    weight, log10( fData->get_Erec() ) );
+                                                    weight, erec_log10 );
             }
             if( fHistoArray[ENIMAGES] )
             {
-                fHistoArray[ENIMAGES]->fill( fData->NImages, weight, log10( fData->get_Erec() ) );
+                fHistoArray[ENIMAGES]->fill( fData->NImages, weight, erec_log10 );
             }
             if( fHistoArray[EPEDVAR] )
             {
-                fHistoArray[EPEDVAR]->fill( fData->meanPedvar_Image, weight, log10( fData->get_Erec() ) );
+                fHistoArray[EPEDVAR]->fill( fData->meanPedvar_Image, weight, erec_log10 );
             }
             if( fHistoArray[EIMGSEL] )
             {
-                fHistoArray[EIMGSEL]->fill( fData->ImgSel, weight, log10( fData->get_Erec() ) );
+                fHistoArray[EIMGSEL]->fill( fData->ImgSel, weight, erec_log10 );
             }
 
             if( fCuts )
@@ -966,7 +970,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                     if( fCuts->getTMVA_EvaluationResult() > -90. && fHistoArray[EMVA] )
                     {
                         fHistoArray[EMVA]->fill(
-                            fCuts->getTMVA_EvaluationResult(), weight, log10( fData->get_Erec() ) );
+                            fCuts->getTMVA_EvaluationResult(), weight, erec_log10 );
                     }
                 }
             }
@@ -980,13 +984,13 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
         {
             if( fHistoArray[EXCORE] )
             {
-                fHistoArray[EXCORE]->fill( fData->Xcore, weight, log10( fData->get_Erec() ) );
+                fHistoArray[EXCORE]->fill( fData->Xcore, weight, erec_log10 );
             }
             if( fInput == 0 )
             {
                 if( fHistoArray[EYCORE] )
                 {
-                    fHistoArray[EYCORE]->fill(-1.*fData->Ycore, weight, log10( fData->get_Erec() ) );
+                    fHistoArray[EYCORE]->fill(-1.*fData->Ycore, weight, erec_log10 );
                 }
                 hXYcore->Fill( fData->Xcore, -1.*fData->Ycore, weight );
                 hAzYcore->Fill( fData->Az, -1.*fData->Ycore, weight );
@@ -995,7 +999,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
             {
                 if( fHistoArray[EYCORE] )
                 {
-                    fHistoArray[EYCORE]->fill( fData->Ycore, weight, log10( fData->get_Erec() ) );
+                    fHistoArray[EYCORE]->fill( fData->Ycore, weight, erec_log10 );
                 }
                 hXYcore->Fill( fData->Xcore, fData->Ycore, weight );
                 hAzYcore->Fill( fData->Az, fData->Ycore, weight );
@@ -1035,133 +1039,133 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                 UInt_t iTelImage = fData->ImgSel_list[t];
 
                 // telescope wise quality cuts
-                if( fData->ntubes[iTelImage] > ntubes_min && fData->size[t] > 0. && fData->get_Erec() > 0. )
+                if( fData->ntubes[iTelImage] > ntubes_min && fData->size[t] > 0. && erec > 0. )
                 {
                     if( fHistoSingleTel[ELENGTH][iTelImage] )
                     {
-                        fHistoSingleTel[ELENGTH][iTelImage]->fill( fData->length[iTelImage], weight, log10( fData->get_Erec() ),
+                        fHistoSingleTel[ELENGTH][iTelImage]->fill( fData->length[iTelImage], weight, erec_log10,
                                 fData->ntubes[iTelImage], fData->size[iTelImage],
                                 fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[EWIDTH][iTelImage] )
                     {
-                        fHistoSingleTel[EWIDTH][iTelImage]->fill( fData->width[iTelImage], weight, log10( fData->get_Erec() ),
+                        fHistoSingleTel[EWIDTH][iTelImage]->fill( fData->width[iTelImage], weight, erec_log10,
                                 fData->ntubes[iTelImage], fData->size[iTelImage],
                                 fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[ENTUBES][iTelImage] )
                     {
-                        fHistoSingleTel[ENTUBES][iTelImage]->fill( fData->ntubes[iTelImage], weight, log10( fData->get_Erec() ), fData->ntubes[iTelImage],
+                        fHistoSingleTel[ENTUBES][iTelImage]->fill( fData->ntubes[iTelImage], weight, erec_log10, fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[ENLOWGAIN][iTelImage] && fData->nlowgain[iTelImage] )
                     {
-                        fHistoSingleTel[ENLOWGAIN][iTelImage]->fill( fData->nlowgain[iTelImage], weight, log10( fData->get_Erec() ), fData->ntubes[iTelImage],
+                        fHistoSingleTel[ENLOWGAIN][iTelImage]->fill( fData->nlowgain[iTelImage], weight, erec_log10, fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[EDIST][iTelImage] )
                     {
-                        fHistoSingleTel[EDIST][iTelImage]->fill( fData->dist[iTelImage], weight, log10( fData->get_Erec() ), fData->ntubes[iTelImage],
+                        fHistoSingleTel[EDIST][iTelImage]->fill( fData->dist[iTelImage], weight, erec_log10, fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[ESIZE][iTelImage] )
                     {
-                        fHistoSingleTel[ESIZE][iTelImage]->fill( log10( fData->size[iTelImage] ), weight, log10( fData->get_Erec() ),
+                        fHistoSingleTel[ESIZE][iTelImage]->fill( log10( fData->size[iTelImage] ), weight, erec_log10,
                                 fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[ESIZEHG][iTelImage] )
                     {
                         fHistoSingleTel[ESIZEHG][iTelImage]->fill( log10( fData->size[iTelImage] - fData->size[iTelImage]*fData->fraclow[iTelImage] ),
-                                weight, log10( fData->get_Erec() ), fData->ntubes[iTelImage],
+                                weight, erec_log10, fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[ESIZELG][iTelImage] && fData->fraclow[iTelImage] > 0. )
                     {
                         fHistoSingleTel[ESIZELG][iTelImage]->fill( log10( fData->size[iTelImage]*fData->fraclow[iTelImage] ), weight,
-                                log10( fData->get_Erec() ), fData->ntubes[iTelImage],
+                                erec_log10, fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[EFRACLOW][iTelImage] )
                     {
-                        fHistoSingleTel[EFRACLOW][iTelImage]->fill( fData->fraclow[iTelImage], weight, log10( fData->get_Erec() ),
+                        fHistoSingleTel[EFRACLOW][iTelImage]->fill( fData->fraclow[iTelImage], weight, erec_log10,
                                 fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[EMAX1][iTelImage] && fData->max1[iTelImage] > 0. )
                     {
-                        fHistoSingleTel[EMAX1][iTelImage]->fill( log10( fData->max1[iTelImage] ), weight, log10( fData->get_Erec() ),
+                        fHistoSingleTel[EMAX1][iTelImage]->fill( log10( fData->max1[iTelImage] ), weight, erec_log10,
                                 fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[EMAX2][iTelImage] && fData->max2[iTelImage] > 0. )
                     {
-                        fHistoSingleTel[EMAX2][iTelImage]->fill( log10( fData->max2[iTelImage] ), weight, log10( fData->get_Erec() ),
+                        fHistoSingleTel[EMAX2][iTelImage]->fill( log10( fData->max2[iTelImage] ), weight, erec_log10,
                                 fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[EMAX3][iTelImage] && fData->max3[iTelImage] > 0. )
                     {
-                        fHistoSingleTel[EMAX3][iTelImage]->fill( log10( fData->max3[iTelImage] ), weight, log10( fData->get_Erec() ),
+                        fHistoSingleTel[EMAX3][iTelImage]->fill( log10( fData->max3[iTelImage] ), weight, erec_log10,
                                 fData->ntubes[iTelImage], fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[EALPHA][iTelImage] )
                     {
-                        fHistoSingleTel[EALPHA][iTelImage]->fill( fData->alpha[iTelImage], weight, log10( fData->get_Erec() ),
+                        fHistoSingleTel[EALPHA][iTelImage]->fill( fData->alpha[iTelImage], weight, erec_log10,
                                 fData->ntubes[iTelImage], fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[ELOS][iTelImage] && fData->size[iTelImage] > 0. )
                     {
                         fHistoSingleTel[ELOS][iTelImage]->fill( fData->length[iTelImage] / fData->size[iTelImage] * 1000., weight,
-                                                                log10( fData->get_Erec() ), fData->ntubes[iTelImage],
+                                                                erec_log10, fData->ntubes[iTelImage],
                                                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[ELOSS][iTelImage] )
                     {
-                        fHistoSingleTel[ELOSS][iTelImage]->fill( fData->loss[iTelImage], weight, log10( fData->get_Erec() ), fData->ntubes[iTelImage],
+                        fHistoSingleTel[ELOSS][iTelImage]->fill( fData->loss[iTelImage], weight, erec_log10, fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[EASYM][iTelImage] )
                     {
-                        fHistoSingleTel[EASYM][iTelImage]->fill( fData->asym[iTelImage], weight, log10( fData->get_Erec() ), fData->ntubes[iTelImage],
+                        fHistoSingleTel[EASYM][iTelImage]->fill( fData->asym[iTelImage], weight, erec_log10, fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[ECENX][iTelImage] )
                     {
-                        fHistoSingleTel[ECENX][iTelImage]->fill( fData->cen_x[iTelImage], weight, log10( fData->get_Erec() ), fData->ntubes[iTelImage],
+                        fHistoSingleTel[ECENX][iTelImage]->fill( fData->cen_x[iTelImage], weight, erec_log10, fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[ECENY][iTelImage] )
                     {
-                        fHistoSingleTel[ECENY][iTelImage]->fill( fData->cen_y[iTelImage], weight, log10( fData->get_Erec() ), fData->ntubes[iTelImage],
+                        fHistoSingleTel[ECENY][iTelImage]->fill( fData->cen_y[iTelImage], weight, erec_log10, fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[ETGRADX][iTelImage] )
                     {
-                        fHistoSingleTel[ETGRADX][iTelImage]->fill( fData->tgrad_x[iTelImage], weight, log10( fData->get_Erec() ), fData->ntubes[iTelImage],
+                        fHistoSingleTel[ETGRADX][iTelImage]->fill( fData->tgrad_x[iTelImage], weight, erec_log10, fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[ETELDIST][iTelImage] )
                     {
-                        fHistoSingleTel[ETELDIST][iTelImage]->fill( fData->R_core[iTelImage], weight, log10( fData->get_Erec() ), fData->ntubes[iTelImage],
+                        fHistoSingleTel[ETELDIST][iTelImage]->fill( fData->R_core[iTelImage], weight, erec_log10, fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
-                    if( fHistoSingleTel[ERECRAT][iTelImage] && fData->get_Erec() > 0. && fData->ES[iTelImage] > 0. )
+                    if( fHistoSingleTel[ERECRAT][iTelImage] && erec > 0. && fData->ES[iTelImage] > 0. )
                     {
-                        fHistoSingleTel[ERECRAT][iTelImage]->fill( fData->ES[iTelImage] / fData->get_Erec(), weight, log10( fData->get_Erec() ), fData->ntubes[iTelImage],
+                        fHistoSingleTel[ERECRAT][iTelImage]->fill( fData->ES[iTelImage] / erec, weight, erec_log10, fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[EPEDVART][iTelImage] )
                     {
-                        fHistoSingleTel[EPEDVART][iTelImage]->fill( fData->meanPedvar_ImageT[iTelImage], weight, log10( fData->get_Erec() ), fData->ntubes[iTelImage],
+                        fHistoSingleTel[EPEDVART][iTelImage]->fill( fData->meanPedvar_ImageT[iTelImage], weight, erec_log10, fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
                     if( fHistoSingleTel[EDISPT][iTelImage] )
                     {
-                        fHistoSingleTel[EDISPT][iTelImage]->fill( fData->Disp_T[t], weight, log10( fData->get_Erec() ), fData->ntubes[iTelImage],
+                        fHistoSingleTel[EDISPT][iTelImage]->fill( fData->Disp_T[t], weight, erec_log10, fData->ntubes[iTelImage],
                                 fData->size[iTelImage], fData->fraclow[iTelImage] );
                     }
-                    if( fHistoSingleTel[ERECRAT][iTelImage] && fData->get_Erec() > 0. )
+                    if( fHistoSingleTel[ERECRAT][iTelImage] && erec > 0. )
                         if( hcen_xy[iTelImage] )
                         {
                             hcen_xy[iTelImage]->Fill( fData->cen_x[iTelImage], fData->cen_y[iTelImage], weight );
@@ -1283,7 +1287,7 @@ TH1D*  VDataMCComparision::getAzimuthWeightingHistogram( string ifile )
             continue;
         }
         // successful energy reconstruction
-        if( tData->EChi2S < 0 || tData->get_Erec() <= 0 )
+        if( tData->EChi2S < 0 || tData->get_Erec(fEnergyReconstructionMethod) <= 0 )
         {
             continue;
         }
