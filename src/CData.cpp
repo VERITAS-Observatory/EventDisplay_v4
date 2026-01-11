@@ -658,7 +658,7 @@ Bool_t CData::Notify()
 }
 
 /*
-   Get Gamma/hadron decision from XGB friend tree.
+   Get Get gamma prediction score.
 */
 float CData::get_GH_Gamma_Prediction()
 {
@@ -1102,7 +1102,7 @@ TTree* CData::getXGBTree( string file_name, string file_suffix, string tree_name
  * Initialize XGB trees as kind of friends
  *
 */
-void CData::initialize_xgb_tree( TTree* stereoTree, TTree* ghTree )
+void CData::initialize_xgb_tree()
 {
     if( fStereoFriendTree )
     {

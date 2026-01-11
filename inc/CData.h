@@ -278,7 +278,7 @@ class CData
         float get_ErecdE( unsigned int method );
         float get_Xoff( unsigned int method );
         float get_Yoff( unsigned int method );
-        void   initialize_xgb_tree( TTree* stereoTree, TTree* ghTree );
+        void   initialize_xgb_tree();
         TTree* getXGBTree( string file_name, string suffix, string tree_name );
         pair<float, float> get_XYoff_derot( unsigned int method );
         virtual Long64_t LoadTree( Long64_t entry );
