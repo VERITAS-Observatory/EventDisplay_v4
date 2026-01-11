@@ -190,11 +190,15 @@ class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
         double fEnergyEffectiveAreaSmoothingThreshold;
         vector< double > fMCZe;                   // zenith angle interval for Monte Carlo
 
+        // direction reconstruction
+        unsigned int fDirectionReconstructionMethod;
+
         // dead time calculation method
         int  fDeadTimeCalculationMethod;
 
         // XGB reconstruction
-        string fXGB_file_suffix;
+        string fXGB_stereo_file_suffix;
+        string fXGB_gh_file_suffix;
 
         int f2DAcceptanceMode ; // USE2DACCEPTANCE
 

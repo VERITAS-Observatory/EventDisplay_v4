@@ -18,13 +18,14 @@ class VTMVARunDataEnergyCut : public TNamed
         double       fEnergyCut_Log10TeV_max;
         TCut         fEnergyCut;
         unsigned int fEnergyReconstructionMethod;
+        unsigned int fDirectionReconstructionMethod;
 
         VTMVARunDataEnergyCut();
         ~VTMVARunDataEnergyCut() {}
 
         void print();
 
-        ClassDef( VTMVARunDataEnergyCut, 2 );
+        ClassDef( VTMVARunDataEnergyCut, 3 );
 };
 
 #endif

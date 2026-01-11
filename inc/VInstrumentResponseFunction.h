@@ -47,8 +47,6 @@ class VInstrumentResponseFunction
         // histograms are not re-filled but duplicated
         unsigned int fDuplicationID;
 
-        unsigned int fEnergyReconstructionMethod;
-
         // histograms and data
         vector< vector< VInstrumentResponseFunctionData* > > fIRFData;
 
@@ -115,7 +113,7 @@ class VInstrumentResponseFunction
         bool   initialize( string iName, string iType, unsigned int iNTel, double iMCMaxCoreRadius,
                            double iZe, int iNoise, double iPedvars, double iXoff, double iYoff );
         void   setDuplicationID( unsigned int iDuplicationID = 9999 );
-        void   setEnergyReconstructionMethod( unsigned int iMethod );
+        void   setStereoReconstructionMethod( unsigned int iEnergy, unsigned int iDirection );
         void   setCuts( VGammaHadronCuts* iCuts );
         void   setContainmentProbability( double iP = 0.68, double iPError = 0.95 )
         {

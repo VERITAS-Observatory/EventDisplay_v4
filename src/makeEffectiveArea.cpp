@@ -101,7 +101,7 @@ int main( int argc, char* argv[] )
     /////////////////////////////////////////////////////////////////
     // gamma/hadron cuts
     VGammaHadronCuts* fCuts = new VGammaHadronCuts();
-    fCuts->initialize();
+    fCuts->initialize( fRunPara->fEnergyReconstructionMethod, fRunPara->fDirectionReconstructionMethod );
     fCuts->setNTel( fRunPara->telconfig_ntel, fRunPara->telconfig_arraycentre_X, fRunPara->telconfig_arraycentre_Y );
     fCuts->setInstrumentEpoch( fRunPara->getInstrumentATMString() );
     fCuts->setTelToAnalyze( fRunPara->fTelToAnalyse );
@@ -175,39 +175,12 @@ int main( int argc, char* argv[] )
     TChain* c = new TChain( "data" );
     if(!c->Add( fRunPara->fdatafile.c_str(), -1 ) )
     {
-        cout << "Error while trying to add mscw data tree from file " << fRunPara->fdatafile  << endl;
+        cout << "Error while trying to add mscw data tree from file " << fRunPara->fdatafile << endl;
         cout << "exiting..." << endl;
         exit( EXIT_FAILURE );
     }
 
-    // XGB file
-    TFile *fXGBFile = 0;
-    TTree *fXGB_tree = 0;
-    if( fRunPara->fXGB_file_suffix != "" && fRunPara->fXGB_file_suffix != "None" )
-    {
-        string xgb_file_name = fRunPara->fdatafile;
-        xgb_file_name.replace( fRunPara->fdatafile.find( ".root" ), 5, "." + fRunPara->fXGB_file_suffix + ".root" );
-        fXGBFile = new TFile( xgb_file_name.c_str() );
-        if( fXGBFile->IsZombie() )
-        {
-            cout << "Error: cannot open XGB file " << xgb_file_name << endl;
-            exit( EXIT_FAILURE );
-        }
-        else
-        {
-            fXGB_tree = ( TTree* )fXGBFile->Get( "StereoAnalysis" );
-            // backwards compatibility
-            if(!fXGB_tree ) fXGB_tree = ( TTree* )fXGBFile->Get( "DispDirection" );
-            if(!fXGB_tree )
-            {
-                cout << "Error: cannot find stereo analysis tree in " << fXGBFile->GetName() << endl;
-                exit( EXIT_FAILURE );
-            }
-            cout << "Adding XGB DispDirection from " << fXGBFile->GetName() << endl;
-        }
-    }
-
-    CData d( c, true, false, fXGB_tree );
+    CData d( c, true, false, fRunPara->fdatafile, fRunPara->fXGB_stereo_file_suffix, fRunPara->fXGB_gh_file_suffix );
     d.initialize_3tel_reconstruction(
         fRunPara->fRerunStereoReconstruction_3telescopes,
         fRunPara->fRerunStereoReconstruction_minAngle,
@@ -342,7 +315,7 @@ int main( int argc, char* argv[] )
             }
         }
 
-        fEffectiveAreaCalculator.fill( hE0mc, &d, fMC_histo, fRunPara->fEnergyReconstructionMethod );
+        fEffectiveAreaCalculator.fill( hE0mc, &d, fMC_histo, fRunPara->fEnergyReconstructionMethod, fRunPara->fDirectionReconstructionMethod );
         fStopWatch.Print();
     }
 

@@ -42,6 +42,7 @@ class VRadialAcceptance
         double fCut_CameraFiducialSize_max;
 
         unsigned int fEnergyReconstructionMethod;
+        unsigned int fDirectionReconstructionMethod;
 
         // regions excluded from background
         vector<double> fXE;
@@ -154,9 +155,13 @@ class VRadialAcceptance
             fAzCut_min = iAzMin;    //!< cut on Az (shower directory)
             fAzCut_max = iAzMax;
         }
-        void   setEnergyReconstructionMethod( unsigned int iEMethod = 1 )
+        void   setEnergyReconstructionMethod( unsigned int iEMethod = 0 )
         {
             fEnergyReconstructionMethod = iEMethod;
+        }
+        void   setDirectionReconstructionMethod( unsigned int iEMethod = 0 )
+        {
+            fDirectionReconstructionMethod = iEMethod;
         }
         void   setSource( double x, double y, double r, double idist, double imaxdist = 5. ); //!< set source position, radius, and minimal distance between source and background
         void   setRegionToExcludeAcceptance( vector<double> x, vector<double> y, vector<double> r ); //set the region to be exclude in the analysis

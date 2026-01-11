@@ -32,7 +32,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // analysis types
 ////////////////////////////////////////////////////////////////////////////////
-enum E_AnalysisType { GEO = 0, MVAAnalysis = 1 };
+enum E_AnalysisType { GEO = 0, MVAAnalysis = 1, XGBoostAnalysis = 2 };
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -106,6 +106,10 @@ class VGammaHadronCuts : public VAnalysisUtilities
         map< unsigned int, double > fTMVA_MVACut;
         double          fTMVA_EvaluationResult;
         VTMVAEvaluatorResults* fTMVAEvaluatorResults;
+
+        // reconstruction methods
+        unsigned int fEnergyReconstructionMethod;
+        unsigned int fDirectionReconstructionMethod;
 
         // orbital phase analysis
         TFile* fPhaseCut_File;                                      //!
@@ -186,8 +190,8 @@ class VGammaHadronCuts : public VAnalysisUtilities
         VGammaHadronCuts();
         ~VGammaHadronCuts();
 
-        bool   applyDirectionCuts( unsigned int iEnergyReconstructionMethod = 0, bool bCount = false, double x0 = -99999., double y0 = -99999. );
-        bool   applyEnergyReconstructionQualityCuts( unsigned int iEnergyReconstructionMethod = 0, bool bCount = false );
+        bool   applyDirectionCuts( bool bCount = false, double x0 = -99999., double y0 = -99999. );
+        bool   applyEnergyReconstructionQualityCuts( bool bCount = false );
         bool   applyInsideFiducialAreaCut( bool bCount = false );
         bool   applyInsideFiducialAreaCut( float Xoff, float Yoff, bool bCount = false );
         bool   applyMCXYoffCut( double x, double y, bool bCount = false );
@@ -195,9 +199,10 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool   applyMeanStereoShapeCuts();
         bool   applyMeanScaledStereoShapeCuts();
         bool   applyPhaseCut( int i );
-        bool   applyStereoQualityCuts( unsigned int iEnergyReconstructionMethod = 0, bool bCount = false, int iEntry = 0, bool fIsOn = false );
+        bool   applyStereoQualityCuts( bool bCount = false, int iEntry = 0, bool fIsOn = false );
         bool   applyStereoShapeCuts();
         bool   applyTMVACut( int i );
+        bool   applyXGBoostCut( int i );
 
         double getArrayCentre_X()
         {
@@ -207,13 +212,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
         {
             return fArrayCentre_Y;
         }
-        double getReconstructedEnergy( unsigned int iEnergyReconstructionMethod = 0 );
-        double getReconstructedEnergyChi2( unsigned int iEnergyReconstructionMethod = 0 );
-        double getReconstructedEnergydE( unsigned int iEnergyReconstructionMethod = 0. );
-        double getReconstructedXoff();
-        double getReconstructedYoff();
-        double getReconstructedXcore();
-        double getReconstructedYcore();
         int    getGammaHadronCutSelector()
         {
             return fGammaHadronCutSelector;
@@ -253,7 +251,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         {
             return fTMVAEvaluatorResults;
         }
-        void   initialize();
+        void   initialize( unsigned int iEnergyMethod, unsigned int iDirectionMethod );
         bool   isGamma( int i = 0, bool bCount = false, bool fIsOn = true );
         bool   isMCCuts()
         {
@@ -304,6 +302,11 @@ class VGammaHadronCuts : public VAnalysisUtilities
             fArrayCentre_X = iX;
             fArrayCentre_Y = iY;
         }
+        void   setStereoReconstructionMethod( unsigned int iEnergyMethod = 0, unsigned int iDirectionMethod = 0 )
+        {
+            fEnergyReconstructionMethod = iEnergyMethod;
+            fDirectionReconstructionMethod = iDirectionMethod;
+        }
         void   setTelToAnalyze( vector< unsigned int > iTelToAnalyze )
         {
             fTelToAnalyze = iTelToAnalyze;
@@ -317,11 +320,15 @@ class VGammaHadronCuts : public VAnalysisUtilities
         {
             return ( fAnalysisType == MVAAnalysis );
         }
+        bool  useXGBoostCuts()
+        {
+            return ( fAnalysisType == XGBoostAnalysis );
+        }
         bool   useOrbitalPhaseCuts()
         {
             return fUseOrbitalPhaseCuts;
         }
 
-        ClassDef( VGammaHadronCuts, 60 );
+        ClassDef( VGammaHadronCuts, 61 );
 };
 #endif

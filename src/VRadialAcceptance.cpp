@@ -584,7 +584,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
     bool bPassed = false;
 
     // apply some basic quality cuts
-    if( fCuts->applyInsideFiducialAreaCut() && fCuts->applyStereoQualityCuts( fEnergyReconstructionMethod, false, entry, true ) )
+    if( fCuts->applyInsideFiducialAreaCut() && fCuts->applyStereoQualityCuts( false, entry, true ) )
     {
         // gamma/hadron cuts
         if(!fCuts->isGamma( entry, false ) )
@@ -615,17 +615,20 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
         // no more cuts after this statement
         bPassed = true;
 
-        idist = sqrt( iData->Xoff* iData->Xoff + iData->Yoff* iData->Yoff );
+        double xoff = iData->get_Xoff( fDirectionReconstructionMethod );
+        double yoff = iData->get_Yoff( fDirectionReconstructionMethod );
+
+        idist = sqrt( xoff* xoff + yoff* yoff );
 
         // fill 2D distribution of events
-        hXYAccTot->Fill( iData->get_Xoff(), iData->get_Yoff() );
-        pair<float, float> xy_derot = iData->get_XYoff_derot();
+        hXYAccTot->Fill( xoff, yoff );
+        pair<float, float> xy_derot = iData->get_XYoff_derot( fDirectionReconstructionMethod );
         hXYAccTotDeRot->Fill( xy_derot.first, xy_derot.second );
 
         hXYAccImgSel[iData->ImgSel]->Fill( xy_derot.first, xy_derot.second ) ;
-        hXYAccImgSelPreDeRot[iData->ImgSel]->Fill( iData->get_Xoff(), iData->get_Yoff() ) ;
+        hXYAccImgSelPreDeRot[iData->ImgSel]->Fill( xoff, yoff );
         hXYAccNImages[iData->NImages]->Fill( xy_derot.first, xy_derot.second ) ;
-        hXYAccNImagesPreDeRot[iData->NImages]->Fill( iData->get_Xoff(), iData->get_Yoff() ) ;
+        hXYAccNImagesPreDeRot[iData->NImages]->Fill( xoff, yoff );
 
         // 1D histograms
         // Radius Dependent Histograms
@@ -666,7 +669,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
         }
 
         // fill azimuth angle dependent histograms (camera coordinates)
-        i_Phi = atan2( iData->get_Yoff(), iData->get_Xoff() ) * TMath::RadToDeg();
+        i_Phi = atan2( yoff, xoff ) * TMath::RadToDeg();
         hPhiDist->Fill( i_Phi );
 
         for( unsigned int j = 0; j < fPhiMin.size(); j++ )
@@ -735,7 +738,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
                 }
                 if( j < hXYAccRun.size() )
                 {
-                    hXYAccRun[j]->Fill( iData->get_Xoff(), iData->get_Yoff() );
+                    hXYAccRun[j]->Fill( xoff, yoff );
                 }
                 break;
             }

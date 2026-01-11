@@ -13,6 +13,7 @@
      3: apply cuts on probabilities given by a friend to the data tree already at the level of
         the event quality level
      4: TMVA gamma/hadron separation
+     5: XGBoost gamma/hadron separation
 
   ID1:
 
@@ -26,6 +27,8 @@
     cut selector = 0 : apply MSCW/MSCL cuts (default)
     cut selector = 22 : apply event probability cuts
     cut selector = 10 : apply cuts from a tree AND apply MSCW/MSCL cuts
+    cut selector = 42: apply TMVA gamma/hadron separation AND apply mean width/length cuts (default TMVA-BDT cut)
+    cut selector = 52: apply XGBoost gamma/hadron separation AND apply mean width/length cuts
 
 */
 
@@ -72,11 +75,13 @@ VGammaHadronCuts::VGammaHadronCuts()
     fTMVA_EvaluationResult = -99.;
     fTMVAEvaluatorResults = 0;
 
+    setStereoReconstructionMethod();
     setArrayCentre();
 }
 
-void VGammaHadronCuts::initialize()
+void VGammaHadronCuts::initialize( unsigned int iEnergyMethod, unsigned int iDirectionMethod )
 {
+    setStereoReconstructionMethod( iEnergyMethod, iDirectionMethod );
     fStats = new VGammaHadronCutsStatistics();
     fStats->initialize();
 }
@@ -602,6 +607,14 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
     {
         fAnalysisType = MVAAnalysis;
     }
+    else if( fGammaHadronCutSelector / 10 == 5 )
+    {
+        fAnalysisType = XGBoostAnalysis;
+    }
+    else
+    {
+        fAnalysisType = GEO;
+    }
 
     return true;
 }
@@ -691,10 +704,15 @@ void VGammaHadronCuts::printCutSummary()
         cout << endl;
         cout << "Orbital Phase bin ( " << fOrbitalPhase_min << ", " << fOrbitalPhase_max << " )";
     }
+    // other cut parameters
+    if( fNTel == 2 )
+    {
+        cout << ", size > " << fCut_Size_min;
+    }
+    cout << endl;
     // TMVA cuts
     if( useTMVACuts() )
     {
-        cout << endl;
         cout << "TMVA gamma/hadron separation with MVA method " << fTMVA_MVAMethod;
         cout << endl;
         cout << "weight files: " << fTMVAWeightFile;
@@ -706,12 +724,11 @@ void VGammaHadronCuts::printCutSummary()
             printTMVA_MVACut();
         }
     }
-    // other cut parameters
-    if( fNTel == 2 )
+    // XGBoost cuts
+    if( useXGBoostCuts() )
     {
-        cout << ", size > " << fCut_Size_min;
+        cout << "XGBoost gamma/hadron separation with fixed 70\% signal efficiency" << endl;
     }
-    cout << endl;
     cout << "Fiducial area (camera) < " << fCut_CameraFiducialSize_max << " deg, ";
     cout << " stereo reconstruction: " << fCut_Chi2_min << " <= sChi2 <= " << fCut_Chi2_max << endl;
     cout << "Energy reconstruction: ";
@@ -748,7 +765,7 @@ void VGammaHadronCuts::printCutSummary()
 /*
   ensure event quality, reasonable output from the table variables, etc
 */
-bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructionMethod, bool bCount, int iEntry, bool fIsOn )
+bool VGammaHadronCuts::applyStereoQualityCuts( bool bCount, int iEntry, bool fIsOn )
 {
     /////////////////////////////////////////////////////////////////////////////////
     // apply number of images cut
@@ -786,7 +803,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
     }
 
     /////////////////////////////////////////////////////////////////////////////////
-    if( iEnergyReconstructionMethod != 99 )
+    if( fEnergyReconstructionMethod != 99 )
     {
         // quality cut for MSCW/L reconstruction cuts
         if( fGammaHadronCutSelector % 10 < 1 && ( fData->MSCW < -50. || fData->MSCL < -50. ) )
@@ -811,8 +828,8 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 
         /////////////////////////////////////////////////////////////////////////////////
         // check energy reconstruction
-        double iErec  = getReconstructedEnergy( iEnergyReconstructionMethod );
-        double iEchi2 = getReconstructedEnergyChi2( iEnergyReconstructionMethod );
+        double iErec  = fData->get_Erec( fEnergyReconstructionMethod );
+        double iEchi2 = fData->get_ErecChi2( fEnergyReconstructionMethod );
 
         if( iErec > 0. && iEchi2 <= fCut_EChi2_min )
         {
@@ -936,8 +953,8 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
     // apply cut on difference between stereo intersection and disp method
     // (for stereo method only: this should always pass)
     float i_disp_diff = sqrt(
-                            ( fData->get_Xoff() - fData->Xoff_intersect ) * ( fData->get_Xoff() - fData->Xoff_intersect ) +
-                            ( fData->get_Yoff() - fData->Yoff_intersect ) * ( fData->get_Yoff() - fData->Yoff_intersect ) );
+                            ( fData->get_Xoff( 0 ) - fData->Xoff_intersect ) * ( fData->get_Xoff( 0 ) - fData->Xoff_intersect ) +
+                            ( fData->get_Yoff( 0 ) - fData->Yoff_intersect ) * ( fData->get_Yoff( 0 ) - fData->Yoff_intersect ) );
     if( fCut_DispIntersectSuccess && ( fData->Xoff_intersect < -90. || fData->Yoff_intersect < -90. ) )
     {
         if( bCount && fStats )
@@ -966,16 +983,15 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 
   iEnergyReconstructionMethod == 100: return always true
 */
-bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnergyReconstructionMethod, bool bCount )
+bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( bool bCount )
 {
-    double iErec = getReconstructedEnergy( iEnergyReconstructionMethod );
-    double iErecChi2 = getReconstructedEnergyChi2( iEnergyReconstructionMethod );
-    double idE = getReconstructedEnergydE( iEnergyReconstructionMethod );
-
-    if( iEnergyReconstructionMethod == 100 )
+    if( fEnergyReconstructionMethod == 100 )
     {
         return true;
     }
+    double iErec = fData->get_Erec( fEnergyReconstructionMethod );
+    double iErecChi2 = fData->get_ErecChi2( fEnergyReconstructionMethod );
+    double idE = fData->get_ErecdE( fEnergyReconstructionMethod );
 
     if( iErecChi2 < fCut_EChi2_min || iErecChi2 > fCut_EChi2_max )
     {
@@ -1010,7 +1026,6 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnerg
 */
 bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
 {
-
     /////////////////////////////////////////////////////////////////////////////
     // apply box cuts  (e.g. MSCW/MSCL or MWR/MLR)
     if( fGammaHadronCutSelector % 10 <= 3 )
@@ -1035,13 +1050,28 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
     }
     /////////////////////////////////////////////////////////////////////////////
     // apply cut using TMVA reader
-    else if( useTMVACuts() )
+    if( useTMVACuts() )
     {
         if( fDebug )
         {
             cout << "VGammaHadronCuts::isGamma: applyTMVACut" << endl;
         }
         if(!applyTMVACut( i ) )
+        {
+            if( bCount && fStats )
+            {
+                fStats->updateCutCounter( VGammaHadronCutsStatistics::eIsGamma );
+            }
+            return false;
+        }
+    }
+    else if( useXGBoostCuts() )
+    {
+        if( fDebug )
+        {
+            cout << "VGammaHadronCuts::isGamma: applyXGBoostCut" << endl;
+        }
+        if(!applyXGBoostCut( i ) )
         {
             if( bCount && fStats )
             {
@@ -1078,6 +1108,23 @@ bool VGammaHadronCuts::applyTMVACut( int i )
     }
 
     return false;
+}
+
+/*
+
+    apply XGBoost cuts
+
+*/
+bool VGammaHadronCuts::applyXGBoostCut( int i )
+{
+    if( fDebug )
+    {
+        cout << "VGammaHadronCuts::applyXGBoostCut event " << i;
+        cout << ", prediction " << fData->GH_Gamma_Prediction;
+        cout << ", is gamma (70\% signal efficiency) " << ( bool )fData->GH_Is_Gamma;
+        cout << endl;
+    }
+    return ( bool )fData->GH_Is_Gamma;
 }
 
 
@@ -1303,7 +1350,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile,
 {
     TDirectory* cDir = gDirectory;
 
-    fTMVAEvaluator = new VTMVAEvaluator();
+    fTMVAEvaluator = new VTMVAEvaluator( fEnergyReconstructionMethod );
 
     fTMVAEvaluator->setDebug( fDebug );
     // constant signal efficiency
@@ -1408,7 +1455,7 @@ bool VGammaHadronCuts::initPhaseCuts( string iDir )
 bool VGammaHadronCuts::applyInsideFiducialAreaCut( bool bCount )
 {
 
-    return applyInsideFiducialAreaCut( getReconstructedXoff(), getReconstructedYoff(), bCount );
+    return applyInsideFiducialAreaCut( fData->get_Xoff( fDirectionReconstructionMethod ), fData->get_Yoff( fDirectionReconstructionMethod ), bCount );
 }
 
 bool VGammaHadronCuts::applyInsideFiducialAreaCut( float Xoff, float Yoff, bool bCount )
@@ -1487,7 +1534,7 @@ bool VGammaHadronCuts::applyMCXYoffCut( double xoff, double yoff, bool bCount )
   x0, y0:   calculate theta2 relative to these points (-99999. if relative to MCx/yoff)
 
 */
-bool VGammaHadronCuts::applyDirectionCuts( unsigned int fEnergyReconstructionMethod, bool bCount, double x0, double y0 )
+bool VGammaHadronCuts::applyDirectionCuts( bool bCount, double x0, double y0 )
 {
     double theta2 = 0.;
 
@@ -1517,7 +1564,8 @@ bool VGammaHadronCuts::applyDirectionCuts( unsigned int fEnergyReconstructionMet
     }
 
     // calculate theta2
-    theta2 = ( getReconstructedXoff() - x0 ) * ( getReconstructedXoff() - x0 ) + ( getReconstructedYoff() - y0 ) * ( getReconstructedYoff() - y0 );
+    theta2 = ( fData->get_Xoff( fDirectionReconstructionMethod ) - x0 ) * ( fData->get_Xoff( fDirectionReconstructionMethod ) - x0 )
+             + ( fData->get_Yoff( fDirectionReconstructionMethod ) - y0 ) * ( fData->get_Yoff( fDirectionReconstructionMethod ) - y0 );
 
     // fetch theta2 cut (max)
     double i_theta2_cut_max = getTheta2Cut_max();
@@ -1563,10 +1611,6 @@ void VGammaHadronCuts::terminate()
     if( fTMVAEvaluatorResults )
     {
         fTMVAEvaluatorResults->Write();
-    }
-    else
-    {
-        cout << "No TMVAEvaluator Results." << endl;
     }
 
     Write();
@@ -1646,83 +1690,4 @@ string VGammaHadronCuts::getTelToAnalyzeString()
     }
 
     return iTemp.str();
-}
-
-double VGammaHadronCuts::getReconstructedEnergy( unsigned int iEnergyReconstructionMethod )
-{
-    if(!fData )
-    {
-        return -99.;
-    }
-    return fData->get_Erec( iEnergyReconstructionMethod );
-}
-
-double VGammaHadronCuts::getReconstructedEnergyChi2( unsigned int iEnergyReconstructionMethod )
-{
-    if(!fData )
-    {
-        return -99.;
-    }
-    if( iEnergyReconstructionMethod == 0 )
-    {
-        return fData->EChi2;
-    }
-    else if( iEnergyReconstructionMethod == 1 )
-    {
-        return fData->EChi2S;
-    }
-    return -99.;
-}
-
-double VGammaHadronCuts::getReconstructedEnergydE( unsigned int iEnergyReconstructionMethod )
-{
-    if(!fData )
-    {
-        return -99.;
-    }
-    if( iEnergyReconstructionMethod == 0 )
-    {
-        return fData->dE;
-    }
-    else if( iEnergyReconstructionMethod == 1 )
-    {
-        return fData->dES;
-    }
-    return -99.;
-}
-
-double VGammaHadronCuts::getReconstructedXoff()
-{
-    if(!fData )
-    {
-        return -9999.;
-    }
-    return fData->get_Xoff( 0 );
-}
-
-double VGammaHadronCuts::getReconstructedYoff()
-{
-    if(!fData )
-    {
-        return -9999.;
-    }
-    return fData->get_Yoff( 0 );
-}
-
-double VGammaHadronCuts::getReconstructedXcore()
-{
-    if(!fData )
-    {
-        return -9999.;
-    }
-    return fData->Xcore;
-}
-
-double VGammaHadronCuts::getReconstructedYcore()
-{
-    if(!fData )
-    {
-        return -9999.;
-    }
-    return fData->Ycore;
 }

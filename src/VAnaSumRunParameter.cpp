@@ -117,12 +117,14 @@ VAnaSumRunParameter::VAnaSumRunParameter()
     // parameter for energy spectra (in log E)
     fEnergyReconstructionSpectralIndex = 2.5;
     fEnergyReconstructionMethod = 0;
+    fDirectionReconstructionMethod = 0;
     fEffectiveAreaVsEnergyMC = 1;             // default: use effective areas vs reconstructed energy (accurate method)
     fEnergySpectrumBinSize = 0.05;
     fEnergyEffectiveAreaSmoothingIterations = -1;
     fEnergyEffectiveAreaSmoothingThreshold = -1.;
     fDeadTimeCalculationMethod = 0;
-    fXGB_file_suffix = "";
+    fXGB_stereo_file_suffix = "";
+    fXGB_gh_file_suffix = "";
 
     // background model
     fTMPL_fBackgroundModel = 0;
@@ -582,11 +584,23 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             else if( temp == "ENERGYRECONSTRUCTIONMETHOD" )
             {
                 fEnergyReconstructionMethod = ( unsigned int )atoi( temp2.c_str() );
-                if( fEnergyReconstructionMethod > 1 )
+                if( fEnergyReconstructionMethod > 2 )
                 {
-                    cout << "Unknown parameter for ENERGYRECONSTRUCTIONMETHOD in parameter file " << i_filename << ": " << temp2 << endl;
-                    cout << "allowed values are 0 and 1" << endl;
-                    return 0;
+                    cout << "Invalid value for ENERGYRECONSTRUCTIONMETHOD in parameter file " << i_filename << ": " << temp2 << endl;
+                    cout << "allowed values are 0 (DispBDT), 1 (LT Tables), 2 (XGB stereo)" << endl;
+                    cout << "exiting..." << endl;
+                    exit( EXIT_FAILURE );
+                }
+            }
+            else if( temp == "DIRECTIONRECONSTRUCTIONMETHOD" )
+            {
+                fDirectionReconstructionMethod = ( unsigned int )atoi( temp2.c_str() );
+                if( fDirectionReconstructionMethod > 2 )
+                {
+                    cout << "Invalid value for DIRECTIONRECONSTRUCTIONMETHOD in parameter file " << i_filename << ": " << temp2 << endl;
+                    cout << "allowed values are 0 (DispBDT), 1 (Intersection Method), 2 (XGB stereo)" << endl;
+                    cout << "exiting..." << endl;
+                    exit( EXIT_FAILURE );
                 }
             }
             else if( temp == "DEADTIMECALCULATIONMETHOD" )
@@ -598,10 +612,15 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                     return 0;
                 }
             }
-            else if( temp == "XGBFILESUFFIX" )
+            else if( temp == "XGBSTEREOFILESUFFIX" )
             {
-                fXGB_file_suffix = temp2;
-                if( fXGB_file_suffix == "None" ) fXGB_file_suffix = "";
+                fXGB_stereo_file_suffix = temp2;
+                if( fXGB_stereo_file_suffix == "None" ) fXGB_stereo_file_suffix = "";
+            }
+            else if( temp == "XGBGAMMAHADRONFILESUFFIX" )
+            {
+                fXGB_gh_file_suffix = temp2;
+                if( fXGB_gh_file_suffix == "None" ) fXGB_gh_file_suffix = "";
             }
             else if( temp == "RATEINTERVALLLENGTH" )
             {
@@ -1173,22 +1192,48 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
         {
             cout << " (use effective area A_REC)";
         }
-        cout << ", Method " << fEnergyReconstructionMethod;
+        cout << endl;
+        cout << "\t Energy reconstruction method " << fEnergyReconstructionMethod;
         if( fEnergyReconstructionMethod == 0 )
         {
             cout << " (dispBDT energy reconstruction)" << endl;
         }
-        else
+        else if( fEnergyReconstructionMethod == 1 )
         {
             cout << " (lookup table energy reconstruction)" << endl;
         }
-        if( fXGB_file_suffix != "" && fXGB_file_suffix != "None" )
+        else if( fEnergyReconstructionMethod == 2 )
         {
-            cout << "\t XY direction file: " << fXGB_file_suffix << endl;
+            cout << " (XGB stereo reconstruction)" << endl;
+        }
+        cout << "\t Direction reconstruction method " << fDirectionReconstructionMethod;
+        if( fDirectionReconstructionMethod == 0 )
+        {
+            cout << " (dispBDT direction reconstruction)" << endl;
+        }
+        else if( fDirectionReconstructionMethod == 1 )
+        {
+            cout << " (intersection method reconstruction)" << endl;
+        }
+        else if( fDirectionReconstructionMethod == 2 )
+        {
+            cout << " (XGB stereo reconstruction)" << endl;
+        }
+        if( fXGB_stereo_file_suffix != "" && fXGB_stereo_file_suffix != "None" )
+        {
+            cout << "\t XGB stereo analysis file suffix: " << fXGB_stereo_file_suffix << endl;
         }
         else
         {
-            cout << "\t no XY direction file used" << endl;
+            cout << "\t no XGB stereo analysis file used" << endl;
+        }
+        if( fXGB_gh_file_suffix != "" && fXGB_gh_file_suffix != "None" )
+        {
+            cout << "\t XGB gamma-hadron separation file suffix: " << fXGB_gh_file_suffix << endl;
+        }
+        else
+        {
+            cout << "\t no XGB gamma-hadron separation file used" << endl;
         }
         cout << "\t dead time calculation method: ";
         if( fDeadTimeCalculationMethod == 0 )
@@ -1466,12 +1511,14 @@ bool VAnaSumRunParameter::checkAnasumParameter( string ifile )
     }
     else
     {
-        // check energy reconstruction method
-        if( iIRF->fEnergyReconstructionMethod != fEnergyReconstructionMethod )
+        // check stereo reconstruction method
+        if( iIRF->fEnergyReconstructionMethod != fEnergyReconstructionMethod || iIRF->fDirectionReconstructionMethod != fDirectionReconstructionMethod )
         {
-            cout << "VAnaSumRunParameter::checkAnasumParameter error in energy reconstruction method specified in runparameter file. " << endl;
-            cout << "\t Effective area file (" << ifile << ") uses energy reconstruction method " << iIRF->fEnergyReconstructionMethod << endl;
-            cout << "\t but energy reconstruction method " << fEnergyReconstructionMethod << " is requested in the anasum runparameter file. " << endl;
+            cout << "VAnaSumRunParameter::checkAnasumParameter error in energy or direction reconstruction method specified in runparameter file. " << endl;
+            cout << "\t Effective area file (" << ifile << ") uses energy methods: " << iIRF->fEnergyReconstructionMethod <<  " (energy) ";
+            cout << iIRF->fDirectionReconstructionMethod << " (direction)" << endl;
+            cout << "\t but reconstruction methods " << fEnergyReconstructionMethod << " (energy) and " << fDirectionReconstructionMethod;
+            cout << " (direction) are requested in the anasum runparameter file. " << endl;
             cout << "exiting..." << endl;
             exit( EXIT_FAILURE );
         }

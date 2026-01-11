@@ -74,6 +74,7 @@ class VInstrumentResponseFunctionData : public TObject, public VHistogramUtiliti
         unsigned int fNTel;
 
         unsigned int fEnergyReconstructionMethod;
+        unsigned int fDirectionReconstructionMethod;
 
         // list of histograms
         enum    E_HISTOID { E_DIFF, E_DIFF2, E_LOGDIFF, E_NIMAG, E_DIST, E_ERROR, E_RELA,
@@ -105,6 +106,10 @@ class VInstrumentResponseFunctionData : public TObject, public VHistogramUtiliti
         void   setEnergyReconstructionMethod( unsigned int iMethod = 0 )
         {
             fEnergyReconstructionMethod = iMethod;
+        }
+        void   setDirectionReconstructionMethod( unsigned int iMethod = 0 )
+        {
+            fDirectionReconstructionMethod = iMethod;
         }
         void   setPlottingStyle( int icolor, double iwidth = 1., int imarker = 20, double isize = 1., int iFillStyle = 0, int iLineStyle = 1 );
         void   setHistogramEbinning( int iN = 60, double iMin = -2.0, double iMax = 4.0 )

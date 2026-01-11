@@ -10,27 +10,32 @@
 #include "CData.h"
 
 
-CData::CData( TTree* tree, bool bMC, bool bShort, TTree* friendTree )
+CData::CData( TTree* tree, bool bMC, bool bShort, TTree* stereoTree, TTree* ghTree )
 {
     fMC = bMC;
     fShort = bShort;
     fVersion = 6;
     fTelescopeCombination = 0;
-
-    fFriendTree = friendTree;
     Init( tree );
-    if( fFriendTree )
-    {
-        fFriendTree->SetBranchAddress( "Dir_Xoff", &Dir_Xoff );
-        fFriendTree->SetBranchAddress( "Dir_Yoff", &Dir_Yoff );
-        fFriendTree->SetBranchAddress( "Dir_Erec", &Dir_Erec );
-    }
-    else
-    {
-        Dir_Xoff = -9999.;
-        Dir_Yoff = -9999.;
-        Dir_Erec = -9999.;
-    }
+
+    fStereoFriendTree = stereoTree;
+    fGHFriendTree = ghTree;
+    initialize_xgb_tree();
+}
+
+
+
+CData::CData( TTree* tree, bool bMC, bool bShort, string file_name, string stereo_suffix, string gamma_hadron_suffix )
+{
+    fMC = bMC;
+    fShort = bShort;
+    fVersion = 6;
+    fTelescopeCombination = 0;
+    Init( tree );
+
+    fStereoFriendTree = getXGBTree( file_name, stereo_suffix, "StereoAnalysis" );
+    fGHFriendTree = getXGBTree( file_name, gamma_hadron_suffix, "Classification" );
+    initialize_xgb_tree();
 }
 
 
@@ -40,6 +45,15 @@ CData::~CData()
     {
         return;
     }
+    for( unsigned int i = 0; i < fXGBFiles.size(); i++ )
+    {
+        if( fXGBFiles[i] )
+        {
+            fXGBFiles[i]->Close();
+            delete fXGBFiles[i];
+        }
+    }
+    fXGBFiles.clear();
     delete fChain->GetCurrentFile();
 }
 
@@ -53,9 +67,13 @@ Int_t CData::GetEntry( Long64_t entry )
     }
 
     int a = fChain->GetEntry( entry );
-    if( fFriendTree )
+    if( fStereoFriendTree )
     {
-        fFriendTree->GetEntry( entry );
+        fStereoFriendTree->GetEntry( entry );
+    }
+    if( fGHFriendTree )
+    {
+        fGHFriendTree->GetEntry( entry );
     }
 
     if( fTelescopeCombination > 0 && fTelescopeCombination != 15 )
@@ -638,35 +656,89 @@ Bool_t CData::Notify()
     return kTRUE;
 }
 
+/*
+   Get Get gamma prediction score.
+*/
+float CData::get_GH_Gamma_Prediction()
+{
+    return GH_Gamma_Prediction;
+}
+
+/*
+  Get Gamma/hadron decision from XGB friend tree.
+*/
+bool CData::is_GH_Gamma()
+{
+    return GH_Is_Gamma;
+}
+
 
 /*
 * Get energy depending on analysis method
 * Methods:
 *
-* 0: return friend tree result (if available) or Erec
+* 0: return Erec
 * 1: return ErecS
-* 2: return Erec
-* 3: return friend tree result
+* 2: return XGB energy (friend tree)
+* 100: return MC energy
 */
 float CData::get_Erec( unsigned iMethod )
 {
-    if( iMethod == 0 && fFriendTree )
-    {
-        return Dir_Erec;
-    }
-    else if( iMethod == 1 )
+    if( iMethod == 1 )
     {
         return ErecS;
     }
     else if( iMethod == 2 )
     {
-        return Erec;
-    }
-    else if( iMethod == 3 )
-    {
         return Dir_Erec;
     }
+    else if( iMethod == 100 )
+    {
+        return MCe0;
+    }
     return Erec;
+}
+
+/*
+ * Get energy chi2
+ */
+float CData::get_ErecChi2( unsigned iMethod )
+{
+    if( iMethod == 1 )
+    {
+        return EChi2S;
+    }
+    // not defined for XGB methods
+    else if( iMethod == 2 )
+    {
+        return 1.e-2;
+    }
+    else if( iMethod == 100 )
+    {
+        return 1.e-2;
+    }
+    return EChi2;
+}
+
+/*
+ * Get energy dE
+ */
+float CData::get_ErecdE( unsigned iMethod )
+{
+    if( iMethod == 1 )
+    {
+        return dES;
+    }
+    // not defined for XGB methods
+    else if( iMethod == 2 )
+    {
+        return 1.e-2;
+    }
+    else if( iMethod == 100 )
+    {
+        return 1.e-2;
+    }
+    return dE;
 }
 
 /*
@@ -674,26 +746,17 @@ float CData::get_Erec( unsigned iMethod )
  *
  * Methods:
  *
- * 0: return friend tree result (if available or Xoff)
- * 1: return Xoff
- * 2: return Xoff_intersect
- * 3: return friend tree result
+ * 0: return Xoff
+ * 1: return Xoff_intersect
+ * 2: return friend tree result
  */
 float CData::get_Xoff( unsigned iMethod )
 {
-    if( iMethod == 0 && fFriendTree )
-    {
-        return Dir_Xoff;
-    }
-    else if( iMethod == 1 )
-    {
-        return Xoff;
-    }
-    else if( iMethod == 2 )
+    if( iMethod == 1 )
     {
         return Xoff_intersect;
     }
-    else if( iMethod == 3 )
+    else if( iMethod == 2 )
     {
         return Dir_Xoff;
     }
@@ -706,26 +769,17 @@ float CData::get_Xoff( unsigned iMethod )
  *
  * Methods:
  *
- * 0: return friend tree result (if available or Yoff)
- * 1: return Yoff
- * 2: return Yoff_intersect
- * 3: return friend tree result
+ * 0: return Yoff
+ * 1: return Yoff_intersect
+ * 2: return friend tree result
  */
 float CData::get_Yoff( unsigned iMethod )
 {
-    if( iMethod == 0 && fFriendTree )
-    {
-        return Dir_Yoff;
-    }
-    else if( iMethod == 1 )
-    {
-        return Yoff;
-    }
-    else if( iMethod == 2 )
+    if( iMethod == 1 )
     {
         return Yoff_intersect;
     }
-    else if( iMethod == 3 )
+    else if( iMethod == 2 )
     {
         return Dir_Yoff;
     }
@@ -1008,4 +1062,67 @@ void CData::initialize_3tel_reconstruction(
     fTelX = tel_x;
     fTelY = tel_y;
     fTelZ = tel_z;
+}
+
+
+/*
+   Read XGB friend tree for gamma/hadron separation and stereo reconstruction
+
+   Note that this functions returns 0 in case the XGB file is not found.
+*/
+TTree* CData::getXGBTree( string file_name, string file_suffix, string tree_name )
+{
+    if( file_suffix == "" || file_suffix == "None" )
+    {
+        return 0;
+    }
+
+    file_name = file_name.replace( file_name.find( ".root" ), 5, "." + file_suffix + ".root" );
+    TFile *iFile = TFile::Open( file_name.c_str() );
+    if(!iFile || iFile->IsZombie() )
+    {
+        cout << "CData warning: cannot open XGB file " << file_name << endl;
+        cout << "(this might be ok if no XGB analysis results are requested)" << endl;
+        return 0;
+    }
+    fXGBFiles.push_back( iFile );
+
+    TTree* iXGB_tree = ( TTree* )iFile->Get( tree_name.c_str() );
+    if(!iXGB_tree )
+    {
+        cout << "CData Error: cannot find " << tree_name << " tree in " << file_name << endl;
+        exit( EXIT_FAILURE );
+    }
+    cout << "\t Adding " << tree_name << " tree from " << file_name << endl;
+    return iXGB_tree;
+}
+
+/*
+ * Initialize XGB trees as kind of friends
+ *
+*/
+void CData::initialize_xgb_tree()
+{
+    if( fStereoFriendTree )
+    {
+        fStereoFriendTree->SetBranchAddress( "Dir_Xoff", &Dir_Xoff );
+        fStereoFriendTree->SetBranchAddress( "Dir_Yoff", &Dir_Yoff );
+        fStereoFriendTree->SetBranchAddress( "Dir_Erec", &Dir_Erec );
+    }
+    else
+    {
+        Dir_Xoff = -9999.;
+        Dir_Yoff = -9999.;
+        Dir_Erec = -9999.;
+    }
+    if( fGHFriendTree )
+    {
+        fGHFriendTree->SetBranchAddress( "Gamma_Prediction", &GH_Gamma_Prediction );
+        fGHFriendTree->SetBranchAddress( "Is_Gamma_70", &GH_Is_Gamma );
+    }
+    else
+    {
+        GH_Gamma_Prediction = -9999.;
+        GH_Is_Gamma = false;
+    }
 }

@@ -440,7 +440,9 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
     bool bPlotResolution_vs_reconstructedEnergy = true;
 
     // simple quality check (FOV shouldn't be larger than 50 deg)
-    if( fData->get_Xoff() < -50. || fData->get_Yoff() < -50. )
+    double xoff = fData->get_Xoff( fDirectionReconstructionMethod );
+    double yoff = fData->get_Yoff( fDirectionReconstructionMethod );
+    if( xoff < -50. || yoff < -50. )
     {
         return;
     }
@@ -460,11 +462,9 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
     if( fType_numeric == 0 )
     {
         // angular difference
-        iDiff = sqrt(( fData->get_Xoff() - fData->MCxoff ) * ( fData->get_Xoff() - fData->MCxoff ) +
-                     ( fData->get_Yoff() - fData->MCyoff ) * ( fData->get_Yoff() - fData->MCyoff ) );
+        iDiff = sqrt(( xoff - fData->MCxoff ) * ( xoff - fData->MCxoff ) + ( yoff - fData->MCyoff ) * ( yoff - fData->MCyoff ) );
         // error
-        iError = sqrt( fData->get_Xoff() * fData->get_Xoff() + fData->get_Yoff() * fData->get_Yoff() ) -
-                 sqrt( fData->MCxoff* fData->MCxoff + fData->MCyoff* fData->MCyoff );
+        iError = sqrt( xoff* xoff + yoff* yoff ) - sqrt( fData->MCxoff* fData->MCxoff + fData->MCyoff* fData->MCyoff );
         // relative error (not sure if it is useful)
         iErrorRelative = -99.e6;
     }

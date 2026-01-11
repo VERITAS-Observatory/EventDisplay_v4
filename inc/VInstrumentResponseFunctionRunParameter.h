@@ -43,6 +43,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
         int             fGammaHadronCutSelector;
 
         unsigned int    fEnergyReconstructionMethod;
+        unsigned int    fDirectionReconstructionMethod;
         unsigned int    fEnergyAxisBins_log10;
         bool            fIgnoreEnergyReconstructionQuality;
         unsigned int    fNSpectralIndex;
@@ -74,7 +75,8 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
         string          fdatafile;
         string          fMCdatafile_tree;
         string          fMCdatafile_histo;
-        string          fXGB_file_suffix;
+        string          fXGB_stereo_file_suffix;
+        string          fXGB_gh_file_suffix;
 
         double          fze;
         int             fnoise;

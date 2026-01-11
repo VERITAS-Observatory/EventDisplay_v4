@@ -17,6 +17,7 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
     fSpectralIndexStep = 0.1;
 
     fEnergyReconstructionMethod = 0;
+    fDirectionReconstructionMethod = 0;
     fEnergyAxisBins_log10 = 60;
     fIgnoreEnergyReconstructionQuality = false;
 
@@ -51,7 +52,8 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
     fdatafile = "";
     fMCdatafile_tree = "";
     fMCdatafile_histo = "";
-    fXGB_file_suffix = "";
+    fXGB_stereo_file_suffix = "";
+    fXGB_gh_file_suffix = "";
 
     fze = 0.;
     fnoise = 0;
@@ -157,6 +159,14 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
                     is_stream >> fEnergyReconstructionMethod;
                 }
             }
+            // direction reconstruction method
+            else if( temp == "DIRECTIONRECONSTRUCTIONMETHOD" )
+            {
+                if(!( is_stream >> std::ws ).eof() )
+                {
+                    is_stream >> fDirectionReconstructionMethod;
+                }
+            }
             // number of bins on log10 energy axis
             else if( temp == "ENERGYAXISBINS" )
             {
@@ -236,12 +246,20 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
                     is_stream >> fCutFileName;
                 }
             }
-            else if( temp == "XGBFILESUFFIX" )
+            else if( temp == "XGBSTEREOFILESUFFIX" )
             {
                 if(!( is_stream >> std::ws ).eof() )
                 {
-                    is_stream >> fXGB_file_suffix;
-                    if( fXGB_file_suffix == "None" ) fXGB_file_suffix = "";
+                    is_stream >> fXGB_stereo_file_suffix;
+                    if( fXGB_stereo_file_suffix == "None" ) fXGB_stereo_file_suffix = "";
+                }
+            }
+            else if( temp == "XGBGAMMAHADRONFILESUFFIX" )
+            {
+                if(!( is_stream >> std::ws ).eof() )
+                {
+                    is_stream >> fXGB_gh_file_suffix;
+                    if( fXGB_gh_file_suffix == "None" ) fXGB_gh_file_suffix = "";
                 }
             }
             // * SCATTERMODE <core scatter radius [m]> <type of CORSIKA simulations (FLAT or VIEWCONE)>
@@ -341,6 +359,10 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
         }
     }
     cout << "========================================" << endl << endl;
+    if( fIgnoreEnergyReconstructionQuality )
+    {
+        fEnergyReconstructionMethod = 100;
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////
     // fill some parameters
@@ -610,9 +632,13 @@ void VInstrumentResponseFunctionRunParameter::print()
     {
         cout << "  MC histograms:   " << fMCdatafile_histo << endl;
     }
-    if( fXGB_file_suffix.size() > 0 )
+    if( fXGB_stereo_file_suffix.size() > 0 )
     {
-        cout << "  XGB file suffix: " << fXGB_file_suffix << endl;
+        cout << "  XGB file suffix: " << fXGB_stereo_file_suffix << endl;
+    }
+    if( fXGB_gh_file_suffix.size() > 0 )
+    {
+        cout << "  XGB Gamma/Hadron file suffix: " << fXGB_gh_file_suffix << endl;
     }
     if( fInstrumentEpoch != "NOT_SET" )
     {
@@ -643,6 +669,7 @@ void VInstrumentResponseFunctionRunParameter::print()
     }
     cout << endl;
     cout << "energy reconstruction method " << fEnergyReconstructionMethod << endl;
+    cout << "direction reconstruction method " << fDirectionReconstructionMethod << endl;
     cout << endl;
 
     cout << "input Monte Carlo with following parameters (will be modified later): " << endl;

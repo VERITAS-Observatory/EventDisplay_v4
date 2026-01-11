@@ -101,6 +101,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         vector< VTMVAEvaluatorData* > fTMVAData;
 
         CData*   fData;
+        unsigned int fEnergyReconstructionMethod;
 
         map< unsigned int, double > fSignalEfficiencyMap;         // from user: energy dependent signal efficiency
         double                      fSignalEfficiencyNoVec;
@@ -171,7 +172,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 
     public:
 
-        VTMVAEvaluator();
+        VTMVAEvaluator( unsigned int iEnergyReconstructionMethod = 0 );
         ~VTMVAEvaluator() {};
 
         bool    evaluate( bool interpolate_mva = false, bool use_average_zenith_angle = true );
@@ -241,7 +242,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
         }
         void   setTMVAMethod( string iMethodName = "BDT" );
 
-        ClassDef( VTMVAEvaluator, 37 );
+        ClassDef( VTMVAEvaluator, 38 );
 };
 
 #endif
