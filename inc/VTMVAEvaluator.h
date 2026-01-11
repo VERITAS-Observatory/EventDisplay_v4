@@ -172,7 +172,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 
     public:
 
-        VTMVAEvaluator(unsigned int iEnergyReconstructionMethod=0);
+        VTMVAEvaluator( unsigned int iEnergyReconstructionMethod = 0 );
         ~VTMVAEvaluator() {};
 
         bool    evaluate( bool interpolate_mva = false, bool use_average_zenith_angle = true );

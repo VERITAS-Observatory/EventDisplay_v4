@@ -694,7 +694,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
         /////////////////////////////////////////////////
         /////////////////////////////////////////////////
         // quality cuts
-        erec = fData->get_Erec(fEnergyReconstructionMethod);
+        erec = fData->get_Erec( fEnergyReconstructionMethod );
 
         // nimage cut
         if( fData->NImages < fNImages_min )
@@ -706,7 +706,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
         {
             continue;
         }
-        erec_log10 = log10(erec);
+        erec_log10 = log10( erec );
         // successful lookup table reconstruction
         if( fData->MSCW < -50. || fData->MSCL < -50. )
         {
@@ -1287,7 +1287,7 @@ TH1D*  VDataMCComparision::getAzimuthWeightingHistogram( string ifile )
             continue;
         }
         // successful energy reconstruction
-        if( tData->EChi2S < 0 || tData->get_Erec(fEnergyReconstructionMethod) <= 0 )
+        if( tData->EChi2S < 0 || tData->get_Erec( fEnergyReconstructionMethod ) <= 0 )
         {
             continue;
         }

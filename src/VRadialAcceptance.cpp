@@ -615,14 +615,14 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
         // no more cuts after this statement
         bPassed = true;
 
-        double xoff = iData->get_Xoff(fDirectionReconstructionMethod);
-        double yoff = iData->get_Yoff(fDirectionReconstructionMethod);
+        double xoff = iData->get_Xoff( fDirectionReconstructionMethod );
+        double yoff = iData->get_Yoff( fDirectionReconstructionMethod );
 
-        idist = sqrt( xoff*xoff + yoff*yoff);
+        idist = sqrt( xoff* xoff + yoff* yoff );
 
         // fill 2D distribution of events
         hXYAccTot->Fill( xoff, yoff );
-        pair<float, float> xy_derot = iData->get_XYoff_derot(fDirectionReconstructionMethod);
+        pair<float, float> xy_derot = iData->get_XYoff_derot( fDirectionReconstructionMethod );
         hXYAccTotDeRot->Fill( xy_derot.first, xy_derot.second );
 
         hXYAccImgSel[iData->ImgSel]->Fill( xy_derot.first, xy_derot.second ) ;

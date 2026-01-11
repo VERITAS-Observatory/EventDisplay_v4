@@ -5,7 +5,7 @@
 
 #include "VTMVAEvaluator.h"
 
-VTMVAEvaluator::VTMVAEvaluator(unsigned int iEnergyReconstructionMethod)
+VTMVAEvaluator::VTMVAEvaluator( unsigned int iEnergyReconstructionMethod )
 {
     fIsZombie = false;
 
@@ -717,11 +717,11 @@ bool VTMVAEvaluator::evaluate( bool interpolate_mva, bool use_average_zenith_ang
     {
         i_ze = fAverageZenithPerRun;
     }
-    if( fData->get_Erec(fEnergyReconstructionMethod) <= 0. )
+    if( fData->get_Erec( fEnergyReconstructionMethod ) <= 0. )
     {
         return false;
     }
-    unsigned int iDataBin = getDataBin( log10( fData->get_Erec(fEnergyReconstructionMethod) ), i_ze );
+    unsigned int iDataBin = getDataBin( log10( fData->get_Erec( fEnergyReconstructionMethod ) ), i_ze );
     if( fDebug )
     {
         cout << "VTMVAEvaluator::evaluate: data bin " << iDataBin;
@@ -761,14 +761,14 @@ bool VTMVAEvaluator::evaluate( bool interpolate_mva, bool use_average_zenith_ang
 */
 double VTMVAEvaluator::interpolate_mva_evaluation()
 {
-    if(!fData || fData->get_Erec(fEnergyReconstructionMethod) <= 0 )
+    if(!fData || fData->get_Erec( fEnergyReconstructionMethod ) <= 0 )
     {
         return 9999.;
     }
     set<unsigned int> data_bins;
     for( unsigned int i = 0; i < fTMVAData.size(); i++ )
     {
-        data_bins.insert( getDataBin( log10( fData->get_Erec(fEnergyReconstructionMethod) ), 0.5 * ( fTMVAData[i]->fZenithCut_max + fTMVAData[i]->fZenithCut_min ) ) );
+        data_bins.insert( getDataBin( log10( fData->get_Erec( fEnergyReconstructionMethod ) ), 0.5 * ( fTMVAData[i]->fZenithCut_max + fTMVAData[i]->fZenithCut_min ) ) );
     }
     TGraph iG(( int )data_bins.size() );
     unsigned int i = 0;
@@ -791,11 +791,11 @@ double VTMVAEvaluator::interpolate_mva_evaluation()
  */
 unsigned int VTMVAEvaluator::getDataBin()
 {
-    if(!fData || fData->get_Erec(fEnergyReconstructionMethod) <= 0 )
+    if(!fData || fData->get_Erec( fEnergyReconstructionMethod ) <= 0 )
     {
         return 9999;
     }
-    return getDataBin( log10( fData->get_Erec(fEnergyReconstructionMethod) ), fData->Ze );
+    return getDataBin( log10( fData->get_Erec( fEnergyReconstructionMethod ) ), fData->Ze );
 }
 
 

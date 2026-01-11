@@ -953,8 +953,8 @@ bool VGammaHadronCuts::applyStereoQualityCuts( bool bCount, int iEntry, bool fIs
     // apply cut on difference between stereo intersection and disp method
     // (for stereo method only: this should always pass)
     float i_disp_diff = sqrt(
-                            ( fData->get_Xoff(0) - fData->Xoff_intersect ) * ( fData->get_Xoff(0) - fData->Xoff_intersect ) +
-                            ( fData->get_Yoff(0) - fData->Yoff_intersect ) * ( fData->get_Yoff(0) - fData->Yoff_intersect ) );
+                            ( fData->get_Xoff( 0 ) - fData->Xoff_intersect ) * ( fData->get_Xoff( 0 ) - fData->Xoff_intersect ) +
+                            ( fData->get_Yoff( 0 ) - fData->Yoff_intersect ) * ( fData->get_Yoff( 0 ) - fData->Yoff_intersect ) );
     if( fCut_DispIntersectSuccess && ( fData->Xoff_intersect < -90. || fData->Yoff_intersect < -90. ) )
     {
         if( bCount && fStats )
@@ -1350,7 +1350,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile,
 {
     TDirectory* cDir = gDirectory;
 
-    fTMVAEvaluator = new VTMVAEvaluator(fEnergyReconstructionMethod);
+    fTMVAEvaluator = new VTMVAEvaluator( fEnergyReconstructionMethod );
 
     fTMVAEvaluator->setDebug( fDebug );
     // constant signal efficiency
