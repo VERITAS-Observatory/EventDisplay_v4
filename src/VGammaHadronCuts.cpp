@@ -1610,10 +1610,6 @@ void VGammaHadronCuts::terminate()
     {
         fTMVAEvaluatorResults->Write();
     }
-    else
-    {
-        cout << "No TMVAEvaluator Results." << endl;
-    }
 
     Write();
 }
