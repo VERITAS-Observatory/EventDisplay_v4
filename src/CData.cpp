@@ -712,11 +712,11 @@ float CData::get_ErecChi2( unsigned iMethod )
     // not defined for XGB methods
     else if( iMethod == 2 )
     {
-        return 0.;
+        return 1.e-2;
     }
     else if( iMethod == 100 )
     {
-        return 0.;
+        return 1.e-2;
     }
     return EChi2;
 }
@@ -733,11 +733,11 @@ float CData::get_ErecdE( unsigned iMethod )
     // not defined for XGB methods
     else if( iMethod == 2 )
     {
-        return 0.;
+        return 1.e-2;
     }
     else if( iMethod == 100 )
     {
-        return 0.;
+        return 1.e-2;
     }
     return dE;
 }

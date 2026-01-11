@@ -575,7 +575,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
                     fHisto[fHisCounter]->hemissC2->Fill( fDataRun->EmissionHeightChi2 );
                 }
                 // chi2 of energy reconstruction
-                if( iErecChi2 > 0. )
+                if( iErecChi2 >= 0. )
                 {
                     fHisto[fHisCounter]->herecChi2->Fill( iErecChi2 );
                 }
