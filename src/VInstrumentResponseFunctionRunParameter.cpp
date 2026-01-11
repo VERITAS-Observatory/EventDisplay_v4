@@ -359,6 +359,10 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
         }
     }
     cout << "========================================" << endl << endl;
+    if( fIgnoreEnergyReconstructionQuality )
+    {
+        fEnergyReconstructionMethod = 100;
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////
     // fill some parameters
@@ -662,7 +666,6 @@ void VInstrumentResponseFunctionRunParameter::print()
     if( fIgnoreEnergyReconstructionQuality )
     {
         cout << ", ignoring cut on quality of energy reconstruction";
-        fEnergyReconstructionMethod = 100;
     }
     cout << endl;
     cout << "energy reconstruction method " << fEnergyReconstructionMethod << endl;

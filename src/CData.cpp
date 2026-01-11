@@ -718,7 +718,7 @@ float CData::get_ErecChi2( unsigned iMethod )
     {
         return 0.;
     }
-    return EChi2S;
+    return EChi2;
 }
 
 /*
@@ -1094,7 +1094,7 @@ TTree* CData::getXGBTree( string file_name, string file_suffix, string tree_name
         cout << "CData Error: cannot find " << tree_name << " tree in " << file_name << endl;
         exit( EXIT_FAILURE );
     }
-    cout << "Adding " << tree_name << " tree from " << file_name << endl;
+    cout << "\t Adding " << tree_name << " tree from " << file_name << endl;
     return iXGB_tree;
 }
 

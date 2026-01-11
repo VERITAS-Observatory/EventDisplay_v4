@@ -1193,7 +1193,7 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
             cout << " (use effective area A_REC)";
         }
         cout << endl;
-        cout << "Energy reconstruction method " << fEnergyReconstructionMethod;
+        cout << "\t Energy reconstruction method " << fEnergyReconstructionMethod;
         if( fEnergyReconstructionMethod == 0 )
         {
             cout << " (dispBDT energy reconstruction)" << endl;
@@ -1206,14 +1206,14 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
         {
             cout << " (XGB stereo reconstruction)" << endl;
         }
-        cout << "Direction reconstruction method " << fDirectionReconstructionMethod;
+        cout << "\t Direction reconstruction method " << fDirectionReconstructionMethod;
         if( fDirectionReconstructionMethod == 0 )
         {
-            cout << " (dispBDT energy reconstruction)" << endl;
+            cout << " (dispBDT direction reconstruction)" << endl;
         }
         else if( fDirectionReconstructionMethod == 1 )
         {
-            cout << " (lookup table energy reconstruction)" << endl;
+            cout << " (intersection method reconstruction)" << endl;
         }
         else if( fDirectionReconstructionMethod == 2 )
         {
