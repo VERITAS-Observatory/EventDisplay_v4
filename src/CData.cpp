@@ -20,8 +20,7 @@ CData::CData( TTree* tree, bool bMC, bool bShort, TTree* stereoTree, TTree* ghTr
 
     fStereoFriendTree = stereoTree;
     fGHFriendTree = ghTree;
-
-    initialize_xgb_tree( fStereoFriendTree, fGHFriendTree );
+    initialize_xgb_tree();
 }
 
 
@@ -36,7 +35,7 @@ CData::CData( TTree* tree, bool bMC, bool bShort, string file_name, string stere
 
     fStereoFriendTree = getXGBTree( file_name, stereo_suffix, "StereoAnalysis" );
     fGHFriendTree = getXGBTree( file_name, gamma_hadron_suffix, "Classification" );
-    initialize_xgb_tree( fStereoFriendTree, fGHFriendTree );
+    initialize_xgb_tree();
 }
 
 
