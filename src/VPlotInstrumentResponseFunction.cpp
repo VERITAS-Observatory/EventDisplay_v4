@@ -1635,11 +1635,13 @@ TCanvas* VPlotInstrumentResponseFunction::plotPSF( vector< double > i_Energy_TeV
                 if( iCumulative )
                 {
                     hCumu->SetLineColor( VUtilities::color_id( i + 1 ) );
+                    hCumu->SetMarkerColor( VUtilities::color_id( i + 1 ) );
                     hCumu->Draw( "same" );
                 }
                 else
                 {
                     h->SetLineColor( VUtilities::color_id( i + 1 ) );
+                    h->SetMarkerColor( VUtilities::color_id( i + 1 ) );
                     // rebin
                     if( iPlotTheta2 )
                     {
