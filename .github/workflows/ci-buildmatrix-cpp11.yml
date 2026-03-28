@@ -42,23 +42,27 @@ jobs:
       - name: Extract source
         run: tar -xzf src.tgz
 
-      - name: Build inside ROOT CentOS7 container
+      - name: Download VBF and SOFA on host
         env:
           VBF_TOKEN: ${{ secrets.VBFcpp11 }}
           SOFA20231011: ${{ secrets.SOFA20231011 }}
         run: |
           set -euo pipefail
+          curl -fL "https://syncandshare.desy.de/index.php/s/${VBF_TOKEN}/download" -o VBF.tar.gz
+          mkdir -p sofa
+          curl -fL "https://syncandshare.desy.de/index.php/s/${SOFA20231011}/download" -o sofa/sofa.tar.gz
+
+      - name: Build inside ROOT CentOS7 container
+        run: |
+          set -euo pipefail
           echo "Using ROOT image: $ROOT_IMAGE"
           docker run --rm \
-            -e VBF_TOKEN="$VBF_TOKEN" \
-            -e SOFA20231011="$SOFA20231011" \
             -v "$PWD:/workspace" \
             -w /workspace \
             "$ROOT_IMAGE" /bin/bash -c '
               set -euo pipefail
               echo "ROOT version: $(root-config --version)"
               # Build VBF
-              curl -L "https://syncandshare.desy.de/index.php/s/${VBF_TOKEN}/download" -o VBF.tar.gz
               mkdir -p VBF && tar -xzf VBF.tar.gz -C VBF --strip-components=1
               pushd VBF
               ./configure --prefix=/workspace/VBF
@@ -66,8 +70,6 @@ jobs:
               make install
               popd
               # Install SOFA
-              mkdir -p sofa
-              curl -L "https://syncandshare.desy.de/index.php/s/${SOFA20231011}/download" -o sofa/sofa.tar.gz
               ./install_sofa.sh
               # Build EventDisplay
               export EVNDISPSYS=/workspace
