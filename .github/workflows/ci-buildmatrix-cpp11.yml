@@ -48,9 +48,9 @@ jobs:
           SOFA20231011: ${{ secrets.SOFA20231011 }}
         run: |
           set -euo pipefail
-          curl -fL "https://syncandshare.desy.de/index.php/s/${VBF_TOKEN}/download" -o VBF.tar.gz
+          curl -fL --retry 3 --retry-delay 3 "https://syncandshare.desy.de/index.php/s/${VBF_TOKEN}/download" -o VBF.tar.gz
           mkdir -p sofa
-          curl -fL "https://syncandshare.desy.de/index.php/s/${SOFA20231011}/download" -o sofa/sofa.tar.gz
+          curl -fL --retry 3 --retry-delay 3 "https://syncandshare.desy.de/index.php/s/${SOFA20231011}/download" -o sofa/sofa.tar.gz
 
       - name: Build inside ROOT CentOS7 container
         run: |
