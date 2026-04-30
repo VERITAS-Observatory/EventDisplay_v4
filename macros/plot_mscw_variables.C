@@ -130,10 +130,6 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
         Vmin.push_back(-10. );
         Vmax.push_back( 3. );
         Vprintout.push_back( "" );
-        V.push_back( "dES" );
-        Vmin.push_back( 0. );
-        Vmax.push_back( 3. );
-        Vprintout.push_back( "" );
         V.push_back( "sqrt( Xcore*Xcore+Ycore*Ycore)" );
         Vmin.push_back( 0. );
         Vmax.push_back( 2500. );
@@ -145,6 +141,14 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
         Vmin.push_back(-2. );
         Vmax.push_back( log10( 300. ) );
         Vprintout.push_back( "VALUE" );
+        V.push_back( "(ErecS-MCe0)/MCe0" );
+        Vmin.push_back(-1. );
+        Vmax.push_back( 1. );
+        Vprintout.push_back( "RMS" );
+        V.push_back( "(Erec-MCe0)/MCe0" );
+        Vmin.push_back(-1. );
+        Vmax.push_back( 1. );
+        Vprintout.push_back( "RMS" );
     }
     else
     {
@@ -153,43 +157,35 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
         Vmax.push_back( log10( 300. ) );
         Vprintout.push_back( "VALUE" );
     }
-    if( plot_type.find( "short_mc" ) != string::npos )
-    {
-        V.push_back( "(ErecS-MCe0)/MCe0" );
-        Vmin.push_back(-1. );
-        Vmax.push_back( 1. );
-        Vprintout.push_back( "RMS" );
-    }
 
     if( is_MC )
     {
-        if( plot_type.find( "geo" ) != string::npos )
-        {
-            V.push_back( "sqrt( (Xoff_intersect-MCxoff)*(Xoff_intersect-MCxoff)+(Yoff_intersect-MCyoff)*(Yoff_intersect-MCyoff))" );
-        }
-        else
-        {
-            V.push_back( "sqrt( (Xoff-MCxoff)*(Xoff-MCxoff)+(Yoff-MCyoff)*(Yoff-MCyoff))" );
-        }
+        V.push_back( "sqrt( (Xoff_intersect-MCxoff)*(Xoff_intersect-MCxoff)+(Yoff_intersect-MCyoff)*(Yoff_intersect-MCyoff))" );
         Vprintout.push_back( "68p" );
+        Vmin.push_back( 0. );
+        Vmax.push_back( 1.5 );
+        V.push_back( "sqrt( (Xoff-MCxoff)*(Xoff-MCxoff)+(Yoff-MCyoff)*(Yoff-MCyoff))" );
+        Vprintout.push_back( "68p" );
+        Vmin.push_back( 0. );
+        Vmax.push_back( 1.5 );
     }
     else
     {
         V.push_back( "sqrt( Xoff*Xoff+Yoff*Yoff)" );
         Vprintout.push_back( "68p" );
+        Vmin.push_back( 0. );
+        Vmax.push_back( 1.5 );
     }
-    Vmin.push_back( 0. );
-    Vmax.push_back( 1.5 );
 
 
-    TCanvas* c = new TCanvas( "c", "mscw variables", 0, 200, 1200, 800 );
-    if( is_MC )
+    TCanvas* c = new TCanvas( "c", "mscw variables", 0, 10, 1400, 900 );
+    if( is_MC && plot_type.find( "short_mc" ) != string::npos )
     {
         c->Divide( 3, 2 );
     }
     else
     {
-        c->Divide( 4, 3 );
+        c->Divide( 4, 4);
     }
 
     for( unsigned int i = 0; i < V.size(); i++ )
@@ -203,7 +199,7 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
         }
 
         char Vcut[400];
-        sprintf( Vcut, "MSCW>-2.&&MSCW<3.&&%s>%f&&%s<%f&&%s", V[i].c_str(), Vmin[i], V[i].c_str(), Vmax[i], iAddCut1.c_str() );
+        sprintf( Vcut, "%f*(MSCW>-2.&&MSCW<3.&&%s>%f&&%s<%f&&%s)", iW1, V[i].c_str(), Vmin[i], V[i].c_str(), Vmax[i], iAddCut1.c_str() );
         cout << "Canvas " << i + 1 << ", variable " << V[i] << " cut: " << Vcut << endl;
 
         f1->cd();
@@ -220,7 +216,7 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
                     V[i].replace(pos, 5, "Erec" );
                 }
             }
-            sprintf( Vcut, "MSCW>-2.&&MSCW<3.&&%s>%f&&%s<%f&&%s", V[i].c_str(), Vmin[i], V[i].c_str(), Vmax[i], iAddCut2.c_str() );
+            sprintf( Vcut, "%f*(MSCW>-2.&&MSCW<3.&&%s>%f&&%s<%f&&%s)", iW2, V[i].c_str(), Vmin[i], V[i].c_str(), Vmax[i], iAddCut2.c_str() );
 
             TList* primitives = gPad->GetListOfPrimitives();
             f2->cd();
