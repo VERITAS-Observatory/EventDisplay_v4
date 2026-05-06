@@ -49,7 +49,7 @@ void print_statistics_output( TH1F* h, string print_out )
  * - (anything else): plot large number of variables
  * - string includes 'geo': use intersection method for angular reconstruction
 */
-void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW2 = 1., string iAddCut1 = "ErecS>0.", string iAddCut2 = "ErecS>0.", string plot_type = "short_mc", string i_print_file = "" )
+void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW2 = 1., string iAddCut1 = "Erec>0.", string iAddCut2 = "Erec>0.", int log_y = 1, string plot_type = "short_mc", string i_print_file = "" )
 {
     TFile* f1 = new TFile( iFile1.c_str() );
     if( f1->IsZombie() )
@@ -62,6 +62,7 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
         cout << "T1 tree not found" << endl;
         return;
     }
+    cout << "Opening " << iFile1 << endl;
     T1->SetLineWidth( 2 );
     bool is_MC = false;
     if( T1->GetBranchStatus( "MCxoff" ) )
@@ -90,6 +91,7 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
             T2->SetLineWidth( 2 );
         }
     }
+    cout << "Opening " << iFile2 << endl;
 
     vector< string > V;
     vector< float > Vmax;
@@ -98,15 +100,15 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
 
     V.push_back( "MSCW" );
     Vmin.push_back(-2. );
-    Vmax.push_back( 3. );
+    Vmax.push_back( 5. );
     Vprintout.push_back( "RMS" );
     V.push_back( "MSCL" );
     Vmin.push_back(-2. );
-    Vmax.push_back( 3. );
+    Vmax.push_back( 5. );
     Vprintout.push_back( "RMS" );
     V.push_back( "NImages" );
     Vmin.push_back( 0. );
-    Vmax.push_back( 70. );
+    Vmax.push_back( 4. );
     Vprintout.push_back( "" );
     if( plot_type.find( "short_mc" ) == string::npos )
     {
@@ -114,7 +116,7 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
         Vmin.push_back( 0. );
         Vmax.push_back( 40. );
         Vprintout.push_back( "" );
-        V.push_back( "log10(EChi2S)" );
+        V.push_back( "log10(EChi2)" );
         Vmin.push_back(-2. );
         Vmax.push_back( 4. );
         Vprintout.push_back( "" );
@@ -124,15 +126,15 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
         Vprintout.push_back( "" );
         V.push_back( "log10(SizeSecondMax)" );
         Vmin.push_back( 2. );
-        Vmax.push_back( 8. );
+        Vmax.push_back( 5.5 );
         Vprintout.push_back( "" );
         V.push_back( "log10(DispDiff)" );
-        Vmin.push_back(-10. );
-        Vmax.push_back( 3. );
+        Vmin.push_back(-6. );
+        Vmax.push_back( 2. );
         Vprintout.push_back( "" );
         V.push_back( "sqrt( Xcore*Xcore+Ycore*Ycore)" );
         Vmin.push_back( 0. );
-        Vmax.push_back( 2500. );
+        Vmax.push_back( 3500. );
         Vprintout.push_back( "" );
     }
     if( is_MC )
@@ -188,22 +190,32 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
         c->Divide( 4, 4);
     }
 
+    int n_bins = 100;
     for( unsigned int i = 0; i < V.size(); i++ )
     {
         TPad* p = ( TPad* )c->cd( i + 1 );
         if( p )
         {
-            p->SetLogy( 1 );
+            p->SetLogy( log_y );
             p->SetGridx( 0 );
             p->SetGridy( 0 );
         }
 
+        char Vdraw[400];
+        if( V[i] == "NImages" )
+        {
+            sprintf( Vdraw, "%s>>h%d(%d, %f, %f)", V[i].c_str(), i, int(Vmax[i]-Vmin[i]), Vmin[i], Vmax[i] );
+        }
+        else
+        {
+            sprintf( Vdraw, "%s>>h%d(%d, %f, %f)", V[i].c_str(), i, n_bins, Vmin[i], Vmax[i] );
+        }
         char Vcut[400];
-        sprintf( Vcut, "%f*(MSCW>-2.&&MSCW<3.&&%s>%f&&%s<%f&&%s)", iW1, V[i].c_str(), Vmin[i], V[i].c_str(), Vmax[i], iAddCut1.c_str() );
-        cout << "Canvas " << i + 1 << ", variable " << V[i] << " cut: " << Vcut << endl;
+        sprintf( Vcut, "%f*(%s>%f&&%s<%f&&%s)", iW1, V[i].c_str(), Vmin[i], V[i].c_str(), Vmax[i], iAddCut1.c_str() );
+        cout << "Canvas " << i + 1 << ", variable " << V[i] << " cut: " << Vcut << " draw: " << Vdraw << endl;
 
         f1->cd();
-        T1->Draw( V[i].c_str(), Vcut );
+        T1->Draw( Vdraw, Vcut );
 
         print_statistics_output(( TH1F* )gPad->GetPrimitive( "htemp" ), Vprintout[i] );
 
@@ -216,7 +228,7 @@ void plot_mscw_variables( string iFile1, string iFile2, float iW1 = 1., float iW
                     V[i].replace(pos, 5, "Erec" );
                 }
             }
-            sprintf( Vcut, "%f*(MSCW>-2.&&MSCW<3.&&%s>%f&&%s<%f&&%s)", iW2, V[i].c_str(), Vmin[i], V[i].c_str(), Vmax[i], iAddCut2.c_str() );
+            sprintf( Vcut, "%f*(%s>%f&&%s<%f&&%s)", iW2, V[i].c_str(), Vmin[i], V[i].c_str(), Vmax[i], iAddCut1.c_str() );
 
             TList* primitives = gPad->GetListOfPrimitives();
             f2->cd();
