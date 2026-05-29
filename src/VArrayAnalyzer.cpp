@@ -1243,7 +1243,7 @@ int VArrayAnalyzer::rcs_method_3( unsigned int iMethod )
             iangdiff = sin( fabs( atan( m[jj] ) - atan( m[ii] ) ) );
 
             // discard all pairs with almost parallel lines
-            float i_diff =  fabs( atan( m[0] ) - atan( m[1] ) );
+            float i_diff =  fabs( atan( mm[0] ) - atan( mm[1] ) );
             if( i_diff < fEvndispReconstructionParameter->fAxesAngles_min[iMethod] / TMath::RadToDeg() ||
                     fabs( 180. / TMath::RadToDeg() - i_diff ) < fEvndispReconstructionParameter->fAxesAngles_min[iMethod] / TMath::RadToDeg() )
             {
