@@ -1544,11 +1544,13 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
         // image centroid should not be outside of the FOV (by more than 10%)
         if( fData->getDetectorGeometry() &&  fData->getTelID() < fData->getDetectorGeometry()->getFieldofView().size() )
         {
+            fdistXmin = -1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()];
             fdistXmax = 1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()];
         }
         // should never land here
         else
         {
+            fdistXmin = -5.;
             fdistXmax = 5.;
         }
     }
@@ -1590,11 +1592,13 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
         // image centroid should not be outside of the FOV (by more than 10%)
         if( fData->getDetectorGeometry() &&  fData->getTelID() < fData->getDetectorGeometry()->getFieldofView().size() )
         {
+            fdistYmin = -1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()];
             fdistYmax = 1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()];
         }
         else
         {
             // should never land here
+            fdistYmin = -5.;
             fdistYmax = 5.;
         }
     }
