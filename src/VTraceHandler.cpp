@@ -798,7 +798,10 @@ double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart
                 fSumWindowLast = n;
             }
         }
-        xmax = xmax - FADC[i] + FADC[i + iIntegrationWindow];
+        if( i + iIntegrationWindow < n )
+        {
+            xmax = xmax - FADC[i] + FADC[i + iIntegrationWindow];
+        }
     }
     // arrival times (weighted average)
     float tcharge = 0.;
