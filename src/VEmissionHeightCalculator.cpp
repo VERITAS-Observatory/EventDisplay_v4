@@ -111,6 +111,9 @@ void VEmissionHeightCalculator::setTelescopePositions( vector< float > x, vector
     {
         return;
     }
+    fTelX.clear();
+    fTelY.clear();
+    fTelZ.clear();
     for( unsigned int i = 0; i < fNTel; i++ )
     {
         fTelX.push_back( x[i] );
@@ -127,6 +130,9 @@ void VEmissionHeightCalculator::setTelescopePositions( vector< float > x, vector
 void VEmissionHeightCalculator::setTelescopePositions( unsigned int ntel, double* x, double* y, double* z )
 {
     fNTel = ntel;
+    fTelX.clear();
+    fTelY.clear();
+    fTelZ.clear();
     for( unsigned int i = 0; i < ntel; i++ )
     {
         fTelX.push_back( x[i] );
