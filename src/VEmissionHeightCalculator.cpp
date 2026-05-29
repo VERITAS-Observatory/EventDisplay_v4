@@ -53,12 +53,18 @@ double VEmissionHeightCalculator::getEmissionHeight( float* cen_x, float* cen_y,
                     fImageDistance = TMath::Tan( imageDistance( cen_x[i], cen_x[j], cen_y[i], cen_y[j] ) / TMath::RadToDeg() );
                     if( fImageDistance > 0. )
                     {
+                        double iLogSizeI = log10( size[i] );
+                        double iLogSizeJ = log10( size[j] );
+                        if( iLogSizeI <= 0. || iLogSizeJ <= 0. )
+                        {
+                            continue;
+                        }
                         // get distance between the two telescopes in shower coordinates
                         fTelescopeDistanceSC = getTelescopeDistanceSC( i, j, az, el );
                         // calculate emission height [km]
                         iEmissionHeightTemp = fTelescopeDistanceSC / fImageDistance / 1.e3;
                         // weight for pairwise emission height calculation
-                        iEmissionHeightWeightTemp = 1. / (( 1. / log10( size[i] ) ) + ( 1. / log10( size[j] ) ) );
+                        iEmissionHeightWeightTemp = 1. / (( 1. / iLogSizeI ) + ( 1. / iLogSizeJ ) );
                         iEmissionHeightWeight    += iEmissionHeightWeightTemp;
                         iEmissionHeight          += iEmissionHeightTemp * iEmissionHeightWeightTemp;
                         iEmissionHeight2         += iEmissionHeightTemp * iEmissionHeightTemp * iEmissionHeightWeightTemp;
