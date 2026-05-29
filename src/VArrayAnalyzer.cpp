@@ -944,7 +944,7 @@ int VArrayAnalyzer::rcs_method_0( unsigned int iMethod )
 bool VArrayAnalyzer::fillShowerCore( unsigned int iMeth, float ximp, float yimp )
 {
     // check validity
-    if(!isnormal( ximp ) || !isnormal( ximp ) )
+    if(!isnormal( ximp ) || !isnormal( yimp ) )
     {
         ximp = -99999.;
         yimp = -99999.;
