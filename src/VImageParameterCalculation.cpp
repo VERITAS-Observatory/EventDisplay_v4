@@ -739,6 +739,10 @@ float VImageParameterCalculation::correctSizeInMuonRing()
     {
 
         float xi_tmp = ( float )i / ( float )numSteps;
+        if( xi_tmp <= 0. )
+        {
+            continue;
+        }
         float kTest_tmp = 2.0 * ngExi[i] * kRatio / xi_tmp;
 
         if( fabs( 1.0 - kTest_tmp ) < fabs( 1.0 - kTest ) )
