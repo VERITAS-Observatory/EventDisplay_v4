@@ -340,9 +340,18 @@ bool train( VTMVARunData* iRun,
 
     //////////////////////////////////////////
     // defining training class
+    TString iFactoryOptions = "V:!DrawProgressBar";
+    if( iTrainGammaHadronSeparation )
+    {
+        iFactoryOptions += ":AnalysisType=Classification";
+    }
+    else
+    {
+        iFactoryOptions += ":AnalysisType=Regression";
+    }
     TMVA::Factory *factory = new TMVA::Factory( iRun->fOutputFile[iEnergyBin][iZenithBin]->GetTitle(),
         iRun->fOutputFile[iEnergyBin][iZenithBin],
-        "V:!DrawProgressBar" );
+        iFactoryOptions );
     TMVA::DataLoader *dataloader = new TMVA::DataLoader( "" );
     ////////////////////////////
     // train gamma/hadron separation
