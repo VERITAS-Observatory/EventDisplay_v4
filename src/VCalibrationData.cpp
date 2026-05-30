@@ -367,6 +367,7 @@ void  VCalibrationData::setAverageTZero( double iAverageTzero, bool iLowGain )
     if( iLowGain )
     {
         fAverageTZero_lowgain = iAverageTzero;
+        return;
     }
 
     fAverageTZero_highgain = iAverageTzero;
