@@ -172,7 +172,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
             }
             else
             {
-                cout << "unknown parameter, choose 1=fill or 2=read lookup tables" << endl;
+                cout << "unknown parameter, choose 1=fill or 0=read lookup tables" << endl;
                 return false;
             }
         }

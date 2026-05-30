@@ -322,6 +322,19 @@ vector< float >& VTraceHandler::getPulseTiming( int fFirst, int fLast, int fTFir
     {
         fFirst = 0;
     }
+    int nTrace = ( int )fpTrace.size();
+    if( nTrace < 2 )
+    {
+        return fpulsetiming;
+    }
+    if( fTFirst < 0 )
+    {
+        fTFirst = 0;
+    }
+    if( fTLast > nTrace - 1 )
+    {
+        fTLast = nTrace - 1;
+    }
     // reset pulse timing vector
     for( unsigned int i = 0; i < fpulsetiming.size(); i++ )
     {
@@ -343,7 +356,12 @@ vector< float >& VTraceHandler::getPulseTiming( int fFirst, int fLast, int fTFir
     // (loop backwards over pulse)
     bool bBreak = false;
     fFindPulseTiming = false;
-    for( int i = maxpos; i >= fTFirst ; i-- )
+    int i_start = maxpos;
+    if( i_start > nTrace - 2 )
+    {
+        i_start = nTrace - 2;
+    }
+    for( int i = i_start; i >= fTFirst ; i-- )
     {
         i_trace = fpTrace[i] - fPed;
         // loop over all pulse level
@@ -780,7 +798,10 @@ double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart
                 fSumWindowLast = n;
             }
         }
-        xmax = xmax - FADC[i] + FADC[i + iIntegrationWindow];
+        if( i + iIntegrationWindow < n )
+        {
+            xmax = xmax - FADC[i] + FADC[i + iIntegrationWindow];
+        }
     }
     // arrival times (weighted average)
     float tcharge = 0.;

@@ -476,7 +476,7 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
         iDiff = sqrt(( fData->Xcore - fData->MCxcore ) * ( fData->Xcore - fData->MCxcore ) +
                      ( fData->Ycore - fData->MCycore ) * ( fData->Ycore - fData->MCycore ) );
         // core error
-        iError = sqrt( fData->Xcore* fData->Xcore + fData->Xcore* fData->Xcore ) -
+        iError = sqrt( fData->Xcore* fData->Xcore + fData->Ycore* fData->Ycore ) -
                  sqrt( fData->MCxcore* fData->MCxcore + fData->MCycore* fData->MCycore );
         // relative error
         if( sqrt( fData->MCxcore * fData->MCxcore + fData->MCycore * fData->MCycore ) > 0. )

@@ -122,9 +122,6 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
         cout << endl;
         exit( EXIT_FAILURE );
     }
-    // unclear why factor of 0.8
-    ntrain *= 0.8;
-    ntest *= 0.8;
     cout << "\tnumber of training events: " << ntrain << endl;
     cout << "\tnumber of test events    : " << ntest  << endl;
     cout << "\tfraction of training events  : " << iTrainTest << endl << endl;

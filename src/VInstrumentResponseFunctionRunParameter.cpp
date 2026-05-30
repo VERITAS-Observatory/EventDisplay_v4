@@ -356,6 +356,13 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
                     is_stream >> fRerunStereoReconstruction_3telescopes;
                 }
             }
+            else
+            {
+                cout << "VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile error: unknown run parameter key " << temp << endl;
+                cout << "line: " << is_line << endl;
+                cout << "exiting..." << endl;
+                exit( EXIT_FAILURE );
+            }
         }
     }
     cout << "========================================" << endl << endl;

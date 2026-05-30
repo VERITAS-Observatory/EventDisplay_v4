@@ -257,7 +257,7 @@ bool train( VTMVARunData* iRun,
         cout << "error during training: energy bin out of range " << iEnergyBin << endl;
         return false;
     }
-    if( iRun->fZenithCutData.size() < iZenithBin || iRun->fOutputFile[0].size() < iZenithBin )
+    if( iRun->fZenithCutData.size() <= iZenithBin || iRun->fOutputFile[0].size() <= iZenithBin )
     {
         cout << "error during training: zenith bin out of range " << iZenithBin << endl;
         return false;
@@ -340,9 +340,18 @@ bool train( VTMVARunData* iRun,
 
     //////////////////////////////////////////
     // defining training class
+    TString iFactoryOptions = "V:!DrawProgressBar";
+    if( iTrainGammaHadronSeparation )
+    {
+        iFactoryOptions += ":AnalysisType=Classification";
+    }
+    else
+    {
+        iFactoryOptions += ":AnalysisType=Regression";
+    }
     TMVA::Factory *factory = new TMVA::Factory( iRun->fOutputFile[iEnergyBin][iZenithBin]->GetTitle(),
         iRun->fOutputFile[iEnergyBin][iZenithBin],
-        "V:!DrawProgressBar" );
+        iFactoryOptions );
     TMVA::DataLoader *dataloader = new TMVA::DataLoader( "" );
     ////////////////////////////
     // train gamma/hadron separation

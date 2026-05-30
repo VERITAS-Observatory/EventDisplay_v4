@@ -8,12 +8,12 @@
 ## Overview
 
 Eventdisplay is a reconstruction and analysis pipeline for data of
-Imaging Atmospheric Cherenkov Telescopes.
+Imaging Atmospheric Cherenkov Telescopes (IACT).
 It has been primarily developed for the analysis of VERITAS and CTAO data to generate results for scientific publications.
 This repository contains the Eventdisplay version used for VERITAS analysis ([CTAO version](https://github.com/Eventdisplay/Eventdisplay))
 
 * Original developers: Gernot Maier and Jamie Holder
-* Authors and contributors: [CITATION.cff](CITATION.cff)
+* Authors and contributors: [CITATION.cff](CITATION.cff) and [CONTRIBUTORS.md](CONTRIBUTORS.md)
 * License: [LICENSE](LICENSE)
 * Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
 * Changelog: [CHANGELOG.md](CHANGELOG.md)
