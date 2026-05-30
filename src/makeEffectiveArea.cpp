@@ -379,20 +379,26 @@ VEffectiveAreaCalculatorMCHistograms* copyMCHistograms( TChain* c )
         unsigned int z = 0;
         while(( chEl = ( TChainElement* )next() ) )
         {
-            TFile* ifInput = new TFile( chEl->GetTitle() );
-            if(!ifInput->IsZombie() )
+            TFile ifInput( chEl->GetTitle() );
+            if(!ifInput.IsZombie() )
             {
+                VEffectiveAreaCalculatorMCHistograms* iMCHisFromFile =
+                    ( VEffectiveAreaCalculatorMCHistograms* )ifInput.Get( "MChistos" );
+                if(!iMCHisFromFile )
+                {
+                    continue;
+                }
+
                 if( z == 0 )
                 {
-                    iMC_his = ( VEffectiveAreaCalculatorMCHistograms* )ifInput->Get( "MChistos" );
+                    iMC_his = ( VEffectiveAreaCalculatorMCHistograms* )iMCHisFromFile->Clone();
                 }
                 else
                 {
                     if( iMC_his )
                     {
-                        iMC_his->add(( VEffectiveAreaCalculatorMCHistograms* )ifInput->Get( "MChistos" ) );
+                        iMC_his->add( iMCHisFromFile );
                     }
-                    ifInput->Close();
                 }
                 z++;
             }
