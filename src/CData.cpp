@@ -1077,7 +1077,15 @@ TTree* CData::getXGBTree( string file_name, string file_suffix, string tree_name
         return 0;
     }
 
-    file_name = file_name.replace( file_name.find( ".root" ), 5, "." + file_suffix + ".root" );
+    size_t iRootPos = file_name.rfind( ".root" );
+    if( iRootPos != string::npos && iRootPos + 5 == file_name.size() )
+    {
+        file_name.replace( iRootPos, 5, "." + file_suffix + ".root" );
+    }
+    else
+    {
+        file_name += "." + file_suffix + ".root";
+    }
     TFile *iFile = TFile::Open( file_name.c_str() );
     if(!iFile || iFile->IsZombie() )
     {
