@@ -115,7 +115,7 @@ int main( int argc, char* argv[] )
     fCuts->printCutSummary();
 
     /////////////////////////////////////////////////////////////////
-    // read MC header (might not be there, no problem; but depend on right input in runparameter file)
+    // read MC header
     VMonteCarloRunHeader* iMonteCarloHeader = fRunPara->readMCRunHeader();
 
     /////////////////////////////////////////////////////////////////
