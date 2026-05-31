@@ -31,6 +31,7 @@ CData::CData( TTree* tree, bool bMC, bool bShort, string file_name, string stere
     fShort = bShort;
     fVersion = 6;
     fTelescopeCombination = 0;
+    fDataFileName = file_name;
     Init( tree );
 
     fStereoFriendTree = getXGBTree( file_name, stereo_suffix, "StereoAnalysis" );
@@ -1133,4 +1134,26 @@ void CData::initialize_xgb_tree()
         GH_Gamma_Prediction = -9999.;
         GH_Is_Gamma = false;
     }
+}
+
+/*
+ * Deferred loading of the XGB gamma-hadron friend tree.
+ * Call this after the analysis type is known (e.g. after readCuts()),
+ * when the caller has confirmed that XGB gamma-hadron cuts are active.
+ * Idempotent: a second call is a no-op if the tree is already loaded.
+ */
+bool CData::loadGHXGBTree( string gh_suffix )
+{
+    if( fGHFriendTree )
+    {
+        return true;
+    }
+    if( fDataFileName.empty() )
+    {
+        cout << "CData::loadGHXGBTree error: no data file name stored" << endl;
+        return false;
+    }
+    fGHFriendTree = getXGBTree( fDataFileName, gh_suffix, "Classification" );
+    initialize_xgb_tree();
+    return ( fGHFriendTree != 0 );
 }
