@@ -771,7 +771,7 @@ double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart
         fSumWindowFirst = n - iIntegrationWindow;
         fSumWindowLast  = n;
 
-        return FADC[1];
+        return charge;
     }
 
     ////////////////////////////////////////
