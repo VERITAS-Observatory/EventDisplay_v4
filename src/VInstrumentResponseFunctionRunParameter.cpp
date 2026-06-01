@@ -360,8 +360,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
             {
                 cout << "VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile error: unknown run parameter key " << temp << endl;
                 cout << "line: " << is_line << endl;
-                cout << "exiting..." << endl;
-                exit( EXIT_FAILURE );
+                return false;
             }
         }
     }
