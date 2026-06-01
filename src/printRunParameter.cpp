@@ -332,7 +332,7 @@ int main( int argc, char* argv[] )
     {
         cout << "error: file not found: " << argv[1] << endl;
         cout << "exiting..." << endl;
-        exit( 0 );
+        exit( EXIT_FAILURE );
     }
 
     if( fOption.size() > 0 )

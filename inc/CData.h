@@ -30,6 +30,7 @@ class CData
         vector< double > fTelX;
         vector< double > fTelY;
         vector< double > fTelZ;
+        string fDataFileName;
 
         void reconstruct_3tel_images( long unsigned int );
         void reconstruct_3tel_images_direction();
@@ -280,6 +281,7 @@ class CData
         float get_Yoff( unsigned int method );
         void   initialize_xgb_tree();
         TTree* getXGBTree( string file_name, string suffix, string tree_name );
+        bool   loadGHXGBTree( string gh_suffix );
         pair<float, float> get_XYoff_derot( unsigned int method );
         virtual Long64_t LoadTree( Long64_t entry );
         float            get_GH_Gamma_Prediction();

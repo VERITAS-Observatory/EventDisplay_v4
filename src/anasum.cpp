@@ -105,7 +105,7 @@ int main( int argc, char* argv[] )
     // stereo analysis (default)
     if( analysisType == 3 || analysisType == 4 )
     {
-        anasum->doStereoAnalysis(( analysisType == 3 ) || ( analysisType == 5 ) );
+        anasum->doStereoAnalysis( analysisType == 3 );
     }
     else
     {

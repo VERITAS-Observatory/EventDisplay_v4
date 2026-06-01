@@ -348,6 +348,20 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
     // initialize cuts
     setCuts( fRunPara->fRunList[fHisCounter], irun );
 
+    // load XGB gamma-hadron friend tree now that the analysis type is known
+    if( fCuts && fCuts->useXGBoostCuts()
+            && fDataRun
+            && !fRunPara->fXGB_gh_file_suffix.empty() )
+    {
+        if(!fDataRun->loadGHXGBTree( fRunPara->fXGB_gh_file_suffix ) )
+        {
+            cout << "VStereoAnalysis::fillHistograms error: failed to load XGB gamma-hadron friend tree" << endl;
+            cout << "suffix: " << fRunPara->fXGB_gh_file_suffix << endl;
+            cout << "exiting..." << endl;
+            exit( EXIT_FAILURE );
+        }
+    }
+
     // define histograms
     fDirTotRun[fHisCounter]->cd();
     fHisto[fHisCounter]->setRunNumber( irun );
@@ -1967,8 +1981,9 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
             false,
             false,
             iFileName,
-            fRunPara->fXGB_stereo_file_suffix,
-            fRunPara->fXGB_gh_file_suffix
+            ( fRunPara->fEnergyReconstructionMethod == 2 || fRunPara->fDirectionReconstructionMethod == 2 )
+                ? fRunPara->fXGB_stereo_file_suffix : "",
+            ""  // GH XGB tree loaded later, after analysis type is known from cut file
         );
         // read current (major) epoch from data file
         VEvndispRunParameter* i_runPara = ( VEvndispRunParameter* )fDataFile->Get( "runparameterV2" );

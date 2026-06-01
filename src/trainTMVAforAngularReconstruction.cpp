@@ -122,9 +122,6 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
         cout << endl;
         exit( EXIT_FAILURE );
     }
-    // unclear why factor of 0.8
-    ntrain *= 0.8;
-    ntest *= 0.8;
     cout << "\tnumber of training events: " << ntrain << endl;
     cout << "\tnumber of test events    : " << ntest  << endl;
     cout << "\tfraction of training events  : " << iTrainTest << endl << endl;
@@ -878,8 +875,10 @@ int main( int argc, char* argv[] )
         iQualityCut = argv[7];
     }
     // TMVA options (default options derived from hyperparameter optimisation on CTAO prod3 simulations)
+    // NegWeightTreatment=Pray is explicit here: BoostType=Grad does not support
+    // InverseBoostNegWeights (TMVA's global default) and silently replaces it with Pray.
     string iTMVAOptions = "NTrees=100:BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:GradBaggingFraction=0.5:nCuts=20:MaxDepth=10:";
-    iTMVAOptions += "PruneMethod=ExpectedError:RegressionLossFunctionBDTG=Huber:MinNodeSize=0.02:VarTransform=N";
+    iTMVAOptions += "PruneMethod=ExpectedError:RegressionLossFunctionBDTG=Huber:MinNodeSize=0.02:NegWeightTreatment=Pray:VarTransform=N";
     if( argc >= 9 )
     {
         iTMVAOptions = argv[8];

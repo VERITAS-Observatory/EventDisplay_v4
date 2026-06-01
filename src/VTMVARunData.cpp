@@ -720,7 +720,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
                 // check sanity
                 if( iZenithCut_min.size() < 2 )
                 {
-                    cout << "VTMVARunData::readConfigurationFile error: need at least one zenith bin ";
+                    cout << "VTMVARunData::readConfigurationFile error: insufficient number of zenith bins ";
                     cout << iZenithCut_min.size() << endl;
                     return false;
                 }
@@ -795,7 +795,7 @@ bool VTMVARunData::fillEnergyCutData(
     // check sanity
     if( iEnergyCut_Log10TeV_min.size() < 1 )
     {
-        cout << "VTMVARunData::readConfigurationFile error: need at least two energy bins ";
+        cout << "VTMVARunData::readConfigurationFile error: insufficient number of energy bins ";
         cout << iEnergyCut_Log10TeV_min.size() << endl;
         return false;
     }

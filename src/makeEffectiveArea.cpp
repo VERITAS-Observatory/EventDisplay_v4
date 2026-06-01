@@ -115,7 +115,7 @@ int main( int argc, char* argv[] )
     fCuts->printCutSummary();
 
     /////////////////////////////////////////////////////////////////
-    // read MC header (might not be there, no problem; but depend on right input in runparameter file)
+    // read MC header
     VMonteCarloRunHeader* iMonteCarloHeader = fRunPara->readMCRunHeader();
 
     /////////////////////////////////////////////////////////////////
@@ -180,7 +180,11 @@ int main( int argc, char* argv[] )
         exit( EXIT_FAILURE );
     }
 
-    CData d( c, true, false, fRunPara->fdatafile, fRunPara->fXGB_stereo_file_suffix, fRunPara->fXGB_gh_file_suffix );
+    const bool i_need_stereo_xgb = ( fRunPara->fEnergyReconstructionMethod == 2
+                                        || fRunPara->fDirectionReconstructionMethod == 2 );
+    CData d( c, true, false, fRunPara->fdatafile,
+             i_need_stereo_xgb ? fRunPara->fXGB_stereo_file_suffix : "",
+             fCuts->useXGBoostCuts() ? fRunPara->fXGB_gh_file_suffix : "" );
     d.initialize_3tel_reconstruction(
         fRunPara->fRerunStereoReconstruction_3telescopes,
         fRunPara->fRerunStereoReconstruction_minAngle,
@@ -379,20 +383,26 @@ VEffectiveAreaCalculatorMCHistograms* copyMCHistograms( TChain* c )
         unsigned int z = 0;
         while(( chEl = ( TChainElement* )next() ) )
         {
-            TFile* ifInput = new TFile( chEl->GetTitle() );
-            if(!ifInput->IsZombie() )
+            TFile ifInput( chEl->GetTitle() );
+            if(!ifInput.IsZombie() )
             {
+                VEffectiveAreaCalculatorMCHistograms* iMCHisFromFile =
+                    ( VEffectiveAreaCalculatorMCHistograms* )ifInput.Get( "MChistos" );
+                if(!iMCHisFromFile )
+                {
+                    continue;
+                }
+
                 if( z == 0 )
                 {
-                    iMC_his = ( VEffectiveAreaCalculatorMCHistograms* )ifInput->Get( "MChistos" );
+                    iMC_his = ( VEffectiveAreaCalculatorMCHistograms* )iMCHisFromFile->Clone();
                 }
                 else
                 {
                     if( iMC_his )
                     {
-                        iMC_his->add(( VEffectiveAreaCalculatorMCHistograms* )ifInput->Get( "MChistos" ) );
+                        iMC_his->add( iMCHisFromFile );
                     }
-                    ifInput->Close();
                 }
                 z++;
             }

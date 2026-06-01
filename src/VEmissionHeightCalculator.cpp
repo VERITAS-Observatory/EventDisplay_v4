@@ -53,12 +53,18 @@ double VEmissionHeightCalculator::getEmissionHeight( float* cen_x, float* cen_y,
                     fImageDistance = TMath::Tan( imageDistance( cen_x[i], cen_x[j], cen_y[i], cen_y[j] ) / TMath::RadToDeg() );
                     if( fImageDistance > 0. )
                     {
+                        double iLogSizeI = log10( size[i] );
+                        double iLogSizeJ = log10( size[j] );
+                        if( iLogSizeI <= 0. || iLogSizeJ <= 0. )
+                        {
+                            continue;
+                        }
                         // get distance between the two telescopes in shower coordinates
                         fTelescopeDistanceSC = getTelescopeDistanceSC( i, j, az, el );
                         // calculate emission height [km]
                         iEmissionHeightTemp = fTelescopeDistanceSC / fImageDistance / 1.e3;
                         // weight for pairwise emission height calculation
-                        iEmissionHeightWeightTemp = 1. / (( 1. / log10( size[i] ) ) + ( 1. / log10( size[j] ) ) );
+                        iEmissionHeightWeightTemp = 1. / (( 1. / iLogSizeI ) + ( 1. / iLogSizeJ ) );
                         iEmissionHeightWeight    += iEmissionHeightWeightTemp;
                         iEmissionHeight          += iEmissionHeightTemp * iEmissionHeightWeightTemp;
                         iEmissionHeight2         += iEmissionHeightTemp * iEmissionHeightTemp * iEmissionHeightWeightTemp;
@@ -105,6 +111,9 @@ void VEmissionHeightCalculator::setTelescopePositions( vector< float > x, vector
     {
         return;
     }
+    fTelX.clear();
+    fTelY.clear();
+    fTelZ.clear();
     for( unsigned int i = 0; i < fNTel; i++ )
     {
         fTelX.push_back( x[i] );
@@ -121,6 +130,9 @@ void VEmissionHeightCalculator::setTelescopePositions( vector< float > x, vector
 void VEmissionHeightCalculator::setTelescopePositions( unsigned int ntel, double* x, double* y, double* z )
 {
     fNTel = ntel;
+    fTelX.clear();
+    fTelY.clear();
+    fTelZ.clear();
     for( unsigned int i = 0; i < ntel; i++ )
     {
         fTelX.push_back( x[i] );
