@@ -353,7 +353,13 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
             && fDataRun
             && !fRunPara->fXGB_gh_file_suffix.empty() )
     {
-        fDataRun->loadGHXGBTree( fRunPara->fXGB_gh_file_suffix );
+        if(!fDataRun->loadGHXGBTree( fRunPara->fXGB_gh_file_suffix ) )
+        {
+            cout << "VStereoAnalysis::fillHistograms error: failed to load XGB gamma-hadron friend tree" << endl;
+            cout << "suffix: " << fRunPara->fXGB_gh_file_suffix << endl;
+            cout << "exiting..." << endl;
+            exit( EXIT_FAILURE );
+        }
     }
 
     // define histograms
