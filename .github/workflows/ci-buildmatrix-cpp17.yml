@@ -7,7 +7,57 @@ on:
   workflow_dispatch:
 
 jobs:
+  prepare:
+    name: Download and cache source files
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Cache VBF tarball
+        id: vbf-cache
+        uses: actions/cache@v3
+        with:
+          path: VBF.tar.gz
+          key: vbf-tarball-${{ hashFiles('.github/workflows/ci-buildmatrix-cpp17.yml') }}
+          restore-keys: |
+            vbf-tarball-
+
+      - name: Download VBF tarball
+        if: steps.vbf-cache.outputs.cache-hit != 'true'
+        run: |
+          curl -L --retry 3 --retry-delay 3 https://syncandshare.desy.de/index.php/s/${{ secrets.VBFcpp17 }}/download -o VBF.tar.gz
+
+      - name: Cache SOFA tarball
+        id: sofa-cache
+        uses: actions/cache@v3
+        with:
+          path: sofa.tar.gz
+          key: sofa-tarball-${{ hashFiles('.github/workflows/ci-buildmatrix-cpp17.yml') }}
+          restore-keys: |
+            sofa-tarball-
+
+      - name: Download SOFA tarball
+        if: steps.sofa-cache.outputs.cache-hit != 'true'
+        run: |
+          curl -L --retry 3 --retry-delay 3 https://syncandshare.desy.de/index.php/s/${{ secrets.SOFA20231011 }}/download -o sofa.tar.gz
+
+      - name: Upload VBF tarball artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: vbf-tarball
+          path: VBF.tar.gz
+          retention-days: 30
+
+      - name: Upload SOFA tarball artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: sofa-tarball
+          path: sofa.tar.gz
+          retention-days: 30
+
   build:
+    needs: prepare
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -26,17 +76,28 @@ jobs:
         run: |
           apt-get update && apt-get install -y libopenblas-dev
 
-      - name: vbf
+      - name: Download VBF tarball
+        uses: actions/download-artifact@v3
+        with:
+          name: vbf-tarball
+          path: .
+
+      - name: Build and install VBF
         run: |
-          curl -L --retry 3 --retry-delay 3 https://syncandshare.desy.de/index.php/s/${{ secrets.VBFcpp17 }}/download -o VBF.tar.gz
-          mkdir VBF && tar -xzf VBF.tar.gz -C VBF --strip-components=1
+          mkdir -p VBF && tar -xzf VBF.tar.gz -C VBF --strip-components=1
           cd VBF && ./configure --prefix=$(echo $GITHUB_WORKSPACE)/VBF
           make
           make install
 
-      - name: sofa
+      - name: Download SOFA tarball
+        uses: actions/download-artifact@v3
+        with:
+          name: sofa-tarball
+          path: .
+
+      - name: Extract SOFA
         run: |
-          curl -L --retry 3 --retry-delay 3 https://syncandshare.desy.de/index.php/s/${{ secrets.SOFA20231011 }}/download -o sofa/sofa.tar.gz
+          mkdir -p sofa && tar -xzf sofa.tar.gz -C sofa --strip-components=1
           ./install_sofa.sh
 
       - name: eventdisplay
