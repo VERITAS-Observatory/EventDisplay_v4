@@ -16,7 +16,7 @@ jobs:
 
       - name: Cache VBF tarball
         id: vbf-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: VBF.tar.gz
           key: vbf-tarball-${{ hashFiles('.github/workflows/ci-buildmatrix-cpp17.yml') }}
@@ -30,7 +30,7 @@ jobs:
 
       - name: Cache SOFA tarball
         id: sofa-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: sofa.tar.gz
           key: sofa-tarball-${{ hashFiles('.github/workflows/ci-buildmatrix-cpp17.yml') }}
@@ -43,14 +43,14 @@ jobs:
           curl -L --retry 3 --retry-delay 3 https://syncandshare.desy.de/index.php/s/${{ secrets.SOFA20231011 }}/download -o sofa.tar.gz
 
       - name: Upload VBF tarball artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: vbf-tarball
           path: VBF.tar.gz
           retention-days: 30
 
       - name: Upload SOFA tarball artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sofa-tarball
           path: sofa.tar.gz
@@ -77,7 +77,7 @@ jobs:
           apt-get update && apt-get install -y libopenblas-dev
 
       - name: Download VBF tarball
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: vbf-tarball
           path: .
@@ -90,7 +90,7 @@ jobs:
           make install
 
       - name: Download SOFA tarball
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: sofa-tarball
           path: .
