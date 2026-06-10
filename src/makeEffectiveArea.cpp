@@ -181,7 +181,7 @@ int main( int argc, char* argv[] )
     }
 
     const bool i_need_stereo_xgb = ( fRunPara->fEnergyReconstructionMethod == 2
-                                        || fRunPara->fDirectionReconstructionMethod == 2 );
+                                     || fRunPara->fDirectionReconstructionMethod == 2 );
     CData d( c, true, false, fRunPara->fdatafile,
              i_need_stereo_xgb ? fRunPara->fXGB_stereo_file_suffix : "",
              fCuts->useXGBoostCuts() ? fRunPara->fXGB_gh_file_suffix : "" );
