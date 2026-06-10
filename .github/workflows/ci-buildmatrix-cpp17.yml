@@ -15,6 +15,7 @@ jobs:
           - "rootproject/root:latest"
           - "rootproject/root:6.26.06-ubuntu22.04"
           - "rootproject/root:6.32.04-ubuntu24.04"
+          - "rootproject/root:6.38.00-ubuntu25.10"
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.root }}
 
