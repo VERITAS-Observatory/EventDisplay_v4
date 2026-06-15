@@ -15,12 +15,12 @@ This changelog is generated using [Towncrier](https://towncrier.readthedocs.io/)
 
 - Fixes long list of bugs listed in [Issue #352](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/352).
   Fix A2: `VTraceHandler::calculateTraceSum_slidingWindow()` fRaw branch returned `FADC[1]` (second FADC sample, ped-subtracted) instead of the accumulated raw charge sum. Affected pedestal calculation path. ([#351](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/351))
-- # Bug fix: non-XGB jobs no longer probe XGB sidecar files (E4)
+- Bug fix: non-XGB jobs no longer probe XGB sidecar files (E4)
 
   XGB sidecar files (stereo and gamma-hadron) are now opened only when the active
   reconstruction method and gamma-hadron cut type actually require them, eliminating
   spurious ROOT file-open errors in non-XGB jobs. ([#352](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/352))
-- # Bug fix: explicit NegWeightTreatment for TMVA Gradient BDT angular reconstruction
+- Bug fix: explicit NegWeightTreatment for TMVA Gradient BDT angular reconstruction
 
   Added `NegWeightTreatment=Pray` to the default TMVA options in
   `trainTMVAforAngularReconstruction` to match actual TMVA behaviour:
