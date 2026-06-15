@@ -97,7 +97,9 @@ jobs:
 
       - name: Extract SOFA
         run: |
-          mkdir -p sofa && tar -xzf sofa.tar.gz -C sofa --strip-components=1
+          export EVNDISPSYS=$(echo $GITHUB_WORKSPACE)
+          mkdir -p "${EVNDISPSYS}/sofa"
+          cp sofa.tar.gz "${EVNDISPSYS}/sofa/sofa.tar.gz"
           ./install_sofa.sh
 
       - name: eventdisplay
@@ -107,5 +109,5 @@ jobs:
           export VBFSYS=$(echo $GITHUB_WORKSPACE)/VBF
           export LD_LIBRARY_PATH="${EVNDISPSYS}/obj:${EVNDISPSYS}/lib:${LD_LIBRARY_PATH}"
           export LD_LIBRARY_PATH="${VBFSYS}/lib:${LD_LIBRARY_PATH}"
-          export SOFASYS=/sofa
+          export SOFASYS="${EVNDISPSYS}/sofa"
           make -j 4 VTS
