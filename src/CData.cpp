@@ -1094,6 +1094,7 @@ TTree* CData::getXGBTree( string file_name, string file_suffix, string tree_name
         cout << "(this might be ok if no XGB analysis results are requested)" << endl;
         return 0;
     }
+    cout << "CData: opened XGB file " << file_name << endl;
     fXGBFiles.push_back( iFile );
 
     TTree* iXGB_tree = ( TTree* )iFile->Get( tree_name.c_str() );
