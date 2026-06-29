@@ -16,7 +16,7 @@ jobs:
 
       - name: Cache VBF tarball
         id: vbf-cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: VBF.tar.gz
           key: vbf-tarball-${{ hashFiles('.github/workflows/ci-buildmatrix-cpp17.yml') }}
@@ -30,7 +30,7 @@ jobs:
 
       - name: Cache SOFA tarball
         id: sofa-cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: sofa.tar.gz
           key: sofa-tarball-${{ hashFiles('.github/workflows/ci-buildmatrix-cpp17.yml') }}
