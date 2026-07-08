@@ -166,7 +166,9 @@ double VTraceHandler::calculateTraceSum_fixedWindow( int fFirst, int fLast, bool
     fTraceAverageTime = 0.;
     for( int i = fFirst; i < fLast; i++ )
     {
-        // require that trace is >0.
+        // require that trace is > 0.
+        // (this might introduce a positive-charge bias
+        //  for pedestal subtracted traces)
         if( i < fpTrazeSize && fpTrace[i] > 0. )
         {
             if(!iRaw )

@@ -151,6 +151,7 @@ void VImageParameterCalculation::calcTimingParameters()
             {
                 fParGeo->tmax = fData->getTZeros()[i];
             }
+            // mean time includes outliers
             fParGeo->tmean += fData->getTZeros()[i];
         }
     }
