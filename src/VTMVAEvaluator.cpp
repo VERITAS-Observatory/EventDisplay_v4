@@ -725,8 +725,11 @@ bool VTMVAEvaluator::evaluate( bool interpolate_mva, bool use_average_zenith_ang
     if( fDebug )
     {
         cout << "VTMVAEvaluator::evaluate: data bin " << iDataBin;
-        cout << ", MVA Method Tag " << fTMVAData[iDataBin]->fTMVAMethodTag;
-        cout << ", MVA Cut value " << fTMVAData[iDataBin]->fTMVACutValue;
+        if( iDataBin < fTMVAData.size() )
+        {
+            cout << ", MVA Method Tag " << fTMVAData[iDataBin]->fTMVAMethodTag;
+            cout << ", MVA Cut value " << fTMVAData[iDataBin]->fTMVACutValue;
+        }
         cout << endl;
     }
     // invalid data bin (e.g., event zenith is outside range of TMVA evaluator)
