@@ -2650,7 +2650,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
             TH2F* hResponseMatrixFineQC_rebined = ( TH2F* ) hVResponseMatrixFineQC[s][i_az]->Rebin2D( 2, 2, "hResponseMatrixFineQC_rebined" );
             // nbins_ResMat = hVResponseMatrixFineQC[s][i_az]->GetYaxis()->GetNbins();
             nbins_ResMat = hResponseMatrixFineQC_rebined->GetYaxis()->GetNbins();
-            for( int i_ybin = 0 ; i_ybin < nbins_ResMat ; i_ybin++ )
+            for( int i_ybin = 1 ; i_ybin <= nbins_ResMat ; i_ybin++ )
             {
                 fGauss->SetParameter( 0, 1 );
                 fGauss->SetParameter( 1, hResponseMatrixFineQC_rebined->GetYaxis()->GetBinCenter( i_ybin ) );
