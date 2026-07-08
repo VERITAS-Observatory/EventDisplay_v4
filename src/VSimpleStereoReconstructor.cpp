@@ -456,7 +456,7 @@ bool VSimpleStereoReconstructor::fillShowerDirection( float xoff, float yoff )
 bool VSimpleStereoReconstructor::fillShowerCore( float ximp, float yimp )
 {
     // check validity
-    if(!isnormal( ximp ) || !isnormal( yimp ) )
+    if(!isfinite( ximp ) || !isfinite( yimp ) )
     {
         fShower_Xcore = -99999.;
         fShower_Ycore = -99999.;
