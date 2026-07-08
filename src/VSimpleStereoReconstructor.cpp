@@ -420,8 +420,8 @@ bool VSimpleStereoReconstructor::reconstruct_core( unsigned int i_ntel,
  */
 bool VSimpleStereoReconstructor::fillShowerDirection( float xoff, float yoff )
 {
-    if( TMath::IsNaN( yoff ) || TMath::IsNaN( yoff )
-            || xoff < -998. || yoff < -998. || yoff > 998. )
+    if( TMath::IsNaN( xoff ) || TMath::IsNaN( yoff )
+            || xoff < -998. || xoff > 998. || yoff < -998. || yoff > 998. )
     {
         reset();
         return false;
