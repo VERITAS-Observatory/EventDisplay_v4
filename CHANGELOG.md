@@ -9,6 +9,17 @@ This changelog is generated using [Towncrier](https://towncrier.readthedocs.io/)
 
 <!-- towncrier release notes start -->
 
+## [v492-rc6](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases/tag/v492-rc6) - 2026-07-16
+
+### New Feature
+
+- `compareDatawithMC` / `VDataMCComparision` add support for XGB stereo friend trees, including CLI/config wiring and validation of matching friend-file entries.
+  - Data/MC comparison now also fills a new `theta` histogram in addition to existing `theta2` plots.
+  - A few targeted correctness fixes landed: effective-area response-matrix bin loop indexing, stereo direction/core validity checks, and a bounds check in TMVA debug output.
+
+  ([#362](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/362))
+
+
 ## [v492.0-rc5](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases/tag/v492.0-rc5) - 2026-06-15
 
 ### Bugfixes
