@@ -84,6 +84,7 @@ class VDataMCComparision
 
         // data tree
         CData* fData;
+        TTree* fStereoFriendTree;
 
         // cuts
         VGammaHadronCuts* fCuts;

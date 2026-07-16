@@ -9,6 +9,121 @@
 
 #include "VDataMCComparision.h"
 
+static string getXGBFileName( string iFileName, const string& iFileSuffix )
+{
+    if( iFileSuffix.empty() || iFileSuffix == "None" )
+    {
+        return "";
+    }
+
+    size_t iRootPos = iFileName.rfind( ".root" );
+    if( iRootPos != string::npos && iRootPos + 5 == iFileName.size() )
+    {
+        iFileName.replace( iRootPos, 5, "." + iFileSuffix + ".root" );
+    }
+    else
+    {
+        iFileName += "." + iFileSuffix + ".root";
+    }
+    return iFileName;
+}
+
+static bool validateXGBFriendFile( const string& iDataFileName, const string& iXGBFileName, const string& iTreeName )
+{
+    TFile* iDataFile = TFile::Open( iDataFileName.c_str() );
+    if(!iDataFile || iDataFile->IsZombie() )
+    {
+        cout << "VDataMCComparision error: cannot open data file " << iDataFileName << endl;
+        return false;
+    }
+    TTree* iDataTree = ( TTree* )iDataFile->Get( "data" );
+    if(!iDataTree )
+    {
+        cout << "VDataMCComparision error: cannot find data tree in " << iDataFileName << endl;
+        iDataFile->Close();
+        delete iDataFile;
+        return false;
+    }
+
+    TFile* iXGBFile = TFile::Open( iXGBFileName.c_str() );
+    if(!iXGBFile || iXGBFile->IsZombie() )
+    {
+        cout << "VDataMCComparision error: cannot open XGB file " << iXGBFileName << endl;
+        iDataFile->Close();
+        delete iDataFile;
+        return false;
+    }
+    TTree* iXGBTree = ( TTree* )iXGBFile->Get( iTreeName.c_str() );
+    if(!iXGBTree )
+    {
+        cout << "VDataMCComparision error: cannot find " << iTreeName << " tree in " << iXGBFileName << endl;
+        iXGBFile->Close();
+        delete iXGBFile;
+        iDataFile->Close();
+        delete iDataFile;
+        return false;
+    }
+
+    bool invalid = ( iDataTree->GetEntries() == iXGBTree->GetEntries() );
+    if(!invalid )
+    {
+        cout << "VDataMCComparision error: entry mismatch between data and XGB friend file" << endl;
+        cout << "\tdata: " << iDataFileName << " (" << iDataTree->GetEntries() << " entries)" << endl;
+        cout << "\txgb:  " << iXGBFileName << " (" << iXGBTree->GetEntries() << " entries)" << endl;
+    }
+
+    iXGBFile->Close();
+    delete iXGBFile;
+    iDataFile->Close();
+    delete iDataFile;
+
+    return invalid;
+}
+
+static TTree* buildXGBFriendChain( TChain* iDataChain, const string& iFileSuffix, const string& iTreeName )
+{
+    if(!iDataChain || iFileSuffix.empty() || iFileSuffix == "None" )
+    {
+        return 0;
+    }
+
+    TObjArray* iFileList = iDataChain->GetListOfFiles();
+    if(!iFileList || iFileList->GetEntries() == 0 )
+    {
+        return 0;
+    }
+
+    TChain* iFriendChain = new TChain( iTreeName.c_str() );
+    TIter iFileIter( iFileList );
+    while( TChainElement* iFileElement = ( TChainElement* )iFileIter() )
+    {
+        string iDataFileName = iFileElement->GetTitle();
+        string iXGBFileName = getXGBFileName( iDataFileName, iFileSuffix );
+        if( iXGBFileName.empty() )
+        {
+            continue;
+        }
+        if(!validateXGBFriendFile( iDataFileName, iXGBFileName, iTreeName ) )
+        {
+            delete iFriendChain;
+            return 0;
+        }
+        if(!iFriendChain->Add( iXGBFileName.c_str(), 0 ) )
+        {
+            cout << "VDataMCComparision error: failed to add XGB file to friend chain " << iXGBFileName << endl;
+            delete iFriendChain;
+            return 0;
+        }
+    }
+
+    if( iFriendChain->GetListOfFiles()->GetEntries() == 0 )
+    {
+        delete iFriendChain;
+        return 0;
+    }
+    return iFriendChain;
+}
+
 VDataMCComparisionHistogramData::VDataMCComparisionHistogramData(
     string iName, string iHistogramType, unsigned int iTelescopeID )
 {
@@ -136,6 +251,7 @@ VDataMCComparision::VDataMCComparision( string iname, int intel )
     }
 
     fData = 0;
+    fStereoFriendTree = 0;
     fCuts = 0;
     fCalculateMVAValues = false;
     fEpochATM = "";
@@ -577,7 +693,13 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
     }
     if( fEnergyReconstructionMethod == 2 || fDirectionReconstructionMethod == 2 )
     {
-        fData = new CData( iC, fName == "SIMS", false, ifile, fXGBStereoFileSuffix, "" );
+        fStereoFriendTree = buildXGBFriendChain( iC, fXGBStereoFileSuffix, "StereoAnalysis" );
+        if(!fStereoFriendTree )
+        {
+            cout << "VDataMCComparision::fillHistograms error: invalid XGB stereo friend chain" << endl;
+            exit( EXIT_FAILURE );
+        }
+        fData = new CData( iC, fName == "SIMS", false, fStereoFriendTree, 0 );
     }
     else
     {
@@ -1280,9 +1402,16 @@ TH1D*  VDataMCComparision::getAzimuthWeightingHistogram( string ifile )
         exit( EXIT_FAILURE );
     }
     CData* tData = 0;
+    TTree* iStereoFriendTree = 0;
     if( fEnergyReconstructionMethod == 2 || fDirectionReconstructionMethod == 2 )
     {
-        tData = new CData( iC, fName == "SIMS", false, ifile, fXGBStereoFileSuffix, "" );
+        iStereoFriendTree = buildXGBFriendChain( iC, fXGBStereoFileSuffix, "StereoAnalysis" );
+        if(!iStereoFriendTree )
+        {
+            cout << "VDataMCComparision::getAzimuthWeightingHistogram error: invalid XGB stereo friend chain" << endl;
+            exit( EXIT_FAILURE );
+        }
+        tData = new CData( iC, fName == "SIMS", false, iStereoFriendTree, 0 );
     }
     else
     {
