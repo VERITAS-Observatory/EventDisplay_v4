@@ -50,7 +50,7 @@ class VNTime
         }
         friend ostream& operator<<( ostream& os, const VNTime* vnt )
         {
-            os << (*vnt ) ;
+            os << ( *vnt ) ;
             return os ;
         }
 
@@ -131,7 +131,7 @@ class VNGain
         // cout << * VNGain
         friend ostream& operator<<( ostream& os, const VNGain* vng )
         {
-            os << (*vng ) ;
+            os << ( *vng ) ;
             return os ;
         }
 
@@ -179,7 +179,7 @@ class VNPixel
         // cout << * VNPixel
         friend ostream& operator<<( ostream& os, const VNPixel* vnp )
         {
-            os << (*vnp ) ;
+            os << ( *vnp ) ;
             return os ;
         }
 
@@ -232,7 +232,7 @@ class VNTelescope
         // cout << *VNTelescope
         friend ostream& operator<<( ostream& os, const VNTelescope* vnt )
         {
-            os << (*vnt ) ;
+            os << ( *vnt ) ;
             return os ;
         }
 
@@ -323,7 +323,7 @@ class VDeadPixelOrganizer
         // cout << * VDeadPixelOrganizer
         friend ostream& operator<<( ostream& os, const VDeadPixelOrganizer* dpo )
         {
-            os << (*dpo ) ;
+            os << ( *dpo ) ;
             return os ;
         }
 

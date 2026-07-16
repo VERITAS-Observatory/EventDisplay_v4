@@ -50,7 +50,7 @@ void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSample
 
     reset();
 
-    if(!iReader )
+    if( !iReader )
     {
         cout << "VTraceHandler::setTrace( VVirtualDataReader* iReader, double ped, double pedrms, unsigned int iChanID ): no reader set" << endl;
         return;
@@ -95,7 +95,7 @@ void VTraceHandler::setTrace( vector<uint16_t> pTrace, double ped, double pedrms
         fpTrace.clear();
         for( unsigned int i = 0; i < i_tsize; i++ )
         {
-            fpTrace.push_back(( double )pTrace[i] );
+            fpTrace.push_back( ( double )pTrace[i] );
         }
     }
     else for( unsigned int i = 0; i < i_tsize; i++ )
@@ -124,7 +124,7 @@ void VTraceHandler::setTrace( vector<uint8_t> pTrace, double ped, double pedrms,
         fpTrace.clear();
         for( unsigned int i = 0; i < i_tsize; i++ )
         {
-            fpTrace.push_back(( double )pTrace[i] );
+            fpTrace.push_back( ( double )pTrace[i] );
         }
     }
     else
@@ -166,10 +166,12 @@ double VTraceHandler::calculateTraceSum_fixedWindow( int fFirst, int fLast, bool
     fTraceAverageTime = 0.;
     for( int i = fFirst; i < fLast; i++ )
     {
-        // require that trace is >0.
+        // require that trace is > 0.
+        // (this might introduce a positive-charge bias
+        //  for pedestal subtracted traces)
         if( i < fpTrazeSize && fpTrace[i] > 0. )
         {
-            if(!iRaw )
+            if( !iRaw )
             {
                 sum += fpTrace[i] - fPed;
                 tcharge += ( i + 0.5 ) * ( fpTrace[i] - fPed );
@@ -231,7 +233,7 @@ double VTraceHandler::getQuickTZero( int fFirst, int fLast, int fTFirst )
         }
         before = pedsubbed;
     }
-    if(( before - after ) > 0.0 )
+    if( ( before - after ) > 0.0 )
     {
         tzero += ( halfmax - after ) / ( before - after );
     }
@@ -271,7 +273,7 @@ vector<float> VTraceHandler::getFADCTiming( int fFirst, int fLast, bool debug )
     //find first bin above 50 dc & first bin after that where the trace goes down again
     for( int i = fFirst; i < fLast && !have_second; i++ )
     {
-        if(!have_first && ( fpTrace[i] - fPed ) > 40 )
+        if( !have_first && ( fpTrace[i] - fPed ) > 40 )
         {
             i_start = i;
             have_first = true;
@@ -284,7 +286,7 @@ vector<float> VTraceHandler::getFADCTiming( int fFirst, int fLast, bool debug )
         temp = fpTrace[i] - fPed;
     }
 
-    if(!have_first && debug )
+    if( !have_first && debug )
     {
         cout << "VTraceHandler::getFADCTiming()  Warning: coulnd't find bin with signal > 40 dc in range " << fFirst << " - " << fLast << endl;
     }
@@ -438,7 +440,7 @@ void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpo
 void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpos, unsigned int& n255 )
 {
     double it = 0.;
-    int nMax = ( int )( fDynamicRange* tmax );
+    int nMax = ( int )( fDynamicRange * tmax );
     n255 = 0;
     // value at maximum
     tmax = -10000.;
@@ -446,7 +448,7 @@ void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpo
     maxpos = -100;
     /////////////////////////////////////////////////////
     // determine maximum position in a high gain channel
-    if(!fHiLo )
+    if( !fHiLo )
     {
         if( fFirst >= 0 && fFirst < fLast && fLast <= fpTrazeSize )
         {
@@ -602,7 +604,7 @@ double VTraceHandler::getLinInterpol( double y5, int x1, double y1, int x2, doub
     // shift by 0.5 to locate bin center
     if( a != 0. && x2 + 0.5 > 0 )
     {
-        b = y2 - a * (( double )( x2 ) + 0.5 );
+        b = y2 - a * ( ( double )( x2 ) + 0.5 );
     }
 
     if( a != 0. )
@@ -669,7 +671,7 @@ double VTraceHandler::getTraceSum( int iSumWindowFirst, int iSumWindowLast, bool
     // find maximum integral
     else if( fTraceIntegrationMethod == 2 )
     {
-        if(!kIPRmeasure )
+        if( !kIPRmeasure )
         {
             // special case: search over restricted window
             if( iForceWindowStart )
@@ -740,7 +742,7 @@ double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart
         return 0.;
     }
     // last bin to start search from
-    if(( n - iIntegrationWindow ) <= iSearchEnd )
+    if( ( n - iIntegrationWindow ) <= iSearchEnd )
     {
         iSearchEnd = n - iIntegrationWindow + 1;
     }
@@ -817,9 +819,9 @@ double VTraceHandler::calculateTraceSum_slidingWindow( unsigned int iSearchStart
     {
         fTraceAverageTime = 0.;
     }
-    if( fTraceAverageTime > (( int )iSearchEnd + ( int )iIntegrationWindow - 1 ) )
+    if( fTraceAverageTime > ( ( int )iSearchEnd + ( int )iIntegrationWindow - 1 ) )
     {
-        fTraceAverageTime = (( int )iSearchEnd + ( int )iIntegrationWindow - 1 );
+        fTraceAverageTime = ( ( int )iSearchEnd + ( int )iIntegrationWindow - 1 );
     }
 
     return charge;

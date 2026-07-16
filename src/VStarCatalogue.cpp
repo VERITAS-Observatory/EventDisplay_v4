@@ -28,7 +28,7 @@ bool VStarCatalogue::init( double iMJD, string iCatalogue )
 {
     fCatalogue = iCatalogue;
 
-    if(!readCatalogue() )
+    if( !readCatalogue() )
     {
         return false;
     }
@@ -65,7 +65,7 @@ bool VStarCatalogue::readVERITASsourcesfromDB( string iofile )
 
     //std::cout<<"VStarCatalogue::readVERITASsourcesfromDB "<<std::endl;
     VDB_Connection my_connection( iTempS.str().c_str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         cout << "VStarCatalogue: failed to connect to database server" << endl;
         return false;
@@ -74,7 +74,7 @@ bool VStarCatalogue::readVERITASsourcesfromDB( string iofile )
     sprintf( c_query, "select * from tblObserving_Sources " );
 
 
-    if(!my_connection.make_query( c_query ) )
+    if( !my_connection.make_query( c_query ) )
     {
         return false;
     }
@@ -146,7 +146,7 @@ bool VStarCatalogue::readVERITASsourcesfromDB( string iofile )
     {
         ofstream os;
         os.open( iofile.c_str() );
-        if(!os )
+        if( !os )
         {
             cout << "error opening file for VERITAS sources: " << iofile << endl;
             return false;
@@ -195,7 +195,7 @@ bool VStarCatalogue::readCatalogue()
 
     ifstream is;
     is.open( fCatalogue.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         // try ENVDISPDATA
         string itemp = "";
@@ -208,7 +208,7 @@ bool VStarCatalogue::readCatalogue()
             fCatalogue   = itemp + "/AstroData/Catalogues/" + fCatalogue;
             is.open( fCatalogue.c_str(), ifstream::in );
         }
-        if(!is )
+        if( !is )
         {
             cout << "VStarCatalogue::readCatalogue error: file not found, " << fCatalogue << endl;
             return false;
@@ -258,7 +258,7 @@ bool VStarCatalogue::readCatalogue()
         iLine_sub = iLine;
         ////////////////////////////////////////////
         // check number of text blocks available
-        if(!checkTextBlocks( iLine_sub, fCatalogueVersion ) )
+        if( !checkTextBlocks( iLine_sub, fCatalogueVersion ) )
         {
             if( fDebug )
             {
@@ -325,13 +325,13 @@ bool VStarCatalogue::readCatalogue()
                 // RA2000
                 is_stream >> iT1;
                 // make sure that entry exists
-                if(( is_stream >> std::ws ).eof() )
+                if( ( is_stream >> std::ws ).eof() )
                 {
                     zid++;
                     continue;
                 }
                 is_stream >> iT2;
-                if(( is_stream >> std::ws ).eof() )
+                if( ( is_stream >> std::ws ).eof() )
                 {
                     zid++;
                     continue;
@@ -1289,12 +1289,12 @@ unsigned int VStarCatalogue::setFOV( string ra_hour, string dec, double FOV_x, d
     double d_tt = 0.;
     is_stream >> temp2;
     d_tt += atof( temp2.c_str() );
-    if(!( is_stream >> std::ws ).eof() )
+    if( !( is_stream >> std::ws ).eof() )
     {
         is_stream >> temp2;
         d_tt += atof( temp2.c_str() ) / 60.;
     }
-    if(!( is_stream >> std::ws ).eof() )
+    if( !( is_stream >> std::ws ).eof() )
     {
         is_stream >> temp2;
         d_tt += atof( temp2.c_str() ) / 3600.;
@@ -1306,12 +1306,12 @@ unsigned int VStarCatalogue::setFOV( string ra_hour, string dec, double FOV_x, d
     d_tt = 0.;
     is_dec >> temp2;
     d_tt += atof( temp2.c_str() );
-    if(!( is_dec >> std::ws ).eof() )
+    if( !( is_dec >> std::ws ).eof() )
     {
         is_dec >> temp2;
         d_tt += atof( temp2.c_str() ) / 60.;
     }
-    if(!( is_dec >> std::ws ).eof() )
+    if( !( is_dec >> std::ws ).eof() )
     {
         is_dec >> temp2;
         d_tt += atof( temp2.c_str() ) / 3600.;
@@ -1576,16 +1576,16 @@ double VStarCatalogue::getDistanceToClosestStar( double x_cam_deg, double y_cam_
         double x = 0.;
         if( cos( fTel_dec * TMath::DegToRad() ) != 0. )
         {
-            x = -1. * ( fStarsinFOV[i]->fRACurrentEpoch - fTel_ra ) * cos( fTel_dec* TMath::DegToRad() );
+            x = -1. * ( fStarsinFOV[i]->fRACurrentEpoch - fTel_ra ) * cos( fTel_dec * TMath::DegToRad() );
         }
         x_rot = x;
         y_rot = y;
         // derotation
-        VSkyCoordinatesUtilities::rotate(-1.*fTel_deRotationAngle_deg* TMath::DegToRad(), x_rot, y_rot );
+        VSkyCoordinatesUtilities::rotate( -1.*fTel_deRotationAngle_deg * TMath::DegToRad(), x_rot, y_rot );
         x_rot *= -1. * fTel_camerascale;
         y_rot *= fTel_camerascale;
 
-        double i_dist = sqrt(( x_cam_deg - x_rot ) * ( x_cam_deg - x_rot ) + ( y_cam_deg - y_rot ) * ( y_cam_deg - y_rot ) );
+        double i_dist = sqrt( ( x_cam_deg - x_rot ) * ( x_cam_deg - x_rot ) + ( y_cam_deg - y_rot ) * ( y_cam_deg - y_rot ) );
 
         if( i_dist < i_minDist )
         {

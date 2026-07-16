@@ -25,7 +25,7 @@ VDB_ObservingSources::VDB_ObservingSources()
 
 bool VDB_ObservingSources::fill( TSQLServer* i_db )
 {
-    if(!i_db )
+    if( !i_db )
     {
         return false;
     }
@@ -38,7 +38,7 @@ bool VDB_ObservingSources::fill( TSQLServer* i_db )
     sprintf( c_query, "select * from tblObserving_Sources" );
 
     TSQLResult* db_res = i_db->Query( c_query );
-    if(!db_res )
+    if( !db_res )
     {
         return false;
     }
@@ -53,7 +53,7 @@ bool VDB_ObservingSources::fill( TSQLServer* i_db )
     {
         TSQLRow* db_row = db_res->Next();
 
-        if(!db_row->GetField( 0 ) )
+        if( !db_row->GetField( 0 ) )
         {
             continue;
         }

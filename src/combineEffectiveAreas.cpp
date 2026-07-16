@@ -211,48 +211,48 @@ bool write_reduced_merged_tree( vector< string > file_list,
     f.GetEntry( 0 );
     for( unsigned int h = 0; h < hist_names.size(); h++ )
     {
-        t->Branch(( hist_names[h] + "_binsx" ).c_str(),
-                  &nbinsx[h],
-                  ( hist_names[h] + "_binsx/I" ).c_str() );
-        t->Branch(( hist_names[h] + "_minx" ).c_str(),
-                  &min_x[h],
-                  ( hist_names[h] + "_minx/F" ).c_str() );
-        t->Branch(( hist_names[h] + "_maxx" ).c_str(),
-                  &max_x[h],
-                  ( hist_names[h] + "_maxx/F" ).c_str() );
+        t->Branch( ( hist_names[h] + "_binsx" ).c_str(),
+                   &nbinsx[h],
+                   ( hist_names[h] + "_binsx/I" ).c_str() );
+        t->Branch( ( hist_names[h] + "_minx" ).c_str(),
+                   &min_x[h],
+                   ( hist_names[h] + "_minx/F" ).c_str() );
+        t->Branch( ( hist_names[h] + "_maxx" ).c_str(),
+                   &max_x[h],
+                   ( hist_names[h] + "_maxx/F" ).c_str() );
         if( hist_to_read[h] )
         {
             nbinsx[h] = hist_to_read[h]->GetXaxis()->GetNbins();
             min_x[h] = hist_to_read[h]->GetXaxis()->GetXmin();
             max_x[h] = hist_to_read[h]->GetXaxis()->GetXmax();
         }
-        t->Branch(( hist_names[h] + "_binsy" ).c_str(),
-                  &nbinsy[h],
-                  ( hist_names[h] + "_binsy/I" ).c_str() );
-        t->Branch(( hist_names[h] + "_miny" ).c_str(),
-                  &min_y[h],
-                  ( hist_names[h] + "_miny/F" ).c_str() );
-        t->Branch(( hist_names[h] + "_maxy" ).c_str(),
-                  &max_y[h],
-                  ( hist_names[h] + "_maxy/F" ).c_str() );
+        t->Branch( ( hist_names[h] + "_binsy" ).c_str(),
+                   &nbinsy[h],
+                   ( hist_names[h] + "_binsy/I" ).c_str() );
+        t->Branch( ( hist_names[h] + "_miny" ).c_str(),
+                   &min_y[h],
+                   ( hist_names[h] + "_miny/F" ).c_str() );
+        t->Branch( ( hist_names[h] + "_maxy" ).c_str(),
+                   &max_y[h],
+                   ( hist_names[h] + "_maxy/F" ).c_str() );
         if( hist_to_read[h] )
         {
             nbinsy[h] = hist_to_read[h]->GetYaxis()->GetNbins();
             min_y[h] = hist_to_read[h]->GetYaxis()->GetXmin();
             max_y[h] = hist_to_read[h]->GetYaxis()->GetXmax();
         }
-        t->Branch(( hist_names[h] + "_binsxy" ).c_str(),
-                  &nbinsxy[h],
-                  ( hist_names[h] + "_binsxy/I" ).c_str() );
+        t->Branch( ( hist_names[h] + "_binsxy" ).c_str(),
+                   &nbinsxy[h],
+                   ( hist_names[h] + "_binsxy/I" ).c_str() );
         nbinsxy[h] = nbinsx[h] * nbinsy[h];
         if( nbinsxy[h] > max_nxy )
         {
             cout << "error: histogram dimensions larger than hardwired values" << endl;
             exit( EXIT_FAILURE );
         }
-        t->Branch(( hist_names[h] + "_value" ).c_str(),
-                  hist_value[h],
-                  ( hist_names[h] + "_value[" + hist_names[h] + "_binsxy]/F" ).c_str() );
+        t->Branch( ( hist_names[h] + "_value" ).c_str(),
+                   hist_value[h],
+                   ( hist_names[h] + "_value[" + hist_names[h] + "_binsxy]/F" ).c_str() );
     }
 
     // loop over all entries and copy histograms to arrays
@@ -303,7 +303,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
         // histograms
         for( unsigned int h = 0; h < hist_to_read.size(); h++ )
         {
-            if(!hist_to_read[h] )
+            if( !hist_to_read[h] )
             {
                 continue;
             }
@@ -402,7 +402,7 @@ void merge( vector< string > file_list,
     // get one example of IRF-runparameters for later checks in the analysis
     // (this assumes they are the same in all merged files!)
     TFile* ifirst = f.GetFile();
-    if(!ifirst )
+    if( !ifirst )
     {
         cout << "error finding pointer to first file in chain" << endl;
         cout << "exiting..." << endl;
@@ -410,7 +410,7 @@ void merge( vector< string > file_list,
     }
     VInstrumentResponseFunctionRunParameter* iRunPara =
         ( VInstrumentResponseFunctionRunParameter* )ifirst->Get( "makeEffectiveArea_runparameter" );
-    if(!iRunPara )
+    if( !iRunPara )
     {
         cout << "error copying VInstrumentResponseFunctionRunParameter to output file" << endl;
         cout << "could not find them in file: " << ifirst->GetName() << endl;
@@ -474,7 +474,7 @@ vector< string > readListOfFiles( string iFile )
 
     ifstream is;
     is.open( iFile.c_str() );
-    if(!is )
+    if( !is )
     {
         cout << "error while reading file list " << iFile << endl;
         cout << "exiting...." << endl;

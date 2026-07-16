@@ -61,15 +61,15 @@ void VSkyCoordinates::reset()
 
 void VSkyCoordinates::precessTarget( int iMJD, int iTelID )
 {
-    if(!fPrecessed )
+    if( !fPrecessed )
     {
-        if(!fSupressStdoutText )
+        if( !fSupressStdoutText )
         {
             cout << "---------------------------------------------------------------------------------------------------------" << endl;
         }
         if( iTelID >= 0 )
         {
-            if(!fSupressStdoutText )
+            if( !fSupressStdoutText )
             {
                 cout << "Pointing telescope " << iTelID + 1 << endl;
             }
@@ -78,7 +78,7 @@ void VSkyCoordinates::precessTarget( int iMJD, int iTelID )
         {
             cout << "Array pointing " << endl;
         }
-        if(!fSupressStdoutText )
+        if( !fSupressStdoutText )
         {
             cout << "\tPrecessing target ( " << getTargetName() << " ) from J2000 to MJD " << iMJD << endl;
             // TEMP
@@ -88,7 +88,7 @@ void VSkyCoordinates::precessTarget( int iMJD, int iTelID )
         // precess target coordinates
         VSkyCoordinatesUtilities::precessTarget( iMJD, fTargetRA, fTargetDec );
 
-        if(!fSupressStdoutText )
+        if( !fSupressStdoutText )
         {
             cout << "\tMJD " << iMJD;
             cout << "\t RA=" << fTargetRA* TMath::RadToDeg() << " dec=" << fTargetDec* TMath::RadToDeg() << endl;
@@ -142,7 +142,7 @@ void VSkyCoordinates::updatePointing( int MJD, double time )
     double el = 0.;
 
     // telescope elevation/azimuth calculated from source coordinates and time
-    VSkyCoordinatesUtilities::getHorizontalCoordinates( MJD, time, fTelDec* TMath::RadToDeg(), fTelRA* TMath::RadToDeg(), az, el );
+    VSkyCoordinatesUtilities::getHorizontalCoordinates( MJD, time, fTelDec * TMath::RadToDeg(), fTelRA * TMath::RadToDeg(), az, el );
     el = 90. - el;
     fTelAzimuthCalculated   = ( float )az;
     fTelElevationCalculated = ( float )el;
@@ -150,7 +150,7 @@ void VSkyCoordinates::updatePointing( int MJD, double time )
     fTelAzimuth   = fTelAzimuthCalculated;
 
     // set target azimuth/elevation
-    VSkyCoordinatesUtilities::getHorizontalCoordinates( MJD, time, fTargetDec* TMath::RadToDeg(), fTargetRA* TMath::RadToDeg(), fTargetAzimuth, fTargetElevation );
+    VSkyCoordinatesUtilities::getHorizontalCoordinates( MJD, time, fTargetDec * TMath::RadToDeg(), fTargetRA * TMath::RadToDeg(), fTargetAzimuth, fTargetElevation );
     fTargetElevation = 90. - fTargetElevation;
 }
 
@@ -259,11 +259,11 @@ void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast, int iTelID, 
     fWobbleNorth = iNorth;
     fWobbleEast = iEast;
 
-    if(!fWobbleSet )
+    if( !fWobbleSet )
     {
         double i_decDiff = 0.;
         double i_RADiff = 0.;
-        VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( iNorth, iEast, fTargetDec* TMath::RadToDeg(), fTargetRA* TMath::RadToDeg(), i_decDiff, i_RADiff );
+        VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( iNorth, iEast, fTargetDec * TMath::RadToDeg(), fTargetRA * TMath::RadToDeg(), i_decDiff, i_RADiff );
         if( i_RADiff < -180. )
         {
             i_RADiff += 360.;
@@ -311,7 +311,7 @@ bool VSkyCoordinates::initStarCatalogue( string iCatalogueName, double iMJD,
         double xmin, double xmax, double ymin, double ymax,
         double iRASkyMapCentre_J2000, double iDecSkyMapCentre_J2000 )
 {
-    if(!fStarCatalogue )
+    if( !fStarCatalogue )
     {
         fStarCatalogue = new VStarCatalogue();
     }
@@ -335,7 +335,7 @@ bool VSkyCoordinates::initStarCatalogue( string iCatalogueName, double iMJD,
         {
             i_y = fabs( ymax );
         }
-        if(!fStarCatalogue->init( iMJD, iCatalogueName ) )
+        if( !fStarCatalogue->init( iMJD, iCatalogueName ) )
         {
             cout << "Error reading star catalogue: " << iCatalogueName << endl;
             cout << "exiting..." << endl;

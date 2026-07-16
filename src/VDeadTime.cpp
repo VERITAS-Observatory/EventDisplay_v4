@@ -187,7 +187,7 @@ void VDeadTime::defineHistograms( float iRunDuration, bool iNoWarning )
         {
             sprintf( hname, "hScalarClock_off" );
         }
-        hScalarClock = new TH1D( hname, "scalar clock", int(( iRunDuration * 1.1 ) / 10. ), 0., iRunDuration * 1.1 );
+        hScalarClock = new TH1D( hname, "scalar clock", int( ( iRunDuration * 1.1 ) / 10. ), 0., iRunDuration * 1.1 );
         hScalarClock->Sumw2();
         hScalarClock->SetXTitle( "event time [s]" );
         hScalarClock->SetYTitle( "10MHz counts" );
@@ -201,7 +201,7 @@ void VDeadTime::defineHistograms( float iRunDuration, bool iNoWarning )
         {
             sprintf( hname, "hScalarBusy_off" );
         }
-        hScalarBusy = new TH1D( hname, "scalar busy counter", int(( iRunDuration * 1.1 ) / 10. ), 0., iRunDuration * 1.1 );
+        hScalarBusy = new TH1D( hname, "scalar busy counter", int( ( iRunDuration * 1.1 ) / 10. ), 0., iRunDuration * 1.1 );
         hScalarBusy->SetXTitle( "event time [s]" );
         hScalarBusy->SetYTitle( "10MHz counts (busy)" );
         hScalarBusy->SetLineColor( 2 );
@@ -217,13 +217,13 @@ void VDeadTime::defineHistograms( float iRunDuration, bool iNoWarning )
         {
             sprintf( hname, "hScalarDeadTimeFraction_off" );
         }
-        hScalarDeadTimeFraction = new TH1D( hname, "scalar dead time fraction", int(( iRunDuration * 1.1 ) / 10. ), 0., iRunDuration * 1.1 );
+        hScalarDeadTimeFraction = new TH1D( hname, "scalar dead time fraction", int( ( iRunDuration * 1.1 ) / 10. ), 0., iRunDuration * 1.1 );
         hScalarDeadTimeFraction->SetXTitle( "event time [s]" );
         hScalarDeadTimeFraction->SetYTitle( "dead time fraction" );
         hScalarDeadTimeFraction->Sumw2();
         hisList->Add( hScalarDeadTimeFraction );
     }
-    else if(!iNoWarning )
+    else if( !iNoWarning )
     {
         cout << "Warning: scalars not used for dead time calculation, run duration zero (" << iRunDuration << ")" << endl;
     }
@@ -244,7 +244,7 @@ double VDeadTime::fillDeadTime( double time, unsigned int* tenMHzClock )
 
 void VDeadTime::fillTenMHzClockArray( double time, unsigned int* tenMHzClock )
 {
-    if(!tenMHzClock || !hScalarClock )
+    if( !tenMHzClock || !hScalarClock )
     {
         return;
     }
@@ -306,8 +306,8 @@ double VDeadTime::fillTimeDifferenceHistograms( double time )
         }
         if( fRunStart > 0. )
         {
-            hTimeDiff2D->Fill(( time - fRunStart ) / 60., tdiff );
-            hNEventTime->Fill(( time - fRunStart ) / 60. );
+            hTimeDiff2D->Fill( ( time - fRunStart ) / 60., tdiff );
+            hNEventTime->Fill( ( time - fRunStart ) / 60. );
         }
     }
     ft0 = time;
@@ -337,7 +337,7 @@ double VDeadTime::calculateDeadTime()
 
 double VDeadTime::calculateDeadTimeFromScalars()
 {
-    if(!hScalarClock || !hScalarBusy || !hScalarDeadTimeFraction )
+    if( !hScalarClock || !hScalarBusy || !hScalarDeadTimeFraction )
     {
         return 0.;
     }
@@ -401,7 +401,7 @@ double VDeadTime::calculateDeadTimeFromTimeDifferences()
 {
     ///////////////////////////////////////////////////
     // dead time calculation from time differences
-    if(!hTimeDiff || !hFTimeDiff )
+    if( !hTimeDiff || !hFTimeDiff )
     {
         return 0.;
     }
@@ -412,7 +412,7 @@ double VDeadTime::calculateDeadTimeFromTimeDifferences()
 
     // assume exponential distributions of dead times
     TF1 fFit( "fFit", "expo", fTFitMin, fTFitMax );
-    hTimeDiff->Fit(&fFit, "Q0R" );
+    hTimeDiff->Fit( &fFit, "Q0R" );
     hFTimeDiff->SetParameter( 0, fFit.GetParameter( 0 ) );
     hFTimeDiff->SetParameter( 1, fFit.GetParameter( 1 ) );
 
@@ -433,7 +433,7 @@ double VDeadTime::calculateDeadTimeFromTimeDifferences()
 
     fDeadTimeMiss = nmiss;
     fDeadTimeMS = ix * 1000.;
-    fDeadTimeFrac = 1. - TMath::Power( TMath::E(), ix* hFTimeDiff->GetParameter( 1 ) );
+    fDeadTimeFrac = 1. - TMath::Power( TMath::E(), ix * hFTimeDiff->GetParameter( 1 ) );
     if( fDeadTimeFrac < 1.e-5 )
     {
         fDeadTimeFrac = 0.;
@@ -447,7 +447,7 @@ double VDeadTime::calculateDeadTimeFromTimeDifferences()
         TH1D* h = hTimeDiff2D->ProjectionY( "h_tempXDGS", i, i, "e" );
         if( h && h->GetEntries() > 1000 )
         {
-            h->Fit(&fFit, "Q0R" );
+            h->Fit( &fFit, "Q0R" );
             ix = h->GetBinCenter( 1 );
             for( int b = h->FindBin( 0.005 ); b > 0; b-- )
             {
@@ -461,10 +461,10 @@ double VDeadTime::calculateDeadTimeFromTimeDifferences()
                     break;
                 }
             }
-            hgDeadTime->SetPoint( i - 1, hTimeDiff2D->GetXaxis()->GetBinCenter( i ), ( 1. - TMath::Power( TMath::E(), ix* fFit.GetParameter( 1 ) ) ) * 100. );
+            hgDeadTime->SetPoint( i - 1, hTimeDiff2D->GetXaxis()->GetBinCenter( i ), ( 1. - TMath::Power( TMath::E(), ix * fFit.GetParameter( 1 ) ) ) * 100. );
             double iDE = 0.;
-            iDE += ix * TMath::Power( TMath::E(), ix* fFit.GetParameter( 1 ) ) * fFit.GetParError( 1 ) * ix * TMath::Power( TMath::E(), ix* fFit.GetParameter( 1 ) ) * fFit.GetParError( 1 );
-            iDE += fFit.GetParameter( 1 ) * TMath::Power( TMath::E(), ix* fFit.GetParameter( 1 ) ) * h->GetBinWidth( 1 ) * fFit.GetParameter( 1 ) * TMath::Power( TMath::E(), ix* fFit.GetParameter( 1 ) ) * h->GetBinWidth( 1 ) / 4.;
+            iDE += ix * TMath::Power( TMath::E(), ix * fFit.GetParameter( 1 ) ) * fFit.GetParError( 1 ) * ix * TMath::Power( TMath::E(), ix * fFit.GetParameter( 1 ) ) * fFit.GetParError( 1 );
+            iDE += fFit.GetParameter( 1 ) * TMath::Power( TMath::E(), ix * fFit.GetParameter( 1 ) ) * h->GetBinWidth( 1 ) * fFit.GetParameter( 1 ) * TMath::Power( TMath::E(), ix * fFit.GetParameter( 1 ) ) * h->GetBinWidth( 1 ) / 4.;
             iDE = sqrt( iDE );
             hgDeadTime->SetPointError( i - 1, 0., iDE * 100. );
 
@@ -563,7 +563,7 @@ double VDeadTime::getDeadTimeFraction( vector< bool > iMask, bool iTimeDiff, boo
         // only get dead time if mask is open!
         if( iMask[i] )
         {
-            iD += getDeadTimeFraction(( double )i + 0.5, iTimeDiff, iCheckForConsistentDeadTime );
+            iD += getDeadTimeFraction( ( double )i + 0.5, iTimeDiff, iCheckForConsistentDeadTime );
             iN++;
         }
     }
@@ -584,7 +584,7 @@ void VDeadTime::writeHistograms( bool iDebug_IO )
 
     iDir->cd();
     wDir = ( TDirectory* )iDir->Get( "deadTimeHistograms" );
-    if(!wDir )
+    if( !wDir )
     {
         iDir->mkdir( "deadTimeHistograms" )->cd();
     }
@@ -613,7 +613,7 @@ void VDeadTime::writeHistograms( bool iDebug_IO )
 
 bool VDeadTime::readHistograms( TDirectoryFile* iDir )
 {
-    if(!iDir )
+    if( !iDir )
     {
         return false;
     }

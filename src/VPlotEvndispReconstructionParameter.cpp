@@ -29,7 +29,7 @@ bool VPlotEvndispReconstructionParameter::initialize( string iEventdisplayFileNa
 
     fDataChain = new TChain( "showerpars" );
     fDataChain->Add( fDataFileName.c_str() );
-    if(!fDataChain )
+    if( !fDataChain )
     {
         cout << "VPlotEvndispReconstructionParameter::initialize() error:";
         cout << "file/chain " << fDataFileName << " not found" << endl;
@@ -39,7 +39,7 @@ bool VPlotEvndispReconstructionParameter::initialize( string iEventdisplayFileNa
     {
         fDataFile = new TFile( fDataChain->GetFile()->GetName() );
     }
-    if(!fDataFile || fDataFile->IsZombie() )
+    if( !fDataFile || fDataFile->IsZombie() )
     {
         cout << "VPlotEvndispReconstructionParameter::initialize() error:";
         cout << "file " << fDataFileName << " not found" << endl;
@@ -48,7 +48,7 @@ bool VPlotEvndispReconstructionParameter::initialize( string iEventdisplayFileNa
 
     // read in EvndispReconstructionParameter
     fEvndispReconstructionParameter = ( VEvndispReconstructionParameter* )fDataFile->Get( "EvndispReconstructionParameter" );
-    if(!fEvndispReconstructionParameter )
+    if( !fEvndispReconstructionParameter )
     {
         cout << "VPlotEvndispReconstructionParameter::initialize() error:";
         cout << " no reconstruction parameters found" << endl;
@@ -57,7 +57,7 @@ bool VPlotEvndispReconstructionParameter::initialize( string iEventdisplayFileNa
 
     // get telescope type
     TTree* i_telconfig = ( TTree* )fDataFile->Get( "telconfig" );
-    if(!i_telconfig )
+    if( !i_telconfig )
     {
         cout << "VPlotEvndispReconstructionParameter::initialize() error:";
         cout << " no telescope configuration found" << endl;
@@ -168,7 +168,7 @@ void VPlotEvndispReconstructionParameter::plot( unsigned int iMethod, unsigned i
 bool VPlotEvndispReconstructionParameter::fill( unsigned int iMethod, unsigned int iTelescope, int iTelTypeCounter )
 {
     cout << "filling histograms for method " << iMethod << " and telescope " << iTelescope + 1 << endl;
-    if(!fDataFile )
+    if( !fDataFile )
     {
         cout << "VPlotEvndispReconstructionParameter::fill() error: no file found" << endl;
         return false;

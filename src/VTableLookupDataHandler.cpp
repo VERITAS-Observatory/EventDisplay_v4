@@ -10,7 +10,7 @@
 VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunParameter* iT )
 {
     fTLRunParameter = iT;
-    if(!fTLRunParameter )
+    if( !fTLRunParameter )
     {
         cout << "VTableLookupDataHandler::VTableLookupDataHandler error: to table lookup run parameters" << endl;
         exit( EXIT_FAILURE );
@@ -148,7 +148,7 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
  */
 void VTableLookupDataHandler::fill()
 {
-    if(!fOTree )
+    if( !fOTree )
     {
         return;
     }
@@ -173,8 +173,8 @@ void VTableLookupDataHandler::fillMChistograms()
     {
         // fill histograms with all simulated events
         double ilogE = log10( fMCEnergy );
-        double idist = sqrt( fMCxcore* fMCxcore + fMCycore* fMCycore );
-        double ioff  = sqrt( fMCxoff* fMCxoff + fMCyoff* fMCyoff );
+        double idist = sqrt( fMCxcore * fMCxcore + fMCycore * fMCycore );
+        double ioff  = sqrt( fMCxoff * fMCxoff + fMCyoff * fMCyoff );
 
         hE0mc->Fill( ilogE );
         hDE0mc->Fill( ilogE, idist );
@@ -195,7 +195,7 @@ void VTableLookupDataHandler::fillMChistograms()
 
 double VTableLookupDataHandler::getMCDistance()
 {
-    return sqrt( fMCxcore* fMCxcore + fMCycore* fMCycore );
+    return sqrt( fMCxcore * fMCxcore + fMCycore * fMCycore );
 }
 
 
@@ -214,7 +214,7 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
 {
     if( fEventCounter < fNEntries && fTotalTime < fMaxTotalTime )
     {
-        if(!randomSelected() )
+        if( !randomSelected() )
         {
             fEventCounter++;
             return true;
@@ -238,7 +238,7 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
             return false;
         }
         // dead time calculation
-        if(!fIsMC && getEventNumber() != 999999 )
+        if( !fIsMC && getEventNumber() != 999999 )
         {
             fDeadTime->fillDeadTime( time );
         }
@@ -250,7 +250,7 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
         }
 
         // calculate theta2
-        if(!fIsMC )
+        if( !fIsMC )
         {
             ftheta2 = ( fYoff_derot - fWobbleN ) * ( fYoff_derot - fWobbleN )
                       + ( fXoff_derot - fWobbleE ) * ( fXoff_derot - fWobbleE );
@@ -291,7 +291,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 {
     ///////////////////////////////////////////////////////////////////////////////
     // read partial event for quick reconstruction quality assessment
-    if(!fshowerpars->GetEntry( fEventCounter ) )
+    if( !fshowerpars->GetEntry( fEventCounter ) )
     {
         return -1;
     }
@@ -322,7 +322,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
         fMCycore = fshowerpars->MCycore;
         fMCxoff = fshowerpars->MCxoff;
         fMCyoff = fshowerpars->MCyoff;
-        if(!bShort && !fwrite )
+        if( !bShort && !fwrite )
         {
             fMCxcore_SC = fshowerpars->MCxcore_SC;
             fMCycore_SC = fshowerpars->MCycore_SC;
@@ -337,7 +337,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     fArray_PointingStatus = fshowerpars->eventStatus;
 
     // the following variables are not set in table filling mode
-    if(!fwrite )
+    if( !fwrite )
     {
         runNumber = fshowerpars->runNumber;
         eventNumber = fshowerpars->eventNumber;
@@ -361,7 +361,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
             fTelAzimuth[i] = fshowerpars->TelAzimuth[i];
         }
         fArray_PointingStatus = fshowerpars->eventStatus;
-        if(!fIsMC )
+        if( !fIsMC )
         {
             for( unsigned int i = 0; i < fNTel; i++ )
             {
@@ -381,7 +381,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     // return if stereo reconstruction was not successful
     // (don't do this if stereo reconstruction is
     //  repeated)
-    if(!fTLRunParameter->fRerunStereoReconstruction
+    if( !fTLRunParameter->fRerunStereoReconstruction
             && ( TMath::IsNaN( fXcore ) || TMath::IsNaN( fYcore ) ) )
     {
         fXcore =  -999999.;
@@ -431,7 +431,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     }
 
     fimg2_ang = fshowerpars->img2_ang[fMethod];
-    if(!bShort )
+    if( !bShort )
     {
         fRA = fshowerpars->ra[fMethod];
         fDec = fshowerpars->dec[fMethod];
@@ -448,7 +448,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     ////////////////////////////////////////////
     // initialize tpars trees
     // loop over all telescopes
-    bitset<8 * sizeof(unsigned long )> i_nimage; // for imagepattern
+    bitset<8 * sizeof( unsigned long )> i_nimage; // for imagepattern
     i_nimage.reset();
 
     for( unsigned int i = 0; i < fNTel; i++ )
@@ -460,16 +460,16 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
         }
         // check if the tpars for this telescope should be read
         // missing tpars are treated as missing telescopes
-        if(!fTLRunParameter->fUseEvndispSelectedImagesOnly )
+        if( !fTLRunParameter->fUseEvndispSelectedImagesOnly )
         {
             fReadTPars = true;
-            if(!ftpars[i] )
+            if( !ftpars[i] )
             {
                 fReadTPars = false;
             }
         }
-        else if(( fTLRunParameter->bWriteReconstructedEventsOnly >= 0 )
-                || fTLRunParameter->bWriteReconstructedEventsOnly == -2 || fwrite )
+        else if( ( fTLRunParameter->bWriteReconstructedEventsOnly >= 0 )
+                 || fTLRunParameter->bWriteReconstructedEventsOnly == -2 || fwrite )
         {
             if( fImgSel_list[i] )
             {
@@ -483,7 +483,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
         // read only those telescope which were part of the reconstruction
         if( fReadTPars )
         {
-            if(!ftpars[i] )
+            if( !ftpars[i] )
             {
                 cout << "VTableLookupDataHandler::fillNextEvent error:";
                 cout << "tree tpars not found (telescope " << i + 1 << ")" << endl;
@@ -526,7 +526,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 
             fCurrentNoiseLevel[i] = ftpars[i]->meanPedvar_Image;
             fFitstat[i] = ftpars[i]->Fitstat;
-            if(!bShort )
+            if( !bShort )
             {
                 fmeanPedvar_ImageT[i] = ftpars[i]->meanPedvar_Image;
                 fnsat[i] = ftpars[i]->nsat;
@@ -551,7 +551,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 
         // bit coding for telescope used in analysis
         // (small arrays only)
-        if(!bShort && fntubes[i] > 4 && i < i_nimage.size() && i < 10 )
+        if( !bShort && fntubes[i] > 4 && i < i_nimage.size() && i < 10 )
         {
             i_nimage.set( i, 1 );
         }
@@ -671,7 +671,7 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
 
     // fall back to original eventdisplay results in case
     // simple reconstructor fails
-    if(( fXoff_intersect < -999. || fYoff_intersect < -999. ) && fChi2_edisp >= 0 )
+    if( ( fXoff_intersect < -999. || fYoff_intersect < -999. ) && fChi2_edisp >= 0 )
     {
         fXoff_intersect = fXoff_edisp;
         fYoff_intersect = fYoff_edisp;
@@ -850,21 +850,21 @@ void VTableLookupDataHandler::doStereoReconstruction( bool bSelectedImagesOnly )
 */
 bool VTableLookupDataHandler::checkIfFilesInChainAreRecovered( TChain* c )
 {
-    if(!c )
+    if( !c )
     {
         cout << "VTableLookupDataHandler::checkIfFilesInChainAreRecovered() error: no chain" << endl;
         return true;
     }
 
     TObjArray* fileElements = c->GetListOfFiles();
-    if(!fileElements )
+    if( !fileElements )
     {
         cout << "VTableLookupDataHandler::checkIfFilesInChainAreRecovered() error: no files in chain" << endl;
         return true;
     }
     TChainElement* chEl = 0;
     TIter next( fileElements );
-    while(( chEl = ( TChainElement* )next() ) )
+    while( ( chEl = ( TChainElement* )next() ) )
     {
         TFile* ifInput = new TFile( chEl->GetTitle() );
         if( ifInput->IsZombie() )
@@ -917,7 +917,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     }
     cout << iNFil_sum << " file(s) in chain " << endl;
     // don't check each file for CTA sims -> this is very inefficient and it takes a long time
-    if(!fTLRunParameter->fPE && fTLRunParameter->readwrite != 'W' )
+    if( !fTLRunParameter->fPE && fTLRunParameter->readwrite != 'W' )
     {
         if( checkIfFilesInChainAreRecovered( fTtelconfig ) )
         {
@@ -1005,14 +1005,14 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     {
         fTshowerpars->Add( finputfile[i].c_str() );
     }
-    if(!fTshowerpars )
+    if( !fTshowerpars )
     {
         cout << "VTableLookupDataHandler::setInputFile: error while retrieving data trees (2)" << endl;
         cout << "exiting..." << endl;
         exit( EXIT_FAILURE );
     }
     // check validity of showerpars tree
-    if(!fTshowerpars->GetBranchStatus( "runNumber" ) )
+    if( !fTshowerpars->GetBranchStatus( "runNumber" ) )
     {
         cout << "VTableLookupDataHandler::setInputFile: error while retrieving data trees (2b)" << endl;
         cout << "exiting..." << endl;
@@ -1070,13 +1070,13 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
             sprintf( iDir, "%s/Tel_%u/tpars", finputfile[f].c_str(), i + 1 );
             iT->Add( iDir );
             // no pointing corrections for MC analysis
-            if(!fIsMC )
+            if( !fIsMC )
             {
                 sprintf( iDir, "%s/Tel_%u/pointing_%u", finputfile[f].c_str(), i + 1, i + 1 );
                 iPC->Add( iDir );
             }
         }
-        if(!iT )
+        if( !iT )
         {
             cout << "VTableLookupDataHandler::setInputFile: error while retrieving data trees (3)" << endl;
             exit( EXIT_FAILURE );
@@ -1122,7 +1122,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     for( unsigned int i = 0; i < fNTel; i++ )
     {
         // standard data format
-        if(!fTLRunParameter->fPE )
+        if( !fTLRunParameter->fPE )
         {
             if( fDebug > 1 )
             {
@@ -1134,7 +1134,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
             {
                 gErrorIgnoreLevel = 5000;
                 sprintf( iDir, "%s/Tel_%u/calib_%u", finputfile[f].c_str(), i + 1, i + 1 );
-                if(!iPedVars.Add( iDir ) )
+                if( !iPedVars.Add( iDir ) )
                 {
                     cout << "VTableLookupDataHandler::setInputFile: error while retrieving pedvars trees" << endl;
                     cout << "exiting..." << endl;
@@ -1144,7 +1144,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
                 {
                     // backwards compatibility: read calibration tree from a different directory (note: this produces a root error message)
                     sprintf( iDir, "%s/Tel_%u/calibration/calib_%u", finputfile[f].c_str(), i + 1, i + 1 );
-                    if(!iPedVars.Add( iDir ) )
+                    if( !iPedVars.Add( iDir ) )
                     {
                         cout << "VTableLookupDataHandler::setInputFile: error while retrieving pedvars trees" << endl;
                         cout << "exiting..." << endl;
@@ -1542,7 +1542,7 @@ bool VTableLookupDataHandler::readRunParameter()
         chEl = ( TChainElement* )next();
 
         TFile ifInput( chEl->GetTitle() );
-        if(!ifInput.IsZombie() )
+        if( !ifInput.IsZombie() )
         {
             cout << "reading eventdisplay run parameters from " << ifInput.GetName() << endl;
             TNamed* iR = ( TNamed* )ifInput.Get( "runparameter" );
@@ -1725,7 +1725,7 @@ bool VTableLookupDataHandler::terminate( TNamed* iM )
         // see if there is a dead time object on file, if not: write the one filled here
         // (note: at this stage, the scalars cannot be used and the dead time might be
         //         underestimated)
-        if(!fIsMC )
+        if( !fIsMC )
         {
             writeDeadTimeHistograms();
         }
@@ -1784,7 +1784,7 @@ bool VTableLookupDataHandler::terminate( TNamed* iM )
             }
 
         }
-        else if(!fIsMC )
+        else if( !fIsMC )
         {
             cout << "Warning, VTableLookupDataHandler->finputfile has size 0, unable to copy TTree 'pointingDataReduced' to file " << fOutFile->GetName() << endl;
         }
@@ -1888,7 +1888,7 @@ bool VTableLookupDataHandler::copyMCRunheader()
         TFile* f = iTel.GetFile();
         if( f )
         {
-            if(( VMonteCarloRunHeader* )f->Get( "MC_runheader" ) )
+            if( ( VMonteCarloRunHeader* )f->Get( "MC_runheader" ) )
             {
                 fOutFile->cd();
                 f->Get( "MC_runheader" )->Write();
@@ -1942,7 +1942,7 @@ void VTableLookupDataHandler::copyMCHistograms()
         // loop over all files in chain (might be many) and add up MC histograms
         // (histograms are needed for effective area calculation)
         TObjArray* fileElements = fTshowerpars->GetListOfFiles();
-        if(!fileElements )
+        if( !fileElements )
         {
             cout << "VTableLookupDataHandler::copyMCHistograms(): no list of files found" << endl;
             return;
@@ -1950,10 +1950,10 @@ void VTableLookupDataHandler::copyMCHistograms()
         TChainElement* chEl = 0;
         TIter next( fileElements );
         unsigned int z = 0;
-        while(( chEl = ( TChainElement* )next() ) )
+        while( ( chEl = ( TChainElement* )next() ) )
         {
             TFile* ifInput = new TFile( chEl->GetTitle() );
-            if(!ifInput->IsZombie() )
+            if( !ifInput->IsZombie() )
             {
                 if( z == 0 )
                 {
@@ -2396,7 +2396,7 @@ bool VTableLookupDataHandler::cut( bool bWrite )
     // number of reconstructed events
     fNStats_Rec++;
 
-    if(!isReconstructed() )
+    if( !isReconstructed() )
     {
         fNStats_Chi2Cut++;
         return false;
@@ -2466,7 +2466,7 @@ double VTableLookupDataHandler::calculateMeanNoiseLevel( bool bCurrentNoiseLevel
     // time dependent pedestal variations
     if( bCurrentNoiseLevel )
     {
-        bitset<8 * sizeof(unsigned long )> i_nimage( fImgSel );
+        bitset<8 * sizeof( unsigned long )> i_nimage( fImgSel );
         for( unsigned int i = 0; i < fCurrentNoiseLevel.size(); i++ )
         {
             if( i >= i_nimage.size() )
@@ -2505,7 +2505,7 @@ double VTableLookupDataHandler::calculateMeanNoiseLevel( bool bCurrentNoiseLevel
 
 void VTableLookupDataHandler::setNEntries( int iN )
 {
-    if(( iN < fNEntries && iN > 0 ) || fNEntries == 0 )
+    if( ( iN < fNEntries && iN > 0 ) || fNEntries == 0 )
     {
         fNEntries = iN;
     }
@@ -2719,7 +2719,7 @@ void VTableLookupDataHandler::fill_selected_images_before_redo_stereo_reconstruc
     float* tmp_size = getSize( fTLRunParameter->fUseEvndispSelectedImagesOnly );
     unsigned int ii = 0;
     fImgSel = 0;
-    bitset<8 * sizeof(unsigned long )> i_nimage;
+    bitset<8 * sizeof( unsigned long )> i_nimage;
     bool i_analyse_telescope = false;
     for( unsigned int i = 0; i < getNTel(); i++ )
     {

@@ -67,42 +67,42 @@ void VPlotMonteCarloQualityFactor::initializeHistograms()
     map< string, VPlotMonteCarloQualityFactorData* >::iterator iData;
     for( iData = fData.begin(); iData != fData.end(); iData++ )
     {
-        sprintf( hname, "hSi_%s", (*iData ).first.c_str() );
+        sprintf( hname, "hSi_%s", ( *iData ).first.c_str() );
         //      sprintf( htitle, "%s (signal)", (*iData).first.c_str() );
-        (*iData ).second->hSignal = new TH1D( hname, "", iBinning, (*iData ).second->fVar_min, (*iData ).second->fVar_max );
-        (*iData ).second->hSignal->SetXTitle((*iData ).first.c_str() );
-        (*iData ).second->hSignal->SetYTitle( "normalized number of events" );
-        setHistogramPlottingStyle((*iData ).second->hSignal, 1, 2, 1., 1, 1, 3003 );
+        ( *iData ).second->hSignal = new TH1D( hname, "", iBinning, ( *iData ).second->fVar_min, ( *iData ).second->fVar_max );
+        ( *iData ).second->hSignal->SetXTitle( ( *iData ).first.c_str() );
+        ( *iData ).second->hSignal->SetYTitle( "normalized number of events" );
+        setHistogramPlottingStyle( ( *iData ).second->hSignal, 1, 2, 1., 1, 1, 3003 );
 
-        sprintf( hname, "hBc_%s", (*iData ).first.c_str() );
+        sprintf( hname, "hBc_%s", ( *iData ).first.c_str() );
         //      sprintf( htitle, "%s (background)", (*iData).first.c_str() );
-        (*iData ).second->hBackground = new TH1D( hname, "", iBinning, (*iData ).second->fVar_min, (*iData ).second->fVar_max );
-        (*iData ).second->hBackground->SetXTitle((*iData ).first.c_str() );
-        (*iData ).second->hBackground->SetYTitle( "normalized number of events" );
-        setHistogramPlottingStyle((*iData ).second->hBackground, 2, 2, 1., 1, 1, 3003 );
+        ( *iData ).second->hBackground = new TH1D( hname, "", iBinning, ( *iData ).second->fVar_min, ( *iData ).second->fVar_max );
+        ( *iData ).second->hBackground->SetXTitle( ( *iData ).first.c_str() );
+        ( *iData ).second->hBackground->SetYTitle( "normalized number of events" );
+        setHistogramPlottingStyle( ( *iData ).second->hBackground, 2, 2, 1., 1, 1, 3003 );
 
-        sprintf( hname, "hQl_%s", (*iData ).first.c_str() );
+        sprintf( hname, "hQl_%s", ( *iData ).first.c_str() );
         //      sprintf( htitle, "%s (q-factor, lower bound)", (*iData).first.c_str() );
-        (*iData ).second->hQFactors_LowerCut = new TH1D( hname, "", iBinning, (*iData ).second->fVar_min, (*iData ).second->fVar_max );
-        (*iData ).second->hQFactors_LowerCut->SetXTitle((*iData ).first.c_str() );
-        (*iData ).second->hQFactors_LowerCut->SetYTitle( "q-factor" );
-        setHistogramPlottingStyle((*iData ).second->hQFactors_LowerCut, 1, 2, 1., 1, 1, 3003 );
+        ( *iData ).second->hQFactors_LowerCut = new TH1D( hname, "", iBinning, ( *iData ).second->fVar_min, ( *iData ).second->fVar_max );
+        ( *iData ).second->hQFactors_LowerCut->SetXTitle( ( *iData ).first.c_str() );
+        ( *iData ).second->hQFactors_LowerCut->SetYTitle( "q-factor" );
+        setHistogramPlottingStyle( ( *iData ).second->hQFactors_LowerCut, 1, 2, 1., 1, 1, 3003 );
 
-        sprintf( hname, "hQu_%s", (*iData ).first.c_str() );
+        sprintf( hname, "hQu_%s", ( *iData ).first.c_str() );
         //      sprintf( htitle, "%s (q-factor, upper bound)", (*iData).first.c_str() );
-        (*iData ).second->hQFactors_UpperCut = new TH1D( hname, "", iBinning, (*iData ).second->fVar_min, (*iData ).second->fVar_max );
-        (*iData ).second->hQFactors_UpperCut->SetXTitle((*iData ).first.c_str() );
-        (*iData ).second->hQFactors_UpperCut->SetYTitle( "q-factor" );
-        setHistogramPlottingStyle((*iData ).second->hQFactors_UpperCut, 2, 2, 1., 1, 1, 3003 );
+        ( *iData ).second->hQFactors_UpperCut = new TH1D( hname, "", iBinning, ( *iData ).second->fVar_min, ( *iData ).second->fVar_max );
+        ( *iData ).second->hQFactors_UpperCut->SetXTitle( ( *iData ).first.c_str() );
+        ( *iData ).second->hQFactors_UpperCut->SetYTitle( "q-factor" );
+        setHistogramPlottingStyle( ( *iData ).second->hQFactors_UpperCut, 2, 2, 1., 1, 1, 3003 );
 
-        (*iData ).second->gQFactor_LowerCutE = new TGraphErrors( 1 );
-        setGraphPlottingStyle((*iData ).second->gQFactor_LowerCutE, 1, 2, 22, 1. );
-        (*iData ).second->gQFactor_UpperCutE = new TGraphErrors( 1 );
-        setGraphPlottingStyle((*iData ).second->gQFactor_UpperCutE, 2, 2, 23, 1. );
-        (*iData ).second->gQFactorMax_LowerCutE = new TGraphErrors( 1 );
-        setGraphPlottingStyle((*iData ).second->gQFactorMax_LowerCutE, 1, 2, 22, 1. );
-        (*iData ).second->gQFactorMax_UpperCutE = new TGraphErrors( 1 );
-        setGraphPlottingStyle((*iData ).second->gQFactorMax_UpperCutE, 2, 2, 23, 1. );
+        ( *iData ).second->gQFactor_LowerCutE = new TGraphErrors( 1 );
+        setGraphPlottingStyle( ( *iData ).second->gQFactor_LowerCutE, 1, 2, 22, 1. );
+        ( *iData ).second->gQFactor_UpperCutE = new TGraphErrors( 1 );
+        setGraphPlottingStyle( ( *iData ).second->gQFactor_UpperCutE, 2, 2, 23, 1. );
+        ( *iData ).second->gQFactorMax_LowerCutE = new TGraphErrors( 1 );
+        setGraphPlottingStyle( ( *iData ).second->gQFactorMax_LowerCutE, 1, 2, 22, 1. );
+        ( *iData ).second->gQFactorMax_UpperCutE = new TGraphErrors( 1 );
+        setGraphPlottingStyle( ( *iData ).second->gQFactorMax_UpperCutE, 2, 2, 23, 1. );
     }
 
 }
@@ -112,21 +112,21 @@ void VPlotMonteCarloQualityFactor::resetHistograms()
     map< string, VPlotMonteCarloQualityFactorData* >::iterator iData;
     for( iData = fData.begin(); iData != fData.end(); iData++ )
     {
-        if((*iData ).second->hSignal )
+        if( ( *iData ).second->hSignal )
         {
-            (*iData ).second->hSignal->Reset();
+            ( *iData ).second->hSignal->Reset();
         }
-        if((*iData ).second->hBackground )
+        if( ( *iData ).second->hBackground )
         {
-            (*iData ).second->hBackground->Reset();
+            ( *iData ).second->hBackground->Reset();
         }
-        if((*iData ).second->hQFactors_UpperCut )
+        if( ( *iData ).second->hQFactors_UpperCut )
         {
-            (*iData ).second->hQFactors_UpperCut->Reset();
+            ( *iData ).second->hQFactors_UpperCut->Reset();
         }
-        if((*iData ).second->hQFactors_LowerCut )
+        if( ( *iData ).second->hQFactors_LowerCut )
         {
-            (*iData ).second->hQFactors_LowerCut->Reset();
+            ( *iData ).second->hQFactors_LowerCut->Reset();
         }
     }
 
@@ -176,7 +176,7 @@ bool VPlotMonteCarloQualityFactor::setDataChain( string iChain, bool bSignal )
 
 void VPlotMonteCarloQualityFactor::fillEnergyDependence( int iMaxNevents, double iEmin, double iEmax, double iEbin )
 {
-    if(!fSignalChain || !fBackgroundChain )
+    if( !fSignalChain || !fBackgroundChain )
     {
         cout << "VPlotMonteCarloQualityFactor::fillEnergyDependence: missing data chain(s): " << fSignalChain << "\t" << fBackgroundChain << endl;
         return;
@@ -190,12 +190,12 @@ void VPlotMonteCarloQualityFactor::fillEnergyDependence( int iMaxNevents, double
     map< string, VPlotMonteCarloQualityFactorData* >::iterator iData;
 
     // loop over all energy bins
-    int  iNbin = int(( iEmax - iEmin ) / iEbin );
+    int  iNbin = int( ( iEmax - iEmin ) / iEbin );
     cout << "Energy binning: " << iNbin << "\t" << iEmin << "\t" << iEmax << "\t" << iEbin << endl;
     for( int i = 0; i < iNbin; i++ )
     {
         resetHistograms();
-        setEnergyRange( iEmin + i* iEbin, iEmin + ( i + 1 )*iEbin );
+        setEnergyRange( iEmin + i * iEbin, iEmin + ( i + 1 )*iEbin );
         cout << endl;
         cout << "==========================================================================" << endl;
         cout << "Energybin: " << i << "\t" << iEmin + i* iEbin << "\t" << iEmin + ( i + 1 )*iEbin << endl;
@@ -204,11 +204,11 @@ void VPlotMonteCarloQualityFactor::fillEnergyDependence( int iMaxNevents, double
         // get maximum values from q-factor histograms
         for( iData = fData.begin(); iData != fData.end(); iData++ )
         {
-            (*iData ).second->gQFactor_LowerCutE->SetPoint( i, iEmin + i* iEbin + 0.5 * iEbin, (*iData ).second->hQFactors_LowerCut->GetBinCenter((*iData ).second->hQFactors_LowerCut->GetMaximumBin() ) );
-            (*iData ).second->gQFactor_UpperCutE->SetPoint( i, iEmin + i* iEbin + 0.5 * iEbin, (*iData ).second->hQFactors_UpperCut->GetBinCenter((*iData ).second->hQFactors_UpperCut->GetMaximumBin() ) );
+            ( *iData ).second->gQFactor_LowerCutE->SetPoint( i, iEmin + i * iEbin + 0.5 * iEbin, ( *iData ).second->hQFactors_LowerCut->GetBinCenter( ( *iData ).second->hQFactors_LowerCut->GetMaximumBin() ) );
+            ( *iData ).second->gQFactor_UpperCutE->SetPoint( i, iEmin + i * iEbin + 0.5 * iEbin, ( *iData ).second->hQFactors_UpperCut->GetBinCenter( ( *iData ).second->hQFactors_UpperCut->GetMaximumBin() ) );
 
-            (*iData ).second->gQFactorMax_LowerCutE->SetPoint( i, iEmin + i* iEbin + 0.5 * iEbin, (*iData ).second->hQFactors_LowerCut->GetMaximum() );
-            (*iData ).second->gQFactorMax_UpperCutE->SetPoint( i, iEmin + i* iEbin + 0.5 * iEbin, (*iData ).second->hQFactors_UpperCut->GetMaximum() );
+            ( *iData ).second->gQFactorMax_LowerCutE->SetPoint( i, iEmin + i * iEbin + 0.5 * iEbin, ( *iData ).second->hQFactors_LowerCut->GetMaximum() );
+            ( *iData ).second->gQFactorMax_UpperCutE->SetPoint( i, iEmin + i * iEbin + 0.5 * iEbin, ( *iData ).second->hQFactors_UpperCut->GetMaximum() );
         }
     }
     setEnergyRange();
@@ -217,7 +217,7 @@ void VPlotMonteCarloQualityFactor::fillEnergyDependence( int iMaxNevents, double
 
 bool VPlotMonteCarloQualityFactor::fill( int iMaxNevents )
 {
-    if(!fSignalChain || !fBackgroundChain )
+    if( !fSignalChain || !fBackgroundChain )
     {
         cout << "VPlotMonteCarloQualityFactor::fill: missing data chain(s): " << fSignalChain << "\t" << fBackgroundChain << endl;
         return false;
@@ -242,10 +242,10 @@ void VPlotMonteCarloQualityFactor::calculateQfactors()
     map< string, VPlotMonteCarloQualityFactorData* >::iterator iData;
     for( iData = fData.begin(); iData != fData.end(); iData++ )
     {
-        TH1D* hS = (*iData ).second->hSignal;
-        TH1D* hB = (*iData ).second->hBackground;
-        TH1D* hQL = (*iData ).second->hQFactors_LowerCut;
-        TH1D* hQU = (*iData ).second->hQFactors_UpperCut;
+        TH1D* hS = ( *iData ).second->hSignal;
+        TH1D* hB = ( *iData ).second->hBackground;
+        TH1D* hQL = ( *iData ).second->hQFactors_LowerCut;
+        TH1D* hQU = ( *iData ).second->hQFactors_UpperCut;
         double iSTot = 0.;
         for( int i = 1; i <= hS->GetNbinsX(); i++ )
         {
@@ -301,7 +301,7 @@ void VPlotMonteCarloQualityFactor::calculateQfactors()
         {
             hB->Scale( 1. / iBTot );
         }
-        cout << (*iData ).first << "\t" << iSTot << "\t" << iBTot << endl;
+        cout << ( *iData ).first << "\t" << iSTot << "\t" << iBTot << endl;
     }
 
 }
@@ -309,7 +309,7 @@ void VPlotMonteCarloQualityFactor::calculateQfactors()
 
 void VPlotMonteCarloQualityFactor::fill( int iMaxNevents, CData* c, bool bSignal )
 {
-    if(!c )
+    if( !c )
     {
         return;
     }
@@ -470,8 +470,8 @@ void VPlotMonteCarloQualityFactor::plot( bool iPrint )
     for( iData = fData.begin(); iData != fData.end(); iData++ )
     {
         // parameter histograms
-        sprintf( hname, "cQ_%s", (*iData ).first.c_str() );
-        sprintf( htitle, "%s", (*iData ).first.c_str() );
+        sprintf( hname, "cQ_%s", ( *iData ).first.c_str() );
+        sprintf( htitle, "%s", ( *iData ).first.c_str() );
         TCanvas* cHis = new TCanvas( hname, htitle, 10 + z * 30, 100, 1300, 800 );
         cHis->Divide( 2, 2 );
 
@@ -479,91 +479,91 @@ void VPlotMonteCarloQualityFactor::plot( bool iPrint )
         iP->SetGridx( 0 );
         iP->SetGridy( 0 );
 
-        (*iData ).second->hSignal->Draw();
-        (*iData ).second->hBackground->Draw( "same" );
+        ( *iData ).second->hSignal->Draw();
+        ( *iData ).second->hBackground->Draw( "same" );
 
         // upper q factor
         iP = ( TPad* )cHis->cd( 2 );
         iP->SetGridx( 0 );
         iP->SetGridy( 0 );
 
-        if((*iData ).second->hQFactors_UpperCut->GetMaximum() > (*iData ).second->hQFactors_LowerCut->GetMaximum() )
+        if( ( *iData ).second->hQFactors_UpperCut->GetMaximum() > ( *iData ).second->hQFactors_LowerCut->GetMaximum() )
         {
-            (*iData ).second->hQFactors_UpperCut->SetMaximum((*iData ).second->hQFactors_UpperCut->GetMaximum() * 1.5 );
+            ( *iData ).second->hQFactors_UpperCut->SetMaximum( ( *iData ).second->hQFactors_UpperCut->GetMaximum() * 1.5 );
         }
         else
         {
-            (*iData ).second->hQFactors_UpperCut->SetMaximum((*iData ).second->hQFactors_LowerCut->GetMaximum() * 1.5 );
+            ( *iData ).second->hQFactors_UpperCut->SetMaximum( ( *iData ).second->hQFactors_LowerCut->GetMaximum() * 1.5 );
         }
 
-        (*iData ).second->hQFactors_UpperCut->Draw();
-        (*iData ).second->hQFactors_LowerCut->Draw( "same" );
+        ( *iData ).second->hQFactors_UpperCut->Draw();
+        ( *iData ).second->hQFactors_LowerCut->Draw( "same" );
 
         // draw energy dependence of q-factor variable
-        if((*iData ).second->gQFactor_LowerCutE->GetN() > 2 )
+        if( ( *iData ).second->gQFactor_LowerCutE->GetN() > 2 )
         {
             iP = ( TPad* )cHis->cd( 3 );
             iP->SetGridx( 0 );
             iP->SetGridy( 0 );
 
-            (*iData ).second->gQFactor_LowerCutE->Draw( "alp" );
-            (*iData ).second->gQFactor_LowerCutE->SetMaximum((*iData ).second->fVar_max );
-            (*iData ).second->gQFactor_LowerCutE->SetMinimum((*iData ).second->fVar_min );
-            (*iData ).second->gQFactor_LowerCutE->GetHistogram()->SetXTitle( "log_{10} energy [TeV]" );
-            sprintf( hname, "value at maximum q-factor (%s)", (*iData ).first.c_str() );
-            (*iData ).second->gQFactor_LowerCutE->GetHistogram()->SetYTitle( hname );
-            (*iData ).second->gQFactor_UpperCutE->Draw( "lp" );
+            ( *iData ).second->gQFactor_LowerCutE->Draw( "alp" );
+            ( *iData ).second->gQFactor_LowerCutE->SetMaximum( ( *iData ).second->fVar_max );
+            ( *iData ).second->gQFactor_LowerCutE->SetMinimum( ( *iData ).second->fVar_min );
+            ( *iData ).second->gQFactor_LowerCutE->GetHistogram()->SetXTitle( "log_{10} energy [TeV]" );
+            sprintf( hname, "value at maximum q-factor (%s)", ( *iData ).first.c_str() );
+            ( *iData ).second->gQFactor_LowerCutE->GetHistogram()->SetYTitle( hname );
+            ( *iData ).second->gQFactor_UpperCutE->Draw( "lp" );
             // plot mean value for all energies
-            double iMaxLower = (*iData ).second->hQFactors_LowerCut->GetBinCenter((*iData ).second->hQFactors_LowerCut->GetMaximumBin() );
-            double iMaxUpper = (*iData ).second->hQFactors_UpperCut->GetBinCenter((*iData ).second->hQFactors_UpperCut->GetMaximumBin() );
+            double iMaxLower = ( *iData ).second->hQFactors_LowerCut->GetBinCenter( ( *iData ).second->hQFactors_LowerCut->GetMaximumBin() );
+            double iMaxUpper = ( *iData ).second->hQFactors_UpperCut->GetBinCenter( ( *iData ).second->hQFactors_UpperCut->GetMaximumBin() );
 
-            TLine* iLUpper = new TLine((*iData ).second->gQFactorMax_LowerCutE->GetHistogram()->GetXaxis()->GetXmin(), iMaxUpper, (*iData ).second->gQFactorMax_LowerCutE->GetHistogram()->GetXaxis()->GetXmax(), iMaxUpper );
+            TLine* iLUpper = new TLine( ( *iData ).second->gQFactorMax_LowerCutE->GetHistogram()->GetXaxis()->GetXmin(), iMaxUpper, ( *iData ).second->gQFactorMax_LowerCutE->GetHistogram()->GetXaxis()->GetXmax(), iMaxUpper );
             iLUpper->SetLineStyle( 2 );
             iLUpper->SetLineWidth( 2 );
-            iLUpper->SetLineColor((*iData ).second->gQFactorMax_UpperCutE->GetLineColor() );
+            iLUpper->SetLineColor( ( *iData ).second->gQFactorMax_UpperCutE->GetLineColor() );
             iLUpper->Draw();
 
-            TLine* iLLower = new TLine((*iData ).second->gQFactorMax_LowerCutE->GetHistogram()->GetXaxis()->GetXmin(), iMaxLower, (*iData ).second->gQFactorMax_LowerCutE->GetHistogram()->GetXaxis()->GetXmax(), iMaxLower );
+            TLine* iLLower = new TLine( ( *iData ).second->gQFactorMax_LowerCutE->GetHistogram()->GetXaxis()->GetXmin(), iMaxLower, ( *iData ).second->gQFactorMax_LowerCutE->GetHistogram()->GetXaxis()->GetXmax(), iMaxLower );
             iLLower->SetLineStyle( 2 );
             iLLower->SetLineWidth( 2 );
-            iLLower->SetLineColor((*iData ).second->gQFactorMax_LowerCutE->GetLineColor() );
+            iLLower->SetLineColor( ( *iData ).second->gQFactorMax_LowerCutE->GetLineColor() );
             iLLower->Draw();
 
         }
         // draw energy dependence of q-factor maximum
-        if((*iData ).second->gQFactorMax_LowerCutE->GetN() > 2 )
+        if( ( *iData ).second->gQFactorMax_LowerCutE->GetN() > 2 )
         {
             iP = ( TPad* )cHis->cd( 4 );
             iP->SetGridx( 0 );
             iP->SetGridy( 0 );
 
-            (*iData ).second->gQFactorMax_LowerCutE->Draw( "alp" );
-            (*iData ).second->gQFactorMax_LowerCutE->SetMaximum( 5. );
-            (*iData ).second->gQFactorMax_LowerCutE->SetMinimum( 0. );
-            (*iData ).second->gQFactorMax_LowerCutE->GetHistogram()->SetXTitle( "log_{10} energy [TeV]" );
-            sprintf( hname, "maximum q-factor (%s)", (*iData ).first.c_str() );
-            (*iData ).second->gQFactorMax_LowerCutE->GetHistogram()->SetYTitle( hname );
-            (*iData ).second->gQFactorMax_UpperCutE->Draw( "lp" );
+            ( *iData ).second->gQFactorMax_LowerCutE->Draw( "alp" );
+            ( *iData ).second->gQFactorMax_LowerCutE->SetMaximum( 5. );
+            ( *iData ).second->gQFactorMax_LowerCutE->SetMinimum( 0. );
+            ( *iData ).second->gQFactorMax_LowerCutE->GetHistogram()->SetXTitle( "log_{10} energy [TeV]" );
+            sprintf( hname, "maximum q-factor (%s)", ( *iData ).first.c_str() );
+            ( *iData ).second->gQFactorMax_LowerCutE->GetHistogram()->SetYTitle( hname );
+            ( *iData ).second->gQFactorMax_UpperCutE->Draw( "lp" );
 
             // plot mean value for all energies
-            double iMaxLower = (*iData ).second->hQFactors_LowerCut->GetBinContent((*iData ).second->hQFactors_LowerCut->GetMaximumBin() );
-            double iMaxUpper = (*iData ).second->hQFactors_UpperCut->GetBinContent((*iData ).second->hQFactors_UpperCut->GetMaximumBin() );
+            double iMaxLower = ( *iData ).second->hQFactors_LowerCut->GetBinContent( ( *iData ).second->hQFactors_LowerCut->GetMaximumBin() );
+            double iMaxUpper = ( *iData ).second->hQFactors_UpperCut->GetBinContent( ( *iData ).second->hQFactors_UpperCut->GetMaximumBin() );
 
-            TLine* iLUpper = new TLine((*iData ).second->gQFactorMax_LowerCutE->GetHistogram()->GetXaxis()->GetXmin(), iMaxUpper, (*iData ).second->gQFactorMax_LowerCutE->GetHistogram()->GetXaxis()->GetXmax(), iMaxUpper );
+            TLine* iLUpper = new TLine( ( *iData ).second->gQFactorMax_LowerCutE->GetHistogram()->GetXaxis()->GetXmin(), iMaxUpper, ( *iData ).second->gQFactorMax_LowerCutE->GetHistogram()->GetXaxis()->GetXmax(), iMaxUpper );
             iLUpper->SetLineStyle( 2 );
             iLUpper->SetLineWidth( 2 );
-            iLUpper->SetLineColor((*iData ).second->gQFactorMax_UpperCutE->GetLineColor() );
+            iLUpper->SetLineColor( ( *iData ).second->gQFactorMax_UpperCutE->GetLineColor() );
             iLUpper->Draw();
 
-            TLine* iLLower = new TLine((*iData ).second->gQFactorMax_LowerCutE->GetHistogram()->GetXaxis()->GetXmin(), iMaxLower, (*iData ).second->gQFactorMax_LowerCutE->GetHistogram()->GetXaxis()->GetXmax(), iMaxLower );
+            TLine* iLLower = new TLine( ( *iData ).second->gQFactorMax_LowerCutE->GetHistogram()->GetXaxis()->GetXmin(), iMaxLower, ( *iData ).second->gQFactorMax_LowerCutE->GetHistogram()->GetXaxis()->GetXmax(), iMaxLower );
             iLLower->SetLineStyle( 2 );
             iLLower->SetLineWidth( 2 );
-            iLLower->SetLineColor((*iData ).second->gQFactorMax_LowerCutE->GetLineColor() );
+            iLLower->SetLineColor( ( *iData ).second->gQFactorMax_LowerCutE->GetLineColor() );
             iLLower->Draw();
         }
         if( iPrint )
         {
-            sprintf( hname, "QFactor-%s.eps", (*iData ).first.c_str() );
+            sprintf( hname, "QFactor-%s.eps", ( *iData ).first.c_str() );
             cHis->Print( hname );
         }
 

@@ -57,10 +57,10 @@ sRunParameter getRunParameter( string ifile )
 {
     ifstream is;
     is.open( ifile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "error opening runparameter file: " << ifile << endl;
-        exit(-1 );
+        exit( -1 );
     }
     string is_line;
     string temp;
@@ -176,7 +176,7 @@ int main( int argc, char* argv[] )
 
     // binning and number of MJD days
     double fMJDBin = 1. / ( 24.*60. / fMJDInt );
-    unsigned int fMJDDays = ( unsigned int )(( fMJDStopp - fMJDStart ) + 0.5 );
+    unsigned int fMJDDays = ( unsigned int )( ( fMJDStopp - fMJDStart ) + 0.5 );
 
     cout << "calculating observability for " << fRunParameter.fObject_name;
     cout << " (ra=" << fRunParameter.fObject_ra << ", dec=" << fRunParameter.fObject_dec << ")" << endl;
@@ -199,11 +199,11 @@ int main( int argc, char* argv[] )
     VLibNovaStar* fObject = new VLibNovaStar( fRunParameter.fObject_ra, fRunParameter.fObject_dec, fRunParameter.fObservatory_longitude, fRunParameter.fObservatory_latitude );
 
     // time and elevation
-    int fNMJD = ( int )(( fMJDStopp - fMJDStart ) / fMJDBin );
+    int fNMJD = ( int )( ( fMJDStopp - fMJDStart ) / fMJDBin );
     // vector of length 3: no moon, illumination < 30%, illumination > 30%
     vector< double > fMoonFrac_min;
     vector< double > fMoonFrac_max;
-    fMoonFrac_min.push_back(-1. );
+    fMoonFrac_min.push_back( -1. );
     fMoonFrac_max.push_back( 0. );
     fMoonFrac_min.push_back( 0.0 );
     fMoonFrac_max.push_back( 0.3 );
@@ -256,7 +256,7 @@ int main( int argc, char* argv[] )
         if( fRunParameter.fObject_t0 > 0. && fRunParameter.fObject_orbit > 0. )
         {
             fPhase = ( fMJD + 2400000.5 - fRunParameter.fObject_t0 ) / fRunParameter.fObject_orbit
-                     - int(( fMJD + 2400000.5 - fRunParameter.fObject_t0 ) / fRunParameter.fObject_orbit - 0.5 );
+                     - int( ( fMJD + 2400000.5 - fRunParameter.fObject_t0 ) / fRunParameter.fObject_orbit - 0.5 );
             if( fPhase > 1. )
             {
                 fPhase -= 1.;
@@ -415,25 +415,25 @@ int main( int argc, char* argv[] )
         {
             fMJD = fMJDStart + i * ( fMJDStopp - fMJDStart ) / ( double )nloop;
 
-            fPhase = ( fMJD + 2400000.5 - fRunParameter.fObject_t0 ) / fRunParameter.fObject_orbit - int(( fMJD + 2400000.5 - fRunParameter.fObject_t0 ) / fRunParameter.fObject_orbit - 0.5 );
+            fPhase = ( fMJD + 2400000.5 - fRunParameter.fObject_t0 ) / fRunParameter.fObject_orbit - int( ( fMJD + 2400000.5 - fRunParameter.fObject_t0 ) / fRunParameter.fObject_orbit - 0.5 );
             if( fPhase > 1. )
             {
                 fPhase -= 1.;
             }
 
-            if(( int )( fPhase / fPhaseBin ) != lastBin && i > 0 && fPhase / fPhaseBin - ( int )( fPhase / fPhaseBin ) < 0.3 )
+            if( ( int )( fPhase / fPhaseBin ) != lastBin && i > 0 && fPhase / fPhaseBin - ( int )( fPhase / fPhaseBin ) < 0.3 )
             {
 
                 TLine* iL = new TLine( fMJD, fRunParameter.fObservingMinElevation_plotting, fMJD, fRunParameter.fObservingMaxElevation );
                 iL->SetLineStyle( 2 );
-                if(( int )( fPhase / fPhaseBin ) == 0 )
+                if( ( int )( fPhase / fPhaseBin ) == 0 )
                 {
                     iL->SetLineWidth( 3 );
                 }
                 iL->Draw();
                 lastBin = ( int )( fPhase / fPhaseBin );
 
-                if((( fMJDStopp - fMJDStart ) / fRunParameter.fObject_orbit * fRunParameter.fObject_nphases ) < 20. )
+                if( ( ( fMJDStopp - fMJDStart ) / fRunParameter.fObject_orbit * fRunParameter.fObject_nphases ) < 20. )
                 {
                     sprintf( hname, "%.1f", fPhase );
                     TText* iT = new TText( fMJD + 0.05, 0.9 * ( fRunParameter.fObservingMaxElevation - fRunParameter.fObservingMinElevation_plotting ), hname );

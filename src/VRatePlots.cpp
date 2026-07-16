@@ -30,8 +30,8 @@ VRatePlots::VRatePlots( VAnaSumRunParameter* iPar, map< int, double > itime )
     hListRun = new TList();
     hListTime = new TList();
 
-    defineRunGraphs(( int )iruns.size() );
-    defineTimeGraphs(( int )iruns.size() );
+    defineRunGraphs( ( int )iruns.size() );
+    defineTimeGraphs( ( int )iruns.size() );
 }
 
 

@@ -181,7 +181,7 @@ void get_laser_run_info_from_DBs()
     unsigned int VERITAS_DB_LaserExclTel;
     unsigned int VERITAS_DB_LaserDate;
     std::cout << "read laserRUN " << fcurrent_run << " fromVERITAS_DB " << std::endl;
-    if(!read_one_laserRUN_fromVERITAS_DB( fcurrent_run, VERITAS_DB_LaserRunNumber, VERITAS_DB_LaserConfigMask, VERITAS_DB_LaserExclTel, VERITAS_DB_LaserDate ) )
+    if( !read_one_laserRUN_fromVERITAS_DB( fcurrent_run, VERITAS_DB_LaserRunNumber, VERITAS_DB_LaserConfigMask, VERITAS_DB_LaserExclTel, VERITAS_DB_LaserDate ) )
     {
         exit( 0 );
     }
@@ -195,7 +195,7 @@ void get_laser_run_info_from_DBs()
     // and the order in which the telescope are called is important
     for( unsigned int tel = 1; tel <= 4; tel++ )
     {
-        if(!read_one_laserRUN_fromVOFFLINE_DB( fcurrent_run, VOFFLINE_DB_LaserRunNumber_Tel, VOFFLINE_DB_Laserdate_Tel, VOFFLINE_DB_Laserversion_Tel, tel ) )
+        if( !read_one_laserRUN_fromVOFFLINE_DB( fcurrent_run, VOFFLINE_DB_LaserRunNumber_Tel, VOFFLINE_DB_Laserdate_Tel, VOFFLINE_DB_Laserversion_Tel, tel ) )
         {
             exit( 0 );
         }
@@ -388,7 +388,7 @@ TString prepare_CalibVOFF_writing()
     Summary_writing_status = telgoodwriting ;
     //-------------------------
 
-    if(( int ) fcurrent_run == ( int ) forget_this_run )
+    if( ( int ) fcurrent_run == ( int ) forget_this_run )
     {
         return wDB_file_name ;
     }
@@ -413,7 +413,7 @@ TString prepare_CalibVOFF_writing()
 
     //-----------------------------------------------------------------------------------------
     //-- tells that the process of checking and writing the file is over (not that it was successful) AND that there is something to write
-    if(!is_file_empty( wDB_file_name ) )
+    if( !is_file_empty( wDB_file_name ) )
     {
         bool_EVNDcalib_good = true;
     }
@@ -707,7 +707,7 @@ bool test_gain_toff( TString file_root_name_gain, TString file_root_name_toff )
         }
         else
         {
-            if( TMath::Abs(( Int_t ) V_pixel_zero_gain.size() - ( Int_t ) V_pixel_zero_toff.size() ) > 2 )
+            if( TMath::Abs( ( Int_t ) V_pixel_zero_gain.size() - ( Int_t ) V_pixel_zero_toff.size() ) > 2 )
             {
                 printf( "ERROR: NOT same number of pixel with zero gain (%4d) and zero toff (%4d) \n", ( int ) V_pixel_zero_gain.size(), ( int ) V_pixel_zero_toff.size() );
                 good_calib = false;
@@ -770,7 +770,7 @@ unsigned long Check_telmissing_from_VOFFDB_for_one_run( unsigned int VERITAS_DB_
         }
 
         //--- end loop on voff run for a given tel
-        if(!run_in_voff_db )
+        if( !run_in_voff_db )
         {
             std::cout << "RUN " << fcurrent_run << ": miss tel:" << missing_tel.set( tel_indice, 1 ) << " in VOFFLINE" << std::endl ;     // construction of the mask for the telescopes missing from VOFFLINE DB
         }
@@ -798,14 +798,14 @@ bool read_one_laserRUN_fromVOFFLINE_DB( unsigned int arg_run, vector < unsigned 
     string iTempS;
     iTempS =  fServer + "/VOFFLINE";
     VDB_Connection my_connection( iTempS.c_str(), "readonly", "" );
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         cout << "ERROR read_one_laserRUN_fromVOFFLINE_DB: failed to connect to database server" << endl;
         cout << "\t server: " <<  fServer << endl;
         return false;
     }
     //---- do the query and check
-    if(!my_connection.make_query( query.c_str() ) )
+    if( !my_connection.make_query( query.c_str() ) )
     {
         cout << "WARNING read_one_laserRUN_fromVOFFLINE_DB: failed to get something from the query " << endl;
         return false;
@@ -831,7 +831,7 @@ bool read_one_laserRUN_fromVOFFLINE_DB( unsigned int arg_run, vector < unsigned 
     else
     {
         cout << "WARNING read_one_laserRUN_fromVOFFLINE_DB:  no laser run found " << endl;
-        VOFFLINE_DB_LaserRunNumber_Telnum.push_back(-1 );
+        VOFFLINE_DB_LaserRunNumber_Telnum.push_back( -1 );
         VOFFLINE_DB_LaserVersion_Telnum.push_back( "toto" ) ;
         VOFFLINE_DB_LaserDate_Telnum.push_back( "now" ) ;
         return true ;
@@ -856,7 +856,7 @@ bool read_one_laserRUN_fromVERITAS_DB(
     iTempS += "/VERITAS";
     std::cout << "server:  " << iTempS << std::endl;
     VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ; // DO NOT create a pointer. this way the connection is automatically closed when getting out of the function
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         cout << "ERROR read_one_laserRUN_fromVERITAS_DB: failed to connect to database server" << endl;
         cout << "\t server: " <<  fServer << endl;
@@ -865,7 +865,7 @@ bool read_one_laserRUN_fromVERITAS_DB(
     string query = WriteQuery_to_get_one_LaserRun_fromVERITAS_DB( arg_run );
 
     //---- do the query and check
-    if(!my_connection.make_query( query.c_str() ) )
+    if( !my_connection.make_query( query.c_str() ) )
     {
         return false;
     }
@@ -1036,8 +1036,8 @@ void set_todays_date()
 {
     time_t rawtime;
     struct tm* timeinfo;
-    time(&rawtime );
-    timeinfo = localtime(&rawtime );
+    time( &rawtime );
+    timeinfo = localtime( &rawtime );
 
     char today_DB[1000]  ;
     sprintf( today_DB, "%04d-%02d-%02d %02d:%02d:%02d",

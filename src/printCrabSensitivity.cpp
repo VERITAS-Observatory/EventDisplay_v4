@@ -27,7 +27,7 @@ void print_sensitivity( string anasum_file, double alpha = 1. / 6. )
         return;
     }
     TTree* t = ( TTree* )f.Get( "total_1/stereo/tRunSummary" );
-    if(!t )
+    if( !t )
     {
         cout << "Error reading run summary tree from " << anasum_file << endl;
         cout << "Exiting...";

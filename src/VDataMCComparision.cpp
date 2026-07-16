@@ -9,6 +9,123 @@
 
 #include "VDataMCComparision.h"
 
+#include "TChainElement.h"
+
+static string getXGBFileName( string iFileName, const string& iFileSuffix )
+{
+    if( iFileSuffix.empty() || iFileSuffix == "None" )
+    {
+        return "";
+    }
+
+    size_t iRootPos = iFileName.rfind( ".root" );
+    if( iRootPos != string::npos && iRootPos + 5 == iFileName.size() )
+    {
+        iFileName.replace( iRootPos, 5, "." + iFileSuffix + ".root" );
+    }
+    else
+    {
+        iFileName += "." + iFileSuffix + ".root";
+    }
+    return iFileName;
+}
+
+static bool validateXGBFriendFile( const string& iDataFileName, const string& iXGBFileName, const string& iTreeName )
+{
+    TFile* iDataFile = TFile::Open( iDataFileName.c_str() );
+    if( !iDataFile || iDataFile->IsZombie() )
+    {
+        cout << "VDataMCComparision error: cannot open data file " << iDataFileName << endl;
+        return false;
+    }
+    TTree* iDataTree = ( TTree* )iDataFile->Get( "data" );
+    if( !iDataTree )
+    {
+        cout << "VDataMCComparision error: cannot find data tree in " << iDataFileName << endl;
+        iDataFile->Close();
+        delete iDataFile;
+        return false;
+    }
+
+    TFile* iXGBFile = TFile::Open( iXGBFileName.c_str() );
+    if( !iXGBFile || iXGBFile->IsZombie() )
+    {
+        cout << "VDataMCComparision error: cannot open XGB file " << iXGBFileName << endl;
+        iDataFile->Close();
+        delete iDataFile;
+        return false;
+    }
+    TTree* iXGBTree = ( TTree* )iXGBFile->Get( iTreeName.c_str() );
+    if( !iXGBTree )
+    {
+        cout << "VDataMCComparision error: cannot find " << iTreeName << " tree in " << iXGBFileName << endl;
+        iXGBFile->Close();
+        delete iXGBFile;
+        iDataFile->Close();
+        delete iDataFile;
+        return false;
+    }
+
+    bool invalid = ( iDataTree->GetEntries() == iXGBTree->GetEntries() );
+    if( !invalid )
+    {
+        cout << "VDataMCComparision error: entry mismatch between data and XGB friend file" << endl;
+        cout << "\tdata: " << iDataFileName << " (" << iDataTree->GetEntries() << " entries)" << endl;
+        cout << "\txgb:  " << iXGBFileName << " (" << iXGBTree->GetEntries() << " entries)" << endl;
+    }
+
+    iXGBFile->Close();
+    delete iXGBFile;
+    iDataFile->Close();
+    delete iDataFile;
+
+    return invalid;
+}
+
+static TTree* buildXGBFriendChain( TChain* iDataChain, const string& iFileSuffix, const string& iTreeName )
+{
+    if( !iDataChain || iFileSuffix.empty() || iFileSuffix == "None" )
+    {
+        return 0;
+    }
+
+    TObjArray* iFileList = iDataChain->GetListOfFiles();
+    if( !iFileList || iFileList->GetEntries() == 0 )
+    {
+        return 0;
+    }
+
+    TChain* iFriendChain = new TChain( iTreeName.c_str() );
+    TIter iFileIter( iFileList );
+    while( TChainElement* iFileElement = ( TChainElement* )iFileIter() )
+    {
+        string iDataFileName = iFileElement->GetTitle();
+        string iXGBFileName = getXGBFileName( iDataFileName, iFileSuffix );
+        if( iXGBFileName.empty() )
+        {
+            continue;
+        }
+        if( !validateXGBFriendFile( iDataFileName, iXGBFileName, iTreeName ) )
+        {
+            delete iFriendChain;
+            return 0;
+        }
+        if( !iFriendChain->Add( iXGBFileName.c_str(), 0 ) )
+        {
+            cout << "VDataMCComparision error: failed to add XGB file to friend chain " << iXGBFileName << endl;
+            delete iFriendChain;
+            return 0;
+        }
+    }
+
+    if( iFriendChain->GetListOfFiles()->GetEntries() == 0 )
+    {
+        delete iFriendChain;
+        return 0;
+    }
+    return iFriendChain;
+}
+
 VDataMCComparisionHistogramData::VDataMCComparisionHistogramData(
     string iName, string iHistogramType, unsigned int iTelescopeID )
 {
@@ -113,11 +230,11 @@ void VDataMCComparisionHistogramData::fill(
     }
     if( fHis2D_sizeHG && i_size - i_size * i_fracLow > 0. )
     {
-        fHis2D_sizeHG->Fill( log10( i_size - i_size* i_fracLow ), iV, iWeight );
+        fHis2D_sizeHG->Fill( log10( i_size - i_size * i_fracLow ), iV, iWeight );
     }
     if( fHis2D_sizeLG && i_size * i_fracLow > 0. )
     {
-        fHis2D_sizeLG->Fill( log10( i_size* i_fracLow ), iV, iWeight );
+        fHis2D_sizeLG->Fill( log10( i_size * i_fracLow ), iV, iWeight );
     }
 }
 
@@ -136,9 +253,11 @@ VDataMCComparision::VDataMCComparision( string iname, int intel )
     }
 
     fData = 0;
+    fStereoFriendTree = 0;
     fCuts = 0;
     fCalculateMVAValues = false;
     fEpochATM = "";
+    fXGBStereoFileSuffix = "";
 
     setStereoReconstructionMethod();
 
@@ -190,7 +309,7 @@ void VDataMCComparision::initialGammaHadronCuts()
     fCuts->setInstrumentEpoch( fEpochATM );
     // HARDWIRED CUT FILE
     // used for BDT comparison
-    if(!fCuts->readCuts( "$VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles/ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-BDT.dat" ) )
+    if( !fCuts->readCuts( "$VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles/ANASUM.GammaHadron-Cut-NTel2-PointSource-Moderate-TMVA-BDT.dat" ) )
     {
         cout << "exiting..." << endl;
         exit( EXIT_FAILURE );
@@ -226,6 +345,9 @@ void VDataMCComparision::defineHistograms()
 
     fHistoArray[ETHETA2] = new VDataMCComparisionHistogramData( "theta2", fName, 0 );
     fHistoArray[ETHETA2]->initHistogram( "#theta^{2} [deg^{2}]", 100, 0., 0.3 );
+
+    fHistoArray[ETHETA] = new VDataMCComparisionHistogramData( "theta", fName, 0 );
+    fHistoArray[ETHETA]->initHistogram( "#theta [deg]", 500, 0., 0.5 );
 
     fHistoArray[ELTHETA2] = new VDataMCComparisionHistogramData( "ltheta2", fName, 0 );
     fHistoArray[ELTHETA2]->initHistogram( "log_{10} #theta^{2} [deg^{2}]", 30, -5., 2. );
@@ -434,7 +556,7 @@ void VDataMCComparision::defineHistograms()
 
 bool VDataMCComparision::setOnOffHistograms( VDataMCComparision* on, VDataMCComparision* off, double norm )
 {
-    if(!on || !off )
+    if( !on || !off )
     {
         cout << "on or off not defined" << endl;
         return false;
@@ -536,7 +658,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 
     // chain data files
     TChain* iC = new TChain( "data" );
-    if(!iC->Add( ifile.c_str() ) )
+    if( !iC->Add( ifile.c_str() ) )
     {
         cout << "error while reading data chain" << endl;
         cout << "exiting..." << endl;
@@ -552,7 +674,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
         {
             if( fSpectralWeight )
             {
-                fSpectralWeight->setMCParameter(-1.*iMC_H->spectral_index, iMC_H->E_range[0], iMC_H->E_range[1] );
+                fSpectralWeight->setMCParameter( -1.*iMC_H->spectral_index, iMC_H->E_range[0], iMC_H->E_range[1] );
                 fSpectralWeight->print();
 
                 // Deals with CARE sims without full information in the run header
@@ -574,7 +696,20 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
     {
         cout << "\t reading simulations..." << endl;
     }
-    fData = new CData( iC, fName == "SIMS" );
+    if( fEnergyReconstructionMethod == 2 || fDirectionReconstructionMethod == 2 )
+    {
+        fStereoFriendTree = buildXGBFriendChain( iC, fXGBStereoFileSuffix, "StereoAnalysis" );
+        if( !fStereoFriendTree )
+        {
+            cout << "VDataMCComparision::fillHistograms error: invalid XGB stereo friend chain" << endl;
+            exit( EXIT_FAILURE );
+        }
+        fData = new CData( iC, fName == "SIMS", false, fStereoFriendTree, 0 );
+    }
+    else
+    {
+        fData = new CData( iC, fName == "SIMS" );
+    }
 
     int nentries =  fData->fChain->GetEntries();
     cout << "\t entries: " << nentries << " (" << fNTel << " telescopes)" << endl;
@@ -868,6 +1003,10 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
             {
                 fHistoArray[ETHETA2]->fill( theta2, weight, erec_log10 );
             }
+            if( fHistoArray[ETHETA] )
+            {
+                fHistoArray[ETHETA]->fill( sqrt( theta2 ), weight, erec_log10 );
+            }
             if( fHistoArray[ELTHETA2] )
             {
                 fHistoArray[ELTHETA2]->fill( log10( theta2 ), weight, erec_log10 );
@@ -990,7 +1129,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
             {
                 if( fHistoArray[EYCORE] )
                 {
-                    fHistoArray[EYCORE]->fill(-1.*fData->Ycore, weight, erec_log10 );
+                    fHistoArray[EYCORE]->fill( -1.*fData->Ycore, weight, erec_log10 );
                 }
                 hXYcore->Fill( fData->Xcore, -1.*fData->Ycore, weight );
                 hAzYcore->Fill( fData->Az, -1.*fData->Ycore, weight );
@@ -1023,7 +1162,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                 if( fData->ntubes[iTelImage] > ntubes_min )
                 {
                     rdist1 = VUtilities::line_point_distance( fData->Ycore, -1.*fData->Xcore, 0., fData->Ze, fData->Az,
-                             fTel_y[iTelImage], -1.*fTel_x[iTelImage], fTel_z[iTelImage] );
+                        fTel_y[iTelImage], -1.*fTel_x[iTelImage], fTel_z[iTelImage] );
                     // camera distance is calculated relative to centre of camera (should be: wobble offset position)
                     hdistR[iTelImage]->Fill( rdist1, sqrt( fData->cen_x[iTelImage]*fData->cen_x[iTelImage]
                                                            + fData->cen_y[iTelImage]*fData->cen_y[iTelImage] ), weight );
@@ -1186,7 +1325,7 @@ void VDataMCComparision::scaleHistograms( string ifile )
         return;
     }
     TH1D* hEmc = ( TH1D* )f.Get( "hE0mc" );
-    if(!hEmc )
+    if( !hEmc )
     {
         cout << "histogram scaling failed, no mc histogram" << endl;
         return;
@@ -1265,13 +1404,28 @@ TH1D*  VDataMCComparision::getAzimuthWeightingHistogram( string ifile )
 
     // chain data files
     TChain* iC = new TChain( "data" );
-    if(!iC->Add( ifile.c_str() ) )
+    if( !iC->Add( ifile.c_str() ) )
     {
         cout << "error while reading data chain" << endl;
         cout << "exiting..." << endl;
         exit( EXIT_FAILURE );
     }
-    CData* tData = new CData( iC, fName == "SIMS" );
+    CData* tData = 0;
+    TTree* iStereoFriendTree = 0;
+    if( fEnergyReconstructionMethod == 2 || fDirectionReconstructionMethod == 2 )
+    {
+        iStereoFriendTree = buildXGBFriendChain( iC, fXGBStereoFileSuffix, "StereoAnalysis" );
+        if( !iStereoFriendTree )
+        {
+            cout << "VDataMCComparision::getAzimuthWeightingHistogram error: invalid XGB stereo friend chain" << endl;
+            exit( EXIT_FAILURE );
+        }
+        tData = new CData( iC, fName == "SIMS", false, iStereoFriendTree, 0 );
+    }
+    else
+    {
+        tData = new CData( iC, fName == "SIMS" );
+    }
     int nentries =  tData->fChain->GetEntries();
     cout << "Filling Az distributions for entries: " << nentries << endl;
     cout << "(requires loop over all ON files)" << endl;
@@ -1326,7 +1480,7 @@ double VDataMCComparision::getCorrectedEmissionHeight( double iEM, double iZe )
     double iCorr = 1.;
     if( cos( fShowerMaxZe_deg * TMath::DegToRad() ) != 0. )
     {
-        iCorr = cos( iZe* TMath::DegToRad() ) / cos( fShowerMaxZe_deg* TMath::DegToRad() );
+        iCorr = cos( iZe * TMath::DegToRad() ) / cos( fShowerMaxZe_deg * TMath::DegToRad() );
     }
     return iEM * iCorr;
 }

@@ -11,7 +11,7 @@
 */
 Ctpars::Ctpars( TTree* tree, bool iMC, unsigned int iShort )
 {
-    if(!tree )
+    if( !tree )
     {
         return;
     }
@@ -29,7 +29,7 @@ Ctpars::Ctpars( TTree* tree, bool iMC, unsigned int iShort )
 
 Ctpars::~Ctpars()
 {
-    if(!fChain )
+    if( !fChain )
     {
         return;
     }
@@ -40,7 +40,7 @@ Ctpars::~Ctpars()
 Int_t Ctpars::GetEntry( Long64_t entry )
 {
     // Read contents of entry.
-    if(!fChain )
+    if( !fChain )
     {
         return 0;
     }
@@ -51,7 +51,7 @@ Int_t Ctpars::GetEntry( Long64_t entry )
 Long64_t Ctpars::LoadTree( Long64_t entry )
 {
     // Set the environment to read one entry
-    if(!fChain )
+    if( !fChain )
     {
         return -5;
     }

@@ -45,7 +45,7 @@ bool readRunParameterFile( string ifile )
 
     ifstream is;
     is.open( ifile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "error opening run parameter file " << ifile << endl;
         return false;
@@ -72,7 +72,7 @@ bool readRunParameterFile( string ifile )
             if( temp == "MCset" )
             {
                 is_stream >> temp;
-                if(( is_stream >> std::ws ).eof() )
+                if( ( is_stream >> std::ws ).eof() )
                 {
                     cout << "error while reading MCset line" << endl;
                     return false;
@@ -105,7 +105,7 @@ bool readRunParameterFile( string ifile )
 */
 bool fillBackgroundRateHistograms( TH1F* hBckRate, TH1F* hBckRateDeq, double woff, string iEffectiveAreaFile )
 {
-    if(!hBckRate || !hBckRateDeq )
+    if( !hBckRate || !hBckRateDeq )
     {
         return false;
     }
@@ -147,7 +147,7 @@ bool fillBackgroundRateHistograms( TH1F* hBckRate, TH1F* hBckRateDeq, double wof
         // note: assume same gamma/hadron cuts applied for effective area generation
         //       as for anasum analysis
         TFile iFile_effArea( iEffectiveAreaFile.c_str() );
-        if(!iFile_effArea.IsZombie() )
+        if( !iFile_effArea.IsZombie() )
         {
             VGammaHadronCuts* i_GammaHadronCuts = ( VGammaHadronCuts* )iFile_effArea.Get( "GammaHadronCuts" );
             if( i_GammaHadronCuts )
@@ -164,8 +164,8 @@ bool fillBackgroundRateHistograms( TH1F* hBckRate, TH1F* hBckRateDeq, double wof
                     }
                     if( i_omega > 0. )
                     {
-                        hBckRateDeq->SetBinContent( b, hBckRate->GetBinContent( b ) / ( i_omega* TMath::RadToDeg() * TMath::RadToDeg() ) );
-                        hBckRateDeq->SetBinError( b, hBckRate->GetBinError( b ) / ( i_omega* TMath::RadToDeg() * TMath::RadToDeg() ) );
+                        hBckRateDeq->SetBinContent( b, hBckRate->GetBinContent( b ) / ( i_omega * TMath::RadToDeg() * TMath::RadToDeg() ) );
+                        hBckRateDeq->SetBinError( b, hBckRate->GetBinError( b ) / ( i_omega * TMath::RadToDeg() * TMath::RadToDeg() ) );
                     }
                 }
             }
@@ -200,7 +200,7 @@ int main( int argc, char* argv[] )
         cout << endl;
         exit( 0 );
     }
-    if(!readRunParameterFile( argv[1] ) )
+    if( !readRunParameterFile( argv[1] ) )
     {
         return false;
     }
@@ -236,7 +236,7 @@ int main( int argc, char* argv[] )
     //    iData->setDebug( true );
     iData->setObservatory( fObservatory );
     // output file
-    if(!iData->initializeOutputFile( fOutputFile ) )
+    if( !iData->initializeOutputFile( fOutputFile ) )
     {
         exit( EXIT_FAILURE );
     }
@@ -251,7 +251,7 @@ int main( int argc, char* argv[] )
     iData->initializeHistograms( 21, -1.9, 2.3, 500, -1.9, 2.3, 400, -2.3, 2.7, 9999 );
 
     // first element is used for on source histograms
-    if(!iData->fillIRFHistograms( fMCset.begin()->second, 20., fMCset.begin()->first ) )
+    if( !iData->fillIRFHistograms( fMCset.begin()->second, 20., fMCset.begin()->first ) )
     {
         cout << "error filling on source histograms" << endl;
     }
@@ -264,7 +264,7 @@ int main( int argc, char* argv[] )
     for( map<double, string>::iterator it = fMCset.begin(); it != fMCset.end(); ++it )
     {
         iData->initializeHistograms( 21, -1.9, 2.3, 500, -1.9, 2.3, 400, -2.3, 2.7, z );
-        if(!iData->fillIRFHistograms( it->second, 20., it->first ) )
+        if( !iData->fillIRFHistograms( it->second, 20., it->first ) )
         {
             cout << "error filling off source histograms: " << it->second << "\t" << it->first << endl;
         }

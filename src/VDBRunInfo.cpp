@@ -70,18 +70,18 @@ unsigned int VDBRunInfo::readRunDQM( int run_number, unsigned int config_mask )
     sprintf( c_query, "SELECT run_id , data_category   , status   , status_reason , tel_cut_mask , usable_duration , time_cut_mask , light_level , vpm_config_mask , authors  , comment from tblRun_Analysis_Comments where run_id=%d", run_number );
 
     VDB_Connection my_connection( iTempS.str().c_str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         return config_mask;
     }
-    if(!my_connection.make_query( c_query ) )
+    if( !my_connection.make_query( c_query ) )
     {
         return config_mask;
     }
     TSQLResult* db_res = my_connection.Get_QueryResult();
 
     TSQLRow* db_row = db_res->Next();
-    if(!db_row )
+    if( !db_row )
     {
         cout << "VDBRunInfo:readRunDQM:Info no row in VOFFLINE DB for run " << run_number << endl;
         return config_mask;
@@ -111,11 +111,11 @@ unsigned int VDBRunInfo::get_dqm_configmask( unsigned int config_mask, unsigned 
 
     for( int i = 0; i < ( int )bitDQM.size(); i++ )
     {
-        bitNDQM.set(( int )bitDQM.size() - i - 1, bitDQM.test( i ) );
+        bitNDQM.set( ( int )bitDQM.size() - i - 1, bitDQM.test( i ) );
     }
 
     bitNDQM = ~bitNDQM;
-    bitset<4> bitNewConfig = bitConfig& bitNDQM;
+    bitset<4> bitNewConfig = bitConfig & bitNDQM;
     unsigned int ConfigMaskNew = 0;
 
     for( int i = 0; i < ( int )bitNewConfig.size(); i++ )
@@ -136,12 +136,12 @@ void VDBRunInfo::readRunInfoFromDB()
     sprintf( c_query, "select * from tblRun_Info where run_id=%d", fRunNumber );
 
     VDB_Connection my_connection( iTempS.str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         fDBStatus = false;
         return;
     }
-    if(!my_connection.make_query( c_query ) )
+    if( !my_connection.make_query( c_query ) )
     {
         fDBStatus = false;
         return;
@@ -149,7 +149,7 @@ void VDBRunInfo::readRunInfoFromDB()
     TSQLResult* db_res = my_connection.Get_QueryResult();
 
     TSQLRow* db_row = db_res->Next();
-    if(!db_row )
+    if( !db_row )
     {
         cout << "VDBRunInfo: failed reading a row from DB for run " << fRunNumber << endl;
         fDBStatus = false;
@@ -255,7 +255,7 @@ void VDBRunInfo::readRunInfoFromDB()
 
     // get source coordinates
     sprintf( c_query, "select * from tblObserving_Sources where source_id like convert( _utf8 \'%s\' using latin1)", fTargetName.c_str() );
-    if(!my_connection.make_query( c_query ) )
+    if( !my_connection.make_query( c_query ) )
     {
         fDBStatus = false;
         return;
@@ -263,7 +263,7 @@ void VDBRunInfo::readRunInfoFromDB()
     db_res = my_connection.Get_QueryResult();
 
     db_row = db_res->Next();
-    if(!db_row )
+    if( !db_row )
     {
         cout << " VDBRunInfo::readRunInfoFromDB warning :  no source name in tblObserving_Sources like the name of the target for this run ("
              << fTargetName << ")" << endl;
@@ -308,12 +308,12 @@ vector< unsigned int > VDBRunInfo::readLaserRun()
 
     //std::cout<<"VDBRunInfo::getLaserRun "<<std::endl;
     VDB_Connection my_connection( iTempS.str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         fDBStatus = false;
         return fLaserRunID;
     }
-    if(!my_connection.make_query( c_query ) )
+    if( !my_connection.make_query( c_query ) )
     {
         fDBStatus = false;
         return fLaserRunID;
@@ -328,7 +328,7 @@ vector< unsigned int > VDBRunInfo::readLaserRun()
     {
         while( TSQLRow* db_row = db_res->Next() )
         {
-            if(!db_row )
+            if( !db_row )
             {
                 cout << "VDBRunInfo: failed reading a row from DB for run " << fRunNumber << endl;
                 fDBStatus = false;
@@ -372,7 +372,7 @@ void VDBRunInfo::set_laser_run(
                 config_mask = readRunDQMFromDBTextFile( iLaserList[i], iLaserConfigMask[i] );
             }
             bitset< 8 > ibit_mask( config_mask );
-            if(!ibit.test( t ) && ibit_mask.test( t ) )
+            if( !ibit.test( t ) && ibit_mask.test( t ) )
             {
                 fLaserRunID[t] = iLaserList[i];
             }
@@ -544,7 +544,7 @@ void VDBRunInfo::set_telescope_to_analyse()
 bool VDBRunInfo::readRunInfoFromDBTextFile()
 {
     VSQLTextFileReader a( fDBTextDirectory, fRunNumber, "runinfo" );
-    if(!a.isGood() )
+    if( !a.isGood() )
     {
         return false;
     }
@@ -611,7 +611,7 @@ bool VDBRunInfo::readRunInfoFromDBTextFile()
 bool VDBRunInfo::readTargetFromDBTextFile()
 {
     VSQLTextFileReader a( fDBTextDirectory, fRunNumber, "target" );
-    if(!a.isGood() )
+    if( !a.isGood() )
     {
         return false;
     }
@@ -635,7 +635,7 @@ vector< unsigned int > VDBRunInfo::readLaserFromDBTextFile()
 {
     vector< unsigned int > iTemp;
     VSQLTextFileReader a( fDBTextDirectory, fRunNumber, "laserrun" );
-    if(!a.isGood() )
+    if( !a.isGood() )
     {
         return iTemp;
     }
@@ -660,7 +660,7 @@ unsigned int VDBRunInfo::readRunDQMFromDBTextFile( int run_number, unsigned int 
     unsigned int ConfigMaskDQM = 0;
 
     VSQLTextFileReader a( fDBTextDirectory, fRunNumber, "rundqm" );
-    if(!a.isGood() )
+    if( !a.isGood() )
     {
         return config_mask;
     }

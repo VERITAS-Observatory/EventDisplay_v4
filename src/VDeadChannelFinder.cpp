@@ -15,7 +15,7 @@ VDeadChannelFinder::VDeadChannelFinder( int irunmode, unsigned int iTelID, bool 
     fIsMC = isMC;
 
     // default values for high gain channels
-    if(!fLowGain )
+    if( !fLowGain )
     {
         fDEAD_ped_min = 5.0;
         fDEAD_ped_max = 40.;
@@ -67,12 +67,12 @@ bool VDeadChannelFinder::readDeadChannelFile( string ifile )
 
     ifstream is;
     is.open( ifile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "VDeadChannelFinder::readDeadChannelFile:";
         cout << "error while opening file with dead channel definition: " << ifile << endl;
         cout << "exiting...." << endl;
-        exit(-1 );
+        exit( -1 );
     }
     cout << "Telescope " << fTelID + 1 << ": reading dead channel definition";
     if( fLowGain )

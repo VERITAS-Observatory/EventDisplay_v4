@@ -32,12 +32,12 @@ VDSTReader::VDSTReader( string isourcefile, bool iMC, int iNTel, bool iDebug )
 
 TTree* VDSTReader::getMCTree()
 {
-    if(!isMC() )
+    if( !isMC() )
     {
         return 0;
     }
 
-    if(!fDSTfile )
+    if( !fDSTfile )
     {
         return 0;
     }
@@ -68,17 +68,17 @@ bool VDSTReader::init()
     {
         cout << "Error reading DST source file: " << fSourceFileName << endl;
         cout << "... exiting ... " << endl;
-        exit(-1 );
+        exit( -1 );
     }
 
     // get and init tree
-    if(!fDSTfile->Get( "dst" ) || !fDSTfile->Get( "telconfig" ) )
+    if( !fDSTfile->Get( "dst" ) || !fDSTfile->Get( "telconfig" ) )
     {
         cout << "Error reading DST tree from dst file" << endl;
         cout << "... exiting ... " << endl;
-        exit(-1 );
+        exit( -1 );
     }
-    fDSTTree->initDSTTree(( TTree* )fDSTfile->Get( "dst" ), ( TTree* )fDSTfile->Get( "telconfig" ) );
+    fDSTTree->initDSTTree( ( TTree* )fDSTfile->Get( "dst" ), ( TTree* )fDSTfile->Get( "telconfig" ) );
     for( unsigned int i = 0; i < fNTelescopes; i++ )
     {
         fNChannel.push_back( fDSTTree->getDSTNChannels( i ) );
@@ -150,7 +150,7 @@ bool VDSTReader::getNextEvent()
         cout << "VDSTReader::getNextEvent()" << endl;
     }
 
-    if(!fDSTTree || !fDSTTree->getDSTTree() )
+    if( !fDSTTree || !fDSTTree->getDSTTree() )
     {
         return false;
     }

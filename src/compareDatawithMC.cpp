@@ -49,7 +49,7 @@ double getTelescopePositions( string iF, vector< double >& iX, vector< double >&
     double r_max = 0.;
 
     TChain* c = new TChain( "telconfig" );
-    if(!c->Add( iF.c_str() ) )
+    if( !c->Add( iF.c_str() ) )
     {
         cout << "error: no tree with telescope positions (telconfig) found" << endl;
         cout << "exiting..." << endl;
@@ -73,13 +73,13 @@ double getTelescopePositions( string iF, vector< double >& iX, vector< double >&
     {
         c->GetEntry( i );
 
-        iX.push_back(( double )x );
-        iY.push_back(( double )y );
-        iZ.push_back(( double )z );
+        iX.push_back( ( double )x );
+        iY.push_back( ( double )y );
+        iZ.push_back( ( double )z );
         cout << "\t telescope " << i + 1 << "\t" << x << "\t" << y << "\t" << z << endl;
         if( sqrt( x * x + y * y ) > r_max )
         {
-            r_max = sqrt( x* x + y* y );
+            r_max = sqrt( x * x + y * y );
         }
     }
     cout << endl;
@@ -95,7 +95,7 @@ void readInputfile( string fInputFile )
 {
     ifstream is;
     is.open( fInputFile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "error: input file list not found" << endl;
         cout << "...exiting" << endl;
@@ -122,7 +122,7 @@ void readInputfile( string fInputFile )
             // check that there are enough parameters in this line
             istringstream is_check( is_line );
             int z = 0;
-            while(!( is_check >> std::ws ).eof() )
+            while( !( is_check >> std::ws ).eof() )
             {
                 is_check >> temp;
                 z++;
@@ -153,20 +153,20 @@ void readInputfile( string fInputFile )
             }
 
             // az range
-            if(!( is_stream >> std::ws ).eof() )
+            if( !( is_stream >> std::ws ).eof() )
             {
                 is_stream >> a.fAz_deg_min;
             }
-            if(!( is_stream >> std::ws ).eof() )
+            if( !( is_stream >> std::ws ).eof() )
             {
                 is_stream >> a.fAz_deg_max;
             }
             // ze range
-            if(!( is_stream >> std::ws ).eof() )
+            if( !( is_stream >> std::ws ).eof() )
             {
                 is_stream >> a.fZe_deg_min;
             }
-            if(!( is_stream >> std::ws ).eof() )
+            if( !( is_stream >> std::ws ).eof() )
             {
                 is_stream >> a.fZe_deg_max;
             }
@@ -209,7 +209,8 @@ int main( int argc, char* argv[] )
         cout << endl;
         cout << endl;
         cout << "compareDatawithMC <input file list> <cut> <outputfile> ";
-        cout << "[BDT gamma/hadron cuts] [epoch_ATM] [shower max zenith angle (default=20deg)]" << endl;
+        cout << "[BDT gamma/hadron cuts] [epoch_ATM] [stereo reconstruction method] ";
+        cout << "[XGB stereo file suffix] [shower max zenith angle (default=20deg)]" << endl;
         cout << endl;
         cout << "\t input file list: see example file COMPAREMC.runparameter in the parameter files directory" << endl;
         cout << "\t cuts: " << endl;
@@ -224,6 +225,9 @@ int main( int argc, char* argv[] )
         cout << endl;
         cout << "\t use BDT cuts for gamma/hadron separation: 0 = no (default), 1 = yes" << endl;
         cout << "\t cut file needs to be indicated within VDataMCComparision::initialGammaHadronCuts()" << endl;
+        cout << endl;
+        cout << "\t stereo reconstruction method: 0 = default, 2 = XGB stereo" << endl;
+        cout << "\t XGB stereo file suffix: defaults to xgb_stereo for method 2" << endl;
         cout << endl;
         cout << "Note: most cuts are hardwired in VDataMCComparision::fillHistograms()" << endl;
         cout << endl;
@@ -249,8 +253,26 @@ int main( int argc, char* argv[] )
     }
     unsigned int fEnergyReconstructionMethod = 0;
     unsigned int fDirectionReconstructionMethod = 0;
+    if( argc > 6 )
+    {
+        fEnergyReconstructionMethod = atoi( argv[6] );
+        fDirectionReconstructionMethod = fEnergyReconstructionMethod;
+    }
+    string fXGBStereoFileSuffix = "";
+    if( fEnergyReconstructionMethod == 2 || fDirectionReconstructionMethod == 2 )
+    {
+        fXGBStereoFileSuffix = "xgb_stereo";
+    }
+    if( argc > 7 )
+    {
+        fXGBStereoFileSuffix = argv[7];
+    }
     cout << "Stereo reconstruction methods for energy: " << fEnergyReconstructionMethod;
     cout << ", direction: " << fDirectionReconstructionMethod << endl;
+    if( fEnergyReconstructionMethod == 2 || fDirectionReconstructionMethod == 2 )
+    {
+        cout << "XGB stereo file suffix: " << fXGBStereoFileSuffix << endl;
+    }
 
 
     // test number of telescopes
@@ -315,6 +337,7 @@ int main( int argc, char* argv[] )
         cout << "----" << endl;
         fStereoCompare.push_back( new VDataMCComparision( fInputData[i].fType, fInputData[i].fNTelescopes ) );
         fStereoCompare.back()->setStereoReconstructionMethod( fEnergyReconstructionMethod, fDirectionReconstructionMethod );
+        fStereoCompare.back()->setXGBStereoFileSuffix( fXGBStereoFileSuffix );
         if( fCalculateMVACut )
         {
             fStereoCompare.back()->setTMVABDTComparision( fEpochATM );
@@ -325,7 +348,7 @@ int main( int argc, char* argv[] )
         fStereoCompare.back()->resetTelescopeCoordinates();
         for( int t = 0; t < fInputData[i].fNTelescopes; t++ )
         {
-            if(!fStereoCompare.back()->setTelescopeCoordinates(
+            if( !fStereoCompare.back()->setTelescopeCoordinates(
                         fInputData[i].fTelX[t], fInputData[i].fTelY[t], fInputData[i].fTelZ[t] ) )
             {
                 exit( EXIT_FAILURE );
@@ -361,6 +384,7 @@ int main( int argc, char* argv[] )
     cout << "----" << endl;
     VDataMCComparision* fDiff = new VDataMCComparision( "DIFF", iNT );
     fDiff->setStereoReconstructionMethod( fEnergyReconstructionMethod, fDirectionReconstructionMethod );
+    fDiff->setXGBStereoFileSuffix( fXGBStereoFileSuffix );
     // assume 5 background regions
     fDiff->setOnOffHistograms( fStereoCompareOn, fStereoCompareOff, 1. / 5. );
     fDiff->writeHistograms( fOutputfile );

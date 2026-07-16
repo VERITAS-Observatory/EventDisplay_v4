@@ -29,7 +29,7 @@ using namespace VConfigMaskUtil;
 void usage( char* prog )
 {
     cout << "Usage: " << prog << " [input.vbf] [numberOfFiles] [newRunNumber]" << endl;
-    exit(-1 );
+    exit( -1 );
 }
 
 int main( int argc, char** argv )

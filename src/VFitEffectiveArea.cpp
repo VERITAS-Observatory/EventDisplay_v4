@@ -64,7 +64,7 @@ void VFitEffectiveArea::fill()
 
 void VFitEffectiveArea::fit( double xmin, double xmax )
 {
-    if(!fEff || !gEff || !gEffLog )
+    if( !fEff || !gEff || !gEffLog )
     {
         return;
     }
@@ -159,7 +159,7 @@ void VFitEffectiveArea::makeCanvases()
 
 void VFitEffectiveArea::resetFitParameters()
 {
-    if(!fEff )
+    if( !fEff )
     {
         return;
     }
@@ -191,7 +191,7 @@ void VFitEffectiveArea::resetFitParameters()
 
 void VFitEffectiveArea::setLinearFitParameters()
 {
-    if(!fEff || !fEffLin )
+    if( !fEff || !fEffLin )
     {
         return;
     }
@@ -227,7 +227,7 @@ void VFitEffectiveArea::getEffectiveArea( double iZe, int az, double index, bool
     }
 
     TTree* ts = ( TTree* )gDirectory->Get( "fEffArea" );
-    if(!ts )
+    if( !ts )
     {
         cout << "error finding effective area tree" << endl;
         return;
@@ -278,7 +278,7 @@ void VFitEffectiveArea::getEffectiveArea( double iZe, int az, double index, bool
 
 void VFitEffectiveArea::setMarkers( TGraph* g, int iMarker, double iSize, int iColor )
 {
-    if(!g )
+    if( !g )
     {
         return;
     }
@@ -377,7 +377,7 @@ double fun_effLin( double* e, double* p )
 
 TGraphAsymmErrors* VFitEffectiveArea::getLogGraph()
 {
-    if(!gEff )
+    if( !gEff )
     {
         return 0;
     }
@@ -430,7 +430,7 @@ TGraphAsymmErrors* VFitEffectiveArea::getLogGraph()
 void VFitEffectiveArea::write( string ofile )
 {
     TFile f( ofile.c_str(), "RECREATE" );
-    if(!f.IsZombie() && fTree )
+    if( !f.IsZombie() && fTree )
     {
         fTree->Write();
     }
@@ -440,7 +440,7 @@ void VFitEffectiveArea::write( string ofile )
 
 void VFitEffectiveArea::smoothGraph( double iOut, int iIter )
 {
-    if(!gEff )
+    if( !gEff )
     {
         return;
     }

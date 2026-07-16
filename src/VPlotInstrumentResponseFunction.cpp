@@ -52,7 +52,7 @@ bool VPlotInstrumentResponseFunction::addInstrumentResponseData( int iDataID, st
 {
     ifstream is;
     is.open( iFileList.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "VPlotInstrumentResponseFunction::addInstrumentResponseData: error opening input file list: " << iFileList << endl;
         return false;
@@ -118,7 +118,7 @@ bool VPlotInstrumentResponseFunction::addInstrumentResponseData( string iFile, d
     }
     iTempIRFReader->setPlottingStyle( iColor, iLineStyle, 2., iMarkerStyle, iMarkerSize );
     iTempIRFReader->setEnergyRange( iEmin_linTeV, iEmax_linTeV );
-    if(!iTempIRFReader->fillData( iFile, iZe, iWoff, iAzBin, iIndex, iNoise, iA_MC ) )
+    if( !iTempIRFReader->fillData( iFile, iZe, iWoff, iAzBin, iIndex, iNoise, iA_MC ) )
     {
         cout << "VPlotInstrumentResponseFunction::addInstrumentResponseData() error filling effective area / IRF data" << endl;
         return false;
@@ -132,7 +132,7 @@ bool VPlotInstrumentResponseFunction::addInstrumentResponseData( string iFile, d
 
 bool VPlotInstrumentResponseFunction::removeInstrumentResponseData( int iDataSetID )
 {
-    if(!checkDataSetID( iDataSetID ) )
+    if( !checkDataSetID( iDataSetID ) )
     {
         return false;
     }
@@ -182,13 +182,13 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMin_
         iEffectiveAreaPlottingCanvas->SetLeftMargin( 0.15 );
         iEffectiveAreaPlottingCanvas->SetRightMargin( 0.07 );
     }
-    if(!iEffectiveAreaPlottingCanvas )
+    if( !iEffectiveAreaPlottingCanvas )
     {
         return 0;
     }
     iEffectiveAreaPlottingCanvas->cd();
 
-    if(!iEffectiveAreaPlottingCanvas->GetListOfPrimitives()->FindObject( "heff" ) )
+    if( !iEffectiveAreaPlottingCanvas->GetListOfPrimitives()->FindObject( "heff" ) )
     {
         TH1D* heff = new TH1D( "heff", "", 100, log10( getPlottingAxis( "energy_Lin" )->fMinValue ), log10( getPlottingAxis( "energy_Lin" )->fMaxValue ) );
         heff->SetStats( 0 );
@@ -218,7 +218,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMin_
             g = fData[i]->gEffArea_Rec;
         }
 
-        if(!g )
+        if( !g )
         {
             cout << "VPlotInstrumentResponseFunction::plotEffectiveArea() warning: no graph (" << fData[i]->fA_MC << ")";
             cout << " found for data set " << i << endl;
@@ -300,7 +300,7 @@ bool VPlotInstrumentResponseFunction::checkDataSetID( unsigned int iDataSetID )
 
 void VPlotInstrumentResponseFunction::plotCutEfficiency( unsigned int iDataSetID )
 {
-    if(!checkDataSetID( iDataSetID ) )
+    if( !checkDataSetID( iDataSetID ) )
     {
         return;
     }
@@ -349,7 +349,7 @@ void VPlotInstrumentResponseFunction::plotCutEfficiency( unsigned int iDataSetID
 
 void VPlotInstrumentResponseFunction::plotEnergyReconstructionBias2D( unsigned int iDataSetID, double iYmin, double iYmax )
 {
-    if(!checkDataSetID( iDataSetID ) )
+    if( !checkDataSetID( iDataSetID ) )
     {
         return;
     }
@@ -387,7 +387,7 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionBias2D( unsigned i
 
 void VPlotInstrumentResponseFunction::plotEnergyReconstructionLogBias2D( unsigned int iDataSetID, string iM, double iYmin, double iYmax )
 {
-    if(!checkDataSetID( iDataSetID ) )
+    if( !checkDataSetID( iDataSetID ) )
     {
         return;
     }
@@ -433,7 +433,7 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionLogBias2D( unsigne
 
 void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned int iDataSetID, bool bFineBinning, bool bQualityCuts, bool bInterPol, bool bPlotMedian )
 {
-    if(!checkDataSetID( iDataSetID ) )
+    if( !checkDataSetID( iDataSetID ) )
     {
         return;
     }
@@ -463,7 +463,7 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
     {
         i_hRecMatrix = fData[iDataSetID]->hERecMatrix;
     }
-    else if(!bFineBinning && !bQualityCuts && fData[iDataSetID]->hERecMatrixCoarse )
+    else if( !bFineBinning && !bQualityCuts && fData[iDataSetID]->hERecMatrixCoarse )
     {
         i_hRecMatrix = fData[iDataSetID]->hERecMatrixCoarse;
     }
@@ -471,11 +471,11 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
     {
         i_hRecMatrix = fData[iDataSetID]->hERecMatrixQC;
     }
-    else if(!bFineBinning && bQualityCuts && fData[iDataSetID]->hERecMatrixCoarseQC )
+    else if( !bFineBinning && bQualityCuts && fData[iDataSetID]->hERecMatrixCoarseQC )
     {
         i_hRecMatrix = fData[iDataSetID]->hERecMatrixCoarseQC;
     }
-    if(!i_hRecMatrix )
+    if( !i_hRecMatrix )
     {
         return;
     }
@@ -494,7 +494,7 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
     i_hRecMatrix->SetAxisRange( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ),
                                 log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), "Y" );
     i_hRecMatrix->SetMaximum( 1.5 );
-    if(!bInterPol )
+    if( !bInterPol )
     {
         i_hRecMatrix->Draw( "colz" );
     }
@@ -514,7 +514,7 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
     iL->SetLineStyle( 2 );
     iL->Draw();
 
-    if(!bPlotMedian )
+    if( !bPlotMedian )
     {
         return;
     }
@@ -579,7 +579,7 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
 
 void VPlotInstrumentResponseFunction::plotCutEfficiencyRatio( unsigned int iDataSetID, unsigned int iCutID, double iPlotMaximum )
 {
-    if(!checkDataSetID( iDataSetID ) && iDataSetID < 999 )
+    if( !checkDataSetID( iDataSetID ) && iDataSetID < 999 )
     {
         return;
     }
@@ -661,7 +661,7 @@ unsigned int VPlotInstrumentResponseFunction::getNumberOfGoodDataSets()
 
 TCanvas* VPlotInstrumentResponseFunction::plotEffectiveAreaRatio( unsigned int iDataSetID, double ymin, double ymax )
 {
-    if(!checkDataSetID( iDataSetID ) )
+    if( !checkDataSetID( iDataSetID ) )
     {
         return 0;
     }
@@ -707,7 +707,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveAreaRatio( unsigned int i
             g = fData[i]->gEffArea_Rec_Ratio;
         }
 
-        if(!g )
+        if( !g )
         {
             continue;
         }
@@ -740,7 +740,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax, TPa
         iEnergyResolutionPlottingCanvas->SetLeftMargin( 0.15 );
         iEnergyResolutionPlottingCanvas->SetRightMargin( 0.07 );
     }
-    if(!iEnergyResolutionPlottingCanvas )
+    if( !iEnergyResolutionPlottingCanvas )
     {
         return 0;
     }
@@ -748,7 +748,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax, TPa
 
     // plotting frame
     TH1D* he0 = 0;
-    if(!iEnergyResolutionPlottingCanvas->GetListOfPrimitives()->FindObject( "he0" ) )
+    if( !iEnergyResolutionPlottingCanvas->GetListOfPrimitives()->FindObject( "he0" ) )
     {
         if( getPlottingAxis( "energy_Lin" )->fMinValue > 0. && getPlottingAxis( "energy_Lin" )->fMaxValue > 0. )
         {
@@ -1057,7 +1057,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotResolution2D( unsigned int iDataSe
         string iResolutionTreeName, string iXaxis,
         double iEnergySlice_GeV )
 {
-    if(!checkDataSetID( iDataSetID ) )
+    if( !checkDataSetID( iDataSetID ) )
     {
         return 0;
     }
@@ -1181,7 +1181,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotResolution2D( unsigned int iDataSe
                 // plot a slice of the 2D histogram
                 else
                 {
-                    h->SetAxisRange(-1., -1., "Y" );
+                    h->SetAxisRange( -1., -1., "Y" );
                     sprintf( hname, "%s_%d_%d", h->GetName(), ( int )iEnergySlice_GeV, h->GetXaxis()->FindBin( log10( iEnergySlice_GeV ) ) );
                     TH1D* h1D = h->ProjectionY( hname, h->GetXaxis()->FindBin( log10( iEnergySlice_GeV ) ), h->GetXaxis()->FindBin( log10( iEnergySlice_GeV ) ) );
                     if( h1D )
@@ -1200,7 +1200,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotResolution2D( unsigned int iDataSe
             }
         }
     }
-    if(!h )
+    if( !h )
     {
         cout << "VPlotInstrumentResponseFunction::plotResolution2D() warning: no histogram found for data set " << iDataSetID << endl;
     }
@@ -1306,7 +1306,7 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
         iResolutionPlottingCanvas->SetLeftMargin( 0.15 );
         iResolutionPlottingCanvas->SetRightMargin( 0.07 );
     }
-    if(!iResolutionPlottingCanvas )
+    if( !iResolutionPlottingCanvas )
     {
         return 0;
     }
@@ -1314,7 +1314,7 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
 
     sprintf( hname, "har_%s_%s", iName.c_str(), iXaxis.c_str() );
     TH1D* har = 0;
-    if(!iResolutionPlottingCanvas->GetListOfPrimitives()->FindObject( hname ) )
+    if( !iResolutionPlottingCanvas->GetListOfPrimitives()->FindObject( hname ) )
     {
         har = new TH1D( hname, "", 100, i_Plotting_L_Min, i_Plotting_L_Max );
         har->SetStats( 0 );
@@ -1367,7 +1367,7 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
         {
             plot_nullHistogram( iResolutionPlottingCanvas, har, i_Plotting_log, false, 1.6, i_Plotting_Min, i_Plotting_Max );
         }
-        if(!g )
+        if( !g )
         {
             // try to get CTA resolution graph
             if( iName.find( "angres" ) != string::npos )
@@ -1381,7 +1381,7 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
                     g = fData[i]->gAngularResolution;
                 }
             }
-            if(!g )
+            if( !g )
             {
                 cout << "VPlotInstrumentResponseFunction::plotResolution() warning: no graph found for data set " << i << endl;
                 continue;
@@ -1430,7 +1430,7 @@ bool VPlotInstrumentResponseFunction::setResolutionFitting( string iFitFunction,
 
 bool VPlotInstrumentResponseFunction::fitResolution( TGraphErrors* g )
 {
-    if(!g )
+    if( !g )
     {
         return false;
     }
@@ -1446,7 +1446,7 @@ bool VPlotInstrumentResponseFunction::fitResolution( TGraphErrors* g )
 
 bool VPlotInstrumentResponseFunction::write_fitResolutionFunction( string iOutName, string iName )
 {
-    if(!fTF1_fitResolution )
+    if( !fTF1_fitResolution )
     {
         cout << "PlotInstrumentResponseFunction::write_fitResolutionFunction error: no function defined" << endl;
         return false;
@@ -1470,7 +1470,7 @@ bool VPlotInstrumentResponseFunction::write_fitResolutionFunction( string iOutNa
 TH1D* VPlotInstrumentResponseFunction::getTheta2orThetaHistogram( unsigned int iDataSetID, double i_Energy_TeV_lin,
         bool iTheta2 )
 {
-    if(!checkDataSetID( iDataSetID ) )
+    if( !checkDataSetID( iDataSetID ) )
     {
         return 0;
     }
@@ -1484,7 +1484,7 @@ TH1D* VPlotInstrumentResponseFunction::getTheta2orThetaHistogram( unsigned int i
 
     // check if theta or theta2 histograms should be used
     unsigned int i_Plotting_Selector = VInstrumentResponseFunctionData::E_DIFF2;
-    if(!iTheta2 )
+    if( !iTheta2 )
     {
         i_Plotting_Selector = VInstrumentResponseFunctionData::E_DIFF;
     }
@@ -1602,7 +1602,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotPSF( vector< double > i_Energy_TeV
         }
         hnull->SetMaximum( 1.1 );
         hnull->SetStats( 0 );
-        plot_nullHistogram(( TPad* )gPad, hnull, false, false, 1.3, 0., iTheta2AxisMax );
+        plot_nullHistogram( ( TPad* )gPad, hnull, false, false, 1.3, 0., iTheta2AxisMax );
         hnull->GetXaxis()->SetNdivisions( 505 );
         hnull->Draw();
 

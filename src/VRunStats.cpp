@@ -202,7 +202,7 @@ bool VRunStats::readDBAnalysisComments()
 
     //std::cout<<"VRunStats::readDBAnalysisComments "<<std::endl;
     VDB_Connection my_connection( itemp.c_str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         return false;
     }
@@ -211,7 +211,7 @@ bool VRunStats::readDBAnalysisComments()
     sprintf( c_query, "select run_id , data_category   , status   , status_reason , tel_cut_mask , usable_duration , time_cut_mask , light_level , vpm_config_mask , authors  , comment from tblRun_Analysis_Comments where run_id >= %d and run_id <= %d", fMin_run_id, fMax_run_id );
     cout << c_query << endl;
 
-    if(!my_connection.make_query( c_query ) )
+    if( !my_connection.make_query( c_query ) )
     {
         return false;
     }
@@ -231,23 +231,23 @@ bool VRunStats::readDBAnalysisComments()
     {
         TSQLRow* db_row = db_res->Next();
 
-        if(!db_row )
+        if( !db_row )
         {
             break;
         }
-        if(!db_row->GetField( 0 ) )
+        if( !db_row->GetField( 0 ) )
         {
             continue;
         }
-        if(!db_row->GetField( 1 ) )
+        if( !db_row->GetField( 1 ) )
         {
             continue;
         }
-        if(!db_row->GetField( 2 ) )
+        if( !db_row->GetField( 2 ) )
         {
             continue;
         }
-        if(!db_row->GetField( 4 ) )
+        if( !db_row->GetField( 4 ) )
         {
             continue;
         }
@@ -300,7 +300,7 @@ bool VRunStats::readFromDB()
 
     //std::cout<<"VRunStats::readFromDB "<<std::endl;
     VDB_Connection my_connection( itemp.c_str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         cout << "error connecting to db" << endl;
         return false;
@@ -308,50 +308,50 @@ bool VRunStats::readFromDB()
 
     TSQLServer* f_db = my_connection.Get_ConnectionResult();
 
-    if(!readDBRun_IDs( f_db ) )
+    if( !readDBRun_IDs( f_db ) )
     {
         return false;
     }
 
-    if(!readDBSourceInfo( f_db ) )
+    if( !readDBSourceInfo( f_db ) )
     {
         return false;
     }
 
-    if(!readDBWeatherInfo( f_db ) )
+    if( !readDBWeatherInfo( f_db ) )
     {
         return false;
     }
 
-    if(!readDB_default_HVEvndispData( f_db ) )
+    if( !readDB_default_HVEvndispData( f_db ) )
     {
         return false;
     }
 
     if( fReadfullHVEvndispData )
     {
-        if(!readDBHVEvndispData( f_db ) )
+        if( !readDBHVEvndispData( f_db ) )
         {
             return false;
         }
     }
 
-    if(!readDBCameraStatus( f_db ) )
+    if( !readDBCameraStatus( f_db ) )
     {
         return false;
     }
 
-    if(!readDBFIRInfo( f_db ) )
+    if( !readDBFIRInfo( f_db ) )
     {
         return false;
     }
 
-    if(!readDBAnalysisComments() )
+    if( !readDBAnalysisComments() )
     {
         return false;
     }
 
-    if(!readDBRunInfo( f_db ) )
+    if( !readDBRunInfo( f_db ) )
     {
         return false;
     }
@@ -364,7 +364,7 @@ bool VRunStats::readFromDB()
 
 bool VRunStats::readDBHVEvndispData( TSQLServer* f_db )
 {
-    if(!f_db )
+    if( !f_db )
     {
         return false;
     }
@@ -377,7 +377,7 @@ bool VRunStats::readDBHVEvndispData( TSQLServer* f_db )
         cout << c_query << endl;
 
         TSQLResult* db_res = f_db->Query( c_query );
-        if(!db_res )
+        if( !db_res )
         {
             return false;
         }
@@ -392,7 +392,7 @@ bool VRunStats::readDBHVEvndispData( TSQLServer* f_db )
         {
             TSQLRow* db_row = db_res->Next();
 
-            if(!db_row )
+            if( !db_row )
             {
                 break;
             }
@@ -450,7 +450,7 @@ bool VRunStats::readDBHVEvndispData( TSQLServer* f_db )
 
 bool VRunStats::readDB_default_HVEvndispData( TSQLServer* f_db )
 {
-    if(!f_db )
+    if( !f_db )
     {
         return false;
     }
@@ -463,7 +463,7 @@ bool VRunStats::readDB_default_HVEvndispData( TSQLServer* f_db )
         cout << c_query << endl;
 
         TSQLResult* db_res = f_db->Query( c_query );
-        if(!db_res )
+        if( !db_res )
         {
             return false;
         }
@@ -480,7 +480,7 @@ bool VRunStats::readDB_default_HVEvndispData( TSQLServer* f_db )
         {
             TSQLRow* db_row = db_res->Next();
 
-            if(!db_row )
+            if( !db_row )
             {
                 break;
             }
@@ -537,7 +537,7 @@ bool VRunStats::readDB_default_HVEvndispData( TSQLServer* f_db )
 
 bool VRunStats::readDBCameraStatus( TSQLServer* f_db )
 {
-    if(!f_db )
+    if( !f_db )
     {
         return false;
     }
@@ -549,7 +549,7 @@ bool VRunStats::readDBCameraStatus( TSQLServer* f_db )
     cout << c_query << endl;
 
     TSQLResult* db_res = f_db->Query( c_query );
-    if(!db_res )
+    if( !db_res )
     {
         return false;
     }
@@ -569,7 +569,7 @@ bool VRunStats::readDBCameraStatus( TSQLServer* f_db )
     {
         TSQLRow* db_row = db_res->Next();
 
-        if(!db_row )
+        if( !db_row )
         {
             break;
         }
@@ -599,7 +599,7 @@ bool VRunStats::readDBCameraStatus( TSQLServer* f_db )
 
 bool VRunStats::readDBFIRInfo( TSQLServer* f_db )
 {
-    if(!f_db )
+    if( !f_db )
     {
         return false;
     }
@@ -611,7 +611,7 @@ bool VRunStats::readDBFIRInfo( TSQLServer* f_db )
     cout << c_query << endl;
 
     TSQLResult* db_res = f_db->Query( c_query );
-    if(!db_res )
+    if( !db_res )
     {
         return false;
     }
@@ -631,7 +631,7 @@ bool VRunStats::readDBFIRInfo( TSQLServer* f_db )
     {
         TSQLRow* db_row = db_res->Next();
 
-        if(!db_row )
+        if( !db_row )
         {
             break;
         }
@@ -656,7 +656,7 @@ bool VRunStats::readDBFIRInfo( TSQLServer* f_db )
 
 bool VRunStats::readDBWeatherInfo( TSQLServer* f_db )
 {
-    if(!f_db )
+    if( !f_db )
     {
         return false;
     }
@@ -668,7 +668,7 @@ bool VRunStats::readDBWeatherInfo( TSQLServer* f_db )
     cout << c_query << endl;
 
     TSQLResult* db_res = f_db->Query( c_query );
-    if(!db_res )
+    if( !db_res )
     {
         return false;
     }
@@ -688,7 +688,7 @@ bool VRunStats::readDBWeatherInfo( TSQLServer* f_db )
     {
         TSQLRow* db_row = db_res->Next();
 
-        if(!db_row )
+        if( !db_row )
         {
             break;
         }
@@ -716,7 +716,7 @@ bool VRunStats::readDBWeatherInfo( TSQLServer* f_db )
 
 bool VRunStats::readDBSourceInfo( TSQLServer* f_db )
 {
-    if(!f_db )
+    if( !f_db )
     {
         return false;
     }
@@ -728,7 +728,7 @@ bool VRunStats::readDBSourceInfo( TSQLServer* f_db )
     cout << c_query << endl;
 
     TSQLResult* db_res = f_db->Query( c_query );
-    if(!db_res )
+    if( !db_res )
     {
         return false;
     }
@@ -758,7 +758,7 @@ bool VRunStats::readDBSourceInfo( TSQLServer* f_db )
 
 bool VRunStats::readDBRun_IDs( TSQLServer* f_db )
 {
-    if(!f_db )
+    if( !f_db )
     {
         return false;
     }
@@ -771,7 +771,7 @@ bool VRunStats::readDBRun_IDs( TSQLServer* f_db )
     cout << c_query << endl;
 
     TSQLResult* db_res = f_db->Query( c_query );
-    if(!db_res )
+    if( !db_res )
     {
         return false;
     }
@@ -786,7 +786,7 @@ bool VRunStats::readDBRun_IDs( TSQLServer* f_db )
     {
         TSQLRow* db_row = db_res->Next();
 
-        if(!db_row )
+        if( !db_row )
         {
             break;
         }
@@ -809,7 +809,7 @@ bool VRunStats::readDBRun_IDs( TSQLServer* f_db )
 
 bool VRunStats::readDBRunInfo( TSQLServer* f_db )
 {
-    if(!f_db )
+    if( !f_db )
     {
         return false;
     }
@@ -822,7 +822,7 @@ bool VRunStats::readDBRunInfo( TSQLServer* f_db )
     cout << c_query << endl;
 
     TSQLResult* db_res = f_db->Query( c_query );
-    if(!db_res )
+    if( !db_res )
     {
         return false;
     }
@@ -844,7 +844,7 @@ bool VRunStats::readDBRunInfo( TSQLServer* f_db )
     {
         TSQLRow* db_row = db_res->Next();
 
-        if(!db_row )
+        if( !db_row )
         {
             break;
         }
@@ -856,7 +856,7 @@ bool VRunStats::readDBRunInfo( TSQLServer* f_db )
         }
 
         // all fields should be defined
-        if(!db_row->GetField( 19 ) )
+        if( !db_row->GetField( 19 ) )
         {
             continue;
         }
@@ -867,7 +867,7 @@ bool VRunStats::readDBRunInfo( TSQLServer* f_db )
             continue;
         }
         // check if this run is an observing run
-        if(!db_row->GetField( 1 ) )
+        if( !db_row->GetField( 1 ) )
         {
             continue;
         }
@@ -877,7 +877,7 @@ bool VRunStats::readDBRunInfo( TSQLServer* f_db )
             continue;
         }
         // don't use aborted runs
-        if(!db_row->GetField( 3 ) )
+        if( !db_row->GetField( 3 ) )
         {
             continue;
         }
@@ -983,7 +983,7 @@ bool VRunStats::readDBRunInfo( TSQLServer* f_db )
         cout << "\t camera " << endl;
         for( unsigned int k = cs_start; k < fCameraStatus.size(); k++ )
         {
-            if(!fCameraStatus[k] )
+            if( !fCameraStatus[k] )
             {
                 continue;
             }
@@ -1000,7 +1000,7 @@ bool VRunStats::readDBRunInfo( TSQLServer* f_db )
         cout << "\t FIR " << endl;
         for( unsigned int k = k_start; k < fFIRData.size(); k++ )
         {
-            if(!fFIRData[k] )
+            if( !fFIRData[k] )
             {
                 continue;
             }
@@ -1016,7 +1016,7 @@ bool VRunStats::readDBRunInfo( TSQLServer* f_db )
         cout << "\t weather " << endl;
         for( unsigned int j = j_start; j < fWeatherData.size(); j++ )
         {
-            if(!fWeatherData[j] )
+            if( !fWeatherData[j] )
             {
                 continue;
             }
@@ -1043,7 +1043,7 @@ bool VRunStats::readDBRunInfo( TSQLServer* f_db )
 
 bool VRunStats::getDBSourceCoordinates( TSQLServer* f_db, string iSource, double& iEVNTargetDec, double& iEVNTargetRA )
 {
-    if(!f_db )
+    if( !f_db )
     {
         return false;
     }
@@ -1052,7 +1052,7 @@ bool VRunStats::getDBSourceCoordinates( TSQLServer* f_db, string iSource, double
 
     sprintf( c_query, "select * from tblObserving_Sources where source_id like convert( _utf8 \'%s\' using latin1)", iSource.c_str() );
     TSQLResult* db_res = f_db->Query( c_query );
-    if(!db_res )
+    if( !db_res )
     {
         return false;
     }
@@ -1076,7 +1076,7 @@ bool VRunStats::getDBSourceCoordinates( TSQLServer* f_db, string iSource, double
 
 bool VRunStats::getDBWeatherData( TSQLServer* f_db, string iTimeStamp, double& iWindSpeed, double& iWindGust, double& iWindDir, double& iTemp, double& iHumidity )
 {
-    if(!f_db )
+    if( !f_db )
     {
         return false;
     }
@@ -1088,7 +1088,7 @@ bool VRunStats::getDBWeatherData( TSQLServer* f_db, string iTimeStamp, double& i
 
     sprintf( c_query, "select * from tblWeather_Status where timestamp = \"%s\" ", iTimeStamp.c_str() );
     TSQLResult* db_res = f_db->Query( c_query );
-    if(!db_res )
+    if( !db_res )
     {
         return false;
     }
@@ -1133,7 +1133,7 @@ void VRunStats::getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip 
     h = atoi( itemp.substr( 8, 2 ).c_str() );
     min = atoi( itemp.substr( 10, 2 ).c_str() );
     s = atoi( itemp.substr( 12, 2 ).c_str() );
-    if(!bStrip )
+    if( !bStrip )
     {
         ms = atoi( itemp.substr( 14, 3 ).c_str() );
     }
@@ -1749,7 +1749,7 @@ bool VRunStats::readDQMData( string iDQMFile )
 {
     ifstream is;
     is.open( iDQMFile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "VRunStats::readDQMData: DQM file not found: " << iDQMFile << endl;
         return false;

@@ -276,7 +276,7 @@ class VCalibrationData
         }
         valarray < valarray < double > >& getPedsTS_vector( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fTS_Peds;
             }
@@ -287,7 +287,7 @@ class VCalibrationData
         }
         valarray< valarray< valarray < double > > >& getPedvarsVTS_vector( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fTS_fVPedvars;
             }
@@ -298,7 +298,7 @@ class VCalibrationData
         }
         valarray < valarray < double > >& getMeanPedvarsVTS_vector( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fTS_fVmeanPedvars;
             }
@@ -309,7 +309,7 @@ class VCalibrationData
         }
         valarray < valarray < double > >& getMeanRMSPedvarsVTS_vector( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fTS_fVmeanRMSPedvars;
             }
@@ -359,7 +359,7 @@ class VCalibrationData
         bool     terminate( vector< unsigned int > a, vector< unsigned int > b, unsigned int iTraceIntegrationMethod, bool iDST = false );
         bool     usePedestalsInTimeSlices( bool iB )
         {
-            if(!iB )
+            if( !iB )
             {
                 return fUsePedestalsInTimeSlices;
             }

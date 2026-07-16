@@ -41,7 +41,7 @@ bool VPlotRadialAcceptance::openAcceptanceFile( string iFile, unsigned int iZeBi
     if( iAzBin >= 0 )
     {
         sprintf( hname, "az_%d", iAzBin );
-        if(!fAcceptanceFile->cd( hname ) )
+        if( !fAcceptanceFile->cd( hname ) )
         {
             cout << "VPlotRadialAcceptance::openAcceptanceFile error, directory for the following az bin not found: " << iAzBin << endl;
             return false;
@@ -51,7 +51,7 @@ bool VPlotRadialAcceptance::openAcceptanceFile( string iFile, unsigned int iZeBi
     // read acceptance histogram from file
     sprintf( hname, "hAccZe_%d", iZeBin );
     fAcceptanceHisto = ( TH1F* )gDirectory->Get( hname );
-    if(!fAcceptanceHisto )
+    if( !fAcceptanceHisto )
     {
         cout << "VPlotRadialAcceptance::addAcceptanceFile: error finding acceptance histogram" << endl;
         cout << hname << endl;
@@ -65,26 +65,26 @@ bool VPlotRadialAcceptance::openAcceptanceFile( string iFile, unsigned int iZeBi
     for( int i = 0; i < 16; i++ )
     {
         sprintf( hname, "hAccPhi_%d", i );
-        fAcceptancePhiHisto.push_back(( TH1F* )gDirectory->Get( hname ) );
-        if(!fAcceptancePhiHisto.back() )
+        fAcceptancePhiHisto.push_back( ( TH1F* )gDirectory->Get( hname ) );
+        if( !fAcceptancePhiHisto.back() )
         {
             cout << "VPlotRadialAcceptance::addAcceptanceFile warning: could not find acceptance histogram " << hname << endl;
         }
         sprintf( hname, "fAccPhi_%d", i );
-        fAcceptancePhiFitFunction.push_back(( TF1* )gDirectory->Get( hname ) );
-        if(!fAcceptancePhiFitFunction.back() )
+        fAcceptancePhiFitFunction.push_back( ( TF1* )gDirectory->Get( hname ) );
+        if( !fAcceptancePhiFitFunction.back() )
         {
             cout << "VPlotRadialAcceptance::addAcceptanceFile warning: could not find acceptance fit function " << hname << endl;
         }
         sprintf( hname, "hAccPhiDerot_%d", i );
-        fAcceptancePhiHistoDeRot.push_back(( TH1F* )gDirectory->Get( hname ) );
-        if(!fAcceptancePhiHistoDeRot.back() )
+        fAcceptancePhiHistoDeRot.push_back( ( TH1F* )gDirectory->Get( hname ) );
+        if( !fAcceptancePhiHistoDeRot.back() )
         {
             cout << "VPlotRadialAcceptance::addAcceptanceFile warning: could not find acceptance histogram " << hname << endl;
         }
         sprintf( hname, "fAccPhiDerot_%d", i );
-        fAcceptancePhiFitFunctionDeRot.push_back(( TF1* )gDirectory->Get( hname ) );
-        if(!fAcceptancePhiFitFunctionDeRot.back() )
+        fAcceptancePhiFitFunctionDeRot.push_back( ( TF1* )gDirectory->Get( hname ) );
+        if( !fAcceptancePhiFitFunctionDeRot.back() )
         {
             cout << "VPlotRadialAcceptance::addAcceptanceFile warning: could not find acceptance fit function " << hname << endl;
         }
@@ -92,7 +92,7 @@ bool VPlotRadialAcceptance::openAcceptanceFile( string iFile, unsigned int iZeBi
     // read acceptance fit function from file
     sprintf( hname, "fAccZe_%d", iZeBin );
     fAcceptanceFunction = ( TF1* )gDirectory->Get( hname );
-    if(!fAcceptanceFunction )
+    if( !fAcceptanceFunction )
     {
         cout << "VPlotRadialAcceptance::addAcceptanceFile: error finding acceptance fit function" << endl;
         cout << hname << endl;
@@ -101,7 +101,7 @@ bool VPlotRadialAcceptance::openAcceptanceFile( string iFile, unsigned int iZeBi
     // read acceptance histogram (fit values) from file
     sprintf( hname, "hAccZe_%dFit", iZeBin );
     fAcceptanceHistoFit = ( TH1F* )gDirectory->Get( hname );
-    if(!fAcceptanceHistoFit )
+    if( !fAcceptanceHistoFit )
     {
         cout << "VPlotRadialAcceptance::addAcceptanceFile: error finding acceptance histogram (fitted)" << endl;
         cout << hname << endl;
@@ -129,7 +129,7 @@ bool VPlotRadialAcceptance::openAcceptanceFile( string iFile, unsigned int iZeBi
 */
 TCanvas* VPlotRadialAcceptance::plotRadialAcceptance( TCanvas* cX, int iColor )
 {
-    if(!fAcceptanceFile || fAcceptanceFile->IsZombie() )
+    if( !fAcceptanceFile || fAcceptanceFile->IsZombie() )
     {
         cout << "VPlotRadialAcceptance::plot() error: data missing";
         return 0;
@@ -190,7 +190,7 @@ TCanvas* VPlotRadialAcceptance::plotRadialAcceptance( TCanvas* cX, int iColor )
 */
 TCanvas* VPlotRadialAcceptance::plotResiduals( TCanvas* cX, double i_res_min, double i_res_max, bool iPlotChi2 )
 {
-    if(!fAcceptanceFile || fAcceptanceFile->IsZombie() )
+    if( !fAcceptanceFile || fAcceptanceFile->IsZombie() )
     {
         cout << "VPlotRadialAcceptance::plotResiduals() error: data missing";
         return 0;
@@ -263,7 +263,7 @@ void VPlotRadialAcceptance::setAxisRange( double x_min, double x_max, double y_m
 
 TCanvas* VPlotRadialAcceptance::plotPhiDependentRadialAcceptances( TCanvas* cX, int iterator, bool iDeRot )
 {
-    if(!fAcceptanceFile || fAcceptanceFile->IsZombie() )
+    if( !fAcceptanceFile || fAcceptanceFile->IsZombie() )
     {
         cout << "VPlotRadialAcceptance::plotPhiDependentRadialAcceptances() error: data missing";
         return 0;
@@ -296,7 +296,7 @@ TCanvas* VPlotRadialAcceptance::plotPhiDependentRadialAcceptances( TCanvas* cX, 
 
     vector< TH1F* > iHisto;
     vector< TF1* > iF1;
-    if(!iDeRot )
+    if( !iDeRot )
     {
         iHisto = fAcceptancePhiHisto;
         iF1    = fAcceptancePhiFitFunction;
@@ -350,7 +350,7 @@ TCanvas* VPlotRadialAcceptance::plotPhiDependentRadialAcceptances( TCanvas* cX, 
 
 TCanvas*  VPlotRadialAcceptance::plotPhiDistributions( TCanvas* cX, int iColor )
 {
-    if(!fAcceptanceFile || fAcceptanceFile->IsZombie() )
+    if( !fAcceptanceFile || fAcceptanceFile->IsZombie() )
     {
         cout << "VPlotRadialAcceptance::plotPhiDistributions() error: data missing";
         return 0;
@@ -378,7 +378,7 @@ TCanvas*  VPlotRadialAcceptance::plotPhiDistributions( TCanvas* cX, int iColor )
     {
         setHistogramPlottingStyle( hPhiDist, iColor );
         hPhiDist->SetLineWidth( 2 );
-        hPhiDist = ( TH1F* )VHistogramUtilities::normalizeTH1(( TH1* )hPhiDist, false );
+        hPhiDist = ( TH1F* )VHistogramUtilities::normalizeTH1( ( TH1* )hPhiDist, false );
         hPhiDist->GetXaxis()->SetTitle( "azimuth (camera) [deg]" );
         hPhiDist->SetMinimum( 0 );
         if( bPlotSame )

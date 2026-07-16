@@ -64,7 +64,7 @@ double VEmissionHeightCalculator::getEmissionHeight( float* cen_x, float* cen_y,
                         // calculate emission height [km]
                         iEmissionHeightTemp = fTelescopeDistanceSC / fImageDistance / 1.e3;
                         // weight for pairwise emission height calculation
-                        iEmissionHeightWeightTemp = 1. / (( 1. / iLogSizeI ) + ( 1. / iLogSizeJ ) );
+                        iEmissionHeightWeightTemp = 1. / ( ( 1. / iLogSizeI ) + ( 1. / iLogSizeJ ) );
                         iEmissionHeightWeight    += iEmissionHeightWeightTemp;
                         iEmissionHeight          += iEmissionHeightTemp * iEmissionHeightWeightTemp;
                         iEmissionHeight2         += iEmissionHeightTemp * iEmissionHeightTemp * iEmissionHeightWeightTemp;
@@ -88,7 +88,7 @@ double VEmissionHeightCalculator::getEmissionHeight( float* cen_x, float* cen_y,
         iEmissionHeight2 /= iEmissionHeightWeight;
         if( iNEM_pairs > 1. )
         {
-            fEmissionHeightChi2 = sqrt( 1. / ( iNEM_pairs - 1. ) * ( iEmissionHeight2 - fEmissionHeight* fEmissionHeight ) );
+            fEmissionHeightChi2 = sqrt( 1. / ( iNEM_pairs - 1. ) * ( iEmissionHeight2 - fEmissionHeight * fEmissionHeight ) );
         }
         else
         {
@@ -170,7 +170,7 @@ double VEmissionHeightCalculator::getTelescopeDistanceSC( unsigned int iTel1, un
     t2[1] = fTelY[iTel2];
     t2[2] = fTelZ[iTel2];
 
-    return VUtilities::line_point_distance( t1[0], t1[1], t1[2], 90. - z* TMath::RadToDeg(), az* TMath::RadToDeg(), t2[0], t2[1], t2[2] );
+    return VUtilities::line_point_distance( t1[0], t1[1], t1[2], 90. - z * TMath::RadToDeg(), az * TMath::RadToDeg(), t2[0], t2[1], t2[2] );
 }
 
 
@@ -179,5 +179,5 @@ double VEmissionHeightCalculator::getTelescopeDistanceSC( unsigned int iTel1, un
 */
 double VEmissionHeightCalculator::imageDistance( double c1x, double c2x, double c1y, double c2y )
 {
-    return sqrt(( c1x - c2x ) * ( c1x - c2x ) + ( c1y - c2y ) * ( c1y - c2y ) );
+    return sqrt( ( c1x - c2x ) * ( c1x - c2x ) + ( c1y - c2y ) * ( c1y - c2y ) );
 }

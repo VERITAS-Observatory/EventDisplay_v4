@@ -99,7 +99,7 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
         cout << "initializing TMVA disp analyzer: " <<  iFileName.str() << endl;
         // check that TMVA file exists
         ifstream i_temp_TMVAFILE( iFileName.str().c_str() );
-        if(!i_temp_TMVAFILE.good() )
+        if( !i_temp_TMVAFILE.good() )
         {
             cout << "VTMVADispAnalyzer error: cannot find: " << endl;
             cout << iFileName.str() << endl;
@@ -161,7 +161,7 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
             fTMVAReader[fTelescopeTypeList[i]]->AddSpectator( "dispError", &temp3 );
         }
 
-        if(!fTMVAReader[fTelescopeTypeList[i]]->BookMVA( "BDTDisp", iFileName.str().c_str() ) )
+        if( !fTMVAReader[fTelescopeTypeList[i]]->BookMVA( "BDTDisp", iFileName.str().c_str() ) )
         {
             cout << "VTMVADispAnalyzer initializion error: xml weight file not found:" << endl;
             cout << "\t" << iFileName.str() << endl;
@@ -215,7 +215,7 @@ float VTMVADispAnalyzer::evaluate( float iWidth, float iLength, float iSize, flo
     // fcross = sqrt( ( icen_y - yoff_4 ) * ( icen_y - yoff_4 ) + ( icen_x - xoff_4 ) * ( icen_x - xoff_4 ) );
     if( yoff_4 > -999. && xoff_4 > -999. )
     {
-        fcross = sqrt(( icen_y + yoff_4 ) * ( icen_y + yoff_4 ) + ( icen_x - xoff_4 ) * ( icen_x - xoff_4 ) );
+        fcross = sqrt( ( icen_y + yoff_4 ) * ( icen_y + yoff_4 ) + ( icen_x - xoff_4 ) * ( icen_x - xoff_4 ) );
     }
     else
     {

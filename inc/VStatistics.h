@@ -43,7 +43,7 @@ namespace VStatistics
 
         if( Non + alphasq * Noff > 0. )
         {
-            Sig5 = Nsig / sqrt( Non + alphasq* Noff );
+            Sig5 = Nsig / sqrt( Non + alphasq * Noff );
         }
         else
         {
@@ -51,7 +51,7 @@ namespace VStatistics
         }
         if( alpha * Ntot > 0. )
         {
-            Sig9 = Nsig / sqrt( alpha* Ntot );
+            Sig9 = Nsig / sqrt( alpha * Ntot );
         }
         else
         {
@@ -63,15 +63,15 @@ namespace VStatistics
         }
         else if( Non == 0 && Noff != 0. )
         {
-            Sig17 = sqrt( 2.*( Noff* log( oneplusalpha * ( Noff / Ntot ) ) ) );
+            Sig17 = sqrt( 2.*( Noff * log( oneplusalpha * ( Noff / Ntot ) ) ) );
         }
         else if( Non != 0 && Noff == 0. )
         {
-            Sig17 = sqrt( 2.*( Non* log( oneplusalphaoveralpha * ( Non / Ntot ) ) ) );
+            Sig17 = sqrt( 2.*( Non * log( oneplusalphaoveralpha * ( Non / Ntot ) ) ) );
         }
         else
         {
-            Sig17 = 2.*( Non* log( oneplusalphaoveralpha * ( Non / Ntot ) ) + Noff* log( oneplusalpha * ( Noff / Ntot ) ) );
+            Sig17 = 2.*( Non * log( oneplusalphaoveralpha * ( Non / Ntot ) ) + Noff * log( oneplusalpha * ( Noff / Ntot ) ) );
             // value in brackets can be a small negative number
             if( TMath::Abs( Sig17 ) < 1.e-15 )
             {
@@ -133,13 +133,13 @@ namespace VStatistics
     inline double Helene( double nOn, double nOff, double alpha, double CL )
     {
         double nDiff = nOn - alpha * nOff;
-        double sigma = sqrt( nOn + alpha* alpha* nOff );
+        double sigma = sqrt( nOn + alpha * alpha * nOff );
 
         double ulim = 0.;
 
         if( sigma > 0. )
         {
-            ulim = TMath::ErfcInverse(( 1. - CL ) * TMath::Erfc(-1. * nDiff / sigma / sqrt( 2. ) ) ) * sigma * sqrt( 2. ) + nDiff;
+            ulim = TMath::ErfcInverse( ( 1. - CL ) * TMath::Erfc( -1. * nDiff / sigma / sqrt( 2. ) ) ) * sigma * sqrt( 2. ) + nDiff;
         }
 
         return ulim;
@@ -243,7 +243,7 @@ namespace VStatistics
             {
                 i_FeldmanCousins.SetMuStep( 0.5 );
             }
-            return i_FeldmanCousins.CalculateUpperLimit( nOn, ratio* nOff );
+            return i_FeldmanCousins.CalculateUpperLimit( nOn, ratio * nOff );
         }
         // Rolke Model 3 Background - Gaussian, Efficiency - Gaussian
         //
@@ -257,7 +257,7 @@ namespace VStatistics
 
             double sdb = ratio * sqrt( nOff );
 
-            i_Rolke.SetGaussBkgGaussEff(( int )nOn, ratio* nOff, 1., 0.3, sdb );
+            i_Rolke.SetGaussBkgGaussEff( ( int )nOn, ratio * nOff, 1., 0.3, sdb );
 
             return i_Rolke.GetUpperLimit();
         }
@@ -268,7 +268,7 @@ namespace VStatistics
             TRolke i_Rolke;
             i_Rolke.SetCL( CL );
             i_Rolke.SetBounding( iBoundedLimits );
-            i_Rolke.SetPoissonBkgKnownEff(( int )nOn, ( int )nOff, 1. / ratio, 1. );
+            i_Rolke.SetPoissonBkgKnownEff( ( int )nOn, ( int )nOff, 1. / ratio, 1. );
 
             return i_Rolke.GetUpperLimit();
         }
@@ -295,12 +295,12 @@ namespace VStatistics
                           T limit_low = static_cast<T>( 0.5 ),
                           T limit_up  = static_cast<T>( 1e-5 ) )
     {
-        const T iMinValidValue = static_cast<T>(-98.0 );
+        const T iMinValidValue = static_cast<T>( -98.0 );
         const T iLimitforInterpolation = static_cast<T>( 0.05 );
 
         // both values invalid
         if( w1 < iMinValidValue && w2 < iMinValidValue )
-            return static_cast<T>(-99.0 );
+            return static_cast<T>( -99.0 );
 
         // same x-value: average or return valid one
         if( std::fabs( ze1 - ze2 ) < static_cast<T>( 1e-3 ) )
@@ -318,9 +318,9 @@ namespace VStatistics
         if( iCos )
         {
             const T d2r = static_cast<T>( TMath::DegToRad() );
-            const T cos_ze1 = std::cos( ze1* d2r );
-            const T cos_ze2 = std::cos( ze2* d2r );
-            const T cos_ze  = std::cos( ze*   d2r );
+            const T cos_ze1 = std::cos( ze1 * d2r );
+            const T cos_ze2 = std::cos( ze2 * d2r );
+            const T cos_ze  = std::cos( ze *   d2r );
 
             id = cos_ze1 - cos_ze2;
             f1 = static_cast<T>( 1 ) - ( cos_ze1 - cos_ze ) / id;
@@ -335,12 +335,12 @@ namespace VStatistics
 
         // one value invalid: conditional return
         if( w1 > iMinValidValue && w2 < iMinValidValue )
-            return ( f1 > iLimitforInterpolation ) ? w1 : static_cast<T>(-99.0 );
+            return ( f1 > iLimitforInterpolation ) ? w1 : static_cast<T>( -99.0 );
         if( w1 < iMinValidValue && w2 > iMinValidValue )
-            return ( f2 > iLimitforInterpolation ) ? w2 : static_cast<T>(-99.0 );
+            return ( f2 > iLimitforInterpolation ) ? w2 : static_cast<T>( -99.0 );
 
         // normal interpolation
-        return ( w1* f1 + w2* f2 );
+        return ( w1 * f1 + w2 * f2 );
     }
 
     /*
@@ -357,7 +357,7 @@ namespace VStatistics
         }
         if( x.size() > 0. )
         {
-            return sum / (( double )x.size() );
+            return sum / ( ( double )x.size() );
         }
 
         return -999.;
@@ -435,7 +435,7 @@ namespace VStatistics
         }
         if( x.size() > 0. )
         {
-            return iAbs / (( double )x.size() );
+            return iAbs / ( ( double )x.size() );
         }
 
         return 0.;
@@ -454,7 +454,7 @@ namespace VStatistics
         }
         if( x.size() > 0. )
         {
-            return iAbs / (( double )x.size() );
+            return iAbs / ( ( double )x.size() );
         }
 
         return 0.;
@@ -486,7 +486,7 @@ namespace VStatistics
             }
             if( y.size() > 0 )
             {
-                return iAbs / (( double )y.size() );
+                return iAbs / ( ( double )y.size() );
             }
         }
 

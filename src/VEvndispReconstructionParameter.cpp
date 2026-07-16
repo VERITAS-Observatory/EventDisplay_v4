@@ -65,19 +65,19 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
     {
         cout << "VEvndispReconstructionParameter::applyArrayAnalysisCuts error: invalid method number " << iMeth << "\t" << fNMethods << endl;
         cout << "exiting..." << endl;
-        exit(-1 );
+        exit( -1 );
     }
     if( iTelType >= fNTel_type )
     {
         cout << "VEvndispReconstructionParameter::applyArrayAnalysisCuts error: invalid telescope type " << iTelType << "\t" << fNTel_type << endl;
         cout << "exiting..." << endl;
-        exit(-1 );
+        exit( -1 );
     }
-    if(!iImageParameter )
+    if( !iImageParameter )
     {
         cout << "VEvndispReconstructionParameter::applyArrayAnalysisCuts error: no image parameters given" << endl;
         cout << "exiting..." << endl;
-        exit(-1 );
+        exit( -1 );
     }
 
     if( fDebug )
@@ -105,11 +105,11 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
     if( fL2TriggerType[iMeth][iTelType] != 9999 )
     {
         bitset< 8 > i_L2TrigType( iLocalTriggerType );
-        if(!i_L2TrigType.test( fL2TriggerType[iMeth][iTelType] ) )
+        if( !i_L2TrigType.test( fL2TriggerType[iMeth][iTelType] ) )
         {
             iArrayCut = false;
         }
-        if(!iArrayCut && fDebug )
+        if( !iArrayCut && fDebug )
         {
             cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut Tel " << iTel + 1 << ", type " << iTelType;
             cout << " (meth " << iMeth << "): L2 trigger type ";
@@ -288,7 +288,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 
     ////////////////////////////////////////////
     // user set: remove image
-    if(!fLocalUseImage[iMeth][iTelType] )
+    if( !fLocalUseImage[iMeth][iTelType] )
     {
         iArrayCut = false;
         if( fDebug )
@@ -300,7 +300,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
     /////////////////////////////////////////////
     // MC only: cut on MC energy (use with care!)
     if( fRunPara->isMC()
-            && (( iImageParameter->MCenergy < fMCEnergy_linTeV_min[iMeth][iTelType] || iImageParameter->MCenergy > fMCEnergy_linTeV_max[iMeth][iTelType] ) ) )
+            && ( ( iImageParameter->MCenergy < fMCEnergy_linTeV_min[iMeth][iTelType] || iImageParameter->MCenergy > fMCEnergy_linTeV_max[iMeth][iTelType] ) ) )
     {
         iArrayCut = false;
         if( fDebug )
@@ -322,7 +322,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             if( i < iImageParameter->fImageBorderPixelPosition_y.size() )
             {
                 if( iStarCatalogue->getDistanceToClosestStar( iImageParameter->fImageBorderPixelPosition_x[i],
-                        iImageParameter->fImageBorderPixelPosition_y[i] ) < fRunPara->fMinStarPixelDistance_deg )
+                    iImageParameter->fImageBorderPixelPosition_y[i] ) < fRunPara->fMinStarPixelDistance_deg )
                 {
                     iArrayCut = false;
                     if( fDebug )
@@ -332,7 +332,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
                         cout << iStarCatalogue->getDistanceToClosestStar( iImageParameter->cen_x, iImageParameter->cen_y );
                         cout << " (" << fRunPara->fMinStarPixelDistance_deg << " deg )" << endl;
                     }
-                    if(!iArrayCut )
+                    if( !iArrayCut )
                     {
                         break;
                     }
@@ -402,7 +402,7 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
     i_d.clear();
     for( unsigned int i = 0; i < fNTel_type; i++ )
     {
-        i_d.push_back(-1. );
+        i_d.push_back( -1. );
     }
     fLocalDistance_min.push_back( i_d );
     i_d.clear();
@@ -414,7 +414,7 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
     i_d.clear();
     for( unsigned int i = 0; i < fNTel_type; i++ )
     {
-        i_d.push_back(-1. );
+        i_d.push_back( -1. );
     }
     fSize_min.push_back( i_d );
     i_d.clear();
@@ -426,13 +426,13 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
     i_d.clear();
     for( unsigned int i = 0; i < fNTel_type; i++ )
     {
-        i_d.push_back(-1.e-2 ); // to allow for width==0
+        i_d.push_back( -1.e-2 ); // to allow for width==0
     }
     fWidth_min.push_back( i_d );
     i_d.clear();
     for( unsigned int i = 0; i < fNTel_type; i++ )
     {
-        i_d.push_back(-1.e10 );
+        i_d.push_back( -1.e10 );
     }
     fLength_min.push_back( i_d );
     i_d.clear();
@@ -450,7 +450,7 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
     i_d.clear();
     for( unsigned int i = 0; i < fNTel_type; i++ )
     {
-        i_d.push_back(-1.e10 );
+        i_d.push_back( -1.e10 );
     }
     fAsym_min.push_back( i_d );
     i_d.clear();
@@ -462,7 +462,7 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
     i_d.clear();
     for( unsigned int i = 0; i < fNTel_type; i++ )
     {
-        i_d.push_back(-1.e3 );
+        i_d.push_back( -1.e3 );
     }
     fLocalAlpha_min.push_back( i_d );
     i_d.clear();
@@ -495,7 +495,7 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
     i_d.clear();
     for( unsigned int i = 0; i < fNTel_type; i++ )
     {
-        i_d.push_back(-1.e10 );
+        i_d.push_back( -1.e10 );
     }
     fFui_min.push_back( i_d );
     for( unsigned int i = 0; i < fNTel_type; i++ )
@@ -512,7 +512,7 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
     i_d.clear();
     for( unsigned int i = 0; i < fNTel_type; i++ )
     {
-        i_d.push_back(-1.e10 );
+        i_d.push_back( -1.e10 );
     }
     fMCEnergy_linTeV_min.push_back( i_d );
 }
@@ -725,7 +725,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 
     ifstream is;
     is.open( ifile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "VEvndispReconstructionParameter::read_arrayAnalysisCuts error while opening array analysis cut file: " << ifile << endl;
         return 0;
@@ -764,13 +764,13 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
             }
             else if( atoi( iTemp.c_str() ) < -10 &&  atoi( iTemp.c_str() ) > -1000 )
             {
-                t_type = ULong64_t(-1 * atoi( iTemp.c_str() ) );
+                t_type = ULong64_t( -1 * atoi( iTemp.c_str() ) );
                 t_temp = getTelescopeType_counter_from_MirrorArea( t_type );
                 v_temp = getTelescopeType_counter_from_MirrorAreaVector( t_type );
             }
             else if( atoi( iTemp.c_str() ) < -1000 )
             {
-                t_type = ULong64_t(-1 * atoi( iTemp.c_str() ) );
+                t_type = ULong64_t( -1 * atoi( iTemp.c_str() ) );
                 t_temp = getTelescopeType_counter_from_MirrorArea_and_PixelSize( t_type );
                 v_temp = getTelescopeType_counter_from_MirrorArea_and_PixelSizeVector( t_type );
             }
@@ -788,7 +788,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
             is_stream >> iTemp;
             iTemp = VUtilities::upperCase( iTemp );
             is_stream >> iTemp2;
-            if(!( is_stream >> std::ws ).eof() )
+            if( !( is_stream >> std::ws ).eof() )
             {
                 is_stream >> iTemp3;
             }
@@ -796,7 +796,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
             {
                 iTemp3 = "";
             }
-            if(!( is_stream >> std::ws ).eof() )
+            if( !( is_stream >> std::ws ).eof() )
             {
                 is_stream >> iTemp4;
             }
@@ -804,7 +804,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
             {
                 iTemp4 = "";
             }
-            if(!( is_stream >> std::ws ).eof() )
+            if( !( is_stream >> std::ws ).eof() )
             {
                 is_stream >> iTemp5;
             }
@@ -812,7 +812,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
             {
                 iTemp5 = "";
             }
-            if(!( is_stream >> std::ws ).eof() )
+            if( !( is_stream >> std::ws ).eof() )
             {
                 is_stream >> iTemp6;
             }
@@ -981,7 +981,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                     {
                         if( i < fRunPara->fImageCleaningParameters.size() )
                         {
-                            if(!fRunPara->fImageCleaningParameters[i]->setImageCleaningMethod( iTemp2 ) )
+                            if( !fRunPara->fImageCleaningParameters[i]->setImageCleaningMethod( iTemp2 ) )
                             {
                                 cout << "VEvndispReconstructionParameter: unknown image cleaning method: " << iTemp2 << endl;
                             }
@@ -1262,7 +1262,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
             // check for non-MC exit statement
             if( iTemp == "MCONLY" )
             {
-                if(!fRunPara->isMC() )
+                if( !fRunPara->isMC() )
                 {
                     return fNMethods;
                 }
@@ -1519,7 +1519,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                 if( t_temp >= 0 )                 // use defaults for telescope number < 0
                 {
                     int tmpi = atoi( iTemp2.c_str() );
-                    if(!tmpi ) for( unsigned int i = 0; i < v_temp.size(); i++ )
+                    if( !tmpi ) for( unsigned int i = 0; i < v_temp.size(); i++ )
                         {
                             fLocalUseImage[m_temp][v_temp[i]] = false;
                         }
@@ -1596,7 +1596,7 @@ int VEvndispReconstructionParameter::getTelescopeType_counter( ULong64_t t )
     set< ULong64_t >::iterator fTel_type_iter;
     for( fTel_type_iter = fTel_type.begin(); fTel_type_iter != fTel_type.end(); fTel_type_iter++ )
     {
-        if(*fTel_type_iter == t )
+        if( *fTel_type_iter == t )
         {
             return z;
         }
@@ -1672,9 +1672,9 @@ vector< int > VEvndispReconstructionParameter::getTelescopeType_counterVector( U
     set< ULong64_t >::iterator fTel_type_iter;
     for( fTel_type_iter = fTel_type.begin(); fTel_type_iter != fTel_type.end(); fTel_type_iter++ )
     {
-        if(*fTel_type_iter == t )
+        if( *fTel_type_iter == t )
         {
-            v.push_back(( int )z );
+            v.push_back( ( int )z );
         }
         z++;
     }

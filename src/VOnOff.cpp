@@ -82,15 +82,15 @@ void VOnOff::createHistograms( TList* ion, TList* il )
         ihname = hon->GetName();
         if( itemp == "TH1D" )
         {
-            il->Add( new TH1D(*(( TH1D* )hon ) ) );
+            il->Add( new TH1D( *( ( TH1D* )hon ) ) );
         }
         else if( itemp == "TH2D" )
         {
-            il->Add( new TH2D(*(( TH2D* )hon ) ) );
+            il->Add( new TH2D( *( ( TH2D* )hon ) ) );
         }
         else if( itemp == "TProfile" )
         {
-            il->Add( new TProfile(*(( TProfile* )hon ) ) );
+            il->Add( new TProfile( *( ( TProfile* )hon ) ) );
         }
         else
         {
@@ -155,7 +155,7 @@ void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, d
         // all other histograms
         else
         {
-            if(!isCombined )
+            if( !isCombined )
             {
                 hTemp->Add( hon, hoff, 1., -1.*i_norm_alpha );
                 hoff->Scale( i_norm_alpha );
@@ -289,7 +289,7 @@ void VOnOff::doQfactors( TList* ionlist, TList* iofflist, double i_norm )
         if( itemp == "TH1D" )
         {
             // qfactor on low bound cut
-            hTemp = new TH1D(*(( TH1D* )hon ) );
+            hTemp = new TH1D( *( ( TH1D* )hon ) );
             hTemp->Reset();
             hQList->Add( hTemp );
             hList->Add( hTemp );
@@ -314,7 +314,7 @@ void VOnOff::doQfactors( TList* ionlist, TList* iofflist, double i_norm )
             }
 
             // qfactor on high bound cut
-            hTemp = new TH1D(*(( TH1D* )hon ) );
+            hTemp = new TH1D( *( ( TH1D* )hon ) );
             hTemp->Reset();
             hQList->Add( hTemp );
             hList->Add( hTemp );
@@ -352,7 +352,7 @@ TH2D* VOnOff::do2DSignificance( TH2D* ion, TH2D* ioff, TH2D* ialpha, string itit
     {
         cout << "VOnOff::do2DSignificance" << endl;
     }
-    hmap_stereo_sig = new TH2D(*ion );
+    hmap_stereo_sig = new TH2D( *ion );
     hmap_stereo_sig->Reset();
     hList->Add( hmap_stereo_sig );
 
@@ -432,7 +432,7 @@ void VOnOff::writeHistograms( TH2D* hSig, TH2D* hSigUC, TH2D* hDiff, TH2D* hDiff
     // write all sky plots into sky histogram directory
     iDir->cd();
     wDir = ( TDirectory* )iDir->Get( "skyHistograms" );
-    if(!wDir )
+    if( !wDir )
     {
         iDir->mkdir( "skyHistograms" )->cd();
     }
@@ -464,7 +464,7 @@ void VOnOff::writeHistograms( TH2D* hSig, TH2D* hSigUC, TH2D* hDiff, TH2D* hDiff
     // write all stereo parameter histograms
     iDir->cd();
     wDir = ( TDirectory* )iDir->Get( "stereoParameterHistograms" );
-    if(!wDir )
+    if( !wDir )
     {
         iDir->mkdir( "stereoParameterHistograms" )->cd();
     }
@@ -480,7 +480,7 @@ void VOnOff::writeHistograms( TH2D* hSig, TH2D* hSigUC, TH2D* hDiff, TH2D* hDiff
     // write all energy histograms
     iDir->cd();
     wDir = ( TDirectory* )iDir->Get( "energyHistograms" );
-    if(!wDir )
+    if( !wDir )
     {
         iDir->mkdir( "energyHistograms" )->cd();
     }
@@ -496,7 +496,7 @@ void VOnOff::writeHistograms( TH2D* hSig, TH2D* hSigUC, TH2D* hDiff, TH2D* hDiff
     // write all random forest histograms
     iDir->cd();
     wDir = ( TDirectory* )iDir->Get( "randomForestHistograms" );
-    if(!wDir )
+    if( !wDir )
     {
         iDir->mkdir( "randomForestHistograms" )->cd();
     }
@@ -512,7 +512,7 @@ void VOnOff::writeHistograms( TH2D* hSig, TH2D* hSigUC, TH2D* hDiff, TH2D* hDiff
     // write all quality factor histograms
     iDir->cd();
     wDir = ( TDirectory* )iDir->Get( "qualityFactorHistograms" );
-    if(!wDir )
+    if( !wDir )
     {
         iDir->mkdir( "qualityFactorHistograms" )->cd();
     }
@@ -541,7 +541,7 @@ void VOnOff::fill1DSignificanceHistogram( double rmax )
     h1Dsig->SetYTitle( "entries" );
     hList->Add( h1Dsig );
 
-    if(!hmap_stereo_sig )
+    if( !hmap_stereo_sig )
     {
         return;
     }

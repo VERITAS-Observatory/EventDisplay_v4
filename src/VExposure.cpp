@@ -136,21 +136,21 @@ unsigned int VExposure::getLaserDate( unsigned int iRunNumber )
     iTempS = getDBServer() + "/VERITAS";
 
     VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         cout << "error connecting to db" << endl;
         return -1;
     }
     char c_query[1000];
     sprintf( c_query, "select * from tblRun_Info where run_id = %d", iRunNumber );
-    if(!my_connection.make_query( c_query ) )
+    if( !my_connection.make_query( c_query ) )
     {
         return -1;
     }
     TSQLResult* db_res = my_connection.Get_QueryResult();
     string itemp;
     TSQLRow* db_row = db_res->Next();
-    if(!db_row )
+    if( !db_row )
     {
         return -1;
     }
@@ -173,7 +173,7 @@ bool VExposure::readFromDB()
 
     //std::cout<<"VExposure::readFromDB() "<<std::endl;
     VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         cout << "error connecting to db" << endl;
         return false;
@@ -181,7 +181,7 @@ bool VExposure::readFromDB()
     cout << "reading from " << iTempS << endl;
     char c_query[1000];
 
-    if(!fMakeRunList )
+    if( !fMakeRunList )
     {
         sprintf( c_query, "select * from tblRun_Info where db_start_time >= \"%s.000000\"  and db_start_time < \"%s.160000\"", fStartDate_SQL.c_str(), fStopDate_SQL.c_str() );
     }
@@ -191,7 +191,7 @@ bool VExposure::readFromDB()
     }
     cout << c_query << endl;
 
-    if(!my_connection.make_query( c_query ) )
+    if( !my_connection.make_query( c_query ) )
     {
         cout << "Returning false!" << endl;
         return false;
@@ -206,13 +206,13 @@ bool VExposure::readFromDB()
     for( int j = 0; j < fNRows; j++ )
     {
         TSQLRow* db_row = db_res->Next();
-        if(!db_row )
+        if( !db_row )
         {
             break;
         }
 
         // all fields should be defined (check if field #19 is there)
-        if(!db_row->GetField( 19 ) )
+        if( !db_row->GetField( 19 ) )
         {
             continue;
         }
@@ -223,7 +223,7 @@ bool VExposure::readFromDB()
             continue;
         }
 
-        if(!db_row->GetField( 1 ) )
+        if( !db_row->GetField( 1 ) )
         {
             continue;
         }
@@ -248,7 +248,7 @@ bool VExposure::readFromDB()
         fRunObsMode.push_back( itemp );
 
         // get run status
-        if(!db_row->GetField( 3 ) )
+        if( !db_row->GetField( 3 ) )
         {
             continue;
         }
@@ -299,7 +299,7 @@ bool VExposure::readFromDB()
         double iRa = 0.;
         double iDec = 0.;
         itemp = db_row->GetField( 19 );
-        if(!getDBSourceCoordinates( my_connection.Get_ConnectionResult(), itemp, iDec, iRa ) )
+        if( !getDBSourceCoordinates( my_connection.Get_ConnectionResult(), itemp, iDec, iRa ) )
         {
             cout << "No coordinates available: " << db_row->GetField( 0 ) << " " << itemp << endl;
             continue;
@@ -338,18 +338,18 @@ bool VExposure::readFromDB()
         double iTime1 = 0.;
         double iTime2 = 0.;
 
-        if(!db_row->GetField( 6 ) )
+        if( !db_row->GetField( 6 ) )
         {
             continue;
         }
         itemp = db_row->GetField( 6 );
         getDBMJDTime( itemp, iMJD, iTime1, true );
-        fRunStartMJD.push_back(( double )iMJD + iTime1 / 86400 );
+        fRunStartMJD.push_back( ( double )iMJD + iTime1 / 86400 );
         if( fDebug )
         {
             cout << "T1 " << iMJD << " " << iTime1 << " ";
         }
-        if(!db_row->GetField( 7 ) )
+        if( !db_row->GetField( 7 ) )
         {
             continue;
         }
@@ -363,7 +363,7 @@ bool VExposure::readFromDB()
         {
             cout << "T2 " << iMJD << " " << iTime2 << " ";
         }
-        fRunStopMJD.push_back(( double )iMJD + iTime2 / 86400 );
+        fRunStopMJD.push_back( ( double )iMJD + iTime2 / 86400 );
         fRunDuration.push_back( iTime2 - iTime1 );
         fRunDate.push_back( fDataStartTime );
 
@@ -396,8 +396,8 @@ bool VExposure::readFromDB()
         {
             angl = atof( db_row->GetField( 18 ) );
         }
-        fWobbleNorth = dist * cos( angl* TMath::DegToRad() );
-        fWobbleEast  = dist * sin( angl* TMath::DegToRad() );
+        fWobbleNorth = dist * cos( angl * TMath::DegToRad() );
+        fWobbleEast  = dist * sin( angl * TMath::DegToRad() );
         if( TMath::Abs( fWobbleNorth ) < 1.e-15 )
         {
             fWobbleNorth = 0.;
@@ -417,7 +417,7 @@ bool VExposure::readFromDB()
         double iSid = 0.;
         double az, el;
         // get Greenwich sideral time
-        iSid = VAstronometry::vlaGmsta(( double )iMJD, ( iTime1 + iTime2 ) / 2. / 86400. );
+        iSid = VAstronometry::vlaGmsta( ( double )iMJD, ( iTime1 + iTime2 ) / 2. / 86400. );
         // calculate local sideral time
         iSid = iSid - VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad();
         // calculate hour angle
@@ -451,7 +451,7 @@ bool VExposure::readFromDBList()
     iTempS = getDBServer() + "/VERITAS";
 
     VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         cout << "error connecting to db 2 " << iTempS << endl;
         return false;
@@ -465,7 +465,7 @@ bool VExposure::readFromDBList()
 
         sprintf( c_query, "select * from tblRun_Info where run_id=%d", fRunDownloadList[i] );
 
-        if(!my_connection.make_query( c_query ) )
+        if( !my_connection.make_query( c_query ) )
         {
             cout << "VExposure::readFromDBList() error: could not connect to DB." << endl;
             return false;
@@ -476,14 +476,14 @@ bool VExposure::readFromDBList()
 
         TSQLRow* db_row = db_res->Next();
 
-        if(!db_row )
+        if( !db_row )
         {
             break;
         }
 
         //////
         // all fields should be defined (check if field #19 is there)
-        if(!db_row->GetField( 19 ) )
+        if( !db_row->GetField( 19 ) )
         {
             continue;
         }
@@ -493,7 +493,7 @@ bool VExposure::readFromDBList()
 
         //////
         // check if this run is an observing run
-        if(!db_row->GetField( 1 ) )
+        if( !db_row->GetField( 1 ) )
         {
             continue;
         }
@@ -502,7 +502,7 @@ bool VExposure::readFromDBList()
 
         //////
         // get run status
-        if(!db_row->GetField( 3 ) )
+        if( !db_row->GetField( 3 ) )
         {
             continue;
         }
@@ -544,7 +544,7 @@ bool VExposure::readFromDBList()
         double iRa = 0.;
         double iDec = 0.;
         itemp = db_row->GetField( 19 );
-        if(!getDBSourceCoordinates( my_connection.Get_ConnectionResult(), itemp, iDec, iRa ) )
+        if( !getDBSourceCoordinates( my_connection.Get_ConnectionResult(), itemp, iDec, iRa ) )
         {
             cout << "No coordinates available: " << db_row->GetField( 0 ) << " " << itemp << endl;
             continue;
@@ -578,8 +578,8 @@ bool VExposure::readFromDBList()
         {
             angl = atof( db_row->GetField( 18 ) );
         }
-        fWobbleNorth = dist * cos( angl* TMath::DegToRad() );
-        fWobbleEast  = dist * sin( angl* TMath::DegToRad() );
+        fWobbleNorth = dist * cos( angl * TMath::DegToRad() );
+        fWobbleEast  = dist * sin( angl * TMath::DegToRad() );
         if( TMath::Abs( fWobbleNorth ) < 1.e-15 )
         {
             fWobbleNorth = 0.;
@@ -617,18 +617,18 @@ bool VExposure::readFromDBList()
         double iTime1 = 0.;
         double iTime2 = 0.;
 
-        if(!db_row->GetField( 6 ) )
+        if( !db_row->GetField( 6 ) )
         {
             continue;
         }
         itemp = db_row->GetField( 6 );
         getDBMJDTime( itemp, iMJD, iTime1, true );
-        fRunStartMJD.push_back(( double )iMJD + iTime1 / 86400 );
+        fRunStartMJD.push_back( ( double )iMJD + iTime1 / 86400 );
         if( fDebug )
         {
             cout << "T1 " << iMJD << " " << iTime1 << " ";
         }
-        if(!db_row->GetField( 7 ) )
+        if( !db_row->GetField( 7 ) )
         {
             continue;
         }
@@ -642,7 +642,7 @@ bool VExposure::readFromDBList()
         {
             cout << "T2 " << iMJD << " " << iTime2 << " ";
         }
-        fRunStopMJD.push_back(( double )iMJD + iTime2 / 86400 );
+        fRunStopMJD.push_back( ( double )iMJD + iTime2 / 86400 );
         fRunDuration.push_back( iTime2 - iTime1 );
         fRunDate.push_back( fDataStartTime );
 
@@ -668,7 +668,7 @@ bool VExposure::readFromDBList()
         double iSid = 0.;
         double az, el;
         // get Greenwich sideral time
-        iSid = VAstronometry::vlaGmsta(( double )iMJD, ( iTime1 + iTime2 ) / 2. / 86400. );
+        iSid = VAstronometry::vlaGmsta( ( double )iMJD, ( iTime1 + iTime2 ) / 2. / 86400. );
         // calculate local sideral time
         iSid = iSid - VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad();
         // calculate hour angle
@@ -743,7 +743,7 @@ bool VExposure::readRootFile( string iRFile, double iMinMJD, double iMaxMJD )
     double az = 0.;
 
     TTree* t = ( TTree* )f.Get( "fRunTable" );
-    if(!t )
+    if( !t )
     {
         return false;
     }
@@ -939,7 +939,7 @@ void VExposure::fillElevationPlot( int iYear, int iMonth, int ze_max_deg )
                 for( int a = 0; a < 360; a++ )
                 {
                     VSkyCoordinatesUtilities::getEquatorialCoordinates( imjd, time, ( double )a, ( double )z, dec, ra );
-                    VAstronometry::vlaEqgal( ra* TMath::DegToRad(), dec* TMath::DegToRad(), &l, &b );
+                    VAstronometry::vlaEqgal( ra * TMath::DegToRad(), dec * TMath::DegToRad(), &l, &b );
 
                     l *= TMath::RadToDeg();
                     if( l > 180 )
@@ -948,7 +948,7 @@ void VExposure::fillElevationPlot( int iYear, int iMonth, int ze_max_deg )
                     }
                     b *= TMath::RadToDeg();
 
-                    int i_l = fMapGal2D->GetXaxis()->FindBin(-1.*l );
+                    int i_l = fMapGal2D->GetXaxis()->FindBin( -1.*l );
                     int i_b = fMapGal2D->GetYaxis()->FindBin( b );
                     if( 90. - ( double )z > fMapGal2D->GetBinContent( i_l, i_b ) )
                     {
@@ -975,7 +975,7 @@ void VExposure::fillElevationPlot( int iYear, int iMonth, int ze_max_deg )
         {
             xb = fMapGal2D->GetYaxis()->GetBinCenter( j );
 
-            aitoff2xy(-1.*xl, xb, al, ab );
+            aitoff2xy( -1.*xl, xb, al, ab );
 
             bl = fMapGal2D_aitoff->GetXaxis()->FindBin( al );
             bb = fMapGal2D_aitoff->GetYaxis()->FindBin( ab );
@@ -1034,7 +1034,7 @@ void VExposure::fillExposureMap()
             int i_r_l = 1;
             if( cos( b_pos * TMath::Pi() / 180. ) > 0. )
             {
-                i_r_l = ( int )( fMaximumIntegrationRadius / cos( b_pos* TMath::Pi() / 180. ) / fMapGal2D->GetXaxis()->GetBinWidth( 2 ) + 0.5 );
+                i_r_l = ( int )( fMaximumIntegrationRadius / cos( b_pos * TMath::Pi() / 180. ) / fMapGal2D->GetXaxis()->GetBinWidth( 2 ) + 0.5 );
             }
             else
             {
@@ -1055,7 +1055,7 @@ void VExposure::fillExposureMap()
             {
                 double l_pos = fMapGal2D->GetXaxis()->GetBinCenter( l );
 
-                r_dist = VAstronometry::vlaDsep( l_pos* TMath::Pi() / 180., b_pos* TMath::Pi() / 180., fRunGalLong1958[i] * TMath::Pi() / 180.,
+                r_dist = VAstronometry::vlaDsep( l_pos * TMath::Pi() / 180., b_pos * TMath::Pi() / 180., fRunGalLong1958[i] * TMath::Pi() / 180.,
                                                  fRunGalLat1958[i] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
                 if( r_dist < fMaximumIntegrationRadius && fRunDuration[i] > 0. )
                 {
@@ -1085,7 +1085,7 @@ void VExposure::fillExposureMap()
         {
             xb = fMapGal2D->GetYaxis()->GetBinCenter( j );
 
-            aitoff2xy(-1.*xl, xb, al, ab );
+            aitoff2xy( -1.*xl, xb, al, ab );
 
             bl = fMapGal2D_aitoff->GetXaxis()->FindBin( al );
             bb = fMapGal2D_aitoff->GetYaxis()->FindBin( ab );
@@ -1109,9 +1109,9 @@ TCanvas* VExposure::plot( double ilmin, double ilmax, double ibmin, double ibmax
     if( fAcceptance )
     {
         fPlottingCanvas.push_back( plot2DGalactic( "cAccGal", "Acceptance corrected exposure", 650, 10, 600, 400,
-                                   fRadAccMapGal2D, ibmin, ibmax, ilmin, ilmax, false, iPalette ) );
+                fRadAccMapGal2D, ibmin, ibmax, ilmin, ilmax, false, iPalette ) );
         fPlottingCanvas.push_back( plot2DGalactic( "cAccGal_aitoff", "Acceptance corrected exposure (aitoff)", 650, 450, 600, 400,
-                                   fRadAccMapGal2D_aitoff, ibmin, ibmax, ilmin, ilmax, true, iPalette ) );
+                fRadAccMapGal2D_aitoff, ibmin, ibmax, ilmin, ilmax, true, iPalette ) );
     }
 
     if( iReturnCanvas < fPlottingCanvas.size() )
@@ -1130,7 +1130,7 @@ TCanvas* VExposure::plot( double ilmin, double ilmax, double ibmin, double ibmax
  */
 void VExposure::plot_HESSSkySurvey( TCanvas* c )
 {
-    if(!c )
+    if( !c )
     {
         return;
     }
@@ -1138,7 +1138,7 @@ void VExposure::plot_HESSSkySurvey( TCanvas* c )
     c->cd();
 
     // first phase
-    TBox* ib1 = new TBox(-30., -3., 30., 3 );
+    TBox* ib1 = new TBox( -30., -3., 30., 3 );
     ib1->SetFillStyle( 0 );
     ib1->SetLineColor( 14 );
     ib1->SetLineStyle( 2 );
@@ -1148,7 +1148,7 @@ void VExposure::plot_HESSSkySurvey( TCanvas* c )
     ib2->SetLineColor( 14 );
     ib2->SetLineStyle( 2 );
     ib2->Draw();
-    TBox* ib3 = new TBox(-60., -3., -30., 3 );
+    TBox* ib3 = new TBox( -60., -3., -30., 3 );
     ib3->SetFillStyle( 0 );
     ib3->SetLineColor( 14 );
     ib3->SetLineStyle( 2 );
@@ -1159,7 +1159,7 @@ void VExposure::plot_HESSSkySurvey( TCanvas* c )
 TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy, int iwx, int iwy, TH2* h,
                                     double ibmin, double ibmax, double ilmin, double ilmax, bool bAitoff, int iPalette )
 {
-    if(!h )
+    if( !h )
     {
         return 0;
     }
@@ -1173,7 +1173,7 @@ TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy,
 
     // set axis ranges of galactic map
     h->SetAxisRange( ibmin, ibmax, "Y" );
-    h->SetAxisRange(-1.*ilmax, -1.*ilmin, "X" );
+    h->SetAxisRange( -1.*ilmax, -1.*ilmin, "X" );
 
     if( bPlotElevationPlots )
     {
@@ -1273,9 +1273,9 @@ void VExposure::drawAitoffCoordinateSystem()
         for( int i = 0; i < M + 1; ++i )
         {
             lo = -180. + 360. / M * i;
-            z  = sqrt( 1 + cos( la* radeg ) * cos( lo* radeg / 2. ) );
-            x  = 180.*cos( la* radeg ) * sin( lo* radeg / 2. ) / z;
-            y  = 90.*sin( la* radeg ) / z;
+            z  = sqrt( 1 + cos( la * radeg ) * cos( lo * radeg / 2. ) );
+            x  = 180.*cos( la * radeg ) * sin( lo * radeg / 2. ) / z;
+            y  = 90.*sin( la * radeg ) / z;
             latitudes[j]->SetPoint( i, x, y );
         }
     }
@@ -1291,9 +1291,9 @@ void VExposure::drawAitoffCoordinateSystem()
         for( int i = 0; i < M + 1; ++i )
         {
             la = -90. + 180. / M * i;
-            z  = sqrt( 1 + cos( la* radeg ) * cos( lo* radeg / 2. ) );
-            x  = 180.*cos( la* radeg ) * sin( lo* radeg / 2. ) / z;
-            y  = 90.*sin( la* radeg ) / z;
+            z  = sqrt( 1 + cos( la * radeg ) * cos( lo * radeg / 2. ) );
+            x  = 180.*cos( la * radeg ) * sin( lo * radeg / 2. ) / z;
+            y  = 90.*sin( la * radeg ) / z;
             longitudes[j]->SetPoint( i, x, y );
         }
     }
@@ -1324,7 +1324,7 @@ void VExposure::plotVTSObjects( bool bAitoff, double ibmin, double ibmax, double
             dec = fRunDec[i];
             VAstronometry::vlaEqgal( ra / 180. * TMath::Pi(), dec / 180. * TMath::Pi(), &l, &b );
 
-            plotObject( l* TMath::RadToDeg(), b* TMath::RadToDeg(), fRunSourceID[i], 0.,
+            plotObject( l * TMath::RadToDeg(), b * TMath::RadToDeg(), fRunSourceID[i], 0.,
                         ibmin, ibmax, ilmin, ilmax, h,
                         bAitoff, iMarkerStyle, iMarkerColor, iTextAngle );
         }
@@ -1426,13 +1426,13 @@ void VExposure::plotObject( double l, double b, string l_name, double iExtension
             {
                 if( bAitoff )
                 {
-                    al = al + il_range * 0.01 * ( cos( iTextAngle* TMath::DegToRad() ) + sin( iTextAngle* TMath::DegToRad() ) );
-                    ab = ab + ib_range * 0.01 * (-1.*sin( iTextAngle* TMath::DegToRad() ) + cos( iTextAngle* TMath::DegToRad() ) );
+                    al = al + il_range * 0.01 * ( cos( iTextAngle * TMath::DegToRad() ) + sin( iTextAngle * TMath::DegToRad() ) );
+                    ab = ab + ib_range * 0.01 * ( -1.*sin( iTextAngle * TMath::DegToRad() ) + cos( iTextAngle * TMath::DegToRad() ) );
                 }
                 else
                 {
-                    al = -1.*l + il_range * 0.01 * ( cos( iTextAngle* TMath::DegToRad() ) + sin( iTextAngle* TMath::DegToRad() ) );
-                    ab = b + ib_range * 0.01 * (-1.*sin( iTextAngle* TMath::DegToRad() ) + cos( iTextAngle* TMath::DegToRad() ) );
+                    al = -1.*l + il_range * 0.01 * ( cos( iTextAngle * TMath::DegToRad() ) + sin( iTextAngle * TMath::DegToRad() ) );
+                    ab = b + ib_range * 0.01 * ( -1.*sin( iTextAngle * TMath::DegToRad() ) + cos( iTextAngle * TMath::DegToRad() ) );
                 }
                 TText* t = new TText( al, ab, l_name.c_str() );
                 t->SetTextColor( iMarkerColor );
@@ -1470,7 +1470,7 @@ void VExposure::getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip 
     h = atoi( itemp.substr( 8, 2 ).c_str() );
     min = atoi( itemp.substr( 10, 2 ).c_str() );
     s = atoi( itemp.substr( 12, 2 ).c_str() );
-    if(!bStrip )
+    if( !bStrip )
     {
         ms = atoi( itemp.substr( 14, 3 ).c_str() );
     }
@@ -1487,15 +1487,15 @@ void VExposure::getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip 
 
 bool VExposure::getDBSourceCoordinates( TSQLServer* f_db, string iSource, double& iEVNTargetDec, double& iEVNTargetRA )
 {
-    if(!f_db )
+    if( !f_db )
     {
         return false;
     }
 
-    if(!fVDB_ObservingSources )
+    if( !fVDB_ObservingSources )
     {
         fVDB_ObservingSources = new VDB_ObservingSources();
-        if(!fVDB_ObservingSources->fill( f_db ) )
+        if( !fVDB_ObservingSources->fill( f_db ) )
         {
             return false;
         }
@@ -1552,7 +1552,7 @@ bool VExposure::readAcceptanceCurveFromFile( string iFile, double iAcceptance_Ma
 
     fAcceptance = ( TF1* )fAcceptanceFile->Get( "fAccZe_0" );
 
-    if(!fAcceptance )
+    if( !fAcceptance )
     {
         cout << "Warning: acceptance curve not found in file: " << iFile << endl;
         return false;
@@ -1722,7 +1722,7 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
             r_centre = VAstronometry::vlaDsep( s->getStarRA2000( i ) * TMath::Pi() / 180., s->getStarDec2000( i ) * TMath::Pi() / 180.,
                                                ( fRunRA[j] + fRunoffsetRA[j] ) * TMath::Pi() / 180., ( fRunDec[j] + fRunoffsetDec[j] ) * TMath::Pi() / 180. ) * 180. / TMath::Pi();
             // do dqm
-            if(!doDQM( j, iMinDuration ) )
+            if( !doDQM( j, iMinDuration ) )
             {
                 continue;
             }
@@ -1809,7 +1809,7 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
             int z = 0;
             for( it_set = iVERITAS_targets.begin(); it_set != iVERITAS_targets.end(); it_set++ )
             {
-                string a = VUtilities::search_and_replace(*it_set, "_", " " );
+                string a = VUtilities::search_and_replace( *it_set, "_", " " );
                 if( iVERITAS_targets.size() == 1 )
                 {
                     sprintf( iTexTable, "%s %s  ", iTexTable, a.c_str() );
@@ -1963,7 +1963,7 @@ void VExposure::printListOfRuns( double il, double ib, double iR, double iMinDur
     {
         ifstream is;
         is.open( iDQMfileList.c_str(), ifstream::in );
-        if(!is )
+        if( !is )
         {
             cout << "DQM file list not found: " << iDQMfileList << endl;
             return;
@@ -1982,7 +1982,7 @@ void VExposure::printListOfRuns( double il, double ib, double iR, double iMinDur
     if( ofile.size() > 0 )
     {
         os.open( ofile.c_str() );
-        if(!os )
+        if( !os )
         {
             cout << "Error writing list of runs to " << ofile << endl;
             return;
@@ -1999,7 +1999,7 @@ void VExposure::printListOfRuns( double il, double ib, double iR, double iMinDur
     }
     for( unsigned int i = 0; i < fRunGalLong1958.size(); i++ )
     {
-        r_dist = VAstronometry::vlaDsep( il* TMath::Pi() / 180., ib* TMath::Pi() / 180., fRunGalLong1958[i] * TMath::Pi() / 180., fRunGalLat1958[i] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
+        r_dist = VAstronometry::vlaDsep( il * TMath::Pi() / 180., ib * TMath::Pi() / 180., fRunGalLong1958[i] * TMath::Pi() / 180., fRunGalLat1958[i] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
 
         if( r_dist < iR && fRunDuration[i] > iMinDuration )
         {
@@ -2017,7 +2017,7 @@ void VExposure::printListOfRuns( double il, double ib, double iR, double iMinDur
             {
                 bPassed = true;
             }
-            if(!bPassed )
+            if( !bPassed )
             {
                 if( iVerbose > 0 && i_vDQMList.size() > 0 )
                 {
@@ -2072,7 +2072,7 @@ void VExposure::aitoff2xy( Double_t l, Double_t b, Double_t& Al, Double_t& Ab )
     Double_t r2     = TMath::Sqrt( 2. );
     Double_t f      = 2 * r2 / TMath::Pi();
     Double_t cdec   = TMath::Cos( delta );
-    Double_t denom  = TMath::Sqrt( 1. + cdec* TMath::Cos( alpha2 ) );
+    Double_t denom  = TMath::Sqrt( 1. + cdec * TMath::Cos( alpha2 ) );
     x      = cdec * TMath::Sin( alpha2 ) * 2.*r2 / denom;
     y      = TMath::Sin( delta ) * r2 / denom;
     x     *= TMath::RadToDeg() / f;
@@ -2092,7 +2092,7 @@ void VExposure::plotMarker( double l, double b, double r, string iText, int iMar
 
     for( unsigned int i = 0; i < fPlottingCanvas.size(); i++ )
     {
-        if(!fPlottingCanvas[i] )
+        if( !fPlottingCanvas[i] )
         {
             continue;
         }
@@ -2462,7 +2462,7 @@ void VExposure::downloadRunList()
         else
         {
             ifstream paths( filepath );
-            if(!paths.is_open() )
+            if( !paths.is_open() )
             {
                 sprintf( mkdir_string, "mkdir %s", filepath );
                 cout << "COMMAND: " << mkdir_string << endl;
@@ -2513,7 +2513,7 @@ void VExposure::downloadRunList()
             else
             {
                 ifstream paths( filepath );
-                if(!paths.is_open() )
+                if( !paths.is_open() )
                 {
                     sprintf( mkdir_string, "mkdir %s", filepath );
                     cout << "COMMAND: " << mkdir_string << endl;
@@ -2526,7 +2526,7 @@ void VExposure::downloadRunList()
                 {
                     cout << "ERROR: \"which bbftp\" shows no match. Install bbftp and add to you $PATH." << endl;
                     cout << "exiting ...." << endl;
-                    exit(-1 );
+                    exit( -1 );
                 }
                 // Then Download
                 sprintf( dl_string, "bbftp -V -S -p 12 -u bbftp -e \"get /veritas/data/d%d/%d.cvbf %s/data/d%d/%d.cvbf\" %s", fLaserDownloadDate[i], fLaserDownload[i],
@@ -2555,7 +2555,7 @@ void VExposure::downloadRunList()
 int VExposure::checkMD5sum( int date, int run, bool force_download )
 {
 
-    if(!fDoCheckSums )
+    if( !fDoCheckSums )
     {
         return 0;
     }
@@ -2590,7 +2590,7 @@ int VExposure::checkMD5sum( int date, int run, bool force_download )
 
 void VExposure::printChecksumSummary()
 {
-    if(!fDoCheckSums )
+    if( !fDoCheckSums )
     {
         return;
     }
@@ -2671,7 +2671,7 @@ TString VExposure::getArchiveMD5sum( int date, int run, bool force_download )
 
     TString checksum = "";
     //attempt to find checksum on disk
-    if(!force_download )
+    if( !force_download )
     {
         if( use_new_ucla_sumfile )
         {
@@ -2749,7 +2749,7 @@ TString VExposure::readMD5sumFromFile( TString filename, int run, bool warn )
     TString search = TString::Format( "%d.cvbf", run );
     TString checksum = "";
 
-    if(! intemp.is_open() )
+    if( ! intemp.is_open() )
     {
         if( warn )
         {
@@ -2803,7 +2803,7 @@ TString VExposure::calcMD5sum( int date, int run )
 
     //check if input file exists
     ifstream itemp( datafilename.Data() );
-    if(! itemp.good() )
+    if( ! itemp.good() )
     {
         itemp.close();
         cout << "VExposure::calcMD5sum Error: File " << datafilename.Data() << " not available. "  << endl;
@@ -2868,11 +2868,11 @@ vector< unsigned int > VExposure::getLaserRun( string iDBserver, unsigned int iR
 
     //std::cout<<"VExposure::getLaserRun "<<std::endl;
     VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         return fLaserRunID;
     }
-    if(!my_connection.make_query( c_query ) )
+    if( !my_connection.make_query( c_query ) )
     {
         return fLaserRunID;
     }
@@ -2885,7 +2885,7 @@ vector< unsigned int > VExposure::getLaserRun( string iDBserver, unsigned int iR
     {
         while( TSQLRow* db_row = db_res->Next() )
         {
-            if(!db_row )
+            if( !db_row )
             {
                 cout << "VDBRunInfo: failed reading a row from DB for run " << iRunNumber << endl;
                 //              fDBStatus = false;
@@ -2910,7 +2910,7 @@ vector< unsigned int > VExposure::getLaserRun( string iDBserver, unsigned int iR
         for( unsigned int i = 0; i < iLaserList.size(); i++ )
         {
             bitset< 8 > ibit( iLaserExclude[i] );
-            if(!ibit.test( t ) )
+            if( !ibit.test( t ) )
             {
                 fLaserRunID[t] = iLaserList[i];
             }
@@ -2940,10 +2940,10 @@ void VExposure::readRunListFromFile( string runlist )
     ifstream inputfile;
     inputfile.open( runlist.c_str() );
 
-    if(!inputfile )
+    if( !inputfile )
     {
         cout << "ERROR: Input runlist not found: " << runlist << endl;
-        exit(-1 );
+        exit( -1 );
     }
 
     while( getline( inputfile, is_line ) )
@@ -2963,7 +2963,7 @@ void VExposure::readRunCommentsFromDB()
 
     //std::cout<<"VExposure::readRunCommentsFromDB "<<std::endl;
     VDB_Connection my_connection( iTempS.str().c_str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         return;
     }
@@ -2974,7 +2974,7 @@ void VExposure::readRunCommentsFromDB()
     {
 
         sprintf( c_query, "SELECT run_id , data_category   , status   , status_reason , tel_cut_mask , usable_duration , time_cut_mask , light_level , vpm_config_mask , authors  , comment from tblRun_Analysis_Comments where run_id=%d", fRun[i] );
-        if(!my_connection.make_query( c_query ) )
+        if( !my_connection.make_query( c_query ) )
         {
             return;
         }
@@ -2982,7 +2982,7 @@ void VExposure::readRunCommentsFromDB()
 
 
         TSQLRow* db_row = db_res->Next();
-        if(!db_row )
+        if( !db_row )
         {
             if( fRun[i] > 46905 )
             {
@@ -3110,10 +3110,10 @@ void VExposure::readLaserRunListFromFile( string runlist )
     ifstream inputfile;
     inputfile.open( runlist.c_str() );
 
-    if(!inputfile )
+    if( !inputfile )
     {
         cout << "ERROR: Input LASER runlist not found: " << runlist << endl;
-        exit(-1 );
+        exit( -1 );
     }
 
     while( getline( inputfile, is_line ) )
@@ -3133,10 +3133,10 @@ void VExposure::readLaserRunDateListFromFile( string runlist )
     ifstream inputfile;
     inputfile.open( runlist.c_str() );
 
-    if(!inputfile )
+    if( !inputfile )
     {
         cout << "ERROR: Input LASER runlist not found: " << runlist << endl;
-        exit(-1 );
+        exit( -1 );
     }
 
     int run = -1;
@@ -3145,7 +3145,7 @@ void VExposure::readLaserRunDateListFromFile( string runlist )
     while( 1 )
     {
         inputfile >> run >> date_run ;
-        if(!inputfile.good() )
+        if( !inputfile.good() )
         {
             break;
         }

@@ -189,7 +189,7 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
 
 bool VDetectorTree::readDetectorTree( VDetectorGeometry* iDet, TTree* iTree )
 {
-    if(!iDet || !iTree )
+    if( !iDet || !iTree )
     {
         return false;
     }

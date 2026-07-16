@@ -159,12 +159,12 @@ void VAstronometry::vlaPreces( double MJD_ep0, double MJD_ep1, double* ra, doubl
     double e2[3];
 
     // Convert spherical coordinates to Cartesian
-    iauS2c(*ra, *dc, e1 );
+    iauS2c( *ra, *dc, e1 );
     // apply precession matrix
     iauRxp( rot_prec, e1, e2 );
     // P-vector to spherical coordinates
     iauC2s( e2, ra, dc );
-    *ra = iauAnp(*ra );
+    *ra = iauAnp( *ra );
 #endif
 }
 
@@ -384,7 +384,7 @@ void VAstronometry::test_vlaDsep()
 void VAstronometry::test_vlaDtp2s()
 {
     double ra, dec;
-    VAstronometry::vlaDtp2s(-0.03, 0.07, 2.3, 1.5, &ra, &dec );
+    VAstronometry::vlaDtp2s( -0.03, 0.07, 2.3, 1.5, &ra, &dec );
     cout << "VAstronometry::vlaDtp2s " << getAstronometryLibrary();
     cout << setprecision( 16 ) << " (" << 0.7596127167359629775 * DR2D << ", " << 1.540864645109263028 * DR2D << ") \t\t";
     cout << ra* DR2D << ", " << dec* DR2D << endl;

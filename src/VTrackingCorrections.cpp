@@ -25,7 +25,7 @@ bool VTrackingCorrections::readTrackingCorrectionsFromDB( string iSQLDate )
 
     //std::cout<<"VTrackingCorrections::readTrackingCorrectionsFromDB "<<std::endl;
     VDB_Connection my_connection( iTemp.c_str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         cout << "VTrackingCorrections: failed to connect to database server" << endl;
         fStatus = false;
@@ -35,7 +35,7 @@ bool VTrackingCorrections::readTrackingCorrectionsFromDB( string iSQLDate )
 
     sprintf( c_query, "select * from tblPositioner_Telescope%d_Corrections where db_start_time <= \"%s\" ", fTelID, iSQLDate.c_str() );
 
-    if(!my_connection.make_query( c_query ) )
+    if( !my_connection.make_query( c_query ) )
     {
         cout << "VTrackingCorrections: failed to find correct tables" << endl;
         cout << "\t" << c_query << endl;

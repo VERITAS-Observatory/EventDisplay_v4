@@ -143,7 +143,7 @@ class VLikelihoodFitter : public VEnergySpectrum
         {
             // Making sure minimum energy is less than the maximum energy
             // Otherwise defaulting to the VEnergySpectrum default values
-            if(( i_min >= i_max ) || ( i_min < 0 ) || ( i_max < 0 ) )
+            if( ( i_min >= i_max ) || ( i_min < 0 ) || ( i_max < 0 ) )
             {
                 cout << "VLikelihoodFitter::setEnergyFitMinMaxLinear Error invalid energy range \n"
                      << "\t\tFit min (" << i_min << "), fit max (" << i_max << ")\n"
@@ -200,7 +200,7 @@ class VLikelihoodFitter : public VEnergySpectrum
         {
 
             // Checking if index is in the range
-            if(( i < 0 ) || ( i >= ( int )fRunList.size() ) )
+            if( ( i < 0 ) || ( i >= ( int )fRunList.size() ) )
             {
                 cout << "VLikelihoodFitter::getResponseMatrix Error index out of range [0-" << fRunList.size() << "]" <<  endl;
                 return 0;
@@ -300,7 +300,7 @@ class VLikelihoodFitter : public VEnergySpectrum
         // Return the confidince interval
         TGraphAsymmErrors* getConfidenceInterval()
         {
-            if(!fConfidenceInterval )
+            if( !fConfidenceInterval )
             {
                 cout << "VLikeLihoodFitter::getConfidenceInterval Error Confidence interval not found... Have you called getLikelihoodFit?" << endl;
                 return 0;

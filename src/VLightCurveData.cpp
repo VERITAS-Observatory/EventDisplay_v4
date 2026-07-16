@@ -103,7 +103,7 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
     fFluxCalculation.setFluxCalculationMethod( i_bRolke );
     fFluxCalculation.setTimeBinnedAnalysis( false );
     fFluxCalculation.setDebug( false );
-    fFluxCalculation.setSignificanceParameters(-999., -999. );
+    fFluxCalculation.setSignificanceParameters( -999., -999. );
     fFluxCalculation.setSignificanceParameters( iThresholdSignificance, iMinEvents, iUpperLimit, iUpperlimitMethod, iLiMaEqu );
     if( fEnergy_max_TeV > 0. )
     {
@@ -139,28 +139,28 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
     fFluxCalculation.calculateIntegralFlux( fEnergy_min_TeV );
 
     fRunList  = fFluxCalculation.getRunList();
-    fNon      = fFluxCalculation.getNOn(-1 );
-    fNoff     = fFluxCalculation.getNOff(-1 );
-    fNoffAlpha = fFluxCalculation.getAlpha(-1 );
-    fRunTime  = fFluxCalculation.getRunTime(-1 );
-    fRunElevation = fFluxCalculation.getRunElevation(-1 );
-    fSignificance = fFluxCalculation.getSignificance(-1 );
+    fNon      = fFluxCalculation.getNOn( -1 );
+    fNoff     = fFluxCalculation.getNOff( -1 );
+    fNoffAlpha = fFluxCalculation.getAlpha( -1 );
+    fRunTime  = fFluxCalculation.getRunTime( -1 );
+    fRunElevation = fFluxCalculation.getRunElevation( -1 );
+    fSignificance = fFluxCalculation.getSignificance( -1 );
 
     //////////////////////////////////////
     // get fluxes and errors
     double iFluxError = 0;
     // 'traditional' method allowing for negative flux
-    if(!i_bRolke )
+    if( !i_bRolke )
     {
-        fFluxCalculation.getFlux(-1, fFlux, iFluxError, fUpperFluxLimit );
+        fFluxCalculation.getFlux( -1, fFlux, iFluxError, fUpperFluxLimit );
         setFluxError( iFluxError );
     }
     else
     {
-        fFluxCalculation.getBoundedFlux(-1, fFlux, fFluxErrorDown, fFluxErrorUp, fUpperFluxLimit );
+        fFluxCalculation.getBoundedFlux( -1, fFlux, fFluxErrorDown, fFluxErrorUp, fUpperFluxLimit );
     }
-    fFluxCalculation.getFluxConfidenceInterval(-1, fRunFluxCI_lo_1sigma, fRunFluxCI_up_1sigma, true );
-    fFluxCalculation.getFluxConfidenceInterval(-1, fRunFluxCI_lo_3sigma, fRunFluxCI_up_3sigma, false );
+    fFluxCalculation.getFluxConfidenceInterval( -1, fRunFluxCI_lo_1sigma, fRunFluxCI_up_1sigma, true );
+    fFluxCalculation.getFluxConfidenceInterval( -1, fRunFluxCI_lo_3sigma, fRunFluxCI_up_3sigma, false );
 
     if( fEnergy_max_TeV > 0. )
     {
@@ -168,11 +168,11 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
         double iFlux = 0.;
         double iFluxE = 0.;
         double iFluxUL = 0.;
-        fFluxCalculation.getFlux(-1, iFlux, iFluxE, iFluxUL );
+        fFluxCalculation.getFlux( -1, iFlux, iFluxE, iFluxUL );
         if( iFluxE > 0. )
         {
             fFlux -= iFlux;
-            setFluxError( sqrt( getFluxError()*getFluxError() + iFluxE* iFluxE ) );
+            setFluxError( sqrt( getFluxError()*getFluxError() + iFluxE * iFluxE ) );
         }
     }
 

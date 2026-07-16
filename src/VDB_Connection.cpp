@@ -46,7 +46,7 @@ bool VDB_Connection::Connect()
 
     // Test the connection
 
-    if(!f_db )
+    if( !f_db )
     {
         // connection failed
         cout << "VDB_Connection: info: failed to connect to database server, sleep for 10 and try again..." << endl;
@@ -54,7 +54,7 @@ bool VDB_Connection::Connect()
         // try again
         f_db = TSQLServer::Connect( fDBserver.c_str(), fconnection_mode.c_str(), fconnection_option.c_str() );
         // give up
-        if(!f_db )
+        if( !f_db )
         {
             cout << "VDB_Connection: failed to connect to database server" << endl;
             cout << "\t server: " << fDBserver  << endl;
@@ -87,7 +87,7 @@ bool VDB_Connection::make_query( const char* the_query )
 
     fDB_Query_successful = false;
 
-    if(!f_db )
+    if( !f_db )
     {
 
         return fDB_Query_successful;
@@ -98,7 +98,7 @@ bool VDB_Connection::make_query( const char* the_query )
 
         fdb_res = f_db->Query( the_query );
 
-        if(!fdb_res )
+        if( !fdb_res )
         {
             std::cout << "VDB_Connection::make_query no result for query:  " << the_query << std::endl;
             return fDB_Query_successful;

@@ -51,7 +51,7 @@ void VLibNovaSunAndMoon::getMoonElevationAzimuth( double& el, double& az )
     // get lunar position in equatorial coordinates
     ln_get_lunar_equ_coords( fJD, &equ );
     // transform to horizontal coordinates
-    ln_get_hrz_from_equ(&equ, &fObserver, fJD, &hrz );
+    ln_get_hrz_from_equ( &equ, &fObserver, fJD, &hrz );
 
     el = hrz.alt;
     az = hrz.az;
@@ -66,7 +66,7 @@ double VLibNovaSunAndMoon::getMoonElevation()
     // get lunar position in equatorial coordinates
     ln_get_lunar_equ_coords( fJD, &equ );
     // transform to horizontal coordinates
-    ln_get_hrz_from_equ(&equ, &fObserver, fJD, &hrz );
+    ln_get_hrz_from_equ( &equ, &fObserver, fJD, &hrz );
 
     return hrz.alt;
 }
@@ -79,7 +79,7 @@ double VLibNovaSunAndMoon::getMoonAzimuth()
     // get lunar position in equatorial coordinates
     ln_get_lunar_equ_coords( fJD, &equ );
     // transform to horizontal coordinates
-    ln_get_hrz_from_equ(&equ, &fObserver, fJD, &hrz );
+    ln_get_hrz_from_equ( &equ, &fObserver, fJD, &hrz );
 
     return hrz.az;
 }
@@ -94,7 +94,7 @@ void VLibNovaSunAndMoon::setDate( int year, int month, int day, int hour, int mi
     date.minutes = minute;
     date.seconds = second;
 
-    fJD = ln_get_julian_day(&date );
+    fJD = ln_get_julian_day( &date );
     cout << "Julian date: " << setprecision( 10 ) << fJD << endl;
 }
 
@@ -129,7 +129,7 @@ double VLibNovaSunAndMoon::getSunElevation()
     // get lunar position in equatorial coordinates
     ln_get_solar_equ_coords( fJD, &equ );
     // transform to horizontal coordinates
-    ln_get_hrz_from_equ(&equ, &fObserver, fJD, &hrz );
+    ln_get_hrz_from_equ( &equ, &fObserver, fJD, &hrz );
 
     return hrz.alt;
 }

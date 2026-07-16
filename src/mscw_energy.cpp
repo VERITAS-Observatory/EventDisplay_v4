@@ -76,7 +76,7 @@ int main( int argc, char* argv[] )
     cout << "--------------------------------------------------------------------------" << endl;
     cout << endl;
 
-    if(!fTLRunParameter->fillParameters( argc, argv ) )
+    if( !fTLRunParameter->fillParameters( argc, argv ) )
     {
         exit( EXIT_SUCCESS );
     }
@@ -90,7 +90,7 @@ int main( int argc, char* argv[] )
 
     // initialize lookup tables
     VTableLookup* fTLook = new VTableLookup( fTLRunParameter->readwrite, fTLRunParameter->fDebug );
-    if(!fTLook->initialize( fTLRunParameter ) )
+    if( !fTLook->initialize( fTLRunParameter ) )
     {
         cout << "error creating lookup tables: no run parameters";
         cout << "exiting..." << endl;

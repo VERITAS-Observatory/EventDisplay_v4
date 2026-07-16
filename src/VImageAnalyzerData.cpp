@@ -9,7 +9,7 @@ VImageAnalyzerData::VImageAnalyzerData( unsigned int iTelID, unsigned int iShort
                                         bool bCalibration, bool bWriteImagePixelList )
 {
     fTelID = iTelID;
-    if(!bCalibration )
+    if( !bCalibration )
     {
         fAnaHistos = new VImageAnalyzerHistograms( iTelID );
         fAnaHistos->init();
@@ -18,7 +18,7 @@ VImageAnalyzerData::VImageAnalyzerData( unsigned int iTelID, unsigned int iShort
     fFillMeanTraces = false;
     fFillPulseSum = false;
 
-    if(!bCalibration )
+    if( !bCalibration )
     {
         fImageParameter = new VImageParameter( iShortTree, bWriteImagePixelList );
         fImageParameterLogL = new VImageParameter( iShortTree, bWriteImagePixelList );
@@ -200,7 +200,7 @@ void VImageAnalyzerData::fillPulseSum( unsigned int iChannel, double iS, bool iH
 {
     if( iS > 0. )
     {
-        if(!iHiLo && iChannel < hPulseSumHigh.size() )
+        if( !iHiLo && iChannel < hPulseSumHigh.size() )
         {
             hPulseSumHigh[iChannel]->Fill( log10( iS ) );
         }
@@ -315,7 +315,7 @@ valarray<double>& VImageAnalyzerData::getTraceWidth( bool iCorrected )
     cout << "VImageAnalyzerData::getTraceWidth error: tzero or width index out of range" << endl;
     cout << fpulsetiming_width_index << "\t";
     cout << fPulseTimingCorrected.size() << "\t" << fPulseTimingUncorrected.size() << endl;
-    exit(-1 );
+    exit( -1 );
 
     return fPulseTimingUncorrected[0]; // should never happen
 }

@@ -51,7 +51,7 @@ VPlotAnasumHistograms::VPlotAnasumHistograms( string ifile, int ion )
 
     default_settings();
 
-    if(!openDataFile( ifile, ion ) )
+    if( !openDataFile( ifile, ion ) )
     {
         return;
     }
@@ -59,7 +59,7 @@ VPlotAnasumHistograms::VPlotAnasumHistograms( string ifile, int ion )
 
 bool VPlotAnasumHistograms::openDataFile( string ifile, int ion )
 {
-    if(!openFile( ifile, fRunNumber, 1 ) )
+    if( !openFile( ifile, fRunNumber, 1 ) )
     {
         return false;
     }
@@ -146,8 +146,8 @@ void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x_deg, double y
     // sign error; see http://veritash.sao.arizona.edu:8081/Eventdisplay-WG/1912
     // x_deg *= -1.;
 
-    VAstronometry::vlaDtp2s( x_deg* TMath::DegToRad(), y_deg* TMath::DegToRad(), fSkyMapCentreRAJ2000* TMath::DegToRad(), fSkyMapCentreDecJ2000* TMath::DegToRad(), &ra, &dec );
-    VAstronometry::vlaDtp2s(( x_deg + xerr_deg )*TMath::DegToRad(), ( y_deg + yerr_deg )*TMath::DegToRad(), fSkyMapCentreRAJ2000* TMath::DegToRad(), fSkyMapCentreDecJ2000* TMath::DegToRad(), &ra_err_deg, &dec_err_deg );
+    VAstronometry::vlaDtp2s( x_deg * TMath::DegToRad(), y_deg * TMath::DegToRad(), fSkyMapCentreRAJ2000 * TMath::DegToRad(), fSkyMapCentreDecJ2000 * TMath::DegToRad(), &ra, &dec );
+    VAstronometry::vlaDtp2s( ( x_deg + xerr_deg )*TMath::DegToRad(), ( y_deg + yerr_deg )*TMath::DegToRad(), fSkyMapCentreRAJ2000 * TMath::DegToRad(), fSkyMapCentreDecJ2000 * TMath::DegToRad(), &ra_err_deg, &dec_err_deg );
 
     ra          *= TMath::RadToDeg();
     dec         *= TMath::RadToDeg();
@@ -160,18 +160,18 @@ void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x_deg, double y
     cout << "(RA,Dec) (J2000) for (x,y)=( " << x_deg << "+/-" << xerr_deg << " , " << y_deg << "+-" << yerr_deg << " ): ";
     cout << "( " << ra << "+/-" << ra_err_deg << " , " << dec << "+/-" << dec_err_deg <<  " )" << endl;
 
-    double hours = ( double )(( int )( ra * 24. / 360. ) );
-    double min   = ( double )(( int )( 60.*( ra * 24. / 360. - hours ) ) );
+    double hours = ( double )( ( int )( ra * 24. / 360. ) );
+    double min   = ( double )( ( int )( 60.*( ra * 24. / 360. - hours ) ) );
     double sec   = ( ra - hours * 360. / 24. - min * 360. / 24. / 60. ) * 24. / 360.*60.*60.;
     double dec_d = ( double )( int )( dec );
-    double dec_m = ( double )( int )(( dec - dec_d ) * 60. );
+    double dec_m = ( double )( int )( ( dec - dec_d ) * 60. );
     double dec_s = ( dec - dec_d - dec_m / 60. ) * 3600.;
 
-    double hours_err = ( double )(( int )( ra_err_deg * 24. / 360. ) );
-    double min_err   = ( double )(( int )( 60.*( ra_err_deg * 24. / 360. - hours_err ) ) );
+    double hours_err = ( double )( ( int )( ra_err_deg * 24. / 360. ) );
+    double min_err   = ( double )( ( int )( 60.*( ra_err_deg * 24. / 360. - hours_err ) ) );
     double sec_err   = ( ra_err_deg - hours_err * 360. / 24. - min_err * 360. / 24. / 60. ) * 24. / 360.*60.*60.;
     double dec_d_err = ( double )( int )( dec_err_deg );
-    double dec_m_err = ( double )( int )(( dec_err_deg - dec_d_err ) * 60. );
+    double dec_m_err = ( double )( int )( ( dec_err_deg - dec_d_err ) * 60. );
     double dec_s_err = ( dec_err_deg - dec_d_err - dec_m_err / 60. ) * 3600.;
 
 
@@ -186,7 +186,7 @@ void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x_deg, double y
     cout << " )" << endl;
 
     // calculating and printing the offset of the position wrt camera center
-    double offset = sqrt( x_deg* x_deg + y_deg* y_deg );
+    double offset = sqrt( x_deg * x_deg + y_deg * y_deg );
     cout << "Offset from camera center = " << offset << " deg" << endl;
 
 }
@@ -273,7 +273,7 @@ void VPlotAnasumHistograms::plot_mscPlots( int irebin, double xmin, double xmax,
         c_mscl->Divide( 2, 1 );
 
         c_mscl->cd( 1 );
-        hmscl_on->SetAxisRange(-2., 10. );
+        hmscl_on->SetAxisRange( -2., 10. );
         hmscl_on->SetTitle( "" );
 
         hmscl_on->Draw( "hist e" );
@@ -311,7 +311,7 @@ void VPlotAnasumHistograms::plot_mscPlots( int irebin, double xmin, double xmax,
         if( mscwfile.size() > 0 )
         {
             TFile* fmscw = new TFile( mscwfile.c_str() );
-            if(!fmscw->IsZombie() )
+            if( !fmscw->IsZombie() )
             {
                 TH1D* mw = ( TH1D* )fmscw->Get( "hMSCWsim" );
                 setHistogramPlottingStyle( mw, 2, 2, 1, 20, 10 );
@@ -366,7 +366,7 @@ void VPlotAnasumHistograms::plot_qualityHistograms( double iSourceStrength, bool
         TCanvas* c_qqmscw = new TCanvas( hname, htitle, 410, 10, 400, 400 );
         c_qqmscw->Draw();
 
-        hq->SetAxisRange(-2., 2. );
+        hq->SetAxisRange( -2., 2. );
 
         hq->Draw();
         cout << hq->GetName() << "\t" << hq->GetBinCenter( hq->GetMaximumBin() ) << endl;
@@ -381,7 +381,7 @@ void VPlotAnasumHistograms::plot_qualityHistograms( double iSourceStrength, bool
         TCanvas* c_qqmscl = new TCanvas( hname, htitle, 810, 10, 400, 400 );
         c_qqmscl->Draw();
 
-        hq->SetAxisRange(-2., 2. );
+        hq->SetAxisRange( -2., 2. );
 
         hq->Draw();
         cout << hq->GetName() << "\t" << hq->GetBinCenter( hq->GetMaximumBin() ) << endl;
@@ -555,7 +555,7 @@ TCanvas* VPlotAnasumHistograms::plot_skyPlots( string iPlotMode, bool iSingleCan
         for( unsigned int i = 0; i < 8; i++ )
         {
             c_skyAll->cd( i + 1 );
-            cSky.push_back(( TCanvas* )gPad );
+            cSky.push_back( ( TCanvas* )gPad );
         }
     }
     if( cSky.size() < 8 )
@@ -609,7 +609,7 @@ TCanvas* VPlotAnasumHistograms::plot_skyPlots( string iPlotMode, bool iSingleCan
     cSky[7]->cd();
     plot_significanceDistributions( 2.0, 0.4, -6.5, 10., ( TCanvas* )gPad );
 
-    if(!c_skyAll )
+    if( !c_skyAll )
     {
         return cSky[3];
     }
@@ -830,7 +830,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
     /////////////////////////
     // get exclusion regions
     TTree* t = ( TTree* )getHistogram( "tExcludedRegions", -1, "" );
-    if(!t )
+    if( !t )
     {
         cout << "tree with excluded regions not found" << endl;
         return 0;
@@ -972,7 +972,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
         hsig_1DExcluded->SetXTitle( "significance #sigma" );
         hsig_1DExcluded->SetYTitle( "# of entries" );
         hsig_1DExcluded->GetXaxis()->SetRangeUser( xmin, xmax );
-        if(!cCanvas )
+        if( !cCanvas )
         {
             if( fPlotCorrelated )
             {
@@ -1020,7 +1020,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 
         /////////////////////////
         // difference plot
-        if(!cCanvas )
+        if( !cCanvas )
         {
             if( fPlotCorrelated )
             {
@@ -1259,10 +1259,10 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
         double Xmin = -1.*ra;
         double Xmax = -1.*ra;
 
-        if( cos(( dec + ymin ) * TMath::Pi() / 180. ) )
+        if( cos( ( dec + ymin ) * TMath::Pi() / 180. ) )
         {
-            Xmin += xmin / cos(( dec + ymin ) * TMath::Pi() / 180. );
-            Xmax += xmax / cos(( dec + ymin ) * TMath::Pi() / 180. );
+            Xmin += xmin / cos( ( dec + ymin ) * TMath::Pi() / 180. );
+            Xmax += xmax / cos( ( dec + ymin ) * TMath::Pi() / 180. );
         }
         char TmpTimeFormat[200];
         if( fabs( rmax ) < 0.3 )
@@ -1283,7 +1283,7 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
             // convert angle to hours/min/seconds
             char iSign[10];
             int ihmsf[4];
-            VAstronometry::vlaDr2tf( 4, -1.*Xmax* TMath::DegToRad(), iSign, ihmsf );
+            VAstronometry::vlaDr2tf( 4, -1.*Xmax * TMath::DegToRad(), iSign, ihmsf );
             iRA_hrs = ihmsf[0];
             iRA_min = ihmsf[1];
             iRA_sec = ihmsf[2];
@@ -1409,7 +1409,7 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
                 {
                     sprintf( hname, "%s_SliceAlpha", hmap_alpha->GetName() );
                     h3 = hmap_alpha->ProjectionY( hname, hmap_alpha->GetXaxis()->FindBin( fSliceXmin ), hmap_alpha->GetXaxis()->FindBin( fSliceXmax ) );
-                    if(( hmap_alpha->GetXaxis()->FindBin( fSliceXmax ) - hmap_alpha->GetXaxis()->FindBin( fSliceXmin ) ) > 0 )
+                    if( ( hmap_alpha->GetXaxis()->FindBin( fSliceXmax ) - hmap_alpha->GetXaxis()->FindBin( fSliceXmin ) ) > 0 )
                     {
                         h3->Scale( 1. / ( double )( 1. + hmap_alpha->GetXaxis()->FindBin( fSliceXmax ) - hmap_alpha->GetXaxis()->FindBin( fSliceXmin ) ) );
                     }
@@ -1437,7 +1437,7 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
                 {
                     sprintf( hname, "%s_SliceAlpha", hmap_alpha->GetName() );
                     h3 = hmap_alpha->ProjectionX( hname, hmap_alpha->GetYaxis()->FindBin( fSliceXmin ), hmap_alpha->GetYaxis()->FindBin( fSliceXmax ) );
-                    if(( hmap_alpha->GetYaxis()->FindBin( fSliceXmax ) - hmap_alpha->GetYaxis()->FindBin( fSliceXmin ) ) > 0 )
+                    if( ( hmap_alpha->GetYaxis()->FindBin( fSliceXmax ) - hmap_alpha->GetYaxis()->FindBin( fSliceXmin ) ) > 0 )
                     {
                         h3->Scale( 1. / ( double )( 1. + hmap_alpha->GetYaxis()->FindBin( fSliceXmax ) - hmap_alpha->GetYaxis()->FindBin( fSliceXmin ) ) );
                     }
@@ -1473,7 +1473,7 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
             }
             if( rmax > 0. )
             {
-                h1->SetAxisRange(-1.*rmax, rmax );
+                h1->SetAxisRange( -1.*rmax, rmax );
             }
             else
             {
@@ -1556,7 +1556,7 @@ vector<sSource> VPlotAnasumHistograms::plot_catalogue( TCanvas* c, string iCatal
     sSource i_sSource;
     vector< sSource > v_obj_XY;
 
-    if(!c )
+    if( !c )
     {
         return v_obj_XY;
     }
@@ -1579,7 +1579,7 @@ vector<sSource> VPlotAnasumHistograms::plot_catalogue( TCanvas* c, string iCatal
 
     // get sky map
     TH2D* h = ( TH2D* )c->GetListOfPrimitives()->FindObject( hSkyMapName.c_str() );
-    if(!h )
+    if( !h )
     {
         return v_obj_XY;
     }
@@ -1590,12 +1590,12 @@ vector<sSource> VPlotAnasumHistograms::plot_catalogue( TCanvas* c, string iCatal
     double iRAMin  = fSkyMapCentreRAJ2000;
     if( cos( dec * TMath::Pi() / 180. ) )
     {
-        iRAMin  = fSkyMapCentreRAJ2000 + h->GetXaxis()->GetXmax() / cos( dec* TMath::Pi() / 180. );
+        iRAMin  = fSkyMapCentreRAJ2000 + h->GetXaxis()->GetXmax() / cos( dec * TMath::Pi() / 180. );
     }
     double iRAMax  = fSkyMapCentreRAJ2000;
     if( cos( dec * TMath::Pi() / 180. ) )
     {
-        iRAMax  = fSkyMapCentreRAJ2000 + h->GetXaxis()->GetXmin() / cos( dec* TMath::Pi() / 180. );
+        iRAMax  = fSkyMapCentreRAJ2000 + h->GetXaxis()->GetXmin() / cos( dec * TMath::Pi() / 180. );
     }
 
     cout << "MINMAX  " << iDecMin << " " << iDecMax << " " << iRAMin << " " << iRAMax << endl;
@@ -1609,7 +1609,7 @@ vector<sSource> VPlotAnasumHistograms::plot_catalogue( TCanvas* c, string iCatal
                 double x = 0.;
                 double y = 0.;
                 int j = 0;
-                VAstronometry::vlaDs2tp( s.getStarRA2000( i )*TMath::Pi() / 180., s.getStarDec2000( i )*TMath::Pi() / 180., ra* TMath::Pi() / 180., dec* TMath::Pi() / 180., &x, &y, &j );
+                VAstronometry::vlaDs2tp( s.getStarRA2000( i )*TMath::Pi() / 180., s.getStarDec2000( i )*TMath::Pi() / 180., ra * TMath::Pi() / 180., dec * TMath::Pi() / 180., &x, &y, &j );
                 x *= -1. * 180. / TMath::Pi();
                 y *= 180. / TMath::Pi();
 
@@ -1772,7 +1772,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
             return;
         }
     }
-    if(!gDirectory->cd( itemp ) )
+    if( !gDirectory->cd( itemp ) )
     {
         cout << "debug directory not found for run  " << fRunNumber << endl;
         return;
@@ -1796,7 +1796,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
 
     // get tree with reflected regions
     TTree* iT = ( TTree* )gDirectory->Get( "tRE" );
-    if(!iT )
+    if( !iT )
     {
         cout << "error: reflected region tree not found" << endl;
         return;
@@ -1884,7 +1884,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
             break;
         }
     }
-    if(!bFound )
+    if( !bFound )
     {
         cout << "no reflected regions defined for this bin." << endl;
         return;
@@ -1893,7 +1893,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
     cout << n_r << "\t" << r << "\t" << x << "\t" << y << "\t" << x_bin << "\t" << y_bin << "\t" << x_bin_wobble << "\t" << y_bin_wobble << endl;
 
     // source region
-    TEllipse* iR = new TEllipse( iSign* x, y, r, r );
+    TEllipse* iR = new TEllipse( iSign * x, y, r, r );
     iR->SetFillStyle( 3004 );
     iR->SetFillColor( 2 );
     iR->SetLineColor( 2 );
@@ -1912,7 +1912,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
     for( int n = 0; n < n_r; n++ )
     {
         cout << "\t background region " << n << "\t" << x_r[n] << "\t" << y_r[n] << "\t" << r_r[n] << endl;
-        TEllipse* iL = new TEllipse( iSign* x_r[n], y_r[n], r_r[n], r_r[n] );
+        TEllipse* iL = new TEllipse( iSign * x_r[n], y_r[n], r_r[n], r_r[n] );
         iL->SetFillStyle( 0 );
         iL->SetLineWidth( 2 );
         iL->SetLineColor( iColor );
@@ -1933,7 +1933,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas* iC, int i, int j, in
     // excluded regions
     for( int e = 0; e < n_ex; e++ )
     {
-        TEllipse* iEx = new TEllipse( iSign* x_ex[e], y_ex[e], r1_ex[e], r2_ex[e], 0, 360, iSign* theta_ex[e] );
+        TEllipse* iEx = new TEllipse( iSign * x_ex[e], y_ex[e], r1_ex[e], r2_ex[e], 0, 360, iSign * theta_ex[e] );
         iEx->SetFillStyle( 0 );
         iEx->SetLineStyle( 3 );
         iEx->SetLineWidth( 2 );
@@ -1978,13 +1978,13 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas* c, int iLineColor )
             return;
         }
     }
-    if(!gFile->cd( itemp ) )
+    if( !gFile->cd( itemp ) )
     {
         cout << "directory " << itemp << " not found" << endl;
         return;
     }
     TTree* t = ( TTree* )gDirectory->Get( "tExcludedRegions" );
-    if(!t )
+    if( !t )
     {
         cout << "tree with excluded regions not found" << endl;
         return;
@@ -2031,7 +2031,7 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas* c, int iLineColor )
     for( int i = 0; i < t->GetEntries(); i++ )
     {
         t->GetEntry( i );
-        TEllipse* e = new TEllipse( iSign* x, y, r1, r2, 0, 360, iSign* theta );
+        TEllipse* e = new TEllipse( iSign * x, y, r1, r2, 0, 360, iSign * theta );
         e->SetFillStyle( 0 );
         e->SetLineColor( iLineColor );
         e->Draw();
@@ -2055,7 +2055,7 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas* c, int iLineColor )
  */
 TH1D* VPlotAnasumHistograms::doQfactors( TH1D* hon, TH1D* hoff, TH1D* hdiff, bool bUpper, int iMethod, double iSourceStrength )
 {
-    if(!hon || !hoff || !hdiff )
+    if( !hon || !hoff || !hdiff )
     {
         return 0;
     }
@@ -2086,9 +2086,9 @@ TH1D* VPlotAnasumHistograms::doQfactors( TH1D* hon, TH1D* hoff, TH1D* hdiff, boo
     }
 
     // qfactor on low bound cut
-    if(!bUpper )
+    if( !bUpper )
     {
-        hTemp = new TH1D(*(( TH1D* )hon ) );
+        hTemp = new TH1D( *( ( TH1D* )hon ) );
         hTemp->Reset();
         if( iMethod == 0 )
         {
@@ -2140,7 +2140,7 @@ TH1D* VPlotAnasumHistograms::doQfactors( TH1D* hon, TH1D* hoff, TH1D* hdiff, boo
     else
     {
         // qfactor on high bound cut
-        hTemp = new TH1D(*(( TH1D* )hon ) );
+        hTemp = new TH1D( *( ( TH1D* )hon ) );
         hTemp->Reset();
         if( iMethod == 0 )
         {
@@ -2202,7 +2202,7 @@ TH1D* VPlotAnasumHistograms::doQfactors( TH1D* hon, TH1D* hoff, TH1D* hdiff, boo
 */
 TH2D* VPlotAnasumHistograms::reflectXaxis( TH2D* h, char* iNewName )
 {
-    if(!h )
+    if( !h )
     {
         return 0;
     }
@@ -2242,7 +2242,7 @@ TH2D* VPlotAnasumHistograms::reflectXaxis( TH2D* h, char* iNewName )
 */
 void VPlotAnasumHistograms::drawPSF( TCanvas* c, string iFile, TH2D* h2, float rPSF_deg )
 {
-    if(!c )
+    if( !c )
     {
         return;
     }
@@ -2292,7 +2292,7 @@ void VPlotAnasumHistograms::drawPSF( TCanvas* c, string iFile, TH2D* h2, float r
     char hname[400];
     sprintf( hname, "%s", h2->GetName() );
     TH2D* h = ( TH2D* )gDirectory->Get( hname );
-    if(!h )
+    if( !h )
     {
         return;
     }
@@ -2328,14 +2328,14 @@ void VPlotAnasumHistograms::drawPSF( TCanvas* c, string iFile, TH2D* h2, float r
         h_xrange = h2_xrange * s_xrange / b_xrange;
         h_yrange = h2_yrange * s_yrange / b_yrange;
 
-        h->SetAxisRange(-1.*h_xrange / 2., h_xrange / 2., "X" );
-        h->SetAxisRange(-1.*h_yrange / 2., h_yrange / 2., "Y" );
+        h->SetAxisRange( -1.*h_xrange / 2., h_xrange / 2., "X" );
+        h->SetAxisRange( -1.*h_yrange / 2., h_yrange / 2., "Y" );
         h->SetTitle( "" );
         h->SetStats( 0 );
         h->DrawCopy( "A col" );
         gPad->Update();
         // draw a white box around the small pad
-        TBox* b = new TBox(-1.*h_xrange / 2., -1.*h_yrange / 2., h_xrange / 2.,  h_yrange / 2. );
+        TBox* b = new TBox( -1.*h_xrange / 2., -1.*h_yrange / 2., h_xrange / 2.,  h_yrange / 2. );
         b->SetFillStyle( 0 );
         b->SetLineColor( 0 );
         b->Draw();
@@ -2405,7 +2405,7 @@ void VPlotAnasumHistograms::plot_deadTimes()
             hTimeDiffFitDiff_on->SetAxisRange( 0., 0.010 );
             hTimeDiffFitDiff_on->SetXTitle( hTimeDiff_on->GetXaxis()->GetTitle() );
             hTimeDiffFitDiff_on->SetYTitle( "fit residuals" );
-            hTimeDiffFitDiff_on->SetMinimum(-1.5 );
+            hTimeDiffFitDiff_on->SetMinimum( -1.5 );
             hTimeDiffFitDiff_on->SetMaximum( 1.5 );
             hTimeDiffFitDiff_on->Draw();
         }
@@ -2441,7 +2441,7 @@ void VPlotAnasumHistograms::plot_deadTimes()
             hTimeDiffFitDiff_off->SetAxisRange( 0., 0.010 );
             hTimeDiffFitDiff_off->SetXTitle( hTimeDiff_off->GetXaxis()->GetTitle() );
             hTimeDiffFitDiff_off->SetYTitle( "fit residuals" );
-            hTimeDiffFitDiff_off->SetMinimum(-1.5 );
+            hTimeDiffFitDiff_off->SetMinimum( -1.5 );
             hTimeDiffFitDiff_off->SetMaximum( 1.5 );
             hTimeDiffFitDiff_off->Draw();
         }
@@ -2508,7 +2508,7 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
     {
         nentries = ( int )getRunList().size();
     }
-    if(( unsigned int )( nentries + nstart ) > getRunList().size() && getRunList().size() > nstart )
+    if( ( unsigned int )( nentries + nstart ) > getRunList().size() && getRunList().size() > nstart )
     {
         nentries = ( int )( getRunList().size() - nstart );
     }
@@ -2575,7 +2575,7 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
 
         // 2D sky plot
         TH2D* h = ( TH2D* )getHistogram( iHistoName.c_str(), getRunList()[i].runnumber, "skyHistograms" );
-        if(!h )
+        if( !h )
         {
             cout << "histogram not found! " << iHistoName.c_str() << endl;
             continue;
@@ -2630,7 +2630,7 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
         }
         hsig_1D->SetXTitle( "significance" );
         hsig_1D->SetYTitle( "# of entries" );
-        hsig_1D->SetAxisRange(-5.5, 5. );
+        hsig_1D->SetAxisRange( -5.5, 5. );
 
         if( hsig_1D->GetEntries() > 0 && hsig_1DAll->GetEntries() > 0 )
         {
@@ -2719,7 +2719,7 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
     lFitRMS->Draw();
 
     // reset run number
-    setRunNumber(-1 );
+    setRunNumber( -1 );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -2955,8 +2955,8 @@ TCanvas* VPlotAnasumHistograms::plot_skyPlots_significance( bool iCorrelated, do
 
         if( rmax != 0. )
         {
-            hmap_stereo_diff->SetAxisRange(-1.*fabs( rmax ), fabs( rmax ), "X" );
-            hmap_stereo_diff->SetAxisRange(-1.*fabs( rmax ), fabs( rmax ), "Y" );
+            hmap_stereo_diff->SetAxisRange( -1.*fabs( rmax ), fabs( rmax ), "X" );
+            hmap_stereo_diff->SetAxisRange( -1.*fabs( rmax ), fabs( rmax ), "Y" );
         }
 
         hmap_stereo_diff->Draw( fPlotMode.c_str() );
@@ -2990,8 +2990,8 @@ TCanvas* VPlotAnasumHistograms::plot_skyPlots_significance( bool iCorrelated, do
         }
         if( rmax != 0. )
         {
-            hmap_stereo_sig->SetAxisRange(-1.*fabs( rmax ), fabs( rmax ), "X" );
-            hmap_stereo_sig->SetAxisRange(-1.*fabs( rmax ), fabs( rmax ), "Y" );
+            hmap_stereo_sig->SetAxisRange( -1.*fabs( rmax ), fabs( rmax ), "X" );
+            hmap_stereo_sig->SetAxisRange( -1.*fabs( rmax ), fabs( rmax ), "Y" );
         }
 
         if( bPoster )
@@ -3039,8 +3039,8 @@ TCanvas* VPlotAnasumHistograms::plot_skyPlots_significance( bool iCorrelated, do
         hmap_alphaNorm_off->SetMaximum( hmap_alphaNorm_off->GetMaximum() * 1.1 );
         if( rmax != 0. )
         {
-            hmap_alphaNorm_off->SetAxisRange(-1.*fabs( rmax ), fabs( rmax ), "X" );
-            hmap_alphaNorm_off->SetAxisRange(-1.*fabs( rmax ), fabs( rmax ), "X" );
+            hmap_alphaNorm_off->SetAxisRange( -1.*fabs( rmax ), fabs( rmax ), "X" );
+            hmap_alphaNorm_off->SetAxisRange( -1.*fabs( rmax ), fabs( rmax ), "X" );
         }
 
         hmap_alphaNorm_off->Draw( fPlotMode.c_str() );
@@ -3099,8 +3099,8 @@ TCanvas* VPlotAnasumHistograms::plot_on( bool iCorrelated, double rmax )
         c_skyOnOff->Draw();
         gPad->SetRightMargin( 0.12 );
 
-        hmap_stereo_on->SetAxisRange(-1.6, 1.6, "X" );
-        hmap_stereo_on->SetAxisRange(-1.6, 1.6, "Y" );
+        hmap_stereo_on->SetAxisRange( -1.6, 1.6, "X" );
+        hmap_stereo_on->SetAxisRange( -1.6, 1.6, "Y" );
         hmap_stereo_on->SetTitle( "" );
 
         hmap_stereo_on->Draw( fPlotMode.c_str() );

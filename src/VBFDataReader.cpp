@@ -51,9 +51,9 @@ bool VBFDataReader::getNextEvent()
         {
             cout << "bool VBFRawDataReader::getNextEvent() " << index << endl;
         }
-        for(;; )
+        for( ;; )
         {
-            if(!reader.hasPacket( index ) )
+            if( !reader.hasPacket( index ) )
             {
                 setEventStatus( 999 );
                 return false;
@@ -125,7 +125,7 @@ bool VBFDataReader::getNextEvent()
                 }
 
                 setEventStatus( 0 );
-                bitset< 8 * sizeof(ULong64_t ) > ib;
+                bitset< 8 * sizeof( ULong64_t ) > ib;
 
                 // check if event for requested telescopes are available
                 bool bComplete = true;
@@ -133,7 +133,7 @@ bool VBFDataReader::getNextEvent()
                 {
                     if( getTeltoAna()[i] < ae->getPresentTelescopes().size() )
                     {
-                        if(!ae->getPresentTelescopes()[getTeltoAna()[i]] )
+                        if( !ae->getPresentTelescopes()[getTeltoAna()[i]] )
                         {
                             fNIncompleteEvent[getTeltoAna()[i]]++;
                             bComplete = false;
@@ -158,13 +158,13 @@ bool VBFDataReader::getNextEvent()
                             }
                         }
                     }
-                    setEventStatus(( unsigned int )ib.to_ulong() );
+                    setEventStatus( ( unsigned int )ib.to_ulong() );
                 }
                 if( fDebug )
                 {
                     cout << "\t VBFRawDataReader::getNextEvent(): hasArrayEvent, complete? " << ib.to_ulong() << " " << bComplete << endl;
                 }
-                if(!bComplete )
+                if( !bComplete )
                 {
                     return false;
                 }
@@ -221,7 +221,7 @@ bool VBFDataReader::getNextEvent()
                 cout << endl;
             }
 
-            if(!gotOneEv && !bSimulations )
+            if( !gotOneEv && !bSimulations )
             {
                 continue;
             }

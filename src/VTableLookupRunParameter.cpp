@@ -92,7 +92,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
             printHelp();
             return false;
         }
-        if(( iTemp.find( "-input" ) < iTemp.size() || iTemp.find( "-sourcefile" ) < iTemp.size() )
+        if( ( iTemp.find( "-input" ) < iTemp.size() || iTemp.find( "-sourcefile" ) < iTemp.size() )
                 && !( iTemp.find( "-inputfilelist" ) < iTemp.size() ) )
         {
             if( iTemp2.size() > 0 )
@@ -653,7 +653,7 @@ bool VTableLookupRunParameter::fillInputFile_fromList( string iList )
 {
     ifstream is;
     is.open( iList.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "VTableLookupRunParameter::fillInputFile_fromList() error reading list of input files: " << endl;
         cout << iList << endl;

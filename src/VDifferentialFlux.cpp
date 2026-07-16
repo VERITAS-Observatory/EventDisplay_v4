@@ -49,7 +49,7 @@ VDifferentialFlux::VDifferentialFlux()
 void VDifferentialFlux::print( bool bSED )
 {
 
-    if(!bSED )
+    if( !bSED )
     {
         cout << "E: " << setprecision( 2 ) << setw( 4 ) << Energy << " [TeV]";
         cout << " (dE = (" << Energy_lowEdge << "-" << Energy_upEdge << ")TeV";
@@ -94,7 +94,7 @@ void VDifferentialFlux::print( bool bSED )
 */
 void VDifferentialFlux::printClean( bool bSED )
 {
-    if(!bSED )
+    if( !bSED )
     {
         cout <<  setprecision( 3 ) << setw( 7 ) << Energy;
         cout << "    " << Energy_lowEdge << "    " << Energy_upEdge ;
@@ -236,7 +236,7 @@ double VDifferentialFlux::nuFnu( double F, double gamma, double e1, double e2, d
     // http://www.isdc.unige.ch/sf2010/fermi
     else
     {
-        nF = c * TMath::Power( sqrt( e1* e2 ) / e3, gamma + 2. );
+        nF = c * TMath::Power( sqrt( e1 * e2 ) / e3, gamma + 2. );
     }
 
     // from eV to ergs

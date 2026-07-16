@@ -49,7 +49,7 @@ VRadialAcceptance::VRadialAcceptance( string ifile )
 
     char hname[200];
     int i = 0;
-    for(;; )
+    for( ;; )
     {
         sprintf( hname, "fAccZe_%d", i );
         TF1* iF = ( TF1* )gDirectory->Get( hname );
@@ -69,7 +69,7 @@ VRadialAcceptance::VRadialAcceptance( string ifile )
     // count number of raw files used to calculate acceptances
     TKey* key;
     TIter nextkey( fAccFile->GetListOfKeys() );
-    while(( key = ( TKey* )nextkey() ) )
+    while( ( key = ( TKey* )nextkey() ) )
     {
         TObject* obj = key->ReadObj();
         string itemp = obj->GetName();
@@ -99,7 +99,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
     hListFitHistograms = new TList();
 
     fCuts = icuts;
-    if(!fCuts )
+    if( !fCuts )
     {
         cout << "VRadialAcceptance error: no gamma/hadron separation cuts defined" << endl;
         cout << "exiting..";
@@ -136,7 +136,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
     hscale = new TH1F( "hscale", "", nxybin, 0., xymax );
     for( int i = 1; i < nxybin; i++ )
     {
-        hscale->SetBinContent( i, TMath::Pi()*xymax* xymax / (( double )( nxybin* nxybin ) ) * ( 2 * i - 1 ) );
+        hscale->SetBinContent( i, TMath::Pi()*xymax * xymax / ( ( double )( nxybin * nxybin ) ) * ( 2 * i - 1 ) );
     }
     for( int i = 1; i < nxybin; i++ )
     {
@@ -200,11 +200,11 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
     fPhiMin.clear();
     fPhiMax.clear();
     fPhiMin.push_back( 135.0 );
-    fPhiMax.push_back(-165.0 );
+    fPhiMax.push_back( -165.0 );
     fPhiMin.push_back( 150.0 );
-    fPhiMax.push_back(-150.0 );
-    fPhiMin.push_back(-180. );
-    fPhiMax.push_back(-120. );
+    fPhiMax.push_back( -150.0 );
+    fPhiMin.push_back( -180. );
+    fPhiMax.push_back( -120. );
     for( int i = 0; i < 13; i++ )
     {
         fPhiMin.push_back( fPhiMin.back() + 22.5 );
@@ -415,7 +415,7 @@ double VRadialAcceptance::getAcceptance( double x, double y, double erec, double
     if( f2DAcceptanceMode == 0 )  // then we give a normal, 1D radial acceptance
     {
 
-        double idist = sqrt( x* x + y* y );
+        double idist = sqrt( x * x + y * y );
         double iacc = 1.;
 
         if( fAcceptanceFunctionDefined && fAccZe.size() > 0 )
@@ -484,7 +484,7 @@ double VRadialAcceptance::getCorrectionFactor( double x, double y, double erec )
  */
 bool VRadialAcceptance::isExcluded( double x, double y )
 {
-    if(( x * x + y * y ) > fMaxDistanceAllowed * fMaxDistanceAllowed )
+    if( ( x * x + y * y ) > fMaxDistanceAllowed * fMaxDistanceAllowed )
     {
         return true;
     }
@@ -511,7 +511,7 @@ bool VRadialAcceptance::isExcludedfromBackground( double x, double y )
     }
 
     // source region (source radius + safety (fDS))
-    if( fDs >= 0. && (( x - fXs ) * ( x - fXs ) + ( y - fYs ) * ( y - fYs ) ) < (( fRs + fDs ) * ( fRs + fDs ) ) )
+    if( fDs >= 0. && ( ( x - fXs ) * ( x - fXs ) + ( y - fYs ) * ( y - fYs ) ) < ( ( fRs + fDs ) * ( fRs + fDs ) ) )
     {
         return true;
     }
@@ -519,7 +519,7 @@ bool VRadialAcceptance::isExcludedfromBackground( double x, double y )
     //Other regions to exclude from background (read from runparameter)
     for( unsigned int i = 0; i < fXE.size(); i ++ )
     {
-        if( TMath::Power((( x - fXE[i] ) * TMath::Cos( fAngE[i] * TMath::DegToRad() ) + ( y - fYE[i] ) * TMath::Sin( fAngE[i] * TMath::DegToRad() ) ) / fR1E[i], 2 ) + TMath::Power((( x - fXE[i] ) * TMath::Sin( fAngE[i] * TMath::DegToRad() ) - ( y - fYE[i] ) * TMath::Cos( fAngE[i] * TMath::DegToRad() ) ) / fR2E[i], 2 ) < 1 )
+        if( TMath::Power( ( ( x - fXE[i] ) * TMath::Cos( fAngE[i] * TMath::DegToRad() ) + ( y - fYE[i] ) * TMath::Sin( fAngE[i] * TMath::DegToRad() ) ) / fR1E[i], 2 ) + TMath::Power( ( ( x - fXE[i] ) * TMath::Sin( fAngE[i] * TMath::DegToRad() ) - ( y - fYE[i] ) * TMath::Cos( fAngE[i] * TMath::DegToRad() ) ) / fR2E[i], 2 ) < 1 )
         {
             return true;
         }
@@ -573,7 +573,7 @@ void VRadialAcceptance::setRegionToExcludeAcceptance( vector<double> x, vector<d
 */
 int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
 {
-    if(!iData )
+    if( !iData )
     {
         cout << "VRadialAcceptance::fillAcceptanceFromData: no data tree defined" << endl;
         return -1;
@@ -587,7 +587,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
     if( fCuts->applyInsideFiducialAreaCut() && fCuts->applyStereoQualityCuts( false, entry, true ) )
     {
         // gamma/hadron cuts
-        if(!fCuts->isGamma( entry, false ) )
+        if( !fCuts->isGamma( entry, false ) )
         {
             return 0;
         }
@@ -608,7 +608,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
                 bFill = true;
             }
         }
-        if(!bFill )
+        if( !bFill )
         {
             return 0;
         }
@@ -618,7 +618,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
         double xoff = iData->get_Xoff( fDirectionReconstructionMethod );
         double yoff = iData->get_Yoff( fDirectionReconstructionMethod );
 
-        idist = sqrt( xoff* xoff + yoff* yoff );
+        idist = sqrt( xoff * xoff + yoff * yoff );
 
         // fill 2D distribution of events
         hXYAccTot->Fill( xoff, yoff );
@@ -632,7 +632,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
 
         // 1D histograms
         // Radius Dependent Histograms
-        eventradius = sqrt( xy_derot.first* xy_derot.first + xy_derot.second* xy_derot.second ) ;
+        eventradius = sqrt( xy_derot.first * xy_derot.first + xy_derot.second * xy_derot.second ) ;
         eventphi    = atan2( xy_derot.second, xy_derot.first ) ; // radians
         if( eventphi < 0.0 )
         {
@@ -760,7 +760,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
 */
 bool VRadialAcceptance::terminate( TDirectory* iDirectory )
 {
-    if(!iDirectory->cd() )
+    if( !iDirectory->cd() )
     {
         cout << "VRadialAcceptance::terminate() error accessing directory  " << iDirectory->GetName() << endl;
         exit( EXIT_FAILURE );
@@ -899,7 +899,7 @@ void VRadialAcceptance::scaleArea( TH1F* h )
         double iL = h->GetXaxis()->GetBinLowEdge( i );
         double iU = h->GetXaxis()->GetBinLowEdge( i ) + h->GetXaxis()->GetBinWidth( i );
 
-        iA = TMath::Pi() * ( iU* iU - iL* iL );
+        iA = TMath::Pi() * ( iU * iU - iL * iL );
 
         if( iA > 0. )
         {
@@ -927,7 +927,7 @@ Double_t VRadialAcceptance_fit_acceptance_function( Double_t* x, Double_t* par )
     double x0 = par[4];
 
     double a1 = -1.*( x0 * ( 2.*a2 + x0 * ( 3.*a3 + x0 * ( 4.*a4 + x0 * 5. * a5 ) ) ) );
-    double a0 = 1. - ( x0 * ( a1 + x0 * ( a2 + x0 * ( a3 + x0 * ( a4 + x0* a5 ) ) ) ) );
+    double a0 = 1. - ( x0 * ( a1 + x0 * ( a2 + x0 * ( a3 + x0 * ( a4 + x0 * a5 ) ) ) ) );
 
     if( x[0] < x0 )
     {
@@ -965,7 +965,7 @@ double VRadialAcceptance::calculate2DBinNormalizationConstant( double radius ) /
         hXYAccTotDeRot->GetBinXYZ( i_bin, i_binx, i_biny, i_binz ) ;
         bincentx = hXYAccTotDeRot->GetXaxis()->GetBinCenter( i_binx ) ;
         bincenty = hXYAccTotDeRot->GetYaxis()->GetBinCenter( i_biny ) ;
-        iradius  = sqrt( bincentx* bincentx + bincenty* bincenty ) ;
+        iradius  = sqrt( bincentx * bincentx + bincenty * bincenty ) ;
         binCont  = hXYAccTotDeRot->GetBinContent( i_binx, i_biny ) ;
         if( iradius < radius )  // bin center < 0.3 deg
         {
@@ -1294,10 +1294,10 @@ int VRadialAcceptance::Set2DAcceptanceMode( int mode )
 
         // load 2d hist hXYAccTotDeRot from file
         hXYAccTotDeRot = ( TH2F* )gDirectory->Get( "hXYAccTotDeRot" );
-        if(! hXYAccTotDeRot )
+        if( ! hXYAccTotDeRot )
         {
             cout << "Error, Radial Acceptance File " << fAccFile->GetName() << " does not contain the TH2F histogram 'hXYAccTotDeRot', required for calculating 2D acceptance.  Suggest using a newer Acceptance File, or use 1D Radial Acceptance mode instead of 2D Acceptance mode." << endl;
-            exit(-1 ) ;
+            exit( -1 ) ;
         }
 
         // calculate normalization constant

@@ -12,7 +12,7 @@ Ctelconfig::Ctelconfig( TTree* tree )
 
 Ctelconfig::~Ctelconfig()
 {
-    if(!fChain )
+    if( !fChain )
     {
         return;
     }
@@ -32,7 +32,7 @@ bool Ctelconfig::IsZombie()
 
 Int_t Ctelconfig::GetEntry( Long64_t entry )
 {
-    if(!fChain )
+    if( !fChain )
     {
         return 0;
     }
@@ -43,7 +43,7 @@ Int_t Ctelconfig::GetEntry( Long64_t entry )
 Long64_t Ctelconfig::LoadTree( Long64_t entry )
 {
     // Set the environment to read one entry
-    if(!fChain )
+    if( !fChain )
     {
         return -5;
     }
@@ -52,7 +52,7 @@ Long64_t Ctelconfig::LoadTree( Long64_t entry )
     {
         return centry;
     }
-    if(!fChain->InheritsFrom( TChain::Class() ) )
+    if( !fChain->InheritsFrom( TChain::Class() ) )
     {
         return centry;
     }
@@ -67,7 +67,7 @@ Long64_t Ctelconfig::LoadTree( Long64_t entry )
 
 void Ctelconfig::Init( TTree* tree )
 {
-    if(!tree )
+    if( !tree )
     {
         return;
     }
@@ -228,9 +228,9 @@ double Ctelconfig::getArrayMaxSize()
         {
             fChain->GetEntry( i );
 
-            if( TMath::Sqrt(( TelX - iXc ) * ( TelX - iXc ) + ( TelY - iYc ) * ( TelY - iYc ) ) > iMax )
+            if( TMath::Sqrt( ( TelX - iXc ) * ( TelX - iXc ) + ( TelY - iYc ) * ( TelY - iYc ) ) > iMax )
             {
-                iMax = TMath::Sqrt(( TelX - iXc ) * ( TelX - iXc ) + ( TelY - iYc ) * ( TelY - iYc ) );
+                iMax = TMath::Sqrt( ( TelX - iXc ) * ( TelX - iXc ) + ( TelY - iYc ) * ( TelY - iYc ) );
             }
         }
 

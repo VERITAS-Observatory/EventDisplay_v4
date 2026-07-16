@@ -32,7 +32,7 @@ VSourceGeometryFitter::VSourceGeometryFitter( string iAnaSumDataFile, int iRunNu
     fXStart         = 0;
     fYStart         = 0;
     fPSF            = 0.063;
-    if(!openFile( fAnasumDataFile, fRunNumber, 1 ) )
+    if( !openFile( fAnasumDataFile, fRunNumber, 1 ) )
     {
         return;
     }
@@ -58,13 +58,13 @@ void VSourceGeometryFitter::setFitterDefaultData()
     fDefaultFitterData.back()->fParameterName.push_back( "Xpos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
-    fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
+    fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
 
     fDefaultFitterData.back()->fParameterName.push_back( "Ypos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
-    fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
+    fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
 
     fDefaultFitterData.back()->fParameterName.push_back( "sigmaSRC" );
@@ -175,13 +175,13 @@ void VSourceGeometryFitter::setFitterDefaultData()
     fDefaultFitterData.back()->fParameterName.push_back( "Xpos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
-    fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
+    fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
 
     fDefaultFitterData.back()->fParameterName.push_back( "Ypos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
-    fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
+    fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
 
     fDefaultFitterData.back()->fParameterName.push_back( "sigma" );
@@ -209,7 +209,7 @@ void VSourceGeometryFitter::setFitterDefaultData()
     fDefaultFitterData.back()->fParameterName.push_back( "Xpos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
-    fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
+    fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
 
     fDefaultFitterData.back()->fParameterName.push_back( "sigmaX" );
@@ -221,7 +221,7 @@ void VSourceGeometryFitter::setFitterDefaultData()
     fDefaultFitterData.back()->fParameterName.push_back( "Ypos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
-    fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
+    fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
 
     fDefaultFitterData.back()->fParameterName.push_back( "sigmaY" );
@@ -241,7 +241,7 @@ void VSourceGeometryFitter::setFitterDefaultData()
     fDefaultFitterData.back()->fParameterName.push_back( "background" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 30. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
-    fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1.e5 );
+    fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1.e5 );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1.e5 );
 
     fDefaultFitterData.back()->fParameterName.push_back( "constant" );
@@ -259,13 +259,13 @@ void VSourceGeometryFitter::setFitterDefaultData()
     fDefaultFitterData.back()->fParameterName.push_back( "Xpos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
-    fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
+    fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
 
     fDefaultFitterData.back()->fParameterName.push_back( "Ypos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
-    fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
+    fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
 
 
@@ -279,13 +279,13 @@ void VSourceGeometryFitter::setFitterDefaultData()
     fDefaultFitterData.back()->fParameterName.push_back( "Xpos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
-    fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
+    fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
 
     fDefaultFitterData.back()->fParameterName.push_back( "Ypos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
-    fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
+    fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
 
     fDefaultFitterData.back()->fParameterName.push_back( "sigma" );
@@ -305,13 +305,13 @@ void VSourceGeometryFitter::setFitterDefaultData()
     fDefaultFitterData.back()->fParameterName.push_back( "Xpos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
-    fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
+    fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
 
     fDefaultFitterData.back()->fParameterName.push_back( "Ypos" );
     fDefaultFitterData.back()->fParameterInitValue.push_back( 0. );
     fDefaultFitterData.back()->fParameterStep.push_back( 1.e-7 );
-    fDefaultFitterData.back()->fParameterLowerLimit.push_back(-1. );
+    fDefaultFitterData.back()->fParameterLowerLimit.push_back( -1. );
     fDefaultFitterData.back()->fParameterUpperLimit.push_back( 1. );
 
     fDefaultFitterData.back()->fParameterName.push_back( "sigma" );
@@ -347,7 +347,7 @@ void VSourceGeometryFitter::help()
 
 TCanvas* VSourceGeometryFitter::plot( double rmax, double zmin, double zmax, string iPlotMode )
 {
-    if(!fHisSkyMap )
+    if( !fHisSkyMap )
     {
         cout << "\t no sky map set" << endl;
         return 0;
@@ -420,7 +420,7 @@ TCanvas* VSourceGeometryFitter::plot( double rmax, double zmin, double zmax, str
 
 void VSourceGeometryFitter::plotFitResult()
 {
-    if(!fFitter || fFitter->fFitResult_Status < -10 )
+    if( !fFitter || fFitter->fFitResult_Status < -10 )
     {
         return;
     }
@@ -492,7 +492,7 @@ void VSourceGeometryFitter::plotFitResult()
 
 TGraph* VSourceGeometryFitter::plotSourceGeometry( int iColor )
 {
-    if(!fFitter || fFitter->fFitResult_Status < -10 )
+    if( !fFitter || fFitter->fFitResult_Status < -10 )
     {
         return 0;
     }
@@ -647,7 +647,7 @@ TGraph* VSourceGeometryFitter::plotSourceGeometry( int iColor )
 
             double angle = fFitter->fFitResult_Parameter[0];
 
-            TEllipse* e = new TEllipse( fFitter->fFitResult_Parameter[1], fFitter->fFitResult_Parameter[3], fFitter->fFitResult_Parameter[2], fFitter->fFitResult_Parameter[4], 0, 360,  angle * 180. / acos(-1. ) );
+            TEllipse* e = new TEllipse( fFitter->fFitResult_Parameter[1], fFitter->fFitResult_Parameter[3], fFitter->fFitResult_Parameter[2], fFitter->fFitResult_Parameter[4], 0, 360,  angle * 180. / acos( -1. ) );
             e->SetFillStyle( 0 );
             e->SetLineWidth( 2 );
             e->SetLineColor( kPink );
@@ -707,7 +707,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
     fYStart = yStart;
     fPSF = getPSF();
 
-    if(!fFitter )
+    if( !fFitter )
     {
         cout << "VSourceGeometryFitter::fitSource: undefined fitter" << endl;
         return;
@@ -716,7 +716,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
     // get sky map histogram
     fHisSkyMap = ( TH2D* )getHistogram( iHisName, fRunNumber, "skyHistograms" );
 
-    if(!fHisSkyMap )
+    if( !fHisSkyMap )
     {
         cout << "VSourceGeometryFitter::fitSource: histogram not found: " << iHisName << endl;
         return;
@@ -735,7 +735,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
     VFun_SourceDescription_RadialSymmetricSource_Chi2 fcn_RadialSymmetricSource_Chi2( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange, fPSF );
     if( fFitter->fFitterName == "RadialSymmetricSource_Chi2" )
     {
-        fSourceGeometryFitter_MINUIT->SetMinuitFCN(&fcn_RadialSymmetricSource_Chi2 );
+        fSourceGeometryFitter_MINUIT->SetMinuitFCN( &fcn_RadialSymmetricSource_Chi2 );
         // update parameters
         fFitter->fParameterInitValue[0]  = xStart;
         fFitter->fParameterLowerLimit[0] = xStart - xyRange;
@@ -764,7 +764,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
     VFun_SourceDescription_RadialSymmetricSource_LL fcn_RadialSymmetricSource_LL( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange, fPSF );
     if( fFitter->fFitterName == "RadialSymmetricSource_LL" )
     {
-        fSourceGeometryFitter_MINUIT->SetMinuitFCN(&fcn_RadialSymmetricSource_LL );
+        fSourceGeometryFitter_MINUIT->SetMinuitFCN( &fcn_RadialSymmetricSource_LL );
         // update parameters
         fFitter->fParameterInitValue[0]  = xStart;
         fFitter->fParameterLowerLimit[0] = xStart - xyRange;
@@ -778,7 +778,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
     VFun_SourceDescription_RadialAsymmetricSource_LL fcn_RadialAsymmetricSource_LL( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange, fPSF );
     if( fFitter->fFitterName == "RadialAsymmetricSource_LL" )
     {
-        fSourceGeometryFitter_MINUIT->SetMinuitFCN(&fcn_RadialAsymmetricSource_LL );
+        fSourceGeometryFitter_MINUIT->SetMinuitFCN( &fcn_RadialAsymmetricSource_LL );
         // update parameters
         fFitter->fParameterInitValue[1]  = xStart;
         fFitter->fParameterLowerLimit[1] = xStart - xyRange;
@@ -810,7 +810,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
     VFun_PSFDescription_2DGauss_Chi2 fcn_2DGauss_Chi2( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange );
     if( fFitter->fFitterName == "2DGauss_Chi2" )
     {
-        fSourceGeometryFitter_MINUIT->SetMinuitFCN(&fcn_2DGauss_Chi2 );
+        fSourceGeometryFitter_MINUIT->SetMinuitFCN( &fcn_2DGauss_Chi2 );
         // update parameters
         fFitter->fParameterInitValue[3]  = xStart;
         fFitter->fParameterLowerLimit[3] = xStart - xyRange;
@@ -824,7 +824,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
     VFun_PSFDescription_2DGauss_LL fcn_2DGauss_LL( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange );
     if( fFitter->fFitterName == "2DGauss_LL" )
     {
-        fSourceGeometryFitter_MINUIT->SetMinuitFCN(&fcn_2DGauss_LL );
+        fSourceGeometryFitter_MINUIT->SetMinuitFCN( &fcn_2DGauss_LL );
         // update parameters
         fFitter->fParameterInitValue[0]  = xStart;
         fFitter->fParameterLowerLimit[0] = xStart - xyRange;
@@ -838,7 +838,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
     VFun_PSFDescription_LinearSuperposition2DGauss_LL fcn_LinearSuperposition2DGauss_LL( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange );
     if( fFitter->fFitterName == "LinearSuperposition2DGauss_LL" )
     {
-        fSourceGeometryFitter_MINUIT->SetMinuitFCN(&fcn_LinearSuperposition2DGauss_LL );
+        fSourceGeometryFitter_MINUIT->SetMinuitFCN( &fcn_LinearSuperposition2DGauss_LL );
         // update parameters
         fFitter->fParameterInitValue[0]  = xStart;
         fFitter->fParameterLowerLimit[0] = xStart - xyRange;
@@ -878,18 +878,18 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
     {
         //double rho = fFitter->fFitResult_Parameter[0];
         double angle = fFitter->fFitResult_Parameter[0];
-        double sX = sqrt( fFitter->fFitResult_Parameter[2] * fFitter->fFitResult_Parameter[2] + fPSF* fPSF );
-        double sY = sqrt( fFitter->fFitResult_Parameter[4] * fFitter->fFitResult_Parameter[4] + fPSF* fPSF );
+        double sX = sqrt( fFitter->fFitResult_Parameter[2] * fFitter->fFitResult_Parameter[2] + fPSF * fPSF );
+        double sY = sqrt( fFitter->fFitResult_Parameter[4] * fFitter->fFitResult_Parameter[4] + fPSF * fPSF );
 
         double angle_err = fFitter->fFitResult_ParameterError[0];
-        double rho =  1. / 2. * tan( 2 * angle ) * ( sX* sX - sY* sY ) / sX / sY ;
+        double rho =  1. / 2. * tan( 2 * angle ) * ( sX * sX - sY * sY ) / sX / sY ;
 
-        double p1 = sX * sX * sY * sY * ( 1 - rho* rho );
-        p1 = p1 / ( sY* sY* pow( cos( angle ), 2 ) - 2 * rho* sX* sY* sin( angle ) * cos( angle ) + sX* sX* pow( sin( angle ), 2 ) );
+        double p1 = sX * sX * sY * sY * ( 1 - rho * rho );
+        p1 = p1 / ( sY * sY * pow( cos( angle ), 2 ) - 2 * rho * sX * sY * sin( angle ) * cos( angle ) + sX * sX * pow( sin( angle ), 2 ) );
         p1 = sqrt( p1 );
 
-        double p2 = sX * sX * sY * sY * ( 1 - rho* rho );
-        p2 = p2 / ( sY* sY* pow( sin( angle ), 2 ) + 2 * rho* sX* sY* sin( angle ) * cos( angle ) + sX* sX* pow( cos( angle ), 2 ) );
+        double p2 = sX * sX * sY * sY * ( 1 - rho * rho );
+        p2 = p2 / ( sY * sY * pow( sin( angle ), 2 ) + 2 * rho * sX * sY * sin( angle ) * cos( angle ) + sX * sX * pow( cos( angle ), 2 ) );
         p2 = sqrt( p2 );
 
         // approximate error, rho approximately 0
@@ -900,7 +900,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
 
         cout << "The semi-axis of the ellipse are p1 = " << p1 << " deg  and p2 = " << p2 << " deg " << endl;
         cout << "The correlation between X and Y is defined by the parameter rho = " << rho << endl;
-        cout << "The angle a is the angle between the X axis and the semi-axis of the ellipse p1. Expressed in degrees the result of the fit gives an  angle a = " << angle * 180 / acos(-1 ) << " +/- " << angle_err * 180 / acos(-1 ) << " deg " << endl;
+        cout << "The angle a is the angle between the X axis and the semi-axis of the ellipse p1. Expressed in degrees the result of the fit gives an  angle a = " << angle * 180 / acos( -1 ) << " +/- " << angle_err * 180 / acos( -1 ) << " deg " << endl;
 
 
     }

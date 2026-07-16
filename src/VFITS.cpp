@@ -12,7 +12,7 @@ VFITS::VFITS( string anasum_file, string fits_file, string object_name, bool iOn
     fTarget_RAJ2000 = 0.;
     fTarget_DecJ2000 = 0.;
     ctRunSum = 0;
-    if(!readAnasumFile( iPrint ) )
+    if( !readAnasumFile( iPrint ) )
     {
         exit( EXIT_FAILURE );
     }
@@ -38,7 +38,7 @@ bool VFITS::printerror( int status )
 bool VFITS::readAnasumFile( bool iPrint )
 {
 
-    if(!openFile( fFile_anasum, -1, false, iPrint ) )
+    if( !openFile( fFile_anasum, -1, false, iPrint ) )
     {
         cout << "VFITS::readAnasumFile() Error reading anasum file: " << fFile_anasum << endl;
         return false;
@@ -54,7 +54,7 @@ bool VFITS::readAnasumFile( bool iPrint )
         fTarget_DecJ2000 = ( float )ctRunSum->TargetDecJ2000;
     }
 
-    ctRunSum->GetEntry(( ctRunSum->fChain->GetEntries() ) - 1 );
+    ctRunSum->GetEntry( ( ctRunSum->fChain->GetEntries() ) - 1 );
     if( ctRunSum->runOn == -1 )
     {
         fTarget_Exposure = ( float )ctRunSum->tOn;
@@ -78,7 +78,7 @@ bool VFITS::readAnasumFile( bool iPrint )
         int status = 0;
         string fFileName = fFile_FITS;
         //fFileName.insert(fFileName.size()-5,"_"+DiagName);
-        if( fits_create_file(&fptr, fFileName.c_str(), &status ) )
+        if( fits_create_file( &fptr, fFileName.c_str(), &status ) )
         {
             return printerror( status );
         }
@@ -125,13 +125,13 @@ bool VFITS::writeMonthlyFlux( bool iPrint, string outfile )
     cout << " Write nightly flux to fits file" << endl;
     VFluxCalculation flux2( fFile_anasum );
     flux2.setSpectralParameters( 0.35, 1.0, -2.2 );
-    flux2.setSignificanceParameters(-9, -9 );
+    flux2.setSignificanceParameters( -9, -9 );
     flux2.calculateIntegralFlux( 0.35 );
 
     VLightCurve flux;
     flux.initializeTeVLightCurve( fFile_anasum, 30, 54500, 59200 );
     flux.setSpectralParameters( 0.35, 1.0, -2.2 );
-    flux.setSignificanceParameters(-9, -9 );
+    flux.setSignificanceParameters( -9, -9 );
     flux.fill( 0.35 );
     flux.plotLightCurve();
     TGraphAsymmErrors* gFlux = flux.getLightCurveGraph();
@@ -168,7 +168,7 @@ bool VFITS::writeMonthlyFlux( bool iPrint, string outfile )
             out << line ;
 
         }
-        flux2.getFlux(-1, flx, flxE, mjd );
+        flux2.getFlux( -1, flx, flxE, mjd );
         flxCrab = flux2.getFluxVsCrab( flx, 0.35, 2.2 );
         flxCrabE = flux2.getFluxVsCrab( flxE, 0.35, 2.2 );
 
@@ -188,13 +188,13 @@ bool VFITS::writeNightlyFlux( bool iPrint, string outfile )
     cout << " Write nightly flux to fits file" << endl;
     VFluxCalculation flux2( fFile_anasum );
     flux2.setSpectralParameters( 0.2, 1.0, -2.5 );
-    flux2.setSignificanceParameters(-9, -9 );
+    flux2.setSignificanceParameters( -9, -9 );
     flux2.calculateIntegralFlux( 0.2 );
 
     VLightCurve flux;
     flux.initializeTeVLightCurve( fFile_anasum );
     flux.setSpectralParameters( 0.2, 1.0, -2.5 );
-    flux.setSignificanceParameters(-9, -9 );
+    flux.setSignificanceParameters( -9, -9 );
     flux.fill( 0.2 );
     flux.plotLightCurve();
     TGraphAsymmErrors* gFlux = flux.getLightCurveGraph();
@@ -231,7 +231,7 @@ bool VFITS::writeNightlyFlux( bool iPrint, string outfile )
             out << line ;
 
         }
-        flux2.getFlux(-1, flx, flxE, mjd );
+        flux2.getFlux( -1, flx, flxE, mjd );
         flxCrab = flux2.getFluxVsCrab( flx, 0.2, 2.5 );
         flxCrabE = flux2.getFluxVsCrab( flxE, 0.2, 2.5 );
 
@@ -780,7 +780,7 @@ int VFITS::createTableFitsFile( vector< vector<double> > Table, char* ttype[], c
         // create new FITS file
         fitsfile* fFitsPtr = NULL;            /* pointer to the FITS file, defined in fitsio.h */
         fptr = fFitsPtr;
-        if( fits_create_file(&fptr, fFileName.c_str(), &status ) )
+        if( fits_create_file( &fptr, fFileName.c_str(), &status ) )
         {
             return printerror( status );
         }
@@ -875,7 +875,7 @@ int VFITS::createImageFitsFile( TH2D* hSkyMap, string DiagName, bool iPrint )
         // create new FITS file
         fitsfile* fFitsPtr = NULL;            /* pointer to the FITS file, defined in fitsio.h */
         fptr = fFitsPtr;
-        if( fits_create_file(&fptr, fFileName.c_str(), &status ) )
+        if( fits_create_file( &fptr, fFileName.c_str(), &status ) )
         {
             return printerror( status );
         }
@@ -1163,7 +1163,7 @@ bool VFITS::writeFITSFile( bool iPrint )
 /***************************************/
 bool VFITS::mergeColumns( fitsfile* fPtr, vector<int> hdunums, vector<vector <int> > columns, int nRows, bool iPrint )
 {
-    if(!fWriteOneFile )
+    if( !fWriteOneFile )
     {
         cout << "!!!!Merging of tables only possible if they are all in the same FITS file! Use 'fWriteOneFile=true'" << endl;
         return false;

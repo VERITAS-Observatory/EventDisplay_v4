@@ -100,7 +100,7 @@ void VDispTable::addAzBin( float iMin, float iMax, bool iPe )
     if( fData->h2D_DispTableN )
     {
         sprintf( hname, "h2D_DispTableN_%d", ( int )fAz_min.size() );
-        h2D_AzDispTableN.push_back(( TH2F* )fData->h2D_DispTableN->Clone( hname ) );
+        h2D_AzDispTableN.push_back( ( TH2F* )fData->h2D_DispTableN->Clone( hname ) );
         h2D_AzDispTableN.back()->SetTitle( "" );
         h2D_AzDispTableN.back()->SetXTitle( "width/length" );
         h2D_AzDispTableN.back()->SetYTitle( "log_{10} size" );
@@ -141,7 +141,7 @@ void VDispTable::addAzBin( float iMin, float iMax, bool iPe )
     if( fData->h3D_DispTableN )
     {
         sprintf( hname, "h3D_DispTableN_%d", ( int )fAz_min.size() );
-        h3D_AzDispTableN.push_back(( TH3F* )fData->h3D_DispTableN->Clone( hname ) );
+        h3D_AzDispTableN.push_back( ( TH3F* )fData->h3D_DispTableN->Clone( hname ) );
         h3D_AzDispTableN.back()->SetTitle( "" );
         h3D_AzDispTableN.back()->SetXTitle( "f(width)" );
         h3D_AzDispTableN.back()->SetXTitle( "f(length)" );
@@ -197,7 +197,7 @@ void VDispTable::setQualityCuts( int iNtubes_min, double iSize_min, double iLeng
 */
 bool VDispTable::isGoodEvent( Ctpars* c )
 {
-    if(!c )
+    if( !c )
     {
         return false;
     }
@@ -273,13 +273,13 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
 
     // get showerpars tree
     TTree* s = ( TTree* )iFile.Get( "showerpars" );
-    if(!s )
+    if( !s )
     {
         cout << "VDispTable::fillTable error finding tree showerpars" << endl;
         return false;
     }
     Cshowerpars* m = new Cshowerpars( s, true, true );
-    if(!m )
+    if( !m )
     {
         return false;
     }
@@ -289,13 +289,13 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
     {
         sprintf( hname, "Tel_%d/tpars", i + 1 );
         TTree* t = ( TTree* )iFile.Get( hname );
-        if(!t )
+        if( !t )
         {
             cout << "VDispTable::fillTable error finding tree tpars for telescope " << i + 1 << endl;
             continue;
         }
         Ctpars* c = new Ctpars( t, true, 1 );
-        if(!c )
+        if( !c )
         {
             continue;
         }
@@ -331,7 +331,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
                 i_meanPedvarsN++;
 
                 // calculate disp (observe sign convention for MCyoff)
-                disp  = sqrt(( c->cen_y + m->MCyoff ) * ( c->cen_y + m->MCyoff ) + ( c->cen_x - m->MCxoff ) * ( c->cen_x - m->MCxoff ) );
+                disp  = sqrt( ( c->cen_y + m->MCyoff ) * ( c->cen_y + m->MCyoff ) + ( c->cen_x - m->MCxoff ) * ( c->cen_x - m->MCxoff ) );
                 disp  = TMath::Abs( disp );
                 // dispPhi is always between 0 and 90 deg -> estimation of error of major axis
                 dispPhi = TMath::Abs( TMath::ATan2( c->sinphi, c->cosphi ) - TMath::ATan2( c->cen_y + m->MCyoff, c->cen_x - m->MCxoff ) );
@@ -381,13 +381,13 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
     {
         sprintf( hname, "Tel_%d/tpars", i + 1 );
         TTree* t = ( TTree* )iFile.Get( hname );
-        if(!t )
+        if( !t )
         {
             cout << "VDispTable::fillTable error finding tree tpars for telescope " << i + 1 << endl;
             continue;
         }
         Ctpars* c = new Ctpars( t, true, 1 );
-        if(!c )
+        if( !c )
         {
             continue;
         }
@@ -436,7 +436,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
                     x_s = c->cen_x - disp * c->cosphi;
                     y_s = c->cen_y - disp * c->sinphi;
                     // calculate deviation from true shower direction and fill this into a tree
-                    miss = sqrt(( m->MCxoff - x_s ) * ( m->MCxoff - x_s ) + ( m->MCyoff + y_s ) * ( m->MCyoff + y_s ) );
+                    miss = sqrt( ( m->MCxoff - x_s ) * ( m->MCxoff - x_s ) + ( m->MCyoff + y_s ) * ( m->MCyoff + y_s ) );
                     h2D_AzDispMissTable[azBin]->Fill( c->width / c->length, log10( c->size ), miss );
                     //////////////////////////////////////////////////////////////////////////////////////
                     // 3D
@@ -449,7 +449,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
                     x_s = c->cen_x - disp * c->cosphi;
                     y_s = c->cen_y - disp * c->sinphi;
                     // calculate deviation from true shower direction and fill this into a tree
-                    miss = sqrt(( m->MCxoff - x_s ) * ( m->MCxoff - x_s ) + ( m->MCyoff + y_s ) * ( m->MCyoff + y_s ) );
+                    miss = sqrt( ( m->MCxoff - x_s ) * ( m->MCxoff - x_s ) + ( m->MCyoff + y_s ) * ( m->MCyoff + y_s ) );
                     h3D_AzDispMissTable[azBin]->Fill( fData->scaleWidthParameter( c->width ), fData->scaleLengthParameter( c->length ), log10( c->size ), miss );
                 }
             }

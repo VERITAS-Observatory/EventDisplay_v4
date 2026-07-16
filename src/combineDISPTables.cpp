@@ -42,10 +42,10 @@ int main( int argc, char* argv[] )
 
     ifstream is;
     is.open( fFileList.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "error: file list not found" << endl;
-        exit(-1 );
+        exit( -1 );
     }
     string is_line;
     while( getline( is, is_line ) )
@@ -62,7 +62,7 @@ int main( int argc, char* argv[] )
     if( fTot->IsZombie() )
     {
         cout << "error creating output file: " << fOutFile << endl;
-        exit(-1 );
+        exit( -1 );
     }
     VDispTableReader* fData = new VDispTableReader();
     fData->SetName( "dispTable" );
@@ -77,21 +77,21 @@ int main( int argc, char* argv[] )
         if( f.IsZombie() )
         {
             cout << "error reading input file " << fInputFile[i] << endl;
-            exit(-1 );
+            exit( -1 );
         }
         // read disp table from this file
         VDispTableReader* a = ( VDispTableReader* )f.Get( "dispTable" );
-        if(!a )
+        if( !a )
         {
             cout << "error: no disp table found in " << fInputFile[i] << endl;
-            exit(-1 );
+            exit( -1 );
         }
         a->initialize( true );
         TTree* t = a->getTree();
-        if(!t )
+        if( !t )
         {
             cout << "error: no tree in disp table in " << fInputFile[i] << endl;
-            exit(-1 );
+            exit( -1 );
         }
         // loop over all file entries
         for( int j = 0; j < t->GetEntries(); j++ )

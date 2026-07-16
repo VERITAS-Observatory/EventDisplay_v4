@@ -75,7 +75,7 @@ bool VAnalysisUtilities::openFile( string iname, int irun, bool iStereo, bool iP
             sprintf( dname, "run_%d/stereo", irun );
             b_cd = fAnasumDataFile->cd( dname );
         }
-        if(!b_cd )
+        if( !b_cd )
         {
             cout << "directory not found for run " << irun << " in " << iname << endl;
             bZombie = true;
@@ -97,7 +97,7 @@ bool VAnalysisUtilities::openFile( string iname, int irun, bool iStereo, bool iP
         else if( irun < 0 )
         {
             sprintf( hdir, "total_%d", -1 * irun );
-            if(!fAnasumDataFile->cd( hdir ) )
+            if( !fAnasumDataFile->cd( hdir ) )
             {
                 return 0;
             }
@@ -105,7 +105,7 @@ bool VAnalysisUtilities::openFile( string iname, int irun, bool iStereo, bool iP
         else
         {
             sprintf( hdir, "run_%d", irun );
-            if(!fAnasumDataFile->cd( hdir ) )
+            if( !fAnasumDataFile->cd( hdir ) )
             {
                 return 0;
             }
@@ -121,7 +121,7 @@ bool VAnalysisUtilities::openFile( string iname, int irun, bool iStereo, bool iP
 
 bool VAnalysisUtilities::readTargetCoordinatesFromtRunSummary( TTree* t, int ion )
 {
-    if(!t )
+    if( !t )
     {
         return false;
     }
@@ -225,7 +225,7 @@ bool VAnalysisUtilities::readRunList()
 
 CRunSummary* VAnalysisUtilities::getRunSummaryTree( int iTot )
 {
-    if(!fAnasumDataFile )
+    if( !fAnasumDataFile )
     {
         return 0;
     }
@@ -246,7 +246,7 @@ CRunSummary* VAnalysisUtilities::getRunSummaryTree( int iTot )
     fAnasumDataFile->cd( hname );
 
     TTree* t = ( TTree* )gDirectory->Get( "tRunSummary" );
-    if(!t )
+    if( !t )
     {
         cout << "Error: no tRunSummary tree found in " << fAnasumDataFile->GetName() << endl;
         return 0;
@@ -299,7 +299,7 @@ bool VAnalysisUtilities::readRunList( vector< int > irunlist, int iTot )
     fRunList.clear();
 
     CRunSummary* c = getRunSummaryTree( iTot );
-    if(!c )
+    if( !c )
     {
         return false;
     }
@@ -333,7 +333,7 @@ bool VAnalysisUtilities::readRunList( vector< int > irunlist, int iTot )
                 bFoundRun = true;
             }
 
-            if(!bFoundRun )
+            if( !bFoundRun )
             {
                 continue;
             }
@@ -416,7 +416,7 @@ bool VAnalysisUtilities::readRunList( vector< int > irunlist, int iTot )
 */
 TObject* VAnalysisUtilities::getHistogram( string hisname, int runnumber, string dirname, double iSlizeY )
 {
-    if(!fAnasumDataFile )
+    if( !fAnasumDataFile )
     {
         return 0;
     }
@@ -444,7 +444,7 @@ TObject* VAnalysisUtilities::getHistogram( string hisname, int runnumber, string
 
     fAnasumDataFile->cd( dx );
     TDirectory* iDir = gDirectory;
-    if(!iDir )
+    if( !iDir )
     {
         return 0;
     }
@@ -474,7 +474,7 @@ TObject* VAnalysisUtilities::getHistogram( string hisname, int runnumber, string
 double VAnalysisUtilities::getNormalisationFactor( int iRun )
 {
 
-    if(!fAnasumDataFile )
+    if( !fAnasumDataFile )
     {
         return -1;
     }
@@ -482,7 +482,7 @@ double VAnalysisUtilities::getNormalisationFactor( int iRun )
     TDirectory* iDir = gDirectory;
     TTree* t = ( TTree* )iDir->Get( "tRunSummary" );
 
-    if(!t )
+    if( !t )
     {
         return -1.;
     }

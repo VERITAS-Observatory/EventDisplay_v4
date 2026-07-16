@@ -108,12 +108,12 @@ int main( int argc, char* argv[] )
     VAstronometry::vlaCldj( year, month, day, &djm, &j );
     if( j == 0 )
     {
-        if(!bPrintWholeYear )
+        if( !bPrintWholeYear )
         {
             // calculate orbital phase
             cout << "Orbital phase of " << object << " for " << year << "-" << month << "-" << day << ", MJD " << djm << ": ";
             cout << endl;
-            double iP = ( djm - t0 ) / orbit - ( int )(( djm - t0 ) / orbit );
+            double iP = ( djm - t0 ) / orbit - ( int )( ( djm - t0 ) / orbit );
             if( iP < 0. )
             {
                 cout << 1. + iP << endl;
@@ -131,7 +131,7 @@ int main( int argc, char* argv[] )
             // 10 day interval
             for( int i = 0; i < 366; i++ )
             {
-                p = ( djm  - t0 ) / orbit - ( int )(( djm - t0 ) / orbit );
+                p = ( djm  - t0 ) / orbit - ( int )( ( djm - t0 ) / orbit );
                 if( p < p_old )
                 {
                     VAstronometry::vlaDjcl( djm_old, &year, &month, &day, &fd, &j );
@@ -141,7 +141,7 @@ int main( int argc, char* argv[] )
                 VAstronometry::vlaDjcl( djm, &year, &month, &day, &fd, &j );
                 cout << "Orbital phase of " << object << " for ";
                 cout << year << "-" << month << "-" << day << ", MJD " << djm << ": ";
-                cout << ( djm - t0 ) / orbit - ( int )(( djm - t0 ) / orbit ) << endl;
+                cout << ( djm - t0 ) / orbit - ( int )( ( djm - t0 ) / orbit ) << endl;
                 p_old = p;
                 djm_old = djm;
                 djm++;
@@ -151,7 +151,7 @@ int main( int argc, char* argv[] )
     else
     {
         cout << "failed calculation of MJD" << endl;
-        exit(-1 );
+        exit( -1 );
     }
     cout << endl;
 }

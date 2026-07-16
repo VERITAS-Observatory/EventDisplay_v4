@@ -187,7 +187,7 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
 
     // loop over all files
     char hname[2000];
-    if(!fData )
+    if( !fData )
     {
         TChain* c = new TChain( "tRunSummary" );
         for( unsigned int i = 0; i < fFile.size(); i++ )
@@ -200,7 +200,7 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
             {
                 sprintf( hname, "total/stereo" );
             }
-            if(!fFile[i]->cd( hname ) )
+            if( !fFile[i]->cd( hname ) )
             {
                 cout << "directory " << hname << " not found in file " << fFile[i] << endl;
                 return 0;
@@ -279,12 +279,12 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
             fRunZe.push_back( 90. - fData->elevationOff );
             fRunAz.push_back( fData->azimuthOff );
         }
-        fRunWobbleOffset.push_back( sqrt( fData->WobbleNorth* fData->WobbleNorth + fData->WobbleWest* fData->WobbleWest ) );
+        fRunWobbleOffset.push_back( sqrt( fData->WobbleNorth * fData->WobbleNorth + fData->WobbleWest * fData->WobbleWest ) );
         fRunPedvars.push_back( fData->pedvarsOn );
         // number of gamma-like events per run (this might be overwritten later)
-        fRunNdiff.push_back( fData->NOn - fData->NOff* fData->OffNorm );
+        fRunNdiff.push_back( fData->NOn - fData->NOff * fData->OffNorm );
         // error on number of gamma-like events
-        fRunNdiffE.push_back( sqrt( fData->NOn + fData->NOff*    fData->OffNorm*    fData->OffNorm ) );
+        fRunNdiffE.push_back( sqrt( fData->NOn + fData->NOff *    fData->OffNorm *    fData->OffNorm ) );
         if( fData->tOn > 0. )
         {
             fRunRate.push_back( fRunNdiff.back() / fData->tOn * 60. );
@@ -304,21 +304,21 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
         fRunNon.push_back( fData->NOn );
         fRunNoff.push_back( fData->NOff );
         fRunNorm.push_back( fData->OffNorm );
-        fRunSigni.push_back(-99. );
-        fRunUFL.push_back(-99. );
-        fRunCI_lo_1sigma.push_back(-99. );
-        fRunCI_up_1sigma.push_back(-99. );
-        fRunCI_lo_3sigma.push_back(-99. );
-        fRunCI_up_3sigma.push_back(-99. );
-        fRunFlux.push_back(-99. );
-        fRunFluxE.push_back(-99. );
+        fRunSigni.push_back( -99. );
+        fRunUFL.push_back( -99. );
+        fRunCI_lo_1sigma.push_back( -99. );
+        fRunCI_up_1sigma.push_back( -99. );
+        fRunCI_lo_3sigma.push_back( -99. );
+        fRunCI_up_3sigma.push_back( -99. );
+        fRunFlux.push_back( -99. );
+        fRunFluxE.push_back( -99. );
         fRunFluxConstant.push_back( 0. );
         fRunFluxConstantE.push_back( 0. );
         fRunEffArea.push_back( 0. );
-        fRunFluxCI_lo_1sigma.push_back(-99. );
-        fRunFluxCI_up_1sigma.push_back(-99. );
-        fRunFluxCI_lo_3sigma.push_back(-99. );
-        fRunFluxCI_up_3sigma.push_back(-99. );
+        fRunFluxCI_lo_1sigma.push_back( -99. );
+        fRunFluxCI_up_1sigma.push_back( -99. );
+        fRunFluxCI_lo_3sigma.push_back( -99. );
+        fRunFluxCI_up_3sigma.push_back( -99. );
     }
 
     cleanRunList();
@@ -523,11 +523,11 @@ void VFluxCalculation::getIntegralEffectiveArea()
             }
 
             sprintf( hname, "run_%d/stereo/EffectiveAreas", int( fRunList[i] + 0.5 ) );
-            if(!fFile[f]->Get( hname ) )
+            if( !fFile[f]->Get( hname ) )
             {
                 continue;
             }
-            if(!fFile[f]->cd( hname ) )
+            if( !fFile[f]->cd( hname ) )
             {
                 cout << "directory " << hname << " not found" << endl;
                 cout << "continue..." << endl;
@@ -540,11 +540,11 @@ void VFluxCalculation::getIntegralEffectiveArea()
             TGraphAsymmErrors* g = ( TGraphAsymmErrors* )gDirectory->Get( "gMeanEffectiveArea" );
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // found graph with effective areas
-            if(!g )
+            if( !g )
             {
                 // try go get off graph
                 g = ( TGraphAsymmErrors* )gDirectory->Get( "gMeanEffectiveArea_off" );
-                if(!g )
+                if( !g )
                 {
                     cout << "error: effective area graph not found" << endl;
                     cout << "continue..." << endl;
@@ -604,11 +604,11 @@ void VFluxCalculation::getIntegralEffectiveArea()
                 // read effective area graphs for time binned intra run light curves
                 TGraph2DErrors* g_time = ( TGraph2DErrors* )gDirectory->Get( "gTimeBinnedMeanEffectiveArea" );
                 // find 2D graph with time dependent effective areas
-                if(!g_time )
+                if( !g_time )
                 {
                     // if not try go get off graph
                     g_time = ( TGraph2DErrors* )gDirectory->Get( "gTimeBinnedMeanEffectiveArea_off" );
-                    if(!g_time )
+                    if( !g_time )
                     {
                         cout << "error: 2D effective area graph not found" << endl;
                         cout << "continue..." << endl;
@@ -1160,30 +1160,30 @@ void VFluxCalculation::calculateFluxes()
                 {
                     if( fMinEnergy > 0. )
                     {
-                        IntraFlux.push_back(-1. / ( fAlpha + 1. ) * IntraFluxConstant[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
-                        IntraFluxE.push_back(-1. / ( fAlpha + 1. ) * IntraFluxConstantE[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
-                        IntraFluxCI_lo_1sigma.push_back(-1. / ( fAlpha + 1. ) * IntraFluxCI_lo_1sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
-                        IntraFluxCI_up_1sigma.push_back(-1. / ( fAlpha + 1. ) * IntraFluxCI_up_1sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
-                        IntraFluxCI_lo_3sigma.push_back(-1. / ( fAlpha + 1. ) * IntraFluxCI_lo_3sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
-                        IntraFluxCI_up_3sigma.push_back(-1. / ( fAlpha + 1. ) * IntraFluxCI_up_3sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+                        IntraFlux.push_back( -1. / ( fAlpha + 1. ) * IntraFluxConstant[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+                        IntraFluxE.push_back( -1. / ( fAlpha + 1. ) * IntraFluxConstantE[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+                        IntraFluxCI_lo_1sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_lo_1sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+                        IntraFluxCI_up_1sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_up_1sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+                        IntraFluxCI_lo_3sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_lo_3sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+                        IntraFluxCI_up_3sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_up_3sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
                     }
                     else if( fIntraRunFluxConstantE[i][t] > 0. )
                     {
-                        IntraFlux.push_back(-1. / ( fAlpha + 1. ) * IntraFluxConstant[t] );
-                        IntraFluxE.push_back(-1. / ( fAlpha + 1. ) * IntraFluxConstantE[t] );
-                        IntraFluxCI_lo_1sigma.push_back(-1. / ( fAlpha + 1. ) * IntraFluxCI_lo_1sigma[t] );
-                        IntraFluxCI_up_1sigma.push_back(-1. / ( fAlpha + 1. ) * IntraFluxCI_up_1sigma[t] );
-                        IntraFluxCI_lo_3sigma.push_back(-1. / ( fAlpha + 1. ) * IntraFluxCI_lo_3sigma[t] );
-                        IntraFluxCI_up_3sigma.push_back(-1. / ( fAlpha + 1. ) * IntraFluxCI_up_3sigma[t] );
+                        IntraFlux.push_back( -1. / ( fAlpha + 1. ) * IntraFluxConstant[t] );
+                        IntraFluxE.push_back( -1. / ( fAlpha + 1. ) * IntraFluxConstantE[t] );
+                        IntraFluxCI_lo_1sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_lo_1sigma[t] );
+                        IntraFluxCI_up_1sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_up_1sigma[t] );
+                        IntraFluxCI_lo_3sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_lo_3sigma[t] );
+                        IntraFluxCI_up_3sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_up_3sigma[t] );
                     }
                     else
                     {
-                        IntraFlux.push_back(-99. );
-                        IntraFluxE.push_back(-99. );
-                        IntraFluxCI_lo_1sigma.push_back(-99. );
-                        IntraFluxCI_up_1sigma.push_back(-99. );
-                        IntraFluxCI_lo_3sigma.push_back(-99. );
-                        IntraFluxCI_up_3sigma.push_back(-99. );
+                        IntraFlux.push_back( -99. );
+                        IntraFluxE.push_back( -99. );
+                        IntraFluxCI_lo_1sigma.push_back( -99. );
+                        IntraFluxCI_up_1sigma.push_back( -99. );
+                        IntraFluxCI_lo_3sigma.push_back( -99. );
+                        IntraFluxCI_up_3sigma.push_back( -99. );
                     }
                 }
                 else  // fMaxEnergy != MAX_SAFE_MC_ENERGY)
@@ -1194,36 +1194,36 @@ void VFluxCalculation::calculateFluxes()
                     }
                     if( fMinEnergy > 0. )
                     {
-                        IntraFlux.push_back(-1. / ( fAlpha + 1. ) * IntraFluxConstant[t] *
-                                            ( TMath::Power( fMinEnergy, fAlpha + 1. ) - TMath::Power( fMaxEnergy, fAlpha + 1. ) ) / TMath::Power( fE0, fAlpha ) );
-                        IntraFluxE.push_back(-1. / ( fAlpha + 1. ) * IntraFluxConstantE[t] *
+                        IntraFlux.push_back( -1. / ( fAlpha + 1. ) * IntraFluxConstant[t] *
                                              ( TMath::Power( fMinEnergy, fAlpha + 1. ) - TMath::Power( fMaxEnergy, fAlpha + 1. ) ) / TMath::Power( fE0, fAlpha ) );
-                        IntraFluxCI_lo_1sigma.push_back(-1. / ( fAlpha + 1. ) * IntraFluxCI_lo_1sigma[t] *
-                                                        ( TMath::Power( fMinEnergy, fAlpha + 1. ) - TMath::Power( fMaxEnergy, fAlpha + 1. ) ) / TMath::Power( fE0, fAlpha ) );
-                        IntraFluxCI_up_1sigma.push_back(-1. / ( fAlpha + 1. ) * IntraFluxCI_up_1sigma[t] *
-                                                        ( TMath::Power( fMinEnergy, fAlpha + 1. ) - TMath::Power( fMaxEnergy, fAlpha + 1. ) ) / TMath::Power( fE0, fAlpha ) );
-                        IntraFluxCI_lo_3sigma.push_back(-1. / ( fAlpha + 1. ) * IntraFluxCI_lo_3sigma[t] *
-                                                        ( TMath::Power( fMinEnergy, fAlpha + 1. ) - TMath::Power( fMaxEnergy, fAlpha + 1. ) ) / TMath::Power( fE0, fAlpha ) );
-                        IntraFluxCI_up_3sigma.push_back(-1. / ( fAlpha + 1. ) * IntraFluxCI_up_3sigma[t] *
-                                                        ( TMath::Power( fMinEnergy, fAlpha + 1. ) - TMath::Power( fMaxEnergy, fAlpha + 1. ) ) / TMath::Power( fE0, fAlpha ) );
+                        IntraFluxE.push_back( -1. / ( fAlpha + 1. ) * IntraFluxConstantE[t] *
+                                              ( TMath::Power( fMinEnergy, fAlpha + 1. ) - TMath::Power( fMaxEnergy, fAlpha + 1. ) ) / TMath::Power( fE0, fAlpha ) );
+                        IntraFluxCI_lo_1sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_lo_1sigma[t] *
+                                                         ( TMath::Power( fMinEnergy, fAlpha + 1. ) - TMath::Power( fMaxEnergy, fAlpha + 1. ) ) / TMath::Power( fE0, fAlpha ) );
+                        IntraFluxCI_up_1sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_up_1sigma[t] *
+                                                         ( TMath::Power( fMinEnergy, fAlpha + 1. ) - TMath::Power( fMaxEnergy, fAlpha + 1. ) ) / TMath::Power( fE0, fAlpha ) );
+                        IntraFluxCI_lo_3sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_lo_3sigma[t] *
+                                                         ( TMath::Power( fMinEnergy, fAlpha + 1. ) - TMath::Power( fMaxEnergy, fAlpha + 1. ) ) / TMath::Power( fE0, fAlpha ) );
+                        IntraFluxCI_up_3sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_up_3sigma[t] *
+                                                         ( TMath::Power( fMinEnergy, fAlpha + 1. ) - TMath::Power( fMaxEnergy, fAlpha + 1. ) ) / TMath::Power( fE0, fAlpha ) );
                     }
                     else if( fIntraRunFluxConstantE[i][t] > 0. )
                     {
-                        IntraFlux.push_back(-1. / ( fAlpha + 1. ) * IntraFluxConstant[t] );
-                        IntraFluxE.push_back(-1. / ( fAlpha + 1. ) * IntraFluxConstantE[t] );
-                        IntraFluxCI_lo_1sigma.push_back(-1. / ( fAlpha + 1. ) * IntraFluxCI_lo_1sigma[t] );
-                        IntraFluxCI_up_1sigma.push_back(-1. / ( fAlpha + 1. ) * IntraFluxCI_up_1sigma[t] );
-                        IntraFluxCI_lo_3sigma.push_back(-1. / ( fAlpha + 1. ) * IntraFluxCI_lo_3sigma[t] );
-                        IntraFluxCI_up_3sigma.push_back(-1. / ( fAlpha + 1. ) * IntraFluxCI_up_3sigma[t] );
+                        IntraFlux.push_back( -1. / ( fAlpha + 1. ) * IntraFluxConstant[t] );
+                        IntraFluxE.push_back( -1. / ( fAlpha + 1. ) * IntraFluxConstantE[t] );
+                        IntraFluxCI_lo_1sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_lo_1sigma[t] );
+                        IntraFluxCI_up_1sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_up_1sigma[t] );
+                        IntraFluxCI_lo_3sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_lo_3sigma[t] );
+                        IntraFluxCI_up_3sigma.push_back( -1. / ( fAlpha + 1. ) * IntraFluxCI_up_3sigma[t] );
                     }
                     else
                     {
-                        IntraFlux.push_back(-99. );
-                        IntraFluxE.push_back(-99. );
-                        IntraFluxCI_lo_1sigma.push_back(-99. );
-                        IntraFluxCI_up_1sigma.push_back(-99. );
-                        IntraFluxCI_lo_3sigma.push_back(-99. );
-                        IntraFluxCI_up_3sigma.push_back(-99. );
+                        IntraFlux.push_back( -99. );
+                        IntraFluxE.push_back( -99. );
+                        IntraFluxCI_lo_1sigma.push_back( -99. );
+                        IntraFluxCI_up_1sigma.push_back( -99. );
+                        IntraFluxCI_lo_3sigma.push_back( -99. );
+                        IntraFluxCI_up_3sigma.push_back( -99. );
                     }
 
                 }
@@ -1289,7 +1289,7 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
     // loop over all files
     for( unsigned int f = 0; f < fFile.size(); f++ )
     {
-        if(!fFile[f] || !fFile[f]->cd() )
+        if( !fFile[f] || !fFile[f]->cd() )
         {
             cout << "error: no input file found" << endl;
             return;
@@ -1330,16 +1330,16 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
             IntraNdiffE.clear();
             // calculate number of events above given energy threshold for this run
             // also get the time and deadtime fraction for each time bin
-            if(( int )fRunList[i] > 0 )
+            if( ( int )fRunList[i] > 0 )
             {
                 sprintf( hname, "run_%d/stereo/energyHistograms", ( int )fRunList[i] );
 
                 // OBS!!!
-                if(!fFile[f]->Get( hname ) )
+                if( !fFile[f]->Get( hname ) )
                 {
                     continue;
                 }
-                if(!fFile[f]->cd( hname ) )
+                if( !fFile[f]->cd( hname ) )
                 {
                     cout << "error finding directory " << hname << endl;
                     return;
@@ -1347,7 +1347,7 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 
                 hon = ( TH1D* )gDirectory->Get( "hLinerecCounts_on" );
                 hoff = ( TH1D* )gDirectory->Get( "hLinerecCounts_off" );
-                if(!hon || !hoff )
+                if( !hon || !hoff )
                 {
                     cout << "error finding counting histogram (energy): " << hon << "\t" << hoff << "\t" << ( int )fRunList[i] << endl;
                     return;
@@ -1359,7 +1359,7 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
                     honDuration1DtimeBinned = ( TH1D* )gDirectory->Get( "hRealDuration1DtimeBinned_on" );
                     hoffDuration1DtimeBinned = ( TH1D* )gDirectory->Get( "hRealDuration1DtimeBinned_off" );
                     //honDeadTimeFraction1DtimeBinned
-                    if(!hon2DtimeBinned || !hoff2DtimeBinned || !honDuration1DtimeBinned || !hoffDuration1DtimeBinned )
+                    if( !hon2DtimeBinned || !hoff2DtimeBinned || !honDuration1DtimeBinned || !hoffDuration1DtimeBinned )
                     {
                         cout << "error finding time binned 2D counting histogram (energy): ";
                         cout << hon2DtimeBinned << "\t" << hoff2DtimeBinned << "\t" << honDuration1DtimeBinned << "\t" << hoffDuration1DtimeBinned << "\t" << ( int )fRunList[i] << endl;
@@ -1486,7 +1486,7 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
             {
                 TRolke i_Rolke;
                 i_Rolke.SetCLSigmas( 1.e-4 );
-                i_Rolke.SetPoissonBkgKnownEff(( int )fRunNon[i], ( int )fRunNoff[i], 1. / fRunNorm[i], 1. );
+                i_Rolke.SetPoissonBkgKnownEff( ( int )fRunNon[i], ( int )fRunNoff[i], 1. / fRunNorm[i], 1. );
                 fRunNdiff[i] = 0.5 * ( i_Rolke.GetLowerLimit() + i_Rolke.GetUpperLimit() );
                 // symmetric error bar is meaning less for low counts
                 i_Rolke.SetCLSigmas( 1. );
@@ -1603,7 +1603,7 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
             }
             else
             {
-                IntraSigni.push_back(-99. );
+                IntraSigni.push_back( -99. );
             }
 
             // calculate upper flux if necessary
@@ -1627,11 +1627,11 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
                 // calculate confidence intervals for fluxes
                 TRolke i_Rolke;
                 i_Rolke.SetCLSigmas( 1. );
-                i_Rolke.SetPoissonBkgKnownEff(( int )fRunNon[i], ( int )fRunNoff[i], 1. / fRunNorm[i], 1. );
+                i_Rolke.SetPoissonBkgKnownEff( ( int )fRunNon[i], ( int )fRunNoff[i], 1. / fRunNorm[i], 1. );
                 fRunCI_lo_1sigma[i] = i_Rolke.GetLowerLimit();
                 fRunCI_up_1sigma[i] = i_Rolke.GetUpperLimit();
                 i_Rolke.SetCLSigmas( 3. );
-                i_Rolke.SetPoissonBkgKnownEff(( int )fRunNon[i], ( int )fRunNoff[i], 1. / fRunNorm[i], 1. );
+                i_Rolke.SetPoissonBkgKnownEff( ( int )fRunNon[i], ( int )fRunNoff[i], 1. / fRunNorm[i], 1. );
                 fRunCI_lo_3sigma[i] = i_Rolke.GetLowerLimit();
                 fRunCI_up_3sigma[i] = i_Rolke.GetUpperLimit();
             }
@@ -1643,23 +1643,23 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
                     if( IntraSigni[t] < fThresholdSignificance || fIntraRunNon[i][t] < fMinEvents )
                     {
                         IntraUFL.push_back( VStatistics::calcUpperLimit( fIntraRunNon[i][t], fIntraRunNoff[i][t],
-                                            fRunNorm[i], fUpperLimit, fUpperLimitMethod ) );
-                        IntraCI_lo_1sigma.push_back(-99. );
-                        IntraCI_up_1sigma.push_back(-99. );
-                        IntraCI_lo_3sigma.push_back(-99. );
-                        IntraCI_up_3sigma.push_back(-99. );
+                            fRunNorm[i], fUpperLimit, fUpperLimitMethod ) );
+                        IntraCI_lo_1sigma.push_back( -99. );
+                        IntraCI_up_1sigma.push_back( -99. );
+                        IntraCI_lo_3sigma.push_back( -99. );
+                        IntraCI_up_3sigma.push_back( -99. );
                     }
                     else
                     {
-                        IntraUFL.push_back(-99. );
+                        IntraUFL.push_back( -99. );
                         // calculate confidence intervals for fluxes
                         TRolke i_Rolke;
                         i_Rolke.SetCLSigmas( 1. );
-                        i_Rolke.SetPoissonBkgKnownEff(( int )fIntraRunNon[i][t], ( int )fIntraRunNoff[i][t], 1. / fRunNorm[i], 1. );
+                        i_Rolke.SetPoissonBkgKnownEff( ( int )fIntraRunNon[i][t], ( int )fIntraRunNoff[i][t], 1. / fRunNorm[i], 1. );
                         IntraCI_lo_1sigma.push_back( i_Rolke.GetLowerLimit() );
                         IntraCI_up_1sigma.push_back( i_Rolke.GetUpperLimit() );
                         i_Rolke.SetCLSigmas( 3. );
-                        i_Rolke.SetPoissonBkgKnownEff(( int )fIntraRunNon[i][t], ( int )fIntraRunNoff[i][t], 1. / fRunNorm[i], 1. );
+                        i_Rolke.SetPoissonBkgKnownEff( ( int )fIntraRunNon[i][t], ( int )fIntraRunNoff[i][t], 1. / fRunNorm[i], 1. );
                         IntraCI_lo_3sigma.push_back( i_Rolke.GetLowerLimit() );
                         IntraCI_up_3sigma.push_back( i_Rolke.GetUpperLimit() );
                     }
@@ -1679,11 +1679,11 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
                 for( unsigned int t = 0; t < fIntraRunNon[i].size(); t++ )
                 {
                     IntraSigni.push_back( 99. );
-                    IntraUFL.push_back(-99. );
-                    IntraCI_lo_1sigma.push_back(-99. );
-                    IntraCI_up_1sigma.push_back(-99. );
-                    IntraCI_lo_3sigma.push_back(-99. );
-                    IntraCI_up_3sigma.push_back(-99. );
+                    IntraUFL.push_back( -99. );
+                    IntraCI_lo_1sigma.push_back( -99. );
+                    IntraCI_up_1sigma.push_back( -99. );
+                    IntraCI_lo_3sigma.push_back( -99. );
+                    IntraCI_up_3sigma.push_back( -99. );
                 }
             }
         }
@@ -1952,7 +1952,7 @@ double VFluxCalculation::getRateError( int irun )
 */
 void VFluxCalculation::writeResults( char* ofile )
 {
-    if(!ofile )
+    if( !ofile )
     {
         return;
     }
@@ -2006,7 +2006,7 @@ TCanvas* VFluxCalculation::plotFluxesVSPedvars()
     cFPedvars->SetGridy( 0 );
     cFPedvars->Draw();
 
-    gFluxPedvars = new TGraphErrors(( int )fRunMJD.size() - 1 );
+    gFluxPedvars = new TGraphErrors( ( int )fRunMJD.size() - 1 );
     gFluxPedvars->SetTitle( "" );
     gFluxPedvars->SetMarkerStyle( 20 );
     gFluxPedvars->SetMarkerSize( 1. );
@@ -2046,7 +2046,7 @@ TCanvas* VFluxCalculation::plotFluxesVSWobbleOffset()
     cFWobbleOffset->SetGridy( 0 );
     cFWobbleOffset->Draw();
 
-    gFluxWobbleOffset = new TGraphErrors(( int )fRunMJD.size() - 1 );
+    gFluxWobbleOffset = new TGraphErrors( ( int )fRunMJD.size() - 1 );
     gFluxWobbleOffset->SetTitle( "" );
     gFluxWobbleOffset->SetMarkerStyle( 20 );
     gFluxWobbleOffset->SetMarkerSize( 1 );
@@ -2091,7 +2091,7 @@ TCanvas* VFluxCalculation::plotFluxesVSElevation( bool iDraw,
         cCanvas_FElevation->Draw();
     }
 
-    gFluxElevation = new TGraphErrors(( int )fRunMJD.size() - 1 );
+    gFluxElevation = new TGraphErrors( ( int )fRunMJD.size() - 1 );
     gFluxElevation->SetTitle( "" );
     gFluxElevation->SetMarkerStyle( 20 );
     gFluxElevation->SetMarkerSize( 1. );
@@ -2150,7 +2150,7 @@ TCanvas* VFluxCalculation::plotFluxesVSAzimuth( bool iDraw,
         cCanvas_FAzimuth->Draw();
     }
 
-    gFluxAzimuth = new TGraphErrors(( int )fRunMJD.size() - 1 );
+    gFluxAzimuth = new TGraphErrors( ( int )fRunMJD.size() - 1 );
     gFluxAzimuth->SetTitle( "" );
     gFluxAzimuth->SetMarkerStyle( 20 );
     gFluxAzimuth->SetMarkerSize( 1. );
@@ -2203,7 +2203,7 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char* iTex, double iMJDOffset, 
     string sFluxMult = "10^{-7}";
     double fluxMult = 1.e7;
 
-    if(!cFMJD )
+    if( !cFMJD )
     {
         fCanvasFluxesVSMJD = new TCanvas( "fCanvasFluxesVSMJD", "fluxes vs MJD", 10, 10, 1100, 700 );
         fCanvasFluxesVSMJD->SetGridx( 0 );
@@ -2256,7 +2256,7 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char* iTex, double iMJDOffset, 
             mean_flux += fRunFlux[i] * ( fRunTOn[i] * ( 1. - fRunDeadTime[i] ) );
             total_time += ( fRunTOn[i] * ( 1. - fRunDeadTime[i] ) );
 
-            iV_Run.push_back(( int )fRunList[i] );
+            iV_Run.push_back( ( int )fRunList[i] );
             iV_Flux.push_back( fRunFlux[i] );
             iV_FluxE.push_back( fRunFluxE[i] );
             if( fRunFlux[i] - fRunFluxE[i] < iMinFlux )
@@ -2328,7 +2328,7 @@ TGraphErrors* VFluxCalculation::plotFluxesInBINs( int run, char* iTex, double iM
     string sFluxMult = "10^{-7}";
     double fluxMult = 1.e7;
 
-    if(!cFMJD )
+    if( !cFMJD )
     {
         fCanvasFluxesInBINs = new TCanvas( "fCanvasFluxesInBINs", "fluxes vs MJD", 10, 10, 600, 400 );
         fCanvasFluxesInBINs->SetGridx( 0 );
@@ -2437,7 +2437,7 @@ TGraphErrors* VFluxCalculation::plotFluxesInBINs( int run, char* iTex, double iM
                         gFluxInBINs->SetPointError( z,  fTimeBinDuration[i] / 86400. / 2., fIntraRunFluxE[i][t] );
                         mean_flux += fIntraRunFlux[i][t] * fIntraRunTOn[i][t];
                         z++;
-                        iV_Run.push_back(( int )fRunList[i] );
+                        iV_Run.push_back( ( int )fRunList[i] );
                         iV_Flux.push_back( fIntraRunFlux[i][t] );
                         iV_FluxE.push_back( fIntraRunFluxE[i][t] );
                     }
@@ -2588,7 +2588,7 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJDDaily( char* iTex, double iMJDOff
     for( unsigned int i = 0; i < fRunMJD.size(); i++ )
     {
         //double run_duration = (fRunTOn[i] * ( 1. - fRunDeadTime[i] ));
-        if( iTDay.find(( int )fRunMJD[i] ) != iTDay.end() )
+        if( iTDay.find( ( int )fRunMJD[i] ) != iTDay.end() )
         {
             iTDay[( int )fRunMJD[i]] += fRunTOn[i];
             //iTDay[( int )fRunMJD[i]] += run_duration;
@@ -2608,7 +2608,7 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJDDaily( char* iTex, double iMJDOff
         }
     }
 
-    TGraphErrors* gFluxMJDDay = new TGraphErrors(( int )iTDay.size() - 1 );
+    TGraphErrors* gFluxMJDDay = new TGraphErrors( ( int )iTDay.size() - 1 );
 
     gFluxMJDDay->SetTitle( "" );
     gFluxMJDDay->SetMarkerStyle( 20 );
@@ -2706,7 +2706,7 @@ void VFluxCalculation::writeTexFileForFluxValues( string iTex, vector< int > iMJ
 {
     ofstream is;
     is.open( iTex.c_str() );
-    if(!is )
+    if( !is )
     {
         cout << "error opening " << iTex << endl;
         return;
@@ -2738,7 +2738,7 @@ void VFluxCalculation::writeTexFileForFluxValues( string iTex, vector< int > iMJ
 
 bool VFluxCalculation::readRXTE( string ifile )
 {
-    if(!fRXTE )
+    if( !fRXTE )
     {
         fRXTE = new VXRayData();
     }
@@ -2888,7 +2888,7 @@ bool VXRayData::readFile( string ifile, string tname, double iMJDmin, double iMJ
     float fluxElow;
     float fluxEup;
     TTree* t = ( TTree* )f.Get( tname.c_str() );
-    if(!t )
+    if( !t )
     {
         cout << "error: tree with X-ray data not found: " << tname << endl;
         return false;
@@ -2907,9 +2907,9 @@ bool VXRayData::readFile( string ifile, string tname, double iMJDmin, double iMJ
     {
         t->GetEntry( i );
 
-        if(( iMJDmin > 0. && MJD >= iMJDmin ) || iMJDmin < 0. )
+        if( ( iMJDmin > 0. && MJD >= iMJDmin ) || iMJDmin < 0. )
         {
-            if(( iMJDmax > 0. && MJD <= iMJDmax ) || iMJDmax < 0. )
+            if( ( iMJDmax > 0. && MJD <= iMJDmax ) || iMJDmax < 0. )
             {
                 fMJD.push_back( MJD );
                 fPhase.push_back( phase );

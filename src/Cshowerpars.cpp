@@ -6,7 +6,7 @@
 
 Cshowerpars::Cshowerpars( TTree* tree, bool iMC, bool iShort )
 {
-    if(!tree )
+    if( !tree )
     {
         return;
     }
@@ -21,7 +21,7 @@ Cshowerpars::Cshowerpars( TTree* tree, bool iMC, bool iShort )
 
 Cshowerpars::~Cshowerpars()
 {
-    if(!fChain )
+    if( !fChain )
     {
         return;
     }
@@ -32,7 +32,7 @@ Cshowerpars::~Cshowerpars()
 Int_t Cshowerpars::GetEntry( Long64_t entry )
 {
     // Read contents of entry.
-    if(!fChain )
+    if( !fChain )
     {
         return 0;
     }
@@ -44,7 +44,7 @@ Int_t Cshowerpars::GetEntry( Long64_t entry )
 Long64_t Cshowerpars::LoadTree( Long64_t entry )
 {
     // Set the environment to read one entry
-    if(!fChain )
+    if( !fChain )
     {
         return -5;
     }
@@ -100,7 +100,7 @@ void Cshowerpars::Init( TTree* tree )
     }
     fChain->SetBranchAddress( "MJD", &MJD );
     fChain->SetBranchAddress( "Time", &Time );
-    if(!bShort )
+    if( !bShort )
     {
         fChain->SetBranchAddress( "dataFormat", &dataFormat );
     }
@@ -109,7 +109,7 @@ void Cshowerpars::Init( TTree* tree )
         dataFormat = 0;
     }
     fChain->SetBranchAddress( "NTel", &NTel );
-    if(!bShort )
+    if( !bShort )
     {
         fChain->SetBranchAddress( "traceFit", &traceFit );
     }
@@ -120,7 +120,7 @@ void Cshowerpars::Init( TTree* tree )
     fChain->SetBranchAddress( "TelElevation", TelElevation );
     fChain->SetBranchAddress( "TelAzimuth", TelAzimuth );
 
-    if(!bMC )
+    if( !bMC )
     {
         fChain->SetBranchAddress( "TelDec", TelDec );
         fChain->SetBranchAddress( "TelRA", TelRA );
@@ -134,7 +134,7 @@ void Cshowerpars::Init( TTree* tree )
         }
     }
 
-    if(!bMC && !bShort )
+    if( !bMC && !bShort )
     {
         fChain->SetBranchAddress( "TelElevationVBF", TelElevationVBF );
         fChain->SetBranchAddress( "TelAzimuthVBF", TelAzimuthVBF );
@@ -180,7 +180,7 @@ void Cshowerpars::Init( TTree* tree )
         }
     }
     fChain->SetBranchAddress( "NMethods", &NMethods );
-    if(!bShort )
+    if( !bShort )
     {
         fChain->SetBranchAddress( "MethodID", MethodID );
     }
@@ -213,7 +213,7 @@ void Cshowerpars::Init( TTree* tree )
             YoffDeRot[i] = 0.;
         }
     }
-    if(!bShort )
+    if( !bShort )
     {
         fChain->SetBranchAddress( "stds", stds );
         if( fChain->GetBranchStatus( "dec" ) )
@@ -233,7 +233,7 @@ void Cshowerpars::Init( TTree* tree )
     }
     fChain->SetBranchAddress( "Xcore", Xcore );
     fChain->SetBranchAddress( "Ycore", Ycore );
-    if(!bShort )
+    if( !bShort )
     {
         fChain->SetBranchAddress( "Xcore_SC", Xcore_SC );
         fChain->SetBranchAddress( "Ycore_SC", Ycore_SC );
@@ -266,7 +266,7 @@ void Cshowerpars::Init( TTree* tree )
         fChain->SetBranchAddress( "MCe0", &MCe0 );
         fChain->SetBranchAddress( "MCxcore", &MCxcore );
         fChain->SetBranchAddress( "MCycore", &MCycore );
-        if(!bShort )
+        if( !bShort )
         {
             fChain->SetBranchAddress( "MCxcos", &MCxcos );
             fChain->SetBranchAddress( "MCycos", &MCycos );
@@ -280,7 +280,7 @@ void Cshowerpars::Init( TTree* tree )
         fChain->SetBranchAddress( "MCaz", &MCaz );
         fChain->SetBranchAddress( "MCxoff", &MCxoff );
         fChain->SetBranchAddress( "MCyoff", &MCyoff );
-        if(!bShort )
+        if( !bShort )
         {
             fChain->SetBranchAddress( "MCxcore_SC", &MCxcore_SC );
             fChain->SetBranchAddress( "MCycore_SC", &MCycore_SC );
@@ -303,7 +303,7 @@ Bool_t Cshowerpars::Notify()
     b_eventNumber = fChain->GetBranch( "eventNumber" );
     b_MJD = fChain->GetBranch( "MJD" );
     b_Time = fChain->GetBranch( "Time" );
-    if(!bShort )
+    if( !bShort )
     {
         b_dataFormat = fChain->GetBranch( "dataFormat" );
     }
@@ -315,7 +315,7 @@ Bool_t Cshowerpars::Notify()
     b_traceFit = fChain->GetBranch( "traceFit" );
     b_TelElevation = fChain->GetBranch( "TelElevation" );
     b_TelAzimuth = fChain->GetBranch( "TelAzimuth" );
-    if(!bMC )
+    if( !bMC )
     {
         b_TelDec = fChain->GetBranch( "TelDec" );
         b_TelRA = fChain->GetBranch( "TelRA" );
@@ -325,7 +325,7 @@ Bool_t Cshowerpars::Notify()
         b_TelDec = 0;
         b_TelRA = 0;
     }
-    if(!bShort )
+    if( !bShort )
     {
         b_TelElevationVBF = fChain->GetBranch( "TelElevationVBF" );
         b_TelAzimuthVBF = fChain->GetBranch( "TelAzimuthVBF" );
@@ -356,7 +356,7 @@ Bool_t Cshowerpars::Notify()
     b_NTrig = fChain->GetBranch( "NTrig" );
     b_LTrig = fChain->GetBranch( "LTrig" );
     b_NMethods = fChain->GetBranch( "NMethods" );
-    if(!bShort )
+    if( !bShort )
     {
         b_MethodID = fChain->GetBranch( "MethodID" );
     }
@@ -367,7 +367,7 @@ Bool_t Cshowerpars::Notify()
     b_NImages = fChain->GetBranch( "NImages" );
     b_ImgSel = fChain->GetBranch( "ImgSel" );
     b_ImgSel_list = fChain->GetBranch( "ImgSel_list" );
-    if(!bShort )
+    if( !bShort )
     {
         b_img2_ang = fChain->GetBranch( "img2_ang" );
     }
@@ -389,7 +389,7 @@ Bool_t Cshowerpars::Notify()
         b_XoffDeRot = 0;
         b_YoffDeRot = 0;
     }
-    if(!bShort )
+    if( !bShort )
     {
         b_stds = fChain->GetBranch( "stds" );
     }
@@ -409,7 +409,7 @@ Bool_t Cshowerpars::Notify()
     }
     b_Xcore = fChain->GetBranch( "Xcore" );
     b_Ycore = fChain->GetBranch( "Ycore" );
-    if(!bShort )
+    if( !bShort )
     {
         b_Xcore_SC = fChain->GetBranch( "Xcore_SC" );
         b_Ycore_SC = fChain->GetBranch( "Ycore_SC" );
@@ -426,7 +426,7 @@ Bool_t Cshowerpars::Notify()
     b_DispDiff = fChain->GetBranch( "DispDiff" );
     if( bMC )
     {
-        if(!bShort )
+        if( !bShort )
         {
             b_MCprim = fChain->GetBranch( "MCprim" );
         }
@@ -437,7 +437,7 @@ Bool_t Cshowerpars::Notify()
         b_MCe0 = fChain->GetBranch( "MCe0" );
         b_MCxcore = fChain->GetBranch( "MCxcore" );
         b_MCycore = fChain->GetBranch( "MCycore" );
-        if(!bShort )
+        if( !bShort )
         {
             b_MCxcos = fChain->GetBranch( "MCxcos" );
             b_MCycos = fChain->GetBranch( "MCycos" );
@@ -451,7 +451,7 @@ Bool_t Cshowerpars::Notify()
         b_MCaz = fChain->GetBranch( "MCaz" );
         b_MCxoff = fChain->GetBranch( "MCxoff" );
         b_MCyoff = fChain->GetBranch( "MCyoff" );
-        if(!bShort )
+        if( !bShort )
         {
             b_MCxcore_SC = fChain->GetBranch( "MCycore_SC" );
             b_MCycore_SC = fChain->GetBranch( "MCycore_SC" );

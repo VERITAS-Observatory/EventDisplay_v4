@@ -84,7 +84,7 @@ bool VEnergySpectrumfromLiterature::readValuesFromFile( string ifile, bool iPrin
 
     ifstream is;
     is.open( gSystem->ExpandPathName( ifile.c_str() ), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "error reading literature values from " << ifile << endl;
         bIsZombie = true;
@@ -204,7 +204,7 @@ bool VEnergySpectrumfromLiterature::readValuesFromFile( string ifile, bool iPrin
 
 TGraphErrors* VEnergySpectrumfromLiterature::getDifferentialFluxPoints( unsigned int iID, bool bLogEnergy )
 {
-    if(!checkIDRange( iID ) )
+    if( !checkIDRange( iID ) )
     {
         return 0;
     }
@@ -216,7 +216,7 @@ TGraphErrors* VEnergySpectrumfromLiterature::getDifferentialFluxPoints( unsigned
         g = new TGraphErrors( 1 );
         g->SetMarkerColor( fPlottingColor );
         g->SetLineColor( fPlottingColor );
-        g->SetLineWidth(( Width_t )fPlottingLineWidth );
+        g->SetLineWidth( ( Width_t )fPlottingLineWidth );
         g->SetLineStyle( fPlottingLineStyle );
         g->SetMarkerStyle( fPlottingMarkerStyle );
         g->SetMarkerSize( fPlottingMarkerSize );
@@ -242,19 +242,19 @@ TGraphErrors* VEnergySpectrumfromLiterature::getDifferentialFluxPoints( unsigned
 
 TGraphAsymmErrors* VEnergySpectrumfromLiterature::getEnergySpectrumWithErrors( unsigned int iID, bool bLogEnergy )
 {
-    if(!checkIDRange( iID ) )
+    if( !checkIDRange( iID ) )
     {
         return 0;
     }
 
     TF1* f = getEnergySpectrum( iID, bLogEnergy );
 
-    if(!f )
+    if( !f )
     {
         return 0;
     }
     TF1* fTemp = new TF1();
-    f->Copy(*fTemp );
+    f->Copy( *fTemp );
     fTemp->SetParameter( 0, f->GetParameter( 0 ) / TMath::Power( fData[iID].Parameter[0], fPlottingMultiplierIndex ) );
     fTemp->SetParameter( 1, f->GetParameter( 1 ) - fPlottingMultiplierIndex );
 
@@ -271,7 +271,7 @@ TGraphAsymmErrors* VEnergySpectrumfromLiterature::getEnergySpectrumWithErrors( u
     TGraphAsymmErrors* g = new TGraphAsymmErrors( nPoints );
     g->SetMarkerColor( fPlottingColor );
     g->SetLineColor( fPlottingColor );
-    g->SetLineWidth(( Width_t )fPlottingLineWidth );
+    g->SetLineWidth( ( Width_t )fPlottingLineWidth );
     g->SetLineStyle( fPlottingLineStyle );
     g->SetMarkerStyle( fPlottingMarkerStyle );
     g->SetMarkerSize( fPlottingMarkerSize );
@@ -349,7 +349,7 @@ TGraphAsymmErrors* VEnergySpectrumfromLiterature::getEnergySpectrumWithErrors( u
 
 TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bLogEnergy, double iEnergyMin_Lin, double iEnergyMax_Lin )
 {
-    if(!checkIDRange( iID ) )
+    if( !checkIDRange( iID ) )
     {
         return 0;
     }
@@ -477,7 +477,7 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
     if( f )
     {
         f->SetLineColor( fPlottingColor );
-        f->SetLineWidth(( Width_t )fPlottingLineWidth );
+        f->SetLineWidth( ( Width_t )fPlottingLineWidth );
         f->SetLineStyle( fPlottingLineStyle );
         f->SetTitle( "" );
     }
@@ -493,7 +493,7 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
 bool VEnergySpectrumfromLiterature::prepare_integration( unsigned int iID, double iEmin, double iEmax )
 {
     fIntegral_TF1 = getEnergySpectrum( iID, false, iEmin, iEmax );
-    if(!fIntegral_TF1 )
+    if( !fIntegral_TF1 )
     {
         return false;
     }
@@ -518,7 +518,7 @@ double VEnergySpectrumfromLiterature::getIntegralFlux( double iEmin, double iEma
 {
     if( fIntegral_ID != iID || !fIntegral_TF1 )
     {
-        if(!prepare_integration( iID, iEmin, iEmax ) )
+        if( !prepare_integration( iID, iEmin, iEmax ) )
         {
             cout << "VEnergySpectrumfromLiterature::getIntegralFlux() error: preparation for integral failed" << endl;
         }
@@ -650,7 +650,7 @@ void VEnergySpectrumfromLiterature::listValues( unsigned int i )
 TCanvas* VEnergySpectrumfromLiterature::plot( unsigned int iID, TCanvas* c, bool iLogY )
 {
     TF1* f = getEnergySpectrum( iID, true );
-    if(!f )
+    if( !f )
     {
         return 0;
     }
@@ -720,10 +720,10 @@ TCanvas* VEnergySpectrumfromLiterature::plot( string iSelection, TCanvas* c )
 
     string itemp;
     istringstream is_stream( iSelection );
-    while(!( is_stream >> std::ws ).eof() )
+    while( !( is_stream >> std::ws ).eof() )
     {
         is_stream >> itemp;
-        v_id.push_back(( unsigned int )atoi( itemp.c_str() ) );
+        v_id.push_back( ( unsigned int )atoi( itemp.c_str() ) );
     }
 
     for( unsigned int i = 0; i < v_id.size(); i++ )
@@ -739,7 +739,7 @@ TCanvas* VEnergySpectrumfromLiterature::plot( string iSelection, TCanvas* c )
 
 sData VEnergySpectrumfromLiterature::getEnergySpectrumDataField( unsigned int iID )
 {
-    if(!checkIDRange( iID ) )
+    if( !checkIDRange( iID ) )
     {
         sData a;
         a.Type = 0.;
@@ -754,7 +754,7 @@ sData VEnergySpectrumfromLiterature::getEnergySpectrumDataField( unsigned int iI
  */
 double VEnergySpectrumfromLiterature::getPowerLaw_Index( unsigned int iID )
 {
-    if(!checkIDRange( iID ) )
+    if( !checkIDRange( iID ) )
     {
         return -9999.;
     }
@@ -772,7 +772,7 @@ double VEnergySpectrumfromLiterature::getPowerLaw_Index( unsigned int iID )
  */
 double VEnergySpectrumfromLiterature::getPowerLaw_FluxConstant_at1TeV( unsigned int iID )
 {
-    if(!checkIDRange( iID ) )
+    if( !checkIDRange( iID ) )
     {
         return -9999.;
     }

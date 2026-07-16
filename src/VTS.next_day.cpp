@@ -69,7 +69,7 @@ int main( int argc, char* argv[] )
         return 1;
     }
     flux->setDebug( fDebug );
-    flux->setSignificanceParameters(-99., -999999 );	//force calculation of flux (not UL), even for negative excess
+    flux->setSignificanceParameters( -99., -999999 );	//force calculation of flux (not UL), even for negative excess
     flux->calculateIntegralFlux( fMinEnergy );
     if( fDebug )
     {
@@ -92,13 +92,13 @@ int main( int argc, char* argv[] )
     // read run list
     VAnalysisUtilities a;
     a.openFile( fDataFile, -1, true, fDebug );
-    if(!a.IsZombie() )
+    if( !a.IsZombie() )
     {
-        CRunSummary* c = a.getRunSummaryTree(-1 );
+        CRunSummary* c = a.getRunSummaryTree( -1 );
 
         // open output stream
         ofstream fResults;
-        fResults.open(( fOUTFile + ".dat" ).c_str() );
+        fResults.open( ( fOUTFile + ".dat" ).c_str() );
         if( fResults && c )
         {
             double tOn_total = 0;
@@ -175,9 +175,9 @@ int main( int argc, char* argv[] )
                 }
                 else
                 {
-                    flux->getFlux(-1, iFlux, iFluxE, var1 );
+                    flux->getFlux( -1, iFlux, iFluxE, var1 );
                     iFluxInCU = flux->getFluxVsCrab( iFlux, fMinEnergy, fGamma );
-                    fluxUL->getFlux(-1, var1, var2, iFluxUL );
+                    fluxUL->getFlux( -1, var1, var2, iFluxUL );
                     iFluxULinCU = fluxUL->getFluxVsCrab( iFluxUL, fMinEnergy, fGamma );
 
                     fResults << setw( 12 ) << left << "Total:";

@@ -10,11 +10,11 @@ VGlobalRunParameter::VGlobalRunParameter( bool bSetGlobalParameter )
     // read global parameters
     if( bSetGlobalParameter )
     {
-        if(!bReadRunParameter )
+        if( !bReadRunParameter )
         {
             // set directories
             setDirectories();
-            if(!readRunparameterFile( getDirectory_EVNDISPParameterFiles() + "EVNDISP.global.runparameter" ) )
+            if( !readRunparameterFile( getDirectory_EVNDISPParameterFiles() + "EVNDISP.global.runparameter" ) )
             {
                 cout << "VGlobalRunParameter: error while reading parameter file with global run parameters" << endl;
                 cout << endl;
@@ -43,7 +43,7 @@ bool VGlobalRunParameter::readRunparameterFile( string i_filename )
 {
     ifstream is;
     is.open( i_filename.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         const char* evn_dir = gSystem->Getenv( "EVNDISPDATA" );
         if( evn_dir )
@@ -51,7 +51,7 @@ bool VGlobalRunParameter::readRunparameterFile( string i_filename )
             string itemp = evn_dir;
             itemp += "/" + i_filename;
             is.open( itemp.c_str(), ifstream::in );
-            if(!is )
+            if( !is )
             {
                 return false;
             }
@@ -73,7 +73,7 @@ bool VGlobalRunParameter::readRunparameterFile( string i_filename )
                 continue;
             }
             // print runparameter to stdout
-            if(!( is_stream >> std::ws ).eof() )
+            if( !( is_stream >> std::ws ).eof() )
             {
                 is_stream >> temp;
                 if( temp == "OBSERVATORY" )
@@ -82,15 +82,15 @@ bool VGlobalRunParameter::readRunparameterFile( string i_filename )
                 }
                 else if( temp == "OBSERVATORY_COORDINATES" )
                 {
-                    if(!( is_stream >> std::ws ).eof() )
+                    if( !( is_stream >> std::ws ).eof() )
                     {
                         is_stream >> fObservatory_Latitude_deg;
                     }
-                    if(!( is_stream >> std::ws ).eof() )
+                    if( !( is_stream >> std::ws ).eof() )
                     {
                         is_stream >> fObservatory_Longitude_deg;
                     }
-                    if(!( is_stream >> std::ws ).eof() )
+                    if( !( is_stream >> std::ws ).eof() )
                     {
                         is_stream >> fObservatory_Height_m;
                     }
@@ -248,7 +248,7 @@ bool VGlobalRunParameter::setDirectories()
 */
 unsigned int VGlobalRunParameter::getEVNDISP_TREE_VERSION( TTree* t )
 {
-    if(!t )
+    if( !t )
     {
         return 0;
     }
@@ -263,7 +263,7 @@ unsigned int VGlobalRunParameter::getEVNDISP_TREE_VERSION( TTree* t )
 
 bool VGlobalRunParameter::getEVNDISP_TREE_isShort( TTree* t )
 {
-    if(!t )
+    if( !t )
     {
         return false;
     }
@@ -273,7 +273,7 @@ bool VGlobalRunParameter::getEVNDISP_TREE_isShort( TTree* t )
     {
         return true;
     }
-    else if(!t->GetBranchStatus( "dataFormat" ) )
+    else if( !t->GetBranchStatus( "dataFormat" ) )
     {
         return true;
     }
@@ -286,7 +286,7 @@ bool VGlobalRunParameter::getEVNDISP_TREE_isShort( TTree* t )
 */
 bool VGlobalRunParameter::update( TChain* c )
 {
-    if(!c )
+    if( !c )
     {
         return false;
     }
@@ -298,7 +298,7 @@ bool VGlobalRunParameter::update( TChain* c )
 
 void VGlobalRunParameter::printGlobalRunParameter()
 {
-    if(!bReadRunParameter )
+    if( !bReadRunParameter )
     {
         cout << "VGlobalRunParameter::printGlobalRunParameter(): no global run parameters read" << endl;
         return;

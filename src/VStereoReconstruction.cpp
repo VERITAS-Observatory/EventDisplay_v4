@@ -23,7 +23,7 @@ VStereoReconstructionData::VStereoReconstructionData()
 
 void VStereoReconstructionData::draw()
 {
-    if(!gData )
+    if( !gData )
     {
         return;
     }
@@ -342,7 +342,7 @@ bool VStereoReconstruction::readDataSetsfromTextFile( string ifile, unsigned int
     // open text file
     ifstream is;
     is.open( ifile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "error opening input file list: " << ifile << endl;
         return false;
@@ -362,7 +362,7 @@ bool VStereoReconstruction::readDataSetsfromTextFile( string ifile, unsigned int
             }
             is_stream >> temp;
             // check set number
-            if(( unsigned int )( atoi( temp.c_str() ) ) != iSet )
+            if( ( unsigned int )( atoi( temp.c_str() ) ) != iSet )
             {
                 continue;
             }

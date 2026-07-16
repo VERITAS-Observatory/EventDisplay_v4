@@ -55,7 +55,7 @@ class VDataMCComparision
         enum E_varname { ELENGTH, EWIDTH, EDIST, EALPHA, ENTUBES, ENLOWGAIN, ESIZE, ESIZEHG,
                          ESIZELG, EFRACLOW, EMAX1, EMAX2, EMAX3, ELOSS, ELOS, EASYM,
                          ECENX, ECENY, ETGRADX, EMSCWT, EMSCLT, EMWRT, EMLTT,
-                         ETELDIST, ETHETA2, ELTHETA2,
+                         ETELDIST, ETHETA2, ELTHETA2, ETHETA,
                          EMSCW, EMSCL, EMWR, EMLR, EXCORE, EYCORE, EEREC, ENIMAGES, ERECRAT, EPEDVAR, EPEDVART,
                          EDISPT, EAEL, EAAZ, EIMGSEL, EEMISSIONHEIGHT, EMVA,
                          ESIGMAT3D, ENC3D, ESMAX3D, EERRSIGMAT3D, EOMEGA3D, EDEPTH3D, ERWIDTH3D, EERRRWIDTH3D
@@ -84,6 +84,7 @@ class VDataMCComparision
 
         // data tree
         CData* fData;
+        TTree* fStereoFriendTree;
 
         // cuts
         VGammaHadronCuts* fCuts;
@@ -93,6 +94,7 @@ class VDataMCComparision
         // reconstruction methods
         unsigned int fEnergyReconstructionMethod;
         unsigned int fDirectionReconstructionMethod;
+        string fXGBStereoFileSuffix;
 
         // lists with all histograms
         TList* hisList;
@@ -151,6 +153,10 @@ class VDataMCComparision
         {
             fEnergyReconstructionMethod = iEnergyMethod;
             fDirectionReconstructionMethod = iDirectionMethod;
+        }
+        void setXGBStereoFileSuffix( string iFileSuffix = "" )
+        {
+            fXGBStereoFileSuffix = iFileSuffix;
         }
         bool setTelescopeCoordinates( double x, double y, double z = 0. );
         void setWobbleFromDataTree()

@@ -99,7 +99,7 @@ bool VSpectralEnergyDistribution::readFermiData( string name, string ifile, doub
 
     ifstream is;
     is.open( ifile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "error reading data from " << ifile << endl;
         return false;
@@ -188,14 +188,14 @@ bool VSpectralEnergyDistribution::readFermiData( string name, string ifile, doub
             i_eV_low = atof( is_temp.c_str() ) * 1.e9;
 
             i_pF_temp.energy_eV_min.push_back( i_eV - i_eV_low );
-            i_pF_temp.energy_Hz_min.push_back(( i_eV - i_eV_low ) / 1.239841875e-6 * TMath::C() );
+            i_pF_temp.energy_Hz_min.push_back( ( i_eV - i_eV_low ) / 1.239841875e-6 * TMath::C() );
 
             double i_eV_high = 0.;
             is_stream >> is_temp;
             i_eV_high = atof( is_temp.c_str() ) * 1.e9;
 
             i_pF_temp.energy_eV_max.push_back( i_eV + i_eV_high );
-            i_pF_temp.energy_Hz_max.push_back(( i_eV + i_eV_high ) / 1.239841875e-6 * TMath::C() );
+            i_pF_temp.energy_Hz_max.push_back( ( i_eV + i_eV_high ) / 1.239841875e-6 * TMath::C() );
 
             is_stream >> is_temp;
             i_pF_temp.flux_error_up_ergscms.push_back( atof( is_temp.c_str() ) );
@@ -251,7 +251,7 @@ bool VSpectralEnergyDistribution::readSED( string ifile )
     // read ascii file
     ifstream is;
     is.open( ifile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "error reading SED from " << ifile << endl;
         return false;
@@ -298,7 +298,7 @@ bool VSpectralEnergyDistribution::readSED( string ifile )
             is_stream >> is_temp;
             i_pF_temp.MJD_max = atof( is_temp.c_str() );
 
-            if(!( is_stream >> std::ws ).eof() )
+            if( !( is_stream >> std::ws ).eof() )
             {
                 is_stream >> is_temp;
                 i_pF_temp.Color = atoi( is_temp.c_str() );
@@ -307,7 +307,7 @@ bool VSpectralEnergyDistribution::readSED( string ifile )
             {
                 i_pF_temp.Color = 1 + z;
             }
-            if(!( is_stream >> std::ws ).eof() )
+            if( !( is_stream >> std::ws ).eof() )
             {
                 is_stream >> is_temp;
                 i_pF_temp.Marker = atoi( is_temp.c_str() );
@@ -316,7 +316,7 @@ bool VSpectralEnergyDistribution::readSED( string ifile )
             {
                 i_pF_temp.Marker = 20 + z;
             }
-            if(!( is_stream >> std::ws ).eof() )
+            if( !( is_stream >> std::ws ).eof() )
             {
                 i_pF_temp.name = is_stream.str().substr( is_stream.tellg(), is_stream.str().size() );
             }
@@ -356,7 +356,7 @@ bool VSpectralEnergyDistribution::readSED( string ifile )
             {
                 i_pF_temp.flux_error_down_ergscms.back() = 0.;
             }
-            if(( is_stream >> std::ws ).eof() )
+            if( ( is_stream >> std::ws ).eof() )
             {
                 i_pF_temp.flux_error_up_ergscms.push_back( atof( is_temp.c_str() ) );
                 if( TMath::Abs( i_pF_temp.flux_error_up_ergscms.back() ) < 1.e-16 )
@@ -437,7 +437,7 @@ bool VSpectralEnergyDistribution::readDataFile( string name, string ifile, doubl
 
     ifstream is;
     is.open( ifile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "error reading data from " << ifile << endl;
         return false;
@@ -567,7 +567,7 @@ bool VSpectralEnergyDistribution::readXMMData( string name, string ifile, double
 
     ifstream is;
     is.open( ifile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "error reading XMM data from " << ifile << endl;
         return false;
@@ -748,7 +748,7 @@ TGraphErrors* VSpectralEnergyDistribution::readOpticalData( string iname, string
 
     ifstream is;
     is.open( ifile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "error reading optical data from " << ifile << endl;
         return 0;
@@ -799,7 +799,7 @@ TGraphErrors* VSpectralEnergyDistribution::readOpticalData( string iname, string
         }
 
 
-        if(!bAverage )
+        if( !bAverage )
         {
             i_pF_temp.MJD_min = MJD_min;
             i_pF_temp.MJD_max = MJD_min;
@@ -818,7 +818,7 @@ TGraphErrors* VSpectralEnergyDistribution::readOpticalData( string iname, string
             flux_ergscms      += getFluxfromMagnitude( imagnitude, iband ) * i_pF_temp.energy_Hz.back();
         }
 
-        g->SetPoint( z, i_pF_temp.MJD_min, imagnitude* iPlotMagnitudeMultiplier );
+        g->SetPoint( z, i_pF_temp.MJD_min, imagnitude * iPlotMagnitudeMultiplier );
         g->SetPointError( z, 0., imagnitudeError );
 
         z++;
@@ -877,7 +877,7 @@ bool VSpectralEnergyDistribution::readPhotoMetricBands( string ifile, bool iPrin
 {
     ifstream is;
     is.open( ifile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "VSpectralEnergyDistribution: error reading photometric bands from " << ifile << endl;
         return false;
@@ -1010,7 +1010,7 @@ U     B     V     R     I     J     H     K     L'
 bool VSpectralEnergyDistribution::readGalacticExtinction( string ifile, bool iPrint )
 {
     ifstream is( ifile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "error reading file" << ifile << endl;
         return false;
@@ -1036,7 +1036,7 @@ bool VSpectralEnergyDistribution::readGalacticExtinction( string ifile, bool iPr
         stringstream is_stream( is_line );
 
         int k = 0;
-        while(!( is_stream >> std::ws ).eof() )
+        while( !( is_stream >> std::ws ).eof() )
         {
             is_stream >> is_temp;
             if( i == 0 )
@@ -1371,7 +1371,7 @@ void VSpectralEnergyDistribution::printASCII()
 
 TGraph* VSpectralEnergyDistribution::plotModel( TCanvas* c, string ifile, int icolor, int ilinestyle, int ilinewidth, bool isJyHz )
 {
-    if(!c || ifile.size() == 0 )
+    if( !c || ifile.size() == 0 )
     {
         return 0;
     }
@@ -1383,7 +1383,7 @@ TGraph* VSpectralEnergyDistribution::plotModel( TCanvas* c, string ifile, int ic
 
     ifstream is;
     is.open( ifile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "error reading model file : " << ifile << endl;
         return 0;
@@ -1460,7 +1460,7 @@ TCanvas* VSpectralEnergyDistribution::plotPowerLaw( TCanvas* c, string iName, do
     f->SetLineStyle( iLineStyle );
 
     // plot power law only
-    if(!bPlotButterfly )
+    if( !bPlotButterfly )
     {
         f->Draw( "same" );
     }
@@ -1486,8 +1486,8 @@ TCanvas* VSpectralEnergyDistribution::plotPowerLaw( TCanvas* c, string iName, do
             double er = 0.;
 
             er += c1 * c1 * iNormError * iNormError;
-            er += ( iNorm* TMath::H() * 1.e7* e* log( c2 ) * TMath::Power( c2, -1.*iGamma + 1. ) )
-                  * ( iNorm* TMath::H() * 1.e7* e* log( c2 ) * TMath::Power( c2, -1.*iGamma + 1. ) )
+            er += ( iNorm * TMath::H() * 1.e7 * e * log( c2 ) * TMath::Power( c2, -1.*iGamma + 1. ) )
+                  * ( iNorm * TMath::H() * 1.e7 * e * log( c2 ) * TMath::Power( c2, -1.*iGamma + 1. ) )
                   * iGammaError * iGammaError;
 
             er = sqrt( er );

@@ -62,7 +62,7 @@ VHoughTransform::VHoughTransform( VDetectorGeometry* fDetectorGeo )
 
         //Set up the accumulator array for a given telescope
         fAccumulatorArray.push_back( initAccumulatorArray( fRMinDpmt[iTelescopeIndex], fRMaxDpmt[iTelescopeIndex],
-                                     fStepsPerPMTDiameter[iTelescopeIndex], iTelescopeIndex ) );
+                fStepsPerPMTDiameter[iTelescopeIndex], iTelescopeIndex ) );
 
         //Print this when the accumulator array is initialized.
         //cout << "Accumulator array for telescope " << iTelescopeIndex + 1 << " initialized." << endl;
@@ -72,7 +72,7 @@ VHoughTransform::VHoughTransform( VDetectorGeometry* fDetectorGeo )
 
         //Set up the lookup table for a given telescope
         fHTLookupTableTree.push_back( initLookupTable( fRMinDpmt[iTelescopeIndex], fRMaxDpmt[iTelescopeIndex],
-                                      fStepsPerPMTDiameter[iTelescopeIndex], iTelescopeIndex ) );
+                fStepsPerPMTDiameter[iTelescopeIndex], iTelescopeIndex ) );
 
         //Print this when the lookup table is initialized
         //cout << "Lookup table for telescope " << iTelescopeIndex + 1 << " initialized." << endl;
@@ -178,7 +178,7 @@ void VHoughTransform::analysis( VEvndispData* fData, VImageParameter* fParGeo )
 
             TBranch* fBranch = fHTLookupTableTree[ fData->getTelID() ]->GetBranch( fBranchName ); //Grab the branch for the ith channel
 
-            fBranch->SetAddress(&fCircleCoordinates ); //Map the arrays in the branch to circle coordinates array
+            fBranch->SetAddress( &fCircleCoordinates ); //Map the arrays in the branch to circle coordinates array
 
 
             //Loop over all circle coordinates for that pixel and fill the appropriate bins of the accumulator array
@@ -195,7 +195,7 @@ void VHoughTransform::analysis( VEvndispData* fData, VImageParameter* fParGeo )
                 {
 
                     //If bin content is zero and is filled, increment the number of non zero bins variable
-                    if(( fAccumulatorArray[ fData->getTelID() ]->GetBinContent( fAccumulatorArray[ fData->getTelID() ]->FindBin( fCircleCoordinates[0], fCircleCoordinates[1], fCircleCoordinates[2] ) ) ) == 0 )
+                    if( ( fAccumulatorArray[ fData->getTelID() ]->GetBinContent( fAccumulatorArray[ fData->getTelID() ]->FindBin( fCircleCoordinates[0], fCircleCoordinates[1], fCircleCoordinates[2] ) ) ) == 0 )
                     {
 
                         fNumberOfNonZeroBins++;
@@ -262,19 +262,19 @@ void VHoughTransform::analysis( VEvndispData* fData, VImageParameter* fParGeo )
     //Calculate hyperdistances for the TD variable
 
     //Distance from the best parametrization to the second best parametrization
-    fDistance1 = sqrt(( fBestParametrization[0] - fSecondBestParametrization[0] ) * ( fBestParametrization[0] - fSecondBestParametrization[0] ) +
-                      ( fBestParametrization[1] - fSecondBestParametrization[1] ) * ( fBestParametrization[1] - fSecondBestParametrization[1] ) +
-                      ( fBestParametrization[2] - fSecondBestParametrization[2] ) * ( fBestParametrization[2] - fSecondBestParametrization[2] ) );
+    fDistance1 = sqrt( ( fBestParametrization[0] - fSecondBestParametrization[0] ) * ( fBestParametrization[0] - fSecondBestParametrization[0] ) +
+                       ( fBestParametrization[1] - fSecondBestParametrization[1] ) * ( fBestParametrization[1] - fSecondBestParametrization[1] ) +
+                       ( fBestParametrization[2] - fSecondBestParametrization[2] ) * ( fBestParametrization[2] - fSecondBestParametrization[2] ) );
 
     //Distance from the best parametrization to the third best parametrization
-    fDistance2 = sqrt(( fBestParametrization[0] - fThirdBestParametrization[0] ) * ( fBestParametrization[0] - fThirdBestParametrization[0] ) +
-                      ( fBestParametrization[1] - fThirdBestParametrization[1] ) * ( fBestParametrization[1] - fThirdBestParametrization[1] ) +
-                      ( fBestParametrization[2] - fThirdBestParametrization[2] ) * ( fBestParametrization[2] - fThirdBestParametrization[2] ) );
+    fDistance2 = sqrt( ( fBestParametrization[0] - fThirdBestParametrization[0] ) * ( fBestParametrization[0] - fThirdBestParametrization[0] ) +
+                       ( fBestParametrization[1] - fThirdBestParametrization[1] ) * ( fBestParametrization[1] - fThirdBestParametrization[1] ) +
+                       ( fBestParametrization[2] - fThirdBestParametrization[2] ) * ( fBestParametrization[2] - fThirdBestParametrization[2] ) );
 
     //Distance from the second best parametrization to the third best parametrization
-    fDistance3 = sqrt(( fSecondBestParametrization[0] - fThirdBestParametrization[0] ) * ( fSecondBestParametrization[0] - fThirdBestParametrization[0] ) +
-                      ( fSecondBestParametrization[1] - fThirdBestParametrization[1] ) * ( fSecondBestParametrization[1] - fThirdBestParametrization[1] ) +
-                      ( fSecondBestParametrization[2] - fThirdBestParametrization[2] ) * ( fSecondBestParametrization[2] - fThirdBestParametrization[2] ) );
+    fDistance3 = sqrt( ( fSecondBestParametrization[0] - fThirdBestParametrization[0] ) * ( fSecondBestParametrization[0] - fThirdBestParametrization[0] ) +
+                       ( fSecondBestParametrization[1] - fThirdBestParametrization[1] ) * ( fSecondBestParametrization[1] - fThirdBestParametrization[1] ) +
+                       ( fSecondBestParametrization[2] - fThirdBestParametrization[2] ) * ( fSecondBestParametrization[2] - fThirdBestParametrization[2] ) );
 
     //Calculate the TD variable from the hyperdistances
     fTD = fDistance1 + fDistance2 + fDistance3;
@@ -314,8 +314,8 @@ void VHoughTransform::analysis( VEvndispData* fData, VImageParameter* fParGeo )
 
                     (
 
-                        sqrt(( fBestParametrization[0] - fPixelXCoordinate ) * ( fBestParametrization[0] - fPixelXCoordinate ) 	+
-                             ( fBestParametrization[1] - fPixelYCoordinate ) * ( fBestParametrization[1] - fPixelYCoordinate ) ) <=
+                        sqrt( ( fBestParametrization[0] - fPixelXCoordinate ) * ( fBestParametrization[0] - fPixelXCoordinate ) 	+
+                              ( fBestParametrization[1] - fPixelYCoordinate ) * ( fBestParametrization[1] - fPixelYCoordinate ) ) <=
                         ( fBestParametrization[2] + fPMTDiameter[ fData->getTelID()] )
 
                     )
@@ -325,8 +325,8 @@ void VHoughTransform::analysis( VEvndispData* fData, VImageParameter* fParGeo )
 
                     && !(
 
-                        sqrt(( fBestParametrization[0] - fPixelXCoordinate ) * ( fBestParametrization[0] - fPixelXCoordinate ) +
-                             ( fBestParametrization[1] - fPixelYCoordinate ) * ( fBestParametrization[1] - fPixelYCoordinate ) ) <=
+                        sqrt( ( fBestParametrization[0] - fPixelXCoordinate ) * ( fBestParametrization[0] - fPixelXCoordinate ) +
+                              ( fBestParametrization[1] - fPixelYCoordinate ) * ( fBestParametrization[1] - fPixelYCoordinate ) ) <=
                         ( fBestParametrization[2] - fPMTDiameter[ fData->getTelID() ] )
 
                     )
@@ -346,8 +346,8 @@ void VHoughTransform::analysis( VEvndispData* fData, VImageParameter* fParGeo )
 
                     (
 
-                        sqrt(( fSecondBestParametrization[0] - fPixelXCoordinate ) * ( fSecondBestParametrization[0] - fPixelXCoordinate ) +
-                             ( fSecondBestParametrization[1] - fPixelYCoordinate ) * ( fSecondBestParametrization[1] - fPixelYCoordinate ) ) <=
+                        sqrt( ( fSecondBestParametrization[0] - fPixelXCoordinate ) * ( fSecondBestParametrization[0] - fPixelXCoordinate ) +
+                              ( fSecondBestParametrization[1] - fPixelYCoordinate ) * ( fSecondBestParametrization[1] - fPixelYCoordinate ) ) <=
                         ( fSecondBestParametrization[2] + fPMTDiameter[ fData->getTelID() ] )
 
                     )
@@ -357,8 +357,8 @@ void VHoughTransform::analysis( VEvndispData* fData, VImageParameter* fParGeo )
 
                     && !(
 
-                        sqrt(( fSecondBestParametrization[0] - fPixelXCoordinate ) * ( fSecondBestParametrization[0] - fPixelXCoordinate ) +
-                             ( fSecondBestParametrization[1] - fPixelYCoordinate ) * ( fSecondBestParametrization[1] - fPixelYCoordinate ) ) <=
+                        sqrt( ( fSecondBestParametrization[0] - fPixelXCoordinate ) * ( fSecondBestParametrization[0] - fPixelXCoordinate ) +
+                              ( fSecondBestParametrization[1] - fPixelYCoordinate ) * ( fSecondBestParametrization[1] - fPixelYCoordinate ) ) <=
                         ( fSecondBestParametrization[2] - fPMTDiameter[ fData->getTelID() ] )
 
                     )
@@ -377,8 +377,8 @@ void VHoughTransform::analysis( VEvndispData* fData, VImageParameter* fParGeo )
 
                     (
 
-                        sqrt(( fThirdBestParametrization[0] - fPixelXCoordinate ) * ( fThirdBestParametrization[0] - fPixelXCoordinate ) +
-                             ( fThirdBestParametrization[1] - fPixelYCoordinate ) * ( fThirdBestParametrization[1] - fPixelYCoordinate ) ) <=
+                        sqrt( ( fThirdBestParametrization[0] - fPixelXCoordinate ) * ( fThirdBestParametrization[0] - fPixelXCoordinate ) +
+                              ( fThirdBestParametrization[1] - fPixelYCoordinate ) * ( fThirdBestParametrization[1] - fPixelYCoordinate ) ) <=
                         ( fThirdBestParametrization[2] + fPMTDiameter[ fData->getTelID() ] )
 
                     )
@@ -389,8 +389,8 @@ void VHoughTransform::analysis( VEvndispData* fData, VImageParameter* fParGeo )
 
                     && !(
 
-                        sqrt(( fThirdBestParametrization[0] - fPixelXCoordinate ) * ( fThirdBestParametrization[0] - fPixelXCoordinate ) +
-                             ( fThirdBestParametrization[1] - fPixelYCoordinate ) * ( fThirdBestParametrization[1] - fPixelYCoordinate ) ) <=
+                        sqrt( ( fThirdBestParametrization[0] - fPixelXCoordinate ) * ( fThirdBestParametrization[0] - fPixelXCoordinate ) +
+                              ( fThirdBestParametrization[1] - fPixelYCoordinate ) * ( fThirdBestParametrization[1] - fPixelYCoordinate ) ) <=
                         ( fThirdBestParametrization[2] - fPMTDiameter[ fData->getTelID() ] )
 
                     )
@@ -429,15 +429,15 @@ void VHoughTransform::analysis( VEvndispData* fData, VImageParameter* fParGeo )
 
     //Calculate the CD parameter (the parameter formerly known as Cdist)
     //(The distance from the centre of the best parametrized circle to the centroid of the pixels included in the NPR count).
-    fCD = sqrt(( fBestParametrization[0] - fNPRCentroidX ) * ( fBestParametrization[0] - fNPRCentroidX ) +
-               ( fBestParametrization[1] - fNPRCentroidY ) * ( fBestParametrization[1] - fNPRCentroidY ) );
+    fCD = sqrt( ( fBestParametrization[0] - fNPRCentroidX ) * ( fBestParametrization[0] - fNPRCentroidX ) +
+                ( fBestParametrization[1] - fNPRCentroidY ) * ( fBestParametrization[1] - fNPRCentroidY ) );
 
     //Calculate the C/N parameter. (CD/NPR). Used to determine azimuthal completeness.
     fCN = fCD / ( double ) fNPR;
 
     //Calculate the distance from the center of the ring to the middle of the bestparametrization plus the radius of the best parametrization
-    fContained = sqrt(( fBestParametrization[0] * fBestParametrization[0] ) +
-                      ( fBestParametrization[1] * fBestParametrization[1] ) ) + fBestParametrization[2];
+    fContained = sqrt( ( fBestParametrization[0] * fBestParametrization[0] ) +
+                       ( fBestParametrization[1] * fBestParametrization[1] ) ) + fBestParametrization[2];
 
 
     if //Check if the event passes the cuts (maybe load this from a cuts file later).
@@ -589,11 +589,11 @@ TH3D* VHoughTransform::initAccumulatorArray( int fRMinDpmt, int fRMaxDpmt, int f
 
 
     //Maximum and minimum values of R, calculated from the previously declared parameters
-    double fRMin = (( double ) fRMinDpmt ) * fPMTDiameter[ iTelescopeIndex ];
-    double fRMax = (( double ) fRMaxDpmt ) * fPMTDiameter[ iTelescopeIndex ];
+    double fRMin = ( ( double ) fRMinDpmt ) * fPMTDiameter[ iTelescopeIndex ];
+    double fRMax = ( ( double ) fRMaxDpmt ) * fPMTDiameter[ iTelescopeIndex ];
 
     //Step size in R
-    double fStepSizeR = fPMTDiameter[ iTelescopeIndex ] / (( double ) fStepsPerPMTDiameter );
+    double fStepSizeR = fPMTDiameter[ iTelescopeIndex ] / ( ( double ) fStepsPerPMTDiameter );
 
     //Number of bins in x
     int fNumberOfXBins = fNumberOfXSteps * 2 + 1;
@@ -716,7 +716,7 @@ TTree* VHoughTransform::initLookupTable( int fRMinDpmt, int fRMaxDpmt, int fStep
             fTemplateCircleCoordinates[1] = fDetectorGeometry->getY_MM( iTelescopeIndex )[iPixelCenterIndex]; 	//Get the y coordinate of the channel
 
             //Set the radius coordinate of the template circle. Divide by fStepsPerPMTDiameter to calculate radius.
-            fTemplateCircleCoordinates[2] = ((( double ) iRadiusIndex ) * fPMTDiameter[ iTelescopeIndex ] ) / (( double ) fStepsPerPMTDiameter );
+            fTemplateCircleCoordinates[2] = ( ( ( double ) iRadiusIndex ) * fPMTDiameter[ iTelescopeIndex ] ) / ( ( double ) fStepsPerPMTDiameter );
 
             //End of setting the coordinates of the template circle.
 
@@ -732,9 +732,9 @@ TTree* VHoughTransform::initLookupTable( int fRMinDpmt, int fRMaxDpmt, int fStep
 
 
                 //Check if the test pixel is hit by the circle parametrization
-                if( fabs(( sqrt(
-                               ( pow(( fTestPixel[0] - fTemplateCircleCoordinates[0] ), 2.0 ) ) +
-                               ( pow(( fTestPixel[1] - fTemplateCircleCoordinates[1] ), 2.0 ) ) ) ) - fTemplateCircleCoordinates[2] ) 	<=
+                if( fabs( ( sqrt(
+                                ( pow( ( fTestPixel[0] - fTemplateCircleCoordinates[0] ), 2.0 ) ) +
+                                ( pow( ( fTestPixel[1] - fTemplateCircleCoordinates[1] ), 2.0 ) ) ) ) - fTemplateCircleCoordinates[2] ) 	<=
                         ( fPMTDiameter[ iTelescopeIndex ] / 2.0 ) )
 
                 {
@@ -781,7 +781,7 @@ TTree* VHoughTransform::initLookupTable( int fRMinDpmt, int fRMaxDpmt, int fStep
 
 
             //Add the circle coordinates to the nonzero pixels if the template is not a duplicate.
-            if(!iIsDuplicate )
+            if( !iIsDuplicate )
 
             {
 
@@ -893,7 +893,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 
 
     //If the parameter file is not opened, do this
-    if(!is )
+    if( !is )
     {
 
         //	cout << "VHoughTransform::readHTParameterFile error while opening parameter file: " << ifile << endl;
@@ -930,7 +930,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
                 is_stream >> iTemp;
                 iTemp = VUtilities::upperCase( iTemp );
                 is_stream >> iTemp2;
-                if(!( is_stream >> std::ws ).eof() )
+                if( !( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> iTemp3;
                 }
@@ -938,7 +938,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
                 {
                     iTemp3 = "";
                 }
-                if(!( is_stream >> std::ws ).eof() )
+                if( !( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> iTemp4;
                 }
@@ -946,7 +946,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
                 {
                     iTemp4 = "";
                 }
-                if(!( is_stream >> std::ws ).eof() )
+                if( !( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> iTemp5;
                 }

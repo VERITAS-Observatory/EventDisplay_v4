@@ -126,7 +126,7 @@ void VImageAnalyzer::doAnalysis()
     {
         bTrigger = getReader()->hasArrayTrigger() && getReader()->hasLocalTrigger( getTelID() );
     }
-    if(!bTrigger )
+    if( !bTrigger )
     {
         fillOutputTree();
         setSums( 0. );
@@ -194,7 +194,7 @@ void VImageAnalyzer::doAnalysis()
     ///////////////////////////////////////////////////////////////////////////////////////////
     // here: no double pass trace integration
     // do a log likelihood image fitting on events on the camera edge only
-    if(!fRunPar->fDoublePass || !fReader->hasFADCTrace() )
+    if( !fRunPar->fDoublePass || !fReader->hasFADCTrace() )
     {
         if( getImageParameters()->ntubes > fRunPar->fLogLikelihood_Ntubes_min[getTelID()]
                 && getImageParameters()->loss > fRunPar->fLogLikelihoodLoss_min[getTelID()] )
@@ -323,7 +323,7 @@ void VImageAnalyzer::fillOutputTree()
     }
 
     // fill some run quality histograms
-    if(!fReader->isMC() )
+    if( !fReader->isMC() )
     {
         getAnaHistos()->fillL2DiagnosticTree( getRunNumber(), getTelescopeEventNumber( getTelID() ),
                                               0, 0, getFADCstopTZero(), getFADCstopSums() );
@@ -348,7 +348,7 @@ void VImageAnalyzer::fillOutputTree()
         getImageParameters()->fLocalTrigger = 0;
     }
     //  there is always a trigger in the real data, but not in MC
-    if(!fReader->isMC() )
+    if( !fReader->isMC() )
     {
         getImageParameters()->fLocalTrigger = 1;
     }
@@ -433,7 +433,7 @@ void VImageAnalyzer::terminate( bool iDebug_IO )
             getDBPixelDataReader()->writeDataTree( getTelID() );
         }
         // write histograms
-        if(!isMC() )
+        if( !isMC() )
         {
             getAnaHistos()->terminate( fOutputfile );
         }
@@ -517,7 +517,7 @@ void VImageAnalyzer::initOutput()
 
 void VImageAnalyzer::setAnaDir( unsigned int iTel )
 {
-    if(!fOutputfile )
+    if( !fOutputfile )
     {
         return;
     }
@@ -528,7 +528,7 @@ void VImageAnalyzer::setAnaDir( unsigned int iTel )
     char i_rootDirTit[200];
     sprintf( i_rootDirTit, "analysis results for telescope %d (type %lld)", ( int )iTel + 1, getDetectorGeometry()->getTelType()[iTel] );
     fOutputfile->cd();
-    if(!fOutputfile->FindObject( i_rootDir ) )
+    if( !fOutputfile->FindObject( i_rootDir ) )
     {
         setRootDir( iTel, fOutputfile->mkdir( i_rootDir, i_rootDirTit ) );
     }
@@ -548,7 +548,7 @@ void VImageAnalyzer::initTrees()
     }
 
     fOutputfile->cd();
-    if(!fAnaDir[getTelID()]->cd() )
+    if( !fAnaDir[getTelID()]->cd() )
     {
         cout << "VImageAnalyzer::initTrees() unable to enter directory: " << fAnaDir[getTelID()]->GetName() << endl;
     }
@@ -692,7 +692,7 @@ bool VImageAnalyzer::initEvent()
         {
             // this calculates telescope elevation and azimuth from telescope pointing in ra and dec
             getPointing()[getTelID()]->setTelPointing( getImageParameters()->MJD, getImageParameters()->time, getRunParameter()->fDBTracking );
-            if(!getPointing()[getTelID()]->isPrecessed() )
+            if( !getPointing()[getTelID()]->isPrecessed() )
             {
                 getPointing()[getTelID()]->precessTarget( getImageParameters()->MJD, getTelID() );
                 // set wobble offsets
@@ -704,7 +704,7 @@ bool VImageAnalyzer::initEvent()
         {
             iSet = false;
         }
-        if(!iSet )
+        if( !iSet )
         {
             if( fNTel != 1 && getTelescopeEventNumber( getTelID() ) < 1 )
             {
@@ -825,7 +825,7 @@ void VImageAnalyzer::printTrace( int iChannel )
             {
                 getDead()[chanID] = 8;
             }
-            if(!getDead()[chanID] )
+            if( !getDead()[chanID] )
             {
                 i_totSum += getSums()[chanID];
                 i_totSumN++;
@@ -930,7 +930,7 @@ void VImageAnalyzer::setNTrigger()
                     }
                     float xj = getDetectorGeo()->getX()[j];
                     float yj = getDetectorGeo()->getY()[j];
-                    if(( xj - xi ) * ( xj - xi ) + ( yj - yi ) * ( yj - yi ) < 0.09 )
+                    if( ( xj - xi ) * ( xj - xi ) + ( yj - yi ) * ( yj - yi ) < 0.09 )
                     {
                         num_in_patch += 1;
                     }
@@ -954,7 +954,7 @@ void VImageAnalyzer::setNTrigger()
  */
 void VImageAnalyzer::imageCleaning()
 {
-    if(!getImageCleaningParameter() )
+    if( !getImageCleaningParameter() )
     {
         return;
     }

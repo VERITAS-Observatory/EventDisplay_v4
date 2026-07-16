@@ -103,7 +103,7 @@ bool VDB_CalibrationInfo::DoFile_for_DBwriting( vector < double > Vchannel_gain,
 {
 
     bool writing_ok = false;
-    if(!fdofile_flag )
+    if( !fdofile_flag )
     {
         std::cout << "ERROR: wrong constructor" << std::endl;
         std::cout << "use: VDB_CalibrationInfo::VDB_CalibrationInfo(int current_run,int current_tel,TString NOW_DB,int VOFFLINE_version_query,int LOW_GAIN)" << std::endl;
@@ -174,7 +174,7 @@ mysql> show columns from tblEventDisplay_Analysis_Status;
 void VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file( string pass_word )
 {
 
-    if(!fwrite_flag )
+    if( !fwrite_flag )
     {
         std::cout << "ERROR: wrong constructor" << std::endl;
         std::cout << "use: VDB_CalibrationInfo::VDB_CalibrationInfo(TString file_to_write_in_DB,TString DBserver) " << std::endl;
@@ -196,7 +196,7 @@ void VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file( string pass_word )
 
     //std::cout<<"VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file "<<std::endl;
     VDB_Connection my_connection( iTempS.c_str(), "readwrite", the_password.c_str() ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         return;
     }
@@ -204,7 +204,7 @@ void VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file( string pass_word )
     std::cout << "query " << query << std::endl;
 
     //---- do the query and check
-    if(!my_connection.make_query( query.c_str() ) )
+    if( !my_connection.make_query( query.c_str() ) )
     {
         cout << "WARNING VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file: failed to get something from the query " << endl;
         return;
@@ -221,7 +221,7 @@ void VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file( string pass_word )
 //---------------------------------------------
 bool VDB_CalibrationInfo::readVOFFLINE()
 {
-    if(!fread_flag )
+    if( !fread_flag )
     {
         std::cout << "ERROR: wrong constructor" << std::endl;
         std::cout << "use: VDB_CalibrationInfo::VDB_CalibrationInfo(int laserrun ,int tel ,string name_out_file,int gain_or_toff,int VOFFLINE_version_query,TString DBserver)" << std::endl;
@@ -313,7 +313,7 @@ string VDB_CalibrationInfo::WriteQuery_to_write_in_DB()
 
     string query = "";
 
-    if(!test_file_format( fFile_to_write ) )
+    if( !test_file_format( fFile_to_write ) )
     {
         return query;
     }
@@ -371,14 +371,14 @@ bool VDB_CalibrationInfo::Read_the_DB()
 
     //std::cout<<"VDB_CalibrationInfo::Read_the_DB "<<std::endl;
     VDB_Connection my_connection( iTempS.str().c_str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         cout << "ERROR VDB_CalibrationInfo::Read_the_DB(): failed to connect to database server" << endl;
         cout << "\t server: " <<  fServer << endl;
         return false;
     }
     //---- do the query and check
-    if(!my_connection.make_query( fquery_read.c_str() ) )
+    if( !my_connection.make_query( fquery_read.c_str() ) )
     {
         cout << "ERROR VDB_CalibrationInfo::Read_the_DB(): failed to get something from the query " << endl;
         cout << "ERROR laser run  " << fcurrent_run << " tel " << fcurrent_tel << " is not in the VOFFLINE DB (yet?)" << std::endl;
@@ -391,14 +391,14 @@ bool VDB_CalibrationInfo::Read_the_DB()
     {
         while( TSQLRow* db_row = db_res->Next() )
         {
-            if(!db_row )
+            if( !db_row )
             {
                 cout << "WARNING VDB_CalibrationInfo::Read_the_DB(): failed reading a row from DB " << endl;
                 cout << "ERROR laser run  " << fcurrent_run << " tel " << fcurrent_tel << " is not in the VOFFLINE DB (yet?)" << std::endl;
                 return false;
             }
 
-            Vchannel.push_back(( unsigned int )atoi( db_row->GetField( 0 ) ) ) ;
+            Vchannel.push_back( ( unsigned int )atoi( db_row->GetField( 0 ) ) ) ;
             Vmean.push_back( atof( db_row->GetField( 1 ) ) ) ;
             Vvar.push_back( atof( db_row->GetField( 2 ) ) );
         }

@@ -28,7 +28,7 @@ VPlotUtilities::~VPlotUtilities()
 */
 void VPlotUtilities::plot_nullHistogram( TPad* c, TH1* h, bool bLogX, bool bLogY, double yTitleOffset, double xmin, double xmax )
 {
-    if(!c || !h )
+    if( !c || !h )
     {
         return;
     }
@@ -40,7 +40,7 @@ void VPlotUtilities::plot_nullHistogram( TPad* c, TH1* h, bool bLogX, bool bLogY
         xmax = TMath::Power( 10., h->GetXaxis()->GetXmax() );
     }
 
-    if(!bLogX )
+    if( !bLogX )
     {
         h->GetYaxis()->SetTitleOffset( yTitleOffset );
         h->Draw();
@@ -103,14 +103,14 @@ void VPlotUtilities::setHistogramPlottingStyle( TH1* h )
 
 void VPlotUtilities::setHistogramPlottingStyle( TH1* his, int icolor, double iwidth, double isize, int imarker, int irebin, int iFillStyle )
 {
-    if(!his )
+    if( !his )
     {
         return;
     }
 
     his->SetLineColor( icolor );
     his->SetMarkerColor( icolor );
-    his->SetLineWidth(( Width_t )iwidth );
+    his->SetLineWidth( ( Width_t )iwidth );
     his->SetMarkerSize( isize );
     if( imarker != 0 )
     {
@@ -136,14 +136,14 @@ void VPlotUtilities::setFunctionPlottingStyle( TF1* fun )
 
 void VPlotUtilities::setFunctionPlottingStyle( TF1* fun, int icolor, double iwidth, double isize, int imarker, int iFillStyle )
 {
-    if(!fun )
+    if( !fun )
     {
         return;
     }
 
     fun->SetLineColor( icolor );
     fun->SetMarkerColor( icolor );
-    fun->SetLineWidth(( Width_t )iwidth );
+    fun->SetLineWidth( ( Width_t )iwidth );
     fun->SetMarkerSize( isize );
     if( imarker != 0 )
     {
@@ -159,7 +159,7 @@ void VPlotUtilities::setFunctionPlottingStyle( TF1* fun, int icolor, double iwid
 void VPlotUtilities::setHistogramPlottingStyle( TH2D* his, double iminF )
 {
 
-    if(!his )
+    if( !his )
     {
         return;
     }
@@ -179,7 +179,7 @@ void VPlotUtilities::setHistogramPlottingStyle( TH2D* his, double iminF )
                 }
             }
         }
-        his->SetMinimum( idiffmin* iminF );
+        his->SetMinimum( idiffmin * iminF );
     }
     if( his->GetMinimum() == his->GetMaximum() )
     {
@@ -191,28 +191,28 @@ void VPlotUtilities::setHistogramPlottingStyle( TH2D* his, double iminF )
 
 void VPlotUtilities::setArrowPlottingStyle( TArrow* a, int icolor, double iwidth, int iLineStyle )
 {
-    if(!a )
+    if( !a )
     {
         return;
     }
 
     a->SetLineColor( icolor );
-    a->SetLineWidth(( Width_t )iwidth );
-    a->SetLineStyle(( Style_t )iLineStyle );
+    a->SetLineWidth( ( Width_t )iwidth );
+    a->SetLineStyle( ( Style_t )iLineStyle );
     a->SetFillColor( icolor );
 }
 
 
 void VPlotUtilities::setArrowPlottingStyle( TArrow* a )
 {
-    if(!a )
+    if( !a )
     {
         return;
     }
 
     a->SetLineColor( fPlottingColor );
-    a->SetLineWidth(( Width_t )fPlottingLineWidth );
-    a->SetLineStyle(( Style_t )fPlottingLineStyle );
+    a->SetLineWidth( ( Width_t )fPlottingLineWidth );
+    a->SetLineStyle( ( Style_t )fPlottingLineStyle );
     a->SetFillColor( fPlottingColor );
     a->SetFillStyle( fPlottingFillStyle );
 }
@@ -226,15 +226,15 @@ void VPlotUtilities::setGraphPlottingStyle( TGraph* g )
 
 void VPlotUtilities::setGraphPlottingStyle( TGraph* g, int icolor, double iwidth, int imarker, double isize, int ifillstyle, int iLineStyle )
 {
-    if(!g )
+    if( !g )
     {
         return;
     }
 
     g->SetTitle( "" );
     g->SetLineColor( icolor );
-    g->SetLineWidth(( Width_t )iwidth );
-    g->SetLineStyle(( Style_t )iLineStyle );
+    g->SetLineWidth( ( Width_t )iwidth );
+    g->SetLineStyle( ( Style_t )iLineStyle );
     g->SetMarkerColor( icolor );
     g->SetMarkerSize( isize );
     g->SetMarkerStyle( imarker );
@@ -280,7 +280,7 @@ int VPlotUtilities::getColorAxisColor( double iV )
 
     int color = int( 0.01 + ( iV - fColorAxis_vmin ) * scale );
 
-    return gStyle->GetColorPalette( int(( color + 0.99 ) * float( fColorAxis_ncolor - 1 ) / float( fColorAxis_ncont ) ) );
+    return gStyle->GetColorPalette( int( ( color + 0.99 ) * float( fColorAxis_ncolor - 1 ) / float( fColorAxis_ncont ) ) );
 }
 
 
@@ -315,7 +315,7 @@ TGaxis* VPlotUtilities::getColorAxisAxis( double x1, double x2, double y1, doubl
         ymin = y1 + ( w1 - fColorAxis_vmin ) * ( y2 - y1 ) / wls;
         ymax = y1 + ( w2 - fColorAxis_vmin ) * ( y2 - y1 ) / wls;
         color = int( 0.01 + ( w1 - fColorAxis_vmin ) * scale );
-        theColor = int(( color + 0.99 ) * float( fColorAxis_ncolor ) / float( fColorAxis_ncont ) );
+        theColor = int( ( color + 0.99 ) * float( fColorAxis_ncolor ) / float( fColorAxis_ncont ) );
         iBox->SetFillColor( gStyle->GetColorPalette( theColor ) );
         iBox->DrawBox( x1, ymin, x2, ymax );
     }
@@ -332,7 +332,7 @@ TGaxis* VPlotUtilities::getColorAxisAxis( double x1, double x2, double y1, doubl
 
 void VPlotUtilities::setPadMargins( TCanvas* c, int nPads, double lM, double rM )
 {
-    if(!c )
+    if( !c )
     {
         return;
     }
@@ -415,7 +415,7 @@ void VPlotUtilities::setBlackAndWhitePalette()
 
 TH2D* VPlotUtilities::removeOuterRing( TH2D* h, double r, double ivalue )
 {
-    if(!h )
+    if( !h )
     {
         return 0;
     }
@@ -475,14 +475,14 @@ unsigned int VPlotUtilities::listPlottingAxis()
 
     for( i_iter = fPlottingAxisData.begin(); i_iter != fPlottingAxisData.end(); i_iter++ )
     {
-        cout << (*i_iter ).first << ":\t\t";
-        if((*i_iter ).second )
+        cout << ( *i_iter ).first << ":\t\t";
+        if( ( *i_iter ).second )
         {
-            cout << " [" << (*i_iter ).second->fMinValue;
-            cout << ", " << (*i_iter ).second->fMaxValue;
-            cout << "] " << (*i_iter ).second->fLogAxis;
-            cout << "\t " << (*i_iter ).second->fAxis;
-            cout << "title: " << (*i_iter ).second->fAxisTitle;
+            cout << " [" << ( *i_iter ).second->fMinValue;
+            cout << ", " << ( *i_iter ).second->fMaxValue;
+            cout << "] " << ( *i_iter ).second->fLogAxis;
+            cout << "\t " << ( *i_iter ).second->fAxis;
+            cout << "title: " << ( *i_iter ).second->fAxisTitle;
         }
         cout << endl;
     }
@@ -492,14 +492,14 @@ unsigned int VPlotUtilities::listPlottingAxis()
 
 void VPlotUtilities::plotHistogramTitle( TH1* h )
 {
-    if(!h )
+    if( !h )
     {
         return;
     }
 
     if( fPlotHistogramTitle.size() > 0 )
     {
-        TText* iT = new TText(-4., 1.e3, fPlotHistogramTitle.c_str() );
+        TText* iT = new TText( -4., 1.e3, fPlotHistogramTitle.c_str() );
         iT->SetNDC();
         if( fPlotHistogramTitle_x > 0. && fPlotHistogramTitle_y > 0. )
         {

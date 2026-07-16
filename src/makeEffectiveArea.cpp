@@ -80,7 +80,7 @@ int main( int argc, char* argv[] )
     // read run parameters from file
     VInstrumentResponseFunctionRunParameter* fRunPara = new VInstrumentResponseFunctionRunParameter();
     fRunPara->SetName( "makeEffectiveArea_runparameter" );
-    if(!fRunPara->readRunParameterFromTextFile( argv[1] ) )
+    if( !fRunPara->readRunParameterFromTextFile( argv[1] ) )
     {
         cout << "error reading runparameters from text file" << endl;
         cout << "exiting..." << endl;
@@ -105,13 +105,13 @@ int main( int argc, char* argv[] )
     fCuts->setNTel( fRunPara->telconfig_ntel, fRunPara->telconfig_arraycentre_X, fRunPara->telconfig_arraycentre_Y );
     fCuts->setInstrumentEpoch( fRunPara->getInstrumentATMString() );
     fCuts->setTelToAnalyze( fRunPara->fTelToAnalyse );
-    if(!fCuts->readCuts( fRunPara->fCutFileName, 2 ) )
+    if( !fCuts->readCuts( fRunPara->fCutFileName, 2 ) )
     {
         cout << "exiting..." << endl;
         exit( EXIT_FAILURE );
     }
     fRunPara->fGammaHadronCutSelector = fCuts->getGammaHadronCutSelector();
-    fCuts->initializeCuts(-1 );
+    fCuts->initializeCuts( -1 );
     fCuts->printCutSummary();
 
     /////////////////////////////////////////////////////////////////
@@ -173,7 +173,7 @@ int main( int argc, char* argv[] )
     /////////////////////////////////////////////////////////////////////////////
     // load data chain
     TChain* c = new TChain( "data" );
-    if(!c->Add( fRunPara->fdatafile.c_str(), -1 ) )
+    if( !c->Add( fRunPara->fdatafile.c_str(), -1 ) )
     {
         cout << "Error while trying to add mscw data tree from file " << fRunPara->fdatafile << endl;
         cout << "exiting..." << endl;
@@ -190,7 +190,7 @@ int main( int argc, char* argv[] )
         fRunPara->fRerunStereoReconstruction_minAngle,
         fRunPara->telconfig_telx, fRunPara->telconfig_tely, fRunPara->telconfig_telz
     );
-    fCuts->setDataTree(&d );
+    fCuts->setDataTree( &d );
     TH1D* hE0mc = ( TH1D* )gDirectory->Get( "hE0mc" );
 
     /////////////////////////////////////////////////////////////////////////////
@@ -199,7 +199,7 @@ int main( int argc, char* argv[] )
     {
         if( f_IRF[i] )
         {
-            f_IRF[i]->setDataTree(&d );
+            f_IRF[i]->setDataTree( &d );
             f_IRF[i]->setCuts( fCuts );
             if( f_IRF[i]->doNotDuplicateIRFs() )
             {
@@ -214,7 +214,7 @@ int main( int argc, char* argv[] )
 
     /////////////////////////////////////////////////////////////////////////////
     // calculate effective areas
-    if(!fRunPara->fFillMCHistograms )
+    if( !fRunPara->fFillMCHistograms )
     {
         // set azimuth bins and spectral index bins
         // (make sure that spectral index is positive)
@@ -250,7 +250,7 @@ int main( int argc, char* argv[] )
                 exit( EXIT_FAILURE );
             }
             fMC_histo = ( VEffectiveAreaCalculatorMCHistograms* )fMC_histoFile->Get( "MChistos" );
-            if(!fMC_histo )
+            if( !fMC_histo )
             {
                 cout << "Error reading MC histograms from file " << fRunPara->fMCdatafile_histo << " (no histograms)" << endl;
                 cout << "exiting..." << endl;
@@ -263,7 +263,7 @@ int main( int argc, char* argv[] )
         else if( fRunPara->fMCdatafile_tree.size() > 0 && fRunPara->fMCdatafile_tree != "0" )
         {
             TChain* c2 = new TChain( "MCpars" );
-            if(!c2->Add( fRunPara->fMCdatafile_tree.c_str(), -1 ) )
+            if( !c2->Add( fRunPara->fMCdatafile_tree.c_str(), -1 ) )
             {
                 cout << "Error while trying to read MC data file: " << fRunPara->fMCdatafile_tree << endl;
                 cout << "exiting..." << endl;
@@ -285,7 +285,7 @@ int main( int argc, char* argv[] )
     }
 
     // fill effective areas
-    if(!fRunPara->fFillMCHistograms && fRunPara->fFillingMode != 1 && fRunPara->fFillingMode != 2 )
+    if( !fRunPara->fFillMCHistograms && fRunPara->fFillingMode != 1 && fRunPara->fFillingMode != 2 )
     {
         fOutputfile->cd();
 
@@ -326,7 +326,7 @@ int main( int argc, char* argv[] )
     /////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////
     // write results to disk
-    if(!fRunPara->fFillMCHistograms )
+    if( !fRunPara->fFillMCHistograms )
     {
         if( fEffectiveAreaCalculator.getTree() )
         {
@@ -381,14 +381,14 @@ VEffectiveAreaCalculatorMCHistograms* copyMCHistograms( TChain* c )
         TChainElement* chEl = 0;
         TIter next( fileElements );
         unsigned int z = 0;
-        while(( chEl = ( TChainElement* )next() ) )
+        while( ( chEl = ( TChainElement* )next() ) )
         {
             TFile ifInput( chEl->GetTitle() );
-            if(!ifInput.IsZombie() )
+            if( !ifInput.IsZombie() )
             {
                 VEffectiveAreaCalculatorMCHistograms* iMCHisFromFile =
                     ( VEffectiveAreaCalculatorMCHistograms* )ifInput.Get( "MChistos" );
-                if(!iMCHisFromFile )
+                if( !iMCHisFromFile )
                 {
                     continue;
                 }

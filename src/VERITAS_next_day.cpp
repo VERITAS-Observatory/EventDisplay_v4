@@ -69,7 +69,7 @@ int main( int argc, char* argv[] )
         return 1;
     }
     flux->setDebug( fDebug );
-    flux->setSignificanceParameters(-5., -5. );
+    flux->setSignificanceParameters( -5., -5. );
     flux->calculateFluxes( fMinEnergy, false );
     //flux->printResults();
     //calculate upper limits for all runs even when significance >= 3
@@ -86,13 +86,13 @@ int main( int argc, char* argv[] )
     // read run list
     VAnalysisUtilities a;
     a.openFile( fDataFile, -1, true, fDebug );
-    if(!a.IsZombie() )
+    if( !a.IsZombie() )
     {
-        CRunSummary* c = a.getRunSummaryTree(-1 );
+        CRunSummary* c = a.getRunSummaryTree( -1 );
 
         // open output stream
         ofstream fResults;
-        fResults.open(( fOUTFile + ".dat" ).c_str() );
+        fResults.open( ( fOUTFile + ".dat" ).c_str() );
         if( fResults && c )
         {
             for( int i = 0; i < c->fChain->GetEntries(); i++ )
@@ -166,9 +166,9 @@ int main( int argc, char* argv[] )
                 }
                 else
                 {
-                    flux->getFlux(-1, iFlux, iFluxE, var1 );
+                    flux->getFlux( -1, iFlux, iFluxE, var1 );
                     iFluxInCU = flux->getFluxVsCrab( iFlux, fMinEnergy, fGamma );
-                    fluxUL->getFlux(-1, var1, var2, iFluxUL );
+                    fluxUL->getFlux( -1, var1, var2, iFluxUL );
                     iFluxULinCU = fluxUL->getFluxVsCrab( iFluxUL, fMinEnergy, fGamma );
 
                     fResults << setw( 12 ) << left << "Total:";

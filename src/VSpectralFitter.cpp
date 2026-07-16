@@ -37,7 +37,7 @@ VSpectralFitter::VSpectralFitter( string fitname )
 */
 TF1* VSpectralFitter::fit( TGraph* g, string fitname )
 {
-    if(!g )
+    if( !g )
     {
         cout << "VSpectralFitter::fit warning: no graph" << endl;
         return 0;
@@ -225,7 +225,7 @@ bool VSpectralFitter::defineFitFunction()
     {
         fFitFunction->SetLineStyle( fPlottingEnergySpectrumLineStyle );
         fFitFunction->SetLineColor( fPlottingEnergySpectrumLineColor );
-        fFitFunction->SetLineWidth(( Width_t )fPlottingEnergySpectrumLineWidth );
+        fFitFunction->SetLineWidth( ( Width_t )fPlottingEnergySpectrumLineWidth );
     }
 
     return true;
@@ -233,7 +233,7 @@ bool VSpectralFitter::defineFitFunction()
 
 void VSpectralFitter::updateFitFunction_lin()
 {
-    if(!fFitFunction || !fFitFunction_lin )
+    if( !fFitFunction || !fFitFunction_lin )
     {
         return;
     }
@@ -248,7 +248,7 @@ void VSpectralFitter::updateFitFunction_lin()
 
 void VSpectralFitter::print()
 {
-    if(!fFitFunction )
+    if( !fFitFunction )
     {
         return;
     }
@@ -301,7 +301,7 @@ void VSpectralFitter::print()
 */
 double VSpectralFitter::getIntegralFlux( double iMinEnergy_TeV, double iMaxEnergy_TeV )
 {
-    if(!fFitFunction_lin )
+    if( !fFitFunction_lin )
     {
         cout << "VSpectralFitter::getIntegralFlux(): error: no fit function" << endl;
         return -99999.;
@@ -330,7 +330,7 @@ double VSpectralFitter::getIntegralFlux( double iMinEnergy_TeV, double iMaxEnerg
 */
 double VSpectralFitter::getIntegralFluxError( double iMinEnergy_TeV, double iMaxEnergy_TeV )
 {
-    if(!fFitFunction_lin || !fFitFunction )
+    if( !fFitFunction_lin || !fFitFunction )
     {
         cout << "VSpectralFitter::getIntegralFlux(): error: no fit function" << endl;
         return -99999.;

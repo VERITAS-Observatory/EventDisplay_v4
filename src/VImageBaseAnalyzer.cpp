@@ -265,13 +265,13 @@ void VImageBaseAnalyzer::FADCStopCorrect()
     }
 
     // don't do this if there is no L2 trigger
-    if(!getReader()->hasLocalTrigger( getTelID() ) )
+    if( !getReader()->hasLocalTrigger( getTelID() ) )
     {
         return;
     }
 
     // don't do this if there are no FADCs
-    if(!getReader()->hasFADCTrace() )
+    if( !getReader()->hasFADCTrace() )
     {
         return;
     }
@@ -300,8 +300,8 @@ void VImageBaseAnalyzer::FADCStopCorrect()
     for( unsigned int t = 0; t < getFADCstopTrig().size(); t++ )
     {
         //  calculate TZero for first crate trigger signal
-        pair< bool, uint32_t > i_hitIndexPair = fReader->getChannelHitIndex(( unsigned int )getFADCstopTrig()[t] );
-        if(!i_hitIndexPair.first )
+        pair< bool, uint32_t > i_hitIndexPair = fReader->getChannelHitIndex( ( unsigned int )getFADCstopTrig()[t] );
+        if( !i_hitIndexPair.first )
         {
             continue;
         }
@@ -318,7 +318,7 @@ void VImageBaseAnalyzer::FADCStopCorrect()
                     continue;
                 }
 
-                fReader->selectHitChan(( uint32_t )i );
+                fReader->selectHitChan( ( uint32_t )i );
                 if( i_channelHitID < getPeds().size() )
                 {
                     fTraceHandler->setTrace( fReader, getNSamples(), getPeds()[i_channelHitID], getPedrms()[i_channelHitID], i_channelHitID, i, 0. );
@@ -457,7 +457,7 @@ void VImageBaseAnalyzer::calcTCorrectedSums( int iFirst, int iLast )
 
                 fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );
                 int offset = 0;
-                if(!getRunParameter()->fFixWindowStart )
+                if( !getRunParameter()->fFixWindowStart )
                 {
                     if( getTOffsets()[i_channelHitID] > 0 )
                     {
@@ -524,7 +524,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
     /////////////////////////////////////////////////////////////////////////////////
     // DST source file,
     // ignore everything and just get the sums and tzeros from data trees
-    if(!fReader->hasFADCTrace() || !getRunParameter()->doFADCAnalysis() )
+    if( !fReader->hasFADCTrace() || !getRunParameter()->doFADCAnalysis() )
     {
         if( getDebugFlag() )
         {
@@ -608,7 +608,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 
             // get time offsets (from laser/flasher calibration): make sure that trace integration starts at the same time in all channels
             int offset = 0;
-            if(!getRunParameter()->fFixWindowStart )
+            if( !getRunParameter()->fFixWindowStart )
             {
                 if( getTOffsets()[i_channelHitID] > 0 )
                 {
@@ -667,7 +667,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
             }
             /////////////////
             // no doublepass: fill summation windows and pass2 sum
-            if(!getRunParameter()->fDoublePass )
+            if( !getRunParameter()->fDoublePass )
             {
                 // don't fill pulse timing in first pass of double pass (saves time)
                 if( getFillPulseSum() )
@@ -709,7 +709,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
             {
                 if( i_channelHitID == getFADCstopTrig()[c] )
                 {
-                    fReader->selectHitChan(( uint32_t )i );
+                    fReader->selectHitChan( ( uint32_t )i );
                     if( fReader->has16Bit() )
                     {
                         fTraceHandler->setTrace( fReader->getSamplesVec16Bit(), getPeds( getHiLo()[i_channelHitID] )[i_channelHitID],
@@ -745,7 +745,7 @@ void VImageBaseAnalyzer::gainCorrect()
     }
 
     // do not gain correct if traces where not calculated by evndisp (using e.g. sim_telarray analysis results)
-    if(!getRunParameter()->doFADCAnalysis() )
+    if( !getRunParameter()->doFADCAnalysis() )
     {
         return;
     }
@@ -825,7 +825,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
         {
             if( getReader()->getDead()[i] > 0 )
             {
-                setDead( i, TMath::Nint( log(( float )getReader()->getDead()[i] ) / log( 2. ) ), iLowGain );
+                setDead( i, TMath::Nint( log( ( float )getReader()->getDead()[i] ) / log( 2. ) ), iLowGain );
             }
             else
             {
@@ -857,7 +857,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
     // find dead channels from calibration and event data
 
     // check if dead channel configuration is time dependent
-    if(!iFirst && !usePedestalsInTimeSlices( iLowGain ) )
+    if( !iFirst && !usePedestalsInTimeSlices( iLowGain ) )
     {
         return;
     }
@@ -915,7 +915,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // time independent values
         // gain/toff/low gain
-        if((!getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fGainFileNumber[getTelID()] > 0
+        if( ( !getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fGainFileNumber[getTelID()] > 0
                 && !( getRunParameter()->fNextDayGainHack && getGains( iLowGain )[i] == 1.0 ) )
                 || ( iLowGain && getRunParameter()->fGainLowGainFileNumber[getTelID()] > 0 ) )
         {
@@ -926,7 +926,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
             setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )
                      ->testGainDev( i, getGains( iLowGain )[i], getGainvars( iLowGain && getLowGainGains() )[i], getGains_DefaultValue( iLowGain )[i] ), iLowGain );
         }
-        if((!getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fTOffFileNumber[getTelID()] > 0 )
+        if( ( !getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fTOffFileNumber[getTelID()] > 0 )
                 || ( iLowGain && getRunParameter()->fTOffLowGainFileNumber[getTelID()] > 0 ) )
         {
             setDead( i, getDeadChannelFinder( iLowGain && getLowGainTOff() )
@@ -949,7 +949,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
                 {
                     setDead( i, 12, iLowGain );
                 }
-                if(!fRunPar->fMCnoDead && fReader->getFullAnaVec()[i] == -1 )
+                if( !fRunPar->fMCnoDead && fReader->getFullAnaVec()[i] == -1 )
                 {
                     setDead( i, 12, iLowGain );
                 }
@@ -969,8 +969,8 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
     {
         // check L1 rates
         vector< unsigned int > iL1Rates_dead = getDBPixelDataReader()->getL1_DeadChannelList( getTelID(), getEventMJD(), getEventTime(),
-                                               getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_L1Rates_min(),
-                                               getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_L1Rates_max() );
+            getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_L1Rates_min(),
+            getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_L1Rates_max() );
         // do not allow L1 rates to kill a significant part of the camera
         if( iL1Rates_dead.size() < getNChannels() / 2 )
         {
@@ -984,8 +984,8 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
         }
         // check measured HVs
         vector< unsigned int > iHV_dead = getDBPixelDataReader()->getHV_DeadChannelList( getTelID(), getEventMJD(), getEventTime(),
-                                          getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_HVrms_min(),
-                                          getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_HVrms_max() );
+            getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_HVrms_min(),
+            getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_HVrms_max() );
         // do not allow HV to kill a significant part of the camera
         if( iHV_dead.size() < getNChannels() / 2 )
         {
@@ -1027,7 +1027,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
         if( getNDead( iLowGain ) > 40 )
         {
             cout << "WARNING: number of dead";
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 cout << " high gain ";
             }
@@ -1041,7 +1041,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
         else
         {
             cout << "Number of dead";
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 cout << " high gain ";
             }
@@ -1081,7 +1081,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
         {
             iPix = getAnaData()->getRandomDeadChannel();
             // check if this one is already dead
-            if(!( getDead( iLowGain ).at( iPix ) ) )
+            if( !( getDead( iLowGain ).at( iPix ) ) )
             {
                 setDead( iPix, 10, iLowGain );
                 iN++;
@@ -1113,7 +1113,7 @@ void VImageBaseAnalyzer::timingCorrect()
     {
         for( unsigned int i = 0; i < nc; i++ )
         {
-            if(!getDead()[i] )
+            if( !getDead()[i] )
             {
                 setPulseTimingCorrection( i, -1. * getTOffsets()[i] );
             }
@@ -1178,7 +1178,7 @@ unsigned int VImageBaseAnalyzer::fillHiLo()
                 continue;
             }
             setHiLo( chID, true );
-            if(!getDead( true )[chID] && !( fReader->getMaxChannels() == 500 && chID == 499 ) )
+            if( !getDead( true )[chID] && !( fReader->getMaxChannels() == 500 && chID == 499 ) )
             {
                 z++;
             }
@@ -1421,7 +1421,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
                 else if( corrfirst < 0 )
                 {
                     unsigned int isw = getDynamicSummationWindow( i_channelHitID );
-                    if(-1 * corrfirst > ( int )isw )
+                    if( -1 * corrfirst > ( int )isw )
                     {
                         isw = 0;
                     }

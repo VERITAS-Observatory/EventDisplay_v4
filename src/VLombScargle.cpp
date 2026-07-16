@@ -66,8 +66,8 @@ void VLombScargle::fillPeriodigram( bool iShuffle )
     for( unsigned int i = 0; i < fNFrequencies; i++ )
     {
         // frequency
-        f  =  fFrequency_min + ( double )i * ( fFrequency_max - fFrequency_min ) / (( double )fNFrequencies );
-        f += 0.5 * ( fFrequency_max - fFrequency_min ) / (( double )fNFrequencies );
+        f  =  fFrequency_min + ( double )i * ( fFrequency_max - fFrequency_min ) / ( ( double )fNFrequencies );
+        f += 0.5 * ( fFrequency_max - fFrequency_min ) / ( ( double )fNFrequencies );
         w  = 2.* TMath::Pi() * f;
 
         // tau
@@ -77,8 +77,8 @@ void VLombScargle::fillPeriodigram( bool iShuffle )
         {
             if( fLightCurveData[j] )
             {
-                i_sin += TMath::Sin( 2.*w* fLightCurveData[j]->getMJD() );
-                i_cos += TMath::Cos( 2.*w* fLightCurveData[j]->getMJD() );
+                i_sin += TMath::Sin( 2.*w * fLightCurveData[j]->getMJD() );
+                i_cos += TMath::Cos( 2.*w * fLightCurveData[j]->getMJD() );
             }
         }
         tau = TMath::ATan2( i_sin, i_cos ) / 2. / w;
@@ -117,7 +117,7 @@ void VLombScargle::fillPeriodigram( bool iShuffle )
         if( i_A_den > 0. && i_B_den > 0. )
         {
             fVFrequency.push_back( f );
-            fVPeriodigram.push_back(( i_A_num* i_A_num / i_A_den + i_B_num* i_B_num / i_B_den ) / 2. / iVar );
+            fVPeriodigram.push_back( ( i_A_num * i_A_num / i_A_den + i_B_num * i_B_num / i_B_den ) / 2. / iVar );
         }
     }
 }
@@ -166,11 +166,11 @@ void VLombScargle::setFrequencyRange( unsigned int iNFrequencies, double iFreque
 
 void VLombScargle::plotProbabilityLevels( bool iPlotinColor )
 {
-    if(!fPeriodigramCanvas )
+    if( !fPeriodigramCanvas )
     {
         return;
     }
-    if(!fPeriodigramHisto )
+    if( !fPeriodigramHisto )
     {
         return;
     }
@@ -183,7 +183,7 @@ void VLombScargle::plotProbabilityLevels( bool iPlotinColor )
 
     for( unsigned int i = 0; i < fProbabilityLevels.size(); i++ )
     {
-        i_z = -1.*log( 1. - exp( log( fProbabilityLevels[i] ) / (( double )fNFrequencies ) ) );
+        i_z = -1.*log( 1. - exp( log( fProbabilityLevels[i] ) / ( ( double )fNFrequencies ) ) );
 
         if( i_z > fPeriodigramHisto->GetMinimum() && i_z < fPeriodigramHisto->GetMaximum() )
         {
@@ -220,16 +220,16 @@ void VLombScargle::plotProbabilityLevels( bool iPlotinColor )
 */
 void VLombScargle::plotProbabilityLevelsFromToyMC( unsigned int iMCCycles, unsigned int iSeed, bool iPlotinColor )
 {
-    if(!fPeriodigramCanvas )
+    if( !fPeriodigramCanvas )
     {
         return;
     }
-    if(!fPeriodigramHisto )
+    if( !fPeriodigramHisto )
     {
         return;
     }
 
-    if(!fRandom )
+    if( !fRandom )
     {
         fRandom = new TRandom3();
     }
@@ -316,7 +316,7 @@ void VLombScargle::plotPeriodigram( string iXTitle, string iYTitle, bool bLogX )
     sprintf( hname, "cLS_%d_%d_%d", fNFrequencies, ( int )fFrequency_min, ( int )fFrequency_max );
     sprintf( htitle, "Lomb-Scargle Periodigram (n_{f}=%d, f_{min}=%.1f, f_{max}=%.1f", fNFrequencies, fFrequency_min, fFrequency_max );
 
-    if(!fPeriodigramCanvas )
+    if( !fPeriodigramCanvas )
     {
         fPeriodigramCanvas = new TCanvas( hname, htitle, 10, 10, 500, 500 );
         fPeriodigramCanvas->SetGridx( 0 );
@@ -354,11 +354,11 @@ void VLombScargle::plotPeriodigram( string iXTitle, string iYTitle, bool bLogX )
 
 void VLombScargle::plotFrequencyLine( double iFrequencyLine_plot, int iColor )
 {
-    if(!fPeriodigramCanvas )
+    if( !fPeriodigramCanvas )
     {
         return;
     }
-    if(!fPeriodigramHisto )
+    if( !fPeriodigramHisto )
     {
         return;
     }

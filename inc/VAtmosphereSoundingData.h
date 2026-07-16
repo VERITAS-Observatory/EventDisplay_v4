@@ -67,7 +67,7 @@ class VAtmosphereSoundingData
 
         TGraph* getDensityGraph()
         {
-            if(!fGraphScaledDensityHeight )
+            if( !fGraphScaledDensityHeight )
             {
                 makeGraphScaledDensity();
             }
@@ -75,7 +75,7 @@ class VAtmosphereSoundingData
         }
         TGraph* getPressureGraph()
         {
-            if(!fGraphPressureHeight )
+            if( !fGraphPressureHeight )
             {
                 makeGraphPressure();
             }
@@ -83,7 +83,7 @@ class VAtmosphereSoundingData
         }
         TGraph* getHumidityGraph()
         {
-            if(!fGraphHumidityHeight )
+            if( !fGraphHumidityHeight )
             {
                 makeGraphHumidity();
             }
@@ -91,7 +91,7 @@ class VAtmosphereSoundingData
         }
         TGraph* getTemperatureGraph()
         {
-            if(!fGraphTemperatureHeight )
+            if( !fGraphTemperatureHeight )
             {
                 makeGraphTemperature();
             }
@@ -99,7 +99,7 @@ class VAtmosphereSoundingData
         }
         TGraph* getIndexGraph()
         {
-            if(!fGraphIndexHeight )
+            if( !fGraphIndexHeight )
             {
                 makeGraphIndex();
             }
@@ -107,7 +107,7 @@ class VAtmosphereSoundingData
         }
         TGraph* getThicknessGraph()
         {
-            if(!fGraphThicknessHeight )
+            if( !fGraphThicknessHeight )
             {
                 makeGraphThickness();
             }

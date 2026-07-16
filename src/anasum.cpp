@@ -92,7 +92,7 @@ int main( int argc, char* argv[] )
 
     parseOptions( argc, argv );
 
-    if(!testCommandlineArguments() )
+    if( !testCommandlineArguments() )
     {
         exit( EXIT_FAILURE );
     }

@@ -228,7 +228,7 @@ bool VOrbitalPhase::setOutputFile( string iOption )
     if( fOutFile == fInFile && iOption == "recreate" )
     {
         cout << "VOrbitalPhase::setOutputFile error: can't overwrite inputfile" << endl;
-        exit(-1 );
+        exit( -1 );
     }
 
     // open output file
@@ -264,7 +264,7 @@ void VOrbitalPhase::calculatePhase( double djm )
 
 
     // calculate phase
-    fOrbitalPhase = ( djm + 2400000.5 - t0 ) / fOrbit - ( int )(( djm + 2400000.5 - t0 ) / fOrbit );
+    fOrbitalPhase = ( djm + 2400000.5 - t0 ) / fOrbit - ( int )( ( djm + 2400000.5 - t0 ) / fOrbit );
     //  cout << "PHASE: " << phase << endl;
 
 }
@@ -305,11 +305,11 @@ void VOrbitalPhase::copyDirectory( TDirectory* source )
     //loop on all entries of this directory
     TKey* key;
     TIter nextkey( source->GetListOfKeys() );
-    while(( key = ( TKey* )nextkey() ) )
+    while( ( key = ( TKey* )nextkey() ) )
     {
         const char* classname = key->GetClassName();
         TClass* cl = gROOT->GetClass( classname );
-        if(!cl )
+        if( !cl )
         {
             continue;
         }

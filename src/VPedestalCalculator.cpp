@@ -55,7 +55,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
         return false;
     }
     // test if summation window is not to big
-    if(( unsigned int )fSumWindow > VDST_MAXSUMWINDOW )
+    if( ( unsigned int )fSumWindow > VDST_MAXSUMWINDOW )
     {
         cout << "=================================" << endl;
         cout << "VPedestalCalculator::initialize error: Telescope: " << getTelID() + 1 << endl;
@@ -66,7 +66,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
         return false;
     }
     // initialize data readers
-    if(!initializeDataReader() )
+    if( !initializeDataReader() )
     {
         cout << "VPedestalCalculator::initialize, error: cannot initialize data readers" << endl;
         cout << "exiting..." << endl;
@@ -127,7 +127,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
         unsigned int t = getTeltoAna()[i];
 
         // define the output tree
-        if(!bCalibrationRun )
+        if( !bCalibrationRun )
         {
 
             getAnaDirectories()[t]->cd();
@@ -135,7 +135,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
             sprintf( hname, "tPedVar" );
             sprintf( htitle, "pedestal variations (telescope %d)", t + 1 );
             fTree.push_back( new TTree( hname, htitle ) );
-            if(!fTree.back() )
+            if( !fTree.back() )
             {
                 return false;
             }
@@ -327,7 +327,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
                         continue;
                     }
                     // check for dead channels
-                    if(!getDead()[chanID] && chanID < fpedcal_mean[telID].size() )
+                    if( !getDead()[chanID] && chanID < fpedcal_mean[telID].size() )
                     {
                         fReader->selectHitChan( i );
                         fTraceHandler->setTrace( fReader, getNSamples(), getPeds()[chanID], getPedrms()[chanID], chanID, i,
@@ -454,7 +454,7 @@ double VPedestalCalculator::adjustTimeSliceLength( double iLengthofTimeSlice, do
 
     double iRunLength = iRunStoppTime - iRunStartTime;
 
-    double iNSlices = ( int )(( iRunStoppTime - iRunStartTime ) / iLengthofTimeSlice );
+    double iNSlices = ( int )( ( iRunStoppTime - iRunStartTime ) / iLengthofTimeSlice );
     if( iNSlices > 0. )
     {
         double iR = iRunLength - iNSlices * iLengthofTimeSlice;

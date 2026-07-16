@@ -28,7 +28,7 @@ VInstrumentResponseFunction::VInstrumentResponseFunction()
 void VInstrumentResponseFunction::setRunParameter( VInstrumentResponseFunctionRunParameter* iRunPara )
 {
     fRunPara = iRunPara;
-    if(!iRunPara )
+    if( !iRunPara )
     {
         return;
     }
@@ -88,7 +88,7 @@ bool VInstrumentResponseFunction::initialize( string iName, string iType, unsign
             i_irf.push_back( new VInstrumentResponseFunctionData() );
             i_irf.back()->setHistogramLogAngbinning( fRunPara->fLogAngularBin );
             i_irf.back()->setHistogramEbinning( fRunPara->fhistoNEbins );
-            if(!i_irf.back()->initialize( hname, iType, iNTel, iMCMaxCoreRadius ) )
+            if( !i_irf.back()->initialize( hname, iType, iNTel, iMCMaxCoreRadius ) )
             {
                 return false;
             }
@@ -117,7 +117,7 @@ bool VInstrumentResponseFunction::initialize( string iName, string iType, unsign
 */
 bool VInstrumentResponseFunction::fill()
 {
-    if(!fillEventData() )
+    if( !fillEventData() )
     {
         return false;
     }
@@ -133,12 +133,12 @@ bool VInstrumentResponseFunction::fill()
 bool VInstrumentResponseFunction::fillEventData()
 {
     // data tree is needed to do anything
-    if(!fData )
+    if( !fData )
     {
         return false;
     }
     // cut are needed
-    if(!fAnaCuts )
+    if( !fAnaCuts )
     {
         return false;
     }
@@ -159,7 +159,7 @@ bool VInstrumentResponseFunction::fillEventData()
         fAnaCuts->newEvent( false );
 
         // apply MC cuts
-        if(!fAnaCuts->applyMCXYoffCut( fData->MCxoff, fData->MCyoff, true ) )
+        if( !fAnaCuts->applyMCXYoffCut( fData->MCxoff, fData->MCyoff, true ) )
         {
             continue;
         }
@@ -167,19 +167,19 @@ bool VInstrumentResponseFunction::fillEventData()
         ////////////////////////////////
         // apply general quality and gamma/hadron separation cuts
         // apply fiducial area cuts
-        if(!fAnaCuts->applyInsideFiducialAreaCut( true ) )
+        if( !fAnaCuts->applyInsideFiducialAreaCut( true ) )
         {
             continue;
         }
 
         // apply reconstruction quality cuts
-        if(!fAnaCuts->applyStereoQualityCuts( true, i, true ) )
+        if( !fAnaCuts->applyStereoQualityCuts( true, i, true ) )
         {
             continue;
         }
 
         // apply gamma/hadron cuts
-        if(!fAnaCuts->isGamma( i, true ) )
+        if( !fAnaCuts->isGamma( i, true ) )
         {
             continue;
         }

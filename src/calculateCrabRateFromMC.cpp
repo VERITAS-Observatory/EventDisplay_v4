@@ -49,7 +49,7 @@ vector< double > read_zenith_bins( string fEffAreaFile )
         exit( EXIT_FAILURE );
     }
     TTree* t = ( TTree* )gDirectory->Get( "fEffAreaH2F" );
-    if(!t )
+    if( !t )
     {
         cout << "error reading effective area tree from " << fEffAreaFile << endl;
         exit( EXIT_FAILURE );
@@ -70,7 +70,7 @@ vector< double > read_zenith_bins( string fEffAreaFile )
                 break;
             }
         }
-        if(!bFound )
+        if( !bFound )
         {
             tmp_zebins.push_back( ze );
         }
@@ -135,7 +135,7 @@ vector< double > read_energy_bins( string iTMVAParameterFile, string iEnergyKeyW
 {
     vector< double > tmp_e;
     ifstream is( iTMVAParameterFile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "Error reading energy bins from TMVA run parameter file" << endl;
         cout << "exiting..." << endl;
@@ -150,7 +150,7 @@ vector< double > read_energy_bins( string iTMVAParameterFile, string iEnergyKeyW
             continue;
         }
         istringstream is_stream( is_line );
-        if(( is_stream >> std::ws ).eof() )
+        if( ( is_stream >> std::ws ).eof() )
         {
             continue;
         }
@@ -162,7 +162,7 @@ vector< double > read_energy_bins( string iTMVAParameterFile, string iEnergyKeyW
         is_stream >> temp;
         if( temp == iEnergyKeyWord )
         {
-            while(!( is_stream >> std::ws ).eof() )
+            while( !( is_stream >> std::ws ).eof() )
             {
                 double iT = 0.;
                 is_stream >> iT;
@@ -263,7 +263,7 @@ TTree* fillMCRates(
         exit( EXIT_FAILURE );
     }
     TTree* t = ( TTree* )gDirectory->Get( "fEffAreaH2F" );
-    if(!t )
+    if( !t )
     {
         cout << "error reading effective area tree from " << fEffAreaFile << endl;
         exit( EXIT_FAILURE );
@@ -346,7 +346,7 @@ vector< string > read_run_list( string iRunList )
 {
     vector< string > i_runs;
     ifstream is( iRunList.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "Error reading run list of background files" << endl;
         cout << "exiting..." << endl;
@@ -379,7 +379,7 @@ void fillBackgroundRates_perRun(
         return;
     }
     TTree* t = ( TTree* )f->Get( "total_1/stereo/tRunSummary" );
-    if(!t )
+    if( !t )
     {
         cout << "Background rate file incomplete (missing tRunSummary tree): " << i_runFileName << endl;
         return;
@@ -407,7 +407,7 @@ void fillBackgroundRates_perRun(
     stringstream iTemp;
     iTemp << "run_" << runOn << "/stereo/energyHistograms/herecCounts_off";
     TH1D* hOff = ( TH1D* )f->Get( iTemp.str().c_str() );
-    if(!hOff )
+    if( !hOff )
     {
         cout << "Background rate file incomplete (missing off histogram)" << i_runFileName << endl;
         return;
@@ -426,7 +426,7 @@ void fillBackgroundRates_perRun(
             h->Fill(
                 0.5 * ( ebins[e].first + ebins[e].second ),
                 90. - elevationOff,
-                iR* OffNorm / tOff * 60. );
+                iR * OffNorm / tOff * 60. );
         }
     }
 

@@ -40,7 +40,7 @@ void VPlotLookupTable::printLookupTables()
 
 void VPlotLookupTable::plot2DHistogram( TH2F* h, unsigned int iSetID, string ititle, int iCanvasX, double i_min, double i_max, bool iZLog )
 {
-    if(!h )
+    if( !h )
     {
         cout << "VPlotLookupTable::plot2DHistogram error: histogram not found: " << endl;
         if( h )
@@ -98,7 +98,7 @@ void VPlotLookupTable::plot2DHistogram( TH2F* h, unsigned int iSetID, string iti
 
 TH2F* VPlotLookupTable::divide2DHistograms( TH2F* h1, TH2F* h2, char* hname )
 {
-    if(!h1 || !h2 )
+    if( !h1 || !h2 )
     {
         return 0;
     }
@@ -237,7 +237,7 @@ void VPlotLookupTable::plotRelativeTables( unsigned int iSetID1, unsigned int iS
 bool VPlotLookupTable::addLookupTable( string iLookupTableFile, string iTable, int ze, int az, int telID, int noise, int woff )
 {
     // add a new data set
-    if(!checkTableName( iTable ) )
+    if( !checkTableName( iTable ) )
     {
         return false;
     }
@@ -251,7 +251,7 @@ bool VPlotLookupTable::addLookupTable( string iLookupTableFile, string iTable, i
     char hname[600];
     // create full directory name
     sprintf( hname, "ze_%03d/woff_%04d/az_%d/tel_%d/NOISE_%05d", ze * 10, woff, az, telID, noise );
-    if(!fI->cd( hname ) )
+    if( !fI->cd( hname ) )
     {
         cout << "VPlotLookupTable::addLookupTable error: directory  " << hname << " not found" << endl;
         return false;
@@ -259,7 +259,7 @@ bool VPlotLookupTable::addLookupTable( string iLookupTableFile, string iTable, i
     cout << "directory: " << hname << endl;
     //  variable directory
     sprintf( hname, "%s", iTable.c_str() );
-    if(!gDirectory->cd( hname ) )
+    if( !gDirectory->cd( hname ) )
     {
         cout << "VPlotLookupTable::addLookupTable error: directory for variable " << iTable << " not found" << endl;
         return false;

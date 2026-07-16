@@ -24,7 +24,7 @@ double readWobbleOffset( TFile* fIn, bool printInteger );
 
 bool readRunParameter( TFile* fIn, string iPara )
 {
-    if(!fIn )
+    if( !fIn )
     {
         return false;
     }
@@ -33,26 +33,26 @@ bool readRunParameter( TFile* fIn, string iPara )
 
     fPar = ( VEvndispRunParameter* )fIn->Get( "runparameterV2" );
     // possibly a DST file
-    if(!fPar )
+    if( !fPar )
     {
         fPar = ( VEvndispRunParameter* )fIn->Get( "runparameterDST" );
     }
     // possibly a anasum file -> check first (!) run directory
-    if(!fPar )
+    if( !fPar )
     {
         TIter next( fIn->GetListOfKeys() );
         TKey* key = 0;
-        while(( key = ( TKey* )next() ) )
+        while( ( key = ( TKey* )next() ) )
         {
             string key_name = key->GetName();
             if( key_name.find( "run_" ) != string::npos )
             {
-                fPar = ( VEvndispRunParameter* )fIn->Get(( key_name + "/stereo/runparameterV2" ).c_str() );
+                fPar = ( VEvndispRunParameter* )fIn->Get( ( key_name + "/stereo/runparameterV2" ).c_str() );
                 break;
             }
         }
     }
-    if(!fPar )
+    if( !fPar )
     {
         return false;
     }
@@ -127,7 +127,7 @@ double readWobbleOffset( TFile* fIn, bool printInteger )
 {
     double fWobble = -999;
     double fWobble_int = -99;
-    if(!fIn )
+    if( !fIn )
     {
         if( printInteger ) return fWobble_int;
         else return fWobble;
@@ -137,9 +137,9 @@ double readWobbleOffset( TFile* fIn, bool printInteger )
     {
         if( printInteger )
         {
-            return TMath::Nint( sqrt( fPar->fWobbleNorth* fPar->fWobbleNorth + fPar->fWobbleEast* fPar->fWobbleEast ) * 100. );
+            return TMath::Nint( sqrt( fPar->fWobbleNorth * fPar->fWobbleNorth + fPar->fWobbleEast * fPar->fWobbleEast ) * 100. );
         }
-        return sqrt( fPar->fWobbleNorth* fPar->fWobbleNorth + fPar->fWobbleEast* fPar->fWobbleEast );
+        return sqrt( fPar->fWobbleNorth * fPar->fWobbleNorth + fPar->fWobbleEast * fPar->fWobbleEast );
     }
     if( printInteger ) return fWobble_int;
     return fWobble;
@@ -151,13 +151,13 @@ double readWobbleOffset( TFile* fIn, bool printInteger )
  */
 double readMeanElevation( TFile* fIn )
 {
-    if(!fIn )
+    if( !fIn )
     {
         return false;
     }
     // get total number of telescopes available
     TTree* telconfig = ( TTree* )fIn->Get( "telconfig" );
-    if(!telconfig )
+    if( !telconfig )
     {
         return false;
     }
@@ -184,7 +184,7 @@ double readMeanElevation( TFile* fIn )
     if( data )
     {
         data->GetEntry( 0 );
-        if(!bData )
+        if( !bData )
         {
             for( unsigned int i = 0; i < iNTel; i++ )
             {
@@ -205,7 +205,7 @@ double readMeanElevation( TFile* fIn )
         if( data->GetEntries() > 1 )
         {
             data->GetEntry( data->GetEntries() - 1 );
-            if(!bData )
+            if( !bData )
             {
                 for( unsigned int i = 0; i < iNTel; i++ )
                 {
@@ -238,7 +238,7 @@ double readMeanElevation( TFile* fIn )
 
 bool readMCParameter( TFile* fIn, string iPara )
 {
-    if(!fIn )
+    if( !fIn )
     {
         return false;
     }
@@ -246,7 +246,7 @@ bool readMCParameter( TFile* fIn, string iPara )
     VMonteCarloRunHeader* fMC = 0;
 
     fMC = ( VMonteCarloRunHeader* )fIn->Get( "MC_runheader" );
-    if(!fMC )
+    if( !fMC )
     {
         return false;
     }
@@ -363,21 +363,21 @@ int main( int argc, char* argv[] )
     VEvndispRunParameter* fPar = 0;
 
     fPar = ( VEvndispRunParameter* )fIn->Get( "runparameterV2" );
-    if(!fPar )
+    if( !fPar )
     {
         fPar = ( VEvndispRunParameter* )fIn->Get( "runparameterDST" );
     }
     // possibly a anasum file -> check first (!) run directory
-    if(!fPar )
+    if( !fPar )
     {
         TIter next( fIn->GetListOfKeys() );
         TKey* key = 0;
-        while(( key = ( TKey* )next() ) )
+        while( ( key = ( TKey* )next() ) )
         {
             string key_name = key->GetName();
             if( key_name.find( "run_" ) != string::npos )
             {
-                fPar = ( VEvndispRunParameter* )fIn->Get(( key_name + "/stereo/runparameterV2" ).c_str() );
+                fPar = ( VEvndispRunParameter* )fIn->Get( ( key_name + "/stereo/runparameterV2" ).c_str() );
                 cout << "Reading run parameters from key_name" << endl;
                 break;
             }

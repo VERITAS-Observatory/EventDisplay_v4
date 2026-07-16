@@ -25,7 +25,7 @@ void VEvndispData::setTeltoAna( vector< unsigned int > iT )
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // fExpectedEventStatus is used in VDisplay -> don't allow to display more than 8*sizeof(size_t) telescope (64?)
     //
-    bitset<8 * sizeof(size_t )> ib;
+    bitset<8 * sizeof( size_t )> ib;
     for( unsigned int i = 0; i < iT.size(); i++ )
     {
         if( iT[i] >= ib.size() )
@@ -86,7 +86,7 @@ void VEvndispData::setTelID( unsigned int iTel )
         else
         {
             cout << "VEvndispData::setTelID: fatal error: fReader == 0" << endl;
-            exit(-1 );
+            exit( -1 );
         }
         if( fDetectorGeo != 0 )
         {
@@ -130,7 +130,7 @@ bool VEvndispData::initializeDataReader()
         fReader = ( VVirtualDataReader* )fMultipleGrIsuReader;
     }
 
-    if(!fReader )
+    if( !fReader )
     {
         return false;
     }
@@ -181,7 +181,7 @@ void VEvndispData::testDataReader()
         else
         {
             cout << "VEvndispData::testDataReader() error: no reader found" << endl;
-            exit(-1 );
+            exit( -1 );
         }
     }
 }
@@ -248,13 +248,13 @@ void VEvndispData::setDetectorGeometry( unsigned int iNTel, vector< string > iCa
         if( iDetectorFile.IsZombie() )
         {
             cout << "VEvndispData::setDetectorGeometry error opening detector file: " << getRunParameter()->fsourcefile << endl;
-            exit(-1 );
+            exit( -1 );
         }
         TTree* iTree = ( TTree* )iDetectorFile.Get( "telconfig" );
-        if(!iTree )
+        if( !iTree )
         {
             cout << "VEvndispData::setDetectorGeometry error: cannot find detector tree (telconfig) in " << getRunParameter()->fsourcefile << endl;
-            exit(-1 );
+            exit( -1 );
         }
         VDetectorTree iDetectorTree;
         iDetectorTree.readDetectorTree( fDetectorGeo, iTree );
@@ -330,7 +330,7 @@ bool VEvndispData::get_reconstruction_parameters( string ifile )
         {
             iNMethods = fEvndispReconstructionParameter->read_arrayAnalysisCuts( getRunParameter()->getDirectory_EVNDISPParameterFiles() + "/" + ifile );
         }
-        if(!iNMethods )
+        if( !iNMethods )
         {
             return false;
         }
@@ -374,7 +374,7 @@ void VEvndispData::dumpTreeData()
     //////////////////////////////////////////////////////////////////////////////
     if( fShowerParameters )
     {
-        fShowerParameters->getTree()->Show(-1 );
+        fShowerParameters->getTree()->Show( -1 );
     }
     for( unsigned int i = 0; i < fNTel; i++ )
     {
@@ -385,7 +385,7 @@ void VEvndispData::dumpTreeData()
         {
             if( getImageParameters()->getTree() )
             {
-                getImageParameters()->getTree()->Show(-1 );
+                getImageParameters()->getTree()->Show( -1 );
             }
             else
             {
@@ -401,7 +401,7 @@ void VEvndispData::dumpTreeData()
             cout << "Log-likelihood tree: " << endl;
             if( getImageParameters( getRunParameter()->fImageLL )->getTree() )
             {
-                getImageParameters( getRunParameter()->fImageLL )->getTree()->Show(-1 );
+                getImageParameters( getRunParameter()->fImageLL )->getTree()->Show( -1 );
             }
         }
     }
@@ -416,7 +416,7 @@ void VEvndispData::setDead( unsigned int iChannel, unsigned int iDead, bool iLow
         {
             getDead( iLowGain )[iChannel] = iDead;
         }
-        bitset<8 * sizeof(uint32_t )> idead = getDead( iLowGain )[iChannel];
+        bitset<8 * sizeof( uint32_t )> idead = getDead( iLowGain )[iChannel];
         for( unsigned int i = 0; i < idead.size(); i++ )
         {
             if( idead.test( i ) )
@@ -435,8 +435,8 @@ void VEvndispData::setDead( unsigned int iChannel, unsigned int iDead, bool iLow
 
         if( iChannel < getDead( iLowGain ).size() )
         {
-            bitset<8 * sizeof(uint32_t )> ibit_dead = getDead( iLowGain )[iChannel];
-            if(!iReset )
+            bitset<8 * sizeof( uint32_t )> ibit_dead = getDead( iLowGain )[iChannel];
+            if( !iReset )
             {
                 ibit_dead.set( iDead, 1 );
             }
@@ -502,7 +502,7 @@ void VEvndispData::printDeadChannels( bool iLowGain, bool iGrepAble )
     {
         if( getDead( iLowGain )[i] > 0 )
         {
-            bitset<16 * sizeof(uint32_t )> i_dead = getDead( iLowGain )[i];
+            bitset<16 * sizeof( uint32_t )> i_dead = getDead( iLowGain )[i];
             TString linestart, extrainfo ;
             if( iGrepAble )
             {
@@ -523,7 +523,7 @@ void VEvndispData::printDeadChannels( bool iLowGain, bool iGrepAble )
             }
             else //set dead by eventdisplay
             {
-                extrainfo.Form( "(pedestal %5.1f, pedvar %5.1f, rel. gain %3.2f, gainvar %3.2f, L1 rate %.2e Hz, HV %4d V, I %4.1f muA)", getPeds( iLowGain )[i], getPedvars(( bool )iLowGain, getSumWindow() )[ i ], getGains( iLowGain )[i], getGainvars( iLowGain )[i], getL1Rate( i ), ( int )getHV( i ), getCurrent( i ) );
+                extrainfo.Form( "(pedestal %5.1f, pedvar %5.1f, rel. gain %3.2f, gainvar %3.2f, L1 rate %.2e Hz, HV %4d V, I %4.1f muA)", getPeds( iLowGain )[i], getPedvars( ( bool )iLowGain, getSumWindow() )[ i ], getGains( iLowGain )[i], getGainvars( iLowGain )[i], getL1Rate( i ), ( int )getHV( i ), getCurrent( i ) );
 
                 cout << linestart << extrainfo ;
                 for( unsigned j = 0; j < i_dead.size(); j++ )
@@ -610,7 +610,7 @@ bool VEvndispData::getTelescopeStatus( unsigned int iTelID )
 
 valarray<double>& VEvndispData::getPeds( bool iLowGain, double iTime )
 {
-    if(!getRunParameter()->fPlotRaw )
+    if( !getRunParameter()->fPlotRaw )
     {
         if( iTime < 90. )
         {
@@ -710,7 +710,7 @@ void VEvndispData::setCurrentSummationWindow( unsigned int imin, unsigned int im
 void VEvndispData::setCurrentSummationWindow( unsigned int iChannel, unsigned int imin, unsigned int imax, bool iSecondWindow )
 {
     // first summation window
-    if(!iSecondWindow )
+    if( !iSecondWindow )
     {
         if( imax > imin )
         {
@@ -767,7 +767,7 @@ unsigned int VEvndispData::getTeltoAnaID( unsigned int iTelID )
 
 VDeadChannelFinder* VEvndispData::getDeadChannelFinder( bool iLowGain )
 {
-    if(!iLowGain )
+    if( !iLowGain )
     {
         return fDeadChannelDefinition_HG[getTeltoAnaID()];
     }
@@ -946,7 +946,7 @@ bool VEvndispData::setSums( valarray< double > iVSum )
     {
         cout << "VEvndispData::setSums() error: setting wrong vector size for integrated charges: " << getNChannels() << "\t" << iVSum.size() << endl;
         cout << "exiting..." << endl;
-        exit(-1 );
+        exit( -1 );
     }
     fAnaData[fTelID]->fSums = iVSum;
     return true;
@@ -954,7 +954,7 @@ bool VEvndispData::setSums( valarray< double > iVSum )
 
 bool VEvndispData::setAverageTZero( unsigned int iChannel, double iTZero, bool iLowGain )
 {
-    if(!iLowGain )
+    if( !iLowGain )
     {
         if( iChannel < fCalData[fTelID]->fAverageTzero.size() )
         {
@@ -981,7 +981,7 @@ bool VEvndispData::setAverageTZero( unsigned int iChannel, double iTZero, bool i
 
 bool VEvndispData::setAverageTZerovars( unsigned int iChannel, double iTZero, bool iLowGain )
 {
-    if(!iLowGain )
+    if( !iLowGain )
     {
         if( iChannel < fCalData[fTelID]->fAverageTzerovars.size() )
         {
@@ -1040,7 +1040,7 @@ bool VEvndispData::initializeStarCatalogue( int iMJD, double iTime )
     {
         double i_MJD = ( double )iMJD + iTime / 86400.;
         fStarCatalogue = new VStarCatalogue();
-        if(!fStarCatalogue->init( i_MJD, getRunParameter()->fStarCatalogueName ) )
+        if( !fStarCatalogue->init( i_MJD, getRunParameter()->fStarCatalogueName ) )
         {
             return false;
         }
@@ -1067,7 +1067,7 @@ bool VEvndispData::initializeStarCatalogue( int iMJD, double iTime )
 unsigned int VEvndispData::getDead( unsigned int iChannel, bool iLowGain = false )
 {
     // high gain channels:
-    if(!iLowGain )
+    if( !iLowGain )
     {
         return getDead( iLowGain )[iChannel];
     }

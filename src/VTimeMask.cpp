@@ -48,7 +48,7 @@ void            VTimeMask::initialise( Int_t run_number, Double_t run_start, Dou
     run_id                                  = run_number;
     start_time                              = run_start;
     mask_file                               = ""; // Default filename
-    if(!file_name.empty() )
+    if( !file_name.empty() )
     {
         mask_file = file_name;
     }
@@ -114,13 +114,13 @@ Bool_t          VTimeMask::setMask()
     // Variables for derived quantities
     Int_t mask_end      = -1;
 
-    if(!mask_file.empty() )
+    if( !mask_file.empty() )
     {
         ifstream settings_file( mask_file.c_str() );
-        if(!settings_file.is_open() )
+        if( !settings_file.is_open() )
         {
             cout << "VTimeMask::setMask warning: failed to find time-mask file named \'" << mask_file << "\' (check your settings in runparameter.dat)." << endl;
-            exit(-1 );
+            exit( -1 );
         }
         else
         {
@@ -688,8 +688,8 @@ void        VTimeMask::getIntervalRates( vector< double >& event_count, vector< 
 
     double count = 0.;
     for( unsigned int t = 0; t < mask.size(); t++ )
-    {
-        total += counted.at( t );
+{
+    total += counted.at( t );
         mean  += t * mask.at( t );
         live  += mask.at( t );
 
@@ -721,7 +721,7 @@ void            VTimeMask::writeObjects() const
 
     iDir->cd();
     wDir = ( TDirectory* )iDir->Get( "timeMask" );
-    if(!wDir )
+    if( !wDir )
     {
         iDir->mkdir( "timeMask" )->cd();
     }
@@ -790,7 +790,7 @@ const TVector*  VTimeMask::getAcceptedVector() const
 
 Bool_t          VTimeMask::readObjects( TDirectory* iDir )
 {
-    if(!iDir )
+    if( !iDir )
     {
         return kFALSE;
     }
@@ -813,8 +813,8 @@ Bool_t          VTimeMask::readObjects( TDirectory* iDir )
     {
         mask.at( i )      = iMaskBits->TestBitNumber( i );
         // The following contains ROOT of a graphic nature: viewer discretion is advised.
-        checked.at( i )   = UInt_t(( iCheckedVector->GetMatrixArray() )[i] );
-        accepted.at( i )  = UInt_t(( iAcceptedVector->GetMatrixArray() )[i] );
+        checked.at( i )   = UInt_t( ( iCheckedVector->GetMatrixArray() )[i] );
+        accepted.at( i )  = UInt_t( ( iAcceptedVector->GetMatrixArray() )[i] );
     }
 
     // Does ROOT 'new' objects when it gets them from a file?
@@ -860,7 +860,7 @@ void VTimeMask::displayMask( ostream& terminal )
             terminal << " - "     ;
         }
         // display mask status at currMJD
-        terminal << checkMaskNow( secs_day* currMJD ) ;
+        terminal << checkMaskNow( secs_day * currMJD ) ;
     }
     terminal << endl;
 }

@@ -458,7 +458,7 @@ bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vec
                             iHis2D[iHisName2D]->SetBinError( b, j + 1, hisList[i]->GetBinError( b ) );
                         }
                     }
-                    if(( iClass == "TH2F" || iClass == "TH2D" ) && iHis3D.find( iHisName2D ) != iHis3D.end() )
+                    if( ( iClass == "TH2F" || iClass == "TH2D" ) && iHis3D.find( iHisName2D ) != iHis3D.end() )
                     {
                         for( int bx = 0; bx <= hisList[i]->GetNbinsX(); bx++ )
                         {
@@ -527,7 +527,7 @@ bool VWPPhysSensitivityFile::fillIRFHistograms( string iEffectiveAreaFile, doubl
     // CTA data
     if( isVTS() == 0 )
     {
-        if(!i_IRF.fillData( iEffectiveAreaFile.c_str(), iZe, iWoff ) )
+        if( !i_IRF.fillData( iEffectiveAreaFile.c_str(), iZe, iWoff ) )
         {
             cout << "VWPPhysSensitivityFile::fillHistograms1D error filling data from " << iEffectiveAreaFile.c_str() << endl;
             return false;

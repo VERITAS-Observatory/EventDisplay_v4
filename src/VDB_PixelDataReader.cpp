@@ -101,7 +101,7 @@ void VDB_PixelDataReader::fillDataRow( unsigned int iDataType, string iTimeStamp
 {
     if( iDataType < fPixelData.size() )
     {
-        if(( unsigned int )iTel < fPixelData[iDataType].size() && ( unsigned int )iPixel < fPixelData[iDataType][iTel].size() )
+        if( ( unsigned int )iTel < fPixelData[iDataType].size() && ( unsigned int )iPixel < fPixelData[iDataType][iTel].size() )
         {
             double i_mjd = 0;
             double i_sec_of_day = 0;
@@ -134,7 +134,7 @@ void VDB_PixelDataReader::fillDataRow( unsigned int iDataType, string iTimeStamp
 bool VDB_PixelDataReader::readFromDBTextFiles( string iDBTextDirectory, unsigned int runNumber, string iDBStartTimeSQL )
 {
     VSQLTextFileReader a( iDBTextDirectory, runNumber, "L1_TriggerInfo" );
-    if(!a.isGood() || !a.checkDataVectorsForSameLength() )
+    if( !a.isGood() || !a.checkDataVectorsForSameLength() )
     {
         return false;
     }
@@ -154,7 +154,7 @@ bool VDB_PixelDataReader::readFromDBTextFiles( string iDBTextDirectory, unsigned
     {
         // HVsettings
         VSQLTextFileReader h( iDBTextDirectory, runNumber, "HVsettings", t );
-        if(!h.isGood() || !h.checkDataVectorsForSameLength() )
+        if( !h.isGood() || !h.checkDataVectorsForSameLength() )
         {
             return false;
         }
@@ -169,7 +169,7 @@ bool VDB_PixelDataReader::readFromDBTextFiles( string iDBTextDirectory, unsigned
         }
         // FADCsettings
         VSQLTextFileReader f( iDBTextDirectory, runNumber, "FADCsettings", t );
-        if(!f.isGood() || !f.checkDataVectorsForSameLength() )
+        if( !f.isGood() || !f.checkDataVectorsForSameLength() )
         {
             return false;
         }
@@ -202,7 +202,7 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
     iTempS << iDBserver << "/VERITAS";
     char c_query[1000];
     VDB_Connection my_connection( iTempS.str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         fDBStatus = false;
         return false;
@@ -217,7 +217,7 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
     c_queryS << " <=  tblRun_Info.data_end_time + INTERVAL 1 MINUTE AND tblRun_Info.run_id=";
     c_queryS << runNumber;
 
-    if(!my_connection.make_query( c_queryS.str().c_str() ) )
+    if( !my_connection.make_query( c_queryS.str().c_str() ) )
     {
         fDBStatus = false;
         return false;
@@ -228,7 +228,7 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
     {
         while( TSQLRow* db_row = db_res->Next() )
         {
-            if(!db_row )
+            if( !db_row )
             {
                 cout << "VDB_PixelDataReader::readFromDB: failed reading a DB row" << endl;
                 fDBStatus = false;
@@ -261,7 +261,7 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
         c_queryS << " (db_start_time >= \"" << iDBStartTimeSQL << "\"";
         c_queryS << "- INTERVAL 1 MINUTE) AND (db_start_time <= \" " << fDBRunStoppTimeSQL << "\" )";
 
-        if(!my_connection.make_query( c_queryS.str().c_str() ) )
+        if( !my_connection.make_query( c_queryS.str().c_str() ) )
         {
             fDBStatus = false;
             cout << "FAILED" << endl;
@@ -273,7 +273,7 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
         {
             while( TSQLRow* db_row = db_res->Next() )
             {
-                if(!db_row )
+                if( !db_row )
                 {
                     cout << "VDB_PixelDataReader::readFromDB: failed reading a DB row" << endl;
                     fDBStatus = false;
@@ -311,7 +311,7 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
 
         sprintf( c_query, "select c.pixel_id , s.fadc_id, c.fadc_channel from tblFADC_Slot_Relation as s, tblFADC_Channel_Relation as c where s.db_start_time < \"%s\" and c.db_start_time < \"%s\" and ( s.db_end_time IS NULL or s.db_end_time > \"%s\" ) and ( c.db_end_time IS NULL or c.db_end_time > \"%s\" ) and s.fadc_crate=c.fadc_crate and s.fadc_slot=c.fadc_slot and s.telescope_id=c.telescope_id and c.pixel_id IS NOT NULL and s.telescope_id=%d order by c.pixel_id ;", iDBStartTimeSQL.c_str(), iDBStartTimeSQL.c_str(), fDBRunStoppTimeSQL.c_str(), fDBRunStoppTimeSQL.c_str(), i );
 
-        if(!my_connection.make_query( c_query ) )
+        if( !my_connection.make_query( c_query ) )
         {
             fDBStatus = false;
             cout << "VDB_PixelDataReader::readFromDB: FAILED making query for reading FADC status" << endl;
@@ -324,7 +324,7 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
         {
             while( TSQLRow* db_row = db_res->Next() )
             {
-                if(!db_row )
+                if( !db_row )
                 {
                     cout << "VDB_PixelDataReader::readFromDB: failed reading a DB row" << endl;
                     fDBStatus = false;
@@ -574,7 +574,7 @@ vector< unsigned int > VDB_PixelDataReader::getDeadChannelList( unsigned int iDa
         }
         if( i_n > 1 )
         {
-            i_rms = sqrt(( 1. / ( i_n - 1. ) ) * ( i_mean2 - i_mean* i_mean / i_n ) );
+            i_rms = sqrt( ( 1. / ( i_n - 1. ) ) * ( i_mean2 - i_mean * i_mean / i_n ) );
             i_mean /= i_n;
         }
 

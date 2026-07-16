@@ -103,7 +103,7 @@ int main( int argc, char* argv[] )
     fCuts->initialize( fRunPara->fEnergyReconstructionMethod, fRunPara->fDirectionReconstructionMethod );
     fCuts->setNTel( ntel );
     fCuts->setTelToAnalyze( teltoana );
-    if(!fCuts->readCuts( cutfilename, 2 ) )
+    if( !fCuts->readCuts( cutfilename, 2 ) )
     {
         cout << "error reading cut file: " << cutfilename << endl;
         cout << "exiting..." << endl;
@@ -153,7 +153,7 @@ int main( int argc, char* argv[] )
     iAz_max.push_back( 22.5 );
     for( unsigned int i = 1; i < 8; i++ )
     {
-        iAz_min.push_back(-22.5 + 45. * ( double )i );
+        iAz_min.push_back( -22.5 + 45. * ( double )i );
         iAz_max.push_back( 22.5 + 45. * ( double )i );
     }
     char htemp[200];
@@ -186,12 +186,12 @@ int main( int argc, char* argv[] )
     {
         ostringstream ifile;
         ifile <<  datadir << "/" << fRunPara->fRunList[i].fRunOff << ".mscw.root";
-        if(! check_if_file_exists( ifile.str() ) )
+        if( ! check_if_file_exists( ifile.str() ) )
         {
             ifile.str( "" );
             ifile <<  datadir << "/" << fRunPara->fRunList[i].fRunOff / 10000;
             ifile << "/" << fRunPara->fRunList[i].fRunOff << ".mscw.root";
-            if(! check_if_file_exists( ifile.str() ) )
+            if( ! check_if_file_exists( ifile.str() ) )
             {
                 cout << "error: file not found, " << ifile.str() << endl;
                 exit( EXIT_FAILURE );
@@ -212,7 +212,7 @@ int main( int argc, char* argv[] )
 
         // Check number of telescopes in run
         VEvndispRunParameter* iParV2 = ( VEvndispRunParameter* )fTest.Get( "runparameterV2" );
-        if(!iParV2 )
+        if( !iParV2 )
         {
             cout << "Error reading run parameters " << endl;
             continue;
@@ -242,7 +242,7 @@ int main( int argc, char* argv[] )
 
         // set gamma/hadron cuts
         fCuts->setInstrumentEpoch( iParV2->getInstrumentATMString() );
-        if(!fCuts->readCuts( cutfilename, 2 ) )
+        if( !fCuts->readCuts( cutfilename, 2 ) )
         {
             cout << "run " << fRunPara->fRunList[i].fRunOff << ": ";
             cout << "error reading cut file: " << cutfilename << endl;
@@ -252,7 +252,7 @@ int main( int argc, char* argv[] )
         // pointer to data tree
         fCuts->setDataTree( d );
 
-        if(!d )
+        if( !d )
         {
             cout << "makeRadialAcceptance: no data tree defined: run " << fRunPara->fRunList[i].fRunOff << endl;
             return 0;

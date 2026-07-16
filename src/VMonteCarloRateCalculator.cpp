@@ -27,7 +27,7 @@ VMonteCarloRateCalculator::VMonteCarloRateCalculator( string ifile )
     fnoise = 0;
     fnrates = 0;
     fMCTree = ( TTree* )fFile->Get( "fMCRate" );
-    if(!fMCTree )
+    if( !fMCTree )
     {
         cout << "VMonteCarloRateCalculator: no rate tree found" << endl;
         return;
@@ -145,7 +145,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double >& e, vector
 
 TCanvas* VMonteCarloRateCalculator::plot_MonteCarloRate_vs_wobbleOffsets( TCanvas* c, double ze, int az, int noise, string iPlottingOption )
 {
-    if(!c )
+    if( !c )
     {
         c = new TCanvas( "cRatevsWobbleDirection", "cRatevsWobbleDirection", 10, 10, 400, 400 );
         c->Draw();
@@ -171,7 +171,7 @@ TCanvas* VMonteCarloRateCalculator::plot_MonteCarloRate_vs_wobbleOffsets( TCanva
 
 TGraphAsymmErrors* VMonteCarloRateCalculator::getMonteCarloRate_vs_wobbleOffsets( double ze, int az, int noise )
 {
-    if(!fFile || !fMCTree )
+    if( !fFile || !fMCTree )
     {
         return 0;
     }
@@ -327,7 +327,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
         iEMaxBin = e_gamma.size() - 1;
     }
 
-    if(!iResponseMatrix && e_gamma.size() != eff.size() )
+    if( !iResponseMatrix && e_gamma.size() != eff.size() )
     {
         cout <<  "VMonteCarloRateCalculator::getMonteCarloRate error: energy and effective area vector have different length: ";
         cout << e_gamma.size() << "\t" << eff.size() << endl;
@@ -335,7 +335,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
     }
 
     // check function ID of cosmic ray / gamma spectrum
-    if(!e_lit || !e_lit->isValidID( e_lit_ID ) )
+    if( !e_lit || !e_lit->isValidID( e_lit_ID ) )
     {
         return -99.;
     }

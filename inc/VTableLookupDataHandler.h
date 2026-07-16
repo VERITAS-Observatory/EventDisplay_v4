@@ -373,7 +373,7 @@ class VTableLookupDataHandler
         }
         double getMCWobbleOffset()
         {
-            return sqrt( fMCxoff* fMCxoff + fMCyoff* fMCyoff );
+            return sqrt( fMCxoff * fMCxoff + fMCyoff * fMCyoff );
         }
         int    getEventCounter()
         {
@@ -450,7 +450,7 @@ class VTableLookupDataHandler
         bool getNextEvent( bool bShort );         //!< get next event from evndisp tree
         double getMeanNoiseLevel( bool bCurrentNoiseLevel = false )
         {
-            if(!bCurrentNoiseLevel )
+            if( !bCurrentNoiseLevel )
             {
                 return calculateMeanNoiseLevel( false );
             }
@@ -461,7 +461,7 @@ class VTableLookupDataHandler
         }
         vector< double > getNoiseLevel( bool bCurrentNoiseLevel = false )
         {
-            if(!bCurrentNoiseLevel )
+            if( !bCurrentNoiseLevel )
             {
                 return fNoiseLevel;
             }
@@ -514,7 +514,7 @@ class VTableLookupDataHandler
         }
         double getWobbleOffset()
         {
-            return sqrt( fXoff* fXoff + fYoff* fYoff );
+            return sqrt( fXoff * fXoff + fYoff * fYoff );
         }
         bool isReconstructed();
         bool readRunParameter();

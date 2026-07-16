@@ -21,7 +21,7 @@ VPlotRunSummary::VPlotRunSummary( string ifile, unsigned int iTot, string iname,
 
     bIsZombie = false;
 
-    if(!openfile( ifile, iTot ) )
+    if( !openfile( ifile, iTot ) )
     {
         cout << "file not found " << ifile << endl;
         bIsZombie = true;
@@ -35,7 +35,7 @@ VPlotRunSummary::VPlotRunSummary( string ifile, unsigned int iTot, string iname,
 
 void VPlotRunSummary::printDailyRates()
 {
-    if(!fIn->IsZombie() )
+    if( !fIn->IsZombie() )
     {
         cout << "printing daily rates for " << fIn->GetName() << endl;
     }
@@ -66,7 +66,7 @@ void VPlotRunSummary::makeNewPhaseRunList( string ifile, string ilist )
 
     ifstream is;
     is.open( ilist.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "error opening list file " << endl;
         return;
@@ -88,7 +88,7 @@ void VPlotRunSummary::makeNewPhaseRunList( string ifile, string ilist )
     sprintf( hname, "%s_%dPhases.sh", iListName.c_str(), ( int )fPhaseRunlist.size() );
     cout << "output scripts is " << hname << endl;
     ofstream os_script( hname );
-    if(!os_script )
+    if( !os_script )
     {
         cout << "error open anasum run script" << endl;
         return;
@@ -112,7 +112,7 @@ void VPlotRunSummary::makeNewPhaseRunList( string ifile, string ilist )
         cout << "\t writing phase " << l << " to " << hname << endl;
         cout << "\t (phase bin " << fPhaseMin[l] << " < " << fPhaseMax[l] << ")" << endl;
         ofstream os( hname );
-        if(!os )
+        if( !os )
         {
             cout << "error opening new run list file for phase " << l << " (" << hname << ")" << endl;
             continue;
@@ -345,13 +345,13 @@ bool VPlotRunSummary::openfile( string file, int iTot )
     {
         sprintf( hfile, "total/stereo" );
     }
-    if(!fIn->cd( hfile ) )
+    if( !fIn->cd( hfile ) )
     {
         return false;
     }
 
     t = ( TTree* )gDirectory->Get( "tRunSummary" );
-    if(!t )
+    if( !t )
     {
         return false;
     }
@@ -483,7 +483,7 @@ void VPlotRunSummary::fill()
         for( unsigned int j = 0; j < fNPhaseBins; j++ )
         {
             fPhaseMin.push_back( j * ( 1. / ( double )fNPhaseBins ) );
-            fPhaseMax.push_back(( j + 1 ) * ( 1. / ( double )fNPhaseBins ) );
+            fPhaseMax.push_back( ( j + 1 ) * ( 1. / ( double )fNPhaseBins ) );
             i_ratevsPhaseX.push_back( 0. );
             i_ratevsPhaseXX.push_back( 0. );
             i_ratevsPhaseE.push_back( 0. );
@@ -526,7 +526,7 @@ void VPlotRunSummary::fill()
         c->GetEntry( i );
 
         ///// test run range
-        if(!fSetRunRange && (( fMinRun > 0 && c->runOn < fMinRun ) || ( fMaxRun > 0 && c->runOn > fMaxRun ) ) )
+        if( !fSetRunRange && ( ( fMinRun > 0 && c->runOn < fMinRun ) || ( fMaxRun > 0 && c->runOn > fMaxRun ) ) )
         {
             continue;
         }
@@ -564,7 +564,7 @@ void VPlotRunSummary::fill()
         {
             cout << "Run " << c->runOn << ": rate " << c->Rate << " +- " << c->RateE << " g/min";
             cout << ", elevation: " << c->elevationOn;
-            cout << ", wobble: " << sqrt( c->WobbleNorth* c->WobbleNorth + c->WobbleWest* c->WobbleWest );
+            cout << ", wobble: " << sqrt( c->WobbleNorth * c->WobbleNorth + c->WobbleWest * c->WobbleWest );
             cout << ", alpha: " << c->OffNorm;
             cout << endl;
             // 1D histograms
@@ -577,13 +577,13 @@ void VPlotRunSummary::fill()
             gRatevsTime->SetPoint( t, c->MJDOn, c->Rate );
             if( c->tOn > 0. )
             {
-                gRatevsTime->SetPointError( t, 0., sqrt( c->NOn + c->OffNorm* c->OffNorm* c->NOff ) / c->tOn * 60. );
+                gRatevsTime->SetPointError( t, 0., sqrt( c->NOn + c->OffNorm * c->OffNorm * c->NOff ) / c->tOn * 60. );
             }
 
             gRateOffvsTime->SetPoint( t, c->MJDOn, c->RateOff );
             if( c->tOn > 0. )
             {
-                gRateOffvsTime->SetPointError( t, 0., c->OffNorm* sqrt( c->NOff ) / c->tOn * 60. );
+                gRateOffvsTime->SetPointError( t, 0., c->OffNorm * sqrt( c->NOff ) / c->tOn * 60. );
             }
 
             gSignificancevsTime->SetPoint( t, c->MJDOn, c->Signi );
@@ -608,7 +608,7 @@ void VPlotRunSummary::fill()
             }
 
             // wobble direction plots
-            int iAng = ( int )( sqrt( c->WobbleNorth* c->WobbleNorth + c->WobbleWest* c->WobbleWest ) * 20. + 0.5 );
+            int iAng = ( int )( sqrt( c->WobbleNorth * c->WobbleNorth + c->WobbleWest * c->WobbleWest ) * 20. + 0.5 );
 
             // (Temporary: dirty fix to get 1.43 point into 1.5 bin)
             if( iAng == 29 )
@@ -657,10 +657,10 @@ void VPlotRunSummary::fill()
             gRawRateOffvsElevation->SetPoint( t, c->elevationOff, c->RawRateOff );
             gRawRateOffvsElevation->SetPointError( t, 0., 0. );
 
-            gRatevsWobbleOffset->SetPoint( t, sqrt( c->WobbleNorth* c->WobbleNorth + c->WobbleWest* c->WobbleWest ), c->Rate );
+            gRatevsWobbleOffset->SetPoint( t, sqrt( c->WobbleNorth * c->WobbleNorth + c->WobbleWest * c->WobbleWest ), c->Rate );
             gRatevsWobbleOffset->SetPointError( t, 0., c->RateE );
 
-            gRateOffvsWobbleOffset->SetPoint( t, sqrt( c->WobbleNorth* c->WobbleNorth + c->WobbleWest* c->WobbleWest ), c->RateOff );
+            gRateOffvsWobbleOffset->SetPoint( t, sqrt( c->WobbleNorth * c->WobbleNorth + c->WobbleWest * c->WobbleWest ), c->RateOff );
             gRateOffvsWobbleOffset->SetPointError( t, 0., c->RateOffE );
 
             int iElevationBin = 0;
@@ -928,13 +928,13 @@ double VPlotRunSummary::getPhase( double iMJD )
         return 0.;
     }
 
-    return ( iMJD + 2400000.5 - fPhaseT0 ) / fPhaseOrbit - ( int )(( iMJD + 2400000.5 - fPhaseT0 ) / fPhaseOrbit ) + fPhasePoff;
+    return ( iMJD + 2400000.5 - fPhaseT0 ) / fPhaseOrbit - ( int )( ( iMJD + 2400000.5 - fPhaseT0 ) / fPhaseOrbit ) + fPhasePoff;
 }
 
 
 void VPlotRunSummary::fillDailyRates( bool iCorrectForDeadTimes )
 {
-    if(!c )
+    if( !c )
     {
         return;
     }
@@ -990,7 +990,7 @@ void VPlotRunSummary::fillDailyRates( bool iCorrectForDeadTimes )
                 }
             }
             // make new day
-            fDayMJD.push_back(( double )c->MJDOn );
+            fDayMJD.push_back( ( double )c->MJDOn );
             fDayDate.push_back( iDate.back() );
             fDayPhase.push_back( getPhase( c->MJDOn ) );
             fDayDuration.push_back( c->tOn / 60. );
@@ -1001,7 +1001,7 @@ void VPlotRunSummary::fillDailyRates( bool iCorrectForDeadTimes )
         else
         {
             fDayDuration.back() += c->tOn / 60.;
-            if(!iCorrectForDeadTimes )
+            if( !iCorrectForDeadTimes )
             {
                 fDayNOn.back() += c->NOn;
                 fDayNOff.back() += c->NOff;
@@ -1037,8 +1037,8 @@ void VPlotRunSummary::fillDailyRates( bool iCorrectForDeadTimes )
         if( fDayDuration[i] > 0. )
         {
             ii_rate = ( fDayNOn[i] - fDayNOff[i] * fDayAlpha[i] ) / fDayDuration[i];
-            ii_rateSigni = VStatistics::calcSignificance(( double )fDayNOn[i], ( double )fDayNOff[i], fDayAlpha[i], 17 );
-            ii_rateE = sqrt(( double )fDayNOn[i] + fDayAlpha[i] * fDayAlpha[i] * ( double )fDayNOff[i] ) / fDayDuration[i];
+            ii_rateSigni = VStatistics::calcSignificance( ( double )fDayNOn[i], ( double )fDayNOff[i], fDayAlpha[i], 17 );
+            ii_rateE = sqrt( ( double )fDayNOn[i] + fDayAlpha[i] * fDayAlpha[i] * ( double )fDayNOff[i] ) / fDayDuration[i];
         }
         else
         {
@@ -1057,9 +1057,9 @@ void VPlotRunSummary::fillDailyRates( bool iCorrectForDeadTimes )
     // fill graphs
     if( gRatevsPhaseDaily && gSignificancevsPhaseDaily )
     {
-        gRatesvsTimeDaily->Set(( int )fDayRate.size() );
-        gRatevsPhaseDaily->Set(( int )fDayRate.size() );
-        gSignificancevsPhaseDaily->Set(( int )fDaySigni.size() );
+        gRatesvsTimeDaily->Set( ( int )fDayRate.size() );
+        gRatevsPhaseDaily->Set( ( int )fDayRate.size() );
+        gSignificancevsPhaseDaily->Set( ( int )fDaySigni.size() );
 
         for( unsigned int i = 0; i < fDayRate.size(); i++ )
         {
@@ -1077,7 +1077,7 @@ void VPlotRunSummary::fillDailyRates( bool iCorrectForDeadTimes )
 
 void VPlotRunSummary::writeRunTable()
 {
-    if(!c )
+    if( !c )
     {
         return;
     }
@@ -1143,14 +1143,14 @@ void VPlotRunSummary::writeRunTable()
 */
 void VPlotRunSummary::writeRunTable( string ioutfile, bool iPhases, bool iSignificancePerHour, bool iCorrectForDeadTimes )
 {
-    if(!c )
+    if( !c )
     {
         return;
     }
 
     ofstream is;
     is.open( ioutfile.c_str() );
-    if(!is )
+    if( !is )
     {
         cout << "error opening output file " << endl;
         return;
@@ -1175,7 +1175,7 @@ void VPlotRunSummary::writeRunTable( string ioutfile, bool iPhases, bool iSignif
         // get date from mjd
         VAstronometry::vlaDjcl( c->MJDOn, &iy, &im, &id, &fd, &j );
         iDate.push_back( iy * 10000 + im * 100 + id );
-        iMJD.push_back(( int )c->MJDOn );
+        iMJD.push_back( ( int )c->MJDOn );
         if( iDate.size() == 1 )
         {
             ifirstRun.push_back( 1 );
@@ -1325,7 +1325,7 @@ void VPlotRunSummary::writeRunTable( string ioutfile, bool iPhases, bool iSignif
                     					//		  is << fDayRate[t]/ig << "$\\pm$";
                     					// don't print daily rate in Crab units
                     					//		  is << fDayRateE[t]/ig << " & "; */
-                    if(!iSignificancePerHour )
+                    if( !iSignificancePerHour )
                     {
                         is << fDaySigni[t];
                     }
@@ -1415,7 +1415,7 @@ TCanvas* VPlotRunSummary::plot_rates( bool iOff )
         g = gRatevsTime;
     }
 
-    if(!g )
+    if( !g )
     {
         return 0;
     }
@@ -1459,7 +1459,7 @@ TCanvas* VPlotRunSummary::plot_ratevsElevation( bool iOff )
     cRatevsElevation->Draw();
 
     TGraphErrors* g = 0;
-    if(!iOff )
+    if( !iOff )
     {
         g = gRatevsElevation;
     }
@@ -1467,7 +1467,7 @@ TCanvas* VPlotRunSummary::plot_ratevsElevation( bool iOff )
     {
         g = gRateOffvsElevation;
     }
-    if(!g )
+    if( !g )
     {
         return 0;
     }
@@ -1491,7 +1491,7 @@ TCanvas* VPlotRunSummary::plot_ratevsElevation( bool iOff )
         iL->Draw();
     }
 
-    if(!iOff )
+    if( !iOff )
     {
         TCanvas* cRatevsElevationBinned = new TCanvas( "cRatevsElevationBinned", "Rate vs elevation", 410, 10, 400, 400 );
         cRatevsElevationBinned->SetGridx( 0 );
@@ -1526,7 +1526,7 @@ TCanvas* VPlotRunSummary::plot_cumSignificance()
     cRR->SetGridy( 0 );
     cRR->Draw();
 
-    gCumSignificancevsTime->SetLineWidth(( Width_t )3. );
+    gCumSignificancevsTime->SetLineWidth( ( Width_t )3. );
     gCumSignificancevsTime->SetMarkerStyle( 2 );
     gCumSignificancevsTime->SetMarkerSize( 1. );
     gCumSignificancevsTime->Draw( "apl" );
@@ -1626,10 +1626,10 @@ void VPlotRunSummary::setListofExcludedRuns( string iList )
 
     string itemp;
     istringstream is_stream( iList );
-    while(!( is_stream >> std::ws ).eof() )
+    while( !( is_stream >> std::ws ).eof() )
     {
         is_stream >> itemp;
-        fListofExcludedRuns.push_back(( int )atoi( itemp.c_str() ) );
+        fListofExcludedRuns.push_back( ( int )atoi( itemp.c_str() ) );
     }
     cout << "list of excluded runs (total " << fListofExcludedRuns.size() << " runs)" << endl;
     for( unsigned int i = 0; i < fListofExcludedRuns.size(); i++ )

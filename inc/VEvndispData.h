@@ -278,7 +278,7 @@ class VEvndispData
         unsigned int        getDead( unsigned int iChannel, bool iLowGain );
         vector<unsigned int>&   getDead( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fAnaData[fTelID]->fDead;
             }
@@ -293,7 +293,7 @@ class VEvndispData
         }
         vector<bool>&       getDeadRecovered( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fAnaData[fTelID]->fDeadRecovered;
             }
@@ -305,7 +305,7 @@ class VEvndispData
         VDeadChannelFinder* getDeadChannelFinder( bool iLowGain = false );
         unsigned int        getNDead( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fAnaData[fTelID]->fNDead;
             }
@@ -316,7 +316,7 @@ class VEvndispData
         }
         vector<unsigned int>&       getDeadUI( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fAnaData[fTelID]->fDeadUI;
             }
@@ -421,7 +421,7 @@ class VEvndispData
         }
         valarray<double>&   getGains( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fCalData[fTelID]->fGains;
             }
@@ -432,7 +432,7 @@ class VEvndispData
         }
         valarray< bool >&   getGains_DefaultValue( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fCalData[fTelID]->fGains_DefaultSetting;
             }
@@ -443,7 +443,7 @@ class VEvndispData
         }
         valarray<double>&   getGainvars( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fCalData[fTelID]->fGainvars;
             }
@@ -660,7 +660,7 @@ class VEvndispData
 
         vector< double >&   getmeanPedvarsAllSumWindow( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fCalData[fTelID]->fVmeanPedvars;
             }
@@ -671,7 +671,7 @@ class VEvndispData
         }
         vector< double >&   getmeanRMSPedvarsAllSumWindow( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fCalData[fTelID]->fVmeanRMSPedvars;
             }
@@ -765,7 +765,7 @@ class VEvndispData
 
         vector< valarray<double> >& getPedvarsAllSumWindows( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fCalData[fTelID]->fVPedvars;
             }
@@ -777,7 +777,7 @@ class VEvndispData
         // getter for pedestal rms
         valarray<double>&   getPedrms( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fCalData[fTelID]->fPedrms;
             }
@@ -981,7 +981,7 @@ class VEvndispData
         }
         valarray<double>&   getAverageTZeros( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fCalData[fTelID]->fAverageTzero;
             }
@@ -992,7 +992,7 @@ class VEvndispData
         }
         valarray<double>&   getAverageTZerosvars( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fCalData[fTelID]->fAverageTzerovars;
             }
@@ -1003,7 +1003,7 @@ class VEvndispData
         }
         valarray<double>&   getTOffsets( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fCalData[fTelID]->fTOffsets;
             }
@@ -1014,7 +1014,7 @@ class VEvndispData
         }
         valarray<double>&   getTOffsetvars( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return fCalData[fTelID]->fTOffsetvars;
             }
@@ -1221,7 +1221,7 @@ class VEvndispData
         }
         void                setCurrentSummationWindow( unsigned int iw, bool iSecondWindow )
         {
-            if(!iSecondWindow )
+            if( !iSecondWindow )
             {
                 fAnaData[fTelID]->fCurrentSummationWindow = iw;
             }
@@ -1234,7 +1234,7 @@ class VEvndispData
         void                setCurrentSummationWindow( unsigned int iChannel, unsigned int imin, unsigned int imax, bool iSecondWindow );
         void                setDead( unsigned int iDead, bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 fAnaData[fTelID]->fDead.assign( fDetectorGeo->getNChannels( fTelID ), iDead );
             }
@@ -1246,7 +1246,7 @@ class VEvndispData
         void                setDead( unsigned int iChannel, unsigned int iDead, bool iLowGain = false, bool iFullSet = false, bool iReset = false );
         void                setNDead( unsigned int iN, bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 fAnaData[fTelID]->fNDead = iN;
             }
@@ -1266,7 +1266,7 @@ class VEvndispData
         }
         void                setGains( double iGain, bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 fCalData[fTelID]->fGains = iGain;
             }
@@ -1277,7 +1277,7 @@ class VEvndispData
         }
         void                setGains( unsigned int iChannel, double iGain, bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 fCalData[fTelID]->fGains[iChannel] = iGain;
             }
@@ -1288,7 +1288,7 @@ class VEvndispData
         }
         void                setGains_DefaultValue( bool iV, bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 fCalData[fTelID]->fGains_DefaultSetting = iV;
             }
@@ -1299,7 +1299,7 @@ class VEvndispData
         }
         void                setGainvars( unsigned int iChannel, double iGainvar, bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 fCalData[fTelID]->fGainvars[iChannel] = iGainvar;
             }
@@ -1310,7 +1310,7 @@ class VEvndispData
         }
         void                setGainvars( double iGainvar, bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 fCalData[fTelID]->fGainvars = iGainvar;
             }
@@ -1622,7 +1622,7 @@ class VEvndispData
         void                setTeltoAna( vector< unsigned int > iT );
         void                setTOffsets( double iToff, bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 fCalData[fTelID]->fTOffsets = iToff;
             }
@@ -1633,7 +1633,7 @@ class VEvndispData
         }
         void                setTOffsets( unsigned int iChannel, double iToff, bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 fCalData[fTelID]->fTOffsets[iChannel] = iToff;
             }
@@ -1644,7 +1644,7 @@ class VEvndispData
         }
         void                setTOffsetvars( double iToffv, bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 fCalData[fTelID]->fTOffsetvars = iToffv;
             }
@@ -1655,7 +1655,7 @@ class VEvndispData
         }
         void                setTOffsetvars( unsigned int iChannel, double iToffv, bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 fCalData[fTelID]->fTOffsetvars[iChannel] = iToffv;
             }
@@ -1666,7 +1666,7 @@ class VEvndispData
         }
         void                setAverageTZero( double iTZero, bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 fCalData[fTelID]->fAverageTzero = iTZero;
             }
@@ -1678,7 +1678,7 @@ class VEvndispData
         bool                setAverageTZero( unsigned int iChannel, double iTZero, bool iLowGain = false );
         void                setAverageTZerovars( double iTZerovars, bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 fCalData[fTelID]->fAverageTzerovars = iTZerovars;
             }
@@ -1822,7 +1822,7 @@ class VEvndispData
         }
         bool                usePedestalsInTimeSlices( bool iLowGain = false )
         {
-            if(!iLowGain )
+            if( !iLowGain )
             {
                 return getRunParameter()->fUsePedestalsInTimeSlices;
             }
