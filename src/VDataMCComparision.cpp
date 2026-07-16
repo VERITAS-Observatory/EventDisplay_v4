@@ -9,6 +9,8 @@
 
 #include "VDataMCComparision.h"
 
+#include "TChainElement.h"
+
 static string getXGBFileName( string iFileName, const string& iFileSuffix )
 {
     if( iFileSuffix.empty() || iFileSuffix == "None" )
