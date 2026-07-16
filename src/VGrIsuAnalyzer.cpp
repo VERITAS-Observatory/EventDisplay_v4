@@ -57,7 +57,7 @@ void VGrIsuAnalyzer::tel_impact( float xcos, float ycos, float xfield, float yfi
     }
     else
     {
-        dn = -sqrt( 1. - dl* dl - dm* dm );
+        dn = -sqrt( 1. - dl * dl - dm * dm );
     }
     setup_matrix( matrix, dl, dm, dn, bInv );
     for( unsigned int i = 0; i < 3; i++ )
@@ -136,7 +136,7 @@ void VGrIsuAnalyzer::setup_matrix( float matrix[3][3], float dl, float dm, float
 
     /* sv is the projection of the primary vector onto the xy plane */
 
-    sv = sqrt( dl* dl + dm* dm );
+    sv = sqrt( dl * dl + dm * dm );
 
     if( sv > 1.0E-09 )
     {
@@ -274,16 +274,16 @@ passes through the point (x[i],y[i]) and has slope m[i].
             /* set up constants for array  */
             D = y[i] - ( m[i] * x[i] );
 
-            a1 = a1 + ( w[i] *  m2* gamma );
-            a2 = a2 + ( w[i] * (-m[i] ) * gamma );
+            a1 = a1 + ( w[i] *  m2 * gamma );
+            a2 = a2 + ( w[i] * ( -m[i] ) * gamma );
             b1 = a2;
             b2 = b2 + ( w[i] *  gamma );
-            c1 = c1 + ( w[i] * D* m[i] * gamma );
-            c2 = c2 + ( w[i] * (-D ) * gamma );
+            c1 = c1 + ( w[i] * D * m[i] * gamma );
+            c2 = c2 + ( w[i] * ( -D ) * gamma );
 
         }
         /* do fit if have more than one telescope */
-        if(( num_images > 1 ) )
+        if( ( num_images > 1 ) )
         {
             /* completed loop over images, now normalize weights */
             a1 = a1 / totweight;
@@ -306,8 +306,8 @@ passes through the point (x[i],y[i]) and has slope m[i].
             /* std is average of square of distances to the line */
             for( unsigned int i = 0; i < num_images; i++ )
             {
-                d = ( float )rcs_perpendicular_dist(( float ) * sx, ( float ) * sy,
-                                                    ( float )x[i], ( float )y[i], ( float )m[i] );
+                d = ( float )rcs_perpendicular_dist( ( float ) * sx, ( float ) * sy,
+                                                     ( float )x[i], ( float )y[i], ( float )m[i] );
                 *std = *std + d * d * w[i];
             }
             *std = *std / totweight;
@@ -396,7 +396,7 @@ float VGrIsuAnalyzer::rcs_perpendicular_dist( float xs, float ys, float xp, floa
     y = ys - yp;
 
     /* get perpendicular distance */
-    d = fabs( dl* y - dm* x );
+    d = fabs( dl * y - dm * x );
 
     return d;
 }
@@ -448,17 +448,17 @@ int VGrIsuAnalyzer::two_line_intersect( vector<float> x, vector<float> y, vector
     // calculate weighted variance
     for( unsigned int i = 0; i < xcore.size(); i++ )
     {
-        *std += weight[i] * (( xcore[i] - *sx ) * ( xcore[i] - *sx ) + ( ycore[i] - *sy ) * ( ycore[i] - *sy ) );
+        *std += weight[i] * ( ( xcore[i] - *sx ) * ( xcore[i] - *sx ) + ( ycore[i] - *sy ) * ( ycore[i] - *sy ) );
     }
     if( wsum > 0. )
     {
-        *std /= (( float )xcore.size() * wsum );
+        *std /= ( ( float )xcore.size() * wsum );
     }
     if( xcore.size() > 0. )
     {
         *std /= ( float )xcore.size() ;
     }
-    if(*std < 1.e-5 )
+    if( *std < 1.e-5 )
     {
         *std = 0.;
     }
@@ -492,12 +492,12 @@ bool VGrIsuAnalyzer::get_intersection( float x1, float mx1, float y1, float my1,
     }
     else
     {
-        *a2  = (( y2 - y1 ) / my1 - ( x2 - x1 ) / mx1 ) / ( mx2 / mx1 - my2 / my1 );
-        *a1  = (( y1 - y2 ) / my2 - ( x1 - x2 ) / mx2 ) / ( mx1 / mx2 - my1 / my2 );
+        *a2  = ( ( y2 - y1 ) / my1 - ( x2 - x1 ) / mx1 ) / ( mx2 / mx1 - my2 / my1 );
+        *a1  = ( ( y1 - y2 ) / my2 - ( x1 - x2 ) / mx2 ) / ( mx1 / mx2 - my1 / my2 );
     }
 
-    *xc = ( x1 + *a1* mx1 );
-    *yc = ( y1 + *a1* my1 );
+    *xc = ( x1 + *a1 * mx1 );
+    *yc = ( y1 + *a1 * my1 );
 
     return true;
 }

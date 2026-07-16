@@ -38,13 +38,13 @@ VLowGainCalibrator::VLowGainCalibrator( int run, int sw, bool isInnerHigh, TStri
 
     TString iName = TString::Format( "%s/%d.DST.root", dir.Data(), run );
     fInfile = new TFile( iName.Data(), "read" );
-    if(!fInfile || fInfile->IsZombie() )
+    if( !fInfile || fInfile->IsZombie() )
     {
         cout << "ERROR: Input file " << iName << " does not exist, exiting immediately..." << endl;
         return ;
     }
     fDsttree = ( TTree* )fInfile->Get( "dst" );
-    if(!fDsttree )
+    if( !fDsttree )
     {
         cout << "ERROR: Input file " << iName << " does not contain a tree named dst, exiting immediately..." << endl;
         return ;
@@ -65,7 +65,7 @@ VLowGainCalibrator::VLowGainCalibrator( int run, int sw, bool isInnerHigh, TStri
         gSystem->mkdir( iName.Data(), "r" );
         iName.Form( "%s/Tel_%d/%d.lmult.root", outdir.Data(), tel + 1, run );
         fOutfile[tel] = new TFile( iName.Data(), "recreate" );
-        if(!fOutfile[tel] || fOutfile[tel]->IsZombie() )
+        if( !fOutfile[tel] || fOutfile[tel]->IsZombie() )
         {
             cout << "ERROR: Output file " << iName << " could not be opened, exiting immediately..." << endl;
             return;
@@ -84,7 +84,7 @@ VLowGainCalibrator::VLowGainCalibrator( int run, int sw, bool isInnerHigh, TStri
 
         iName.Form( "%s/Tel_%d/%d.debug.root", outdir.Data(), tel + 1, run );
         fDebugfile[tel] = new TFile( iName.Data(), "recreate" );
-        if(!fDebugfile[tel] || fDebugfile[tel]->IsZombie() )
+        if( !fDebugfile[tel] || fDebugfile[tel]->IsZombie() )
         {
             cout << "ERROR: Output file " << iName << " could not be opened, exiting immediately..." << endl;
             return ;
@@ -358,7 +358,7 @@ void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance, bool i
 {
     resetLightLevels( tel );
     // check first that monitoring charge histogram exists
-    if(( int )fMonitorChargeHist[tel]->GetEntries() == 0 )
+    if( ( int )fMonitorChargeHist[tel]->GetEntries() == 0 )
     {
         cout << "ERROR: Could not find histogram with monitoring charges for telescope " << tel + 1 << "." << endl;
         cout << "       Have you run VLowGainCalibrator::makeMonitorChargeHists() before?" << endl;
@@ -456,7 +456,7 @@ void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance, bool i
     {
         h2 = ( TH1D* )fMonitorChargeHist[tel]->Clone( "h2" );
     }
-    if(( int )h2->GetEntries() == 0 )
+    if( ( int )h2->GetEntries() == 0 )
     {
         cout << "ERROR: Could not find histogram to be used for fitting the light level for tel " << tel + 1  << "." << endl;
         return;
@@ -872,7 +872,7 @@ bool VLowGainCalibrator::doTheFit()
                 {
 
                     TString opt = "";
-                    if(!fDEBUG )
+                    if( !fDEBUG )
                     {
                         opt = "Q";
                     }

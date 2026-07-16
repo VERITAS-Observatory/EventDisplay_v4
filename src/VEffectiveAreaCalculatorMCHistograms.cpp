@@ -34,19 +34,19 @@ void VEffectiveAreaCalculatorMCHistograms::setDefaultValues()
     fVMinAz.clear();
     fVMaxAz.clear();
     fVMinAz.push_back( 135.0 );
-    fVMaxAz.push_back(-165.0 );
+    fVMaxAz.push_back( -165.0 );
     fVMinAz.push_back( 150.0 );
-    fVMaxAz.push_back(-150.0 );
-    fVMinAz.push_back(-180. );
-    fVMaxAz.push_back(-120. );
+    fVMaxAz.push_back( -150.0 );
+    fVMinAz.push_back( -180. );
+    fVMaxAz.push_back( -120. );
     for( int i = 0; i < 13; i++ )
     {
         fVMinAz.push_back( fVMinAz.back() + 22.5 );
         fVMaxAz.push_back( fVMaxAz.back() + 22.5 );
     }
     // (no az cut)
-    fVMinAz.push_back(-1.e3 );
-    fVMaxAz.push_back(+1.e3 );
+    fVMinAz.push_back( -1.e3 );
+    fVMaxAz.push_back( +1.e3 );
 
     /////////////////////////////////////////////////////////////////
     // define  spectral index bins
@@ -166,7 +166,7 @@ bool VEffectiveAreaCalculatorMCHistograms::fill( double i_ze, TTree* i_MCData, b
     cout << "=========================================================================================" << endl;
     cout << endl;
 
-    if(!i_MCData )
+    if( !i_MCData )
     {
         cout << "VEffectiveAreaCalculatorMCHistograms::fill error: no MC data chain" << endl;
         return false;
@@ -393,7 +393,7 @@ void VEffectiveAreaCalculatorMCHistograms::setCuts( double iArrayxyoff_MC_min, d
 */
 bool VEffectiveAreaCalculatorMCHistograms::add( const VEffectiveAreaCalculatorMCHistograms* iMChis )
 {
-    if(!iMChis )
+    if( !iMChis )
     {
         return false;
     }
@@ -451,7 +451,7 @@ int VEffectiveAreaCalculatorMCHistograms::checkParameters( const VEffectiveAreaC
     {
         cout << "VEffectiveAreaCalculatorMCHistograms::checkParameters" << endl;
     }
-    if(!iMChis )
+    if( !iMChis )
     {
         return 1;
     }

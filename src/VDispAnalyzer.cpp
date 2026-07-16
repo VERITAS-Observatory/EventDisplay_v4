@@ -156,7 +156,7 @@ vector< vector< float > > VDispAnalyzer::get_sign_permutation_vector( unsigned i
         vector< float > i_temp_v( x_size, 1. );
         while( y > 0 )
         {
-            if(( y & 1 ) == 1 )
+            if( ( y & 1 ) == 1 )
             {
                 i_temp_v[i_counter] = -1.;
             }
@@ -196,7 +196,7 @@ unsigned int VDispAnalyzer::find_smallest_diff_element(
         }
         calculateMeanShowerDirection( v_xs, v_ys, v_weight, xs, ys, disp_diff );
         v_disp_diff[s] = disp_diff;
-        v_dist[s] = sqrt( xs* xs + ys* ys );
+        v_dist[s] = sqrt( xs * xs + ys * ys );
     }
     // fixed average FOV
     //    float i_average_FOV = 3.5;
@@ -278,7 +278,7 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
                 }
                 else
                 {
-                    f_angdiff += ( 180. - iangdiff* TMath::RadToDeg() );
+                    f_angdiff += ( 180. - iangdiff * TMath::RadToDeg() );
                 }
                 fmean_iangdiffN++;
             }
@@ -328,8 +328,8 @@ void VDispAnalyzer::calculateMeanDirection( float& xs, float& ys,
             float x2 = x[ii] + v_disp[ii] * cosphi[ii] + tel_pointing_dx[ii];
             float y1 = y[ii] - v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
             float y2 = y[ii] + v_disp[ii] * sinphi[ii] + tel_pointing_dy[ii];
-            if( sqrt(( x1 - x_off4 ) * ( x1 - x_off4 ) + ( y1 + y_off4 ) * ( y1 + y_off4 ) )
-                    < sqrt(( x2 - x_off4 ) * ( x2 - x_off4 ) + ( y2 + y_off4 ) * ( y2 + y_off4 ) ) )
+            if( sqrt( ( x1 - x_off4 ) * ( x1 - x_off4 ) + ( y1 + y_off4 ) * ( y1 + y_off4 ) )
+                    < sqrt( ( x2 - x_off4 ) * ( x2 - x_off4 ) + ( y2 + y_off4 ) * ( y2 + y_off4 ) ) )
             {
                 fdisp_xs_T[ii] = x1;
                 fdisp_ys_T[ii] = y1;
@@ -395,8 +395,8 @@ void VDispAnalyzer::calculateMeanShowerDirection(
     {
         for( unsigned int m = n + 1; m < v_x.size(); m++ )
         {
-            dispdiff += sqrt(( v_x[n] - v_x[m] ) * ( v_x[n] - v_x[m] )
-                             + ( v_y[n] - v_y[m] ) * ( v_y[n] - v_y[m] ) )
+            dispdiff += sqrt( ( v_x[n] - v_x[m] ) * ( v_x[n] - v_x[m] )
+                              + ( v_y[n] - v_y[m] ) * ( v_y[n] - v_y[m] ) )
                         * TMath::Abs( v_weight[n] ) * TMath::Abs( v_weight[m] );
             z += TMath::Abs( v_weight[n] ) * TMath::Abs( v_weight[m] );
         }
@@ -464,7 +464,7 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
     f_ys = -99.;
 
     // make sure that all data arrays exist
-    if(!img_size || !img_cen_x || !img_cen_y
+    if( !img_size || !img_cen_x || !img_cen_y
             || !img_cosphi || !img_sinphi
             || !img_width || !img_length
             || !img_asym || !img_tgrad
@@ -498,13 +498,13 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
                 && img_width[i] > fWidth_min
                 && ( img_fitstat[i] < 1 || img_fitstat[i] >= fFitstat_min ) )
         {
-            disp = evaluate(( float )img_width[i], ( float )img_length[i], ( float )img_asym[i],
-                            ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
-                            ( float )img_size[i], img_pedvar[i], ( float )img_tgrad[i], ( float )img_loss[i],
-                            ( float )img_cen_x[i], ( float )img_cen_y[i],
-                            ( float )xoff_4, ( float )yoff_4, iTelType[i],
-                            ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
-                            -99., ( float )img_fui[i], ( float )img_ntubes[i], ( float )img_pedvar[i] );
+            disp = evaluate( ( float )img_width[i], ( float )img_length[i], ( float )img_asym[i],
+                             ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
+                             ( float )img_size[i], img_pedvar[i], ( float )img_tgrad[i], ( float )img_loss[i],
+                             ( float )img_cen_x[i], ( float )img_cen_y[i],
+                             ( float )xoff_4, ( float )yoff_4, iTelType[i],
+                             ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
+                             -99., ( float )img_fui[i], ( float )img_ntubes[i], ( float )img_pedvar[i] );
             if( disp < -98. )
             {
                 continue;
@@ -534,15 +534,15 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
                         float loss_inflation = 1.0 + 5.0 * img_loss[i];
                         dispError_inflated *= loss_inflation;
                     }
-                    v_weight.push_back( exp(-1. * fDispErrorExponential* TMath::Abs( dispError_inflated ) ) );
-                    if(!UseIntersectForHeadTail && i < dispSignT.size() && dispSignT[i] > -99. )
+                    v_weight.push_back( exp( -1. * fDispErrorExponential * TMath::Abs( dispError_inflated ) ) );
+                    if( !UseIntersectForHeadTail && i < dispSignT.size() && dispSignT[i] > -99. )
                     {
                         v_weight.back() *= dispSignT[i];
                     }
                 }
                 else
                 {
-                    v_weight.push_back(-999. );
+                    v_weight.push_back( -999. );
                 }
             }
             // no estimated uncertainties: use image size and geometry
@@ -554,7 +554,7 @@ void VDispAnalyzer::calculateMeanDispDirection( unsigned int i_ntel,
                 // Downweight high-loss images: loss=0.1 -> 0.61x, loss=0.2 -> 0.37x
                 if( img_loss[i] > 0.05 )
                 {
-                    float loss_penalty = exp(-5.0 * img_loss[i] );
+                    float loss_penalty = exp( -5.0 * img_loss[i] );
                     geom_weight *= loss_penalty;
                 }
                 v_weight.push_back( geom_weight );
@@ -613,7 +613,7 @@ vector< float > VDispAnalyzer::calculateExpectedDirectionError_or_Sign( unsigned
 {
     vector< float > i_disp( i_ntel, -9999. );
     // make sure that all data arrays exist
-    if(!img_size || !img_cen_x || !img_cen_y
+    if( !img_size || !img_cen_x || !img_cen_y
             || !img_cosphi || !img_sinphi
             || !img_width || !img_length
             || !img_asym || !img_tgrad
@@ -637,13 +637,13 @@ vector< float > VDispAnalyzer::calculateExpectedDirectionError_or_Sign( unsigned
                 && img_width[i] > fWidth_min
                 && ( img_fitstat[i] < 1 || img_fitstat[i] >= fFitstat_min ) )
         {
-            i_disp[i] = evaluate(( float )img_width[i], ( float )img_length[i], ( float )img_asym[i],
-                                 ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
-                                 ( float )img_size[i], img_pedvar[i], ( float )img_tgrad[i], ( float )img_loss[i],
-                                 ( float )img_cen_x[i], ( float )img_cen_y[i],
-                                 ( float )xoff_4, ( float )yoff_4, iTelType[i],
-                                 ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
-                                 -99., ( float )img_fui[i], ( float )img_ntubes[i] );
+            i_disp[i] = evaluate( ( float )img_width[i], ( float )img_length[i], ( float )img_asym[i],
+                                  ( float )sqrt( img_cen_x[i] * img_cen_x[i] + img_cen_y[i] * img_cen_y[i] ),
+                                  ( float )img_size[i], img_pedvar[i], ( float )img_tgrad[i], ( float )img_loss[i],
+                                  ( float )img_cen_x[i], ( float )img_cen_y[i],
+                                  ( float )xoff_4, ( float )yoff_4, iTelType[i],
+                                  ( float )( 90. - iArrayElevation ), ( float )iArrayAzimuth,
+                                  -99., ( float )img_fui[i], ( float )img_ntubes[i] );
         }
     }
     return i_disp;
@@ -732,7 +732,7 @@ void VDispAnalyzer::calculateEnergies( unsigned int i_ntel,
     fdisp_energyQL = -1;
 
     // make sure that all data arrays exist
-    if(!img_size || !img_cen_x || !img_cen_y
+    if( !img_size || !img_cen_x || !img_cen_y
             || !img_cosphi || !img_sinphi
             || !img_width || !img_length
             || !img_asym || !img_tgrad

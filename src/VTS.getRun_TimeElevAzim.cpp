@@ -33,7 +33,7 @@ static inline std::string& rchop( std::string& s )
 bool is_number( const std::string& s )
 {
     std::string::const_iterator it = s.begin();
-    while( it != s.end() && std::isdigit(*it ) )
+    while( it != s.end() && std::isdigit( *it ) )
     {
         ++it;
     }
@@ -78,7 +78,7 @@ int main( int argc, char* argv[] )
     int  c             = 0 ;
     int  inputrun      = 0 ;
     string inputfile ;
-    while(( c = getopt( argc, argv, "r:f:" ) ) != -1 )
+    while( ( c = getopt( argc, argv, "r:f:" ) ) != -1 )
     {
         switch( c )
         {
@@ -165,7 +165,7 @@ int main( int argc, char* argv[] )
     tmpdb_ver = blah->getDBServer() + "/VERITAS" ;
     cout << "Using server " << tmpdb_ver << endl;
     VDB_Connection my_connection_ver( tmpdb_ver.c_str(), "readonly", "" ) ;
-    if(!my_connection_ver.Get_Connection_Status() )
+    if( !my_connection_ver.Get_Connection_Status() )
     {
         cout << "error connecting to db" << endl;
         return -1;
@@ -180,7 +180,7 @@ int main( int argc, char* argv[] )
         char c_query[1000] ;
         sprintf( c_query, "select run_id, data_start_time, data_end_time, config_mask from tblRun_Info where run_id = %d", runnumber ) ;
         //printf( "%s\n", query ) ;
-        if(!my_connection_ver.make_query( c_query ) )
+        if( !my_connection_ver.make_query( c_query ) )
         {
             cout << "Error, unable to get response from db for query \"" << c_query << "\"" << endl;
             cout << "Exiting..." << endl;
@@ -190,7 +190,7 @@ int main( int argc, char* argv[] )
         //TSQLResult *db_res = f_db->Query( query );
         TSQLResult* db_res = my_connection_ver.Get_QueryResult();
 
-        if(!db_res )
+        if( !db_res )
         {
             cout << "TSQLResult empty, exiting..." << endl ;
             exit( 1 ) ;
@@ -202,7 +202,7 @@ int main( int argc, char* argv[] )
         for( int j = 0; j < fNRows; j++ )
         {
             TSQLRow* db_row = db_res->Next();
-            if(!db_row )
+            if( !db_row )
             {
                 break;
             }
@@ -227,7 +227,7 @@ int main( int argc, char* argv[] )
         string tmpdb_vof;
         tmpdb_vof = blah->getDBServer() + "/VOFFLINE" ;
         VDB_Connection my_connection_vof( tmpdb_ver.c_str(), "readonly", "" ) ;
-        if(!my_connection_vof.Get_Connection_Status() )
+        if( !my_connection_vof.Get_Connection_Status() )
         {
             cout << "error connecting to db VOFFLINE" << endl;
             return -1;
@@ -240,17 +240,17 @@ int main( int argc, char* argv[] )
         vector <double> mjdSecondsOfDay ;
         vector <double> ra   ;
         vector <double> decl ;
-        bitset<8 * sizeof(ULong64_t )> a = ImgSel;
+        bitset<8 * sizeof( ULong64_t )> a = ImgSel;
         int telescope = -1 ;
         for( unsigned int i_tel = 0 ; i_tel < 4 ; i_tel++ )
         {
-            if(! a.test( i_tel ) )
+            if( ! a.test( i_tel ) )
             {
                 continue ;
             }
             sprintf( c_query, "select mjd, ra, decl from VOFFLINE.tblPointing_Monitor_Telescope%d_Calibrated_Pointing where mjd > %f and mjd < %f ;", i_tel, MJDStart, MJDEnd ) ;
             //printf( "%s\n", query) ;
-            if(!my_connection_vof.make_query( c_query ) )
+            if( !my_connection_vof.make_query( c_query ) )
             {
                 cout << "Error, unable to get response from db for query \"" << c_query << "\"" << endl;
                 cout << "Exiting..." << endl;
@@ -266,7 +266,7 @@ int main( int argc, char* argv[] )
             for( int j = 0; j < fNRows; j++ )
             {
                 TSQLRow* db_row = db_res2->Next();
-                if(!db_row )
+                if( !db_row )
                 {
                     break;
                 }
@@ -276,8 +276,8 @@ int main( int argc, char* argv[] )
                 itemp = db_row->GetField( 0 ) ;
                 sscanf( itemp.c_str(), "%lf", &imjd ) ;
                 mjd.push_back( imjd );
-                mjdDay.push_back(( int )imjd ) ;
-                mjdDayFraction.push_back(( double )( imjd - ( int )imjd ) ) ;
+                mjdDay.push_back( ( int )imjd ) ;
+                mjdDayFraction.push_back( ( double )( imjd - ( int )imjd ) ) ;
                 mjdSecondsOfDay.push_back( mjdDayFraction.back() * 86400.0 ) ;
 
                 // ra decl
@@ -339,7 +339,7 @@ int main( int argc, char* argv[] )
                 mjdFrac = mjd[i_row] - floor( mjd[i_row] ) ;
                 ra_rad = ra[i_row] ;
                 de_rad = decl[i_row] ;
-                iSid = VAstronometry::vlaGmsta(( double ) mjdInt, mjdFrac ) ;
+                iSid = VAstronometry::vlaGmsta( ( double ) mjdInt, mjdFrac ) ;
                 iSid = iSid - lon_rad ;
                 ha   = VAstronometry::vlaDranrm( iSid - ra_rad ) ;
                 VAstronometry::vlaDe2h( ha, de_rad, lat_rad, &Azim, &Elev ) ;
@@ -406,7 +406,7 @@ void getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip )
     h = atoi( itemp.substr( 8, 2 ).c_str() );
     min = atoi( itemp.substr( 10, 2 ).c_str() );
     s = atoi( itemp.substr( 12, 2 ).c_str() );
-    if(!bStrip )
+    if( !bStrip )
     {
         ms = atoi( itemp.substr( 14, 3 ).c_str() );
     }

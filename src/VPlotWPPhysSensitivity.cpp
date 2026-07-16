@@ -58,18 +58,18 @@ bool VPlotWPPhysSensitivity::addDataSet( string iAnalysis, string iSubArray, dou
     i_temp.fPlottingFillStyle.push_back( iFillStyle );
     i_temp.fLegend.push_back( iLegend );
 
-    return addDataSet(&i_temp );
+    return addDataSet( &i_temp );
 }
 
 bool VPlotWPPhysSensitivity::addDataSets( string iDataSettxtFile, string iDirectionString )
 {
     std::cout << "VPlotWPPhysSensitivity::addDataSets " << std::endl;
     unsigned int z_site = 0;
-    for(;; )
+    for( ;; )
     {
         cout << "A " << z_site << endl;
         fData.push_back( new VSiteData() );
-        if(!fData.back()->addDataSet( iDataSettxtFile, z_site, iDirectionString ) )
+        if( !fData.back()->addDataSet( iDataSettxtFile, z_site, iDirectionString ) )
         {
             fData.pop_back();
             break;
@@ -119,7 +119,7 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
     char hname[2000];
     ////////////////////////////
     // effective areas
-    TCanvas* c = fIRF->plotEffectiveArea(-1., 2.e7, iEffAreaPad );
+    TCanvas* c = fIRF->plotEffectiveArea( -1., 2.e7, iEffAreaPad );
     plotLegend( c, true );
     if( iPrint.size() > 0 )
     {
@@ -176,7 +176,7 @@ void VPlotWPPhysSensitivity::initialProjectedSensitivityPlots()
     fProjectionEnergy_min_logTeV.clear();
     fProjectionEnergy_max_logTeV.clear();
     // (hard coded energies here...not good)
-    if(!fUseIntegratedSensitivityForOffAxisPlots )
+    if( !fUseIntegratedSensitivityForOffAxisPlots )
     {
         fProjectionEnergy_min_logTeV.push_back( log10( 10.0 ) );
         fProjectionEnergy_max_logTeV.push_back( log10( 10.0 ) );
@@ -215,7 +215,7 @@ void VPlotWPPhysSensitivity::initialProjectedSensitivityPlots()
 
 void VPlotWPPhysSensitivity::fillProjectedSensitivityPlot( unsigned int iDataSet, TGraphAsymmErrors* g )
 {
-    if(!g )
+    if( !g )
     {
         return;
     }
@@ -368,7 +368,7 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
         sprintf( htitle, "ratio of sensitivities (to requirement)" );
     }
     TCanvas* cSensRatio = 0;
-    if(!iSensRatio )
+    if( !iSensRatio )
     {
         cSensRatio = new TCanvas( hname, htitle, 200, 200, 900, 600 );
         cSensRatio->SetGridy( 0 );
@@ -409,7 +409,7 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
     // loop over all data sets and divide it by the first
     for( unsigned int i = 0; i < fData.size(); i++ )
     {
-        if(!fData[i] )
+        if( !fData[i] )
         {
             continue;
         }
@@ -494,7 +494,7 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( double iEmin_TeV, do
 
 void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( TGraphAsymmErrors* gSensitivity, double iEmin_TeV, double iEmax_TeV, string iAnalysis )
 {
-    if(!gSensitivity )
+    if( !gSensitivity )
     {
         return;
     }
@@ -562,7 +562,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
     unsigned int z = 0;
     for( unsigned int i = 0; i < fData.size(); i++ )
     {
-        if(!fData[i] || !fData[i]->checkIntegrity() )
+        if( !fData[i] || !fData[i]->checkIntegrity() )
         {
             continue;
         }
@@ -585,7 +585,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
             TCanvas* c_temp = 0;
             // cSens name = cSensitivity (default from VSensitivityCalculator::fPlot_CanvasName )
             c_temp = a->plotDifferentialSensitivityvsEnergyFromCrabSpectrum( cSens, "CTA-PHYS", fData[i]->fPlottingColor[j], iUnit,
-                     0.2, fData[i]->fSiteFile_Emin[j], fData[i]->fSiteFile_Emax[j] );
+                0.2, fData[i]->fSiteFile_Emin[j], fData[i]->fSiteFile_Emax[j] );
             if( c_temp )
             {
                 cSens = c_temp;
@@ -681,7 +681,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
 
 bool VPlotWPPhysSensitivity::plotLegend( TCanvas* c, bool iDown, bool iLeft, bool iAddFirst )
 {
-    if(!c )
+    if( !c )
     {
         return false;
     }

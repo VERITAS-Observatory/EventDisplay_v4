@@ -142,7 +142,7 @@ void VCamera::setUpCamera()
         fgraphTubes.back()->SetUniqueID( 200000 + i );
         fgraphTubes.back()->SetLineColor( 15 );
         // PMT values
-        fgraphTubesEntry.push_back( new TEllipse( x, y, rx* fmaxRad * 0.5, ry* fmaxRad * 0.5 ) );
+        fgraphTubesEntry.push_back( new TEllipse( x, y, rx * fmaxRad * 0.5, ry * fmaxRad * 0.5 ) );
         fgraphTubesEntry.back()->SetLineColor( 10 );
         fgraphTubesEntry.back()->SetFillColor( 10 );
         fgraphTubesEntry.back()->SetFillStyle( 0 );
@@ -150,7 +150,7 @@ void VCamera::setUpCamera()
         // channel numbering
         sprintf( c_number, "%d", i );
         fTextChannelNumber.push_back( new TText( fgraphTubes.back()->GetX1() - fgraphTubes.back()->GetR1() / 1.4,
-                                      fgraphTubes.back()->GetY1() - fgraphTubes.back()->GetR2() / 2., c_number ) );
+                fgraphTubes.back()->GetY1() - fgraphTubes.back()->GetR2() / 2., c_number ) );
         fTextChannelNumber.back()->SetTextFont( 42 );
         fTextChannelNumber.back()->SetTextSize( 0.015 );
         fTextChannelNumber.back()->SetUniqueID( 200000 + i );
@@ -246,11 +246,11 @@ void VCamera::setUpCamera()
     fTextEventPlotPaper->SetTextFont( 42 );
     fTextEventPlotPaper->SetTextSize( i_TextSize * 2 );
     // camera scale axis (left+top)
-    fCameraXaxis = new TGaxis( convertX(-1.* fdist_edgeX ), 0.97, convertX( fdist_edgeX ), 0.97, -1.*fdist_edgeX, fdist_edgeX, 510, "+L" );
+    fCameraXaxis = new TGaxis( convertX( -1.* fdist_edgeX ), 0.97, convertX( fdist_edgeX ), 0.97, -1.*fdist_edgeX, fdist_edgeX, 510, "+L" );
     fCameraXaxis->SetLabelSize( 0.02 );
     fCameraXaxis->SetLineColor( 42 );
     fCameraXaxis->SetLabelColor( 42 );
-    fCameraYaxis = new TGaxis( 0.96, convertY(-1. * fdist_edgeY ), 0.96, convertY( fdist_edgeY ), -1. * fdist_edgeY, fdist_edgeY, 510, "+L" );
+    fCameraYaxis = new TGaxis( 0.96, convertY( -1. * fdist_edgeY ), 0.96, convertY( fdist_edgeY ), -1. * fdist_edgeY, fdist_edgeY, 510, "+L" );
     fCameraYaxis->SetLabelSize( 0.02 );
     fCameraYaxis->SetLineColor( 43 );
     fCameraYaxis->SetLabelColor( 43 );
@@ -279,7 +279,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
     fCanvas->cd();
     fCanvas->SetEditable( true );
 
-    if(!iAllinOne )
+    if( !iAllinOne )
     {
         fCanvas->Clear();
     }
@@ -324,7 +324,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                 setPMTColorScheme( fData->getTCorrectedSumFirst(), false, 100., 0., "summation window start", false, false );
                 break;
             case C_PEDMEAN:
-                if(!bFixScale )
+                if( !bFixScale )
                 {
                     setPMTColorScheme( fData->getPeds(), false, 100., 0., "charge", false );
                 }
@@ -342,7 +342,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                     {
                         i_pedvars[ii] = fData->getPedvars( fData->getCurrentSumWindow()[ii] )[ii];
                     }
-                    if(!bFixScale )
+                    if( !bFixScale )
                     {
                         setPMTColorScheme( i_pedvars, false, 100., 0., "charge", false );
                     }
@@ -354,7 +354,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
             }
             break;
             case C_GAINS:
-                if(!bFixScale )
+                if( !bFixScale )
                 {
                     setPMTColorScheme( fData->getGains(), false, 100., 0., "gain", false );
                 }
@@ -364,7 +364,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                 }
                 break;
             case C_GAINVARS:
-                if(!bFixScale )
+                if( !bFixScale )
                 {
                     setPMTColorScheme( fData->getGainvars(), false, 100., 0., "gain", false );
                 }
@@ -402,7 +402,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                 setPMTColorScheme( fData->getTZeros(), true, 100., 0., "time [samples]", true );
                 break;
             case C_PEDMEANLOW:
-                if(!bFixScale )
+                if( !bFixScale )
                 {
                     setPMTColorScheme( fData->getPeds( true ), false, 100., 0., "charge", false );
                 }
@@ -418,7 +418,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                 {
                     i_pedvars[ii] = fData->getPedvars( fData->getCurrentSumWindow()[ii], true )[ii];
                 }
-                if(!bFixScale )
+                if( !bFixScale )
                 {
                     setPMTColorScheme( i_pedvars, false, 100., 0., "charge", false );
                 }
@@ -429,7 +429,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
             }
             break;
             case C_GAINSLOW:
-                if(!bFixScale )
+                if( !bFixScale )
                 {
                     setPMTColorScheme( fData->getGains( true ), false, 100., 0., "gain", false );
                 }
@@ -439,7 +439,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                 }
                 break;
             case C_GAINVARSLOW:
-                if(!bFixScale )
+                if( !bFixScale )
                 {
                     setPMTColorScheme( fData->getGainvars( true ), false, 100., 0., "gain", false );
                 }
@@ -480,7 +480,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                 break;
         }
         // draw the tubes
-        if(!fBoolAllinOne )
+        if( !fBoolAllinOne )
         {
             for( unsigned int i = 0; i < fgraphTubes.size(); i++ )
             {
@@ -520,7 +520,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
             fCameraFOV->Draw();
         }
         // mark zero suppressed channels
-        if(!fBoolAllinOne )
+        if( !fBoolAllinOne )
         {
             for( unsigned int i = 0; i < fgraphTubesEntry.size(); i++ )
             {
@@ -532,7 +532,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
             }
         }
         // draw pixel recovered by the correlation image cleaning
-        if(!fBoolAllinOne && fData->getImageCleaningParameter()->getImageCleaningMethod() == "TWOLEVELANDCORRELATION" )
+        if( !fBoolAllinOne && fData->getImageCleaningParameter()->getImageCleaningMethod() == "TWOLEVELANDCORRELATION" )
         {
             for( unsigned int i = 0; i < fgraphMarker.size(); i++ )
             {
@@ -658,7 +658,7 @@ void VCamera::setPMTColorForChargeTiming()
         //   - not dead, or a dead channel recovered by the loglikelihood method
         //   - a hit
         //   - not switched of by the user
-        if((!( fData->getDead( i, fData->getHiLo()[i] ) && !( fData->getDeadRecovered()[i] && ( fData->getImage()[i] || fData->getBorder()[i] ) ) ) || fData->getLLEst()[i] ) && fData->getImageUser()[i] != -1 )
+        if( ( !( fData->getDead( i, fData->getHiLo()[i] ) && !( fData->getDeadRecovered()[i] && ( fData->getImage()[i] || fData->getBorder()[i] ) ) ) || fData->getLLEst()[i] ) && fData->getImageUser()[i] != -1 )
         {
             // set tube radii
             fgraphTubesEntry[i]->SetR1( fgraphTubes[i]->GetR1()*abs( fPMTData[i] ) * fmaxRad );
@@ -718,7 +718,7 @@ void VCamera::setPMTColorForChargeTiming()
             }
         }
         // dead pixels
-        else if(!fBoolAllinOne )
+        else if( !fBoolAllinOne )
         {
             fgraphTubesEntry[i]->SetR1( fgraphTubes[i]->GetR1() * fmaxRad );
             fgraphTubesEntry[i]->SetR2( fgraphTubes[i]->GetR2() * fmaxRad );
@@ -775,7 +775,7 @@ void VCamera::drawEventText()
     sprintf( iText, "T%d", fTelescope + 1 );
     fTextTelescopeN->SetTitle( iText );
     fTextTelescopeN->SetNDC( true );
-    if(!fBoolAllinOne )
+    if( !fBoolAllinOne )
     {
         fTextTelescopeN->DrawLatex( 0.85, 0.1, fTextTelescopeN->GetTitle() );
     }
@@ -812,7 +812,7 @@ void VCamera::drawEventText()
         for( unsigned int i = 0; i < i_toShow; i++ )
         {
             fTextEvent[i]->SetNDC( true );
-            if(!fPlotPaper )
+            if( !fPlotPaper )
             {
                 fTextEvent[i]->DrawLatex( i_TextX, i_TextY -= i_TextdY, fTextEvent[i]->GetTitle() );
             }
@@ -932,7 +932,7 @@ void VCamera::drawEventText()
     for( unsigned int i = 0; i < i_toShow; i++ )
     {
         fTextEvent[i]->SetNDC( true );
-        if(!fPlotPaper )
+        if( !fPlotPaper )
         {
             fTextEvent[i]->DrawLatex( i_TextX, i_TextY -= i_TextdY, fTextEvent[i]->GetTitle() );
         }
@@ -941,14 +941,14 @@ void VCamera::drawEventText()
     if( fData->getImageParameters()->ntubes > 0 && !fBoolAllinOne )
     {
         fTextEvent[fTextEvent.size() - 2]->SetNDC( true );
-        if(!fPlotPaper )
+        if( !fPlotPaper )
         {
             fTextEvent[fTextEvent.size() - 2]->DrawLatex( i_TextX, 0.01, fTextEvent[fTextEvent.size() - 2]->GetTitle() );
         }
         if( fData->getRunParameter()->fImageLL )
         {
             fTextEvent[fTextEvent.size() - 1]->SetNDC( true );
-            if(!fPlotPaper )
+            if( !fPlotPaper )
             {
                 fTextEvent[fTextEvent.size() - 1]->DrawLatex( i_TextX, 0.04, fTextEvent[fTextEvent.size() - 1]->GetTitle() );
             }
@@ -956,7 +956,7 @@ void VCamera::drawEventText()
     }
 
     // draw MC infos (if fBoolAllinOne only for first telescope)
-    if( fData->getReader()->isMC() && fTextMC.size() > 0 && (!fBoolAllinOne || fTelescope == 0 ) )
+    if( fData->getReader()->isMC() && fTextMC.size() > 0 && ( !fBoolAllinOne || fTelescope == 0 ) )
     {
         sprintf( iText, "Primary: %d", fData->getShowerParameters()->MCprimary );
         fTextMC[0]->SetTitle( iText );
@@ -974,7 +974,7 @@ void VCamera::drawEventText()
         for( unsigned int i = 0; i < fTextMC.size(); i++ )
         {
             fTextMC[i]->SetNDC( true );
-            if(!fPlotPaper )
+            if( !fPlotPaper )
             {
                 fTextMC[i]->DrawLatex( i_TextX, i_TextY -= i_TextdY, fTextMC[i]->GetTitle() );
             }
@@ -1163,7 +1163,7 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
         y1 = ymin + ( w1 - wlmin ) * ( ymax - ymin ) / wls;
         y2 = ymin + ( w2 - wlmin ) * ( ymax - ymin ) / wls;
         color = int( 0.01 + ( w1 - wlmin ) * scale );
-        theColor = int(( color + 0.99 ) * float( fncolors ) / float( fndivz ) );
+        theColor = int( ( color + 0.99 ) * float( fncolors ) / float( fndivz ) );
         iBox->SetFillColor( gStyle->GetColorPalette( theColor ) );
         iBox->DrawBox( x1, y1, x2, y2 );
     }
@@ -1183,8 +1183,8 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
     // expect length of v_value to be npixel
     for( unsigned int i = 0; i < v_value.size(); i++ )
     {
-        bool iDrawChannel = (!( fData->getDead( i, fData->getHiLo()[i] ) && !( fData->getDeadRecovered( iLowGain )[i] && ( fData->getImage()[i] || fData->getBorder()[i] ) ) )
-                             && fData->getImageUser()[i] != -1 );
+        bool iDrawChannel = ( !( fData->getDead( i, fData->getHiLo()[i] ) && !( fData->getDeadRecovered( iLowGain )[i] && ( fData->getImage()[i] || fData->getBorder()[i] ) ) )
+                              && fData->getImageUser()[i] != -1 );
         if( iDrawAllChannels )
         {
             iDrawChannel = true;
@@ -1216,16 +1216,16 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
                     scaler = 0.20;
                 }
             }
-            if(!i_scale )
+            if( !i_scale )
             {
                 scaler = 1.;
             }
             w1 = v_value[i];
 
             color = int( 0.01 + ( w1 - wlmin ) * scale );
-            theColor = int(( color + 0.99 ) * float( fncolors ) / float( fndivz ) );
-            fgraphTubesEntry[i]->SetR1( fgraphTubes[i]->GetR1() * fmaxRad* scaler );
-            fgraphTubesEntry[i]->SetR2( fgraphTubes[i]->GetR2() * fmaxRad* scaler );
+            theColor = int( ( color + 0.99 ) * float( fncolors ) / float( fndivz ) );
+            fgraphTubesEntry[i]->SetR1( fgraphTubes[i]->GetR1() * fmaxRad * scaler );
+            fgraphTubesEntry[i]->SetR2( fgraphTubes[i]->GetR2() * fmaxRad * scaler );
             fgraphTubesEntry[i]->SetLineColor( gStyle->GetColorPalette( theColor ) );
             fgraphTubesEntry[i]->SetFillColor( gStyle->GetColorPalette( theColor ) );
             fgraphTubesEntry[i]->SetFillStyle( 1001 );
@@ -1235,7 +1235,7 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
             }
         }
         // dead channels
-        else if(!fBoolAllinOne )
+        else if( !fBoolAllinOne )
         {
             fgraphTubesEntry[i]->SetR1( fgraphTubes[i]->GetR1() * fmaxRad );
             fgraphTubesEntry[i]->SetR2( fgraphTubes[i]->GetR2() * fmaxRad );
@@ -1285,7 +1285,7 @@ void VCamera::setPMTColorOnOff( const vector<bool>& v_value, int iColor, int iFi
             break;
         }
         // PMTs which are not that and a hit
-        if(!fData->getDead( i, fData->getHiLo()[i] ) )
+        if( !fData->getDead( i, fData->getHiLo()[i] ) )
         {
             // true: draw filled circle according to the fill color/style
             if( v_value[i] )
@@ -1304,7 +1304,7 @@ void VCamera::setPMTColorOnOff( const vector<bool>& v_value, int iColor, int iFi
             }
         }
         // dead channels
-        else if(!fBoolAllinOne )
+        else if( !fBoolAllinOne )
         {
             fgraphTubesEntry[i]->SetR1( fgraphTubes[i]->GetR1() * fmaxRad );
             fgraphTubesEntry[i]->SetR2( fgraphTubes[i]->GetR2() * fmaxRad );
@@ -1333,9 +1333,9 @@ void VCamera::setPMTColorOff( const vector<bool>& v_value )
         {
             break;
         }
-        if(!fData->getDead( i, fData->getHiLo()[i] ) )
+        if( !fData->getDead( i, fData->getHiLo()[i] ) )
         {
-            if(! v_value[i] ) // draw empty circle
+            if( ! v_value[i] ) // draw empty circle
             {
                 fgraphTubesEntry[i]->SetFillColor( 10 );
                 fgraphTubesEntry[i]->SetLineColor( 10 );
@@ -1404,7 +1404,7 @@ void VCamera::drawAnaResults()
     // (applies for 'all in one' only
     if( fBoolAllinOne && fData->getTelID() < fData->getShowerParameters()->fTelIDImageSelected[iMethod].size() )
     {
-        if(!fData->getShowerParameters()->fTelIDImageSelected[iMethod][fData->getTelID()] )
+        if( !fData->getShowerParameters()->fTelIDImageSelected[iMethod][fData->getTelID()] )
         {
             return;
         }
@@ -1523,7 +1523,7 @@ void VCamera::drawAnaResults()
         // draw a line from the center through the long axis of the ellipse
         if( fAnaVis )
         {
-            if(!fBoolAllinOne )
+            if( !fBoolAllinOne )
             {
                 fCenterLine->SetX1( convertX( 0. ) );
                 fCenterLine->SetY1( convertY( 0. ) );
@@ -1562,7 +1562,7 @@ void VCamera::drawAnaResults()
             {
                 fEllipseLine->SetLineColor( 1 );
             }
-            if(!fBoolAllinOne )
+            if( !fBoolAllinOne )
             {
                 fEllipseLine->SetLineStyle( 1 );
             }
@@ -1573,7 +1573,7 @@ void VCamera::drawAnaResults()
             fEllipseLine->SetLineWidth( 1 );
             fEllipseLine->Draw();
             // draw image centroids
-            if(!fBoolAllinOne )
+            if( !fBoolAllinOne )
             {
                 fAnaShowerCentroid = new TMarker( convertX( fData->getImageParameters()->cen_x ),
                                                   convertY( fData->getImageParameters()->cen_y ), 3 );
@@ -1586,7 +1586,7 @@ void VCamera::drawAnaResults()
                 if( fData->getDetectorGeo()->getGrIsuVersion() >= 412 )
                 {
                     fAnaShowerDir = new TMarker( convertX( fData->getShowerParameters()->fShower_Xoffset[iMethod] ),
-                                                 convertY(-1.*fData->getShowerParameters()->fShower_Yoffset[iMethod] ), 29 );
+                                                 convertY( -1.*fData->getShowerParameters()->fShower_Yoffset[iMethod] ), 29 );
                 }
                 else
                 {
@@ -1604,7 +1604,7 @@ void VCamera::drawAnaResults()
                     if( fData->getDetectorGeo()->getGrIsuVersion() >= 412 )
                     {
                         fAnaShowerDir = new TMarker( convertX( fData->getShowerParameters()->fShower_Xoffset[0] ),
-                                                     convertY(-1.*fData->getShowerParameters()->fShower_Yoffset[0] ), 29 );
+                                                     convertY( -1.*fData->getShowerParameters()->fShower_Yoffset[0] ), 29 );
                     }
                     else
                     {
@@ -1620,7 +1620,7 @@ void VCamera::drawAnaResults()
                 {
                     unsigned int d_min = 0;
                     unsigned int d_max = fData->getShowerParameters()->fShower_Xoff_DISP[iMethod].size();
-                    if(!fBoolAllinOne )
+                    if( !fBoolAllinOne )
                     {
                         d_min = fData->getTelID();
                         d_max = fData->getTelID() + 1;
@@ -1659,7 +1659,7 @@ void VCamera::drawAnaResults()
                 if( fData->getDetectorGeo()->getGrIsuVersion() >= 412 )
                 {
                     fMCShowerDir  = new TMarker( convertX( fData->getShowerParameters()->MCTel_Xoff ),
-                                                 convertY(-1.*fData->getShowerParameters()->MCTel_Yoff ), 29 );
+                                                 convertY( -1.*fData->getShowerParameters()->MCTel_Yoff ), 29 );
                 }
                 else
                 {
@@ -1719,7 +1719,7 @@ int VCamera::getChannel( int px, int py, TObject* objSel )
 
     for( unsigned int i = 0; i < fgraphTubes.size(); i++ )
     {
-        dist = sqrt(( x - fgraphTubes[i]->GetX1() ) * ( x - fgraphTubes[i]->GetX1() ) + ( y - fgraphTubes[i]->GetY1() ) * ( y - fgraphTubes[i]->GetY1() ) );
+        dist = sqrt( ( x - fgraphTubes[i]->GetX1() ) * ( x - fgraphTubes[i]->GetX1() ) + ( y - fgraphTubes[i]->GetY1() ) * ( y - fgraphTubes[i]->GetY1() ) );
         if( dist < fgraphTubes[i]->GetR1() )
         {
             showSelectedChannel( i, false );
@@ -1799,7 +1799,7 @@ valarray<double>& VCamera::rescaleSums( valarray<double>& v_value, bool iOffset 
         // maximum/minimum
         for( unsigned i = 0; i < i_v_valueSize; i++ )
         {
-            if((!fData->getDead( i, fData->getHiLo()[i] ) || fData->getLLEst()[i] ) )
+            if( ( !fData->getDead( i, fData->getHiLo()[i] ) || fData->getLLEst()[i] ) )
             {
                 if( abs( v_value[i] ) > imax )
                 {
@@ -1865,7 +1865,7 @@ double VCamera::getMax( valarray<double>& i_val )
     // assume that nothing is smaller than that
     double max = -1.e10;
     //   for( unsigned int i = 0; i < i_val.size(); i++ ) if( !fData->getDead()[i] ) { max = i_val[i]; break; }
-    for( unsigned int i = 0; i < iSize; i++ ) if(!fData->getDead( i, fData->getHiLo()[i] ) && i_val[i] > max )
+    for( unsigned int i = 0; i < iSize; i++ ) if( !fData->getDead( i, fData->getHiLo()[i] ) && i_val[i] > max )
         {
             max = i_val[i];
         }
@@ -1883,7 +1883,7 @@ double VCamera::getMin( valarray<double>& i_val )
     // assume that nothing is bigger than that
     double min = 1.e10;
     //   for( unsigned int i = 0; i < i_val.size(); i++ ) if( !fData->getDead()[i] ) { min = i_val[i]; break; }
-    for( unsigned int i = 0; i < iSize; i++ ) if(!fData->getDead( i, fData->getHiLo()[i] ) && i_val[i] < min )
+    for( unsigned int i = 0; i < iSize; i++ ) if( !fData->getDead( i, fData->getHiLo()[i] ) && i_val[i] < min )
         {
             min = i_val[i];
         }
@@ -1903,7 +1903,7 @@ void VCamera::getMinMax( valarray<double>& i_val, double& imin, double& imax )
     double max = -1.e10;
     for( unsigned int i = 0; i < iSize; i++ )
     {
-        if(!fData->getDead( i, fData->getHiLo()[i] ) && fData->getImageUser()[i] != -1 )
+        if( !fData->getDead( i, fData->getHiLo()[i] ) && fData->getImageUser()[i] != -1 )
         {
             if( i_val[i] < min )
             {
@@ -1931,7 +1931,7 @@ double VCamera::convertX( double i_x, double i_off )
     {
         return 0.;
     }
-    return ( i_x / iDist_edge* fmaxPlot + i_off );
+    return ( i_x / iDist_edge * fmaxPlot + i_off );
 }
 
 
@@ -1946,7 +1946,7 @@ double VCamera::convertY( double i_y, double i_off )
     {
         return 0.;
     }
-    return ( i_y / iDist_edge* fmaxPlot + i_off );
+    return ( i_y / iDist_edge * fmaxPlot + i_off );
 }
 
 /*
@@ -1957,7 +1957,7 @@ double VCamera::convertY( double i_y, double i_off )
 void VCamera::drawStarsInFOV()
 {
     // check if star catalogue is available
-    if(!fData->getStarCatalogue() )
+    if( !fData->getStarCatalogue() )
     {
         return;
     }
@@ -1995,15 +1995,15 @@ void VCamera::drawStarsInFOV()
             double x = 0.;
             if( cos( iTel_dec * TMath::DegToRad() ) != 0. )
             {
-                x = -1. * ( iStar[i]->fRACurrentEpoch - iTel_ra ) * cos( iTel_dec* TMath::DegToRad() );
+                x = -1. * ( iStar[i]->fRACurrentEpoch - iTel_ra ) * cos( iTel_dec * TMath::DegToRad() );
             }
             fData->getArrayPointing()->derotateCoords( fData->getEventMJD(), fData->getEventTime(), x, y, x_rot, y_rot );
 
-            TMarker* iM = new TMarker( convertX(-1.*x_rot* iScale ), convertY( y_rot* iScale ), 5 );
+            TMarker* iM = new TMarker( convertX( -1.*x_rot * iScale ), convertY( y_rot * iScale ), 5 );
             iM->SetMarkerColor( 2 );
             iM->Draw();
             sprintf( hname, "BMAG %.1f", iStar[i]->fBrightness_B );
-            TText* iT = new TText( convertX(-1.*x_rot ), convertY( y_rot ), hname );
+            TText* iT = new TText( convertX( -1.*x_rot ), convertY( y_rot ), hname );
             iT->SetTextAngle( 45. );
             iT->SetTextSize( 0.0175 );
             iT->SetTextColor( 2 );

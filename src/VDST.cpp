@@ -22,7 +22,7 @@ VDST::VDST( bool iMode, bool iMC )
     fDSTini = false;
     fDSTfile = 0;
     // no dst output, don't do anything
-    if(!iMode )
+    if( !iMode )
     {
         return;
     }
@@ -31,7 +31,7 @@ VDST::VDST( bool iMode, bool iMC )
     if( fDSTfile->IsZombie() )
     {
         cout << "VDST::VDST error while create dst file" << endl;
-        exit(-1 );
+        exit( -1 );
     }
 
     initDSTTree( true, false, getTraceFit() > -1 );
@@ -72,7 +72,7 @@ void VDST::fill()
         return;
     }
     // init base analyzer
-    if(!fDSTini )
+    if( !fDSTini )
     {
         for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
         {
@@ -94,7 +94,7 @@ void VDST::fill()
     if( fDSTntel > VDST_MAXTELESCOPES || ( int )getNChannels() > VDST_MAXCHANNELS )
     {
         cout << "void VDST::fill(): error: too many cameras or pmts, maximum is " << VDST_MAXTELESCOPES << "/" << VDST_MAXCHANNELS << endl;
-        exit(-1 );
+        exit( -1 );
     }
     // ignore following code
     // (GM) XXXX check muon/laser list
@@ -120,7 +120,7 @@ void VDST::fill()
     fDSTATgpsyear = ( unsigned int )getReader()->getATGPSYear();
     // update pointing
     // get pointing and local trigger (stored as unsigned long)
-    bitset<8 * sizeof(unsigned long ) > i_localTrigger;
+    bitset<8 * sizeof( unsigned long ) > i_localTrigger;
     fDSTNTrig = 0;
     for( unsigned int i = 0; i < getNTel(); i++ )
     {
@@ -264,7 +264,7 @@ void VDST::fill()
             //   ii) fRunPar->fdstwriteallpixel is set to true
             //           or
             //  iii) this is a border or image pixel
-            if( isTeltoAna( i ) && ((!fBLaser || ( i_total > fRunPar->fLaserSumMin ) ) && ( fRunPar->fdstwriteallpixel || getBorder()[j] || getImage()[j] ) ) )
+            if( isTeltoAna( i ) && ( ( !fBLaser || ( i_total > fRunPar->fLaserSumMin ) ) && ( fRunPar->fdstwriteallpixel || getBorder()[j] || getImage()[j] ) ) )
             {
                 intubes++;
                 // for laser only
@@ -473,10 +473,10 @@ bool VDST::writeCalibrationData()
     t->Branch( "num_sumwindow", &fnum_sumwindow, "num_sumwindow/i" );
     t->Branch( "sumwindow", fsumwindow, "sumwindow[num_sumwindow]/i" );
     t->Branch( "ped_high", fPed_high, "ped_high[NPixel]/F" );
-    sprintf( hname, "pedvar_high[%d]/F", VDST_MAXCHANNELS* VDST_MAXSUMWINDOW );
+    sprintf( hname, "pedvar_high[%d]/F", VDST_MAXCHANNELS * VDST_MAXSUMWINDOW );
     t->Branch( "pedvar_high", fPedvar_high, hname );
     t->Branch( "ped_low", fPed_low, "ped_low[NPixel]/F" );
-    sprintf( hname, "pedvar_low[%d]/F", VDST_MAXCHANNELS* VDST_MAXSUMWINDOW );
+    sprintf( hname, "pedvar_low[%d]/F", VDST_MAXCHANNELS * VDST_MAXSUMWINDOW );
     t->Branch( "pedvar_low", fPedvar_low, hname );
     t->Branch( "conv_high", fConv_high, "conv_high[NPixel]/F" );
     t->Branch( "conv_low", fConv_low, "conv_low[NPixel]/F" );

@@ -38,7 +38,7 @@ uint32_t PointingMonitor::dateToUInt32( const string& dateStr )
 uint32_t PointingMonitor::mjdToDate( double mjd )
 {
     time_t timeStamp = ( time_t )( mjd - 40587 ) * 86400;
-    tm* timeStructure = gmtime(&timeStamp );
+    tm* timeStructure = gmtime( &timeStamp );
     uint64_t timeInt = timeStructure->tm_year + 1900;
     timeInt *= 100;
     timeInt += timeStructure->tm_mon + 1;
@@ -62,7 +62,7 @@ double PointingMonitor::dateTimeToMjd( uint64_t dateTime )
     timeStructure.tm_mon = dateTime % 100 - 1;
     dateTime /= 100;
     timeStructure.tm_year = dateTime - 1900;
-    time_t timeStamp = timegm(&timeStructure );
+    time_t timeStamp = timegm( &timeStructure );
     double mjd = double( timeStamp ) / 86400 + 40587;
     return mjd;
 }
@@ -93,12 +93,12 @@ vector<pointingmonitor::CameraParameters> PointingMonitor::getCameraParametersLi
     string fDBserver = getDBServer() + "VOFFLINE";
     //std::cout<<"PointingMonitor::getCameraParametersList "<<std::endl;
     VDB_Connection my_connection( fDBserver.c_str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         cout << "PointingMonitor: failed to connect to database server" << endl;
         return parametersVec;
     }
-    if(!my_connection.make_query( strbuf.str().c_str() ) )
+    if( !my_connection.make_query( strbuf.str().c_str() ) )
     {
         return parametersVec;
     }
@@ -109,7 +109,7 @@ vector<pointingmonitor::CameraParameters> PointingMonitor::getCameraParametersLi
     for( int i = 0; i < fNRows; i++ )
     {
         TSQLRow* db_row = db_res->Next();
-        if(!db_row )
+        if( !db_row )
         {
             continue;
         }
@@ -172,12 +172,12 @@ vector<pointingmonitor::CalibrationParameters> PointingMonitor::getCalibrationPa
     string fDBserver = getDBServer() + "VOFFLINE";
     //std::cout<<"PointingMonitor::getCalibrationParametersList "<<std::endl;
     VDB_Connection my_connection( fDBserver.c_str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         cout << "PointingMonitor: failed to connect to database server" << endl;
         return parametersVec;
     }
-    if(!my_connection.make_query( strbuf.str().c_str() ) )
+    if( !my_connection.make_query( strbuf.str().c_str() ) )
     {
         return parametersVec;
     }
@@ -188,7 +188,7 @@ vector<pointingmonitor::CalibrationParameters> PointingMonitor::getCalibrationPa
     for( int i = 0; i < fNRows; i++ )
     {
         TSQLRow* db_row = db_res->Next();
-        if(!db_row )
+        if( !db_row )
         {
             continue;
         }
@@ -252,12 +252,12 @@ vector<pointingmonitor::UncalibratedPointing> PointingMonitor::getUncalibratedPo
     string fDBserver = getDBServer() + "VOFFLINE";
     //std::cout<<"PointingMonitor::getUncalibratedPointing "<<std::endl;
     VDB_Connection my_connection( fDBserver.c_str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         cout << "PointingMonitor: failed to connect to database server" << endl;
         return pointingVec;
     }
-    if(!my_connection.make_query( strbuf.str().c_str() ) )
+    if( !my_connection.make_query( strbuf.str().c_str() ) )
     {
         return  pointingVec;
     }
@@ -268,7 +268,7 @@ vector<pointingmonitor::UncalibratedPointing> PointingMonitor::getUncalibratedPo
     for( int i = 0; i < fNRows; i++ )
     {
         TSQLRow* db_row = db_res->Next();
-        if(!db_row )
+        if( !db_row )
         {
             continue;
         }
@@ -336,8 +336,8 @@ vector<pointingmonitor::CalibratedPointing> PointingMonitor::calibratedPointing(
         sin0 = sin( pointing.dec );
         dect = cos0 - dy * sin0;
         rat = pointing.ra + atan2( dx, dect );
-        dect = sqrt( dx* dx + dect* dect );
-        dect = atan2( dy* cos0 + sin0, dect );
+        dect = sqrt( dx * dx + dect * dect );
+        dect = atan2( dy * cos0 + sin0, dect );
 
         // rotation angle calculation is not yet implemented
         // float rot = pointing.rotation - camParameters.skyCameraRotation;

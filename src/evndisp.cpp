@@ -44,21 +44,21 @@ int main( int argc, char* argv[] )
 
     // read the command line parameters
     VReadRunParameter* fReadRunParameter = new VReadRunParameter();
-    if(!fReadRunParameter->readCommandline( argc, argv ) )
+    if( !fReadRunParameter->readCommandline( argc, argv ) )
     {
-        exit(-1 );
+        exit( -1 );
     }
     fReadRunParameter->getRunParameter()->print();
 
     // initialize main loop
     VEventLoop mainEventLoop( fReadRunParameter->getRunParameter() );
-    if(!mainEventLoop.initEventLoop() )
+    if( !mainEventLoop.initEventLoop() )
     {
-        exit(-1 );
+        exit( -1 );
     }
 
     // no display, command line mode
-    if(!fReadRunParameter->getRunParameter()->fdisplaymode )
+    if( !fReadRunParameter->getRunParameter()->fdisplaymode )
     {
         mainEventLoop.loop( fReadRunParameter->getRunParameter()->fnevents );
         fStopWatch.Stop();

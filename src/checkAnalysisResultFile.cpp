@@ -19,7 +19,7 @@ int main( int argc, char* argv[] )
     {
         cout << "./checkAnalysisResultFile <root file> [ntel]" << endl;
         cout << endl;
-        exit(-1 );
+        exit( -1 );
     }
     string iFile = argv[1];
     int ntel = 4;
@@ -34,7 +34,7 @@ int main( int argc, char* argv[] )
         exit( EXIT_FAILURE );
     }
     TTree* s = ( TTree* )iF.Get( "showerpars" );
-    if(!s )
+    if( !s )
     {
         cout << "missing showerpars tree in " << iFile << endl;
         exit( EXIT_FAILURE );
@@ -44,7 +44,7 @@ int main( int argc, char* argv[] )
     {
         sprintf( hname, "Tel_%d/tpars", i + 1 );
         TTree* t = ( TTree* )iF.Get( hname );
-        if(!t )
+        if( !t )
         {
             cout << "missing " << hname << " tree in " << iFile << endl;
             exit( EXIT_FAILURE );
@@ -60,7 +60,7 @@ int main( int argc, char* argv[] )
     for( unsigned int i = 0; i < i_objects.size(); i++ )
     {
         TNamed* r = ( TNamed* )iF.Get( i_objects[i].c_str() );
-        if(!r )
+        if( !r )
         {
             cout << "missing object " << i_objects[i] << " in " << iFile << endl;
             exit( EXIT_FAILURE );

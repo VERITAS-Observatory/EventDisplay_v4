@@ -66,20 +66,20 @@ void VAtmosphereSoundingData::setdefaultvalues( unsigned int iN )
     // set default values
     for( unsigned int i = 0; i < iN; i++ )
     {
-        fPressure_Pa.push_back(-9999. );
-        fHeight_m.push_back(-9999. );
-        fDensity_gcm3.push_back(-9999. );
-        fThickness_gcm2.push_back(-9999. );
-        fTemperature_K.push_back(-9999. );
-        fDewPoint_K.push_back(-9999. );
-        fRelativeHumidity.push_back(-9999. );
-        fVaporMassDensity_gm3.push_back(-9999. );
-        fMixingRatio_gkg.push_back(-9999. );
-        fWindDirection_deg.push_back(-9999. );
-        fWindSpeed_ms.push_back(-9999. );
-        fIndexofRefraction.push_back(-9999. );
-        fO2_cmkm.push_back(-9999. );
-        fO3_cmkm.push_back(-9999. );
+        fPressure_Pa.push_back( -9999. );
+        fHeight_m.push_back( -9999. );
+        fDensity_gcm3.push_back( -9999. );
+        fThickness_gcm2.push_back( -9999. );
+        fTemperature_K.push_back( -9999. );
+        fDewPoint_K.push_back( -9999. );
+        fRelativeHumidity.push_back( -9999. );
+        fVaporMassDensity_gm3.push_back( -9999. );
+        fMixingRatio_gkg.push_back( -9999. );
+        fWindDirection_deg.push_back( -9999. );
+        fWindSpeed_ms.push_back( -9999. );
+        fIndexofRefraction.push_back( -9999. );
+        fO2_cmkm.push_back( -9999. );
+        fO3_cmkm.push_back( -9999. );
     }
 }
 

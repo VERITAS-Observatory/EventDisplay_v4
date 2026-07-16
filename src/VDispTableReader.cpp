@@ -73,7 +73,7 @@ bool VDispTableReader::setHistoBinning( string iVariableName, int iBin, double i
             break;
         }
     }
-    if(!iFound )
+    if( !iFound )
     {
         cout << "VDispTableReader::setHistoBinning: invalid variable name; allowed are: " << endl;
         for( unsigned int i = 0; i < fHisto_ListOfVariables.size(); i++ )
@@ -182,21 +182,21 @@ bool VDispTableReader::initialize( bool iRead )
     // prepare data tree for writing
     //
     //////////////////////////////////////////////////////////////////////////////////////////////
-    if(!iRead )
+    if( !iRead )
     {
-        if(!isHistoBinningSet( "WidthOverLength" ) )
+        if( !isHistoBinningSet( "WidthOverLength" ) )
         {
             return false;
         }
-        if(!isHistoBinningSet( "ScaleLength" ) )
+        if( !isHistoBinningSet( "ScaleLength" ) )
         {
             return false;
         }
-        if(!isHistoBinningSet( "ScaleWidth" ) )
+        if( !isHistoBinningSet( "ScaleWidth" ) )
         {
             return false;
         }
-        if(!isHistoBinningSet( "Size" ) )
+        if( !isHistoBinningSet( "Size" ) )
         {
             return false;
         }
@@ -394,49 +394,49 @@ void VDispTableReader::reset()
 
 bool VDispTableReader::fill( float i_ze, unsigned int i_az, float i_az_min, float i_az_max, float i_woff, float i_meanPedvars, TH2* iH2D, TH2* iH2DN, TH2* iH2DPhi, TH2* iH2DMiss, TH3* iH3D, TH3* iH3DN, TH3* iH3DPhi, TH3* iH3DMiss )
 {
-    if(!iH2D || !iH2DN || !iH2DPhi || !iH2DMiss )
+    if( !iH2D || !iH2DN || !iH2DPhi || !iH2DMiss )
     {
         return false;
     }
-    if(!iH3D || !iH3DN || !iH3DPhi || !iH3DMiss )
-    {
-        return false;
-    }
-
-    if(!h2D_DispTable )
-    {
-        return false;
-    }
-    if(!h2D_DispPhiTable )
-    {
-        return false;
-    }
-    if(!h2D_DispTableN )
-    {
-        return false;
-    }
-    if(!h2D_DispMissTable )
-    {
-        return false;
-    }
-    if(!h3D_DispTable )
-    {
-        return false;
-    }
-    if(!h3D_DispPhiTable )
-    {
-        return false;
-    }
-    if(!h3D_DispTableN )
-    {
-        return false;
-    }
-    if(!h3D_DispMissTable )
+    if( !iH3D || !iH3DN || !iH3DPhi || !iH3DMiss )
     {
         return false;
     }
 
-    if(!fData )
+    if( !h2D_DispTable )
+    {
+        return false;
+    }
+    if( !h2D_DispPhiTable )
+    {
+        return false;
+    }
+    if( !h2D_DispTableN )
+    {
+        return false;
+    }
+    if( !h2D_DispMissTable )
+    {
+        return false;
+    }
+    if( !h3D_DispTable )
+    {
+        return false;
+    }
+    if( !h3D_DispPhiTable )
+    {
+        return false;
+    }
+    if( !h3D_DispTableN )
+    {
+        return false;
+    }
+    if( !h3D_DispMissTable )
+    {
+        return false;
+    }
+
+    if( !fData )
     {
         return false;
     }
@@ -612,7 +612,7 @@ int VDispTableReader::getTreeEntryFinder( unsigned int iID )
 
     for( map<unsigned int, int>::iterator i_iter = fTreeEntry_Map.begin(); i_iter != fTreeEntry_Map.end(); ++i_iter )
     {
-        cout << (*i_iter ).first << "\t" << (*i_iter ).second << endl;
+        cout << ( *i_iter ).first << "\t" << ( *i_iter ).second << endl;
     }
 
     return 0;
@@ -653,7 +653,7 @@ float VDispTableReader::getLowerZe( float iZe )
 {
     unsigned int i_ze_bin_up  = 0;
     unsigned int i_ze_bin_low = 0;
-    getIndexBoundary(&i_ze_bin_up, &i_ze_bin_low, f_ze, iZe );
+    getIndexBoundary( &i_ze_bin_up, &i_ze_bin_low, f_ze, iZe );
 
     return f_ze[i_ze_bin_low];
 }
@@ -662,7 +662,7 @@ float VDispTableReader::getUpperZe( float iZe )
 {
     unsigned int i_ze_bin_up  = 0;
     unsigned int i_ze_bin_low = 0;
-    getIndexBoundary(&i_ze_bin_up, &i_ze_bin_low, f_ze, iZe );
+    getIndexBoundary( &i_ze_bin_up, &i_ze_bin_low, f_ze, iZe );
 
     return f_ze[i_ze_bin_up];
 }
@@ -704,7 +704,7 @@ int VDispTableReader::getTreeEntryFinder( float iZe, float iAz, float iWoff, flo
     {
         unsigned int i_ze_bin_up  = 0;
         unsigned int i_ze_bin_low = 0;
-        getIndexBoundary(&i_ze_bin_up, &i_ze_bin_low, f_ze, iZe );
+        getIndexBoundary( &i_ze_bin_up, &i_ze_bin_low, f_ze, iZe );
         if( iZe_Inter == 1 )
         {
             i_ze_bin = i_ze_bin_low;

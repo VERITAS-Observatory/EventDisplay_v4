@@ -37,12 +37,12 @@ void VPedestalLowGain::setChannelNumberRange( unsigned int iChannel1_min, unsign
 bool VPedestalLowGain::readLowGainPedestalFiles( string iFile1, string iFile2 )
 {
     fFile1 = readLowGainHistograms( iFile1, fChannel1_min, fChannel1_max );
-    if(!fFile1 )
+    if( !fFile1 )
     {
         return false;
     }
     fFile2 = readLowGainHistograms( iFile2, fChannel2_min, fChannel2_max );
-    if(!fFile2 )
+    if( !fFile2 )
     {
         return false;
     }
@@ -63,7 +63,7 @@ TFile* VPedestalLowGain::readLowGainHistograms( string iFile, unsigned int iChan
         return fFile;
     }
     sprintf( hname, "distributions_%d", fTelescopeID );
-    if(!fFile->cd( hname ) && !fFile->cd( "distributions" ) )
+    if( !fFile->cd( hname ) && !fFile->cd( "distributions" ) )
     {
         cout << "VPedestalLowGain::readLowGainHistograms error reading " << fFile->GetName() << ": " <<  endl;
         cout << "VPedestalLowGain::readLowGainHistograms could not find directory \'distributions\' nor " << hname << endl;
@@ -92,7 +92,7 @@ TFile* VPedestalLowGain::readLowGainHistograms( string iFile, unsigned int iChan
     sprintf( hname, "%s", iFile.c_str() );
     ifstream is;
     is.open( hname, ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "VPedestalLowGain::readLowGainHistograms error reading " << hname << endl;
     }
@@ -153,7 +153,7 @@ bool VPedestalLowGain::writeLowGainPedestalFile( string iOutFileName )
     sprintf( hname, "%s", iOutFileName.c_str() );
     ofstream is;
     is.open( hname, ifstream::out );
-    if(!is )
+    if( !is )
     {
         cout << "VPedestalLowGain::writeLowGainPedestalFile error reading " << hname << endl;
     }
@@ -220,7 +220,7 @@ vector< double > VPedestalLowGain::readPedestalFiles( string iFile )
     // read text file
     ifstream is;
     is.open( iFile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "VPedestalLowGain::readLowGainHistograms error reading " << iFile << endl;
         return iPed;

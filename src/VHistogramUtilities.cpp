@@ -31,7 +31,7 @@ TH1D* VHistogramUtilities::get_ResidualHistogram_from_TF1( string iname, TH1* h,
     {
         return 0;
     }
-    if(!h || !f )
+    if( !h || !f )
     {
         return 0;
     }
@@ -65,7 +65,7 @@ TH1D* VHistogramUtilities::get_ResidualHistogram_from_TF1( string iname, TH1* h,
 */
 TGraphErrors* VHistogramUtilities::get_Profile_from_TH2D( TH2D* iP, TGraphErrors* g, string iMeanType, int rbin, double iXaxisValue, double iMinusValue )
 {
-    if(!iP )
+    if( !iP )
     {
         return 0;
     }
@@ -150,7 +150,7 @@ TGraphErrors* VHistogramUtilities::get_Profile_from_TH2D( TH2D* iP, TGraphErrors
             g->SetPoint( z, ( x1 + x2 ) / 2., ( y1 + y2 ) / 2. );
             z++;
         }
-        g->Set(( int )( g->GetN() / rbin ) );
+        g->Set( ( int )( g->GetN() / rbin ) );
     }
     return g;
 }
@@ -166,7 +166,7 @@ TGraphErrors* VHistogramUtilities::get_Profile_from_TH2D( TH2D* iP, TGraphErrors
 
 TH2* VHistogramUtilities::interpolateResponseMatrix( TH2* hResponseMatrix, string iNewHistoName )
 {
-    if(!hResponseMatrix )
+    if( !hResponseMatrix )
     {
         return 0;
     }
@@ -262,7 +262,7 @@ TH2* VHistogramUtilities::interpolateResponseMatrix( TH2* hResponseMatrix, strin
 */
 bool VHistogramUtilities::normalizeTH2D_y( TH2* h )
 {
-    if(!h )
+    if( !h )
     {
         return false;
     }
@@ -293,7 +293,7 @@ bool VHistogramUtilities::normalizeTH2D_y( TH2* h )
 */
 bool VHistogramUtilities::normalizeTH2D_x( TH2* h )
 {
-    if(!h )
+    if( !h )
     {
         return false;
     }
@@ -319,7 +319,7 @@ bool VHistogramUtilities::normalizeTH2D_x( TH2* h )
 
 TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormalize, bool iLeft_to_right, double i_bin_value, double i_min_value )
 {
-    if(!iH_in )
+    if( !iH_in )
     {
         return 0;
     }
@@ -396,7 +396,7 @@ regioncode:  extra specifier for additional region cuts
 TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, double rSource, bool iDiff, TH2D* hTest,
         int iExcN, float* iExcX, float* iExcY, float* iExcR1, float* iExcR2, float* iExcTheta, string regioncode )
 {
-    if(!h )
+    if( !h )
     {
         return 0;
     }
@@ -521,7 +521,7 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
             bool iBBreak = false;
             for( int e = 0; e < iExcN; e++ )
             {
-                if( TMath::Power((( x_r - iExcX[e] ) * TMath::Cos( iExcTheta[e] * TMath::DegToRad() ) + ( y_r - iExcY[e] ) * TMath::Sin( iExcTheta[e] * TMath::DegToRad() ) ) / iExcR1[e], 2 ) + TMath::Power((( x_r - iExcX[e] ) * TMath::Sin( iExcTheta[e] * TMath::DegToRad() ) - ( y_r - iExcY[e] ) * TMath::Cos( iExcTheta[e] * TMath::DegToRad() ) ) / iExcR2[e], 2 ) < 1. )
+                if( TMath::Power( ( ( x_r - iExcX[e] ) * TMath::Cos( iExcTheta[e] * TMath::DegToRad() ) + ( y_r - iExcY[e] ) * TMath::Sin( iExcTheta[e] * TMath::DegToRad() ) ) / iExcR1[e], 2 ) + TMath::Power( ( ( x_r - iExcX[e] ) * TMath::Sin( iExcTheta[e] * TMath::DegToRad() ) - ( y_r - iExcY[e] ) * TMath::Cos( iExcTheta[e] * TMath::DegToRad() ) ) / iExcR2[e], 2 ) < 1. )
                 {
                     iBBreak = true;
                     break;
@@ -544,7 +544,7 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 bool VHistogramUtilities::get_Graph_from_Histogram( TH1* h, TGraphErrors* g, bool bIgnoreErrors, double iMinBinContent,
         double iXmin, double iXmax )
 {
-    if(!h || !g )
+    if( !h || !g )
     {
         return false;
     }
@@ -580,7 +580,7 @@ bool VHistogramUtilities::get_Graph_from_Histogram( TH1* h, TGraphErrors* g, boo
 bool VHistogramUtilities::get_Graph_from_Histogram( TH1* h, TGraphAsymmErrors* g, bool bIgnoreErrors, bool bLinXaxis,
         double iCutUnrealisticErrors, double iXmin, double iXmax )
 {
-    if(!h || !g )
+    if( !h || !g )
     {
         return false;
     }
@@ -617,7 +617,7 @@ bool VHistogramUtilities::get_Graph_from_Histogram( TH1* h, TGraphAsymmErrors* g
                     g->SetPointEYhigh( z, h->GetBinError( i ) );
                 }
             }
-            if(!bLinXaxis )
+            if( !bLinXaxis )
             {
                 g->SetPoint( z, h->GetXaxis()->GetBinCenter( i ), h->GetBinContent( i ) );
                 g->SetPointEXlow( z, h->GetXaxis()->GetBinCenter( i ) - h->GetXaxis()->GetBinLowEdge( i ) );
@@ -665,13 +665,13 @@ TH1F* VHistogramUtilities::get_CTA_IRF_Histograms( string iHistogramName, double
     {
         sprintf( hname, "%s_offaxis", iHistogramName.c_str() );
         h2D = ( TH2F* )gDirectory->Get( hname );
-        if(!h2D )
+        if( !h2D )
         {
             return 0;
         }
         sprintf( hname, "%s_px", h2D->GetName() );
         h = ( TH1F* )h2D->ProjectionX( hname, h2D->GetYaxis()->FindBin( iCameraOffset ), h2D->GetYaxis()->FindBin( iCameraOffset ) );
-        if(!h )
+        if( !h )
         {
             return 0;
         }
@@ -710,7 +710,7 @@ TH1F* VHistogramUtilities::get_CTA_IRF_Histograms_from2D( string iHistogramName,
 
 int VHistogramUtilities::findBinInGraph( TGraph* g, double x )
 {
-    if(!g )
+    if( !g )
     {
         return -1;
     }
@@ -736,7 +736,7 @@ int VHistogramUtilities::findBinInGraph( TGraph* g, double x )
 
 TH1* VHistogramUtilities::normalizeTH1( TH1* h, bool iIntegral )
 {
-    if(!h )
+    if( !h )
     {
         return 0;
     }
@@ -774,7 +774,7 @@ TH1* VHistogramUtilities::normalizeTH1( TH1* h, bool iIntegral )
 
 bool VHistogramUtilities::divide( TGraphAsymmErrors* g, TGraphAsymmErrors* g1, TGraph* g2, double epsilon )
 {
-    if(!g || !g1 || !g2 )
+    if( !g || !g1 || !g2 )
     {
         return false;
     }
@@ -805,7 +805,7 @@ bool VHistogramUtilities::divide( TGraphAsymmErrors* g, TGraphAsymmErrors* g1, T
 
 bool VHistogramUtilities::divide( TGraphAsymmErrors* g, TGraphAsymmErrors* g1, TGraphAsymmErrors* g2, double epsilon )
 {
-    if(!g || !g1 || !g2 )
+    if( !g || !g1 || !g2 )
     {
         return false;
     }
@@ -831,7 +831,7 @@ bool VHistogramUtilities::divide( TGraphAsymmErrors* g, TGraphAsymmErrors* g1, T
 
                 double iErr1 = 1. / y1 * 0.5 * ( g1->GetErrorYhigh( i ) + g1->GetErrorYlow( i ) );
                 double iErr2 = 1. / y2 * 0.5 * ( g2->GetErrorYhigh( j ) + g2->GetErrorYlow( j ) );
-                double yErr = y * sqrt( iErr1* iErr1 + iErr2* iErr2 );
+                double yErr = y * sqrt( iErr1 * iErr1 + iErr2 * iErr2 );
                 g->SetPointError( z, g1->GetErrorXlow( i ), g1->GetErrorXhigh( i ), yErr, yErr );
                 z++;
                 break;
@@ -849,7 +849,7 @@ bool VHistogramUtilities::divide( TGraphAsymmErrors* g, TGraphAsymmErrors* g1, T
 */
 double VHistogramUtilities::interpolateTH2D( TH2* h, double x, double y )
 {
-    if(!h )
+    if( !h )
     {
         return 0.;
     }
@@ -865,7 +865,7 @@ double VHistogramUtilities::interpolateTH2D( TH2* h, double x, double y )
 
 TH2D* VHistogramUtilities::calculateContainmentDistance( TH2D* h, string inewHistogramName )
 {
-    if(!h )
+    if( !h )
     {
         return 0;
     }
@@ -908,7 +908,7 @@ TH2D* VHistogramUtilities::calculateContainmentDistance( TH2D* h, string inewHis
 */
 TH2F* VHistogramUtilities::reduce2DHistogramSize( TH2* h, string inewHistogramName )
 {
-    if(!h )
+    if( !h )
     {
         return 0;
     }

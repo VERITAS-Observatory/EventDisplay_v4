@@ -42,7 +42,7 @@ CData::CData( TTree* tree, bool bMC, bool bShort, string file_name, string stere
 
 CData::~CData()
 {
-    if(!fChain )
+    if( !fChain )
     {
         return;
     }
@@ -62,7 +62,7 @@ CData::~CData()
 
 Int_t CData::GetEntry( Long64_t entry )
 {
-    if(!fChain )
+    if( !fChain )
     {
         return 0;
     }
@@ -87,7 +87,7 @@ Int_t CData::GetEntry( Long64_t entry )
 
 Long64_t CData::LoadTree( Long64_t entry )
 {
-    if(!fChain )
+    if( !fChain )
     {
         return -5;
     }
@@ -151,7 +151,7 @@ void CData::Init( TTree* tree )
 
     fChain->SetBranchAddress( "runNumber", &runNumber );
     fChain->SetBranchAddress( "eventNumber", &eventNumber );
-    if(!fShort )
+    if( !fShort )
     {
         fChain->SetBranchAddress( "MJD", &MJD );
         fChain->SetBranchAddress( "Time", &Time );
@@ -163,7 +163,7 @@ void CData::Init( TTree* tree )
     }
     fChain->SetBranchAddress( "TelElevation", TelElevation );
     fChain->SetBranchAddress( "TelAzimuth", TelAzimuth );
-    if(!fShort )
+    if( !fShort )
     {
         fChain->SetBranchAddress( "TelDec", TelDec );
         fChain->SetBranchAddress( "TelRA", TelRA );
@@ -194,7 +194,7 @@ void CData::Init( TTree* tree )
         fChain->SetBranchAddress( "MCe0", &MCe0 );
         fChain->SetBranchAddress( "MCxcore", &MCxcore );
         fChain->SetBranchAddress( "MCycore", &MCycore );
-        if(!fShort )
+        if( !fShort )
         {
             fChain->SetBranchAddress( "MCxcore_SC", &MCxcore_SC );
             fChain->SetBranchAddress( "MCycore_SC", &MCycore_SC );
@@ -234,7 +234,7 @@ void CData::Init( TTree* tree )
     fChain->SetBranchAddress( "img2_ang", &img2_ang );
     fChain->SetBranchAddress( "Ze", &Ze );
     fChain->SetBranchAddress( "Az", &Az );
-    if(!fShort )
+    if( !fShort )
     {
         fChain->SetBranchAddress( "ra", &ra );
         fChain->SetBranchAddress( "dec", &dec );
@@ -254,7 +254,7 @@ void CData::Init( TTree* tree )
         fChain->SetBranchAddress( "Yoff_derot", &Yoff_derot );
     }
 
-    if(!fShort )
+    if( !fShort )
     {
         fChain->SetBranchAddress( "stdS", &stdS );
         fChain->SetBranchAddress( "theta2", &theta2 );
@@ -266,7 +266,7 @@ void CData::Init( TTree* tree )
     }
     fChain->SetBranchAddress( "Xcore", &Xcore );
     fChain->SetBranchAddress( "Ycore", &Ycore );
-    if(!fShort )
+    if( !fShort )
     {
         fChain->SetBranchAddress( "Xcore_SC", &Xcore_SC );
         fChain->SetBranchAddress( "Ycore_SC", &Ycore_SC );
@@ -278,7 +278,7 @@ void CData::Init( TTree* tree )
     fChain->SetBranchAddress( "stdP", &stdP );
     fChain->SetBranchAddress( "Chi2", &Chi2 );
     fChain->SetBranchAddress( "meanPedvar_Image", &meanPedvar_Image );
-    if(!fShort )
+    if( !fShort )
     {
         fChain->SetBranchAddress( "meanPedvar_ImageT", meanPedvar_ImageT );
     }
@@ -307,7 +307,7 @@ void CData::Init( TTree* tree )
         }
     }
 
-    if(!fShort )
+    if( !fShort )
     {
         fChain->SetBranchAddress( "dist", dist );
         fChain->SetBranchAddress( "size", size );
@@ -407,7 +407,7 @@ void CData::Init( TTree* tree )
         }
     }
     fChain->SetBranchAddress( "R_core", R_core );
-    if(!fShort )
+    if( !fShort )
     {
         fChain->SetBranchAddress( "MSCWT", MSCWT );
         fChain->SetBranchAddress( "MSCWTSigma", MSCWTSigma );
@@ -424,7 +424,7 @@ void CData::Init( TTree* tree )
             MSCLTSigma[i] = 0.;
         }
     }
-    if(!fShort )
+    if( !fShort )
     {
         fChain->SetBranchAddress( "ES", ES );
         fChain->SetBranchAddress( "E", E );
@@ -437,7 +437,7 @@ void CData::Init( TTree* tree )
             E[i] = 0.;
         }
     }
-    if(!fShort )
+    if( !fShort )
     {
         fChain->SetBranchAddress( "NMSCW", &NMSCW );
     }
@@ -477,7 +477,7 @@ void CData::Init( TTree* tree )
     fChain->SetBranchAddress( "EmissionHeight", &EmissionHeight );
     fChain->SetBranchAddress( "EmissionHeightChi2", &EmissionHeightChi2 );
     fChain->SetBranchAddress( "NTelPairs", &NTelPairs );
-    if(!fShort && fChain->GetBranchStatus( "EmissionHeightT" ) )
+    if( !fShort && fChain->GetBranchStatus( "EmissionHeightT" ) )
     {
         fChain->SetBranchAddress( "EmissionHeightT", EmissionHeightT );
     }
@@ -827,8 +827,8 @@ pair<float, float> CData::get_XYoff_derot( unsigned int iMethod )
 void CData::reconstruct_3tel_images( unsigned long int telescope_combination )
 {
     reconstruct_3tel_reset_variables();
-    bitset<sizeof(long int ) * 4> tel_bitset( telescope_combination );
-    bitset<sizeof(long int ) * 4> tel_nimages( 0 );
+    bitset<sizeof( long int ) * 4> tel_bitset( telescope_combination );
+    bitset<sizeof( long int ) * 4> tel_nimages( 0 );
     int NImages_saved = ( int )NImages;
 
     // update list of available images
@@ -1018,7 +1018,7 @@ void CData::reconstruct_3tel_images_direction()
         size, cen_x, cen_y, cosphi, sinphi, width, length, img_weight );
     Xcore = i_SR.fShower_Xcore;
     Ycore = i_SR.fShower_Ycore;
-    bitset<sizeof(long int ) * 4> tel_nimages( ImgSel );
+    bitset<sizeof( long int ) * 4> tel_nimages( ImgSel );
     for( unsigned int t = 0; t < fTelX.size(); t++ )
     {
         R_core[t] = -9999.;
@@ -1088,7 +1088,7 @@ TTree* CData::getXGBTree( string file_name, string file_suffix, string tree_name
         file_name += "." + file_suffix + ".root";
     }
     TFile *iFile = TFile::Open( file_name.c_str() );
-    if(!iFile || iFile->IsZombie() )
+    if( !iFile || iFile->IsZombie() )
     {
         cout << "CData warning: cannot open XGB file " << file_name << endl;
         cout << "(this might be ok if no XGB analysis results are requested)" << endl;
@@ -1098,7 +1098,7 @@ TTree* CData::getXGBTree( string file_name, string file_suffix, string tree_name
     fXGBFiles.push_back( iFile );
 
     TTree* iXGB_tree = ( TTree* )iFile->Get( tree_name.c_str() );
-    if(!iXGB_tree )
+    if( !iXGB_tree )
     {
         cout << "CData Error: cannot find " << tree_name << " tree in " << file_name << endl;
         exit( EXIT_FAILURE );

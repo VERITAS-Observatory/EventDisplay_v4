@@ -29,7 +29,7 @@ using namespace VConfigMaskUtil;
 void usage( char* prog )
 {
     cout << "Usage: " << prog << " [listOfFiles] [output.vbf] [newRunNumber]" << endl;
-    exit(-1 );
+    exit( -1 );
 }
 
 int main( int argc, char** argv )
@@ -44,10 +44,10 @@ int main( int argc, char** argv )
 
     ifstream infile;
     infile.open( argv[1] );
-    if(!infile.is_open() )
+    if( !infile.is_open() )
     {
         cerr << "Couldn't open " << argv[1] << endl;
-        exit(-1 );
+        exit( -1 );
     }
 
     int newRunNumber = 0;

@@ -109,7 +109,7 @@ bool VPlotSensitivityfromLisFiles::addLisFile( string iFile, string iCut )
 {
     ifstream is;
     is.open( iFile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "VPlotSensitivityfromLisFiles::addLisFile: error opening input file: " << iFile << endl;
         return false;
@@ -143,7 +143,7 @@ bool VPlotSensitivityfromLisFiles::addLisFile( string iFile, string iCut )
             cout << "adding new data set " << fData.size() << endl;
             continue;
         }
-        else if(!bContinue )
+        else if( !bContinue )
         {
             continue;
         }
@@ -168,7 +168,7 @@ bool VPlotSensitivityfromLisFiles::addLisFile( string iFile, string iCut )
                     fData.back()->fVar[fVarName[i]].push_back( log10( 0.5 * ( TMath::Power( 10., fData.back()->fVar["E1"].back() ) + TMath::Power( 10., fData.back()->fVar["E2"].back() ) ) ) );
                     continue;
                 }
-                if(!( is_stream >> std::ws ).eof() )
+                if( !( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> temp;
                     fData.back()->fVar[fVarName[i]].push_back( atof( temp.c_str() ) );
@@ -203,10 +203,10 @@ bool VPlotSensitivityfromLisFiles::printDataSet( unsigned int iID )
     map< string, vector< double > >::iterator fVarIter;
     for( fVarIter = fData[iID]->fVar.begin(); fVarIter != fData[iID]->fVar.end(); fVarIter++ )
     {
-        cout << (*fVarIter ).first << "\t" << (*fVarIter ).second.size();
-        for( unsigned int i = 0; i < (*fVarIter ).second.size(); i++ )
+        cout << ( *fVarIter ).first << "\t" << ( *fVarIter ).second.size();
+        for( unsigned int i = 0; i < ( *fVarIter ).second.size(); i++ )
         {
-            cout << "\t" << (*fVarIter ).second[i];
+            cout << "\t" << ( *fVarIter ).second[i];
         }
         cout << endl;
     }
@@ -248,7 +248,7 @@ TCanvas* VPlotSensitivityfromLisFiles::plot( string iVName, unsigned int iID, TC
         return 0;
     }
 
-    if(!checkVarName( iVName ) )
+    if( !checkVarName( iVName ) )
     {
         cout << "VPlotSensitivityfromLisFiles::plot error: variable not found: " << iVName << endl;
         return 0;
@@ -257,7 +257,7 @@ TCanvas* VPlotSensitivityfromLisFiles::plot( string iVName, unsigned int iID, TC
     char hname[800];
     char htitle[800];
 
-    if(!c )
+    if( !c )
     {
         sprintf( hname, "c_%s_%d", iVName.c_str(), iID );
         sprintf( htitle, "%s (%d)", iVName.c_str(), iID );
@@ -404,7 +404,7 @@ bool VPlotSensitivityfromLisFiles::applycuts( double amp, double NTel, double NP
     for( a = fRemoveID.begin(); a != fRemoveID.end(); a++ )
     {
         cout << "removing data set with ID " << *a << endl;
-        removeDataSet(*a );
+        removeDataSet( *a );
     }
 
     return true;

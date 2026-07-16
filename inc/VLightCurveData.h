@@ -96,7 +96,7 @@ class VLightCurveDataLessThan
 
         bool operator()( const VLightCurveData* a, const VLightCurveData* b )
         {
-            if(!a || !b )
+            if( !a || !b )
             {
                 return false;
             }

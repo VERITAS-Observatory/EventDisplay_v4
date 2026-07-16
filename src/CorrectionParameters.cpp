@@ -53,7 +53,7 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
     Debug::stream()
             << "DO: In "
             << Angle::toDeg( el_driveangle ) << ' '
-            << Angle::toDeg( az_driveangle ) << std::endl;
+                    << Angle::toDeg( az_driveangle ) << std::endl;
 #endif
 
     double az = az_driveangle;
@@ -62,19 +62,19 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
     double az1;
     double az2;
 
-    if(( enable_offsets ) && ( do_corrections ) && ( enable_corrections ) )
-    {
-        // ----------------------------------------------------------------------
-        // 1: Compensate for flexure in the mount
-        // ----------------------------------------------------------------------
+    if( ( enable_offsets ) && ( do_corrections ) && ( enable_corrections ) )
+{
+    // ----------------------------------------------------------------------
+    // 1: Compensate for flexure in the mount
+    // ----------------------------------------------------------------------
 
-        // I can see this perhaps been more appropriate as correction 4,
-        // but lets see how we get on with it here. Also there is an
-        // elevation effect on azimuth, and an effect /of/ azimuth on
-        // both elevation and azimuth but I expect them to be small.
+    // I can see this perhaps been more appropriate as correction 4,
+    // but lets see how we get on with it here. Also there is an
+    // elevation effect on azimuth, and an effect /of/ azimuth on
+    // both elevation and azimuth but I expect them to be small.
 
-        // zero at zenith
-        el = el - ( flex_el_A* cos( el ) + flex_el_B* sin( 2 * el ) );
+    // zero at zenith
+    el = el - ( flex_el_A * cos( el ) + flex_el_B * sin( 2 * el ) );
 
         // Transform to Cartesians for next corrections
         double ud = sin( el );
@@ -85,8 +85,8 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
         // 2: Rotate to account for non-level AZ plane
         // ----------------------------------------------------------------------
 
-        Angle::rotateCartesians(-az_ew, ew, ud );
-        Angle::rotateCartesians(-az_ns, ns, ud );
+        Angle::rotateCartesians( -az_ew, ew, ud );
+        Angle::rotateCartesians( -az_ns, ns, ud );
 
         // ----------------------------------------------------------------------
         // 3: Account for focal plane misalignment perp to the EL drive axis
@@ -99,21 +99,21 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
         // Initial guess: just do the transformations in
         // reverse.. should get us close to the correct point.
         az = atan2( ew, ns );
-        el = atan2( ud, sqrt( ns* ns + ew* ew ) );
+        el = atan2( ud, sqrt( ns * ns + ew * ew ) );
 
         ud = 0.0;
-        ns = cos(-fp_az );
-        ew = sin(-fp_az );
+        ns = cos( -fp_az );
+        ew = sin( -fp_az );
 
         Angle::rotateCartesians( el, ns, ud );
-        Angle::rotateCartesians(-el_udew, ew, ud );
+        Angle::rotateCartesians( -el_udew, ew, ud );
         Angle::rotateCartesians( az, ns, ew );
 
         // xaz and xel are estimates of the drive az and el which would
         // give the real az and el if they were uncorrected using the
         // undoCorrections routines below
         double xaz = atan2( ew, ns );
-        double xel = atan2( ud, sqrt( ew* ew + ns* ns ) );
+        double xel = atan2( ud, sqrt( ew * ew + ns * ns ) );
 
         SphericalCoords here = SphericalCoords::makeLatLongRad( el, az );
         SphericalCoords there;
@@ -130,8 +130,8 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
             Angle::rotateCartesians( xaz, ns, ew );
             // ------------------------------------------------------------------
 
-            there = SphericalCoords::makeLatLongRad( atan2( ud, sqrt( ew* ew + ns* ns ) ),
-                    atan2( ew, ns ) );
+            there = SphericalCoords::makeLatLongRad( atan2( ud, sqrt( ew * ew + ns * ns ) ),
+                atan2( ew, ns ) );
 
 #if 0
             Debug::stream()
@@ -154,7 +154,7 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
             xel = Angle::makeRad( xel - ( there.latitudeRad() - el ) ).radPM180();
             i++;
         }
-        while(( here.separation( there ) > sc_inversion_tol ) &&
+        while( ( here.separation( there ) > sc_inversion_tol ) &&
                 ( i < sc_inversion_it_max ) );
 
         if( here.separation( there ) > sc_inversion_tol )
@@ -187,60 +187,60 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
     // 6: Subtract Offsets
     // --------------------------------------------------------------------------
 
-    if(( enable_offsets ) && ( do_corrections ) )
-    {
-        az1 = az1 - az_offset;
-        az2 = az2 - az_offset;
-        el = el - el_offset;
-    }
+    if( ( enable_offsets ) && ( do_corrections ) )
+{
+    az1 = az1 - az_offset;
+    az2 = az2 - az_offset;
+    el = el - el_offset;
+}
 
-    az1 = fmod( fmod( az1, Angle::sc_twoPi ) + Angle::sc_twoPi, Angle::sc_twoPi );
-    az2 = az1 - Angle::sc_twoPi;
+az1 = fmod( fmod( az1, Angle::sc_twoPi ) + Angle::sc_twoPi, Angle::sc_twoPi );
+az2 = az1 - Angle::sc_twoPi;
 
-    // never happen
-    if(( az1 > sc_lim_az_cw ) && ( az2 < sc_lim_az_cc ) )
-    {
-        return false;
-    }
-    else if( az1 > sc_lim_az_cw )
-    {
-        az = az2;
-    }
-    else if( az2 < sc_lim_az_cc )
-    {
-        az = az1;
-    }
-    else if( fabs( az1 - tel_az_driveangle ) <= fabs( az2 - tel_az_driveangle ) )
-    {
-        az = az1;
-    }
-    else
-    {
-        az = az2;
-    }
-
-#if 0
-    if( el > Angle::sc_halfPi )      -- THIS IS WRONG WE JUST HAVE TO ALLOW THE
-    {
-        -- ELEVATION TO GO GREATER THAN 90 AND LESS
-        el = Angle::sc_Pi - el;
-        -- THAN ZERO OR PREFERABLY USE THE INBUILT
-        az = az + Angle::sc_Pi;
-        -- OFFSETS
-    }
-#endif
-
-    el_driveangle = el;
-    az_driveangle = az;
+// never happen
+if( ( az1 > sc_lim_az_cw ) && ( az2 < sc_lim_az_cc ) )
+{
+    return false;
+}
+else if( az1 > sc_lim_az_cw )
+{
+    az = az2;
+}
+else if( az2 < sc_lim_az_cc )
+{
+    az = az1;
+}
+else if( fabs( az1 - tel_az_driveangle ) <= fabs( az2 - tel_az_driveangle ) )
+{
+    az = az1;
+}
+else
+{
+    az = az2;
+}
 
 #if 0
-    Debug::stream()
-            << "DO: Out: "
-            << Angle::toDeg( el_driveangle ) << ' '
-            << Angle::toDeg( az_driveangle ) << std::endl;
+if( el > Angle::sc_halfPi )      -- THIS IS WRONG WE JUST HAVE TO ALLOW THE
+{
+    -- ELEVATION TO GO GREATER THAN 90 AND LESS
+    el = Angle::sc_Pi - el;
+    -- THAN ZERO OR PREFERABLY USE THE INBUILT
+    az = az + Angle::sc_Pi;
+    -- OFFSETS
+}
 #endif
 
-    return true;
+el_driveangle = el;
+az_driveangle = az;
+
+#if 0
+Debug::stream()
+        << "DO: Out: "
+        << Angle::toDeg( el_driveangle ) << ' '
+        << Angle::toDeg( az_driveangle ) << std::endl;
+#endif
+
+return true;
 }
 
 
@@ -248,10 +248,10 @@ void CorrectionParameters::
 undoAzElCorrections( double& az_driveangle, double& el_driveangle,
                      bool do_corrections ) const
 {
-    if((!enable_offsets ) || (!do_corrections ) )
-    {
-        SphericalCoords sc =
-            SphericalCoords::makeLatLongRad( el_driveangle, az_driveangle );
+    if( ( !enable_offsets ) || ( !do_corrections ) )
+{
+    SphericalCoords sc =
+        SphericalCoords::makeLatLongRad( el_driveangle, az_driveangle );
         az_driveangle = sc.phiRad();
         el_driveangle = sc.latitudeRad();
         return;
@@ -273,22 +273,22 @@ undoAzElCorrections( double& az_driveangle, double& el_driveangle,
 
 #if 0
     if( el > Angle::sc_halfPi )      -- THIS IS WRONG WE JUST HAVE TO ALLOW THE
-    {
-        -- ELEVATION TO GO GREATER THAN 90 AND LESS
-        el = Angle::sc_Pi - el;
-        -- THAN ZERO OR PREFERABLY USE THE INBUILT
-        az = az + Angle::sc_Pi;
-        -- OFFSETS
-    }
+{
+    -- ELEVATION TO GO GREATER THAN 90 AND LESS
+    el = Angle::sc_Pi - el;
+    -- THAN ZERO OR PREFERABLY USE THE INBUILT
+    az = az + Angle::sc_Pi;
+    -- OFFSETS
+}
 #endif
 
-    if( enable_corrections )
-    {
-        // ----------------------------------------------------------------------
-        // 2: Remove gear ratio scaling
-        // ----------------------------------------------------------------------
+if( enable_corrections )
+{
+    // ----------------------------------------------------------------------
+    // 2: Remove gear ratio scaling
+    // ----------------------------------------------------------------------
 
-        az = fmod( az* az_ratio + Angle::sc_twoPi, Angle::sc_twoPi );
+    az = fmod( az * az_ratio + Angle::sc_twoPi, Angle::sc_twoPi );
         el = el * el_ratio;
 
         // ----------------------------------------------------------------------
@@ -318,7 +318,7 @@ undoAzElCorrections( double& az_driveangle, double& el_driveangle,
 
         // Back to Spherical coordinates
         az = atan2( ew, ns );
-        el = atan2( ud, sqrt( ew* ew + ns* ns ) );
+        el = atan2( ud, sqrt( ew * ew + ns * ns ) );
 
         // ----------------------------------------------------------------------
         // 6: Compensate for flexure in the mount
@@ -336,10 +336,10 @@ undoAzElCorrections( double& az_driveangle, double& el_driveangle,
         do
         {
             last_el = el;
-            el = real_el + ( flex_el_A* cos( el ) + flex_el_B* sin( 2 * el ) );
+            el = real_el + ( flex_el_A * cos( el ) + flex_el_B * sin( 2 * el ) );
             i++;
         }
-        while(( fabs( last_el - el ) > sc_inversion_tol ) &&
+        while( ( fabs( last_el - el ) > sc_inversion_tol ) &&
                 ( i < sc_inversion_it_max ) );
     }
 
@@ -360,39 +360,39 @@ bool CorrectionParameters::save( const char* filename )
 const
 {
     std::ofstream stream( filename );
-    if(!stream )
-    {
-        return false;
-    }
-    stream << enable_offsets << std::endl
-           << enable_corrections << std::endl
-           << az_ratio << std::endl
-           << el_ratio << std::endl
-           << az_offset << std::endl
-           << el_offset << std::endl
-           << az_ns << std::endl
-           << az_ew << std::endl
-           << el_udew << std::endl
-           << fp_az << std::endl
-           << flex_el_A << std::endl
-           << flex_el_B << std::endl
-           << enable_vff << std::endl
-           << el_pos_vff_s << std::endl
-           << el_pos_vff_t << std::endl
-           << el_neg_vff_s << std::endl
-           << el_neg_vff_t << std::endl
-           << az_pos_vff_s << std::endl
-           << az_pos_vff_t << std::endl
-           << az_neg_vff_s << std::endl
-           << az_neg_vff_t << std::endl;
-    return true;
+    if( !stream )
+{
+    return false;
+}
+stream << enable_offsets << std::endl
+       << enable_corrections << std::endl
+       << az_ratio << std::endl
+       << el_ratio << std::endl
+       << az_offset << std::endl
+       << el_offset << std::endl
+       << az_ns << std::endl
+       << az_ew << std::endl
+       << el_udew << std::endl
+       << fp_az << std::endl
+       << flex_el_A << std::endl
+       << flex_el_B << std::endl
+       << enable_vff << std::endl
+       << el_pos_vff_s << std::endl
+       << el_pos_vff_t << std::endl
+       << el_neg_vff_s << std::endl
+       << el_neg_vff_t << std::endl
+       << az_pos_vff_s << std::endl
+       << az_pos_vff_t << std::endl
+       << az_neg_vff_s << std::endl
+       << az_neg_vff_t << std::endl;
+return true;
 }
 
 
 bool CorrectionParameters::load( const char* filename )
 {
     std::ifstream stream( filename );
-    if(!stream )
+    if( !stream )
     {
         return false;
     }
@@ -417,7 +417,7 @@ bool CorrectionParameters::load( const char* filename )
            >> az_pos_vff_t
            >> az_neg_vff_s
            >> az_neg_vff_t;
-    if(!stream )
+    if( !stream )
     {
         return false;
     }
@@ -437,7 +437,7 @@ std::string CorrectionParameters::saveFilename( unsigned scope_num )
 {
     time_t t = time( 0 );
     struct tm* tm;
-    tm = gmtime(&t );
+    tm = gmtime( &t );
     std::ostringstream stream;
     stream << "corrections_t" << scope_num + 1 << '_'
            << std::setw( 2 ) << std::setfill( '0' ) << tm->tm_year % 100

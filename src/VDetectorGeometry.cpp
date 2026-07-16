@@ -19,7 +19,7 @@ VDetectorGeometry::VDetectorGeometry( unsigned int iNTel, vector< string > iCame
     {
         cout << "VDetectorGeometry::VDetectorGeometry  error: number of telescopes larger than camera vector ";
         cout << iNTel << "\t" << iCamera.size() << endl;
-        exit(-1 );
+        exit( -1 );
     }
     setCoordinateTransformer( iCoordinateTransformerX, iCoordinateTransformerY );
     setSourceType( iSourceType );
@@ -39,10 +39,10 @@ VDetectorGeometry::VDetectorGeometry( unsigned int iNTel, vector< string > iCame
     // camera configuration from .cam file (default telescope positions)
     else
     {
-        if(!initialize( iNTel, iCamera ) )
+        if( !initialize( iNTel, iCamera ) )
         {
             cout << "DetectorGeometry::VDetectorGeometry error in camera reader" << endl;
-            exit(-1 );
+            exit( -1 );
         }
         for( unsigned int i = 0; i < iNTel; i++ )
         {

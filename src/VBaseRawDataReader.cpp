@@ -111,7 +111,7 @@ bool VBaseRawDataReader::setTelescopeID( unsigned int iTelID )
 
 uint32_t VBaseRawDataReader::getHitID( uint32_t i )
 {
-    if(!fEvent[fTelID] )
+    if( !fEvent[fTelID] )
     {
         return 0;
     }
@@ -131,7 +131,7 @@ uint32_t VBaseRawDataReader::getHitID( uint32_t i )
 
 uint16_t VBaseRawDataReader::getMaxChannels()
 {
-    if(!fEvent[fTelID] )
+    if( !fEvent[fTelID] )
     {
         return 499;
     }
@@ -152,7 +152,7 @@ uint16_t VBaseRawDataReader::getMaxChannels()
 
 uint16_t VBaseRawDataReader::getNumSamples()
 {
-    if(!fEvent[fTelID] )
+    if( !fEvent[fTelID] )
     {
         return 0;
     }
@@ -169,7 +169,7 @@ uint16_t VBaseRawDataReader::getNumSamples()
 
 uint8_t VBaseRawDataReader::getNewEventType( unsigned int itelID )
 {
-    if(!fEvent[itelID] )
+    if( !fEvent[itelID] )
     {
         return 0;
     }
@@ -321,7 +321,7 @@ void VBaseRawDataReader::injectGaussianNoise( double injectGaussianNoise,  UInt_
 {
     finjectGaussianNoise = injectGaussianNoise;
 
-    if(!fRandomInjectGaussianNoise )
+    if( !fRandomInjectGaussianNoise )
     {
         fRandomInjectGaussianNoise = new TRandom3( seed );
     }
@@ -361,7 +361,7 @@ bool VBaseRawDataReader::isZeroSuppressed( unsigned int channel )
 {
     pair< bool, uint32_t > i_hitIndexPair = getChannelHitIndex( channel );
 
-    if(!i_hitIndexPair.first )
+    if( !i_hitIndexPair.first )
     {
         return true;
     }
@@ -406,7 +406,7 @@ uint8_t VBaseRawDataReader::getSample( unsigned channel, unsigned sample, bool i
         if( fTraceAmplitudeCorrectionG.size() > 0 && fTelID < fTraceAmplitudeCorrectionG.size() )
         {
             iNoiseGaus = fRandomInjectGaussianNoise->Gaus( 0.,
-                         finjectGaussianNoise* fTraceAmplitudeCorrectionG[fTelID] );
+                finjectGaussianNoise * fTraceAmplitudeCorrectionG[fTelID] );
         }
         else
         {
@@ -450,7 +450,7 @@ uint8_t VBaseRawDataReader::getSample( unsigned channel, unsigned sample, bool i
 std::vector< uint8_t > VBaseRawDataReader::getSamplesVec()
 {
     // standard way
-    if(!fNoiseFileReader )
+    if( !fNoiseFileReader )
     {
         if( fEvent[fTelID] )
         {

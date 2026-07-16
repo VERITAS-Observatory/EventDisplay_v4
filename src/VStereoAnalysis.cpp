@@ -47,13 +47,13 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
                            VGlobalRunParameter::getObservatory_Latitude_deg() );
 
     // calculating run start, end and duration (verifies data trees)
-    if(!bTotalAnalysisOnly )
+    if( !bTotalAnalysisOnly )
     {
         setRunTimes();
     }
 
     // targets and exclusion regions
-    if(!bTotalAnalysisOnly )
+    if( !bTotalAnalysisOnly )
     {
         defineAstroSource();
     }
@@ -80,9 +80,9 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
     {
         iDirRun[i]->cd();
         fHisto.push_back( new VStereoHistograms( i_hsuffix, fRunPara->fSkyMapBinSize, fRunPara->fSkyMapBinSizeUC,
-                          fRunPara->fEnergySpectrumBinSize, fRunPara->fTimeIntervall,
-                          f_t_in_s_min[fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff],
-                          f_t_in_s_max[fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff], fIsOn ) );
+                fRunPara->fEnergySpectrumBinSize, fRunPara->fTimeIntervall,
+                f_t_in_s_min[fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff],
+                f_t_in_s_max[fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff], fIsOn ) );
         fHisto.back()->setSkyMapSize( fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax,
                                       fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax );
         if( fIsOn )
@@ -183,14 +183,14 @@ string  VStereoAnalysis::setRunTimes( CData* iData )
     i_min = fDataRun->Time;
     f_t_in_s_min[i_run] = i_min;
     i_minMJD = fDataRun->MJD;
-    i_minUTC = VSkyCoordinatesUtilities::getUTC(( int )i_minMJD, i_min );
+    i_minUTC = VSkyCoordinatesUtilities::getUTC( ( int )i_minMJD, i_min );
 
     int i_nentries = ( int )fDataRun->fChain->GetEntries() - 2;
     fDataRun->GetEntry( i_nentries );
     i_max = fDataRun->Time;
     f_t_in_s_max[i_run] = i_max;
     i_maxMJD = fDataRun->MJD;
-    i_maxUTC = VSkyCoordinatesUtilities::getUTC(( int )i_maxMJD, i_max );
+    i_maxUTC = VSkyCoordinatesUtilities::getUTC( ( int )i_maxMJD, i_max );
 
     i_dur = ( i_maxUTC - i_minUTC ) * 24 * 60 * 60;
 
@@ -224,13 +224,13 @@ string  VStereoAnalysis::setRunTimes( CData* iData )
  */
 int VStereoAnalysis::getDataRunNumber() const
 {
-    if(!fDataRun )
-    {
-        cout << "VStereoAnalysis::getDataRunNumber error: no data tree." << endl;
-    }
-    else
-    {
-        if( fDataRun->GetEntry( 0 ) == -1 )
+    if( !fDataRun )
+{
+    cout << "VStereoAnalysis::getDataRunNumber error: no data tree." << endl;
+}
+else
+{
+    if( fDataRun->GetEntry( 0 ) == -1 )
         {
             cout << "VStereoAnalysis::getDataRunNumber error: can't seem to access tree." << endl;
         }
@@ -353,7 +353,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
             && fDataRun
             && !fRunPara->fXGB_gh_file_suffix.empty() )
     {
-        if(!fDataRun->loadGHXGBTree( fRunPara->fXGB_gh_file_suffix ) )
+        if( !fDataRun->loadGHXGBTree( fRunPara->fXGB_gh_file_suffix ) )
         {
             cout << "VStereoAnalysis::fillHistograms error: failed to load XGB gamma-hadron friend tree" << endl;
             cout << "suffix: " << fRunPara->fXGB_gh_file_suffix << endl;
@@ -470,13 +470,13 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
             i_UTC = VSkyCoordinatesUtilities::getUTC( fDataRun->MJD, fDataRun->Time );
 
             // phase cuts - this is also a time cut that adds to the previously initialized mask
-            if(!fCuts->applyPhaseCut( i ) )
+            if( !fCuts->applyPhaseCut( i ) )
             {
                 fTimeMask->setMaskDuringPhaseCuts( i_UTC );
                 continue;
             }
             // make time cut
-            if(!fTimeMask->checkAgainstMask( i_UTC ) )
+            if( !fTimeMask->checkAgainstMask( i_UTC ) )
             {
                 continue;
             }
@@ -487,7 +487,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
             fHisto[fHisCounter]->hrate_1min->Fill( i_UTC );
 
             // dead time calculation
-            if(!iDeadtimeDirectory )
+            if( !iDeadtimeDirectory )
             {
                 fDeadTime[fHisCounter]->fillDeadTime( fDataRun->Time );
             }
@@ -503,13 +503,13 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
             // apply all quality cuts
             //
             // check if event is outside fiducial area
-            if(!fCuts->applyInsideFiducialAreaCut() )
+            if( !fCuts->applyInsideFiducialAreaCut() )
             {
                 continue;
             }
 
             // stereo quality cuts (e.g. successful direction, mscw, mscl reconstruction)
-            if(!fCuts->applyStereoQualityCuts( false, i, fIsOn ) )
+            if( !fCuts->applyStereoQualityCuts( false, i, fIsOn ) )
             {
                 continue;
             }
@@ -518,7 +518,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
             fHisto[fHisCounter]->hTriggerPatternBeforeCuts->Fill( fDataRun->LTrig );
             fHisto[fHisCounter]->hImagePatternBeforeCuts->Fill( fDataRun->ImgSel );
 
-            iDirectionOffset = sqrt( iXoff* iXoff + iYoff* iYoff );
+            iDirectionOffset = sqrt( iXoff * iXoff + iYoff * iYoff );
             getDerotatedCoordinates( icounter, i_UTC, iXoff, iYoff,  i_xderot, i_yderot );
 
             // gamma/hadron cuts
@@ -613,8 +613,8 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
                                     fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->FindBin( iDirectionOffset ) );
                 double i_ymin = fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->GetBinLowEdge(
                                     fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->FindBin( iDirectionOffset ) );
-                double iSoli = 2. * TMath::Pi() * ( 1. - cos( i_ymax* TMath::Pi() / 180. ) );
-                iSoli       -= 2. * TMath::Pi() * ( 1. - cos( i_ymin* TMath::Pi() / 180. ) );
+                double iSoli = 2. * TMath::Pi() * ( 1. - cos( i_ymax * TMath::Pi() / 180. ) );
+                iSoli       -= 2. * TMath::Pi() * ( 1. - cos( i_ymin * TMath::Pi() / 180. ) );
                 iWeight = fCuts->getTheta2Cut_max();
                 if( iWeight > 0. )
                 {
@@ -651,25 +651,25 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
                     }
                     // get 1 / effective area
                     iEnergyWeighting = fEnergy.getEffectiveArea( iErec, fDataRun->Ze,
-                                       iDirectionOffset, iPedVar_temp,
-                                       fRunPara->fEnergyReconstructionSpectralIndex, true,
-                                       fRunPara->fEffectiveAreaVsEnergyMC );
+                        iDirectionOffset, iPedVar_temp,
+                        fRunPara->fEnergyReconstructionSpectralIndex, true,
+                        fRunPara->fEffectiveAreaVsEnergyMC );
 
                     // fill energy histograms: require a valid effective area value
                     if( iEnergyWeighting > 0. )
                     {
                         // energy histogram (counts per bin)
                         fHisto[fHisCounter]->herecCounts->Fill( log10( iErec ) );
-                        fHisto[fHisCounter]->herecCounts2DtimeBinned->Fill( log10( iErec ), (( double )fDataRun->Time - f_t_in_s_min[irun] ) );
+                        fHisto[fHisCounter]->herecCounts2DtimeBinned->Fill( log10( iErec ), ( ( double )fDataRun->Time - f_t_in_s_min[irun] ) );
                         fHisto[fHisCounter]->hLinerecCounts->Fill( iErec );
-                        fHisto[fHisCounter]->hLinerecCounts2DtimeBinned->Fill( iErec, (( double )fDataRun->Time - f_t_in_s_min[irun] ) );
+                        fHisto[fHisCounter]->hLinerecCounts2DtimeBinned->Fill( iErec, ( ( double )fDataRun->Time - f_t_in_s_min[irun] ) );
                         fHisto[fHisCounter]->herecWeights->Fill( log10( iErec ), log10( 1. / iEnergyWeighting ) );
                         fHisto[fHisCounter]->hLinerecWeights->Fill( iErec, log10( 1. / iEnergyWeighting ) );
                         fHisto[fHisCounter]->herecEffectiveArea->Fill( log10( iErec ), 1. / iEnergyWeighting );
                         fHisto[fHisCounter]->hLinerecEffectiveArea->Fill( iErec, 1. / iEnergyWeighting );
                         // filling the effective area for each time bin
                         double time_of_previous_EVENT = time_of_EVENT;
-                        time_of_EVENT = (( double )fDataRun->Time - f_t_in_s_min[irun] );
+                        time_of_EVENT = ( ( double )fDataRun->Time - f_t_in_s_min[irun] );
                         double index_time_bin_PREVIOUS_EVENT = index_time_bin_NOW;
                         index_time_bin_NOW = fHisto[fHisCounter]->hRealDuration1DtimeBinned->FindFixBin( time_of_EVENT );
 
@@ -693,7 +693,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
                 for( unsigned int t = 0; t < fRunPara->fRunList[fHisCounter].fTelToAnalyze.size(); t++ )
                 {
                     // for some runs LTrig is not filled!
-                    if((( t + 1 ) & fDataRun->LTrig ) || ( fDataRun->LTrig == 0 ) )
+                    if( ( ( t + 1 ) & fDataRun->LTrig ) || ( fDataRun->LTrig == 0 ) )
                     {
                         fMeanAzimuth  = VSkyCoordinatesUtilities::addToMeanAzimuth( fMeanAzimuth, fDataRun->TelAzimuth[fRunPara->fRunList[fHisCounter].fTelToAnalyze[t]] );
                         fMeanElevation += fDataRun->TelElevation[fRunPara->fRunList[fHisCounter].fTelToAnalyze[t]];
@@ -728,7 +728,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
         if( fTimeMask->getMask()[i_s] )
         {
             // dead time is taken into account for each second
-            double dead_time_fraction = fDeadTime[fHisCounter]->getDeadTimeFraction(( double )i_s + 0.5, fRunPara->fDeadTimeCalculationMethod );
+            double dead_time_fraction = fDeadTime[fHisCounter]->getDeadTimeFraction( ( double )i_s + 0.5, fRunPara->fDeadTimeCalculationMethod );
             fHisto[fHisCounter]->hRealDuration1DtimeBinned->Fill( i_s, 1 - dead_time_fraction );
         }
 
@@ -1004,7 +1004,7 @@ void VStereoAnalysis::scaleAlpha( TH2D* halpha_on, bool bUC )
             hmap_alphaNorm = fHisto[fHisCounter]->hmap_alphaNorm;
         }
     }
-    if(!halpha_off || !hmap_alphaNorm )
+    if( !halpha_off || !hmap_alphaNorm )
     {
         cout << "VStereoAnalysis::scaleAlpha: fatal error, cannot find histograms ";
         cout << halpha_off << "\t" << hmap_alphaNorm << endl;
@@ -1078,7 +1078,7 @@ double VStereoAnalysis::combineHistograms()
                         {
                             alphaUC = fHisto[h]->h_combine_map_alpha_offUC->GetBinContent( i, j ) / ( 1. + fHisto[h]->h_combine_map_alpha_offUC->GetBinContent( i, j ) );
                         }
-                        else if(!fIsOn )
+                        else if( !fIsOn )
                         {
                             alphaUC = 1. / ( 1. + fHisto[h]->h_combine_map_alpha_offUC->GetBinContent( i, j ) );
                         }
@@ -1109,7 +1109,7 @@ double VStereoAnalysis::combineHistograms()
                         {
                             alpha = fHisto[h]->h_combine_map_alpha_off->GetBinContent( i, j ) / ( 1. + fHisto[h]->h_combine_map_alpha_off->GetBinContent( i, j ) );
                         }
-                        else if(!fIsOn )
+                        else if( !fIsOn )
                         {
                             alpha = 1. / ( 1. + fHisto[h]->h_combine_map_alpha_off->GetBinContent( i, j ) );
                         }
@@ -1158,7 +1158,7 @@ double VStereoAnalysis::combineHistograms()
         while( TH1* h1 = ( TH1* )next() )
         {
             TH1* h2 = ( TH1* )nexth();
-            if(!h1 || !h2 )
+            if( !h1 || !h2 )
             {
                 continue;
             }
@@ -1382,7 +1382,7 @@ double VStereoAnalysis::getDeadTimeFraction()
         {
             return fDeadTime[fHisCounter]->getDeadTimeFraction( fTimeMask->getMask(), fRunPara->fDeadTimeCalculationMethod );
         }
-        return fDeadTime[fHisCounter]->getDeadTimeFraction(-1, fRunPara->fDeadTimeCalculationMethod );
+        return fDeadTime[fHisCounter]->getDeadTimeFraction( -1, fRunPara->fDeadTimeCalculationMethod );
     }
 
     return 0.;
@@ -1480,7 +1480,7 @@ void VStereoAnalysis::astro_set_skymap_centershift_from_runparameters( unsigned 
 double VStereoAnalysis::astro_get_mjd( unsigned int runlist_iter )
 {
     double iMJD = ( double )fRunPara->fRunList[runlist_iter].fMJDOn;
-    if(!fIsOn )
+    if( !fIsOn )
     {
         iMJD = ( double )fRunPara->fRunList[runlist_iter].fMJDOff;
     }
@@ -1602,15 +1602,15 @@ pair< double, double > VStereoAnalysis::astro_calculate_ra_dec_currentEpoch( uns
     // set target coordinates into run parameter list
     fRunPara->setTargetRADec_currentEpoch(
         runlist_iter,
-        i_radec.first* TMath::RadToDeg(),
-        i_radec.second* TMath::RadToDeg() );
+        i_radec.first * TMath::RadToDeg(),
+        i_radec.second * TMath::RadToDeg() );
 
     return i_radec;
 }
 
 void VStereoAnalysis::astro_print_pointing( unsigned int runlist_iter )
 {
-    if(!fIsOn )
+    if( !fIsOn )
     {
         return;
     }
@@ -1675,7 +1675,7 @@ void VStereoAnalysis::astro_set_exclusionsregions( unsigned int runlist_iter )
  */
 void VStereoAnalysis::astro_setup_star_cataloge( unsigned int runlist_iter )
 {
-    if(!fIsOn )
+    if( !fIsOn )
     {
         return;
     }
@@ -1687,7 +1687,7 @@ void VStereoAnalysis::astro_setup_star_cataloge( unsigned int runlist_iter )
               fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax,
               fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000, fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000 );
     VStarCatalogue* iStarCatalogue = fAstro.back()->getStarCatalogue();
-    if(!iStarCatalogue )
+    if( !iStarCatalogue )
     {
         cout << "VStereoAnalysis::astro_setup_star_cataloge() error: star catalogue not found: " << fRunPara->fStarCatalogue << endl;
         cout << "exiting..." << endl;
@@ -1705,7 +1705,7 @@ void VStereoAnalysis::astro_setup_star_cataloge( unsigned int runlist_iter )
     cout << "\t\t ID \t RA \t Dec \t magnitude " << endl;
     for( unsigned int i = 0; i < iStarCatalogue->getListOfStarsinFOV().size(); i++ )
     {
-        if(!iStarCatalogue->getListOfStarsinFOV()[i]
+        if( !iStarCatalogue->getListOfStarsinFOV()[i]
                 || iStarCatalogue->getListOfStarsinFOV()[i]->getBrightness( fRunPara->fStarBand )
                 >= fRunPara->fStarMinBrightness
                 || fRunPara->fStarExlusionRadius <= 0. )
@@ -1819,7 +1819,7 @@ void VStereoAnalysis::setCuts( VAnaSumRunParameterDataClass iL, int irun )
                 exit( EXIT_FAILURE );
             }
             VGammaHadronCuts* iC = ( VGammaHadronCuts* )iF->Get( "GammaHadronCuts" );
-            if(!iC )
+            if( !iC )
             {
                 cout << "VStereoAnalysis::setCuts error reading cuts from file: " << endl;
                 cout << "\t" << iEffFile << endl;
@@ -1970,7 +1970,7 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
             exit( EXIT_FAILURE );
         }
         fDataRunTree = ( TTree* )fDataFile->Get( "data" );
-        if(!fDataRunTree )
+        if( !fDataRunTree )
         {
             cout << "VStereoAnalysis::getDataFromFile() error: cannot find data tree in " << iFileName << endl;
             cout << "exiting..." << endl;
@@ -2028,7 +2028,7 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
     {
         delete fTreeSelectedEvents;
     }
-    if(!fRunPara )
+    if( !fRunPara )
     {
         return false;
     }
@@ -2046,7 +2046,7 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
         sprintf( htitle, "selected events (off) for run %d", irun );
     }
     fTreeSelectedEvents = new TTree( hname, htitle );
-    if(!isOn )
+    if( !isOn )
     {
         fTreeSelectedEvents->SetLineColor( 2 );
     }
@@ -2113,7 +2113,7 @@ void VStereoAnalysis::reset_TreeWithSelectedEvents()
 
 void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c, double i_xderot, double i_yderot, double i_theta2 )
 {
-    if(!c )
+    if( !c )
     {
         return;
     }
@@ -2215,7 +2215,7 @@ bool VStereoAnalysis::init_DL3Tree( int irun, int icounter )
     {
         delete fDL3EventTree;
     }
-    if(!fRunPara )
+    if( !fRunPara )
     {
         return false;
     }
@@ -2272,7 +2272,7 @@ bool VStereoAnalysis::init_DL3Tree( int irun, int icounter )
  */
 void VStereoAnalysis::fill_DL3Tree( CData* c, double i_xderot, double i_yderot, unsigned int icounter, double i_UTC )
 {
-    if(!c )
+    if( !c )
     {
         return;
     }
@@ -2316,17 +2316,17 @@ void VStereoAnalysis::fill_DL3Tree( CData* c, double i_xderot, double i_yderot, 
     {
         double i_Spherical_RA  = 0.;
         double i_Spherical_DEC = 0.;
-        VAstronometry::vlaDtp2s( fDL3EventTree_Xderot* TMath::DegToRad(),
-                                 fDL3EventTree_Yderot* TMath::DegToRad(),
-                                 fRunPara->fRunList[icounter].fArrayPointingRAJ2000* TMath::DegToRad(),
-                                 fRunPara->fRunList[icounter].fArrayPointingDecJ2000* TMath::DegToRad(),
+        VAstronometry::vlaDtp2s( fDL3EventTree_Xderot * TMath::DegToRad(),
+                                 fDL3EventTree_Yderot * TMath::DegToRad(),
+                                 fRunPara->fRunList[icounter].fArrayPointingRAJ2000 * TMath::DegToRad(),
+                                 fRunPara->fRunList[icounter].fArrayPointingDecJ2000 * TMath::DegToRad(),
                                  &i_Spherical_RA, &i_Spherical_DEC );
         fDL3EventTree_RA  = i_Spherical_RA * TMath::RadToDeg();
         fDL3EventTree_DEC = i_Spherical_DEC * TMath::RadToDeg();
 
         // Convert from spherical RA and DEC to Azimuth and Zenith
         // convert to degrees and do calculation
-        fVsky->setTargetJ2000( i_Spherical_DEC* TMath::RadToDeg(), i_Spherical_RA* TMath::RadToDeg() );
+        fVsky->setTargetJ2000( i_Spherical_DEC * TMath::RadToDeg(), i_Spherical_RA * TMath::RadToDeg() );
         fVsky->precessTarget( fDL3EventTree_MJD, 0 ) ;
 
         // calculate new param

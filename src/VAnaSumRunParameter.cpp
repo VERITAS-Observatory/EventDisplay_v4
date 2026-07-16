@@ -195,12 +195,12 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 {
     ifstream is;
     is.open( i_filename.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         string itemp = getDirectory_EVNDISPParameterFiles();
         itemp += "/" + i_filename;
         is.open( itemp.c_str(), ifstream::in );
-        if(!is )
+        if( !is )
         {
             cout << "no file found to read run parameters: " << itemp << endl;
             exit( EXIT_FAILURE );
@@ -226,12 +226,12 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             }
             // print runparameter to stdout
             cout << is_line << endl;
-            if(( is_stream >> std::ws ).eof() )
+            if( ( is_stream >> std::ws ).eof() )
             {
                 return returnWithError( "VAnaSumRunParameter::readRunParameter: not enough parameters", is_line );
             }
             is_stream >> temp;
-            if(( is_stream >> std::ws ).eof() )
+            if( ( is_stream >> std::ws ).eof() )
             {
                 return returnWithError( "VAnaSumRunParameter::readRunParameter: not enough parameters", is_line );
             }
@@ -242,12 +242,12 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                 // check if timemask file needs an additional path
                 ifstream is_test;
                 is_test.open( fTimeMaskFile.c_str(), ifstream::in );
-                if(!is_test )
+                if( !is_test )
                 {
                     string iDIR_temp = i_filename.substr( 0, i_filename.rfind( "/" ) );
                     iDIR_temp += "/" + fTimeMaskFile;
                     is_test.open( iDIR_temp.c_str(), ifstream::in );
-                    if(!is_test )
+                    if( !is_test )
                     {
                         cout << "Error opening time mask file: " << fTimeMaskFile << endl;
                         cout << "exiting..." << endl;
@@ -276,7 +276,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             {
                 fTMPL_fBackgroundModel = eREFLECTEDREGION;
                 fTMPL_RE_distanceSourceOff = atof( temp2.c_str() );
-                if(!( is_stream >> std::ws ).eof() )
+                if( !( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> temp2;
                     fTMPL_RE_nMinoffsource = atoi( temp2.c_str() );
@@ -285,7 +285,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                 {
                     returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REFLECTEDREGION dist noff_min noff_max" );
                 }
-                if(!( is_stream >> std::ws ).eof() )
+                if( !( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> temp2;
                     fTMPL_RE_nMaxoffsource = atoi( temp2.c_str() );
@@ -297,7 +297,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             }
             else if( temp == "REFLECTEDREGION_OFFREMOVAL" )
             {
-                if(!( is_stream >> std::ws ).eof() )
+                if( !( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> temp2;
                     fTMPL_RE_RemoveOffRegionsRandomly = bool( atoi( temp2.c_str() ) );
@@ -307,7 +307,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             {
                 fTMPL_fBackgroundModel = eRINGMODEL;
                 fTMPL_RM_RingRadius = atof( temp2.c_str() );
-                if(!( is_stream >> std::ws ).eof() )
+                if( !( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> temp2;
                     fTMPL_RM_RingWidth = atof( temp2.c_str() );
@@ -361,7 +361,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             {
                 fStarMinBrightness = atof( temp2.c_str() );
                 string iStarBand = "";
-                if(!( is_stream >> std::ws ).eof() )
+                if( !( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> fStarExlusionRadius;
                 }
@@ -369,7 +369,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                 {
                     fStarExlusionRadius = 0.;
                 }
-                if(!( is_stream >> std::ws ).eof() )
+                if( !( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> fStarBand;
                 }
@@ -676,7 +676,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             }
             else if( temp == "WRITEDATAONOFFEVENTS" )
             {
-                if(( unsigned int )atoi( temp2.c_str() ) == 1 )
+                if( ( unsigned int )atoi( temp2.c_str() ) == 1 )
                 {
                     fWriteDataOnOffTrees = true;
                 }
@@ -730,7 +730,7 @@ int VAnaSumRunParameter::loadShortFileList( string i_listfilename, string iDataD
     int i_nline = 0;
     ifstream is;
     is.open( i_listfilename.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << " VAnaSumRunParameter::loadShortFileList error: file with list of runs not found : " << i_listfilename << endl;
         cout << "exiting..." << endl;
@@ -751,7 +751,7 @@ int VAnaSumRunParameter::loadShortFileList( string i_listfilename, string iDataD
             is_stream >> temp;
             i_sT.fRunOn = atoi( temp.c_str() );
             i_sT.fRunOff = atoi( temp.c_str() );
-            if(!bTotalAnalysisOnly )
+            if( !bTotalAnalysisOnly )
             {
                 // open mscw file and read out telescope participating in analysis
                 temp = iDataDir + "/" + temp + ".mscw.root";
@@ -763,7 +763,7 @@ int VAnaSumRunParameter::loadShortFileList( string i_listfilename, string iDataD
                     exit( EXIT_FAILURE );
                 }
                 VEvndispRunParameter* iPar = ( VEvndispRunParameter* )iF.Get( "runparameterV2" );
-                if(!iPar )
+                if( !iPar )
                 {
                     cout << "VAnaSumRunParameter::loadShortFileList: error, no run parameters found in: ";
                     cout << temp << endl;
@@ -846,11 +846,11 @@ int VAnaSumRunParameter::loadSimpleFileList( string i_listfilename )
     int i_nline = 0;
     ifstream is;
     is.open( i_listfilename.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << " VAnaSumRunParameter:::loadSimpleFileList error: file with list of runs not found : " << i_listfilename << endl;
         cout << "exiting..." << endl;
-        exit(-1 );
+        exit( -1 );
     }
     string is_line;
     string temp;
@@ -889,11 +889,11 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
     int i_nline = 0;
     ifstream is;
     is.open( i_listfilename.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << " VAnaSumRunParameter::loadLongFileList error: file with list of runs not found : " << i_listfilename << endl;
         cout << "exiting..." << endl;
-        exit(-1 );
+        exit( -1 );
     }
     string is_line;
     string temp;
@@ -926,7 +926,7 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
                     continue;
                 }
             }
-            checkNumberOfArguments(-1, narg, i_listfilename, is_line, fVersion, bShortList );
+            checkNumberOfArguments( -1, narg, i_listfilename, is_line, fVersion, bShortList );
             is_stream >> temp;
             // read run list
             i_sT.fRunOn = atoi( temp.c_str() );
@@ -961,7 +961,7 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
                 i_sT.fCutFile = temp;
                 // source radius (actually (source radius)^2 )
                 // (read theta2 cut from cut file)
-                if(!bTotalAnalysisOnly )
+                if( !bTotalAnalysisOnly )
                 {
                     i_sT.fSourceRadius = readSourceRadius( i_sT.fCutFile );
                 }
@@ -974,7 +974,7 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
                     cout << "VAnaSumRunParameter::loadLongFileList: error in run list: " << endl;
                     cout << is_line << endl;
                     cout << "invalid source radius " << i_sT.fSourceRadius << endl;
-                    exit(-1 );
+                    exit( -1 );
                 }
             }
             // background model
@@ -1009,7 +1009,7 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
             }
             else if( fVersion < 7 )
             {
-                if(!bTotalAnalysisOnly )
+                if( !bTotalAnalysisOnly )
                 {
                     i_sT.fmaxradius =  readMaximumDistance( i_sT.fCutFile );
                 }
@@ -1044,7 +1044,7 @@ int VAnaSumRunParameter::loadLongFileList( string i_listfilename, bool bShortLis
                     i_sT.fCutFile = temp;
                     // source radius (actually (source radius)^2 )
                     // (read theta2 cut from cut file)
-                    if(!bTotalAnalysisOnly )
+                    if( !bTotalAnalysisOnly )
                     {
                         readCutParameter( i_sT.fCutFile, i_sT.fSourceRadius, i_sT.fmaxradius );
                     }
@@ -1158,7 +1158,7 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
             cout << "\t region excluded from background estimation: " << endl;
             for( unsigned int l = 0; l < fExclusionRegions.size(); l++ )
             {
-                if(!fExclusionRegions[l] )
+                if( !fExclusionRegions[l] )
                 {
                     continue;
                 }
@@ -1303,7 +1303,7 @@ int VAnaSumRunParameter::checkNumberOfArguments( string is )
     istringstream is_stream( is );
     string itemp;
     int z = 0;
-    while(!( is_stream >> std::ws ).eof() )
+    while( !( is_stream >> std::ws ).eof() )
     {
         is_stream >> itemp;
         z++;
@@ -1344,7 +1344,7 @@ void VAnaSumRunParameter::checkNumberOfArguments( int im, int narg, string i_lis
     {
         cout << "VAnaSumRunParameter::checkNumberOfArguments error: unknown background model" << endl;
         cout << "exiting..." << endl;
-        exit(-1 );
+        exit( -1 );
     }
 
     // wobble offsets removed with version >=3
@@ -1369,7 +1369,7 @@ void VAnaSumRunParameter::checkNumberOfArguments( int im, int narg, string i_lis
         n_tot -= 1;    // no more cut file
     }
 
-    if(( im == -1 && narg < n_tot ) || ( im >= 0 && narg != n_tot ) )
+    if( ( im == -1 && narg < n_tot ) || ( im >= 0 && narg != n_tot ) )
     {
         cout << "error: not enough/too many parameter in " << i_listfilename << ": " << endl;
         cout << is_line << endl;
@@ -1439,7 +1439,7 @@ double VAnaSumRunParameter::readSourceRadius( string ifile )
 {
     VGammaHadronCuts iC;
     iC.setNTel( 1 );  // irrelevant - but suppresses some warnings
-    if(!iC.readCuts( ifile, 0 ) )
+    if( !iC.readCuts( ifile, 0 ) )
     {
         return -1;
     };
@@ -1466,7 +1466,7 @@ bool VAnaSumRunParameter::readCutParameter( string ifile, double& iSourceRadius,
         exit( EXIT_FAILURE );
     }
     VGammaHadronCuts* iC = ( VGammaHadronCuts* )iF->Get( "GammaHadronCuts" );
-    if(!iC )
+    if( !iC )
     {
         cout << "VAnaSumRunParameter::readSourceRadius error reading direction cut from file: " << endl;
         cout << "\t" << ifile << endl;
@@ -1502,7 +1502,7 @@ bool VAnaSumRunParameter::checkAnasumParameter( string ifile )
         exit( EXIT_FAILURE );
     }
     VInstrumentResponseFunctionRunParameter* iIRF = ( VInstrumentResponseFunctionRunParameter* )iF->Get( "makeEffectiveArea_runparameter" );
-    if(!iIRF )
+    if( !iIRF )
     {
         cout << "VAnaSumRunParameter::checkAnasumParameter error reading IRF parameter from file: " << endl;
         cout << "\t" << ifile << endl;
@@ -1547,7 +1547,7 @@ double VAnaSumRunParameter::readMaximumDistance( string ifile )
 {
     VGammaHadronCuts iC;
     iC.setNTel( 1 );  // irrelevant - but suppressed printing of warnings to screen
-    if(!iC.readCuts( ifile, 0 ) )
+    if( !iC.readCuts( ifile, 0 ) )
     {
         return -1;
     }
@@ -1704,7 +1704,7 @@ void VAnaSumRunParameter::getEventdisplayRunParameter( string fDatadir )
         if( i_f->IsZombie() )
         {
             cout << "VAnaSumRunParameter::getEventdisplayRunParameter fatal error: file not found, " << i_temp << endl;
-            exit(-1 );
+            exit( -1 );
         }
         VEvndispRunParameter* iParV2 = ( VEvndispRunParameter* )i_f->Get( "runparameterV2" );
         if( iParV2 )
@@ -1751,7 +1751,7 @@ void VAnaSumRunParameter::getEventdisplayRunParameter( string fDatadir )
             if( i_f->IsZombie() )
             {
                 cout << "VAnaSumRunParameter::getEventdisplayRunParameter fatal error: file not found, " << i_temp << endl;
-                exit(-1 );
+                exit( -1 );
             }
             VEvndispRunParameter* iParV2 = ( VEvndispRunParameter* )i_f->Get( "runparameterV2" );
             if( iParV2 )
@@ -1839,13 +1839,13 @@ bool VAnaSumRunParameter::writeListOfExcludedSkyRegions()
 */
 bool VAnaSumRunParameter::getListOfExcludedSkyRegions( TFile* f )
 {
-    if(!f )
+    if( !f )
     {
         return false;
     }
 
-    TTree* tEx = (( TTree* )f->Get( "total_1/stereo/tExcludedRegions" ) );
-    if(!tEx )
+    TTree* tEx = ( ( TTree* )f->Get( "total_1/stereo/tExcludedRegions" ) );
+    if( !tEx )
     {
         return false;
     }

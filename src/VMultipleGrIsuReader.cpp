@@ -87,7 +87,7 @@ bool VMultipleGrIsuReader::init( VDetectorGeometry* iD, string i_sourcefile, vec
     {
         if( fSourceFileName[i].size() > 0 )
         {
-            if(!iSingleExternalPedFile )
+            if( !iSingleExternalPedFile )
             {
                 fReader.push_back( new VGrIsuReader( iD, 1, fSourceFileName[i], i_sumwindow, i_telnumberoffset, i_sampleoffset, ifadcscale, fDebug, iseed, iExPedFile ) );
             }
@@ -113,11 +113,11 @@ bool VMultipleGrIsuReader::init( VDetectorGeometry* iD, string i_sourcefile, vec
 
 void VMultipleGrIsuReader::fillRandomPeds( VGrIsuReader* g, int iseed )
 {
-    if(! g )
+    if( ! g )
     {
         return;
     }
-    if(!fNoiseFileReader )
+    if( !fNoiseFileReader )
     {
         return;
     }
@@ -687,7 +687,7 @@ bool VMultipleGrIsuReader::getNextEvent()
     }
     /////////////////////////////////////////////////////////////
     // set eventstatuts to 999 for the case of no success
-    if(!iB )
+    if( !iB )
     {
         setEventStatus( 999 );
     }

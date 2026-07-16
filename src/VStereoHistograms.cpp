@@ -79,25 +79,25 @@ void VStereoHistograms::defineHistograms()
         cout << "VStereoHistograms::defineHistograms error: invalid binsize for stereo maps: " << fBinSize << endl;
         exit( EXIT_FAILURE );
     }
-    int xbin   = ( int )(( xmax - xmin ) / fBinSize + 0.5 );
-    int xbinUC = ( int )(( xmax - xmin ) / fBinSizeUC + 0.5 );
-    int ybin   = ( int )(( ymax - ymin ) / fBinSize + 0.5 );
-    int ybinUC = ( int )(( ymax - ymin ) / fBinSizeUC + 0.5 );
+    int xbin   = ( int )( ( xmax - xmin ) / fBinSize + 0.5 );
+    int xbinUC = ( int )( ( xmax - xmin ) / fBinSizeUC + 0.5 );
+    int ybin   = ( int )( ( ymax - ymin ) / fBinSize + 0.5 );
+    int ybinUC = ( int )( ( ymax - ymin ) / fBinSizeUC + 0.5 );
 
     ///////////////////////////////////
     // limits of energy histograms
     // log energy axis
     double i_emin = -1.9;
     double i_emax =  2.3;
-    int    i_ebin = int(( i_emax - i_emin ) / fBinSizeEnergy + 0.5 );
+    int    i_ebin = int( ( i_emax - i_emin ) / fBinSizeEnergy + 0.5 );
     // linear energy axis
     double i_Linemin = 0.05;
     double i_Linemax = 50.;
-    int    i_Linebin = int(( i_Linemax - i_Linemin ) / 0.01 );
+    int    i_Linebin = int( ( i_Linemax - i_Linemin ) / 0.01 );
     // 2D time binning
     double i_tmin = fTimeMin;
     double i_tmax = fTimeMax;
-    int i_tbin = int(( i_tmax - i_tmin ) / fBinSizeTime + 0.5 );
+    int i_tbin = int( ( i_tmax - i_tmin ) / fBinSizeTime + 0.5 );
     if( i_tbin <= 0 )
     {
         i_tbin = 1;
@@ -105,7 +105,7 @@ void VStereoHistograms::defineHistograms()
     // distance to camera centre axis
     double i_t_offmin = 0.;
     double i_t_offmax = 4.;
-    int i_t_offbin = TMath::Nint(( i_t_offmax - i_t_offmin ) / 0.25 );
+    int i_t_offbin = TMath::Nint( ( i_t_offmax - i_t_offmin ) / 0.25 );
 
     sprintf( i_key, "htheta2_%s", fHisSuffix.c_str() );
     sprintf( i_name, "#theta^{2} Histogram (%s)", fHisSuffix.c_str() );
@@ -502,7 +502,7 @@ void VStereoHistograms::defineHistograms()
             obj->Sumw2();
         }
         obj->SetLineWidth( 2 );
-        if(!bIsOn )
+        if( !bIsOn )
         {
             obj->SetLineColor( 2 );
             obj->SetMarkerColor( 2 );
@@ -536,7 +536,7 @@ void VStereoHistograms::writeHistograms()
     // write all sky plots into sky histogram directory
     iDir->cd();
     wDir = ( TDirectory* )iDir->Get( "skyHistograms" );
-    if(!wDir )
+    if( !wDir )
     {
         iDir->mkdir( "skyHistograms" )->cd();
     }
@@ -552,7 +552,7 @@ void VStereoHistograms::writeHistograms()
     // write all stereo parameter histograms
     iDir->cd();
     wDir = ( TDirectory* )iDir->Get( "stereoParameterHistograms" );
-    if(!wDir )
+    if( !wDir )
     {
         iDir->mkdir( "stereoParameterHistograms" )->cd();
     }
@@ -565,7 +565,7 @@ void VStereoHistograms::writeHistograms()
     // write all energy histograms
     iDir->cd();
     wDir = ( TDirectory* )iDir->Get( "energyHistograms" );
-    if(!wDir )
+    if( !wDir )
     {
         iDir->mkdir( "energyHistograms" )->cd();
     }
@@ -578,7 +578,7 @@ void VStereoHistograms::writeHistograms()
     // write all random forest histograms
     iDir->cd();
     wDir = ( TDirectory* )iDir->Get( "randomForestHistograms" );
-    if(!wDir )
+    if( !wDir )
     {
         iDir->mkdir( "randomForestHistograms" )->cd();
     }
@@ -591,7 +591,7 @@ void VStereoHistograms::writeHistograms()
     // write all rate histograms
     iDir->cd();
     wDir = ( TDirectory* )iDir->Get( "rawRateHistograms" );
-    if(!wDir )
+    if( !wDir )
     {
         iDir->mkdir( "rawRateHistograms" )->cd();
     }
@@ -626,22 +626,22 @@ bool VStereoHistograms::readParameterHistograms()
 {
     TDirectory* iDir = gDirectory;
 
-    if(!readHistograms( hListStereoParameterHistograms, "stereoParameterHistograms" ) )
+    if( !readHistograms( hListStereoParameterHistograms, "stereoParameterHistograms" ) )
     {
         return false;
     }
     iDir->cd();
-    if(!readHistograms( hListRandomForestParameterHistograms, "randomForestHistograms" ) )
+    if( !readHistograms( hListRandomForestParameterHistograms, "randomForestHistograms" ) )
     {
         return false;
     }
     iDir->cd();
-    if(!readHistograms( hListEnergyHistograms, "energyHistograms" ) )
+    if( !readHistograms( hListEnergyHistograms, "energyHistograms" ) )
     {
         return false;
     }
     iDir->cd();
-    if(!readHistograms( hisRateList, "rawRateHistograms" ) )
+    if( !readHistograms( hisRateList, "rawRateHistograms" ) )
     {
         return false;
     }
@@ -657,12 +657,12 @@ bool VStereoHistograms::readHistograms( TList* iL, string iDir )
 
     // write all sky plots into sky histogram directory
     wDir = ( TDirectory* )gDirectory->Get( iDir.c_str() );
-    if(!wDir )
+    if( !wDir )
     {
         string iT = "stereo/" + iDir;
         wDir = ( TDirectory* )gDirectory->Get( iT.c_str() );
     }
-    if(!wDir )
+    if( !wDir )
     {
         cout << "VStereoHistograms::readHistograms() directory not found " << iDir << endl;
         return false;
@@ -689,7 +689,7 @@ bool VStereoHistograms::readHistograms( TList* iL, string iDir )
         {
             bRead = true;
         }
-        if(!bIsOn && iTemp.find( "_off" ) < iTemp.size() )
+        if( !bIsOn && iTemp.find( "_off" ) < iTemp.size() )
         {
             bRead = true;
         }
@@ -725,11 +725,11 @@ bool VStereoHistograms::readSkyPlots()
 
     // sky histogram directory
     wDir = ( TDirectory* )gDirectory->Get( "skyHistograms" );
-    if(!wDir )
+    if( !wDir )
     {
         wDir = ( TDirectory* )gDirectory->Get( "stereo/skyHistograms" );
     }
-    if(!wDir )
+    if( !wDir )
     {
         cout << "VStereoHistograms::readSkyPlots() directory not found " << endl;
         return false;
@@ -761,7 +761,7 @@ bool VStereoHistograms::readSkyPlots()
         {
             bFill = true;
         }
-        if(!bIsOn && iTemp.find( "_off" ) < iTemp.size() )
+        if( !bIsOn && iTemp.find( "_off" ) < iTemp.size() )
         {
             bFill = true;
         }
@@ -795,7 +795,7 @@ bool VStereoHistograms::readSkyPlots()
             h_combine_map_stereo_offUC = ( TH2D* )ho;
         }
 
-        if(!bFill )
+        if( !bFill )
         {
             continue;
         }
@@ -848,12 +848,12 @@ bool VStereoHistograms::readSkyPlots()
 
 void VStereoHistograms::makeRateHistograms( double iStart, double iStopp )
 {
-    if(!hisRateList )
+    if( !hisRateList )
     {
         return;
     }
 
-    if(!hrate_1sec || !hrate_10sec || !hrate_1min )
+    if( !hrate_1sec || !hrate_10sec || !hrate_1min )
     {
         return;
     }
@@ -864,11 +864,11 @@ void VStereoHistograms::makeRateHistograms( double iStart, double iStopp )
     hrate_1min->Reset();
 
     // 1 bin per second
-    int i_nbins = ( int )(( iStopp - iStart ) * 24. * 60. * 60. );
+    int i_nbins = ( int )( ( iStopp - iStart ) * 24. * 60. * 60. );
     hrate_1sec->SetBins( i_nbins, iStart, iStopp );
-    i_nbins = ( int )(( iStopp - iStart ) / 10. * 24. * 60. * 60. );
+    i_nbins = ( int )( ( iStopp - iStart ) / 10. * 24. * 60. * 60. );
     hrate_10sec->SetBins( i_nbins, iStart, iStopp );
-    i_nbins = ( int )(( iStopp - iStart ) / 60. * 24. * 60. * 60. );
+    i_nbins = ( int )( ( iStopp - iStart ) / 60. * 24. * 60. * 60. );
     hrate_1min->SetBins( i_nbins, iStart, iStopp );
 }
 
@@ -886,7 +886,7 @@ void VStereoHistograms::writeObjects( string iFile, string iDirectory, TObject* 
     if( iDirectory.size() > 0 )
     {
         wDir = ( TDirectory* )iDir->Get( iDirectory.c_str() );
-        if(!wDir )
+        if( !wDir )
         {
             iDir->mkdir( iDirectory.c_str() )->cd();
         }

@@ -80,13 +80,13 @@ int main( int argc, char* argv[] )
     }
     // get telconfig tree
     TTree* tel = ( TTree* )f->Get( "telconfig" );
-    if(!tel )
+    if( !tel )
     {
         cout << "error finding tree telconfig" << endl;
         exit( 0 );
     }
     Ctelconfig* ctel = new Ctelconfig( tel );
-    if(!ctel )
+    if( !ctel )
     {
         exit( 0 );
     }
@@ -102,13 +102,13 @@ int main( int argc, char* argv[] )
     int minEvents = 3;
     // get showerpars tree
     TTree* s = ( TTree* )f->Get( "showerpars" );
-    if(!s )
+    if( !s )
     {
         cout << "error finding tree showerpars" << endl;
         exit( 0 );
     }
     Cshowerpars* m = new Cshowerpars( s, false, true );
-    if(!m )
+    if( !m )
     {
         exit( 0 );
     }
@@ -127,13 +127,13 @@ int main( int argc, char* argv[] )
         /// read tpars tree
         sprintf( hname, "Tel_%d/tpars", i + 1 );
         TTree* t = ( TTree* )f->Get( hname );
-        if(!t )
+        if( !t )
         {
             cout << "no tree tpars for telescope " << i + 1 << " skipping this telescope" << endl;
             continue;
         }
         Ctpars* c = new Ctpars( t, false, 1 );
-        if(!c )
+        if( !c )
         {
             exit( 0 );
         }
@@ -144,7 +144,7 @@ int main( int argc, char* argv[] )
             continue;
         }
         /// check if muon parameters are in the tpars tree
-        if(!c->fChain->GetBranchStatus( "houghMuonValid" ) )
+        if( !c->fChain->GetBranchStatus( "houghMuonValid" ) )
         {
             cout << endl << "error: input file does not contain muon parameters, exiting" << endl << endl;
             exit( 0 );
@@ -169,7 +169,7 @@ int main( int argc, char* argv[] )
             {
                 continue;
             }
-            if(( c->muonValid == CUTmuonValid && c->muonRadius > CUTLOmuonRadius && c->muonRSigma < CUTUPmuonRSigma && ( sqrt( pow( c->muonX0, 2 ) + pow( c->muonY0, 2 ) ) + c->muonRadius < CUTUPmuonRadius ) && c->muonSize < CUTUPmuonSize ) || c->houghMuonValid == CUThoughMuonValid )
+            if( ( c->muonValid == CUTmuonValid && c->muonRadius > CUTLOmuonRadius && c->muonRSigma < CUTUPmuonRSigma && ( sqrt( pow( c->muonX0, 2 ) + pow( c->muonY0, 2 ) ) + c->muonRadius < CUTUPmuonRadius ) && c->muonSize < CUTUPmuonSize ) || c->houghMuonValid == CUThoughMuonValid )
             {
                 if( j > 10000 )
                 {
@@ -216,7 +216,7 @@ int main( int argc, char* argv[] )
         TF1* fitRadiusSize[ntel];
         for( unsigned int i = 0; i < ntel; i++ )
         {
-            if(!bMinEvents[i] )
+            if( !bMinEvents[i] )
             {
                 continue;
             }
@@ -259,7 +259,7 @@ int main( int argc, char* argv[] )
         cout << "writing to database: " << DBstring << endl;
 
         VDB_Connection my_connection( DBstring.c_str(), iDB_user.c_str(), iDB_passwd.c_str() );
-        if(!my_connection.Get_Connection_Status() )
+        if( !my_connection.Get_Connection_Status() )
         {
             cout << "error: no connection to database, exiting" << endl;
             exit( 0 );
@@ -268,7 +268,7 @@ int main( int argc, char* argv[] )
         unsigned int EDversion = VGlobalRunParameter::getEVNDISP_VERSION_UI();
         char c_query[1000];
         sprintf( c_query, "SELECT * FROM tblCalib_Description WHERE package='EVNDISP' AND version=%u", EDversion );
-        if(!my_connection.make_query( c_query ) )
+        if( !my_connection.make_query( c_query ) )
         {
             cout << "error: DB" << endl;
             exit( 0 );
@@ -277,7 +277,7 @@ int main( int argc, char* argv[] )
         bool bNewDescription = false;
         int calib_ID = 0;
         TSQLRow* Description_row = dbDescription->Next();
-        if(!Description_row || !Description_row->GetField( 0 ) )
+        if( !Description_row || !Description_row->GetField( 0 ) )
         {
             cout << "\t no existing row for EVNDISP version " << EDversion << " in tblCalib_Description" << endl;
             bNewDescription = true;
@@ -291,21 +291,21 @@ int main( int argc, char* argv[] )
         if( bNewDescription )
         {
             sprintf( c_query, "INSERT INTO tblCalib_Description (package,version,calib_type,val1_str,val2_str) VALUES ('EVNDISP',%u,'MUON_RING','Slope dc/deg','Number of rings')", EDversion );
-            if(!my_connection.make_query( c_query ) )
+            if( !my_connection.make_query( c_query ) )
             {
                 cout << "error: failed to create new row in tblCalib_Description" << endl;
                 exit( 0 );
             }
             cout << "\t created new row for EVNDISP version " << EDversion << " in tblCalib_Description" << endl;
             sprintf( c_query, "SELECT * FROM tblCalib_Description WHERE package='EVNDISP' AND version=%u", EDversion );
-            if(!my_connection.make_query( c_query ) )
+            if( !my_connection.make_query( c_query ) )
             {
                 cout << "error: DB" << endl;
                 exit( 0 );
             }
             TSQLResult* dbDescriptionNew = my_connection.Get_QueryResult();
             TSQLRow* DescriptionNew_row = dbDescriptionNew->Next();
-            if(!DescriptionNew_row || !DescriptionNew_row->GetField( 0 ) )
+            if( !DescriptionNew_row || !DescriptionNew_row->GetField( 0 ) )
             {
                 cout << "\t still no row for EVNDISP version " << EDversion << " in tblCalib_Description" << endl;
                 exit( 0 );
@@ -328,20 +328,20 @@ int main( int argc, char* argv[] )
         for( unsigned int i = 0; i < ntel; i++ )
         {
 
-            if(!bMinEvents[i] )
+            if( !bMinEvents[i] )
             {
                 continue;
             }
             bNewData[i] = false;
             sprintf( c_query, "SELECT calib_id,run_id,telescope_id FROM tblCalib_Run_Data WHERE calib_id=%i AND run_id=%i AND telescope_id=%i", calib_ID, RunNumber, i );
-            if(!my_connection.make_query( c_query ) )
+            if( !my_connection.make_query( c_query ) )
             {
                 cout << "error: failed to connect to tblCalib_Run_Data" << endl;
                 exit( 0 );
             }
             dbRun[i] = my_connection.Get_QueryResult();
             Run_row[i] = dbRun[i]->Next();
-            if(!Run_row[i] || !Run_row[i]->GetField( 0 ) )
+            if( !Run_row[i] || !Run_row[i]->GetField( 0 ) )
             {
                 cout << "\t no existing row for T" << i + 1 << " in tblCalib_Run_Data" << endl;
                 bNewData[i] = true;
@@ -350,7 +350,7 @@ int main( int argc, char* argv[] )
             {
                 sprintf( c_query, "INSERT INTO tblCalib_Run_Data (calib_id,run_id,telescope_id,val1,err1,val2) VALUES (%i, %i, %i, %.1f, %.1f, %i )", calib_ID, RunNumber, i, slope[i], slopeErr[i], nMuons[i] );
 
-                if(!my_connection.make_query( c_query ) )
+                if( !my_connection.make_query( c_query ) )
                 {
                     cout << "error: failed to create new row in tblCalib_Run_Data for telescope " << i + 1 << endl;
                     exit( 0 );
@@ -360,7 +360,7 @@ int main( int argc, char* argv[] )
             else
             {
                 sprintf( c_query, "UPDATE tblCalib_Run_Data SET val1 = %.1f, err1 = %.1f, val2 = %i WHERE calib_id=%i AND run_id=%i AND telescope_id=%i", slope[i], slopeErr[i], nMuons[i], calib_ID, RunNumber, i );
-                if(!my_connection.make_query( c_query ) )
+                if( !my_connection.make_query( c_query ) )
                 {
                     cout << "error: failed to update row in tblCalib_Run_Data for telescope " << i + 1 << endl;
                     exit( 0 );

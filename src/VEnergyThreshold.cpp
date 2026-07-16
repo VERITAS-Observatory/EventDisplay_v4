@@ -174,7 +174,7 @@ bool VEnergyThreshold::openEffectiveAreaFile( string iname )
 
 bool VEnergyThreshold::writeResults()
 {
-    if(!fOutFile->IsZombie() && fTreeEth )
+    if( !fOutFile->IsZombie() && fTreeEth )
     {
         cout << "writing threshold tree to " << fOutFile->GetName() << endl;
         fTreeEth->Write();
@@ -197,15 +197,15 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
         cout << "VEnergyThreshold::calculateEnergyThreshold " << fTreeEth << endl;
     }
 
-    if(!fEffArea )
+    if( !fEffArea )
     {
         cout << "VEnergyThreshold::calculateEnergyThreshold() error reading effective area file" << endl;
         return false;
     }
 
-    if(!fTreeEth )
+    if( !fTreeEth )
     {
-        if(!setUpThresholdTree() )
+        if( !setUpThresholdTree() )
         {
             return false;
         }
@@ -254,7 +254,7 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
                                     TMath::Power( TMath::Power( 10., e0[b] ),
                                                   -1.*2.4 ) );
             }
-            feth = getEnergyThreshold(&hLin, true, bFit );
+            feth = getEnergyThreshold( &hLin, true, bFit );
         }
 
         if( nbins_esys > 1 )
@@ -302,7 +302,7 @@ bool VEnergyThreshold::calculateEnergyThreshold( bool bFit, int nentries )
 
 double VEnergyThreshold::getEnergy_maxSystematic( TGraphErrors* g, double iSys )
 {
-    if(!g )
+    if( !g )
     {
         return 0.;
     }
@@ -368,7 +368,7 @@ double VEnergyThreshold::getEnergy_maxSystematic( vector< double > x, vector< do
 
 double VEnergyThreshold::getEnergyThreshold( TH1D* h, bool bLogEnergyAxis, bool bFit )
 {
-    if(!h )
+    if( !h )
     {
         return 0.;
     }
@@ -376,7 +376,7 @@ double VEnergyThreshold::getEnergyThreshold( TH1D* h, bool bLogEnergyAxis, bool 
     int iMaxBin = h->GetMaximumBin();
 
     // weighed bin of three largest bins
-    if(!bFit )
+    if( !bFit )
     {
         double iTotWeight = 0.;
         for( int tt = iMaxBin - 1; tt <= iMaxBin + 1; tt++ )
@@ -433,7 +433,7 @@ bool VEnergyThreshold::setUpThresholdTree()
         return true;
     }
 
-    if(!fOutFile )
+    if( !fOutFile )
     {
         cout << "VEnergyThreshold::setUpThresholdTree: no output file defined" << endl;
         return false;
@@ -502,7 +502,7 @@ double VEnergyThreshold::getEnergyThreshold( VRunList* iRunData )
     }
 
     // open file with energy thresholds
-    if(!fEnergyThresholdFile && !openEnergyThresholdFile() )
+    if( !fEnergyThresholdFile && !openEnergyThresholdFile() )
     {
         return 0.001;
     }
@@ -526,7 +526,7 @@ bool VEnergyThreshold::openEnergyThresholdFile()
         return false;
     }
     fTreeEth = ( TTree* )fEnergyThresholdFile->Get( "fTreeEth" );
-    if(!fTreeEth )
+    if( !fTreeEth )
     {
         return false;
     }
@@ -570,9 +570,9 @@ double VEnergyThreshold::interpolateEnergyThreshold( VRunList* iRunData )
 
 void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff, int noise, int az, bool bPlot, string plot_option )
 {
-    if(!fTreeEth )
+    if( !fTreeEth )
     {
-        if(!openEnergyThresholdFile() )
+        if( !openEnergyThresholdFile() )
         {
             cout << "error opening energy threshold file" << endl;
             return;
@@ -639,7 +639,7 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
         else
         {
             c = ( TCanvas* )gROOT->GetListOfCanvases()->FindObject( hname );
-            if(!c )
+            if( !c )
             {
                 continue;
             }
@@ -650,7 +650,7 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
         fTreeEth->SetMarkerColor( fPlottingMarkerColor );
         fTreeEth->SetLineColor( fPlottingMarkerColor );
         fTreeEth->SetMarkerSize( fPlottingMarkerSize );
-        fTreeEth->SetLineWidth(( Width_t )fPlottingLineWidth );
+        fTreeEth->SetLineWidth( ( Width_t )fPlottingLineWidth );
 
         if( bPlot )
         {
@@ -694,7 +694,7 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
         }
         if( g )
         {
-            g->SetLineWidth(( Width_t )fPlottingLineWidth );
+            g->SetLineWidth( ( Width_t )fPlottingLineWidth );
             g->Draw( plot_option.c_str() );
         }
         // draw titles
@@ -712,7 +712,7 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
 
 double VEnergyThreshold::getEnergy_MaxEffectiveAreaFraction( TObject* h, double iFrac )
 {
-    if(!h )
+    if( !h )
     {
         return 0.;
     }

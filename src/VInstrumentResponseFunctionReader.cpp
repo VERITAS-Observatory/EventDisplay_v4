@@ -137,14 +137,14 @@ bool VInstrumentResponseFunctionReader::fillData()
 {
     // read in all the necessary data from the effective area tree
 
-    if(!getDataFromFile() )
+    if( !getDataFromFile() )
     {
         fIsZombie = true;
         return false;
     }
 
     // calculate ratio of cut - efficiencies
-    if(!calculateCutEfficiencies() )
+    if( !calculateCutEfficiencies() )
     {
         return false;
     }
@@ -168,10 +168,10 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     TH1F* h = 0;
     // gamma-ray effective area vs reconstruction energy
     h = get_CTA_IRF_Histograms( "EffectiveArea", fWoff );
-    if(!h )
+    if( !h )
     {
         h = get_CTA_IRF_Histograms( "harea_gamma", fWoff );
-        if(!h )
+        if( !h )
         {
             return false;
         }
@@ -183,7 +183,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     get_Graph_from_Histogram( h, gEffArea_Rec, false, bLinX );
     // gamma-ray effective area vs true energy
     h = get_CTA_IRF_Histograms( "EffectiveAreaEtrue", fWoff );
-    if(!h )
+    if( !h )
     {
         h = get_CTA_IRF_Histograms( "harea_gamma", fWoff );
         if( h )
@@ -218,7 +218,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     h = 0;
     gEnergyResolution = new TGraphErrors( 1 );
     h = ( TH1F* )get_CTA_IRF_Histograms( "ERes", fWoff );
-    if(!h )
+    if( !h )
     {
         h = ( TH1F* )get_CTA_IRF_Histograms( "EnResol_RMS", fWoff );
     }
@@ -232,7 +232,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     h = 0;
     gEnergyBias_Mean = new TGraphErrors( 1 );
     h = ( TH1F* )get_CTA_IRF_Histograms( "Ebias", fWoff );
-    if(!h )
+    if( !h )
     {
         h = ( TH1F* )get_CTA_IRF_Histograms_from2D( "EestOverEtrue", -1. );
     }
@@ -249,7 +249,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     gAngularResolution = new TGraphErrors( 1 );
     h = ( TH1F* )get_CTA_IRF_Histograms( "AngRes", fWoff );
     // try Paris style file
-    if(!h )
+    if( !h )
     {
         h = ( TH1F* )get_CTA_IRF_Histograms( "AngResolution68", fWoff );
         // arcmin -> deg
@@ -270,7 +270,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     gAngularResolution80 = new TGraphErrors( 1 );
     h = ( TH1F* )get_CTA_IRF_Histograms( "AngRes80", fWoff );
     // try Paris style file
-    if(!h )
+    if( !h )
     {
         h = ( TH1F* )get_CTA_IRF_Histograms( "AngResolution80", fWoff );
         // arcmin -> deg
@@ -300,7 +300,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
  */
 bool VInstrumentResponseFunctionReader::fill_from_effectiveAreaFromH2( TTree* t )
 {
-    if(!t )
+    if( !t )
     {
         return false;
     }
@@ -431,7 +431,7 @@ bool VInstrumentResponseFunctionReader::fill_from_effectiveAreaFromH2( TTree* t 
  */
 bool VInstrumentResponseFunctionReader::fill_from_effectiveArea( TTree* t )
 {
-    if(!t )
+    if( !t )
     {
         return false;
     }
@@ -584,24 +584,24 @@ bool VInstrumentResponseFunctionReader::fill_from_effectiveArea( TTree* t )
         // energy resolution calculation as 68% value
         //       getEnergyResolutionPlot68( (TH2D*)c->hEsysMCRelative2D );
         // energy resolution is RMS
-        getEnergyResolutionPlot(( TH2D* )c->hEsysMCRelativeRMS );
+        getEnergyResolutionPlot( ( TH2D* )c->hEsysMCRelativeRMS );
         //       getEnergyResolutionPlot( (TProfile*)c->hEsysRec );
         setGraphPlottingStyle( gEnergyResolution );
         // get energy bias
-        gEnergyBias_Mean = get_Profile_from_TH2D(( TH2D* )c->hEsysMCRelativeRMS, 0, "mean", 1, -10., 0. );
+        gEnergyBias_Mean = get_Profile_from_TH2D( ( TH2D* )c->hEsysMCRelativeRMS, 0, "mean", 1, -10., 0. );
         setGraphPlottingStyle( gEnergyBias_Mean );
-        gEnergyBias_Median = get_Profile_from_TH2D(( TH2D* )c->hEsysMCRelativeRMS, 0, "median", 1, -10., 0. );
+        gEnergyBias_Median = get_Profile_from_TH2D( ( TH2D* )c->hEsysMCRelativeRMS, 0, "median", 1, -10., 0. );
         setGraphPlottingStyle( gEnergyBias_Median, 1, 1., 7 );
-        gEnergyLogBias_Mean = get_Profile_from_TH2D(( TH2D* )c->hEsys2D, 0, "mean", 1, -10. );
+        gEnergyLogBias_Mean = get_Profile_from_TH2D( ( TH2D* )c->hEsys2D, 0, "mean", 1, -10. );
         setGraphPlottingStyle( gEnergyLogBias_Mean, 1, 1., 7 );
-        gEnergyLogBias_Median = get_Profile_from_TH2D(( TH2D* )c->hEsys2D, 0, "median", 1, -10. );
+        gEnergyLogBias_Median = get_Profile_from_TH2D( ( TH2D* )c->hEsys2D, 0, "median", 1, -10. );
         setGraphPlottingStyle( gEnergyLogBias_Median );
         // get rate histograms
         hWeightedRate = ( TH1D* )c->hWeightedRate;
         // get cut efficiencies
         if( c->hhEcutTrigger )
         {
-            hCutEfficiency.push_back(( TH1D* )c->hhEcutTrigger->Clone() );
+            hCutEfficiency.push_back( ( TH1D* )c->hhEcutTrigger->Clone() );
         }
         else
         {
@@ -609,7 +609,7 @@ bool VInstrumentResponseFunctionReader::fill_from_effectiveArea( TTree* t )
         }
         if( c->hhEcutFiducialArea )
         {
-            hCutEfficiency.push_back(( TH1D* )c->hhEcutFiducialArea->Clone() );
+            hCutEfficiency.push_back( ( TH1D* )c->hhEcutFiducialArea->Clone() );
         }
         else
         {
@@ -617,7 +617,7 @@ bool VInstrumentResponseFunctionReader::fill_from_effectiveArea( TTree* t )
         }
         if( c->hhEcutStereoQuality )
         {
-            hCutEfficiency.push_back(( TH1D* )c->hhEcutStereoQuality->Clone() );
+            hCutEfficiency.push_back( ( TH1D* )c->hhEcutStereoQuality->Clone() );
         }
         else
         {
@@ -625,7 +625,7 @@ bool VInstrumentResponseFunctionReader::fill_from_effectiveArea( TTree* t )
         }
         if( c->hhEcutTelType )
         {
-            hCutEfficiency.push_back(( TH1D* )c->hhEcutTelType->Clone() );
+            hCutEfficiency.push_back( ( TH1D* )c->hhEcutTelType->Clone() );
         }
         else
         {
@@ -633,7 +633,7 @@ bool VInstrumentResponseFunctionReader::fill_from_effectiveArea( TTree* t )
         }
         if( c->hhEcutDirection )
         {
-            hCutEfficiency.push_back(( TH1D* )c->hhEcutDirection->Clone() );
+            hCutEfficiency.push_back( ( TH1D* )c->hhEcutDirection->Clone() );
         }
         else
         {
@@ -641,7 +641,7 @@ bool VInstrumentResponseFunctionReader::fill_from_effectiveArea( TTree* t )
         }
         if( c->hhEcutEnergyReconstruction )
         {
-            hCutEfficiency.push_back(( TH1D* )c->hhEcutEnergyReconstruction->Clone() );
+            hCutEfficiency.push_back( ( TH1D* )c->hhEcutEnergyReconstruction->Clone() );
         }
         else
         {
@@ -649,7 +649,7 @@ bool VInstrumentResponseFunctionReader::fill_from_effectiveArea( TTree* t )
         }
         if( c->hhEcutGammaHadron )
         {
-            hCutEfficiency.push_back(( TH1D* )c->hhEcutGammaHadron->Clone() );
+            hCutEfficiency.push_back( ( TH1D* )c->hhEcutGammaHadron->Clone() );
         }
         else
         {
@@ -704,10 +704,10 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
         bFound = fill_from_effectiveAreaFromH2( t );
     }
     // not effective area tree - is this a CTA file?
-    if(!t )
+    if( !t )
     {
         // try to read CTA file
-        if(!getDataFromCTAFile() )
+        if( !getDataFromCTAFile() )
         {
             cout << "Error: effective area histogram not found in CTA-style file" << endl;
             return false;
@@ -726,7 +726,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
         cout << "reading IRF " << fIRF_TreeNames[i].c_str() << endl;
         TTree* t_a = ( TTree* )iFile->Get( fIRF_TreeNames[i].c_str() );
         fIRF_Data[i] = getIRFFromFile( t_a, i );
-        if(!fIRF_Data[i] )
+        if( !fIRF_Data[i] )
         {
             cout << " ...not found (index " << i << ")" << endl;
         }
@@ -793,9 +793,9 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
                                 {
                                     if( iSum / iTot > 0. )
                                     {
-                                        gEffArea_Recp80->SetPoint( z, i_x, i_y * 0.8 / iSum* iTot );
-                                        gEffArea_Recp80->SetPointEYhigh( z, gEffArea_Rec->GetErrorYhigh( p )  * 0.8 / iSum* iTot );
-                                        gEffArea_Recp80->SetPointEYlow( z, gEffArea_Rec->GetErrorYlow( p )  * 0.8 / iSum* iTot );
+                                        gEffArea_Recp80->SetPoint( z, i_x, i_y * 0.8 / iSum * iTot );
+                                        gEffArea_Recp80->SetPointEYhigh( z, gEffArea_Rec->GetErrorYhigh( p )  * 0.8 / iSum * iTot );
+                                        gEffArea_Recp80->SetPointEYlow( z, gEffArea_Rec->GetErrorYlow( p )  * 0.8 / iSum * iTot );
                                         z++;
                                     }
                                     break;
@@ -809,7 +809,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
         }
     }
 
-    if(!bFound )
+    if( !bFound )
     {
         return false;
     }
@@ -821,14 +821,14 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 
 VInstrumentResponseFunctionData* VInstrumentResponseFunctionReader::getIRFFromFile( TTree* t, unsigned int iIRFIndex )
 {
-    if(!t )
+    if( !t )
     {
         return 0;
     }
 
     VInstrumentResponseFunctionData* c = new VInstrumentResponseFunctionData();
     TBranch* br = t->GetBranch( "IRF" );
-    br->SetAddress(&c );
+    br->SetAddress( &c );
 
     for( int j = 0; j < t->GetEntries(); j++ )
     {
@@ -840,7 +840,7 @@ VInstrumentResponseFunctionData* VInstrumentResponseFunctionReader::getIRFFromFi
         }
 
         // check that there is data for this tree entry
-        if(!c )
+        if( !c )
         {
             continue;
         }
@@ -914,7 +914,7 @@ VInstrumentResponseFunctionData* VInstrumentResponseFunctionReader::getIRFFromFi
 
 void VInstrumentResponseFunctionReader::getEnergyResolutionPlot68( TH2D* iP, double iMinEnergy, double iReferenceValue )
 {
-    if(!iP )
+    if( !iP )
     {
         gEnergyResolution = 0;
         return;
@@ -992,7 +992,7 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot68( TH2D* iP, dou
 
 void VInstrumentResponseFunctionReader::getEnergyResolutionPlot( TH2D* iP, double iMinEnergy )
 {
-    if(!iP )
+    if( !iP )
     {
         gEnergyResolution = 0;
         return;
@@ -1027,7 +1027,7 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot( TH2D* iP, doubl
 
 void VInstrumentResponseFunctionReader::getEnergyResolutionPlot( TProfile* iP, int i_rebin, double iMinEnergy )
 {
-    if(!iP )
+    if( !iP )
     {
         gEnergyResolution = 0;
         return;
@@ -1087,7 +1087,7 @@ bool VInstrumentResponseFunctionReader::calculateCutEfficiencies()
         if( hCutEfficiency[i] )
         {
             sprintf( hname, "%s_R", hCutEfficiency[i]->GetName() );
-            hCutEfficiencyRelativePlots.push_back(( TH1D* )hCutEfficiency[i]->Clone( hname ) );
+            hCutEfficiencyRelativePlots.push_back( ( TH1D* )hCutEfficiency[i]->Clone( hname ) );
             hCutEfficiencyRelativePlots.back()->Reset();
         }
         else
@@ -1109,7 +1109,7 @@ bool VInstrumentResponseFunctionReader::calculateCutEfficiencies()
 
 bool VInstrumentResponseFunctionReader::calculateEffectiveAreaRatios( TGraphAsymmErrors* g0 )
 {
-    if(!g0 )
+    if( !g0 )
     {
         return false;
     }
@@ -1122,7 +1122,7 @@ bool VInstrumentResponseFunctionReader::calculateEffectiveAreaRatios( TGraphAsym
 
 TGraphAsymmErrors* VInstrumentResponseFunctionReader::calculateEffectiveAreaRatios( TGraphAsymmErrors* g0, TGraphAsymmErrors* g1 )
 {
-    if(!g0 || !g1 )
+    if( !g0 || !g1 )
     {
         return 0;
     }
@@ -1186,7 +1186,7 @@ TGraphAsymmErrors* VInstrumentResponseFunctionReader::calculateEffectiveAreaRati
 
 bool VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms( TH1F* hEffRec, string iContainmentRadius, TH1F* hEff_MC )
 {
-    if(!hEffRec )
+    if( !hEffRec )
     {
         return false;
     }
@@ -1216,7 +1216,7 @@ bool VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms( TH1F* hEff
             g->GetPoint( i, x, y );
             if( y > 0. )
             {
-                hEffRec->SetBinContent( hEffRec->FindBin( x ), y*    i_EffAreaScaleFactor );
+                hEffRec->SetBinContent( hEffRec->FindBin( x ), y *    i_EffAreaScaleFactor );
                 hEffRec->SetBinError( hEffRec->FindBin( x ), 0.5 * ( g->GetErrorYlow( i ) + g->GetErrorYhigh( i ) ) );
             }
         }
@@ -1247,7 +1247,7 @@ bool VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms( TH1F* hEff
 
 bool VInstrumentResponseFunctionReader::fillBiasHistograms( TH1F* h, string iMeanOrMedian )
 {
-    if(!h )
+    if( !h )
     {
         return false;
     }
@@ -1267,7 +1267,7 @@ bool VInstrumentResponseFunctionReader::fillBiasHistograms( TH1F* h, string iMea
         cout << "\t allowed values: mean or median" << endl;
         return false;
     }
-    if(!g )
+    if( !g )
     {
         cout << "VInstrumentResponseFunctionReader::fillBiasHistograms warning: no bias graph found" << endl;
         return false;
@@ -1304,7 +1304,7 @@ bool VInstrumentResponseFunctionReader::fillBiasHistograms( TH1F* h, string iMea
 
 bool VInstrumentResponseFunctionReader::fillResolutionHistogram( TH1F* h, string iContainmentRadius, string iResolutionTreeName )
 {
-    if(!h )
+    if( !h )
     {
         return false;
     }

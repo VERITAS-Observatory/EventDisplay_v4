@@ -16,7 +16,7 @@ VRunSummary::VRunSummary()
 
 bool VRunSummary::setBranches()
 {
-    if(!fRunSummaryTree )
+    if( !fRunSummaryTree )
     {
         return false;
     }
@@ -338,7 +338,7 @@ bool VRunSummary::fill( string iDataDirectory,
 
 bool VRunSummary::initTree()
 {
-    if(!fRunSummaryTree )
+    if( !fRunSummaryTree )
     {
         return false;
     }

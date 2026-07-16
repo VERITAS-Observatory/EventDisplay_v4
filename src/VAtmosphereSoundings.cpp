@@ -48,7 +48,7 @@ void VAtmosphereSoundings::setModtranHeights()
     int hmax = 120000;
     for( int h = hmin; h <= hmax; h += step )
     {
-        fModtranHeights.push_back(( double )h );
+        fModtranHeights.push_back( ( double )h );
         if( h == 25000 )
         {
             step = 2500;
@@ -71,7 +71,7 @@ VAtmosphereSoundings::VAtmosphereSoundings( string iRootFile )
     setHeights();
     setPlottingPeriod();
 
-    if(!readSoundingsFromRootFile( iRootFile ) )
+    if( !readSoundingsFromRootFile( iRootFile ) )
     {
         cout << "VAtmosphereSoundings::VAtmosphereSoundings: could not read file " << iRootFile << endl;
         return;
@@ -87,7 +87,7 @@ bool VAtmosphereSoundings::readSoundingsFromRootFile( string iRootFile )
         return false;
     }
     fDataTree = ( TTree* )fDataFile->Get( "tSoundings" );
-    if(!fDataTree )
+    if( !fDataTree )
     {
         cout << "VAtmosphereSoundings::VAtmosphereSoundings( string ) error: data tree not found in " << iRootFile << endl;
         return false;
@@ -110,7 +110,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 {
     ifstream is;
     is.open( iFileList.c_str() );
-    if(!is )
+    if( !is )
     {
         cout << "VAtmosphereSoundings::readSoundingsFromTextFile: error: file list not found: " << iFileList << endl;
         return false;
@@ -137,7 +137,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 
         ifstream is;
         is.open( fListTextFile[i].c_str() );
-        if(!is )
+        if( !is )
         {
             cout << "VAtmosphereSoundings::readSoundingsFromTextFile: error: sounding file not found: " << fListTextFile[i] << endl;
             continue;
@@ -205,7 +205,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
                         double iT = 0.;
                         istringstream is_stream( is_line );
                         iT = -9999.;
-                        if(!( is_stream >> std::ws ).eof() )
+                        if( !( is_stream >> std::ws ).eof() )
                         {
                             is_stream >> iT;
                         }
@@ -215,10 +215,10 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
                         }
                         else
                         {
-                            fData.back()->fPressure_Pa.push_back(-9999. );
+                            fData.back()->fPressure_Pa.push_back( -9999. );
                         }
                         iT = -9999.;
-                        if(!( is_stream >> std::ws ).eof() )
+                        if( !( is_stream >> std::ws ).eof() )
                         {
                             is_stream >> iT;
                         }
@@ -228,10 +228,10 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
                         }
                         else
                         {
-                            fData.back()->fHeight_m.push_back(-9999. );
+                            fData.back()->fHeight_m.push_back( -9999. );
                         }
                         iT = -9999.;
-                        if(!( is_stream >> std::ws ).eof() )
+                        if( !( is_stream >> std::ws ).eof() )
                         {
                             is_stream >> iT;
                             iT += 273.15;
@@ -242,11 +242,11 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
                         }
                         else
                         {
-                            fData.back()->fTemperature_K.push_back(-9999. );
+                            fData.back()->fTemperature_K.push_back( -9999. );
                         }
 
                         iT = -9999.;
-                        if(!( is_stream >> std::ws ).eof() )
+                        if( !( is_stream >> std::ws ).eof() )
                         {
                             is_stream >> iT;
                             iT += 273.15;
@@ -257,11 +257,11 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
                         }
                         else
                         {
-                            fData.back()->fDewPoint_K.push_back(-9999. );
+                            fData.back()->fDewPoint_K.push_back( -9999. );
                         }
 
                         iT = -9999.;
-                        if(!( is_stream >> std::ws ).eof() )
+                        if( !( is_stream >> std::ws ).eof() )
                         {
                             is_stream >> iT;
                             iT /= 1.e2;                // % to fraction
@@ -272,11 +272,11 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
                         }
                         else
                         {
-                            fData.back()->fRelativeHumidity.push_back(-9999. );
+                            fData.back()->fRelativeHumidity.push_back( -9999. );
                         }
                         // mixing ratio
                         iT = -9999.;
-                        if(!( is_stream >> std::ws ).eof() )
+                        if( !( is_stream >> std::ws ).eof() )
                         {
                             is_stream >> iT;
                         }
@@ -286,11 +286,11 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
                         }
                         else
                         {
-                            fData.back()->fMixingRatio_gkg.push_back(-9999. );
+                            fData.back()->fMixingRatio_gkg.push_back( -9999. );
                         }
                         // wind direction
                         iT = -9999.;
-                        if(!( is_stream >> std::ws ).eof() )
+                        if( !( is_stream >> std::ws ).eof() )
                         {
                             is_stream >> iT;
                         }
@@ -300,11 +300,11 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
                         }
                         else
                         {
-                            fData.back()->fWindDirection_deg.push_back(-9999. );
+                            fData.back()->fWindDirection_deg.push_back( -9999. );
                         }
                         // wind speed
                         iT = -9999.;
-                        if(!( is_stream >> std::ws ).eof() )
+                        if( !( is_stream >> std::ws ).eof() )
                         {
                             is_stream >> iT;
                             iT *= 0.514444;  // [knots] to [m/s]
@@ -315,7 +315,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
                         }
                         else
                         {
-                            fData.back()->fWindSpeed_ms.push_back(-9999. );
+                            fData.back()->fWindSpeed_ms.push_back( -9999. );
                         }
                     }
                     z++;
@@ -354,7 +354,7 @@ void VAtmosphereSoundings::fillO2()
         {
             for( unsigned int j = 0; j < fData[i]->fPressure_Pa.size(); j++ )
             {
-                fData[i]->fO2_cmkm.push_back(-9999. );
+                fData[i]->fO2_cmkm.push_back( -9999. );
             }
         }
     }
@@ -368,7 +368,7 @@ void VAtmosphereSoundings::fillO3()
         {
             for( unsigned int j = 0; j < fData[i]->fPressure_Pa.size(); j++ )
             {
-                fData[i]->fO3_cmkm.push_back(-9999. );
+                fData[i]->fO3_cmkm.push_back( -9999. );
             }
         }
     }
@@ -403,7 +403,7 @@ void VAtmosphereSoundings::fillAtmosphericPressure()
 */
 void VAtmosphereSoundings::fillAtmosphericPressure( VAtmosphereSoundingData* iData )
 {
-    if(!iData )
+    if( !iData )
     {
         return;
     }
@@ -445,7 +445,7 @@ void VAtmosphereSoundings::fillAtmosphericThickness()
 
 void VAtmosphereSoundings::fillAtmosphericThickness( VAtmosphereSoundingData* iData )
 {
-    if(!iData )
+    if( !iData )
     {
         return;
     }
@@ -488,7 +488,7 @@ void VAtmosphereSoundings::fillIndexofRefraction()
 
             for( unsigned int j = 0; j < fData[i]->fPressure_Pa.size(); j++ )
             {
-                fData[i]->fIndexofRefraction.push_back(-9999. );
+                fData[i]->fIndexofRefraction.push_back( -9999. );
             }
         }
 
@@ -505,7 +505,7 @@ int VAtmosphereSoundings::read_CORSIKA_Atmosphere( string iFile, string iName, i
 {
     ifstream is;
     is.open( iFile.c_str() );
-    if(!is )
+    if( !is )
     {
         cout << "VAtmosphereSoundings::read_CORSIKA_Atmosphere: error opening CORSIKA atmospheric file " << iFile << endl;
         return -1;
@@ -533,7 +533,7 @@ int VAtmosphereSoundings::read_CORSIKA_Atmosphere( string iFile, string iName, i
 
         istringstream is_stream( is_line );
 
-        fDataCORSIKAMODTRAN.back()->fPressure_Pa.push_back(-9999. );
+        fDataCORSIKAMODTRAN.back()->fPressure_Pa.push_back( -9999. );
 
         is_stream >> iTemp;
         d = atof( iTemp.c_str() );
@@ -547,22 +547,22 @@ int VAtmosphereSoundings::read_CORSIKA_Atmosphere( string iFile, string iName, i
         d = atof( iTemp.c_str() );
         fDataCORSIKAMODTRAN.back()->fThickness_gcm2.push_back( d );
 
-        fDataCORSIKAMODTRAN.back()->fTemperature_K.push_back(-9999. );
+        fDataCORSIKAMODTRAN.back()->fTemperature_K.push_back( -9999. );
 
-        fDataCORSIKAMODTRAN.back()->fDewPoint_K.push_back(-9999. );
+        fDataCORSIKAMODTRAN.back()->fDewPoint_K.push_back( -9999. );
 
-        fDataCORSIKAMODTRAN.back()->fRelativeHumidity.push_back(-9999. );
-        fDataCORSIKAMODTRAN.back()->fVaporMassDensity_gm3.push_back(-9999. );
+        fDataCORSIKAMODTRAN.back()->fRelativeHumidity.push_back( -9999. );
+        fDataCORSIKAMODTRAN.back()->fVaporMassDensity_gm3.push_back( -9999. );
 
         is_stream >> iTemp;
         d = atof( iTemp.c_str() );
         fDataCORSIKAMODTRAN.back()->fIndexofRefraction.push_back( d + 1. );
 
-        fDataCORSIKAMODTRAN.back()->fMixingRatio_gkg.push_back(-9999. );
-        fDataCORSIKAMODTRAN.back()->fWindDirection_deg.push_back(-9999. );
-        fDataCORSIKAMODTRAN.back()->fWindSpeed_ms.push_back(-9999. );
-        fDataCORSIKAMODTRAN.back()->fO2_cmkm.push_back(-9999. );
-        fDataCORSIKAMODTRAN.back()->fO3_cmkm.push_back(-9999. );
+        fDataCORSIKAMODTRAN.back()->fMixingRatio_gkg.push_back( -9999. );
+        fDataCORSIKAMODTRAN.back()->fWindDirection_deg.push_back( -9999. );
+        fDataCORSIKAMODTRAN.back()->fWindSpeed_ms.push_back( -9999. );
+        fDataCORSIKAMODTRAN.back()->fO2_cmkm.push_back( -9999. );
+        fDataCORSIKAMODTRAN.back()->fO3_cmkm.push_back( -9999. );
 
     }
     is.close();
@@ -581,7 +581,7 @@ int VAtmosphereSoundings::read_MODTRAN_Atmosphere( string iFile, string iName, i
 {
     ifstream is;
     is.open( iFile.c_str() );
-    if(!is )
+    if( !is )
     {
         cout << "VAtmosphereSoundings::read_MODTRAN_Atmosphere: error opening MODTRAN tp6 file" << iFile << endl;
         return -1;
@@ -643,12 +643,12 @@ int VAtmosphereSoundings::read_MODTRAN_Atmosphere( string iFile, string iName, i
             is_stream >> iTemp;
             fDataCORSIKAMODTRAN.back()->fTemperature_K.push_back( atof( iTemp.c_str() ) );
             // density
-            fDataCORSIKAMODTRAN.back()->fDensity_gcm3.push_back(-9999. );
-            fDataCORSIKAMODTRAN.back()->fThickness_gcm2.push_back(-9999. );
-            fDataCORSIKAMODTRAN.back()->fDewPoint_K.push_back(-9999. );
-            fDataCORSIKAMODTRAN.back()->fMixingRatio_gkg.push_back(-9999. );
-            fDataCORSIKAMODTRAN.back()->fWindDirection_deg.push_back(-9999. );
-            fDataCORSIKAMODTRAN.back()->fWindSpeed_ms.push_back(-9999. );
+            fDataCORSIKAMODTRAN.back()->fDensity_gcm3.push_back( -9999. );
+            fDataCORSIKAMODTRAN.back()->fThickness_gcm2.push_back( -9999. );
+            fDataCORSIKAMODTRAN.back()->fDewPoint_K.push_back( -9999. );
+            fDataCORSIKAMODTRAN.back()->fMixingRatio_gkg.push_back( -9999. );
+            fDataCORSIKAMODTRAN.back()->fWindDirection_deg.push_back( -9999. );
+            fDataCORSIKAMODTRAN.back()->fWindSpeed_ms.push_back( -9999. );
             // N2
             is_stream >> iTemp;
             // CNTMSLF
@@ -701,7 +701,7 @@ int VAtmosphereSoundings::read_MODTRAN_Atmosphere( string iFile, string iName, i
         {
             for( unsigned int j = 0; j < fDataCORSIKAMODTRAN[i]->fIndexofRefraction.size(); j++ )
             {
-                fDataCORSIKAMODTRAN[i]->fRelativeHumidity.push_back(-9999. );
+                fDataCORSIKAMODTRAN[i]->fRelativeHumidity.push_back( -9999. );
             }
         }
     }
@@ -722,7 +722,7 @@ void VAtmosphereSoundings::fillWaterVaporDensity()
 
 void VAtmosphereSoundings::fillWaterVaporDensity( VAtmosphereSoundingData* iData )
 {
-    if(!iData )
+    if( !iData )
     {
         return;
     }
@@ -882,7 +882,7 @@ double VAtmosphereSoundings::getWaterVaporMassDensity( double ATEMP )
     double AMWT = 18.015;           // molecular weight of water
     double B = AVOGAD / AMWT;
 
-    return ATEMP * B * TMath::Exp( C1 + C2* ATEMP + C3* ATEMP* ATEMP ) * 1.0e-6;
+    return ATEMP * B * TMath::Exp( C1 + C2 * ATEMP + C3 * ATEMP * ATEMP ) * 1.0e-6;
 }
 
 
@@ -1197,11 +1197,11 @@ unsigned int VAtmosphereSoundings::checkPlottingPeriodIdentifier( unsigned int i
     map< unsigned int, vector< unsigned int> >::iterator i_iter;
     for( i_iter = fPlottingPeriodDates.begin(); i_iter != fPlottingPeriodDates.end(); i_iter++ )
     {
-        for( unsigned int j = 0; j < (*i_iter ).second.size(); j++ )
+        for( unsigned int j = 0; j < ( *i_iter ).second.size(); j++ )
         {
-            if((*i_iter ).second[j] == iDate )
+            if( ( *i_iter ).second[j] == iDate )
             {
-                return (*i_iter ).first;
+                return ( *i_iter ).first;
             }
         }
     }
@@ -1232,7 +1232,7 @@ bool VAtmosphereSoundings::readPlottingPeriodsFromTextFile( string iFile )
     // get file names with run dates
     ifstream is;
     is.open( iFile.c_str() );
-    if(!is )
+    if( !is )
     {
         cout << "VAtmosphereSoundings::readPlottingPeriodsFromTextFile(): file with plotting periods not found " << iFile << endl;
         return false;
@@ -1261,13 +1261,13 @@ bool VAtmosphereSoundings::readPlottingPeriodsFromTextFile( string iFile )
     for( i_iter = fPlottingPeriodFiles.begin(); i_iter != fPlottingPeriodFiles.end(); i_iter++ )
     {
         ifstream is;
-        is.open((*i_iter ).second.c_str() );
-        if(!is )
+        is.open( ( *i_iter ).second.c_str() );
+        if( !is )
         {
-            cout << "error opening file for plotting periods " << (*i_iter ).first << "(" << (*i_iter ).second << ")" << endl;
+            cout << "error opening file for plotting periods " << ( *i_iter ).first << "(" << ( *i_iter ).second << ")" << endl;
             continue;
         }
-        cout << "reading plotting dates for " << (*i_iter ).first << "(" << (*i_iter ).second << ")" << endl;
+        cout << "reading plotting dates for " << ( *i_iter ).first << "(" << ( *i_iter ).second << ")" << endl;
         unsigned int iDate = 0;
         while( getline( is, is_line ) )
         {
@@ -1282,11 +1282,11 @@ bool VAtmosphereSoundings::readPlottingPeriodsFromTextFile( string iFile )
 
             iDate = ( unsigned int )atoi( iTemp.c_str() );
 
-            fPlottingPeriodDates[(*i_iter ).first].push_back( iDate );
+            fPlottingPeriodDates[( *i_iter ).first].push_back( iDate );
         }
         is.close();
 
-        cout << "\t read " << fPlottingPeriodDates[(*i_iter ).first].size() << " days " << endl;
+        cout << "\t read " << fPlottingPeriodDates[( *i_iter ).first].size() << " days " << endl;
     }
 
     return true;
@@ -1438,8 +1438,8 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
     iYbin.push_back( 100 );
     iXmin.push_back( fPlottingHeight_min );
     iXmax.push_back( fPlottingHeight_max );
-    iYmin.push_back(-13. );
-    iYmax.push_back(-5. );
+    iYmin.push_back( -13. );
+    iYmax.push_back( -5. );
     if( b2D )
     {
         iYbin.back() = 200;
@@ -1498,7 +1498,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
             if( hMonthly[k].find( iID ) == hMonthly[k].end() )
             {
                 sprintf( hname, "h%d%d", k, iID );
-                if(!b2D )
+                if( !b2D )
                 {
                     hMonthly[k][iID] = new TProfile( hname, "", iXbin[k], iXmin[k], iXmax[k], iYmin[k], iYmax[k] );
                 }
@@ -1605,7 +1605,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
                     {
                         if( fData[i]->fDensity_gcm3[j] > 0. && fData[i]->fHeight_m[j] > 0. && ( int )( fData[i]->fHeight_m[j] * 3.2808399 + 2 ) % 1000 < 4 )
                         {
-                            if(!fPlotRelativePlots )
+                            if( !fPlotRelativePlots )
                             {
                                 if( hMonthly[k][iID] )
                                 {
@@ -1709,7 +1709,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 
     TCanvas* cTemp = 0;
 
-    if(!bSames )
+    if( !bSames )
     {
         fCanvasProfile.clear();
         fCanvas2D.clear();
@@ -1717,11 +1717,11 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 
     for( unsigned int k = 0; k < hMonthly.size(); k++ )
     {
-        if(!bSames )
+        if( !bSames )
         {
             sprintf( hname, "c%s%s%d", iYaxis[k].c_str(), iXaxis[k].c_str(), b2D );
             sprintf( htitle, "%s vs %s", iYaxis[k].c_str(), iXaxis[k].c_str() );
-            if(!b2D )
+            if( !b2D )
             {
                 fCanvasProfile.push_back( new TCanvas( hname, htitle, 10, 10, 600, 400 ) );
                 cTemp = fCanvasProfile.back();
@@ -1740,7 +1740,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
         }
         else
         {
-            if(!b2D && k < fCanvasProfile.size() )
+            if( !b2D && k < fCanvasProfile.size() )
             {
                 cTemp = fCanvasProfile[k];
             }
@@ -1772,7 +1772,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
             int z = 0;
             for( iterTempMap = hMonthly[k].begin(); iterTempMap != hMonthly[k].end(); iterTempMap++ )
             {
-                TProfile* h = ( TProfile* )(*iterTempMap ).second;
+                TProfile* h = ( TProfile* )( *iterTempMap ).second;
                 if( h )
                 {
                     if( h->GetEntries() > 0 )
@@ -1811,7 +1811,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
                             }
                             else if( k == 6 )
                             {
-                                h->SetAxisRange(-13., -5., "Y" ); // atmospheric thickness
+                                h->SetAxisRange( -13., -5., "Y" ); // atmospheric thickness
                             }
                             h->Draw( hname );
                         }
@@ -1822,7 +1822,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
                         }
                         z++;
                         cTemp->Update();
-                        sprintf( hname, "%d", (*iterTempMap ).first );
+                        sprintf( hname, "%d", ( *iterTempMap ).first );
                         if( fPlottingLegend[k] )
                         {
                             fPlottingLegend[k]->AddEntry( h, hname, "pl" );
@@ -1886,7 +1886,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 */
 bool VAtmosphereSoundings::readRootFile()
 {
-    if(!fDataTree )
+    if( !fDataTree )
     {
         return false;
     }
@@ -2192,7 +2192,7 @@ bool VAtmosphereSoundings::add_user_Atmosphere( unsigned int iIndexCORSIKAMODTRA
         cout << iIndexCORSIKAMODTRAN << "\t" << fDataCORSIKAMODTRAN.size() << endl;
         return false;
     }
-    if(!fDataCORSIKAMODTRAN[iIndexCORSIKAMODTRAN] )
+    if( !fDataCORSIKAMODTRAN[iIndexCORSIKAMODTRAN] )
     {
         cout << "VAtmosphereSoundings::add_user_profile: empty data set (MODTRAN): " << iIndexCORSIKAMODTRAN << endl;
         return false;
@@ -2241,7 +2241,7 @@ vector< double > VAtmosphereSoundings::getDataVectorForUserAtmosphere( double iH
 {
     vector< double > f;   // return vector
     vector< double > n;   // counting vector
-    if(!iDataMonteCarlo )
+    if( !iDataMonteCarlo )
     {
         return f;
     }
@@ -2459,7 +2459,7 @@ bool VAtmosphereSoundings::write_MODTRAN_UserProfile( unsigned int iIndexUserDat
         cout << "VAtmosphereSoundings::write_MODTRAN_UserProfile: index out of range: " << iIndexUserData << "\t" << fDataUserProfile.size() << endl;
         return false;
     }
-    if(!fDataUserProfile[iIndexUserData] )
+    if( !fDataUserProfile[iIndexUserData] )
     {
         cout << "VAtmosphereSoundings::write_MODTRAN_UserProfile: no data" << endl;
         return false;
@@ -2536,7 +2536,7 @@ bool VAtmosphereSoundings::write_2C1( unsigned int iIndexAverageData, string fil
         cout << "VAtmosphereSoundings::write_2C1: index out of range: " << iIndexAverageData << "\t" << fAverageProfile.size() << endl;
         return false;
     }
-    if(!fAverageProfile[iIndexAverageData] )
+    if( !fAverageProfile[iIndexAverageData] )
     {
         cout << "VAtmosphereSoundings::write_2C1: no data" << endl;
         return false;
@@ -2546,7 +2546,7 @@ bool VAtmosphereSoundings::write_2C1( unsigned int iIndexAverageData, string fil
 
     FILE* file;
     file = fopen( filename.data(), "w" );
-    if(!file )
+    if( !file )
     {
         cout << "VAtmosphereSoundings::write_2C1: couldn't open file " << filename << endl;
         return false;
@@ -2561,11 +2561,11 @@ bool VAtmosphereSoundings::write_2C1( unsigned int iIndexAverageData, string fil
 
     for( unsigned int i = 0; i < Data->fHeight_m.size(); i++ )
     {
-        if(( Data->fPressure_Pa.at( i ) < 0 || Data->fTemperature_K.at( i ) < 0 ) && !have_line )
+        if( ( Data->fPressure_Pa.at( i ) < 0 || Data->fTemperature_K.at( i ) < 0 ) && !have_line )
         {
             continue;    // do not do anything if we are below the probe's starting height.
         }
-        if(( Data->fPressure_Pa.at( i ) < 0 || Data->fTemperature_K.at( i ) < 0 ) &&  have_line )
+        if( ( Data->fPressure_Pa.at( i ) < 0 || Data->fTemperature_K.at( i ) < 0 ) &&  have_line )
         {
             max_height = Data->fHeight_m.at( i - 1 );
             break;
@@ -2696,7 +2696,7 @@ double VAtmosphereSoundings::getInterpolation( double h, VAtmosphereSoundingData
 
 double VAtmosphereSoundings::safe_eval( TGraph* g, double h, string opt )
 {
-    if(!g )
+    if( !g )
     {
         cout << "VAtmosphereSoundings::safe_eval: Error: no graph " << endl;
         return -9999;
@@ -2785,7 +2785,7 @@ bool VAtmosphereSoundings::write_CORSIKA_UserProfile( unsigned int iMODTRANIndex
         cout << "VAtmosphereSoundings::write_CORSIKA_UserProfile: index out of range: " << iMODTRANIndex << "\t" << fDataCORSIKAMODTRAN.size() << endl;
         return false;
     }
-    if(!fDataCORSIKAMODTRAN[iMODTRANIndex] )
+    if( !fDataCORSIKAMODTRAN[iMODTRANIndex] )
     {
         cout << "VAtmosphereSoundings::write_CORSIKA_UserProfile: no data" << endl;
         return false;
@@ -2857,7 +2857,7 @@ int VAtmosphereSoundings::push_average_atmosphere( string name = "", vector<int>
     for( unsigned int iData = 0; iData < fDataInterpol.size(); iData++ )
     {
         VAtmosphereSoundingData* Data = fDataInterpol.at( iData );
-        if(!isDateInRange( Data, years, months, days, hours, mjds, nMinPoints ) )
+        if( !isDateInRange( Data, years, months, days, hours, mjds, nMinPoints ) )
         {
             continue;
         }
@@ -3192,12 +3192,12 @@ void VAtmosphereSoundings::plot_season( double mjd_start, double mjd_end, TStrin
 
     int col[] = { 3, 5, 6, 7, 9, 11, 13, 28, 30, 38, 40, 41, 42, 46 }; //somewhat different root colors
     double month = 29.53;						 //average length of synodic month
-    int Nmonth = TMath::CeilNint(( mjd_end - mjd_start ) / month ) ;
+    int Nmonth = TMath::CeilNint( ( mjd_end - mjd_start ) / month ) ;
 
     vector<double> start, end;
     for( int i = 0; i < Nmonth; i++ )
     {
-        start.push_back( mjd_start + i* month + 1 );
+        start.push_back( mjd_start + i * month + 1 );
         end.push_back( mjd_start + ( i + 1 )*month - 1 );
 
         int y1, y2, m1, m2, d1, d2, j;

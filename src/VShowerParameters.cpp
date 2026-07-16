@@ -69,7 +69,7 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 
     fTreeSC->Branch( "TelElevation", fTelElevation, "TelElevation[NTel]/F" );
     fTreeSC->Branch( "TelAzimuth", fTelAzimuth, "TelAzimuth[NTel]/F" );
-    if(!iMC )
+    if( !iMC )
     {
         fTreeSC->Branch( "TelDec", fTelDec, "TelDec[NTel]/F" );
         fTreeSC->Branch( "TelRA", fTelRA, "TelRA[NTel]/F" );
@@ -144,7 +144,7 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
         sprintf( i_des, "stds[NMethods]/F" );
         fTreeSC->Branch( "stds", fShower_stdS, i_des );
     }
-    if(!iMC )
+    if( !iMC )
     {
         sprintf( i_des, "dec[NMethods]/F" );
         fTreeSC->Branch( "dec", fDec, i_des );

@@ -39,7 +39,7 @@ bool VLightCurveUtilities::writeASCIIFile( string iFile )
 bool VLightCurveUtilities::writeASCIIFile( string iFile, vector< VLightCurveData* > iV )
 {
     ofstream is( iFile.c_str() );
-    if(!is )
+    if( !is )
     {
         cout << "VLightCurveUtilities::writeASCIIFile() error writing light curve to " << iFile << endl;
         return false;
@@ -69,7 +69,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 
     // open ascii file
     ifstream is( iFile.c_str() );
-    if(!is )
+    if( !is )
     {
         cout << "VLightCurveUtilities::readASCIIFile(): error reading " << iFile << endl;
         fIsZombie = true;
@@ -171,7 +171,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
         is_stream >> iTemp2;     // rate or flux error
 
         // upper error (if available)
-        if(!is_stream )
+        if( !is_stream )
         {
             is_stream >> iTemp3;
         }
@@ -185,7 +185,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
         iTemp3 *= iFluxMultiplier;
 
         // flux state (if available)
-        if(!( is_stream >> std::ws ).eof() )
+        if( !( is_stream >> std::ws ).eof() )
         {
             is_stream >> iTemp4;
         }
@@ -203,7 +203,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
         {
             fLightCurveData.back()->fUpperFluxLimit = iTemp1;
             fLightCurveData.back()->fFlux = -99.;
-            fLightCurveData.back()->setFluxError(-99. );
+            fLightCurveData.back()->setFluxError( -99. );
             fLightCurveData.back()->fFluxState = iTemp4;
         }
 
@@ -430,7 +430,7 @@ double VLightCurveUtilities::getPhase( double iMJD )
     {
         iMJD = ( iMJD - fPhase_MJD0 ) / fPhase_Period_days;
         iMJD =   iMJD - TMath::Floor( iMJD );
-        if(!fPhasePlotting )
+        if( !fPhasePlotting )
         {
             iMJD  *= fPhase_Period_days;
         }
@@ -448,8 +448,8 @@ double VLightCurveUtilities::getPhase( double iMJD )
 */
 double VLightCurveUtilities::getPhaseError( double iMJD )
 {
-    double iError = sqrt( fPhaseError_up_fPhase_Period_days* fPhaseError_up_fPhase_Period_days
-                          + fPhaseError_low_fPhase_Period_days* fPhaseError_low_fPhase_Period_days );
+    double iError = sqrt( fPhaseError_up_fPhase_Period_days * fPhaseError_up_fPhase_Period_days
+                          + fPhaseError_low_fPhase_Period_days * fPhaseError_low_fPhase_Period_days );
 
     double iP = 0.;
 
@@ -524,7 +524,7 @@ double VLightCurveUtilities::getFlux_Variance()
 
     if( iNN > 1. )
     {
-        return ( 1. / ( iNN - 1. ) * ( Sxx - 1. / iNN* Sx* Sx ) );
+        return ( 1. / ( iNN - 1. ) * ( Sxx - 1. / iNN * Sx * Sx ) );
     }
 
     return 0.;
@@ -613,7 +613,7 @@ double VLightCurveUtilities::getMeanObservationInterval()
 */
 bool VLightCurveUtilities::writeASCIIFile( string iFile, TF1* f1, unsigned int iNPoints, double iMJD_min, double iMJD_max, double iFluxMeanError, bool bClear )
 {
-    if(!f1 )
+    if( !f1 )
     {
         return false;
     }
@@ -625,7 +625,7 @@ bool VLightCurveUtilities::writeASCIIFile( string iFile, TF1* f1, unsigned int i
         for( unsigned int i = 0; i < iNPoints; i++ )
         {
             fLightCurveData.push_back( new VLightCurveData() );
-            fLightCurveData.back()->fMJD_Data_min = iMJD_min + i * ( iMJD_max - iMJD_min ) / (( double )iNPoints );
+            fLightCurveData.back()->fMJD_Data_min = iMJD_min + i * ( iMJD_max - iMJD_min ) / ( ( double )iNPoints );
             fLightCurveData.back()->fMJD_Data_max = fLightCurveData.back()->fMJD_Data_min;
             fLightCurveData.back()->fFlux = f1->Eval( fLightCurveData.back()->fMJD_Data_min );
             fLightCurveData.back()->setFluxError( TMath::Abs( gRandom->Gaus( 0., iFluxMeanError ) ) );
@@ -655,7 +655,7 @@ bool VLightCurveUtilities::writeASCIIFile( string iFile, TF1* f1, unsigned int i
 */
 double VLightCurveUtilities::getVariabilityIndex( TGraphAsymmErrors* g, double iSystematicFraction )
 {
-    if(!g )
+    if( !g )
     {
         return 0;
     }
@@ -677,7 +677,7 @@ double VLightCurveUtilities::getVariabilityIndex( TGraphAsymmErrors* g, double i
 
         if( sigmaF.back() > 0. )
         {
-            w.push_back( 1. / ( sigmaF.back()*sigmaF.back() + ( iSystematicFraction* F.back() ) * ( iSystematicFraction* F.back() ) ) );
+            w.push_back( 1. / ( sigmaF.back()*sigmaF.back() + ( iSystematicFraction * F.back() ) * ( iSystematicFraction * F.back() ) ) );
             w_sum += w.back();
             w_F += F.back() * w.back();
         }

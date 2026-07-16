@@ -29,7 +29,7 @@ VTableCalculator::VTableCalculator( int intel, bool iEnergy, bool iPE )
 
     Omode = 'r';
     fwrite = false;
-    if(( Omode == 'w' ) || ( Omode == 'W' ) )
+    if( ( Omode == 'w' ) || ( Omode == 'W' ) )
     {
         fwrite = true;
     }
@@ -75,19 +75,19 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
     setBinning();
 
     fOutDir = iDir;
-    if(!fOutDir )
+    if( !fOutDir )
     {
         cout << "VTableCalculator: error data directory in root file does not exist " << fOutDir << "\t" << fpara << endl;
-        exit(-1 );
+        exit( -1 );
     }
-    if(!fOutDir->cd() )
+    if( !fOutDir->cd() )
     {
         cout << "VTableCalculator: error accessing data directory in root file " << fOutDir << "\t" << fpara << endl;
-        exit(-1 );
+        exit( -1 );
     }
     Omode  = m;
     fwrite = false;
-    if(( Omode == 'w' ) || ( Omode == 'W' ) )
+    if( ( Omode == 'w' ) || ( Omode == 'W' ) )
     {
         fwrite = true;
     }
@@ -100,10 +100,10 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
     // table writing
     if( fwrite )
     {
-        if(!fOutDir->IsWritable() )
+        if( !fOutDir->IsWritable() )
         {
             cout << "VTableCalculator: error data directory in root file not writable" << endl;
-            exit(-1 );
+            exit( -1 );
         }
 
         /* HSTOGRAM BOOKING */
@@ -111,10 +111,10 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
         // median of variable
         sprintf( hname, "%s_median_%s", fpara.c_str(), fHName_Add.c_str() );
         sprintf( htitle, "%s vs. dist. vs. log10 size (median)", fpara.c_str() );
-        hMedian = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize* amp_delta, NumDist, 0., dist_delta* NumDist );
+        hMedian = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize * amp_delta, NumDist, 0., dist_delta * NumDist );
         hMedian->SetXTitle( "log_{10} size" );
         hMedian->SetYTitle( "distance [m]" );
-        if(!fEnergy )
+        if( !fEnergy )
         {
             sprintf( htitle, "%s (median) [deg]", fpara.c_str() );
         }
@@ -126,10 +126,10 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
         // mean and rms
         sprintf( hname, "%s_mean_%s", fpara.c_str(), fHName_Add.c_str() );
         sprintf( htitle, "%s vs. dist. vs. log10 size (mean)", fpara.c_str() );
-        hMean = new TProfile2D( hname, htitle, NumSize, amp_offset, amp_offset + NumSize* amp_delta, NumDist, 0., dist_delta* NumDist, fBinning1DXlow, fBinning1DXhigh );
+        hMean = new TProfile2D( hname, htitle, NumSize, amp_offset, amp_offset + NumSize * amp_delta, NumDist, 0., dist_delta * NumDist, fBinning1DXlow, fBinning1DXhigh );
         hMean->SetXTitle( "log_{10} size" );
         hMean->SetYTitle( "distance [m]" );
-        if(!fEnergy )
+        if( !fEnergy )
         {
             sprintf( htitle, "%s (mean) [deg]", fpara.c_str() );
         }
@@ -191,7 +191,7 @@ void VTableCalculator::setBinning()
     {
         fBinning1DXlow =  0.01;
         fBinning1DXhigh = 100.;
-        HistBins = int(( fBinning1DXhigh - fBinning1DXlow ) / 0.005 );
+        HistBins = int( ( fBinning1DXhigh - fBinning1DXlow ) / 0.005 );
     }
 }
 
@@ -212,7 +212,7 @@ bool VTableCalculator::create1DHistogram( int i, int j, double w_first_event )
 {
     if( i >= 0 && j >= 0 && i < ( int )Oh.size() && j < ( int )Oh[i].size() && !Oh[i][j] )
     {
-        if(!fOutDir->cd() )
+        if( !fOutDir->cd() )
         {
             return false;
         }
@@ -271,7 +271,7 @@ void VTableCalculator::terminate( TDirectory* iOut, char* xtitle )
         fOutDir = iOut;
     }
 
-    if(!fOutDir->cd() )
+    if( !fOutDir->cd() )
     {
         cout << "Error: unable to reach writing directory ( VTableCalculator::terminate())" << endl;
         return;
@@ -296,17 +296,17 @@ void VTableCalculator::terminate( TDirectory* iOut, char* xtitle )
         char htitle[1000];
         sprintf( hname, "%s_nevents_%s", fName.c_str(), fHName_Add.c_str() );
         sprintf( htitle, "%s vs. dist. vs. log10 size (# of events)", fName.c_str() );
-        TH2F* hNevents = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize* amp_delta, NumDist, 0., dist_delta* NumDist );
+        TH2F* hNevents = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize * amp_delta, NumDist, 0., dist_delta * NumDist );
         hNevents->SetXTitle( "log_{10} size" );
         hNevents->SetYTitle( "distance [m]" );
         hNevents->SetZTitle( "# of events/bin" );
         // most probable of variable
         sprintf( hname, "%s_mpv_%s", fName.c_str(), fHName_Add.c_str() );
         sprintf( htitle, "%s vs. dist. vs. log10 size (mpv)", fName.c_str() );
-        TH2F* hMPV = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize* amp_delta, NumDist, 0., dist_delta* NumDist );
+        TH2F* hMPV = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize * amp_delta, NumDist, 0., dist_delta * NumDist );
         hMPV->SetXTitle( "log_{10} size" );
         hMPV->SetYTitle( "distance [m]" );
-        if(!fEnergy )
+        if( !fEnergy )
         {
             sprintf( htitle, "%s (mpv) [deg]", fName.c_str() );
         }
@@ -318,10 +318,10 @@ void VTableCalculator::terminate( TDirectory* iOut, char* xtitle )
         // sigma of median (16-84% (2sigma for Gauss))
         sprintf( hname, "%s_sigma_%s", fName.c_str(), fHName_Add.c_str() );
         sprintf( htitle, "%s vs. dist. vs. log10 size (sigma)", fName.c_str() );
-        TH2F* hSigma = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize* amp_delta, NumDist, 0., dist_delta* NumDist );
+        TH2F* hSigma = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize * amp_delta, NumDist, 0., dist_delta * NumDist );
         hSigma->SetXTitle( "log_{10} size" );
         hSigma->SetYTitle( "distance [m]" );
-        if(!fEnergy )
+        if( !fEnergy )
         {
             sprintf( htitle, "%s (2xsigma) [deg]", fName.c_str() );
         }
@@ -593,7 +593,7 @@ double VTableCalculator::calc( int ntel, float* r, float* s, float* w, double* m
                 {
                     if( fWrite1DHistograms && ir < ( int )Oh[is].size() )
                     {
-                        if(!Oh[is][ir] && !create1DHistogram( is, ir, w[tel] ) )
+                        if( !Oh[is][ir] && !create1DHistogram( is, ir, w[tel] ) )
                         {
                             continue;
                         }
@@ -613,10 +613,10 @@ double VTableCalculator::calc( int ntel, float* r, float* s, float* w, double* m
                     }
                     if( fFillMedianApproximations && ir < ( int )OMedian.size() )
                     {
-                        if(!OMedian[is][ir] )
+                        if( !OMedian[is][ir] )
                         {
                             // weight is ignored in the approx median calculation
-                            if(!createMedianApprox( is, ir ) )
+                            if( !createMedianApprox( is, ir ) )
                             {
                                 continue;
                             }
@@ -640,16 +640,16 @@ double VTableCalculator::calc( int ntel, float* r, float* s, float* w, double* m
     {
 
         // tables are accessed for the first time: get the from the file
-        if(!fReadHistogramsFromFile )
+        if( !fReadHistogramsFromFile )
         {
             cout << "read tables from " << fOutDir->GetPath() << endl;
             hMedian = ( TH2F* )fOutDir->Get( hMedianName.c_str() );
             fReadHistogramsFromFile = true;
 
-            if(!hMedian )
+            if( !hMedian )
             {
                 cout << "VTableCalculator error: table histograms not found in " << gDirectory->GetName() << endl;
-                exit(-1 );
+                exit( -1 );
             }
         }
 
@@ -743,13 +743,13 @@ double VTableCalculator::calc( int ntel, float* r, float* s, float* w, double* m
                 {
                     ///////////////////////////////////////////////////////////////////////////////////////////////////////
                     // mean scaled calculation
-                    if(!fEnergy && sigma > 0. && w )
+                    if( !fEnergy && sigma > 0. && w )
                     {
                         // handle showers with (width==0.) correctly
                         if( w[tel] > 0. )
                         {
-                            value  += ( w[tel] - med ) / sigma * ( med* med ) / ( sigma* sigma );
-                            weight += ( med* med ) / ( sigma* sigma );
+                            value  += ( w[tel] - med ) / sigma * ( med * med ) / ( sigma * sigma );
+                            weight += ( med * med ) / ( sigma * sigma );
                         }
                     }
                     ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -761,8 +761,8 @@ double VTableCalculator::calc( int ntel, float* r, float* s, float* w, double* m
                         // store expected relative error
                         sigma_tel.push_back( sigma / med );
                         // use relative error as weighting (otherwise: significant bias towards lower energies
-                        sigma2_tel.push_back( med / ( sigma* sigma ) );
-                        sigma2_tel_noRadiusWeigth.push_back( 1. / ( sigma* sigma ) );
+                        sigma2_tel.push_back( med / ( sigma * sigma ) );
+                        sigma2_tel_noRadiusWeigth.push_back( 1. / ( sigma * sigma ) );
                         // add additional weight for events inside or outside the light pool
                         if( r[tel] < 140. )
                         {
@@ -770,7 +770,7 @@ double VTableCalculator::calc( int ntel, float* r, float* s, float* w, double* m
                         }
                         else
                         {
-                            sigma2_tel.back() = sigma2_tel.back() * 100.*exp(-1.*( r[tel] - 140. ) / 50. );
+                            sigma2_tel.back() = sigma2_tel.back() * 100.*exp( -1.*( r[tel] - 140. ) / 50. );
                         }
                     }
                     else
@@ -785,7 +785,7 @@ double VTableCalculator::calc( int ntel, float* r, float* s, float* w, double* m
         ////////////////////////////////////////////////////////////////
         // mean scaled value
         // (MSCW/MSCL)
-        if(!fEnergy )
+        if( !fEnergy )
         {
             if( weight > 0 )
             {
@@ -887,7 +887,7 @@ void VTableCalculator::setInterpolationConstants( int iwidth, int iinter )
 
 double VTableCalculator::getWeightMeanBinContent( TH2F* h, int ix0, int iy0, double x, double y )
 {
-    if(!h )
+    if( !h )
     {
         return 0.;
     }
@@ -927,7 +927,7 @@ double VTableCalculator::getWeightMeanBinContent( TH2F* h, int ix0, int iy0, dou
     double dist = 0.;
 
     // first bin (x,y is inside this bin)
-    dist = sqrt(( i_bc_x0 - x ) * ( i_bc_x0 - x ) + ( i_bc_y0 - y ) * ( i_bc_y0 - y ) );
+    dist = sqrt( ( i_bc_x0 - x ) * ( i_bc_x0 - x ) + ( i_bc_y0 - y ) * ( i_bc_y0 - y ) );
     // return bin content if x,y is very close to bin center
     if( fabs( dist ) < 1.e-5 )
     {
@@ -941,7 +941,7 @@ double VTableCalculator::getWeightMeanBinContent( TH2F* h, int ix0, int iy0, dou
     // second bin
     if( h->GetBinContent( ix1, iy0 ) > 0. )
     {
-        dist = sqrt(( i_bc_x1 - x ) * ( i_bc_x1 - x ) + ( i_bc_y0 - y ) * ( i_bc_y0 - y ) );
+        dist = sqrt( ( i_bc_x1 - x ) * ( i_bc_x1 - x ) + ( i_bc_y0 - y ) * ( i_bc_y0 - y ) );
         if( dist > 0. )
         {
             weight += 1. / dist;
@@ -952,7 +952,7 @@ double VTableCalculator::getWeightMeanBinContent( TH2F* h, int ix0, int iy0, dou
     // third bin
     if( h->GetBinContent( ix1, iy1 ) > 0. && dist > 0. )
     {
-        dist = sqrt(( i_bc_x1 - x ) * ( i_bc_x1 - x ) + ( i_bc_y1 - y ) * ( i_bc_y1 - y ) );
+        dist = sqrt( ( i_bc_x1 - x ) * ( i_bc_x1 - x ) + ( i_bc_y1 - y ) * ( i_bc_y1 - y ) );
         if( dist > 0. )
         {
             weight += 1. / dist;
@@ -963,7 +963,7 @@ double VTableCalculator::getWeightMeanBinContent( TH2F* h, int ix0, int iy0, dou
     // fourth bin
     if( h->GetBinContent( ix0, iy1 ) > 0. )
     {
-        dist = sqrt(( i_bc_x0 - x ) * ( i_bc_x0 - x ) + ( i_bc_y1 - y ) * ( i_bc_y1 - y ) );
+        dist = sqrt( ( i_bc_x0 - x ) * ( i_bc_x0 - x ) + ( i_bc_y1 - y ) * ( i_bc_y1 - y ) );
         if( dist > 0. )
         {
             weight += 1. / dist;
@@ -990,7 +990,7 @@ void VTableCalculator::setVHistograms( vector< TH2F* >& hM )
 
 TH2F* VTableCalculator::getHistoMedian()
 {
-    if(!fReadHistogramsFromFile )
+    if( !fReadHistogramsFromFile )
     {
         fReadHistogramsFromFile = readHistograms();
     }
@@ -1020,7 +1020,7 @@ bool VTableCalculator::readHistograms()
 
 double VTableCalculator::interpolate( TH2F* h, float x, float y, bool iError )
 {
-    if(!h )
+    if( !h )
     {
         return 0.;
     }
@@ -1053,7 +1053,7 @@ double VTableCalculator::interpolate( TH2F* h, float x, float y, bool iError )
     float v = 0.;
 
     // first interpolate on distance axis, then on size axis
-    if(!iError )
+    if( !iError )
     {
         e1 = VStatistics::interpolate( static_cast<float>( h->GetBinContent( i_x, i_y ) ), static_cast<float>( h->GetYaxis()->GetBinCenter( i_y ) ),
                                        static_cast<float>( h->GetBinContent( i_x, i_y + 1 ) ), static_cast<float>( h->GetYaxis()->GetBinCenter( i_y + 1 ) ),
@@ -1099,7 +1099,7 @@ double VTableCalculator::interpolate( TH2F* h, float x, float y, bool iError )
 */
 void VTableCalculator::fillMPV( TH2F* h, int i, int j, TH1F* h1D, double iMedianValue, double iSigmaValue )
 {
-    if(!h || !h1D )
+    if( !h || !h1D )
     {
         return;
     }
@@ -1111,7 +1111,7 @@ void VTableCalculator::fillMPV( TH2F* h, int i, int j, TH1F* h1D, double iMedian
         return;
     }
     // don't do anything if difference between mean and median is <15%
-    if( iMedianValue > 0. && TMath::Abs(( iMedianValue - h1D->GetMean() ) / iMedianValue ) < 0.15 )
+    if( iMedianValue > 0. && TMath::Abs( ( iMedianValue - h1D->GetMean() ) / iMedianValue ) < 0.15 )
     {
         h->SetBinContent( i, j, iMedianValue );
         return;
@@ -1123,7 +1123,7 @@ void VTableCalculator::fillMPV( TH2F* h, int i, int j, TH1F* h1D, double iMedian
     iLandau.SetParameters( iMedianValue, iSigmaValue, h1D->GetEntries() );
     // do not allow the most probable value to be more than x3 off the median
     iLandau.SetParLimits( 0, iMedianValue / 3., iMedianValue * 3. );
-    h1D->Fit(&iLandau, "QMNR" );
+    h1D->Fit( &iLandau, "QMNR" );
     // require >10% fit probability to use Landau most probable value
     if( TMath::Prob( iLandau.GetChisquare(), iLandau.GetNDF() ) > 0.1
             && iLandau.GetParameter( 0 ) > 0. && iMedianValue / iLandau.GetParameter( 0 ) < 2.5 )

@@ -248,11 +248,11 @@ TH1F* VCalibrationData::getHistogram( unsigned int iTel, unsigned int iChannel, 
         sprintf( iHName, "distributions/hped_%d_%d_%d", iTel, iWindowSize, iChannel );
         if( iType < ( int )fFile.size() && fFile[iType] )
         {
-            if(!fFile[iType]->Get( iHName ) )
+            if( !fFile[iType]->Get( iHName ) )
             {
                 sprintf( iHName, "distributions_%d/hped_%d_%d_%d", iTel + 1, iTel, iWindowSize, iChannel );
             }
-            if(!fFile[iType]->Get( iHName ) && iTelType != 99999 )
+            if( !fFile[iType]->Get( iHName ) && iTelType != 99999 )
             {
                 iSname << "distributions_" << iTelType << "/hped_" << iTelType << "_" << iWindowSize << "_" << iChannel;
                 sprintf( iHName, "%s", iSname.str().c_str() );
@@ -335,7 +335,7 @@ TH1F* VCalibrationData::getHistoAverageTzero( unsigned int iTel, unsigned int iC
 
 TH1F*  VCalibrationData::getHistoDist( int iType, bool iDist )
 {
-    if(!iDist )
+    if( !iDist )
     {
         if( iType < ( int )fHisto_variance.size() )
         {
@@ -380,7 +380,7 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     // no DST analysis
-    if(!iDST )
+    if( !iDST )
     {
 
         // fill tree with used calibration data
@@ -728,7 +728,7 @@ valarray<double>& VCalibrationData::getPeds( bool iLowGain, double iTime )
 
         for( unsigned int i = 0; i < fTS_ped_temp.size(); i++ )
         {
-            fTS_ped_temp[i] = ( ifrac1* getPedsTS_vector( iLowGain )[i1][i] + ifrac2* getPedsTS_vector( iLowGain )[i2][i] );
+            fTS_ped_temp[i] = ( ifrac1 * getPedsTS_vector( iLowGain )[i1][i] + ifrac2 * getPedsTS_vector( iLowGain )[i2][i] );
         }
 
         return fTS_ped_temp;
@@ -776,7 +776,7 @@ valarray<double>& VCalibrationData::getPedvars( bool iLowGain, unsigned int iSW,
             // loop over all channels and calculate pedvars for this time (weighted mean between time bins)
             for( unsigned int i = 0; i < fTS_pedvar_temp[iSW].size(); i++ )
             {
-                fTS_pedvar_temp[iSW][i] = ( ifrac1* getPedvarsVTS_vector( iLowGain )[i1][iSW - 1][i] + ifrac2* getPedvarsVTS_vector( iLowGain )[i2][iSW - 1][i] );
+                fTS_pedvar_temp[iSW][i] = ( ifrac1 * getPedvarsVTS_vector( iLowGain )[i1][iSW - 1][i] + ifrac2 * getPedvarsVTS_vector( iLowGain )[i2][iSW - 1][i] );
             }
 
             return fTS_pedvar_temp[iSW];
@@ -840,7 +840,7 @@ void VCalibrationData::setPeds( unsigned int iChannel, double iPed, bool iLowGai
 
 double VCalibrationData::getmeanPedvars( bool iLowGain, unsigned int iSW )
 {
-    if(!iLowGain && iSW < fVmeanPedvars.size() )
+    if( !iLowGain && iSW < fVmeanPedvars.size() )
     {
         return fVmeanPedvars[iSW];
     }
@@ -856,7 +856,7 @@ double VCalibrationData::getmeanPedvars( bool iLowGain, unsigned int iSW )
 
 double VCalibrationData::getmeanRMSPedvars( bool iLowGain, unsigned int iSW )
 {
-    if(!iLowGain && iSW < fVmeanRMSPedvars.size() )
+    if( !iLowGain && iSW < fVmeanRMSPedvars.size() )
     {
         return fVmeanRMSPedvars[iSW];
     }
@@ -902,7 +902,7 @@ void VCalibrationData::getmeanPedvars( double& imean, double& irms, bool iLowGai
     }
     if( its_n > 1. )
     {
-        irms = sqrt( 1. / ( its_n - 1. ) * ( its_sum2 - 1. / its_n* its_sum* its_sum ) );
+        irms = sqrt( 1. / ( its_n - 1. ) * ( its_sum2 - 1. / its_n * its_sum * its_sum ) );
     }
 }
 
@@ -925,7 +925,7 @@ The LowGainSumCorrection is used to correct the integrated charge, calculated fr
 */
 double VCalibrationData::getLowGainSumCorrection( int iSumWindow, int jSumWindow, bool HiLo )
 {
-    if(!HiLo )
+    if( !HiLo )
     {
         return 1.0;
     }

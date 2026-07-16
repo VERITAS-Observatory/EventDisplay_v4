@@ -130,7 +130,7 @@ const
     }
     else
     {
-        Angle::makeRad(-rad() ).hms( hours, mins, secs, fsec, sec_digits );
+        Angle::makeRad( -rad() ).hms( hours, mins, secs, fsec, sec_digits );
         negative = true;
     }
 
@@ -284,11 +284,11 @@ bool SEphem::Angle::setFromHMSString( std::string str )
 
     while( i < str.length() )
     {
-        if(( str[i] >= '0' ) && ( str[i] <= '9' ) )
+        if( ( str[i] >= '0' ) && ( str[i] <= '9' ) )
         {
             hours = hours * 10 + ( str[i++] - '0' );
         }
-        else if(( str[i] == ':' ) || ( str[i] == 'h' ) || ( str[i] == ' ' ) )
+        else if( ( str[i] == ':' ) || ( str[i] == 'h' ) || ( str[i] == ' ' ) )
         {
             i++;
             break;
@@ -301,11 +301,11 @@ bool SEphem::Angle::setFromHMSString( std::string str )
 
     while( i < str.length() )
     {
-        if(( str[i] >= '0' ) && ( str[i] <= '9' ) )
+        if( ( str[i] >= '0' ) && ( str[i] <= '9' ) )
         {
             mins = mins * 10 + ( str[i++] - '0' );
         }
-        else if(( str[i] == ':' ) || ( str[i] == 'm' ) || ( str[i] == ' ' ) )
+        else if( ( str[i] == ':' ) || ( str[i] == 'm' ) || ( str[i] == ' ' ) )
         {
             i++;
             break;
@@ -318,7 +318,7 @@ bool SEphem::Angle::setFromHMSString( std::string str )
 
     while( i < str.length() )
     {
-        if(( str[i] >= '0' ) && ( str[i] <= '9' ) )
+        if( ( str[i] >= '0' ) && ( str[i] <= '9' ) )
         {
             secs = secs * 10 + ( str[i++] - '0' );
         }
@@ -339,7 +339,7 @@ bool SEphem::Angle::setFromHMSString( std::string str )
 
     while( i < str.length() )
     {
-        if(( str[i] >= '0' ) && ( str[i] <= '9' ) )
+        if( ( str[i] >= '0' ) && ( str[i] <= '9' ) )
         {
             fracs = fracs * 10 + ( str[i++] - '0' );
             frac10s = frac10s * 10;
@@ -384,11 +384,11 @@ bool SEphem::Angle::setFromDMSString( std::string str )
 
     while( i < str.length() )
     {
-        if(( str[i] >= '0' ) && ( str[i] <= '9' ) )
+        if( ( str[i] >= '0' ) && ( str[i] <= '9' ) )
         {
             degs = degs * 10 + ( str[i++] - '0' );
         }
-        else if(( str[i] == ':' ) || ( str[i] == 'd' ) || ( str[i] == ' ' ) )
+        else if( ( str[i] == ':' ) || ( str[i] == 'd' ) || ( str[i] == ' ' ) )
         {
             i++;
             break;
@@ -401,11 +401,11 @@ bool SEphem::Angle::setFromDMSString( std::string str )
 
     while( i < str.length() )
     {
-        if(( str[i] >= '0' ) && ( str[i] <= '9' ) )
+        if( ( str[i] >= '0' ) && ( str[i] <= '9' ) )
         {
             mins = mins * 10 + ( str[i++] - '0' );
         }
-        else if(( str[i] == ':' ) || ( str[i] == 'm' ) || ( str[i] == ' ' ) )
+        else if( ( str[i] == ':' ) || ( str[i] == 'm' ) || ( str[i] == ' ' ) )
         {
             i++;
             break;
@@ -418,7 +418,7 @@ bool SEphem::Angle::setFromDMSString( std::string str )
 
     while( i < str.length() )
     {
-        if(( str[i] >= '0' ) && ( str[i] <= '9' ) )
+        if( ( str[i] >= '0' ) && ( str[i] <= '9' ) )
         {
             secs = secs * 10 + ( str[i++] - '0' );
         }
@@ -439,7 +439,7 @@ bool SEphem::Angle::setFromDMSString( std::string str )
 
     while( i < str.length() )
     {
-        if(( str[i] >= '0' ) && ( str[i] <= '9' ) )
+        if( ( str[i] >= '0' ) && ( str[i] <= '9' ) )
         {
             fracs = fracs * 10 + ( str[i++] - '0' );
             frac10s = frac10s * 10;
@@ -460,9 +460,9 @@ bool SEphem::Angle::setFromDMSString( std::string str )
         return false;
     }
 
-    setDeg(( negative ? -1 : 1 ) *
-           ( double( degs ) + double( mins ) / 60 + double( secs ) / ( 60 * 60 ) +
-             double( fracs ) / double( frac10s ) / ( 60 * 60 ) ) );
+    setDeg( ( negative ? -1 : 1 ) *
+            ( double( degs ) + double( mins ) / 60 + double( secs ) / ( 60 * 60 ) +
+              double( fracs ) / double( frac10s ) / ( 60 * 60 ) ) );
 
     return true;
 }
@@ -479,5 +479,5 @@ unsigned long SEphem::Angle::toBAR( double a, unsigned radix, bool round )
 double SEphem::Angle::frBAR( unsigned long a, unsigned radix, bool round )
 {
     unsigned long maxbar = ( 0x00000001 << radix );
-    return frRot(( double( a % maxbar ) + ( round ? 0.5 : 0.0 ) ) / double( maxbar ) );
+    return frRot( ( double( a % maxbar ) + ( round ? 0.5 : 0.0 ) ) / double( maxbar ) );
 }

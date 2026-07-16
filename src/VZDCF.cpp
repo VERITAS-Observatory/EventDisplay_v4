@@ -27,7 +27,7 @@ bool VZDCF::readZDCF( string iFile )
 
     // read in ascii file
     ifstream is( iFile.c_str() );
-    if(!is )
+    if( !is )
     {
         cout << "VZDCF::readZDCF error reading ZDCF file: " << iFile << endl;
         return false;
@@ -181,7 +181,7 @@ TCanvas* VZDCF::plot( TCanvas* c, bool bzdcf, double taumin, double taumax, doub
     TH1D* hZDCF = 0;
 
     // canvas
-    if(!c )
+    if( !c )
     {
         if( bzdcf )
         {
@@ -241,7 +241,7 @@ TCanvas* VZDCF::plot( TCanvas* c, bool bzdcf, double taumin, double taumax, doub
         }
         else
         {
-            hZDCF->SetMinimum(-5. );
+            hZDCF->SetMinimum( -5. );
             hZDCF->SetMaximum( ymax );
         }
         hZDCF->Draw( "" );
@@ -260,7 +260,7 @@ TCanvas* VZDCF::plot( TCanvas* c, bool bzdcf, double taumin, double taumax, doub
         {
             hZDCF = ( TH1D* )c->GetListOfPrimitives()->FindObject( "hZDCF_sig" );
         }
-        if(!hZDCF )
+        if( !hZDCF )
         {
             cout << "VZDCF::plot: no zdcf histogram found with name hZDCF " << endl;
             c->GetListOfPrimitives()->Print();
@@ -270,7 +270,7 @@ TCanvas* VZDCF::plot( TCanvas* c, bool bzdcf, double taumin, double taumax, doub
 
     // fill graph
     TGraphAsymmErrors* g = new TGraphAsymmErrors( 1 );
-    setGraphPlottingStyle(( TGraph* )g, 1, 1., 20, 1. );
+    setGraphPlottingStyle( ( TGraph* )g, 1, 1., 20, 1. );
 
     int z = 0;
 

@@ -42,7 +42,7 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut, bool iSignal );
  */
 TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut, bool iSignal )
 {
-    if(!iRun )
+    if( !iRun )
     {
         return 0;
     }
@@ -131,7 +131,7 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut, bool iSignal )
             {
                 iTreeVector[i]->SetBranchAddress( "MCe0", &MCe0 );
             }
-            if(!iDataTree_reduced )
+            if( !iDataTree_reduced )
             {
                 cout << "Error preparing reduced tree" << endl;
                 return 0;
@@ -217,7 +217,7 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut, bool iSignal )
             iRun->fSignalTree[i]->Delete();
             iRun->fSignalTree[i] = 0;
         }
-        else if(!iSignal && iRun->fBackgroundTree[i] )
+        else if( !iSignal && iRun->fBackgroundTree[i] )
         {
             iRun->fBackgroundTree[i]->Delete();
             iRun->fBackgroundTree[i] = 0;
@@ -248,7 +248,7 @@ bool train( VTMVARunData* iRun,
             unsigned int iEnergyBin, unsigned int iZenithBin,
             bool iTrainGammaHadronSeparation )
 {
-    if(!iRun )
+    if( !iRun )
     {
         return false;
     }
@@ -267,7 +267,7 @@ bool train( VTMVARunData* iRun,
 
     TCut iCutBck = iRun->fQualityCuts && iRun->fQualityCutsBkg && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut && iRun->fZenithCutData[iZenithBin]->fZenithCut;
 
-    if(!iRun->fMCxyoffCutSignalOnly )
+    if( !iRun->fMCxyoffCutSignalOnly )
     {
         iCutBck = iCutBck && iRun->fMCxyoffCut;
     }
@@ -288,7 +288,7 @@ bool train( VTMVARunData* iRun,
     {
         iSignalTree_reduced = prepareSelectedEventsTree( iRun, iCutSignal, true );
         iBackgroundTree_reduced = prepareSelectedEventsTree( iRun, iCutBck, false );
-        if(!iSignalTree_reduced || !iBackgroundTree_reduced )
+        if( !iSignalTree_reduced || !iBackgroundTree_reduced )
         {
             cout << "Error: failed preparing training / testing trees" << endl;
             return false;
@@ -317,7 +317,7 @@ bool train( VTMVARunData* iRun,
         iSignalTree_reduced = ( TTree* )iF->Get( "data_signal" );
         iBackgroundTree_reduced = ( TTree* )iF->Get( "data_background" );
     }
-    if(!iSignalTree_reduced || !iBackgroundTree_reduced )
+    if( !iSignalTree_reduced || !iBackgroundTree_reduced )
     {
         cout << "Error: failed preparing training / testing trees" << endl;
         return false;
@@ -485,7 +485,7 @@ int main( int argc, char* argv[] )
 
     //////////////////////////////////////
     // read run parameters from configuration file
-    if(!fData->readConfigurationFile( argv[1] ) )
+    if( !fData->readConfigurationFile( argv[1] ) )
     {
         cout << "error opening or reading run parameter file (";
         cout << argv[1];
@@ -500,7 +500,7 @@ int main( int argc, char* argv[] )
 
     //////////////////////////////////////
     // read and prepare data files
-    if(!fData->openDataFiles() )
+    if( !fData->openDataFiles() )
     {
         cout << "error opening data files" << endl;
         exit( EXIT_FAILURE );
@@ -566,13 +566,13 @@ int main( int argc, char* argv[] )
             // prepare a short root file with the necessary values only
             // write energy & zenith cuts, plus signal and background efficiencies
             TFile *root_file = fData->fOutputFile[i][j];
-            if(!root_file )
+            if( !root_file )
             {
                 cout << "Error finding tvma root file " << endl;
                 continue;
             }
             TFile *short_root_file = TFile::Open( iTempS.str().c_str(), "RECREATE" );
-            if(!short_root_file->IsZombie() )
+            if( !short_root_file->IsZombie() )
             {
                 VTMVARunDataEnergyCut *fDataEnergyCut = ( VTMVARunDataEnergyCut* )root_file->Get( "fDataEnergyCut" );
                 VTMVARunDataZenithCut *fDataZenithCut = ( VTMVARunDataZenithCut* )root_file->Get( "fDataZenithCut" );

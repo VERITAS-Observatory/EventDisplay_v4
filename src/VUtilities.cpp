@@ -56,7 +56,7 @@ string VUtilities::testFileLocation( string iFile, string iDirectory, bool bEVND
 {
     ifstream is;
     is.open( gSystem->ExpandPathName( iFile.c_str() ), ifstream::in );
-    if(!is )
+    if( !is )
     {
         string itemp;
         if( bEVNDISPDATA )
@@ -70,7 +70,7 @@ string VUtilities::testFileLocation( string iFile, string iDirectory, bool bEVND
         }
         ifstream is2;
         is2.open( itemp.c_str(), ifstream::in );
-        if(!is2 )
+        if( !is2 )
         {
             cout << "testFileLocation: Error opening file: " << iFile << endl;
             cout << "(not found in current directory and in " << iDirectory << ")" << endl;
@@ -166,7 +166,7 @@ string VUtilities::trim_spaces( string str, string whitespace )
 string VUtilities::search_and_replace( string i1, string iO, string iN )
 {
     size_t j;
-    for(; ( j = i1.find( iO ) ) != string::npos ; )
+    for( ; ( j = i1.find( iO ) ) != string::npos ; )
     {
         i1.replace( j, iO.length(), iN );
     }
@@ -194,9 +194,9 @@ double VUtilities::line_point_distance( double x1, double y1, double z1, double 
     double alt = 90. - ze;
     az = 180. - az;
 
-    double cx = -1.*cos( alt* TMath::DegToRad() ) * cos( az* TMath::DegToRad() );
-    double cy = -1.*cos( alt* TMath::DegToRad() ) * sin( az* TMath::DegToRad() );
-    double cz = sin( alt* TMath::DegToRad() );
+    double cx = -1.*cos( alt * TMath::DegToRad() ) * cos( az * TMath::DegToRad() );
+    double cy = -1.*cos( alt * TMath::DegToRad() ) * sin( az * TMath::DegToRad() );
+    double cz = sin( alt * TMath::DegToRad() );
 
     double a1 = ( y - y1 ) * cz - ( z - z1 ) * cy;
     double a2 = ( z - z1 ) * cx - ( x - x1 ) * cz;
@@ -219,7 +219,7 @@ unsigned int VUtilities::count_number_of_textblocks( string str )
     unsigned int z = 0;
     string iTemp;
     istringstream is_stream( str );
-    while(!( is_stream >> std::ws ).eof() )
+    while( !( is_stream >> std::ws ).eof() )
     {
         is_stream >> iTemp;
         z++;

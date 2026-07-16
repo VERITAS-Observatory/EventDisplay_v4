@@ -27,10 +27,10 @@ VLightCurve::VLightCurve()
     setSignificanceParameters();
     setSpectralParameters();
 
-    setPlottingParameter(-99., -99. );
+    setPlottingParameter( -99., -99. );
     fRateAxisTitleUnSet = false;
     setLightCurveAxis();
-    setPhaseFoldingValues(-99., -99., false );
+    setPhaseFoldingValues( -99., -99., false );
     setFluxCalculationMethod();
 }
 
@@ -163,7 +163,7 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
         fPlottingMJDMax = iMJDMax + 5.;
     }
 
-    unsigned int iNbins = ( unsigned int )TMath::Nint(( iMJDMax - iMJDMin ) / fDayInterval + 0.5 );
+    unsigned int iNbins = ( unsigned int )TMath::Nint( ( iMJDMax - iMJDMin ) / fDayInterval + 0.5 );
     if( iNbins == 0 && iMJDMax > iMJDMin )
     {
         iNbins = 1;
@@ -194,11 +194,11 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
                     fLightCurveData.push_back( new VLightCurveData() );
                     if( iMJDMin + ( i + 1 ) * fDayInterval < iMJDMax )
                     {
-                        fLightCurveData.back()->setMJDInterval( iMJDMin + i* fDayInterval, iMJDMin + ( i + 1 ) * fDayInterval );
+                        fLightCurveData.back()->setMJDInterval( iMJDMin + i * fDayInterval, iMJDMin + ( i + 1 ) * fDayInterval );
                     }
                     else
                     {
-                        fLightCurveData.back()->setMJDInterval( iMJDMin + i* fDayInterval, iMJDMax );
+                        fLightCurveData.back()->setMJDInterval( iMJDMin + i * fDayInterval, iMJDMax );
                     }
                 }
                 if( fLightCurveData.back() )
@@ -298,7 +298,7 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
     TH1D* hLightCurve = 0;
 
     // canvas
-    if(!iCanvasLightCurve )
+    if( !iCanvasLightCurve )
     {
         sprintf( hname, "%s", iCanvasName.c_str() );
         if( fName.size() > 0 )
@@ -376,11 +376,11 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
             i_title << "_" << ( int )fPhase_MJD0 << "_" << ( int )fPhase_Period_days << "_" << ( int )fPhasePlotting;
         }
         hLightCurve = ( TH1D* )fCanvasLightCurve->GetListOfPrimitives()->FindObject( i_title.str().c_str() );
-        if(!hLightCurve )
+        if( !hLightCurve )
         {
             hLightCurve = ( TH1D* )fCanvasLightCurve->GetListOfPrimitives()->FindObject( "hLightCurve" );
         }
-        if(!hLightCurve )
+        if( !hLightCurve )
         {
             cout << "VLightCurve::plot: no light curve histogram found with name " << i_title.str() << endl;
             return fCanvasLightCurve;
@@ -464,7 +464,7 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
     }
     if( fLightCurveGraph->GetN() > 0 )
     {
-        setGraphPlottingStyle(( TGraph* )fLightCurveGraph );
+        setGraphPlottingStyle( ( TGraph* )fLightCurveGraph );
         if( iPlotConfidenceInterval < 0 )
         {
             fLightCurveGraph->Draw( iPlottingOption.c_str() );
@@ -507,7 +507,7 @@ void VLightCurve::setSpectralParameters( double iMinEnergy, double  E0, double a
 
 bool VLightCurve::plotObservingPeriods( TCanvas* iCanvasLightCurve, int iColor )
 {
-    if(!iCanvasLightCurve || !iCanvasLightCurve->cd() )
+    if( !iCanvasLightCurve || !iCanvasLightCurve->cd() )
     {
         return false;
     }
@@ -548,7 +548,7 @@ void VLightCurve::setLightCurveAxis( double iYmin, double iYmax, string iAxisTit
 */
 TH1D* VLightCurve::fillObservingIntervallHistogram( bool bPlot, double iPlotMax, string iName, string iTitle )
 {
-    if(!fObservingInvervallHisto )
+    if( !fObservingInvervallHisto )
     {
         fObservingInvervallHisto = new TH1D( iName.c_str(), "", 10000, 0., 1000. );
         fObservingInvervallHisto->SetXTitle( "observing interval #Delta t [d]" );
@@ -632,7 +632,7 @@ bool VLightCurve::fillLightCurveMCPhaseFolded( string iOutFile, double iGapsToFi
     {
         if( fLightCurveData[i] && bFillRandomMC )
         {
-            iMCLightCurveData.push_back( new VLightCurveData((*fLightCurveData[i] ) ) );
+            iMCLightCurveData.push_back( new VLightCurveData( ( *fLightCurveData[i] ) ) );
         }
     }
 
@@ -771,15 +771,15 @@ string VLightCurve::getLightCurveAxisTitle()
         if( fEnergy_max_TeV < 0. )
         {
             // determine number of decimal places (do not allow more than three)
-            if(( int )( fEnergy_min_TeV * 10. ) % 10 == 0 && ( int )( fEnergy_min_TeV * 100. ) % 10 == 0 && ( int )( fEnergy_min_TeV * 1000. ) % 10 == 0 )
+            if( ( int )( fEnergy_min_TeV * 10. ) % 10 == 0 && ( int )( fEnergy_min_TeV * 100. ) % 10 == 0 && ( int )( fEnergy_min_TeV * 1000. ) % 10 == 0 )
             {
                 sprintf( hname, "Flux (E>%.0f TeV) [cm^{-2}s^{-1}]", fEnergy_min_TeV );
             }
-            else if(( int )( fEnergy_min_TeV * 100. ) % 10 == 0 && ( int )( fEnergy_min_TeV * 1000. ) % 10 == 0 )
+            else if( ( int )( fEnergy_min_TeV * 100. ) % 10 == 0 && ( int )( fEnergy_min_TeV * 1000. ) % 10 == 0 )
             {
                 sprintf( hname, "Flux (E>%.1f TeV) [cm^{-2}s^{-1}]", fEnergy_min_TeV );
             }
-            else if(( int )( fEnergy_min_TeV * 1000. ) % 10 == 0 )
+            else if( ( int )( fEnergy_min_TeV * 1000. ) % 10 == 0 )
             {
                 sprintf( hname, "Flux (E>%.2f TeV) [cm^{-2}s^{-1}]", fEnergy_min_TeV );
             }
@@ -891,7 +891,7 @@ TCanvas* VLightCurve::plotPhaseDistribution( TCanvas* iCanvasPhaseDist, string i
 
     TH1D* hPhaseDist = 0;
 
-    if(!iCanvasPhaseDist )
+    if( !iCanvasPhaseDist )
     {
         sprintf( hname, "%s", iCanvasName.c_str() );
         if( fName.size() > 0 )
@@ -929,7 +929,7 @@ TCanvas* VLightCurve::plotPhaseDistribution( TCanvas* iCanvasPhaseDist, string i
         }
     }
 
-    if(!iCanvasPhaseDist )
+    if( !iCanvasPhaseDist )
     {
         iCanvasPhaseDist = fCanvasPhaseDistribution;
 

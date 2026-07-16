@@ -29,7 +29,7 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
         // open text file
         ifstream is;
         is.open( ifile.c_str(), ifstream::in );
-        if(!is )
+        if( !is )
         {
             cout << "error reading special channels (L2 channels, etc) for telescope " << getTelID() + 1 << " from " << ifile << endl;
             return false;
@@ -130,13 +130,13 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
                 // channel status
                 else if( is_temp == "STATUS" )
                 {
-                    if(!( is_stream >> std::ws ).eof() )
+                    if( !( is_stream >> std::ws ).eof() )
                     {
                         // get status flag
                         unsigned int iStatusFlag = 1;
                         is_stream >> iStatusFlag;
                         fChannelStatus.clear();
-                        while(!( is_stream >> std::ws ).eof() )
+                        while( !( is_stream >> std::ws ).eof() )
                         {
                             is_stream >> is_temp;
                             unsigned int iC = ( unsigned int )atoi( is_temp.c_str() );
@@ -149,13 +149,13 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
                 // HIGHQE channels
                 else if( is_temp == "HIGHQE" )
                 {
-                    if(!( is_stream >> std::ws ).eof() )
+                    if( !( is_stream >> std::ws ).eof() )
                     {
                         is_stream >> is_temp;
                         unsigned int iC = ( unsigned int )atoi( is_temp.c_str() );
                         if( fHIGHQE_gainfactor.find( iC ) == fHIGHQE_gainfactor.end() )
                         {
-                            if(!( is_stream >> std::ws ).eof() )
+                            if( !( is_stream >> std::ws ).eof() )
                             {
                                 is_stream >> is_temp;
                                 double iF = atof( is_temp.c_str() );
@@ -194,7 +194,7 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
             map< unsigned int, double >::iterator it;
             for( it = fHIGHQE_gainfactor.begin(); it != fHIGHQE_gainfactor.end(); it++ )
             {
-                cout << (*it ).first << " (" << (*it ).second << ") ";
+                cout << ( *it ).first << " (" << ( *it ).second << ") ";
             }
             cout << endl;
         }
@@ -206,7 +206,7 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
             map< unsigned int, unsigned int >::iterator it;
             for( it = fChannelStatus.begin(); it != fChannelStatus.end(); it++ )
             {
-                cout << (*it ).first << " (" << (*it ).second << ") ";
+                cout << ( *it ).first << " (" << ( *it ).second << ") ";
             }
             cout << endl;
         }
@@ -227,7 +227,7 @@ bool VSpecialChannel::readThroughput( string iEpoch, string ifile, string iDirec
     ifile = iDirectory + "/" + ifile;
     ifstream is;
     is.open( ifile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "error reading throughput correction for telescope " << getTelID() + 1 << " from " << ifile << endl;
         return false;
@@ -271,7 +271,7 @@ bool VSpecialChannel::readThroughput( string iEpoch, string ifile, string iDirec
                     }
                     t++;
                 }
-                while(!is_stream.eof() );
+                while( !is_stream.eof() );
                 if( iSFactor > 0. )
                 {
                     for( unsigned int i = 0; i < iNChannel; i++ )

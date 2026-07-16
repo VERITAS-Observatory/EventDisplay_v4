@@ -31,7 +31,7 @@ vector< string > readListOfFiles( string iFile )
 
     ifstream is;
     is.open( iFile.c_str() );
-    if(!is )
+    if( !is )
     {
         cout << "error while reading file list " << iFile << endl;
         cout << "exiting...." << endl;
@@ -153,18 +153,18 @@ int main( int argc, char* argv[] )
         //loop on all entries of this directory
         TKey* key;
         TIter nextkey( fIn->GetListOfKeys() );
-        while(( key = ( TKey* )nextkey() ) )
+        while( ( key = ( TKey* )nextkey() ) )
         {
             const char* classname = key->GetClassName();
             TClass* cl = gROOT->GetClass( classname );
-            if(!cl )
+            if( !cl )
             {
                 continue;
             }
             if( cl->InheritsFrom( "TDirectory" ) )
             {
                 TDirectory* iSource = ( TDirectory* )key->ReadObj();
-                if(!iSource )
+                if( !iSource )
                 {
                     continue;
                 }
@@ -207,7 +207,7 @@ void copyDirectory( TDirectory* source,
         adir = ( TDirectory* )savdir->Get( source->GetName() );
     }
 
-    if(!adir )
+    if( !adir )
     {
         // 2. case: make top directory
         if( hx )
@@ -218,7 +218,7 @@ void copyDirectory( TDirectory* source,
         {
             adir = savdir->mkdir( source->GetName() );
         }
-        if(!adir )
+        if( !adir )
         {
             cout << "error while creating directory " << source->GetName() << endl;
             cout << "exiting..." << endl;
@@ -229,11 +229,11 @@ void copyDirectory( TDirectory* source,
     //loop on all entries of this directory
     TKey* key;
     TIter nextkey( source->GetListOfKeys() );
-    while(( key = ( TKey* )nextkey() ) )
+    while( ( key = ( TKey* )nextkey() ) )
     {
         const char* classname = key->GetClassName();
         TClass* cl = gROOT->GetClass( classname );
-        if(!cl )
+        if( !cl )
         {
             continue;
         }

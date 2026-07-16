@@ -9,7 +9,7 @@ CEffArea::CEffArea( TTree* tree )
     if( tree == 0 )
     {
         TFile* f = ( TFile* )gROOT->GetListOfFiles()->FindObject( "effectiveArea.root" );
-        if(!f )
+        if( !f )
         {
             f = new TFile( "effectiveArea.root" );
         }
@@ -22,7 +22,7 @@ CEffArea::CEffArea( TTree* tree )
 
 CEffArea::~CEffArea()
 {
-    if(!fChain )
+    if( !fChain )
     {
         return;
     }
@@ -33,7 +33,7 @@ CEffArea::~CEffArea()
 Int_t CEffArea::GetEntry( Long64_t entry )
 {
     // Read contents of entry.
-    if(!fChain )
+    if( !fChain )
     {
         return 0;
     }
@@ -44,7 +44,7 @@ Int_t CEffArea::GetEntry( Long64_t entry )
 Long64_t CEffArea::LoadTree( Long64_t entry )
 {
     // Set the environment to read one entry
-    if(!fChain )
+    if( !fChain )
     {
         return -5;
     }
@@ -53,7 +53,7 @@ Long64_t CEffArea::LoadTree( Long64_t entry )
     {
         return centry;
     }
-    if(!fChain->InheritsFrom( TChain::Class() ) )
+    if( !fChain->InheritsFrom( TChain::Class() ) )
     {
         return centry;
     }
@@ -98,7 +98,7 @@ void CEffArea::Init( TTree* tree )
     hhEcutEnergyReconstruction = 0;
     hWeightedRate = 0;
     // Set branch addresses and branch pointers
-    if(!tree )
+    if( !tree )
     {
         return;
     }

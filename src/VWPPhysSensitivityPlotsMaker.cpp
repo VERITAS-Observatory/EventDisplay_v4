@@ -201,7 +201,7 @@ bool VWPPhysSensitivityPlotsMaker::writeTexFileBody( string iTexFile, string iTe
     cout << "Writing tex file: " << iTexFile << endl;
     ofstream os;
     os.open( iTexFile.c_str() );
-    if(!os )
+    if( !os )
     {
         cout << "VWPPhysSensitivityPlotsMaker::writeTexFileBody: failed writing to " << iTexFile << endl;
         return false;

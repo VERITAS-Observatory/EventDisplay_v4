@@ -144,7 +144,7 @@ VGrIsuReader::VGrIsuReader( VDetectorGeometry* iDetGeo, unsigned int intel, stri
 
     // get and test grisu version
     fGrisuVersion = getGrisuVersion();
-    if(( fDetectorGeo->getGrIsuVersion() >= 411 || fGrisuVersion >= 411 ) && fGrisuVersion != fDetectorGeo->getGrIsuVersion() && fGrisuVersion != 0 )
+    if( ( fDetectorGeo->getGrIsuVersion() >= 411 || fGrisuVersion >= 411 ) && fGrisuVersion != fDetectorGeo->getGrIsuVersion() && fGrisuVersion != 0 )
     {
         if( fIgnoreCFGVersions )
         {
@@ -202,7 +202,7 @@ void VGrIsuReader::closeDataFile( bool iPeds )
 
 void VGrIsuReader::openDataFile( bool iPeds )
 {
-    if(!iPeds )
+    if( !iPeds )
     {
         // check if sourcefile is zipped
         fBZipped = false;
@@ -230,10 +230,10 @@ void VGrIsuReader::openDataFile( bool iPeds )
 
         // open the source file
         is.open( fSourceFileName.c_str() );
-        if(!is.is_open() )
+        if( !is.is_open() )
         {
             cout << "VGrIsuReader::VGrIsuReader() - error opening file (" << fSourceFileName << ")" << endl;
-            exit(-1 );
+            exit( -1 );
         }
         if( is )
         {
@@ -253,10 +253,10 @@ void VGrIsuReader::openDataFile( bool iPeds )
             is_ped.open( fSourceFileName.c_str() );
         }
         cout << fExternalPedFile << "\t external file " << endl;
-        if(!is_ped.is_open() )
+        if( !is_ped.is_open() )
         {
             cout << "VGrIsuReader::VGrIsuReader() - error opening pedestal file (" << fExternalPedFile << ")" << endl;
-            exit(-1 );
+            exit( -1 );
         }
         if( is_ped )
         {
@@ -385,7 +385,7 @@ void VGrIsuReader::readPedsfromLibrary( unsigned int iTelID )
     if( iTree == 0 )
     {
         cout << "VGrIsuReader::readPeds() error, pedestal tree not found: " << iTreeName << endl;
-        exit(-1 );
+        exit( -1 );
     }
     double iped, ipedvar, isumwindow;
     unsigned int tubeNumber;
@@ -424,7 +424,7 @@ void VGrIsuReader::readPedsfromLibrary( unsigned int iTelID )
         if( TMath::Abs( fSumWindow[i] - isumwindow ) > 1.e-4 )
         {
             cout << "VGrIsuReader::readPeds() error, incompatible sum window sizes: " << isumwindow << "\t" << fSumWindow[i] << "\t" << i << endl;
-            exit(-1 );
+            exit( -1 );
         }
     }
     iTree->ResetBranchAddresses();
@@ -458,10 +458,10 @@ void VGrIsuReader::readPedsfromPlines()
         is_ped.open( fSourceFileName.c_str() );
     }
     cout << "\t read noise from: " << fExternalPedFile << endl;
-    if(!is_ped )
+    if( !is_ped )
     {
         cout << "VGrIsuReader::VGrIsuReader() - error opening pedestal file (" << fExternalPedFile << ")" << endl;
-        exit(-1 );
+        exit( -1 );
     }
 
     string is_line;
@@ -497,7 +497,7 @@ void VGrIsuReader::readPedsfromPlines()
             // assume, that pedestals are always before(!) simulation and trace data
             if( is_line.substr( 0, 1 ) == "R" || is_line.substr( 0, 1 ) == "S" )
             {
-                if(!pedFound )
+                if( !pedFound )
                 {
                     //////////////////////////////////////////////////////////////////////////////////////////////
                     // what to do, if there are no "P" lines in the GrIsu file?
@@ -538,7 +538,7 @@ void VGrIsuReader::readPedsfromPlines()
                 }
                 fhPeds[i_telID][i_channel]->Reset();
                 is_stream >> is_Temp;
-                while(!( is_stream >> std::ws ).eof() )
+                while( !( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> is_Temp;
                     i_val.push_back( atof( is_Temp.c_str() ) );
@@ -546,7 +546,7 @@ void VGrIsuReader::readPedsfromPlines()
                     meanRMS2 += ( double )i_val.back() * ( double )i_val.back();
                     i_sampleTemp = atoi( is_Temp.c_str() );
                     i_sampleTemp  = ( int )( fdefaultPed + ( i_sampleTemp - fdefaultPed ) / fFADCScale );
-                    i_pedSample.push_back(( uint8_t )i_sampleTemp );
+                    i_pedSample.push_back( ( uint8_t )i_sampleTemp );
                 }
                 fGrIsuPeds[i_telID][i_channel] = i_pedSample;
                 fGrIsuPedsN[i_telID][i_channel] = i_pedSample.size();
@@ -580,11 +580,11 @@ void VGrIsuReader::readPedsfromPlines()
                             if( TMath::Abs( mean ) > 1.e-4 )
                             {
                                 i_valMean.push_back( mean );
-                                if(( int )w == fSumWindow[i_telID] )
+                                if( ( int )w == fSumWindow[i_telID] )
                                 {
                                     fhPeds[i_telID][i_channel]->Fill( mean );
                                 }
-                                i_valMean2.push_back( mean* mean );
+                                i_valMean2.push_back( mean * mean );
                             }
                         }
                         i_valMean_Size = i_valMean.size();
@@ -621,7 +621,7 @@ void VGrIsuReader::readPedsfromPlines()
                             rms = sqrt( rms );
                         }
                         fVPedvars[i_telID][w][i_channel] = rms;
-                        if(( int )w == fSumWindow[i_telID] )
+                        if( ( int )w == fSumWindow[i_telID] )
                         {
                             fPedvars[i_telID][i_channel] = rms;
                         }
@@ -661,7 +661,7 @@ bool VGrIsuReader::getNextEvent()
         iSuccess = getNextShowerEvent();
     }
 
-    if(!iSuccess )
+    if( !iSuccess )
     {
         setEventStatus( 999 );
     }
@@ -733,7 +733,7 @@ bool VGrIsuReader::getNextShowerEvent()
     // set eventtype IGNORE
     fEventType = 1;
     // is there anything left in the file?
-    if(!( is >> std::ws ).eof() )
+    if( !( is >> std::ws ).eof() )
     {
         return false;
     }
@@ -754,7 +754,7 @@ bool VGrIsuReader::getNextShowerEvent()
     // read triggered pixels from GrIsu file
     sp = is.tellg();
     char iSRecord;
-    while(!( is >> std::ws ).eof() )
+    while( !( is >> std::ws ).eof() )
     {
         is >> iSRecord;
         is_line = iSRecord;
@@ -830,7 +830,7 @@ bool VGrIsuReader::getNextShowerEvent()
             // (GM 20090728)	 fMC_Az = atan2( fMC_Xcos, fMC_Ycos ) + 180./degrad;
             fMC_Az = atan2( fMC_Xcos, fMC_Ycos );
 
-            fMC_Ze = 1. - ( fMC_Xcos* fMC_Xcos + fMC_Ycos* fMC_Ycos );
+            fMC_Ze = 1. - ( fMC_Xcos * fMC_Xcos + fMC_Ycos * fMC_Ycos );
             if( fMC_Ze < 0. )
             {
                 fMC_Ze = 0.;
@@ -845,7 +845,7 @@ bool VGrIsuReader::getNextShowerEvent()
             // add wobble offset
             double az = 0.;
             double ze = 0.;
-            VSkyCoordinatesUtilities::getRotatedShowerDirection( fMC_Ze* degrad, fMC_Az* degrad, fMC_Yoffset, -1.*fMC_Xoffset, ze, az );
+            VSkyCoordinatesUtilities::getRotatedShowerDirection( fMC_Ze * degrad, fMC_Az * degrad, fMC_Yoffset, -1.*fMC_Xoffset, ze, az );
             fMC_Ze = ze / degrad;
             fMC_Az = VSkyCoordinatesUtilities::adjustAzimuthToRange( az ) / degrad;
             resetEvent();
@@ -875,7 +875,7 @@ bool VGrIsuReader::getNextShowerEvent()
             fLocalTrigger.assign( fNTel, false );
             ///////////////////////////
             // no multiple raw data reader defined, information of all telescopes is in the data
-            if(!fMultiGrIsuReader )
+            if( !fMultiGrIsuReader )
             {
                 // read the local triggers
                 if( fNTel > fLocalTrigger.size() )
@@ -993,7 +993,7 @@ bool VGrIsuReader::getNextShowerEvent()
             for( int i = 0; i < ( int )( i_nsample + fSampleOffset ); i++ )
             {
                 is >> iRecord;
-                iRecord = ( int )(( iRecord - fdefaultPed ) / fFADCScale + fdefaultPed );
+                iRecord = ( int )( ( iRecord - fdefaultPed ) / fFADCScale + fdefaultPed );
                 // overflow
                 //	       if( fDetectorGeo->getGrIsuVersion() < 413 && iRecord > (int)fDetectorGeo->getLowGainThreshold()[i_telID] )
                 if( fGrisuVersion < 413 && iRecord > ( int )fDetectorGeo->getLowGainThreshold()[i_telID] )
@@ -1004,7 +1004,7 @@ bool VGrIsuReader::getNextShowerEvent()
                 if( i >= fSampleOffset )
                 {
                     ftempSampleUI[i - fSampleOffset] = iRecord;
-                    ftempSampleFL[i - fSampleOffset] = (( iRecord - fdefaultPed ) / fFADCScale + fdefaultPed );
+                    ftempSampleFL[i - fSampleOffset] = ( ( iRecord - fdefaultPed ) / fFADCScale + fdefaultPed );
                 }
             }
             for( unsigned int i = 0; i < fSamplesVec[i_telID][i_channel].size(); i++ )
@@ -1219,14 +1219,14 @@ bool VGrIsuReader::openTraceLibrary()
         if( fTraceFile->IsZombie() )
         {
             cout << "VGrIsuReader::VGrIsuReader(): error, trace library not found " << fTraceFileName << endl;
-            exit(-1 );
+            exit( -1 );
         }
         cout << "VGrIsuReader::VGrIsuReader(): reading tracefile: " << fTraceFileName << endl;
         char itree[200];
         for( unsigned int i = 0; i < fNTel; i++ )
         {
             sprintf( itree, "trace_%d", i );
-            fTraceTree.push_back(( TTree* )gDirectory->Get( itree ) );
+            fTraceTree.push_back( ( TTree* )gDirectory->Get( itree ) );
             if( fTraceTree.back() == 0 )
             {
                 cout << "VGrIsuReader::VGrIsuReader(): warning, trace tree not found: " << itree << endl;
@@ -1317,7 +1317,7 @@ void VGrIsuReader::fillBackgroundfromTraceLibrary()
     for( unsigned int h = 0; h < fNTel; h++ )
     {
         // get randomly a event from the trace library
-        fTraceTree[h]->GetEntry( fRandomGen->Integer(( int )fTraceTree[h]->GetEntries() ) );
+        fTraceTree[h]->GetEntry( fRandomGen->Integer( ( int )fTraceTree[h]->GetEntries() ) );
         // loop over all tubes (MC camera file tube numbering)
         for( unsigned int i = 0; i < fMaxChannels[h]; i++ )
         {
@@ -1399,7 +1399,7 @@ void VGrIsuReader::fillBackgroundfromPlines()
             if( fFullHitVec[h][i] )
             {
                 // generate a trace from background
-                if(!fLocalTrigger[h] && fFullTrigVec[h][i] == 0 )
+                if( !fLocalTrigger[h] && fFullTrigVec[h][i] == 0 )
                 {
                     for( unsigned int j = 0; j < fNumSamples[h]; j++ )
                     {
@@ -1542,7 +1542,7 @@ void VGrIsuReader::setRandomDead( int iNC, int iNB )
             int iNstep = 0;
             do
             {
-                iPix = fRandomGen->Integer(( int )fFullAnaVec[iTel].size() );
+                iPix = fRandomGen->Integer( ( int )fFullAnaVec[iTel].size() );
                 // check if this one is already dead
                 if( fFullAnaVec[iTel][iPix] == 1 )
                 {
@@ -1567,7 +1567,7 @@ void VGrIsuReader::setRandomDead( int iNC, int iNB )
             int iPix = 0;
             do
             {
-                iPix = fRandomGen->Integer(( int )fFullAnaVec[iTel].size() );
+                iPix = fRandomGen->Integer( ( int )fFullAnaVec[iTel].size() );
                 iPix = iPix / 10 * 10;
                 // don't care about if anything is already dead
                 for( unsigned j = 0; j < iNboard; j++ )
@@ -1648,7 +1648,7 @@ vector< uint8_t >& VGrIsuReader::getNoiseVec( unsigned int iTel, uint32_t iHitID
 {
     if( iTel < fGrIsuPeds.size() && iHitID < fGrIsuPeds[iTel].size() )
     {
-        if(!bNoiseTraceFilled )
+        if( !bNoiseTraceFilled )
         {
             iNewTrace = true;
             bNoiseTraceFilled = true;

@@ -51,7 +51,7 @@ pair<float, float> getArrayPointing( Cshowerpars* i_showerpars )
     pair< float, float> i_mean_pointing;
     i_mean_pointing.first = 0.;
     i_mean_pointing.second = 0.;
-    if(!i_showerpars )
+    if( !i_showerpars )
     {
         return i_mean_pointing;
     }
@@ -98,7 +98,7 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
     cout << "----------------------------------------------------------------" << endl;
     cout << endl;
 
-    if(!iDataTree )
+    if( !iDataTree )
     {
         cout << "Error: data tree for telescope type " << iTelType << " does not exist" << endl;
         return false;
@@ -110,7 +110,7 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
     unsigned int ntest    = 0 ;
     unsigned int nentries = iDataTree->GetEntries() ;
     cout << endl;
-    ntrain = floor( nentries* iTrainTest ) ;
+    ntrain = floor( nentries * iTrainTest ) ;
     ntest  = nentries - ntrain ;
     if( ntrain <= 100 || ntest <= 100 )
     {
@@ -313,7 +313,7 @@ vector< string > fillInputFile_fromList( string iList )
 
     ifstream is;
     is.open( iList.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "fillInputFile_fromList() error reading list of input files: " << endl;
         cout << iList << endl;
@@ -400,7 +400,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
     cout << "reading telescope list from ";
     cout << iInputFileList[0] << endl;
 
-    Ctelconfig i_tel(&i_telChain );
+    Ctelconfig i_tel( &i_telChain );
     i_tel.GetEntry( 0 );
     unsigned int i_ntel = i_tel.NTel;
 
@@ -560,7 +560,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
     {
         i_showerparsTree.Add( iInputFileList[f].c_str(), 0 );
     }
-    Cshowerpars i_showerpars(&i_showerparsTree, true, true );
+    Cshowerpars i_showerpars( &i_showerparsTree, true, true );
 
     // get all tpars tree
     vector< TChain* > i_tparsTree;
@@ -629,7 +629,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
             fEM_sinphi[i] = 0.;
             fEM_weight[i] = 1.;
 
-            if(!i_tpars[i] )
+            if( !i_tpars[i] )
             {
                 continue;
             }
@@ -652,10 +652,10 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
                 fEM_sinphi[i] = i_tpars[i]->sinphi;
             }
         }
-        pair< float, float> i_mean_array_pointing = getArrayPointing(&i_showerpars );
+        pair< float, float> i_mean_array_pointing = getArrayPointing( &i_showerpars );
 
         EmissionHeight = fEmissionHeightCalculator->getEmissionHeight( fEM_cen_x, fEM_cen_y, fEM_size,
-                         i_mean_array_pointing.first, i_mean_array_pointing.second );
+            i_mean_array_pointing.first, i_mean_array_pointing.second );
 
         i_SR.reconstruct_direction(
             fEM_TelX.size(),
@@ -681,7 +681,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
         for( unsigned int i = 0; i < i_tpars.size(); i++ )
         {
             // check if telescope is of valid telescope type
-            if(( fTelType[i] != iTelType && iTelType != 0 ) || !i_tpars[i] )
+            if( ( fTelType[i] != iTelType && iTelType != 0 ) || !i_tpars[i] )
             {
                 continue;
             }
@@ -756,16 +756,16 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
 
             //////////////////////////////////////////////////////////////////////////////////////////////////
             // calculate disp (observe sign convention for MC in y direction for MCyoff and Yoff)
-            disp  = sqrt(( cen_y + MCyoff ) * ( cen_y + MCyoff ) + ( cen_x - MCxoff ) * ( cen_x - MCxoff ) );
+            disp  = sqrt( ( cen_y + MCyoff ) * ( cen_y + MCyoff ) + ( cen_x - MCxoff ) * ( cen_x - MCxoff ) );
             if( redo_stereo_reconstruction )
             {
-                cross = sqrt(( cen_y + i_SR.fShower_Yoffset ) * ( cen_y + i_SR.fShower_Yoffset )
-                             + ( cen_x - i_SR.fShower_Xoffset ) * ( cen_x - i_SR.fShower_Xoffset ) );
+                cross = sqrt( ( cen_y + i_SR.fShower_Yoffset ) * ( cen_y + i_SR.fShower_Yoffset )
+                              + ( cen_x - i_SR.fShower_Xoffset ) * ( cen_x - i_SR.fShower_Xoffset ) );
             }
             else
             {
-                cross = sqrt(( cen_y + Yoff ) * ( cen_y + Yoff )
-                             + ( cen_x - Xoff ) * ( cen_x - Xoff ) );
+                cross = sqrt( ( cen_y + Yoff ) * ( cen_y + Yoff )
+                              + ( cen_x - Xoff ) * ( cen_x - Xoff ) );
             }
             dispCrossError = disp - cross;
             dispPhi = TMath::ATan2( sinphi, cosphi ) - TMath::ATan2( cen_y + MCyoff, cen_x - MCxoff );
@@ -781,15 +781,15 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
             float x2 = cen_x + disp * cosphi;
             float y1 = cen_y - disp * sinphi;
             float y2 = cen_y + disp * sinphi;
-            if( sqrt(( x1 - MCxoff ) * ( x1 - MCxoff ) + ( y1 + MCyoff ) * ( y1 + MCyoff ) )
-                    < sqrt(( x2 - MCxoff ) * ( x2 - MCxoff ) + ( y2 + MCyoff ) * ( y2 + MCyoff ) ) )
+            if( sqrt( ( x1 - MCxoff ) * ( x1 - MCxoff ) + ( y1 + MCyoff ) * ( y1 + MCyoff ) )
+                    < sqrt( ( x2 - MCxoff ) * ( x2 - MCxoff ) + ( y2 + MCyoff ) * ( y2 + MCyoff ) ) )
             {
-                dispError = sqrt(( x1 - MCxoff ) * ( x1 - MCxoff ) + ( y1 + MCyoff ) * ( y1 + MCyoff ) );
+                dispError = sqrt( ( x1 - MCxoff ) * ( x1 - MCxoff ) + ( y1 + MCyoff ) * ( y1 + MCyoff ) );
                 dispSign = 1.;
             }
             else
             {
-                dispError = sqrt(( x2 - MCxoff ) * ( x2 - MCxoff ) + ( y2 + MCyoff ) * ( y2 + MCyoff ) );
+                dispError = sqrt( ( x2 - MCxoff ) * ( x2 - MCxoff ) + ( y2 + MCyoff ) * ( y2 + MCyoff ) );
                 dispSign = -1.;
             }
             dispEnergy = i_showerpars.MCe0;

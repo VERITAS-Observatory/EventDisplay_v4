@@ -27,9 +27,9 @@ double VDouble_gauss::operator()( double* x, double* par )
 
     if( x[0] < mean )
     {
-        return norm * TMath::Exp(-0.5 * ( x[0] - mean ) * ( x[0] - mean ) / sigma1 / sigma1 );
+        return norm * TMath::Exp( -0.5 * ( x[0] - mean ) * ( x[0] - mean ) / sigma1 / sigma1 );
     }
-    return norm * TMath::Exp(-0.5 * ( x[0] - mean ) * ( x[0] - mean ) / sigma2 / sigma2 );
+    return norm * TMath::Exp( -0.5 * ( x[0] - mean ) * ( x[0] - mean ) / sigma2 / sigma2 );
 
 }
 
@@ -41,7 +41,7 @@ double VDouble_gauss::operator()( double* x, double* par )
 double VFun_gauss::operator()( double* x, double* par )
 {
 
-    return par[0] * TMath::Exp(-1 * x[0] * x[0] / 2. );
+    return par[0] * TMath::Exp( -1 * x[0] * x[0] / 2. );
 
 }
 
@@ -148,7 +148,7 @@ double VMathsandFunctions::getRatioError( double x1, double x2, double ex1, doub
 {
     if( x2 != 0. )
     {
-        return TMath::Sqrt( 1. / x2 / x2* ex1* ex1 + x1* x1 / x2 / x2 / x2 / x2* ex2* ex2 );
+        return TMath::Sqrt( 1. / x2 / x2 * ex1 * ex1 + x1 * x1 / x2 / x2 / x2 / x2 * ex2 * ex2 );
     }
 
     return 0.;

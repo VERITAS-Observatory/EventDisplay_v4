@@ -49,8 +49,8 @@ int main( int argc, char* argv[] )
 
     if( runnumber > 0 )
     {
-        a.setTelMinElevation(-99999.0 );
-        a.setMinDuration(-99999.0 );
+        a.setTelMinElevation( -99999.0 );
+        a.setMinDuration( -99999.0 );
         a.setRunNumber( runnumber );
         a.readFromDBList();
         a.setSelectLaser( laserruns );

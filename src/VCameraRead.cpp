@@ -54,7 +54,7 @@ bool VCameraRead::setTelID( unsigned int iTel )
         cout << " VCameraRead::setTelID() error: telescope ID out of range: requested " << iTel << ", current " << fTelID << ", ntel: " << fNTel << endl;
         //      cout << "                                setting ID to zero" << endl;
         cout << "   ...exiting" << endl;
-        exit(-1 );
+        exit( -1 );
         return false;
     }
     return true;
@@ -81,7 +81,7 @@ bool VCameraRead::initialize( unsigned int iNtel, vector< string > iCamera )
     {
         string iCameraFile = fConfigDir + iCamera[i] + ".cam";
         ifstream inFileStream( iCameraFile.c_str() );
-        if(!inFileStream )
+        if( !inFileStream )
         {
             cout << "VCameraRead::initialize camera geometry file not found: " << iCamera[i] << endl;
             cout << iCameraFile << endl;
@@ -173,10 +173,10 @@ bool VCameraRead::readCameraFile( string iCameraFile )
     iCameraFile.insert( 0, fConfigDir );
     iCameraFile.append( ".cam" );
     std::ifstream inFileStream( iCameraFile.c_str() );
-    if(!inFileStream )
+    if( !inFileStream )
     {
         std::cout << "VCameraRead::readCameraFile() error: camera geometry file not found: " << iCameraFile << std::endl;
-        exit(-1 );
+        exit( -1 );
         return false;
     }
 
@@ -215,7 +215,7 @@ bool VCameraRead::readCameraFile( string iCameraFile )
             // reading neighbours
             is_stream >> i_char;
             unsigned int j = 0;
-            while(!( is_stream >> std::ws ).eof() && i_char.substr( 0, 1 ) == "N" )
+            while( !( is_stream >> std::ws ).eof() && i_char.substr( 0, 1 ) == "N" )
             {
                 if( j < fNeighbour[fTelID][i_ch].size() )
                 {
@@ -225,11 +225,11 @@ bool VCameraRead::readCameraFile( string iCameraFile )
                 j++;
             }
             // maybe there is some information about triggers and dead channels
-            if(!( is_stream >> std::ws ).eof() && i_char.substr( 0, 4 ) == "TRIG" )
+            if( !( is_stream >> std::ws ).eof() && i_char.substr( 0, 4 ) == "TRIG" )
             {
                 is_stream >> fTrigTube[fTelID][i_ch];
             }
-            if(!( is_stream >> std::ws ).eof() )
+            if( !( is_stream >> std::ws ).eof() )
             {
                 is_stream >> i_char;
                 if( i_char.substr( 0, 3 ) == "ANA" )
@@ -238,13 +238,13 @@ bool VCameraRead::readCameraFile( string iCameraFile )
                 }
             }
             // get conversion from MC tube numbering to real data tube numbering
-            if(!( is_stream >> std::ws ).eof() )
+            if( !( is_stream >> std::ws ).eof() )
             {
                 is_stream >> i_char;
                 if( i_char.substr( 0, 3 ) == "MIX" )
                 {
                     is_stream >> i_mix;
-                    fXim.push_back(( unsigned int )i_mix );
+                    fXim.push_back( ( unsigned int )i_mix );
                 }
             }
             zaehler++;
@@ -263,7 +263,7 @@ bool VCameraRead::readCameraFile( string iCameraFile )
         if( i_max > fXim.size() )
         {
             cout << "error in mixing vector size: " << i_max << "\t" << fXim.size() << endl;
-            exit(-1 );
+            exit( -1 );
         }
         fMix.assign( fXim.size(), 0 );
         for( unsigned int i = 0; i < fXim.size(); i++ )
@@ -298,10 +298,10 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 
     iFile.insert( 0, fConfigDir );
     std::ifstream inFileStream( iFile.c_str() );
-    if(!inFileStream )
+    if( !inFileStream )
     {
         cout << "VCameraRead::readGrisucfg() error: grisu cfg file not found: " << iFile << endl;
-        exit(-1 );
+        exit( -1 );
         return false;
     }
 
@@ -437,7 +437,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
             {
                 i_stream >> i_char;
                 i_stream >> i_char;
-                if(!i_stream.eof() )
+                if( !i_stream.eof() )
                 {
                     i_stream >> fLowGainMultiplier_Trace[0];
                     for( unsigned int i = 1; i < fNTel; i++ )
@@ -632,7 +632,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
             {
                 for( unsigned int j = 0; j < fMaxNeighbour; j++ )
                 {
-                    if(!i_stream.eof() )
+                    if( !i_stream.eof() )
                     {
                         i_stream >> fNeighbour[i_telID][i_chan][j];
                         // grisu starts at 1 with counting, evndisp at 0
@@ -799,11 +799,11 @@ void VCameraRead::readPixelFile( string iFile )
     }
     ifstream is;
     is.open( iFile.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "VCameraRead error: cannot find file with pixel information: " << iFile << endl;
         cout << "...exiting" << endl;
-        exit(-1 );
+        exit( -1 );
     }
     string is_line;
     string itemp;
@@ -842,7 +842,7 @@ void VCameraRead::readPixelFile( string iFile )
                 }
                 for( unsigned int j = 0; j < fMaxNeighbour; j++ )
                 {
-                    if(!( is_stream >> std::ws ).eof() )
+                    if( !( is_stream >> std::ws ).eof() )
                     {
                         if( j < fNeighbour[i_telID][i_chan].size() )
                         {
@@ -865,7 +865,7 @@ void VCameraRead::readPixelFile( string iFile )
                         }
                         else
                         {
-                            fNeighbour[i_telID][i_chan].push_back(-1 );
+                            fNeighbour[i_telID][i_chan].push_back( -1 );
                         }
                     }
                 }
@@ -1040,9 +1040,9 @@ void VCameraRead::convertMMtoDeg()
             fXTubeMM[i][j] *= fCoordinateTransformerX;
             fYTubeMM[i][j] *= fCoordinateTransformerY;
 
-            fXTube[i][j] = atan2(( double )fXTubeMM[i][j] / 1000., ( double )fMirFocalLength[i] ) * 45. / atan( 1. );
-            fYTube[i][j] = atan2(( double )fYTubeMM[i][j] / 1000., ( double )fMirFocalLength[i] ) * 45. / atan( 1. );
-            fRTube[i][j] = atan2(( double )fRTubeMM[i][j] / 1000., ( double )fMirFocalLength[i] ) * 45. / atan( 1. );
+            fXTube[i][j] = atan2( ( double )fXTubeMM[i][j] / 1000., ( double )fMirFocalLength[i] ) * 45. / atan( 1. );
+            fYTube[i][j] = atan2( ( double )fYTubeMM[i][j] / 1000., ( double )fMirFocalLength[i] ) * 45. / atan( 1. );
+            fRTube[i][j] = atan2( ( double )fRTubeMM[i][j] / 1000., ( double )fMirFocalLength[i] ) * 45. / atan( 1. );
         }
     }
 }
@@ -1104,7 +1104,7 @@ void VCameraRead::rotateCamera()
                     cout << "VCameraRead::rotateCamera() error: invalid vector sizes (expected " << i << "," << j << "): ";
                     cout << fXTube[i].size() << "\t" << fYTube[i].size() << "\t" << fRotXTube[i].size() << "\t" << fRotYTube[i].size() << endl;
                     cout << "exiting..." << endl;
-                    exit(-1 );
+                    exit( -1 );
                 }
             }
         }
@@ -1113,7 +1113,7 @@ void VCameraRead::rotateCamera()
             cout << "VCameraRead::rotateCamera() error: invalid vector sizes (expected " << i << "): ";
             cout << fXTube.size() << "\t" << fYTube.size() << "\t" << fRotXTube.size() << "\t" << fRotYTube.size() << endl;
             cout << "exiting..." << endl;
-            exit(-1 );
+            exit( -1 );
         }
     }
     cout << endl;
@@ -1274,8 +1274,8 @@ bool VCameraRead::makeNeighbourList()
         {
             for( unsigned int k = 0; k < j; k++ )
             {
-                double itemp = sqrt(( getX_MM( i )[j] - getX_MM( i )[k] ) * ( getX_MM( i )[j] - getX_MM( i )[k] )
-                                    + ( getY_MM( i )[j] - getY_MM( i )[k] ) * ( getY_MM( i )[j] - getY_MM( i )[k] ) );
+                double itemp = sqrt( ( getX_MM( i )[j] - getX_MM( i )[k] ) * ( getX_MM( i )[j] - getX_MM( i )[k] )
+                                     + ( getY_MM( i )[j] - getY_MM( i )[k] ) * ( getY_MM( i )[j] - getY_MM( i )[k] ) );
                 if( itemp < iTubeDistance_min )
                 {
                     iTubeDistance_min = itemp;
@@ -1290,8 +1290,8 @@ bool VCameraRead::makeNeighbourList()
         {
             for( unsigned int k = 0; k < j; k++ )
             {
-                double itemp = sqrt(( getX_MM( i )[j] - getX_MM( i )[k] ) * ( getX_MM( i )[j] - getX_MM( i )[k] )
-                                    + ( getY_MM( i )[j] - getY_MM( i )[k] ) * ( getY_MM( i )[j] - getY_MM( i )[k] ) );
+                double itemp = sqrt( ( getX_MM( i )[j] - getX_MM( i )[k] ) * ( getX_MM( i )[j] - getX_MM( i )[k] )
+                                     + ( getY_MM( i )[j] - getY_MM( i )[k] ) * ( getY_MM( i )[j] - getY_MM( i )[k] ) );
                 if( itemp < 2.1 * sqrt( 2. )*iTubeDistance_min )
                 {
                     if( getAnaPixel( i )[k] > 0 )
@@ -1382,7 +1382,7 @@ unsigned int VCameraRead::getTelType_Counter( ULong64_t iTelType )
     unsigned int z = 0;
     for( set< ULong64_t >::iterator i_s = s.begin(); i_s != s.end(); i_s++ )
     {
-        if(*i_s == iTelType )
+        if( *i_s == iTelType )
         {
             return z;
         }
@@ -1408,7 +1408,7 @@ vector<ULong64_t> VCameraRead::getTelType_list()
     set< ULong64_t >::iterator it_s;
     for( it_s = s.begin(); it_s != s.end(); it_s++ )
     {
-        t.push_back(*it_s );
+        t.push_back( *it_s );
     }
 
     return t;
@@ -1422,13 +1422,13 @@ bool VCameraRead::read_camerarotation_fromDB( string iDBStartTime )
     sprintf( c_query, "select telescope_id, version, pmt_rotation from tblPointing_Monitor_Camera_Parameters where start_date <= \"%s\" AND end_date > \"%s\" ", iDBStartTime.substr( 0, 10 ).c_str(), iDBStartTime.substr( 0, 10 ).c_str() );
 
     VDB_Connection my_connection( iTempS.str().c_str(), "readonly", "" ) ;
-    if(!my_connection.Get_Connection_Status() )
+    if( !my_connection.Get_Connection_Status() )
     {
         cout << "VCameraRead: failed to connect to database server" << endl;
         cout << "\t server: " <<  iTempS.str() << endl;
         return false;
     }
-    if(!my_connection.make_query( c_query ) )
+    if( !my_connection.make_query( c_query ) )
     {
         return false;
     }
@@ -1439,7 +1439,7 @@ bool VCameraRead::read_camerarotation_fromDB( string iDBStartTime )
     for( int j = 0; j < iNRows; j++ )
     {
         TSQLRow* db_row = db_res->Next();
-        if(!db_row )
+        if( !db_row )
         {
             continue;
         }
@@ -1477,7 +1477,7 @@ bool VCameraRead::read_camerarotation_fromDB( string iDBStartTime )
 bool VCameraRead::read_camerarotation_fromDBTextFile( unsigned int run_number, string iDBTextDirectory )
 {
     VSQLTextFileReader a( iDBTextDirectory, run_number, "camerarotation" );
-    if(!a.isGood() )
+    if( !a.isGood() )
     {
         return false;
     }
@@ -1525,14 +1525,14 @@ bool VCameraRead::readDetectorGeometryFromDB(
     {
         if( iDBTextDirectory.size() == 0 )
         {
-            if(!read_camerarotation_fromDB( iDBStartTime ) )
+            if( !read_camerarotation_fromDB( iDBStartTime ) )
             {
                 return false;
             }
         }
         else
         {
-            if(!read_camerarotation_fromDBTextFile( iRunNumber, iDBTextDirectory ) )
+            if( !read_camerarotation_fromDBTextFile( iRunNumber, iDBTextDirectory ) )
             {
                 return false;
             }

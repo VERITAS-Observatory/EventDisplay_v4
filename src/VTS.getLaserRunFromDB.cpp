@@ -32,12 +32,12 @@ int main( int argc, char* argv[] )
     {
         cout << "error: maximum number of telescopes are " << fNTel;
         cout << ", requested is laser run for telescope telescope " << fTelID << endl;
-        exit(-1 );
+        exit( -1 );
     }
     else if( fTelID < 1 )
     {
         cout << "error: first telescope is T1 (1)" << endl;
-        exit(-1 );
+        exit( -1 );
     }
 
     // get DBservers

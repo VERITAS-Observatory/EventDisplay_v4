@@ -16,7 +16,7 @@ VInterpolate2DHistos::VInterpolate2DHistos( int iseed )
 
 TH2F* VInterpolate2DHistos::doSimpleInterpolation( TH2F* h, string iname, int iwidth, int maxiter, bool bError )
 {
-    if(!h )
+    if( !h )
     {
         return 0;
     }
@@ -49,7 +49,7 @@ TH2F* VInterpolate2DHistos::doSimpleInterpolation( TH2F* h, string iname, int iw
                         {
                             if( ii > 0 && jj > 0 && htemp->GetBinContent( ii, jj ) > 0. )
                             {
-                                if(!bError )
+                                if( !bError )
                                 {
                                     imean += htemp->GetBinContent( ii, jj );
                                 }
@@ -64,7 +64,7 @@ TH2F* VInterpolate2DHistos::doSimpleInterpolation( TH2F* h, string iname, int iw
                     }
                     if( z > 0. )
                     {
-                        if(!bError )
+                        if( !bError )
                         {
                             hs->SetBinContent( i, j, imean / z );
                         }
@@ -85,7 +85,7 @@ TH2F* VInterpolate2DHistos::doSimpleInterpolation( TH2F* h, string iname, int iw
 
 TH2F* VInterpolate2DHistos::doGaussianInterpolation( TH2F* h, string iname, TH2F* hNevents, int nGausN, double nWidth )
 {
-    if(!h || !hNevents )
+    if( !h || !hNevents )
     {
         return 0;
     }
@@ -119,8 +119,8 @@ TH2F* VInterpolate2DHistos::doGaussianInterpolation( TH2F* h, string iname, TH2F
             // loop over all bin entries
             for( int k = 0; k < n; k++ )
             {
-                x = fRandom->Gaus( xc, xWidth* nWidth / 2. );
-                y = fRandom->Gaus( yc, yWidth* nWidth / 2. );
+                x = fRandom->Gaus( xc, xWidth * nWidth / 2. );
+                y = fRandom->Gaus( yc, yWidth * nWidth / 2. );
                 h2D.Fill( x, y, z );
             }
         }

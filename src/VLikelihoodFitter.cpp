@@ -18,7 +18,7 @@ bool VLikelihoodFitter::initialize()
     fMeanEffectiveAreaMC = getEffectiveAreasMCFromFile();
 
     // Checking effective areas returned ok
-    if(!fMeanEffectiveAreaMC[0] )
+    if( !fMeanEffectiveAreaMC[0] )
     {
         cout << "VLikelihoodFitter::initialize Error getting effective areas" << endl;
         return false;
@@ -32,11 +32,11 @@ bool VLikelihoodFitter::initialize()
     vector <double> i_fEnergyBins;
     for( int i = 0; i <= i_fNEnergyBins; i ++ )
     {
-        i_fEnergyBins.push_back(-1.1 + i* fEnergyBinWidth );
+        i_fEnergyBins.push_back( -1.1 + i * fEnergyBinWidth );
     }
 
     // Setting energy binning
-    if(!setAnalysisBinning( i_fNEnergyBins, i_fEnergyBins ) )
+    if( !setAnalysisBinning( i_fNEnergyBins, i_fEnergyBins ) )
     {
         cout << "VLikelihoodFitter::initialize errors setting analysis bins, see above." << endl;
         return false;
@@ -96,7 +96,7 @@ bool VLikelihoodFitter::setAnalysisBinning( int i_fNEnergyBins, vector <double> 
     vector <TH1D*> i_hOffRaw = getCountingHistogramRaw( "off" );
 
     // Checking that both sets of histograms returned ok
-    if(!i_hOnRaw[0] || !i_hOffRaw[0] )
+    if( !i_hOnRaw[0] || !i_hOffRaw[0] )
     {
         cout << "VLikelihoodFitter::setAnalysisBinning error getting On/Off histograms" << endl;
         return false;
@@ -104,7 +104,7 @@ bool VLikelihoodFitter::setAnalysisBinning( int i_fNEnergyBins, vector <double> 
 
     vector <TH2F*> i_hResponseMatrixRaw = getResponseMatrixRaw();
     // Checking if response matrix returned ok
-    if(!i_hResponseMatrixRaw[0] )
+    if( !i_hResponseMatrixRaw[0] )
     {
         cout << "VLikelihoodFitter::setAnalysisBinning error getting response matrix" << endl;
         return false;
@@ -121,12 +121,12 @@ bool VLikelihoodFitter::setAnalysisBinning( int i_fNEnergyBins, vector <double> 
         // Rebinning Off counts
         ss.str( std::string() );
         ss << "Rebinned On Counts " << fRunList[i].runnumber;
-        fOnRebinnedHistograms.push_back(( TH1D* ) i_hOnRaw[i]->Rebin( fNEnergyBins, ss.str().c_str(), &( fEnergyBins )[0] ) );
+        fOnRebinnedHistograms.push_back( ( TH1D* ) i_hOnRaw[i]->Rebin( fNEnergyBins, ss.str().c_str(), &( fEnergyBins )[0] ) );
 
         // Rebinning Off counts
         ss.str( std::string() );
         ss << "Rebinned Off Counts " << fRunList[i].runnumber;
-        fOffRebinnedHistograms.push_back(( TH1D* ) i_hOffRaw[i]->Rebin( fNEnergyBins, ss.str().c_str(), &( fEnergyBins )[0] ) );
+        fOffRebinnedHistograms.push_back( ( TH1D* ) i_hOffRaw[i]->Rebin( fNEnergyBins, ss.str().c_str(), &( fEnergyBins )[0] ) );
 
         // Calculating totals
         fTotalOn.push_back( fOnRebinnedHistograms[i]->Integral( 1, fNEnergyBins ) );
@@ -273,7 +273,7 @@ vector <TGraphAsymmErrors*> VLikelihoodFitter::getEffectiveAreasMCFromFile()
 
 
         // Checking if there are any issues
-        if(!i_gMeanEffectiveArea )
+        if( !i_gMeanEffectiveArea )
         {
             cout << "VLikelihoodFitter::getEffectiveAreasMCFromFile Error getting Effective Area ( MC ) ";
 
@@ -292,7 +292,7 @@ vector <TGraphAsymmErrors*> VLikelihoodFitter::getEffectiveAreasMCFromFile()
         i_gMeanEffectiveArea->SetTitle( ss.str().c_str() );
 
         // Save the runwise effective area to a vector
-        iVtemp.push_back(( TGraphAsymmErrors* )i_gMeanEffectiveArea->Clone() );
+        iVtemp.push_back( ( TGraphAsymmErrors* )i_gMeanEffectiveArea->Clone() );
     }
 
     return iVtemp;
@@ -321,7 +321,7 @@ vector <TH1D*> VLikelihoodFitter::getCountingHistogramRaw( string onoff )
         TH1D* i_hErecCounts = ( TH1D* )getHistogram( ss.str().c_str(), fRunList[i].runnumber, "energyHistograms", -9999 );
 
         // Checking if histograms exist
-        if(!i_hErecCounts )
+        if( !i_hErecCounts )
         {
             cout << "VLikelihoodFitter::getCountingHistogramRaw Error getting " << onoff << " counts histrogram for run " << fRunList[i].runnumber ;
             iVTemp.clear();
@@ -389,7 +389,7 @@ vector <TH2F*> VLikelihoodFitter::getResponseMatrixRaw()
 
         for( int j = 0; j <= i_fNEnergyBins; j ++ )
         {
-            i_fEnergyBins.push_back(-1.1 + j * 0.05 );
+            i_fEnergyBins.push_back( -1.1 + j * 0.05 );
         }
 
 
@@ -397,7 +397,7 @@ vector <TH2F*> VLikelihoodFitter::getResponseMatrixRaw()
 
         for( int j = 0; j <= i_fNEnergyBinsMC; j ++ )
         {
-            i_fEnergyBinsMC.push_back(-1.1 + j * 0.05 );
+            i_fEnergyBinsMC.push_back( -1.1 + j * 0.05 );
         }
 
         TH2F* ihres_tmp = new TH2F( "ihres_tmp", "Response Matrix; E_{Rec}; E_{MC}", i_fNEnergyBins, &( i_fEnergyBins[0] ), i_fNEnergyBinsMC, &( i_fEnergyBinsMC[0] ) );
@@ -444,7 +444,7 @@ vector <TH2F*> VLikelihoodFitter::getResponseMatrixRaw()
         // expect integral over E_mc (Y) to be 1
         VHistogramUtilities::normalizeTH2D_y( ihres_tmp );
         ihres_tmp->SetTitle( ss.str().c_str() );
-        iVtemp.push_back(( TH2F* )ihres_tmp->Clone() );
+        iVtemp.push_back( ( TH2F* )ihres_tmp->Clone() );
 
     }
 
@@ -467,8 +467,8 @@ void VLikelihoodFitter::printRunInfo()
     for( unsigned int i = 0; i < fRunList.size(); i++ )
     {
         cout << i << "\t" << fRunList[i].runnumber << "\t" << fRunList[i].MJD << "\t" << fRunList[i].tOn* fRunList[i].deadTimeFraction <<
-             "\t\t" << fTotalOn[i] << "\t\t" << fTotalOff[i] << "\t\t" << fRunList[i].alpha  <<
-             "\t\t" << TMath::Power( 10, fLastOn[i] ) << "\t\t" << TMath::Power( 10, fLastOff[i] ) <<  endl;
+                     "\t\t" << fTotalOn[i] << "\t\t" << fTotalOff[i] << "\t\t" << fRunList[i].alpha  <<
+                     "\t\t" << TMath::Power( 10, fLastOn[i] ) << "\t\t" << TMath::Power( 10, fLastOff[i] ) <<  endl;
 
         // Adding totals
         i_total_tOn += fRunList[i].tOn * fRunList[i].deadTimeFraction;
@@ -1142,7 +1142,7 @@ bool VLikelihoodFitter::initializeMinimizer( double iNormGuess, int iPrintStatus
 
 
     // Checking the a global fit has been applied before trying to fix the shape
-    if(!fGlobalBestFitParameters && iFixShape )
+    if( !fGlobalBestFitParameters && iFixShape )
     {
         cout << "VLikelihoodFitter::initializeMinimizer Global fit must be applied before getting binwise fit "
              << endl << "\t Call VLikelihoodFitter::getLikelihoodFit() first!" << endl;
@@ -1180,7 +1180,7 @@ bool VLikelihoodFitter::initializeMinimizer( double iNormGuess, int iPrintStatus
         fParmName.clear();
         fParmName.assign( fNParms, "" );
     }
-    fMinimizer->SetFunction(*fFitfunction );
+    fMinimizer->SetFunction( *fFitfunction );
 
 
     // Setting initial parameters for each model
@@ -1600,7 +1600,7 @@ double VLikelihoodFitter::getRunwiseLogL( int i_run, vector <double> parms )
         // Avoiding 0*log(0)
         if( fOnCounts[i_run][j] > 0 )
         {
-            a = fOnCounts[i_run][j] * log( i_myModel[i_run][j] + fRunList[i_run].alpha* i_myvOffMLE[i_run][j] );
+            a = fOnCounts[i_run][j] * log( i_myModel[i_run][j] + fRunList[i_run].alpha * i_myvOffMLE[i_run][j] );
         }
 
         else
@@ -1836,7 +1836,7 @@ double VLikelihoodFitter::getLogL_internal( const double* parms )
 
             if( i_total_On[j] >= 1 )
             {
-                a = i_total_On[j] * TMath::Log( i_total_Model[j] + i_mean_alpha* i_total_ModelOff[j] );
+                a = i_total_On[j] * TMath::Log( i_total_Model[j] + i_mean_alpha * i_total_ModelOff[j] );
             }
 
             // 0*log(0)
@@ -2071,7 +2071,7 @@ double VLikelihoodFitter::calculateIntrinsicSpectrum( Double_t* x, Double_t* par
         fModel_intrinsic->SetParameter( i, parm[i] );
     }
     // Returning dNdE * exp (- tau)
-    return fModel_intrinsic->Eval( x[0] ) * TMath::Exp(-1 * fEBLOpacityGraph->Eval( TMath::Power( 10, x[0] ) ) );
+    return fModel_intrinsic->Eval( x[0] ) * TMath::Exp( -1 * fEBLOpacityGraph->Eval( TMath::Power( 10, x[0] ) ) );
 
 }
 
@@ -2188,11 +2188,11 @@ TGraphAsymmErrors* VLikelihoodFitter::calculateConfidenceInterval( double* i_cov
             // log^2(E/E0) * errAlpha^2
             i_flux_err += TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * i_covmat[ 4 ];
             // (E/E0) * log^2(E/E0) * errBeta
-            i_flux_err += TMath::Power( TMath::Power( 10., i_energy ) / fENorm* TMath::Log( TMath::Power( 10., i_energy ) / fENorm ), 2 ) * i_covmat[ 8 ];
+            i_flux_err += TMath::Power( TMath::Power( 10., i_energy ) / fENorm * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ), 2 ) * i_covmat[ 8 ];
             // 2 * log(E/E0) * cov_N_Alpha / N
             i_flux_err += -2. * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * i_covmat[ 1 ] /  i_fitfunction->GetParameter( 0 );
             // 2 * (E/E0) log(E/E0) * cov_N_Beta / N
-            i_flux_err += -2. * ( TMath::Power( 10., i_energy ) / fENorm* TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) ) * i_covmat[ 2 ] /  i_fitfunction->GetParameter( 0 );
+            i_flux_err += -2. * ( TMath::Power( 10., i_energy ) / fENorm * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) ) * i_covmat[ 2 ] /  i_fitfunction->GetParameter( 0 );
             // 2 * log^2(E/E0) * (E/E0) * cov_Alpha_Beta
             i_flux_err += 2. * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * TMath::Log( TMath::Power( 10., i_energy ) / fENorm ) * TMath::Power( 10., i_energy ) / fENorm * i_covmat[ 5 ] ;
 
@@ -2295,7 +2295,7 @@ float* VLikelihoodFitter::getSpectralPoint( double BinMin, double BinMax, double
     // Initial guess is set to the model evaluated at normalization energy
     // Print status of 0 (quiet)
     // Spectral shape parameters are frozen (true)
-    if(!initializeMinimizer( iBestFit->Eval( ifENorm ), 0,  true ) )
+    if( !initializeMinimizer( iBestFit->Eval( ifENorm ), 0,  true ) )
     {
         cout << "VLikelihoodFitter::getSpectralPoint minimizer initialization failed."
              << endl << "\t Please run VLikelihoodFitter::getLikelihoodFit() " << endl;
@@ -2345,7 +2345,7 @@ float* VLikelihoodFitter::getSpectralPoint( double BinMin, double BinMax, double
 
     // Fit details are saved if the fit is valid
     // If the fit isn't valid, the details are only outputted if bPrintAll == True
-    if(( fMinimizer->Status() != 0 ) && !bPrintAll )
+    if( ( fMinimizer->Status() != 0 ) && !bPrintAll )
     {
         return 0;
     }
@@ -2398,7 +2398,7 @@ float* VLikelihoodFitter::getSpectralPoint( double BinMin, double BinMax, double
     // Saving some useful information
     fSpectralPoint_FitStatus.push_back( fMinimizer->Status() );
     fSpectralPoint_TS.push_back( getBinTS( i_onTotal, i_offTotal, i_mean_alpha ) );
-    fSpectralPoint_likelihood_max.push_back(-1 * fMinimizer->MinValue() );
+    fSpectralPoint_likelihood_max.push_back( -1 * fMinimizer->MinValue() );
 
     return iFluxPoint;
 }
@@ -2411,7 +2411,7 @@ TGraph* VLikelihoodFitter::getContours( unsigned int i, unsigned int j )
 {
 
     // Checking the parameters are in the acceptable range
-    if(( i >= fNParms ) || ( j >= fNParms ) )
+    if( ( i >= fNParms ) || ( j >= fNParms ) )
     {
         cout << "VLikelihoodFitter::getContours invalid search parameters: "
              << "\n\ti :" << i << " , j:" << j
@@ -2600,7 +2600,7 @@ TGraphAsymmErrors* VLikelihoodFitter::getEnergySpectrum( TF1* iBestFit, bool bPr
     // Clear previous fit details
     clearSpectralPoints();
     // Checking parameters (note expecting 1 - nPar for broken pwl)
-    if(( iBestFit->GetNpar() != ( int )fNParms )  && ( fModelID != 6 ) )
+    if( ( iBestFit->GetNpar() != ( int )fNParms )  && ( fModelID != 6 ) )
     {
         cout << "VLikelihoodFitter::getEnergySpectrum Error invalid number of parameters!\n"
              << "\t\tExpected: " << fNParms << endl
@@ -2635,7 +2635,7 @@ TGraphAsymmErrors* VLikelihoodFitter::getEnergySpectrum( TF1* iBestFit, bool bPr
     {
         // Excluding bins outside of the minimum and maximum energy range
         // if ( ( fEnergyBins[i] < iGlobalMin ) ||   (fEnergyBins[i] > iGlobalMax || fEnergyBins[i+1] > iGlobalMax)  )
-        if(( fEnergyBins[i] < iGlobalMin ) || ( fEnergyBins[i] > iGlobalMax ) )
+        if( ( fEnergyBins[i] < iGlobalMin ) || ( fEnergyBins[i] > iGlobalMax ) )
         {
             continue;
         }
@@ -2723,7 +2723,7 @@ TCanvas* VLikelihoodFitter::getTotalCountsPlots()
     for( unsigned int i = 0 ; i < i_vOffMLE[0].size(); i++ )
     {
 
-        i_vModelOnCounts[i] = ( i_vModelTotal[i]  + i_mean_alpha* i_vOffMLETotal[i] );
+        i_vModelOnCounts[i] = ( i_vModelTotal[i]  + i_mean_alpha * i_vOffMLETotal[i] );
 
         i_OnRes [i] = ( i_OnTotal[i] - i_vModelOnCounts[i] ) / i_vModelOnCounts[i];
         i_OffRes [i] =	( i_OffTotal[i] - i_vOffMLETotal[i] ) / i_vOffMLETotal[i];
@@ -2896,7 +2896,7 @@ TCanvas* VLikelihoodFitter::getTotalCountsPlots()
     i_gOnRes->SetTitle( "On Count Residuals" );
     i_gOnRes->GetXaxis()->SetTitle( "log(Energy) [TeV]" );
     i_gOnRes->GetYaxis()->SetTitle( "(Counts - Model) / Model" );
-    i_gOnRes->GetYaxis()->SetRangeUser(-2, 2 );
+    i_gOnRes->GetYaxis()->SetRangeUser( -2, 2 );
 
     i_gOnRes->SetMarkerStyle( 8 );
     i_gOnRes->SetMarkerSize( 1.0 );
@@ -2915,7 +2915,7 @@ TCanvas* VLikelihoodFitter::getTotalCountsPlots()
     i_gOffRes->SetTitle( "Off Count Residuals" );
     i_gOffRes->GetXaxis()->SetTitle( "log(Energy) [TeV]" );
     i_gOffRes->GetYaxis()->SetTitle( "(Counts - Model) / Model" );
-    i_gOffRes->GetYaxis()->SetRangeUser(-2, 2 );
+    i_gOffRes->GetYaxis()->SetRangeUser( -2, 2 );
 
     i_gOffRes->SetMarkerStyle( 8 );
     i_gOffRes->SetMarkerSize( 1.0 );
@@ -3014,7 +3014,7 @@ TCanvas* VLikelihoodFitter::getRunPlots( unsigned int i_Entry )
 
     for( unsigned int i = 0; i < fOffCounts[i_Entry].size(); i++ )
     {
-        i_vExcess.push_back( fOnCounts[i_Entry][i] - fRunList[i_Entry].alpha* fOffCounts[i_Entry][i] );
+        i_vExcess.push_back( fOnCounts[i_Entry][i] - fRunList[i_Entry].alpha * fOffCounts[i_Entry][i] );
     }
 
     TGraphAsymmErrors* i_gExcess = new TGraphAsymmErrors( fEnergyBinCentres.size(), &( fEnergyBinCentres[0] ), &( i_vExcess[0] ) );
@@ -3104,7 +3104,7 @@ float* VLikelihoodFitter::getIntegralFlux( double i_EMin, double i_EMax, TF1* i_
 
 
     // Calculating Error
-    i_flux[1] = sqrt( a* a* i_Model->GetParError( 0 ) * i_Model->GetParError( 0 ) + ( b + c + d ) * ( b + c + d ) *  i_Model->GetParError( 1 ) * i_Model->GetParError( 1 ) );
+    i_flux[1] = sqrt( a * a * i_Model->GetParError( 0 ) * i_Model->GetParError( 0 ) + ( b + c + d ) * ( b + c + d ) *  i_Model->GetParError( 1 ) * i_Model->GetParError( 1 ) );
 
 
 
@@ -3138,8 +3138,8 @@ double VLikelihoodFitter::getBinTS( double i_on, double i_off, double i_alpha )
     double i_a = 0;
     double i_b = 0;
 
-    i_a = i_on * TMath::Log(( 1. + i_alpha ) * i_on / ( i_alpha * ( i_on + i_off ) ) );
-    i_b = i_off * TMath::Log(( 1. + i_alpha ) * i_off / (( i_on + i_off ) ) );
+    i_a = i_on * TMath::Log( ( 1. + i_alpha ) * i_on / ( i_alpha * ( i_on + i_off ) ) );
+    i_b = i_off * TMath::Log( ( 1. + i_alpha ) * i_off / ( ( i_on + i_off ) ) );
 
     return 2.*( i_a + i_b );
 
@@ -3378,7 +3378,7 @@ double VLikelihoodFitter::getVariabilityIndex( double i_delT, TF1* i_bestFit, do
     }
 
     // Checking for null pointers
-    if(!i_bestFit )
+    if( !i_bestFit )
     {
         cout << "VLikeLihoodFitter::getVariabilityIndex null pointer passed as i_bestFit"
              << "\n\tExpected TF1* of best fit parameters" << endl;
@@ -3399,7 +3399,7 @@ double VLikelihoodFitter::getVariabilityIndex( double i_delT, TF1* i_bestFit, do
 
 
     // Setting data binning
-    int i_nBins = int( round(( i_mjdMax - i_mjdMin ) / i_delT ) );
+    int i_nBins = int( round( ( i_mjdMax - i_mjdMin ) / i_delT ) );
     fVarIndexTimeBins.clear();
     fVarIndexTimeBins.assign( i_nBins + 1, 0 );
     // Local Copy
@@ -3467,7 +3467,7 @@ double VLikelihoodFitter::getVariabilityIndex( double i_delT, TF1* i_bestFit, do
         }
 
         // Bin index for this MJD
-        int ibin = int(( fRunList[i].MJD - i_mjdMin ) / i_delT );
+        int ibin = int( ( fRunList[i].MJD - i_mjdMin ) / i_delT );
 
         fNRunsInBin[ibin]++;
         i_NRunsInBin[ibin]++;
@@ -3601,7 +3601,7 @@ double VLikelihoodFitter::getVariabilityIndex( double i_delT, TF1* i_bestFit, do
                 // Last two parameters are:
                 // epislon (default of 1.e-11 is too coarse)
                 // number of iterations (default is 100, playing it a bit safer)
-                ul = i_profile->GetX(-2.71 / 2, i_localFit->GetParameter( 0 ), i_localFit->GetParameter( 0 ) + n_mult* i_localFit->GetParError( 0 ),  1.e-15, 500 );
+                ul = i_profile->GetX( -2.71 / 2, i_localFit->GetParameter( 0 ), i_localFit->GetParameter( 0 ) + n_mult * i_localFit->GetParError( 0 ),  1.e-15, 500 );
                 n_mult += 1.;
 
                 delete i_profile;
@@ -3885,7 +3885,7 @@ float VLikelihoodFitter::getSignificance()
     for( unsigned int i = 0; i < i_total_On.size(); i++ )
     {
         // Fit min/max
-        if(( fEnergyBinCentres[i] < fFitMin_logTeV ) || ( fEnergyBinCentres[i] > fFitMax_logTeV ) )
+        if( ( fEnergyBinCentres[i] < fFitMin_logTeV ) || ( fEnergyBinCentres[i] > fFitMax_logTeV ) )
         {
             continue;
         }

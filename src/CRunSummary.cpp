@@ -23,7 +23,7 @@ CRunSummary::~CRunSummary()
 Int_t CRunSummary::GetEntry( Long64_t entry )
 {
     // Read contents of entry.
-    if(!fChain )
+    if( !fChain )
     {
         return 0;
     }
@@ -34,7 +34,7 @@ Int_t CRunSummary::GetEntry( Long64_t entry )
 Long64_t CRunSummary::LoadTree( Long64_t entry )
 {
     // Set the environment to read one entry
-    if(!fChain )
+    if( !fChain )
     {
         return -5;
     }

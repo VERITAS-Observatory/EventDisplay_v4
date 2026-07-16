@@ -79,7 +79,7 @@ bool VSimpleStereoReconstructor::reconstruct_direction( unsigned int i_ntel,
     fTelAzimuth   = iArrayAzimuth;
 
     // make sure that all data arrays exist
-    if(!img_size || !img_cen_x || !img_cen_y
+    if( !img_size || !img_cen_x || !img_cen_y
             || !img_cosphi || !img_sinphi
             || !img_width || !img_length
             || !img_weight )
@@ -184,7 +184,7 @@ bool VSimpleStereoReconstructor::reconstruct_direction( unsigned int i_ntel,
             }
             else
             {
-                fmean_iangdiff += ( 180. - iangdiff* TMath::RadToDeg() );
+                fmean_iangdiff += ( 180. - iangdiff * TMath::RadToDeg() );
             }
             fmean_iangdiffN++;
 
@@ -271,7 +271,7 @@ bool VSimpleStereoReconstructor::reconstruct_direction( unsigned int i_ntel,
     // do not continue with core reconstruction in case there is no valid
     // direction reconstruction
     // (y sign flip!)
-    if(!fillShowerDirection( fShower_Xoffset, -1.*fShower_Yoffset ) )
+    if( !fillShowerDirection( fShower_Xoffset, -1.*fShower_Yoffset ) )
     {
         return false;
     }
@@ -316,7 +316,7 @@ bool VSimpleStereoReconstructor::reconstruct_core( unsigned int i_ntel,
     iShowerDir_ys *= -1.;
 
     // make sure that all data arrays exist
-    if(!img_size || !img_cen_x || !img_cen_y
+    if( !img_size || !img_cen_x || !img_cen_y
             || !img_cosphi || !img_sinphi
             || !img_width || !img_length
             || !img_weight )
@@ -330,8 +330,8 @@ bool VSimpleStereoReconstructor::reconstruct_core( unsigned int i_ntel,
     ////////////////////////////////////////////////
 
     // calculated telescope positions in shower coordinates
-    float i_xcos = sin(( 90. - fTelElevation ) / TMath::RadToDeg() ) * sin(( fTelAzimuth - 180. ) / TMath::RadToDeg() );
-    float i_ycos = sin(( 90. - fTelElevation ) / TMath::RadToDeg() ) * cos(( fTelAzimuth - 180. ) / TMath::RadToDeg() );
+    float i_xcos = sin( ( 90. - fTelElevation ) / TMath::RadToDeg() ) * sin( ( fTelAzimuth - 180. ) / TMath::RadToDeg() );
+    float i_ycos = sin( ( 90. - fTelElevation ) / TMath::RadToDeg() ) * cos( ( fTelAzimuth - 180. ) / TMath::RadToDeg() );
     float i_xrot, i_yrot, i_zrot = 0.;
 
     float ximp = 0.;
@@ -370,7 +370,7 @@ bool VSimpleStereoReconstructor::reconstruct_core( unsigned int i_ntel,
             }
             if( i_cenx != 0. )
             {
-                m.push_back(-1. * i_ceny / i_cenx );
+                m.push_back( -1. * i_ceny / i_cenx );
             }
             else
             {
@@ -379,7 +379,7 @@ bool VSimpleStereoReconstructor::reconstruct_core( unsigned int i_ntel,
             // image weight
             iweight = img_size[i];
             iweight *= ( 1. - img_width[i] / img_length[i] );
-            w.push_back( iweight* iweight );
+            w.push_back( iweight * iweight );
         }
     }
     // check minimum angle between image lines; ignore if too small
@@ -431,11 +431,11 @@ bool VSimpleStereoReconstructor::fillShowerDirection( float xoff, float yoff )
 
     double el = 0.;
     double az = 0.;
-    VAstronometry::vlaDtp2s(-1.* fShower_Xoffset* TMath::DegToRad(),
-                            fShower_Yoffset* TMath::DegToRad(),
-                            fTelAzimuth* TMath::DegToRad(),
-                            fTelElevation* TMath::DegToRad(),
-                            &az, &el );
+    VAstronometry::vlaDtp2s( -1.* fShower_Xoffset * TMath::DegToRad(),
+                             fShower_Yoffset * TMath::DegToRad(),
+                             fTelAzimuth * TMath::DegToRad(),
+                             fTelElevation * TMath::DegToRad(),
+                             &az, &el );
     if( TMath::IsNaN( el ) )
     {
         fShower_Ze = -99999.;
@@ -456,7 +456,7 @@ bool VSimpleStereoReconstructor::fillShowerDirection( float xoff, float yoff )
 bool VSimpleStereoReconstructor::fillShowerCore( float ximp, float yimp )
 {
     // check validity
-    if(!isfinite( ximp ) || !isfinite( yimp ) )
+    if( !isfinite( ximp ) || !isfinite( yimp ) )
     {
         fShower_Xcore = -99999.;
         fShower_Ycore = -99999.;
@@ -470,18 +470,18 @@ bool VSimpleStereoReconstructor::fillShowerCore( float ximp, float yimp )
     // calculate z in shower coordinates (for z=0 in ground coordinates)
     if( fShower_Ze != 0. )
     {
-        zimp = yimp / tan(( 90. - fShower_Ze ) * TMath::DegToRad() );
+        zimp = yimp / tan( ( 90. - fShower_Ze ) * TMath::DegToRad() );
     }
     // calculate direction cosinii
     // taking telescope plane as reference plane.
-    i_xcos = sin(( 90. - fTelElevation ) * TMath::DegToRad() )
-             * sin(( fTelAzimuth - 180. ) * TMath::DegToRad() );
+    i_xcos = sin( ( 90. - fTelElevation ) * TMath::DegToRad() )
+             * sin( ( fTelAzimuth - 180. ) * TMath::DegToRad() );
     if( fabs( i_xcos ) < 1.e-7 )
     {
         i_xcos = 0.;
     }
-    i_ycos = sin(( 90. - fTelElevation ) * TMath::DegToRad() )
-             * cos(( fTelAzimuth - 180. ) * TMath::DegToRad() );
+    i_ycos = sin( ( 90. - fTelElevation ) * TMath::DegToRad() )
+             * cos( ( fTelAzimuth - 180. ) * TMath::DegToRad() );
     if( fabs( i_ycos ) < 1.e-7 )
     {
         i_ycos = 0.;

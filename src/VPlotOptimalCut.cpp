@@ -13,7 +13,7 @@ VPlotOptimalCut::VPlotOptimalCut( string iFile )
         return;
     }
     fData = ( TTree* )fFile->Get( "topt" );
-    if(!fData )
+    if( !fData )
     {
         cout << "VPlotOptimalCut: error finding data tree in " << iFile << endl;
         return;
@@ -63,7 +63,7 @@ double VPlotOptimalCut::getCutValue( string iVariable, int iEntryNumber )
 
 void VPlotOptimalCut::plotHistograms( string iVariable, int i_opt_n, bool bPrint )
 {
-    if(!fFile )
+    if( !fFile )
     {
         return;
     }
@@ -79,7 +79,7 @@ void VPlotOptimalCut::plotHistograms( string iVariable, int i_opt_n, bool bPrint
 
     sprintf( hname, "hOn%s", iVariable.c_str() );
     TH1F* hon = ( TH1F* )fFile->Get( hname );
-    if(!hon )
+    if( !hon )
     {
         return;
     }
@@ -89,7 +89,7 @@ void VPlotOptimalCut::plotHistograms( string iVariable, int i_opt_n, bool bPrint
     hon->Draw();
     sprintf( hname, "hOff%s", iVariable.c_str() );
     TH1F* hoff = ( TH1F* )fFile->Get( hname );
-    if(!hoff )
+    if( !hoff )
     {
         return;
     }
@@ -144,7 +144,7 @@ void VPlotOptimalCut::plotHistograms( string iVariable, int i_opt_n, bool bPrint
 */
 void VPlotOptimalCut::plotOptimalCuts( string iVariable, int iSourceStrength, bool iMax, double size, double iMaxObs )
 {
-    if(!fData )
+    if( !fData )
     {
         return;
     }
@@ -157,7 +157,7 @@ void VPlotOptimalCut::plotOptimalCuts( string iVariable, int iSourceStrength, bo
     c->SetGridx( 0 );
     c->SetGridy( 0 );
     c->Draw();
-    if(!iMax )
+    if( !iMax )
     {
         sprintf( hname, "obs5sigma[%d]:%s_min", iSourceStrength, iVariable.c_str() );
     }
@@ -180,7 +180,7 @@ void VPlotOptimalCut::plotOptimalCuts( string iVariable, int iSourceStrength, bo
 
 int VPlotOptimalCut::findOptimalCut( int iSourceStrength, double size )
 {
-    if(!fData )
+    if( !fData )
     {
         return -1;
     }

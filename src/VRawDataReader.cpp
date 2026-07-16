@@ -44,7 +44,7 @@ bool VRawDataReader::getNextEvent()
     {
         try
         {
-            iStatus = fFileRead[i]->getNextEvent(*fEvent[i] );
+            iStatus = fFileRead[i]->getNextEvent( *fEvent[i] );
             if( fDebug )
             {
                 cout << "bool VRawDataReader::getNextEvent() status: " << iStatus << endl;
@@ -56,7 +56,7 @@ bool VRawDataReader::getNextEvent()
             return false;
         }
 
-        if(!iStatus )
+        if( !iStatus )
         {
             return false;
         }
@@ -67,7 +67,7 @@ bool VRawDataReader::getNextEvent()
             {
                 // ugly, but same data for all telescopes
                 iStatus = setSimulationData( fEvent[i] );
-                if(!iStatus )
+                if( !iStatus )
                 {
                     std::cout << "VRawDataReader::getNextEvent: no simulation bank found" << std::endl;
                 }

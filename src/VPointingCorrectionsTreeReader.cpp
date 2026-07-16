@@ -33,7 +33,7 @@ VPointingCorrectionsTreeReader::VPointingCorrectionsTreeReader( TChain* t )
 
 int VPointingCorrectionsTreeReader::getEntry( Long64_t iEntry )
 {
-    if(!fTree )
+    if( !fTree )
     {
         fEventStatus = 0;
         fPointingErrorX = 0.;
@@ -46,7 +46,7 @@ int VPointingCorrectionsTreeReader::getEntry( Long64_t iEntry )
 
 Long64_t VPointingCorrectionsTreeReader::getEntries()
 {
-    if(!fTree )
+    if( !fTree )
     {
         fEventStatus = 0;
         fPointingErrorX = 0.;

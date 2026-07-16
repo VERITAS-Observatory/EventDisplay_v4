@@ -38,7 +38,7 @@ namespace VUtilities
     // from http://stackoverflow.com/questions/2844817/how-do-i-check-if-a-c-string-is-an-int
     inline bool isInteger( const std::string& s )
     {
-        if( s.empty() || ((!isdigit( s[0] ) ) && ( s[0] != '-' ) && ( s[0] != '+' ) ) )
+        if( s.empty() || ( ( !isdigit( s[0] ) ) && ( s[0] != '-' ) && ( s[0] != '+' ) ) )
         {
             return false ;
         }
@@ -46,7 +46,7 @@ namespace VUtilities
         char* p ;
         strtol( s.c_str(), &p, 10 ) ;
 
-        return (*p == 0 ) ;
+        return ( *p == 0 ) ;
     }
 
     // friendlier colors

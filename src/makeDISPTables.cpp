@@ -60,7 +60,7 @@ bool readInputParameter( string i_filename )
 {
     ifstream is;
     is.open( i_filename.c_str(), ifstream::in );
-    if(!is )
+    if( !is )
     {
         cout << "no file found to read run parameters: " << i_filename << endl;
         exit( 0 );
@@ -83,13 +83,13 @@ bool readInputParameter( string i_filename )
             }
             // print runparameter to stdout
             cout << is_line << endl;
-            if(( is_stream >> std::ws ).eof() )
+            if( ( is_stream >> std::ws ).eof() )
             {
                 cout << "error reading runparameter file" << endl;
                 return false;
             }
             is_stream >> temp;
-            if(( is_stream >> std::ws ).eof() )
+            if( ( is_stream >> std::ws ).eof() )
             {
                 cout << "error reading runparameter file" << endl;
                 return false;
@@ -131,7 +131,7 @@ bool readInputParameter( string i_filename )
             }
             else if( temp == "ZENITHANGLE" )
             {
-                while(!( is_stream >> std::ws ).eof() )
+                while( !( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> temp;
                     f_ze.push_back( temp );
@@ -139,7 +139,7 @@ bool readInputParameter( string i_filename )
             }
             else if( temp == "WOBBLEOFFSET" )
             {
-                while(!( is_stream >> std::ws ).eof() )
+                while( !( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> temp;
                     f_woff.push_back( temp );
@@ -147,7 +147,7 @@ bool readInputParameter( string i_filename )
             }
             else if( temp == "NOISELEVEL" )
             {
-                while(!( is_stream >> std::ws ).eof() )
+                while( !( is_stream >> std::ws ).eof() )
                 {
                     is_stream >> temp;
                     f_noise.push_back( temp );
@@ -192,7 +192,7 @@ int main( int argc, char* argv[] )
     TStopwatch fStopWatch;
     fStopWatch.Start();
 
-    if(!readInputParameter( argv[1] ) )
+    if( !readInputParameter( argv[1] ) )
     {
         exit( 0 );
     }
@@ -208,8 +208,8 @@ int main( int argc, char* argv[] )
 
     // add four azimuth bins
     fDisp->addAzBin( 135., -135. );
-    fDisp->addAzBin(-135., -45. );
-    fDisp->addAzBin(-45., 45. );
+    fDisp->addAzBin( -135., -45. );
+    fDisp->addAzBin( -45., 45. );
     fDisp->addAzBin( 45., 135. );
 
     fDisp->setDataVectors( f_ze, f_woff, f_noise );

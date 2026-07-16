@@ -52,7 +52,7 @@ void VPlotCompareDataWithMC::help()
 
 void VPlotCompareDataWithMC::setAxisTitles( TH2D* h, string iS, int iTel )
 {
-    if(!h )
+    if( !h )
     {
         return;
     }
@@ -79,7 +79,7 @@ bool VPlotCompareDataWithMC::openDataFile( string ifile )
 
 void VPlotCompareDataWithMC::drawMatchingTests( TH1D* h1, TH1D* h2, double x_min, double x_max )
 {
-    if(!h1 || !h2 )
+    if( !h1 || !h2 )
     {
         return;
     }
@@ -117,7 +117,7 @@ void VPlotCompareDataWithMC::drawMatchingTests( TH1D* h1, TH1D* h2, double x_min
 
 void VPlotCompareDataWithMC::plotLegend( TH1D* hsims, TH1D* hdiff, double x0 )
 {
-    if(!hsims || !hdiff )
+    if( !hsims || !hdiff )
     {
         return;
     }
@@ -151,7 +151,7 @@ void VPlotCompareDataWithMC::setScalingMethod( int iScalingMethod )
 void VPlotCompareDataWithMC::getScaling( TH1D* h_sims, TH1D* h_diff, double& s_sims, double& s_diff,
         int iScalingMethod, double xmin, double xmax )
 {
-    if(!h_sims || !h_diff )
+    if( !h_sims || !h_diff )
     {
         return;
     }
@@ -285,7 +285,7 @@ void VPlotCompareDataWithMC::getScaling( double& s_sims, double& s_diff, string 
     TH1D* h_sims = ( TH1D* )fDataFile->Get( hname );
     sprintf( hname, "h%s_DIFF", his.c_str() );
     TH1D* h_diff = ( TH1D* )fDataFile->Get( hname );
-    if(!h_sims || !h_diff )
+    if( !h_sims || !h_diff )
     {
         cout << "NO SCALING POSSIBLE, no histograms " << h_sims << " " << h_diff << "\t( " << hname << ")" << endl;
         s_sims = 1.;
@@ -299,7 +299,7 @@ void VPlotCompareDataWithMC::getScaling( double& s_sims, double& s_diff, string 
 
 void VPlotCompareDataWithMC::setHistogramAtt( TH2D* his, double imin )
 {
-    if(!his )
+    if( !his )
     {
         return;
     }
@@ -316,7 +316,7 @@ void VPlotCompareDataWithMC::setHistogramAtt( TH1D* his, int icolor, double iwid
 {
     his->SetLineColor( icolor );
     his->SetMarkerColor( icolor );
-    his->SetLineWidth(( Width_t )iwidth );
+    his->SetLineWidth( ( Width_t )iwidth );
     his->SetMarkerSize( isize );
     if( imarker != 0 )
     {
@@ -334,7 +334,7 @@ void VPlotCompareDataWithMC::setHistogramAtt( TH1D* his, int icolor, double iwid
 
 TF1* VPlotCompareDataWithMC::do_theta2Fit( TH1D* h, int icolor, int istyle )
 {
-    if(!h )
+    if( !h )
     {
         return 0;
     }
@@ -364,7 +364,7 @@ TF1* VPlotCompareDataWithMC::do_theta2Fit( TH1D* h, int icolor, int istyle )
 
 void VPlotCompareDataWithMC::plotCummulativePlot( TH1D* h1, TH1D* h2, double xmin, double xmax, double iSystematicCutCheck, int iTelescope, bool iLeftToRight, double iBinValue )
 {
-    if(!h1 || !h2 )
+    if( !h1 || !h2 )
     {
         return;
     }
@@ -379,7 +379,7 @@ void VPlotCompareDataWithMC::plotCummulativePlot( TH1D* h1, TH1D* h2, double xmi
     }
     TH1D* hCumu_1 = VHistogramUtilities::get_Cumulative_Histogram( h1, true, iLeftToRight, iBinValue );
     TH1D* hCumu_2 = VHistogramUtilities::get_Cumulative_Histogram( h2, true, iLeftToRight, iBinValue );
-    if(!hCumu_1 || !hCumu_2 )
+    if( !hCumu_1 || !hCumu_2 )
     {
         return;
     }
@@ -421,7 +421,7 @@ void VPlotCompareDataWithMC::plotCummulativePlot( TH1D* h1, TH1D* h2, double xmi
 
 void VPlotCompareDataWithMC::plotRelativePlot( TH1D* h1, TH1D* h2, double xmin, double xmax, int iTelescope )
 {
-    if(!h1 || !h2 )
+    if( !h1 || !h2 )
     {
         return;
     }
@@ -462,7 +462,7 @@ void VPlotCompareDataWithMC::plotRelativePlot( TH1D* h1, TH1D* h2, double xmin, 
 
 TCanvas* VPlotCompareDataWithMC::plotRelativePlots( char* i_CanvasName, char* i_CanvasTitle, TH1D* h1, TH1D* h2, double xmin, double xmax )
 {
-    if(!h1 || !h2 )
+    if( !h1 || !h2 )
     {
         return 0;
     }
@@ -500,7 +500,7 @@ TCanvas* VPlotCompareDataWithMC::plotRelativePlots( char* i_CanvasName, char* i_
  */
 void VPlotCompareDataWithMC::multiplicity_plots()
 {
-    if(!fDataFile )
+    if( !fDataFile )
     {
         return;
     }
@@ -533,7 +533,7 @@ void VPlotCompareDataWithMC::multiplicity_plots()
     TH1D* hImgSel_SIMS = ( TH1D* )fDataFile->Get( "hImgSel_SIMS" );
     TH1D* hImgSel_DIFF = ( TH1D* )fDataFile->Get( "hImgSel_DIFF" );
 
-    if(!hNImages_SIMS || !hNImages_DIFF || !hImgSel_SIMS || !hImgSel_DIFF )
+    if( !hNImages_SIMS || !hNImages_DIFF || !hImgSel_SIMS || !hImgSel_DIFF )
     {
         cout << hNImages_SIMS << "\t" << hNImages_DIFF << "\t" << hImgSel_SIMS << "\t" << hImgSel_DIFF << endl;
         return;
@@ -613,7 +613,7 @@ void VPlotCompareDataWithMC::multiplicity_plots()
 */
 TCanvas* VPlotCompareDataWithMC::plot_singleCanvas( string iHistoName, string iCanvasTitle, double iHistoXAxisMax, string iScalingVariable )
 {
-    if(!fDataFile )
+    if( !fDataFile )
     {
         return 0;
     }
@@ -637,7 +637,7 @@ TCanvas* VPlotCompareDataWithMC::plot_singleCanvas( string iHistoName, string iC
     sprintf( hname, "%s_DIFF", iHistoName.c_str() );
     TH1D* hHistogram_DIFF = ( TH1D* )fDataFile->Get( hname );
 
-    if(!hHistogram_SIMS || !hHistogram_DIFF )
+    if( !hHistogram_SIMS || !hHistogram_DIFF )
     {
         return 0;
     }
@@ -682,7 +682,7 @@ TCanvas* VPlotCompareDataWithMC::emission_height( double iEmissionHeightMax )
 
 void VPlotCompareDataWithMC::widthlength_vs_energy_plots( int iTelescope, int iRebin, double xmin, double xmax )
 {
-    if(!fDataFile )
+    if( !fDataFile )
     {
         return;
     }
@@ -702,7 +702,7 @@ void VPlotCompareDataWithMC::widthlength_vs_energy_plots( int iTelescope, int iR
 */
 void VPlotCompareDataWithMC::msc_vs_energy_plots( int iRebin, double xmin, double xmax, double iSystematicCutCheck )
 {
-    if(!fDataFile )
+    if( !fDataFile )
     {
         return;
     }
@@ -722,7 +722,7 @@ void VPlotCompareDataWithMC::msc_vs_energy_plots( int iRebin, double xmin, doubl
 */
 void VPlotCompareDataWithMC::mva_vs_energy_plots( int iRebin, double xmin, double xmax, double iSystematicCutCheck )
 {
-    if(!fDataFile )
+    if( !fDataFile )
     {
         return;
     }
@@ -739,7 +739,7 @@ void VPlotCompareDataWithMC::mva_vs_energy_plots( int iRebin, double xmin, doubl
  */
 void VPlotCompareDataWithMC::erecRatio_vs_energy_plots( int iTelescope, int iRebin, double xmin, double xmax )
 {
-    if(!fDataFile )
+    if( !fDataFile )
     {
         return;
     }
@@ -756,7 +756,7 @@ TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVari
         string iPlot, int iTelescope, double iSystematicCutCheck,
         string iXVariable, double y_min, bool iPlotLogY )
 {
-    if(!fDataFile )
+    if( !fDataFile )
     {
         return 0;
     }
@@ -809,7 +809,7 @@ TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVari
     }
     TH2D* h_diff = ( TH2D* )fDataFile->Get( hname );
 
-    if(!h_sims || !h_diff )
+    if( !h_sims || !h_diff )
     {
         return 0;
     }
@@ -859,7 +859,7 @@ TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVari
 
         hSims->SetAxisRange( x_min, x_max );
         hDiff->SetAxisRange( x_min, x_max );
-        if(!iPlotLogY )
+        if( !iPlotLogY )
         {
             hSims->SetMaximum( hSims->GetMaximum() * 1.8 );
         }
@@ -993,7 +993,7 @@ TCanvas* VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVari
  */
 TCanvas* VPlotCompareDataWithMC::stereo_parameter()
 {
-    if(!fDataFile )
+    if( !fDataFile )
     {
         return 0;
     }
@@ -1064,7 +1064,7 @@ TCanvas* VPlotCompareDataWithMC::stereo_parameter()
     hlt2_sims->Scale( s_sims );
     hlt2_diff->Scale( s_diff );
 
-    hlt2_sims->SetAxisRange(-5., -1. );
+    hlt2_sims->SetAxisRange( -5., -1. );
 
     cSD->cd( 2 );
     gPad->SetLeftMargin( 0.14 );
@@ -1091,7 +1091,7 @@ TCanvas* VPlotCompareDataWithMC::stereo_parameter()
     TH1D* hmscw_diff = ( TH1D* )fDataFile->Get( "hMSCW_DIFF" );
     setHistogramAtt( hmscw_diff, 1, 1, 1, 25, 2 );
 
-    hmscw_sims->SetAxisRange(-1., 1. );
+    hmscw_sims->SetAxisRange( -1., 1. );
     getScaling( s_sims, s_diff, "MSCW", fScalingMethod, -0.5, 0.5 );
     if( hmscw_sims->GetEntries() > 0 )
     {
@@ -1132,7 +1132,7 @@ TCanvas* VPlotCompareDataWithMC::stereo_parameter()
     hmscl_diff->SetLineWidth( 3 );
     hmscl_diff->SetStats( 0 );
 
-    hmscl_sims->SetAxisRange(-1., 1. );
+    hmscl_sims->SetAxisRange( -1., 1. );
     getScaling( s_sims, s_diff, "MSCL", fScalingMethod, -0.75, 0.75 );
     if( hmscl_sims->GetEntries() > 0 )
     {
@@ -1180,7 +1180,7 @@ TCanvas* VPlotCompareDataWithMC::stereo_parameter()
 
 void VPlotCompareDataWithMC::mva_parameter()
 {
-    if(!fDataFile )
+    if( !fDataFile )
     {
         return;
     }
@@ -1213,7 +1213,7 @@ void VPlotCompareDataWithMC::mva_parameter()
     double error_sims = 0.;
     double error_diff = 0.;
 
-    hmva_sims->SetAxisRange(-1., 1. );
+    hmva_sims->SetAxisRange( -1., 1. );
     getScaling( s_sims, s_diff, "MVA", fScalingMethod, -0.75, 0.75 );
     if( hmva_sims->GetEntries() > 0 )
     {
@@ -1268,7 +1268,7 @@ void VPlotCompareDataWithMC::mva_parameter()
 
 TCanvas* VPlotCompareDataWithMC::core_plots( int iRebin )
 {
-    if(!fDataFile )
+    if( !fDataFile )
     {
         return 0;
     }
@@ -1302,8 +1302,8 @@ TCanvas* VPlotCompareDataWithMC::core_plots( int iRebin )
     TH1D* hXcore_diff = ( TH1D* )fDataFile->Get( "hXcore_DIFF" );
     setHistogramAtt( hXcore_diff, 1, 1, 1, 21, iRebin );
 
-    hXcore_sims->SetAxisRange(-250., 250. );
-    hXcore_on->SetAxisRange(-250., 250. );
+    hXcore_sims->SetAxisRange( -250., 250. );
+    hXcore_on->SetAxisRange( -250., 250. );
 
     double nSims = 0.;
     double nDiff = 0.;
@@ -1344,8 +1344,8 @@ TCanvas* VPlotCompareDataWithMC::core_plots( int iRebin )
     TH1D* hYcore_diff = ( TH1D* )fDataFile->Get( "hYcore_DIFF" );
     setHistogramAtt( hYcore_diff, 1, 1, 1, 21, iRebin );
 
-    hYcore_sims->SetAxisRange(-250., 250. );
-    hYcore_on->SetAxisRange(-250., 250. );
+    hYcore_sims->SetAxisRange( -250., 250. );
+    hYcore_on->SetAxisRange( -250., 250. );
 
     getScaling( nSims, nDiff, "Ycore", fScalingMethod );
     hYcore_diff->Scale( nDiff );
@@ -1476,7 +1476,7 @@ TCanvas* VPlotCompareDataWithMC::core_plots( int iRebin )
 void VPlotCompareDataWithMC::centroids()
 {
 
-    if(!fDataFile )
+    if( !fDataFile )
     {
         return;
     }
@@ -1546,7 +1546,7 @@ void VPlotCompareDataWithMC::centroids()
 */
 TCanvas* VPlotCompareDataWithMC::distance_plots()
 {
-    if(!fDataFile )
+    if( !fDataFile )
     {
         return 0;
     }
@@ -1762,7 +1762,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
         cout << "error: unknown plotting mode (allowed are SIMSDIFF, ONOFF, REL)" << endl;
         return 0;
     }
-    if(!fDataFile )
+    if( !fDataFile )
     {
         return 0;
     }
@@ -1832,17 +1832,17 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
     hname.push_back( "asym" );
     f_rebin.push_back( i_rebin );
     f_logy.push_back( 0 );
-    f_x_min.push_back(-2.0 );
+    f_x_min.push_back( -2.0 );
     f_x_max.push_back( 2.0 );
     hname.push_back( "cen_x" );
     f_rebin.push_back( i_rebin );
     f_logy.push_back( 0 );
-    f_x_min.push_back(-2.0 );
+    f_x_min.push_back( -2.0 );
     f_x_max.push_back( 2.0 );
     hname.push_back( "cen_y" );
     f_rebin.push_back( i_rebin );
     f_logy.push_back( 0 );
-    f_x_min.push_back(-2.0 );
+    f_x_min.push_back( -2.0 );
     f_x_max.push_back( 2.0 );
     hname.push_back( "ntubes" );
     f_rebin.push_back( 1 );
@@ -1867,7 +1867,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
     hname.push_back( "tgrad_x" );
     f_rebin.push_back( i_rebin );
     f_logy.push_back( 0 );
-    f_x_min.push_back(-7.5 );
+    f_x_min.push_back( -7.5 );
     f_x_max.push_back( 7.5 );
     hname.push_back( "pedvarT" );
     f_rebin.push_back( i_rebin );
@@ -1905,28 +1905,28 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
     {
         sprintf( hn, "h%s_%d_SIMS", hname[j].c_str(), telid );
         hsims = ( TH1D* )fDataFile->Get( hn );
-        if(!hsims )
+        if( !hsims )
         {
             cout << "sims histogram not found " << hn << endl;
             continue;
         }
         sprintf( hn, "h%s_%d_DIFF", hname[j].c_str(), telid );
         hdiff = ( TH1D* )fDataFile->Get( hn );
-        if(!hdiff )
+        if( !hdiff )
         {
             cout << "diff histogram not found " << hn << endl;
             continue;
         }
         sprintf( hn, "h%s_%d_ON", hname[j].c_str(), telid );
         hon = ( TH1D* )fDataFile->Get( hn );
-        if(!hon )
+        if( !hon )
         {
             cout << "on histogram not found " << hn << endl;
             continue;
         }
         sprintf( hn, "h%s_%d_OFF", hname[j].c_str(), telid );
         hoff = ( TH1D* )fDataFile->Get( hn );
-        if(!hoff )
+        if( !hoff )
         {
             cout << "off histogram not found " << hn << endl;
             continue;
@@ -1980,7 +1980,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
         //		iL = new TLegend( 0.80 , 0.80, 1.05, 1.05 );
 
         double iTitleOffset = 1.3;
-        if(!iOneCanvas )
+        if( !iOneCanvas )
         {
             iTitleOffset = 1.;
         }
@@ -2012,9 +2012,9 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
         }
 
         hdiff->SetYTitle( "number of shower [a.u.]" );
-        if(!f_logy[j] && hdiff->GetMinimum() < -5. )
+        if( !f_logy[j] && hdiff->GetMinimum() < -5. )
         {
-            hdiff->SetMinimum(-5. );
+            hdiff->SetMinimum( -5. );
         }
         if( f_logy[j] )
         {
@@ -2056,7 +2056,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
                 iL->AddEntry( hsims, cn, "pl" );
             }
 
-            if(!gPad->GetLogy() )
+            if( !gPad->GetLogy() )
             {
                 TLine* iL0 = new TLine( f_x_min[j], 0., f_x_max[j], 0. );
                 iL0->SetLineStyle( 2 );
@@ -2083,7 +2083,7 @@ TCanvas* VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool
         {
             hrel->Draw( "cle" );
         }
-        if(!fPlotPoster && iPlot != "REL" )
+        if( !fPlotPoster && iPlot != "REL" )
         {
             if( iL )
             {
@@ -2142,7 +2142,7 @@ void VPlotCompareDataWithMC::msc_plots( char* offFile, char* helium, char* proto
 {
     char hname[200];
 
-    if(!fDataFile )
+    if( !fDataFile )
     {
         return;
     }
@@ -2196,7 +2196,7 @@ void VPlotCompareDataWithMC::msc_plots( char* offFile, char* helium, char* proto
         hMSC_sims->SetXTitle( "mean scaled length" );
     }
     hMSC_sims->Draw( "e" );
-    TBox* iB = new TBox(-1.5, 0., 0.5,  hMSC_sims->GetMaximum() );
+    TBox* iB = new TBox( -1.5, 0., 0.5,  hMSC_sims->GetMaximum() );
     iB->SetFillColor( 5 );
     iB->SetFillStyle( 1001 );
     iB->SetFillColor( 18 );
@@ -2210,7 +2210,7 @@ void VPlotCompareDataWithMC::msc_plots( char* offFile, char* helium, char* proto
     if( offFile )
     {
         TFile* fOff = new TFile( offFile );
-        if(!fOff->IsZombie() )
+        if( !fOff->IsZombie() )
         {
             fOff->cd( "total/stereo/stereoParameterHistograms/" );
             if( ivar == "MSCW" )
@@ -2222,7 +2222,7 @@ void VPlotCompareDataWithMC::msc_plots( char* offFile, char* helium, char* proto
                 sprintf( hname, "hmscl_off" );
             }
             TH1D* hMSC_off_ana = ( TH1D* )gDirectory->Get( hname );
-            if(!hMSC_off_ana )
+            if( !hMSC_off_ana )
             {
                 cout << "histogram not found: " << hname << endl;
                 return;
@@ -2251,7 +2251,7 @@ void VPlotCompareDataWithMC::msc_plots( char* offFile, char* helium, char* proto
         hCR->Sumw2();
         hCR->SetStats( 0 );
         TFile* fH = new TFile( helium );
-        if(!fH->IsZombie() )
+        if( !fH->IsZombie() )
         {
             TTree* t = ( TTree* )gDirectory->Get( "data" );
             hHelium = new TH1D( "hHelium", "", nbins, -5., 15. );
@@ -2261,7 +2261,7 @@ void VPlotCompareDataWithMC::msc_plots( char* offFile, char* helium, char* proto
         }
         hHelium->SetStats( 0 );
         TFile* fP = new TFile( proton );
-        if(!fP->IsZombie() )
+        if( !fP->IsZombie() )
         {
             TTree* t = ( TTree* )gDirectory->Get( "data" );
             hProton = new TH1D( "hProton", "", nbins, -5., 15. );
@@ -2296,7 +2296,7 @@ void VPlotCompareDataWithMC::msc_plots( char* offFile, char* helium, char* proto
 */
 void VPlotCompareDataWithMC::mwr_vs_energy_plots( int iRebin, double xmin, double xmax, double iSystematicCutCheck )
 {
-    if(!fDataFile )
+    if( !fDataFile )
     {
         return;
     }

@@ -506,11 +506,11 @@ void VDeadPixelOrganizer::organize()
                 {
 
                     // load the variables describing the state and its duration
-                    state      = (*histIter ).state        ;
-                    begtimeMJD = (*histIter ).begtime.mjd  ;
-                    begtimeSec = (*histIter ).begtime.time ;
-                    endtimeMJD = (*histIter ).endtime.mjd  ;
-                    endtimeSec = (*histIter ).endtime.time ;
+                    state      = ( *histIter ).state        ;
+                    begtimeMJD = ( *histIter ).begtime.mjd  ;
+                    begtimeSec = ( *histIter ).begtime.time ;
+                    endtimeMJD = ( *histIter ).endtime.mjd  ;
+                    endtimeSec = ( *histIter ).endtime.time ;
 
                     // add it to our tree if the pixel duration is not functional
                     if( state != 0 )
