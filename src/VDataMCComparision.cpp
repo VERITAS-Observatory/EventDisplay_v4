@@ -139,6 +139,7 @@ VDataMCComparision::VDataMCComparision( string iname, int intel )
     fCuts = 0;
     fCalculateMVAValues = false;
     fEpochATM = "";
+    fXGBStereoFileSuffix = "";
 
     setStereoReconstructionMethod();
 
@@ -574,7 +575,14 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
     {
         cout << "\t reading simulations..." << endl;
     }
-    fData = new CData( iC, fName == "SIMS" );
+    if( fEnergyReconstructionMethod == 2 || fDirectionReconstructionMethod == 2 )
+    {
+        fData = new CData( iC, fName == "SIMS", false, ifile, fXGBStereoFileSuffix, "" );
+    }
+    else
+    {
+        fData = new CData( iC, fName == "SIMS" );
+    }
 
     int nentries =  fData->fChain->GetEntries();
     cout << "\t entries: " << nentries << " (" << fNTel << " telescopes)" << endl;
@@ -1271,7 +1279,15 @@ TH1D*  VDataMCComparision::getAzimuthWeightingHistogram( string ifile )
         cout << "exiting..." << endl;
         exit( EXIT_FAILURE );
     }
-    CData* tData = new CData( iC, fName == "SIMS" );
+    CData* tData = 0;
+    if( fEnergyReconstructionMethod == 2 || fDirectionReconstructionMethod == 2 )
+    {
+        tData = new CData( iC, fName == "SIMS", false, ifile, fXGBStereoFileSuffix, "" );
+    }
+    else
+    {
+        tData = new CData( iC, fName == "SIMS" );
+    }
     int nentries =  tData->fChain->GetEntries();
     cout << "Filling Az distributions for entries: " << nentries << endl;
     cout << "(requires loop over all ON files)" << endl;

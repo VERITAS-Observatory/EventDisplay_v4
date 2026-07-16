@@ -93,6 +93,7 @@ class VDataMCComparision
         // reconstruction methods
         unsigned int fEnergyReconstructionMethod;
         unsigned int fDirectionReconstructionMethod;
+        string fXGBStereoFileSuffix;
 
         // lists with all histograms
         TList* hisList;
@@ -151,6 +152,10 @@ class VDataMCComparision
         {
             fEnergyReconstructionMethod = iEnergyMethod;
             fDirectionReconstructionMethod = iDirectionMethod;
+        }
+        void setXGBStereoFileSuffix( string iFileSuffix = "" )
+        {
+            fXGBStereoFileSuffix = iFileSuffix;
         }
         bool setTelescopeCoordinates( double x, double y, double z = 0. );
         void setWobbleFromDataTree()

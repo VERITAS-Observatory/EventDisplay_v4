@@ -209,7 +209,8 @@ int main( int argc, char* argv[] )
         cout << endl;
         cout << endl;
         cout << "compareDatawithMC <input file list> <cut> <outputfile> ";
-        cout << "[BDT gamma/hadron cuts] [epoch_ATM] [shower max zenith angle (default=20deg)]" << endl;
+        cout << "[BDT gamma/hadron cuts] [epoch_ATM] [stereo reconstruction method] ";
+        cout << "[XGB stereo file suffix] [shower max zenith angle (default=20deg)]" << endl;
         cout << endl;
         cout << "\t input file list: see example file COMPAREMC.runparameter in the parameter files directory" << endl;
         cout << "\t cuts: " << endl;
@@ -224,6 +225,9 @@ int main( int argc, char* argv[] )
         cout << endl;
         cout << "\t use BDT cuts for gamma/hadron separation: 0 = no (default), 1 = yes" << endl;
         cout << "\t cut file needs to be indicated within VDataMCComparision::initialGammaHadronCuts()" << endl;
+        cout << endl;
+        cout << "\t stereo reconstruction method: 0 = default, 2 = XGB stereo" << endl;
+        cout << "\t XGB stereo file suffix: defaults to xgb_stereo for method 2" << endl;
         cout << endl;
         cout << "Note: most cuts are hardwired in VDataMCComparision::fillHistograms()" << endl;
         cout << endl;
@@ -249,8 +253,26 @@ int main( int argc, char* argv[] )
     }
     unsigned int fEnergyReconstructionMethod = 0;
     unsigned int fDirectionReconstructionMethod = 0;
+    if( argc > 6 )
+    {
+        fEnergyReconstructionMethod = atoi( argv[6] );
+        fDirectionReconstructionMethod = fEnergyReconstructionMethod;
+    }
+    string fXGBStereoFileSuffix = "";
+    if( fEnergyReconstructionMethod == 2 || fDirectionReconstructionMethod == 2 )
+    {
+        fXGBStereoFileSuffix = "xgb_stereo";
+    }
+    if( argc > 7 )
+    {
+        fXGBStereoFileSuffix = argv[7];
+    }
     cout << "Stereo reconstruction methods for energy: " << fEnergyReconstructionMethod;
     cout << ", direction: " << fDirectionReconstructionMethod << endl;
+    if( fEnergyReconstructionMethod == 2 || fDirectionReconstructionMethod == 2 )
+    {
+        cout << "XGB stereo file suffix: " << fXGBStereoFileSuffix << endl;
+    }
 
 
     // test number of telescopes
@@ -315,6 +337,7 @@ int main( int argc, char* argv[] )
         cout << "----" << endl;
         fStereoCompare.push_back( new VDataMCComparision( fInputData[i].fType, fInputData[i].fNTelescopes ) );
         fStereoCompare.back()->setStereoReconstructionMethod( fEnergyReconstructionMethod, fDirectionReconstructionMethod );
+        fStereoCompare.back()->setXGBStereoFileSuffix( fXGBStereoFileSuffix );
         if( fCalculateMVACut )
         {
             fStereoCompare.back()->setTMVABDTComparision( fEpochATM );
@@ -361,6 +384,7 @@ int main( int argc, char* argv[] )
     cout << "----" << endl;
     VDataMCComparision* fDiff = new VDataMCComparision( "DIFF", iNT );
     fDiff->setStereoReconstructionMethod( fEnergyReconstructionMethod, fDirectionReconstructionMethod );
+    fDiff->setXGBStereoFileSuffix( fXGBStereoFileSuffix );
     // assume 5 background regions
     fDiff->setOnOffHistograms( fStereoCompareOn, fStereoCompareOff, 1. / 5. );
     fDiff->writeHistograms( fOutputfile );
