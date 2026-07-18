@@ -18,8 +18,8 @@ RUN mkdir VBF && tar -xzf VBF-$VBF_VERSION.tar.gz -C VBF --strip-components=1 &&
     make && make install && make clean
 
 # Environment (build stage)
-ENV LD_LIBRARY_PATH="" \
-    VBFSYS=/opt/VBF \
+ENV LD_LIBRARY_PATH=""
+ENV VBFSYS=/opt/VBF \
     EVNDISPSYS=/opt/EventDisplay_v4 \
     SOFASYS=/opt/EventDisplay_v4/sofa \
     PATH=/opt/VBF/bin:$PATH \
@@ -48,6 +48,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Environment (runtime stage)
+ENV LD_LIBRARY_PATH=""
 ENV EVNDISPSYS=/opt/EventDisplay_v4 \
     VBFSYS=/opt/VBF \
     SOFASYS=/opt/EventDisplay_v4/sofa \
