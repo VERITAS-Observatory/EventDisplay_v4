@@ -1,4 +1,5 @@
 ARG ROOT_VERSION=6.38.00-ubuntu25.10
+ARG EVENTDISPLAY_ML_VERSION=3.2.0
 FROM rootproject/root:${ROOT_VERSION} AS build
 ARG VBF_VERSION=0.3.4
 ARG BUILD_BRANCH=main
@@ -33,6 +34,7 @@ WORKDIR /opt/EventDisplay_v4
 RUN ./install_sofa.sh && make -j"${NUM_CORES}" VTS
 
 FROM rootproject/root:${ROOT_VERSION}
+ARG EVENTDISPLAY_ML_VERSION
 WORKDIR /opt/
 COPY --from=build /opt/VBF /opt/VBF
 COPY --from=build /opt/EventDisplay_v4 /opt/EventDisplay_v4
@@ -40,11 +42,16 @@ COPY --from=build /opt/EventDisplay_v4 /opt/EventDisplay_v4
 LABEL maintainer.name="Eventdisplay Team" \
     maintainer.email="gernot.maier@desy.de"
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3-pip && \
+    python3 -m pip install --no-cache-dir --break-system-packages "eventdisplay-ml==${EVENTDISPLAY_ML_VERSION}" && \
+    rm -rf /var/lib/apt/lists/*
+
 # Environment (runtime stage)
 ENV EVNDISPSYS=/opt/EventDisplay_v4 \
     VBFSYS=/opt/VBF \
     SOFASYS=/opt/EventDisplay_v4/sofa \
-    PATH=/opt/VBF/bin:$PATH \
+    PATH=/usr/local/bin:/opt/VBF/bin:$PATH \
     LD_LIBRARY_PATH=/opt/EventDisplay_v4/obj:/opt/EventDisplay_v4/lib:$ROOTSYS/lib:/opt/VBF/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
     VERITAS_DATA_DIR=/opt/data \
     VERITAS_LOG_DIR=/opt/data \
