@@ -9,6 +9,32 @@ This changelog is generated using [Towncrier](https://towncrier.readthedocs.io/)
 
 <!-- towncrier release notes start -->
 
+## v492.0 (in development)
+
+### New Feature
+
+- Add machine-learning based stereo reconstruction, including XGBoost workflows, configurable direction/energy reconstruction methods, and improved DispBDT handling for truncated images. ([#318](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/318), [#322](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/322), [#339](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/339))
+- Add XGBoost-based gamma/hadron classification routines. ([#337](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/337))
+- Add 3-telescope reconstruction support for MC/IRF production, including recalculation of stereo quantities at `mscw_energy` level and new mean-scaled-variable handling. ([#289](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/289), [#293](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/293), [#299](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/299))
+- Extend `compareDatawithMC` to use XGB stereo friend trees and fill `theta` histograms. ([#362](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/362))
+- Add average-zenith based interpolation/reporting updates and a `--minpedestalevents` CLI option. ([#281](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/281), [#298](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/298), [#334](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/334), [#336](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/336))
+
+### Bugfixes
+
+- Fix several 3-telescope and stereo-reconstruction issues, including `Chi2` filling, image/telescope selection, `SizeSecondMax`, response-matrix binning, and direction/core validity checks. ([#289](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/289), [#299](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/299), [#362](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/362))
+- Fix an `anasum` crash on empty trees, limit repeated faulty-VBF error output, and apply the intended wobble-offset cut in MC rate calculations for BDT optimization. ([#286](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/286), [#298](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/298), [#314](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/314))
+- Fix raw sliding-window charge handling, guard XGB sidecar-file access for non-XGB jobs, and make TMVA negative-weight treatment explicit for gradient BDT angular training. ([#351](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/351), [#352](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/352), [#353](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/353))
+
+### Maintenance
+
+- Reduce storage footprint of `mscw_energy` and related output trees by about 25% and improve `mscw_energy` runtime by about 20%. ([#288](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/288), [#293](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/293), [#299](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/299))
+- Refactor tree-reader support classes from ROOT-generated `.C` files to maintained `.cpp` implementations, remove obsolete code/classes, and move ROOT macros to `./macros`. ([#289](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/289), [#299](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/299), [#330](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/330))
+- Update SOFA, ROOT 6.38 compatibility, CI workflows, docker/build setup, and introduce Towncrier-based changelog management. ([#284](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/284), [#300](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/300), [#307](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/307), [#317](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/317), [#323](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/323), [#358](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/358))
+
+### Documentation
+
+- Update installation and docker build documentation. ([#287](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/287), [#292](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/292))
+
 ## [v492-rc6](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases/tag/v492-rc6) - 2026-07-16
 
 ### New Feature
