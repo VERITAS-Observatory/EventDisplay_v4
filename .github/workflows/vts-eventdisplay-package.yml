@@ -45,7 +45,9 @@ jobs:
           fi
 
           if [[ "${{ github.event_name }}" == 'workflow_dispatch' ]]; then
-            echo "EVENTDISPLAY_ML_VERSION=${{ inputs.eventdisplay_ml_version }}" >> "$GITHUB_ENV"
+            if [[ -n "${{ inputs.eventdisplay_ml_version }}" ]]; then
+              echo "EVENTDISPLAY_ML_VERSION=${{ inputs.eventdisplay_ml_version }}" >> "$GITHUB_ENV"
+            fi
           fi
 
       - name: Log in to the Container registry
