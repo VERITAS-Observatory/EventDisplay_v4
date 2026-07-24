@@ -209,9 +209,9 @@ int main( int argc, char* argv[] )
         cout << endl;
         cout << endl;
         cout << "compareDatawithMC <input file list> <cut> <outputfile> ";
-        cout << "[BDT gamma/hadron cuts] [epoch_ATM] [stereo reconstruction method] ";
+        cout << "[BDT gamma/hadron cuts] [epoch_ATM] [energy reconstruction method] ";
         cout << "[XGB stereo file suffix] [shower max zenith angle (default=20deg)] ";
-        cout << "[theta2 cut in deg2; <=0 disables it]" << endl;
+        cout << "[theta2 cut in deg2; <=0 disables it] [direction reconstruction method]" << endl;
         cout << endl;
         cout << "\t input file list: see example file COMPAREMC.runparameter in the parameter files directory" << endl;
         cout << "\t cuts: " << endl;
@@ -228,7 +228,8 @@ int main( int argc, char* argv[] )
         cout << "\t use BDT cuts for gamma/hadron separation: 0 = no (default), 1 = yes" << endl;
         cout << "\t cut file needs to be indicated within VDataMCComparision::initialGammaHadronCuts()" << endl;
         cout << endl;
-        cout << "\t stereo reconstruction method: 0 = default, 2 = XGB stereo" << endl;
+        cout << "\t reconstruction methods: 0 = default, 2 = XGB stereo" << endl;
+        cout << "\t direction reconstruction method: optional final argument; defaults to the energy method" << endl;
         cout << "\t XGB stereo file suffix: defaults to xgb_stereo for method 2" << endl;
         cout << endl;
         cout << "Note: most cuts are hardwired in VDataMCComparision::fillHistograms()" << endl;
@@ -278,6 +279,15 @@ int main( int argc, char* argv[] )
     if( argc > 9 )
     {
         fTheta2Cut = atof( argv[9] );
+    }
+    if( argc > 10 )
+    {
+        fDirectionReconstructionMethod = atoi( argv[10] );
+    }
+    if( fXGBStereoFileSuffix.empty()
+            && ( fEnergyReconstructionMethod == 2 || fDirectionReconstructionMethod == 2 ) )
+    {
+        fXGBStereoFileSuffix = "xgb_stereo";
     }
     cout << "Stereo reconstruction methods for energy: " << fEnergyReconstructionMethod;
     cout << ", direction: " << fDirectionReconstructionMethod << endl;
@@ -330,6 +340,8 @@ int main( int argc, char* argv[] )
         if( fInputData[i].fType == "ON" )
         {
             VDataMCComparision iTemp( fInputData[i].fType, fInputData[i].fNTelescopes );
+            iTemp.setStereoReconstructionMethod( fEnergyReconstructionMethod, fDirectionReconstructionMethod );
+            iTemp.setXGBStereoFileSuffix( fXGBStereoFileSuffix );
             iTemp.setAzRange( fInputData[i].fAz_deg_min, fInputData[i].fAz_deg_max );
             iTemp.setZeRange( fInputData[i].fZe_deg_min, fInputData[i].fZe_deg_max );
             hAzOn = iTemp.getAzimuthWeightingHistogram( fInputData[i].fFileName );
