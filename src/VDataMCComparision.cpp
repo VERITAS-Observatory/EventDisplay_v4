@@ -290,6 +290,7 @@ VDataMCComparision::VDataMCComparision( string iname, int intel )
     fWobbleFromDataTree = false;
 
     setShowerMaximZe_deg();
+    setTheta2Cut();
 
     defineHistograms();
 }
@@ -626,15 +627,20 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
     double fCoreMax_QC = 350;        // cut on core distance
     int    fNImages_min = 2;         // minimum number of images per event
     // stereo cuts
-    double theta2_cut = 0.035; // 0.35;
+    double theta2_cut = 0.035;
     if( iSingleTelescopeCuts > 0 || iSingleTelescopeCuts == -2 )
     {
         theta2_cut = 0.2;
     }
     if( iSingleTelescopeCuts == -3 )
     {
-        theta2_cut = 0.035; //0.035;
+        theta2_cut = 0.035;
     }
+    if( fTheta2Cut >= 0. )
+    {
+        theta2_cut = fTheta2Cut;
+    }
+    bool applyTheta2Cut = theta2_cut > 0.;
 
     double theta2_min = 0.;
     double msw_max = 2.0;
@@ -727,7 +733,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
     {
         cout << " stereo cuts (hardwired)" << endl;
         cout << "\t " << msw_min << " < MSCW < " << msw_max << ", " << msl_min << " < MSCL < " << msl_max;
-        cout << ", theta2 < " << theta2_cut << " deg2" << endl;
+        cout << endl;
     }
     else if( fSingleTelescopeCuts == -2 )
     {
@@ -735,7 +741,14 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
     }
     else if( fSingleTelescopeCuts == -3 )
     {
-        cout << " Theta2 cut (<" << theta2_cut << " deg2),  ";
+        if( applyTheta2Cut )
+        {
+            cout << " Theta2 cut (<" << theta2_cut << " deg2),  ";
+        }
+        else
+        {
+            cout << " no theta2 cut,  ";
+        }
         cout << " Size2ndMax cut (>" << size2ndmax_min << ")" << endl;
     }
     else
@@ -930,7 +943,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
         /////////////////////////////////////////////////////////
         //   ---    apply theta2 cuts ---
         /////////////////////////////////////////////////////////
-        if( fSingleTelescopeCuts < -1 )
+        if( fSingleTelescopeCuts == -3 && applyTheta2Cut )
         {
             if( theta2 <= theta2_min || theta2 > theta2_cut )
             {
@@ -953,7 +966,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                 continue;
             }
             // wobble cut
-            if( fWobbleNorth != 0. || fWobbleEast != 0. )
+            if( ( fWobbleNorth != 0. || fWobbleEast != 0. ) && applyTheta2Cut )
             {
                 if( theta2 <= theta2_min || theta2 > theta2_cut )
                 {
