@@ -543,6 +543,11 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
             for( unsigned int t = 0; t < fMap->getTheta2_length(); t++ )
             {
                 fHisto[fHisCounter]->htheta2->Fill( fMap->getTheta2()[t], fMap->getTheta2_weigth()[t] );
+                if( iErec > 0. )
+                {
+                    fHisto[fHisCounter]->hthetaErec->Fill( log10( iErec ), sqrt( fMap->getTheta2()[t] ), fMap->getTheta2_weigth()[t] );
+                    fHisto[fHisCounter]->htheta2Erec->Fill( log10( iErec ), fMap->getTheta2()[t], fMap->getTheta2_weigth()[t] );
+                }
             }
             // fill theta for tree with selected events
             if( fMap->getTheta2_length() > 0 )

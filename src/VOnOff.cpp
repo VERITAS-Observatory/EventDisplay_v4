@@ -142,7 +142,7 @@ void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, d
         }
 
         // htheta2 histogram (note: calculated from one reflected region only!)
-        if( itemp.find( "htheta2" ) == 0 )
+        if( itemp == "htheta2_on" )
         {
             hTemp->Add( hon, hoff, 1., -1. );
             hTheta2_diff = ( TH1D* )hTemp;
