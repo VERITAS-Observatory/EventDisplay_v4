@@ -540,11 +540,15 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
             // theta2 ---
             fMap->calculateTheta2( fIsOn, i_xderot, i_yderot );
 
-            for( unsigned int t = 0; t < fMap->getTheta2_length(); t++ )
+            // Keep the one- and two-dimensional angular distributions on the
+            // same event selection. This makes ProjectionY() of htheta2Erec
+            // directly comparable to htheta2.
+            const bool bThetaEnergyRange = iErec >= 0.05 && iErec <= 100.;
+            if( bIsGamma && bThetaEnergyRange )
             {
-                fHisto[fHisCounter]->htheta2->Fill( fMap->getTheta2()[t], fMap->getTheta2_weigth()[t] );
-                if( iErec > 0. )
+                for( unsigned int t = 0; t < fMap->getTheta2_length(); t++ )
                 {
+                    fHisto[fHisCounter]->htheta2->Fill( fMap->getTheta2()[t], fMap->getTheta2_weigth()[t] );
                     fHisto[fHisCounter]->hthetaErec->Fill( log10( iErec ), sqrt( fMap->getTheta2()[t] ), fMap->getTheta2_weigth()[t] );
                     fHisto[fHisCounter]->htheta2Erec->Fill( log10( iErec ), fMap->getTheta2()[t], fMap->getTheta2_weigth()[t] );
                 }

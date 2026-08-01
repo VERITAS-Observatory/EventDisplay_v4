@@ -141,11 +141,18 @@ void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, d
             continue;
         }
 
-        // htheta2 histogram (note: calculated from one reflected region only!)
-        if( itemp == "htheta2_on" )
+        // Angular distributions are calculated from one reflected region only.
+        // Keep their ON-OFF subtraction consistent: applying the source-region
+        // alpha normalisation to the energy-resolved histograms would leave the
+        // nearly isotropic OFF population in hthetaErec/htheta2Erec, although it
+        // is removed from htheta2.
+        if( itemp == "htheta2_on" || itemp == "hthetaErec_on" || itemp == "htheta2Erec_on" )
         {
             hTemp->Add( hon, hoff, 1., -1. );
-            hTheta2_diff = ( TH1D* )hTemp;
+            if( itemp == "htheta2_on" )
+            {
+                hTheta2_diff = ( TH1D* )hTemp;
+            }
         }
         // energy histogram with x-axis in logE or linE
         else if( itemp.find( "herec" ) == 0 || itemp.find( "hLinerec" ) == 0 )
