@@ -392,7 +392,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     fEffArea->Branch( "Rec_seff_U", Rec_seff_U, "Rec_seff_U[Rec_nbins]/D" );
 
     fEffArea->Branch( "Rec_angRes_p68", Rec_angRes_p68, "Rec_angRes_p68[Rec_nbins]/F" );
-    fEffArea->Branch( "Rec_angRes_p80", Rec_angRes_p80, "Rec_angRes_p80[Rec_nbins]/F" );
+    fEffArea->Branch( "Rec_angRes_p95", Rec_angRes_p95, "Rec_angRes_p95[Rec_nbins]/F" );
 
     // For reconstructing the response matrices
     fEffArea->Branch( "nbins_ResMat", &nbins_ResMat, "nbins_ResMat/I" );
@@ -1131,7 +1131,7 @@ void VEffectiveAreaCalculator::multiplyByScatterArea( TGraphAsymmErrors* g )
 */
 void VEffectiveAreaCalculator::fillAngularResolution( unsigned int i_az, bool iContainment_95p )
 {
-    if( iContainment_95p && i_az < fGraph_AngularResolution68p.size() && fGraph_AngularResolution68p[i_az] )
+    if( iContainment_95p && i_az < fGraph_AngularResolution95p.size() && fGraph_AngularResolution95p[i_az] )
     {
         // get first and last energy bin
         double i_emin = 1.e5;
@@ -1154,7 +1154,7 @@ void VEffectiveAreaCalculator::fillAngularResolution( unsigned int i_az, bool iC
         {
             if( Rec_e0[i] > i_emin && Rec_e0[i] < i_emax )
             {
-                Rec_angRes_p80[i]  = fGraph_AngularResolution95p[i_az]->Eval( Rec_e0[i] );
+                Rec_angRes_p95[i]  = fGraph_AngularResolution95p[i_az]->Eval( Rec_e0[i] );
             }
         }
     }
@@ -1900,7 +1900,7 @@ void VEffectiveAreaCalculator::reset()
         ResMat_Rec[i] = 0.;
         ResMat_Rec_Err[i] = 0.;
         Rec_angRes_p68[i] = 0.;
-        Rec_angRes_p80[i] = 0.;
+        Rec_angRes_p95[i] = 0.;
 
     }
 
@@ -2533,7 +2533,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
                 Rec_eff_error[i] = 0.;
                 Rec_effNoTh2_error[i] = 0.;
                 Rec_angRes_p68[i] = 0.;
-                Rec_angRes_p80[i] = 0.;
+                Rec_angRes_p95[i] = 0.;
             }
             double x = 0.;
             double y = 0.;

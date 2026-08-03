@@ -373,7 +373,7 @@ void merge( vector< string > file_list,
     {
         f.SetBranchStatus( "Rec_effNoTh2", 1 );
         f.SetBranchStatus( "Rec_angRes_p68", 1 );
-        f.SetBranchStatus( "Rec_angRes_p80", 1 );
+        f.SetBranchStatus( "Rec_angRes_p95", 1 );
         // Full histograms for DL3
         f.SetBranchStatus( "hEsysMCRelative2D", 1 );
         f.SetBranchStatus( "hEsysMCRelative2DNoDirectionCut", 1 );

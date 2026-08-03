@@ -252,7 +252,7 @@ class VEffectiveAreaCalculator
         float Rec_effNoTh2_error[1000];
 
         float Rec_angRes_p68[1000];
-        float Rec_angRes_p80[1000];
+        float Rec_angRes_p95[1000];
 
         // H2F effective area tree
         float fH2F_e0_esys[1000];
