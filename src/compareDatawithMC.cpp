@@ -211,7 +211,7 @@ int main( int argc, char* argv[] )
         cout << "compareDatawithMC <input file list> <cut> <outputfile> ";
         cout << "[BDT gamma/hadron cuts] [epoch_ATM] [energy reconstruction method] ";
         cout << "[XGB stereo file suffix] [shower max zenith angle (default=20deg)] ";
-        cout << "[theta2 cut in deg2; <=0 disables it] [direction reconstruction method]" << endl;
+        cout << "[theta2 cut in deg2; <=0: use default] [direction reconstruction method]" << endl;
         cout << endl;
         cout << "\t input file list: see example file COMPAREMC.runparameter in the parameter files directory" << endl;
         cout << "\t cuts: " << endl;
