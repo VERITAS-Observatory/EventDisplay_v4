@@ -63,6 +63,8 @@ class VStereoHistograms
 
         // parameter histograms
         TH1D* htheta2;                            //!< Theta2 Histogram
+        TH2D* hthetaErec;                         //!< Theta vs reconstructed energy
+        TH2D* htheta2Erec;                        //!< Theta2 vs reconstructed energy
         TH1D* hmean_width;                        //!< Mean Width Histogram
         TH1D* hmean_length;                       //!< Mean Length Histogram
         TH1D* hmean_dist;                         //!< Mean Distance Histogram

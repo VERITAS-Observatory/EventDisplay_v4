@@ -117,6 +117,32 @@ void VStereoHistograms::defineHistograms()
     hListStereoParameterHistograms->Add( htheta2 );
     hListNameofParameterHistograms["htheta2"] = htheta2;
 
+    const double i_thetaErecMin = log10( 0.05 );
+    const double i_thetaErecMax = log10( 100. );
+    const int i_thetaErecBins = 33;
+
+    sprintf( i_key, "hthetaErec_%s", fHisSuffix.c_str() );
+    sprintf( i_name, "#theta vs reconstructed energy (%s)", fHisSuffix.c_str() );
+    hthetaErec = new TH2D( i_key, i_name, i_thetaErecBins, i_thetaErecMin, i_thetaErecMax, 1000, 0., 1. );
+    hthetaErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
+    hthetaErec->SetYTitle( "#theta [deg]" );
+    hthetaErec->SetZTitle( "No. of Events" );
+    hisList->Add( hthetaErec );
+    hListParameterHistograms->Add( hthetaErec );
+    hListStereoParameterHistograms->Add( hthetaErec );
+    hListNameofParameterHistograms["hthetaErec"] = hthetaErec;
+
+    sprintf( i_key, "htheta2Erec_%s", fHisSuffix.c_str() );
+    sprintf( i_name, "#theta^{2} vs reconstructed energy (%s)", fHisSuffix.c_str() );
+    htheta2Erec = new TH2D( i_key, i_name, i_thetaErecBins, i_thetaErecMin, i_thetaErecMax, 2000, 0., 1. );
+    htheta2Erec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
+    htheta2Erec->SetYTitle( "#theta^{2} [deg^{2}]" );
+    htheta2Erec->SetZTitle( "No. of Events" );
+    hisList->Add( htheta2Erec );
+    hListParameterHistograms->Add( htheta2Erec );
+    hListStereoParameterHistograms->Add( htheta2Erec );
+    hListNameofParameterHistograms["htheta2Erec"] = htheta2Erec;
+
     sprintf( i_key, "hemiss_%s", fHisSuffix.c_str() );
     sprintf( i_name, "emission height Histogram (%s)", fHisSuffix.c_str() );
     hemiss = new TH1D( i_key, i_name, 500, 0., 500. );
