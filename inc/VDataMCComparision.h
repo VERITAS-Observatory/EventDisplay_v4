@@ -118,7 +118,7 @@ class VDataMCComparision
         // angle for shower max correction
         double fShowerMaxZe_deg;
 
-        // optional preselection in theta squared; a non-positive value disables it
+        // optional override for theta2 preselection; values >= 0 override defaults (0 disables the cut)
         double fTheta2Cut;
 
         void setEntries( TH1D* );
