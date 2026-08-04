@@ -216,7 +216,7 @@ int main( int argc, char* argv[] )
         cout << "\t input file list: see example file COMPAREMC.runparameter in the parameter files directory" << endl;
         cout << "\t cuts: " << endl;
         cout << "\t\t cut=-3:        theta2 cut only (default: theta2 < 0.035 deg2)" << endl;
-        cout << "\t\t                  use the optional theta2-cut argument <= 0 for no theta2 preselection" << endl;
+        cout << "\t\t                  use the optional theta2-cut argument 0 for no theta2 preselection" << endl;
         cout << "\t\t in most cases, the following cuts should not be used: " << endl;
         cout << "\t\t cut=-2:        no cuts" << endl;
         cout << "\t\t cut=-1:        stereo cuts (MSCW, etc.)" << endl;
