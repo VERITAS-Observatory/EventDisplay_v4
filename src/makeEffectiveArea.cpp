@@ -143,7 +143,7 @@ int main( int argc, char* argv[] )
         f_IRF_Name.push_back( "angular_resolution" );
         f_IRF_Type.push_back( "angular_resolution" );
         f_IRF_ContainmentProbability.push_back( 0.68 );
-        // 80% angular resolution file
+        // 95% angular resolution file
         f_IRF_Name.push_back( "angular_resolution_095p" );
         f_IRF_Type.push_back( "angular_resolution" );
         f_IRF_ContainmentProbability.push_back( 0.95 );

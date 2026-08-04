@@ -118,6 +118,9 @@ class VDataMCComparision
         // angle for shower max correction
         double fShowerMaxZe_deg;
 
+        // optional override for theta2 preselection; values >= 0 override defaults (0 disables the cut)
+        double fTheta2Cut;
+
         void setEntries( TH1D* );
         void setEntries( TH2D* );
 
@@ -148,6 +151,10 @@ class VDataMCComparision
         void setShowerMaximZe_deg( double iZe = 20. )
         {
             fShowerMaxZe_deg = iZe;
+        }
+        void setTheta2Cut( double iTheta2Cut = -1. )
+        {
+            fTheta2Cut = iTheta2Cut;
         }
         void   setStereoReconstructionMethod( unsigned int iEnergyMethod = 0, unsigned int iDirectionMethod = 0 )
         {

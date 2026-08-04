@@ -209,12 +209,14 @@ int main( int argc, char* argv[] )
         cout << endl;
         cout << endl;
         cout << "compareDatawithMC <input file list> <cut> <outputfile> ";
-        cout << "[BDT gamma/hadron cuts] [epoch_ATM] [stereo reconstruction method] ";
-        cout << "[XGB stereo file suffix] [shower max zenith angle (default=20deg)]" << endl;
+        cout << "[BDT gamma/hadron cuts] [epoch_ATM] [energy reconstruction method] ";
+        cout << "[XGB stereo file suffix] [shower max zenith angle (default=20deg)] ";
+        cout << "[theta2 cut in deg2; <=0: use default] [direction reconstruction method]" << endl;
         cout << endl;
         cout << "\t input file list: see example file COMPAREMC.runparameter in the parameter files directory" << endl;
         cout << "\t cuts: " << endl;
-        cout << "\t\t cut=-3:        theta2 cut only (RECOMMENDED CUT)" << endl;
+        cout << "\t\t cut=-3:        theta2 cut only (default: theta2 < 0.035 deg2)" << endl;
+        cout << "\t\t                  use the optional theta2-cut argument 0 for no theta2 preselection" << endl;
         cout << "\t\t in most cases, the following cuts should not be used: " << endl;
         cout << "\t\t cut=-2:        no cuts" << endl;
         cout << "\t\t cut=-1:        stereo cuts (MSCW, etc.)" << endl;
@@ -226,7 +228,8 @@ int main( int argc, char* argv[] )
         cout << "\t use BDT cuts for gamma/hadron separation: 0 = no (default), 1 = yes" << endl;
         cout << "\t cut file needs to be indicated within VDataMCComparision::initialGammaHadronCuts()" << endl;
         cout << endl;
-        cout << "\t stereo reconstruction method: 0 = default, 2 = XGB stereo" << endl;
+        cout << "\t reconstruction methods: 0 = default, 2 = XGB stereo" << endl;
+        cout << "\t direction reconstruction method: optional final argument; defaults to the energy method" << endl;
         cout << "\t XGB stereo file suffix: defaults to xgb_stereo for method 2" << endl;
         cout << endl;
         cout << "Note: most cuts are hardwired in VDataMCComparision::fillHistograms()" << endl;
@@ -267,11 +270,42 @@ int main( int argc, char* argv[] )
     {
         fXGBStereoFileSuffix = argv[7];
     }
+    double fShowerMaxZe_deg = 20.;
+    if( argc > 8 )
+    {
+        fShowerMaxZe_deg = atof( argv[8] );
+    }
+    double fTheta2Cut = -1.;
+    if( argc > 9 )
+    {
+        fTheta2Cut = atof( argv[9] );
+    }
+    if( argc > 10 )
+    {
+        fDirectionReconstructionMethod = atoi( argv[10] );
+    }
+    if( fXGBStereoFileSuffix.empty()
+            && ( fEnergyReconstructionMethod == 2 || fDirectionReconstructionMethod == 2 ) )
+    {
+        fXGBStereoFileSuffix = "xgb_stereo";
+    }
     cout << "Stereo reconstruction methods for energy: " << fEnergyReconstructionMethod;
     cout << ", direction: " << fDirectionReconstructionMethod << endl;
     if( fEnergyReconstructionMethod == 2 || fDirectionReconstructionMethod == 2 )
     {
         cout << "XGB stereo file suffix: " << fXGBStereoFileSuffix << endl;
+    }
+    cout << "Shower maximum zenith angle: " << fShowerMaxZe_deg << " deg" << endl;
+    if( fTheta2Cut >= 0. )
+    {
+        if( fTheta2Cut > 0. )
+        {
+            cout << "Theta2 cut: " << fTheta2Cut << " deg2" << endl;
+        }
+        else
+        {
+            cout << "Theta2 cut: disabled" << endl;
+        }
     }
 
 
@@ -306,6 +340,8 @@ int main( int argc, char* argv[] )
         if( fInputData[i].fType == "ON" )
         {
             VDataMCComparision iTemp( fInputData[i].fType, fInputData[i].fNTelescopes );
+            iTemp.setStereoReconstructionMethod( fEnergyReconstructionMethod, fDirectionReconstructionMethod );
+            iTemp.setXGBStereoFileSuffix( fXGBStereoFileSuffix );
             iTemp.setAzRange( fInputData[i].fAz_deg_min, fInputData[i].fAz_deg_max );
             iTemp.setZeRange( fInputData[i].fZe_deg_min, fInputData[i].fZe_deg_max );
             hAzOn = iTemp.getAzimuthWeightingHistogram( fInputData[i].fFileName );
@@ -338,6 +374,8 @@ int main( int argc, char* argv[] )
         fStereoCompare.push_back( new VDataMCComparision( fInputData[i].fType, fInputData[i].fNTelescopes ) );
         fStereoCompare.back()->setStereoReconstructionMethod( fEnergyReconstructionMethod, fDirectionReconstructionMethod );
         fStereoCompare.back()->setXGBStereoFileSuffix( fXGBStereoFileSuffix );
+        fStereoCompare.back()->setShowerMaximZe_deg( fShowerMaxZe_deg );
+        fStereoCompare.back()->setTheta2Cut( fTheta2Cut );
         if( fCalculateMVACut )
         {
             fStereoCompare.back()->setTMVABDTComparision( fEpochATM );
