@@ -27,7 +27,7 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
 
     // IRF histogram bin definition
     fBiasBin = 300;                       // Energy bias (bias bins)
-    fLogAngularBin = 100;                 // Angular resolution Log10 (bins)
+    fLogAngularBin = 200;                 // Angular resolution Log10 (bins)
     fResponseMatricesEbinning = 500;      // bins in the ResponseMatrices
     fhistoNEbins = fEnergyAxisBins_log10; // E binning (affects 2D histograms only)
 
